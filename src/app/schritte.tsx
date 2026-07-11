@@ -25,6 +25,8 @@ import {
   zeitpunktZuIso,
 } from "../model";
 import type { VokabularEintrag } from "../vokabulare/thw";
+import { THW_ORTSVERBAENDE } from "../vokabulare/thw-ov";
+import { stanFahrzeugVorbelegung } from "../vokabulare/thw-stan-fahrzeuge";
 import {
   FE_TEXT,
   ORG_OPTIONEN,
@@ -218,7 +220,14 @@ export function SchrittEinheit({ bogen, aendern }: SchrittProps) {
         <Feld titel="Einheitstyp">
           <VokabAuswahl
             wert={e.einheitsTyp}
-            aendern={(v) => setE({ einheitsTyp: v })}
+            aendern={(v) => {
+              // StAN-Fahrzeuge vorbelegen, solange noch keine Fahrzeuge erfasst sind
+              const vorbelegung = bogen.fahrzeuge.length === 0 ? stanFahrzeugVorbelegung(e.organisation, v) : [];
+              aendern({
+                einheit: { ...e, einheitsTyp: v },
+                ...(vorbelegung.length > 0 ? { fahrzeuge: vorbelegung } : {}),
+              });
+            }}
             tabelle={vokabularFuer(e.organisation, "einheitstyp")}
             platzhalter="z. B. Löschzug, SEG Sanität"
           />
@@ -246,7 +255,35 @@ export function SchrittEinheit({ bogen, aendern }: SchrittProps) {
           <Feld titel="Name">
             <input
               value={h.name}
-              onChange={(ev) => setE({ hierarchie: e.hierarchie.map((x, j) => (j === i ? { ...x, name: ev.target.value } : x)) })}
+              list={e.organisation === OrganisationsTyp.THW && h.bezeichnung.code === 1 ? "thw-ov-liste" : undefined}
+              onChange={(ev) => {
+                const name = ev.target.value;
+                // THW-OV-Ebene: bei exaktem Treffer im OV-Verzeichnis Kontaktdaten übernehmen.
+                const ov =
+                  e.organisation === OrganisationsTyp.THW && h.bezeichnung.code === 1
+                    ? THW_ORTSVERBAENDE.find((o) => o.name === name)
+                    : undefined;
+                setE({
+                  hierarchie: e.hierarchie.map((x, j) =>
+                    j === i
+                      ? ov
+                        ? { ...x, name, telefon: ov.telefon.replace(/\D/g, "") || undefined, email: ov.email || undefined }
+                        : { ...x, name }
+                      : x,
+                  ),
+                });
+              }}
+              onBlur={(ev) => {
+                // OV-Kürzel ("OODE") beim Verlassen des Felds zum vollen Eintrag auflösen.
+                if (!(e.organisation === OrganisationsTyp.THW && h.bezeichnung.code === 1)) return;
+                const ov = THW_ORTSVERBAENDE.find((o) => o.kurz === ev.target.value.trim().toUpperCase());
+                if (!ov) return;
+                setE({
+                  hierarchie: e.hierarchie.map((x, j) =>
+                    j === i ? { ...x, name: ov.name, telefon: ov.telefon.replace(/\D/g, "") || undefined, email: ov.email || undefined } : x,
+                  ),
+                });
+              }}
             />
           </Feld>
           <Feld titel="Telefon" schmal>
@@ -287,6 +324,14 @@ export function SchrittEinheit({ bogen, aendern }: SchrittProps) {
           </button>
         )}
       </p>
+      {e.organisation === OrganisationsTyp.THW && (
+        <datalist id="thw-ov-liste">
+          {THW_ORTSVERBAENDE.map((o) => (
+            // Label macht das OV-Kürzel sichtbar und mitsuchbar (Browser matchen auch darauf).
+            <option key={o.name} value={o.name}>{`${o.kurz} · ${o.plz} ${o.ort}`}</option>
+          ))}
+        </datalist>
+      )}
     </section>
   );
 }
@@ -651,9 +696,24 @@ function FahrzeugKarte(props: {
 }
 
 export function SchrittFahrzeuge({ bogen, aendern }: SchrittProps) {
+  const vorlage = stanFahrzeugVorbelegung(bogen.einheit.organisation, bogen.einheit.einheitsTyp);
   return (
     <section className="karte">
       <h2>4. Fahrzeuge</h2>
+      {vorlage.length > 0 && (
+        <p>
+          <button
+            type="button"
+            onClick={() => {
+              if (bogen.fahrzeuge.length === 0 || window.confirm("Aktuelle Fahrzeugliste durch die StAN-Vorbelegung ersetzen?")) {
+                aendern({ fahrzeuge: vorlage });
+              }
+            }}
+          >
+            StAN-Vorbelegung laden ({vorlage.length} Fahrzeuge)
+          </button>
+        </p>
+      )}
       {bogen.fahrzeuge.map((f, i) => (
         <FahrzeugKarte
           key={i}

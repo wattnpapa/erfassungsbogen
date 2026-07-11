@@ -218,6 +218,8 @@ export const THW_FAHRZEUGTYPEN: VokabularEintrag[] = [
   { code: 20, kurz: "Mobilkran", name: "Mobilkran" },
   { code: 21, kurz: "Gabelstapler", name: "Gabelstapler" },
   { code: 22, kurz: "MzAB", name: "Mehrzweckarbeitsboot" },
+  { code: 23, kurz: "MTW TZ", name: "Mannschaftstransportwagen Technischer Zug" },
+  { code: 24, kurz: "MTW gl", name: "Mannschaftstransportwagen geländegängig" },
   { code: 40, kurz: "Anh 2t", name: "Anhänger (2 t Nutzlast)" },
   { code: 41, kurz: "Anh K", name: "Anhänger mit Spezialaufbau für FGr K (1 t Nutzlast)" },
   { code: 42, kurz: "Anh FüLa", name: "Anhänger Führung und Lage" },
