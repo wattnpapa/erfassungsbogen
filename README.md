@@ -2,7 +2,7 @@
 
 # Erfassungsbogen
 
-Multiplattform-App (perspektivisch Desktop/Electron, Android, iOS) zum Erfassen von
+Multiplattform-App (Web, Desktop/Electron, Android, iOS) zum Erfassen von
 Einheiten-Erfassungsbögen **aller BOS- und sonstigen Organisationen** (THW, Feuerwehr,
 Polizei, DRK/JUH/MHD/ASB, DLRG, Bundeswehr, …), Export als druckbares PDF und
 Offline-Transport des kompletten Bogens über einen einzelnen QR-Code.
@@ -27,6 +27,29 @@ Gesamtübersicht (alles nachbearbeitbar), PDF-Export im Papier-Layout mit
 QR-Code auf der letzten Seite, Bogen speichern/laden als JSON-Datei.
 Alles läuft clientseitig (Codec + pako + qrcode + pdfmake), kein Server nötig.
 Code: [index.html](index.html), [src/app/](src/app/).
+
+## Desktop-App (Electron)
+
+Für die Offline-Nutzung ohne Browser gibt es die App als Desktop-Anwendung —
+fertige Pakete zum Herunterladen unter
+[Releases](https://github.com/wattnpapa/erfassungsbogen/releases/latest):
+
+- **macOS**: `.dmg` (unsigniert — beim ersten Start Rechtsklick → „Öffnen")
+- **Windows**: NSIS-Installer (`.exe`)
+- **Linux**: `.deb` (Debian/Ubuntu) und `.pacman` (Arch)
+
+Jeder Push auf `main` baut automatisch ein Release mit Datums-Version
+([release.yml](.github/workflows/release.yml), Aufbau wie bei
+[S1-Control](https://github.com/wattnpapa/S1-Control)). Lokal:
+
+```
+npm run electron:dev     # Entwicklung: Vite-Dev-Server im Electron-Fenster
+npm run electron:build   # Paket für die eigene Plattform → release/
+```
+
+Der Hauptprozess ([electron/main.js](electron/main.js)) lädt die unveränderte
+Web-App aus `dist/` — kein Node-Zugriff im Renderer, externe Links öffnen im
+System-Browser.
 
 ## Stand: Codec + QR-Rendering fertig (Schema v2)
 

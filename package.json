@@ -2,10 +2,7 @@
   "name": "erfassungsbogen",
   "version": "1.0.0",
   "description": "Digitaler Einheiten-Erfassungsbogen für BOS: Assistent, PDF-Export im Papier-Layout, Offline-Transport per QR-Code.",
-  "main": "index.js",
-  "directories": {
-    "doc": "docs"
-  },
+  "main": "electron/main.js",
   "scripts": {
     "demo": "tsx scripts/qr-demo.ts",
     "icons": "node scripts/render-icons.mjs",
@@ -14,11 +11,63 @@
     "build": "vite build",
     "preview": "vite preview",
     "ios:sync": "vite build && cap sync ios",
-    "ios:open": "cap open ios"
+    "ios:open": "cap open ios",
+    "electron:dev": "concurrently -k \"npm:dev\" \"wait-on tcp:5173 && cross-env VITE_DEV_SERVER_URL=http://localhost:5173 electron .\"",
+    "electron:build": "vite build && electron-builder"
   },
   "keywords": [],
-  "author": "",
+  "author": {
+    "name": "Johannes Rudolph",
+    "email": "johannes.rudolph@thw-oldenburg.de"
+  },
   "license": "EUPL-1.2",
+  "build": {
+    "appId": "de.erfassungsbogen.app",
+    "productName": "Erfassungsbogen",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "electron/**/*",
+      "package.json"
+    ],
+    "mac": {
+      "category": "public.app-category.productivity",
+      "hardenedRuntime": true,
+      "target": [
+        "dmg",
+        "zip"
+      ]
+    },
+    "win": {
+      "target": "nsis"
+    },
+    "nsis": {
+      "createStartMenuShortcut": true,
+      "createDesktopShortcut": true,
+      "shortcutName": "Erfassungsbogen",
+      "menuCategory": "Sonstige"
+    },
+    "linux": {
+      "target": [
+        "deb",
+        "pacman"
+      ],
+      "category": "Utility",
+      "desktop": {
+        "Name": "Erfassungsbogen",
+        "Categories": "Utility;"
+      }
+    },
+    "publish": [
+      {
+        "provider": "generic",
+        "url": "https://github.com/wattnpapa/erfassungsbogen/releases/latest/download"
+      }
+    ],
+    "generateUpdatesFilesForAllChannels": true
+  },
   "dependencies": {
     "@capacitor/android": "^8.4.1",
     "@capacitor/barcode-scanner": "^3.1.0",
@@ -26,6 +75,8 @@
     "@capacitor/filesystem": "^8.1.2",
     "@capacitor/ios": "^8.4.1",
     "@capacitor/share": "^8.0.1",
+    "electron-updater": "^6.8.3",
+    "jsqr": "^1.4.0",
     "pako": "^3.0.1",
     "pdfmake": "^0.3.11",
     "qrcode": "^1.5.4",
@@ -43,11 +94,15 @@
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.3",
-    "jsqr": "^1.4.0",
+    "concurrently": "^9.1.2",
+    "cross-env": "^7.0.3",
+    "electron": "^35.0.0",
+    "electron-builder": "^25.1.8",
     "pngjs": "^7.0.0",
     "tsx": "^4.23.0",
     "typescript": "^7.0.2",
-    "vite": "^8.1.4"
+    "vite": "^8.1.4",
+    "wait-on": "^8.0.2"
   },
   "type": "module",
   "private": true

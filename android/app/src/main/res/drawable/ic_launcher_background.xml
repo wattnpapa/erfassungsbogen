@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Hintergrund-Layer des Adaptive Icons: Marken-Verlauf aus icon-square.svg. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <gradient
+        android:angle="270"
+        android:startColor="#1d3d8f"
+        android:endColor="#12275e" />
+</shape>

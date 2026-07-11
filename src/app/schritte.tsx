@@ -27,6 +27,7 @@ import {
 import type { VokabularEintrag } from "../vokabulare/thw";
 import { THW_ORTSVERBAENDE, type ThwOrtsverband } from "../vokabulare/thw-ov";
 import { stanFahrzeugVorbelegung } from "../vokabulare/thw-stan-fahrzeuge";
+import { stanPersonalVorbelegung } from "../vokabulare/thw-stan-personal";
 import {
   FE_TEXT,
   ORG_OPTIONEN,
@@ -303,11 +304,16 @@ export function SchrittEinheit({ bogen, aendern }: SchrittProps) {
           <VokabAuswahl
             wert={e.einheitsTyp}
             aendern={(v) => {
-              // StAN-Fahrzeuge vorbelegen, solange noch keine Fahrzeuge erfasst sind
-              const vorbelegung = bogen.fahrzeuge.length === 0 ? stanFahrzeugVorbelegung(e.organisation, v) : [];
+              // StAN-Fahrzeuge und -Sollplätze vorbelegen, solange noch nichts erfasst ist
+              const fahrzeuge = bogen.fahrzeuge.length === 0 ? stanFahrzeugVorbelegung(e.organisation, v) : [];
+              const personal =
+                bogen.personal.length === 0 && bogen.personalErfassung === PersonalErfassung.VOLLSTAENDIG
+                  ? stanPersonalVorbelegung(e.organisation, v)
+                  : [];
               aendern({
                 einheit: { ...e, einheitsTyp: v },
-                ...(vorbelegung.length > 0 ? { fahrzeuge: vorbelegung } : {}),
+                ...(fahrzeuge.length > 0 ? { fahrzeuge } : {}),
+                ...(personal.length > 0 ? { personal } : {}),
               });
             }}
             tabelle={vokabularFuer(e.organisation, "einheitstyp")}
@@ -561,6 +567,7 @@ function PersonKarte(props: {
 
 export function SchrittPersonal({ bogen, aendern }: SchrittProps) {
   const nurStaerke = bogen.personalErfassung === PersonalErfassung.NUR_STAERKE;
+  const vorlage = stanPersonalVorbelegung(bogen.einheit.organisation, bogen.einheit.einheitsTyp);
   const s = staerke(bogen);
   const mwd = unterbringungMWD(bogen);
   const sm = bogen.staerkeManuell ?? { fuehrer: 0, unterfuehrer: 0, mannschaft: 0, gesamt: 0 };
@@ -645,6 +652,20 @@ export function SchrittPersonal({ bogen, aendern }: SchrittProps) {
 
       <Hinweise bogen={bogen} />
 
+      {!nurStaerke && vorlage.length > 0 && (
+        <p>
+          <button
+            type="button"
+            onClick={() => {
+              if (bogen.personal.length === 0 || window.confirm("Aktuelle Personalliste durch die StAN-Sollplätze ersetzen?")) {
+                aendern({ personal: vorlage });
+              }
+            }}
+          >
+            StAN-Sollplätze laden ({vorlage.length} Personen)
+          </button>
+        </p>
+      )}
       {bogen.personal.map((p, i) => (
         <PersonKarte
           key={i}

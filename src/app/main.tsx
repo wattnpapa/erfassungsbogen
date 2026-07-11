@@ -8,6 +8,7 @@ import type { Erfassungsbogen } from "../model";
 import { decodePayloadUrl } from "../codec";
 import { bogenLaden, browserKompressor, neuerBogen } from "./hilfen";
 import { istNativ, qrScannen } from "./nativ";
+import { QrScannerWeb } from "./qr-scanner-web";
 import { Fusszeile } from "./fusszeile";
 import {
   SchrittEinheit,
@@ -21,10 +22,30 @@ import {
 const SCHRITTE = ["Einheit", "Einsatz", "Personal", "Fahrzeuge", "Sofortbedarf", "Übersicht"];
 const UEBERSICHT = SCHRITTE.length - 1;
 
+/**
+ * Bogen aus dem URL-Fragment übernehmen (QR-Code mit App-URL bzw. Universal
+ * Link öffnet die Web-App als https://erfassungsbogen.app/#<Payload>).
+ * Läuft einmalig beim Laden; das Fragment wird danach aus der Adresszeile
+ * entfernt, damit die Daten nicht in Verlauf/Lesezeichen hängen bleiben.
+ */
+function bogenAusUrlFragment(): { bogen: Erfassungsbogen | null; fehler: string } {
+  const fragment = window.location.hash.slice(1);
+  if (!fragment) return { bogen: null, fehler: "" };
+  window.history.replaceState(null, "", window.location.pathname + window.location.search);
+  try {
+    return { bogen: decodePayloadUrl(fragment, browserKompressor), fehler: "" };
+  } catch {
+    return { bogen: null, fehler: "Der geöffnete Link enthält keinen gültigen Erfassungsbogen." };
+  }
+}
+
+const START = bogenAusUrlFragment();
+
 function App() {
-  const [bogen, setBogen] = useState<Erfassungsbogen | null>(null);
-  const [schritt, setSchritt] = useState(0);
-  const [fehler, setFehler] = useState("");
+  const [bogen, setBogen] = useState<Erfassungsbogen | null>(START.bogen);
+  const [schritt, setSchritt] = useState(START.bogen ? UEBERSICHT : 0);
+  const [fehler, setFehler] = useState(START.fehler);
+  const [scannerOffen, setScannerOffen] = useState(false);
 
   async function ladeDatei(e: ChangeEvent<HTMLInputElement>) {
     const datei = e.target.files?.[0];
@@ -39,13 +60,27 @@ function App() {
     }
   }
 
-  async function scanneQr() {
+  function uebernehmeQrText(text: string) {
+    setScannerOffen(false);
     try {
-      const text = await qrScannen();
-      if (!text) return; // Abbruch
       setBogen(decodePayloadUrl(text, browserKompressor));
       setSchritt(UEBERSICHT);
       setFehler("");
+    } catch {
+      setFehler("Der gescannte QR-Code enthält keinen gültigen Erfassungsbogen.");
+    }
+  }
+
+  async function scanneQr() {
+    // Nativ (iOS/Android) scannt das Capacitor-Plugin, sonst die Webcam.
+    if (!istNativ()) {
+      setScannerOffen(true);
+      return;
+    }
+    try {
+      const text = await qrScannen();
+      if (!text) return; // Abbruch
+      uebernehmeQrText(text);
     } catch (err) {
       setFehler(err instanceof Error ? err.message : String(err));
     }
@@ -64,15 +99,16 @@ function App() {
           <button className="primaer" onClick={() => { setBogen(neuerBogen()); setSchritt(0); }}>
             Neuen Bogen erstellen
           </button>
-          {istNativ() && (
-            <button onClick={scanneQr}>QR-Code scannen…</button>
-          )}
+          <button onClick={scanneQr}>QR-Code scannen…</button>
           <label className="datei-knopf">
             Aus Datei laden…
             <input type="file" accept=".json,application/json" onChange={ladeDatei} hidden />
           </label>
         </div>
         {fehler && <p className="fehler">{fehler}</p>}
+        {scannerOffen && (
+          <QrScannerWeb onErgebnis={uebernehmeQrText} onAbbruch={() => setScannerOffen(false)} />
+        )}
       </main>
       <Fusszeile />
       </>
