@@ -25,7 +25,7 @@ import {
   zeitpunktZuIso,
 } from "../model";
 import type { VokabularEintrag } from "../vokabulare/thw";
-import { THW_ORTSVERBAENDE } from "../vokabulare/thw-ov";
+import { THW_ORTSVERBAENDE, type ThwOrtsverband } from "../vokabulare/thw-ov";
 import { stanFahrzeugVorbelegung } from "../vokabulare/thw-stan-fahrzeuge";
 import {
   FE_TEXT,
@@ -187,6 +187,88 @@ function KennzahlenFeld(props: { teile: number[]; aendern: (t: number[]) => void
   );
 }
 
+/**
+ * OV-Namensfeld mit eigener Vorschlagsliste aus dem OV-Verzeichnis. Bewusst
+ * keine native <datalist>: Safari/iOS zeigt deren Vorschläge praktisch nicht.
+ * Auswahl übernimmt Kürzel + Kontaktdaten; ein direkt eingetipptes Kürzel
+ * ("OODE") wird beim Verlassen des Felds aufgelöst.
+ */
+function OvNamensFeld(props: { name: string; tippen: (name: string) => void; uebernehmen: (ov: ThwOrtsverband) => void }) {
+  const { name, tippen, uebernehmen } = props;
+  const [offen, setOffen] = useState(false);
+  const [aktiv, setAktiv] = useState(0);
+
+  const suche = name.trim().toLowerCase();
+  const treffer =
+    offen && suche
+      ? THW_ORTSVERBAENDE.filter(
+          (o) => o.name.toLowerCase().includes(suche) || o.kurz.toLowerCase().startsWith(suche) || o.ort.toLowerCase().startsWith(suche),
+        )
+          .sort((a, b) => Number(b.name.toLowerCase().startsWith(suche)) - Number(a.name.toLowerCase().startsWith(suche)))
+          .slice(0, 8)
+      : [];
+
+  const waehlen = (ov: ThwOrtsverband) => {
+    uebernehmen(ov);
+    setOffen(false);
+  };
+
+  return (
+    <span className="autocomplete">
+      <input
+        value={name}
+        placeholder="tippen für Vorschläge…"
+        onChange={(ev) => {
+          tippen(ev.target.value);
+          setOffen(true);
+          setAktiv(0);
+        }}
+        onKeyDown={(ev) => {
+          if (treffer.length === 0) return;
+          if (ev.key === "ArrowDown") {
+            ev.preventDefault();
+            setAktiv((aktiv + 1) % treffer.length);
+          } else if (ev.key === "ArrowUp") {
+            ev.preventDefault();
+            setAktiv((aktiv + treffer.length - 1) % treffer.length);
+          } else if (ev.key === "Enter") {
+            ev.preventDefault();
+            waehlen(treffer[aktiv]);
+          } else if (ev.key === "Escape") {
+            setOffen(false);
+          }
+        }}
+        onBlur={() => {
+          setOffen(false);
+          const eingabe = name.trim();
+          const ov = THW_ORTSVERBAENDE.find((o) => o.kurz === eingabe.toUpperCase() || o.name === eingabe);
+          if (ov) uebernehmen(ov);
+        }}
+      />
+      {treffer.length > 0 && (
+        <ul className="vorschlaege">
+          {treffer.map((o, k) => (
+            // onMouseDown statt onClick, damit die Auswahl vor dem blur greift
+            <li
+              key={o.name}
+              className={k === aktiv ? "aktiv" : undefined}
+              onMouseDown={(ev) => {
+                ev.preventDefault();
+                waehlen(o);
+              }}
+            >
+              {o.name}
+              <small>
+                {o.kurz} · {o.plz} {o.ort}
+              </small>
+            </li>
+          ))}
+        </ul>
+      )}
+    </span>
+  );
+}
+
 // --------------------------------------------------------- Schritt Einheit
 
 export function SchrittEinheit({ bogen, aendern }: SchrittProps) {
@@ -253,40 +335,26 @@ export function SchrittEinheit({ bogen, aendern }: SchrittProps) {
             />
           </Feld>
           <Feld titel="Name">
-            <input
-              value={h.name}
-              list={e.organisation === OrganisationsTyp.THW && h.bezeichnung.code === 1 ? "thw-ov-liste" : undefined}
-              onChange={(ev) => {
-                const name = ev.target.value;
-                // THW-OV-Ebene: bei exaktem Treffer im OV-Verzeichnis Kontaktdaten übernehmen.
-                const ov =
-                  e.organisation === OrganisationsTyp.THW && h.bezeichnung.code === 1
-                    ? THW_ORTSVERBAENDE.find((o) => o.name === name)
-                    : undefined;
-                setE({
-                  hierarchie: e.hierarchie.map((x, j) =>
-                    j === i
-                      ? ov
-                        ? { ...x, name, kurz: ov.kurz || undefined, telefon: ov.telefon.replace(/\D/g, "") || undefined, email: ov.email || undefined }
-                        : { ...x, name }
-                      : x,
-                  ),
-                });
-              }}
-              onBlur={(ev) => {
-                // OV-Kürzel ("OODE") beim Verlassen des Felds zum vollen Eintrag auflösen.
-                if (!(e.organisation === OrganisationsTyp.THW && h.bezeichnung.code === 1)) return;
-                const ov = THW_ORTSVERBAENDE.find((o) => o.kurz === ev.target.value.trim().toUpperCase());
-                if (!ov) return;
-                setE({
-                  hierarchie: e.hierarchie.map((x, j) =>
-                    j === i
-                      ? { ...x, name: ov.name, kurz: ov.kurz || undefined, telefon: ov.telefon.replace(/\D/g, "") || undefined, email: ov.email || undefined }
-                      : x,
-                  ),
-                });
-              }}
-            />
+            {e.organisation === OrganisationsTyp.THW && h.bezeichnung.code === 1 ? (
+              <OvNamensFeld
+                name={h.name}
+                tippen={(name) => setE({ hierarchie: e.hierarchie.map((x, j) => (j === i ? { ...x, name } : x)) })}
+                uebernehmen={(ov) =>
+                  setE({
+                    hierarchie: e.hierarchie.map((x, j) =>
+                      j === i
+                        ? { ...x, name: ov.name, kurz: ov.kurz || undefined, telefon: ov.telefon.replace(/\D/g, "") || undefined, email: ov.email || undefined }
+                        : x,
+                    ),
+                  })
+                }
+              />
+            ) : (
+              <input
+                value={h.name}
+                onChange={(ev) => setE({ hierarchie: e.hierarchie.map((x, j) => (j === i ? { ...x, name: ev.target.value } : x)) })}
+              />
+            )}
           </Feld>
           <Feld titel="Kürzel" schmal>
             <input
@@ -335,14 +403,6 @@ export function SchrittEinheit({ bogen, aendern }: SchrittProps) {
           </button>
         )}
       </p>
-      {e.organisation === OrganisationsTyp.THW && (
-        <datalist id="thw-ov-liste">
-          {THW_ORTSVERBAENDE.map((o) => (
-            // Label macht das OV-Kürzel sichtbar und mitsuchbar (Browser matchen auch darauf).
-            <option key={o.name} value={o.name}>{`${o.kurz} · ${o.plz} ${o.ort}`}</option>
-          ))}
-        </datalist>
-      )}
     </section>
   );
 }
@@ -966,7 +1026,7 @@ export function Uebersicht(props: {
         {qr ? (
           <>
             <img src={qr.datenUrl} alt="EEB2-QR-Code" />
-            <p className="hinweis">{qr.bytes} Bytes · QR-Version {qr.version} (ECC M) — dieser Code steht auch auf der letzten PDF-Seite.</p>
+            <p className="hinweis">{qr.zeichen} Zeichen · QR-Version {qr.version} (ECC M) — öffnet beim Scannen mit der Kamera die App; dieser Code steht auch auf der letzten PDF-Seite.</p>
           </>
         ) : (
           <p className="hinweis">QR-Code wird erzeugt…</p>
