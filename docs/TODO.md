@@ -1,5 +1,16 @@
 # To-do
 
+## Gerätetest & TestFlight (iOS)
+
+- [ ] **Gerätetest iPhone:** `npm run ios:open`, iPhone anschließen, ▶︎ (Team
+      2AKGEZS43R ist hinterlegt, signiert automatisch). Auf dem Gerät testen:
+      In-App-Scanner („QR-Code scannen…") mit gedrucktem Bogen-QR, danach
+      PDF-/JSON-Export übers Share-Sheet (AirDrop/Dateien/Drucken).
+- [ ] **App Store Connect:** Unter <https://appstoreconnect.apple.com> neue App
+      anlegen (Plattform iOS, Bundle-ID `de.erfassungsbogen.app`, Name z. B.
+      „Einheiten-Erfassungsbogen") und in Xcode unter *Settings → Accounts* die
+      Apple-ID hinterlegen. Danach übernimmt Claude Archiv + TestFlight-Upload.
+
 ## Web-QR-Scanner (Browser/Desktop)
 
 Stand: 2026-07-11. Der Scan-Knopf auf dem Startbildschirm ist jetzt immer
