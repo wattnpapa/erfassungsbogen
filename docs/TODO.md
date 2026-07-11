@@ -1,4 +1,24 @@
-# To-do: QR-Deep-Links (Universal Links / App Links) fertigstellen
+# To-do
+
+## Web-QR-Scanner (Browser/Desktop)
+
+Stand: 2026-07-11. Der Scan-Knopf auf dem Startbildschirm ist jetzt immer
+sichtbar: nativ scannt das Capacitor-Plugin, im Browser/Electron die Webcam
+(`src/app/qr-scanner-web.tsx`, getUserMedia + jsQR). Verifiziert sind der
+Fehlerpfad (keine Kamera/Zugriff verweigert) und der Dekodier-Roundtrip
+(`npm run demo`) — der Live-Scan mit echter Kamera noch nicht.
+
+- [ ] Live-Test mit Webcam: Start → „QR-Code scannen…" → gedruckten oder
+      angezeigten QR vorhalten → Übersicht öffnet sich mit dem Bogen.
+- [ ] Electron-Paket (macOS): Kamerazugriff braucht `NSCameraUsageDescription`
+      in der Info.plist und bei Hardened Runtime das Entitlement
+      `com.apple.security.device.camera`, sonst scheitert getUserMedia im
+      signierten Build.
+- [ ] Merken: getUserMedia läuft nur im Secure Context (localhost oder HTTPS).
+      Ein Test über eine HTTP-Adresse im LAN zeigt nur den Fehlerhinweis —
+      das ist erwartetes Browserverhalten, kein Bug.
+
+# QR-Deep-Links (Universal Links / App Links) fertigstellen
 
 Stand: 2026-07-11. Die QR-Codes enthalten jetzt `https://erfassungsbogen.app/#<Payload>`;
 Web-App-Hash-Einstieg, AASA, assetlinks, iOS-Entitlement und Android-Intent-Filter
