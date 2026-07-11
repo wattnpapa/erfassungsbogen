@@ -1,0 +1,27 @@
+<svg viewBox="0 0 1120 220" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Erfassungsbogen.app">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1d3d8f"/>
+      <stop offset="1" stop-color="#12275e"/>
+    </linearGradient>
+  </defs>
+  <g transform="translate(10 10) scale(0.390625)">
+    <rect width="512" height="512" rx="116" fill="url(#bg)"/>
+    <path d="M128 124 a28 28 0 0 1 28-28 H322 L384 158 V388 a28 28 0 0 1 -28 28 H156 a28 28 0 0 1 -28-28 Z" fill="#ffffff"/>
+    <path d="M322 96 L384 158 H338 a16 16 0 0 1 -16-16 Z" fill="#c9cede"/>
+    <rect x="164" y="164" width="132" height="22" rx="11" fill="#1d3d8f"/>
+    <rect x="164" y="206" width="184" height="22" rx="11" fill="#c9cede"/>
+    <rect x="164" y="262" width="76" height="76" rx="12" fill="#12275e"/>
+    <rect x="182" y="280" width="40" height="40" rx="6" fill="#ffffff"/>
+    <rect x="192" y="290" width="20" height="20" rx="4" fill="#12275e"/>
+    <rect x="262" y="262" width="26" height="26" rx="6" fill="#12275e"/>
+    <rect x="322" y="262" width="26" height="26" rx="6" fill="#12275e"/>
+    <rect x="292" y="292" width="26" height="26" rx="6" fill="#12275e"/>
+    <rect x="322" y="322" width="26" height="26" rx="6" fill="#12275e"/>
+    <rect x="262" y="322" width="26" height="26" rx="6" fill="#12275e"/>
+    <rect x="164" y="358" width="26" height="26" rx="6" fill="#12275e"/>
+    <rect x="224" y="358" width="26" height="26" rx="6" fill="#12275e"/>
+    <rect x="292" y="352" width="26" height="26" rx="6" fill="#12275e"/>
+  </g>
+  <text x="248" y="135" font-family="-apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="88" font-weight="700" fill="#12275e">Erfassungsbogen<tspan fill="#1d3d8f" font-weight="500">.app</tspan></text>
+</svg>

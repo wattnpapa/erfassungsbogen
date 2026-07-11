@@ -1,3 +1,5 @@
+<img src="public/icon.svg" alt="Erfassungsbogen.app Logo" width="96" align="right">
+
 # Erfassungsbogen
 
 Multiplattform-App (perspektivisch Desktop/Electron, Android, iOS) zum Erfassen von
