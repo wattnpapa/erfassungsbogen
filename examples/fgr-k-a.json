@@ -1,0 +1,306 @@
+{
+  "schemaVersion": 2,
+  "stand": 2325,
+  "einheit": {
+    "organisation": 1,
+    "einheitsTyp": { "code": 43 },
+    "name": "OV Oldenburg - Ni",
+    "hierarchie": [
+      {
+        "bezeichnung": { "code": 1 },
+        "name": "Oldenburg - Ni",
+        "kurz": "OODE",
+        "telefon": "04413401050",
+        "email": "ov-oldenburg-ni@thw.de"
+      },
+      {
+        "bezeichnung": { "code": 2 },
+        "name": "Oldenburg",
+        "telefon": "04413611180",
+        "email": "poststelle.rst_oldenburg@thw.de"
+      },
+      {
+        "bezeichnung": { "code": 3 },
+        "name": "Bremen, Niedersachsen",
+        "telefon": "051133690100",
+        "email": "poststelle.lvhbni@thw.de"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2325,
+    "zeitraumBis": 2328,
+    "ortAuftrag": "Fernmeldebauübung Kabelblitz"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "nachname": "Berger",
+      "vorname": "Martin",
+      "staerkeRolle": 1,
+      "funktionen": [{ "code": 3 }, { "code": 7 }],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "kontakte": [
+        { "art": 0, "dienstlich": false, "wert": "01715550101" },
+        { "art": 2, "dienstlich": true, "emailTemplate": 1 }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "nachname": "Brandt",
+      "vorname": "Timo",
+      "staerkeRolle": 1,
+      "funktionen": [{ "code": 4 }, { "code": 35 }],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "kontakte": [{ "art": 0, "dienstlich": false, "wert": "01785550102" }],
+      "zusatzqualifikationen": []
+    },
+    {
+      "nachname": "Sander",
+      "vorname": "Michael",
+      "staerkeRolle": 1,
+      "funktionen": [{ "code": 4 }, { "code": 7 }],
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
+      "kontakte": [{ "art": 0, "dienstlich": false, "wert": "01635550103" }],
+      "zusatzqualifikationen": []
+    },
+    {
+      "nachname": "Hofmann",
+      "vorname": "Lennart",
+      "staerkeRolle": 0,
+      "funktionen": [{ "code": 5 }],
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "nachname": "Neumann",
+      "vorname": "Andre",
+      "staerkeRolle": 0,
+      "funktionen": [{ "code": 5 }, { "code": 7 }],
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "nachname": "Martens",
+      "vorname": "Tobias",
+      "staerkeRolle": 0,
+      "funktionen": [{ "code": 5 }],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "nachname": "Sommer",
+      "vorname": "Jens",
+      "staerkeRolle": 0,
+      "funktionen": [{ "code": 5 }],
+      "fahrerlaubnis": 6,
+      "geschlecht": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "nachname": "Grote",
+      "vorname": "Julian",
+      "staerkeRolle": 0,
+      "funktionen": [{ "code": 5 }],
+      "fahrerlaubnis": 6,
+      "geschlecht": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "nachname": "Thiel",
+      "vorname": "Fabian",
+      "staerkeRolle": 0,
+      "funktionen": [{ "code": 5 }],
+      "fahrerlaubnis": 6,
+      "geschlecht": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "nachname": "Schulte",
+      "vorname": "Torben",
+      "staerkeRolle": 0,
+      "funktionen": [{ "code": 5 }, { "code": 35 }],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "nachname": "Hartmann",
+      "vorname": "Diana",
+      "staerkeRolle": 0,
+      "funktionen": [{ "code": 5 }, { "code": 35 }],
+      "fahrerlaubnis": 0,
+      "geschlecht": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "nachname": "Hansen",
+      "vorname": "Antje",
+      "staerkeRolle": 0,
+      "funktionen": [{ "code": 5 }],
+      "fahrerlaubnis": 0,
+      "geschlecht": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "nachname": "Becker",
+      "vorname": "Miriam",
+      "staerkeRolle": 0,
+      "funktionen": [{ "code": 5 }],
+      "fahrerlaubnis": 0,
+      "geschlecht": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "nachname": "Meinert",
+      "vorname": "Laura",
+      "staerkeRolle": 0,
+      "funktionen": [{ "code": 5 }],
+      "fahrerlaubnis": 6,
+      "geschlecht": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "nachname": "Brinkmann",
+      "vorname": "Simon",
+      "staerkeRolle": 0,
+      "funktionen": [{ "code": 5 }],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "nachname": "Carstens",
+      "vorname": "Lars",
+      "staerkeRolle": 0,
+      "funktionen": [{ "code": 5 }],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "nachname": "Hagen",
+      "vorname": "Sven",
+      "staerkeRolle": 0,
+      "funktionen": [{ "code": 5 }],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "nachname": "Ziegler",
+      "vorname": "Leon",
+      "staerkeRolle": 0,
+      "funktionen": [{ "code": 5 }],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "nachname": "Nolte",
+      "vorname": "Thies",
+      "staerkeRolle": 0,
+      "funktionen": [{ "code": 5 }],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "nachname": "Mertens",
+      "vorname": "Tom",
+      "staerkeRolle": 0,
+      "funktionen": [{ "code": 5 }],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": { "code": 1 },
+      "thwKennzeichen": 84397,
+      "funkrufname": {
+        "kennwort": { "code": 1 },
+        "eigenerStandort": false,
+        "ort": "Oldenburg",
+        "teile": [18, 13]
+      },
+      "stanKonform": true
+    },
+    {
+      "typ": { "freitext": "MzKW" },
+      "thwKennzeichen": 90272,
+      "funkrufname": {
+        "kennwort": { "code": 1 },
+        "eigenerStandort": false,
+        "ort": "Oldenburg",
+        "teile": [24, 54]
+      },
+      "stanKonform": false
+    },
+    {
+      "typ": { "code": 2 },
+      "thwKennzeichen": 96464,
+      "funkrufname": {
+        "kennwort": { "code": 1 },
+        "eigenerStandort": false,
+        "ort": "Oldenburg",
+        "teile": [16, 11]
+      },
+      "stanKonform": true
+    },
+    {
+      "typ": { "freitext": "Anh Versorgung" },
+      "thwKennzeichen": 94010,
+      "stanKonform": false
+    },
+    {
+      "typ": { "freitext": "MTW OV" },
+      "thwKennzeichen": 98933,
+      "funkrufname": {
+        "kennwort": { "code": 1 },
+        "eigenerStandort": false,
+        "ort": "Oldenburg",
+        "teile": [86, 25]
+      },
+      "stanKonform": false
+    },
+    {
+      "typ": { "freitext": "Anh OV" },
+      "thwKennzeichen": 95039,
+      "stanKonform": false
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 20,
+    "davonVegetarisch": 0,
+    "dieselLiter": 0,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": false,
+    "ruhezeitErforderlich": false
+  }
+}
