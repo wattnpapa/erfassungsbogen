@@ -14,6 +14,8 @@ import {
   PersonalErfassung,
   VokabularWert,
   datumAusIso,
+  staerke,
+  unterbringungMWD,
 } from "../model";
 import { encodePayload, type Kompressor } from "../codec";
 import {
@@ -164,6 +166,58 @@ export async function bogenLaden(datei: File): Promise<Erfassungsbogen> {
     throw new Error("Keine gültige Erfassungsbogen-Datei (Schema-Version 2 erwartet).");
   }
   return b;
+}
+
+// ------------------------------------------------------ Plausibilitätsprüfung
+
+/**
+ * Nicht-blockierende Plausibilitätshinweise für Stärkemeldung, Unterbringung
+ * und Einsatzzeitraum. Leeres Array = alles plausibel.
+ */
+export function plausibilitaet(b: Erfassungsbogen): string[] {
+  const hinweise: string[] = [];
+  const s = staerke(b);
+  const mwd = unterbringungMWD(b);
+
+  if (s.gesamt === 0) {
+    hinweise.push("Stärke ist 0 — es ist noch kein Personal erfasst.");
+  }
+  if (s.gesamt !== s.fuehrer + s.unterfuehrer + s.mannschaft) {
+    hinweise.push(
+      `Stärke: ${s.fuehrer} + ${s.unterfuehrer} + ${s.mannschaft} ergibt nicht die Gesamtstärke ${s.gesamt}.`,
+    );
+  }
+  // Unterbringung nur prüfen, wenn sie belastbar ist: bei vollständiger
+  // Personalerfassung abgeleitet, im Meldekopf-Modus nur wenn manuell erfasst.
+  const mwdBelastbar =
+    b.personalErfassung === PersonalErfassung.VOLLSTAENDIG || b.unterbringungManuell != null;
+  const mwdSumme = mwd.m + mwd.w + mwd.d;
+  if (mwdBelastbar && s.gesamt > 0 && mwdSumme !== s.gesamt) {
+    hinweise.push(
+      `Unterbringung: M ${mwd.m} + W ${mwd.w} + D ${mwd.d} = ${mwdSumme} weicht von der Gesamtstärke ${s.gesamt} ab.`,
+    );
+  }
+  if (
+    b.personalErfassung === PersonalErfassung.NUR_STAERKE &&
+    b.staerkeManuell &&
+    b.personal.length > b.staerkeManuell.gesamt
+  ) {
+    hinweise.push(
+      `Es sind ${b.personal.length} Ansprechpartner erfasst, die Gesamtstärke ist aber nur ${b.staerkeManuell.gesamt}.`,
+    );
+  }
+  if (b.einsatz.zeitraumBis < b.einsatz.zeitraumVon) {
+    hinweise.push("Einsatzzeitraum: „bis“ liegt vor „von“.");
+  }
+  if (b.sofortbedarf && s.gesamt > 0 && b.sofortbedarf.verpflegungPersonen > s.gesamt) {
+    hinweise.push(
+      `Verpflegung für ${b.sofortbedarf.verpflegungPersonen} Personen angefordert, die Gesamtstärke ist aber ${s.gesamt}.`,
+    );
+  }
+  if (b.sofortbedarf && b.sofortbedarf.davonVegetarisch > b.sofortbedarf.verpflegungPersonen) {
+    hinweise.push("Sofortbedarf: „davon vegetarisch“ ist größer als die Verpflegungs-Personenzahl.");
+  }
+  return hinweise;
 }
 
 // ------------------------------------------------------------- Neuer Bogen

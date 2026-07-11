@@ -37,6 +37,7 @@ import {
   neuePerson,
   neuesFahrzeug,
   orgLabel,
+  plausibilitaet,
   qrErzeugen,
   vokabText,
   vokabularFuer,
@@ -148,6 +149,41 @@ const zahl = (s: string): number => {
   const n = parseInt(s, 10);
   return Number.isFinite(n) && n >= 0 ? n : 0;
 };
+
+/** Plausibilitätshinweise (nicht blockierend). */
+function Hinweise({ bogen }: { bogen: Erfassungsbogen }) {
+  return (
+    <>
+      {plausibilitaet(bogen).map((h) => (
+        <p key={h} className="warnung">⚠ {h}</p>
+      ))}
+    </>
+  );
+}
+
+/**
+ * Eingabefeld für Funkruf-Kennzahlen ("18/13").
+ * Lokaler Text-Zustand, damit Trennzeichen beim Tippen erhalten bleiben —
+ * geparst wird im Hintergrund (je Teil 0–255, wie im QR-Format).
+ */
+function KennzahlenFeld(props: { teile: number[]; aendern: (t: number[]) => void }) {
+  const [text, setText] = useState(props.teile.join("/"));
+  return (
+    <input
+      value={text}
+      placeholder="18/13"
+      onChange={(e) => {
+        setText(e.target.value);
+        props.aendern(
+          e.target.value
+            .split(/[^0-9]+/)
+            .filter(Boolean)
+            .map((n) => Math.min(255, zahl(n))),
+        );
+      }}
+    />
+  );
+}
 
 // --------------------------------------------------------- Schritt Einheit
 
@@ -491,6 +527,8 @@ export function SchrittPersonal({ bogen, aendern }: SchrittProps) {
         </p>
       )}
 
+      <Hinweise bogen={bogen} />
+
       {bogen.personal.map((p, i) => (
         <PersonKarte
           key={i}
@@ -597,16 +635,9 @@ function FahrzeugKarte(props: {
               </Feld>
             )}
             <Feld titel="Kennzahlen (z. B. 18/13)" schmal>
-              <input
-                value={f.funkrufname.teile.join("/")}
-                onChange={(e) =>
-                  set({
-                    funkrufname: {
-                      ...f.funkrufname!,
-                      teile: e.target.value.split(/\D+/).filter(Boolean).map((n) => Math.min(255, zahl(n))),
-                    },
-                  })
-                }
+              <KennzahlenFeld
+                teile={f.funkrufname.teile}
+                aendern={(t) => set({ funkrufname: { ...f.funkrufname!, teile: t } })}
               />
             </Feld>
           </>
@@ -760,6 +791,7 @@ export function Uebersicht(props: {
           </span>
         </div>
         {fehler && <p className="fehler">{fehler}</p>}
+        <Hinweise bogen={bogen} />
         <p>
           <strong>{orgLabel(org)}</strong>
           {" · "}{vokabText(bogen.einheit.einheitsTyp, vokabularFuer(org, "einheitstyp"), "name") || "(Einheitstyp offen)"}
