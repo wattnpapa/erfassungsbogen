@@ -53,9 +53,10 @@ jobs:
     env:
       BUILD_VERSION: ${{ needs.prepare.outputs.build_version }}
       BUILD_SEMVER: ${{ needs.prepare.outputs.build_semver }}
+      # Footer-Anzeige = Release-/Tag-Version (nicht der electron-builder-Semver).
+      APP_BUILD_VERSION: ${{ needs.prepare.outputs.build_version }}
       # Signiert wird nur, wenn die Secrets hinterlegt sind (wie bei S1-Control);
       # sonst unsigniert (Gatekeeper: Rechtsklick → Öffnen, kein Auto-Update auf macOS).
-      CSC_IDENTITY_AUTO_DISCOVERY: "false"
       CSC_LINK: ${{ secrets.CSC_LINK }}
       CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
       APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
@@ -67,6 +68,12 @@ jobs:
           node-version: 24
           cache: npm
       - run: npm ci
+      # Ohne Zertifikat die Identitätssuche abschalten (unsignierter Build).
+      # Achtung: Mit CSC_LINK darf die Variable NICHT gesetzt sein, sonst
+      # überspringt electron-builder die Suche trotz importiertem Zertifikat.
+      - name: Unsigniert bauen, wenn kein Zertifikat hinterlegt ist
+        if: env.CSC_LINK == ''
+        run: echo "CSC_IDENTITY_AUTO_DISCOVERY=false" >> "$GITHUB_ENV"
       - name: App Store Connect API-Key vorbereiten (nur mit Secrets)
         if: env.APPLE_API_KEY_ID != ''
         env:
@@ -99,6 +106,8 @@ jobs:
     env:
       BUILD_VERSION: ${{ needs.prepare.outputs.build_version }}
       BUILD_SEMVER: ${{ needs.prepare.outputs.build_semver }}
+      # Footer-Anzeige = Release-/Tag-Version (nicht der electron-builder-Semver).
+      APP_BUILD_VERSION: ${{ needs.prepare.outputs.build_version }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -126,6 +135,8 @@ jobs:
     env:
       BUILD_VERSION: ${{ needs.prepare.outputs.build_version }}
       BUILD_SEMVER: ${{ needs.prepare.outputs.build_semver }}
+      # Footer-Anzeige = Release-/Tag-Version (nicht der electron-builder-Semver).
+      APP_BUILD_VERSION: ${{ needs.prepare.outputs.build_version }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -157,6 +168,8 @@ jobs:
     needs: [prepare, check]
     env:
       BUILD_VERSION: ${{ needs.prepare.outputs.build_version }}
+      # Footer-Anzeige = Release-/Tag-Version.
+      APP_BUILD_VERSION: ${{ needs.prepare.outputs.build_version }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
