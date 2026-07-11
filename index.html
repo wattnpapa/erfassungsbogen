@@ -24,7 +24,8 @@
       color: #1a1c22;
       background: var(--grau);
     }
-    main { max-width: 60rem; margin: 0 auto; padding: 1rem 1rem 6rem; }
+    #app { min-height: 100dvh; display: flex; flex-direction: column; }
+    main { width: 100%; max-width: 60rem; margin: 0 auto; padding: 1rem 1rem 6rem; }
     h1 { color: var(--blau); font-size: 1.4rem; margin: 0.5rem 0; }
     h2 { color: var(--blau); font-size: 1.1rem; border-bottom: 2px solid var(--blau); padding-bottom: 0.2rem; }
     h3 { font-size: 1rem; margin: 0.8rem 0 0.3rem; }
@@ -98,6 +99,27 @@
     dl.paare { display: grid; grid-template-columns: max-content 1fr; gap: 0.2rem 1rem; margin: 0.4rem 0; font-size: 0.92rem; }
     dl.paare dt { color: #555; }
     dl.paare dd { margin: 0; }
+    /* Seiten-Fußzeile: margin-top auto = ans Viewport-Ende; Abstand unten,
+       damit die fixe Schritt-Navigation sie nicht verdeckt. */
+    footer.seite {
+      width: 100%; max-width: 60rem; margin: auto auto 0; padding: 0 1rem 5rem;
+      display: flex; flex-wrap: wrap; gap: 0.3rem 1.2rem; justify-content: center;
+      font-size: 0.85rem; color: #556;
+    }
+    footer.seite .fusslinks { display: inline-flex; gap: 0.8rem; flex-wrap: wrap; }
+    footer.seite a { color: var(--blau-hell); }
+    button.link {
+      border: none; background: none; padding: 0; font-size: inherit;
+      color: var(--blau-hell); text-decoration: underline; cursor: pointer;
+    }
+    dialog {
+      border: 1px solid var(--rand); border-radius: 0.5rem;
+      width: min(34rem, calc(100vw - 2rem)); padding: 1rem 1.25rem;
+      color: inherit; font-size: 0.95rem;
+    }
+    dialog::backdrop { background: rgba(0, 0, 0, 0.4); }
+    dialog h2 { border: none; }
+    dialog h3 { color: var(--blau); }
   </style>
 </head>
 <body>

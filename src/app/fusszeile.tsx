@@ -1,0 +1,112 @@
+/**
+ * Seiten-Fußzeile: Version, Credits sowie Impressum/Datenschutz/Über als Dialoge.
+ * Aufbau angelehnt an sprechfunk-uebung.de (gleicher Autor).
+ */
+
+import { useRef, type ReactNode, type RefObject } from "react";
+
+const KONTAKT = "johannes.rudolph@thw-oldenburg.de";
+const REPO = "https://github.com/wattnpapa/erfassungsbogen";
+
+function Dialog({ titel, dialogRef, children }: {
+  titel: string;
+  dialogRef: RefObject<HTMLDialogElement | null>;
+  children: ReactNode;
+}) {
+  return (
+    <dialog ref={dialogRef} aria-label={titel}>
+      <div className="kopfzeile">
+        <h2>{titel}</h2>
+        <button onClick={() => dialogRef.current?.close()}>Schließen</button>
+      </div>
+      {children}
+    </dialog>
+  );
+}
+
+export function Fusszeile() {
+  const ueber = useRef<HTMLDialogElement>(null);
+  const impressum = useRef<HTMLDialogElement>(null);
+  const datenschutz = useRef<HTMLDialogElement>(null);
+
+  return (
+    <footer className="seite">
+      <span>
+        Einheiten-Erfassungsbogen v{__APP_VERSION__} · von{" "}
+        <button className="link" onClick={() => ueber.current?.showModal()}>Johannes Rudolph</button>
+      </span>
+      <span className="fusslinks">
+        <button className="link" onClick={() => impressum.current?.showModal()}>Impressum</button>
+        <button className="link" onClick={() => datenschutz.current?.showModal()}>Datenschutz</button>
+        <a href={`mailto:${KONTAKT}`}>Kontakt</a>
+        <a href={REPO} target="_blank" rel="noopener noreferrer">GitHub</a>
+      </span>
+
+      <Dialog titel="Über dieses Projekt" dialogRef={ueber}>
+        <p>
+          Der Einheiten-Erfassungsbogen ist ein Projekt von <strong>Johannes Rudolph</strong>,
+          ehrenamtlicher Helfer im THW (Ortsverband Oldenburg). Die App digitalisiert die
+          Erfassung von Einheiten im Bevölkerungsschutz – BOS-übergreifend, offline nutzbar
+          und mit QR-Code-Transport, damit die Daten auch ohne Netz beim Meldekopf ankommen.
+        </p>
+        <p>
+          Die Anwendung ist Open Source (Lizenz EUPL-1.2). Fehler, Ideen und Beiträge gern
+          über <a href={REPO} target="_blank" rel="noopener noreferrer">GitHub</a> oder per{" "}
+          <a href={`mailto:${KONTAKT}`}>E-Mail</a>.
+        </p>
+        <p>
+          Weiteres Projekt: <a href="https://sprechfunk-uebung.de/" target="_blank" rel="noopener noreferrer">
+          Sprechfunk-Übungsgenerator</a> – Sprechfunkübungen für BOS-Einheiten erstellen.
+        </p>
+      </Dialog>
+
+      <Dialog titel="Impressum" dialogRef={impressum}>
+        <p><strong>Angaben gemäß § 5 DDG</strong></p>
+        <p>
+          Johannes Rudolph<br />
+          Kniphauser Straße 16<br />
+          26419 Schortens<br />
+          Deutschland
+        </p>
+        <p><strong>Kontakt</strong></p>
+        <p>E-Mail: <a href={`mailto:${KONTAKT}`}>{KONTAKT}</a></p>
+        <p><strong>Verantwortlich für den Inhalt nach § 18 Abs. 2 MStV</strong></p>
+        <p>Johannes Rudolph</p>
+      </Dialog>
+
+      <Dialog titel="Datenschutz" dialogRef={datenschutz}>
+        <h3>1. Verantwortlicher</h3>
+        <p>
+          Johannes Rudolph<br />
+          E-Mail: <a href={`mailto:${KONTAKT}`}>{KONTAKT}</a>
+        </p>
+        <h3>2. Verarbeitung beim Aufruf der Website</h3>
+        <p>
+          Die Website wird über GitHub Pages (GitHub Inc.) ausgeliefert. Dabei verarbeitet
+          GitHub technisch notwendige Verbindungsdaten (z.&nbsp;B. IP-Adresse) in
+          Server-Logs zur Bereitstellung und Absicherung des Dienstes. Details:{" "}
+          <a href="https://docs.github.com/site-policy/privacy-policies/github-privacy-statement"
+            target="_blank" rel="noopener noreferrer">GitHub Privacy Statement</a>.
+        </p>
+        <h3>3. Erfasste Bogendaten</h3>
+        <p>
+          Alle im Erfassungsbogen eingegebenen Daten (Einheit, Personal, Fahrzeuge usw.)
+          werden ausschließlich lokal auf dem eigenen Gerät verarbeitet. Es findet keine
+          Übertragung an einen Server statt. Eine Weitergabe erfolgt nur, wenn Nutzende
+          selbst eine Datei, ein PDF oder einen QR-Code erzeugen und teilen.
+        </p>
+        <h3>4. Cookies und Tracking</h3>
+        <p>
+          Die App setzt keine Cookies, nutzt keine Analyse-Dienste und bindet keine
+          Inhalte von Drittanbietern ein.
+        </p>
+        <h3>5. Betroffenenrechte</h3>
+        <p>
+          Nach Art. 15–21 DSGVO bestehen Rechte auf Auskunft, Berichtigung, Löschung,
+          Einschränkung der Verarbeitung und Widerspruch. Anfragen bitte an die oben
+          genannte E-Mail-Adresse.
+        </p>
+      </Dialog>
+    </footer>
+  );
+}

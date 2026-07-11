@@ -6,6 +6,7 @@ import { StrictMode, useState, type ChangeEvent } from "react";
 import { createRoot } from "react-dom/client";
 import type { Erfassungsbogen } from "../model";
 import { bogenLaden, neuerBogen } from "./hilfen";
+import { Fusszeile } from "./fusszeile";
 import {
   SchrittEinheit,
   SchrittEinsatz,
@@ -38,6 +39,7 @@ function App() {
 
   if (!bogen) {
     return (
+      <>
       <main className="start">
         <h1>Einheiten-Erfassungsbogen</h1>
         <p>
@@ -55,12 +57,15 @@ function App() {
         </div>
         {fehler && <p className="fehler">{fehler}</p>}
       </main>
+      <Fusszeile />
+      </>
     );
   }
 
   const aendern = (patch: Partial<Erfassungsbogen>) => setBogen({ ...bogen, ...patch });
 
   return (
+    <>
     <main>
       <header>
         <h1>Einheiten-Erfassungsbogen</h1>
@@ -92,6 +97,8 @@ function App() {
         </footer>
       )}
     </main>
+    <Fusszeile />
+    </>
   );
 }
 
