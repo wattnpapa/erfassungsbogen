@@ -1,5 +1,7 @@
 ext {
-    minSdkVersion = 24
+    // 26 statt Capacitor-Standard 24: der QR-Scanner
+    // (io.ionic.libs:ionbarcode-android) verlangt mindestens Android 8.0.
+    minSdkVersion = 26
     compileSdkVersion = 36
     targetSdkVersion = 36
     androidxActivityVersion = '1.11.0'
