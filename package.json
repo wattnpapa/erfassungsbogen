@@ -8,15 +8,20 @@
   },
   "scripts": {
     "demo": "tsx scripts/qr-demo.ts",
+    "icons": "node scripts/render-icons.mjs",
     "typecheck": "tsc --noEmit",
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "ios:sync": "vite build && cap sync ios",
+    "ios:open": "cap open ios"
   },
   "keywords": [],
   "author": "",
   "license": "EUPL-1.2",
   "dependencies": {
+    "@capacitor/core": "^8.4.1",
+    "@capacitor/ios": "^8.4.1",
     "pako": "^3.0.1",
     "pdfmake": "^0.3.11",
     "qrcode": "^1.5.4",
@@ -24,6 +29,8 @@
     "react-dom": "^19.2.7"
   },
   "devDependencies": {
+    "@capacitor/cli": "^7.6.7",
+    "@resvg/resvg-js": "^2.6.2",
     "@types/node": "^26.1.1",
     "@types/pako": "^2.0.4",
     "@types/pdfmake": "^0.3.3",
