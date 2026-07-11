@@ -1,6 +1,7 @@
-# Desktop-Releases (Electron): macOS (dmg/zip), Windows (NSIS), Linux (deb/pacman).
+# App-Releases: macOS (dmg/zip), Windows (NSIS), Linux (deb/pacman) via Electron,
+# Android (signierte APK) via Capacitor/Gradle.
 # Vorbild: S1-Control (build-main.yml) — Datums-Version, Git-Tag, GitHub Release.
-name: Desktop Releases
+name: App Releases
 
 on:
   push:
@@ -151,9 +152,50 @@ jobs:
             release/*.pacman
             release/latest*.yml
 
+  build-android:
+    runs-on: ubuntu-latest
+    needs: [prepare, check]
+    env:
+      BUILD_VERSION: ${{ needs.prepare.outputs.build_version }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+      - run: npm ci
+      - name: Web-App bauen und nach Android syncen
+        run: |
+          npm run build
+          npx cap sync android
+      - name: Keystore aus Secret entpacken
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+        run: echo "$ANDROID_KEYSTORE_BASE64" | base64 -d > "$RUNNER_TEMP/release.keystore"
+      - name: Signierte APK bauen
+        working-directory: android
+        env:
+          ANDROID_KEYSTORE_PATH: ${{ runner.temp }}/release.keystore
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+        run: |
+          # versionCode muss pro Release monoton steigen (Minuten seit Epoche).
+          ./gradlew assembleRelease \
+            -PappVersionCode=$(( $(date -u +%s) / 60 )) \
+            -PappVersionName="$BUILD_VERSION"
+          cp app/build/outputs/apk/release/app-release.apk \
+            "app/build/outputs/apk/release/Erfassungsbogen-$BUILD_VERSION-android.apk"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: erfassungsbogen-android-${{ env.BUILD_VERSION }}
+          path: android/app/build/outputs/apk/release/Erfassungsbogen-*.apk
+
   release:
     runs-on: ubuntu-latest
-    needs: [prepare, build-mac, build-win, build-linux]
+    needs: [prepare, build-mac, build-win, build-linux, build-android]
     steps:
       - name: Artefakte herunterladen
         uses: actions/download-artifact@v4

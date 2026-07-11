@@ -7,8 +7,10 @@ android {
         applicationId "de.erfassungsbogen.app"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1
-        versionName "1.0"
+        // CI setzt -PappVersionCode/-PappVersionName (Datums-Version aus release.yml);
+        // lokal gelten die Standardwerte.
+        versionCode project.hasProperty("appVersionCode") ? appVersionCode.toInteger() : 1
+        versionName project.hasProperty("appVersionName") ? appVersionName : "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
              // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
@@ -16,10 +18,26 @@ android {
             ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
         }
     }
+    // Release-Signierung nur, wenn der Keystore per Umgebung hereingereicht wird
+    // (CI: release.yml entpackt das Secret ANDROID_KEYSTORE_BASE64); lokale
+    // Builds bleiben unsigniert bzw. debug-signiert.
+    if (System.getenv("ANDROID_KEYSTORE_PATH") != null) {
+        signingConfigs {
+            release {
+                storeFile file(System.getenv("ANDROID_KEYSTORE_PATH"))
+                storePassword System.getenv("ANDROID_KEYSTORE_PASSWORD")
+                keyAlias "erfassungsbogen"
+                keyPassword System.getenv("ANDROID_KEYSTORE_PASSWORD")
+            }
+        }
+    }
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            if (System.getenv("ANDROID_KEYSTORE_PATH") != null) {
+                signingConfig signingConfigs.release
+            }
         }
     }
 }
