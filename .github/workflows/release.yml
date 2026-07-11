@@ -51,6 +51,7 @@ jobs:
     needs: [prepare, check]
     env:
       BUILD_VERSION: ${{ needs.prepare.outputs.build_version }}
+      BUILD_SEMVER: ${{ needs.prepare.outputs.build_semver }}
       # Signiert wird nur, wenn die Secrets hinterlegt sind (wie bei S1-Control);
       # sonst unsigniert (Gatekeeper: Rechtsklick → Öffnen, kein Auto-Update auf macOS).
       CSC_IDENTITY_AUTO_DISCOVERY: "false"
@@ -81,6 +82,7 @@ jobs:
           npx electron-builder --mac --publish never \
             ${NOTARIZE:+--config.mac.notarize=true} \
             --config.artifactName='Erfassungsbogen-${{ env.BUILD_VERSION }}-${os}-${arch}.${ext}'
+          node scripts/ensure-update-metadata.cjs mac
       - uses: actions/upload-artifact@v4
         with:
           name: erfassungsbogen-mac-${{ env.BUILD_VERSION }}
@@ -95,6 +97,7 @@ jobs:
     needs: [prepare, check]
     env:
       BUILD_VERSION: ${{ needs.prepare.outputs.build_version }}
+      BUILD_SEMVER: ${{ needs.prepare.outputs.build_semver }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -107,6 +110,7 @@ jobs:
           npm pkg set version="${{ needs.prepare.outputs.build_semver }}"
           npm run build
           npx electron-builder --win --x64 --publish never --config.artifactName='Erfassungsbogen-${{ env.BUILD_VERSION }}-${os}-${arch}.${ext}'
+          node scripts/ensure-update-metadata.cjs win
       - uses: actions/upload-artifact@v4
         with:
           name: erfassungsbogen-win-${{ env.BUILD_VERSION }}
@@ -120,6 +124,7 @@ jobs:
     needs: [prepare, check]
     env:
       BUILD_VERSION: ${{ needs.prepare.outputs.build_version }}
+      BUILD_SEMVER: ${{ needs.prepare.outputs.build_semver }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -137,6 +142,7 @@ jobs:
           npm run build
           npx electron-builder --linux --x64 --publish never \
             --config.artifactName='Erfassungsbogen-${{ env.BUILD_VERSION }}-${os}-${arch}.${ext}'
+          node scripts/ensure-update-metadata.cjs linux
       - uses: actions/upload-artifact@v4
         with:
           name: erfassungsbogen-linux-${{ env.BUILD_VERSION }}
