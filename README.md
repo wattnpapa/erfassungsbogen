@@ -38,6 +38,13 @@ fertige Pakete zum Herunterladen unter
 - **Windows**: NSIS-Installer (`.exe`)
 - **Linux**: `.deb` (Debian/Ubuntu) und `.pacman` (Arch)
 
+Die App prüft beim Start automatisch auf neue Versionen (electron-updater gegen
+das neueste GitHub-Release), lädt Updates im Hintergrund und installiert sie
+nach Bestätigung bzw. beim nächsten Beenden. Offline-Starts bleiben ungestört.
+Auf macOS setzt das Installieren von Updates eine signierte App voraus
+(Signierung/Notarisierung aktiviert sich im Workflow automatisch, sobald die
+Apple-Secrets wie bei S1-Control hinterlegt sind).
+
 Jeder Push auf `main` baut automatisch ein Release mit Datums-Version
 ([release.yml](.github/workflows/release.yml), Aufbau wie bei
 [S1-Control](https://github.com/wattnpapa/S1-Control)). Lokal:
