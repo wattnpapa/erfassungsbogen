@@ -24,6 +24,8 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
+      - name: Build-Version erzeugen (Footer-Anzeige)
+        run: echo "APP_BUILD_VERSION=$(date -u '+%Y.%m.%d.%H.%M')" >> "$GITHUB_ENV"
       - run: npm run build
       - uses: actions/upload-pages-artifact@v3
         with:
