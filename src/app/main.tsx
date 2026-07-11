@@ -5,7 +5,9 @@
 import { StrictMode, useState, type ChangeEvent } from "react";
 import { createRoot } from "react-dom/client";
 import type { Erfassungsbogen } from "../model";
-import { bogenLaden, neuerBogen } from "./hilfen";
+import { decodePayloadUrl } from "../codec";
+import { bogenLaden, browserKompressor, neuerBogen } from "./hilfen";
+import { istNativ, qrScannen } from "./nativ";
 import { Fusszeile } from "./fusszeile";
 import {
   SchrittEinheit,
@@ -37,6 +39,18 @@ function App() {
     }
   }
 
+  async function scanneQr() {
+    try {
+      const text = await qrScannen();
+      if (!text) return; // Abbruch
+      setBogen(decodePayloadUrl(text, browserKompressor));
+      setSchritt(UEBERSICHT);
+      setFehler("");
+    } catch (err) {
+      setFehler(err instanceof Error ? err.message : String(err));
+    }
+  }
+
   if (!bogen) {
     return (
       <>
@@ -50,6 +64,9 @@ function App() {
           <button className="primaer" onClick={() => { setBogen(neuerBogen()); setSchritt(0); }}>
             Neuen Bogen erstellen
           </button>
+          {istNativ() && (
+            <button onClick={scanneQr}>QR-Code scannen…</button>
+          )}
           <label className="datei-knopf">
             Aus Datei laden…
             <input type="file" accept=".json,application/json" onChange={ladeDatei} hidden />

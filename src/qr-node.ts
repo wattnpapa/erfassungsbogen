@@ -7,7 +7,7 @@
 import { deflateRawSync, inflateRawSync } from "node:zlib";
 import QRCode from "qrcode";
 import type { Erfassungsbogen } from "./model";
-import { encodePayload, decodePayload, type Kompressor } from "./codec";
+import { encodePayloadUrl, decodePayloadUrl, type Kompressor } from "./codec";
 
 export const nodeKompressor: Kompressor = {
   deflateRaw: (d) => new Uint8Array(deflateRawSync(d, { level: 9 })),
@@ -15,22 +15,19 @@ export const nodeKompressor: Kompressor = {
 };
 
 export interface QrErgebnis {
-  payload: Uint8Array;
+  /** QR-Inhalt: App-URL mit Base64url-Payload im Fragment. */
+  url: string;
   /** QR-Version (1–40), bestimmt Modulzahl = 17 + 4·Version. */
   version: number;
-}
-
-function segmente(payload: Uint8Array) {
-  return [{ data: Buffer.from(payload), mode: "byte" as const }];
 }
 
 const QR_OPTIONEN = { errorCorrectionLevel: "M" as const };
 
 /** Bogen → QR-Code als SVG-String (für PDF-Einbettung und Anzeige). */
 export async function bogenZuQrSvg(b: Erfassungsbogen): Promise<QrErgebnis & { svg: string }> {
-  const payload = encodePayload(b, nodeKompressor);
-  const svg = await QRCode.toString(segmente(payload), { ...QR_OPTIONEN, type: "svg" });
-  return { payload, version: QRCode.create(segmente(payload), QR_OPTIONEN).version, svg };
+  const url = encodePayloadUrl(b, nodeKompressor);
+  const svg = await QRCode.toString(url, { ...QR_OPTIONEN, type: "svg" });
+  return { url, version: QRCode.create(url, QR_OPTIONEN).version, svg };
 }
 
 /** Bogen → QR-Code als PNG-Buffer (für Druck/Export). */
@@ -38,16 +35,16 @@ export async function bogenZuQrPng(
   b: Erfassungsbogen,
   breitePx = 600,
 ): Promise<QrErgebnis & { png: Buffer }> {
-  const payload = encodePayload(b, nodeKompressor);
-  const png = await QRCode.toBuffer(segmente(payload), {
+  const url = encodePayloadUrl(b, nodeKompressor);
+  const png = await QRCode.toBuffer(url, {
     ...QR_OPTIONEN,
     type: "png",
     width: breitePx,
   });
-  return { payload, version: QRCode.create(segmente(payload), QR_OPTIONEN).version, png };
+  return { url, version: QRCode.create(url, QR_OPTIONEN).version, png };
 }
 
-/** Gescannter QR-Inhalt (Bytes) → Bogen. */
-export function qrPayloadZuBogen(payload: Uint8Array): Erfassungsbogen {
-  return decodePayload(payload, nodeKompressor);
+/** Gescannter QR-Text (App-URL oder nackter Base64url-Payload) → Bogen. */
+export function qrTextZuBogen(text: string): Erfassungsbogen {
+  return decodePayloadUrl(text, nodeKompressor);
 }

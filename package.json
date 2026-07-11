@@ -20,8 +20,12 @@
   "author": "",
   "license": "EUPL-1.2",
   "dependencies": {
+    "@capacitor/android": "^8.4.1",
+    "@capacitor/barcode-scanner": "^3.1.0",
     "@capacitor/core": "^8.4.1",
+    "@capacitor/filesystem": "^8.1.2",
     "@capacitor/ios": "^8.4.1",
+    "@capacitor/share": "^8.0.1",
     "pako": "^3.0.1",
     "pdfmake": "^0.3.11",
     "qrcode": "^1.5.4",

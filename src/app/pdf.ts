@@ -27,6 +27,7 @@ import {
   vokabText,
   vokabularFuer,
 } from "./hilfen";
+import { istNativ, pdfTeilen } from "./nativ";
 
 // vfs-Zuweisung ist je nach pdfmake-Version unterschiedlich verpackt
 const fonts = pdfFonts as unknown as { pdfMake?: { vfs: Record<string, string> }; vfs?: Record<string, string> };
@@ -233,7 +234,7 @@ export async function pdfErzeugen(b: Erfassungsbogen): Promise<void> {
       { text: "Digitaler Bogen als QR-Code", bold: true, fontSize: 13, color: BLAU, alignment: "center", margin: [0, 60, 0, 0] },
       { image: qr.datenUrl, width: 240, alignment: "center", margin: [0, 16, 0, 0] },
       {
-        text: `Format EEB2 · ${qr.bytes} Bytes · QR-Version ${qr.version} (Fehlerkorrektur M)\nMit der EEB-App scannen, um den Bogen digital zu übernehmen.`,
+        text: `Format EEB2 · ${qr.zeichen} Zeichen · QR-Version ${qr.version} (Fehlerkorrektur M)\nMit der Kamera oder der EEB-App scannen, um den Bogen digital zu übernehmen.`,
         alignment: "center",
         fontSize: 8,
         margin: [0, 10, 0, 0],
@@ -242,5 +243,11 @@ export async function pdfErzeugen(b: Erfassungsbogen): Promise<void> {
   };
 
   const dateiname = `eeb-${(b.einheit.name || "bogen").replace(/[^\wäöüÄÖÜß-]+/g, "_")}.pdf`;
-  pdfMake.createPdf(dd).download(dateiname);
+  if (istNativ()) {
+    // In der App gibt es keinen Browser-Download: PDF übers Share-Sheet anbieten
+    const base64 = await pdfMake.createPdf(dd).getBase64();
+    await pdfTeilen(dateiname, base64);
+  } else {
+    pdfMake.createPdf(dd).download(dateiname);
+  }
 }

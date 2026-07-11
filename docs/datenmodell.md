@@ -140,9 +140,15 @@ Litern), Unterbringung (bool), Ruhezeit erforderlich (bool).
 ## QR-Payload-Format „EEB2"
 
 ```
-QR-Inhalt (Byte-Modus):   0x45 0x45 0x42 0x32 ('EEB2') ‖ DeflateRaw(Binärstrom)
-alternativ (Alnum-Modus): "EEB2:" ‖ Base45(DeflateRaw(Binärstrom))
+QR-Inhalt (URL):  "https://erfassungsbogen.app/#" ‖ Base64url(Payload)
+Payload (binär):  0x45 0x45 0x42 0x32 ('EEB2') ‖ DeflateRaw(Binärstrom)
 ```
+
+Der URL-Präfix ist der App-Identifikator: Die native Kamera von iOS/Android
+erkennt die URL und öffnet die App (Universal Link) bzw. die Web-App. Die
+Daten stehen im Fragment (`#`) und werden daher nie an einen Server gesendet.
+Der Decoder akzeptiert die volle URL oder den nackten Base64url-Payload;
+die Magic-Bytes 'EEB2' im Binärteil bleiben die Format-Kennung.
 
 Binärstrom: Felder in fester Reihenfolge, Varint-Längen, UTF-8-Strings, Optionals
 über Flag-Bits, Vokabular-Werte als Varint-Code (0 = Freitext folgt).

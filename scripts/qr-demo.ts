@@ -27,7 +27,8 @@ import {
   staerke,
   unterbringungMWD,
 } from "../src/model";
-import { bogenZuQrPng, bogenZuQrSvg, qrPayloadZuBogen } from "../src/qr-node";
+import { EEB_URL_PREFIX } from "../src/codec";
+import { bogenZuQrPng, bogenZuQrSvg, qrTextZuBogen } from "../src/qr-node";
 
 // Vokabular-Codes aus src/vokabulare/thw.ts:
 // Einheitstyp 43 = FGr K (A); Funktionen 3=GrFü 4=TrFü 5=He 7=SGL 35=FüGeh;
@@ -132,7 +133,7 @@ writeFileSync("examples/fgr-k-a.png", pngErg.png);
 const s = staerke(bogen);
 const mwd = unterbringungMWD(bogen);
 console.log(`Bogen: FGr K (A), Stärke ${s.fuehrer}/${s.unterfuehrer}/${s.mannschaft}/${s.gesamt}, M${mwd.m}/W${mwd.w}/D${mwd.d}`);
-console.log(`Payload: ${pngErg.payload.length} Bytes → QR-Version ${pngErg.version} (ECC M)`);
+console.log(`QR-Inhalt: ${pngErg.url.length} Zeichen (URL) → QR-Version ${pngErg.version} (ECC M)`);
 console.log("Geschrieben: examples/fgr-k-a.svg, examples/fgr-k-a.png");
 
 // Rück-Scan des PNG mit jsQR (echter QR-Decoder)
@@ -140,8 +141,10 @@ const bild = PNG.sync.read(pngErg.png);
 const scan = jsQR(new Uint8ClampedArray(bild.data), bild.width, bild.height);
 if (!scan) throw new Error("jsQR konnte den QR-Code nicht lesen");
 
-const gescannt = new Uint8Array(scan.binaryData);
-const dekodiert = qrPayloadZuBogen(gescannt);
+if (!scan.data.startsWith(EEB_URL_PREFIX)) {
+  throw new Error(`QR-Inhalt beginnt nicht mit ${EEB_URL_PREFIX}`);
+}
+const dekodiert = qrTextZuBogen(scan.data);
 
 // Deep-Equal (JSON-normalisiert, damit fehlende vs. undefined-Felder gleich zählen)
 deepStrictEqual(JSON.parse(JSON.stringify(dekodiert)), JSON.parse(JSON.stringify(bogen)));

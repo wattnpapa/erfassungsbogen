@@ -414,3 +414,61 @@ export function decodePayload(payload: Uint8Array, k: Kompressor): Erfassungsbog
   }
   return decodeBinaer(k.inflateRaw(payload.subarray(EEB_MAGIC.length)));
 }
+
+// ----------------------------------------------------------------- QR-URL
+
+/**
+ * URL-Präfix im QR-Code: Die native Kamera erkennt die URL und öffnet die
+ * App (Universal Link) bzw. die Web-App. Die Daten stehen im Fragment (#),
+ * werden also nie an einen Server übertragen.
+ */
+export const EEB_URL_PREFIX = "https://erfassungsbogen.app/#";
+
+const B64URL = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
+const B64URL_REV = new Map([...B64URL].map((c, i) => [c, i] as const));
+
+function base64UrlKodieren(daten: Uint8Array): string {
+  let s = "";
+  for (let i = 0; i < daten.length; i += 3) {
+    const a = daten[i] ?? 0;
+    const b = daten[i + 1];
+    const c = daten[i + 2];
+    s += B64URL.charAt(a >> 2) + B64URL.charAt(((a & 3) << 4) | ((b ?? 0) >> 4));
+    if (b !== undefined) s += B64URL.charAt(((b & 15) << 2) | ((c ?? 0) >> 6));
+    if (c !== undefined) s += B64URL.charAt(c & 63);
+  }
+  return s;
+}
+
+function base64UrlDekodieren(s: string): Uint8Array {
+  const bytes: number[] = [];
+  let puffer = 0;
+  let bits = 0;
+  for (const zeichen of s) {
+    const wert = B64URL_REV.get(zeichen);
+    if (wert === undefined) throw new Error("Kein EEB2-QR-Code (ungültige Zeichen)");
+    puffer = (puffer << 6) | wert;
+    bits += 6;
+    if (bits >= 8) {
+      bits -= 8;
+      bytes.push((puffer >> bits) & 0xff);
+    }
+  }
+  return Uint8Array.from(bytes);
+}
+
+/** Bogen → QR-Inhalt als URL (Präfix + Base64url-Payload). */
+export function encodePayloadUrl(b: Erfassungsbogen, k: Kompressor): string {
+  return EEB_URL_PREFIX + base64UrlKodieren(encodePayload(b, k));
+}
+
+/**
+ * Gescannter QR-Text bzw. App-Link → Bogen. Akzeptiert die volle URL
+ * (Datenteil hinter '#') oder den nackten Base64url-Payload.
+ */
+export function decodePayloadUrl(text: string, k: Kompressor): Erfassungsbogen {
+  let daten = text.trim();
+  const raute = daten.indexOf("#");
+  if (raute >= 0) daten = daten.slice(raute + 1);
+  return decodePayload(base64UrlDekodieren(daten), k);
+}

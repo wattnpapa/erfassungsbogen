@@ -17,7 +17,8 @@ import {
   staerke,
   unterbringungMWD,
 } from "../model";
-import { encodePayload, type Kompressor } from "../codec";
+import { encodePayloadUrl, type Kompressor } from "../codec";
+import { istNativ, textTeilen } from "./nativ";
 import {
   FUNKRUF_KENNWOERTER,
   THW_EINHEITSTYPEN,
@@ -129,26 +130,32 @@ export function datumDeutsch(iso: string): string {
 
 export interface QrInfo {
   datenUrl: string;
-  bytes: number;
+  zeichen: number;
   version: number;
 }
 
 export async function qrErzeugen(b: Erfassungsbogen): Promise<QrInfo> {
-  const payload = encodePayload(b, browserKompressor);
-  // qrcode akzeptiert Byte-Segmente als Uint8Array (Typdefinition kennt nur Buffer)
-  const segmente = [{ data: payload as unknown as Buffer, mode: "byte" as const }];
+  // QR-Inhalt ist eine App-URL: Die Kamera erkennt sie und öffnet die App
+  // bzw. die Web-App; die Daten stehen im Fragment (bleiben also lokal).
+  const url = encodePayloadUrl(b, browserKompressor);
   const optionen = { errorCorrectionLevel: "M" as const };
-  const datenUrl = await QRCode.toDataURL(segmente, { ...optionen, width: 520, margin: 2 });
-  return { datenUrl, bytes: payload.length, version: QRCode.create(segmente, optionen).version };
+  const datenUrl = await QRCode.toDataURL(url, { ...optionen, width: 520, margin: 2 });
+  return { datenUrl, zeichen: url.length, version: QRCode.create(url, optionen).version };
 }
 
 // ------------------------------------------------------------ Datei-Dialog
 
-export function bogenSpeichern(b: Erfassungsbogen): void {
-  const blob = new Blob([JSON.stringify(b, null, 2)], { type: "application/json" });
+export async function bogenSpeichern(b: Erfassungsbogen): Promise<void> {
+  const json = JSON.stringify(b, null, 2);
+  const name = (b.einheit.name || "bogen").replace(/[^\wäöüÄÖÜß-]+/g, "_");
+  if (istNativ()) {
+    // In der App gibt es keinen Browser-Download: JSON übers Share-Sheet anbieten
+    await textTeilen(`eeb-${name}.json`, json);
+    return;
+  }
+  const blob = new Blob([json], { type: "application/json" });
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
-  const name = (b.einheit.name || "bogen").replace(/[^\wäöüÄÖÜß-]+/g, "_");
   a.download = `eeb-${name}.json`;
   a.click();
   URL.revokeObjectURL(a.href);
