@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Einheiten-Erfassungsbogen</title>
+  <style>
+    :root {
+      --blau: #12275e;
+      --blau-hell: #1d3d8f;
+      --rand: #c9cede;
+      --grau: #f2f3f7;
+      --fehler: #b3261e;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      color: #1a1c22;
+      background: var(--grau);
+    }
+    main { max-width: 60rem; margin: 0 auto; padding: 1rem 1rem 6rem; }
+    h1 { color: var(--blau); font-size: 1.4rem; margin: 0.5rem 0; }
+    h2 { color: var(--blau); font-size: 1.1rem; border-bottom: 2px solid var(--blau); padding-bottom: 0.2rem; }
+    h3 { font-size: 1rem; margin: 0.8rem 0 0.3rem; }
+    .start { text-align: center; padding-top: 4rem; }
+    .aktionen { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; margin-top: 1.5rem; }
+    button, .datei-knopf {
+      font: inherit; padding: 0.5rem 1rem; border: 1px solid var(--rand);
+      border-radius: 0.4rem; background: #fff; cursor: pointer;
+    }
+    button:hover, .datei-knopf:hover { border-color: var(--blau-hell); }
+    button.primaer, .datei-knopf.primaer { background: var(--blau); color: #fff; border-color: var(--blau); }
+    button.primaer:hover { background: var(--blau-hell); }
+    button:disabled { opacity: 0.4; cursor: default; }
+    .schritte { display: flex; gap: 0.3rem; flex-wrap: wrap; margin: 0.5rem 0 1rem; }
+    .schritte button { padding: 0.3rem 0.7rem; font-size: 0.85rem; border-radius: 1rem; }
+    .schritte button.aktiv { background: var(--blau); color: #fff; border-color: var(--blau); }
+    section.karte, .karte {
+      background: #fff; border: 1px solid var(--rand); border-radius: 0.5rem;
+      padding: 1rem; margin-bottom: 1rem;
+    }
+    label.feld { display: block; margin: 0.6rem 0 0; font-size: 0.85rem; color: #444; }
+    label.feld > input, label.feld > select, label.feld > textarea {
+      display: block; width: 100%; margin-top: 0.15rem;
+    }
+    input, select, textarea {
+      font: inherit; padding: 0.4rem 0.5rem; border: 1px solid var(--rand);
+      border-radius: 0.3rem; background: #fff;
+    }
+    input:focus, select:focus, textarea:focus { outline: 2px solid var(--blau-hell); }
+    .zeile { display: flex; gap: 0.8rem; flex-wrap: wrap; align-items: flex-end; }
+    .zeile > label.feld { flex: 1 1 10rem; margin-top: 0.4rem; }
+    .zeile > label.feld.schmal { flex: 0 1 7rem; }
+    .inline { display: inline-flex; align-items: center; gap: 0.4rem; margin: 0.6rem 0.8rem 0 0; font-size: 0.9rem; }
+    .chips { display: flex; flex-wrap: wrap; gap: 0.3rem; align-items: center; margin-top: 0.2rem; }
+    .chip {
+      background: var(--grau); border: 1px solid var(--rand); border-radius: 1rem;
+      padding: 0.1rem 0.5rem; font-size: 0.85rem; display: inline-flex; gap: 0.3rem; align-items: center;
+    }
+    .chip button { border: none; padding: 0 0.2rem; background: none; font-weight: bold; }
+    .karte .entfernen { float: right; color: var(--fehler); border-color: var(--fehler); font-size: 0.8rem; }
+    footer.nav {
+      position: fixed; bottom: 0; left: 0; right: 0; background: #fff;
+      border-top: 1px solid var(--rand); padding: 0.7rem 1rem;
+      display: flex; justify-content: space-between; gap: 1rem;
+    }
+    footer.nav .platzhalter { flex: 1; }
+    .fehler { color: var(--fehler); }
+    .hinweis { font-size: 0.85rem; color: #555; }
+    table.uebersicht { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+    table.uebersicht th, table.uebersicht td { border: 1px solid var(--rand); padding: 0.3rem 0.5rem; text-align: left; vertical-align: top; }
+    table.uebersicht th { background: var(--grau); }
+    .kopfzeile { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; }
+    .kopfzeile h2 { border: none; margin: 0; }
+    .qr-box { text-align: center; }
+    .qr-box img { max-width: 260px; width: 100%; image-rendering: pixelated; border: 1px solid var(--rand); }
+    dl.paare { display: grid; grid-template-columns: max-content 1fr; gap: 0.2rem 1rem; margin: 0.4rem 0; font-size: 0.92rem; }
+    dl.paare dt { color: #555; }
+    dl.paare dd { margin: 0; }
+  </style>
+</head>
+<body>
+  <div id="app"></div>
+  <script type="module" src="/src/app/main.tsx"></script>
+</body>
+</html>

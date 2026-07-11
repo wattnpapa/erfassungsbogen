@@ -1,0 +1,43 @@
+{
+  "name": "erfassungsbogen",
+  "version": "1.0.0",
+  "description": "Digitaler Einheiten-Erfassungsbogen für BOS: Assistent, PDF-Export im Papier-Layout, Offline-Transport per QR-Code.",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "demo": "tsx scripts/qr-demo.ts",
+    "typecheck": "tsc --noEmit",
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "EUPL-1.2",
+  "dependencies": {
+    "pako": "^3.0.1",
+    "pdfmake": "^0.3.11",
+    "qrcode": "^1.5.4",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7"
+  },
+  "devDependencies": {
+    "@types/node": "^26.1.1",
+    "@types/pako": "^2.0.4",
+    "@types/pdfmake": "^0.3.3",
+    "@types/pngjs": "^6.0.5",
+    "@types/qrcode": "^1.5.6",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^6.0.3",
+    "jsqr": "^1.4.0",
+    "pngjs": "^7.0.0",
+    "tsx": "^4.23.0",
+    "typescript": "^7.0.2",
+    "vite": "^8.1.4"
+  },
+  "type": "module",
+  "private": true
+}
