@@ -24,6 +24,8 @@
 	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 	<key>NSCameraUsageDescription</key>
 	<string>Die Kamera wird ausschließlich zum Scannen der QR-Codes auf Erfassungsbögen verwendet, um deren Daten offline zu übernehmen.</string>
 	<key>UILaunchStoryboardName</key>
