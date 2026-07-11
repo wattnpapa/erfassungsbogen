@@ -1,0 +1,15 @@
+{
+  "applinks": {
+    "details": [
+      {
+        "appIDs": ["2AKGEZS43R.de.erfassungsbogen.app"],
+        "components": [
+          {
+            "/": "/",
+            "comment": "Erfassungsbogen-QR: Payload steht im Fragment, daher genügt die Wurzel"
+          }
+        ]
+      }
+    ]
+  }
+}
