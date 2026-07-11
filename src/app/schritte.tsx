@@ -267,7 +267,7 @@ export function SchrittEinheit({ bogen, aendern }: SchrittProps) {
                   hierarchie: e.hierarchie.map((x, j) =>
                     j === i
                       ? ov
-                        ? { ...x, name, telefon: ov.telefon.replace(/\D/g, "") || undefined, email: ov.email || undefined }
+                        ? { ...x, name, kurz: ov.kurz || undefined, telefon: ov.telefon.replace(/\D/g, "") || undefined, email: ov.email || undefined }
                         : { ...x, name }
                       : x,
                   ),
@@ -280,10 +280,21 @@ export function SchrittEinheit({ bogen, aendern }: SchrittProps) {
                 if (!ov) return;
                 setE({
                   hierarchie: e.hierarchie.map((x, j) =>
-                    j === i ? { ...x, name: ov.name, telefon: ov.telefon.replace(/\D/g, "") || undefined, email: ov.email || undefined } : x,
+                    j === i
+                      ? { ...x, name: ov.name, kurz: ov.kurz || undefined, telefon: ov.telefon.replace(/\D/g, "") || undefined, email: ov.email || undefined }
+                      : x,
                   ),
                 });
               }}
+            />
+          </Feld>
+          <Feld titel="Kürzel" schmal>
+            <input
+              value={h.kurz ?? ""}
+              placeholder="OODE"
+              onChange={(ev) =>
+                setE({ hierarchie: e.hierarchie.map((x, j) => (j === i ? { ...x, kurz: ev.target.value.toUpperCase() || undefined } : x)) })
+              }
             />
           </Feld>
           <Feld titel="Telefon" schmal>
@@ -871,7 +882,7 @@ export function Uebersicht(props: {
           {bogen.einheit.hierarchie.map((h, i) => (
             <span key={i} style={{ display: "contents" }}>
               <dt>{vokabText(h.bezeichnung, vokabularFuer(org, "ebene")) || "Ebene"}</dt>
-              <dd>{h.name}{h.telefon ? ` · ${h.telefon}` : ""}{h.email ? ` · ${h.email}` : ""}</dd>
+              <dd>{h.name}{h.kurz ? ` (${h.kurz})` : ""}{h.telefon ? ` · ${h.telefon}` : ""}{h.email ? ` · ${h.email}` : ""}</dd>
             </span>
           ))}
         </dl>

@@ -175,6 +175,8 @@ export interface HierarchieEbene {
   /** Vokabular der Organisation: THW OV/RB/LV; FW GEMEINDE/LANDKREIS/BEZIRK; … */
   bezeichnung: VokabularWert;
   name: string; // "Oldenburg - Ni"
+  /** Offizielles Kürzel der Ebene (THW-OV: "OODE"); erscheint auf Bogen und PDF. */
+  kurz?: string;
   telefon?: string; // nur Ziffern
   email?: string;
 }

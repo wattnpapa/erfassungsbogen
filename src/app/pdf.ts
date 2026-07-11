@@ -57,7 +57,7 @@ export async function pdfErzeugen(b: Erfassungsbogen): Promise<void> {
   for (const h of b.einheit.hierarchie) {
     infoZeilen.push([
       { text: vokabText(h.bezeichnung, vokabularFuer(org, "ebene")) || "Ebene", bold: true },
-      { text: h.name },
+      { text: h.kurz ? `${h.name} (${h.kurz})` : h.name },
       { text: "Telefon:\neMail:", bold: true },
       { text: `${h.telefon ?? "—"}\n${h.email ?? "—"}` },
     ]);

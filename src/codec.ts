@@ -203,11 +203,12 @@ function encodeEinheit(w: Writer, e: Einheit): void {
     w.str(e.name);
     w.varint(e.hierarchie.length);
     for (const h of e.hierarchie) {
-      w.u8((h.telefon ? 1 : 0) | (h.email ? 2 : 0));
+      w.u8((h.telefon ? 1 : 0) | (h.email ? 2 : 0) | (h.kurz ? 4 : 0));
       w.vokab(h.bezeichnung);
       w.str(h.name);
       if (h.telefon) w.bcd(h.telefon);
       if (h.email) w.str(h.email);
+      if (h.kurz) w.str(h.kurz);
     }
   }
 }
@@ -336,6 +337,7 @@ function decodeEinheit(r: Reader): Einheit {
       const h: HierarchieEbene = { bezeichnung: r.vokab(), name: r.str() };
       if (hflags & 1) h.telefon = r.bcd();
       if (hflags & 2) h.email = r.str();
+      if (hflags & 4) h.kurz = r.str();
       e.hierarchie.push(h);
     }
   }
