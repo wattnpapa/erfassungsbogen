@@ -1008,6 +1008,7 @@ export function Uebersicht(props: {
       ))}
 
       {abschnitt(`Personal (${bogen.personal.length})`, 2, (
+        <div className="tabellen-scroll">
         <table className="uebersicht">
           <thead>
             <tr><th>Funktion / Zusatzfunktion</th><th>Name, Vorname</th><th>Erreichbarkeit</th></tr>
@@ -1030,9 +1031,11 @@ export function Uebersicht(props: {
             ))}
           </tbody>
         </table>
+        </div>
       ))}
 
       {abschnitt(`Fahrzeuge (${bogen.fahrzeuge.length})`, 3, (
+        <div className="tabellen-scroll">
         <table className="uebersicht">
           <thead>
             <tr><th>Typ</th><th>Kennzeichen</th><th>Funkrufname</th><th>StAN</th><th>Änderungen</th></tr>
@@ -1049,6 +1052,7 @@ export function Uebersicht(props: {
             ))}
           </tbody>
         </table>
+        </div>
       ))}
 
       {abschnitt("Sofortbedarf & Sonstiges", 4, (

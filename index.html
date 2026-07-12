@@ -66,10 +66,14 @@
     input, select, textarea {
       font: inherit; padding: 0.4rem 0.5rem; border: 1px solid var(--rand);
       border-radius: 0.3rem; background: #fff;
+      /* Lange Optionstexte dürfen das Layout nicht über den Viewport drücken. */
+      max-width: 100%;
     }
     input:focus, select:focus, textarea:focus { outline: 2px solid var(--blau-hell); }
     .zeile { display: flex; gap: 0.8rem; flex-wrap: wrap; align-items: flex-end; }
-    .zeile > label.feld { flex: 1 1 10rem; margin-top: 0.4rem; }
+    /* min-width: 0 – lange Select-Optionen dürfen die Spalte nicht aufdrücken. */
+    .zeile > label.feld { flex: 1 1 10rem; margin-top: 0.4rem; min-width: 0; }
+    select { min-width: 0; }
     .zeile > label.feld.schmal { flex: 0 1 7rem; }
     .inline { display: inline-flex; align-items: center; gap: 0.4rem; margin: 0.6rem 0.8rem 0 0; font-size: 0.9rem; }
     .autocomplete { position: relative; display: block; }
@@ -109,6 +113,8 @@
     .update-banner .primaer { background: #fff; color: var(--blau); border-color: #fff; }
     .update-banner .link { color: #cdd6f4; }
     .update-banner .fehler { color: #ffb4ab; flex-basis: 100%; }
+    /* Breite Tabellen rollen im eigenen Bereich statt das Layout zu sprengen. */
+    .tabellen-scroll { overflow-x: auto; }
     table.uebersicht { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
     table.uebersicht th, table.uebersicht td { border: 1px solid var(--rand); padding: 0.3rem 0.5rem; text-align: left; vertical-align: top; }
     table.uebersicht th { background: var(--grau); }
@@ -174,51 +180,243 @@
     }
 
     /* ---------------------------------------------------------------
-       Native iOS-Anmutung – greift NUR in der iOS-App. main.tsx setzt
-       beim Start die Klasse .platform-ios auf <html> (Capacitor).
-       Web und Android bleiben unverändert.
+       Native iOS-Anmutung nach den Apple Human Interface Guidelines –
+       greift NUR in der iOS-App. main.tsx setzt beim Start die Klasse
+       .platform-ios auf <html> (Capacitor). Web und Android bleiben
+       unverändert.
+
+       Umgesetzte HIG-Punkte:
+       - Semantische Systemfarben mit Light/Dark Mode (color-scheme)
+       - Dynamic Type über die -apple-system-Textstile
+       - Touch-Ziele mindestens 44 pt
+       - Flächen statt Rahmen („content over chrome")
+       - Untere Navigationsleiste als transluzentes Material (Blur)
        --------------------------------------------------------------- */
+    .platform-ios {
+      color-scheme: light dark;
+      accent-color: var(--ios-akzent-flaeche);
+      /* Werte der iOS-Systempalette (Light) plus Marken-Tint. */
+      --ios-fond: #f2f2f7;                       /* systemGroupedBackground */
+      --ios-flaeche: #ffffff;                    /* secondarySystemGroupedBackground */
+      --ios-text: #000000;                       /* label */
+      --ios-text-2: rgba(60, 60, 67, 0.6);       /* secondaryLabel */
+      --ios-trenner: rgba(60, 60, 67, 0.29);     /* separator */
+      --ios-fuellung: rgba(118, 118, 128, 0.12); /* tertiarySystemFill */
+      --ios-akzent: var(--blau);                 /* Tint für Text und Links */
+      --ios-akzent-flaeche: var(--blau);         /* Tint als Button-Füllung */
+      --ios-rot: #ff3b30;                        /* systemRed */
+      --ios-warnung-text: #7a5200;
+      --ios-warnung-fond: #fff7e0;
+      --ios-balken: rgba(249, 249, 249, 0.82);   /* Bar-Material */
+    }
+    @media (prefers-color-scheme: dark) {
+      .platform-ios {
+        --ios-fond: #000000;
+        --ios-flaeche: #1c1c1e;
+        --ios-text: #ffffff;
+        --ios-text-2: rgba(235, 235, 245, 0.6);
+        --ios-trenner: rgba(84, 84, 88, 0.6);
+        --ios-fuellung: rgba(118, 118, 128, 0.24);
+        --ios-akzent: #a8bdf2;        /* aufgehelltes Markenblau, lesbar auf Dunkel */
+        --ios-akzent-flaeche: #3f63cc;
+        --ios-rot: #ff453a;
+        --ios-warnung-text: #ffd60a;
+        --ios-warnung-fond: rgba(255, 214, 10, 0.12);
+        --ios-balken: rgba(29, 29, 31, 0.78);
+      }
+    }
+
+    /* Grundfläche und Systemschrift; -apple-system-body skaliert mit der
+       Textgröße des Systems (Dynamic Type), ebenso alle Stile darunter. */
     .platform-ios body {
-      background: #fff;
+      font: -apple-system-body;
+      background: var(--ios-fond);
+      color: var(--ios-text);
       -webkit-font-smoothing: antialiased;
       -webkit-tap-highlight-color: transparent;
     }
-    /* Kein Text-Callout / keine Auswahl auf Bedien-Elementen
+    .platform-ios h1 {
+      font: -apple-system-largeTitle;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--ios-text);
+    }
+    .platform-ios h2 {
+      font: -apple-system-title3;
+      font-weight: 600;
+      color: var(--ios-text);
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+    .platform-ios h3 { font: -apple-system-headline; color: var(--ios-text); }
+    .platform-ios label.feld { font: -apple-system-subheadline; color: var(--ios-text-2); }
+    .platform-ios .inline { font: -apple-system-subheadline; min-height: 44px; }
+    .platform-ios .hinweis { font: -apple-system-footnote; color: var(--ios-text-2); }
+    .platform-ios dl.paare { font: -apple-system-subheadline; }
+    .platform-ios dl.paare dt { color: var(--ios-text-2); }
+
+    /* Bedienelemente: Flächen statt Rahmen, iOS-Radien, gedimmter
+       Gedrückt-Zustand, kein Text-Callout / keine Auswahl auf Controls
        (Inhalte in Eingabefeldern bleiben selbstverständlich wählbar). */
     .platform-ios button,
-    .platform-ios .datei-knopf,
-    .platform-ios .chip,
-    .platform-ios .schritte button {
+    .platform-ios .datei-knopf {
+      font: -apple-system-body;
+      min-height: 44px;
+      border: none;
+      border-radius: 12px;
+      background: var(--ios-fuellung);
+      color: var(--ios-akzent);
+      transition: opacity 0.1s;
       -webkit-touch-callout: none;
       -webkit-user-select: none;
       user-select: none;
     }
-    /* iOS zoomt bei Feld-Schrift < 16px hinein – das verrät „Webseite". */
-    .platform-ios input,
+    .platform-ios button:active:not(:disabled),
+    .platform-ios .datei-knopf:active { opacity: 0.55; }
+    .platform-ios button.primaer,
+    .platform-ios .datei-knopf.primaer {
+      background: var(--ios-akzent-flaeche);
+      color: #fff;
+      font-weight: 600;
+    }
+    .platform-ios button.primaer:hover { background: var(--ios-akzent-flaeche); }
+    .platform-ios button:disabled { opacity: 0.35; }
+    /* Text-Buttons: nur Tint, unsichtbar vergrößerte Tippfläche (≥44pt). */
+    .platform-ios button.link {
+      min-height: 0;
+      background: none;
+      border-radius: 0;
+      font: inherit;
+      color: var(--ios-akzent);
+      text-decoration: none;
+      padding: 0.8rem 0.3rem;
+      margin: -0.8rem -0.3rem;
+    }
+    /* „Startseite" oben links wie ein Nav-Bar-Rücksprung (Textstil Body). */
+    .platform-ios .zur-start {
+      font: -apple-system-body;
+      background: none;
+      border-radius: 0;
+      color: var(--ios-akzent);
+      display: inline-flex;
+      align-items: center;
+      min-height: 44px;
+      padding: 0;
+      margin-top: 0;
+    }
+    /* Schritt-Pills: kompakte Optik, Tippfläche per Pseudo-Element auf 44pt. */
+    .platform-ios .schritte { row-gap: 10px; }
+    .platform-ios .schritte button {
+      font: -apple-system-subheadline;
+      min-height: 34px;
+      border-radius: 17px;
+      position: relative;
+    }
+    .platform-ios .schritte button::after { content: ""; position: absolute; inset: -5px -2px; }
+    .platform-ios .schritte button.aktiv { background: var(--ios-akzent-flaeche); color: #fff; }
+
+    /* Karten ohne Rahmen – Trennung über Flächenkontrast (grouped style). */
+    .platform-ios section.karte,
+    .platform-ios .karte {
+      background: var(--ios-flaeche);
+      border: none;
+      border-radius: 12px;
+    }
+    /* Destruktive Aktion in systemRed als Text auf Füllfläche. */
+    .platform-ios .karte .entfernen {
+      font: -apple-system-footnote;
+      color: var(--ios-rot);
+      background: var(--ios-fuellung);
+    }
+    .platform-ios .fehler { color: var(--ios-rot); }
+    .platform-ios .warnung {
+      font: -apple-system-footnote;
+      color: var(--ios-warnung-text);
+      background: var(--ios-warnung-fond);
+      border: none;
+      border-radius: 10px;
+      padding: 0.6rem 0.75rem;
+    }
+
+    /* Eingabefelder: gefüllt statt umrandet, Textstil Body (≥17px verhindert
+       zugleich den Auto-Zoom beim Fokussieren). Checkboxen bleiben nativ. */
+    .platform-ios input:not([type="checkbox"]):not([type="radio"]):not([type="file"]),
     .platform-ios select,
     .platform-ios textarea {
-      font-size: 16px;
+      font: -apple-system-body;
+      border: none;
+      border-radius: 10px;
+      background: var(--ios-fuellung);
+      color: var(--ios-text);
+      caret-color: var(--ios-akzent);
+      padding: 0.7rem 0.75rem;
     }
-    /* Größere Touch-Ziele (≥ 44px) und weichere iOS-Radien. */
-    .platform-ios button,
-    .platform-ios .datei-knopf {
-      min-height: 44px;
-      border-radius: 0.7rem;
+    .platform-ios input:focus,
+    .platform-ios select:focus,
+    .platform-ios textarea:focus { outline: 2px solid var(--ios-akzent); outline-offset: 1px; }
+    .platform-ios .inline input { width: 22px; height: 22px; }
+    .platform-ios output.abgeleitet {
+      border: none;
+      border-radius: 10px;
+      background: var(--ios-fuellung);
+      color: var(--ios-text-2);
+      padding: 0.7rem 0.75rem;
     }
-    .platform-ios .schritte button { min-height: 2rem; }
-    .platform-ios section.karte,
-    .platform-ios .karte { border-radius: 0.9rem; }
-    /* „Startseite" oben links wie ein Nav-Bar-Item (17px = iOS-Standard). */
-    .platform-ios .zur-start {
-      font-size: 17px;
-      padding: 0;
-      margin-top: 0.2rem;
+    .platform-ios ul.vorschlaege {
+      background: var(--ios-flaeche);
+      border: none;
+      border-radius: 10px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
     }
-    /* Große, kräftige Titelzeile wie in iOS-Apps. */
-    .platform-ios main > header h1 {
-      font-size: 1.9rem;
-      font-weight: 700;
-      letter-spacing: -0.02em;
+    .platform-ios ul.vorschlaege li { min-height: 44px; display: flex; align-items: center; }
+    .platform-ios ul.vorschlaege li.aktiv,
+    .platform-ios ul.vorschlaege li:hover { background: var(--ios-fuellung); }
+    .platform-ios ul.vorschlaege li small { color: var(--ios-text-2); }
+    .platform-ios .chip {
+      background: var(--ios-fuellung);
+      border: none;
+      color: var(--ios-text);
+      padding: 0.35rem 0.75rem;
+    }
+    .platform-ios .chip button {
+      min-height: 0;
+      background: none;
+      border-radius: 0;
+      color: inherit;
+      padding: 0.5rem 0.55rem;
+      margin: -0.5rem -0.35rem;
+    }
+
+    /* Übersichtstabelle und QR-Fläche in Systemfarben; der QR-Code behält
+       im Dark Mode eine weiße Ruhezone, damit er scannbar bleibt. */
+    .platform-ios table.uebersicht { font: -apple-system-footnote; }
+    .platform-ios table.uebersicht th,
+    .platform-ios table.uebersicht td { border-color: var(--ios-trenner); }
+    .platform-ios table.uebersicht th { background: var(--ios-fuellung); }
+    .platform-ios .qr-box img { border-color: var(--ios-trenner); background: #fff; padding: 8px; }
+
+    /* Untere Navigationsleiste als transluzentes Bar-Material mit Hairline. */
+    .platform-ios footer.nav {
+      background: var(--ios-balken);
+      -webkit-backdrop-filter: saturate(180%) blur(20px);
+      backdrop-filter: saturate(180%) blur(20px);
+      border-top: 0.5px solid var(--ios-trenner);
+    }
+
+    /* Seiten-Fußzeile und Dialoge (Impressum usw.) in Systemfarben. */
+    .platform-ios footer.seite { font: -apple-system-footnote; color: var(--ios-text-2); }
+    .platform-ios footer.seite a {
+      color: var(--ios-akzent);
+      text-decoration: none;
+      padding: 0.8rem 0.3rem;
+      margin: -0.8rem -0.3rem;
+    }
+    .platform-ios dialog {
+      border: none;
+      border-radius: 14px;
+      background: var(--ios-flaeche);
+      color: var(--ios-text);
+      box-shadow: 0 24px 64px rgba(0, 0, 0, 0.35);
     }
   </style>
 </head>
