@@ -203,8 +203,9 @@
 
     /* ---------------------------------------------------------------
        Native iOS-Anmutung nach den Apple Human Interface Guidelines –
-       greift NUR in der iOS-App. main.tsx setzt beim Start die Klasse
-       .platform-ios auf <html> (Capacitor). Web und Android bleiben
+       greift in der iOS-App sowie im Browser-Debug-Modus (Vorschau).
+       main.tsx setzt beim Start die Klasse .platform-ios auf <html>
+       (Capacitor bzw. Debug-Umschalter). Web und Android bleiben sonst
        unverändert.
 
        Umgesetzte HIG-Punkte (Stand iOS 27, Liquid Glass):
@@ -468,9 +469,10 @@
 
     /* ---------------------------------------------------------------
        Native Android-Anmutung nach Material Design 3 (m3.material.io) –
-       greift NUR in der Android-App. main.tsx setzt beim Start die
-       Klasse .platform-android auf <html> (Capacitor). Web und iOS
-       bleiben unverändert.
+       greift in der Android-App sowie im Browser-Debug-Modus (Vorschau).
+       main.tsx setzt beim Start die Klasse .platform-android auf <html>
+       (Capacitor bzw. Debug-Umschalter). Web und iOS bleiben sonst
+       unverändert.
 
        Umgesetzte M3-Punkte:
        - Farbrollen (primary, secondary-container, surface-container-*,
@@ -774,6 +776,63 @@
     }
     .platform-android dialog h2,
     .platform-android dialog h3 { color: var(--md-on-surface); }
+
+    /* ---------------------------------------------------------------
+       Debug-Modus: schwebende Leiste zum Umschalten der visuellen
+       Plattform (Web / iOS / Android) und optionaler Handy-Rahmen.
+       Nur im Browser sichtbar (siehe debug-plattform.tsx). Bewusst
+       gegen das Plattform-CSS abgeschirmt, damit die Leiste in jeder
+       Vorschau gleich aussieht.
+       --------------------------------------------------------------- */
+    .eeb-debug {
+      position: fixed;
+      top: 8px;
+      right: 8px;
+      z-index: 2147483000;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 6px;
+      border-radius: 10px;
+      background: rgba(28, 28, 30, 0.9);
+      color: #fff;
+      font: 500 12px/1.2 -apple-system, "Segoe UI", Roboto, sans-serif;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+      -webkit-backdrop-filter: blur(8px);
+      backdrop-filter: blur(8px);
+    }
+    .eeb-debug-titel { opacity: 0.6; padding: 0 4px; letter-spacing: 0.02em; }
+    .eeb-debug button.eeb-seg {
+      font: inherit; min-height: 0; margin: 0;
+      padding: 4px 9px; border: none; border-radius: 7px;
+      background: rgba(255, 255, 255, 0.14); color: #fff; cursor: pointer;
+      -webkit-appearance: none; appearance: none;
+    }
+    .eeb-debug button.eeb-seg:hover { background: rgba(255, 255, 255, 0.24); }
+    .eeb-debug button.eeb-seg.aktiv { background: #0a84ff; color: #fff; }
+    .eeb-debug-rahmen {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding-left: 4px; margin-left: 2px;
+      border-left: 1px solid rgba(255, 255, 255, 0.2);
+      cursor: pointer; user-select: none;
+    }
+    .eeb-debug-rahmen input { margin: 0; accent-color: #0a84ff; }
+
+    /* Handy-Rahmen: App auf Gerätebreite begrenzen und einrahmen. Der
+       Innenraum folgt der Plattform-Hintergrundfarbe. */
+    .debug-rahmen body { background: #2e2e30; }
+    .debug-rahmen #app {
+      max-width: 402px;
+      margin: 16px auto;
+      min-height: calc(100dvh - 32px);
+      border: 12px solid #0a0a0a;
+      border-radius: 46px;
+      overflow: hidden;
+      background: var(--grau);
+      box-shadow: 0 12px 44px rgba(0, 0, 0, 0.5);
+    }
+    .platform-ios.debug-rahmen #app { background: var(--ios-fond); }
+    .platform-android.debug-rahmen #app { background: var(--md-surface); }
   </style>
 </head>
 <body>

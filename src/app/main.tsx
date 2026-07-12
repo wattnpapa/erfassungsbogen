@@ -8,7 +8,8 @@ import { createRoot } from "react-dom/client";
 import type { Erfassungsbogen } from "../model";
 import { decodePayloadUrl, decodeVorlagePayloadUrl, istVorlageNutzlast } from "../codec";
 import { bogenLaden, browserKompressor, neuerBogen } from "./hilfen";
-import { bogenLinksEmpfangen, istNativ, plattform, qrScannen, textTeilen } from "./nativ";
+import { bogenLinksEmpfangen, istNativ, qrScannen, textTeilen } from "./nativ";
+import { DebugLeiste, debugAktiv, wendePlattformKlasseAn, wendeRahmenAn } from "./debug-plattform";
 import { vorlageAnlegen, vorlagenLaden, type Vorlage } from "./vorlagen";
 import { Musterung, VorlagenListe } from "./vorlagen-ui";
 import {
@@ -481,10 +482,22 @@ function App() {
 }
 
 // Plattform-Klasse (z. B. platform-ios) auf <html> für plattformspezifisches CSS.
-document.documentElement.classList.add(`platform-${plattform()}`);
+// Im Browser kann der Debug-Modus die visuelle Plattform überschreiben.
+wendePlattformKlasseAn();
+wendeRahmenAn();
+
+// Im Debug-Modus eine schwebende Leiste zum Umschalten der Vorschau zeigen.
+function Wurzel() {
+  return (
+    <>
+      <App />
+      {debugAktiv() && <DebugLeiste />}
+    </>
+  );
+}
 
 createRoot(document.getElementById("app")!).render(
   <StrictMode>
-    <App />
+    <Wurzel />
   </StrictMode>,
 );
