@@ -73,6 +73,53 @@ export function bogenAlsEingebetteteDatei(b: Erfassungsbogen): EingebetteteDatei
   };
 }
 
+/** Dateiname der eingebetteten Sammel-Daten (mehrere Bögen eines Einsatzes). */
+export const EEB_EINSATZ_DATEINAME = "einsatz.json";
+
+/** Mehrere Bögen als ein eingebettetes JSON-Array (für die Einsatz-Sammel-PDF). */
+export function boegenAlsEingebetteteDatei(boegen: Erfassungsbogen[]): EingebetteteDatei {
+  const json = JSON.stringify(boegen, null, 2);
+  const base64 = base64AusBytes(new TextEncoder().encode(json));
+  return {
+    src: `data:application/json;base64,${base64}`,
+    name: EEB_EINSATZ_DATEINAME,
+    description: "Strukturierte Daten aller Bögen des Einsatzes (maschinenlesbar)",
+    relationship: "Alternative",
+  };
+}
+
+/**
+ * Sammel-PDF eines Einsatzes: alle Bögen hintereinander (je Bogen die
+ * vollständigen Seiten inkl. QR-Code), plus ALLE Bögen als eingebettetes
+ * JSON-Array — so ist der ganze Einsatz maschinen- und menschenlesbar in einer
+ * Datei übergebbar. Baut die Seiten aus {@link pdfDokument} zusammen.
+ */
+export function einsatzPdfDokument(
+  name: string,
+  boegenMitQr: { bogen: Erfassungsbogen; qr: QrInfo }[],
+): TDocumentDefinitions {
+  const content: Content[] = [];
+  boegenMitQr.forEach(({ bogen, qr }, i) => {
+    if (i > 0) content.push({ text: "", pageBreak: "before" });
+    content.push(...(pdfDokument(bogen, qr).content as Content[]));
+  });
+  return {
+    pageSize: "A4",
+    pageMargins: [40, 36, 40, 40],
+    defaultStyle: { fontSize: 9 },
+    info: { title: `Einsatz-Sammlung ${name}` },
+    files: { [EEB_EINSATZ_DATEINAME]: boegenAlsEingebetteteDatei(boegenMitQr.map((x) => x.bogen)) },
+    footer: (seite, gesamt) => ({
+      columns: [
+        { text: `Einsatz-Sammlung: ${name}`, margin: [40, 0, 0, 0] },
+        { text: `${seite} / ${gesamt}`, alignment: "right", margin: [0, 0, 40, 0] },
+      ],
+      fontSize: 8,
+    }),
+    content,
+  };
+}
+
 /** Bogen + fertiges QR-Bild → pdfmake-DocDefinition (Papier-Layout). */
 export function pdfDokument(b: Erfassungsbogen, qr: QrInfo): TDocumentDefinitions {
   const org = b.einheit.organisation;
