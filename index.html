@@ -185,12 +185,14 @@
        .platform-ios auf <html> (Capacitor). Web und Android bleiben
        unverändert.
 
-       Umgesetzte HIG-Punkte:
+       Umgesetzte HIG-Punkte (Stand iOS 27, Liquid Glass):
        - Semantische Systemfarben mit Light/Dark Mode (color-scheme)
        - Dynamic Type über die -apple-system-Textstile
        - Touch-Ziele mindestens 44 pt
        - Flächen statt Rahmen („content over chrome")
-       - Untere Navigationsleiste als transluzentes Material (Blur)
+       - Liquid Glass: Kapsel-Buttons, schwebende Glas-Leiste mit
+         abgedunkelter Kante und Glanzlicht; reduzierte Transparenz
+         und größere, konzentrische Radien gemäß iOS-27-Feinschliff
        --------------------------------------------------------------- */
     .platform-ios {
       color-scheme: light dark;
@@ -207,7 +209,9 @@
       --ios-rot: #ff3b30;                        /* systemRed */
       --ios-warnung-text: #7a5200;
       --ios-warnung-fond: #fff7e0;
-      --ios-balken: rgba(249, 249, 249, 0.82);   /* Bar-Material */
+      --ios-balken: rgba(249, 249, 249, 0.8);    /* Glas-Material (iOS 27: weniger transparent) */
+      --ios-glas-rand: rgba(0, 0, 0, 0.1);       /* abgedunkelte Glas-Kante */
+      --ios-glanz: rgba(255, 255, 255, 0.5);     /* Specular Highlight */
     }
     @media (prefers-color-scheme: dark) {
       .platform-ios {
@@ -222,7 +226,9 @@
         --ios-rot: #ff453a;
         --ios-warnung-text: #ffd60a;
         --ios-warnung-fond: rgba(255, 214, 10, 0.12);
-        --ios-balken: rgba(29, 29, 31, 0.78);
+        --ios-balken: rgba(29, 29, 31, 0.8);
+        --ios-glas-rand: rgba(255, 255, 255, 0.12);
+        --ios-glanz: rgba(255, 255, 255, 0.14);
       }
     }
 
@@ -263,7 +269,7 @@
       font: -apple-system-body;
       min-height: 44px;
       border: none;
-      border-radius: 12px;
+      border-radius: 999px; /* Kapselform (Liquid Glass) */
       background: var(--ios-fuellung);
       color: var(--ios-akzent);
       transition: opacity 0.1s;
@@ -309,18 +315,19 @@
     .platform-ios .schritte button {
       font: -apple-system-subheadline;
       min-height: 34px;
-      border-radius: 17px;
+      border-radius: 999px;
       position: relative;
     }
     .platform-ios .schritte button::after { content: ""; position: absolute; inset: -5px -2px; }
     .platform-ios .schritte button.aktiv { background: var(--ios-akzent-flaeche); color: #fff; }
 
-    /* Karten ohne Rahmen – Trennung über Flächenkontrast (grouped style). */
+    /* Karten ohne Rahmen – Trennung über Flächenkontrast (grouped style);
+       größere, konzentrische Radien passend zu den Kapsel-Buttons. */
     .platform-ios section.karte,
     .platform-ios .karte {
       background: var(--ios-flaeche);
       border: none;
-      border-radius: 12px;
+      border-radius: 20px;
     }
     /* Destruktive Aktion in systemRed als Text auf Füllfläche. */
     .platform-ios .karte .entfernen {
@@ -395,12 +402,30 @@
     .platform-ios table.uebersicht th { background: var(--ios-fuellung); }
     .platform-ios .qr-box img { border-color: var(--ios-trenner); background: #fff; padding: 8px; }
 
-    /* Untere Navigationsleiste als transluzentes Bar-Material mit Hairline. */
+    /* Untere Navigationsleiste als schwebende Liquid-Glass-Kapsel:
+       abgedunkelte Kante, Glanzlicht oben, reduzierte Transparenz und
+       Diffusion des Hintergrunds (blur + saturate) gemäß iOS 27. */
     .platform-ios footer.nav {
+      left: calc(12px + env(safe-area-inset-left));
+      right: calc(12px + env(safe-area-inset-right));
+      bottom: calc(12px + env(safe-area-inset-bottom));
+      padding: 0.55rem 0.6rem;
+      border-radius: 999px;
+      border: 0.5px solid var(--ios-glas-rand);
       background: var(--ios-balken);
-      -webkit-backdrop-filter: saturate(180%) blur(20px);
-      backdrop-filter: saturate(180%) blur(20px);
-      border-top: 0.5px solid var(--ios-trenner);
+      -webkit-backdrop-filter: saturate(180%) blur(24px);
+      backdrop-filter: saturate(180%) blur(24px);
+      box-shadow:
+        inset 0 1px 0 var(--ios-glanz),
+        0 8px 24px rgba(0, 0, 0, 0.16);
+    }
+    /* Bedienungshilfe „Transparenz reduzieren": Glas wird opake Fläche. */
+    @media (prefers-reduced-transparency: reduce) {
+      .platform-ios footer.nav {
+        background: var(--ios-flaeche);
+        -webkit-backdrop-filter: none;
+        backdrop-filter: none;
+      }
     }
 
     /* Seiten-Fußzeile und Dialoge (Impressum usw.) in Systemfarben. */
@@ -413,7 +438,7 @@
     }
     .platform-ios dialog {
       border: none;
-      border-radius: 14px;
+      border-radius: 22px;
       background: var(--ios-flaeche);
       color: var(--ios-text);
       box-shadow: 0 24px 64px rgba(0, 0, 0, 0.35);
