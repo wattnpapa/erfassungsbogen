@@ -7,9 +7,13 @@
  * Seite 1: Kopf, Stärke, Zugehörigkeit, Einsatz, Fahrzeuge.
  * Seite 2: Personalliste + Qualifikationen + Sofortbedarf.
  * Letzte Seite: QR-Code (EEB2-Payload, als Bild übergeben).
+ *
+ * Zusätzlich wird der Bogen als strukturiertes JSON in die PDF eingebettet
+ * (analog zu ZUGFeRD-Rechnungen): dokumentweit als „Associated File" (/AF)
+ * und im /Names/EmbeddedFiles-Baum, sodass die PDF auch maschinenlesbar ist.
  */
 
-import type { Content, TDocumentDefinitions, TableCell } from "pdfmake/interfaces";
+import type { Attachment, Content, TDocumentDefinitions, TableCell } from "pdfmake/interfaces";
 import {
   Erfassungsbogen,
   KontaktArt,
@@ -34,7 +38,40 @@ import {
 const BLAU = "#12275e";
 const GRAU = "#e8e8e8";
 
+/** Dateiname der eingebetteten Maschinen-Daten (analog factur-x.xml bei ZUGFeRD). */
+export const EEB_JSON_DATEINAME = "erfassungsbogen.json";
+
 const kasten = (ja: boolean) => (ja ? "[X]" : "[  ]");
+
+/** pdfmake-Attachment inkl. der von pdfkit unterstützten AFRelationship (fehlt im Typ). */
+type EingebetteteDatei = Attachment & { relationship?: string };
+
+/** Uint8Array → Base64 (chunkweise, damit auch große Bögen nicht den Stack sprengen). */
+function base64AusBytes(bytes: Uint8Array): string {
+  let binaer = "";
+  const schritt = 0x8000;
+  for (let i = 0; i < bytes.length; i += schritt) {
+    binaer += String.fromCharCode(...bytes.subarray(i, i + schritt));
+  }
+  return btoa(binaer);
+}
+
+/**
+ * Serialisiert den Bogen als UTF-8-JSON und verpackt ihn als Base64-Data-URL,
+ * die pdfmake dokumentweit einbettet. Das Model trägt selbst `schemaVersion`,
+ * ist also für externe Auswertung selbstbeschreibend.
+ */
+export function bogenAlsEingebetteteDatei(b: Erfassungsbogen): EingebetteteDatei {
+  const json = JSON.stringify(b, null, 2);
+  const base64 = base64AusBytes(new TextEncoder().encode(json));
+  return {
+    src: `data:application/json;base64,${base64}`,
+    name: EEB_JSON_DATEINAME,
+    description: "Strukturierte Daten des Einheitenerfassungsbogens (maschinenlesbar)",
+    // Alternative = maschinenlesbares Gegenstück zur sichtbaren Darstellung (wie ZUGFeRD).
+    relationship: "Alternative",
+  };
+}
 
 /** Bogen + fertiges QR-Bild → pdfmake-DocDefinition (Papier-Layout). */
 export function pdfDokument(b: Erfassungsbogen, qr: QrInfo): TDocumentDefinitions {
@@ -178,6 +215,8 @@ export function pdfDokument(b: Erfassungsbogen, qr: QrInfo): TDocumentDefinition
     pageMargins: [40, 36, 40, 40],
     defaultStyle: { fontSize: 9 },
     info: { title: `Erfassungsbogen ${typKurz || typName}` },
+    // Maschinenlesbares JSON dokumentweit einbetten (ZUGFeRD-artig).
+    files: { [EEB_JSON_DATEINAME]: bogenAlsEingebetteteDatei(b) },
     footer: (seite, gesamt) => ({
       columns: [
         { text: `Stand: ${datumDeutsch(datumZuIso(b.stand))}`, margin: [40, 0, 0, 0] },

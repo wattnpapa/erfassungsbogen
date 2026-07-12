@@ -22,7 +22,7 @@ import {
   type Erfassungsbogen,
 } from "../model";
 import type { QrInfo } from "./hilfen";
-import { pdfDokument } from "./pdf-dokument";
+import { EEB_JSON_DATEINAME, bogenAlsEingebetteteDatei, pdfDokument } from "./pdf-dokument";
 
 const QR: QrInfo = { datenUrl: "data:image/png;base64,QRTESTBILD", zeichen: 123, version: 7 };
 
@@ -164,6 +164,30 @@ describe("pdfDokument()", () => {
     const t = texte(pdfDokument(b, QR).content).join("\n");
     expect(t).toContain("Personal am Meldekopf nur in Stärke erfasst.");
     expect(t).toContain("1 / 3 / 17 / 21");
+  });
+
+  it("bettet den Bogen als maschinenlesbares JSON ein (ZUGFeRD-artig)", () => {
+    const b = basisBogen();
+    const dd = pdfDokument(b, QR);
+    const dateien = (dd as { files?: Record<string, { src: string; relationship?: string }> }).files;
+    const datei = dateien?.[EEB_JSON_DATEINAME];
+    expect(datei).toBeDefined();
+    expect(datei!.relationship).toBe("Alternative");
+    expect(datei!.src).toMatch(/^data:application\/json;base64,/);
+
+    // Data-URL zurück zu JSON dekodieren und mit dem Bogen vergleichen.
+    const base64 = datei!.src.split(",")[1]!;
+    const json = new TextDecoder().decode(Uint8Array.from(atob(base64), (c) => c.charCodeAt(0)));
+    expect(JSON.parse(json)).toEqual(b);
+  });
+
+  it("kodiert Umlaute im eingebetteten JSON UTF-8-sauber", () => {
+    const b = basisBogen();
+    b.sonstiges = "Grüße an die Führungskräfte – Straße 5";
+    const datei = bogenAlsEingebetteteDatei(b);
+    const base64 = datei.src.split(",")[1]!;
+    const json = new TextDecoder().decode(Uint8Array.from(atob(base64), (c) => c.charCodeAt(0)));
+    expect(JSON.parse(json).sonstiges).toBe("Grüße an die Führungskräfte – Straße 5");
   });
 
   it("erzeugt eine Fußzeile mit Stand und Seitenzahlen", () => {
