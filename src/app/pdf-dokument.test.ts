@@ -24,7 +24,12 @@ import {
 import type { QrInfo } from "./hilfen";
 import { EEB_JSON_DATEINAME, bogenAlsEingebetteteDatei, pdfDokument } from "./pdf-dokument";
 
-const QR: QrInfo = { datenUrl: "data:image/png;base64,QRTESTBILD", zeichen: 123, version: 7 };
+const QR: QrInfo = {
+  datenUrl: "data:image/png;base64,QRTESTBILD",
+  url: "https://erfassungsbogen.app/#TESTPAYLOAD",
+  zeichen: 123,
+  version: 7,
+};
 
 // Sammelt rekursiv alle String-Werte einer pdfmake-Struktur ein — robust
 // gegenüber der verschachtelten Tabellen-/Stack-Form.
@@ -108,8 +113,27 @@ describe("pdfDokument()", () => {
     // Das übergebene QR-Bild muss unverändert im Dokument landen.
     expect(JSON.stringify(dd.content)).toContain(QR.datenUrl);
     expect(texte(dd.content)).toContain(
-      `Format EEB2 · ${QR.zeichen} Zeichen · QR-Version ${QR.version} (Fehlerkorrektur M)\nMit der Kamera oder der EEB-App scannen, um den Bogen digital zu übernehmen.`,
+      `Format EEB2 · ${QR.zeichen} Zeichen · QR-Version ${QR.version} (Fehlerkorrektur M)\nMit der Kamera scannen oder den Link antippen, um den Bogen digital zu übernehmen.`,
     );
+  });
+
+  it("legt unter dem QR-Code einen anklickbaren App-Link auf QR-Bild und Text", () => {
+    const dd = pdfDokument(basisBogen(), QR);
+    // Alle pdfmake-Knoten flach durchgehen und die mit `link` einsammeln.
+    const links: { text?: unknown; image?: unknown; link: string }[] = [];
+    const sammle = (node: unknown): void => {
+      if (Array.isArray(node)) node.forEach(sammle);
+      else if (node && typeof node === "object") {
+        if (typeof (node as { link?: unknown }).link === "string") {
+          links.push(node as { link: string });
+        }
+        Object.values(node).forEach(sammle);
+      }
+    };
+    sammle(dd.content);
+    // Sowohl das QR-Bild als auch der Textlink verweisen auf die App-URL.
+    expect(links.some((n) => n.link === QR.url && n.image === QR.datenUrl)).toBe(true);
+    expect(links.some((n) => n.link === QR.url && n.text === "Bogen direkt in der App öffnen")).toBe(true);
   });
 
   it("druckt Kopf, Einsatz, Zugehörigkeit und Stärke", () => {

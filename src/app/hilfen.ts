@@ -134,6 +134,8 @@ export function datumDeutsch(iso: string): string {
 
 export interface QrInfo {
   datenUrl: string;
+  /** Der im QR-Code kodierte App-Link (Präfix + Payload) — auch als Textlink nutzbar. */
+  url: string;
   zeichen: number;
   version: number;
 }
@@ -144,7 +146,7 @@ export async function qrErzeugen(b: Erfassungsbogen): Promise<QrInfo> {
   const url = encodePayloadUrl(b, browserKompressor);
   const optionen = { errorCorrectionLevel: "M" as const };
   const datenUrl = await QRCode.toDataURL(url, { ...optionen, width: 520, margin: 2 });
-  return { datenUrl, zeichen: url.length, version: QRCode.create(url, optionen).version };
+  return { datenUrl, url, zeichen: url.length, version: QRCode.create(url, optionen).version };
 }
 
 /**
@@ -155,7 +157,7 @@ export async function qrVorlageErzeugen(b: Erfassungsbogen): Promise<QrInfo> {
   const url = encodeVorlagePayloadUrl(b, browserKompressor);
   const optionen = { errorCorrectionLevel: "M" as const };
   const datenUrl = await QRCode.toDataURL(url, { ...optionen, width: 520, margin: 2 });
-  return { datenUrl, zeichen: url.length, version: QRCode.create(url, optionen).version };
+  return { datenUrl, url, zeichen: url.length, version: QRCode.create(url, optionen).version };
 }
 
 // ------------------------------------------------------------ Datei-Dialog

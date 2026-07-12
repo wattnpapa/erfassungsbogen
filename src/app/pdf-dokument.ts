@@ -317,9 +317,20 @@ export function pdfDokument(b: Erfassungsbogen, qr: QrInfo): TDocumentDefinition
       // ---- QR-Seite ----
       { text: "", pageBreak: "before" },
       { text: "Digitaler Bogen als QR-Code", bold: true, fontSize: 13, color: BLAU, alignment: "center", margin: [0, 60, 0, 0] },
-      { image: qr.datenUrl, width: 240, alignment: "center", margin: [0, 16, 0, 0] },
+      // QR-Bild UND Textlink tragen dieselbe App-URL: mit der Kamera scannen ODER
+      // in der digitalen PDF direkt anklicken, um den Bogen in der App zu öffnen.
+      { image: qr.datenUrl, width: 240, alignment: "center", margin: [0, 16, 0, 0], link: qr.url },
       {
-        text: `Format EEB2 · ${qr.zeichen} Zeichen · QR-Version ${qr.version} (Fehlerkorrektur M)\nMit der Kamera oder der EEB-App scannen, um den Bogen digital zu übernehmen.`,
+        text: "Bogen direkt in der App öffnen",
+        link: qr.url,
+        color: BLAU,
+        decoration: "underline",
+        alignment: "center",
+        fontSize: 11,
+        margin: [0, 12, 0, 0],
+      },
+      {
+        text: `Format EEB2 · ${qr.zeichen} Zeichen · QR-Version ${qr.version} (Fehlerkorrektur M)\nMit der Kamera scannen oder den Link antippen, um den Bogen digital zu übernehmen.`,
         alignment: "center",
         fontSize: 8,
         margin: [0, 10, 0, 0],
