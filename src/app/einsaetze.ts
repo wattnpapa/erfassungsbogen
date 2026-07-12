@@ -257,6 +257,33 @@ export function meldungHinzufuegen(
   return { eintrag, neu: true };
 }
 
+/**
+ * Importierte Sammlung einfügen bzw. mit einer bestehenden zusammenführen.
+ * Gleiche Einsatz-ID → Meldungen mergen (Dedupe über die inhaltsbasierte
+ * Eintrags-ID, keine Dubletten bei Reimport). Sonst als neuen Einsatz anlegen.
+ */
+export function einsatzImportieren(s: Einsatzsammlung): { neuerEinsatz: boolean; hinzugefuegt: number } {
+  const liste = einsaetzeLaden();
+  const vorhanden = liste.find((x) => x.id === s.id);
+  if (!vorhanden) {
+    liste.push(s);
+    einsaetzeSpeichern(liste);
+    return { neuerEinsatz: true, hinzugefuegt: s.eintraege.length };
+  }
+  const ids = new Set(vorhanden.eintraege.map((e) => e.id));
+  let hinzugefuegt = 0;
+  for (const e of s.eintraege) {
+    if (!ids.has(e.id)) {
+      vorhanden.eintraege.push(e);
+      ids.add(e.id);
+      hinzugefuegt++;
+    }
+  }
+  vorhanden.geaendert = Date.now();
+  einsaetzeSpeichern(liste);
+  return { neuerEinsatz: false, hinzugefuegt };
+}
+
 /** Status einer Meldung setzen (z. B. Einheit rückt ab → fällt aus aktuellen Summen). */
 export function meldungStatusSetzen(einsatzId: string, eintragId: string, status: MeldeStatus): void {
   const liste = einsaetzeLaden();
