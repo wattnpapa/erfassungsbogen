@@ -3,6 +3,12 @@
 **Stufe 1** — Datenmodell und QR-Code-Kodierung. Stand: 2026-07-12, **Schema-Version 3**
 (v3 = Ernährungsform je Person; v2 = organisationsübergreifend; v1 war THW-spezifisch).
 
+**Abwärtskompatibilität (Pflicht):** Schema-Änderungen dürfen ältere QR-Codes/Dateien nie
+unlesbar machen. `decodeBinaer` (`src/codec.ts`) und `bogenLaden`/`migriereBogen`
+(`src/app/hilfen.ts`) akzeptieren jede Version `2..SCHEMA_VERSION`, füllen fehlende Felder
+mit Defaults und überführen entfallene Felder (z. B. v2 `Sofortbedarf.davonVegetarisch`
+→ `verpflegungManuell`); danach wird der Bogen auf `SCHEMA_VERSION` gehoben.
+
 Der Bogen ist **BOS-übergreifend**: THW, Feuerwehr, Polizei, Hilfsorganisationen
 (DRK/JUH/MHD/ASB), DLRG, Bundeswehr, Rettungsdienst — und beliebige sonstige
 Organisationen, die an einem Einsatz teilnehmen.

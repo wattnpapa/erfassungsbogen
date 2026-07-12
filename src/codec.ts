@@ -26,7 +26,7 @@ import type {
   Sofortbedarf,
   VokabularWert,
 } from "./model";
-import { KontaktArt } from "./model";
+import { Ernaehrung, KontaktArt, SCHEMA_VERSION } from "./model";
 
 export const EEB_MAGIC = new Uint8Array([0x45, 0x45, 0x42, 0x32]); // "EEB2"
 
@@ -284,7 +284,7 @@ function decodeKontakt(r: Reader): Kontakt {
   return k;
 }
 
-function decodePerson(r: Reader): Person {
+function decodePerson(r: Reader, version: number): Person {
   const vorname = r.str();
   const nachname = r.str();
   const flags = r.u8();
@@ -294,7 +294,8 @@ function decodePerson(r: Reader): Person {
     fahrerlaubnis: flags & 0x0f,
     geschlecht: (flags >> 4) & 3,
     staerkeRolle: (flags >> 6) & 3,
-    ernaehrung: r.u8(),
+    // v2 kannte keine Ernährungsform → Default Fleisch (Migration).
+    ernaehrung: version >= 3 ? r.u8() : Ernaehrung.FLEISCH,
     funktionen: [],
     kontakte: [],
     zusatzqualifikationen: [],
@@ -362,7 +363,10 @@ function decodeEinsatz(r: Reader): Einsatz {
 export function decodeBinaer(daten: Uint8Array): Erfassungsbogen {
   const r = new Reader(daten);
   const schemaVersion = r.varint();
-  if (schemaVersion !== 3) throw new Error(`EEB2: unbekannte Schema-Version ${schemaVersion}`);
+  // Abwärtskompatibel: ältere Schemata werden migriert (siehe unten), nicht abgelehnt.
+  if (schemaVersion < 2 || schemaVersion > SCHEMA_VERSION) {
+    throw new Error(`EEB2: nicht unterstützte Schema-Version ${schemaVersion}`);
+  }
   const b: Erfassungsbogen = {
     schemaVersion,
     stand: r.u16(),
@@ -382,11 +386,15 @@ export function decodeBinaer(daten: Uint8Array): Erfassungsbogen {
   }
   if (pflags & 4) b.unterbringungManuell = { m: r.u8(), w: r.u8(), d: r.u8() };
   if (pflags & 8) b.verpflegungManuell = { vegetarisch: r.u8(), vegan: r.u8() };
-  for (let i = r.varint(); i > 0; i--) b.personal.push(decodePerson(r));
+  for (let i = r.varint(); i > 0; i--) b.personal.push(decodePerson(r, schemaVersion));
   for (let i = r.varint(); i > 0; i--) b.fahrzeuge.push(decodeFahrzeug(r));
   if (r.u8() === 1) {
+    const verpflegungPersonen = r.u8();
+    // v2 speicherte die Aggregatzahl "davon vegetarisch" im Sofortbedarf;
+    // ab v3 wird sie aus dem Personal abgeleitet.
+    const davonVegetarisch = schemaVersion < 3 ? r.u8() : 0;
     b.sofortbedarf = {
-      verpflegungPersonen: r.u8(),
+      verpflegungPersonen,
       dieselLiter: r.varint(),
       benzinLiter: r.varint(),
       gemischLiter: r.varint(),
@@ -396,9 +404,15 @@ export function decodeBinaer(daten: Uint8Array): Erfassungsbogen {
     const sflags = r.u8();
     b.sofortbedarf.unterbringung = (sflags & 1) !== 0;
     b.sofortbedarf.ruhezeitErforderlich = (sflags & 2) !== 0;
+    // Migration: alte Aggregatzahl als manuelle Verpflegungsangabe erhalten,
+    // damit sie in Anzeige/PDF nicht verloren geht (Personal hat keine Ernährungsangabe).
+    if (davonVegetarisch > 0 && !b.verpflegungManuell) {
+      b.verpflegungManuell = { vegetarisch: davonVegetarisch, vegan: 0 };
+    }
   }
   if (r.u8() === 1) b.sonstiges = r.str();
   if (!r.amEnde) throw new Error("EEB2: überschüssige Daten am Ende");
+  b.schemaVersion = SCHEMA_VERSION; // nach Migration auf aktuelle Version heben
   return b;
 }
 

@@ -14,6 +14,7 @@ import {
   Person,
   PersonalErfassung,
   SCHEMA_VERSION,
+  Sofortbedarf,
   VokabularWert,
   datumAusIso,
   staerke,
@@ -164,6 +165,27 @@ export async function bogenSpeichern(b: Erfassungsbogen): Promise<void> {
   URL.revokeObjectURL(a.href);
 }
 
+/**
+ * Ältere Bögen (QR wie JSON) abwärtskompatibel auf das aktuelle Schema heben.
+ * Muss zum Codec-Migrationspfad in `decodeBinaer` passen.
+ */
+export function migriereBogen(b: Erfassungsbogen): Erfassungsbogen {
+  if (b.schemaVersion < 3) {
+    for (const p of b.personal) {
+      if (p.ernaehrung == null) p.ernaehrung = Ernaehrung.FLEISCH;
+    }
+    const sb = b.sofortbedarf as (Sofortbedarf & { davonVegetarisch?: number }) | undefined;
+    if (sb) {
+      if (sb.davonVegetarisch && sb.davonVegetarisch > 0 && !b.verpflegungManuell) {
+        b.verpflegungManuell = { vegetarisch: sb.davonVegetarisch, vegan: 0 };
+      }
+      delete sb.davonVegetarisch;
+    }
+  }
+  b.schemaVersion = SCHEMA_VERSION;
+  return b;
+}
+
 export async function bogenLaden(datei: File): Promise<Erfassungsbogen> {
   let daten: unknown;
   try {
@@ -172,10 +194,10 @@ export async function bogenLaden(datei: File): Promise<Erfassungsbogen> {
     throw new Error("Datei ist kein gültiges JSON.");
   }
   const b = daten as Erfassungsbogen;
-  if (b?.schemaVersion !== SCHEMA_VERSION || !b.einheit || !b.einsatz || !Array.isArray(b.personal)) {
-    throw new Error(`Keine gültige Erfassungsbogen-Datei (Schema-Version ${SCHEMA_VERSION} erwartet).`);
+  if (typeof b?.schemaVersion !== "number" || b.schemaVersion < 2 || b.schemaVersion > SCHEMA_VERSION || !b.einheit || !b.einsatz || !Array.isArray(b.personal)) {
+    throw new Error(`Keine gültige Erfassungsbogen-Datei (Schema-Version 2–${SCHEMA_VERSION} erwartet).`);
   }
-  return b;
+  return migriereBogen(b);
 }
 
 // ------------------------------------------------------ Plausibilitätsprüfung
