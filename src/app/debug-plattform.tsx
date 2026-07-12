@@ -51,7 +51,8 @@ function gespeichertePlattform(): VisuellePlattform | null {
 
 /**
  * Ob die Debug-Leiste angezeigt wird: nur im Browser und nur bei aktivem
- * Debug-Modus. `?debug` in der URL schaltet ihn dauerhaft ein.
+ * Debug-Modus. `?debug` in der URL schaltet ihn dauerhaft ein, ein
+ * gemerktes „0" (per Schließen-Button) dauerhaft aus – auch im Dev-Server.
  */
 export function debugAktiv(): boolean {
   if (istNativ()) return false;
@@ -63,7 +64,9 @@ export function debugAktiv(): boolean {
   } catch {
     /* URL-Parsing scheitert nie im Browser, aber sicher ist sicher. */
   }
-  if (lese(SPEICHER_DEBUG) === "1") return true;
+  const gemerkt = lese(SPEICHER_DEBUG);
+  if (gemerkt === "1") return true;
+  if (gemerkt === "0") return false;
   return import.meta.env.DEV;
 }
 
@@ -99,12 +102,26 @@ export function wendeRahmenAn(): void {
 export function DebugLeiste() {
   const [aktuelle, setAktuelle] = useState<VisuellePlattform>(visuellePlattform());
   const [rahmen, setRahmen] = useState<boolean>(() => lese(SPEICHER_RAHMEN) === "1");
+  const [sichtbar, setSichtbar] = useState(true);
 
   function waehle(p: VisuellePlattform) {
     schreibe(SPEICHER_PLATTFORM, p);
     wendePlattformKlasseAn(p);
     setAktuelle(p);
   }
+
+  /**
+   * Debug-Modus ausblenden. Merkt das „aus" dauerhaft (auch im Dev-Server)
+   * und setzt die Vorschau auf Web zurück, damit die App normal aussieht.
+   * Wieder einschalten per `?debug` in der URL.
+   */
+  function schliesse() {
+    schreibe(SPEICHER_DEBUG, "0");
+    waehle("web");
+    setSichtbar(false);
+  }
+
+  if (!sichtbar) return null;
 
   function schalteRahmen(an: boolean) {
     schreibe(SPEICHER_RAHMEN, an ? "1" : "0");
@@ -136,6 +153,15 @@ export function DebugLeiste() {
         <input type="checkbox" checked={rahmen} onChange={(e) => schalteRahmen(e.target.checked)} />
         Rahmen
       </label>
+      <button
+        type="button"
+        className="eeb-debug-schliessen"
+        aria-label="Debug-Vorschau ausblenden"
+        title="Ausblenden (wieder per ?debug in der URL)"
+        onClick={schliesse}
+      >
+        ✕
+      </button>
     </div>
   );
 }
