@@ -7,6 +7,7 @@
  */
 
 import { Capacitor } from "@capacitor/core";
+import { App } from "@capacitor/app";
 import {
   CapacitorBarcodeScanner,
   CapacitorBarcodeScannerCameraDirection,
@@ -22,6 +23,25 @@ export function istNativ(): boolean {
 /** Aktuelle Laufzeit-Plattform: "ios" | "android" | "web". */
 export function plattform(): string {
   return Capacitor.getPlatform();
+}
+
+/**
+ * Universal Links (iOS) / App Links (Android) empfangen: Der Callback
+ * bekommt die volle URL (https://erfassungsbogen.app/#<Payload>) — beim
+ * Kaltstart über die Launch-URL, bei bereits laufender App über appUrlOpen.
+ * Liefert eine Aufräumfunktion, die den Listener wieder entfernt.
+ */
+export function bogenLinksEmpfangen(callback: (url: string) => void): () => void {
+  if (!istNativ()) return () => {};
+  const listener = App.addListener("appUrlOpen", ({ url }) => callback(url));
+  App.getLaunchUrl()
+    .then((start) => {
+      if (start?.url) callback(start.url);
+    })
+    .catch(() => {});
+  return () => {
+    listener.then((l) => l.remove()).catch(() => {});
+  };
 }
 
 /**

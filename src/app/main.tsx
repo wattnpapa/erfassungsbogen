@@ -2,12 +2,12 @@
  * SPA-Einstieg: Startbildschirm (neu / Datei laden), Assistent, Übersicht.
  */
 
-import { StrictMode, useState, type ChangeEvent } from "react";
+import { StrictMode, useEffect, useState, type ChangeEvent } from "react";
 import { createRoot } from "react-dom/client";
 import type { Erfassungsbogen } from "../model";
 import { decodePayloadUrl } from "../codec";
 import { bogenLaden, browserKompressor, neuerBogen } from "./hilfen";
-import { istNativ, plattform, qrScannen } from "./nativ";
+import { bogenLinksEmpfangen, istNativ, plattform, qrScannen } from "./nativ";
 import { QrScannerWeb } from "./qr-scanner-web";
 import { Fusszeile } from "./fusszeile";
 import { UpdateBanner } from "./aktualisierung";
@@ -65,7 +65,7 @@ function App() {
     }
   }
 
-  function uebernehmeQrText(text: string) {
+  function uebernehmeText(text: string, fehlertext: string) {
     setScannerOffen(false);
     try {
       setBogen(decodePayloadUrl(text, browserKompressor));
@@ -73,9 +73,22 @@ function App() {
       setZeigeStart(false);
       setFehler("");
     } catch {
-      setFehler("Der gescannte QR-Code enthält keinen gültigen Erfassungsbogen.");
+      setFehler(fehlertext);
     }
   }
+
+  function uebernehmeQrText(text: string) {
+    uebernehmeText(text, "Der gescannte QR-Code enthält keinen gültigen Erfassungsbogen.");
+  }
+
+  // Universal Link (iOS) / App Link (Android) öffnet die native App:
+  // Bogen aus der übergebenen URL übernehmen (Kaltstart und laufende App).
+  useEffect(() => {
+    return bogenLinksEmpfangen((url) =>
+      uebernehmeText(url, "Der geöffnete Link enthält keinen gültigen Erfassungsbogen."),
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- nur einmal registrieren; der Handler nutzt ausschließlich stabile Setter
+  }, []);
 
   async function scanneQr() {
     // Nativ (iOS/Android) scannt das Capacitor-Plugin, sonst die Webcam.

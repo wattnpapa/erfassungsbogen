@@ -37,25 +37,22 @@ sind angelegt. Was noch fehlt:
 
 ## Hosting / Domain
 
-- [ ] Web-App unter `https://erfassungsbogen.app` deployen (Vite-Build, `dist/`).
-- [ ] Sicherstellen, dass der Hoster diese beiden Dateien **mit Content-Type
-      `application/json` und ohne Redirect** ausliefert (liegen unter `public/`,
-      landen also automatisch im Build):
-  - `https://erfassungsbogen.app/.well-known/apple-app-site-association`
-  - `https://erfassungsbogen.app/.well-known/assetlinks.json`
-- [ ] Prüfen mit `curl -i https://erfassungsbogen.app/.well-known/apple-app-site-association`
-      (Status 200, JSON, kein HTML-Fallback der SPA). Bei SPA-Rewrite-Regeln
-      `.well-known/` explizit ausnehmen.
+- [x] Web-App unter `https://erfassungsbogen.app` deployen (Vite-Build, `dist/`).
+- [x] AASA/assetlinks werden ausgeliefert (Status 200, ohne Redirect). GitHub
+      Pages liefert zwar `application/octet-stream` statt `application/json`,
+      aber Apples CDN hat die Datei akzeptiert (geprüft 2026-07-12:
+      `app-site-association.cdn-apple.com/a/v1/erfassungsbogen.app` spiegelt
+      sie mit `Apple-Origin-Format: json`).
 
 ## Android
 
-- [ ] SHA256-Fingerprint des Signierzertifikats in
-      `public/.well-known/assetlinks.json` eintragen (ersetzt den Platzhalter).
-  - Play App Signing: Play Console → Einrichtung → App-Signatur → SHA-256.
-  - Lokales Keystore: `keytool -list -v -keystore <keystore>` → SHA256.
-  - Debug-Builds zum Testen: Fingerprint von `~/.android/debug.keystore`
-    (Passwort `android`) zusätzlich in die Liste aufnehmen.
-- [ ] Nach dem Deploy Verifizierung prüfen:
+- [x] SHA256-Fingerprints in `public/.well-known/assetlinks.json` eingetragen
+      (2026-07-12): Release-Zertifikat (aus der signierten Release-APK per
+      `apksigner verify --print-certs` gezogen, `DA:88:C3:…`) und
+      Debug-Keystore (`54:17:28:…`). Achtung: Bei einem Wechsel auf Play App
+      Signing signiert Google mit einem eigenen Schlüssel — dann den
+      SHA-256 aus der Play Console ergänzen.
+- [ ] Nach dem nächsten Web-Deploy (assetlinks muss live sein) Verifizierung prüfen:
       `adb shell pm get-app-links de.erfassungsbogen.app` → Status `verified`.
 
 ## iOS
@@ -71,24 +68,10 @@ sind angelegt. Was noch fehlt:
 
 ## Nativer Link-Empfang (Capacitor)
 
-- [ ] `npm login` (Token ist aktuell ungültig, Installationen schlagen mit E401 fehl).
-- [ ] `npm install @capacitor/app && npx cap sync`
-- [ ] `appUrlOpen`-Listener ergänzen (z. B. in `src/app/nativ.ts`), der den
-      Payload an die bestehende Logik übergibt — `decodePayloadUrl` akzeptiert
-      die volle URL bereits:
-
-  ```ts
-  import { App } from "@capacitor/app";
-  App.addListener("appUrlOpen", ({ url }) => {
-    // url = "https://erfassungsbogen.app/#<Payload>" → Bogen laden,
-    // gleiche Übernahme wie uebernehmeQrText() in main.tsx.
-  });
-  ```
-
-  Hinweis: `main.tsx` liest das Fragment bisher nur beim Seitenstart
-  (`bogenAusUrlFragment`). Öffnet der Link eine **bereits laufende** App,
-  kommt nur der Listener zum Zug — die Übernahme dafür am besten als
-  gemeinsame Funktion herausziehen.
+Erledigt 2026-07-12: `@capacitor/app` installiert und gesynct;
+`bogenLinksEmpfangen()` in `src/app/nativ.ts` liefert Links aus
+`appUrlOpen` (laufende App) und `getLaunchUrl()` (Kaltstart) an
+`main.tsx`, das die URL über die gemeinsame Übernahme-Funktion dekodiert.
 
 ## Ende-zu-Ende-Test
 
