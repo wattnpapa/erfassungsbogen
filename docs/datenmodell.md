@@ -137,7 +137,7 @@ ausgeschriebene Hierarchie der Normalfall.
 |---|---|---|
 | typ | `VokabularWert` | Org-Namensraum |
 | thwKennzeichen ODER kennzeichenFreitext | Varint / string | „THW-84397" → 84397; sonst „OL-FW 2041" |
-| funkrufname | `Funkrufname` | Kennwort + Standort-Flag + Teile `[18,13]` bzw. `[11,48,1]` |
+| funkrufname | `Funkrufname` | Kennwort + Standort-Flag + Teile `[18,13]` bzw. `[11,48,1]`. THW: bei der StAN-Fahrzeug-Vorbelegung aus der Funkrufnamenregelung (Taschenkarte, `src/vokabulare/thw-funkrufnamen.ts`) vorbelegt — Teileinheit-Zahl aus dem Einheitstyp (1. Zug/TZ), Fahrzeug-Zahl je Fahrzeug; editierbar |
 | stanKonform | bool? | „Ausstattung nach StAN/Norm" — `undefined` = Frage nicht anwendbar (z. B. Fremdorganisation) |
 | aenderungen | string | Freitext, meist leer |
 
