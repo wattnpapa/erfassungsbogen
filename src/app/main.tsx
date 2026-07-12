@@ -8,7 +8,7 @@ import { createRoot } from "react-dom/client";
 import type { Erfassungsbogen } from "../model";
 import { decodePayloadUrl, decodeVorlagePayloadUrl, istVorlageNutzlast } from "../codec";
 import { bogenLaden, browserKompressor, neuerBogen } from "./hilfen";
-import { bogenLinksEmpfangen, istNativ, plattform, qrScannen } from "./nativ";
+import { bogenLinksEmpfangen, istNativ, plattform, qrScannen, textTeilen } from "./nativ";
 import { vorlageAnlegen, vorlagenLaden, type Vorlage } from "./vorlagen";
 import { Musterung, VorlagenListe } from "./vorlagen-ui";
 import {
@@ -16,10 +16,14 @@ import {
   einheitSchluessel,
   einsaetzeLaden,
   einsatzAnlegen,
+  einsatzImportieren,
   meldungHinzufuegen,
   type Einsatzsammlung,
 } from "./einsaetze";
 import { EinsatzDetail, EinsatzListe } from "./einsaetze-ui";
+import { aktuelleMeldungen } from "./auswertung";
+import { boegenAusPdfBytes, einsatzAusDatei, einsatzDateiInhalt } from "./einsatz-transport";
+import { einsatzPdfErzeugen } from "./pdf";
 import { QrScannerWeb } from "./qr-scanner-web";
 import { Fusszeile } from "./fusszeile";
 import { UpdateBanner } from "./aktualisierung";
@@ -222,6 +226,87 @@ function App() {
     setZeigeStart(false);
   }
 
+  async function exportiereEinsatz(s: Einsatzsammlung) {
+    const name = (s.name || "einsatz").replace(/[^\wäöüÄÖÜß-]+/g, "_");
+    const text = einsatzDateiInhalt(s);
+    if (istNativ()) {
+      await textTeilen(`eeb-einsatz-${name}.json`, text);
+      return;
+    }
+    const blob = new Blob([text], { type: "application/json" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = `eeb-einsatz-${name}.json`;
+    a.click();
+    URL.revokeObjectURL(a.href);
+  }
+
+  async function sammelPdf(s: Einsatzsammlung) {
+    const boegen = aktuelleMeldungen(s.eintraege).map((e) => e.bogen);
+    if (boegen.length === 0) {
+      setFehler("Keine anwesenden Einheiten für die Sammel-PDF.");
+      return;
+    }
+    try {
+      await einsatzPdfErzeugen(s.name, boegen);
+    } catch (e) {
+      setFehler(`Sammel-PDF: ${e instanceof Error ? e.message : e}`);
+    }
+  }
+
+  /** Bögen aus einer JSON-/PDF-Datei in den offenen Einsatz aufnehmen (Bulk, mit Dedupe). */
+  async function importiereBoegen(zielId: string, datei: File) {
+    try {
+      let boegen: Erfassungsbogen[];
+      if (datei.name.toLowerCase().endsWith(".pdf") || datei.type === "application/pdf") {
+        boegen = boegenAusPdfBytes(new Uint8Array(await datei.arrayBuffer()));
+      } else {
+        const daten = JSON.parse(await datei.text());
+        boegen = Array.isArray(daten) ? daten : [daten];
+      }
+      let neu = 0;
+      let uebersprungen = 0;
+      for (const b of boegen) {
+        try {
+          const r = meldungHinzufuegen(zielId, b, { quelle: "pdf-import" });
+          if (r) r.neu ? neu++ : uebersprungen++;
+        } catch {
+          /* ungültiger Bogen — überspringen */
+        }
+      }
+      einsaetzeNeuLaden();
+      setFehler("");
+      setMeldung(
+        neu + uebersprungen === 0
+          ? "Keine Bögen in der Datei gefunden."
+          : `${neu} Bogen/Bögen aufgenommen${uebersprungen ? `, ${uebersprungen} bereits vorhanden` : ""}.`,
+      );
+    } catch (e) {
+      setFehler(`Import: ${e instanceof Error ? e.message : e}`);
+    }
+  }
+
+  /** Ganze Einsatz-Sammlung aus einer Datei importieren (Schichtübergabe/Backup). */
+  async function importiereEinsatzDatei(e: ChangeEvent<HTMLInputElement>) {
+    const datei = e.target.files?.[0];
+    e.target.value = "";
+    if (!datei) return;
+    try {
+      const s = einsatzAusDatei(await datei.text());
+      const r = einsatzImportieren(s);
+      einsaetzeNeuLaden();
+      setFehler("");
+      setMeldung(
+        r.neuerEinsatz
+          ? `Einsatz „${s.name}" importiert (${r.hinzugefuegt} Meldung(en)).`
+          : `Einsatz „${s.name}": ${r.hinzugefuegt} neue Meldung(en) ergänzt.`,
+      );
+      setOffenerEinsatzId(s.id);
+    } catch (err) {
+      setFehler(err instanceof Error ? err.message : String(err));
+    }
+  }
+
   // Offener Einsatz (Meldekopf/Zugführer) — Vorrang vor Assistent/Start, aber
   // nicht über der Musterung/dem Assistenten während einer manuellen Erfassung.
   const offenerEinsatz = offenerEinsatzId ? einsaetze.find((s) => s.id === offenerEinsatzId) : null;
@@ -248,6 +333,9 @@ function App() {
           onGeaendert={einsaetzeNeuLaden}
           onScannen={() => scanneInEinsatz(offenerEinsatz.id)}
           onManuell={() => manuellInEinsatz(offenerEinsatz.id)}
+          onDateiImport={(datei) => importiereBoegen(offenerEinsatz.id, datei)}
+          onExport={() => exportiereEinsatz(offenerEinsatz)}
+          onSammelPdf={() => sammelPdf(offenerEinsatz)}
           onGeloescht={() => { setOffenerEinsatzId(null); einsaetzeNeuLaden(); setMeldung("Einsatz gelöscht."); }}
         />
         {(meldung || fehler) && (
@@ -306,7 +394,13 @@ function App() {
         <section className="start-vorlagen">
           <div className="kopfzeile">
             <h2>Einsatz-Sammlung (Meldekopf)</h2>
-            <button type="button" onClick={neuerEinsatz}>Neuer Einsatz…</button>
+            <span>
+              <button type="button" onClick={neuerEinsatz}>Neuer Einsatz…</button>{" "}
+              <label className="datei-knopf">
+                Einsatz importieren…
+                <input type="file" accept=".json,application/json" hidden onChange={importiereEinsatzDatei} />
+              </label>
+            </span>
           </div>
           <p className="hinweis">
             Fremde Bögen zu einem Einsatz/einer Übung sammeln (scannen oder manuell) — mit Stärke-Summen über alle anwesenden Einheiten.

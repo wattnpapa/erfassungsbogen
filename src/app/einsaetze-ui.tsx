@@ -101,9 +101,12 @@ export function EinsatzDetail(props: {
   onGeaendert: () => void;
   onScannen: () => void;
   onManuell: () => void;
+  onDateiImport: (datei: File) => void;
+  onExport: () => void;
+  onSammelPdf: () => void;
   onGeloescht: () => void;
 }) {
-  const { einsatz, onZurueck, onGeaendert, onScannen, onManuell, onGeloescht } = props;
+  const { einsatz, onZurueck, onGeaendert, onScannen, onManuell, onDateiImport, onExport, onSammelPdf, onGeloescht } = props;
   const sum = aggregiere(einsatz.eintraege);
   const kopf = neuesteJeEinheit(einsatz.eintraege).sort((a, b) =>
     einheitAnzeige(a.bogen).localeCompare(einheitAnzeige(b.bogen), "de"),
@@ -153,6 +156,24 @@ export function EinsatzDetail(props: {
       <div className="aktionen">
         <button type="button" className="primaer" onClick={onScannen}>Bogen scannen…</button>
         <button type="button" onClick={onManuell}>Einheit manuell erfassen…</button>
+        <label className="datei-knopf">
+          Aus Datei/PDF…
+          <input
+            type="file"
+            accept=".json,application/json,.pdf,application/pdf"
+            hidden
+            onChange={(e) => {
+              const f = e.target.files?.[0];
+              e.target.value = "";
+              if (f) onDateiImport(f);
+            }}
+          />
+        </label>
+      </div>
+
+      <div className="vorlage-aktionen" style={{ marginBottom: "0.5rem" }}>
+        <button type="button" onClick={onSammelPdf}>Sammel-PDF (alle Bögen)</button>{" "}
+        <button type="button" onClick={onExport}>Als Datei exportieren</button>
       </div>
 
       <section className="karte">
