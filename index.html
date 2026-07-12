@@ -443,6 +443,315 @@
       color: var(--ios-text);
       box-shadow: 0 24px 64px rgba(0, 0, 0, 0.35);
     }
+
+    /* ---------------------------------------------------------------
+       Native Android-Anmutung nach Material Design 3 (m3.material.io) –
+       greift NUR in der Android-App. main.tsx setzt beim Start die
+       Klasse .platform-android auf <html> (Capacitor). Web und iOS
+       bleiben unverändert.
+
+       Umgesetzte M3-Punkte:
+       - Farbrollen (primary, secondary-container, surface-container-*,
+         outline, error) als Tonpalette aus dem Markenblau, Light/Dark
+       - Type Scale (headline, title, label-large, body) mit Roboto
+       - Shape Scale: Voll-Kapsel-Buttons, 12dp-Karten, 28dp-Dialoge
+       - State Layer beim Drücken statt Ripple (reines CSS)
+       - Touch-Ziele mindestens 48 dp
+       - Elevation über Flächentöne und M3-Schattenstufen
+       --------------------------------------------------------------- */
+    .platform-android {
+      color-scheme: light dark;
+      accent-color: var(--md-primary);
+      /* Tonpalette aus dem Markenblau #12275e (Seed), Light Scheme. */
+      --md-primary: #12275e;
+      --md-on-primary: #ffffff;
+      --md-secondary-container: #dae2f9;
+      --md-on-secondary-container: #131c2b;
+      --md-surface: #faf9fd;
+      --md-surface-container-low: #f4f3f7;
+      --md-surface-container: #eeedf1;
+      --md-surface-container-high: #e8e7ec;
+      --md-surface-container-highest: #e2e2e6;
+      --md-on-surface: #1a1b20;
+      --md-on-surface-variant: #44464f;
+      --md-outline: #74777f;
+      --md-outline-variant: #c4c6d0;
+      --md-error: #b3261e;
+      --md-warnung-text: #7a5200;
+      --md-warnung-fond: #fff7e0;
+      --md-druck: rgba(26, 27, 32, 0.1);          /* State Layer „pressed" */
+      --md-deaktiviert-flaeche: rgba(26, 27, 32, 0.12);
+      --md-deaktiviert-text: rgba(26, 27, 32, 0.38);
+      --md-schatten-1: 0 1px 2px rgba(0, 0, 0, 0.3), 0 1px 3px 1px rgba(0, 0, 0, 0.15);
+      --md-schatten-2: 0 1px 2px rgba(0, 0, 0, 0.3), 0 2px 6px 2px rgba(0, 0, 0, 0.15);
+      --md-schatten-3: 0 4px 8px 3px rgba(0, 0, 0, 0.15), 0 1px 3px rgba(0, 0, 0, 0.3);
+    }
+    @media (prefers-color-scheme: dark) {
+      .platform-android {
+        --md-primary: #b4c5ff;
+        --md-on-primary: #0e2361;
+        --md-secondary-container: #3e4759;
+        --md-on-secondary-container: #dae2f9;
+        --md-surface: #121318;
+        --md-surface-container-low: #1a1b21;
+        --md-surface-container: #1e1f25;
+        --md-surface-container-high: #282a2f;
+        --md-surface-container-highest: #33353a;
+        --md-on-surface: #e2e2e9;
+        --md-on-surface-variant: #c4c6d0;
+        --md-outline: #8e9099;
+        --md-outline-variant: #44464f;
+        --md-error: #ffb4ab;
+        --md-warnung-text: #ffdf9e;
+        --md-warnung-fond: rgba(255, 223, 158, 0.12);
+        --md-druck: rgba(226, 226, 233, 0.1);
+        --md-deaktiviert-flaeche: rgba(226, 226, 233, 0.12);
+        --md-deaktiviert-text: rgba(226, 226, 233, 0.38);
+      }
+    }
+
+    /* Grundfläche und Roboto; rem-Größen skalieren mit der Android-
+       Schriftgröße (Text-Zoom des WebView). body-large: 16sp/24. */
+    .platform-android body {
+      font-family: Roboto, system-ui, sans-serif;
+      font-size: 1rem;
+      line-height: 1.5;
+      letter-spacing: 0.03125em;
+      background: var(--md-surface);
+      color: var(--md-on-surface);
+      -webkit-tap-highlight-color: transparent;
+    }
+    /* Überschriften nach M3 Type Scale in on-surface (regular weight). */
+    .platform-android h1 {
+      font-size: 1.5rem;             /* headline-small */
+      font-weight: 400;
+      letter-spacing: 0;
+      color: var(--md-on-surface);
+    }
+    .platform-android h2 {
+      font-size: 1.375rem;           /* title-large */
+      font-weight: 400;
+      letter-spacing: 0;
+      color: var(--md-on-surface);
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+    .platform-android h3 {
+      font-size: 1rem;               /* title-medium */
+      font-weight: 500;
+      letter-spacing: 0.009375em;
+      color: var(--md-on-surface);
+    }
+    .platform-android label.feld {
+      font-size: 0.875rem;           /* body-medium */
+      letter-spacing: 0.017857em;
+      color: var(--md-on-surface-variant);
+    }
+    .platform-android .inline { min-height: 48px; color: var(--md-on-surface); }
+    .platform-android .hinweis {
+      font-size: 0.75rem;            /* body-small */
+      letter-spacing: 0.033333em;
+      color: var(--md-on-surface-variant);
+    }
+    .platform-android dl.paare { font-size: 0.875rem; }
+    .platform-android dl.paare dt { color: var(--md-on-surface-variant); }
+
+    /* Buttons: Tonal Button als Standard, Filled Button für .primaer –
+       Voll-Kapsel, label-large, 48-dp-Ziel, State Layer beim Drücken. */
+    .platform-android button,
+    .platform-android .datei-knopf {
+      font-size: 0.875rem;           /* label-large */
+      font-weight: 500;
+      letter-spacing: 0.007143em;
+      min-height: 48px;
+      padding: 0.5rem 1rem;
+      border: none;
+      border-radius: 999px;
+      background: var(--md-secondary-container);
+      color: var(--md-on-secondary-container);
+      -webkit-user-select: none;
+      user-select: none;
+    }
+    .platform-android button:active:not(:disabled),
+    .platform-android .datei-knopf:active {
+      background-image: linear-gradient(var(--md-druck), var(--md-druck));
+    }
+    /* Fokus-Indikator in primary statt des UA-Standardrings (M3 Focus). */
+    .platform-android button:focus-visible,
+    .platform-android .datei-knopf:focus-within {
+      outline: 2px solid var(--md-primary);
+      outline-offset: 2px;
+    }
+    .platform-android button:hover,
+    .platform-android .datei-knopf:hover { border: none; }
+    .platform-android button.primaer,
+    .platform-android .datei-knopf.primaer {
+      background-color: var(--md-primary);
+      color: var(--md-on-primary);
+    }
+    .platform-android button.primaer:hover { background-color: var(--md-primary); }
+    .platform-android button:disabled {
+      opacity: 1;
+      background: var(--md-deaktiviert-flaeche);
+      color: var(--md-deaktiviert-text);
+    }
+    /* Text-Buttons: nur Primary-Tint, ohne Fläche. */
+    .platform-android button.link {
+      min-height: 0;
+      padding: 0.8rem 0.3rem;
+      margin: -0.8rem -0.3rem;
+      background: none;
+      border-radius: 0;
+      font-size: inherit;
+      font-weight: inherit;
+      letter-spacing: inherit;
+      color: var(--md-primary);
+    }
+    .platform-android .zur-start {
+      background: none;
+      border-radius: 0;
+      padding: 0;
+      margin-top: 0.4rem;
+      min-height: 48px;
+      display: inline-flex;
+      align-items: center;
+      color: var(--md-primary);
+      font-weight: 500;
+    }
+    /* Schritt-Pills als M3 Filter Chips: 32 dp hoch, 8-dp-Radius,
+       Outline; ausgewählt = secondary-container. Tippfläche wird per
+       Pseudo-Element auf 48 dp vergrößert. */
+    .platform-android .schritte { row-gap: 12px; }
+    .platform-android .schritte button {
+      min-height: 32px;
+      padding: 0.2rem 0.8rem;
+      border-radius: 8px;
+      background: transparent;
+      border: 1px solid var(--md-outline-variant);
+      color: var(--md-on-surface-variant);
+      position: relative;
+    }
+    .platform-android .schritte button::after { content: ""; position: absolute; inset: -8px -2px; }
+    .platform-android .schritte button.aktiv {
+      background: var(--md-secondary-container);
+      border-color: transparent;
+      color: var(--md-on-secondary-container);
+      font-weight: 500;
+    }
+
+    /* Karten als Elevated Cards: 12-dp-Radius, Elevation 1. */
+    .platform-android section.karte,
+    .platform-android .karte {
+      background: var(--md-surface-container-low);
+      border: none;
+      border-radius: 12px;
+      box-shadow: var(--md-schatten-1);
+    }
+    /* Destruktive Aktion als Text-Button in error. */
+    .platform-android .karte .entfernen {
+      background: transparent;
+      color: var(--md-error);
+      padding: 0.4rem 0.8rem;
+      min-height: 40px;
+    }
+    .platform-android .fehler { color: var(--md-error); }
+    .platform-android .warnung {
+      font-size: 0.875rem;
+      color: var(--md-warnung-text);
+      background: var(--md-warnung-fond);
+      border: none;
+      border-radius: 8px;
+      padding: 0.6rem 0.75rem;
+    }
+
+    /* Eingabefelder als Outlined Text Fields: 4-dp-Radius, outline-
+       farbener Rand, im Fokus 2 dp in primary. 16px verhindert zugleich
+       den Auto-Zoom beim Fokussieren. */
+    .platform-android input:not([type="checkbox"]):not([type="radio"]):not([type="file"]),
+    .platform-android select,
+    .platform-android textarea {
+      font-size: 1rem;
+      border: 1px solid var(--md-outline);
+      border-radius: 4px;
+      background: transparent;
+      color: var(--md-on-surface);
+      caret-color: var(--md-primary);
+      padding: 0.7rem 0.75rem;
+    }
+    .platform-android input:focus,
+    .platform-android select:focus,
+    .platform-android textarea:focus {
+      border-color: var(--md-primary);
+      outline: 1px solid var(--md-primary);
+      outline-offset: -2px;
+    }
+    .platform-android .inline input { width: 20px; height: 20px; }
+    .platform-android output.abgeleitet {
+      border: none;
+      border-radius: 4px;
+      background: var(--md-surface-container-highest);
+      color: var(--md-on-surface-variant);
+      padding: 0.7rem 0.75rem;
+    }
+    /* Autocomplete-Liste als M3-Menü (Elevation 2). */
+    .platform-android ul.vorschlaege {
+      background: var(--md-surface-container);
+      border: none;
+      border-radius: 4px;
+      box-shadow: var(--md-schatten-2);
+    }
+    .platform-android ul.vorschlaege li { min-height: 48px; display: flex; align-items: center; }
+    .platform-android ul.vorschlaege li.aktiv,
+    .platform-android ul.vorschlaege li:hover { background: var(--md-surface-container-highest); }
+    .platform-android ul.vorschlaege li small { color: var(--md-on-surface-variant); }
+    /* Chips als M3 Input Chips: 32 dp, 8-dp-Radius, Outline. */
+    .platform-android .chip {
+      min-height: 32px;
+      background: transparent;
+      border: 1px solid var(--md-outline);
+      border-radius: 8px;
+      color: var(--md-on-surface-variant);
+      padding: 0.1rem 0.6rem;
+    }
+    .platform-android .chip button {
+      min-height: 0;
+      background: none;
+      border-radius: 0;
+      color: inherit;
+      padding: 0.5rem 0.55rem;
+      margin: -0.5rem -0.35rem;
+    }
+
+    /* Übersichtstabelle und QR-Fläche in M3-Farben; der QR-Code behält
+       im Dark Theme eine weiße Ruhezone, damit er scannbar bleibt. */
+    .platform-android table.uebersicht th,
+    .platform-android table.uebersicht td { border-color: var(--md-outline-variant); }
+    .platform-android table.uebersicht th { background: var(--md-surface-container); }
+    .platform-android .qr-box img { border-color: var(--md-outline-variant); background: #fff; padding: 8px; }
+
+    /* Untere Navigationsleiste als M3 Bottom App Bar: flache
+       surface-container-Fläche, Trennung über Ton statt Linie. */
+    .platform-android footer.nav {
+      background: var(--md-surface-container);
+      border-top: none;
+    }
+
+    /* Seiten-Fußzeile und Dialoge (Impressum usw.) in M3-Farben;
+       Dialog mit 28-dp-Radius auf surface-container-high (Elevation 3). */
+    .platform-android footer.seite { font-size: 0.75rem; color: var(--md-on-surface-variant); }
+    .platform-android footer.seite a { color: var(--md-primary); }
+    .platform-android button.link,
+    .platform-android footer.seite a { text-decoration: none; }
+    .platform-android dialog {
+      border: none;
+      border-radius: 28px;
+      background: var(--md-surface-container-high);
+      color: var(--md-on-surface);
+      box-shadow: var(--md-schatten-3);
+      padding: 1.5rem;
+    }
+    .platform-android dialog h2,
+    .platform-android dialog h3 { color: var(--md-on-surface); }
   </style>
 </head>
 <body>
