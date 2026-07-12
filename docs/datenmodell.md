@@ -1,7 +1,7 @@
 # Datenmodell Einheiten-Erfassungsbogen (EEB)
 
-**Stufe 1** — Datenmodell und QR-Code-Kodierung. Stand: 2026-07-10, **Schema-Version 2**
-(v2 = organisationsübergreifend; v1 war THW-spezifisch).
+**Stufe 1** — Datenmodell und QR-Code-Kodierung. Stand: 2026-07-12, **Schema-Version 3**
+(v3 = Ernährungsform je Person; v2 = organisationsübergreifend; v1 war THW-spezifisch).
 
 Der Bogen ist **BOS-übergreifend**: THW, Feuerwehr, Polizei, Hilfsorganisationen
 (DRK/JUH/MHD/ASB), DLRG, Bundeswehr, Rettungsdienst — und beliebige sonstige
@@ -47,6 +47,7 @@ RD: RTW, NEF). Deshalb:
 | Stärkerolle | — | 2 Bit explizit (Führer/Unterführer/Mannschaft) → Stärkemeldung org-unabhängig ableitbar |
 | Fahrerlaubnis (EU-Klassen AM…DE) | „Kf CE" | 4 Bit Enum; „Kf" implizit |
 | Geschlecht (M/W/D) | — | 2 Bit → Unterbringungszahlen **abgeleitet** |
+| Ernährung (Fleisch/Vegetarisch/Vegan) | — | 2 Bit → Verpflegungs-Zusammenfassung **abgeleitet** |
 | Fahrzeugtyp | „Anh Versorgung 2t" / „LF 20" | 1 Byte Code im Org-Namensraum |
 | Kennzeichen | „THW-95039" / „OL-FW 2041" | THW: Zahl als Varint (2–3 Bytes); sonst Freitext |
 | Funkrufname | „Heros Oldenburg 18/13", „Florian Wardenburg 11/48/1" | Kennwort-Code (global: Heros, Florian, Rotkreuz, Akkon …) + Flag „eigener Standort" + n×1 Byte Teile |
@@ -77,12 +78,13 @@ Verbindliche Typdefinitionen: [`src/model.ts`](../src/model.ts).
 | personal | `Person[]` | ✓ | bei `NUR_STAERKE`: nur Führungskräfte/Ansprechpartner |
 | staerkeManuell | `Staerke` | bei `NUR_STAERKE` | Führer/Unterführer/Mannschaft (Gesamt = Summe) |
 | unterbringungManuell | {m,w,d} | – | nur wenn Personal nicht einzeln erfasst |
+| verpflegungManuell | {vegetarisch,vegan} | – | nur wenn Personal nicht einzeln erfasst |
 | fahrzeuge | `Fahrzeug[]` | ✓ | |
 | sofortbedarf | `Sofortbedarf` | – | |
 | sonstiges | string | – | Inhalt „Erfassungsbogen Sonstige" |
 
 Abgeleitet (nie gespeichert, außer manuell überschrieben): Stärke, Unterbringung
-M/W/D, Ansprechpartner (erste Führungskraft mit Kontakt).
+M/W/D, Verpflegung (vegetarisch/vegan), Ansprechpartner (erste Führungskraft mit Kontakt).
 
 ### Einheit
 
@@ -119,6 +121,7 @@ ausgeschriebene Hierarchie der Normalfall.
 | funktionen | `VokabularWert[]` | Anzeige-Funktionen im Org-Namensraum |
 | fahrerlaubnis | Enum | EU-Klassen (4 Bit) |
 | geschlecht | Enum | M/W/D (2 Bit) |
+| ernaehrung | Enum | Fleisch/Vegetarisch/Vegan (2 Bit) — Verpflegung wird **abgeleitet** |
 | kontakte | `Kontakt[]` | Art (Mobil/Festnetz/eMail), D/P-Flag, BCD bzw. Template |
 | zusatzqualifikationen | `VokabularWert[]` | „weitere interne/externe Qualifikationen" |
 
@@ -134,8 +137,11 @@ ausgeschriebene Hierarchie der Normalfall.
 
 ### Sofortbedarf
 
-Verpflegung (Personen, davon vegetarisch), Betriebsstoff (Diesel/Benzin/Gemisch in
-Litern), Unterbringung (bool), Ruhezeit erforderlich (bool).
+Verpflegung (Personenzahl), Betriebsstoff (Diesel/Benzin/Gemisch in Litern),
+Unterbringung (bool), Ruhezeit erforderlich (bool). Die Aufteilung vegetarisch/vegan
+wird aus den Ernährungsangaben der Personen **abgeleitet** (`verpflegung()` in
+`model.ts`) — im Meldekopf-Modus (`NUR_STAERKE`, kein Einzelpersonal) ersatzweise
+über `verpflegungManuell`.
 
 ## QR-Payload-Format „EEB2"
 

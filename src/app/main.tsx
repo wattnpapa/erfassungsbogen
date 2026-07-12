@@ -134,6 +134,9 @@ function App() {
     <UpdateBanner />
     <main>
       <header>
+        <button type="button" className="zur-start" onClick={() => setZeigeStart(true)}>
+          ‹ Startseite
+        </button>
         <h1>Einheiten-Erfassungsbogen</h1>
         <nav className="schritte">
           {SCHRITTE.map((name, i) => (
@@ -150,7 +153,7 @@ function App() {
       {schritt === 3 && <SchrittFahrzeuge bogen={bogen} aendern={aendern} />}
       {schritt === 4 && <SchrittSofortbedarf bogen={bogen} aendern={aendern} />}
       {schritt === UEBERSICHT && (
-        <Uebersicht bogen={bogen} geheZu={setSchritt} neu={() => { setBogen(null); setSchritt(0); }} zurStartseite={() => setZeigeStart(true)} />
+        <Uebersicht bogen={bogen} geheZu={setSchritt} neu={() => { setBogen(null); setSchritt(0); }} />
       )}
 
       {schritt !== UEBERSICHT && (

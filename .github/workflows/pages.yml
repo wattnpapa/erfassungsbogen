@@ -25,7 +25,12 @@ jobs:
           cache: npm
       - run: npm ci
       - name: Build-Version erzeugen (Footer-Anzeige)
-        run: echo "APP_BUILD_VERSION=$(date -u '+%Y.%m.%d.%H.%M')" >> "$GITHUB_ENV"
+        # Einheitliches Format YYYY.MMDD.HHMM (z. B. 2026.712.1035), wie im Release-Workflow.
+        run: |
+          Y=$(date -u +%Y)
+          MMDD=$(( 10#$(date -u +%m) * 100 + 10#$(date -u +%d) ))
+          HHMM=$(( 10#$(date -u +%H) * 100 + 10#$(date -u +%M) ))
+          echo "APP_BUILD_VERSION=$Y.$MMDD.$HHMM" >> "$GITHUB_ENV"
       - run: npm run build
       - uses: actions/upload-pages-artifact@v3
         with:

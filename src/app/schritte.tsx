@@ -8,6 +8,7 @@ import {
   Erfassungsbogen,
   Einheit,
   Einsatz,
+  Ernaehrung,
   Fahrzeug,
   Geschlecht,
   Kontakt,
@@ -21,6 +22,7 @@ import {
   datumZuIso,
   staerke,
   unterbringungMWD,
+  verpflegung,
   zeitpunktAusIso,
   zeitpunktZuIso,
 } from "../model";
@@ -545,6 +547,13 @@ function PersonKarte(props: {
             <option value={Geschlecht.D}>D</option>
           </select>
         </Feld>
+        <Feld titel="Ernährung" schmal>
+          <select value={p.ernaehrung} onChange={(e) => set({ ernaehrung: Number(e.target.value) })}>
+            <option value={Ernaehrung.FLEISCH}>Fleisch</option>
+            <option value={Ernaehrung.VEGETARISCH}>Vegetarisch</option>
+            <option value={Ernaehrung.VEGAN}>Vegan</option>
+          </select>
+        </Feld>
         <Feld titel="Fahrerlaubnis" schmal>
           <select value={p.fahrerlaubnis} onChange={(e) => set({ fahrerlaubnis: Number(e.target.value) })}>
             {Object.entries(FE_TEXT).map(([wert, text]) => (
@@ -827,6 +836,10 @@ export function SchrittFahrzeuge({ bogen, aendern }: SchrittProps) {
 export function SchrittSofortbedarf({ bogen, aendern }: SchrittProps) {
   const s = bogen.sofortbedarf;
   const gesamt = staerke(bogen).gesamt;
+  const nurStaerke = bogen.personalErfassung === PersonalErfassung.NUR_STAERKE;
+  const vp = verpflegung(bogen);
+  const setVpManuell = (patch: Partial<{ vegetarisch: number; vegan: number }>) =>
+    aendern({ verpflegungManuell: { vegetarisch: vp.vegetarisch, vegan: vp.vegan, ...patch } });
   return (
     <section className="karte">
       <h2>5. Sofortbedarf & Sonstiges</h2>
@@ -837,7 +850,7 @@ export function SchrittSofortbedarf({ bogen, aendern }: SchrittProps) {
           onChange={(e) =>
             aendern({
               sofortbedarf: e.target.checked
-                ? { verpflegungPersonen: gesamt, davonVegetarisch: 0, dieselLiter: 0, benzinLiter: 0, gemischLiter: 0, unterbringung: false, ruhezeitErforderlich: false }
+                ? { verpflegungPersonen: gesamt, dieselLiter: 0, benzinLiter: 0, gemischLiter: 0, unterbringung: false, ruhezeitErforderlich: false }
                 : undefined,
             })
           }
@@ -850,9 +863,20 @@ export function SchrittSofortbedarf({ bogen, aendern }: SchrittProps) {
             <Feld titel="Verpflegung (Personen)" schmal>
               <input type="number" min={0} value={s.verpflegungPersonen} onChange={(e) => aendern({ sofortbedarf: { ...s, verpflegungPersonen: zahl(e.target.value) } })} />
             </Feld>
-            <Feld titel="davon vegetarisch" schmal>
-              <input type="number" min={0} value={s.davonVegetarisch} onChange={(e) => aendern({ sofortbedarf: { ...s, davonVegetarisch: zahl(e.target.value) } })} />
-            </Feld>
+            {nurStaerke ? (
+              <>
+                <Feld titel="davon vegetarisch" schmal>
+                  <input type="number" min={0} value={vp.vegetarisch} onChange={(e) => setVpManuell({ vegetarisch: zahl(e.target.value) })} />
+                </Feld>
+                <Feld titel="davon vegan" schmal>
+                  <input type="number" min={0} value={vp.vegan} onChange={(e) => setVpManuell({ vegan: zahl(e.target.value) })} />
+                </Feld>
+              </>
+            ) : (
+              <Feld titel="Ernährung (aus Personal)" schmal>
+                <output className="abgeleitet">{vp.vegetarisch} vegetarisch · {vp.vegan} vegan</output>
+              </Feld>
+            )}
             <Feld titel="Diesel (l)" schmal>
               <input type="number" min={0} value={s.dieselLiter} onChange={(e) => aendern({ sofortbedarf: { ...s, dieselLiter: zahl(e.target.value) } })} />
             </Feld>
@@ -888,15 +912,15 @@ export function Uebersicht(props: {
   bogen: Erfassungsbogen;
   geheZu: (schritt: number) => void;
   neu: () => void;
-  zurStartseite: () => void;
 }) {
-  const { bogen, geheZu, neu, zurStartseite } = props;
+  const { bogen, geheZu, neu } = props;
   const [qr, setQr] = useState<QrInfo | null>(null);
   const [fehler, setFehler] = useState("");
   const [pdfLaeuft, setPdfLaeuft] = useState(false);
   const org = bogen.einheit.organisation;
   const s = staerke(bogen);
   const mwd = unterbringungMWD(bogen);
+  const vp = verpflegung(bogen);
 
   useEffect(() => {
     let aktiv = true;
@@ -940,7 +964,6 @@ export function Uebersicht(props: {
               {pdfLaeuft ? "PDF wird erstellt…" : "PDF erzeugen"}
             </button>{" "}
             <button type="button" onClick={() => bogenSpeichern(bogen)}>Als Datei speichern</button>{" "}
-            <button type="button" onClick={zurStartseite}>Startseite</button>{" "}
             <button type="button" onClick={() => window.confirm("Aktuellen Bogen verwerfen?") && neu()}>Neuer Bogen</button>
           </span>
         </div>
@@ -1031,7 +1054,7 @@ export function Uebersicht(props: {
       {abschnitt("Sofortbedarf & Sonstiges", 4, (
         <dl className="paare">
           <dt>Verpflegung</dt>
-          <dd>{bogen.sofortbedarf ? `${bogen.sofortbedarf.verpflegungPersonen} Personen, davon vegetarisch ${bogen.sofortbedarf.davonVegetarisch}` : "—"}</dd>
+          <dd>{bogen.sofortbedarf ? `${bogen.sofortbedarf.verpflegungPersonen} Personen, davon ${vp.vegetarisch} vegetarisch, ${vp.vegan} vegan` : "—"}</dd>
           <dt>Betriebsstoff</dt>
           <dd>
             {bogen.sofortbedarf

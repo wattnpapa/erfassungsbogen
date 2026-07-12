@@ -19,6 +19,11 @@ export function istNativ(): boolean {
   return Capacitor.isNativePlatform();
 }
 
+/** Aktuelle Laufzeit-Plattform: "ios" | "android" | "web". */
+export function plattform(): string {
+  return Capacitor.getPlatform();
+}
+
 /**
  * QR-Code mit der Kamera scannen (fertige Scanner-UI des Plugins).
  * Liefert den rohen QR-Text oder null bei Abbruch durch den Nutzer.

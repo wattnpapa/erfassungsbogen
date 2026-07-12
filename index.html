@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>Einheiten-Erfassungsbogen</title>
   <link rel="icon" type="image/svg+xml" href="./icon.svg" />
   <link rel="icon" type="image/png" sizes="32x32" href="./icons/icon-32.png" />
@@ -34,11 +34,20 @@
     button, .datei-knopf {
       font: inherit; padding: 0.5rem 1rem; border: 1px solid var(--rand);
       border-radius: 0.4rem; background: #fff; cursor: pointer;
+      /* iOS-WKWebView tönt Button-Text sonst in Systemblau. */
+      color: inherit; -webkit-appearance: none; appearance: none;
     }
     button:hover, .datei-knopf:hover { border-color: var(--blau-hell); }
     button.primaer, .datei-knopf.primaer { background: var(--blau); color: #fff; border-color: var(--blau); }
     button.primaer:hover { background: var(--blau-hell); }
     button:disabled { opacity: 0.4; cursor: default; }
+    /* Immer sichtbarer Rücksprung zur Startseite im Kopfbereich. */
+    .zur-start {
+      display: inline-block; border: none; background: none;
+      padding: 0.2rem 0; margin-top: 0.4rem;
+      color: var(--blau); font-size: 0.95rem; cursor: pointer;
+    }
+    .zur-start:hover { border: none; text-decoration: underline; }
     .schritte { display: flex; gap: 0.3rem; flex-wrap: wrap; margin: 0.5rem 0 1rem; }
     .schritte button { padding: 0.3rem 0.7rem; font-size: 0.85rem; border-radius: 1rem; }
     .schritte button.aktiv { background: var(--blau); color: #fff; border-color: var(--blau); }
@@ -47,8 +56,12 @@
       padding: 1rem; margin-bottom: 1rem;
     }
     label.feld { display: block; margin: 0.6rem 0 0; font-size: 0.85rem; color: #444; }
-    label.feld > input, label.feld > select, label.feld > textarea {
+    label.feld > input, label.feld > select, label.feld > textarea, label.feld > output {
       display: block; width: 100%; margin-top: 0.15rem;
+    }
+    output.abgeleitet {
+      padding: 0.4rem 0.5rem; border: 1px dashed var(--rand); border-radius: 0.3rem;
+      background: #f7f7f7; color: #555; box-sizing: border-box;
     }
     input, select, textarea {
       font: inherit; padding: 0.4rem 0.5rem; border: 1px solid var(--rand);
@@ -89,6 +102,13 @@
       border-radius: 0.3rem; padding: 0.4rem 0.6rem; font-size: 0.9rem;
     }
     .hinweis { font-size: 0.85rem; color: #555; }
+    .update-banner {
+      display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 0.75rem;
+      background: var(--blau); color: #fff; padding: 0.5rem 1rem; font-size: 0.9rem;
+    }
+    .update-banner .primaer { background: #fff; color: var(--blau); border-color: #fff; }
+    .update-banner .link { color: #cdd6f4; }
+    .update-banner .fehler { color: #ffb4ab; flex-basis: 100%; }
     table.uebersicht { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
     table.uebersicht th, table.uebersicht td { border: 1px solid var(--rand); padding: 0.3rem 0.5rem; text-align: left; vertical-align: top; }
     table.uebersicht th { background: var(--grau); }
@@ -136,6 +156,70 @@
     dialog::backdrop { background: rgba(0, 0, 0, 0.4); }
     dialog h2 { border: none; }
     dialog h3 { color: var(--blau); }
+
+    /* ---------------------------------------------------------------
+       Safe-Area (Notch, Statusleiste, Home-Indicator). env() ist auf
+       Geräten ohne Aussparung 0, daher plattformübergreifend gefahrlos.
+       Setzt viewport-fit=cover im viewport-Meta voraus.
+       --------------------------------------------------------------- */
+    #app {
+      padding-top: env(safe-area-inset-top);
+      padding-left: env(safe-area-inset-left);
+      padding-right: env(safe-area-inset-right);
+    }
+    footer.nav {
+      padding-bottom: calc(0.7rem + env(safe-area-inset-bottom));
+      padding-left: calc(1rem + env(safe-area-inset-left));
+      padding-right: calc(1rem + env(safe-area-inset-right));
+    }
+
+    /* ---------------------------------------------------------------
+       Native iOS-Anmutung – greift NUR in der iOS-App. main.tsx setzt
+       beim Start die Klasse .platform-ios auf <html> (Capacitor).
+       Web und Android bleiben unverändert.
+       --------------------------------------------------------------- */
+    .platform-ios body {
+      background: #fff;
+      -webkit-font-smoothing: antialiased;
+      -webkit-tap-highlight-color: transparent;
+    }
+    /* Kein Text-Callout / keine Auswahl auf Bedien-Elementen
+       (Inhalte in Eingabefeldern bleiben selbstverständlich wählbar). */
+    .platform-ios button,
+    .platform-ios .datei-knopf,
+    .platform-ios .chip,
+    .platform-ios .schritte button {
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+    /* iOS zoomt bei Feld-Schrift < 16px hinein – das verrät „Webseite". */
+    .platform-ios input,
+    .platform-ios select,
+    .platform-ios textarea {
+      font-size: 16px;
+    }
+    /* Größere Touch-Ziele (≥ 44px) und weichere iOS-Radien. */
+    .platform-ios button,
+    .platform-ios .datei-knopf {
+      min-height: 44px;
+      border-radius: 0.7rem;
+    }
+    .platform-ios .schritte button { min-height: 2rem; }
+    .platform-ios section.karte,
+    .platform-ios .karte { border-radius: 0.9rem; }
+    /* „Startseite" oben links wie ein Nav-Bar-Item (17px = iOS-Standard). */
+    .platform-ios .zur-start {
+      font-size: 17px;
+      padding: 0;
+      margin-top: 0.2rem;
+    }
+    /* Große, kräftige Titelzeile wie in iOS-Apps. */
+    .platform-ios main > header h1 {
+      font-size: 1.9rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
   </style>
 </head>
 <body>

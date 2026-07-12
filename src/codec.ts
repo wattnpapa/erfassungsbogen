@@ -159,6 +159,7 @@ function encodePerson(w: Writer, p: Person): void {
   w.str(p.nachname);
   // 4 Bit Fahrerlaubnis + 2 Bit Geschlecht + 2 Bit Stärkerolle
   w.u8(p.fahrerlaubnis | (p.geschlecht << 4) | (p.staerkeRolle << 6));
+  w.u8(p.ernaehrung); // eigenes Byte (Vorbyte voll); komprimiert sich als 0-Serie weg
   w.varint(p.funktionen.length);
   for (const f of p.funktionen) w.vokab(f);
   w.varint(p.kontakte.length);
@@ -224,7 +225,6 @@ function encodeEinsatz(w: Writer, ez: Einsatz): void {
 
 function encodeSofortbedarf(w: Writer, s: Sofortbedarf): void {
   w.u8(s.verpflegungPersonen);
-  w.u8(s.davonVegetarisch);
   w.varint(s.dieselLiter);
   w.varint(s.benzinLiter);
   w.varint(s.gemischLiter);
@@ -242,7 +242,8 @@ export function encodeBinaer(b: Erfassungsbogen): Uint8Array {
   w.u8(
     b.personalErfassung |
       (b.staerkeManuell ? 2 : 0) |
-      (b.unterbringungManuell ? 4 : 0),
+      (b.unterbringungManuell ? 4 : 0) |
+      (b.verpflegungManuell ? 8 : 0),
   );
   if (b.staerkeManuell) {
     w.u8(b.staerkeManuell.fuehrer);
@@ -253,6 +254,10 @@ export function encodeBinaer(b: Erfassungsbogen): Uint8Array {
     w.u8(b.unterbringungManuell.m);
     w.u8(b.unterbringungManuell.w);
     w.u8(b.unterbringungManuell.d);
+  }
+  if (b.verpflegungManuell) {
+    w.u8(b.verpflegungManuell.vegetarisch);
+    w.u8(b.verpflegungManuell.vegan);
   }
   w.varint(b.personal.length);
   for (const p of b.personal) encodePerson(w, p);
@@ -289,6 +294,7 @@ function decodePerson(r: Reader): Person {
     fahrerlaubnis: flags & 0x0f,
     geschlecht: (flags >> 4) & 3,
     staerkeRolle: (flags >> 6) & 3,
+    ernaehrung: r.u8(),
     funktionen: [],
     kontakte: [],
     zusatzqualifikationen: [],
@@ -356,7 +362,7 @@ function decodeEinsatz(r: Reader): Einsatz {
 export function decodeBinaer(daten: Uint8Array): Erfassungsbogen {
   const r = new Reader(daten);
   const schemaVersion = r.varint();
-  if (schemaVersion !== 2) throw new Error(`EEB2: unbekannte Schema-Version ${schemaVersion}`);
+  if (schemaVersion !== 3) throw new Error(`EEB2: unbekannte Schema-Version ${schemaVersion}`);
   const b: Erfassungsbogen = {
     schemaVersion,
     stand: r.u16(),
@@ -375,12 +381,12 @@ export function decodeBinaer(daten: Uint8Array): Erfassungsbogen {
     b.staerkeManuell = { fuehrer, unterfuehrer, mannschaft, gesamt: fuehrer + unterfuehrer + mannschaft };
   }
   if (pflags & 4) b.unterbringungManuell = { m: r.u8(), w: r.u8(), d: r.u8() };
+  if (pflags & 8) b.verpflegungManuell = { vegetarisch: r.u8(), vegan: r.u8() };
   for (let i = r.varint(); i > 0; i--) b.personal.push(decodePerson(r));
   for (let i = r.varint(); i > 0; i--) b.fahrzeuge.push(decodeFahrzeug(r));
   if (r.u8() === 1) {
     b.sofortbedarf = {
       verpflegungPersonen: r.u8(),
-      davonVegetarisch: r.u8(),
       dieselLiter: r.varint(),
       benzinLiter: r.varint(),
       gemischLiter: r.varint(),

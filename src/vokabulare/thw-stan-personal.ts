@@ -20,7 +20,7 @@
  */
 
 import type { Person, VokabularWert } from "../model";
-import { Fahrerlaubnis, Geschlecht, OrganisationsTyp, StaerkeRolle } from "../model";
+import { Ernaehrung, Fahrerlaubnis, Geschlecht, OrganisationsTyp, StaerkeRolle } from "../model";
 
 export interface StanSollplatz {
   /** Grundfunktion als Code in THW_FUNKTIONEN; fehlt bei Mannschaftsplätzen. */
@@ -103,6 +103,7 @@ export function stanPersonalVorbelegung(
       funktionen: v.funktion != null ? [{ code: v.funktion }] : [],
       fahrerlaubnis: Fahrerlaubnis.NONE,
       geschlecht: Geschlecht.M,
+      ernaehrung: Ernaehrung.FLEISCH,
       kontakte: [],
       zusatzqualifikationen: [],
     })),

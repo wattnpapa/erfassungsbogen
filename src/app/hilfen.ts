@@ -7,15 +7,18 @@ import { deflateRaw, inflateRaw } from "pako";
 import QRCode from "qrcode";
 import {
   Erfassungsbogen,
+  Ernaehrung,
   Fahrerlaubnis,
   Fahrzeug,
   OrganisationsTyp,
   Person,
   PersonalErfassung,
+  SCHEMA_VERSION,
   VokabularWert,
   datumAusIso,
   staerke,
   unterbringungMWD,
+  verpflegung,
 } from "../model";
 import { encodePayloadUrl, type Kompressor } from "../codec";
 import { istNativ, textTeilen } from "./nativ";
@@ -169,8 +172,8 @@ export async function bogenLaden(datei: File): Promise<Erfassungsbogen> {
     throw new Error("Datei ist kein gültiges JSON.");
   }
   const b = daten as Erfassungsbogen;
-  if (b?.schemaVersion !== 2 || !b.einheit || !b.einsatz || !Array.isArray(b.personal)) {
-    throw new Error("Keine gültige Erfassungsbogen-Datei (Schema-Version 2 erwartet).");
+  if (b?.schemaVersion !== SCHEMA_VERSION || !b.einheit || !b.einsatz || !Array.isArray(b.personal)) {
+    throw new Error(`Keine gültige Erfassungsbogen-Datei (Schema-Version ${SCHEMA_VERSION} erwartet).`);
   }
   return b;
 }
@@ -221,8 +224,11 @@ export function plausibilitaet(b: Erfassungsbogen): string[] {
       `Verpflegung für ${b.sofortbedarf.verpflegungPersonen} Personen angefordert, die Gesamtstärke ist aber ${s.gesamt}.`,
     );
   }
-  if (b.sofortbedarf && b.sofortbedarf.davonVegetarisch > b.sofortbedarf.verpflegungPersonen) {
-    hinweise.push("Sofortbedarf: „davon vegetarisch“ ist größer als die Verpflegungs-Personenzahl.");
+  if (b.sofortbedarf) {
+    const vp = verpflegung(b);
+    if (vp.vegetarisch + vp.vegan > b.sofortbedarf.verpflegungPersonen) {
+      hinweise.push("Sofortbedarf: mehr Vegetarier/Veganer erfasst als Personen mit Verpflegungsbedarf.");
+    }
   }
   return hinweise;
 }
@@ -232,7 +238,7 @@ export function plausibilitaet(b: Erfassungsbogen): string[] {
 export function neuerBogen(): Erfassungsbogen {
   const heute = datumAusIso(new Date().toISOString().slice(0, 10));
   return {
-    schemaVersion: 2,
+    schemaVersion: SCHEMA_VERSION,
     stand: heute,
     einheit: {
       organisation: OrganisationsTyp.THW,
@@ -255,6 +261,7 @@ export function neuePerson(): Person {
     funktionen: [],
     fahrerlaubnis: Fahrerlaubnis.NONE,
     geschlecht: 0,
+    ernaehrung: Ernaehrung.FLEISCH,
     kontakte: [],
     zusatzqualifikationen: [],
   };

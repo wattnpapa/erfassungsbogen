@@ -9,7 +9,7 @@
  * React Native / Capacitor und Node.
  */
 
-export const SCHEMA_VERSION = 2;
+export const SCHEMA_VERSION = 3;
 
 // ---------------------------------------------------------- Zeitrepräsentation
 //
@@ -109,6 +109,13 @@ export enum Geschlecht {
   D = 2,
 }
 
+/** Ernährungsform je Person — Grundlage der Verpflegungs-Zusammenfassung (2 Bit im QR). */
+export enum Ernaehrung {
+  FLEISCH = 0,
+  VEGETARISCH = 1,
+  VEGAN = 2,
+}
+
 export enum KontaktArt {
   MOBIL = 0,
   FESTNETZ = 1,
@@ -140,6 +147,7 @@ export interface Person {
   funktionen: VokabularWert[];
   fahrerlaubnis: Fahrerlaubnis; // "Kf" ergibt sich implizit aus > NONE
   geschlecht: Geschlecht; // → Unterbringung M/W/D wird abgeleitet
+  ernaehrung: Ernaehrung; // → Verpflegung (vegetarisch/vegan) wird abgeleitet
   kontakte: Kontakt[]; // i. d. R. nur Führungskräfte
   zusatzqualifikationen: VokabularWert[]; // "weitere interne/externe Qualifikationen"
 }
@@ -208,8 +216,7 @@ export interface Einsatz {
 }
 
 export interface Sofortbedarf {
-  verpflegungPersonen: number; // Default: Gesamtstärke
-  davonVegetarisch: number;
+  verpflegungPersonen: number; // Default: Gesamtstärke; Aufteilung veg./vegan wird abgeleitet
   dieselLiter: number;
   benzinLiter: number;
   gemischLiter: number;
@@ -245,6 +252,7 @@ export interface Erfassungsbogen {
   personal: Person[];
   staerkeManuell?: Staerke; // Pflicht bei NUR_STAERKE
   unterbringungManuell?: { m: number; w: number; d: number }; // optional bei NUR_STAERKE
+  verpflegungManuell?: { vegetarisch: number; vegan: number }; // optional bei NUR_STAERKE (kein Einzelpersonal)
   fahrzeuge: Fahrzeug[];
   sofortbedarf?: Sofortbedarf;
   sonstiges?: string;
@@ -277,6 +285,32 @@ export function unterbringungMWD(
     else zaehler.d++;
   }
   return zaehler;
+}
+
+/** Verpflegungs-Zusammenfassung "0 vegetarisch / 0 vegan" — abgeleitet aus dem Personal oder (Meldekopf) manuell. */
+export interface VerpflegungSplit {
+  gesamt: number;
+  fleisch: number;
+  vegetarisch: number;
+  vegan: number;
+}
+
+export function verpflegung(
+  b: Pick<Erfassungsbogen, "personal" | "staerkeManuell" | "verpflegungManuell">,
+): VerpflegungSplit {
+  if (b.verpflegungManuell) {
+    const { vegetarisch, vegan } = b.verpflegungManuell;
+    const gesamt = b.staerkeManuell?.gesamt ?? b.personal.length;
+    return { gesamt, fleisch: Math.max(0, gesamt - vegetarisch - vegan), vegetarisch, vegan };
+  }
+  let vegetarisch = 0;
+  let vegan = 0;
+  for (const p of b.personal) {
+    if (p.ernaehrung === Ernaehrung.VEGETARISCH) vegetarisch++;
+    else if (p.ernaehrung === Ernaehrung.VEGAN) vegan++;
+  }
+  const gesamt = b.personal.length;
+  return { gesamt, fleisch: gesamt - vegetarisch - vegan, vegetarisch, vegan };
 }
 
 /** Ansprechpartner/-in für den Bogenkopf: erste Führungskraft mit Kontakt. */

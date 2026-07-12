@@ -15,6 +15,7 @@ import {
   datumZuIso,
   staerke,
   unterbringungMWD,
+  verpflegung,
   zeitpunktZuIso,
 } from "../model";
 import {
@@ -44,6 +45,7 @@ export async function pdfErzeugen(b: Erfassungsbogen): Promise<void> {
   const typKurz = vokabText(b.einheit.einheitsTyp, vokabularFuer(org, "einheitstyp"));
   const s = staerke(b);
   const mwd = unterbringungMWD(b);
+  const vp = verpflegung(b);
   const qr = await qrErzeugen(b);
   const ansprech = b.personal[0];
 
@@ -156,7 +158,7 @@ export async function pdfErzeugen(b: Erfassungsbogen): Promise<void> {
             {
               stack: [
                 { text: "Sofortbedarf:", bold: true, decoration: "underline" },
-                { text: `${kasten(sb.verpflegungPersonen > 0)} Verpflegung für ${sb.verpflegungPersonen} Personen, davon vegetarisch ${sb.davonVegetarisch}` },
+                { text: `${kasten(sb.verpflegungPersonen > 0)} Verpflegung für ${sb.verpflegungPersonen} Personen, davon ${vp.vegetarisch} vegetarisch, ${vp.vegan} vegan` },
                 { text: `${kasten(sb.dieselLiter + sb.benzinLiter + sb.gemischLiter > 0)} Betriebsstoff: ${sb.dieselLiter} l Diesel / ${sb.benzinLiter} l Benzin / ${sb.gemischLiter} l Gemisch` },
               ],
             },

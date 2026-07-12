@@ -15,12 +15,14 @@ import jsQR from "jsqr";
 import { PNG } from "pngjs";
 import {
   Erfassungsbogen,
+  Ernaehrung as E,
   Fahrerlaubnis as FE,
   Geschlecht as G,
   KontaktArt,
   OrganisationsTyp,
   PersonalErfassung,
   Person,
+  SCHEMA_VERSION,
   StaerkeRolle as R,
   VokabularWert,
   datumAusIso,
@@ -51,12 +53,13 @@ const P = (
   funktionen,
   fahrerlaubnis: fe,
   geschlecht: g,
+  ernaehrung: E.FLEISCH,
   kontakte: mobilPrivat ? [{ art: KontaktArt.MOBIL, dienstlich: false, wert: mobilPrivat }] : [],
   zusatzqualifikationen: [],
 });
 
 const bogen: Erfassungsbogen = {
-  schemaVersion: 2,
+  schemaVersion: SCHEMA_VERSION,
   stand: datumAusIso("2026-05-14"),
   einheit: {
     organisation: OrganisationsTyp.THW,
@@ -91,8 +94,8 @@ const bogen: Erfassungsbogen = {
     P("Jannik", "Krause", R.MANNSCHAFT, [V(5)], FE.BE, G.M),
     P("Felix", "Brandt", R.MANNSCHAFT, [V(5)], FE.BE, G.M),
     P("Tom", "Fischer", R.MANNSCHAFT, [V(5), V(35)], FE.B, G.M),
-    P("Doris", "Hartmann", R.MANNSCHAFT, [V(5), V(35)], FE.NONE, G.W),
-    P("Anna", "Weber", R.MANNSCHAFT, [V(5)], FE.NONE, G.W),
+    { ...P("Doris", "Hartmann", R.MANNSCHAFT, [V(5), V(35)], FE.NONE, G.W), ernaehrung: E.VEGETARISCH },
+    { ...P("Anna", "Weber", R.MANNSCHAFT, [V(5)], FE.NONE, G.W), ernaehrung: E.VEGAN },
     P("Miriam", "Vogt", R.MANNSCHAFT, [V(5)], FE.NONE, G.W),
     P("Lena", "Michels", R.MANNSCHAFT, [V(5)], FE.BE, G.W),
     P("Sebastian", "Braun", R.MANNSCHAFT, [V(5)], FE.NONE, G.M),
@@ -112,7 +115,6 @@ const bogen: Erfassungsbogen = {
   ],
   sofortbedarf: {
     verpflegungPersonen: 20,
-    davonVegetarisch: 0,
     dieselLiter: 0,
     benzinLiter: 0,
     gemischLiter: 0,
