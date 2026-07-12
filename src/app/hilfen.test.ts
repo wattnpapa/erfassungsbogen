@@ -21,6 +21,7 @@ import {
   type Person,
 } from "../model";
 import {
+  bogenLaden,
   datumDeutsch,
   funkrufText,
   funktionsText,
@@ -34,6 +35,11 @@ import {
   vokabText,
   vokabularFuer,
 } from "./hilfen";
+
+// Minimaler File-Ersatz: bogenLaden nutzt nur datei.text().
+function jsonDatei(inhalt: string): File {
+  return { text: async () => inhalt } as File;
+}
 
 function person(p: Partial<Person> = {}): Person {
   return {
@@ -205,6 +211,95 @@ describe("migriereBogen() (JSON-Pfad, muss zum Codec passen)", () => {
     expect(b.verpflegungManuell).toEqual({ vegetarisch: 4, vegan: 0 });
     // Das Alt-Feld darf nicht im Sofortbedarf zurückbleiben.
     expect((b.sofortbedarf as unknown as Record<string, unknown>).davonVegetarisch).toBeUndefined();
+  });
+});
+
+describe("bogenLaden() (JSON-Datei)", () => {
+  it("lädt einen gültigen aktuellen Bogen und hebt ihn aufs aktuelle Schema", async () => {
+    const bogen = { ...neuerBogen(), einheit: { ...neuerBogen().einheit, name: "OV Test" } };
+    const b = await bogenLaden(jsonDatei(JSON.stringify(bogen)));
+    expect(b.schemaVersion).toBe(SCHEMA_VERSION);
+    expect(b.einheit.name).toBe("OV Test");
+  });
+
+  it("migriert einen alten v2-Bogen (Ernährung, davonVegetarisch)", async () => {
+    const alt = {
+      schemaVersion: 2,
+      stand: 0,
+      einheit: { organisation: OrganisationsTyp.THW, einheitsTyp: { code: 43 }, name: "OV", hierarchie: [] },
+      einsatz: { zeitraumVon: 0, zeitraumBis: 0, ortAuftrag: "" },
+      personalErfassung: PersonalErfassung.VOLLSTAENDIG,
+      personal: [{ vorname: "A", nachname: "B", staerkeRolle: 0, funktionen: [], fahrerlaubnis: 0, geschlecht: 0, kontakte: [], zusatzqualifikationen: [] }],
+      fahrzeuge: [],
+      sofortbedarf: { verpflegungPersonen: 5, davonVegetarisch: 2, dieselLiter: 0, benzinLiter: 0, gemischLiter: 0, unterbringung: false, ruhezeitErforderlich: false },
+    };
+    const b = await bogenLaden(jsonDatei(JSON.stringify(alt)));
+    expect(b.schemaVersion).toBe(SCHEMA_VERSION);
+    expect(b.personal[0]!.ernaehrung).toBe(Ernaehrung.FLEISCH);
+    expect(b.verpflegungManuell).toEqual({ vegetarisch: 2, vegan: 0 });
+  });
+
+  it("lehnt kaputtes JSON ab", async () => {
+    await expect(bogenLaden(jsonDatei("{ kein json"))).rejects.toThrow(/kein gültiges JSON/i);
+  });
+
+  it("lehnt eine zu neue Schema-Version ab", async () => {
+    const b = { ...neuerBogen(), schemaVersion: SCHEMA_VERSION + 1 };
+    await expect(bogenLaden(jsonDatei(JSON.stringify(b)))).rejects.toThrow(/gültige Erfassungsbogen-Datei/i);
+  });
+
+  it("lehnt eine zu alte Schema-Version ab", async () => {
+    const b = { ...neuerBogen(), schemaVersion: 1 };
+    await expect(bogenLaden(jsonDatei(JSON.stringify(b)))).rejects.toThrow(/gültige Erfassungsbogen-Datei/i);
+  });
+
+  it("lehnt eine Datei ohne Pflichtstruktur ab", async () => {
+    await expect(bogenLaden(jsonDatei(JSON.stringify({ schemaVersion: SCHEMA_VERSION })))).rejects.toThrow(
+      /gültige Erfassungsbogen-Datei/i,
+    );
+  });
+});
+
+describe("plausibilitaet() — weitere Zweige", () => {
+  function bogen(over: Partial<Erfassungsbogen> = {}): Erfassungsbogen {
+    return { ...neuerBogen(), ...over };
+  }
+
+  it("erkennt eine manuelle Stärke, deren Summe nicht zur Gesamtstärke passt", () => {
+    const b = bogen({
+      personalErfassung: PersonalErfassung.NUR_STAERKE,
+      personal: [],
+      staerkeManuell: { fuehrer: 1, unterfuehrer: 1, mannschaft: 1, gesamt: 5 },
+    });
+    expect(plausibilitaet(b).some((h) => /ergibt nicht die Gesamtstärke/.test(h))).toBe(true);
+  });
+
+  it("erkennt bei vollständiger Erfassung eine falsche manuelle Unterbringungssumme", () => {
+    const b = bogen({
+      personal: [person(), person()],
+      unterbringungManuell: { m: 1, w: 0, d: 0 },
+    });
+    expect(plausibilitaet(b).some((h) => /Unterbringung/.test(h))).toBe(true);
+  });
+
+  it("warnt, wenn im Meldekopf-Modus mehr Ansprechpartner als die Gesamtstärke erfasst sind", () => {
+    const b = bogen({
+      personalErfassung: PersonalErfassung.NUR_STAERKE,
+      personal: [person(), person()],
+      staerkeManuell: { fuehrer: 0, unterfuehrer: 0, mannschaft: 1, gesamt: 1 },
+    });
+    expect(plausibilitaet(b).some((h) => /Ansprechpartner erfasst/.test(h))).toBe(true);
+  });
+
+  it("warnt, wenn mehr Vegetarier/Veganer als Verpflegungsbedarf erfasst sind", () => {
+    const b = bogen({
+      personalErfassung: PersonalErfassung.NUR_STAERKE,
+      personal: [],
+      staerkeManuell: { fuehrer: 0, unterfuehrer: 0, mannschaft: 5, gesamt: 5 },
+      verpflegungManuell: { vegetarisch: 3, vegan: 0 },
+      sofortbedarf: { verpflegungPersonen: 1, dieselLiter: 0, benzinLiter: 0, gemischLiter: 0, unterbringung: false, ruhezeitErforderlich: false },
+    });
+    expect(plausibilitaet(b).some((h) => /mehr Vegetarier\/Veganer/.test(h))).toBe(true);
   });
 });
 
