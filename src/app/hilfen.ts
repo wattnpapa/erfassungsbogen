@@ -21,7 +21,7 @@ import {
   unterbringungMWD,
   verpflegung,
 } from "../model";
-import { encodePayloadUrl, type Kompressor } from "../codec";
+import { encodePayloadUrl, encodeVorlagePayloadUrl, type Kompressor } from "../codec";
 import { istNativ, textTeilen } from "./nativ";
 import {
   FUNKRUF_KENNWOERTER,
@@ -142,6 +142,17 @@ export async function qrErzeugen(b: Erfassungsbogen): Promise<QrInfo> {
   // QR-Inhalt ist eine App-URL: Die Kamera erkennt sie und öffnet die App
   // bzw. die Web-App; die Daten stehen im Fragment (bleiben also lokal).
   const url = encodePayloadUrl(b, browserKompressor);
+  const optionen = { errorCorrectionLevel: "M" as const };
+  const datenUrl = await QRCode.toDataURL(url, { ...optionen, width: 520, margin: 2 });
+  return { datenUrl, zeichen: url.length, version: QRCode.create(url, optionen).version };
+}
+
+/**
+ * QR-Code zum Teilen einer Vorlage in der Einheit. Trägt den Marker "V." im
+ * Fragment, damit der Empfänger sie importiert statt als Einsatzbogen zu öffnen.
+ */
+export async function qrVorlageErzeugen(b: Erfassungsbogen): Promise<QrInfo> {
+  const url = encodeVorlagePayloadUrl(b, browserKompressor);
   const optionen = { errorCorrectionLevel: "M" as const };
   const datenUrl = await QRCode.toDataURL(url, { ...optionen, width: 520, margin: 2 });
   return { datenUrl, zeichen: url.length, version: QRCode.create(url, optionen).version };

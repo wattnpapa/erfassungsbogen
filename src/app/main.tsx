@@ -1,13 +1,16 @@
 /**
- * SPA-Einstieg: Startbildschirm (neu / Datei laden), Assistent, Übersicht.
+ * SPA-Einstieg: Startbildschirm (neu / Vorlage / Datei / QR), Assistent,
+ * Übersicht, Vorlagenliste und Musterung.
  */
 
 import { StrictMode, useEffect, useState, type ChangeEvent } from "react";
 import { createRoot } from "react-dom/client";
 import type { Erfassungsbogen } from "../model";
-import { decodePayloadUrl } from "../codec";
+import { decodePayloadUrl, decodeVorlagePayloadUrl, istVorlageNutzlast } from "../codec";
 import { bogenLaden, browserKompressor, neuerBogen } from "./hilfen";
 import { bogenLinksEmpfangen, istNativ, plattform, qrScannen } from "./nativ";
+import { vorlageAnlegen, vorlagenLaden, type Vorlage } from "./vorlagen";
+import { Musterung, VorlagenAuswahl } from "./vorlagen-ui";
 import { QrScannerWeb } from "./qr-scanner-web";
 import { Fusszeile } from "./fusszeile";
 import { UpdateBanner } from "./aktualisierung";
@@ -22,34 +25,65 @@ import {
 
 const SCHRITTE = ["Einheit", "Einsatz", "Personal", "Fahrzeuge", "Sofortbedarf", "Übersicht"];
 const UEBERSICHT = SCHRITTE.length - 1;
+const SCHRITT_EINSATZ = 1; // Landepunkt nach der Musterung: Ort/Zeitraum sind das einzig Leere.
 
 /**
- * Bogen aus dem URL-Fragment übernehmen (QR-Code mit App-URL bzw. Universal
- * Link öffnet die Web-App als https://erfassungsbogen.app/#<Payload>).
- * Läuft einmalig beim Laden; das Fragment wird danach aus der Adresszeile
- * entfernt, damit die Daten nicht in Verlauf/Lesezeichen hängen bleiben.
+ * Startzustand aus dem URL-Fragment: Ein QR/Universal Link kann einen
+ * Einsatzbogen (`#…`) oder eine geteilte Vorlage (`#V.…`) tragen. Eine Vorlage
+ * wird direkt importiert (nicht als Arbeitsbogen geöffnet). Das Fragment wird
+ * danach aus der Adresszeile entfernt, damit die Daten nicht im Verlauf hängen.
  */
-function bogenAusUrlFragment(): { bogen: Erfassungsbogen | null; fehler: string } {
+function startAusUrlFragment(): {
+  bogen: Erfassungsbogen | null;
+  vorlage: Vorlage | null;
+  fehler: string;
+} {
   const fragment = window.location.hash.slice(1);
-  if (!fragment) return { bogen: null, fehler: "" };
+  if (!fragment) return { bogen: null, vorlage: null, fehler: "" };
   window.history.replaceState(null, "", window.location.pathname + window.location.search);
   try {
-    return { bogen: decodePayloadUrl(fragment, browserKompressor), fehler: "" };
+    if (istVorlageNutzlast(fragment)) {
+      const b = decodeVorlagePayloadUrl(fragment, browserKompressor);
+      return { bogen: null, vorlage: vorlageAnlegen(b.einheit.name, b), fehler: "" };
+    }
+    return { bogen: decodePayloadUrl(fragment, browserKompressor), vorlage: null, fehler: "" };
   } catch {
-    return { bogen: null, fehler: "Der geöffnete Link enthält keinen gültigen Erfassungsbogen." };
+    return { bogen: null, vorlage: null, fehler: "Der geöffnete Link enthält keinen gültigen Erfassungsbogen." };
   }
 }
 
-const START = bogenAusUrlFragment();
+const START = startAusUrlFragment();
 
 function App() {
   const [bogen, setBogen] = useState<Erfassungsbogen | null>(START.bogen);
   const [schritt, setSchritt] = useState(START.bogen ? UEBERSICHT : 0);
   const [fehler, setFehler] = useState(START.fehler);
+  const [meldung, setMeldung] = useState(START.vorlage ? `Vorlage „${START.vorlage.name}" importiert.` : "");
   const [scannerOffen, setScannerOffen] = useState(false);
   // Zeigt den Startbildschirm, ohne den aktuellen Bogen zu verwerfen –
   // er lässt sich von dort per „Aktuellen Bogen fortsetzen“ wieder öffnen.
   const [zeigeStart, setZeigeStart] = useState(false);
+  const [vorlagen, setVorlagen] = useState<Vorlage[]>(() => vorlagenLaden());
+  const [zeigeVorlagen, setZeigeVorlagen] = useState(START.vorlage != null);
+  const [musterVorlage, setMusterVorlage] = useState<Vorlage | null>(null);
+
+  const vorlagenNeuLaden = () => setVorlagen(vorlagenLaden());
+
+  function oeffneVorlagen() {
+    vorlagenNeuLaden();
+    setMeldung("");
+    setFehler("");
+    setZeigeVorlagen(true);
+  }
+
+  function musterungFertig(neuerArbeitsbogen: Erfassungsbogen) {
+    setBogen(neuerArbeitsbogen);
+    setSchritt(SCHRITT_EINSATZ);
+    setMusterVorlage(null);
+    setZeigeVorlagen(false);
+    setZeigeStart(false);
+    setMeldung("");
+  }
 
   async function ladeDatei(e: ChangeEvent<HTMLInputElement>) {
     const datei = e.target.files?.[0];
@@ -59,6 +93,7 @@ function App() {
       setBogen(await bogenLaden(datei));
       setSchritt(UEBERSICHT);
       setZeigeStart(false);
+      setZeigeVorlagen(false);
       setFehler("");
     } catch (err) {
       setFehler(err instanceof Error ? err.message : String(err));
@@ -68,9 +103,21 @@ function App() {
   function uebernehmeText(text: string, fehlertext: string) {
     setScannerOffen(false);
     try {
+      // Geteilte Vorlage (Marker „V.“): importieren statt als Bogen öffnen.
+      if (istVorlageNutzlast(text)) {
+        const b = decodeVorlagePayloadUrl(text, browserKompressor);
+        const v = vorlageAnlegen(b.einheit.name, b);
+        setVorlagen(vorlagenLaden());
+        setMusterVorlage(null);
+        setZeigeVorlagen(true);
+        setMeldung(`Vorlage „${v.name}" importiert.`);
+        setFehler("");
+        return;
+      }
       setBogen(decodePayloadUrl(text, browserKompressor));
       setSchritt(UEBERSICHT);
       setZeigeStart(false);
+      setZeigeVorlagen(false);
       setFehler("");
     } catch {
       setFehler(fehlertext);
@@ -82,7 +129,7 @@ function App() {
   }
 
   // Universal Link (iOS) / App Link (Android) öffnet die native App:
-  // Bogen aus der übergebenen URL übernehmen (Kaltstart und laufende App).
+  // Bogen oder Vorlage aus der übergebenen URL übernehmen (Kaltstart und laufende App).
   useEffect(() => {
     return bogenLinksEmpfangen((url) =>
       uebernehmeText(url, "Der geöffnete Link enthält keinen gültigen Erfassungsbogen."),
@@ -105,6 +152,34 @@ function App() {
     }
   }
 
+  // Musterung einer Vorlage (Vorrang vor allen anderen Ansichten).
+  if (musterVorlage) {
+    return (
+      <>
+        <UpdateBanner />
+        <Musterung vorlage={musterVorlage} onStart={musterungFertig} onAbbrechen={() => setMusterVorlage(null)} />
+        <Fusszeile />
+      </>
+    );
+  }
+
+  // Vorlagenliste.
+  if (zeigeVorlagen) {
+    return (
+      <>
+        <UpdateBanner />
+        {meldung && <p className="meldung" role="status">{meldung}</p>}
+        <VorlagenAuswahl
+          vorlagen={vorlagen}
+          onMustern={(v) => { setMeldung(""); setMusterVorlage(v); }}
+          onGeaendert={vorlagenNeuLaden}
+          onZurueck={() => { setZeigeVorlagen(false); setMeldung(""); }}
+        />
+        <Fusszeile />
+      </>
+    );
+  }
+
   if (!bogen || zeigeStart) {
     return (
       <>
@@ -124,12 +199,14 @@ function App() {
           <button className={bogen ? "" : "primaer"} onClick={() => { setBogen(neuerBogen()); setSchritt(0); setZeigeStart(false); }}>
             Neuen Bogen erstellen
           </button>
+          <button onClick={oeffneVorlagen}>Aus Vorlage starten…</button>
           <button onClick={scanneQr}>QR-Code scannen…</button>
           <label className="datei-knopf">
             Aus Datei laden…
             <input type="file" accept=".json,application/json" onChange={ladeDatei} hidden />
           </label>
         </div>
+        {meldung && <p className="meldung" role="status">{meldung}</p>}
         {fehler && <p className="fehler">{fehler}</p>}
         {scannerOffen && (
           <QrScannerWeb onErgebnis={uebernehmeQrText} onAbbruch={() => setScannerOffen(false)} />
@@ -166,7 +243,12 @@ function App() {
       {schritt === 3 && <SchrittFahrzeuge bogen={bogen} aendern={aendern} />}
       {schritt === 4 && <SchrittSofortbedarf bogen={bogen} aendern={aendern} />}
       {schritt === UEBERSICHT && (
-        <Uebersicht bogen={bogen} geheZu={setSchritt} neu={() => { setBogen(null); setSchritt(0); }} />
+        <Uebersicht
+          bogen={bogen}
+          geheZu={setSchritt}
+          neu={() => { setBogen(null); setSchritt(0); }}
+          onVorlageGespeichert={(name) => { vorlagenNeuLaden(); setMeldung(`Als Vorlage „${name}" gespeichert.`); }}
+        />
       )}
 
       {schritt !== UEBERSICHT && (

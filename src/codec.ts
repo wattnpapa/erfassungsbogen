@@ -477,6 +477,13 @@ function base64UrlDekodieren(s: string): Uint8Array {
   return Uint8Array.from(bytes);
 }
 
+/** Datenteil hinter '#' aus voller URL, nacktem '#…'-Fragment oder rohem Payload. */
+function fragmentInhalt(text: string): string {
+  const daten = text.trim();
+  const raute = daten.indexOf("#");
+  return raute >= 0 ? daten.slice(raute + 1) : daten;
+}
+
 /** Bogen → QR-Inhalt als URL (Präfix + Base64url-Payload). */
 export function encodePayloadUrl(b: Erfassungsbogen, k: Kompressor): string {
   return EEB_URL_PREFIX + base64UrlKodieren(encodePayload(b, k));
@@ -487,8 +494,34 @@ export function encodePayloadUrl(b: Erfassungsbogen, k: Kompressor): string {
  * (Datenteil hinter '#') oder den nackten Base64url-Payload.
  */
 export function decodePayloadUrl(text: string, k: Kompressor): Erfassungsbogen {
-  let daten = text.trim();
-  const raute = daten.indexOf("#");
-  if (raute >= 0) daten = daten.slice(raute + 1);
+  return decodePayload(base64UrlDekodieren(fragmentInhalt(text)), k);
+}
+
+// ------------------------------------------------------------ Vorlagen-QR
+//
+// Eine geteilte Vorlage ist technisch derselbe Bogen (einsatzfrei). Damit der
+// Scanner sie von einem Einsatzbogen unterscheidet, trägt ihr QR-Fragment den
+// Marker "V." VOR dem Base64url-Payload. Alte QR-Codes haben keinen Marker und
+// werden weiter als Einsatzbogen gelesen — abwärtskompatibel, ohne Eingriff ins
+// Binärformat. Das '.' liegt außerhalb des Base64url-Alphabets, kann also nie
+// Teil eines Payloads sein.
+
+/** Marker im URL-Fragment, der eine geteilte Vorlage kennzeichnet. */
+export const EEB_VORLAGE_MARKER = "V.";
+
+/** true, wenn Text/Link eine geteilte Vorlage transportiert (Fragment beginnt mit "V."). */
+export function istVorlageNutzlast(text: string): boolean {
+  return fragmentInhalt(text).startsWith(EEB_VORLAGE_MARKER);
+}
+
+/** Vorlage-Bogen → QR-Inhalt als URL (Präfix + Marker + Base64url-Payload). */
+export function encodeVorlagePayloadUrl(b: Erfassungsbogen, k: Kompressor): string {
+  return EEB_URL_PREFIX + EEB_VORLAGE_MARKER + base64UrlKodieren(encodePayload(b, k));
+}
+
+/** Gescannter Vorlagen-QR bzw. -Link → Bogen (Marker "V." wird entfernt, falls vorhanden). */
+export function decodeVorlagePayloadUrl(text: string, k: Kompressor): Erfassungsbogen {
+  let daten = fragmentInhalt(text);
+  if (daten.startsWith(EEB_VORLAGE_MARKER)) daten = daten.slice(EEB_VORLAGE_MARKER.length);
   return decodePayload(base64UrlDekodieren(daten), k);
 }

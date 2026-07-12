@@ -26,6 +26,7 @@ import {
   zeitpunktAusIso,
   zeitpunktZuIso,
 } from "../model";
+import { vorlageAnlegen } from "./vorlagen";
 import type { VokabularEintrag } from "../vokabulare/thw";
 import { THW_ORTSVERBAENDE, type ThwOrtsverband } from "../vokabulare/thw-ov";
 import { stanFahrzeugVorbelegung } from "../vokabulare/thw-stan-fahrzeuge";
@@ -912,8 +913,17 @@ export function Uebersicht(props: {
   bogen: Erfassungsbogen;
   geheZu: (schritt: number) => void;
   neu: () => void;
+  onVorlageGespeichert?: (name: string) => void;
 }) {
   const { bogen, geheZu, neu } = props;
+
+  function alsVorlageSpeichern() {
+    const name = window.prompt("Als Vorlage speichern unter:", bogen.einheit.name || "Vorlage");
+    if (name == null) return;
+    const v = vorlageAnlegen(name, bogen);
+    props.onVorlageGespeichert?.(v.name);
+  }
+
   const [qr, setQr] = useState<QrInfo | null>(null);
   const [fehler, setFehler] = useState("");
   const [pdfLaeuft, setPdfLaeuft] = useState(false);
@@ -964,6 +974,7 @@ export function Uebersicht(props: {
               {pdfLaeuft ? "PDF wird erstellt…" : "PDF erzeugen"}
             </button>{" "}
             <button type="button" onClick={() => bogenSpeichern(bogen)}>Als Datei speichern</button>{" "}
+            <button type="button" onClick={alsVorlageSpeichern}>Als Vorlage speichern</button>{" "}
             <button type="button" onClick={() => window.confirm("Aktuellen Bogen verwerfen?") && neu()}>Neuer Bogen</button>
           </span>
         </div>
