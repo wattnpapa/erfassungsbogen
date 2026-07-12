@@ -39,6 +39,16 @@ import { fahrzeugSymbolSvg } from "./taktische-zeichen";
 const BLAU = "#12275e";
 const GRAU = "#e8e8e8";
 
+/**
+ * Kantenlänge des QR-Bilds in pt (1 pt = 1/72 Zoll). 150 pt ≈ 53 mm: klein
+ * genug, dass kleine Einheiten (wenig Daten → niedrige QR-Version → große
+ * Module) komplett auf eine Seite passen, und noch groß genug für einfache
+ * A4-Drucker (Version 16 ≈ 0,65 mm, Version 20 ≈ 0,55 mm je Modul). Bewusst als
+ * Konstante, damit sich die Größe nach einem Druck-/Scan-Praxistest leicht
+ * nachziehen lässt.
+ */
+const QR_BREITE = 150;
+
 /** Dateiname der eingebetteten Maschinen-Daten (analog factur-x.xml bei ZUGFeRD). */
 export const EEB_JSON_DATEINAME = "erfassungsbogen.json";
 
@@ -301,8 +311,9 @@ export function pdfDokument(b: Erfassungsbogen, qr: QrInfo): TDocumentDefinition
       ...fahrzeuge,
 
       // ---- Personal ----
-      { text: "", pageBreak: "before" },
-      { table: { widths: [130, "*", 170], body: personalZeilen }, margin: [0, 0, 0, 10] },
+      // Kein fester Seitenumbruch: kleine Einheiten passen so auf eine Seite,
+      // größere lässt pdfmake bei Bedarf selbst umbrechen.
+      { table: { widths: [130, "*", 170], body: personalZeilen }, margin: [0, 12, 0, 10] },
       ...(b.personalErfassung === PersonalErfassung.NUR_STAERKE
         ? [{ text: "Personal am Meldekopf nur in Stärke erfasst.", italics: true, margin: [0, 0, 0, 6] } as Content]
         : []),
@@ -318,26 +329,34 @@ export function pdfDokument(b: Erfassungsbogen, qr: QrInfo): TDocumentDefinition
         margin: [0, 10, 0, 0],
       },
 
-      // ---- QR-Seite ----
-      { text: "", pageBreak: "before" },
-      { text: "Digitaler Bogen als QR-Code", bold: true, fontSize: 13, color: BLAU, alignment: "center", margin: [0, 60, 0, 0] },
-      // QR-Bild UND Textlink tragen dieselbe App-URL: mit der Kamera scannen ODER
-      // in der digitalen PDF direkt anklicken, um den Bogen in der App zu öffnen.
-      { image: qr.datenUrl, width: 240, alignment: "center", margin: [0, 16, 0, 0], link: qr.url },
+      // ---- QR-Block ----
+      // Kein fester Seitenumbruch mehr; als unbreakable-Gruppe zusammengehalten,
+      // damit der QR-Code nicht über eine Seitengrenze zerrissen wird. Passt der
+      // Block nicht mehr, rückt er als Ganzes auf die nächste Seite.
       {
-        text: "Bogen direkt in der App öffnen",
-        link: qr.url,
-        color: BLAU,
-        decoration: "underline",
-        alignment: "center",
-        fontSize: 11,
-        margin: [0, 12, 0, 0],
-      },
-      {
-        text: `Format EEB2 · ${qr.zeichen} Zeichen · QR-Version ${qr.version} (Fehlerkorrektur M)\nMit der Kamera scannen oder den Link antippen, um den Bogen digital zu übernehmen.`,
-        alignment: "center",
-        fontSize: 8,
-        margin: [0, 10, 0, 0],
+        unbreakable: true,
+        margin: [0, 14, 0, 0],
+        stack: [
+          { text: "Digitaler Bogen als QR-Code", bold: true, fontSize: 13, color: BLAU, alignment: "center" },
+          // QR-Bild UND Textlink tragen dieselbe App-URL: mit der Kamera scannen ODER
+          // in der digitalen PDF direkt anklicken, um den Bogen in der App zu öffnen.
+          { image: qr.datenUrl, width: QR_BREITE, alignment: "center", margin: [0, 8, 0, 0], link: qr.url },
+          {
+            text: "Bogen direkt in der App öffnen",
+            link: qr.url,
+            color: BLAU,
+            decoration: "underline",
+            alignment: "center",
+            fontSize: 11,
+            margin: [0, 8, 0, 0],
+          },
+          {
+            text: `Format EEB2 · ${qr.zeichen} Zeichen · QR-Version ${qr.version} (Fehlerkorrektur M)\nMit der Kamera scannen oder den Link antippen, um den Bogen digital zu übernehmen.`,
+            alignment: "center",
+            fontSize: 8,
+            margin: [0, 6, 0, 0],
+          },
+        ],
       },
     ],
   };
