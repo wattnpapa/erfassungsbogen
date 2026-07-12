@@ -14,19 +14,23 @@ Zwei Anwendungsfälle:
    Meldekopf auf dem Tablet in Minuten erfasst (nur Stärke, Führungskraft, Fahrzeuge),
    der Bogen wird gedruckt und weitergegeben.
 
-## Browser-App (SPA-Prototyp)
+## Web-App
+
+Läuft ohne Installation unter **<https://erfassungsbogen.app>** (GitHub Pages,
+jeder Push auf `main` deployt automatisch).
+
+Assistent (Einheit → Einsatz → Personal → Fahrzeuge → Sofortbedarf) mit
+Gesamtübersicht (alles nachbearbeitbar), PDF-Export im Papier-Layout mit
+QR-Code auf der letzten Seite, Bogen speichern/laden als JSON-Datei,
+QR-Scannen per Kamera (nativ über Capacitor-Plugin, im Browser/Electron per
+Webcam). Alles läuft clientseitig (Codec + pako + qrcode + pdfmake), kein
+Server nötig. Code: [index.html](index.html), [src/app/](src/app/).
 
 ```
 npm install
 npm run dev      # Entwicklung: http://localhost:5173
 npm run build    # Produktion: dist/ — direkt für GitHub Pages geeignet (base: "./")
 ```
-
-Assistent (Einheit → Einsatz → Personal → Fahrzeuge → Sofortbedarf) mit
-Gesamtübersicht (alles nachbearbeitbar), PDF-Export im Papier-Layout mit
-QR-Code auf der letzten Seite, Bogen speichern/laden als JSON-Datei.
-Alles läuft clientseitig (Codec + pako + qrcode + pdfmake), kein Server nötig.
-Code: [index.html](index.html), [src/app/](src/app/).
 
 ## Desktop-App (Electron)
 
@@ -58,41 +62,45 @@ Der Hauptprozess ([electron/main.js](electron/main.js)) lädt die unveränderte
 Web-App aus `dist/` — kein Node-Zugriff im Renderer, externe Links öffnen im
 System-Browser.
 
-## Stand: Codec + QR-Rendering fertig (Schema v2)
+## Mobile Apps (Android & iOS)
+
+Beide Apps entstehen per [Capacitor](https://capacitorjs.com) aus derselben
+Web-App ([android/](android/), [ios/](ios/)) und sind plattformgerecht
+gestylt: iOS nach Apple HIG (Dark Mode, Dynamic Type, 44pt-Touch-Ziele),
+Android nach Material Design 3 (Farbrollen, Type Scale, 48dp-Touch-Ziele).
+
+- **Android**: signierte APK liegt jedem [Release](https://github.com/wattnpapa/erfassungsbogen/releases/latest) bei (minSdk 26 / Android 8.0).
+- **iOS**: Build über Xcode (`npm run ios:sync && npm run ios:open`);
+  App-Store-/TestFlight-Einreichung ist in Vorbereitung ([docs/TODO.md](docs/TODO.md)).
+
+Die QR-Codes enthalten `https://erfassungsbogen.app/#<Payload>` — als
+Universal/App Link öffnet der Scan mit der Systemkamera direkt die installierte
+App, ohne App die Web-App. Datenschutzerklärung für die Stores:
+[public/datenschutz.html](public/datenschutz.html).
+
+## Datenmodell & QR-Codec (Schema v3)
 
 - [docs/datenmodell.md](docs/datenmodell.md) — Datenmodell und Binärformat „EEB2"
 - [src/model.ts](src/model.ts) — plattformneutrale TypeScript-Typen
-- [src/codec.ts](src/codec.ts) — Encoder **und Decoder** (plattformneutral, Kompression injizierbar)
+- [src/codec.ts](src/codec.ts) — Encoder und Decoder (plattformneutral, Kompression injizierbar)
 - [src/qr-node.ts](src/qr-node.ts) — QR-Erzeugung als SVG/PNG für Node/Electron
 - [src/vokabulare/thw.ts](src/vokabulare/thw.ts) — THW-Vokabular (StAN Stand 01.07.2026)
 - [scripts/qr-demo.ts](scripts/qr-demo.ts) — End-to-End-Test: Bogen → QR-PNG → jsQR-Scan → Decoder → identisch (`npm run demo`; Ausgabe in `examples/`)
-- [prototype/qr-size-check.mjs](prototype/qr-size-check.mjs) — frühes Messskript (historisch)
 
-### Messergebnis (`node prototype/qr-size-check.mjs`)
+Kern der Kompression: organisationsspezifische Vokabulare mit 1-Byte-Codes und
+Freitext-Ausweg, BCD-Telefonnummern, abgeleitete statt gespeicherter Werte
+(Stärke, M/W/D), Deflate. Ein voller THW-Bogen (20 Personen, 6 Fahrzeuge)
+passt so in einen QR-Code von ca. 4,5 × 4,5 cm (Version 18, ECC M), die
+Meldekopf-Schnellerfassung in ca. 2,9 × 2,9 cm.
 
-```
-Voller THW-Bogen (FGr K (A), 20 Personen einzeln, 6 Fahrzeuge):
-  JSON 4874 Bytes → QR-Payload 511 Bytes  → QR Version 18 bei ECC M (≈ 4,5×4,5 cm)
+**Abwärtskompatibilität:** Schemaänderungen sind immer migrierbar — QR-Codes
+und JSON-Dateien älterer Schema-Versionen (ab v2) bleiben lesbar.
 
-… mit OV-Verzeichnis-Referenz (OV-Nummer statt Name/Hierarchie/Kontakten):
-  JSON 4556 Bytes → QR-Payload 411 Bytes  → QR Version 15 bei ECC M (≈ 3,9×3,9 cm)
+## Offene Punkte
 
-Meldekopf-Schnellerfassung (FF-Löschzug, nur Stärke, 4 Fahrzeuge):
-  JSON 1453 Bytes → QR-Payload 191 Bytes  → QR Version 10 bei ECC M (≈ 2,9×2,9 cm)
-```
-
-**Ergebnis: machbar.** Beide Fälle passen mit 15 % Fehlerkorrektur bequem in einen
-QR-Code; bis zum Budget (Version 25 = 997 Bytes) bleibt ~50 % Reserve. Kern der
-Kompression: organisationsspezifische Vokabulare mit 1-Byte-Codes und Freitext-Ausweg,
-BCD-Telefonnummern, abgeleitete statt gespeicherter Werte (Stärke, M/W/D), Deflate.
-
-## Nächste Stufen
-
-1. App-Gerüst (Framework-Entscheidung offen), PDF-Export im Papier-Layout,
-   QR-Scanning per Kamera (Codec-Gegenstück ist fertig)
-2. Meldekopf-Modus-UI (minimale Pflichtfelder, Einsatz-Vorbelegung, Touch-optimiert)
-3. Weitere BOS-Vokabulare (nach und nach), THW-OV-Verzeichnis befüllen
-4. Optional: Deflate-Dictionary, Signatur
+Siehe [docs/TODO.md](docs/TODO.md) (Gerätetests, App Store Connect,
+Deep-Link-Verifizierung) — danach: weitere BOS-Vokabulare, THW-OV-Verzeichnis
+vervollständigen.
 
 ## Lizenz
 
