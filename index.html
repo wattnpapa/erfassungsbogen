@@ -111,7 +111,11 @@
     .meldung { text-align: center; border: 1px solid var(--rand); border-radius: 0.4rem; padding: 0.5rem 0.75rem; margin: 0.75rem auto; max-width: 60rem; font-size: 0.9rem; }
     .start-vorlagen { text-align: left; max-width: 40rem; margin: 2.5rem auto 0; }
     .start-vorlagen > h2 { text-align: left; }
-    .vorlage-aktionen { margin-top: 0.6rem; }
+    /* Aktionszeile der Vorlagenkarte: in Fluss haltendes Flex-Layout statt
+       float, sonst rutschte „Löschen" beim Umbruch aus der Karte heraus.
+       „Löschen" bleibt rechts, klappt bei Platzmangel sauber in die nächste Zeile. */
+    .vorlage-aktionen { margin-top: 0.6rem; display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; }
+    .vorlage-aktionen .entfernen { float: none; margin-left: auto; }
     .staerke-leiste { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.5rem; text-align: center; }
     .staerke-leiste > div { display: flex; flex-direction: column; }
     .staerke-leiste strong { font-size: 1.5rem; line-height: 1.1; }
@@ -140,8 +144,16 @@
     table.uebersicht { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
     table.uebersicht th, table.uebersicht td { border: 1px solid var(--rand); padding: 0.3rem 0.5rem; text-align: left; vertical-align: top; }
     table.uebersicht th { background: var(--grau); }
-    .kopfzeile { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; }
+    .kopfzeile { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.4rem 1rem; }
     .kopfzeile h2 { border: none; margin: 0; }
+    /* Titel füllt die Zeile und darf umbrechen; die Aktion rückt nach rechts
+       und klappt bei Platzmangel unter den Titel, statt ihn zu überlagern
+       (lange Wörter wie „(Meldekopf)" sprengten sonst die schmale Titelspalte). */
+    .kopfzeile > :first-child { flex: 1 1 auto; min-width: 0; overflow-wrap: break-word; }
+    .kopfzeile > :last-child { flex: 0 1 auto; min-width: 0; margin-left: auto; }
+    /* Aktionsgruppen mit mehreren Knöpfen (als <span> im Kopf) umbrechen als
+       Flex-Zeile, statt schmal auf dem Handy seitlich aus dem Bild zu laufen. */
+    .kopfzeile > span { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: baseline; justify-content: flex-end; }
     .qr-box { text-align: center; }
     .qr-box img { max-width: 260px; width: 100%; image-rendering: pixelated; border: 1px solid var(--rand); }
     dl.paare { display: grid; grid-template-columns: max-content 1fr; gap: 0.2rem 1rem; margin: 0.4rem 0; font-size: 0.92rem; }
