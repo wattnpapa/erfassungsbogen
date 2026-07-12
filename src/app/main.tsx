@@ -10,7 +10,7 @@ import { decodePayloadUrl, decodeVorlagePayloadUrl, istVorlageNutzlast } from ".
 import { bogenLaden, browserKompressor, neuerBogen } from "./hilfen";
 import { bogenLinksEmpfangen, istNativ, plattform, qrScannen } from "./nativ";
 import { vorlageAnlegen, vorlagenLaden, type Vorlage } from "./vorlagen";
-import { Musterung, VorlagenAuswahl } from "./vorlagen-ui";
+import { Musterung, VorlagenListe } from "./vorlagen-ui";
 import { QrScannerWeb } from "./qr-scanner-web";
 import { Fusszeile } from "./fusszeile";
 import { UpdateBanner } from "./aktualisierung";
@@ -64,23 +64,14 @@ function App() {
   // er lässt sich von dort per „Aktuellen Bogen fortsetzen“ wieder öffnen.
   const [zeigeStart, setZeigeStart] = useState(false);
   const [vorlagen, setVorlagen] = useState<Vorlage[]>(() => vorlagenLaden());
-  const [zeigeVorlagen, setZeigeVorlagen] = useState(START.vorlage != null);
   const [musterVorlage, setMusterVorlage] = useState<Vorlage | null>(null);
 
   const vorlagenNeuLaden = () => setVorlagen(vorlagenLaden());
-
-  function oeffneVorlagen() {
-    vorlagenNeuLaden();
-    setMeldung("");
-    setFehler("");
-    setZeigeVorlagen(true);
-  }
 
   function musterungFertig(neuerArbeitsbogen: Erfassungsbogen) {
     setBogen(neuerArbeitsbogen);
     setSchritt(SCHRITT_EINSATZ);
     setMusterVorlage(null);
-    setZeigeVorlagen(false);
     setZeigeStart(false);
     setMeldung("");
   }
@@ -109,7 +100,7 @@ function App() {
         const v = vorlageAnlegen(b.einheit.name, b);
         setVorlagen(vorlagenLaden());
         setMusterVorlage(null);
-        setZeigeVorlagen(true);
+        setZeigeStart(true); // Startbildschirm listet die (nun importierte) Vorlage
         setMeldung(`Vorlage „${v.name}" importiert.`);
         setFehler("");
         return;
@@ -117,7 +108,6 @@ function App() {
       setBogen(decodePayloadUrl(text, browserKompressor));
       setSchritt(UEBERSICHT);
       setZeigeStart(false);
-      setZeigeVorlagen(false);
       setFehler("");
     } catch {
       setFehler(fehlertext);
@@ -163,23 +153,6 @@ function App() {
     );
   }
 
-  // Vorlagenliste.
-  if (zeigeVorlagen) {
-    return (
-      <>
-        <UpdateBanner />
-        {meldung && <p className="meldung" role="status">{meldung}</p>}
-        <VorlagenAuswahl
-          vorlagen={vorlagen}
-          onMustern={(v) => { setMeldung(""); setMusterVorlage(v); }}
-          onGeaendert={vorlagenNeuLaden}
-          onZurueck={() => { setZeigeVorlagen(false); setMeldung(""); }}
-        />
-        <Fusszeile />
-      </>
-    );
-  }
-
   if (!bogen || zeigeStart) {
     return (
       <>
@@ -199,7 +172,6 @@ function App() {
           <button className={bogen ? "" : "primaer"} onClick={() => { setBogen(neuerBogen()); setSchritt(0); setZeigeStart(false); }}>
             Neuen Bogen erstellen
           </button>
-          <button onClick={oeffneVorlagen}>Aus Vorlage starten…</button>
           <button onClick={scanneQr}>QR-Code scannen…</button>
           <label className="datei-knopf">
             Aus Datei laden…
@@ -210,6 +182,16 @@ function App() {
         {fehler && <p className="fehler">{fehler}</p>}
         {scannerOffen && (
           <QrScannerWeb onErgebnis={uebernehmeQrText} onAbbruch={() => setScannerOffen(false)} />
+        )}
+        {vorlagen.length > 0 && (
+          <section className="start-vorlagen">
+            <h2>Gespeicherte Vorlagen</h2>
+            <VorlagenListe
+              vorlagen={vorlagen}
+              onMustern={(v) => { setMeldung(""); setMusterVorlage(v); }}
+              onGeaendert={vorlagenNeuLaden}
+            />
+          </section>
         )}
       </main>
       <Fusszeile />

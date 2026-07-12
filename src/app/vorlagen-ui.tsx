@@ -1,7 +1,8 @@
 /**
  * Oberfläche für „Meine Vorlagen":
- *  - VorlagenAuswahl: Liste der gespeicherten Vorlagen mit Verwalten (umbenennen,
- *    löschen), Teilen per QR und Einstieg in die Musterung.
+ *  - VorlagenListe: einbettbare Kartenliste der gespeicherten Vorlagen mit
+ *    Verwalten (umbenennen, löschen), Teilen per QR und Einstieg in die
+ *    Musterung. Wird direkt unter den Start-Buttons angezeigt.
  *  - Musterung: die anwesende Mannschaft und die ausrückenden Fahrzeuge
  *    zusammenstellen (Variante A) → frischer Arbeitsbogen.
  */
@@ -39,13 +40,12 @@ function staerkeText(b: Erfassungsbogen): string {
 
 // ------------------------------------------------------------ Vorlagenliste
 
-export function VorlagenAuswahl(props: {
+export function VorlagenListe(props: {
   vorlagen: Vorlage[];
   onMustern: (v: Vorlage) => void;
   onGeaendert: () => void;
-  onZurueck: () => void;
 }) {
-  const { vorlagen, onMustern, onGeaendert, onZurueck } = props;
+  const { vorlagen, onMustern, onGeaendert } = props;
   const [qrFuer, setQrFuer] = useState<Vorlage | null>(null);
 
   function umbenennen(v: Vorlage) {
@@ -65,51 +65,36 @@ export function VorlagenAuswahl(props: {
   }
 
   return (
-    <main>
-      <header>
-        <button type="button" className="zur-start" onClick={onZurueck}>‹ Startseite</button>
-        <h1>Aus Vorlage starten</h1>
-      </header>
-
-      {vorlagen.length === 0 ? (
-        <section className="karte">
-          <p>Noch keine Vorlagen gespeichert.</p>
-          <p className="hinweis">
-            Einen Bogen mit der ganzen Mannschaft ausfüllen und in der Übersicht auf
-            „Als Vorlage speichern" tippen — oder eine per QR geteilte Vorlage scannen.
+    <>
+      {vorlagen.map((v) => (
+        <section className="karte" key={v.id}>
+          <div className="kopfzeile">
+            <h2>{v.name}</h2>
+            <button type="button" className="primaer" onClick={() => onMustern(v)}>
+              Einsatz vorbereiten
+            </button>
+          </div>
+          <p>
+            <strong>{orgLabel(v.bogen.einheit.organisation)}</strong>
+            {" · "}
+            {vokabText(v.bogen.einheit.einheitsTyp, vokabularFuer(v.bogen.einheit.organisation, "einheitstyp"), "name") ||
+              v.bogen.einheit.name ||
+              "(Einheit offen)"}
           </p>
+          <p className="hinweis">
+            Stärke {staerkeText(v.bogen)} · {v.bogen.personal.length} Personen · {v.bogen.fahrzeuge.length} Fahrzeuge
+          </p>
+          <div className="vorlage-aktionen">
+            <button type="button" onClick={() => setQrFuer(qrFuer?.id === v.id ? null : v)}>
+              {qrFuer?.id === v.id ? "QR schließen" : "Per QR teilen"}
+            </button>{" "}
+            <button type="button" onClick={() => umbenennen(v)}>Umbenennen</button>{" "}
+            <button type="button" className="entfernen" onClick={() => loeschen(v)}>Löschen</button>
+          </div>
+          {qrFuer?.id === v.id && <VorlageQr vorlage={v} />}
         </section>
-      ) : (
-        vorlagen.map((v) => (
-          <section className="karte" key={v.id}>
-            <div className="kopfzeile">
-              <h2>{v.name}</h2>
-              <button type="button" className="primaer" onClick={() => onMustern(v)}>
-                Einsatz vorbereiten
-              </button>
-            </div>
-            <p>
-              <strong>{orgLabel(v.bogen.einheit.organisation)}</strong>
-              {" · "}
-              {vokabText(v.bogen.einheit.einheitsTyp, vokabularFuer(v.bogen.einheit.organisation, "einheitstyp"), "name") ||
-                v.bogen.einheit.name ||
-                "(Einheit offen)"}
-            </p>
-            <p className="hinweis">
-              Stärke {staerkeText(v.bogen)} · {v.bogen.personal.length} Personen · {v.bogen.fahrzeuge.length} Fahrzeuge
-            </p>
-            <div className="vorlage-aktionen">
-              <button type="button" onClick={() => setQrFuer(qrFuer?.id === v.id ? null : v)}>
-                {qrFuer?.id === v.id ? "QR schließen" : "Per QR teilen"}
-              </button>{" "}
-              <button type="button" onClick={() => umbenennen(v)}>Umbenennen</button>{" "}
-              <button type="button" className="entfernen" onClick={() => loeschen(v)}>Löschen</button>
-            </div>
-            {qrFuer?.id === v.id && <VorlageQr vorlage={v} />}
-          </section>
-        ))
-      )}
-    </main>
+      ))}
+    </>
   );
 }
 
