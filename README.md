@@ -47,7 +47,7 @@ Alle Downloads unter
 | Gerät | Download |
 |---|---|
 | **Windows** | Installer (`.exe`) |
-| **macOS** | `.dmg` (unsigniert — beim ersten Start Rechtsklick → „Öffnen") |
+| **macOS** | `.dmg` (signiert & notarisiert — per Doppelklick startbar) |
 | **Linux** | `.deb` (Debian/Ubuntu) oder `.pacman` (Arch) |
 | **Android** | APK (Android 8.0 oder neuer) |
 | **iPhone/iPad** | App Store / TestFlight in Vorbereitung — bis dahin: <https://erfassungsbogen.app> |

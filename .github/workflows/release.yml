@@ -96,8 +96,9 @@ jobs:
       BUILD_VERSION: ${{ needs.prepare.outputs.build_version }}
       # Footer-Anzeige = Build-/Tag-Version (identisch zur npm-/electron-Version).
       APP_BUILD_VERSION: ${{ needs.prepare.outputs.build_version }}
-      # Signiert wird nur, wenn die Secrets hinterlegt sind (wie bei S1-Control);
-      # sonst unsigniert (Gatekeeper: Rechtsklick → Öffnen, kein Auto-Update auf macOS).
+      # Signiert + notarisiert, wenn die Secrets hinterlegt sind (wie bei S1-Control):
+      # dann startet die .dmg per Doppelklick und die App aktualisiert sich selbst.
+      # Ohne Secrets: unsigniert (Gatekeeper: Rechtsklick → Öffnen, kein Auto-Update).
       CSC_LINK: ${{ secrets.CSC_LINK }}
       CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
       APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
