@@ -2,5 +2,7 @@ node_modules/
 dist/
 build/
 release/
+reports/
+coverage/
 *.log
 .DS_Store

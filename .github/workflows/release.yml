@@ -50,6 +50,10 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run typecheck
+      - run: npm test
+      - name: Playwright-Browser installieren (für die Cucumber-E2E-Tests)
+        run: npx playwright install --with-deps chromium
+      - run: npm run test:e2e
 
   build-pages:
     runs-on: ubuntu-latest
