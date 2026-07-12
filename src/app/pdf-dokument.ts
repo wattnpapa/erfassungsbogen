@@ -34,6 +34,7 @@ import {
   vokabularFuer,
   type QrInfo,
 } from "./hilfen";
+import { fahrzeugSymbolSvg } from "./taktische-zeichen";
 
 const BLAU = "#12275e";
 const GRAU = "#e8e8e8";
@@ -167,14 +168,17 @@ export function pdfDokument(b: Erfassungsbogen, qr: QrInfo): TDocumentDefinition
 
   const fahrzeuge: Content[] = b.fahrzeuge.map((f): Content => ({
     table: {
-      widths: ["*", "*", "*"],
+      // Erste Spalte: taktisches Zeichen (DV 102), zeilenübergreifend links.
+      widths: [56, "*", "*", "*"],
       body: [
         [
+          { svg: fahrzeugSymbolSvg(f, org), width: 50, rowSpan: 2, alignment: "center", margin: [2, 6, 2, 6] as [number, number, number, number] },
           { text: vokabText(f.typ, vokabularFuer(org, "fahrzeug")) || "Fahrzeug", bold: true },
           { text: kennzeichenText(f), bold: true },
           { text: f.funkrufname ? `FuRn: ${funkrufText(f, b.einheit.name)}` : "" },
         ],
         [
+          {}, // von rowSpan des Zeichens belegt
           {
             colSpan: 3,
             text:
