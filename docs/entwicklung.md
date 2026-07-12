@@ -22,6 +22,31 @@ Deployment: jeder Push auf `main` baut die Seite und deployt sie auf
 GitHub Pages unter <https://erfassungsbogen.app>
 ([release.yml](../.github/workflows/release.yml)).
 
+## Einsatz-Sammlung (Meldekopf)
+
+Fremde Bögen werden lokal unter einem Einsatz/einer Übung gesammelt (Gegenstück
+zu „Meine Vorlagen" für die eigene Einheit). Reine Logik ist von der
+localStorage-Hülle getrennt und unit-getestet.
+
+- [src/app/einsaetze.ts](../src/app/einsaetze.ts) — Speicher, Fingerabdruck
+  (`einheitSchluessel`), Dedupe über inhaltsbasierte Eintrags-ID, Revisions-Historie
+  (neueste je Einheit zählt), Zug-Etikett je Einheit, Import/Merge.
+- [src/app/auswertung.ts](../src/app/auswertung.ts) — Summen über die aktuell
+  anwesenden Einheiten (`aggregiere`) und Zwischensummen je Zug
+  (`aggregiereNachZug`), aufgebaut auf denselben abgeleiteten Werten wie die
+  Einzelsicht.
+- [src/app/einsatz-transport.ts](../src/app/einsatz-transport.ts) — Export/Import
+  als JSON-Datei sowie Import aus dem in Sammel-PDFs eingebetteten JSON (pako).
+- [src/app/einsaetze-ui.tsx](../src/app/einsaetze-ui.tsx) — Liste, Detailansicht
+  (Summen, Zwischensummen, Einheitenliste mit Status/Historie), Sammeln per
+  Scan/Datei/manuell.
+
+Kernregeln: Historie stapeln (tägliche Neumeldung = neue Revision), Zuordnung per
+Fingerabdruck (vorgeschlagen, vom Menschen bestätigt/überschrieben), Idempotenz
+(gleicher Bogeninhalt erzeugt keine zweite Revision). Das optionale Feld
+`zugEtikett` bleibt abwärtskompatibel — alte Sammlungen ohne Etikett laden
+unverändert.
+
 ## Desktop-App (Electron)
 
 Die App prüft beim Start automatisch auf neue Versionen (electron-updater gegen

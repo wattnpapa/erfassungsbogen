@@ -26,6 +26,11 @@ ohne Anmeldung.
   landet automatisch in der App bzw. auf der Webseite.
 - **Speichern und laden**: der Bogen lässt sich als Datei sichern und
   weitergeben.
+- **Einsätze sammeln (Meldekopf)**: mehrere fremde Bögen unter einem Einsatz
+  bündeln — per Scan, aus Datei/PDF oder am Tablet manuell erfasst. Die App
+  zählt Stärke und Bedarf über alle anwesenden Einheiten laufend zusammen (mit
+  Zwischensummen je Zug), merkt sich tägliche Neumeldungen als Historie und gibt
+  alles als Sammel-PDF oder Datei an die nächste Führungsstelle weiter.
 - **Alles bleibt auf dem Gerät**: keine Anmeldung, kein Server, keine Cloud —
   siehe [Datenschutzerklärung](https://erfassungsbogen.app/datenschutz.html).
 
@@ -37,7 +42,10 @@ ohne Anmeldung.
 2. **Meldeköpfe und Bereitstellungsräume**: trifft eine Einheit ohne Bogen
    ein, ist sie am Tablet in wenigen Minuten erfasst (nur Stärke,
    Führungskraft, Fahrzeuge) — Bogen drucken, weitergeben, fertig. Bringt
-   die Einheit einen QR-Code mit, reicht ein Scan.
+   die Einheit einen QR-Code mit, reicht ein Scan. Alle eintreffenden Einheiten
+   lassen sich unter einem Einsatz sammeln, sodass Stärke und Bedarf jederzeit
+   auf einen Blick zusammengezählt sind — ideal auch für Zug- und
+   Verbandsführer, die ihre Einheiten bündeln und geschlossen weitermelden.
 
 ## Herunterladen
 
