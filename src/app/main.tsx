@@ -11,6 +11,15 @@ import { bogenLaden, browserKompressor, neuerBogen } from "./hilfen";
 import { bogenLinksEmpfangen, istNativ, plattform, qrScannen } from "./nativ";
 import { vorlageAnlegen, vorlagenLaden, type Vorlage } from "./vorlagen";
 import { Musterung, VorlagenListe } from "./vorlagen-ui";
+import {
+  EinsatzArt,
+  einheitSchluessel,
+  einsaetzeLaden,
+  einsatzAnlegen,
+  meldungHinzufuegen,
+  type Einsatzsammlung,
+} from "./einsaetze";
+import { EinsatzDetail, EinsatzListe } from "./einsaetze-ui";
 import { QrScannerWeb } from "./qr-scanner-web";
 import { Fusszeile } from "./fusszeile";
 import { UpdateBanner } from "./aktualisierung";
@@ -65,8 +74,14 @@ function App() {
   const [zeigeStart, setZeigeStart] = useState(false);
   const [vorlagen, setVorlagen] = useState<Vorlage[]>(() => vorlagenLaden());
   const [musterVorlage, setMusterVorlage] = useState<Vorlage | null>(null);
+  // Einsatz-Sammlung (Meldekopf/Zugführer): Liste, offener Einsatz und das
+  // Sammelziel für hereinkommende Bögen (Scan/manuell landen dort statt zu öffnen).
+  const [einsaetze, setEinsaetze] = useState<Einsatzsammlung[]>(() => einsaetzeLaden());
+  const [offenerEinsatzId, setOffenerEinsatzId] = useState<string | null>(null);
+  const [sammelZielId, setSammelZielId] = useState<string | null>(null);
 
   const vorlagenNeuLaden = () => setVorlagen(vorlagenLaden());
+  const einsaetzeNeuLaden = () => setEinsaetze(einsaetzeLaden());
 
   function musterungFertig(neuerArbeitsbogen: Erfassungsbogen) {
     setBogen(neuerArbeitsbogen);
@@ -91,6 +106,37 @@ function App() {
     }
   }
 
+  /**
+   * Bogen in eine Einsatz-Sammlung aufnehmen (Meldekopf/Zugführer). Erkennt die
+   * App die Einheit schon im Einsatz, wird die Zuordnung bestätigt (neue Fassung
+   * = Historie) oder als eigene Einheit geführt (Vorschlag+Bestätigung).
+   */
+  function bogenInSammlung(zielId: string, b: Erfassungsbogen, quelle: "scan" | "manuell") {
+    const einsatz = einsaetzeLaden().find((s) => s.id === zielId);
+    const schl = einheitSchluessel(b.einheit);
+    let override: string | undefined;
+    if (einsatz?.eintraege.some((e) => e.einheitSchluessel === schl)) {
+      const name = b.einheit.name || "diese Einheit";
+      const alsFassung = window.confirm(
+        `„${name}" ist bereits im Einsatz.\n\nOK = als neue Fassung anhängen (Historie).\nAbbrechen = als eigene, separate Einheit führen.`,
+      );
+      if (!alsFassung) override = `${schl}#${Date.now()}`;
+    }
+    const r = meldungHinzufuegen(zielId, b, { quelle, einheitSchluesselOverride: override });
+    einsaetzeNeuLaden();
+    if (!r) {
+      setFehler("Einsatz nicht gefunden.");
+      return;
+    }
+    setMeldung(
+      r.neu
+        ? `Meldung von „${b.einheit.name || "Einheit"}" aufgenommen.`
+        : `Bereits vorhanden — übersprungen (gleicher Inhalt).`,
+    );
+    setFehler("");
+    setOffenerEinsatzId(zielId); // zurück in die Einsatzansicht
+  }
+
   function uebernehmeText(text: string, fehlertext: string) {
     setScannerOffen(false);
     try {
@@ -105,7 +151,15 @@ function App() {
         setFehler("");
         return;
       }
-      setBogen(decodePayloadUrl(text, browserKompressor));
+      const dekodiert = decodePayloadUrl(text, browserKompressor);
+      // Sammelmodus (Meldekopf/Zugführer): Bogen als Meldung ablegen, nicht öffnen.
+      if (sammelZielId) {
+        const ziel = sammelZielId;
+        setSammelZielId(null);
+        bogenInSammlung(ziel, dekodiert, "scan");
+        return;
+      }
+      setBogen(dekodiert);
       setSchritt(UEBERSICHT);
       setZeigeStart(false);
       setFehler("");
@@ -142,12 +196,68 @@ function App() {
     }
   }
 
+  function neuerEinsatz() {
+    const name = window.prompt("Neuen Einsatz/Übung anlegen — Name:", "");
+    if (name == null || !name.trim()) return;
+    const ort = window.prompt("Ort / Auftrag (optional):", "") ?? "";
+    const s = einsatzAnlegen(name, EinsatzArt.EINSATZ, ort);
+    einsaetzeNeuLaden();
+    setMeldung("");
+    setZeigeStart(false);
+    setOffenerEinsatzId(s.id);
+  }
+
+  function scanneInEinsatz(zielId: string) {
+    setSammelZielId(zielId);
+    setMeldung("");
+    scanneQr(); // web: Scanner-Overlay; nativ: Plugin-Modal → uebernehmeQrText
+  }
+
+  function manuellInEinsatz(zielId: string) {
+    setSammelZielId(zielId);
+    setOffenerEinsatzId(null); // Assistent übernimmt die Ansicht
+    setMeldung("");
+    setBogen(neuerBogen());
+    setSchritt(0);
+    setZeigeStart(false);
+  }
+
+  // Offener Einsatz (Meldekopf/Zugführer) — Vorrang vor Assistent/Start, aber
+  // nicht über der Musterung/dem Assistenten während einer manuellen Erfassung.
+  const offenerEinsatz = offenerEinsatzId ? einsaetze.find((s) => s.id === offenerEinsatzId) : null;
+
   // Musterung einer Vorlage (Vorrang vor allen anderen Ansichten).
   if (musterVorlage) {
     return (
       <>
         <UpdateBanner />
         <Musterung vorlage={musterVorlage} onStart={musterungFertig} onAbbrechen={() => setMusterVorlage(null)} />
+        <Fusszeile />
+      </>
+    );
+  }
+
+  // Offener Einsatz: Detailansicht mit Summen, Einheiten und Sammel-Aktionen.
+  if (offenerEinsatz) {
+    return (
+      <>
+        <UpdateBanner />
+        <EinsatzDetail
+          einsatz={offenerEinsatz}
+          onZurueck={() => { setOffenerEinsatzId(null); setMeldung(""); }}
+          onGeaendert={einsaetzeNeuLaden}
+          onScannen={() => scanneInEinsatz(offenerEinsatz.id)}
+          onManuell={() => manuellInEinsatz(offenerEinsatz.id)}
+          onGeloescht={() => { setOffenerEinsatzId(null); einsaetzeNeuLaden(); setMeldung("Einsatz gelöscht."); }}
+        />
+        {(meldung || fehler) && (
+          <p className={fehler ? "fehler" : "meldung"} role="status" style={{ textAlign: "center" }}>
+            {fehler || meldung}
+          </p>
+        )}
+        {scannerOffen && (
+          <QrScannerWeb onErgebnis={uebernehmeQrText} onAbbruch={() => { setScannerOffen(false); setSammelZielId(null); }} />
+        )}
         <Fusszeile />
       </>
     );
@@ -193,6 +303,20 @@ function App() {
             />
           </section>
         )}
+        <section className="start-vorlagen">
+          <div className="kopfzeile">
+            <h2>Einsatz-Sammlung (Meldekopf)</h2>
+            <button type="button" onClick={neuerEinsatz}>Neuer Einsatz…</button>
+          </div>
+          <p className="hinweis">
+            Fremde Bögen zu einem Einsatz/einer Übung sammeln (scannen oder manuell) — mit Stärke-Summen über alle anwesenden Einheiten.
+          </p>
+          <EinsatzListe
+            einsaetze={einsaetze}
+            onOeffnen={(s) => { setMeldung(""); setOffenerEinsatzId(s.id); }}
+            onGeaendert={einsaetzeNeuLaden}
+          />
+        </section>
       </main>
       <Fusszeile />
       </>
@@ -230,6 +354,20 @@ function App() {
           geheZu={setSchritt}
           neu={() => { setBogen(null); setSchritt(0); }}
           onVorlageGespeichert={(name) => { vorlagenNeuLaden(); setMeldung(`Als Vorlage „${name}" gespeichert.`); }}
+          sammelAktion={
+            sammelZielId
+              ? {
+                  label: "In Einsatz übernehmen",
+                  onUebernehmen: () => {
+                    const ziel = sammelZielId;
+                    setSammelZielId(null);
+                    setBogen(null);
+                    setSchritt(0);
+                    bogenInSammlung(ziel, bogen, "manuell");
+                  },
+                }
+              : undefined
+          }
         />
       )}
 

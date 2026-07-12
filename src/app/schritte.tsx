@@ -914,6 +914,8 @@ export function Uebersicht(props: {
   geheZu: (schritt: number) => void;
   neu: () => void;
   onVorlageGespeichert?: (name: string) => void;
+  /** Gesetzt, wenn der Bogen für eine Einsatz-Sammlung erfasst wird (Meldekopf/Zugführer). */
+  sammelAktion?: { label: string; onUebernehmen: () => void };
 }) {
   const { bogen, geheZu, neu } = props;
 
@@ -970,7 +972,12 @@ export function Uebersicht(props: {
         <div className="kopfzeile">
           <h2>Gesamtübersicht</h2>
           <span>
-            <button type="button" className="primaer" onClick={pdf} disabled={pdfLaeuft}>
+            {props.sammelAktion && (
+              <button type="button" className="primaer" onClick={props.sammelAktion.onUebernehmen}>
+                {props.sammelAktion.label}
+              </button>
+            )}{" "}
+            <button type="button" className={props.sammelAktion ? "" : "primaer"} onClick={pdf} disabled={pdfLaeuft}>
               {pdfLaeuft ? "PDF wird erstellt…" : "PDF erzeugen"}
             </button>{" "}
             <button type="button" onClick={() => bogenSpeichern(bogen)}>Als Datei speichern</button>{" "}
