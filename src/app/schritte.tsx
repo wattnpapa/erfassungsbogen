@@ -888,8 +888,9 @@ export function Uebersicht(props: {
   bogen: Erfassungsbogen;
   geheZu: (schritt: number) => void;
   neu: () => void;
+  zurStartseite: () => void;
 }) {
-  const { bogen, geheZu, neu } = props;
+  const { bogen, geheZu, neu, zurStartseite } = props;
   const [qr, setQr] = useState<QrInfo | null>(null);
   const [fehler, setFehler] = useState("");
   const [pdfLaeuft, setPdfLaeuft] = useState(false);
@@ -939,6 +940,7 @@ export function Uebersicht(props: {
               {pdfLaeuft ? "PDF wird erstellt…" : "PDF erzeugen"}
             </button>{" "}
             <button type="button" onClick={() => bogenSpeichern(bogen)}>Als Datei speichern</button>{" "}
+            <button type="button" onClick={zurStartseite}>Startseite</button>{" "}
             <button type="button" onClick={() => window.confirm("Aktuellen Bogen verwerfen?") && neu()}>Neuer Bogen</button>
           </span>
         </div>

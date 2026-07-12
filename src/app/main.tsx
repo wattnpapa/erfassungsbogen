@@ -7,9 +7,10 @@ import { createRoot } from "react-dom/client";
 import type { Erfassungsbogen } from "../model";
 import { decodePayloadUrl } from "../codec";
 import { bogenLaden, browserKompressor, neuerBogen } from "./hilfen";
-import { istNativ, qrScannen } from "./nativ";
+import { istNativ, plattform, qrScannen } from "./nativ";
 import { QrScannerWeb } from "./qr-scanner-web";
 import { Fusszeile } from "./fusszeile";
+import { UpdateBanner } from "./aktualisierung";
 import {
   SchrittEinheit,
   SchrittEinsatz,
@@ -46,6 +47,9 @@ function App() {
   const [schritt, setSchritt] = useState(START.bogen ? UEBERSICHT : 0);
   const [fehler, setFehler] = useState(START.fehler);
   const [scannerOffen, setScannerOffen] = useState(false);
+  // Zeigt den Startbildschirm, ohne den aktuellen Bogen zu verwerfen –
+  // er lässt sich von dort per „Aktuellen Bogen fortsetzen“ wieder öffnen.
+  const [zeigeStart, setZeigeStart] = useState(false);
 
   async function ladeDatei(e: ChangeEvent<HTMLInputElement>) {
     const datei = e.target.files?.[0];
@@ -54,6 +58,7 @@ function App() {
     try {
       setBogen(await bogenLaden(datei));
       setSchritt(UEBERSICHT);
+      setZeigeStart(false);
       setFehler("");
     } catch (err) {
       setFehler(err instanceof Error ? err.message : String(err));
@@ -65,6 +70,7 @@ function App() {
     try {
       setBogen(decodePayloadUrl(text, browserKompressor));
       setSchritt(UEBERSICHT);
+      setZeigeStart(false);
       setFehler("");
     } catch {
       setFehler("Der gescannte QR-Code enthält keinen gültigen Erfassungsbogen.");
@@ -86,9 +92,10 @@ function App() {
     }
   }
 
-  if (!bogen) {
+  if (!bogen || zeigeStart) {
     return (
       <>
+      <UpdateBanner />
       <main className="start">
         <h1>Einheiten-Erfassungsbogen</h1>
         <p>
@@ -96,7 +103,12 @@ function App() {
           inklusive QR-Code für den Offline-Transport.
         </p>
         <div className="aktionen">
-          <button className="primaer" onClick={() => { setBogen(neuerBogen()); setSchritt(0); }}>
+          {bogen && (
+            <button className="primaer" onClick={() => setZeigeStart(false)}>
+              Aktuellen Bogen fortsetzen
+            </button>
+          )}
+          <button className={bogen ? "" : "primaer"} onClick={() => { setBogen(neuerBogen()); setSchritt(0); setZeigeStart(false); }}>
             Neuen Bogen erstellen
           </button>
           <button onClick={scanneQr}>QR-Code scannen…</button>
@@ -119,6 +131,7 @@ function App() {
 
   return (
     <>
+    <UpdateBanner />
     <main>
       <header>
         <h1>Einheiten-Erfassungsbogen</h1>
@@ -137,7 +150,7 @@ function App() {
       {schritt === 3 && <SchrittFahrzeuge bogen={bogen} aendern={aendern} />}
       {schritt === 4 && <SchrittSofortbedarf bogen={bogen} aendern={aendern} />}
       {schritt === UEBERSICHT && (
-        <Uebersicht bogen={bogen} geheZu={setSchritt} neu={() => { setBogen(null); setSchritt(0); }} />
+        <Uebersicht bogen={bogen} geheZu={setSchritt} neu={() => { setBogen(null); setSchritt(0); }} zurStartseite={() => setZeigeStart(true)} />
       )}
 
       {schritt !== UEBERSICHT && (
@@ -154,6 +167,9 @@ function App() {
     </>
   );
 }
+
+// Plattform-Klasse (z. B. platform-ios) auf <html> für plattformspezifisches CSS.
+document.documentElement.classList.add(`platform-${plattform()}`);
 
 createRoot(document.getElementById("app")!).render(
   <StrictMode>
