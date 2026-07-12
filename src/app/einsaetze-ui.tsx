@@ -15,6 +15,7 @@ import {
   EinsatzArt,
   MeldeStatus,
   einsatzLoeschen,
+  einheitZugEtikettSetzen,
   meldungEntfernen,
   meldungStatusSetzen,
   neuesteJeEinheit,
@@ -199,11 +200,19 @@ function EinheitKarte(props: {
 }) {
   const { einsatzId, kopf, alle, onGeaendert } = props;
   const [historie, setHistorie] = useState(false);
+  // null = nicht in Bearbeitung; String = Entwurf des Zug-Etiketts.
+  const [zugEntwurf, setZugEntwurf] = useState<string | null>(null);
   const revs = revisionen(alle, kopf.einheitSchluessel);
   const abgerueckt = kopf.status === MeldeStatus.ABGERUECKT;
 
   function statusUmschalten() {
     meldungStatusSetzen(einsatzId, kopf.id, abgerueckt ? MeldeStatus.ANWESEND : MeldeStatus.ABGERUECKT);
+    onGeaendert();
+  }
+
+  function zugSpeichern() {
+    einheitZugEtikettSetzen(einsatzId, kopf.einheitSchluessel, zugEntwurf ?? "");
+    setZugEntwurf(null);
     onGeaendert();
   }
 
@@ -230,6 +239,9 @@ function EinheitKarte(props: {
       </div>
       <div className="vorlage-aktionen">
         <button type="button" onClick={statusUmschalten}>{abgerueckt ? "Als anwesend" : "Abrücken"}</button>{" "}
+        <button type="button" onClick={() => setZugEntwurf(kopf.zugEtikett ?? "")}>
+          {kopf.zugEtikett ? "Zug ändern" : "Zug zuordnen"}
+        </button>{" "}
         {revs.length > 1 && (
           <button type="button" onClick={() => setHistorie(!historie)}>
             {historie ? "Historie schließen" : `Historie (${revs.length})`}
@@ -237,6 +249,23 @@ function EinheitKarte(props: {
         )}{" "}
         <button type="button" className="entfernen" onClick={entfernen}>Entfernen</button>
       </div>
+      {zugEntwurf !== null && (
+        <div className="zug-bearbeiten">
+          <input
+            type="text"
+            value={zugEntwurf}
+            placeholder="z. B. 2. Zug"
+            autoFocus
+            onChange={(e) => setZugEntwurf(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") zugSpeichern();
+              if (e.key === "Escape") setZugEntwurf(null);
+            }}
+          />{" "}
+          <button type="button" className="primaer" onClick={zugSpeichern}>Speichern</button>{" "}
+          <button type="button" onClick={() => setZugEntwurf(null)}>Abbrechen</button>
+        </div>
+      )}
       {historie && revs.length > 1 && (
         <ul className="historie">
           {revs.map((r, i) => (

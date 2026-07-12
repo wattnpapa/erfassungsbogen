@@ -304,3 +304,27 @@ export function meldungEntfernen(einsatzId: string, eintragId: string): void {
   s.geaendert = Date.now();
   einsaetzeSpeichern(liste);
 }
+
+/**
+ * Zug-/Verbands-Etikett einer Einheit setzen. Wirkt auf ALLE Revisionen der
+ * Einheit — das Etikett beschreibt die Einheit (Zugzugehörigkeit), nicht die
+ * einzelne Meldung; so bleiben Gruppierung und Historie konsistent. Leerer Text
+ * entfernt das Etikett. Speichert nur bei tatsächlicher Änderung.
+ */
+export function einheitZugEtikettSetzen(einsatzId: string, einheitSchl: string, etikett: string): void {
+  const liste = einsaetzeLaden();
+  const s = liste.find((x) => x.id === einsatzId);
+  if (!s) return;
+  const wert = etikett.trim() || undefined;
+  let geaendert = false;
+  for (const e of s.eintraege) {
+    if (e.einheitSchluessel === einheitSchl && e.zugEtikett !== wert) {
+      e.zugEtikett = wert;
+      geaendert = true;
+    }
+  }
+  if (geaendert) {
+    s.geaendert = Date.now();
+    einsaetzeSpeichern(liste);
+  }
+}

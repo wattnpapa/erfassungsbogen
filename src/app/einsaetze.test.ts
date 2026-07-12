@@ -25,6 +25,7 @@ import {
   meldungHinzufuegen,
   meldungStatusSetzen,
   meldungEntfernen,
+  einheitZugEtikettSetzen,
   type Einsatzsammlung,
 } from "./einsaetze";
 
@@ -186,6 +187,48 @@ describe("Status & Löschen", () => {
     expect(einsaetzeLaden()[0]!.eintraege).toHaveLength(0);
     einsatzLoeschen(s.id);
     expect(einsaetzeLaden()).toHaveLength(0);
+  });
+});
+
+describe("einheitZugEtikettSetzen()", () => {
+  it("setzt das Etikett auf allen Revisionen der Einheit", () => {
+    const s = einsatzAnlegen("E", EinsatzArt.EINSATZ);
+    meldungHinzufuegen(s.id, bogen({ stand: 100 }));
+    meldungHinzufuegen(s.id, bogen({ stand: 101 }));
+    const schl = einsaetzeLaden()[0]!.eintraege[0]!.einheitSchluessel;
+    einheitZugEtikettSetzen(s.id, schl, "  2. Zug  ");
+    const eintraege = einsaetzeLaden()[0]!.eintraege;
+    expect(eintraege).toHaveLength(2);
+    expect(eintraege.every((e) => e.zugEtikett === "2. Zug")).toBe(true); // getrimmt, auf allen
+  });
+
+  it("lässt andere Einheiten unberührt", () => {
+    const s = einsatzAnlegen("E", EinsatzArt.EINSATZ);
+    meldungHinzufuegen(s.id, bogen());
+    meldungHinzufuegen(s.id, bogen({ einheit: { ...bogen().einheit, name: "OV Wardenburg" } }));
+    const schl = neuesteJeEinheit(einsaetzeLaden()[0]!.eintraege).find((e) =>
+      e.einheitSchluessel.includes("oldenburg"),
+    )!.einheitSchluessel;
+    einheitZugEtikettSetzen(s.id, schl, "1. Zug");
+    const eintraege = einsaetzeLaden()[0]!.eintraege;
+    expect(eintraege.filter((e) => e.zugEtikett === "1. Zug")).toHaveLength(1);
+    expect(eintraege.filter((e) => e.zugEtikett === undefined)).toHaveLength(1);
+  });
+
+  it("entfernt das Etikett bei leerem Text", () => {
+    const s = einsatzAnlegen("E", EinsatzArt.EINSATZ);
+    meldungHinzufuegen(s.id, bogen(), { zugEtikett: "3. Zug" });
+    const schl = einsaetzeLaden()[0]!.eintraege[0]!.einheitSchluessel;
+    einheitZugEtikettSetzen(s.id, schl, "   ");
+    expect(einsaetzeLaden()[0]!.eintraege[0]!.zugEtikett).toBeUndefined();
+  });
+
+  it("ignoriert unbekannte Einsätze/Einheiten ohne zu werfen", () => {
+    const s = einsatzAnlegen("E", EinsatzArt.EINSATZ);
+    meldungHinzufuegen(s.id, bogen());
+    expect(() => einheitZugEtikettSetzen("gibtsnicht", "k", "X")).not.toThrow();
+    einheitZugEtikettSetzen(s.id, "unbekannt", "X");
+    expect(einsaetzeLaden()[0]!.eintraege[0]!.zugEtikett).toBeUndefined();
   });
 });
 
