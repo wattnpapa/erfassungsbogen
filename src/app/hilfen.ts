@@ -265,6 +265,16 @@ export function plausibilitaet(b: Erfassungsbogen): string[] {
       hinweise.push("Sofortbedarf: mehr Vegetarier/Veganer erfasst als Personen mit Verpflegungsbedarf.");
     }
   }
+  // Manuell erfasste Verpflegungs-Aufteilung (Meldekopf): veg + vegan dürfen die
+  // Gesamtstärke nicht übersteigen — Hinweis schon bei der Stärkeerfassung.
+  if (b.verpflegungManuell && s.gesamt > 0) {
+    const vp = verpflegung(b);
+    if (vp.vegetarisch + vp.vegan > s.gesamt) {
+      hinweise.push(
+        `Verpflegung: ${vp.vegetarisch} vegetarisch + ${vp.vegan} vegan übersteigen die Gesamtstärke ${s.gesamt}.`,
+      );
+    }
+  }
   return hinweise;
 }
 
