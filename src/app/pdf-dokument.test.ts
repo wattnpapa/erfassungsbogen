@@ -21,12 +21,14 @@ import {
   zeitpunktAusIso,
   type Erfassungsbogen,
 } from "../model";
-import type { QrInfo } from "./hilfen";
+import type { QrSatz } from "./hilfen";
 import { EEB_JSON_DATEINAME, bogenAlsEingebetteteDatei, pdfDokument } from "./pdf-dokument";
 
-const QR: QrInfo = {
-  datenUrl: "data:image/png;base64,QRTESTBILD",
-  url: "https://erfassungsbogen.app/#TESTPAYLOAD",
+const QR_BILD = "data:image/png;base64,QRTESTBILD";
+const QR_URL = "https://erfassungsbogen.app/#TESTPAYLOAD";
+const QR: QrSatz = {
+  teile: [{ datenUrl: QR_BILD, url: QR_URL, teilNr: 1, anzahl: 1, version: 7 }],
+  segmentiert: false,
   zeichen: 123,
   version: 7,
 };
@@ -111,7 +113,7 @@ describe("pdfDokument()", () => {
     expect(dd.pageSize).toBe("A4");
     expect((dd.info as { title: string }).title).toBe("Erfassungsbogen FGr K (A)");
     // Das übergebene QR-Bild muss unverändert im Dokument landen.
-    expect(JSON.stringify(dd.content)).toContain(QR.datenUrl);
+    expect(JSON.stringify(dd.content)).toContain(QR_BILD);
     expect(texte(dd.content)).toContain(
       `Format EEB2 · ${QR.zeichen} Zeichen · QR-Version ${QR.version} (Fehlerkorrektur M)\nMit der Kamera scannen oder den Link antippen, um den Bogen digital zu übernehmen.`,
     );
@@ -132,8 +134,28 @@ describe("pdfDokument()", () => {
     };
     sammle(dd.content);
     // Sowohl das QR-Bild als auch der Textlink verweisen auf die App-URL.
-    expect(links.some((n) => n.link === QR.url && n.image === QR.datenUrl)).toBe(true);
-    expect(links.some((n) => n.link === QR.url && n.text === "Bogen direkt in der App öffnen")).toBe(true);
+    expect(links.some((n) => n.link === QR_URL && n.image === QR_BILD)).toBe(true);
+    expect(links.some((n) => n.link === QR_URL && n.text === "Bogen direkt in der App öffnen")).toBe(true);
+  });
+
+  it("zeigt bei Segmentierung mehrere QR-Bilder mit Teil x / n", () => {
+    const segQr: QrSatz = {
+      teile: [
+        { datenUrl: "data:image/png;base64,TEIL1", url: "https://erfassungsbogen.app/#EEBS.1.2.99.AA", teilNr: 1, anzahl: 2, version: 20 },
+        { datenUrl: "data:image/png;base64,TEIL2", url: "https://erfassungsbogen.app/#EEBS.2.2.99.BB", teilNr: 2, anzahl: 2, version: 20 },
+      ],
+      segmentiert: true,
+      zeichen: 1800,
+      version: 20,
+    };
+    const dd = pdfDokument(basisBogen(), segQr);
+    const roh = JSON.stringify(dd.content);
+    expect(roh).toContain("TEIL1");
+    expect(roh).toContain("TEIL2");
+    const t = texte(dd.content).join("\n");
+    expect(t).toContain("Teil 1 / 2");
+    expect(t).toContain("Teil 2 / 2");
+    expect(t).toContain("in 2 QR-Codes aufgeteilt");
   });
 
   it("druckt Kopf, Einsatz, Zugehörigkeit und Stärke", () => {

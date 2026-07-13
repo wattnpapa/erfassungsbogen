@@ -525,3 +525,136 @@ export function decodeVorlagePayloadUrl(text: string, k: Kompressor): Erfassungs
   if (daten.startsWith(EEB_VORLAGE_MARKER)) daten = daten.slice(EEB_VORLAGE_MARKER.length);
   return decodePayload(base64UrlDekodieren(daten), k);
 }
+
+// ---------------------------------------------------------- Segmentierung
+//
+// Passt ein Bogen nicht in einen QR-Code (Budget ≤ v25, ECC M), wird der
+// Payload auf mehrere QR-Codes verteilt. Jeder Teil ist eine App-URL mit dem
+// Kopf "EEBS.<teilNr>.<anzahl>.<id>." VOR dem Base64url-Chunk. Wie beim
+// Vorlagen-Marker liegt "." außerhalb des Base64url-Alphabets, ein alter Scanner
+// (der Base64url erwartet) lehnt einen Segment-QR also sauber ab. Der Single-QR
+// bleibt unberührt — er trägt keinen Kopf (siehe docs/datenmodell.md).
+
+/** Marker im URL-Fragment, der einen Segment-Teil kennzeichnet. */
+export const EEB_SEGMENT_MARKER = "EEBS.";
+
+/** 32-Bit-FNV-1a über den gesamten Payload — bindet Teile aneinander und prüft die Zusammensetzung. */
+function pruefsumme(daten: Uint8Array): number {
+  let h = 0x811c9dc5;
+  for (let i = 0; i < daten.length; i++) {
+    h ^= daten[i]!;
+    h = Math.imul(h, 0x01000193);
+  }
+  return h >>> 0;
+}
+
+/** Ein gescannter Segment-Teil. */
+export interface SegmentTeil {
+  teilNr: number; // 1-basiert
+  anzahl: number; // Gesamtzahl (≥ 2)
+  id: number; // Prüfsumme über den vollständigen Payload — Bindeglied der Teile
+  chunk: Uint8Array; // Byte-Abschnitt des Payloads
+}
+
+/** true, wenn Text/Link einen Segment-Teil transportiert (Fragment beginnt mit "EEBS."). */
+export function istSegmentNutzlast(text: string): boolean {
+  return fragmentInhalt(text).startsWith(EEB_SEGMENT_MARKER);
+}
+
+/**
+ * Payload → `anzahl` Segment-URLs (anzahl ≥ 2). Die Chunks sind fortlaufende,
+ * möglichst gleich große Byte-Abschnitte; aneinandergehängt ergeben sie exakt
+ * den Payload wieder. Der Aufrufer (App) bestimmt `anzahl` so, dass jeder Teil
+ * ins QR-Budget passt.
+ */
+export function segmentPayloadUrls(payload: Uint8Array, anzahl: number): string[] {
+  if (anzahl < 2) throw new Error("Segmentierung braucht mindestens 2 Teile");
+  if (anzahl > payload.length) throw new Error("Mehr Teile als Payload-Bytes angefordert");
+  const id = pruefsumme(payload);
+  const groesse = Math.ceil(payload.length / anzahl);
+  const urls: string[] = [];
+  for (let i = 0; i < anzahl; i++) {
+    const chunk = payload.subarray(i * groesse, Math.min((i + 1) * groesse, payload.length));
+    urls.push(`${EEB_URL_PREFIX}${EEB_SEGMENT_MARKER}${i + 1}.${anzahl}.${id}.${base64UrlKodieren(chunk)}`);
+  }
+  return urls;
+}
+
+/** Gescannter Segment-QR bzw. -Link → Segment-Teil. Wirft bei fehlendem/ungültigem Kopf. */
+export function parseSegmentUrl(text: string): SegmentTeil {
+  const fragment = fragmentInhalt(text);
+  if (!fragment.startsWith(EEB_SEGMENT_MARKER)) throw new Error("Kein EEB2-Segment");
+  const rest = fragment.slice(EEB_SEGMENT_MARKER.length);
+  // teilNr . anzahl . id . chunk — der Base64url-Chunk enthält selbst keinen Punkt.
+  const punkt1 = rest.indexOf(".");
+  const punkt2 = rest.indexOf(".", punkt1 + 1);
+  const punkt3 = rest.indexOf(".", punkt2 + 1);
+  if (punkt1 < 0 || punkt2 < 0 || punkt3 < 0) throw new Error("EEB2-Segment: ungültiger Kopf");
+  const teilNr = Number(rest.slice(0, punkt1));
+  const anzahl = Number(rest.slice(punkt1 + 1, punkt2));
+  const id = Number(rest.slice(punkt2 + 1, punkt3));
+  if (
+    !Number.isInteger(teilNr) ||
+    !Number.isInteger(anzahl) ||
+    !Number.isInteger(id) ||
+    anzahl < 2 ||
+    teilNr < 1 ||
+    teilNr > anzahl
+  ) {
+    throw new Error("EEB2-Segment: ungültiger Kopf");
+  }
+  return { teilNr, anzahl, id, chunk: base64UrlDekodieren(rest.slice(punkt3 + 1)) };
+}
+
+/** Ergebnis von {@link segmentSammeln}. */
+export interface SammelErgebnis {
+  /** Aktueller Sammelstand (nach Aufnahme des neuen Teils). */
+  teile: SegmentTeil[];
+  status: "gesammelt" | "duplikat" | "fremd" | "vollständig";
+  /** Wie viele der `anzahl` Teile jetzt vorliegen. */
+  haben: number;
+  anzahl: number;
+}
+
+/**
+ * Nimmt einen neuen Teil in einen laufenden Sammelstand auf (reine Funktion —
+ * der Zustand lebt in der App). Gehört der Teil zu einem anderen Bogen (andere
+ * `id`/`anzahl`), wird neu begonnen (`fremd`); ein schon vorhandener `teilNr`
+ * ist ein `duplikat`; sind danach alle Teile da, `vollständig`.
+ */
+export function segmentSammeln(vorhandene: SegmentTeil[], neu: SegmentTeil): SammelErgebnis {
+  const passt = vorhandene.length > 0 && vorhandene[0]!.id === neu.id && vorhandene[0]!.anzahl === neu.anzahl;
+  if (passt && vorhandene.some((t) => t.teilNr === neu.teilNr)) {
+    return { teile: vorhandene, status: "duplikat", haben: vorhandene.length, anzahl: neu.anzahl };
+  }
+  const fremd = vorhandene.length > 0 && !passt;
+  const teile = passt ? [...vorhandene, neu] : [neu];
+  const status = teile.length === neu.anzahl ? "vollständig" : fremd ? "fremd" : "gesammelt";
+  return { teile, status, haben: teile.length, anzahl: neu.anzahl };
+}
+
+/**
+ * Vollständiger Satz Segment-Teile → Bogen. Wirft bei fehlenden/doppelten
+ * Teilen oder falscher Prüfsumme (defekte/vermischte Teile).
+ */
+export function segmenteZuBogen(teile: SegmentTeil[], k: Kompressor): Erfassungsbogen {
+  if (teile.length === 0) throw new Error("EEB2-Segmente: keine Teile");
+  const anzahl = teile[0]!.anzahl;
+  const id = teile[0]!.id;
+  const sortiert = [...teile].sort((a, b) => a.teilNr - b.teilNr);
+  for (let i = 0; i < anzahl; i++) {
+    const t = sortiert[i];
+    if (!t || t.teilNr !== i + 1 || t.anzahl !== anzahl || t.id !== id) {
+      throw new Error(`EEB2-Segmente: unvollständig oder vermischt (Teil ${i + 1}/${anzahl} fehlt)`);
+    }
+  }
+  const gesamtLaenge = sortiert.reduce((n, t) => n + t.chunk.length, 0);
+  const payload = new Uint8Array(gesamtLaenge);
+  let pos = 0;
+  for (const t of sortiert) {
+    payload.set(t.chunk, pos);
+    pos += t.chunk.length;
+  }
+  if (pruefsumme(payload) !== id) throw new Error("EEB2-Segmente: Prüfsumme falsch (defekte Teile)");
+  return decodePayload(payload, k);
+}

@@ -174,8 +174,35 @@ schlägt bei Bitfehlern ohnehin fehl. Optional später: Ed25519-Signatur (+64 By
 191 Bytes → QR v10. Budget ≤ v25 (997 Bytes bei ECC M) wird stets deutlich
 unterschritten.
 
-**Fallback:** Segmentierung auf 2 QR-Codes ist im Format vorgesehen
-(Header-Byte `teilNr/anzahl`), nach aktueller Messung aber nicht nötig.
+### Segmentierung auf mehrere QR-Codes (Fallback)
+
+Der Normalfall bleibt **ein** QR-Code (unverändert, s. o.). Nur wenn ein Bogen so
+groß wird, dass der Single-QR das Budget (Ziel ≤ Version 25, ECC M) überschreitet,
+wird der **Payload** auf mehrere QR-Codes aufgeteilt. Jeder Teil ist eine eigene
+App-URL mit einem Text-Kopf im Fragment — analog zum Vorlagen-Marker `V.` und wie
+dieser außerhalb des Base64url-Alphabets, also nie mit einem Payload verwechselbar:
+
+```
+Segment-QR (URL):  "https://erfassungsbogen.app/#" ‖ "EEBS." ‖ teilNr "." anzahl "." id "." Base64url(Chunk)
+```
+
+| Kopf-Feld | Bedeutung |
+|---|---|
+| `teilNr` | 1-basierte Nummer dieses Teils (dezimal) |
+| `anzahl` | Gesamtzahl der Teile (dezimal, ≥ 2) |
+| `id` | 32-Bit-Prüfsumme (FNV-1a) über den **gesamten** Payload (dezimal). Bindet die Teile aneinander (Teile fremder Bögen tragen eine andere `id`) und prüft nach dem Zusammensetzen die Unversehrtheit. |
+| `Chunk` | fortlaufender Byte-Abschnitt des Payloads. Alle Chunks in `teilNr`-Reihenfolge aneinandergehängt ergeben exakt den Single-QR-Payload (`'EEB2'` ‖ DeflateRaw). |
+
+**Zusammensetzen:** Der Scanner sammelt Teile mit gleicher `id`/`anzahl`, ignoriert
+Duplikate, meldet den Fortschritt („Teil 1 von 2"), und dekodiert erst, wenn alle
+`1..anzahl` vorliegen. Fehlt ein Teil, bleibt der Sammelstand unvollständig; ist die
+Prüfsumme nach dem Zusammensetzen falsch, wird abgelehnt. Ein zwischendurch
+gescannter fremder oder unsegmentierter Code wird sofort separat behandelt.
+
+**Abwärtskompatibel:** Passt der Bogen in einen QR (aktuell immer der Fall —
+voller THW-Bogen ≈ v18), wird **kein** Kopf erzeugt; der Single-QR-Roundtrip ist
+Byte-für-Byte identisch zu vorher. Referenz: [`src/codec.ts`](../src/codec.ts)
+(`segmentPayloadUrls`, `parseSegmentUrl`, `segmentSammeln`, `segmenteZuBogen`).
 
 ## Meldekopf-Workflow (Anforderungen an die App, Stufe 2+)
 

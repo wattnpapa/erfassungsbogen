@@ -3,11 +3,20 @@
  * Übersicht, Vorlagenliste und Musterung.
  */
 
-import { StrictMode, useEffect, useState, type ChangeEvent } from "react";
+import { StrictMode, useEffect, useRef, useState, type ChangeEvent } from "react";
 import { createRoot } from "react-dom/client";
 import type { Erfassungsbogen } from "../model";
-import { decodePayloadUrl, decodeVorlagePayloadUrl, istVorlageNutzlast } from "../codec";
-import { bogenLaden, browserKompressor, neuerBogen } from "./hilfen";
+import {
+  decodePayloadUrl,
+  decodeVorlagePayloadUrl,
+  istVorlageNutzlast,
+  istSegmentNutzlast,
+  parseSegmentUrl,
+  segmentSammeln,
+  segmenteZuBogen,
+  type SegmentTeil,
+} from "../codec";
+import { SCHRITT_STATUS_TITEL, bogenLaden, browserKompressor, neuerBogen, schrittStatus } from "./hilfen";
 import { bogenLinksEmpfangen, istNativ, qrScannen, textTeilen } from "./nativ";
 import { DebugLeiste, debugAktiv, wendePlattformKlasseAn, wendeRahmenAn } from "./debug-plattform";
 import { vorlageAnlegen, vorlagenLaden, type Vorlage } from "./vorlagen";
@@ -84,6 +93,10 @@ function App() {
   const [einsaetze, setEinsaetze] = useState<Einsatzsammlung[]>(() => einsaetzeLaden());
   const [offenerEinsatzId, setOffenerEinsatzId] = useState<string | null>(null);
   const [sammelZielId, setSammelZielId] = useState<string | null>(null);
+  // Segmentierung: gesammelte Teile eines großen Bogens (Zustand als Ref, damit
+  // der laufende Kamera-/Native-Scan darauf zugreift) + Fortschrittstext fürs Overlay.
+  const segmentTeileRef = useRef<SegmentTeil[]>([]);
+  const [scanFortschritt, setScanFortschritt] = useState("");
 
   const vorlagenNeuLaden = () => setVorlagen(vorlagenLaden());
   const einsaetzeNeuLaden = () => setEinsaetze(einsaetzeLaden());
@@ -142,11 +155,32 @@ function App() {
     setOffenerEinsatzId(zielId); // zurück in die Einsatzansicht
   }
 
-  function uebernehmeText(text: string, fehlertext: string) {
-    setScannerOffen(false);
-    try {
-      // Geteilte Vorlage (Marker „V.“): importieren statt als Bogen öffnen.
-      if (istVorlageNutzlast(text)) {
+  /** Fertigen Bogen übernehmen: im Sammelmodus als Meldung ablegen, sonst öffnen. */
+  function uebernimmBogen(b: Erfassungsbogen) {
+    if (sammelZielId) {
+      const ziel = sammelZielId;
+      setSammelZielId(null);
+      bogenInSammlung(ziel, b, "scan");
+      return;
+    }
+    setBogen(b);
+    setSchritt(UEBERSICHT);
+    setZeigeStart(false);
+    setFehler("");
+  }
+
+  /**
+   * Einen gescannten/übergebenen QR-Text verarbeiten. Rückgabe: true = fertig
+   * (Overlay schließen / Native-Schleife beenden), false = es wird noch ein
+   * weiterer Segment-Teil erwartet. Segment-Teile werden gesammelt (Fortschritt
+   * „Teil x von n"), Duplikate/fremde/fehlende Teile sauber behandelt und bei
+   * Vollständigkeit dekodiert. Vorlagen (Marker „V.") werden importiert.
+   */
+  function uebernehmeText(text: string, fehlertext: string): boolean {
+    if (istVorlageNutzlast(text)) {
+      segmentTeileRef.current = [];
+      setScanFortschritt("");
+      try {
         const b = decodeVorlagePayloadUrl(text, browserKompressor);
         const v = vorlageAnlegen(b.einheit.name, b);
         setVorlagen(vorlagenLaden());
@@ -154,27 +188,66 @@ function App() {
         setZeigeStart(true); // Startbildschirm listet die (nun importierte) Vorlage
         setMeldung(`Vorlage „${v.name}" importiert.`);
         setFehler("");
-        return;
+      } catch {
+        setFehler(fehlertext);
       }
-      const dekodiert = decodePayloadUrl(text, browserKompressor);
-      // Sammelmodus (Meldekopf/Zugführer): Bogen als Meldung ablegen, nicht öffnen.
-      if (sammelZielId) {
-        const ziel = sammelZielId;
-        setSammelZielId(null);
-        bogenInSammlung(ziel, dekodiert, "scan");
-        return;
+      return true;
+    }
+    // Segment-Teil eines großen Bogens: sammeln, bis alle Teile vorliegen.
+    if (istSegmentNutzlast(text)) {
+      try {
+        const teil = parseSegmentUrl(text);
+        const r = segmentSammeln(segmentTeileRef.current, teil);
+        segmentTeileRef.current = r.teile;
+        if (r.status === "vollständig") {
+          const b = segmenteZuBogen(r.teile, browserKompressor);
+          segmentTeileRef.current = [];
+          setScanFortschritt("");
+          uebernimmBogen(b);
+          return true;
+        }
+        setFehler("");
+        setScanFortschritt(
+          r.status === "duplikat"
+            ? `Teil ${teil.teilNr} war schon dabei — ${r.haben} von ${r.anzahl} Teilen gescannt.`
+            : r.status === "fremd"
+              ? `Anderer Bogen erkannt — neu begonnen (Teil ${teil.teilNr} von ${r.anzahl}).`
+              : `Teil ${r.haben} von ${r.anzahl} gescannt — bitte die übrigen Teile zeigen.`,
+        );
+        return false;
+      } catch {
+        setFehler(fehlertext);
+        return true;
       }
-      setBogen(dekodiert);
-      setSchritt(UEBERSICHT);
-      setZeigeStart(false);
-      setFehler("");
+    }
+    // Normaler Einzel-Bogen.
+    segmentTeileRef.current = [];
+    setScanFortschritt("");
+    try {
+      uebernimmBogen(decodePayloadUrl(text, browserKompressor));
     } catch {
       setFehler(fehlertext);
     }
+    return true;
   }
 
-  function uebernehmeQrText(text: string) {
-    uebernehmeText(text, "Der gescannte QR-Code enthält keinen gültigen Erfassungsbogen.");
+  function uebernehmeQrText(text: string): boolean {
+    return uebernehmeText(text, "Der gescannte QR-Code enthält keinen gültigen Erfassungsbogen.");
+  }
+
+  /** Web-Scanner-Ergebnis: bei Fertigstellung das Overlay schließen. */
+  function scanErgebnisWeb(text: string) {
+    if (uebernehmeQrText(text)) {
+      setScannerOffen(false);
+      setScanFortschritt("");
+    }
+  }
+
+  function scanAbbrechen(auchSammelZiel: boolean) {
+    setScannerOffen(false);
+    if (auchSammelZiel) setSammelZielId(null);
+    segmentTeileRef.current = [];
+    setScanFortschritt("");
   }
 
   // Universal Link (iOS) / App Link (Android) öffnet die native App:
@@ -193,9 +266,23 @@ function App() {
       return;
     }
     try {
-      const text = await qrScannen();
-      if (!text) return; // Abbruch
-      uebernehmeQrText(text);
+      // Schleife für die Segmentierung: bei einem Einzel-Bogen genau ein Durchlauf,
+      // bei mehreren Teilen so lange, bis alle gescannt sind oder abgebrochen wird.
+      for (;;) {
+        const teile = segmentTeileRef.current;
+        const anweisung =
+          teile.length > 0
+            ? `Teil ${teile.length} von ${teile[0]!.anzahl} gescannt — nächsten Teil in den Rahmen halten`
+            : "QR-Code des Erfassungsbogens in den Rahmen halten";
+        const text = await qrScannen(anweisung);
+        if (!text) {
+          // Abbruch: angefangenen Sammelstand verwerfen.
+          segmentTeileRef.current = [];
+          setScanFortschritt("");
+          return;
+        }
+        if (uebernehmeQrText(text)) return;
+      }
     } catch (err) {
       setFehler(err instanceof Error ? err.message : String(err));
     }
@@ -345,7 +432,7 @@ function App() {
           </p>
         )}
         {scannerOffen && (
-          <QrScannerWeb onErgebnis={uebernehmeQrText} onAbbruch={() => { setScannerOffen(false); setSammelZielId(null); }} />
+          <QrScannerWeb onErgebnis={scanErgebnisWeb} fortschritt={scanFortschritt} onAbbruch={() => scanAbbrechen(true)} />
         )}
         <Fusszeile />
       </>
@@ -380,7 +467,7 @@ function App() {
         {meldung && <p className="meldung" role="status">{meldung}</p>}
         {fehler && <p className="fehler">{fehler}</p>}
         {scannerOffen && (
-          <QrScannerWeb onErgebnis={uebernehmeQrText} onAbbruch={() => setScannerOffen(false)} />
+          <QrScannerWeb onErgebnis={scanErgebnisWeb} fortschritt={scanFortschritt} onAbbruch={() => scanAbbrechen(false)} />
         )}
         {vorlagen.length > 0 && (
           <section className="start-vorlagen">
@@ -420,6 +507,9 @@ function App() {
 
   const aendern = (patch: Partial<Erfassungsbogen>) => setBogen({ ...bogen, ...patch });
 
+  // Leichter Füllstand je Schritt (Orientierung; die Übersicht hat keinen Status).
+  const status = schrittStatus(bogen);
+
   return (
     <>
     <UpdateBanner />
@@ -430,11 +520,23 @@ function App() {
         </button>
         <h1>Einheiten-Erfassungsbogen</h1>
         <nav className="schritte">
-          {SCHRITTE.map((name, i) => (
-            <button key={name} className={i === schritt ? "aktiv" : ""} onClick={() => setSchritt(i)}>
-              {i + 1}. {name}
-            </button>
-          ))}
+          {SCHRITTE.map((name, i) => {
+            const st = status[i]; // undefined für die Übersicht (letzter Schritt)
+            const klassen = [i === schritt ? "aktiv" : "", st ? `status-${st}` : ""].filter(Boolean).join(" ");
+            const glyph = st === "ok" ? "✓" : st === "begonnen" ? "•" : "";
+            return (
+              <button
+                key={name}
+                className={klassen}
+                aria-label={st ? `${i + 1}. ${name} — ${SCHRITT_STATUS_TITEL[st]}` : undefined}
+                title={st ? SCHRITT_STATUS_TITEL[st] : undefined}
+                onClick={() => setSchritt(i)}
+              >
+                {i + 1}. {name}
+                {glyph && <span className="schritt-status" aria-hidden="true">{glyph}</span>}
+              </button>
+            );
+          })}
         </nav>
       </header>
 

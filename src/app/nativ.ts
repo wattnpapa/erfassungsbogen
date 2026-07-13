@@ -48,12 +48,12 @@ export function bogenLinksEmpfangen(callback: (url: string) => void): () => void
  * QR-Code mit der Kamera scannen (fertige Scanner-UI des Plugins).
  * Liefert den rohen QR-Text oder null bei Abbruch durch den Nutzer.
  */
-export async function qrScannen(): Promise<string | null> {
+export async function qrScannen(anweisung = "QR-Code des Erfassungsbogens in den Rahmen halten"): Promise<string | null> {
   try {
     const ergebnis = await CapacitorBarcodeScanner.scanBarcode({
       hint: CapacitorBarcodeScannerTypeHint.QR_CODE,
       cameraDirection: CapacitorBarcodeScannerCameraDirection.BACK,
-      scanInstructions: "QR-Code des Erfassungsbogens in den Rahmen halten",
+      scanInstructions: anweisung,
     });
     return ergebnis.ScanResult || null;
   } catch (err) {

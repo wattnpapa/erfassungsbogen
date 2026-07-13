@@ -34,7 +34,7 @@ import { stanPersonalVorbelegung } from "../vokabulare/thw-stan-personal";
 import {
   FE_TEXT,
   ORG_OPTIONEN,
-  QrInfo,
+  QrSatz,
   bogenSpeichern,
   datumDeutsch,
   funkrufText,
@@ -926,7 +926,7 @@ export function Uebersicht(props: {
     props.onVorlageGespeichert?.(v.name);
   }
 
-  const [qr, setQr] = useState<QrInfo | null>(null);
+  const [qr, setQr] = useState<QrSatz | null>(null);
   const [fehler, setFehler] = useState("");
   const [pdfLaeuft, setPdfLaeuft] = useState(false);
   const org = bogen.einheit.organisation;
@@ -1092,10 +1092,28 @@ export function Uebersicht(props: {
       <section className="karte qr-box">
         <h2>QR-Code (Offline-Transport)</h2>
         {qr ? (
-          <>
-            <img src={qr.datenUrl} alt="EEB2-QR-Code" />
-            <p className="hinweis">{qr.zeichen} Zeichen · QR-Version {qr.version} (ECC M) — öffnet beim Scannen mit der Kamera die App; dieser Code steht auch auf der letzten PDF-Seite.</p>
-          </>
+          qr.segmentiert ? (
+            <>
+              <p className="hinweis">
+                Bogen zu groß für einen Code — in {qr.teile.length} Teile aufgeteilt. Alle Teile
+                nacheinander scannen; die App setzt sie zusammen. Auch auf der letzten PDF-Seite.
+              </p>
+              <div className="qr-teile">
+                {qr.teile.map((t) => (
+                  <figure key={t.teilNr}>
+                    <img src={t.datenUrl} alt={`EEB2-QR-Code Teil ${t.teilNr} von ${t.anzahl}`} />
+                    <figcaption>Teil {t.teilNr} / {t.anzahl}</figcaption>
+                  </figure>
+                ))}
+              </div>
+              <p className="hinweis">{qr.zeichen} Zeichen · je ≤ QR-Version {qr.version} (ECC M)</p>
+            </>
+          ) : (
+            <>
+              <img src={qr.teile[0]!.datenUrl} alt="EEB2-QR-Code" />
+              <p className="hinweis">{qr.zeichen} Zeichen · QR-Version {qr.version} (ECC M) — öffnet beim Scannen mit der Kamera die App; dieser Code steht auch auf der letzten PDF-Seite.</p>
+            </>
+          )
         ) : (
           <p className="hinweis">QR-Code wird erzeugt…</p>
         )}

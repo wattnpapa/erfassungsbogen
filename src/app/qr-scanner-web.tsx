@@ -10,12 +10,18 @@ import jsQR from "jsqr";
 export function QrScannerWeb(props: {
   onErgebnis: (text: string) => void;
   onAbbruch: () => void;
+  /** Fortschritt bei Segmentierung, z. B. „Teil 1 von 2 gescannt". */
+  fortschritt?: string;
 }) {
   const videoRef = useRef<HTMLVideoElement>(null);
   // Callbacks über eine Ref ansprechen, damit der Kamera-Effekt nur einmal
   // läuft und neue Prop-Identitäten den Stream nicht neu starten.
   const propsRef = useRef(props);
   propsRef.current = props;
+  // Zuletzt gemeldeter Code: verhindert, dass derselbe (weiter im Bild
+  // liegende) QR-Code 60×/s gemeldet wird — bei Segmentierung soll erst ein
+  // NEUER Teil auslösen, der Scanner läuft dafür durchgehend weiter.
+  const letzterText = useRef("");
   const [fehler, setFehler] = useState("");
 
   useEffect(() => {
@@ -42,10 +48,11 @@ export function QrScannerWeb(props: {
         ctx.drawImage(video, 0, 0, leinwand.width, leinwand.height);
         const bild = ctx.getImageData(0, 0, leinwand.width, leinwand.height);
         const code = jsQR(bild.data, bild.width, bild.height, { inversionAttempts: "dontInvert" });
-        if (code?.data) {
-          stoppen();
+        // Nur einen NEUEN Code melden. Der Scanner läuft weiter (Segmentierung:
+        // mehrere Teile); den Overlay schließt der Aufrufer, wenn er fertig ist.
+        if (code?.data && code.data !== letzterText.current) {
+          letzterText.current = code.data;
           propsRef.current.onErgebnis(code.data);
-          return;
         }
       }
       rahmen = requestAnimationFrame(suchen);
@@ -80,7 +87,7 @@ export function QrScannerWeb(props: {
       <video ref={videoRef} playsInline muted />
       {fehler
         ? <p className="scanner-text fehler">{fehler}</p>
-        : <p className="scanner-text">QR-Code des Erfassungsbogens vor die Kamera halten</p>}
+        : <p className="scanner-text">{props.fortschritt || "QR-Code des Erfassungsbogens vor die Kamera halten"}</p>}
       {!fehler && <div className="scanner-rahmen" aria-hidden="true" />}
       <button onClick={props.onAbbruch}>Abbrechen</button>
     </div>

@@ -21,7 +21,7 @@ import {
   unterbringungMWD,
   verpflegung,
 } from "../model";
-import { encodePayloadUrl, encodeVorlagePayloadUrl, type Kompressor } from "../codec";
+import { encodePayload, encodePayloadUrl, encodeVorlagePayloadUrl, segmentPayloadUrls, type Kompressor } from "../codec";
 import { istNativ, textTeilen } from "./nativ";
 import {
   FUNKRUF_KENNWOERTER,
@@ -140,13 +140,76 @@ export interface QrInfo {
   version: number;
 }
 
-export async function qrErzeugen(b: Erfassungsbogen): Promise<QrInfo> {
-  // QR-Inhalt ist eine App-URL: Die Kamera erkennt sie und öffnet die App
-  // bzw. die Web-App; die Daten stehen im Fragment (bleiben also lokal).
+/** Ein QR-Bild eines Satzes: bei Segmentierung Teil `teilNr` von `anzahl`. */
+export interface QrTeil {
+  datenUrl: string;
+  /** Der im QR-Code kodierte App-Link dieses Teils. */
+  url: string;
+  teilNr: number; // 1-basiert
+  anzahl: number; // 1 = unsegmentiert
+  version: number;
+}
+
+/**
+ * Ergebnis der QR-Erzeugung: im Normalfall genau ein Teil (unsegmentiert),
+ * bei zu großem Bogen mehrere Teile (Segmentierung, siehe docs/datenmodell.md).
+ */
+export interface QrSatz {
+  teile: QrTeil[];
+  segmentiert: boolean;
+  /** Zeichenzahl der (unsegmentierten) Voll-URL — Maß für die Datengröße. */
+  zeichen: number;
+  /** Höchste QR-Version über alle Teile. */
+  version: number;
+}
+
+/** Ziel-Obergrenze für die QR-Version eines einzelnen Codes (ECC M). */
+const QR_ZIEL_VERSION = 25;
+const QR_OPTIONEN = { errorCorrectionLevel: "M" as const };
+
+/** QR-Version einer URL messen; `Infinity`, wenn sie in keinen QR-Code passt. */
+function qrVersion(url: string): number {
+  try {
+    return QRCode.create(url, QR_OPTIONEN).version;
+  } catch {
+    return Infinity;
+  }
+}
+
+async function teilBild(url: string, teilNr: number, anzahl: number): Promise<QrTeil> {
+  const datenUrl = await QRCode.toDataURL(url, { ...QR_OPTIONEN, width: 520, margin: 2 });
+  return { datenUrl, url, teilNr, anzahl, version: qrVersion(url) };
+}
+
+/**
+ * Bogen → QR-Satz. QR-Inhalt ist eine App-URL: Die Kamera erkennt sie und öffnet
+ * die App bzw. die Web-App; die Daten stehen im Fragment (bleiben also lokal).
+ * Passt der Bogen in einen QR-Code (Budget ≤ v25), bleibt es bei genau einem —
+ * unverändert zu früher. Erst darüber wird der Payload segmentiert.
+ */
+export async function qrErzeugen(b: Erfassungsbogen): Promise<QrSatz> {
   const url = encodePayloadUrl(b, browserKompressor);
-  const optionen = { errorCorrectionLevel: "M" as const };
-  const datenUrl = await QRCode.toDataURL(url, { ...optionen, width: 520, margin: 2 });
-  return { datenUrl, url, zeichen: url.length, version: QRCode.create(url, optionen).version };
+  const einzelVersion = qrVersion(url);
+  if (einzelVersion <= QR_ZIEL_VERSION) {
+    const teil = await teilBild(url, 1, 1);
+    return { teile: [teil], segmentiert: false, zeichen: url.length, version: teil.version };
+  }
+
+  // Zu groß: kleinste Teilzahl suchen, bei der jeder Teil ins Budget passt.
+  const payload = encodePayload(b, browserKompressor);
+  const maxTeile = Math.min(20, payload.length);
+  let urls = segmentPayloadUrls(payload, Math.min(2, maxTeile));
+  for (let anzahl = 2; anzahl <= maxTeile; anzahl++) {
+    urls = segmentPayloadUrls(payload, anzahl);
+    if (urls.every((u) => qrVersion(u) <= QR_ZIEL_VERSION)) break;
+  }
+  const teile = await Promise.all(urls.map((u, i) => teilBild(u, i + 1, urls.length)));
+  return {
+    teile,
+    segmentiert: true,
+    zeichen: url.length,
+    version: Math.max(...teile.map((t) => t.version)),
+  };
 }
 
 /**
@@ -266,6 +329,46 @@ export function plausibilitaet(b: Erfassungsbogen): string[] {
     }
   }
   return hinweise;
+}
+
+// ------------------------------------------------- Fortschritt je Schritt
+
+/** Heuristischer Füllstand eines Assistenten-Schritts (reiner Orientierungshelfer). */
+export type SchrittStatus = "leer" | "begonnen" | "ok";
+
+export const SCHRITT_STATUS_TITEL: Record<SchrittStatus, string> = {
+  leer: "noch leer",
+  begonnen: "begonnen",
+  ok: "ausgefüllt",
+};
+
+/**
+ * Leichter Status je Schritt (Einheit, Einsatz, Personal, Fahrzeuge,
+ * Sofortbedarf) aus dem Bogen abgeleitet — nur Orientierung, nichts wird
+ * erzwungen. Die Übersicht (letzter Schritt) hat bewusst keinen Status.
+ */
+export function schrittStatus(b: Erfassungsbogen): SchrittStatus[] {
+  const e = b.einheit;
+  const typGesetzt = e.einheitsTyp.code != null || !!e.einheitsTyp.freitext?.trim();
+  const nameGesetzt = !!e.name.trim() || e.standortRef != null;
+  const einheitBegonnen = typGesetzt || nameGesetzt || e.hierarchie.length > 0 || !!e.organisationName;
+  const einheit: SchrittStatus = typGesetzt && nameGesetzt ? "ok" : einheitBegonnen ? "begonnen" : "leer";
+
+  const ez = b.einsatz;
+  const einsatz: SchrittStatus = ez.ortAuftrag.trim()
+    ? "ok"
+    : ez.einsatzbeginn != null || ez.einsatzende != null
+      ? "begonnen"
+      : "leer";
+
+  const personal: SchrittStatus = staerke(b).gesamt > 0 ? "ok" : b.personal.length > 0 ? "begonnen" : "leer";
+
+  const fahrzeuge: SchrittStatus = b.fahrzeuge.length > 0 ? "ok" : "leer";
+
+  // Sofortbedarf/Sonstiges ist durchweg optional: „ok", sobald etwas erfasst ist, sonst neutral „leer".
+  const sofortbedarf: SchrittStatus = b.sofortbedarf != null || !!b.sonstiges?.trim() ? "ok" : "leer";
+
+  return [einheit, einsatz, personal, fahrzeuge, sofortbedarf];
 }
 
 // ------------------------------------------------------------- Neuer Bogen

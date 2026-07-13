@@ -42,7 +42,7 @@ import {
 } from "../src/model";
 import { bogenZuQrPng } from "../src/qr-node";
 import { pdfDokument } from "../src/app/pdf-dokument";
-import type { QrInfo } from "../src/app/hilfen";
+import type { QrSatz } from "../src/app/hilfen";
 
 const wurzel = join(dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -378,9 +378,11 @@ pdfmake.setUrlAccessPolicy((url: string) => url.startsWith("data:"));
 // Lokaler Zugriff nur auf die mitgelieferten Schriftdateien.
 pdfmake.setLocalAccessPolicy((pfad: string) => pfad.startsWith(robotoDir));
 
-async function qrInfo(b: Erfassungsbogen): Promise<QrInfo> {
+// Die Beispielbögen sind klein und passen in einen QR-Code (ein Teil).
+async function qrInfo(b: Erfassungsbogen): Promise<QrSatz> {
   const { png, url, version } = await bogenZuQrPng(b, 520);
-  return { datenUrl: `data:image/png;base64,${png.toString("base64")}`, zeichen: url.length, version };
+  const datenUrl = `data:image/png;base64,${png.toString("base64")}`;
+  return { teile: [{ datenUrl, url, teilNr: 1, anzahl: 1, version }], segmentiert: false, zeichen: url.length, version };
 }
 
 const ausgabe = join(wurzel, "examples");

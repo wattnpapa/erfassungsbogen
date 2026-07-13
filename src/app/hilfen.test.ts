@@ -32,6 +32,7 @@ import {
   neuesFahrzeug,
   orgLabel,
   plausibilitaet,
+  schrittStatus,
   vokabText,
   vokabularFuer,
 } from "./hilfen";
@@ -317,5 +318,35 @@ describe("Konstruktoren für neue Objekte", () => {
     const p = neuePerson();
     expect(p).toMatchObject({ vorname: "", nachname: "", fahrerlaubnis: Fahrerlaubnis.NONE, ernaehrung: Ernaehrung.FLEISCH });
     expect(neuesFahrzeug()).toEqual({ typ: {} });
+  });
+});
+
+describe("schrittStatus", () => {
+  it("meldet für einen leeren Bogen alle Schritte als leer", () => {
+    expect(schrittStatus(neuerBogen())).toEqual(["leer", "leer", "leer", "leer", "leer"]);
+  });
+
+  it("meldet einen vollständig gefüllten Bogen als ok", () => {
+    const b = neuerBogen();
+    b.einheit.einheitsTyp = { code: 43 };
+    b.einheit.name = "OV Oldenburg - Ni";
+    b.einsatz.ortAuftrag = "Übung Kabelblitz";
+    b.personal = [neuePerson()];
+    b.fahrzeuge = [neuesFahrzeug()];
+    b.sofortbedarf = { verpflegungPersonen: 1, dieselLiter: 0, benzinLiter: 0, gemischLiter: 0, unterbringung: false, ruhezeitErforderlich: false };
+    expect(schrittStatus(b)).toEqual(["ok", "ok", "ok", "ok", "ok"]);
+  });
+
+  it("erkennt Zwischenzustände als begonnen", () => {
+    const b = neuerBogen();
+    b.einheit.name = "OV X"; // Typ fehlt noch → begonnen
+    b.einsatz.einsatzbeginn = 1000; // Ort fehlt noch → begonnen
+    b.personalErfassung = PersonalErfassung.NUR_STAERKE;
+    b.staerkeManuell = { fuehrer: 0, unterfuehrer: 0, mannschaft: 0, gesamt: 0 };
+    b.personal = [neuePerson()]; // Ansprechpartner erfasst, Stärke aber 0 → begonnen
+    const s = schrittStatus(b);
+    expect(s[0]).toBe("begonnen");
+    expect(s[1]).toBe("begonnen");
+    expect(s[2]).toBe("begonnen");
   });
 });

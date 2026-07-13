@@ -32,7 +32,7 @@ import {
   orgLabel,
   vokabText,
   vokabularFuer,
-  type QrInfo,
+  type QrSatz,
 } from "./hilfen";
 import { fahrzeugSymbolSvg } from "./taktische-zeichen";
 
@@ -48,6 +48,9 @@ const GRAU = "#e8e8e8";
  * nachziehen lässt.
  */
 const QR_BREITE = 150;
+
+/** Kantenlänge je QR-Bild bei Segmentierung (mehrere Codes nebeneinander). */
+const QR_SEGMENT_BREITE = 120;
 
 /** Dateiname der eingebetteten Maschinen-Daten (analog factur-x.xml bei ZUGFeRD). */
 export const EEB_JSON_DATEINAME = "erfassungsbogen.json";
@@ -107,7 +110,7 @@ export function boegenAlsEingebetteteDatei(boegen: Erfassungsbogen[]): Eingebett
  */
 export function einsatzPdfDokument(
   name: string,
-  boegenMitQr: { bogen: Erfassungsbogen; qr: QrInfo }[],
+  boegenMitQr: { bogen: Erfassungsbogen; qr: QrSatz }[],
 ): TDocumentDefinitions {
   const content: Content[] = [];
   boegenMitQr.forEach(({ bogen, qr }, i) => {
@@ -131,8 +134,67 @@ export function einsatzPdfDokument(
   };
 }
 
-/** Bogen + fertiges QR-Bild → pdfmake-DocDefinition (Papier-Layout). */
-export function pdfDokument(b: Erfassungsbogen, qr: QrInfo): TDocumentDefinitions {
+/**
+ * QR-Block der letzten Seite. Ein Teil = wie bisher (Bild + antippbarer Link).
+ * Mehrere Teile (Segmentierung) = QR-Bilder nebeneinander mit „Teil x / n"; ein
+ * Öffnen-Link entfällt, da jeder Teil nur einen Abschnitt trägt.
+ */
+function qrBlock(qr: QrSatz): Content {
+  const kopf = (text: string): Content => ({ text, bold: true, fontSize: 13, color: BLAU, alignment: "center" });
+  if (qr.teile.length === 1) {
+    const t = qr.teile[0]!;
+    return {
+      unbreakable: true,
+      margin: [0, 14, 0, 0],
+      stack: [
+        kopf("Digitaler Bogen als QR-Code"),
+        // QR-Bild UND Textlink tragen dieselbe App-URL: mit der Kamera scannen ODER
+        // in der digitalen PDF direkt anklicken, um den Bogen in der App zu öffnen.
+        { image: t.datenUrl, width: QR_BREITE, alignment: "center", margin: [0, 8, 0, 0], link: t.url },
+        {
+          text: "Bogen direkt in der App öffnen",
+          link: t.url,
+          color: BLAU,
+          decoration: "underline",
+          alignment: "center",
+          fontSize: 11,
+          margin: [0, 8, 0, 0],
+        },
+        {
+          text: `Format EEB2 · ${qr.zeichen} Zeichen · QR-Version ${qr.version} (Fehlerkorrektur M)\nMit der Kamera scannen oder den Link antippen, um den Bogen digital zu übernehmen.`,
+          alignment: "center",
+          fontSize: 8,
+          margin: [0, 6, 0, 0],
+        },
+      ],
+    };
+  }
+  const anzahl = qr.teile.length;
+  const spalten: Content[] = qr.teile.map((t) => ({
+    width: "auto",
+    stack: [
+      { text: `Teil ${t.teilNr} / ${anzahl}`, bold: true, alignment: "center", color: BLAU },
+      { image: t.datenUrl, width: QR_SEGMENT_BREITE, alignment: "center", margin: [0, 4, 0, 0] },
+    ],
+  }));
+  return {
+    unbreakable: true,
+    margin: [0, 14, 0, 0],
+    stack: [
+      kopf(`Digitaler Bogen als QR-Code (${anzahl} Teile)`),
+      { columns: spalten, columnGap: 16, alignment: "center", margin: [0, 8, 0, 0] },
+      {
+        text: `Format EEB2 · ${qr.zeichen} Zeichen · in ${anzahl} QR-Codes aufgeteilt (je ≤ Version ${qr.version}, Fehlerkorrektur M)\nAlle ${anzahl} Teile nacheinander mit der Kamera scannen — die App setzt den Bogen zusammen.`,
+        alignment: "center",
+        fontSize: 8,
+        margin: [0, 6, 0, 0],
+      },
+    ],
+  };
+}
+
+/** Bogen + fertiger QR-Satz → pdfmake-DocDefinition (Papier-Layout). */
+export function pdfDokument(b: Erfassungsbogen, qr: QrSatz): TDocumentDefinitions {
   const org = b.einheit.organisation;
   const typName = vokabText(b.einheit.einheitsTyp, vokabularFuer(org, "einheitstyp"), "name") || "Einheit";
   const typKurz = vokabText(b.einheit.einheitsTyp, vokabularFuer(org, "einheitstyp"));
@@ -333,31 +395,7 @@ export function pdfDokument(b: Erfassungsbogen, qr: QrInfo): TDocumentDefinition
       // Kein fester Seitenumbruch mehr; als unbreakable-Gruppe zusammengehalten,
       // damit der QR-Code nicht über eine Seitengrenze zerrissen wird. Passt der
       // Block nicht mehr, rückt er als Ganzes auf die nächste Seite.
-      {
-        unbreakable: true,
-        margin: [0, 14, 0, 0],
-        stack: [
-          { text: "Digitaler Bogen als QR-Code", bold: true, fontSize: 13, color: BLAU, alignment: "center" },
-          // QR-Bild UND Textlink tragen dieselbe App-URL: mit der Kamera scannen ODER
-          // in der digitalen PDF direkt anklicken, um den Bogen in der App zu öffnen.
-          { image: qr.datenUrl, width: QR_BREITE, alignment: "center", margin: [0, 8, 0, 0], link: qr.url },
-          {
-            text: "Bogen direkt in der App öffnen",
-            link: qr.url,
-            color: BLAU,
-            decoration: "underline",
-            alignment: "center",
-            fontSize: 11,
-            margin: [0, 8, 0, 0],
-          },
-          {
-            text: `Format EEB2 · ${qr.zeichen} Zeichen · QR-Version ${qr.version} (Fehlerkorrektur M)\nMit der Kamera scannen oder den Link antippen, um den Bogen digital zu übernehmen.`,
-            alignment: "center",
-            fontSize: 8,
-            margin: [0, 6, 0, 0],
-          },
-        ],
-      },
+      qrBlock(qr),
     ],
   };
 }
