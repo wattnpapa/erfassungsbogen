@@ -28,7 +28,7 @@ import { einsatzCsvInhalt } from "./einsatz-csv";
 import { einsatzPdfErzeugen } from "./pdf";
 import { QrScannerWeb } from "./qr-scanner-web";
 import { Fusszeile } from "./fusszeile";
-import { UpdateBanner } from "./aktualisierung";
+import { Aktualisierungshinweise } from "./aktualisierung";
 import {
   SchrittEinheit,
   SchrittEinsatz,
@@ -328,7 +328,7 @@ function App() {
   if (musterVorlage) {
     return (
       <>
-        <UpdateBanner />
+        <Aktualisierungshinweise />
         <Musterung vorlage={musterVorlage} onStart={musterungFertig} onAbbrechen={() => setMusterVorlage(null)} />
         <Fusszeile />
       </>
@@ -339,7 +339,7 @@ function App() {
   if (offenerEinsatz) {
     return (
       <>
-        <UpdateBanner />
+        <Aktualisierungshinweise />
         <EinsatzDetail
           einsatz={offenerEinsatz}
           onZurueck={() => { setOffenerEinsatzId(null); setMeldung(""); }}
@@ -368,7 +368,7 @@ function App() {
   if (!bogen || zeigeStart) {
     return (
       <>
-      <UpdateBanner />
+      <Aktualisierungshinweise />
       <main className="start">
         <h1>Einheiten-Erfassungsbogen</h1>
         <p>
@@ -435,7 +435,7 @@ function App() {
 
   return (
     <>
-    <UpdateBanner />
+    <Aktualisierungshinweise />
     <main>
       <header>
         <button type="button" className="zur-start" onClick={() => setZeigeStart(true)}>
