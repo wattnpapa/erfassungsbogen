@@ -13,9 +13,11 @@ import {
   istSegmentNutzlast,
   parseSegmentUrl,
   segmentSammeln,
+  segmentePayload,
   segmenteZuBogen,
   type SegmentTeil,
 } from "../codec";
+import { signaturLabel, signaturVonPayload, signaturVonText, type SignaturStatus } from "../signatur";
 import { SCHRITT_STATUS_TITEL, bogenLaden, browserKompressor, neuerBogen, schrittStatus } from "./hilfen";
 import { bogenLinksEmpfangen, istNativ, qrScannen, textTeilen } from "./nativ";
 import { DebugLeiste, debugAktiv, wendePlattformKlasseAn, wendeRahmenAn } from "./debug-plattform";
@@ -28,6 +30,7 @@ import {
   einsatzAnlegen,
   einsatzImportieren,
   meldungHinzufuegen,
+  type EintragSignatur,
   type Einsatzsammlung,
 } from "./einsaetze";
 import { EinsatzDetail, EinsatzListe } from "./einsaetze-ui";
@@ -61,19 +64,27 @@ function startAusUrlFragment(): {
   bogen: Erfassungsbogen | null;
   vorlage: Vorlage | null;
   fehler: string;
+  /** Rohes Fragment für die (asynchrone) Signaturprüfung nach dem Mounten. */
+  text: string;
 } {
   const fragment = window.location.hash.slice(1);
-  if (!fragment) return { bogen: null, vorlage: null, fehler: "" };
+  if (!fragment) return { bogen: null, vorlage: null, fehler: "", text: "" };
   window.history.replaceState(null, "", window.location.pathname + window.location.search);
   try {
     if (istVorlageNutzlast(fragment)) {
       const b = decodeVorlagePayloadUrl(fragment, browserKompressor);
-      return { bogen: null, vorlage: vorlageAnlegen(b.einheit.name, b), fehler: "" };
+      return { bogen: null, vorlage: vorlageAnlegen(b.einheit.name, b), fehler: "", text: fragment };
     }
-    return { bogen: decodePayloadUrl(fragment, browserKompressor), vorlage: null, fehler: "" };
+    return { bogen: decodePayloadUrl(fragment, browserKompressor), vorlage: null, fehler: "", text: fragment };
   } catch {
-    return { bogen: null, vorlage: null, fehler: "Der geöffnete Link enthält keinen gültigen Erfassungsbogen." };
+    return { bogen: null, vorlage: null, fehler: "Der geöffnete Link enthält keinen gültigen Erfassungsbogen.", text: "" };
   }
+}
+
+/** SignaturStatus → gespeicherter Eintragsstatus (nur signierte Empfänge). */
+function alsEintragSignatur(status: SignaturStatus): EintragSignatur | undefined {
+  if (status.zustand === "unsigniert") return undefined;
+  return { zustand: status.zustand, pubkey: status.pubkey, kurzform: status.kurzform };
 }
 
 const START = startAusUrlFragment();
@@ -82,6 +93,9 @@ function App() {
   const [bogen, setBogen] = useState<Erfassungsbogen | null>(START.bogen);
   const [schritt, setSchritt] = useState(START.bogen ? UEBERSICHT : 0);
   const [fehler, setFehler] = useState(START.fehler);
+  // Signaturstatus des zuletzt IMPORTIERTEN Bogens (Herkunft des Transports).
+  // Wird beim Bearbeiten verworfen — dann beschreibt er den Bogen nicht mehr.
+  const [bogenSignatur, setBogenSignatur] = useState<SignaturStatus | null>(null);
   const [meldung, setMeldung] = useState(START.vorlage ? `Vorlage „${START.vorlage.name}" importiert.` : "");
   const [scannerOffen, setScannerOffen] = useState(false);
   // Zeigt den Startbildschirm, ohne den aktuellen Bogen zu verwerfen –
@@ -104,6 +118,7 @@ function App() {
 
   function musterungFertig(neuerArbeitsbogen: Erfassungsbogen) {
     setBogen(neuerArbeitsbogen);
+    setBogenSignatur(null);
     setSchritt(SCHRITT_EINSATZ);
     setMusterVorlage(null);
     setZeigeStart(false);
@@ -116,6 +131,7 @@ function App() {
     if (!datei) return;
     try {
       setBogen(await bogenLaden(datei));
+      setBogenSignatur(null); // Datei-Import: kein signierter Transport
       setSchritt(UEBERSICHT);
       setZeigeStart(false);
       setZeigeVorlagen(false);
@@ -130,7 +146,12 @@ function App() {
    * App die Einheit schon im Einsatz, wird die Zuordnung bestätigt (neue Fassung
    * = Historie) oder als eigene Einheit geführt (Vorschlag+Bestätigung).
    */
-  function bogenInSammlung(zielId: string, b: Erfassungsbogen, quelle: "scan" | "manuell") {
+  function bogenInSammlung(
+    zielId: string,
+    b: Erfassungsbogen,
+    quelle: "scan" | "manuell",
+    signatur?: EintragSignatur,
+  ) {
     const einsatz = einsaetzeLaden().find((s) => s.id === zielId);
     const schl = einheitSchluessel(b.einheit);
     let override: string | undefined;
@@ -141,7 +162,7 @@ function App() {
       );
       if (!alsFassung) override = `${schl}#${Date.now()}`;
     }
-    const r = meldungHinzufuegen(zielId, b, { quelle, einheitSchluesselOverride: override });
+    const r = meldungHinzufuegen(zielId, b, { quelle, einheitSchluesselOverride: override, signatur });
     einsaetzeNeuLaden();
     if (!r) {
       setFehler("Einsatz nicht gefunden.");
@@ -156,15 +177,20 @@ function App() {
     setOffenerEinsatzId(zielId); // zurück in die Einsatzansicht
   }
 
-  /** Fertigen Bogen übernehmen: im Sammelmodus als Meldung ablegen, sonst öffnen. */
-  function uebernimmBogen(b: Erfassungsbogen) {
+  /**
+   * Fertigen Bogen übernehmen: im Sammelmodus als Meldung ablegen, sonst öffnen.
+   * `signatur` = Signaturstatus des Transports (Herkunft); beim Öffnen als
+   * Provenienz angezeigt, im Sammelmodus je Meldung gespeichert.
+   */
+  function uebernimmBogen(b: Erfassungsbogen, signatur: SignaturStatus) {
     if (sammelZielId) {
       const ziel = sammelZielId;
       setSammelZielId(null);
-      bogenInSammlung(ziel, b, "scan");
+      bogenInSammlung(ziel, b, "scan", alsEintragSignatur(signatur));
       return;
     }
     setBogen(b);
+    setBogenSignatur(signatur);
     setSchritt(UEBERSICHT);
     setZeigeStart(false);
     setFehler("");
@@ -175,9 +201,10 @@ function App() {
    * (Overlay schließen / Native-Schleife beenden), false = es wird noch ein
    * weiterer Segment-Teil erwartet. Segment-Teile werden gesammelt (Fortschritt
    * „Teil x von n"), Duplikate/fremde/fehlende Teile sauber behandelt und bei
-   * Vollständigkeit dekodiert. Vorlagen (Marker „V.") werden importiert.
+   * Vollständigkeit dekodiert. Vorlagen (Marker „V.") werden importiert. Die
+   * Signatur des Transports wird geprüft (blockiert den Import nie).
    */
-  function uebernehmeText(text: string, fehlertext: string): boolean {
+  async function uebernehmeText(text: string, fehlertext: string): Promise<boolean> {
     if (istVorlageNutzlast(text)) {
       segmentTeileRef.current = [];
       setScanFortschritt("");
@@ -187,7 +214,8 @@ function App() {
         setVorlagen(vorlagenLaden());
         setMusterVorlage(null);
         setZeigeStart(true); // Startbildschirm listet die (nun importierte) Vorlage
-        setMeldung(`Vorlage „${v.name}" importiert.`);
+        const status = await signaturVonText(text);
+        setMeldung(`Vorlage „${v.name}" importiert.${status.zustand !== "unsigniert" ? ` (${signaturLabel(status)})` : ""}`);
         setFehler("");
       } catch {
         setFehler(fehlertext);
@@ -201,10 +229,14 @@ function App() {
         const r = segmentSammeln(segmentTeileRef.current, teil);
         segmentTeileRef.current = r.teile;
         if (r.status === "vollständig") {
+          // Signatur über den zusammengesetzten Payload prüfen (auch signierte
+          // Bögen können segmentiert sein — die Teile ergeben ihn 1:1 wieder).
+          const payload = segmentePayload(r.teile);
           const b = segmenteZuBogen(r.teile, browserKompressor);
+          const status = await signaturVonPayload(payload);
           segmentTeileRef.current = [];
           setScanFortschritt("");
-          uebernimmBogen(b);
+          uebernimmBogen(b, status);
           return true;
         }
         setFehler("");
@@ -225,20 +257,22 @@ function App() {
     segmentTeileRef.current = [];
     setScanFortschritt("");
     try {
-      uebernimmBogen(decodePayloadUrl(text, browserKompressor));
+      const dekodiert = decodePayloadUrl(text, browserKompressor);
+      const status = await signaturVonText(text);
+      uebernimmBogen(dekodiert, status);
     } catch {
       setFehler(fehlertext);
     }
     return true;
   }
 
-  function uebernehmeQrText(text: string): boolean {
+  function uebernehmeQrText(text: string): Promise<boolean> {
     return uebernehmeText(text, "Der gescannte QR-Code enthält keinen gültigen Erfassungsbogen.");
   }
 
   /** Web-Scanner-Ergebnis: bei Fertigstellung das Overlay schließen. */
-  function scanErgebnisWeb(text: string) {
-    if (uebernehmeQrText(text)) {
+  async function scanErgebnisWeb(text: string) {
+    if (await uebernehmeQrText(text)) {
       setScannerOffen(false);
       setScanFortschritt("");
     }
@@ -250,6 +284,17 @@ function App() {
     segmentTeileRef.current = [];
     setScanFortschritt("");
   }
+
+  // Kaltstart über QR/Universal Link: den beim Rendern schon dekodierten Bogen
+  // nachträglich (asynchron) auf seine Signatur prüfen — blockiert nichts.
+  useEffect(() => {
+    if (!START.bogen || !START.text) return;
+    let aktiv = true;
+    signaturVonText(START.text).then((s) => aktiv && setBogenSignatur(s));
+    return () => {
+      aktiv = false;
+    };
+  }, []);
 
   // Universal Link (iOS) / App Link (Android) öffnet die native App:
   // Bogen oder Vorlage aus der übergebenen URL übernehmen (Kaltstart und laufende App).
@@ -282,7 +327,7 @@ function App() {
           setScanFortschritt("");
           return;
         }
-        if (uebernehmeQrText(text)) return;
+        if (await uebernehmeQrText(text)) return;
       }
     } catch (err) {
       setFehler(err instanceof Error ? err.message : String(err));
@@ -311,6 +356,7 @@ function App() {
     setOffenerEinsatzId(null); // Assistent übernimmt die Ansicht
     setMeldung("");
     setBogen(neuerBogen());
+    setBogenSignatur(null);
     setSchritt(0);
     setZeigeStart(false);
   }
@@ -468,7 +514,7 @@ function App() {
               Aktuellen Bogen fortsetzen
             </button>
           )}
-          <button className={bogen ? "" : "primaer"} onClick={() => { setBogen(neuerBogen()); setSchritt(0); setZeigeStart(false); }}>
+          <button className={bogen ? "" : "primaer"} onClick={() => { setBogen(neuerBogen()); setBogenSignatur(null); setSchritt(0); setZeigeStart(false); }}>
             Neuen Bogen erstellen
           </button>
           <button onClick={scanneQr}>QR-Code scannen…</button>
@@ -518,7 +564,12 @@ function App() {
     );
   }
 
-  const aendern = (patch: Partial<Erfassungsbogen>) => setBogen({ ...bogen, ...patch });
+  // Bearbeiten verwirft den Import-Signaturstatus: er beschreibt den empfangenen
+  // Transport, nicht den nun geänderten Bogen.
+  const aendern = (patch: Partial<Erfassungsbogen>) => {
+    setBogen({ ...bogen, ...patch });
+    setBogenSignatur(null);
+  };
 
   // Leichter Füllstand je Schritt (Orientierung; die Übersicht hat keinen Status).
   const status = schrittStatus(bogen);
@@ -561,8 +612,9 @@ function App() {
       {schritt === UEBERSICHT && (
         <Uebersicht
           bogen={bogen}
+          signatur={bogenSignatur}
           geheZu={setSchritt}
-          neu={() => { setBogen(null); setSchritt(0); }}
+          neu={() => { setBogen(null); setBogenSignatur(null); setSchritt(0); }}
           onVorlageGespeichert={(name) => { vorlagenNeuLaden(); setMeldung(`Als Vorlage „${name}" gespeichert.`); }}
           sammelAktion={
             sammelZielId
@@ -572,7 +624,9 @@ function App() {
                     const ziel = sammelZielId;
                     setSammelZielId(null);
                     setBogen(null);
+                    setBogenSignatur(null);
                     setSchritt(0);
+                    // Manuell erfasster Bogen ist kein signierter Transport.
                     bogenInSammlung(ziel, bogen, "manuell");
                   },
                 }

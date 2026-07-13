@@ -21,7 +21,15 @@ import {
   unterbringungMWD,
   verpflegung,
 } from "../model";
-import { encodePayload, encodePayloadUrl, encodeVorlagePayloadUrl, segmentPayloadUrls, type Kompressor } from "../codec";
+import {
+  EEB_URL_PREFIX,
+  base64UrlKodieren,
+  encodePayload,
+  encodeVorlagePayloadUrl,
+  segmentPayloadUrls,
+  type Kompressor,
+} from "../codec";
+import { encodeSigniertVorlagePayloadUrl, signiertePayloadBytes } from "../signatur";
 import { istNativ, textTeilen } from "./nativ";
 import {
   FUNKRUF_KENNWOERTER,
@@ -181,14 +189,30 @@ async function teilBild(url: string, teilNr: number, anzahl: number): Promise<Qr
   return { datenUrl, url, teilNr, anzahl, version: qrVersion(url) };
 }
 
+async function qrAusUrl(url: string): Promise<QrInfo> {
+  const datenUrl = await QRCode.toDataURL(url, { ...QR_OPTIONEN, width: 520, margin: 2 });
+  return { datenUrl, url, zeichen: url.length, version: qrVersion(url) };
+}
+
 /**
  * Bogen → QR-Satz. QR-Inhalt ist eine App-URL: Die Kamera erkennt sie und öffnet
  * die App bzw. die Web-App; die Daten stehen im Fragment (bleiben also lokal).
  * Passt der Bogen in einen QR-Code (Budget ≤ v25), bleibt es bei genau einem —
  * unverändert zu früher. Erst darüber wird der Payload segmentiert.
+ *
+ * Mit `signaturPrivat` wird der Payload Ed25519-signiert (Container „EEB2S",
+ * netto +97 Bytes) — der Schlüssel bleibt lokal. Signieren und Segmentieren sind
+ * orthogonal: die Segment-Chunks setzen den signierten Payload 1:1 wieder
+ * zusammen, die Signatur bleibt intakt.
  */
-export async function qrErzeugen(b: Erfassungsbogen): Promise<QrSatz> {
-  const url = encodePayloadUrl(b, browserKompressor);
+export async function qrErzeugen(
+  b: Erfassungsbogen,
+  signaturPrivat?: Uint8Array | null,
+): Promise<QrSatz> {
+  const payload = signaturPrivat
+    ? await signiertePayloadBytes(b, browserKompressor, signaturPrivat)
+    : encodePayload(b, browserKompressor);
+  const url = EEB_URL_PREFIX + base64UrlKodieren(payload);
   const einzelVersion = qrVersion(url);
   if (einzelVersion <= QR_ZIEL_VERSION) {
     const teil = await teilBild(url, 1, 1);
@@ -196,7 +220,6 @@ export async function qrErzeugen(b: Erfassungsbogen): Promise<QrSatz> {
   }
 
   // Zu groß: kleinste Teilzahl suchen, bei der jeder Teil ins Budget passt.
-  const payload = encodePayload(b, browserKompressor);
   const maxTeile = Math.min(20, payload.length);
   let urls = segmentPayloadUrls(payload, Math.min(2, maxTeile));
   for (let anzahl = 2; anzahl <= maxTeile; anzahl++) {
@@ -215,12 +238,17 @@ export async function qrErzeugen(b: Erfassungsbogen): Promise<QrSatz> {
 /**
  * QR-Code zum Teilen einer Vorlage in der Einheit. Trägt den Marker "V." im
  * Fragment, damit der Empfänger sie importiert statt als Einsatzbogen zu öffnen.
+ * Vorlagen sind klein und werden nicht segmentiert (ein Einzel-QR). Optional
+ * signiert (wie {@link qrErzeugen}).
  */
-export async function qrVorlageErzeugen(b: Erfassungsbogen): Promise<QrInfo> {
-  const url = encodeVorlagePayloadUrl(b, browserKompressor);
-  const optionen = { errorCorrectionLevel: "M" as const };
-  const datenUrl = await QRCode.toDataURL(url, { ...optionen, width: 520, margin: 2 });
-  return { datenUrl, url, zeichen: url.length, version: QRCode.create(url, optionen).version };
+export async function qrVorlageErzeugen(
+  b: Erfassungsbogen,
+  signaturPrivat?: Uint8Array | null,
+): Promise<QrInfo> {
+  const url = signaturPrivat
+    ? await encodeSigniertVorlagePayloadUrl(b, browserKompressor, signaturPrivat)
+    : encodeVorlagePayloadUrl(b, browserKompressor);
+  return qrAusUrl(url);
 }
 
 // ------------------------------------------------------------ Datei-Dialog

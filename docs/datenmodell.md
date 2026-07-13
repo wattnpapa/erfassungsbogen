@@ -162,12 +162,58 @@ Daten stehen im Fragment (`#`) und werden daher nie an einen Server gesendet.
 Der Decoder akzeptiert die volle URL oder den nackten Base64url-Payload;
 die Magic-Bytes 'EEB2' im Binärteil bleiben die Format-Kennung.
 
+### Optionale Signatur „EEB2S" (Ed25519)
+
+Ein signierter Payload trägt ein **eigenes 5-Byte-Magic** und zwischen Magic und
+Nutzdaten den öffentlichen Schlüssel und die Signatur:
+
+```
+Signierter Payload:  0x45 0x45 0x42 0x32 0x53 ('EEB2S')
+                     ‖ pubkey[32]      (Ed25519, roher öffentlicher Schlüssel)
+                     ‖ signatur[64]    (Ed25519 über den DeflateRaw-Strom)
+                     ‖ DeflateRaw(Binärstrom)
+```
+
+- **Abwärtskompatibel.** `'EEB2S'` beginnt zwar mit `'EEB2'`, der Decoder prüft
+  aber **zuerst** die 5 Signatur-Bytes und erst dann die 4 EEB2-Bytes. Alte,
+  unsignierte `'EEB2'`-Codes (Deflate-Strom direkt hinter dem Magic) werden
+  unverändert gelesen. Der Deflate-Strom hinter der Signatur ist **byte-identisch**
+  zum unsignierten Payload — die Signatur ist reine Hülle.
+- **Signaturumfang.** Signiert wird genau der komprimierte Binärstrom
+  (`DeflateRaw(Binärstrom)`), nicht Magic/Schlüssel. Manipulation an den Nutzdaten
+  bricht die Prüfung; ein Angreifer kann jedoch neu signieren — die Signatur
+  belegt **Herkunft** (welcher Schlüssel), nicht Unveränderbarkeit gegen den
+  Schlüsselinhaber selbst.
+- **Verifikation blockiert den Import nie.** Ergebnis ist ein Anzeigehinweis:
+  „✓ signiert von <Kurzform>" / „nicht signiert" / „Signatur ungültig".
+- **Größenbudget.** Die Signaturhülle ist 101 Bytes (5 Magic + 32 Schlüssel +
+  64 Signatur); netto wächst der Payload um **+97 Bytes** gegenüber unsigniert
+  (das 4-Byte-`EEB2`-Magic wird durch das 5-Byte-`EEB2S` ersetzt), nach Base64url
+  ~+130 Zeichen. Gemessen am vollen THW-Bogen: unsigniert QR v13 → signiert QR
+  v17 — deutlich unter dem Ziel ≤ v25.
+- **Vorlagen/Segmentierung orthogonal.** Der Vorlagen-Marker `V.` und die
+  Base64url/URL-Hülle liegen um den ganzen Payload; ein signierter Vorlagen-QR ist
+  `#V.` ‖ Base64url(`EEB2S…`).
+
+**Schlüsselverwaltung (bewusst simpel, kein Server).** Jedes Gerät erzeugt lokal
+**einmalig** ein Ed25519-Schlüsselpaar; der private Schlüssel bleibt im
+Gerätespeicher (`localStorage`, nie in QR/URL/Datei). Der öffentliche Schlüssel ist
+in der App anzeig- und exportierbar (Kurzform = die ersten Bytes als Hex).
+
+**Trust-Modell (TOFU-artig, dokumentiert einfach):** Es gibt **keine** zentrale
+Zertifizierung. „✓ signiert von <Kurzform>" heißt: „dieser Datensatz stammt
+unverändert vom Inhaber genau dieses Schlüssels" — **nicht**, dass der Schlüssel
+zu einer bestimmten Person/Dienststelle gehört. Vertrauen entsteht außerhalb der
+App (Schlüssel-Kurzform am Meldekopf abgleichen, bekannte Absender wiedererkennen).
+Der Nutzen ist Integrität + Wiedererkennbarkeit, nicht PKI.
+
 Binärstrom: Felder in fester Reihenfolge, Varint-Längen, UTF-8-Strings, Optionals
 über Flag-Bits, Vokabular-Werte als Varint-Code (0 = Freitext folgt).
 Referenzimplementierung: [`prototype/qr-size-check.mjs`](../prototype/qr-size-check.mjs).
 
 **Integrität:** QR-Fehlerkorrektur (ECC M = 15 %) sichert den Transport; Deflate
-schlägt bei Bitfehlern ohnehin fehl. Optional später: Ed25519-Signatur (+64 Bytes).
+schlägt bei Bitfehlern ohnehin fehl. **Authentizität** optional per
+Ed25519-Signatur (Container `EEB2S`, netto +97 Bytes) — siehe „Optionale Signatur" oben.
 
 **Gemessene Größen** (siehe README): voller THW-Bogen 511 Bytes → QR v18
 (mit OV-Verzeichnis-Referenz 411 Bytes → QR v15); Meldekopf-Schnellerfassung
@@ -225,4 +271,5 @@ Byte-für-Byte identisch zu vorher. Referenz: [`src/codec.ts`](../src/codec.ts)
 - THW-OV-Verzeichnis befüllen (Quelle: öffentliche THW-Dienststellenliste) und
   Aktualisierungsweg festlegen. (Format ist umgesetzt, siehe `standortRef`.)
 - Deflate-Preset-Dictionary aus typischen Bögen (~10–20 % zusätzliche Ersparnis).
-- Signatur/Authentizität ja/nein.
+- ~~Signatur/Authentizität ja/nein.~~ Umgesetzt: optionale Ed25519-Signatur
+  (`EEB2S`, `src/codec.ts` + `src/signatur.ts`), Verifikation bei Import.

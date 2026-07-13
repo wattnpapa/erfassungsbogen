@@ -40,6 +40,19 @@ export enum MeldeStatus {
 /** Wie kam die Meldung in die Sammlung? (Herkunftsnachweis) */
 export type MeldeQuelle = "scan" | "manuell" | "pdf-import";
 
+/**
+ * Ergebnis der Signaturprüfung beim Empfang (nur gespeichert, wenn der Transport
+ * signiert war). Fehlt das Feld → der Bogen kam unsigniert an. Belegt Herkunft
+ * (welcher Schlüssel), keine Identitäts-Zusicherung — siehe docs/datenmodell.md.
+ */
+export interface EintragSignatur {
+  zustand: "gueltig" | "ungueltig";
+  /** Öffentlicher Schlüssel (Hex) — bei „gueltig" zur Wiedererkennung. */
+  pubkey?: string;
+  /** Anzeige-Kurzform des Schlüssels. */
+  kurzform?: string;
+}
+
 export interface MeldeEintrag {
   /** Stabiler, inhaltsbasierter Schlüssel → Dedupe bei Doppelmeldeweg/Reimport. */
   id: string;
@@ -50,6 +63,8 @@ export interface MeldeEintrag {
   status: MeldeStatus;
   /** Optionales Verbands-/Zug-Etikett aus einem gesammelten Bündel. */
   zugEtikett?: string;
+  /** Signaturstatus des Empfangstransports (fehlt = unsigniert empfangen). */
+  signatur?: EintragSignatur;
   bogen: Erfassungsbogen;
 }
 
@@ -220,6 +235,8 @@ export interface MeldungOptionen {
   zugEtikett?: string;
   /** Manuell bestätigte Zuordnung (Vorschlag+Bestätigung) statt Auto-Fingerabdruck. */
   einheitSchluesselOverride?: string;
+  /** Signaturstatus des Empfangstransports (nur bei signiertem Scan gesetzt). */
+  signatur?: EintragSignatur;
 }
 
 /**
@@ -249,6 +266,7 @@ export function meldungHinzufuegen(
     quelle: opt.quelle ?? "scan",
     status: MeldeStatus.ANWESEND,
     zugEtikett: opt.zugEtikett?.trim() || undefined,
+    signatur: opt.signatur,
     bogen: migriert,
   };
   s.eintraege.push(eintrag);

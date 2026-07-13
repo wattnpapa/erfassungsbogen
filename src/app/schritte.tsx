@@ -51,6 +51,15 @@ import {
   vokabularFuer,
 } from "./hilfen";
 import { pdfErzeugen } from "./pdf";
+import { signaturLabel, type SignaturStatus } from "../signatur";
+import {
+  geraeteKurzform,
+  geraeteOeffentlichHex,
+  geraeteSchluesselSicherstellen,
+  signierenAktiv,
+  signierenSetzen,
+} from "./geraete-schluessel";
+import { istNativ, textTeilen } from "./nativ";
 
 export type SchrittProps = {
   bogen: Erfassungsbogen;
@@ -979,6 +988,8 @@ export function Uebersicht(props: {
   geheZu: (schritt: number) => void;
   neu: () => void;
   onVorlageGespeichert?: (name: string) => void;
+  /** Signaturstatus des importierten Transports (Herkunft), falls der Bogen gescannt wurde. */
+  signatur?: SignaturStatus | null;
   /** Gesetzt, wenn der Bogen für eine Einsatz-Sammlung erfasst wird (Meldekopf/Zugführer). */
   sammelAktion?: { label: string; onUebernehmen: () => void };
 }) {
@@ -994,6 +1005,9 @@ export function Uebersicht(props: {
   const [qr, setQr] = useState<QrSatz | null>(null);
   const [fehler, setFehler] = useState("");
   const [pdfLaeuft, setPdfLaeuft] = useState(false);
+  // QR signieren (Geräteschlüssel). Voreinstellung aus dem Gerätespeicher.
+  const [signieren, setSignieren] = useState(() => signierenAktiv());
+  const [schluesselKurz, setSchluesselKurz] = useState<string | null>(null);
   const org = bogen.einheit.organisation;
   const s = staerke(bogen);
   const mwd = unterbringungMWD(bogen);
@@ -1001,13 +1015,41 @@ export function Uebersicht(props: {
 
   useEffect(() => {
     let aktiv = true;
-    qrErzeugen(bogen)
-      .then((q) => aktiv && setQr(q))
-      .catch((e) => aktiv && setFehler(`QR-Code: ${e instanceof Error ? e.message : e}`));
+    (async () => {
+      try {
+        // Bei aktivem Signieren den (ggf. neu erzeugten) Geräteschlüssel nutzen.
+        const privat = signieren ? await geraeteSchluesselSicherstellen() : null;
+        if (privat) geraeteKurzform().then((k) => aktiv && setSchluesselKurz(k));
+        const q = await qrErzeugen(bogen, privat);
+        if (aktiv) setQr(q);
+      } catch (e) {
+        if (aktiv) setFehler(`QR-Code: ${e instanceof Error ? e.message : e}`);
+      }
+    })();
     return () => {
       aktiv = false;
     };
-  }, [bogen]);
+  }, [bogen, signieren]);
+
+  function signierenUmschalten(an: boolean) {
+    setSignieren(an);
+    signierenSetzen(an);
+  }
+
+  async function schluesselTeilen() {
+    const hex = await geraeteOeffentlichHex();
+    if (!hex) return;
+    const text = `EEB-Signaturschlüssel (öffentlich)\nKurzform: ${schluesselKurz ?? ""}\n${hex}`;
+    if (istNativ()) {
+      await textTeilen("eeb-signaturschluessel.txt", text);
+    } else if (navigator.clipboard) {
+      await navigator.clipboard.writeText(hex);
+      setFehler(""); // kein Fehler; Rückmeldung via Titel/alert unnötig
+      window.alert(`Öffentlicher Schlüssel in die Zwischenablage kopiert:\n\n${hex}`);
+    } else {
+      window.prompt("Öffentlicher Schlüssel (kopieren):", hex);
+    }
+  }
 
   async function pdf() {
     setPdfLaeuft(true);
@@ -1051,6 +1093,14 @@ export function Uebersicht(props: {
           </span>
         </div>
         {fehler && <p className="fehler">{fehler}</p>}
+        {props.signatur && props.signatur.zustand !== "unsigniert" && (
+          <p className={`signatur-herkunft ${props.signatur.zustand}`} role="status">
+            Empfangen als: <strong>{signaturLabel(props.signatur)}</strong>
+            {props.signatur.zustand === "gueltig"
+              ? " — Herkunft belegt (nicht die Identität des Absenders)."
+              : " — die Daten passen nicht zur Signatur."}
+          </p>
+        )}
         <Hinweise bogen={bogen} />
         <p>
           <strong>{orgLabel(org)}</strong>
@@ -1171,17 +1221,48 @@ export function Uebersicht(props: {
                   </figure>
                 ))}
               </div>
-              <p className="hinweis">{qr.zeichen} Zeichen · je ≤ QR-Version {qr.version} (ECC M)</p>
+              <p className="hinweis">
+                {qr.zeichen} Zeichen · je ≤ QR-Version {qr.version} (ECC M){signieren ? " · signiert (EEB2S)" : ""}
+              </p>
             </>
           ) : (
             <>
               <img src={qr.teile[0]!.datenUrl} alt="EEB2-QR-Code" />
-              <p className="hinweis">{qr.zeichen} Zeichen · QR-Version {qr.version} (ECC M) — öffnet beim Scannen mit der Kamera die App; dieser Code steht auch auf der letzten PDF-Seite.</p>
+              <p className="hinweis">
+                {qr.zeichen} Zeichen · QR-Version {qr.version} (ECC M)
+                {signieren ? " · signiert (EEB2S)" : ""} — öffnet beim Scannen mit der Kamera die App; dieser Code steht auch auf der letzten PDF-Seite.
+              </p>
             </>
           )
+
         ) : (
           <p className="hinweis">QR-Code wird erzeugt…</p>
         )}
+        <div className="signatur-optionen">
+          <label>
+            <input
+              type="checkbox"
+              checked={signieren}
+              onChange={(e) => signierenUmschalten(e.target.checked)}
+            />{" "}
+            QR mit Geräteschlüssel signieren (Ed25519, +97 Byte)
+          </label>
+          {signieren && (
+            <p className="hinweis">
+              Dieses Gerät: <strong>{schluesselKurz ?? "Schlüssel wird erzeugt…"}</strong>
+              {schluesselKurz && (
+                <>
+                  {" · "}
+                  <button type="button" className="link" onClick={schluesselTeilen}>
+                    öffentlichen Schlüssel anzeigen/teilen
+                  </button>
+                </>
+              )}
+              <br />
+              Belegt Herkunft/Integrität, nicht die Identität — der private Schlüssel bleibt auf dem Gerät.
+            </p>
+          )}
+        </div>
       </section>
     </>
   );

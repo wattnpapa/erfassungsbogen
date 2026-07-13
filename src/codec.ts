@@ -30,6 +30,13 @@ import { Ernaehrung, KontaktArt, SCHEMA_VERSION } from "./model";
 
 export const EEB_MAGIC = new Uint8Array([0x45, 0x45, 0x42, 0x32]); // "EEB2"
 
+/** Magic für signierte Payloads: "EEB2S" (EEB2 + 'S'). Siehe docs/datenmodell.md. */
+export const EEB_SIGNIERT_MAGIC = new Uint8Array([0x45, 0x45, 0x42, 0x32, 0x53]); // "EEB2S"
+
+/** Länge eines rohen Ed25519-Schlüssels bzw. einer Signatur (Bytes). */
+export const PUBKEY_LAENGE = 32;
+export const SIGNATUR_LAENGE = 64;
+
 /** Injizierbare Kompression (roher Deflate-Strom, ohne zlib-Header). */
 export type Kompressor = {
   deflateRaw(daten: Uint8Array): Uint8Array;
@@ -417,22 +424,82 @@ export function decodeBinaer(daten: Uint8Array): Erfassungsbogen {
 }
 
 // -------------------------------------------------------------- QR-Payload
+//
+// Zwei Container-Formen (siehe docs/datenmodell.md):
+//   unsigniert:  'EEB2'  ‖ DeflateRaw(Binärstrom)
+//   signiert:    'EEB2S' ‖ pubkey[32] ‖ signatur[64] ‖ DeflateRaw(Binärstrom)
+// Der komprimierte Strom ist in beiden Formen byte-identisch; die Signatur ist
+// reine Hülle. packePayload/entpackePayload trennen Hülle und Nutzdaten OHNE
+// Krypto — Signieren/Prüfen liegt in src/signatur.ts.
 
-/** Bogen → QR-Payload ('EEB2' + DeflateRaw(Binärstrom)). */
-export function encodePayload(b: Erfassungsbogen, k: Kompressor): Uint8Array {
-  const komprimiert = k.deflateRaw(encodeBinaer(b));
-  const payload = new Uint8Array(EEB_MAGIC.length + komprimiert.length);
-  payload.set(EEB_MAGIC);
-  payload.set(komprimiert, EEB_MAGIC.length);
+/** Rohe Signaturhülle eines Payloads: öffentlicher Schlüssel + Signatur. */
+export interface Signaturhuelle {
+  pubkey: Uint8Array; // 32 Bytes
+  signatur: Uint8Array; // 64 Bytes
+}
+
+/** Zerlegter Payload: komprimierter Binärstrom + (falls signiert) Signaturhülle. */
+export interface PayloadTeile {
+  komprimiert: Uint8Array;
+  signatur?: Signaturhuelle;
+}
+
+function beginntMit(daten: Uint8Array, magic: Uint8Array): boolean {
+  return daten.length >= magic.length && magic.every((byte, i) => daten[i] === byte);
+}
+
+/** Komprimierter Strom (+ optionale Signaturhülle) → Payload-Bytes. */
+export function packePayload(teile: PayloadTeile): Uint8Array {
+  const { komprimiert, signatur } = teile;
+  if (!signatur) {
+    const payload = new Uint8Array(EEB_MAGIC.length + komprimiert.length);
+    payload.set(EEB_MAGIC);
+    payload.set(komprimiert, EEB_MAGIC.length);
+    return payload;
+  }
+  if (signatur.pubkey.length !== PUBKEY_LAENGE || signatur.signatur.length !== SIGNATUR_LAENGE) {
+    throw new Error("EEB2S: Schlüssel/Signatur haben falsche Länge");
+  }
+  const kopf = EEB_SIGNIERT_MAGIC.length + PUBKEY_LAENGE + SIGNATUR_LAENGE;
+  const payload = new Uint8Array(kopf + komprimiert.length);
+  payload.set(EEB_SIGNIERT_MAGIC);
+  payload.set(signatur.pubkey, EEB_SIGNIERT_MAGIC.length);
+  payload.set(signatur.signatur, EEB_SIGNIERT_MAGIC.length + PUBKEY_LAENGE);
+  payload.set(komprimiert, kopf);
   return payload;
 }
 
-/** QR-Payload → Bogen. Wirft bei falschem Magic oder defekten Daten. */
-export function decodePayload(payload: Uint8Array, k: Kompressor): Erfassungsbogen {
-  if (payload.length < 5 || !EEB_MAGIC.every((byte, i) => payload[i] === byte)) {
-    throw new Error("Kein EEB2-QR-Code");
+/**
+ * Payload-Bytes → Teile. Erkennt signiert ('EEB2S') vs. unsigniert ('EEB2').
+ * WICHTIG: 'EEB2S' zuerst prüfen, da es mit 'EEB2' beginnt. Wirft bei fremdem
+ * Magic oder zu kurzem Signatur-Container.
+ */
+export function entpackePayload(payload: Uint8Array): PayloadTeile {
+  if (beginntMit(payload, EEB_SIGNIERT_MAGIC)) {
+    const kopf = EEB_SIGNIERT_MAGIC.length + PUBKEY_LAENGE + SIGNATUR_LAENGE;
+    if (payload.length < kopf + 1) throw new Error("EEB2S: Signatur-Container unvollständig");
+    const pubkey = payload.slice(EEB_SIGNIERT_MAGIC.length, EEB_SIGNIERT_MAGIC.length + PUBKEY_LAENGE);
+    const signatur = payload.slice(EEB_SIGNIERT_MAGIC.length + PUBKEY_LAENGE, kopf);
+    return { komprimiert: payload.slice(kopf), signatur: { pubkey, signatur } };
   }
-  return decodeBinaer(k.inflateRaw(payload.subarray(EEB_MAGIC.length)));
+  if (beginntMit(payload, EEB_MAGIC) && payload.length >= EEB_MAGIC.length + 1) {
+    return { komprimiert: payload.slice(EEB_MAGIC.length) };
+  }
+  throw new Error("Kein EEB2-QR-Code");
+}
+
+/** Bogen → unsignierter QR-Payload ('EEB2' + DeflateRaw(Binärstrom)). */
+export function encodePayload(b: Erfassungsbogen, k: Kompressor): Uint8Array {
+  return packePayload({ komprimiert: k.deflateRaw(encodeBinaer(b)) });
+}
+
+/**
+ * QR-Payload → Bogen. Akzeptiert signierte und unsignierte Payloads; eine
+ * eventuelle Signatur wird hier NICHT geprüft (das macht src/signatur.ts, ohne
+ * den Import zu blockieren). Wirft bei falschem Magic oder defekten Daten.
+ */
+export function decodePayload(payload: Uint8Array, k: Kompressor): Erfassungsbogen {
+  return decodeBinaer(k.inflateRaw(entpackePayload(payload).komprimiert));
 }
 
 // ----------------------------------------------------------------- QR-URL
@@ -447,7 +514,7 @@ export const EEB_URL_PREFIX = "https://erfassungsbogen.app/#";
 const B64URL = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
 const B64URL_REV = new Map([...B64URL].map((c, i) => [c, i] as const));
 
-function base64UrlKodieren(daten: Uint8Array): string {
+export function base64UrlKodieren(daten: Uint8Array): string {
   let s = "";
   for (let i = 0; i < daten.length; i += 3) {
     const a = daten[i] ?? 0;
@@ -460,7 +527,7 @@ function base64UrlKodieren(daten: Uint8Array): string {
   return s;
 }
 
-function base64UrlDekodieren(s: string): Uint8Array {
+export function base64UrlDekodieren(s: string): Uint8Array {
   const bytes: number[] = [];
   let puffer = 0;
   let bits = 0;
@@ -478,7 +545,7 @@ function base64UrlDekodieren(s: string): Uint8Array {
 }
 
 /** Datenteil hinter '#' aus voller URL, nacktem '#…'-Fragment oder rohem Payload. */
-function fragmentInhalt(text: string): string {
+export function fragmentInhalt(text: string): string {
   const daten = text.trim();
   const raute = daten.indexOf("#");
   return raute >= 0 ? daten.slice(raute + 1) : daten;
@@ -637,7 +704,13 @@ export function segmentSammeln(vorhandene: SegmentTeil[], neu: SegmentTeil): Sam
  * Vollständiger Satz Segment-Teile → Bogen. Wirft bei fehlenden/doppelten
  * Teilen oder falscher Prüfsumme (defekte/vermischte Teile).
  */
-export function segmenteZuBogen(teile: SegmentTeil[], k: Kompressor): Erfassungsbogen {
+/**
+ * Segment-Teile → vollständiger Payload (validiert Vollständigkeit, Reihenfolge
+ * und Prüfsumme). Wirft bei fehlenden/vermischten/defekten Teilen. Getrennt von
+ * {@link segmenteZuBogen}, damit der Aufrufer den rohen Payload (z. B. für die
+ * Signaturprüfung) bekommt.
+ */
+export function segmentePayload(teile: SegmentTeil[]): Uint8Array {
   if (teile.length === 0) throw new Error("EEB2-Segmente: keine Teile");
   const anzahl = teile[0]!.anzahl;
   const id = teile[0]!.id;
@@ -656,5 +729,9 @@ export function segmenteZuBogen(teile: SegmentTeil[], k: Kompressor): Erfassungs
     pos += t.chunk.length;
   }
   if (pruefsumme(payload) !== id) throw new Error("EEB2-Segmente: Prüfsumme falsch (defekte Teile)");
-  return decodePayload(payload, k);
+  return payload;
+}
+
+export function segmenteZuBogen(teile: SegmentTeil[], k: Kompressor): Erfassungsbogen {
+  return decodePayload(segmentePayload(teile), k);
 }

@@ -110,6 +110,30 @@ describe("bogenInhaltsId()", () => {
   });
 });
 
+describe("Signaturstatus je Meldung", () => {
+  it("speichert den Signaturstatus und übersteht die Serialisierung", () => {
+    const s = einsatzAnlegen("E", EinsatzArt.EINSATZ);
+    const r = meldungHinzufuegen(s.id, bogen(), {
+      quelle: "scan",
+      signatur: { zustand: "gueltig", pubkey: "ab".repeat(32), kurzform: "abab abab abab abab" },
+    });
+    expect(r?.eintrag.signatur?.zustand).toBe("gueltig");
+    // Roundtrip durch JSON (localStorage-Format) erhält das Feld.
+    const wieder = einsaetzeAusJson(einsaetzeZuJson(einsaetzeLaden()));
+    expect(wieder[0]!.eintraege[0]!.signatur).toEqual({
+      zustand: "gueltig",
+      pubkey: "ab".repeat(32),
+      kurzform: "abab abab abab abab",
+    });
+  });
+
+  it("lässt das Feld bei unsigniertem Empfang weg", () => {
+    const s = einsatzAnlegen("E", EinsatzArt.EINSATZ);
+    const r = meldungHinzufuegen(s.id, bogen(), { quelle: "pdf-import" });
+    expect(r?.eintrag.signatur).toBeUndefined();
+  });
+});
+
 describe("meldungHinzufuegen() — Idempotenz & Historie", () => {
   it("nimmt einen neuen Bogen als Meldung auf", () => {
     const s = einsatzAnlegen("Hochwasser 2026", EinsatzArt.EINSATZ, "Oldenburg");
