@@ -291,6 +291,26 @@ describe("plausibilitaet() — weitere Zweige", () => {
     expect(plausibilitaet(b).some((h) => /Ansprechpartner erfasst/.test(h))).toBe(true);
   });
 
+  it("warnt im Meldekopf-Modus, wenn veg + vegan die Gesamtstärke übersteigen (auch ohne Sofortbedarf)", () => {
+    const b = bogen({
+      personalErfassung: PersonalErfassung.NUR_STAERKE,
+      personal: [],
+      staerkeManuell: { fuehrer: 0, unterfuehrer: 0, mannschaft: 5, gesamt: 5 },
+      verpflegungManuell: { vegetarisch: 4, vegan: 3 },
+    });
+    expect(plausibilitaet(b).some((h) => /übersteigen die Gesamtstärke 5/.test(h))).toBe(true);
+  });
+
+  it("warnt nicht, wenn veg + vegan die Gesamtstärke einhalten", () => {
+    const b = bogen({
+      personalErfassung: PersonalErfassung.NUR_STAERKE,
+      personal: [],
+      staerkeManuell: { fuehrer: 0, unterfuehrer: 0, mannschaft: 5, gesamt: 5 },
+      verpflegungManuell: { vegetarisch: 2, vegan: 1 },
+    });
+    expect(plausibilitaet(b).some((h) => /übersteigen die Gesamtstärke/.test(h))).toBe(false);
+  });
+
   it("warnt, wenn mehr Vegetarier/Veganer als Verpflegungsbedarf erfasst sind", () => {
     const b = bogen({
       personalErfassung: PersonalErfassung.NUR_STAERKE,

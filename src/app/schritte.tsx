@@ -156,6 +156,41 @@ const zahl = (s: string): number => {
   return Number.isFinite(n) && n >= 0 ? n : 0;
 };
 
+/**
+ * Großer, touch-freundlicher Zähler (− / Zahl / +) für die Erfassung ohne
+ * Tastatur am Tablet. Werte bleiben ≥ min; direkte Zahleneingabe bleibt möglich.
+ */
+function Stepper(props: { titel: string; wert: number; setzen: (n: number) => void; min?: number }) {
+  const min = props.min ?? 0;
+  const setze = (n: number) => props.setzen(Math.max(min, n));
+  return (
+    <div className="stepper-feld">
+      <span className="stepper-titel">{props.titel}</span>
+      <div className="stepper">
+        <button
+          type="button"
+          aria-label={`${props.titel}: verringern`}
+          disabled={props.wert <= min}
+          onClick={() => setze(props.wert - 1)}
+        >
+          −
+        </button>
+        <input
+          type="number"
+          inputMode="numeric"
+          min={min}
+          value={props.wert}
+          aria-label={props.titel}
+          onChange={(e) => setze(zahl(e.target.value))}
+        />
+        <button type="button" aria-label={`${props.titel}: erhöhen`} onClick={() => setze(props.wert + 1)}>
+          +
+        </button>
+      </div>
+    </div>
+  );
+}
+
 /** Plausibilitätshinweise (nicht blockierend). */
 function Hinweise({ bogen }: { bogen: Erfassungsbogen }) {
   return (
@@ -586,6 +621,9 @@ export function SchrittPersonal({ bogen, aendern }: SchrittProps) {
     neu.gesamt = neu.fuehrer + neu.unterfuehrer + neu.mannschaft;
     aendern({ staerkeManuell: neu });
   };
+  const vp = verpflegung(bogen);
+  const setVp = (patch: Partial<{ vegetarisch: number; vegan: number }>) =>
+    aendern({ verpflegungManuell: { vegetarisch: vp.vegetarisch, vegan: vp.vegan, ...patch } });
 
   return (
     <section className="karte">
@@ -650,6 +688,14 @@ export function SchrittPersonal({ bogen, aendern }: SchrittProps) {
                 ))}
               </>
             )}
+          </div>
+          <h3>Verpflegung</h3>
+          <div className="stepper-zeile">
+            <Stepper titel="vegetarisch" wert={vp.vegetarisch} setzen={(n) => setVp({ vegetarisch: n })} />
+            <Stepper titel="vegan" wert={vp.vegan} setzen={(n) => setVp({ vegan: n })} />
+            <span className="hinweis stepper-rest">
+              {vp.vegetarisch + vp.vegan} von {sm.gesamt} vegetarisch/vegan · {Math.max(0, sm.gesamt - vp.vegetarisch - vp.vegan)} sonstige
+            </span>
           </div>
           <h3>Führungskraft / Ansprechpartner</h3>
         </>

@@ -107,6 +107,25 @@
     }
     .hinweis { font-size: 0.85rem; color: #555; }
 
+    /* Touch-Zähler (− / Zahl / +) für die Meldekopf-Schnellerfassung: große
+       Tippziele, damit am Tablet ohne Tastatur gezählt werden kann. */
+    .stepper-zeile { display: flex; flex-wrap: wrap; gap: 0.8rem 1.4rem; align-items: flex-end; margin-top: 0.4rem; }
+    .stepper-feld { display: flex; flex-direction: column; gap: 0.2rem; }
+    .stepper-titel { font-size: 0.85rem; color: #444; }
+    .stepper-rest { align-self: center; }
+    .stepper { display: inline-flex; align-items: stretch; gap: 0.4rem; }
+    .stepper button {
+      width: 3.25rem; min-height: 3.25rem; padding: 0;
+      font-size: 1.6rem; line-height: 1;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .stepper input {
+      width: 3.75rem; text-align: center; font-size: 1.4rem;
+      font-variant-numeric: tabular-nums; -moz-appearance: textfield; appearance: textfield;
+    }
+    .stepper input::-webkit-outer-spin-button,
+    .stepper input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+
     /* Vorlagen & Musterung */
     .meldung { text-align: center; border: 1px solid var(--rand); border-radius: 0.4rem; padding: 0.5rem 0.75rem; margin: 0.75rem auto; max-width: 60rem; font-size: 0.9rem; }
     .start-vorlagen { text-align: left; max-width: 40rem; margin: 2.5rem auto 0; }
@@ -293,6 +312,9 @@
     .platform-ios label.feld { font: -apple-system-subheadline; color: var(--ios-text-2); }
     .platform-ios .inline { font: -apple-system-subheadline; min-height: 44px; }
     .platform-ios .hinweis { font: -apple-system-footnote; color: var(--ios-text-2); }
+    .platform-ios .stepper-titel { font: -apple-system-subheadline; color: var(--ios-text-2); }
+    .platform-ios .stepper button { min-height: 3.25rem; font-size: 1.6rem; }
+    .platform-ios .stepper input { font-size: 1.25rem; text-align: center; }
     .platform-ios dl.paare { font: -apple-system-subheadline; }
     .platform-ios dl.paare dt { color: var(--ios-text-2); }
 
@@ -591,6 +613,9 @@
     }
     .platform-android dl.paare { font-size: 0.875rem; }
     .platform-android dl.paare dt { color: var(--md-on-surface-variant); }
+    .platform-android .stepper-titel { font-size: 0.875rem; color: var(--md-on-surface-variant); }
+    .platform-android .stepper button { min-height: 3.25rem; font-size: 1.6rem; }
+    .platform-android .stepper input { font-size: 1.25rem; text-align: center; }
 
     /* Buttons: Tonal Button als Standard, Filled Button für .primaer –
        Voll-Kapsel, label-large, 48-dp-Ziel, State Layer beim Drücken. */
