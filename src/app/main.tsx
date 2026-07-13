@@ -33,10 +33,11 @@ import {
 import { EinsatzDetail, EinsatzListe } from "./einsaetze-ui";
 import { aktuelleMeldungen } from "./auswertung";
 import { boegenAusPdfBytes, einsatzAusDatei, einsatzDateiInhalt } from "./einsatz-transport";
+import { einsatzCsvInhalt } from "./einsatz-csv";
 import { einsatzPdfErzeugen } from "./pdf";
 import { QrScannerWeb } from "./qr-scanner-web";
 import { Fusszeile } from "./fusszeile";
-import { UpdateBanner } from "./aktualisierung";
+import { Aktualisierungshinweise } from "./aktualisierung";
 import {
   SchrittEinheit,
   SchrittEinsatz,
@@ -314,19 +315,30 @@ function App() {
     setZeigeStart(false);
   }
 
-  async function exportiereEinsatz(s: Einsatzsammlung) {
-    const name = (s.name || "einsatz").replace(/[^\wäöüÄÖÜß-]+/g, "_");
-    const text = einsatzDateiInhalt(s);
+  /** Text als Datei anbieten — App: Share-Sheet, Browser: Download (wie bogenSpeichern). */
+  async function dateiAnbieten(dateiname: string, text: string, mime: string) {
     if (istNativ()) {
-      await textTeilen(`eeb-einsatz-${name}.json`, text);
+      await textTeilen(dateiname, text);
       return;
     }
-    const blob = new Blob([text], { type: "application/json" });
+    const blob = new Blob([text], { type: mime });
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
-    a.download = `eeb-einsatz-${name}.json`;
+    a.download = dateiname;
     a.click();
     URL.revokeObjectURL(a.href);
+  }
+
+  function einsatzDateiname(s: Einsatzsammlung): string {
+    return (s.name || "einsatz").replace(/[^\wäöüÄÖÜß-]+/g, "_");
+  }
+
+  async function exportiereEinsatz(s: Einsatzsammlung) {
+    await dateiAnbieten(`eeb-einsatz-${einsatzDateiname(s)}.json`, einsatzDateiInhalt(s), "application/json");
+  }
+
+  async function exportiereEinsatzCsv(s: Einsatzsammlung) {
+    await dateiAnbieten(`eeb-einsatz-${einsatzDateiname(s)}.csv`, einsatzCsvInhalt(s), "text/csv;charset=utf-8");
   }
 
   async function sammelPdf(s: Einsatzsammlung) {
@@ -403,7 +415,7 @@ function App() {
   if (musterVorlage) {
     return (
       <>
-        <UpdateBanner />
+        <Aktualisierungshinweise />
         <Musterung vorlage={musterVorlage} onStart={musterungFertig} onAbbrechen={() => setMusterVorlage(null)} />
         <Fusszeile />
       </>
@@ -414,7 +426,7 @@ function App() {
   if (offenerEinsatz) {
     return (
       <>
-        <UpdateBanner />
+        <Aktualisierungshinweise />
         <EinsatzDetail
           einsatz={offenerEinsatz}
           onZurueck={() => { setOffenerEinsatzId(null); setMeldung(""); }}
@@ -423,6 +435,7 @@ function App() {
           onManuell={() => manuellInEinsatz(offenerEinsatz.id)}
           onDateiImport={(datei) => importiereBoegen(offenerEinsatz.id, datei)}
           onExport={() => exportiereEinsatz(offenerEinsatz)}
+          onCsvExport={() => exportiereEinsatzCsv(offenerEinsatz)}
           onSammelPdf={() => sammelPdf(offenerEinsatz)}
           onGeloescht={() => { setOffenerEinsatzId(null); einsaetzeNeuLaden(); setMeldung("Einsatz gelöscht."); }}
         />
@@ -442,7 +455,7 @@ function App() {
   if (!bogen || zeigeStart) {
     return (
       <>
-      <UpdateBanner />
+      <Aktualisierungshinweise />
       <main className="start">
         <h1>Einheiten-Erfassungsbogen</h1>
         <p>
@@ -512,7 +525,7 @@ function App() {
 
   return (
     <>
-    <UpdateBanner />
+    <Aktualisierungshinweise />
     <main>
       <header>
         <button type="button" className="zur-start" onClick={() => setZeigeStart(true)}>

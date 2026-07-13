@@ -10,6 +10,18 @@
       ],
       "port": 5173,
       "autoPort": true
+    },
+    {
+      "name": "eeb-preview",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "run",
+        "preview",
+        "--",
+        "--port",
+        "4173"
+      ],
+      "port": 4173
     }
   ]
 }

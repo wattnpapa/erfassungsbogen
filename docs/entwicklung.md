@@ -22,6 +22,32 @@ Deployment: jeder Push auf `main` baut die Seite und deployt sie auf
 GitHub Pages unter <https://erfassungsbogen.app>
 ([release.yml](../.github/workflows/release.yml)).
 
+### Offline (Service Worker)
+
+Die Web-App ist offline-fähig: ein Service Worker (Workbox über
+[vite-plugin-pwa](https://vite-pwa-org.netlify.app), Konfiguration in
+[vite.config.ts](../vite.config.ts)) precacht beim ersten Besuch die App-Shell
+(HTML/JS/CSS, Icons, manifest; das THW-OV-Verzeichnis steckt im JS-Bundle).
+Danach startet und läuft die Seite ohne Netz — Bogen ausfüllen, PDF und
+QR-Code erzeugen funktionieren rein clientseitig.
+
+- **Nur im Browser.** Registriert wird der SW ausschließlich über `http(s)` und
+  nur, wenn die App nicht nativ läuft (Guard `istNativ()` in
+  [src/app/aktualisierung.tsx](../src/app/aktualisierung.tsx)). In der
+  Capacitor-App (`capacitor://`) und in Electron (`file://`) liegt `sw.js`
+  ungenutzt im Bundle; dort bringen die eigenen Update-Mechanismen die App
+  aktuell.
+- **Updates ohne Aggressiv-Cache.** `registerType: "prompt"` — eine neue Version
+  lädt im Hintergrund und wartet; das Banner „Neue Version verfügbar – Neu laden"
+  aktiviert sie erst auf Klick (kein Auto-Reload, damit ein gerade ausgefüllter
+  Bogen nicht verlorengeht). `cleanupOutdatedCaches` räumt alte Stände weg.
+- **Deep Links bleiben unangetastet.** Die `.well-known`-Dateien
+  (AASA/assetlinks) werden weder precacht noch auf die App-Shell umgeleitet
+  (`navigateFallbackDenylist`), damit Universal/App Links weiter greifen.
+- **Testen.** Der SW greift nur im Produktions-Build, nicht in `npm run dev`.
+  Also `npm run build && npm run preview`, dann in den DevTools „Offline"
+  aktivieren (oder den Server stoppen) und neu laden.
+
 ## Einsatz-Sammlung (Meldekopf)
 
 Fremde Bögen werden lokal unter einem Einsatz/einer Übung gesammelt (Gegenstück
