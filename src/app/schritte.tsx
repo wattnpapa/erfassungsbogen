@@ -11,6 +11,7 @@ import {
   Ernaehrung,
   Fahrzeug,
   Geschlecht,
+  HierarchieEbene,
   Kontakt,
   KontaktArt,
   OrganisationsTyp,
@@ -29,6 +30,7 @@ import {
 import { vorlageAnlegen } from "./vorlagen";
 import type { VokabularEintrag } from "../vokabulare/thw";
 import { THW_ORTSVERBAENDE, type ThwOrtsverband } from "../vokabulare/thw-ov";
+import { THW_OV_REGIONALSTRUKTUR } from "../vokabulare/thw-ov-regionalstruktur";
 import { stanFahrzeugVorbelegung } from "../vokabulare/thw-stan-fahrzeuge";
 import { stanPersonalVorbelegung } from "../vokabulare/thw-stan-personal";
 import {
@@ -232,6 +234,31 @@ function KennzahlenFeld(props: { teile: number[]; aendern: (t: number[]) => void
  * Auswahl übernimmt Kürzel + Kontaktdaten; ein direkt eingetipptes Kürzel
  * ("OODE") wird beim Verlassen des Felds aufgelöst.
  */
+/** Setzt in der Hierarchie die (erste) Ebene mit `code` auf `name`; hängt sie sonst an. */
+function ebeneNameSetzen(hierarchie: HierarchieEbene[], code: number, name: string): HierarchieEbene[] {
+  const idx = hierarchie.findIndex((h) => h.bezeichnung.code === code);
+  if (idx >= 0) return hierarchie.map((h, j) => (j === idx ? { ...h, name } : h));
+  return [...hierarchie, { bezeichnung: { code }, name }];
+}
+
+/**
+ * Übernimmt einen OV in die OV-Zeile `i` (Name + Kontaktdaten) und füllt,
+ * soweit bekannt, Regionalstelle (Ebene 2) und Landesverband (Ebene 3) mit.
+ */
+function ovInHierarchieUebernehmen(hierarchie: HierarchieEbene[], i: number, ov: ThwOrtsverband): HierarchieEbene[] {
+  let neu = hierarchie.map((h, j) =>
+    j === i
+      ? { ...h, name: ov.name, kurz: ov.kurz || undefined, telefon: ov.telefon.replace(/\D/g, "") || undefined, email: ov.email || undefined }
+      : h,
+  );
+  const struktur = THW_OV_REGIONALSTRUKTUR[ov.name];
+  if (struktur) {
+    neu = ebeneNameSetzen(neu, 2, struktur.regionalstelle);
+    neu = ebeneNameSetzen(neu, 3, struktur.landesverband);
+  }
+  return neu;
+}
+
 function OvNamensFeld(props: { name: string; tippen: (name: string) => void; uebernehmen: (ov: ThwOrtsverband) => void }) {
   const { name, tippen, uebernehmen } = props;
   const [offen, setOffen] = useState(false);
@@ -383,15 +410,7 @@ export function SchrittEinheit({ bogen, aendern }: SchrittProps) {
               <OvNamensFeld
                 name={h.name}
                 tippen={(name) => setE({ hierarchie: e.hierarchie.map((x, j) => (j === i ? { ...x, name } : x)) })}
-                uebernehmen={(ov) =>
-                  setE({
-                    hierarchie: e.hierarchie.map((x, j) =>
-                      j === i
-                        ? { ...x, name: ov.name, kurz: ov.kurz || undefined, telefon: ov.telefon.replace(/\D/g, "") || undefined, email: ov.email || undefined }
-                        : x,
-                    ),
-                  })
-                }
+                uebernehmen={(ov) => setE({ hierarchie: ovInHierarchieUebernehmen(e.hierarchie, i, ov) })}
               />
             ) : (
               <input
