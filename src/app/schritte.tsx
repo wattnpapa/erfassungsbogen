@@ -30,7 +30,11 @@ import {
 import { vorlageAnlegen } from "./vorlagen";
 import type { VokabularEintrag } from "../vokabulare/thw";
 import { THW_ORTSVERBAENDE, type ThwOrtsverband } from "../vokabulare/thw-ov";
-import { THW_OV_REGIONALSTRUKTUR } from "../vokabulare/thw-ov-regionalstruktur";
+import {
+  THW_OV_REGIONALSTRUKTUR,
+  THW_REGIONALSTELLEN_KONTAKT,
+  THW_LANDESVERBAENDE_KONTAKT,
+} from "../vokabulare/thw-ov-regionalstruktur";
 import { stanFahrzeugVorbelegung } from "../vokabulare/thw-stan-fahrzeuge";
 import { stanPersonalVorbelegung } from "../vokabulare/thw-stan-personal";
 import {
@@ -243,11 +247,24 @@ function KennzahlenFeld(props: { teile: number[]; aendern: (t: number[]) => void
  * Auswahl übernimmt Kürzel + Kontaktdaten; ein direkt eingetipptes Kürzel
  * ("OODE") wird beim Verlassen des Felds aufgelöst.
  */
-/** Setzt in der Hierarchie die (erste) Ebene mit `code` auf `name`; hängt sie sonst an. */
-function ebeneNameSetzen(hierarchie: HierarchieEbene[], code: number, name: string): HierarchieEbene[] {
+/**
+ * Setzt in der Hierarchie die (erste) Ebene mit `code` auf `name`; hängt sie
+ * sonst an. Übergebene Kontaktfelder (Telefon/E-Mail) werden mitgeschrieben.
+ */
+function ebeneNameSetzen(
+  hierarchie: HierarchieEbene[],
+  code: number,
+  name: string,
+  kontakt?: { telefon?: string; email?: string },
+): HierarchieEbene[] {
+  const felder = {
+    name,
+    ...(kontakt?.telefon ? { telefon: kontakt.telefon } : {}),
+    ...(kontakt?.email ? { email: kontakt.email } : {}),
+  };
   const idx = hierarchie.findIndex((h) => h.bezeichnung.code === code);
-  if (idx >= 0) return hierarchie.map((h, j) => (j === idx ? { ...h, name } : h));
-  return [...hierarchie, { bezeichnung: { code }, name }];
+  if (idx >= 0) return hierarchie.map((h, j) => (j === idx ? { ...h, ...felder } : h));
+  return [...hierarchie, { bezeichnung: { code }, ...felder }];
 }
 
 /**
@@ -262,8 +279,10 @@ function ovInHierarchieUebernehmen(hierarchie: HierarchieEbene[], i: number, ov:
   );
   const struktur = THW_OV_REGIONALSTRUKTUR[ov.name];
   if (struktur) {
-    neu = ebeneNameSetzen(neu, 2, struktur.regionalstelle);
-    neu = ebeneNameSetzen(neu, 3, struktur.landesverband);
+    const rst = THW_REGIONALSTELLEN_KONTAKT[struktur.regionalstelle];
+    const lv = THW_LANDESVERBAENDE_KONTAKT[struktur.landesverband];
+    neu = ebeneNameSetzen(neu, 2, struktur.regionalstelle, rst && { telefon: rst.telefon.replace(/\D/g, ""), email: rst.email });
+    neu = ebeneNameSetzen(neu, 3, struktur.landesverband, lv && { telefon: lv.telefon.replace(/\D/g, ""), email: lv.email });
   }
   return neu;
 }

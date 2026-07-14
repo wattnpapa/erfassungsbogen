@@ -1,9 +1,13 @@
 /**
- * Zuordnung jedes THW-Ortsverbands zu Regionalstelle und Landesverband.
- * Schlüssel ist der OV-Name aus thw-ov.ts (THW_ORTSVERBAENDE[].name).
+ * Zuordnung jedes THW-Ortsverbands zu Regionalstelle und Landesverband sowie
+ * die Kontaktdaten der Regionalstellen und Landesverbände (für das Autofill
+ * der Zugehörigkeit-Ebenen 2/3).
+ * Schlüssel von THW_OV_REGIONALSTRUKTUR ist der OV-Name aus thw-ov.ts
+ * (THW_ORTSVERBAENDE[].name); Schlüssel der Kontakt-Tabellen sind die
+ * Regionalstellen- bzw. Landesverbandsnamen aus THW_OV_REGIONALSTRUKTUR.
  *
  * GENERIERT — nicht von Hand bearbeiten.
- * Quelle: https://thwiki.org/api.php (THWiki), abgerufen 2026-07-13.
+ * Quelle: https://thwiki.org/api.php (THWiki), abgerufen 2026-07-14.
  * Neu erzeugen mit:  node scripts/ov-regionalstruktur-generieren.mjs
  */
 
@@ -12,6 +16,14 @@ export interface OvRegionalstruktur {
   regionalstelle: string;
   /** Landesverband (THW-Bezeichnung, ggf. Ländergruppe), z. B. "Bremen, Niedersachsen". */
   landesverband: string;
+}
+
+/** Kontaktdaten einer Regionalstelle oder eines Landesverbands. */
+export interface StelleKontakt {
+  /** Telefon in nationaler Schreibweise, z. B. "0241 920322-0". */
+  telefon: string;
+  /** Poststellen-E-Mail, z. B. "Poststelle.RSt_Aachen@thw.de". */
+  email: string;
 }
 
 export const THW_OV_REGIONALSTRUKTUR: Record<string, OvRegionalstruktur> = {
@@ -684,4 +696,86 @@ export const THW_OV_REGIONALSTRUKTUR: Record<string, OvRegionalstruktur> = {
   "Zittau": { regionalstelle: "Dresden", landesverband: "Sachsen, Thüringen" },
   "Zweibrücken": { regionalstelle: "Neustadt a.d.W.", landesverband: "Hessen, Rheinland-Pfalz, Saarland" },
   "Zwickau": { regionalstelle: "Chemnitz", landesverband: "Sachsen, Thüringen" },
+};
+
+/** Regionalstellenname → Kontaktdaten. */
+export const THW_REGIONALSTELLEN_KONTAKT: Record<string, StelleKontakt> = {
+  "Aachen": { telefon: "0241 920322-0", email: "Poststelle.RSt_Aachen@thw.de" },
+  "Arnsberg": { telefon: "02931 9609-0", email: "Poststelle.RSt_Arnsberg@thw.de" },
+  "Bad Kreuznach": { telefon: "0671 483546 0", email: "Poststelle.RSt_Bad-Kreuznach@thw.de" },
+  "Bad Tölz": { telefon: "08041 79246-0", email: "Poststelle.RSt_Bad-Toelz@thw.de" },
+  "Bamberg": { telefon: "09544 98604-0", email: "Poststelle.RSt_Bamberg@thw.de" },
+  "Berlin": { telefon: "030 6341467-0", email: "Poststelle.RSt_Berlin@thw.de" },
+  "Biberach": { telefon: "0228 9945221-0", email: "Poststelle.RSt_Biberach@thw.de" },
+  "Bielefeld": { telefon: "0521 915135-0", email: "Poststelle.RSt_Bielefeld@thw.de" },
+  "Bochum": { telefon: "0234 610289-0", email: "Poststelle.RSt_Bochum@thw.de" },
+  "Braunschweig": { telefon: "0531 288770-0", email: "Poststelle.RSt_Braunschweig@thw.de" },
+  "Bremen": { telefon: "0421 6436230-0", email: "Poststelle.RSt_Bremen@thw.de" },
+  "Buxtehude": { telefon: "04161 74960-0", email: "Poststelle.RSt_Buxtehude@thw.de" },
+  "Chemnitz": { telefon: "0371 356359 0", email: "Poststelle.Rst_Chemnitz@thw.de" },
+  "Darmstadt": { telefon: "06151 30875 0", email: "Poststelle.RSt_Darmstadt@thw.de" },
+  "Dortmund": { telefon: "0231 534255-0", email: "Poststelle.RSt_Dortmund@thw.de" },
+  "Dresden": { telefon: "0351 563492 0", email: "Poststelle.Rst_Dresden@thw.de" },
+  "Düsseldorf": { telefon: "02103 79105-0", email: "Poststelle.RSt_Duesseldorf@thw.de" },
+  "Erfurt": { telefon: "0361 601479 0", email: "Poststelle.RSt_Erfurt@thw.de" },
+  "Frankfurt (Oder)": { telefon: "0335 284683-0", email: "Poststelle.Rst_Frankfurt_O@thw.de" },
+  "Frankfurt am Main": { telefon: "069 7137688 0", email: "Poststelle.RSt_Frankfurt_M@thw.de" },
+  "Freiburg": { telefon: "0761 503907-0", email: "Poststelle.RSt_Freiburg@thw.de" },
+  "Gelnhausen": { telefon: "06051 91444-0", email: "Poststelle.RSt_Gelnhausen@thw.de" },
+  "Gelsenkirchen": { telefon: "0209 386467-0", email: "Poststelle.RSt_Gelsenkirchen@thw.de" },
+  "Gießen": { telefon: "06403 97706-0", email: "Poststelle.RSt_Giessen@thw.de" },
+  "Göppingen": { telefon: "0228 9945223-0", email: "Poststelle.RSt_Goeppingen@thw.de" },
+  "Göttingen": { telefon: "0551 900336-0", email: "Poststelle.RSt_Goettingen@thw.de" },
+  "Halle": { telefon: "0345 131613 0", email: "Poststelle.Rst_Halle_Sa@thw.de" },
+  "Hamburg": { telefon: "040 5009109-0", email: "Poststelle.RSt_Hamburg@thw.de" },
+  "Hannover": { telefon: "0511 6766988-0", email: "Poststelle.RSt_Hannover@thw.de" },
+  "Heilbronn": { telefon: "07131 64475-0", email: "Poststelle.RSt_Heilbronn@thw.de" },
+  "Hof": { telefon: "09281 14495-0", email: "Poststelle.RSt_Hof@thw.de" },
+  "Homberg": { telefon: "05681 93117-0", email: "Poststelle.RSt_Homberg@thw.de" },
+  "Ingolstadt": { telefon: "0228 9945324-0", email: "Poststelle.RSt_Ingolstadt@thw.de" },
+  "Karlsruhe": { telefon: "0721 824875-0", email: "Poststelle.RSt_Karlsruhe@thw.de" },
+  "Karlstadt": { telefon: "09353 98482-0", email: "Poststelle.RSt_Karlstadt@thw.de" },
+  "Kempten": { telefon: "0831 540749-0", email: "Poststelle.RSt_Kempten@thw.de" },
+  "Koblenz": { telefon: "0261 889967-0", email: "Poststelle.RSt_Koblenz@thw.de" },
+  "Köln": { telefon: "02203 98885-0", email: "Poststelle.RSt_Koeln@thw.de" },
+  "Leipzig": { telefon: "0228 9945824 0", email: "Poststelle.RSt_Leipzig@thw.de" },
+  "Lingen": { telefon: "0591 800379-0", email: "Poststelle.RSt_Lingen@thw.de" },
+  "Lübeck": { telefon: "0451 486697 0", email: "Poststelle.RSt_Luebeck@thw.de" },
+  "Magdeburg": { telefon: "0391 611989 0", email: "Poststelle.RSt_Magdeburg@thw.de" },
+  "Mannheim": { telefon: "0621 484009-0", email: "Poststelle.RSt_Mannheim@thw.de" },
+  "Merzig": { telefon: "06861 91139-0", email: "Poststelle.RSt_Merzig@thw.de" },
+  "Mönchengladbach": { telefon: "02161 47764-0", email: "Poststelle.RSt_Moenchengladbach@thw.de" },
+  "Mühldorf": { telefon: "08631 18620-0", email: "Poststelle.RSt_Muehldorf@thw.de" },
+  "München": { telefon: "089 630216-0", email: "Poststelle.RSt_Muenchen@thw.de" },
+  "Münster": { telefon: "0228 9945530-0", email: "Poststelle.Rst_Muenster@thw.de" },
+  "Neumünster": { telefon: "04321 85134 0", email: "Poststelle.RSt_Neumuenster@thw.de" },
+  "Neustadt a.d.W.": { telefon: "06321 48411-0", email: "Poststelle.RSt_Neustadt_w@thw.de" },
+  "Nürnberg": { telefon: "0911 965334-0", email: "Poststelle.RSt_Nuernberg@thw.de" },
+  "Oldenburg": { telefon: "0441 212141-0", email: "Poststelle.RSt_Oldenburg@thw.de" },
+  "Olpe": { telefon: "0228 9945531-0", email: "Poststelle.RSt_Olpe@thw.de" },
+  "Potsdam": { telefon: "03329 69607-0", email: "Poststelle.RSt_Potsdam@thw.de" },
+  "Saarbrücken": { telefon: "0681 50082-0", email: "Poststelle.RSt_Saarbruecken@thw.de" },
+  "Schleswig": { telefon: "04621 30500-0", email: "Poststelle.RSt_Schleswig@thw.de" },
+  "Schwandorf": { telefon: "09431 38596-0", email: "Poststelle.RSt_Schwandorf@thw.de" },
+  "Schwerin": { telefon: "0385 305196-0", email: "Poststelle.RSt_Schwerin@thw.de" },
+  "Stralsund": { telefon: "03831 28211-0", email: "Poststelle.RSt_Stralsund@thw.de" },
+  "Straubing": { telefon: "09421 96341-0", email: "Poststelle.RSt_Straubing@thw.de" },
+  "Stuttgart": { telefon: "0711 849608-0", email: "Poststelle.RSt_Stuttgart@thw.de" },
+  "Trier": { telefon: "0651 824980-0", email: "Poststelle.RSt_Trier@thw.de" },
+  "Tübingen": { telefon: "07071 9135-0", email: "Poststelle.RSt_Tuebingen@thw.de" },
+  "Verden": { telefon: "04231 93763-0", email: "Poststelle.RSt_Verden@thw.de" },
+  "Villingen-Schwenningen": { telefon: "07721 20289-0", email: "Poststelle.RSt_Vschwenningen@thw.de" },
+  "Wesel": { telefon: "0281 319284-0", email: "Poststelle.RSt_Wesel@thw.de" },
+};
+
+/** Landesverbandsname → Kontaktdaten. */
+export const THW_LANDESVERBAENDE_KONTAKT: Record<string, StelleKontakt> = {
+  "Baden-Württemberg": { telefon: "0711 95555-0", email: "Poststelle.LVBW@thw.de" },
+  "Bayern": { telefon: "0228 994531-0", email: "Poststelle.LVBY@thw.de" },
+  "Berlin, Brandenburg, Sachsen-Anhalt": { telefon: "030 30682 0", email: "Poststelle.LVBEBBST@thw.de" },
+  "Bremen, Niedersachsen": { telefon: "0511 33690-0", email: "Poststelle.LVHBNI@thw.de" },
+  "Hamburg, Mecklenburg-Vorpommern, Schleswig-Holstein": { telefon: "0431 57933-0", email: "Poststelle.LVHHMVSH@thw.de" },
+  "Hessen, Rheinland-Pfalz, Saarland": { telefon: "06131 9297 0", email: "Poststelle.LVHERPSL@thw.de" },
+  "Nordrhein-Westfalen": { telefon: "02103 7910-0", email: "Poststelle.LVNW@thw.de" },
+  "Sachsen, Thüringen": { telefon: "03447 5684-0", email: "Poststelle.LVSNTH@thw.de" },
 };
