@@ -1,7 +1,11 @@
 /**
  * Erzeugt 100 Beispiel-Erfassungsbögen von THW-Einheiten aus ganz Deutschland
- * als PDF nach examples/ (bewusst NUR die PDFs — das maschinenlesbare JSON
- * steckt bereits in der PDF eingebettet).
+ * als PDF nach examples/thw/ (bewusst NUR die PDFs — das maschinenlesbare JSON
+ * steckt bereits in der PDF eingebettet). examples/ ist je Hilfsorganisation
+ * in Unterordner gegliedert; der Beispielbögen-Dialog im Footer
+ * (src/app/fusszeile.tsx) liest die Ordnerstruktur per Glob und bietet zuerst
+ * die Organisation an. Weitere Organisationen bekommen eigene Unterordner
+ * (und perspektivisch eigene Generatoren).
  *
  * Aufruf (Node ≥ 22): npm run beispiele
  *
@@ -23,7 +27,7 @@
  *    (PKW 21-24, MTW 25-28, MzKW 54).
  *
  * Am Ende läuft eine Selbstprüfung (Verteilung, Funkrufnamen-Regeln,
- * QR-Roundtrip); examples/README.md bekommt eine Übersichtstabelle.
+ * QR-Roundtrip); examples/thw/README.md bekommt eine Übersichtstabelle.
  */
 
 import { mkdirSync, readdirSync, rmSync, writeFileSync } from "node:fs";
@@ -950,7 +954,8 @@ const beispiele = [
 
 pruefen(beispiele, STAN_TREU);
 
-const ausgabe = join(wurzel, "examples");
+// Ausgabe in den Organisations-Unterordner — dieser Generator erzeugt THW-Bögen.
+const ausgabe = join(wurzel, "examples", "thw");
 mkdirSync(ausgabe, { recursive: true });
 // Alte Beispiel-PDFs entfernen (qr-demo-Ausgaben .png/.svg bleiben unberührt).
 for (const datei of readdirSync(ausgabe)) {
@@ -993,6 +998,6 @@ ${zeilen.join("\n")}
 
 const jeLv = new Map<string, number>();
 for (const b of beispiele) jeLv.set(b.landesverband, (jeLv.get(b.landesverband) ?? 0) + 1);
-console.log(`\nFertig: ${beispiele.length} Beispiel-PDFs in examples/ (+ README.md)`);
+console.log(`\nFertig: ${beispiele.length} Beispiel-PDFs in examples/thw/ (+ README.md)`);
 console.log(`StAN-treu: ${beispiele.filter((b) => b.abweichung === "—").length}, mit Abweichung: ${beispiele.filter((b) => b.abweichung !== "—").length}, segmentierte QR: ${segmentierte}`);
 for (const [lv, n] of [...jeLv.entries()].sort()) console.log(`  ${lv}: ${n}`);

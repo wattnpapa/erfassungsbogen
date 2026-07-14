@@ -3,19 +3,44 @@
  * Aufbau angelehnt an sprechfunk-uebung.de (gleicher Autor).
  */
 
-import { useRef, type MouseEvent, type ReactNode, type RefObject } from "react";
+import { useRef, useState, type MouseEvent, type ReactNode, type RefObject } from "react";
 import { istNativ, pdfTeilen } from "./nativ";
 
 const KONTAKT = "johannes.rudolph@thw-oldenburg.de";
 const REPO = "https://github.com/wattnpapa/erfassungsbogen";
 
-// Beispiel-PDFs aus examples/ — der Glob wird beim Build aufgelöst, neue
-// Dateien im Ordner erscheinen also automatisch ohne Codeänderung.
+// Anzeigenamen für die Organisations-Unterordner in examples/. Unbekannte
+// Ordner erscheinen mit ihrem Ordnernamen in Großbuchstaben, damit neue
+// Organisationen auch ohne Eintrag hier sichtbar bleiben.
+const ORG_ORDNER_LABEL: Record<string, string> = {
+  thw: "THW",
+  feuerwehr: "Feuerwehr",
+  polizei: "Polizei",
+  bundespolizei: "Bundespolizei",
+  drk: "DRK",
+  juh: "Johanniter (JUH)",
+  mhd: "Malteser (MHD)",
+  asb: "ASB",
+  dlrg: "DLRG",
+  bundeswehr: "Bundeswehr",
+  rettungsdienst: "Rettungsdienst",
+};
+
+// Beispiel-PDFs aus examples/<organisation>/ — der Glob wird beim Build
+// aufgelöst, neue Dateien und Organisations-Ordner erscheinen also automatisch
+// ohne Codeänderung (erzeugt von scripts/beispielboegen-pdf.mts).
 const BEISPIELE = Object.entries(
-  import.meta.glob("../../examples/*.pdf", { eager: true, query: "?url", import: "default" }),
+  import.meta.glob("../../examples/*/*.pdf", { eager: true, query: "?url", import: "default" }),
 )
-  .map(([pfad, url]) => ({ datei: pfad.split("/").pop()!, url: url as string }))
+  .map(([pfad, url]) => {
+    const teile = pfad.split("/");
+    return { ordner: teile[teile.length - 2]!, datei: teile[teile.length - 1]!, url: url as string };
+  })
   .sort((a, b) => a.datei.localeCompare(b.datei, "de"));
+
+const ORGANISATIONEN = [...new Set(BEISPIELE.map((b) => b.ordner))]
+  .map((ordner) => ({ ordner, label: ORG_ORDNER_LABEL[ordner] ?? ordner.toUpperCase() }))
+  .sort((a, b) => a.label.localeCompare(b.label, "de"));
 
 /** Nativ gibt es keinen Browser-Download: PDF laden und übers Share-Sheet anbieten. */
 async function beispielTeilen(e: MouseEvent, datei: string, url: string): Promise<void> {
@@ -52,6 +77,8 @@ export function Fusszeile() {
   const impressum = useRef<HTMLDialogElement>(null);
   const datenschutz = useRef<HTMLDialogElement>(null);
   const beispiele = useRef<HTMLDialogElement>(null);
+  // Zweistufige Auswahl im Beispielbögen-Dialog: erst Organisation, dann Bogen.
+  const [beispielOrg, setBeispielOrg] = useState<string | null>(null);
 
   return (
     <footer className="seite">
@@ -60,7 +87,15 @@ export function Fusszeile() {
         <button className="link" onClick={() => ueber.current?.showModal()}>Johannes Rudolph</button>
       </span>
       <span className="fusslinks">
-        <button className="link" onClick={() => beispiele.current?.showModal()}>Beispielbögen</button>
+        <button
+          className="link"
+          onClick={() => {
+            setBeispielOrg(null); // beim Öffnen wieder mit der Organisationswahl starten
+            beispiele.current?.showModal();
+          }}
+        >
+          Beispielbögen
+        </button>
         <button className="link" onClick={() => impressum.current?.showModal()}>Impressum</button>
         <button className="link" onClick={() => datenschutz.current?.showModal()}>Datenschutz</button>
         <a href={`mailto:${KONTAKT}`}>Kontakt</a>
@@ -73,15 +108,38 @@ export function Fusszeile() {
           zum Ansehen, für Übungen oder zum Testen des QR-Imports. Die eingebetteten
           QR-Codes lassen sich direkt mit der App scannen.
         </p>
-        <ul>
-          {BEISPIELE.map(({ datei, url }) => (
-            <li key={datei}>
-              <a href={url} download={datei} onClick={(e) => void beispielTeilen(e, datei, url)}>
-                {datei}
-              </a>
-            </li>
-          ))}
-        </ul>
+        {beispielOrg == null ? (
+          <>
+            <p><strong>Organisation wählen:</strong></p>
+            <ul>
+              {ORGANISATIONEN.map(({ ordner, label }) => (
+                <li key={ordner}>
+                  <button className="link" onClick={() => setBeispielOrg(ordner)}>
+                    {label} ({BEISPIELE.filter((b) => b.ordner === ordner).length} Bögen)
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </>
+        ) : (
+          <>
+            <p>
+              <button className="link" onClick={() => setBeispielOrg(null)}>
+                ← Andere Organisation
+              </button>
+            </p>
+            <p><strong>{ORG_ORDNER_LABEL[beispielOrg] ?? beispielOrg.toUpperCase()}</strong></p>
+            <ul>
+              {BEISPIELE.filter((b) => b.ordner === beispielOrg).map(({ datei, url }) => (
+                <li key={datei}>
+                  <a href={url} download={datei} onClick={(e) => void beispielTeilen(e, datei, url)}>
+                    {datei}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </>
+        )}
       </Dialog>
 
       <Dialog titel="Über dieses Projekt" dialogRef={ueber}>
