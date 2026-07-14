@@ -49,8 +49,15 @@ const GRAU = "#e8e8e8";
  */
 const QR_BREITE = 150;
 
-/** Kantenlänge je QR-Bild bei Segmentierung (mehrere Codes nebeneinander). */
-const QR_SEGMENT_BREITE = 120;
+/**
+ * Kantenlänge je QR-Bild bei Segmentierung. Bewusst groß (≈ 8 cm) und pro Seite
+ * nur ZWEI Codes, diagonal versetzt (oben links / unten rechts): Liegen mehrere
+ * Codes dicht beieinander, geraten beim Anvisieren eines Codes immer Nachbarn
+ * mit ins Kamerabild und die Erkennung springt zwischen ihnen. Der Diagonal-
+ * abstand (~15 cm) stellt sicher, dass formatfüllend immer nur ein Code im
+ * Sucher ist — ohne die anderen abdecken zu müssen.
+ */
+const QR_SEGMENT_BREITE = 230;
 
 /** Dateiname der eingebetteten Maschinen-Daten (analog factur-x.xml bei ZUGFeRD). */
 export const EEB_JSON_DATEINAME = "erfassungsbogen.json";
@@ -136,8 +143,10 @@ export function einsatzPdfDokument(
 
 /**
  * QR-Block der letzten Seite. Ein Teil = wie bisher (Bild + antippbarer Link).
- * Mehrere Teile (Segmentierung) = QR-Bilder nebeneinander mit „Teil x / n"; ein
- * Öffnen-Link entfällt, da jeder Teil nur einen Abschnitt trägt.
+ * Mehrere Teile (Segmentierung) = eigene QR-Seiten mit je zwei diagonal
+ * versetzten Codes „Teil x / n" (Kamera sieht immer nur einen Code, siehe
+ * QR_SEGMENT_BREITE); ein Öffnen-Link entfällt, da jeder Teil nur einen
+ * Abschnitt trägt.
  */
 function qrBlock(qr: QrSatz): Content {
   const kopf = (text: string): Content => ({ text, bold: true, fontSize: 13, color: BLAU, alignment: "center" });
@@ -170,27 +179,45 @@ function qrBlock(qr: QrSatz): Content {
     };
   }
   const anzahl = qr.teile.length;
-  const spalten: Content[] = qr.teile.map((t) => ({
-    width: "auto",
+  // Pro Seite zwei Teile, diagonal versetzt (siehe QR_SEGMENT_BREITE). Jede
+  // QR-Seite beginnt auf einer frischen Seite, damit kein Formularrest die
+  // Diagonale zusammenstaucht.
+  const teilZelle = (t: QrSatz["teile"][number]): Content => ({
     stack: [
       { text: `Teil ${t.teilNr} / ${anzahl}`, bold: true, alignment: "center", color: BLAU },
-      { image: t.datenUrl, width: QR_SEGMENT_BREITE, alignment: "center", margin: [0, 4, 0, 0] },
+      { image: t.datenUrl, width: QR_SEGMENT_BREITE, margin: [0, 4, 0, 0] },
     ],
-  }));
-  return {
-    unbreakable: true,
-    margin: [0, 14, 0, 0],
-    stack: [
+  });
+  const hinweis = (): Content => ({
+    text:
+      `Format EEB2 · ${qr.zeichen} Zeichen · in ${anzahl} QR-Codes aufgeteilt (je ≤ Version ${qr.version}, Fehlerkorrektur M)\n` +
+      `Alle ${anzahl} Teile nacheinander mit der Kamera scannen — die App setzt den Bogen zusammen.\n` +
+      `Beim Scannen jeweils nur einen Code ins Kamerabild nehmen.`,
+    alignment: "center",
+    fontSize: 8,
+    margin: [0, 12, 0, 0],
+  });
+  const seiten: Content[] = [];
+  for (let i = 0; i < qr.teile.length; i += 2) {
+    const links = qr.teile[i]!;
+    const rechts = qr.teile[i + 1];
+    const stack: Content[] = [
       kopf(`Digitaler Bogen als QR-Code (${anzahl} Teile)`),
-      { columns: spalten, columnGap: 16, alignment: "center", margin: [0, 8, 0, 0] },
-      {
-        text: `Format EEB2 · ${qr.zeichen} Zeichen · in ${anzahl} QR-Codes aufgeteilt (je ≤ Version ${qr.version}, Fehlerkorrektur M)\nAlle ${anzahl} Teile nacheinander mit der Kamera scannen — die App setzt den Bogen zusammen.`,
-        alignment: "center",
-        fontSize: 8,
-        margin: [0, 6, 0, 0],
-      },
-    ],
-  };
+      // Erster Code oben links …
+      { columns: [{ width: "auto", stack: [teilZelle(links)] }], margin: [0, 10, 0, 0] },
+    ];
+    if (rechts) {
+      // … zweiter Code unten rechts (Leerspalte schiebt ihn an den Rand,
+      // der obere Rand erzeugt den vertikalen Diagonalabstand).
+      stack.push({
+        columns: [{ width: "*", text: "" }, { width: "auto", stack: [teilZelle(rechts)] }],
+        margin: [0, 150, 0, 0],
+      });
+    }
+    stack.push(hinweis());
+    seiten.push({ stack, pageBreak: "before" });
+  }
+  return { stack: seiten };
 }
 
 /** Bogen + fertiger QR-Satz → pdfmake-DocDefinition (Papier-Layout). */

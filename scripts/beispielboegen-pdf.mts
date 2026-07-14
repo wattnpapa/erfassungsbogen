@@ -24,6 +24,7 @@ import { mkdirSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 import pdfmake from "pdfmake";
+import QRCode from "qrcode";
 import {
   Erfassungsbogen,
   Ernaehrung as E,
@@ -40,7 +41,15 @@ import {
   datumAusIso,
   staerke,
 } from "../src/model";
-import { bogenZuQrPng } from "../src/qr-node";
+import { nodeKompressor } from "../src/qr-node";
+import {
+  EEB_URL_PREFIX,
+  QR_EINZEL_MAX_VERSION,
+  QR_SEGMENT_ZIEL_VERSION,
+  base64UrlKodieren,
+  encodePayload,
+  segmentPayloadUrls,
+} from "../src/codec";
 import { pdfDokument } from "../src/app/pdf-dokument";
 import type { QrSatz } from "../src/app/hilfen";
 
@@ -125,6 +134,75 @@ const OV_KL = ov(
   { name: "Rheinland-Pfalz, Saarland", tel: "06131974640", mail: "poststelle.lvrps@thw.de" },
 );
 const OVE = [OV_OL, OV_KL];
+
+// ----------------------------------------------- Stress-Test: sehr großer Bogen
+// Bewusst überfüllte Einheit (Vollzug + Verstärkung), damit der Payload NICHT
+// mehr in einen einzelnen QR-Code passt und die App-Segmentierung greift. Die
+// Helfer werden aus Namenspools erzeugt und mit reichlich Freitext (Kontakte,
+// Qualifikationen) versehen — das treibt die Datenmenge über das QR-Budget.
+const VORNAMEN = [
+  "Alexander", "Benedikt", "Christoph", "Dominik", "Emil", "Fabian", "Gregor",
+  "Hendrik", "Ingo", "Jakob", "Konstantin", "Leopold", "Maximilian", "Nikolas",
+  "Ottokar", "Philipp", "Quirin", "Raphael", "Sebastian", "Theodor", "Valentin",
+  "Wilhelm", "Annika", "Bettina", "Charlotte", "Dorothea", "Elisabeth",
+  "Franziska", "Gabriele", "Henrike", "Isabella", "Josephine", "Katharina",
+  "Leonore", "Magdalena", "Natalie", "Ottilie", "Philippa",
+];
+const NACHNAMEN = [
+  "Achenbach", "Baumgartner", "Christiansen", "Dietrichkeit", "Ehrenberg",
+  "Falkenhagen", "Grünewald", "Hillebrand", "Immenhausen", "Jägersberg",
+  "Kirchhoff", "Lindenberg", "Muckenfuß", "Nachtigall", "Oberländer",
+  "Pappenheim", "Quintenz", "Rosenkranz", "Sternberg", "Trautvetter",
+  "Uhlenbrock", "Vollenweider", "Wackernagel", "Xylander", "Zähringer",
+  "Angermüller", "Brömmelkamp", "Cranachhausen", "Düsterhöft", "Engelbrechten",
+  "Fürstenwalde", "Gerstenkorn", "Habermehl", "Ickelsheimer", "Jungmichel",
+  "Kettenhofen", "Lämmerhirt", "Mohrenschildt",
+];
+const QUALI_POOL = [
+  "Rettungssanitäter (extern)",
+  "Motorsägenschein AS Baum I + II (extern)",
+  "Kettensägenführer Modul C/D (extern)",
+  "Baggerführer bis 8 t inkl. Anbaugeräte (Beruf)",
+  "Elektrofachkraft für festgelegte Tätigkeiten (Beruf)",
+  "Atemschutzgeräteträger G26.3, jährlich belehrt",
+  "Sprechfunker BOS-Digitalfunk, Netzknoten Rheinland-Pfalz",
+  "Höhenrettung / Absturzsicherung (Fachgruppe Höhenrettung)",
+];
+
+function grossbogenPersonal(): Person[] {
+  const leute: Person[] = [];
+  // Führung
+  leute.push(P("Reinhardt", "Fürstenwalde", R.FUEHRER, [V(1)], FE.CE, G.M, {
+    mobil: "01701230001", mail: true,
+    quali: ["Zugführer-Lehrgang THW-Bundesschule", "Berufsfeuerwehr Gruppenführer (Beruf)"],
+  }));
+  leute.push(P("Cornelia", "Rosenkranz", R.UNTERFUEHRER, [V(2)], FE.C, G.W, {
+    mobil: "01701230002", mail: true, zf: [V(30)],
+    quali: ["Fachberater THW", "Einsatzstellenhygiene (extern)"],
+  }));
+  // 4 Gruppen à Gruppenführer + Truppführer + 7 Helfer = 36 Personen
+  const funktionen: VokabularWert[][] = [[V(3)], [V(4)], ...Array(7).fill([V(5)])];
+  const zusatz = [V(30), V(31), V(32), V(36), V(38), V(41), V(49), V(51), V(67)];
+  const fahr = [FE.CE, FE.C, FE.C, FE.B, FE.B, FE.NONE, FE.NONE, FE.NONE, FE.NONE];
+  const ern = [E.FLEISCH, E.FLEISCH, E.VEGETARISCH, E.FLEISCH, E.VEGAN, E.FLEISCH, E.VEGETARISCH, E.FLEISCH, E.VEGAN];
+  let n = 0;
+  for (let g = 0; g < 5; g++) {
+    for (let i = 0; i < funktionen.length; i++) {
+      const vorname = VORNAMEN[n % VORNAMEN.length]!;
+      const nachname = NACHNAMEN[(n * 7) % NACHNAMEN.length]!;
+      const geschlecht = n % 5 === 0 ? G.W : G.M;
+      leute.push(P(vorname, nachname, i < 2 ? R.UNTERFUEHRER : R.MANNSCHAFT, funktionen[i]!, fahr[i]!, geschlecht, {
+        mobil: `017012${String(30010 + n).padStart(5, "0")}`,
+        mail: i < 2,
+        zf: [zusatz[n % zusatz.length]!, zusatz[(n + 3) % zusatz.length]!],
+        ernaehrung: ern[n % ern.length],
+        quali: [QUALI_POOL[n % QUALI_POOL.length]!, QUALI_POOL[(n + 4) % QUALI_POOL.length]!],
+      }));
+      n++;
+    }
+  }
+  return leute;
+}
 
 // -------------------------------------------------------- Beispiel-Definitionen
 
@@ -359,6 +437,55 @@ const beispiele: Beispiel[] = [
       sonstiges: "Kann bis zu 250 Portionen/Ausgabe leisten. Anlieferung Frischware am ersten Tag erforderlich.",
     },
   },
+
+  // ---- STRESS-TEST: Verstärkter Bergungszug (übergroßer Bogen, QR-Segmentierung)
+  // Bewusst überfüllt: 38 Helfer mit Kontakten/Qualifikationen, 10 Fahrzeuge und
+  // lange Freitexte sprengen das QR-Budget eines einzelnen Codes → die App teilt
+  // den Payload auf mehrere QR-Teile auf. Zum Ausprobieren des Scan-Sammelns.
+  {
+    datei: "grossbogen-verstaerkter-bergungszug",
+    ort: 0,
+    bogen: {
+      stand: datumAusIso("2026-06-20"),
+      einheit: { einheitsTyp: V(18) },
+      einsatz: {
+        zeitraumVon: datumAusIso("2026-06-20"),
+        zeitraumBis: datumAusIso("2026-06-27"),
+        ortAuftrag:
+          "Großschadenslage nach Starkregen und Hangrutsch im Landkreis Oldenburg — " +
+          "Verstärkter Bergungszug mit Schwerer Bergung: Menschenrettung aus verschütteten " +
+          "Gebäuden, Abstützen einsturzgefährdeter Bauwerke, Beräumung der Zufahrtswege, " +
+          "Aufbau einer Bereitstellungsraum-Struktur für nachrückende Kräfte.",
+      },
+      personalErfassung: PersonalErfassung.VOLLSTAENDIG,
+      personal: grossbogenPersonal(),
+      fahrzeuge: [
+        { typ: V(2), thwKennzeichen: 84100, funkrufname: FR([21, 11]), stanKonform: true },
+        { typ: V(4), thwKennzeichen: 84101, funkrufname: FR([22, 12]), stanKonform: true },
+        { typ: V(4), thwKennzeichen: 84102, funkrufname: FR([22, 22]), stanKonform: true },
+        { typ: V(6), thwKennzeichen: 84103, funkrufname: FR([25, 51]), stanKonform: true, aenderungen: "MLW IV mit Zusatzbeladung Abstützsystem Holz" },
+        { typ: V(7), thwKennzeichen: 84104, funkrufname: FR([23, 51]), stanKonform: true },
+        { typ: V(16), kennzeichenFreitext: "Kettenbagger 8 t (Mietgerät)", funkrufname: FR([23, 61]), stanKonform: false, aenderungen: "Ersatzgerät, nicht STAN-konform — Tiltrotator + Abbruchgreifer" },
+        { typ: V(8), thwKennzeichen: 84105, funkrufname: FR([29, 11]), stanKonform: true, aenderungen: "LKW Ladebordwand für Materialtransport Schwere Bergung" },
+        { typ: V(45), thwKennzeichen: 84106, stanKonform: true, aenderungen: "Tieflader für Bagger" },
+        { typ: V(47), thwKennzeichen: 84107, stanKonform: true, aenderungen: "NEA 50 kVA für Baustellenbeleuchtung" },
+        { typ: V(43), thwKennzeichen: 84108, stanKonform: true, aenderungen: "Anhänger Plane/Spriegel mit Verpflegungs- und Sanitätsausstattung" },
+      ],
+      sofortbedarf: {
+        verpflegungPersonen: 38,
+        dieselLiter: 600,
+        benzinLiter: 80,
+        gemischLiter: 20,
+        unterbringung: true,
+        ruhezeitErforderlich: true,
+      },
+      sonstiges:
+        "Einsatz mehrschichtig über mindestens sieben Tage geplant. Ablösung nach je 12 h " +
+        "erforderlich, zweite Schicht wird nachgeführt. Unterbringung in Turnhalle organisiert, " +
+        "Feldküche der FGr Log-V angefragt. Schwere Bergung benötigt zusätzlich Rüstholz, " +
+        "Baustützen und Abbruchhämmer — Nachforderung über die Regionalstelle läuft.",
+    },
+  },
 ];
 
 // ---------------------------------------------------------------- PDF-Rendering
@@ -378,11 +505,63 @@ pdfmake.setUrlAccessPolicy((url: string) => url.startsWith("data:"));
 // Lokaler Zugriff nur auf die mitgelieferten Schriftdateien.
 pdfmake.setLocalAccessPolicy((pfad: string) => pfad.startsWith(robotoDir));
 
-// Die Beispielbögen sind klein und passen in einen QR-Code (ein Teil).
+// Spiegelt die App-Logik (src/app/hilfen.ts qrErzeugen) mit dem Node-Kompressor:
+// Passt der Bogen in einen einzelnen QR-Code (≤ QR_EINZEL_MAX_VERSION, ECC M),
+// bleibt es bei einem Teil; sonst wird der Payload auf so viele Teile aufgeteilt,
+// dass jeder auf die gröbere QR_SEGMENT_ZIEL_VERSION kommt — grobe, gut scannbare
+// Codes (Segmentierung, siehe docs/datenmodell.md).
+const QR_OPTIONEN = { errorCorrectionLevel: "M" as const };
+
+function qrVersion(url: string): number {
+  try {
+    return QRCode.create(url, QR_OPTIONEN).version;
+  } catch {
+    return Infinity;
+  }
+}
+
+async function pngDatenUrl(url: string): Promise<string> {
+  const png = await QRCode.toBuffer(url, { ...QR_OPTIONEN, type: "png", width: 520 });
+  return `data:image/png;base64,${png.toString("base64")}`;
+}
+
 async function qrInfo(b: Erfassungsbogen): Promise<QrSatz> {
-  const { png, url, version } = await bogenZuQrPng(b, 520);
-  const datenUrl = `data:image/png;base64,${png.toString("base64")}`;
-  return { teile: [{ datenUrl, url, teilNr: 1, anzahl: 1, version }], segmentiert: false, zeichen: url.length, version };
+  const payload = encodePayload(b, nodeKompressor);
+  const url = EEB_URL_PREFIX + base64UrlKodieren(payload);
+  const einzelVersion = qrVersion(url);
+  if (einzelVersion <= QR_EINZEL_MAX_VERSION) {
+    const datenUrl = await pngDatenUrl(url);
+    return {
+      teile: [{ datenUrl, url, teilNr: 1, anzahl: 1, version: einzelVersion }],
+      segmentiert: false,
+      zeichen: url.length,
+      version: einzelVersion,
+    };
+  }
+
+  // Zu groß: kleinste Teilzahl suchen, bei der jeder Teil auf die gröbere
+  // Segment-Zielversion kommt (grobe Codes = zuverlässig scannbar).
+  const maxTeile = Math.min(20, payload.length);
+  let urls = segmentPayloadUrls(payload, Math.min(2, maxTeile));
+  for (let anzahl = 2; anzahl <= maxTeile; anzahl++) {
+    urls = segmentPayloadUrls(payload, anzahl);
+    if (urls.every((u) => qrVersion(u) <= QR_SEGMENT_ZIEL_VERSION)) break;
+  }
+  const teile = await Promise.all(
+    urls.map(async (u, i) => ({
+      datenUrl: await pngDatenUrl(u),
+      url: u,
+      teilNr: i + 1,
+      anzahl: urls.length,
+      version: qrVersion(u),
+    })),
+  );
+  return {
+    teile,
+    segmentiert: true,
+    zeichen: url.length,
+    version: Math.max(...teile.map((t) => t.version)),
+  };
 }
 
 const ausgabe = join(wurzel, "examples");
@@ -404,7 +583,10 @@ for (const bsp of beispiele) {
   const pfad = join(ausgabe, `${bsp.datei}.pdf`);
   await pdfmake.createPdf(pdfDokument(bogen, qr)).write(pfad);
   const s = staerke(bogen);
-  console.log(`✓ ${bsp.datei}.pdf — Stärke ${s.fuehrer}/${s.unterfuehrer}/${s.mannschaft}/${s.gesamt}, QR-Version ${qr.version}`);
+  const qrInfo2 = qr.segmentiert
+    ? `${qr.zeichen} Zeichen → ${qr.teile.length} QR-Teile (max. Version ${qr.version})`
+    : `${qr.zeichen} Zeichen → 1 QR-Code (Version ${qr.version})`;
+  console.log(`✓ ${bsp.datei}.pdf — Stärke ${s.fuehrer}/${s.unterfuehrer}/${s.mannschaft}/${s.gesamt}, ${qrInfo2}`);
 }
 
 console.log(`\nFertig: ${beispiele.length} Beispiel-PDFs in examples/`);

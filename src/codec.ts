@@ -595,12 +595,26 @@ export function decodeVorlagePayloadUrl(text: string, k: Kompressor): Erfassungs
 
 // ---------------------------------------------------------- Segmentierung
 //
-// Passt ein Bogen nicht in einen QR-Code (Budget ≤ v25, ECC M), wird der
-// Payload auf mehrere QR-Codes verteilt. Jeder Teil ist eine App-URL mit dem
-// Kopf "EEBS.<teilNr>.<anzahl>.<id>." VOR dem Base64url-Chunk. Wie beim
+// Passt ein Bogen nicht in einen einzelnen QR-Code, wird der Payload auf mehrere
+// QR-Codes verteilt. Jeder Teil ist eine App-URL mit dem Kopf
+// "EEBS.<teilNr>.<anzahl>.<id>." VOR dem Base64url-Chunk. Wie beim
 // Vorlagen-Marker liegt "." außerhalb des Base64url-Alphabets, ein alter Scanner
 // (der Base64url erwartet) lehnt einen Segment-QR also sauber ab. Der Single-QR
 // bleibt unberührt — er trägt keinen Kopf (siehe docs/datenmodell.md).
+
+/**
+ * QR-Budget (Fehlerkorrektur M). Zwei getrennte Schwellen, weil Erzeugen und
+ * Scannen unterschiedliche Optima haben:
+ *
+ * - {@link QR_EINZEL_MAX_VERSION}: Bis zu dieser Version bleibt ein Bogen EIN
+ *   einzelner QR-Code (unverändertes Verhalten für normale Bögen).
+ * - {@link QR_SEGMENT_ZIEL_VERSION}: Sobald segmentiert wird, zielt JEDER Teil
+ *   auf höchstens diese — deutlich gröbere — Version. Weniger Module je Code =
+ *   größere Punkte auf Papier/Display = zuverlässig mit dem Handy scannbar. Der
+ *   Preis sind mehr Teile; das ist beim Sammel-Scan gewollt.
+ */
+export const QR_EINZEL_MAX_VERSION = 25;
+export const QR_SEGMENT_ZIEL_VERSION = 18;
 
 /** Marker im URL-Fragment, der einen Segment-Teil kennzeichnet. */
 export const EEB_SEGMENT_MARKER = "EEBS.";

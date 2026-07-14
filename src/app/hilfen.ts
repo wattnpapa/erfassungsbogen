@@ -23,6 +23,8 @@ import {
 } from "../model";
 import {
   EEB_URL_PREFIX,
+  QR_EINZEL_MAX_VERSION,
+  QR_SEGMENT_ZIEL_VERSION,
   base64UrlKodieren,
   encodePayload,
   encodeVorlagePayloadUrl,
@@ -171,8 +173,6 @@ export interface QrSatz {
   version: number;
 }
 
-/** Ziel-Obergrenze für die QR-Version eines einzelnen Codes (ECC M). */
-const QR_ZIEL_VERSION = 25;
 const QR_OPTIONEN = { errorCorrectionLevel: "M" as const };
 
 /** QR-Version einer URL messen; `Infinity`, wenn sie in keinen QR-Code passt. */
@@ -185,7 +185,9 @@ function qrVersion(url: string): number {
 }
 
 async function teilBild(url: string, teilNr: number, anzahl: number): Promise<QrTeil> {
-  const datenUrl = await QRCode.toDataURL(url, { ...QR_OPTIONEN, width: 520, margin: 2 });
+  // margin 4 = volle Ruhezone (Quiet Zone) — hilft der Erkennung, den Code vom
+  // Umfeld zu trennen, besonders wenn mehrere Codes auf einer Seite stehen.
+  const datenUrl = await QRCode.toDataURL(url, { ...QR_OPTIONEN, width: 520, margin: 4 });
   return { datenUrl, url, teilNr, anzahl, version: qrVersion(url) };
 }
 
@@ -214,17 +216,18 @@ export async function qrErzeugen(
     : encodePayload(b, browserKompressor);
   const url = EEB_URL_PREFIX + base64UrlKodieren(payload);
   const einzelVersion = qrVersion(url);
-  if (einzelVersion <= QR_ZIEL_VERSION) {
+  if (einzelVersion <= QR_EINZEL_MAX_VERSION) {
     const teil = await teilBild(url, 1, 1);
     return { teile: [teil], segmentiert: false, zeichen: url.length, version: teil.version };
   }
 
-  // Zu groß: kleinste Teilzahl suchen, bei der jeder Teil ins Budget passt.
+  // Zu groß: kleinste Teilzahl suchen, bei der jeder Teil auf die gröbere
+  // Segment-Zielversion kommt (grobe Codes = zuverlässig scannbar).
   const maxTeile = Math.min(20, payload.length);
   let urls = segmentPayloadUrls(payload, Math.min(2, maxTeile));
   for (let anzahl = 2; anzahl <= maxTeile; anzahl++) {
     urls = segmentPayloadUrls(payload, anzahl);
-    if (urls.every((u) => qrVersion(u) <= QR_ZIEL_VERSION)) break;
+    if (urls.every((u) => qrVersion(u) <= QR_SEGMENT_ZIEL_VERSION)) break;
   }
   const teile = await Promise.all(urls.map((u, i) => teilBild(u, i + 1, urls.length)));
   return {
