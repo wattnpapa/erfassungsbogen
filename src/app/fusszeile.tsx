@@ -3,10 +3,33 @@
  * Aufbau angelehnt an sprechfunk-uebung.de (gleicher Autor).
  */
 
-import { useRef, type ReactNode, type RefObject } from "react";
+import { useRef, type MouseEvent, type ReactNode, type RefObject } from "react";
+import { istNativ, pdfTeilen } from "./nativ";
 
 const KONTAKT = "johannes.rudolph@thw-oldenburg.de";
 const REPO = "https://github.com/wattnpapa/erfassungsbogen";
+
+// Beispiel-PDFs aus examples/ — der Glob wird beim Build aufgelöst, neue
+// Dateien im Ordner erscheinen also automatisch ohne Codeänderung.
+const BEISPIELE = Object.entries(
+  import.meta.glob("../../examples/*.pdf", { eager: true, query: "?url", import: "default" }),
+)
+  .map(([pfad, url]) => ({ datei: pfad.split("/").pop()!, url: url as string }))
+  .sort((a, b) => a.datei.localeCompare(b.datei, "de"));
+
+/** Nativ gibt es keinen Browser-Download: PDF laden und übers Share-Sheet anbieten. */
+async function beispielTeilen(e: MouseEvent, datei: string, url: string): Promise<void> {
+  if (!istNativ()) return; // Web: normaler Download-Link
+  e.preventDefault();
+  const blob = await (await fetch(url)).blob();
+  const base64 = await new Promise<string>((resolve, reject) => {
+    const leser = new FileReader();
+    leser.onload = () => resolve((leser.result as string).split(",", 2)[1]);
+    leser.onerror = () => reject(leser.error);
+    leser.readAsDataURL(blob);
+  });
+  await pdfTeilen(datei, base64);
+}
 
 function Dialog({ titel, dialogRef, children }: {
   titel: string;
@@ -28,6 +51,7 @@ export function Fusszeile() {
   const ueber = useRef<HTMLDialogElement>(null);
   const impressum = useRef<HTMLDialogElement>(null);
   const datenschutz = useRef<HTMLDialogElement>(null);
+  const beispiele = useRef<HTMLDialogElement>(null);
 
   return (
     <footer className="seite">
@@ -36,11 +60,29 @@ export function Fusszeile() {
         <button className="link" onClick={() => ueber.current?.showModal()}>Johannes Rudolph</button>
       </span>
       <span className="fusslinks">
+        <button className="link" onClick={() => beispiele.current?.showModal()}>Beispielbögen</button>
         <button className="link" onClick={() => impressum.current?.showModal()}>Impressum</button>
         <button className="link" onClick={() => datenschutz.current?.showModal()}>Datenschutz</button>
         <a href={`mailto:${KONTAKT}`}>Kontakt</a>
         <a href={REPO} target="_blank" rel="noopener noreferrer">GitHub</a>
       </span>
+
+      <Dialog titel="Beispielbögen" dialogRef={beispiele}>
+        <p>
+          Ausgefüllte Beispiel-Erfassungsbögen (fiktive Einheiten und Personen) als PDF –
+          zum Ansehen, für Übungen oder zum Testen des QR-Imports. Die eingebetteten
+          QR-Codes lassen sich direkt mit der App scannen.
+        </p>
+        <ul>
+          {BEISPIELE.map(({ datei, url }) => (
+            <li key={datei}>
+              <a href={url} download={datei} onClick={(e) => void beispielTeilen(e, datei, url)}>
+                {datei}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </Dialog>
 
       <Dialog titel="Über dieses Projekt" dialogRef={ueber}>
         <p>
