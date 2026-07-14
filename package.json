@@ -61,8 +61,10 @@
       ],
       "category": "Utility",
       "desktop": {
-        "Name": "Erfassungsbogen",
-        "Categories": "Utility;"
+        "entry": {
+          "Name": "Erfassungsbogen",
+          "Categories": "Utility;"
+        }
       }
     },
     "publish": [
