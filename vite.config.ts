@@ -37,9 +37,11 @@ export default defineConfig({
         maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
         // SPA nutzt Hash-Routing; index.html als Fallback für Navigationen.
         navigateFallback: "index.html",
-        // .well-known (Universal-/App-Links) und statische Extra-Seiten wie
-        // datenschutz.html NICHT auf die App-Shell umbiegen.
-        navigateFallbackDenylist: [/^\/\.well-known\//, /\/[^/]+\.(?:html|json|txt|xml)$/],
+        // .well-known (Universal-/App-Links), statische Extra-Seiten wie
+        // datenschutz.html und Datei-Downloads (Beispiel-PDFs) NICHT auf die
+        // App-Shell umbiegen — Klicks auf <a download> sind Navigations-Requests,
+        // ohne Ausnahme würde der SW statt des PDFs die index.html ausliefern.
+        navigateFallbackDenylist: [/^\/\.well-known\//, /\/[^/]+\.(?:html|json|txt|xml|pdf)$/],
         // Alte Precaches beim Versionswechsel entsorgen (kein Aggressiv-Cache).
         cleanupOutdatedCaches: true,
       },
