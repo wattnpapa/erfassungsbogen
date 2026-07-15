@@ -899,6 +899,62 @@
     }
     .platform-ios.debug-rahmen #app { background: var(--ios-fond); }
     .platform-android.debug-rahmen #app { background: var(--md-surface); }
+
+    /* ---------------------------------------------------------------
+       Vollbild-QR zum Vorzeigen: weißer Grund, maximale Größe — für den
+       Handy-zu-Tablet-Scan ohne Papier. Bei Segmentierung blättert die
+       Navigation durch die Teile (der Scanner sammelt sie ohnehin
+       nacheinander ein).
+       --------------------------------------------------------------- */
+    .qr-vollbild {
+      position: fixed; inset: 0; z-index: 110; background: #fff;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 0.8rem; padding: 1rem;
+    }
+    .qr-vollbild img {
+      width: min(92vw, 68vh); max-width: none;
+      image-rendering: pixelated; border: none;
+    }
+    .qr-vollbild p { margin: 0; color: #000; text-align: center; }
+    .qr-vollbild-nav { display: flex; gap: 0.8rem; flex-wrap: wrap; justify-content: center; }
+    .qr-vollbild-nav button { background: #fff; color: #1a1c22; border: 1px solid var(--rand); }
+    .qr-vollbild-nav button.primaer { background: var(--blau); color: #fff; }
+
+    /* Papierkorb-Karten (gelöschte Vorlagen/Einsätze): sichtbar zurückgestuft. */
+    section.karte.papierkorb { background: var(--grau); border-style: dashed; }
+
+    /* ---------------------------------------------------------------
+       Feld-Modus: große Tippziele + maximaler Kontrast für den Einsatz
+       draußen (Handschuhe, pralle Sonne). Schalter in der Fußzeile,
+       feld-modus.ts setzt die Klasse auf <html>. Bewusst als letzter
+       Block: gewinnt die Kaskade auch gegen die Plattform-Stile.
+       --------------------------------------------------------------- */
+    .feld-modus { font-size: 118%; }
+    .feld-modus body { color: #000; background: #fff; color-scheme: light; }
+    .feld-modus button:not(.link), .feld-modus .datei-knopf {
+      min-height: 48px; padding: 0.6rem 1.1rem;
+      border: 2px solid #444; border-radius: 0.4rem;
+      background: #fff; color: #000;
+    }
+    .feld-modus button.primaer, .feld-modus .datei-knopf.primaer {
+      background: var(--blau); color: #fff; border-color: var(--blau);
+    }
+    .feld-modus input, .feld-modus select, .feld-modus textarea {
+      min-height: 48px; border: 2px solid #444; background: #fff; color: #000;
+    }
+    .feld-modus input[type="checkbox"], .feld-modus input[type="radio"] {
+      min-height: 0; width: 1.7rem; height: 1.7rem; accent-color: var(--blau);
+    }
+    .feld-modus section.karte, .feld-modus .karte { border: 2px solid #444; background: #fff; }
+    .feld-modus label.feld { color: #000; font-size: 0.95rem; }
+    .feld-modus .hinweis, .feld-modus footer.seite { color: #1a1c22; }
+    .feld-modus .stepper-titel, .feld-modus dl.paare dt { color: #000; }
+    .feld-modus .muster-sub, .feld-modus .staerke-leiste span,
+    .feld-modus ul.vorschlaege li small { opacity: 1; color: #1a1c22; }
+    .feld-modus table.uebersicht th, .feld-modus table.uebersicht td { border-color: #444; }
+    .feld-modus .schritte button:not(.link) { min-height: 44px; font-size: 0.95rem; }
+    .feld-modus .stepper button:not(.link) { width: 3.75rem; min-height: 3.75rem; }
+    .feld-modus output.abgeleitet { border: 2px dashed #444; color: #1a1c22; background: #fff; }
   </style>
 </head>
 <body>

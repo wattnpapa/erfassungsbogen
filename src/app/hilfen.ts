@@ -10,6 +10,7 @@ import {
   Ernaehrung,
   Fahrerlaubnis,
   Fahrzeug,
+  KontaktArt,
   OrganisationsTyp,
   Person,
   PersonalErfassung,
@@ -369,6 +370,24 @@ export function plausibilitaet(b: Erfassungsbogen): string[] {
       );
     }
   }
+  // Vollständigkeit für die Weitergabe: genau die Angaben, wegen derer der
+  // Meldekopf sonst zurückfragen muss (Erreichbarkeit, Kennzeichen, Auftrag).
+  if (!b.einsatz.ortAuftrag.trim()) {
+    hinweise.push("Ort/Auftrag ist noch leer.");
+  }
+  const telefonErfasst = b.personal.some((p) =>
+    p.kontakte.some((k) => k.art !== KontaktArt.EMAIL && (k.wert ?? "").trim() !== ""),
+  );
+  if (s.gesamt > 0 && !telefonErfasst) {
+    hinweise.push(
+      "Keine telefonische Erreichbarkeit erfasst — mindestens eine Führungskraft sollte eine Nummer angeben.",
+    );
+  }
+  b.fahrzeuge.forEach((f, i) => {
+    if (!kennzeichenText(f).trim()) {
+      hinweise.push(`Fahrzeug ${i + 1} hat noch kein Kennzeichen.`);
+    }
+  });
   return hinweise;
 }
 

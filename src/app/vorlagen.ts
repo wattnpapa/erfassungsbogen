@@ -15,6 +15,7 @@
 import type { Erfassungsbogen } from "../model";
 import { datumAusIso } from "../model";
 import { migriereBogen } from "./hilfen";
+import { aktive, imPapierkorb, papierkorbBereinigt } from "./papierkorb";
 
 /** Versionierter Schlüssel — erlaubt spätere Formatwechsel der Sammlung selbst. */
 const SPEICHER_SCHLUESSEL = "eeb.vorlagen.v1";
@@ -26,6 +27,8 @@ export interface Vorlage {
   geaendert: number;
   /** Schnellstart-Vorlage für die App-Icon-Kurzaktion (0..1 pro Gerät). */
   standard?: boolean;
+  /** Im Papierkorb seit (Date.now()); fehlt = aktiv. Siehe papierkorb.ts. */
+  geloeschtAm?: number;
   /** Einsatzfreier Bogen: einheit + personal + fahrzeuge + Standard-Sofortbedarf. */
   bogen: Erfassungsbogen;
 }
@@ -112,9 +115,27 @@ function speicher(): Storage | null {
   }
 }
 
-export function vorlagenLaden(): Vorlage[] {
+/**
+ * Komplette Liste inkl. Papierkorb — Basis aller Mutationen, damit beim
+ * Zurückschreiben keine Papierkorb-Einträge verloren gehen. Abgelaufene
+ * Einträge werden hier endgültig bereinigt (und der Stand persistiert).
+ */
+function alleVorlagenLaden(): Vorlage[] {
   const s = speicher();
-  return s ? vorlagenAusJson(s.getItem(SPEICHER_SCHLUESSEL)) : [];
+  if (!s) return [];
+  const r = papierkorbBereinigt(vorlagenAusJson(s.getItem(SPEICHER_SCHLUESSEL)));
+  if (r.entfernt > 0) vorlagenSpeichern(r.liste);
+  return r.liste;
+}
+
+/** Aktive Vorlagen (ohne Papierkorb) — das, was Listen anzeigen. */
+export function vorlagenLaden(): Vorlage[] {
+  return aktive(alleVorlagenLaden());
+}
+
+/** Vorlagen im Papierkorb, zuletzt gelöschte zuerst. */
+export function vorlagenPapierkorb(): Vorlage[] {
+  return imPapierkorb(alleVorlagenLaden());
 }
 
 export function vorlagenSpeichern(liste: Vorlage[]): void {
@@ -130,7 +151,7 @@ function neueId(): string {
  * Nutzbar sowohl beim Speichern aus der Übersicht als auch beim QR-Import.
  */
 export function vorlageAnlegen(name: string, bogen: Erfassungsbogen): Vorlage {
-  const liste = vorlagenLaden();
+  const liste = alleVorlagenLaden();
   const jetzt = Date.now();
   const v: Vorlage = {
     id: neueId(),
@@ -146,12 +167,31 @@ export function vorlageAnlegen(name: string, bogen: Erfassungsbogen): Vorlage {
 
 export function vorlageUmbenennen(id: string, name: string): void {
   vorlagenSpeichern(
-    vorlagenLaden().map((v) =>
+    alleVorlagenLaden().map((v) =>
       v.id === id ? { ...v, name: name.trim() || v.name, geaendert: Date.now() } : v,
     ),
   );
 }
 
+/** In den Papierkorb verschieben (30 Tage wiederherstellbar). */
 export function vorlageLoeschen(id: string): void {
-  vorlagenSpeichern(vorlagenLaden().filter((v) => v.id !== id));
+  vorlagenSpeichern(
+    alleVorlagenLaden().map((v) => (v.id === id ? { ...v, geloeschtAm: Date.now() } : v)),
+  );
+}
+
+/** Aus dem Papierkorb zurückholen. */
+export function vorlageWiederherstellen(id: string): void {
+  vorlagenSpeichern(
+    alleVorlagenLaden().map((v) => {
+      if (v.id !== id) return v;
+      const { geloeschtAm: _, ...rest } = v;
+      return rest;
+    }),
+  );
+}
+
+/** Endgültig löschen (nur aus dem Papierkorb heraus angeboten). */
+export function vorlageEndgueltigLoeschen(id: string): void {
+  vorlagenSpeichern(alleVorlagenLaden().filter((v) => v.id !== id));
 }

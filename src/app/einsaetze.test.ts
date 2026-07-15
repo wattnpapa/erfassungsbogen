@@ -21,7 +21,11 @@ import {
   einsaetzeZuJson,
   einsatzAnlegen,
   einsatzLoeschen,
+  einsatzWiederherstellen,
+  einsatzEndgueltigLoeschen,
+  einsatzImportieren,
   einsaetzeLaden,
+  einsaetzePapierkorb,
   meldungHinzufuegen,
   meldungStatusSetzen,
   meldungEntfernen,
@@ -211,6 +215,48 @@ describe("Status & Löschen", () => {
     expect(einsaetzeLaden()[0]!.eintraege).toHaveLength(0);
     einsatzLoeschen(s.id);
     expect(einsaetzeLaden()).toHaveLength(0);
+  });
+});
+
+describe("Papierkorb", () => {
+  it("löschen verschiebt in den Papierkorb, wiederherstellen holt zurück", () => {
+    const s = einsatzAnlegen("E", EinsatzArt.EINSATZ);
+    meldungHinzufuegen(s.id, bogen());
+    einsatzLoeschen(s.id);
+    expect(einsaetzeLaden()).toEqual([]);
+    expect(einsaetzePapierkorb().map((x) => x.id)).toEqual([s.id]);
+
+    einsatzWiederherstellen(s.id);
+    expect(einsaetzeLaden().map((x) => x.id)).toEqual([s.id]);
+    expect(einsaetzeLaden()[0]!.eintraege).toHaveLength(1); // Meldungen überleben den Papierkorb
+    expect(einsaetzePapierkorb()).toEqual([]);
+  });
+
+  it("endgültig löschen entfernt den Einsatz komplett", () => {
+    const s = einsatzAnlegen("E", EinsatzArt.EINSATZ);
+    einsatzLoeschen(s.id);
+    einsatzEndgueltigLoeschen(s.id);
+    expect(einsaetzeLaden()).toEqual([]);
+    expect(einsaetzePapierkorb()).toEqual([]);
+  });
+
+  it("Mutationen an anderen Einsätzen lassen den Papierkorb unangetastet", () => {
+    const weg = einsatzAnlegen("Weg", EinsatzArt.EINSATZ);
+    einsatzLoeschen(weg.id);
+    const bleibt = einsatzAnlegen("Bleibt", EinsatzArt.EINSATZ);
+    meldungHinzufuegen(bleibt.id, bogen());
+    expect(einsaetzeLaden().map((x) => x.name)).toEqual(["Bleibt"]);
+    expect(einsaetzePapierkorb().map((x) => x.id)).toEqual([weg.id]);
+  });
+
+  it("Import mit gleicher Einsatz-ID belebt einen Einsatz im Papierkorb wieder", () => {
+    const s = einsatzAnlegen("E", EinsatzArt.EINSATZ);
+    einsatzLoeschen(s.id);
+    const kopie: Einsatzsammlung = { ...s, eintraege: [] };
+    const r = einsatzImportieren(kopie);
+    expect(r.neuerEinsatz).toBe(false);
+    expect(einsaetzeLaden().map((x) => x.id)).toEqual([s.id]);
+    expect(einsaetzePapierkorb()).toEqual([]);
   });
 });
 

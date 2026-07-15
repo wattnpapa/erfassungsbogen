@@ -18,7 +18,10 @@ import {
   vorlageAnlegen,
   vorlageUmbenennen,
   vorlageLoeschen,
+  vorlageWiederherstellen,
+  vorlageEndgueltigLoeschen,
   vorlagenLaden,
+  vorlagenPapierkorb,
   type Vorlage,
 } from "./vorlagen";
 
@@ -152,5 +155,48 @@ describe("CRUD über localStorage", () => {
   it("nutzt den Einheitsnamen, wenn kein Name angegeben ist", () => {
     vorlageAnlegen("   ", bogen());
     expect(vorlagenLaden()[0]!.name).toBe("OV Test");
+  });
+});
+
+describe("Papierkorb", () => {
+  it("löschen verschiebt in den Papierkorb, wiederherstellen holt zurück", () => {
+    const v = vorlageAnlegen("A", bogen());
+    vorlageLoeschen(v.id);
+    expect(vorlagenLaden()).toEqual([]);
+    expect(vorlagenPapierkorb().map((x) => x.id)).toEqual([v.id]);
+
+    vorlageWiederherstellen(v.id);
+    expect(vorlagenLaden().map((x) => x.id)).toEqual([v.id]);
+    expect(vorlagenLaden()[0]!.geloeschtAm).toBeUndefined();
+    expect(vorlagenPapierkorb()).toEqual([]);
+  });
+
+  it("endgültig löschen entfernt den Eintrag komplett", () => {
+    const v = vorlageAnlegen("A", bogen());
+    vorlageLoeschen(v.id);
+    vorlageEndgueltigLoeschen(v.id);
+    expect(vorlagenLaden()).toEqual([]);
+    expect(vorlagenPapierkorb()).toEqual([]);
+  });
+
+  it("Mutationen (anlegen/umbenennen) lassen Papierkorb-Einträge unangetastet", () => {
+    const geloescht = vorlageAnlegen("Weg", bogen());
+    vorlageLoeschen(geloescht.id);
+    const bleibt = vorlageAnlegen("Bleibt", bogen());
+    vorlageUmbenennen(bleibt.id, "Bleibt 2");
+    expect(vorlagenLaden().map((x) => x.name)).toEqual(["Bleibt 2"]);
+    expect(vorlagenPapierkorb().map((x) => x.id)).toEqual([geloescht.id]);
+  });
+
+  it("abgelaufene Einträge werden beim Laden endgültig bereinigt", () => {
+    const v = vorlageAnlegen("Alt", bogen());
+    vorlageLoeschen(v.id);
+    // Löschzeitpunkt künstlich 31 Tage in die Vergangenheit setzen.
+    const roh = JSON.parse(localStorage.getItem("eeb.vorlagen.v1")!) as Vorlage[];
+    roh[0]!.geloeschtAm = Date.now() - 31 * 24 * 60 * 60 * 1000;
+    localStorage.setItem("eeb.vorlagen.v1", JSON.stringify(roh));
+
+    expect(vorlagenPapierkorb()).toEqual([]);
+    expect(JSON.parse(localStorage.getItem("eeb.vorlagen.v1")!)).toEqual([]); // persistiert
   });
 });

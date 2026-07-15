@@ -1024,6 +1024,10 @@ export function Uebersicht(props: {
   const [qr, setQr] = useState<QrSatz | null>(null);
   const [fehler, setFehler] = useState("");
   const [pdfLaeuft, setPdfLaeuft] = useState(false);
+  // Vollbild-QR zum Vorzeigen (Handy-zu-Tablet-Scan ohne Papier); bei
+  // Segmentierung blättert `vollbildTeil` durch die Teile.
+  const [vollbild, setVollbild] = useState(false);
+  const [vollbildTeil, setVollbildTeil] = useState(0);
   // QR signieren (Geräteschlüssel). Voreinstellung aus dem Gerätespeicher.
   const [signieren, setSignieren] = useState(() => signierenAktiv());
   const [schluesselKurz, setSchluesselKurz] = useState<string | null>(null);
@@ -1257,6 +1261,13 @@ export function Uebersicht(props: {
         ) : (
           <p className="hinweis">QR-Code wird erzeugt…</p>
         )}
+        {qr && (
+          <p>
+            <button type="button" onClick={() => { setVollbildTeil(0); setVollbild(true); }}>
+              Vollbild anzeigen
+            </button>
+          </p>
+        )}
         <div className="signatur-optionen">
           <label>
             <input
@@ -1283,6 +1294,40 @@ export function Uebersicht(props: {
           )}
         </div>
       </section>
+
+      {vollbild && qr && (() => {
+        const teil = qr.teile[Math.min(vollbildTeil, qr.teile.length - 1)]!;
+        return (
+          <div className="qr-vollbild" role="dialog" aria-label="QR-Code im Vollbild">
+            <img
+              src={teil.datenUrl}
+              alt={qr.segmentiert ? `EEB2-QR-Code Teil ${teil.teilNr} von ${teil.anzahl}` : "EEB2-QR-Code"}
+            />
+            {qr.segmentiert && (
+              <p>
+                <strong>Teil {teil.teilNr} von {teil.anzahl}</strong> — alle Teile nacheinander scannen lassen.
+              </p>
+            )}
+            <div className="qr-vollbild-nav">
+              {qr.segmentiert && (
+                <button type="button" disabled={vollbildTeil === 0} onClick={() => setVollbildTeil(vollbildTeil - 1)}>
+                  ← Voriger Teil
+                </button>
+              )}
+              {qr.segmentiert && (
+                <button
+                  type="button"
+                  disabled={vollbildTeil >= qr.teile.length - 1}
+                  onClick={() => setVollbildTeil(vollbildTeil + 1)}
+                >
+                  Nächster Teil →
+                </button>
+              )}
+              <button type="button" className="primaer" onClick={() => setVollbild(false)}>Schließen</button>
+            </div>
+          </div>
+        );
+      })()}
     </>
   );
 }

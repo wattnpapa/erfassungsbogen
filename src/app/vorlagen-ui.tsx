@@ -19,9 +19,12 @@ import {
   type QrInfo,
 } from "./hilfen";
 import {
+  vorlageEndgueltigLoeschen,
   vorlageInstanziieren,
   vorlageLoeschen,
   vorlageUmbenennen,
+  vorlageWiederherstellen,
+  vorlagenPapierkorb,
   type Vorlage,
 } from "./vorlagen";
 
@@ -47,6 +50,8 @@ export function VorlagenListe(props: {
 }) {
   const { vorlagen, onMustern, onGeaendert } = props;
   const [qrFuer, setQrFuer] = useState<Vorlage | null>(null);
+  const [zeigePapierkorb, setZeigePapierkorb] = useState(false);
+  const papierkorb = vorlagenPapierkorb();
 
   function umbenennen(v: Vorlage) {
     const name = window.prompt("Vorlage umbenennen:", v.name);
@@ -56,10 +61,17 @@ export function VorlagenListe(props: {
     }
   }
 
+  // Kein confirm: Löschen ist nur der Weg in den Papierkorb (30 Tage
+  // wiederherstellbar) — ein Fehltipp lässt sich rückgängig machen.
   function loeschen(v: Vorlage) {
-    if (window.confirm(`Vorlage „${v.name}" löschen?`)) {
-      vorlageLoeschen(v.id);
-      if (qrFuer?.id === v.id) setQrFuer(null);
+    vorlageLoeschen(v.id);
+    if (qrFuer?.id === v.id) setQrFuer(null);
+    onGeaendert();
+  }
+
+  function endgueltigLoeschen(v: Vorlage) {
+    if (window.confirm(`Vorlage „${v.name}" endgültig löschen? Das lässt sich nicht rückgängig machen.`)) {
+      vorlageEndgueltigLoeschen(v.id);
       onGeaendert();
     }
   }
@@ -94,6 +106,33 @@ export function VorlagenListe(props: {
           {qrFuer?.id === v.id && <VorlageQr vorlage={v} />}
         </section>
       ))}
+      {papierkorb.length > 0 && (
+        <p>
+          <button type="button" className="link" onClick={() => setZeigePapierkorb(!zeigePapierkorb)}>
+            {zeigePapierkorb ? "Papierkorb ausblenden" : `Papierkorb (${papierkorb.length})`}
+          </button>
+        </p>
+      )}
+      {zeigePapierkorb &&
+        papierkorb.map((v) => (
+          <section className="karte papierkorb" key={v.id}>
+            <div className="kopfzeile">
+              <h2>{v.name}</h2>
+              <span>
+                <button type="button" onClick={() => { vorlageWiederherstellen(v.id); onGeaendert(); }}>
+                  Wiederherstellen
+                </button>{" "}
+                <button type="button" className="entfernen" onClick={() => endgueltigLoeschen(v)}>
+                  Endgültig löschen
+                </button>
+              </span>
+            </div>
+            <p className="hinweis">
+              Gelöscht am {new Date(v.geloeschtAm!).toLocaleDateString("de-DE")} — wird nach 30 Tagen
+              automatisch endgültig entfernt.
+            </p>
+          </section>
+        ))}
     </>
   );
 }

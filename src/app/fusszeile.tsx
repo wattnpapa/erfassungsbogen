@@ -3,8 +3,10 @@
  * Aufbau angelehnt an sprechfunk-uebung.de (gleicher Autor).
  */
 
-import { useRef, useState, type MouseEvent, type ReactNode, type RefObject } from "react";
-import { istNativ, pdfTeilen } from "./nativ";
+import { useRef, useState, type ChangeEvent, type MouseEvent, type ReactNode, type RefObject } from "react";
+import { istNativ, pdfTeilen, textTeilen } from "./nativ";
+import { feldModusAktiv, feldModusSetzen } from "./feld-modus";
+import { sicherungEinspielen, sicherungErstellen } from "./sicherung";
 
 const KONTAKT = "johannes.rudolph@thw-oldenburg.de";
 const REPO = "https://github.com/wattnpapa/erfassungsbogen";
@@ -79,6 +81,48 @@ export function Fusszeile() {
   const beispiele = useRef<HTMLDialogElement>(null);
   // Zweistufige Auswahl im Beispielbögen-Dialog: erst Organisation, dann Bogen.
   const [beispielOrg, setBeispielOrg] = useState<string | null>(null);
+  const sicherung = useRef<HTMLDialogElement>(null);
+  const [feldModus, setFeldModus] = useState(() => feldModusAktiv());
+  const [sicherungFehler, setSicherungFehler] = useState("");
+
+  function feldModusUmschalten() {
+    const an = !feldModus;
+    setFeldModus(an);
+    feldModusSetzen(an);
+  }
+
+  /** Alle lokalen App-Daten als Datei anbieten — App: Share-Sheet, Browser: Download. */
+  async function sicherungExportieren() {
+    const inhalt = sicherungErstellen();
+    const name = `eeb-sicherung-${new Date().toISOString().slice(0, 10)}.json`;
+    if (istNativ()) {
+      await textTeilen(name, inhalt);
+      return;
+    }
+    const blob = new Blob([inhalt], { type: "application/json" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = name;
+    a.click();
+    URL.revokeObjectURL(a.href);
+  }
+
+  async function sicherungImportieren(e: ChangeEvent<HTMLInputElement>) {
+    const datei = e.target.files?.[0];
+    e.target.value = "";
+    if (!datei) return;
+    const sicher = window.confirm(
+      "Sicherung einspielen? ALLE App-Daten auf diesem Gerät (Vorlagen, Einsätze, Entwurf, Einstellungen, Geräteschlüssel) werden durch den Inhalt der Datei ersetzt.",
+    );
+    if (!sicher) return;
+    try {
+      const anzahl = sicherungEinspielen(await datei.text());
+      window.alert(`Sicherung eingespielt (${anzahl} Einträge). Die App lädt jetzt neu.`);
+      window.location.reload();
+    } catch (err) {
+      setSicherungFehler(err instanceof Error ? err.message : String(err));
+    }
+  }
 
   return (
     <footer className="seite">
@@ -87,6 +131,15 @@ export function Fusszeile() {
         <button className="link" onClick={() => ueber.current?.showModal()}>Johannes Rudolph</button>
       </span>
       <span className="fusslinks">
+        <button
+          className="link"
+          onClick={feldModusUmschalten}
+          aria-pressed={feldModus}
+          title="Große Tippziele und hoher Kontrast für den Einsatz draußen"
+        >
+          {feldModus ? "✓ Feld-Modus" : "Feld-Modus"}
+        </button>
+        <button className="link" onClick={() => { setSicherungFehler(""); sicherung.current?.showModal(); }}>Datensicherung</button>
         <button
           className="link"
           onClick={() => {
@@ -101,6 +154,30 @@ export function Fusszeile() {
         <a href={`mailto:${KONTAKT}`}>Kontakt</a>
         <a href={REPO} target="_blank" rel="noopener noreferrer">GitHub</a>
       </span>
+
+      <Dialog titel="Datensicherung" dialogRef={sicherung}>
+        <p>
+          Alle lokalen Daten dieser App — Vorlagen, Einsatz-Sammlungen, der aktuelle
+          Entwurf, Einstellungen und der Signatur-Geräteschlüssel — lassen sich als
+          eine Datei sichern und auf einem anderen Gerät (oder nach einer
+          Neuinstallation) wieder einspielen.
+        </p>
+        <p className="warnung">
+          Die Datei enthält den privaten Signaturschlüssel und ggf. Personendaten.
+          Sicher aufbewahren und nur über vertrauenswürdige Wege übertragen.
+        </p>
+        <div className="aktionen">
+          <button className="primaer" onClick={() => void sicherungExportieren()}>Sicherung erstellen…</button>
+          <label className="datei-knopf">
+            Sicherung einspielen…
+            <input type="file" accept=".json,application/json" hidden onChange={(e) => void sicherungImportieren(e)} />
+          </label>
+        </div>
+        {sicherungFehler && <p className="fehler">{sicherungFehler}</p>}
+        <p className="hinweis">
+          Einspielen ersetzt die vorhandenen App-Daten auf diesem Gerät vollständig.
+        </p>
+      </Dialog>
 
       <Dialog titel="Beispielbögen" dialogRef={beispiele}>
         <p>

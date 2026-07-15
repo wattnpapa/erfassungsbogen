@@ -17,6 +17,7 @@ import {
   SCHEMA_VERSION,
   datumAusIso,
   type Erfassungsbogen,
+  KontaktArt,
   type Fahrzeug,
   type Person,
 } from "../model";
@@ -153,13 +154,43 @@ describe("plausibilitaet()", () => {
   }
 
   it("meldet keine Hinweise für einen stimmigen Bogen", () => {
+    const basis = neuerBogen();
     const b = bogen({
+      einsatz: { ...basis.einsatz, ortAuftrag: "Übung Kabelblitz" },
       personal: [
-        person({ staerkeRolle: StaerkeRolle.FUEHRER, geschlecht: Geschlecht.M }),
+        person({
+          staerkeRolle: StaerkeRolle.FUEHRER,
+          geschlecht: Geschlecht.M,
+          kontakte: [{ art: KontaktArt.MOBIL, dienstlich: true, wert: "01711234567" }],
+        }),
         person({ geschlecht: Geschlecht.W }),
       ],
+      fahrzeuge: [{ typ: { code: 1 }, thwKennzeichen: 84397 }],
     });
     expect(plausibilitaet(b)).toEqual([]);
+  });
+
+  it("weist auf leeren Ort/Auftrag, fehlende Erreichbarkeit und Fahrzeuge ohne Kennzeichen hin", () => {
+    const b = bogen({
+      personal: [person({ staerkeRolle: StaerkeRolle.FUEHRER })], // ohne Kontakte
+      fahrzeuge: [{ typ: { code: 1 } }],
+    });
+    const hinweise = plausibilitaet(b);
+    expect(hinweise.some((h) => /Ort\/Auftrag/.test(h))).toBe(true);
+    expect(hinweise.some((h) => /telefonische Erreichbarkeit/.test(h))).toBe(true);
+    expect(hinweise.some((h) => /Fahrzeug 1.*kein Kennzeichen/.test(h))).toBe(true);
+  });
+
+  it("zählt eMail nicht als telefonische Erreichbarkeit, ein ziviles Kennzeichen aber als Kennzeichen", () => {
+    const basis = neuerBogen();
+    const b = bogen({
+      einsatz: { ...basis.einsatz, ortAuftrag: "X" },
+      personal: [person({ kontakte: [{ art: KontaktArt.EMAIL, dienstlich: true, wert: "a@b.de" }] })],
+      fahrzeuge: [{ typ: { code: 1 }, kennzeichenFreitext: "OL-FW 2041" }],
+    });
+    const hinweise = plausibilitaet(b);
+    expect(hinweise.some((h) => /telefonische Erreichbarkeit/.test(h))).toBe(true);
+    expect(hinweise.some((h) => /Kennzeichen/.test(h) && /Fahrzeug/.test(h))).toBe(false);
   });
 
   it("weist auf eine Stärke von 0 hin", () => {

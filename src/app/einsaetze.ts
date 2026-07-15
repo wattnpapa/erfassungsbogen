@@ -21,6 +21,7 @@
 
 import type { Einheit, Erfassungsbogen } from "../model";
 import { migriereBogen } from "./hilfen";
+import { aktive, imPapierkorb, papierkorbBereinigt } from "./papierkorb";
 
 /** Versionierter Schlüssel — erlaubt spätere Formatwechsel der Sammlung selbst. */
 const SPEICHER_SCHLUESSEL = "eeb.einsaetze.v1";
@@ -75,6 +76,8 @@ export interface Einsatzsammlung {
   ort?: string;
   angelegt: number; // Date.now()
   geaendert: number;
+  /** Im Papierkorb seit (Date.now()); fehlt = aktiv. Siehe papierkorb.ts. */
+  geloeschtAm?: number;
   eintraege: MeldeEintrag[];
 }
 
@@ -190,9 +193,27 @@ function speicher(): Storage | null {
   }
 }
 
-export function einsaetzeLaden(): Einsatzsammlung[] {
+/**
+ * Komplette Liste inkl. Papierkorb — Basis aller Mutationen, damit beim
+ * Zurückschreiben keine Papierkorb-Einträge verloren gehen. Abgelaufene
+ * Einträge werden hier endgültig bereinigt (und der Stand persistiert).
+ */
+function alleEinsaetzeLaden(): Einsatzsammlung[] {
   const s = speicher();
-  return s ? einsaetzeAusJson(s.getItem(SPEICHER_SCHLUESSEL)) : [];
+  if (!s) return [];
+  const r = papierkorbBereinigt(einsaetzeAusJson(s.getItem(SPEICHER_SCHLUESSEL)));
+  if (r.entfernt > 0) einsaetzeSpeichern(r.liste);
+  return r.liste;
+}
+
+/** Aktive Einsätze (ohne Papierkorb) — das, was Listen anzeigen. */
+export function einsaetzeLaden(): Einsatzsammlung[] {
+  return aktive(alleEinsaetzeLaden());
+}
+
+/** Einsätze im Papierkorb, zuletzt gelöschte zuerst. */
+export function einsaetzePapierkorb(): Einsatzsammlung[] {
+  return imPapierkorb(alleEinsaetzeLaden());
 }
 
 export function einsaetzeSpeichern(liste: Einsatzsammlung[]): void {
@@ -204,7 +225,7 @@ function neueId(): string {
 }
 
 export function einsatzAnlegen(name: string, art: EinsatzArt, ort?: string): Einsatzsammlung {
-  const liste = einsaetzeLaden();
+  const liste = alleEinsaetzeLaden();
   const jetzt = Date.now();
   const s: Einsatzsammlung = {
     id: neueId(),
@@ -220,8 +241,27 @@ export function einsatzAnlegen(name: string, art: EinsatzArt, ort?: string): Ein
   return s;
 }
 
+/** In den Papierkorb verschieben (30 Tage wiederherstellbar). */
 export function einsatzLoeschen(id: string): void {
-  einsaetzeSpeichern(einsaetzeLaden().filter((s) => s.id !== id));
+  einsaetzeSpeichern(
+    alleEinsaetzeLaden().map((s) => (s.id === id ? { ...s, geloeschtAm: Date.now() } : s)),
+  );
+}
+
+/** Aus dem Papierkorb zurückholen. */
+export function einsatzWiederherstellen(id: string): void {
+  einsaetzeSpeichern(
+    alleEinsaetzeLaden().map((s) => {
+      if (s.id !== id) return s;
+      const { geloeschtAm: _, ...rest } = s;
+      return rest;
+    }),
+  );
+}
+
+/** Endgültig löschen (nur aus dem Papierkorb heraus angeboten). */
+export function einsatzEndgueltigLoeschen(id: string): void {
+  einsaetzeSpeichern(alleEinsaetzeLaden().filter((s) => s.id !== id));
 }
 
 /** Ergebnis von {@link meldungHinzufuegen}: `neu=false` heißt „Dublette übersprungen". */
@@ -250,7 +290,7 @@ export function meldungHinzufuegen(
   bogen: Erfassungsbogen,
   opt: MeldungOptionen = {},
 ): MeldungAufnahme | null {
-  const liste = einsaetzeLaden();
+  const liste = alleEinsaetzeLaden();
   const s = liste.find((x) => x.id === einsatzId);
   if (!s) return null;
 
@@ -281,13 +321,16 @@ export function meldungHinzufuegen(
  * Eintrags-ID, keine Dubletten bei Reimport). Sonst als neuen Einsatz anlegen.
  */
 export function einsatzImportieren(s: Einsatzsammlung): { neuerEinsatz: boolean; hinzugefuegt: number } {
-  const liste = einsaetzeLaden();
+  const liste = alleEinsaetzeLaden();
   const vorhanden = liste.find((x) => x.id === s.id);
   if (!vorhanden) {
     liste.push(s);
     einsaetzeSpeichern(liste);
     return { neuerEinsatz: true, hinzugefuegt: s.eintraege.length };
   }
+  // Import belebt einen Einsatz im Papierkorb wieder — sonst verschwänden die
+  // gemergten Meldungen unsichtbar im Papierkorb.
+  delete vorhanden.geloeschtAm;
   const ids = new Set(vorhanden.eintraege.map((e) => e.id));
   let hinzugefuegt = 0;
   for (const e of s.eintraege) {
@@ -304,7 +347,7 @@ export function einsatzImportieren(s: Einsatzsammlung): { neuerEinsatz: boolean;
 
 /** Status einer Meldung setzen (z. B. Einheit rückt ab → fällt aus aktuellen Summen). */
 export function meldungStatusSetzen(einsatzId: string, eintragId: string, status: MeldeStatus): void {
-  const liste = einsaetzeLaden();
+  const liste = alleEinsaetzeLaden();
   const s = liste.find((x) => x.id === einsatzId);
   if (!s) return;
   const e = s.eintraege.find((x) => x.id === eintragId);
@@ -315,7 +358,7 @@ export function meldungStatusSetzen(einsatzId: string, eintragId: string, status
 }
 
 export function meldungEntfernen(einsatzId: string, eintragId: string): void {
-  const liste = einsaetzeLaden();
+  const liste = alleEinsaetzeLaden();
   const s = liste.find((x) => x.id === einsatzId);
   if (!s) return;
   s.eintraege = s.eintraege.filter((e) => e.id !== eintragId);
@@ -330,7 +373,7 @@ export function meldungEntfernen(einsatzId: string, eintragId: string): void {
  * entfernt das Etikett. Speichert nur bei tatsächlicher Änderung.
  */
 export function einheitZugEtikettSetzen(einsatzId: string, einheitSchl: string, etikett: string): void {
-  const liste = einsaetzeLaden();
+  const liste = alleEinsaetzeLaden();
   const s = liste.find((x) => x.id === einsatzId);
   if (!s) return;
   const wert = etikett.trim() || undefined;

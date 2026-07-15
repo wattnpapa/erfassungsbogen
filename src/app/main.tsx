@@ -21,7 +21,7 @@ import { signaturLabel, signaturVonPayload, signaturVonText, type SignaturStatus
 import { SCHRITT_STATUS_TITEL, bogenLaden, browserKompressor, neuerBogen, schrittStatus } from "./hilfen";
 import { bogenLinksEmpfangen, istNativ, qrScannen, textTeilen } from "./nativ";
 import { DebugLeiste, debugAktiv, wendePlattformKlasseAn, wendeRahmenAn } from "./debug-plattform";
-import { vorlageAnlegen, vorlagenLaden, type Vorlage } from "./vorlagen";
+import { vorlageAnlegen, vorlagenLaden, vorlagenPapierkorb, type Vorlage } from "./vorlagen";
 import { Musterung, VorlagenListe } from "./vorlagen-ui";
 import {
   EinsatzArt,
@@ -39,6 +39,9 @@ import { boegenAusPdfBytes, einsatzAusDatei, einsatzDateiInhalt } from "./einsat
 import { einsatzCsvInhalt } from "./einsatz-csv";
 import { einsatzPdfErzeugen } from "./pdf";
 import { QrScannerWeb } from "./qr-scanner-web";
+import { qrAusBild } from "./qr-bild";
+import { entwurfLaden, entwurfSpeichern, entwurfVerwerfen } from "./entwurf";
+import { wendeFeldModusAn } from "./feld-modus";
 import { Fusszeile } from "./fusszeile";
 import { Aktualisierungshinweise } from "./aktualisierung";
 import {
@@ -89,18 +92,29 @@ function alsEintragSignatur(status: SignaturStatus): EintragSignatur | undefined
 
 const START = startAusUrlFragment();
 
+// Kaltstart ohne Bogen aus der URL: den automatisch gesicherten Entwurf
+// anbieten — Autosave überlebt geschlossene Tabs, leere Akkus und vom System
+// beendete Apps (siehe entwurf.ts).
+const ENTWURF = START.bogen ? null : entwurfLaden();
+
 function App() {
-  const [bogen, setBogen] = useState<Erfassungsbogen | null>(START.bogen);
-  const [schritt, setSchritt] = useState(START.bogen ? UEBERSICHT : 0);
+  const [bogen, setBogen] = useState<Erfassungsbogen | null>(START.bogen ?? ENTWURF?.bogen ?? null);
+  const [schritt, setSchritt] = useState(START.bogen || ENTWURF ? UEBERSICHT : 0);
   const [fehler, setFehler] = useState(START.fehler);
   // Signaturstatus des zuletzt IMPORTIERTEN Bogens (Herkunft des Transports).
   // Wird beim Bearbeiten verworfen — dann beschreibt er den Bogen nicht mehr.
   const [bogenSignatur, setBogenSignatur] = useState<SignaturStatus | null>(null);
-  const [meldung, setMeldung] = useState(START.vorlage ? `Vorlage „${START.vorlage.name}" importiert.` : "");
+  const [meldung, setMeldung] = useState(
+    START.vorlage
+      ? `Vorlage „${START.vorlage.name}" importiert.`
+      : ENTWURF
+        ? `Entwurf vom ${new Date(ENTWURF.gespeichert).toLocaleString("de-DE", { dateStyle: "short", timeStyle: "short" })} Uhr wiederhergestellt.`
+        : "",
+  );
   const [scannerOffen, setScannerOffen] = useState(false);
   // Zeigt den Startbildschirm, ohne den aktuellen Bogen zu verwerfen –
   // er lässt sich von dort per „Aktuellen Bogen fortsetzen“ wieder öffnen.
-  const [zeigeStart, setZeigeStart] = useState(false);
+  const [zeigeStart, setZeigeStart] = useState(!START.bogen && !!ENTWURF);
   const [vorlagen, setVorlagen] = useState<Vorlage[]>(() => vorlagenLaden());
   const [musterVorlage, setMusterVorlage] = useState<Vorlage | null>(null);
   // Einsatz-Sammlung (Meldekopf/Zugführer): Liste, offener Einsatz und das
@@ -115,6 +129,13 @@ function App() {
 
   const vorlagenNeuLaden = () => setVorlagen(vorlagenLaden());
   const einsaetzeNeuLaden = () => setEinsaetze(einsaetzeLaden());
+
+  // Entwurfssicherung: jede Änderung still sichern; wird der Bogen bewusst
+  // geschlossen (Neuer Bogen, Übernahme in einen Einsatz), fällt der Entwurf weg.
+  useEffect(() => {
+    if (bogen) entwurfSpeichern(bogen);
+    else entwurfVerwerfen();
+  }, [bogen]);
 
   function musterungFertig(neuerArbeitsbogen: Erfassungsbogen) {
     setBogen(neuerArbeitsbogen);
@@ -136,6 +157,24 @@ function App() {
       setZeigeStart(false);
       setZeigeVorlagen(false);
       setFehler("");
+    } catch (err) {
+      setFehler(err instanceof Error ? err.message : String(err));
+    }
+  }
+
+  /** QR-Code aus einem Foto/Screenshot einlesen — gleiche Pipeline wie der Scan. */
+  async function ladeQrBild(e: ChangeEvent<HTMLInputElement>) {
+    const datei = e.target.files?.[0];
+    e.target.value = "";
+    if (!datei) return;
+    try {
+      const text = await qrAusBild(datei);
+      if (!text) {
+        setFehler("Im Bild wurde kein QR-Code gefunden — am besten ein scharfes, möglichst gerades Foto des Codes verwenden.");
+        return;
+      }
+      setFehler("");
+      await uebernehmeText(text, "Der QR-Code im Bild enthält keinen gültigen Erfassungsbogen.");
     } catch (err) {
       setFehler(err instanceof Error ? err.message : String(err));
     }
@@ -483,7 +522,7 @@ function App() {
           onExport={() => exportiereEinsatz(offenerEinsatz)}
           onCsvExport={() => exportiereEinsatzCsv(offenerEinsatz)}
           onSammelPdf={() => sammelPdf(offenerEinsatz)}
-          onGeloescht={() => { setOffenerEinsatzId(null); einsaetzeNeuLaden(); setMeldung("Einsatz gelöscht."); }}
+          onGeloescht={() => { setOffenerEinsatzId(null); einsaetzeNeuLaden(); setMeldung("Einsatz in den Papierkorb verschoben."); }}
         />
         {(meldung || fehler) && (
           <p className={fehler ? "fehler" : "meldung"} role="status" style={{ textAlign: "center" }}>
@@ -519,16 +558,23 @@ function App() {
           </button>
           <button onClick={scanneQr}>QR-Code scannen…</button>
           <label className="datei-knopf">
+            QR aus Bild einlesen…
+            <input type="file" accept="image/*" onChange={ladeQrBild} hidden />
+          </label>
+          <label className="datei-knopf">
             Aus Datei laden…
             <input type="file" accept=".json,application/json" onChange={ladeDatei} hidden />
           </label>
         </div>
         {meldung && <p className="meldung" role="status">{meldung}</p>}
         {fehler && <p className="fehler">{fehler}</p>}
+        {scanFortschritt && !scannerOffen && <p className="meldung" role="status">{scanFortschritt}</p>}
         {scannerOffen && (
           <QrScannerWeb onErgebnis={scanErgebnisWeb} fortschritt={scanFortschritt} onAbbruch={() => scanAbbrechen(false)} />
         )}
-        {vorlagen.length > 0 && (
+        {/* Auch anzeigen, wenn NUR der Papierkorb gefüllt ist — sonst wäre eine
+            versehentlich gelöschte letzte Vorlage nicht wiederherstellbar. */}
+        {(vorlagen.length > 0 || vorlagenPapierkorb().length > 0) && (
           <section className="start-vorlagen">
             <h2>Gespeicherte Vorlagen</h2>
             <VorlagenListe
@@ -654,6 +700,7 @@ function App() {
 // Im Browser kann der Debug-Modus die visuelle Plattform überschreiben.
 wendePlattformKlasseAn();
 wendeRahmenAn();
+wendeFeldModusAn();
 
 // Im Debug-Modus eine schwebende Leiste zum Umschalten der Vorschau zeigen.
 function Wurzel() {
