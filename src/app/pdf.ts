@@ -16,6 +16,27 @@ import { einsatzPdfDokument, pdfDokument } from "./pdf-dokument";
 const fonts = pdfFonts as unknown as { pdfMake?: { vfs: Record<string, string> }; vfs?: Record<string, string> };
 (pdfMake as unknown as { vfs: Record<string, string> }).vfs = fonts.pdfMake?.vfs ?? fonts.vfs ?? {};
 
+// Die THWin-Papiervorlage ist in „BundesSans Office" gesetzt (Bund-Hausschrift,
+// nicht frei weitergebbar). Deren im Word-Dokument hinterlegte Ausweichschrift
+// ist Arial — und das metrisch praktisch deckungsgleiche Helvetica ist eine der
+// 14 PDF-Standardschriften, die pdfkit/pdfmake ohne eingebettete Font-Datei
+// (kein vfs-Eintrag nötig) rendern kann. So wirkt die erzeugte PDF wie das
+// Original, statt im pdfmake-Standard Roboto. Roboto bleibt als Fallback erhalten.
+(pdfMake as unknown as { fonts: Record<string, unknown> }).fonts = {
+  Roboto: {
+    normal: "Roboto-Regular.ttf",
+    bold: "Roboto-Medium.ttf",
+    italics: "Roboto-Italic.ttf",
+    bolditalics: "Roboto-MediumItalic.ttf",
+  },
+  Helvetica: {
+    normal: "Helvetica",
+    bold: "Helvetica-Bold",
+    italics: "Helvetica-Oblique",
+    bolditalics: "Helvetica-BoldOblique",
+  },
+};
+
 export async function pdfErzeugen(b: Erfassungsbogen): Promise<void> {
   const qr = await qrErzeugen(b);
   const dd = pdfDokument(b, qr);

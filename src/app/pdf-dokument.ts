@@ -36,8 +36,27 @@ import {
 } from "./hilfen";
 import { fahrzeugSymbolSvg } from "./taktische-zeichen";
 
-const BLAU = "#12275e";
-const GRAU = "#e8e8e8";
+// Farben exakt aus der THWin-Papiervorlage (06-BrB_Erfassungsbogen.dotx):
+// Kopfbalken-Blau w:fill="003399", Grau der Kopfzeilen/Hinweiszeile w:fill="D9D9D9".
+const BLAU = "#003399";
+const GRAU = "#d9d9d9";
+
+/**
+ * Schriftart und Seitenränder wie in der THWin-Vorlage. Helvetica (≙ Arial, die
+ * im Word-Dokument hinterlegte Ausweichschrift der Bund-Hausschrift BundesSans)
+ * wird in pdf.ts als PDF-Standardschrift registriert.
+ */
+const SCHRIFT = "Helvetica";
+
+/**
+ * Seitenränder [links, oben, rechts, unten] in pt, umgerechnet aus den
+ * pgMar-Twips der Vorlage (1 pt = 20 Twips): links 1418→70,9 · oben 567→28,3 ·
+ * rechts 1134→56,7. Der charakteristische breite linke / schmale rechte Rand
+ * lässt die PDF wie das Original wirken. Unten bewusst etwas größer als die
+ * 284 Twips der Vorlage (≈14 pt), damit die App-Fußzeile („Stand … / Seite")
+ * Platz behält.
+ */
+const SEITENRAENDER: [number, number, number, number] = [71, 28, 57, 32];
 
 /**
  * Kantenlänge des QR-Bilds in pt (1 pt = 1/72 Zoll). 150 pt ≈ 53 mm: klein
@@ -126,8 +145,8 @@ export function einsatzPdfDokument(
   });
   return {
     pageSize: "A4",
-    pageMargins: [40, 36, 40, 40],
-    defaultStyle: { fontSize: 9 },
+    pageMargins: SEITENRAENDER,
+    defaultStyle: { fontSize: 8, font: SCHRIFT },
     info: { title: `Einsatz-Sammlung ${name}` },
     files: { [EEB_EINSATZ_DATEINAME]: boegenAlsEingebetteteDatei(boegenMitQr.map((x) => x.bogen)) },
     footer: (seite, gesamt) => ({
@@ -361,8 +380,8 @@ export function pdfDokument(b: Erfassungsbogen, qr: QrSatz): TDocumentDefinition
 
   return {
     pageSize: "A4",
-    pageMargins: [40, 36, 40, 40],
-    defaultStyle: { fontSize: 9 },
+    pageMargins: SEITENRAENDER,
+    defaultStyle: { fontSize: 8, font: SCHRIFT },
     info: { title: `Erfassungsbogen ${typKurz || typName}` },
     // Maschinenlesbares JSON dokumentweit einbetten (ZUGFeRD-artig).
     files: { [EEB_JSON_DATEINAME]: bogenAlsEingebetteteDatei(b) },
@@ -386,7 +405,7 @@ export function pdfDokument(b: Erfassungsbogen, qr: QrSatz): TDocumentDefinition
                 color: "#ffffff",
                 fillColor: BLAU,
                 bold: true,
-                fontSize: 13,
+                fontSize: 12,
                 margin: [6, 8, 6, 8],
               },
               { text: orgLabel(org) + (b.einheit.organisationName ? `\n${b.einheit.organisationName}` : ""), bold: true, color: BLAU, margin: [2, 8, 2, 8] },

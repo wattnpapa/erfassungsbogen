@@ -916,7 +916,10 @@ function roundtrip(satz: QrSatz, erwartetGesamt: number, datei: string): void {
 
 // ---------------------------------------------------------------- Hauptlauf
 
-// Serverseitige pdfmake-Fonts (Roboto liegt im Paket).
+// Serverseitige pdfmake-Fonts (Roboto liegt im Paket). Helvetica ist eine der
+// 14 PDF-Standardschriften und in pdfkit ohne Datei über den Namen verfügbar —
+// die Bögen sind in Helvetica (≙ Arial) gesetzt, damit sie wie die THWin-
+// Papiervorlage wirken (siehe SCHRIFT in src/app/pdf-dokument.ts).
 const robotoDir = join(wurzel, "node_modules/pdfmake/fonts/Roboto");
 pdfmake.setFonts({
   Roboto: {
@@ -925,11 +928,19 @@ pdfmake.setFonts({
     italics: join(robotoDir, "Roboto-Italic.ttf"),
     bolditalics: join(robotoDir, "Roboto-MediumItalic.ttf"),
   },
+  Helvetica: {
+    normal: "Helvetica",
+    bold: "Helvetica-Bold",
+    italics: "Helvetica-Oblique",
+    bolditalics: "Helvetica-BoldOblique",
+  },
 });
 // Nur eingebettete data:-URLs zulassen (QR-Bild + JSON), kein Netzzugriff.
 pdfmake.setUrlAccessPolicy((url: string) => url.startsWith("data:"));
-// Lokaler Zugriff nur auf die mitgelieferten Schriftdateien.
-pdfmake.setLocalAccessPolicy((pfad: string) => pfad.startsWith(robotoDir));
+// Lokaler Zugriff nur auf die mitgelieferten Roboto-Dateien sowie die PDF-
+// Standardschrift Helvetica (in pdfkit als AFM eingebaut, wird von pdfmake über
+// den Namen als „lokale Datei" geprüft, aber nicht wirklich von Platte gelesen).
+pdfmake.setLocalAccessPolicy((pfad: string) => pfad.startsWith(robotoDir) || pfad.startsWith("Helvetica"));
 
 const ANZAHL = 100;
 const STAN_TREU = 40; // max. 40 % exakt im StAN-Soll
