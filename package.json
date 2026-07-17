@@ -6,6 +6,7 @@
   "scripts": {
     "demo": "tsx scripts/qr-demo.ts",
     "beispiele": "node --import tsx scripts/beispielboegen-pdf.mts",
+    "beispiele:kats": "node --import tsx scripts/kats-nds-beispielboegen.mts",
     "icons": "node scripts/render-icons.mjs",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",

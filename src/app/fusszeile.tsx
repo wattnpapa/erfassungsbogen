@@ -11,10 +11,12 @@ import { sicherungEinspielen, sicherungErstellen } from "./sicherung";
 const KONTAKT = "johannes.rudolph@thw-oldenburg.de";
 const REPO = "https://github.com/wattnpapa/erfassungsbogen";
 
-// Anzeigenamen für die Organisations-Unterordner in examples/. Unbekannte
-// Ordner erscheinen mit ihrem Ordnernamen in Großbuchstaben, damit neue
-// Organisationen auch ohne Eintrag hier sichtbar bleiben.
-const ORG_ORDNER_LABEL: Record<string, string> = {
+// Anzeigenamen für die Ordner in examples/. Erste Ebene ist die Organisation
+// bzw. ein Thema (z. B. „Katastrophenschutz"), darunter können weitere Ebenen
+// folgen (z. B. Bundesländer). Unbekannte Ordner erscheinen mit ihrem
+// Ordnernamen in Großbuchstaben, damit neue Ordner auch ohne Eintrag hier
+// sichtbar bleiben.
+const ORDNER_LABEL: Record<string, string> = {
   thw: "THW",
   feuerwehr: "Feuerwehr",
   polizei: "Polizei",
@@ -26,23 +28,57 @@ const ORG_ORDNER_LABEL: Record<string, string> = {
   dlrg: "DLRG",
   bundeswehr: "Bundeswehr",
   rettungsdienst: "Rettungsdienst",
+  katastrophenschutz: "Katastrophenschutz",
+  niedersachsen: "Niedersachsen",
 };
 
-// Beispiel-PDFs aus examples/<organisation>/ — der Glob wird beim Build
-// aufgelöst, neue Dateien und Organisations-Ordner erscheinen also automatisch
-// ohne Codeänderung (erzeugt von scripts/beispielboegen-pdf.mts).
+function ordnerLabel(ordner: string): string {
+  return ORDNER_LABEL[ordner] ?? ordner.replace(/-/g, " ").toUpperCase();
+}
+
+// Beispiel-PDFs aus examples/ — beliebig tief verschachtelt (z. B.
+// examples/thw/*.pdf oder examples/katastrophenschutz/niedersachsen/*.pdf). Der
+// Glob wird beim Build aufgelöst, neue Dateien und Ordner erscheinen also
+// automatisch ohne Codeänderung (erzeugt von scripts/beispielboegen-pdf.mts
+// bzw. scripts/kats-nds-beispielboegen.mts). `ordner` sind die Verzeichnis-
+// segmente zwischen examples/ und der Datei.
 const BEISPIELE = Object.entries(
-  import.meta.glob("../../examples/*/*.pdf", { eager: true, query: "?url", import: "default" }),
+  import.meta.glob("../../examples/**/*.pdf", { eager: true, query: "?url", import: "default" }),
 )
   .map(([pfad, url]) => {
     const teile = pfad.split("/");
-    return { ordner: teile[teile.length - 2]!, datei: teile[teile.length - 1]!, url: url as string };
+    const iExamples = teile.lastIndexOf("examples");
+    return {
+      ordner: teile.slice(iExamples + 1, teile.length - 1),
+      datei: teile[teile.length - 1]!,
+      url: url as string,
+    };
   })
   .sort((a, b) => a.datei.localeCompare(b.datei, "de"));
 
-const ORGANISATIONEN = [...new Set(BEISPIELE.map((b) => b.ordner))]
-  .map((ordner) => ({ ordner, label: ORG_ORDNER_LABEL[ordner] ?? ordner.toUpperCase() }))
-  .sort((a, b) => a.label.localeCompare(b.label, "de"));
+/** Trefferliste unter einem Ordner-Pfad (Prefix-Abgleich). */
+function unterPfad(pfad: string[]): typeof BEISPIELE {
+  return BEISPIELE.filter((b) => pfad.every((seg, i) => b.ordner[i] === seg));
+}
+
+/** Direkte Unterordner (mit Bogenzahl) unterhalb eines Pfades. */
+function unterordner(pfad: string[]): { ordner: string; anzahl: number }[] {
+  const zaehler = new Map<string, number>();
+  for (const b of unterPfad(pfad)) {
+    if (b.ordner.length > pfad.length) {
+      const naechster = b.ordner[pfad.length]!;
+      zaehler.set(naechster, (zaehler.get(naechster) ?? 0) + 1);
+    }
+  }
+  return [...zaehler.entries()]
+    .map(([ordner, anzahl]) => ({ ordner, anzahl }))
+    .sort((a, b) => ordnerLabel(a.ordner).localeCompare(ordnerLabel(b.ordner), "de"));
+}
+
+/** Bögen, die direkt in diesem Ordner liegen (keine tiefere Ebene mehr). */
+function boegenHier(pfad: string[]): typeof BEISPIELE {
+  return unterPfad(pfad).filter((b) => b.ordner.length === pfad.length);
+}
 
 /** Nativ gibt es keinen Browser-Download: PDF laden und übers Share-Sheet anbieten. */
 async function beispielTeilen(e: MouseEvent, datei: string, url: string): Promise<void> {
@@ -79,8 +115,9 @@ export function Fusszeile() {
   const impressum = useRef<HTMLDialogElement>(null);
   const datenschutz = useRef<HTMLDialogElement>(null);
   const beispiele = useRef<HTMLDialogElement>(null);
-  // Zweistufige Auswahl im Beispielbögen-Dialog: erst Organisation, dann Bogen.
-  const [beispielOrg, setBeispielOrg] = useState<string | null>(null);
+  // Ordner-Navigation im Beispielbögen-Dialog: erst Organisation/Thema, ggf.
+  // weitere Ebenen (z. B. Bundesland), dann der Bogen.
+  const [beispielPfad, setBeispielPfad] = useState<string[]>([]);
   const sicherung = useRef<HTMLDialogElement>(null);
   const [feldModus, setFeldModus] = useState(() => feldModusAktiv());
   const [sicherungFehler, setSicherungFehler] = useState("");
@@ -143,7 +180,7 @@ export function Fusszeile() {
         <button
           className="link"
           onClick={() => {
-            setBeispielOrg(null); // beim Öffnen wieder mit der Organisationswahl starten
+            setBeispielPfad([]); // beim Öffnen wieder ganz oben starten
             beispiele.current?.showModal();
           }}
         >
@@ -185,38 +222,32 @@ export function Fusszeile() {
           zum Ansehen, für Übungen oder zum Testen des QR-Imports. Die eingebetteten
           QR-Codes lassen sich direkt mit der App scannen.
         </p>
-        {beispielOrg == null ? (
-          <>
-            <p><strong>Organisation wählen:</strong></p>
-            <ul>
-              {ORGANISATIONEN.map(({ ordner, label }) => (
-                <li key={ordner}>
-                  <button className="link" onClick={() => setBeispielOrg(ordner)}>
-                    {label} ({BEISPIELE.filter((b) => b.ordner === ordner).length} Bögen)
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </>
-        ) : (
-          <>
-            <p>
-              <button className="link" onClick={() => setBeispielOrg(null)}>
-                ← Andere Organisation
-              </button>
-            </p>
-            <p><strong>{ORG_ORDNER_LABEL[beispielOrg] ?? beispielOrg.toUpperCase()}</strong></p>
-            <ul>
-              {BEISPIELE.filter((b) => b.ordner === beispielOrg).map(({ datei, url }) => (
-                <li key={datei}>
-                  <a href={url} download={datei} onClick={(e) => void beispielTeilen(e, datei, url)}>
-                    {datei}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </>
+        {beispielPfad.length > 0 && (
+          <p>
+            <button className="link" onClick={() => setBeispielPfad(beispielPfad.slice(0, -1))}>
+              ← Zurück
+            </button>
+            {"  "}
+            <strong>{beispielPfad.map(ordnerLabel).join(" › ")}</strong>
+          </p>
         )}
+        {beispielPfad.length === 0 && <p><strong>Organisation oder Thema wählen:</strong></p>}
+        <ul>
+          {unterordner(beispielPfad).map(({ ordner, anzahl }) => (
+            <li key={`d/${ordner}`}>
+              <button className="link" onClick={() => setBeispielPfad([...beispielPfad, ordner])}>
+                {ordnerLabel(ordner)} ({anzahl} {anzahl === 1 ? "Bogen" : "Bögen"})
+              </button>
+            </li>
+          ))}
+          {boegenHier(beispielPfad).map(({ datei, url }) => (
+            <li key={`f/${datei}`}>
+              <a href={url} download={datei} onClick={(e) => void beispielTeilen(e, datei, url)}>
+                {datei}
+              </a>
+            </li>
+          ))}
+        </ul>
       </Dialog>
 
       <Dialog titel="Über dieses Projekt" dialogRef={ueber}>
