@@ -115,7 +115,7 @@ describe("pdfDokument()", () => {
     // Das übergebene QR-Bild muss unverändert im Dokument landen.
     expect(JSON.stringify(dd.content)).toContain(QR_BILD);
     expect(texte(dd.content)).toContain(
-      `Format EEB2 · ${QR.zeichen} Zeichen · QR-Version ${QR.version} (Fehlerkorrektur M)\nMit der Kamera scannen oder den Link antippen, um den Bogen digital zu übernehmen.`,
+      "Mit der Kamera scannen oder den Link antippen, um den Bogen digital zu übernehmen.",
     );
   });
 
@@ -155,7 +155,7 @@ describe("pdfDokument()", () => {
     const t = texte(dd.content).join("\n");
     expect(t).toContain("Teil 1 / 2");
     expect(t).toContain("Teil 2 / 2");
-    expect(t).toContain("in 2 QR-Codes aufgeteilt");
+    expect(t).toContain("Alle 2 Teile nacheinander mit der Kamera scannen");
   });
 
   it("druckt Kopf, Einsatz, Zugehörigkeit und Stärke", () => {

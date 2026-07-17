@@ -170,7 +170,7 @@ function qrBlock(qr: QrSatz): Content {
           margin: [0, 8, 0, 0],
         },
         {
-          text: `Format EEB2 · ${qr.zeichen} Zeichen · QR-Version ${qr.version} (Fehlerkorrektur M)\nMit der Kamera scannen oder den Link antippen, um den Bogen digital zu übernehmen.`,
+          text: "Mit der Kamera scannen oder den Link antippen, um den Bogen digital zu übernehmen.",
           alignment: "center",
           fontSize: 8,
           margin: [0, 6, 0, 0],
@@ -190,7 +190,6 @@ function qrBlock(qr: QrSatz): Content {
   });
   const hinweis = (): Content => ({
     text:
-      `Format EEB2 · ${qr.zeichen} Zeichen · in ${anzahl} QR-Codes aufgeteilt (je ≤ Version ${qr.version}, Fehlerkorrektur M)\n` +
       `Alle ${anzahl} Teile nacheinander mit der Kamera scannen — die App setzt den Bogen zusammen.\n` +
       `Beim Scannen jeweils nur einen Code ins Kamerabild nehmen.`,
     alignment: "center",
