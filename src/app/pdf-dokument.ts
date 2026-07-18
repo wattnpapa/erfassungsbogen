@@ -17,6 +17,7 @@ import type { Attachment, Content, TDocumentDefinitions, TableCell } from "pdfma
 import {
   Erfassungsbogen,
   KontaktArt,
+  OrganisationsTyp,
   PersonalErfassung,
   datumZuIso,
   staerke,
@@ -37,10 +38,61 @@ import {
 } from "./hilfen";
 import { fahrzeugSymbolSvg } from "./taktische-zeichen";
 
-// Farben exakt aus der THWin-Papiervorlage (06-BrB_Erfassungsbogen.dotx):
-// Kopfbalken-Blau w:fill="003399", Grau der Kopfzeilen/Hinweiszeile w:fill="D9D9D9".
-const BLAU = "#003399";
+// Grau der Kopfzeilen/Hinweiszeile exakt aus der THWin-Papiervorlage
+// (06-BrB_Erfassungsbogen.dotx): w:fill="D9D9D9".
 const GRAU = "#d9d9d9";
+
+/**
+ * Kennfarbe je Organisation: färbt Kopfbalken, Organisationsangabe und die
+ * QR-Überschriften, sodass man schon am aufgeschlagenen Bogen sieht, von wem er
+ * stammt. Wo eine eindeutige Hausfarbe existiert (THW-Blau, Feuerrot,
+ * DRK-Rot), ist sie übernommen; sonst eine gut unterscheidbare, an die
+ * Organisation angelehnte Farbe.
+ *
+ * Die Werte sind bis auf das Weiß des Rettungsdienstes dunkel gehalten, damit
+ * der Kopfbalken weiße Schrift tragen kann; helle Kennfarben schaltet
+ * {@link orgFarbe} automatisch auf dunkle Schrift um. Die drei Rottöne (Feuerwehr, DRK, Malteser) und die beiden Grüntöne (Polizei,
+ * Bundespolizei) unterscheiden sich in Helligkeit bzw. Sättigung; daneben steht
+ * ohnehin der Name der Organisation.
+ */
+const ORG_FARBEN: Partial<Record<OrganisationsTyp, string>> = {
+  [OrganisationsTyp.THW]: "#20214f", // THW-Blau (RAL 5002 Ultramarinblau)
+  [OrganisationsTyp.FEUERWEHR]: "#c8102e", // Feuerrot (RAL 3000)
+  [OrganisationsTyp.POLIZEI]: "#2d6a2e", // Polizeigrün, heller als die Bundespolizei
+  [OrganisationsTyp.BUNDESPOLIZEI]: "#00694e", // Grün in der BGS-Tradition
+  [OrganisationsTyp.DRK]: "#e30613", // DRK-Rot
+  [OrganisationsTyp.JUH]: "#1a1a1a", // Johanniter-Schwarz
+  [OrganisationsTyp.MHD]: "#7d1128", // Malteser-Bordeaux
+  [OrganisationsTyp.ASB]: "#a34700", // dunkles ASB-Orange
+  [OrganisationsTyp.DLRG]: "#9c6b00", // dunkles DLRG-Gelb
+  [OrganisationsTyp.BUNDESWEHR]: "#4b5320", // Oliv
+  [OrganisationsTyp.RETTUNGSDIENST]: "#ffffff", // Weiß (Rettungsdienst-Fahrzeuglackierung)
+  [OrganisationsTyp.SONSTIGE]: "#4d4d4d", // neutrales Grau
+};
+
+const NEUTRAL = "#4d4d4d";
+
+/** Relative Helligkeit 0–1 eines #rrggbb-Werts (nach WCAG, ohne Gamma-Korrektur — reicht hier). */
+function helligkeit(hex: string): number {
+  const [r, g, b] = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16) / 255) as [number, number, number];
+  return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+}
+
+/**
+ * Kennfarben der Organisation für den Bogen:
+ * - `balken`  = Füllung des Kopfbalkens,
+ * - `schrift` = Text IM Kopfbalken (dunkel, sobald die Füllung zu hell für Weiß ist —
+ *   der Rettungsdienst ist weiß, da wäre weiße Schrift unsichtbar),
+ * - `akzent`  = farbiger Text auf weißem Papier (Organisationsangabe, QR-Überschriften);
+ *   fällt bei hellen Kennfarben auf ein lesbares Neutralgrau zurück.
+ *
+ * Unbekannte Organisationen bekommen das Grau der „Sonstigen".
+ */
+export function orgFarbe(org: OrganisationsTyp): { balken: string; schrift: string; akzent: string } {
+  const balken = ORG_FARBEN[org] ?? NEUTRAL;
+  const hell = helligkeit(balken) > 0.6;
+  return { balken, schrift: hell ? "#000000" : "#ffffff", akzent: hell ? NEUTRAL : balken };
+}
 
 /**
  * Schriftart und Seitenränder wie in der THWin-Vorlage. Helvetica (≙ Arial, die
@@ -168,8 +220,8 @@ export function einsatzPdfDokument(
  * QR_SEGMENT_BREITE); ein Öffnen-Link entfällt, da jeder Teil nur einen
  * Abschnitt trägt.
  */
-function qrBlock(qr: QrSatz): Content {
-  const kopf = (text: string): Content => ({ text, bold: true, fontSize: 13, color: BLAU, alignment: "center" });
+function qrBlock(qr: QrSatz, akzent: string): Content {
+  const kopf = (text: string): Content => ({ text, bold: true, fontSize: 13, color: akzent, alignment: "center" });
   if (qr.teile.length === 1) {
     const t = qr.teile[0]!;
     return {
@@ -183,7 +235,7 @@ function qrBlock(qr: QrSatz): Content {
         {
           text: "Bogen direkt in der App öffnen",
           link: t.url,
-          color: BLAU,
+          color: akzent,
           decoration: "underline",
           alignment: "center",
           fontSize: 11,
@@ -204,7 +256,7 @@ function qrBlock(qr: QrSatz): Content {
   // Diagonale zusammenstaucht.
   const teilZelle = (t: QrSatz["teile"][number]): Content => ({
     stack: [
-      { text: `Teil ${t.teilNr} / ${anzahl}`, bold: true, alignment: "center", color: BLAU },
+      { text: `Teil ${t.teilNr} / ${anzahl}`, bold: true, alignment: "center", color: akzent },
       { image: t.datenUrl, width: QR_SEGMENT_BREITE, margin: [0, 4, 0, 0] },
     ],
   });
@@ -242,6 +294,7 @@ function qrBlock(qr: QrSatz): Content {
 /** Bogen + fertiger QR-Satz → pdfmake-DocDefinition (Papier-Layout). */
 export function pdfDokument(b: Erfassungsbogen, qr: QrSatz): TDocumentDefinitions {
   const org = b.einheit.organisation;
+  const farbe = orgFarbe(org);
   const typName = vokabText(b.einheit.einheitsTyp, vokabularFuer(org, "einheitstyp"), "name") || "Einheit";
   const typKurz = vokabText(b.einheit.einheitsTyp, vokabularFuer(org, "einheitstyp"));
   const s = staerke(b);
@@ -397,15 +450,16 @@ export function pdfDokument(b: Erfassungsbogen, qr: QrSatz): TDocumentDefinition
       // ---- Kopf ----
       {
         table: {
-          // Kopf zweispaltig: Titel im blauen Kasten, rechts die Einheit von
+          // Kopf zweispaltig: Titel im Kasten in der Kennfarbe der Organisation,
+          // rechts die Einheit von
           // oben nach unten — Organisation, Organisationsname, Einheitstyp.
           widths: ["*", 150],
           body: [
             [
               {
                 text: `Erfassungsbogen ${typName}`,
-                color: "#ffffff",
-                fillColor: BLAU,
+                color: farbe.schrift,
+                fillColor: farbe.balken,
                 bold: true,
                 fontSize: 12,
                 margin: [6, 8, 6, 8],
@@ -413,7 +467,7 @@ export function pdfDokument(b: Erfassungsbogen, qr: QrSatz): TDocumentDefinition
               {
                 text: [orgLabel(org), b.einheit.organisationName, typKurz].filter(Boolean).join("\n"),
                 bold: true,
-                color: BLAU,
+                color: farbe.akzent,
                 margin: [2, 8, 2, 8],
               },
             ],
@@ -440,7 +494,7 @@ export function pdfDokument(b: Erfassungsbogen, qr: QrSatz): TDocumentDefinition
       // Kein fester Seitenumbruch mehr; als unbreakable-Gruppe zusammengehalten,
       // damit der QR-Code nicht über eine Seitengrenze zerrissen wird. Passt der
       // Block nicht mehr, rückt er als Ganzes auf die nächste Seite.
-      qrBlock(qr),
+      qrBlock(qr, farbe.akzent),
     ],
   };
 }
