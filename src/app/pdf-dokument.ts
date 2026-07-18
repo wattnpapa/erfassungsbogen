@@ -428,13 +428,6 @@ export function pdfDokument(b: Erfassungsbogen, qr: QrSatz): TDocumentDefinition
       { table: { widths: [180, "*"], body: qualiZeilen } },
       ...sofort,
       ...(b.sonstiges ? [{ text: `Sonstiges: ${b.sonstiges}`, margin: [0, 8, 0, 0] } as Content] : []),
-      {
-        table: {
-          widths: ["*"],
-          body: [[{ text: "Sollten die vorgegebenen Felder nicht genügen,\nist der „Erfassungsbogen Sonstige“ zu verwenden!", bold: true, alignment: "center", fillColor: GRAU }]],
-        },
-        margin: [0, 10, 0, 0],
-      },
 
       // ---- QR-Block ----
       // Kein fester Seitenumbruch mehr; als unbreakable-Gruppe zusammengehalten,
