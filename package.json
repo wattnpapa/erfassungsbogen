@@ -9,6 +9,7 @@
     "beispiele:kats": "node --import tsx scripts/kats-nds-beispielboegen.mts",
     "beispiele:kats-sn": "node --import tsx scripts/kats-sachsen-beispielboegen.mts",
     "beispiele:kats-bb": "node --import tsx scripts/kats-brandenburg-beispielboegen.mts",
+    "beispiele:kats-th": "node --import tsx scripts/kats-thueringen-beispielboegen.mts",
     "beispiele:dlrg": "node --import tsx scripts/dlrg-beispielboegen.mts",
     "icons": "node scripts/render-icons.mjs",
     "typecheck": "tsc --noEmit",

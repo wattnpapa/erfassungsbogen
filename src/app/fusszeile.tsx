@@ -32,6 +32,7 @@ const ORDNER_LABEL: Record<string, string> = {
   brandenburg: "Brandenburg",
   niedersachsen: "Niedersachsen",
   sachsen: "Sachsen",
+  thueringen: "Thüringen",
 };
 
 function ordnerLabel(ordner: string): string {
