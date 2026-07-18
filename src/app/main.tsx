@@ -21,6 +21,7 @@ import { signaturLabel, signaturVonPayload, signaturVonText, type SignaturStatus
 import { SCHRITT_STATUS_TITEL, bogenLaden, browserKompressor, neuerBogen, schrittStatus } from "./hilfen";
 import { bogenLinksEmpfangen, istNativ, qrScannen, textTeilen } from "./nativ";
 import { DebugLeiste, debugAktiv, wendePlattformKlasseAn, wendeRahmenAn } from "./debug-plattform";
+import { statistikStarten } from "./statistik";
 import { vorlageAnlegen, vorlagenLaden, vorlagenPapierkorb, type Vorlage } from "./vorlagen";
 import { Musterung, VorlagenListe } from "./vorlagen-ui";
 import {
@@ -711,6 +712,9 @@ function Wurzel() {
     </>
   );
 }
+
+// Reichweitenmessung der Web-App (no-op in der nativen App und im Electron-Build).
+statistikStarten();
 
 createRoot(document.getElementById("app")!).render(
   <StrictMode>

@@ -5,6 +5,7 @@
 
 import { useRef, useState, type ChangeEvent, type MouseEvent, type ReactNode, type RefObject } from "react";
 import { istNativ, pdfTeilen, textTeilen } from "./nativ";
+import { statistikAbgewaehlt, statistikAbwaehlen } from "./statistik";
 import { feldModusAktiv, feldModusSetzen } from "./feld-modus";
 import { sicherungEinspielen, sicherungErstellen } from "./sicherung";
 
@@ -124,6 +125,13 @@ export function Fusszeile() {
   const sicherung = useRef<HTMLDialogElement>(null);
   const [feldModus, setFeldModus] = useState(() => feldModusAktiv());
   const [sicherungFehler, setSicherungFehler] = useState("");
+  const [statistikAus, setStatistikAus] = useState(() => statistikAbgewaehlt());
+
+  function statistikUmschalten(ereignis: ChangeEvent<HTMLInputElement>) {
+    const aus = ereignis.target.checked;
+    setStatistikAus(aus);
+    statistikAbwaehlen(aus);
+  }
 
   function feldModusUmschalten() {
     const an = !feldModus;
@@ -306,11 +314,34 @@ export function Fusszeile() {
           Übertragung an einen Server statt. Eine Weitergabe erfolgt nur, wenn Nutzende
           selbst eine Datei, ein PDF oder einen QR-Code erzeugen und teilen.
         </p>
-        <h3>4. Cookies und Tracking</h3>
+        <h3>4. Cookies und Reichweitenmessung</h3>
         <p>
-          Die App setzt keine Cookies, nutzt keine Analyse-Dienste und bindet keine
-          Inhalte von Drittanbietern ein.
+          Es werden keine Cookies gesetzt und keine Daten im Endgerät gespeichert
+          oder ausgelesen.
         </p>
+        {istNativ() ? (
+          <p>
+            Diese App läuft vollständig lokal und bindet keine Analyse-Dienste ein.
+          </p>
+        ) : (
+          <>
+            <p>
+              Auf der Website wird zur Reichweitenmessung{" "}
+              <a href="https://www.goatcounter.com/" target="_blank" rel="noopener noreferrer">
+                GoatCounter
+              </a>{" "}
+              eingesetzt. Erfasst werden nur Zeitpunkt des Aufrufs, aufgerufene Seite,
+              verweisende Seite sowie Browser- und Ländertyp. Die IP-Adresse wird nicht
+              gespeichert, es entsteht keine geräteübergreifende Kennung. Inhalte des
+              Erfassungsbogens werden nicht übertragen. Rechtsgrundlage ist Art. 6
+              Abs. 1 lit. f DSGVO.
+            </p>
+            <label className="inline">
+              <input type="checkbox" checked={statistikAus} onChange={statistikUmschalten} />
+              Nicht mitzählen (gilt ab dem nächsten Start)
+            </label>
+          </>
+        )}
         <h3>5. Betroffenenrechte</h3>
         <p>
           Nach Art. 15–21 DSGVO bestehen Rechte auf Auskunft, Berichtigung, Löschung,
