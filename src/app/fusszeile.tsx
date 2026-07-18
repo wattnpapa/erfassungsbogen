@@ -29,6 +29,7 @@ const ORDNER_LABEL: Record<string, string> = {
   bundeswehr: "Bundeswehr",
   rettungsdienst: "Rettungsdienst",
   katastrophenschutz: "Katastrophenschutz",
+  brandenburg: "Brandenburg",
   niedersachsen: "Niedersachsen",
   sachsen: "Sachsen",
 };
