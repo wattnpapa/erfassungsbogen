@@ -32,7 +32,7 @@ Then("sehe ich den Schritt {string}", async function (this: EebWelt, text: strin
   await this.page.getByRole("heading", { name: text }).waitFor({ state: "visible" });
 });
 
-Then("sehe ich die Übersicht mit der Einheit {string}", async function (this: EebWelt, name: string) {
+Then("sehe ich die Übersicht mit dem Standort {string}", async function (this: EebWelt, name: string) {
   await this.page.getByRole("heading", { name: "Gesamtübersicht" }).waitFor({ state: "visible" });
   await sichtbar(this, name);
 });

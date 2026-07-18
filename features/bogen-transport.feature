@@ -16,6 +16,6 @@ Funktionalität: Erfassungsbogen erstellen und offline transportieren
 
   Szenario: Geteilter Link eines alten Bogens wird geladen und migriert
     Angenommen ich öffne einen geteilten Bogen-Link eines alten Bogens
-    Dann sehe ich die Übersicht mit der Einheit "OV Oldenburg - Ni"
+    Dann sehe ich die Übersicht mit dem Standort "Oldenburg - Ni"
     Und sehe ich die Organisation "THW"
     Und sehe ich die Person "Rudolph" in der Personalliste
