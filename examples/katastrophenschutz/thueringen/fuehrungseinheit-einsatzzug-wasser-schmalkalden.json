@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "stand": 2390,
   "einheit": {
     "organisation": 2,
@@ -115,7 +115,7 @@
         "freitext": "ELW 1"
       },
       "aenderungen": "Einsatzleitwagen 1",
-      "kennzeichenFreitext": "SM-2022",
+      "kennzeichen": "SM-2022",
       "funkrufname": {
         "kennwort": {
           "freitext": "Kater"

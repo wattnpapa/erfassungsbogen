@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "stand": 2388,
   "einheit": {
     "organisation": 6,
@@ -204,7 +204,7 @@
         "freitext": "GW-V"
       },
       "aenderungen": "Gerätewagen Verpflegung (Land)",
-      "kennzeichenFreitext": "BAR-2038",
+      "kennzeichen": "BAR-2038",
       "funkrufname": {
         "kennwort": {
           "code": 4
@@ -223,7 +223,7 @@
         "freitext": "LKW"
       },
       "aenderungen": "Lastkraftwagen mit Ladebordwand (Träger)",
-      "kennzeichenFreitext": "BAR-2039",
+      "kennzeichen": "BAR-2039",
       "funkrufname": {
         "kennwort": {
           "code": 4
@@ -242,7 +242,7 @@
         "freitext": "MTW"
       },
       "aenderungen": "Mannschaftstransportwagen (Träger)",
-      "kennzeichenFreitext": "BAR-2040",
+      "kennzeichen": "BAR-2040",
       "funkrufname": {
         "kennwort": {
           "code": 4
@@ -261,7 +261,7 @@
         "freitext": "FKH"
       },
       "aenderungen": "Feldkochherd (Land) — Anhänger, kein Einsatz-Kfz",
-      "kennzeichenFreitext": "Anh FKH"
+      "kennzeichen": "Anh FKH"
     }
   ],
   "sofortbedarf": {

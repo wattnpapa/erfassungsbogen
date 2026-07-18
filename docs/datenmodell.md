@@ -1,13 +1,20 @@
 # Datenmodell Einheiten-Erfassungsbogen (EEB)
 
-**Stufe 1** — Datenmodell und QR-Code-Kodierung. Stand: 2026-07-12, **Schema-Version 3**
-(v3 = Ernährungsform je Person; v2 = organisationsübergreifend; v1 war THW-spezifisch).
+**Stufe 1** — Datenmodell und QR-Code-Kodierung. Stand: 2026-07-18, **Schema-Version 4**
+(v4 = ein einziges Kennzeichen-Feld; v3 = Ernährungsform je Person; v2 =
+organisationsübergreifend; v1 war THW-spezifisch).
 
 **Abwärtskompatibilität (Pflicht):** Schema-Änderungen dürfen ältere QR-Codes/Dateien nie
 unlesbar machen. `decodeBinaer` (`src/codec.ts`) und `bogenLaden`/`migriereBogen`
 (`src/app/hilfen.ts`) akzeptieren jede Version `2..SCHEMA_VERSION`, füllen fehlende Felder
 mit Defaults und überführen entfallene Felder (z. B. v2 `Sofortbedarf.davonVegetarisch`
 → `verpflegungManuell`); danach wird der Bogen auf `SCHEMA_VERSION` gehoben.
+
+**Bewusste Ausnahme (v4):** Bis v3 stand das THW-Kennzeichen als Zahl im QR-Code
+(Flag 16 im Fahrzeug-Byte). Dieses Sonderformat ist entfallen; es gibt nur noch ein
+Kennzeichen als String. Beim Decodieren alter QR-Codes wird die Zahl nur noch
+übersprungen, damit der übrige Datenstrom lesbar bleibt — **das Kennzeichen bleibt
+dort leer**. In JSON-Dateien und Vorlagen wird es dagegen migriert (84397 → „THW-84397").
 
 Der Bogen ist **BOS-übergreifend**: THW, Feuerwehr, Polizei, Hilfsorganisationen
 (DRK/JUH/MHD/ASB), DLRG, Bundeswehr, Rettungsdienst — und beliebige sonstige
@@ -136,7 +143,7 @@ ausgeschriebene Hierarchie der Normalfall.
 | Feld | Typ | Bemerkung |
 |---|---|---|
 | typ | `VokabularWert` | Org-Namensraum |
-| thwKennzeichen ODER kennzeichenFreitext | Varint / string | „THW-84397" → 84397; sonst „OL-FW 2041" |
+| kennzeichen | string | Wie am Fahrzeug angeschrieben: „OL-FW 2041", „THW-84397" |
 | funkrufname | `Funkrufname` | Kennwort + Standort-Flag + Teile `[18,13]` bzw. `[11,48,1]`. THW: bei der StAN-Fahrzeug-Vorbelegung aus der Funkrufnamenregelung (Taschenkarte, `src/vokabulare/thw-funkrufnamen.ts`) vorbelegt — Teileinheit-Zahl aus dem Einheitstyp (1. Zug/TZ), Fahrzeug-Zahl je Fahrzeug; editierbar |
 | stanKonform | bool? | „Ausstattung nach StAN/Norm" — `undefined` = Frage nicht anwendbar (z. B. Fremdorganisation) |
 | aenderungen | string | Freitext, meist leer |

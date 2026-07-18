@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "stand": 2389,
   "einheit": {
     "organisation": 2,
@@ -111,7 +111,7 @@
         "freitext": "ELW 1"
       },
       "aenderungen": "Einsatzleitwagen 1",
-      "kennzeichenFreitext": "WAK-2015",
+      "kennzeichen": "WAK-2015",
       "funkrufname": {
         "kennwort": {
           "freitext": "Kater"

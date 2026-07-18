@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "stand": 2388,
   "einheit": {
     "organisation": 1,
@@ -292,7 +292,7 @@
         "code": 9
       },
       "stanKonform": true,
-      "thwKennzeichen": 80230,
+      "kennzeichen": "THW-80230",
       "funkrufname": {
         "kennwort": {
           "code": 1
@@ -309,7 +309,7 @@
         "code": 10
       },
       "stanKonform": true,
-      "thwKennzeichen": 80231,
+      "kennzeichen": "THW-80231",
       "funkrufname": {
         "kennwort": {
           "code": 1
@@ -326,7 +326,7 @@
         "code": 12
       },
       "stanKonform": true,
-      "thwKennzeichen": 80232,
+      "kennzeichen": "THW-80232",
       "funkrufname": {
         "kennwort": {
           "code": 1
@@ -343,7 +343,7 @@
         "code": 6
       },
       "stanKonform": true,
-      "thwKennzeichen": 80233,
+      "kennzeichen": "THW-80233",
       "funkrufname": {
         "kennwort": {
           "code": 1
@@ -360,7 +360,7 @@
         "code": 15
       },
       "stanKonform": true,
-      "thwKennzeichen": 80234,
+      "kennzeichen": "THW-80234",
       "funkrufname": {
         "kennwort": {
           "code": 1
@@ -377,28 +377,28 @@
         "code": 21
       },
       "stanKonform": true,
-      "kennzeichenFreitext": "auf LKW verlastet"
+      "kennzeichen": "auf LKW verlastet"
     },
     {
       "typ": {
         "code": 44
       },
       "stanKonform": true,
-      "thwKennzeichen": 80235
+      "kennzeichen": "THW-80235"
     },
     {
       "typ": {
         "freitext": "Anh FGr Log-MW"
       },
       "stanKonform": true,
-      "thwKennzeichen": 80236
+      "kennzeichen": "THW-80236"
     },
     {
       "typ": {
         "freitext": "Anhänger"
       },
       "stanKonform": true,
-      "thwKennzeichen": 80237
+      "kennzeichen": "THW-80237"
     }
   ],
   "sofortbedarf": {

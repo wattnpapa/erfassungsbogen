@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "stand": 2388,
   "einheit": {
     "organisation": 6,
@@ -98,7 +98,7 @@
         "freitext": "GW-BHP"
       },
       "aenderungen": "Gerätewagen Behandlungsplatz",
-      "kennzeichenFreitext": "EIC-2038",
+      "kennzeichen": "EIC-2038",
       "funkrufname": {
         "kennwort": {
           "code": 4

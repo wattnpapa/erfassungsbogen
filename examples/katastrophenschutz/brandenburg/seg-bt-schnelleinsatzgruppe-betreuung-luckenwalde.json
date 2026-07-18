@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "stand": 2390,
   "einheit": {
     "organisation": 8,
@@ -188,7 +188,7 @@
         "freitext": "GW-Bt"
       },
       "aenderungen": "Gerätewagen Betreuung — Feldbetten, Zelt, Sanitär (Land)",
-      "kennzeichenFreitext": "TF-2036",
+      "kennzeichen": "TF-2036",
       "funkrufname": {
         "kennwort": {
           "code": 6
@@ -207,7 +207,7 @@
         "freitext": "MTW"
       },
       "aenderungen": "Mannschaftstransportwagen (Träger)",
-      "kennzeichenFreitext": "TF-2037",
+      "kennzeichen": "TF-2037",
       "funkrufname": {
         "kennwort": {
           "code": 6

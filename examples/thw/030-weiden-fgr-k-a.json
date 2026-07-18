@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "stand": 2389,
   "einheit": {
     "organisation": 1,
@@ -232,7 +232,7 @@
         "code": 1
       },
       "stanKonform": true,
-      "thwKennzeichen": 80171,
+      "kennzeichen": "THW-80171",
       "funkrufname": {
         "kennwort": {
           "code": 1
@@ -249,7 +249,7 @@
         "code": 5
       },
       "stanKonform": true,
-      "thwKennzeichen": 80172,
+      "kennzeichen": "THW-80172",
       "funkrufname": {
         "kennwort": {
           "code": 1
@@ -266,20 +266,20 @@
         "code": 40
       },
       "stanKonform": true,
-      "thwKennzeichen": 80173
+      "kennzeichen": "THW-80173"
     },
     {
       "typ": {
         "code": 41
       },
       "stanKonform": true,
-      "thwKennzeichen": 80174
+      "kennzeichen": "THW-80174"
     },
     {
       "typ": {
         "freitext": "MzKW"
       },
-      "thwKennzeichen": 80175,
+      "kennzeichen": "THW-80175",
       "stanKonform": false,
       "aenderungen": "OV-eigenes Fahrzeug, zusätzlich zur StAN",
       "funkrufname": {

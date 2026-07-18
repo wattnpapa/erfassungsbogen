@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "stand": 1369,
   "einheit": {
     "organisation": 9,
@@ -124,7 +124,7 @@
       "typ": {
         "freitext": "KdoW (Kommandowagen)"
       },
-      "kennzeichenFreitext": "RA-DL 101",
+      "kennzeichen": "RA-DL 101",
       "stanKonform": true,
       "funkrufname": {
         "kennwort": {

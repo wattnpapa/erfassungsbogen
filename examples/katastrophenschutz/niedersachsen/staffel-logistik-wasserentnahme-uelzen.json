@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "stand": 2389,
   "einheit": {
     "organisation": 2,
@@ -137,7 +137,7 @@
         "freitext": "GW-L2"
       },
       "aenderungen": "Gerätewagen Logistik 2 (Wasserentnahme)",
-      "kennzeichenFreitext": "UE-2022",
+      "kennzeichen": "UE-2022",
       "funkrufname": {
         "kennwort": {
           "code": 2

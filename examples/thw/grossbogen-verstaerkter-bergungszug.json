@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "stand": 2388,
   "einheit": {
     "organisation": 1,
@@ -1256,7 +1256,7 @@
       "typ": {
         "code": 24
       },
-      "thwKennzeichen": 80360,
+      "kennzeichen": "THW-80360",
       "funkrufname": {
         "kennwort": {
           "code": 1
@@ -1273,7 +1273,7 @@
       "typ": {
         "code": 4
       },
-      "thwKennzeichen": 80361,
+      "kennzeichen": "THW-80361",
       "funkrufname": {
         "kennwort": {
           "code": 1
@@ -1290,7 +1290,7 @@
       "typ": {
         "freitext": "MzKW"
       },
-      "thwKennzeichen": 80362,
+      "kennzeichen": "THW-80362",
       "funkrufname": {
         "kennwort": {
           "code": 1
@@ -1308,7 +1308,7 @@
       "typ": {
         "code": 16
       },
-      "kennzeichenFreitext": "Kettenbagger 8 t (Mietgerät)",
+      "kennzeichen": "Kettenbagger 8 t (Mietgerät)",
       "funkrufname": {
         "kennwort": {
           "code": 1
@@ -1326,7 +1326,7 @@
       "typ": {
         "code": 4
       },
-      "thwKennzeichen": 80363,
+      "kennzeichen": "THW-80363",
       "funkrufname": {
         "kennwort": {
           "code": 1
@@ -1343,7 +1343,7 @@
       "typ": {
         "code": 7
       },
-      "thwKennzeichen": 80364,
+      "kennzeichen": "THW-80364",
       "funkrufname": {
         "kennwort": {
           "code": 1
@@ -1360,7 +1360,7 @@
       "typ": {
         "code": 8
       },
-      "thwKennzeichen": 80365,
+      "kennzeichen": "THW-80365",
       "funkrufname": {
         "kennwort": {
           "code": 1
@@ -1378,7 +1378,7 @@
       "typ": {
         "code": 45
       },
-      "thwKennzeichen": 80366,
+      "kennzeichen": "THW-80366",
       "stanKonform": true,
       "aenderungen": "Tieflader für Bagger"
     },
@@ -1386,7 +1386,7 @@
       "typ": {
         "code": 47
       },
-      "thwKennzeichen": 80367,
+      "kennzeichen": "THW-80367",
       "stanKonform": true,
       "aenderungen": "NEA 50 kVA für Baustellenbeleuchtung"
     },
@@ -1394,7 +1394,7 @@
       "typ": {
         "code": 43
       },
-      "thwKennzeichen": 80368,
+      "kennzeichen": "THW-80368",
       "stanKonform": true,
       "aenderungen": "Verpflegungs- und Sanitätsausstattung"
     }

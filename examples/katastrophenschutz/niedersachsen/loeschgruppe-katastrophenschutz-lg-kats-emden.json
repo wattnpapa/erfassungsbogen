@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "stand": 2390,
   "einheit": {
     "organisation": 2,
@@ -194,7 +194,7 @@
         "freitext": "LF KatS"
       },
       "aenderungen": "Löschgruppenfahrzeug Katastrophenschutz",
-      "kennzeichenFreitext": "EMD-2018",
+      "kennzeichen": "EMD-2018",
       "funkrufname": {
         "kennwort": {
           "code": 2

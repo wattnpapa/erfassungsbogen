@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "stand": 2390,
   "einheit": {
     "organisation": 2,
@@ -212,7 +212,7 @@
         "freitext": "GW-L1 BtrMt"
       },
       "aenderungen": "Gerätewagen Logistik 1 Betriebsmittel (Kraftstoffversorgung)",
-      "kennzeichenFreitext": "LG-2013",
+      "kennzeichen": "LG-2013",
       "funkrufname": {
         "kennwort": {
           "code": 2
@@ -231,14 +231,14 @@
         "freitext": "Anh"
       },
       "aenderungen": "Anhänger für Marschgepäck",
-      "kennzeichenFreitext": "Anh"
+      "kennzeichen": "Anh"
     },
     {
       "typ": {
         "freitext": "GW-L1 Vpf"
       },
       "aenderungen": "Gerätewagen Logistik 1 Verpflegung",
-      "kennzeichenFreitext": "LG-2014",
+      "kennzeichen": "LG-2014",
       "funkrufname": {
         "kennwort": {
           "code": 2
@@ -257,14 +257,14 @@
         "freitext": "Anh Kühl"
       },
       "aenderungen": "Kühlanhänger",
-      "kennzeichenFreitext": "Anh Kühl"
+      "kennzeichen": "Anh Kühl"
     },
     {
       "typ": {
         "freitext": "GW-L2 Vers"
       },
       "aenderungen": "Gerätewagen Logistik 2 Versorgung (Unterbringung)",
-      "kennzeichenFreitext": "LG-2015",
+      "kennzeichen": "LG-2015",
       "funkrufname": {
         "kennwort": {
           "code": 2
@@ -283,7 +283,7 @@
         "freitext": "KTW"
       },
       "aenderungen": "Krankentransportwagen (Eigenschutz)",
-      "kennzeichenFreitext": "LG-2016",
+      "kennzeichen": "LG-2016",
       "funkrufname": {
         "kennwort": {
           "code": 2

@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "stand": 2388,
   "einheit": {
     "organisation": 1,
@@ -199,7 +199,7 @@
         "code": 4
       },
       "stanKonform": true,
-      "thwKennzeichen": 80190,
+      "kennzeichen": "THW-80190",
       "funkrufname": {
         "kennwort": {
           "code": 1
@@ -216,13 +216,13 @@
         "code": 43
       },
       "stanKonform": true,
-      "thwKennzeichen": 80191
+      "kennzeichen": "THW-80191"
     },
     {
       "typ": {
         "freitext": "PKW OV"
       },
-      "thwKennzeichen": 80192,
+      "kennzeichen": "THW-80192",
       "stanKonform": false,
       "aenderungen": "OV-eigenes Fahrzeug, zusätzlich zur StAN",
       "funkrufname": {

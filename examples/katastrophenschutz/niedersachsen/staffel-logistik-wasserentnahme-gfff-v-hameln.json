@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "stand": 2390,
   "einheit": {
     "organisation": 2,
@@ -137,7 +137,7 @@
         "freitext": "GW GFFF-V"
       },
       "aenderungen": "Gerätewagen GFFF-V (Wasserentnahme)",
-      "kennzeichenFreitext": "HM-2026",
+      "kennzeichen": "HM-2026",
       "funkrufname": {
         "kennwort": {
           "code": 2

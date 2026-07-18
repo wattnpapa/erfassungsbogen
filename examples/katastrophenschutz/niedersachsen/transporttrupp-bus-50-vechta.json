@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "stand": 2388,
   "einheit": {
     "organisation": 7,
@@ -94,7 +94,7 @@
         "freitext": "KOM"
       },
       "aenderungen": "Kraftomnibus (mind. 50 Sitzplätze)",
-      "kennzeichenFreitext": "VEC-2042",
+      "kennzeichen": "VEC-2042",
       "funkrufname": {
         "kennwort": {
           "code": 5
@@ -113,7 +113,7 @@
         "freitext": "Anh"
       },
       "aenderungen": "Anhänger für Gepäck (optional)",
-      "kennzeichenFreitext": "Anh"
+      "kennzeichen": "Anh"
     }
   ],
   "sofortbedarf": {

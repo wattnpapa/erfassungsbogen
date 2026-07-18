@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "stand": 2388,
   "einheit": {
     "organisation": 2,
@@ -597,7 +597,7 @@
         "freitext": "ELW 1"
       },
       "aenderungen": "Einsatzleitwagen 1 — Führung Gefahrstoffeinheit (Landkreis)",
-      "kennzeichenFreitext": "UM-2019",
+      "kennzeichen": "UM-2019",
       "funkrufname": {
         "kennwort": {
           "code": 2
@@ -616,7 +616,7 @@
         "freitext": "GW-G"
       },
       "aenderungen": "Gerätewagen Gefahrgut (Träger)",
-      "kennzeichenFreitext": "UM-2020",
+      "kennzeichen": "UM-2020",
       "funkrufname": {
         "kennwort": {
           "code": 2
@@ -635,7 +635,7 @@
         "freitext": "GW-G"
       },
       "aenderungen": "Gerätewagen Gefahrgut (Träger)",
-      "kennzeichenFreitext": "UM-2021",
+      "kennzeichen": "UM-2021",
       "funkrufname": {
         "kennwort": {
           "code": 2
@@ -654,7 +654,7 @@
         "freitext": "GW-Mess"
       },
       "aenderungen": "Gerätewagen Messtechnik/Strahlenschutz (Land)",
-      "kennzeichenFreitext": "UM-2022",
+      "kennzeichen": "UM-2022",
       "funkrufname": {
         "kennwort": {
           "code": 2
@@ -673,7 +673,7 @@
         "freitext": "GW-Dekon"
       },
       "aenderungen": "Gerätewagen Dekontamination Personen (Bund/Land)",
-      "kennzeichenFreitext": "UM-2023",
+      "kennzeichen": "UM-2023",
       "funkrufname": {
         "kennwort": {
           "code": 2
@@ -692,7 +692,7 @@
         "freitext": "LF 20"
       },
       "aenderungen": "Löschgruppenfahrzeug LF 20 — Brandschutzsicherstellung (Träger)",
-      "kennzeichenFreitext": "UM-2024",
+      "kennzeichen": "UM-2024",
       "funkrufname": {
         "kennwort": {
           "code": 2
@@ -711,7 +711,7 @@
         "freitext": "MTW"
       },
       "aenderungen": "Mannschaftstransportwagen (Träger)",
-      "kennzeichenFreitext": "UM-2025",
+      "kennzeichen": "UM-2025",
       "funkrufname": {
         "kennwort": {
           "code": 2

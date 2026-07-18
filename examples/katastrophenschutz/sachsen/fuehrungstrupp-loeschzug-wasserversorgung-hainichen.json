@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "stand": 2388,
   "einheit": {
     "organisation": 2,
@@ -103,7 +103,7 @@
         "freitext": "MZF/ELW 1"
       },
       "aenderungen": "Mehrzweckfahrzeug/Einsatzleitwagen 1 (Träger)",
-      "kennzeichenFreitext": "HC-2010",
+      "kennzeichen": "HC-2010",
       "funkrufname": {
         "kennwort": {
           "code": 2

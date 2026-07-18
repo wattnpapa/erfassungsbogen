@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "stand": 2389,
   "einheit": {
     "organisation": 1,
@@ -392,7 +392,7 @@
         "code": 8
       },
       "stanKonform": true,
-      "thwKennzeichen": 80321,
+      "kennzeichen": "THW-80321",
       "funkrufname": {
         "kennwort": {
           "code": 1
@@ -409,7 +409,7 @@
         "code": 8
       },
       "stanKonform": true,
-      "thwKennzeichen": 80322,
+      "kennzeichen": "THW-80322",
       "funkrufname": {
         "kennwort": {
           "code": 1
@@ -426,20 +426,20 @@
         "code": 53
       },
       "stanKonform": true,
-      "thwKennzeichen": 80323
+      "kennzeichen": "THW-80323"
     },
     {
       "typ": {
         "code": 54
       },
       "stanKonform": true,
-      "thwKennzeichen": 80324
+      "kennzeichen": "THW-80324"
     },
     {
       "typ": {
         "freitext": "Anh OV (Plane)"
       },
-      "thwKennzeichen": 80325,
+      "kennzeichen": "THW-80325",
       "stanKonform": false,
       "aenderungen": "OV-eigenes Fahrzeug, zusätzlich zur StAN"
     }

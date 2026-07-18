@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "stand": 1369,
   "einheit": {
     "organisation": 9,
@@ -173,7 +173,7 @@
       "typ": {
         "freitext": "GW-W (Gerätewagen Wasserrettung)"
       },
-      "kennzeichenFreitext": "BAD-DL 71",
+      "kennzeichen": "BAD-DL 71",
       "stanKonform": true,
       "aenderungen": "Tauchausstattung, Kompressor, Sauerstoff",
       "funkrufname": {

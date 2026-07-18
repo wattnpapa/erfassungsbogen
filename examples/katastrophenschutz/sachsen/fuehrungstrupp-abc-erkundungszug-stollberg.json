@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "stand": 2390,
   "einheit": {
     "organisation": 2,
@@ -103,7 +103,7 @@
         "freitext": "Messleitfahrzeug"
       },
       "aenderungen": "Messleitfahrzeug (Bund)",
-      "kennzeichenFreitext": "STL-2005",
+      "kennzeichen": "STL-2005",
       "funkrufname": {
         "kennwort": {
           "code": 2

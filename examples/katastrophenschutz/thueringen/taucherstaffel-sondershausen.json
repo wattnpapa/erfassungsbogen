@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "stand": 2388,
   "einheit": {
     "organisation": 9,
@@ -159,7 +159,7 @@
         "freitext": "GW-Tauch"
       },
       "aenderungen": "Gerätewagen Taucher mit Trailer",
-      "kennzeichenFreitext": "KYF-2036",
+      "kennzeichen": "KYF-2036",
       "funkrufname": {
         "kennwort": {
           "code": 7
@@ -178,7 +178,7 @@
         "freitext": "Rettungsboot"
       },
       "aenderungen": "Rettungsboot auf Trailer",
-      "kennzeichenFreitext": "Boot RTB",
+      "kennzeichen": "Boot RTB",
       "funkrufname": {
         "kennwort": {
           "code": 7

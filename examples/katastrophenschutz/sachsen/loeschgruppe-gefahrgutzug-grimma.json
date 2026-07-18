@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "stand": 2388,
   "einheit": {
     "organisation": 2,
@@ -210,7 +210,7 @@
         "freitext": "LF 10/6"
       },
       "aenderungen": "Löschgruppenfahrzeug 10/6 (Freistaat Sachsen)",
-      "kennzeichenFreitext": "GHA-2002",
+      "kennzeichen": "GHA-2002",
       "funkrufname": {
         "kennwort": {
           "code": 2

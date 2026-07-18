@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "stand": 2390,
   "einheit": {
     "organisation": 2,
@@ -109,7 +109,7 @@
         "freitext": "MZF/ELW 1"
       },
       "aenderungen": "Mehrzweckfahrzeug/Einsatzleitwagen 1 (Träger)",
-      "kennzeichenFreitext": "DD-2001",
+      "kennzeichen": "DD-2001",
       "funkrufname": {
         "kennwort": {
           "code": 2

@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "stand": 2388,
   "einheit": {
     "organisation": 2,
@@ -137,7 +137,7 @@
         "freitext": "GW-Dekon"
       },
       "aenderungen": "Gerätewagen Dekontamination",
-      "kennzeichenFreitext": "G-2020",
+      "kennzeichen": "G-2020",
       "funkrufname": {
         "kennwort": {
           "freitext": "Kater"

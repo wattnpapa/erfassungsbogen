@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "stand": 2388,
   "einheit": {
     "organisation": 2,
@@ -113,7 +113,7 @@
         "freitext": "MZF/ELW 1"
       },
       "aenderungen": "Mehrzweckfahrzeug/Einsatzleitwagen 1 (Freistaat Sachsen)",
-      "kennzeichenFreitext": "PL-2050",
+      "kennzeichen": "PL-2050",
       "funkrufname": {
         "kennwort": {
           "code": 2

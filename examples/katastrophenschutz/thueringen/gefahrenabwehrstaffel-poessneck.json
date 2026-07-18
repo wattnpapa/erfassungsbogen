@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "stand": 2389,
   "einheit": {
     "organisation": 2,
@@ -153,7 +153,7 @@
         "freitext": "GW-G"
       },
       "aenderungen": "Gerätewagen Gefahrgut",
-      "kennzeichenFreitext": "SOK-2018",
+      "kennzeichen": "SOK-2018",
       "funkrufname": {
         "kennwort": {
           "freitext": "Kater"
@@ -172,7 +172,7 @@
         "freitext": "GW-A/S"
       },
       "aenderungen": "Gerätewagen Atemschutz/Strahlenschutz",
-      "kennzeichenFreitext": "SOK-2019",
+      "kennzeichen": "SOK-2019",
       "funkrufname": {
         "kennwort": {
           "freitext": "Kater"

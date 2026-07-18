@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "stand": 2390,
   "einheit": {
     "organisation": 5,
@@ -123,7 +123,7 @@
         "freitext": "ELW 1"
       },
       "aenderungen": "Einsatzleitwagen 1",
-      "kennzeichenFreitext": "WAK-2005",
+      "kennzeichen": "WAK-2005",
       "funkrufname": {
         "kennwort": {
           "code": 3

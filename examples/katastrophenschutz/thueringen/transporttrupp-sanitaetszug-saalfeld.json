@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "stand": 2390,
   "einheit": {
     "organisation": 5,
@@ -83,7 +83,7 @@
         "freitext": "KTW"
       },
       "aenderungen": "Krankentransportwagen",
-      "kennzeichenFreitext": "SLF-2008",
+      "kennzeichen": "SLF-2008",
       "funkrufname": {
         "kennwort": {
           "code": 3

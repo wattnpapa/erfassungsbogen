@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "stand": 2390,
   "einheit": {
     "organisation": 255,
@@ -153,7 +153,7 @@
         "freitext": "MTW"
       },
       "aenderungen": "Mannschaftstransportkraftwagen mit bis zu 8 Sitzen, Transportmöglichkeit für 5 Hunde (Träger)",
-      "kennzeichenFreitext": "DL-2049",
+      "kennzeichen": "DL-2049",
       "funkrufname": {
         "kennwort": {
           "freitext": "Antonius"

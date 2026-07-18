@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "stand": 2390,
   "einheit": {
     "organisation": 7,
@@ -222,7 +222,7 @@
         "freitext": "MTW"
       },
       "aenderungen": "Mannschaftstransportkraftwagen (Träger)",
-      "kennzeichenFreitext": "SEB-2021",
+      "kennzeichen": "SEB-2021",
       "funkrufname": {
         "kennwort": {
           "code": 5
@@ -240,7 +240,7 @@
         "freitext": "GW-Bt"
       },
       "aenderungen": "Gerätewagen Betreuung (Bund)",
-      "kennzeichenFreitext": "SEB-2022",
+      "kennzeichen": "SEB-2022",
       "funkrufname": {
         "kennwort": {
           "code": 5

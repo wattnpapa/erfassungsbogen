@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "stand": 2390,
   "einheit": {
     "organisation": 2,
@@ -145,7 +145,7 @@
         "freitext": "GW-Li"
       },
       "aenderungen": "Gerätewagen Licht und Netzersatz (Land)",
-      "kennzeichenFreitext": "OSL-2045",
+      "kennzeichen": "OSL-2045",
       "funkrufname": {
         "kennwort": {
           "code": 2
@@ -164,7 +164,7 @@
         "freitext": "WLF"
       },
       "aenderungen": "Wechselladerfahrzeug für Abrollbehälter Netzersatz (Landkreis)",
-      "kennzeichenFreitext": "OSL-2046",
+      "kennzeichen": "OSL-2046",
       "funkrufname": {
         "kennwort": {
           "code": 2
@@ -183,7 +183,7 @@
         "freitext": "NEA 200 kVA"
       },
       "aenderungen": "Netzersatzanlage 200 kVA (Land) — Anhänger, kein Einsatz-Kfz",
-      "kennzeichenFreitext": "Anh NEA"
+      "kennzeichen": "Anh NEA"
     }
   ],
   "sofortbedarf": {

@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "stand": 2389,
   "einheit": {
     "organisation": 9,
@@ -159,7 +159,7 @@
         "freitext": "GW WR"
       },
       "aenderungen": "Gerätewagen Wasserrettung",
-      "kennzeichenFreitext": "H-2027",
+      "kennzeichen": "H-2027",
       "funkrufname": {
         "kennwort": {
           "code": 7
@@ -178,7 +178,7 @@
         "freitext": "MZB KatS"
       },
       "aenderungen": "Mehrzweckboot Katastrophenschutz",
-      "kennzeichenFreitext": "auf Anh"
+      "kennzeichen": "auf Anh"
     }
   ],
   "sofortbedarf": {

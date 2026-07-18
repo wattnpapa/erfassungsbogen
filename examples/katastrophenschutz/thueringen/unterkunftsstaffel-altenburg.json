@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "stand": 2389,
   "einheit": {
     "organisation": 7,
@@ -143,7 +143,7 @@
         "freitext": "MTW"
       },
       "aenderungen": "Mannschaftstransportwagen",
-      "kennzeichenFreitext": "ABG-2013",
+      "kennzeichen": "ABG-2013",
       "funkrufname": {
         "kennwort": {
           "code": 5

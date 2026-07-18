@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "stand": 2389,
   "einheit": {
     "organisation": 2,
@@ -88,7 +88,7 @@
         "freitext": "TLF 20/40"
       },
       "aenderungen": "Tanklöschfahrzeug 20/40 (Freistaat Sachsen)",
-      "kennzeichenFreitext": "DZ-2014",
+      "kennzeichen": "DZ-2014",
       "funkrufname": {
         "kennwort": {
           "code": 2

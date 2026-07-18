@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "stand": 2388,
   "einheit": {
     "organisation": 2,
@@ -88,7 +88,7 @@
         "freitext": "TLF 4000"
       },
       "aenderungen": "Tanklöschfahrzeug, Tankinhalt mindestens 4000 Liter",
-      "kennzeichenFreitext": "AP-2040",
+      "kennzeichen": "AP-2040",
       "funkrufname": {
         "kennwort": {
           "freitext": "Kater"

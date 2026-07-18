@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "stand": 2388,
   "einheit": {
     "organisation": 2,
@@ -186,7 +186,7 @@
         "freitext": "NEA 250"
       },
       "aenderungen": "mobile Netzersatzanlage 250 kVA mit Zugfahrzeug",
-      "kennzeichenFreitext": "STD-2046",
+      "kennzeichen": "STD-2046",
       "funkrufname": {
         "kennwort": {
           "code": 2
@@ -205,7 +205,7 @@
         "freitext": "TB Ks"
       },
       "aenderungen": "mobiler Tankbehälter Kraftstoff 6000 l mit Transportfahrzeug (ADR)",
-      "kennzeichenFreitext": "STD-2047",
+      "kennzeichen": "STD-2047",
       "funkrufname": {
         "kennwort": {
           "code": 2

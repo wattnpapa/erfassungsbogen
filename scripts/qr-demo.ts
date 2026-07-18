@@ -106,12 +106,12 @@ const bogen: Erfassungsbogen = {
     P("Theo", "Meier", R.MANNSCHAFT, [V(5)], FE.NONE, G.M),
   ],
   fahrzeuge: [
-    { typ: V(1), thwKennzeichen: 84397, funkrufname: { kennwort: V(1), eigenerStandort: true, teile: [18, 13] }, stanKonform: true },
-    { typ: VF("MzKW"), thwKennzeichen: 90272, funkrufname: { kennwort: V(1), eigenerStandort: true, teile: [24, 54] }, stanKonform: false },
-    { typ: V(2), thwKennzeichen: 96464, funkrufname: { kennwort: V(1), eigenerStandort: true, teile: [16, 11] }, stanKonform: true },
-    { typ: VF("Anh Versorgung"), thwKennzeichen: 94010, stanKonform: false },
-    { typ: VF("MTW OV"), thwKennzeichen: 98933, funkrufname: { kennwort: V(1), eigenerStandort: true, teile: [86, 25] }, stanKonform: false },
-    { typ: VF("Anh OV"), thwKennzeichen: 95039, stanKonform: false },
+    { typ: V(1), kennzeichen: "THW-84397", funkrufname: { kennwort: V(1), eigenerStandort: true, teile: [18, 13] }, stanKonform: true },
+    { typ: VF("MzKW"), kennzeichen: "THW-90272", funkrufname: { kennwort: V(1), eigenerStandort: true, teile: [24, 54] }, stanKonform: false },
+    { typ: V(2), kennzeichen: "THW-96464", funkrufname: { kennwort: V(1), eigenerStandort: true, teile: [16, 11] }, stanKonform: true },
+    { typ: VF("Anh Versorgung"), kennzeichen: "THW-94010", stanKonform: false },
+    { typ: VF("MTW OV"), kennzeichen: "THW-98933", funkrufname: { kennwort: V(1), eigenerStandort: true, teile: [86, 25] }, stanKonform: false },
+    { typ: VF("Anh OV"), kennzeichen: "THW-95039", stanKonform: false },
   ],
   sofortbedarf: {
     verpflegungPersonen: 20,

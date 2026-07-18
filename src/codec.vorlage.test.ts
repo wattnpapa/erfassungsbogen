@@ -51,7 +51,7 @@ function bogen(): Erfassungsbogen {
         zusatzqualifikationen: [],
       },
     ],
-    fahrzeuge: [{ typ: { code: 2 }, thwKennzeichen: 84397 }],
+    fahrzeuge: [{ typ: { code: 2 }, kennzeichen: "THW-84397" }],
   };
 }
 

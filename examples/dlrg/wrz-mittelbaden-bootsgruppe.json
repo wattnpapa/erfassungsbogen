@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "stand": 1369,
   "einheit": {
     "organisation": 9,
@@ -143,7 +143,7 @@
       "typ": {
         "freitext": "BGF (Bootsgerätewagen)"
       },
-      "kennzeichenFreitext": "RA-DL 711",
+      "kennzeichen": "RA-DL 711",
       "stanKonform": true,
       "funkrufname": {
         "kennwort": {
@@ -161,7 +161,7 @@
       "typ": {
         "freitext": "HWB-Anhänger (Hochwasserboot)"
       },
-      "kennzeichenFreitext": "RA-DL 712",
+      "kennzeichen": "RA-DL 712",
       "stanKonform": true,
       "aenderungen": "Hochwasserrettungsboot mit Motor auf Anhänger"
     }

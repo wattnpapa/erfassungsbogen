@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "stand": 2389,
   "einheit": {
     "organisation": 6,
@@ -147,7 +147,7 @@
         "freitext": "MTW"
       },
       "aenderungen": "Mannschaftstransportwagen",
-      "kennzeichenFreitext": "UH-2037",
+      "kennzeichen": "UH-2037",
       "funkrufname": {
         "kennwort": {
           "code": 4

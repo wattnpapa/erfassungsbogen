@@ -81,7 +81,7 @@ function bogen(over: Partial<Erfassungsbogen> = {}): Erfassungsbogen {
     einsatz: { zeitraumVon: 100, zeitraumBis: 130, ortAuftrag: "Übung Kabelblitz" },
     personalErfassung: PersonalErfassung.VOLLSTAENDIG,
     personal: [person("Berger", StaerkeRolle.UNTERFUEHRER), person("Ahlers", StaerkeRolle.MANNSCHAFT)],
-    fahrzeuge: [{ typ: { code: 2 }, thwKennzeichen: 84397 }],
+    fahrzeuge: [{ typ: { code: 2 }, kennzeichen: "THW-84397" }],
     ...over,
   };
 }

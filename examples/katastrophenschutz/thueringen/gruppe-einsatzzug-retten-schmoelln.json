@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "stand": 2389,
   "einheit": {
     "organisation": 2,
@@ -210,7 +210,7 @@
         "freitext": "LF 20 KatS"
       },
       "aenderungen": "Löschgruppenfahrzeug Katastrophenschutz",
-      "kennzeichenFreitext": "ABG-2002",
+      "kennzeichen": "ABG-2002",
       "funkrufname": {
         "kennwort": {
           "freitext": "Kater"

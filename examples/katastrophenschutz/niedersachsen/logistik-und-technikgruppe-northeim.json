@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "stand": 2388,
   "einheit": {
     "organisation": 2,
@@ -178,7 +178,7 @@
         "freitext": "Kombi-L"
       },
       "aenderungen": "Kombinationskraftwagen Logistik (Führungstrupp)",
-      "kennzeichenFreitext": "NOM-2043",
+      "kennzeichen": "NOM-2043",
       "funkrufname": {
         "kennwort": {
           "code": 2
@@ -197,7 +197,7 @@
         "freitext": "GW L gr"
       },
       "aenderungen": "Gerätewagen Logistik groß",
-      "kennzeichenFreitext": "NOM-2044",
+      "kennzeichen": "NOM-2044",
       "funkrufname": {
         "kennwort": {
           "code": 2
@@ -216,14 +216,14 @@
         "freitext": "Anh Log"
       },
       "aenderungen": "Anhänger für Logistikzwecke",
-      "kennzeichenFreitext": "Anh Log"
+      "kennzeichen": "Anh Log"
     },
     {
       "typ": {
         "freitext": "GW L kl"
       },
       "aenderungen": "Gerätewagen Logistik klein",
-      "kennzeichenFreitext": "NOM-2045",
+      "kennzeichen": "NOM-2045",
       "funkrufname": {
         "kennwort": {
           "code": 2
@@ -242,14 +242,14 @@
         "freitext": "NEA"
       },
       "aenderungen": "mobile Netzersatzanlage mit Lichtmast",
-      "kennzeichenFreitext": "Anh NEA"
+      "kennzeichen": "Anh NEA"
     },
     {
       "typ": {
         "freitext": "Anh Tank"
       },
       "aenderungen": "Anhänger mobile Kraftstoffversorgung",
-      "kennzeichenFreitext": "Anh Tank"
+      "kennzeichen": "Anh Tank"
     }
   ],
   "sofortbedarf": {

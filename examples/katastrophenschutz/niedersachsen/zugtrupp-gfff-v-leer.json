@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "stand": 2388,
   "einheit": {
     "organisation": 2,
@@ -121,7 +121,7 @@
         "freitext": "KdoW GFFF-V"
       },
       "aenderungen": "Kommandowagen GFFF-V, geländefähig",
-      "kennzeichenFreitext": "LER-2024",
+      "kennzeichen": "LER-2024",
       "funkrufname": {
         "kennwort": {
           "code": 2

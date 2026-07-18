@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "stand": 2388,
   "einheit": {
     "organisation": 2,
@@ -92,7 +92,7 @@
         "freitext": "Krad"
       },
       "aenderungen": "Kraftrad",
-      "kennzeichenFreitext": "AUR-2004",
+      "kennzeichen": "AUR-2004",
       "funkrufname": {
         "kennwort": {
           "code": 2
@@ -111,7 +111,7 @@
         "freitext": "Krad"
       },
       "aenderungen": "Kraftrad",
-      "kennzeichenFreitext": "AUR-2005",
+      "kennzeichen": "AUR-2005",
       "funkrufname": {
         "kennwort": {
           "code": 2
@@ -130,7 +130,7 @@
         "freitext": "Krad"
       },
       "aenderungen": "Kraftrad",
-      "kennzeichenFreitext": "AUR-2006",
+      "kennzeichen": "AUR-2006",
       "funkrufname": {
         "kennwort": {
           "code": 2

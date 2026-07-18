@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "stand": 2389,
   "einheit": {
     "organisation": 1,
@@ -201,20 +201,20 @@
         "code": 21
       },
       "stanKonform": true,
-      "kennzeichenFreitext": "auf LKW verlastet"
+      "kennzeichen": "auf LKW verlastet"
     },
     {
       "typ": {
         "code": 47
       },
       "stanKonform": true,
-      "thwKennzeichen": 80201
+      "kennzeichen": "THW-80201"
     },
     {
       "typ": {
         "freitext": "PKW OV"
       },
-      "thwKennzeichen": 80202,
+      "kennzeichen": "THW-80202",
       "stanKonform": false,
       "aenderungen": "OV-eigenes Fahrzeug, zusätzlich zur StAN",
       "funkrufname": {

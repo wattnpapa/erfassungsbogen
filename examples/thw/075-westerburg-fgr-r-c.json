@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "stand": 2388,
   "einheit": {
     "organisation": 1,
@@ -180,7 +180,7 @@
         "code": 7
       },
       "stanKonform": true,
-      "thwKennzeichen": 80290,
+      "kennzeichen": "THW-80290",
       "funkrufname": {
         "kennwort": {
           "code": 1
@@ -197,7 +197,7 @@
         "code": 18
       },
       "stanKonform": true,
-      "kennzeichenFreitext": "auf Anh Tieflader",
+      "kennzeichen": "auf Anh Tieflader",
       "funkrufname": {
         "kennwort": {
           "code": 1
@@ -214,14 +214,14 @@
         "code": 45
       },
       "stanKonform": true,
-      "thwKennzeichen": 80291
+      "kennzeichen": "THW-80291"
     },
     {
       "typ": {
         "code": 46
       },
       "stanKonform": true,
-      "thwKennzeichen": 80292
+      "kennzeichen": "THW-80292"
     }
   ],
   "sofortbedarf": {

@@ -599,7 +599,7 @@ function fahrzeugeBauen(specs: FzSpec[], ort: BbOrt, traeger: Traeger): Fahrzeug
     for (let i = 0; i < (s.anzahl ?? 1); i++) {
       const fz: Fahrzeug = { typ: { freitext: s.kurz } };
       if (s.lang) fz.aenderungen = s.lang;
-      fz.kennzeichenFreitext = s.ohneKennzeichen ?? kennzeichen(ort.kfz);
+      fz.kennzeichen = s.ohneKennzeichen ?? kennzeichen(ort.kfz);
       if (s.kennzahl != null) {
         const lfd = (belegt.get(s.kennzahl) ?? 0) + 1;
         belegt.set(s.kennzahl, lfd);
@@ -775,13 +775,13 @@ function pruefen(beispiele: BeispielBogen[]): void {
     const anhaengerKz = new Set(
       spec.fahrzeuge.filter((x) => x.ohneKennzeichen).map((x) => x.ohneKennzeichen!),
     );
-    const kfz = b.bogen.fahrzeuge.filter((fz) => !anhaengerKz.has(fz.kennzeichenFreitext ?? ""));
+    const kfz = b.bogen.fahrzeuge.filter((fz) => !anhaengerKz.has(fz.kennzeichen ?? ""));
     if (kfz.length !== spec.sollKfz) {
       fehler.push(`${b.datei}: ${kfz.length} Einsatz-Kfz ≠ Anlage ${spec.sollKfz}`);
     }
     for (const fz of b.bogen.fahrzeuge) {
       const kurz = fz.typ.freitext ?? "?";
-      const anhaenger = anhaengerKz.has(fz.kennzeichenFreitext ?? "");
+      const anhaenger = anhaengerKz.has(fz.kennzeichen ?? "");
       if (anhaenger && fz.funkrufname) {
         fehler.push(`${b.datei}: Anhänger ${kurz} sollte keinen Funkrufnamen führen`);
       }

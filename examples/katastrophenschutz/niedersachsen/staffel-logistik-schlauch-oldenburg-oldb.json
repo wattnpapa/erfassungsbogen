@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "stand": 2390,
   "einheit": {
     "organisation": 2,
@@ -137,7 +137,7 @@
         "freitext": "GW-L2 SW"
       },
       "aenderungen": "Gerätewagen Logistik 2 Schlauch",
-      "kennzeichenFreitext": "OL-2019",
+      "kennzeichen": "OL-2019",
       "funkrufname": {
         "kennwort": {
           "code": 2

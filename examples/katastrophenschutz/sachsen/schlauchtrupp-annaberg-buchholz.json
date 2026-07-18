@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "stand": 2389,
   "einheit": {
     "organisation": 2,
@@ -88,7 +88,7 @@
         "freitext": "SW-KatS"
       },
       "aenderungen": "Schlauchwagen für den Katastrophenschutz (Bund)",
-      "kennzeichenFreitext": "ANA-2012",
+      "kennzeichen": "ANA-2012",
       "funkrufname": {
         "kennwort": {
           "code": 2
@@ -106,7 +106,7 @@
         "freitext": "Schlauchanhänger"
       },
       "aenderungen": "Schlauchanhänger (Freistaat Sachsen)",
-      "kennzeichenFreitext": "Anh Schlauch"
+      "kennzeichen": "Anh Schlauch"
     }
   ],
   "sofortbedarf": {

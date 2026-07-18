@@ -9,7 +9,7 @@
  * React Native / Capacitor und Node.
  */
 
-export const SCHEMA_VERSION = 3;
+export const SCHEMA_VERSION = 4;
 
 // ---------------------------------------------------------- Zeitrepräsentation
 //
@@ -169,10 +169,8 @@ export interface Funkrufname {
 export interface Fahrzeug {
   /** Vokabular der Organisation: THW FmKW/MzKW/…; FW LF/DLK/ELW/…; RD RTW/KTW/NEF/… */
   typ: VokabularWert;
-  /** THW-Kennzeichen als Zahl ("THW-84397" → 84397) … */
-  thwKennzeichen?: number;
-  /** … oder ziviles/behördliches Kennzeichen als Freitext ("OL-FW 2041"). Genau eines von beiden. */
-  kennzeichenFreitext?: string;
+  /** Amtliches Kennzeichen, wie es am Fahrzeug steht ("OL-FW 2041", "THW-84397"). */
+  kennzeichen?: string;
   funkrufname?: Funkrufname;
   stanKonform?: boolean; // "Ausstattung nach StAN/Norm ja/nein"; undefined = Frage nicht anwendbar
   aenderungen?: string; // "Änderungen bzw. Sondergerät"

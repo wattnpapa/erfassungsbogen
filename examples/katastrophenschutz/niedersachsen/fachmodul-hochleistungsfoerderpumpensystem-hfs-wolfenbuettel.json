@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "stand": 2390,
   "einheit": {
     "organisation": 2,
@@ -182,7 +182,7 @@
         "freitext": "GW-L2 HFS"
       },
       "aenderungen": "Gerätewagen Logistik 2 mit Beladungssatz HFS",
-      "kennzeichenFreitext": "WF-2010",
+      "kennzeichen": "WF-2010",
       "funkrufname": {
         "kennwort": {
           "code": 2
@@ -201,7 +201,7 @@
         "freitext": "WLF"
       },
       "aenderungen": "Wechselladerfahrzeug mit AB-HFS",
-      "kennzeichenFreitext": "WF-2011",
+      "kennzeichen": "WF-2011",
       "funkrufname": {
         "kennwort": {
           "code": 2
@@ -220,14 +220,14 @@
         "freitext": "AB HFS"
       },
       "aenderungen": "Abrollbehälter Hochleistungsförderpumpensystem",
-      "kennzeichenFreitext": "auf WLF"
+      "kennzeichen": "auf WLF"
     },
     {
       "typ": {
         "freitext": "MTW"
       },
       "aenderungen": "Mannschaftstransportwagen (optional)",
-      "kennzeichenFreitext": "WF-2012",
+      "kennzeichen": "WF-2012",
       "funkrufname": {
         "kennwort": {
           "code": 2

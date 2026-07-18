@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "stand": 2388,
   "einheit": {
     "organisation": 2,
@@ -143,7 +143,7 @@
         "freitext": "MTW"
       },
       "aenderungen": "Mannschaftstransportwagen",
-      "kennzeichenFreitext": "G-2051",
+      "kennzeichen": "G-2051",
       "funkrufname": {
         "kennwort": {
           "freitext": "Kater"

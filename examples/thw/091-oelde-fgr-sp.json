@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "stand": 2388,
   "einheit": {
     "organisation": 1,
@@ -166,7 +166,7 @@
         "code": 5
       },
       "stanKonform": true,
-      "thwKennzeichen": 80332,
+      "kennzeichen": "THW-80332",
       "funkrufname": {
         "kennwort": {
           "code": 1
@@ -183,7 +183,7 @@
         "freitext": "Anh FGr Sp"
       },
       "stanKonform": true,
-      "thwKennzeichen": 80333
+      "kennzeichen": "THW-80333"
     }
   ],
   "sofortbedarf": {

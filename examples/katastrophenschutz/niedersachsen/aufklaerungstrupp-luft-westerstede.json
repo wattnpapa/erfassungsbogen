@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "stand": 2390,
   "einheit": {
     "organisation": 2,
@@ -96,7 +96,7 @@
         "freitext": "Kombi UAV"
       },
       "aenderungen": "Kombinationskraftwagen UAV",
-      "kennzeichenFreitext": "WST-2007",
+      "kennzeichen": "WST-2007",
       "funkrufname": {
         "kennwort": {
           "code": 2

@@ -73,7 +73,7 @@ function bogen(): Erfassungsbogen {
     einsatz: { zeitraumVon: 100, zeitraumBis: 130, ortAuftrag: "Übung Kabelblitz", einsatzbeginn: 999 },
     personalErfassung: PersonalErfassung.VOLLSTAENDIG,
     personal: [person("Berger", StaerkeRolle.UNTERFUEHRER), person("Ahlers", StaerkeRolle.MANNSCHAFT), person("Voss", StaerkeRolle.MANNSCHAFT)],
-    fahrzeuge: [{ typ: { code: 2 }, thwKennzeichen: 84397 }, { typ: { code: 3 }, thwKennzeichen: 84401 }],
+    fahrzeuge: [{ typ: { code: 2 }, kennzeichen: "THW-84397" }, { typ: { code: 3 }, kennzeichen: "THW-84401" }],
     sofortbedarf: { verpflegungPersonen: 3, dieselLiter: 50, benzinLiter: 0, gemischLiter: 0, unterbringung: true, ruhezeitErforderlich: false },
   };
 }

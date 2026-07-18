@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "stand": 2390,
   "einheit": {
     "organisation": 5,
@@ -238,7 +238,7 @@
         "freitext": "GW-San"
       },
       "aenderungen": "Gerätewagen Sanität",
-      "kennzeichenFreitext": "GTH-2006",
+      "kennzeichen": "GTH-2006",
       "funkrufname": {
         "kennwort": {
           "code": 3
@@ -257,7 +257,7 @@
         "freitext": "MTW"
       },
       "aenderungen": "Mannschaftstransportwagen",
-      "kennzeichenFreitext": "GTH-2007",
+      "kennzeichen": "GTH-2007",
       "funkrufname": {
         "kennwort": {
           "code": 3

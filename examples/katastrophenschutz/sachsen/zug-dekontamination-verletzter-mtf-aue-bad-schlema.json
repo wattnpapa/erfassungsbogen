@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "stand": 2390,
   "einheit": {
     "organisation": 2,
@@ -431,7 +431,7 @@
         "freitext": "MTW+"
       },
       "aenderungen": "Mannschaftstransportwagen MTF (Bund)",
-      "kennzeichenFreitext": "ASZ-2035",
+      "kennzeichen": "ASZ-2035",
       "funkrufname": {
         "kennwort": {
           "code": 2
@@ -449,7 +449,7 @@
         "freitext": "Dekon-LKW P+"
       },
       "aenderungen": "Dekontaminationslastkraftwagen Personen 2+ (Bund)",
-      "kennzeichenFreitext": "ASZ-2036",
+      "kennzeichen": "ASZ-2036",
       "funkrufname": {
         "kennwort": {
           "code": 2
@@ -467,7 +467,7 @@
         "freitext": "LF-KatS"
       },
       "aenderungen": "Löschgruppenfahrzeug KatS (Bund)",
-      "kennzeichenFreitext": "ASZ-2037",
+      "kennzeichen": "ASZ-2037",
       "funkrufname": {
         "kennwort": {
           "code": 2

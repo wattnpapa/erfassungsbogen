@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "stand": 2389,
   "einheit": {
     "organisation": 8,
@@ -351,7 +351,7 @@
         "freitext": "LKW-Log Bt"
       },
       "aenderungen": "Lastkraftwagen Logistik/Betreuung (Bund)",
-      "kennzeichenFreitext": "MEI-2038",
+      "kennzeichen": "MEI-2038",
       "funkrufname": {
         "kennwort": {
           "code": 6
@@ -369,7 +369,7 @@
         "freitext": "GW-V"
       },
       "aenderungen": "Gerätewagen Versorgung (Freistaat Sachsen)",
-      "kennzeichenFreitext": "MEI-2039",
+      "kennzeichen": "MEI-2039",
       "funkrufname": {
         "kennwort": {
           "code": 6
@@ -387,21 +387,21 @@
         "freitext": "FKH"
       },
       "aenderungen": "Feldkochherd (Freistaat Sachsen)",
-      "kennzeichenFreitext": "Anh FKH"
+      "kennzeichen": "Anh FKH"
     },
     {
       "typ": {
         "freitext": "Kühlanhänger"
       },
       "aenderungen": "Kühlanhänger (Freistaat Sachsen)",
-      "kennzeichenFreitext": "Anh Kühl"
+      "kennzeichen": "Anh Kühl"
     },
     {
       "typ": {
         "freitext": "KTW Typ B"
       },
       "aenderungen": "Notfallkrankenwagen Typ B (Bund)",
-      "kennzeichenFreitext": "MEI-2040",
+      "kennzeichen": "MEI-2040",
       "funkrufname": {
         "kennwort": {
           "code": 6
@@ -419,7 +419,7 @@
         "freitext": "KTW Typ B"
       },
       "aenderungen": "Notfallkrankenwagen Typ B (Bund)",
-      "kennzeichenFreitext": "MEI-2041",
+      "kennzeichen": "MEI-2041",
       "funkrufname": {
         "kennwort": {
           "code": 6
@@ -437,7 +437,7 @@
         "freitext": "KTW Typ B"
       },
       "aenderungen": "Notfallkrankenwagen Typ B (Bund)",
-      "kennzeichenFreitext": "MEI-2042",
+      "kennzeichen": "MEI-2042",
       "funkrufname": {
         "kennwort": {
           "code": 6
@@ -455,7 +455,7 @@
         "freitext": "KTW Typ B"
       },
       "aenderungen": "Notfallkrankenwagen Typ B (Bund)",
-      "kennzeichenFreitext": "MEI-2043",
+      "kennzeichen": "MEI-2043",
       "funkrufname": {
         "kennwort": {
           "code": 6
@@ -473,7 +473,7 @@
         "freitext": "KTW Typ B"
       },
       "aenderungen": "Notfallkrankenwagen Typ B (Bund)",
-      "kennzeichenFreitext": "MEI-2044",
+      "kennzeichen": "MEI-2044",
       "funkrufname": {
         "kennwort": {
           "code": 6
@@ -491,7 +491,7 @@
         "freitext": "KTW Typ B"
       },
       "aenderungen": "Notfallkrankenwagen Typ B (Bund)",
-      "kennzeichenFreitext": "MEI-2045",
+      "kennzeichen": "MEI-2045",
       "funkrufname": {
         "kennwort": {
           "code": 6

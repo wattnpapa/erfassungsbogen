@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "stand": 2389,
   "einheit": {
     "organisation": 2,
@@ -182,7 +182,7 @@
         "freitext": "Zugfahrzeug"
       },
       "aenderungen": "Zugfahrzeug (Anhängerzugleistung mind. 8,6 t)",
-      "kennzeichenFreitext": "EL-2049",
+      "kennzeichen": "EL-2049",
       "funkrufname": {
         "kennwort": {
           "code": 2
@@ -201,14 +201,14 @@
         "freitext": "SMF"
       },
       "aenderungen": "Sandsackfüllmaschine, elektromechanisch",
-      "kennzeichenFreitext": "auf Anh Trsp"
+      "kennzeichen": "auf Anh Trsp"
     },
     {
       "typ": {
         "freitext": "Anh Trsp"
       },
       "aenderungen": "Anhänger zum Transport der Sandsackfüllmaschine, mit Materialcontainer",
-      "kennzeichenFreitext": "Anh Trsp"
+      "kennzeichen": "Anh Trsp"
     }
   ],
   "sofortbedarf": {

@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "stand": 2388,
   "einheit": {
     "organisation": 6,
@@ -106,7 +106,7 @@
         "freitext": "GW-V"
       },
       "aenderungen": "Gerätewagen Versorgung (Freistaat Sachsen)",
-      "kennzeichenFreitext": "BZ-2023",
+      "kennzeichen": "BZ-2023",
       "funkrufname": {
         "kennwort": {
           "code": 4
@@ -124,14 +124,14 @@
         "freitext": "FKH"
       },
       "aenderungen": "Feldkochherd (Freistaat Sachsen)",
-      "kennzeichenFreitext": "Anh FKH"
+      "kennzeichen": "Anh FKH"
     },
     {
       "typ": {
         "freitext": "Kühlanhänger"
       },
       "aenderungen": "Kühlanhänger (Freistaat Sachsen)",
-      "kennzeichenFreitext": "Anh Kühl"
+      "kennzeichen": "Anh Kühl"
     }
   ],
   "sofortbedarf": {

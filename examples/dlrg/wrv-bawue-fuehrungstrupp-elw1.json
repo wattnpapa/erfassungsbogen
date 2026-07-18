@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "stand": 1369,
   "einheit": {
     "organisation": 9,
@@ -122,7 +122,7 @@
       "typ": {
         "freitext": "ELW 1 (Einsatzleitwagen)"
       },
-      "kennzeichenFreitext": "KA-DL 11",
+      "kennzeichen": "KA-DL 11",
       "stanKonform": true,
       "aenderungen": "Führungs- und Fernmeldeausstattung",
       "funkrufname": {

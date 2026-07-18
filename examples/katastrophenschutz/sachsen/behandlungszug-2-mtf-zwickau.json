@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "stand": 2389,
   "einheit": {
     "organisation": 7,
@@ -588,7 +588,7 @@
         "freitext": "MTW"
       },
       "aenderungen": "Mannschaftstransportkraftwagen (Bund)",
-      "kennzeichenFreitext": "Z-2030",
+      "kennzeichen": "Z-2030",
       "funkrufname": {
         "kennwort": {
           "code": 5
@@ -606,7 +606,7 @@
         "freitext": "GW-San"
       },
       "aenderungen": "Gerätewagen Sanität (Bund)",
-      "kennzeichenFreitext": "Z-2031",
+      "kennzeichen": "Z-2031",
       "funkrufname": {
         "kennwort": {
           "code": 5
@@ -624,7 +624,7 @@
         "freitext": "GW-San"
       },
       "aenderungen": "Gerätewagen Sanität (Bund)",
-      "kennzeichenFreitext": "Z-2032",
+      "kennzeichen": "Z-2032",
       "funkrufname": {
         "kennwort": {
           "code": 5
@@ -642,7 +642,7 @@
         "freitext": "GW-San"
       },
       "aenderungen": "Gerätewagen Sanität (Bund)",
-      "kennzeichenFreitext": "Z-2033",
+      "kennzeichen": "Z-2033",
       "funkrufname": {
         "kennwort": {
           "code": 5
@@ -660,7 +660,7 @@
         "freitext": "GW-San"
       },
       "aenderungen": "Gerätewagen Sanität (Bund)",
-      "kennzeichenFreitext": "Z-2034",
+      "kennzeichen": "Z-2034",
       "funkrufname": {
         "kennwort": {
           "code": 5

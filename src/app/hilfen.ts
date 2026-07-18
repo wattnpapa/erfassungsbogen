@@ -124,7 +124,7 @@ export function funktionsText(p: Person, org: OrganisationsTyp): string {
 }
 
 export function kennzeichenText(f: Fahrzeug): string {
-  return f.thwKennzeichen != null ? `THW-${String(f.thwKennzeichen).padStart(5, "0")}` : (f.kennzeichenFreitext ?? "");
+  return f.kennzeichen ?? "";
 }
 
 export function funkrufText(f: Fahrzeug, einheitOrt: string): string {
@@ -285,6 +285,17 @@ export function migriereBogen(b: Erfassungsbogen): Erfassungsbogen {
         b.verpflegungManuell = { vegetarisch: sb.davonVegetarisch, vegan: 0 };
       }
       delete sb.davonVegetarisch;
+    }
+  }
+  if (b.schemaVersion < 4) {
+    // Getrennte Kennzeichenfelder zusammengeführt: THW-Nummer wird zum String.
+    for (const f of b.fahrzeuge as (Fahrzeug & { thwKennzeichen?: number; kennzeichenFreitext?: string })[]) {
+      if (f.kennzeichen == null) {
+        f.kennzeichen =
+          f.thwKennzeichen != null ? `THW-${String(f.thwKennzeichen).padStart(5, "0")}` : f.kennzeichenFreitext;
+      }
+      delete f.thwKennzeichen;
+      delete f.kennzeichenFreitext;
     }
   }
   b.schemaVersion = SCHEMA_VERSION;

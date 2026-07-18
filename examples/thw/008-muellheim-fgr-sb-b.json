@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "stand": 2390,
   "einheit": {
     "organisation": 1,
@@ -274,7 +274,7 @@
         "code": 19
       },
       "stanKonform": true,
-      "kennzeichenFreitext": "auf Anh Tieflader",
+      "kennzeichen": "auf Anh Tieflader",
       "funkrufname": {
         "kennwort": {
           "code": 1
@@ -291,7 +291,7 @@
         "code": 44
       },
       "stanKonform": true,
-      "thwKennzeichen": 80115
+      "kennzeichen": "THW-80115"
     }
   ],
   "sofortbedarf": {

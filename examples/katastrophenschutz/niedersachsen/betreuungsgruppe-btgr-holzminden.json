@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "stand": 2388,
   "einheit": {
     "organisation": 5,
@@ -184,7 +184,7 @@
         "freitext": "GW Bt"
       },
       "aenderungen": "Gerätewagen Betreuungsdienst",
-      "kennzeichenFreitext": "HOL-2035",
+      "kennzeichen": "HOL-2035",
       "funkrufname": {
         "kennwort": {
           "code": 3
@@ -203,7 +203,7 @@
         "freitext": "MTW Bt"
       },
       "aenderungen": "Mannschaftstransportwagen Betreuung",
-      "kennzeichenFreitext": "HOL-2036",
+      "kennzeichen": "HOL-2036",
       "funkrufname": {
         "kennwort": {
           "code": 3
@@ -222,7 +222,7 @@
         "freitext": "Anh Bt"
       },
       "aenderungen": "Anhänger Betreuung",
-      "kennzeichenFreitext": "Anh Bt"
+      "kennzeichen": "Anh Bt"
     }
   ],
   "sofortbedarf": {

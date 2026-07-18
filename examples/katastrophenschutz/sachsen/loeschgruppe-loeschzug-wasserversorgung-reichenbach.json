@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "stand": 2390,
   "einheit": {
     "organisation": 2,
@@ -210,7 +210,7 @@
         "freitext": "LF 20 KatS"
       },
       "aenderungen": "Löschgruppenfahrzeug für den Katastrophenschutz (Bund)",
-      "kennzeichenFreitext": "RC-2011",
+      "kennzeichen": "RC-2011",
       "funkrufname": {
         "kennwort": {
           "code": 2

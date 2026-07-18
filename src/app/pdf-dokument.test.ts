@@ -90,7 +90,7 @@ function basisBogen(): Erfassungsbogen {
     fahrzeuge: [
       {
         typ: { freitext: "MzKW" },
-        thwKennzeichen: 84397,
+        kennzeichen: "THW-84397",
         funkrufname: { kennwort: { code: 1 }, eigenerStandort: true, teile: [18, 13] },
         stanKonform: true,
       },

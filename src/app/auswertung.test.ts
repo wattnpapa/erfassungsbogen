@@ -39,7 +39,7 @@ function bogen(name: string, over: Partial<Erfassungsbogen> = {}): Erfassungsbog
       person(StaerkeRolle.MANNSCHAFT, Geschlecht.W, Ernaehrung.VEGETARISCH),
       person(StaerkeRolle.MANNSCHAFT, Geschlecht.M, Ernaehrung.VEGAN),
     ],
-    fahrzeuge: [{ typ: { code: 2 }, thwKennzeichen: 1 }],
+    fahrzeuge: [{ typ: { code: 2 }, kennzeichen: "THW-00001" }],
     sofortbedarf: { verpflegungPersonen: 3, dieselLiter: 40, benzinLiter: 5, gemischLiter: 0, unterbringung: true, ruhezeitErforderlich: false },
     ...over,
   };

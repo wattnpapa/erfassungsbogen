@@ -37,7 +37,16 @@ describe("Abwärtskompatibilität: alter v2-QR-Code", () => {
       "Anna Weber",
       "Tom Fischer",
     ]);
-    expect(bogen.fahrzeuge[0]).toMatchObject({ typ: { code: 1 }, thwKennzeichen: 84397, stanKonform: true });
+    expect(bogen.fahrzeuge[0]).toMatchObject({ typ: { code: 1 }, stanKonform: true });
+  });
+
+  it("lässt das Kennzeichen des alten THW-Sonderformats leer", () => {
+    // Ab Schema 4 gibt es nur noch ein Kennzeichen-Feld als String. Die alte
+    // THW-Nummer wird beim Decodieren bewusst verworfen (bewusste Entscheidung,
+    // siehe docs/datenmodell.md) — der übrige Datenstrom bleibt lesbar.
+    // Dass der Sofortbedarf hinter dem Fahrzeug noch stimmt (siehe unten),
+    // belegt: die alte Varint-Nummer wurde sauber übersprungen.
+    expect(bogen.fahrzeuge[0]!.kennzeichen).toBeUndefined();
   });
 
   it("setzt für v2-Personen die fehlende Ernährungsform auf FLEISCH", () => {

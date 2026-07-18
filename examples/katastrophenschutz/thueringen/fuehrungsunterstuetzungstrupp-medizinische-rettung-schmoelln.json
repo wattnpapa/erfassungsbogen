@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "stand": 2390,
   "einheit": {
     "organisation": 5,
@@ -108,7 +108,7 @@
         "freitext": "FüKW MTF"
       },
       "aenderungen": "Führungskraftwagen Medizinische Task Force (ergänzende Zivilschutzausstattung des Bundes)",
-      "kennzeichenFreitext": "ABG-2046",
+      "kennzeichen": "ABG-2046",
       "funkrufname": {
         "kennwort": {
           "code": 3

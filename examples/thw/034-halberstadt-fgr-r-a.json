@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "stand": 2390,
   "einheit": {
     "organisation": 1,
@@ -196,7 +196,7 @@
         "code": 7
       },
       "stanKonform": true,
-      "thwKennzeichen": 80184,
+      "kennzeichen": "THW-80184",
       "funkrufname": {
         "kennwort": {
           "code": 1
@@ -213,7 +213,7 @@
         "code": 16
       },
       "stanKonform": true,
-      "kennzeichenFreitext": "auf Anh Tieflader",
+      "kennzeichen": "auf Anh Tieflader",
       "funkrufname": {
         "kennwort": {
           "code": 1
@@ -230,20 +230,20 @@
         "code": 45
       },
       "stanKonform": true,
-      "thwKennzeichen": 80185
+      "kennzeichen": "THW-80185"
     },
     {
       "typ": {
         "code": 46
       },
       "stanKonform": true,
-      "thwKennzeichen": 80186
+      "kennzeichen": "THW-80186"
     },
     {
       "typ": {
         "freitext": "MzKW"
       },
-      "thwKennzeichen": 80187,
+      "kennzeichen": "THW-80187",
       "stanKonform": false,
       "aenderungen": "OV-eigenes Fahrzeug, zusätzlich zur StAN",
       "funkrufname": {

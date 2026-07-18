@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "stand": 2389,
   "einheit": {
     "organisation": 6,
@@ -139,7 +139,7 @@
         "freitext": "MTWm"
       },
       "aenderungen": "Mannschaftstransportwagen multifunktional",
-      "kennzeichenFreitext": "FRI-2041",
+      "kennzeichen": "FRI-2041",
       "funkrufname": {
         "kennwort": {
           "code": 4
@@ -158,7 +158,7 @@
         "freitext": "Anh Bt"
       },
       "aenderungen": "Anhänger Betreuung (optional)",
-      "kennzeichenFreitext": "Anh Bt"
+      "kennzeichen": "Anh Bt"
     }
   ],
   "sofortbedarf": {

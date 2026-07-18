@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "stand": 2390,
   "einheit": {
     "organisation": 5,
@@ -210,7 +210,7 @@
         "freitext": "GW San"
       },
       "aenderungen": "Gerätewagen Sanitätsdienst",
-      "kennzeichenFreitext": "CLP-2033",
+      "kennzeichen": "CLP-2033",
       "funkrufname": {
         "kennwort": {
           "code": 3
@@ -229,7 +229,7 @@
         "freitext": "MTW"
       },
       "aenderungen": "Mannschaftstransportwagen",
-      "kennzeichenFreitext": "CLP-2034",
+      "kennzeichen": "CLP-2034",
       "funkrufname": {
         "kennwort": {
           "code": 3

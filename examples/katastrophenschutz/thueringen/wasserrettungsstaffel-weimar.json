@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "stand": 2389,
   "einheit": {
     "organisation": 5,
@@ -159,7 +159,7 @@
         "freitext": "GW-W"
       },
       "aenderungen": "Gerätewagen Wasserrettung mit Trailer",
-      "kennzeichenFreitext": "WE-2035",
+      "kennzeichen": "WE-2035",
       "funkrufname": {
         "kennwort": {
           "freitext": "Wasserwacht"
@@ -178,7 +178,7 @@
         "freitext": "Rettungsboot"
       },
       "aenderungen": "Rettungsboot auf Trailer",
-      "kennzeichenFreitext": "Boot RTB",
+      "kennzeichen": "Boot RTB",
       "funkrufname": {
         "kennwort": {
           "freitext": "Wasserwacht"

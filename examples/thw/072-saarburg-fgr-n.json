@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "stand": 2389,
   "einheit": {
     "organisation": 1,
@@ -217,27 +217,27 @@
         "code": 21
       },
       "stanKonform": true,
-      "kennzeichenFreitext": "auf LKW verlastet"
+      "kennzeichen": "auf LKW verlastet"
     },
     {
       "typ": {
         "code": 44
       },
       "stanKonform": true,
-      "thwKennzeichen": 80285
+      "kennzeichen": "THW-80285"
     },
     {
       "typ": {
         "code": 47
       },
       "stanKonform": true,
-      "thwKennzeichen": 80286
+      "kennzeichen": "THW-80286"
     },
     {
       "typ": {
         "freitext": "MzKW"
       },
-      "thwKennzeichen": 80287,
+      "kennzeichen": "THW-80287",
       "stanKonform": false,
       "aenderungen": "OV-eigenes Fahrzeug, zusätzlich zur StAN",
       "funkrufname": {

@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "stand": 2389,
   "einheit": {
     "organisation": 2,
@@ -153,7 +153,7 @@
         "freitext": "Dekon-LKW P"
       },
       "aenderungen": "Dekontaminationslastkraftwagen Personen 2 (Bund)",
-      "kennzeichenFreitext": "EB-2003",
+      "kennzeichen": "EB-2003",
       "funkrufname": {
         "kennwort": {
           "code": 2

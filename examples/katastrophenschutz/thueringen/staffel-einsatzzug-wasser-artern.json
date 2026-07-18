@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "stand": 2388,
   "einheit": {
     "organisation": 2,
@@ -122,7 +122,7 @@
         "freitext": "SW-KatS"
       },
       "aenderungen": "Schlauchwagen Katastrophenschutz",
-      "kennzeichenFreitext": "KYF-2024",
+      "kennzeichen": "KYF-2024",
       "funkrufname": {
         "kennwort": {
           "freitext": "Kater"
@@ -141,7 +141,7 @@
         "freitext": "MTW"
       },
       "aenderungen": "Mannschaftstransportwagen",
-      "kennzeichenFreitext": "KYF-2025",
+      "kennzeichen": "KYF-2025",
       "funkrufname": {
         "kennwort": {
           "freitext": "Kater"

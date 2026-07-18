@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "stand": 2388,
   "einheit": {
     "organisation": 5,
@@ -534,7 +534,7 @@
         "freitext": "MTW"
       },
       "aenderungen": "Mannschaftstransportkraftwagen (Bund)",
-      "kennzeichenFreitext": "TDO-2025",
+      "kennzeichen": "TDO-2025",
       "funkrufname": {
         "kennwort": {
           "code": 3
@@ -552,7 +552,7 @@
         "freitext": "GW-Beh"
       },
       "aenderungen": "Gerätewagen Behandlung (Bund)",
-      "kennzeichenFreitext": "TDO-2026",
+      "kennzeichen": "TDO-2026",
       "funkrufname": {
         "kennwort": {
           "code": 3
@@ -570,7 +570,7 @@
         "freitext": "GW-San"
       },
       "aenderungen": "Gerätewagen Sanität (Bund)",
-      "kennzeichenFreitext": "TDO-2027",
+      "kennzeichen": "TDO-2027",
       "funkrufname": {
         "kennwort": {
           "code": 3
@@ -588,7 +588,7 @@
         "freitext": "GW-San"
       },
       "aenderungen": "Gerätewagen Sanität (Bund)",
-      "kennzeichenFreitext": "TDO-2028",
+      "kennzeichen": "TDO-2028",
       "funkrufname": {
         "kennwort": {
           "code": 3
@@ -606,7 +606,7 @@
         "freitext": "GW-San"
       },
       "aenderungen": "Gerätewagen Sanität (Bund)",
-      "kennzeichenFreitext": "TDO-2029",
+      "kennzeichen": "TDO-2029",
       "funkrufname": {
         "kennwort": {
           "code": 3

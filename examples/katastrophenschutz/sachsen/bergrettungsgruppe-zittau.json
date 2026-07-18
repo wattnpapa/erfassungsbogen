@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "stand": 2389,
   "einheit": {
     "organisation": 5,
@@ -197,7 +197,7 @@
         "freitext": "MTW"
       },
       "aenderungen": "Mannschaftstransportkraftwagen mit bis zu 8 Sitzen (Träger)",
-      "kennzeichenFreitext": "ZI-2048",
+      "kennzeichen": "ZI-2048",
       "funkrufname": {
         "kennwort": {
           "freitext": "Bergwacht"

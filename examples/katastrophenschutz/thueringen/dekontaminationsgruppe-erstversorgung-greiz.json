@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "stand": 2389,
   "einheit": {
     "organisation": 5,
@@ -194,7 +194,7 @@
         "freitext": "MTW"
       },
       "aenderungen": "Mannschaftstransportwagen",
-      "kennzeichenFreitext": "GRZ-2041",
+      "kennzeichen": "GRZ-2041",
       "funkrufname": {
         "kennwort": {
           "code": 3

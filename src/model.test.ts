@@ -182,8 +182,8 @@ describe("ansprechpartner()", () => {
 });
 
 describe("Konstanten", () => {
-  it("SCHEMA_VERSION ist die aktuelle Version 3", () => {
-    expect(SCHEMA_VERSION).toBe(3);
+  it("SCHEMA_VERSION ist die aktuelle Version 4", () => {
+    expect(SCHEMA_VERSION).toBe(4);
     // Sanity: der Meldekopf-Modus ist als eigener Enum-Wert vorhanden.
     expect(PersonalErfassung.NUR_STAERKE).toBe(1);
   });

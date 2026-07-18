@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "stand": 2390,
   "einheit": {
     "organisation": 8,
@@ -211,7 +211,7 @@
         "freitext": "GW-Bt"
       },
       "aenderungen": "Gerätewagen Betreuung",
-      "kennzeichenFreitext": "IK-2010",
+      "kennzeichen": "IK-2010",
       "funkrufname": {
         "kennwort": {
           "code": 6
@@ -230,7 +230,7 @@
         "freitext": "MTW"
       },
       "aenderungen": "Mannschaftstransportwagen",
-      "kennzeichenFreitext": "IK-2011",
+      "kennzeichen": "IK-2011",
       "funkrufname": {
         "kennwort": {
           "code": 6

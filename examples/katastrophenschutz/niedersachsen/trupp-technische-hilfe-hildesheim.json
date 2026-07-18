@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "stand": 2388,
   "einheit": {
     "organisation": 2,
@@ -88,7 +88,7 @@
         "freitext": "RW"
       },
       "aenderungen": "Rüstwagen",
-      "kennzeichenFreitext": "HI-2020",
+      "kennzeichen": "HI-2020",
       "funkrufname": {
         "kennwort": {
           "code": 2

@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "stand": 2390,
   "einheit": {
     "organisation": 8,
@@ -127,7 +127,7 @@
         "freitext": "ELW 1"
       },
       "aenderungen": "Einsatzleitwagen 1",
-      "kennzeichenFreitext": "J-2009",
+      "kennzeichen": "J-2009",
       "funkrufname": {
         "kennwort": {
           "code": 6

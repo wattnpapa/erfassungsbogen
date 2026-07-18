@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "stand": 2388,
   "einheit": {
     "organisation": 2,
@@ -100,7 +100,7 @@
         "freitext": "GW-Ortung"
       },
       "aenderungen": "Gerätewagen Ortung",
-      "kennzeichenFreitext": "WAK-2048",
+      "kennzeichen": "WAK-2048",
       "funkrufname": {
         "kennwort": {
           "freitext": "Kater"

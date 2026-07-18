@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "stand": 2390,
   "einheit": {
     "organisation": 1,
@@ -208,21 +208,21 @@
         "code": 21
       },
       "stanKonform": true,
-      "kennzeichenFreitext": "auf LKW verlastet"
+      "kennzeichen": "auf LKW verlastet"
     },
     {
       "typ": {
         "code": 44
       },
       "stanKonform": true,
-      "thwKennzeichen": 80308
+      "kennzeichen": "THW-80308"
     },
     {
       "typ": {
         "code": 47
       },
       "stanKonform": true,
-      "thwKennzeichen": 80309
+      "kennzeichen": "THW-80309"
     }
   ],
   "sofortbedarf": {

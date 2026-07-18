@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "stand": 2388,
   "einheit": {
     "organisation": 9,
@@ -140,7 +140,7 @@
         "freitext": "Tauch-GKW"
       },
       "aenderungen": "Tauchgerätekraftwagen (Freistaat Sachsen)",
-      "kennzeichenFreitext": "BZ-2047",
+      "kennzeichen": "BZ-2047",
       "funkrufname": {
         "kennwort": {
           "code": 7
@@ -158,7 +158,7 @@
         "freitext": "Motor-Rettungsboot"
       },
       "aenderungen": "Motor-Rettungsboot (Schlauchboot) mit Trailer (Freistaat Sachsen)",
-      "kennzeichenFreitext": "auf Trailer",
+      "kennzeichen": "auf Trailer",
       "funkrufname": {
         "kennwort": {
           "code": 7

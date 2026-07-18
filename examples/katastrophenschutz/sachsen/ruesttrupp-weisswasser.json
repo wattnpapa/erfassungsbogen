@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "stand": 2389,
   "einheit": {
     "organisation": 2,
@@ -92,7 +92,7 @@
         "freitext": "RW"
       },
       "aenderungen": "Rüstwagen (Freistaat Sachsen)",
-      "kennzeichenFreitext": "WSW-2009",
+      "kennzeichen": "WSW-2009",
       "funkrufname": {
         "kennwort": {
           "code": 2

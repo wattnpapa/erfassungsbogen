@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "stand": 2388,
   "einheit": {
     "organisation": 1,
@@ -210,7 +210,7 @@
         "code": 4
       },
       "stanKonform": true,
-      "thwKennzeichen": 80116,
+      "kennzeichen": "THW-80116",
       "funkrufname": {
         "kennwort": {
           "code": 1
@@ -226,7 +226,7 @@
       "typ": {
         "freitext": "PKW OV"
       },
-      "thwKennzeichen": 80118,
+      "kennzeichen": "THW-80118",
       "stanKonform": false,
       "aenderungen": "OV-eigenes Fahrzeug, zusätzlich zur StAN",
       "funkrufname": {

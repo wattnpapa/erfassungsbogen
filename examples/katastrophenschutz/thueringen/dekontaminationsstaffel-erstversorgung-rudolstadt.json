@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "stand": 2388,
   "einheit": {
     "organisation": 5,
@@ -139,7 +139,7 @@
         "freitext": "GW-Dekon EV"
       },
       "aenderungen": "Gerätewagen Dekontamination Erstversorgung (ergänzende Zivilschutzausstattung des Bundes)",
-      "kennzeichenFreitext": "SLF-2042",
+      "kennzeichen": "SLF-2042",
       "funkrufname": {
         "kennwort": {
           "code": 3

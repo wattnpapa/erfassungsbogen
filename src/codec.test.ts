@@ -85,13 +85,13 @@ function basisBogen(): Erfassungsbogen {
     fahrzeuge: [
       {
         typ: { code: 1 },
-        thwKennzeichen: 84397,
+        kennzeichen: "THW-84397",
         funkrufname: { kennwort: { code: 1 }, eigenerStandort: true, teile: [18, 13] },
         stanKonform: true,
       },
       {
         typ: { freitext: "MzKW" },
-        kennzeichenFreitext: "OL-FW 2041",
+        kennzeichen: "OL-FW 2041",
         funkrufname: { kennwort: { code: 1 }, eigenerStandort: false, ort: "Wardenburg", teile: [24, 54] },
         stanKonform: false,
         aenderungen: "Zusatzbeladung Ölwehr",

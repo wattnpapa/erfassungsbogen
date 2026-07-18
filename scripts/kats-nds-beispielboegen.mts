@@ -957,8 +957,8 @@ function fahrzeugeBauen(specs: FzSpec[], traeger: Traeger, ort: NdsOrt): Fahrzeu
     for (let i = 0; i < (s.anzahl ?? 1); i++) {
       const fz: Fahrzeug = { typ: { freitext: s.kurz } };
       if (s.lang) fz.aenderungen = s.lang;
-      if (s.ohneKennzeichen) fz.kennzeichenFreitext = s.ohneKennzeichen;
-      else fz.kennzeichenFreitext = kennzeichen(ort.kfz);
+      if (s.ohneKennzeichen) fz.kennzeichen = s.ohneKennzeichen;
+      else fz.kennzeichen = kennzeichen(ort.kfz);
       if (!s.ohneFunk) {
         const kennung = fzKennung(s.kurz);
         if (kennung != null) {

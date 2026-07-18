@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "stand": 2389,
   "einheit": {
     "organisation": 2,
@@ -96,7 +96,7 @@
         "freitext": "ELW 2"
       },
       "aenderungen": "Einsatzleitwagen 2",
-      "kennzeichenFreitext": "SON-2045",
+      "kennzeichen": "SON-2045",
       "funkrufname": {
         "kennwort": {
           "freitext": "Kater"

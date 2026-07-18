@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "stand": 2389,
   "einheit": {
     "organisation": 2,
@@ -92,7 +92,7 @@
         "freitext": "TLF 3000"
       },
       "aenderungen": "Tanklöschfahrzeug 3000",
-      "kennzeichenFreitext": "H-2021",
+      "kennzeichen": "H-2021",
       "funkrufname": {
         "kennwort": {
           "code": 2

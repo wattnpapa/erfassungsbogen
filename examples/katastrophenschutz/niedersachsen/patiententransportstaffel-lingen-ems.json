@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "stand": 2390,
   "einheit": {
     "organisation": 7,
@@ -151,7 +151,7 @@
         "freitext": "KTW"
       },
       "aenderungen": "Krankentransportwagen (erweiterte Transportfähigkeit)",
-      "kennzeichenFreitext": "EL-2029",
+      "kennzeichen": "EL-2029",
       "funkrufname": {
         "kennwort": {
           "code": 5
@@ -170,7 +170,7 @@
         "freitext": "KTW"
       },
       "aenderungen": "Krankentransportwagen (erweiterte Transportfähigkeit)",
-      "kennzeichenFreitext": "EL-2030",
+      "kennzeichen": "EL-2030",
       "funkrufname": {
         "kennwort": {
           "code": 5
@@ -189,7 +189,7 @@
         "freitext": "KTW"
       },
       "aenderungen": "Krankentransportwagen (erweiterte Transportfähigkeit)",
-      "kennzeichenFreitext": "EL-2031",
+      "kennzeichen": "EL-2031",
       "funkrufname": {
         "kennwort": {
           "code": 5

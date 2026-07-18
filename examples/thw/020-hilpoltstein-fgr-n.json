@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "stand": 2389,
   "einheit": {
     "organisation": 1,
@@ -177,20 +177,20 @@
         "code": 21
       },
       "stanKonform": true,
-      "kennzeichenFreitext": "auf LKW verlastet"
+      "kennzeichen": "auf LKW verlastet"
     },
     {
       "typ": {
         "code": 44
       },
       "stanKonform": true,
-      "thwKennzeichen": 80150
+      "kennzeichen": "THW-80150"
     },
     {
       "typ": {
         "freitext": "Anh OV (Plane)"
       },
-      "thwKennzeichen": 80152,
+      "kennzeichen": "THW-80152",
       "stanKonform": false,
       "aenderungen": "OV-eigenes Fahrzeug, zusätzlich zur StAN"
     }

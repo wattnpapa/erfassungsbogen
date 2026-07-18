@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "stand": 2390,
   "einheit": {
     "organisation": 5,
@@ -143,7 +143,7 @@
         "freitext": "MTW"
       },
       "aenderungen": "Mannschaftstransportwagen mit Materialsatz Registrierungsstelle",
-      "kennzeichenFreitext": "EL-2040",
+      "kennzeichen": "EL-2040",
       "funkrufname": {
         "kennwort": {
           "code": 3

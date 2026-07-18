@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "stand": 2389,
   "einheit": {
     "organisation": 2,
@@ -214,7 +214,7 @@
         "freitext": "LF 20 KatS"
       },
       "aenderungen": "Löschgruppenfahrzeug Katastrophenschutz",
-      "kennzeichenFreitext": "EA-2023",
+      "kennzeichen": "EA-2023",
       "funkrufname": {
         "kennwort": {
           "freitext": "Kater"

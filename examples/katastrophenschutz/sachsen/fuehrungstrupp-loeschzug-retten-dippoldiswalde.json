@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "stand": 2390,
   "einheit": {
     "organisation": 2,
@@ -107,7 +107,7 @@
         "freitext": "MZF/ELW 1"
       },
       "aenderungen": "Mehrzweckfahrzeug/Einsatzleitwagen 1 (Träger)",
-      "kennzeichenFreitext": "DW-2007",
+      "kennzeichen": "DW-2007",
       "funkrufname": {
         "kennwort": {
           "code": 2

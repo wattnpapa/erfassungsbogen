@@ -1076,7 +1076,7 @@ function fahrzeugeBauen(specs: FzSpec[], ort: ThOrt, traeger: Traeger): Fahrzeug
     for (let i = 0; i < (s.anzahl ?? 1); i++) {
       const fz: Fahrzeug = { typ: { freitext: s.kurz } };
       if (s.lang) fz.aenderungen = s.lang;
-      fz.kennzeichenFreitext = s.ohneKennzeichen ?? kennzeichen(ort.kfz);
+      fz.kennzeichen = s.ohneKennzeichen ?? kennzeichen(ort.kfz);
       if (s.kennzahl != null) {
         const lfd = (belegt.get(s.kennzahl) ?? 0) + 1;
         belegt.set(s.kennzahl, lfd);
@@ -1259,7 +1259,7 @@ function pruefen(beispiele: BeispielBogen[]): void {
     );
     for (const fz of b.bogen.fahrzeuge) {
       const kurz = fz.typ.freitext ?? "?";
-      if (anhaengerKz.has(fz.kennzeichenFreitext ?? "")) continue;
+      if (anhaengerKz.has(fz.kennzeichen ?? "")) continue;
       if (fz.funkrufname?.teile.length !== 3) {
         fehler.push(`${b.datei}: ${kurz} ohne vollständigen Funkrufnamen (Wache/Kennzahl/lfd. Nr.)`);
       }

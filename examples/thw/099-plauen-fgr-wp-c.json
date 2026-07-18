@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "stand": 2390,
   "einheit": {
     "organisation": 1,
@@ -250,7 +250,7 @@
         "code": 6
       },
       "stanKonform": true,
-      "thwKennzeichen": 80355,
+      "kennzeichen": "THW-80355",
       "funkrufname": {
         "kennwort": {
           "code": 1
@@ -267,14 +267,14 @@
         "code": 52
       },
       "stanKonform": true,
-      "thwKennzeichen": 80356
+      "kennzeichen": "THW-80356"
     },
     {
       "typ": {
         "code": 43
       },
       "stanKonform": true,
-      "thwKennzeichen": 80357
+      "kennzeichen": "THW-80357"
     }
   ],
   "sofortbedarf": {

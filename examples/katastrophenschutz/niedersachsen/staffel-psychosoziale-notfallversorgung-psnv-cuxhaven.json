@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "stand": 2390,
   "einheit": {
     "organisation": 6,
@@ -144,7 +144,7 @@
         "freitext": "MTW"
       },
       "aenderungen": "Mannschaftstransportwagen",
-      "kennzeichenFreitext": "CUX-2037",
+      "kennzeichen": "CUX-2037",
       "funkrufname": {
         "kennwort": {
           "code": 4

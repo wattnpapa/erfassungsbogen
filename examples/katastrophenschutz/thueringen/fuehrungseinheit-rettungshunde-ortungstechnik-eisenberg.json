@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "stand": 2390,
   "einheit": {
     "organisation": 2,
@@ -117,7 +117,7 @@
         "freitext": "KdoW"
       },
       "aenderungen": "Kommandowagen",
-      "kennzeichenFreitext": "SHK-2047",
+      "kennzeichen": "SHK-2047",
       "funkrufname": {
         "kennwort": {
           "freitext": "Kater"

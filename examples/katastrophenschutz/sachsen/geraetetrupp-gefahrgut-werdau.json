@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "stand": 2390,
   "einheit": {
     "organisation": 2,
@@ -100,7 +100,7 @@
         "freitext": "GW-G"
       },
       "aenderungen": "Gerätewagen Gefahrgut (Freistaat Sachsen)",
-      "kennzeichenFreitext": "WDA-2004",
+      "kennzeichen": "WDA-2004",
       "funkrufname": {
         "kennwort": {
           "code": 2

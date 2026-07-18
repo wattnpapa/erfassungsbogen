@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "stand": 2389,
   "einheit": {
     "organisation": 2,
@@ -113,7 +113,7 @@
         "freitext": "KdoW"
       },
       "aenderungen": "Kommandowagen (Freistaat Sachsen)",
-      "kennzeichenFreitext": "WUR-2013",
+      "kennzeichen": "WUR-2013",
       "funkrufname": {
         "kennwort": {
           "code": 2

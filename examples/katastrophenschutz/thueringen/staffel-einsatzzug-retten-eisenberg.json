@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "stand": 2388,
   "einheit": {
     "organisation": 2,
@@ -118,7 +118,7 @@
         "freitext": "RW"
       },
       "aenderungen": "Rüstwagen",
-      "kennzeichenFreitext": "SHK-2003",
+      "kennzeichen": "SHK-2003",
       "funkrufname": {
         "kennwort": {
           "freitext": "Kater"
@@ -137,7 +137,7 @@
         "freitext": "MTW"
       },
       "aenderungen": "Mannschaftstransportwagen",
-      "kennzeichenFreitext": "SHK-2004",
+      "kennzeichen": "SHK-2004",
       "funkrufname": {
         "kennwort": {
           "freitext": "Kater"

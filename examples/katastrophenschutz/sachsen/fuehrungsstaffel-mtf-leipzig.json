@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "stand": 2390,
   "einheit": {
     "organisation": 2,
@@ -147,7 +147,7 @@
         "freitext": "KdoW"
       },
       "aenderungen": "Kommandowagen (Bund)",
-      "kennzeichenFreitext": "L-2024",
+      "kennzeichen": "L-2024",
       "funkrufname": {
         "kennwort": {
           "code": 2

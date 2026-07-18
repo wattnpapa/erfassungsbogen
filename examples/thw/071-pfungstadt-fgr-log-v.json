@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "stand": 2389,
   "einheit": {
     "organisation": 1,
@@ -269,7 +269,7 @@
         "code": 8
       },
       "stanKonform": true,
-      "thwKennzeichen": 80282,
+      "kennzeichen": "THW-80282",
       "funkrufname": {
         "kennwort": {
           "code": 1
@@ -286,7 +286,7 @@
         "code": 5
       },
       "stanKonform": true,
-      "thwKennzeichen": 80283,
+      "kennzeichen": "THW-80283",
       "funkrufname": {
         "kennwort": {
           "code": 1
@@ -303,7 +303,7 @@
         "freitext": "Anhänger"
       },
       "stanKonform": true,
-      "thwKennzeichen": 80284
+      "kennzeichen": "THW-80284"
     }
   ],
   "sofortbedarf": {

@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "stand": 2388,
   "einheit": {
     "organisation": 9,
@@ -159,7 +159,7 @@
         "freitext": "GW StrR"
       },
       "aenderungen": "Gerätewagen Strömungsrettung",
-      "kennzeichenFreitext": "CE-2028",
+      "kennzeichen": "CE-2028",
       "funkrufname": {
         "kennwort": {
           "code": 7
@@ -178,14 +178,14 @@
         "freitext": "MZB KatS"
       },
       "aenderungen": "Mehrzweckboot Katastrophenschutz",
-      "kennzeichenFreitext": "auf Anh"
+      "kennzeichen": "auf Anh"
     },
     {
       "typ": {
         "freitext": "Raft"
       },
       "aenderungen": "Raft (Strömungsrettung)",
-      "kennzeichenFreitext": "auf Anh"
+      "kennzeichen": "auf Anh"
     }
   ],
   "sofortbedarf": {

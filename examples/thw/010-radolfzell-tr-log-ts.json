@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "stand": 2390,
   "einheit": {
     "organisation": 1,
@@ -111,7 +111,7 @@
         "code": 13
       },
       "stanKonform": true,
-      "thwKennzeichen": 80119,
+      "kennzeichen": "THW-80119",
       "funkrufname": {
         "kennwort": {
           "code": 1

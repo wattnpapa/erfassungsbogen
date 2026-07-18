@@ -216,7 +216,7 @@ interface FzSpec {
 function fahrzeug(spec: FzSpec): Fahrzeug {
   const f: Fahrzeug = {
     typ: { freitext: spec.typ },
-    kennzeichenFreitext: spec.kennzeichen,
+    kennzeichen: spec.kennzeichen,
     stanKonform: true,
     aenderungen: spec.aenderungen,
   };
@@ -512,7 +512,7 @@ function pruefen(): void {
     }
     if (!plan.personal[0]?.kontakte.length) fehler.push(`${plan.datei}: erste Person (Ansprechpartner) ohne Kontakt`);
     for (const f of plan.fahrzeuge) {
-      const kz = f.kennzeichenFreitext!;
+      const kz = f.kennzeichen!;
       if (kennzeichen.has(kz)) fehler.push(`Kennzeichen doppelt: ${kz}`);
       kennzeichen.add(kz);
       if (f.funkrufname && f.funkrufname.kennwort.code !== 7) fehler.push(`${plan.datei}: Funkruf-Kennwort ≠ Pelikan`);

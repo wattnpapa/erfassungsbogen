@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "stand": 2389,
   "einheit": {
     "organisation": 2,
@@ -190,7 +190,7 @@
         "freitext": "TSF"
       },
       "aenderungen": "Tragkraftspritzenfahrzeug",
-      "kennzeichenFreitext": "PE-2008",
+      "kennzeichen": "PE-2008",
       "funkrufname": {
         "kennwort": {
           "code": 2
@@ -209,7 +209,7 @@
         "freitext": "WLF"
       },
       "aenderungen": "Wechselladerfahrzeug mit AB Vegetationsbrandbekämpfung (AB VEG)",
-      "kennzeichenFreitext": "PE-2009",
+      "kennzeichen": "PE-2009",
       "funkrufname": {
         "kennwort": {
           "code": 2
@@ -228,7 +228,7 @@
         "freitext": "AB VEG"
       },
       "aenderungen": "Abrollbehälter Vegetationsbrandbekämpfung",
-      "kennzeichenFreitext": "auf WLF"
+      "kennzeichen": "auf WLF"
     }
   ],
   "sofortbedarf": {

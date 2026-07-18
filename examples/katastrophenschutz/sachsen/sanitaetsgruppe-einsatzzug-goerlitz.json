@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "stand": 2389,
   "einheit": {
     "organisation": 5,
@@ -202,7 +202,7 @@
         "freitext": "GW-San"
       },
       "aenderungen": "Gerätewagen Sanität (Freistaat Sachsen)",
-      "kennzeichenFreitext": "GR-2016",
+      "kennzeichen": "GR-2016",
       "funkrufname": {
         "kennwort": {
           "code": 3
@@ -220,7 +220,7 @@
         "freitext": "MTW"
       },
       "aenderungen": "Mannschaftstransportkraftwagen (Freistaat Sachsen)",
-      "kennzeichenFreitext": "GR-2017",
+      "kennzeichen": "GR-2017",
       "funkrufname": {
         "kennwort": {
           "code": 3

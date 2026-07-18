@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "stand": 2389,
   "einheit": {
     "organisation": 2,
@@ -119,7 +119,7 @@
         "freitext": "CBRN MLK"
       },
       "aenderungen": "Messleitkomponente (ergänzende Zivilschutzausstattung des Bundes)",
-      "kennzeichenFreitext": "SHL-2043",
+      "kennzeichen": "SHL-2043",
       "funkrufname": {
         "kennwort": {
           "freitext": "Kater"

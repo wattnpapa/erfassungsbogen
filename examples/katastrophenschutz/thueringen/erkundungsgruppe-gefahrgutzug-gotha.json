@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "stand": 2388,
   "einheit": {
     "organisation": 2,
@@ -191,7 +191,7 @@
         "freitext": "GW-Mess"
       },
       "aenderungen": "Gerätewagen Messtechnik",
-      "kennzeichenFreitext": "GTH-2016",
+      "kennzeichen": "GTH-2016",
       "funkrufname": {
         "kennwort": {
           "freitext": "Kater"
@@ -210,7 +210,7 @@
         "freitext": "CBRN-ErkKW"
       },
       "aenderungen": "CBRN-Erkundungswagen",
-      "kennzeichenFreitext": "GTH-2017",
+      "kennzeichen": "GTH-2017",
       "funkrufname": {
         "kennwort": {
           "freitext": "Kater"

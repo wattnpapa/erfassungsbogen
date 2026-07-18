@@ -45,6 +45,7 @@ import {
   datumDeutsch,
   funkrufText,
   funktionsText,
+  kennzeichenAusText,
   kennzeichenText,
   neuePerson,
   neuesFahrzeug,
@@ -789,7 +790,6 @@ function FahrzeugKarte(props: {
 }) {
   const { fahrzeug: f, org, aendern, entfernen } = props;
   const set = (patch: Partial<Fahrzeug>) => aendern({ ...f, ...patch });
-  const istThwKz = f.thwKennzeichen != null;
   return (
     <div className="karte">
       <button type="button" className="entfernen" onClick={entfernen}>Fahrzeug entfernen</button>
@@ -797,32 +797,13 @@ function FahrzeugKarte(props: {
         <Feld titel="Fahrzeugtyp">
           <VokabAuswahl wert={f.typ} aendern={(v) => set({ typ: v })} tabelle={vokabularFuer(org, "fahrzeug")} platzhalter="z. B. MzKW, LF 20" />
         </Feld>
-        <Feld titel="Kennzeichen-Art" schmal>
-          <select
-            value={istThwKz ? "thw" : "frei"}
-            onChange={(e) =>
-              e.target.value === "thw"
-                ? set({ thwKennzeichen: 0, kennzeichenFreitext: undefined })
-                : set({ thwKennzeichen: undefined, kennzeichenFreitext: "" })
-            }
-          >
-            <option value="thw">THW-Nummer</option>
-            <option value="frei">Kennzeichen</option>
-          </select>
+        <Feld titel="Kennzeichen">
+          <input
+            value={f.kennzeichen ?? ""}
+            onChange={(e) => set({ kennzeichen: e.target.value })}
+            placeholder="OL-FW 2041 / THW-84397"
+          />
         </Feld>
-        {istThwKz ? (
-          <Feld titel="THW-Nummer (nur Ziffern)" schmal>
-            <input
-              value={f.thwKennzeichen || ""}
-              onChange={(e) => set({ thwKennzeichen: zahl(e.target.value.replace(/\D/g, "")) })}
-              placeholder="84397"
-            />
-          </Feld>
-        ) : (
-          <Feld titel="Kennzeichen" schmal>
-            <input value={f.kennzeichenFreitext ?? ""} onChange={(e) => set({ kennzeichenFreitext: e.target.value })} placeholder="OL-FW 2041" />
-          </Feld>
-        )}
         <Feld titel="Ausstattung nach StAN" schmal>
           <select
             value={f.stanKonform == null ? "na" : f.stanKonform ? "ja" : "nein"}

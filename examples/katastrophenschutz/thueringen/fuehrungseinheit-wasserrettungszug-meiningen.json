@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "stand": 2389,
   "einheit": {
     "organisation": 9,
@@ -117,7 +117,7 @@
         "freitext": "KdoW"
       },
       "aenderungen": "Kommandowagen",
-      "kennzeichenFreitext": "SM-2034",
+      "kennzeichen": "SM-2034",
       "funkrufname": {
         "kennwort": {
           "code": 7

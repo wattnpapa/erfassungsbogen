@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "stand": 2389,
   "einheit": {
     "organisation": 2,
@@ -190,7 +190,7 @@
         "freitext": "ELW 2"
       },
       "aenderungen": "Einsatzleitwagen 2 — Führungsunterstützung (Landkreis)",
-      "kennzeichenFreitext": "OPR-2001",
+      "kennzeichen": "OPR-2001",
       "funkrufname": {
         "kennwort": {
           "code": 2
@@ -209,7 +209,7 @@
         "freitext": "ELW 1"
       },
       "aenderungen": "Einsatzleitwagen 1 (Träger)",
-      "kennzeichenFreitext": "OPR-2002",
+      "kennzeichen": "OPR-2002",
       "funkrufname": {
         "kennwort": {
           "code": 2
@@ -228,7 +228,7 @@
         "freitext": "MTW"
       },
       "aenderungen": "Mannschaftstransportwagen (Träger)",
-      "kennzeichenFreitext": "OPR-2003",
+      "kennzeichen": "OPR-2003",
       "funkrufname": {
         "kennwort": {
           "code": 2

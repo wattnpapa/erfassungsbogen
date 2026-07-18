@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "stand": 2390,
   "einheit": {
     "organisation": 2,
@@ -88,7 +88,7 @@
         "freitext": "Transportfahrzeug"
       },
       "aenderungen": "geeignetes Transportfahrzeug (mobiles Hochwasserschutzsystem, bis 3 Sätze à 150 m)",
-      "kennzeichenFreitext": "WHV-2050",
+      "kennzeichen": "WHV-2050",
       "funkrufname": {
         "kennwort": {
           "code": 2
@@ -107,7 +107,7 @@
         "freitext": "UslG"
       },
       "aenderungen": "Umschlaggerät (Logistik am Einsatzort)",
-      "kennzeichenFreitext": "auf Anh"
+      "kennzeichen": "auf Anh"
     }
   ],
   "sofortbedarf": {

@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "stand": 2388,
   "einheit": {
     "organisation": 8,
@@ -200,7 +200,7 @@
         "freitext": "GW Vpf"
       },
       "aenderungen": "Gerätewagen Verpflegung",
-      "kennzeichenFreitext": "HK-2038",
+      "kennzeichen": "HK-2038",
       "funkrufname": {
         "kennwort": {
           "code": 6
@@ -219,7 +219,7 @@
         "freitext": "MTW Vpf"
       },
       "aenderungen": "Mannschaftstransportwagen Verpflegung",
-      "kennzeichenFreitext": "HK-2039",
+      "kennzeichen": "HK-2039",
       "funkrufname": {
         "kennwort": {
           "code": 6
@@ -238,14 +238,14 @@
         "freitext": "FKH"
       },
       "aenderungen": "Feldkochherd",
-      "kennzeichenFreitext": "Anh FKH"
+      "kennzeichen": "Anh FKH"
     },
     {
       "typ": {
         "freitext": "Anh Kühl"
       },
       "aenderungen": "Kühlanhänger",
-      "kennzeichenFreitext": "Anh Kühl"
+      "kennzeichen": "Anh Kühl"
     }
   ],
   "sofortbedarf": {

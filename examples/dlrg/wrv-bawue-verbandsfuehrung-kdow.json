@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "stand": 1369,
   "einheit": {
     "organisation": 9,
@@ -129,7 +129,7 @@
       "typ": {
         "freitext": "KdoW (Kommandowagen)"
       },
-      "kennzeichenFreitext": "S-DL 12",
+      "kennzeichen": "S-DL 12",
       "stanKonform": true,
       "funkrufname": {
         "kennwort": {

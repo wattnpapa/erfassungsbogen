@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "stand": 2388,
   "einheit": {
     "organisation": 9,
@@ -223,7 +223,7 @@
         "freitext": "GW-W"
       },
       "aenderungen": "Gerätewagen Wasserrettung (Land)",
-      "kennzeichenFreitext": "BRB-2041",
+      "kennzeichen": "BRB-2041",
       "funkrufname": {
         "kennwort": {
           "code": 7
@@ -242,7 +242,7 @@
         "freitext": "MZB"
       },
       "aenderungen": "Mehrzweckboot mit Trailer (Land)",
-      "kennzeichenFreitext": "BRB-2042",
+      "kennzeichen": "BRB-2042",
       "funkrufname": {
         "kennwort": {
           "code": 7
@@ -261,7 +261,7 @@
         "freitext": "RTB"
       },
       "aenderungen": "Rettungsboot mit Trailer (Träger)",
-      "kennzeichenFreitext": "BRB-2043",
+      "kennzeichen": "BRB-2043",
       "funkrufname": {
         "kennwort": {
           "code": 7
@@ -280,7 +280,7 @@
         "freitext": "MTW"
       },
       "aenderungen": "Mannschaftstransportwagen (Träger)",
-      "kennzeichenFreitext": "BRB-2044",
+      "kennzeichen": "BRB-2044",
       "funkrufname": {
         "kennwort": {
           "code": 7

@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "stand": 2389,
   "einheit": {
     "organisation": 1,
@@ -129,7 +129,7 @@
         "code": 2
       },
       "stanKonform": true,
-      "thwKennzeichen": 80336,
+      "kennzeichen": "THW-80336",
       "funkrufname": {
         "kennwort": {
           "code": 1
@@ -145,7 +145,7 @@
       "typ": {
         "freitext": "MzKW"
       },
-      "thwKennzeichen": 80337,
+      "kennzeichen": "THW-80337",
       "stanKonform": false,
       "aenderungen": "OV-eigenes Fahrzeug, zusätzlich zur StAN",
       "funkrufname": {

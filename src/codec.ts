@@ -185,15 +185,10 @@ function encodeFunkrufname(w: Writer, fr: Funkrufname): void {
 
 function encodeFahrzeug(w: Writer, f: Fahrzeug): void {
   const flags =
-    (f.stanKonform != null ? 1 : 0) |
-    (f.stanKonform ? 2 : 0) |
-    (f.funkrufname ? 4 : 0) |
-    (f.aenderungen ? 8 : 0) |
-    (f.thwKennzeichen != null ? 16 : 0);
+    (f.stanKonform != null ? 1 : 0) | (f.stanKonform ? 2 : 0) | (f.funkrufname ? 4 : 0) | (f.aenderungen ? 8 : 0);
   w.u8(flags);
   w.vokab(f.typ);
-  if (f.thwKennzeichen != null) w.varint(f.thwKennzeichen);
-  else w.str(f.kennzeichenFreitext ?? "");
+  w.str(f.kennzeichen ?? "");
   if (f.funkrufname) encodeFunkrufname(w, f.funkrufname);
   if (f.aenderungen) w.str(f.aenderungen);
 }
@@ -325,8 +320,11 @@ function decodeFunkrufname(r: Reader): Funkrufname {
 function decodeFahrzeug(r: Reader): Fahrzeug {
   const flags = r.u8();
   const f: Fahrzeug = { typ: r.vokab() };
-  if (flags & 16) f.thwKennzeichen = r.varint();
-  else f.kennzeichenFreitext = r.str();
+  // Bis Schema 3 stand hinter Flag 16 ein THW-Kennzeichen als Varint statt eines
+  // Kennzeichen-Strings. Der Wert wird nur noch übersprungen, damit der Rest des
+  // Datenstroms lesbar bleibt — das Kennzeichen bleibt bei solchen Codes leer.
+  if (flags & 16) r.varint();
+  else f.kennzeichen = r.str();
   if (flags & 4) f.funkrufname = decodeFunkrufname(r);
   if (flags & 1) f.stanKonform = (flags & 2) !== 0;
   if (flags & 8) f.aenderungen = r.str();

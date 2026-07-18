@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "stand": 2388,
   "einheit": {
     "organisation": 1,
@@ -265,7 +265,7 @@
         "code": 10
       },
       "stanKonform": true,
-      "thwKennzeichen": 80106,
+      "kennzeichen": "THW-80106",
       "funkrufname": {
         "kennwort": {
           "code": 1
@@ -282,7 +282,7 @@
         "code": 22
       },
       "stanKonform": true,
-      "kennzeichenFreitext": "auf Anh",
+      "kennzeichen": "auf Anh",
       "funkrufname": {
         "kennwort": {
           "code": 1
@@ -299,7 +299,7 @@
         "code": 22
       },
       "stanKonform": true,
-      "kennzeichenFreitext": "auf Anh",
+      "kennzeichen": "auf Anh",
       "funkrufname": {
         "kennwort": {
           "code": 1

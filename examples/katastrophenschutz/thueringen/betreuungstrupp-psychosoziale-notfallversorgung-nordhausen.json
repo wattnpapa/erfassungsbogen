@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "stand": 2390,
   "einheit": {
     "organisation": 7,
@@ -87,7 +87,7 @@
         "freitext": "MTW"
       },
       "aenderungen": "Mannschaftstransportwagen",
-      "kennzeichenFreitext": "NDH-2014",
+      "kennzeichen": "NDH-2014",
       "funkrufname": {
         "kennwort": {
           "code": 5

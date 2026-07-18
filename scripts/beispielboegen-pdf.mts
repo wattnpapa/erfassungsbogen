@@ -515,6 +515,11 @@ function personalBauen(typCode: number, delta: number): Person[] {
 
 let naechstesKennzeichen = 80101;
 
+/** THW-Kennzeichen in der Schreibweise am Fahrzeug: 84397 → "THW-84397". */
+function thwKennzeichen(nummer: number): string {
+  return `THW-${String(nummer).padStart(5, "0")}`;
+}
+
 interface FahrzeugPlan {
   fahrzeuge: Fahrzeug[];
   notizen: string[];
@@ -535,9 +540,9 @@ function fahrzeugeBauen(typCode: number, minus: boolean, plus: boolean): Fahrzeu
       const fz: Fahrzeug = { typ: { ...vorgabe.typ }, stanKonform: true };
       const code = vorgabe.typ.code;
       if (code != null && OHNE_KENNZEICHEN[code]) {
-        fz.kennzeichenFreitext = OHNE_KENNZEICHEN[code];
+        fz.kennzeichen = OHNE_KENNZEICHEN[code];
       } else {
-        fz.thwKennzeichen = naechstesKennzeichen++;
+        fz.kennzeichen = thwKennzeichen(naechstesKennzeichen++);
       }
       const kennzahl = vorgabe.kennzahlen?.[i];
       if (teil != null && kennzahl != null) {
@@ -574,7 +579,7 @@ function fahrzeugeBauen(typCode: number, minus: boolean, plus: boolean): Fahrzeu
       if (extra.kennzahlen.length > 0 && frei == null) continue; // Klasse voll belegt
       const fz: Fahrzeug = {
         typ: { freitext: extra.freitext },
-        thwKennzeichen: naechstesKennzeichen++,
+        kennzeichen: thwKennzeichen(naechstesKennzeichen++),
         stanKonform: false,
         aenderungen: "OV-eigenes Fahrzeug, zusätzlich zur StAN",
       };
@@ -741,16 +746,16 @@ function grossbogenBauen(): BeispielBogen {
   const fr = (teile: [number, number]): Funkrufname =>
     ({ kennwort: { code: 1 }, eigenerStandort: true, teile });
   const fahrzeuge: Fahrzeug[] = [
-    { typ: { code: 24 }, thwKennzeichen: naechstesKennzeichen++, funkrufname: fr([71, 25]), stanKonform: true }, // MTW gl Führungstrupp
-    { typ: { code: 4 }, thwKennzeichen: naechstesKennzeichen++, funkrufname: fr([72, 51]), stanKonform: true }, // GKW 1. Gruppe
-    { typ: { freitext: "MzKW" }, thwKennzeichen: naechstesKennzeichen++, funkrufname: fr([72, 54]), stanKonform: false, aenderungen: "OV-eigenes Fahrzeug, zusätzlich zur StAN" },
-    { typ: { code: 16 }, kennzeichenFreitext: "Kettenbagger 8 t (Mietgerät)", funkrufname: fr([72, 71]), stanKonform: false, aenderungen: "Mietgerät — Tiltrotator und Abbruchgreifer" },
-    { typ: { code: 4 }, thwKennzeichen: naechstesKennzeichen++, funkrufname: fr([73, 51]), stanKonform: true }, // GKW 2. Gruppe
-    { typ: { code: 7 }, thwKennzeichen: naechstesKennzeichen++, funkrufname: fr([73, 61]), stanKonform: true }, // LKW Kipper 2. Gruppe
-    { typ: { code: 8 }, thwKennzeichen: naechstesKennzeichen++, funkrufname: fr([71, 43]), stanKonform: true, aenderungen: "Materialtransport Schwere Bergung, Ladebordwand" },
-    { typ: { code: 45 }, thwKennzeichen: naechstesKennzeichen++, stanKonform: true, aenderungen: "Tieflader für Bagger" },
-    { typ: { code: 47 }, thwKennzeichen: naechstesKennzeichen++, stanKonform: true, aenderungen: "NEA 50 kVA für Baustellenbeleuchtung" },
-    { typ: { code: 43 }, thwKennzeichen: naechstesKennzeichen++, stanKonform: true, aenderungen: "Verpflegungs- und Sanitätsausstattung" },
+    { typ: { code: 24 }, kennzeichen: thwKennzeichen(naechstesKennzeichen++), funkrufname: fr([71, 25]), stanKonform: true }, // MTW gl Führungstrupp
+    { typ: { code: 4 }, kennzeichen: thwKennzeichen(naechstesKennzeichen++), funkrufname: fr([72, 51]), stanKonform: true }, // GKW 1. Gruppe
+    { typ: { freitext: "MzKW" }, kennzeichen: thwKennzeichen(naechstesKennzeichen++), funkrufname: fr([72, 54]), stanKonform: false, aenderungen: "OV-eigenes Fahrzeug, zusätzlich zur StAN" },
+    { typ: { code: 16 }, kennzeichen: "Kettenbagger 8 t (Mietgerät)", funkrufname: fr([72, 71]), stanKonform: false, aenderungen: "Mietgerät — Tiltrotator und Abbruchgreifer" },
+    { typ: { code: 4 }, kennzeichen: thwKennzeichen(naechstesKennzeichen++), funkrufname: fr([73, 51]), stanKonform: true }, // GKW 2. Gruppe
+    { typ: { code: 7 }, kennzeichen: thwKennzeichen(naechstesKennzeichen++), funkrufname: fr([73, 61]), stanKonform: true }, // LKW Kipper 2. Gruppe
+    { typ: { code: 8 }, kennzeichen: thwKennzeichen(naechstesKennzeichen++), funkrufname: fr([71, 43]), stanKonform: true, aenderungen: "Materialtransport Schwere Bergung, Ladebordwand" },
+    { typ: { code: 45 }, kennzeichen: thwKennzeichen(naechstesKennzeichen++), stanKonform: true, aenderungen: "Tieflader für Bagger" },
+    { typ: { code: 47 }, kennzeichen: thwKennzeichen(naechstesKennzeichen++), stanKonform: true, aenderungen: "NEA 50 kVA für Baustellenbeleuchtung" },
+    { typ: { code: 43 }, kennzeichen: thwKennzeichen(naechstesKennzeichen++), stanKonform: true, aenderungen: "Verpflegungs- und Sanitätsausstattung" },
   ];
 
   const stand = datumAusIso("2026-07-16");
@@ -857,14 +862,14 @@ function pruefen(beispiele: BeispielBogen[], stanTreuSoll: number): void {
   if (stanTreu !== stanTreuSoll) {
     fehler.push(`StAN-treue Bögen: ${stanTreu} statt ${stanTreuSoll}`);
   }
-  const kennzeichen = new Set<number>();
+  const kennzeichen = new Set<string>();
   for (const b of beispiele) {
     const teilSoll = teileinheitKennzahl(b.bogen.einheit.einheitsTyp.code);
     const belegt = new Set<string>();
     for (const fz of b.bogen.fahrzeuge) {
-      if (fz.thwKennzeichen != null) {
-        if (kennzeichen.has(fz.thwKennzeichen)) fehler.push(`${b.datei}: Kennzeichen doppelt`);
-        kennzeichen.add(fz.thwKennzeichen);
+      if (fz.kennzeichen?.startsWith("THW-")) {
+        if (kennzeichen.has(fz.kennzeichen)) fehler.push(`${b.datei}: Kennzeichen doppelt`);
+        kennzeichen.add(fz.kennzeichen);
       }
       const fr = fz.funkrufname;
       if (!fr) continue;

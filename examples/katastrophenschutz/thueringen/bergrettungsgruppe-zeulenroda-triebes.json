@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "stand": 2390,
   "einheit": {
     "organisation": 5,
@@ -216,7 +216,7 @@
         "freitext": "GW-Bergrettung"
       },
       "aenderungen": "Gerätewagen Bergrettung mit Anhänger",
-      "kennzeichenFreitext": "GRZ-2031",
+      "kennzeichen": "GRZ-2031",
       "funkrufname": {
         "kennwort": {
           "freitext": "Bergwacht"
@@ -235,7 +235,7 @@
         "freitext": "KLGF"
       },
       "aenderungen": "Kleingeländefahrzeug",
-      "kennzeichenFreitext": "GRZ-2032",
+      "kennzeichen": "GRZ-2032",
       "funkrufname": {
         "kennwort": {
           "freitext": "Bergwacht"
@@ -254,7 +254,7 @@
         "freitext": "KTW-Bergrettung"
       },
       "aenderungen": "Krankentransportwagen Bergrettung",
-      "kennzeichenFreitext": "GRZ-2033",
+      "kennzeichen": "GRZ-2033",
       "funkrufname": {
         "kennwort": {
           "freitext": "Bergwacht"

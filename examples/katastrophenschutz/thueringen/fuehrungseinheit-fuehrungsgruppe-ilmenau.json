@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "stand": 2388,
   "einheit": {
     "organisation": 2,
@@ -133,7 +133,7 @@
         "freitext": "MTW"
       },
       "aenderungen": "Mannschaftstransportwagen",
-      "kennzeichenFreitext": "IK-2044",
+      "kennzeichen": "IK-2044",
       "funkrufname": {
         "kennwort": {
           "freitext": "Kater"

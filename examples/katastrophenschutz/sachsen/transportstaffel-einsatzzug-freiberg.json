@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "stand": 2390,
   "einheit": {
     "organisation": 8,
@@ -155,7 +155,7 @@
         "freitext": "KTW Typ B"
       },
       "aenderungen": "Notfallkrankenwagen Typ B (Bund)",
-      "kennzeichenFreitext": "FG-2018",
+      "kennzeichen": "FG-2018",
       "funkrufname": {
         "kennwort": {
           "code": 6
@@ -173,7 +173,7 @@
         "freitext": "KTW Typ B"
       },
       "aenderungen": "Notfallkrankenwagen Typ B (Freistaat Sachsen)",
-      "kennzeichenFreitext": "FG-2019",
+      "kennzeichen": "FG-2019",
       "funkrufname": {
         "kennwort": {
           "code": 6
@@ -191,7 +191,7 @@
         "freitext": "KTW Typ B"
       },
       "aenderungen": "Notfallkrankenwagen Typ B (Freistaat Sachsen)",
-      "kennzeichenFreitext": "FG-2020",
+      "kennzeichen": "FG-2020",
       "funkrufname": {
         "kennwort": {
           "code": 6

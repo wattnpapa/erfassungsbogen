@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "stand": 2390,
   "einheit": {
     "organisation": 6,
@@ -100,7 +100,7 @@
         "freitext": "MZF/ELW 1"
       },
       "aenderungen": "Mehrzweckfahrzeug/Einsatzleitwagen 1 (Träger)",
-      "kennzeichenFreitext": "HOT-2015",
+      "kennzeichen": "HOT-2015",
       "funkrufname": {
         "kennwort": {
           "code": 4

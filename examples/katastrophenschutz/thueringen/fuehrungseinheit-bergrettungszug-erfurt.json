@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "stand": 2390,
   "einheit": {
     "organisation": 5,
@@ -121,7 +121,7 @@
         "freitext": "KdoW"
       },
       "aenderungen": "Kommandowagen mit Anhänger",
-      "kennzeichenFreitext": "EF-2029",
+      "kennzeichen": "EF-2029",
       "funkrufname": {
         "kennwort": {
           "freitext": "Bergwacht"
@@ -140,7 +140,7 @@
         "freitext": "KLGF"
       },
       "aenderungen": "Kleingeländefahrzeug",
-      "kennzeichenFreitext": "EF-2030",
+      "kennzeichen": "EF-2030",
       "funkrufname": {
         "kennwort": {
           "freitext": "Bergwacht"

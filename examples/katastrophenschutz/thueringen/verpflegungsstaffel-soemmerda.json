@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "stand": 2388,
   "einheit": {
     "organisation": 6,
@@ -159,7 +159,7 @@
         "freitext": "GW-V"
       },
       "aenderungen": "Gerätewagen Verpflegung",
-      "kennzeichenFreitext": "SÖM-2012",
+      "kennzeichen": "SÖM-2012",
       "funkrufname": {
         "kennwort": {
           "code": 4
@@ -178,7 +178,7 @@
         "freitext": "FKH"
       },
       "aenderungen": "Anhänger Feldkochherd",
-      "kennzeichenFreitext": "Anh FKH"
+      "kennzeichen": "Anh FKH"
     }
   ],
   "sofortbedarf": {

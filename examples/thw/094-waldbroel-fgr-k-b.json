@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "stand": 2389,
   "einheit": {
     "organisation": 1,
@@ -276,7 +276,7 @@
         "code": 1
       },
       "stanKonform": true,
-      "thwKennzeichen": 80338,
+      "kennzeichen": "THW-80338",
       "funkrufname": {
         "kennwort": {
           "code": 1
@@ -293,7 +293,7 @@
         "code": 5
       },
       "stanKonform": true,
-      "thwKennzeichen": 80339,
+      "kennzeichen": "THW-80339",
       "funkrufname": {
         "kennwort": {
           "code": 1
@@ -310,7 +310,7 @@
         "code": 5
       },
       "stanKonform": true,
-      "thwKennzeichen": 80340,
+      "kennzeichen": "THW-80340",
       "funkrufname": {
         "kennwort": {
           "code": 1
@@ -327,21 +327,21 @@
         "code": 40
       },
       "stanKonform": true,
-      "thwKennzeichen": 80341
+      "kennzeichen": "THW-80341"
     },
     {
       "typ": {
         "code": 41
       },
       "stanKonform": true,
-      "thwKennzeichen": 80342
+      "kennzeichen": "THW-80342"
     },
     {
       "typ": {
         "freitext": "Fahrzeuge/Anhänger Richtfunk"
       },
       "stanKonform": true,
-      "thwKennzeichen": 80343
+      "kennzeichen": "THW-80343"
     }
   ],
   "sofortbedarf": {

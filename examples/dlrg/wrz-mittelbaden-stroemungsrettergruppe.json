@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "stand": 1369,
   "einheit": {
     "organisation": 9,
@@ -217,7 +217,7 @@
       "typ": {
         "freitext": "SrGrFzg (GA Strömungsrettung)"
       },
-      "kennzeichenFreitext": "RA-DL 461",
+      "kennzeichen": "RA-DL 461",
       "stanKonform": true,
       "aenderungen": "Zugfahrzeug mit Beladung Strömungsrettung",
       "funkrufname": {
@@ -236,7 +236,7 @@
       "typ": {
         "freitext": "Raft-Anhänger (Strömungsrettung)"
       },
-      "kennzeichenFreitext": "RA-DL 462",
+      "kennzeichen": "RA-DL 462",
       "stanKonform": true,
       "aenderungen": "Raft (aufblasbares Wildwasserboot) auf Anhänger"
     }

@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "stand": 2388,
   "einheit": {
     "organisation": 5,
@@ -681,7 +681,7 @@
         "freitext": "ELW 1"
       },
       "aenderungen": "Einsatzleitwagen 1 — Führung SEE-San (Träger)",
-      "kennzeichenFreitext": "P-2026",
+      "kennzeichen": "P-2026",
       "funkrufname": {
         "kennwort": {
           "code": 3
@@ -700,7 +700,7 @@
         "freitext": "NEF"
       },
       "aenderungen": "Notarzteinsatzfahrzeug (Träger)",
-      "kennzeichenFreitext": "P-2027",
+      "kennzeichen": "P-2027",
       "funkrufname": {
         "kennwort": {
           "code": 3
@@ -719,7 +719,7 @@
         "freitext": "RTW"
       },
       "aenderungen": "Rettungswagen (Träger)",
-      "kennzeichenFreitext": "P-2028",
+      "kennzeichen": "P-2028",
       "funkrufname": {
         "kennwort": {
           "code": 3
@@ -738,7 +738,7 @@
         "freitext": "RTW"
       },
       "aenderungen": "Rettungswagen (Träger)",
-      "kennzeichenFreitext": "P-2029",
+      "kennzeichen": "P-2029",
       "funkrufname": {
         "kennwort": {
           "code": 3
@@ -757,7 +757,7 @@
         "freitext": "KTW"
       },
       "aenderungen": "Krankentransportwagen (Träger)",
-      "kennzeichenFreitext": "P-2030",
+      "kennzeichen": "P-2030",
       "funkrufname": {
         "kennwort": {
           "code": 3
@@ -776,7 +776,7 @@
         "freitext": "KTW"
       },
       "aenderungen": "Krankentransportwagen (Träger)",
-      "kennzeichenFreitext": "P-2031",
+      "kennzeichen": "P-2031",
       "funkrufname": {
         "kennwort": {
           "code": 3
@@ -795,7 +795,7 @@
         "freitext": "KTW"
       },
       "aenderungen": "Krankentransportwagen (Träger)",
-      "kennzeichenFreitext": "P-2032",
+      "kennzeichen": "P-2032",
       "funkrufname": {
         "kennwort": {
           "code": 3
@@ -814,7 +814,7 @@
         "freitext": "KTW-B"
       },
       "aenderungen": "Krankentransportwagen Typ B für den Katastrophenschutz (Bund)",
-      "kennzeichenFreitext": "P-2033",
+      "kennzeichen": "P-2033",
       "funkrufname": {
         "kennwort": {
           "code": 3
@@ -833,7 +833,7 @@
         "freitext": "GKTW"
       },
       "aenderungen": "Großraum-Krankentransportwagen (Land)",
-      "kennzeichenFreitext": "P-2034",
+      "kennzeichen": "P-2034",
       "funkrufname": {
         "kennwort": {
           "code": 3
@@ -852,7 +852,7 @@
         "freitext": "GW-San"
       },
       "aenderungen": "Gerätewagen Sanität — Behandlungsplatz (Land)",
-      "kennzeichenFreitext": "P-2035",
+      "kennzeichen": "P-2035",
       "funkrufname": {
         "kennwort": {
           "code": 3

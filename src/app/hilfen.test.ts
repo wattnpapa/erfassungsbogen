@@ -115,13 +115,13 @@ describe("funktionsText()", () => {
 });
 
 describe("kennzeichenText()", () => {
-  it("formatiert ein THW-Kennzeichen fünfstellig mit Präfix", () => {
-    expect(kennzeichenText({ typ: {}, thwKennzeichen: 84397 } as Fahrzeug)).toBe("THW-84397");
-    expect(kennzeichenText({ typ: {}, thwKennzeichen: 12 } as Fahrzeug)).toBe("THW-00012");
+  it("gibt das erfasste Kennzeichen unverändert zurück", () => {
+    expect(kennzeichenText({ typ: {}, kennzeichen: "THW-84397" } as Fahrzeug)).toBe("THW-84397");
+    expect(kennzeichenText({ typ: {}, kennzeichen: "OL-FW 2041" } as Fahrzeug)).toBe("OL-FW 2041");
   });
 
-  it("gibt ein Freitext-Kennzeichen unverändert zurück", () => {
-    expect(kennzeichenText({ typ: {}, kennzeichenFreitext: "OL-FW 2041" } as Fahrzeug)).toBe("OL-FW 2041");
+  it("liefert '' für ein Fahrzeug ohne Kennzeichen", () => {
+    expect(kennzeichenText({ typ: {} } as Fahrzeug)).toBe("");
   });
 });
 
@@ -165,7 +165,7 @@ describe("plausibilitaet()", () => {
         }),
         person({ geschlecht: Geschlecht.W }),
       ],
-      fahrzeuge: [{ typ: { code: 1 }, thwKennzeichen: 84397 }],
+      fahrzeuge: [{ typ: { code: 1 }, kennzeichen: "THW-84397" }],
     });
     expect(plausibilitaet(b)).toEqual([]);
   });
@@ -186,7 +186,7 @@ describe("plausibilitaet()", () => {
     const b = bogen({
       einsatz: { ...basis.einsatz, ortAuftrag: "X" },
       personal: [person({ kontakte: [{ art: KontaktArt.EMAIL, dienstlich: true, wert: "a@b.de" }] })],
-      fahrzeuge: [{ typ: { code: 1 }, kennzeichenFreitext: "OL-FW 2041" }],
+      fahrzeuge: [{ typ: { code: 1 }, kennzeichen: "OL-FW 2041" }],
     });
     const hinweise = plausibilitaet(b);
     expect(hinweise.some((h) => /telefonische Erreichbarkeit/.test(h))).toBe(true);
@@ -243,6 +243,24 @@ describe("migriereBogen() (JSON-Pfad, muss zum Codec passen)", () => {
     expect(b.verpflegungManuell).toEqual({ vegetarisch: 4, vegan: 0 });
     // Das Alt-Feld darf nicht im Sofortbedarf zurückbleiben.
     expect((b.sofortbedarf as unknown as Record<string, unknown>).davonVegetarisch).toBeUndefined();
+  });
+
+  it("führt die getrennten Kennzeichenfelder eines v3-Bogens zusammen", () => {
+    const alt = {
+      ...neuerBogen(),
+      schemaVersion: 3,
+      fahrzeuge: [
+        { typ: { code: 1 }, thwKennzeichen: 84397 },
+        { typ: { code: 2 }, thwKennzeichen: 12 },
+        { typ: { code: 3 }, kennzeichenFreitext: "OL-FW 2041" },
+      ],
+    } as unknown as Erfassungsbogen;
+
+    const b = migriereBogen(alt);
+    expect(b.fahrzeuge.map((f) => f.kennzeichen)).toEqual(["THW-84397", "THW-00012", "OL-FW 2041"]);
+    // Die Alt-Felder dürfen nicht zurückbleiben.
+    const roh = b.fahrzeuge as unknown as Record<string, unknown>[];
+    expect(roh.every((f) => !("thwKennzeichen" in f) && !("kennzeichenFreitext" in f))).toBe(true);
   });
 });
 

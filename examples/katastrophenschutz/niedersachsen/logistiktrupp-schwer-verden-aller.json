@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "stand": 2390,
   "einheit": {
     "organisation": 2,
@@ -88,7 +88,7 @@
         "freitext": "WLF"
       },
       "aenderungen": "Wechselladerfahrzeug",
-      "kennzeichenFreitext": "VER-2048",
+      "kennzeichen": "VER-2048",
       "funkrufname": {
         "kennwort": {
           "code": 2
@@ -107,28 +107,28 @@
         "freitext": "AB Mulde"
       },
       "aenderungen": "Abrollbehälter Mulde",
-      "kennzeichenFreitext": "auf WLF"
+      "kennzeichen": "auf WLF"
     },
     {
       "typ": {
         "freitext": "AB Logistik"
       },
       "aenderungen": "Abrollbehälter Logistik",
-      "kennzeichenFreitext": "auf WLF"
+      "kennzeichen": "auf WLF"
     },
     {
       "typ": {
         "freitext": "Anh"
       },
       "aenderungen": "Transportanhänger",
-      "kennzeichenFreitext": "Anh"
+      "kennzeichen": "Anh"
     },
     {
       "typ": {
         "freitext": "UslG"
       },
       "aenderungen": "Umschlaggerät (Teleskoplader)",
-      "kennzeichenFreitext": "auf Anh"
+      "kennzeichen": "auf Anh"
     }
   ],
   "sofortbedarf": {

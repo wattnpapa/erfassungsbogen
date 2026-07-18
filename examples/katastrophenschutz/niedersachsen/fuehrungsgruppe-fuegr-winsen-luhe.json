@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "stand": 2388,
   "einheit": {
     "organisation": 5,
@@ -188,7 +188,7 @@
         "freitext": "FüKW"
       },
       "aenderungen": "Führungskraftwagen",
-      "kennzeichenFreitext": "WL-2001",
+      "kennzeichen": "WL-2001",
       "funkrufname": {
         "kennwort": {
           "code": 3
@@ -207,7 +207,7 @@
         "freitext": "KdoW"
       },
       "aenderungen": "Kommandowagen, geländefähig",
-      "kennzeichenFreitext": "WL-2002",
+      "kennzeichen": "WL-2002",
       "funkrufname": {
         "kennwort": {
           "code": 3
@@ -226,7 +226,7 @@
         "freitext": "Anh Zelt"
       },
       "aenderungen": "Anhänger Zelt (erweiterter Besprechungsraum)",
-      "kennzeichenFreitext": "Anh Zelt"
+      "kennzeichen": "Anh Zelt"
     }
   ],
   "sofortbedarf": {

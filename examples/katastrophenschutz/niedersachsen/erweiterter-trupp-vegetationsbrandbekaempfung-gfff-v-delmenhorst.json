@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "stand": 2390,
   "einheit": {
     "organisation": 2,
@@ -107,7 +107,7 @@
         "freitext": "CCFM 3000 Niedersachsen"
       },
       "aenderungen": "spezialisiertes Waldbrandtanklöschfahrzeug",
-      "kennzeichenFreitext": "DEL-2025",
+      "kennzeichen": "DEL-2025",
       "funkrufname": {
         "kennwort": {
           "code": 2
