@@ -4,7 +4,7 @@
  * der Capacitor-Scanner (siehe nativ.ts).
  */
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ChangeEvent } from "react";
 import jsQR from "jsqr";
 
 export function QrScannerWeb(props: {
@@ -12,6 +12,8 @@ export function QrScannerWeb(props: {
   onAbbruch: () => void;
   /** Fortschritt bei Segmentierung, z. B. „Teil 1 von 2 gescannt". */
   fortschritt?: string;
+  /** Ausweg, wenn das Abfilmen nicht klappt: QR aus einem Foto/Screenshot lesen. */
+  onBild?: (e: ChangeEvent<HTMLInputElement>) => void;
 }) {
   const videoRef = useRef<HTMLVideoElement>(null);
   // Callbacks über eine Ref ansprechen, damit der Kamera-Effekt nur einmal
@@ -22,7 +24,7 @@ export function QrScannerWeb(props: {
   // liegende) QR-Code 60×/s gemeldet wird — bei Segmentierung soll erst ein
   // NEUER Teil auslösen, der Scanner läuft dafür durchgehend weiter.
   const letzterText = useRef("");
-  const [fehler, setFehler] = useState("");
+  const [fehler, setFehler] = useState(false);
 
   useEffect(() => {
     let aktiv = true;
@@ -65,7 +67,7 @@ export function QrScannerWeb(props: {
           audio: false,
         });
       } catch {
-        if (aktiv) setFehler("Keine Kamera verfügbar oder Zugriff verweigert. Alternativ den Bogen aus einer Datei laden.");
+        if (aktiv) setFehler(true);
         return;
       }
       if (!aktiv) {
@@ -86,10 +88,23 @@ export function QrScannerWeb(props: {
     <div className="scanner" role="dialog" aria-label="QR-Code scannen">
       <video ref={videoRef} playsInline muted />
       {fehler
-        ? <p className="scanner-text fehler">{fehler}</p>
+        ? (
+          <p className="scanner-text fehler">
+            Keine Kamera verfügbar oder Zugriff verweigert.
+            {props.onBild && " Stattdessen ein Foto oder einen Screenshot des QR-Codes einlesen."}
+          </p>
+        )
         : <p className="scanner-text">{props.fortschritt || "QR-Code des Erfassungsbogens vor die Kamera halten"}</p>}
       {!fehler && <div className="scanner-rahmen" aria-hidden="true" />}
-      <button onClick={props.onAbbruch}>Abbrechen</button>
+      <div className="scanner-aktionen">
+        {props.onBild && (
+          <label className="datei-knopf">
+            QR aus Bild einlesen…
+            <input type="file" accept="image/*" onChange={props.onBild} hidden />
+          </label>
+        )}
+        <button onClick={props.onAbbruch}>Abbrechen</button>
+      </div>
     </div>
   );
 }

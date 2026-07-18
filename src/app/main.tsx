@@ -531,7 +531,7 @@ function App() {
           </p>
         )}
         {scannerOffen && (
-          <QrScannerWeb onErgebnis={scanErgebnisWeb} fortschritt={scanFortschritt} onAbbruch={() => scanAbbrechen(true)} />
+          <QrScannerWeb onErgebnis={scanErgebnisWeb} fortschritt={scanFortschritt} onAbbruch={() => scanAbbrechen(true)} onBild={ladeQrBild} />
         )}
         <Fusszeile />
       </>
@@ -558,10 +558,15 @@ function App() {
             Neuen Bogen erstellen
           </button>
           <button onClick={scanneQr}>QR-Code scannen…</button>
-          <label className="datei-knopf">
-            QR aus Bild einlesen…
-            <input type="file" accept="image/*" onChange={ladeQrBild} hidden />
-          </label>
+          {/* Im Web sitzt „QR aus Bild einlesen" im Scanner-Overlay, wo es gebraucht
+              wird. Nativ scannt eine System-Oberfläche ohne eigene Knöpfe — dort
+              bleibt der Ausweg deshalb hier auf der Startseite. */}
+          {istNativ() && (
+            <label className="datei-knopf">
+              QR aus Bild einlesen…
+              <input type="file" accept="image/*" onChange={ladeQrBild} hidden />
+            </label>
+          )}
           <label className="datei-knopf">
             Aus Datei laden…
             <input type="file" accept=".json,application/json" onChange={ladeDatei} hidden />
@@ -571,7 +576,7 @@ function App() {
         {fehler && <p className="fehler">{fehler}</p>}
         {scanFortschritt && !scannerOffen && <p className="meldung" role="status">{scanFortschritt}</p>}
         {scannerOffen && (
-          <QrScannerWeb onErgebnis={scanErgebnisWeb} fortschritt={scanFortschritt} onAbbruch={() => scanAbbrechen(false)} />
+          <QrScannerWeb onErgebnis={scanErgebnisWeb} fortschritt={scanFortschritt} onAbbruch={() => scanAbbrechen(false)} onBild={ladeQrBild} />
         )}
         {/* Auch anzeigen, wenn NUR der Papierkorb gefüllt ist — sonst wäre eine
             versehentlich gelöschte letzte Vorlage nicht wiederherstellbar. */}
