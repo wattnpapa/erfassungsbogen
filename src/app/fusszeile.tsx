@@ -30,6 +30,7 @@ const ORDNER_LABEL: Record<string, string> = {
   rettungsdienst: "Rettungsdienst",
   katastrophenschutz: "Katastrophenschutz",
   niedersachsen: "Niedersachsen",
+  sachsen: "Sachsen",
 };
 
 function ordnerLabel(ordner: string): string {
