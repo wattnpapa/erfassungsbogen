@@ -2,10 +2,10 @@ import { describe, it, expect, beforeEach, vi } from "vitest";
 
 // statistik.ts zieht über ./nativ die Capacitor-Plugins; der Mock hält die
 // Node-Testumgebung frei davon (gleiches Muster wie entwurf.test.ts).
-const nativ = vi.hoisted(() => ({ wert: false }));
-vi.mock("./nativ", () => ({ istNativ: () => nativ.wert }));
+const nativ = vi.hoisted(() => ({ ist: false, name: "web" }));
+vi.mock("./nativ", () => ({ istNativ: () => nativ.ist, plattform: () => nativ.name }));
 
-import { statistikStarten, statistikAbgewaehlt, statistikAbwaehlen } from "./statistik";
+import { statistikStarten, statistikAbgewaehlt, statistikAbwaehlen, nutzungsKanal } from "./statistik";
 
 class MemStorage {
   private m = new Map<string, string>();
@@ -29,82 +29,153 @@ class MemStorage {
   }
 }
 
-/** Minimales DOM: nur so viel, wie statistikStarten() anfasst. */
-function fakeDom(protocol: string, hostname: string) {
-  const eingehaengt: { src: string; endpunkt: string | undefined }[] = [];
-  const skripte: unknown[] = [];
-  const document = {
-    querySelector: (sel: string) => (sel.includes("goatcounter") ? (skripte[0] ?? null) : null),
-    createElement: () => ({ dataset: {} as Record<string, string>, src: "", async: false, addEventListener() {} }),
-    head: {
-      appendChild(el: { src: string; dataset: Record<string, string> }) {
-        skripte.push(el);
-        eingehaengt.push({ src: el.src, endpunkt: el.dataset.goatcounter });
-      },
+/** Gesendete Zähl-URLs dieses Testlaufs. */
+let gesendet: string[] = [];
+
+/**
+ * Minimales Browser-Umfeld: nur so viel, wie statistik.ts anfasst.
+ * `standalone` schaltet die PWA-Erkennung, `beacon` simuliert ein
+ * blockiertes sendBeacon (dann muss der Image-Fallback greifen).
+ */
+function fakeUmfeld(opt: {
+  protocol?: string;
+  hostname?: string;
+  ua?: string;
+  standalone?: boolean;
+  beacon?: boolean;
+  referrer?: string;
+}) {
+  const { protocol = "https:", hostname = "erfassungsbogen.app", ua = "", standalone = false } = opt;
+  const beacon = opt.beacon ?? true;
+
+  // navigator ist in Node ein reiner Getter — nur über stubGlobal ersetzbar.
+  vi.stubGlobal("window", {
+    location: { protocol, hostname, pathname: "/", search: "?geheim=1", hash: "#nutzlast" },
+    matchMedia: (q: string) => ({ matches: standalone && q.includes("standalone") }),
+  });
+  vi.stubGlobal("navigator", {
+    userAgent: ua,
+    sendBeacon: (url: string) => {
+      if (!beacon) return false;
+      gesendet.push(url);
+      return true;
     },
-  };
-  (globalThis as Record<string, unknown>).document = document;
-  (globalThis as Record<string, unknown>).window = {
-    location: { protocol, hostname, pathname: "/" },
-    document,
-  };
-  return eingehaengt;
+  });
+  vi.stubGlobal("document", { referrer: opt.referrer ?? "" });
+  vi.stubGlobal(
+    "Image",
+    class {
+      set src(url: string) {
+        gesendet.push(url);
+      }
+    },
+  );
 }
 
 beforeEach(() => {
+  vi.unstubAllGlobals();
   (globalThis as { localStorage?: Storage }).localStorage = new MemStorage() as unknown as Storage;
-  nativ.wert = false;
-  delete (globalThis as Record<string, unknown>).window;
-  delete (globalThis as Record<string, unknown>).document;
+  nativ.ist = false;
+  nativ.name = "web";
+  gesendet = [];
+});
+
+/** Der p-Parameter der zuletzt gesendeten Zähl-URL. */
+function letzterPfad(): string | null {
+  const url = gesendet[gesendet.length - 1];
+  return url ? new URL(url).searchParams.get("p") : null;
+}
+
+describe("nutzungsKanal()", () => {
+  it("unterscheidet die installierten Apps", () => {
+    fakeUmfeld({});
+    nativ.ist = true;
+    nativ.name = "ios";
+    expect(nutzungsKanal()).toEqual({ pfad: "/app/ios", titel: "App (iOS)" });
+    nativ.name = "android";
+    expect(nutzungsKanal()).toEqual({ pfad: "/app/android", titel: "App (Android)" });
+  });
+
+  it("erkennt den Electron-Build an file://", () => {
+    fakeUmfeld({ protocol: "file:", hostname: "" });
+    expect(nutzungsKanal()).toEqual({ pfad: "/app/desktop", titel: "App (Desktop)" });
+  });
+
+  it("trennt Browser und installierte PWA je Geräteklasse", () => {
+    fakeUmfeld({ ua: "Mozilla/5.0 (Macintosh)" });
+    expect(nutzungsKanal().pfad).toBe("/browser/desktop");
+
+    fakeUmfeld({ ua: "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X)" });
+    expect(nutzungsKanal().pfad).toBe("/browser/ios");
+
+    fakeUmfeld({ ua: "Mozilla/5.0 (Linux; Android 14)", standalone: true });
+    expect(nutzungsKanal()).toEqual({ pfad: "/pwa/android", titel: "PWA (Android)" });
+  });
 });
 
 describe("statistikStarten()", () => {
-  it("hängt das Zählskript auf der Produktions-Domain ein", () => {
-    const eingehaengt = fakeDom("https:", "erfassungsbogen.app");
+  it("sendet genau einen Treffer an die Zähl-URL", () => {
+    fakeUmfeld({ ua: "Mozilla/5.0 (Macintosh)" });
     statistikStarten();
-    expect(eingehaengt).toHaveLength(1);
-    expect(eingehaengt[0]?.src).toBe("https://gc.zgo.at/count.js");
-    expect(eingehaengt[0]?.endpunkt).toBe("https://erfassungsbogen.goatcounter.com/count");
+    expect(gesendet).toHaveLength(1);
+    const url = new URL(gesendet[0]!);
+    expect(url.origin + url.pathname).toBe("https://erfassungsbogen.goatcounter.com/count");
+    expect(url.searchParams.get("p")).toBe("/browser/desktop");
+    expect(url.searchParams.get("t")).toBe("Browser (Desktop)");
   });
 
-  it("meldet als Pfad nur location.pathname – nie Query oder Fragment", () => {
-    fakeDom("https:", "erfassungsbogen.app");
+  it("überträgt niemals Query oder Fragment der aktuellen URL", () => {
+    fakeUmfeld({ ua: "Mozilla/5.0 (Macintosh)" });
     statistikStarten();
-    const gc = (globalThis as { window?: { goatcounter?: { path?: () => string } } }).window?.goatcounter;
-    expect(gc?.path?.()).toBe("/");
+    expect(gesendet[0]).not.toContain("geheim");
+    expect(gesendet[0]).not.toContain("nutzlast");
   });
 
-  it("zählt nicht in der nativen App", () => {
-    const eingehaengt = fakeDom("https:", "erfassungsbogen.app");
-    nativ.wert = true;
+  it("zählt auch in der nativen App", () => {
+    fakeUmfeld({ protocol: "capacitor:", hostname: "localhost" });
+    nativ.ist = true;
+    nativ.name = "ios";
     statistikStarten();
-    expect(eingehaengt).toHaveLength(0);
+    expect(letzterPfad()).toBe("/app/ios");
   });
 
-  it("zählt nicht unter file:// (Electron-Build)", () => {
-    const eingehaengt = fakeDom("file:", "");
+  it("sendet in App und Electron keinen Referrer", () => {
+    fakeUmfeld({ protocol: "file:", hostname: "", referrer: "https://beispiel.invalid/" });
     statistikStarten();
-    expect(eingehaengt).toHaveLength(0);
+    expect(new URL(gesendet[0]!).searchParams.get("r")).toBe("");
+  });
+
+  it("weicht auf das Zählpixel aus, wenn sendBeacon blockiert ist", () => {
+    fakeUmfeld({ ua: "Mozilla/5.0 (Macintosh)", beacon: false });
+    statistikStarten();
+    expect(gesendet).toHaveLength(1);
+    expect(letzterPfad()).toBe("/browser/desktop");
   });
 
   it("zählt nicht in der lokalen Entwicklung", () => {
-    const eingehaengt = fakeDom("http:", "localhost");
+    fakeUmfeld({ protocol: "http:", hostname: "localhost" });
     statistikStarten();
-    expect(eingehaengt).toHaveLength(0);
+    expect(gesendet).toHaveLength(0);
   });
 
   it("zählt nicht nach Widerspruch", () => {
-    const eingehaengt = fakeDom("https:", "erfassungsbogen.app");
+    fakeUmfeld({ ua: "Mozilla/5.0 (Macintosh)" });
     statistikAbwaehlen(true);
     statistikStarten();
-    expect(eingehaengt).toHaveLength(0);
+    expect(gesendet).toHaveLength(0);
   });
 
-  it("hängt das Skript kein zweites Mal ein", () => {
-    const eingehaengt = fakeDom("https:", "erfassungsbogen.app");
-    statistikStarten();
-    statistikStarten();
-    expect(eingehaengt).toHaveLength(1);
+  it("bleibt still, wenn gar kein Versandweg funktioniert (offline, kein Beacon)", () => {
+    fakeUmfeld({ ua: "Mozilla/5.0 (Macintosh)", beacon: false });
+    vi.stubGlobal(
+      "Image",
+      class {
+        set src(_url: string) {
+          throw new Error("kein Netz");
+        }
+      },
+    );
+    expect(() => statistikStarten()).not.toThrow();
   });
 });
 

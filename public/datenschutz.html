@@ -58,8 +58,10 @@
         target="_blank" rel="noopener noreferrer">GitHub Privacy Statement</a>.
     </p>
     <p>
-      Die installierten Apps (iOS, Android, Desktop) laufen vollständig lokal und
-      stellen im Betrieb keine Verbindung zu einem Server des Anbieters her.
+      Die installierten Apps (iOS, Android, Desktop) arbeiten vollständig lokal. Die
+      einzige Verbindung nach außen ist der unter Punkt 4 beschriebene Zählimpuls beim
+      Start; er überträgt keine Bogendaten. Ohne Internetverbindung unterbleibt er
+      folgenlos.
     </p>
 
     <h2>3. Erfasste Bogendaten</h2>
@@ -76,19 +78,22 @@
       oder ausgelesen.
     </p>
     <p>
-      Auf der Website (nicht in den installierten Apps) wird zur Reichweitenmessung
+      Zur Reichweitenmessung wird
       <a href="https://www.goatcounter.com/" target="_blank" rel="noopener noreferrer">GoatCounter</a>
-      eingesetzt. Erfasst werden dabei ausschließlich der Zeitpunkt des Aufrufs, die
-      aufgerufene Seite, die verweisende Seite sowie Browser- und Ländertyp. Die
-      IP-Adresse wird nur flüchtig zur Erkennung wiederkehrender Aufrufe innerhalb
-      eines Tages verwendet und nicht gespeichert; es entsteht keine geräteübergreifende
-      Kennung und kein Personenbezug. Inhalte des Erfassungsbogens werden nicht
-      übertragen.
+      eingesetzt. Beim Start der Website oder App wird einmalig ein Zählimpuls gesendet.
+      Übertragen werden dabei ausschließlich der Zeitpunkt, die Nutzungsart
+      (Browser, installierte PWA oder App, jeweils mit grober Geräteklasse
+      iOS/Android/Desktop) und – nur im Browser – die verweisende Seite. Aus der
+      Verbindung ergeben sich zusätzlich Browser- und Ländertyp. Die IP-Adresse wird
+      nur flüchtig zur Erkennung wiederkehrender Aufrufe innerhalb eines Tages
+      verwendet und nicht gespeichert; es entsteht keine geräteübergreifende Kennung
+      und kein Personenbezug. Inhalte des Erfassungsbogens werden nicht übertragen.
     </p>
     <p>
       Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO. Das berechtigte Interesse besteht
       darin, die Nutzung des Angebots zu verstehen und es bedarfsgerecht
-      weiterzuentwickeln. Der Verarbeitung kann nach Art. 21 DSGVO widersprochen werden:
+      weiterzuentwickeln, insbesondere zu erkennen, welche Nutzungsart tatsächlich
+      verwendet wird. Der Verarbeitung kann nach Art. 21 DSGVO widersprochen werden:
       dazu in der App unter „Datenschutz“ die Option <em>Nicht mitzählen</em> aktivieren.
     </p>
 

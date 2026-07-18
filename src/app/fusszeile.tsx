@@ -8,7 +8,7 @@ import type { Erfassungsbogen } from "../model";
 import { istNativ, textTeilen } from "./nativ";
 import { migriereBogen } from "./hilfen";
 import { pdfErzeugen } from "./pdf";
-import { statistikAbgewaehlt, statistikAbwaehlen } from "./statistik";
+import { nutzungsKanal, statistikAbgewaehlt, statistikAbwaehlen } from "./statistik";
 import { feldModusAktiv, feldModusSetzen } from "./feld-modus";
 import { sicherungEinspielen, sicherungErstellen } from "./sicherung";
 
@@ -343,29 +343,22 @@ export function Fusszeile() {
           Es werden keine Cookies gesetzt und keine Daten im Endgerät gespeichert
           oder ausgelesen.
         </p>
-        {istNativ() ? (
-          <p>
-            Diese App läuft vollständig lokal und bindet keine Analyse-Dienste ein.
-          </p>
-        ) : (
-          <>
-            <p>
-              Auf der Website wird zur Reichweitenmessung{" "}
-              <a href="https://www.goatcounter.com/" target="_blank" rel="noopener noreferrer">
-                GoatCounter
-              </a>{" "}
-              eingesetzt. Erfasst werden nur Zeitpunkt des Aufrufs, aufgerufene Seite,
-              verweisende Seite sowie Browser- und Ländertyp. Die IP-Adresse wird nicht
-              gespeichert, es entsteht keine geräteübergreifende Kennung. Inhalte des
-              Erfassungsbogens werden nicht übertragen. Rechtsgrundlage ist Art. 6
-              Abs. 1 lit. f DSGVO.
-            </p>
-            <label className="inline">
-              <input type="checkbox" checked={statistikAus} onChange={statistikUmschalten} />
-              Nicht mitzählen (gilt ab dem nächsten Start)
-            </label>
-          </>
-        )}
+        <p>
+          Zur Reichweitenmessung wird{" "}
+          <a href="https://www.goatcounter.com/" target="_blank" rel="noopener noreferrer">
+            GoatCounter
+          </a>{" "}
+          eingesetzt: beim Start wird einmalig ein Zählimpuls gesendet. Übertragen
+          werden nur Zeitpunkt und Nutzungsart ({nutzungsKanal().titel}) sowie – im
+          Browser – die verweisende Seite. Die IP-Adresse wird nicht gespeichert, es
+          entsteht keine geräteübergreifende Kennung. Inhalte des Erfassungsbogens
+          werden nicht übertragen. Ohne Internetverbindung unterbleibt der Impuls.
+          Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO.
+        </p>
+        <label className="inline">
+          <input type="checkbox" checked={statistikAus} onChange={statistikUmschalten} />
+          Nicht mitzählen (gilt ab dem nächsten Start)
+        </label>
         <h3>5. Betroffenenrechte</h3>
         <p>
           Nach Art. 15–21 DSGVO bestehen Rechte auf Auskunft, Berichtigung, Löschung,

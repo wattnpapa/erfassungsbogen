@@ -713,7 +713,7 @@ function Wurzel() {
   );
 }
 
-// Reichweitenmessung der Web-App (no-op in der nativen App und im Electron-Build).
+// Einen Start zählen (Browser, PWA, App). Schlägt ohne Netz still fehl.
 statistikStarten();
 
 createRoot(document.getElementById("app")!).render(
