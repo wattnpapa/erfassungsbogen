@@ -162,7 +162,11 @@ Daten stehen im Fragment (`#`) und werden daher nie an einen Server gesendet.
 Der Decoder akzeptiert die volle URL oder den nackten Base64url-Payload;
 die Magic-Bytes 'EEB2' im Binärteil bleiben die Format-Kennung.
 
-### Optionale Signatur „EEB2S" (Ed25519)
+### Signatur „EEB2S" (Ed25519)
+
+Jeder von der App erzeugte QR-Code (Bogen, Vorlage, PDF-Seite) wird signiert; der
+Geräteschlüssel wird dafür beim ersten Bedarf einmalig erzeugt. Gelesen werden
+weiterhin auch unsignierte `'EEB2'`-Codes.
 
 Ein signierter Payload trägt ein **eigenes 5-Byte-Magic** und zwischen Magic und
 Nutzdaten den öffentlichen Schlüssel und die Signatur:
@@ -212,8 +216,8 @@ Binärstrom: Felder in fester Reihenfolge, Varint-Längen, UTF-8-Strings, Option
 Referenzimplementierung: [`prototype/qr-size-check.mjs`](../prototype/qr-size-check.mjs).
 
 **Integrität:** QR-Fehlerkorrektur (ECC M = 15 %) sichert den Transport; Deflate
-schlägt bei Bitfehlern ohnehin fehl. **Authentizität** optional per
-Ed25519-Signatur (Container `EEB2S`, netto +97 Bytes) — siehe „Optionale Signatur" oben.
+schlägt bei Bitfehlern ohnehin fehl. **Authentizität** stets per
+Ed25519-Signatur (Container `EEB2S`, netto +97 Bytes) — siehe „Signatur" oben.
 
 **Gemessene Größen** (siehe README): voller THW-Bogen 511 Bytes → QR v18
 (mit OV-Verzeichnis-Referenz 411 Bytes → QR v15); Meldekopf-Schnellerfassung
@@ -271,5 +275,5 @@ Byte-für-Byte identisch zu vorher. Referenz: [`src/codec.ts`](../src/codec.ts)
 - THW-OV-Verzeichnis befüllen (Quelle: öffentliche THW-Dienststellenliste) und
   Aktualisierungsweg festlegen. (Format ist umgesetzt, siehe `standortRef`.)
 - Deflate-Preset-Dictionary aus typischen Bögen (~10–20 % zusätzliche Ersparnis).
-- ~~Signatur/Authentizität ja/nein.~~ Umgesetzt: optionale Ed25519-Signatur
+- ~~Signatur/Authentizität ja/nein.~~ Umgesetzt: Ed25519-Signatur (immer aktiv)
   (`EEB2S`, `src/codec.ts` + `src/signatur.ts`), Verifikation bei Import.

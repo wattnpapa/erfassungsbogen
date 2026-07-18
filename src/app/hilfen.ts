@@ -27,12 +27,11 @@ import {
   QR_EINZEL_MAX_VERSION,
   QR_SEGMENT_ZIEL_VERSION,
   base64UrlKodieren,
-  encodePayload,
-  encodeVorlagePayloadUrl,
   segmentPayloadUrls,
   type Kompressor,
 } from "../codec";
 import { encodeSigniertVorlagePayloadUrl, signiertePayloadBytes } from "../signatur";
+import { geraeteSchluesselSicherstellen } from "./geraete-schluessel";
 import { istNativ, textTeilen } from "./nativ";
 import {
   FUNKRUF_KENNWOERTER,
@@ -203,18 +202,17 @@ async function qrAusUrl(url: string): Promise<QrInfo> {
  * Passt der Bogen in einen QR-Code (Budget ≤ v25), bleibt es bei genau einem —
  * unverändert zu früher. Erst darüber wird der Payload segmentiert.
  *
- * Mit `signaturPrivat` wird der Payload Ed25519-signiert (Container „EEB2S",
- * netto +97 Bytes) — der Schlüssel bleibt lokal. Signieren und Segmentieren sind
- * orthogonal: die Segment-Chunks setzen den signierten Payload 1:1 wieder
- * zusammen, die Signatur bleibt intakt.
+ * Der Payload wird immer Ed25519-signiert (Container „EEB2S", netto +97 Bytes)
+ * — der Geräteschlüssel bleibt lokal und wird bei Bedarf einmalig erzeugt.
+ * Signieren und Segmentieren sind orthogonal: die Segment-Chunks setzen den
+ * signierten Payload 1:1 wieder zusammen, die Signatur bleibt intakt.
  */
-export async function qrErzeugen(
-  b: Erfassungsbogen,
-  signaturPrivat?: Uint8Array | null,
-): Promise<QrSatz> {
-  const payload = signaturPrivat
-    ? await signiertePayloadBytes(b, browserKompressor, signaturPrivat)
-    : encodePayload(b, browserKompressor);
+export async function qrErzeugen(b: Erfassungsbogen): Promise<QrSatz> {
+  const payload = await signiertePayloadBytes(
+    b,
+    browserKompressor,
+    await geraeteSchluesselSicherstellen(),
+  );
   const url = EEB_URL_PREFIX + base64UrlKodieren(payload);
   const einzelVersion = qrVersion(url);
   if (einzelVersion <= QR_EINZEL_MAX_VERSION) {
@@ -242,16 +240,15 @@ export async function qrErzeugen(
 /**
  * QR-Code zum Teilen einer Vorlage in der Einheit. Trägt den Marker "V." im
  * Fragment, damit der Empfänger sie importiert statt als Einsatzbogen zu öffnen.
- * Vorlagen sind klein und werden nicht segmentiert (ein Einzel-QR). Optional
+ * Vorlagen sind klein und werden nicht segmentiert (ein Einzel-QR). Immer
  * signiert (wie {@link qrErzeugen}).
  */
-export async function qrVorlageErzeugen(
-  b: Erfassungsbogen,
-  signaturPrivat?: Uint8Array | null,
-): Promise<QrInfo> {
-  const url = signaturPrivat
-    ? await encodeSigniertVorlagePayloadUrl(b, browserKompressor, signaturPrivat)
-    : encodeVorlagePayloadUrl(b, browserKompressor);
+export async function qrVorlageErzeugen(b: Erfassungsbogen): Promise<QrInfo> {
+  const url = await encodeSigniertVorlagePayloadUrl(
+    b,
+    browserKompressor,
+    await geraeteSchluesselSicherstellen(),
+  );
   return qrAusUrl(url);
 }
 

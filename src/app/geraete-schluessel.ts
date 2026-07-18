@@ -1,5 +1,5 @@
 /**
- * Geräte-Schlüsselverwaltung für die optionale Ed25519-Signatur.
+ * Geräte-Schlüsselverwaltung für die Ed25519-Signatur (immer aktiv).
  *
  * Bewusst minimal (siehe docs/datenmodell.md, Trust-Modell): EIN lokal erzeugtes
  * Schlüsselpaar je Gerät. Der private Schlüssel liegt als Hex im localStorage und
@@ -17,7 +17,6 @@ import {
 } from "../signatur";
 
 const SCHLUESSEL_KEY = "eeb.geraeteschluessel.v1"; // privater Schlüssel (Hex)
-const SIGNIEREN_KEY = "eeb.signieren.v1"; // "1" = neue QR/Vorlagen signieren
 
 function speicher(): Storage | null {
   try {
@@ -59,16 +58,6 @@ export async function geraeteOeffentlichHex(): Promise<string | null> {
 export async function geraeteKurzform(): Promise<string | null> {
   const hex = await geraeteOeffentlichHex();
   return hex ? schluesselKurzform(hex) : null;
-}
-
-/** true, wenn neue QR-Codes/Vorlagen signiert werden sollen. */
-export function signierenAktiv(): boolean {
-  return speicher()?.getItem(SIGNIEREN_KEY) === "1";
-}
-
-/** Signieren an-/abschalten (Voreinstellung fürs Gerät). */
-export function signierenSetzen(an: boolean): void {
-  speicher()?.setItem(SIGNIEREN_KEY, an ? "1" : "0");
 }
 
 /** Geräteschlüssel verwerfen (neuer Schlüssel wird bei Bedarf neu erzeugt). */

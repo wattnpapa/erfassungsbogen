@@ -56,13 +56,7 @@ import {
 } from "./hilfen";
 import { pdfErzeugen } from "./pdf";
 import { signaturLabel, type SignaturStatus } from "../signatur";
-import {
-  geraeteKurzform,
-  geraeteOeffentlichHex,
-  geraeteSchluesselSicherstellen,
-  signierenAktiv,
-  signierenSetzen,
-} from "./geraete-schluessel";
+import { geraeteKurzform, geraeteOeffentlichHex } from "./geraete-schluessel";
 import { istNativ, textTeilen } from "./nativ";
 
 export type SchrittProps = {
@@ -1028,8 +1022,6 @@ export function Uebersicht(props: {
   // Segmentierung blättert `vollbildTeil` durch die Teile.
   const [vollbild, setVollbild] = useState(false);
   const [vollbildTeil, setVollbildTeil] = useState(0);
-  // QR signieren (Geräteschlüssel). Voreinstellung aus dem Gerätespeicher.
-  const [signieren, setSignieren] = useState(() => signierenAktiv());
   const [schluesselKurz, setSchluesselKurz] = useState<string | null>(null);
   const org = bogen.einheit.organisation;
   const s = staerke(bogen);
@@ -1040,11 +1032,9 @@ export function Uebersicht(props: {
     let aktiv = true;
     (async () => {
       try {
-        // Bei aktivem Signieren den (ggf. neu erzeugten) Geräteschlüssel nutzen.
-        const privat = signieren ? await geraeteSchluesselSicherstellen() : null;
-        if (privat) geraeteKurzform().then((k) => aktiv && setSchluesselKurz(k));
-        const q = await qrErzeugen(bogen, privat);
+        const q = await qrErzeugen(bogen); // signiert immer mit dem Geräteschlüssel
         if (aktiv) setQr(q);
+        geraeteKurzform().then((k) => aktiv && setSchluesselKurz(k));
       } catch (e) {
         if (aktiv) setFehler(`QR-Code: ${e instanceof Error ? e.message : e}`);
       }
@@ -1052,12 +1042,7 @@ export function Uebersicht(props: {
     return () => {
       aktiv = false;
     };
-  }, [bogen, signieren]);
-
-  function signierenUmschalten(an: boolean) {
-    setSignieren(an);
-    signierenSetzen(an);
-  }
+  }, [bogen]);
 
   async function schluesselTeilen() {
     const hex = await geraeteOeffentlichHex();
@@ -1245,7 +1230,7 @@ export function Uebersicht(props: {
                 ))}
               </div>
               <p className="hinweis">
-                {qr.zeichen} Zeichen · je ≤ QR-Version {qr.version} (ECC M){signieren ? " · signiert (EEB2S)" : ""}
+                {qr.zeichen} Zeichen · je ≤ QR-Version {qr.version} (ECC M) · signiert (EEB2S)
               </p>
             </>
           ) : (
@@ -1253,7 +1238,7 @@ export function Uebersicht(props: {
               <img src={qr.teile[0]!.datenUrl} alt="EEB2-QR-Code" />
               <p className="hinweis">
                 {qr.zeichen} Zeichen · QR-Version {qr.version} (ECC M)
-                {signieren ? " · signiert (EEB2S)" : ""} — öffnet beim Scannen mit der Kamera die App; dieser Code steht auch auf der letzten PDF-Seite.
+                {" · signiert (EEB2S)"} — öffnet beim Scannen mit der Kamera die App; dieser Code steht auch auf der letzten PDF-Seite.
               </p>
             </>
           )
@@ -1269,29 +1254,20 @@ export function Uebersicht(props: {
           </p>
         )}
         <div className="signatur-optionen">
-          <label>
-            <input
-              type="checkbox"
-              checked={signieren}
-              onChange={(e) => signierenUmschalten(e.target.checked)}
-            />{" "}
-            QR mit Geräteschlüssel signieren (Ed25519, +97 Byte)
-          </label>
-          {signieren && (
-            <p className="hinweis">
-              Dieses Gerät: <strong>{schluesselKurz ?? "Schlüssel wird erzeugt…"}</strong>
-              {schluesselKurz && (
-                <>
-                  {" · "}
-                  <button type="button" className="link" onClick={schluesselTeilen}>
-                    öffentlichen Schlüssel anzeigen/teilen
-                  </button>
-                </>
-              )}
-              <br />
-              Belegt Herkunft/Integrität, nicht die Identität — der private Schlüssel bleibt auf dem Gerät.
-            </p>
-          )}
+          <p className="hinweis">
+            Signiert mit dem Geräteschlüssel (Ed25519, +97 Byte). Dieses Gerät:{" "}
+            <strong>{schluesselKurz ?? "Schlüssel wird erzeugt…"}</strong>
+            {schluesselKurz && (
+              <>
+                {" · "}
+                <button type="button" className="link" onClick={schluesselTeilen}>
+                  öffentlichen Schlüssel anzeigen/teilen
+                </button>
+              </>
+            )}
+            <br />
+            Belegt Herkunft/Integrität, nicht die Identität — der private Schlüssel bleibt auf dem Gerät.
+          </p>
         </div>
       </section>
 
