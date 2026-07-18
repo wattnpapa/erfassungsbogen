@@ -97,7 +97,7 @@ function normText(s: string | undefined): string {
 export function einheitSchluessel(e: Einheit): string {
   const typ = e.einheitsTyp.code != null ? `c${e.einheitsTyp.code}` : normText(e.einheitsTyp.freitext);
   if (e.standortRef != null) return `ref:${e.standortRef}|${typ}`;
-  return `org:${e.organisation}|${normText(e.organisationName)}|${typ}|${normText(e.name)}`;
+  return `org:${e.organisation}|${normText(e.organisationName)}|${typ}|${normText(e.hierarchie[0]?.name)}`;
 }
 
 /** FNV-1a (32 Bit) über einen String → 8-stelliger Hex. Deterministisch, kryptofrei (nur Dedupe). */

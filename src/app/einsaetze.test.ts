@@ -77,7 +77,7 @@ function bogen(over: Partial<Erfassungsbogen> = {}): Erfassungsbogen {
   return {
     schemaVersion: SCHEMA_VERSION,
     stand: 100,
-    einheit: { organisation: OrganisationsTyp.THW, einheitsTyp: { code: 1 }, name: "OV Oldenburg", hierarchie: [] },
+    einheit: { organisation: OrganisationsTyp.THW, einheitsTyp: { code: 1 }, hierarchie: [{ bezeichnung: { code: 1 }, name: "OV Oldenburg" }] },
     einsatz: { zeitraumVon: 100, zeitraumBis: 130, ortAuftrag: "Übung Kabelblitz" },
     personalErfassung: PersonalErfassung.VOLLSTAENDIG,
     personal: [person("Berger", StaerkeRolle.UNTERFUEHRER), person("Ahlers", StaerkeRolle.MANNSCHAFT)],
@@ -88,21 +88,21 @@ function bogen(over: Partial<Erfassungsbogen> = {}): Erfassungsbogen {
 
 describe("einheitSchluessel()", () => {
   it("nutzt den Standort-Ref, wenn vorhanden (stabil gegen Namensschreibweise)", () => {
-    const a = einheitSchluessel({ ...bogen().einheit, standortRef: 42, name: "OV Oldenburg" });
-    const b = einheitSchluessel({ ...bogen().einheit, standortRef: 42, name: "Oldenburg – Ni" });
+    const a = einheitSchluessel({ ...bogen().einheit, standortRef: 42, hierarchie: [{ bezeichnung: { code: 1 }, name: "OV Oldenburg" }] });
+    const b = einheitSchluessel({ ...bogen().einheit, standortRef: 42, hierarchie: [{ bezeichnung: { code: 1 }, name: "Oldenburg – Ni" }] });
     expect(a).toBe(b);
     expect(a).toContain("ref:42");
   });
 
   it("fällt ohne Ref auf Organisation + Typ + normalisierten Namen zurück", () => {
     const a = einheitSchluessel(bogen().einheit);
-    const b = einheitSchluessel({ ...bogen().einheit, name: "  ov   OLDENBURG " });
+    const b = einheitSchluessel({ ...bogen().einheit, hierarchie: [{ bezeichnung: { code: 1 }, name: "  ov   OLDENBURG " }] });
     expect(a).toBe(b); // Normalisierung: klein, getrimmt, Whitespace kollabiert
   });
 
   it("unterscheidet verschiedene Einheiten", () => {
     const a = einheitSchluessel(bogen().einheit);
-    const b = einheitSchluessel({ ...bogen().einheit, name: "OV Wardenburg" });
+    const b = einheitSchluessel({ ...bogen().einheit, hierarchie: [{ bezeichnung: { code: 1 }, name: "OV Wardenburg" }] });
     expect(a).not.toBe(b);
   });
 });
@@ -182,7 +182,7 @@ describe("neuesteJeEinheit() & revisionen()", () => {
     const s = einsatzAnlegen("E", EinsatzArt.EINSATZ);
     meldungHinzufuegen(s.id, bogen({ stand: 100 }));
     meldungHinzufuegen(s.id, bogen({ stand: 102 }));
-    meldungHinzufuegen(s.id, bogen({ einheit: { ...bogen().einheit, name: "OV Wardenburg" } }));
+    meldungHinzufuegen(s.id, bogen({ einheit: { ...bogen().einheit, hierarchie: [{ bezeichnung: { code: 1 }, name: "OV Wardenburg" }] } }));
     const kopf = neuesteJeEinheit(einsaetzeLaden()[0]!.eintraege);
     expect(kopf).toHaveLength(2); // zwei Einheiten
     const ol = kopf.find((e) => e.einheitSchluessel.includes("oldenburg"));
@@ -275,7 +275,7 @@ describe("einheitZugEtikettSetzen()", () => {
   it("lässt andere Einheiten unberührt", () => {
     const s = einsatzAnlegen("E", EinsatzArt.EINSATZ);
     meldungHinzufuegen(s.id, bogen());
-    meldungHinzufuegen(s.id, bogen({ einheit: { ...bogen().einheit, name: "OV Wardenburg" } }));
+    meldungHinzufuegen(s.id, bogen({ einheit: { ...bogen().einheit, hierarchie: [{ bezeichnung: { code: 1 }, name: "OV Wardenburg" }] } }));
     const schl = neuesteJeEinheit(einsaetzeLaden()[0]!.eintraege).find((e) =>
       e.einheitSchluessel.includes("oldenburg"),
     )!.einheitSchluessel;

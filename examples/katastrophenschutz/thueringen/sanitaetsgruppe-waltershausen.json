@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 4,
+  "schemaVersion": 5,
   "stand": 2390,
   "einheit": {
     "organisation": 5,
@@ -7,7 +7,6 @@
     "einheitsTyp": {
       "freitext": "Sanitätsgruppe"
     },
-    "name": "Waltershausen",
     "hierarchie": [
       {
         "bezeichnung": {

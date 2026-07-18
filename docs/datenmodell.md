@@ -1,8 +1,12 @@
 # Datenmodell Einheiten-Erfassungsbogen (EEB)
 
-**Stufe 1** — Datenmodell und QR-Code-Kodierung. Stand: 2026-07-18, **Schema-Version 4**
+**Stufe 1** — Datenmodell und QR-Code-Kodierung. Stand: 2026-07-18, **Schema-Version 5**
+<<<<<<< HEAD
 (v4 = ein einziges Kennzeichen-Feld; v3 = Ernährungsform je Person; v2 =
 organisationsübergreifend; v1 war THW-spezifisch).
+=======
+(v3 = Ernährungsform je Person; v2 = organisationsübergreifend; v1 war THW-spezifisch).
+>>>>>>> 99bf358 (Einheitenname ableiten statt doppelt erfassen)
 
 **Abwärtskompatibilität (Pflicht):** Schema-Änderungen dürfen ältere QR-Codes/Dateien nie
 unlesbar machen. `decodeBinaer` (`src/codec.ts`) und `bogenLaden`/`migriereBogen`
@@ -106,9 +110,16 @@ M/W/D, Verpflegung (vegetarisch/vegan), Ansprechpartner (erste Führungskraft mi
 | organisation | Enum `OrganisationsTyp` | THW, FEUERWEHR, POLIZEI, DRK, …, SONSTIGE |
 | organisationName | string | Pflicht bei SONSTIGE („Freiwillige Feuerwehr Wardenburg") |
 | einheitsTyp | `VokabularWert` | FGr K (A), Löschzug, SEG Sanität, … |
-| standortRef | number | Referenz ins mitgelieferte Standort-Verzeichnis (THW: offizielle OV-Nummer). Wenn gesetzt, entfallen name + hierarchie im QR komplett; im Modell bleiben sie für Anzeige/PDF gefüllt |
-| name | string | „OV Oldenburg - Ni", „LZ Wardenburg" |
-| hierarchie | `HierarchieEbene[]` | generisch: THW OV/RB/LV; FW Gemeinde/Landkreis; DRK KV/LV — Bezeichnung als Vokabular, Name + optionale Kontakte |
+| standortRef | number | Referenz ins mitgelieferte Standort-Verzeichnis (THW: offizielle OV-Nummer). Wenn gesetzt, entfällt die hierarchie im QR komplett; im Modell bleibt sie für Anzeige/PDF gefüllt |
+| hierarchie | `HierarchieEbene[]` | 1..n Ebenen, unterste zuerst. Die **erste Ebene ist die eigene Einheit** und Pflicht (THW OV/RB/LV; FW Gemeinde/Landkreis; DRK KV/LV) — Bezeichnung als Vokabular, Name + optionale Kontakte |
+
+Der **Anzeigename** der Einheit wird abgeleitet statt erfasst: Organisation (bzw.
+`organisationName`) + Name der ersten Ebene + Einheitstyp, z. B. „THW Oldenburg (NI)
+FGr K (A)" (`einheitAnzeigename` in `src/app/hilfen.ts`). Bis Schema 4 gab es
+daneben ein Freitextfeld `name` — faktisch eine Doppeleingabe zur ersten Ebene.
+Alte QR-Codes und JSON-Dateien bleiben lesbar: der Slot im Binärformat wird als
+leerer String weitergeschrieben, ein gefüllter Altname ohne Hierarchie wird beim
+Dekodieren zur ersten Ebene.
 
 **Zeitfelder** werden im gesamten Modell einheitlich numerisch gespeichert und erst
 bei Anzeige/PDF formatiert (`datumZuIso`/`zeitpunktZuIso` in `src/model.ts`).
@@ -263,7 +274,7 @@ Byte-für-Byte identisch zu vorher. Referenz: [`src/codec.ts`](../src/codec.ts)
 
 ## Meldekopf-Workflow (Anforderungen an die App, Stufe 2+)
 
-1. **Minimale Pflichtfelder:** Organisation, Einheitsname, Stärke (3 Zahlen),
+1. **Minimale Pflichtfelder:** Organisation, Name der ersten Ebene, Stärke (3 Zahlen),
    eine Führungskraft mit Mobilnummer. Alles andere optional & nachtragbar.
 2. **Vorbelegung:** Einsatz/Übung wird am Meldekopf einmal konfiguriert und für
    jede erfasste Einheit vorbelegt (Zeitraum, Ort/Auftrag, Einsatzbeginn = jetzt).

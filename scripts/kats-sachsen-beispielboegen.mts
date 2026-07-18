@@ -1023,7 +1023,6 @@ function bogenBauen(spec: BogenSpec, ort: SnOrt): BeispielBogen {
       organisation: spec.traeger.org,
       organisationName: spec.traeger.organisationName(ort),
       einheitsTyp: { freitext: spec.einheit },
-      name: ort.ort,
       hierarchie,
     },
     einsatz: {

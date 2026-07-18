@@ -30,7 +30,7 @@ describe("Abwärtskompatibilität: alter v2-QR-Code", () => {
   });
 
   it("liest Einheit, Personal und Fahrzeug korrekt", () => {
-    expect(bogen.einheit.name).toBe("OV Oldenburg - Ni");
+    expect(bogen.einheit.hierarchie[0]!.name).toBe("Oldenburg - Ni");
     expect(bogen.einheit.einheitsTyp).toEqual({ code: 43 });
     expect(bogen.personal.map((p) => `${p.vorname} ${p.nachname}`)).toEqual([
       "Johannes Rudolph",

@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 4,
+  "schemaVersion": 5,
   "stand": 2389,
   "einheit": {
     "organisation": 9,
@@ -7,7 +7,6 @@
     "einheitsTyp": {
       "freitext": "Staffel Wasserrettung (WRSt)"
     },
-    "name": "Langenhagen",
     "hierarchie": [
       {
         "bezeichnung": {

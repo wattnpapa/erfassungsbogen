@@ -51,7 +51,6 @@ function bogen(): Erfassungsbogen {
     einheit: {
       organisation: OrganisationsTyp.THW,
       einheitsTyp: { code: 43 },
-      name: "OV Oldenburg - Ni",
       hierarchie: [],
     },
     einsatz: {

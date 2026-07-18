@@ -50,7 +50,6 @@ function basisBogen(): Erfassungsbogen {
       organisation: OrganisationsTyp.THW,
       // Freitext-Werte, damit die Assertions unabhängig von den Vokabular-Tabellen sind.
       einheitsTyp: { freitext: "FGr K (A)" },
-      name: "OV Oldenburg - Ni",
       hierarchie: [
         { bezeichnung: { freitext: "OV" }, name: "Oldenburg - Ni", kurz: "OODE", telefon: "04413401050", email: "ov@thw.de" },
       ],
@@ -180,9 +179,9 @@ describe("pdfDokument()", () => {
     const t = texte(pdfDokument(basisBogen(), QR).content).join("\n");
     expect(t).toContain("MzKW");
     expect(t).toContain("THW-84397");
-    // eigenerStandort → Ort = Name der Einheit, Kennzahlen mit "/" verbunden.
+    // eigenerStandort → Ort = Name der untersten Ebene, Kennzahlen mit "/" verbunden.
     expect(t).toContain("FuRn:");
-    expect(t).toContain("OV Oldenburg - Ni 18/13");
+    expect(t).toContain("Oldenburg - Ni 18/13");
     expect(t).toContain("Ausstattung nach StAN: ja [X] / nein [  ]");
   });
 

@@ -44,7 +44,6 @@ function grosserBogen(personen = 40): Erfassungsbogen {
     einheit: {
       organisation: OrganisationsTyp.THW,
       einheitsTyp: { code: 43 },
-      name: "OV Oldenburg - Ni",
       hierarchie: [{ bezeichnung: { code: 1 }, name: "Oldenburg - Ni", kurz: "OODE", telefon: "04413401050", email: "ov@thw.de" }],
     },
     einsatz: {

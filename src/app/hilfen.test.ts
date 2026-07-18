@@ -156,6 +156,7 @@ describe("plausibilitaet()", () => {
   it("meldet keine Hinweise für einen stimmigen Bogen", () => {
     const basis = neuerBogen();
     const b = bogen({
+      einheit: { ...basis.einheit, hierarchie: [{ bezeichnung: { code: 1 }, name: "Oldenburg - Ni" }] },
       einsatz: { ...basis.einsatz, ortAuftrag: "Übung Kabelblitz" },
       personal: [
         person({
@@ -168,6 +169,13 @@ describe("plausibilitaet()", () => {
       fahrzeuge: [{ typ: { code: 1 }, kennzeichen: "THW-84397" }],
     });
     expect(plausibilitaet(b)).toEqual([]);
+  });
+
+  it("weist auf den fehlenden Namen der eigenen Einheit hin, nicht aber bei Standort-Referenz", () => {
+    const basis = neuerBogen();
+    expect(plausibilitaet(bogen()).some((h) => /unterste Ebene/.test(h))).toBe(true);
+    const mitRef = bogen({ einheit: { ...basis.einheit, standortRef: 42, hierarchie: [] } });
+    expect(plausibilitaet(mitRef).some((h) => /unterste Ebene/.test(h))).toBe(false);
   });
 
   it("weist auf leeren Ort/Auftrag, fehlende Erreichbarkeit und Fahrzeuge ohne Kennzeichen hin", () => {
@@ -228,7 +236,7 @@ describe("migriereBogen() (JSON-Pfad, muss zum Codec passen)", () => {
     const alt = {
       schemaVersion: 2,
       stand: 0,
-      einheit: { organisation: OrganisationsTyp.THW, einheitsTyp: { code: 43 }, name: "OV", hierarchie: [] },
+      einheit: { organisation: OrganisationsTyp.THW, einheitsTyp: { code: 43 }, hierarchie: [{ bezeichnung: { code: 1 }, name: "OV" }] },
       einsatz: { zeitraumVon: 0, zeitraumBis: 0, ortAuftrag: "" },
       personalErfassung: PersonalErfassung.VOLLSTAENDIG,
       // v2-Person ohne ernaehrung:
@@ -266,17 +274,17 @@ describe("migriereBogen() (JSON-Pfad, muss zum Codec passen)", () => {
 
 describe("bogenLaden() (JSON-Datei)", () => {
   it("lädt einen gültigen aktuellen Bogen und hebt ihn aufs aktuelle Schema", async () => {
-    const bogen = { ...neuerBogen(), einheit: { ...neuerBogen().einheit, name: "OV Test" } };
+    const bogen = { ...neuerBogen(), einheit: { ...neuerBogen().einheit, hierarchie: [{ bezeichnung: { code: 1 }, name: "OV Test" }] } };
     const b = await bogenLaden(jsonDatei(JSON.stringify(bogen)));
     expect(b.schemaVersion).toBe(SCHEMA_VERSION);
-    expect(b.einheit.name).toBe("OV Test");
+    expect(b.einheit.hierarchie[0]!.name).toBe("OV Test");
   });
 
   it("migriert einen alten v2-Bogen (Ernährung, davonVegetarisch)", async () => {
     const alt = {
       schemaVersion: 2,
       stand: 0,
-      einheit: { organisation: OrganisationsTyp.THW, einheitsTyp: { code: 43 }, name: "OV", hierarchie: [] },
+      einheit: { organisation: OrganisationsTyp.THW, einheitsTyp: { code: 43 }, hierarchie: [{ bezeichnung: { code: 1 }, name: "OV" }] },
       einsatz: { zeitraumVon: 0, zeitraumBis: 0, ortAuftrag: "" },
       personalErfassung: PersonalErfassung.VOLLSTAENDIG,
       personal: [{ vorname: "A", nachname: "B", staerkeRolle: 0, funktionen: [], fahrerlaubnis: 0, geschlecht: 0, kontakte: [], zusatzqualifikationen: [] }],
@@ -398,7 +406,7 @@ describe("schrittStatus", () => {
   it("meldet einen vollständig gefüllten Bogen als ok", () => {
     const b = neuerBogen();
     b.einheit.einheitsTyp = { code: 43 };
-    b.einheit.name = "OV Oldenburg - Ni";
+    b.einheit.hierarchie = [{ bezeichnung: { code: 1 }, name: "OV Oldenburg - Ni" }];
     b.einsatz.ortAuftrag = "Übung Kabelblitz";
     b.personal = [neuePerson()];
     b.fahrzeuge = [neuesFahrzeug()];
@@ -408,7 +416,7 @@ describe("schrittStatus", () => {
 
   it("erkennt Zwischenzustände als begonnen", () => {
     const b = neuerBogen();
-    b.einheit.name = "OV X"; // Typ fehlt noch → begonnen
+    b.einheit.hierarchie = [{ bezeichnung: { code: 1 }, name: "OV X" }]; // Typ fehlt noch → begonnen
     b.einsatz.einsatzbeginn = 1000; // Ort fehlt noch → begonnen
     b.personalErfassung = PersonalErfassung.NUR_STAERKE;
     b.staerkeManuell = { fuehrer: 0, unterfuehrer: 0, mannschaft: 0, gesamt: 0 };

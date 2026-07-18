@@ -1009,9 +1009,6 @@ function bogenBauen(spec: BogenSpec, ort: NdsOrt): BeispielBogen {
       organisation: spec.traeger.org,
       organisationName: spec.traeger.organisationName(ort),
       einheitsTyp: { freitext: spec.einheit },
-      // Der Ort dient zugleich als Ortsbezeichnung des Funkrufnamens
-      // („Florian Cuxhaven 40").
-      name: ort.ort,
       hierarchie,
     },
     einsatz: {

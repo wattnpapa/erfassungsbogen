@@ -9,7 +9,7 @@
  * React Native / Capacitor und Node.
  */
 
-export const SCHEMA_VERSION = 4;
+export const SCHEMA_VERSION = 5;
 
 // ---------------------------------------------------------- Zeitrepräsentation
 //
@@ -195,14 +195,19 @@ export interface Einheit {
   einheitsTyp: VokabularWert;
   /**
    * Referenz in ein mitgeliefertes Standort-Verzeichnis (THW: offizielle
-   * OV-Nummer). Wenn gesetzt, sind name + hierarchie inkl. Kontakten daraus
-   * ableitbar und entfallen im QR komplett (~150 Bytes Ersparnis).
-   * name/hierarchie bleiben im Modell für Anzeige und PDF trotzdem gefüllt.
+   * OV-Nummer). Wenn gesetzt, ist die hierarchie inkl. Kontakten daraus
+   * ableitbar und entfällt im QR komplett (~150 Bytes Ersparnis).
+   * Die hierarchie bleibt im Modell für Anzeige und PDF trotzdem gefüllt.
    */
   standortRef?: number;
-  /** Anzeigename der Einheit: "OV Oldenburg - Ni", "LZ Wardenburg". */
-  name: string;
-  hierarchie: HierarchieEbene[]; // 0..n Ebenen, Reihenfolge: unterste zuerst
+  /**
+   * 1..n Ebenen, Reihenfolge: unterste zuerst. Die erste Ebene ist die eigene
+   * Einheit (THW: der OV) und damit Pflicht — aus ihrem Namen wird zusammen mit
+   * Organisation und Einheitstyp der Anzeigename gebildet (einheitAnzeigename).
+   * Ein früher separates Freitextfeld „Name der Einheit" gab es bis Schema 4;
+   * es war eine Doppeleingabe zur ersten Ebene (siehe decodeEinheit).
+   */
+  hierarchie: HierarchieEbene[];
 }
 
 export interface Einsatz {

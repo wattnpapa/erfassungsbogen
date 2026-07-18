@@ -1,12 +1,11 @@
 {
-  "schemaVersion": 4,
+  "schemaVersion": 5,
   "stand": 2390,
   "einheit": {
     "organisation": 1,
     "einheitsTyp": {
       "code": 16
     },
-    "name": "Schwabach",
     "hierarchie": [
       {
         "bezeichnung": {

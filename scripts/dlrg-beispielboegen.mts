@@ -259,7 +259,6 @@ function bogenAus(plan: Bauplan): Erfassungsbogen {
     einheit: {
       organisation: OrganisationsTyp.DLRG,
       einheitsTyp: { freitext: plan.einheitsTyp },
-      name: plan.name,
       hierarchie: plan.hierarchie,
     },
     einsatz: { zeitraumVon: EINSATZ.von, zeitraumBis: EINSATZ.bis, ortAuftrag: EINSATZ.ort },
@@ -289,7 +288,6 @@ const baeuplane: Bauplan[] = [
   {
     datei: "wrz-mittelbaden-fuehrungstrupp-kdow",
     einheitsTyp: "Wasserrettungszug — Führungstrupp (KdoW)",
-    name: "Wasserrettungszug Mittelbaden — Führungstrupp",
     hierarchie: hierarchie("Rastatt", BEZIRK, LV_BADEN, "072229876543", "rastatt"),
     personal: [
       person({ rolle: R.FUEHRER, funktionen: ["ZFü"], fe: FE.B, kontakt: true, quali: ["Zugführer Wasserrettung"] }),
@@ -305,7 +303,6 @@ const baeuplane: Bauplan[] = [
   {
     datei: "wrz-mittelbaden-stroemungsrettergruppe",
     einheitsTyp: "Wasserrettungszug — Strömungsrettergruppe",
-    name: "Wasserrettungszug Mittelbaden — Strömungsrettergruppe",
     hierarchie: hierarchie("Gaggenau", BEZIRK, LV_BADEN, "072259988776", "gaggenau"),
     personal: [
       person({ rolle: R.UNTERFUEHRER, funktionen: ["GrFü"], fe: FE.C, kontakt: true, quali: ["Strömungsretter", "Zugführer Wasserrettung"] }),
@@ -323,7 +320,6 @@ const baeuplane: Bauplan[] = [
   {
     datei: "wrz-mittelbaden-bootsgruppe",
     einheitsTyp: "Wasserrettungszug — Bootsgruppe",
-    name: "Wasserrettungszug Mittelbaden — Bootsgruppe",
     hierarchie: hierarchie("Bühl", BEZIRK, LV_BADEN, "072238877665", "buehl"),
     personal: [
       person({ rolle: R.UNTERFUEHRER, funktionen: ["GrFü", "Bf"], fe: FE.BE, kontakt: true, quali: ["Bootsführer DLRG"] }),
@@ -341,7 +337,6 @@ const baeuplane: Bauplan[] = [
   {
     datei: "wrz-mittelbaden-tauchgruppe",
     einheitsTyp: "Wasserrettungszug — Tauchgruppe",
-    name: "Wasserrettungszug Mittelbaden — Tauchgruppe",
     hierarchie: hierarchie("Baden-Baden", BEZIRK, LV_BADEN, "072217766554", "baden-baden"),
     personal: [
       person({ rolle: R.UNTERFUEHRER, funktionen: ["GrFü", "TEF"], fe: FE.C, kontakt: true, quali: ["Tauchereinsatzführer", "Einsatztaucher Stufe 2"] }),
@@ -359,7 +354,6 @@ const baeuplane: Bauplan[] = [
   {
     datei: "wrz-mittelbaden-logistiktrupp",
     einheitsTyp: "Wasserrettungszug — Logistiktrupp",
-    name: "Wasserrettungszug Mittelbaden — Logistiktrupp",
     hierarchie: hierarchie("Achern", BEZIRK, LV_BADEN, "078416655443", "achern"),
     personal: [
       person({ rolle: R.UNTERFUEHRER, funktionen: ["GrFü"], fe: FE.CE, kontakt: true }),
@@ -378,7 +372,6 @@ const baeuplane: Bauplan[] = [
   {
     datei: "wrv-bawue-fuehrungstrupp-elw1",
     einheitsTyp: "Wasserrettungsverband — Führungstrupp (ELW 1)",
-    name: "Wasserrettungsverband Baden-Württemberg — Führungstrupp",
     hierarchie: [
       { bezeichnung: { freitext: "Landesverband" }, name: "Baden", kurz: "LV Baden", telefon: "0721136010", email: "info@baden.dlrg.de" },
       { bezeichnung: { freitext: "Koordinierungsstelle" }, name: "Wasserrettung Baden-Württemberg" },
@@ -398,7 +391,6 @@ const baeuplane: Bauplan[] = [
   {
     datei: "wrv-bawue-verbandsfuehrung-kdow",
     einheitsTyp: "Wasserrettungsverband — Verbandsführung (KdoW)",
-    name: "Wasserrettungsverband Baden-Württemberg — Verbandsführung",
     hierarchie: [
       { bezeichnung: { freitext: "Landesverband" }, name: "Württemberg", kurz: "LV Württemberg", telefon: "0711921950", email: "info@wuerttemberg.dlrg.de" },
       { bezeichnung: { freitext: "Koordinierungsstelle" }, name: "Wasserrettung Baden-Württemberg" },

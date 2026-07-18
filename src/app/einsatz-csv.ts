@@ -13,7 +13,7 @@
  */
 
 import { datumZuIso, staerke, unterbringungMWD, verpflegung, type Erfassungsbogen } from "../model";
-import { datumDeutsch, orgLabel, vokabText, vokabularFuer } from "./hilfen";
+import { datumDeutsch, einheitAnzeigename, orgLabel, vokabText, vokabularFuer } from "./hilfen";
 import { aktuelleMeldungen } from "./auswertung";
 import type { Einsatzsammlung, MeldeEintrag, MeldeQuelle } from "./einsaetze";
 
@@ -64,10 +64,9 @@ function zeile(werte: (string | number)[]): string {
   return werte.map(feld).join(TRENNER);
 }
 
-/** Anzeigename wie in der Meldekopf-Oberfläche: Name, sonst Einheitstyp, sonst Organisation. */
+/** Anzeigename wie in der Meldekopf-Oberfläche: Organisation + Standort + Einheitstyp. */
 function einheitName(b: Erfassungsbogen): string {
-  const org = b.einheit.organisation;
-  return b.einheit.name || vokabText(b.einheit.einheitsTyp, vokabularFuer(org, "einheitstyp"), "name") || orgLabel(org);
+  return einheitAnzeigename(b.einheit);
 }
 
 /** Fahrzeug-Kurzbezeichnungen einer Einheit, z. B. „GKW / MzKW". */

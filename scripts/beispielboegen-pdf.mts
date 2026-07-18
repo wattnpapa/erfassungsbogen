@@ -668,9 +668,6 @@ function bogenBauen(nr: number, ov: ThwOrtsverband, typCode: number, stanTreu: b
     einheit: {
       organisation: OrganisationsTyp.THW,
       einheitsTyp: { code: typCode },
-      // Reiner OV-Name (ohne "OV"-Präfix): dient zugleich als Ortsbezeichnung
-      // des Funkrufnamens — gesprochen wird "Heros Crailsheim 36/46".
-      name: ov.name,
       hierarchie: hierarchieFuerOv(ov),
     },
     einsatz: {
@@ -765,7 +762,6 @@ function grossbogenBauen(): BeispielBogen {
     einheit: {
       organisation: OrganisationsTyp.THW,
       einheitsTyp: { freitext: "Verstärkter Bergungszug" },
-      name: ov.name,
       hierarchie: hierarchieFuerOv(ov),
     },
     einsatz: {

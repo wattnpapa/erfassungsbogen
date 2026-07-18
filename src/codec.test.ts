@@ -43,7 +43,6 @@ function basisBogen(): Erfassungsbogen {
     einheit: {
       organisation: OrganisationsTyp.THW,
       einheitsTyp: { code: 43 },
-      name: "OV Oldenburg - Ni",
       hierarchie: [
         { bezeichnung: { code: 1 }, name: "Oldenburg - Ni", kurz: "OODE", telefon: "04413401050", email: "ov@thw.de" },
       ],
@@ -123,7 +122,6 @@ describe("Binär-Roundtrip (encodeBinaer/decodeBinaer)", () => {
         organisation: OrganisationsTyp.THW,
         einheitsTyp: { code: 43 },
         standortRef: 40, // Name/Hierarchie kommen aus dem Verzeichnis → im QR leer
-        name: "",
         hierarchie: [],
       },
       einsatz: {
@@ -151,7 +149,6 @@ describe("Binär-Roundtrip (encodeBinaer/decodeBinaer)", () => {
         organisation: OrganisationsTyp.SONSTIGE,
         organisationName: "Nachbarschaftshilfe",
         einheitsTyp: { freitext: "Trupp" },
-        name: "Ortsgruppe",
         hierarchie: [],
       },
       einsatz: { zeitraumVon: 0, zeitraumBis: 0, ortAuftrag: "" },

@@ -1,12 +1,11 @@
 {
-  "schemaVersion": 4,
+  "schemaVersion": 5,
   "stand": 2388,
   "einheit": {
     "organisation": 1,
     "einheitsTyp": {
       "code": 4
     },
-    "name": "Rathenow",
     "hierarchie": [
       {
         "bezeichnung": {

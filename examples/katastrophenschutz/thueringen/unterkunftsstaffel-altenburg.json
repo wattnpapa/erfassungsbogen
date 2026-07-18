@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 4,
+  "schemaVersion": 5,
   "stand": 2389,
   "einheit": {
     "organisation": 7,
@@ -7,7 +7,6 @@
     "einheitsTyp": {
       "freitext": "Unterkunftsstaffel"
     },
-    "name": "Altenburg",
     "hierarchie": [
       {
         "bezeichnung": {

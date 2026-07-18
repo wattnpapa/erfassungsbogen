@@ -1,12 +1,11 @@
 {
-  "schemaVersion": 4,
+  "schemaVersion": 5,
   "stand": 1369,
   "einheit": {
     "organisation": 9,
     "einheitsTyp": {
       "freitext": "Wasserrettungsverband — Führungstrupp (ELW 1)"
     },
-    "name": "Wasserrettungsverband Baden-Württemberg — Führungstrupp",
     "hierarchie": [
       {
         "bezeichnung": {

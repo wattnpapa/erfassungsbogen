@@ -26,6 +26,7 @@ import {
 } from "../model";
 import {
   datumDeutsch,
+  einheitOrt,
   funkrufText,
   funktionsText,
   kennzeichenText,
@@ -292,7 +293,7 @@ export function pdfDokument(b: Erfassungsbogen, qr: QrSatz): TDocumentDefinition
           { svg: fahrzeugSymbolSvg(f, org), width: 50, rowSpan: 2, alignment: "center", margin: [2, 6, 2, 6] as [number, number, number, number] },
           { text: vokabText(f.typ, vokabularFuer(org, "fahrzeug")) || "Fahrzeug", bold: true },
           { text: kennzeichenText(f), bold: true },
-          { text: f.funkrufname ? `FuRn: ${funkrufText(f, b.einheit.name)}` : "" },
+          { text: f.funkrufname ? `FuRn: ${funkrufText(f, einheitOrt(b.einheit))}` : "" },
         ],
         [
           {}, // von rowSpan des Zeichens belegt
@@ -396,10 +397,11 @@ export function pdfDokument(b: Erfassungsbogen, qr: QrSatz): TDocumentDefinition
       // ---- Kopf ----
       {
         table: {
-          widths: [60, "*", 120],
+          // Kopf zweispaltig: Titel im blauen Kasten, rechts die Einheit von
+          // oben nach unten — Organisation, Organisationsname, Einheitstyp.
+          widths: ["*", 150],
           body: [
             [
-              { text: typKurz, bold: true, fontSize: 10, margin: [2, 8, 2, 8] },
               {
                 text: `Erfassungsbogen ${typName}`,
                 color: "#ffffff",
@@ -408,7 +410,12 @@ export function pdfDokument(b: Erfassungsbogen, qr: QrSatz): TDocumentDefinition
                 fontSize: 12,
                 margin: [6, 8, 6, 8],
               },
-              { text: orgLabel(org) + (b.einheit.organisationName ? `\n${b.einheit.organisationName}` : ""), bold: true, color: BLAU, margin: [2, 8, 2, 8] },
+              {
+                text: [orgLabel(org), b.einheit.organisationName, typKurz].filter(Boolean).join("\n"),
+                bold: true,
+                color: BLAU,
+                margin: [2, 8, 2, 8],
+              },
             ],
           ],
         },

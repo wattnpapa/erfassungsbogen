@@ -1,12 +1,11 @@
 {
-  "schemaVersion": 4,
+  "schemaVersion": 5,
   "stand": 2389,
   "einheit": {
     "organisation": 1,
     "einheitsTyp": {
       "code": 27
     },
-    "name": "Heidenrod",
     "hierarchie": [
       {
         "bezeichnung": {

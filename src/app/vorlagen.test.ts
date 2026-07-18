@@ -69,7 +69,7 @@ function bogen(): Erfassungsbogen {
   return {
     schemaVersion: SCHEMA_VERSION,
     stand: 100,
-    einheit: { organisation: OrganisationsTyp.THW, einheitsTyp: { code: 1 }, name: "OV Test", hierarchie: [] },
+    einheit: { organisation: OrganisationsTyp.THW, einheitsTyp: { code: 1 }, hierarchie: [{ bezeichnung: { code: 1 }, name: "OV Test" }] },
     einsatz: { zeitraumVon: 100, zeitraumBis: 130, ortAuftrag: "Übung Kabelblitz", einsatzbeginn: 999 },
     personalErfassung: PersonalErfassung.VOLLSTAENDIG,
     personal: [person("Berger", StaerkeRolle.UNTERFUEHRER), person("Ahlers", StaerkeRolle.MANNSCHAFT), person("Voss", StaerkeRolle.MANNSCHAFT)],
@@ -152,9 +152,9 @@ describe("CRUD über localStorage", () => {
     expect(vorlagenLaden()).toEqual([]);
   });
 
-  it("nutzt den Einheitsnamen, wenn kein Name angegeben ist", () => {
+  it("nutzt den abgeleiteten Einheitsnamen, wenn kein Name angegeben ist", () => {
     vorlageAnlegen("   ", bogen());
-    expect(vorlagenLaden()[0]!.name).toBe("OV Test");
+    expect(vorlagenLaden()[0]!.name).toBe("THW OV Test Media Team");
   });
 });
 

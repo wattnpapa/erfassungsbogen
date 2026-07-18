@@ -13,7 +13,7 @@ import * as pdfFonts from "pdfmake/build/vfs_fonts";
 // „File 'data/Helvetica-Bold.afm' not found in virtual file system" ab.
 import helvetica from "pdfmake/build/standard-fonts/Helvetica";
 import type { Erfassungsbogen } from "../model";
-import { qrErzeugen } from "./hilfen";
+import { einheitAnzeigename, qrErzeugen } from "./hilfen";
 import { istNativ, pdfTeilen } from "./nativ";
 import { einsatzPdfDokument, pdfDokument } from "./pdf-dokument";
 
@@ -54,7 +54,7 @@ pdf.addFonts({
 export async function pdfErzeugen(b: Erfassungsbogen, name?: string): Promise<void> {
   const qr = await qrErzeugen(b);
   const dd = pdfDokument(b, qr);
-  const dateiname = name ?? `eeb-${(b.einheit.name || "bogen").replace(/[^\wäöüÄÖÜß-]+/g, "_")}.pdf`;
+  const dateiname = name ?? `eeb-${einheitAnzeigename(b.einheit).replace(/[^\wäöüÄÖÜß-]+/g, "_")}.pdf`;
   if (istNativ()) {
     // In der App gibt es keinen Browser-Download: PDF übers Share-Sheet anbieten
     const base64 = await pdfMake.createPdf(dd).getBase64();

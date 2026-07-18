@@ -43,6 +43,9 @@ import {
   QrSatz,
   bogenSpeichern,
   datumDeutsch,
+  einheitAnzeigename,
+  einheitOrt,
+  ersteEbene,
   funkrufText,
   funktionsText,
   kennzeichenAusText,
@@ -372,7 +375,10 @@ export function SchrittEinheit({ bogen, aendern }: SchrittProps) {
         <Feld titel="Organisation">
           <select
             value={e.organisation}
-            onChange={(ev) => setE({ organisation: Number(ev.target.value), einheitsTyp: {}, hierarchie: [] })}
+            onChange={(ev) => {
+              const organisation = Number(ev.target.value);
+              setE({ organisation, einheitsTyp: {}, hierarchie: [ersteEbene(organisation)] });
+            }}
           >
             {ORG_OPTIONEN.map((o) => (
               <option key={o.wert} value={o.wert}>{o.label}</option>
@@ -408,16 +414,13 @@ export function SchrittEinheit({ bogen, aendern }: SchrittProps) {
             platzhalter="z. B. Löschzug, SEG Sanität"
           />
         </Feld>
-        <Feld titel="Name der Einheit">
-          <input
-            value={e.name}
-            onChange={(ev) => setE({ name: ev.target.value })}
-            placeholder="z. B. OV Oldenburg - Ni"
-          />
-        </Feld>
       </div>
 
       <h3>Zugehörigkeit / Kontaktstellen</h3>
+      <p className="hinweis">
+        Die unterste Ebene ist die eigene Einheit. Aus ihrem Namen, der Organisation und dem
+        Einheitstyp bildet sich die Bezeichnung auf dem Bogen: <b>{einheitAnzeigename(e)}</b>
+      </p>
       {e.hierarchie.map((h, i) => (
         <div className="zeile" key={i}>
           <Feld titel="Ebene" schmal>
@@ -428,7 +431,7 @@ export function SchrittEinheit({ bogen, aendern }: SchrittProps) {
               platzhalter="z. B. Landkreis"
             />
           </Feld>
-          <Feld titel="Name">
+          <Feld titel={i === 0 ? "Name (Pflicht)" : "Name"}>
             {e.organisation === OrganisationsTyp.THW && h.bezeichnung.code === 1 ? (
               <OvNamensFeld
                 name={h.name}
@@ -465,20 +468,24 @@ export function SchrittEinheit({ bogen, aendern }: SchrittProps) {
               onChange={(ev) => setE({ hierarchie: e.hierarchie.map((x, j) => (j === i ? { ...x, email: ev.target.value || undefined } : x)) })}
             />
           </Feld>
-          <button type="button" onClick={() => setE({ hierarchie: e.hierarchie.filter((_, j) => j !== i) })}>✕</button>
+          {/* Die unterste Ebene ist die Einheit selbst und bleibt stehen. */}
+          {i > 0 && (
+            <button type="button" onClick={() => setE({ hierarchie: e.hierarchie.filter((_, j) => j !== i) })}>✕</button>
+          )}
         </div>
       ))}
       <p>
         <button type="button" onClick={() => setE({ hierarchie: [...e.hierarchie, { bezeichnung: {}, name: "" }] })}>
           + Ebene hinzufügen
         </button>{" "}
-        {e.organisation === OrganisationsTyp.THW && e.hierarchie.length === 0 && (
+        {e.organisation === OrganisationsTyp.THW && e.hierarchie.length === 1 && (
           <button
             type="button"
             onClick={() =>
               setE({
+                // Die schon erfasste unterste Ebene bleibt als OV erhalten.
                 hierarchie: [
-                  { bezeichnung: { code: 1 }, name: "" },
+                  { ...e.hierarchie[0], bezeichnung: { code: 1 } },
                   { bezeichnung: { code: 2 }, name: "" },
                   { bezeichnung: { code: 3 }, name: "" },
                 ],
@@ -990,7 +997,7 @@ export function Uebersicht(props: {
   const { bogen, geheZu, neu } = props;
 
   function alsVorlageSpeichern() {
-    const name = window.prompt("Als Vorlage speichern unter:", bogen.einheit.name || "Vorlage");
+    const name = window.prompt("Als Vorlage speichern unter:", einheitAnzeigename(bogen.einheit));
     if (name == null) return;
     const v = vorlageAnlegen(name, bogen);
     props.onVorlageGespeichert?.(v.name);
@@ -1094,7 +1101,7 @@ export function Uebersicht(props: {
         <p>
           <strong>{orgLabel(org)}</strong>
           {" · "}{vokabText(bogen.einheit.einheitsTyp, vokabularFuer(org, "einheitstyp"), "name") || "(Einheitstyp offen)"}
-          {" · "}{bogen.einheit.name || "(Name offen)"}
+          {" · "}{einheitOrt(bogen.einheit) || "(Standort offen)"}
         </p>
         <p>
           Stärke: <strong>{s.fuehrer} / {s.unterfuehrer} / {s.mannschaft} / {s.gesamt}</strong>
@@ -1106,7 +1113,6 @@ export function Uebersicht(props: {
         <dl className="paare">
           <dt>Organisation</dt><dd>{orgLabel(org)}{bogen.einheit.organisationName ? ` — ${bogen.einheit.organisationName}` : ""}</dd>
           <dt>Einheitstyp</dt><dd>{vokabText(bogen.einheit.einheitsTyp, vokabularFuer(org, "einheitstyp"), "name") || "—"}</dd>
-          <dt>Name</dt><dd>{bogen.einheit.name || "—"}</dd>
           {bogen.einheit.hierarchie.map((h, i) => (
             <span key={i} style={{ display: "contents" }}>
               <dt>{vokabText(h.bezeichnung, vokabularFuer(org, "ebene")) || "Ebene"}</dt>
@@ -1167,7 +1173,7 @@ export function Uebersicht(props: {
               <tr key={i}>
                 <td>{vokabText(f.typ, vokabularFuer(org, "fahrzeug")) || "—"}</td>
                 <td>{kennzeichenText(f)}</td>
-                <td>{funkrufText(f, bogen.einheit.name)}</td>
+                <td>{funkrufText(f, einheitOrt(bogen.einheit))}</td>
                 <td>{f.stanKonform == null ? "—" : f.stanKonform ? "ja" : "nein"}</td>
                 <td>{f.aenderungen ?? ""}</td>
               </tr>

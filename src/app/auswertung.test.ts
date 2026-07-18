@@ -31,7 +31,7 @@ function bogen(name: string, over: Partial<Erfassungsbogen> = {}): Erfassungsbog
   return {
     schemaVersion: SCHEMA_VERSION,
     stand: 100,
-    einheit: { organisation: OrganisationsTyp.THW, einheitsTyp: { code: 1 }, name, hierarchie: [] },
+    einheit: { organisation: OrganisationsTyp.THW, einheitsTyp: { code: 1 }, hierarchie: [{ bezeichnung: { code: 1 }, name }] },
     einsatz: { zeitraumVon: 100, zeitraumBis: 130, ortAuftrag: "Lage" },
     personalErfassung: PersonalErfassung.VOLLSTAENDIG,
     personal: [

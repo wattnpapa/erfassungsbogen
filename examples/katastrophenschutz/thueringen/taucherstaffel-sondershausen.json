@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 4,
+  "schemaVersion": 5,
   "stand": 2388,
   "einheit": {
     "organisation": 9,
@@ -7,7 +7,6 @@
     "einheitsTyp": {
       "freitext": "Taucherstaffel"
     },
-    "name": "Sondershausen",
     "hierarchie": [
       {
         "bezeichnung": {

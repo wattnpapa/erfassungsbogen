@@ -36,7 +36,7 @@ function bogen(over: Partial<Erfassungsbogen> = {}): Erfassungsbogen {
   return {
     schemaVersion: SCHEMA_VERSION,
     stand: 100,
-    einheit: { organisation: OrganisationsTyp.THW, einheitsTyp: { code: 1 }, name: "OV Oldenburg", hierarchie: [] },
+    einheit: { organisation: OrganisationsTyp.THW, einheitsTyp: { code: 1 }, hierarchie: [{ bezeichnung: { code: 1 }, name: "OV Oldenburg" }] },
     einsatz: { zeitraumVon: 100, zeitraumBis: 130, ortAuftrag: "Lage" },
     personalErfassung: PersonalErfassung.VOLLSTAENDIG,
     personal: [person("Berger", StaerkeRolle.FUEHRER)],
@@ -84,7 +84,7 @@ describe("boegenAusPdfBytes()", () => {
     const json = new TextEncoder().encode(JSON.stringify(bogen()));
     const boegen = boegenAusPdfBytes(pdfMitStream(json));
     expect(boegen).toHaveLength(1);
-    expect(boegen[0]!.einheit.name).toBe("OV Oldenburg");
+    expect(boegen[0]!.einheit.hierarchie[0]!.name).toBe("OV Oldenburg");
   });
 
   it("entpackt einen FlateDecode-komprimierten Bogen", () => {
@@ -95,7 +95,7 @@ describe("boegenAusPdfBytes()", () => {
   });
 
   it("findet ein eingebettetes Bogen-Array (Sammel-PDF)", () => {
-    const arr = [bogen({ stand: 100 }), bogen({ einheit: { organisation: 1, einheitsTyp: { code: 1 }, name: "OV Wardenburg", hierarchie: [] } })];
+    const arr = [bogen({ stand: 100 }), bogen({ einheit: { organisation: 1, einheitsTyp: { code: 1 }, hierarchie: [{ bezeichnung: { code: 1 }, name: "OV Wardenburg" }] } })];
     const json = new TextEncoder().encode(JSON.stringify(arr));
     const boegen = boegenAusPdfBytes(pdfMitStream(deflate(json)));
     expect(boegen).toHaveLength(2);

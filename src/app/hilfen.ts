@@ -6,8 +6,10 @@
 import { deflateRaw, inflateRaw } from "pako";
 import QRCode from "qrcode";
 import {
+  Einheit,
   Erfassungsbogen,
   Ernaehrung,
+  HierarchieEbene,
   Fahrerlaubnis,
   Fahrzeug,
   KontaktArt,
@@ -127,12 +129,31 @@ export function kennzeichenText(f: Fahrzeug): string {
   return f.kennzeichen ?? "";
 }
 
-export function funkrufText(f: Fahrzeug, einheitOrt: string): string {
+export function funkrufText(f: Fahrzeug, standort: string): string {
   if (!f.funkrufname) return "";
   const fr = f.funkrufname;
   const kennwort = vokabText(fr.kennwort, FUNKRUF_KENNWOERTER);
-  const ort = fr.eigenerStandort ? einheitOrt : (fr.ort ?? "");
+  const ort = fr.eigenerStandort ? standort : (fr.ort ?? "");
   return [kennwort, ort, fr.teile.join("/")].filter(Boolean).join(" ");
+}
+
+/**
+ * Standort der Einheit = Name der untersten Zugehörigkeits-Ebene
+ * ("Oldenburg (NI)"). Speist den Ortsteil des Funkrufnamens.
+ */
+export function einheitOrt(e: Einheit): string {
+  return e.hierarchie[0]?.name.trim() ?? "";
+}
+
+/**
+ * Anzeigename der Einheit — abgeleitet statt erfasst: Organisation (bzw.
+ * Organisationsname), Standort und Einheitstyp, z. B. „THW Oldenburg (NI)
+ * FGr K (A)". Ist immer nicht-leer, weil die Organisation stets gesetzt ist.
+ */
+export function einheitAnzeigename(e: Einheit): string {
+  const org = e.organisationName?.trim() || orgLabel(e.organisation);
+  const typ = vokabText(e.einheitsTyp, vokabularFuer(e.organisation, "einheitstyp"), "name");
+  return [org, einheitOrt(e), typ].filter(Boolean).join(" ");
 }
 
 export function datumDeutsch(iso: string): string {
@@ -256,7 +277,7 @@ export async function qrVorlageErzeugen(b: Erfassungsbogen): Promise<QrInfo> {
 
 export async function bogenSpeichern(b: Erfassungsbogen): Promise<void> {
   const json = JSON.stringify(b, null, 2);
-  const name = (b.einheit.name || "bogen").replace(/[^\wäöüÄÖÜß-]+/g, "_");
+  const name = einheitAnzeigename(b.einheit).replace(/[^\wäöüÄÖÜß-]+/g, "_");
   if (istNativ()) {
     // In der App gibt es keinen Browser-Download: JSON übers Share-Sheet anbieten
     await textTeilen(`eeb-${name}.json`, json);
@@ -298,6 +319,13 @@ export function migriereBogen(b: Erfassungsbogen): Erfassungsbogen {
       delete f.kennzeichenFreitext;
     }
   }
+  if (b.schemaVersion < 5) {
+    // Bis Schema 4 war „Name der Einheit" ein eigenes Freitextfeld neben einer
+    // optionalen Hierarchie — faktisch eine Doppeleingabe zur untersten Ebene.
+    const e = b.einheit as Einheit & { name?: string };
+    if (e.name && e.hierarchie.length === 0) e.hierarchie.push({ bezeichnung: {}, name: e.name });
+    delete e.name;
+  }
   b.schemaVersion = SCHEMA_VERSION;
   return b;
 }
@@ -327,6 +355,11 @@ export function plausibilitaet(b: Erfassungsbogen): string[] {
   const s = staerke(b);
   const mwd = unterbringungMWD(b);
 
+  // Ohne den Namen der untersten Ebene bleibt die Einheit auf dem Bogen
+  // namenlos (nur Organisation + Einheitstyp) und der Funkrufname ortlos.
+  if (!einheitOrt(b.einheit) && b.einheit.standortRef == null) {
+    hinweise.push("Zugehörigkeit: Der Name der eigenen Einheit (unterste Ebene) fehlt.");
+  }
   if (s.gesamt === 0) {
     hinweise.push("Stärke ist 0 — es ist noch kein Personal erfasst.");
   }
@@ -418,8 +451,9 @@ export const SCHRITT_STATUS_TITEL: Record<SchrittStatus, string> = {
 export function schrittStatus(b: Erfassungsbogen): SchrittStatus[] {
   const e = b.einheit;
   const typGesetzt = e.einheitsTyp.code != null || !!e.einheitsTyp.freitext?.trim();
-  const nameGesetzt = !!e.name.trim() || e.standortRef != null;
-  const einheitBegonnen = typGesetzt || nameGesetzt || e.hierarchie.length > 0 || !!e.organisationName;
+  // Die erste Zugehörigkeits-Ebene ist die eigene Einheit und damit Pflicht.
+  const nameGesetzt = !!einheitOrt(e) || e.standortRef != null;
+  const einheitBegonnen = typGesetzt || nameGesetzt || e.hierarchie.length > 1 || !!e.organisationName;
   const einheit: SchrittStatus = typGesetzt && nameGesetzt ? "ok" : einheitBegonnen ? "begonnen" : "leer";
 
   const ez = b.einsatz;
@@ -441,6 +475,15 @@ export function schrittStatus(b: Erfassungsbogen): SchrittStatus[] {
 
 // ------------------------------------------------------------- Neuer Bogen
 
+/**
+ * Erste (unterste) Zugehörigkeits-Ebene: die eigene Einheit. Bezeichnung ist
+ * mit der untersten Ebene der Organisation vorbelegt (THW: Ortsverband).
+ */
+export function ersteEbene(org: OrganisationsTyp): HierarchieEbene {
+  const [unterste] = vokabularFuer(org, "ebene");
+  return { bezeichnung: unterste ? { code: unterste.code } : {}, name: "" };
+}
+
 export function neuerBogen(): Erfassungsbogen {
   const heute = datumAusIso(new Date().toISOString().slice(0, 10));
   return {
@@ -449,8 +492,7 @@ export function neuerBogen(): Erfassungsbogen {
     einheit: {
       organisation: OrganisationsTyp.THW,
       einheitsTyp: {},
-      name: "",
-      hierarchie: [],
+      hierarchie: [ersteEbene(OrganisationsTyp.THW)],
     },
     einsatz: { zeitraumVon: heute, zeitraumBis: heute, ortAuftrag: "" },
     personalErfassung: PersonalErfassung.VOLLSTAENDIG,

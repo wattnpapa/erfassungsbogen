@@ -31,7 +31,7 @@ function bogen(name: string, over: Partial<Erfassungsbogen> = {}): Erfassungsbog
   return {
     schemaVersion: SCHEMA_VERSION,
     stand: 100,
-    einheit: { organisation: OrganisationsTyp.THW, einheitsTyp: { code: 1 }, name, hierarchie: [] },
+    einheit: { organisation: OrganisationsTyp.THW, einheitsTyp: { code: 1 }, hierarchie: [{ bezeichnung: { code: 1 }, name }] },
     einsatz: { zeitraumVon: 100, zeitraumBis: 130, ortAuftrag: "Lage" },
     personalErfassung: PersonalErfassung.VOLLSTAENDIG,
     personal: [
@@ -86,7 +86,7 @@ describe("einsatzCsvInhalt()", () => {
     const csv = einsatzCsvInhalt(sammlung([meldung(bogen("OV Alpha"), { zugEtikett: "1. Zug" })]));
     const [, daten] = zeilen(csv);
     const f = daten!.split(";");
-    expect(f[0]).toBe("OV Alpha");
+    expect(f[0]).toBe("THW OV Alpha Media Team");
     expect(f[1]).toBe("THW");
     expect(f[2]).toBe("1. Zug");
     // Stärke F/U/M/gesamt
@@ -126,13 +126,13 @@ describe("einsatzCsvInhalt()", () => {
     const csv = einsatzCsvInhalt(
       sammlung([
         meldung(bogen("Feuerwehr; Ort", {
-          einheit: { organisation: OrganisationsTyp.THW, einheitsTyp: { code: 1 }, name: "Feuerwehr; Ort", hierarchie: [] },
+          einheit: { organisation: OrganisationsTyp.THW, einheitsTyp: { code: 1 }, hierarchie: [{ bezeichnung: { code: 1 }, name: "Feuerwehr; Ort" }] },
           sofortbedarf: { verpflegungPersonen: 3, dieselLiter: 12.5, benzinLiter: 0, gemischLiter: 0, unterbringung: false, ruhezeitErforderlich: false },
         })),
       ]),
     );
     const daten = zeilen(csv)[1]!;
-    expect(daten).toContain('"Feuerwehr; Ort"'); // Semikolon-Feld gequotet
+    expect(daten).toContain('"THW Feuerwehr; Ort Media Team"'); // Semikolon-Feld gequotet
     expect(daten.split(";")).toContain("12,5"); // Diesel als deutsche Dezimalzahl
   });
 });

@@ -64,7 +64,6 @@ const bogen: Erfassungsbogen = {
   einheit: {
     organisation: OrganisationsTyp.THW,
     einheitsTyp: V(43), // FGr K (A)
-    name: "OV Oldenburg - Ni",
     hierarchie: [
       { bezeichnung: V(1), name: "Oldenburg - Ni", kurz: "OODE", telefon: "04413401050", email: "ov-oldenburg-ni@thw.de" },
       { bezeichnung: V(2), name: "Oldenburg", telefon: "04413611180", email: "poststelle.rst_oldenburg@thw.de" },

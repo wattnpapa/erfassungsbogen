@@ -40,10 +40,10 @@ beforeEach(() => {
 describe("entwurfAusJson()", () => {
   it("überlebt einen Roundtrip", () => {
     const b = neuerBogen();
-    b.einheit.name = "OV Test";
+    b.einheit.hierarchie = [{ bezeichnung: { code: 1 }, name: "OV Test" }];
     const e = entwurfAusJson(entwurfZuJson(b, 1234));
     expect(e?.gespeichert).toBe(1234);
-    expect(e?.bogen.einheit.name).toBe("OV Test");
+    expect(e?.bogen.einheit.hierarchie[0]!.name).toBe("OV Test");
   });
 
   it("ist defensiv gegen Müll und fremde Formate", () => {
@@ -64,9 +64,9 @@ describe("entwurfAusJson()", () => {
 describe("Speichern/Laden/Verwerfen über localStorage", () => {
   it("legt ab, lädt zurück und verwirft", () => {
     const b = neuerBogen();
-    b.einheit.name = "LZ Wardenburg";
+    b.einheit.hierarchie = [{ bezeichnung: { code: 1 }, name: "LZ Wardenburg" }];
     entwurfSpeichern(b);
-    expect(entwurfLaden()?.bogen.einheit.name).toBe("LZ Wardenburg");
+    expect(entwurfLaden()?.bogen.einheit.hierarchie[0]!.name).toBe("LZ Wardenburg");
 
     entwurfVerwerfen();
     expect(entwurfLaden()).toBeNull();

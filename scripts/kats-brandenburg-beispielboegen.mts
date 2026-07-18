@@ -647,7 +647,6 @@ function bogenBauen(spec: BogenSpec): BeispielBogen {
       organisation: spec.traeger.org,
       organisationName: spec.traeger.organisationName(ort),
       einheitsTyp: { freitext: `${spec.einheit} (${spec.kuerzel})` },
-      name: ort.ort,
       hierarchie,
     },
     einsatz: {

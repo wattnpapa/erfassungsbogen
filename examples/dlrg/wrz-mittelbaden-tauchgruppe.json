@@ -1,12 +1,11 @@
 {
-  "schemaVersion": 4,
+  "schemaVersion": 5,
   "stand": 1369,
   "einheit": {
     "organisation": 9,
     "einheitsTyp": {
       "freitext": "Wasserrettungszug — Tauchgruppe"
     },
-    "name": "Wasserrettungszug Mittelbaden — Tauchgruppe",
     "hierarchie": [
       {
         "bezeichnung": {

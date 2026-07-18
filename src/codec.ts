@@ -203,7 +203,10 @@ function encodeEinheit(w: Writer, e: Einheit): void {
     // mitgelieferten Standort-Verzeichnis (THW: OV-Nummer).
     w.varint(e.standortRef);
   } else {
-    w.str(e.name);
+    // Slot des früheren Freitextfelds „Name der Einheit" (bis Schema 4).
+    // Bleibt als leerer String erhalten (1 Byte), damit ältere Lesegeräte das
+    // Format weiter parsen können; der Name kommt heute aus hierarchie[0].
+    w.str("");
     w.varint(e.hierarchie.length);
     for (const h of e.hierarchie) {
       w.u8((h.telefon ? 1 : 0) | (h.email ? 2 : 0) | (h.kurz ? 4 : 0));
@@ -336,14 +339,14 @@ function decodeEinheit(r: Reader): Einheit {
   const flags = r.u8();
   const organisationName = flags & 1 ? r.str() : undefined;
   const einheitsTyp = r.vokab();
-  const e: Einheit = { organisation, einheitsTyp, name: "", hierarchie: [] };
+  const e: Einheit = { organisation, einheitsTyp, hierarchie: [] };
   if (organisationName != null) e.organisationName = organisationName;
   if (flags & 2) {
-    // Auflösung von Name/Hierarchie über das Standort-Verzeichnis ist
-    // Aufgabe der App (Verzeichnis nicht Teil des Codecs).
+    // Auflösung der Hierarchie über das Standort-Verzeichnis ist Aufgabe der
+    // App (Verzeichnis nicht Teil des Codecs).
     e.standortRef = r.varint();
   } else {
-    e.name = r.str();
+    const altName = r.str(); // früheres Freitextfeld „Name der Einheit"
     for (let i = r.varint(); i > 0; i--) {
       const hflags = r.u8();
       const h: HierarchieEbene = { bezeichnung: r.vokab(), name: r.str() };
@@ -352,6 +355,9 @@ function decodeEinheit(r: Reader): Einheit {
       if (hflags & 4) h.kurz = r.str();
       e.hierarchie.push(h);
     }
+    // Migration älterer Bögen (Schema ≤ 4): dort war der Name ein eigenes Feld
+    // und die Hierarchie optional. Ohne unterste Ebene ginge er sonst verloren.
+    if (altName && e.hierarchie.length === 0) e.hierarchie.push({ bezeichnung: {}, name: altName });
   }
   return e;
 }

@@ -14,7 +14,7 @@
 
 import type { Erfassungsbogen } from "../model";
 import { datumAusIso } from "../model";
-import { migriereBogen } from "./hilfen";
+import { einheitAnzeigename, migriereBogen } from "./hilfen";
 import { aktive, imPapierkorb, papierkorbBereinigt } from "./papierkorb";
 
 /** Versionierter Schlüssel — erlaubt spätere Formatwechsel der Sammlung selbst. */
@@ -155,7 +155,7 @@ export function vorlageAnlegen(name: string, bogen: Erfassungsbogen): Vorlage {
   const jetzt = Date.now();
   const v: Vorlage = {
     id: neueId(),
-    name: name.trim() || bogen.einheit.name || "Vorlage",
+    name: name.trim() || einheitAnzeigename(bogen.einheit),
     erstellt: jetzt,
     geaendert: jetzt,
     bogen: bogenAlsVorlage(bogen),

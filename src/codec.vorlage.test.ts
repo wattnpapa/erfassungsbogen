@@ -33,7 +33,6 @@ function bogen(): Erfassungsbogen {
     einheit: {
       organisation: OrganisationsTyp.THW,
       einheitsTyp: { code: 1 },
-      name: "OV Oldenburg – FGr N",
       hierarchie: [],
     },
     einsatz: { zeitraumVon: 200, zeitraumBis: 200, ortAuftrag: "" },
