@@ -1,0 +1,241 @@
+{
+  "schemaVersion": 3,
+  "stand": 2388,
+  "einheit": {
+    "organisation": 1,
+    "einheitsTyp": {
+      "code": 4
+    },
+    "name": "Bergheim",
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "code": 1
+        },
+        "name": "Bergheim",
+        "kurz": "OBGH",
+        "telefon": "02271986650",
+        "email": "OV-Bergheim@thw.de"
+      },
+      {
+        "bezeichnung": {
+          "code": 2
+        },
+        "name": "Köln",
+        "telefon": "02203988850",
+        "email": "Poststelle.RSt_Koeln@thw.de"
+      },
+      {
+        "bezeichnung": {
+          "code": 3
+        },
+        "name": "Nordrhein-Westfalen",
+        "telefon": "0210379100",
+        "email": "Poststelle.LVNW@thw.de"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2388,
+    "zeitraumBis": 2390,
+    "ortAuftrag": "Gebäudeschaden Bergheim — Abstützen, Räumen"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Thorsten",
+      "nachname": "Zimmermann",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "code": 3
+        },
+        {
+          "code": 38
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "01621381661"
+        },
+        {
+          "art": 2,
+          "dienstlich": true,
+          "emailTemplate": 1
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Paul",
+      "nachname": "Pohl",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "code": 4
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Florian",
+      "nachname": "Zimmermann",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        },
+        {
+          "code": 38
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Paul",
+      "nachname": "Bergmann",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        },
+        {
+          "code": 32
+        },
+        {
+          "code": 30
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Markus",
+      "nachname": "Schäfer",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        },
+        {
+          "code": 32
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Marcel",
+      "nachname": "Richter",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Florian",
+      "nachname": "Jäger",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Ole",
+      "nachname": "Schäfer",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Patrick",
+      "nachname": "Pohl",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "code": 4
+      },
+      "stanKonform": true,
+      "thwKennzeichen": 80297,
+      "funkrufname": {
+        "kennwort": {
+          "code": 1
+        },
+        "eigenerStandort": true,
+        "teile": [
+          22,
+          51
+        ]
+      }
+    },
+    {
+      "typ": {
+        "code": 43
+      },
+      "stanKonform": true,
+      "thwKennzeichen": 80298
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 9,
+    "dieselLiter": 60,
+    "benzinLiter": 0,
+    "gemischLiter": 5,
+    "unterbringung": true,
+    "ruhezeitErforderlich": true
+  }
+}

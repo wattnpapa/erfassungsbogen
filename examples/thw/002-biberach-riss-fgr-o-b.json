@@ -1,0 +1,260 @@
+{
+  "schemaVersion": 3,
+  "stand": 2389,
+  "einheit": {
+    "organisation": 1,
+    "einheitsTyp": {
+      "code": 13
+    },
+    "name": "Biberach/Riß",
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "code": 1
+        },
+        "name": "Biberach/Riß",
+        "kurz": "OBIB",
+        "telefon": "07351802020",
+        "email": "OV-Biberach-Riss@thw.de"
+      },
+      {
+        "bezeichnung": {
+          "code": 2
+        },
+        "name": "Biberach",
+        "telefon": "022899452210",
+        "email": "Poststelle.RSt_Biberach@thw.de"
+      },
+      {
+        "bezeichnung": {
+          "code": 3
+        },
+        "name": "Baden-Württemberg",
+        "telefon": "0711955550",
+        "email": "Poststelle.LVBW@thw.de"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2389,
+    "zeitraumBis": 2390,
+    "ortAuftrag": "Gebäudeeinsturz Biberach/Riß — technische Ortung"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Tim",
+      "nachname": "Krämer",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "code": 3
+        },
+        {
+          "code": 62
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "01798738592"
+        },
+        {
+          "art": 2,
+          "dienstlich": true,
+          "emailTemplate": 1
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Michael",
+      "nachname": "Braun",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "code": 4
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "01630953549"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Lars",
+      "nachname": "Bergmann",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        },
+        {
+          "code": 46
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Jan",
+      "nachname": "Winkler",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        },
+        {
+          "code": 62
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 2,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Motorsägenschein AS Baum I (extern)"
+        }
+      ]
+    },
+    {
+      "vorname": "Patrick",
+      "nachname": "Lehmann",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 2,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Uwe",
+      "nachname": "Scholz",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Laura",
+      "nachname": "Vogt",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Uwe",
+      "nachname": "Baumann",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        },
+        {
+          "code": 62
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Thomas",
+      "nachname": "Walter",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "code": 23
+      },
+      "stanKonform": true,
+      "thwKennzeichen": 80103,
+      "funkrufname": {
+        "kennwort": {
+          "code": 1
+        },
+        "eigenerStandort": true,
+        "teile": [
+          45,
+          25
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "PKW OV"
+      },
+      "thwKennzeichen": 80105,
+      "stanKonform": false,
+      "aenderungen": "OV-eigenes Fahrzeug, zusätzlich zur StAN",
+      "funkrufname": {
+        "kennwort": {
+          "code": 1
+        },
+        "eigenerStandort": true,
+        "teile": [
+          45,
+          21
+        ]
+      }
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 9,
+    "dieselLiter": 50,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": false,
+    "ruhezeitErforderlich": false
+  },
+  "sonstiges": "Anh FGr O in Instandsetzung — nicht mit ausgerückt. PKW OV zusätzlich über StAN-Soll dabei."
+}

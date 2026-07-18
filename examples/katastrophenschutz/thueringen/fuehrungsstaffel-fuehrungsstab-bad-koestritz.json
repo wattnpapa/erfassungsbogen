@@ -1,0 +1,170 @@
+{
+  "schemaVersion": 3,
+  "stand": 2388,
+  "einheit": {
+    "organisation": 2,
+    "organisationName": "Katastrophenschutz Landesfeuerwehr- und Katastrophenschutzschule Thüringen",
+    "einheitsTyp": {
+      "freitext": "Führungsstaffel Führungsstab"
+    },
+    "name": "Bad Köstritz",
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Katastrophenschutz-Führungsstab des Landes"
+        },
+        "name": "Bad Köstritz"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Untere KatS-Behörde"
+        },
+        "name": "Landesfeuerwehr- und Katastrophenschutzschule Thüringen"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2388,
+    "zeitraumBis": 2389,
+    "ortAuftrag": "Landesweite Lage — Sachgebiete S1 bis S6 des Führungsstabes"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Doreen",
+      "nachname": "Kirchner",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "Sachgebietsleiter/-in S1 bis S6"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 1,
+      "ernaehrung": 1,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "01751028790"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Enrico",
+      "nachname": "Schneider",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "Sachgebietsleiter/-in S1 bis S6"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "01599448827"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Patrick",
+      "nachname": "Franke",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "Sachgebietsleiter/-in S1 bis S6"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Enrico",
+      "nachname": "Schwarz",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "Sachgebietsleiter/-in S1 bis S6"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Gesundheits- und Krankenpfleger (Beruf)"
+        }
+      ]
+    },
+    {
+      "vorname": "Maria",
+      "nachname": "Beyer",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Sichter/-in und Melder/-in"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Lars",
+      "nachname": "Bergmann",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Sichter/-in und Melder/-in"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "MTW"
+      },
+      "aenderungen": "Mannschaftstransportwagen",
+      "kennzeichenFreitext": "G-2051",
+      "funkrufname": {
+        "kennwort": {
+          "freitext": "Kater"
+        },
+        "eigenerStandort": false,
+        "ort": "Thüringen Schule",
+        "teile": [
+          1,
+          19,
+          1
+        ]
+      }
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 6,
+    "dieselLiter": 45,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": false,
+    "ruhezeitErforderlich": false
+  },
+  "sonstiges": "Teileinheit des Verbandes „Katastrophenschutz-Führungsstab des Landes\" (KatS-FüStab) nach ThürKatSVO Anlage 17; Sollstärke der Teileinheit 4/0/2/6, Mannschaftsstärke des Verbandes 10/0/9/19. Der Verband führt 2 dieser Teileinheiten."
+}

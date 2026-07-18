@@ -1,0 +1,153 @@
+{
+  "schemaVersion": 3,
+  "stand": 2389,
+  "einheit": {
+    "organisation": 1,
+    "einheitsTyp": {
+      "code": 22
+    },
+    "name": "Rottweil",
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "code": 1
+        },
+        "name": "Rottweil",
+        "kurz": "OROW",
+        "telefon": "07411744150",
+        "email": "OV-Rottweil@thw.de"
+      },
+      {
+        "bezeichnung": {
+          "code": 2
+        },
+        "name": "Villingen-Schwenningen",
+        "telefon": "07721202890",
+        "email": "Poststelle.RSt_Vschwenningen@thw.de"
+      },
+      {
+        "bezeichnung": {
+          "code": 3
+        },
+        "name": "Baden-Württemberg",
+        "telefon": "0711955550",
+        "email": "Poststelle.LVBW@thw.de"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2389,
+    "zeitraumBis": 2390,
+    "ortAuftrag": "Vermisstensuche ZimmernobRottweil — Erkundung mit UAS"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Maren",
+      "nachname": "Fischer",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "code": 4
+        },
+        {
+          "code": 83
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "01775335839"
+        },
+        {
+          "art": 2,
+          "dienstlich": true,
+          "emailTemplate": 1
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Andreas",
+      "nachname": "Wagner",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        },
+        {
+          "code": 82
+        },
+        {
+          "code": 30
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Lukas",
+      "nachname": "Heinrich",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Michael",
+      "nachname": "Werner",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "code": 23
+      },
+      "stanKonform": true,
+      "thwKennzeichen": 80121,
+      "funkrufname": {
+        "kennwort": {
+          "code": 1
+        },
+        "eigenerStandort": true,
+        "teile": [
+          76,
+          25
+        ]
+      }
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 4,
+    "dieselLiter": 30,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": false,
+    "ruhezeitErforderlich": false
+  }
+}

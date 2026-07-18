@@ -1,0 +1,266 @@
+{
+  "schemaVersion": 3,
+  "stand": 2390,
+  "einheit": {
+    "organisation": 7,
+    "organisationName": "Malteser Hilfsdienst Landkreis Sächsische Schweiz-Osterzgebirge",
+    "einheitsTyp": {
+      "freitext": "Betreuungsgruppe Einsatzzug"
+    },
+    "name": "Sebnitz",
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Einsatzzug (KatS-EZ)"
+        },
+        "name": "Sebnitz"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "MHD-Kreisverband"
+        },
+        "name": "Sächsische Schweiz-Osterzgebirge"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Untere KatS-Behörde"
+        },
+        "name": "Landkreis Sächsische Schweiz-Osterzgebirge"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2390,
+    "zeitraumBis": 2394,
+    "ortAuftrag": "Evakuierung Sebnitz — Betreuung und Unterbringung Betroffener"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Georg",
+      "nachname": "Weiß",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Gruppenführer/-in"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "01579374924"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Manuela",
+      "nachname": "Döring",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Helfer/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Enrico",
+      "nachname": "Beier",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Helfer/-in"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Volker",
+      "nachname": "Fischer",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Helfer/-in"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Nicole",
+      "nachname": "Jentzsch",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Helfer/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "René",
+      "nachname": "Herrmann",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Helfer/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Atemschutzgeräteträger"
+        }
+      ]
+    },
+    {
+      "vorname": "Niklas",
+      "nachname": "Günther",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Helfer/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Olaf",
+      "nachname": "Haase",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Helfer/-in"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Hagen",
+      "nachname": "Kirchner",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Helfer/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Atemschutzgeräteträger"
+        }
+      ]
+    },
+    {
+      "vorname": "Kerstin",
+      "nachname": "Göbel",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Helfer/-in"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Antje",
+      "nachname": "Bauer",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Helfer/-in"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "MTW"
+      },
+      "aenderungen": "Mannschaftstransportkraftwagen (Träger)",
+      "kennzeichenFreitext": "SEB-2021",
+      "funkrufname": {
+        "kennwort": {
+          "code": 5
+        },
+        "eigenerStandort": true,
+        "teile": [
+          41,
+          19,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "GW-Bt"
+      },
+      "aenderungen": "Gerätewagen Betreuung (Bund)",
+      "kennzeichenFreitext": "SEB-2022",
+      "funkrufname": {
+        "kennwort": {
+          "code": 5
+        },
+        "eigenerStandort": true,
+        "teile": [
+          41,
+          74,
+          1
+        ]
+      }
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 11,
+    "dieselLiter": 115,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": true,
+    "ruhezeitErforderlich": false
+  },
+  "sonstiges": "Teileinheit des Verbandes „Einsatzzug (KatS-EZ)\" nach SächsKatSVO Anlage 3. Die Verordnung sieht für diese Einheit eine Doppelbesetzung (Ablösung) vor; der Bogen zeigt die einfache Sollstärke."
+}

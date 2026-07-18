@@ -1,0 +1,192 @@
+{
+  "schemaVersion": 3,
+  "stand": 2389,
+  "einheit": {
+    "organisation": 9,
+    "organisationName": "DLRG Region Hannover",
+    "einheitsTyp": {
+      "freitext": "Staffel Wasserrettung (WRSt)"
+    },
+    "name": "Langenhagen",
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Staffel Wasserrettung (WRSt)"
+        },
+        "name": "Langenhagen"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "DLRG-Kreisverband"
+        },
+        "name": "Hannover"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Untere KatS-Behörde"
+        },
+        "name": "Region Hannover"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2389,
+    "zeitraumBis": 2393,
+    "ortAuftrag": "Hochwasser Langenhagen — Personenrettung und Bootstransport"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Martin",
+      "nachname": "Bruns",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Gruppenführer/-in"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "01631599242"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Dennis",
+      "nachname": "Tammen",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Bootsführer/-in"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Bootsführerschein"
+        }
+      ]
+    },
+    {
+      "vorname": "Erik",
+      "nachname": "Harms",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Wasserrettungshelfer/-in"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungsschwimmer"
+        }
+      ]
+    },
+    {
+      "vorname": "Markus",
+      "nachname": "Richter",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Wasserrettungshelfer/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungsschwimmer"
+        }
+      ]
+    },
+    {
+      "vorname": "Birgit",
+      "nachname": "Wübben",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Wasserrettungshelfer/-in"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungsschwimmer"
+        }
+      ]
+    },
+    {
+      "vorname": "Jonas",
+      "nachname": "Lang",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Wasserrettungshelfer/-in"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungsschwimmer"
+        }
+      ]
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "GW WR"
+      },
+      "aenderungen": "Gerätewagen Wasserrettung",
+      "kennzeichenFreitext": "H-2027",
+      "funkrufname": {
+        "kennwort": {
+          "code": 7
+        },
+        "eigenerStandort": false,
+        "ort": "Hannover",
+        "teile": [
+          75,
+          58,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "MZB KatS"
+      },
+      "aenderungen": "Mehrzweckboot Katastrophenschutz",
+      "kennzeichenFreitext": "auf Anh"
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 6,
+    "dieselLiter": 70,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": true,
+    "ruhezeitErforderlich": false
+  }
+}

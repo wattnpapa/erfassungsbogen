@@ -3,8 +3,11 @@
  * Aufbau angelehnt an sprechfunk-uebung.de (gleicher Autor).
  */
 
-import { useRef, useState, type ChangeEvent, type MouseEvent, type ReactNode, type RefObject } from "react";
-import { istNativ, pdfTeilen, textTeilen } from "./nativ";
+import { useRef, useState, type ChangeEvent, type ReactNode, type RefObject } from "react";
+import type { Erfassungsbogen } from "../model";
+import { istNativ, textTeilen } from "./nativ";
+import { migriereBogen } from "./hilfen";
+import { pdfErzeugen } from "./pdf";
 import { statistikAbgewaehlt, statistikAbwaehlen } from "./statistik";
 import { feldModusAktiv, feldModusSetzen } from "./feld-modus";
 import { sicherungEinspielen, sicherungErstellen } from "./sicherung";
@@ -40,21 +43,23 @@ function ordnerLabel(ordner: string): string {
   return ORDNER_LABEL[ordner] ?? ordner.replace(/-/g, " ").toUpperCase();
 }
 
-// Beispiel-PDFs aus examples/ — beliebig tief verschachtelt (z. B.
-// examples/thw/*.pdf oder examples/katastrophenschutz/niedersachsen/*.pdf). Der
-// Glob wird beim Build aufgelöst, neue Dateien und Ordner erscheinen also
-// automatisch ohne Codeänderung (erzeugt von scripts/beispielboegen-pdf.mts
-// bzw. scripts/kats-nds-beispielboegen.mts). `ordner` sind die Verzeichnis-
-// segmente zwischen examples/ und der Datei.
+// Beispielbögen aus examples/ — beliebig tief verschachtelt (z. B.
+// examples/thw/*.json oder examples/katastrophenschutz/niedersachsen/*.json).
+// Abgelegt ist nur das Bogen-JSON; die PDF entsteht erst beim Klick aus dem
+// aktuellen Layout (siehe beispielPdf), damit Layout-Änderungen nicht jedes
+// Mal ein Neurendern aller Beispiele erzwingen. Der Glob wird beim Build
+// aufgelöst, neue Dateien und Ordner erscheinen also automatisch ohne
+// Codeänderung (erzeugt von scripts/*-beispielboegen*.mts). `ordner` sind die
+// Verzeichnissegmente zwischen examples/ und der Datei.
 const BEISPIELE = Object.entries(
-  import.meta.glob("../../examples/**/*.pdf", { eager: true, query: "?url", import: "default" }),
+  import.meta.glob("../../examples/**/*.json", { eager: true, query: "?url", import: "default" }),
 )
   .map(([pfad, url]) => {
     const teile = pfad.split("/");
     const iExamples = teile.lastIndexOf("examples");
     return {
       ordner: teile.slice(iExamples + 1, teile.length - 1),
-      datei: teile[teile.length - 1]!,
+      datei: teile[teile.length - 1]!.replace(/\.json$/, ""),
       url: url as string,
     };
   })
@@ -84,18 +89,13 @@ function boegenHier(pfad: string[]): typeof BEISPIELE {
   return unterPfad(pfad).filter((b) => b.ordner.length === pfad.length);
 }
 
-/** Nativ gibt es keinen Browser-Download: PDF laden und übers Share-Sheet anbieten. */
-async function beispielTeilen(e: MouseEvent, datei: string, url: string): Promise<void> {
-  if (!istNativ()) return; // Web: normaler Download-Link
-  e.preventDefault();
-  const blob = await (await fetch(url)).blob();
-  const base64 = await new Promise<string>((resolve, reject) => {
-    const leser = new FileReader();
-    leser.onload = () => resolve((leser.result as string).split(",", 2)[1]);
-    leser.onerror = () => reject(leser.error);
-    leser.readAsDataURL(blob);
-  });
-  await pdfTeilen(datei, base64);
+/**
+ * Beispielbogen laden und daraus die PDF im aktuellen Layout erzeugen —
+ * Download (Web) bzw. Share-Sheet (App) übernimmt pdfErzeugen.
+ */
+async function beispielPdf(datei: string, url: string): Promise<void> {
+  const bogen = migriereBogen((await (await fetch(url)).json()) as Erfassungsbogen);
+  await pdfErzeugen(bogen, `${datei}.pdf`);
 }
 
 function Dialog({ titel, dialogRef, children }: {
@@ -122,6 +122,9 @@ export function Fusszeile() {
   // Ordner-Navigation im Beispielbögen-Dialog: erst Organisation/Thema, ggf.
   // weitere Ebenen (z. B. Bundesland), dann der Bogen.
   const [beispielPfad, setBeispielPfad] = useState<string[]>([]);
+  // Dateiname des Bogens, dessen PDF gerade entsteht (leer = keiner läuft).
+  const [beispielLaeuft, setBeispielLaeuft] = useState("");
+  const [beispielFehler, setBeispielFehler] = useState("");
   const sicherung = useRef<HTMLDialogElement>(null);
   const [feldModus, setFeldModus] = useState(() => feldModusAktiv());
   const [sicherungFehler, setSicherungFehler] = useState("");
@@ -137,6 +140,19 @@ export function Fusszeile() {
     const an = !feldModus;
     setFeldModus(an);
     feldModusSetzen(an);
+  }
+
+  /** Beispielbogen anfordern: JSON laden, PDF erzeugen, Fehler im Dialog zeigen. */
+  async function beispielHolen(datei: string, url: string) {
+    setBeispielFehler("");
+    setBeispielLaeuft(datei);
+    try {
+      await beispielPdf(datei, url);
+    } catch (err) {
+      setBeispielFehler(`PDF konnte nicht erzeugt werden: ${err instanceof Error ? err.message : String(err)}`);
+    } finally {
+      setBeispielLaeuft("");
+    }
   }
 
   /** Alle lokalen App-Daten als Datei anbieten — App: Share-Sheet, Browser: Download. */
@@ -192,6 +208,7 @@ export function Fusszeile() {
           className="link"
           onClick={() => {
             setBeispielPfad([]); // beim Öffnen wieder ganz oben starten
+            setBeispielFehler("");
             beispiele.current?.showModal();
           }}
         >
@@ -229,9 +246,10 @@ export function Fusszeile() {
 
       <Dialog titel="Beispielbögen" dialogRef={beispiele}>
         <p>
-          Ausgefüllte Beispiel-Erfassungsbögen (fiktive Einheiten und Personen) als PDF –
-          zum Ansehen, für Übungen oder zum Testen des QR-Imports. Die eingebetteten
-          QR-Codes lassen sich direkt mit der App scannen.
+          Ausgefüllte Beispiel-Erfassungsbögen (fiktive Einheiten und Personen) –
+          zum Ansehen, für Übungen oder zum Testen des QR-Imports. Beim Anklicken
+          entsteht die PDF im aktuellen Layout; die eingebetteten QR-Codes lassen
+          sich direkt mit der App scannen.
         </p>
         {beispielPfad.length > 0 && (
           <p>
@@ -253,12 +271,18 @@ export function Fusszeile() {
           ))}
           {boegenHier(beispielPfad).map(({ datei, url }) => (
             <li key={`f/${datei}`}>
-              <a href={url} download={datei} onClick={(e) => void beispielTeilen(e, datei, url)}>
+              <button
+                className="link"
+                disabled={beispielLaeuft !== ""}
+                onClick={() => void beispielHolen(datei, url)}
+              >
                 {datei}
-              </a>
+              </button>
+              {beispielLaeuft === datei && " – PDF wird erzeugt …"}
             </li>
           ))}
         </ul>
+        {beispielFehler && <p className="fehler">{beispielFehler}</p>}
       </Dialog>
 
       <Dialog titel="Über dieses Projekt" dialogRef={ueber}>

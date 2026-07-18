@@ -1,0 +1,313 @@
+{
+  "schemaVersion": 3,
+  "stand": 2388,
+  "einheit": {
+    "organisation": 1,
+    "einheitsTyp": {
+      "code": 9
+    },
+    "name": "Haßmersheim",
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "code": 1
+        },
+        "name": "Haßmersheim",
+        "kurz": "OHAS",
+        "telefon": "06266928030",
+        "email": "OV-Hassmersheim@thw.de"
+      },
+      {
+        "bezeichnung": {
+          "code": 2
+        },
+        "name": "Mannheim",
+        "telefon": "06214840090",
+        "email": "Poststelle.RSt_Mannheim@thw.de"
+      },
+      {
+        "bezeichnung": {
+          "code": 3
+        },
+        "name": "Baden-Württemberg",
+        "telefon": "0711955550",
+        "email": "Poststelle.LVBW@thw.de"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2388,
+    "zeitraumBis": 2392,
+    "ortAuftrag": "Hochwasser Haßmersheim — Personenrettung, Transport"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Dominik",
+      "nachname": "Lutz",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "code": 3
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "01662343366"
+        },
+        {
+          "art": 2,
+          "dienstlich": true,
+          "emailTemplate": 1
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Simon",
+      "nachname": "König",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "code": 4
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Jannik",
+      "nachname": "Jäger",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "code": 4
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Jana",
+      "nachname": "Maier",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        },
+        {
+          "code": 36
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Christian",
+      "nachname": "Scherer",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        },
+        {
+          "code": 36
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Moritz",
+      "nachname": "Ludwig",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
+      "ernaehrung": 2,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Silke",
+      "nachname": "Seidel",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        },
+        {
+          "code": 31
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Katharina",
+      "nachname": "Ziegler",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Daniel",
+      "nachname": "Dietrich",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Marie",
+      "nachname": "Schwarz",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        },
+        {
+          "code": 39
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Sandra",
+      "nachname": "Wenzel",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        },
+        {
+          "code": 37
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Torben",
+      "nachname": "Köhler",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "code": 10
+      },
+      "stanKonform": true,
+      "thwKennzeichen": 80111,
+      "funkrufname": {
+        "kennwort": {
+          "code": 1
+        },
+        "eigenerStandort": true,
+        "teile": [
+          36,
+          46
+        ]
+      }
+    },
+    {
+      "typ": {
+        "code": 22
+      },
+      "stanKonform": true,
+      "kennzeichenFreitext": "auf Anh",
+      "funkrufname": {
+        "kennwort": {
+          "code": 1
+        },
+        "eigenerStandort": true,
+        "teile": [
+          36,
+          81
+        ]
+      }
+    },
+    {
+      "typ": {
+        "code": 22
+      },
+      "stanKonform": true,
+      "kennzeichenFreitext": "auf Anh",
+      "funkrufname": {
+        "kennwort": {
+          "code": 1
+        },
+        "eigenerStandort": true,
+        "teile": [
+          36,
+          82
+        ]
+      }
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 12,
+    "dieselLiter": 80,
+    "benzinLiter": 80,
+    "gemischLiter": 0,
+    "unterbringung": true,
+    "ruhezeitErforderlich": false
+  }
+}

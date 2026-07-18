@@ -1,0 +1,121 @@
+{
+  "schemaVersion": 3,
+  "stand": 2390,
+  "einheit": {
+    "organisation": 2,
+    "organisationName": "Feuerwehr Stadt Wilhelmshaven",
+    "einheitsTyp": {
+      "freitext": "Geräteeinheit mobiles Hochwasserschutzsystem"
+    },
+    "name": "Wilhelmshaven",
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Geräteeinheit mobiles Hochwasserschutzsystem"
+        },
+        "name": "Wilhelmshaven"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Untere KatS-Behörde"
+        },
+        "name": "Stadt Wilhelmshaven"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2390,
+    "zeitraumBis": 2391,
+    "ortAuftrag": "Hochwasser Wilhelmshaven — Aufbau mobiler Hochwasserschutz (materielle Reserve)"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Leon",
+      "nachname": "Krüger",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Truppführer/-in"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "01555385893"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Bernd",
+      "nachname": "Janssen",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Helfer/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Kerstin",
+      "nachname": "Kaiser",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Helfer/-in"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "Transportfahrzeug"
+      },
+      "aenderungen": "geeignetes Transportfahrzeug (mobiles Hochwasserschutzsystem, bis 3 Sätze à 150 m)",
+      "kennzeichenFreitext": "WHV-2050",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Wilhelmshaven",
+        "teile": [
+          9,
+          69,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "UslG"
+      },
+      "aenderungen": "Umschlaggerät (Logistik am Einsatzort)",
+      "kennzeichenFreitext": "auf Anh"
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 3,
+    "dieselLiter": 0,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": false,
+    "ruhezeitErforderlich": false
+  }
+}

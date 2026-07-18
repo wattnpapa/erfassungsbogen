@@ -1,0 +1,199 @@
+{
+  "schemaVersion": 3,
+  "stand": 2389,
+  "einheit": {
+    "organisation": 2,
+    "organisationName": "Katastrophenschutz Saale-Orla-Kreis",
+    "einheitsTyp": {
+      "freitext": "Gefahrenabwehrstaffel"
+    },
+    "name": "Pößneck",
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Katastrophenschutz-Gefahrgutzug"
+        },
+        "name": "Pößneck"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Untere KatS-Behörde"
+        },
+        "name": "Saale-Orla-Kreis"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2389,
+    "zeitraumBis": 2392,
+    "ortAuftrag": "Gefahrgutunfall Pößneck — Abdichten, Umfüllen, Gefahrenabwehr"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Lukas",
+      "nachname": "Lehmann",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Staffelführer/-in"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "01534626209"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Mario",
+      "nachname": "Richter",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmann/Truppfrau"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 2,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Atemschutzgeräteträger"
+        }
+      ]
+    },
+    {
+      "vorname": "René",
+      "nachname": "Möller",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmann/Truppfrau"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Atemschutzgeräteträger"
+        }
+      ]
+    },
+    {
+      "vorname": "Jan",
+      "nachname": "Mämpel",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmann/Truppfrau"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Atemschutzgeräteträger"
+        }
+      ]
+    },
+    {
+      "vorname": "Gunter",
+      "nachname": "Werner",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmann/Truppfrau"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Atemschutzgeräteträger"
+        }
+      ]
+    },
+    {
+      "vorname": "Ulrike",
+      "nachname": "Seidel",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmann/Truppfrau"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Atemschutzgeräteträger"
+        }
+      ]
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "GW-G"
+      },
+      "aenderungen": "Gerätewagen Gefahrgut",
+      "kennzeichenFreitext": "SOK-2018",
+      "funkrufname": {
+        "kennwort": {
+          "freitext": "Kater"
+        },
+        "eigenerStandort": false,
+        "ort": "Saale-Orla-Kreis",
+        "teile": [
+          2,
+          54,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "GW-A/S"
+      },
+      "aenderungen": "Gerätewagen Atemschutz/Strahlenschutz",
+      "kennzeichenFreitext": "SOK-2019",
+      "funkrufname": {
+        "kennwort": {
+          "freitext": "Kater"
+        },
+        "eigenerStandort": false,
+        "ort": "Saale-Orla-Kreis",
+        "teile": [
+          2,
+          56,
+          1
+        ]
+      }
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 6,
+    "dieselLiter": 140,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": false,
+    "ruhezeitErforderlich": true
+  },
+  "sonstiges": "Teileinheit des Verbandes „Katastrophenschutz-Gefahrgutzug\" (KatS-GGZ) nach ThürKatSVO Anlage 5; Sollstärke der Teileinheit 0/1/5/6, Mannschaftsstärke des Verbandes 1/5/24/30."
+}

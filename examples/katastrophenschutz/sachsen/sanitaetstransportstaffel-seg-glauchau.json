@@ -1,0 +1,217 @@
+{
+  "schemaVersion": 3,
+  "stand": 2388,
+  "einheit": {
+    "organisation": 8,
+    "organisationName": "Arbeiter-Samariter-Bund Landkreis Zwickau",
+    "einheitsTyp": {
+      "freitext": "Sanitätstransportstaffel SEG"
+    },
+    "name": "Glauchau",
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Schnell-Einsatz-Gruppe (SEG)"
+        },
+        "name": "Glauchau"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "ASB-Kreisverband"
+        },
+        "name": "Zwickau"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Untere KatS-Behörde"
+        },
+        "name": "Landkreis Zwickau"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2388,
+    "zeitraumBis": 2389,
+    "ortAuftrag": "Schnelleinsatz Glauchau — Transport von Betroffenen"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Steffen",
+      "nachname": "Bergmann",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Rettungssanitäter/-in"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "01670766748"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungssanitäter"
+        }
+      ]
+    },
+    {
+      "vorname": "Marco",
+      "nachname": "Herrmann",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Rettungssanitäter/-in"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungssanitäter"
+        }
+      ]
+    },
+    {
+      "vorname": "Hagen",
+      "nachname": "Pfeifer",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Rettungssanitäter/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungssanitäter"
+        }
+      ]
+    },
+    {
+      "vorname": "Sebastian",
+      "nachname": "Schneider",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Helfer/-in"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungssanitäter (extern)"
+        }
+      ]
+    },
+    {
+      "vorname": "Sven",
+      "nachname": "Löffler",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Helfer/-in"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Markus",
+      "nachname": "Dietze",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Helfer/-in"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "KTW Typ B"
+      },
+      "aenderungen": "Notfallkrankenwagen Typ B (Bund)",
+      "kennzeichenFreitext": "GC-2054",
+      "funkrufname": {
+        "kennwort": {
+          "code": 6
+        },
+        "eigenerStandort": true,
+        "teile": [
+          41,
+          85,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "KTW Typ B"
+      },
+      "aenderungen": "Notfallkrankenwagen Typ B (Freistaat Sachsen)",
+      "kennzeichenFreitext": "GC-2055",
+      "funkrufname": {
+        "kennwort": {
+          "code": 6
+        },
+        "eigenerStandort": true,
+        "teile": [
+          41,
+          85,
+          2
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "KTW Typ B"
+      },
+      "aenderungen": "Notfallkrankenwagen Typ B (Freistaat Sachsen)",
+      "kennzeichenFreitext": "GC-2056",
+      "funkrufname": {
+        "kennwort": {
+          "code": 6
+        },
+        "eigenerStandort": true,
+        "teile": [
+          41,
+          85,
+          3
+        ]
+      }
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 6,
+    "dieselLiter": 135,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": false,
+    "ruhezeitErforderlich": true
+  },
+  "sonstiges": "Teileinheit des Verbandes „Schnell-Einsatz-Gruppe (SEG)\" nach SächsKatSVO Anlage 10. Die Verordnung sieht für diese Einheit eine Doppelbesetzung (Ablösung) vor; der Bogen zeigt die einfache Sollstärke."
+}

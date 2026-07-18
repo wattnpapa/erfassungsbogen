@@ -1,0 +1,184 @@
+{
+  "schemaVersion": 3,
+  "stand": 2388,
+  "einheit": {
+    "organisation": 9,
+    "organisationName": "DLRG Landkreis Bautzen",
+    "einheitsTyp": {
+      "freitext": "Taucheinsatztrupp"
+    },
+    "name": "Bautzen",
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Wasserrettungsgruppe (KatS-WRGr)"
+        },
+        "name": "Bautzen"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "DLRG-Kreisverband"
+        },
+        "name": "Bautzen"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Untere KatS-Behörde"
+        },
+        "name": "Landkreis Bautzen"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2388,
+    "zeitraumBis": 2390,
+    "ortAuftrag": "Vermisstensuche Gewässer Bautzen — Tauchereinsatz"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Lukas",
+      "nachname": "Bräutigam",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Gruppenführer/-in"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "01639207004"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Dirk",
+      "nachname": "Hempel",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Rettungstaucher/-in (davon ein/-e Bootsführer/-in)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 2,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungstaucher"
+        }
+      ]
+    },
+    {
+      "vorname": "Sven",
+      "nachname": "Zimmermann",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Rettungstaucher/-in (davon ein/-e Bootsführer/-in)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungstaucher"
+        }
+      ]
+    },
+    {
+      "vorname": "Nadine",
+      "nachname": "Starke",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Rettungstaucher/-in (davon ein/-e Bootsführer/-in)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungstaucher"
+        }
+      ]
+    },
+    {
+      "vorname": "Markus",
+      "nachname": "Hartmann",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Rettungstaucher/-in (davon ein/-e Bootsführer/-in)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungstaucher"
+        }
+      ]
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "Tauch-GKW"
+      },
+      "aenderungen": "Tauchgerätekraftwagen (Freistaat Sachsen)",
+      "kennzeichenFreitext": "BZ-2047",
+      "funkrufname": {
+        "kennwort": {
+          "code": 7
+        },
+        "eigenerStandort": true,
+        "teile": [
+          71,
+          58,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "Motor-Rettungsboot"
+      },
+      "aenderungen": "Motor-Rettungsboot (Schlauchboot) mit Trailer (Freistaat Sachsen)",
+      "kennzeichenFreitext": "auf Trailer",
+      "funkrufname": {
+        "kennwort": {
+          "code": 7
+        },
+        "eigenerStandort": true,
+        "teile": [
+          71,
+          79,
+          1
+        ]
+      }
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 5,
+    "dieselLiter": 70,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": true,
+    "ruhezeitErforderlich": false
+  },
+  "sonstiges": "Teileinheit des Verbandes „Wasserrettungsgruppe (KatS-WRGr)\" nach SächsKatSVO Anlage 4. Die Verordnung sieht für diese Einheit eine Doppelbesetzung (Ablösung) vor; der Bogen zeigt die einfache Sollstärke."
+}

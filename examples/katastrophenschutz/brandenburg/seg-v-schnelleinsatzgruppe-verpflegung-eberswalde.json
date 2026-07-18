@@ -1,0 +1,276 @@
+{
+  "schemaVersion": 3,
+  "stand": 2388,
+  "einheit": {
+    "organisation": 6,
+    "organisationName": "Johanniter-Unfall-Hilfe Landkreis Barnim",
+    "einheitsTyp": {
+      "freitext": "Schnelleinsatzgruppe-Verpflegung (SEG-V)"
+    },
+    "name": "Eberswalde",
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Fachdienst Betreuung"
+        },
+        "name": "Barnim"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "JUH-Kreisverband"
+        },
+        "name": "Barnim"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Untere KatS-Behörde"
+        },
+        "name": "Landkreis Barnim"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2388,
+    "zeitraumBis": 2390,
+    "ortAuftrag": "Flächenlage Eberswalde — Verpflegung von Einsatzkräften und Betroffenen"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Steffen",
+      "nachname": "Ahrendt",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Gruppenführer/-in"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "01722275346"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Ralf",
+      "nachname": "Schulze",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Helfer/-in Verpflegung"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Koch (Beruf)"
+        }
+      ]
+    },
+    {
+      "vorname": "Steffi",
+      "nachname": "Heinrich",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Helfer/-in Verpflegung"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Koch (Beruf)"
+        }
+      ]
+    },
+    {
+      "vorname": "Tino",
+      "nachname": "Bergmann",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Helfer/-in Verpflegung"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Koch (Beruf)"
+        }
+      ]
+    },
+    {
+      "vorname": "Olaf",
+      "nachname": "Kaiser",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Helfer/-in Verpflegung"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
+      "ernaehrung": 2,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Koch (Beruf)"
+        }
+      ]
+    },
+    {
+      "vorname": "Philipp",
+      "nachname": "Heinrich",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Helfer/-in Verpflegung"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Koch (Beruf)"
+        }
+      ]
+    },
+    {
+      "vorname": "Markus",
+      "nachname": "Löffler",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kraftfahrer/-in"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Maria",
+      "nachname": "Meißner",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kraftfahrer/-in"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 1,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Ronny",
+      "nachname": "Kruse",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kraftfahrer/-in"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "GW-V"
+      },
+      "aenderungen": "Gerätewagen Verpflegung (Land)",
+      "kennzeichenFreitext": "BAR-2038",
+      "funkrufname": {
+        "kennwort": {
+          "code": 4
+        },
+        "eigenerStandort": false,
+        "ort": "Barnim",
+        "teile": [
+          14,
+          59,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "LKW"
+      },
+      "aenderungen": "Lastkraftwagen mit Ladebordwand (Träger)",
+      "kennzeichenFreitext": "BAR-2039",
+      "funkrufname": {
+        "kennwort": {
+          "code": 4
+        },
+        "eigenerStandort": false,
+        "ort": "Barnim",
+        "teile": [
+          14,
+          74,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "MTW"
+      },
+      "aenderungen": "Mannschaftstransportwagen (Träger)",
+      "kennzeichenFreitext": "BAR-2040",
+      "funkrufname": {
+        "kennwort": {
+          "code": 4
+        },
+        "eigenerStandort": false,
+        "ort": "Barnim",
+        "teile": [
+          14,
+          19,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "FKH"
+      },
+      "aenderungen": "Feldkochherd (Land) — Anhänger, kein Einsatz-Kfz",
+      "kennzeichenFreitext": "Anh FKH"
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 9,
+    "dieselLiter": 235,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": false,
+    "ruhezeitErforderlich": false
+  },
+  "sonstiges": "Mindeststärke 0/1/8/9 und 3 Einsatz-Kfz nach KatSV Anlage zu § 4 Abs. 1 (KatSV Brandenburg). Die Verordnung regelt keine Fahrzeugtypen — die hier gezeigten Typen sind beispielhaft nach dem Katalog „Funkkennziffern Feuerwehr & Rettungsdienst im Land Brandenburg\" belegt; verbindlich sind die Ausführungsvorschriften nach § 8 KatSV."
+}

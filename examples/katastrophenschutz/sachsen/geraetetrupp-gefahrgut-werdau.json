@@ -1,0 +1,126 @@
+{
+  "schemaVersion": 3,
+  "stand": 2390,
+  "einheit": {
+    "organisation": 2,
+    "organisationName": "Feuerwehr Landkreis Zwickau",
+    "einheitsTyp": {
+      "freitext": "Gerätetrupp Gefahrgut"
+    },
+    "name": "Werdau",
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Gefahrgutzug (KatS-GGZ)"
+        },
+        "name": "Werdau"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Untere KatS-Behörde"
+        },
+        "name": "Landkreis Zwickau"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2390,
+    "zeitraumBis": 2393,
+    "ortAuftrag": "Gefahrgutunfall Werdau — Abdichten, Umfüllen, Sonderausstattung"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Anja",
+      "nachname": "Starke",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Gruppenführer/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "01584147485"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Gesundheits- und Krankenpfleger (Beruf)"
+        }
+      ]
+    },
+    {
+      "vorname": "Philipp",
+      "nachname": "Nitzsche",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmann/Truppfrau"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Atemschutzgeräteträger"
+        }
+      ]
+    },
+    {
+      "vorname": "Paul",
+      "nachname": "Hentschel",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmann/Truppfrau"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Atemschutzgeräteträger"
+        }
+      ]
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "GW-G"
+      },
+      "aenderungen": "Gerätewagen Gefahrgut (Freistaat Sachsen)",
+      "kennzeichenFreitext": "WDA-2004",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": true,
+        "teile": [
+          11,
+          54,
+          1
+        ]
+      }
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 3,
+    "dieselLiter": 70,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": true,
+    "ruhezeitErforderlich": true
+  },
+  "sonstiges": "Teileinheit des Verbandes „Gefahrgutzug (KatS-GGZ)\" nach SächsKatSVO Anlage 1. Die Verordnung sieht für diese Einheit eine Doppelbesetzung (Ablösung) vor; der Bogen zeigt die einfache Sollstärke."
+}

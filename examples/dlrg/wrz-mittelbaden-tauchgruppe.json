@@ -1,0 +1,200 @@
+{
+  "schemaVersion": 3,
+  "stand": 1369,
+  "einheit": {
+    "organisation": 9,
+    "einheitsTyp": {
+      "freitext": "Wasserrettungszug — Tauchgruppe"
+    },
+    "name": "Wasserrettungszug Mittelbaden — Tauchgruppe",
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Ortsgruppe"
+        },
+        "name": "Baden-Baden",
+        "kurz": "OG Baden-Baden",
+        "telefon": "072217766554",
+        "email": "info@baden-baden.dlrg.de"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Bezirk"
+        },
+        "name": "Mittelbaden"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Landesverband"
+        },
+        "name": "Baden"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 1405,
+    "zeitraumBis": 1408,
+    "ortAuftrag": "Hochwasserlage an Rhein und Murg im Landkreis Rastatt — Menschenrettung aus überfluteten Bereichen, Deichverteidigung und Sicherung der Rettungskräfte auf dem Wasser; Bereitstellungsraum am DLRG-Zentrum Rastatt."
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Kai",
+      "nachname": "Nagel",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "GrFü"
+        },
+        {
+          "freitext": "TEF"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "01536087066"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Tauchereinsatzführer"
+        },
+        {
+          "freitext": "Einsatztaucher Stufe 2"
+        }
+      ]
+    },
+    {
+      "vorname": "Tobias",
+      "nachname": "Frey",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Et"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 2,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Einsatztaucher Stufe 2"
+        }
+      ]
+    },
+    {
+      "vorname": "Verena",
+      "nachname": "Bauer",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Et"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Einsatztaucher Stufe 1"
+        }
+      ]
+    },
+    {
+      "vorname": "Florian",
+      "nachname": "Berger",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Et"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Einsatztaucher Stufe 1"
+        }
+      ]
+    },
+    {
+      "vorname": "Lars",
+      "nachname": "Dietrich",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Sm"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Signalmann (Tauchen)"
+        },
+        {
+          "freitext": "Wasserretter"
+        }
+      ]
+    },
+    {
+      "vorname": "Alexander",
+      "nachname": "Bauer",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kf"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Wasserretter"
+        }
+      ]
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "GW-W (Gerätewagen Wasserrettung)"
+      },
+      "kennzeichenFreitext": "BAD-DL 71",
+      "stanKonform": true,
+      "aenderungen": "Tauchausstattung, Kompressor, Sauerstoff",
+      "funkrufname": {
+        "kennwort": {
+          "code": 7
+        },
+        "eigenerStandort": false,
+        "ort": "Baden-Baden",
+        "teile": [
+          42,
+          1
+        ]
+      }
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 6,
+    "dieselLiter": 60,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": true,
+    "ruhezeitErforderlich": true
+  }
+}

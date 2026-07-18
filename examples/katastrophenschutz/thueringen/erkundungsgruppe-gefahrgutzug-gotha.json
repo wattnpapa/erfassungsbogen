@@ -1,0 +1,237 @@
+{
+  "schemaVersion": 3,
+  "stand": 2388,
+  "einheit": {
+    "organisation": 2,
+    "organisationName": "Katastrophenschutz Landkreis Gotha",
+    "einheitsTyp": {
+      "freitext": "Erkundungsgruppe Gefahrgutzug"
+    },
+    "name": "Gotha",
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Katastrophenschutz-Gefahrgutzug"
+        },
+        "name": "Gotha"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Untere KatS-Behörde"
+        },
+        "name": "Landkreis Gotha"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2388,
+    "zeitraumBis": 2392,
+    "ortAuftrag": "Gefahrgutunfall Gotha — Erkunden, Messen und Spüren"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Steffen",
+      "nachname": "Schwarz",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Gruppenführer/-in"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "01565199320"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Peter",
+      "nachname": "Wagner",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmann/Truppfrau"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "ABC-Erkundung"
+        }
+      ]
+    },
+    {
+      "vorname": "Ronny",
+      "nachname": "Stein",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmann/Truppfrau"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "ABC-Erkundung"
+        }
+      ]
+    },
+    {
+      "vorname": "Sabine",
+      "nachname": "Sauer",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmann/Truppfrau"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "ABC-Erkundung"
+        }
+      ]
+    },
+    {
+      "vorname": "Sven",
+      "nachname": "Eckardt",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmann/Truppfrau"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "ABC-Erkundung"
+        }
+      ]
+    },
+    {
+      "vorname": "Kristin",
+      "nachname": "Wolf",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmann/Truppfrau"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "ABC-Erkundung"
+        }
+      ]
+    },
+    {
+      "vorname": "Hagen",
+      "nachname": "Franke",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmann/Truppfrau"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 2,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "ABC-Erkundung"
+        }
+      ]
+    },
+    {
+      "vorname": "Dennis",
+      "nachname": "Gräf",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmann/Truppfrau"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "ABC-Erkundung"
+        }
+      ]
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "GW-Mess"
+      },
+      "aenderungen": "Gerätewagen Messtechnik",
+      "kennzeichenFreitext": "GTH-2016",
+      "funkrufname": {
+        "kennwort": {
+          "freitext": "Kater"
+        },
+        "eigenerStandort": false,
+        "ort": "Gotha",
+        "teile": [
+          1,
+          57,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "CBRN-ErkKW"
+      },
+      "aenderungen": "CBRN-Erkundungswagen",
+      "kennzeichenFreitext": "GTH-2017",
+      "funkrufname": {
+        "kennwort": {
+          "freitext": "Kater"
+        },
+        "eigenerStandort": false,
+        "ort": "Gotha",
+        "teile": [
+          1,
+          58,
+          1
+        ]
+      }
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 8,
+    "dieselLiter": 140,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": true,
+    "ruhezeitErforderlich": false
+  },
+  "sonstiges": "Teileinheit des Verbandes „Katastrophenschutz-Gefahrgutzug\" (KatS-GGZ) nach ThürKatSVO Anlage 5; Sollstärke der Teileinheit 0/1/7/8, Mannschaftsstärke des Verbandes 1/5/24/30."
+}

@@ -1,0 +1,170 @@
+{
+  "schemaVersion": 3,
+  "stand": 2389,
+  "einheit": {
+    "organisation": 7,
+    "organisationName": "Malteser Hilfsdienst Landkreis Altenburger Land",
+    "einheitsTyp": {
+      "freitext": "Unterkunftsstaffel"
+    },
+    "name": "Altenburg",
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Katastrophenschutz-Betreuungszug"
+        },
+        "name": "Altenburg"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "MHD-Kreisverband"
+        },
+        "name": "Altenburger Land"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Untere KatS-Behörde"
+        },
+        "name": "Landkreis Altenburger Land"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2389,
+    "zeitraumBis": 2391,
+    "ortAuftrag": "Evakuierung Altenburg — Aufbau temporärer Unterkünfte"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Sebastian",
+      "nachname": "Herrmann",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Staffelführer/-in"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "01522130953"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Doreen",
+      "nachname": "Beyer",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Betreuungshelfer/-in"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Karsten",
+      "nachname": "Pfeifer",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Betreuungshelfer/-in"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Doreen",
+      "nachname": "Schwarz",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Betreuungshelfer/-in"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 1,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Sarah",
+      "nachname": "Gräf",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Betreuungshelfer/-in"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Peter",
+      "nachname": "Keller",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Betreuungshelfer/-in"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Koch (Beruf)"
+        }
+      ]
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "MTW"
+      },
+      "aenderungen": "Mannschaftstransportwagen",
+      "kennzeichenFreitext": "ABG-2013",
+      "funkrufname": {
+        "kennwort": {
+          "code": 5
+        },
+        "eigenerStandort": false,
+        "ort": "Altenburger Land",
+        "teile": [
+          1,
+          19,
+          1
+        ]
+      }
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 6,
+    "dieselLiter": 45,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": false,
+    "ruhezeitErforderlich": false
+  },
+  "sonstiges": "Teileinheit des Verbandes „Katastrophenschutz-Betreuungszug\" (KatS-BetrZ) nach ThürKatSVO Anlage 4; Sollstärke der Teileinheit 0/1/5/6, Mannschaftsstärke des Verbandes 1/5/22/28."
+}

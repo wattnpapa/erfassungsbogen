@@ -1,7 +1,8 @@
 /**
- * Erzeugt DLRG-Beispiel-Erfassungsbögen als PDF nach examples/dlrg/ — je
- * Teileinheit ein Bogen (das maschinenlesbare JSON steckt in der PDF und im
- * eingebetteten QR-Code). examples/ ist je Hilfsorganisation in Unterordner
+ * Erzeugt DLRG-Beispiel-Erfassungsbögen als JSON nach examples/dlrg/ — je
+ * Teileinheit ein Bogen. Abgelegt ist nur das Bogen-JSON; die PDF (mit
+ * eingebettetem JSON und QR-Code) entsteht erst beim Anklicken in der App aus
+ * dem aktuellen Layout. examples/ ist je Hilfsorganisation in Unterordner
  * gegliedert; der Beispielbögen-Dialog im Footer (src/app/fusszeile.tsx) liest
  * die Ordnerstruktur per Glob und bietet zuerst die Organisation an.
  *
@@ -38,7 +39,6 @@
 import { mkdirSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
-import pdfmake from "pdfmake";
 import QRCode from "qrcode";
 import {
   Erfassungsbogen,
@@ -69,7 +69,6 @@ import {
   segmentPayloadUrls,
 } from "../src/codec";
 import { nodeKompressor } from "../src/qr-node";
-import { pdfDokument } from "../src/app/pdf-dokument";
 import type { QrSatz, QrTeil } from "../src/app/hilfen";
 
 const wurzel = join(dirname(fileURLToPath(import.meta.url)), "..");
@@ -524,34 +523,12 @@ function pruefen(): void {
 
 // ---------------------------------------------------------------- Hauptlauf
 
-// Serverseitige pdfmake-Fonts (Roboto liegt im Paket). Helvetica ist eine der
-// 14 PDF-Standardschriften und in pdfkit ohne Datei über den Namen verfügbar —
-// die Bögen sind in Helvetica (≙ Arial) gesetzt (siehe SCHRIFT in
-// src/app/pdf-dokument.ts).
-const robotoDir = join(wurzel, "node_modules/pdfmake/fonts/Roboto");
-pdfmake.setFonts({
-  Roboto: {
-    normal: join(robotoDir, "Roboto-Regular.ttf"),
-    bold: join(robotoDir, "Roboto-Medium.ttf"),
-    italics: join(robotoDir, "Roboto-Italic.ttf"),
-    bolditalics: join(robotoDir, "Roboto-MediumItalic.ttf"),
-  },
-  Helvetica: {
-    normal: "Helvetica",
-    bold: "Helvetica-Bold",
-    italics: "Helvetica-Oblique",
-    bolditalics: "Helvetica-BoldOblique",
-  },
-});
-pdfmake.setUrlAccessPolicy((url: string) => url.startsWith("data:"));
-pdfmake.setLocalAccessPolicy((pfad: string) => pfad.startsWith(robotoDir) || pfad.startsWith("Helvetica"));
-
 pruefen();
 
 const ausgabe = join(wurzel, "examples", "dlrg");
 mkdirSync(ausgabe, { recursive: true });
 for (const datei of readdirSync(ausgabe)) {
-  if (datei.endsWith(".pdf")) rmSync(join(ausgabe, datei));
+  if (datei.endsWith(".json")) rmSync(join(ausgabe, datei));
 }
 
 const uebersicht: string[] = [];
@@ -559,7 +536,7 @@ for (const plan of baeuplane) {
   const bogen = bogenAus(plan);
   const qr = await qrSatz(bogen);
   roundtrip(qr, bogen.personal.length, plan.datei);
-  await pdfmake.createPdf(pdfDokument(bogen, qr)).write(join(ausgabe, `${plan.datei}.pdf`));
+  writeFileSync(join(ausgabe, `${plan.datei}.json`), JSON.stringify(bogen, null, 2) + "\n");
   const s = staerke(bogen);
   uebersicht.push(
     `| ${plan.datei} | ${plan.einheitsTyp} | ${plan.hierarchie[0]!.name} | ${s.fuehrer}/${s.unterfuehrer}/${s.mannschaft}/${s.gesamt} | ${bogen.fahrzeuge.length} |`,
@@ -590,4 +567,4 @@ ${uebersicht.join("\n")}
 `,
 );
 
-console.log(`\nFertig: ${baeuplane.length} Beispiel-PDFs in examples/dlrg/ (+ README.md)`);
+console.log(`\nFertig: ${baeuplane.length} Beispielbögen in examples/dlrg/ (+ README.md)`);

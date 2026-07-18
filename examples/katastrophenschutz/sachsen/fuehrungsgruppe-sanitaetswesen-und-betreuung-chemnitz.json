@@ -1,0 +1,139 @@
+{
+  "schemaVersion": 3,
+  "stand": 2388,
+  "einheit": {
+    "organisation": 5,
+    "organisationName": "Deutsches Rotes Kreuz Stadt Chemnitz",
+    "einheitsTyp": {
+      "freitext": "Führungsgruppe Sanitätswesen und Betreuung"
+    },
+    "name": "Chemnitz",
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Führungsgruppe Sanitätswesen und Betreuung (FüGr San/Bt)"
+        },
+        "name": "Chemnitz"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "DRK-Kreisverband"
+        },
+        "name": "Chemnitz"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Untere KatS-Behörde"
+        },
+        "name": "Stadt Chemnitz"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2388,
+    "zeitraumBis": 2390,
+    "ortAuftrag": "MANV Chemnitz — Führungsunterstützung Sanitätswesen und Betreuung"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Sebastian",
+      "nachname": "Kühn",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "Verbandsführer/-in"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "01598459183"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Katrin",
+      "nachname": "Göbel",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "Verbandsführer/-in"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 1,
+      "ernaehrung": 2,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Sven",
+      "nachname": "Werner",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "Verbandsführer/-in"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Atemschutzgeräteträger"
+        }
+      ]
+    },
+    {
+      "vorname": "Christian",
+      "nachname": "Krause",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Helfer/-in"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "MZF/ELW 1"
+      },
+      "aenderungen": "Mehrzweckfahrzeug/Einsatzleitwagen 1 (Freistaat Sachsen)",
+      "kennzeichenFreitext": "C-2051",
+      "funkrufname": {
+        "kennwort": {
+          "code": 3
+        },
+        "eigenerStandort": true,
+        "teile": [
+          41,
+          14,
+          1
+        ]
+      }
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 4,
+    "dieselLiter": 45,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": true,
+    "ruhezeitErforderlich": false
+  },
+  "sonstiges": "Teileinheit des Verbandes „Führungsgruppe Sanitätswesen und Betreuung (FüGr San/Bt)\" nach SächsKatSVO Anlage 8. Die Verordnung sieht für diese Einheit eine Doppelbesetzung (Ablösung) vor; der Bogen zeigt die einfache Sollstärke."
+}

@@ -1,0 +1,205 @@
+{
+  "schemaVersion": 3,
+  "stand": 2388,
+  "einheit": {
+    "organisation": 9,
+    "organisationName": "DLRG Kyffhäuserkreis",
+    "einheitsTyp": {
+      "freitext": "Taucherstaffel"
+    },
+    "name": "Sondershausen",
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Katastrophenschutz-Wasserrettungszug"
+        },
+        "name": "Sondershausen"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "DLRG-Kreisverband"
+        },
+        "name": "Kyffhäuserkreis"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Untere KatS-Behörde"
+        },
+        "name": "Kyffhäuserkreis"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2388,
+    "zeitraumBis": 2390,
+    "ortAuftrag": "Hochwasser Sondershausen — Tauchereinsatz und Unterwassersuche"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Ralf",
+      "nachname": "Fischer",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Staffelführer/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "01775541747"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Sebastian",
+      "nachname": "Brand",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Einsatztaucher/-in"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Einsatztaucher Stufe 2"
+        }
+      ]
+    },
+    {
+      "vorname": "Olaf",
+      "nachname": "Becker",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Einsatztaucher/-in"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Einsatztaucher Stufe 2"
+        }
+      ]
+    },
+    {
+      "vorname": "Grit",
+      "nachname": "Schröter",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Einsatztaucher/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Einsatztaucher Stufe 2"
+        }
+      ]
+    },
+    {
+      "vorname": "Sven",
+      "nachname": "Klein",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Einsatztaucher/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Einsatztaucher Stufe 2"
+        }
+      ]
+    },
+    {
+      "vorname": "Patrick",
+      "nachname": "Meißner",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Bootsführer/-in"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Bootsführerschein Binnen"
+        }
+      ]
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "GW-Tauch"
+      },
+      "aenderungen": "Gerätewagen Taucher mit Trailer",
+      "kennzeichenFreitext": "KYF-2036",
+      "funkrufname": {
+        "kennwort": {
+          "code": 7
+        },
+        "eigenerStandort": false,
+        "ort": "Kyffhäuserkreis",
+        "teile": [
+          1,
+          75,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "Rettungsboot"
+      },
+      "aenderungen": "Rettungsboot auf Trailer",
+      "kennzeichenFreitext": "Boot RTB",
+      "funkrufname": {
+        "kennwort": {
+          "code": 7
+        },
+        "eigenerStandort": false,
+        "ort": "Kyffhäuserkreis",
+        "teile": [
+          1,
+          76,
+          1
+        ]
+      }
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 6,
+    "dieselLiter": 70,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": false,
+    "ruhezeitErforderlich": false
+  },
+  "sonstiges": "Teileinheit des Verbandes „Katastrophenschutz-Wasserrettungszug\" (KatS-WRZ) nach ThürKatSVO Anlage 9; Sollstärke der Teileinheit 0/1/5/6, Mannschaftsstärke des Verbandes 1/5/22/28."
+}

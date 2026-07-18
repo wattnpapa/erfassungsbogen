@@ -1,0 +1,125 @@
+{
+  "schemaVersion": 3,
+  "stand": 2388,
+  "einheit": {
+    "organisation": 6,
+    "organisationName": "Johanniter-Unfall-Hilfe Landkreis Eichsfeld",
+    "einheitsTyp": {
+      "freitext": "Techniktrupp Behandlungsplatz"
+    },
+    "name": "Heilbad Heiligenstadt",
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Katastrophenschutz-Unterstützungseinheit Behandlungsplatz"
+        },
+        "name": "Heilbad Heiligenstadt"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "JUH-Kreisverband"
+        },
+        "name": "Eichsfeld"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Untere KatS-Behörde"
+        },
+        "name": "Landkreis Eichsfeld"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2388,
+    "zeitraumBis": 2389,
+    "ortAuftrag": "MANV Heilbad Heiligenstadt — Aufbau und Betrieb des Behandlungsplatzes"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Torsten",
+      "nachname": "Krause",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Helfer/-in Technik"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "01621272842"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Volkmar",
+      "nachname": "Schröter",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Helfer/-in Technik"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungssanitäter (extern)"
+        }
+      ]
+    },
+    {
+      "vorname": "Nico",
+      "nachname": "Mämpel",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Helfer/-in Technik"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "GW-BHP"
+      },
+      "aenderungen": "Gerätewagen Behandlungsplatz",
+      "kennzeichenFreitext": "EIC-2038",
+      "funkrufname": {
+        "kennwort": {
+          "code": 4
+        },
+        "eigenerStandort": false,
+        "ort": "Eichsfeld",
+        "teile": [
+          1,
+          96,
+          1
+        ]
+      }
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 3,
+    "dieselLiter": 70,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": false,
+    "ruhezeitErforderlich": false
+  },
+  "sonstiges": "Teileinheit des Verbandes „Katastrophenschutz-Unterstützungseinheit Behandlungsplatz\" (KatS-UE BHP) nach ThürKatSVO Anlage 10; Sollstärke der Teileinheit 0/0/3/3, Mannschaftsstärke des Verbandes 0/1/8/9."
+}

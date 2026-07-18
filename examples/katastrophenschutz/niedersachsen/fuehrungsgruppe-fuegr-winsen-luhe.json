@@ -1,0 +1,240 @@
+{
+  "schemaVersion": 3,
+  "stand": 2388,
+  "einheit": {
+    "organisation": 5,
+    "organisationName": "Deutsches Rotes Kreuz Landkreis Harburg",
+    "einheitsTyp": {
+      "freitext": "Führungsgruppe (FüGr)"
+    },
+    "name": "Winsen (Luhe)",
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Führungsgruppe (FüGr)"
+        },
+        "name": "Winsen (Luhe)"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "DRK-Kreisverband"
+        },
+        "name": "Harburg"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Untere KatS-Behörde"
+        },
+        "name": "Landkreis Harburg"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2388,
+    "zeitraumBis": 2392,
+    "ortAuftrag": "Führung Verband Behandlungsplatz 50 im Einsatzabschnitt Winsen (Luhe)"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Svenja",
+      "nachname": "Harms",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "Verbandsführer/-in (Leitung)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "01669352280"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Bernd",
+      "nachname": "König",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "Verbandsführer/-in S3"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Tim",
+      "nachname": "Braun",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "Notärztin/Notarzt (medizinische Leitung)"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Notarzt"
+        }
+      ]
+    },
+    {
+      "vorname": "Paul",
+      "nachname": "Janssen",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "Verbandsführer/-in S2"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Fabian",
+      "nachname": "Franke",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "Verbandsführer/-in S1/4/6"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Karsten",
+      "nachname": "Lang",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Zugführer/-in (Lageführung)"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Sebastian",
+      "nachname": "Wolf",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Gruppenführer/-in (Dokumentation)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Katrin",
+      "nachname": "Klein",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Sprechfunker/-in / Melder/-in"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 1,
+      "ernaehrung": 2,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Miriam",
+      "nachname": "Gerdes",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Sprechfunker/-in / Melder/-in"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "FüKW"
+      },
+      "aenderungen": "Führungskraftwagen",
+      "kennzeichenFreitext": "WL-2001",
+      "funkrufname": {
+        "kennwort": {
+          "code": 3
+        },
+        "eigenerStandort": false,
+        "ort": "Harburg",
+        "teile": [
+          40,
+          12,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "KdoW"
+      },
+      "aenderungen": "Kommandowagen, geländefähig",
+      "kennzeichenFreitext": "WL-2002",
+      "funkrufname": {
+        "kennwort": {
+          "code": 3
+        },
+        "eigenerStandort": false,
+        "ort": "Harburg",
+        "teile": [
+          40,
+          10,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "Anh Zelt"
+      },
+      "aenderungen": "Anhänger Zelt (erweiterter Besprechungsraum)",
+      "kennzeichenFreitext": "Anh Zelt"
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 9,
+    "dieselLiter": 115,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": true,
+    "ruhezeitErforderlich": true
+  }
+}

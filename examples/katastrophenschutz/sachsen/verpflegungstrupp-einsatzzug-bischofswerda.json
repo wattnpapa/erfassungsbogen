@@ -1,0 +1,146 @@
+{
+  "schemaVersion": 3,
+  "stand": 2388,
+  "einheit": {
+    "organisation": 6,
+    "organisationName": "Johanniter-Unfall-Hilfe Landkreis Bautzen",
+    "einheitsTyp": {
+      "freitext": "Verpflegungstrupp Einsatzzug"
+    },
+    "name": "Bischofswerda",
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Einsatzzug (KatS-EZ)"
+        },
+        "name": "Bischofswerda"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "JUH-Kreisverband"
+        },
+        "name": "Bautzen"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Untere KatS-Behörde"
+        },
+        "name": "Landkreis Bautzen"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2388,
+    "zeitraumBis": 2392,
+    "ortAuftrag": "Flächenlage Bischofswerda — Verpflegung von Einsatzkräften und Betroffenen"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Nadine",
+      "nachname": "Oertel",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Helfer/-in (Verpflegung)"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 1,
+      "ernaehrung": 1,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "01632995348"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Koch (Beruf)"
+        }
+      ]
+    },
+    {
+      "vorname": "Jan",
+      "nachname": "Hempel",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Helfer/-in (Verpflegung)"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Koch (Beruf)"
+        }
+      ]
+    },
+    {
+      "vorname": "Sandra",
+      "nachname": "Zimmermann",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Helfer/-in (Verpflegung)"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Koch (Beruf)"
+        }
+      ]
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "GW-V"
+      },
+      "aenderungen": "Gerätewagen Versorgung (Freistaat Sachsen)",
+      "kennzeichenFreitext": "BZ-2023",
+      "funkrufname": {
+        "kennwort": {
+          "code": 4
+        },
+        "eigenerStandort": true,
+        "teile": [
+          41,
+          74,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "FKH"
+      },
+      "aenderungen": "Feldkochherd (Freistaat Sachsen)",
+      "kennzeichenFreitext": "Anh FKH"
+    },
+    {
+      "typ": {
+        "freitext": "Kühlanhänger"
+      },
+      "aenderungen": "Kühlanhänger (Freistaat Sachsen)",
+      "kennzeichenFreitext": "Anh Kühl"
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 3,
+    "dieselLiter": 140,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": false,
+    "ruhezeitErforderlich": false
+  },
+  "sonstiges": "Teileinheit des Verbandes „Einsatzzug (KatS-EZ)\" nach SächsKatSVO Anlage 3. Die Verordnung sieht für diese Einheit eine Doppelbesetzung (Ablösung) vor; der Bogen zeigt die einfache Sollstärke."
+}

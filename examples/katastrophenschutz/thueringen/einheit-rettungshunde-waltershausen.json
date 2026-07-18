@@ -1,0 +1,180 @@
+{
+  "schemaVersion": 3,
+  "stand": 2388,
+  "einheit": {
+    "organisation": 2,
+    "organisationName": "Katastrophenschutz Landkreis Gotha",
+    "einheitsTyp": {
+      "freitext": "Einheit Rettungshunde"
+    },
+    "name": "Waltershausen",
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Katastrophenschutz-Facheinheit Rettungshunde/Ortungstechnik"
+        },
+        "name": "Waltershausen"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Untere KatS-Behörde"
+        },
+        "name": "Landkreis Gotha"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2388,
+    "zeitraumBis": 2389,
+    "ortAuftrag": "Gebäudeeinsturz Waltershausen — Suche vermisster Personen mit Rettungshunden"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Bernd",
+      "nachname": "Fischer",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Staffelführer/-in"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "01618527935"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Ronny",
+      "nachname": "Schmidt",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Hundeführer/-in"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
+      "ernaehrung": 2,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungshundeführer Fläche/Trümmer"
+        }
+      ]
+    },
+    {
+      "vorname": "Martin",
+      "nachname": "Bachmann",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Hundeführer/-in"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungshundeführer Fläche/Trümmer"
+        }
+      ]
+    },
+    {
+      "vorname": "Marlen",
+      "nachname": "Beyer",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Hundeführer/-in"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 1,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungshundeführer Fläche/Trümmer"
+        }
+      ]
+    },
+    {
+      "vorname": "Tino",
+      "nachname": "Weiß",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Hundeführer/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungshundeführer Fläche/Trümmer"
+        }
+      ]
+    },
+    {
+      "vorname": "Hagen",
+      "nachname": "Hempel",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Hundeführer/-in"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungshundeführer Fläche/Trümmer"
+        }
+      ]
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "Rettungshundefahrzeug"
+      },
+      "aenderungen": "Rettungshundefahrzeug",
+      "kennzeichenFreitext": "GTH-2049",
+      "funkrufname": {
+        "kennwort": {
+          "freitext": "Kater"
+        },
+        "eigenerStandort": false,
+        "ort": "Gotha",
+        "teile": [
+          2,
+          19,
+          1
+        ]
+      }
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 6,
+    "dieselLiter": 45,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": false,
+    "ruhezeitErforderlich": false
+  },
+  "sonstiges": "Teileinheit des Verbandes „Katastrophenschutz-Facheinheit Rettungshunde/Ortungstechnik\" (KatS-RHOT) nach ThürKatSVO Anlage 16; Sollstärke der Teileinheit 0/1/5/6, Mannschaftsstärke des Verbandes 1/3/9/13."
+}

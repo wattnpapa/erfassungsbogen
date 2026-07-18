@@ -1,0 +1,104 @@
+{
+  "schemaVersion": 3,
+  "stand": 2389,
+  "einheit": {
+    "organisation": 2,
+    "organisationName": "Katastrophenschutz Unstrut-Hainich-Kreis",
+    "einheitsTyp": {
+      "freitext": "Führungseinheit Logistikzug"
+    },
+    "name": "Bad Langensalza",
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Katastrophenschutz-Logistikzug"
+        },
+        "name": "Bad Langensalza"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Untere KatS-Behörde"
+        },
+        "name": "Unstrut-Hainich-Kreis"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2389,
+    "zeitraumBis": 2392,
+    "ortAuftrag": "Flächenlage Bad Langensalza — Führung Logistikzug"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Josephine",
+      "nachname": "Keller",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "Einheitsführer/-in"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 1,
+      "ernaehrung": 2,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "01547246222"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Klaus",
+      "nachname": "Fischer",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Melder/-in"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Sprechfunker"
+        }
+      ]
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "MTW"
+      },
+      "aenderungen": "Mannschaftstransportwagen",
+      "kennzeichenFreitext": "UH-2026",
+      "funkrufname": {
+        "kennwort": {
+          "freitext": "Kater"
+        },
+        "eigenerStandort": false,
+        "ort": "Unstrut-Hainich-Kreis",
+        "teile": [
+          2,
+          19,
+          1
+        ]
+      }
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 2,
+    "dieselLiter": 45,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": true,
+    "ruhezeitErforderlich": false
+  },
+  "sonstiges": "Teileinheit des Verbandes „Katastrophenschutz-Logistikzug\" (KatS-LogZ) nach ThürKatSVO Anlage 7; Sollstärke der Teileinheit 1/0/1/2, Mannschaftsstärke des Verbandes 1/3/13/17. Der im Schaubild eigenständig ausgewiesene Einheitsführer ist hier eingerechnet."
+}

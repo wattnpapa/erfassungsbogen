@@ -1,0 +1,127 @@
+{
+  "schemaVersion": 3,
+  "stand": 2388,
+  "einheit": {
+    "organisation": 7,
+    "organisationName": "Malteser Hilfsdienst Landkreis Vechta",
+    "einheitsTyp": {
+      "freitext": "Transporttrupp Bus 50"
+    },
+    "name": "Vechta",
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Transporttrupp Bus 50"
+        },
+        "name": "Vechta"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "MHD-Kreisverband"
+        },
+        "name": "Vechta"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Untere KatS-Behörde"
+        },
+        "name": "Landkreis Vechta"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2388,
+    "zeitraumBis": 2391,
+    "ortAuftrag": "Evakuierung Vechta — Transport von bis zu 50 Betroffenen"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Sebastian",
+      "nachname": "Bruns",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Fahrer/-in / Helfer/-in"
+        }
+      ],
+      "fahrerlaubnis": 14,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "01768804967"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Jannik",
+      "nachname": "Winkler",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Fahrer/-in / Helfer/-in"
+        }
+      ],
+      "fahrerlaubnis": 14,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Frank",
+      "nachname": "Sanders",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Fahrer/-in / Helfer/-in"
+        }
+      ],
+      "fahrerlaubnis": 14,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "KOM"
+      },
+      "aenderungen": "Kraftomnibus (mind. 50 Sitzplätze)",
+      "kennzeichenFreitext": "VEC-2042",
+      "funkrufname": {
+        "kennwort": {
+          "code": 5
+        },
+        "eigenerStandort": false,
+        "ort": "Vechta",
+        "teile": [
+          57,
+          18,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "Anh"
+      },
+      "aenderungen": "Anhänger für Gepäck (optional)",
+      "kennzeichenFreitext": "Anh"
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 3,
+    "dieselLiter": 120,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": false,
+    "ruhezeitErforderlich": false
+  }
+}

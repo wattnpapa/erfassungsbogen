@@ -1,0 +1,223 @@
+{
+  "schemaVersion": 3,
+  "stand": 2389,
+  "einheit": {
+    "organisation": 5,
+    "organisationName": "Bergwacht Sachsen (DRK) — Landkreis Görlitz",
+    "einheitsTyp": {
+      "freitext": "Bergrettungsgruppe"
+    },
+    "name": "Zittau",
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Bergrettungsgruppe (KatS-BergRGr)"
+        },
+        "name": "Zittau"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Bergwacht-Bereitschaft"
+        },
+        "name": "Zittau"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Untere KatS-Behörde"
+        },
+        "name": "Landkreis Görlitz"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2389,
+    "zeitraumBis": 2391,
+    "ortAuftrag": "Bergunfall Zittau — Rettung aus Steilgelände"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Sven",
+      "nachname": "Rudolph",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Gruppenführer/-in"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "01721051498"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "René",
+      "nachname": "Pfeifer",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Bergretter/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Bergrettung / Höhenrettung"
+        }
+      ]
+    },
+    {
+      "vorname": "Robert",
+      "nachname": "Riedel",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Bergretter/-in"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Bergrettung / Höhenrettung"
+        }
+      ]
+    },
+    {
+      "vorname": "Anke",
+      "nachname": "Rudolph",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Bergretter/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Bergrettung / Höhenrettung"
+        }
+      ]
+    },
+    {
+      "vorname": "Dirk",
+      "nachname": "Seidel",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Bergretter/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Bergrettung / Höhenrettung"
+        }
+      ]
+    },
+    {
+      "vorname": "Peter",
+      "nachname": "Lange",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Bergretter/-in"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Bergrettung / Höhenrettung"
+        }
+      ]
+    },
+    {
+      "vorname": "René",
+      "nachname": "Bergmann",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Bergretter/-in"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Bergrettung / Höhenrettung"
+        }
+      ]
+    },
+    {
+      "vorname": "Sarah",
+      "nachname": "Schulze",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Bergretter/-in"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Bergrettung / Höhenrettung"
+        }
+      ]
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "MTW"
+      },
+      "aenderungen": "Mannschaftstransportkraftwagen mit bis zu 8 Sitzen (Träger)",
+      "kennzeichenFreitext": "ZI-2048",
+      "funkrufname": {
+        "kennwort": {
+          "freitext": "Bergwacht"
+        },
+        "eigenerStandort": true,
+        "teile": [
+          41,
+          19,
+          1
+        ]
+      }
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 8,
+    "dieselLiter": 45,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": false,
+    "ruhezeitErforderlich": false
+  },
+  "sonstiges": "Teileinheit des Verbandes „Bergrettungsgruppe (KatS-BergRGr)\" nach SächsKatSVO Anlage 5. Die Verordnung sieht für diese Einheit eine Doppelbesetzung (Ablösung) vor; der Bogen zeigt die einfache Sollstärke."
+}

@@ -1,8 +1,8 @@
 /**
  * Erzeugt Beispiel-Erfassungsbögen der Starkeinheiten des Katastrophenschutzes
- * Niedersachsen (KatS-StAN NDS, Fassung 2023/2025 des NLBK) als PDF nach
- * examples/katastrophenschutz/niedersachsen/. Wie beim THW-Generator steckt das
- * maschinenlesbare JSON bereits im eingebetteten QR-Code der PDF.
+ * Niedersachsen (KatS-StAN NDS, Fassung 2023/2025 des NLBK) als JSON nach
+ * examples/katastrophenschutz/niedersachsen/. Abgelegt ist nur das Bogen-JSON;
+ * die PDF entsteht erst beim Anklicken in der App aus dem aktuellen Layout.
  *
  * Aufruf (Node ≥ 22): npm run beispiele:kats
  *
@@ -26,7 +26,6 @@
 import { mkdirSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
-import pdfmake from "pdfmake";
 import QRCode from "qrcode";
 import {
   Erfassungsbogen,
@@ -57,7 +56,6 @@ import {
   segmentPayloadUrls,
 } from "../src/codec";
 import { nodeKompressor } from "../src/qr-node";
-import { pdfDokument } from "../src/app/pdf-dokument";
 import type { QrSatz, QrTeil } from "../src/app/hilfen";
 
 const wurzel = join(dirname(fileURLToPath(import.meta.url)), "..");
@@ -1113,28 +1111,6 @@ function roundtrip(satz: QrSatz, erwartetGesamt: number, datei: string): void {
 
 // ---------------------------------------------------------------- Hauptlauf
 
-// Serverseitige pdfmake-Fonts: Roboto liegt im Paket, Helvetica (≙ Arial) ist
-// eine der 14 PDF-Standardschriften und in pdfkit ohne Datei über den Namen
-// verfügbar — die Bögen sind in Helvetica gesetzt (siehe SCHRIFT in
-// src/app/pdf-dokument.ts, THWin-Papiervorlage).
-const robotoDir = join(wurzel, "node_modules/pdfmake/fonts/Roboto");
-pdfmake.setFonts({
-  Roboto: {
-    normal: join(robotoDir, "Roboto-Regular.ttf"),
-    bold: join(robotoDir, "Roboto-Medium.ttf"),
-    italics: join(robotoDir, "Roboto-Italic.ttf"),
-    bolditalics: join(robotoDir, "Roboto-MediumItalic.ttf"),
-  },
-  Helvetica: {
-    normal: "Helvetica",
-    bold: "Helvetica-Bold",
-    italics: "Helvetica-Oblique",
-    bolditalics: "Helvetica-BoldOblique",
-  },
-});
-pdfmake.setUrlAccessPolicy((url: string) => url.startsWith("data:"));
-pdfmake.setLocalAccessPolicy((pfad: string) => pfad.startsWith(robotoDir) || pfad.startsWith("Helvetica"));
-
 // Jede Teileinheit an einen anderen Ort in Niedersachsen setzen (geografisch
 // breit gestreut, deterministisch).
 const orte = [...NDS_ORTE];
@@ -1146,7 +1122,7 @@ const beispiele: BeispielBogen[] = SPECS.map((spec, i) => {
 const ausgabe = join(wurzel, "examples", "katastrophenschutz", "niedersachsen");
 mkdirSync(ausgabe, { recursive: true });
 for (const datei of readdirSync(ausgabe)) {
-  if (datei.endsWith(".pdf")) rmSync(join(ausgabe, datei));
+  if (datei.endsWith(".json")) rmSync(join(ausgabe, datei));
 }
 
 let segmentierte = 0;
@@ -1154,7 +1130,7 @@ for (const [i, bsp] of beispiele.entries()) {
   const qr = await qrSatz(bsp.bogen);
   roundtrip(qr, bsp.bogen.personal.length, bsp.datei);
   if (qr.segmentiert) segmentierte++;
-  await pdfmake.createPdf(pdfDokument(bsp.bogen, qr)).write(join(ausgabe, `${bsp.datei}.pdf`));
+  writeFileSync(join(ausgabe, `${bsp.datei}.json`), JSON.stringify(bsp.bogen, null, 2) + "\n");
 }
 
 // Übersichtstabelle für die README.
@@ -1188,7 +1164,7 @@ ${zeilen.join("\n")}
 `,
 );
 
-console.log(`Fertig: ${beispiele.length} Beispiel-PDFs in examples/katastrophenschutz/niedersachsen/ (+ README.md)`);
+console.log(`Fertig: ${beispiele.length} Beispielbögen in examples/katastrophenschutz/niedersachsen/ (+ README.md)`);
 console.log(`Segmentierte QR: ${segmentierte}`);
 const jeFd = new Map<string, number>();
 for (const b of beispiele) jeFd.set(b.fachdienst, (jeFd.get(b.fachdienst) ?? 0) + 1);

@@ -1,0 +1,167 @@
+{
+  "schemaVersion": 3,
+  "stand": 2390,
+  "einheit": {
+    "organisation": 5,
+    "organisationName": "Bergwacht Thüringen (DRK) — Stadt Erfurt",
+    "einheitsTyp": {
+      "freitext": "Führungseinheit Bergrettungszug"
+    },
+    "name": "Erfurt",
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Katastrophenschutz-Bergrettungszug"
+        },
+        "name": "Erfurt"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Bergwacht-Bereitschaft"
+        },
+        "name": "Erfurt"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Untere KatS-Behörde"
+        },
+        "name": "Stadt Erfurt"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2390,
+    "zeitraumBis": 2392,
+    "ortAuftrag": "Bergunfall Erfurt — Führung Bergrettungszug"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Volkmar",
+      "nachname": "Ludwig",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "Einheitsführer/-in"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "01620557379"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Uwe",
+      "nachname": "Gebhardt",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Gruppenführer/-in"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Motorsägenschein (extern)"
+        }
+      ]
+    },
+    {
+      "vorname": "Robert",
+      "nachname": "Voigt",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Melder/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Sprechfunker"
+        }
+      ]
+    },
+    {
+      "vorname": "Sebastian",
+      "nachname": "Richter",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Melder/-in"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Sprechfunker"
+        }
+      ]
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "KdoW"
+      },
+      "aenderungen": "Kommandowagen mit Anhänger",
+      "kennzeichenFreitext": "EF-2029",
+      "funkrufname": {
+        "kennwort": {
+          "freitext": "Bergwacht"
+        },
+        "eigenerStandort": false,
+        "ort": "Erfurt",
+        "teile": [
+          1,
+          10,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "KLGF"
+      },
+      "aenderungen": "Kleingeländefahrzeug",
+      "kennzeichenFreitext": "EF-2030",
+      "funkrufname": {
+        "kennwort": {
+          "freitext": "Bergwacht"
+        },
+        "eigenerStandort": false,
+        "ort": "Erfurt",
+        "teile": [
+          1,
+          79,
+          1
+        ]
+      }
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 4,
+    "dieselLiter": 45,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": false,
+    "ruhezeitErforderlich": false
+  },
+  "sonstiges": "Teileinheit des Verbandes „Katastrophenschutz-Bergrettungszug\" (KatS-BRZ) nach ThürKatSVO Anlage 8; Sollstärke der Teileinheit 1/1/2/4, Mannschaftsstärke des Verbandes 1/3/18/22. Der im Schaubild eigenständig ausgewiesene Einheitsführer ist hier eingerechnet."
+}

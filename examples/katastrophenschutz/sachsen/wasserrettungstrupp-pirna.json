@@ -1,0 +1,184 @@
+{
+  "schemaVersion": 3,
+  "stand": 2389,
+  "einheit": {
+    "organisation": 5,
+    "organisationName": "Deutsches Rotes Kreuz Landkreis Sächsische Schweiz-Osterzgebirge",
+    "einheitsTyp": {
+      "freitext": "Wasserrettungstrupp"
+    },
+    "name": "Pirna",
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Wasserrettungsgruppe (KatS-WRGr)"
+        },
+        "name": "Pirna"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "DRK-Kreisverband"
+        },
+        "name": "Sächsische Schweiz-Osterzgebirge"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Untere KatS-Behörde"
+        },
+        "name": "Landkreis Sächsische Schweiz-Osterzgebirge"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2389,
+    "zeitraumBis": 2393,
+    "ortAuftrag": "Hochwasser Pirna — Personenrettung aus dem Wasser, Bootsbetrieb"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Peggy",
+      "nachname": "Oertel",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Gruppenführer/-in"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "01571615387"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Paul",
+      "nachname": "Kaiser",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Rettungsschwimmer/-in (davon ein/-e Bootsführer/-in)"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungsschwimmer"
+        }
+      ]
+    },
+    {
+      "vorname": "Maria",
+      "nachname": "Bergmann",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Rettungsschwimmer/-in (davon ein/-e Bootsführer/-in)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungsschwimmer"
+        }
+      ]
+    },
+    {
+      "vorname": "Uwe",
+      "nachname": "Bergmann",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Rettungsschwimmer/-in (davon ein/-e Bootsführer/-in)"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungsschwimmer"
+        }
+      ]
+    },
+    {
+      "vorname": "Tobias",
+      "nachname": "Herrmann",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Rettungsschwimmer/-in (davon ein/-e Bootsführer/-in)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungsschwimmer"
+        }
+      ]
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "MTW"
+      },
+      "aenderungen": "Mannschaftstransportkraftwagen (Freistaat Sachsen)",
+      "kennzeichenFreitext": "PIR-2046",
+      "funkrufname": {
+        "kennwort": {
+          "code": 3
+        },
+        "eigenerStandort": true,
+        "teile": [
+          71,
+          19,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "Motor-Rettungsboot"
+      },
+      "aenderungen": "Motor-Rettungsboot mit Trailer (Freistaat Sachsen)",
+      "kennzeichenFreitext": "auf Trailer",
+      "funkrufname": {
+        "kennwort": {
+          "code": 3
+        },
+        "eigenerStandort": true,
+        "teile": [
+          71,
+          79,
+          1
+        ]
+      }
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 5,
+    "dieselLiter": 45,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": false,
+    "ruhezeitErforderlich": true
+  },
+  "sonstiges": "Teileinheit des Verbandes „Wasserrettungsgruppe (KatS-WRGr)\" nach SächsKatSVO Anlage 4. Die Verordnung sieht für diese Einheit eine Doppelbesetzung (Ablösung) vor; der Bogen zeigt die einfache Sollstärke."
+}

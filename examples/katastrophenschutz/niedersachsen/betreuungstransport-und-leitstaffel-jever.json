@@ -1,0 +1,172 @@
+{
+  "schemaVersion": 3,
+  "stand": 2389,
+  "einheit": {
+    "organisation": 6,
+    "organisationName": "Johanniter-Unfall-Hilfe Landkreis Friesland",
+    "einheitsTyp": {
+      "freitext": "Betreuungstransport- und -leitstaffel"
+    },
+    "name": "Jever",
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Betreuungstransport- und -leitstaffel"
+        },
+        "name": "Jever"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "JUH-Kreisverband"
+        },
+        "name": "Friesland"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Untere KatS-Behörde"
+        },
+        "name": "Landkreis Friesland"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2389,
+    "zeitraumBis": 2390,
+    "ortAuftrag": "Evakuierung Jever — Transport und Leitung Betreuungsstelle"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Alexander",
+      "nachname": "Ramke",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Gruppenführer/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "01524711394"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Lisa",
+      "nachname": "Hartmann",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Betreuungshelfer/-in"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Carina",
+      "nachname": "Kruse",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Betreuungshelfer/-in"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Kevin",
+      "nachname": "Ramke",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Betreuungshelfer/-in"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Robert",
+      "nachname": "Lüdemann",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Betreuungshelfer/-in"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
+      "ernaehrung": 2,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Andreas",
+      "nachname": "Kruse",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Betreuungshelfer/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "MTWm"
+      },
+      "aenderungen": "Mannschaftstransportwagen multifunktional",
+      "kennzeichenFreitext": "FRI-2041",
+      "funkrufname": {
+        "kennwort": {
+          "code": 4
+        },
+        "eigenerStandort": false,
+        "ort": "Friesland",
+        "teile": [
+          49,
+          99,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "Anh Bt"
+      },
+      "aenderungen": "Anhänger Betreuung (optional)",
+      "kennzeichenFreitext": "Anh Bt"
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 6,
+    "dieselLiter": 45,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": false,
+    "ruhezeitErforderlich": false
+  }
+}

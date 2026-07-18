@@ -1,0 +1,150 @@
+{
+  "schemaVersion": 3,
+  "stand": 1369,
+  "einheit": {
+    "organisation": 9,
+    "einheitsTyp": {
+      "freitext": "Wasserrettungsverband — Führungstrupp (ELW 1)"
+    },
+    "name": "Wasserrettungsverband Baden-Württemberg — Führungstrupp",
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Landesverband"
+        },
+        "name": "Baden",
+        "kurz": "LV Baden",
+        "telefon": "0721136010",
+        "email": "info@baden.dlrg.de"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Koordinierungsstelle"
+        },
+        "name": "Wasserrettung Baden-Württemberg"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 1405,
+    "zeitraumBis": 1408,
+    "ortAuftrag": "Hochwasserlage an Rhein und Murg im Landkreis Rastatt — Menschenrettung aus überfluteten Bereichen, Deichverteidigung und Sicherung der Rettungskräfte auf dem Wasser; Bereitstellungsraum am DLRG-Zentrum Rastatt."
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Markus",
+      "nachname": "Dietrich",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "VFü"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "01525518783"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Verbandsführer"
+        }
+      ]
+    },
+    {
+      "vorname": "Marco",
+      "nachname": "Kübler",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "ZFü"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "01713876769"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Zugführer Wasserrettung"
+        }
+      ]
+    },
+    {
+      "vorname": "Dennis",
+      "nachname": "Vogt",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "GrFü"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Sanitäter (San A/B)"
+        }
+      ]
+    },
+    {
+      "vorname": "Alexander",
+      "nachname": "Huber",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kf"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "ELW 1 (Einsatzleitwagen)"
+      },
+      "kennzeichenFreitext": "KA-DL 11",
+      "stanKonform": true,
+      "aenderungen": "Führungs- und Fernmeldeausstattung",
+      "funkrufname": {
+        "kennwort": {
+          "code": 7
+        },
+        "eigenerStandort": false,
+        "ort": "Baden-Württ.",
+        "teile": [
+          11,
+          1
+        ]
+      }
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 4,
+    "dieselLiter": 60,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": true,
+    "ruhezeitErforderlich": true
+  },
+  "sonstiges": "FaBe (Arzt) wird als Fachberater lageabhängig angegliedert (STAN)."
+}

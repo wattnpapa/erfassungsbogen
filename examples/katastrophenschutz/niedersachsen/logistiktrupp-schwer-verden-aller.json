@@ -1,0 +1,142 @@
+{
+  "schemaVersion": 3,
+  "stand": 2390,
+  "einheit": {
+    "organisation": 2,
+    "organisationName": "Feuerwehr Landkreis Verden",
+    "einheitsTyp": {
+      "freitext": "Logistiktrupp schwer"
+    },
+    "name": "Verden (Aller)",
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Logistiktrupp schwer"
+        },
+        "name": "Verden (Aller)"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Untere KatS-Behörde"
+        },
+        "name": "Landkreis Verden"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2390,
+    "zeitraumBis": 2394,
+    "ortAuftrag": "Hochwasser Verden (Aller) — schwerer Materialumschlag und Transport"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Martin",
+      "nachname": "Becker",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Truppführer/-in"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "01557951639"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Lea",
+      "nachname": "Kruse",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Technikhelfer/-in"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Christian",
+      "nachname": "Ahlers",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Technikhelfer/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "WLF"
+      },
+      "aenderungen": "Wechselladerfahrzeug",
+      "kennzeichenFreitext": "VER-2048",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Verden",
+        "teile": [
+          21,
+          66,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "AB Mulde"
+      },
+      "aenderungen": "Abrollbehälter Mulde",
+      "kennzeichenFreitext": "auf WLF"
+    },
+    {
+      "typ": {
+        "freitext": "AB Logistik"
+      },
+      "aenderungen": "Abrollbehälter Logistik",
+      "kennzeichenFreitext": "auf WLF"
+    },
+    {
+      "typ": {
+        "freitext": "Anh"
+      },
+      "aenderungen": "Transportanhänger",
+      "kennzeichenFreitext": "Anh"
+    },
+    {
+      "typ": {
+        "freitext": "UslG"
+      },
+      "aenderungen": "Umschlaggerät (Teleskoplader)",
+      "kennzeichenFreitext": "auf Anh"
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 3,
+    "dieselLiter": 120,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": true,
+    "ruhezeitErforderlich": true
+  }
+}

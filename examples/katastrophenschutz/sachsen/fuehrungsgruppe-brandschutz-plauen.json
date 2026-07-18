@@ -1,0 +1,139 @@
+{
+  "schemaVersion": 3,
+  "stand": 2388,
+  "einheit": {
+    "organisation": 2,
+    "organisationName": "Feuerwehr Vogtlandkreis",
+    "einheitsTyp": {
+      "freitext": "Führungsgruppe Brandschutz"
+    },
+    "name": "Plauen",
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Führungsgruppe Brandschutz (FüGr BS)"
+        },
+        "name": "Plauen"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Untere KatS-Behörde"
+        },
+        "name": "Vogtlandkreis"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2388,
+    "zeitraumBis": 2390,
+    "ortAuftrag": "Flächenlage Plauen — Führungsunterstützung Brandschutz"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Mario",
+      "nachname": "Riedel",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "Verbandsführer/-in"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "01770674825"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Steffen",
+      "nachname": "Richter",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "Verbandsführer/-in"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "01780282829"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Lars",
+      "nachname": "Fiedler",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "Verbandsführer/-in"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Atemschutzgeräteträger"
+        }
+      ]
+    },
+    {
+      "vorname": "Doreen",
+      "nachname": "Wolf",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmann/Truppfrau"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "MZF/ELW 1"
+      },
+      "aenderungen": "Mehrzweckfahrzeug/Einsatzleitwagen 1 (Freistaat Sachsen)",
+      "kennzeichenFreitext": "PL-2050",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": true,
+        "teile": [
+          11,
+          14,
+          1
+        ]
+      }
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 4,
+    "dieselLiter": 45,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": false,
+    "ruhezeitErforderlich": true
+  },
+  "sonstiges": "Teileinheit des Verbandes „Führungsgruppe Brandschutz (FüGr BS)\" nach SächsKatSVO Anlage 7. Die Verordnung sieht für diese Einheit eine Doppelbesetzung (Ablösung) vor; der Bogen zeigt die einfache Sollstärke."
+}

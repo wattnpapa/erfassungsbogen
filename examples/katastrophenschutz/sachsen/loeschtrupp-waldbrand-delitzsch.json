@@ -1,0 +1,114 @@
+{
+  "schemaVersion": 3,
+  "stand": 2389,
+  "einheit": {
+    "organisation": 2,
+    "organisationName": "Feuerwehr Landkreis Nordsachsen",
+    "einheitsTyp": {
+      "freitext": "Löschtrupp Waldbrand"
+    },
+    "name": "Delitzsch",
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Löschzug Waldbrand (KatS-LZWb)"
+        },
+        "name": "Delitzsch"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Untere KatS-Behörde"
+        },
+        "name": "Landkreis Nordsachsen"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2389,
+    "zeitraumBis": 2391,
+    "ortAuftrag": "Waldbrand Delitzsch — mobiler Löschangriff im Gelände"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Lars",
+      "nachname": "Petzold",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Gruppenführer/-in"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "01548358979"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Yvonne",
+      "nachname": "Köhler",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmann/Truppfrau"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Mario",
+      "nachname": "Neubert",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmann/Truppfrau"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "TLF 20/40"
+      },
+      "aenderungen": "Tanklöschfahrzeug 20/40 (Freistaat Sachsen)",
+      "kennzeichenFreitext": "DZ-2014",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": true,
+        "teile": [
+          11,
+          26,
+          1
+        ]
+      }
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 3,
+    "dieselLiter": 120,
+    "benzinLiter": 0,
+    "gemischLiter": 5,
+    "unterbringung": true,
+    "ruhezeitErforderlich": false
+  },
+  "sonstiges": "Teileinheit des Verbandes „Löschzug Waldbrand (KatS-LZWb)\" nach SächsKatSVO Anlage 2. Die Verordnung sieht für diese Einheit eine Doppelbesetzung (Ablösung) vor; der Bogen zeigt die einfache Sollstärke."
+}

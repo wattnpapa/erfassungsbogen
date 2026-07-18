@@ -1,0 +1,177 @@
+{
+  "schemaVersion": 3,
+  "stand": 1369,
+  "einheit": {
+    "organisation": 9,
+    "einheitsTyp": {
+      "freitext": "Wasserrettungszug — Bootsgruppe"
+    },
+    "name": "Wasserrettungszug Mittelbaden — Bootsgruppe",
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Ortsgruppe"
+        },
+        "name": "Bühl",
+        "kurz": "OG Bühl",
+        "telefon": "072238877665",
+        "email": "info@buehl.dlrg.de"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Bezirk"
+        },
+        "name": "Mittelbaden"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Landesverband"
+        },
+        "name": "Baden"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 1405,
+    "zeitraumBis": 1408,
+    "ortAuftrag": "Hochwasserlage an Rhein und Murg im Landkreis Rastatt — Menschenrettung aus überfluteten Bereichen, Deichverteidigung und Sicherung der Rettungskräfte auf dem Wasser; Bereitstellungsraum am DLRG-Zentrum Rastatt."
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Sabine",
+      "nachname": "Maier",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "GrFü"
+        },
+        {
+          "freitext": "Bf"
+        }
+      ],
+      "fahrerlaubnis": 6,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "01789242342"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Bootsführer DLRG"
+        }
+      ]
+    },
+    {
+      "vorname": "Dennis",
+      "nachname": "Schmidt",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Bf"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Bootsführer DLRG"
+        },
+        {
+          "freitext": "Sanitäter (San A/B)"
+        }
+      ]
+    },
+    {
+      "vorname": "Hanna",
+      "nachname": "Hoffmann",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Bf"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Bootsführer DLRG"
+        }
+      ]
+    },
+    {
+      "vorname": "Sophie",
+      "nachname": "Kübler",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Hf"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Andreas",
+      "nachname": "Rapp",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kf"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "BGF (Bootsgerätewagen)"
+      },
+      "kennzeichenFreitext": "RA-DL 711",
+      "stanKonform": true,
+      "funkrufname": {
+        "kennwort": {
+          "code": 7
+        },
+        "eigenerStandort": false,
+        "ort": "Bühl",
+        "teile": [
+          71,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "HWB-Anhänger (Hochwasserboot)"
+      },
+      "kennzeichenFreitext": "RA-DL 712",
+      "stanKonform": true,
+      "aenderungen": "Hochwasserrettungsboot mit Motor auf Anhänger"
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 5,
+    "dieselLiter": 120,
+    "benzinLiter": 40,
+    "gemischLiter": 0,
+    "unterbringung": true,
+    "ruhezeitErforderlich": true
+  }
+}

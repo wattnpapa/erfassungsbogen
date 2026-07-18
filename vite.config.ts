@@ -48,6 +48,13 @@ export default defineConfig({
     }),
   ],
   define: { __APP_VERSION__: JSON.stringify(appVersion) },
+  build: {
+    // Die Beispielbögen (examples/**/*.json) werden per Glob als URL eingebunden
+    // und erst beim Anklicken geladen. Ohne diese Ausnahme würde Vite alle
+    // Bögen unter 4 KB als data:-URL ins Haupt-Bundle inlinen — sie lägen dann
+    // bei jedem App-Start im Speicher, statt nur bei Bedarf geladen zu werden.
+    assetsInlineLimit: (datei) => (/examples\/.*\.json$/.test(datei) ? false : undefined),
+  },
   // PORT kommt vom Claude-Code-Preview (autoPort); Fallback ist Vite-Standard 5173.
   server: { port: Number(process.env.PORT) || 5173 },
 });

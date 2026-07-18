@@ -1,0 +1,199 @@
+{
+  "schemaVersion": 3,
+  "stand": 2388,
+  "einheit": {
+    "organisation": 9,
+    "organisationName": "DLRG Landkreis Celle",
+    "einheitsTyp": {
+      "freitext": "Staffel Strömungsrettung (StrRSt)"
+    },
+    "name": "Celle",
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Staffel Strömungsrettung (StrRSt)"
+        },
+        "name": "Celle"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "DLRG-Kreisverband"
+        },
+        "name": "Celle"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Untere KatS-Behörde"
+        },
+        "name": "Landkreis Celle"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2388,
+    "zeitraumBis": 2389,
+    "ortAuftrag": "Starkregen Celle — Rettung aus Fließgewässer und Strömung"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Dominik",
+      "nachname": "Ernst",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Gruppenführer/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "01725496830"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Ralf",
+      "nachname": "Graf",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Bootsführer/-in"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Bootsführerschein"
+        }
+      ]
+    },
+    {
+      "vorname": "Moritz",
+      "nachname": "Ernst",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Strömungsretter/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Strömungsretter"
+        }
+      ]
+    },
+    {
+      "vorname": "Markus",
+      "nachname": "Renken",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Strömungsretter/-in"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Strömungsretter"
+        }
+      ]
+    },
+    {
+      "vorname": "Lars",
+      "nachname": "Gerdes",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Strömungsretter/-in"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Strömungsretter"
+        }
+      ]
+    },
+    {
+      "vorname": "Claudia",
+      "nachname": "Albers",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Strömungsretter/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Strömungsretter"
+        }
+      ]
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "GW StrR"
+      },
+      "aenderungen": "Gerätewagen Strömungsrettung",
+      "kennzeichenFreitext": "CE-2028",
+      "funkrufname": {
+        "kennwort": {
+          "code": 7
+        },
+        "eigenerStandort": false,
+        "ort": "Celle",
+        "teile": [
+          75,
+          58,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "MZB KatS"
+      },
+      "aenderungen": "Mehrzweckboot Katastrophenschutz",
+      "kennzeichenFreitext": "auf Anh"
+    },
+    {
+      "typ": {
+        "freitext": "Raft"
+      },
+      "aenderungen": "Raft (Strömungsrettung)",
+      "kennzeichenFreitext": "auf Anh"
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 6,
+    "dieselLiter": 70,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": false,
+    "ruhezeitErforderlich": false
+  }
+}

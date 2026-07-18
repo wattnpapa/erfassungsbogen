@@ -1,0 +1,205 @@
+{
+  "schemaVersion": 3,
+  "stand": 2389,
+  "einheit": {
+    "organisation": 5,
+    "organisationName": "Wasserwacht Thüringen (DRK) — Stadt Weimar",
+    "einheitsTyp": {
+      "freitext": "Wasserrettungsstaffel"
+    },
+    "name": "Weimar",
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Katastrophenschutz-Wasserrettungszug"
+        },
+        "name": "Weimar"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Wasserwacht-Ortsgruppe"
+        },
+        "name": "Weimar"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Untere KatS-Behörde"
+        },
+        "name": "Stadt Weimar"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2389,
+    "zeitraumBis": 2393,
+    "ortAuftrag": "Hochwasser Weimar — Menschenrettung aus Wassergefahren"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Josephine",
+      "nachname": "Haase",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Staffelführer/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 2,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "01520021402"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Antje",
+      "nachname": "Anschütz",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Rettungsschwimmer/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungsschwimmabzeichen Silber"
+        }
+      ]
+    },
+    {
+      "vorname": "Steffen",
+      "nachname": "Kaiser",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Rettungsschwimmer/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungsschwimmabzeichen Silber"
+        }
+      ]
+    },
+    {
+      "vorname": "Kerstin",
+      "nachname": "Becker",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Rettungsschwimmer/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungsschwimmabzeichen Silber"
+        }
+      ]
+    },
+    {
+      "vorname": "Gunter",
+      "nachname": "Keller",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Bootsführer/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Bootsführerschein Binnen"
+        }
+      ]
+    },
+    {
+      "vorname": "Thomas",
+      "nachname": "Schmidt",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Bootsführer/-in"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Bootsführerschein Binnen"
+        }
+      ]
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "GW-W"
+      },
+      "aenderungen": "Gerätewagen Wasserrettung mit Trailer",
+      "kennzeichenFreitext": "WE-2035",
+      "funkrufname": {
+        "kennwort": {
+          "freitext": "Wasserwacht"
+        },
+        "eigenerStandort": false,
+        "ort": "Weimar",
+        "teile": [
+          1,
+          75,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "Rettungsboot"
+      },
+      "aenderungen": "Rettungsboot auf Trailer",
+      "kennzeichenFreitext": "Boot RTB",
+      "funkrufname": {
+        "kennwort": {
+          "freitext": "Wasserwacht"
+        },
+        "eigenerStandort": false,
+        "ort": "Weimar",
+        "teile": [
+          1,
+          76,
+          1
+        ]
+      }
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 6,
+    "dieselLiter": 70,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": false,
+    "ruhezeitErforderlich": true
+  },
+  "sonstiges": "Teileinheit des Verbandes „Katastrophenschutz-Wasserrettungszug\" (KatS-WRZ) nach ThürKatSVO Anlage 9; Sollstärke der Teileinheit 0/1/5/6, Mannschaftsstärke des Verbandes 1/5/22/28. Der Verband führt 3 dieser Teileinheiten."
+}

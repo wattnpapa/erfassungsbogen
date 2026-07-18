@@ -1,8 +1,8 @@
 /**
  * Erzeugt Beispiel-Erfassungsbögen der Katastrophenschutzeinheiten des
- * Freistaates Thüringen als PDF nach examples/katastrophenschutz/thueringen/.
- * Wie bei den übrigen Generatoren steckt das maschinenlesbare JSON bereits im
- * eingebetteten QR-Code der PDF.
+ * Freistaates Thüringen als JSON nach examples/katastrophenschutz/thueringen/.
+ * Abgelegt ist nur das Bogen-JSON; die PDF entsteht erst beim Anklicken in der
+ * App aus dem aktuellen Layout.
  *
  * Aufruf (Node ≥ 22): npm run beispiele:kats-th
  *
@@ -54,7 +54,6 @@
 import { mkdirSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
-import pdfmake from "pdfmake";
 import QRCode from "qrcode";
 import {
   Erfassungsbogen,
@@ -85,7 +84,6 @@ import {
   segmentPayloadUrls,
 } from "../src/codec";
 import { nodeKompressor } from "../src/qr-node";
-import { pdfDokument } from "../src/app/pdf-dokument";
 import type { QrSatz, QrTeil } from "../src/app/hilfen";
 
 const wurzel = join(dirname(fileURLToPath(import.meta.url)), "..");
@@ -1309,27 +1307,6 @@ function pruefen(beispiele: BeispielBogen[]): void {
 
 // ---------------------------------------------------------------- Hauptlauf
 
-// Serverseitige pdfmake-Fonts: Roboto liegt im Paket, Helvetica (≙ Arial) ist
-// eine der 14 PDF-Standardschriften und in pdfkit ohne Datei über den Namen
-// verfügbar (siehe SCHRIFT in src/app/pdf-dokument.ts).
-const robotoDir = join(wurzel, "node_modules/pdfmake/fonts/Roboto");
-pdfmake.setFonts({
-  Roboto: {
-    normal: join(robotoDir, "Roboto-Regular.ttf"),
-    bold: join(robotoDir, "Roboto-Medium.ttf"),
-    italics: join(robotoDir, "Roboto-Italic.ttf"),
-    bolditalics: join(robotoDir, "Roboto-MediumItalic.ttf"),
-  },
-  Helvetica: {
-    normal: "Helvetica",
-    bold: "Helvetica-Bold",
-    italics: "Helvetica-Oblique",
-    bolditalics: "Helvetica-BoldOblique",
-  },
-});
-pdfmake.setUrlAccessPolicy((url: string) => url.startsWith("data:"));
-pdfmake.setLocalAccessPolicy((pfad: string) => pfad.startsWith(robotoDir) || pfad.startsWith("Helvetica"));
-
 // Jede Teileinheit an einen anderen Standort in Thüringen setzen
 // (deterministisch über die unteren Katastrophenschutzbehörden gestreut);
 // die Landeseinheiten bleiben an der TLFKS.
@@ -1342,13 +1319,13 @@ pruefen(beispiele);
 const ausgabe = join(wurzel, "examples", "katastrophenschutz", "thueringen");
 mkdirSync(ausgabe, { recursive: true });
 for (const datei of readdirSync(ausgabe)) {
-  if (datei.endsWith(".pdf")) rmSync(join(ausgabe, datei));
+  if (datei.endsWith(".json")) rmSync(join(ausgabe, datei));
 }
 
 for (const bsp of beispiele) {
   const qr = await qrSatz(bsp.bogen);
   roundtrip(qr, bsp.bogen.personal.length, bsp.datei);
-  await pdfmake.createPdf(pdfDokument(bsp.bogen, qr)).write(join(ausgabe, `${bsp.datei}.pdf`));
+  writeFileSync(join(ausgabe, `${bsp.datei}.json`), JSON.stringify(bsp.bogen, null, 2) + "\n");
 }
 
 const zeilen = beispiele.map((b) => {

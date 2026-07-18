@@ -1,7 +1,9 @@
 /**
  * Erzeugt 100 Beispiel-Erfassungsbögen von THW-Einheiten aus ganz Deutschland
- * als PDF nach examples/thw/ (bewusst NUR die PDFs — das maschinenlesbare JSON
- * steckt bereits in der PDF eingebettet). examples/ ist je Hilfsorganisation
+ * als JSON nach examples/thw/. Abgelegt wird nur der Bogen selbst; die PDF
+ * entsteht erst beim Anklicken in der App (src/app/fusszeile.tsx) aus dem
+ * jeweils aktuellen Layout — Layout-Änderungen erfordern also kein Neurendern
+ * aller Beispiele. examples/ ist je Hilfsorganisation
  * in Unterordner gegliedert; der Beispielbögen-Dialog im Footer
  * (src/app/fusszeile.tsx) liest die Ordnerstruktur per Glob und bietet zuerst
  * die Organisation an. Weitere Organisationen bekommen eigene Unterordner
@@ -33,7 +35,6 @@
 import { mkdirSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
-import pdfmake from "pdfmake";
 import QRCode from "qrcode";
 import {
   Erfassungsbogen,
@@ -64,7 +65,6 @@ import {
   segmentPayloadUrls,
 } from "../src/codec";
 import { nodeKompressor } from "../src/qr-node";
-import { pdfDokument } from "../src/app/pdf-dokument";
 import type { QrSatz, QrTeil } from "../src/app/hilfen";
 import { THW_EINHEITSTYPEN, THW_FAHRZEUGTYPEN } from "../src/vokabulare/thw";
 import {
@@ -916,32 +916,6 @@ function roundtrip(satz: QrSatz, erwartetGesamt: number, datei: string): void {
 
 // ---------------------------------------------------------------- Hauptlauf
 
-// Serverseitige pdfmake-Fonts (Roboto liegt im Paket). Helvetica ist eine der
-// 14 PDF-Standardschriften und in pdfkit ohne Datei über den Namen verfügbar —
-// die Bögen sind in Helvetica (≙ Arial) gesetzt, damit sie wie die THWin-
-// Papiervorlage wirken (siehe SCHRIFT in src/app/pdf-dokument.ts).
-const robotoDir = join(wurzel, "node_modules/pdfmake/fonts/Roboto");
-pdfmake.setFonts({
-  Roboto: {
-    normal: join(robotoDir, "Roboto-Regular.ttf"),
-    bold: join(robotoDir, "Roboto-Medium.ttf"),
-    italics: join(robotoDir, "Roboto-Italic.ttf"),
-    bolditalics: join(robotoDir, "Roboto-MediumItalic.ttf"),
-  },
-  Helvetica: {
-    normal: "Helvetica",
-    bold: "Helvetica-Bold",
-    italics: "Helvetica-Oblique",
-    bolditalics: "Helvetica-BoldOblique",
-  },
-});
-// Nur eingebettete data:-URLs zulassen (QR-Bild + JSON), kein Netzzugriff.
-pdfmake.setUrlAccessPolicy((url: string) => url.startsWith("data:"));
-// Lokaler Zugriff nur auf die mitgelieferten Roboto-Dateien sowie die PDF-
-// Standardschrift Helvetica (in pdfkit als AFM eingebaut, wird von pdfmake über
-// den Namen als „lokale Datei" geprüft, aber nicht wirklich von Platte gelesen).
-pdfmake.setLocalAccessPolicy((pfad: string) => pfad.startsWith(robotoDir) || pfad.startsWith("Helvetica"));
-
 const ANZAHL = 100;
 const STAN_TREU = 40; // max. 40 % exakt im StAN-Soll
 
@@ -968,9 +942,9 @@ pruefen(beispiele, STAN_TREU);
 // Ausgabe in den Organisations-Unterordner — dieser Generator erzeugt THW-Bögen.
 const ausgabe = join(wurzel, "examples", "thw");
 mkdirSync(ausgabe, { recursive: true });
-// Alte Beispiel-PDFs entfernen (qr-demo-Ausgaben .png/.svg bleiben unberührt).
+// Alte Beispiel-JSONs entfernen (qr-demo-Ausgaben .png/.svg bleiben unberührt).
 for (const datei of readdirSync(ausgabe)) {
-  if (datei.endsWith(".pdf")) rmSync(join(ausgabe, datei));
+  if (datei.endsWith(".json")) rmSync(join(ausgabe, datei));
 }
 
 let segmentierte = 0;
@@ -978,7 +952,7 @@ for (const [i, bsp] of beispiele.entries()) {
   const qr = await qrSatz(bsp.bogen);
   roundtrip(qr, bsp.bogen.personal.length, bsp.datei);
   if (qr.segmentiert) segmentierte++;
-  await pdfmake.createPdf(pdfDokument(bsp.bogen, qr)).write(join(ausgabe, `${bsp.datei}.pdf`));
+  writeFileSync(join(ausgabe, `${bsp.datei}.json`), JSON.stringify(bsp.bogen, null, 2) + "\n");
   if ((i + 1) % 10 === 0) console.log(`… ${i + 1}/${beispiele.length}`);
 }
 
@@ -1009,6 +983,6 @@ ${zeilen.join("\n")}
 
 const jeLv = new Map<string, number>();
 for (const b of beispiele) jeLv.set(b.landesverband, (jeLv.get(b.landesverband) ?? 0) + 1);
-console.log(`\nFertig: ${beispiele.length} Beispiel-PDFs in examples/thw/ (+ README.md)`);
+console.log(`\nFertig: ${beispiele.length} Beispielbögen in examples/thw/ (+ README.md)`);
 console.log(`StAN-treu: ${beispiele.filter((b) => b.abweichung === "—").length}, mit Abweichung: ${beispiele.filter((b) => b.abweichung !== "—").length}, segmentierte QR: ${segmentierte}`);
 for (const [lv, n] of [...jeLv.entries()].sort()) console.log(`  ${lv}: ${n}`);

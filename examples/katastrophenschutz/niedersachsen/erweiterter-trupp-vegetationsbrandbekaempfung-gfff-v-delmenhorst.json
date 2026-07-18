@@ -1,0 +1,133 @@
+{
+  "schemaVersion": 3,
+  "stand": 2390,
+  "einheit": {
+    "organisation": 2,
+    "organisationName": "Feuerwehr Stadt Delmenhorst",
+    "einheitsTyp": {
+      "freitext": "Erweiterter Trupp Vegetationsbrandbekämpfung (GFFF-V)"
+    },
+    "name": "Delmenhorst",
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Erweiterter Trupp Vegetationsbrandbekämpfung (GFFF-V)"
+        },
+        "name": "Delmenhorst"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Untere KatS-Behörde"
+        },
+        "name": "Stadt Delmenhorst"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2390,
+    "zeitraumBis": 2392,
+    "ortAuftrag": "Waldbrand Delmenhorst — mobiler Löschangriff im Gelände"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Florian",
+      "nachname": "Otto",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Staffelführer/-in"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "01545342971"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Carina",
+      "nachname": "Engel",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Maschinist/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Joachim",
+      "nachname": "Ramke",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmitglied"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Paul",
+      "nachname": "Bruns",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmitglied"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Berufskraftfahrer (Beruf)"
+        }
+      ]
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "CCFM 3000 Niedersachsen"
+      },
+      "aenderungen": "spezialisiertes Waldbrandtanklöschfahrzeug",
+      "kennzeichenFreitext": "DEL-2025",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Delmenhorst",
+        "teile": [
+          3,
+          29,
+          1
+        ]
+      }
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 4,
+    "dieselLiter": 120,
+    "benzinLiter": 0,
+    "gemischLiter": 5,
+    "unterbringung": true,
+    "ruhezeitErforderlich": false
+  }
+}

@@ -1,0 +1,122 @@
+{
+  "schemaVersion": 3,
+  "stand": 2390,
+  "einheit": {
+    "organisation": 2,
+    "organisationName": "Feuerwehr Landkreis Ammerland",
+    "einheitsTyp": {
+      "freitext": "Aufklärungstrupp Luft"
+    },
+    "name": "Westerstede",
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Aufklärungstrupp Luft"
+        },
+        "name": "Westerstede"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Untere KatS-Behörde"
+        },
+        "name": "Landkreis Ammerland"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2390,
+    "zeitraumBis": 2393,
+    "ortAuftrag": "Vermisstensuche Westerstede — Luftbilderkundung mit UAS"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Christina",
+      "nachname": "Freese",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Truppführer/-in"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "01693136020"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Bernd",
+      "nachname": "Renken",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Drohnensteuerer/-in / Luftbeobachter/-in"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "UAS-Steuerberechtigung"
+        }
+      ]
+    },
+    {
+      "vorname": "Lars",
+      "nachname": "Kaiser",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Drohnensteuerer/-in / Luftbeobachter/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 2,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "UAS-Steuerberechtigung"
+        }
+      ]
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "Kombi UAV"
+      },
+      "aenderungen": "Kombinationskraftwagen UAV",
+      "kennzeichenFreitext": "WST-2007",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Ammerland",
+        "teile": [
+          21,
+          15,
+          1
+        ]
+      }
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 3,
+    "dieselLiter": 45,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": false,
+    "ruhezeitErforderlich": false
+  }
+}

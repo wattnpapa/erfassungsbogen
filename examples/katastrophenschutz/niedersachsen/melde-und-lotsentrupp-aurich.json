@@ -1,0 +1,156 @@
+{
+  "schemaVersion": 3,
+  "stand": 2388,
+  "einheit": {
+    "organisation": 2,
+    "organisationName": "Feuerwehr Landkreis Aurich",
+    "einheitsTyp": {
+      "freitext": "Melde- und Lotsentrupp"
+    },
+    "name": "Aurich",
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Melde- und Lotsentrupp"
+        },
+        "name": "Aurich"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Untere KatS-Behörde"
+        },
+        "name": "Landkreis Aurich"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2388,
+    "zeitraumBis": 2391,
+    "ortAuftrag": "Flächenlage Aurich — Lotsendienst und Meldewege"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Matthias",
+      "nachname": "Albers",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Melder/-in / Lotse"
+        }
+      ],
+      "fahrerlaubnis": 4,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "01572286678"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Karsten",
+      "nachname": "Schwarz",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Melder/-in / Lotse"
+        }
+      ],
+      "fahrerlaubnis": 4,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungssanitäter (extern)"
+        }
+      ]
+    },
+    {
+      "vorname": "Lars",
+      "nachname": "Hoffmann",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Melder/-in / Lotse"
+        }
+      ],
+      "fahrerlaubnis": 4,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "Krad"
+      },
+      "aenderungen": "Kraftrad",
+      "kennzeichenFreitext": "AUR-2004",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Aurich",
+        "teile": [
+          14,
+          79,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "Krad"
+      },
+      "aenderungen": "Kraftrad",
+      "kennzeichenFreitext": "AUR-2005",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Aurich",
+        "teile": [
+          14,
+          79,
+          2
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "Krad"
+      },
+      "aenderungen": "Kraftrad",
+      "kennzeichenFreitext": "AUR-2006",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Aurich",
+        "teile": [
+          14,
+          79,
+          3
+        ]
+      }
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 3,
+    "dieselLiter": 24,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": true,
+    "ruhezeitErforderlich": true
+  }
+}

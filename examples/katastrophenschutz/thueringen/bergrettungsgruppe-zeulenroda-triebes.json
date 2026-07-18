@@ -1,0 +1,281 @@
+{
+  "schemaVersion": 3,
+  "stand": 2390,
+  "einheit": {
+    "organisation": 5,
+    "organisationName": "Bergwacht Thüringen (DRK) — Landkreis Greiz",
+    "einheitsTyp": {
+      "freitext": "Bergrettungsgruppe"
+    },
+    "name": "Zeulenroda-Triebes",
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Katastrophenschutz-Bergrettungszug"
+        },
+        "name": "Zeulenroda-Triebes"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Bergwacht-Bereitschaft"
+        },
+        "name": "Zeulenroda-Triebes"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Untere KatS-Behörde"
+        },
+        "name": "Landkreis Greiz"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2390,
+    "zeitraumBis": 2393,
+    "ortAuftrag": "Bergunfall Zeulenroda-Triebes — Rettung und Erstversorgung im unwegsamen Gelände"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Claudia",
+      "nachname": "Fischer",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Gruppenführer/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "01526787490"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Michael",
+      "nachname": "Döring",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Bergretter/-in"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Bergrettung"
+        }
+      ]
+    },
+    {
+      "vorname": "Peter",
+      "nachname": "Reinhardt",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Bergretter/-in"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Bergrettung"
+        }
+      ]
+    },
+    {
+      "vorname": "Robert",
+      "nachname": "Liebold",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Bergretter/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Bergrettung"
+        }
+      ]
+    },
+    {
+      "vorname": "Olaf",
+      "nachname": "Reinhardt",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Bergretter/-in"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Bergrettung"
+        }
+      ]
+    },
+    {
+      "vorname": "Torsten",
+      "nachname": "Richter",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Bergretter/-in"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Bergrettung"
+        }
+      ]
+    },
+    {
+      "vorname": "Robert",
+      "nachname": "Schilling",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Bergretter/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 2,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Bergrettung"
+        }
+      ]
+    },
+    {
+      "vorname": "Nicole",
+      "nachname": "Bachmann",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Rettungssanitäter/-in"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 1,
+      "ernaehrung": 2,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungssanitäter"
+        }
+      ]
+    },
+    {
+      "vorname": "Jens",
+      "nachname": "König",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Rettungssanitäter/-in"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungssanitäter"
+        }
+      ]
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "GW-Bergrettung"
+      },
+      "aenderungen": "Gerätewagen Bergrettung mit Anhänger",
+      "kennzeichenFreitext": "GRZ-2031",
+      "funkrufname": {
+        "kennwort": {
+          "freitext": "Bergwacht"
+        },
+        "eigenerStandort": false,
+        "ort": "Greiz",
+        "teile": [
+          2,
+          74,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "KLGF"
+      },
+      "aenderungen": "Kleingeländefahrzeug",
+      "kennzeichenFreitext": "GRZ-2032",
+      "funkrufname": {
+        "kennwort": {
+          "freitext": "Bergwacht"
+        },
+        "eigenerStandort": false,
+        "ort": "Greiz",
+        "teile": [
+          2,
+          79,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "KTW-Bergrettung"
+      },
+      "aenderungen": "Krankentransportwagen Bergrettung",
+      "kennzeichenFreitext": "GRZ-2033",
+      "funkrufname": {
+        "kennwort": {
+          "freitext": "Bergwacht"
+        },
+        "eigenerStandort": false,
+        "ort": "Greiz",
+        "teile": [
+          2,
+          85,
+          1
+        ]
+      }
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 9,
+    "dieselLiter": 115,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": true,
+    "ruhezeitErforderlich": true
+  },
+  "sonstiges": "Teileinheit des Verbandes „Katastrophenschutz-Bergrettungszug\" (KatS-BRZ) nach ThürKatSVO Anlage 8; Sollstärke der Teileinheit 0/1/8/9, Mannschaftsstärke des Verbandes 1/3/18/22. Der Verband führt 2 dieser Teileinheiten."
+}

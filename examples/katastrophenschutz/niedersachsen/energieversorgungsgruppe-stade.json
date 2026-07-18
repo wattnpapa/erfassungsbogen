@@ -1,0 +1,231 @@
+{
+  "schemaVersion": 3,
+  "stand": 2388,
+  "einheit": {
+    "organisation": 2,
+    "organisationName": "Feuerwehr Landkreis Stade",
+    "einheitsTyp": {
+      "freitext": "Energieversorgungsgruppe"
+    },
+    "name": "Stade",
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Energieversorgungsgruppe"
+        },
+        "name": "Stade"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Untere KatS-Behörde"
+        },
+        "name": "Landkreis Stade"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2388,
+    "zeitraumBis": 2391,
+    "ortAuftrag": "Stromausfall Stade — Netzersatz für kritische Infrastruktur"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Dirk",
+      "nachname": "Behrens",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Gruppenführer/-in"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "01548714995"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Erik",
+      "nachname": "Vosteen",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Elektrofachkraft (Staffel Netzersatzanlage)"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Elektrofachkraft DIN VDE 1000-10"
+        }
+      ]
+    },
+    {
+      "vorname": "Kevin",
+      "nachname": "Bauer",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Elektrofachkraft (Staffel Netzersatzanlage)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 2,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Elektrofachkraft DIN VDE 1000-10"
+        }
+      ]
+    },
+    {
+      "vorname": "Joachim",
+      "nachname": "Tammen",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Technikhelfer/-in (Staffel Netzersatzanlage)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Joachim",
+      "nachname": "Schröder",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Technikhelfer/-in (Staffel Netzersatzanlage)"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Katrin",
+      "nachname": "Hoffmann",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Technikhelfer/-in (Staffel Netzersatzanlage)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Uwe",
+      "nachname": "Otto",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppführer/-in (Kraft- und Betriebsstofftrupp)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Kevin",
+      "nachname": "Otto",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Technikhelfer/-in (Betriebsstofftrupp)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Martin",
+      "nachname": "Otto",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Technikhelfer/-in (Betriebsstofftrupp)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "NEA 250"
+      },
+      "aenderungen": "mobile Netzersatzanlage 250 kVA mit Zugfahrzeug",
+      "kennzeichenFreitext": "STD-2046",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Stade",
+        "teile": [
+          27,
+          55,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "TB Ks"
+      },
+      "aenderungen": "mobiler Tankbehälter Kraftstoff 6000 l mit Transportfahrzeug (ADR)",
+      "kennzeichenFreitext": "STD-2047",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Stade",
+        "teile": [
+          27,
+          69,
+          1
+        ]
+      }
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 9,
+    "dieselLiter": 70,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": false,
+    "ruhezeitErforderlich": false
+  }
+}

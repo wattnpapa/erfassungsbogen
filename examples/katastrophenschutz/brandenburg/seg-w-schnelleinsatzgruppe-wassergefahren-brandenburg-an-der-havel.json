@@ -1,0 +1,307 @@
+{
+  "schemaVersion": 3,
+  "stand": 2388,
+  "einheit": {
+    "organisation": 9,
+    "organisationName": "DLRG Stadt Brandenburg an der Havel",
+    "einheitsTyp": {
+      "freitext": "Schnelleinsatzgruppe-Wassergefahren (SEG-W)"
+    },
+    "name": "Brandenburg an der Havel",
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Fachdienst Bergung, Teilbereich Wassergefahren"
+        },
+        "name": "Brandenburg an der Havel"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "DLRG-Kreisverband"
+        },
+        "name": "Brandenburg an der Havel"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Untere KatS-Behörde"
+        },
+        "name": "Stadt Brandenburg an der Havel"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2388,
+    "zeitraumBis": 2392,
+    "ortAuftrag": "Hochwasser Brandenburg an der Havel — Menschenrettung aus Wassergefahren, Deichverteidigung"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Nico",
+      "nachname": "Below",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Gruppenführer/-in"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "01764800950"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Bianca",
+      "nachname": "Schulz",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Gruppenführer/-in"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 1,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Karsten",
+      "nachname": "Dittrich",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Rettungsschwimmer/-in"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungsschwimmabzeichen Silber"
+        }
+      ]
+    },
+    {
+      "vorname": "Ralf",
+      "nachname": "Wenzel",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Rettungsschwimmer/-in"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungsschwimmabzeichen Silber"
+        }
+      ]
+    },
+    {
+      "vorname": "Tino",
+      "nachname": "Keller",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Rettungsschwimmer/-in"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungsschwimmabzeichen Silber"
+        }
+      ]
+    },
+    {
+      "vorname": "Andreas",
+      "nachname": "Noack",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Rettungsschwimmer/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungsschwimmabzeichen Silber"
+        }
+      ]
+    },
+    {
+      "vorname": "Markus",
+      "nachname": "Röhl",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Bootsführer/-in"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Bootsführerschein Binnen"
+        }
+      ]
+    },
+    {
+      "vorname": "Sven",
+      "nachname": "Müller",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Bootsführer/-in"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Bootsführerschein Binnen"
+        }
+      ]
+    },
+    {
+      "vorname": "Torsten",
+      "nachname": "Köhler",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kraftfahrer/-in"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Annett",
+      "nachname": "Wolf",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kraftfahrer/-in"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 1,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "GW-W"
+      },
+      "aenderungen": "Gerätewagen Wasserrettung (Land)",
+      "kennzeichenFreitext": "BRB-2041",
+      "funkrufname": {
+        "kennwort": {
+          "code": 7
+        },
+        "eigenerStandort": false,
+        "ort": "Havel",
+        "teile": [
+          10,
+          58,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "MZB"
+      },
+      "aenderungen": "Mehrzweckboot mit Trailer (Land)",
+      "kennzeichenFreitext": "BRB-2042",
+      "funkrufname": {
+        "kennwort": {
+          "code": 7
+        },
+        "eigenerStandort": false,
+        "ort": "Havel",
+        "teile": [
+          10,
+          79,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "RTB"
+      },
+      "aenderungen": "Rettungsboot mit Trailer (Träger)",
+      "kennzeichenFreitext": "BRB-2043",
+      "funkrufname": {
+        "kennwort": {
+          "code": 7
+        },
+        "eigenerStandort": false,
+        "ort": "Havel",
+        "teile": [
+          10,
+          88,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "MTW"
+      },
+      "aenderungen": "Mannschaftstransportwagen (Träger)",
+      "kennzeichenFreitext": "BRB-2044",
+      "funkrufname": {
+        "kennwort": {
+          "code": 7
+        },
+        "eigenerStandort": false,
+        "ort": "Havel",
+        "teile": [
+          10,
+          19,
+          1
+        ]
+      }
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 10,
+    "dieselLiter": 205,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": false,
+    "ruhezeitErforderlich": false
+  },
+  "sonstiges": "Mindeststärke 0/2/8/10 und 4 Einsatz-Kfz nach KatSV Anlage zu § 4 Abs. 1 (KatSV Brandenburg). Die Verordnung regelt keine Fahrzeugtypen — die hier gezeigten Typen sind beispielhaft nach dem Katalog „Funkkennziffern Feuerwehr & Rettungsdienst im Land Brandenburg\" belegt; verbindlich sind die Ausführungsvorschriften nach § 8 KatSV."
+}

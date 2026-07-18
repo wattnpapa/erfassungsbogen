@@ -1,0 +1,127 @@
+{
+  "schemaVersion": 3,
+  "stand": 2388,
+  "einheit": {
+    "organisation": 2,
+    "organisationName": "Katastrophenschutz Wartburgkreis",
+    "einheitsTyp": {
+      "freitext": "Einheit Ortungstechnik"
+    },
+    "name": "Ruhla",
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Katastrophenschutz-Facheinheit Rettungshunde/Ortungstechnik"
+        },
+        "name": "Ruhla"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Untere KatS-Behörde"
+        },
+        "name": "Wartburgkreis"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2388,
+    "zeitraumBis": 2392,
+    "ortAuftrag": "Gebäudeeinsturz Ruhla — Ortung verschütteter Personen mit Technik"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Claudia",
+      "nachname": "Köhler",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Truppführer/-in"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "01514190911"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Sprechfunker"
+        }
+      ]
+    },
+    {
+      "vorname": "Robert",
+      "nachname": "Anschütz",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Helfer/-in Ortungstechnik"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Technische Ortung"
+        }
+      ]
+    },
+    {
+      "vorname": "Gunter",
+      "nachname": "Brand",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Helfer/-in Ortungstechnik"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 2,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Technische Ortung"
+        }
+      ]
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "GW-Ortung"
+      },
+      "aenderungen": "Gerätewagen Ortung",
+      "kennzeichenFreitext": "WAK-2048",
+      "funkrufname": {
+        "kennwort": {
+          "freitext": "Kater"
+        },
+        "eigenerStandort": false,
+        "ort": "Wartburgkreis",
+        "teile": [
+          2,
+          79,
+          1
+        ]
+      }
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 3,
+    "dieselLiter": 70,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": true,
+    "ruhezeitErforderlich": false
+  },
+  "sonstiges": "Teileinheit des Verbandes „Katastrophenschutz-Facheinheit Rettungshunde/Ortungstechnik\" (KatS-RHOT) nach ThürKatSVO Anlage 16; Sollstärke der Teileinheit 0/1/2/3, Mannschaftsstärke des Verbandes 1/3/9/13."
+}

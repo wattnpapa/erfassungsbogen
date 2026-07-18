@@ -1,0 +1,263 @@
+{
+  "schemaVersion": 3,
+  "stand": 2388,
+  "einheit": {
+    "organisation": 2,
+    "organisationName": "Feuerwehr Landkreis Northeim",
+    "einheitsTyp": {
+      "freitext": "Logistik- und Technikgruppe"
+    },
+    "name": "Northeim",
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Logistik- und Technikgruppe"
+        },
+        "name": "Northeim"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Untere KatS-Behörde"
+        },
+        "name": "Landkreis Northeim"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2388,
+    "zeitraumBis": 2392,
+    "ortAuftrag": "Bereitstellungsraum Northeim — Materialnachschub und technische Unterstützung"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Sven",
+      "nachname": "Klein",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Gruppenführer/-in (Logistik-Führungstrupp)"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "01740595940"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Birgit",
+      "nachname": "Wilkens",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Sprechfunker/-in (Logistik-Führungstrupp)"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 1,
+      "ernaehrung": 2,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Ralf",
+      "nachname": "Cordes",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Technikhelfer/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Lea",
+      "nachname": "Harms",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Technikhelfer/-in"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Peter",
+      "nachname": "Wübben",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Technikhelfer/-in"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Frank",
+      "nachname": "Bauer",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Technikhelfer/-in"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Kerstin",
+      "nachname": "Peters",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Technikhelfer/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Sandra",
+      "nachname": "Focke",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Technikhelfer/-in"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Sebastian",
+      "nachname": "Wessels",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Technikhelfer/-in"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 2,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "Kombi-L"
+      },
+      "aenderungen": "Kombinationskraftwagen Logistik (Führungstrupp)",
+      "kennzeichenFreitext": "NOM-2043",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Northeim",
+        "teile": [
+          10,
+          60,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "GW L gr"
+      },
+      "aenderungen": "Gerätewagen Logistik groß",
+      "kennzeichenFreitext": "NOM-2044",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Northeim",
+        "teile": [
+          10,
+          68,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "Anh Log"
+      },
+      "aenderungen": "Anhänger für Logistikzwecke",
+      "kennzeichenFreitext": "Anh Log"
+    },
+    {
+      "typ": {
+        "freitext": "GW L kl"
+      },
+      "aenderungen": "Gerätewagen Logistik klein",
+      "kennzeichenFreitext": "NOM-2045",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Northeim",
+        "teile": [
+          10,
+          64,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "NEA"
+      },
+      "aenderungen": "mobile Netzersatzanlage mit Lichtmast",
+      "kennzeichenFreitext": "Anh NEA"
+    },
+    {
+      "typ": {
+        "freitext": "Anh Tank"
+      },
+      "aenderungen": "Anhänger mobile Kraftstoffversorgung",
+      "kennzeichenFreitext": "Anh Tank"
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 9,
+    "dieselLiter": 280,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": true,
+    "ruhezeitErforderlich": false
+  }
+}

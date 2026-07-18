@@ -1,0 +1,135 @@
+{
+  "schemaVersion": 3,
+  "stand": 2390,
+  "einheit": {
+    "organisation": 5,
+    "organisationName": "Deutsches Rotes Kreuz Landkreis Altenburger Land",
+    "einheitsTyp": {
+      "freitext": "Führungsunterstützungstrupp Medizinische Rettung"
+    },
+    "name": "Schmölln",
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Katastrophenschutz-Unterstützungseinheit Führung „Medizinische Rettung“"
+        },
+        "name": "Schmölln"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "DRK-Kreisverband"
+        },
+        "name": "Altenburger Land"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Untere KatS-Behörde"
+        },
+        "name": "Landkreis Altenburger Land"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2390,
+    "zeitraumBis": 2391,
+    "ortAuftrag": "MANV Schmölln — Führung der Medizinischen Task Force"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Klaus",
+      "nachname": "Kirchner",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "Einheitsführer/-in"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "01571753867"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Sprechfunker"
+        }
+      ]
+    },
+    {
+      "vorname": "Katrin",
+      "nachname": "Riedel",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "Führungsassistent/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "01732033259"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Falk",
+      "nachname": "Werner",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Fernmelder/-in"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Sprechfunker"
+        }
+      ]
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "FüKW MTF"
+      },
+      "aenderungen": "Führungskraftwagen Medizinische Task Force (ergänzende Zivilschutzausstattung des Bundes)",
+      "kennzeichenFreitext": "ABG-2046",
+      "funkrufname": {
+        "kennwort": {
+          "code": 3
+        },
+        "eigenerStandort": false,
+        "ort": "Altenburger Land",
+        "teile": [
+          2,
+          11,
+          1
+        ]
+      }
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 3,
+    "dieselLiter": 45,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": false,
+    "ruhezeitErforderlich": true
+  },
+  "sonstiges": "Teileinheit des Verbandes „Katastrophenschutz-Unterstützungseinheit Führung „Medizinische Rettung“\" (KatS-UE Führung Med. Rettung) nach ThürKatSVO Anlage 15; Sollstärke der Teileinheit 2/0/1/3, Mannschaftsstärke des Verbandes 2/0/1/3."
+}

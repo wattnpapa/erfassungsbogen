@@ -1,0 +1,155 @@
+{
+  "schemaVersion": 3,
+  "stand": 1369,
+  "einheit": {
+    "organisation": 9,
+    "einheitsTyp": {
+      "freitext": "Wasserrettungsverband — Verbandsführung (KdoW)"
+    },
+    "name": "Wasserrettungsverband Baden-Württemberg — Verbandsführung",
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Landesverband"
+        },
+        "name": "Württemberg",
+        "kurz": "LV Württemberg",
+        "telefon": "0711921950",
+        "email": "info@wuerttemberg.dlrg.de"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Koordinierungsstelle"
+        },
+        "name": "Wasserrettung Baden-Württemberg"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 1405,
+    "zeitraumBis": 1408,
+    "ortAuftrag": "Hochwasserlage an Rhein und Murg im Landkreis Rastatt — Menschenrettung aus überfluteten Bereichen, Deichverteidigung und Sicherung der Rettungskräfte auf dem Wasser; Bereitstellungsraum am DLRG-Zentrum Rastatt."
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Kai",
+      "nachname": "Kübler",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "ZFü"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "01645504327"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Zugführer Wasserrettung"
+        },
+        {
+          "freitext": "Sanitäter (San A/B)"
+        }
+      ]
+    },
+    {
+      "vorname": "Dominik",
+      "nachname": "Hoffmann",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "GrFü"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "01718394987"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Sprechfunker (BOS-Digitalfunk)"
+        }
+      ]
+    },
+    {
+      "vorname": "Moritz",
+      "nachname": "Baumann",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "HF"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Sanitäter (San A/B)"
+        }
+      ]
+    },
+    {
+      "vorname": "Lukas",
+      "nachname": "Becker",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kf"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Sprechfunker (BOS-Digitalfunk)"
+        }
+      ]
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "KdoW (Kommandowagen)"
+      },
+      "kennzeichenFreitext": "S-DL 12",
+      "stanKonform": true,
+      "funkrufname": {
+        "kennwort": {
+          "code": 7
+        },
+        "eigenerStandort": false,
+        "ort": "Baden-Württ.",
+        "teile": [
+          10,
+          2
+        ]
+      }
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 4,
+    "dieselLiter": 60,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": true,
+    "ruhezeitErforderlich": true
+  }
+}

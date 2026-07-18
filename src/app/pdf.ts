@@ -7,40 +7,54 @@
 
 import pdfMake from "pdfmake/build/pdfmake";
 import * as pdfFonts from "pdfmake/build/vfs_fonts";
+// Metriken (AFM) der PDF-Standardschrift Helvetica. Anders als in Node, wo
+// pdfkit sie von Platte liest, muss der Browser-Build sie explizit ins
+// virtuelle Dateisystem bekommen — sonst bricht das Rendern mit
+// „File 'data/Helvetica-Bold.afm' not found in virtual file system" ab.
+import helvetica from "pdfmake/build/standard-fonts/Helvetica";
 import type { Erfassungsbogen } from "../model";
 import { qrErzeugen } from "./hilfen";
 import { istNativ, pdfTeilen } from "./nativ";
 import { einsatzPdfDokument, pdfDokument } from "./pdf-dokument";
 
+interface FontContainer {
+  vfs: Record<string, string | { data: string; encoding?: string }>;
+  fonts: Record<string, unknown>;
+}
+const pdf = pdfMake as unknown as {
+  addVirtualFileSystem(vfs: FontContainer["vfs"]): void;
+  addFontContainer(container: FontContainer): void;
+  addFonts(fonts: Record<string, unknown>): void;
+};
+
 // vfs-Zuweisung ist je nach pdfmake-Version unterschiedlich verpackt
 const fonts = pdfFonts as unknown as { pdfMake?: { vfs: Record<string, string> }; vfs?: Record<string, string> };
-(pdfMake as unknown as { vfs: Record<string, string> }).vfs = fonts.pdfMake?.vfs ?? fonts.vfs ?? {};
+pdf.addVirtualFileSystem(fonts.pdfMake?.vfs ?? fonts.vfs ?? {});
 
 // Die THWin-Papiervorlage ist in „BundesSans Office" gesetzt (Bund-Hausschrift,
 // nicht frei weitergebbar). Deren im Word-Dokument hinterlegte Ausweichschrift
 // ist Arial — und das metrisch praktisch deckungsgleiche Helvetica ist eine der
-// 14 PDF-Standardschriften, die pdfkit/pdfmake ohne eingebettete Font-Datei
-// (kein vfs-Eintrag nötig) rendern kann. So wirkt die erzeugte PDF wie das
-// Original, statt im pdfmake-Standard Roboto. Roboto bleibt als Fallback erhalten.
-(pdfMake as unknown as { fonts: Record<string, unknown> }).fonts = {
+// 14 PDF-Standardschriften. So wirkt die erzeugte PDF wie das Original, statt
+// im pdfmake-Standard Roboto. Roboto bleibt als Fallback erhalten (steht
+// bereits als Vorgabe in pdfMake.fonts).
+pdf.addFontContainer(helvetica as unknown as FontContainer);
+pdf.addFonts({
   Roboto: {
     normal: "Roboto-Regular.ttf",
     bold: "Roboto-Medium.ttf",
     italics: "Roboto-Italic.ttf",
     bolditalics: "Roboto-MediumItalic.ttf",
   },
-  Helvetica: {
-    normal: "Helvetica",
-    bold: "Helvetica-Bold",
-    italics: "Helvetica-Oblique",
-    bolditalics: "Helvetica-BoldOblique",
-  },
-};
+});
 
-export async function pdfErzeugen(b: Erfassungsbogen): Promise<void> {
+/**
+ * Bogen als PDF ausgeben. `name` überschreibt den aus der Einheit abgeleiteten
+ * Dateinamen (die Beispielbögen behalten so ihren Dateinamen aus examples/).
+ */
+export async function pdfErzeugen(b: Erfassungsbogen, name?: string): Promise<void> {
   const qr = await qrErzeugen(b);
   const dd = pdfDokument(b, qr);
-  const dateiname = `eeb-${(b.einheit.name || "bogen").replace(/[^\wäöüÄÖÜß-]+/g, "_")}.pdf`;
+  const dateiname = name ?? `eeb-${(b.einheit.name || "bogen").replace(/[^\wäöüÄÖÜß-]+/g, "_")}.pdf`;
   if (istNativ()) {
     // In der App gibt es keinen Browser-Download: PDF übers Share-Sheet anbieten
     const base64 = await pdfMake.createPdf(dd).getBase64();
