@@ -32,7 +32,7 @@ import {
   segmentPayloadUrls,
   type Kompressor,
 } from "../codec";
-import { encodeSigniertVorlagePayloadUrl, signiertePayloadBytes } from "../signatur";
+import { signiertePayloadBytes } from "../signatur";
 import { geraeteSchluesselSicherstellen } from "./geraete-schluessel";
 import { istNativ, textTeilen } from "./nativ";
 import {
@@ -163,14 +163,6 @@ export function datumDeutsch(iso: string): string {
 
 // ---------------------------------------------------------------- QR-Code
 
-export interface QrInfo {
-  datenUrl: string;
-  /** Der im QR-Code kodierte App-Link (Präfix + Payload) — auch als Textlink nutzbar. */
-  url: string;
-  zeichen: number;
-  version: number;
-}
-
 /** Ein QR-Bild eines Satzes: bei Segmentierung Teil `teilNr` von `anzahl`. */
 export interface QrTeil {
   datenUrl: string;
@@ -212,11 +204,6 @@ async function teilBild(url: string, teilNr: number, anzahl: number): Promise<Qr
   return { datenUrl, url, teilNr, anzahl, version: qrVersion(url) };
 }
 
-async function qrAusUrl(url: string): Promise<QrInfo> {
-  const datenUrl = await QRCode.toDataURL(url, { ...QR_OPTIONEN, width: 520, margin: 2 });
-  return { datenUrl, url, zeichen: url.length, version: qrVersion(url) };
-}
-
 /**
  * Bogen → QR-Satz. QR-Inhalt ist eine App-URL: Die Kamera erkennt sie und öffnet
  * die App bzw. die Web-App; die Daten stehen im Fragment (bleiben also lokal).
@@ -256,21 +243,6 @@ export async function qrErzeugen(b: Erfassungsbogen): Promise<QrSatz> {
     zeichen: url.length,
     version: Math.max(...teile.map((t) => t.version)),
   };
-}
-
-/**
- * QR-Code zum Teilen einer Vorlage in der Einheit. Trägt den Marker "V." im
- * Fragment, damit der Empfänger sie importiert statt als Einsatzbogen zu öffnen.
- * Vorlagen sind klein und werden nicht segmentiert (ein Einzel-QR). Immer
- * signiert (wie {@link qrErzeugen}).
- */
-export async function qrVorlageErzeugen(b: Erfassungsbogen): Promise<QrInfo> {
-  const url = await encodeSigniertVorlagePayloadUrl(
-    b,
-    browserKompressor,
-    await geraeteSchluesselSicherstellen(),
-  );
-  return qrAusUrl(url);
 }
 
 // ------------------------------------------------------------ Datei-Dialog

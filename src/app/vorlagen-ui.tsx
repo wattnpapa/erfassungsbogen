@@ -1,22 +1,21 @@
 /**
  * Oberfläche für „Meine Vorlagen":
  *  - VorlagenListe: einbettbare Kartenliste der gespeicherten Vorlagen mit
- *    Verwalten (umbenennen, löschen), Teilen per QR und Einstieg in die
- *    Musterung. Wird direkt unter den Start-Buttons angezeigt.
+ *    Verwalten (umbenennen, löschen) und Einstieg in die Musterung. Wird direkt
+ *    unter den Start-Buttons angezeigt. Geteilt wird erst der fertige Bogen
+ *    (nach der Musterung in der Übersicht), nicht die ungemusterte Vorlage.
  *  - Musterung: die anwesende Mannschaft und die ausrückenden Fahrzeuge
  *    zusammenstellen (Variante A) → frischer Arbeitsbogen.
  */
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { StaerkeRolle, staerke, type Erfassungsbogen } from "../model";
 import {
   funktionsText,
   kennzeichenText,
   orgLabel,
-  qrVorlageErzeugen,
   vokabText,
   vokabularFuer,
-  type QrInfo,
 } from "./hilfen";
 import {
   vorlageEndgueltigLoeschen,
@@ -49,7 +48,6 @@ export function VorlagenListe(props: {
   onGeaendert: () => void;
 }) {
   const { vorlagen, onMustern, onGeaendert } = props;
-  const [qrFuer, setQrFuer] = useState<Vorlage | null>(null);
   const [zeigePapierkorb, setZeigePapierkorb] = useState(false);
   const papierkorb = vorlagenPapierkorb();
 
@@ -65,7 +63,6 @@ export function VorlagenListe(props: {
   // wiederherstellbar) — ein Fehltipp lässt sich rückgängig machen.
   function loeschen(v: Vorlage) {
     vorlageLoeschen(v.id);
-    if (qrFuer?.id === v.id) setQrFuer(null);
     onGeaendert();
   }
 
@@ -97,13 +94,9 @@ export function VorlagenListe(props: {
             Stärke {staerkeText(v.bogen)} · {v.bogen.personal.length} Personen · {v.bogen.fahrzeuge.length} Fahrzeuge
           </p>
           <div className="vorlage-aktionen">
-            <button type="button" onClick={() => setQrFuer(qrFuer?.id === v.id ? null : v)}>
-              {qrFuer?.id === v.id ? "QR schließen" : "Per QR teilen"}
-            </button>{" "}
             <button type="button" onClick={() => umbenennen(v)}>Umbenennen</button>{" "}
             <button type="button" className="entfernen" onClick={() => loeschen(v)}>Löschen</button>
           </div>
-          {qrFuer?.id === v.id && <VorlageQr vorlage={v} />}
         </section>
       ))}
       {papierkorb.length > 0 && (
@@ -134,34 +127,6 @@ export function VorlagenListe(props: {
           </section>
         ))}
     </>
-  );
-}
-
-function VorlageQr({ vorlage }: { vorlage: Vorlage }) {
-  const [qr, setQr] = useState<QrInfo | null>(null);
-  const [fehler, setFehler] = useState("");
-
-  useEffect(() => {
-    let aktiv = true;
-    setQr(null);
-    setFehler("");
-    qrVorlageErzeugen(vorlage.bogen)
-      .then((q) => aktiv && setQr(q))
-      .catch((e) => aktiv && setFehler(`QR-Code: ${e instanceof Error ? e.message : e}`));
-    return () => {
-      aktiv = false;
-    };
-  }, [vorlage]);
-
-  return (
-    <div className="qr-box">
-      <p className="hinweis">
-        Von einem Kameraden scannen lassen — der QR importiert die Vorlage in seine App,
-        ohne einen Einsatzbogen zu öffnen.
-      </p>
-      {fehler && <p className="fehler">{fehler}</p>}
-      {qr && <img src={qr.datenUrl} alt={`QR-Code der Vorlage ${vorlage.name}`} />}
-    </div>
   );
 }
 
