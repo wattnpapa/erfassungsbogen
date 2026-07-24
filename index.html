@@ -11,8 +11,10 @@
   <meta name="theme-color" content="#12275e" />
   <style>
     :root {
-      --blau: #12275e;
-      --blau-hell: #1d3d8f;
+      /* Akzentfarbe folgt der Organisation des offenen Bogens: org-farben.ts
+         setzt --org-akzent* auf <html>; ohne Bogen greift das THW-Blau. */
+      --blau: var(--org-akzent, #12275e);
+      --blau-hell: var(--org-akzent-hell, #1d3d8f);
       --rand: #c9cede;
       --grau: #f2f3f7;
       --fehler: #b3261e;
@@ -313,8 +315,8 @@
         --ios-text-2: rgba(235, 235, 245, 0.6);
         --ios-trenner: rgba(84, 84, 88, 0.6);
         --ios-fuellung: rgba(118, 118, 128, 0.24);
-        --ios-akzent: #a8bdf2;        /* aufgehelltes Markenblau, lesbar auf Dunkel */
-        --ios-akzent-flaeche: #3f63cc;
+        --ios-akzent: var(--org-akzent-dunkel, #a8bdf2);        /* aufgehellter Org-Ton, lesbar auf Dunkel */
+        --ios-akzent-flaeche: var(--org-akzent, #3f63cc);       /* Grundton als Füllung (weiße Schrift bleibt lesbar) */
         --ios-rot: #ff453a;
         --ios-warnung-text: #ffd60a;
         --ios-warnung-fond: rgba(255, 214, 10, 0.12);
@@ -558,8 +560,9 @@
     .platform-android {
       color-scheme: light dark;
       accent-color: var(--md-primary);
-      /* Tonpalette aus dem Markenblau #12275e (Seed), Light Scheme. */
-      --md-primary: #12275e;
+      /* Tonpalette aus dem Markenblau #12275e (Seed), Light Scheme.
+         --md-primary folgt der Organisation (org-farben.ts), Fallback THW-Blau. */
+      --md-primary: var(--org-akzent, #12275e);
       --md-on-primary: #ffffff;
       --md-secondary-container: #dae2f9;
       --md-on-secondary-container: #131c2b;
@@ -585,8 +588,8 @@
     @media (prefers-color-scheme: dark) {
       .platform-android {
         --erledigt: #6cd18a; /* aufgehelltes Grün, lesbar auf dunkler Fläche */
-        --md-primary: #b4c5ff;
-        --md-on-primary: #0e2361;
+        --md-primary: var(--org-akzent-dunkel, #b4c5ff);
+        --md-on-primary: var(--org-akzent-tief, #0e2361);
         --md-secondary-container: #3e4759;
         --md-on-secondary-container: #dae2f9;
         --md-surface: #121318;

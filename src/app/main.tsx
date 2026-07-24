@@ -43,6 +43,7 @@ import { QrScannerWeb } from "./qr-scanner-web";
 import { qrAusBild } from "./qr-bild";
 import { entwurfLaden, entwurfSpeichern, entwurfVerwerfen } from "./entwurf";
 import { wendeFeldModusAn } from "./feld-modus";
+import { wendeOrgAkzentAn } from "./org-farben";
 import { Fusszeile } from "./fusszeile";
 import { Aktualisierungshinweise } from "./aktualisierung";
 import {
@@ -137,6 +138,13 @@ function App() {
     if (bogen) entwurfSpeichern(bogen);
     else entwurfVerwerfen();
   }, [bogen]);
+
+  // Akzentfarbe der Oberfläche der Organisation des offenen Bogens anpassen —
+  // ohne Bogen (Startseite/Einsatzansicht) das Standard-Blau. So sieht man
+  // schon an der Farbe, in welcher Organisation man gerade unterwegs ist.
+  useEffect(() => {
+    wendeOrgAkzentAn(bogen?.einheit.organisation);
+  }, [bogen?.einheit.organisation]);
 
   function musterungFertig(neuerArbeitsbogen: Erfassungsbogen) {
     setBogen(neuerArbeitsbogen);
