@@ -130,6 +130,33 @@ Meldekopf-Schnellerfassung in ca. 2,9 × 2,9 cm.
 **Abwärtskompatibilität:** Schemaänderungen sind immer migrierbar — QR-Codes
 und JSON-Dateien älterer Schema-Versionen (ab v2) bleiben lesbar.
 
+## Vorbelegungen in Schritt 1 (Stärkeplätze & Fahrzeuge)
+
+Beim Anlegen einer Einheit lassen sich Personal-Sollplätze und Fahrzeuge
+vorbelegen. Es gibt zwei Quellen:
+
+- **THW (code-basiert, StAN-konform):** an den Einheitstyp gekoppelt, gepflegt in
+  [src/vokabulare/thw-stan-personal.ts](../src/vokabulare/thw-stan-personal.ts)
+  und [thw-stan-fahrzeuge.ts](../src/vokabulare/thw-stan-fahrzeuge.ts).
+- **Landesvorlagen (freitext-basiert, aus den Beispielbögen abgeleitet):** für
+  alle übrigen Organisationen außer Polizei, Bundespolizei und Bundeswehr.
+  Logik in [src/vokabulare/landesvorlagen.ts](../src/vokabulare/landesvorlagen.ts),
+  UI in `SchrittEinheit` ([src/app/schritte.tsx](../src/app/schritte.tsx)):
+  erst Bundesland, dann Einheit wählen → Einheitstyp, Stärkeplätze (Namen offen)
+  und Fahrzeuge (ohne Kennzeichen/Funkrufname) werden gesetzt.
+
+**Konvention – Landesvorlagen pflegen sich selbst:** Jeder Beispielbogen unter
+`examples/katastrophenschutz/<bundesland>/*.json` wird beim Build per
+`import.meta.glob` eingelesen und steht automatisch als Landesvorlage der darin
+angegebenen Organisation und des Bundeslands zur Verfügung. Ein **neues
+Bundesland** ist nur ein neuer Unterordner, eine **neue Einheit** nur eine
+weitere JSON-Datei – beide erscheinen ohne Codeänderung. Kommen also künftig
+weitere StAN-Unterlagen der Länder als Beispielbögen hinzu (erzeugt von
+`scripts/kats-*-beispielboegen.mts`), sind sie damit auch als Vorlage
+verfügbar. Der Anzeigename eines Bundeslands wird bei Bedarf in
+`BUNDESLAND_LABEL` (in `landesvorlagen.ts`) ergänzt; unbekannte Ordner werden
+sonst kapitalisiert angezeigt.
+
 ## Offene Punkte
 
 Siehe [TODO.md](TODO.md) (Gerätetests, App Store Connect,

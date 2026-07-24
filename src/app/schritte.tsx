@@ -38,6 +38,13 @@ import {
 import { stanFahrzeugVorbelegung } from "../vokabulare/thw-stan-fahrzeuge";
 import { stanPersonalVorbelegung } from "../vokabulare/thw-stan-personal";
 import {
+  bundeslandLabel,
+  hatLandesvorlagen,
+  landesvorlage,
+  landesvorlagenBundeslaender,
+  landesvorlagenEinheiten,
+} from "../vokabulare/landesvorlagen";
+import {
   FE_TEXT,
   ORG_OPTIONEN,
   QrSatz,
@@ -364,10 +371,42 @@ function OvNamensFeld(props: { name: string; tippen: (name: string) => void; ueb
 
 // --------------------------------------------------------- Schritt Einheit
 
+// Organisationen mit eigener oder ohne Vorbelegungslogik: THW hat die
+// code-basierte StAN-Vorbelegung, Polizei/Bundespolizei/Bundeswehr sollen keine
+// Landesvorlagen bekommen (bewusste Vorgabe).
+const OHNE_LANDESVORLAGEN: OrganisationsTyp[] = [
+  OrganisationsTyp.THW,
+  OrganisationsTyp.POLIZEI,
+  OrganisationsTyp.BUNDESPOLIZEI,
+  OrganisationsTyp.BUNDESWEHR,
+];
+
 export function SchrittEinheit({ bogen, aendern }: SchrittProps) {
   const e = bogen.einheit;
   const setE = (p: Partial<Einheit>) => aendern({ einheit: { ...e, ...p } });
   const ebenen = vokabularFuer(e.organisation, "ebene");
+
+  // Landesvorlagen (KatS-Beispielbögen der Bundesländer) für Schritt 1.
+  const [vorlageBundesland, setVorlageBundesland] = useState("");
+  const zeigeLandesvorlagen =
+    !OHNE_LANDESVORLAGEN.includes(e.organisation) && hatLandesvorlagen(e.organisation);
+  const vorlagenBundeslaender = zeigeLandesvorlagen ? landesvorlagenBundeslaender(e.organisation) : [];
+  // Nach Organisationswechsel kann das gemerkte Bundesland unpassend sein.
+  const aktBundesland = vorlagenBundeslaender.includes(vorlageBundesland) ? vorlageBundesland : "";
+  const vorlagenEinheiten = aktBundesland ? landesvorlagenEinheiten(e.organisation, aktBundesland) : [];
+
+  function landesvorlageAnwenden(name: string) {
+    const v = landesvorlage(e.organisation, aktBundesland, name);
+    if (!v) return;
+    const hatDaten = bogen.personal.length > 0 || bogen.fahrzeuge.length > 0;
+    if (hatDaten && !window.confirm("Personal und Fahrzeuge durch die Landesvorlage ersetzen?")) return;
+    aendern({
+      einheit: { ...e, einheitsTyp: v.einheitsTyp },
+      personalErfassung: PersonalErfassung.VOLLSTAENDIG,
+      personal: v.personal,
+      fahrzeuge: v.fahrzeuge,
+    });
+  }
 
   return (
     <section className="karte">
@@ -416,6 +455,39 @@ export function SchrittEinheit({ bogen, aendern }: SchrittProps) {
           />
         </Feld>
       </div>
+
+      {zeigeLandesvorlagen && (
+        <>
+          <div className="zeile">
+            <Feld titel="Landesvorlage – Bundesland">
+              <select value={aktBundesland} onChange={(ev) => setVorlageBundesland(ev.target.value)}>
+                <option value="">– Bundesland wählen –</option>
+                {vorlagenBundeslaender.map((b) => (
+                  <option key={b} value={b}>{bundeslandLabel(b)}</option>
+                ))}
+              </select>
+            </Feld>
+            <Feld titel="Landesvorlage – Einheit">
+              <select
+                value=""
+                disabled={!aktBundesland}
+                onChange={(ev) => {
+                  if (ev.target.value) landesvorlageAnwenden(ev.target.value);
+                }}
+              >
+                <option value="">{aktBundesland ? "– Einheit wählen –" : "erst Bundesland wählen"}</option>
+                {vorlagenEinheiten.map((n) => (
+                  <option key={n} value={n}>{n}</option>
+                ))}
+              </select>
+            </Feld>
+          </div>
+          <p className="hinweis">
+            Nach dem Vorbild der Katastrophenschutz-Stärke des Bundeslands: Einheitstyp,
+            Stärkeplätze (Namen offen) und Fahrzeuge werden vorbelegt und lassen sich anschließend anpassen.
+          </p>
+        </>
+      )}
 
       <h3>Zugehörigkeit / Kontaktstellen</h3>
       <p className="hinweis">
