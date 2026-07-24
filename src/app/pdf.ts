@@ -65,6 +65,16 @@ export async function pdfErzeugen(b: Erfassungsbogen, name?: string): Promise<vo
 }
 
 /**
+ * Bogen als PDF-Daten-URL — für die eingebettete Vorschau in der Übersicht
+ * (Browser/Desktop; die native App zeigt PDFs übers Share-Sheet an).
+ */
+export async function pdfDatenUrl(b: Erfassungsbogen): Promise<string> {
+  const qr = await qrErzeugen(b);
+  const dd = pdfDokument(b, qr);
+  return pdfMake.createPdf(dd).getDataUrl();
+}
+
+/**
  * Sammel-PDF eines Einsatzes: alle übergebenen Bögen in einer PDF (je Bogen
  * die vollständigen Seiten inkl. QR), plus alle Bögen als eingebettetes JSON.
  */

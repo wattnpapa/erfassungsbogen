@@ -342,28 +342,47 @@ export function fahrzeugHinweise(b: Erfassungsbogen): string[] {
 }
 
 /**
+ * Ein offener Punkt der Plausibilitäts-/Vollständigkeitsprüfung: der Hinweis
+ * plus der Assistenten-Schritt (0-basiert), auf dem er sich beheben lässt —
+ * die Übersicht macht daraus eine klickbare Checkliste.
+ */
+export interface Pruefpunkt {
+  text: string;
+  schritt: number;
+}
+
+// Schritt-Indizes des Assistenten (siehe SCHRITTE in main.tsx).
+const S_EINHEIT = 0;
+const S_EINSATZ = 1;
+const S_PERSONAL = 2;
+const S_FAHRZEUGE = 3;
+const S_SOFORTBEDARF = 4;
+
+/**
  * Nicht-blockierende Plausibilitätshinweise für Stärkemeldung, Unterbringung
- * und Einsatzzeitraum. Leeres Array = alles plausibel. Die Fahrzeug-Hinweise
- * hängen standardmäßig mit an (für die Gesamtübersicht); auf der Personalseite
+ * und Einsatzzeitraum — je Punkt mit dem Schritt, auf dem er sich beheben
+ * lässt. Leeres Array = alles plausibel. Die Fahrzeug-Hinweise hängen
+ * standardmäßig mit an (für die Gesamtübersicht); auf der Personalseite
  * werden sie über `mitFahrzeugen = false` weggelassen.
  */
-export function plausibilitaet(b: Erfassungsbogen, mitFahrzeugen = true): string[] {
-  const hinweise: string[] = [];
+export function pruefpunkte(b: Erfassungsbogen, mitFahrzeugen = true): Pruefpunkt[] {
+  const hinweise: Pruefpunkt[] = [];
   const s = staerke(b);
   const mwd = unterbringungMWD(b);
 
   // Ohne den Namen der untersten Ebene bleibt die Einheit auf dem Bogen
   // namenlos (nur Organisation + Einheitstyp) und der Funkrufname ortlos.
   if (!einheitOrt(b.einheit) && b.einheit.standortRef == null) {
-    hinweise.push("Zugehörigkeit: Der Name der eigenen Einheit (unterste Ebene) fehlt.");
+    hinweise.push({ text: "Zugehörigkeit: Der Name der eigenen Einheit (unterste Ebene) fehlt.", schritt: S_EINHEIT });
   }
   if (s.gesamt === 0) {
-    hinweise.push("Stärke ist 0 — es ist noch kein Personal erfasst.");
+    hinweise.push({ text: "Stärke ist 0 — es ist noch kein Personal erfasst.", schritt: S_PERSONAL });
   }
   if (s.gesamt !== s.fuehrer + s.unterfuehrer + s.mannschaft) {
-    hinweise.push(
-      `Stärke: ${s.fuehrer} + ${s.unterfuehrer} + ${s.mannschaft} ergibt nicht die Gesamtstärke ${s.gesamt}.`,
-    );
+    hinweise.push({
+      text: `Stärke: ${s.fuehrer} + ${s.unterfuehrer} + ${s.mannschaft} ergibt nicht die Gesamtstärke ${s.gesamt}.`,
+      schritt: S_PERSONAL,
+    });
   }
   // Unterbringung nur prüfen, wenn sie belastbar ist: bei vollständiger
   // Personalerfassung abgeleitet, im Meldekopf-Modus nur wenn manuell erfasst.
@@ -371,31 +390,37 @@ export function plausibilitaet(b: Erfassungsbogen, mitFahrzeugen = true): string
     b.personalErfassung === PersonalErfassung.VOLLSTAENDIG || b.unterbringungManuell != null;
   const mwdSumme = mwd.m + mwd.w + mwd.d;
   if (mwdBelastbar && s.gesamt > 0 && mwdSumme !== s.gesamt) {
-    hinweise.push(
-      `Unterbringung: M ${mwd.m} + W ${mwd.w} + D ${mwd.d} = ${mwdSumme} weicht von der Gesamtstärke ${s.gesamt} ab.`,
-    );
+    hinweise.push({
+      text: `Unterbringung: M ${mwd.m} + W ${mwd.w} + D ${mwd.d} = ${mwdSumme} weicht von der Gesamtstärke ${s.gesamt} ab.`,
+      schritt: S_PERSONAL,
+    });
   }
   if (
     b.personalErfassung === PersonalErfassung.NUR_STAERKE &&
     b.staerkeManuell &&
     b.personal.length > b.staerkeManuell.gesamt
   ) {
-    hinweise.push(
-      `Es sind ${b.personal.length} Ansprechpartner erfasst, die Gesamtstärke ist aber nur ${b.staerkeManuell.gesamt}.`,
-    );
+    hinweise.push({
+      text: `Es sind ${b.personal.length} Ansprechpartner erfasst, die Gesamtstärke ist aber nur ${b.staerkeManuell.gesamt}.`,
+      schritt: S_PERSONAL,
+    });
   }
   if (b.einsatz.zeitraumBis < b.einsatz.zeitraumVon) {
-    hinweise.push("Einsatzzeitraum: „bis“ liegt vor „von“.");
+    hinweise.push({ text: "Einsatzzeitraum: „bis“ liegt vor „von“.", schritt: S_EINSATZ });
   }
   if (b.sofortbedarf && s.gesamt > 0 && b.sofortbedarf.verpflegungPersonen > s.gesamt) {
-    hinweise.push(
-      `Verpflegung für ${b.sofortbedarf.verpflegungPersonen} Personen angefordert, die Gesamtstärke ist aber ${s.gesamt}.`,
-    );
+    hinweise.push({
+      text: `Verpflegung für ${b.sofortbedarf.verpflegungPersonen} Personen angefordert, die Gesamtstärke ist aber ${s.gesamt}.`,
+      schritt: S_SOFORTBEDARF,
+    });
   }
   if (b.sofortbedarf) {
     const vp = verpflegung(b);
     if (vp.vegetarisch + vp.vegan > b.sofortbedarf.verpflegungPersonen) {
-      hinweise.push("Sofortbedarf: mehr Vegetarier/Veganer erfasst als Personen mit Verpflegungsbedarf.");
+      hinweise.push({
+        text: "Sofortbedarf: mehr Vegetarier/Veganer erfasst als Personen mit Verpflegungsbedarf.",
+        schritt: S_SOFORTBEDARF,
+      });
     }
   }
   // Manuell erfasste Verpflegungs-Aufteilung (Meldekopf): veg + vegan dürfen die
@@ -403,29 +428,36 @@ export function plausibilitaet(b: Erfassungsbogen, mitFahrzeugen = true): string
   if (b.verpflegungManuell && s.gesamt > 0) {
     const vp = verpflegung(b);
     if (vp.vegetarisch + vp.vegan > s.gesamt) {
-      hinweise.push(
-        `Verpflegung: ${vp.vegetarisch} vegetarisch + ${vp.vegan} vegan übersteigen die Gesamtstärke ${s.gesamt}.`,
-      );
+      hinweise.push({
+        text: `Verpflegung: ${vp.vegetarisch} vegetarisch + ${vp.vegan} vegan übersteigen die Gesamtstärke ${s.gesamt}.`,
+        schritt: S_PERSONAL,
+      });
     }
   }
   // Vollständigkeit für die Weitergabe: genau die Angaben, wegen derer der
   // Meldekopf sonst zurückfragen muss (Auftrag, Erreichbarkeit). Die fehlenden
   // Kennzeichen prüft fahrzeugHinweise() auf dem Fahrzeug-Schritt.
   if (!b.einsatz.ortAuftrag.trim()) {
-    hinweise.push("Ort/Auftrag ist noch leer.");
+    hinweise.push({ text: "Ort/Auftrag ist noch leer.", schritt: S_EINSATZ });
   }
   const telefonErfasst = b.personal.some((p) =>
     p.kontakte.some((k) => k.art !== KontaktArt.EMAIL && (k.wert ?? "").trim() !== ""),
   );
   if (s.gesamt > 0 && !telefonErfasst) {
-    hinweise.push(
-      "Keine telefonische Erreichbarkeit erfasst — mindestens eine Führungskraft sollte eine Nummer angeben.",
-    );
+    hinweise.push({
+      text: "Keine telefonische Erreichbarkeit erfasst — mindestens eine Führungskraft sollte eine Nummer angeben.",
+      schritt: S_PERSONAL,
+    });
   }
   if (mitFahrzeugen) {
-    hinweise.push(...fahrzeugHinweise(b));
+    hinweise.push(...fahrzeugHinweise(b).map((text) => ({ text, schritt: S_FAHRZEUGE })));
   }
   return hinweise;
+}
+
+/** Nur die Hinweistexte — für Stellen, die keinen Sprung zum Schritt brauchen. */
+export function plausibilitaet(b: Erfassungsbogen, mitFahrzeugen = true): string[] {
+  return pruefpunkte(b, mitFahrzeugen).map((p) => p.text);
 }
 
 // ------------------------------------------------- Fortschritt je Schritt

@@ -46,6 +46,7 @@ import {
   type MeldeEintrag,
 } from "./einsaetze";
 import { aggregiere, aggregiereNachZug, type EinsatzSummen } from "./auswertung";
+import { debugAktiv } from "./debug-plattform";
 
 const ART_LABEL: Record<EinsatzArt, string> = {
   [EinsatzArt.EINSATZ]: "Einsatz",
@@ -276,7 +277,11 @@ export function EinsatzDetail(props: {
       <div className="vorlage-aktionen" style={{ marginBottom: "0.5rem" }}>
         <button type="button" onClick={onSammelPdf}>Sammel-PDF (alle Bögen)</button>{" "}
         <button type="button" onClick={onCsvExport}>Als CSV</button>{" "}
-        <button type="button" onClick={onExport}>Als Datei exportieren</button>
+        {/* Roh-JSON nur im Debug-Modus: fürs Publikum trägt die Sammel-PDF die
+            Bögen als eingebettetes JSON — ein separater Export verwirrt nur. */}
+        {debugAktiv() && (
+          <button type="button" onClick={onExport}>Als Datei exportieren (Debug)</button>
+        )}
       </div>
 
       <section className="karte">

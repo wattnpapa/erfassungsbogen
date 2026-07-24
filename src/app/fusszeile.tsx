@@ -9,7 +9,7 @@ import { istNativ, textTeilen } from "./nativ";
 import { migriereBogen } from "./hilfen";
 import { pdfErzeugen } from "./pdf";
 import { nutzungsKanal, statistikAbgewaehlt, statistikAbwaehlen } from "./statistik";
-import { feldModusAktiv, feldModusSetzen } from "./feld-modus";
+import { AnzeigeSchalter } from "./anzeige-schalter";
 import { sicherungEinspielen, sicherungErstellen } from "./sicherung";
 
 const KONTAKT = "johannes.rudolph@thw-oldenburg.de";
@@ -126,7 +126,6 @@ export function Fusszeile() {
   const [beispielLaeuft, setBeispielLaeuft] = useState("");
   const [beispielFehler, setBeispielFehler] = useState("");
   const sicherung = useRef<HTMLDialogElement>(null);
-  const [feldModus, setFeldModus] = useState(() => feldModusAktiv());
   const [sicherungFehler, setSicherungFehler] = useState("");
   const [statistikAus, setStatistikAus] = useState(() => statistikAbgewaehlt());
 
@@ -134,12 +133,6 @@ export function Fusszeile() {
     const aus = ereignis.target.checked;
     setStatistikAus(aus);
     statistikAbwaehlen(aus);
-  }
-
-  function feldModusUmschalten() {
-    const an = !feldModus;
-    setFeldModus(an);
-    feldModusSetzen(an);
   }
 
   /** Beispielbogen anfordern: JSON laden, PDF erzeugen, Fehler im Dialog zeigen. */
@@ -195,14 +188,7 @@ export function Fusszeile() {
         <button className="link" onClick={() => ueber.current?.showModal()}>Johannes Rudolph</button>
       </span>
       <span className="fusslinks">
-        <button
-          className="link"
-          onClick={feldModusUmschalten}
-          aria-pressed={feldModus}
-          title="Große Tippziele und hoher Kontrast für den Einsatz draußen"
-        >
-          {feldModus ? "✓ Feld-Modus" : "Feld-Modus"}
-        </button>
+        <AnzeigeSchalter />
         <button className="link" onClick={() => { setSicherungFehler(""); sicherung.current?.showModal(); }}>Datensicherung</button>
         <button
           className="link"

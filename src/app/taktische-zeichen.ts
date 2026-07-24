@@ -15,7 +15,7 @@
 
 import { erzeugeTaktischesZeichen } from "taktische-zeichen-core";
 import type { GrundzeichenId, OrganisationId } from "taktische-zeichen-core";
-import type { Fahrzeug } from "../model";
+import type { Einheit, Fahrzeug } from "../model";
 import { OrganisationsTyp } from "../model";
 import { vokabText, vokabularFuer } from "./hilfen";
 
@@ -84,4 +84,27 @@ export function fahrzeugSymbolSvg(f: Fahrzeug, org: OrganisationsTyp): string {
     skipFontRegistration: true,
   });
   return zeichen.toString().replace(/Roboto Slab/g, "Roboto");
+}
+
+/**
+ * Taktisches Zeichen der Einheit selbst (taktische Formation, DV 102) — der
+ * „Avatar" der Einheit in der Oberfläche. Beschriftet mit dem Kurzzeichen des
+ * Einheitstyps, sofern es kurz genug ist; die Organisationsfarbe kommt aus
+ * der Bibliothek.
+ */
+export function einheitSymbolSvg(e: Einheit): string {
+  const kurz = vokabText(e.einheitsTyp, vokabularFuer(e.organisation, "einheitstyp"), "kurz");
+  const label = kurz.trim();
+  const zeichen = erzeugeTaktischesZeichen({
+    grundzeichen: "taktische-formation",
+    organisation: organisationId(e.organisation),
+    text: label.length > 0 && label.length <= 10 ? label : undefined,
+    skipFontRegistration: true,
+  });
+  return zeichen.toString();
+}
+
+/** SVG-String → data:-URL für <img>-Anzeige in der Oberfläche. */
+export function svgDataUrl(svg: string): string {
+  return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
 }

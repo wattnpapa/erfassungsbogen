@@ -3,7 +3,7 @@
  * Schritte: Einheit → Einsatz → Personal → Fahrzeuge → Sofortbedarf → Übersicht.
  */
 
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type KeyboardEvent as ReactKeyboardEvent, type ReactNode } from "react";
 import {
   Erfassungsbogen,
   Einheit,
@@ -28,6 +28,7 @@ import {
   zeitpunktZuIso,
 } from "../model";
 import { vorlageAnlegen } from "./vorlagen";
+import { parseNamen } from "./personal-schnell";
 import type { VokabularEintrag } from "../vokabulare/thw";
 import { THW_ORTSVERBAENDE, type ThwOrtsverband } from "../vokabulare/thw-ov";
 import {
@@ -62,11 +63,15 @@ import {
   neuesFahrzeug,
   orgLabel,
   plausibilitaet,
+  pruefpunkte,
   qrErzeugen,
   vokabText,
   vokabularFuer,
+  type Pruefpunkt,
 } from "./hilfen";
-import { pdfErzeugen } from "./pdf";
+import { pdfDatenUrl, pdfErzeugen } from "./pdf";
+import { debugAktiv } from "./debug-plattform";
+import { einheitSymbolSvg, fahrzeugSymbolSvg, svgDataUrl } from "./taktische-zeichen";
 import { signaturLabel, type SignaturStatus } from "../signatur";
 import { geraeteKurzform, geraeteOeffentlichHex } from "./geraete-schluessel";
 import { istNativ, linkTeilen, textTeilen } from "./nativ";
@@ -177,6 +182,15 @@ const zahl = (s: string): number => {
   return Number.isFinite(n) && n >= 0 ? n : 0;
 };
 
+// Die Stärke-Notation „x / x / x / x" ist BOS-Konvention, aber nicht jedem
+// geläufig — Tooltip/aria erklären sie, ohne die Anzeige aufzublähen.
+const STAERKE_LEGENDE = "Führer / Unterführer / Mannschaft / Gesamt";
+const MWD_LEGENDE = "Unterbringungsplätze: männlich / weiblich / divers";
+
+function staerkeVorlesen(s: { fuehrer: number; unterfuehrer: number; mannschaft: number; gesamt: number }): string {
+  return `${s.fuehrer} Führer, ${s.unterfuehrer} Unterführer, ${s.mannschaft} Mannschaft, ${s.gesamt} gesamt`;
+}
+
 /**
  * Großer, touch-freundlicher Zähler (− / Zahl / +) für die Erfassung ohne
  * Tastatur am Tablet. Werte bleiben ≥ min; direkte Zahleneingabe bleibt möglich.
@@ -220,6 +234,36 @@ function Hinweise({ hinweise }: { hinweise: string[] }) {
         <p key={h} className="warnung">⚠ {h}</p>
       ))}
     </>
+  );
+}
+
+/**
+ * Vollständigkeits-Checkliste der Übersicht: bündelt alle offenen Punkte in
+ * einer Box; jeder Punkt springt direkt zum Schritt, auf dem er sich beheben
+ * lässt. Ist alles vollständig, gibt es eine kurze grüne Bestätigung.
+ */
+function Vollstaendigkeit(props: { punkte: Pruefpunkt[]; geheZu: (schritt: number) => void }) {
+  const { punkte, geheZu } = props;
+  if (punkte.length === 0) {
+    return (
+      <p className="vollstaendig-ok" role="status">✓ Alle Angaben vollständig und plausibel.</p>
+    );
+  }
+  return (
+    <div className="vollstaendigkeit" role="status">
+      <p className="vollstaendigkeit-titel">
+        ⚠ {punkte.length === 1 ? "1 offener Punkt" : `${punkte.length} offene Punkte`} für die Weitergabe — antippen zum Beheben:
+      </p>
+      <ul>
+        {punkte.map((p) => (
+          <li key={p.text}>
+            <button type="button" className="link" onClick={() => geheZu(p.schritt)}>
+              {p.text}
+            </button>
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }
 
@@ -762,9 +806,112 @@ function PersonKarte(props: {
   );
 }
 
+/**
+ * Schnelleingabe-Tabelle: eine Zeile je Person mit den Kernfeldern. Enter in
+ * der letzten Zeile legt die nächste Person an (Fokus springt mit) — für den
+ * Zugführer, der 12 Namen hintereinander erfasst, ohne 12 Karten aufzuklappen.
+ * Details (Funktionen, Kontakte …) bleiben in der Kartenansicht.
+ */
+function PersonalSchnellTabelle(props: {
+  personal: Person[];
+  aendern: (p: Person[]) => void;
+  fokusNeue: boolean;
+  aufNeueFokus: () => void;
+}) {
+  const { personal, aendern, fokusNeue, aufNeueFokus } = props;
+  const set = (i: number, patch: Partial<Person>) =>
+    aendern(personal.map((p, j) => (j === i ? { ...p, ...patch } : p)));
+
+  function enterWeiter(e: ReactKeyboardEvent, i: number) {
+    if (e.key !== "Enter") return;
+    e.preventDefault();
+    if (i === personal.length - 1) {
+      aufNeueFokus();
+      aendern([...personal, neuePerson()]);
+      return;
+    }
+    // Nicht letzte Zeile: in derselben Spalte eine Zeile nach unten.
+    const zelle = (e.target as HTMLElement).closest("td");
+    const zeile = zelle?.parentElement;
+    if (!zelle || !zeile) return;
+    const spalte = Array.from(zeile.children).indexOf(zelle);
+    const naechste = zeile.nextElementSibling?.children[spalte]?.querySelector<HTMLElement>("input, select");
+    naechste?.focus();
+  }
+
+  return (
+    <div className="tabellen-scroll">
+      <table className="uebersicht schnell-tabelle">
+        <thead>
+          <tr><th>Vorname</th><th>Nachname</th><th>Stärkerolle</th><th>Geschlecht</th><th aria-label="Entfernen" /></tr>
+        </thead>
+        <tbody>
+          {personal.map((p, i) => (
+            <tr key={i}>
+              <td>
+                <input
+                  value={p.vorname}
+                  autoFocus={fokusNeue && i === personal.length - 1}
+                  onChange={(e) => set(i, { vorname: e.target.value })}
+                  onKeyDown={(e) => enterWeiter(e, i)}
+                />
+              </td>
+              <td>
+                <input
+                  value={p.nachname}
+                  onChange={(e) => set(i, { nachname: e.target.value })}
+                  onKeyDown={(e) => enterWeiter(e, i)}
+                />
+              </td>
+              <td>
+                <select value={p.staerkeRolle} onChange={(e) => set(i, { staerkeRolle: Number(e.target.value) })}>
+                  <option value={StaerkeRolle.FUEHRER}>Führer/in</option>
+                  <option value={StaerkeRolle.UNTERFUEHRER}>Unterführer/in</option>
+                  <option value={StaerkeRolle.MANNSCHAFT}>Mannschaft</option>
+                </select>
+              </td>
+              <td>
+                <select value={p.geschlecht} onChange={(e) => set(i, { geschlecht: Number(e.target.value) })}>
+                  <option value={Geschlecht.M}>M</option>
+                  <option value={Geschlecht.W}>W</option>
+                  <option value={Geschlecht.D}>D</option>
+                </select>
+              </td>
+              <td>
+                <button
+                  type="button"
+                  aria-label={`Person ${i + 1} entfernen`}
+                  onClick={() => aendern(personal.filter((_, j) => j !== i))}
+                >
+                  ✕
+                </button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
 export function SchrittPersonal({ bogen, aendern }: SchrittProps) {
   const nurStaerke = bogen.personalErfassung === PersonalErfassung.NUR_STAERKE;
   const vorlage = stanPersonalVorbelegung(bogen.einheit.organisation, bogen.einheit.einheitsTyp);
+  // Schnelleingabe: Tabellenansicht statt Detail-Karten; `fokusNeue` lässt den
+  // Fokus beim Anlegen per Enter in die neue Zeile springen.
+  const [schnell, setSchnell] = useState(false);
+  const [fokusNeue, setFokusNeue] = useState(false);
+  const namenDialog = useRef<HTMLDialogElement>(null);
+  const [namenText, setNamenText] = useState("");
+  const namenVorschau = parseNamen(namenText);
+
+  function namenUebernehmen() {
+    if (namenVorschau.length === 0) return;
+    aendern({ personal: [...bogen.personal, ...namenVorschau.map((n) => ({ ...neuePerson(), ...n }))] });
+    setSchnell(true); // die frisch eingefügten Namen direkt als Tabelle zeigen
+    setNamenText("");
+    namenDialog.current?.close();
+  }
   const s = staerke(bogen);
   const mwd = unterbringungMWD(bogen);
   const sm = bogen.staerkeManuell ?? { fuehrer: 0, unterfuehrer: 0, mannschaft: 0, gesamt: 0 };
@@ -854,7 +1001,13 @@ export function SchrittPersonal({ bogen, aendern }: SchrittProps) {
       )}
       {!nurStaerke && (
         <p className="hinweis">
-          Stärke (abgeleitet): <strong>{s.fuehrer} / {s.unterfuehrer} / {s.mannschaft} / {s.gesamt}</strong> · Unterbringung: M {mwd.m} / W {mwd.w} / D {mwd.d}
+          Stärke (abgeleitet):{" "}
+          <strong title={STAERKE_LEGENDE} aria-label={`Stärke: ${staerkeVorlesen(s)}`}>
+            {s.fuehrer} / {s.unterfuehrer} / {s.mannschaft} / {s.gesamt}
+          </strong>
+          {" "}<span className="legende">({STAERKE_LEGENDE})</span>
+          {" · "}
+          <span title={MWD_LEGENDE}>Unterbringung: M {mwd.m} / W {mwd.w} / D {mwd.d}</span>
         </p>
       )}
 
@@ -874,18 +1027,79 @@ export function SchrittPersonal({ bogen, aendern }: SchrittProps) {
           </button>
         </p>
       )}
-      {bogen.personal.map((p, i) => (
-        <PersonKarte
-          key={i}
-          person={p}
-          org={bogen.einheit.organisation}
-          aendern={(np) => aendern({ personal: bogen.personal.map((x, j) => (j === i ? np : x)) })}
-          entfernen={() => aendern({ personal: bogen.personal.filter((_, j) => j !== i) })}
-        />
-      ))}
-      <button type="button" className="primaer" onClick={() => aendern({ personal: [...bogen.personal, neuePerson()] })}>
+      {/* Ansichtswahl: Detail-Karten (alle Felder) oder Schnelleingabe-Tabelle
+          (viele Personen zügig erfassen); dazu Mehrzeilen-Import fertiger Listen. */}
+      {!nurStaerke && (
+        <p className="ansicht-wahl">
+          <span className="inline">
+            <input type="radio" name="pansicht" checked={!schnell} onChange={() => { setSchnell(false); setFokusNeue(false); }} />
+            Detail-Karten
+          </span>
+          <span className="inline">
+            <input type="radio" name="pansicht" checked={schnell} onChange={() => { setSchnell(true); setFokusNeue(false); }} />
+            Schnelleingabe (Tabelle)
+          </span>
+          <button type="button" onClick={() => { setNamenText(""); namenDialog.current?.showModal(); }}>
+            Namen einfügen…
+          </button>
+        </p>
+      )}
+      {!nurStaerke && schnell ? (
+        bogen.personal.length > 0 && (
+          <PersonalSchnellTabelle
+            personal={bogen.personal}
+            aendern={(p) => aendern({ personal: p })}
+            fokusNeue={fokusNeue}
+            aufNeueFokus={() => setFokusNeue(true)}
+          />
+        )
+      ) : (
+        bogen.personal.map((p, i) => (
+          <PersonKarte
+            key={i}
+            person={p}
+            org={bogen.einheit.organisation}
+            aendern={(np) => aendern({ personal: bogen.personal.map((x, j) => (j === i ? np : x)) })}
+            entfernen={() => aendern({ personal: bogen.personal.filter((_, j) => j !== i) })}
+          />
+        ))
+      )}
+      <button
+        type="button"
+        className="primaer"
+        onClick={() => {
+          setFokusNeue(true);
+          aendern({ personal: [...bogen.personal, neuePerson()] });
+        }}
+      >
         + Person hinzufügen
       </button>
+
+      <dialog ref={namenDialog} aria-label="Namen einfügen">
+        <div className="kopfzeile">
+          <h2>Namen einfügen</h2>
+          <button type="button" onClick={() => namenDialog.current?.close()}>Schließen</button>
+        </div>
+        <p className="hinweis">
+          Eine Person je Zeile — als „Nachname, Vorname" oder „Vorname Nachname".
+          Praktisch, wenn die Liste schon existiert (Nachricht, Tabelle, Zettel):
+          einfach hier hineinkopieren.
+        </p>
+        <textarea
+          rows={8}
+          value={namenText}
+          onChange={(e) => setNamenText(e.target.value)}
+          placeholder={"Muster, Max\nErika Musterfrau\n…"}
+          style={{ width: "100%" }}
+        />
+        <p>
+          <button type="button" className="primaer" disabled={namenVorschau.length === 0} onClick={namenUebernehmen}>
+            {namenVorschau.length === 0
+              ? "Übernehmen"
+              : `${namenVorschau.length} ${namenVorschau.length === 1 ? "Person" : "Personen"} übernehmen`}
+          </button>
+        </p>
+      </dialog>
     </section>
   );
 }
@@ -903,6 +1117,8 @@ function FahrzeugKarte(props: {
   return (
     <div className="karte">
       <button type="button" className="entfernen" onClick={entfernen}>Fahrzeug entfernen</button>
+      {/* Taktisches Zeichen (DV 102) wie auf dem PDF — bestätigt die Typauswahl auf einen Blick. */}
+      <img className="fahrzeug-symbol" src={svgDataUrl(fahrzeugSymbolSvg(f, org))} alt="" aria-hidden="true" />
       <div className="zeile">
         <Feld titel="Fahrzeugtyp">
           <VokabAuswahl wert={f.typ} aendern={(v) => set({ typ: v })} tabelle={vokabularFuer(org, "fahrzeug")} platzhalter="z. B. MzKW, LF 20" />
@@ -1114,8 +1330,14 @@ export function Uebersicht(props: {
   // Segmentierung blättert `vollbildTeil` durch die Teile.
   const [vollbild, setVollbild] = useState(false);
   const [vollbildTeil, setVollbildTeil] = useState(0);
+  // „Bogen übergeben": ein Dialog bündelt alle Transportwege (QR/PDF/Link/Datei).
+  const teilenDialog = useRef<HTMLDialogElement>(null);
   const [schluesselKurz, setSchluesselKurz] = useState<string | null>(null);
   const [linkKopiert, setLinkKopiert] = useState(false);
+  // Eingebettete PDF-Vorschau (nur Browser/Desktop): auf Wunsch erzeugt,
+  // verworfen sobald der Bogen sich ändert (dann wäre sie veraltet).
+  const [vorschauUrl, setVorschauUrl] = useState<string | null>(null);
+  const [vorschauLaeuft, setVorschauLaeuft] = useState(false);
   const org = bogen.einheit.organisation;
   const s = staerke(bogen);
   const mwd = unterbringungMWD(bogen);
@@ -1123,6 +1345,7 @@ export function Uebersicht(props: {
 
   useEffect(() => {
     let aktiv = true;
+    setVorschauUrl(null); // Bogen geändert → alte PDF-Vorschau wäre veraltet
     (async () => {
       try {
         const q = await qrErzeugen(bogen); // signiert immer mit dem Geräteschlüssel
@@ -1136,6 +1359,44 @@ export function Uebersicht(props: {
       aktiv = false;
     };
   }, [bogen]);
+
+  // Vollbild-QR = Vorzeige-Moment: der Bildschirm darf dabei nicht ausgehen.
+  // Wake Lock anfordern, nach Tab-Wechsel erneut (das System gibt ihn dann frei);
+  // ohne Browser-Unterstützung passiert einfach nichts.
+  useEffect(() => {
+    if (!vollbild) return;
+    let lock: WakeLockSentinel | null = null;
+    let aktiv = true;
+    const anfordern = async () => {
+      try {
+        lock = (await navigator.wakeLock?.request("screen")) ?? null;
+      } catch {
+        /* nicht verfügbar (z. B. Energiesparmodus) — kein Beinbruch */
+      }
+    };
+    void anfordern();
+    const sichtbar = () => {
+      if (aktiv && document.visibilityState === "visible") void anfordern();
+    };
+    document.addEventListener("visibilitychange", sichtbar);
+    return () => {
+      aktiv = false;
+      document.removeEventListener("visibilitychange", sichtbar);
+      lock?.release().catch(() => {});
+    };
+  }, [vollbild]);
+
+  async function vorschauLaden() {
+    setVorschauLaeuft(true);
+    setFehler("");
+    try {
+      setVorschauUrl(await pdfDatenUrl(bogen));
+    } catch (e) {
+      setFehler(`PDF-Vorschau: ${e instanceof Error ? e.message : e}`);
+    } finally {
+      setVorschauLaeuft(false);
+    }
+  }
 
   async function schluesselTeilen() {
     const hex = await geraeteOeffentlichHex();
@@ -1202,18 +1463,16 @@ export function Uebersicht(props: {
       <section className="karte">
         <div className="kopfzeile">
           <h2>Gesamtübersicht</h2>
-          <span>
+          <span className="uebersicht-aktionen">
             {props.sammelAktion && (
               <button type="button" className="primaer" onClick={props.sammelAktion.onUebernehmen}>
                 {props.sammelAktion.label}
               </button>
             )}{" "}
-            <button type="button" className={props.sammelAktion ? "" : "primaer"} onClick={pdf} disabled={pdfLaeuft}>
-              {pdfLaeuft ? "PDF wird erstellt…" : "PDF erzeugen"}
-            </button>{" "}
-            <button type="button" onClick={() => bogenSpeichern(bogen)}>Als Datei speichern</button>{" "}
-            <button type="button" onClick={bogenLinkTeilen} disabled={!qr} title="Öffnet beim Antippen den kompletten Bogen — derselbe Link wie im QR-Code">
-              {linkKopiert ? "Link kopiert ✓" : "Link teilen"}
+            {/* Ein Weg zum Ziel: PDF/QR/Link/Datei sind vier Transportarten
+                desselben Bogens — der Dialog bündelt sie mit Situationshilfe. */}
+            <button type="button" className={props.sammelAktion ? "" : "primaer"} onClick={() => teilenDialog.current?.showModal()}>
+              Bogen übergeben…
             </button>{" "}
             <button type="button" onClick={alsVorlageSpeichern}>Als Vorlage speichern</button>{" "}
             <button type="button" onClick={() => window.confirm("Aktuellen Bogen verwerfen?") && neu()}>Neuer Bogen</button>
@@ -1228,16 +1487,29 @@ export function Uebersicht(props: {
               : " — die Daten passen nicht zur Signatur."}
           </p>
         )}
-        <Hinweise hinweise={plausibilitaet(bogen)} />
-        <p>
-          <strong>{orgLabel(org)}</strong>
-          {" · "}{vokabText(bogen.einheit.einheitsTyp, vokabularFuer(org, "einheitstyp"), "name") || "(Einheitstyp offen)"}
-          {" · "}{einheitOrt(bogen.einheit) || "(Standort offen)"}
-        </p>
-        <p>
-          Stärke: <strong>{s.fuehrer} / {s.unterfuehrer} / {s.mannschaft} / {s.gesamt}</strong>
-          {" · "}Unterbringung: M {mwd.m} / W {mwd.w} / D {mwd.d}
-        </p>
+        <Vollstaendigkeit punkte={pruefpunkte(bogen)} geheZu={geheZu} />
+        <div className="einheit-kopf">
+          <img
+            className="einheit-avatar gross"
+            src={svgDataUrl(einheitSymbolSvg(bogen.einheit))}
+            alt="Taktisches Zeichen der Einheit"
+          />
+          <div>
+            <p>
+              <strong>{orgLabel(org)}</strong>
+              {" · "}{vokabText(bogen.einheit.einheitsTyp, vokabularFuer(org, "einheitstyp"), "name") || "(Einheitstyp offen)"}
+              {" · "}{einheitOrt(bogen.einheit) || "(Standort offen)"}
+            </p>
+            <p>
+              Stärke:{" "}
+              <strong title={STAERKE_LEGENDE} aria-label={`Stärke: ${staerkeVorlesen(s)}`}>
+                {s.fuehrer} / {s.unterfuehrer} / {s.mannschaft} / {s.gesamt}
+              </strong>
+              {" · "}
+              <span title={MWD_LEGENDE}>Unterbringung: M {mwd.m} / W {mwd.w} / D {mwd.d}</span>
+            </p>
+          </div>
+        </div>
       </section>
 
       {abschnitt("Einheit", 0, (
@@ -1330,6 +1602,27 @@ export function Uebersicht(props: {
         </dl>
       ))}
 
+      {/* Eingebettete PDF-Vorschau: man sieht, was der Meldekopf bekommt, bevor
+          gedruckt wird. Nur im Browser — die native App zeigt PDFs im Share-Sheet,
+          und mobile WebViews rendern eingebettete PDFs nicht zuverlässig. */}
+      {!istNativ() && (
+        <section className="karte">
+          <div className="kopfzeile">
+            <h2>PDF-Vorschau</h2>
+            <button type="button" onClick={vorschauLaden} disabled={vorschauLaeuft}>
+              {vorschauLaeuft ? "Vorschau wird erzeugt…" : vorschauUrl ? "Vorschau aktualisieren" : "Vorschau anzeigen"}
+            </button>
+          </div>
+          {vorschauUrl ? (
+            <iframe className="pdf-rahmen" src={vorschauUrl} title="PDF-Vorschau des Erfassungsbogens" />
+          ) : (
+            <p className="hinweis">
+              Zeigt den fertigen Bogen im Papier-Layout, ohne ihn herunterzuladen — die PDF entsteht direkt im Browser.
+            </p>
+          )}
+        </section>
+      )}
+
       <section className="karte qr-box">
         <h2>QR-Code (Offline-Transport)</h2>
         {qr ? (
@@ -1389,6 +1682,53 @@ export function Uebersicht(props: {
         </div>
       </section>
 
+      <dialog ref={teilenDialog} aria-label="Bogen übergeben" className="teilen-dialog">
+        <div className="kopfzeile">
+          <h2>Bogen übergeben</h2>
+          <button type="button" onClick={() => teilenDialog.current?.close()}>Schließen</button>
+        </div>
+        <div className="teilen-weg">
+          <button
+            type="button"
+            className="primaer"
+            disabled={!qr}
+            onClick={() => {
+              teilenDialog.current?.close();
+              setVollbildTeil(0);
+              setVollbild(true);
+            }}
+          >
+            QR-Code im Vollbild zeigen
+          </button>
+          <p className="hinweis">
+            Vor Ort ohne Netz: Die Gegenstelle scannt den Code direkt vom Display
+            {qr?.segmentiert ? ` (${qr.teile.length} Teile nacheinander)` : ""}.
+          </p>
+        </div>
+        <div className="teilen-weg">
+          <button type="button" onClick={pdf} disabled={pdfLaeuft}>
+            {pdfLaeuft ? "PDF wird erstellt…" : "PDF erzeugen"}
+          </button>
+          <p className="hinweis">Zum Drucken oder Versenden — Papier-Layout, QR-Code auf der letzten Seite.</p>
+        </div>
+        <div className="teilen-weg">
+          <button type="button" onClick={bogenLinkTeilen} disabled={!qr}>
+            {linkKopiert ? "Link kopiert ✓" : "Link teilen"}
+          </button>
+          <p className="hinweis">Derselbe Inhalt wie im QR-Code — öffnet den Bogen beim Antippen.</p>
+        </div>
+        {/* Roh-JSON nur im Debug-Modus anbieten: fürs Publikum ist der Bogen
+            ohnehin in jeder PDF eingebettet — ein separater JSON-Download
+            verwirrt mehr, als er nützt. */}
+        {debugAktiv() && (
+          <div className="teilen-weg">
+            <button type="button" onClick={() => bogenSpeichern(bogen)}>Als Datei speichern (Debug)</button>
+            <p className="hinweis">Roh-JSON des Bogens — nur im Debug-Modus sichtbar.</p>
+          </div>
+        )}
+        {fehler && <p className="fehler">{fehler}</p>}
+      </dialog>
+
       {vollbild && qr && (() => {
         const teil = qr.teile[Math.min(vollbildTeil, qr.teile.length - 1)]!;
         return (
@@ -1402,6 +1742,7 @@ export function Uebersicht(props: {
                 <strong>Teil {teil.teilNr} von {teil.anzahl}</strong> — alle Teile nacheinander scannen lassen.
               </p>
             )}
+            <p className="hinweis">Der Bildschirm bleibt an — Display-Helligkeit hoch stellen hilft beim Scannen.</p>
             <div className="qr-vollbild-nav">
               {qr.segmentiert && (
                 <button type="button" disabled={vollbildTeil === 0} onClick={() => setVollbildTeil(vollbildTeil - 1)}>

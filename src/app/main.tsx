@@ -18,7 +18,8 @@ import {
   type SegmentTeil,
 } from "../codec";
 import { signaturLabel, signaturVonPayload, signaturVonText, type SignaturStatus } from "../signatur";
-import { SCHRITT_STATUS_TITEL, bogenLaden, browserKompressor, neuerBogen, schrittStatus } from "./hilfen";
+import { SCHRITT_STATUS_TITEL, bogenLaden, browserKompressor, einheitAnzeigename, neuerBogen, schrittStatus } from "./hilfen";
+import { staerke } from "../model";
 import { bogenLinksEmpfangen, istNativ, qrScannen, textTeilen } from "./nativ";
 import { DebugLeiste, debugAktiv, wendePlattformKlasseAn, wendeRahmenAn } from "./debug-plattform";
 import { statistikStarten } from "./statistik";
@@ -42,8 +43,10 @@ import { einsatzPdfErzeugen } from "./pdf";
 import { QrScannerWeb } from "./qr-scanner-web";
 import { qrAusBild } from "./qr-bild";
 import { entwurfLaden, entwurfSpeichern, entwurfVerwerfen } from "./entwurf";
-import { wendeFeldModusAn } from "./feld-modus";
-import { wendeOrgAkzentAn } from "./org-farben";
+import { wendeAnzeigeModusAn } from "./anzeige-modus";
+import { AnzeigeSchalter } from "./anzeige-schalter";
+import { orgFarbe, wendeOrgAkzentAn } from "./org-farben";
+import { einheitSymbolSvg, svgDataUrl } from "./taktische-zeichen";
 import { Fusszeile } from "./fusszeile";
 import { Aktualisierungshinweise } from "./aktualisierung";
 import {
@@ -92,6 +95,89 @@ function alsEintragSignatur(status: SignaturStatus): EintragSignatur | undefined
   return { zustand: status.zustand, pubkey: status.pubkey, kurzform: status.kurzform };
 }
 
+/**
+ * Kurzer Bestätigungston für den Kiosk-Scan (Meldekopf sammelt viele Bögen):
+ * hoher Ton = aufgenommen, tiefer Ton = Duplikat. Ohne Audio-Unterstützung
+ * passiert einfach nichts — der Ton ist reiner Komfort.
+ */
+function piep(erfolg: boolean): void {
+  try {
+    const Ctor =
+      window.AudioContext ??
+      (window as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+    if (!Ctor) return;
+    const ctx = new Ctor();
+    const oszillator = ctx.createOscillator();
+    const pegel = ctx.createGain();
+    oszillator.type = "sine";
+    oszillator.frequency.value = erfolg ? 880 : 330;
+    pegel.gain.value = 0.08;
+    oszillator.connect(pegel).connect(ctx.destination);
+    oszillator.start();
+    oszillator.stop(ctx.currentTime + 0.18);
+    oszillator.onended = () => void ctx.close();
+  } catch {
+    /* kein Ton möglich — egal */
+  }
+}
+
+/**
+ * „So funktioniert's": das Grundprinzip (Offline-QR-Transport) in drei
+ * Schritten. Beim Erststart steht es prominent unter den Aktionen; sobald
+ * Daten vorhanden sind, rückt es ans Ende der Startseite — als Nachschlage-
+ * Erklärung, ohne den Arbeitsbereich zu verdrängen.
+ */
+function SoFunktionierts() {
+  return (
+    <section className="onboarding" aria-label="So funktioniert es">
+      <h2>So funktioniert&rsquo;s</h2>
+      <div className="onboarding-schritte">
+        <div className="onboarding-schritt">
+          <svg viewBox="0 0 48 48" aria-hidden="true">
+            <rect x="10" y="6" width="28" height="36" rx="3" fill="none" stroke="currentColor" strokeWidth="2.5" />
+            <line x1="16" y1="16" x2="32" y2="16" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
+            <line x1="16" y1="23" x2="32" y2="23" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
+            <line x1="16" y1="30" x2="26" y2="30" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
+          </svg>
+          <strong>1. Bogen ausfüllen</strong>
+          <span>Einheit, Personal und Fahrzeuge erfassen — Vorlagen und Vorbelegungen helfen.</span>
+        </div>
+        <div className="onboarding-schritt">
+          <svg viewBox="0 0 48 48" aria-hidden="true">
+            <g fill="currentColor">
+              <rect x="8" y="8" width="12" height="12" rx="1.5" fill="none" stroke="currentColor" strokeWidth="2.5" />
+              <rect x="12" y="12" width="4" height="4" />
+              <rect x="28" y="8" width="12" height="12" rx="1.5" fill="none" stroke="currentColor" strokeWidth="2.5" />
+              <rect x="32" y="12" width="4" height="4" />
+              <rect x="8" y="28" width="12" height="12" rx="1.5" fill="none" stroke="currentColor" strokeWidth="2.5" />
+              <rect x="12" y="32" width="4" height="4" />
+              <rect x="28" y="28" width="5" height="5" />
+              <rect x="35" y="28" width="5" height="5" />
+              <rect x="28" y="35" width="5" height="5" />
+              <rect x="35" y="35" width="5" height="5" />
+            </g>
+          </svg>
+          <strong>2. QR-Code zeigen</strong>
+          <span>Der ganze Bogen steckt im QR-Code — als PDF, Vollbild oder Link. Ganz ohne Internet.</span>
+        </div>
+        <div className="onboarding-schritt">
+          <svg viewBox="0 0 48 48" aria-hidden="true">
+            <g fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+              <path d="M8 14 V10 a2 2 0 0 1 2-2 h4" />
+              <path d="M34 8 h4 a2 2 0 0 1 2 2 v4" />
+              <path d="M40 34 v4 a2 2 0 0 1-2 2 h-4" />
+              <path d="M14 40 h-4 a2 2 0 0 1-2-2 v-4" />
+              <path d="M16 24 l6 6 l10 -12" />
+            </g>
+          </svg>
+          <strong>3. Meldekopf scannt</strong>
+          <span>Die Gegenstelle scannt den Code und hat sofort alle Daten — samt Stärke-Summen.</span>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 const START = startAusUrlFragment();
 
 // Kaltstart ohne Bogen aus der URL: den automatisch gesicherten Entwurf
@@ -124,6 +210,15 @@ function App() {
   const [einsaetze, setEinsaetze] = useState<Einsatzsammlung[]>(() => einsaetzeLaden());
   const [offenerEinsatzId, setOffenerEinsatzId] = useState<string | null>(null);
   const [sammelZielId, setSammelZielId] = useState<string | null>(null);
+  // Sammelziel zusätzlich als Ref: der laufende (asynchrone) Scan-Loop und die
+  // Scanner-Callbacks lesen sonst einen veralteten Closure-Stand.
+  const sammelZielRef = useRef<string | null>(null);
+  const setSammelZiel = (id: string | null) => {
+    sammelZielRef.current = id;
+    setSammelZielId(id);
+  };
+  // Kiosk-Scan (Meldekopf): Zähler der in diesem Durchgang aufgenommenen Bögen.
+  const kioskZaehlerRef = useRef(0);
   // Segmentierung: gesammelte Teile eines großen Bogens (Zustand als Ref, damit
   // der laufende Kamera-/Native-Scan darauf zugreift) + Fortschrittstext fürs Overlay.
   const segmentTeileRef = useRef<SegmentTeil[]>([]);
@@ -134,9 +229,17 @@ function App() {
 
   // Entwurfssicherung: jede Änderung still sichern; wird der Bogen bewusst
   // geschlossen (Neuer Bogen, Übernahme in einen Einsatz), fällt der Entwurf weg.
+  // Der Zeitstempel speist die sichtbare „automatisch gespeichert"-Anzeige —
+  // sie nimmt die Angst, dass Eingaben bei Akku/Abbruch verloren gehen.
+  const [gespeichertUm, setGespeichertUm] = useState<Date | null>(null);
   useEffect(() => {
-    if (bogen) entwurfSpeichern(bogen);
-    else entwurfVerwerfen();
+    if (bogen) {
+      entwurfSpeichern(bogen);
+      setGespeichertUm(new Date());
+    } else {
+      entwurfVerwerfen();
+      setGespeichertUm(null);
+    }
   }, [bogen]);
 
   // Akzentfarbe der Oberfläche der Organisation des offenen Bogens anpassen —
@@ -199,6 +302,8 @@ function App() {
     b: Erfassungsbogen,
     quelle: "scan" | "manuell",
     signatur?: EintragSignatur,
+    /** Kiosk-Scan: Rückmeldung ins Scanner-Overlay statt Ansichtswechsel. */
+    kiosk = false,
   ) {
     const einsatz = einsaetzeLaden().find((s) => s.id === zielId);
     const schl = einheitSchluessel(b.einheit);
@@ -216,6 +321,20 @@ function App() {
       setFehler("Einsatz nicht gefunden.");
       return;
     }
+    if (kiosk) {
+      // Dauerscannen: Piep + Zähler im Overlay, die Kamera bleibt an — beim
+      // Massen-Check-in muss niemand zwischen den Bögen die Ansicht wechseln.
+      if (r.neu) kioskZaehlerRef.current += 1;
+      piep(r.neu);
+      const stand = `${kioskZaehlerRef.current} ${kioskZaehlerRef.current === 1 ? "Bogen" : "Bögen"} in diesem Durchgang`;
+      setScanFortschritt(
+        r.neu
+          ? `✓ „${b.einheit.name || "Einheit"}" aufgenommen — ${stand}. Nächsten Bogen zeigen…`
+          : `Bereits vorhanden — übersprungen (gleicher Inhalt). ${stand}.`,
+      );
+      setFehler("");
+      return;
+    }
     setMeldung(
       r.neu
         ? `Meldung von „${b.einheit.name || "Einheit"}" aufgenommen.`
@@ -229,19 +348,22 @@ function App() {
    * Fertigen Bogen übernehmen: im Sammelmodus als Meldung ablegen, sonst öffnen.
    * `signatur` = Signaturstatus des Transports (Herkunft); beim Öffnen als
    * Provenienz angezeigt, im Sammelmodus je Meldung gespeichert.
+   *
+   * Rückgabe: true = Scan beendet (Overlay/Loop schließen), false = Kiosk-Modus,
+   * der Scanner bleibt für den nächsten Bogen an (Sammelziel bleibt gesetzt).
    */
-  function uebernimmBogen(b: Erfassungsbogen, signatur: SignaturStatus) {
-    if (sammelZielId) {
-      const ziel = sammelZielId;
-      setSammelZielId(null);
-      bogenInSammlung(ziel, b, "scan", alsEintragSignatur(signatur));
-      return;
+  function uebernimmBogen(b: Erfassungsbogen, signatur: SignaturStatus): boolean {
+    const ziel = sammelZielRef.current;
+    if (ziel) {
+      bogenInSammlung(ziel, b, "scan", alsEintragSignatur(signatur), true);
+      return false; // Kiosk: weiter scannen, bis abgebrochen wird
     }
     setBogen(b);
     setBogenSignatur(signatur);
     setSchritt(UEBERSICHT);
     setZeigeStart(false);
     setFehler("");
+    return true;
   }
 
   /**
@@ -284,8 +406,7 @@ function App() {
           const status = await signaturVonPayload(payload);
           segmentTeileRef.current = [];
           setScanFortschritt("");
-          uebernimmBogen(b, status);
-          return true;
+          return uebernimmBogen(b, status);
         }
         setFehler("");
         setScanFortschritt(
@@ -307,7 +428,7 @@ function App() {
     try {
       const dekodiert = decodePayloadUrl(text, browserKompressor);
       const status = await signaturVonText(text);
-      uebernimmBogen(dekodiert, status);
+      return uebernimmBogen(dekodiert, status);
     } catch {
       setFehler(fehlertext);
     }
@@ -328,9 +449,14 @@ function App() {
 
   function scanAbbrechen(auchSammelZiel: boolean) {
     setScannerOffen(false);
-    if (auchSammelZiel) setSammelZielId(null);
+    if (auchSammelZiel) setSammelZiel(null);
     segmentTeileRef.current = [];
     setScanFortschritt("");
+    // Kiosk-Bilanz beim Schließen kurz bestätigen (der Zähler stand im Overlay).
+    if (kioskZaehlerRef.current > 0) {
+      setMeldung(`${kioskZaehlerRef.current} ${kioskZaehlerRef.current === 1 ? "Bogen" : "Bögen"} in diesem Durchgang aufgenommen.`);
+      kioskZaehlerRef.current = 0;
+    }
   }
 
   // Kaltstart über QR/Universal Link: den beim Rendern schon dekodierten Bogen
@@ -370,9 +496,14 @@ function App() {
             : "QR-Code des Erfassungsbogens in den Rahmen halten";
         const text = await qrScannen(anweisung);
         if (!text) {
-          // Abbruch: angefangenen Sammelstand verwerfen.
+          // Abbruch: angefangenen Sammelstand (und ein Kiosk-Sammelziel) verwerfen.
           segmentTeileRef.current = [];
           setScanFortschritt("");
+          setSammelZiel(null);
+          if (kioskZaehlerRef.current > 0) {
+            setMeldung(`${kioskZaehlerRef.current} ${kioskZaehlerRef.current === 1 ? "Bogen" : "Bögen"} in diesem Durchgang aufgenommen.`);
+            kioskZaehlerRef.current = 0;
+          }
           return;
         }
         if (await uebernehmeQrText(text)) return;
@@ -394,13 +525,14 @@ function App() {
   }
 
   function scanneInEinsatz(zielId: string) {
-    setSammelZielId(zielId);
+    setSammelZiel(zielId);
+    kioskZaehlerRef.current = 0; // neuer Kiosk-Durchgang
     setMeldung("");
     scanneQr(); // web: Scanner-Overlay; nativ: Plugin-Modal → uebernehmeQrText
   }
 
   function manuellInEinsatz(zielId: string) {
-    setSammelZielId(zielId);
+    setSammelZiel(zielId);
     setOffenerEinsatzId(null); // Assistent übernimmt die Ansicht
     setMeldung("");
     setBogen(neuerBogen());
@@ -547,21 +679,52 @@ function App() {
   }
 
   if (!bogen || zeigeStart) {
+    // Erststart = noch keinerlei Daten: Onboarding prominent statt am Seitenende.
+    const erststart = !bogen && vorlagen.length === 0 && einsaetze.length === 0;
     return (
       <>
       <Aktualisierungshinweise />
       <main className="start">
+        <div className="kopf-leiste">
+          <span />
+          <AnzeigeSchalter />
+        </div>
         <h1>Einheiten-Erfassungsbogen</h1>
         <p>
           Bogen digital erfassen (BOS-übergreifend), als PDF drucken, als Datei teilen –
           inklusive QR-Code für den Offline-Transport.
         </p>
+        <p className="offline-badge">✓ Funktioniert komplett offline — alle Daten bleiben auf diesem Gerät.</p>
+        {/* „Weiter, wo du warst": der Entwurf als Karte mit taktischem Zeichen,
+            Kennfarbe der Organisation und Stärke — der häufigste Weg zurück in
+            die Arbeit ist damit ein einziger Tipp. */}
+        {bogen && (() => {
+          const s = staerke(bogen);
+          return (
+            <section
+              className="entwurf-karte"
+              style={{ borderLeftColor: orgFarbe(bogen.einheit.organisation).balken }}
+            >
+              <img
+                className="einheit-avatar gross"
+                src={svgDataUrl(einheitSymbolSvg(bogen.einheit))}
+                alt=""
+                aria-hidden="true"
+              />
+              <span className="entwurf-text">
+                <strong>{einheitAnzeigename(bogen.einheit)}</strong>
+                <span className="hinweis">
+                  Stärke {s.fuehrer} / {s.unterfuehrer} / {s.mannschaft} / {s.gesamt}
+                  {gespeichertUm
+                    ? ` · gespeichert ${gespeichertUm.toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit" })} Uhr`
+                    : ""}
+                </span>
+              </span>
+              <button className="primaer" onClick={() => setZeigeStart(false)}>Fortsetzen</button>
+            </section>
+          );
+        })()}
         <div className="aktionen">
-          {bogen && (
-            <button className="primaer" onClick={() => setZeigeStart(false)}>
-              Aktuellen Bogen fortsetzen
-            </button>
-          )}
           <button className={bogen ? "" : "primaer"} onClick={() => { setBogen(neuerBogen()); setBogenSignatur(null); setSchritt(0); setZeigeStart(false); }}>
             Neuen Bogen erstellen
           </button>
@@ -586,6 +749,10 @@ function App() {
         {scannerOffen && (
           <QrScannerWeb onErgebnis={scanErgebnisWeb} fortschritt={scanFortschritt} onAbbruch={() => scanAbbrechen(false)} onBild={ladeQrBild} />
         )}
+        {/* Erststart ohne Daten: das Grundprinzip prominent direkt unter den
+            Aktionen erklären — der USP steckt sonst nur im Untertitel. Mit
+            vorhandenen Daten wandert die Erklärung ans Seitenende (unten). */}
+        {erststart && <SoFunktionierts />}
         {/* Auch anzeigen, wenn NUR der Papierkorb gefüllt ist — sonst wäre eine
             versehentlich gelöschte letzte Vorlage nicht wiederherstellbar. */}
         {(vorlagen.length > 0 || vorlagenPapierkorb().length > 0) && (
@@ -618,6 +785,9 @@ function App() {
             onGeaendert={einsaetzeNeuLaden}
           />
         </section>
+        {/* Mit vorhandenen Daten bleibt die Erklärung erreichbar — am Ende der
+            Startseite, über der Fußzeile, statt den Arbeitsbereich zu verdrängen. */}
+        {!erststart && <SoFunktionierts />}
       </main>
       <Fusszeile />
       </>
@@ -639,10 +809,22 @@ function App() {
     <Aktualisierungshinweise />
     <main>
       <header>
-        <button type="button" className="zur-start" onClick={() => setZeigeStart(true)}>
-          ‹ Startseite
-        </button>
-        <h1>Einheiten-Erfassungsbogen</h1>
+        <div className="kopf-leiste">
+          <button type="button" className="zur-start" onClick={() => setZeigeStart(true)}>
+            ‹ Startseite
+          </button>
+          <AnzeigeSchalter />
+        </div>
+        <div className="titelzeile">
+          {/* Taktisches Zeichen der Einheit als „Avatar" — Wiedererkennung auf einen Blick. */}
+          <img
+            className="einheit-avatar"
+            src={svgDataUrl(einheitSymbolSvg(bogen.einheit))}
+            alt=""
+            aria-hidden="true"
+          />
+          <h1>Einheiten-Erfassungsbogen</h1>
+        </div>
         <nav className="schritte">
           {SCHRITTE.map((name, i) => {
             const st = status[i]; // undefined für die Übersicht (letzter Schritt)
@@ -662,6 +844,11 @@ function App() {
             );
           })}
         </nav>
+        {gespeichertUm && (
+          <p className="autosave" role="status">
+            ✓ automatisch gespeichert · {gespeichertUm.toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit" })} Uhr — bleibt auf diesem Gerät
+          </p>
+        )}
       </header>
 
       {schritt === 0 && <SchrittEinheit bogen={bogen} aendern={aendern} />}
@@ -682,7 +869,7 @@ function App() {
                   label: "In Einsatz übernehmen",
                   onUebernehmen: () => {
                     const ziel = sammelZielId;
-                    setSammelZielId(null);
+                    setSammelZiel(null);
                     setBogen(null);
                     setBogenSignatur(null);
                     setSchritt(0);
@@ -714,7 +901,7 @@ function App() {
 // Im Browser kann der Debug-Modus die visuelle Plattform überschreiben.
 wendePlattformKlasseAn();
 wendeRahmenAn();
-wendeFeldModusAn();
+wendeAnzeigeModusAn();
 
 // Im Debug-Modus eine schwebende Leiste zum Umschalten der Vorschau zeigen.
 function Wurzel() {

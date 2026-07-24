@@ -44,6 +44,16 @@
     button.primaer, .datei-knopf.primaer { background: var(--blau); color: #fff; border-color: var(--blau); }
     button.primaer:hover { background: var(--blau-hell); }
     button:disabled { opacity: 0.4; cursor: default; }
+    /* Kopfleiste: Rücksprung links, Anzeige-Umschalter rechts. */
+    .kopf-leiste { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; }
+    /* Umschalter Standard/Feld/Nacht als kompakte Segmente. */
+    .anzeige-schalter { display: inline-flex; border: 1px solid var(--rand); border-radius: 1rem; overflow: hidden; }
+    .anzeige-schalter button {
+      border: none; border-radius: 0; background: #fff; color: #444;
+      padding: 0.25rem 0.7rem; font-size: 0.8rem; min-height: 0;
+    }
+    .anzeige-schalter button + button { border-left: 1px solid var(--rand); }
+    .anzeige-schalter button.aktiv { background: var(--blau); color: #fff; }
     /* Immer sichtbarer Rücksprung zur Startseite im Kopfbereich. */
     .zur-start {
       display: inline-block; border: none; background: none;
@@ -60,6 +70,8 @@
     .schritte button.status-ok .schritt-status { color: var(--erledigt); }
     .schritte button.status-begonnen .schritt-status { color: var(--blau-hell); opacity: 0.7; }
     .schritte button.aktiv .schritt-status { color: #fff; opacity: 0.9; }
+    /* Erledigte Schritte auch am Chip selbst erkennbar (nicht nur am Glyph). */
+    .schritte button.status-ok:not(.aktiv) { border-color: #9ed0b2; background: #f2faf5; }
     section.karte, .karte {
       background: #fff; border: 1px solid var(--rand); border-radius: 0.5rem;
       padding: 1rem; margin-bottom: 1rem;
@@ -115,6 +127,76 @@
       border-radius: 0.3rem; padding: 0.4rem 0.6rem; font-size: 0.9rem;
     }
     .hinweis { font-size: 0.85rem; color: #555; }
+    /* Vollständigkeits-Checkliste (Übersicht): EINE Box statt gestapelter
+       Warnungen; jeder Punkt ist ein Link und springt zum passenden Schritt. */
+    .vollstaendigkeit {
+      color: #7a5200; background: #fff7e0; border: 1px solid #e6c675;
+      border-radius: 0.3rem; padding: 0.5rem 0.7rem; font-size: 0.9rem; margin: 0.6rem 0;
+    }
+    .vollstaendigkeit-titel { margin: 0 0 0.3rem; font-weight: 600; }
+    /* Eigener Marker mit hängendem Einzug: der Standard-Marker sitzt bei
+       umbrechenden Button-Kindern sonst auf der letzten Zeile (wie .beispiel-liste). */
+    .vollstaendigkeit ul { margin: 0; padding-left: 1.2rem; list-style: none; }
+    .vollstaendigkeit li { margin: 0.15rem 0; position: relative; }
+    .vollstaendigkeit li::before { content: "•"; position: absolute; left: -0.9em; }
+    .vollstaendigkeit button.link { color: inherit; text-align: left; }
+    .vollstaendig-ok { color: var(--erledigt); font-size: 0.9rem; font-weight: 600; }
+    /* Taktische Zeichen in der Oberfläche: Einheiten-„Avatar" im Kopf und in
+       der Übersicht, Fahrzeug-Symbol (DV 102) in der Fahrzeugkarte. */
+    .titelzeile { display: flex; align-items: center; gap: 0.6rem; }
+    .titelzeile h1 { min-width: 0; }
+    img.einheit-avatar { height: 2.4rem; width: auto; flex: 0 0 auto; }
+    img.einheit-avatar.gross { height: 3.4rem; }
+    .einheit-kopf { display: flex; align-items: center; gap: 0.9rem; }
+    .einheit-kopf > div { min-width: 0; }
+    img.fahrzeug-symbol { height: 2.4rem; width: auto; float: left; margin: 0.1rem 0.8rem 0.2rem 0; }
+    .legende { opacity: 0.75; }
+    /* Autosave-Anzeige im Assistenten-Kopf: leise Bestätigung statt Sorge. */
+    .autosave { margin: -0.5rem 0 0.8rem; font-size: 0.78rem; color: var(--erledigt); }
+    /* Startseite: Offline-Versprechen als grünes Badge unter dem Untertitel. */
+    .offline-badge {
+      display: inline-block; margin: 0.2rem auto 0; padding: 0.25rem 0.8rem;
+      border: 1px solid #b6dfc6; border-radius: 1rem; background: #e8f6ee;
+      color: #1c5c44; font-size: 0.85rem;
+    }
+    /* „Weiter, wo du warst": Entwurfs-Karte mit Kennfarbe der Organisation. */
+    .entwurf-karte {
+      display: flex; align-items: center; gap: 0.9rem; text-align: left;
+      max-width: 34rem; margin: 1.5rem auto 0; padding: 0.8rem 1rem;
+      background: #fff; border: 1px solid var(--rand); border-left: 6px solid var(--blau);
+      border-radius: 0.5rem;
+    }
+    .entwurf-karte .entwurf-text { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 0.1rem; }
+    .entwurf-karte .entwurf-text strong { overflow-wrap: break-word; }
+    .entwurf-karte button { flex: 0 0 auto; }
+    /* Erststart-Onboarding: drei Schritte erklären den Offline-QR-Transport. */
+    .onboarding { margin-top: 2.5rem; }
+    .onboarding h2 { border: none; text-align: center; }
+    .onboarding-schritte { display: flex; gap: 1.2rem; justify-content: center; flex-wrap: wrap; }
+    .onboarding-schritt {
+      flex: 1 1 12rem; max-width: 15rem; display: flex; flex-direction: column;
+      align-items: center; gap: 0.25rem;
+    }
+    .onboarding-schritt svg { width: 3rem; height: 3rem; color: var(--blau); }
+    .onboarding-schritt span { font-size: 0.85rem; color: #555; }
+    /* Personal-Schnelleingabe: kompakte Tabellenzeilen, Felder füllen die Zelle. */
+    .ansicht-wahl { display: flex; align-items: center; gap: 0.2rem 0.8rem; flex-wrap: wrap; }
+    .ansicht-wahl button { margin-top: 0.4rem; }
+    .schnell-tabelle td { padding: 0.15rem 0.25rem; }
+    .schnell-tabelle td input, .schnell-tabelle td select { width: 100%; min-width: 5.5rem; }
+    .schnell-tabelle td:last-child button { border: none; background: none; font-weight: bold; }
+    /* Eingebettete PDF-Vorschau (Übersicht, nur Browser/Desktop). */
+    .pdf-rahmen { width: 100%; height: 32rem; border: 1px solid var(--rand); border-radius: 0.3rem; margin-top: 0.6rem; }
+    /* „Bogen übergeben"-Dialog: je Transportweg ein voller Knopf + Situationshilfe. */
+    .teilen-dialog .teilen-weg { margin: 0.9rem 0; }
+    .teilen-dialog .teilen-weg button { width: 100%; }
+    .teilen-dialog .teilen-weg .hinweis { margin: 0.25rem 0 0; }
+    /* Übersichts-Aktionen: auf schmalen Screens volle Breite statt zerfranstem
+       rechtsbündigem Stapel (klare Hierarchie, große Tippziele). */
+    @media (max-width: 540px) {
+      .kopfzeile > span.uebersicht-aktionen { flex-direction: column; align-items: stretch; width: 100%; }
+      .uebersicht-aktionen button { width: 100%; }
+    }
 
     /* Touch-Zähler (− / Zahl / +) für die Meldekopf-Schnellerfassung: große
        Tippziele, damit am Tablet ohne Tastatur gezählt werden kann. */
@@ -973,8 +1055,74 @@
     .feld-modus ul.vorschlaege li small { opacity: 1; color: #1a1c22; }
     .feld-modus table.uebersicht th, .feld-modus table.uebersicht td { border-color: #444; }
     .feld-modus .schritte button:not(.link) { min-height: 44px; font-size: 0.95rem; }
+    .feld-modus .anzeige-schalter button.aktiv { background: var(--blau); color: #fff; border-color: var(--blau); }
     .feld-modus .stepper button:not(.link) { width: 3.75rem; min-height: 3.75rem; }
     .feld-modus output.abgeleitet { border: 2px dashed #444; color: #1a1c22; background: #fff; }
+
+    /* ---------------------------------------------------------------
+       Nacht-Modus: gedimmte, warme Darstellung für Nachteinsätze (Zelt,
+       Fahrzeugkabine) — wenig Blaulichtanteil, keine grellen Flächen,
+       schont die Dunkeladaption. Schalter im Kopfbereich/Fußzeile,
+       anzeige-modus.ts setzt die Klasse auf <html>. Bewusst als letzter
+       Block: gewinnt die Kaskade auch gegen die Plattform-Stile.
+       QR-Codes behalten ihre weiße Ruhezone, sonst wären sie unscannbar.
+       --------------------------------------------------------------- */
+    .nacht-modus body { background: #101010; color: #d3c9b8; color-scheme: dark; }
+    .nacht-modus h1, .nacht-modus h2 { color: #d99a2b; }
+    .nacht-modus h2 { border-color: #6b501c; }
+    .nacht-modus h3 { color: #d3c9b8; }
+    .nacht-modus section.karte, .nacht-modus .karte {
+      background: #181815; border-color: #3a382f; box-shadow: none;
+    }
+    .nacht-modus button:not(.link), .nacht-modus .datei-knopf {
+      background: #23211c; color: #d3c9b8; border: 1px solid #4a463c;
+    }
+    .nacht-modus button.primaer, .nacht-modus .datei-knopf.primaer {
+      background: #8a6414; color: #0f0d08; border-color: #8a6414; font-weight: 600;
+    }
+    .nacht-modus button.link { background: none; border: none; color: #d99a2b; }
+    .nacht-modus .zur-start { background: none; border: none; color: #d99a2b; }
+    .nacht-modus input, .nacht-modus select, .nacht-modus textarea, .nacht-modus output.abgeleitet {
+      background: #1d1c18; color: #d3c9b8; border: 1px solid #4a463c;
+    }
+    .nacht-modus input:focus, .nacht-modus select:focus, .nacht-modus textarea:focus { outline-color: #8a6414; }
+    .nacht-modus label.feld, .nacht-modus .stepper-titel, .nacht-modus dl.paare dt { color: #a89e8c; }
+    .nacht-modus .hinweis, .nacht-modus footer.seite, .nacht-modus .onboarding-schritt span { color: #a89e8c; }
+    .nacht-modus .schritte button { background: #23211c; color: #d3c9b8; border-color: #4a463c; }
+    .nacht-modus .schritte button.aktiv { background: #8a6414; color: #0f0d08; border-color: #8a6414; }
+    .nacht-modus .schritte button.status-ok:not(.aktiv) { background: #23211c; border-color: #5c6b4a; }
+    .nacht-modus .schritte button.status-ok .schritt-status { color: #9ab873; }
+    .nacht-modus .schritte button.status-begonnen .schritt-status { color: #d99a2b; }
+    .nacht-modus footer.nav { background: #181815; border-color: #3a382f; box-shadow: none; }
+    .nacht-modus table.uebersicht th, .nacht-modus table.uebersicht td { border-color: #3a382f; }
+    .nacht-modus table.uebersicht th { background: #23211c; }
+    .nacht-modus .warnung, .nacht-modus .vollstaendigkeit {
+      background: #2a2415; border-color: #6b501c; color: #d9b96a;
+    }
+    .nacht-modus .fehler { color: #e08a7e; }
+    .nacht-modus .meldung { background: #181815; border-color: #3a382f; }
+    .nacht-modus .vollstaendig-ok { color: #9ab873; }
+    .nacht-modus .autosave { color: #9ab873; }
+    .nacht-modus .offline-badge { background: #1d241a; border-color: #40523a; color: #9ab873; }
+    .nacht-modus .entwurf-karte { background: #181815; border-color: #3a382f; }
+    .nacht-modus .onboarding-schritt svg { color: #d99a2b; }
+    .nacht-modus .chip { background: #23211c; border-color: #4a463c; color: #d3c9b8; }
+    .nacht-modus ul.vorschlaege { background: #181815; border-color: #4a463c; }
+    .nacht-modus ul.vorschlaege li.aktiv, .nacht-modus ul.vorschlaege li:hover { background: #23211c; }
+    .nacht-modus ul.vorschlaege li small { color: #a89e8c; }
+    .nacht-modus dialog { background: #181815; color: #d3c9b8; border-color: #4a463c; }
+    .nacht-modus .anzeige-schalter button { background: #23211c; color: #d3c9b8; }
+    .nacht-modus .anzeige-schalter button.aktiv { background: #8a6414; color: #0f0d08; }
+    .nacht-modus .karte .entfernen { color: #e08a7e; border-color: #e08a7e; background: none; }
+    /* QR-Bilder und Vollbild bleiben hell — Scannbarkeit geht vor Dunkeladaption;
+       fürs Vorzeigen wird ohnehin das Display der Gegenseite gebraucht. */
+    .nacht-modus .qr-box img { background: #fff; padding: 8px; }
+    .nacht-modus .signatur-herkunft.gueltig { background: #1d241a; border-color: #40523a; color: #9ab873; }
+    .nacht-modus .signatur-badge.gueltig { color: #9ab873; }
+    .nacht-modus .update-banner { background: #23211c; color: #d3c9b8; }
+    .nacht-modus output.abgeleitet { border-style: dashed; }
+    .nacht-modus .pdf-rahmen { border-color: #3a382f; }
+    .nacht-modus a, .nacht-modus footer.seite a { color: #d99a2b; }
   </style>
 </head>
 <body>
