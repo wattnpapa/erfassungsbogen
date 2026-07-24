@@ -293,12 +293,17 @@ function ovInHierarchieUebernehmen(hierarchie: HierarchieEbene[], i: number, ov:
   return neu;
 }
 
-function OvNamensFeld(props: { name: string; tippen: (name: string) => void; uebernehmen: (ov: ThwOrtsverband) => void }) {
-  const { name, tippen, uebernehmen } = props;
+function OvVorschlagFeld(props: {
+  wert: string;
+  platzhalter: string;
+  tippen: (wert: string) => void;
+  uebernehmen: (ov: ThwOrtsverband) => void;
+}) {
+  const { wert, platzhalter, tippen, uebernehmen } = props;
   const [offen, setOffen] = useState(false);
   const [aktiv, setAktiv] = useState(0);
 
-  const suche = name.trim().toLowerCase();
+  const suche = wert.trim().toLowerCase();
   const treffer =
     offen && suche
       ? THW_ORTSVERBAENDE.filter(
@@ -316,8 +321,8 @@ function OvNamensFeld(props: { name: string; tippen: (name: string) => void; ueb
   return (
     <span className="autocomplete">
       <input
-        value={name}
-        placeholder="tippen für Vorschläge…"
+        value={wert}
+        placeholder={platzhalter}
         onChange={(ev) => {
           tippen(ev.target.value);
           setOffen(true);
@@ -340,7 +345,7 @@ function OvNamensFeld(props: { name: string; tippen: (name: string) => void; ueb
         }}
         onBlur={() => {
           setOffen(false);
-          const eingabe = name.trim();
+          const eingabe = wert.trim();
           const ov = THW_ORTSVERBAENDE.find((o) => o.kurz === eingabe.toUpperCase() || o.name === eingabe);
           if (ov) uebernehmen(ov);
         }}
@@ -506,8 +511,9 @@ export function SchrittEinheit({ bogen, aendern }: SchrittProps) {
           </Feld>
           <Feld titel={i === 0 ? "Name (Pflicht)" : "Name"}>
             {e.organisation === OrganisationsTyp.THW && h.bezeichnung.code === 1 ? (
-              <OvNamensFeld
-                name={h.name}
+              <OvVorschlagFeld
+                wert={h.name}
+                platzhalter="tippen für Vorschläge…"
                 tippen={(name) => setE({ hierarchie: e.hierarchie.map((x, j) => (j === i ? { ...x, name } : x)) })}
                 uebernehmen={(ov) => setE({ hierarchie: ovInHierarchieUebernehmen(e.hierarchie, i, ov) })}
               />
@@ -518,15 +524,30 @@ export function SchrittEinheit({ bogen, aendern }: SchrittProps) {
               />
             )}
           </Feld>
-          <Feld titel="Kürzel" schmal>
-            <input
-              value={h.kurz ?? ""}
-              placeholder="OODE"
-              onChange={(ev) =>
-                setE({ hierarchie: e.hierarchie.map((x, j) => (j === i ? { ...x, kurz: ev.target.value.toUpperCase() || undefined } : x)) })
-              }
-            />
-          </Feld>
+          {/* Das Kürzel (z. B. THW-OV "OODE") ergibt nur beim THW Sinn; andere Organisationen führen keine solchen Kürzel. */}
+          {e.organisation === OrganisationsTyp.THW && (
+            <Feld titel="Kürzel" schmal>
+              {h.bezeichnung.code === 1 ? (
+                // Viele kennen ihr OV-Kürzel und tippen es ein – dieselbe Vorschlagsliste wie beim OV-Namen.
+                <OvVorschlagFeld
+                  wert={h.kurz ?? ""}
+                  platzhalter="OODE"
+                  tippen={(kurz) =>
+                    setE({ hierarchie: e.hierarchie.map((x, j) => (j === i ? { ...x, kurz: kurz.toUpperCase() || undefined } : x)) })
+                  }
+                  uebernehmen={(ov) => setE({ hierarchie: ovInHierarchieUebernehmen(e.hierarchie, i, ov) })}
+                />
+              ) : (
+                <input
+                  value={h.kurz ?? ""}
+                  placeholder="OODE"
+                  onChange={(ev) =>
+                    setE({ hierarchie: e.hierarchie.map((x, j) => (j === i ? { ...x, kurz: ev.target.value.toUpperCase() || undefined } : x)) })
+                  }
+                />
+              )}
+            </Feld>
+          )}
           <Feld titel="Telefon" schmal>
             <input
               value={h.telefon ?? ""}
