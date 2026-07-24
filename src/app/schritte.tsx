@@ -62,7 +62,7 @@ import {
 import { pdfErzeugen } from "./pdf";
 import { signaturLabel, type SignaturStatus } from "../signatur";
 import { geraeteKurzform, geraeteOeffentlichHex } from "./geraete-schluessel";
-import { istNativ, textTeilen } from "./nativ";
+import { istNativ, linkTeilen, textTeilen } from "./nativ";
 
 export type SchrittProps = {
   bogen: Erfassungsbogen;
@@ -1013,6 +1013,7 @@ export function Uebersicht(props: {
   const [vollbild, setVollbild] = useState(false);
   const [vollbildTeil, setVollbildTeil] = useState(0);
   const [schluesselKurz, setSchluesselKurz] = useState<string | null>(null);
+  const [linkKopiert, setLinkKopiert] = useState(false);
   const org = bogen.einheit.organisation;
   const s = staerke(bogen);
   const mwd = unterbringungMWD(bogen);
@@ -1046,6 +1047,29 @@ export function Uebersicht(props: {
       window.alert(`Öffentlicher Schlüssel in die Zwischenablage kopiert:\n\n${hex}`);
     } else {
       window.prompt("Öffentlicher Schlüssel (kopieren):", hex);
+    }
+  }
+
+  async function bogenLinkTeilen() {
+    if (!qr) return;
+    const url = qr.vollUrl;
+    const titel = `Erfassungsbogen ${einheitAnzeigename(bogen.einheit)}`;
+    try {
+      if (istNativ()) {
+        await linkTeilen(titel, url);
+      } else if (navigator.share) {
+        await navigator.share({ title: titel, text: titel, url });
+      } else if (navigator.clipboard) {
+        await navigator.clipboard.writeText(url);
+        setLinkKopiert(true);
+        window.setTimeout(() => setLinkKopiert(false), 3000);
+      } else {
+        window.prompt("Link kopieren:", url);
+      }
+    } catch (e) {
+      // Abbruch im Share-Dialog ist kein Fehler
+      if (e instanceof Error && e.name === "AbortError") return;
+      setFehler(`Link teilen: ${e instanceof Error ? e.message : e}`);
     }
   }
 
@@ -1086,6 +1110,9 @@ export function Uebersicht(props: {
               {pdfLaeuft ? "PDF wird erstellt…" : "PDF erzeugen"}
             </button>{" "}
             <button type="button" onClick={() => bogenSpeichern(bogen)}>Als Datei speichern</button>{" "}
+            <button type="button" onClick={bogenLinkTeilen} disabled={!qr} title="Öffnet beim Antippen den kompletten Bogen — derselbe Link wie im QR-Code">
+              {linkKopiert ? "Link kopiert ✓" : "Link teilen"}
+            </button>{" "}
             <button type="button" onClick={alsVorlageSpeichern}>Als Vorlage speichern</button>{" "}
             <button type="button" onClick={() => window.confirm("Aktuellen Bogen verwerfen?") && neu()}>Neuer Bogen</button>
           </span>

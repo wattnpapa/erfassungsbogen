@@ -83,6 +83,16 @@ export async function pdfTeilen(dateiname: string, base64: string): Promise<void
   await teilen(dateiname, datei.uri);
 }
 
+/** Einen Link (App-URL) als Text übers Share-Sheet anbieten — ohne Datei-Anhang. */
+export async function linkTeilen(titel: string, url: string): Promise<void> {
+  try {
+    await Share.share({ title: titel, text: titel, url });
+  } catch (err) {
+    if (/cancel|abbruch/i.test(err instanceof Error ? err.message : String(err))) return;
+    throw err;
+  }
+}
+
 /** Text (z. B. Bogen-JSON) als Datei übers Share-Sheet anbieten. */
 export async function textTeilen(dateiname: string, text: string): Promise<void> {
   const datei = await Filesystem.writeFile({

@@ -184,6 +184,13 @@ export interface QrSatz {
   zeichen: number;
   /** Höchste QR-Version über alle Teile. */
   version: number;
+  /**
+   * Der vollständige App-Link mit dem gesamten (signierten) Payload — auch dann,
+   * wenn der Bogen für einen einzelnen QR-Code zu groß ist: Segmentierung ist nur
+   * eine Grenze des QR-Bildes, nicht des Links. Diese eine URL öffnet beim Antippen
+   * den kompletten Bogen und lässt sich als Textlink teilen.
+   */
+  vollUrl: string;
 }
 
 const QR_OPTIONEN = { errorCorrectionLevel: "M" as const };
@@ -225,7 +232,7 @@ export async function qrErzeugen(b: Erfassungsbogen): Promise<QrSatz> {
   const einzelVersion = qrVersion(url);
   if (einzelVersion <= QR_EINZEL_MAX_VERSION) {
     const teil = await teilBild(url, 1, 1);
-    return { teile: [teil], segmentiert: false, zeichen: url.length, version: teil.version };
+    return { teile: [teil], segmentiert: false, zeichen: url.length, version: teil.version, vollUrl: url };
   }
 
   // Zu groß: kleinste Teilzahl suchen, bei der jeder Teil auf die gröbere
@@ -242,6 +249,7 @@ export async function qrErzeugen(b: Erfassungsbogen): Promise<QrSatz> {
     segmentiert: true,
     zeichen: url.length,
     version: Math.max(...teile.map((t) => t.version)),
+    vollUrl: url,
   };
 }
 

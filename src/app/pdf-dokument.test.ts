@@ -31,6 +31,7 @@ const QR: QrSatz = {
   segmentiert: false,
   zeichen: 123,
   version: 7,
+  vollUrl: QR_URL,
 };
 
 // Sammelt rekursiv alle String-Werte einer pdfmake-Struktur ein — robust
@@ -146,6 +147,7 @@ describe("pdfDokument()", () => {
       segmentiert: true,
       zeichen: 1800,
       version: 20,
+      vollUrl: "https://erfassungsbogen.app/#EEBSVOLL",
     };
     const dd = pdfDokument(basisBogen(), segQr);
     const roh = JSON.stringify(dd.content);
