@@ -275,7 +275,13 @@ export function EinsatzDetail(props: {
       </div>
 
       <div className="vorlage-aktionen" style={{ marginBottom: "0.5rem" }}>
-        <button type="button" onClick={onSammelPdf}>Sammel-PDF (alle Bögen)</button>{" "}
+        <button
+          type="button"
+          onClick={onSammelPdf}
+          title="Alle Bögen als eine PDF — mit eingebetteter kompletter Sammlung (Züge, Status, Historie). Auf dem Zielgerät über „Einsatz importieren…" einlesbar."
+        >
+          Sammel-PDF (alle Bögen)
+        </button>{" "}
         <button type="button" onClick={onCsvExport}>Als CSV</button>{" "}
         {/* Roh-JSON nur im Debug-Modus: fürs Publikum trägt die Sammel-PDF die
             Bögen als eingebettetes JSON — ein separater Export verwirrt nur. */}

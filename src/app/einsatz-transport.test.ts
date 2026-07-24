@@ -12,7 +12,7 @@ import {
   type Person,
 } from "../model";
 import { einsatzAnlegen, einsaetzeLaden, einsatzImportieren, meldungHinzufuegen } from "./einsaetze";
-import { boegenAusPdfBytes, einsatzAusDatei, einsatzDateiInhalt } from "./einsatz-transport";
+import { boegenAusPdfBytes, einsatzAusDatei, einsatzAusPdfBytes, einsatzDateiInhalt } from "./einsatz-transport";
 
 class MemStorage {
   private m = new Map<string, string>();
@@ -104,6 +104,32 @@ describe("boegenAusPdfBytes()", () => {
   it("liefert nichts, wenn kein Bogen-JSON enthalten ist", () => {
     const noise = new TextEncoder().encode("BT /F1 12 Tf (Hallo) Tj ET");
     expect(boegenAusPdfBytes(pdfMitStream(noise))).toHaveLength(0);
+  });
+});
+
+describe("einsatzAusPdfBytes()", () => {
+  it("findet den roh eingebetteten Einsatz-Umschlag (inkl. Metadaten)", () => {
+    const s = einsatzAnlegen("Schichtübergabe", 0, "Oldenburg");
+    meldungHinzufuegen(s.id, bogen());
+    const umschlag = einsatzDateiInhalt(einsaetzeLaden()[0]!);
+    const gefunden = einsatzAusPdfBytes(pdfMitStream(new TextEncoder().encode(umschlag)));
+    expect(gefunden?.name).toBe("Schichtübergabe");
+    expect(gefunden?.eintraege).toHaveLength(1);
+  });
+
+  it("entpackt einen FlateDecode-komprimierten Umschlag", () => {
+    const s = einsatzAnlegen("E", 0);
+    meldungHinzufuegen(s.id, bogen());
+    const umschlag = einsatzDateiInhalt(einsaetzeLaden()[0]!);
+    const gefunden = einsatzAusPdfBytes(pdfMitStream(deflate(new TextEncoder().encode(umschlag))));
+    expect(gefunden?.id).toBe(s.id);
+  });
+
+  it("liefert null ohne Umschlag — eine bloße Bogen-Liste ist keine Sammlung", () => {
+    const json = new TextEncoder().encode(JSON.stringify([bogen()]));
+    expect(einsatzAusPdfBytes(pdfMitStream(json))).toBeNull();
+    const noise = new TextEncoder().encode("BT /F1 12 Tf (Hallo) Tj ET");
+    expect(einsatzAusPdfBytes(pdfMitStream(noise))).toBeNull();
   });
 });
 

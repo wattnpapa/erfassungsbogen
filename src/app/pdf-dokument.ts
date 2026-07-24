@@ -118,6 +118,24 @@ export function bogenAlsEingebetteteDatei(b: Erfassungsbogen): EingebetteteDatei
 /** Dateiname der eingebetteten Sammel-Daten (mehrere Bögen eines Einsatzes). */
 export const EEB_EINSATZ_DATEINAME = "einsatz.json";
 
+/**
+ * Dateiname der eingebetteten VOLLSTÄNDIGEN Einsatz-Sammlung (Umschlag
+ * „eeb-einsatz" mit Zug-Zuordnungen, Anwesenheits-Status und Historie) —
+ * macht die Sammel-PDF zur kompletten Schichtübergabe in einer Datei.
+ */
+export const EEB_EINSATZ_SAMMLUNG_DATEINAME = "einsatz-sammlung.json";
+
+/** Vorserialisierte Einsatz-Sammlung (einsatzDateiInhalt) als eingebettete Datei. */
+export function sammlungAlsEingebetteteDatei(json: string): EingebetteteDatei {
+  const base64 = base64AusBytes(new TextEncoder().encode(json));
+  return {
+    src: `data:application/json;base64,${base64}`,
+    name: EEB_EINSATZ_SAMMLUNG_DATEINAME,
+    description: "Vollständige Einsatz-Sammlung inkl. Zug-Zuordnung, Status und Historie (maschinenlesbar)",
+    relationship: "Alternative",
+  };
+}
+
 /** Mehrere Bögen als ein eingebettetes JSON-Array (für die Einsatz-Sammel-PDF). */
 export function boegenAlsEingebetteteDatei(boegen: Erfassungsbogen[]): EingebetteteDatei {
   const json = JSON.stringify(boegen, null, 2);
@@ -139,6 +157,8 @@ export function boegenAlsEingebetteteDatei(boegen: Erfassungsbogen[]): Eingebett
 export function einsatzPdfDokument(
   name: string,
   boegenMitQr: { bogen: Erfassungsbogen; qr: QrSatz }[],
+  /** Optional: kompletter Einsatz-Umschlag (einsatzDateiInhalt) für die Schichtübergabe. */
+  sammlungJson?: string,
 ): TDocumentDefinitions {
   const content: Content[] = [];
   boegenMitQr.forEach(({ bogen, qr }, i) => {
@@ -150,7 +170,10 @@ export function einsatzPdfDokument(
     pageMargins: SEITENRAENDER,
     defaultStyle: { fontSize: 8, font: SCHRIFT },
     info: { title: `Einsatz-Sammlung ${name}` },
-    files: { [EEB_EINSATZ_DATEINAME]: boegenAlsEingebetteteDatei(boegenMitQr.map((x) => x.bogen)) },
+    files: {
+      [EEB_EINSATZ_DATEINAME]: boegenAlsEingebetteteDatei(boegenMitQr.map((x) => x.bogen)),
+      ...(sammlungJson ? { [EEB_EINSATZ_SAMMLUNG_DATEINAME]: sammlungAlsEingebetteteDatei(sammlungJson) } : {}),
+    },
     footer: (seite, gesamt) => ({
       columns: [
         { text: `Einsatz-Sammlung: ${name}`, margin: [40, 0, 0, 0] },

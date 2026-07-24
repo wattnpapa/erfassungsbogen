@@ -37,7 +37,7 @@ import {
 } from "./einsaetze";
 import { EinsatzDetail, EinsatzListe } from "./einsaetze-ui";
 import { aktuelleMeldungen } from "./auswertung";
-import { boegenAusPdfBytes, einsatzAusDatei, einsatzDateiInhalt } from "./einsatz-transport";
+import { boegenAusPdfBytes, einsatzAusDatei, einsatzAusPdfBytes, einsatzDateiInhalt } from "./einsatz-transport";
 import { einsatzCsvInhalt } from "./einsatz-csv";
 import { einsatzPdfErzeugen } from "./pdf";
 import { QrScannerWeb } from "./qr-scanner-web";
@@ -574,7 +574,7 @@ function App() {
       return;
     }
     try {
-      await einsatzPdfErzeugen(s.name, boegen);
+      await einsatzPdfErzeugen(s, boegen);
     } catch (e) {
       setFehler(`Sammel-PDF: ${e instanceof Error ? e.message : e}`);
     }
@@ -612,13 +612,30 @@ function App() {
     }
   }
 
-  /** Ganze Einsatz-Sammlung aus einer Datei importieren (Schichtübergabe/Backup). */
+  /**
+   * Ganze Einsatz-Sammlung aus einer Datei importieren (Schichtübergabe/Backup).
+   * Akzeptiert die Sammel-PDF (dort ist die komplette Sammlung inkl. Zügen,
+   * Status und Historie eingebettet) ebenso wie eine JSON-Datei.
+   */
   async function importiereEinsatzDatei(e: ChangeEvent<HTMLInputElement>) {
     const datei = e.target.files?.[0];
     e.target.value = "";
     if (!datei) return;
     try {
-      const s = einsatzAusDatei(await datei.text());
+      let s: Einsatzsammlung;
+      if (datei.name.toLowerCase().endsWith(".pdf") || datei.type === "application/pdf") {
+        const gefunden = einsatzAusPdfBytes(new Uint8Array(await datei.arrayBuffer()));
+        if (!gefunden) {
+          setFehler(
+            "In dieser PDF steckt keine komplette Einsatz-Sammlung (ältere Sammel-PDF oder Einzelbogen). " +
+              "Einzelne Bögen lassen sich im geöffneten Einsatz über „Aus Datei/PDF…" aufnehmen.",
+          );
+          return;
+        }
+        s = gefunden;
+      } else {
+        s = einsatzAusDatei(await datei.text());
+      }
       const r = einsatzImportieren(s);
       einsaetzeNeuLaden();
       setFehler("");
@@ -772,7 +789,7 @@ function App() {
               <button type="button" onClick={neuerEinsatz}>Neuer Einsatz…</button>{" "}
               <label className="datei-knopf">
                 Einsatz importieren…
-                <input type="file" accept=".json,application/json" hidden onChange={importiereEinsatzDatei} />
+                <input type="file" accept=".json,application/json,.pdf,application/pdf" hidden onChange={importiereEinsatzDatei} />
               </label>
             </span>
           </div>

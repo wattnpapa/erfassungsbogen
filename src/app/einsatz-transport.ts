@@ -42,6 +42,17 @@ function istBogen(x: unknown): x is Erfassungsbogen {
   );
 }
 
+/** Geparster JSON-Wert → Einsatz-Sammlung (Umschlag oder bloße Sammlung); wirft bei Ungültigem. */
+function einsatzAusRoh(roh: unknown): Einsatzsammlung {
+  const alsDatei = roh as Partial<EinsatzDatei>;
+  const s = (alsDatei?.typ === "eeb-einsatz" && alsDatei.einsatz ? alsDatei.einsatz : roh) as Einsatzsammlung;
+  if (!s || typeof s.id !== "string" || !Array.isArray(s.eintraege)) {
+    throw new Error("Keine gültige Einsatz-Datei.");
+  }
+  s.eintraege = s.eintraege.filter((e) => e && istBogen(e.bogen)).map((e) => ({ ...e, bogen: migriereBogen(e.bogen) }));
+  return s;
+}
+
 /**
  * Datei-Text → Einsatz-Sammlung. Akzeptiert den {@link EinsatzDatei}-Umschlag
  * ebenso wie eine bloße Sammlung. Enthaltene Bögen werden schema-migriert;
@@ -54,13 +65,7 @@ export function einsatzAusDatei(text: string): Einsatzsammlung {
   } catch {
     throw new Error("Datei ist kein gültiges JSON.");
   }
-  const alsDatei = roh as Partial<EinsatzDatei>;
-  const s = (alsDatei?.typ === "eeb-einsatz" && alsDatei.einsatz ? alsDatei.einsatz : roh) as Einsatzsammlung;
-  if (!s || typeof s.id !== "string" || !Array.isArray(s.eintraege)) {
-    throw new Error("Keine gültige Einsatz-Datei.");
-  }
-  s.eintraege = s.eintraege.filter((e) => e && istBogen(e.bogen)).map((e) => ({ ...e, bogen: migriereBogen(e.bogen) }));
-  return s;
+  return einsatzAusRoh(roh);
 }
 
 // -------------------------------------------------------------- PDF-Import
@@ -88,24 +93,13 @@ function boegenAusText(text: string): Erfassungsbogen[] {
 }
 
 /**
- * Erfassungsbögen aus den Bytes einer PDF extrahieren (eingebettetes JSON).
- * Jeder Datenstrom wird sowohl entpackt (FlateDecode) als auch roh geprüft.
- * Dubletten (gleicher Inhalt) werden entfernt.
+ * Alle Datenströme einer PDF als Texte liefern — je Strom entpackt
+ * (FlateDecode) und roh. Nicht dekodierbare Ströme fallen still raus;
+ * die Aufrufer filtern ohnehin auf gültiges Bogen-/Einsatz-JSON.
  */
-export function boegenAusPdfBytes(bytes: Uint8Array): Erfassungsbogen[] {
+function streamTexte(bytes: Uint8Array): string[] {
   const latin1 = latin1String(bytes);
-  const gefunden: Erfassungsbogen[] = [];
-  const gesehen = new Set<string>();
-  const merke = (boegen: Erfassungsbogen[]) => {
-    for (const b of boegen) {
-      const schl = JSON.stringify(b);
-      if (!gesehen.has(schl)) {
-        gesehen.add(schl);
-        gefunden.push(b);
-      }
-    }
-  };
-
+  const texte: string[] = [];
   const re = /stream\r?\n/g;
   let m: RegExpExecArray | null;
   while ((m = re.exec(latin1))) {
@@ -119,16 +113,60 @@ export function boegenAusPdfBytes(bytes: Uint8Array): Erfassungsbogen[] {
     const roh = bytes.subarray(start, bis);
     // 1) entpackt (FlateDecode)
     try {
-      merke(boegenAusText(new TextDecoder().decode(inflate(roh))));
+      texte.push(new TextDecoder().decode(inflate(roh)));
     } catch {
       // kein Flate-Strom — ignorieren
     }
     // 2) roh (unkomprimiert eingebettet)
     try {
-      merke(boegenAusText(new TextDecoder().decode(roh)));
+      texte.push(new TextDecoder().decode(roh));
     } catch {
       // nicht dekodierbar — ignorieren
     }
   }
+  return texte;
+}
+
+/**
+ * Erfassungsbögen aus den Bytes einer PDF extrahieren (eingebettetes JSON).
+ * Dubletten (gleicher Inhalt) werden entfernt.
+ */
+export function boegenAusPdfBytes(bytes: Uint8Array): Erfassungsbogen[] {
+  const gefunden: Erfassungsbogen[] = [];
+  const gesehen = new Set<string>();
+  for (const text of streamTexte(bytes)) {
+    for (const b of boegenAusText(text)) {
+      const schl = JSON.stringify(b);
+      if (!gesehen.has(schl)) {
+        gesehen.add(schl);
+        gefunden.push(b);
+      }
+    }
+  }
   return gefunden;
+}
+
+/**
+ * Vollständige Einsatz-Sammlung aus den Bytes einer Sammel-PDF extrahieren —
+ * der Umschlag „eeb-einsatz" (inkl. Zug-Zuordnung, Status, Historie) wird seit
+ * dieser Fassung zusätzlich zu den Bögen eingebettet. `null`, wenn die PDF
+ * keinen Umschlag trägt (ältere Sammel-PDFs, fremde PDFs).
+ */
+export function einsatzAusPdfBytes(bytes: Uint8Array): Einsatzsammlung | null {
+  for (const text of streamTexte(bytes)) {
+    let roh: unknown;
+    try {
+      roh = JSON.parse(text);
+    } catch {
+      continue;
+    }
+    // Nur der explizite Umschlag zählt: eine bloße Bogen-Liste ist KEINE Sammlung.
+    if ((roh as Partial<EinsatzDatei>)?.typ !== "eeb-einsatz") continue;
+    try {
+      return einsatzAusRoh(roh);
+    } catch {
+      continue;
+    }
+  }
+  return null;
 }

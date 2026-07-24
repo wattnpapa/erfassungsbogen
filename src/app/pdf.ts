@@ -16,6 +16,8 @@ import type { Erfassungsbogen } from "../model";
 import { einheitAnzeigename, qrErzeugen } from "./hilfen";
 import { istNativ, pdfTeilen } from "./nativ";
 import { einsatzPdfDokument, pdfDokument } from "./pdf-dokument";
+import { einsatzDateiInhalt } from "./einsatz-transport";
+import type { Einsatzsammlung } from "./einsaetze";
 
 interface FontContainer {
   vfs: Record<string, string | { data: string; encoding?: string }>;
@@ -76,13 +78,15 @@ export async function pdfDatenUrl(b: Erfassungsbogen): Promise<string> {
 
 /**
  * Sammel-PDF eines Einsatzes: alle übergebenen Bögen in einer PDF (je Bogen
- * die vollständigen Seiten inkl. QR), plus alle Bögen als eingebettetes JSON.
+ * die vollständigen Seiten inkl. QR), plus alle Bögen als eingebettetes JSON
+ * UND die komplette Einsatz-Sammlung (Züge, Status, Historie) — die PDF ist
+ * damit die vollständige Schichtübergabe in einer Datei.
  */
-export async function einsatzPdfErzeugen(name: string, boegen: Erfassungsbogen[]): Promise<void> {
+export async function einsatzPdfErzeugen(einsatz: Einsatzsammlung, boegen: Erfassungsbogen[]): Promise<void> {
   const boegenMitQr: { bogen: Erfassungsbogen; qr: Awaited<ReturnType<typeof qrErzeugen>> }[] = [];
   for (const b of boegen) boegenMitQr.push({ bogen: b, qr: await qrErzeugen(b) });
-  const dd = einsatzPdfDokument(name, boegenMitQr);
-  const dateiname = `eeb-einsatz-${(name || "sammlung").replace(/[^\wäöüÄÖÜß-]+/g, "_")}.pdf`;
+  const dd = einsatzPdfDokument(einsatz.name, boegenMitQr, einsatzDateiInhalt(einsatz));
+  const dateiname = `eeb-einsatz-${(einsatz.name || "sammlung").replace(/[^\wäöüÄÖÜß-]+/g, "_")}.pdf`;
   if (istNativ()) {
     const base64 = await pdfMake.createPdf(dd).getBase64();
     await pdfTeilen(dateiname, base64);
