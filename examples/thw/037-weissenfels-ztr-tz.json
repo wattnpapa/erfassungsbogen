@@ -13,7 +13,7 @@
         },
         "name": "Weißenfels",
         "kurz": "OWFS",
-        "telefon": "03444199130",
+        "telefon": "5556783615",
         "email": "OV-Weissenfels@thw.de"
       },
       {
@@ -21,7 +21,7 @@
           "code": 2
         },
         "name": "Halle",
-        "telefon": "03451316130",
+        "telefon": "5554235800",
         "email": "Poststelle.Rst_Halle_Sa@thw.de"
       },
       {
@@ -29,7 +29,7 @@
           "code": 3
         },
         "name": "Berlin, Brandenburg, Sachsen-Anhalt",
-        "telefon": "030306820",
+        "telefon": "5559944891",
         "email": "Poststelle.LVBEBBST@thw.de"
       }
     ]
@@ -57,7 +57,7 @@
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "01614760800"
+          "wert": "5550423060"
         },
         {
           "art": 2,
@@ -90,7 +90,7 @@
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "01785667022"
+          "wert": "5556112011"
         }
       ],
       "zusatzqualifikationen": []

@@ -13,7 +13,7 @@
         },
         "name": "Eilenburg",
         "kurz": "OEIL",
-        "telefon": "03423700060",
+        "telefon": "5558242382",
         "email": "OV-Eilenburg@thw.de"
       },
       {
@@ -21,7 +21,7 @@
           "code": 2
         },
         "name": "Leipzig",
-        "telefon": "022899458240",
+        "telefon": "5553758422",
         "email": "Poststelle.RSt_Leipzig@thw.de"
       },
       {
@@ -29,7 +29,7 @@
           "code": 3
         },
         "name": "Sachsen, Thüringen",
-        "telefon": "0344756840",
+        "telefon": "5551576790",
         "email": "Poststelle.LVSNTH@thw.de"
       }
     ]
@@ -60,7 +60,7 @@
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "01751530466"
+          "wert": "5554133509"
         },
         {
           "art": 2,
@@ -86,7 +86,7 @@
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "01737504564"
+          "wert": "5558830381"
         }
       ],
       "zusatzqualifikationen": []

@@ -13,7 +13,7 @@
         },
         "name": "Westerburg",
         "kurz": "OWEB",
-        "telefon": "02663916460",
+        "telefon": "5550348766",
         "email": "OV-Westerburg@thw.de"
       },
       {
@@ -21,7 +21,7 @@
           "code": 2
         },
         "name": "Koblenz",
-        "telefon": "02618899670",
+        "telefon": "5556573297",
         "email": "Poststelle.RSt_Koblenz@thw.de"
       },
       {
@@ -29,7 +29,7 @@
           "code": 3
         },
         "name": "Hessen, Rheinland-Pfalz, Saarland",
-        "telefon": "0613192970",
+        "telefon": "5550710911",
         "email": "Poststelle.LVHERPSL@thw.de"
       }
     ]
@@ -60,7 +60,7 @@
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "01780307392"
+          "wert": "5559367029"
         },
         {
           "art": 2,
@@ -89,7 +89,7 @@
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "01672086456"
+          "wert": "5559422540"
         }
       ],
       "zusatzqualifikationen": []

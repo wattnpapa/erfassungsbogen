@@ -13,7 +13,7 @@
         },
         "name": "Landshut",
         "kurz": "OLHT",
-        "telefon": "087112557",
+        "telefon": "5552988029",
         "email": "OV-Landshut@thw.de"
       },
       {
@@ -21,7 +21,7 @@
           "code": 2
         },
         "name": "Mühldorf",
-        "telefon": "08631186200",
+        "telefon": "5553378172",
         "email": "Poststelle.RSt_Muehldorf@thw.de"
       },
       {
@@ -29,7 +29,7 @@
           "code": 3
         },
         "name": "Bayern",
-        "telefon": "02289945310",
+        "telefon": "5553793604",
         "email": "Poststelle.LVBY@thw.de"
       }
     ]
@@ -57,7 +57,7 @@
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "01597829162"
+          "wert": "5557675201"
         },
         {
           "art": 2,
@@ -83,7 +83,7 @@
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "01740724828"
+          "wert": "5550960244"
         }
       ],
       "zusatzqualifikationen": []

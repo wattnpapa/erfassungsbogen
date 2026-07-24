@@ -13,7 +13,7 @@
         },
         "name": "Karlsruhe",
         "kurz": "OKAR",
-        "telefon": "07218246710",
+        "telefon": "5552263111",
         "email": "OV-Karlsruhe@thw.de"
       },
       {
@@ -21,7 +21,7 @@
           "code": 2
         },
         "name": "Karlsruhe",
-        "telefon": "07218248750",
+        "telefon": "5556271105",
         "email": "Poststelle.RSt_Karlsruhe@thw.de"
       },
       {
@@ -29,7 +29,7 @@
           "code": 3
         },
         "name": "Baden-Württemberg",
-        "telefon": "0711955550",
+        "telefon": "5556969331",
         "email": "Poststelle.LVBW@thw.de"
       }
     ]
@@ -57,7 +57,7 @@
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "01547903327"
+          "wert": "5553920412"
         },
         {
           "art": 2,
@@ -83,7 +83,7 @@
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "01612894153"
+          "wert": "5550621323"
         }
       ],
       "zusatzqualifikationen": []

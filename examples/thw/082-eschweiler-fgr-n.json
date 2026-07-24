@@ -13,7 +13,7 @@
         },
         "name": "Eschweiler",
         "kurz": "OESW",
-        "telefon": "02403501260",
+        "telefon": "5555566636",
         "email": "OV-Eschweiler@thw.de"
       },
       {
@@ -21,7 +21,7 @@
           "code": 2
         },
         "name": "Aachen",
-        "telefon": "02419203220",
+        "telefon": "5551421158",
         "email": "Poststelle.RSt_Aachen@thw.de"
       },
       {
@@ -29,7 +29,7 @@
           "code": 3
         },
         "name": "Nordrhein-Westfalen",
-        "telefon": "0210379100",
+        "telefon": "5550737750",
         "email": "Poststelle.LVNW@thw.de"
       }
     ]
@@ -57,7 +57,7 @@
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "01611238454"
+          "wert": "5556967540"
         },
         {
           "art": 2,
@@ -83,7 +83,7 @@
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "01764460256"
+          "wert": "5554092186"
         }
       ],
       "zusatzqualifikationen": []

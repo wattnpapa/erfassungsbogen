@@ -13,7 +13,7 @@
         },
         "name": "Speyer",
         "kurz": "OSPY",
-        "telefon": "06232676590",
+        "telefon": "5557273629",
         "email": "OV-Speyer@thw.de"
       },
       {
@@ -21,7 +21,7 @@
           "code": 2
         },
         "name": "Neustadt a.d.W.",
-        "telefon": "06321484110",
+        "telefon": "5559687227",
         "email": "Poststelle.RSt_Neustadt_w@thw.de"
       },
       {
@@ -29,7 +29,7 @@
           "code": 3
         },
         "name": "Hessen, Rheinland-Pfalz, Saarland",
-        "telefon": "0613192970",
+        "telefon": "5550710911",
         "email": "Poststelle.LVHERPSL@thw.de"
       }
     ]
@@ -57,7 +57,7 @@
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "01557046941"
+          "wert": "5550903643"
         },
         {
           "art": 2,

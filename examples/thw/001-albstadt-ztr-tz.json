@@ -13,7 +13,7 @@
         },
         "name": "Albstadt",
         "kurz": "OALB",
-        "telefon": "07432984190",
+        "telefon": "5557923066",
         "email": "OV-Albstadt@thw.de"
       },
       {
@@ -21,7 +21,7 @@
           "code": 2
         },
         "name": "Tübingen",
-        "telefon": "0707191350",
+        "telefon": "5558798342",
         "email": "Poststelle.RSt_Tuebingen@thw.de"
       },
       {
@@ -29,7 +29,7 @@
           "code": 3
         },
         "name": "Baden-Württemberg",
-        "telefon": "0711955550",
+        "telefon": "5556969331",
         "email": "Poststelle.LVBW@thw.de"
       }
     ]
@@ -57,7 +57,7 @@
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "01572591223"
+          "wert": "5556968346"
         },
         {
           "art": 2,
@@ -83,7 +83,7 @@
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "01565149070"
+          "wert": "5554851103"
         }
       ],
       "zusatzqualifikationen": []

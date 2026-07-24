@@ -13,7 +13,7 @@
         },
         "name": "Hannover/Langenhagen",
         "kurz": "OHAN",
-        "telefon": "05114731390",
+        "telefon": "5553413839",
         "email": "OV-Hannover@thw.de"
       },
       {
@@ -21,7 +21,7 @@
           "code": 2
         },
         "name": "Hannover",
-        "telefon": "051167669880",
+        "telefon": "5552521474",
         "email": "Poststelle.RSt_Hannover@thw.de"
       },
       {
@@ -29,7 +29,7 @@
           "code": 3
         },
         "name": "Bremen, Niedersachsen",
-        "telefon": "0511336900",
+        "telefon": "5558869463",
         "email": "Poststelle.LVHBNI@thw.de"
       }
     ]
@@ -57,7 +57,7 @@
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "01775186785"
+          "wert": "5551861942"
         },
         {
           "art": 2,
@@ -83,7 +83,7 @@
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "01569286400"
+          "wert": "5556774856"
         }
       ],
       "zusatzqualifikationen": []

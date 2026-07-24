@@ -13,7 +13,7 @@
         },
         "name": "Wilhelmshaven",
         "kurz": "OWHV",
-        "telefon": "04421774760",
+        "telefon": "5559079287",
         "email": "OV-Wilhelmshaven@thw.de"
       },
       {
@@ -21,7 +21,7 @@
           "code": 2
         },
         "name": "Oldenburg",
-        "telefon": "04412121410",
+        "telefon": "5551892887",
         "email": "Poststelle.RSt_Oldenburg@thw.de"
       },
       {
@@ -29,7 +29,7 @@
           "code": 3
         },
         "name": "Bremen, Niedersachsen",
-        "telefon": "0511336900",
+        "telefon": "5558869463",
         "email": "Poststelle.LVHBNI@thw.de"
       }
     ]
@@ -57,7 +57,7 @@
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "01663154071"
+          "wert": "5554720313"
         },
         {
           "art": 2,
@@ -86,7 +86,7 @@
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "01676487033"
+          "wert": "5552460764"
         }
       ],
       "zusatzqualifikationen": []

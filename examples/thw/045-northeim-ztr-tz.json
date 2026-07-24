@@ -13,7 +13,7 @@
         },
         "name": "Northeim",
         "kurz": "ONOH",
-        "telefon": "05551910300",
+        "telefon": "5555890576",
         "email": "OV-Northeim@thw.de"
       },
       {
@@ -21,7 +21,7 @@
           "code": 2
         },
         "name": "Göttingen",
-        "telefon": "05519003360",
+        "telefon": "5556198135",
         "email": "Poststelle.RSt_Goettingen@thw.de"
       },
       {
@@ -29,7 +29,7 @@
           "code": 3
         },
         "name": "Bremen, Niedersachsen",
-        "telefon": "0511336900",
+        "telefon": "5558869463",
         "email": "Poststelle.LVHBNI@thw.de"
       }
     ]
@@ -60,7 +60,7 @@
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "01774850461"
+          "wert": "5556128462"
         },
         {
           "art": 2,
@@ -86,7 +86,7 @@
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "01570645235"
+          "wert": "5552441291"
         }
       ],
       "zusatzqualifikationen": [

@@ -13,7 +13,7 @@
         },
         "name": "Bochum",
         "kurz": "OBOM",
-        "telefon": "02343383070",
+        "telefon": "5551604598",
         "email": "OV-Bochum@thw.de"
       },
       {
@@ -21,7 +21,7 @@
           "code": 2
         },
         "name": "Bochum",
-        "telefon": "02346102890",
+        "telefon": "5552429288",
         "email": "Poststelle.RSt_Bochum@thw.de"
       },
       {
@@ -29,7 +29,7 @@
           "code": 3
         },
         "name": "Nordrhein-Westfalen",
-        "telefon": "0210379100",
+        "telefon": "5550737750",
         "email": "Poststelle.LVNW@thw.de"
       }
     ]
@@ -60,7 +60,7 @@
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "01775565360"
+          "wert": "5557697578"
         },
         {
           "art": 2,
@@ -86,7 +86,7 @@
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "01754602587"
+          "wert": "5554630300"
         }
       ],
       "zusatzqualifikationen": []

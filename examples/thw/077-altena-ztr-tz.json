@@ -13,7 +13,7 @@
         },
         "name": "Altena",
         "kurz": "OALN",
-        "telefon": "02352548410",
+        "telefon": "5554901839",
         "email": "OV-Altena@thw.de"
       },
       {
@@ -21,7 +21,7 @@
           "code": 2
         },
         "name": "Dortmund",
-        "telefon": "02315342550",
+        "telefon": "5558412537",
         "email": "Poststelle.RSt_Dortmund@thw.de"
       },
       {
@@ -29,7 +29,7 @@
           "code": 3
         },
         "name": "Nordrhein-Westfalen",
-        "telefon": "0210379100",
+        "telefon": "5550737750",
         "email": "Poststelle.LVNW@thw.de"
       }
     ]
@@ -60,7 +60,7 @@
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "01562531381"
+          "wert": "5555699098"
         },
         {
           "art": 2,
@@ -89,7 +89,7 @@
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "01780563977"
+          "wert": "5551984614"
         }
       ],
       "zusatzqualifikationen": []

@@ -13,7 +13,7 @@
         },
         "name": "Obernburg",
         "kurz": "OOBG",
-        "telefon": "06022649510",
+        "telefon": "5551256192",
         "email": "OV-Obernburg@thw.de"
       },
       {
@@ -21,7 +21,7 @@
           "code": 2
         },
         "name": "Karlstadt",
-        "telefon": "09353984820",
+        "telefon": "5553200492",
         "email": "Poststelle.RSt_Karlstadt@thw.de"
       },
       {
@@ -29,7 +29,7 @@
           "code": 3
         },
         "name": "Bayern",
-        "telefon": "02289945310",
+        "telefon": "5553793604",
         "email": "Poststelle.LVBY@thw.de"
       }
     ]
@@ -57,7 +57,7 @@
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "01657983368"
+          "wert": "5557731157"
         },
         {
           "art": 2,
@@ -83,7 +83,7 @@
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "01740422079"
+          "wert": "5555982667"
         }
       ],
       "zusatzqualifikationen": []

@@ -13,7 +13,7 @@
         },
         "name": "Pfungstadt",
         "kurz": "OPST",
-        "telefon": "06157801660",
+        "telefon": "5559612011",
         "email": "OV-Pfungstadt@thw.de"
       },
       {
@@ -21,7 +21,7 @@
           "code": 2
         },
         "name": "Darmstadt",
-        "telefon": "06151308750",
+        "telefon": "5559073703",
         "email": "Poststelle.RSt_Darmstadt@thw.de"
       },
       {
@@ -29,7 +29,7 @@
           "code": 3
         },
         "name": "Hessen, Rheinland-Pfalz, Saarland",
-        "telefon": "0613192970",
+        "telefon": "5550710911",
         "email": "Poststelle.LVHERPSL@thw.de"
       }
     ]
@@ -57,7 +57,7 @@
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "01571003621"
+          "wert": "5556779521"
         },
         {
           "art": 2,
@@ -86,7 +86,7 @@
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "01537432026"
+          "wert": "5551028388"
         }
       ],
       "zusatzqualifikationen": []

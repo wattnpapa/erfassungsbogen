@@ -13,7 +13,7 @@
         },
         "name": "Duisburg",
         "kurz": "ODUI",
-        "telefon": "02036086030",
+        "telefon": "5551404793",
         "email": "OV-Duisburg@thw.de"
       },
       {
@@ -21,7 +21,7 @@
           "code": 2
         },
         "name": "Düsseldorf",
-        "telefon": "02103791050",
+        "telefon": "5551294687",
         "email": "Poststelle.RSt_Duesseldorf@thw.de"
       },
       {
@@ -29,7 +29,7 @@
           "code": 3
         },
         "name": "Nordrhein-Westfalen",
-        "telefon": "0210379100",
+        "telefon": "5550737750",
         "email": "Poststelle.LVNW@thw.de"
       }
     ]
@@ -60,7 +60,7 @@
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "01771814523"
+          "wert": "5551038888"
         },
         {
           "art": 2,

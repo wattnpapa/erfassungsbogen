@@ -13,7 +13,7 @@
         },
         "name": "Berlin Tempelhof-Schöneberg",
         "kurz": "OTES",
-        "telefon": "0307851016",
+        "telefon": "5554358144",
         "email": "ov-berlin-tempelhof-schoeneberg@thw.de"
       },
       {
@@ -21,7 +21,7 @@
           "code": 2
         },
         "name": "Potsdam",
-        "telefon": "03329696070",
+        "telefon": "5553397300",
         "email": "Poststelle.RSt_Potsdam@thw.de"
       },
       {
@@ -29,7 +29,7 @@
           "code": 3
         },
         "name": "Berlin, Brandenburg, Sachsen-Anhalt",
-        "telefon": "030306820",
+        "telefon": "5559944891",
         "email": "Poststelle.LVBEBBST@thw.de"
       }
     ]
@@ -60,7 +60,7 @@
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "01780953652"
+          "wert": "5554907395"
         },
         {
           "art": 2,
@@ -86,7 +86,7 @@
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "01598194892"
+          "wert": "5553421005"
         }
       ],
       "zusatzqualifikationen": []

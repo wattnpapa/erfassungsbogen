@@ -13,7 +13,7 @@
         },
         "name": "Lübeck",
         "kurz": "OHLB",
-        "telefon": "04514505390",
+        "telefon": "5552882697",
         "email": "OV-Luebeck@thw.de"
       },
       {
@@ -21,7 +21,7 @@
           "code": 2
         },
         "name": "Lübeck",
-        "telefon": "04514866970",
+        "telefon": "5553581465",
         "email": "Poststelle.RSt_Luebeck@thw.de"
       },
       {
@@ -29,7 +29,7 @@
           "code": 3
         },
         "name": "Hamburg, Mecklenburg-Vorpommern, Schleswig-Holstein",
-        "telefon": "0431579330",
+        "telefon": "5551530326",
         "email": "Poststelle.LVHHMVSH@thw.de"
       }
     ]
@@ -57,7 +57,7 @@
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "01788530261"
+          "wert": "5550097016"
         },
         {
           "art": 2,
@@ -83,7 +83,7 @@
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "01535227837"
+          "wert": "5557099004"
         }
       ],
       "zusatzqualifikationen": []

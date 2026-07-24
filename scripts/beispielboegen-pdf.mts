@@ -65,6 +65,7 @@ import {
   segmentPayloadUrls,
 } from "../src/codec";
 import { nodeKompressor } from "../src/qr-node";
+import { fakeTelefon } from "./fake-telefon";
 import type { QrSatz, QrTeil } from "../src/app/hilfen";
 import { THW_EINHEITSTYPEN, THW_FAHRZEUGTYPEN } from "../src/vokabulare/thw";
 import {
@@ -352,7 +353,7 @@ function hierarchieFuerOv(ov: ThwOrtsverband): HierarchieEbene[] {
       bezeichnung: { code: 1 },
       name: ov.name,
       kurz: ov.kurz || undefined,
-      telefon: ov.telefon.replace(/\D/g, "") || undefined,
+      telefon: fakeTelefon(ov.telefon) || undefined,
       email: ov.email || undefined,
     },
   ];
@@ -363,13 +364,13 @@ function hierarchieFuerOv(ov: ThwOrtsverband): HierarchieEbene[] {
     ebenen.push({
       bezeichnung: { code: 2 },
       name: struktur.regionalstelle,
-      telefon: rst?.telefon.replace(/\D/g, ""),
+      telefon: rst && fakeTelefon(rst.telefon),
       email: rst?.email,
     });
     ebenen.push({
       bezeichnung: { code: 3 },
       name: struktur.landesverband,
-      telefon: lv?.telefon.replace(/\D/g, ""),
+      telefon: lv && fakeTelefon(lv.telefon),
       email: lv?.email,
     });
   }
@@ -449,7 +450,7 @@ function personenFabrik(): PersonenFabrik {
         person.kontakte.push({
           art: KontaktArt.MOBIL,
           dienstlich: false,
-          wert: `01${ganz(5, 7)}${ganz(1, 9)}${String(ganz(0, 9999999)).padStart(7, "0")}`,
+          wert: fakeTelefon(`01${ganz(5, 7)}${ganz(1, 9)}${String(ganz(0, 9999999)).padStart(7, "0")}`),
         });
         person.kontakte.push({ art: KontaktArt.EMAIL, dienstlich: true, emailTemplate: 1 });
       }
@@ -505,7 +506,7 @@ function personalBauen(typCode: number, delta: number): Person[] {
     zweite.kontakte.push({
       art: KontaktArt.MOBIL,
       dienstlich: false,
-      wert: `01${ganz(5, 7)}${ganz(1, 9)}${String(ganz(0, 9999999)).padStart(7, "0")}`,
+      wert: fakeTelefon(`01${ganz(5, 7)}${ganz(1, 9)}${String(ganz(0, 9999999)).padStart(7, "0")}`),
     });
   }
   return personen;
@@ -735,7 +736,7 @@ function grossbogenBauen(): BeispielBogen {
       p.kontakte.push({
         art: KontaktArt.MOBIL,
         dienstlich: false,
-        wert: `01701${String(230000 + i).padStart(6, "0")}`,
+        wert: fakeTelefon(`01701${String(230000 + i).padStart(6, "0")}`),
       });
     }
   });

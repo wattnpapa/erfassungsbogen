@@ -13,7 +13,7 @@
         },
         "name": "Schleswig",
         "kurz": "OSLS",
-        "telefon": "04621951830",
+        "telefon": "5558379356",
         "email": "OV-Schleswig@thw.de"
       },
       {
@@ -21,7 +21,7 @@
           "code": 2
         },
         "name": "Schleswig",
-        "telefon": "04621305000",
+        "telefon": "5551603762",
         "email": "Poststelle.RSt_Schleswig@thw.de"
       },
       {
@@ -29,7 +29,7 @@
           "code": 3
         },
         "name": "Hamburg, Mecklenburg-Vorpommern, Schleswig-Holstein",
-        "telefon": "0431579330",
+        "telefon": "5551530326",
         "email": "Poststelle.LVHHMVSH@thw.de"
       }
     ]
@@ -57,7 +57,7 @@
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "01723082525"
+          "wert": "5559555288"
         },
         {
           "art": 2,
@@ -87,7 +87,7 @@
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "01547636366"
+          "wert": "5551450772"
         }
       ],
       "zusatzqualifikationen": []

@@ -13,7 +13,7 @@
         },
         "name": "Kempen",
         "kurz": "OKMP",
-        "telefon": "02152962289",
+        "telefon": "5558206365",
         "email": "OV-Kempen@thw.de"
       },
       {
@@ -21,7 +21,7 @@
           "code": 2
         },
         "name": "Mönchengladbach",
-        "telefon": "02161477640",
+        "telefon": "5557870815",
         "email": "Poststelle.RSt_Moenchengladbach@thw.de"
       },
       {
@@ -29,7 +29,7 @@
           "code": 3
         },
         "name": "Nordrhein-Westfalen",
-        "telefon": "0210379100",
+        "telefon": "5550737750",
         "email": "Poststelle.LVNW@thw.de"
       }
     ]
@@ -60,7 +60,7 @@
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "01645118396"
+          "wert": "5559184223"
         },
         {
           "art": 2,
@@ -89,7 +89,7 @@
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "01555117450"
+          "wert": "5556337655"
         }
       ],
       "zusatzqualifikationen": []

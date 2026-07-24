@@ -13,7 +13,7 @@
         },
         "name": "Sinsheim",
         "kurz": "OSIH",
-        "telefon": "07261945290",
+        "telefon": "5554542552",
         "email": "OV-Sinsheim@thw.de"
       },
       {
@@ -21,7 +21,7 @@
           "code": 2
         },
         "name": "Mannheim",
-        "telefon": "06214840090",
+        "telefon": "5551674035",
         "email": "Poststelle.RSt_Mannheim@thw.de"
       },
       {
@@ -29,7 +29,7 @@
           "code": 3
         },
         "name": "Baden-Württemberg",
-        "telefon": "0711955550",
+        "telefon": "5556969331",
         "email": "Poststelle.LVBW@thw.de"
       }
     ]
@@ -60,7 +60,7 @@
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "01717078861"
+          "wert": "5553470411"
         },
         {
           "art": 2,
@@ -86,7 +86,7 @@
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "01786132983"
+          "wert": "5557339801"
         }
       ],
       "zusatzqualifikationen": []

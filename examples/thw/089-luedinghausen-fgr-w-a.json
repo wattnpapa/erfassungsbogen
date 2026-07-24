@@ -13,7 +13,7 @@
         },
         "name": "Lüdinghausen",
         "kurz": "OLDH",
-        "telefon": "02591794310",
+        "telefon": "5553428076",
         "email": "OV-Luedinghausen@thw.de"
       },
       {
@@ -21,7 +21,7 @@
           "code": 2
         },
         "name": "Münster",
-        "telefon": "022899455300",
+        "telefon": "5558616576",
         "email": "Poststelle.Rst_Muenster@thw.de"
       },
       {
@@ -29,7 +29,7 @@
           "code": 3
         },
         "name": "Nordrhein-Westfalen",
-        "telefon": "0210379100",
+        "telefon": "5550737750",
         "email": "Poststelle.LVNW@thw.de"
       }
     ]
@@ -57,7 +57,7 @@
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "01772483562"
+          "wert": "5557110818"
         },
         {
           "art": 2,
@@ -83,7 +83,7 @@
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "01573051112"
+          "wert": "5559525733"
         }
       ],
       "zusatzqualifikationen": []

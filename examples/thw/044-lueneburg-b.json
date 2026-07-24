@@ -13,7 +13,7 @@
         },
         "name": "Lüneburg",
         "kurz": "OLUE",
-        "telefon": "04131400540",
+        "telefon": "5555669759",
         "email": "OV-Lueneburg@thw.de"
       },
       {
@@ -21,7 +21,7 @@
           "code": 2
         },
         "name": "Buxtehude",
-        "telefon": "04161749600",
+        "telefon": "5552223909",
         "email": "Poststelle.RSt_Buxtehude@thw.de"
       },
       {
@@ -29,7 +29,7 @@
           "code": 3
         },
         "name": "Bremen, Niedersachsen",
-        "telefon": "0511336900",
+        "telefon": "5558869463",
         "email": "Poststelle.LVHBNI@thw.de"
       }
     ]
@@ -57,7 +57,7 @@
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "01591826985"
+          "wert": "5555616927"
         },
         {
           "art": 2,
@@ -83,7 +83,7 @@
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "01728060079"
+          "wert": "5553824367"
         }
       ],
       "zusatzqualifikationen": []

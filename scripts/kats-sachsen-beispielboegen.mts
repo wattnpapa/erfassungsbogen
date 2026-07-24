@@ -68,6 +68,7 @@ import {
 } from "../src/codec";
 import { nodeKompressor } from "../src/qr-node";
 import type { QrSatz, QrTeil } from "../src/app/hilfen";
+import { fakeTelefon } from "./fake-telefon";
 
 const wurzel = join(dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -933,7 +934,7 @@ function personBauen(spec: PlatzSpec, erste: boolean): Person {
     person.kontakte.push({
       art: KontaktArt.MOBIL,
       dienstlich: false,
-      wert: `01${ganz(5, 7)}${ganz(1, 9)}${String(ganz(0, 9999999)).padStart(7, "0")}`,
+      wert: fakeTelefon(`01${ganz(5, 7)}${ganz(1, 9)}${String(ganz(0, 9999999)).padStart(7, "0")}`),
     });
   }
   return person;
@@ -951,7 +952,7 @@ function personalBauen(specs: PlatzSpec[]): Person[] {
     zweite.kontakte.push({
       art: KontaktArt.MOBIL,
       dienstlich: false,
-      wert: `01${ganz(5, 7)}${ganz(1, 9)}${String(ganz(0, 9999999)).padStart(7, "0")}`,
+      wert: fakeTelefon(`01${ganz(5, 7)}${ganz(1, 9)}${String(ganz(0, 9999999)).padStart(7, "0")}`),
     });
   }
   return personen;

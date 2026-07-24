@@ -13,7 +13,7 @@
         },
         "name": "Schleiden",
         "kurz": "OSLE",
-        "telefon": "02445851510",
+        "telefon": "5558331074",
         "email": "OV-Schleiden@thw.de"
       },
       {
@@ -21,7 +21,7 @@
           "code": 2
         },
         "name": "Aachen",
-        "telefon": "02419203220",
+        "telefon": "5551421158",
         "email": "Poststelle.RSt_Aachen@thw.de"
       },
       {
@@ -29,7 +29,7 @@
           "code": 3
         },
         "name": "Nordrhein-Westfalen",
-        "telefon": "0210379100",
+        "telefon": "5550737750",
         "email": "Poststelle.LVNW@thw.de"
       }
     ]
@@ -57,7 +57,7 @@
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "01711913065"
+          "wert": "5554305301"
         },
         {
           "art": 2,
@@ -86,7 +86,7 @@
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "01738040922"
+          "wert": "5554250939"
         }
       ],
       "zusatzqualifikationen": []

@@ -13,7 +13,7 @@
         },
         "name": "Eckernförde",
         "kurz": "OECK",
-        "telefon": "04351726610",
+        "telefon": "5551760068",
         "email": "OV-Eckernfoerde@thw.de"
       },
       {
@@ -21,7 +21,7 @@
           "code": 2
         },
         "name": "Schleswig",
-        "telefon": "04621305000",
+        "telefon": "5551603762",
         "email": "Poststelle.RSt_Schleswig@thw.de"
       },
       {
@@ -29,7 +29,7 @@
           "code": 3
         },
         "name": "Hamburg, Mecklenburg-Vorpommern, Schleswig-Holstein",
-        "telefon": "0431579330",
+        "telefon": "5551530326",
         "email": "Poststelle.LVHHMVSH@thw.de"
       }
     ]
@@ -57,7 +57,7 @@
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "01752161545"
+          "wert": "5550535606"
         },
         {
           "art": 2,
@@ -83,7 +83,7 @@
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "01712658189"
+          "wert": "5557306981"
         }
       ],
       "zusatzqualifikationen": []

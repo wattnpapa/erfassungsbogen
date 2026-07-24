@@ -13,7 +13,7 @@
         },
         "name": "Rottweil",
         "kurz": "OROW",
-        "telefon": "07411744150",
+        "telefon": "5558910879",
         "email": "OV-Rottweil@thw.de"
       },
       {
@@ -21,7 +21,7 @@
           "code": 2
         },
         "name": "Villingen-Schwenningen",
-        "telefon": "07721202890",
+        "telefon": "5558642829",
         "email": "Poststelle.RSt_Vschwenningen@thw.de"
       },
       {
@@ -29,7 +29,7 @@
           "code": 3
         },
         "name": "Baden-Württemberg",
-        "telefon": "0711955550",
+        "telefon": "5556969331",
         "email": "Poststelle.LVBW@thw.de"
       }
     ]
@@ -60,7 +60,7 @@
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "01775335839"
+          "wert": "5559191128"
         },
         {
           "art": 2,

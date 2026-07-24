@@ -13,7 +13,7 @@
         },
         "name": "Hallenberg-Hesborn",
         "kurz": "OHAH",
-        "telefon": "02984929950",
+        "telefon": "5551607258",
         "email": "OV-Hesborn@thw.de"
       },
       {
@@ -21,7 +21,7 @@
           "code": 2
         },
         "name": "Arnsberg",
-        "telefon": "0293196090",
+        "telefon": "5556643154",
         "email": "Poststelle.RSt_Arnsberg@thw.de"
       },
       {
@@ -29,7 +29,7 @@
           "code": 3
         },
         "name": "Nordrhein-Westfalen",
-        "telefon": "0210379100",
+        "telefon": "5550737750",
         "email": "Poststelle.LVNW@thw.de"
       }
     ]
@@ -60,7 +60,7 @@
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "01756014194"
+          "wert": "5555130433"
         },
         {
           "art": 2,
@@ -86,7 +86,7 @@
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "01620445200"
+          "wert": "5554939577"
         }
       ],
       "zusatzqualifikationen": []

@@ -13,7 +13,7 @@
         },
         "name": "Büren",
         "kurz": "OBNU",
-        "telefon": "02958997450",
+        "telefon": "5552984143",
         "email": "OV-Bueren@thw.de"
       },
       {
@@ -21,7 +21,7 @@
           "code": 2
         },
         "name": "Arnsberg",
-        "telefon": "0293196090",
+        "telefon": "5556643154",
         "email": "Poststelle.RSt_Arnsberg@thw.de"
       },
       {
@@ -29,7 +29,7 @@
           "code": 3
         },
         "name": "Nordrhein-Westfalen",
-        "telefon": "0210379100",
+        "telefon": "5550737750",
         "email": "Poststelle.LVNW@thw.de"
       }
     ]
@@ -57,7 +57,7 @@
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "01532791301"
+          "wert": "5553608287"
         },
         {
           "art": 2,
@@ -83,7 +83,7 @@
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "01771102450"
+          "wert": "5555251905"
         }
       ],
       "zusatzqualifikationen": []

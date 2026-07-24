@@ -13,7 +13,7 @@
         },
         "name": "Andernach",
         "kurz": "OAND",
-        "telefon": "02632309810",
+        "telefon": "5551788213",
         "email": "OV-Andernach@thw.de"
       },
       {
@@ -21,7 +21,7 @@
           "code": 2
         },
         "name": "Koblenz",
-        "telefon": "02618899670",
+        "telefon": "5556573297",
         "email": "Poststelle.RSt_Koblenz@thw.de"
       },
       {
@@ -29,7 +29,7 @@
           "code": 3
         },
         "name": "Hessen, Rheinland-Pfalz, Saarland",
-        "telefon": "0613192970",
+        "telefon": "5550710911",
         "email": "Poststelle.LVHERPSL@thw.de"
       }
     ]
@@ -57,7 +57,7 @@
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "01631145452"
+          "wert": "5552784231"
         },
         {
           "art": 2,

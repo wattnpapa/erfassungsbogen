@@ -13,7 +13,7 @@
         },
         "name": "Rathenow",
         "kurz": "ORAT",
-        "telefon": "03385515600",
+        "telefon": "5556181003",
         "email": "OV-Rathenow@thw.de"
       },
       {
@@ -21,7 +21,7 @@
           "code": 2
         },
         "name": "Potsdam",
-        "telefon": "03329696070",
+        "telefon": "5553397300",
         "email": "Poststelle.RSt_Potsdam@thw.de"
       },
       {
@@ -29,7 +29,7 @@
           "code": 3
         },
         "name": "Berlin, Brandenburg, Sachsen-Anhalt",
-        "telefon": "030306820",
+        "telefon": "5559944891",
         "email": "Poststelle.LVBEBBST@thw.de"
       }
     ]
@@ -57,7 +57,7 @@
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "01792134723"
+          "wert": "5559437174"
         },
         {
           "art": 2,

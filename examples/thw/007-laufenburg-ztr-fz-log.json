@@ -13,7 +13,7 @@
         },
         "name": "Laufenburg",
         "kurz": "OLBG",
-        "telefon": "07763704590",
+        "telefon": "5555070503",
         "email": "OV-Laufenburg@thw.de"
       },
       {
@@ -21,7 +21,7 @@
           "code": 2
         },
         "name": "Villingen-Schwenningen",
-        "telefon": "07721202890",
+        "telefon": "5558642829",
         "email": "Poststelle.RSt_Vschwenningen@thw.de"
       },
       {
@@ -29,7 +29,7 @@
           "code": 3
         },
         "name": "Baden-Württemberg",
-        "telefon": "0711955550",
+        "telefon": "5556969331",
         "email": "Poststelle.LVBW@thw.de"
       }
     ]
@@ -57,7 +57,7 @@
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "01653918511"
+          "wert": "5552560231"
         },
         {
           "art": 2,
@@ -86,7 +86,7 @@
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "01635606531"
+          "wert": "5556452031"
         }
       ],
       "zusatzqualifikationen": []

@@ -13,7 +13,7 @@
         },
         "name": "Regen",
         "kurz": "OREG",
-        "telefon": "099211325",
+        "telefon": "5553512081",
         "email": "OV-Regen@thw.de"
       },
       {
@@ -21,7 +21,7 @@
           "code": 2
         },
         "name": "Straubing",
-        "telefon": "09421963410",
+        "telefon": "5550914126",
         "email": "Poststelle.RSt_Straubing@thw.de"
       },
       {
@@ -29,7 +29,7 @@
           "code": 3
         },
         "name": "Bayern",
-        "telefon": "02289945310",
+        "telefon": "5553793604",
         "email": "Poststelle.LVBY@thw.de"
       }
     ]
@@ -57,7 +57,7 @@
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "01570122857"
+          "wert": "5555105255"
         },
         {
           "art": 2,
@@ -83,7 +83,7 @@
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "01626640201"
+          "wert": "5551446139"
         }
       ],
       "zusatzqualifikationen": []

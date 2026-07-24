@@ -13,7 +13,7 @@
         },
         "name": "Starnberg",
         "kurz": "OSTG",
-        "telefon": "081518224",
+        "telefon": "5558841126",
         "email": "OV-Starnberg@thw.de"
       },
       {
@@ -21,7 +21,7 @@
           "code": 2
         },
         "name": "Bad Tölz",
-        "telefon": "08041792460",
+        "telefon": "5558903684",
         "email": "Poststelle.RSt_Bad-Toelz@thw.de"
       },
       {
@@ -29,7 +29,7 @@
           "code": 3
         },
         "name": "Bayern",
-        "telefon": "02289945310",
+        "telefon": "5553793604",
         "email": "Poststelle.LVBY@thw.de"
       }
     ]
@@ -60,7 +60,7 @@
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "01726015644"
+          "wert": "5550753243"
         },
         {
           "art": 2,
@@ -89,7 +89,7 @@
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "01784440129"
+          "wert": "5558910237"
         }
       ],
       "zusatzqualifikationen": []

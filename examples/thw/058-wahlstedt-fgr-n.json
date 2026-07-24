@@ -13,7 +13,7 @@
         },
         "name": "Wahlstedt",
         "kurz": "OWAH",
-        "telefon": "0455492883",
+        "telefon": "5552329531",
         "email": "OV-Wahlstedt@thw.de"
       },
       {
@@ -21,7 +21,7 @@
           "code": 2
         },
         "name": "Neumünster",
-        "telefon": "04321851340",
+        "telefon": "5558951580",
         "email": "Poststelle.RSt_Neumuenster@thw.de"
       },
       {
@@ -29,7 +29,7 @@
           "code": 3
         },
         "name": "Hamburg, Mecklenburg-Vorpommern, Schleswig-Holstein",
-        "telefon": "0431579330",
+        "telefon": "5551530326",
         "email": "Poststelle.LVHHMVSH@thw.de"
       }
     ]
@@ -57,7 +57,7 @@
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "01682136819"
+          "wert": "5555629742"
         },
         {
           "art": 2,
@@ -90,7 +90,7 @@
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "01590985359"
+          "wert": "5557348143"
         }
       ],
       "zusatzqualifikationen": []

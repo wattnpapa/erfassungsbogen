@@ -13,7 +13,7 @@
         },
         "name": "Grevenbroich",
         "kurz": "OGVB",
-        "telefon": "02181213550",
+        "telefon": "5556192253",
         "email": "OV-Grevenbroich@thw.de"
       },
       {
@@ -21,7 +21,7 @@
           "code": 2
         },
         "name": "Mönchengladbach",
-        "telefon": "02161477640",
+        "telefon": "5557870815",
         "email": "Poststelle.RSt_Moenchengladbach@thw.de"
       },
       {
@@ -29,7 +29,7 @@
           "code": 3
         },
         "name": "Nordrhein-Westfalen",
-        "telefon": "0210379100",
+        "telefon": "5550737750",
         "email": "Poststelle.LVNW@thw.de"
       }
     ]
@@ -60,7 +60,7 @@
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "01651041288"
+          "wert": "5550321417"
         },
         {
           "art": 2,

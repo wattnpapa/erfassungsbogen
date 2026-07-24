@@ -13,7 +13,7 @@
         },
         "name": "Erlangen",
         "kurz": "OERL",
-        "telefon": "0913163206",
+        "telefon": "5551576774",
         "email": "OV-Erlangen@thw.de"
       },
       {
@@ -21,7 +21,7 @@
           "code": 2
         },
         "name": "Nürnberg",
-        "telefon": "09119653340",
+        "telefon": "5554798424",
         "email": "Poststelle.RSt_Nuernberg@thw.de"
       },
       {
@@ -29,7 +29,7 @@
           "code": 3
         },
         "name": "Bayern",
-        "telefon": "02289945310",
+        "telefon": "5553793604",
         "email": "Poststelle.LVBY@thw.de"
       }
     ]
@@ -57,7 +57,7 @@
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "01723248632"
+          "wert": "5555414473"
         },
         {
           "art": 2,
@@ -86,7 +86,7 @@
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "01621504080"
+          "wert": "5558510016"
         }
       ],
       "zusatzqualifikationen": []

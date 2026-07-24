@@ -13,7 +13,7 @@
         },
         "name": "Cottbus",
         "kurz": "OCOT",
-        "telefon": "03553553770",
+        "telefon": "5553652808",
         "email": "OV-Cottbus@thw.de"
       },
       {
@@ -21,7 +21,7 @@
           "code": 2
         },
         "name": "Frankfurt (Oder)",
-        "telefon": "03352846830",
+        "telefon": "5553138335",
         "email": "Poststelle.Rst_Frankfurt_O@thw.de"
       },
       {
@@ -29,7 +29,7 @@
           "code": 3
         },
         "name": "Berlin, Brandenburg, Sachsen-Anhalt",
-        "telefon": "030306820",
+        "telefon": "5559944891",
         "email": "Poststelle.LVBEBBST@thw.de"
       }
     ]
@@ -60,7 +60,7 @@
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "01514012633"
+          "wert": "5553780101"
         },
         {
           "art": 2,

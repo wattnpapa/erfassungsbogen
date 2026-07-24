@@ -13,7 +13,7 @@
         },
         "name": "Müllheim",
         "kurz": "OMLH",
-        "telefon": "07631747770",
+        "telefon": "5552509452",
         "email": "OV-Muellheim@thw.de"
       },
       {
@@ -21,7 +21,7 @@
           "code": 2
         },
         "name": "Freiburg",
-        "telefon": "07615039070",
+        "telefon": "5557192643",
         "email": "Poststelle.RSt_Freiburg@thw.de"
       },
       {
@@ -29,7 +29,7 @@
           "code": 3
         },
         "name": "Baden-Württemberg",
-        "telefon": "0711955550",
+        "telefon": "5556969331",
         "email": "Poststelle.LVBW@thw.de"
       }
     ]
@@ -57,7 +57,7 @@
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "01571012443"
+          "wert": "5558845969"
         },
         {
           "art": 2,

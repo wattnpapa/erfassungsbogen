@@ -13,7 +13,7 @@
         },
         "name": "Grimma",
         "kurz": "OGRM",
-        "telefon": "03437948930",
+        "telefon": "5555078023",
         "email": "OV-Grimma@thw.de"
       },
       {
@@ -21,7 +21,7 @@
           "code": 2
         },
         "name": "Leipzig",
-        "telefon": "022899458240",
+        "telefon": "5553758422",
         "email": "Poststelle.RSt_Leipzig@thw.de"
       },
       {
@@ -29,7 +29,7 @@
           "code": 3
         },
         "name": "Sachsen, Thüringen",
-        "telefon": "0344756840",
+        "telefon": "5551576790",
         "email": "Poststelle.LVSNTH@thw.de"
       }
     ]
@@ -57,7 +57,7 @@
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "01756087057"
+          "wert": "5550289683"
         },
         {
           "art": 2,
@@ -90,7 +90,7 @@
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "01675993698"
+          "wert": "5551545110"
         }
       ],
       "zusatzqualifikationen": []

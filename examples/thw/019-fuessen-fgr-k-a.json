@@ -13,7 +13,7 @@
         },
         "name": "Füssen",
         "kurz": "OFSS",
-        "telefon": "08362921559",
+        "telefon": "5550339893",
         "email": "OV-Fuessen@thw.de"
       },
       {
@@ -21,7 +21,7 @@
           "code": 2
         },
         "name": "Kempten",
-        "telefon": "08315407490",
+        "telefon": "5557725642",
         "email": "Poststelle.RSt_Kempten@thw.de"
       },
       {
@@ -29,7 +29,7 @@
           "code": 3
         },
         "name": "Bayern",
-        "telefon": "02289945310",
+        "telefon": "5553793604",
         "email": "Poststelle.LVBY@thw.de"
       }
     ]
@@ -60,7 +60,7 @@
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "01546578299"
+          "wert": "5551495611"
         },
         {
           "art": 2,
@@ -86,7 +86,7 @@
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "01623611737"
+          "wert": "5558367820"
         }
       ],
       "zusatzqualifikationen": []

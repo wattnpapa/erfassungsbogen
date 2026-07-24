@@ -13,7 +13,7 @@
         },
         "name": "Plauen",
         "kurz": "OPLA",
-        "telefon": "03741287430",
+        "telefon": "5550186520",
         "email": "OV-Plauen@thw.de"
       },
       {
@@ -21,7 +21,7 @@
           "code": 2
         },
         "name": "Chemnitz",
-        "telefon": "03713563590",
+        "telefon": "5555509943",
         "email": "Poststelle.Rst_Chemnitz@thw.de"
       },
       {
@@ -29,7 +29,7 @@
           "code": 3
         },
         "name": "Sachsen, Thüringen",
-        "telefon": "0344756840",
+        "telefon": "5551576790",
         "email": "Poststelle.LVSNTH@thw.de"
       }
     ]
@@ -57,7 +57,7 @@
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "01626890951"
+          "wert": "5555727054"
         },
         {
           "art": 2,
@@ -83,7 +83,7 @@
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "01673723247"
+          "wert": "5554496475"
         }
       ],
       "zusatzqualifikationen": []

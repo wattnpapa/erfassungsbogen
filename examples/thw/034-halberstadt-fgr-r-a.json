@@ -13,7 +13,7 @@
         },
         "name": "Halberstadt",
         "kurz": "OHAT",
-        "telefon": "03941595010",
+        "telefon": "5554568726",
         "email": "OV-Halberstadt@thw.de"
       },
       {
@@ -21,7 +21,7 @@
           "code": 2
         },
         "name": "Magdeburg",
-        "telefon": "03916119890",
+        "telefon": "5550742434",
         "email": "Poststelle.RSt_Magdeburg@thw.de"
       },
       {
@@ -29,7 +29,7 @@
           "code": 3
         },
         "name": "Berlin, Brandenburg, Sachsen-Anhalt",
-        "telefon": "030306820",
+        "telefon": "5559944891",
         "email": "Poststelle.LVBEBBST@thw.de"
       }
     ]
@@ -57,7 +57,7 @@
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "01673539593"
+          "wert": "5556156640"
         },
         {
           "art": 2,
@@ -83,7 +83,7 @@
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "01660131770"
+          "wert": "5557069313"
         }
       ],
       "zusatzqualifikationen": []

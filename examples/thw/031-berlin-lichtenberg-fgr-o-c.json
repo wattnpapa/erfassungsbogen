@@ -13,7 +13,7 @@
         },
         "name": "Berlin Lichtenberg",
         "kurz": "OLIC",
-        "telefon": "03051061855",
+        "telefon": "5557154879",
         "email": "OV-Berlin-Lichtenberg@thw.de"
       },
       {
@@ -21,7 +21,7 @@
           "code": 2
         },
         "name": "Berlin",
-        "telefon": "03063414670",
+        "telefon": "5559348745",
         "email": "Poststelle.RSt_Berlin@thw.de"
       },
       {
@@ -29,7 +29,7 @@
           "code": 3
         },
         "name": "Berlin, Brandenburg, Sachsen-Anhalt",
-        "telefon": "030306820",
+        "telefon": "5559944891",
         "email": "Poststelle.LVBEBBST@thw.de"
       }
     ]
@@ -57,7 +57,7 @@
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "01691625376"
+          "wert": "5556439763"
         },
         {
           "art": 2,
@@ -87,7 +87,7 @@
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "01778663636"
+          "wert": "5556607896"
         }
       ],
       "zusatzqualifikationen": []

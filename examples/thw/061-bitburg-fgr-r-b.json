@@ -13,7 +13,7 @@
         },
         "name": "Bitburg",
         "kurz": "OBIT",
-        "telefon": "06561946580",
+        "telefon": "5558451179",
         "email": "OV-Bitburg@thw.de"
       },
       {
@@ -21,7 +21,7 @@
           "code": 2
         },
         "name": "Trier",
-        "telefon": "06518249800",
+        "telefon": "5558791084",
         "email": "Poststelle.RSt_Trier@thw.de"
       },
       {
@@ -29,7 +29,7 @@
           "code": 3
         },
         "name": "Hessen, Rheinland-Pfalz, Saarland",
-        "telefon": "0613192970",
+        "telefon": "5550710911",
         "email": "Poststelle.LVHERPSL@thw.de"
       }
     ]
@@ -57,7 +57,7 @@
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "01663291957"
+          "wert": "5559721424"
         },
         {
           "art": 2,
@@ -86,7 +86,7 @@
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "01653131796"
+          "wert": "5557150155"
         }
       ],
       "zusatzqualifikationen": []

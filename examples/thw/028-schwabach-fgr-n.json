@@ -13,7 +13,7 @@
         },
         "name": "Schwabach",
         "kurz": "OSWA",
-        "telefon": "09122836839",
+        "telefon": "5557098122",
         "email": "OV-Schwabach@thw.de"
       },
       {
@@ -21,7 +21,7 @@
           "code": 2
         },
         "name": "Nürnberg",
-        "telefon": "09119653340",
+        "telefon": "5554798424",
         "email": "Poststelle.RSt_Nuernberg@thw.de"
       },
       {
@@ -29,7 +29,7 @@
           "code": 3
         },
         "name": "Bayern",
-        "telefon": "02289945310",
+        "telefon": "5553793604",
         "email": "Poststelle.LVBY@thw.de"
       }
     ]
@@ -57,7 +57,7 @@
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "01641613500"
+          "wert": "5558456346"
         },
         {
           "art": 2,

@@ -13,7 +13,7 @@
         },
         "name": "Ulm",
         "kurz": "OULM",
-        "telefon": "07319260880",
+        "telefon": "5553584007",
         "email": "OV-Ulm@thw.de"
       },
       {
@@ -21,7 +21,7 @@
           "code": 2
         },
         "name": "Biberach",
-        "telefon": "022899452210",
+        "telefon": "5556720745",
         "email": "Poststelle.RSt_Biberach@thw.de"
       },
       {
@@ -29,7 +29,7 @@
           "code": 3
         },
         "name": "Baden-Württemberg",
-        "telefon": "0711955550",
+        "telefon": "5556969331",
         "email": "Poststelle.LVBW@thw.de"
       }
     ]
@@ -57,7 +57,7 @@
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "01630358133"
+          "wert": "5550659550"
         },
         {
           "art": 2,
@@ -83,7 +83,7 @@
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "01743807836"
+          "wert": "5555946912"
         }
       ],
       "zusatzqualifikationen": []

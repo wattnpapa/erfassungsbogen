@@ -13,7 +13,7 @@
         },
         "name": "Bad Segeberg",
         "kurz": "OBSG",
-        "telefon": "04551968480",
+        "telefon": "5551450197",
         "email": "OV-Bad-Segeberg@thw.de"
       },
       {
@@ -21,7 +21,7 @@
           "code": 2
         },
         "name": "Neumünster",
-        "telefon": "04321851340",
+        "telefon": "5558951580",
         "email": "Poststelle.RSt_Neumuenster@thw.de"
       },
       {
@@ -29,7 +29,7 @@
           "code": 3
         },
         "name": "Hamburg, Mecklenburg-Vorpommern, Schleswig-Holstein",
-        "telefon": "0431579330",
+        "telefon": "5551530326",
         "email": "Poststelle.LVHHMVSH@thw.de"
       }
     ]
@@ -57,7 +57,7 @@
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "01623040031"
+          "wert": "5557642511"
         },
         {
           "art": 2,
@@ -87,7 +87,7 @@
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "01628618032"
+          "wert": "5559729102"
         }
       ],
       "zusatzqualifikationen": []

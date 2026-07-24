@@ -70,6 +70,7 @@ import {
 } from "../src/codec";
 import { nodeKompressor } from "../src/qr-node";
 import type { QrSatz, QrTeil } from "../src/app/hilfen";
+import { fakeTelefon } from "./fake-telefon";
 
 const wurzel = join(dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -179,7 +180,7 @@ function person(opt: {
     p.kontakte.push({
       art: KontaktArt.MOBIL,
       dienstlich: false,
-      wert: `01${ganz(5, 7)}${ganz(1, 9)}${String(ganz(0, 9999999)).padStart(7, "0")}`,
+      wert: fakeTelefon(`01${ganz(5, 7)}${ganz(1, 9)}${String(ganz(0, 9999999)).padStart(7, "0")}`),
     });
   }
   return p;
@@ -196,7 +197,7 @@ function hierarchie(
   domain: string,
 ): HierarchieEbene[] {
   return [
-    { bezeichnung: { freitext: "Ortsgruppe" }, name: og, kurz: `OG ${og}`, telefon: tel, email: `info@${domain}.dlrg.de` },
+    { bezeichnung: { freitext: "Ortsgruppe" }, name: og, kurz: `OG ${og}`, telefon: fakeTelefon(tel), email: `info@${domain}.dlrg.de` },
     { bezeichnung: { freitext: "Bezirk" }, name: bezirk },
     { bezeichnung: { freitext: "Landesverband" }, name: lv },
   ];
@@ -373,7 +374,7 @@ const baeuplane: Bauplan[] = [
     datei: "wrv-bawue-fuehrungstrupp-elw1",
     einheitsTyp: "Wasserrettungsverband — Führungstrupp (ELW 1)",
     hierarchie: [
-      { bezeichnung: { freitext: "Landesverband" }, name: "Baden", kurz: "LV Baden", telefon: "0721136010", email: "info@baden.dlrg.de" },
+      { bezeichnung: { freitext: "Landesverband" }, name: "Baden", kurz: "LV Baden", telefon: fakeTelefon("0721136010"), email: "info@baden.dlrg.de" },
       { bezeichnung: { freitext: "Koordinierungsstelle" }, name: "Wasserrettung Baden-Württemberg" },
     ],
     personal: [
@@ -392,7 +393,7 @@ const baeuplane: Bauplan[] = [
     datei: "wrv-bawue-verbandsfuehrung-kdow",
     einheitsTyp: "Wasserrettungsverband — Verbandsführung (KdoW)",
     hierarchie: [
-      { bezeichnung: { freitext: "Landesverband" }, name: "Württemberg", kurz: "LV Württemberg", telefon: "0711921950", email: "info@wuerttemberg.dlrg.de" },
+      { bezeichnung: { freitext: "Landesverband" }, name: "Württemberg", kurz: "LV Württemberg", telefon: fakeTelefon("0711921950"), email: "info@wuerttemberg.dlrg.de" },
       { bezeichnung: { freitext: "Koordinierungsstelle" }, name: "Wasserrettung Baden-Württemberg" },
     ],
     personal: [

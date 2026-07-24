@@ -13,7 +13,7 @@
         },
         "name": "Oberhausen-Rheinhausen",
         "kurz": "OOBE",
-        "telefon": "07254957700",
+        "telefon": "5554913627",
         "email": "OV-Oberhausen-BW@thw.de"
       },
       {
@@ -21,7 +21,7 @@
           "code": 2
         },
         "name": "Karlsruhe",
-        "telefon": "07218248750",
+        "telefon": "5556271105",
         "email": "Poststelle.RSt_Karlsruhe@thw.de"
       },
       {
@@ -29,7 +29,7 @@
           "code": 3
         },
         "name": "Baden-Württemberg",
-        "telefon": "0711955550",
+        "telefon": "5556969331",
         "email": "Poststelle.LVBW@thw.de"
       }
     ]
@@ -57,7 +57,7 @@
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "01729670529"
+          "wert": "5553780331"
         },
         {
           "art": 2,
@@ -83,7 +83,7 @@
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "01718600082"
+          "wert": "5558674486"
         }
       ],
       "zusatzqualifikationen": []

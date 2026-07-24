@@ -13,7 +13,7 @@
         },
         "name": "Bremen Süd",
         "kurz": "OHBS",
-        "telefon": "04217903220",
+        "telefon": "5558230687",
         "email": "OV-Bremen-Sued@thw.de"
       },
       {
@@ -21,7 +21,7 @@
           "code": 2
         },
         "name": "Bremen",
-        "telefon": "042164362300",
+        "telefon": "5558210436",
         "email": "Poststelle.RSt_Bremen@thw.de"
       },
       {
@@ -29,7 +29,7 @@
           "code": 3
         },
         "name": "Bremen, Niedersachsen",
-        "telefon": "0511336900",
+        "telefon": "5558869463",
         "email": "Poststelle.LVHBNI@thw.de"
       }
     ]
@@ -57,7 +57,7 @@
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "01729425268"
+          "wert": "5558111297"
         },
         {
           "art": 2,
@@ -83,7 +83,7 @@
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "01754645121"
+          "wert": "5555659007"
         }
       ],
       "zusatzqualifikationen": []

@@ -13,7 +13,7 @@
         },
         "name": "Stolberg",
         "kurz": "OSTB",
-        "telefon": "02402124930",
+        "telefon": "5554926584",
         "email": "OV-Stolberg@thw.de"
       },
       {
@@ -21,7 +21,7 @@
           "code": 2
         },
         "name": "Aachen",
-        "telefon": "02419203220",
+        "telefon": "5551421158",
         "email": "Poststelle.RSt_Aachen@thw.de"
       },
       {
@@ -29,7 +29,7 @@
           "code": 3
         },
         "name": "Nordrhein-Westfalen",
-        "telefon": "0210379100",
+        "telefon": "5550737750",
         "email": "Poststelle.LVNW@thw.de"
       }
     ]
@@ -60,7 +60,7 @@
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "01721539732"
+          "wert": "5559801611"
         },
         {
           "art": 2,
