@@ -46,6 +46,7 @@ import {
   einheitAnzeigename,
   einheitOrt,
   ersteEbene,
+  fahrzeugHinweise,
   funkrufText,
   funktionsText,
   kennzeichenAusText,
@@ -205,10 +206,10 @@ function Stepper(props: { titel: string; wert: number; setzen: (n: number) => vo
 }
 
 /** Plausibilitätshinweise (nicht blockierend). */
-function Hinweise({ bogen }: { bogen: Erfassungsbogen }) {
+function Hinweise({ hinweise }: { hinweise: string[] }) {
   return (
     <>
-      {plausibilitaet(bogen).map((h) => (
+      {hinweise.map((h) => (
         <p key={h} className="warnung">⚠ {h}</p>
       ))}
     </>
@@ -755,7 +756,7 @@ export function SchrittPersonal({ bogen, aendern }: SchrittProps) {
         </p>
       )}
 
-      <Hinweise bogen={bogen} />
+      <Hinweise hinweise={plausibilitaet(bogen, false)} />
 
       {!nurStaerke && vorlage.length > 0 && (
         <p>
@@ -903,6 +904,7 @@ export function SchrittFahrzeuge({ bogen, aendern }: SchrittProps) {
       <button type="button" className="primaer" onClick={() => aendern({ fahrzeuge: [...bogen.fahrzeuge, neuesFahrzeug()] })}>
         + Fahrzeug hinzufügen
       </button>
+      <Hinweise hinweise={fahrzeugHinweise(bogen)} />
     </section>
   );
 }
@@ -1097,7 +1099,7 @@ export function Uebersicht(props: {
               : " — die Daten passen nicht zur Signatur."}
           </p>
         )}
-        <Hinweise bogen={bogen} />
+        <Hinweise hinweise={plausibilitaet(bogen)} />
         <p>
           <strong>{orgLabel(org)}</strong>
           {" · "}{vokabText(bogen.einheit.einheitsTyp, vokabularFuer(org, "einheitstyp"), "name") || "(Einheitstyp offen)"}

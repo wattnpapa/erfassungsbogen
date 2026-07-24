@@ -319,10 +319,27 @@ export async function bogenLaden(datei: File): Promise<Erfassungsbogen> {
 // ------------------------------------------------------ Plausibilitätsprüfung
 
 /**
- * Nicht-blockierende Plausibilitätshinweise für Stärkemeldung, Unterbringung
- * und Einsatzzeitraum. Leeres Array = alles plausibel.
+ * Hinweise, die den Fahrzeug-Schritt betreffen (fehlende Kennzeichen).
+ * Getrennt gehalten, damit sie auf der Fahrzeugseite erscheinen und nicht
+ * schon bei der Personalerfassung stören.
  */
-export function plausibilitaet(b: Erfassungsbogen): string[] {
+export function fahrzeugHinweise(b: Erfassungsbogen): string[] {
+  const hinweise: string[] = [];
+  b.fahrzeuge.forEach((f, i) => {
+    if (!kennzeichenText(f).trim()) {
+      hinweise.push(`Fahrzeug ${i + 1} hat noch kein Kennzeichen.`);
+    }
+  });
+  return hinweise;
+}
+
+/**
+ * Nicht-blockierende Plausibilitätshinweise für Stärkemeldung, Unterbringung
+ * und Einsatzzeitraum. Leeres Array = alles plausibel. Die Fahrzeug-Hinweise
+ * hängen standardmäßig mit an (für die Gesamtübersicht); auf der Personalseite
+ * werden sie über `mitFahrzeugen = false` weggelassen.
+ */
+export function plausibilitaet(b: Erfassungsbogen, mitFahrzeugen = true): string[] {
   const hinweise: string[] = [];
   const s = staerke(b);
   const mwd = unterbringungMWD(b);
@@ -384,7 +401,8 @@ export function plausibilitaet(b: Erfassungsbogen): string[] {
     }
   }
   // Vollständigkeit für die Weitergabe: genau die Angaben, wegen derer der
-  // Meldekopf sonst zurückfragen muss (Erreichbarkeit, Kennzeichen, Auftrag).
+  // Meldekopf sonst zurückfragen muss (Auftrag, Erreichbarkeit). Die fehlenden
+  // Kennzeichen prüft fahrzeugHinweise() auf dem Fahrzeug-Schritt.
   if (!b.einsatz.ortAuftrag.trim()) {
     hinweise.push("Ort/Auftrag ist noch leer.");
   }
@@ -396,11 +414,9 @@ export function plausibilitaet(b: Erfassungsbogen): string[] {
       "Keine telefonische Erreichbarkeit erfasst — mindestens eine Führungskraft sollte eine Nummer angeben.",
     );
   }
-  b.fahrzeuge.forEach((f, i) => {
-    if (!kennzeichenText(f).trim()) {
-      hinweise.push(`Fahrzeug ${i + 1} hat noch kein Kennzeichen.`);
-    }
-  });
+  if (mitFahrzeugen) {
+    hinweise.push(...fahrzeugHinweise(b));
+  }
   return hinweise;
 }
 

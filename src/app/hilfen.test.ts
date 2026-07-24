@@ -24,6 +24,7 @@ import {
 import {
   bogenLaden,
   datumDeutsch,
+  fahrzeugHinweise,
   funkrufText,
   funktionsText,
   kennzeichenText,
@@ -187,6 +188,26 @@ describe("plausibilitaet()", () => {
     expect(hinweise.some((h) => /Ort\/Auftrag/.test(h))).toBe(true);
     expect(hinweise.some((h) => /telefonische Erreichbarkeit/.test(h))).toBe(true);
     expect(hinweise.some((h) => /Fahrzeug 1.*kein Kennzeichen/.test(h))).toBe(true);
+  });
+
+  it("lässt die Kennzeichen-Hinweise mit mitFahrzeugen=false weg (Personalseite)", () => {
+    const b = bogen({
+      personal: [person({ staerkeRolle: StaerkeRolle.FUEHRER })],
+      fahrzeuge: [{ typ: { code: 1 } }],
+    });
+    const hinweise = plausibilitaet(b, false);
+    expect(hinweise.some((h) => /kein Kennzeichen/.test(h))).toBe(false);
+    // Andere Vollständigkeitshinweise bleiben erhalten.
+    expect(hinweise.some((h) => /telefonische Erreichbarkeit/.test(h))).toBe(true);
+  });
+
+  it("meldet fehlende Kennzeichen getrennt über fahrzeugHinweise", () => {
+    const b = bogen({
+      fahrzeuge: [{ typ: { code: 1 } }, { typ: { code: 2 }, kennzeichen: "OL-FW 2041" }],
+    });
+    const hinweise = fahrzeugHinweise(b);
+    expect(hinweise.some((h) => /Fahrzeug 1.*kein Kennzeichen/.test(h))).toBe(true);
+    expect(hinweise.some((h) => /Fahrzeug 2/.test(h))).toBe(false);
   });
 
   it("zählt eMail nicht als telefonische Erreichbarkeit, ein ziviles Kennzeichen aber als Kennzeichen", () => {
