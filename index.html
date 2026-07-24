@@ -214,6 +214,16 @@
     button.link {
       border: none; background: none; padding: 0; font-size: inherit;
       color: var(--blau-hell); text-decoration: underline; cursor: pointer;
+      text-align: inherit;
+    }
+    /* Beispiel-Liste: eigener Aufzählungspunkt mit hängendem Einzug, damit
+       lange Namen (Button-Links) sauber links umbrechen und der Punkt an der
+       ersten Zeile bleibt. Der Standard-Marker sitzt bei umbrechenden
+       Button-Kindern sonst auf der letzten Zeile. */
+    .beispiel-liste { list-style: none; padding-left: 1.4em; }
+    .beispiel-liste li { position: relative; }
+    .beispiel-liste li::before {
+      content: "•"; position: absolute; left: -1.1em; color: currentColor;
     }
     .scanner {
       position: fixed; inset: 0; z-index: 100; background: #000;

@@ -261,7 +261,7 @@ export function Fusszeile() {
           </p>
         )}
         {beispielPfad.length === 0 && <p><strong>Organisation oder Thema wählen:</strong></p>}
-        <ul>
+        <ul className="beispiel-liste">
           {unterordner(beispielPfad).map(({ ordner, anzahl }) => (
             <li key={`d/${ordner}`}>
               <button className="link" onClick={() => setBeispielPfad([...beispielPfad, ordner])}>
