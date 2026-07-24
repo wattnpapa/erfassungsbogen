@@ -393,18 +393,21 @@ export function SchrittEinheit({ bogen, aendern }: SchrittProps) {
 
   // Landesvorlagen (KatS-Beispielbögen der Bundesländer) für Schritt 1.
   const [vorlageBundesland, setVorlageBundesland] = useState("");
+  const [vorlageEinheit, setVorlageEinheit] = useState("");
   const zeigeLandesvorlagen =
     !OHNE_LANDESVORLAGEN.includes(e.organisation) && hatLandesvorlagen(e.organisation);
   const vorlagenBundeslaender = zeigeLandesvorlagen ? landesvorlagenBundeslaender(e.organisation) : [];
   // Nach Organisationswechsel kann das gemerkte Bundesland unpassend sein.
   const aktBundesland = vorlagenBundeslaender.includes(vorlageBundesland) ? vorlageBundesland : "";
   const vorlagenEinheiten = aktBundesland ? landesvorlagenEinheiten(e.organisation, aktBundesland) : [];
+  const aktEinheit = vorlagenEinheiten.includes(vorlageEinheit) ? vorlageEinheit : "";
 
   function landesvorlageAnwenden(name: string) {
     const v = landesvorlage(e.organisation, aktBundesland, name);
     if (!v) return;
     const hatDaten = bogen.personal.length > 0 || bogen.fahrzeuge.length > 0;
     if (hatDaten && !window.confirm("Personal und Fahrzeuge durch die Landesvorlage ersetzen?")) return;
+    setVorlageEinheit(name);
     aendern({
       einheit: { ...e, einheitsTyp: v.einheitsTyp },
       personalErfassung: PersonalErfassung.VOLLSTAENDIG,
@@ -465,7 +468,13 @@ export function SchrittEinheit({ bogen, aendern }: SchrittProps) {
         <>
           <div className="zeile">
             <Feld titel="Landesvorlage – Bundesland">
-              <select value={aktBundesland} onChange={(ev) => setVorlageBundesland(ev.target.value)}>
+              <select
+                value={aktBundesland}
+                onChange={(ev) => {
+                  setVorlageBundesland(ev.target.value);
+                  setVorlageEinheit("");
+                }}
+              >
                 <option value="">– Bundesland wählen –</option>
                 {vorlagenBundeslaender.map((b) => (
                   <option key={b} value={b}>{bundeslandLabel(b)}</option>
@@ -474,7 +483,7 @@ export function SchrittEinheit({ bogen, aendern }: SchrittProps) {
             </Feld>
             <Feld titel="Landesvorlage – Einheit">
               <select
-                value=""
+                value={aktEinheit}
                 disabled={!aktBundesland}
                 onChange={(ev) => {
                   if (ev.target.value) landesvorlageAnwenden(ev.target.value);
