@@ -9,8 +9,27 @@
  */
 
 import { useState } from "react";
-import { datumZuIso, staerke, type Erfassungsbogen } from "../model";
-import { datumDeutsch, orgLabel, vokabText, vokabularFuer } from "./hilfen";
+import {
+  KontaktArt,
+  PersonalErfassung,
+  datumZuIso,
+  staerke,
+  unterbringungMWD,
+  verpflegung,
+  zeitpunktZuIso,
+  type Erfassungsbogen,
+  type Kontakt,
+} from "../model";
+import {
+  datumDeutsch,
+  einheitOrt,
+  funkrufText,
+  funktionsText,
+  kennzeichenText,
+  orgLabel,
+  vokabText,
+  vokabularFuer,
+} from "./hilfen";
 import {
   EinsatzArt,
   MeldeStatus,
@@ -275,6 +294,122 @@ export function EinsatzDetail(props: {
   );
 }
 
+/** Erreichbarkeit einer Person wie im Bogenkopf/PDF ("Mobil: … (D)"). */
+function kontaktText(k: Kontakt): string {
+  if (k.emailTemplate === 1) return "eMail: Standard (D)";
+  const art = k.art === KontaktArt.EMAIL ? "eMail" : k.art === KontaktArt.MOBIL ? "Mobil" : "Tel";
+  return `${art}: ${k.wert ?? ""} (${k.dienstlich ? "D" : "P"})`;
+}
+
+/**
+ * Read-only Vollansicht eines gemeldeten Bogens (Zugehörigkeit, Einsatz,
+ * Personal, Fahrzeuge, Sofortbedarf) — spiegelt die Erfassungs-Übersicht bzw.
+ * das PDF, aber ohne Bearbeiten-Aktionen: fremde Bögen werden hier nur gelesen.
+ */
+function BogenDetails({ bogen }: { bogen: Erfassungsbogen }) {
+  const org = bogen.einheit.organisation;
+  const standort = einheitOrt(bogen.einheit);
+  const s = staerke(bogen);
+  const mwd = unterbringungMWD(bogen);
+  const vp = verpflegung(bogen);
+  const nurStaerke = bogen.personalErfassung === PersonalErfassung.NUR_STAERKE;
+  const sb = bogen.sofortbedarf;
+
+  return (
+    <div className="bogen-details">
+      <h4>Zugehörigkeit</h4>
+      <dl className="paare">
+        <dt>Organisation</dt>
+        <dd>{orgLabel(org)}{bogen.einheit.organisationName ? ` — ${bogen.einheit.organisationName}` : ""}</dd>
+        <dt>Einheitstyp</dt>
+        <dd>{vokabText(bogen.einheit.einheitsTyp, vokabularFuer(org, "einheitstyp"), "name") || "—"}</dd>
+        {bogen.einheit.hierarchie.map((h, i) => (
+          <span key={i} style={{ display: "contents" }}>
+            <dt>{vokabText(h.bezeichnung, vokabularFuer(org, "ebene")) || "Ebene"}</dt>
+            <dd>{h.name}{h.kurz ? ` (${h.kurz})` : ""}{h.telefon ? ` · ${h.telefon}` : ""}{h.email ? ` · ${h.email}` : ""}</dd>
+          </span>
+        ))}
+      </dl>
+
+      <h4>Einsatz / Auftrag</h4>
+      <dl className="paare">
+        <dt>Zeitraum</dt>
+        <dd>{datumDeutsch(datumZuIso(bogen.einsatz.zeitraumVon))} – {datumDeutsch(datumZuIso(bogen.einsatz.zeitraumBis))}</dd>
+        <dt>Ort / Auftrag</dt><dd>{bogen.einsatz.ortAuftrag || "—"}</dd>
+        <dt>Beginn / Ende</dt>
+        <dd>
+          {bogen.einsatz.einsatzbeginn != null ? zeitpunktZuIso(bogen.einsatz.einsatzbeginn).replace("T", " ") : "—"}
+          {" / "}
+          {bogen.einsatz.einsatzende != null ? zeitpunktZuIso(bogen.einsatz.einsatzende).replace("T", " ") : "—"}
+        </dd>
+      </dl>
+
+      <h4>Personal ({s.fuehrer} / {s.unterfuehrer} / {s.mannschaft} / {s.gesamt})</h4>
+      {nurStaerke && (
+        <p className="hinweis">
+          Meldekopf-Modus: nur Stärke gemeldet{bogen.personal.length > 0 ? " — unten die Ansprechpartner:innen" : ""}.
+        </p>
+      )}
+      {bogen.personal.length > 0 ? (
+        <div className="tabellen-scroll">
+          <table className="uebersicht">
+            <thead>
+              <tr><th>Funktion / Zusatzfunktion</th><th>Name, Vorname</th><th>Erreichbarkeit</th></tr>
+            </thead>
+            <tbody>
+              {bogen.personal.map((p, i) => (
+                <tr key={i}>
+                  <td>{funktionsText(p, org) || "—"}</td>
+                  <td>{p.nachname}{p.nachname && p.vorname ? ", " : ""}{p.vorname}</td>
+                  <td>{p.kontakte.map(kontaktText).join(" · ") || "—"}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      ) : (
+        !nurStaerke && <p className="hinweis">Kein Personal erfasst.</p>
+      )}
+      <p className="hinweis">Unterbringung: M {mwd.m} / W {mwd.w} / D {mwd.d}</p>
+
+      <h4>Fahrzeuge ({bogen.fahrzeuge.length})</h4>
+      {bogen.fahrzeuge.length > 0 ? (
+        <div className="tabellen-scroll">
+          <table className="uebersicht">
+            <thead>
+              <tr><th>Typ</th><th>Kennzeichen</th><th>Funkrufname</th><th>StAN</th><th>Änderungen</th></tr>
+            </thead>
+            <tbody>
+              {bogen.fahrzeuge.map((f, i) => (
+                <tr key={i}>
+                  <td>{vokabText(f.typ, vokabularFuer(org, "fahrzeug")) || "—"}</td>
+                  <td>{kennzeichenText(f) || "—"}</td>
+                  <td>{funkrufText(f, standort) || "—"}</td>
+                  <td>{f.stanKonform == null ? "—" : f.stanKonform ? "ja" : "nein"}</td>
+                  <td>{f.aenderungen ?? ""}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      ) : (
+        <p className="hinweis">Keine Fahrzeuge erfasst.</p>
+      )}
+
+      <h4>Sofortbedarf &amp; Sonstiges</h4>
+      <dl className="paare">
+        <dt>Verpflegung</dt>
+        <dd>{sb ? `${sb.verpflegungPersonen} Personen, davon ${vp.vegetarisch} vegetarisch, ${vp.vegan} vegan` : "—"}</dd>
+        <dt>Betriebsstoff</dt>
+        <dd>{sb ? `${sb.dieselLiter} l Diesel / ${sb.benzinLiter} l Benzin / ${sb.gemischLiter} l Gemisch` : "—"}</dd>
+        <dt>Unterbringung / Ruhezeit</dt>
+        <dd>{sb ? `${sb.unterbringung ? "Unterbringung" : "keine Unterbringung"} · ${sb.ruhezeitErforderlich ? "Ruhezeit erforderlich" : "keine Ruhezeit"}` : "—"}</dd>
+        <dt>Sonstiges</dt><dd>{bogen.sonstiges || "—"}</dd>
+      </dl>
+    </div>
+  );
+}
+
 function EinheitKarte(props: {
   einsatzId: string;
   kopf: MeldeEintrag;
@@ -282,6 +417,7 @@ function EinheitKarte(props: {
   onGeaendert: () => void;
 }) {
   const { einsatzId, kopf, alle, onGeaendert } = props;
+  const [details, setDetails] = useState(false);
   const [historie, setHistorie] = useState(false);
   // null = nicht in Bearbeitung; String = Entwurf des Zug-Etiketts.
   const [zugEntwurf, setZugEntwurf] = useState<string | null>(null);
@@ -322,6 +458,9 @@ function EinheitKarte(props: {
         </span>
       </div>
       <div className="vorlage-aktionen">
+        <button type="button" onClick={() => setDetails(!details)}>
+          {details ? "Details schließen" : "Details"}
+        </button>{" "}
         <button type="button" onClick={statusUmschalten}>{abgerueckt ? "Als anwesend" : "Abrücken"}</button>{" "}
         <button type="button" onClick={() => setZugEntwurf(kopf.zugEtikett ?? "")}>
           {kopf.zugEtikett ? "Zug ändern" : "Zug zuordnen"}
@@ -333,6 +472,7 @@ function EinheitKarte(props: {
         )}{" "}
         <button type="button" className="entfernen" onClick={entfernen}>Entfernen</button>
       </div>
+      {details && <BogenDetails bogen={kopf.bogen} />}
       {zugEntwurf !== null && (
         <div className="zug-bearbeiten">
           <input
