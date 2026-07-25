@@ -3,6 +3,11 @@
  * Übersicht, Vorlagenliste und Musterung.
  */
 
+// Oberflächenschrift: Archivo (Grotesk in der DIN-Linie — der Formenwelt der
+// Fahrzeug- und Schilderbeschriftung im BOS-Umfeld). Bewusst aus dem Bundle
+// statt von einem CDN: die App muss offline vollständig funktionieren.
+import "@fontsource-variable/archivo";
+
 import { StrictMode, useEffect, useRef, useState, type ChangeEvent } from "react";
 import { createRoot } from "react-dom/client";
 import type { Erfassungsbogen } from "../model";
@@ -628,7 +633,7 @@ function App() {
         if (!gefunden) {
           setFehler(
             "In dieser PDF steckt keine komplette Einsatz-Sammlung (ältere Sammel-PDF oder Einzelbogen). " +
-              "Einzelne Bögen lassen sich im geöffneten Einsatz über „Aus Datei/PDF…" aufnehmen.",
+              "Einzelne Bögen lassen sich im geöffneten Einsatz über „Aus Datei/PDF…“ aufnehmen.",
           );
           return;
         }

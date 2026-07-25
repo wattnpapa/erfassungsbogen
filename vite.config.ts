@@ -30,7 +30,10 @@ export default defineConfig({
       manifest: false,
       workbox: {
         // App-Shell + statische Assets precachen (Dateien mit Hash im Namen).
-        globPatterns: ["**/*.{js,css,html,svg,png,webmanifest}"],
+        // woff2 gehört zwingend dazu: die Oberflächenschrift liegt im Bundle
+        // (kein CDN), fehlte sie im Precache, fiele die App offline auf die
+        // Systemschrift zurück.
+        globPatterns: ["**/*.{js,css,html,svg,png,webmanifest,woff2}"],
         // Das Haupt-Bundle (React, pdfmake, THW-OV-Verzeichnis …) ist ~3 MB und
         // damit größer als Workbox' 2-MiB-Standard. Es IST die App-Shell und muss
         // für den Offline-Start precacht werden – Limit entsprechend anheben.

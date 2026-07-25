@@ -278,7 +278,7 @@ export function EinsatzDetail(props: {
         <button
           type="button"
           onClick={onSammelPdf}
-          title="Alle Bögen als eine PDF — mit eingebetteter kompletter Sammlung (Züge, Status, Historie). Auf dem Zielgerät über „Einsatz importieren…" einlesbar."
+          title="Alle Bögen als eine PDF — mit eingebetteter kompletter Sammlung (Züge, Status, Historie). Auf dem Zielgerät über „Einsatz importieren…“ einlesbar."
         >
           Sammel-PDF (alle Bögen)
         </button>{" "}

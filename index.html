@@ -10,87 +10,253 @@
   <link rel="manifest" href="./manifest.webmanifest" />
   <meta name="theme-color" content="#12275e" />
   <style>
+    /* ===============================================================
+       Design-Token — die eine Quelle für Farbe, Schrift, Maß und Form der
+       Web-Oberfläche. Die Plattform-Layer (.platform-ios/.platform-android)
+       und die Anzeigemodi (.feld-modus/.nacht-modus) belegen dieselben
+       Token neu, statt jede Komponente einzeln zu überschreiben.
+       =============================================================== */
     :root {
-      /* Akzentfarbe folgt der Organisation des offenen Bogens: org-farben.ts
-         setzt --org-akzent* auf <html>; ohne Bogen greift das THW-Blau. */
-      --blau: var(--org-akzent, #12275e);
-      --blau-hell: var(--org-akzent-hell, #1d3d8f);
-      --rand: #c9cede;
-      --grau: #f2f3f7;
-      --fehler: #b3261e;
-      --erledigt: #1f7a3d; /* Grün für den „ok"-Status in der Schritt-Navigation */
+      color-scheme: light;
+
+      /* Neutrale: leicht ins Blaue gekippt, damit sie zur Kennfarbe passen. */
+      --n-0:   #ffffff;
+      --n-50:  #f3f5f9;
+      --n-100: #e8ebf2;
+      --n-200: #d7dce7;
+      --n-300: #bcc3d3;
+      --n-400: #8b94a9;
+      --n-500: #5c6478;
+      --n-900: #11141b;
+
+      /* Rollen statt Rohwerte — nur diese werden in Komponenten benutzt. */
+      --grund:       var(--n-50);
+      --flaeche:     var(--n-0);
+      --flaeche-2:   var(--n-100);
+      --text:        var(--n-900);
+      --text-2:      var(--n-500);
+      --text-3:      var(--n-400);
+      --linie-fein:  var(--n-200);
+      --linie:       var(--n-300);
+      --linie-stark: var(--n-400);
+
+      /* Kennfarbe der Organisation: org-farben.ts setzt --org-akzent* auf
+         <html>; ohne offenen Bogen greift das THW-Blau. */
+      --akzent:      var(--org-akzent, #12275e);
+      --akzent-hell: var(--org-akzent-hell, #1d3d8f);
+      --auf-akzent:  #ffffff;
+
+      /* Signalfarben — bewusst getrennt von der Kennfarbe, damit „erledigt"
+         und „Achtung" in jeder Organisation gleich aussehen. */
+      --gut:        #146b3a;
+      --warn-text:  #6d4700;
+      --warn-fond:  #fdf4dd;
+      --warn-linie: #ddbe79;
+      --alarm:      #a4231c;
+
+      /* Form: rechteckig und kantenbetont — Behördenformular, nicht App-Kachel. */
+      --radius:       0px;
+      --strich:       1px;
+      --strich-stark: 1px;
+      --fokus:        3px;
+      --ziel:         0rem; /* Zuschlag auf alle Tippziele; der Feld-Modus erhöht ihn */
+
+      /* Schrift: Archivo (DIN-Linie) fürs Lesen, dicktengleich für Daten. */
+      --schrift: "Archivo Variable", Archivo, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      --schrift-daten: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+
+      --t-xs:  0.75rem;
+      --t-s:   0.8125rem;
+      --t-m:   0.9375rem;
+      --t-l:   1.0625rem;
+      --t-xl:  1.3125rem;
+      --t-2xl: 1.625rem;
+
+      --r-1: 0.25rem;
+      --r-2: 0.5rem;
+      --r-3: 0.75rem;
+      --r-4: 1rem;
+      --r-5: 1.5rem;
+      --r-6: 2rem;
+
+      /* Kopfbalken des Assistenten. Eigene Token, damit iOS/Android ihn ohne
+         Spezifitäts-Wettrennen auf ihre plattformeigene Kopfzeile zurücksetzen
+         können und der Nacht-Modus ihn abdunkeln kann. */
+      --kopf-fond:  var(--akzent);
+      --kopf-auf:   var(--auf-akzent);
+      --kopf-auf-2: rgba(255, 255, 255, 0.78);
+      --kopf-linie: rgba(255, 255, 255, 0.3);
+      --kopf-strich: 3px;
+      --kopf-aus:   calc(var(--r-4) * -1); /* zieht den Balken bis an den Rand von main */
+      --kopf-innen: var(--r-3) var(--r-4) 0;
+
+      /* Rückwärtskompatible Aliasse: Bestandsregeln und die Plattform-Layer
+         greifen weiter auf diese Namen zu, zeigen jetzt aber auf die Token. */
+      --blau: var(--akzent);
+      --blau-hell: var(--akzent-hell);
+      --rand: var(--linie);
+      --grau: var(--grund);
+      --fehler: var(--alarm);
+      --erledigt: var(--gut);
     }
     * { box-sizing: border-box; }
     body {
       margin: 0;
-      font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      color: #1a1c22;
-      background: var(--grau);
+      font-family: var(--schrift);
+      font-size: var(--t-m);
+      line-height: 1.5;
+      color: var(--text);
+      background: var(--grund);
+      -webkit-font-smoothing: antialiased;
     }
     #app { min-height: 100dvh; display: flex; flex-direction: column; }
-    main { width: 100%; max-width: 60rem; margin: 0 auto; padding: 1rem 1rem 6rem; }
-    h1 { color: var(--blau); font-size: 1.4rem; margin: 0.5rem 0; }
-    h2 { color: var(--blau); font-size: 1.1rem; border-bottom: 2px solid var(--blau); padding-bottom: 0.2rem; }
-    h3 { font-size: 1rem; margin: 0.8rem 0 0.3rem; }
-    .start { text-align: center; padding-top: 4rem; }
-    .aktionen { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; margin-top: 1.5rem; }
-    button, .datei-knopf {
-      font: inherit; padding: 0.5rem 1rem; border: 1px solid var(--rand);
-      border-radius: 0.4rem; background: #fff; cursor: pointer;
-      /* iOS-WKWebView tönt Button-Text sonst in Systemblau. */
-      color: inherit; -webkit-appearance: none; appearance: none;
+    main { width: 100%; max-width: 60rem; margin: 0 auto; padding: var(--r-4) var(--r-4) 6rem; }
+    /* Überschriften tragen Gewicht statt Farbe — die Kennfarbe bleibt dem
+       Kopfbalken und der primären Aktion vorbehalten und verliert damit
+       nicht ihre Signalwirkung. */
+    h1 {
+      font-size: var(--t-2xl); font-weight: 700; letter-spacing: -0.02em;
+      line-height: 1.15; color: var(--text); margin: 0 0 var(--r-2); text-wrap: balance;
     }
-    button:hover, .datei-knopf:hover { border-color: var(--blau-hell); }
-    button.primaer, .datei-knopf.primaer { background: var(--blau); color: #fff; border-color: var(--blau); }
-    button.primaer:hover { background: var(--blau-hell); }
+    h2 {
+      font-size: var(--t-xl); font-weight: 700; letter-spacing: -0.015em;
+      line-height: 1.2; color: var(--text); margin: 0 0 var(--r-3);
+      border: none; padding: 0; text-wrap: balance;
+    }
+    h3 { font-size: var(--t-m); font-weight: 700; color: var(--text); margin: var(--r-4) 0 var(--r-1); }
+    /* Startseite linksbündig: ein Satzspiegel mit fester linker Kante wirkt
+       verbindlicher als die zentrierte Mittelachse. */
+    .start { text-align: left; padding-top: var(--r-4); }
+    .start > h1 { font-size: clamp(1.75rem, 5vw, 2.5rem); margin-top: var(--r-4); }
+    .start > p { max-width: 48ch; color: var(--text-2); font-size: var(--t-l); margin: 0 0 var(--r-2); }
+    /* Das Offline-Versprechen ist ein Etikett, kein Fließtext — es darf nicht
+       auf Absatzbreite umbrechen. */
+    .start > p.offline-badge { max-width: none; width: max-content; font-size: var(--t-s); }
+    .aktionen { display: flex; gap: var(--r-2); justify-content: flex-start; flex-wrap: wrap; margin-top: var(--r-5); }
+    .aktionen > button, .aktionen > .datei-knopf {
+      min-height: calc(2.75rem + var(--ziel)); padding: 0.6rem 1.1rem; font-size: var(--t-m);
+    }
+    button, .datei-knopf {
+      font: inherit; font-size: var(--t-s); font-weight: 600;
+      padding: 0.5rem 0.9rem;
+      min-height: calc(2.25rem + var(--ziel));
+      display: inline-flex; align-items: center; justify-content: center; gap: 0.4rem;
+      border: var(--strich-stark) solid var(--linie-stark);
+      border-radius: var(--radius); background: var(--flaeche); cursor: pointer;
+      /* iOS-WKWebView tönt Button-Text sonst in Systemblau. */
+      color: var(--text); -webkit-appearance: none; appearance: none;
+    }
+    button:hover, .datei-knopf:hover { border-color: var(--akzent); color: var(--akzent); }
+    button.primaer, .datei-knopf.primaer { background: var(--akzent); color: var(--auf-akzent); border-color: var(--akzent); }
+    button.primaer:hover { background: var(--akzent-hell); border-color: var(--akzent-hell); color: var(--auf-akzent); }
     button:disabled { opacity: 0.4; cursor: default; }
+    /* Sichtbarer Tastaturfokus in der Kennfarbe — überall gleich. */
+    button:focus-visible, .datei-knopf:focus-within, a:focus-visible {
+      outline: var(--fokus) solid var(--akzent); outline-offset: 1px;
+    }
     /* Kopfleiste: Rücksprung links, Anzeige-Umschalter rechts. */
     .kopf-leiste { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; }
     /* Umschalter Standard/Feld/Nacht als kompakte Segmente. */
-    .anzeige-schalter { display: inline-flex; border: 1px solid var(--rand); border-radius: 1rem; overflow: hidden; }
+    .anzeige-schalter { display: inline-flex; border: var(--strich) solid var(--linie); border-radius: var(--radius); overflow: hidden; }
     .anzeige-schalter button {
-      border: none; border-radius: 0; background: #fff; color: #444;
-      padding: 0.25rem 0.7rem; font-size: 0.8rem; min-height: 0;
+      border: none; border-radius: 0; background: var(--flaeche); color: var(--text-2);
+      padding: 0.25rem 0.7rem; font-size: var(--t-xs); min-height: calc(1.9rem + var(--ziel));
     }
-    .anzeige-schalter button + button { border-left: 1px solid var(--rand); }
-    .anzeige-schalter button.aktiv { background: var(--blau); color: #fff; }
+    .anzeige-schalter button + button { border-left: var(--strich) solid var(--linie); }
+    .anzeige-schalter button.aktiv { background: var(--akzent); color: var(--auf-akzent); }
     /* Immer sichtbarer Rücksprung zur Startseite im Kopfbereich. */
     .zur-start {
-      display: inline-block; border: none; background: none;
-      padding: 0.2rem 0; margin-top: 0.4rem;
-      color: var(--blau); font-size: 0.95rem; cursor: pointer;
+      display: inline-flex; border: none; background: none;
+      padding: 0.2rem 0; margin-top: 0; min-height: 0;
+      color: var(--akzent); font-size: var(--t-m); font-weight: 600; cursor: pointer;
     }
-    .zur-start:hover { border: none; text-decoration: underline; }
-    .schritte { display: flex; gap: 0.3rem; flex-wrap: wrap; margin: 0.5rem 0 1rem; }
-    .schritte button { padding: 0.3rem 0.7rem; font-size: 0.85rem; border-radius: 1rem; }
-    .schritte button.aktiv { background: var(--blau); color: #fff; border-color: var(--blau); }
+    .zur-start:hover { border: none; background: none; text-decoration: underline; }
+
+    /* ---------------------------------------------------------------
+       Kopfbalken des Assistenten: die Kennfarbe der Organisation trägt
+       Titel und Schrittleiste. Damit beantwortet der Balken auf einen
+       Blick „wessen Bogen" und „wo bin ich" — und die Farbe erscheint
+       an genau einer Stelle statt über alle Überschriften verteilt.
+       Die Reihenfolge wird per order gesetzt, damit die Schrittleiste
+       als Reiterzeile an der Unterkante sitzt.
+       --------------------------------------------------------------- */
+    main > header {
+      display: flex; flex-direction: column;
+      background: var(--kopf-fond); color: var(--kopf-auf);
+      margin: var(--kopf-aus) var(--kopf-aus) var(--r-5);
+      padding: var(--kopf-innen);
+    }
+    main > header .kopf-leiste { order: 0; }
+    main > header .titelzeile { order: 1; padding: var(--r-2) 0 var(--r-3); }
+    main > header .autosave { order: 2; }
+    main > header .schritte { order: 3; }
+    main > header h1 { color: var(--kopf-auf); font-size: var(--t-xl); margin: 0; }
+    main > header .zur-start { color: var(--kopf-auf); opacity: 0.85; }
+    main > header .zur-start:hover { opacity: 1; }
+    main > header .anzeige-schalter { border-color: var(--kopf-linie); }
+    main > header .anzeige-schalter button { background: transparent; color: var(--kopf-auf-2); }
+    main > header .anzeige-schalter button + button { border-left-color: var(--kopf-linie); }
+    main > header .anzeige-schalter button.aktiv { background: var(--kopf-auf); color: var(--kopf-fond); }
+    main > header .autosave { color: var(--kopf-auf-2); margin: 0; padding: 0 0 var(--r-3); }
+    /* Das taktische Zeichen liegt auf der Kennfarbe. Ohne helle Unterlage
+       verschwindet ein gleichfarbiges Symbol (THW-Blau auf THW-Blau) im
+       Balken — die Zeichen sind ohnehin für weißes Papier gezeichnet. */
+    main > header img.einheit-avatar { background: #fff; padding: 2px; }
+    .platform-ios main > header img.einheit-avatar,
+    .platform-android main > header img.einheit-avatar { background: none; padding: 0; }
+
+    /* Schrittleiste als Reiterzeile: aktiver Schritt per Unterstrich, nicht
+       per Pille — das hält die Zeile ruhig und zeigt den Fortschritt links
+       nach rechts wie auf einem Formularkopf. */
+    .schritte { display: flex; gap: 0; flex-wrap: wrap; margin: 0; border-top: var(--strich) solid var(--kopf-linie); }
+    .schritte button {
+      padding: 0.55rem 0.75rem; font-size: var(--t-s); font-weight: 600;
+      min-height: calc(2.5rem + var(--ziel));
+      border: none; border-bottom: var(--kopf-strich) solid transparent; border-radius: 0;
+      background: none; color: var(--kopf-auf-2);
+    }
+    .schritte button:hover { background: none; color: var(--kopf-auf); border-bottom-color: var(--kopf-linie); }
+    .schritte button.aktiv { background: none; color: var(--kopf-auf); border-bottom-color: var(--kopf-auf); }
+    .schritte button.status-ok:not(.aktiv) { background: none; border-bottom-color: transparent; }
     /* Dezenter Füllstand je Schritt: ✓ = ausgefüllt, • = begonnen. Reiner
        Orientierungshelfer, blockiert nichts. */
     .schritte .schritt-status { margin-left: 0.35em; font-weight: 700; font-size: 0.95em; line-height: 1; }
-    .schritte button.status-ok .schritt-status { color: var(--erledigt); }
-    .schritte button.status-begonnen .schritt-status { color: var(--blau-hell); opacity: 0.7; }
-    .schritte button.aktiv .schritt-status { color: #fff; opacity: 0.9; }
-    /* Erledigte Schritte auch am Chip selbst erkennbar (nicht nur am Glyph). */
-    .schritte button.status-ok:not(.aktiv) { border-color: #9ed0b2; background: #f2faf5; }
+    .schritte button.status-ok .schritt-status { color: #8fe0ab; }
+    .schritte button.status-begonnen .schritt-status { color: rgba(255, 255, 255, 0.75); }
+    .schritte button.aktiv .schritt-status { color: var(--auf-akzent); }
+    /* Karten: Kante statt Schatten. Die Trennung entsteht über Linie und
+       Weißraum, nicht über abgerundete, schwebende Kacheln. */
     section.karte, .karte {
-      background: #fff; border: 1px solid var(--rand); border-radius: 0.5rem;
-      padding: 1rem; margin-bottom: 1rem;
+      background: var(--flaeche); border: var(--strich) solid var(--linie); border-radius: var(--radius);
+      padding: var(--r-4); margin-bottom: var(--r-4);
     }
-    label.feld { display: block; margin: 0.6rem 0 0; font-size: 0.85rem; color: #444; }
+    /* Beschriftungen dunkel und halbfett statt hellgrau — im Feld muss ein
+       Feldname genauso sicher lesbar sein wie sein Inhalt. */
+    label.feld { display: block; margin: var(--r-3) 0 0; font-size: var(--t-xs); font-weight: 600; color: var(--text-2); }
     label.feld > input, label.feld > select, label.feld > textarea, label.feld > output {
-      display: block; width: 100%; margin-top: 0.15rem;
+      display: block; width: 100%; margin-top: var(--r-1);
     }
     output.abgeleitet {
-      padding: 0.4rem 0.5rem; border: 1px dashed var(--rand); border-radius: 0.3rem;
-      background: #f7f7f7; color: #555; box-sizing: border-box;
+      padding: 0.45rem 0.55rem; border: var(--strich) dashed var(--linie); border-radius: var(--radius);
+      background: var(--flaeche-2); color: var(--text-2); box-sizing: border-box;
     }
     input, select, textarea {
-      font: inherit; padding: 0.4rem 0.5rem; border: 1px solid var(--rand);
-      border-radius: 0.3rem; background: #fff;
+      font: inherit; font-size: var(--t-m); padding: 0.45rem 0.55rem;
+      border: var(--strich-stark) solid var(--linie-stark);
+      border-radius: var(--radius); background: var(--flaeche); color: var(--text);
       /* Lange Optionstexte dürfen das Layout nicht über den Viewport drücken. */
       max-width: 100%;
     }
-    input:focus, select:focus, textarea:focus { outline: 2px solid var(--blau-hell); }
+    input:not([type="checkbox"]):not([type="radio"]):not([type="file"]), select, textarea {
+      min-height: calc(2.25rem + var(--ziel));
+    }
+    input[type="checkbox"], input[type="radio"] {
+      accent-color: var(--akzent); width: 1.1rem; height: 1.1rem; min-height: 0; padding: 0;
+    }
+    input::placeholder, textarea::placeholder { color: var(--text-3); }
+    input:focus, select:focus, textarea:focus {
+      outline: var(--fokus) solid var(--akzent); outline-offset: 0; border-color: var(--akzent);
+    }
     .zeile { display: flex; gap: 0.8rem; flex-wrap: wrap; align-items: flex-end; }
     /* min-width: 0 – lange Select-Optionen dürfen die Spalte nicht aufdrücken. */
     .zeile > label.feld { flex: 1 1 10rem; margin-top: 0.4rem; min-width: 0; }
@@ -102,36 +268,38 @@
     ul.vorschlaege {
       position: absolute; z-index: 20; left: 0; right: 0; top: 100%; min-width: 15rem;
       margin: 2px 0 0; padding: 0; list-style: none;
-      background: #fff; border: 1px solid var(--rand); border-radius: 0.3rem;
+      background: var(--flaeche); border: var(--strich) solid var(--linie-stark); border-radius: var(--radius);
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); max-height: 16rem; overflow-y: auto;
     }
-    ul.vorschlaege li { padding: 0.4rem 0.6rem; cursor: pointer; font-size: 0.9rem; }
-    ul.vorschlaege li small { color: #667; margin-left: 0.3rem; }
-    ul.vorschlaege li.aktiv, ul.vorschlaege li:hover { background: #eef1fa; }
+    ul.vorschlaege li { padding: 0.45rem 0.6rem; cursor: pointer; font-size: var(--t-m); }
+    ul.vorschlaege li small { color: var(--text-2); margin-left: 0.3rem; }
+    ul.vorschlaege li.aktiv, ul.vorschlaege li:hover { background: var(--flaeche-2); }
     .chips { display: flex; flex-wrap: wrap; gap: 0.3rem; align-items: center; margin-top: 0.2rem; }
     .chip {
-      background: var(--grau); border: 1px solid var(--rand); border-radius: 1rem;
-      padding: 0.1rem 0.5rem; font-size: 0.85rem; display: inline-flex; gap: 0.3rem; align-items: center;
+      background: var(--flaeche-2); border: var(--strich) solid var(--linie); border-radius: var(--radius);
+      padding: 0.15rem 0.5rem; font-size: var(--t-s); display: inline-flex; gap: 0.3rem; align-items: center;
     }
-    .chip button { border: none; padding: 0 0.2rem; background: none; font-weight: bold; }
-    .karte .entfernen { float: right; color: var(--fehler); border-color: var(--fehler); font-size: 0.8rem; }
+    .chip button { border: none; padding: 0 0.2rem; min-height: 0; background: none; font-weight: bold; }
+    .karte .entfernen { float: right; color: var(--alarm); border-color: var(--alarm); font-size: var(--t-xs); }
+    .karte .entfernen:hover { color: var(--alarm); border-color: var(--alarm); background: var(--flaeche-2); }
     footer.nav {
-      position: fixed; bottom: 0; left: 0; right: 0; background: #fff;
-      border-top: 1px solid var(--rand); padding: 0.7rem 1rem;
+      position: fixed; bottom: 0; left: 0; right: 0; background: var(--flaeche);
+      border-top: var(--strich-stark) solid var(--linie); padding: 0.7rem 1rem;
       display: flex; justify-content: space-between; gap: 1rem;
     }
     footer.nav .platzhalter { flex: 1; }
-    .fehler { color: var(--fehler); }
+    footer.nav button { min-height: calc(2.6rem + var(--ziel)); padding: 0.55rem 1.1rem; font-size: var(--t-m); }
+    .fehler { color: var(--alarm); }
     .warnung {
-      color: #7a5200; background: #fff7e0; border: 1px solid #e6c675;
-      border-radius: 0.3rem; padding: 0.4rem 0.6rem; font-size: 0.9rem;
+      color: var(--warn-text); background: var(--warn-fond); border: var(--strich) solid var(--warn-linie);
+      border-radius: var(--radius); padding: 0.5rem 0.7rem; font-size: var(--t-s);
     }
-    .hinweis { font-size: 0.85rem; color: #555; }
+    .hinweis { font-size: var(--t-xs); color: var(--text-2); }
     /* Vollständigkeits-Checkliste (Übersicht): EINE Box statt gestapelter
        Warnungen; jeder Punkt ist ein Link und springt zum passenden Schritt. */
     .vollstaendigkeit {
-      color: #7a5200; background: #fff7e0; border: 1px solid #e6c675;
-      border-radius: 0.3rem; padding: 0.5rem 0.7rem; font-size: 0.9rem; margin: 0.6rem 0;
+      color: var(--warn-text); background: var(--warn-fond); border: var(--strich) solid var(--warn-linie);
+      border-radius: var(--radius); padding: 0.5rem 0.7rem; font-size: var(--t-s); margin: 0.6rem 0;
     }
     .vollstaendigkeit-titel { margin: 0 0 0.3rem; font-weight: 600; }
     /* Eigener Marker mit hängendem Einzug: der Standard-Marker sitzt bei
@@ -155,30 +323,30 @@
     .autosave { margin: -0.5rem 0 0.8rem; font-size: 0.78rem; color: var(--erledigt); }
     /* Startseite: Offline-Versprechen als grünes Badge unter dem Untertitel. */
     .offline-badge {
-      display: inline-block; margin: 0.2rem auto 0; padding: 0.25rem 0.8rem;
-      border: 1px solid #b6dfc6; border-radius: 1rem; background: #e8f6ee;
-      color: #1c5c44; font-size: 0.85rem;
+      display: inline-block; margin: var(--r-3) 0 0; padding: 0.3rem 0.7rem;
+      border: var(--strich) solid var(--gut); border-radius: var(--radius); background: transparent;
+      color: var(--gut); font-size: var(--t-s); font-weight: 600;
     }
     /* „Weiter, wo du warst": Entwurfs-Karte mit Kennfarbe der Organisation. */
     .entwurf-karte {
       display: flex; align-items: center; gap: 0.9rem; text-align: left;
-      max-width: 34rem; margin: 1.5rem auto 0; padding: 0.8rem 1rem;
-      background: #fff; border: 1px solid var(--rand); border-left: 6px solid var(--blau);
-      border-radius: 0.5rem;
+      max-width: 40rem; margin: var(--r-5) 0 0; padding: var(--r-3) var(--r-4);
+      background: var(--flaeche); border: var(--strich) solid var(--linie); border-left: 6px solid var(--akzent);
+      border-radius: var(--radius);
     }
     .entwurf-karte .entwurf-text { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 0.1rem; }
     .entwurf-karte .entwurf-text strong { overflow-wrap: break-word; }
     .entwurf-karte button { flex: 0 0 auto; }
     /* Erststart-Onboarding: drei Schritte erklären den Offline-QR-Transport. */
-    .onboarding { margin-top: 2.5rem; }
-    .onboarding h2 { border: none; text-align: center; }
-    .onboarding-schritte { display: flex; gap: 1.2rem; justify-content: center; flex-wrap: wrap; }
+    .onboarding { margin-top: var(--r-6); }
+    .onboarding h2 { border: none; text-align: left; }
+    .onboarding-schritte { display: flex; gap: var(--r-5); justify-content: flex-start; flex-wrap: wrap; }
     .onboarding-schritt {
-      flex: 1 1 12rem; max-width: 15rem; display: flex; flex-direction: column;
-      align-items: center; gap: 0.25rem;
+      flex: 1 1 12rem; max-width: 16rem; display: flex; flex-direction: column;
+      align-items: flex-start; text-align: left; gap: 0.25rem;
     }
-    .onboarding-schritt svg { width: 3rem; height: 3rem; color: var(--blau); }
-    .onboarding-schritt span { font-size: 0.85rem; color: #555; }
+    .onboarding-schritt svg { width: 2.25rem; height: 2.25rem; color: var(--akzent); }
+    .onboarding-schritt span { font-size: var(--t-s); color: var(--text-2); }
     /* Personal-Schnelleingabe: kompakte Tabellenzeilen, Felder füllen die Zelle. */
     .ansicht-wahl { display: flex; align-items: center; gap: 0.2rem 0.8rem; flex-wrap: wrap; }
     .ansicht-wahl button { margin-top: 0.4rem; }
@@ -202,7 +370,7 @@
        Tippziele, damit am Tablet ohne Tastatur gezählt werden kann. */
     .stepper-zeile { display: flex; flex-wrap: wrap; gap: 0.8rem 1.4rem; align-items: flex-end; margin-top: 0.4rem; }
     .stepper-feld { display: flex; flex-direction: column; gap: 0.2rem; }
-    .stepper-titel { font-size: 0.85rem; color: #444; }
+    .stepper-titel { font-size: var(--t-xs); font-weight: 600; color: var(--text-2); }
     .stepper-rest { align-self: center; }
     .stepper { display: inline-flex; align-items: stretch; gap: 0.4rem; }
     .stepper button {
@@ -218,18 +386,35 @@
     .stepper input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
 
     /* Vorlagen & Musterung */
-    .meldung { text-align: center; border: 1px solid var(--rand); border-radius: 0.4rem; padding: 0.5rem 0.75rem; margin: 0.75rem auto; max-width: 60rem; font-size: 0.9rem; }
-    .start-vorlagen { text-align: left; max-width: 40rem; margin: 2.5rem auto 0; }
+    .meldung { text-align: left; background: var(--flaeche); border: var(--strich) solid var(--linie); border-left: 3px solid var(--akzent); border-radius: var(--radius); padding: 0.5rem 0.75rem; margin: var(--r-3) 0; max-width: 60rem; font-size: var(--t-s); }
+    .start-vorlagen { text-align: left; max-width: 44rem; margin: var(--r-6) 0 0; }
     .start-vorlagen > h2 { text-align: left; }
     /* Aktionszeile der Vorlagenkarte: in Fluss haltendes Flex-Layout statt
        float, sonst rutschte „Löschen" beim Umbruch aus der Karte heraus.
        „Löschen" bleibt rechts, klappt bei Platzmangel sauber in die nächste Zeile. */
     .vorlage-aktionen { margin-top: 0.6rem; display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; }
     .vorlage-aktionen .entfernen { float: none; margin-left: auto; }
-    .staerke-leiste { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.5rem; text-align: center; }
-    .staerke-leiste > div { display: flex; flex-direction: column; }
-    .staerke-leiste strong { font-size: 1.5rem; line-height: 1.1; }
-    .staerke-leiste span { font-size: 0.75rem; opacity: 0.7; }
+    /* Stärke als Instrumentenleiste: die Zahl ist das Fachliche, also groß und
+       dicktengleich; die Beschriftung tritt als gesperrte Versalzeile zurück.
+       Die Gesamtsumme trägt als einzige die Kennfarbe. */
+    .staerke-leiste {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; text-align: left;
+      border: var(--strich) solid var(--linie); background: var(--flaeche);
+    }
+    .staerke-leiste > div {
+      display: flex; flex-direction: column; gap: 0.1rem;
+      padding: var(--r-2) var(--r-3); border-left: var(--strich) solid var(--linie-fein);
+    }
+    .staerke-leiste > div:first-child { border-left: none; }
+    .staerke-leiste strong {
+      font-size: 1.75rem; line-height: 1.05; font-weight: 700;
+      letter-spacing: -0.02em; font-variant-numeric: tabular-nums;
+    }
+    .staerke-leiste > div:last-child strong { color: var(--akzent); }
+    .staerke-leiste span {
+      font-family: var(--schrift-daten); font-size: 0.6rem; letter-spacing: 0.12em;
+      text-transform: uppercase; color: var(--text-2); opacity: 1;
+    }
     .muster-zeile { display: flex; align-items: center; gap: 0.7rem; padding: 0.55rem 0.2rem; border-top: 1px solid var(--rand); cursor: pointer; min-height: 44px; }
     .muster-zeile input[type=checkbox] { width: 1.25rem; height: 1.25rem; flex: 0 0 auto; }
     .muster-zeile.gestrichen { opacity: 0.45; }
@@ -251,9 +436,14 @@
     .update-banner .fehler { color: #ffb4ab; flex-basis: 100%; }
     /* Breite Tabellen rollen im eigenen Bereich statt das Layout zu sprengen. */
     .tabellen-scroll { overflow-x: auto; }
-    table.uebersicht { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
-    table.uebersicht th, table.uebersicht td { border: 1px solid var(--rand); padding: 0.3rem 0.5rem; text-align: left; vertical-align: top; }
-    table.uebersicht th { background: var(--grau); }
+    /* Übersichtstabelle: Zahlen in Tabellenbreite, Spaltenköpfe als gesperrte
+       Versalzeile — Meldevordruck-Anmutung statt Web-Tabelle. */
+    table.uebersicht { width: 100%; border-collapse: collapse; font-size: var(--t-s); font-variant-numeric: tabular-nums; }
+    table.uebersicht th, table.uebersicht td { border: var(--strich) solid var(--linie); padding: 0.35rem 0.5rem; text-align: left; vertical-align: top; }
+    table.uebersicht th {
+      background: var(--flaeche-2); font-family: var(--schrift-daten); font-size: var(--t-xs);
+      font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase; color: var(--text-2);
+    }
     .kopfzeile { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.4rem 1rem; }
     .kopfzeile h2 { border: none; margin: 0; }
     /* Titel füllt die Zeile und darf umbrechen; die Aktion rückt nach rechts
@@ -284,22 +474,24 @@
     .bogen-details h4 { margin: 0.8rem 0 0.2rem; font-size: 0.9rem; color: var(--blau); }
     .bogen-details h4:first-child { margin-top: 0; }
     dl.paare { display: grid; grid-template-columns: max-content 1fr; gap: 0.2rem 1rem; margin: 0.4rem 0; font-size: 0.92rem; }
-    dl.paare dt { color: #555; }
+    dl.paare dt { color: var(--text-2); }
     dl.paare dd { margin: 0; }
     /* Seiten-Fußzeile: margin-top auto = ans Viewport-Ende; Abstand unten,
        damit die fixe Schritt-Navigation sie nicht verdeckt. */
     footer.seite {
       width: 100%; max-width: 60rem; margin: auto auto 0; padding: 0 1rem 5rem;
       display: flex; flex-wrap: wrap; gap: 0.3rem 1.2rem; justify-content: center;
-      font-size: 0.85rem; color: #556;
+      font-size: var(--t-xs); color: var(--text-2);
     }
     footer.seite .fusslinks { display: inline-flex; gap: 0.8rem; flex-wrap: wrap; }
-    footer.seite a { color: var(--blau-hell); }
+    footer.seite a { color: var(--akzent-hell); }
     button.link {
       border: none; background: none; padding: 0; font-size: inherit;
-      color: var(--blau-hell); text-decoration: underline; cursor: pointer;
+      min-height: 0; display: inline; font-weight: inherit;
+      color: var(--akzent-hell); text-decoration: underline; cursor: pointer;
       text-align: inherit;
     }
+    button.link:hover { border: none; background: none; color: var(--akzent); }
     /* Beispiel-Liste: eigener Aufzählungspunkt mit hängendem Einzug, damit
        lange Namen (Button-Links) sauber links umbrechen und der Punkt an der
        ersten Zeile bleibt. Der Standard-Marker sitzt bei umbrechenden
@@ -329,13 +521,13 @@
       display: flex; flex-direction: column; align-items: center; gap: 0.75rem;
     }
     dialog {
-      border: 1px solid var(--rand); border-radius: 0.5rem;
-      width: min(34rem, calc(100vw - 2rem)); padding: 1rem 1.25rem;
-      color: inherit; font-size: 0.95rem;
+      border: var(--strich-stark) solid var(--linie-stark); border-radius: var(--radius);
+      width: min(34rem, calc(100vw - 2rem)); padding: var(--r-4) var(--r-5);
+      background: var(--flaeche); color: var(--text); font-size: var(--t-m);
     }
-    dialog::backdrop { background: rgba(0, 0, 0, 0.4); }
+    dialog::backdrop { background: rgba(0, 0, 0, 0.45); }
     dialog h2 { border: none; }
-    dialog h3 { color: var(--blau); }
+    dialog h3 { color: var(--text); }
 
     /* ---------------------------------------------------------------
        Safe-Area (Notch, Statusleiste, Home-Indicator). env() ist auf
@@ -939,6 +1131,46 @@
     .platform-android dialog h3 { color: var(--md-on-surface); }
 
     /* ---------------------------------------------------------------
+       Der farbige Kopfbalken ist eine Web-Angelegenheit. iOS und Android
+       behalten ihre plattformeigene Kopfzeile (Navigation Bar bzw. Top
+       App Bar) ohne Kennfarbenfläche — die Kopf-Token werden dafür
+       schlicht neu belegt, ohne Spezifitäts-Wettrennen.
+       --------------------------------------------------------------- */
+    .platform-ios {
+      --kopf-fond: transparent;
+      --kopf-auf: var(--ios-text);
+      --kopf-auf-2: var(--ios-text-2);
+      --kopf-linie: transparent;
+      --kopf-strich: 0px;
+      --kopf-aus: 0px;
+      --kopf-innen: 0px;
+    }
+    .platform-android {
+      --kopf-fond: transparent;
+      --kopf-auf: var(--md-on-surface);
+      --kopf-auf-2: var(--md-on-surface-variant);
+      --kopf-linie: transparent;
+      --kopf-strich: 0px;
+      --kopf-aus: 0px;
+      --kopf-innen: 0px;
+    }
+    /* Ohne Balken greift wieder der normale Abstand zwischen Kopf und Inhalt. */
+    .platform-ios main > header,
+    .platform-android main > header { margin-bottom: var(--r-4); }
+    .platform-ios main > header .schritte,
+    .platform-android main > header .schritte { gap: 0.3rem; margin: 0.5rem 0 0.5rem; }
+    .platform-ios main > header .autosave,
+    .platform-android main > header .autosave { padding-bottom: var(--r-2); }
+    /* Ohne Balkenfläche taugt „Text in Balkenfarbe" nicht mehr als Kontrast
+       für den aktiven Umschalter — hier greift der Plattform-Tint. */
+    .platform-ios main > header .anzeige-schalter button.aktiv {
+      background: var(--ios-akzent-flaeche); color: #fff;
+    }
+    .platform-android main > header .anzeige-schalter button.aktiv {
+      background: var(--md-primary); color: var(--md-on-primary);
+    }
+
+    /* ---------------------------------------------------------------
        Debug-Modus: schwebende Leiste zum Umschalten der visuellen
        Plattform (Web / iOS / Android) und optionaler Handy-Rahmen.
        Nur im Browser sichtbar (siehe debug-plattform.tsx). Bewusst
@@ -1023,7 +1255,7 @@
     .qr-vollbild-nav button.primaer { background: var(--blau); color: #fff; }
 
     /* Papierkorb-Karten (gelöschte Vorlagen/Einsätze): sichtbar zurückgestuft. */
-    section.karte.papierkorb { background: var(--grau); border-style: dashed; }
+    section.karte.papierkorb { background: var(--flaeche-2); border-style: dashed; }
 
     /* ---------------------------------------------------------------
        Feld-Modus: große Tippziele + maximaler Kontrast für den Einsatz
@@ -1031,33 +1263,32 @@
        feld-modus.ts setzt die Klasse auf <html>. Bewusst als letzter
        Block: gewinnt die Kaskade auch gegen die Plattform-Stile.
        --------------------------------------------------------------- */
-    .feld-modus { font-size: 118%; }
-    .feld-modus body { color: #000; background: #fff; color-scheme: light; }
-    .feld-modus button:not(.link), .feld-modus .datei-knopf {
-      min-height: 48px; padding: 0.6rem 1.1rem;
-      border: 2px solid #444; border-radius: 0.4rem;
-      background: #fff; color: #000;
+    .feld-modus {
+      color-scheme: light;
+      font-size: 112%;
+      --grund:       #e8eaef;
+      --flaeche:     #ffffff;
+      --flaeche-2:   #dfe3ea;
+      --text:        #000000;
+      --text-2:      #262b36;
+      --text-3:      #262b36;
+      --linie-fein:  #111318;
+      --linie:       #111318;
+      --linie-stark: #111318;
+      --strich:       2px;
+      --strich-stark: 2px;
+      --fokus:        4px;
+      --ziel:         0.75rem; /* zieht alle Tippziele von 36 auf 48 px */
+      --t-xs: 0.8125rem;
+      --t-s:  0.875rem;
     }
-    .feld-modus button.primaer, .feld-modus .datei-knopf.primaer {
-      background: var(--blau); color: #fff; border-color: var(--blau);
-    }
-    .feld-modus input, .feld-modus select, .feld-modus textarea {
-      min-height: 48px; border: 2px solid #444; background: #fff; color: #000;
-    }
-    .feld-modus input[type="checkbox"], .feld-modus input[type="radio"] {
-      min-height: 0; width: 1.7rem; height: 1.7rem; accent-color: var(--blau);
-    }
-    .feld-modus section.karte, .feld-modus .karte { border: 2px solid #444; background: #fff; }
-    .feld-modus label.feld { color: #000; font-size: 0.95rem; }
-    .feld-modus .hinweis, .feld-modus footer.seite { color: #1a1c22; }
-    .feld-modus .stepper-titel, .feld-modus dl.paare dt { color: #000; }
+    /* Draußen darf nichts „zurücktreten": Beschriftungen fett und schwarz,
+       nichts läuft über Transparenz oder Grauwerte. */
+    .feld-modus label.feld { color: var(--text); font-weight: 700; }
     .feld-modus .muster-sub, .feld-modus .staerke-leiste span,
-    .feld-modus ul.vorschlaege li small { opacity: 1; color: #1a1c22; }
-    .feld-modus table.uebersicht th, .feld-modus table.uebersicht td { border-color: #444; }
-    .feld-modus .schritte button:not(.link) { min-height: 44px; font-size: 0.95rem; }
-    .feld-modus .anzeige-schalter button.aktiv { background: var(--blau); color: #fff; border-color: var(--blau); }
-    .feld-modus .stepper button:not(.link) { width: 3.75rem; min-height: 3.75rem; }
-    .feld-modus output.abgeleitet { border: 2px dashed #444; color: #1a1c22; background: #fff; }
+    .feld-modus ul.vorschlaege li small { opacity: 1; color: var(--text-2); }
+    .feld-modus input[type="checkbox"], .feld-modus input[type="radio"] { width: 1.7rem; height: 1.7rem; }
+    .feld-modus .stepper button { width: 3.75rem; min-height: 3.75rem; }
 
     /* ---------------------------------------------------------------
        Nacht-Modus: gedimmte, warme Darstellung für Nachteinsätze (Zelt,
@@ -1067,62 +1298,50 @@
        Block: gewinnt die Kaskade auch gegen die Plattform-Stile.
        QR-Codes behalten ihre weiße Ruhezone, sonst wären sie unscannbar.
        --------------------------------------------------------------- */
-    .nacht-modus body { background: #101010; color: #d3c9b8; color-scheme: dark; }
-    .nacht-modus h1, .nacht-modus h2 { color: #d99a2b; }
-    .nacht-modus h2 { border-color: #6b501c; }
-    .nacht-modus h3 { color: #d3c9b8; }
-    .nacht-modus section.karte, .nacht-modus .karte {
-      background: #181815; border-color: #3a382f; box-shadow: none;
+    .nacht-modus {
+      color-scheme: dark;
+      --grund:       #0d0c08;
+      --flaeche:     #17150f;
+      --flaeche-2:   #221f16;
+      --text:        #d9cdb6;
+      --text-2:      #a2977e;
+      --text-3:      #877c66;
+      --linie-fein:  #2b271d;
+      --linie:       #423c2d;
+      --linie-stark: #5c5440;
+      /* Auch die Kennfarbe weicht nachts einem warmen Ton: ein sattes
+         Organisationsblau wäre genau das Licht, das die Dunkeladaption
+         zerstört. Die Organisation bleibt am taktischen Zeichen erkennbar. */
+      --akzent:      #a8791a;
+      --akzent-hell: #c9932c;
+      --auf-akzent:  #100d07;
+      --gut:         #8fae63;
+      --alarm:       #e08a7e;
+      --warn-text:   #d9b96a;
+      --warn-fond:   #2a2415;
+      --warn-linie:  #6b501c;
+      /* Der Kopfbalken bleibt nachts dunkel: eine vollflächig eingefärbte
+         Fläche wäre die hellste Stelle im Bild und würde blenden. */
+      --kopf-fond:  #221f16;
+      --kopf-auf:   #d9cdb6;
+      --kopf-auf-2: #a2977e;
+      --kopf-linie: #423c2d;
     }
-    .nacht-modus button:not(.link), .nacht-modus .datei-knopf {
-      background: #23211c; color: #d3c9b8; border: 1px solid #4a463c;
+    .nacht-modus main > header .schritte button.aktiv {
+      color: var(--akzent-hell); border-bottom-color: var(--akzent-hell);
     }
-    .nacht-modus button.primaer, .nacht-modus .datei-knopf.primaer {
-      background: #8a6414; color: #0f0d08; border-color: #8a6414; font-weight: 600;
-    }
-    .nacht-modus button.link { background: none; border: none; color: #d99a2b; }
-    .nacht-modus .zur-start { background: none; border: none; color: #d99a2b; }
-    .nacht-modus input, .nacht-modus select, .nacht-modus textarea, .nacht-modus output.abgeleitet {
-      background: #1d1c18; color: #d3c9b8; border: 1px solid #4a463c;
-    }
-    .nacht-modus input:focus, .nacht-modus select:focus, .nacht-modus textarea:focus { outline-color: #8a6414; }
-    .nacht-modus label.feld, .nacht-modus .stepper-titel, .nacht-modus dl.paare dt { color: #a89e8c; }
-    .nacht-modus .hinweis, .nacht-modus footer.seite, .nacht-modus .onboarding-schritt span { color: #a89e8c; }
-    .nacht-modus .schritte button { background: #23211c; color: #d3c9b8; border-color: #4a463c; }
-    .nacht-modus .schritte button.aktiv { background: #8a6414; color: #0f0d08; border-color: #8a6414; }
-    .nacht-modus .schritte button.status-ok:not(.aktiv) { background: #23211c; border-color: #5c6b4a; }
-    .nacht-modus .schritte button.status-ok .schritt-status { color: #9ab873; }
-    .nacht-modus .schritte button.status-begonnen .schritt-status { color: #d99a2b; }
-    .nacht-modus footer.nav { background: #181815; border-color: #3a382f; box-shadow: none; }
-    .nacht-modus table.uebersicht th, .nacht-modus table.uebersicht td { border-color: #3a382f; }
-    .nacht-modus table.uebersicht th { background: #23211c; }
-    .nacht-modus .warnung, .nacht-modus .vollstaendigkeit {
-      background: #2a2415; border-color: #6b501c; color: #d9b96a;
-    }
-    .nacht-modus .fehler { color: #e08a7e; }
-    .nacht-modus .meldung { background: #181815; border-color: #3a382f; }
-    .nacht-modus .vollstaendig-ok { color: #9ab873; }
-    .nacht-modus .autosave { color: #9ab873; }
-    .nacht-modus .offline-badge { background: #1d241a; border-color: #40523a; color: #9ab873; }
-    .nacht-modus .entwurf-karte { background: #181815; border-color: #3a382f; }
-    .nacht-modus .onboarding-schritt svg { color: #d99a2b; }
-    .nacht-modus .chip { background: #23211c; border-color: #4a463c; color: #d3c9b8; }
-    .nacht-modus ul.vorschlaege { background: #181815; border-color: #4a463c; }
-    .nacht-modus ul.vorschlaege li.aktiv, .nacht-modus ul.vorschlaege li:hover { background: #23211c; }
-    .nacht-modus ul.vorschlaege li small { color: #a89e8c; }
-    .nacht-modus dialog { background: #181815; color: #d3c9b8; border-color: #4a463c; }
-    .nacht-modus .anzeige-schalter button { background: #23211c; color: #d3c9b8; }
-    .nacht-modus .anzeige-schalter button.aktiv { background: #8a6414; color: #0f0d08; }
-    .nacht-modus .karte .entfernen { color: #e08a7e; border-color: #e08a7e; background: none; }
+    .nacht-modus .schritte button.status-ok .schritt-status { color: var(--gut); }
+    .nacht-modus .schritte button.status-begonnen .schritt-status { color: var(--akzent-hell); }
+    .nacht-modus .vollstaendig-ok, .nacht-modus .autosave { color: var(--gut); }
+    .nacht-modus .offline-badge { color: var(--gut); border-color: var(--gut); }
+    .nacht-modus .rolle-badge.rolle-f { background: #2a2440; color: #c3b6ea; }
+    .nacht-modus .rolle-badge.rolle-u { background: #1d2a22; color: #9fcbb2; }
+    .nacht-modus .rolle-badge.rolle-m { background: var(--flaeche-2); color: var(--text-2); }
+    .nacht-modus .signatur-herkunft.gueltig { background: #1d241a; border-color: #40523a; color: var(--gut); }
+    .nacht-modus .signatur-badge.gueltig { color: var(--gut); }
     /* QR-Bilder und Vollbild bleiben hell — Scannbarkeit geht vor Dunkeladaption;
        fürs Vorzeigen wird ohnehin das Display der Gegenseite gebraucht. */
     .nacht-modus .qr-box img { background: #fff; padding: 8px; }
-    .nacht-modus .signatur-herkunft.gueltig { background: #1d241a; border-color: #40523a; color: #9ab873; }
-    .nacht-modus .signatur-badge.gueltig { color: #9ab873; }
-    .nacht-modus .update-banner { background: #23211c; color: #d3c9b8; }
-    .nacht-modus output.abgeleitet { border-style: dashed; }
-    .nacht-modus .pdf-rahmen { border-color: #3a382f; }
-    .nacht-modus a, .nacht-modus footer.seite a { color: #d99a2b; }
   </style>
 </head>
 <body>
