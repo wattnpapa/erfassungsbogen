@@ -1316,6 +1316,13 @@ export function Uebersicht(props: {
   signatur?: SignaturStatus | null;
   /** Gesetzt, wenn der Bogen für eine Einsatz-Sammlung erfasst wird (Meldekopf/Zugführer). */
   sammelAktion?: { label: string; onUebernehmen: () => void };
+  /**
+   * Öffnet die Einsatz-Auswahl, um den offenen Bogen nachträglich in eine
+   * Sammlung zu legen — der Meldekopf scannt/öffnet oft erst und entscheidet
+   * dann, wohin der Bogen gehört. Im Sammelmodus überflüssig: dort führt
+   * `sammelAktion` bereits in den vorgewählten Einsatz.
+   */
+  onInEinsatzAufnehmen?: () => void;
 }) {
   const { bogen, geheZu, neu } = props;
 
@@ -1480,6 +1487,11 @@ export function Uebersicht(props: {
             <button type="button" className={props.sammelAktion ? "" : "primaer"} onClick={() => teilenDialog.current?.showModal()}>
               Bogen übergeben…
             </button>{" "}
+            {!props.sammelAktion && props.onInEinsatzAufnehmen && (
+              <>
+                <button type="button" onClick={props.onInEinsatzAufnehmen}>In Einsatz aufnehmen…</button>{" "}
+              </>
+            )}
             <button type="button" onClick={alsVorlageSpeichern}>Als Vorlage speichern</button>{" "}
             <button type="button" onClick={() => window.confirm("Aktuellen Bogen verwerfen?") && neu()}>Neuer Bogen</button>
           </span>

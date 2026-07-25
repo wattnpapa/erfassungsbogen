@@ -27,7 +27,8 @@ ohne Anmeldung.
 - **Speichern und laden**: der Bogen lässt sich als Datei sichern und
   weitergeben.
 - **Einsätze sammeln (Meldekopf)**: mehrere fremde Bögen unter einem Einsatz
-  bündeln — per Scan, aus Datei/PDF oder am Tablet manuell erfasst. Die App
+  bündeln — per Scan, aus Datei/PDF, am Tablet manuell erfasst oder direkt aus
+  der Übersicht eines gerade geöffneten Bogens („In Einsatz aufnehmen"). Die App
   zählt Stärke und Bedarf über alle anwesenden Einheiten laufend zusammen (mit
   Zwischensummen je Zug), merkt sich tägliche Neumeldungen als Historie und gibt
   alles als Sammel-PDF oder Datei an die nächste Führungsstelle weiter.

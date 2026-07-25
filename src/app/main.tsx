@@ -42,7 +42,7 @@ import {
   type EintragSignatur,
   type Einsatzsammlung,
 } from "./einsaetze";
-import { EinsatzDetail, EinsatzListe } from "./einsaetze-ui";
+import { ART_LABEL, EinsatzDetail, EinsatzListe } from "./einsaetze-ui";
 import { aktuelleMeldungen } from "./auswertung";
 import { boegenAusPdfBytes, einsatzAusDatei, einsatzAusPdfBytes, einsatzDateiInhalt } from "./einsatz-transport";
 import { einsatzCsvInhalt } from "./einsatz-csv";
@@ -235,6 +235,8 @@ function App() {
     sammelZielRef.current = id;
     setSammelZielId(id);
   };
+  // Auswahl „In Einsatz aufnehmen" aus der Übersicht heraus.
+  const einsatzWahlDialog = useRef<HTMLDialogElement>(null);
   // Kiosk-Scan (Meldekopf): Zähler der in diesem Durchgang aufgenommenen Bögen.
   const kioskZaehlerRef = useRef(0);
   // Segmentierung: gesammelte Teile eines großen Bogens (Zustand als Ref, damit
@@ -565,6 +567,34 @@ function App() {
     setMeldung("");
     setZeigeStart(false);
     setOffenerEinsatzId(s.id);
+  }
+
+  /**
+   * Offenen Bogen nachträglich in eine Sammlung legen (Auswahl aus der Übersicht).
+   * Kam er über einen Transport herein (Scan/Link), reist sein Signaturstatus als
+   * Herkunftsnachweis mit; ein selbst erfasster Bogen zählt als „manuell".
+   * Wie bei der Übernahme aus dem Sammelmodus ist der Bogen danach abgelegt —
+   * der Arbeitsentwurf wird geschlossen und die Einsatzansicht übernimmt.
+   */
+  function bogenInEinsatzLegen(zielId: string) {
+    if (!bogen) return;
+    const b = bogen;
+    const sig = bogenSignatur;
+    einsatzWahlDialog.current?.close();
+    setBogen(null);
+    setBogenSignatur(null);
+    setSchritt(0);
+    bogenInSammlung(zielId, b, sig ? "scan" : "manuell", sig ? alsEintragSignatur(sig) : undefined);
+  }
+
+  /** Aus der Einsatz-Auswahl heraus einen neuen Einsatz anlegen und den Bogen hineinlegen. */
+  function neuerEinsatzFuerBogen() {
+    const name = window.prompt("Neuen Einsatz/Übung anlegen — Name:", "");
+    if (name == null || !name.trim()) return;
+    const ort = window.prompt("Ort / Auftrag (optional):", "") ?? "";
+    const s = einsatzAnlegen(name, EinsatzArt.EINSATZ, ort);
+    einsaetzeNeuLaden();
+    bogenInEinsatzLegen(s.id);
   }
 
   function scanneInEinsatz(zielId: string) {
@@ -940,6 +970,7 @@ function App() {
           geheZu={setSchritt}
           neu={() => { setBogen(null); setBogenSignatur(null); setSchritt(0); }}
           onVorlageGespeichert={(name) => { vorlagenNeuLaden(); setMeldung(`Als Vorlage „${name}" gespeichert.`); }}
+          onInEinsatzAufnehmen={() => { einsaetzeNeuLaden(); einsatzWahlDialog.current?.showModal(); }}
           sammelAktion={
             sammelZielId
               ? {
@@ -957,6 +988,39 @@ function App() {
               : undefined
           }
         />
+      )}
+
+      {/* Einsatz-Auswahl für „In Einsatz aufnehmen…": ein gescannter oder
+          geöffneter Bogen wandert von der Übersicht direkt in eine Sammlung. */}
+      {schritt === UEBERSICHT && (
+        <dialog ref={einsatzWahlDialog} aria-label="In Einsatz aufnehmen" className="teilen-dialog">
+          <div className="kopfzeile">
+            <h2>In Einsatz aufnehmen</h2>
+            <button type="button" onClick={() => einsatzWahlDialog.current?.close()}>Schließen</button>
+          </div>
+          <p className="hinweis">
+            Der Bogen wird als Meldung abgelegt und hier geschlossen; ist die Einheit im Einsatz schon
+            gemeldet, wird nachgefragt (neue Fassung oder eigene Einheit).
+          </p>
+          {einsaetze.map((s) => (
+            <div className="teilen-weg" key={s.id}>
+              <button type="button" onClick={() => bogenInEinsatzLegen(s.id)}>{s.name}</button>
+              <p className="hinweis">
+                {ART_LABEL[s.art]}{s.ort ? ` · ${s.ort}` : ""} · {aktuelleMeldungen(s.eintraege).length} Einheit(en) anwesend
+              </p>
+            </div>
+          ))}
+          <div className="teilen-weg">
+            <button type="button" className={einsaetze.length === 0 ? "primaer" : ""} onClick={neuerEinsatzFuerBogen}>
+              Neuen Einsatz anlegen…
+            </button>
+            <p className="hinweis">
+              {einsaetze.length === 0
+                ? "Noch keine Sammlung vorhanden — der Bogen ist die erste Meldung darin."
+                : "Für einen neuen Einsatz oder eine Übung."}
+            </p>
+          </div>
+        </dialog>
       )}
 
       {schritt !== UEBERSICHT && (

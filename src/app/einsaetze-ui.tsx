@@ -49,7 +49,7 @@ import {
 import { aggregiere, aggregiereNachZug, type EinsatzSummen } from "./auswertung";
 import { debugAktiv } from "./debug-plattform";
 
-const ART_LABEL: Record<EinsatzArt, string> = {
+export const ART_LABEL: Record<EinsatzArt, string> = {
   [EinsatzArt.EINSATZ]: "Einsatz",
   [EinsatzArt.UEBUNG]: "Übung",
   [EinsatzArt.VERANSTALTUNG]: "Veranstaltung",
