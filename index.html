@@ -282,6 +282,11 @@
     .chip button { border: none; padding: 0 0.2rem; min-height: 0; background: none; font-weight: bold; }
     .karte .entfernen { float: right; color: var(--alarm); border-color: var(--alarm); font-size: var(--t-xs); }
     .karte .entfernen:hover { color: var(--alarm); border-color: var(--alarm); background: var(--flaeche-2); }
+    /* Destruktive Aktion außerhalb einer Karte (z. B. „Endgültig löschen"):
+       Alarmfarbe in Rahmen und Text, aber keine gefüllte Signalfläche — die
+       gehört in dieser App der einen primären Aktion einer Ansicht. */
+    button.gefahr { color: var(--alarm); border-color: var(--alarm); }
+    button.gefahr:hover:not(:disabled) { color: var(--alarm); border-color: var(--alarm); background: var(--flaeche-2); }
     footer.nav {
       position: fixed; bottom: 0; left: 0; right: 0; background: var(--flaeche);
       border-top: var(--strich-stark) solid var(--linie); padding: 0.7rem 1rem;
@@ -520,6 +525,10 @@
     footer.seite .fuss-gruppe button.link:hover {
       color: var(--akzent); text-decoration-color: currentColor;
     }
+    /* „Alle Daten löschen" steht zwischen ruhigen Links — es darf nicht
+       schreien, muss aber vor dem Klick als etwas anderes erkennbar sein. */
+    footer.seite .fuss-gruppe button.link.gefahr,
+    footer.seite .fuss-gruppe button.link.gefahr:hover { color: var(--alarm); }
     .fuss-marke { margin: 0; color: var(--text-3); }
     footer.seite a { color: var(--akzent-hell); }
     button.link {
@@ -780,6 +789,9 @@
       color: var(--ios-rot);
       background: var(--ios-fuellung);
     }
+    .platform-ios button.gefahr { color: var(--ios-rot); background: var(--ios-fuellung); }
+    .platform-ios button.link.gefahr,
+    .platform-ios footer.seite .fuss-gruppe button.link.gefahr { color: var(--ios-rot); background: none; }
     .platform-ios .fehler { color: var(--ios-rot); }
     .platform-ios .warnung {
       font: -apple-system-footnote;
@@ -1105,6 +1117,9 @@
       padding: 0.4rem 0.8rem;
       min-height: 40px;
     }
+    .platform-android button.gefahr { background: transparent; color: var(--md-error); }
+    .platform-android button.link.gefahr,
+    .platform-android footer.seite .fuss-gruppe button.link.gefahr { color: var(--md-error); }
     .platform-android .fehler { color: var(--md-error); }
     .platform-android .warnung {
       font-size: 0.875rem;

@@ -11,7 +11,7 @@ import { einheitSymbolSvg, svgDataUrl } from "./taktische-zeichen";
 import { pdfErzeugen } from "./pdf";
 import { nutzungsKanal, statistikAbgewaehlt, statistikAbwaehlen } from "./statistik";
 import { AnzeigeSchalter } from "./anzeige-schalter";
-import { sicherungEinspielen, sicherungErstellen } from "./sicherung";
+import { alleDatenLoeschen, datenUmfang, sicherungErstellen, sicherungEinspielen, type DatenUmfang } from "./sicherung";
 
 const KONTAKT = "johannes.rudolph@thw-oldenburg.de";
 const REPO = "https://github.com/wattnpapa/erfassungsbogen";
@@ -214,6 +214,15 @@ export function Fusszeile({ onBogenOeffnen }: {
   const [beispielLaedt, setBeispielLaedt] = useState(false);
   const sicherung = useRef<HTMLDialogElement>(null);
   const [sicherungFehler, setSicherungFehler] = useState("");
+  const loeschen = useRef<HTMLDialogElement>(null);
+  // Stand beim Öffnen des Löschen-Dialogs — die Rückfrage nennt Zahlen, damit
+  // niemand „alles löschen" blind bestätigt.
+  const [loeschUmfang, setLoeschUmfang] = useState<DatenUmfang | null>(null);
+  // Zweite Bestätigung im Dialog selbst (statt window.confirm): der Haken steht
+  // neben der Liste dessen, was verschwindet, und ist nach dem Schließen wieder
+  // leer — ein zweiter Klick allein löscht also nie.
+  const [loeschVerstanden, setLoeschVerstanden] = useState(false);
+  const [loeschFehler, setLoeschFehler] = useState("");
   const [statistikAus, setStatistikAus] = useState(() => statistikAbgewaehlt());
 
   function statistikUmschalten(ereignis: ChangeEvent<HTMLInputElement>) {
@@ -335,6 +344,29 @@ export function Fusszeile({ onBogenOeffnen }: {
     }
   }
 
+  /** Löschen-Dialog öffnen: Stand frisch erheben, Bestätigung zurücksetzen. */
+  function loeschenOeffnen() {
+    setLoeschUmfang(datenUmfang());
+    setLoeschVerstanden(false);
+    setLoeschFehler("");
+    loeschen.current?.showModal();
+  }
+
+  /**
+   * Alles löschen und neu laden: der laufende Stand in React (offener Entwurf,
+   * geladene Vorlagen) wüsste sonst nichts vom leeren Speicher und könnte ihn
+   * beim nächsten Speichern wieder auffüllen.
+   */
+  function alleDatenLoeschenJetzt() {
+    try {
+      const anzahl = alleDatenLoeschen();
+      window.alert(`Alle lokalen Daten gelöscht (${anzahl} Einträge). Die App startet jetzt neu.`);
+      window.location.reload();
+    } catch (err) {
+      setLoeschFehler(err instanceof Error ? err.message : String(err));
+    }
+  }
+
   return (
     <footer className="seite">
       {/* Nach Zweck gruppiert statt als eine Reihe gleich gewichteter Links:
@@ -357,6 +389,7 @@ export function Fusszeile({ onBogenOeffnen }: {
           >
             Beispielbögen
           </button>
+          <button className="link gefahr" onClick={loeschenOeffnen}>Alle Daten löschen</button>
         </nav>
         <nav className="fuss-gruppe" aria-label="Rechtliches">
           <span className="fuss-titel">Rechtliches</span>
@@ -400,6 +433,67 @@ export function Fusszeile({ onBogenOeffnen }: {
         <p className="hinweis">
           Einspielen ersetzt die vorhandenen App-Daten auf diesem Gerät vollständig.
         </p>
+      </Dialog>
+
+      {/* Restlos löschen — z. B. bevor ein geteiltes Tablet weitergegeben wird
+          oder nach einer Übung. Bewusst mit Zahlen, Sicherungs-Ausweg und
+          eigenem Haken: rückgängig gibt es hier nicht. */}
+      <Dialog titel="Alle lokalen Daten löschen" dialogRef={loeschen}>
+        <p>
+          Entfernt <strong>alle</strong> Daten dieser App von diesem Gerät — auch die
+          Einträge im Papierkorb. Es gibt keine Kopie in einer Cloud: was hier weg
+          ist, ist weg.
+        </p>
+        {loeschUmfang && (
+          loeschUmfang.eintraege === 0 ? (
+            <p>Auf diesem Gerät sind derzeit keine App-Daten gespeichert.</p>
+          ) : (
+            <>
+              <p><strong>Betroffen sind:</strong></p>
+              <ul>
+                <li>
+                  {loeschUmfang.vorlagen} {loeschUmfang.vorlagen === 1 ? "Vorlage" : "Vorlagen"}
+                  {" (inkl. Papierkorb)"}
+                </li>
+                <li>
+                  {loeschUmfang.einsaetze} {loeschUmfang.einsaetze === 1 ? "Einsatz-Sammlung" : "Einsatz-Sammlungen"}
+                  {" mit "}{loeschUmfang.meldungen} {loeschUmfang.meldungen === 1 ? "gemeldeten Bogen" : "gemeldeten Bögen"}
+                </li>
+                <li>{loeschUmfang.entwurf ? "der aktuelle Bogen-Entwurf" : "kein offener Bogen-Entwurf"}</li>
+                <li>{loeschUmfang.absender ? "die hinterlegte Absenderkarte" : "keine Absenderkarte"}</li>
+                <li>
+                  {loeschUmfang.geraeteschluessel
+                    ? "der Signatur-Geräteschlüssel — künftige Bögen werden mit einem neuen Schlüssel signiert"
+                    : "kein Signatur-Geräteschlüssel"}
+                </li>
+                <li>alle Einstellungen (Darstellung, Vorbelegungen)</li>
+              </ul>
+            </>
+          )
+        )}
+        <p className="warnung">
+          Bereits erzeugte PDFs, QR-Codes und Sicherungsdateien bleiben unberührt —
+          nur der Speicher dieser App wird geleert. Der Widerspruch zur
+          Reichweitenmessung bleibt bestehen.
+        </p>
+        <div className="aktionen">
+          <button onClick={() => void sicherungExportieren()}>Vorher Sicherung erstellen…</button>
+        </div>
+        <label className="inline">
+          <input
+            type="checkbox"
+            checked={loeschVerstanden}
+            onChange={(e) => setLoeschVerstanden(e.target.checked)}
+          />
+          Ja, alle lokalen Daten dieser App endgültig löschen
+        </label>
+        <div className="aktionen">
+          <button className="gefahr" disabled={!loeschVerstanden} onClick={alleDatenLoeschenJetzt}>
+            Endgültig löschen
+          </button>
+          <button onClick={() => loeschen.current?.close()}>Abbrechen</button>
+        </div>
+        {loeschFehler && <p className="fehler">{loeschFehler}</p>}
       </Dialog>
 
       <Dialog

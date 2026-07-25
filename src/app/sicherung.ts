@@ -7,7 +7,17 @@
  *
  * Achtung: Die Datei enthält auch den PRIVATEN Signatur-Geräteschlüssel —
  * die UI weist darauf hin, dass sie wie ein Schlüssel zu behandeln ist.
+ *
+ * Gegenstück ist das restlose Löschen (`alleDatenLoeschen`) — beides arbeitet
+ * über denselben `eeb.`-Präfix, damit „gesichert" und „gelöscht" dieselbe Menge
+ * meinen.
  */
+
+import { absenderkarteGefuellt, absenderkarteLaden } from "./absenderkarte";
+import { einsaetzeLaden, einsaetzePapierkorb } from "./einsaetze";
+import { entwurfLaden } from "./entwurf";
+import { geraeteSchluesselPrivat } from "./geraete-schluessel";
+import { vorlagenLaden, vorlagenPapierkorb } from "./vorlagen";
 
 const FORMAT = "eeb-sicherung";
 const VERSION = 1;
@@ -96,4 +106,55 @@ export function sicherungEinspielen(text: string): number {
   for (const k of alleEebSchluessel(s)) s.removeItem(k);
   for (const [k, v] of Object.entries(eintraege)) s.setItem(k, v);
   return Object.keys(eintraege).length;
+}
+
+// ------------------------------------------------- Restlos löschen
+
+/**
+ * Was auf diesem Gerät liegt — für die Rückfrage vor dem Löschen. Ohne konkrete
+ * Zahlen ist „alles löschen?" eine Frage, die niemand verantwortlich beantworten
+ * kann. Vorlagen und Einsätze zählen inklusive Papierkorb: was gelöscht wird,
+ * muss auch gezeigt werden.
+ */
+export interface DatenUmfang {
+  /** Zahl der `eeb.*`-Einträge insgesamt (auch Einstellungen). */
+  eintraege: number;
+  vorlagen: number;
+  einsaetze: number;
+  /** Gemeldete Bögen über alle Einsatz-Sammlungen. */
+  meldungen: number;
+  entwurf: boolean;
+  absender: boolean;
+  geraeteschluessel: boolean;
+}
+
+export function datenUmfang(): DatenUmfang {
+  const s = speicher();
+  const einsaetze = [...einsaetzeLaden(), ...einsaetzePapierkorb()];
+  return {
+    eintraege: s ? alleEebSchluessel(s).length : 0,
+    vorlagen: vorlagenLaden().length + vorlagenPapierkorb().length,
+    einsaetze: einsaetze.length,
+    meldungen: einsaetze.reduce((summe, e) => summe + e.eintraege.length, 0),
+    entwurf: entwurfLaden() != null,
+    absender: absenderkarteGefuellt(absenderkarteLaden()),
+    geraeteschluessel: geraeteSchluesselPrivat() != null,
+  };
+}
+
+/**
+ * Alle lokalen App-Daten (`eeb.*`) endgültig entfernen — auch der Papierkorb,
+ * auch der private Geräteschlüssel. Rückgabe: Zahl der entfernten Einträge.
+ *
+ * Nicht betroffen ist der Widerspruch zur Reichweitenmessung (`skipgc`, ohne
+ * `eeb.`-Präfix): das ist eine Datenschutz-Entscheidung über die App, kein
+ * erfasster Inhalt — sie beim „Alles löschen" stillschweigend zurückzunehmen
+ * wäre das Gegenteil dessen, was hier jemand will.
+ */
+export function alleDatenLoeschen(): number {
+  const s = speicher();
+  if (!s) throw new Error("Lokaler Speicher ist nicht verfügbar (Privatmodus?).");
+  const schluessel = alleEebSchluessel(s);
+  for (const k of schluessel) s.removeItem(k);
+  return schluessel.length;
 }

@@ -1,5 +1,33 @@
 import { describe, it, expect, beforeEach } from "vitest";
-import { sicherungEinspielen, sicherungErstellen, sicherungInhalt, sicherungParsen } from "./sicherung";
+import {
+  alleDatenLoeschen,
+  datenUmfang,
+  sicherungEinspielen,
+  sicherungErstellen,
+  sicherungInhalt,
+  sicherungParsen,
+} from "./sicherung";
+import { OrganisationsTyp, PersonalErfassung, SCHEMA_VERSION, type Erfassungsbogen } from "../model";
+import { absenderkarteSpeichern } from "./absenderkarte";
+import { EinsatzArt, einsatzAnlegen, meldungHinzufuegen } from "./einsaetze";
+import { entwurfLaden, entwurfSpeichern } from "./entwurf";
+import { vorlageAnlegen, vorlageLoeschen, vorlagenLaden } from "./vorlagen";
+
+function bogen(): Erfassungsbogen {
+  return {
+    schemaVersion: SCHEMA_VERSION,
+    stand: 100,
+    einheit: {
+      organisation: OrganisationsTyp.THW,
+      einheitsTyp: { code: 1 },
+      hierarchie: [{ bezeichnung: { code: 1 }, name: "OV Oldenburg" }],
+    },
+    einsatz: { zeitraumVon: 100, zeitraumBis: 130, ortAuftrag: "Übung Kabelblitz" },
+    personalErfassung: PersonalErfassung.VOLLSTAENDIG,
+    personal: [],
+    fahrzeuge: [],
+  };
+}
 
 class MemStorage {
   private m = new Map<string, string>();
@@ -66,5 +94,61 @@ describe("sicherungErstellen() / sicherungEinspielen()", () => {
     sicherungEinspielen(datei);
     expect(localStorage.getItem("eeb.vorlagen.v1")).toBe("[\"neu\"]");
     expect(localStorage.getItem("eeb.entwurf.v1")).toBeNull(); // nicht in der Sicherung → weg
+  });
+});
+
+describe("datenUmfang()", () => {
+  it("meldet auf einem frischen Gerät nichts", () => {
+    expect(datenUmfang()).toEqual({
+      eintraege: 0,
+      vorlagen: 0,
+      einsaetze: 0,
+      meldungen: 0,
+      entwurf: false,
+      absender: false,
+      geraeteschluessel: false,
+    });
+  });
+
+  it("zählt Vorlagen und Einsätze inklusive Papierkorb", () => {
+    const v = vorlageAnlegen("Basis", bogen());
+    vorlageLoeschen(v.id); // nur in den Papierkorb
+    const e = einsatzAnlegen("Übung", EinsatzArt.UEBUNG);
+    meldungHinzufuegen(e.id, bogen(), { quelle: "manuell" });
+    einsatzAnlegen("Sturmflut", EinsatzArt.EINSATZ);
+
+    const u = datenUmfang();
+    expect(u.vorlagen).toBe(1); // im Papierkorb, aber vorhanden
+    expect(u.einsaetze).toBe(2);
+    expect(u.meldungen).toBe(1);
+    expect(u.eintraege).toBeGreaterThanOrEqual(2);
+  });
+
+  it("erkennt Entwurf und Absenderkarte", () => {
+    entwurfSpeichern(bogen());
+    absenderkarteSpeichern({ name: "Rudolph", email: "", telefon: "" });
+    const u = datenUmfang();
+    expect(u.entwurf).toBe(true);
+    expect(u.absender).toBe(true);
+  });
+});
+
+describe("alleDatenLoeschen()", () => {
+  it("entfernt alle eeb.*-Einträge und lässt fremde Schlüssel stehen", () => {
+    vorlageAnlegen("Basis", bogen());
+    entwurfSpeichern(bogen());
+    localStorage.setItem("skipgc", "t"); // Widerspruch zur Reichweitenmessung
+    localStorage.setItem("fremd", "bleibt");
+
+    expect(alleDatenLoeschen()).toBeGreaterThanOrEqual(2);
+    expect(datenUmfang().eintraege).toBe(0);
+    expect(vorlagenLaden()).toEqual([]);
+    expect(entwurfLaden()).toBeNull();
+    expect(localStorage.getItem("skipgc")).toBe("t");
+    expect(localStorage.getItem("fremd")).toBe("bleibt");
+  });
+
+  it("ist auf einem leeren Gerät ein Nullvorgang", () => {
+    expect(alleDatenLoeschen()).toBe(0);
   });
 });
