@@ -538,6 +538,40 @@
     .beispiel-liste li::before {
       content: "•"; position: absolute; left: -1.1em; color: currentColor;
     }
+    /* Beispielbögen-Tabelle: taktisches Zeichen + Einheit, darunter jeweils die
+       leisen Zusatzzeilen (Träger, Ebene, Fahrzeuge) — eine Zeile je Bogen mit
+       den Aktionen rechts. */
+    table.uebersicht.beispiele td { vertical-align: middle; }
+    table.uebersicht.beispiele .hinweis { display: block; }
+    .beispiel-einheit { display: flex; align-items: center; gap: 0.5rem; }
+    .beispiel-einheit > img { height: 1.9rem; width: auto; flex: 0 0 auto; }
+    .beispiel-einheit > span { min-width: 0; }
+    .beispiel-aktionen { display: flex; gap: 0.4rem; white-space: nowrap; }
+    /* Zeilen-Aktionen: echte Knöpfe, aber schmaler als die Seitenaktionen —
+       zwei davon müssen in eine Tabellenzelle passen. Die Höhe bleibt beim
+       Touch-Ziel (var(--ziel)), die Breite spart nur das Innenmaß. */
+    .beispiel-aktionen button { padding: 0.4rem 0.6rem; }
+    .knopf-icon {
+      width: 1.15em; height: 1.15em; flex: 0 0 auto;
+      fill: none; stroke: currentColor; stroke-width: 1.8;
+      stroke-linecap: round; stroke-linejoin: round;
+    }
+    /* Auf dem Handy wird aus jeder Tabellenzeile eine Karte: die Aktionen
+       müssen ohne seitliches Rollen erreichbar sein. Die role-Attribute im
+       Markup halten die Tabellensemantik trotz display:block. */
+    @media (max-width: 34rem) {
+      table.uebersicht.beispiele,
+      table.uebersicht.beispiele tbody,
+      table.uebersicht.beispiele tr,
+      table.uebersicht.beispiele td { display: block; width: auto; }
+      table.uebersicht.beispiele thead { display: none; }
+      table.uebersicht.beispiele tr {
+        border: var(--strich) solid var(--linie); margin-bottom: var(--r-3); padding: var(--r-2);
+      }
+      table.uebersicht.beispiele td { border: none; padding: 0.15rem 0; }
+      table.uebersicht.beispiele td.zahl::before { content: "Stärke "; color: var(--text-2); }
+      .beispiel-aktionen { gap: 1.2rem; padding-top: 0.3rem; }
+    }
     .scanner {
       position: fixed; inset: 0; z-index: 100; background: #000;
       display: flex; flex-direction: column; align-items: center;
@@ -562,6 +596,9 @@
       width: min(34rem, calc(100vw - 2rem)); padding: var(--r-4) var(--r-5);
       background: var(--flaeche); color: var(--text); font-size: var(--t-m);
     }
+    /* Dialoge mit Tabelle (Beispielbögen) brauchen mehr Breite als die
+       Textdialoge — auf schmalen Geräten greift wie gehabt die Viewport-Grenze. */
+    dialog.breit { width: min(50rem, calc(100vw - 2rem)); }
     dialog::backdrop { background: rgba(0, 0, 0, 0.45); }
     dialog h2 { border: none; }
     dialog h3 { color: var(--text); }

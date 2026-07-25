@@ -3,10 +3,11 @@
  * Aufbau angelehnt an sprechfunk-uebung.de (gleicher Autor).
  */
 
-import { useRef, useState, type ChangeEvent, type ReactNode, type RefObject } from "react";
-import type { Erfassungsbogen } from "../model";
+import { useEffect, useRef, useState, type ChangeEvent, type ReactNode, type RefObject } from "react";
+import { staerke, type Erfassungsbogen } from "../model";
 import { istNativ, textTeilen } from "./nativ";
-import { migriereBogen } from "./hilfen";
+import { einheitOrt, migriereBogen, orgLabel, vokabText, vokabularFuer } from "./hilfen";
+import { einheitSymbolSvg, svgDataUrl } from "./taktische-zeichen";
 import { pdfErzeugen } from "./pdf";
 import { nutzungsKanal, statistikAbgewaehlt, statistikAbwaehlen } from "./statistik";
 import { AnzeigeSchalter } from "./anzeige-schalter";
@@ -89,22 +90,93 @@ function boegenHier(pfad: string[]): typeof BEISPIELE {
   return unterPfad(pfad).filter((b) => b.ordner.length === pfad.length);
 }
 
+// Einmal geladene Beispielbögen bleiben für die Sitzung liegen: die Tabelle
+// zeigt Einheit, Herkunft und Stärke aus dem Bogen selbst, und beim Blättern
+// zwischen den Ordnern (oder für PDF/Ansehen) wird nicht erneut geladen.
+const BOGEN_CACHE = new Map<string, Erfassungsbogen>();
+
+/** Beispielbogen-JSON laden (gecacht) und auf das aktuelle Schema heben. */
+async function beispielBogen(url: string): Promise<Erfassungsbogen> {
+  const bekannt = BOGEN_CACHE.get(url);
+  if (bekannt) return bekannt;
+  const bogen = migriereBogen((await (await fetch(url)).json()) as Erfassungsbogen);
+  BOGEN_CACHE.set(url, bogen);
+  return bogen;
+}
+
+/**
+ * Eigene Kopie für alles, was den Bogen weitergibt (Öffnen, PDF): der geöffnete
+ * Bogen wird bearbeitet, der Stand im Cache muss davon unberührt bleiben.
+ */
+async function beispielKopie(url: string): Promise<Erfassungsbogen> {
+  return structuredClone(await beispielBogen(url));
+}
+
 /**
  * Beispielbogen laden und daraus die PDF im aktuellen Layout erzeugen —
  * Download (Web) bzw. Share-Sheet (App) übernimmt pdfErzeugen.
  */
 async function beispielPdf(datei: string, url: string): Promise<void> {
-  const bogen = migriereBogen((await (await fetch(url)).json()) as Erfassungsbogen);
-  await pdfErzeugen(bogen, `${datei}.pdf`);
+  await pdfErzeugen(await beispielKopie(url), `${datei}.pdf`);
 }
 
-function Dialog({ titel, dialogRef, children }: {
+/** Einheitstyp im Vokabular der Organisation („Betreuungsgruppe (BTGr)"). */
+function einheitsTypText(b: Erfassungsbogen): string {
+  return vokabText(b.einheit.einheitsTyp, vokabularFuer(b.einheit.organisation, "einheitstyp"), "name");
+}
+
+/** Träger der Einheit — der erfasste Organisationsname, sonst die Organisation. */
+function traegerText(b: Erfassungsbogen): string {
+  return b.einheit.organisationName?.trim() || orgLabel(b.einheit.organisation);
+}
+
+/**
+ * Oberste Zuständigkeitsebene („THW Landesverband Baden-Württemberg"). Steckt
+ * ihr Name schon im Träger („Feuerwehr Landkreis Stade" über der „Unteren
+ * KatS-Behörde Landkreis Stade"), bringt die Zeile nichts Neues und entfällt.
+ */
+function obersteEbene(b: Erfassungsbogen): string {
+  const ebene = b.einheit.hierarchie[b.einheit.hierarchie.length - 1];
+  if (!ebene || b.einheit.hierarchie.length < 2) return "";
+  if (ebene.name && traegerText(b).includes(ebene.name)) return "";
+  const bezeichnung = vokabText(ebene.bezeichnung, vokabularFuer(b.einheit.organisation, "ebene"), "name");
+  return [bezeichnung, ebene.name].filter(Boolean).join(" ").trim();
+}
+
+/**
+ * Icons der Zeilen-Aktionen: inline statt Bilddatei, damit sie die Textfarbe
+ * (und damit die Kennfarbe der Organisation) erben und offline da sind.
+ */
+function IconAuge() {
+  return (
+    <svg className="knopf-icon" viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M2 12s3.6-6.2 10-6.2S22 12 22 12s-3.6 6.2-10 6.2S2 12 2 12Z" />
+      <circle cx="12" cy="12" r="3" />
+    </svg>
+  );
+}
+
+function IconPdf() {
+  return (
+    <svg className="knopf-icon" viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M14 3H7a1.5 1.5 0 0 0-1.5 1.5v15A1.5 1.5 0 0 0 7 21h10a1.5 1.5 0 0 0 1.5-1.5V7.5Z" />
+      <path d="M14 3v4.5h4.5" />
+      <path d="M12 11v5" />
+      <path d="m9.75 13.75 2.25 2.25 2.25-2.25" />
+    </svg>
+  );
+}
+
+function Dialog({ titel, dialogRef, klasse, onSchliessen, children }: {
   titel: string;
   dialogRef: RefObject<HTMLDialogElement | null>;
+  klasse?: string;
+  /** Feuert auch bei Esc und Backdrop-Schluss, nicht nur beim Knopf. */
+  onSchliessen?: () => void;
   children: ReactNode;
 }) {
   return (
-    <dialog ref={dialogRef} aria-label={titel}>
+    <dialog ref={dialogRef} aria-label={titel} className={klasse} onClose={onSchliessen}>
       <div className="kopfzeile">
         <h2>{titel}</h2>
         <button onClick={() => dialogRef.current?.close()}>Schließen</button>
@@ -114,7 +186,14 @@ function Dialog({ titel, dialogRef, children }: {
   );
 }
 
-export function Fusszeile() {
+export function Fusszeile({ onBogenOeffnen }: {
+  /**
+   * Beispielbogen in der App öffnen — wie ein frisch gescannter Bogen.
+   * Rückgabe false = die Übernahme wurde abgelehnt (Rückfrage abgebrochen);
+   * dann bleibt der Dialog stehen.
+   */
+  onBogenOeffnen: (bogen: Erfassungsbogen) => boolean;
+}) {
   const ueber = useRef<HTMLDialogElement>(null);
   const impressum = useRef<HTMLDialogElement>(null);
   const datenschutz = useRef<HTMLDialogElement>(null);
@@ -125,6 +204,14 @@ export function Fusszeile() {
   // Dateiname des Bogens, dessen PDF gerade entsteht (leer = keiner läuft).
   const [beispielLaeuft, setBeispielLaeuft] = useState("");
   const [beispielFehler, setBeispielFehler] = useState("");
+  // Der Dialog lädt die Bögen des offenen Ordners nach, um Einheit, Herkunft
+  // und Stärke in der Tabelle zu zeigen. Die Tabelle rendert ausschließlich aus
+  // `beispielDaten` (URL → Bogen) — der Modul-Cache ist nur die Abkürzung beim
+  // Nachladen, nie die Anzeigequelle. Sonst könnte die Ansicht mit einem
+  // geleerten Cache dauerhaft leer stehen bleiben, ohne dass etwas nachlädt.
+  const [beispieleOffen, setBeispieleOffen] = useState(false);
+  const [beispielDaten, setBeispielDaten] = useState<Record<string, Erfassungsbogen>>({});
+  const [beispielLaedt, setBeispielLaedt] = useState(false);
   const sicherung = useRef<HTMLDialogElement>(null);
   const [sicherungFehler, setSicherungFehler] = useState("");
   const [statistikAus, setStatistikAus] = useState(() => statistikAbgewaehlt());
@@ -135,7 +222,60 @@ export function Fusszeile() {
     statistikAbwaehlen(aus);
   }
 
-  /** Beispielbogen anfordern: JSON laden, PDF erzeugen, Fehler im Dialog zeigen. */
+  // Bögen des offenen Ordners laden, sobald der Dialog offen ist bzw. der Pfad
+  // wechselt. Fehlschläge (z. B. offline) sind kein Beinbruch: die Tabelle
+  // zeigt dann den Dateinamen und meldet es unter der Liste.
+  const beispielPfadSchluessel = beispielPfad.join("/");
+  useEffect(() => {
+    if (!beispieleOffen) return;
+    const pfad = beispielPfadSchluessel ? beispielPfadSchluessel.split("/") : [];
+    const urls = boegenHier(pfad).map((b) => b.url);
+    let aktiv = true;
+    // Schon Bekanntes sofort zeigen, den Rest nachladen.
+    const bekannt: Record<string, Erfassungsbogen> = {};
+    for (const u of urls) {
+      const b = BOGEN_CACHE.get(u);
+      if (b) bekannt[u] = b;
+    }
+    setBeispielDaten(bekannt);
+    const fehlend = urls.filter((u) => !(u in bekannt));
+    if (fehlend.length === 0) {
+      setBeispielLaedt(false);
+      return;
+    }
+    setBeispielLaedt(true);
+    // Je Bogen einzeln in den Stand geben statt erst am Ende: bei einem großen
+    // Ordner (THW: über 100 Bögen) füllt sich die Tabelle so nach und nach.
+    void Promise.all(
+      fehlend.map((u) =>
+        beispielBogen(u).then(
+          (b) => {
+            if (aktiv) setBeispielDaten((stand) => ({ ...stand, [u]: b }));
+            return true;
+          },
+          () => false,
+        ),
+      ),
+    ).then((geladen) => {
+      if (!aktiv) return;
+      setBeispielLaedt(false);
+      if (geladen.some((ok) => !ok)) {
+        setBeispielFehler(
+          "Einige Beispielbögen ließen sich nicht laden (offline?). Die Bögen selbst bleiben über die Aktionen erreichbar.",
+        );
+      }
+    });
+    return () => {
+      aktiv = false;
+    };
+  }, [beispieleOffen, beispielPfadSchluessel]);
+
+  // Anzeigestand der offenen Ebene.
+  const beispielOrdner = unterordner(beispielPfad);
+  const beispielBoegen = boegenHier(beispielPfad);
+  const beispielGeladen = beispielBoegen.filter((b) => b.url in beispielDaten).length;
+
+  /** PDF eines Beispielbogens anfordern; Fehler im Dialog zeigen. */
   async function beispielHolen(datei: string, url: string) {
     setBeispielFehler("");
     setBeispielLaeuft(datei);
@@ -143,6 +283,20 @@ export function Fusszeile() {
       await beispielPdf(datei, url);
     } catch (err) {
       setBeispielFehler(`PDF konnte nicht erzeugt werden: ${err instanceof Error ? err.message : String(err)}`);
+    } finally {
+      setBeispielLaeuft("");
+    }
+  }
+
+  /** Beispielbogen in der App öffnen — wie ein gescannter Bogen. */
+  async function beispielAnsehen(datei: string, url: string) {
+    setBeispielFehler("");
+    setBeispielLaeuft(datei);
+    try {
+      const bogen = await beispielKopie(url);
+      if (onBogenOeffnen(bogen)) beispiele.current?.close();
+    } catch (err) {
+      setBeispielFehler(`Bogen konnte nicht geladen werden: ${err instanceof Error ? err.message : String(err)}`);
     } finally {
       setBeispielLaeuft("");
     }
@@ -197,6 +351,7 @@ export function Fusszeile() {
             onClick={() => {
               setBeispielPfad([]); // beim Öffnen wieder ganz oben starten
               setBeispielFehler("");
+              setBeispieleOffen(true);
               beispiele.current?.showModal();
             }}
           >
@@ -247,12 +402,18 @@ export function Fusszeile() {
         </p>
       </Dialog>
 
-      <Dialog titel="Beispielbögen" dialogRef={beispiele}>
+      <Dialog
+        titel="Beispielbögen"
+        dialogRef={beispiele}
+        klasse="breit"
+        onSchliessen={() => setBeispieleOffen(false)}
+      >
         <p>
           Ausgefüllte Beispiel-Erfassungsbögen (fiktive Einheiten und Personen) –
-          zum Ansehen, für Übungen oder zum Testen des QR-Imports. Beim Anklicken
-          entsteht die PDF im aktuellen Layout; die eingebetteten QR-Codes lassen
-          sich direkt mit der App scannen.
+          zum Ansehen, für Übungen oder zum Testen des QR-Imports. <strong>Anzeigen</strong>{" "}
+          öffnet den Bogen in der App, als wäre er gerade gescannt worden;{" "}
+          <strong>PDF</strong> erzeugt ihn im aktuellen Layout – die eingebetteten
+          QR-Codes lassen sich direkt mit der App scannen.
         </p>
         {beispielPfad.length > 0 && (
           <p>
@@ -264,27 +425,106 @@ export function Fusszeile() {
           </p>
         )}
         {beispielPfad.length === 0 && <p><strong>Organisation oder Thema wählen:</strong></p>}
-        <ul className="beispiel-liste">
-          {unterordner(beispielPfad).map(({ ordner, anzahl }) => (
-            <li key={`d/${ordner}`}>
-              <button className="link" onClick={() => setBeispielPfad([...beispielPfad, ordner])}>
-                {ordnerLabel(ordner)} ({anzahl} {anzahl === 1 ? "Bogen" : "Bögen"})
-              </button>
-            </li>
-          ))}
-          {boegenHier(beispielPfad).map(({ datei, url }) => (
-            <li key={`f/${datei}`}>
-              <button
-                className="link"
-                disabled={beispielLaeuft !== ""}
-                onClick={() => void beispielHolen(datei, url)}
-              >
-                {datei}
-              </button>
-              {beispielLaeuft === datei && " – PDF wird erzeugt …"}
-            </li>
-          ))}
-        </ul>
+        {beispielOrdner.length > 0 && (
+          <ul className="beispiel-liste">
+            {beispielOrdner.map(({ ordner, anzahl }) => (
+              <li key={`d/${ordner}`}>
+                <button className="link" onClick={() => setBeispielPfad([...beispielPfad, ordner])}>
+                  {ordnerLabel(ordner)} ({anzahl} {anzahl === 1 ? "Bogen" : "Bögen"})
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
+        {/* Ladefortschritt sichtbar machen: ein Ordner mit 45 Bögen braucht einen
+            Moment, und eine Tabelle mit „—" sieht sonst aus wie „keine Daten". */}
+        {beispielLaedt && beispielBoegen.length > 0 && (
+          <p className="hinweis" role="status">
+            Angaben werden geladen … ({beispielGeladen} von {beispielBoegen.length} Bögen)
+          </p>
+        )}
+        {beispielBoegen.length > 0 && (
+          <div className="tabellen-scroll">
+            {/* Die role-Attribute sind kein Selbstzweck: auf schmalen Geräten
+                setzt das CSS die Zeilen auf display:block (Karten statt
+                Seitwärtsrollen) und nähme der Tabelle sonst die Semantik. */}
+            <table className="uebersicht beispiele" role="table">
+              <thead role="rowgroup">
+                <tr role="row">
+                  <th role="columnheader">Einheit</th>
+                  <th role="columnheader">Herkunft</th>
+                  <th role="columnheader">Stärke</th>
+                  <th role="columnheader">Bogen</th>
+                </tr>
+              </thead>
+              <tbody role="rowgroup">
+                {beispielBoegen.map(({ datei, url }) => {
+                  const b = beispielDaten[url];
+                  const s = b ? staerke(b) : null;
+                  return (
+                    <tr key={datei} role="row">
+                      <td role="cell">
+                        <span className="beispiel-einheit">
+                          {b && (
+                            <img src={svgDataUrl(einheitSymbolSvg(b.einheit))} alt="" aria-hidden="true" />
+                          )}
+                          <span>
+                            <strong>{b ? einheitsTypText(b) || datei : datei}</strong>
+                            {beispielLaeuft === datei && <span className="hinweis">wird vorbereitet …</span>}
+                          </span>
+                        </span>
+                      </td>
+                      <td role="cell">
+                        {b ? (
+                          <>
+                            <strong>{einheitOrt(b.einheit) || "—"}</strong>
+                            <span className="hinweis">{traegerText(b)}</span>
+                            {obersteEbene(b) && <span className="hinweis">{obersteEbene(b)}</span>}
+                          </>
+                        ) : (
+                          <span className="hinweis">{beispielLaedt ? "…" : "nicht geladen"}</span>
+                        )}
+                      </td>
+                      <td className="zahl" role="cell">
+                        {b && s ? (
+                          <>
+                            <strong>{s.fuehrer}/{s.unterfuehrer}/{s.mannschaft}/{s.gesamt}</strong>
+                            <span className="hinweis">
+                              {b.fahrzeuge.length} {b.fahrzeuge.length === 1 ? "Fahrzeug" : "Fahrzeuge"}
+                            </span>
+                          </>
+                        ) : (
+                          <span className="hinweis">{beispielLaedt ? "…" : "—"}</span>
+                        )}
+                      </td>
+                      <td role="cell">
+                        <span className="beispiel-aktionen">
+                          {/* Bewusst kein .primaer: das ist in dieser App die
+                              eine dominante Aktion einer Ansicht — in einer
+                              Liste mit Dutzenden Zeilen wäre sie nur laut. */}
+                          <button
+                            disabled={beispielLaeuft !== ""}
+                            onClick={() => void beispielAnsehen(datei, url)}
+                          >
+                            <IconAuge />
+                            Anzeigen
+                          </button>
+                          <button
+                            disabled={beispielLaeuft !== ""}
+                            onClick={() => void beispielHolen(datei, url)}
+                          >
+                            <IconPdf />
+                            PDF
+                          </button>
+                        </span>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
         {beispielFehler && <p className="fehler">{beispielFehler}</p>}
       </Dialog>
 

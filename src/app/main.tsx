@@ -292,6 +292,32 @@ function App() {
     }
   }
 
+  /**
+   * Beispielbogen aus der Fußzeile öffnen — bewusst derselbe Weg wie bei einem
+   * frisch gescannten Bogen (Übersicht, keine Signatur). Er ersetzt den offenen
+   * Bogen inkl. Entwurfssicherung, daher vorher rückfragen. Rückgabe false =
+   * abgelehnt, der Beispielbögen-Dialog bleibt dann offen.
+   */
+  function oeffneBeispiel(b: Erfassungsbogen): boolean {
+    if (
+      bogen &&
+      !window.confirm(
+        "Der aktuell geöffnete Bogen wird durch den Beispielbogen ersetzt (auch der gespeicherte Entwurf). Fortfahren?",
+      )
+    ) {
+      return false;
+    }
+    setBogen(b);
+    setBogenSignatur(null); // Beispiel aus der App, kein signierter Transport
+    setSchritt(UEBERSICHT);
+    setMusterVorlage(null);
+    setOffenerEinsatzId(null);
+    setZeigeStart(false);
+    setFehler("");
+    setMeldung("Beispielbogen geöffnet — fiktive Daten zum Ansehen und Ausprobieren.");
+    return true;
+  }
+
   /** QR-Code aus einem Foto/Screenshot einlesen — gleiche Pipeline wie der Scan. */
   async function ladeQrBild(e: ChangeEvent<HTMLInputElement>) {
     const datei = e.target.files?.[0];
@@ -678,7 +704,7 @@ function App() {
       <>
         <Aktualisierungshinweise />
         <Musterung vorlage={musterVorlage} onStart={musterungFertig} onAbbrechen={() => setMusterVorlage(null)} />
-        <Fusszeile />
+        <Fusszeile onBogenOeffnen={oeffneBeispiel} />
       </>
     );
   }
@@ -708,7 +734,7 @@ function App() {
         {scannerOffen && (
           <QrScannerWeb onErgebnis={scanErgebnisWeb} fortschritt={scanFortschritt} onAbbruch={() => scanAbbrechen(true)} onBild={ladeQrBild} />
         )}
-        <Fusszeile />
+        <Fusszeile onBogenOeffnen={oeffneBeispiel} />
       </>
     );
   }
@@ -841,7 +867,7 @@ function App() {
             Startseite, über der Fußzeile, statt den Arbeitsbereich zu verdrängen. */}
         {!erststart && <SoFunktionierts />}
       </main>
-      <Fusszeile />
+      <Fusszeile onBogenOeffnen={oeffneBeispiel} />
       </>
     );
   }
@@ -944,7 +970,7 @@ function App() {
         </footer>
       )}
     </main>
-    <Fusszeile />
+    <Fusszeile onBogenOeffnen={oeffneBeispiel} />
     </>
   );
 }
