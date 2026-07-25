@@ -52,6 +52,11 @@ export interface EintragSignatur {
   pubkey?: string;
   /** Anzeige-Kurzform des Schlüssels. */
   kurzform?: string;
+  /**
+   * Freiwillige Absenderangaben aus der mitsignierten Absenderkarte — nur bei
+   * „gueltig" gesetzt (bei gebrochener Signatur wären sie wertlos).
+   */
+  absender?: { name?: string; email?: string; telefon?: string };
 }
 
 export interface MeldeEintrag {

@@ -463,6 +463,10 @@
     /* Signatur/Authentizität: Herkunftshinweis, Meldungs-Badge und QR-Optionen. */
     .signatur-optionen { margin-top: 0.6rem; text-align: left; font-size: 0.88rem; }
     .signatur-optionen label { display: inline-flex; align-items: center; gap: 0.35rem; }
+    /* Freiwillige Absenderangaben zur Signatur (Name/E-Mail/Telefon). */
+    .absenderkarte { border: 1px solid var(--rand); border-radius: 0.4rem; padding: 0.5rem 0.7rem 0.7rem; margin-top: 0.5rem; }
+    .absenderkarte label.feld { display: block; }
+    .absenderkarte .zeile > label.feld { flex: 1 1 12rem; }
     .signatur-herkunft { font-size: 0.9rem; border: 1px solid var(--rand); border-radius: 0.4rem; padding: 0.4rem 0.6rem; margin: 0.4rem 0; }
     .signatur-herkunft.gueltig { background: #e8f6ee; border-color: #b6dfc6; color: #1c5c44; }
     .signatur-herkunft.ungueltig { background: #fdecea; border-color: #f3b6ae; color: #8a1c12; }

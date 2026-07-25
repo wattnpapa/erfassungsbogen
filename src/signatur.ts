@@ -24,12 +24,18 @@ import {
   PUBKEY_LAENGE,
   base64UrlDekodieren,
   base64UrlKodieren,
+  dekodiereAbsenderkarte,
   encodeBinaer,
   entpackePayload,
   fragmentInhalt,
+  kodiereAbsenderkarte,
   packePayload,
+  signierteBytes,
+  type Absenderkarte,
   type Kompressor,
 } from "./codec";
+
+export type { Absenderkarte } from "./codec";
 
 /** Ein lokal erzeugtes Geräte-Schlüsselpaar (rohe Ed25519-Bytes). */
 export interface Schluesselpaar {
@@ -39,10 +45,16 @@ export interface Schluesselpaar {
   oeffentlich: Uint8Array;
 }
 
-/** Ergebnis der Signaturprüfung beim Import — reiner Anzeigestatus. */
+/**
+ * Ergebnis der Signaturprüfung beim Import — reiner Anzeigestatus.
+ *
+ * `absender` steht bewusst NUR am Zustand „gueltig": Die Karte ist zwar
+ * mitsigniert, bei gebrochener Signatur wäre sie aber wertlos und dürfte nie
+ * als Absenderangabe angezeigt werden.
+ */
 export type SignaturStatus =
   | { zustand: "unsigniert" }
-  | { zustand: "gueltig"; pubkey: string; kurzform: string }
+  | { zustand: "gueltig"; pubkey: string; kurzform: string; absender?: Absenderkarte }
   | { zustand: "ungueltig"; pubkey: string; kurzform: string };
 
 // --------------------------------------------------------------- Hex-Helfer
@@ -92,21 +104,32 @@ export function oeffentlicherSchluessel(privat: Uint8Array): Promise<Uint8Array>
 
 // ------------------------------------------------------------ Signierter QR
 
+/** Karte ohne jeden gefüllten Wert zählt als „keine Karte" (kein Container-Wechsel). */
+function kartenBytes(karte?: Absenderkarte): Uint8Array | undefined {
+  if (!karte || (!karte.name && !karte.email && !karte.telefon)) return undefined;
+  return kodiereAbsenderkarte(karte);
+}
+
 /**
- * Bogen → signierte Payload-Bytes ('EEB2S'…). Exportiert, damit der Aufrufer den
- * Payload bei Bedarf segmentieren kann (die Segment-Chunks setzen ihn 1:1 wieder
- * zusammen — Signatur bleibt intakt).
+ * Bogen → signierte Payload-Bytes ('EEB2S'… bzw. mit Absenderkarte 'EEB2K'…).
+ * Exportiert, damit der Aufrufer den Payload bei Bedarf segmentieren kann (die
+ * Segment-Chunks setzen ihn 1:1 wieder zusammen — Signatur bleibt intakt).
+ *
+ * `karte` ist freiwillig: ohne sie ist der Payload byte-identisch zu früher.
  */
 export async function signiertePayloadBytes(
   b: Erfassungsbogen,
   k: Kompressor,
   privat: Uint8Array,
+  karte?: Absenderkarte,
 ): Promise<Uint8Array> {
   const komprimiert = k.deflateRaw(encodeBinaer(b));
-  // Signiert wird GENAU der komprimierte Strom (nicht Magic/Schlüssel).
-  const signatur = await ed.signAsync(komprimiert, privat);
+  const kartenRoh = kartenBytes(karte);
+  // Signiert wird GENAU der Container-Rumpf hinter der Signatur (ohne Karte
+  // also weiterhin nur der komprimierte Strom) — nicht Magic/Schlüssel.
+  const signatur = await ed.signAsync(signierteBytes(komprimiert, kartenRoh), privat);
   const pubkey = await ed.getPublicKeyAsync(privat);
-  return packePayload({ komprimiert, signatur: { pubkey, signatur } });
+  return packePayload({ komprimiert, signatur: { pubkey, signatur, karte: kartenRoh } });
 }
 
 /** Bogen → signierter QR-Inhalt als App-URL (Präfix + Base64url('EEB2S'…)). */
@@ -114,8 +137,9 @@ export async function encodeSigniertPayloadUrl(
   b: Erfassungsbogen,
   k: Kompressor,
   privat: Uint8Array,
+  karte?: Absenderkarte,
 ): Promise<string> {
-  return EEB_URL_PREFIX + base64UrlKodieren(await signiertePayloadBytes(b, k, privat));
+  return EEB_URL_PREFIX + base64UrlKodieren(await signiertePayloadBytes(b, k, privat, karte));
 }
 
 /** Vorlage-Bogen → signierter QR-Inhalt als URL (Präfix + Marker „V." + Base64url). */
@@ -123,11 +147,30 @@ export async function encodeSigniertVorlagePayloadUrl(
   b: Erfassungsbogen,
   k: Kompressor,
   privat: Uint8Array,
+  karte?: Absenderkarte,
 ): Promise<string> {
-  return EEB_URL_PREFIX + EEB_VORLAGE_MARKER + base64UrlKodieren(await signiertePayloadBytes(b, k, privat));
+  return (
+    EEB_URL_PREFIX +
+    EEB_VORLAGE_MARKER +
+    base64UrlKodieren(await signiertePayloadBytes(b, k, privat, karte))
+  );
 }
 
 // ----------------------------------------------------------- Verifikation
+
+/**
+ * Rohe Kartenbytes → Absenderkarte. Eine defekte Karte darf die Prüfung nicht
+ * kippen: dann gilt der Bogen als signiert, aber ohne Absenderangabe.
+ */
+function absenderVon(roh?: Uint8Array): Absenderkarte | undefined {
+  if (!roh) return undefined;
+  try {
+    const karte = dekodiereAbsenderkarte(roh);
+    return karte.name || karte.email || karte.telefon ? karte : undefined;
+  } catch {
+    return undefined;
+  }
+}
 
 /**
  * Signatur eines Payloads prüfen. Liefert nur einen Anzeigestatus und wirft
@@ -147,10 +190,10 @@ export async function signaturVonPayload(payload: Uint8Array): Promise<SignaturS
   const hexPub = zuHex(pubkey);
   const kurz = schluesselKurzform(pubkey);
   try {
-    const ok = await ed.verifyAsync(signatur, teile.komprimiert, pubkey);
-    return ok
-      ? { zustand: "gueltig", pubkey: hexPub, kurzform: kurz }
-      : { zustand: "ungueltig", pubkey: hexPub, kurzform: kurz };
+    const daten = signierteBytes(teile.komprimiert, teile.signatur.karte);
+    const ok = await ed.verifyAsync(signatur, daten, pubkey);
+    if (!ok) return { zustand: "ungueltig", pubkey: hexPub, kurzform: kurz };
+    return { zustand: "gueltig", pubkey: hexPub, kurzform: kurz, absender: absenderVon(teile.signatur.karte) };
   } catch {
     // z. B. ungültiger Schlüsselpunkt → Signatur nicht verwertbar.
     return { zustand: "ungueltig", pubkey: hexPub, kurzform: kurz };
@@ -173,7 +216,21 @@ export async function signaturVonText(text: string): Promise<SignaturStatus> {
   return signaturVonPayload(payload);
 }
 
-/** Kurzlabel für die Anzeige aus einem Status („✓ signiert von …" etc.). */
+/**
+ * Absenderkarte als eine Zeile („Max Mustermann · max@thw.de · 0170 …").
+ * Leere Karte → leerer String.
+ */
+export function absenderLabel(karte?: Absenderkarte): string {
+  if (!karte) return "";
+  return [karte.name, karte.email, karte.telefon].filter(Boolean).join(" · ");
+}
+
+/**
+ * Kurzlabel für die Anzeige aus einem Status („✓ signiert von …" etc.).
+ * Bewusst der Schlüssel-Fingerabdruck, nicht der Name aus der Absenderkarte:
+ * belegt ist der Schlüssel, der Name ist nur eine Eigenangabe (getrennt
+ * ausgeben, siehe absenderLabel).
+ */
 export function signaturLabel(status: SignaturStatus): string {
   switch (status.zustand) {
     case "gueltig":

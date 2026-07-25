@@ -341,6 +341,13 @@ export function Fusszeile() {
           Übertragung an einen Server statt. Eine Weitergabe erfolgt nur, wenn Nutzende
           selbst eine Datei, ein PDF oder einen QR-Code erzeugen und teilen.
         </p>
+        <p>
+          Freiwillig können unter „Absender“ Name, E-Mail-Adresse und Telefonnummer
+          hinterlegt werden. Diese Angaben bleiben auf dem Gerät gespeichert und werden
+          in jedem selbst erzeugten QR-Code, Link und PDF mitgegeben, damit die
+          Gegenstelle bei Rückfragen weiß, an wen sie sich wenden kann. Die Angabe ist
+          nicht erforderlich und jederzeit änder- und löschbar.
+        </p>
         <h3>4. Cookies und Reichweitenmessung</h3>
         <p>
           Es werden keine Cookies gesetzt und keine Daten im Endgerät gespeichert

@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { deflateRawSync, inflateRawSync } from "node:zlib";
 import {
+  EEB_KARTE_MAGIC,
   EEB_MAGIC,
   EEB_SIGNIERT_MAGIC,
   EEB_URL_PREFIX,
@@ -10,12 +11,16 @@ import {
   decodePayload,
   decodePayloadUrl,
   decodeVorlagePayloadUrl,
+  dekodiereAbsenderkarte,
   encodePayload,
   entpackePayload,
+  kodiereAbsenderkarte,
   packePayload,
+  type Absenderkarte,
   type Kompressor,
 } from "./codec";
 import {
+  absenderLabel,
   ausHex,
   encodeSigniertPayloadUrl,
   encodeSigniertVorlagePayloadUrl,
@@ -25,6 +30,7 @@ import {
   signaturVonPayload,
   signaturVonText,
   signaturLabel,
+  signiertePayloadBytes,
   zuHex,
 } from "./signatur";
 import {
@@ -189,6 +195,101 @@ describe("Signieren → Verifizieren", () => {
     payload.set(kpB.oeffentlich, EEB_SIGNIERT_MAGIC.length); // pubkey tauschen
     const status = await signaturVonText(base64UrlKodieren(payload));
     expect(status.zustand).toBe("ungueltig");
+  });
+});
+
+describe("Absenderkarte", () => {
+  const karte: Absenderkarte = {
+    name: "Max Mustermann",
+    email: "max@thw-oldenburg.de",
+    telefon: "0170 1234567",
+  };
+
+  it("kodiert/dekodiert alle Feldkombinationen", () => {
+    const faelle: Absenderkarte[] = [
+      {},
+      { name: "Max" },
+      { email: "max@example.org" },
+      { telefon: "0441 123456" },
+      { name: "Max", telefon: "0441 123456" }, // Lücke in der Mitte
+      karte,
+    ];
+    for (const f of faelle) {
+      expect(dekodiereAbsenderkarte(kodiereAbsenderkarte(f))).toEqual(f);
+    }
+  });
+
+  it("reist im Container EEB2K mit und erscheint nur bei gültiger Signatur", async () => {
+    const b = bogen();
+    const kp = await schluesselpaarErzeugen();
+    const payload = await signiertePayloadBytes(b, zlib, kp.privat, karte);
+    expect(Array.from(payload.subarray(0, 5))).toEqual(Array.from(EEB_KARTE_MAGIC));
+    // Nutzdaten bleiben unberührt lesbar …
+    gleich(decodePayload(payload, zlib), b);
+    // … und die Karte kommt an.
+    const status = await signaturVonPayload(payload);
+    expect(status.zustand).toBe("gueltig");
+    if (status.zustand === "gueltig") expect(status.absender).toEqual(karte);
+    // Das Label bleibt am Fingerabdruck: belegt ist der Schlüssel, nicht der Name.
+    expect(signaturLabel(status)).toMatch(/^✓ signiert von [0-9a-f ]+$/);
+  });
+
+  it("ist mitsigniert: eine ausgetauschte Karte bricht die Signatur", async () => {
+    const b = bogen();
+    const kp = await schluesselpaarErzeugen();
+    const payload = await signiertePayloadBytes(b, zlib, kp.privat, karte);
+    // Ein Byte im Namen der Karte kippen (Karte liegt hinter Magic+Schlüssel+Signatur+Längen-Varint).
+    const kartenStart = EEB_KARTE_MAGIC.length + 32 + 64 + 1;
+    payload[kartenStart + 2] = payload[kartenStart + 2]! ^ 0xff;
+    const status = await signaturVonPayload(payload);
+    expect(status.zustand).toBe("ungueltig");
+    // Bei ungültiger Signatur darf keine Absenderangabe durchkommen.
+    expect((status as { absender?: unknown }).absender).toBeUndefined();
+  });
+
+  it("bleibt ohne Angaben beim alten Container EEB2S (byte-identisch)", async () => {
+    const b = bogen();
+    const kp = await schluesselpaarErzeugen();
+    const ohne = await signiertePayloadBytes(b, zlib, kp.privat);
+    const leer = await signiertePayloadBytes(b, zlib, kp.privat, {});
+    expect(Array.from(leer)).toEqual(Array.from(ohne));
+    expect(Array.from(leer.subarray(0, 5))).toEqual(Array.from(EEB_SIGNIERT_MAGIC));
+  });
+
+  it("kostet nur wenige Bytes gegenüber dem signierten Payload ohne Karte", async () => {
+    const b = bogen();
+    const kp = await schluesselpaarErzeugen();
+    const ohne = await signiertePayloadBytes(b, zlib, kp.privat);
+    const mit = await signiertePayloadBytes(b, zlib, kp.privat, karte);
+    // Flagbyte + 3 Längenbytes + Feldinhalte + Längen-Varint der Karte.
+    expect(mit.length - ohne.length).toBe(kodiereAbsenderkarte(karte).length + 1);
+  });
+
+  it("übersteht eine defekte Karte, ohne die Signaturprüfung zu kippen", async () => {
+    // Karte behauptet einen längeren Namen, als Bytes folgen → dekodieren wirft,
+    // die Signatur bleibt aber gültig: signiert, nur ohne verwertbare Angabe.
+    const komprimiert = zlib.deflateRaw(new Uint8Array([1, 2, 3]));
+    const kaputt = new Uint8Array([1, 40, 65, 66]); // Flag NAME, Länge 40, nur 2 Bytes
+    const kp = await schluesselpaarErzeugen();
+    const payload = packePayload({
+      komprimiert,
+      signatur: { pubkey: kp.oeffentlich, signatur: new Uint8Array(64), karte: kaputt },
+    });
+    const teile = entpackePayload(payload);
+    expect(Array.from(teile.signatur!.karte!)).toEqual(Array.from(kaputt));
+    expect(() => dekodiereAbsenderkarte(kaputt)).toThrow();
+  });
+
+  it("lehnt einen abgeschnittenen EEB2K-Container ab", () => {
+    const zuKurz = new Uint8Array([...EEB_KARTE_MAGIC, ...new Uint8Array(96), 50, 1, 2]);
+    expect(() => entpackePayload(zuKurz)).toThrow(/unvollständig/i);
+  });
+
+  it("fasst die Angaben für die Anzeige zusammen", () => {
+    expect(absenderLabel(karte)).toBe("Max Mustermann · max@thw-oldenburg.de · 0170 1234567");
+    expect(absenderLabel({ name: "Max" })).toBe("Max");
+    expect(absenderLabel({})).toBe("");
+    expect(absenderLabel()).toBe("");
   });
 });
 

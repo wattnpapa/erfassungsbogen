@@ -25,6 +25,7 @@ import {
   verpflegung,
 } from "../model";
 import {
+  EEB_KARTE_MAGIC,
   EEB_URL_PREFIX,
   QR_EINZEL_MAX_VERSION,
   QR_SEGMENT_ZIEL_VERSION,
@@ -33,6 +34,7 @@ import {
   type Kompressor,
 } from "../codec";
 import { signiertePayloadBytes } from "../signatur";
+import { absenderkarteLaden } from "./absenderkarte";
 import { geraeteSchluesselSicherstellen } from "./geraete-schluessel";
 import { istNativ, textTeilen } from "./nativ";
 import {
@@ -191,6 +193,8 @@ export interface QrSatz {
    * den kompletten Bogen und lässt sich als Textlink teilen.
    */
   vollUrl: string;
+  /** Container des Payloads — „EEB2K", sobald eine Absenderkarte mitreist. */
+  container: "EEB2S" | "EEB2K";
 }
 
 const QR_OPTIONEN = { errorCorrectionLevel: "M" as const };
@@ -221,18 +225,25 @@ async function teilBild(url: string, teilNr: number, anzahl: number): Promise<Qr
  * — der Geräteschlüssel bleibt lokal und wird bei Bedarf einmalig erzeugt.
  * Signieren und Segmentieren sind orthogonal: die Segment-Chunks setzen den
  * signierten Payload 1:1 wieder zusammen, die Signatur bleibt intakt.
+ *
+ * Ist eine Absenderkarte hinterlegt (freiwillig, siehe absenderkarte.ts), reist
+ * sie mitsigniert im Container „EEB2K" mit; ohne Karte bleibt alles wie bisher.
  */
 export async function qrErzeugen(b: Erfassungsbogen): Promise<QrSatz> {
+  const karte = absenderkarteLaden();
   const payload = await signiertePayloadBytes(
     b,
     browserKompressor,
     await geraeteSchluesselSicherstellen(),
+    karte,
   );
+  // Nicht aus der Karte raten: das 5. Magic-Byte sagt, was tatsächlich drinsteht.
+  const container = payload[4] === EEB_KARTE_MAGIC[4] ? "EEB2K" : "EEB2S";
   const url = EEB_URL_PREFIX + base64UrlKodieren(payload);
   const einzelVersion = qrVersion(url);
   if (einzelVersion <= QR_EINZEL_MAX_VERSION) {
     const teil = await teilBild(url, 1, 1);
-    return { teile: [teil], segmentiert: false, zeichen: url.length, version: teil.version, vollUrl: url };
+    return { teile: [teil], segmentiert: false, zeichen: url.length, version: teil.version, vollUrl: url, container };
   }
 
   // Zu groß: kleinste Teilzahl suchen, bei der jeder Teil auf die gröbere
@@ -250,6 +261,7 @@ export async function qrErzeugen(b: Erfassungsbogen): Promise<QrSatz> {
     zeichen: url.length,
     version: Math.max(...teile.map((t) => t.version)),
     vollUrl: url,
+    container,
   };
 }
 

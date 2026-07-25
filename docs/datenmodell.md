@@ -201,7 +201,8 @@ Signierter Payload:  0x45 0x45 0x42 0x32 0x53 ('EEB2S')
   unsignierte `'EEB2'`-Codes (Deflate-Strom direkt hinter dem Magic) werden
   unverändert gelesen. Der Deflate-Strom hinter der Signatur ist **byte-identisch**
   zum unsignierten Payload — die Signatur ist reine Hülle.
-- **Signaturumfang.** Signiert wird genau der komprimierte Binärstrom
+- **Signaturumfang.** Signiert wird genau der **Container-Rumpf hinter dem
+  Signaturfeld** — bei `'EEB2S'` also der komprimierte Binärstrom
   (`DeflateRaw(Binärstrom)`), nicht Magic/Schlüssel. Manipulation an den Nutzdaten
   bricht die Prüfung; ein Angreifer kann jedoch neu signieren — die Signatur
   belegt **Herkunft** (welcher Schlüssel), nicht Unveränderbarkeit gegen den
@@ -228,6 +229,45 @@ unverändert vom Inhaber genau dieses Schlüssels" — **nicht**, dass der Schl�
 zu einer bestimmten Person/Dienststelle gehört. Vertrauen entsteht außerhalb der
 App (Schlüssel-Kurzform am Meldekopf abgleichen, bekannte Absender wiedererkennen).
 Der Nutzen ist Integrität + Wiedererkennbarkeit, nicht PKI.
+
+### Absenderkarte „EEB2K" (freiwillige Kontaktangaben)
+
+Ein Schlüssel-Fingerabdruck ist wiedererkennbar, aber stumm. Wer möchte, hinterlegt
+deshalb **einmalig** am Gerät Name, E-Mail und/oder Telefonnummer; diese
+**Absenderkarte** reist danach in jedem übergebenen Bogen (QR, Link, PDF) mit und
+gibt der Gegenstelle einen Rückkanal für Rückfragen.
+
+```
+Signiert + Karte:    0x45 0x45 0x42 0x32 0x4b ('EEB2K')
+                     ‖ pubkey[32]
+                     ‖ signatur[64]    (Ed25519 über alles ab hier)
+                     ‖ varint(len) ‖ karte[len]
+                     ‖ DeflateRaw(Binärstrom)
+
+karte:               flags[1]          (Bit 0 Name, Bit 1 E-Mail, Bit 2 Telefon)
+                     ‖ je gesetztem Bit: varint(Länge) ‖ UTF-8
+```
+
+- **Opt-in mit eigenem Magic.** Ohne hinterlegte Karte bleibt der Payload
+  **byte-identisch** zu `'EEB2S'` — niemand zahlt für ein Feld, das er nicht
+  nutzt. Der Decoder prüft `'EEB2K'`, `'EEB2S'`, `'EEB2'` in dieser Reihenfolge.
+  Umgekehrt gilt: App-Stände von **vor** dieser Version können `'EEB2K'`-Codes
+  nicht lesen — die Karte ist ein bewusster Schnitt für Absender, die sie setzen.
+- **Mitsigniert.** Die Signatur deckt `varint(len) ‖ karte ‖ DeflateRaw(…)` ab.
+  Eine ausgetauschte Karte bricht die Prüfung; angezeigt wird sie deshalb **nur**
+  bei gültiger Signatur. Unbekannte Flagbits und überschüssige Bytes am Kartenende
+  werden ignoriert, damit spätere Felder alte Leser nicht blind machen.
+- **Keine Identitätszusicherung.** Die Karte ist eine **Eigenangabe** des
+  Absenders — sie belegt so viel wie ein selbst geschriebener Briefkopf. Sie macht
+  den Absender ansprechbar; verifiziert wird außerhalb der App (Rückruf).
+  Die Oberfläche formuliert das entsprechend („Eigene Angabe des Absenders").
+- **Größenbudget.** Flagbyte + Längen-Varint + Feldinhalte, unkomprimiert.
+  Realistisch ~40–70 Bytes, gedeckelt auf 40 / 48 / 24 Zeichen (Name / E-Mail /
+  Telefon); nach Base64url ~+55–95 Zeichen. Am vollen THW-Bogen bleibt der QR
+  damit weiterhin klar unter dem Ziel ≤ v25.
+- **Datenschutz.** Personenbezogene Daten, freiwillig und jederzeit löschbar
+  (`eeb.absenderkarte.v1` im `localStorage`, wandert über die Datensicherung mit).
+  Referenz: [`src/app/absenderkarte.ts`](../src/app/absenderkarte.ts).
 
 Binärstrom: Felder in fester Reihenfolge, Varint-Längen, UTF-8-Strings, Optionals
 über Flag-Bits, Vokabular-Werte als Varint-Code (0 = Freitext folgt).

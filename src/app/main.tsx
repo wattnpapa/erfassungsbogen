@@ -30,6 +30,8 @@ import { DebugLeiste, debugAktiv, wendePlattformKlasseAn, wendeRahmenAn } from "
 import { statistikStarten } from "./statistik";
 import { vorlageAnlegen, vorlagenLaden, vorlagenPapierkorb, type Vorlage } from "./vorlagen";
 import { Musterung, VorlagenListe } from "./vorlagen-ui";
+import { absenderkarteGefuellt, absenderkarteLaden, type Absenderkarte } from "./absenderkarte";
+import { AbsenderkarteFeld } from "./absenderkarte-ui";
 import {
   EinsatzArt,
   einheitSchluessel,
@@ -97,7 +99,15 @@ function startAusUrlFragment(): {
 /** SignaturStatus → gespeicherter Eintragsstatus (nur signierte Empfänge). */
 function alsEintragSignatur(status: SignaturStatus): EintragSignatur | undefined {
   if (status.zustand === "unsigniert") return undefined;
-  return { zustand: status.zustand, pubkey: status.pubkey, kurzform: status.kurzform };
+  if (status.zustand === "ungueltig") {
+    return { zustand: status.zustand, pubkey: status.pubkey, kurzform: status.kurzform };
+  }
+  return {
+    zustand: status.zustand,
+    pubkey: status.pubkey,
+    kurzform: status.kurzform,
+    absender: status.absender,
+  };
 }
 
 /**
@@ -209,6 +219,9 @@ function App() {
   // er lässt sich von dort per „Aktuellen Bogen fortsetzen“ wieder öffnen.
   const [zeigeStart, setZeigeStart] = useState(!START.bogen && !!ENTWURF);
   const [vorlagen, setVorlagen] = useState<Vorlage[]>(() => vorlagenLaden());
+  // Absenderkarte (Gerätestand) — auch auf der Startseite einstellbar; die
+  // Übersicht liest sie beim Mounten erneut aus dem Speicher.
+  const [absender, setAbsender] = useState<Absenderkarte>(() => absenderkarteLaden());
   const [musterVorlage, setMusterVorlage] = useState<Vorlage | null>(null);
   // Einsatz-Sammlung (Meldekopf/Zugführer): Liste, offener Einsatz und das
   // Sammelziel für hereinkommende Bögen (Scan/manuell landen dort statt zu öffnen).
@@ -805,6 +818,23 @@ function App() {
             einsaetze={einsaetze}
             onOeffnen={(s) => { setMeldung(""); setOffenerEinsatzId(s.id); }}
             onGeaendert={einsaetzeNeuLaden}
+          />
+        </section>
+        {/* Absender einmal einrichten, bevor der erste Bogen entsteht: hier auf
+            der Startseite gefunden, gilt die Angabe für jeden späteren Transport.
+            Ohne hinterlegte Karte gleich aufgeklappt — ein Link allein würde die
+            Funktion an dieser Stelle verstecken. */}
+        <section className="start-vorlagen">
+          <h2>Absender für übergebene Bögen</h2>
+          <p className="hinweis">
+            Jeder Bogen wird mit dem Geräteschlüssel signiert. Wer hier freiwillig Name und
+            Rückkanal hinterlegt, macht daraus einen Absender, den die Gegenstelle bei
+            Rückfragen auch erreichen kann.
+          </p>
+          <AbsenderkarteFeld
+            karte={absender}
+            onGespeichert={setAbsender}
+            startOffen={!absenderkarteGefuellt(absender)}
           />
         </section>
         {/* Mit vorhandenen Daten bleibt die Erklärung erreichbar — am Ende der

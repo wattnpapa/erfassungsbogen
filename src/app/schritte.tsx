@@ -72,7 +72,9 @@ import {
 import { pdfDatenUrl, pdfErzeugen } from "./pdf";
 import { debugAktiv } from "./debug-plattform";
 import { einheitSymbolSvg, fahrzeugSymbolSvg, svgDataUrl } from "./taktische-zeichen";
-import { signaturLabel, type SignaturStatus } from "../signatur";
+import { absenderLabel, signaturLabel, type SignaturStatus } from "../signatur";
+import { absenderkarteLaden, type Absenderkarte } from "./absenderkarte";
+import { AbsenderkarteFeld } from "./absenderkarte-ui";
 import { geraeteKurzform, geraeteOeffentlichHex } from "./geraete-schluessel";
 import { istNativ, linkTeilen, textTeilen } from "./nativ";
 
@@ -1333,6 +1335,9 @@ export function Uebersicht(props: {
   // „Bogen übergeben": ein Dialog bündelt alle Transportwege (QR/PDF/Link/Datei).
   const teilenDialog = useRef<HTMLDialogElement>(null);
   const [schluesselKurz, setSchluesselKurz] = useState<string | null>(null);
+  // Freiwillige Absenderangaben zur Signatur. Als Effekt-Abhängigkeit geführt:
+  // eine geänderte Karte ändert den signierten Payload → QR neu erzeugen.
+  const [absender, setAbsender] = useState<Absenderkarte>(() => absenderkarteLaden());
   const [linkKopiert, setLinkKopiert] = useState(false);
   // Eingebettete PDF-Vorschau (nur Browser/Desktop): auf Wunsch erzeugt,
   // verworfen sobald der Bogen sich ändert (dann wäre sie veraltet).
@@ -1358,7 +1363,7 @@ export function Uebersicht(props: {
     return () => {
       aktiv = false;
     };
-  }, [bogen]);
+  }, [bogen, absender]);
 
   // Vollbild-QR = Vorzeige-Moment: der Bildschirm darf dabei nicht ausgehen.
   // Wake Lock anfordern, nach Tab-Wechsel erneut (das System gibt ihn dann frei);
@@ -1485,6 +1490,15 @@ export function Uebersicht(props: {
             {props.signatur.zustand === "gueltig"
               ? " — Herkunft belegt (nicht die Identität des Absenders)."
               : " — die Daten passen nicht zur Signatur."}
+            {/* Die Absenderkarte ist mitsigniert, aber selbst gesetzt: als
+                Rückfrage-Kontakt brauchbar, als Identitätsnachweis nicht. */}
+            {props.signatur.zustand === "gueltig" && props.signatur.absender && (
+              <>
+                <br />
+                Eigene Angabe des Absenders: <strong>{absenderLabel(props.signatur.absender)}</strong>{" "}
+                — bei Zweifeln über diesen Kontakt zurückfragen.
+              </>
+            )}
           </p>
         )}
         <Vollstaendigkeit punkte={pruefpunkte(bogen)} geheZu={geheZu} />
@@ -1641,7 +1655,7 @@ export function Uebersicht(props: {
                 ))}
               </div>
               <p className="hinweis">
-                {qr.zeichen} Zeichen · je ≤ QR-Version {qr.version} (ECC M) · signiert (EEB2S)
+                {qr.zeichen} Zeichen · je ≤ QR-Version {qr.version} (ECC M) · signiert ({qr.container})
               </p>
             </>
           ) : (
@@ -1649,7 +1663,7 @@ export function Uebersicht(props: {
               <img src={qr.teile[0]!.datenUrl} alt="EEB2-QR-Code" />
               <p className="hinweis">
                 {qr.zeichen} Zeichen · QR-Version {qr.version} (ECC M)
-                {" · signiert (EEB2S)"} — öffnet beim Scannen mit der Kamera die App; dieser Code steht auch auf der letzten PDF-Seite.
+                {` · signiert (${qr.container})`} — öffnet beim Scannen mit der Kamera die App; dieser Code steht auch auf der letzten PDF-Seite.
               </p>
             </>
           )
@@ -1679,6 +1693,7 @@ export function Uebersicht(props: {
             <br />
             Belegt Herkunft/Integrität, nicht die Identität — der private Schlüssel bleibt auf dem Gerät.
           </p>
+          <AbsenderkarteFeld karte={absender} onGespeichert={setAbsender} />
         </div>
       </section>
 
