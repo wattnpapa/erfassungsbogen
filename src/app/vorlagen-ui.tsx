@@ -87,7 +87,6 @@ export function VorlagenListe(props: {
             <strong>{orgLabel(v.bogen.einheit.organisation)}</strong>
             {" · "}
             {vokabText(v.bogen.einheit.einheitsTyp, vokabularFuer(v.bogen.einheit.organisation, "einheitstyp"), "name") ||
-              v.bogen.einheit.name ||
               "(Einheit offen)"}
           </p>
           <p className="hinweis">

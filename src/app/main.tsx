@@ -88,7 +88,7 @@ function startAusUrlFragment(): {
   try {
     if (istVorlageNutzlast(fragment)) {
       const b = decodeVorlagePayloadUrl(fragment, browserKompressor);
-      return { bogen: null, vorlage: vorlageAnlegen(b.einheit.name, b), fehler: "", text: fragment };
+      return { bogen: null, vorlage: vorlageAnlegen(einheitAnzeigename(b.einheit), b), fehler: "", text: fragment };
     }
     return { bogen: decodePayloadUrl(fragment, browserKompressor), vorlage: null, fehler: "", text: fragment };
   } catch {
@@ -285,7 +285,6 @@ function App() {
       setBogenSignatur(null); // Datei-Import: kein signierter Transport
       setSchritt(UEBERSICHT);
       setZeigeStart(false);
-      setZeigeVorlagen(false);
       setFehler("");
     } catch (err) {
       setFehler(err instanceof Error ? err.message : String(err));
@@ -353,7 +352,7 @@ function App() {
     const schl = einheitSchluessel(b.einheit);
     let override: string | undefined;
     if (einsatz?.eintraege.some((e) => e.einheitSchluessel === schl)) {
-      const name = b.einheit.name || "diese Einheit";
+      const name = einheitAnzeigename(b.einheit);
       const alsFassung = window.confirm(
         `„${name}" ist bereits im Einsatz.\n\nOK = als neue Fassung anhängen (Historie).\nAbbrechen = als eigene, separate Einheit führen.`,
       );
@@ -373,7 +372,7 @@ function App() {
       const stand = `${kioskZaehlerRef.current} ${kioskZaehlerRef.current === 1 ? "Bogen" : "Bögen"} in diesem Durchgang`;
       setScanFortschritt(
         r.neu
-          ? `✓ „${b.einheit.name || "Einheit"}" aufgenommen — ${stand}. Nächsten Bogen zeigen…`
+          ? `✓ „${einheitAnzeigename(b.einheit)}" aufgenommen — ${stand}. Nächsten Bogen zeigen…`
           : `Bereits vorhanden — übersprungen (gleicher Inhalt). ${stand}.`,
       );
       setFehler("");
@@ -381,7 +380,7 @@ function App() {
     }
     setMeldung(
       r.neu
-        ? `Meldung von „${b.einheit.name || "Einheit"}" aufgenommen.`
+        ? `Meldung von „${einheitAnzeigename(b.einheit)}" aufgenommen.`
         : `Bereits vorhanden — übersprungen (gleicher Inhalt).`,
     );
     setFehler("");
@@ -424,7 +423,7 @@ function App() {
       setScanFortschritt("");
       try {
         const b = decodeVorlagePayloadUrl(text, browserKompressor);
-        const v = vorlageAnlegen(b.einheit.name, b);
+        const v = vorlageAnlegen(einheitAnzeigename(b.einheit), b);
         setVorlagen(vorlagenLaden());
         setMusterVorlage(null);
         setZeigeStart(true); // Startbildschirm listet die (nun importierte) Vorlage

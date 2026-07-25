@@ -57,7 +57,6 @@ import {
   fahrzeugHinweise,
   funkrufText,
   funktionsText,
-  kennzeichenAusText,
   kennzeichenText,
   neuePerson,
   neuesFahrzeug,
@@ -384,7 +383,8 @@ function OvVorschlagFeld(props: {
             setAktiv((aktiv + treffer.length - 1) % treffer.length);
           } else if (ev.key === "Enter") {
             ev.preventDefault();
-            waehlen(treffer[aktiv]);
+            const ov = treffer[aktiv];
+            if (ov) waehlen(ov);
           } else if (ev.key === "Escape") {
             setOffen(false);
           }
@@ -630,16 +630,17 @@ export function SchrittEinheit({ bogen, aendern }: SchrittProps) {
         {e.organisation === OrganisationsTyp.THW && e.hierarchie.length === 1 && (
           <button
             type="button"
-            onClick={() =>
+            onClick={() => {
+              const ov = e.hierarchie[0] ?? ersteEbene(e.organisation);
               setE({
                 // Die schon erfasste unterste Ebene bleibt als OV erhalten.
                 hierarchie: [
-                  { ...e.hierarchie[0], bezeichnung: { code: 1 } },
+                  { ...ov, bezeichnung: { code: 1 } },
                   { bezeichnung: { code: 2 }, name: "" },
                   { bezeichnung: { code: 3 }, name: "" },
                 ],
-              })
-            }
+              });
+            }}
           >
             OV/RB/LV-Vorlage
           </button>

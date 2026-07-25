@@ -22,6 +22,7 @@ import {
 } from "../model";
 import {
   datumDeutsch,
+  einheitAnzeigename,
   einheitOrt,
   funkrufText,
   funktionsText,
@@ -71,11 +72,6 @@ function signaturBadge(e: MeldeEintrag) {
     );
   }
   return <span className="signatur-badge ungueltig" title="Signatur passt nicht zu den Daten">⚠ Signatur ungültig</span>;
-}
-
-function einheitAnzeige(b: Erfassungsbogen): string {
-  const org = b.einheit.organisation;
-  return b.einheit.name || vokabText(b.einheit.einheitsTyp, vokabularFuer(org, "einheitstyp"), "name") || orgLabel(org);
 }
 
 function staerkeText(b: Erfassungsbogen): string {
@@ -193,7 +189,7 @@ export function EinsatzDetail(props: {
   const sum = aggregiere(einsatz.eintraege);
   const zugGruppen = aggregiereNachZug(einsatz.eintraege);
   const kopf = neuesteJeEinheit(einsatz.eintraege).sort((a, b) =>
-    einheitAnzeige(a.bogen).localeCompare(einheitAnzeige(b.bogen), "de"),
+    einheitAnzeigename(a.bogen.einheit).localeCompare(einheitAnzeigename(b.bogen.einheit), "de"),
   );
 
   // Verschiebt nur in den Papierkorb (30 Tage wiederherstellbar über die
@@ -447,7 +443,7 @@ function EinheitKarte(props: {
   }
 
   function entfernen() {
-    if (window.confirm(`Meldung von „${einheitAnzeige(kopf.bogen)}" (Stand ${standText(kopf.bogen)}) entfernen?`)) {
+    if (window.confirm(`Meldung von „${einheitAnzeigename(kopf.bogen.einheit)}" (Stand ${standText(kopf.bogen)}) entfernen?`)) {
       meldungEntfernen(einsatzId, kopf.id);
       onGeaendert();
     }
@@ -458,7 +454,7 @@ function EinheitKarte(props: {
       <div className="kopfzeile">
         <span className="muster-text">
           <span className="muster-name">
-            {einheitAnzeige(kopf.bogen)}
+            {einheitAnzeigename(kopf.bogen.einheit)}
             {kopf.zugEtikett ? <span className="zug-badge"> {kopf.zugEtikett}</span> : null}
           </span>
           <span className="muster-sub">
