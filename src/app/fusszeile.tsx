@@ -183,28 +183,45 @@ export function Fusszeile() {
 
   return (
     <footer className="seite">
-      <span>
+      {/* Nach Zweck gruppiert statt als eine Reihe gleich gewichteter Links:
+          „was tut der Eintrag" ist die einzige Ordnung, die hier etwas
+          Wahres über den Inhalt aussagt. Der Anzeige-Umschalter ist ein
+          Bedienelement und kein Link — er bekommt eine eigene, benannte
+          Spalte statt zwischen den Links zu stehen. */}
+      <div className="fuss-gruppen">
+        <nav className="fuss-gruppe" aria-label="Daten">
+          <span className="fuss-titel">Daten</span>
+          <button className="link" onClick={() => { setSicherungFehler(""); sicherung.current?.showModal(); }}>Datensicherung</button>
+          <button
+            className="link"
+            onClick={() => {
+              setBeispielPfad([]); // beim Öffnen wieder ganz oben starten
+              setBeispielFehler("");
+              beispiele.current?.showModal();
+            }}
+          >
+            Beispielbögen
+          </button>
+        </nav>
+        <nav className="fuss-gruppe" aria-label="Rechtliches">
+          <span className="fuss-titel">Rechtliches</span>
+          <button className="link" onClick={() => impressum.current?.showModal()}>Impressum</button>
+          <button className="link" onClick={() => datenschutz.current?.showModal()}>Datenschutz</button>
+        </nav>
+        <nav className="fuss-gruppe" aria-label="Projekt">
+          <span className="fuss-titel">Projekt</span>
+          <a href={`mailto:${KONTAKT}`}>Kontakt</a>
+          <a href={REPO} target="_blank" rel="noopener noreferrer">GitHub</a>
+        </nav>
+        <div className="fuss-gruppe">
+          <span className="fuss-titel">Darstellung</span>
+          <AnzeigeSchalter />
+        </div>
+      </div>
+      <p className="fuss-marke">
         Einheiten-Erfassungsbogen v{__APP_VERSION__} · von{" "}
         <button className="link" onClick={() => ueber.current?.showModal()}>Johannes Rudolph</button>
-      </span>
-      <span className="fusslinks">
-        <AnzeigeSchalter />
-        <button className="link" onClick={() => { setSicherungFehler(""); sicherung.current?.showModal(); }}>Datensicherung</button>
-        <button
-          className="link"
-          onClick={() => {
-            setBeispielPfad([]); // beim Öffnen wieder ganz oben starten
-            setBeispielFehler("");
-            beispiele.current?.showModal();
-          }}
-        >
-          Beispielbögen
-        </button>
-        <button className="link" onClick={() => impressum.current?.showModal()}>Impressum</button>
-        <button className="link" onClick={() => datenschutz.current?.showModal()}>Datenschutz</button>
-        <a href={`mailto:${KONTAKT}`}>Kontakt</a>
-        <a href={REPO} target="_blank" rel="noopener noreferrer">GitHub</a>
-      </span>
+      </p>
 
       <Dialog titel="Datensicherung" dialogRef={sicherung}>
         <p>

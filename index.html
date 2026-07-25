@@ -478,12 +478,45 @@
     dl.paare dd { margin: 0; }
     /* Seiten-Fußzeile: margin-top auto = ans Viewport-Ende; Abstand unten,
        damit die fixe Schritt-Navigation sie nicht verdeckt. */
+    /* Seiten-Fußzeile: statt einer zentrierten Reihe gleich gewichteter Links
+       nach Zweck gruppierte Spalten, mit derselben gesperrten Versal-
+       Beschriftung wie die Datenbildschirme. Linksbündig wie der Rest der
+       Seite, oben von einer Haarlinie abgesetzt. */
     footer.seite {
-      width: 100%; max-width: 60rem; margin: auto auto 0; padding: 0 1rem 5rem;
-      display: flex; flex-wrap: wrap; gap: 0.3rem 1.2rem; justify-content: center;
+      width: 100%; max-width: 60rem;
+      /* align-self statt seitlicher auto-Ränder: im Spalten-Flex von #app
+         würden `margin-left/right: auto` die Fußzeile auf Inhaltsbreite
+         schrumpfen lassen — das Spalten-Grid darin fiele mangels definiter
+         Breite auf eine einzige Spalte zurück. margin-top: auto schiebt sie
+         weiterhin ans Seitenende. */
+      align-self: center;
+      margin: auto 0 0;
+      padding: var(--r-5) var(--r-4) 5rem;
+      display: flex; flex-direction: column; gap: var(--r-4);
+      border-top: var(--strich) solid var(--linie);
       font-size: var(--t-xs); color: var(--text-2);
     }
-    footer.seite .fusslinks { display: inline-flex; gap: 0.8rem; flex-wrap: wrap; }
+    .fuss-gruppen {
+      display: grid; gap: var(--r-4) var(--r-5);
+      grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+    }
+    .fuss-gruppe { display: flex; flex-direction: column; align-items: flex-start; gap: 0.35rem; }
+    .fuss-titel {
+      font-family: var(--schrift-daten); font-size: 0.6rem; letter-spacing: 0.12em;
+      text-transform: uppercase; color: var(--text-3);
+    }
+    /* Ruhige, aber eindeutige Links: Textfarbe mit feiner Unterstreichung,
+       die beim Überfahren in die Kennfarbe wechselt. */
+    footer.seite .fuss-gruppe a,
+    footer.seite .fuss-gruppe button.link {
+      color: var(--text); font-size: var(--t-s);
+      text-decoration: underline; text-decoration-color: var(--linie); text-underline-offset: 0.2em;
+    }
+    footer.seite .fuss-gruppe a:hover,
+    footer.seite .fuss-gruppe button.link:hover {
+      color: var(--akzent); text-decoration-color: currentColor;
+    }
+    .fuss-marke { margin: 0; color: var(--text-3); }
     footer.seite a { color: var(--akzent-hell); }
     button.link {
       border: none; background: none; padding: 0; font-size: inherit;
