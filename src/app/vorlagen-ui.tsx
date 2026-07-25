@@ -26,6 +26,7 @@ import {
   vorlagenPapierkorb,
   type Vorlage,
 } from "./vorlagen";
+import { SeitenKopf } from "./seiten-kopf";
 
 function personName(vorname: string, nachname: string): string {
   return `${vorname} ${nachname}`.trim() || "(ohne Name)";
@@ -154,13 +155,15 @@ export function Musterung(props: {
   }
 
   return (
-    <main className="musterung">
-      <header>
-        <button type="button" className="zur-start" onClick={onAbbrechen}>‹ Abbrechen</button>
+    <>
+    <SeitenKopf>
+      <button type="button" className="zur-start" onClick={onAbbrechen}>‹ Abbrechen</button>
+      <div className="titelzeile">
         <h1>{vorlage.name}</h1>
-        <p className="hinweis">Anwesende abhaken lassen — die Vorlage bleibt unverändert.</p>
-      </header>
-
+      </div>
+      <p className="hinweis">Anwesende abhaken lassen — die Vorlage bleibt unverändert.</p>
+    </SeitenKopf>
+    <main className="musterung">
       <section className="karte staerke-leiste">
         <div><strong>{s.fuehrer}</strong><span>Führer</span></div>
         <div><strong>{s.unterfuehrer}</strong><span>Unterf.</span></div>
@@ -213,5 +216,6 @@ export function Musterung(props: {
         </button>
       </footer>
     </main>
+    </>
   );
 }

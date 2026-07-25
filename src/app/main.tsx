@@ -52,6 +52,7 @@ import { qrAusBild } from "./qr-bild";
 import { entwurfLaden, entwurfSpeichern, entwurfVerwerfen } from "./entwurf";
 import { wendeAnzeigeModusAn } from "./anzeige-modus";
 import { AnzeigeSchalter } from "./anzeige-schalter";
+import { SeitenKopf } from "./seiten-kopf";
 import { orgFarbe, wendeOrgAkzentAn } from "./org-farben";
 import { einheitSymbolSvg, svgDataUrl } from "./taktische-zeichen";
 import { Fusszeile } from "./fusszeile";
@@ -774,12 +775,16 @@ function App() {
     return (
       <>
       <Aktualisierungshinweise />
-      <main className="start">
+      <SeitenKopf variante="start-kopf">
         <div className="kopf-leiste">
           <span />
           <AnzeigeSchalter />
         </div>
-        <h1>Einheiten-Erfassungsbogen</h1>
+        <div className="titelzeile">
+          <h1>Einheiten-Erfassungsbogen</h1>
+        </div>
+      </SeitenKopf>
+      <main className="start">
         <p>
           Bogen digital erfassen (BOS-übergreifend), als PDF drucken, als Datei teilen –
           inklusive QR-Code für den Offline-Transport.
@@ -914,50 +919,49 @@ function App() {
   return (
     <>
     <Aktualisierungshinweise />
+    <SeitenKopf variante="assistent-kopf">
+      <div className="kopf-leiste">
+        <button type="button" className="zur-start" onClick={() => setZeigeStart(true)}>
+          ‹ Startseite
+        </button>
+        <AnzeigeSchalter />
+      </div>
+      <div className="titelzeile">
+        {/* Taktisches Zeichen der Einheit als „Avatar" — Wiedererkennung auf einen Blick. */}
+        <img
+          className="einheit-avatar"
+          src={svgDataUrl(einheitSymbolSvg(bogen.einheit))}
+          alt=""
+          aria-hidden="true"
+        />
+        <h1>Einheiten-Erfassungsbogen</h1>
+      </div>
+      <nav className="schritte">
+        {SCHRITTE.map((name, i) => {
+          const st = status[i]; // undefined für die Übersicht (letzter Schritt)
+          const klassen = [i === schritt ? "aktiv" : "", st ? `status-${st}` : ""].filter(Boolean).join(" ");
+          const glyph = st === "ok" ? "✓" : st === "begonnen" ? "•" : "";
+          return (
+            <button
+              key={name}
+              className={klassen}
+              aria-label={st ? `${i + 1}. ${name} — ${SCHRITT_STATUS_TITEL[st]}` : undefined}
+              title={st ? SCHRITT_STATUS_TITEL[st] : undefined}
+              onClick={() => setSchritt(i)}
+            >
+              {i + 1}. {name}
+              {glyph && <span className="schritt-status" aria-hidden="true">{glyph}</span>}
+            </button>
+          );
+        })}
+      </nav>
+      {gespeichertUm && (
+        <p className="autosave" role="status">
+          ✓ automatisch gespeichert · {gespeichertUm.toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit" })} Uhr — bleibt auf diesem Gerät
+        </p>
+      )}
+    </SeitenKopf>
     <main>
-      <header>
-        <div className="kopf-leiste">
-          <button type="button" className="zur-start" onClick={() => setZeigeStart(true)}>
-            ‹ Startseite
-          </button>
-          <AnzeigeSchalter />
-        </div>
-        <div className="titelzeile">
-          {/* Taktisches Zeichen der Einheit als „Avatar" — Wiedererkennung auf einen Blick. */}
-          <img
-            className="einheit-avatar"
-            src={svgDataUrl(einheitSymbolSvg(bogen.einheit))}
-            alt=""
-            aria-hidden="true"
-          />
-          <h1>Einheiten-Erfassungsbogen</h1>
-        </div>
-        <nav className="schritte">
-          {SCHRITTE.map((name, i) => {
-            const st = status[i]; // undefined für die Übersicht (letzter Schritt)
-            const klassen = [i === schritt ? "aktiv" : "", st ? `status-${st}` : ""].filter(Boolean).join(" ");
-            const glyph = st === "ok" ? "✓" : st === "begonnen" ? "•" : "";
-            return (
-              <button
-                key={name}
-                className={klassen}
-                aria-label={st ? `${i + 1}. ${name} — ${SCHRITT_STATUS_TITEL[st]}` : undefined}
-                title={st ? SCHRITT_STATUS_TITEL[st] : undefined}
-                onClick={() => setSchritt(i)}
-              >
-                {i + 1}. {name}
-                {glyph && <span className="schritt-status" aria-hidden="true">{glyph}</span>}
-              </button>
-            );
-          })}
-        </nav>
-        {gespeichertUm && (
-          <p className="autosave" role="status">
-            ✓ automatisch gespeichert · {gespeichertUm.toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit" })} Uhr — bleibt auf diesem Gerät
-          </p>
-        )}
-      </header>
-
       {schritt === 0 && <SchrittEinheit bogen={bogen} aendern={aendern} />}
       {schritt === 1 && <SchrittEinsatz bogen={bogen} aendern={aendern} />}
       {schritt === 2 && <SchrittPersonal bogen={bogen} aendern={aendern} />}

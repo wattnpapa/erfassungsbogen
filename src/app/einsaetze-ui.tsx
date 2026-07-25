@@ -48,6 +48,7 @@ import {
 } from "./einsaetze";
 import { aggregiere, aggregiereNachZug, type EinsatzSummen } from "./auswertung";
 import { debugAktiv } from "./debug-plattform";
+import { SeitenKopf } from "./seiten-kopf";
 
 export const ART_LABEL: Record<EinsatzArt, string> = {
   [EinsatzArt.EINSATZ]: "Einsatz",
@@ -200,15 +201,17 @@ export function EinsatzDetail(props: {
   }
 
   return (
-    <main className="einsatz-detail">
-      <header>
-        <button type="button" className="zur-start" onClick={onZurueck}>‹ Einsätze</button>
+    <>
+    <SeitenKopf>
+      <button type="button" className="zur-start" onClick={onZurueck}>‹ Einsätze</button>
+      <div className="titelzeile">
         <h1>{einsatz.name}</h1>
-        <p className="hinweis">
-          {ART_LABEL[einsatz.art]}{einsatz.ort ? ` · ${einsatz.ort}` : ""}
-        </p>
-      </header>
-
+      </div>
+      <p className="hinweis">
+        {ART_LABEL[einsatz.art]}{einsatz.ort ? ` · ${einsatz.ort}` : ""}
+      </p>
+    </SeitenKopf>
+    <main className="einsatz-detail">
       <section className="karte staerke-leiste">
         <div><strong>{sum.einheiten}</strong><span>Einheiten</span></div>
         <div><strong>{sum.staerke.fuehrer}</strong><span>Führer</span></div>
@@ -298,6 +301,7 @@ export function EinsatzDetail(props: {
         <button type="button" className="entfernen" onClick={loeschen}>Einsatz löschen</button>
       </footer>
     </main>
+    </>
   );
 }
 

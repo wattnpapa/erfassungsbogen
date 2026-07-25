@@ -79,7 +79,7 @@
       --r-5: 1.5rem;
       --r-6: 2rem;
 
-      /* Kopfbalken des Assistenten. Eigene Token, damit iOS/Android ihn ohne
+      /* Seitenkopf. Eigene Token, damit iOS/Android ihn ohne
          Spezifitäts-Wettrennen auf ihre plattformeigene Kopfzeile zurücksetzen
          können und der Nacht-Modus ihn abdunkeln kann. */
       --kopf-fond:  var(--akzent);
@@ -87,8 +87,11 @@
       --kopf-auf-2: rgba(255, 255, 255, 0.78);
       --kopf-linie: rgba(255, 255, 255, 0.3);
       --kopf-strich: 3px;
-      --kopf-aus:   calc(var(--r-4) * -1); /* zieht den Balken bis an den Rand von main */
-      --kopf-innen: var(--r-3) var(--r-4) 0;
+      --kopf-innen: var(--r-3) var(--r-4);
+      /* Harte Unterkante: der Kopf endet an einer Linie, statt in den Inhalt
+         auszulaufen. Auf der Kennfarbe liegt sie als dunklerer Schatten. */
+      --kopf-kante:       4px;
+      --kopf-kante-farbe: rgba(0, 0, 0, 0.35);
 
       /* Rückwärtskompatible Aliasse: Bestandsregeln und die Plattform-Layer
          greifen weiter auf diese Namen zu, zeigen jetzt aber auf die Token. */
@@ -110,9 +113,9 @@
       -webkit-font-smoothing: antialiased;
     }
     #app { min-height: 100dvh; display: flex; flex-direction: column; }
-    main { width: 100%; max-width: 60rem; margin: 0 auto; padding: var(--r-4) var(--r-4) 6rem; }
+    main { width: 100%; max-width: 60rem; margin: 0 auto; padding: var(--r-5) var(--r-4) 6rem; }
     /* Überschriften tragen Gewicht statt Farbe — die Kennfarbe bleibt dem
-       Kopfbalken und der primären Aktion vorbehalten und verliert damit
+       Seitenkopf und der primären Aktion vorbehalten und verliert damit
        nicht ihre Signalwirkung. */
     h1 {
       font-size: var(--t-2xl); font-weight: 700; letter-spacing: -0.02em;
@@ -126,8 +129,7 @@
     h3 { font-size: var(--t-m); font-weight: 700; color: var(--text); margin: var(--r-4) 0 var(--r-1); }
     /* Startseite linksbündig: ein Satzspiegel mit fester linker Kante wirkt
        verbindlicher als die zentrierte Mittelachse. */
-    .start { text-align: left; padding-top: var(--r-4); }
-    .start > h1 { font-size: clamp(1.75rem, 5vw, 2.5rem); margin-top: var(--r-4); }
+    .start { text-align: left; }
     .start > p { max-width: 48ch; color: var(--text-2); font-size: var(--t-l); margin: 0 0 var(--r-2); }
     /* Das Offline-Versprechen ist ein Etikett, kein Fließtext — es darf nicht
        auf Absatzbreite umbrechen. */
@@ -173,37 +175,59 @@
     .zur-start:hover { border: none; background: none; text-decoration: underline; }
 
     /* ---------------------------------------------------------------
-       Kopfbalken des Assistenten: die Kennfarbe der Organisation trägt
-       Titel und Schrittleiste. Damit beantwortet der Balken auf einen
-       Blick „wessen Bogen" und „wo bin ich" — und die Farbe erscheint
-       an genau einer Stelle statt über alle Überschriften verteilt.
-       Die Reihenfolge wird per order gesetzt, damit die Schrittleiste
-       als Reiterzeile an der Unterkante sitzt.
+       Seitenkopf: jede Web-Ansicht beginnt mit derselben Kopfleiste über
+       die volle Fensterbreite, in der Kennfarbe der Organisation und mit
+       harter Unterkante. Damit ist auf einen Blick klar, wo die Seite
+       anfängt und der Inhalt beginnt — statt eines fließenden Übergangs.
+       Der Kopf beantwortet zugleich „wessen Bogen" und „wo bin ich", und
+       die Kennfarbe erscheint an genau einer Stelle statt über alle
+       Überschriften verteilt.
+
+       Der Balken selbst ist randlos; nur sein Inhalt (.kopf-inhalt) bleibt
+       auf dem Satzspiegel von main, damit Titel und Inhalt dieselbe linke
+       Kante haben. Die Reihenfolge wird per order gesetzt, damit die
+       Schrittleiste als Reiterzeile an der Unterkante sitzt.
        --------------------------------------------------------------- */
-    main > header {
-      display: flex; flex-direction: column;
+    .seiten-kopf {
       background: var(--kopf-fond); color: var(--kopf-auf);
-      margin: var(--kopf-aus) var(--kopf-aus) var(--r-5);
+      border-bottom: var(--kopf-kante) solid var(--kopf-kante-farbe);
+    }
+    .seiten-kopf .kopf-inhalt {
+      width: 100%; max-width: 60rem; margin: 0 auto;
+      display: flex; flex-direction: column;
       padding: var(--kopf-innen);
     }
-    main > header .kopf-leiste { order: 0; }
-    main > header .titelzeile { order: 1; padding: var(--r-2) 0 var(--r-3); }
-    main > header .autosave { order: 2; }
-    main > header .schritte { order: 3; }
-    main > header h1 { color: var(--kopf-auf); font-size: var(--t-xl); margin: 0; }
-    main > header .zur-start { color: var(--kopf-auf); opacity: 0.85; }
-    main > header .zur-start:hover { opacity: 1; }
-    main > header .anzeige-schalter { border-color: var(--kopf-linie); }
-    main > header .anzeige-schalter button { background: transparent; color: var(--kopf-auf-2); }
-    main > header .anzeige-schalter button + button { border-left-color: var(--kopf-linie); }
-    main > header .anzeige-schalter button.aktiv { background: var(--kopf-auf); color: var(--kopf-fond); }
-    main > header .autosave { color: var(--kopf-auf-2); margin: 0; padding: 0 0 var(--r-3); }
+    .seiten-kopf .titelzeile { padding: var(--r-2) 0 var(--r-3); }
+    /* Der Rücksprung ist ein Wort, keine Zeile: als Flex-Kind bliebe er sonst
+       auf volle Breite gedehnt und stünde mittig. */
+    .seiten-kopf .kopf-inhalt > .zur-start { align-self: flex-start; }
+    /* Im Assistenten steht die Schrittleiste im Markup vor dem Speicherstand,
+       sitzt visuell aber als Reiterzeile ganz unten. */
+    .seiten-kopf.assistent-kopf .kopf-leiste { order: 0; }
+    .seiten-kopf.assistent-kopf .titelzeile { order: 1; }
+    .seiten-kopf.assistent-kopf .autosave { order: 2; }
+    .seiten-kopf.assistent-kopf .schritte { order: 3; }
+    /* Die Schrittleiste sitzt bündig auf der Unterkante des Balkens. */
+    .seiten-kopf.assistent-kopf .kopf-inhalt { padding-bottom: 0; }
+    .seiten-kopf h1 { color: var(--kopf-auf); font-size: var(--t-xl); margin: 0; }
+    .seiten-kopf .hinweis { color: var(--kopf-auf-2); margin: var(--r-1) 0 0; }
+    .seiten-kopf .zur-start { color: var(--kopf-auf); opacity: 0.85; }
+    .seiten-kopf .zur-start:hover { opacity: 1; }
+    .seiten-kopf .anzeige-schalter { border-color: var(--kopf-linie); }
+    .seiten-kopf .anzeige-schalter button { background: transparent; color: var(--kopf-auf-2); }
+    .seiten-kopf .anzeige-schalter button + button { border-left-color: var(--kopf-linie); }
+    .seiten-kopf .anzeige-schalter button.aktiv { background: var(--kopf-auf); color: var(--kopf-fond); }
+    .seiten-kopf .autosave { color: var(--kopf-auf-2); margin: 0; padding: 0 0 var(--r-3); }
+    /* Startseite: der Titel ist hier die Hauptsache und darf größer stehen —
+       der Kopf ist zugleich der Seitenaufmacher. */
+    .seiten-kopf.start-kopf .kopf-inhalt { padding-bottom: var(--r-4); }
+    .seiten-kopf.start-kopf h1 { font-size: clamp(1.5rem, 4vw, 2rem); }
     /* Das taktische Zeichen liegt auf der Kennfarbe. Ohne helle Unterlage
        verschwindet ein gleichfarbiges Symbol (THW-Blau auf THW-Blau) im
        Balken — die Zeichen sind ohnehin für weißes Papier gezeichnet. */
-    main > header img.einheit-avatar { background: #fff; padding: 2px; }
-    .platform-ios main > header img.einheit-avatar,
-    .platform-android main > header img.einheit-avatar { background: none; padding: 0; }
+    .seiten-kopf img.einheit-avatar { background: #fff; padding: 2px; }
+    .platform-ios .seiten-kopf img.einheit-avatar,
+    .platform-android .seiten-kopf img.einheit-avatar { background: none; padding: 0; }
 
     /* Schrittleiste als Reiterzeile: aktiver Schritt per Unterstrich, nicht
        per Pille — das hält die Zeile ruhig und zeigt den Fortschritt links
@@ -1231,8 +1255,10 @@
       --kopf-auf-2: var(--ios-text-2);
       --kopf-linie: transparent;
       --kopf-strich: 0px;
-      --kopf-aus: 0px;
-      --kopf-innen: 0px;
+      /* Ohne Fläche trägt der Kopf keinen eigenen Rand — sein Inhalt steht
+         auf demselben Satzspiegel wie main. */
+      --kopf-innen: 0 var(--r-4);
+      --kopf-kante: 0px;
     }
     .platform-android {
       --kopf-fond: transparent;
@@ -1240,22 +1266,23 @@
       --kopf-auf-2: var(--md-on-surface-variant);
       --kopf-linie: transparent;
       --kopf-strich: 0px;
-      --kopf-aus: 0px;
-      --kopf-innen: 0px;
+      --kopf-innen: 0 var(--r-4);
+      --kopf-kante: 0px;
     }
     /* Ohne Balken greift wieder der normale Abstand zwischen Kopf und Inhalt. */
-    .platform-ios main > header,
-    .platform-android main > header { margin-bottom: var(--r-4); }
-    .platform-ios main > header .schritte,
-    .platform-android main > header .schritte { gap: 0.3rem; margin: 0.5rem 0 0.5rem; }
-    .platform-ios main > header .autosave,
-    .platform-android main > header .autosave { padding-bottom: var(--r-2); }
+    .platform-ios .seiten-kopf,
+    .platform-android .seiten-kopf { padding-top: var(--r-4); }
+    .platform-ios .seiten-kopf .schritte,
+    .platform-android .seiten-kopf .schritte { gap: 0.3rem; margin: 0.5rem 0 0.5rem; }
+    .platform-ios .seiten-kopf .autosave,
+    .platform-android .seiten-kopf .autosave { padding-bottom: var(--r-2); }
+    .platform-ios main, .platform-android main { padding-top: var(--r-4); }
     /* Ohne Balkenfläche taugt „Text in Balkenfarbe" nicht mehr als Kontrast
        für den aktiven Umschalter — hier greift der Plattform-Tint. */
-    .platform-ios main > header .anzeige-schalter button.aktiv {
+    .platform-ios .seiten-kopf .anzeige-schalter button.aktiv {
       background: var(--ios-akzent-flaeche); color: #fff;
     }
-    .platform-android main > header .anzeige-schalter button.aktiv {
+    .platform-android .seiten-kopf .anzeige-schalter button.aktiv {
       background: var(--md-primary); color: var(--md-on-primary);
     }
 
@@ -1415,8 +1442,10 @@
       --kopf-auf:   #d9cdb6;
       --kopf-auf-2: #a2977e;
       --kopf-linie: #423c2d;
+      /* Auf dunklem Grund trennt eine hellere Kante, keine schwarze. */
+      --kopf-kante-farbe: #5c5440;
     }
-    .nacht-modus main > header .schritte button.aktiv {
+    .nacht-modus .seiten-kopf .schritte button.aktiv {
       color: var(--akzent-hell); border-bottom-color: var(--akzent-hell);
     }
     .nacht-modus .schritte button.status-ok .schritt-status { color: var(--gut); }
