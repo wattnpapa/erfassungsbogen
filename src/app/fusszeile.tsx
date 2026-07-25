@@ -682,10 +682,23 @@ export function Fusszeile({ onBogenOeffnen }: {
           Gegenstelle bei Rückfragen weiß, an wen sie sich wenden kann. Die Angabe ist
           nicht erforderlich und jederzeit änder- und löschbar.
         </p>
-        <h3>4. Cookies und Reichweitenmessung</h3>
+        <h3>4. Speicherung im Endgerät und Reichweitenmessung</h3>
         <p>
-          Es werden keine Cookies gesetzt und keine Daten im Endgerät gespeichert
-          oder ausgelesen.
+          Es werden keine Cookies gesetzt. Die App speichert ihre Daten aber im
+          lokalen Speicher (localStorage) des Geräts, weil sie ohne Server
+          arbeitet und die Arbeit sonst bei jedem Neustart verloren wäre:
+          eigene Vorlagen, Einsatz-Sammlungen, der aktuelle Bogen-Entwurf, die
+          Absenderkarte, der private Signatur-Geräteschlüssel und die
+          Anzeige-Einstellungen (Feld-/Nachtmodus). Ein Widerspruch gegen die
+          Reichweitenmessung wird ebenfalls dort vermerkt.
+        </p>
+        <p>
+          Diese Einträge sind für den ausdrücklich gewünschten Dienst technisch
+          erforderlich (§ 25 Abs. 2 Nr. 2 TDDDG); eine Einwilligung ist dafür
+          nicht nötig. Sie verlassen das Gerät nicht: es gibt keine Übertragung
+          an einen Server, keinen Zugriff durch Dritte und keine Kennung zur
+          Wiedererkennung. Gelöscht werden sie über „Alle Daten löschen“ in der
+          Fußzeile oder durch Löschen der Websitedaten im Browser.
         </p>
         <p>
           Zur Reichweitenmessung wird{" "}
@@ -708,6 +721,14 @@ export function Fusszeile({ onBogenOeffnen }: {
           Nach Art. 15–21 DSGVO bestehen Rechte auf Auskunft, Berichtigung, Löschung,
           Einschränkung der Verarbeitung und Widerspruch. Anfragen bitte an die oben
           genannte E-Mail-Adresse.
+        </p>
+        <p>
+          Für die lokal gespeicherten Daten lassen sich Auskunft und Löschung
+          unmittelbar selbst ausüben, ohne Anfrage: „Datensicherung“ in der Fußzeile
+          gibt alle gespeicherten Einträge als Datei heraus (und spielt sie wieder
+          ein), „Alle Daten löschen“ nennt den Umfang und entfernt sie vollständig
+          von diesem Gerät. Der Reichweitenmessung wird über das Kästchen in
+          Abschnitt 4 widersprochen.
         </p>
       </Dialog>
     </footer>
