@@ -131,9 +131,10 @@
        verbindlicher als die zentrierte Mittelachse. */
     .start { text-align: left; }
     .start > p { max-width: 48ch; color: var(--text-2); font-size: var(--t-l); margin: 0 0 var(--r-2); }
-    /* Das Offline-Versprechen ist ein Etikett, kein Fließtext — es darf nicht
-       auf Absatzbreite umbrechen. */
-    .start > p.offline-badge { max-width: none; width: max-content; font-size: var(--t-s); }
+    /* Das Offline-Versprechen ist ein Etikett, kein Fließtext — es bleibt auf
+       breiten Fenstern einzeilig (max-content), darf aber nie über den Rand
+       hinauslaufen: auf dem Telefon bricht es innerhalb der Fensterbreite um. */
+    .start > p.offline-badge { max-width: 100%; width: max-content; font-size: var(--t-s); }
     .aktionen { display: flex; gap: var(--r-2); justify-content: flex-start; flex-wrap: wrap; margin-top: var(--r-5); }
     .aktionen > button, .aktionen > .datei-knopf {
       min-height: calc(2.75rem + var(--ziel)); padding: 0.6rem 1.1rem; font-size: var(--t-m);
@@ -158,11 +159,19 @@
     }
     /* Kopfleiste: Rücksprung links, Anzeige-Umschalter rechts. */
     .kopf-leiste { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; }
-    /* Umschalter Standard/Feld/Nacht als kompakte Segmente. */
-    .anzeige-schalter { display: inline-flex; border: var(--strich) solid var(--linie); border-radius: var(--radius); overflow: hidden; }
+    /* Umschalter Standard/Feld/Nacht als kompakte Segmente. In schmalen
+       Spalten (Fußzeile auf dem Telefon) darf die Segmentzeile umbrechen,
+       statt über den Rand hinauszuragen. */
+    .anzeige-schalter {
+      display: inline-flex; flex-wrap: wrap; max-width: 100%;
+      border: var(--strich) solid var(--linie); border-radius: var(--radius); overflow: hidden;
+    }
     .anzeige-schalter button {
       border: none; border-radius: 0; background: var(--flaeche); color: var(--text-2);
       padding: 0.25rem 0.7rem; font-size: var(--t-xs); min-height: calc(1.9rem + var(--ziel));
+      /* Nach einem Umbruch füllen die Segmente die Zeile, statt rechts eine
+         Lücke zu lassen. */
+      flex: 1 1 auto;
     }
     .anzeige-schalter button + button { border-left: var(--strich) solid var(--linie); }
     .anzeige-schalter button.aktiv { background: var(--akzent); color: var(--auf-akzent); }
@@ -306,6 +315,14 @@
     .chip button { border: none; padding: 0 0.2rem; min-height: 0; background: none; font-weight: bold; }
     .karte .entfernen { float: right; color: var(--alarm); border-color: var(--alarm); font-size: var(--t-xs); }
     .karte .entfernen:hover { color: var(--alarm); border-color: var(--alarm); background: var(--flaeche-2); }
+    /* Auf dem Telefon ist neben einem schwebenden Knopf keine Spalte mehr übrig:
+       Feldzeilen bilden einen eigenen Blockkontext und schrumpfen auf den Rest
+       zwischen den Floats — aus Eingabefeldern werden Streifen von 50 px. Auf
+       schmalen Fenstern stehen Knopf und taktisches Zeichen darum in eigenen
+       Zeilen, die Felder bekommen die volle Kartenbreite. */
+    @media (max-width: 30rem) {
+      .karte .entfernen { float: none; display: block; margin: 0 0 var(--r-2) auto; }
+    }
     /* Destruktive Aktion außerhalb einer Karte (z. B. „Endgültig löschen"):
        Alarmfarbe in Rahmen und Text, aber keine gefüllte Signalfläche — die
        gehört in dieser App der einen primären Aktion einer Ansicht. */
@@ -347,6 +364,11 @@
     .einheit-kopf { display: flex; align-items: center; gap: 0.9rem; }
     .einheit-kopf > div { min-width: 0; }
     img.fahrzeug-symbol { height: 2.4rem; width: auto; float: left; margin: 0.1rem 0.8rem 0.2rem 0; }
+    /* Umflossen wird nur, wo Platz dafür ist: auf dem Telefon steht das
+       Fahrzeugsymbol über den Feldern statt neben ihnen. */
+    @media (max-width: 30rem) {
+      img.fahrzeug-symbol { float: none; display: block; margin: 0 0 var(--r-1); }
+    }
     .legende { opacity: 0.75; }
     /* Autosave-Anzeige im Assistenten-Kopf: leise Bestätigung statt Sorge. */
     .autosave { margin: -0.5rem 0 0.8rem; font-size: 0.78rem; color: var(--erledigt); }
@@ -366,6 +388,13 @@
     .entwurf-karte .entwurf-text { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 0.1rem; }
     .entwurf-karte .entwurf-text strong { overflow-wrap: break-word; }
     .entwurf-karte button { flex: 0 0 auto; }
+    /* Auf dem Telefon reicht die Zeile nicht für Zeichen, Name und Knopf: der
+       Einheitsname würde mitten im Wort umbrechen. Dann rutscht der Knopf auf
+       eine eigene Zeile und der Name bekommt die volle Breite. */
+    @media (max-width: 30rem) {
+      .entwurf-karte { flex-wrap: wrap; }
+      .entwurf-karte button { width: 100%; }
+    }
     /* Erststart-Onboarding: drei Schritte erklären den Offline-QR-Transport. */
     .onboarding { margin-top: var(--r-6); }
     .onboarding h2 { border: none; text-align: left; }
@@ -435,6 +464,18 @@
       padding: var(--r-2) var(--r-3); border-left: var(--strich) solid var(--linie-fein);
     }
     .staerke-leiste > div:first-child { border-left: none; }
+    /* Auf dem Telefon passen vier Zahlenfelder nicht nebeneinander — im
+       Feld-Modus sprengten sie die Karte. Zwei feste Spalten, und die
+       Trennlinien laufen dann auch zwischen den Zeilen. */
+    @media (max-width: 30rem) {
+      .staerke-leiste { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .staerke-leiste > div {
+        border-left: var(--strich) solid var(--linie-fein);
+        border-top: var(--strich) solid var(--linie-fein);
+      }
+      .staerke-leiste > div:nth-child(odd) { border-left: none; }
+      .staerke-leiste > div:nth-child(-n + 2) { border-top: none; }
+    }
     .staerke-leiste strong {
       font-size: 1.75rem; line-height: 1.05; font-weight: 700;
       letter-spacing: -0.02em; font-variant-numeric: tabular-nums;
@@ -506,9 +547,15 @@
     .bogen-details { margin-top: 0.6rem; border-top: 1px solid var(--rand); padding-top: 0.4rem; }
     .bogen-details h4 { margin: 0.8rem 0 0.2rem; font-size: 0.9rem; color: var(--blau); }
     .bogen-details h4:first-child { margin-top: 0; }
-    dl.paare { display: grid; grid-template-columns: max-content 1fr; gap: 0.2rem 1rem; margin: 0.4rem 0; font-size: 0.92rem; }
+    /* minmax(0, …) statt blanker Spuren: sonst zwingt ein langes, nicht
+       trennbares Wort (E-Mail-Adresse, Funkrufname) die Spalte breiter als die
+       Karte und die ganze Ansicht läuft auf dem Telefon nach rechts aus. */
+    dl.paare {
+      display: grid; grid-template-columns: minmax(0, max-content) minmax(0, 1fr);
+      gap: 0.2rem 1rem; margin: 0.4rem 0; font-size: 0.92rem;
+    }
     dl.paare dt { color: var(--text-2); }
-    dl.paare dd { margin: 0; }
+    dl.paare dd { margin: 0; overflow-wrap: anywhere; }
     /* Seiten-Fußzeile: margin-top auto = ans Viewport-Ende; Abstand unten,
        damit die fixe Schritt-Navigation sie nicht verdeckt. */
     /* Seiten-Fußzeile: statt einer zentrierten Reihe gleich gewichteter Links
