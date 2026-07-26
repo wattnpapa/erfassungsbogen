@@ -20,6 +20,7 @@ import {
 import { parseNamen } from "../personal-schnell";
 import { stanPersonalVorbelegung } from "../../vokabulare/thw-stan-personal";
 import { FE_TEXT, neuePerson, plausibilitaet, vokabularFuer } from "../hilfen";
+import { frageJaNein } from "../dialoge";
 import {
   Feld,
   Hinweise,
@@ -348,8 +349,15 @@ export function SchrittPersonal({ bogen, aendern }: SchrittProps) {
         <p>
           <button
             type="button"
-            onClick={() => {
-              if (bogen.personal.length === 0 || window.confirm("Aktuelle Personalliste durch die StAN-Sollplätze ersetzen?")) {
+            onClick={async () => {
+              if (
+                bogen.personal.length === 0 ||
+                (await frageJaNein({
+                  titel: "StAN-Sollplätze laden?",
+                  text: `Die aktuelle Personalliste (${bogen.personal.length} Personen) wird durch die ${vorlage.length} Sollplätze der StAN ersetzt.`,
+                  ok: "Ersetzen",
+                }))
+              ) {
                 aendern({ personal: vorlage });
               }
             }}

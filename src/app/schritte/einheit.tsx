@@ -26,6 +26,7 @@ import {
   landesvorlagenEinheiten,
 } from "../../vokabulare/landesvorlagen";
 import { ORG_OPTIONEN, einheitAnzeigename, ersteEbene, vokabularFuer } from "../hilfen";
+import { frageJaNein } from "../dialoge";
 import { Feld, VokabAuswahl, type SchrittProps } from "./bausteine";
 
 /**
@@ -182,11 +183,20 @@ export function SchrittEinheit({ bogen, aendern }: SchrittProps) {
   const vorlagenEinheiten = aktBundesland ? landesvorlagenEinheiten(e.organisation, aktBundesland) : [];
   const aktEinheit = vorlagenEinheiten.includes(vorlageEinheit) ? vorlageEinheit : "";
 
-  function landesvorlageAnwenden(name: string) {
+  async function landesvorlageAnwenden(name: string) {
     const v = landesvorlage(e.organisation, aktBundesland, name);
     if (!v) return;
     const hatDaten = bogen.personal.length > 0 || bogen.fahrzeuge.length > 0;
-    if (hatDaten && !window.confirm("Personal und Fahrzeuge durch die Landesvorlage ersetzen?")) return;
+    if (
+      hatDaten &&
+      !(await frageJaNein({
+        titel: "Landesvorlage anwenden?",
+        text: `Personal (${bogen.personal.length}) und Fahrzeuge (${bogen.fahrzeuge.length}) im Bogen werden durch „${name}" ersetzt.`,
+        ok: "Ersetzen",
+      }))
+    ) {
+      return;
+    }
     setVorlageEinheit(name);
     aendern({
       einheit: { ...e, einheitsTyp: v.einheitsTyp },
@@ -266,7 +276,7 @@ export function SchrittEinheit({ bogen, aendern }: SchrittProps) {
                 value={aktEinheit}
                 disabled={!aktBundesland}
                 onChange={(ev) => {
-                  if (ev.target.value) landesvorlageAnwenden(ev.target.value);
+                  if (ev.target.value) void landesvorlageAnwenden(ev.target.value);
                 }}
               >
                 <option value="">{aktBundesland ? "– Einheit wählen –" : "erst Bundesland wählen"}</option>

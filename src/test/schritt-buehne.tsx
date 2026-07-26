@@ -7,6 +7,7 @@
 import { useState, type ComponentType } from "react";
 import type { Erfassungsbogen } from "../model";
 import { neuerBogen } from "../app/hilfen";
+import { Dialogschicht } from "../app/dialoge";
 import type { SchrittProps } from "../app/schritte";
 
 export function SchrittBuehne(props: {
@@ -16,5 +17,12 @@ export function SchrittBuehne(props: {
 }) {
   const { komponente: Schritt } = props;
   const [bogen, setBogen] = useState<Erfassungsbogen>(() => props.bogen ?? neuerBogen());
-  return <Schritt bogen={bogen} aendern={(patch) => setBogen((b) => ({ ...b, ...patch }))} />;
+  return (
+    <>
+      <Schritt bogen={bogen} aendern={(patch) => setBogen((b) => ({ ...b, ...patch }))} />
+      {/* Wie in der App: Rückfragen brauchen die Dialogschicht, sonst wartet ein
+          `await frageJaNein(...)` im Schritt für immer. */}
+      <Dialogschicht />
+    </>
+  );
 }

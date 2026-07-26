@@ -8,11 +8,13 @@
 
 import { afterEach } from "vitest";
 import { cleanup } from "@testing-library/react";
+import { dialogeZuruecksetzen } from "../app/dialoge";
 
-// jsdom (29) kennt <dialog> nur als Element, nicht seine Methoden. Die App
-// öffnet damit den Übergabe-, Namens- und Einsatzwahl-Dialog; ohne Ersatz
-// bricht jeder Klick darauf ab. Nachgebildet wird nur, was die App nutzt:
-// das `open`-Attribut und das `close`-Ereignis.
+// Älteres jsdom kennt <dialog> nur als Element, nicht seine Methoden. Die App
+// öffnet damit den Übergabe-, Namens- und Einsatzwahl-Dialog sowie alle
+// Rückfragen (src/app/dialoge.tsx); ohne Ersatz bricht jeder Klick darauf ab.
+// Nachgebildet wird nur, was die App nutzt: das `open`-Attribut, der
+// Rückgabewert und das `close`-Ereignis.
 const dialog = window.HTMLDialogElement?.prototype as HTMLDialogElement | undefined;
 if (dialog && typeof dialog.showModal !== "function") {
   dialog.show = function () {
@@ -31,6 +33,9 @@ if (dialog && typeof dialog.showModal !== "function") {
 
 afterEach(() => {
   cleanup();
+  // Eine unbeantwortete Rückfrage überlebt das Abräumen des DOM — ohne
+  // Zurücksetzen zeigt der nächste Test sie statt seiner eigenen.
+  dialogeZuruecksetzen();
   localStorage.clear();
   sessionStorage.clear();
 });

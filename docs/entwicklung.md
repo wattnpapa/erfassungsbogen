@@ -19,6 +19,26 @@ in einer eigenen Datei unter [src/app/schritte/](../src/app/schritte/); was
 mehrere Schritte teilen (Feld-Rahmen, Vokabular-Auswahl, Zähler, Hinweise),
 steht in `schritte/bausteine.tsx`.
 
+### Rückfragen und Eingaben (keine Systemdialoge)
+
+`window.prompt`, `window.confirm` und `window.alert` sind in dieser App tabu:
+Die iOS-App (WKWebView unter Capacitor) beantwortet sie nicht — `prompt` liefert
+dort sofort `null`, der Knopf tut also scheinbar nichts. Stattdessen zeichnet die
+App ihre Abfragen selbst, [src/app/dialoge.tsx](../src/app/dialoge.tsx):
+
+- `frageText` / `frageFelder` — eine oder mehrere Eingaben (Ersatz für `prompt`);
+  Rückgabe `null` heißt abgebrochen, ein leerer String heißt leer gelassen.
+- `frageJaNein` — Rückfrage mit sprechender Zusage statt „OK" (Ersatz für `confirm`).
+- `frageWahl` — mehrere benannte Wege mit Erklärung, wenn „OK/Abbrechen" die
+  Frage verfälschen würde (z. B. „neue Fassung" gegen „eigene Einheit").
+- `zeigeHinweis` — Mitteilung, auf Wunsch mit Text zum Kopieren (Ersatz für `alert`).
+
+Der Zugang ist imperativ (`await frageText(...)`), gezeichnet wird von der
+einmal eingehängten `<Dialogschicht />` (in `App`, in Tests in der
+Schritt-Bühne). Der E2E-Wachhund in
+[features/support/haken.ts](../features/support/haken.ts) lässt jedes Szenario
+scheitern, in dem doch ein Systemdialog auftaucht.
+
 ```
 npm install
 npm run dev      # Entwicklung: http://localhost:5173
@@ -71,7 +91,8 @@ npm run test:e2e      # Cucumber/Playwright gegen die laufende Web-App
 - **`oberflaeche`** — React-Komponenten mit Testing Library in jsdom,
   Dateiendung `.test.tsx`. Abgedeckt sind der Assistenten-Durchlauf
   ([src/app/app.test.tsx](../src/app/app.test.tsx): Startseite → Schritte →
-  Übersicht → Bogen übergeben) sowie die Schritte mit eigener Logik
+  Übersicht → Bogen übergeben), das Anlegen einer Einsatz-Sammlung über den
+  Dialog (beide Einstiege samt Abbruch) sowie die Schritte mit eigener Logik
   (Einheit, Personal, Fahrzeuge).
 
 Für einen einzelnen Schritt genügt die Bühne aus

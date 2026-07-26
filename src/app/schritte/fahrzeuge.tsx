@@ -6,6 +6,7 @@ import { Fahrzeug, OrganisationsTyp } from "../../model";
 import { stanFahrzeugVorbelegung } from "../../vokabulare/thw-stan-fahrzeuge";
 import { fahrzeugHinweise, neuesFahrzeug, vokabularFuer } from "../hilfen";
 import { fahrzeugSymbolSvg, svgDataUrl } from "../taktische-zeichen";
+import { frageJaNein } from "../dialoge";
 import {
   Feld,
   Hinweise,
@@ -108,8 +109,15 @@ export function SchrittFahrzeuge({ bogen, aendern }: SchrittProps) {
         <p>
           <button
             type="button"
-            onClick={() => {
-              if (bogen.fahrzeuge.length === 0 || window.confirm("Aktuelle Fahrzeugliste durch die StAN-Vorbelegung ersetzen?")) {
+            onClick={async () => {
+              if (
+                bogen.fahrzeuge.length === 0 ||
+                (await frageJaNein({
+                  titel: "StAN-Vorbelegung laden?",
+                  text: `Die aktuelle Fahrzeugliste (${bogen.fahrzeuge.length} Fahrzeuge) wird durch die ${vorlage.length} Fahrzeuge der StAN ersetzt.`,
+                  ok: "Ersetzen",
+                }))
+              ) {
                 aendern({ fahrzeuge: vorlage });
               }
             }}

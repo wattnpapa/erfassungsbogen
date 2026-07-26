@@ -53,6 +53,7 @@ import { orgFarbe, wendeOrgAkzentAn } from "./org-farben";
 import { einheitSymbolSvg, svgDataUrl } from "./taktische-zeichen";
 import { Fusszeile } from "./fusszeile";
 import { Aktualisierungshinweise } from "./aktualisierung";
+import { Dialogschicht, frageFelder, frageJaNein, frageWahl } from "./dialoge";
 import {
   SchrittEinheit,
   SchrittEinsatz,
@@ -203,12 +204,32 @@ function SoFunktionierts() {
 
 const START = startAusUrlFragment();
 
+/**
+ * Auswahl der Einsatzart für den Anlege-Dialog. Die alte Abfrage über
+ * `window.prompt` legte immer einen „Einsatz" an, obwohl sie „Einsatz/Übung"
+ * versprach — mit einem eigenen Dialog ist die Wahl endlich möglich.
+ */
+const ART_WAHL = Object.entries(ART_LABEL).map(([wert, label]) => ({ wert, label }));
+
 // Kaltstart ohne Bogen aus der URL: den automatisch gesicherten Entwurf
 // anbieten — Autosave überlebt geschlossene Tabs, leere Akkus und vom System
 // beendete Apps (siehe entwurf.ts).
 const ENTWURF = START.bogen ? null : entwurfLaden();
 
 export function App() {
+  // Rückfragen, Eingaben und Hinweise zeichnet die App selbst (dialoge.tsx) —
+  // die eingebauten window.prompt/confirm/alert bleiben in der iOS-App
+  // unbeantwortet. Die Schicht steht außerhalb des Inhalts, damit sie in jeder
+  // Ansicht erreichbar ist, auch über einem schon offenen Dialog.
+  return (
+    <>
+      <AppInhalt />
+      <Dialogschicht />
+    </>
+  );
+}
+
+function AppInhalt() {
   const [bogen, setBogen] = useState<Erfassungsbogen | null>(START.bogen ?? ENTWURF?.bogen ?? null);
   const [schritt, setSchritt] = useState(START.bogen || ENTWURF ? UEBERSICHT : 0);
   const [fehler, setFehler] = useState(START.fehler);
@@ -316,12 +337,14 @@ export function App() {
    * Bogen inkl. Entwurfssicherung, daher vorher rückfragen. Rückgabe false =
    * abgelehnt, der Beispielbögen-Dialog bleibt dann offen.
    */
-  function oeffneBeispiel(b: Erfassungsbogen): boolean {
+  async function oeffneBeispiel(b: Erfassungsbogen): Promise<boolean> {
     if (
       bogen &&
-      !window.confirm(
-        "Der aktuell geöffnete Bogen wird durch den Beispielbogen ersetzt (auch der gespeicherte Entwurf). Fortfahren?",
-      )
+      !(await frageJaNein({
+        titel: "Beispielbogen öffnen?",
+        text: "Der aktuell geöffnete Bogen wird durch den Beispielbogen ersetzt — auch der gespeicherte Entwurf.",
+        ok: "Beispielbogen öffnen",
+      }))
     ) {
       return false;
     }
@@ -359,7 +382,7 @@ export function App() {
    * App die Einheit schon im Einsatz, wird die Zuordnung bestätigt (neue Fassung
    * = Historie) oder als eigene Einheit geführt (Vorschlag+Bestätigung).
    */
-  function bogenInSammlung(
+  async function bogenInSammlung(
     zielId: string,
     b: Erfassungsbogen,
     quelle: "scan" | "manuell",
@@ -376,11 +399,33 @@ export function App() {
     const schl = einheitSchluessel(b.einheit);
     let override: string | undefined;
     if (einsatz?.eintraege.some((e) => e.einheitSchluessel === schl)) {
-      const name = einheitAnzeigename(b.einheit);
-      const alsFassung = window.confirm(
-        `„${name}" ist bereits im Einsatz.\n\nOK = als neue Fassung anhängen (Historie).\nAbbrechen = als eigene, separate Einheit führen.`,
-      );
-      if (!alsFassung) override = `${schl}#${Date.now()}`;
+      // Die Frage hat zwei gleichwertige Antworten und deshalb zwei benannte
+      // Knöpfe: „OK/Abbrechen" hätte den zweiten Weg als Abbruch getarnt.
+      const wahl = await frageWahl({
+        titel: "Einheit ist bereits gemeldet",
+        text: `„${einheitAnzeigename(b.einheit)}" steht in diesem Einsatz schon. Wie soll der neue Bogen dazu stehen?`,
+        wege: [
+          {
+            wert: "fassung",
+            label: "Als neue Fassung anhängen",
+            hinweis: "Der Normalfall bei einer Folgemeldung: die bisherige Meldung wandert in die Historie.",
+          },
+          {
+            wert: "eigene",
+            label: "Als eigene Einheit führen",
+            hinweis: "Für eine zweite, gleich benannte Einheit — beide zählen getrennt in die Summe.",
+          },
+        ],
+      });
+      if (!wahl) {
+        // Abgebrochen: der Bogen bleibt draußen. Im Kiosk-Scan steht die
+        // Rückmeldung im Overlay, sonst über der Ansicht.
+        const text = `„${einheitAnzeigename(b.einheit)}" nicht aufgenommen.`;
+        if (kiosk) setScanFortschritt(text);
+        else setMeldung(text);
+        return;
+      }
+      if (wahl === "eigene") override = `${schl}#${Date.now()}`;
     }
     const r = meldungHinzufuegen(zielId, b, {
       quelle,
@@ -426,10 +471,16 @@ export function App() {
    * Rückgabe: true = Scan beendet (Overlay/Loop schließen), false = Kiosk-Modus,
    * der Scanner bleibt für den nächsten Bogen an (Sammelziel bleibt gesetzt).
    */
-  function uebernimmBogen(b: Erfassungsbogen, signatur: SignaturStatus, payload?: Uint8Array | null): boolean {
+  async function uebernimmBogen(
+    b: Erfassungsbogen,
+    signatur: SignaturStatus,
+    payload?: Uint8Array | null,
+  ): Promise<boolean> {
     const ziel = sammelZielRef.current;
     if (ziel) {
-      bogenInSammlung(ziel, b, "scan", { signatur: alsEintragSignatur(signatur), herkunft: payload }, true);
+      // Abwarten: steckt in der Aufnahme eine Rückfrage (Einheit schon
+      // gemeldet), darf der Scan-Loop nicht schon den nächsten Code lesen.
+      await bogenInSammlung(ziel, b, "scan", { signatur: alsEintragSignatur(signatur), herkunft: payload }, true);
       return false; // Kiosk: weiter scannen, bis abgebrochen wird
     }
     setBogen(b);
@@ -607,12 +658,32 @@ export function App() {
     }
   }
 
-  function neuerEinsatz() {
-    const name = window.prompt("Neuen Einsatz/Übung anlegen — Name:", "");
-    if (name == null || !name.trim()) return;
-    const ort = window.prompt("Ort / Auftrag (optional):", "") ?? "";
-    const s = einsatzAnlegen(name, EinsatzArt.EINSATZ, ort);
+  /**
+   * Einsatz-Sammlung anlegen: Name, Art und Ort in einem Dialog. Rückgabe null =
+   * abgebrochen. Beide Wege dorthin (Startseite und Einsatz-Auswahl über einem
+   * offenen Bogen) fragen dasselbe — deshalb eine gemeinsame Stelle.
+   */
+  async function einsatzErfragen(): Promise<Einsatzsammlung | null> {
+    const werte = await frageFelder({
+      titel: "Neuen Einsatz anlegen",
+      hinweis:
+        "Eine Sammlung für fremde Bögen — mit Stärke-Summen über alle anwesenden Einheiten.",
+      ok: "Einsatz anlegen",
+      felder: [
+        { name: "name", label: "Name", platzhalter: "z. B. Hochwasser Weser" },
+        { name: "art", label: "Art", auswahl: ART_WAHL },
+        { name: "ort", label: "Ort / Auftrag (optional)", optional: true, platzhalter: "z. B. Deichabschnitt Nord" },
+      ],
+    });
+    if (!werte) return null;
+    const s = einsatzAnlegen(werte.name!, Number(werte.art) as EinsatzArt, werte.ort);
     einsaetzeNeuLaden();
+    return s;
+  }
+
+  async function neuerEinsatz() {
+    const s = await einsatzErfragen();
+    if (!s) return;
     setMeldung("");
     setZeigeStart(false);
     setOffenerEinsatzId(s.id);
@@ -625,7 +696,7 @@ export function App() {
    * Wie bei der Übernahme aus dem Sammelmodus ist der Bogen danach abgelegt —
    * der Arbeitsentwurf wird geschlossen und die Einsatzansicht übernimmt.
    */
-  function bogenInEinsatzLegen(zielId: string) {
+  async function bogenInEinsatzLegen(zielId: string) {
     if (!bogen) return;
     const b = bogen;
     const sig = bogenSignatur;
@@ -634,7 +705,7 @@ export function App() {
     setBogen(null);
     setzeEmpfang(null);
     setSchritt(0);
-    bogenInSammlung(
+    await bogenInSammlung(
       zielId,
       b,
       sig ? "scan" : "manuell",
@@ -643,13 +714,10 @@ export function App() {
   }
 
   /** Aus der Einsatz-Auswahl heraus einen neuen Einsatz anlegen und den Bogen hineinlegen. */
-  function neuerEinsatzFuerBogen() {
-    const name = window.prompt("Neuen Einsatz/Übung anlegen — Name:", "");
-    if (name == null || !name.trim()) return;
-    const ort = window.prompt("Ort / Auftrag (optional):", "") ?? "";
-    const s = einsatzAnlegen(name, EinsatzArt.EINSATZ, ort);
-    einsaetzeNeuLaden();
-    bogenInEinsatzLegen(s.id);
+  async function neuerEinsatzFuerBogen() {
+    const s = await einsatzErfragen();
+    if (!s) return;
+    await bogenInEinsatzLegen(s.id);
   }
 
   function scanneInEinsatz(zielId: string) {
@@ -1049,7 +1117,7 @@ export function App() {
                     setzeEmpfang(null);
                     setSchritt(0);
                     // Manuell erfasster Bogen ist kein signierter Transport.
-                    bogenInSammlung(ziel, bogen, "manuell");
+                    void bogenInSammlung(ziel, bogen, "manuell");
                   },
                 }
               : undefined

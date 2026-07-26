@@ -524,6 +524,20 @@
     .teilen-dialog .teilen-weg { margin: 0.9rem 0; }
     .teilen-dialog .teilen-weg button { width: 100%; }
     .teilen-dialog .teilen-weg .hinweis { margin: 0.25rem 0 0; }
+    /* Eigene Abfragen (Eingabe/Rückfrage/Hinweis) statt window.prompt & Co. —
+       siehe src/app/dialoge.tsx. Die Antwortknöpfe stehen als Zeile am Fuß, die
+       bejahende zuerst; auf dem Telefon wird daraus ein Stapel voller Breite. */
+    dialog.abfrage p { margin: 0 0 var(--r-3); }
+    dialog.abfrage label.feld { margin-top: var(--r-3); }
+    dialog.abfrage .kopiertext { width: 100%; font-family: var(--schrift-daten); font-size: var(--t-xs); }
+    .abfrage-aktionen { display: flex; flex-wrap: wrap; gap: var(--r-2); margin-top: var(--r-4); }
+    /* Benannte Wege (mehr als OK/Abbrechen): voller Knopf mit Erklärung darunter. */
+    .abfrage-weg { margin: 0.9rem 0; }
+    .abfrage-weg button { width: 100%; }
+    .abfrage-weg .hinweis { margin: 0.25rem 0 0; }
+    @media (max-width: 540px) {
+      .abfrage-aktionen { flex-direction: column; align-items: stretch; }
+    }
     /* Übersichts-Aktionen: auf schmalen Screens volle Breite statt zerfranstem
        rechtsbündigem Stapel (klare Hierarchie, große Tippziele). */
     @media (max-width: 540px) {

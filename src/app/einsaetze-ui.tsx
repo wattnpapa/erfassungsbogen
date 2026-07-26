@@ -50,6 +50,7 @@ import { aggregiere, aggregiereNachZug, type EinsatzSummen } from "./auswertung"
 import { SORTIERUNGEN, einheitenAnsicht, type EinheitenSortierung } from "./einheiten-liste";
 import { debugAktiv } from "./debug-plattform";
 import { SeitenKopf } from "./seiten-kopf";
+import { frageJaNein } from "./dialoge";
 
 export const ART_LABEL: Record<EinsatzArt, string> = {
   [EinsatzArt.EINSATZ]: "Einsatz",
@@ -108,12 +109,14 @@ export function EinsatzListe(props: {
     onGeaendert();
   }
 
-  function endgueltigLoeschen(s: Einsatzsammlung) {
-    if (
-      window.confirm(
-        `Einsatz „${s.name}" mit ${s.eintraege.length} Meldung(en) endgültig löschen? Enthält fremde Personendaten; das lässt sich nicht rückgängig machen.`,
-      )
-    ) {
+  async function endgueltigLoeschen(s: Einsatzsammlung) {
+    const sicher = await frageJaNein({
+      titel: "Einsatz endgültig löschen?",
+      text: `„${s.name}" mit ${s.eintraege.length} Meldung(en) wird aus dem Papierkorb entfernt. Darin stecken fremde Personendaten; rückgängig geht das nicht.`,
+      ok: "Endgültig löschen",
+      gefahr: true,
+    });
+    if (sicher) {
       einsatzEndgueltigLoeschen(s.id);
       onGeaendert();
     }
@@ -571,8 +574,14 @@ function EinheitKarte(props: {
     onGeaendert();
   }
 
-  function entfernen() {
-    if (window.confirm(`Meldung von „${einheitAnzeigename(kopf.bogen.einheit)}" (Stand ${standText(kopf.bogen)}) entfernen?`)) {
+  async function entfernen() {
+    const sicher = await frageJaNein({
+      titel: "Meldung entfernen?",
+      text: `„${einheitAnzeigename(kopf.bogen.einheit)}" (Stand ${standText(kopf.bogen)}) wird aus diesem Einsatz entfernt — samt Historie.`,
+      ok: "Meldung entfernen",
+      gefahr: true,
+    });
+    if (sicher) {
       meldungEntfernen(einsatzId, kopf.id);
       onGeaendert();
     }

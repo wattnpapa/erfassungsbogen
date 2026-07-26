@@ -43,6 +43,7 @@ import { absenderkarteLaden, type Absenderkarte } from "../absenderkarte";
 import { AbsenderkarteFeld } from "../absenderkarte-ui";
 import { geraeteKurzform, geraeteOeffentlichHex } from "../geraete-schluessel";
 import { istNativ, linkTeilen, textTeilen } from "../nativ";
+import { frageJaNein, frageText, zeigeHinweis } from "../dialoge";
 import {
   MWD_LEGENDE,
   STAERKE_LEGENDE,
@@ -80,11 +81,28 @@ export function Uebersicht(props: {
 }) {
   const { bogen, geheZu, neu } = props;
 
-  function alsVorlageSpeichern() {
-    const name = window.prompt("Als Vorlage speichern unter:", einheitAnzeigename(bogen.einheit));
+  async function alsVorlageSpeichern() {
+    const name = await frageText({
+      titel: "Als Vorlage speichern",
+      label: "Name der Vorlage",
+      vorgabe: einheitAnzeigename(bogen.einheit),
+      hinweis: "Die Vorlage bleibt auf diesem Gerät und lässt sich für den nächsten Einsatz mustern.",
+      ok: "Vorlage speichern",
+    });
     if (name == null) return;
     const v = vorlageAnlegen(name, bogen);
     props.onVorlageGespeichert?.(v.name);
+  }
+
+  /** Bogen schließen und mit einem leeren beginnen — der offene wäre danach weg. */
+  async function bogenVerwerfen() {
+    const sicher = await frageJaNein({
+      titel: "Aktuellen Bogen verwerfen?",
+      text: `„${einheitAnzeigename(bogen.einheit)}" wird geschlossen und der gespeicherte Entwurf gelöscht.`,
+      ok: "Verwerfen und neu beginnen",
+      gefahr: true,
+    });
+    if (sicher) neu();
   }
 
   const [qr, setQr] = useState<QrSatz | null>(null);
@@ -175,10 +193,15 @@ export function Uebersicht(props: {
       await textTeilen("eeb-signaturschluessel.txt", text);
     } else if (navigator.clipboard) {
       await navigator.clipboard.writeText(hex);
-      setFehler(""); // kein Fehler; Rückmeldung via Titel/alert unnötig
-      window.alert(`Öffentlicher Schlüssel in die Zwischenablage kopiert:\n\n${hex}`);
+      setFehler("");
+      await zeigeHinweis({
+        titel: "Öffentlicher Schlüssel kopiert",
+        text: "Der Schlüssel liegt in der Zwischenablage — die Gegenstelle kann damit prüfen, dass Bögen von diesem Gerät stammen.",
+        kopiertext: hex,
+      });
     } else {
-      window.prompt("Öffentlicher Schlüssel (kopieren):", hex);
+      // Ohne Zwischenablage bleibt das Markieren von Hand — der Text steht dafür da.
+      await zeigeHinweis({ titel: "Öffentlicher Schlüssel", text: "Zum Weitergeben markieren und kopieren:", kopiertext: hex });
     }
   }
 
@@ -196,7 +219,7 @@ export function Uebersicht(props: {
         setLinkKopiert(true);
         window.setTimeout(() => setLinkKopiert(false), 3000);
       } else {
-        window.prompt("Link kopieren:", url);
+        await zeigeHinweis({ titel: "Bogen-Link", text: "Zum Weitergeben markieren und kopieren:", kopiertext: url });
       }
     } catch (e) {
       // Abbruch im Share-Dialog ist kein Fehler
@@ -249,7 +272,7 @@ export function Uebersicht(props: {
               </>
             )}
             <button type="button" onClick={alsVorlageSpeichern}>Als Vorlage speichern</button>{" "}
-            <button type="button" onClick={() => window.confirm("Aktuellen Bogen verwerfen?") && neu()}>Neuer Bogen</button>
+            <button type="button" onClick={() => void bogenVerwerfen()}>Neuer Bogen</button>
           </span>
         </div>
         {fehler && <p className="fehler">{fehler}</p>}

@@ -9,6 +9,12 @@ import type { Page } from "playwright";
 export class EebWelt extends World {
   page!: Page;
   readonly basisUrl: string;
+  /**
+   * Eingebaute JavaScript-Dialoge (prompt/confirm/alert), die während des
+   * Szenarios aufgetaucht sind. Jeder Eintrag lässt das Szenario scheitern —
+   * siehe die Begründung am Wachhund in support/haken.ts.
+   */
+  readonly systemdialoge: string[] = [];
 
   constructor(optionen: IWorldOptions) {
     super(optionen);

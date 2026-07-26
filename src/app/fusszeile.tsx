@@ -11,6 +11,7 @@ import { einheitSymbolSvg, svgDataUrl } from "./taktische-zeichen";
 import { pdfErzeugen } from "./pdf";
 import { nutzungsKanal, statistikAbgewaehlt, statistikAbwaehlen } from "./statistik";
 import { AnzeigeSchalter } from "./anzeige-schalter";
+import { frageJaNein, zeigeHinweis } from "./dialoge";
 import { alleDatenLoeschen, datenUmfang, sicherungErstellen, sicherungEinspielen, type DatenUmfang } from "./sicherung";
 
 const KONTAKT = "johannes.rudolph@thw-oldenburg.de";
@@ -309,7 +310,7 @@ export function Fusszeile({ onBogenOeffnen, kompakt = false }: {
    * Rückgabe false = die Übernahme wurde abgelehnt (Rückfrage abgebrochen);
    * dann bleibt der Dialog stehen.
    */
-  onBogenOeffnen: (bogen: Erfassungsbogen) => boolean;
+  onBogenOeffnen: (bogen: Erfassungsbogen) => Promise<boolean>;
   /**
    * Schmale Linkzeile statt voller Fußzeile — für den Assistenten. Beim
    * Ausfüllen gehören Datensicherung, „Alle Daten löschen" und 227
@@ -422,7 +423,7 @@ export function Fusszeile({ onBogenOeffnen, kompakt = false }: {
     setBeispielLaeuft(datei);
     try {
       const bogen = await beispielKopie(url);
-      if (onBogenOeffnen(bogen)) beispiele.current?.close();
+      if (await onBogenOeffnen(bogen)) beispiele.current?.close();
     } catch (err) {
       setBeispielFehler(`Bogen konnte nicht geladen werden: ${err instanceof Error ? err.message : String(err)}`);
     } finally {
@@ -450,13 +451,20 @@ export function Fusszeile({ onBogenOeffnen, kompakt = false }: {
     const datei = e.target.files?.[0];
     e.target.value = "";
     if (!datei) return;
-    const sicher = window.confirm(
-      "Sicherung einspielen? ALLE App-Daten auf diesem Gerät (Vorlagen, Einsätze, Entwurf, Einstellungen, Geräteschlüssel) werden durch den Inhalt der Datei ersetzt.",
-    );
+    const sicher = await frageJaNein({
+      titel: "Sicherung einspielen?",
+      text: "Alle App-Daten auf diesem Gerät — Vorlagen, Einsätze, Entwurf, Einstellungen und der Geräteschlüssel — werden durch den Inhalt der Datei ersetzt.",
+      ok: "Einspielen und ersetzen",
+      gefahr: true,
+    });
     if (!sicher) return;
     try {
       const anzahl = sicherungEinspielen(await datei.text());
-      window.alert(`Sicherung eingespielt (${anzahl} Einträge). Die App lädt jetzt neu.`);
+      await zeigeHinweis({
+        titel: "Sicherung eingespielt",
+        text: `${anzahl} Einträge übernommen. Die App lädt jetzt neu.`,
+        ok: "Neu laden",
+      });
       window.location.reload();
     } catch (err) {
       setSicherungFehler(err instanceof Error ? err.message : String(err));
@@ -476,10 +484,14 @@ export function Fusszeile({ onBogenOeffnen, kompakt = false }: {
    * geladene Vorlagen) wüsste sonst nichts vom leeren Speicher und könnte ihn
    * beim nächsten Speichern wieder auffüllen.
    */
-  function alleDatenLoeschenJetzt() {
+  async function alleDatenLoeschenJetzt() {
     try {
       const anzahl = alleDatenLoeschen();
-      window.alert(`Alle lokalen Daten gelöscht (${anzahl} Einträge). Die App startet jetzt neu.`);
+      await zeigeHinweis({
+        titel: "Alle lokalen Daten gelöscht",
+        text: `${anzahl} Einträge entfernt. Die App startet jetzt neu.`,
+        ok: "Neu starten",
+      });
       window.location.reload();
     } catch (err) {
       setLoeschFehler(err instanceof Error ? err.message : String(err));

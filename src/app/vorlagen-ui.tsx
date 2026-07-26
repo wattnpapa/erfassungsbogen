@@ -27,6 +27,7 @@ import {
   type Vorlage,
 } from "./vorlagen";
 import { SeitenKopf } from "./seiten-kopf";
+import { frageJaNein, frageText } from "./dialoge";
 
 function personName(vorname: string, nachname: string): string {
   return `${vorname} ${nachname}`.trim() || "(ohne Name)";
@@ -52,8 +53,8 @@ export function VorlagenListe(props: {
   const [zeigePapierkorb, setZeigePapierkorb] = useState(false);
   const papierkorb = vorlagenPapierkorb();
 
-  function umbenennen(v: Vorlage) {
-    const name = window.prompt("Vorlage umbenennen:", v.name);
+  async function umbenennen(v: Vorlage) {
+    const name = await frageText({ titel: "Vorlage umbenennen", label: "Name", vorgabe: v.name, ok: "Umbenennen" });
     if (name != null) {
       vorlageUmbenennen(v.id, name);
       onGeaendert();
@@ -67,8 +68,14 @@ export function VorlagenListe(props: {
     onGeaendert();
   }
 
-  function endgueltigLoeschen(v: Vorlage) {
-    if (window.confirm(`Vorlage „${v.name}" endgültig löschen? Das lässt sich nicht rückgängig machen.`)) {
+  async function endgueltigLoeschen(v: Vorlage) {
+    const sicher = await frageJaNein({
+      titel: "Vorlage endgültig löschen?",
+      text: `„${v.name}" wird aus dem Papierkorb entfernt. Das lässt sich nicht rückgängig machen.`,
+      ok: "Endgültig löschen",
+      gefahr: true,
+    });
+    if (sicher) {
       vorlageEndgueltigLoeschen(v.id);
       onGeaendert();
     }

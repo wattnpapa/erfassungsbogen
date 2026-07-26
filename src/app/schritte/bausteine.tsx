@@ -8,6 +8,7 @@ import { useState, type ReactNode } from "react";
 import { Erfassungsbogen, VokabularWert } from "../../model";
 import type { VokabularEintrag } from "../../vokabulare/thw";
 import { type Pruefpunkt } from "../hilfen";
+import { frageText } from "../dialoge";
 
 export type SchrittProps = {
   bogen: Erfassungsbogen;
@@ -75,16 +76,23 @@ export function VokabListe(props: {
       ))}
       <select
         value=""
-        onChange={(e) => {
-          const v = e.target.value;
+        onChange={async (e) => {
+          // Das Feld gleich zurücksetzen: die Freitext-Abfrage läuft asynchron,
+          // solange dürfte sonst „Freitext…" als scheinbare Auswahl stehen.
+          const feld = e.currentTarget;
+          const v = feld.value;
+          feld.value = "";
           if (!v) return;
           if (v === "frei") {
-            const t = window.prompt(`${hinzufuegenText} (Freitext):`);
+            const t = await frageText({
+              titel: hinzufuegenText,
+              label: "Freitext",
+              ok: "Hinzufügen",
+            });
             if (t) aendern([...werte, { freitext: t }]);
-          } else {
-            aendern([...werte, { code: Number(v) }]);
+            return;
           }
-          e.target.value = "";
+          aendern([...werte, { code: Number(v) }]);
         }}
       >
         <option value="">{hinzufuegenText}…</option>

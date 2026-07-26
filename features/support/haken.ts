@@ -41,6 +41,16 @@ BeforeAll(async function () {
 Before(async function (this: EebWelt) {
   const kontext = await browser.newContext();
   this.page = await kontext.newPage();
+  // Wachhund gegen window.prompt/confirm/alert: In der iOS-App (WKWebView)
+  // beantwortet das System diese Dialoge nicht — `prompt` liefert dort sofort
+  // `null`, der Knopf tut also scheinbar nichts. Genau daran scheiterte „Neuen
+  // Einsatz anlegen" auf dem Telefon. Hier wird jeder Systemdialog vermerkt und
+  // lässt das Szenario scheitern (siehe After), statt still weggeklickt zu
+  // werden — Rückfragen gehören in die eigene Oberfläche (src/app/dialoge.ts).
+  this.page.on("dialog", async (dialog) => {
+    this.systemdialoge.push(`${dialog.type()}: ${dialog.message()}`);
+    await dialog.dismiss();
+  });
 });
 
 After(async function (this: EebWelt, { result }) {
@@ -48,7 +58,14 @@ After(async function (this: EebWelt, { result }) {
     const png = await this.page.screenshot();
     this.attach(png, "image/png");
   }
+  const dialoge = this.systemdialoge;
   await this.page?.context().close();
+  if (dialoge.length > 0) {
+    throw new Error(
+      `Die App hat ${dialoge.length} eingebaute JavaScript-Dialoge benutzt — die bleiben in der iOS-App ` +
+        `unbeantwortet. Stattdessen die eigenen Dialoge verwenden (src/app/dialoge.tsx):\n  ${dialoge.join("\n  ")}`,
+    );
+  }
 });
 
 AfterAll(async function () {

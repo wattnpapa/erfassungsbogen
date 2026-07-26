@@ -177,14 +177,108 @@ describe("Assistenten-Durchlauf", () => {
     expect(screen.getByRole("button", { name: "Neuen Bogen erstellen" })).toBeDefined();
   });
 
-  it("verwirft den Bogen auf Nachfrage und kehrt zur Startseite zurück", async () => {
+  it("verwirft den Bogen erst nach der Rückfrage und kehrt zur Startseite zurück", async () => {
     const nutzer = userEvent.setup();
-    vi.spyOn(window, "confirm").mockReturnValue(true);
     render(<App />);
     await neuerBogenBis(nutzer, 5);
 
     await nutzer.click(screen.getByRole("button", { name: "Neuer Bogen" }));
 
+    // Die Rückfrage ist ein eigener Dialog, kein window.confirm: in der iOS-App
+    // (WKWebView) bliebe ein Systemdialog unbeantwortet.
+    const rueckfrage = await screen.findByRole("dialog", { name: "Aktuellen Bogen verwerfen?" });
+    // Solange nicht bestätigt ist, bleibt der Bogen offen.
+    expect(screen.getByRole("heading", { name: "Gesamtübersicht" })).toBeDefined();
+
+    await nutzer.click(within(rueckfrage).getByRole("button", { name: "Verwerfen und neu beginnen" }));
+
+    expect(await screen.findByRole("button", { name: "Neuen Bogen erstellen" })).toBeDefined();
+  });
+
+  it("behält den Bogen, wenn die Verwerfen-Rückfrage abgebrochen wird", async () => {
+    const nutzer = userEvent.setup();
+    render(<App />);
+    await neuerBogenBis(nutzer, 5);
+
+    await nutzer.click(screen.getByRole("button", { name: "Neuer Bogen" }));
+    const rueckfrage = await screen.findByRole("dialog", { name: "Aktuellen Bogen verwerfen?" });
+    await nutzer.click(within(rueckfrage).getByRole("button", { name: "Abbrechen" }));
+
+    expect(screen.getByRole("heading", { name: "Gesamtübersicht" })).toBeDefined();
+  });
+});
+
+/**
+ * Einsatz-Sammlung anlegen — der Weg, der mit `window.prompt` auf dem iPhone
+ * gar nicht funktionierte: das System beantwortet die eingebauten
+ * JavaScript-Dialoge dort nicht, der Knopf tat also scheinbar nichts. Geprüft
+ * werden beide Einstiege (Startseite und offener Bogen) samt Abbruch.
+ */
+describe("Neuen Einsatz anlegen", () => {
+  afterEach(() => {
+    window.history.replaceState(null, "", window.location.pathname + window.location.search);
+    localStorage.clear();
+  });
+
+  /** Anlege-Dialog ausfüllen und abschicken. */
+  async function einsatzAnlegen(
+    nutzer: ReturnType<typeof userEvent.setup>,
+    name: string,
+    art?: string,
+    ort?: string,
+  ) {
+    const dialog = await screen.findByRole("dialog", { name: "Neuen Einsatz anlegen" });
+    const anlegen = within(dialog).getByRole("button", { name: "Einsatz anlegen" });
+    // Ohne Namen ist der Einsatz nicht anzulegen — die Pflichtangabe sperrt den Knopf.
+    expect(anlegen.hasAttribute("disabled")).toBe(true);
+
+    await nutzer.type(within(dialog).getByLabelText("Name"), name);
+    if (art) await nutzer.selectOptions(within(dialog).getByLabelText("Art"), art);
+    if (ort) await nutzer.type(within(dialog).getByLabelText("Ort / Auftrag (optional)"), ort);
+    await nutzer.click(anlegen);
+  }
+
+  it("legt von der Startseite aus einen Einsatz an und öffnet ihn", async () => {
+    const nutzer = userEvent.setup();
+    render(<App />);
+
+    await nutzer.click(screen.getByRole("button", { name: "Neuer Einsatz…" }));
+    await einsatzAnlegen(nutzer, "Hochwasser Weser", "Übung", "Deichabschnitt Nord");
+
+    // Die Einsatzansicht übernimmt — mit Name, gewählter Art und Ort im Kopf.
+    expect(await screen.findByRole("heading", { level: 1, name: "Hochwasser Weser" })).toBeDefined();
+    expect(screen.getByText("Übung · Deichabschnitt Nord")).toBeDefined();
+  });
+
+  it("legt nichts an, wenn der Dialog abgebrochen wird", async () => {
+    const nutzer = userEvent.setup();
+    render(<App />);
+
+    await nutzer.click(screen.getByRole("button", { name: "Neuer Einsatz…" }));
+    const dialog = await screen.findByRole("dialog", { name: "Neuen Einsatz anlegen" });
+    await nutzer.type(within(dialog).getByLabelText("Name"), "Verworfen");
+    await nutzer.click(within(dialog).getByRole("button", { name: "Abbrechen" }));
+
+    // Die Startseite bleibt stehen, die Einsatzliste leer.
     expect(screen.getByRole("button", { name: "Neuen Bogen erstellen" })).toBeDefined();
+    expect(screen.queryByRole("heading", { name: "Verworfen" })).toBeNull();
+  });
+
+  it("nimmt einen geöffneten Bogen in einen neu angelegten Einsatz auf", async () => {
+    const nutzer = userEvent.setup();
+    render(<App />);
+    // Wie nach einem Scan: der Bogen kommt über einen Link herein und liegt offen.
+    fragmentSetzen(encodePayloadUrl(bogenMitName("Scanhausen"), browserKompressor));
+    await screen.findByRole("heading", { name: "Gesamtübersicht" });
+
+    await nutzer.click(screen.getByRole("button", { name: "In Einsatz aufnehmen…" }));
+    // Der Anlege-Dialog erscheint über der schon offenen Einsatz-Auswahl.
+    await nutzer.click(screen.getByRole("button", { name: "Neuen Einsatz anlegen…" }));
+    await einsatzAnlegen(nutzer, "Sammelhausen");
+
+    // Der Bogen ist als Meldung abgelegt: Einsatzansicht mit einer Einheit.
+    expect(await screen.findByRole("heading", { level: 1, name: "Sammelhausen" })).toBeDefined();
+    const liste = screen.getByRole("heading", { name: "Einheiten (1)" }).closest("section")!;
+    expect(within(liste).getByText("THW Scanhausen")).toBeDefined();
   });
 });
