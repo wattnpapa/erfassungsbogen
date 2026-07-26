@@ -642,13 +642,13 @@ function App() {
   }
 
   async function sammelPdf(s: Einsatzsammlung) {
-    const boegen = aktuelleMeldungen(s.eintraege).map((e) => e.bogen);
-    if (boegen.length === 0) {
+    const meldungen = aktuelleMeldungen(s.eintraege);
+    if (meldungen.length === 0) {
       setFehler("Keine anwesenden Einheiten für die Sammel-PDF.");
       return;
     }
     try {
-      await einsatzPdfErzeugen(s, boegen);
+      await einsatzPdfErzeugen(s, meldungen);
     } catch (e) {
       setFehler(`Sammel-PDF: ${e instanceof Error ? e.message : e}`);
     }

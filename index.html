@@ -648,6 +648,24 @@
     .bogen-details { margin-top: 0.6rem; border-top: 1px solid var(--rand); padding-top: 0.4rem; }
     .bogen-details h4 { margin: 0.8rem 0 0.2rem; font-size: 0.9rem; color: var(--blau); }
     .bogen-details h4:first-child { margin-top: 0; }
+    /* Änderungen gegenüber der vorherigen Meldung („Folgemeldung"): Bewegung
+       statt Bestand — durchgestrichener Altwert, hervorgehobener Neuwert,
+       Zu-/Abgänge in den Signalfarben (die der Nacht-Modus mitzieht). */
+    .diff-block { margin-top: 0.6rem; border-top: 1px solid var(--rand); padding-top: 0.4rem; }
+    .diff-block h4 { margin: 0.7rem 0 0.15rem; font-size: 0.9rem; color: var(--blau); }
+    .diff-block > .hinweis { margin: 0 0 0.2rem; }
+    ul.diff-liste { margin: 0.1rem 0; padding-left: 1.1rem; font-size: 0.92rem; }
+    ul.diff-liste li { overflow-wrap: anywhere; }
+    .diff-feld { color: var(--text-2); }
+    .diff-vorher { text-decoration: line-through; color: var(--text-2); }
+    .diff-nachher { font-weight: 600; font-variant-numeric: tabular-nums; }
+    ul.diff-liste.zugang { list-style: none; padding-left: 0.2rem; color: var(--gut); }
+    ul.diff-liste.abgang { list-style: none; padding-left: 0.2rem; color: var(--alarm); }
+    .diff-zeichen { font-weight: 700; font-family: var(--schrift-daten); }
+    /* Kurzfassung in der Einheitenzeile: dieselbe Nebenzeile, aber lesbar statt
+       abgeblendet — sie ist der eigentliche Übergabehinweis. */
+    .muster-sub.diff-kurz { opacity: 1; color: var(--akzent); font-weight: 600; }
+    .historie .diff-block { margin-bottom: 0.6rem; }
     /* minmax(0, …) statt blanker Spuren: sonst zwingt ein langes, nicht
        trennbares Wort (E-Mail-Adresse, Funkrufname) die Spalte breiter als die
        Karte und die ganze Ansicht läuft auf dem Telefon nach rechts aus. */

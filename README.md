@@ -35,6 +35,10 @@ Kurze Einführung und die häufigsten Fragen:
   zählt Stärke und Bedarf über alle anwesenden Einheiten laufend zusammen (mit
   Zwischensummen je Zug), merkt sich tägliche Neumeldungen als Historie und gibt
   alles als Sammel-PDF oder Datei an die nächste Führungsstelle weiter.
+- **Für die Schichtübergabe**: meldet eine Einheit neu, zeigt die App, was sich
+  gegenüber ihrer letzten Meldung geändert hat — Stärke 12 → 9, Fahrzeug
+  abgemeldet, Ruhezeit jetzt nötig. Die Sammel-PDF beginnt mit derselben
+  Übersicht, eine Zeile je Einheit.
 - **Alles bleibt auf dem Gerät**: keine Anmeldung, kein Server, keine Cloud —
   siehe [Datenschutzerklärung](https://erfassungsbogen.app/datenschutz.html).
 

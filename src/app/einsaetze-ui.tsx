@@ -10,7 +10,6 @@
 
 import { useState } from "react";
 import {
-  KontaktArt,
   PersonalErfassung,
   datumZuIso,
   staerke,
@@ -18,7 +17,6 @@ import {
   verpflegung,
   zeitpunktZuIso,
   type Erfassungsbogen,
-  type Kontakt,
 } from "../model";
 import {
   datumDeutsch,
@@ -27,10 +25,12 @@ import {
   funkrufText,
   funktionsText,
   kennzeichenText,
+  kontaktText,
   orgLabel,
   vokabText,
   vokabularFuer,
 } from "./hilfen";
+import { bogenDiff, diffKurzfassung, type WertAenderung } from "./meldung-diff";
 import {
   EinsatzArt,
   MeldeStatus,
@@ -344,13 +344,6 @@ export function EinsatzDetail(props: {
   );
 }
 
-/** Erreichbarkeit einer Person wie im Bogenkopf/PDF ("Mobil: … (D)"). */
-function kontaktText(k: Kontakt): string {
-  if (k.emailTemplate === 1) return "eMail: Standard (D)";
-  const art = k.art === KontaktArt.EMAIL ? "eMail" : k.art === KontaktArt.MOBIL ? "Mobil" : "Tel";
-  return `${art}: ${k.wert ?? ""} (${k.dienstlich ? "D" : "P"})`;
-}
-
 /**
  * Read-only Vollansicht eines gemeldeten Bogens (Zugehörigkeit, Einsatz,
  * Personal, Fahrzeuge, Sofortbedarf) — spiegelt die Erfassungs-Übersicht bzw.
@@ -460,6 +453,94 @@ function BogenDetails({ bogen }: { bogen: Erfassungsbogen }) {
   );
 }
 
+// ------------------------------------------------------- Änderungen (Diff)
+
+/** Geänderte Felder als „vorher → nachher"; rendert nichts, wenn leer. */
+function DiffWerte({ titel, eintraege }: { titel: string; eintraege: WertAenderung[] }) {
+  if (eintraege.length === 0) return null;
+  return (
+    <>
+      <h4>{titel}</h4>
+      <ul className="diff-liste">
+        {eintraege.map((a) => (
+          <li key={a.feld}>
+            <span className="diff-feld">{a.feld}:</span> <span className="diff-vorher">{a.vorher}</span>
+            {" → "}
+            <span className="diff-nachher">{a.nachher}</span>
+          </li>
+        ))}
+      </ul>
+    </>
+  );
+}
+
+/** Zu- bzw. abgegangene Positionen (Personen, Fahrzeuge). */
+function DiffPosten({ titel, art, zeilen }: { titel: string; art: "zugang" | "abgang"; zeilen: string[] }) {
+  if (zeilen.length === 0) return null;
+  return (
+    <>
+      <h4>{titel}</h4>
+      <ul className={`diff-liste ${art}`}>
+        {zeilen.map((z, i) => (
+          <li key={`${z}-${i}`}>
+            <span className="diff-zeichen">{art === "zugang" ? "+" : "−"}</span> {z}
+          </li>
+        ))}
+      </ul>
+    </>
+  );
+}
+
+/**
+ * „Was hat sich seit der letzten Meldung geändert?" — Kern der Schichtübergabe.
+ * Zeigt ausschließlich Bewegung; unveränderte Felder bleiben weg (dafür gibt es
+ * die Vollansicht „Details").
+ */
+function Aenderungen({ vorher, nachher }: { vorher: Erfassungsbogen; nachher: Erfassungsbogen }) {
+  const d = bogenDiff(vorher, nachher);
+  if (d.anzahl === 0) {
+    return (
+      <p className="hinweis diff-block">
+        Inhaltlich unverändert gegenüber der Meldung vom {standText(vorher)} (nur der Meldestand ist neuer).
+      </p>
+    );
+  }
+  return (
+    <div className="diff-block">
+      <p className="hinweis">Gegenüber der Meldung vom {standText(vorher)}:</p>
+      <DiffWerte titel="Stärke" eintraege={d.staerke} />
+      <DiffPosten titel="Personal neu gemeldet" art="zugang" zeilen={d.personalZugang} />
+      <DiffPosten titel="Personal nicht mehr gemeldet" art="abgang" zeilen={d.personalAbgang} />
+      <DiffWerte titel="Personal geändert" eintraege={d.personalGeaendert} />
+      <DiffPosten titel="Fahrzeuge neu gemeldet" art="zugang" zeilen={d.fahrzeugeZugang} />
+      <DiffPosten titel="Fahrzeuge abgemeldet" art="abgang" zeilen={d.fahrzeugeAbgang} />
+      <DiffWerte titel="Fahrzeuge geändert" eintraege={d.fahrzeugeGeaendert} />
+      <DiffWerte titel="Sofortbedarf" eintraege={d.bedarf} />
+      <DiffWerte titel="Auftrag / Sonstiges" eintraege={d.sonstiges} />
+    </div>
+  );
+}
+
+/** Eine Revisionszeile in der Historie, mit Diff zur direkt älteren Fassung. */
+function HistorieZeile({ eintrag, vorheriger, aktuell }: { eintrag: MeldeEintrag; vorheriger?: MeldeEintrag; aktuell: boolean }) {
+  const [offen, setOffen] = useState(false);
+  return (
+    <li>
+      Stand {standText(eintrag.bogen)} · Stärke {staerkeText(eintrag.bogen)} · {QUELLE_LABEL[eintrag.quelle]}
+      {aktuell ? " (aktuell)" : ""}
+      {vorheriger && (
+        <>
+          {" "}
+          <button type="button" className="link" onClick={() => setOffen(!offen)}>
+            {offen ? "Änderungen ausblenden" : "Änderungen"}
+          </button>
+        </>
+      )}
+      {offen && vorheriger && <Aenderungen vorher={vorheriger.bogen} nachher={eintrag.bogen} />}
+    </li>
+  );
+}
+
 function EinheitKarte(props: {
   einsatzId: string;
   kopf: MeldeEintrag;
@@ -469,9 +550,14 @@ function EinheitKarte(props: {
   const { einsatzId, kopf, alle, onGeaendert } = props;
   const [details, setDetails] = useState(false);
   const [historie, setHistorie] = useState(false);
+  const [aenderungen, setAenderungen] = useState(false);
   // null = nicht in Bearbeitung; String = Entwurf des Zug-Etiketts.
   const [zugEntwurf, setZugEntwurf] = useState<string | null>(null);
   const revs = revisionen(alle, kopf.einheitSchluessel);
+  // Folgemeldung: die direkt ältere Fassung derselben Einheit ist der Bezug für
+  // „was hat sich seit der letzten Meldung geändert?".
+  const vorige = revs[1];
+  const kurz = vorige ? diffKurzfassung(bogenDiff(vorige.bogen, kopf.bogen)) : "";
   const abgerueckt = kopf.status === MeldeStatus.ABGERUECKT;
 
   function statusUmschalten() {
@@ -505,12 +591,26 @@ function EinheitKarte(props: {
             {abgerueckt ? " · abgerückt" : ""}
             {kopf.signatur ? <> · {signaturBadge(kopf)}</> : null}
           </span>
+          {/* Folgemeldung: die Veränderung gehört in die Zeile, nicht erst hinter
+              einen Klick — sie ist die Information der Schichtübergabe. */}
+          {kurz && vorige && (
+            <span className="muster-sub diff-kurz">
+              seit {standText(vorige.bogen)}: {kurz}
+            </span>
+          )}
         </span>
       </div>
       <div className="vorlage-aktionen">
         <button type="button" onClick={() => setDetails(!details)}>
           {details ? "Details schließen" : "Details"}
         </button>{" "}
+        {vorige && (
+          <>
+            <button type="button" onClick={() => setAenderungen(!aenderungen)}>
+              {aenderungen ? "Änderungen schließen" : "Änderungen"}
+            </button>{" "}
+          </>
+        )}
         <button type="button" onClick={statusUmschalten}>{abgerueckt ? "Als anwesend" : "Abrücken"}</button>{" "}
         <button type="button" onClick={() => setZugEntwurf(kopf.zugEtikett ?? "")}>
           {kopf.zugEtikett ? "Zug ändern" : "Zug zuordnen"}
@@ -522,6 +622,7 @@ function EinheitKarte(props: {
         )}{" "}
         <button type="button" className="entfernen" onClick={entfernen}>Entfernen</button>
       </div>
+      {aenderungen && vorige && <Aenderungen vorher={vorige.bogen} nachher={kopf.bogen} />}
       {details && <BogenDetails bogen={kopf.bogen} />}
       {zugEntwurf !== null && (
         <div className="zug-bearbeiten">
@@ -543,10 +644,7 @@ function EinheitKarte(props: {
       {historie && revs.length > 1 && (
         <ul className="historie">
           {revs.map((r, i) => (
-            <li key={r.id}>
-              Stand {standText(r.bogen)} · Stärke {staerkeText(r.bogen)} · {QUELLE_LABEL[r.quelle]}
-              {i === 0 ? " (aktuell)" : ""}
-            </li>
+            <HistorieZeile key={r.id} eintrag={r} vorheriger={revs[i + 1]} aktuell={i === 0} />
           ))}
         </ul>
       )}

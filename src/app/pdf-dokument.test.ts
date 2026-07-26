@@ -22,7 +22,7 @@ import {
   type Erfassungsbogen,
 } from "../model";
 import type { QrSatz } from "./hilfen";
-import { EEB_JSON_DATEINAME, bogenAlsEingebetteteDatei, pdfDokument } from "./pdf-dokument";
+import { EEB_JSON_DATEINAME, bogenAlsEingebetteteDatei, einsatzPdfDokument, pdfDokument } from "./pdf-dokument";
 
 const QR_BILD = "data:image/png;base64,QRTESTBILD";
 const QR_URL = "https://erfassungsbogen.app/#TESTPAYLOAD";
@@ -245,5 +245,54 @@ describe("pdfDokument()", () => {
     const t = texte(footer(2, 5)).join("\n");
     expect(t).toContain("Stand: 14.05.2026");
     expect(t).toContain("2 / 5");
+  });
+});
+
+describe("einsatzPdfDokument()", () => {
+  /** Zweite Meldung derselben Einheit: 1 Person und 1 Fahrzeug weniger, Ruhezeit nötig. */
+  function folgeBogen(): Erfassungsbogen {
+    const b = basisBogen();
+    b.stand = datumAusIso("2026-05-15");
+    b.personal = [b.personal[0]!];
+    b.fahrzeuge = [];
+    b.sofortbedarf = { ...b.sofortbedarf!, ruhezeitErforderlich: true };
+    return b;
+  }
+
+  it("stellt der Sammlung eine Übersicht mit Änderungsspalte voran", () => {
+    const dd = einsatzPdfDokument("Hochwasser", [
+      { bogen: folgeBogen(), qr: QR, vorher: basisBogen() },
+    ]);
+    const t = texte(dd.content).join("\n");
+    expect(t).toContain("Übergabe-Übersicht: Hochwasser");
+    expect(t).toContain("Veränderung seit der letzten Meldung");
+    expect(t).toContain("gegenüber 14.05.2026:");
+    expect(t).toContain("Gesamtstärke: 2 → 1");
+    expect(t).toContain("Fahrzeug abgemeldet: MzKW (THW-84397)");
+    expect(t).toContain("Ruhezeit erforderlich: nein → ja");
+    // Die Übersicht steht vor dem ersten Bogen.
+    expect(t.indexOf("Übergabe-Übersicht")).toBeLessThan(t.indexOf("Erfassungsbogen FGr K (A)"));
+  });
+
+  it("weist Erstmeldungen und unveränderte Folgemeldungen aus", () => {
+    const t = texte(
+      einsatzPdfDokument("Lage", [
+        { bogen: basisBogen(), qr: QR },
+        { bogen: basisBogen(), qr: QR, vorher: basisBogen() },
+      ]).content,
+    ).join("\n");
+    expect(t).toContain("Erstmeldung");
+    expect(t).toContain("unverändert gegenüber 14.05.2026");
+  });
+
+  it("summiert Stärke und Fahrzeuge über alle Bögen", () => {
+    const t = texte(
+      einsatzPdfDokument("Lage", [
+        { bogen: basisBogen(), qr: QR },
+        { bogen: basisBogen(), qr: QR },
+      ]).content,
+    ).join("\n");
+    expect(t).toContain("Summe (2 Einheiten)");
+    expect(t).toContain("2 / 0 / 2 / 4");
   });
 });

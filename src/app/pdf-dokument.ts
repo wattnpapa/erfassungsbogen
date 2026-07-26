@@ -27,6 +27,7 @@ import {
 } from "../model";
 import {
   datumDeutsch,
+  einheitAnzeigename,
   einheitOrt,
   funkrufText,
   funktionsText,
@@ -36,6 +37,7 @@ import {
   vokabularFuer,
   type QrSatz,
 } from "./hilfen";
+import { bogenDiff, diffZeilen } from "./meldung-diff";
 import { fahrzeugSymbolSvg } from "./taktische-zeichen";
 import { orgFarbe } from "./org-farben";
 
@@ -148,21 +150,100 @@ export function boegenAlsEingebetteteDatei(boegen: Erfassungsbogen[]): Eingebett
   };
 }
 
+/** Ein Bogen der Sammel-PDF samt QR und (für die Änderungsspalte) seiner Vorfassung. */
+export interface SammelBogen {
+  bogen: Erfassungsbogen;
+  qr: QrSatz;
+  /** Vorherige Meldung derselben Einheit; fehlt bei einer Erstmeldung. */
+  vorher?: Erfassungsbogen;
+}
+
+/** Mehr Zeilen passen nicht sinnvoll in eine Tabellenzelle — der Rest wird gezählt. */
+const UEBERSICHT_MAX_ZEILEN = 8;
+
 /**
- * Sammel-PDF eines Einsatzes: alle Bögen hintereinander (je Bogen die
+ * Übergabe-Übersicht: eine Zeile je Einheit mit Stärke, Fahrzeugen und der
+ * Spalte „Veränderung seit der letzten Meldung" — der Teil, den die ablösende
+ * Schicht zuerst liest. Die Detailbögen dahinter bleiben unverändert im Layout
+ * des Papiervordrucks.
+ */
+function uebersichtsTabelle(boegen: SammelBogen[]): Content {
+  const kopf = (text: string): TableCell => ({ text, bold: true, fillColor: GRAU });
+  const body: TableCell[][] = [
+    [
+      kopf("Einheit"),
+      kopf("Stand"),
+      kopf("Stärke\nF / U / M / G"),
+      kopf("Fzg"),
+      kopf("Veränderung seit der letzten Meldung"),
+    ],
+  ];
+  const summe = { fuehrer: 0, unterfuehrer: 0, mannschaft: 0, gesamt: 0, fahrzeuge: 0 };
+  for (const { bogen: b, vorher } of boegen) {
+    const s = staerke(b);
+    summe.fuehrer += s.fuehrer;
+    summe.unterfuehrer += s.unterfuehrer;
+    summe.mannschaft += s.mannschaft;
+    summe.gesamt += s.gesamt;
+    summe.fahrzeuge += b.fahrzeuge.length;
+
+    let aenderung: Content;
+    if (!vorher) {
+      aenderung = { text: "Erstmeldung", italics: true };
+    } else {
+      const d = bogenDiff(vorher, b);
+      aenderung =
+        d.anzahl === 0
+          ? { text: `unverändert gegenüber ${datumDeutsch(datumZuIso(vorher.stand))}`, italics: true }
+          : {
+              stack: [
+                { text: `gegenüber ${datumDeutsch(datumZuIso(vorher.stand))}:`, bold: true },
+                ...diffZeilen(d, UEBERSICHT_MAX_ZEILEN).map((z) => ({ text: z })),
+              ],
+            };
+    }
+    body.push([
+      { text: einheitAnzeigename(b.einheit) },
+      { text: datumDeutsch(datumZuIso(b.stand)) },
+      { text: `${s.fuehrer} / ${s.unterfuehrer} / ${s.mannschaft} / ${s.gesamt}` },
+      { text: `${b.fahrzeuge.length}` },
+      aenderung,
+    ]);
+  }
+  body.push([
+    { text: `Summe (${boegen.length} Einheiten)`, bold: true },
+    { text: "" },
+    { text: `${summe.fuehrer} / ${summe.unterfuehrer} / ${summe.mannschaft} / ${summe.gesamt}`, bold: true },
+    { text: `${summe.fahrzeuge}`, bold: true },
+    { text: "" },
+  ]);
+  return { table: { headerRows: 1, widths: [118, 40, 52, 16, "*"], body }, margin: [0, 0, 0, 4] };
+}
+
+/**
+ * Sammel-PDF eines Einsatzes: vorneweg die Übergabe-Übersicht (Stärke,
+ * Fahrzeuge, Änderungen je Einheit), dahinter alle Bögen (je Bogen die
  * vollständigen Seiten inkl. QR-Code), plus ALLE Bögen als eingebettetes
  * JSON-Array — so ist der ganze Einsatz maschinen- und menschenlesbar in einer
  * Datei übergebbar. Baut die Seiten aus {@link pdfDokument} zusammen.
  */
 export function einsatzPdfDokument(
   name: string,
-  boegenMitQr: { bogen: Erfassungsbogen; qr: QrSatz }[],
+  boegenMitQr: SammelBogen[],
   /** Optional: kompletter Einsatz-Umschlag (einsatzDateiInhalt) für die Schichtübergabe. */
   sammlungJson?: string,
 ): TDocumentDefinitions {
-  const content: Content[] = [];
-  boegenMitQr.forEach(({ bogen, qr }, i) => {
-    if (i > 0) content.push({ text: "", pageBreak: "before" });
+  const content: Content[] = [
+    { text: `Übergabe-Übersicht: ${name}`, bold: true, fontSize: 12, margin: [0, 0, 0, 8] },
+    uebersichtsTabelle(boegenMitQr),
+    {
+      text: "Die Änderungsspalte vergleicht jede Meldung mit der vorherigen Meldung derselben Einheit. Die vollständigen Bögen folgen.",
+      italics: true,
+      margin: [0, 4, 0, 0],
+    },
+  ];
+  boegenMitQr.forEach(({ bogen, qr }) => {
+    content.push({ text: "", pageBreak: "before" });
     content.push(...(pdfDokument(bogen, qr).content as Content[]));
   });
   return {

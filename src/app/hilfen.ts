@@ -12,6 +12,7 @@ import {
   HierarchieEbene,
   Fahrerlaubnis,
   Fahrzeug,
+  Kontakt,
   KontaktArt,
   OrganisationsTyp,
   Person,
@@ -129,6 +130,13 @@ export function funktionsText(p: Person, org: OrganisationsTyp): string {
 
 export function kennzeichenText(f: Fahrzeug): string {
   return f.kennzeichen ?? "";
+}
+
+/** Erreichbarkeit einer Person wie im Bogenkopf/PDF ("Mobil: … (D)"). */
+export function kontaktText(k: Kontakt): string {
+  if (k.emailTemplate === 1) return "eMail: Standard (D)";
+  const art = k.art === KontaktArt.EMAIL ? "eMail" : k.art === KontaktArt.MOBIL ? "Mobil" : "Tel";
+  return `${art}: ${k.wert ?? ""} (${k.dienstlich ? "D" : "P"})`;
 }
 
 export function funkrufText(f: Fahrzeug, standort: string): string {

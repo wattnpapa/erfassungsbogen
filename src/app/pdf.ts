@@ -15,9 +15,9 @@ import helvetica from "pdfmake/build/standard-fonts/Helvetica";
 import type { Erfassungsbogen } from "../model";
 import { einheitAnzeigename, qrErzeugen } from "./hilfen";
 import { istNativ, pdfTeilen } from "./nativ";
-import { einsatzPdfDokument, pdfDokument } from "./pdf-dokument";
+import { einsatzPdfDokument, pdfDokument, type SammelBogen } from "./pdf-dokument";
 import { einsatzDateiInhalt } from "./einsatz-transport";
-import type { Einsatzsammlung } from "./einsaetze";
+import { revisionen, type Einsatzsammlung, type MeldeEintrag } from "./einsaetze";
 
 interface FontContainer {
   vfs: Record<string, string | { data: string; encoding?: string }>;
@@ -77,14 +77,24 @@ export async function pdfDatenUrl(b: Erfassungsbogen): Promise<string> {
 }
 
 /**
- * Sammel-PDF eines Einsatzes: alle übergebenen Bögen in einer PDF (je Bogen
- * die vollständigen Seiten inkl. QR), plus alle Bögen als eingebettetes JSON
- * UND die komplette Einsatz-Sammlung (Züge, Status, Historie) — die PDF ist
- * damit die vollständige Schichtübergabe in einer Datei.
+ * Sammel-PDF eines Einsatzes: Übergabe-Übersicht mit Änderungsspalte, dahinter
+ * die übergebenen Meldungen als vollständige Bögen (inkl. QR), plus alle Bögen
+ * als eingebettetes JSON UND die komplette Einsatz-Sammlung (Züge, Status,
+ * Historie) — die PDF ist damit die vollständige Schichtübergabe in einer Datei.
+ *
+ * Erwartet die Meldungen (nicht nur die Bögen), weil die Änderungsspalte je
+ * Einheit die vorherige Revision aus der Sammlung braucht.
  */
-export async function einsatzPdfErzeugen(einsatz: Einsatzsammlung, boegen: Erfassungsbogen[]): Promise<void> {
-  const boegenMitQr: { bogen: Erfassungsbogen; qr: Awaited<ReturnType<typeof qrErzeugen>> }[] = [];
-  for (const b of boegen) boegenMitQr.push({ bogen: b, qr: await qrErzeugen(b) });
+export async function einsatzPdfErzeugen(einsatz: Einsatzsammlung, meldungen: MeldeEintrag[]): Promise<void> {
+  const boegenMitQr: SammelBogen[] = [];
+  for (const m of meldungen) {
+    // revisionen() liefert neueste zuerst — die Vorfassung steht direkt hinter
+    // dieser Meldung. Fehlt sie, ist es eine Erstmeldung.
+    const revs = revisionen(einsatz.eintraege, m.einheitSchluessel);
+    const idx = revs.findIndex((r) => r.id === m.id);
+    const vorher = idx >= 0 ? revs[idx + 1]?.bogen : undefined;
+    boegenMitQr.push({ bogen: m.bogen, qr: await qrErzeugen(m.bogen), vorher });
+  }
   const dd = einsatzPdfDokument(einsatz.name, boegenMitQr, einsatzDateiInhalt(einsatz));
   const dateiname = `eeb-einsatz-${(einsatz.name || "sammlung").replace(/[^\wäöüÄÖÜß-]+/g, "_")}.pdf`;
   if (istNativ()) {
