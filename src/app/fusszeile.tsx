@@ -182,20 +182,142 @@ function Dialog({ titel, dialogRef, klasse, onSchliessen, children }: {
     <dialog ref={dialogRef} aria-label={titel} className={klasse} onClose={onSchliessen}>
       <div className="kopfzeile">
         <h2>{titel}</h2>
-        <button onClick={() => dialogRef.current?.close()}>Schließen</button>
+        <button type="button" onClick={() => dialogRef.current?.close()}>Schließen</button>
       </div>
       {children}
     </dialog>
   );
 }
 
-export function Fusszeile({ onBogenOeffnen }: {
+/**
+ * Impressum und Datenschutz stehen als eigene Bausteine, weil sie die einzigen
+ * Teile der Fußzeile sind, die auf jeder Seite erreichbar bleiben müssen — auch
+ * in der schmalen Assistenten-Zeile, die den Rest weglässt.
+ */
+function Impressumsdialog({ dialogRef }: { dialogRef: RefObject<HTMLDialogElement | null> }) {
+  return (
+    <Dialog titel="Impressum" dialogRef={dialogRef}>
+      <p><strong>Angaben gemäß § 5 DDG</strong></p>
+      <p>
+        Johannes Rudolph<br />
+        Kniphauser Straße 16<br />
+        26419 Schortens<br />
+        Deutschland
+      </p>
+      <p><strong>Kontakt</strong></p>
+      <p>E-Mail: <a href={`mailto:${KONTAKT}`}>{KONTAKT}</a></p>
+      <p><strong>Verantwortlich für den Inhalt nach § 18 Abs. 2 MStV</strong></p>
+      <p>Johannes Rudolph</p>
+    </Dialog>
+  );
+}
+
+function Datenschutzdialog({ dialogRef }: { dialogRef: RefObject<HTMLDialogElement | null> }) {
+  const [statistikAus, setStatistikAus] = useState(() => statistikAbgewaehlt());
+
+  function statistikUmschalten(ereignis: ChangeEvent<HTMLInputElement>) {
+    const aus = ereignis.target.checked;
+    setStatistikAus(aus);
+    statistikAbwaehlen(aus);
+  }
+
+  return (
+    <Dialog titel="Datenschutz" dialogRef={dialogRef}>
+      <h3>1. Verantwortlicher</h3>
+      <p>
+        Johannes Rudolph<br />
+        E-Mail: <a href={`mailto:${KONTAKT}`}>{KONTAKT}</a>
+      </p>
+      <h3>2. Verarbeitung beim Aufruf der Website</h3>
+      <p>
+        Die Website wird über GitHub Pages (GitHub Inc.) ausgeliefert. Dabei verarbeitet
+        GitHub technisch notwendige Verbindungsdaten (z.&nbsp;B. IP-Adresse) in
+        Server-Logs zur Bereitstellung und Absicherung des Dienstes. Details:{" "}
+        <a href="https://docs.github.com/site-policy/privacy-policies/github-privacy-statement"
+          target="_blank" rel="noopener noreferrer">GitHub Privacy Statement</a>.
+      </p>
+      <h3>3. Erfasste Bogendaten</h3>
+      <p>
+        Alle im Erfassungsbogen eingegebenen Daten (Einheit, Personal, Fahrzeuge usw.)
+        werden ausschließlich lokal auf dem eigenen Gerät verarbeitet. Es findet keine
+        Übertragung an einen Server statt. Eine Weitergabe erfolgt nur, wenn Nutzende
+        selbst eine Datei, ein PDF oder einen QR-Code erzeugen und teilen.
+      </p>
+      <p>
+        Freiwillig können unter „Absender“ Name, E-Mail-Adresse und Telefonnummer
+        hinterlegt werden. Diese Angaben bleiben auf dem Gerät gespeichert und werden
+        in jedem selbst erzeugten QR-Code, Link und PDF mitgegeben, damit die
+        Gegenstelle bei Rückfragen weiß, an wen sie sich wenden kann. Die Angabe ist
+        nicht erforderlich und jederzeit änder- und löschbar.
+      </p>
+      <h3>4. Speicherung im Endgerät und Reichweitenmessung</h3>
+      <p>
+        Es werden keine Cookies gesetzt. Die App speichert ihre Daten aber im
+        lokalen Speicher (localStorage) des Geräts, weil sie ohne Server
+        arbeitet und die Arbeit sonst bei jedem Neustart verloren wäre:
+        eigene Vorlagen, Einsatz-Sammlungen, der aktuelle Bogen-Entwurf, die
+        Absenderkarte, der private Signatur-Geräteschlüssel und die
+        Anzeige-Einstellungen (Feld-/Nachtmodus). Ein Widerspruch gegen die
+        Reichweitenmessung wird ebenfalls dort vermerkt.
+      </p>
+      <p>
+        Diese Einträge sind für den ausdrücklich gewünschten Dienst technisch
+        erforderlich (§ 25 Abs. 2 Nr. 2 TDDDG); eine Einwilligung ist dafür
+        nicht nötig. Sie verlassen das Gerät nicht: es gibt keine Übertragung
+        an einen Server, keinen Zugriff durch Dritte und keine Kennung zur
+        Wiedererkennung. Gelöscht werden sie über „Alle Daten löschen“ in der
+        Fußzeile oder durch Löschen der Websitedaten im Browser.
+      </p>
+      <p>
+        Zur Reichweitenmessung wird{" "}
+        <a href="https://www.goatcounter.com/" target="_blank" rel="noopener noreferrer">
+          GoatCounter
+        </a>{" "}
+        eingesetzt: beim Start wird einmalig ein Zählimpuls gesendet. Übertragen
+        werden nur Zeitpunkt und Nutzungsart ({nutzungsKanal().titel}) sowie – im
+        Browser – die verweisende Seite. Die IP-Adresse wird nicht gespeichert, es
+        entsteht keine geräteübergreifende Kennung. Inhalte des Erfassungsbogens
+        werden nicht übertragen. Ohne Internetverbindung unterbleibt der Impuls.
+        Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO.
+      </p>
+      <label className="inline">
+        <input type="checkbox" checked={statistikAus} onChange={statistikUmschalten} />
+        Nicht mitzählen (gilt ab dem nächsten Start)
+      </label>
+      <h3>5. Betroffenenrechte</h3>
+      <p>
+        Nach Art. 15–21 DSGVO bestehen Rechte auf Auskunft, Berichtigung, Löschung,
+        Einschränkung der Verarbeitung und Widerspruch. Anfragen bitte an die oben
+        genannte E-Mail-Adresse.
+      </p>
+      <p>
+        Für die lokal gespeicherten Daten lassen sich Auskunft und Löschung
+        unmittelbar selbst ausüben, ohne Anfrage: „Datensicherung“ in der Fußzeile
+        gibt alle gespeicherten Einträge als Datei heraus (und spielt sie wieder
+        ein), „Alle Daten löschen“ nennt den Umfang und entfernt sie vollständig
+        von diesem Gerät. Der Reichweitenmessung wird über das Kästchen in
+        Abschnitt 4 widersprochen.
+      </p>
+    </Dialog>
+  );
+}
+
+export function Fusszeile({ onBogenOeffnen, kompakt = false }: {
   /**
    * Beispielbogen in der App öffnen — wie ein frisch gescannter Bogen.
    * Rückgabe false = die Übernahme wurde abgelehnt (Rückfrage abgebrochen);
    * dann bleibt der Dialog stehen.
    */
   onBogenOeffnen: (bogen: Erfassungsbogen) => boolean;
+  /**
+   * Schmale Linkzeile statt voller Fußzeile — für den Assistenten. Beim
+   * Ausfüllen gehören Datensicherung, „Alle Daten löschen" und 227
+   * Beispielbögen nicht unter das Formular: sie sind Startseiten-Angelegenheiten
+   * und stehen am Meldekopf-Tablet nur zwischen Feld und Weiter-Knopf.
+   * Impressum und Datenschutz bleiben, sie müssen von jeder Seite erreichbar
+   * sein; die Darstellung sitzt im Assistenten ohnehin schon im Seitenkopf.
+   */
+  kompakt?: boolean;
 }) {
   const ueber = useRef<HTMLDialogElement>(null);
   const impressum = useRef<HTMLDialogElement>(null);
@@ -226,13 +348,6 @@ export function Fusszeile({ onBogenOeffnen }: {
   // leer — ein zweiter Klick allein löscht also nie.
   const [loeschVerstanden, setLoeschVerstanden] = useState(false);
   const [loeschFehler, setLoeschFehler] = useState("");
-  const [statistikAus, setStatistikAus] = useState(() => statistikAbgewaehlt());
-
-  function statistikUmschalten(ereignis: ChangeEvent<HTMLInputElement>) {
-    const aus = ereignis.target.checked;
-    setStatistikAus(aus);
-    statistikAbwaehlen(aus);
-  }
 
   // Bögen des offenen Ordners laden, sobald der Dialog offen ist bzw. der Pfad
   // wechselt. Fehlschläge (z. B. offline) sind kein Beinbruch: die Tabelle
@@ -370,6 +485,24 @@ export function Fusszeile({ onBogenOeffnen }: {
     }
   }
 
+  // Im Assistenten bleibt von der Fußzeile eine Zeile übrig: Pflichtangaben und
+  // die Anleitung. Alles Übrige — samt der schweren Beispielbögen-Liste — wird
+  // gar nicht erst gerendert, statt nur ausgeblendet zu werden.
+  if (kompakt) {
+    return (
+      <footer className="seite fuss-schmal">
+        <nav aria-label="Rechtliches und Hilfe">
+          <button type="button" className="link" onClick={() => impressum.current?.showModal()}>Impressum</button>
+          <button type="button" className="link" onClick={() => datenschutz.current?.showModal()}>Datenschutz</button>
+          <a href={ANLEITUNG} target="_blank" rel="noopener noreferrer">Anleitung</a>
+          <span className="fuss-version">v{__APP_VERSION__}</span>
+        </nav>
+        <Impressumsdialog dialogRef={impressum} />
+        <Datenschutzdialog dialogRef={datenschutz} />
+      </footer>
+    );
+  }
+
   return (
     <footer className="seite">
       {/* Nach Zweck gruppiert statt als eine Reihe gleich gewichteter Links:
@@ -380,8 +513,8 @@ export function Fusszeile({ onBogenOeffnen }: {
       <div className="fuss-gruppen">
         <nav className="fuss-gruppe" aria-label="Daten">
           <span className="fuss-titel">Daten</span>
-          <button className="link" onClick={() => { setSicherungFehler(""); sicherung.current?.showModal(); }}>Datensicherung</button>
-          <button
+          <button type="button" className="link" onClick={() => { setSicherungFehler(""); sicherung.current?.showModal(); }}>Datensicherung</button>
+          <button type="button"
             className="link"
             onClick={() => {
               setBeispielPfad([]); // beim Öffnen wieder ganz oben starten
@@ -392,12 +525,12 @@ export function Fusszeile({ onBogenOeffnen }: {
           >
             Beispielbögen
           </button>
-          <button className="link gefahr" onClick={loeschenOeffnen}>Alle Daten löschen</button>
+          <button type="button" className="link gefahr" onClick={loeschenOeffnen}>Alle Daten löschen</button>
         </nav>
         <nav className="fuss-gruppe" aria-label="Rechtliches">
           <span className="fuss-titel">Rechtliches</span>
-          <button className="link" onClick={() => impressum.current?.showModal()}>Impressum</button>
-          <button className="link" onClick={() => datenschutz.current?.showModal()}>Datenschutz</button>
+          <button type="button" className="link" onClick={() => impressum.current?.showModal()}>Impressum</button>
+          <button type="button" className="link" onClick={() => datenschutz.current?.showModal()}>Datenschutz</button>
         </nav>
         <nav className="fuss-gruppe" aria-label="Projekt">
           <span className="fuss-titel">Projekt</span>
@@ -412,7 +545,7 @@ export function Fusszeile({ onBogenOeffnen }: {
       </div>
       <p className="fuss-marke">
         Einheiten-Erfassungsbogen v{__APP_VERSION__} · von{" "}
-        <button className="link" onClick={() => ueber.current?.showModal()}>Johannes Rudolph</button>
+        <button type="button" className="link" onClick={() => ueber.current?.showModal()}>Johannes Rudolph</button>
       </p>
 
       <Dialog titel="Datensicherung" dialogRef={sicherung}>
@@ -427,10 +560,10 @@ export function Fusszeile({ onBogenOeffnen }: {
           Sicher aufbewahren und nur über vertrauenswürdige Wege übertragen.
         </p>
         <div className="aktionen">
-          <button className="primaer" onClick={() => void sicherungExportieren()}>Sicherung erstellen…</button>
+          <button type="button" className="primaer" onClick={() => void sicherungExportieren()}>Sicherung erstellen…</button>
           <label className="datei-knopf">
             Sicherung einspielen…
-            <input type="file" accept=".json,application/json" hidden onChange={(e) => void sicherungImportieren(e)} />
+            <input type="file" accept=".json,application/json" className="nur-sr" onChange={(e) => void sicherungImportieren(e)} />
           </label>
         </div>
         {sicherungFehler && <p className="fehler">{sicherungFehler}</p>}
@@ -481,7 +614,7 @@ export function Fusszeile({ onBogenOeffnen }: {
           Reichweitenmessung bleibt bestehen.
         </p>
         <div className="aktionen">
-          <button onClick={() => void sicherungExportieren()}>Vorher Sicherung erstellen…</button>
+          <button type="button" onClick={() => void sicherungExportieren()}>Vorher Sicherung erstellen…</button>
         </div>
         <label className="inline">
           <input
@@ -492,10 +625,10 @@ export function Fusszeile({ onBogenOeffnen }: {
           Ja, alle lokalen Daten dieser App endgültig löschen
         </label>
         <div className="aktionen">
-          <button className="gefahr" disabled={!loeschVerstanden} onClick={alleDatenLoeschenJetzt}>
+          <button type="button" className="gefahr" disabled={!loeschVerstanden} onClick={alleDatenLoeschenJetzt}>
             Endgültig löschen
           </button>
-          <button onClick={() => loeschen.current?.close()}>Abbrechen</button>
+          <button type="button" onClick={() => loeschen.current?.close()}>Abbrechen</button>
         </div>
         {loeschFehler && <p className="fehler">{loeschFehler}</p>}
       </Dialog>
@@ -515,7 +648,7 @@ export function Fusszeile({ onBogenOeffnen }: {
         </p>
         {beispielPfad.length > 0 && (
           <p>
-            <button className="link" onClick={() => setBeispielPfad(beispielPfad.slice(0, -1))}>
+            <button type="button" className="link" onClick={() => setBeispielPfad(beispielPfad.slice(0, -1))}>
               ← Zurück
             </button>
             {"  "}
@@ -527,7 +660,7 @@ export function Fusszeile({ onBogenOeffnen }: {
           <ul className="beispiel-liste">
             {beispielOrdner.map(({ ordner, anzahl }) => (
               <li key={`d/${ordner}`}>
-                <button className="link" onClick={() => setBeispielPfad([...beispielPfad, ordner])}>
+                <button type="button" className="link" onClick={() => setBeispielPfad([...beispielPfad, ordner])}>
                   {ordnerLabel(ordner)} ({anzahl} {anzahl === 1 ? "Bogen" : "Bögen"})
                 </button>
               </li>
@@ -600,14 +733,14 @@ export function Fusszeile({ onBogenOeffnen }: {
                           {/* Bewusst kein .primaer: das ist in dieser App die
                               eine dominante Aktion einer Ansicht — in einer
                               Liste mit Dutzenden Zeilen wäre sie nur laut. */}
-                          <button
+                          <button type="button"
                             disabled={beispielLaeuft !== ""}
                             onClick={() => void beispielAnsehen(datei, url)}
                           >
                             <IconAuge />
                             Anzeigen
                           </button>
-                          <button
+                          <button type="button"
                             disabled={beispielLaeuft !== ""}
                             onClick={() => void beispielHolen(datei, url)}
                           >
@@ -644,97 +777,9 @@ export function Fusszeile({ onBogenOeffnen }: {
         </p>
       </Dialog>
 
-      <Dialog titel="Impressum" dialogRef={impressum}>
-        <p><strong>Angaben gemäß § 5 DDG</strong></p>
-        <p>
-          Johannes Rudolph<br />
-          Kniphauser Straße 16<br />
-          26419 Schortens<br />
-          Deutschland
-        </p>
-        <p><strong>Kontakt</strong></p>
-        <p>E-Mail: <a href={`mailto:${KONTAKT}`}>{KONTAKT}</a></p>
-        <p><strong>Verantwortlich für den Inhalt nach § 18 Abs. 2 MStV</strong></p>
-        <p>Johannes Rudolph</p>
-      </Dialog>
+      <Impressumsdialog dialogRef={impressum} />
 
-      <Dialog titel="Datenschutz" dialogRef={datenschutz}>
-        <h3>1. Verantwortlicher</h3>
-        <p>
-          Johannes Rudolph<br />
-          E-Mail: <a href={`mailto:${KONTAKT}`}>{KONTAKT}</a>
-        </p>
-        <h3>2. Verarbeitung beim Aufruf der Website</h3>
-        <p>
-          Die Website wird über GitHub Pages (GitHub Inc.) ausgeliefert. Dabei verarbeitet
-          GitHub technisch notwendige Verbindungsdaten (z.&nbsp;B. IP-Adresse) in
-          Server-Logs zur Bereitstellung und Absicherung des Dienstes. Details:{" "}
-          <a href="https://docs.github.com/site-policy/privacy-policies/github-privacy-statement"
-            target="_blank" rel="noopener noreferrer">GitHub Privacy Statement</a>.
-        </p>
-        <h3>3. Erfasste Bogendaten</h3>
-        <p>
-          Alle im Erfassungsbogen eingegebenen Daten (Einheit, Personal, Fahrzeuge usw.)
-          werden ausschließlich lokal auf dem eigenen Gerät verarbeitet. Es findet keine
-          Übertragung an einen Server statt. Eine Weitergabe erfolgt nur, wenn Nutzende
-          selbst eine Datei, ein PDF oder einen QR-Code erzeugen und teilen.
-        </p>
-        <p>
-          Freiwillig können unter „Absender“ Name, E-Mail-Adresse und Telefonnummer
-          hinterlegt werden. Diese Angaben bleiben auf dem Gerät gespeichert und werden
-          in jedem selbst erzeugten QR-Code, Link und PDF mitgegeben, damit die
-          Gegenstelle bei Rückfragen weiß, an wen sie sich wenden kann. Die Angabe ist
-          nicht erforderlich und jederzeit änder- und löschbar.
-        </p>
-        <h3>4. Speicherung im Endgerät und Reichweitenmessung</h3>
-        <p>
-          Es werden keine Cookies gesetzt. Die App speichert ihre Daten aber im
-          lokalen Speicher (localStorage) des Geräts, weil sie ohne Server
-          arbeitet und die Arbeit sonst bei jedem Neustart verloren wäre:
-          eigene Vorlagen, Einsatz-Sammlungen, der aktuelle Bogen-Entwurf, die
-          Absenderkarte, der private Signatur-Geräteschlüssel und die
-          Anzeige-Einstellungen (Feld-/Nachtmodus). Ein Widerspruch gegen die
-          Reichweitenmessung wird ebenfalls dort vermerkt.
-        </p>
-        <p>
-          Diese Einträge sind für den ausdrücklich gewünschten Dienst technisch
-          erforderlich (§ 25 Abs. 2 Nr. 2 TDDDG); eine Einwilligung ist dafür
-          nicht nötig. Sie verlassen das Gerät nicht: es gibt keine Übertragung
-          an einen Server, keinen Zugriff durch Dritte und keine Kennung zur
-          Wiedererkennung. Gelöscht werden sie über „Alle Daten löschen“ in der
-          Fußzeile oder durch Löschen der Websitedaten im Browser.
-        </p>
-        <p>
-          Zur Reichweitenmessung wird{" "}
-          <a href="https://www.goatcounter.com/" target="_blank" rel="noopener noreferrer">
-            GoatCounter
-          </a>{" "}
-          eingesetzt: beim Start wird einmalig ein Zählimpuls gesendet. Übertragen
-          werden nur Zeitpunkt und Nutzungsart ({nutzungsKanal().titel}) sowie – im
-          Browser – die verweisende Seite. Die IP-Adresse wird nicht gespeichert, es
-          entsteht keine geräteübergreifende Kennung. Inhalte des Erfassungsbogens
-          werden nicht übertragen. Ohne Internetverbindung unterbleibt der Impuls.
-          Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO.
-        </p>
-        <label className="inline">
-          <input type="checkbox" checked={statistikAus} onChange={statistikUmschalten} />
-          Nicht mitzählen (gilt ab dem nächsten Start)
-        </label>
-        <h3>5. Betroffenenrechte</h3>
-        <p>
-          Nach Art. 15–21 DSGVO bestehen Rechte auf Auskunft, Berichtigung, Löschung,
-          Einschränkung der Verarbeitung und Widerspruch. Anfragen bitte an die oben
-          genannte E-Mail-Adresse.
-        </p>
-        <p>
-          Für die lokal gespeicherten Daten lassen sich Auskunft und Löschung
-          unmittelbar selbst ausüben, ohne Anfrage: „Datensicherung“ in der Fußzeile
-          gibt alle gespeicherten Einträge als Datei heraus (und spielt sie wieder
-          ein), „Alle Daten löschen“ nennt den Umfang und entfernt sie vollständig
-          von diesem Gerät. Der Reichweitenmessung wird über das Kästchen in
-          Abschnitt 4 widersprochen.
-        </p>
-      </Dialog>
+      <Datenschutzdialog dialogRef={datenschutz} />
     </footer>
   );
 }

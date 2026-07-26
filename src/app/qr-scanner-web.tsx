@@ -100,10 +100,10 @@ export function QrScannerWeb(props: {
         {props.onBild && (
           <label className="datei-knopf">
             QR aus Bild einlesen…
-            <input type="file" accept="image/*" onChange={props.onBild} hidden />
+            <input type="file" accept="image/*" onChange={props.onBild} className="nur-sr" />
           </label>
         )}
-        <button onClick={props.onAbbruch}>Abbrechen</button>
+        <button type="button" onClick={props.onAbbruch}>Abbrechen</button>
       </div>
     </div>
   );

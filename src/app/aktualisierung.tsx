@@ -124,8 +124,8 @@ export function UpdateBanner() {
       {prozent === null ? (
         <>
           <span>Version {update.version} verfügbar.</span>
-          <button className="primaer" onClick={installieren}>Aktualisieren</button>
-          <button className="link" onClick={() => setUpdate(null)}>Später</button>
+          <button type="button" className="primaer" onClick={installieren}>Aktualisieren</button>
+          <button type="button" className="link" onClick={() => setUpdate(null)}>Später</button>
         </>
       ) : (
         <span>Update wird geladen … {prozent}%</span>
@@ -182,8 +182,8 @@ export function WebUpdateBanner() {
   return (
     <div className="update-banner" role="status">
       <span>Neue Version verfügbar.</span>
-      <button className="primaer" onClick={() => neuLaden?.()}>Neu laden</button>
-      <button className="link" onClick={() => setNeueVersion(false)}>Später</button>
+      <button type="button" className="primaer" onClick={() => neuLaden?.()}>Neu laden</button>
+      <button type="button" className="link" onClick={() => setNeueVersion(false)}>Später</button>
     </div>
   );
 }

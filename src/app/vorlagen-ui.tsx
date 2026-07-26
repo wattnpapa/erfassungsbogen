@@ -163,7 +163,7 @@ export function Musterung(props: {
       </div>
       <p className="hinweis">Anwesende abhaken lassen — die Vorlage bleibt unverändert.</p>
     </SeitenKopf>
-    <main className="musterung">
+    <main id="inhalt" tabIndex={-1} className="musterung">
       <section className="karte staerke-leiste">
         <div><strong>{s.fuehrer}</strong><span>Führer</span></div>
         <div><strong>{s.unterfuehrer}</strong><span>Unterf.</span></div>

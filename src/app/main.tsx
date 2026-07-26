@@ -784,7 +784,7 @@ function App() {
           <h1>Einheiten-Erfassungsbogen</h1>
         </div>
       </SeitenKopf>
-      <main className="start">
+      <main id="inhalt" tabIndex={-1} className="start">
         <p>
           Bogen digital erfassen (BOS-übergreifend), als PDF drucken, als Datei teilen –
           inklusive QR-Code für den Offline-Transport.
@@ -815,27 +815,30 @@ function App() {
                     : ""}
                 </span>
               </span>
-              <button className="primaer" onClick={() => setZeigeStart(false)}>Fortsetzen</button>
+              <button type="button" className="primaer" onClick={() => setZeigeStart(false)}>Fortsetzen</button>
             </section>
           );
         })()}
         <div className="aktionen">
-          <button className={bogen ? "" : "primaer"} onClick={() => { setBogen(neuerBogen()); setBogenSignatur(null); setSchritt(0); setZeigeStart(false); }}>
+          <button type="button" className={bogen ? "" : "primaer"} onClick={() => { setBogen(neuerBogen()); setBogenSignatur(null); setSchritt(0); setZeigeStart(false); }}>
             Neuen Bogen erstellen
           </button>
-          <button onClick={scanneQr}>QR-Code scannen…</button>
+          <button type="button" onClick={scanneQr}>QR-Code scannen…</button>
           {/* Im Web sitzt „QR aus Bild einlesen" im Scanner-Overlay, wo es gebraucht
               wird. Nativ scannt eine System-Oberfläche ohne eigene Knöpfe — dort
               bleibt der Ausweg deshalb hier auf der Startseite. */}
           {istNativ() && (
             <label className="datei-knopf">
               QR aus Bild einlesen…
-              <input type="file" accept="image/*" onChange={ladeQrBild} hidden />
+              <input type="file" accept="image/*" onChange={ladeQrBild} className="nur-sr" />
             </label>
           )}
+          {/* Das Feld ist nur fürs Auge weg (.nur-sr), nicht per `hidden`: sonst
+              fällt der Knopf komplett aus der Tabfolge und ist ausschließlich
+              mit der Maus bedienbar. */}
           <label className="datei-knopf">
             Aus Datei laden…
-            <input type="file" accept=".json,application/json" onChange={ladeDatei} hidden />
+            <input type="file" accept=".json,application/json" onChange={ladeDatei} className="nur-sr" />
           </label>
         </div>
         {meldung && <p className="meldung" role="status">{meldung}</p>}
@@ -867,7 +870,7 @@ function App() {
               <button type="button" onClick={neuerEinsatz}>Neuer Einsatz…</button>{" "}
               <label className="datei-knopf">
                 Einsatz importieren…
-                <input type="file" accept=".json,application/json,.pdf,application/pdf" hidden onChange={importiereEinsatzDatei} />
+                <input type="file" accept=".json,application/json,.pdf,application/pdf" className="nur-sr" onChange={importiereEinsatzDatei} />
               </label>
             </span>
           </div>
@@ -936,7 +939,10 @@ function App() {
         />
         <h1>Einheiten-Erfassungsbogen</h1>
       </div>
-      <nav className="schritte">
+      {/* Der aktive Schritt steht nicht nur als CSS-Klasse da: ohne
+          aria-current="step" liest eine Vorlesesoftware sechs gleichwertige
+          Knöpfe vor und sagt nicht, wo man gerade ist. */}
+      <nav className="schritte" aria-label="Schritte">
         {SCHRITTE.map((name, i) => {
           const st = status[i]; // undefined für die Übersicht (letzter Schritt)
           const klassen = [i === schritt ? "aktiv" : "", st ? `status-${st}` : ""].filter(Boolean).join(" ");
@@ -944,7 +950,9 @@ function App() {
           return (
             <button
               key={name}
+              type="button"
               className={klassen}
+              aria-current={i === schritt ? "step" : undefined}
               aria-label={st ? `${i + 1}. ${name} — ${SCHRITT_STATUS_TITEL[st]}` : undefined}
               title={st ? SCHRITT_STATUS_TITEL[st] : undefined}
               onClick={() => setSchritt(i)}
@@ -961,7 +969,7 @@ function App() {
         </p>
       )}
     </SeitenKopf>
-    <main>
+    <main id="inhalt" tabIndex={-1}>
       {schritt === 0 && <SchrittEinheit bogen={bogen} aendern={aendern} />}
       {schritt === 1 && <SchrittEinsatz bogen={bogen} aendern={aendern} />}
       {schritt === 2 && <SchrittPersonal bogen={bogen} aendern={aendern} />}
@@ -1029,15 +1037,18 @@ function App() {
 
       {schritt !== UEBERSICHT && (
         <footer className="nav">
-          <button disabled={schritt === 0} onClick={() => setSchritt(schritt - 1)}>← Zurück</button>
+          <button type="button" disabled={schritt === 0} onClick={() => setSchritt(schritt - 1)}>← Zurück</button>
           <span className="platzhalter" />
-          <button className="primaer" onClick={() => setSchritt(schritt + 1)}>
+          <button type="button" className="primaer" onClick={() => setSchritt(schritt + 1)}>
             {schritt === UEBERSICHT - 1 ? "Zur Übersicht →" : "Weiter →"}
           </button>
         </footer>
       )}
     </main>
-    <Fusszeile onBogenOeffnen={oeffneBeispiel} />
+    {/* Im Assistenten nur die Pflichtzeile: unter einem halb ausgefüllten
+        Formular haben Datensicherung, „Alle Daten löschen" und die
+        Beispielbögen nichts zu suchen — die stehen auf der Startseite. */}
+    <Fusszeile onBogenOeffnen={oeffneBeispiel} kompakt />
     </>
   );
 }

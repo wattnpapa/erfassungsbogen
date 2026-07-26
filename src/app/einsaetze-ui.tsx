@@ -211,7 +211,7 @@ export function EinsatzDetail(props: {
         {ART_LABEL[einsatz.art]}{einsatz.ort ? ` · ${einsatz.ort}` : ""}
       </p>
     </SeitenKopf>
-    <main className="einsatz-detail">
+    <main id="inhalt" tabIndex={-1} className="einsatz-detail">
       <section className="karte staerke-leiste">
         <div><strong>{sum.einheiten}</strong><span>Einheiten</span></div>
         <div><strong>{sum.staerke.fuehrer}</strong><span>Führer</span></div>
@@ -263,7 +263,7 @@ export function EinsatzDetail(props: {
           <input
             type="file"
             accept=".json,application/json,.pdf,application/pdf"
-            hidden
+            className="nur-sr"
             onChange={(e) => {
               const f = e.target.files?.[0];
               e.target.value = "";
