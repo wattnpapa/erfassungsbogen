@@ -61,11 +61,16 @@ localStorage-Hülle getrennt und unit-getestet.
   anwesenden Einheiten (`aggregiere`) und Zwischensummen je Zug
   (`aggregiereNachZug`), aufgebaut auf denselben abgeleiteten Werten wie die
   Einzelsicht.
+- [src/app/einheiten-liste.ts](../src/app/einheiten-liste.ts) — Suche (alle
+  Wörter müssen treffen, Groß/Klein und Akzente egal) und umschaltbare
+  Sortierung (Name / Eintreffzeit / Zug / Organisation) der Einheitenliste.
+  Betrifft nur die Anzeige; die Summen rechnen unverändert über alle
+  anwesenden Einheiten.
 - [src/app/einsatz-transport.ts](../src/app/einsatz-transport.ts) — Export/Import
   als JSON-Datei sowie Import aus dem in Sammel-PDFs eingebetteten JSON (pako).
 - [src/app/einsaetze-ui.tsx](../src/app/einsaetze-ui.tsx) — Liste, Detailansicht
-  (Summen, Zwischensummen, Einheitenliste mit Status/Historie), Sammeln per
-  Scan/Datei/manuell.
+  (Summen, Zwischensummen, Einheitenliste mit Suche/Sortierung und
+  Status/Historie), Sammeln per Scan/Datei/manuell.
 
 Kernregeln: Historie stapeln (tägliche Neumeldung = neue Revision), Zuordnung per
 Fingerabdruck (vorgeschlagen, vom Menschen bestätigt/überschrieben), Idempotenz

@@ -47,6 +47,7 @@ import {
   type MeldeEintrag,
 } from "./einsaetze";
 import { aggregiere, aggregiereNachZug, type EinsatzSummen } from "./auswertung";
+import { SORTIERUNGEN, einheitenAnsicht, type EinheitenSortierung } from "./einheiten-liste";
 import { debugAktiv } from "./debug-plattform";
 import { SeitenKopf } from "./seiten-kopf";
 
@@ -187,11 +188,16 @@ export function EinsatzDetail(props: {
   onGeloescht: () => void;
 }) {
   const { einsatz, onZurueck, onGeaendert, onScannen, onManuell, onDateiImport, onExport, onCsvExport, onSammelPdf, onGeloescht } = props;
+  const [suche, setSuche] = useState("");
+  const [sortierung, setSortierung] = useState<EinheitenSortierung>("name");
   const sum = aggregiere(einsatz.eintraege);
   const zugGruppen = aggregiereNachZug(einsatz.eintraege);
-  const kopf = neuesteJeEinheit(einsatz.eintraege).sort((a, b) =>
-    einheitAnzeigename(a.bogen.einheit).localeCompare(einheitAnzeigename(b.bogen.einheit), "de"),
-  );
+  // Alle gemeldeten Einheiten (neueste Revision je Einheit) — Grundlage für die
+  // Gesamtzahl; `kopf` ist davon nur der gerade angezeigte Ausschnitt. Suche und
+  // Sortierung ändern die Summen oben bewusst nicht.
+  const alleEinheiten = neuesteJeEinheit(einsatz.eintraege);
+  const kopf = einheitenAnsicht(alleEinheiten, suche, sortierung);
+  const gefiltert = kopf.length !== alleEinheiten.length;
 
   // Verschiebt nur in den Papierkorb (30 Tage wiederherstellbar über die
   // Einsatzliste) — daher kein confirm.
@@ -290,8 +296,41 @@ export function EinsatzDetail(props: {
       </div>
 
       <section className="karte">
-        <h2>Einheiten ({kopf.length})</h2>
-        {kopf.length === 0 && <p className="hinweis">Noch keine Meldung. Bogen scannen oder manuell erfassen.</p>}
+        <h2>Einheiten ({gefiltert ? `${kopf.length} von ${alleEinheiten.length}` : alleEinheiten.length})</h2>
+        {/* Ab einer Handvoll Meldungen trägt die Liste allein nicht mehr — bei
+            einer Großlage stehen hier 30–50 Einheiten. Bei ein, zwei Meldungen
+            wäre die Leiste nur Beiwerk, daher erst ab drei. */}
+        {alleEinheiten.length > 2 && (
+          <div className="zeile einheiten-filter">
+            <label className="feld">
+              Suche
+              <input
+                type="search"
+                value={suche}
+                placeholder="Einheit, Organisation, Ort, Zug, Kennzeichen…"
+                onChange={(e) => setSuche(e.target.value)}
+              />
+            </label>
+            <label className="feld sortierung">
+              Sortierung
+              <select
+                value={sortierung}
+                onChange={(e) => setSortierung(e.target.value as EinheitenSortierung)}
+              >
+                {SORTIERUNGEN.map((s) => (
+                  <option key={s.wert} value={s.wert}>{s.label}</option>
+                ))}
+              </select>
+            </label>
+          </div>
+        )}
+        {alleEinheiten.length === 0 && <p className="hinweis">Noch keine Meldung. Bogen scannen oder manuell erfassen.</p>}
+        {alleEinheiten.length > 0 && kopf.length === 0 && (
+          <p className="hinweis">
+            Keine Einheit passt zu „{suche.trim()}“.{" "}
+            <button type="button" className="link" onClick={() => setSuche("")}>Suche löschen</button>
+          </p>
+        )}
         {kopf.map((e) => (
           <EinheitKarte key={e.einheitSchluessel} einsatzId={einsatz.id} kopf={e} alle={einsatz.eintraege} onGeaendert={onGeaendert} />
         ))}

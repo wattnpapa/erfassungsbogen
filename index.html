@@ -638,6 +638,12 @@
     .signatur-badge { white-space: nowrap; font-weight: 600; }
     .signatur-badge.gueltig { color: #1c5c44; }
     .signatur-badge.ungueltig { color: #8a1c12; }
+    /* Such- und Sortierzeile über der Einheitenliste. Sitzt direkt unter der
+       Überschrift, daher oben kein zusätzlicher Abstand; die Sortierung bekommt
+       eine eigene, breitere Spur, sonst schneidet die Auswahl ihre Beschriftung ab. */
+    .einheiten-filter { margin: 0 0 var(--r-3); }
+    .einheiten-filter > label.feld { margin-top: var(--r-2); }
+    .zeile.einheiten-filter > label.feld.sortierung { flex: 0 1 15rem; }
     /* Ausklappbare Vollansicht einer gemeldeten Einheit in der Einsatz-Sammlung. */
     .bogen-details { margin-top: 0.6rem; border-top: 1px solid var(--rand); padding-top: 0.4rem; }
     .bogen-details h4 { margin: 0.8rem 0 0.2rem; font-size: 0.9rem; color: var(--blau); }
