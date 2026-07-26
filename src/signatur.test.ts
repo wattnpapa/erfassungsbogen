@@ -6,8 +6,8 @@ import {
   EEB_SIGNIERT_MAGIC,
   EEB_URL_PREFIX,
   EEB_VORLAGE_MARKER,
-  base64UrlDekodieren,
-  base64UrlKodieren,
+  datenDekodieren,
+  datenKodieren,
   decodePayload,
   decodePayloadUrl,
   decodeVorlagePayloadUrl,
@@ -144,7 +144,7 @@ describe("Abwärtskompatibilität: unsigniert bleibt lesbar", () => {
     const unsigniert = entpackePayload(encodePayload(b, zlib)).komprimiert;
     const kp = await schluesselpaarErzeugen();
     const url = await encodeSigniertPayloadUrl(b, zlib, kp.privat);
-    const payload = base64UrlDekodieren(url.slice(EEB_URL_PREFIX.length));
+    const payload = datenDekodieren(url.slice(EEB_URL_PREFIX.length));
     const signiert = entpackePayload(payload);
     expect(signiert.signatur).toBeDefined();
     expect(Array.from(signiert.komprimiert)).toEqual(Array.from(unsigniert));
@@ -176,10 +176,10 @@ describe("Signieren → Verifizieren", () => {
     expect(status0.zustand).toBe("gueltig");
 
     // Payload extrahieren, ein Nutzdaten-Byte kippen, Status erneut prüfen.
-    const payload = base64UrlDekodieren(url.slice(EEB_URL_PREFIX.length));
+    const payload = datenDekodieren(url.slice(EEB_URL_PREFIX.length));
     const kopf = EEB_SIGNIERT_MAGIC.length + 32 + 64;
     payload[kopf] = payload[kopf]! ^ 0xff; // erstes komprimiertes Byte verfälschen
-    const manipuliert = base64UrlKodieren(payload);
+    const manipuliert = datenKodieren(payload);
     const status1 = await signaturVonText(manipuliert);
     expect(status1.zustand).toBe("ungueltig");
     expect(signaturLabel(status1)).toMatch(/ungültig/i);
@@ -191,9 +191,9 @@ describe("Signieren → Verifizieren", () => {
     const kpB = await schluesselpaarErzeugen();
     // Mit A signieren, aber B's pubkey einsetzen → verify schlägt fehl.
     const url = await encodeSigniertPayloadUrl(b, zlib, kpA.privat);
-    const payload = base64UrlDekodieren(url.slice(EEB_URL_PREFIX.length));
+    const payload = datenDekodieren(url.slice(EEB_URL_PREFIX.length));
     payload.set(kpB.oeffentlich, EEB_SIGNIERT_MAGIC.length); // pubkey tauschen
-    const status = await signaturVonText(base64UrlKodieren(payload));
+    const status = await signaturVonText(datenKodieren(payload));
     expect(status.zustand).toBe("ungueltig");
   });
 });

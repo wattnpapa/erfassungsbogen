@@ -1,12 +1,8 @@
 # Datenmodell Einheiten-Erfassungsbogen (EEB)
 
 **Stufe 1** — Datenmodell und QR-Code-Kodierung. Stand: 2026-07-18, **Schema-Version 5**
-<<<<<<< HEAD
 (v4 = ein einziges Kennzeichen-Feld; v3 = Ernährungsform je Person; v2 =
 organisationsübergreifend; v1 war THW-spezifisch).
-=======
-(v3 = Ernährungsform je Person; v2 = organisationsübergreifend; v1 war THW-spezifisch).
->>>>>>> 99bf358 (Einheitenname ableiten statt doppelt erfassen)
 
 **Abwärtskompatibilität (Pflicht):** Schema-Änderungen dürfen ältere QR-Codes/Dateien nie
 unlesbar machen. `decodeBinaer` (`src/codec.ts`) und `bogenLaden`/`migriereBogen`
@@ -75,9 +71,10 @@ RD: RTW, NEF). Deshalb:
 | Org-Standard-eMail | „vorname.nachname@thw-oldenburg.de" | 1 Byte Template-Referenz |
 | Stärke (0/3/17/20) | — | **abgeleitet** aus Stärkerollen — oder manuell (Meldekopf-Modus, 3 Bytes) |
 
-Anschließend: Binärstrom → Deflate → QR-Code (Byte-Modus) bzw. optional Base45 →
-QR-Code (Alphanumerisch-Modus, wie beim EU-Impfzertifikat — nur nötig, wenn ältere
-Scanner keinen Byte-Modus beherrschen).
+Anschließend: Binärstrom → Deflate → **Base41** → QR-Code im alphanumerischen
+Modus (5,5 statt 8 Bit je Zeichen). Das Prinzip entspricht Base45 beim
+EU-Impfzertifikat, nutzt aber ein URL-sicheres Alphabet — siehe
+„Transportkodierung" unten.
 
 ## Entitäten
 
@@ -170,15 +167,46 @@ wird aus den Ernährungsangaben der Personen **abgeleitet** (`verpflegung()` in
 ## QR-Payload-Format „EEB2"
 
 ```
-QR-Inhalt (URL):  "https://erfassungsbogen.app/#" ‖ Base64url(Payload)
+QR-Inhalt (URL):  "https://erfassungsbogen.app/#" ‖ "B." ‖ Base41(Payload)
 Payload (binär):  0x45 0x45 0x42 0x32 ('EEB2') ‖ DeflateRaw(Binärstrom)
 ```
 
 Der URL-Präfix ist der App-Identifikator: Die native Kamera von iOS/Android
 erkennt die URL und öffnet die App (Universal Link) bzw. die Web-App. Die
 Daten stehen im Fragment (`#`) und werden daher nie an einen Server gesendet.
-Der Decoder akzeptiert die volle URL oder den nackten Base64url-Payload;
+Der Decoder akzeptiert die volle URL oder den nackten Payload;
 die Magic-Bytes 'EEB2' im Binärteil bleiben die Format-Kennung.
+
+### Transportkodierung „B." (Base41)
+
+Der Datenteil wird **Base41** kodiert und trägt dafür den Marker `B.` vor sich.
+Grund ist der Kodiermodus des QR-Codes: Base64url enthält Kleinbuchstaben und
+`_` und zwingt den Code damit in den **Byte-Modus** — 8 Bit QR-Kapazität je
+Zeichen für 6 Bit Nutzdaten, ein Viertel der Kapazität verfällt. Der
+**alphanumerische Modus** kostet nur 5,5 Bit je Zeichen, kennt aber nur
+`0-9 A-Z SPACE $ % * + - . / :`.
+
+Base41 nutzt davon 41 Zeichen — ohne SPACE (in URLs nicht erlaubt), ohne `%`
+(Escape-Zeichen), ohne `.` (trennt die Marker) und ohne `+` (wird von manchen
+Parsern als Leerzeichen gelesen). Wegen 41³ = 68921 ≥ 65536 werden aus **2 Bytes
+3 Zeichen** — dasselbe Verhältnis wie bei Base45 (RFC 9285), nur mit
+URL-sicherem Alphabet.
+
+Der Präfix bleibt in Kleinbuchstaben: Der QR-Encoder mischt die Modi von selbst
+und legt ein Byte-Segment für den Präfix neben ein Alphanumerik-Segment für die
+Daten. Eine Großschreibung der URL würde nur ~0,12 QR-Versionsstufen bringen und
+dafür Universal Links und Kamera-Apps riskieren.
+
+**Wirkung** (227 Beispielbögen, unsigniert, Fehlerkorrektur M): QR-Version im
+Mittel 20,50 → 17,66, Modulkante 99 → 88; 222 statt 216 Bögen passen in einen
+einzelnen Code. Binärformat und Deflate-Kompression bleiben unberührt.
+
+**Abwärtskompatibel beim Lesen.** `.` kommt weder im Base41- noch im
+Base64url-Alphabet vor, der Marker ist also eindeutig. Datenteile **ohne**
+Marker werden weiterhin als Base64url gelesen — jeder je gedruckte QR-Code
+bleibt gültig, auch gemischte Segment-Sätze. Umgekehrt gilt das nicht: Eine
+App-Version von vor der Umstellung kann einen `B.`-Code nicht lesen und lehnt
+ihn mit „Kein EEB2-QR-Code" ab (wie schon bei den Markern `V.` und `EEBS.`).
 
 ### Signatur „EEB2S" (Ed25519)
 
@@ -211,12 +239,12 @@ Signierter Payload:  0x45 0x45 0x42 0x32 0x53 ('EEB2S')
   „✓ signiert von <Kurzform>" / „nicht signiert" / „Signatur ungültig".
 - **Größenbudget.** Die Signaturhülle ist 101 Bytes (5 Magic + 32 Schlüssel +
   64 Signatur); netto wächst der Payload um **+97 Bytes** gegenüber unsigniert
-  (das 4-Byte-`EEB2`-Magic wird durch das 5-Byte-`EEB2S` ersetzt), nach Base64url
-  ~+130 Zeichen. Gemessen am vollen THW-Bogen: unsigniert QR v13 → signiert QR
+  (das 4-Byte-`EEB2`-Magic wird durch das 5-Byte-`EEB2S` ersetzt), nach Base41
+  ~+146 Zeichen. Gemessen am vollen THW-Bogen: unsigniert QR v13 → signiert QR
   v17 — deutlich unter dem Ziel ≤ v25.
 - **Vorlagen/Segmentierung orthogonal.** Der Vorlagen-Marker `V.` und die
-  Base64url/URL-Hülle liegen um den ganzen Payload; ein signierter Vorlagen-QR ist
-  `#V.` ‖ Base64url(`EEB2S…`).
+  Base41/URL-Hülle liegen um den ganzen Payload; ein signierter Vorlagen-QR ist
+  `#V.B.` ‖ Base41(`EEB2S…`).
 
 **Schlüsselverwaltung (bewusst simpel, kein Server).** Jedes Gerät erzeugt lokal
 **einmalig** ein Ed25519-Schlüsselpaar; der private Schlüssel bleibt im
@@ -263,7 +291,7 @@ karte:               flags[1]          (Bit 0 Name, Bit 1 E-Mail, Bit 2 Telefon)
   Die Oberfläche formuliert das entsprechend („Eigene Angabe des Absenders").
 - **Größenbudget.** Flagbyte + Längen-Varint + Feldinhalte, unkomprimiert.
   Realistisch ~40–70 Bytes, gedeckelt auf 40 / 48 / 24 Zeichen (Name / E-Mail /
-  Telefon); nach Base64url ~+55–95 Zeichen. Am vollen THW-Bogen bleibt der QR
+  Telefon); nach Base41 ~+60–105 Zeichen. Am vollen THW-Bogen bleibt der QR
   damit weiterhin klar unter dem Ziel ≤ v25.
 - **Datenschutz.** Personenbezogene Daten, freiwillig und jederzeit löschbar
   (`eeb.absenderkarte.v1` im `localStorage`, wandert über die Datensicherung mit).
@@ -288,10 +316,11 @@ Der Normalfall bleibt **ein** QR-Code (unverändert, s. o.). Nur wenn ein Bogen 
 groß wird, dass der Single-QR das Budget (Ziel ≤ Version 25, ECC M) überschreitet,
 wird der **Payload** auf mehrere QR-Codes aufgeteilt. Jeder Teil ist eine eigene
 App-URL mit einem Text-Kopf im Fragment — analog zum Vorlagen-Marker `V.` und wie
-dieser außerhalb des Base64url-Alphabets, also nie mit einem Payload verwechselbar:
+dieser außerhalb des Base41- und Base64url-Alphabets, also nie mit einem Payload
+verwechselbar:
 
 ```
-Segment-QR (URL):  "https://erfassungsbogen.app/#" ‖ "EEBS." ‖ teilNr "." anzahl "." id "." Base64url(Chunk)
+Segment-QR (URL):  "https://erfassungsbogen.app/#" ‖ "EEBS." ‖ teilNr "." anzahl "." id "." "B." Base41(Chunk)
 ```
 
 | Kopf-Feld | Bedeutung |

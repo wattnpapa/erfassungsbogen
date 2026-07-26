@@ -22,8 +22,8 @@ import {
   EEB_URL_PREFIX,
   EEB_VORLAGE_MARKER,
   PUBKEY_LAENGE,
-  base64UrlDekodieren,
-  base64UrlKodieren,
+  datenDekodieren,
+  datenKodieren,
   dekodiereAbsenderkarte,
   encodeBinaer,
   entpackePayload,
@@ -132,17 +132,17 @@ export async function signiertePayloadBytes(
   return packePayload({ komprimiert, signatur: { pubkey, signatur, karte: kartenRoh } });
 }
 
-/** Bogen → signierter QR-Inhalt als App-URL (Präfix + Base64url('EEB2S'…)). */
+/** Bogen → signierter QR-Inhalt als App-URL (Präfix + Base41('EEB2S'…)). */
 export async function encodeSigniertPayloadUrl(
   b: Erfassungsbogen,
   k: Kompressor,
   privat: Uint8Array,
   karte?: Absenderkarte,
 ): Promise<string> {
-  return EEB_URL_PREFIX + base64UrlKodieren(await signiertePayloadBytes(b, k, privat, karte));
+  return EEB_URL_PREFIX + datenKodieren(await signiertePayloadBytes(b, k, privat, karte));
 }
 
-/** Vorlage-Bogen → signierter QR-Inhalt als URL (Präfix + Marker „V." + Base64url). */
+/** Vorlage-Bogen → signierter QR-Inhalt als URL (Präfix + Marker „V." + Base41). */
 export async function encodeSigniertVorlagePayloadUrl(
   b: Erfassungsbogen,
   k: Kompressor,
@@ -152,7 +152,7 @@ export async function encodeSigniertVorlagePayloadUrl(
   return (
     EEB_URL_PREFIX +
     EEB_VORLAGE_MARKER +
-    base64UrlKodieren(await signiertePayloadBytes(b, k, privat, karte))
+    datenKodieren(await signiertePayloadBytes(b, k, privat, karte))
   );
 }
 
@@ -209,7 +209,7 @@ export async function signaturVonText(text: string): Promise<SignaturStatus> {
   if (daten.startsWith(EEB_VORLAGE_MARKER)) daten = daten.slice(EEB_VORLAGE_MARKER.length);
   let payload: Uint8Array;
   try {
-    payload = base64UrlDekodieren(daten);
+    payload = datenDekodieren(daten);
   } catch {
     return { zustand: "unsigniert" };
   }

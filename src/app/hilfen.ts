@@ -30,7 +30,7 @@ import {
   EEB_URL_PREFIX,
   QR_EINZEL_MAX_VERSION,
   QR_SEGMENT_ZIEL_VERSION,
-  base64UrlKodieren,
+  datenKodieren,
   segmentPayloadUrls,
   type Kompressor,
 } from "../codec";
@@ -247,7 +247,7 @@ export async function qrErzeugen(b: Erfassungsbogen): Promise<QrSatz> {
   );
   // Nicht aus der Karte raten: das 5. Magic-Byte sagt, was tatsächlich drinsteht.
   const container = payload[4] === EEB_KARTE_MAGIC[4] ? "EEB2K" : "EEB2S";
-  const url = EEB_URL_PREFIX + base64UrlKodieren(payload);
+  const url = EEB_URL_PREFIX + datenKodieren(payload);
   const einzelVersion = qrVersion(url);
   if (einzelVersion <= QR_EINZEL_MAX_VERSION) {
     const teil = await teilBild(url, 1, 1);

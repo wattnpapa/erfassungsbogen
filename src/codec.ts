@@ -647,6 +647,98 @@ export function base64UrlDekodieren(s: string): Uint8Array {
   return Uint8Array.from(bytes);
 }
 
+// ---------------------------------------------------------------- Base41
+//
+// Base64url zwingt den QR-Code in den Byte-Modus (8 Bit je Zeichen für 6 Bit
+// Nutzdaten — ein Viertel der Kapazität verfällt), weil sein Alphabet Klein-
+// buchstaben und '_' enthält. Der alphanumerische QR-Modus kostet nur 5,5 Bit
+// je Zeichen, kennt aber ausschließlich: 0-9 A-Z SPACE $ % * + - . / :
+//
+// Davon nutzbar sind hier 41 Zeichen — ohne SPACE (in URLs nicht erlaubt),
+// ohne '%' (Escape-Zeichen), ohne '.' (trennt unsere Marker) und ohne '+'
+// (wird von manchen Parsern als Leerzeichen gelesen). 41³ = 68921 ≥ 65536,
+// also werden aus 2 Bytes 3 Zeichen — dasselbe Verhältnis wie bei Base45
+// (RFC 9285), nur mit URL-sicherem Alphabet.
+//
+// Ergebnis: rund 22 % weniger QR-Kapazitätsbedarf bei identischen Nutzdaten.
+// Das Binärformat und die Deflate-Kompression bleiben davon unberührt.
+
+const B41 = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ$*-/:";
+const B41_REV = new Map([...B41].map((c, i) => [c, i] as const));
+
+/** Bytes → Base41 (je 2 Bytes 3 Zeichen, niedrigste Stelle zuerst). */
+export function base41Kodieren(daten: Uint8Array): string {
+  let s = "";
+  for (let i = 0; i < daten.length; i += 2) {
+    if (i + 1 < daten.length) {
+      const v = daten[i]! * 256 + daten[i + 1]!;
+      s += B41[v % 41]! + B41[Math.floor(v / 41) % 41]! + B41[Math.floor(v / 1681)]!;
+    } else {
+      // Einzelnes Restbyte: 2 Zeichen genügen (41² = 1681 > 255).
+      const v = daten[i]!;
+      s += B41[v % 41]! + B41[Math.floor(v / 41)]!;
+    }
+  }
+  return s;
+}
+
+/**
+ * Base41 → Bytes. Prüft streng: Das Alphabet lässt Zeichengruppen zu, die
+ * keinen gültigen Bytewert ergeben (41³ > 65536), und eine Restlänge von 1
+ * Zeichen kann gar nicht entstehen. Beides muss auffallen, statt still
+ * verfälschte Daten zu liefern.
+ */
+export function base41Dekodieren(s: string): Uint8Array {
+  const bytes: number[] = [];
+  for (let i = 0; i < s.length; i += 3) {
+    const rest = s.length - i;
+    if (rest === 1) throw new Error("Kein EEB2-QR-Code (Base41: unvollständige Gruppe)");
+    const ziffern: number[] = [];
+    for (let j = 0; j < Math.min(3, rest); j++) {
+      const wert = B41_REV.get(s[i + j]!);
+      if (wert === undefined) throw new Error("Kein EEB2-QR-Code (ungültige Zeichen)");
+      ziffern.push(wert);
+    }
+    if (ziffern.length === 3) {
+      const v = ziffern[0]! + ziffern[1]! * 41 + ziffern[2]! * 1681;
+      if (v > 0xffff) throw new Error("Kein EEB2-QR-Code (Base41: Wert außerhalb 16 Bit)");
+      bytes.push(v >> 8, v & 0xff);
+    } else {
+      const v = ziffern[0]! + ziffern[1]! * 41;
+      if (v > 0xff) throw new Error("Kein EEB2-QR-Code (Base41: Restbyte außerhalb 8 Bit)");
+      bytes.push(v);
+    }
+  }
+  return Uint8Array.from(bytes);
+}
+
+// ------------------------------------------------- Kodierung des Datenteils
+//
+// Der Datenteil eines Fragments trägt seit Base41 den Marker "B." vor sich.
+// Weil '.' weder im Base41- noch im Base64url-Alphabet vorkommt, ist der
+// Marker eindeutig — und alte QR-Codes ohne Marker bleiben unverändert lesbar.
+// Alle Stellen, die Payload-Bytes zu Text machen (Einzelbogen, Vorlage,
+// Segment-Chunk, signierte Varianten), gehen durch dieses Paar.
+
+/** Marker vor einem Base41-kodierten Datenteil. */
+export const EEB_BASE41_MARKER = "B.";
+
+/** Payload-Bytes → Datenteil des Fragments. */
+export function datenKodieren(daten: Uint8Array): string {
+  return EEB_BASE41_MARKER + base41Kodieren(daten);
+}
+
+/**
+ * Datenteil des Fragments → Payload-Bytes. Erkennt Base41 am Marker und liest
+ * markerlose Datenteile weiterhin als Base64url — jeder je erzeugte QR-Code
+ * bleibt damit gültig.
+ */
+export function datenDekodieren(text: string): Uint8Array {
+  return text.startsWith(EEB_BASE41_MARKER)
+    ? base41Dekodieren(text.slice(EEB_BASE41_MARKER.length))
+    : base64UrlDekodieren(text);
+}
+
 /** Datenteil hinter '#' aus voller URL, nacktem '#…'-Fragment oder rohem Payload. */
 export function fragmentInhalt(text: string): string {
   const daten = text.trim();
@@ -654,17 +746,17 @@ export function fragmentInhalt(text: string): string {
   return raute >= 0 ? daten.slice(raute + 1) : daten;
 }
 
-/** Bogen → QR-Inhalt als URL (Präfix + Base64url-Payload). */
+/** Bogen → QR-Inhalt als URL (Präfix + Base41-Payload). */
 export function encodePayloadUrl(b: Erfassungsbogen, k: Kompressor): string {
-  return EEB_URL_PREFIX + base64UrlKodieren(encodePayload(b, k));
+  return EEB_URL_PREFIX + datenKodieren(encodePayload(b, k));
 }
 
 /**
  * Gescannter QR-Text bzw. App-Link → Bogen. Akzeptiert die volle URL
- * (Datenteil hinter '#') oder den nackten Base64url-Payload.
+ * (Datenteil hinter '#') oder den nackten Payload, in Base41 wie in Base64url.
  */
 export function decodePayloadUrl(text: string, k: Kompressor): Erfassungsbogen {
-  return decodePayload(base64UrlDekodieren(fragmentInhalt(text)), k);
+  return decodePayload(datenDekodieren(fragmentInhalt(text)), k);
 }
 
 // ------------------------------------------------------------ Vorlagen-QR
@@ -684,16 +776,16 @@ export function istVorlageNutzlast(text: string): boolean {
   return fragmentInhalt(text).startsWith(EEB_VORLAGE_MARKER);
 }
 
-/** Vorlage-Bogen → QR-Inhalt als URL (Präfix + Marker + Base64url-Payload). */
+/** Vorlage-Bogen → QR-Inhalt als URL (Präfix + Marker + Base41-Payload). */
 export function encodeVorlagePayloadUrl(b: Erfassungsbogen, k: Kompressor): string {
-  return EEB_URL_PREFIX + EEB_VORLAGE_MARKER + base64UrlKodieren(encodePayload(b, k));
+  return EEB_URL_PREFIX + EEB_VORLAGE_MARKER + datenKodieren(encodePayload(b, k));
 }
 
 /** Gescannter Vorlagen-QR bzw. -Link → Bogen (Marker "V." wird entfernt, falls vorhanden). */
 export function decodeVorlagePayloadUrl(text: string, k: Kompressor): Erfassungsbogen {
   let daten = fragmentInhalt(text);
   if (daten.startsWith(EEB_VORLAGE_MARKER)) daten = daten.slice(EEB_VORLAGE_MARKER.length);
-  return decodePayload(base64UrlDekodieren(daten), k);
+  return decodePayload(datenDekodieren(daten), k);
 }
 
 // ---------------------------------------------------------- Segmentierung
@@ -759,7 +851,7 @@ export function segmentPayloadUrls(payload: Uint8Array, anzahl: number): string[
   const urls: string[] = [];
   for (let i = 0; i < anzahl; i++) {
     const chunk = payload.subarray(i * groesse, Math.min((i + 1) * groesse, payload.length));
-    urls.push(`${EEB_URL_PREFIX}${EEB_SEGMENT_MARKER}${i + 1}.${anzahl}.${id}.${base64UrlKodieren(chunk)}`);
+    urls.push(`${EEB_URL_PREFIX}${EEB_SEGMENT_MARKER}${i + 1}.${anzahl}.${id}.${datenKodieren(chunk)}`);
   }
   return urls;
 }
@@ -769,7 +861,8 @@ export function parseSegmentUrl(text: string): SegmentTeil {
   const fragment = fragmentInhalt(text);
   if (!fragment.startsWith(EEB_SEGMENT_MARKER)) throw new Error("Kein EEB2-Segment");
   const rest = fragment.slice(EEB_SEGMENT_MARKER.length);
-  // teilNr . anzahl . id . chunk — der Base64url-Chunk enthält selbst keinen Punkt.
+  // teilNr . anzahl . id . chunk — nur die ersten drei Punkte gehören zum Kopf;
+  // ein etwaiger vierter ist der Base41-Marker des Chunks.
   const punkt1 = rest.indexOf(".");
   const punkt2 = rest.indexOf(".", punkt1 + 1);
   const punkt3 = rest.indexOf(".", punkt2 + 1);
@@ -787,7 +880,7 @@ export function parseSegmentUrl(text: string): SegmentTeil {
   ) {
     throw new Error("EEB2-Segment: ungültiger Kopf");
   }
-  return { teilNr, anzahl, id, chunk: base64UrlDekodieren(rest.slice(punkt3 + 1)) };
+  return { teilNr, anzahl, id, chunk: datenDekodieren(rest.slice(punkt3 + 1)) };
 }
 
 /** Ergebnis von {@link segmentSammeln}. */

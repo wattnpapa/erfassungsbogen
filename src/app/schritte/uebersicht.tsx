@@ -404,16 +404,13 @@ export function Uebersicht(props: {
                   </figure>
                 ))}
               </div>
-              <p className="hinweis">
-                {qr.zeichen} Zeichen · je ≤ QR-Version {qr.version} (ECC M) · signiert ({qr.container})
-              </p>
+              <p className="hinweis">Signiert ({qr.container}).</p>
             </>
           ) : (
             <>
               <img src={qr.teile[0]!.datenUrl} alt="EEB2-QR-Code" />
               <p className="hinweis">
-                {qr.zeichen} Zeichen · QR-Version {qr.version} (ECC M)
-                {` · signiert (${qr.container})`} — öffnet beim Scannen mit der Kamera die App; dieser Code steht auch auf der letzten PDF-Seite.
+                Signiert ({qr.container}) — öffnet beim Scannen mit der Kamera die App; dieser Code steht auch auf der letzten PDF-Seite.
               </p>
             </>
           )
