@@ -50,14 +50,14 @@ function KontakteEditor(props: { kontakte: Kontakt[]; aendern: (k: Kontakt[]) =>
             </select>
           </Feld>
           {k.art === KontaktArt.EMAIL && thw && (
-            <span className="inline">
+            <label className="inline">
               <input
                 type="checkbox"
                 checked={k.emailTemplate === 1}
                 onChange={(e) => set(i, { emailTemplate: e.target.checked ? 1 : undefined, wert: e.target.checked ? undefined : "" })}
               />
               THW-Standardadresse
-            </span>
+            </label>
           )}
           {!(k.art === KontaktArt.EMAIL && k.emailTemplate === 1) && (
             <Feld titel={k.art === KontaktArt.EMAIL ? "Adresse" : "Nummer"}>
@@ -67,10 +67,10 @@ function KontakteEditor(props: { kontakte: Kontakt[]; aendern: (k: Kontakt[]) =>
               />
             </Feld>
           )}
-          <span className="inline">
+          <label className="inline">
             <input type="checkbox" checked={k.dienstlich} onChange={(e) => set(i, { dienstlich: e.target.checked })} />
             dienstlich
-          </span>
+          </label>
           <button type="button" onClick={() => aendern(kontakte.filter((_, j) => j !== i))}>✕</button>
         </div>
       ))}
@@ -259,7 +259,7 @@ export function SchrittPersonal({ bogen, aendern }: SchrittProps) {
     <section className="karte">
       <h2>3. Personal</h2>
       <p>
-        <span className="inline">
+        <label className="inline">
           <input
             type="radio"
             name="perfassung"
@@ -267,8 +267,8 @@ export function SchrittPersonal({ bogen, aendern }: SchrittProps) {
             onChange={() => aendern({ personalErfassung: PersonalErfassung.VOLLSTAENDIG, staerkeManuell: undefined, unterbringungManuell: undefined })}
           />
           Personal vollständig erfassen
-        </span>
-        <span className="inline">
+        </label>
+        <label className="inline">
           <input
             type="radio"
             name="perfassung"
@@ -276,7 +276,7 @@ export function SchrittPersonal({ bogen, aendern }: SchrittProps) {
             onChange={() => aendern({ personalErfassung: PersonalErfassung.NUR_STAERKE, staerkeManuell: sm })}
           />
           Nur Stärke (Meldekopf-Schnellerfassung)
-        </span>
+        </label>
       </p>
 
       {nurStaerke && (
@@ -296,14 +296,14 @@ export function SchrittPersonal({ bogen, aendern }: SchrittProps) {
             </Feld>
           </div>
           <div className="zeile">
-            <span className="inline">
+            <label className="inline">
               <input
                 type="checkbox"
                 checked={bogen.unterbringungManuell != null}
                 onChange={(e) => aendern({ unterbringungManuell: e.target.checked ? { m: 0, w: 0, d: 0 } : undefined })}
               />
               Unterbringung M/W/D angeben
-            </span>
+            </label>
             {bogen.unterbringungManuell && (
               <>
                 {(["m", "w", "d"] as const).map((g) => (
@@ -362,14 +362,14 @@ export function SchrittPersonal({ bogen, aendern }: SchrittProps) {
           (viele Personen zügig erfassen); dazu Mehrzeilen-Import fertiger Listen. */}
       {!nurStaerke && (
         <p className="ansicht-wahl">
-          <span className="inline">
+          <label className="inline">
             <input type="radio" name="pansicht" checked={!schnell} onChange={() => { setSchnell(false); setFokusNeue(false); }} />
             Detail-Karten
-          </span>
-          <span className="inline">
+          </label>
+          <label className="inline">
             <input type="radio" name="pansicht" checked={schnell} onChange={() => { setSchnell(true); setFokusNeue(false); }} />
             Schnelleingabe (Tabelle)
-          </span>
+          </label>
           <button type="button" onClick={() => { setNamenText(""); namenDialog.current?.showModal(); }}>
             Namen einfügen…
           </button>

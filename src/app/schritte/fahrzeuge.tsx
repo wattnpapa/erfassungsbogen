@@ -50,7 +50,7 @@ function FahrzeugKarte(props: {
         </Feld>
       </div>
       <div className="zeile">
-        <span className="inline">
+        <label className="inline">
           <input
             type="checkbox"
             checked={f.funkrufname != null}
@@ -59,7 +59,7 @@ function FahrzeugKarte(props: {
             }
           />
           Funkrufname
-        </span>
+        </label>
         {f.funkrufname && (
           <>
             <Feld titel="Kennwort" schmal>
@@ -70,14 +70,14 @@ function FahrzeugKarte(props: {
                 platzhalter="Kennwort"
               />
             </Feld>
-            <span className="inline">
+            <label className="inline">
               <input
                 type="checkbox"
                 checked={f.funkrufname.eigenerStandort}
                 onChange={(e) => set({ funkrufname: { ...f.funkrufname!, eigenerStandort: e.target.checked, ort: e.target.checked ? undefined : "" } })}
               />
               eigener Standort
-            </span>
+            </label>
             {!f.funkrufname.eigenerStandort && (
               <Feld titel="Ort" schmal>
                 <input value={f.funkrufname.ort ?? ""} onChange={(e) => set({ funkrufname: { ...f.funkrufname!, ort: e.target.value } })} />

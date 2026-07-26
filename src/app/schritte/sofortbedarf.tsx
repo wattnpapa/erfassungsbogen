@@ -16,7 +16,7 @@ export function SchrittSofortbedarf({ bogen, aendern }: SchrittProps) {
   return (
     <section className="karte">
       <h2>5. Sofortbedarf & Sonstiges</h2>
-      <p className="inline">
+      <label className="inline">
         <input
           type="checkbox"
           checked={s != null}
@@ -29,7 +29,7 @@ export function SchrittSofortbedarf({ bogen, aendern }: SchrittProps) {
           }
         />
         Sofortbedarf erfassen
-      </p>
+      </label>
       {s && (
         <>
           <div className="zeile">
@@ -61,14 +61,14 @@ export function SchrittSofortbedarf({ bogen, aendern }: SchrittProps) {
             </Feld>
           </div>
           <p>
-            <span className="inline">
+            <label className="inline">
               <input type="checkbox" checked={s.unterbringung} onChange={(e) => aendern({ sofortbedarf: { ...s, unterbringung: e.target.checked } })} />
               Unterbringung
-            </span>
-            <span className="inline">
+            </label>
+            <label className="inline">
               <input type="checkbox" checked={s.ruhezeitErforderlich} onChange={(e) => aendern({ sofortbedarf: { ...s, ruhezeitErforderlich: e.target.checked } })} />
               Ruhezeit erforderlich
-            </span>
+            </label>
           </p>
         </>
       )}

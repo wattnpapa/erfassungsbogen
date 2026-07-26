@@ -33,7 +33,7 @@ describe("Schritt Fahrzeuge", () => {
     buehne();
 
     await nutzer.click(screen.getByRole("button", { name: "+ Fahrzeug hinzufügen" }));
-    await nutzer.click(screen.getByRole("checkbox")); // Funkrufname
+    await nutzer.click(screen.getByLabelText("Funkrufname"));
 
     const kennzahlen = screen.getByLabelText("Kennzahlen (z. B. 18/13)") as HTMLInputElement;
     await nutzer.type(kennzahlen, "18/13");
