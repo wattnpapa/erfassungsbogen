@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Die App selbst ist eine einzige Seite mit Hash-Routing; als eigenständige
-     Adressen gibt es nur sie und die beiden statischen Textseiten. Bewusst ohne
+     Adressen gibt es nur sie und die statischen Textseiten. Bewusst ohne
      <lastmod>: ein Datum, das bei jedem Release von Hand nachgezogen werden
      müsste, wäre schnell falsch und damit schlechter als keines. -->
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
@@ -11,6 +11,14 @@
   <url>
     <loc>https://erfassungsbogen.app/anleitung.html</loc>
     <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://erfassungsbogen.app/vorlage.html</loc>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://erfassungsbogen.app/impressum.html</loc>
+    <priority>0.3</priority>
   </url>
   <url>
     <loc>https://erfassungsbogen.app/datenschutz.html</loc>

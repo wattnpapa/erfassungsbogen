@@ -29,11 +29,20 @@
   <meta property="og:url" content="https://erfassungsbogen.app/" />
   <meta property="og:title" content="Einheiten-Erfassungsbogen für BOS" />
   <meta property="og:description" content="Bogen am Bildschirm ausfüllen, als PDF im Papier-Layout drucken — und der komplette Inhalt steckt zusätzlich in einem QR-Code, der ohne Internet auf jedem anderen Gerät wieder eingelesen wird." />
-  <meta property="og:image" content="https://erfassungsbogen.app/icons/icon-512.png" />
-  <meta property="og:image:type" content="image/png" />
-  <meta property="og:image:alt" content="Logo des Einheiten-Erfassungsbogens" />
-  <meta name="twitter:card" content="summary" />
+  <!-- Vorschaukarte im Querformat: Der Link wird vor allem in Messenger-Gruppen
+       von Ortsverbänden und Wehren weitergereicht, und dort entscheidet das Bild
+       über den Klick. Das Icon allein füllt diese Karte nicht — deshalb
+       og-bild.jpg (1200×630, erzeugt von scripts/og-bild.mjs). -->
+  <meta property="og:image" content="https://erfassungsbogen.app/og-bild.jpg" />
+  <meta property="og:image:type" content="image/jpeg" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="Einheiten-Erfassungsbogen — ausfüllen, drucken, per QR-Code weitergeben. Ohne Anmeldung, offline, kostenlos." />
+  <meta name="twitter:card" content="summary_large_image" />
 
+  <!-- softwareVersion und dateModified setzt vite.config.ts beim Build ein: von
+       Hand gepflegte Werte wären nach dem nächsten Release falsch, und ein
+       veraltetes Änderungsdatum schadet mehr als ein fehlendes. -->
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -55,6 +64,9 @@
     "softwareHelp": { "@type": "CreativeWork", "url": "https://erfassungsbogen.app/anleitung.html" },
     "privacyPolicy": "https://erfassungsbogen.app/datenschutz.html",
     "image": "https://erfassungsbogen.app/icons/icon-512.png",
+    "screenshot": "https://erfassungsbogen.app/screenshots/start-breit.png",
+    "softwareVersion": "%APP_VERSION%",
+    "dateModified": "%BUILD_DATE%",
     "keywords": "Erfassungsbogen, Einheitenerfassungsbogen, BOS, THW, Feuerwehr, Katastrophenschutz, Hilfsorganisation, Meldekopf, Bereitstellungsraum, Stärkemeldung, Einsatzdokumentation, QR-Code, offline, PDF",
     "featureList": [
       "Erfassungsbogen für Einheit, Einsatz, Personalstärke, Fahrzeuge und Sofortbedarf",
@@ -1673,7 +1685,9 @@
       </p>
       <p>
         <a href="./anleitung.html">Anleitung und häufige Fragen</a> ·
+        <a href="./vorlage.html">Vorlage und Aufbau des Bogens</a> ·
         <a href="./datenschutz.html">Datenschutz</a> ·
+        <a href="./impressum.html">Impressum</a> ·
         <a href="https://github.com/wattnpapa/erfassungsbogen">Quellcode auf GitHub</a>
       </p>
     </div>

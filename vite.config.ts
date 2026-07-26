@@ -9,12 +9,30 @@ const { version } = JSON.parse(readFileSync(new URL("./package.json", import.met
 // im CI über APP_BUILD_VERSION gesetzt. Lokal Fallback auf package.json-Version.
 const appVersion = process.env.APP_BUILD_VERSION || version;
 
+/**
+ * Setzt Version und Build-Datum in die strukturierten Daten der index.html ein
+ * (%APP_VERSION% / %BUILD_DATE%). Suchmaschinen werten `dateModified` als
+ * Frische-Signal — von Hand gepflegt wäre es nach dem nächsten Release falsch,
+ * und ein falsches Datum ist schlechter als keines.
+ */
+function bauStempel() {
+  return {
+    name: "eeb-baustempel",
+    transformIndexHtml(html: string) {
+      return html
+        .replaceAll("%APP_VERSION%", appVersion)
+        .replaceAll("%BUILD_DATE%", new Date().toISOString().slice(0, 10));
+    },
+  };
+}
+
 // base "./": relative Pfade, damit der Build direkt auf GitHub Pages
 // (Unterpfad /<repo>/) funktioniert.
 export default defineConfig({
   base: "./",
   plugins: [
     react(),
+    bauStempel(),
     // Service Worker nur für die im Browser aufgerufene Web-App (erfassungsbogen.app):
     // cached die App-Shell (HTML/JS/CSS, Icons, manifest, das eingebaute THW-OV-
     // Verzeichnis steckt im JS-Bundle), damit die Seite auch offline startet.

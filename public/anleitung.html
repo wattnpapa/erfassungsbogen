@@ -11,8 +11,11 @@
   <meta property="og:title" content="Anleitung und häufige Fragen – Einheiten-Erfassungsbogen">
   <meta property="og:description" content="Wie der digitale Einheiten-Erfassungsbogen ausgefüllt, gedruckt und per QR-Code ohne Internet weitergegeben wird.">
   <meta property="og:url" content="https://erfassungsbogen.app/anleitung.html">
-  <meta property="og:image" content="https://erfassungsbogen.app/icons/icon-512.png">
+  <meta property="og:image" content="https://erfassungsbogen.app/og-bild.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
   <meta property="og:locale" content="de_DE">
+  <meta name="twitter:card" content="summary_large_image">
   <style>
     :root {
       --blau: #12275e;
@@ -53,6 +56,17 @@
     th, td { border: 1px solid var(--rand); padding: 0.4rem 0.6rem; text-align: left; vertical-align: top; }
     th { background: #e7eaf3; }
     footer { margin-top: 2.5rem; padding-top: 1rem; border-top: 1px solid var(--rand); font-size: 0.85rem; color: #555; }
+    /* Bildschirmfotos aus public/screenshots/ (npm run screenshots). Sie zeigen
+       den beschriebenen Ablauf und machen die Seite auch für die Bildersuche
+       auffindbar; width/height stehen im Markup, damit beim Laden nichts
+       springt. */
+    figure { margin: 1.2rem 0; }
+    figure img {
+      display: block; width: 100%; height: auto;
+      border: 1px solid var(--rand); background: #fff;
+    }
+    figure img.schmal { max-width: 17rem; }
+    figcaption { font-size: 0.85rem; color: #555; margin-top: 0.4rem; }
   </style>
 </head>
 <body>
@@ -70,6 +84,15 @@
     </p>
 
     <p><a class="start" href="./">Bogen jetzt ausfüllen</a></p>
+
+    <figure>
+      <img src="./screenshots/start-breit.png" width="1280" height="800" loading="lazy"
+        alt="Startseite des Einheiten-Erfassungsbogens: die Schaltflächen „Neuen Bogen erstellen“, „QR-Code scannen“ und „Aus Datei laden“ sowie die Einsatz-Sammlung für den Meldekopf.">
+      <figcaption>
+        Die Startseite: neuen Bogen anlegen, einen fremden Bogen per QR-Code
+        einlesen oder eine Einsatz-Sammlung für den Meldekopf eröffnen.
+      </figcaption>
+    </figure>
 
     <h2>In fünf Schritten zum fertigen Bogen</h2>
     <ol>
@@ -118,6 +141,15 @@
       Bogen ist ebenfalls da. Optional lässt sich ein Bogen mit einer
       Ed25519-Signatur versehen, damit die Gegenstelle die Herkunft prüfen kann.
     </p>
+
+    <figure>
+      <img class="schmal" src="./screenshots/start-schmal.png" width="390" height="844" loading="lazy"
+        alt="Der Einheiten-Erfassungsbogen auf dem Telefon: dieselbe Startseite im schmalen Layout, mit „Neuen Bogen erstellen“ und „QR-Code scannen“ untereinander.">
+      <figcaption>
+        Auf dem Telefon läuft dieselbe App — sie lässt sich zum Home-Bildschirm
+        hinzufügen und arbeitet danach ohne Netz weiter.
+      </figcaption>
+    </figure>
 
     <h2>Meldekopf und Bereitstellungsraum: Einsätze sammeln</h2>
     <p>
@@ -217,7 +249,9 @@
 
     <footer>
       <a href="./">Zurück zur App</a> ·
+      <a href="./vorlage.html">Vorlage &amp; Aufbau des Bogens</a> ·
       <a href="./datenschutz.html">Datenschutz</a> ·
+      <a href="./impressum.html">Impressum</a> ·
       <a href="https://github.com/wattnpapa/erfassungsbogen">GitHub</a>
     </footer>
   </main>
