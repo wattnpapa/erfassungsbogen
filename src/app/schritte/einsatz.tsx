@@ -34,25 +34,25 @@ export function SchrittEinsatz({ bogen, aendern }: SchrittProps) {
         </Feld>
       </div>
       <div className="zeile">
-        <span className="inline">
+        <label className="inline">
           <input
             type="checkbox"
             checked={ez.einsatzbeginn != null}
             onChange={(e) => setEz({ einsatzbeginn: e.target.checked ? zeitpunktAusIso(jetztLokal()) : undefined })}
           />
           Einsatzbeginn
-        </span>
+        </label>
         {ez.einsatzbeginn != null && (
           <input type="datetime-local" value={zeitpunktZuIso(ez.einsatzbeginn)} onChange={(e) => setEz({ einsatzbeginn: zeitpunktAusIso(e.target.value) })} />
         )}
-        <span className="inline">
+        <label className="inline">
           <input
             type="checkbox"
             checked={ez.einsatzende != null}
             onChange={(e) => setEz({ einsatzende: e.target.checked ? zeitpunktAusIso(jetztLokal()) : undefined })}
           />
           Einsatzende
-        </span>
+        </label>
         {ez.einsatzende != null && (
           <input type="datetime-local" value={zeitpunktZuIso(ez.einsatzende)} onChange={(e) => setEz({ einsatzende: zeitpunktAusIso(e.target.value) })} />
         )}

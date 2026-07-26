@@ -65,10 +65,22 @@ const UEBERSICHT = SCHRITTE.length - 1;
 const SCHRITT_EINSATZ = 1; // Landepunkt nach der Musterung: Ort/Zeitraum sind das einzig Leere.
 
 /**
+ * Fragment aus der Adresszeile holen und dort entfernen, damit die Daten nicht
+ * im Verlauf hängen bleiben. Gemeinsame Grundlage für den Kaltstart und für
+ * `hashchange` (siehe den Listener in `App`).
+ */
+function fragmentNehmen(): string {
+  const fragment = window.location.hash.slice(1);
+  if (fragment) {
+    window.history.replaceState(null, "", window.location.pathname + window.location.search);
+  }
+  return fragment;
+}
+
+/**
  * Startzustand aus dem URL-Fragment: Ein QR/Universal Link kann einen
  * Einsatzbogen (`#…`) oder eine geteilte Vorlage (`#V.…`) tragen. Eine Vorlage
- * wird direkt importiert (nicht als Arbeitsbogen geöffnet). Das Fragment wird
- * danach aus der Adresszeile entfernt, damit die Daten nicht im Verlauf hängen.
+ * wird direkt importiert (nicht als Arbeitsbogen geöffnet).
  */
 function startAusUrlFragment(): {
   bogen: Erfassungsbogen | null;
@@ -77,9 +89,8 @@ function startAusUrlFragment(): {
   /** Rohes Fragment für die (asynchrone) Signaturprüfung nach dem Mounten. */
   text: string;
 } {
-  const fragment = window.location.hash.slice(1);
+  const fragment = fragmentNehmen();
   if (!fragment) return { bogen: null, vorlage: null, fehler: "", text: "" };
-  window.history.replaceState(null, "", window.location.pathname + window.location.search);
   try {
     if (istVorlageNutzlast(fragment)) {
       const b = decodeVorlagePayloadUrl(fragment, browserKompressor);
@@ -402,6 +413,9 @@ export function App() {
     setBogenSignatur(signatur);
     setSchritt(UEBERSICHT);
     setZeigeStart(false);
+    // Einsatzansicht hat Vorrang vor der Übersicht (siehe Render weiter unten):
+    // ohne dieses Schließen bliebe ein per Link geöffneter Bogen unsichtbar.
+    setOffenerEinsatzId(null);
     setFehler("");
     return true;
   }
@@ -508,6 +522,23 @@ export function App() {
     return () => {
       aktiv = false;
     };
+  }, []);
+
+  // Web-Pendant zum Universal Link: Wird ein Bogen-Link angetippt, während die
+  // Seite schon offen ist, lädt der Browser das Dokument NICHT neu — es ändert
+  // sich nur das Fragment. Auf dem Telefon ist genau das der Normalfall (der
+  // Browser benutzt den vorhandenen Tab bzw. die laufende PWA weiter), am
+  // Rechner trifft es jeden Link ab dem zweiten. Ohne diesen Listener liefe der
+  // Kaltstart-Pfad oben nie und man bliebe auf der Startseite stehen.
+  useEffect(() => {
+    function beiFragmentwechsel() {
+      const fragment = fragmentNehmen();
+      if (!fragment) return;
+      void uebernehmeText(fragment, "Der geöffnete Link enthält keinen gültigen Erfassungsbogen.");
+    }
+    window.addEventListener("hashchange", beiFragmentwechsel);
+    return () => window.removeEventListener("hashchange", beiFragmentwechsel);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- nur einmal registrieren; der Handler nutzt ausschließlich stabile Setter
   }, []);
 
   // Universal Link (iOS) / App Link (Android) öffnet die native App:

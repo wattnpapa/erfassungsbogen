@@ -12,12 +12,6 @@ import { SchrittPersonal } from "./personal";
 
 const buehne = () => render(<SchrittBuehne komponente={SchrittPersonal} />);
 
-/**
- * Die Umschalter sind Radios ohne eigenes Label (Beschriftung steht daneben),
- * deshalb über ihre Reihenfolge: 0/1 = Erfassungsart, 2/3 = Ansicht.
- */
-const radios = () => screen.getAllByRole("radio");
-
 describe("Schritt Personal", () => {
   it("legt über „+ Person hinzufügen“ eine Detail-Karte an und zählt sie zur Stärke", async () => {
     const nutzer = userEvent.setup();
@@ -47,7 +41,7 @@ describe("Schritt Personal", () => {
     const nutzer = userEvent.setup();
     buehne();
 
-    await nutzer.click(radios()[1]!);
+    await nutzer.click(screen.getByLabelText("Nur Stärke (Meldekopf-Schnellerfassung)"));
 
     await nutzer.type(screen.getByLabelText("Führer"), "1");
     await nutzer.type(screen.getByLabelText("Unterführer"), "2");
@@ -56,12 +50,31 @@ describe("Schritt Personal", () => {
     expect((screen.getByLabelText("Gesamt") as HTMLInputElement).value).toBe("12");
   });
 
+  /**
+   * Beschriftung und Bedienelement müssen verbunden bleiben: nur so liest ein
+   * Screenreader den Namen vor, und nur so trifft ein Klick auf den Text. Stand
+   * die Beschriftung bloß daneben (<span>), fiel beides aus — daher der Klick
+   * hier bewusst auf den Text und nicht auf das Kästchen.
+   */
+  it("schaltet die Erfassungsart auch über einen Klick auf die Beschriftung um", async () => {
+    const nutzer = userEvent.setup();
+    buehne();
+
+    const nurStaerke = screen.getByLabelText("Nur Stärke (Meldekopf-Schnellerfassung)") as HTMLInputElement;
+    expect(nurStaerke.checked).toBe(false);
+
+    await nutzer.click(screen.getByText("Nur Stärke (Meldekopf-Schnellerfassung)"));
+
+    expect(nurStaerke.checked).toBe(true);
+    expect(screen.getByLabelText("Gesamt")).toBeDefined();
+  });
+
   it("legt in der Schnelleingabe mit Enter die nächste Zeile an", async () => {
     const nutzer = userEvent.setup();
     buehne();
 
     await nutzer.click(screen.getByRole("button", { name: "+ Person hinzufügen" }));
-    await nutzer.click(radios()[3]!); // Schnelleingabe (Tabelle)
+    await nutzer.click(screen.getByLabelText("Schnelleingabe (Tabelle)"));
 
     const tabelle = screen.getByRole("table");
     expect(within(tabelle).getAllByRole("row")).toHaveLength(2); // Kopf + 1 Person
