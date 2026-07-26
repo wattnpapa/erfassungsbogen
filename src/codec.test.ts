@@ -9,6 +9,7 @@ import {
   encodeBinaer,
   encodePayload,
   encodePayloadUrl,
+  signierteBytes,
   type Kompressor,
 } from "./codec";
 import {
@@ -211,6 +212,36 @@ describe("QR-Payload (encodePayload/decodePayload)", () => {
 
   it("lehnt fremde Daten ohne EEB2-Magic ab", () => {
     expect(() => decodePayload(new Uint8Array([1, 2, 3, 4, 5, 6]), zlib)).toThrow(/Kein EEB2/i);
+  });
+});
+
+describe("signierteBytes(): was eine Stufe deckt", () => {
+  const stufe = (fuellung: number, karte?: Uint8Array) => ({
+    pubkey: new Uint8Array(32).fill(fuellung),
+    signatur: new Uint8Array(64).fill(fuellung + 1),
+    ...(karte ? { karte } : {}),
+  });
+  const strom = new Uint8Array([7, 7, 7]);
+
+  it("beginnt mit dem eigenen Kartenblock und endet mit dem Strom", () => {
+    const karte = new Uint8Array([1, 2, 65, 66]);
+    const daten = signierteBytes(strom, karte, []);
+    // varint(4) ‖ Karte ‖ Strom
+    expect(Array.from(daten)).toEqual([4, 1, 2, 65, 66, 7, 7, 7]);
+    // Ohne Karte bleibt die Länge 0 stehen — der Block fehlt nie ganz.
+    expect(Array.from(signierteBytes(strom, undefined, []))).toEqual([0, 7, 7, 7]);
+  });
+
+  it("nimmt frühere Stufen mit hinein (bindet die Reihenfolge)", () => {
+    const allein = signierteBytes(strom, undefined, []);
+    const mitEiner = signierteBytes(strom, undefined, [stufe(1)]);
+    const mitZwei = signierteBytes(strom, undefined, [stufe(1), stufe(3)]);
+    // Je Vorgängerstufe: 32 Schlüssel + 64 Signatur + 1 Kartenlänge.
+    expect(mitEiner.length - allein.length).toBe(97);
+    expect(mitZwei.length - mitEiner.length).toBe(97);
+    // Andere Reihenfolge = andere Bytes → andere Signatur.
+    const getauscht = signierteBytes(strom, undefined, [stufe(3), stufe(1)]);
+    expect(Array.from(getauscht)).not.toEqual(Array.from(mitZwei));
   });
 });
 

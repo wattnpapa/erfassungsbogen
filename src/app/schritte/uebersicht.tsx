@@ -32,7 +32,13 @@ import {
 import { pdfDatenUrl, pdfErzeugen } from "../pdf";
 import { debugAktiv } from "../debug-plattform";
 import { einheitSymbolSvg, svgDataUrl } from "../taktische-zeichen";
-import { absenderLabel, signaturLabel, type SignaturStatus } from "../../signatur";
+import {
+  absenderLabel,
+  kettenLabel,
+  ketteVollstaendig,
+  signaturLabel,
+  type SignaturStatus,
+} from "../../signatur";
 import { absenderkarteLaden, type Absenderkarte } from "../absenderkarte";
 import { AbsenderkarteFeld } from "../absenderkarte-ui";
 import { geraeteKurzform, geraeteOeffentlichHex } from "../geraete-schluessel";
@@ -44,6 +50,11 @@ import {
   staerkeVorlesen,
 } from "./bausteine";
 
+/** Stufenzahl im QR-Hinweis — nur nennen, wenn es tatsächlich ein Meldeweg ist. */
+function stufenText(qr: QrSatz): string {
+  return qr.stufen > 1 ? `, ${qr.stufen} Stufen` : "";
+}
+
 export function Uebersicht(props: {
   bogen: Erfassungsbogen;
   geheZu: (schritt: number) => void;
@@ -51,6 +62,12 @@ export function Uebersicht(props: {
   onVorlageGespeichert?: (name: string) => void;
   /** Signaturstatus des importierten Transports (Herkunft), falls der Bogen gescannt wurde. */
   signatur?: SignaturStatus | null;
+  /**
+   * Rohbytes des empfangenen Payloads. Solange der Bogen unverändert ist, reist
+   * dieser Payload samt Original-Signatur weiter (dieses Gerät zeichnet nur
+   * gegen) — sonst stünde beim nächsten Empfänger das eigene Gerät als Ursprung.
+   */
+  herkunft?: Uint8Array | null;
   /** Gesetzt, wenn der Bogen für eine Einsatz-Sammlung erfasst wird (Meldekopf/Zugführer). */
   sammelAktion?: { label: string; onUebernehmen: () => void };
   /**
@@ -98,7 +115,9 @@ export function Uebersicht(props: {
     setVorschauUrl(null); // Bogen geändert → alte PDF-Vorschau wäre veraltet
     (async () => {
       try {
-        const q = await qrErzeugen(bogen); // signiert immer mit dem Geräteschlüssel
+        // Eigener/bearbeiteter Bogen: mit dem Geräteschlüssel signiert.
+        // Unverändert empfangener Bogen: Original-Payload gegengezeichnet.
+        const q = await qrErzeugen(bogen, props.herkunft);
         if (aktiv) setQr(q);
         geraeteKurzform().then((k) => aktiv && setSchluesselKurz(k));
       } catch (e) {
@@ -108,7 +127,7 @@ export function Uebersicht(props: {
     return () => {
       aktiv = false;
     };
-  }, [bogen, absender]);
+  }, [bogen, absender, props.herkunft]);
 
   // Vollbild-QR = Vorzeige-Moment: der Bildschirm darf dabei nicht ausgehen.
   // Wake Lock anfordern, nach Tab-Wechsel erneut (das System gibt ihn dann frei);
@@ -140,7 +159,7 @@ export function Uebersicht(props: {
     setVorschauLaeuft(true);
     setFehler("");
     try {
-      setVorschauUrl(await pdfDatenUrl(bogen));
+      setVorschauUrl(await pdfDatenUrl(bogen, props.herkunft));
     } catch (e) {
       setFehler(`PDF-Vorschau: ${e instanceof Error ? e.message : e}`);
     } finally {
@@ -190,7 +209,7 @@ export function Uebersicht(props: {
     setPdfLaeuft(true);
     setFehler("");
     try {
-      await pdfErzeugen(bogen);
+      await pdfErzeugen(bogen, undefined, props.herkunft);
     } catch (e) {
       setFehler(`PDF: ${e instanceof Error ? e.message : e}`);
     } finally {
@@ -240,6 +259,18 @@ export function Uebersicht(props: {
             {props.signatur.zustand === "gueltig"
               ? " — Herkunft belegt (nicht die Identität des Absenders)."
               : " — die Daten passen nicht zur Signatur."}
+            {/* Weitergereichter Bogen: der Meldeweg als Kette. Die äußere
+                Signatur sagt nur, wer übergeben hat — wer ihn erstellt hat,
+                steht am Anfang der Kette. */}
+            {kettenLabel(props.signatur) && (
+              <>
+                <br />
+                Meldeweg: <strong>{kettenLabel(props.signatur)}</strong>
+                {ketteVollstaendig(props.signatur)
+                  ? " — jede Stufe hat denselben Bogen gezeichnet."
+                  : " — eine Stufe der Kette ist nicht gedeckt; der Ursprung ist damit unbelegt."}
+              </>
+            )}
             {/* Die Absenderkarte ist mitsigniert, aber selbst gesetzt: als
                 Rückfrage-Kontakt brauchbar, als Identitätsnachweis nicht. */}
             {props.signatur.zustand === "gueltig" && props.signatur.absender && (
@@ -404,13 +435,13 @@ export function Uebersicht(props: {
                   </figure>
                 ))}
               </div>
-              <p className="hinweis">Signiert ({qr.container}).</p>
+              <p className="hinweis">Signiert (EEB2C{stufenText(qr)}).</p>
             </>
           ) : (
             <>
               <img src={qr.teile[0]!.datenUrl} alt="EEB2-QR-Code" />
               <p className="hinweis">
-                Signiert ({qr.container}) — öffnet beim Scannen mit der Kamera die App; dieser Code steht auch auf der letzten PDF-Seite.
+                Signiert (EEB2C{stufenText(qr)}) — öffnet beim Scannen mit der Kamera die App; dieser Code steht auch auf der letzten PDF-Seite.
               </p>
             </>
           )
@@ -426,9 +457,19 @@ export function Uebersicht(props: {
           </p>
         )}
         <div className="signatur-optionen">
+          {/* Beim Weiterreichen ist die wichtigste Aussage, WESSEN Signatur der
+              Code trägt — sonst hielte der nächste Empfänger dieses Gerät für
+              den Ursprung. */}
+          {qr?.weitergeleitet && (
+            <p className="hinweis">
+              <strong>Unveränderter Bogen von fremder Stelle:</strong> Der Code trägt weiterhin die
+              Original-Signatur; dieses Gerät hat nur gegengezeichnet (Weitergabe bezeugt). Sobald
+              hier etwas bearbeitet wird, ist es ein eigener Bogen und wird allein selbst signiert.
+            </p>
+          )}
           <p className="hinweis">
-            Signiert mit dem Geräteschlüssel (Ed25519, +97 Byte). Dieses Gerät:{" "}
-            <strong>{schluesselKurz ?? "Schlüssel wird erzeugt…"}</strong>
+            {qr?.weitergeleitet ? "Gegengezeichnet" : "Signiert"} mit dem Geräteschlüssel (Ed25519,
+            +97 Byte). Dieses Gerät: <strong>{schluesselKurz ?? "Schlüssel wird erzeugt…"}</strong>
             {schluesselKurz && (
               <>
                 {" · "}

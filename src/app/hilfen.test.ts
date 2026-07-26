@@ -7,6 +7,12 @@ vi.mock("./nativ", () => ({
   textTeilen: async () => {},
 }));
 
+// Fester „Geräteschlüssel": ohne localStorage würde je Aufruf ein neuer
+// entstehen und die Prüfung, WER gezeichnet hat, wäre nicht formulierbar.
+vi.mock("./geraete-schluessel", () => ({
+  geraeteSchluesselSicherstellen: async () => new Uint8Array(32).fill(5),
+}));
+
 import {
   Ernaehrung,
   Fahrerlaubnis,
@@ -23,6 +29,7 @@ import {
 } from "../model";
 import {
   bogenLaden,
+  browserKompressor,
   datumDeutsch,
   fahrzeugHinweise,
   funkrufText,
@@ -34,10 +41,19 @@ import {
   neuesFahrzeug,
   orgLabel,
   plausibilitaet,
+  qrErzeugen,
   schrittStatus,
   vokabText,
   vokabularFuer,
 } from "./hilfen";
+import { decodePayload, encodePayload, payloadAusText } from "../codec";
+import {
+  oeffentlicherSchluessel,
+  schluesselKurzform,
+  schluesselpaarErzeugen,
+  signaturVonPayload,
+  signiertePayloadBytes,
+} from "../signatur";
 
 // Minimaler File-Ersatz: bogenLaden nutzt nur datei.text().
 function jsonDatei(inhalt: string): File {
@@ -446,5 +462,70 @@ describe("schrittStatus", () => {
     expect(s[0]).toBe("begonnen");
     expect(s[1]).toBe("begonnen");
     expect(s[2]).toBe("begonnen");
+  });
+});
+
+describe("qrErzeugen(): Herkunft eines fremden Bogens", () => {
+  const GERAET = new Uint8Array(32).fill(5); // wie im Mock oben
+
+  /** Payload, wie ihn ein anderes Gerät signiert übergeben hätte. */
+  async function fremderPayload(b: Erfassungsbogen, name = "Melder") {
+    const fremd = await schluesselpaarErzeugen();
+    const payload = await signiertePayloadBytes(b, browserKompressor, fremd.privat, { name });
+    return { payload, pubkey: fremd.oeffentlich };
+  }
+
+  function ausQr(qr: { vollUrl: string }) {
+    return payloadAusText(qr.vollUrl)!;
+  }
+
+  it("zeichnet einen unveränderten Empfang gegen und erhält die Original-Signatur", async () => {
+    const b = neuerBogen();
+    b.einsatz.ortAuftrag = "Übung Kabelblitz";
+    const { payload, pubkey } = await fremderPayload(b);
+    // Der Bogen, der offen liegt, ist genau der empfangene.
+    const empfangen = decodePayload(payload, browserKompressor);
+
+    const qr = await qrErzeugen(empfangen, payload);
+
+    expect(qr.weitergeleitet).toBe(true);
+    const status = await signaturVonPayload(ausQr(qr));
+    expect(status.zustand).toBe("gueltig");
+    if (status.zustand !== "gueltig") return;
+    expect(status.stufen?.map((s) => s.kurzform)).toEqual([
+      schluesselKurzform(pubkey),
+      schluesselKurzform(await oeffentlicherSchluessel(GERAET)),
+    ]);
+  });
+
+  it("signiert nach einer Bearbeitung allein selbst (fremde Signatur deckt die Änderung nicht)", async () => {
+    const b = neuerBogen();
+    b.einsatz.ortAuftrag = "Übung Kabelblitz";
+    const { payload } = await fremderPayload(b);
+    const bearbeitet = decodePayload(payload, browserKompressor);
+    bearbeitet.einsatz.ortAuftrag = "Nachtrag durch Meldekopf";
+
+    const qr = await qrErzeugen(bearbeitet, payload);
+
+    expect(qr.weitergeleitet).toBe(false);
+    const status = await signaturVonPayload(ausQr(qr));
+    expect(status.zustand).toBe("gueltig");
+    if (status.zustand !== "gueltig") return;
+    expect(status.stufen).toBeUndefined(); // keine Kette — eigener Bogen
+    expect(status.kurzform).toBe(schluesselKurzform(await oeffentlicherSchluessel(GERAET)));
+  });
+
+  it("signiert ohne Herkunft wie bisher", async () => {
+    const qr = await qrErzeugen(neuerBogen());
+    expect(qr.weitergeleitet).toBe(false);
+    expect(qr.stufen).toBe(1); // nur die eigene Signatur
+  });
+
+  it("fällt bei unsigniertem Empfang auf die eigene Signatur zurück", async () => {
+    const b = neuerBogen();
+    const roh = encodePayload(b, browserKompressor);
+    const qr = await qrErzeugen(decodePayload(roh, browserKompressor), roh);
+    expect(qr.weitergeleitet).toBe(false);
+    expect((await signaturVonPayload(ausQr(qr))).zustand).toBe("gueltig");
   });
 });

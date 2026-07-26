@@ -26,15 +26,16 @@ import {
   verpflegung,
 } from "../model";
 import {
-  EEB_KARTE_MAGIC,
   EEB_URL_PREFIX,
   QR_EINZEL_MAX_VERSION,
   QR_SEGMENT_ZIEL_VERSION,
   datenKodieren,
+  decodePayload,
+  entpackePayload,
   segmentPayloadUrls,
   type Kompressor,
 } from "../codec";
-import { signiertePayloadBytes } from "../signatur";
+import { gegengezeichnetePayloadBytes, signiertePayloadBytes } from "../signatur";
 import { absenderkarteLaden } from "./absenderkarte";
 import { geraeteSchluesselSicherstellen } from "./geraete-schluessel";
 import { istNativ, textTeilen } from "./nativ";
@@ -201,8 +202,17 @@ export interface QrSatz {
    * den kompletten Bogen und lässt sich als Textlink teilen.
    */
   vollUrl: string;
-  /** Container des Payloads — „EEB2K", sobald eine Absenderkarte mitreist. */
-  container: "EEB2S" | "EEB2K";
+  /**
+   * Signaturstufen im Payload ('EEB2C'): 1 = selbst signiert, >1 = Meldeweg
+   * (dieses Gerät hat einen fremden Bogen gegengezeichnet).
+   */
+  stufen: number;
+  /**
+   * true = der Code trägt den unveränderten Payload eines fremden Bogens, von
+   * diesem Gerät gegengezeichnet (Signaturkette). false = mit dem
+   * Geräteschlüssel allein signiert (eigener oder bearbeiteter Bogen).
+   */
+  weitergeleitet: boolean;
 }
 
 const QR_OPTIONEN = { errorCorrectionLevel: "M" as const };
@@ -229,29 +239,40 @@ async function teilBild(url: string, teilNr: number, anzahl: number): Promise<Qr
  * Passt der Bogen in einen QR-Code (Budget ≤ v25), bleibt es bei genau einem —
  * unverändert zu früher. Erst darüber wird der Payload segmentiert.
  *
- * Der Payload wird immer Ed25519-signiert (Container „EEB2S", netto +97 Bytes)
- * — der Geräteschlüssel bleibt lokal und wird bei Bedarf einmalig erzeugt.
- * Signieren und Segmentieren sind orthogonal: die Segment-Chunks setzen den
- * signierten Payload 1:1 wieder zusammen, die Signatur bleibt intakt.
+ * Der Payload wird immer Ed25519-signiert (Container „EEB2C", eine Stufe, netto
+ * +99 Bytes) — der Geräteschlüssel bleibt lokal und wird bei Bedarf einmalig
+ * erzeugt. Signieren und Segmentieren sind orthogonal: die Segment-Chunks setzen
+ * den signierten Payload 1:1 wieder zusammen, die Signatur bleibt intakt.
  *
  * Ist eine Absenderkarte hinterlegt (freiwillig, siehe absenderkarte.ts), reist
- * sie mitsigniert im Container „EEB2K" mit; ohne Karte bleibt alles wie bisher.
+ * sie in der Stufe mitsigniert mit.
+ *
+ * `herkunft` = der beim Empfang gescannte Payload. Ist der Bogen seither
+ * unverändert, wird dieser Payload GEGENGEZEICHNET: die Original-Signatur bleibt
+ * erhalten und prüfbar, das eigene Gerät bezeugt nur die Weitergabe. Sobald hier
+ * bearbeitet wurde, ist es ein eigener Bogen und wird allein selbst signiert.
  */
-export async function qrErzeugen(b: Erfassungsbogen): Promise<QrSatz> {
+export async function qrErzeugen(b: Erfassungsbogen, herkunft?: Uint8Array | null): Promise<QrSatz> {
   const karte = absenderkarteLaden();
-  const payload = await signiertePayloadBytes(
-    b,
-    browserKompressor,
-    await geraeteSchluesselSicherstellen(),
-    karte,
-  );
-  // Nicht aus der Karte raten: das 5. Magic-Byte sagt, was tatsächlich drinsteht.
-  const container = payload[4] === EEB_KARTE_MAGIC[4] ? "EEB2K" : "EEB2S";
+  const privat = await geraeteSchluesselSicherstellen();
+  let payload: Uint8Array | null = null;
+  if (herkunft && unveraendert(herkunft, b)) {
+    try {
+      payload = await gegengezeichnetePayloadBytes(herkunft, privat, karte);
+    } catch {
+      // Unsignierter oder unlesbarer Empfang → regulär selbst signieren.
+      payload = null;
+    }
+  }
+  const weitergeleitet = payload != null;
+  payload ??= await signiertePayloadBytes(b, browserKompressor, privat, karte);
+  // Nicht raten, sondern den Payload befragen: er sagt, wie viele Stufen drinstehen.
+  const stufen = entpackePayload(payload).stufen.length;
   const url = EEB_URL_PREFIX + datenKodieren(payload);
   const einzelVersion = qrVersion(url);
   if (einzelVersion <= QR_EINZEL_MAX_VERSION) {
     const teil = await teilBild(url, 1, 1);
-    return { teile: [teil], segmentiert: false, zeichen: url.length, version: teil.version, vollUrl: url, container };
+    return { teile: [teil], segmentiert: false, zeichen: url.length, version: teil.version, vollUrl: url, stufen, weitergeleitet };
   }
 
   // Zu groß: kleinste Teilzahl suchen, bei der jeder Teil auf die gröbere
@@ -269,8 +290,26 @@ export async function qrErzeugen(b: Erfassungsbogen): Promise<QrSatz> {
     zeichen: url.length,
     version: Math.max(...teile.map((t) => t.version)),
     vollUrl: url,
-    container,
+    stufen,
+    weitergeleitet,
   };
+}
+
+/**
+ * Steckt in `herkunft` genau der Bogen, der hier offen liegt? Nur dann darf die
+ * fremde Signatur mitreisen — sie deckt jene Bytes, nicht die bearbeiteten.
+ *
+ * Verglichen wird der dekodierte Bogen als JSON: beide Seiten stammen aus
+ * `decodeBinaer`, dessen Feldreihenfolge fest ist. Ein Unterschied in der
+ * Schlüsselreihenfolge (z. B. nach einer Schema-Migration des offenen Bogens)
+ * führt zur konservativen Antwort „verändert" — dann wird selbst signiert.
+ */
+function unveraendert(herkunft: Uint8Array, b: Erfassungsbogen): boolean {
+  try {
+    return JSON.stringify(decodePayload(herkunft, browserKompressor)) === JSON.stringify(b);
+  } catch {
+    return false;
+  }
 }
 
 // ------------------------------------------------------------ Datei-Dialog

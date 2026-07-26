@@ -9,11 +9,13 @@
 import { useEffect, useRef, useState, type ChangeEvent } from "react";
 import type { Erfassungsbogen } from "../model";
 import {
+  base64UrlKodieren,
   decodePayloadUrl,
   decodeVorlagePayloadUrl,
   istVorlageNutzlast,
   istSegmentNutzlast,
   parseSegmentUrl,
+  payloadAusText,
   segmentSammeln,
   segmentePayload,
   segmenteZuBogen,
@@ -213,6 +215,15 @@ export function App() {
   // Signaturstatus des zuletzt IMPORTIERTEN Bogens (Herkunft des Transports).
   // Wird beim Bearbeiten verworfen — dann beschreibt er den Bogen nicht mehr.
   const [bogenSignatur, setBogenSignatur] = useState<SignaturStatus | null>(null);
+  // Rohbytes des empfangenen Payloads. Nur sie tragen die fremde Signatur:
+  // Beim Weiterreichen wird dieser Payload gegengezeichnet, statt den Bogen neu
+  // zu signieren (sonst stünde das eigene Gerät als Ursprung da).
+  const [bogenHerkunft, setBogenHerkunft] = useState<Uint8Array | null>(null);
+  /** Empfangsstand setzen/verwerfen — Status und Rohpayload gehören zusammen. */
+  const setzeEmpfang = (signatur: SignaturStatus | null, payload: Uint8Array | null = null) => {
+    setBogenSignatur(signatur);
+    setBogenHerkunft(payload);
+  };
   const [meldung, setMeldung] = useState(
     START.vorlage
       ? `Vorlage „${START.vorlage.name}" importiert.`
@@ -277,7 +288,7 @@ export function App() {
 
   function musterungFertig(neuerArbeitsbogen: Erfassungsbogen) {
     setBogen(neuerArbeitsbogen);
-    setBogenSignatur(null);
+    setzeEmpfang(null);
     setSchritt(SCHRITT_EINSATZ);
     setMusterVorlage(null);
     setZeigeStart(false);
@@ -290,7 +301,7 @@ export function App() {
     if (!datei) return;
     try {
       setBogen(await bogenLaden(datei));
-      setBogenSignatur(null); // Datei-Import: kein signierter Transport
+      setzeEmpfang(null); // Datei-Import: kein signierter Transport
       setSchritt(UEBERSICHT);
       setZeigeStart(false);
       setFehler("");
@@ -315,7 +326,7 @@ export function App() {
       return false;
     }
     setBogen(b);
-    setBogenSignatur(null); // Beispiel aus der App, kein signierter Transport
+    setzeEmpfang(null); // Beispiel aus der App, kein signierter Transport
     setSchritt(UEBERSICHT);
     setMusterVorlage(null);
     setOffenerEinsatzId(null);
@@ -352,7 +363,12 @@ export function App() {
     zielId: string,
     b: Erfassungsbogen,
     quelle: "scan" | "manuell",
-    signatur?: EintragSignatur,
+    /**
+     * Was beim Empfang mitkam: geprüfter Signaturstatus und der rohe Payload.
+     * Letzterer wird mitgespeichert, damit der Meldekopf die Meldung später mit
+     * erhaltener Original-Signatur weiterreichen kann (Gegenzeichnen).
+     */
+    empfang?: { signatur?: EintragSignatur; herkunft?: Uint8Array | null },
     /** Kiosk-Scan: Rückmeldung ins Scanner-Overlay statt Ansichtswechsel. */
     kiosk = false,
   ) {
@@ -366,7 +382,12 @@ export function App() {
       );
       if (!alsFassung) override = `${schl}#${Date.now()}`;
     }
-    const r = meldungHinzufuegen(zielId, b, { quelle, einheitSchluesselOverride: override, signatur });
+    const r = meldungHinzufuegen(zielId, b, {
+      quelle,
+      einheitSchluesselOverride: override,
+      signatur: empfang?.signatur,
+      herkunft: empfang?.herkunft ? base64UrlKodieren(empfang.herkunft) : undefined,
+    });
     einsaetzeNeuLaden();
     if (!r) {
       setFehler("Einsatz nicht gefunden.");
@@ -398,19 +419,21 @@ export function App() {
   /**
    * Fertigen Bogen übernehmen: im Sammelmodus als Meldung ablegen, sonst öffnen.
    * `signatur` = Signaturstatus des Transports (Herkunft); beim Öffnen als
-   * Provenienz angezeigt, im Sammelmodus je Meldung gespeichert.
+   * Provenienz angezeigt, im Sammelmodus je Meldung gespeichert. `payload` sind
+   * die empfangenen Rohbytes — sie erhalten die fremde Signatur fürs
+   * Weiterreichen (siehe qrErzeugen/Gegenzeichnen).
    *
    * Rückgabe: true = Scan beendet (Overlay/Loop schließen), false = Kiosk-Modus,
    * der Scanner bleibt für den nächsten Bogen an (Sammelziel bleibt gesetzt).
    */
-  function uebernimmBogen(b: Erfassungsbogen, signatur: SignaturStatus): boolean {
+  function uebernimmBogen(b: Erfassungsbogen, signatur: SignaturStatus, payload?: Uint8Array | null): boolean {
     const ziel = sammelZielRef.current;
     if (ziel) {
-      bogenInSammlung(ziel, b, "scan", alsEintragSignatur(signatur), true);
+      bogenInSammlung(ziel, b, "scan", { signatur: alsEintragSignatur(signatur), herkunft: payload }, true);
       return false; // Kiosk: weiter scannen, bis abgebrochen wird
     }
     setBogen(b);
-    setBogenSignatur(signatur);
+    setzeEmpfang(signatur, payload ?? null);
     setSchritt(UEBERSICHT);
     setZeigeStart(false);
     // Einsatzansicht hat Vorrang vor der Übersicht (siehe Render weiter unten):
@@ -460,7 +483,7 @@ export function App() {
           const status = await signaturVonPayload(payload);
           segmentTeileRef.current = [];
           setScanFortschritt("");
-          return uebernimmBogen(b, status);
+          return uebernimmBogen(b, status, payload);
         }
         setFehler("");
         setScanFortschritt(
@@ -482,7 +505,7 @@ export function App() {
     try {
       const dekodiert = decodePayloadUrl(text, browserKompressor);
       const status = await signaturVonText(text);
-      return uebernimmBogen(dekodiert, status);
+      return uebernimmBogen(dekodiert, status, payloadAusText(text));
     } catch {
       setFehler(fehlertext);
     }
@@ -518,7 +541,7 @@ export function App() {
   useEffect(() => {
     if (!START.bogen || !START.text) return;
     let aktiv = true;
-    signaturVonText(START.text).then((s) => aktiv && setBogenSignatur(s));
+    signaturVonText(START.text).then((s) => aktiv && setzeEmpfang(s, payloadAusText(START.text)));
     return () => {
       aktiv = false;
     };
@@ -606,11 +629,17 @@ export function App() {
     if (!bogen) return;
     const b = bogen;
     const sig = bogenSignatur;
+    const herkunft = bogenHerkunft;
     einsatzWahlDialog.current?.close();
     setBogen(null);
-    setBogenSignatur(null);
+    setzeEmpfang(null);
     setSchritt(0);
-    bogenInSammlung(zielId, b, sig ? "scan" : "manuell", sig ? alsEintragSignatur(sig) : undefined);
+    bogenInSammlung(
+      zielId,
+      b,
+      sig ? "scan" : "manuell",
+      sig ? { signatur: alsEintragSignatur(sig), herkunft } : undefined,
+    );
   }
 
   /** Aus der Einsatz-Auswahl heraus einen neuen Einsatz anlegen und den Bogen hineinlegen. */
@@ -635,7 +664,7 @@ export function App() {
     setOffenerEinsatzId(null); // Assistent übernimmt die Ansicht
     setMeldung("");
     setBogen(neuerBogen());
-    setBogenSignatur(null);
+    setzeEmpfang(null);
     setSchritt(0);
     setZeigeStart(false);
   }
@@ -845,7 +874,7 @@ export function App() {
           );
         })()}
         <div className="aktionen">
-          <button type="button" className={bogen ? "" : "primaer"} onClick={() => { setBogen(neuerBogen()); setBogenSignatur(null); setSchritt(0); setZeigeStart(false); }}>
+          <button type="button" className={bogen ? "" : "primaer"} onClick={() => { setBogen(neuerBogen()); setzeEmpfang(null); setSchritt(0); setZeigeStart(false); }}>
             Neuen Bogen erstellen
           </button>
           <button type="button" onClick={scanneQr}>QR-Code scannen…</button>
@@ -938,7 +967,7 @@ export function App() {
   // Transport, nicht den nun geänderten Bogen.
   const aendern = (patch: Partial<Erfassungsbogen>) => {
     setBogen({ ...bogen, ...patch });
-    setBogenSignatur(null);
+    setzeEmpfang(null);
   };
 
   // Leichter Füllstand je Schritt (Orientierung; die Übersicht hat keinen Status).
@@ -1004,8 +1033,9 @@ export function App() {
         <Uebersicht
           bogen={bogen}
           signatur={bogenSignatur}
+          herkunft={bogenHerkunft}
           geheZu={setSchritt}
-          neu={() => { setBogen(null); setBogenSignatur(null); setSchritt(0); }}
+          neu={() => { setBogen(null); setzeEmpfang(null); setSchritt(0); }}
           onVorlageGespeichert={(name) => { vorlagenNeuLaden(); setMeldung(`Als Vorlage „${name}" gespeichert.`); }}
           onInEinsatzAufnehmen={() => { einsaetzeNeuLaden(); einsatzWahlDialog.current?.showModal(); }}
           sammelAktion={
@@ -1016,7 +1046,7 @@ export function App() {
                     const ziel = sammelZielId;
                     setSammelZiel(null);
                     setBogen(null);
-                    setBogenSignatur(null);
+                    setzeEmpfang(null);
                     setSchritt(0);
                     // Manuell erfasster Bogen ist kein signierter Transport.
                     bogenInSammlung(ziel, bogen, "manuell");

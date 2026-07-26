@@ -13,6 +13,7 @@ import * as pdfFonts from "pdfmake/build/vfs_fonts";
 // „File 'data/Helvetica-Bold.afm' not found in virtual file system" ab.
 import helvetica from "pdfmake/build/standard-fonts/Helvetica";
 import type { Erfassungsbogen } from "../model";
+import { base64UrlDekodieren } from "../codec";
 import { einheitAnzeigename, qrErzeugen } from "./hilfen";
 import { istNativ, pdfTeilen } from "./nativ";
 import { einsatzPdfDokument, pdfDokument, type SammelBogen } from "./pdf-dokument";
@@ -52,9 +53,15 @@ pdf.addFonts({
 /**
  * Bogen als PDF ausgeben. `name` überschreibt den aus der Einheit abgeleiteten
  * Dateinamen (die Beispielbögen behalten so ihren Dateinamen aus examples/).
+ * `herkunft` = empfangener Payload: unverändert weitergereicht behält der
+ * QR-Code auf der letzten Seite die Original-Signatur (siehe qrErzeugen).
  */
-export async function pdfErzeugen(b: Erfassungsbogen, name?: string): Promise<void> {
-  const qr = await qrErzeugen(b);
+export async function pdfErzeugen(
+  b: Erfassungsbogen,
+  name?: string,
+  herkunft?: Uint8Array | null,
+): Promise<void> {
+  const qr = await qrErzeugen(b, herkunft);
   const dd = pdfDokument(b, qr);
   const dateiname = name ?? `eeb-${einheitAnzeigename(b.einheit).replace(/[^\wäöüÄÖÜß-]+/g, "_")}.pdf`;
   if (istNativ()) {
@@ -70,8 +77,8 @@ export async function pdfErzeugen(b: Erfassungsbogen, name?: string): Promise<vo
  * Bogen als PDF-Daten-URL — für die eingebettete Vorschau in der Übersicht
  * (Browser/Desktop; die native App zeigt PDFs übers Share-Sheet an).
  */
-export async function pdfDatenUrl(b: Erfassungsbogen): Promise<string> {
-  const qr = await qrErzeugen(b);
+export async function pdfDatenUrl(b: Erfassungsbogen, herkunft?: Uint8Array | null): Promise<string> {
+  const qr = await qrErzeugen(b, herkunft);
   const dd = pdfDokument(b, qr);
   return pdfMake.createPdf(dd).getDataUrl();
 }
@@ -85,6 +92,21 @@ export async function pdfDatenUrl(b: Erfassungsbogen): Promise<string> {
  * Erwartet die Meldungen (nicht nur die Bögen), weil die Änderungsspalte je
  * Einheit die vorherige Revision aus der Sammlung braucht.
  */
+/**
+ * Empfangene Rohbytes einer Meldung — Grundlage fürs Gegenzeichnen, damit eine
+ * unverändert weitergegebene Meldung die Original-Signatur behält. Ältere
+ * Sammlungen haben sie nicht; ein beschädigter Eintrag darf das PDF nicht
+ * verhindern (dann wird wie früher selbst signiert).
+ */
+function herkunftBytes(m: MeldeEintrag): Uint8Array | null {
+  if (!m.herkunft) return null;
+  try {
+    return base64UrlDekodieren(m.herkunft);
+  } catch {
+    return null;
+  }
+}
+
 export async function einsatzPdfErzeugen(einsatz: Einsatzsammlung, meldungen: MeldeEintrag[]): Promise<void> {
   const boegenMitQr: SammelBogen[] = [];
   for (const m of meldungen) {
@@ -93,7 +115,7 @@ export async function einsatzPdfErzeugen(einsatz: Einsatzsammlung, meldungen: Me
     const revs = revisionen(einsatz.eintraege, m.einheitSchluessel);
     const idx = revs.findIndex((r) => r.id === m.id);
     const vorher = idx >= 0 ? revs[idx + 1]?.bogen : undefined;
-    boegenMitQr.push({ bogen: m.bogen, qr: await qrErzeugen(m.bogen), vorher });
+    boegenMitQr.push({ bogen: m.bogen, qr: await qrErzeugen(m.bogen, herkunftBytes(m)), vorher });
   }
   const dd = einsatzPdfDokument(einsatz.name, boegenMitQr, einsatzDateiInhalt(einsatz));
   const dateiname = `eeb-einsatz-${(einsatz.name || "sammlung").replace(/[^\wäöüÄÖÜß-]+/g, "_")}.pdf`;

@@ -208,43 +208,55 @@ bleibt gültig, auch gemischte Segment-Sätze. Umgekehrt gilt das nicht: Eine
 App-Version von vor der Umstellung kann einen `B.`-Code nicht lesen und lehnt
 ihn mit „Kein EEB2-QR-Code" ab (wie schon bei den Markern `V.` und `EEBS.`).
 
-### Signatur „EEB2S" (Ed25519)
+### Signatur „EEB2C" (Ed25519, n Stufen)
 
 Jeder von der App erzeugte QR-Code (Bogen, Vorlage, PDF-Seite) wird signiert; der
 Geräteschlüssel wird dafür beim ersten Bedarf einmalig erzeugt. Gelesen werden
 weiterhin auch unsignierte `'EEB2'`-Codes.
 
-Ein signierter Payload trägt ein **eigenes 5-Byte-Magic** und zwischen Magic und
-Nutzdaten den öffentlichen Schlüssel und die Signatur:
+Es gibt **einen** signierten Container. Er trägt eine **Liste von Stufen** — der
+Meldeweg des Bogens. Stufe 1 ist der Ersteller; wer einen fremden Bogen
+unverändert weiterreicht, hängt eine Stufe an (siehe „Signaturkette" unten). Der
+Normalfall ist `n=1`.
 
 ```
-Signierter Payload:  0x45 0x45 0x42 0x32 0x53 ('EEB2S')
-                     ‖ pubkey[32]      (Ed25519, roher öffentlicher Schlüssel)
-                     ‖ signatur[64]    (Ed25519 über den DeflateRaw-Strom)
+Signierter Payload:  0x45 0x45 0x42 0x32 0x43 ('EEB2C')
+                     ‖ varint(n)                  (Stufen, 1…32)
+                     ‖ stufe_1 … stufe_n
                      ‖ DeflateRaw(Binärstrom)
+
+stufe_k            = pubkey[32]                   (Ed25519, roher Schlüssel)
+                     ‖ signatur[64]
+                     ‖ varint(kartenLen) ‖ karte  (kartenLen 0 = keine Karte)
 ```
 
-- **Abwärtskompatibel.** `'EEB2S'` beginnt zwar mit `'EEB2'`, der Decoder prüft
-  aber **zuerst** die 5 Signatur-Bytes und erst dann die 4 EEB2-Bytes. Alte,
-  unsignierte `'EEB2'`-Codes (Deflate-Strom direkt hinter dem Magic) werden
-  unverändert gelesen. Der Deflate-Strom hinter der Signatur ist **byte-identisch**
-  zum unsignierten Payload — die Signatur ist reine Hülle.
-- **Signaturumfang.** Signiert wird genau der **Container-Rumpf hinter dem
-  Signaturfeld** — bei `'EEB2S'` also der komprimierte Binärstrom
-  (`DeflateRaw(Binärstrom)`), nicht Magic/Schlüssel. Manipulation an den Nutzdaten
-  bricht die Prüfung; ein Angreifer kann jedoch neu signieren — die Signatur
-  belegt **Herkunft** (welcher Schlüssel), nicht Unveränderbarkeit gegen den
-  Schlüsselinhaber selbst.
+- **Magic-Reihenfolge.** `'EEB2C'` beginnt mit `'EEB2'`, der Decoder prüft daher
+  **zuerst** die 5 Bytes und erst dann die 4. Unsignierte `'EEB2'`-Codes
+  (Deflate-Strom direkt hinter dem Magic) werden unverändert gelesen. Der
+  Deflate-Strom hinter den Stufen ist **byte-identisch** zum unsignierten
+  Payload — die Stufen sind reine Hülle.
+- **Signaturumfang.** Stufe k zeichnet **ihren Kartenblock ‖ die Stufen 1…k−1 ‖
+  den komprimierten Strom** — nicht Magic und nicht ihren eigenen Schlüssel.
+  Dass die Vorgängerstufen mitgezeichnet werden, macht den Meldeweg
+  manipulationsfest: eine Stufe lässt sich nicht entfernen, einfügen oder
+  umsortieren, ohne jede spätere Signatur zu brechen. Manipulation an den
+  Nutzdaten bricht alle Stufen; ein Angreifer kann jedoch neu signieren — die
+  Signatur belegt **Herkunft** (welcher Schlüssel), nicht Unveränderbarkeit
+  gegen den Schlüsselinhaber selbst.
 - **Verifikation blockiert den Import nie.** Ergebnis ist ein Anzeigehinweis:
   „✓ signiert von <Kurzform>" / „nicht signiert" / „Signatur ungültig".
-- **Größenbudget.** Die Signaturhülle ist 101 Bytes (5 Magic + 32 Schlüssel +
-  64 Signatur); netto wächst der Payload um **+97 Bytes** gegenüber unsigniert
-  (das 4-Byte-`EEB2`-Magic wird durch das 5-Byte-`EEB2S` ersetzt), nach Base41
-  ~+146 Zeichen. Gemessen am vollen THW-Bogen: unsigniert QR v13 → signiert QR
-  v17 — deutlich unter dem Ziel ≤ v25.
+  Maßgeblich ist die **letzte** Stufe — sie belegt, von wem dieser Bogen kam.
+- **Stufenzahl gedeckelt** (32, `MAX_STUFEN`). Reale Meldewege haben eine bis
+  drei; die Grenze hält einen aufgeblähten Payload früh und mit klarer Meldung
+  auf, statt ihn n-mal kryptografisch prüfen zu lassen.
+- **Größenbudget.** Eine Stufe kostet 97 Bytes (32 Schlüssel + 64 Signatur + 1
+  Kartenlänge), dazu 5 Magic + 1 Stufenzahl. Netto **+99 Bytes** gegenüber
+  unsigniert bei `n=1` (das 4-Byte-`EEB2`-Magic wird durch das 5-Byte-`EEB2C`
+  ersetzt), nach Base41 ~+149 Zeichen. Gemessen am vollen THW-Bogen:
+  unsigniert QR v13 → signiert QR v17 — deutlich unter dem Ziel ≤ v25.
 - **Vorlagen/Segmentierung orthogonal.** Der Vorlagen-Marker `V.` und die
   Base41/URL-Hülle liegen um den ganzen Payload; ein signierter Vorlagen-QR ist
-  `#V.B.` ‖ Base41(`EEB2S…`).
+  `#V.B.` ‖ Base41(`EEB2C…`).
 
 **Schlüsselverwaltung (bewusst simpel, kein Server).** Jedes Gerät erzeugt lokal
 **einmalig** ein Ed25519-Schlüsselpaar; der private Schlüssel bleibt im
@@ -258,33 +270,28 @@ zu einer bestimmten Person/Dienststelle gehört. Vertrauen entsteht außerhalb d
 App (Schlüssel-Kurzform am Meldekopf abgleichen, bekannte Absender wiedererkennen).
 Der Nutzen ist Integrität + Wiedererkennbarkeit, nicht PKI.
 
-### Absenderkarte „EEB2K" (freiwillige Kontaktangaben)
+### Absenderkarte (freiwillige Kontaktangaben, je Stufe)
 
 Ein Schlüssel-Fingerabdruck ist wiedererkennbar, aber stumm. Wer möchte, hinterlegt
 deshalb **einmalig** am Gerät Name, E-Mail und/oder Telefonnummer; diese
 **Absenderkarte** reist danach in jedem übergebenen Bogen (QR, Link, PDF) mit und
 gibt der Gegenstelle einen Rückkanal für Rückfragen.
 
-```
-Signiert + Karte:    0x45 0x45 0x42 0x32 0x4b ('EEB2K')
-                     ‖ pubkey[32]
-                     ‖ signatur[64]    (Ed25519 über alles ab hier)
-                     ‖ varint(len) ‖ karte[len]
-                     ‖ DeflateRaw(Binärstrom)
+Die Karte gehört zur **Stufe**, nicht zum Payload: jede Stelle im Meldeweg trägt
+ihre eigene (oder keine).
 
+```
 karte:               flags[1]          (Bit 0 Name, Bit 1 E-Mail, Bit 2 Telefon)
                      ‖ je gesetztem Bit: varint(Länge) ‖ UTF-8
 ```
 
-- **Opt-in mit eigenem Magic.** Ohne hinterlegte Karte bleibt der Payload
-  **byte-identisch** zu `'EEB2S'` — niemand zahlt für ein Feld, das er nicht
-  nutzt. Der Decoder prüft `'EEB2K'`, `'EEB2S'`, `'EEB2'` in dieser Reihenfolge.
-  Umgekehrt gilt: App-Stände von **vor** dieser Version können `'EEB2K'`-Codes
-  nicht lesen — die Karte ist ein bewusster Schnitt für Absender, die sie setzen.
-- **Mitsigniert.** Die Signatur deckt `varint(len) ‖ karte ‖ DeflateRaw(…)` ab.
-  Eine ausgetauschte Karte bricht die Prüfung; angezeigt wird sie deshalb **nur**
-  bei gültiger Signatur. Unbekannte Flagbits und überschüssige Bytes am Kartenende
-  werden ignoriert, damit spätere Felder alte Leser nicht blind machen.
+- **Opt-in ohne Formatwechsel.** Ohne hinterlegte Karte steht in der Stufe nur
+  `kartenLen = 0` — ein Byte, das ohnehin im Container steht. Eine Karte ohne
+  jeden gefüllten Wert zählt als keine Karte (byte-identischer Payload).
+- **Mitsigniert.** Der Kartenblock steht am Anfang der von der Stufe signierten
+  Bytes. Eine ausgetauschte Karte bricht die Prüfung; angezeigt wird sie deshalb
+  **nur** bei gültiger Signatur. Unbekannte Flagbits und überschüssige Bytes am
+  Kartenende werden ignoriert, damit spätere Felder alte Leser nicht blind machen.
 - **Keine Identitätszusicherung.** Die Karte ist eine **Eigenangabe** des
   Absenders — sie belegt so viel wie ein selbst geschriebener Briefkopf. Sie macht
   den Absender ansprechbar; verifiziert wird außerhalb der App (Rückruf).
@@ -297,13 +304,47 @@ karte:               flags[1]          (Bit 0 Name, Bit 1 E-Mail, Bit 2 Telefon)
   (`eeb.absenderkarte.v1` im `localStorage`, wandert über die Datensicherung mit).
   Referenz: [`src/app/absenderkarte.ts`](../src/app/absenderkarte.ts).
 
+### Signaturkette beim Weiterreichen (Gegenzeichnen)
+
+Ein gescannter Bogen wird oft weitergegeben — der Meldekopf sammelt Bögen fremder
+Einheiten und reicht sie an die nächste Führungsstelle. Würde die App den Bogen
+dabei neu signieren, stünde beim nächsten Empfänger **das weiterreichende Gerät
+als Ursprung**; die Herkunft wäre nach dem ersten Meldeschritt verloren.
+
+Deshalb wird ein **unverändert** weitergereichter Bogen **gegengezeichnet**: der
+komprimierte Strom und alle bisherigen Stufen bleiben wörtlich erhalten, das
+eigene Gerät hängt nur eine Stufe an und bezeugt damit die Weitergabe.
+
+- **Eine Stufe je Stelle.** `n` wächst von 1 (Ersteller) über 2 (Meldekopf) auf
+  3 (Leitstelle) — der Meldeweg steht als Liste im Container, ohne
+  Verschachtelung und ohne Sonderfall.
+- **Reihenfolge mitsigniert.** Weil Stufe k die Stufen 1…k−1 mitzeichnet, bricht
+  jedes Entfernen, Einfügen oder Umsortieren die späteren Signaturen. Der Weg
+  ist damit so belastbar wie die einzelnen Signaturen.
+- **Unverändert heißt unverändert.** Angehängt wird nur, wenn der offene Bogen
+  exakt dem empfangenen Payload entspricht. Nach jeder Bearbeitung ist es ein
+  eigener Bogen: dann wird mit einer einzelnen Stufe selbst signiert, und die
+  Oberfläche sagt das.
+- **Anzeige.** „Meldeweg: <Ursprung> → <Zwischenstelle> → <Absender>". Eine
+  gebrochene frühere Stufe entwertet die letzte **nicht** — die belegt weiter,
+  was der letzte Absender übergeben hat; unbelegt ist dann nur der behauptete
+  Ursprung.
+- **Größenbudget.** 97 Bytes je zusätzlicher Stufe, plus die Karte jener Stelle.
+- **Aufbewahrung.** Nur die Rohbytes tragen die fremden Signaturen, ein
+  dekodierter Bogen nicht. Der empfangene Payload wird deshalb am offenen Bogen
+  und je Meldung in der Einsatz-Sammlung (`herkunft`, Base64url) mitgeführt.
+  Meldungen ohne dieses Feld (manuell erfasst, unsigniert empfangen, ältere
+  Sammlungen) werden selbst signiert.
+  Referenz: [`src/signatur.ts`](../src/signatur.ts) (`gegengezeichnetePayloadBytes`).
+
 Binärstrom: Felder in fester Reihenfolge, Varint-Längen, UTF-8-Strings, Optionals
 über Flag-Bits, Vokabular-Werte als Varint-Code (0 = Freitext folgt).
 Referenzimplementierung: [`prototype/qr-size-check.mjs`](../prototype/qr-size-check.mjs).
 
 **Integrität:** QR-Fehlerkorrektur (ECC M = 15 %) sichert den Transport; Deflate
 schlägt bei Bitfehlern ohnehin fehl. **Authentizität** stets per
-Ed25519-Signatur (Container `EEB2S`, netto +97 Bytes) — siehe „Signatur" oben.
+Ed25519-Signatur (Container `EEB2C`, netto +99 Bytes bei einer Stufe) — siehe
+„Signatur" oben.
 
 **Gemessene Größen** (siehe README): voller THW-Bogen 511 Bytes → QR v18
 (mit OV-Verzeichnis-Referenz 411 Bytes → QR v15); Meldekopf-Schnellerfassung
@@ -363,4 +404,5 @@ Byte-für-Byte identisch zu vorher. Referenz: [`src/codec.ts`](../src/codec.ts)
   Aktualisierungsweg festlegen. (Format ist umgesetzt, siehe `standortRef`.)
 - Deflate-Preset-Dictionary aus typischen Bögen (~10–20 % zusätzliche Ersparnis).
 - ~~Signatur/Authentizität ja/nein.~~ Umgesetzt: Ed25519-Signatur (immer aktiv)
-  (`EEB2S`, `src/codec.ts` + `src/signatur.ts`), Verifikation bei Import.
+  (`EEB2C`, `src/codec.ts` + `src/signatur.ts`), Verifikation bei Import,
+  Signaturkette beim Weiterreichen.

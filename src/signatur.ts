@@ -21,17 +21,18 @@ import type { Erfassungsbogen } from "./model";
 import {
   EEB_URL_PREFIX,
   EEB_VORLAGE_MARKER,
+  MAX_STUFEN,
   PUBKEY_LAENGE,
-  datenDekodieren,
   datenKodieren,
   dekodiereAbsenderkarte,
   encodeBinaer,
   entpackePayload,
-  fragmentInhalt,
   kodiereAbsenderkarte,
   packePayload,
+  payloadAusText,
   signierteBytes,
   type Absenderkarte,
+  type Kettenstufe,
   type Kompressor,
 } from "./codec";
 
@@ -45,16 +46,36 @@ export interface Schluesselpaar {
   oeffentlich: Uint8Array;
 }
 
+/** Eine Stufe der Signaturkette (wer hat diesen Bogen wann gezeichnet). */
+export interface Signaturstufe {
+  zustand: "gueltig" | "ungueltig";
+  pubkey: string;
+  kurzform: string;
+  /** Freiwillige Absenderangaben jener Stufe — nur bei „gueltig" verwertbar. */
+  absender?: Absenderkarte;
+}
+
 /**
  * Ergebnis der Signaturprüfung beim Import — reiner Anzeigestatus.
  *
  * `absender` steht bewusst NUR am Zustand „gueltig": Die Karte ist zwar
  * mitsigniert, bei gebrochener Signatur wäre sie aber wertlos und dürfte nie
  * als Absenderangabe angezeigt werden.
+ *
+ * `pubkey`/`kurzform`/`absender` beschreiben immer die LETZTE Stufe, also wer den
+ * Bogen gezeichnet und übergeben hat. `stufen` steht nur bei einem
+ * weitergereichten Bogen: chronologisch vom Ursprung (Index 0) bis zu dieser
+ * letzten Stufe.
  */
 export type SignaturStatus =
   | { zustand: "unsigniert" }
-  | { zustand: "gueltig"; pubkey: string; kurzform: string; absender?: Absenderkarte }
+  | {
+      zustand: "gueltig";
+      pubkey: string;
+      kurzform: string;
+      absender?: Absenderkarte;
+      stufen?: Signaturstufe[];
+    }
   | { zustand: "ungueltig"; pubkey: string; kurzform: string };
 
 // --------------------------------------------------------------- Hex-Helfer
@@ -104,18 +125,30 @@ export function oeffentlicherSchluessel(privat: Uint8Array): Promise<Uint8Array>
 
 // ------------------------------------------------------------ Signierter QR
 
-/** Karte ohne jeden gefüllten Wert zählt als „keine Karte" (kein Container-Wechsel). */
+/** Karte ohne jeden gefüllten Wert zählt als „keine Karte" (Kartenlänge 0). */
 function kartenBytes(karte?: Absenderkarte): Uint8Array | undefined {
   if (!karte || (!karte.name && !karte.email && !karte.telefon)) return undefined;
   return kodiereAbsenderkarte(karte);
 }
 
+/** Neue Stufe hinter `frueher` zeichnen — der gemeinsame Kern beider Signierwege. */
+async function neueStufe(
+  komprimiert: Uint8Array,
+  privat: Uint8Array,
+  karte: Uint8Array | undefined,
+  frueher: Kettenstufe[],
+): Promise<Kettenstufe> {
+  const signatur = await ed.signAsync(signierteBytes(komprimiert, karte, frueher), privat);
+  const pubkey = await ed.getPublicKeyAsync(privat);
+  return { pubkey, signatur, ...(karte ? { karte } : {}) };
+}
+
 /**
- * Bogen → signierte Payload-Bytes ('EEB2S'… bzw. mit Absenderkarte 'EEB2K'…).
+ * Bogen → signierte Payload-Bytes ('EEB2C' mit einer Stufe: dem Ersteller).
  * Exportiert, damit der Aufrufer den Payload bei Bedarf segmentieren kann (die
  * Segment-Chunks setzen ihn 1:1 wieder zusammen — Signatur bleibt intakt).
  *
- * `karte` ist freiwillig: ohne sie ist der Payload byte-identisch zu früher.
+ * `karte` ist freiwillig; ohne sie steht in der Stufe nur die Kartenlänge 0.
  */
 export async function signiertePayloadBytes(
   b: Erfassungsbogen,
@@ -124,15 +157,11 @@ export async function signiertePayloadBytes(
   karte?: Absenderkarte,
 ): Promise<Uint8Array> {
   const komprimiert = k.deflateRaw(encodeBinaer(b));
-  const kartenRoh = kartenBytes(karte);
-  // Signiert wird GENAU der Container-Rumpf hinter der Signatur (ohne Karte
-  // also weiterhin nur der komprimierte Strom) — nicht Magic/Schlüssel.
-  const signatur = await ed.signAsync(signierteBytes(komprimiert, kartenRoh), privat);
-  const pubkey = await ed.getPublicKeyAsync(privat);
-  return packePayload({ komprimiert, signatur: { pubkey, signatur, karte: kartenRoh } });
+  const stufe = await neueStufe(komprimiert, privat, kartenBytes(karte), []);
+  return packePayload({ komprimiert, stufen: [stufe] });
 }
 
-/** Bogen → signierter QR-Inhalt als App-URL (Präfix + Base41('EEB2S'…)). */
+/** Bogen → signierter QR-Inhalt als App-URL (Präfix + Base41('EEB2C'…)). */
 export async function encodeSigniertPayloadUrl(
   b: Erfassungsbogen,
   k: Kompressor,
@@ -140,6 +169,28 @@ export async function encodeSigniertPayloadUrl(
   karte?: Absenderkarte,
 ): Promise<string> {
   return EEB_URL_PREFIX + datenKodieren(await signiertePayloadBytes(b, k, privat, karte));
+}
+
+/**
+ * Fremden Bogen unverändert weiterreichen: eine Stufe ANHÄNGEN statt neu zu
+ * signieren. Der komprimierte Strom und alle bisherigen Stufen bleiben wörtlich
+ * erhalten — damit bleibt beim nächsten Empfänger prüfbar, von wem der Bogen
+ * ursprünglich kam und über wen er gelaufen ist.
+ *
+ * Wirft, wenn `herkunft` kein EEB2-Payload, selbst unsigniert oder die Kette
+ * voll ist (dann gibt es keine Herkunft zu bezeugen bzw. keinen Platz — der
+ * Aufrufer signiert regulär).
+ */
+export async function gegengezeichnetePayloadBytes(
+  herkunft: Uint8Array,
+  privat: Uint8Array,
+  karte?: Absenderkarte,
+): Promise<Uint8Array> {
+  const { komprimiert, stufen } = entpackePayload(herkunft);
+  if (stufen.length === 0) throw new Error("Empfangener Bogen ist unsigniert — nichts gegenzuzeichnen");
+  if (stufen.length >= MAX_STUFEN) throw new Error(`Meldeweg hat schon ${MAX_STUFEN} Stufen`);
+  const stufe = await neueStufe(komprimiert, privat, kartenBytes(karte), stufen);
+  return packePayload({ komprimiert, stufen: [...stufen, stufe] });
 }
 
 /** Vorlage-Bogen → signierter QR-Inhalt als URL (Präfix + Marker „V." + Base41). */
@@ -173,9 +224,36 @@ function absenderVon(roh?: Uint8Array): Absenderkarte | undefined {
 }
 
 /**
+ * Eine Stufe prüfen. Signiert hat sie ihren Kartenblock, alle Stufen VOR ihr und
+ * den komprimierten Strom — `frueher` muss also genau die Vorgängerstufen in
+ * Container-Reihenfolge enthalten.
+ */
+async function pruefeStufe(
+  komprimiert: Uint8Array,
+  stufe: Kettenstufe,
+  frueher: Kettenstufe[],
+): Promise<Signaturstufe> {
+  const anzeige = { pubkey: zuHex(stufe.pubkey), kurzform: schluesselKurzform(stufe.pubkey) };
+  try {
+    const daten = signierteBytes(komprimiert, stufe.karte, frueher);
+    const ok = await ed.verifyAsync(stufe.signatur, daten, stufe.pubkey);
+    if (!ok) return { zustand: "ungueltig", ...anzeige };
+    return { zustand: "gueltig", ...anzeige, absender: absenderVon(stufe.karte) };
+  } catch {
+    // z. B. ungültiger Schlüsselpunkt → Signatur nicht verwertbar.
+    return { zustand: "ungueltig", ...anzeige };
+  }
+}
+
+/**
  * Signatur eines Payloads prüfen. Liefert nur einen Anzeigestatus und wirft
  * nie — ein defekter/fremder Payload gilt als „unsigniert" (der Import selbst
  * läuft über decodePayload und ist davon unabhängig).
+ *
+ * Bei mehreren Stufen wird der ganze Meldeweg geprüft. Maßgeblich für den
+ * Gesamtzustand ist die LETZTE Stufe: sie belegt, was der Absender übergeben
+ * hat, von dem dieser Bogen tatsächlich kam. Eine gebrochene frühere Stufe
+ * entwertet sie nicht — dann ist nur der behauptete Ursprung nicht gedeckt.
  */
 export async function signaturVonPayload(payload: Uint8Array): Promise<SignaturStatus> {
   let teile;
@@ -184,20 +262,24 @@ export async function signaturVonPayload(payload: Uint8Array): Promise<SignaturS
   } catch {
     return { zustand: "unsigniert" };
   }
-  if (!teile.signatur) return { zustand: "unsigniert" };
-  const { pubkey, signatur } = teile.signatur;
-  if (pubkey.length !== PUBKEY_LAENGE) return { zustand: "unsigniert" };
-  const hexPub = zuHex(pubkey);
-  const kurz = schluesselKurzform(pubkey);
-  try {
-    const daten = signierteBytes(teile.komprimiert, teile.signatur.karte);
-    const ok = await ed.verifyAsync(signatur, daten, pubkey);
-    if (!ok) return { zustand: "ungueltig", pubkey: hexPub, kurzform: kurz };
-    return { zustand: "gueltig", pubkey: hexPub, kurzform: kurz, absender: absenderVon(teile.signatur.karte) };
-  } catch {
-    // z. B. ungültiger Schlüsselpunkt → Signatur nicht verwertbar.
-    return { zustand: "ungueltig", pubkey: hexPub, kurzform: kurz };
+  if (teile.stufen.length === 0) return { zustand: "unsigniert" };
+  if (teile.stufen.some((s) => s.pubkey.length !== PUBKEY_LAENGE)) return { zustand: "unsigniert" };
+
+  const stufen: Signaturstufe[] = [];
+  for (const [i, s] of teile.stufen.entries()) {
+    stufen.push(await pruefeStufe(teile.komprimiert, s, teile.stufen.slice(0, i)));
   }
+  const letzte = stufen[stufen.length - 1]!;
+  if (letzte.zustand === "ungueltig") {
+    return { zustand: "ungueltig", pubkey: letzte.pubkey, kurzform: letzte.kurzform };
+  }
+  return {
+    zustand: "gueltig",
+    pubkey: letzte.pubkey,
+    kurzform: letzte.kurzform,
+    absender: letzte.absender,
+    ...(stufen.length > 1 ? { stufen } : {}),
+  };
 }
 
 /**
@@ -205,14 +287,8 @@ export async function signaturVonPayload(payload: Uint8Array): Promise<SignaturS
  * volle URL, das nackte Fragment und einen etwaigen Vorlagen-Marker „V.".
  */
 export async function signaturVonText(text: string): Promise<SignaturStatus> {
-  let daten = fragmentInhalt(text);
-  if (daten.startsWith(EEB_VORLAGE_MARKER)) daten = daten.slice(EEB_VORLAGE_MARKER.length);
-  let payload: Uint8Array;
-  try {
-    payload = datenDekodieren(daten);
-  } catch {
-    return { zustand: "unsigniert" };
-  }
+  const payload = payloadAusText(text);
+  if (!payload) return { zustand: "unsigniert" };
   return signaturVonPayload(payload);
 }
 
@@ -240,4 +316,25 @@ export function signaturLabel(status: SignaturStatus): string {
     case "unsigniert":
       return "nicht signiert";
   }
+}
+
+/**
+ * Signaturkette als Weg lesbar machen: „a1b2 … (Ursprung) → c3d4 … → e5f6 …".
+ * Leer, wenn der Bogen direkt vom Ersteller kommt (keine Weiterleitung).
+ */
+export function kettenLabel(status: SignaturStatus): string {
+  if (status.zustand !== "gueltig" || !status.stufen) return "";
+  return status.stufen
+    .map((s, i) => {
+      const rolle = i === 0 ? " (Ursprung)" : "";
+      const warnung = s.zustand === "ungueltig" ? " ⚠ nicht gedeckt" : "";
+      return `${s.kurzform}${rolle}${warnung}`;
+    })
+    .join(" → ");
+}
+
+/** Trägt die Kette eine Stufe, deren Signatur nicht aufgeht? */
+export function ketteVollstaendig(status: SignaturStatus): boolean {
+  if (status.zustand !== "gueltig" || !status.stufen) return true;
+  return status.stufen.every((s) => s.zustand === "gueltig");
 }

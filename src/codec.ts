@@ -30,14 +30,12 @@ import { Ernaehrung, KontaktArt, SCHEMA_VERSION } from "./model";
 
 export const EEB_MAGIC = new Uint8Array([0x45, 0x45, 0x42, 0x32]); // "EEB2"
 
-/** Magic für signierte Payloads: "EEB2S" (EEB2 + 'S'). Siehe docs/datenmodell.md. */
-export const EEB_SIGNIERT_MAGIC = new Uint8Array([0x45, 0x45, 0x42, 0x32, 0x53]); // "EEB2S"
-
 /**
- * Magic für signierte Payloads MIT Absenderkarte: "EEB2K" (EEB2 + 'K').
- * Eigenes Magic, damit Payloads ohne Karte byte-identisch zu früher bleiben.
+ * Magic für signierte Payloads: "EEB2C" (EEB2 + 'C' für Chain/Kette).
+ * EIN Container für jede Signaturlage — n=1 ist der Normalfall (Ersteller),
+ * jede Weitergabe hängt eine Stufe an. Siehe docs/datenmodell.md.
  */
-export const EEB_KARTE_MAGIC = new Uint8Array([0x45, 0x45, 0x42, 0x32, 0x4b]); // "EEB2K"
+export const EEB_KETTE_MAGIC = new Uint8Array([0x45, 0x45, 0x42, 0x32, 0x43]); // "EEB2C"
 
 /** Länge eines rohen Ed25519-Schlüssels bzw. einer Signatur (Bytes). */
 export const PUBKEY_LAENGE = 32;
@@ -439,14 +437,20 @@ export function decodeBinaer(daten: Uint8Array): Erfassungsbogen {
 
 // -------------------------------------------------------------- QR-Payload
 //
-// Drei Container-Formen (siehe docs/datenmodell.md):
-//   unsigniert:      'EEB2'  ‖ DeflateRaw(Binärstrom)
-//   signiert:        'EEB2S' ‖ pubkey[32] ‖ signatur[64] ‖ DeflateRaw(Binärstrom)
-//   + Absenderkarte: 'EEB2K' ‖ pubkey[32] ‖ signatur[64] ‖ varint(len) ‖ Karte
-//                            ‖ DeflateRaw(Binärstrom)
-// Der komprimierte Strom ist in allen Formen byte-identisch; Signatur und Karte
-// sind reine Hülle. packePayload/entpackePayload trennen Hülle und Nutzdaten
-// OHNE Krypto — Signieren/Prüfen liegt in src/signatur.ts.
+// Zwei Container-Formen (siehe docs/datenmodell.md):
+//   unsigniert: 'EEB2'  ‖ DeflateRaw(Binärstrom)
+//   signiert:   'EEB2C' ‖ varint(n) ‖ stufe_1 … stufe_n ‖ DeflateRaw(Binärstrom)
+//
+//   stufe_k   = pubkey[32] ‖ signatur[64] ‖ varint(kartenLen) ‖ karte[kartenLen]
+//
+// Der komprimierte Strom ist in beiden Formen byte-identisch; die Stufen sind
+// reine Hülle. packePayload/entpackePayload trennen Hülle und Nutzdaten OHNE
+// Krypto — Signieren/Prüfen liegt in src/signatur.ts.
+//
+// n Stufen = der Meldeweg. Der Ersteller ist Stufe 1; wer einen fremden Bogen
+// unverändert weiterreicht, hängt eine Stufe an, statt neu zu signieren (sonst
+// stünde sein Gerät beim nächsten Empfänger als Ursprung da). Der komprimierte
+// Strom bleibt dabei wörtlich erhalten, sonst bräche Stufe 1.
 
 /**
  * Freiwillige Kontaktangaben des Absenders, die mit der Signatur reisen
@@ -459,19 +463,29 @@ export interface Absenderkarte {
   telefon?: string;
 }
 
-/** Rohe Signaturhülle eines Payloads: öffentlicher Schlüssel + Signatur. */
-export interface Signaturhuelle {
+/** Eine rohe Signaturstufe des Containers: wer hat gezeichnet, mit welcher Karte. */
+export interface Kettenstufe {
   pubkey: Uint8Array; // 32 Bytes
   signatur: Uint8Array; // 64 Bytes
-  /** Roh kodierte Absenderkarte; fehlt = Container 'EEB2S' (ohne Karte). */
+  /** Roh kodierte Absenderkarte; fehlt = diese Stufe hat keine hinterlegt. */
   karte?: Uint8Array;
 }
 
-/** Zerlegter Payload: komprimierter Binärstrom + (falls signiert) Signaturhülle. */
+/**
+ * Zerlegter Payload: komprimierter Binärstrom + Signaturstufen in
+ * Container-Reihenfolge (Index 0 = Ursprung). Leeres `stufen` = unsigniert.
+ */
 export interface PayloadTeile {
   komprimiert: Uint8Array;
-  signatur?: Signaturhuelle;
+  stufen: Kettenstufe[];
 }
+
+/**
+ * Obergrenze der Stufen im Container. Reale Meldewege haben eine bis drei; die
+ * Grenze hält einen absichtlich aufgeblähten Payload früh und mit klarer
+ * Meldung auf, statt ihn n-mal kryptografisch prüfen zu lassen.
+ */
+export const MAX_STUFEN = 32;
 
 // ------------------------------------------------------------ Absenderkarte
 
@@ -508,92 +522,114 @@ export function dekodiereAbsenderkarte(daten: Uint8Array): Absenderkarte {
   return karte;
 }
 
+// ------------------------------------------------------- Stufen & Signaturbytes
+
+/** varint(len) ‖ karte — der Kartenblock einer Stufe (len 0 = keine Karte). */
+function kartenBlock(karte?: Uint8Array): Uint8Array {
+  const w = new Writer();
+  w.varint(karte?.length ?? 0);
+  const kopf = w.bytes();
+  if (!karte?.length) return kopf;
+  const daten = new Uint8Array(kopf.length + karte.length);
+  daten.set(kopf);
+  daten.set(karte, kopf.length);
+  return daten;
+}
+
+/** Eine Stufe als Container-Bytes: pubkey ‖ signatur ‖ Kartenblock. */
+function stufeBytes(s: Kettenstufe): Uint8Array {
+  if (s.pubkey.length !== PUBKEY_LAENGE || s.signatur.length !== SIGNATUR_LAENGE) {
+    throw new Error("EEB2C: Schlüssel/Signatur haben falsche Länge");
+  }
+  return verkette([s.pubkey, s.signatur, kartenBlock(s.karte)]);
+}
+
+function verkette(teile: Uint8Array[]): Uint8Array {
+  const gesamt = new Uint8Array(teile.reduce((n, t) => n + t.length, 0));
+  let pos = 0;
+  for (const t of teile) {
+    gesamt.set(t, pos);
+    pos += t.length;
+  }
+  return gesamt;
+}
+
 /**
- * Die von der Signatur abgedeckten Bytes: alles hinter dem Signaturfeld.
- * 'EEB2S' → nur der komprimierte Strom (unverändert zu früher),
- * 'EEB2K' → varint(Kartenlänge) ‖ Karte ‖ komprimierter Strom.
+ * Die von Stufe k signierten Bytes: **eigener Kartenblock ‖ alle früheren Stufen
+ * ‖ komprimierter Strom**.
  *
- * Hinweis: Beim Prüfen wird die Länge kanonisch neu kodiert. Ein Payload mit
+ * Dass die früheren Stufen mitgezeichnet werden, macht den Meldeweg
+ * manipulationsfest: eine Zwischenstufe lässt sich nicht entfernen, einfügen
+ * oder umsortieren, ohne jede spätere Signatur zu brechen. `frueher` sind die
+ * Stufen 1…k−1 in Container-Reihenfolge; für Stufe 1 also leer.
+ *
+ * Hinweis: Beim Prüfen werden die Längen kanonisch neu kodiert. Ein Payload mit
  * absichtlich nicht-minimalem Varint fällt damit als „Signatur ungültig" auf —
  * das ist die richtige Reaktion, denn seine Bytes wurden so nie signiert.
  */
-export function signierteBytes(komprimiert: Uint8Array, karte?: Uint8Array): Uint8Array {
-  if (!karte) return komprimiert;
-  const w = new Writer();
-  w.varint(karte.length);
-  const kopf = w.bytes();
-  const daten = new Uint8Array(kopf.length + karte.length + komprimiert.length);
-  daten.set(kopf);
-  daten.set(karte, kopf.length);
-  daten.set(komprimiert, kopf.length + karte.length);
-  return daten;
+export function signierteBytes(
+  komprimiert: Uint8Array,
+  karte: Uint8Array | undefined,
+  frueher: Kettenstufe[],
+): Uint8Array {
+  return verkette([kartenBlock(karte), ...frueher.map(stufeBytes), komprimiert]);
 }
 
 function beginntMit(daten: Uint8Array, magic: Uint8Array): boolean {
   return daten.length >= magic.length && magic.every((byte, i) => daten[i] === byte);
 }
 
-/** Komprimierter Strom (+ optionale Signaturhülle) → Payload-Bytes. */
+/** Komprimierter Strom + Signaturstufen → Payload-Bytes. */
 export function packePayload(teile: PayloadTeile): Uint8Array {
-  const { komprimiert, signatur } = teile;
-  if (!signatur) {
-    const payload = new Uint8Array(EEB_MAGIC.length + komprimiert.length);
-    payload.set(EEB_MAGIC);
-    payload.set(komprimiert, EEB_MAGIC.length);
-    return payload;
-  }
-  if (signatur.pubkey.length !== PUBKEY_LAENGE || signatur.signatur.length !== SIGNATUR_LAENGE) {
-    throw new Error("EEB2S: Schlüssel/Signatur haben falsche Länge");
-  }
-  const magic = signatur.karte ? EEB_KARTE_MAGIC : EEB_SIGNIERT_MAGIC;
-  const rumpf = signierteBytes(komprimiert, signatur.karte);
-  const kopf = magic.length + PUBKEY_LAENGE + SIGNATUR_LAENGE;
-  const payload = new Uint8Array(kopf + rumpf.length);
-  payload.set(magic);
-  payload.set(signatur.pubkey, magic.length);
-  payload.set(signatur.signatur, magic.length + PUBKEY_LAENGE);
-  payload.set(rumpf, kopf);
-  return payload;
+  const { komprimiert, stufen } = teile;
+  if (stufen.length === 0) return verkette([EEB_MAGIC, komprimiert]);
+  if (stufen.length > MAX_STUFEN) throw new Error(`EEB2C: mehr als ${MAX_STUFEN} Stufen`);
+  const anzahl = new Writer();
+  anzahl.varint(stufen.length);
+  return verkette([EEB_KETTE_MAGIC, anzahl.bytes(), ...stufen.map(stufeBytes), komprimiert]);
 }
 
 /**
- * Payload-Bytes → Teile. Erkennt 'EEB2K' (signiert + Absenderkarte), 'EEB2S'
- * (signiert) und 'EEB2' (unsigniert). WICHTIG: die 5-Byte-Magics zuerst prüfen,
- * da beide mit 'EEB2' beginnen. Wirft bei fremdem Magic oder zu kurzem
- * Signatur-Container.
+ * Payload-Bytes → Teile. Erkennt 'EEB2C' (signiert, n Stufen) und 'EEB2'
+ * (unsigniert). WICHTIG: das 5-Byte-Magic zuerst prüfen, da beide mit 'EEB2'
+ * beginnen. Wirft bei fremdem Magic oder unvollständigem Container.
  */
 export function entpackePayload(payload: Uint8Array): PayloadTeile {
-  if (beginntMit(payload, EEB_KARTE_MAGIC)) {
-    const kopf = EEB_KARTE_MAGIC.length + PUBKEY_LAENGE + SIGNATUR_LAENGE;
-    if (payload.length < kopf + 2) throw new Error("EEB2K: Signatur-Container unvollständig");
-    const pubkey = payload.slice(EEB_KARTE_MAGIC.length, EEB_KARTE_MAGIC.length + PUBKEY_LAENGE);
-    const signatur = payload.slice(EEB_KARTE_MAGIC.length + PUBKEY_LAENGE, kopf);
-    const r = new Reader(payload.subarray(kopf));
-    const kartenLaenge = r.varint();
-    const kartenStart = kopf + r.gelesen;
-    const kartenEnde = kartenStart + kartenLaenge;
-    if (payload.length < kartenEnde + 1) throw new Error("EEB2K: Absenderkarte unvollständig");
-    return {
-      komprimiert: payload.slice(kartenEnde),
-      signatur: { pubkey, signatur, karte: payload.slice(kartenStart, kartenEnde) },
-    };
-  }
-  if (beginntMit(payload, EEB_SIGNIERT_MAGIC)) {
-    const kopf = EEB_SIGNIERT_MAGIC.length + PUBKEY_LAENGE + SIGNATUR_LAENGE;
-    if (payload.length < kopf + 1) throw new Error("EEB2S: Signatur-Container unvollständig");
-    const pubkey = payload.slice(EEB_SIGNIERT_MAGIC.length, EEB_SIGNIERT_MAGIC.length + PUBKEY_LAENGE);
-    const signatur = payload.slice(EEB_SIGNIERT_MAGIC.length + PUBKEY_LAENGE, kopf);
-    return { komprimiert: payload.slice(kopf), signatur: { pubkey, signatur } };
+  if (beginntMit(payload, EEB_KETTE_MAGIC)) {
+    const r = new Reader(payload.subarray(EEB_KETTE_MAGIC.length));
+    const anzahl = r.varint();
+    if (anzahl < 1 || anzahl > MAX_STUFEN) throw new Error("EEB2C: unplausible Stufenzahl");
+    const stufen: Kettenstufe[] = [];
+    let pos = EEB_KETTE_MAGIC.length + r.gelesen;
+    for (let i = 0; i < anzahl; i++) {
+      if (payload.length < pos + PUBKEY_LAENGE + SIGNATUR_LAENGE + 1) {
+        throw new Error("EEB2C: Signatur-Container unvollständig");
+      }
+      const pubkey = payload.slice(pos, pos + PUBKEY_LAENGE);
+      const signatur = payload.slice(pos + PUBKEY_LAENGE, pos + PUBKEY_LAENGE + SIGNATUR_LAENGE);
+      pos += PUBKEY_LAENGE + SIGNATUR_LAENGE;
+      const kr = new Reader(payload.subarray(pos));
+      const kartenLaenge = kr.varint();
+      pos += kr.gelesen;
+      if (payload.length < pos + kartenLaenge + 1) throw new Error("EEB2C: Absenderkarte unvollständig");
+      stufen.push({
+        pubkey,
+        signatur,
+        ...(kartenLaenge > 0 ? { karte: payload.slice(pos, pos + kartenLaenge) } : {}),
+      });
+      pos += kartenLaenge;
+    }
+    return { komprimiert: payload.slice(pos), stufen };
   }
   if (beginntMit(payload, EEB_MAGIC) && payload.length >= EEB_MAGIC.length + 1) {
-    return { komprimiert: payload.slice(EEB_MAGIC.length) };
+    return { komprimiert: payload.slice(EEB_MAGIC.length), stufen: [] };
   }
   throw new Error("Kein EEB2-QR-Code");
 }
 
 /** Bogen → unsignierter QR-Payload ('EEB2' + DeflateRaw(Binärstrom)). */
 export function encodePayload(b: Erfassungsbogen, k: Kompressor): Uint8Array {
-  return packePayload({ komprimiert: k.deflateRaw(encodeBinaer(b)) });
+  return packePayload({ komprimiert: k.deflateRaw(encodeBinaer(b)), stufen: [] });
 }
 
 /**
@@ -757,6 +793,22 @@ export function encodePayloadUrl(b: Erfassungsbogen, k: Kompressor): string {
  */
 export function decodePayloadUrl(text: string, k: Kompressor): Erfassungsbogen {
   return decodePayload(datenDekodieren(fragmentInhalt(text)), k);
+}
+
+/**
+ * Gescannter QR-Text bzw. App-Link → rohe Payload-Bytes; `null`, wenn der Text
+ * kein Base64url-Payload ist. Ein etwaiger Vorlagen-Marker „V." wird abgetrennt.
+ * Diese Rohbytes sind die Grundlage jeder Signaturprüfung UND der Weitergabe
+ * eines fremden Bogens: nur sie tragen die Original-Signatur.
+ */
+export function payloadAusText(text: string): Uint8Array | null {
+  let daten = fragmentInhalt(text);
+  if (daten.startsWith(EEB_VORLAGE_MARKER)) daten = daten.slice(EEB_VORLAGE_MARKER.length);
+  try {
+    return datenDekodieren(daten);
+  } catch {
+    return null;
+  }
 }
 
 // ------------------------------------------------------------ Vorlagen-QR

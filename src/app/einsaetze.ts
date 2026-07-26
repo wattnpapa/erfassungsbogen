@@ -71,6 +71,14 @@ export interface MeldeEintrag {
   zugEtikett?: string;
   /** Signaturstatus des Empfangstransports (fehlt = unsigniert empfangen). */
   signatur?: EintragSignatur;
+  /**
+   * Der empfangene QR-Payload als Base64url — nur bei signiertem Scan gesetzt.
+   * Er trägt die Original-Signatur des Absenders: reicht der Meldekopf die
+   * Meldung unverändert weiter, wird dieser Payload gegengezeichnet statt neu
+   * signiert, damit der Ursprung beim nächsten Empfänger prüfbar bleibt.
+   * Fehlt bei älteren Sammlungen — dann wird wie früher selbst signiert.
+   */
+  herkunft?: string;
   bogen: Erfassungsbogen;
 }
 
@@ -282,6 +290,8 @@ export interface MeldungOptionen {
   einheitSchluesselOverride?: string;
   /** Signaturstatus des Empfangstransports (nur bei signiertem Scan gesetzt). */
   signatur?: EintragSignatur;
+  /** Empfangener Payload (Base64url) — erhält die Original-Signatur, s. {@link MeldeEintrag.herkunft}. */
+  herkunft?: string;
 }
 
 /**
@@ -312,6 +322,7 @@ export function meldungHinzufuegen(
     status: MeldeStatus.ANWESEND,
     zugEtikett: opt.zugEtikett?.trim() || undefined,
     signatur: opt.signatur,
+    herkunft: opt.herkunft,
     bogen: migriert,
   };
   s.eintraege.push(eintrag);

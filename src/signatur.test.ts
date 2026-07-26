@@ -1,9 +1,8 @@
 import { describe, it, expect } from "vitest";
 import { deflateRawSync, inflateRawSync } from "node:zlib";
 import {
-  EEB_KARTE_MAGIC,
+  EEB_KETTE_MAGIC,
   EEB_MAGIC,
-  EEB_SIGNIERT_MAGIC,
   EEB_URL_PREFIX,
   EEB_VORLAGE_MARKER,
   datenDekodieren,
@@ -24,6 +23,9 @@ import {
   ausHex,
   encodeSigniertPayloadUrl,
   encodeSigniertVorlagePayloadUrl,
+  gegengezeichnetePayloadBytes,
+  ketteVollstaendig,
+  kettenLabel,
   oeffentlicherSchluessel,
   schluesselKurzform,
   schluesselpaarErzeugen,
@@ -96,38 +98,60 @@ describe("Schlüsselverwaltung", () => {
 });
 
 describe("packePayload/entpackePayload", () => {
-  it("Roundtrip unsigniert (Magic EEB2, keine Hülle)", () => {
+  const stufe = (fuellung: number, karte?: Uint8Array) => ({
+    pubkey: new Uint8Array(32).fill(fuellung),
+    signatur: new Uint8Array(64).fill(fuellung + 1),
+    ...(karte ? { karte } : {}),
+  });
+
+  it("Roundtrip unsigniert (Magic EEB2, keine Stufen)", () => {
     const komprimiert = new Uint8Array([9, 8, 7, 6]);
-    const payload = packePayload({ komprimiert });
+    const payload = packePayload({ komprimiert, stufen: [] });
     expect(Array.from(payload.subarray(0, 4))).toEqual(Array.from(EEB_MAGIC));
     const teile = entpackePayload(payload);
-    expect(teile.signatur).toBeUndefined();
+    expect(teile.stufen).toEqual([]);
     expect(Array.from(teile.komprimiert)).toEqual([9, 8, 7, 6]);
   });
 
-  it("Roundtrip signiert (Magic EEB2S, Hülle erhalten)", () => {
+  it("Roundtrip signiert (Magic EEB2C, eine Stufe)", () => {
     const komprimiert = new Uint8Array([1, 2, 3]);
-    const pubkey = new Uint8Array(32).fill(7);
-    const signatur = new Uint8Array(64).fill(9);
-    const payload = packePayload({ komprimiert, signatur: { pubkey, signatur } });
-    expect(Array.from(payload.subarray(0, 5))).toEqual(Array.from(EEB_SIGNIERT_MAGIC));
+    const payload = packePayload({ komprimiert, stufen: [stufe(7)] });
+    expect(Array.from(payload.subarray(0, 5))).toEqual(Array.from(EEB_KETTE_MAGIC));
     const teile = entpackePayload(payload);
     expect(Array.from(teile.komprimiert)).toEqual([1, 2, 3]);
-    expect(Array.from(teile.signatur!.pubkey)).toEqual(Array.from(pubkey));
-    expect(Array.from(teile.signatur!.signatur)).toEqual(Array.from(signatur));
+    expect(teile.stufen.length).toBe(1);
+    expect(Array.from(teile.stufen[0]!.pubkey)).toEqual(Array.from(new Uint8Array(32).fill(7)));
+    expect(teile.stufen[0]!.karte).toBeUndefined();
+  });
+
+  it("Roundtrip mehrerer Stufen in Reihenfolge, mit und ohne Karte", () => {
+    const komprimiert = new Uint8Array([4, 5]);
+    const karte = new Uint8Array([1, 3, 65, 66, 67]);
+    const payload = packePayload({ komprimiert, stufen: [stufe(1, karte), stufe(3), stufe(5, karte)] });
+    const teile = entpackePayload(payload);
+    expect(Array.from(teile.komprimiert)).toEqual([4, 5]);
+    expect(teile.stufen.map((s) => s.pubkey[0])).toEqual([1, 3, 5]);
+    expect(Array.from(teile.stufen[0]!.karte!)).toEqual(Array.from(karte));
+    expect(teile.stufen[1]!.karte).toBeUndefined();
+    expect(Array.from(teile.stufen[2]!.karte!)).toEqual(Array.from(karte));
   });
 
   it("lehnt falsche Schlüssel-/Signaturlänge beim Packen ab", () => {
     expect(() =>
-      packePayload({ komprimiert: new Uint8Array([1]), signatur: { pubkey: new Uint8Array(31), signatur: new Uint8Array(64) } }),
+      packePayload({
+        komprimiert: new Uint8Array([1]),
+        stufen: [{ pubkey: new Uint8Array(31), signatur: new Uint8Array(64) }],
+      }),
     ).toThrow(/Länge/i);
   });
 
-  it("lehnt fremde Daten und unvollständige Signatur-Container ab", () => {
+  it("lehnt fremde Daten, unvollständige Container und unplausible Stufenzahlen ab", () => {
     expect(() => entpackePayload(new Uint8Array([1, 2, 3, 4, 5, 6]))).toThrow(/Kein EEB2/i);
-    // EEB2S-Magic, aber Container zu kurz für Schlüssel+Signatur
-    const zuKurz = new Uint8Array([...EEB_SIGNIERT_MAGIC, 1, 2, 3]);
-    expect(() => entpackePayload(zuKurz)).toThrow(/unvollständig/i);
+    // EEB2C-Magic, Stufenzahl 1, aber zu kurz für Schlüssel+Signatur
+    expect(() => entpackePayload(new Uint8Array([...EEB_KETTE_MAGIC, 1, 2, 3]))).toThrow(/unvollständig/i);
+    // Stufenzahl 0 bzw. absurd hoch → früh und mit klarer Meldung raus
+    expect(() => entpackePayload(new Uint8Array([...EEB_KETTE_MAGIC, 0, 1]))).toThrow(/Stufenzahl/i);
+    expect(() => entpackePayload(new Uint8Array([...EEB_KETTE_MAGIC, 200, 1]))).toThrow(/Stufenzahl/i);
   });
 });
 
@@ -146,7 +170,7 @@ describe("Abwärtskompatibilität: unsigniert bleibt lesbar", () => {
     const url = await encodeSigniertPayloadUrl(b, zlib, kp.privat);
     const payload = datenDekodieren(url.slice(EEB_URL_PREFIX.length));
     const signiert = entpackePayload(payload);
-    expect(signiert.signatur).toBeDefined();
+    expect(signiert.stufen.length).toBe(1);
     expect(Array.from(signiert.komprimiert)).toEqual(Array.from(unsigniert));
   });
 });
@@ -177,7 +201,7 @@ describe("Signieren → Verifizieren", () => {
 
     // Payload extrahieren, ein Nutzdaten-Byte kippen, Status erneut prüfen.
     const payload = datenDekodieren(url.slice(EEB_URL_PREFIX.length));
-    const kopf = EEB_SIGNIERT_MAGIC.length + 32 + 64;
+    const kopf = payload.length - entpackePayload(payload).komprimiert.length;
     payload[kopf] = payload[kopf]! ^ 0xff; // erstes komprimiertes Byte verfälschen
     const manipuliert = datenKodieren(payload);
     const status1 = await signaturVonText(manipuliert);
@@ -192,7 +216,7 @@ describe("Signieren → Verifizieren", () => {
     // Mit A signieren, aber B's pubkey einsetzen → verify schlägt fehl.
     const url = await encodeSigniertPayloadUrl(b, zlib, kpA.privat);
     const payload = datenDekodieren(url.slice(EEB_URL_PREFIX.length));
-    payload.set(kpB.oeffentlich, EEB_SIGNIERT_MAGIC.length); // pubkey tauschen
+    payload.set(kpB.oeffentlich, EEB_KETTE_MAGIC.length + 1); // pubkey der Stufe 1 tauschen
     const status = await signaturVonText(datenKodieren(payload));
     expect(status.zustand).toBe("ungueltig");
   });
@@ -219,11 +243,12 @@ describe("Absenderkarte", () => {
     }
   });
 
-  it("reist im Container EEB2K mit und erscheint nur bei gültiger Signatur", async () => {
+  it("reist in der Signaturstufe mit und erscheint nur bei gültiger Signatur", async () => {
     const b = bogen();
     const kp = await schluesselpaarErzeugen();
     const payload = await signiertePayloadBytes(b, zlib, kp.privat, karte);
-    expect(Array.from(payload.subarray(0, 5))).toEqual(Array.from(EEB_KARTE_MAGIC));
+    expect(Array.from(payload.subarray(0, 5))).toEqual(Array.from(EEB_KETTE_MAGIC));
+    expect(entpackePayload(payload).stufen[0]!.karte).toBeDefined();
     // Nutzdaten bleiben unberührt lesbar …
     gleich(decodePayload(payload, zlib), b);
     // … und die Karte kommt an.
@@ -238,8 +263,9 @@ describe("Absenderkarte", () => {
     const b = bogen();
     const kp = await schluesselpaarErzeugen();
     const payload = await signiertePayloadBytes(b, zlib, kp.privat, karte);
-    // Ein Byte im Namen der Karte kippen (Karte liegt hinter Magic+Schlüssel+Signatur+Längen-Varint).
-    const kartenStart = EEB_KARTE_MAGIC.length + 32 + 64 + 1;
+    // Ein Byte im Namen der Karte kippen. Die Karte liegt hinter
+    // Magic+Stufenzahl+Schlüssel+Signatur+Kartenlängen-Varint.
+    const kartenStart = EEB_KETTE_MAGIC.length + 1 + 32 + 64 + 1;
     payload[kartenStart + 2] = payload[kartenStart + 2]! ^ 0xff;
     const status = await signaturVonPayload(payload);
     expect(status.zustand).toBe("ungueltig");
@@ -247,22 +273,22 @@ describe("Absenderkarte", () => {
     expect((status as { absender?: unknown }).absender).toBeUndefined();
   });
 
-  it("bleibt ohne Angaben beim alten Container EEB2S (byte-identisch)", async () => {
+  it("zählt eine leere Karte als keine Karte (byte-identisch)", async () => {
     const b = bogen();
     const kp = await schluesselpaarErzeugen();
     const ohne = await signiertePayloadBytes(b, zlib, kp.privat);
     const leer = await signiertePayloadBytes(b, zlib, kp.privat, {});
     expect(Array.from(leer)).toEqual(Array.from(ohne));
-    expect(Array.from(leer.subarray(0, 5))).toEqual(Array.from(EEB_SIGNIERT_MAGIC));
+    expect(entpackePayload(leer).stufen[0]!.karte).toBeUndefined();
   });
 
-  it("kostet nur wenige Bytes gegenüber dem signierten Payload ohne Karte", async () => {
+  it("kostet nur die Kartenbytes gegenüber dem signierten Payload ohne Karte", async () => {
     const b = bogen();
     const kp = await schluesselpaarErzeugen();
     const ohne = await signiertePayloadBytes(b, zlib, kp.privat);
     const mit = await signiertePayloadBytes(b, zlib, kp.privat, karte);
-    // Flagbyte + 3 Längenbytes + Feldinhalte + Längen-Varint der Karte.
-    expect(mit.length - ohne.length).toBe(kodiereAbsenderkarte(karte).length + 1);
+    // Das Längen-Varint steht in beiden Fällen (ohne Karte als 0).
+    expect(mit.length - ohne.length).toBe(kodiereAbsenderkarte(karte).length);
   });
 
   it("übersteht eine defekte Karte, ohne die Signaturprüfung zu kippen", async () => {
@@ -273,15 +299,15 @@ describe("Absenderkarte", () => {
     const kp = await schluesselpaarErzeugen();
     const payload = packePayload({
       komprimiert,
-      signatur: { pubkey: kp.oeffentlich, signatur: new Uint8Array(64), karte: kaputt },
+      stufen: [{ pubkey: kp.oeffentlich, signatur: new Uint8Array(64), karte: kaputt }],
     });
     const teile = entpackePayload(payload);
-    expect(Array.from(teile.signatur!.karte!)).toEqual(Array.from(kaputt));
+    expect(Array.from(teile.stufen[0]!.karte!)).toEqual(Array.from(kaputt));
     expect(() => dekodiereAbsenderkarte(kaputt)).toThrow();
   });
 
-  it("lehnt einen abgeschnittenen EEB2K-Container ab", () => {
-    const zuKurz = new Uint8Array([...EEB_KARTE_MAGIC, ...new Uint8Array(96), 50, 1, 2]);
+  it("lehnt eine Stufe mit abgeschnittener Karte ab", () => {
+    const zuKurz = new Uint8Array([...EEB_KETTE_MAGIC, 1, ...new Uint8Array(96), 50, 1, 2]);
     expect(() => entpackePayload(zuKurz)).toThrow(/unvollständig/i);
   });
 
@@ -290,6 +316,158 @@ describe("Absenderkarte", () => {
     expect(absenderLabel({ name: "Max" })).toBe("Max");
     expect(absenderLabel({})).toBe("");
     expect(absenderLabel()).toBe("");
+  });
+});
+
+describe("Signaturkette beim Weiterreichen", () => {
+  it("erhält die Original-Signatur und bezeugt die Weitergabe", async () => {
+    const b = bogen();
+    const ersteller = await schluesselpaarErzeugen();
+    const meldekopf = await schluesselpaarErzeugen();
+    const original = await signiertePayloadBytes(b, zlib, ersteller.privat, { name: "Melder" });
+
+    const weiter = await gegengezeichnetePayloadBytes(original, meldekopf.privat, { name: "Meldekopf" });
+
+    // Der Bogen bleibt derselbe — nur die Hülle wächst um eine Stufe.
+    gleich(decodePayload(weiter, zlib), b);
+    const status = await signaturVonPayload(weiter);
+    expect(entpackePayload(weiter).stufen.length).toBe(2);
+    expect(status.zustand).toBe("gueltig");
+    if (status.zustand !== "gueltig") return;
+    // Vorn steht, wer übergeben hat …
+    expect(status.kurzform).toBe(schluesselKurzform(meldekopf.oeffentlich));
+    expect(status.absender?.name).toBe("Meldekopf");
+    // … die Kette beginnt beim Ursprung.
+    expect(status.stufen?.map((s) => s.kurzform)).toEqual([
+      schluesselKurzform(ersteller.oeffentlich),
+      schluesselKurzform(meldekopf.oeffentlich),
+    ]);
+    expect(status.stufen?.[0]?.absender?.name).toBe("Melder");
+    expect(ketteVollstaendig(status)).toBe(true);
+    expect(kettenLabel(status)).toBe(
+      `${schluesselKurzform(ersteller.oeffentlich)} (Ursprung) → ${schluesselKurzform(meldekopf.oeffentlich)}`,
+    );
+  });
+
+  it("trägt auch über mehrere Stufen und ohne eigene Karte", async () => {
+    const b = bogen();
+    const a = await schluesselpaarErzeugen();
+    const c = await schluesselpaarErzeugen();
+    const d = await schluesselpaarErzeugen();
+    // Ursprung ohne Karte (Kartenlänge 0) — die Kette muss das aushalten.
+    const s1 = await signiertePayloadBytes(b, zlib, a.privat);
+    expect(entpackePayload(s1).stufen[0]!.karte).toBeUndefined();
+    const s2 = await gegengezeichnetePayloadBytes(s1, c.privat);
+    const s3 = await gegengezeichnetePayloadBytes(s2, d.privat, { name: "Leitstelle" });
+
+    gleich(decodePayload(s3, zlib), b);
+    const status = await signaturVonPayload(s3);
+    expect(status.zustand).toBe("gueltig");
+    if (status.zustand !== "gueltig") return;
+    expect(status.stufen?.map((s) => s.kurzform)).toEqual([
+      schluesselKurzform(a.oeffentlich),
+      schluesselKurzform(c.oeffentlich),
+      schluesselKurzform(d.oeffentlich),
+    ]);
+    expect(ketteVollstaendig(status)).toBe(true);
+  });
+
+  it("deckt eine gefälschte frühere Stufe auf, ohne die letzte zu entwerten", async () => {
+    const b = bogen();
+    const ersteller = await schluesselpaarErzeugen();
+    const faelscher = await schluesselpaarErzeugen();
+    const meldekopf = await schluesselpaarErzeugen();
+    const original = await signiertePayloadBytes(b, zlib, ersteller.privat);
+    // Herkunft behaupten, aber mit fremdem Schlüssel: die Signatur der Stufe 1
+    // passt nicht zum genannten Ursprung.
+    const teile = entpackePayload(original);
+    const gefaelscht = packePayload({
+      komprimiert: teile.komprimiert,
+      stufen: [{ pubkey: faelscher.oeffentlich, signatur: teile.stufen[0]!.signatur }],
+    });
+    const weiter = await gegengezeichnetePayloadBytes(gefaelscht, meldekopf.privat);
+
+    const status = await signaturVonPayload(weiter);
+    // Die letzte Stufe ist echt (der Meldekopf hat genau diese Bytes übergeben),
+    // der behauptete Ursprung aber nicht gedeckt.
+    expect(status.zustand).toBe("gueltig");
+    if (status.zustand !== "gueltig") return;
+    expect(ketteVollstaendig(status)).toBe(false);
+    expect(status.stufen?.[0]?.zustand).toBe("ungueltig");
+    expect(status.stufen?.[1]?.zustand).toBe("gueltig");
+    expect(kettenLabel(status)).toMatch(/nicht gedeckt/);
+  });
+
+  it("bindet die Reihenfolge: eine entfernte Zwischenstufe bricht die letzte Signatur", async () => {
+    const b = bogen();
+    const a = await schluesselpaarErzeugen();
+    const c = await schluesselpaarErzeugen();
+    const d = await schluesselpaarErzeugen();
+    const s3 = await gegengezeichnetePayloadBytes(
+      await gegengezeichnetePayloadBytes(await signiertePayloadBytes(b, zlib, a.privat), c.privat),
+      d.privat,
+    );
+    const { komprimiert, stufen } = entpackePayload(s3);
+    // Mittlere Stufe herausschneiden — Stufe 3 hat sie mitgezeichnet.
+    const gekuerzt = packePayload({ komprimiert, stufen: [stufen[0]!, stufen[2]!] });
+    const status = await signaturVonPayload(gekuerzt);
+    expect(status.zustand).toBe("ungueltig");
+  });
+
+  it("bindet die Reihenfolge: getauschte Stufen brechen die Prüfung", async () => {
+    const b = bogen();
+    const a = await schluesselpaarErzeugen();
+    const c = await schluesselpaarErzeugen();
+    const original = await signiertePayloadBytes(b, zlib, a.privat);
+    const weiter = await gegengezeichnetePayloadBytes(original, c.privat);
+    const { komprimiert, stufen } = entpackePayload(weiter);
+    const vertauscht = packePayload({ komprimiert, stufen: [stufen[1]!, stufen[0]!] });
+    const status = await signaturVonPayload(vertauscht);
+    expect(status.zustand).toBe("ungueltig");
+  });
+
+  it("bemerkt veränderte Nutzdaten in der ganzen Kette", async () => {
+    const b = bogen();
+    const ersteller = await schluesselpaarErzeugen();
+    const meldekopf = await schluesselpaarErzeugen();
+    const original = await signiertePayloadBytes(b, zlib, ersteller.privat);
+    const weiter = await gegengezeichnetePayloadBytes(original, meldekopf.privat);
+    // Ein Byte im komprimierten Strom kippen (letztes Byte des Payloads).
+    weiter[weiter.length - 1]! ^= 0xff;
+    const status = await signaturVonPayload(weiter);
+    expect(status.zustand).toBe("ungueltig");
+  });
+
+  it("lässt einen unsignierten Empfang nicht gegenzeichnen", async () => {
+    const roh = encodePayload(bogen(), zlib);
+    const kp = await schluesselpaarErzeugen();
+    await expect(gegengezeichnetePayloadBytes(roh, kp.privat)).rejects.toThrow(/unsigniert/i);
+  });
+
+  it("bleibt ein lesbarer Bogen mit Karte je Stufe", async () => {
+    const b = bogen();
+    const ersteller = await schluesselpaarErzeugen();
+    const meldekopf = await schluesselpaarErzeugen();
+    const original = await signiertePayloadBytes(b, zlib, ersteller.privat, { name: "Melder" });
+    const weiter = await gegengezeichnetePayloadBytes(original, meldekopf.privat, { name: "Meldekopf" });
+
+    expect(Array.from(weiter.subarray(0, 5))).toEqual(Array.from(EEB_KETTE_MAGIC));
+    const teile = entpackePayload(weiter);
+    expect(teile.stufen.map((s) => dekodiereAbsenderkarte(s.karte!))).toEqual([
+      { name: "Melder" },
+      { name: "Meldekopf" },
+    ]);
+    gleich(decodePayload(weiter, zlib), b);
+  });
+
+  it("kostet je Stufe nur die Signaturhülle", async () => {
+    const b = bogen();
+    const a = await schluesselpaarErzeugen();
+    const c = await schluesselpaarErzeugen();
+    const original = await signiertePayloadBytes(b, zlib, a.privat);
+    const weiter = await gegengezeichnetePayloadBytes(original, c.privat);
+    // Schlüssel + Signatur (96) + Kartenrahmen/Flags/Längen — deutlich unter 120.
+    expect(weiter.length - original.length).toBeLessThan(120);
   });
 });
 
