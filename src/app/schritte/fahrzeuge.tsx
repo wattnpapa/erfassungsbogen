@@ -8,6 +8,7 @@ import { fahrzeugHinweise, neuesFahrzeug, vokabularFuer } from "../hilfen";
 import { fahrzeugSymbolSvg, svgDataUrl } from "../taktische-zeichen";
 import { frageJaNein } from "../dialoge";
 import {
+  Auswahl,
   Feld,
   Hinweise,
   KennzahlenFeld,
@@ -40,14 +41,14 @@ function FahrzeugKarte(props: {
           />
         </Feld>
         <Feld titel="Ausstattung nach StAN" schmal>
-          <select
+          <Auswahl
             value={f.stanKonform == null ? "na" : f.stanKonform ? "ja" : "nein"}
             onChange={(e) => set({ stanKonform: e.target.value === "na" ? undefined : e.target.value === "ja" })}
           >
             <option value="na">— (nicht anwendbar)</option>
             <option value="ja">ja</option>
             <option value="nein">nein</option>
-          </select>
+          </Auswahl>
         </Feld>
       </div>
       <div className="zeile">

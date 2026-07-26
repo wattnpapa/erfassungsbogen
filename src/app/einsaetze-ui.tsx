@@ -49,6 +49,7 @@ import {
 import { aggregiere, aggregiereNachZug, type EinsatzSummen } from "./auswertung";
 import { SORTIERUNGEN, einheitenAnsicht, type EinheitenSortierung } from "./einheiten-liste";
 import { debugAktiv } from "./debug-plattform";
+import { Auswahl } from "./schritte/bausteine";
 import { SeitenKopf } from "./seiten-kopf";
 import { frageJaNein } from "./dialoge";
 
@@ -316,14 +317,15 @@ export function EinsatzDetail(props: {
             </label>
             <label className="feld sortierung">
               Sortierung
-              <select
+              <Auswahl
+                beschriftung="Sortierung"
                 value={sortierung}
                 onChange={(e) => setSortierung(e.target.value as EinheitenSortierung)}
               >
                 {SORTIERUNGEN.map((s) => (
                   <option key={s.wert} value={s.wert}>{s.label}</option>
                 ))}
-              </select>
+              </Auswahl>
             </label>
           </div>
         )}

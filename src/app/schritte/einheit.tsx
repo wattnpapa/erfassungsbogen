@@ -27,7 +27,7 @@ import {
 } from "../../vokabulare/landesvorlagen";
 import { ORG_OPTIONEN, einheitAnzeigename, ersteEbene, vokabularFuer } from "../hilfen";
 import { frageJaNein } from "../dialoge";
-import { Feld, VokabAuswahl, type SchrittProps } from "./bausteine";
+import { Auswahl, Feld, VokabAuswahl, type SchrittProps } from "./bausteine";
 
 /**
  * Setzt in der Hierarchie die (erste) Ebene mit `code` auf `name`; hängt sie
@@ -211,7 +211,7 @@ export function SchrittEinheit({ bogen, aendern }: SchrittProps) {
       <h2>1. Einheit</h2>
       <div className="zeile">
         <Feld titel="Organisation">
-          <select
+          <Auswahl
             value={e.organisation}
             onChange={(ev) => {
               const organisation = Number(ev.target.value);
@@ -221,7 +221,7 @@ export function SchrittEinheit({ bogen, aendern }: SchrittProps) {
             {ORG_OPTIONEN.map((o) => (
               <option key={o.wert} value={o.wert}>{o.label}</option>
             ))}
-          </select>
+          </Auswahl>
         </Feld>
         <Feld titel={`Organisationsname${e.organisation === OrganisationsTyp.SONSTIGE ? " (Pflicht)" : " (optional)"}`}>
           <input
@@ -258,7 +258,7 @@ export function SchrittEinheit({ bogen, aendern }: SchrittProps) {
         <>
           <div className="zeile">
             <Feld titel="Landesvorlage – Bundesland">
-              <select
+              <Auswahl
                 value={aktBundesland}
                 onChange={(ev) => {
                   setVorlageBundesland(ev.target.value);
@@ -269,10 +269,10 @@ export function SchrittEinheit({ bogen, aendern }: SchrittProps) {
                 {vorlagenBundeslaender.map((b) => (
                   <option key={b} value={b}>{bundeslandLabel(b)}</option>
                 ))}
-              </select>
+              </Auswahl>
             </Feld>
             <Feld titel="Landesvorlage – Einheit">
-              <select
+              <Auswahl
                 value={aktEinheit}
                 disabled={!aktBundesland}
                 onChange={(ev) => {
@@ -283,7 +283,7 @@ export function SchrittEinheit({ bogen, aendern }: SchrittProps) {
                 {vorlagenEinheiten.map((n) => (
                   <option key={n} value={n}>{n}</option>
                 ))}
-              </select>
+              </Auswahl>
             </Feld>
           </div>
           <p className="hinweis">

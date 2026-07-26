@@ -20,6 +20,47 @@ When("ich auf {string} klicke", async function (this: EebWelt, name: string) {
   await this.page.getByRole("button", { name }).click();
 });
 
+When("ich zum Schritt {string} wechsle", async function (this: EebWelt, schritt: string) {
+  // Die Schrittleiste hängt an den Knopf je nach Bearbeitungsstand noch einen
+  // Status an („3. Personal — begonnen"), daher Präfix statt exaktem Namen.
+  await this.page
+    .getByRole("button", { name: new RegExp(`^${schritt.replace(/\./g, "\\.")}`) })
+    .click();
+});
+
+/**
+ * Der zugängliche Name einer Auswahlliste muss *genau* der Feldname sein.
+ *
+ * Beschriftet wird über ein umschließendes `<label className="feld">`; ohne
+ * eigenes aria-label zählt dort der Text aller <option>-Elemente mit, und das
+ * Feld heißt „OrganisationTHWFeuerwehr…". `exact: true` vergleicht den
+ * vollständigen Namen — in dem Fall findet dieser Locator nichts.
+ */
+Then("heißt die Auswahlliste genau {string}", async function (this: EebWelt, name: string) {
+  const feld = this.page.getByLabel(name, { exact: true });
+  try {
+    await feld.first().waitFor({ state: "visible", timeout: 5_000 });
+  } catch {
+    throw new Error(
+      `Keine Auswahlliste heißt „${name}“. Vorhandene Namen: ${await auswahlNamen(this)}`,
+    );
+  }
+  const gefunden = await feld.evaluateAll((el) => el.map((e) => e.tagName.toLowerCase()));
+  if (gefunden.length !== 1 || gefunden[0] !== "select") {
+    throw new Error(
+      `Erwartet: genau eine Auswahlliste namens „${name}“ — gefunden: [${gefunden.join(", ")}]`,
+    );
+  }
+});
+
+/** Namen aller sichtbaren Auswahllisten — nur für die Fehlermeldung oben. */
+async function auswahlNamen(welt: EebWelt): Promise<string> {
+  const namen = await welt.page.locator("select:visible").evaluateAll((el) =>
+    el.map((e) => e.getAttribute("aria-label") ?? e.closest("label")?.textContent ?? "(ohne)"),
+  );
+  return namen.map((n) => `„${n}“`).join(", ") || "keine";
+}
+
 Then("sehe ich die Überschrift {string}", async function (this: EebWelt, text: string) {
   await this.page.getByRole("heading", { name: text }).first().waitFor({ state: "visible" });
 });

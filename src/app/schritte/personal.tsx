@@ -23,6 +23,7 @@ import { FE_TEXT, neuePerson, plausibilitaet, vokabularFuer } from "../hilfen";
 import { frageJaNein } from "../dialoge";
 import {
   Feld,
+  Auswahl,
   Hinweise,
   MWD_LEGENDE,
   STAERKE_LEGENDE,
@@ -41,14 +42,14 @@ function KontakteEditor(props: { kontakte: Kontakt[]; aendern: (k: Kontakt[]) =>
       {kontakte.map((k, i) => (
         <div className="zeile" key={i}>
           <Feld titel="Art" schmal>
-            <select
+            <Auswahl
               value={k.art}
               onChange={(e) => set(i, { art: Number(e.target.value), emailTemplate: undefined, wert: "" })}
             >
               <option value={KontaktArt.MOBIL}>Mobil</option>
               <option value={KontaktArt.FESTNETZ}>Festnetz</option>
               <option value={KontaktArt.EMAIL}>eMail</option>
-            </select>
+            </Auswahl>
           </Feld>
           {k.art === KontaktArt.EMAIL && thw && (
             <label className="inline">
@@ -98,32 +99,32 @@ function PersonKarte(props: {
         <Feld titel="Vorname"><input value={p.vorname} onChange={(e) => set({ vorname: e.target.value })} /></Feld>
         <Feld titel="Nachname"><input value={p.nachname} onChange={(e) => set({ nachname: e.target.value })} /></Feld>
         <Feld titel="Stärkerolle (vor Ort)" schmal>
-          <select value={p.staerkeRolle} onChange={(e) => set({ staerkeRolle: Number(e.target.value) })}>
+          <Auswahl value={p.staerkeRolle} onChange={(e) => set({ staerkeRolle: Number(e.target.value) })}>
             <option value={StaerkeRolle.FUEHRER}>Führer/in</option>
             <option value={StaerkeRolle.UNTERFUEHRER}>Unterführer/in</option>
             <option value={StaerkeRolle.MANNSCHAFT}>Mannschaft</option>
-          </select>
+          </Auswahl>
         </Feld>
         <Feld titel="Geschlecht" schmal>
-          <select value={p.geschlecht} onChange={(e) => set({ geschlecht: Number(e.target.value) })}>
+          <Auswahl value={p.geschlecht} onChange={(e) => set({ geschlecht: Number(e.target.value) })}>
             <option value={Geschlecht.M}>M</option>
             <option value={Geschlecht.W}>W</option>
             <option value={Geschlecht.D}>D</option>
-          </select>
+          </Auswahl>
         </Feld>
         <Feld titel="Ernährung" schmal>
-          <select value={p.ernaehrung} onChange={(e) => set({ ernaehrung: Number(e.target.value) })}>
+          <Auswahl value={p.ernaehrung} onChange={(e) => set({ ernaehrung: Number(e.target.value) })}>
             <option value={Ernaehrung.FLEISCH}>Fleisch</option>
             <option value={Ernaehrung.VEGETARISCH}>Vegetarisch</option>
             <option value={Ernaehrung.VEGAN}>Vegan</option>
-          </select>
+          </Auswahl>
         </Feld>
         <Feld titel="Fahrerlaubnis" schmal>
-          <select value={p.fahrerlaubnis} onChange={(e) => set({ fahrerlaubnis: Number(e.target.value) })}>
+          <Auswahl value={p.fahrerlaubnis} onChange={(e) => set({ fahrerlaubnis: Number(e.target.value) })}>
             {Object.entries(FE_TEXT).map(([wert, text]) => (
               <option key={wert} value={wert}>{text}</option>
             ))}
-          </select>
+          </Auswahl>
         </Feld>
       </div>
       <Feld titel="Funktionen / Zusatzfunktionen">
@@ -196,18 +197,28 @@ function PersonalSchnellTabelle(props: {
                 />
               </td>
               <td>
-                <select value={p.staerkeRolle} onChange={(e) => set(i, { staerkeRolle: Number(e.target.value) })}>
+                {/* In der Tabelle gibt es kein <Feld> — Beschriftung wie beim
+                    Entfernen-Knopf mit der Zeilennummer, sonst heißen alle gleich. */}
+                <Auswahl
+                  beschriftung={`Person ${i + 1}: Stärkerolle`}
+                  value={p.staerkeRolle}
+                  onChange={(e) => set(i, { staerkeRolle: Number(e.target.value) })}
+                >
                   <option value={StaerkeRolle.FUEHRER}>Führer/in</option>
                   <option value={StaerkeRolle.UNTERFUEHRER}>Unterführer/in</option>
                   <option value={StaerkeRolle.MANNSCHAFT}>Mannschaft</option>
-                </select>
+                </Auswahl>
               </td>
               <td>
-                <select value={p.geschlecht} onChange={(e) => set(i, { geschlecht: Number(e.target.value) })}>
+                <Auswahl
+                  beschriftung={`Person ${i + 1}: Geschlecht`}
+                  value={p.geschlecht}
+                  onChange={(e) => set(i, { geschlecht: Number(e.target.value) })}
+                >
                   <option value={Geschlecht.M}>M</option>
                   <option value={Geschlecht.W}>W</option>
                   <option value={Geschlecht.D}>D</option>
-                </select>
+                </Auswahl>
               </td>
               <td>
                 <button

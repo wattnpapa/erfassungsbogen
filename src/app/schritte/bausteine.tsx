@@ -4,7 +4,7 @@
  * einem einzelnen Schritt — alles hier wird von mehreren Schritten genutzt.
  */
 
-import { useState, type ReactNode } from "react";
+import { createContext, useContext, useState, type ComponentProps, type ReactNode } from "react";
 import { Erfassungsbogen, VokabularWert } from "../../model";
 import type { VokabularEintrag } from "../../vokabulare/thw";
 import { type Pruefpunkt } from "../hilfen";
@@ -15,6 +15,28 @@ export type SchrittProps = {
   aendern: (patch: Partial<Erfassungsbogen>) => void;
 };
 
+/** Feldname des umschließenden <Feld> — Auswahllisten beschriften sich daraus. */
+const FeldTitel = createContext<string | undefined>(undefined);
+
+/**
+ * Auswahlliste — überall statt eines nackten <select> zu verwenden.
+ *
+ * Grund: Beschriftet wird in dieser App über ein umschließendes
+ * `<label className="feld">`, und bei einem <select> zählt der Text *aller*
+ * <option>-Elemente zum Textinhalt des Labels. Vorlesesoftware und
+ * Prüfwerkzeuge nennen dann die halbe Optionsliste als Feldnamen
+ * („ArtEinsatzÜbungVeranstaltung" statt „Art"). Ein aria-label gewinnt
+ * gegenüber dem Label und nennt nur den Feldnamen. Ohne <Feld> herum muss die
+ * Beschriftung explizit mitgegeben werden.
+ */
+export function Auswahl({
+  beschriftung,
+  ...rest
+}: ComponentProps<"select"> & { beschriftung?: string }) {
+  const ausFeld = useContext(FeldTitel);
+  return <select aria-label={beschriftung ?? ausFeld} {...rest} />;
+}
+
 export function VokabAuswahl(props: {
   wert: VokabularWert;
   aendern: (v: VokabularWert) => void;
@@ -22,6 +44,7 @@ export function VokabAuswahl(props: {
   platzhalter: string;
 }) {
   const { wert, aendern, tabelle, platzhalter } = props;
+  const titel = useContext(FeldTitel);
   if (tabelle.length === 0) {
     return (
       <input
@@ -34,7 +57,7 @@ export function VokabAuswahl(props: {
   const istFrei = wert.code == null;
   return (
     <span style={{ display: "flex", gap: "0.4rem", flexWrap: "wrap" }}>
-      <select
+      <Auswahl
         value={istFrei ? "frei" : String(wert.code)}
         onChange={(e) => {
           const v = e.target.value;
@@ -47,9 +70,13 @@ export function VokabAuswahl(props: {
             {t.kurz} – {t.name}
           </option>
         ))}
-      </select>
+      </Auswahl>
       {istFrei && (
+        // Zweites Bedienelement im selben Label: ohne eigenen Namen erbte es
+        // den des Labels (samt Optionstexten) und wäre von der Liste daneben
+        // nicht zu unterscheiden.
         <input
+          aria-label={titel && `${titel} (Freitext)`}
           value={wert.freitext ?? ""}
           onChange={(e) => aendern({ freitext: e.target.value })}
           placeholder={platzhalter}
@@ -74,7 +101,8 @@ export function VokabListe(props: {
           <button type="button" onClick={() => aendern(werte.filter((_, j) => j !== i))}>×</button>
         </span>
       ))}
-      <select
+      <Auswahl
+        beschriftung={`${hinzufuegenText} hinzufügen`}
         value=""
         onChange={async (e) => {
           // Das Feld gleich zurücksetzen: die Freitext-Abfrage läuft asynchron,
@@ -102,7 +130,7 @@ export function VokabListe(props: {
           </option>
         ))}
         <option value="frei">Freitext…</option>
-      </select>
+      </Auswahl>
     </span>
   );
 }
@@ -111,7 +139,7 @@ export function Feld(props: { titel: string; schmal?: boolean; children: ReactNo
   return (
     <label className={`feld${props.schmal ? " schmal" : ""}`}>
       {props.titel}
-      {props.children}
+      <FeldTitel.Provider value={props.titel}>{props.children}</FeldTitel.Provider>
     </label>
   );
 }
