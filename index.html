@@ -613,9 +613,11 @@
     .kopfzeile h2 { border: none; margin: 0; }
     /* Titel füllt die Zeile und darf umbrechen; die Aktion rückt nach rechts
        und klappt bei Platzmangel unter den Titel, statt ihn zu überlagern
-       (lange Wörter wie „(Meldekopf)" sprengten sonst die schmale Titelspalte). */
+       (lange Wörter wie „(Meldekopf)" sprengten sonst die schmale Titelspalte).
+       Steht nur ein Kind in der Zeile, darf es nicht als „Aktion" gelten —
+       sonst schöbe margin-left:auto den Titel an den rechten Kartenrand. */
     .kopfzeile > :first-child { flex: 1 1 auto; min-width: 0; overflow-wrap: break-word; }
-    .kopfzeile > :last-child { flex: 0 1 auto; min-width: 0; margin-left: auto; }
+    .kopfzeile > :last-child:not(:first-child) { flex: 0 1 auto; min-width: 0; margin-left: auto; }
     /* Aktionsgruppen mit mehreren Knöpfen (als <span> im Kopf) umbrechen als
        Flex-Zeile, statt schmal auf dem Handy seitlich aus dem Bild zu laufen. */
     .kopfzeile > span { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: baseline; justify-content: flex-end; }
