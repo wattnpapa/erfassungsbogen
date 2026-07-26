@@ -1,0 +1,121 @@
+# language: de
+Funktionalität: Einsatz-Sammlung führen (Meldekopf)
+  Als Meldekopf sammle ich fremde Bögen unter einem Einsatz, sehe die Summen
+  über alle anwesenden Einheiten, ordne Züge zu, verfolge Folgemeldungen in der
+  Historie und gebe die Sammlung als PDF oder CSV weiter.
+
+  Grundlage:
+    Angenommen ich öffne einen geteilten Bogen-Link eines alten Bogens
+    Wenn ich auf "In Einsatz aufnehmen…" klicke
+    Und ich auf "Neuen Einsatz anlegen…" klicke
+    Und ich im Dialog "Name" mit "Hochwasser Weser" fülle
+    Und ich im Dialog auf "Einsatz anlegen" klicke
+    Dann sehe ich die Überschrift "Hochwasser Weser"
+    Und sehe ich die Überschrift "Einheiten (1)"
+
+  Szenario: Die Sammlung summiert Stärke und Bedarf über alle Einheiten
+    Dann sehe ich die Überschrift "Bedarf (anwesende Einheiten)"
+    Und sehe ich den Hinweis "Verpflegung:"
+    Und sehe ich den Hinweis "Kraftstoff: Diesel"
+    Und sehe ich den Hinweis "Fahrzeuge: 1"
+
+  Szenario: Die Vollansicht einer gemeldeten Einheit aufklappen
+    Wenn ich auf "Details" klicke
+    Dann sehe ich die Überschrift "Zugehörigkeit"
+    Und sehe ich den Hinweis "Rudolph"
+    Wenn ich auf "Details schließen" klicke
+    Dann sehe ich "Zugehörigkeit" nicht
+
+  Szenario: Abgerückte Einheit zählt nicht mehr in die Summe
+    Wenn ich auf "Abrücken" klicke
+    Dann sehe ich die Schaltfläche "Als anwesend"
+    Und sehe ich den Hinweis "abgerückt"
+    Wenn ich auf "Als anwesend" klicke
+    Dann sehe ich die Schaltfläche "Abrücken"
+
+  Szenario: Einheit einem Zug zuordnen
+    Wenn ich auf "Zug zuordnen" klicke
+    Und ich das Feld mit dem Platzhalter "z. B. 2. Zug" mit "2. Zug" fülle
+    Und ich auf "Speichern" klicke
+    Dann sehe ich die Schaltfläche "Zug ändern"
+    Und sehe ich den Hinweis "2. Zug"
+
+  Szenario: Zug-Zuordnung abbrechen ändert nichts
+    Wenn ich auf "Zug zuordnen" klicke
+    Und ich das Feld mit dem Platzhalter "z. B. 2. Zug" mit "3. Zug" fülle
+    Und ich auf "Abbrechen" klicke
+    Dann sehe ich die Schaltfläche "Zug zuordnen"
+
+  Szenario: Meldung entfernen fragt in der App zurück
+    Wenn ich auf "Entfernen" klicke
+    Dann sehe ich den Dialog "Meldung entfernen?"
+    Wenn ich im Dialog auf "Meldung entfernen" klicke
+    Dann sehe ich die Überschrift "Einheiten (0)"
+    Und sehe ich den Hinweis "Noch keine Meldung."
+
+  Szenario: Folgemeldung derselben Einheit wandert in die Historie
+    Wenn ich denselben Bogen-Link erneut öffne
+    Und ich zum Schritt "5. Sofortbedarf" wechsle
+    Und ich das Feld "Sonstiges (Freitext)" mit "Ablösung angefordert" fülle
+    Und ich zum Schritt "6. Übersicht" wechsle
+    Und ich auf "In Einsatz aufnehmen…" klicke
+    Und ich auf "Hochwasser Weser" klicke
+    Dann sehe ich den Dialog "Einheit ist bereits gemeldet"
+    Wenn ich im Dialog auf "Als neue Fassung anhängen" klicke
+    Dann sehe ich die Überschrift "Einheiten (1)"
+    Und sehe ich die Schaltfläche "Historie (2)"
+    Wenn ich auf "Änderungen" klicke
+    Dann sehe ich den Hinweis "Auftrag / Sonstiges"
+    Und sehe ich den Hinweis "Ablösung angefordert"
+
+  Szenario: Dieselbe Einheit lässt sich getrennt weiterführen
+    Wenn ich denselben Bogen-Link erneut öffne
+    Und ich zum Schritt "5. Sofortbedarf" wechsle
+    Und ich das Feld "Sonstiges (Freitext)" mit "zweiter Trupp" fülle
+    Und ich zum Schritt "6. Übersicht" wechsle
+    Und ich auf "In Einsatz aufnehmen…" klicke
+    Und ich auf "Hochwasser Weser" klicke
+    Und ich im Dialog auf "Als eigene Einheit führen" klicke
+    Dann sehe ich die Überschrift "Einheiten (2)"
+
+  Szenario: Einheit manuell in den Einsatz erfassen
+    Wenn ich auf "Einheit manuell erfassen…" klicke
+    Dann sehe ich den Schritt "1. Einheit"
+    Wenn ich das Feld "Organisation" auf "Feuerwehr" stelle
+    Und ich das Feld "Name (Pflicht)" mit "Wardenburg" fülle
+    Und ich zum Schritt "6. Übersicht" wechsle
+    Dann sehe ich die Schaltfläche "In Einsatz übernehmen"
+    Wenn ich auf "In Einsatz übernehmen" klicke
+    Dann sehe ich die Überschrift "Hochwasser Weser"
+    Und sehe ich die Überschrift "Einheiten (2)"
+
+  Szenario: Sammel-PDF bündelt alle Bögen in einer Datei
+    Wenn ich auf "Sammel-PDF (alle Bögen)" klicke und eine Datei erhalte
+    Dann heißt die heruntergeladene Datei wie "eeb-einsatz-*.pdf"
+
+  Szenario: CSV-Export für die Weiterverarbeitung
+    Wenn ich auf "Als CSV" klicke und eine Datei erhalte
+    Dann heißt die heruntergeladene Datei wie "eeb-einsatz-*.csv"
+
+  Szenario: Gelöschter Einsatz liegt im Papierkorb und kommt zurück
+    Wenn ich auf "Einsatz löschen" klicke
+    Dann sehe ich die Schaltfläche "Neuen Bogen erstellen"
+    Und sehe ich die Schaltfläche "Papierkorb (1)"
+    Wenn ich auf "Papierkorb (1)" klicke
+    Und ich auf "Wiederherstellen" klicke
+    Dann sehe ich die Schaltfläche "Öffnen"
+
+  Szenario: Einsatz endgültig löschen fragt in der App zurück
+    Wenn ich auf "Einsatz löschen" klicke
+    Und ich auf "Papierkorb (1)" klicke
+    Und ich auf "Endgültig löschen" klicke
+    Dann sehe ich den Dialog "Einsatz endgültig löschen?"
+    Und sehe ich den Hinweis "Darin stecken fremde Personendaten"
+    Wenn ich im Dialog auf "Endgültig löschen" klicke
+    Dann sehe ich die Schaltfläche "Papierkorb (1)" nicht
+
+  Szenario: Zurück zur Startseite listet den Einsatz mit seinen Summen
+    Wenn ich auf "‹ Einsätze" klicke
+    Dann sehe ich die Überschrift "Einsatz-Sammlung (Meldekopf)"
+    Und sehe ich die Überschrift "Hochwasser Weser"
+    Und sehe ich den Hinweis "1 Einheit(en) anwesend"

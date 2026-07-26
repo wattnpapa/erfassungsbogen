@@ -81,7 +81,7 @@ QR-Code erzeugen funktionieren rein clientseitig.
 npm test              # beide Suiten
 npm run test:watch
 npm run test:coverage
-npm run test:e2e      # Cucumber/Playwright gegen die laufende Web-App
+npm run test:e2e      # Cucumber/Playwright gegen die gebaute Web-App
 ```
 
 `npm test` fährt zwei Vitest-Projekte ([vitest.config.ts](../vitest.config.ts)):
@@ -104,6 +104,49 @@ Zwei Dinge, die jsdom nicht mitbringt und die
 nachreichen: `<dialog>`-Methoden (`showModal`/`close` — die App öffnet damit
 Übergabe-, Namens- und Einsatzwahl-Dialog) und das virtuelle Modul
 `virtual:pwa-register`, das sonst erst vite-plugin-pwa im Build liefert.
+
+### Verhaltenstests (Cucumber + Playwright)
+
+`npm run test:e2e` fährt die Gherkin-Szenarien aus [features/](../features) im
+echten Browser. Die Suite deckt die Wege ab, die eine Komponente allein nicht
+belegen kann — Kodierung, Signatur, Speicher, Druck und Seitenwechsel im
+Zusammenspiel:
+
+| Datei | Worum es geht |
+| --- | --- |
+| [bogen-transport.feature](../features/bogen-transport.feature) | Startseite, Einstieg in den Assistenten, geteilter Link eines alten Bogens (Migration v2→v3) |
+| [assistent.feature](../features/assistent.feature) | Alle sechs Schritte, Schrittleiste, OV-Vorschläge, Landesvorlage, Namensimport, Schnelleingabe, Meldekopf-Stärke, Fahrzeuge, Sofortbedarf, Vollständigkeit, Entwurfswiederherstellung |
+| [uebergabe.feature](../features/uebergabe.feature) | QR-Code und Vollbild, PDF-Vorschau, PDF-Download, Link teilen — samt Runde „Link erzeugen → öffnen → Herkunft belegt → gegengezeichnet" |
+| [vorlagen.feature](../features/vorlagen.feature) | Vorlage speichern, umbenennen, Papierkorb, Musterung (Abwesende streichen) |
+| [einsatz-sammlung.feature](../features/einsatz-sammlung.feature) | Einsatz anlegen (Dialog, Pflichtfeld, Enter, Esc, Abbruch), Bogen aufnehmen |
+| [einsatz-detail.feature](../features/einsatz-detail.feature) | Summen, Vollansicht, Abrücken, Zug-Etikett, Folgemeldung/Historie/Diff, Sammel-PDF, CSV, Papierkorb |
+| [daten-und-anzeige.feature](../features/daten-und-anzeige.feature) | Anzeigemodus Feld/Nacht, Datensicherung, „Alle Daten löschen", Pflichtangaben, Beispielbögen, kaputter Link |
+
+Der Prüfstand steht in [features/support/haken.ts](../features/support/haken.ts):
+
+- **Gegen den Build, nicht gegen den Dev-Server.** `BeforeAll` baut die App und
+  startet `vite preview`. Grund: pdfmake hängt im Dev-Server beim Rendern (siehe
+  „PDF" unten) — ohne den Build wäre jeder PDF-Weg ungetestet. Nebenbei läuft die
+  Suite so gegen den minifizierten Stand samt Service Worker.
+  `EEB_SERVER=dev` schaltet auf den Dev-Server um, `EEB_BASE_URL=…` hängt sich an
+  einen bereits laufenden Server, `EEB_BROWSER=webkit` fährt die Suite als
+  iOS-WKWebView-Näherung.
+- **Wachhund gegen Systemdialoge.** Jedes `window.prompt/confirm/alert` lässt das
+  Szenario scheitern — in der iOS-App bleiben sie unbeantwortet (siehe oben,
+  „Rückfragen").
+
+Zwei Fallen beim Schreiben neuer Schritte:
+
+- **Auswahllisten über den Namen, Eingabefelder über das Label.** Auswahllisten
+  tragen ihren Feldnamen als `aria-label` (Zusicherung aus
+  [beschriftungen.feature](../features/beschriftungen.feature)) — dort greift
+  `getByLabel(..., { exact: true })`. Bei einem Textfeld im umschließenden
+  `<label>` wandert dagegen der eingegebene Inhalt in den zugänglichen Namen:
+  ein Schritt darauf fände das Feld nur, solange es leer ist. Eingaben sucht
+  deshalb das Label, dessen Text mit dem Feldnamen beginnt
+  ([oberflaeche.steps.ts](../features/schritte/oberflaeche.steps.ts)).
+- **Schaltflächen exakt treffen.** Namen werden `exact` verglichen — sonst fängt
+  „Löschen" auch „Alle Daten löschen" aus der Fußzeile ein.
 
 ## Einsatz-Sammlung (Meldekopf)
 
