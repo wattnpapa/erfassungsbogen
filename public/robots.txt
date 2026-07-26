@@ -1,0 +1,7 @@
+# Erfassungsbogen.app — alles öffentlich, nichts zu verbergen: Der Bogen selbst
+# wird ausschließlich im Gerät verarbeitet, hier liegen nur die App und ihre
+# Texte. Crawler dürfen daher alles lesen.
+User-agent: *
+Allow: /
+
+Sitemap: https://erfassungsbogen.app/sitemap.xml

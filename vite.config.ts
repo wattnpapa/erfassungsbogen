@@ -34,6 +34,10 @@ export default defineConfig({
         // (kein CDN), fehlte sie im Precache, fiele die App offline auf die
         // Systemschrift zurück.
         globPatterns: ["**/*.{js,css,html,svg,png,webmanifest,woff2}"],
+        // Die Manifest-Screenshots braucht nur der Installationsdialog des
+        // Browsers, nicht die laufende App — sie gehören nicht in den
+        // Offline-Vorrat, den jedes Gerät beim ersten Aufruf mitlädt.
+        globIgnores: ["screenshots/**"],
         // Das Haupt-Bundle (React, pdfmake, THW-OV-Verzeichnis …) ist ~3 MB und
         // damit größer als Workbox' 2-MiB-Standard. Es IST die App-Shell und muss
         // für den Offline-Start precacht werden – Limit entsprechend anheben.

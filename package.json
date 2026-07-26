@@ -12,6 +12,7 @@
     "beispiele:kats-th": "node --import tsx scripts/kats-thueringen-beispielboegen.mts",
     "beispiele:dlrg": "node --import tsx scripts/dlrg-beispielboegen.mts",
     "icons": "node scripts/render-icons.mjs",
+    "screenshots": "node scripts/screenshots.mjs",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",

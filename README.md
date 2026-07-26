@@ -13,6 +13,9 @@ anderen Gerät wieder eingelesen werden kann.
 **<https://erfassungsbogen.app>** — läuft im Browser, ohne Installation und
 ohne Anmeldung.
 
+Kurze Einführung und die häufigsten Fragen:
+[Anleitung](https://erfassungsbogen.app/anleitung.html).
+
 ## Was kann die App?
 
 - **Bogen ausfüllen**: Schritt für Schritt durch Einheit, Einsatz, Personal,

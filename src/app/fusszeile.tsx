@@ -15,6 +15,9 @@ import { alleDatenLoeschen, datenUmfang, sicherungErstellen, sicherungEinspielen
 
 const KONTAKT = "johannes.rudolph@thw-oldenburg.de";
 const REPO = "https://github.com/wattnpapa/erfassungsbogen";
+// Absolut, nicht relativ: dieselbe Fußzeile läuft in der Electron-/Capacitor-App,
+// wo ein relativer Pfad auf das mitgelieferte Bundle statt auf die Seite zeigt.
+const ANLEITUNG = "https://erfassungsbogen.app/anleitung.html";
 
 // Anzeigenamen für die Ordner in examples/. Erste Ebene ist die Organisation
 // bzw. ein Thema (z. B. „Katastrophenschutz"), darunter können weitere Ebenen
@@ -398,6 +401,7 @@ export function Fusszeile({ onBogenOeffnen }: {
         </nav>
         <nav className="fuss-gruppe" aria-label="Projekt">
           <span className="fuss-titel">Projekt</span>
+          <a href={ANLEITUNG} target="_blank" rel="noopener noreferrer">Anleitung</a>
           <a href={`mailto:${KONTAKT}`}>Kontakt</a>
           <a href={REPO} target="_blank" rel="noopener noreferrer">GitHub</a>
         </nav>

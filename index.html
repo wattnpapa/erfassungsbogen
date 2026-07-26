@@ -3,12 +3,74 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>Einheiten-Erfassungsbogen</title>
+  <title>Einheiten-Erfassungsbogen für BOS — ausfüllen, drucken, per QR-Code weitergeben</title>
   <link rel="icon" type="image/svg+xml" href="./icon.svg" />
   <link rel="icon" type="image/png" sizes="32x32" href="./icons/icon-32.png" />
   <link rel="apple-touch-icon" href="./apple-touch-icon.png" />
   <link rel="manifest" href="./manifest.webmanifest" />
   <meta name="theme-color" content="#12275e" />
+
+  <!-- ===============================================================
+       Auffindbarkeit: Die App selbst ist eine leere Seite plus Bundle —
+       ein Crawler sähe ohne diese Angaben nichts als den Titel. Beschreibung,
+       Vorschaubild und die strukturierten Daten sagen daher außerhalb des
+       JavaScript, worum es geht; die eigentlichen Fließtexte stehen in der
+       statischen Anleitung (anleitung.html), auf die von hier verwiesen wird.
+       Die Adressen sind bewusst absolut: dieselbe Datei läuft auch in der
+       Electron-/Capacitor-App, wo relative Pfade auf file:// zeigen würden.
+       =============================================================== -->
+  <meta name="description" content="Digitaler Einheiten-Erfassungsbogen für Feuerwehr, THW, Hilfsorganisationen, Bundeswehr und Katastrophenschutz: Bogen ausfüllen, im Papier-Layout drucken und per QR-Code offline weitergeben. Kostenlos, ohne Anmeldung, alle Daten bleiben auf dem Gerät." />
+  <link rel="canonical" href="https://erfassungsbogen.app/" />
+  <meta name="author" content="Johannes Rudolph" />
+
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Erfassungsbogen.app" />
+  <meta property="og:locale" content="de_DE" />
+  <meta property="og:url" content="https://erfassungsbogen.app/" />
+  <meta property="og:title" content="Einheiten-Erfassungsbogen für BOS" />
+  <meta property="og:description" content="Bogen am Bildschirm ausfüllen, als PDF im Papier-Layout drucken — und der komplette Inhalt steckt zusätzlich in einem QR-Code, der ohne Internet auf jedem anderen Gerät wieder eingelesen wird." />
+  <meta property="og:image" content="https://erfassungsbogen.app/icons/icon-512.png" />
+  <meta property="og:image:type" content="image/png" />
+  <meta property="og:image:alt" content="Logo des Einheiten-Erfassungsbogens" />
+  <meta name="twitter:card" content="summary" />
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Einheiten-Erfassungsbogen",
+    "alternateName": "Erfassungsbogen.app",
+    "url": "https://erfassungsbogen.app/",
+    "description": "Digitaler Einheiten-Erfassungsbogen für Behörden und Organisationen mit Sicherheitsaufgaben (BOS): Einheit, Personalstärke, Fahrzeuge und Sofortbedarf erfassen, als PDF im Papier-Layout drucken und den kompletten Bogen offline per QR-Code an die nächste Führungsstelle weitergeben.",
+    "applicationCategory": ["BusinessApplication", "UtilitiesApplication"],
+    "applicationSubCategory": "EmergencyApplication",
+    "operatingSystem": "Web, Windows, macOS, Linux, Android, iOS",
+    "browserRequirements": "Benötigt JavaScript. Nach dem ersten Aufruf offline lauffähig (PWA).",
+    "inLanguage": "de",
+    "isAccessibleForFree": true,
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "EUR" },
+    "license": "https://spdx.org/licenses/EUPL-1.2.html",
+    "codeRepository": "https://github.com/wattnpapa/erfassungsbogen",
+    "downloadUrl": "https://github.com/wattnpapa/erfassungsbogen/releases/latest",
+    "softwareHelp": { "@type": "CreativeWork", "url": "https://erfassungsbogen.app/anleitung.html" },
+    "privacyPolicy": "https://erfassungsbogen.app/datenschutz.html",
+    "image": "https://erfassungsbogen.app/icons/icon-512.png",
+    "keywords": "Erfassungsbogen, Einheitenerfassungsbogen, BOS, THW, Feuerwehr, Katastrophenschutz, Hilfsorganisation, Meldekopf, Bereitstellungsraum, Stärkemeldung, Einsatzdokumentation, QR-Code, offline, PDF",
+    "featureList": [
+      "Erfassungsbogen für Einheit, Einsatz, Personalstärke, Fahrzeuge und Sofortbedarf",
+      "PDF-Ausgabe im gewohnten Papier-Layout",
+      "Kompletter Bogen als QR-Code — Übergabe ohne Internet, Server oder Kopplung der Geräte",
+      "Meldekopf-Betrieb: fremde Bögen unter einem Einsatz sammeln und Stärke fortlaufend summieren",
+      "Beispielbögen und Landesvorlagen für THW, Feuerwehr, DLRG und den Katastrophenschutz der Länder",
+      "Arbeitet vollständig lokal auf dem Gerät — ohne Anmeldung, ohne Server, ohne Cloud"
+    ],
+    "author": {
+      "@type": "Person",
+      "name": "Johannes Rudolph",
+      "url": "https://github.com/wattnpapa"
+    }
+  }
+  </script>
   <style>
     /* ===============================================================
        Design-Token — die eine Quelle für Farbe, Schrift, Maß und Form der
@@ -114,6 +176,9 @@
     }
     #app { min-height: 100dvh; display: flex; flex-direction: column; }
     main { width: 100%; max-width: 60rem; margin: 0 auto; padding: var(--r-5) var(--r-4) 6rem; }
+    /* Hinweistext ohne JavaScript — gleiche Maße wie <main>, damit die Seite
+       auch in diesem Zustand nicht wie ein Fehler aussieht. */
+    .ohne-js { width: 100%; max-width: 40rem; margin: 0 auto; padding: var(--r-5) var(--r-4); }
     /* Überschriften tragen Gewicht statt Farbe — die Kennfarbe bleibt dem
        Seitenkopf und der primären Aktion vorbehalten und verliert damit
        nicht ihre Signalwirkung. */
@@ -1511,6 +1576,31 @@
 </head>
 <body>
   <div id="app"></div>
+  <!-- Ohne JavaScript bleibt der Bildschirm sonst leer — wer hier landet (auch
+       ein Crawler ohne JS) soll wenigstens erfahren, was das Angebot ist und wo
+       die lesbaren Texte stehen. -->
+  <noscript>
+    <div class="ohne-js">
+      <h1>Einheiten-Erfassungsbogen</h1>
+      <p>
+        Der digitale Einheiten-Erfassungsbogen für alle BOS und Hilfsorganisationen —
+        Feuerwehr, THW, Polizei, DRK/JUH/MHD/ASB, DLRG, Bundeswehr und weitere.
+        Bogen am Bildschirm ausfüllen, im gewohnten Papier-Layout als PDF drucken —
+        und der komplette Inhalt steckt zusätzlich in einem QR-Code, der ganz ohne
+        Internet auf jedem anderen Gerät wieder eingelesen werden kann.
+      </p>
+      <p>
+        Zum Ausfüllen wird JavaScript benötigt: Der Bogen wird vollständig im Browser
+        verarbeitet, es gibt keinen Server, an den er geschickt würde.
+        Bitte JavaScript aktivieren und die Seite neu laden.
+      </p>
+      <p>
+        <a href="./anleitung.html">Anleitung und häufige Fragen</a> ·
+        <a href="./datenschutz.html">Datenschutz</a> ·
+        <a href="https://github.com/wattnpapa/erfassungsbogen">Quellcode auf GitHub</a>
+      </p>
+    </div>
+  </noscript>
   <script type="module" src="/src/app/main.tsx"></script>
 </body>
 </html>
