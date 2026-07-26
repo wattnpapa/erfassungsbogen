@@ -12,6 +12,13 @@ QR-Scannen per Kamera (nativ über Capacitor-Plugin, im Browser/Electron per
 Webcam). Alles läuft clientseitig (Codec + pako + qrcode + pdfmake), kein
 Server nötig. Code: [index.html](../index.html), [src/app/](../src/app/).
 
+Aufbau der Oberfläche: [src/app/main.tsx](../src/app/main.tsx) ist nur der
+Browser-Einstieg (Plattformklassen, Wurzelknoten), die Anwendung selbst steht in
+[src/app/app.tsx](../src/app/app.tsx). Die Assistenten-Schritte liegen je Schritt
+in einer eigenen Datei unter [src/app/schritte/](../src/app/schritte/); was
+mehrere Schritte teilen (Feld-Rahmen, Vokabular-Auswahl, Zähler, Hinweise),
+steht in `schritte/bausteine.tsx`.
+
 ```
 npm install
 npm run dev      # Entwicklung: http://localhost:5173
@@ -47,6 +54,35 @@ QR-Code erzeugen funktionieren rein clientseitig.
 - **Testen.** Der SW greift nur im Produktions-Build, nicht in `npm run dev`.
   Also `npm run build && npm run preview`, dann in den DevTools „Offline"
   aktivieren (oder den Server stoppen) und neu laden.
+
+## Tests
+
+```
+npm test              # beide Suiten
+npm run test:watch
+npm run test:coverage
+npm run test:e2e      # Cucumber/Playwright gegen die laufende Web-App
+```
+
+`npm test` fährt zwei Vitest-Projekte ([vitest.config.ts](../vitest.config.ts)):
+
+- **`logik`** — Codec, Datenmodell, Signatur und die App-Helfer. Läuft in Node,
+  Dateiendung `.test.ts`.
+- **`oberflaeche`** — React-Komponenten mit Testing Library in jsdom,
+  Dateiendung `.test.tsx`. Abgedeckt sind der Assistenten-Durchlauf
+  ([src/app/app.test.tsx](../src/app/app.test.tsx): Startseite → Schritte →
+  Übersicht → Bogen übergeben) sowie die Schritte mit eigener Logik
+  (Einheit, Personal, Fahrzeuge).
+
+Für einen einzelnen Schritt genügt die Bühne aus
+[src/test/schritt-buehne.tsx](../src/test/schritt-buehne.tsx) — sie hält den
+Bogen im Zustand und hängt den Schritt so ein wie die App (`bogen` + `aendern`).
+
+Zwei Dinge, die jsdom nicht mitbringt und die
+[src/test/oberflaeche.ts](../src/test/oberflaeche.ts) bzw. die Vitest-Konfiguration
+nachreichen: `<dialog>`-Methoden (`showModal`/`close` — die App öffnet damit
+Übergabe-, Namens- und Einsatzwahl-Dialog) und das virtuelle Modul
+`virtual:pwa-register`, das sonst erst vite-plugin-pwa im Build liefert.
 
 ## Einsatz-Sammlung (Meldekopf)
 

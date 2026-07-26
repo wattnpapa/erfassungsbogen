@@ -1,16 +1,49 @@
 import { defineConfig } from "vitest/config";
 
-// Unit-Tests laufen in Node (der Codec ist plattformneutral, die getesteten
-// App-Helfer brauchen kein DOM). Die React-/Browser-Verhaltenstests kommen
-// später in einer eigenen Suite (Playwright/Cucumber).
+// Zwei Suiten in einem Lauf:
+//   „logik"       — Codec, Modell und App-Helfer; plattformneutral, läuft in Node.
+//   „oberflaeche" — React-Komponenten mit Testing Library, braucht ein DOM (jsdom).
+// Die Trennung hält die schnellen Logiktests frei vom DOM-Aufbau und macht schon
+// an der Endung sichtbar, wo ein Test läuft (.test.ts / .test.tsx).
 export default defineConfig({
   test: {
-    environment: "node",
-    include: ["src/**/*.test.ts"],
+    projects: [
+      {
+        test: {
+          name: "logik",
+          environment: "node",
+          include: ["src/**/*.test.ts"],
+        },
+      },
+      {
+        resolve: {
+          alias: {
+            // Liefert sonst erst vite-plugin-pwa im Build/Dev.
+            "virtual:pwa-register": new URL("./src/test/pwa-register.ts", import.meta.url).pathname,
+          },
+        },
+        // Im Build setzt vite.config.ts hier die Release-Version der Fußzeile.
+        define: { __APP_VERSION__: JSON.stringify("test") },
+        test: {
+          name: "oberflaeche",
+          environment: "jsdom",
+          include: ["src/**/*.test.tsx"],
+          setupFiles: ["src/test/oberflaeche.ts"],
+        },
+      },
+    ],
     coverage: {
       provider: "v8",
-      include: ["src/**/*.ts"],
-      exclude: ["src/**/*.test.ts", "src/**/*.d.ts"],
+      include: ["src/**/*.ts", "src/**/*.tsx"],
+      exclude: [
+        "src/**/*.test.ts",
+        "src/**/*.test.tsx",
+        "src/**/*.d.ts",
+        "src/test/**",
+        // Reiner Browser-Einstieg: hängt die App in den Wurzelknoten, außerhalb
+        // eines Browsers nicht ausführbar.
+        "src/app/main.tsx",
+      ],
     },
   },
 });

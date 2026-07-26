@@ -1,0 +1,93 @@
+/**
+ * Schritt 3 — Personal. Der Schritt hat drei Erfassungswege (Detail-Karten,
+ * Schnelleingabe-Tabelle, Namens-Import) und die Meldekopf-Schnellerfassung;
+ * geprüft wird, dass jeder davon Personal bzw. Stärke tatsächlich verändert.
+ */
+
+import { describe, it, expect } from "vitest";
+import { render, screen, within } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import { SchrittBuehne } from "../../test/schritt-buehne";
+import { SchrittPersonal } from "./personal";
+
+const buehne = () => render(<SchrittBuehne komponente={SchrittPersonal} />);
+
+/**
+ * Die Umschalter sind Radios ohne eigenes Label (Beschriftung steht daneben),
+ * deshalb über ihre Reihenfolge: 0/1 = Erfassungsart, 2/3 = Ansicht.
+ */
+const radios = () => screen.getAllByRole("radio");
+
+describe("Schritt Personal", () => {
+  it("legt über „+ Person hinzufügen“ eine Detail-Karte an und zählt sie zur Stärke", async () => {
+    const nutzer = userEvent.setup();
+    buehne();
+
+    expect(screen.getByLabelText(/^Stärke: 0 Führer/)).toBeDefined();
+
+    await nutzer.click(screen.getByRole("button", { name: "+ Person hinzufügen" }));
+
+    expect(screen.getByLabelText("Vorname")).toBeDefined();
+    // Eine neue Person zählt zunächst als Mannschaft.
+    expect(screen.getByLabelText("Stärke: 0 Führer, 0 Unterführer, 1 Mannschaft, 1 gesamt")).toBeDefined();
+  });
+
+  it("entfernt eine Person wieder", async () => {
+    const nutzer = userEvent.setup();
+    buehne();
+
+    await nutzer.click(screen.getByRole("button", { name: "+ Person hinzufügen" }));
+    await nutzer.click(screen.getByRole("button", { name: "Person entfernen" }));
+
+    expect(screen.queryByLabelText("Vorname")).toBeNull();
+    expect(screen.getByLabelText(/^Stärke: 0 Führer/)).toBeDefined();
+  });
+
+  it("rechnet in der Meldekopf-Schnellerfassung die Gesamtstärke aus", async () => {
+    const nutzer = userEvent.setup();
+    buehne();
+
+    await nutzer.click(radios()[1]!);
+
+    await nutzer.type(screen.getByLabelText("Führer"), "1");
+    await nutzer.type(screen.getByLabelText("Unterführer"), "2");
+    await nutzer.type(screen.getByLabelText("Mannschaft"), "9");
+
+    expect((screen.getByLabelText("Gesamt") as HTMLInputElement).value).toBe("12");
+  });
+
+  it("legt in der Schnelleingabe mit Enter die nächste Zeile an", async () => {
+    const nutzer = userEvent.setup();
+    buehne();
+
+    await nutzer.click(screen.getByRole("button", { name: "+ Person hinzufügen" }));
+    await nutzer.click(radios()[3]!); // Schnelleingabe (Tabelle)
+
+    const tabelle = screen.getByRole("table");
+    expect(within(tabelle).getAllByRole("row")).toHaveLength(2); // Kopf + 1 Person
+
+    const vorname = within(tabelle).getAllByRole("textbox")[0]!;
+    await nutzer.type(vorname, "Erika{Enter}");
+
+    expect(within(screen.getByRole("table")).getAllByRole("row")).toHaveLength(3);
+  });
+
+  it("übernimmt eine eingefügte Namensliste als Personen", async () => {
+    const nutzer = userEvent.setup();
+    buehne();
+
+    await nutzer.click(screen.getByRole("button", { name: "Namen einfügen…" }));
+    const dialog = document.querySelector<HTMLDialogElement>("dialog[aria-label='Namen einfügen']")!;
+    expect(dialog.hasAttribute("open")).toBe(true);
+
+    await nutzer.type(within(dialog).getByRole("textbox"), "Muster, Max\nErika Musterfrau");
+
+    // Der Knopf beziffert die erkannten Zeilen — das ist die Vorschau.
+    await nutzer.click(within(dialog).getByRole("button", { name: "2 Personen übernehmen" }));
+
+    expect(dialog.hasAttribute("open")).toBe(false);
+    const tabelle = screen.getByRole("table"); // Übernahme schaltet auf die Tabelle
+    const werte = (within(tabelle).getAllByRole("textbox") as HTMLInputElement[]).map((f) => f.value);
+    expect(werte).toEqual(["Max", "Muster", "Erika", "Musterfrau"]);
+  });
+});
