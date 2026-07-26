@@ -16,8 +16,77 @@ Given("ich öffne einen geteilten Bogen-Link eines alten Bogens", async function
   await this.oeffneApp(V2_FRAGMENT);
 });
 
+/** Zweite Meldung derselben Einheit — Grundlage für Folgemeldung und Historie. */
+When("ich denselben Bogen-Link erneut öffne", async function (this: EebWelt) {
+  await this.oeffneApp(V2_FRAGMENT);
+});
+
+Given("ich öffne einen Bogen-Link mit beschädigtem Inhalt", async function (this: EebWelt) {
+  await this.oeffneApp("EEB2cZdefekt");
+});
+
+/**
+ * Der eben geteilte Link, aus der Zwischenablage heraus geöffnet: damit läuft
+ * die volle Runde durch Kodierung, Signatur und Empfang — genau das, was sonst
+ * der QR-Code zwischen zwei Geräten transportiert.
+ */
+When("ich den Link aus der Zwischenablage öffne", async function (this: EebWelt) {
+  const url = await this.page.evaluate(() => navigator.clipboard.readText());
+  if (!url.includes("#")) throw new Error(`Kein Bogen-Link in der Zwischenablage: „${url}"`);
+  await this.page.goto(url, { waitUntil: "domcontentloaded" });
+});
+
+/**
+ * Schaltfläche über ihre volle Beschriftung. Bewusst `exact`: bei Teiltreffern
+ * fängt „Löschen" auch „Alle Daten löschen" aus der Fußzeile ein — ein Klick,
+ * der nicht gemeint war, ist schlimmer als ein Schritt, der die Beschriftung
+ * ausschreiben muss.
+ */
+function schaltflaeche(welt: EebWelt, name: string) {
+  return welt.page.getByRole("button", { name, exact: true });
+}
+
 When("ich auf {string} klicke", async function (this: EebWelt, name: string) {
-  await this.page.getByRole("button", { name }).click();
+  await schaltflaeche(this, name).click();
+});
+
+When("ich in der Vorschlagsliste {string} wähle", async function (this: EebWelt, name: string) {
+  // onMouseDown statt Klick: die Liste wählt vor dem blur aus (siehe
+  // OvVorschlagFeld in schritte/einheit.tsx).
+  await this.page.locator("ul.vorschlaege li").filter({ hasText: name }).first().click();
+});
+
+When("ich in der Musterung {string} abwähle", async function (this: EebWelt, name: string) {
+  await this.page.locator("label.muster-zeile").filter({ hasText: name }).locator("input").uncheck();
+});
+
+When("ich in der Musterung {string} ankreuze", async function (this: EebWelt, name: string) {
+  await this.page.locator("label.muster-zeile").filter({ hasText: name }).locator("input").check();
+});
+
+When("ich das Feld mit dem Platzhalter {string} mit {string} fülle", async function (
+  this: EebWelt,
+  platzhalter: string,
+  wert: string,
+) {
+  await this.page.getByPlaceholder(platzhalter).first().fill(wert);
+});
+
+/**
+ * Die PDF-Vorschau rendert im Browser (pdfmake) und braucht spürbar länger als
+ * ein Klick — deshalb ein eigener Schritt mit großzügiger Frist.
+ */
+When(
+  "ich auf {string} klicke und die PDF-Vorschau erscheint",
+  { timeout: 60_000 },
+  async function (this: EebWelt, name: string) {
+    await schaltflaeche(this, name).click();
+    await this.page.locator("iframe.pdf-rahmen").waitFor({ state: "visible", timeout: 55_000 });
+  },
+);
+
+Then("sehe ich das Bild {string}", async function (this: EebWelt, name: string) {
+  await this.page.getByRole("img", { name, exact: true }).first().waitFor({ state: "visible" });
 });
 
 When("ich zum Schritt {string} wechsle", async function (this: EebWelt, schritt: string) {
@@ -66,7 +135,7 @@ Then("sehe ich die Überschrift {string}", async function (this: EebWelt, text: 
 });
 
 Then("sehe ich die Schaltfläche {string}", async function (this: EebWelt, name: string) {
-  await this.page.getByRole("button", { name }).waitFor({ state: "visible" });
+  await schaltflaeche(this, name).waitFor({ state: "visible" });
 });
 
 Then("sehe ich den Schritt {string}", async function (this: EebWelt, text: string) {
@@ -116,6 +185,16 @@ When("ich im Dialog {string} auf {string} stelle", async function (this: EebWelt
 
 When("ich im Dialog auf {string} klicke", async function (this: EebWelt, name: string) {
   await offenerDialog(this).getByRole("button", { name }).click();
+});
+
+When("ich im Dialog den Text {string} eingebe", async function (this: EebWelt, text: string) {
+  // Mehrzeilige Eingaben („Namen einfügen") haben keine eigene Beschriftung —
+  // der Dialogtitel benennt sie bereits.
+  await offenerDialog(this).locator("textarea").fill(text.replaceAll("\\n", "\n"));
+});
+
+When("ich im Dialog {string} ankreuze", async function (this: EebWelt, name: string) {
+  await offenerDialog(this).getByLabel(name, { exact: true }).check();
 });
 
 When("ich im Dialog die Eingabetaste drücke", async function (this: EebWelt) {

@@ -1,5 +1,5 @@
 import { setWorldConstructor, World, type IWorldOptions } from "@cucumber/cucumber";
-import type { Page } from "playwright";
+import type { Download, Page } from "playwright";
 
 /**
  * Cucumber-World: pro Szenario neu, hält die Playwright-Seite und die
@@ -15,6 +15,8 @@ export class EebWelt extends World {
    * siehe die Begründung am Wachhund in support/haken.ts.
    */
   readonly systemdialoge: string[] = [];
+  /** Alle im Szenario ausgelösten Downloads (PDF, CSV, Datensicherung). */
+  readonly downloads: Download[] = [];
 
   constructor(optionen: IWorldOptions) {
     super(optionen);
