@@ -705,6 +705,7 @@ function AppInhalt() {
     setBogen(null);
     setzeEmpfang(null);
     setSchritt(0);
+    setMeldung(""); // Rückmeldung des Assistenten gehört nicht in die Folgeansicht
     await bogenInSammlung(
       zielId,
       b,
@@ -937,12 +938,12 @@ function AppInhalt() {
                     : ""}
                 </span>
               </span>
-              <button type="button" className="primaer" onClick={() => setZeigeStart(false)}>Fortsetzen</button>
+              <button type="button" className="primaer" onClick={() => { setMeldung(""); setZeigeStart(false); }}>Fortsetzen</button>
             </section>
           );
         })()}
         <div className="aktionen">
-          <button type="button" className={bogen ? "" : "primaer"} onClick={() => { setBogen(neuerBogen()); setzeEmpfang(null); setSchritt(0); setZeigeStart(false); }}>
+          <button type="button" className={bogen ? "" : "primaer"} onClick={() => { setMeldung(""); setBogen(neuerBogen()); setzeEmpfang(null); setSchritt(0); setZeigeStart(false); }}>
             Neuen Bogen erstellen
           </button>
           <button type="button" onClick={scanneQr}>QR-Code scannen…</button>
@@ -1046,7 +1047,7 @@ function AppInhalt() {
     <Aktualisierungshinweise />
     <SeitenKopf variante="assistent-kopf">
       <div className="kopf-leiste">
-        <button type="button" className="zur-start" onClick={() => setZeigeStart(true)}>
+        <button type="button" className="zur-start" onClick={() => { setMeldung(""); setZeigeStart(true); }}>
           ‹ Startseite
         </button>
         <AnzeigeSchalter />
@@ -1092,6 +1093,11 @@ function AppInhalt() {
       )}
     </SeitenKopf>
     <main id="inhalt" tabIndex={-1}>
+      {/* Rückmeldungen (Vorlage gespeichert, Beispielbogen geöffnet …) gehören
+          dorthin, wo die Aktion ausgelöst wurde. Ohne diese Zeile blieben sie
+          im Assistenten unsichtbar und tauchten später unvermittelt auf der
+          Startseite auf. */}
+      {meldung && <p className="meldung" role="status">{meldung}</p>}
       {schritt === 0 && <SchrittEinheit bogen={bogen} aendern={aendern} />}
       {schritt === 1 && <SchrittEinsatz bogen={bogen} aendern={aendern} />}
       {schritt === 2 && <SchrittPersonal bogen={bogen} aendern={aendern} />}
@@ -1103,7 +1109,7 @@ function AppInhalt() {
           signatur={bogenSignatur}
           herkunft={bogenHerkunft}
           geheZu={setSchritt}
-          neu={() => { setBogen(null); setzeEmpfang(null); setSchritt(0); }}
+          neu={() => { setMeldung(""); setBogen(null); setzeEmpfang(null); setSchritt(0); }}
           onVorlageGespeichert={(name) => { vorlagenNeuLaden(); setMeldung(`Als Vorlage „${name}" gespeichert.`); }}
           onInEinsatzAufnehmen={() => { einsaetzeNeuLaden(); einsatzWahlDialog.current?.showModal(); }}
           sammelAktion={
@@ -1116,6 +1122,7 @@ function AppInhalt() {
                     setBogen(null);
                     setzeEmpfang(null);
                     setSchritt(0);
+                    setMeldung("");
                     // Manuell erfasster Bogen ist kein signierter Transport.
                     void bogenInSammlung(ziel, bogen, "manuell");
                   },
