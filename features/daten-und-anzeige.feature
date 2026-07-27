@@ -91,6 +91,23 @@ Funktionalität: Darstellung, Datensicherung und Auskunft
     Dann ist kein Dialog offen
     Und sehe ich die Schaltfläche "Fortsetzen"
 
+  Szenario: Angefangenen Bogen direkt von der Startseite verwerfen
+    Angenommen ich öffne einen geteilten Bogen-Link eines alten Bogens
+    Wenn ich auf "‹ Startseite" klicke
+    Und ich auf "Verwerfen" klicke
+    Dann sehe ich den Dialog "Angefangenen Bogen verwerfen?"
+    Wenn ich im Dialog auf "Verwerfen" klicke
+    Dann sehe ich den Hinweis "Angefangener Bogen verworfen."
+    Und sehe ich die Schaltfläche "Fortsetzen" nicht
+
+  Szenario: Das Verwerfen abbrechen lässt den angefangenen Bogen stehen
+    Angenommen ich öffne einen geteilten Bogen-Link eines alten Bogens
+    Wenn ich auf "‹ Startseite" klicke
+    Und ich auf "Verwerfen" klicke
+    Und ich im Dialog auf "Abbrechen" klicke
+    Dann ist kein Dialog offen
+    Und sehe ich die Schaltfläche "Fortsetzen"
+
   Szenario: Pflichtangaben sind aus der Fußzeile erreichbar
     Angenommen ich öffne die App
     Wenn ich auf "Impressum" klicke

@@ -495,12 +495,17 @@
     .entwurf-karte .entwurf-text { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 0.1rem; }
     .entwurf-karte .entwurf-text strong { overflow-wrap: break-word; }
     .entwurf-karte button { flex: 0 0 auto; }
-    /* Auf dem Telefon reicht die Zeile nicht für Zeichen, Name und Knopf: der
-       Einheitsname würde mitten im Wort umbrechen. Dann rutscht der Knopf auf
+    /* „Fortsetzen" und „Verwerfen" stehen als Paar enger beieinander als die
+       Teile der Karte — sonst wirkt das Verwerfen wie eine eigene Spalte. */
+    .entwurf-karte .entwurf-aktionen { flex: 0 0 auto; display: flex; gap: var(--r-2); }
+    /* Auf dem Telefon reicht die Zeile nicht für Zeichen, Name und Knöpfe: der
+       Einheitsname würde mitten im Wort umbrechen. Dann rutschen die Knöpfe auf
        eine eigene Zeile und der Name bekommt die volle Breite. */
     @media (max-width: 30rem) {
       .entwurf-karte { flex-wrap: wrap; }
       .entwurf-karte button { width: 100%; }
+      .entwurf-karte .entwurf-aktionen { width: 100%; }
+      .entwurf-karte .entwurf-aktionen button { flex: 1 1 0; min-width: 0; }
     }
     /* Erststart-Onboarding: drei Schritte erklären den Offline-QR-Transport. */
     .onboarding { margin-top: var(--r-6); }

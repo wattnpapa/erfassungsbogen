@@ -332,6 +332,27 @@ function AppInhalt() {
   }
 
   /**
+   * Den angefangenen Bogen direkt von der Startseite aus wegwerfen — das
+   * Gegenstück zu „Fortsetzen". Ohne diesen Weg müsste man den Entwurf erst
+   * öffnen, um ihn in der Übersicht zu verwerfen. Anders als bei Vorlagen und
+   * Einsätzen gibt es für den Entwurf keinen Papierkorb, deshalb die Rückfrage.
+   */
+  async function entwurfWegwerfen() {
+    if (!bogen) return;
+    const sicher = await frageJaNein({
+      titel: "Angefangenen Bogen verwerfen?",
+      text: `„${einheitAnzeigename(bogen.einheit)}" wird gelöscht. Das lässt sich nicht rückgängig machen.`,
+      ok: "Verwerfen",
+      gefahr: true,
+    });
+    if (!sicher) return;
+    setBogen(null); // löscht auch die Entwurfssicherung (siehe oben)
+    setzeEmpfang(null);
+    setSchritt(0);
+    setMeldung("Angefangener Bogen verworfen.");
+  }
+
+  /**
    * Beispielbogen aus der Fußzeile öffnen — bewusst derselbe Weg wie bei einem
    * frisch gescannten Bogen (Übersicht, keine Signatur). Er ersetzt den offenen
    * Bogen inkl. Entwurfssicherung, daher vorher rückfragen. Rückgabe false =
@@ -938,7 +959,10 @@ function AppInhalt() {
                     : ""}
                 </span>
               </span>
-              <button type="button" className="primaer" onClick={() => { setMeldung(""); setZeigeStart(false); }}>Fortsetzen</button>
+              <span className="entwurf-aktionen">
+                <button type="button" className="primaer" onClick={() => { setMeldung(""); setZeigeStart(false); }}>Fortsetzen</button>
+                <button type="button" className="gefahr" onClick={entwurfWegwerfen}>Verwerfen</button>
+              </span>
             </section>
           );
         })()}
