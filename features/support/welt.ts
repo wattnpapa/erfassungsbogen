@@ -17,6 +17,12 @@ export class EebWelt extends World {
   readonly systemdialoge: string[] = [];
   /** Alle im Szenario ausgelösten Downloads (PDF, CSV, Datensicherung). */
   readonly downloads: Download[] = [];
+  /**
+   * Der aus der Übersicht gegriffene QR-Code als PNG — damit ihn ein späterer
+   * Schritt wieder einlesen kann, so wie es sonst die Kamera des zweiten
+   * Geräts täte.
+   */
+  qrBild?: Buffer;
 
   constructor(optionen: IWorldOptions) {
     super(optionen);

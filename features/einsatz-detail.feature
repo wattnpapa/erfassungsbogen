@@ -114,6 +114,22 @@ Funktionalität: Einsatz-Sammlung führen (Meldekopf)
     Wenn ich im Dialog auf "Endgültig löschen" klicke
     Dann sehe ich die Schaltfläche "Papierkorb (1)" nicht
 
+  Szenario: Bei einer einzigen Meldung bleibt die Filterleiste weg
+    Dann sehe ich "Suche" nicht
+
+  Szenario: Die Sammel-PDF bringt die ganze Sammlung auf ein leeres Gerät
+    Wenn ich auf "Sammel-PDF (alle Bögen)" klicke und eine Datei erhalte
+    Und ich auf "‹ Einsätze" klicke
+    Und ich auf "Alle Daten löschen" klicke
+    Und ich im Dialog "Ja, alle lokalen Daten dieser App endgültig löschen" ankreuze
+    Und ich im Dialog auf "Endgültig löschen" klicke
+    Und ich im Dialog auf "Neu starten" klicke
+    Dann sehe ich "Hochwasser Weser" nicht
+    Wenn ich die zuletzt erhaltene Datei über "Einsatz importieren…" einlese
+    Dann sehe ich die Überschrift "Hochwasser Weser"
+    Und sehe ich die Überschrift "Einheiten (1)"
+    Und führt die Einheitenliste "THW" an Stelle 1
+
   Szenario: Zurück zur Startseite listet den Einsatz mit seinen Summen
     Wenn ich auf "‹ Einsätze" klicke
     Dann sehe ich die Überschrift "Einsatz-Sammlung (Meldekopf)"

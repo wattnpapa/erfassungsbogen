@@ -1,6 +1,7 @@
 import { Given, When, Then } from "@cucumber/cucumber";
 import type { EebWelt } from "../support/welt";
 import { V2_FRAGMENT } from "../fixtures";
+import { dateiKnopf } from "./oberflaeche.steps";
 
 // Sichtbarkeit als Zusicherung: locator.waitFor wirft bei Zeitüberschreitung,
 // d. h. „nicht sichtbar“ lässt den Schritt (und damit das Szenario) fehlschlagen.
@@ -159,6 +160,97 @@ Then("sehe ich die Person {string} in der Personalliste", async function (this: 
   await sichtbar(this, nachname);
 });
 
+// ------------------------------------------------------------ QR als Bild
+
+/**
+ * Der angezeigte QR-Code als PNG. Zusammen mit dem Einlese-Schritt unten wird
+ * daraus die Runde, die der Code eigentlich geht: dieses Gerät zeigt ihn an,
+ * das andere liest ihn ein. Der Link-Weg (uebergabe.feature) prüft dieselbe
+ * Kodierung, aber nicht das Bild — und genau daran hängt jsQR.
+ */
+When("ich mir den angezeigten QR-Code merke", async function (this: EebWelt) {
+  const bild = this.page.getByRole("img", { name: "EEB2-QR-Code", exact: true }).first();
+  await bild.waitFor({ state: "visible" });
+  const quelle = await bild.getAttribute("src");
+  const daten = quelle?.match(/^data:image\/png;base64,(.+)$/)?.[1];
+  if (!daten) throw new Error(`QR-Bild ist kein PNG-Datenverweis: „${quelle?.slice(0, 40)}…"`);
+  this.qrBild = Buffer.from(daten, "base64");
+});
+
+When("ich den gemerkten QR-Code über {string} einlese", async function (this: EebWelt, beschriftung: string) {
+  if (!this.qrBild) throw new Error("Es wurde noch kein QR-Code gemerkt.");
+  await dateiKnopf(this, beschriftung).setInputFiles({
+    name: "qr-code.png",
+    mimeType: "image/png",
+    buffer: this.qrBild,
+  });
+});
+
+// -------------------------------------------------------- Einheitenliste
+
+/**
+ * Eine weitere Einheit in den offenen Einsatz — als Aufbauschritt gedacht, um
+ * eine Liste zu füllen. Der Weg selbst ist in einsatz-detail.feature einzeln
+ * belegt; hier zählt nur das Ergebnis.
+ */
+When(
+  "ich die Einheit {string} {string} manuell in den Einsatz aufnehme",
+  async function (this: EebWelt, organisation: string, name: string) {
+    await schaltflaeche(this, "Einheit manuell erfassen…").click();
+    await this.page.getByRole("heading", { name: "1. Einheit" }).waitFor({ state: "visible" });
+    await this.page.locator("main").getByLabel("Organisation", { exact: true }).selectOption({ label: organisation });
+    await this.page
+      .locator("main")
+      .locator("label")
+      .filter({ hasText: /^Name \(Pflicht\)/ })
+      .locator("input")
+      .first()
+      .fill(name);
+    await this.page.getByRole("button", { name: /^6\. Übersicht/ }).click();
+    await schaltflaeche(this, "In Einsatz übernehmen").click();
+    await this.page.getByRole("heading", { name: /^Einheiten \(/ }).waitFor({ state: "visible" });
+  },
+);
+
+/** Die Namen der Einheitenkarten in der Reihenfolge, in der sie stehen. */
+function einheitenNamen(welt: EebWelt): Promise<string[]> {
+  return welt.page.locator(".einheit-zeile .muster-name").allInnerTexts();
+}
+
+Then("führt die Einheitenliste {string} an Stelle {int}", async function (this: EebWelt, name: string, platz: number) {
+  const namen = await einheitenNamen(this);
+  const ist = namen[platz - 1];
+  if (!ist?.includes(name)) {
+    throw new Error(`An Stelle ${platz} steht „${ist ?? "(nichts)"}", erwartet war „${name}". Liste: ${namen.join(" | ")}`);
+  }
+});
+
+Then("führt die Einheitenliste {string} nicht", async function (this: EebWelt, name: string) {
+  const namen = await einheitenNamen(this);
+  if (namen.some((n) => n.includes(name))) {
+    throw new Error(`„${name}" steht noch in der Liste: ${namen.join(" | ")}`);
+  }
+});
+
+Then("führt die Einheitenliste genau {int} Einheiten", async function (this: EebWelt, anzahl: number) {
+  const namen = await einheitenNamen(this);
+  if (namen.length !== anzahl) {
+    throw new Error(`Die Liste führt ${namen.length} Einheiten, erwartet waren ${anzahl}: ${namen.join(" | ")}`);
+  }
+});
+
+/**
+ * Die Zahl ganz oben — sie zählt alle anwesenden Einheiten des Einsatzes.
+ * Eine Suche darf sie nicht verändern: wer filtert, will etwas finden und
+ * nicht die Lagemeldung umschreiben.
+ */
+Then("meldet die Kopfleiste {int} Einheiten", async function (this: EebWelt, anzahl: number) {
+  const wert = (await this.page.locator(".staerke-leiste div").first().locator("strong").innerText()).trim();
+  if (wert !== String(anzahl)) {
+    throw new Error(`Die Kopfleiste meldet ${wert} Einheiten, erwartet waren ${anzahl}`);
+  }
+});
+
 // ---------------------------------------------------- Eigene Dialoge der App
 
 /** Der offene Dialog — Abfragen der App tragen ihren Titel als aria-label. */
@@ -185,6 +277,15 @@ When("ich im Dialog {string} auf {string} stelle", async function (this: EebWelt
 
 When("ich im Dialog auf {string} klicke", async function (this: EebWelt, name: string) {
   await offenerDialog(this).getByRole("button", { name }).click();
+});
+
+/**
+ * Benannter Dialog statt „der zuletzt geöffnete": Der Scanner ist kein
+ * `<dialog>`, sondern ein Overlay mit `role="dialog"` — und sein „Abbrechen"
+ * heißt genauso wie das der Absenderkarte darunter.
+ */
+When("ich im Dialog {string} auf {string} klicke", async function (this: EebWelt, titel: string, name: string) {
+  await dialog(this, titel).getByRole("button", { name, exact: true }).click();
 });
 
 When("ich im Dialog den Text {string} eingebe", async function (this: EebWelt, text: string) {

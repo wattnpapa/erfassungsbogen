@@ -22,6 +22,46 @@ Funktionalität: Darstellung, Datensicherung und Auskunft
     Wenn ich auf "Sicherung erstellen…" klicke und eine Datei erhalte
     Dann heißt die heruntergeladene Datei wie "*.json"
 
+  Szenario: Eine Sicherung holt die Daten auf ein leergeräumtes Gerät zurück
+    Angenommen ich öffne einen geteilten Bogen-Link eines alten Bogens
+    Wenn ich auf "Als Vorlage speichern" klicke
+    Und ich im Dialog "Name der Vorlage" mit "FGr K Oldenburg" fülle
+    Und ich im Dialog auf "Vorlage speichern" klicke
+    Und ich auf "‹ Startseite" klicke
+    Und ich auf "Datensicherung" klicke
+    Und ich auf "Sicherung erstellen…" klicke und eine Datei erhalte
+    Und ich im Dialog auf "Schließen" klicke
+    Und ich auf "Alle Daten löschen" klicke
+    Und ich im Dialog "Ja, alle lokalen Daten dieser App endgültig löschen" ankreuze
+    Und ich im Dialog auf "Endgültig löschen" klicke
+    Und ich im Dialog auf "Neu starten" klicke
+    Dann sehe ich "Gespeicherte Vorlagen" nicht
+    Wenn ich auf "Datensicherung" klicke
+    Und ich die zuletzt erhaltene Datei über "Sicherung einspielen…" einlese
+    Dann sehe ich den Dialog "Sicherung einspielen?"
+    Wenn ich im Dialog auf "Einspielen und ersetzen" klicke
+    Dann sehe ich den Dialog "Sicherung eingespielt"
+    Wenn ich im Dialog auf "Neu laden" klicke
+    Dann sehe ich die Überschrift "Gespeicherte Vorlagen"
+    Und sehe ich die Überschrift "FGr K Oldenburg"
+
+  Szenario: Ohne Netz startet die App weiter
+    Angenommen ich öffne die App
+    Wenn ich die App vom Netz trenne
+    Und ich die Seite neu lade
+    Dann sehe ich die Überschrift "Einheiten-Erfassungsbogen"
+    Und sehe ich die Schaltfläche "Neuen Bogen erstellen"
+    Und sehe ich den Hinweis "Funktioniert komplett offline"
+
+  Szenario: Ohne Netz entsteht auch der Bogen samt QR-Code
+    Angenommen ich öffne die App
+    Wenn ich die App vom Netz trenne
+    Und ich die Seite neu lade
+    Und ich auf "Neuen Bogen erstellen" klicke
+    Und ich zum Schritt "6. Übersicht" wechsle
+    Dann sehe ich die Überschrift "Gesamtübersicht"
+    Und sehe ich das Bild "EEB2-QR-Code"
+
   Szenario: Alle Daten löschen verlangt einen bewussten Haken
     Angenommen ich öffne einen geteilten Bogen-Link eines alten Bogens
     Wenn ich auf "‹ Startseite" klicke

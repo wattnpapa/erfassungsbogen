@@ -7,6 +7,7 @@
  */
 
 import { When, Then } from "@cucumber/cucumber";
+import { readFile } from "node:fs/promises";
 import type { Locator } from "playwright";
 import type { EebWelt } from "../support/welt";
 
@@ -101,6 +102,65 @@ When(
     await download;
   },
 );
+
+/**
+ * Datei-Eingaben stecken in einem `<label className="datei-knopf">`; das
+ * `<input type="file">` darin ist nur fürs Auge weg (.nur-sr), damit der Knopf
+ * in der Tabfolge bleibt. Angesprochen wird es über die Beschriftung des
+ * Labels — also über das, was auch auf dem Knopf steht.
+ */
+export function dateiKnopf(welt: EebWelt, beschriftung: string): Locator {
+  return welt.page
+    .locator("label.datei-knopf")
+    .filter({ hasText: beschriftung })
+    .locator("input[type=file]")
+    .first();
+}
+
+const MIME_TYPEN: Record<string, string> = {
+  json: "application/json",
+  pdf: "application/pdf",
+  csv: "text/csv",
+};
+
+/**
+ * Der Gegenweg zum Download: die eben erzeugte Datei wieder einlesen. Erst
+ * damit ist eine Sicherung eine Sicherung und eine Sammel-PDF ein Transport —
+ * eine Datei, die nur entsteht und nie wieder ankommt, belegt nichts.
+ *
+ * Bewusst mit dem vorgeschlagenen Dateinamen statt mit dem Pfad aus dem
+ * Download-Verzeichnis: der ist eine endungslose UUID, und die App entscheidet
+ * an der Endung, ob in der Datei eine Sammlung oder eine Sicherung steckt.
+ */
+When(
+  "ich die zuletzt erhaltene Datei über {string} einlese",
+  { timeout: 60_000 },
+  async function (this: EebWelt, beschriftung: string) {
+    const datei = this.downloads[this.downloads.length - 1];
+    if (!datei) throw new Error("In diesem Szenario wurde noch keine Datei heruntergeladen.");
+    const pfad = await datei.path();
+    if (!pfad) throw new Error(`Download „${datei.suggestedFilename()}" liegt nicht auf der Platte.`);
+    const name = datei.suggestedFilename();
+    const endung = name.split(".").pop()?.toLowerCase() ?? "";
+    await dateiKnopf(this, beschriftung).setInputFiles({
+      name,
+      mimeType: MIME_TYPEN[endung] ?? "application/octet-stream",
+      buffer: await readFile(pfad),
+    });
+  },
+);
+
+/**
+ * Netz weg — der Normalfall im Einsatz, nicht die Ausnahme. Vorher muss der
+ * Service Worker aktiv sein: er ist es, der die App danach aus dem Cache
+ * ausliefert. Ohne das Warten prüfte der Test nur, wie schnell der Browser ist.
+ */
+When("ich die App vom Netz trenne", async function (this: EebWelt) {
+  await this.page.evaluate(async () => {
+    await navigator.serviceWorker.ready;
+  });
+  await this.page.context().setOffline(true);
+});
 
 When("ich in der Schnelltabelle Zeile {int} auf {string} setze", async function (
   this: EebWelt,

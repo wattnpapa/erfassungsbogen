@@ -76,11 +76,27 @@ Funktionalität: Bogen übergeben — QR, PDF, Link
     Dann sehe ich den Hinweis "Unveränderter Bogen von fremder Stelle:" nicht
     Und sehe ich den Hinweis "Signiert mit dem Geräteschlüssel"
 
+  Szenario: Der hinterlegte Absender reist mit zum Empfänger
+    Wenn ich auf "‹ Startseite" klicke
+    Und ich das Feld "Name" mit "Max Mustermann" fülle
+    Und ich das Feld "Telefon" mit "0170 1234567" fülle
+    Und ich auf "Übernehmen" klicke
+    Und ich auf "Fortsetzen" klicke
+    Und ich auf "Bogen übergeben…" klicke
+    Und ich im Dialog auf "Link teilen" klicke
+    Und ich den Link aus der Zwischenablage öffne
+    Dann sehe ich den Hinweis "Empfangen als:"
+    Und sehe ich den Hinweis "Eigene Angabe des Absenders:"
+    Und sehe ich den Hinweis "Max Mustermann"
+
   Szenario: Der Bogen lässt sich aus der Übersicht als Vorlage sichern
     Wenn ich auf "Als Vorlage speichern" klicke
     Dann sehe ich den Dialog "Als Vorlage speichern"
     Wenn ich im Dialog "Name der Vorlage" mit "FGr K Oldenburg" fülle
     Und ich im Dialog auf "Vorlage speichern" klicke
-    Und ich auf "‹ Startseite" klicke
+    # Die Rückmeldung steht dort, wo gespeichert wurde — der Weg zur Startseite
+    # räumt sie wieder weg. Erst darauf warten, dann weitergehen: sonst hinge das
+    # Szenario davon ab, was der Browser zuerst abarbeitet.
     Dann sehe ich den Hinweis 'Als Vorlage „FGr K Oldenburg" gespeichert.'
-    Und sehe ich die Überschrift "FGr K Oldenburg"
+    Wenn ich auf "‹ Startseite" klicke
+    Dann sehe ich die Überschrift "FGr K Oldenburg"
