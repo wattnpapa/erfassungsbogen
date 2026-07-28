@@ -52,9 +52,13 @@ function inlineCssMinify(): Plugin {
 
 /**
  * Zieht das gebaute Stylesheet (nur die @font-face-Regeln von Archivo, ~1 KB)
- * in die index.html hinein. Als externe Datei ist es der einzige
- * render-blockierende Request — eine ganze Netz-Runde vor dem ersten Rendern
- * für drei Regeln, die dank font-display:swap ohnehin nicht sofort greifen.
+ * in die index.html hinein und bettet die Woff2 dabei als Base64 mit ein.
+ * Als externe Dateien wären das zwei Requests vor der fertigen Schrift — und
+ * der font-display:swap-Repaint des Intro-Absatzes zählt als neuer
+ * LCP-Kandidat: auf langsamen Leitungen hing das LCP an der Schriftdatei,
+ * weil sie sich die Bandbreite mit dem Haupt-Bundle teilt. Eingebettet ist
+ * die Schrift beim ersten Malen da (kein Umspringen mehr); die ~42 KB
+ * zahlt nur der Kaltbesuch, App-Nutzer haben die index.html im SW-Precache.
  */
 function fontCssInline(): Plugin {
   return {
@@ -67,9 +71,22 @@ function fontCssInline(): Plugin {
       if (!html || html.type !== "asset" || !cssName) return;
       const css = bundle[cssName];
       if (css.type !== "asset") return;
-      // Die Font-Pfade sind relativ zum assets/-Ordner; im HTML an der
+      let regeln = String(css.source).trim();
+      // Nur das Latin-Subset einbetten — es deckt Deutsch ab, alles andere
+      // (latin-ext, vietnamese) lädt der Browser dank unicode-range ohnehin
+      // nur bei Bedarf und darf extern bleiben. Die eingebettete Datei aus
+      // dem Bundle nehmen (sonst läge sie ungenutzt im Precache).
+      regeln = regeln.replace(/url\(\.\/(archivo-latin-wght-[^)]+\.woff2)\)/g, (treffer, datei) => {
+        const name = Object.keys(bundle).find((n) => n.endsWith(`/${datei}`) || n === datei);
+        const asset = name && bundle[name];
+        if (!asset || asset.type !== "asset") return treffer.replace("url(./", "url(./assets/");
+        const base64 = Buffer.from(asset.source).toString("base64");
+        delete bundle[name];
+        return `url(data:font/woff2;base64,${base64})`;
+      });
+      // Übrige Pfade sind relativ zum assets/-Ordner; im HTML an der
       // Seitenwurzel muss der Ordner mit in den Pfad.
-      const regeln = String(css.source).trim().replaceAll("url(./", "url(./assets/");
+      regeln = regeln.replaceAll("url(./", "url(./assets/");
       const link = new RegExp(`<link rel="stylesheet"[^>]*href="[^"]*${cssName.split("/").pop()}"[^>]*>`);
       if (!link.test(String(html.source))) return;
       html.source = String(html.source).replace(link, `<style>${regeln}</style>`);
