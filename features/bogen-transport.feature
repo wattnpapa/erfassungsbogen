@@ -6,7 +6,7 @@ Funktionalität: Erfassungsbogen erstellen und offline transportieren
 
   Szenario: Startseite bietet die Grundaktionen an
     Angenommen ich öffne die App
-    Dann sehe ich die Überschrift "Einheiten-Erfassungsbogen"
+    Dann sehe ich die Überschrift "Digitaler Einheiten-Erfassungsbogen"
     Und sehe ich die Schaltfläche "Neuen Bogen erstellen"
 
   Szenario: Neuen Bogen beginnen führt in den Assistenten

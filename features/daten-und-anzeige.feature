@@ -49,7 +49,7 @@ Funktionalität: Darstellung, Datensicherung und Auskunft
     Angenommen ich öffne die App
     Wenn ich die App vom Netz trenne
     Und ich die Seite neu lade
-    Dann sehe ich die Überschrift "Einheiten-Erfassungsbogen"
+    Dann sehe ich die Überschrift "Digitaler Einheiten-Erfassungsbogen"
     Und sehe ich die Schaltfläche "Neuen Bogen erstellen"
     Und sehe ich den Hinweis "Funktioniert komplett offline"
 

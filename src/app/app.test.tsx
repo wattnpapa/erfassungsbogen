@@ -73,7 +73,7 @@ describe("Assistenten-Durchlauf", () => {
     const nutzer = userEvent.setup();
     render(<App />);
 
-    expect(screen.getByRole("heading", { name: "Einheiten-Erfassungsbogen" })).toBeDefined();
+    expect(screen.getByRole("heading", { name: "Digitaler Einheiten-Erfassungsbogen" })).toBeDefined();
     await nutzer.click(screen.getByRole("button", { name: "Neuen Bogen erstellen" }));
 
     expect(screen.getByRole("heading", { name: "1. Einheit" })).toBeDefined();

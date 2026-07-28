@@ -550,7 +550,16 @@ export function Fusszeile({ onBogenOeffnen, kompakt = false }: {
           <a href={ANLEITUNG} target="_blank" rel="noopener noreferrer">Anleitung</a>
           <a href={VORLAGE} target="_blank" rel="noopener noreferrer">Aufbau des Bogens</a>
           <a href={`mailto:${KONTAKT}`}>Kontakt</a>
-          <a href={REPO} target="_blank" rel="noopener noreferrer">GitHub</a>
+          <a href={REPO} target="_blank" rel="noopener noreferrer">Open Source auf GitHub</a>
+          <a href="https://sprechfunk-uebung.de/" target="_blank" rel="noopener noreferrer">Sprechfunk-Übungsgenerator</a>
+        </nav>
+        <nav className="fuss-gruppe" aria-label="Für Ihre Organisation">
+          <span className="fuss-titel">Für Ihre Organisation</span>
+          <a href="https://erfassungsbogen.app/thw.html" target="_blank" rel="noopener noreferrer">THW</a>
+          <a href="https://erfassungsbogen.app/feuerwehr.html" target="_blank" rel="noopener noreferrer">Feuerwehr</a>
+          <a href="https://erfassungsbogen.app/dlrg.html" target="_blank" rel="noopener noreferrer">DLRG</a>
+          <a href="https://erfassungsbogen.app/katastrophenschutz.html" target="_blank" rel="noopener noreferrer">Katastrophenschutz</a>
+          <a href="https://erfassungsbogen.app/meldekopf.html" target="_blank" rel="noopener noreferrer">Meldekopf</a>
         </nav>
         <div className="fuss-gruppe">
           <span className="fuss-titel">Darstellung</span>

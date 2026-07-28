@@ -971,14 +971,14 @@ function AppInhalt() {
           <AnzeigeSchalter />
         </div>
         <div className="titelzeile">
-          <h1>Einheiten-Erfassungsbogen</h1>
+          <h1>Digitaler Einheiten-Erfassungsbogen</h1>
         </div>
       </SeitenKopf>
       <main id="inhalt" tabIndex={-1} className="start">
         <p>
           Das kostenlose Online-Tool für BOS-Einheiten und Hilfsorganisationen:
-          Bogen digital erfassen, als PDF drucken, als Datei teilen – inklusive
-          QR-Code für den Offline-Transport.
+          Bogen digital erfassen, als PDF drucken, als Datei teilen – und per
+          QR-Code ohne Internetverbindung von Gerät zu Gerät übertragen.
         </p>
         <p className="offline-badge">✓ Funktioniert komplett offline — alle Daten bleiben auf diesem Gerät.</p>
         {/* „Weiter, wo du warst": der Entwurf als Karte mit taktischem Zeichen,
