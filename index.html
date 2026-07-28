@@ -99,6 +99,19 @@
     ]
   }
   </script>
+  <script>
+    // Gespeicherten Anzeigemodus (Feld/Nacht) VOR dem ersten Malen anwenden:
+    // Das statische Start-Gerüst unten erscheint sofort mit dem HTML — ohne
+    // diese Zeilen wäre es bis zum Laden des App-Bundles hell und würde im
+    // Nachteinsatz genau die Blendung verursachen, die der Nacht-Modus
+    // verhindern soll. Gleiche Logik wie anzeigeModus() in anzeige-modus.ts.
+    try {
+      var eebModus = localStorage.getItem("eeb.anzeigemodus.v1")
+        || (localStorage.getItem("eeb.feldmodus.v1") === "1" ? "feld" : "");
+      if (eebModus === "feld" || eebModus === "nacht")
+        document.documentElement.classList.add(eebModus + "-modus");
+    } catch (e) { /* Privatmodus/blockierter Speicher: Standard-Darstellung */ }
+  </script>
   <style>
     /* ===============================================================
        Design-Token — die eine Quelle für Farbe, Schrift, Maß und Form der
@@ -1707,7 +1720,38 @@
   </style>
 </head>
 <body>
-  <div id="app"></div>
+  <!-- Statisches Start-Gerüst: dieselbe Struktur, die app.tsx auf der
+       Startseite rendert. Es erscheint sofort mit dem HTML (Kopf + Intro sind
+       das Largest Contentful Paint) und wird beim React-Mount durch die echte
+       Oberfläche ersetzt — bei identischem Markup ohne sichtbaren Wechsel.
+       Knöpfe bewusst NICHT vorab zeigen: sie wären bis zum Mount ohne
+       Funktion; sie erscheinen unterhalb und verschieben nichts (kein CLS). -->
+  <div id="app">
+    <button type="button" class="sprungmarke">Zum Inhalt springen</button>
+    <header class="seiten-kopf start-kopf">
+      <div class="kopf-inhalt">
+        <div class="kopf-leiste">
+          <span></span>
+          <span class="anzeige-schalter" role="group" aria-label="Anzeigemodus">
+            <button type="button" class="aktiv" aria-pressed="true" title="Normale Darstellung">Standard</button>
+            <button type="button" aria-pressed="false" title="Große Tippziele und hoher Kontrast für den Einsatz draußen">Feld</button>
+            <button type="button" aria-pressed="false" title="Gedimmte, warme Darstellung für Nachteinsätze — blendet nicht">Nacht</button>
+          </span>
+        </div>
+        <div class="titelzeile">
+          <h1>Digitaler Einheiten-Erfassungsbogen</h1>
+        </div>
+      </div>
+    </header>
+    <main id="inhalt" tabindex="-1" class="start">
+      <p>
+        Das kostenlose Online-Tool für BOS-Einheiten und Hilfsorganisationen:
+        Bogen digital erfassen, als PDF drucken, als Datei teilen – und per
+        QR-Code ohne Internetverbindung von Gerät zu Gerät übertragen.
+      </p>
+      <p class="offline-badge">✓ Funktioniert komplett offline — alle Daten bleiben auf diesem Gerät.</p>
+    </main>
+  </div>
   <!-- Ohne JavaScript bleibt der Bildschirm sonst leer — wer hier landet (auch
        ein Crawler ohne JS) soll wenigstens erfahren, was das Angebot ist und wo
        die lesbaren Texte stehen. -->

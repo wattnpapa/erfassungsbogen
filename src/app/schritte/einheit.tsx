@@ -3,31 +3,59 @@
  * Hierarchie der Kontaktstellen (beim THW mit OV-Vorschlagsliste).
  */
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Einheit,
   HierarchieEbene,
   OrganisationsTyp,
   PersonalErfassung,
 } from "../../model";
-import { THW_ORTSVERBAENDE, type ThwOrtsverband } from "../../vokabulare/thw-ov";
-import {
-  THW_OV_REGIONALSTRUKTUR,
-  THW_REGIONALSTELLEN_KONTAKT,
-  THW_LANDESVERBAENDE_KONTAKT,
-} from "../../vokabulare/thw-ov-regionalstruktur";
+import type { ThwOrtsverband } from "../../vokabulare/thw-ov";
 import { stanFahrzeugVorbelegung } from "../../vokabulare/thw-stan-fahrzeuge";
 import { stanPersonalVorbelegung } from "../../vokabulare/thw-stan-personal";
-import {
-  bundeslandLabel,
-  hatLandesvorlagen,
-  landesvorlage,
-  landesvorlagenBundeslaender,
-  landesvorlagenEinheiten,
-} from "../../vokabulare/landesvorlagen";
 import { ORG_OPTIONEN, einheitAnzeigename, ersteEbene, vokabularFuer } from "../hilfen";
 import { frageJaNein } from "../dialoge";
 import { Auswahl, Feld, VokabAuswahl, type SchrittProps } from "./bausteine";
+
+// Die beiden großen Datenpakete laden erst mit Schritt 1, nicht mit dem
+// Start-Bundle: das THW-OV-Verzeichnis (~190 KB Quelldaten) und die
+// Landesvorlagen, die über ihren eager-Glob sämtliche KatS-Beispielbögen als
+// Daten enthalten (~300 KB). Einmal geladen, bleiben die Module im Cache —
+// der useState-Startwert greift dann sofort, ohne Nachlade-Flackern.
+type OvDaten = typeof import("../../vokabulare/thw-ov") &
+  typeof import("../../vokabulare/thw-ov-regionalstruktur");
+type LandesvorlagenModul = typeof import("../../vokabulare/landesvorlagen");
+
+let ovDatenCache: OvDaten | null = null;
+let landesvorlagenCache: LandesvorlagenModul | null = null;
+
+/** THW-OV-Verzeichnis samt Regionalstruktur; lädt nur, wenn `aktiv` (THW gewählt). */
+function useOvDaten(aktiv: boolean): OvDaten | null {
+  const [daten, setDaten] = useState(ovDatenCache);
+  useEffect(() => {
+    if (!aktiv || daten) return;
+    void Promise.all([
+      import("../../vokabulare/thw-ov"),
+      import("../../vokabulare/thw-ov-regionalstruktur"),
+    ]).then(([ov, struktur]) => {
+      ovDatenCache = { ...ov, ...struktur };
+      setDaten(ovDatenCache);
+    });
+  }, [aktiv, daten]);
+  return daten;
+}
+
+function useLandesvorlagen(): LandesvorlagenModul | null {
+  const [modul, setModul] = useState(landesvorlagenCache);
+  useEffect(() => {
+    if (modul) return;
+    void import("../../vokabulare/landesvorlagen").then((m) => {
+      landesvorlagenCache = m;
+      setModul(m);
+    });
+  }, [modul]);
+  return modul;
+}
 
 /**
  * Setzt in der Hierarchie die (erste) Ebene mit `code` auf `name`; hängt sie
@@ -53,16 +81,16 @@ function ebeneNameSetzen(
  * Übernimmt einen OV in die OV-Zeile `i` (Name + Kontaktdaten) und füllt,
  * soweit bekannt, Regionalstelle (Ebene 2) und Landesverband (Ebene 3) mit.
  */
-function ovInHierarchieUebernehmen(hierarchie: HierarchieEbene[], i: number, ov: ThwOrtsverband): HierarchieEbene[] {
+function ovInHierarchieUebernehmen(daten: OvDaten, hierarchie: HierarchieEbene[], i: number, ov: ThwOrtsverband): HierarchieEbene[] {
   let neu = hierarchie.map((h, j) =>
     j === i
       ? { ...h, name: ov.name, kurz: ov.kurz || undefined, telefon: ov.telefon.replace(/\D/g, "") || undefined, email: ov.email || undefined }
       : h,
   );
-  const struktur = THW_OV_REGIONALSTRUKTUR[ov.name];
+  const struktur = daten.THW_OV_REGIONALSTRUKTUR[ov.name];
   if (struktur) {
-    const rst = THW_REGIONALSTELLEN_KONTAKT[struktur.regionalstelle];
-    const lv = THW_LANDESVERBAENDE_KONTAKT[struktur.landesverband];
+    const rst = daten.THW_REGIONALSTELLEN_KONTAKT[struktur.regionalstelle];
+    const lv = daten.THW_LANDESVERBAENDE_KONTAKT[struktur.landesverband];
     neu = ebeneNameSetzen(neu, 2, struktur.regionalstelle, rst && { telefon: rst.telefon.replace(/\D/g, ""), email: rst.email });
     neu = ebeneNameSetzen(neu, 3, struktur.landesverband, lv && { telefon: lv.telefon.replace(/\D/g, ""), email: lv.email });
   }
@@ -78,17 +106,19 @@ function ovInHierarchieUebernehmen(hierarchie: HierarchieEbene[], i: number, ov:
 function OvVorschlagFeld(props: {
   wert: string;
   platzhalter: string;
+  /** OV-Verzeichnis; leer, solange das Datenpaket noch lädt. */
+  verzeichnis: readonly ThwOrtsverband[];
   tippen: (wert: string) => void;
   uebernehmen: (ov: ThwOrtsverband) => void;
 }) {
-  const { wert, platzhalter, tippen, uebernehmen } = props;
+  const { wert, platzhalter, verzeichnis, tippen, uebernehmen } = props;
   const [offen, setOffen] = useState(false);
   const [aktiv, setAktiv] = useState(0);
 
   const suche = wert.trim().toLowerCase();
   const treffer =
     offen && suche
-      ? THW_ORTSVERBAENDE.filter(
+      ? verzeichnis.filter(
           (o) => o.name.toLowerCase().includes(suche) || o.kurz.toLowerCase().startsWith(suche) || o.ort.toLowerCase().startsWith(suche),
         )
           .sort((a, b) => Number(b.name.toLowerCase().startsWith(suche)) - Number(a.name.toLowerCase().startsWith(suche)))
@@ -129,7 +159,7 @@ function OvVorschlagFeld(props: {
         onBlur={() => {
           setOffen(false);
           const eingabe = wert.trim();
-          const ov = THW_ORTSVERBAENDE.find((o) => o.kurz === eingabe.toUpperCase() || o.name === eingabe);
+          const ov = verzeichnis.find((o) => o.kurz === eingabe.toUpperCase() || o.name === eingabe);
           if (ov) uebernehmen(ov);
         }}
       />
@@ -171,20 +201,23 @@ export function SchrittEinheit({ bogen, aendern }: SchrittProps) {
   const e = bogen.einheit;
   const setE = (p: Partial<Einheit>) => aendern({ einheit: { ...e, ...p } });
   const ebenen = vokabularFuer(e.organisation, "ebene");
+  const ovDaten = useOvDaten(e.organisation === OrganisationsTyp.THW);
+  const ovVerzeichnis = ovDaten?.THW_ORTSVERBAENDE ?? [];
 
   // Landesvorlagen (KatS-Beispielbögen der Bundesländer) für Schritt 1.
+  const lvModul = useLandesvorlagen();
   const [vorlageBundesland, setVorlageBundesland] = useState("");
   const [vorlageEinheit, setVorlageEinheit] = useState("");
   const zeigeLandesvorlagen =
-    !OHNE_LANDESVORLAGEN.includes(e.organisation) && hatLandesvorlagen(e.organisation);
-  const vorlagenBundeslaender = zeigeLandesvorlagen ? landesvorlagenBundeslaender(e.organisation) : [];
+    lvModul !== null && !OHNE_LANDESVORLAGEN.includes(e.organisation) && lvModul.hatLandesvorlagen(e.organisation);
+  const vorlagenBundeslaender = lvModul && zeigeLandesvorlagen ? lvModul.landesvorlagenBundeslaender(e.organisation) : [];
   // Nach Organisationswechsel kann das gemerkte Bundesland unpassend sein.
   const aktBundesland = vorlagenBundeslaender.includes(vorlageBundesland) ? vorlageBundesland : "";
-  const vorlagenEinheiten = aktBundesland ? landesvorlagenEinheiten(e.organisation, aktBundesland) : [];
+  const vorlagenEinheiten = lvModul && aktBundesland ? lvModul.landesvorlagenEinheiten(e.organisation, aktBundesland) : [];
   const aktEinheit = vorlagenEinheiten.includes(vorlageEinheit) ? vorlageEinheit : "";
 
   async function landesvorlageAnwenden(name: string) {
-    const v = landesvorlage(e.organisation, aktBundesland, name);
+    const v = lvModul?.landesvorlage(e.organisation, aktBundesland, name);
     if (!v) return;
     const hatDaten = bogen.personal.length > 0 || bogen.fahrzeuge.length > 0;
     if (
@@ -254,7 +287,7 @@ export function SchrittEinheit({ bogen, aendern }: SchrittProps) {
         </Feld>
       </div>
 
-      {zeigeLandesvorlagen && (
+      {lvModul && zeigeLandesvorlagen && (
         <>
           <div className="zeile">
             <Feld titel="Landesvorlage – Bundesland">
@@ -267,7 +300,7 @@ export function SchrittEinheit({ bogen, aendern }: SchrittProps) {
               >
                 <option value="">– Bundesland wählen –</option>
                 {vorlagenBundeslaender.map((b) => (
-                  <option key={b} value={b}>{bundeslandLabel(b)}</option>
+                  <option key={b} value={b}>{lvModul.bundeslandLabel(b)}</option>
                 ))}
               </Auswahl>
             </Feld>
@@ -313,8 +346,9 @@ export function SchrittEinheit({ bogen, aendern }: SchrittProps) {
               <OvVorschlagFeld
                 wert={h.name}
                 platzhalter="tippen für Vorschläge…"
+                verzeichnis={ovVerzeichnis}
                 tippen={(name) => setE({ hierarchie: e.hierarchie.map((x, j) => (j === i ? { ...x, name } : x)) })}
-                uebernehmen={(ov) => setE({ hierarchie: ovInHierarchieUebernehmen(e.hierarchie, i, ov) })}
+                uebernehmen={(ov) => ovDaten && setE({ hierarchie: ovInHierarchieUebernehmen(ovDaten, e.hierarchie, i, ov) })}
               />
             ) : (
               <input
@@ -331,10 +365,11 @@ export function SchrittEinheit({ bogen, aendern }: SchrittProps) {
                 <OvVorschlagFeld
                   wert={h.kurz ?? ""}
                   platzhalter="OODE"
+                  verzeichnis={ovVerzeichnis}
                   tippen={(kurz) =>
                     setE({ hierarchie: e.hierarchie.map((x, j) => (j === i ? { ...x, kurz: kurz.toUpperCase() || undefined } : x)) })
                   }
-                  uebernehmen={(ov) => setE({ hierarchie: ovInHierarchieUebernehmen(e.hierarchie, i, ov) })}
+                  uebernehmen={(ov) => ovDaten && setE({ hierarchie: ovInHierarchieUebernehmen(ovDaten, e.hierarchie, i, ov) })}
                 />
               ) : (
                 <input

@@ -8,11 +8,6 @@
 
 import { Capacitor } from "@capacitor/core";
 import { App } from "@capacitor/app";
-import {
-  CapacitorBarcodeScanner,
-  CapacitorBarcodeScannerCameraDirection,
-  CapacitorBarcodeScannerTypeHint,
-} from "@capacitor/barcode-scanner";
 import { Directory, Encoding, Filesystem } from "@capacitor/filesystem";
 import { Share } from "@capacitor/share";
 
@@ -49,6 +44,12 @@ export function bogenLinksEmpfangen(callback: (url: string) => void): () => void
  * Liefert den rohen QR-Text oder null bei Abbruch durch den Nutzer.
  */
 export async function qrScannen(anweisung = "QR-Code des Erfassungsbogens in den Rahmen halten"): Promise<string | null> {
+  // Dynamischer Import: das Plugin zieht über sein definitions.js die komplette
+  // html5-qrcode-Bibliothek (~360 KB) mit — die gehört nicht ins Start-Bundle,
+  // zumal der native Scanner im Browser nie aufgerufen wird.
+  const { CapacitorBarcodeScanner, CapacitorBarcodeScannerCameraDirection, CapacitorBarcodeScannerTypeHint } = await import(
+    "@capacitor/barcode-scanner"
+  );
   try {
     const ergebnis = await CapacitorBarcodeScanner.scanBarcode({
       hint: CapacitorBarcodeScannerTypeHint.QR_CODE,

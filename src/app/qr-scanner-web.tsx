@@ -5,7 +5,7 @@
  */
 
 import { useEffect, useRef, useState, type ChangeEvent } from "react";
-import jsQR from "jsqr";
+import type jsQRTyp from "jsqr";
 
 export function QrScannerWeb(props: {
   onErgebnis: (text: string) => void;
@@ -30,6 +30,11 @@ export function QrScannerWeb(props: {
     let aktiv = true;
     let stream: MediaStream | null = null;
     let rahmen = 0;
+    // jsQR (~130 KB) lädt erst mit dem Overlay, nicht mit dem Start-Bundle.
+    // Bis dahin läuft die Scanschleife leer — das Kamerabild steht ohnehin
+    // erst nach der getUserMedia-Freigabe.
+    let jsQR: typeof jsQRTyp | null = null;
+    void import("jsqr").then((m) => { jsQR = m.default; });
     const leinwand = document.createElement("canvas");
     const ctx = leinwand.getContext("2d", { willReadFrequently: true });
 
@@ -42,7 +47,7 @@ export function QrScannerWeb(props: {
     function suchen() {
       if (!aktiv) return;
       const video = videoRef.current;
-      if (video && ctx && video.readyState >= video.HAVE_ENOUGH_DATA && video.videoWidth) {
+      if (video && ctx && jsQR && video.readyState >= video.HAVE_ENOUGH_DATA && video.videoWidth) {
         // Verkleinert dekodieren: deutlich schneller und für QR ausreichend.
         const faktor = Math.min(1, 640 / video.videoWidth);
         leinwand.width = Math.round(video.videoWidth * faktor);

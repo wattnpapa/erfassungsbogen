@@ -64,7 +64,8 @@ describe("Schritt Einheit", () => {
 
     await nutzer.selectOptions(screen.getByLabelText("Organisation"), "Feuerwehr");
 
-    const bundesland = screen.getByLabelText("Landesvorlage – Bundesland");
+    // findBy…: das Landesvorlagen-Datenpaket lädt asynchron nach (dynamischer Import).
+    const bundesland = await screen.findByLabelText("Landesvorlage – Bundesland");
     expect(bundesland).toBeDefined();
     // Ohne gewähltes Bundesland bleibt die Einheitenauswahl gesperrt.
     expect((screen.getByLabelText("Landesvorlage – Einheit") as HTMLSelectElement).disabled).toBe(true);

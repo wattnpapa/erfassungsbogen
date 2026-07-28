@@ -5,7 +5,8 @@
  * Live-Scan (inklusive Segment-Sammlung über mehrere Bilder).
  */
 
-import jsQR from "jsqr";
+// jsQR (~130 KB) erst beim ersten Bild laden, nicht mit dem Start-Bundle.
+const jsQRLaden = () => import("jsqr").then((m) => m.default);
 
 interface Bildquelle {
   quelle: CanvasImageSource;
@@ -42,6 +43,7 @@ async function bildLaden(datei: Blob): Promise<Bildquelle> {
  * invertierte Darstellungen (z. B. Dark-Mode-Screenshots).
  */
 export async function qrAusBild(datei: Blob): Promise<string | null> {
+  const jsQR = await jsQRLaden();
   const bild = await bildLaden(datei);
   try {
     const leinwand = document.createElement("canvas");
