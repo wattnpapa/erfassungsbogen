@@ -116,6 +116,34 @@ const SEO_AUFNAHMEN = [
     aktion: entwurfFortsetzen,
   },
   {
+    datei: "drk-erfassungsbogen.png",
+    ...BREIT,
+    seed: async () =>
+      entwurfSeed(await beispielBogen("katastrophenschutz/niedersachsen/zugtrupp-sanitaets-und-betreuungszug-ztr-sbz-wittmund.json")),
+    aktion: entwurfFortsetzen,
+  },
+  {
+    datei: "johanniter-erfassungsbogen.png",
+    ...SCHMAL,
+    seed: async () =>
+      entwurfSeed(await beispielBogen("katastrophenschutz/niedersachsen/betreuungstransport-und-leitstaffel-jever.json")),
+    aktion: entwurfFortsetzen,
+  },
+  {
+    datei: "malteser-erfassungsbogen.png",
+    ...BREIT,
+    seed: async () =>
+      entwurfSeed(await beispielBogen("katastrophenschutz/sachsen/betreuungsgruppe-einsatzzug-sebnitz.json")),
+    aktion: entwurfFortsetzen,
+  },
+  {
+    datei: "asb-erfassungsbogen.png",
+    ...SCHMAL,
+    seed: async () =>
+      entwurfSeed(await beispielBogen("katastrophenschutz/sachsen/sanitaetsstaffel-seg-oschatz.json")),
+    aktion: entwurfFortsetzen,
+  },
+  {
     // Einsatz-Sammlung des Meldekopfs: mehrere gescannte Einheiten
     // verschiedener Organisationen mit Stärke- und Bedarfssummen.
     datei: "meldekopf-einsatz-sammlung.png",
