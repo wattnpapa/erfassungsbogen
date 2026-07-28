@@ -930,8 +930,9 @@ function AppInhalt() {
       </SeitenKopf>
       <main id="inhalt" tabIndex={-1} className="start">
         <p>
-          Bogen digital erfassen (BOS-übergreifend), als PDF drucken, als Datei teilen –
-          inklusive QR-Code für den Offline-Transport.
+          Das kostenlose Online-Tool für BOS-Einheiten und Hilfsorganisationen:
+          Bogen digital erfassen, als PDF drucken, als Datei teilen – inklusive
+          QR-Code für den Offline-Transport.
         </p>
         <p className="offline-badge">✓ Funktioniert komplett offline — alle Daten bleiben auf diesem Gerät.</p>
         {/* „Weiter, wo du warst": der Entwurf als Karte mit taktischem Zeichen,

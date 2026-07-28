@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>Einheiten-Erfassungsbogen für BOS — ausfüllen, drucken, per QR-Code weitergeben</title>
+  <title>Einheiten-Erfassungsbogen für BOS — kostenloses Online-Tool: ausfüllen, drucken, per QR-Code weitergeben</title>
   <link rel="icon" type="image/svg+xml" href="./icon.svg" />
   <link rel="icon" type="image/png" sizes="32x32" href="./icons/icon-32.png" />
   <link rel="apple-touch-icon" href="./apple-touch-icon.png" />
@@ -19,7 +19,7 @@
        Die Adressen sind bewusst absolut: dieselbe Datei läuft auch in der
        Electron-/Capacitor-App, wo relative Pfade auf file:// zeigen würden.
        =============================================================== -->
-  <meta name="description" content="Digitaler Einheiten-Erfassungsbogen für Feuerwehr, THW, Hilfsorganisationen, Bundeswehr und Katastrophenschutz: Bogen ausfüllen, im Papier-Layout drucken und per QR-Code offline weitergeben. Kostenlos, ohne Anmeldung, alle Daten bleiben auf dem Gerät." />
+  <meta name="description" content="Kostenloses Online-Tool für BOS-Einheiten: digitale Erfassung von Personal, Stärke und Fahrzeugen für Feuerwehr, THW, DLRG, Bundeswehr, Katastrophenschutz und Hilfsorganisationen. Die Web-App zur Stärkemeldung — Bogen ausfüllen, im Papier-Layout drucken, per QR-Code ohne Internet weitergeben. Ohne Anmeldung, alle Daten bleiben auf dem Gerät." />
   <link rel="canonical" href="https://erfassungsbogen.app/" />
   <meta name="author" content="Johannes Rudolph" />
 
@@ -27,8 +27,8 @@
   <meta property="og:site_name" content="Erfassungsbogen.app" />
   <meta property="og:locale" content="de_DE" />
   <meta property="og:url" content="https://erfassungsbogen.app/" />
-  <meta property="og:title" content="Einheiten-Erfassungsbogen für BOS" />
-  <meta property="og:description" content="Bogen am Bildschirm ausfüllen, als PDF im Papier-Layout drucken — und der komplette Inhalt steckt zusätzlich in einem QR-Code, der ohne Internet auf jedem anderen Gerät wieder eingelesen wird." />
+  <meta property="og:title" content="Einheiten-Erfassungsbogen für BOS — kostenloses Online-Tool" />
+  <meta property="og:description" content="Die Web-App zur digitalen Stärkemeldung für Feuerwehr, THW, DLRG und Hilfsorganisationen: Bogen am Bildschirm ausfüllen, als PDF im Papier-Layout drucken — und der komplette Inhalt steckt zusätzlich in einem QR-Code, der ohne Internet auf jedem anderen Gerät wieder eingelesen wird." />
   <!-- Vorschaukarte im Querformat: Der Link wird vor allem in Messenger-Gruppen
        von Ortsverbänden und Wehren weitergereicht, und dort entscheidet das Bild
        über den Klick. Das Icon allein füllt diese Karte nicht — deshalb
@@ -50,7 +50,7 @@
     "name": "Einheiten-Erfassungsbogen",
     "alternateName": "Erfassungsbogen.app",
     "url": "https://erfassungsbogen.app/",
-    "description": "Digitaler Einheiten-Erfassungsbogen für Behörden und Organisationen mit Sicherheitsaufgaben (BOS): Einheit, Personalstärke, Fahrzeuge und Sofortbedarf erfassen, als PDF im Papier-Layout drucken und den kompletten Bogen offline per QR-Code an die nächste Führungsstelle weitergeben.",
+    "description": "Kostenloses Online-Tool und datenschutzkonforme Web-App für Behörden und Organisationen mit Sicherheitsaufgaben (BOS): digitale Erfassung von Einheit, Personalstärke, Fahrzeugen und Sofortbedarf — Stärkemeldung als PDF im Papier-Layout drucken und den kompletten Bogen offline per QR-Code an die nächste Führungsstelle weitergeben. Alle Daten bleiben lokal auf dem Gerät.",
     "applicationCategory": ["BusinessApplication", "UtilitiesApplication"],
     "applicationSubCategory": "EmergencyApplication",
     "operatingSystem": "Web, Windows, macOS, Linux, Android, iOS",
@@ -67,7 +67,7 @@
     "screenshot": "https://erfassungsbogen.app/screenshots/start-breit.png",
     "softwareVersion": "%APP_VERSION%",
     "dateModified": "%BUILD_DATE%",
-    "keywords": "Erfassungsbogen, Einheitenerfassungsbogen, BOS, THW, Feuerwehr, Katastrophenschutz, Hilfsorganisation, Meldekopf, Bereitstellungsraum, Stärkemeldung, Einsatzdokumentation, QR-Code, offline, PDF",
+    "keywords": "Erfassungsbogen, Einheitenerfassungsbogen, BOS, Online-Tool, Web-App, Software, THW, Feuerwehr, DLRG, Rettungsdienst, Katastrophenschutz, Hilfsorganisation, Meldekopf, Bereitstellungsraum, Stärkemeldung, digitale Stärkemeldung, Einsatzdokumentation, digitale Erfassung, QR-Code, offline, PDF, kostenlos",
     "featureList": [
       "Erfassungsbogen für Einheit, Einsatz, Personalstärke, Fahrzeuge und Sofortbedarf",
       "PDF-Ausgabe im gewohnten Papier-Layout",
@@ -829,6 +829,12 @@
       position: fixed; inset: 0; z-index: 100; background: #000;
       display: flex; flex-direction: column; align-items: center;
       justify-content: space-between; padding: 1.5rem 1rem; gap: 1rem;
+      /* Mobile Browser: `inset: 0` misst den Layout-Viewport — bei sichtbarer
+         Browserleiste läge „Abbrechen" darunter und der Scan-Modus hätte
+         scheinbar keinen Ausgang. `100dvh` folgt der Leiste; die Safe-Area
+         hält die Knöpfe über dem Home-Indikator (PWA/Standalone). */
+      height: 100dvh;
+      padding-bottom: calc(1.5rem + env(safe-area-inset-bottom));
     }
     .scanner video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
     .scanner > * { position: relative; }
@@ -1691,11 +1697,13 @@
     <div class="ohne-js">
       <h1>Einheiten-Erfassungsbogen</h1>
       <p>
-        Der digitale Einheiten-Erfassungsbogen für alle BOS und Hilfsorganisationen —
-        Feuerwehr, THW, Polizei, DRK/JUH/MHD/ASB, DLRG, Bundeswehr und weitere.
-        Bogen am Bildschirm ausfüllen, im gewohnten Papier-Layout als PDF drucken —
-        und der komplette Inhalt steckt zusätzlich in einem QR-Code, der ganz ohne
-        Internet auf jedem anderen Gerät wieder eingelesen werden kann.
+        Der digitale Einheiten-Erfassungsbogen — das kostenlose Online-Tool für
+        alle BOS und Hilfsorganisationen: Feuerwehr, THW, Polizei, DRK/JUH/MHD/ASB,
+        DLRG, Bundeswehr und weitere. Die Web-App zur digitalen Stärkemeldung und
+        Einsatzdokumentation: Bogen am Bildschirm ausfüllen, im gewohnten
+        Papier-Layout als PDF drucken — und der komplette Inhalt steckt zusätzlich
+        in einem QR-Code, der ganz ohne Internet auf jedem anderen Gerät wieder
+        eingelesen werden kann.
       </p>
       <p>
         Zum Ausfüllen wird JavaScript benötigt: Der Bogen wird vollständig im Browser

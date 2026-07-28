@@ -2,11 +2,13 @@
 
 # Erfassungsbogen
 
-Der digitale Einheiten-Erfassungsbogen für alle BOS und Hilfsorganisationen —
-THW, Feuerwehr, Polizei, DRK/JUH/MHD/ASB, DLRG, Bundeswehr und weitere.
-Bogen am Bildschirm ausfüllen, als PDF drucken — und der komplette Inhalt
-steckt zusätzlich in einem einzigen QR-Code, der ganz ohne Internet auf jedem
-anderen Gerät wieder eingelesen werden kann.
+Der digitale Einheiten-Erfassungsbogen — ein kostenloses Online-Tool für alle
+BOS-Einheiten und Hilfsorganisationen: THW, Feuerwehr, Polizei, DRK/JUH/MHD/ASB,
+DLRG, Bundeswehr und den Katastrophenschutz. Die Software für die digitale
+Stärkemeldung und Einsatzdokumentation: Bogen am Bildschirm ausfüllen, als PDF
+drucken — und der komplette Inhalt steckt zusätzlich in einem einzigen QR-Code,
+der ganz ohne Internet auf jedem anderen Gerät wieder eingelesen werden kann
+(offline-first, ohne Server).
 
 ## Direkt ausprobieren
 
