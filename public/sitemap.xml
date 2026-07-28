@@ -29,6 +29,22 @@
     <priority>0.7</priority>
   </url>
   <url>
+    <loc>https://erfassungsbogen.app/drk.html</loc>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://erfassungsbogen.app/johanniter.html</loc>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://erfassungsbogen.app/malteser.html</loc>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://erfassungsbogen.app/asb.html</loc>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://erfassungsbogen.app/katastrophenschutz.html</loc>
     <priority>0.7</priority>
   </url>

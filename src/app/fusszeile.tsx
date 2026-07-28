@@ -558,6 +558,10 @@ export function Fusszeile({ onBogenOeffnen, kompakt = false }: {
           <a href="https://erfassungsbogen.app/thw.html" target="_blank" rel="noopener noreferrer">THW</a>
           <a href="https://erfassungsbogen.app/feuerwehr.html" target="_blank" rel="noopener noreferrer">Feuerwehr</a>
           <a href="https://erfassungsbogen.app/dlrg.html" target="_blank" rel="noopener noreferrer">DLRG</a>
+          <a href="https://erfassungsbogen.app/drk.html" target="_blank" rel="noopener noreferrer">DRK</a>
+          <a href="https://erfassungsbogen.app/johanniter.html" target="_blank" rel="noopener noreferrer">Johanniter</a>
+          <a href="https://erfassungsbogen.app/malteser.html" target="_blank" rel="noopener noreferrer">Malteser</a>
+          <a href="https://erfassungsbogen.app/asb.html" target="_blank" rel="noopener noreferrer">ASB</a>
           <a href="https://erfassungsbogen.app/katastrophenschutz.html" target="_blank" rel="noopener noreferrer">Katastrophenschutz</a>
           <a href="https://erfassungsbogen.app/meldekopf.html" target="_blank" rel="noopener noreferrer">Meldekopf</a>
         </nav>
