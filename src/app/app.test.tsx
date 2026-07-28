@@ -8,7 +8,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { OrganisationsTyp, type Erfassungsbogen } from "../model";
-import { encodePayloadUrl, encodeVorlagePayloadUrl, fragmentInhalt } from "../codec";
+import { encodePayload, encodePayloadUrl, encodeVorlagePayloadUrl, fragmentInhalt, segmentPayloadUrls } from "../codec";
 import { browserKompressor, neuerBogen } from "./hilfen";
 
 // Die PDF-Erzeugung (pdfmake) ist eigenständig getestet und im Test nur teuer;
@@ -175,6 +175,44 @@ describe("Assistenten-Durchlauf", () => {
 
     expect(await screen.findByText(/keinen gültigen Erfassungsbogen/)).toBeDefined();
     expect(screen.getByRole("button", { name: "Neuen Bogen erstellen" })).toBeDefined();
+  });
+
+  it("öffnet bei einem Segment-Teil per Link den Scanner und setzt den Bogen mit den übrigen Teilen zusammen", async () => {
+    // Mehrteiliger Bogen: Der erste Teil kommt als Link (Handy-Kamera hat den
+    // QR-Code gescannt) — der Scanner muss sich öffnen, damit die restlichen
+    // Teile direkt folgen können. Der Link-Teil darf dabei nicht verloren gehen.
+    const teile = segmentPayloadUrls(encodePayload(bogenMitName("Segmenthausen"), browserKompressor), 2);
+    render(<App />);
+
+    fragmentSetzen(teile[0]!);
+    expect(await screen.findByRole("dialog", { name: "QR-Code scannen" })).toBeDefined();
+
+    // Der zweite (letzte) Teil vervollständigt den Bogen — nur wenn Teil 1 aus
+    // dem Link im Sammelstand liegt, öffnet sich jetzt die Übersicht.
+    fragmentSetzen(teile[1]!);
+    expect(await screen.findByRole("heading", { name: "Gesamtübersicht" })).toBeDefined();
+    const einheit = screen.getByRole("heading", { name: "Einheit" }).closest("section")!;
+    expect(within(einheit).getByText(/Segmenthausen/)).toBeDefined();
+  });
+
+  it("übernimmt einen Segment-Teil auch beim Kaltstart (App noch nie geöffnet) und öffnet den Scanner", async () => {
+    // Der Weg des allerersten Kontakts: QR-Code mit der Handy-Kamera gescannt,
+    // die Web-App lädt KALT mit dem Segment-Fragment in der URL. Der Teil muss
+    // in den Sammelstand und der Scanner direkt angehen — sonst wäre der Teil
+    // weg (das Fragment wird beim Start aus der Adresszeile entfernt).
+    const teile = segmentPayloadUrls(encodePayload(bogenMitName("Kaltstarthausen"), browserKompressor), 2);
+    window.location.hash = fragmentInhalt(teile[0]!);
+    vi.resetModules();
+    const { App: AppKalt } = await import("./app");
+    render(<AppKalt />);
+
+    expect(await screen.findByRole("dialog", { name: "QR-Code scannen" })).toBeDefined();
+    expect(window.location.hash).toBe("");
+
+    fragmentSetzen(teile[1]!);
+    expect(await screen.findByRole("heading", { name: "Gesamtübersicht" })).toBeDefined();
+    const einheit = screen.getByRole("heading", { name: "Einheit" }).closest("section")!;
+    expect(within(einheit).getByText(/Kaltstarthausen/)).toBeDefined();
   });
 
   it("verwirft den Bogen erst nach der Rückfrage und kehrt zur Startseite zurück", async () => {

@@ -82,8 +82,10 @@ function fragmentNehmen(): string {
 
 /**
  * Startzustand aus dem URL-Fragment: Ein QR/Universal Link kann einen
- * Einsatzbogen (`#…`) oder eine geteilte Vorlage (`#V.…`) tragen. Eine Vorlage
- * wird direkt importiert (nicht als Arbeitsbogen geöffnet).
+ * Einsatzbogen (`#…`), eine geteilte Vorlage (`#V.…`) oder einen Segment-Teil
+ * eines mehrteiligen Bogens (`#EEBS.…`) tragen. Eine Vorlage wird direkt
+ * importiert (nicht als Arbeitsbogen geöffnet); ein Segment-Teil wird nach dem
+ * Mounten in den Sammelstand übernommen und der Scanner geöffnet.
  */
 function startAusUrlFragment(): {
   bogen: Erfassungsbogen | null;
@@ -91,17 +93,26 @@ function startAusUrlFragment(): {
   fehler: string;
   /** Rohes Fragment für die (asynchrone) Signaturprüfung nach dem Mounten. */
   text: string;
+  /** Segment-Teil eines mehrteiligen Bogens — die übrigen Teile fehlen noch. */
+  segment: string;
 } {
   const fragment = fragmentNehmen();
-  if (!fragment) return { bogen: null, vorlage: null, fehler: "", text: "" };
+  if (!fragment) return { bogen: null, vorlage: null, fehler: "", text: "", segment: "" };
   try {
     if (istVorlageNutzlast(fragment)) {
       const b = decodeVorlagePayloadUrl(fragment, browserKompressor);
-      return { bogen: null, vorlage: vorlageAnlegen(einheitAnzeigename(b.einheit), b), fehler: "", text: fragment };
+      return { bogen: null, vorlage: vorlageAnlegen(einheitAnzeigename(b.einheit), b), fehler: "", text: fragment, segment: "" };
     }
-    return { bogen: decodePayloadUrl(fragment, browserKompressor), vorlage: null, fehler: "", text: fragment };
+    if (istSegmentNutzlast(fragment)) {
+      // Erster Kontakt per Handy-Kamera, App noch nie geöffnet: Der QR-Teil
+      // trägt eine App-URL und landet als Kaltstart hier. Nur validieren —
+      // übernehmen kann erst die gemountete App (Sammelstand + Scanner).
+      parseSegmentUrl(fragment);
+      return { bogen: null, vorlage: null, fehler: "", text: "", segment: fragment };
+    }
+    return { bogen: decodePayloadUrl(fragment, browserKompressor), vorlage: null, fehler: "", text: fragment, segment: "" };
   } catch {
-    return { bogen: null, vorlage: null, fehler: "Der geöffnete Link enthält keinen gültigen Erfassungsbogen.", text: "" };
+    return { bogen: null, vorlage: null, fehler: "Der geöffnete Link enthält keinen gültigen Erfassungsbogen.", text: "", segment: "" };
   }
 }
 
@@ -203,6 +214,10 @@ function SoFunktionierts() {
 }
 
 const START = startAusUrlFragment();
+
+// Ein Segment-Teil aus dem Kaltstart darf nur einmal in den Sammelstand —
+// StrictMode (Entwicklung) führt Mount-Effekte doppelt aus.
+let startSegmentVerbraucht = false;
 
 /**
  * Auswahl der Einsatzart für den Anlege-Dialog. Die alte Abfrage über
@@ -619,6 +634,23 @@ function AppInhalt() {
     };
   }, []);
 
+  // Kaltstart mit einem Segment-Teil: Jemand hat einen Teil eines mehrteiligen
+  // Bogens mit der Handy-Kamera gescannt, ohne dass die App lief (typisch:
+  // erster Kontakt, nichts installiert). Der Teil wandert in den Sammelstand
+  // und der Scanner öffnet sich sofort — die übrigen Teile lassen sich dann
+  // ohne Umweg abscannen. Ohne diesen Pfad wäre der Teil verloren, denn das
+  // Fragment ist bereits aus der Adresszeile entfernt.
+  useEffect(() => {
+    if (!START.segment || startSegmentVerbraucht) return;
+    startSegmentVerbraucht = true; // StrictMode mountet doppelt — der Teil zählt nur einmal
+    void uebernehmeText(START.segment, "Der geöffnete Link enthält keinen gültigen Erfassungsbogen.").then(
+      (fertig) => {
+        if (!fertig) void scanneQr();
+      },
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- nur beim Mounten; der Handler nutzt ausschließlich stabile Setter
+  }, []);
+
   // Web-Pendant zum Universal Link: Wird ein Bogen-Link angetippt, während die
   // Seite schon offen ist, lädt der Browser das Dokument NICHT neu — es ändert
   // sich nur das Fragment. Auf dem Telefon ist genau das der Normalfall (der
@@ -629,7 +661,15 @@ function AppInhalt() {
     function beiFragmentwechsel() {
       const fragment = fragmentNehmen();
       if (!fragment) return;
-      void uebernehmeText(fragment, "Der geöffnete Link enthält keinen gültigen Erfassungsbogen.");
+      void uebernehmeText(fragment, "Der geöffnete Link enthält keinen gültigen Erfassungsbogen.").then(
+        (fertig) => {
+          // Segment-Teil eines mehrteiligen Bogens: Scanner öffnen, damit die
+          // übrigen Teile direkt folgen können. Kam umgekehrt der LETZTE Teil
+          // per Link, während der Scanner offen war, schließt er sich.
+          if (!fertig) void scanneQr();
+          else setScannerOffen(false);
+        },
+      );
     }
     window.addEventListener("hashchange", beiFragmentwechsel);
     return () => window.removeEventListener("hashchange", beiFragmentwechsel);
@@ -639,9 +679,15 @@ function AppInhalt() {
   // Universal Link (iOS) / App Link (Android) öffnet die native App:
   // Bogen oder Vorlage aus der übergebenen URL übernehmen (Kaltstart und laufende App).
   useEffect(() => {
-    return bogenLinksEmpfangen((url) =>
-      uebernehmeText(url, "Der geöffnete Link enthält keinen gültigen Erfassungsbogen."),
-    );
+    return bogenLinksEmpfangen((url) => {
+      void uebernehmeText(url, "Der geöffnete Link enthält keinen gültigen Erfassungsbogen.").then(
+        (fertig) => {
+          // Wie beim Web-Fragmentwechsel: Ein Segment-Teil per Link startet
+          // den Scanner für die übrigen Teile (hier die native Scan-Schleife).
+          if (!fertig) void scanneQr();
+        },
+      );
+    });
     // eslint-disable-next-line react-hooks/exhaustive-deps -- nur einmal registrieren; der Handler nutzt ausschließlich stabile Setter
   }, []);
 
