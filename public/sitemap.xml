@@ -17,6 +17,30 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://erfassungsbogen.app/thw.html</loc>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://erfassungsbogen.app/feuerwehr.html</loc>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://erfassungsbogen.app/dlrg.html</loc>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://erfassungsbogen.app/katastrophenschutz.html</loc>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://erfassungsbogen.app/meldekopf.html</loc>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://erfassungsbogen.app/papier-oder-digital.html</loc>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://erfassungsbogen.app/impressum.html</loc>
     <priority>0.3</priority>
   </url>

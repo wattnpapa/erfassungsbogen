@@ -86,6 +86,16 @@
 
     <p><a class="start" href="./">Bogen jetzt ausfüllen</a></p>
 
+    <p>
+      Für die eigene Organisation gibt es eigene Einstiege mit Vorbelegungen
+      und Beispielbögen: <a href="./thw.html">THW</a>,
+      <a href="./feuerwehr.html">Feuerwehr</a>, <a href="./dlrg.html">DLRG</a>
+      und der <a href="./katastrophenschutz.html">Katastrophenschutz der
+      Länder</a>; für Führungsstellen die Seite
+      <a href="./meldekopf.html">Meldekopf digital</a>. Wer noch abwägt, findet
+      den Vergleich <a href="./papier-oder-digital.html">Papier oder digital?</a>
+    </p>
+
     <figure>
       <img src="./screenshots/start-breit.png" width="1280" height="800" loading="lazy"
         alt="Startseite des Einheiten-Erfassungsbogens: die Schaltflächen „Neuen Bogen erstellen“, „QR-Code scannen“ und „Aus Datei laden“ sowie die Einsatz-Sammlung für den Meldekopf.">
@@ -183,6 +193,21 @@
       <tr><td>iPhone, iPad</td><td>Über Safari zum Home-Bildschirm hinzufügen</td></tr>
     </table>
 
+    <h2>Technische Daten</h2>
+    <table>
+      <tr><th>Merkmal</th><th>Details</th></tr>
+      <tr><td>Kosten</td><td>Kostenlos — keine Konten, keine Bezahlschranke, keine Werbung</td></tr>
+      <tr><td>Lizenz</td><td>Open Source unter EUPL-1.2 (Europäische Union Public Licence)</td></tr>
+      <tr><td>Offline</td><td>Offline-first: nach dem ersten Aufruf ohne Internet nutzbar (PWA); Desktop- und Android-Apps von vornherein</td></tr>
+      <tr><td>Registrierung</td><td>Keine — die App startet direkt</td></tr>
+      <tr><td>Datenhaltung</td><td>Ausschließlich lokal auf dem Gerät; kein Server, keine Cloud</td></tr>
+      <tr><td>Übergabe</td><td>QR-Code (kompletter Bogen im Code), Datei, PDF</td></tr>
+      <tr><td>Export</td><td>PDF im Papier-Layout, Bogen-Datei, CSV der Einsatz-Sammlung</td></tr>
+      <tr><td>Backup</td><td>Alle lokalen Daten als eine Datei sichern und wieder einspielen</td></tr>
+      <tr><td>Signatur</td><td>Optionale Ed25519-Signatur zur Herkunftsprüfung übergebener Bögen</td></tr>
+      <tr><td>Plattformen</td><td>Browser (alle Systeme), Windows, macOS, Linux, Android; iPhone/iPad über Safari („Zum Home-Bildschirm")</td></tr>
+    </table>
+
     <h2>Häufige Fragen</h2>
 
     <h3>Was kostet die App?</h3>
@@ -251,6 +276,12 @@
     <footer>
       <a href="./">Zurück zur App</a> ·
       <a href="./vorlage.html">Vorlage &amp; Aufbau des Bogens</a> ·
+      <a href="./thw.html">THW</a> ·
+      <a href="./feuerwehr.html">Feuerwehr</a> ·
+      <a href="./dlrg.html">DLRG</a> ·
+      <a href="./katastrophenschutz.html">Katastrophenschutz</a> ·
+      <a href="./meldekopf.html">Meldekopf digital</a> ·
+      <a href="./papier-oder-digital.html">Papier oder digital?</a> ·
       <a href="./datenschutz.html">Datenschutz</a> ·
       <a href="./impressum.html">Impressum</a> ·
       <a href="https://github.com/wattnpapa/erfassungsbogen">GitHub</a>
@@ -261,6 +292,13 @@
   {
     "@context": "https://schema.org",
     "@graph": [
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          { "@type": "ListItem", "position": 1, "name": "Erfassungsbogen.app", "item": "https://erfassungsbogen.app/" },
+          { "@type": "ListItem", "position": 2, "name": "Anleitung und häufige Fragen", "item": "https://erfassungsbogen.app/anleitung.html" }
+        ]
+      },
       {
         "@type": "HowTo",
         "name": "Einheiten-Erfassungsbogen ausfüllen und weitergeben",

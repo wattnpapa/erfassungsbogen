@@ -46,7 +46,25 @@
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
+    "@graph": [
+    {
+    "@type": "WebSite",
+    "@id": "https://erfassungsbogen.app/#website",
+    "url": "https://erfassungsbogen.app/",
+    "name": "Erfassungsbogen.app",
+    "description": "Digitaler Einheiten-Erfassungsbogen für BOS: kostenloses Online-Tool zur Stärkemeldung mit QR-Code-Transport ohne Internet.",
+    "inLanguage": "de",
+    "publisher": { "@id": "https://erfassungsbogen.app/#autor" }
+    },
+    {
+    "@type": "Person",
+    "@id": "https://erfassungsbogen.app/#autor",
+    "name": "Johannes Rudolph",
+    "url": "https://github.com/wattnpapa"
+    },
+    {
     "@type": "SoftwareApplication",
+    "@id": "https://erfassungsbogen.app/#app",
     "name": "Einheiten-Erfassungsbogen",
     "alternateName": "Erfassungsbogen.app",
     "url": "https://erfassungsbogen.app/",
@@ -76,11 +94,9 @@
       "Beispielbögen und Landesvorlagen für THW, Feuerwehr, DLRG und den Katastrophenschutz der Länder",
       "Arbeitet vollständig lokal auf dem Gerät — ohne Anmeldung, ohne Server, ohne Cloud"
     ],
-    "author": {
-      "@type": "Person",
-      "name": "Johannes Rudolph",
-      "url": "https://github.com/wattnpapa"
+    "author": { "@id": "https://erfassungsbogen.app/#autor" }
     }
+    ]
   }
   </script>
   <style>
@@ -1713,6 +1729,12 @@
       <p>
         <a href="./anleitung.html">Anleitung und häufige Fragen</a> ·
         <a href="./vorlage.html">Vorlage und Aufbau des Bogens</a> ·
+        <a href="./thw.html">Erfassungsbogen für das THW</a> ·
+        <a href="./feuerwehr.html">Erfassungsbogen für die Feuerwehr</a> ·
+        <a href="./dlrg.html">Erfassungsbogen für die DLRG</a> ·
+        <a href="./katastrophenschutz.html">Katastrophenschutz der Länder</a> ·
+        <a href="./meldekopf.html">Meldekopf digital</a> ·
+        <a href="./papier-oder-digital.html">Papier oder digital?</a> ·
         <a href="./datenschutz.html">Datenschutz</a> ·
         <a href="./impressum.html">Impressum</a> ·
         <a href="https://github.com/wattnpapa/erfassungsbogen">Quellcode auf GitHub</a>
