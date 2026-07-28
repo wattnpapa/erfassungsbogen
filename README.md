@@ -18,6 +18,19 @@ ohne Anmeldung.
 Kurze Einführung und die häufigsten Fragen:
 [Anleitung](https://erfassungsbogen.app/anleitung.html).
 
+Eigene Einstiege für die eigene Organisation —
+[THW](https://erfassungsbogen.app/thw.html),
+[Feuerwehr](https://erfassungsbogen.app/feuerwehr.html),
+[DRK](https://erfassungsbogen.app/drk.html),
+[Johanniter](https://erfassungsbogen.app/johanniter.html),
+[Malteser](https://erfassungsbogen.app/malteser.html),
+[ASB](https://erfassungsbogen.app/asb.html),
+[DLRG](https://erfassungsbogen.app/dlrg.html) und
+[Katastrophenschutz der Länder](https://erfassungsbogen.app/katastrophenschutz.html) —
+sowie für Führungsstellen:
+[Meldekopf digital](https://erfassungsbogen.app/meldekopf.html).
+Wer noch abwägt: [Papier oder digital?](https://erfassungsbogen.app/papier-oder-digital.html)
+
 ## Was kann die App?
 
 - **Bogen ausfüllen**: Schritt für Schritt durch Einheit, Einsatz, Personal,
