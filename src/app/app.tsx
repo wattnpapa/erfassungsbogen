@@ -43,7 +43,6 @@ import { ART_LABEL, EinsatzDetail, EinsatzListe } from "./einsaetze-ui";
 import { aktuelleMeldungen } from "./auswertung";
 import { boegenAusPdfBytes, einsatzAusDatei, einsatzAusPdfBytes, einsatzDateiInhalt } from "./einsatz-transport";
 import { einsatzCsvInhalt } from "./einsatz-csv";
-import { einsatzPdfErzeugen } from "./pdf";
 import { QrScannerWeb } from "./qr-scanner-web";
 import { qrAusBild } from "./qr-bild";
 import { entwurfLaden, entwurfSpeichern, entwurfVerwerfen } from "./entwurf";
@@ -838,6 +837,9 @@ function AppInhalt() {
       return;
     }
     try {
+      // Dynamisch: pdfmake samt eingebetteter Schriften bleibt aus dem
+      // Start-Bundle heraus und wird erst beim ersten PDF geladen.
+      const { einsatzPdfErzeugen } = await import("./pdf");
       await einsatzPdfErzeugen(s, meldungen);
     } catch (e) {
       setFehler(`Sammel-PDF: ${e instanceof Error ? e.message : e}`);

@@ -29,7 +29,6 @@ import {
   vokabText,
   vokabularFuer,
 } from "../hilfen";
-import { pdfDatenUrl, pdfErzeugen } from "../pdf";
 import { debugAktiv } from "../debug-plattform";
 import { einheitSymbolSvg, svgDataUrl } from "../taktische-zeichen";
 import {
@@ -177,6 +176,9 @@ export function Uebersicht(props: {
     setVorschauLaeuft(true);
     setFehler("");
     try {
+      // Dynamisch: pdfmake samt eingebetteter Schriften bleibt aus dem
+      // Start-Bundle heraus und wird erst beim ersten PDF geladen.
+      const { pdfDatenUrl } = await import("../pdf");
       setVorschauUrl(await pdfDatenUrl(bogen, props.herkunft));
     } catch (e) {
       setFehler(`PDF-Vorschau: ${e instanceof Error ? e.message : e}`);
@@ -232,6 +234,7 @@ export function Uebersicht(props: {
     setPdfLaeuft(true);
     setFehler("");
     try {
+      const { pdfErzeugen } = await import("../pdf");
       await pdfErzeugen(bogen, undefined, props.herkunft);
     } catch (e) {
       setFehler(`PDF: ${e instanceof Error ? e.message : e}`);

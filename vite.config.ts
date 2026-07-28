@@ -1,7 +1,8 @@
 import { readFileSync } from "node:fs";
-import { defineConfig } from "vite";
+import { defineConfig, type Plugin } from "vite";
 import react from "@vitejs/plugin-react";
 import { VitePWA } from "vite-plugin-pwa";
+import { transform } from "esbuild";
 
 const { version } = JSON.parse(readFileSync(new URL("./package.json", import.meta.url), "utf8"));
 
@@ -26,6 +27,57 @@ function bauStempel() {
   };
 }
 
+/**
+ * Minifiziert den Inline-<style>-Block der index.html im Build. Das Design-Token-
+ * CSS liegt bewusst inline (kein zweiter Request vor dem ersten Rendern), aber
+ * Vite fasst Inline-CSS nicht an — unminifiziert gingen ~10 KB Kommentare und
+ * Einrückung mit jedem Seitenaufruf über die Leitung.
+ */
+function inlineCssMinify(): Plugin {
+  return {
+    name: "eeb-inline-css-minify",
+    apply: "build",
+    async transformIndexHtml(html: string) {
+      const teile = html.split(/(<style>[\s\S]*?<\/style>)/);
+      for (let i = 0; i < teile.length; i++) {
+        const css = teile[i].match(/^<style>([\s\S]*)<\/style>$/);
+        if (!css) continue;
+        const { code } = await transform(css[1], { loader: "css", minify: true });
+        teile[i] = `<style>${code.trim()}</style>`;
+      }
+      return teile.join("");
+    },
+  };
+}
+
+/**
+ * Zieht das gebaute Stylesheet (nur die @font-face-Regeln von Archivo, ~1 KB)
+ * in die index.html hinein. Als externe Datei ist es der einzige
+ * render-blockierende Request — eine ganze Netz-Runde vor dem ersten Rendern
+ * für drei Regeln, die dank font-display:swap ohnehin nicht sofort greifen.
+ */
+function fontCssInline(): Plugin {
+  return {
+    name: "eeb-font-css-inline",
+    apply: "build",
+    enforce: "post",
+    generateBundle(_optionen, bundle) {
+      const html = bundle["index.html"];
+      const cssName = Object.keys(bundle).find((n) => n.endsWith(".css"));
+      if (!html || html.type !== "asset" || !cssName) return;
+      const css = bundle[cssName];
+      if (css.type !== "asset") return;
+      // Die Font-Pfade sind relativ zum assets/-Ordner; im HTML an der
+      // Seitenwurzel muss der Ordner mit in den Pfad.
+      const regeln = String(css.source).trim().replaceAll("url(./", "url(./assets/");
+      const link = new RegExp(`<link rel="stylesheet"[^>]*href="[^"]*${cssName.split("/").pop()}"[^>]*>`);
+      if (!link.test(String(html.source))) return;
+      html.source = String(html.source).replace(link, `<style>${regeln}</style>`);
+      delete bundle[cssName];
+    },
+  };
+}
+
 // base "./": relative Pfade, damit der Build direkt auf GitHub Pages
 // (Unterpfad /<repo>/) funktioniert.
 export default defineConfig({
@@ -33,6 +85,8 @@ export default defineConfig({
   plugins: [
     react(),
     bauStempel(),
+    inlineCssMinify(),
+    fontCssInline(),
     // Service Worker nur für die im Browser aufgerufene Web-App (erfassungsbogen.app):
     // cached die App-Shell (HTML/JS/CSS, Icons, manifest, das eingebaute THW-OV-
     // Verzeichnis steckt im JS-Bundle), damit die Seite auch offline startet.

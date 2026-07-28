@@ -8,7 +8,6 @@ import { staerke, type Erfassungsbogen } from "../model";
 import { istNativ, textTeilen } from "./nativ";
 import { einheitOrt, migriereBogen, orgLabel, vokabText, vokabularFuer } from "./hilfen";
 import { einheitSymbolSvg, svgDataUrl } from "./taktische-zeichen";
-import { pdfErzeugen } from "./pdf";
 import { nutzungsKanal, statistikAbgewaehlt, statistikAbwaehlen } from "./statistik";
 import { AnzeigeSchalter } from "./anzeige-schalter";
 import { frageJaNein, zeigeHinweis } from "./dialoge";
@@ -122,6 +121,9 @@ async function beispielKopie(url: string): Promise<Erfassungsbogen> {
  * Download (Web) bzw. Share-Sheet (App) übernimmt pdfErzeugen.
  */
 async function beispielPdf(datei: string, url: string): Promise<void> {
+  // Dynamisch: pdfmake samt eingebetteter Schriften bleibt aus dem
+  // Start-Bundle heraus und wird erst beim ersten PDF geladen.
+  const { pdfErzeugen } = await import("./pdf");
   await pdfErzeugen(await beispielKopie(url), `${datei}.pdf`);
 }
 

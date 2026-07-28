@@ -751,7 +751,9 @@
     .fuss-gruppe { display: flex; flex-direction: column; align-items: flex-start; gap: 0.35rem; }
     .fuss-titel {
       font-family: var(--schrift-daten); font-size: 0.6rem; letter-spacing: 0.12em;
-      text-transform: uppercase; color: var(--text-3);
+      /* --text-2 statt --text-3: die winzige Versalzeile braucht 4,5:1 Kontrast
+         (WCAG AA), --text-3 schafft auf dem Seitengrund nur knapp 3:1. */
+      text-transform: uppercase; color: var(--text-2);
     }
     /* Ruhige, aber eindeutige Links: Textfarbe mit feiner Unterstreichung,
        die beim Überfahren in die Kennfarbe wechselt. */
@@ -768,7 +770,7 @@
        schreien, muss aber vor dem Klick als etwas anderes erkennbar sein. */
     footer.seite .fuss-gruppe button.link.gefahr,
     footer.seite .fuss-gruppe button.link.gefahr:hover { color: var(--alarm); }
-    .fuss-marke { margin: 0; color: var(--text-3); }
+    .fuss-marke { margin: 0; color: var(--text-2); }
     footer.seite a { color: var(--akzent-hell); }
     /* Schmale Variante im Assistenten: eine Zeile mit den Angaben, die auf
        jeder Seite stehen müssen. Beim Ausfüllen soll unter dem Formular nicht
@@ -781,7 +783,7 @@
       display: flex; flex-wrap: wrap; align-items: baseline;
       gap: 0.4rem var(--r-3);
     }
-    .fuss-schmal .fuss-version { color: var(--text-3); margin-left: auto; }
+    .fuss-schmal .fuss-version { color: var(--text-2); margin-left: auto; }
     footer.seite.fuss-schmal a,
     footer.seite.fuss-schmal button.link {
       color: var(--text-2); font-size: var(--t-xs);
