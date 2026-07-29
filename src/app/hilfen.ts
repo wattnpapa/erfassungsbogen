@@ -29,6 +29,7 @@ import {
   EEB_URL_PREFIX,
   QR_EINZEL_MAX_VERSION,
   QR_SEGMENT_ZIEL_VERSION,
+  base64UrlKodieren,
   datenKodieren,
   decodePayload,
   entpackePayload,
@@ -200,6 +201,11 @@ export interface QrSatz {
    * wenn der Bogen für einen einzelnen QR-Code zu groß ist: Segmentierung ist nur
    * eine Grenze des QR-Bildes, nicht des Links. Diese eine URL öffnet beim Antippen
    * den kompletten Bogen und lässt sich als Textlink teilen.
+   *
+   * Anders als die QR-Teile ist sie Base64url-kodiert (markerlos): Base41-Zeichen
+   * wie `$ * / :` brechen in Chat-Programmen die Link-Erkennung ab, Base64url
+   * (`A–Z a–z 0–9 - _`) nicht. Markerlose Datenteile liest der Decoder seit jeher
+   * als Base64url — auch ältere App-Stände öffnen diesen Link.
    */
   vollUrl: string;
   /**
@@ -269,10 +275,12 @@ export async function qrErzeugen(b: Erfassungsbogen, herkunft?: Uint8Array | nul
   // Nicht raten, sondern den Payload befragen: er sagt, wie viele Stufen drinstehen.
   const stufen = entpackePayload(payload).stufen.length;
   const url = EEB_URL_PREFIX + datenKodieren(payload);
+  // Textlink zum Teilen: Base64url statt Base41 (siehe QrSatz.vollUrl).
+  const vollUrl = EEB_URL_PREFIX + base64UrlKodieren(payload);
   const einzelVersion = qrVersion(url);
   if (einzelVersion <= QR_EINZEL_MAX_VERSION) {
     const teil = await teilBild(url, 1, 1);
-    return { teile: [teil], segmentiert: false, zeichen: url.length, version: teil.version, vollUrl: url, stufen, weitergeleitet };
+    return { teile: [teil], segmentiert: false, zeichen: url.length, version: teil.version, vollUrl, stufen, weitergeleitet };
   }
 
   // Zu groß: kleinste Teilzahl suchen, bei der jeder Teil auf die gröbere
@@ -289,7 +297,7 @@ export async function qrErzeugen(b: Erfassungsbogen, herkunft?: Uint8Array | nul
     segmentiert: true,
     zeichen: url.length,
     version: Math.max(...teile.map((t) => t.version)),
-    vollUrl: url,
+    vollUrl,
     stufen,
     weitergeleitet,
   };

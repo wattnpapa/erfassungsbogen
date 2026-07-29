@@ -46,7 +46,7 @@ import {
   vokabText,
   vokabularFuer,
 } from "./hilfen";
-import { decodePayload, encodePayload, payloadAusText } from "../codec";
+import { EEB_URL_PREFIX, decodePayload, encodePayload, payloadAusText } from "../codec";
 import {
   oeffentlicherSchluessel,
   schluesselKurzform,
@@ -527,5 +527,21 @@ describe("qrErzeugen(): Herkunft eines fremden Bogens", () => {
     const qr = await qrErzeugen(decodePayload(roh, browserKompressor), roh);
     expect(qr.weitergeleitet).toBe(false);
     expect((await signaturVonPayload(ausQr(qr))).zustand).toBe("gueltig");
+  });
+});
+
+describe("qrErzeugen(): Textlink (vollUrl)", () => {
+  it("ist Base64url-kodiert — Chat-Programme erkennen den ganzen Link", async () => {
+    const b = neuerBogen();
+    b.einsatz.ortAuftrag = "Übung Kabelblitz";
+    const qr = await qrErzeugen(b);
+    const fragment = qr.vollUrl.slice(EEB_URL_PREFIX.length);
+    // Nur A–Z a–z 0–9 - _ : an keinem dieser Zeichen bricht die Link-Erkennung ab.
+    expect(fragment).toMatch(/^[A-Za-z0-9_-]+$/);
+  });
+
+  it("trägt denselben Payload wie das QR-Bild (dort Base41)", async () => {
+    const qr = await qrErzeugen(neuerBogen());
+    expect(payloadAusText(qr.vollUrl)).toEqual(payloadAusText(qr.teile[0]!.url));
   });
 });

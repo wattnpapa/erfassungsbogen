@@ -208,6 +208,14 @@ bleibt gültig, auch gemischte Segment-Sätze. Umgekehrt gilt das nicht: Eine
 App-Version von vor der Umstellung kann einen `B.`-Code nicht lesen und lehnt
 ihn mit „Kein EEB2-QR-Code" ab (wie schon bei den Markern `V.` und `EEBS.`).
 
+**Textlink bleibt Base64url.** Der teilbare App-Link („Bogen übergeben" →
+Link) ist bewusst **nicht** Base41: dessen Sonderzeichen (`$ * / :`) brechen
+in Chat-Programmen die Link-Erkennung ab — der Link wird dort zerhackt oder
+nur teilweise anklickbar. Der Textlink nutzt darum das markerlose
+Base64url-Format (`A–Z a–z 0–9 - _`, zudem ~11 % kürzer), das jeder je
+veröffentlichte Decoder liest. Base41 zahlt sich nur im QR-Bild aus
+(alphanumerischer Modus); in einem Textlink zählt allein die Link-Erkennung.
+
 ### Signatur „EEB2C" (Ed25519, n Stufen)
 
 Jeder von der App erzeugte QR-Code (Bogen, Vorlage, PDF-Seite) wird signiert; der
