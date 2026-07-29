@@ -293,8 +293,6 @@
     .sprungmarke:focus { top: var(--r-2); }
     /* Der Sprung setzt den Fokus auf <main>; dort ist der Rahmen überflüssig. */
     main:focus { outline: none; }
-    /* Kopfleiste: Rücksprung links, Anzeige-Umschalter rechts. */
-    .kopf-leiste { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; }
     /* Umschalter Standard/Feld/Nacht als kompakte Segmente. In schmalen
        Spalten (Fußzeile auf dem Telefon) darf die Segmentzeile umbrechen,
        statt über den Rand hinauszuragen. */
@@ -348,7 +346,7 @@
     .seiten-kopf .kopf-inhalt > .zur-start { align-self: flex-start; }
     /* Im Assistenten steht die Schrittleiste im Markup vor dem Speicherstand,
        sitzt visuell aber als Reiterzeile ganz unten. */
-    .seiten-kopf.assistent-kopf .kopf-leiste { order: 0; }
+    .seiten-kopf.assistent-kopf .zur-start { order: 0; }
     .seiten-kopf.assistent-kopf .titelzeile { order: 1; }
     .seiten-kopf.assistent-kopf .autosave { order: 2; }
     .seiten-kopf.assistent-kopf .schritte { order: 3; }
@@ -358,10 +356,6 @@
     .seiten-kopf .hinweis { color: var(--kopf-auf-2); margin: var(--r-1) 0 0; }
     .seiten-kopf .zur-start { color: var(--kopf-auf); opacity: 0.85; }
     .seiten-kopf .zur-start:hover { opacity: 1; }
-    .seiten-kopf .anzeige-schalter { border-color: var(--kopf-linie); }
-    .seiten-kopf .anzeige-schalter button { background: transparent; color: var(--kopf-auf-2); }
-    .seiten-kopf .anzeige-schalter button + button { border-left-color: var(--kopf-linie); }
-    .seiten-kopf .anzeige-schalter button.aktiv { background: var(--kopf-auf); color: var(--kopf-fond); }
     .seiten-kopf .autosave { color: var(--kopf-auf-2); margin: 0; padding: 0 0 var(--r-3); }
     /* Startseite: der Titel ist hier die Hauptsache und darf größer stehen —
        der Kopf ist zugleich der Seitenaufmacher. */
@@ -1534,14 +1528,6 @@
     .platform-ios .seiten-kopf .autosave,
     .platform-android .seiten-kopf .autosave { padding-bottom: var(--r-2); }
     .platform-ios main, .platform-android main { padding-top: var(--r-4); }
-    /* Ohne Balkenfläche taugt „Text in Balkenfarbe" nicht mehr als Kontrast
-       für den aktiven Umschalter — hier greift der Plattform-Tint. */
-    .platform-ios .seiten-kopf .anzeige-schalter button.aktiv {
-      background: var(--ios-akzent-flaeche); color: #fff;
-    }
-    .platform-android .seiten-kopf .anzeige-schalter button.aktiv {
-      background: var(--md-primary); color: var(--md-on-primary);
-    }
 
     /* ---------------------------------------------------------------
        Debug-Modus: schwebende Leiste zum Umschalten der visuellen
@@ -1730,14 +1716,6 @@
     <button type="button" class="sprungmarke">Zum Inhalt springen</button>
     <header class="seiten-kopf start-kopf">
       <div class="kopf-inhalt">
-        <div class="kopf-leiste">
-          <span></span>
-          <span class="anzeige-schalter" role="group" aria-label="Anzeigemodus">
-            <button type="button" class="aktiv" aria-pressed="true" title="Normale Darstellung">Standard</button>
-            <button type="button" aria-pressed="false" title="Große Tippziele und hoher Kontrast für den Einsatz draußen">Feld</button>
-            <button type="button" aria-pressed="false" title="Gedimmte, warme Darstellung für Nachteinsätze — blendet nicht">Nacht</button>
-          </span>
-        </div>
         <div class="titelzeile">
           <h1>Digitaler Einheiten-Erfassungsbogen</h1>
         </div>

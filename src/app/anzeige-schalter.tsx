@@ -1,7 +1,6 @@
 /**
- * Kompakter Umschalter Standard / Feld / Nacht — sitzt prominent im
- * Kopfbereich (Startseite, Assistent) und in der Fußzeile, damit der Wechsel
- * im Einsatz nicht erst gesucht werden muss.
+ * Kompakter Umschalter Standard / Feld / Nacht — sitzt in der Fußzeile,
+ * wo alle App-Einstellungen versammelt sind.
  */
 
 import { useEffect, useState } from "react";

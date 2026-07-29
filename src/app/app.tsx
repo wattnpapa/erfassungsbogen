@@ -46,7 +46,6 @@ import { einsatzCsvInhalt } from "./einsatz-csv";
 import { QrScannerWeb } from "./qr-scanner-web";
 import { qrAusBild } from "./qr-bild";
 import { entwurfLaden, entwurfSpeichern, entwurfVerwerfen } from "./entwurf";
-import { AnzeigeSchalter } from "./anzeige-schalter";
 import { SeitenKopf } from "./seiten-kopf";
 import { orgFarbe, wendeOrgAkzentAn } from "./org-farben";
 import { einheitSymbolSvg, svgDataUrl } from "./taktische-zeichen";
@@ -968,10 +967,6 @@ function AppInhalt() {
       <>
       <Aktualisierungshinweise />
       <SeitenKopf variante="start-kopf">
-        <div className="kopf-leiste">
-          <span />
-          <AnzeigeSchalter />
-        </div>
         <div className="titelzeile">
           <h1>Digitaler Einheiten-Erfassungsbogen</h1>
         </div>
@@ -1119,12 +1114,9 @@ function AppInhalt() {
     <>
     <Aktualisierungshinweise />
     <SeitenKopf variante="assistent-kopf">
-      <div className="kopf-leiste">
-        <button type="button" className="zur-start" onClick={() => { setMeldung(""); setZeigeStart(true); }}>
-          ‹ Startseite
-        </button>
-        <AnzeigeSchalter />
-      </div>
+      <button type="button" className="zur-start" onClick={() => { setMeldung(""); setZeigeStart(true); }}>
+        ‹ Startseite
+      </button>
       <div className="titelzeile">
         {/* Taktisches Zeichen der Einheit als „Avatar" — Wiedererkennung auf einen Blick. */}
         <img
