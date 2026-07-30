@@ -49,7 +49,7 @@ function texte(node: unknown, acc: string[] = []): string[] {
 function basisBogen(): Erfassungsbogen {
   return {
     schemaVersion: SCHEMA_VERSION,
-    stand: datumAusIso("2026-05-14"),
+    stand: zeitpunktAusIso("2026-05-14T10:39"),
     einheit: {
       organisation: OrganisationsTyp.THW,
       // Freitext-Werte, damit die Assertions unabhängig von den Vokabular-Tabellen sind.
@@ -259,7 +259,7 @@ describe("pdfDokument()", () => {
     const dd = pdfDokument(basisBogen(), QR);
     const footer = dd.footer as (s: number, g: number) => unknown;
     const t = texte(footer(2, 5)).join("\n");
-    expect(t).toContain("Stand: 14.05.2026");
+    expect(t).toContain("Stand: 141039mai26");
     expect(t).toContain("2 / 5");
   });
 });
@@ -268,7 +268,7 @@ describe("einsatzPdfDokument()", () => {
   /** Zweite Meldung derselben Einheit: 1 Person und 1 Fahrzeug weniger, Ruhezeit nötig. */
   function folgeBogen(): Erfassungsbogen {
     const b = basisBogen();
-    b.stand = datumAusIso("2026-05-15");
+    b.stand = zeitpunktAusIso("2026-05-15T08:00");
     b.personal = [b.personal[0]!];
     b.fahrzeuge = [];
     b.sofortbedarf = { ...b.sofortbedarf!, ruhezeitErforderlich: true };
@@ -282,7 +282,7 @@ describe("einsatzPdfDokument()", () => {
     const t = texte(dd.content).join("\n");
     expect(t).toContain("Übergabe-Übersicht: Hochwasser");
     expect(t).toContain("Veränderung seit der letzten Meldung");
-    expect(t).toContain("gegenüber 14.05.2026:");
+    expect(t).toContain("gegenüber 141039mai26:");
     expect(t).toContain("Gesamtstärke: 2 → 1");
     expect(t).toContain("Fahrzeug abgemeldet: MzKW (THW-84397)");
     expect(t).toContain("Ruhezeit erforderlich: nein → ja");
@@ -298,7 +298,7 @@ describe("einsatzPdfDokument()", () => {
       ]).content,
     ).join("\n");
     expect(t).toContain("Erstmeldung");
-    expect(t).toContain("unverändert gegenüber 14.05.2026");
+    expect(t).toContain("unverändert gegenüber 141039mai26");
   });
 
   it("summiert Stärke und Fahrzeuge über alle Bögen", () => {

@@ -6,6 +6,8 @@
 import { deflateRaw, inflateRaw } from "pako";
 import QRCode from "qrcode";
 import {
+  EEB_EPOCHE_MS,
+  EebZeitpunkt,
   Einheit,
   Erfassungsbogen,
   Ernaehrung,
@@ -21,6 +23,8 @@ import {
   Sofortbedarf,
   VokabularWert,
   datumAusIso,
+  jetztZeitpunkt,
+  MINUTEN_JE_TAG,
   mitTransportVersion,
   staerke,
   unterbringungMWD,
@@ -46,9 +50,9 @@ import {
   THW_EINHEITSTYPEN,
   THW_FUNKTIONEN,
   THW_FAHRZEUGTYPEN,
-  THW_HIERARCHIE_EBENEN,
   type VokabularEintrag,
 } from "../vokabulare/thw";
+import { hierarchieEbenenFuer } from "../vokabulare/ebenen";
 
 export const browserKompressor: Kompressor = {
   deflateRaw: (d) => deflateRaw(d, { level: 9 }),
@@ -76,18 +80,21 @@ export function orgLabel(o: OrganisationsTyp): string {
   return ORG_OPTIONEN.find((e) => e.wert === o)?.label ?? `Organisation #${o}`;
 }
 
-/** Vokabulare gelten organisationsspezifisch — bislang nur THW befüllt. */
+/**
+ * Vokabulare gelten organisationsspezifisch — Hierarchie-Ebenen gibt es für
+ * die meisten Organisationen, die übrigen Tabellen bislang nur beim THW.
+ */
 export function vokabularFuer(
   org: OrganisationsTyp,
   art: "einheitstyp" | "funktion" | "fahrzeug" | "ebene" | "kennwort",
 ): VokabularEintrag[] {
   if (art === "kennwort") return FUNKRUF_KENNWOERTER;
+  if (art === "ebene") return hierarchieEbenenFuer(org);
   if (org !== OrganisationsTyp.THW) return [];
   switch (art) {
     case "einheitstyp": return THW_EINHEITSTYPEN;
     case "funktion": return THW_FUNKTIONEN;
     case "fahrzeug": return THW_FAHRZEUGTYPEN;
-    case "ebene": return THW_HIERARCHIE_EBENEN;
   }
 }
 
@@ -172,6 +179,20 @@ export function einheitAnzeigename(e: Einheit): string {
 export function datumDeutsch(iso: string): string {
   const [j, m, t] = iso.split("-");
   return `${t}.${m}.${j}`;
+}
+
+// Deutsche BOS-Monatskürzel (umlautfrei, daher „mrz" statt „mär").
+const ZEITGRUPPE_MONATE = ["jan", "feb", "mrz", "apr", "mai", "jun", "jul", "aug", "sep", "okt", "nov", "dez"];
+
+/**
+ * NATO-Zeitgruppe (Datum-Zeit-Gruppe) wie bei THWin und im BOS-Schriftverkehr
+ * üblich: TThhmm + Monatskürzel + Jahr, z. B. „161039jul26" für 16.07.2026, 10:39.
+ * Ohne Zeitzonenbuchstaben — alle Zeiten im Bogen sind lokale Wandzeit.
+ */
+export function zeitgruppe(z: EebZeitpunkt): string {
+  const d = new Date(EEB_EPOCHE_MS + z * 60_000);
+  const p = (n: number) => String(n).padStart(2, "0");
+  return `${p(d.getUTCDate())}${p(d.getUTCHours())}${p(d.getUTCMinutes())}${ZEITGRUPPE_MONATE[d.getUTCMonth()]}${p(d.getUTCFullYear() % 100)}`;
 }
 
 // ---------------------------------------------------------------- QR-Code
@@ -373,6 +394,10 @@ export function migriereBogen(b: Erfassungsbogen): Erfassungsbogen {
     const e = b.einheit as Einheit & { name?: string };
     if (e.name && e.hierarchie.length === 0) e.hierarchie.push({ bezeichnung: {}, name: e.name });
     delete e.name;
+  }
+  if (b.schemaVersion < 7) {
+    // Stand war ein Kalendertag; ab Schema 7 minutengenau → Mitternacht annehmen.
+    b.stand *= MINUTEN_JE_TAG;
   }
   b.schemaVersion = SCHEMA_VERSION;
   return b;
@@ -584,7 +609,7 @@ export function neuerBogen(): Erfassungsbogen {
   const heute = datumAusIso(new Date().toISOString().slice(0, 10));
   return {
     schemaVersion: SCHEMA_VERSION,
-    stand: heute,
+    stand: jetztZeitpunkt(),
     einheit: {
       organisation: OrganisationsTyp.THW,
       einheitsTyp: {},

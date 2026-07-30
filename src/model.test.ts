@@ -3,18 +3,21 @@ import {
   Ernaehrung,
   Geschlecht,
   KontaktArt,
+  MINUTEN_JE_TAG,
   PersonalErfassung,
   StaerkeRolle,
   SCHEMA_VERSION,
   ansprechpartner,
   datumAusIso,
   datumZuIso,
+  mitTransportVersion,
   staerke,
   transportSchemaVersion,
   unterbringungMWD,
   verpflegung,
   zeitpunktAusIso,
   zeitpunktZuIso,
+  type Erfassungsbogen,
   type Person,
 } from "./model";
 
@@ -183,15 +186,35 @@ describe("ansprechpartner()", () => {
 });
 
 describe("Konstanten", () => {
-  it("SCHEMA_VERSION ist die aktuelle Version 6", () => {
-    expect(SCHEMA_VERSION).toBe(6);
+  it("SCHEMA_VERSION ist die aktuelle Version 7", () => {
+    expect(SCHEMA_VERSION).toBe(7);
     // Sanity: der Meldekopf-Modus ist als eigener Enum-Wert vorhanden.
     expect(PersonalErfassung.NUR_STAERKE).toBe(1);
   });
 
-  it("transportSchemaVersion fordert Schema 6 nur für Übungsbögen", () => {
-    expect(transportSchemaVersion({ uebung: true })).toBe(6);
-    expect(transportSchemaVersion({})).toBe(5);
-    expect(transportSchemaVersion({ uebung: undefined })).toBe(5);
+  it("transportSchemaVersion: kleinste tragende Version", () => {
+    const mitternacht = 1000 * MINUTEN_JE_TAG;
+    expect(transportSchemaVersion({ uebung: true, stand: mitternacht })).toBe(6);
+    expect(transportSchemaVersion({ stand: mitternacht })).toBe(5);
+    expect(transportSchemaVersion({ uebung: undefined, stand: mitternacht })).toBe(5);
+    // Ein Stand mit Uhrzeit ist erst ab Schema 7 kodierbar — auch ohne Übungs-Flag.
+    expect(transportSchemaVersion({ stand: mitternacht + 639 })).toBe(7);
+    expect(transportSchemaVersion({ uebung: true, stand: mitternacht + 639 })).toBe(7);
+  });
+
+  it("mitTransportVersion rechnet den Stand für alte Schemata auf Tage zurück", () => {
+    const leer: Erfassungsbogen = {
+      schemaVersion: SCHEMA_VERSION,
+      stand: 0,
+      einheit: { organisation: 1, einheitsTyp: {}, hierarchie: [] },
+      einsatz: { zeitraumVon: 0, zeitraumBis: 0, ortAuftrag: "" },
+      personalErfassung: PersonalErfassung.VOLLSTAENDIG,
+      personal: [],
+      fahrzeuge: [],
+    };
+    const b = { ...leer, stand: 1000 * MINUTEN_JE_TAG };
+    expect(mitTransportVersion(b)).toMatchObject({ schemaVersion: 5, stand: 1000 });
+    const mitZeit = { ...b, stand: 1000 * MINUTEN_JE_TAG + 639 };
+    expect(mitTransportVersion(mitZeit)).toMatchObject({ schemaVersion: 7, stand: 1000 * MINUTEN_JE_TAG + 639 });
   });
 });

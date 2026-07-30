@@ -22,6 +22,7 @@ import {
   StaerkeRolle,
   SCHEMA_VERSION,
   datumAusIso,
+  zeitpunktAusIso,
   type Erfassungsbogen,
   KontaktArt,
   type Fahrzeug,
@@ -45,6 +46,7 @@ import {
   schrittStatus,
   vokabText,
   vokabularFuer,
+  zeitgruppe,
 } from "./hilfen";
 import { EEB_URL_PREFIX, decodePayload, encodePayload, payloadAusText } from "../codec";
 import {
@@ -95,6 +97,12 @@ describe("vokabularFuer()", () => {
   it("liefert die Funkruf-Kennwörter organisationsübergreifend", () => {
     // Kennwörter sind ein globales Vokabular — auch für (noch) leere Organisationen.
     expect(vokabularFuer(OrganisationsTyp.FEUERWEHR, "kennwort").length).toBeGreaterThan(0);
+  });
+
+  it("liefert Hierarchie-Ebenen je Organisation aus dem Ebenen-Vokabular", () => {
+    expect(vokabularFuer(OrganisationsTyp.THW, "ebene").map((e) => e.kurz)).toEqual(["OV", "RB", "LV"]);
+    expect(vokabularFuer(OrganisationsTyp.FEUERWEHR, "ebene").length).toBeGreaterThan(0);
+    expect(vokabularFuer(OrganisationsTyp.POLIZEI, "ebene")).toEqual([]);
   });
 });
 
@@ -162,6 +170,18 @@ describe("datumDeutsch()", () => {
   it("wandelt ISO in Tag.Monat.Jahr (mit führenden Nullen)", () => {
     expect(datumDeutsch("2025-05-14")).toBe("14.05.2025");
     expect(datumDeutsch("2025-12-01")).toBe("01.12.2025");
+  });
+});
+
+describe("zeitgruppe()", () => {
+  it("formatiert als NATO-Zeitgruppe TThhmm + Monatskürzel + Jahr", () => {
+    expect(zeitgruppe(zeitpunktAusIso("2026-07-16T10:39"))).toBe("161039jul26");
+    expect(zeitgruppe(zeitpunktAusIso("2026-01-02T00:00"))).toBe("020000jan26");
+    expect(zeitgruppe(zeitpunktAusIso("2025-12-01T23:05"))).toBe("012305dez25");
+  });
+
+  it("nutzt für März das umlautfreie Kürzel mrz", () => {
+    expect(zeitgruppe(zeitpunktAusIso("2026-03-31T07:00"))).toBe("310700mrz26");
   });
 });
 
@@ -306,6 +326,18 @@ describe("migriereBogen() (JSON-Pfad, muss zum Codec passen)", () => {
     // Die Alt-Felder dürfen nicht zurückbleiben.
     const roh = b.fahrzeuge as unknown as Record<string, unknown>[];
     expect(roh.every((f) => !("thwKennzeichen" in f) && !("kennzeichenFreitext" in f))).toBe(true);
+  });
+
+  it("hebt den Tageszähler-Stand eines v6-Bogens auf Minuten (Mitternacht)", () => {
+    const alt = { ...neuerBogen(), schemaVersion: 6, stand: datumAusIso("2026-05-14") } as Erfassungsbogen;
+    const b = migriereBogen(alt);
+    expect(b.stand).toBe(zeitpunktAusIso("2026-05-14T00:00"));
+    expect(b.schemaVersion).toBe(SCHEMA_VERSION);
+  });
+
+  it("lässt den minutengenauen Stand eines v7-Bogens unangetastet", () => {
+    const b = migriereBogen({ ...neuerBogen(), stand: zeitpunktAusIso("2026-05-14T10:39") });
+    expect(b.stand).toBe(zeitpunktAusIso("2026-05-14T10:39"));
   });
 });
 

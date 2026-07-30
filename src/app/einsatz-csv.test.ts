@@ -97,7 +97,7 @@ describe("einsatzCsvInhalt()", () => {
     expect(f.slice(10, 13)).toEqual(["2", "1", "0"]);
     // Diesel/Benzin/Gemisch
     expect(f.slice(13, 16)).toEqual(["40", "5", "0"]);
-    expect(f[17]).toMatch(/^\d{2}\.\d{2}\.\d{4}$/); // Stand als deutsches Datum
+    expect(f[17]).toMatch(/^\d{6}[a-z]{3}\d{2}$/); // Stand als NATO-Zeitgruppe
     expect(f[18]).toBe("Scan");
   });
 

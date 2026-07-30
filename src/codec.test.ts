@@ -40,7 +40,7 @@ function gleich(a: unknown, b: unknown): void {
 function basisBogen(): Erfassungsbogen {
   return {
     schemaVersion: SCHEMA_VERSION,
-    stand: datumAusIso("2026-05-14"),
+    stand: zeitpunktAusIso("2026-05-14T10:39"),
     einheit: {
       organisation: OrganisationsTyp.THW,
       einheitsTyp: { code: 43 },
@@ -124,12 +124,23 @@ describe("Binär-Roundtrip (encodeBinaer/decodeBinaer)", () => {
     expect(encodeBinaer(uebung).length).toBe(encodeBinaer(echt).length);
   });
 
-  it("schreibt die kleinste tragende Schema-Version (5 ohne, 6 mit Übungs-Flag)", () => {
-    // Bögen ohne Übungs-Flag bleiben für ältere App-Stände (Schema 5) lesbar;
-    // Übungsbögen fordern Schema 6, damit ein alter Stand sie ablehnt, statt
-    // sie unmarkiert als echten Bogen anzuzeigen.
-    expect(encodeBinaer(basisBogen())[0]).toBe(5);
-    expect(encodeBinaer({ ...basisBogen(), uebung: true })[0]).toBe(6);
+  it("schreibt die kleinste tragende Schema-Version (5/6/7)", () => {
+    // Bögen ohne Übungs-Flag und ohne Uhrzeit im Stand bleiben für ältere
+    // App-Stände (Schema 5) lesbar; Übungsbögen fordern Schema 6. Ein Stand
+    // mit Uhrzeit ist erst ab Schema 7 kodierbar und fordert daher Schema 7.
+    const mitternacht = { ...basisBogen(), stand: zeitpunktAusIso("2026-05-14T00:00") };
+    expect(encodeBinaer(mitternacht)[0]).toBe(5);
+    expect(encodeBinaer({ ...mitternacht, uebung: true })[0]).toBe(6);
+    expect(encodeBinaer(basisBogen())[0]).toBe(7); // Stand 10:39 → Schema 7
+  });
+
+  it("erhält die Uhrzeit im Stand über den Roundtrip", () => {
+    expect(decodeBinaer(encodeBinaer(basisBogen())).stand).toBe(zeitpunktAusIso("2026-05-14T10:39"));
+  });
+
+  it("liest einen Mitternachts-Stand auch über den alten Tageszähler-Pfad", () => {
+    const mitternacht = { ...basisBogen(), stand: zeitpunktAusIso("2026-05-14T00:00") };
+    expect(decodeBinaer(encodeBinaer(mitternacht)).stand).toBe(zeitpunktAusIso("2026-05-14T00:00"));
   });
 
   it("erhält einen Meldekopf-Bogen (NUR_STAERKE, manuelle Blöcke, standortRef)", () => {

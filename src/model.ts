@@ -9,7 +9,7 @@
  * React Native / Capacitor und Node.
  */
 
-export const SCHEMA_VERSION = 6;
+export const SCHEMA_VERSION = 7;
 
 /**
  * Schema-Version, die ein Transport (QR, JSON) für diesen Bogen fordern muss.
@@ -17,14 +17,19 @@ export const SCHEMA_VERSION = 6;
  * Übungs-Flag bleiben Schema 5 und damit für ältere App-Stände lesbar. Nur
  * echte Übungsbögen fordern Schema 6 — ein alter Stand lehnt sie dann mit
  * einer klaren Meldung ab, statt sie unmarkiert als echten Bogen anzuzeigen.
+ * Ein Stand mit Uhrzeit (Minuten ≠ Mitternacht) ist erst ab Schema 7 kodierbar.
  */
-export function transportSchemaVersion(b: Pick<Erfassungsbogen, "uebung">): number {
+export function transportSchemaVersion(b: Pick<Erfassungsbogen, "uebung" | "stand">): number {
+  if (b.stand % MINUTEN_JE_TAG !== 0) return 7;
   return b.uebung ? 6 : 5;
 }
 
 /** Kopie des Bogens mit der Transport-Schema-Version — für JSON-Exporte/-Einbettungen. */
 export function mitTransportVersion(b: Erfassungsbogen): Erfassungsbogen {
-  return { ...b, schemaVersion: transportSchemaVersion(b) };
+  const schemaVersion = transportSchemaVersion(b);
+  // Vor Schema 7 war der Stand ein Kalendertag — beim Herabschreiben zurückrechnen,
+  // sonst läse ein alter App-Stand die Minutenzahl als Tageszähler.
+  return { ...b, schemaVersion, stand: schemaVersion >= 7 ? b.stand : b.stand / MINUTEN_JE_TAG };
 }
 
 // ---------------------------------------------------------- Zeitrepräsentation
@@ -43,6 +48,17 @@ export type EebDatum = number;
 export type EebZeitpunkt = number;
 
 export const EEB_EPOCHE_MS = Date.UTC(2020, 0, 1);
+
+/** Umrechnung EebDatum ↔ EebZeitpunkt (Tageszähler ↔ Minutenzähler). */
+export const MINUTEN_JE_TAG = 1440;
+
+/** Aktuelle lokale Wandzeit, minutengenau. */
+export function jetztZeitpunkt(): EebZeitpunkt {
+  const d = new Date();
+  return Math.round(
+    (Date.UTC(d.getFullYear(), d.getMonth(), d.getDate(), d.getHours(), d.getMinutes()) - EEB_EPOCHE_MS) / 60_000,
+  );
+}
 
 export function datumAusIso(iso: string): EebDatum {
   const [j = 0, m = 1, t = 1] = iso.split("-").map(Number);
@@ -263,7 +279,12 @@ export enum PersonalErfassung {
 
 export interface Erfassungsbogen {
   schemaVersion: number;
-  stand: EebDatum;
+  /**
+   * Letzte inhaltliche Änderung, minutengenau (ab Schema 7; davor ein
+   * Kalendertag — die Migration hebt ihn auf Mitternacht). Grundlage der
+   * Revisionsreihenfolge in der Einsatz-Sammlung und der Zeitgruppe im PDF.
+   */
+  stand: EebZeitpunkt;
   /**
    * Als Übung gekennzeichneter Bogen (ab Schema 6). Reist mit dem Bogen durch
    * jeden Transport: App-Störer, PDF-Wasserzeichen „ÜBUNG" und die

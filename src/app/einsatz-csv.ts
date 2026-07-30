@@ -12,8 +12,8 @@
  * wie alle Exporte rein lokal.
  */
 
-import { datumZuIso, staerke, unterbringungMWD, verpflegung, type Erfassungsbogen } from "../model";
-import { datumDeutsch, einheitAnzeigename, orgLabel, vokabText, vokabularFuer } from "./hilfen";
+import { staerke, unterbringungMWD, verpflegung, type Erfassungsbogen } from "../model";
+import { einheitAnzeigename, orgLabel, vokabText, vokabularFuer, zeitgruppe } from "./hilfen";
 import { aktuelleMeldungen } from "./auswertung";
 import type { Einsatzsammlung, MeldeEintrag, MeldeQuelle } from "./einsaetze";
 
@@ -99,7 +99,7 @@ function datenZeile(e: MeldeEintrag): string {
     sb?.benzinLiter ?? 0,
     sb?.gemischLiter ?? 0,
     fahrzeugListe(b),
-    datumDeutsch(datumZuIso(b.stand)),
+    zeitgruppe(b.stand),
     QUELLE_LABEL[e.quelle],
   ]);
 }

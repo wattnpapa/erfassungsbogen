@@ -36,6 +36,7 @@ import {
   orgLabel,
   vokabText,
   vokabularFuer,
+  zeitgruppe,
   type QrSatz,
 } from "./hilfen";
 import { bogenDiff, diffZeilen } from "./meldung-diff";
@@ -215,10 +216,10 @@ function uebersichtsTabelle(boegen: SammelBogen[]): Content {
       const d = bogenDiff(vorher, b);
       aenderung =
         d.anzahl === 0
-          ? { text: `unverändert gegenüber ${datumDeutsch(datumZuIso(vorher.stand))}`, italics: true }
+          ? { text: `unverändert gegenüber ${zeitgruppe(vorher.stand)}`, italics: true }
           : {
               stack: [
-                { text: `gegenüber ${datumDeutsch(datumZuIso(vorher.stand))}:`, bold: true },
+                { text: `gegenüber ${zeitgruppe(vorher.stand)}:`, bold: true },
                 ...diffZeilen(d, UEBERSICHT_MAX_ZEILEN).map((z) => ({ text: z })),
               ],
             };
@@ -228,7 +229,7 @@ function uebersichtsTabelle(boegen: SammelBogen[]): Content {
       b.uebung
         ? { stack: [{ text: einheitAnzeigename(b.einheit) }, { text: "ÜBUNG", bold: true, color: UEBUNG_FARBE }] }
         : { text: einheitAnzeigename(b.einheit) },
-      { text: datumDeutsch(datumZuIso(b.stand)) },
+      { text: zeitgruppe(b.stand) },
       { text: `${s.fuehrer} / ${s.unterfuehrer} / ${s.mannschaft} / ${s.gesamt}` },
       { text: `${b.fahrzeuge.length}` },
       aenderung,
@@ -526,7 +527,7 @@ export function pdfDokument(b: Erfassungsbogen, qr: QrSatz): TDocumentDefinition
     files: { [EEB_JSON_DATEINAME]: bogenAlsEingebetteteDatei(b) },
     footer: (seite, gesamt) => ({
       columns: [
-        { text: `Stand: ${datumDeutsch(datumZuIso(b.stand))}`, margin: [40, 0, 0, 0] },
+        { text: `Stand: ${zeitgruppe(b.stand)}`, margin: [40, 0, 0, 0] },
         { text: `${seite} / ${gesamt}`, alignment: "right", margin: [0, 0, 40, 0] },
       ],
       fontSize: 8,

@@ -26,6 +26,7 @@ import {
   StaerkeRolle as R,
   VokabularWert,
   datumAusIso,
+  zeitpunktAusIso,
   staerke,
   unterbringungMWD,
 } from "../src/model";
@@ -60,7 +61,7 @@ const P = (
 
 const bogen: Erfassungsbogen = {
   schemaVersion: SCHEMA_VERSION,
-  stand: datumAusIso("2026-05-14"),
+  stand: zeitpunktAusIso("2026-05-14T10:39"),
   einheit: {
     organisation: OrganisationsTyp.THW,
     einheitsTyp: V(43), // FGr K (A)

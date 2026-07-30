@@ -51,6 +51,7 @@ import {
   SCHEMA_VERSION,
   StaerkeRolle as R,
   datumAusIso,
+  MINUTEN_JE_TAG,
   staerke,
 } from "../src/model";
 import {
@@ -647,7 +648,9 @@ function bogenBauen(nr: number, ov: ThwOrtsverband, typCode: number, stanTreu: b
   if (istDelta < 0) notizen.unshift(`${-istDelta} Sollplätze unbesetzt.`);
 
   // Einsatz: Juli-2026-Unwetterlage, Ort aus dem OV-Standort.
-  const stand = datumAusIso("2026-07-16") + ganz(0, 2);
+  const tag = datumAusIso("2026-07-16") + ganz(0, 2);
+  // Stand minutengenau (Schema 7): Meldung irgendwann zwischen 06:00 und 21:59.
+  const stand = tag * MINUTEN_JE_TAG + ganz(6, 21) * 60 + ganz(0, 59);
   const dauer = ganz(1, 4);
   const ortAuftrag = wahl(SZENARIO[typCode] ?? ["Einsatz {ort}"]).replaceAll("{ort}", ov.ort);
 
@@ -673,8 +676,8 @@ function bogenBauen(nr: number, ov: ThwOrtsverband, typCode: number, stanTreu: b
       hierarchie: hierarchieFuerOv(ov),
     },
     einsatz: {
-      zeitraumVon: stand,
-      zeitraumBis: stand + dauer,
+      zeitraumVon: tag,
+      zeitraumBis: tag + dauer,
       ortAuftrag,
     },
     personalErfassung: PersonalErfassung.VOLLSTAENDIG,
@@ -768,7 +771,7 @@ function grossbogenBauen(): BeispielBogen {
       hierarchie: hierarchieFuerOv(ov),
     },
     einsatz: {
-      zeitraumVon: stand,
+      zeitraumVon: tag,
       zeitraumBis: stand + 7,
       ortAuftrag:
         `Großschadenslage nach Starkregen und Hangrutsch im Landkreis ${ov.ort} — ` +

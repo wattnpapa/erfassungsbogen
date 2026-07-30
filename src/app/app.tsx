@@ -23,7 +23,7 @@ import {
 } from "../codec";
 import { signaturLabel, signaturVonPayload, signaturVonText, type SignaturStatus } from "../signatur";
 import { SCHRITT_STATUS_TITEL, bogenLaden, browserKompressor, einheitAnzeigename, neuerBogen, schrittStatus } from "./hilfen";
-import { staerke } from "../model";
+import { jetztZeitpunkt, staerke } from "../model";
 import { bogenLinksEmpfangen, istNativ, qrScannen, textTeilen } from "./nativ";
 import { vorlageAnlegen, vorlagenLaden, vorlagenPapierkorb, type Vorlage } from "./vorlagen";
 import { Musterung, VorlagenListe } from "./vorlagen-ui";
@@ -1103,7 +1103,9 @@ function AppInhalt() {
   // Bearbeiten verwirft den Import-Signaturstatus: er beschreibt den empfangenen
   // Transport, nicht den nun geänderten Bogen.
   const aendern = (patch: Partial<Erfassungsbogen>) => {
-    setBogen({ ...bogen, ...patch });
+    // Jede Bearbeitung datiert den Stand neu — die Zeitgruppe im PDF und die
+    // Revisionsreihenfolge der Einsatz-Sammlung zeigen die letzte Änderung.
+    setBogen({ ...bogen, ...patch, stand: jetztZeitpunkt() });
     setzeEmpfang(null);
   };
 

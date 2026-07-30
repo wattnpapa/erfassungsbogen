@@ -1,9 +1,9 @@
 # Datenmodell Einheiten-Erfassungsbogen (EEB)
 
-**Stufe 1** — Datenmodell und QR-Code-Kodierung. Stand: 2026-07-29, **Schema-Version 6**
-(v6 = Übungs-Kennzeichnung `uebung`; v5 = Einheitsname in der Hierarchie; v4 = ein
-einziges Kennzeichen-Feld; v3 = Ernährungsform je Person; v2 =
-organisationsübergreifend; v1 war THW-spezifisch).
+**Stufe 1** — Datenmodell und QR-Code-Kodierung. Stand: 2026-07-30, **Schema-Version 7**
+(v7 = `stand` minutengenau als Zeitpunkt statt Kalendertag; v6 = Übungs-Kennzeichnung
+`uebung`; v5 = Einheitsname in der Hierarchie; v4 = ein einziges Kennzeichen-Feld;
+v3 = Ernährungsform je Person; v2 = organisationsübergreifend; v1 war THW-spezifisch).
 
 **Abwärtskompatibilität (Pflicht):** Schema-Änderungen dürfen ältere QR-Codes/Dateien nie
 unlesbar machen. `decodeBinaer` (`src/codec.ts`) und `bogenLaden`/`migriereBogen`
@@ -19,6 +19,12 @@ schreiben nicht stur `SCHEMA_VERSION`, sondern `transportSchemaVersion(b)`
 unterstützte Schema-Version" ablehnt, ist gewollt: lieber gar nicht anzeigen
 als eine Übung unmarkiert wie einen echten Bogen. Im Binärformat sitzt das
 Flag in Bit 4 des Personal-Flags-Bytes und kostet 0 Byte extra.
+
+Ein `stand` mit Uhrzeit (≠ Mitternacht) fordert Schema 7: erst dort ist er als
+Zeitpunkt (uint32, Minuten) kodiert; bis Schema 6 war er ein Kalendertag (uint16),
+beim Herabschreiben rechnet `mitTransportVersion` auf Tage zurück. Da jede
+Bearbeitung den Stand minutengenau neu datiert, sind neue Bögen praktisch immer
+Schema 7 (+2 Bytes im QR). Beim Lesen älterer Versionen wird Mitternacht angenommen.
 
 **Bewusste Ausnahme (v4):** Bis v3 stand das THW-Kennzeichen als Zahl im QR-Code
 (Flag 16 im Fahrzeug-Byte). Dieses Sonderformat ist entfallen; es gibt nur noch ein
@@ -95,7 +101,7 @@ Verbindliche Typdefinitionen: [`src/model.ts`](../src/model.ts).
 | Feld | Typ | Pflicht | Bemerkung |
 |---|---|---|---|
 | schemaVersion | uint | ✓ | für Migrationen |
-| stand | Datum | ✓ | |
+| stand | Zeitpunkt | ✓ | letzte Bearbeitung, minutengenau (ab Schema 7; davor Kalendertag). Anzeige als NATO-Zeitgruppe, z. B. „161039jul26" |
 | uebung | bool | – | ab Schema 6: Bogen ist eine Übung (Störer, PDF-Wasserzeichen, Kennzeichnung in Sammlungen); fehlt = echter Bogen |
 | einheit | `Einheit` | ✓ | Organisation, Typ, Hierarchie |
 | einsatz | `Einsatz` | ✓ | Zeitraum, Ort, Auftrag, Beginn/Ende |
@@ -119,7 +125,7 @@ M/W/D, Verpflegung (vegetarisch/vegan), Ansprechpartner (erste Führungskraft mi
 | organisationName | string | Pflicht bei SONSTIGE („Freiwillige Feuerwehr Wardenburg") |
 | einheitsTyp | `VokabularWert` | FGr K (A), Löschzug, SEG Sanität, … |
 | standortRef | number | Referenz ins mitgelieferte Standort-Verzeichnis (THW: offizielle OV-Nummer). Wenn gesetzt, entfällt die hierarchie im QR komplett; im Modell bleibt sie für Anzeige/PDF gefüllt |
-| hierarchie | `HierarchieEbene[]` | 1..n Ebenen, unterste zuerst. Die **erste Ebene ist die eigene Einheit** und Pflicht (THW OV/RB/LV; FW Gemeinde/Landkreis; DRK KV/LV) — Bezeichnung als Vokabular, Name + optionale Kontakte |
+| hierarchie | `HierarchieEbene[]` | 1..n Ebenen, unterste zuerst. Die **erste Ebene ist die eigene Einheit** und Pflicht — Bezeichnung als Vokabular (`src/vokabulare/ebenen.ts`: THW OV→RB→LV, FW Gemeinde→LK→Bezirk→Land, DRK OV→KV→LV, …; Codes steigen mit der Hierarchie), Name + optionale Kontakte |
 
 Der **Anzeigename** der Einheit wird abgeleitet statt erfasst: Organisation (bzw.
 `organisationName`) + Name der ersten Ebene + Einheitstyp, z. B. „THW Oldenburg (NI)

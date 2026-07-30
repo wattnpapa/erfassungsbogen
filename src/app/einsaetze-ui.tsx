@@ -20,6 +20,7 @@ import {
 } from "../model";
 import {
   datumDeutsch,
+  zeitgruppe,
   einheitAnzeigename,
   einheitOrt,
   funkrufText,
@@ -89,7 +90,7 @@ function summenStaerkeText(sum: EinsatzSummen): string {
 }
 
 function standText(b: Erfassungsbogen): string {
-  return datumDeutsch(datumZuIso(b.stand));
+  return zeitgruppe(b.stand);
 }
 
 // ---------------------------------------------------------------- Einsatzliste

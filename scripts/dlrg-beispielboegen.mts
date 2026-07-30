@@ -55,6 +55,7 @@ import {
   StaerkeRolle as R,
   Staerke,
   datumAusIso,
+  zeitpunktAusIso,
   staerke,
 } from "../src/model";
 import {
@@ -257,7 +258,7 @@ function bogenAus(plan: Bauplan): Erfassungsbogen {
   return {
     schemaVersion: SCHEMA_VERSION,
     uebung: true, // Beispielbogen: überall als Übung gekennzeichnet (Störer, PDF-Wasserzeichen)
-    stand: datumAusIso("2023-10-01"),
+    stand: zeitpunktAusIso("2023-10-01T09:30"), // Stand minutengenau (Schema 7)
     einheit: {
       organisation: OrganisationsTyp.DLRG,
       einheitsTyp: { freitext: plan.einheitsTyp },

@@ -70,6 +70,7 @@ import {
   StaerkeRolle as R,
   VokabularWert,
   datumAusIso,
+  MINUTEN_JE_TAG,
   staerke,
 } from "../src/model";
 import {
@@ -1112,7 +1113,9 @@ function bogenBauen(spec: BogenSpec, ort: ThOrt): BeispielBogen {
     ...spec.traeger.ebene(ort),
   ];
 
-  const stand = datumAusIso("2026-07-16") + ganz(0, 2);
+  const tag = datumAusIso("2026-07-16") + ganz(0, 2);
+  // Stand minutengenau (Schema 7): Meldung irgendwann zwischen 06:00 und 21:59.
+  const stand = tag * MINUTEN_JE_TAG + ganz(6, 21) * 60 + ganz(0, 59);
   const dauer = ganz(1, 4);
   const diesel = fahrzeuge.reduce((s, fz) => s + dieselFuer(fz.typ.freitext ?? ""), 0);
 
@@ -1134,8 +1137,8 @@ function bogenBauen(spec: BogenSpec, ort: ThOrt): BeispielBogen {
       hierarchie,
     },
     einsatz: {
-      zeitraumVon: stand,
-      zeitraumBis: stand + dauer,
+      zeitraumVon: tag,
+      zeitraumBis: tag + dauer,
       ortAuftrag: spec.szenario.replaceAll("{ort}", ort.ort),
     },
     personalErfassung: PersonalErfassung.VOLLSTAENDIG,

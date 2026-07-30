@@ -26,7 +26,7 @@ import type {
   Sofortbedarf,
   VokabularWert,
 } from "./model";
-import { Ernaehrung, KontaktArt, SCHEMA_VERSION, transportSchemaVersion } from "./model";
+import { Ernaehrung, KontaktArt, MINUTEN_JE_TAG, SCHEMA_VERSION, transportSchemaVersion } from "./model";
 
 export const EEB_MAGIC = new Uint8Array([0x45, 0x45, 0x42, 0x32]); // "EEB2"
 
@@ -249,8 +249,12 @@ export function encodeBinaer(b: Erfassungsbogen): Uint8Array {
   const w = new Writer();
   // Kleinste tragende Version statt b.schemaVersion (siehe transportSchemaVersion):
   // Bögen ohne Übungs-Flag bleiben für ältere App-Stände lesbar.
-  w.varint(transportSchemaVersion(b));
-  w.u16(b.stand);
+  const version = transportSchemaVersion(b);
+  w.varint(version);
+  // Stand: bis Schema 6 ein Tageszähler (u16), ab Schema 7 minutengenau (u32).
+  // Vor Schema 7 ist der Stand garantiert Mitternacht (sonst wäre die Version 7).
+  if (version >= 7) w.u32(b.stand);
+  else w.u16(b.stand / MINUTEN_JE_TAG);
   encodeEinheit(w, b.einheit);
   encodeEinsatz(w, b.einsatz);
 
@@ -391,7 +395,8 @@ export function decodeBinaer(daten: Uint8Array): Erfassungsbogen {
   }
   const b: Erfassungsbogen = {
     schemaVersion,
-    stand: r.u16(),
+    // Migration: vor Schema 7 war der Stand ein Tageszähler → auf Minuten heben.
+    stand: schemaVersion >= 7 ? r.u32() : r.u16() * MINUTEN_JE_TAG,
     einheit: decodeEinheit(r),
     einsatz: decodeEinsatz(r),
     personalErfassung: 0,

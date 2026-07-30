@@ -13,7 +13,7 @@
  */
 
 import type { Erfassungsbogen } from "../model";
-import { datumAusIso } from "../model";
+import { datumAusIso, jetztZeitpunkt } from "../model";
 import { einheitAnzeigename, migriereBogen } from "./hilfen";
 import { aktive, imPapierkorb, papierkorbBereinigt } from "./papierkorb";
 
@@ -47,7 +47,7 @@ function heute(): number {
 export function bogenAlsVorlage(b: Erfassungsbogen): Erfassungsbogen {
   const kopie = structuredClone(b);
   const t = heute();
-  kopie.stand = t;
+  kopie.stand = jetztZeitpunkt();
   kopie.einsatz = { zeitraumVon: t, zeitraumBis: t, ortAuftrag: "" };
   return kopie;
 }
