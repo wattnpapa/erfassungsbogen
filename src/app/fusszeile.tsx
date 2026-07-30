@@ -670,7 +670,9 @@ export function Fusszeile({ onBogenOeffnen, kompakt = false }: {
       >
         <p>
           Ausgefüllte Beispiel-Erfassungsbögen (fiktive Einheiten und Personen) –
-          zum Ansehen, für Übungen oder zum Testen des QR-Imports. <strong>Anzeigen</strong>{" "}
+          zum Ansehen, für Übungen oder zum Testen des QR-Imports. Alle sind als
+          Übung gekennzeichnet: In der App erscheint ein Störer, PDFs tragen das
+          Wasserzeichen „ÜBUNG". <strong>Anzeigen</strong>{" "}
           öffnet den Bogen in der App, als wäre er gerade gescannt worden;{" "}
           <strong>PDF</strong> erzeugt ihn im aktuellen Layout – die eingebetteten
           QR-Codes lassen sich direkt mit der App scannen.

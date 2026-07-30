@@ -115,6 +115,23 @@ describe("Binär-Roundtrip (encodeBinaer/decodeBinaer)", () => {
     gleich(decodeBinaer(encodeBinaer(b)), b);
   });
 
+  it("erhält das Übungs-Flag — ohne den Strom zu verlängern", () => {
+    const echt = basisBogen();
+    const uebung = { ...basisBogen(), uebung: true };
+    expect(decodeBinaer(encodeBinaer(uebung)).uebung).toBe(true);
+    expect(decodeBinaer(encodeBinaer(echt)).uebung).toBeUndefined();
+    // Das Flag sitzt in einem freien Bit des Personal-Flags-Bytes.
+    expect(encodeBinaer(uebung).length).toBe(encodeBinaer(echt).length);
+  });
+
+  it("schreibt die kleinste tragende Schema-Version (5 ohne, 6 mit Übungs-Flag)", () => {
+    // Bögen ohne Übungs-Flag bleiben für ältere App-Stände (Schema 5) lesbar;
+    // Übungsbögen fordern Schema 6, damit ein alter Stand sie ablehnt, statt
+    // sie unmarkiert als echten Bogen anzuzeigen.
+    expect(encodeBinaer(basisBogen())[0]).toBe(5);
+    expect(encodeBinaer({ ...basisBogen(), uebung: true })[0]).toBe(6);
+  });
+
   it("erhält einen Meldekopf-Bogen (NUR_STAERKE, manuelle Blöcke, standortRef)", () => {
     const b: Erfassungsbogen = {
       schemaVersion: SCHEMA_VERSION,
@@ -266,16 +283,20 @@ describe("QR-URL (encodePayloadUrl/decodePayloadUrl)", () => {
 });
 
 describe("Fehlerbehandlung im Decoder", () => {
+  // Der Encoder schreibt seit Schema 6 immer die kleinste tragende Version
+  // (transportSchemaVersion) statt b.schemaVersion — ungültige Versionen
+  // entstehen also nur noch aus fremden/kaputten Strömen. Das Versions-Byte
+  // wird deshalb direkt im Strom manipuliert (varint ≤ 127 = 1 Byte).
   it("lehnt zu neue Schema-Versionen ab", () => {
-    const b = basisBogen();
-    b.schemaVersion = SCHEMA_VERSION + 1;
-    expect(() => decodeBinaer(encodeBinaer(b))).toThrow(/nicht unterstützte Schema-Version/i);
+    const bytes = encodeBinaer(basisBogen());
+    bytes[0] = SCHEMA_VERSION + 1;
+    expect(() => decodeBinaer(bytes)).toThrow(/nicht unterstützte Schema-Version/i);
   });
 
   it("lehnt zu alte (< 2) Schema-Versionen ab", () => {
-    const b = basisBogen();
-    b.schemaVersion = 1;
-    expect(() => decodeBinaer(encodeBinaer(b))).toThrow(/nicht unterstützte Schema-Version/i);
+    const bytes = encodeBinaer(basisBogen());
+    bytes[0] = 1;
+    expect(() => decodeBinaer(bytes)).toThrow(/nicht unterstützte Schema-Version/i);
   });
 
   it("meldet überschüssige Daten am Ende", () => {

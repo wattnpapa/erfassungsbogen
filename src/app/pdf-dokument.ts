@@ -20,6 +20,7 @@ import {
   OrganisationsTyp,
   PersonalErfassung,
   datumZuIso,
+  mitTransportVersion,
   staerke,
   unterbringungMWD,
   verpflegung,
@@ -44,6 +45,26 @@ import { orgFarbe } from "./org-farben";
 // Grau der Kopfzeilen/Hinweiszeile exakt aus der THWin-Papiervorlage
 // (06-BrB_Erfassungsbogen.dotx): w:fill="D9D9D9".
 const GRAU = "#d9d9d9";
+
+// Kennzeichnung von Übungsbögen (Störer-Zeile, Übersichts-Markierung):
+// gedecktes Signalrot, das sich von allen Organisations-Kennfarben abhebt.
+const UEBUNG_FARBE = "#b02a1e";
+
+/** Wasserzeichen „ÜBUNG" diagonal über jeder Seite (pdfmake-eingebaut). */
+function uebungsWasserzeichen(): TDocumentDefinitions["watermark"] {
+  return { text: "ÜBUNG", color: UEBUNG_FARBE, opacity: 0.08, bold: true, font: SCHRIFT };
+}
+
+/** Störer-Zeile über dem Bogenkopf — sichtbar auch beim Schwarzweiß-Druck. */
+function uebungsStoerer(): Content {
+  return {
+    text: "ÜBUNG — Dieser Bogen beschreibt keinen echten Einsatz.",
+    color: UEBUNG_FARBE,
+    bold: true,
+    fontSize: 10,
+    margin: [0, 0, 0, 6],
+  };
+}
 
 /**
  * Schriftart und Seitenränder wie in der THWin-Vorlage. Helvetica (≙ Arial, die
@@ -106,7 +127,7 @@ function base64AusBytes(bytes: Uint8Array): string {
  * ist also für externe Auswertung selbstbeschreibend.
  */
 export function bogenAlsEingebetteteDatei(b: Erfassungsbogen): EingebetteteDatei {
-  const json = JSON.stringify(b, null, 2);
+  const json = JSON.stringify(mitTransportVersion(b), null, 2);
   const base64 = base64AusBytes(new TextEncoder().encode(json));
   return {
     src: `data:application/json;base64,${base64}`,
@@ -140,7 +161,7 @@ export function sammlungAlsEingebetteteDatei(json: string): EingebetteteDatei {
 
 /** Mehrere Bögen als ein eingebettetes JSON-Array (für die Einsatz-Sammel-PDF). */
 export function boegenAlsEingebetteteDatei(boegen: Erfassungsbogen[]): EingebetteteDatei {
-  const json = JSON.stringify(boegen, null, 2);
+  const json = JSON.stringify(boegen.map(mitTransportVersion), null, 2);
   const base64 = base64AusBytes(new TextEncoder().encode(json));
   return {
     src: `data:application/json;base64,${base64}`,
@@ -203,7 +224,10 @@ function uebersichtsTabelle(boegen: SammelBogen[]): Content {
             };
     }
     body.push([
-      { text: einheitAnzeigename(b.einheit) },
+      // Übungsbögen bleiben auch in der Sammel-Übersicht als solche erkennbar.
+      b.uebung
+        ? { stack: [{ text: einheitAnzeigename(b.einheit) }, { text: "ÜBUNG", bold: true, color: UEBUNG_FARBE }] }
+        : { text: einheitAnzeigename(b.einheit) },
       { text: datumDeutsch(datumZuIso(b.stand)) },
       { text: `${s.fuehrer} / ${s.unterfuehrer} / ${s.mannschaft} / ${s.gesamt}` },
       { text: `${b.fahrzeuge.length}` },
@@ -251,6 +275,13 @@ export function einsatzPdfDokument(
     pageMargins: SEITENRAENDER,
     defaultStyle: { fontSize: 8, font: SCHRIFT },
     info: { title: `Einsatz-Sammlung ${name}` },
+    // Ein Wasserzeichen gilt in pdfmake immer dokumentweit — es erscheint darum
+    // nur, wenn ausnahmslos jeder Bogen eine Übung ist. In gemischten Sammlungen
+    // bleiben die Übungsbögen über ihre Störer-Zeile und die Markierung in der
+    // Übersichtstabelle erkennbar.
+    ...(boegenMitQr.length > 0 && boegenMitQr.every(({ bogen }) => bogen.uebung)
+      ? { watermark: uebungsWasserzeichen() }
+      : {}),
     files: {
       [EEB_EINSATZ_DATEINAME]: boegenAlsEingebetteteDatei(boegenMitQr.map((x) => x.bogen)),
       ...(sammlungJson ? { [EEB_EINSATZ_SAMMLUNG_DATEINAME]: sammlungAlsEingebetteteDatei(sammlungJson) } : {}),
@@ -490,6 +521,7 @@ export function pdfDokument(b: Erfassungsbogen, qr: QrSatz): TDocumentDefinition
     pageMargins: SEITENRAENDER,
     defaultStyle: { fontSize: 8, font: SCHRIFT },
     info: { title: `Erfassungsbogen ${typKurz || typName}` },
+    ...(b.uebung ? { watermark: uebungsWasserzeichen() } : {}),
     // Maschinenlesbares JSON dokumentweit einbetten (ZUGFeRD-artig).
     files: { [EEB_JSON_DATEINAME]: bogenAlsEingebetteteDatei(b) },
     footer: (seite, gesamt) => ({
@@ -500,6 +532,9 @@ export function pdfDokument(b: Erfassungsbogen, qr: QrSatz): TDocumentDefinition
       fontSize: 8,
     }),
     content: [
+      // Störer VOR dem Kopf: das Wasserzeichen allein kann beim Kopieren oder
+      // blassen Druck untergehen, die Textzeile nicht.
+      ...(b.uebung ? [uebungsStoerer()] : []),
       // ---- Kopf ----
       {
         table: {

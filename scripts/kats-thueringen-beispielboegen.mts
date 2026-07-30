@@ -1125,6 +1125,7 @@ function bogenBauen(spec: BogenSpec, ort: ThOrt): BeispielBogen {
 
   const bogen: Erfassungsbogen = {
     schemaVersion: SCHEMA_VERSION,
+    uebung: true, // Beispielbogen: überall als Übung gekennzeichnet (Störer, PDF-Wasserzeichen)
     stand,
     einheit: {
       organisation: spec.traeger.org,

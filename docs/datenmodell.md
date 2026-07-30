@@ -1,7 +1,8 @@
 # Datenmodell Einheiten-Erfassungsbogen (EEB)
 
-**Stufe 1** — Datenmodell und QR-Code-Kodierung. Stand: 2026-07-18, **Schema-Version 5**
-(v4 = ein einziges Kennzeichen-Feld; v3 = Ernährungsform je Person; v2 =
+**Stufe 1** — Datenmodell und QR-Code-Kodierung. Stand: 2026-07-29, **Schema-Version 6**
+(v6 = Übungs-Kennzeichnung `uebung`; v5 = Einheitsname in der Hierarchie; v4 = ein
+einziges Kennzeichen-Feld; v3 = Ernährungsform je Person; v2 =
 organisationsübergreifend; v1 war THW-spezifisch).
 
 **Abwärtskompatibilität (Pflicht):** Schema-Änderungen dürfen ältere QR-Codes/Dateien nie
@@ -9,6 +10,15 @@ unlesbar machen. `decodeBinaer` (`src/codec.ts`) und `bogenLaden`/`migriereBogen
 (`src/app/hilfen.ts`) akzeptieren jede Version `2..SCHEMA_VERSION`, füllen fehlende Felder
 mit Defaults und überführen entfallene Felder (z. B. v2 `Sofortbedarf.davonVegetarisch`
 → `verpflegungManuell`); danach wird der Bogen auf `SCHEMA_VERSION` gehoben.
+
+**Vorwärtskompatibilität (kleinste tragende Version):** Encoder und JSON-Exporte
+schreiben nicht stur `SCHEMA_VERSION`, sondern `transportSchemaVersion(b)`
+(`src/model.ts`) — die kleinste Version, die den Inhalt trägt. Ein Bogen ohne
+Übungs-Flag bleibt Schema 5 und damit für ältere App-Stände lesbar; nur ein
+Übungsbogen fordert Schema 6. Dass ein alter Stand ihn dann mit „nicht
+unterstützte Schema-Version" ablehnt, ist gewollt: lieber gar nicht anzeigen
+als eine Übung unmarkiert wie einen echten Bogen. Im Binärformat sitzt das
+Flag in Bit 4 des Personal-Flags-Bytes und kostet 0 Byte extra.
 
 **Bewusste Ausnahme (v4):** Bis v3 stand das THW-Kennzeichen als Zahl im QR-Code
 (Flag 16 im Fahrzeug-Byte). Dieses Sonderformat ist entfallen; es gibt nur noch ein
@@ -86,6 +96,7 @@ Verbindliche Typdefinitionen: [`src/model.ts`](../src/model.ts).
 |---|---|---|---|
 | schemaVersion | uint | ✓ | für Migrationen |
 | stand | Datum | ✓ | |
+| uebung | bool | – | ab Schema 6: Bogen ist eine Übung (Störer, PDF-Wasserzeichen, Kennzeichnung in Sammlungen); fehlt = echter Bogen |
 | einheit | `Einheit` | ✓ | Organisation, Typ, Hierarchie |
 | einsatz | `Einsatz` | ✓ | Zeitraum, Ort, Auftrag, Beginn/Ende |
 | personalErfassung | Enum | ✓ | `VOLLSTAENDIG` / `NUR_STAERKE` |

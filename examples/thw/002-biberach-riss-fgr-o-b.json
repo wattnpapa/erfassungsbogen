@@ -1,5 +1,6 @@
 {
-  "schemaVersion": 5,
+  "schemaVersion": 6,
+  "uebung": true,
   "stand": 2389,
   "einheit": {
     "organisation": 1,

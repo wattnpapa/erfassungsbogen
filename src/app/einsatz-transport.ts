@@ -11,7 +11,7 @@
  */
 
 import { inflate } from "pako";
-import { SCHEMA_VERSION, type Erfassungsbogen } from "../model";
+import { SCHEMA_VERSION, mitTransportVersion, type Erfassungsbogen } from "../model";
 import { migriereBogen } from "./hilfen";
 import type { Einsatzsammlung } from "./einsaetze";
 
@@ -25,7 +25,13 @@ interface EinsatzDatei {
 
 /** Ganze Einsatz-Sammlung als Datei-Inhalt (menschenlesbar eingerückt). */
 export function einsatzDateiInhalt(s: Einsatzsammlung): string {
-  const datei: EinsatzDatei = { typ: "eeb-einsatz", version: 1, einsatz: s };
+  // Jeder enthaltene Bogen mit seiner Transport-Version: nur Übungsbögen
+  // fordern das neue Schema, alles andere bleibt für alte Stände lesbar.
+  const einsatz: Einsatzsammlung = {
+    ...s,
+    eintraege: s.eintraege.map((e) => ({ ...e, bogen: mitTransportVersion(e.bogen) })),
+  };
+  const datei: EinsatzDatei = { typ: "eeb-einsatz", version: 1, einsatz };
   return JSON.stringify(datei, null, 2);
 }
 

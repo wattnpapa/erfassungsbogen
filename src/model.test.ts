@@ -10,6 +10,7 @@ import {
   datumAusIso,
   datumZuIso,
   staerke,
+  transportSchemaVersion,
   unterbringungMWD,
   verpflegung,
   zeitpunktAusIso,
@@ -182,9 +183,15 @@ describe("ansprechpartner()", () => {
 });
 
 describe("Konstanten", () => {
-  it("SCHEMA_VERSION ist die aktuelle Version 5", () => {
-    expect(SCHEMA_VERSION).toBe(5);
+  it("SCHEMA_VERSION ist die aktuelle Version 6", () => {
+    expect(SCHEMA_VERSION).toBe(6);
     // Sanity: der Meldekopf-Modus ist als eigener Enum-Wert vorhanden.
     expect(PersonalErfassung.NUR_STAERKE).toBe(1);
+  });
+
+  it("transportSchemaVersion fordert Schema 6 nur für Übungsbögen", () => {
+    expect(transportSchemaVersion({ uebung: true })).toBe(6);
+    expect(transportSchemaVersion({})).toBe(5);
+    expect(transportSchemaVersion({ uebung: undefined })).toBe(5);
   });
 });

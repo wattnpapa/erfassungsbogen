@@ -9,7 +9,23 @@
  * React Native / Capacitor und Node.
  */
 
-export const SCHEMA_VERSION = 5;
+export const SCHEMA_VERSION = 6;
+
+/**
+ * Schema-Version, die ein Transport (QR, JSON) für diesen Bogen fordern muss.
+ * Es wird die kleinste Version geschrieben, die den Inhalt trägt: Bögen ohne
+ * Übungs-Flag bleiben Schema 5 und damit für ältere App-Stände lesbar. Nur
+ * echte Übungsbögen fordern Schema 6 — ein alter Stand lehnt sie dann mit
+ * einer klaren Meldung ab, statt sie unmarkiert als echten Bogen anzuzeigen.
+ */
+export function transportSchemaVersion(b: Pick<Erfassungsbogen, "uebung">): number {
+  return b.uebung ? 6 : 5;
+}
+
+/** Kopie des Bogens mit der Transport-Schema-Version — für JSON-Exporte/-Einbettungen. */
+export function mitTransportVersion(b: Erfassungsbogen): Erfassungsbogen {
+  return { ...b, schemaVersion: transportSchemaVersion(b) };
+}
 
 // ---------------------------------------------------------- Zeitrepräsentation
 //
@@ -248,6 +264,13 @@ export enum PersonalErfassung {
 export interface Erfassungsbogen {
   schemaVersion: number;
   stand: EebDatum;
+  /**
+   * Als Übung gekennzeichneter Bogen (ab Schema 6). Reist mit dem Bogen durch
+   * jeden Transport: App-Störer, PDF-Wasserzeichen „ÜBUNG" und die
+   * Kennzeichnung in der Einsatz-Sammlung leiten sich hieraus ab — auch auf
+   * dem empfangenden Gerät. Nicht gesetzt (undefined) = echter Bogen.
+   */
+  uebung?: boolean;
   einheit: Einheit;
   einsatz: Einsatz;
   personalErfassung: PersonalErfassung;

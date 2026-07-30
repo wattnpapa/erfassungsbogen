@@ -357,6 +357,23 @@
     .seiten-kopf .zur-start { color: var(--kopf-auf); opacity: 0.85; }
     .seiten-kopf .zur-start:hover { opacity: 1; }
     .seiten-kopf .autosave { color: var(--kopf-auf-2); margin: 0; padding: 0 0 var(--r-3); }
+    /* Übungs-Störer: volle Fensterbreite direkt unter dem Kopf, Text auf dem
+       Satzspiegel. Schraffur wie ein Absperrband — deutlich anders als jede
+       Meldung oder Warnung, denn er beschreibt keinen Fehler, sondern einen
+       Zustand, der die ganze Sitzung gilt. Bewusst Tokens statt Festfarben,
+       damit Feld- und Nachtmodus lesbar bleiben. */
+    .uebungs-band {
+      background: repeating-linear-gradient(
+        -45deg,
+        var(--warn-fond), var(--warn-fond) 12px,
+        transparent 12px, transparent 24px
+      ), var(--flaeche);
+      color: var(--warn-text);
+      border-bottom: var(--strich-stark) solid var(--warn-linie);
+      font-size: var(--t-s);
+    }
+    .uebungs-band { padding: 0.4rem max(calc((100% - 60rem) / 2), var(--r-3)); }
+    .uebungs-band strong { letter-spacing: 0.08em; }
     /* Startseite: der Titel ist hier die Hauptsache und darf größer stehen —
        der Kopf ist zugleich der Seitenaufmacher. */
     .seiten-kopf.start-kopf .kopf-inhalt { padding-bottom: var(--r-4); }
@@ -694,6 +711,16 @@
     .signatur-badge { white-space: nowrap; font-weight: 600; }
     .signatur-badge.gueltig { color: #1c5c44; }
     .signatur-badge.ungueltig { color: #8a1c12; }
+    /* Übungs-Kennzeichen an Meldungen in der Einsatz-Sammlung — gleiche
+       Farbwelt wie der Störer im Assistenten (Warn-Tokens), damit „Übung"
+       überall dieselbe Handschrift trägt. */
+    .uebung-badge {
+      display: inline-block; margin-left: 0.4rem; padding: 0 0.35rem;
+      background: var(--warn-fond); color: var(--warn-text);
+      border: 1px solid var(--warn-linie); border-radius: 0.35rem;
+      font-size: 0.75rem; font-weight: 700; letter-spacing: 0.06em;
+      vertical-align: 0.1em;
+    }
     /* Such- und Sortierzeile über der Einheitenliste. Sitzt direkt unter der
        Überschrift, daher oben kein zusätzlicher Abstand; die Sortierung bekommt
        eine eigene, breitere Spur, sonst schneidet die Auswahl ihre Beschriftung ab. */

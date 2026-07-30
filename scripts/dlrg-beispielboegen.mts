@@ -256,6 +256,7 @@ const EINSATZ = {
 function bogenAus(plan: Bauplan): Erfassungsbogen {
   return {
     schemaVersion: SCHEMA_VERSION,
+    uebung: true, // Beispielbogen: überall als Übung gekennzeichnet (Störer, PDF-Wasserzeichen)
     stand: datumAusIso("2023-10-01"),
     einheit: {
       organisation: OrganisationsTyp.DLRG,

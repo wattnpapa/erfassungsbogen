@@ -1,5 +1,6 @@
 /**
- * Schritt 2 — Einsatz: Zeitraum, Ort/Auftrag sowie Beginn und Ende.
+ * Schritt 2 — Einsatz: Zeitraum, Ort/Auftrag, Beginn und Ende sowie die
+ * Übungs-Kennzeichnung.
  */
 
 import {
@@ -57,6 +58,27 @@ export function SchrittEinsatz({ bogen, aendern }: SchrittProps) {
           <input type="datetime-local" value={zeitpunktZuIso(ez.einsatzende)} onChange={(e) => setEz({ einsatzende: zeitpunktAusIso(e.target.value) })} />
         )}
       </div>
+      {/* Übung als Eigenschaft des BOGENS, nicht der App: die Kennzeichnung
+          reist im QR mit und erscheint auch auf dem empfangenden Gerät —
+          ein Geräte-Modus könnte das nicht leisten. Nicht gesetzt = Feld
+          fehlt komplett (kein `false` im QR/JSON). */}
+      <div className="zeile">
+        <label className="inline">
+          <input
+            type="checkbox"
+            checked={bogen.uebung === true}
+            onChange={(e) => aendern({ uebung: e.target.checked || undefined })}
+          />
+          Dies ist eine Übung
+        </label>
+      </div>
+      {bogen.uebung && (
+        <p className="hinweis">
+          Der Bogen wird überall als Übung gekennzeichnet: Störer in der App (auch nach dem
+          Scannen auf anderen Geräten), Wasserzeichen „ÜBUNG" im PDF und Markierung in der
+          Einsatz-Sammlung. Im Personal-Schritt lassen sich zusätzlich Beispielnamen erzeugen.
+        </p>
+      )}
     </section>
   );
 }

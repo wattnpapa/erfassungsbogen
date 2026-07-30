@@ -26,7 +26,7 @@ import type {
   Sofortbedarf,
   VokabularWert,
 } from "./model";
-import { Ernaehrung, KontaktArt, SCHEMA_VERSION } from "./model";
+import { Ernaehrung, KontaktArt, SCHEMA_VERSION, transportSchemaVersion } from "./model";
 
 export const EEB_MAGIC = new Uint8Array([0x45, 0x45, 0x42, 0x32]); // "EEB2"
 
@@ -247,7 +247,9 @@ function encodeSofortbedarf(w: Writer, s: Sofortbedarf): void {
 /** Bogen → unkomprimierter Binärstrom. */
 export function encodeBinaer(b: Erfassungsbogen): Uint8Array {
   const w = new Writer();
-  w.varint(b.schemaVersion);
+  // Kleinste tragende Version statt b.schemaVersion (siehe transportSchemaVersion):
+  // Bögen ohne Übungs-Flag bleiben für ältere App-Stände lesbar.
+  w.varint(transportSchemaVersion(b));
   w.u16(b.stand);
   encodeEinheit(w, b.einheit);
   encodeEinsatz(w, b.einsatz);
@@ -256,7 +258,8 @@ export function encodeBinaer(b: Erfassungsbogen): Uint8Array {
     b.personalErfassung |
       (b.staerkeManuell ? 2 : 0) |
       (b.unterbringungManuell ? 4 : 0) |
-      (b.verpflegungManuell ? 8 : 0),
+      (b.verpflegungManuell ? 8 : 0) |
+      (b.uebung ? 16 : 0),
   );
   if (b.staerkeManuell) {
     w.u8(b.staerkeManuell.fuehrer);
@@ -397,6 +400,9 @@ export function decodeBinaer(daten: Uint8Array): Erfassungsbogen {
   };
   const pflags = r.u8();
   b.personalErfassung = pflags & 1;
+  // Übungs-Flag (ab Schema 6). Ältere Encoder schreiben Bit 4 nie — die
+  // Abfrage ist damit auch für alte Ströme korrekt (Flag bleibt weg).
+  if (pflags & 16) b.uebung = true;
   if (pflags & 2) {
     const fuehrer = r.u8();
     const unterfuehrer = r.u8();

@@ -21,6 +21,7 @@ import {
   Sofortbedarf,
   VokabularWert,
   datumAusIso,
+  mitTransportVersion,
   staerke,
   unterbringungMWD,
   verpflegung,
@@ -323,7 +324,7 @@ function unveraendert(herkunft: Uint8Array, b: Erfassungsbogen): boolean {
 // ------------------------------------------------------------ Datei-Dialog
 
 export async function bogenSpeichern(b: Erfassungsbogen): Promise<void> {
-  const json = JSON.stringify(b, null, 2);
+  const json = JSON.stringify(mitTransportVersion(b), null, 2);
   const name = einheitAnzeigename(b.einheit).replace(/[^\wäöüÄÖÜß-]+/g, "_");
   if (istNativ()) {
     // In der App gibt es keinen Browser-Download: JSON übers Share-Sheet anbieten

@@ -595,6 +595,8 @@ function EinheitKarte(props: {
         <span className="muster-text">
           <span className="muster-name">
             {einheitAnzeigename(kopf.bogen.einheit)}
+            {/* Übungsbögen bleiben auch neben echten Meldungen unübersehbar. */}
+            {kopf.bogen.uebung ? <span className="uebung-badge">ÜBUNG</span> : null}
             {kopf.zugEtikett ? <span className="zug-badge"> {kopf.zugEtikett}</span> : null}
           </span>
           <span className="muster-sub">

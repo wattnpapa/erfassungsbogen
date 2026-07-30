@@ -18,6 +18,7 @@ import {
   StaerkeRolle,
   SCHEMA_VERSION,
   datumAusIso,
+  mitTransportVersion,
   zeitpunktAusIso,
   type Erfassungsbogen,
 } from "../model";
@@ -226,10 +227,23 @@ describe("pdfDokument()", () => {
     expect(datei!.relationship).toBe("Alternative");
     expect(datei!.src).toMatch(/^data:application\/json;base64,/);
 
-    // Data-URL zurück zu JSON dekodieren und mit dem Bogen vergleichen.
+    // Data-URL zurück zu JSON dekodieren und mit dem Bogen vergleichen —
+    // eingebettet wird die Transport-Version (5 ohne Übungs-Flag), damit
+    // ältere App-Stände das JSON weiter lesen können.
     const base64 = datei!.src.split(",")[1]!;
     const json = new TextDecoder().decode(Uint8Array.from(atob(base64), (c) => c.charCodeAt(0)));
-    expect(JSON.parse(json)).toEqual(b);
+    expect(JSON.parse(json)).toEqual(mitTransportVersion(b));
+  });
+
+  it("kennzeichnet Übungsbögen mit Wasserzeichen und Störer-Zeile", () => {
+    const b = { ...basisBogen(), uebung: true };
+    const dd = pdfDokument(b, QR);
+    expect((dd.watermark as { text?: string })?.text).toBe("ÜBUNG");
+    // Die erste Inhaltszeile ist die Störer-Zeile — sichtbar auch dort, wo das
+    // Wasserzeichen untergeht (Schwarzweiß-Kopie, blasser Druck).
+    expect(JSON.stringify((dd.content as unknown[])[0])).toContain("ÜBUNG");
+    // Echte Bögen bleiben unangetastet.
+    expect(pdfDokument(basisBogen(), QR).watermark).toBeUndefined();
   });
 
   it("kodiert Umlaute im eingebetteten JSON UTF-8-sauber", () => {

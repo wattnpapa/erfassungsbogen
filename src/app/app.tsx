@@ -1157,6 +1157,14 @@ function AppInhalt() {
         </p>
       )}
     </SeitenKopf>
+    {/* Übungs-Störer: volle Breite direkt unter dem Kopf, auf jedem Schritt.
+        Er hängt am Bogen (nicht an einem Geräte-Modus) und erscheint darum
+        auch, wenn ein fremder Übungsbogen gescannt wurde. */}
+    {bogen.uebung && (
+      <div className="uebungs-band" role="status">
+        <strong>ÜBUNG</strong> — Dieser Bogen ist als Übung gekennzeichnet und beschreibt keinen echten Einsatz.
+      </div>
+    )}
     <main id="inhalt" tabIndex={-1}>
       {/* Rückmeldungen (Vorlage gespeichert, Beispielbogen geöffnet …) gehören
           dorthin, wo die Aktion ausgelöst wurde. Ohne diese Zeile blieben sie

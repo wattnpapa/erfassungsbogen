@@ -8,6 +8,7 @@ import { describe, it, expect } from "vitest";
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { SchrittBuehne } from "../../test/schritt-buehne";
+import { neuerBogen } from "../hilfen";
 import { SchrittPersonal } from "./personal";
 
 const buehne = () => render(<SchrittBuehne komponente={SchrittPersonal} />);
@@ -102,5 +103,27 @@ describe("Schritt Personal", () => {
     const tabelle = screen.getByRole("table"); // Übernahme schaltet auf die Tabelle
     const werte = (within(tabelle).getAllByRole("textbox") as HTMLInputElement[]).map((f) => f.value);
     expect(werte).toEqual(["Max", "Muster", "Erika", "Musterfrau"]);
+  });
+
+  it("bietet Beispielnamen nur bei Übungsbögen an", async () => {
+    const nutzer = userEvent.setup();
+    render(<SchrittBuehne komponente={SchrittPersonal} bogen={{ ...neuerBogen(), uebung: true }} />);
+
+    await nutzer.click(screen.getByRole("button", { name: "Namen einfügen…" }));
+    const dialog = document.querySelector<HTMLDialogElement>("dialog[aria-label='Namen einfügen']")!;
+    await nutzer.click(within(dialog).getByRole("button", { name: "Beispielpersonen einfügen" }));
+
+    // Vorgabe 9 Personen — als Schnelleingabe-Tabelle sichtbar (Kopf + 9 Zeilen).
+    expect(within(screen.getByRole("table")).getAllByRole("row")).toHaveLength(10);
+  });
+
+  it("versteckt den Beispielnamen-Weg bei echten Bögen vollständig", async () => {
+    const nutzer = userEvent.setup();
+    buehne(); // frischer Bogen ohne Übungs-Flag
+
+    await nutzer.click(screen.getByRole("button", { name: "Namen einfügen…" }));
+
+    expect(screen.queryByRole("button", { name: "Beispielpersonen einfügen" })).toBeNull();
+    expect(screen.queryByText("Beispielnamen (Übung)")).toBeNull();
   });
 });

@@ -665,6 +665,7 @@ function bogenBauen(nr: number, ov: ThwOrtsverband, typCode: number, stanTreu: b
 
   const bogen: Erfassungsbogen = {
     schemaVersion: SCHEMA_VERSION,
+    uebung: true, // Beispielbogen: überall als Übung gekennzeichnet (Störer, PDF-Wasserzeichen)
     stand,
     einheit: {
       organisation: OrganisationsTyp.THW,
@@ -759,6 +760,7 @@ function grossbogenBauen(): BeispielBogen {
   const stand = datumAusIso("2026-07-16");
   const bogen: Erfassungsbogen = {
     schemaVersion: SCHEMA_VERSION,
+    uebung: true, // Beispielbogen: überall als Übung gekennzeichnet (Störer, PDF-Wasserzeichen)
     stand,
     einheit: {
       organisation: OrganisationsTyp.THW,

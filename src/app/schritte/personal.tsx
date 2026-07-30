@@ -18,6 +18,7 @@ import {
   verpflegung,
 } from "../../model";
 import { parseNamen } from "../personal-schnell";
+import { beispielPersonen } from "../beispielnamen";
 import { stanPersonalVorbelegung } from "../../vokabulare/thw-stan-personal";
 import { FE_TEXT, neuePerson, plausibilitaet, vokabularFuer } from "../hilfen";
 import { frageJaNein } from "../dialoge";
@@ -247,12 +248,22 @@ export function SchrittPersonal({ bogen, aendern }: SchrittProps) {
   const namenDialog = useRef<HTMLDialogElement>(null);
   const [namenText, setNamenText] = useState("");
   const namenVorschau = parseNamen(namenText);
+  // Anzahl für den Beispielnamen-Generator (nur Übungsbögen). Vorgabe 9:
+  // Trupp bis Gruppe, die häufigste Größenordnung in Übungslagen.
+  const [beispielAnzahl, setBeispielAnzahl] = useState(9);
 
   function namenUebernehmen() {
     if (namenVorschau.length === 0) return;
     aendern({ personal: [...bogen.personal, ...namenVorschau.map((n) => ({ ...neuePerson(), ...n }))] });
     setSchnell(true); // die frisch eingefügten Namen direkt als Tabelle zeigen
     setNamenText("");
+    namenDialog.current?.close();
+  }
+
+  function beispielnamenUebernehmen() {
+    const anzahl = Math.max(1, Math.min(99, beispielAnzahl));
+    aendern({ personal: [...bogen.personal, ...beispielPersonen(anzahl, bogen.personal)] });
+    setSchnell(true);
     namenDialog.current?.close();
   }
   const s = staerke(bogen);
@@ -449,6 +460,32 @@ export function SchrittPersonal({ bogen, aendern }: SchrittProps) {
               : `${namenVorschau.length} ${namenVorschau.length === 1 ? "Person" : "Personen"} übernehmen`}
           </button>
         </p>
+        {/* Beispielnamen nur bei Übungsbögen (Haken in Schritt 2): im echten
+            Einsatz existiert dieser Weg gar nicht erst — künstliche Daten
+            lassen sich dort auch nicht versehentlich erzeugen. */}
+        {bogen.uebung && (
+          <>
+            <h3>Beispielnamen (Übung)</h3>
+            <p className="hinweis">
+              Erzeugt erkennbar fiktive Personen mit zufälligem Namen, Geschlecht, Ernährung
+              und Fahrerlaubnis; Führungs- und Unterführerplätze werden passend zur Stärke verteilt.
+            </p>
+            <div className="zeile">
+              <Feld titel="Anzahl" schmal>
+                <input
+                  type="number"
+                  min={1}
+                  max={99}
+                  value={beispielAnzahl}
+                  onChange={(e) => setBeispielAnzahl(zahl(e.target.value))}
+                />
+              </Feld>
+              <button type="button" onClick={beispielnamenUebernehmen}>
+                Beispielpersonen einfügen
+              </button>
+            </div>
+          </>
+        )}
       </dialog>
     </section>
   );
