@@ -34,7 +34,15 @@ Given("ich öffne einen Bogen-Link mit beschädigtem Inhalt", async function (th
 When("ich den Link aus der Zwischenablage öffne", async function (this: EebWelt) {
   const url = await this.page.evaluate(() => navigator.clipboard.readText());
   if (!url.includes("#")) throw new Error(`Kein Bogen-Link in der Zwischenablage: „${url}"`);
-  await this.page.goto(url, { waitUntil: "domcontentloaded" });
+  // Nur die Nutzlast zählt: der Link trägt die Produktionsadresse (siehe
+  // EEB_URL_PREFIX), geöffnet wird er aber auf dem Prüfstand. Sonst prüfte die
+  // Runde den ausgelieferten Stand der echten Seite statt den eigenen Build —
+  // und schlüge bei jeder Schemaänderung fehl, bis veröffentlicht ist.
+  // Dazwischen leer laden: ein reiner Fragmentwechsel startet die Seite nicht
+  // neu — der Übergabe-Dialog stünde noch offen. Der Bogen soll aber ankommen
+  // wie auf einem zweiten Gerät.
+  await this.page.goto("about:blank");
+  await this.oeffneApp(url.slice(url.indexOf("#") + 1));
 });
 
 /**
