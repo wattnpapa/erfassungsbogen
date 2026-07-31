@@ -1,0 +1,132 @@
+{
+  "schemaVersion": 7,
+  "uebung": true,
+  "stand": 3448050,
+  "einheit": {
+    "organisation": 2,
+    "organisationName": "Freiwillige Feuerwehr Ganderkesee",
+    "einheitsTyp": {
+      "freitext": "Selbständiger Trupp"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Ortsfeuerwehr"
+        },
+        "name": "Bookholzberg"
+      },
+      {
+        "bezeichnung": {
+          "code": 1
+        },
+        "name": "Ganderkesee"
+      },
+      {
+        "bezeichnung": {
+          "code": 2
+        },
+        "name": "Oldenburg"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2394,
+    "zeitraumBis": 2396,
+    "ortAuftrag": "Überörtliche Hilfe Bookholzberg — Löschwasserversorgung im Pendelverkehr"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Ines",
+      "nachname": "Petersen",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "Truppführer/-in"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5556588449"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Atemschutzgeräteträger"
+        }
+      ]
+    },
+    {
+      "vorname": "Sven",
+      "nachname": "Schoone",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Maschinist/-in"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Maschinist"
+        }
+      ]
+    },
+    {
+      "vorname": "Sandra",
+      "nachname": "Meyer",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmitglied"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Atemschutzgeräteträger"
+        }
+      ]
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "TLF 2000"
+      },
+      "aenderungen": "Löschfahrzeug mit Truppbesatzung (Typ 2.1.1): FP 1 000 l/min, 1 800 l Löschwasser, Schnellangriff, 2 Atemschutzgeräte",
+      "kennzeichen": "OL-FW 1001",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Oldenburg",
+        "teile": [
+          36,
+          21,
+          1
+        ]
+      }
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 3,
+    "dieselLiter": 70,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": false,
+    "ruhezeitErforderlich": false
+  }
+}

@@ -246,21 +246,30 @@ vorbelegen. Es gibt zwei Quellen:
 - **Landesvorlagen (freitext-basiert, aus den Beispielbögen abgeleitet):** für
   alle übrigen Organisationen außer Polizei, Bundespolizei und Bundeswehr.
   Logik in [src/vokabulare/landesvorlagen.ts](../src/vokabulare/landesvorlagen.ts),
-  UI in `SchrittEinheit` ([src/app/schritte.tsx](../src/app/schritte.tsx)):
+  UI in `SchrittEinheit` ([src/app/schritte/einheit.tsx](../src/app/schritte/einheit.tsx)):
   erst Bundesland, dann Einheit wählen → Einheitstyp, Stärkeplätze (Namen offen)
-  und Fahrzeuge (ohne Kennzeichen/Funkrufname) werden gesetzt.
+  und Fahrzeuge (ohne Kennzeichen/Funkrufname) werden gesetzt. Die Einheitenliste
+  ist nach Regelwerk gruppiert, weil unter derselben Organisation und demselben
+  Bundesland mehrere nebeneinanderstehen können – in Niedersachsen etwa die
+  KatS-StAN und die Nds. Feuerwehrverordnung.
 
 **Konvention – Landesvorlagen pflegen sich selbst:** Jeder Beispielbogen unter
-`examples/katastrophenschutz/<bundesland>/*.json` wird beim Build per
-`import.meta.glob` eingelesen und steht automatisch als Landesvorlage der darin
-angegebenen Organisation und des Bundeslands zur Verfügung. Ein **neues
-Bundesland** ist nur ein neuer Unterordner, eine **neue Einheit** nur eine
-weitere JSON-Datei – beide erscheinen ohne Codeänderung. Kommen also künftig
-weitere StAN-Unterlagen der Länder als Beispielbögen hinzu (erzeugt von
-`scripts/kats-*-beispielboegen.mts`), sind sie damit auch als Vorlage
-verfügbar. Der Anzeigename eines Bundeslands wird bei Bedarf in
-`BUNDESLAND_LABEL` (in `landesvorlagen.ts`) ergänzt; unbekannte Ordner werden
-sonst kapitalisiert angezeigt.
+`examples/<bereich>/<bundesland>/*.json` wird beim Build per `import.meta.glob`
+eingelesen und steht automatisch als Landesvorlage der darin angegebenen
+Organisation und des Bundeslands zur Verfügung. Ein **neues Bundesland** ist nur
+ein neuer Unterordner, eine **neue Einheit** nur eine weitere JSON-Datei – beide
+erscheinen ohne Codeänderung. Kommen also künftig weitere StAN-Unterlagen oder
+Landesverordnungen als Beispielbögen hinzu (erzeugt von
+`scripts/kats-*-beispielboegen.mts` bzw. `scripts/fw-*-beispielboegen.mts`), sind
+sie damit auch als Vorlage verfügbar. Anzeigenamen werden bei Bedarf in
+`BUNDESLAND_LABEL` bzw. `BEREICH_LABEL` (in `landesvorlagen.ts`) ergänzt;
+unbekannte Ordner werden sonst kapitalisiert angezeigt.
+
+Ein **neuer Bereich** ist die einzige Änderung, die Code braucht: Er muss in
+`BEREICHE` (in `landesvorlagen.ts`) eingetragen und in den Glob-Mustern ergänzt
+werden. Damit bleiben die organisationseigenen Beispiele (`examples/thw/`,
+`examples/dlrg/`) außen vor – sie gelten bundes- bzw. verbandsweit und sind keine
+Landesvorlagen.
 
 ## Offene Punkte
 

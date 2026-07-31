@@ -70,6 +70,16 @@ Funktionalität: Bogen im Assistenten erfassen
     Dann sehe ich die Überschrift "Personal (3)"
     Und sehe ich die Überschrift "Fahrzeuge (1)"
 
+  Szenario: Landesvorlage aus der Feuerwehrverordnung des Landes steht neben dem Katastrophenschutz
+    Wenn ich das Feld "Organisation" auf "Feuerwehr" stelle
+    Und ich das Feld "Landesvorlage – Bundesland" auf "Niedersachsen" stelle
+    Und ich das Feld "Landesvorlage – Einheit" auf "Gruppe" stelle
+    Dann steht im Feld "Einheitstyp" der Wert "Gruppe"
+    Wenn ich zum Schritt "6. Übersicht" wechsle
+    # Gruppe nach § 2 Abs. 2 Satz 1 Nr. 3 Nds. FwVO: neun Funktionen, ein Löschfahrzeug
+    Dann sehe ich die Überschrift "Personal (9)"
+    Und sehe ich die Überschrift "Fahrzeuge (1)"
+
   Szenario: Einsatzdaten landen in der Übersicht
     Wenn ich zum Schritt "2. Einsatz" wechsle
     Und ich das Feld "Einsatzort / Auftrag" mit "Deichverteidigung Elsfleth" fülle
