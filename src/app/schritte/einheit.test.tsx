@@ -30,10 +30,13 @@ describe("Schritt Einheit", () => {
 
     await nutzer.type(screen.getByLabelText("Name (Pflicht)"), "Oldenburg");
 
-    const treffer = screen
-      .getAllByRole("listitem")
-      .find((li) => li.textContent?.startsWith("Oldenburg (NI)"))!;
-    expect(treffer).toBeDefined();
+    // Die OV-Liste lädt asynchron nach (dynamischer Import) — auf einer kalten
+    // Maschine steht sie beim Tippen noch nicht, daher warten statt zugreifen.
+    const treffer = await screen.findByText(
+      (_text, el) => el?.tagName === "LI" && el.textContent?.startsWith("Oldenburg (NI)") === true,
+      undefined,
+      { timeout: 5000 }, // 220 kB OV-Daten: ein kalter CI-Runner braucht länger als die Vorgabe von 1 s
+    );
     await nutzer.click(treffer);
 
     expect((screen.getByLabelText("Name (Pflicht)") as HTMLInputElement).value).toBe("Oldenburg (NI)");
