@@ -8,7 +8,7 @@ import { describe, it, expect } from "vitest";
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { SchrittBuehne } from "../../test/schritt-buehne";
-import { neuerBogen } from "../hilfen";
+import { neuePerson, neuerBogen } from "../hilfen";
 import { SchrittPersonal } from "./personal";
 
 const buehne = () => render(<SchrittBuehne komponente={SchrittPersonal} />);
@@ -115,6 +115,48 @@ describe("Schritt Personal", () => {
 
     // Vorgabe 9 Personen — als Schnelleingabe-Tabelle sichtbar (Kopf + 9 Zeilen).
     expect(within(screen.getByRole("table")).getAllByRole("row")).toHaveLength(10);
+  });
+
+  /**
+   * Nach einer Vorlage steht der Bogen voller namenloser Sollplätze. Wer dann
+   * Namen einfügt, will sie nicht hinter den leeren Zeilen wiederfinden: die
+   * leeren weichen, alles schon Ausgefüllte bleibt stehen.
+   */
+  it("räumt beim Einfügen von Beispielpersonen die namenlosen Vorlagenzeilen weg", async () => {
+    const nutzer = userEvent.setup();
+    const thomas = { ...neuePerson(), vorname: "Thomas", nachname: "Lange" };
+    render(
+      <SchrittBuehne
+        komponente={SchrittPersonal}
+        bogen={{ ...neuerBogen(), uebung: true, personal: [neuePerson(), thomas, neuePerson()] }}
+      />,
+    );
+
+    await nutzer.click(screen.getByRole("button", { name: "Namen einfügen…" }));
+    const dialog = document.querySelector<HTMLDialogElement>("dialog[aria-label='Namen einfügen']")!;
+    await nutzer.click(within(dialog).getByRole("button", { name: "Beispielpersonen einfügen" }));
+
+    // Thomas + 9 Beispielpersonen, die beiden leeren Zeilen sind weg.
+    const tabelle = screen.getByRole("table");
+    expect(within(tabelle).getAllByRole("row")).toHaveLength(11); // Kopf + 10
+    const werte = (within(tabelle).getAllByRole("textbox") as HTMLInputElement[]).map((f) => f.value);
+    expect(werte.slice(0, 2)).toEqual(["Thomas", "Lange"]);
+    expect(werte.some((v) => v === "")).toBe(false);
+  });
+
+  it("räumt die namenlosen Zeilen auch beim Einfügen einer Namensliste weg", async () => {
+    const nutzer = userEvent.setup();
+    render(
+      <SchrittBuehne komponente={SchrittPersonal} bogen={{ ...neuerBogen(), personal: [neuePerson(), neuePerson()] }} />,
+    );
+
+    await nutzer.click(screen.getByRole("button", { name: "Namen einfügen…" }));
+    const dialog = document.querySelector<HTMLDialogElement>("dialog[aria-label='Namen einfügen']")!;
+    await nutzer.type(within(dialog).getByRole("textbox"), "Muster, Max");
+    await nutzer.click(within(dialog).getByRole("button", { name: "1 Person übernehmen" }));
+
+    const werte = (within(screen.getByRole("table")).getAllByRole("textbox") as HTMLInputElement[]).map((f) => f.value);
+    expect(werte).toEqual(["Max", "Muster"]);
   });
 
   it("versteckt den Beispielnamen-Weg bei echten Bögen vollständig", async () => {

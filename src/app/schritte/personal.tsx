@@ -238,6 +238,15 @@ function PersonalSchnellTabelle(props: {
   );
 }
 
+/**
+ * Personen, die schon einen Namen tragen. Eingefügte Namen ersetzen die
+ * namenlosen Zeilen — etwa die Sollplätze einer Vorlage —, statt sich
+ * dahinter zu stellen; Ausgefülltes bleibt unangetastet.
+ */
+function benannte(personal: Person[]): Person[] {
+  return personal.filter((p) => p.vorname.trim() !== "" || p.nachname.trim() !== "");
+}
+
 export function SchrittPersonal({ bogen, aendern }: SchrittProps) {
   const nurStaerke = bogen.personalErfassung === PersonalErfassung.NUR_STAERKE;
   const vorlage = stanPersonalVorbelegung(bogen.einheit.organisation, bogen.einheit.einheitsTyp);
@@ -254,7 +263,7 @@ export function SchrittPersonal({ bogen, aendern }: SchrittProps) {
 
   function namenUebernehmen() {
     if (namenVorschau.length === 0) return;
-    aendern({ personal: [...bogen.personal, ...namenVorschau.map((n) => ({ ...neuePerson(), ...n }))] });
+    aendern({ personal: [...benannte(bogen.personal), ...namenVorschau.map((n) => ({ ...neuePerson(), ...n }))] });
     setSchnell(true); // die frisch eingefügten Namen direkt als Tabelle zeigen
     setNamenText("");
     namenDialog.current?.close();
@@ -262,7 +271,8 @@ export function SchrittPersonal({ bogen, aendern }: SchrittProps) {
 
   function beispielnamenUebernehmen() {
     const anzahl = Math.max(1, Math.min(99, beispielAnzahl));
-    aendern({ personal: [...bogen.personal, ...beispielPersonen(anzahl, bogen.personal)] });
+    const bestand = benannte(bogen.personal);
+    aendern({ personal: [...bestand, ...beispielPersonen(anzahl, bestand)] });
     setSchnell(true);
     namenDialog.current?.close();
   }
