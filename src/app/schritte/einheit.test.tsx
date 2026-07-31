@@ -78,10 +78,38 @@ describe("Schritt Einheit", () => {
     const nutzer = userEvent.setup();
     buehne();
 
-    await nutzer.click(screen.getByRole("button", { name: "+ Ebene hinzufügen" }));
+    await nutzer.click(screen.getByRole("button", { name: "+ übergeordnete Ebene" }));
     expect(screen.getAllByLabelText(/^Name/)).toHaveLength(2);
 
     await nutzer.click(screen.getByRole("button", { name: "✕" }));
     expect(screen.getAllByLabelText(/^Name/)).toHaveLength(1);
+  });
+
+  it("belegt beim Hinzufügen die jeweils nächsthöhere Ebene vor", async () => {
+    const nutzer = userEvent.setup();
+    buehne();
+
+    // THW startet mit dem OV (Code 1); hinzugefügte Ebenen steigen auf RB und LV.
+    expect((screen.getByLabelText("Ebene (eigene Einheit)") as HTMLSelectElement).value).toBe("1");
+    await nutzer.click(screen.getByRole("button", { name: "+ übergeordnete Ebene" }));
+    await nutzer.click(screen.getByRole("button", { name: "+ übergeordnete Ebene" }));
+
+    const uebergeordnet = screen.getAllByLabelText("Ebene (übergeordnet)") as HTMLSelectElement[];
+    expect(uebergeordnet.map((s) => s.value)).toEqual(["2", "3"]);
+  });
+
+  it("bietet auch der Feuerwehr eine Ebenen-Leiter an — Gemeinde zuerst", async () => {
+    const nutzer = userEvent.setup();
+    buehne();
+
+    await nutzer.selectOptions(screen.getByLabelText("Organisation"), "Feuerwehr");
+
+    const eigene = screen.getByLabelText("Ebene (eigene Einheit)") as HTMLSelectElement;
+    expect(eigene.value).toBe("1");
+    expect(eigene.selectedOptions[0]?.textContent).toContain("Gemeinde/Stadt");
+
+    await nutzer.click(screen.getByRole("button", { name: "+ übergeordnete Ebene" }));
+    const naechste = screen.getByLabelText("Ebene (übergeordnet)") as HTMLSelectElement;
+    expect(naechste.selectedOptions[0]?.textContent).toContain("Landkreis");
   });
 });

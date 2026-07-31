@@ -19,8 +19,8 @@ import { Auswahl, Feld, VokabAuswahl, type SchrittProps } from "./bausteine";
 
 // Die beiden großen Datenpakete laden erst mit Schritt 1, nicht mit dem
 // Start-Bundle: das THW-OV-Verzeichnis (~190 KB Quelldaten) und die
-// Landesvorlagen, die über ihren eager-Glob sämtliche KatS-Beispielbögen als
-// Daten enthalten (~300 KB). Einmal geladen, bleiben die Module im Cache —
+// Landesvorlagen, die über ihren eager-Glob sämtliche landesrechtlichen
+// Beispielbögen als Daten enthalten (~300 KB). Einmal geladen, bleiben die Module im Cache —
 // der useState-Startwert greift dann sofort, ohne Nachlade-Flackern.
 type OvDaten = typeof import("../../vokabulare/thw-ov") &
   typeof import("../../vokabulare/thw-ov-regionalstruktur");
@@ -213,7 +213,10 @@ export function SchrittEinheit({ bogen, aendern }: SchrittProps) {
   const vorlagenBundeslaender = lvModul && zeigeLandesvorlagen ? lvModul.landesvorlagenBundeslaender(e.organisation) : [];
   // Nach Organisationswechsel kann das gemerkte Bundesland unpassend sein.
   const aktBundesland = vorlagenBundeslaender.includes(vorlageBundesland) ? vorlageBundesland : "";
-  const vorlagenEinheiten = lvModul && aktBundesland ? lvModul.landesvorlagenEinheiten(e.organisation, aktBundesland) : [];
+  // Nach Regelwerk gruppiert: unter derselben Organisation und demselben
+  // Bundesland stehen z. B. KatS-StAN und Landes-Feuerwehrverordnung nebeneinander.
+  const vorlagenGruppen = lvModul && aktBundesland ? lvModul.landesvorlagenGruppen(e.organisation, aktBundesland) : [];
+  const vorlagenEinheiten = vorlagenGruppen.flatMap((g) => g.namen);
   const aktEinheit = vorlagenEinheiten.includes(vorlageEinheit) ? vorlageEinheit : "";
 
   async function landesvorlageAnwenden(name: string) {
@@ -313,27 +316,33 @@ export function SchrittEinheit({ bogen, aendern }: SchrittProps) {
                 }}
               >
                 <option value="">{aktBundesland ? "– Einheit wählen –" : "erst Bundesland wählen"}</option>
-                {vorlagenEinheiten.map((n) => (
-                  <option key={n} value={n}>{n}</option>
+                {vorlagenGruppen.map((g) => (
+                  <optgroup key={g.bereich} label={lvModul.bereichLabel(g.bereich)}>
+                    {g.namen.map((n) => (
+                      <option key={n} value={n}>{n}</option>
+                    ))}
+                  </optgroup>
                 ))}
               </Auswahl>
             </Feld>
           </div>
           <p className="hinweis">
-            Nach dem Vorbild der Katastrophenschutz-Stärke des Bundeslands: Einheitstyp,
-            Stärkeplätze (Namen offen) und Fahrzeuge werden vorbelegt und lassen sich anschließend anpassen.
+            Nach dem Vorbild der landesrechtlichen Einheiten des Bundeslands (Katastrophenschutz-Stärke,
+            Feuerwehrverordnung): Einheitstyp, Stärkeplätze (Namen offen) und Fahrzeuge werden vorbelegt
+            und lassen sich anschließend anpassen.
           </p>
         </>
       )}
 
       <h3>Zugehörigkeit / Kontaktstellen</h3>
       <p className="hinweis">
-        Die unterste Ebene ist die eigene Einheit. Aus ihrem Namen, der Organisation und dem
-        Einheitstyp bildet sich die Bezeichnung auf dem Bogen: <b>{einheitAnzeigename(e)}</b>
+        Die erste Ebene ist die eigene Einheit, jede weitere Zeile die nächsthöhere Stelle
+        {ebenen.length > 0 && <> ({ebenen.map((v) => v.name).join(" → ")})</>}.
+        Aus Name, Organisation und Einheitstyp bildet sich die Bezeichnung auf dem Bogen: <b>{einheitAnzeigename(e)}</b>
       </p>
       {e.hierarchie.map((h, i) => (
         <div className="zeile" key={i}>
-          <Feld titel="Ebene" schmal>
+          <Feld titel={i === 0 ? "Ebene (eigene Einheit)" : "Ebene (übergeordnet)"} schmal>
             <VokabAuswahl
               wert={h.bezeichnung}
               aendern={(v) => setE({ hierarchie: e.hierarchie.map((x, j) => (j === i ? { ...x, bezeichnung: v } : x)) })}
@@ -403,8 +412,18 @@ export function SchrittEinheit({ bogen, aendern }: SchrittProps) {
         </div>
       ))}
       <p>
-        <button type="button" onClick={() => setE({ hierarchie: [...e.hierarchie, { bezeichnung: {}, name: "" }] })}>
-          + Ebene hinzufügen
+        <button
+          type="button"
+          onClick={() => {
+            // Nächsthöhere Ebene vorbelegen: Codes steigen mit der Hierarchie
+            // (s. vokabulare/ebenen.ts), also die erste noch über allen
+            // erfassten Codes liegende Stufe. Bei Freitext-Ebenen bleibt offen.
+            const hoechste = Math.max(0, ...e.hierarchie.map((h) => h.bezeichnung.code ?? 0));
+            const naechste = ebenen.find((v) => v.code > hoechste);
+            setE({ hierarchie: [...e.hierarchie, { bezeichnung: naechste ? { code: naechste.code } : {}, name: "" }] });
+          }}
+        >
+          + übergeordnete Ebene
         </button>{" "}
         {e.organisation === OrganisationsTyp.THW && e.hierarchie.length === 1 && (
           <button

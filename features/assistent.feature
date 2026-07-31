@@ -39,7 +39,7 @@ Funktionalität: Bogen im Assistenten erfassen
     Wenn ich das Feld "Organisation" auf "Feuerwehr" stelle
     Und ich das Feld "Organisationsname (optional)" mit "Freiwillige Feuerwehr Wardenburg" fülle
     Und ich das Feld "Einheitstyp" mit "Löschzug" fülle
-    Und ich das Feld "Ebene" auf "Gemeinde – Gemeinde/Stadt" stelle
+    Und ich das Feld "Ebene (eigene Einheit)" auf "Gemeinde – Gemeinde/Stadt" stelle
     Und ich das Feld "Name (Pflicht)" mit "Wardenburg" fülle
     Und ich zum Schritt "6. Übersicht" wechsle
     Dann sehe ich den Hinweis "Feuerwehr — Freiwillige Feuerwehr Wardenburg"
@@ -55,7 +55,7 @@ Funktionalität: Bogen im Assistenten erfassen
 
   Szenario: Eine Ebene hinzufügen und wieder entfernen
     Wenn ich das Feld "Organisation" auf "Feuerwehr" stelle
-    Und ich auf "+ Ebene hinzufügen" klicke
+    Und ich auf "+ übergeordnete Ebene" klicke
     Und ich das Feld "Name (Pflicht)" mit "Wardenburg" fülle
     Dann sehe ich die Schaltfläche "✕"
     Wenn ich auf "✕" klicke
