@@ -65,6 +65,22 @@ When("ich in der Vorschlagsliste {string} wähle", async function (this: EebWelt
   await this.page.locator("ul.vorschlaege li").filter({ hasText: name }).first().click();
 });
 
+/**
+ * Klick in EINER Zeile der Einheitenliste. Nötig, sobald mehrere Einheiten
+ * gemeldet sind: „Details", „Abrücken" oder „Zusammenführen…" stehen dann in
+ * jeder Zeile, und ein globaler Klick träfe mehrere Knöpfe gleichen Namens.
+ */
+When(
+  "ich bei der Einheit {string} auf {string} klicke",
+  async function (this: EebWelt, einheit: string, name: string) {
+    await this.page
+      .locator(".einheit-zeile")
+      .filter({ hasText: einheit })
+      .getByRole("button", { name, exact: true })
+      .click();
+  },
+);
+
 When("ich in der Musterung {string} abwähle", async function (this: EebWelt, name: string) {
   await this.page.locator("label.muster-zeile").filter({ hasText: name }).locator("input").uncheck();
 });

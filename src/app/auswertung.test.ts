@@ -78,6 +78,17 @@ describe("aggregiere()", () => {
     expect(s.staerke.gesamt).toBe(3);
   });
 
+  it("ignoriert zusammengeführte Teile — ihre Zahlen stecken schon im Ziel", () => {
+    // Ohne diesen Ausschluss wäre ein zurückgekehrter Truppteil doppelt in der
+    // Stärke: einmal im Zielbogen, einmal als eigene Meldung.
+    const s = aggregiere([
+      meldung(bogen("A")),
+      meldung(bogen("B"), { status: MeldeStatus.AUFGEGANGEN }),
+    ]);
+    expect(s.einheiten).toBe(1);
+    expect(s.staerke.gesamt).toBe(3);
+  });
+
   it("zählt je Einheit nur die neueste Revision", () => {
     const alt = bogen("A", { stand: 100 });
     const neu = bogen("A", { stand: 105, personal: [person(StaerkeRolle.FUEHRER)] }); // nur 1 Person

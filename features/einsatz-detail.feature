@@ -46,6 +46,46 @@ Funktionalität: Einsatz-Sammlung führen (Meldekopf)
     Und ich auf "Abbrechen" klicke
     Dann sehe ich die Schaltfläche "Zug zuordnen"
 
+  Szenario: Bogen aufteilen — der Fachberater steht plötzlich einzeln
+    Wenn ich auf "Aufteilen…" klicke
+    Dann sehe ich den Hinweis "Der abgeteilte Teil braucht eine Bezeichnung."
+    Wenn ich das Feld "Bezeichnung des abgeteilten Teils" mit "Fachberater" fülle
+    Und ich "Rudolph, Johannes" ankreuze
+    Und ich auf "Aufteilen" klicke
+    Dann sehe ich die Überschrift "Einheiten (2)"
+    Und sehe ich den Hinweis "Fachberater"
+    Und sehe ich den Hinweis "abgeteilt aus"
+    # Die Stärke verteilt sich, sie verschwindet nicht: aus 1 / 0 / 2 / 3 werden
+    # zwei Meldungen, die zusammen wieder 3 ergeben.
+    Und sehe ich den Hinweis "Stärke 1 / 0 / 0 / 1"
+    Und sehe ich den Hinweis "Stärke 0 / 0 / 2 / 2"
+
+  Szenario: Aufgeteilte Teile wieder zusammenführen — der Zug sammelt sich
+    Wenn ich auf "Aufteilen…" klicke
+    Und ich das Feld "Bezeichnung des abgeteilten Teils" mit "Fachberater" fülle
+    Und ich "Rudolph, Johannes" ankreuze
+    Und ich auf "Aufteilen" klicke
+    Dann sehe ich die Überschrift "Einheiten (2)"
+    # Zusammenführen wird erst angeboten, wenn es einen zweiten Teil gibt — und
+    # nur zeilenweise: nach der Aufteilung trägt jede Zeile den Knopf.
+    Wenn ich bei der Einheit "Fachberater" auf "Zusammenführen…" klicke
+    Und ich das Feld "Bezeichnung danach" mit "" fülle
+    Und ich auf "Zusammenführen" klicke
+    # Die Einheit steht wieder mit ihrer vollen Stärke da, nichts doppelt.
+    Dann sehe ich den Hinweis "Stärke 1 / 0 / 2 / 3"
+    Und sehe ich den Hinweis "zusammengeführt"
+    Und sehe ich den Hinweis "aufgegangen in"
+
+  Szenario: Ohne zweiten Teil gibt es nichts zusammenzuführen
+    Dann sehe ich die Schaltfläche "Zusammenführen…" nicht
+
+  Szenario: Aufteilen abbrechen ändert nichts
+    Wenn ich auf "Aufteilen…" klicke
+    Und ich das Feld "Bezeichnung des abgeteilten Teils" mit "Fachberater" fülle
+    Und ich "Rudolph, Johannes" ankreuze
+    Und ich auf "Abbrechen" klicke
+    Dann sehe ich die Überschrift "Einheiten (1)"
+
   Szenario: Meldung entfernen fragt in der App zurück
     Wenn ich auf "Entfernen" klicke
     Dann sehe ich den Dialog "Meldung entfernen?"

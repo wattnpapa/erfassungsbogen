@@ -119,7 +119,7 @@ Zusammenspiel:
 | [uebergabe.feature](../features/uebergabe.feature) | QR-Code und Vollbild, PDF-Vorschau, PDF-Download, Link teilen — samt Runde „Link erzeugen → öffnen → Herkunft belegt → gegengezeichnet" |
 | [vorlagen.feature](../features/vorlagen.feature) | Vorlage speichern, umbenennen, Papierkorb, Musterung (Abwesende streichen) |
 | [einsatz-sammlung.feature](../features/einsatz-sammlung.feature) | Einsatz anlegen (Dialog, Pflichtfeld, Enter, Esc, Abbruch), Bogen aufnehmen |
-| [einsatz-detail.feature](../features/einsatz-detail.feature) | Summen, Vollansicht, Abrücken, Zug-Etikett, Folgemeldung/Historie/Diff, Sammel-PDF, CSV, Papierkorb |
+| [einsatz-detail.feature](../features/einsatz-detail.feature) | Summen, Vollansicht, Abrücken, Zug-Etikett, Aufteilen/Zusammenführen, Folgemeldung/Historie/Diff, Sammel-PDF, CSV, Papierkorb |
 | [daten-und-anzeige.feature](../features/daten-und-anzeige.feature) | Anzeigemodus Feld/Nacht, Datensicherung, „Alle Daten löschen", Pflichtangaben, Beispielbögen, kaputter Link |
 
 Der Prüfstand steht in [features/support/haken.ts](../features/support/haken.ts):
@@ -134,6 +134,16 @@ Der Prüfstand steht in [features/support/haken.ts](../features/support/haken.ts
 - **Wachhund gegen Systemdialoge.** Jedes `window.prompt/confirm/alert` lässt das
   Szenario scheitern — in der iOS-App bleiben sie unbeantwortet (siehe oben,
   „Rückfragen").
+- **Portprüfung vor dem Start.** Ist Port 5273 belegt, bricht die Suite mit
+  Klartext ab, statt zu laufen. Der Grund ist eine teure Falle: `vite
+  --strictPort` beendet sich bei belegtem Port still, und die Suite testet dann
+  gegen den FREMDEN Server unter derselben Adresse — im schlimmsten Fall gegen
+  den Build eines anderen Verzeichnisses (Haupt-Repo statt Worktree). Alte
+  Szenarien werden grün, nur die zur neuen Arbeit scheitern, und zwar mit
+  „Element nicht gefunden" statt mit dem wahren Grund. Damit es überhaupt nicht
+  dazu kommt, beendet `AfterAll` die ganze Prozessgruppe des Servers (`npx`
+  startet vite als Kind — ein Signal an npx allein ließe ihn weiterlaufen) und
+  wartet auf sein Ende, bevor cucumber aussteigt.
 
 Zwei Fallen beim Schreiben neuer Schritte:
 
@@ -157,6 +167,18 @@ localStorage-Hülle getrennt und unit-getestet.
 - [src/app/einsaetze.ts](../src/app/einsaetze.ts) — Speicher, Fingerabdruck
   (`einheitSchluessel`), Dedupe über inhaltsbasierte Eintrags-ID, Revisions-Historie
   (neueste je Einheit zählt), Zug-Etikett je Einheit, Import/Merge.
+- [src/app/aufteilen.ts](../src/app/aufteilen.ts) — Bogen aufteilen: Personal,
+  Fahrzeuge und (im Meldekopf-Modus) die Stärkezahlen auf Rest und abgeteilten
+  Teil verteilen; Kraftstoff bleibt beim Rest, die Verpflegungszahl zieht mit
+  der Stärke um. Oberfläche in
+  [src/app/aufteilen-ui.tsx](../src/app/aufteilen-ui.tsx).
+- [src/app/zusammenfuehren.ts](../src/app/zusammenfuehren.ts) — Gegenstück: Teile
+  wieder zu einer Meldung verschmelzen. Personal und Fahrzeuge werden
+  zusammengelegt (nicht entdoppelt — Teile einer Aufteilung sind
+  überschneidungsfrei), Sofortbedarf summiert, Ja/Nein-Angaben mit ODER
+  verknüpft. Ist ein Teil nur als Stärke gemeldet, führt das Ergebnis die Summen
+  als Zahlen und behält die bekannten Namen als Ansprechpartner. Oberfläche in
+  [src/app/zusammenfuehren-ui.tsx](../src/app/zusammenfuehren-ui.tsx).
 - [src/app/auswertung.ts](../src/app/auswertung.ts) — Summen über die aktuell
   anwesenden Einheiten (`aggregiere`) und Zwischensummen je Zug
   (`aggregiereNachZug`), aufgebaut auf denselben abgeleiteten Werten wie die
@@ -174,9 +196,37 @@ localStorage-Hülle getrennt und unit-getestet.
 
 Kernregeln: Historie stapeln (tägliche Neumeldung = neue Revision), Zuordnung per
 Fingerabdruck (vorgeschlagen, vom Menschen bestätigt/überschrieben), Idempotenz
-(gleicher Bogeninhalt erzeugt keine zweite Revision). Das optionale Feld
-`zugEtikett` bleibt abwärtskompatibel — alte Sammlungen ohne Etikett laden
-unverändert.
+(gleicher Bogeninhalt erzeugt keine zweite Revision). Die optionalen Felder
+`zugEtikett`, `teilEtikett` und `stammtVon` bleiben abwärtskompatibel — alte
+Sammlungen ohne sie laden unverändert.
+
+**Aufteilen.** Wird ein Zug zerrissen oder steht ein Fachberater plötzlich
+einzeln, entstehen aus einer Meldung zwei: der Rest wird als neue Revision
+derselben Einheit fortgeschrieben (die Diff-Ansicht zeigt die Abgänge dadurch
+von selbst), der abgeteilte Teil kommt als eigene Meldung dazu. Damit sich beide
+nicht als Revision überschreiben, hängt an seinem Fingerabdruck ein `|teil:N`;
+`teilEtikett` benennt ihn in Liste, CSV und Sammel-PDF. Beide Bögen entstehen
+lokal, tragen also bewusst **keine** Signatur und keinen Herkunfts-Payload der
+Ursprungsmeldung — die deckten den veränderten Inhalt nicht mehr. Die signierte
+Ursprungsfassung bleibt in der Historie.
+
+**Zusammenführen.** Sammelt sich der Zug wieder, nimmt eine Meldung die anderen
+auf: das Ziel bekommt eine neue Revision mit allem darin, die eingegliederten
+Teile bleiben mit ihrer Historie stehen. Ihr Status wird `AUFGEGANGEN` — bewusst
+nicht `ABGERUECKT`, denn abgerückt wären sie ein Abgang, den es nie gab; sie
+stecken jetzt in den Zahlen des Ziels. Aus den Summen fallen sie so oder so
+(`aktuelleMeldungen` zählt nur `ANWESEND`), doppelt gezählt wird nichts.
+Zusammengeführt wird nur innerhalb einer Einheit (gleicher Stamm-Fingerabdruck):
+zwei verschiedene Einheiten zu verschmelzen wäre kein Zusammenführen, sondern
+Datenverlust.
+
+Eine Falle steckt in der Revisionsreihenfolge: `istNeuer` wertet den Stand
+minutengenau und erst bei Gleichstand die Empfangszeit. Aufteilen und gleich
+wieder Zusammenführen fällt in dieselbe Minute — und bei schnellen Geräten in
+dieselbe Millisekunde. Dann bliebe die ALTE Fassung Revisionskopf und die Summen
+zeigten den Zustand vor der Änderung. Beide Mutationen setzen die Empfangszeit
+deshalb über `ablosendeEmpfangszeit` einen Millisekundenschritt über alle
+bisherigen Fassungen derselben Einheit.
 
 ## Desktop-App (Electron)
 

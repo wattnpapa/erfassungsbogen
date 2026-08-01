@@ -733,6 +733,31 @@
       font-size: 0.75rem; font-weight: 700; letter-spacing: 0.06em;
       vertical-align: 0.1em;
     }
+    /* Meldungen, die nicht mitzählen (abgerückt oder in eine andere Meldung
+       aufgegangen), treten zurück — dieselbe Handschrift wie die gestrichenen
+       Zeilen der Musterung. Die Nebenzeile sagt, welcher der beiden Fälle es
+       ist; der Name bleibt lesbar, nur eben durchgestrichen. */
+    .einheit-zeile.gestrichen { opacity: 0.55; }
+    .einheit-zeile.gestrichen .muster-name { text-decoration: line-through; }
+    /* Zug- und Teil-Kennzeichnung an einer gemeldeten Einheit. Ruhiger als der
+       Übungs-Störer daneben: sie ordnen ein, sie warnen nicht. Das Teil-Etikett
+       trägt den Akzent, weil es nach einer Aufteilung das einzige ist, was zwei
+       gleichnamige Zeilen unterscheidet. */
+    .zug-badge, .teil-badge {
+      display: inline-block; margin-left: 0.4rem; padding: 0 0.35rem;
+      border: 1px solid var(--rand); border-radius: 0.35rem;
+      font-size: 0.75rem; font-weight: 600; color: var(--text-2);
+      vertical-align: 0.1em; white-space: nowrap;
+    }
+    .teil-badge { border-color: var(--akzent); color: var(--akzent); }
+    /* Aufteilen-Feld in der Einheitenkarte: gleiche Handschrift wie die
+       ausklappbare Vollansicht, damit die Karte nicht in Kästen zerfällt. */
+    .aufteilen-panel { margin-top: 0.6rem; border-top: 1px solid var(--rand); padding-top: 0.4rem; }
+    .aufteilen-panel h4 { margin: 0 0 0.2rem; font-size: 0.9rem; color: var(--blau); }
+    .aufteilen-panel h5 { margin: 0.7rem 0 0; font-size: 0.85rem; }
+    .aufteilen-panel .muster-zeile { cursor: default; }
+    .aufteilen-vorschau { margin: 0.5rem 0 0.2rem; font-variant-numeric: tabular-nums; }
+    .aufteilen-fehler { color: var(--alarm); opacity: 1; }
     /* Such- und Sortierzeile über der Einheitenliste. Sitzt direkt unter der
        Überschrift, daher oben kein zusätzlicher Abstand; die Sortierung bekommt
        eine eigene, breitere Spur, sonst schneidet die Auswahl ihre Beschriftung ab. */

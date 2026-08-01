@@ -102,10 +102,25 @@ BeforeAll({ timeout: 180_000 }, async function () {
     // `detached`: `npx` startet vite als eigenes Kind. Ohne eigene Prozessgruppe
     // erwischt das SIGTERM am Ende nur npx, vite überlebt verwaist und hält den
     // Port — genau so entstand der Fremdserver, gegen den die Suite später lief.
-    server = spawn("npx", argumente, { stdio: "ignore", env: process.env, detached: true });
+    // stderr wird mitgelesen (statt "ignore"), damit ein Fehlstart seinen eigenen
+    // Grund nennen kann — der Exit-Code allein sagt nicht, ob dist fehlt, die
+    // Konfiguration kaputt ist oder der Port doch belegt war.
+    server = spawn("npx", argumente, {
+      stdio: ["ignore", "ignore", "pipe"],
+      env: process.env,
+      detached: true,
+    });
+    let meckern = "";
+    server.stderr?.on("data", (d: Buffer) => {
+      meckern = (meckern + d.toString()).slice(-2000);
+    });
     let gestorben: Error | undefined;
     server.once("exit", (code) => {
-      gestorben = new Error(`Der Prüfstand-Server (vite ${MODUS}) endete vorzeitig mit Code ${code}.`);
+      gestorben = new Error(
+        `Der Prüfstand-Server (vite ${MODUS}) endete vorzeitig mit Code ${code}.` +
+          (meckern.trim() ? `
+${meckern.trim()}` : ""),
+      );
     });
     await warteAufServer(BASIS_URL, () => gestorben);
   }
@@ -153,11 +168,24 @@ AfterAll(async function () {
   await browser?.close();
   // Die ganze Prozessgruppe (negative PID): `npx` allein zu beenden ließe vite
   // verwaist weiterlaufen — siehe die Begründung am `detached` oben.
-  if (server?.pid && server.exitCode === null) {
+  //
+  // Und auf das Ende WARTEN: ohne das steigt cucumber aus, bevor der Port
+  // freigegeben ist, und der unmittelbar folgende Lauf scheitert an
+  // `pruefePortFrei` — am eigenen Aufräumen statt an einem echten Fremden.
+  if (!server?.pid || server.exitCode !== null) return;
+  const p = server;
+  const beendet = new Promise<void>((fertig) => p.once("exit", () => fertig()));
+  const signalisieren = (signal: NodeJS.Signals) => {
     try {
-      process.kill(-server.pid, "SIGTERM");
+      process.kill(-p.pid!, signal);
     } catch {
-      server.kill("SIGTERM"); // Gruppe schon weg — dann reicht der Einzelne.
+      p.kill(signal); // Gruppe schon weg — dann reicht der Einzelne.
     }
+  };
+  signalisieren("SIGTERM");
+  const frist = new Promise<"haengt">((r) => setTimeout(() => r("haengt"), 3000));
+  if ((await Promise.race([beendet, frist])) === "haengt") {
+    signalisieren("SIGKILL");
+    await Promise.race([beendet, new Promise((r) => setTimeout(r, 1000))]);
   }
 });

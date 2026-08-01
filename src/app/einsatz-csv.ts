@@ -25,10 +25,13 @@ const QUELLE_LABEL: Record<MeldeQuelle, string> = {
   scan: "Scan",
   manuell: "Manuell",
   "pdf-import": "PDF-Import",
+  aufteilung: "Aufteilung",
+  zusammenfuehrung: "Zusammenführung",
 };
 
 const SPALTEN = [
   "Einheit",
+  "Teil",
   "Organisation",
   "Zug",
   "Stärke F",
@@ -83,6 +86,9 @@ function datenZeile(e: MeldeEintrag): string {
   const sb = b.sofortbedarf;
   return zeile([
     einheitName(b),
+    // Eigene Spalte statt Anhängsel am Namen: nach einer Aufteilung stehen
+    // sonst zwei gleichnamige Zeilen da, und filtern lässt sich das auch nicht.
+    e.teilEtikett ?? "",
     orgLabel(b.einheit.organisation),
     e.zugEtikett ?? "",
     st.fuehrer,
@@ -135,6 +141,7 @@ function summenZeile(meldungen: MeldeEintrag[]): string {
   }
   return zeile([
     `Summe (${meldungen.length} Einheiten)`,
+    "",
     "",
     "",
     acc.f, acc.u, acc.m, acc.gesamt,

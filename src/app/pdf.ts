@@ -120,6 +120,7 @@ export async function einsatzPdfErzeugen(einsatz: Einsatzsammlung, meldungen: Me
       qr: await qrErzeugen(m.bogen, herkunftBytes(m)),
       vorher,
       zugEtikett: m.zugEtikett,
+      teil: m.teilEtikett,
     });
   }
   const dd = einsatzPdfDokument(einsatz.name, boegenMitQr, einsatzDateiInhalt(einsatz));

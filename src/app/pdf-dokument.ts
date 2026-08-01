@@ -181,6 +181,8 @@ export interface SammelBogen {
   vorher?: Erfassungsbogen;
   /** Zug-/Verbandsetikett aus der Sammlung — Grundlage der Zwischensummen. */
   zugEtikett?: string;
+  /** Bezeichnung eines abgeteilten Truppteils (MeldeEintrag.teilEtikett). */
+  teil?: string;
 }
 
 /** Mehr Zeilen passen nicht sinnvoll in eine Tabellenzelle — der Rest wird gezählt. */
@@ -204,7 +206,7 @@ function uebersichtsTabelle(boegen: SammelBogen[]): Content {
     ],
   ];
   const summe = { fuehrer: 0, unterfuehrer: 0, mannschaft: 0, gesamt: 0, fahrzeuge: 0 };
-  for (const { bogen: b, vorher } of boegen) {
+  for (const { bogen: b, vorher, teil } of boegen) {
     const s = staerke(b);
     summe.fuehrer += s.fuehrer;
     summe.unterfuehrer += s.unterfuehrer;
@@ -227,11 +229,14 @@ function uebersichtsTabelle(boegen: SammelBogen[]): Content {
               ],
             };
     }
+    // Name, darunter bei Bedarf die Kennzeichnung eines abgeteilten Truppteils
+    // und der Übungs-Störer — beides muss in der Übersicht stehen, sonst sind
+    // zwei Zeilen derselben Einheit nicht auseinanderzuhalten.
+    const namensZeilen: Content[] = [{ text: einheitAnzeigename(b.einheit) }];
+    if (teil) namensZeilen.push({ text: teil, italics: true });
+    if (b.uebung) namensZeilen.push({ text: "ÜBUNG", bold: true, color: UEBUNG_FARBE });
     body.push([
-      // Übungsbögen bleiben auch in der Sammel-Übersicht als solche erkennbar.
-      b.uebung
-        ? { stack: [{ text: einheitAnzeigename(b.einheit) }, { text: "ÜBUNG", bold: true, color: UEBUNG_FARBE }] }
-        : { text: einheitAnzeigename(b.einheit) },
+      namensZeilen.length === 1 ? namensZeilen[0]! : { stack: namensZeilen },
       { text: zeitgruppe(b.stand) },
       { text: `${s.fuehrer} / ${s.unterfuehrer} / ${s.mannschaft} / ${s.gesamt}` },
       { text: `${b.fahrzeuge.length}` },

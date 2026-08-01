@@ -40,13 +40,21 @@ import {
   einsatzWiederherstellen,
   einsaetzePapierkorb,
   einheitZugEtikettSetzen,
+  meldungAufteilen,
+  meldungenZusammenfuehren,
   meldungEntfernen,
   meldungStatusSetzen,
   neuesteJeEinheit,
   revisionen,
+  stammSchluessel,
+  type AufteilungOptionen,
   type Einsatzsammlung,
   type MeldeEintrag,
+  type ZusammenfuehrungOptionen,
 } from "./einsaetze";
+import { AufteilenPanel } from "./aufteilen-ui";
+import { ZusammenfuehrenPanel } from "./zusammenfuehren-ui";
+import type { AufteilungsWahl } from "./aufteilen";
 import { aggregiere, aggregiereNachZug, type EinsatzSummen } from "./auswertung";
 import { SORTIERUNGEN, einheitenAnsicht, type EinheitenSortierung } from "./einheiten-liste";
 import { debugAktiv } from "./debug-plattform";
@@ -64,6 +72,8 @@ const QUELLE_LABEL: Record<MeldeEintrag["quelle"], string> = {
   scan: "Scan",
   manuell: "Manuell",
   "pdf-import": "PDF-Import",
+  aufteilung: "Aufteilung",
+  zusammenfuehrung: "Zusammenführung",
 };
 
 /** Kurzes Signatur-Etikett für eine Meldung (leer, wenn unsigniert empfangen). */
@@ -557,6 +567,8 @@ function EinheitKarte(props: {
   const [details, setDetails] = useState(false);
   const [historie, setHistorie] = useState(false);
   const [aenderungen, setAenderungen] = useState(false);
+  const [aufteilen, setAufteilen] = useState(false);
+  const [zusammenfuehren, setZusammenfuehren] = useState(false);
   // null = nicht in Bearbeitung; String = Entwurf des Zug-Etiketts.
   const [zugEntwurf, setZugEntwurf] = useState<string | null>(null);
   const revs = revisionen(alle, kopf.einheitSchluessel);
@@ -565,15 +577,47 @@ function EinheitKarte(props: {
   const vorige = revs[1];
   const kurz = vorige ? diffKurzfassung(bogenDiff(vorige.bogen, kopf.bogen)) : "";
   const abgerueckt = kopf.status === MeldeStatus.ABGERUECKT;
+  const aufgegangen = kopf.status === MeldeStatus.AUFGEGANGEN;
+  // Nur anwesende Meldungen zählen — und nur an ihnen sind Aufteilen und
+  // Zusammenführen sinnvoll.
+  const zaehlt = kopf.status === MeldeStatus.ANWESEND;
+  // Andere anwesende Teile derselben Einheit — die Gegenstücke zum Zusammenführen.
+  const geschwister = neuesteJeEinheit(alle).filter(
+    (e) =>
+      e.einheitSchluessel !== kopf.einheitSchluessel &&
+      stammSchluessel(e.einheitSchluessel) === stammSchluessel(kopf.einheitSchluessel) &&
+      e.status === MeldeStatus.ANWESEND,
+  );
+  const zielVonAufgegangen = kopf.aufgegangenIn
+    ? alle.find((e) => e.einheitSchluessel === kopf.aufgegangenIn!.einheitSchluessel)
+    : undefined;
+  // Herkunft eines abgeteilten Teils: Name der Einheit, aus der er stammt.
+  const stammt = kopf.stammtVon
+    ? alle.find((e) => e.einheitSchluessel === kopf.stammtVon!.einheitSchluessel)
+    : undefined;
 
   function statusUmschalten() {
-    meldungStatusSetzen(einsatzId, kopf.id, abgerueckt ? MeldeStatus.ANWESEND : MeldeStatus.ABGERUECKT);
+    // Aus „abgerückt" und „aufgegangen" führt derselbe Weg zurück: wieder
+    // eigenständig anwesend.
+    meldungStatusSetzen(einsatzId, kopf.id, zaehlt ? MeldeStatus.ABGERUECKT : MeldeStatus.ANWESEND);
     onGeaendert();
   }
 
   function zugSpeichern() {
     einheitZugEtikettSetzen(einsatzId, kopf.einheitSchluessel, zugEntwurf ?? "");
     setZugEntwurf(null);
+    onGeaendert();
+  }
+
+  function aufteilenAusfuehren(wahl: AufteilungsWahl, opt: AufteilungOptionen) {
+    meldungAufteilen(einsatzId, kopf.id, wahl, opt);
+    setAufteilen(false);
+    onGeaendert();
+  }
+
+  function zusammenfuehrenAusfuehren(teilIds: string[], opt: ZusammenfuehrungOptionen) {
+    meldungenZusammenfuehren(einsatzId, kopf.id, teilIds, opt);
+    setZusammenfuehren(false);
     onGeaendert();
   }
 
@@ -591,18 +635,22 @@ function EinheitKarte(props: {
   }
 
   return (
-    <div className={`einheit-zeile${abgerueckt ? " gestrichen" : ""}`}>
+    <div className={`einheit-zeile${zaehlt ? "" : " gestrichen"}`}>
       <div className="kopfzeile">
         <span className="muster-text">
           <span className="muster-name">
             {einheitAnzeigename(kopf.bogen.einheit)}
             {/* Übungsbögen bleiben auch neben echten Meldungen unübersehbar. */}
             {kopf.bogen.uebung ? <span className="uebung-badge">ÜBUNG</span> : null}
+            {/* Ohne diese Kennzeichnung stünde dieselbe Einheit nach einer
+                Aufteilung zweimal gleichnamig untereinander. */}
+            {kopf.teilEtikett ? <span className="teil-badge">{kopf.teilEtikett}</span> : null}
             {kopf.zugEtikett ? <span className="zug-badge"> {kopf.zugEtikett}</span> : null}
           </span>
           <span className="muster-sub">
             {orgLabel(kopf.bogen.einheit.organisation)} · Stärke {staerkeText(kopf.bogen)} · Stand {standText(kopf.bogen)} · {QUELLE_LABEL[kopf.quelle]}
             {abgerueckt ? " · abgerückt" : ""}
+            {aufgegangen ? " · zusammengeführt" : ""}
             {kopf.signatur ? <> · {signaturBadge(kopf)}</> : null}
           </span>
           {/* Folgemeldung: die Veränderung gehört in die Zeile, nicht erst hinter
@@ -610,6 +658,33 @@ function EinheitKarte(props: {
           {kurz && vorige && (
             <span className="muster-sub diff-kurz">
               seit {standText(vorige.bogen)}: {kurz}
+            </span>
+          )}
+          {kopf.aufgegangenIn && (
+            <span className="muster-sub">
+              aufgegangen in{" "}
+              {zielVonAufgegangen ? einheitAnzeigename(zielVonAufgegangen.bogen.einheit) : "eine andere Meldung"}
+              {zielVonAufgegangen?.teilEtikett ? ` (${zielVonAufgegangen.teilEtikett})` : ""}
+              {" am "}
+              {new Date(kopf.aufgegangenIn.zusammengefuehrtAm).toLocaleString("de-DE", {
+                day: "2-digit",
+                month: "2-digit",
+                hour: "2-digit",
+                minute: "2-digit",
+              })}
+            </span>
+          )}
+          {kopf.stammtVon && (
+            <span className="muster-sub">
+              abgeteilt aus {stammt ? einheitAnzeigename(stammt.bogen.einheit) : "einer Meldung"}
+              {kopf.stammtVon.teilEtikett ? ` (${kopf.stammtVon.teilEtikett})` : ""}
+              {" am "}
+              {new Date(kopf.stammtVon.abgeteiltAm).toLocaleString("de-DE", {
+                day: "2-digit",
+                month: "2-digit",
+                hour: "2-digit",
+                minute: "2-digit",
+              })}
             </span>
           )}
         </span>
@@ -625,10 +700,25 @@ function EinheitKarte(props: {
             </button>{" "}
           </>
         )}
-        <button type="button" onClick={statusUmschalten}>{abgerueckt ? "Als anwesend" : "Abrücken"}</button>{" "}
+        <button type="button" onClick={statusUmschalten}>{zaehlt ? "Abrücken" : "Als anwesend"}</button>{" "}
         <button type="button" onClick={() => setZugEntwurf(kopf.zugEtikett ?? "")}>
           {kopf.zugEtikett ? "Zug ändern" : "Zug zuordnen"}
         </button>{" "}
+        {zaehlt && (
+          <>
+            <button type="button" onClick={() => setAufteilen(!aufteilen)}>
+              {aufteilen ? "Aufteilen schließen" : "Aufteilen…"}
+            </button>{" "}
+          </>
+        )}
+        {/* Nur anbieten, wenn es überhaupt einen anderen Teil zum Eingliedern gibt. */}
+        {zaehlt && geschwister.length > 0 && (
+          <>
+            <button type="button" onClick={() => setZusammenfuehren(!zusammenfuehren)}>
+              {zusammenfuehren ? "Zusammenführen schließen" : "Zusammenführen…"}
+            </button>{" "}
+          </>
+        )}
         {revs.length > 1 && (
           <button type="button" onClick={() => setHistorie(!historie)}>
             {historie ? "Historie schließen" : `Historie (${revs.length})`}
@@ -638,6 +728,21 @@ function EinheitKarte(props: {
       </div>
       {aenderungen && vorige && <Aenderungen vorher={vorige.bogen} nachher={kopf.bogen} />}
       {details && <BogenDetails bogen={kopf.bogen} />}
+      {zusammenfuehren && geschwister.length > 0 && (
+        <ZusammenfuehrenPanel
+          ziel={kopf}
+          teile={geschwister}
+          onAbbrechen={() => setZusammenfuehren(false)}
+          onZusammenfuehren={zusammenfuehrenAusfuehren}
+        />
+      )}
+      {aufteilen && (
+        <AufteilenPanel
+          eintrag={kopf}
+          onAbbrechen={() => setAufteilen(false)}
+          onAufteilen={aufteilenAusfuehren}
+        />
+      )}
       {zugEntwurf !== null && (
         <div className="zug-bearbeiten">
           <input

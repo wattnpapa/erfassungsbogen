@@ -7,6 +7,7 @@ import {
   Fahrerlaubnis,
   Geschlecht,
   Ernaehrung,
+  staerke,
   type Erfassungsbogen,
   type Person,
 } from "../model";
@@ -30,6 +31,9 @@ import {
   meldungStatusSetzen,
   meldungEntfernen,
   einheitZugEtikettSetzen,
+  meldungAufteilen,
+  meldungenZusammenfuehren,
+  stammSchluessel,
   type Einsatzsammlung,
 } from "./einsaetze";
 
@@ -346,5 +350,209 @@ describe("Serialisierung", () => {
     };
     const liste = einsaetzeAusJson(JSON.stringify([alt]));
     expect(liste[0]!.eintraege[0]!.bogen.schemaVersion).toBe(SCHEMA_VERSION);
+  });
+});
+
+describe("meldungAufteilen()", () => {
+  /** Einsatz mit einer gemeldeten Einheit — Ausgangslage aller Aufteilungen. */
+  function mitMeldung(over: Partial<Erfassungsbogen> = {}, opt: Parameters<typeof meldungHinzufuegen>[2] = {}) {
+    const s = einsatzAnlegen("Hochwasser", EinsatzArt.EINSATZ);
+    const r = meldungHinzufuegen(s.id, bogen(over), { quelle: "scan", ...opt })!;
+    return { einsatzId: s.id, eintragId: r.eintrag.id };
+  }
+
+  const wahl = { teilEtikett: "Fachberater", personal: [0], fahrzeuge: [] };
+
+  it("macht aus einer Meldung zwei zählende Einheiten, ohne Stärke zu verlieren", () => {
+    const { einsatzId, eintragId } = mitMeldung();
+    const r = meldungAufteilen(einsatzId, eintragId, wahl)!;
+
+    expect(r.rest.einheitSchluessel).not.toBe(r.abgeteilt.einheitSchluessel);
+    const koepfe = neuesteJeEinheit(einsaetzeLaden()[0]!.eintraege);
+    expect(koepfe).toHaveLength(2);
+    // Der Rest löst die Ursprungsmeldung als neueste Fassung seiner Einheit ab.
+    expect(koepfe.map((e) => e.id)).toContain(r.rest.id);
+    expect(koepfe.map((e) => e.id)).not.toContain(eintragId);
+    expect(koepfe.reduce((n, e) => n + staerke(e.bogen).gesamt, 0)).toBe(2);
+  });
+
+  it("behält die Ursprungsmeldung als Revision des Rests (Historie bleibt lesbar)", () => {
+    const { einsatzId, eintragId } = mitMeldung();
+    const r = meldungAufteilen(einsatzId, eintragId, wahl)!;
+    const revs = revisionen(einsaetzeLaden()[0]!.eintraege, r.rest.einheitSchluessel);
+    expect(revs.map((e) => e.id)).toEqual([r.rest.id, eintragId]);
+  });
+
+  it("kennzeichnet den abgeteilten Teil und hält seine Herkunft fest", () => {
+    const { einsatzId, eintragId } = mitMeldung();
+    const r = meldungAufteilen(einsatzId, eintragId, wahl)!;
+    expect(r.abgeteilt.teilEtikett).toBe("Fachberater");
+    expect(r.abgeteilt.quelle).toBe("aufteilung");
+    expect(r.abgeteilt.stammtVon?.einheitSchluessel).toBe(r.rest.einheitSchluessel);
+    expect(r.rest.teilEtikett).toBeUndefined();
+    expect(r.rest.quelle).toBe("aufteilung");
+  });
+
+  it("überträgt Signatur und Herkunfts-Payload NICHT — sie deckten den Inhalt nicht mehr", () => {
+    const { einsatzId, eintragId } = mitMeldung(
+      {},
+      { signatur: { zustand: "gueltig", pubkey: "ab".repeat(32) }, herkunft: "payload" },
+    );
+    const r = meldungAufteilen(einsatzId, eintragId, wahl)!;
+    for (const e of [r.rest, r.abgeteilt]) {
+      expect(e.signatur).toBeUndefined();
+      expect(e.herkunft).toBeUndefined();
+    }
+    // Die signierte Ursprungsfassung bleibt in der Historie erhalten.
+    expect(einsaetzeLaden()[0]!.eintraege.find((e) => e.id === eintragId)?.signatur?.zustand).toBe("gueltig");
+  });
+
+  it("kann den abgeteilten Teil sofort als abgerückt führen", () => {
+    const { einsatzId, eintragId } = mitMeldung();
+    const r = meldungAufteilen(einsatzId, eintragId, wahl, { status: MeldeStatus.ABGERUECKT })!;
+    expect(r.abgeteilt.status).toBe(MeldeStatus.ABGERUECKT);
+    expect(r.rest.status).toBe(MeldeStatus.ANWESEND);
+  });
+
+  it("erbt das Zug-Etikett, lässt es aber gezielt umsetzen und leeren", () => {
+    const a = mitMeldung();
+    meldungHinzufuegen(a.einsatzId, bogen(), {});
+    einheitZugEtikettSetzen(a.einsatzId, einheitSchluessel(bogen().einheit), "2. Zug");
+    const geerbt = meldungAufteilen(a.einsatzId, a.eintragId, wahl)!;
+    expect(geerbt.abgeteilt.zugEtikett).toBe("2. Zug");
+
+    const b = mitMeldung();
+    einheitZugEtikettSetzen(b.einsatzId, einheitSchluessel(bogen().einheit), "2. Zug");
+    expect(meldungAufteilen(b.einsatzId, b.eintragId, wahl, { zugEtikett: "3. Zug" })!.abgeteilt.zugEtikett).toBe("3. Zug");
+
+    const c = mitMeldung();
+    einheitZugEtikettSetzen(c.einsatzId, einheitSchluessel(bogen().einheit), "2. Zug");
+    expect(meldungAufteilen(c.einsatzId, c.eintragId, wahl, { zugEtikett: "  " })!.abgeteilt.zugEtikett).toBeUndefined();
+  });
+
+  it("hängt weitere Teile an denselben Stamm statt sie zu verschachteln", () => {
+    const { einsatzId, eintragId } = mitMeldung();
+    const erste = meldungAufteilen(einsatzId, eintragId, { ...wahl, personal: [0] })!;
+    const zweite = meldungAufteilen(einsatzId, erste.rest.id, { teilEtikett: "Trupp", personal: [0], fahrzeuge: [] })!;
+
+    expect(stammSchluessel(zweite.abgeteilt.einheitSchluessel)).toBe(erste.rest.einheitSchluessel);
+    expect(zweite.abgeteilt.einheitSchluessel).not.toBe(erste.abgeteilt.einheitSchluessel);
+    expect(neuesteJeEinheit(einsaetzeLaden()[0]!.eintraege)).toHaveLength(3);
+  });
+
+  it("übersteht die Serialisierung mit Teil-Etikett und Herkunft", () => {
+    const { einsatzId, eintragId } = mitMeldung();
+    meldungAufteilen(einsatzId, eintragId, wahl);
+    const wieder = einsaetzeAusJson(einsaetzeZuJson(einsaetzeLaden()));
+    const teil = wieder[0]!.eintraege.find((e) => e.teilEtikett === "Fachberater");
+    expect(teil?.stammtVon?.abgeteiltAm).toBeGreaterThan(0);
+  });
+
+  it("liefert null für unbekannten Einsatz oder Eintrag", () => {
+    const { einsatzId, eintragId } = mitMeldung();
+    expect(meldungAufteilen("gibts-nicht", eintragId, wahl)).toBeNull();
+    expect(meldungAufteilen(einsatzId, "gibts-nicht", wahl)).toBeNull();
+  });
+
+  it("wirft bei einer Auswahl, die den Rest leer ließe", () => {
+    const { einsatzId, eintragId } = mitMeldung();
+    expect(() => meldungAufteilen(einsatzId, eintragId, { teilEtikett: "Alles", personal: [0, 1], fahrzeuge: [0] })).toThrow();
+  });
+});
+
+describe("meldungenZusammenfuehren()", () => {
+  /** Einsatz mit einer aufgeteilten Einheit — Ausgangslage des Zusammenführens. */
+  function aufgeteilt() {
+    const s = einsatzAnlegen("Hochwasser", EinsatzArt.EINSATZ);
+    const erst = meldungHinzufuegen(s.id, bogen(), { quelle: "scan" })!;
+    const r = meldungAufteilen(s.id, erst.eintrag.id, {
+      teilEtikett: "Fachberater",
+      personal: [0],
+      fahrzeuge: [],
+    })!;
+    return { einsatzId: s.id, rest: r.rest, teil: r.abgeteilt };
+  }
+
+  it("führt den Teil zurück und zählt die Einheit wieder als eine", () => {
+    const { einsatzId, rest, teil } = aufgeteilt();
+    const r = meldungenZusammenfuehren(einsatzId, rest.id, [teil.id])!;
+
+    const koepfe = neuesteJeEinheit(einsaetzeLaden()[0]!.eintraege);
+    const zaehlend = koepfe.filter((e) => e.status === MeldeStatus.ANWESEND);
+    expect(zaehlend).toHaveLength(1);
+    expect(staerke(zaehlend[0]!.bogen).gesamt).toBe(2); // nichts doppelt gezählt
+    expect(r.ziel.quelle).toBe("zusammenfuehrung");
+  });
+
+  it("führt den aufgegangenen Teil nicht als abgerückt, sondern als aufgegangen", () => {
+    const { einsatzId, rest, teil } = aufgeteilt();
+    const r = meldungenZusammenfuehren(einsatzId, rest.id, [teil.id])!;
+    expect(r.aufgegangen[0]!.status).toBe(MeldeStatus.AUFGEGANGEN);
+    expect(r.aufgegangen[0]!.status).not.toBe(MeldeStatus.ABGERUECKT);
+    expect(r.aufgegangen[0]!.aufgegangenIn?.einheitSchluessel).toBe(rest.einheitSchluessel);
+  });
+
+  it("lässt die Historie des aufgegangenen Teils stehen", () => {
+    const { einsatzId, rest, teil } = aufgeteilt();
+    meldungenZusammenfuehren(einsatzId, rest.id, [teil.id]);
+    const eintraege = einsaetzeLaden()[0]!.eintraege;
+    expect(eintraege.some((e) => e.id === teil.id)).toBe(true);
+    expect(revisionen(eintraege, teil.einheitSchluessel)).toHaveLength(1);
+  });
+
+  it("nimmt die Teil-Bezeichnung weg, wenn die Einheit wieder ganz ist", () => {
+    const { einsatzId, rest, teil } = aufgeteilt();
+    // Erst dem Rest selbst eine Bezeichnung geben, damit das Leeren sichtbar wird.
+    const mitEtikett = meldungAufteilen(einsatzId, rest.id, {
+      teilEtikett: "Trupp",
+      personal: [0],
+      fahrzeuge: [],
+    })!;
+    const r = meldungenZusammenfuehren(einsatzId, mitEtikett.abgeteilt.id, [teil.id], { teilEtikett: "" })!;
+    expect(r.ziel.teilEtikett).toBeUndefined();
+  });
+
+  it("behält die bisherige Bezeichnung ohne Angabe", () => {
+    const { einsatzId, rest, teil } = aufgeteilt();
+    const r = meldungenZusammenfuehren(einsatzId, teil.id, [rest.id])!;
+    expect(r.ziel.teilEtikett).toBe("Fachberater");
+  });
+
+  it("weist Teile fremder Einheiten ab", () => {
+    const { einsatzId, rest } = aufgeteilt();
+    const fremd = meldungHinzufuegen(einsatzId, bogen({
+      einheit: { ...bogen().einheit, hierarchie: [{ bezeichnung: { code: 1 }, name: "OV Wardenburg" }] },
+    }), { quelle: "scan" })!;
+    expect(() => meldungenZusammenfuehren(einsatzId, rest.id, [fremd.eintrag.id])).toThrow(/derselben Einheit/);
+  });
+
+  it("weist das Zusammenführen mit sich selbst ab", () => {
+    const { einsatzId, rest } = aufgeteilt();
+    expect(() => meldungenZusammenfuehren(einsatzId, rest.id, [rest.id])).toThrow(/mit sich selbst/);
+  });
+
+  it("holt einen aufgegangenen Teil über den Status zurück und löscht den Verweis", () => {
+    const { einsatzId, rest, teil } = aufgeteilt();
+    meldungenZusammenfuehren(einsatzId, rest.id, [teil.id]);
+    meldungStatusSetzen(einsatzId, teil.id, MeldeStatus.ANWESEND);
+    const wieder = einsaetzeLaden()[0]!.eintraege.find((e) => e.id === teil.id)!;
+    expect(wieder.status).toBe(MeldeStatus.ANWESEND);
+    expect(wieder.aufgegangenIn).toBeUndefined();
+  });
+
+  it("übersteht die Serialisierung mit Status und Verweis", () => {
+    const { einsatzId, rest, teil } = aufgeteilt();
+    meldungenZusammenfuehren(einsatzId, rest.id, [teil.id]);
+    const wieder = einsaetzeAusJson(einsaetzeZuJson(einsaetzeLaden()));
+    const auf = wieder[0]!.eintraege.find((e) => e.id === teil.id)!;
+    expect(auf.status).toBe(MeldeStatus.AUFGEGANGEN);
+    expect(auf.aufgegangenIn?.zusammengefuehrtAm).toBeGreaterThan(0);
+  });
+
+  it("liefert null für unbekannten Einsatz, Ziel oder Teil", () => {
+    const { einsatzId, rest, teil } = aufgeteilt();
+    expect(meldungenZusammenfuehren("gibts-nicht", rest.id, [teil.id])).toBeNull();
+    expect(meldungenZusammenfuehren(einsatzId, "gibts-nicht", [teil.id])).toBeNull();
+    expect(meldungenZusammenfuehren(einsatzId, rest.id, ["gibts-nicht"])).toBeNull();
   });
 });

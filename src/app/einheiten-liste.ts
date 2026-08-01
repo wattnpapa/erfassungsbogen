@@ -8,9 +8,9 @@
  *
  *  - SUCHE: alle Wörter müssen treffen (UND), Groß/Klein und Akzente egal.
  *    Gesucht wird über das, was auf der Karte bzw. im Funkverkehr steht —
- *    Einheit, Organisation, Ort/Zugehörigkeit, Zug-Etikett, Kennzeichen und
- *    Funkrufname. Nicht über Personennamen: die Liste ist eine Einheitenliste,
- *    und die Namen stehen ausgeklappt in den Details.
+ *    Einheit, Organisation, Ort/Zugehörigkeit, Zug- und Teil-Etikett,
+ *    Kennzeichen und Funkrufname. Nicht über Personennamen: die Liste ist eine
+ *    Einheitenliste, und die Namen stehen ausgeklappt in den Details.
  *  - SORTIERUNG: umschaltbar, immer mit dem Anzeigenamen als letztem
  *    Vergleich, damit die Reihenfolge bei Gleichstand stabil bleibt.
  *
@@ -49,6 +49,7 @@ function suchtext(e: MeldeEintrag): string {
     orgLabel(einheit.organisation),
     einheit.organisationName ?? "",
     e.zugEtikett ?? "",
+    e.teilEtikett ?? "",
     ...einheit.hierarchie.flatMap((h) => [h.name, h.kurz ?? ""]),
     ...e.bogen.fahrzeuge.flatMap((f) => [kennzeichenText(f), funkrufText(f, ort)]),
   ];

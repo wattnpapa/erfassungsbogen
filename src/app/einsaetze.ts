@@ -19,7 +19,9 @@
  * localStorage-Hülle getrennt und unit-getestet.
  */
 
-import type { Einheit, Erfassungsbogen } from "../model";
+import { jetztZeitpunkt, type Einheit, type Erfassungsbogen } from "../model";
+import { teileBogen, type AufteilungsWahl } from "./aufteilen";
+import { fuegeZusammen } from "./zusammenfuehren";
 import { migriereBogen } from "./hilfen";
 import { aktive, imPapierkorb, papierkorbBereinigt } from "./papierkorb";
 
@@ -32,14 +34,29 @@ export enum EinsatzArt {
   VERANSTALTUNG = 2,
 }
 
-/** Anwesenheit einer Einheit vor Ort — steuert, ob sie in aktuelle Summen zählt. */
+/**
+ * Anwesenheit einer Einheit vor Ort — steuert, ob sie in aktuelle Summen zählt.
+ * Nur ANWESEND zählt; die anderen bleiben in der Historie sichtbar.
+ *
+ * AUFGEGANGEN trennt zwei Dinge, die sonst verwechselt würden: ein
+ * zusammengeführter Truppteil ist NICHT abgerückt — er ist wieder Teil seiner
+ * Einheit und steckt in deren Zahlen. Als „abgerückt" gemeldet, läse die
+ * Führungsstelle einen Abgang, den es nie gab.
+ */
 export enum MeldeStatus {
   ANWESEND = 0,
   ABGERUECKT = 1,
+  AUFGEGANGEN = 2,
 }
 
-/** Wie kam die Meldung in die Sammlung? (Herkunftsnachweis) */
-export type MeldeQuelle = "scan" | "manuell" | "pdf-import";
+/**
+ * Wie kam die Meldung in die Sammlung? (Herkunftsnachweis)
+ * „aufteilung" und „zusammenfuehrung" sind die Quellen, die hier vor Ort
+ * ENTSTEHEN statt anzukommen: der Bogen wurde aus einer anderen Meldung
+ * herausgetrennt bzw. aus mehreren verschmolzen (siehe {@link meldungAufteilen},
+ * {@link meldungenZusammenfuehren}).
+ */
+export type MeldeQuelle = "scan" | "manuell" | "pdf-import" | "aufteilung" | "zusammenfuehrung";
 
 /**
  * Ergebnis der Signaturprüfung beim Empfang (nur gespeichert, wenn der Transport
@@ -69,6 +86,31 @@ export interface MeldeEintrag {
   status: MeldeStatus;
   /** Optionales Verbands-/Zug-Etikett aus einem gesammelten Bündel. */
   zugEtikett?: string;
+  /**
+   * Bezeichnung eines abgeteilten Truppteils („Fachberater", „Rest 2. Zug").
+   * Gesetzt, sobald eine Einheit aufgeteilt wurde — sonst stünde dieselbe
+   * Einheit zweimal gleichnamig in der Liste. Bewusst am EINTRAG und nicht im
+   * Bogen: kein Schemawechsel, keine QR-Bytes; die Sammlung trägt es durch
+   * Sammel-PDF und Einsatz-Transport mit. Siehe aufteilen.ts.
+   */
+  teilEtikett?: string;
+  /**
+   * Wohin ein Teil zusammengeführt wurde (Status AUFGEGANGEN) — Gegenstück zu
+   * {@link MeldeEintrag.stammtVon}. Zeigt in der Liste, wo die Zahlen dieses
+   * Teils jetzt stecken.
+   */
+  aufgegangenIn?: {
+    einheitSchluessel: string;
+    zusammengefuehrtAm: number; // Date.now()
+  };
+  /** Woher ein abgeteilter Teil stammt — Herkunftsspur der Aufteilung. */
+  stammtVon?: {
+    /** Fingerabdruck der Einheit, aus der abgeteilt wurde. */
+    einheitSchluessel: string;
+    /** Deren Teil-Bezeichnung, falls schon sie ein Teil war. */
+    teilEtikett?: string;
+    abgeteiltAm: number; // Date.now()
+  };
   /** Signaturstatus des Empfangstransports (fehlt = unsigniert empfangen). */
   signatur?: EintragSignatur;
   /**
@@ -111,6 +153,33 @@ export function einheitSchluessel(e: Einheit): string {
   const typ = e.einheitsTyp.code != null ? `c${e.einheitsTyp.code}` : normText(e.einheitsTyp.freitext);
   if (e.standortRef != null) return `ref:${e.standortRef}|${typ}`;
   return `org:${e.organisation}|${normText(e.organisationName)}|${typ}|${normText(e.hierarchie[0]?.name)}`;
+}
+
+/**
+ * Anhängsel, das einen abgeteilten Truppteil vom Rest der Einheit unterscheidet.
+ * Ohne ihn hätten beide denselben Fingerabdruck und würden sich gegenseitig als
+ * Revision überschreiben — nur einer zählte in den Summen.
+ */
+const TEIL_TRENNER = "|teil:";
+
+/** Fingerabdruck ohne Teil-Anhängsel — alle Teile einer Einheit teilen ihn. */
+export function stammSchluessel(schluessel: string): string {
+  const i = schluessel.indexOf(TEIL_TRENNER);
+  return i < 0 ? schluessel : schluessel.slice(0, i);
+}
+
+/**
+ * Nächster freier Teil-Schlüssel zu einer Einheit. Teile eines schon geteilten
+ * Teils hängen am selben Stamm, damit aus wiederholtem Aufteilen keine
+ * verschachtelten Schlüssel werden.
+ */
+export function freierTeilSchluessel(vergeben: Iterable<string>, basis: string): string {
+  const stamm = stammSchluessel(basis);
+  const belegt = new Set(vergeben);
+  for (let n = 1; ; n++) {
+    const k = `${stamm}${TEIL_TRENNER}${n}`;
+    if (!belegt.has(k)) return k;
+  }
 }
 
 /** FNV-1a (32 Bit) über einen String → 8-stelliger Hex. Deterministisch, kryptofrei (nur Dedupe). */
@@ -231,6 +300,25 @@ export function einsaetzePapierkorb(): Einsatzsammlung[] {
 
 export function einsaetzeSpeichern(liste: Einsatzsammlung[]): void {
   speicher()?.setItem(SPEICHER_SCHLUESSEL, einsaetzeZuJson(liste));
+}
+
+/**
+ * Empfangszeit für eine hier vor Ort erzeugte Fassung, die die bisherige
+ * ablösen MUSS (Aufteilen, Zusammenführen).
+ *
+ * Der Revisionsvergleich wertet den Stand minutengenau und erst bei Gleichstand
+ * die Empfangszeit ({@link istNeuer}). Zwei Schritte in derselben Minute — beim
+ * Aufteilen und gleich wieder Zusammenführen der Normalfall — haben denselben
+ * Stand; fallen sie zusätzlich in dieselbe Millisekunde, bliebe die ALTE Fassung
+ * Revisionskopf und die Summen zeigten den Zustand vor der Änderung. Ein
+ * Millisekundenschritt über die bisherigen Fassungen hinaus macht die Reihenfolge
+ * eindeutig.
+ */
+function ablosendeEmpfangszeit(eintraege: MeldeEintrag[], einheitSchl: string, jetzt: number): number {
+  return Math.max(
+    jetzt,
+    ...eintraege.filter((e) => e.einheitSchluessel === einheitSchl).map((e) => e.empfangenAm + 1),
+  );
 }
 
 function neueId(): string {
@@ -369,6 +457,9 @@ export function meldungStatusSetzen(einsatzId: string, eintragId: string, status
   const e = s.eintraege.find((x) => x.id === eintragId);
   if (!e) return;
   e.status = status;
+  // Wird ein aufgegangener Teil wieder eigenständig geführt, ist der Verweis auf
+  // das Ziel überholt — er stünde sonst an einer Meldung, die wieder mitzählt.
+  if (status !== MeldeStatus.AUFGEGANGEN) delete e.aufgegangenIn;
   s.geaendert = Date.now();
   einsaetzeSpeichern(liste);
 }
@@ -380,6 +471,179 @@ export function meldungEntfernen(einsatzId: string, eintragId: string): void {
   s.eintraege = s.eintraege.filter((e) => e.id !== eintragId);
   s.geaendert = Date.now();
   einsaetzeSpeichern(liste);
+}
+
+export interface AufteilungOptionen {
+  /** Status des abgeteilten Teils — „abgerückt", wenn er den Einsatz verlässt. */
+  status?: MeldeStatus;
+  /**
+   * Zug-Etikett des abgeteilten Teils. Fehlt das Feld, erbt er das des
+   * Ursprungs; ein leerer Text stellt ihn bewusst zugfrei.
+   */
+  zugEtikett?: string;
+}
+
+export interface AufteilungErgebnis {
+  /** Neue Revision der Einheit, die weiterbesteht. */
+  rest: MeldeEintrag;
+  /** Der abgeteilte Teil als eigene Meldung mit eigenem Fingerabdruck. */
+  abgeteilt: MeldeEintrag;
+}
+
+/**
+ * Eine Meldung aufteilen: der Rest wird als neue Revision derselben Einheit
+ * fortgeschrieben (die Änderungsansicht zeigt die Abgänge dadurch von selbst),
+ * der abgeteilte Teil kommt als eigenständige Meldung mit eigenem Fingerabdruck
+ * dazu und zählt damit getrennt in den Summen.
+ *
+ * Beide Bögen sind hier vor Ort entstanden: Signatur und Herkunfts-Payload der
+ * Ursprungsmeldung werden NICHT übernommen — sie deckten den veränderten Inhalt
+ * nicht mehr und würden eine Echtheit behaupten, die es nicht gibt. Die
+ * signierte Ursprungsfassung bleibt in der Historie erhalten.
+ */
+export function meldungAufteilen(
+  einsatzId: string,
+  eintragId: string,
+  wahl: AufteilungsWahl,
+  opt: AufteilungOptionen = {},
+): AufteilungErgebnis | null {
+  const liste = alleEinsaetzeLaden();
+  const s = liste.find((x) => x.id === einsatzId);
+  if (!s) return null;
+  const quelle = s.eintraege.find((e) => e.id === eintragId);
+  if (!quelle) return null;
+
+  // Der Rest muss die bisher neueste Fassung ablösen. Eine Senderuhr kann
+  // vorgehen — dann bliebe „jetzt" hinter dem alten Stand zurück.
+  const stand = Math.max(jetztZeitpunkt(), quelle.bogen.stand);
+  const geteilt = teileBogen(quelle.bogen, wahl, stand);
+  const jetzt = Date.now();
+
+  const restId = bogenInhaltsId(geteilt.rest);
+  const rest: MeldeEintrag = s.eintraege.find((e) => e.id === restId) ?? {
+    id: restId,
+    einheitSchluessel: quelle.einheitSchluessel,
+    empfangenAm: ablosendeEmpfangszeit(s.eintraege, quelle.einheitSchluessel, jetzt),
+    quelle: "aufteilung",
+    status: quelle.status,
+    zugEtikett: quelle.zugEtikett,
+    teilEtikett: quelle.teilEtikett,
+    stammtVon: quelle.stammtVon,
+    bogen: geteilt.rest,
+  };
+
+  const abgeteiltId = bogenInhaltsId(geteilt.abgeteilt);
+  const abgeteilt: MeldeEintrag = s.eintraege.find((e) => e.id === abgeteiltId) ?? {
+    id: abgeteiltId,
+    einheitSchluessel: freierTeilSchluessel(
+      s.eintraege.map((e) => e.einheitSchluessel),
+      quelle.einheitSchluessel,
+    ),
+    empfangenAm: jetzt,
+    quelle: "aufteilung",
+    status: opt.status ?? MeldeStatus.ANWESEND,
+    zugEtikett: opt.zugEtikett === undefined ? quelle.zugEtikett : opt.zugEtikett.trim() || undefined,
+    teilEtikett: wahl.teilEtikett.trim(),
+    stammtVon: {
+      einheitSchluessel: quelle.einheitSchluessel,
+      teilEtikett: quelle.teilEtikett,
+      abgeteiltAm: jetzt,
+    },
+    bogen: geteilt.abgeteilt,
+  };
+
+  // Idempotent wie meldungHinzufuegen: identischer Inhalt ergibt dieselbe ID
+  // (dieselbe Aufteilung binnen einer Minute nochmals ausgelöst) und wird nicht
+  // erneut angehängt.
+  for (const e of [rest, abgeteilt]) {
+    if (!s.eintraege.some((x) => x.id === e.id)) s.eintraege.push(e);
+  }
+  s.geaendert = jetzt;
+  einsaetzeSpeichern(liste);
+  return { rest, abgeteilt };
+}
+
+export interface ZusammenfuehrungOptionen {
+  /**
+   * Neue Teil-Bezeichnung des Ziels. Fehlt das Feld, bleibt die bisherige
+   * stehen; ein leerer Text entfernt sie — die Einheit ist wieder ganz.
+   */
+  teilEtikett?: string;
+}
+
+export interface ZusammenfuehrungErgebnis {
+  /** Neue Revision der Einheit, in der jetzt alles steckt. */
+  ziel: MeldeEintrag;
+  /** Die Teile, die darin aufgegangen sind (Status AUFGEGANGEN). */
+  aufgegangen: MeldeEintrag[];
+}
+
+/**
+ * Abgeteilte Truppteile zurück in eine Meldung führen. Das Ziel bekommt eine
+ * neue Revision mit allem darin; die eingegliederten Teile bleiben mit ihrer
+ * Historie erhalten, fallen aber als AUFGEGANGEN aus den Summen — sonst wären
+ * ihre Personen doppelt gezählt.
+ *
+ * Nur Teile DERSELBEN Einheit lassen sich zusammenführen (gleicher Stamm-
+ * Fingerabdruck). Zwei verschiedene Einheiten zu verschmelzen wäre kein
+ * Zusammenführen, sondern ein Datenverlust: die eine verschwände.
+ *
+ * Wie bei der Aufteilung tragen die Ergebnisse KEINE Signatur und keinen
+ * Herkunfts-Payload — der Inhalt ist hier vor Ort entstanden.
+ */
+export function meldungenZusammenfuehren(
+  einsatzId: string,
+  zielEintragId: string,
+  teilEintragIds: string[],
+  opt: ZusammenfuehrungOptionen = {},
+): ZusammenfuehrungErgebnis | null {
+  const liste = alleEinsaetzeLaden();
+  const s = liste.find((x) => x.id === einsatzId);
+  if (!s) return null;
+  const zielEintrag = s.eintraege.find((e) => e.id === zielEintragId);
+  if (!zielEintrag) return null;
+  const teile = teilEintragIds.map((id) => s.eintraege.find((e) => e.id === id));
+  if (teile.some((e) => e == null)) return null;
+  const quellen = teile as MeldeEintrag[];
+
+  const stamm = stammSchluessel(zielEintrag.einheitSchluessel);
+  if (quellen.some((e) => stammSchluessel(e.einheitSchluessel) !== stamm)) {
+    throw new Error("Zusammenführen geht nur mit Teilen derselben Einheit.");
+  }
+  if (quellen.some((e) => e.einheitSchluessel === zielEintrag.einheitSchluessel)) {
+    throw new Error("Ein Teil kann nicht mit sich selbst zusammengeführt werden.");
+  }
+
+  const stand = Math.max(jetztZeitpunkt(), ...[zielEintrag, ...quellen].map((e) => e.bogen.stand));
+  const bogen = fuegeZusammen(
+    zielEintrag.bogen,
+    quellen.map((e) => e.bogen),
+    stand,
+  );
+  const jetzt = Date.now();
+
+  const id = bogenInhaltsId(bogen);
+  const ziel: MeldeEintrag = s.eintraege.find((e) => e.id === id) ?? {
+    id,
+    einheitSchluessel: zielEintrag.einheitSchluessel,
+    empfangenAm: ablosendeEmpfangszeit(s.eintraege, zielEintrag.einheitSchluessel, jetzt),
+    quelle: "zusammenfuehrung",
+    status: MeldeStatus.ANWESEND,
+    zugEtikett: zielEintrag.zugEtikett,
+    teilEtikett:
+      opt.teilEtikett === undefined ? zielEintrag.teilEtikett : opt.teilEtikett.trim() || undefined,
+    stammtVon: zielEintrag.stammtVon,
+    bogen,
+  };
+  if (!s.eintraege.some((e) => e.id === ziel.id)) s.eintraege.push(ziel);
+
+  for (const q of quellen) {
+    q.status = MeldeStatus.AUFGEGANGEN;
+    q.aufgegangenIn = { einheitSchluessel: zielEintrag.einheitSchluessel, zusammengefuehrtAm: jetzt };
+  }
+  s.geaendert = jetzt;
+  einsaetzeSpeichern(liste);
+  return { ziel, aufgegangen: quellen };
 }
 
 /**
