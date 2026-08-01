@@ -7,6 +7,56 @@
 import { useEffect, useRef, useState, type ChangeEvent } from "react";
 import type jsQRTyp from "jsqr";
 
+/** Was schiefging (ein Satz) und was dagegen hilft (kurze Schritte). */
+type KameraFehler = { text: string; schritte?: string[] };
+
+/**
+ * Kamerastart-Fehler in einen Rat übersetzen, der zur Ursache passt.
+ *
+ * Wichtig für Feldmeldungen wie „der Browser fragt gar nicht erst": Steht die
+ * Kamera einmal auf „blockiert" — im Browser für die Seite ODER im Betriebs-
+ * system für die Browser-App —, kommt getUserMedia ohne jede Nachfrage als
+ * NotAllowedError zurück. Beide Stellen gehören deshalb in den Hinweis.
+ */
+function kameraRat(err: unknown): KameraFehler {
+  const name = err instanceof Error ? err.name : "";
+  switch (name) {
+    case "NotAllowedError":
+    case "SecurityError":
+      return {
+        text: "Die Kamera ist für diese Seite blockiert — deshalb fragt der Browser gar nicht erst nach. Zwei Stellen prüfen:",
+        schritte: [
+          "Im Browser: Schloss- oder Info-Symbol in der Adresszeile → Berechtigungen → Kamera zulassen.",
+          "Im Gerät: Einstellungen → Apps → dieser Browser → Berechtigungen → Kamera erlauben.",
+        ],
+      };
+    case "NotFoundError":
+    case "OverconstrainedError":
+      return { text: "Dieses Gerät meldet keine nutzbare Kamera." };
+    case "NotReadableError":
+    case "AbortError":
+      return {
+        text: "Die Kamera lässt sich nicht öffnen — meist hält sie gerade eine andere App belegt. "
+          + "Andere Kamera-Apps schließen und erneut versuchen.",
+      };
+    default:
+      return { text: `Die Kamera lässt sich nicht starten${name ? ` (${name})` : ""}.` };
+  }
+}
+
+/** Kamera anfordern; die Rückkamera ist Wunsch, nicht Bedingung. */
+async function kameraOeffnen(): Promise<MediaStream> {
+  try {
+    return await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" }, audio: false });
+  } catch (err) {
+    // Verweigert bleibt verweigert — ein zweiter Anlauf lohnt nur, wenn die
+    // Rückkamera-Vorgabe selbst das Problem war (Geräte ohne Rückkamera,
+    // Browser mit eigenwilliger Auslegung von facingMode).
+    if (err instanceof Error && (err.name === "NotAllowedError" || err.name === "SecurityError")) throw err;
+    return await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+  }
+}
+
 export function QrScannerWeb(props: {
   onErgebnis: (text: string) => void;
   onAbbruch: () => void;
@@ -24,7 +74,11 @@ export function QrScannerWeb(props: {
   // liegende) QR-Code 60×/s gemeldet wird — bei Segmentierung soll erst ein
   // NEUER Teil auslösen, der Scanner läuft dafür durchgehend weiter.
   const letzterText = useRef("");
-  const [fehler, setFehler] = useState(false);
+  const [fehler, setFehler] = useState<KameraFehler | null>(null);
+  // Hochzählen startet den Kamera-Effekt neu — nötig, weil eine im Browser
+  // oder im Betriebssystem nachträglich erteilte Freigabe erst beim nächsten
+  // getUserMedia greift.
+  const [versuch, setVersuch] = useState(0);
 
   useEffect(() => {
     let aktiv = true;
@@ -66,19 +120,30 @@ export function QrScannerWeb(props: {
     }
 
     (async () => {
+      // Fehlt die Schnittstelle ganz, gibt es keinen Fehler zum Auswerten:
+      // typisch für unsichere Verbindungen (http) und für Browser, die die
+      // Kamera-API gesperrt haben.
+      if (!navigator.mediaDevices?.getUserMedia) {
+        if (aktiv) {
+          setFehler({
+            text: window.isSecureContext === false
+              ? "Ohne gesicherte Verbindung (https) geben Browser die Kamera nicht frei. Die App über ihre https-Adresse öffnen."
+              : "Dieser Browser gibt die Kamera für Webseiten nicht frei. In Privacy- und Blocker-Browsern lässt sich das in deren Einstellungen erlauben; sonst hilft ein anderer Browser.",
+          });
+        }
+        return;
+      }
       try {
-        stream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: "environment" },
-          audio: false,
-        });
-      } catch {
-        if (aktiv) setFehler(true);
+        stream = await kameraOeffnen();
+      } catch (err) {
+        if (aktiv) setFehler(kameraRat(err));
         return;
       }
       if (!aktiv) {
         stream.getTracks().forEach((t) => t.stop());
         return;
       }
+      setFehler(null);
       const video = videoRef.current;
       if (!video) return;
       video.srcObject = stream;
@@ -87,21 +152,31 @@ export function QrScannerWeb(props: {
     })();
 
     return stoppen;
-  }, []);
+  }, [versuch]);
 
   return (
     <div className="scanner" role="dialog" aria-label="QR-Code scannen">
       <video ref={videoRef} playsInline muted />
       {fehler
         ? (
-          <p className="scanner-text fehler">
-            Keine Kamera verfügbar oder Zugriff verweigert.
-            {props.onBild && " Stattdessen ein Foto oder einen Screenshot des QR-Codes einlesen."}
-          </p>
+          <div className="scanner-text fehler">
+            <p>{fehler.text}</p>
+            {fehler.schritte && (
+              <ul className="scanner-schritte">
+                {fehler.schritte.map((schritt) => <li key={schritt}>{schritt}</li>)}
+              </ul>
+            )}
+            {props.onBild && <p>Ohne Kamera geht es weiter über ein Foto oder einen Screenshot des QR-Codes.</p>}
+          </div>
         )
         : <p className="scanner-text">{props.fortschritt || "QR-Code des Erfassungsbogens vor die Kamera halten"}</p>}
       {!fehler && <div className="scanner-rahmen" aria-hidden="true" />}
       <div className="scanner-aktionen">
+        {fehler && (
+          <button type="button" onClick={() => { setFehler(null); setVersuch((n) => n + 1); }}>
+            Kamera erneut versuchen
+          </button>
+        )}
         {props.onBild && (
           <label className="datei-knopf">
             QR aus Bild einlesen…
