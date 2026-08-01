@@ -53,6 +53,7 @@ import {
   type VokabularEintrag,
 } from "../vokabulare/thw";
 import { hierarchieEbenenFuer } from "../vokabulare/ebenen";
+import { sitzplatzBilanz, type SitzplatzBilanz } from "../vokabulare/sitzplaetze";
 
 export const browserKompressor: Kompressor = {
   deflateRaw: (d) => deflateRaw(d, { level: 9 }),
@@ -420,9 +421,20 @@ export async function bogenLaden(datei: File): Promise<Erfassungsbogen> {
 // ------------------------------------------------------ Plausibilitätsprüfung
 
 /**
- * Hinweise, die den Fahrzeug-Schritt betreffen (fehlende Kennzeichen).
- * Getrennt gehalten, damit sie auf der Fahrzeugseite erscheinen und nicht
- * schon bei der Personalerfassung stören.
+ * Transportbilanz des Bogens: Sitzplätze aller erfassten Fahrzeuge gegen die
+ * Gesamtstärke. Sitzplatzzahlen sind Richtwerte je Fahrzeugtyp (s.
+ * vokabulare/sitzplaetze.ts); Fahrzeuge ohne hinterlegte Zahl machen die
+ * Bilanz unvollständig, dann wird bewusst nicht gewarnt.
+ */
+export function transportBilanz(b: Erfassungsbogen): SitzplatzBilanz {
+  const tabelle = vokabularFuer(b.einheit.organisation, "fahrzeug");
+  return sitzplatzBilanz(b.fahrzeuge, tabelle, staerke(b).gesamt);
+}
+
+/**
+ * Hinweise, die den Fahrzeug-Schritt betreffen: fehlende Kennzeichen und zu
+ * wenig Sitzplätze für die gemeldete Stärke. Getrennt gehalten, damit sie auf
+ * der Fahrzeugseite erscheinen und nicht schon bei der Personalerfassung stören.
  */
 export function fahrzeugHinweise(b: Erfassungsbogen): string[] {
   const hinweise: string[] = [];
@@ -431,6 +443,19 @@ export function fahrzeugHinweise(b: Erfassungsbogen): string[] {
       hinweise.push(`Fahrzeug ${i + 1} hat noch kein Kennzeichen.`);
     }
   });
+  // Ohne Fahrzeuge reist die Einheit erklärtermaßen anders an — das ist kein
+  // offener Punkt, sondern eine Aussage. Erst wenn Fahrzeuge dastehen, muss
+  // die Rechnung aufgehen.
+  const bilanz = transportBilanz(b);
+  if (b.fahrzeuge.length > 0 && bilanz.fehlend > 0) {
+    // Bewusst als Feststellung formuliert, nicht als Fehler: bei vielen
+    // Teileinheiten fahren Leute planmäßig im Zugtrupp oder privat mit. Genau
+    // das gehört dann in „Sonstiges" — der Meldekopf muss es wissen.
+    hinweise.push(
+      `Sitzplätze: ${bilanz.plaetze} in den erfassten Fahrzeugen für ${bilanz.benoetigt} Personen — ` +
+        `${bilanz.fehlend} brauchen eine andere Mitfahrgelegenheit (Richtwerte je Fahrzeugtyp).`,
+    );
+  }
   return hinweise;
 }
 

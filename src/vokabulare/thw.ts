@@ -22,6 +22,12 @@ export interface VokabularEintrag {
   kurz: string;
   name: string;
   stanNr?: string;
+  /**
+   * Nur Fahrzeugtypen: Sitzplätze inkl. Fahrer/in (Richtwert der Serienfahrzeuge,
+   * Quellen s. THW_FAHRZEUGTYPEN). Grundlage des Transport-Sanitychecks in
+   * src/vokabulare/sitzplaetze.ts. Fehlt = unbekannt; dann prüft die App nicht.
+   */
+  sitzplaetze?: number;
 }
 
 // ---------------------------------------------------------- Hierarchie-Ebenen
@@ -194,48 +200,57 @@ export const THW_FUNKTIONEN: FunktionsEintrag[] = [
 // Aus den Ausstattungs-Kapiteln der StAN-Einzeldokumente 2026 (Kurzzeichen wo
 // vorhanden). OV-Fahrzeuge (MzKW, MTW OV, Anh OV, …) bewusst nicht enthalten
 // — dafür den Freitext-Ausweg nutzen (s. Kopf).
+//
+// `sitzplaetze` = Sitzplätze inkl. Fahrer/in nach den Fahrzeugbeschreibungen
+// des THW (thw.de/Ausstattung) bzw. der jeweiligen Serienbeschaffung:
+// GKW 1+8, MTW 1+8, MLW IV 1/6, FmKW 1+6, FüKW 1+5, FüKomKW 1+2,
+// MTW FGr 5 (Kleinbus, 3,2 t), LKW 7 t (Kipper/Lbw/Lkr/WLF) 1+2.
+// Baumaschinen und Kran zählen nur ihre Bedienplätze, Anhänger 0. Das MzAB
+// steht mit 0, weil es niemanden auf der Straße befördert (es reist auf dem
+// Trailer). Bewusst OHNE Eintrag bleibt, was nicht belegbar ist (MTW gl) —
+// fehlt der Wert, hält sich der Sanitycheck heraus, statt zu raten.
 
 export const THW_FAHRZEUGTYPEN: VokabularEintrag[] = [
-  { code: 1, kurz: "FmKW", name: "Fernmeldekraftwagen" },
-  { code: 2, kurz: "FüKW", name: "Führungskraftwagen" },
-  { code: 3, kurz: "FüKomKW", name: "Führungs- und Kommunikationskraftwagen" },
-  { code: 4, kurz: "GKW", name: "Gerätekraftwagen" },
-  { code: 5, kurz: "MTW FGr", name: "Mannschaftstransportwagen Fachgruppe" },
-  { code: 6, kurz: "MLW IV", name: "Mannschaftslastwagen IV" },
-  { code: 7, kurz: "LKW Kipper", name: "Lastkraftwagen Kipper" },
-  { code: 8, kurz: "LKW Lbw", name: "Lastkraftwagen mit Ladebordwand" },
-  { code: 9, kurz: "LKW LK", name: "Lastkraftwagen mit Ladekran" },
-  { code: 10, kurz: "LKW LK gl", name: "Lastkraftwagen geländegängig mit Ladekran" },
-  { code: 11, kurz: "LKW WLF", name: "Lastkraftwagen Wechsellader" },
-  { code: 12, kurz: "LKW WLF Tank", name: "LKW WLF Abrollsystem Tank" },
-  { code: 13, kurz: "SZM", name: "Sattelzugmaschine" },
-  { code: 14, kurz: "Auflieger", name: "Auflieger Sattelzug" },
-  { code: 15, kurz: "PKW gl", name: "Personenkraftwagen geländegängig" },
-  { code: 16, kurz: "Bagger", name: "Baumaschine Bagger" },
-  { code: 17, kurz: "Radlader", name: "Baumaschine Radlader" },
-  { code: 18, kurz: "Teleskoplader", name: "Baumaschine Teleskoplader" },
-  { code: 19, kurz: "Schreitbagger", name: "Schreitbagger" },
-  { code: 20, kurz: "Mobilkran", name: "Mobilkran" },
-  { code: 21, kurz: "Gabelstapler", name: "Gabelstapler" },
-  { code: 22, kurz: "MzAB", name: "Mehrzweckarbeitsboot" },
-  { code: 23, kurz: "MTW TZ", name: "Mannschaftstransportwagen Technischer Zug" },
+  { code: 1, kurz: "FmKW", name: "Fernmeldekraftwagen", sitzplaetze: 7 },
+  { code: 2, kurz: "FüKW", name: "Führungskraftwagen", sitzplaetze: 6 },
+  { code: 3, kurz: "FüKomKW", name: "Führungs- und Kommunikationskraftwagen", sitzplaetze: 3 },
+  { code: 4, kurz: "GKW", name: "Gerätekraftwagen", sitzplaetze: 9 },
+  { code: 5, kurz: "MTW FGr", name: "Mannschaftstransportwagen Fachgruppe", sitzplaetze: 5 },
+  { code: 6, kurz: "MLW IV", name: "Mannschaftslastwagen IV", sitzplaetze: 7 },
+  { code: 7, kurz: "LKW Kipper", name: "Lastkraftwagen Kipper", sitzplaetze: 3 },
+  { code: 8, kurz: "LKW Lbw", name: "Lastkraftwagen mit Ladebordwand", sitzplaetze: 3 },
+  { code: 9, kurz: "LKW Lkr", name: "Lastkraftwagen mit Ladekran", sitzplaetze: 3 },
+  { code: 10, kurz: "LKW Lkr gl", name: "Lastkraftwagen geländegängig mit Ladekran", sitzplaetze: 3 },
+  { code: 11, kurz: "LKW WLF", name: "Lastkraftwagen Wechsellader", sitzplaetze: 3 },
+  { code: 12, kurz: "LKW WLF Tank", name: "LKW WLF Abrollsystem Tank", sitzplaetze: 3 },
+  { code: 13, kurz: "SZM", name: "Sattelzugmaschine", sitzplaetze: 2 },
+  { code: 14, kurz: "Auflieger", name: "Auflieger Sattelzug", sitzplaetze: 0 },
+  { code: 15, kurz: "PKW gl", name: "Personenkraftwagen geländegängig", sitzplaetze: 5 },
+  { code: 16, kurz: "Bagger", name: "Baumaschine Bagger", sitzplaetze: 1 },
+  { code: 17, kurz: "Radlader", name: "Baumaschine Radlader", sitzplaetze: 1 },
+  { code: 18, kurz: "Teleskoplader", name: "Baumaschine Teleskoplader", sitzplaetze: 1 },
+  { code: 19, kurz: "Schreitbagger", name: "Schreitbagger", sitzplaetze: 1 },
+  { code: 20, kurz: "Mobilkran", name: "Mobilkran", sitzplaetze: 2 },
+  { code: 21, kurz: "Gabelstapler", name: "Gabelstapler", sitzplaetze: 1 },
+  { code: 22, kurz: "MzAB", name: "Mehrzweckarbeitsboot", sitzplaetze: 0 },
+  { code: 23, kurz: "MTW TZ", name: "Mannschaftstransportwagen Technischer Zug", sitzplaetze: 9 },
   { code: 24, kurz: "MTW gl", name: "Mannschaftstransportwagen geländegängig" },
-  { code: 40, kurz: "Anh 2t", name: "Anhänger (2 t Nutzlast)" },
-  { code: 41, kurz: "Anh K", name: "Anhänger mit Spezialaufbau für FGr K (1 t Nutzlast)" },
-  { code: 42, kurz: "Anh FüLa", name: "Anhänger Führung und Lage" },
-  { code: 43, kurz: "Anh Plane/Spriegel", name: "Anhänger Plane/Spriegel" },
-  { code: 44, kurz: "Anh Plattform", name: "Anhänger Plattform" },
-  { code: 45, kurz: "Anh Tieflader", name: "Anhänger Tieflader" },
-  { code: 46, kurz: "Anh DLE", name: "Anhänger Drucklufterzeuger" },
-  { code: 47, kurz: "Anh NEA mittel", name: "Anhänger mit Netzersatzanlage (mittel)" },
-  { code: 48, kurz: "Anh NEA groß", name: "Anhänger mit Netzersatzanlage (groß)" },
-  { code: 49, kurz: "Anh NEA sehr groß", name: "Anhänger mit Netzersatzanlage (sehr groß)" },
-  { code: 50, kurz: "Anh SwPu klein", name: "Anhänger mit Schmutzwasserpumpe (klein)" },
-  { code: 51, kurz: "Anh SwPu mittel", name: "Anhänger mit Schmutzwasserpumpe (mittel)" },
-  { code: 52, kurz: "Anh SwPu groß", name: "Anhänger mit Schmutzwasserpumpe (groß)" },
-  { code: 53, kurz: "Anh TWAA", name: "Anhänger TWAA" },
-  { code: 54, kurz: "Anh BDF", name: "Anhänger BDF-Lafette" },
-  { code: 55, kurz: "Anh ASH", name: "Anhänger mit Abstützsystem Holz" },
+  { code: 40, kurz: "Anh 2t", name: "Anhänger (2 t Nutzlast)", sitzplaetze: 0 },
+  { code: 41, kurz: "Anh K", name: "Anhänger mit Spezialaufbau für FGr K (1 t Nutzlast)", sitzplaetze: 0 },
+  { code: 42, kurz: "Anh FüLa", name: "Anhänger Führung und Lage", sitzplaetze: 0 },
+  { code: 43, kurz: "Anh Plane/Spriegel", name: "Anhänger Plane/Spriegel", sitzplaetze: 0 },
+  { code: 44, kurz: "Anh Plattform", name: "Anhänger Plattform", sitzplaetze: 0 },
+  { code: 45, kurz: "Anh Tieflader", name: "Anhänger Tieflader", sitzplaetze: 0 },
+  { code: 46, kurz: "Anh DLE", name: "Anhänger Drucklufterzeuger", sitzplaetze: 0 },
+  { code: 47, kurz: "Anh NEA mittel", name: "Anhänger mit Netzersatzanlage (mittel)", sitzplaetze: 0 },
+  { code: 48, kurz: "Anh NEA groß", name: "Anhänger mit Netzersatzanlage (groß)", sitzplaetze: 0 },
+  { code: 49, kurz: "Anh NEA sehr groß", name: "Anhänger mit Netzersatzanlage (sehr groß)", sitzplaetze: 0 },
+  { code: 50, kurz: "Anh SwPu klein", name: "Anhänger mit Schmutzwasserpumpe (klein)", sitzplaetze: 0 },
+  { code: 51, kurz: "Anh SwPu mittel", name: "Anhänger mit Schmutzwasserpumpe (mittel)", sitzplaetze: 0 },
+  { code: 52, kurz: "Anh SwPu groß", name: "Anhänger mit Schmutzwasserpumpe (groß)", sitzplaetze: 0 },
+  { code: 53, kurz: "Anh TWAA", name: "Anhänger TWAA", sitzplaetze: 0 },
+  { code: 54, kurz: "Anh BDF", name: "Anhänger BDF-Lafette", sitzplaetze: 0 },
+  { code: 55, kurz: "Anh ASH", name: "Anhänger mit Abstützsystem Holz", sitzplaetze: 0 },
 ];
 
 // ----------------------------------------------- Funkrufnamen-Kennwörter (BOS)

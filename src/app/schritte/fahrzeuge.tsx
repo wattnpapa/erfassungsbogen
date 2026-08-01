@@ -4,7 +4,7 @@
 
 import { Fahrzeug, OrganisationsTyp } from "../../model";
 import { stanFahrzeugVorbelegung } from "../../vokabulare/thw-stan-fahrzeuge";
-import { fahrzeugHinweise, neuesFahrzeug, vokabularFuer } from "../hilfen";
+import { fahrzeugHinweise, neuesFahrzeug, transportBilanz, vokabularFuer } from "../hilfen";
 import { fahrzeugSymbolSvg, svgDataUrl } from "../taktische-zeichen";
 import { frageJaNein } from "../dialoge";
 import {
@@ -101,11 +101,32 @@ function FahrzeugKarte(props: {
   );
 }
 
+/**
+ * Sitzplätze gegen Stärke — die Rechnung, die sonst niemand macht. Steht auch
+ * dann da, wenn sie aufgeht: beim Streichen eines Fahrzeugs sieht man sofort,
+ * was das für die Anfahrt bedeutet. Reicht es nicht, übernimmt der Hinweis am
+ * Ende der Seite (fahrzeugHinweise) — sonst stünde dasselbe zweimal.
+ */
+function Transportbilanz({ bogen }: Pick<SchrittProps, "bogen">) {
+  const b = transportBilanz(bogen);
+  if (bogen.fahrzeuge.length === 0 || b.fehlend > 0) return null;
+  return (
+    <p className="hinweis">
+      Sitzplätze: <strong>{b.plaetze}</strong> für {b.benoetigt}{" "}
+      {b.benoetigt === 1 ? "Person" : "Personen"}
+      {b.unbekannt > 0
+        ? ` — ${b.unbekannt} ${b.unbekannt === 1 ? "Fahrzeug" : "Fahrzeuge"} ohne hinterlegte Sitzplatzzahl, die Rechnung ist unvollständig.`
+        : " (Richtwerte je Fahrzeugtyp, ohne Anhänger)."}
+    </p>
+  );
+}
+
 export function SchrittFahrzeuge({ bogen, aendern }: SchrittProps) {
   const vorlage = stanFahrzeugVorbelegung(bogen.einheit.organisation, bogen.einheit.einheitsTyp);
   return (
     <section className="karte">
       <h2>4. Fahrzeuge</h2>
+      <Transportbilanz bogen={bogen} />
       {vorlage.length > 0 && (
         <p>
           <button

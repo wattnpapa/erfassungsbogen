@@ -51,8 +51,8 @@ export const THW_STAN_FAHRZEUGE: Record<number, StanFahrzeug[]> = {
   6: [fk(7, 42), fk(16, 71), f(45), f(46)], // R (A): LKW Kipper, Bagger, Anh Tieflader, Anh DLE
   7: [fk(7, 42), fk(17, 72), f(45), f(46)], // R (B): Radlader statt Bagger
   8: [fk(7, 42), fk(18, 73), f(45), f(46)], // R (C): Teleskoplader
-  9: [fk(10, 46), fk(22, 81, 82)], // W (A): LKW LK gl (mittel), 2x MzAB
-  10: [fk(10, 46), f(44)], // W (B): LKW LK gl, Anh Plattform
+  9: [fk(10, 46), fk(22, 81, 82)], // W (A): LKW Lkr gl (mittel), 2x MzAB
+  10: [fk(10, 46), f(44)], // W (B): LKW Lkr gl, Anh Plattform
   11: [fk(20, 47), f(44)], // BrB: Mobilkran, Anh Plattform
   12: [fk(23, 25), ft("Anh FGr O")], // O (A): MTW TZ, Anhänger FGr O
   13: [fk(23, 25), ft("Anh FGr O")], // O (B)
@@ -70,8 +70,8 @@ export const THW_STAN_FAHRZEUGE: Record<number, StanFahrzeug[]> = {
   27: [fk(8, 43), fk(6, 34), f(50), f(43)], // WP (A): LKW Lbw, MLW IV, Anh SwPu klein, Anh Plane/Spriegel
   28: [fk(8, 43), fk(6, 34), f(51), f(43)], // WP (B): Anh SwPu mittel
   29: [fk(8, 43), fk(6, 34), f(52), f(43)], // WP (C): Anh SwPu groß
-  30: [fk(11, 65), fk(9, 44), f(44)], // Öl (A): LKW WLF, LKW LK (mittel), Anh Plattform
-  31: [fk(11, 65), fk(9, 44), f(44)], // Öl (B): LKW LK (leicht)
+  30: [fk(11, 65), fk(9, 44), f(44)], // Öl (A): LKW WLF, LKW Lkr (mittel), Anh Plattform
+  31: [fk(11, 65), fk(9, 44), f(44)], // Öl (B): LKW Lkr (leicht)
   32: [fk(11, 65, 67), f(44)], // Öl (C): 2x LKW WLF, Anh Plattform
   36: [fk(2, 10)], // ZTr FZ Log: FüKW (ZTr-Fahrzeug → 10; s. Kopf-Kommentar)
   37: [fk(9, 44), fk(10, 46), fk(12, 65), fk(6, 34), fk(15, 21), f(21), f(44), ft("Anh FGr Log-MW"), ft("Anhänger")], // Log-MW

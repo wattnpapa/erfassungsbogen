@@ -44,6 +44,7 @@ import {
   plausibilitaet,
   qrErzeugen,
   schrittStatus,
+  transportBilanz,
   vokabText,
   vokabularFuer,
   zeitgruppe,
@@ -235,6 +236,41 @@ describe("plausibilitaet()", () => {
     expect(hinweise.some((h) => /kein Kennzeichen/.test(h))).toBe(false);
     // Andere Vollständigkeitshinweise bleiben erhalten.
     expect(hinweise.some((h) => /telefonische Erreichbarkeit/.test(h))).toBe(true);
+  });
+
+  it("warnt, wenn die Sitzplätze der Fahrzeuge für die Stärke nicht reichen", () => {
+    // FGr W (B): 10 Helfer, dazu laut StAN ein LKW Lkr gl (3 Plätze) und ein
+    // Anhänger — sieben Leute hätten keine Mitfahrgelegenheit.
+    const b = bogen({
+      personal: Array.from({ length: 10 }, () => person()),
+      fahrzeuge: [{ typ: { code: 10 } }, { typ: { code: 44 } }],
+    });
+    const hinweise = fahrzeugHinweise(b);
+    expect(hinweise.some((h) => /Sitzplätze: 3 .*für 10 Personen — 7 brauchen/.test(h))).toBe(true);
+    expect(transportBilanz(b)).toMatchObject({ plaetze: 3, benoetigt: 10, fehlend: 7 });
+  });
+
+  it("warnt nicht bei genug Sitzplätzen, ohne Fahrzeuge oder bei unbekanntem Fahrzeugtyp", () => {
+    const personal = Array.from({ length: 8 }, () => person());
+    const genug = bogen({ personal, fahrzeuge: [{ typ: { code: 4 } }] }); // GKW: 9 Plätze
+    expect(fahrzeugHinweise(genug).some((h) => /Sitzplätze/.test(h))).toBe(false);
+
+    // Keine Fahrzeuge = die Einheit reist erklärtermaßen anders an.
+    expect(fahrzeugHinweise(bogen({ personal })).some((h) => /Sitzplätze/.test(h))).toBe(false);
+
+    // MTW gl hat keine hinterlegte Platzzahl — die Bilanz bleibt unvollständig.
+    const unklar = bogen({ personal, fahrzeuge: [{ typ: { code: 24 } }] });
+    expect(fahrzeugHinweise(unklar).some((h) => /Sitzplätze/.test(h))).toBe(false);
+    expect(transportBilanz(unklar).unbekannt).toBe(1);
+  });
+
+  it("nimmt die Sitzplatz-Warnung in die Gesamtübersicht auf, nicht auf die Personalseite", () => {
+    const b = bogen({
+      personal: Array.from({ length: 10 }, () => person()),
+      fahrzeuge: [{ typ: { code: 10 }, kennzeichen: "THW-84397" }],
+    });
+    expect(plausibilitaet(b).some((h) => /Sitzplätze/.test(h))).toBe(true);
+    expect(plausibilitaet(b, false).some((h) => /Sitzplätze/.test(h))).toBe(false);
   });
 
   it("meldet fehlende Kennzeichen getrennt über fahrzeugHinweise", () => {
