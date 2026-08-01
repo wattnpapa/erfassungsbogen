@@ -39,6 +39,7 @@ import {
   zeitgruppe,
   type QrSatz,
 } from "./hilfen";
+import { summiereBoegen, type EinsatzSummen } from "./auswertung";
 import { bogenDiff, diffZeilen } from "./meldung-diff";
 import { fahrzeugSymbolSvg } from "./taktische-zeichen";
 import { orgFarbe } from "./org-farben";
@@ -178,6 +179,8 @@ export interface SammelBogen {
   qr: QrSatz;
   /** Vorherige Meldung derselben Einheit; fehlt bei einer Erstmeldung. */
   vorher?: Erfassungsbogen;
+  /** Zug-/Verbandsetikett aus der Sammlung — Grundlage der Zwischensummen. */
+  zugEtikett?: string;
 }
 
 /** Mehr Zeilen passen nicht sinnvoll in eine Tabellenzelle — der Rest wird gezählt. */
@@ -242,7 +245,96 @@ function uebersichtsTabelle(boegen: SammelBogen[]): Content {
     { text: `${summe.fahrzeuge}`, bold: true },
     { text: "" },
   ]);
-  return { table: { headerRows: 1, widths: [118, 40, 52, 16, "*"], body }, margin: [0, 0, 0, 4] };
+  // Breiten für die quer liegende Übersichtsseite: Einheitsname und Zeitgruppe
+  // bekommen so viel Platz, dass sie einzeilig bleiben.
+  return { table: { headerRows: 1, widths: [170, 56, 60, 22, "*"], body }, margin: [0, 0, 0, 4] };
+}
+
+/** „Diesel 120 l · Benzin 30 l" — Gemisch nur, wenn gemeldet (wie in der Oberfläche). */
+function kraftstoffText(k: EinsatzSummen["kraftstoff"]): string {
+  const teile = [`Diesel ${k.dieselLiter} l`, `Benzin ${k.benzinLiter} l`];
+  if (k.gemischLiter > 0) teile.push(`Gemisch ${k.gemischLiter} l`);
+  return teile.join(" · ");
+}
+
+/**
+ * Bedarfs-Übersicht des ganzen Einsatzes: Verpflegung, Unterbringung,
+ * Kraftstoff und Ruhezeit über alle Bögen der Sammlung — dieselben Zahlen, die
+ * der Meldekopf auf dem Bildschirm sieht (gemeinsame Summierung in
+ * auswertung.ts). Ohne sie zeigte die gedruckte Sammlung nur die Stärke.
+ */
+function bedarfsTabelle(boegen: SammelBogen[]): Content {
+  const s = summiereBoegen(boegen.map((x) => x.bogen));
+  const body: TableCell[][] = [
+    [
+      { text: "Verpflegung:", bold: true },
+      {
+        text:
+          `${s.verpflegung.gesamt} Portionen ` +
+          `(${s.verpflegung.fleisch} Fleisch / ${s.verpflegung.vegetarisch} vegetarisch / ${s.verpflegung.vegan} vegan)`,
+      },
+    ],
+    [
+      { text: "Unterbringung/WC/Dusche:", bold: true },
+      {
+        text:
+          `M ${s.unterbringung.m} / W ${s.unterbringung.w} / D ${s.unterbringung.d}` +
+          (s.unterbringungBenoetigt > 0 ? ` · ${s.unterbringungBenoetigt}× Unterbringung angefordert` : ""),
+      },
+    ],
+    [{ text: "Betriebsstoff:", bold: true }, { text: kraftstoffText(s.kraftstoff) }],
+    [
+      { text: "Fahrzeuge / Ruhezeit:", bold: true },
+      { text: `${s.fahrzeuge} Fahrzeuge · Ruhezeit erforderlich bei ${s.ruhezeitErforderlich} Einheit(en)` },
+    ],
+  ];
+  return {
+    stack: [
+      { text: `Bedarf gesamt (${s.einheiten} Einheiten, ${s.staerke.gesamt} Personen)`, bold: true, margin: [0, 10, 0, 4] },
+      { table: { headerRows: 0, widths: [130, "*"], body }, margin: [0, 0, 0, 4] },
+    ],
+    unbreakable: true,
+  };
+}
+
+/**
+ * Zwischensummen je Zug/Verband — nur sinnvoll, wenn die Sammlung überhaupt
+ * mehr als eine Gruppe kennt (sonst wiederholt die Tabelle nur den Gesamtwert).
+ */
+function zugSummenTabelle(boegen: SammelBogen[]): Content | undefined {
+  const nach = new Map<string, Erfassungsbogen[]>();
+  for (const { bogen, zugEtikett } of boegen) {
+    const k = zugEtikett ?? "";
+    (nach.get(k) ?? nach.set(k, []).get(k)!).push(bogen);
+  }
+  if (nach.size < 2) return undefined;
+  const kopf = (text: string): TableCell => ({ text, bold: true, fillColor: GRAU });
+  const body: TableCell[][] = [
+    [kopf("Zug / Verband"), kopf("Einh."), kopf("Stärke\nF / U / M / G"), kopf("Verpfl."), kopf("M / W / D"), kopf("Betriebsstoff"), kopf("Fzg")],
+  ];
+  const gruppen = [...nach.entries()].sort(([a], [b]) => {
+    if (a === "") return 1; // „ohne Etikett" ans Ende — wie in der Oberfläche
+    if (b === "") return -1;
+    return a.localeCompare(b, "de");
+  });
+  for (const [etikett, gruppe] of gruppen) {
+    const s = summiereBoegen(gruppe);
+    body.push([
+      { text: etikett || "Ohne Zug" },
+      { text: `${s.einheiten}` },
+      { text: `${s.staerke.fuehrer} / ${s.staerke.unterfuehrer} / ${s.staerke.mannschaft} / ${s.staerke.gesamt}` },
+      { text: `${s.verpflegung.gesamt}` },
+      { text: `${s.unterbringung.m} / ${s.unterbringung.w} / ${s.unterbringung.d}` },
+      { text: kraftstoffText(s.kraftstoff) },
+      { text: `${s.fahrzeuge}` },
+    ]);
+  }
+  return {
+    stack: [
+      { text: "Zwischensummen nach Zug", bold: true, margin: [0, 10, 0, 4] },
+      { table: { headerRows: 1, widths: [150, 32, 60, 36, 56, "*", 24], body }, margin: [0, 0, 0, 4] },
+    ],
+  };
 }
 
 /**
@@ -258,6 +350,7 @@ export function einsatzPdfDokument(
   /** Optional: kompletter Einsatz-Umschlag (einsatzDateiInhalt) für die Schichtübergabe. */
   sammlungJson?: string,
 ): TDocumentDefinitions {
+  const zugSummen = zugSummenTabelle(boegenMitQr);
   const content: Content[] = [
     { text: `Übergabe-Übersicht: ${name}`, bold: true, fontSize: 12, margin: [0, 0, 0, 8] },
     uebersichtsTabelle(boegenMitQr),
@@ -266,13 +359,21 @@ export function einsatzPdfDokument(
       italics: true,
       margin: [0, 4, 0, 0],
     },
+    bedarfsTabelle(boegenMitQr),
+    ...(zugSummen ? [zugSummen] : []),
   ];
   boegenMitQr.forEach(({ bogen, qr }) => {
-    content.push({ text: "", pageBreak: "before" });
+    // Zurück ins Hochformat: der Bogen selbst bleibt exakt der Papiervordruck.
+    // pdfmake übernimmt die Ausrichtung des Knotens, der den Umbruch auslöst.
+    content.push({ text: "", pageBreak: "before", pageOrientation: "portrait" });
     content.push(...(pdfDokument(bogen, qr).content as Content[]));
   });
   return {
     pageSize: "A4",
+    // Nur die vorangestellte Übersicht liegt quer — sie trägt breite Tabellen
+    // (Änderungsspalte, Zug-Zwischensummen); ab dem ersten Bogen wird oben
+    // wieder auf Hochformat zurückgeschaltet.
+    pageOrientation: "landscape",
     pageMargins: SEITENRAENDER,
     defaultStyle: { fontSize: 8, font: SCHRIFT },
     info: { title: `Einsatz-Sammlung ${name}` },

@@ -311,4 +311,50 @@ describe("einsatzPdfDokument()", () => {
     expect(t).toContain("Summe (2 Einheiten)");
     expect(t).toContain("2 / 0 / 2 / 4");
   });
+
+  it("legt die Übersicht quer und schaltet ab dem ersten Bogen zurück ins Hochformat", () => {
+    const dd = einsatzPdfDokument("Lage", [
+      { bogen: basisBogen(), qr: QR },
+      { bogen: basisBogen(), qr: QR },
+    ]);
+    expect(dd.pageOrientation).toBe("landscape");
+    const umbrueche = (dd.content as { pageBreak?: string; pageOrientation?: string }[]).filter(
+      (c) => c && c.pageBreak === "before",
+    );
+    // Je Bogen ein Umbruch — und jeder stellt ausdrücklich auf Hochformat.
+    expect(umbrueche).toHaveLength(2);
+    expect(umbrueche.every((c) => c.pageOrientation === "portrait")).toBe(true);
+  });
+
+  it("weist Verpflegung, Unterbringung und Betriebsstoff als Gesamtbedarf aus", () => {
+    const t = texte(
+      einsatzPdfDokument("Lage", [
+        { bogen: basisBogen(), qr: QR },
+        { bogen: basisBogen(), qr: QR },
+      ]).content,
+    ).join("\n");
+    expect(t).toContain("Bedarf gesamt (2 Einheiten, 4 Personen)");
+    expect(t).toContain("4 Portionen (2 Fleisch / 0 vegetarisch / 2 vegan)");
+    expect(t).toContain("M 2 / W 2 / D 0 · 2× Unterbringung angefordert");
+    expect(t).toContain("Diesel 400 l · Benzin 0 l");
+    expect(t).toContain("2 Fahrzeuge · Ruhezeit erforderlich bei 0 Einheit(en)");
+  });
+
+  it("zeigt Zwischensummen erst ab zwei Zügen — und stellt „ohne Zug“ ans Ende", () => {
+    const einZug = texte(
+      einsatzPdfDokument("Lage", [{ bogen: basisBogen(), qr: QR, zugEtikett: "1. Zug" }]).content,
+    ).join("\n");
+    expect(einZug).not.toContain("Zwischensummen nach Zug");
+
+    const t = texte(
+      einsatzPdfDokument("Lage", [
+        { bogen: basisBogen(), qr: QR },
+        { bogen: basisBogen(), qr: QR, zugEtikett: "2. Zug" },
+        { bogen: basisBogen(), qr: QR, zugEtikett: "1. Zug" },
+      ]).content,
+    ).join("\n");
+    expect(t).toContain("Zwischensummen nach Zug");
+    expect(t.indexOf("1. Zug")).toBeLessThan(t.indexOf("2. Zug"));
+    expect(t.indexOf("2. Zug")).toBeLessThan(t.indexOf("Ohne Zug"));
+  });
 });

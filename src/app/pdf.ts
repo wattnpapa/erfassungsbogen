@@ -115,7 +115,12 @@ export async function einsatzPdfErzeugen(einsatz: Einsatzsammlung, meldungen: Me
     const revs = revisionen(einsatz.eintraege, m.einheitSchluessel);
     const idx = revs.findIndex((r) => r.id === m.id);
     const vorher = idx >= 0 ? revs[idx + 1]?.bogen : undefined;
-    boegenMitQr.push({ bogen: m.bogen, qr: await qrErzeugen(m.bogen, herkunftBytes(m)), vorher });
+    boegenMitQr.push({
+      bogen: m.bogen,
+      qr: await qrErzeugen(m.bogen, herkunftBytes(m)),
+      vorher,
+      zugEtikett: m.zugEtikett,
+    });
   }
   const dd = einsatzPdfDokument(einsatz.name, boegenMitQr, einsatzDateiInhalt(einsatz));
   const dateiname = `eeb-einsatz-${(einsatz.name || "sammlung").replace(/[^\wäöüÄÖÜß-]+/g, "_")}.pdf`;

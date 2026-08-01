@@ -13,6 +13,7 @@ import {
   staerke,
   unterbringungMWD,
   verpflegung,
+  type Erfassungsbogen,
   type Staerke,
   type VerpflegungSplit,
 } from "../model";
@@ -53,11 +54,14 @@ function leereSummen(): EinsatzSummen {
   };
 }
 
-/** Summiert eine bereits gefilterte Meldungsliste (neueste je Einheit, anwesend). */
-function summiere(meldungen: MeldeEintrag[]): EinsatzSummen {
+/**
+ * Summiert eine Liste von Bögen. Getrennt von {@link summiere}, damit auch die
+ * Sammel-PDF (die nur die Bögen kennt) exakt dieselben Zahlen ausweist wie die
+ * Meldekopf-Oberfläche.
+ */
+export function summiereBoegen(boegen: Erfassungsbogen[]): EinsatzSummen {
   const s = leereSummen();
-  for (const m of meldungen) {
-    const b = m.bogen;
+  for (const b of boegen) {
     const st = staerke(b);
     s.staerke.fuehrer += st.fuehrer;
     s.staerke.unterfuehrer += st.unterfuehrer;
@@ -87,6 +91,11 @@ function summiere(meldungen: MeldeEintrag[]): EinsatzSummen {
     s.einheiten++;
   }
   return s;
+}
+
+/** Summiert eine bereits gefilterte Meldungsliste (neueste je Einheit, anwesend). */
+function summiere(meldungen: MeldeEintrag[]): EinsatzSummen {
+  return summiereBoegen(meldungen.map((m) => m.bogen));
 }
 
 /** Gesamtsummen über alle aktuell anwesenden Einheiten des Einsatzes. */
