@@ -251,7 +251,7 @@ export function EinsatzDetail(props: {
         <section className="karte">
           <h2>Zwischensummen nach Zug</h2>
           {zugGruppen.map((g) => (
-            <div className="zug-summe" key={g.zugEtikett ?? " ohne"}>
+            <div className="zug-summe" key={g.zugEtikett ? `zug:${g.zugEtikett}` : "zug:ohne"}>
               <p>
                 <strong>{g.zugEtikett ?? "Ohne Zug"}</strong>
                 {" · "}{g.summen.einheiten} Einheit(en){" · "}Stärke {summenStaerkeText(g.summen)}
