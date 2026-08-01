@@ -198,7 +198,20 @@ npm run electron:build   # Paket für die eigene Plattform → release/
 
 Der Hauptprozess ([electron/main.js](../electron/main.js)) lädt die unveränderte
 Web-App aus `dist/` — kein Node-Zugriff im Renderer, externe Links öffnen im
-System-Browser.
+System-Browser. Die Kamera (QR-Scan) wird dort ausdrücklich freigegeben.
+
+### Windows: x64 **und** ARM64
+
+Für Windows entstehen zwei Installer. Auf ARM-Geräten (Snapdragon X u. Ä.)
+läuft ein x64-Paket nur emuliert, und emulierte Apps kommen dort nicht an die
+Kamera — der QR-Scan bliebe schwarz, eine Kameraauswahl gäbe es nicht, weil das
+System gar keine Kamera meldet. Deshalb baut der Workflow beide Architekturen.
+
+electron-updater kennt unter Windows nur eine `latest.yml`. Damit sich eine
+ARM64-Installation nicht beim nächsten Update selbst durch das x64-Paket
+ersetzt, gibt es einen zweiten Kanal: `latest-arm64.yml`
+([ensure-update-metadata.cjs](../scripts/ensure-update-metadata.cjs) legt sie
+an, [main.js](../electron/main.js) liest sie auf ARM64).
 
 ## Mobile Apps (Android & iOS)
 

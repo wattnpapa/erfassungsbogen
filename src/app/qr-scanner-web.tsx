@@ -6,6 +6,7 @@
 
 import { useEffect, useRef, useState, type ChangeEvent } from "react";
 import type jsQRTyp from "jsqr";
+import { gemerkteKamera, kameraListe, merkeKamera, type Kamera } from "./kamera";
 
 /** Was schiefging (ein Satz) und was dagegen hilft (kurze Schritte). */
 type KameraFehler = { text: string; schritte?: string[] };
@@ -44,15 +45,29 @@ function kameraRat(err: unknown): KameraFehler {
   }
 }
 
-/** Kamera anfordern; die Rückkamera ist Wunsch, nicht Bedingung. */
-async function kameraOeffnen(): Promise<MediaStream> {
+/** Verweigert bleibt verweigert — hier lohnt kein zweiter Anlauf. */
+function istVerweigert(err: unknown): boolean {
+  return err instanceof Error && (err.name === "NotAllowedError" || err.name === "SecurityError");
+}
+
+/**
+ * Kamera anfordern. Eine gewählte Kamera geht vor, die Rückkamera ist Wunsch,
+ * nicht Bedingung — jede Stufe darf scheitern, ohne den Scan zu beenden: Die
+ * gemerkte Kamera kann abgemeldet sein, Geräte ohne Rückkamera kennen
+ * `facingMode` nicht, und manche Webviews weisen die Objekt-Form ganz zurück.
+ */
+async function kameraOeffnen(wunschId: string): Promise<MediaStream> {
+  if (wunschId) {
+    try {
+      return await navigator.mediaDevices.getUserMedia({ video: { deviceId: { exact: wunschId } }, audio: false });
+    } catch (err) {
+      if (istVerweigert(err)) throw err;
+    }
+  }
   try {
     return await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" }, audio: false });
   } catch (err) {
-    // Verweigert bleibt verweigert — ein zweiter Anlauf lohnt nur, wenn die
-    // Rückkamera-Vorgabe selbst das Problem war (Geräte ohne Rückkamera,
-    // Browser mit eigenwilliger Auslegung von facingMode).
-    if (err instanceof Error && (err.name === "NotAllowedError" || err.name === "SecurityError")) throw err;
+    if (istVerweigert(err)) throw err;
     return await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
   }
 }
@@ -85,6 +100,12 @@ export function QrScannerWeb(props: {
   // oder im Betriebssystem nachträglich erteilte Freigabe erst beim nächsten
   // getUserMedia greift.
   const [versuch, setVersuch] = useState(0);
+  const [kameras, setKameras] = useState<Kamera[]>([]);
+  // Wunsch (gemerkte/gewählte Kamera) und tatsächlich laufende Kamera sind
+  // getrennt: Der Wunsch startet den Effekt neu, die laufende meldet nur, was
+  // daraus geworden ist — sonst würde die Rückmeldung den Stream erneut starten.
+  const [wunschKamera, setWunschKamera] = useState(gemerkteKamera);
+  const [benutzteKamera, setBenutzteKamera] = useState("");
 
   useEffect(() => {
     let aktiv = true;
@@ -140,7 +161,7 @@ export function QrScannerWeb(props: {
         return;
       }
       try {
-        stream = await kameraOeffnen();
+        stream = await kameraOeffnen(wunschKamera);
       } catch (err) {
         if (aktiv) setFehler(kameraRat(err));
         return;
@@ -150,6 +171,16 @@ export function QrScannerWeb(props: {
         return;
       }
       setFehler(null);
+      setBenutzteKamera(stream.getVideoTracks()[0]?.getSettings().deviceId ?? "");
+      // Geräteliste erst NACH der Freigabe holen: vorher liefert der Browser
+      // aus Datenschutzgründen keine Namen (und teils gar keine Geräte). Sie
+      // ist reiner Komfort — fehlt die Schnittstelle oder scheitert sie,
+      // scannt die geöffnete Kamera unverändert weiter.
+      Promise.resolve(navigator.mediaDevices.enumerateDevices?.() ?? [])
+        .then((geraete) => {
+          if (aktiv) setKameras(kameraListe(geraete));
+        })
+        .catch(() => {});
       const video = videoRef.current;
       if (!video) return;
       video.srcObject = stream;
@@ -158,7 +189,13 @@ export function QrScannerWeb(props: {
     })();
 
     return stoppen;
-  }, [versuch]);
+  }, [versuch, wunschKamera]);
+
+  // Wert der Auswahl: die laufende Kamera, solange sie in der Liste steht —
+  // sonst der Wunsch bzw. die erste Kamera, damit die Auswahl nie leer wirkt.
+  const auswahl = [benutzteKamera, wunschKamera].find((id) => kameras.some((k) => k.id === id))
+    ?? kameras[0]?.id
+    ?? "";
 
   return (
     <div className="scanner" role="dialog" aria-label="QR-Code scannen">
@@ -178,6 +215,17 @@ export function QrScannerWeb(props: {
         : <p className="scanner-text">{props.fortschritt || "QR-Code des Erfassungsbogens vor die Kamera halten"}</p>}
       {!fehler && <div className="scanner-rahmen" aria-hidden="true" />}
       <div className="scanner-aktionen">
+        {kameras.length > 1 && !fehler && (
+          <label className="scanner-kamera">
+            <span className="nur-sr">Kamera</span>
+            <select
+              value={auswahl}
+              onChange={(e) => { merkeKamera(e.target.value); setWunschKamera(e.target.value); }}
+            >
+              {kameras.map((k) => <option key={k.id} value={k.id}>{k.name}</option>)}
+            </select>
+          </label>
+        )}
         {fehler && (
           <button type="button" onClick={() => { setFehler(null); setVersuch((n) => n + 1); }}>
             Kamera erneut versuchen

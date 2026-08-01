@@ -80,7 +80,7 @@ Alle Downloads unter
 
 | Gerät | Download |
 |---|---|
-| **Windows** | Installer (`.exe`) |
+| **Windows** | Installer (`.exe`) — für ARM-Geräte (Snapdragon) die `arm64`-Datei, sonst `x64` |
 | **macOS** | `.dmg` (signiert & notarisiert — per Doppelklick startbar) |
 | **Linux** | `.deb` (Debian/Ubuntu) oder `.pacman` (Arch) |
 | **Android** | APK (Android 8.0 oder neuer) |

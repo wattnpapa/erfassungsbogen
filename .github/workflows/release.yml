@@ -156,10 +156,17 @@ jobs:
           node-version: 24
           cache: npm
       - run: npm ci
-      - name: Windows-Artefakte bauen (NSIS-Installer)
+      - name: Windows-Artefakte bauen (NSIS-Installer für x64 und ARM64)
+        # Zwei getrennte Läufe, damit je Architektur ein eigener Installer
+        # entsteht. ARM64 zuerst: Beide Läufe schreiben dieselbe latest.yml,
+        # und die soll am Ende (samt Blockmap für differenzielle Updates) auf
+        # das x64-Paket zeigen — die ARM64-Metadaten legt das Skript danach an.
+        # ARM64 ist kein Luxus: Auf Snapdragon-Geräten kommt die emulierte
+        # x64-App nicht an die Kamera, der QR-Scan bliebe dort schwarz.
         run: |
           npm pkg set version="${{ needs.prepare.outputs.build_version }}"
           npm run build
+          npx electron-builder --win --arm64 --publish never --config.artifactName='Erfassungsbogen-${{ env.BUILD_VERSION }}-${os}-${arch}.${ext}'
           npx electron-builder --win --x64 --publish never --config.artifactName='Erfassungsbogen-${{ env.BUILD_VERSION }}-${os}-${arch}.${ext}'
           node scripts/ensure-update-metadata.cjs win
       - uses: actions/upload-artifact@v4

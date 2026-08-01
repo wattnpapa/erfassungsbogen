@@ -922,6 +922,10 @@
     .scanner-aktionen {
       display: flex; flex-direction: column; align-items: center; gap: 0.75rem;
     }
+    /* Kamera-Auswahl im Scanner (erst ab zwei Kameras sichtbar): erbt das
+       Feld-Aussehen, bleibt aber schmal genug, dass lange Gerätenamen die
+       Knopfleiste nicht über den Rand ziehen. */
+    .scanner-kamera select { max-width: min(80vw, 22rem); }
     dialog {
       border: var(--strich-stark) solid var(--linie-stark); border-radius: var(--radius);
       width: min(34rem, calc(100vw - 2rem)); padding: var(--r-4) var(--r-5);

@@ -18,9 +18,18 @@ function kameraFehler(name: string): Error {
   return err;
 }
 
-/** Stream-Attrappe: mehr als das Stoppen der Spuren nutzt die Komponente nicht. */
-function streamAttrappe(): MediaStream {
-  return { getTracks: () => [{ stop: () => {} }] } as unknown as MediaStream;
+/**
+ * Stream-Attrappe: Die Komponente stoppt die Spuren und fragt die Videospur,
+ * welche Kamera tatsächlich läuft (für die Auswahl).
+ */
+function streamAttrappe(deviceId = ""): MediaStream {
+  const spur = { stop: () => {}, getSettings: () => ({ deviceId }) };
+  return { getTracks: () => [spur], getVideoTracks: () => [spur] } as unknown as MediaStream;
+}
+
+/** enumerateDevices()-Eintrag, so knapp wie die Komponente ihn braucht. */
+function kameraGeraet(deviceId: string, label: string): MediaDeviceInfo {
+  return { kind: "videoinput", deviceId, label, groupId: "g", toJSON: () => ({}) } as MediaDeviceInfo;
 }
 
 const echteMediaDevices = navigator.mediaDevices;
@@ -32,6 +41,8 @@ function mediaDevicesSetzen(wert: unknown): void {
 beforeEach(() => {
   // jsdom kennt kein play(); ohne Ersatz stolpert der Erfolgspfad darüber.
   HTMLMediaElement.prototype.play = vi.fn(async () => {});
+  // Die zuletzt gewählte Kamera überlebt sonst ins nächste Szenario.
+  localStorage.clear();
 });
 
 afterEach(() => {
@@ -86,5 +97,44 @@ describe("QR-Scanner im Browser", () => {
 
     await vi.waitFor(() => expect(screen.queryByText(/blockiert/)).toBeNull());
     expect(getUserMedia).toHaveBeenCalledTimes(2);
+  });
+
+  it("lässt bei mehreren Kameras zwischen Front und Haupt wechseln", async () => {
+    const nutzer = userEvent.setup();
+    const getUserMedia = vi.fn(async (c: MediaStreamConstraints) => {
+      // Ohne Gerätewunsch antwortet die Attrappe wie ein Gerät mit Rückkamera.
+      const wunsch = (c.video as { deviceId?: { exact?: string } } | undefined)?.deviceId?.exact;
+      return streamAttrappe(wunsch ?? "hinten");
+    });
+    mediaDevicesSetzen({
+      getUserMedia,
+      enumerateDevices: async () => [kameraGeraet("hinten", "Surface Camera Rear"), kameraGeraet("vorn", "Surface Camera Front")],
+    });
+
+    render(<QrScannerWeb onErgebnis={() => {}} onAbbruch={() => {}} />);
+
+    const auswahl = await screen.findByRole("combobox", { name: "Kamera" });
+    expect((auswahl as HTMLSelectElement).value).toBe("hinten");
+
+    await nutzer.selectOptions(auswahl, "vorn");
+
+    // Gezielt nach Gerät fragen — die Rückkamera-Vorgabe würde die Wahl sonst
+    // gleich wieder überstimmen. Und sie überlebt das Schließen des Scanners.
+    await vi.waitFor(() => {
+      expect(getUserMedia).toHaveBeenLastCalledWith({ video: { deviceId: { exact: "vorn" } }, audio: false });
+    });
+    expect(localStorage.getItem("eeb-kamera")).toBe("vorn");
+  });
+
+  it("zeigt ohne zweite Kamera keine Auswahl", async () => {
+    mediaDevicesSetzen({
+      getUserMedia: vi.fn(async () => streamAttrappe("eine")),
+      enumerateDevices: async () => [kameraGeraet("eine", "Integrated Webcam")],
+    });
+
+    render(<QrScannerWeb onErgebnis={() => {}} onAbbruch={() => {}} />);
+
+    await screen.findByText(/vor die Kamera halten/);
+    expect(screen.queryByRole("combobox")).toBeNull();
   });
 });

@@ -36,6 +36,14 @@ function fensterErstellen() {
     },
   });
 
+  // Berechtigungen (Kamera für den QR-Scan, Zwischenablage beim Link-Kopieren)
+  // ausdrücklich erteilen. Ohne Handler entscheidet das die Vorgabe der
+  // jeweiligen Electron-Version; im Fenster läuft ausschließlich die eigene,
+  // lokal geladene App, für die diese Zugriffe gewollt sind.
+  const sitzung = fenster.webContents.session;
+  sitzung.setPermissionRequestHandler((_inhalt, _recht, antwort) => antwort(true));
+  sitzung.setPermissionCheckHandler(() => true);
+
   fenster.webContents.setWindowOpenHandler(({ url }) => {
     if (istExtern(url)) shell.openExternal(url);
     return { action: "deny" };
@@ -65,6 +73,15 @@ function updatesEinrichten() {
   // Die App ist für Offline-Betrieb gedacht: Fehler (kein Netz, kein
   // Release, unsignierter Build) still ignorieren, nie den Start stören.
   autoUpdater.on("error", () => {});
+
+  // Windows on ARM (Snapdragon & Co.) hat eigene Update-Metadaten: Der
+  // ARM64-Build darf sich nicht durch das x64-Paket ersetzen — emuliert kommt
+  // die App auf diesen Geräten nicht an die Kamera, der QR-Scan wäre wieder
+  // tot. Für Windows kennt electron-updater von Haus aus nur „latest.yml",
+  // deshalb hier ein eigener Kanal (siehe scripts/ensure-update-metadata.cjs).
+  if (process.platform === "win32" && process.arch === "arm64") {
+    autoUpdater.channel = "latest-arm64";
+  }
 
   autoUpdater.on("update-downloaded", async (info) => {
     const { response } = await dialog.showMessageBox({
