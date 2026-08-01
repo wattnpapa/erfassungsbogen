@@ -1010,6 +1010,12 @@ function AppInhalt() {
             </section>
           );
         })()}
+        {/* Rückmeldungen stehen ÜBER den Aktionen: „Entwurf … wiederhergestellt"
+            erklärt die Karte darüber, und unter den Knöpfen klebte der Kasten
+            optisch an der Knopfreihe, statt ein eigener Block zu sein. */}
+        {meldung && <p className="meldung" role="status">{meldung}</p>}
+        {fehler && <p className="fehler">{fehler}</p>}
+        {scanFortschritt && !scannerOffen && <p className="meldung" role="status">{scanFortschritt}</p>}
         <div className="aktionen">
           <button type="button" className={bogen ? "" : "primaer"} onClick={() => { setMeldung(""); setBogen(neuerBogen()); setzeEmpfang(null); setSchritt(0); setZeigeStart(false); }}>
             Neuen Bogen erstellen
@@ -1032,9 +1038,6 @@ function AppInhalt() {
             <input type="file" accept=".json,application/json" onChange={ladeDatei} className="nur-sr" />
           </label>
         </div>
-        {meldung && <p className="meldung" role="status">{meldung}</p>}
-        {fehler && <p className="fehler">{fehler}</p>}
-        {scanFortschritt && !scannerOffen && <p className="meldung" role="status">{scanFortschritt}</p>}
         {scannerOffen && (
           <QrScannerWeb onErgebnis={scanErgebnisWeb} fortschritt={scanFortschritt} onAbbruch={() => scanAbbrechen(false)} onBild={ladeQrBild} />
         )}

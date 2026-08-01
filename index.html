@@ -241,6 +241,18 @@
        breiten Fenstern einzeilig (max-content), darf aber nie über den Rand
        hinauslaufen: auf dem Telefon bricht es innerhalb der Fensterbreite um. */
     .start > p.offline-badge { max-width: 100%; width: max-content; font-size: var(--t-s); }
+    /* Rückmeldungen sind Kästen, keine Einleitungsabsätze: `.start > p` drückte
+       ihnen sonst dessen Schriftgrad UND `margin-top: 0` auf — der Kasten klebte
+       dadurch ohne jeden Abstand am Nachbarn. Gleicher Oberabstand wie die
+       Knopfreihe, damit er als eigener Block steht. */
+    .start > p.meldung, .start > p.fehler {
+      font-size: var(--t-s); margin: var(--r-5) 0 0;
+      /* Wie das Offline-Etikett darüber: so breit wie der Satz, nie breiter als
+         die Spalte — ein Ein-Zeiler soll keinen 900-px-Balken aufspannen. */
+      width: max-content; max-width: 100%;
+    }
+    .start > p.meldung { color: var(--text); }
+    .start > p.fehler { color: var(--alarm); }
     .aktionen { display: flex; gap: var(--r-2); justify-content: flex-start; flex-wrap: wrap; margin-top: var(--r-5); }
     .aktionen > button, .aktionen > .datei-knopf {
       min-height: calc(2.75rem + var(--ziel)); padding: 0.6rem 1.1rem; font-size: var(--t-m);
