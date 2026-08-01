@@ -1,0 +1,294 @@
+{
+  "schemaVersion": 7,
+  "uebung": true,
+  "stand": 2735670,
+  "einheit": {
+    "organisation": 5,
+    "organisationName": "DRK-Kreisverband Moorlande e. V.",
+    "einheitsTyp": {
+      "freitext": "Verpflegungsgruppe (Bereitschaft)"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Verpflegungsgruppe (Bereitschaft)"
+        },
+        "name": "Moorlande"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Bereitschaft"
+        },
+        "name": "Moorlande"
+      },
+      {
+        "bezeichnung": {
+          "code": 2
+        },
+        "name": "Moorlande e. V.",
+        "kurz": "KV Moorlande",
+        "telefon": "5554714735",
+        "email": "einsatz@drk-moorlande.example"
+      },
+      {
+        "bezeichnung": {
+          "code": 3
+        },
+        "name": "Niedersachsen"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 1907,
+    "zeitraumBis": 1908,
+    "ortAuftrag": "Bombenfund im Stadtteil Moorlande-Süd — Evakuierung von rund 1.500 Anwohnenden: Betreuungsstelle in der Sporthalle, sanitätsdienstliche Versorgung und Transport nicht gehfähiger Personen; Bereitstellungsraum am DRK-Haus."
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Britta",
+      "nachname": "Meyer",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Gruppenführer/-in"
+        },
+        {
+          "freitext": "Küchenleitung"
+        }
+      ],
+      "fahrerlaubnis": 6,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5558805671"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Gruppenführer (DRK)"
+        },
+        {
+          "freitext": "Koch (Beruf)"
+        }
+      ]
+    },
+    {
+      "vorname": "Dirk",
+      "nachname": "Janßen",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Koch/Köchin"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Koch (Beruf)"
+        },
+        {
+          "freitext": "Ausbilder Erste Hilfe"
+        }
+      ]
+    },
+    {
+      "vorname": "Kai",
+      "nachname": "Eilers",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Verpflegungshelfer/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Belehrung Infektionsschutzgesetz"
+        },
+        {
+          "freitext": "Ausbilder Erste Hilfe"
+        }
+      ]
+    },
+    {
+      "vorname": "Insa",
+      "nachname": "Tammen",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Verpflegungshelfer/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Belehrung Infektionsschutzgesetz"
+        }
+      ]
+    },
+    {
+      "vorname": "Nele",
+      "nachname": "Focken",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Verpflegungshelfer/-in"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Belehrung Infektionsschutzgesetz"
+        },
+        {
+          "freitext": "Sanitätshelfer (San A/B)"
+        }
+      ]
+    },
+    {
+      "vorname": "Bernd",
+      "nachname": "Kramer",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Verpflegungshelfer/-in"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Johann",
+      "nachname": "Saathoff",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Verpflegungshelfer/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Truppführer"
+        }
+      ]
+    },
+    {
+      "vorname": "Jann",
+      "nachname": "Gerdes",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Verpflegungshelfer/-in"
+        },
+        {
+          "freitext": "Materialerhaltung"
+        }
+      ],
+      "fahrerlaubnis": 6,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Janna",
+      "nachname": "Groenewold",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kraftfahrer/-in"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Kraftfahrer CE"
+        },
+        {
+          "freitext": "Sanitätshelfer (San A/B)"
+        }
+      ]
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "MTW"
+      },
+      "kennzeichen": "MRL-RK 171",
+      "stanKonform": true,
+      "aenderungen": "Zugfahrzeug der Verpflegungsgruppe — KatS-gemeldet (1. Verpflegungsgruppe)",
+      "funkrufname": {
+        "kennwort": {
+          "code": 3
+        },
+        "eigenerStandort": false,
+        "ort": "Moorlande",
+        "teile": [
+          87,
+          17,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "Anh. Verpflegung"
+      },
+      "kennzeichen": "MRL-RK 173",
+      "stanKonform": true,
+      "aenderungen": "Erstangriff Verpflegung für 150 Personen (Brände/Evakuierungen)"
+    },
+    {
+      "typ": {
+        "freitext": "Anh. Feldküche"
+      },
+      "kennzeichen": "MRL-RK 174",
+      "stanKonform": true,
+      "aenderungen": "Feldkochherd für ca. 300–500 Mahlzeiten"
+    },
+    {
+      "typ": {
+        "freitext": "Anh. Kühl"
+      },
+      "kennzeichen": "MRL-RK 175",
+      "stanKonform": true,
+      "aenderungen": "Kühlanhänger — kein Tiefkühler"
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 9,
+    "dieselLiter": 140,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": true,
+    "ruhezeitErforderlich": true
+  },
+  "sonstiges": "Erstangriff für 150 Personen aus dem Verpflegungsanhänger; mit Feldküche ca. 300–500 Mahlzeiten. Der Kühlanhänger kühlt nur, er friert nicht ein."
+}

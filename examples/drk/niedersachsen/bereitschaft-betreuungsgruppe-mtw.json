@@ -1,0 +1,257 @@
+{
+  "schemaVersion": 7,
+  "uebung": true,
+  "stand": 2735670,
+  "einheit": {
+    "organisation": 5,
+    "organisationName": "DRK-Kreisverband Moorlande e. V.",
+    "einheitsTyp": {
+      "freitext": "Betreuungsgruppe (Bereitschaft, MTW)"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Betreuungsgruppe (Bereitschaft, MTW)"
+        },
+        "name": "Moorlande"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Bereitschaft"
+        },
+        "name": "Moorlande"
+      },
+      {
+        "bezeichnung": {
+          "code": 2
+        },
+        "name": "Moorlande e. V.",
+        "kurz": "KV Moorlande",
+        "telefon": "5554714735",
+        "email": "einsatz@drk-moorlande.example"
+      },
+      {
+        "bezeichnung": {
+          "code": 3
+        },
+        "name": "Niedersachsen"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 1907,
+    "zeitraumBis": 1908,
+    "ortAuftrag": "Bombenfund im Stadtteil Moorlande-Süd — Evakuierung von rund 1.500 Anwohnenden: Betreuungsstelle in der Sporthalle, sanitätsdienstliche Versorgung und Transport nicht gehfähiger Personen; Bereitstellungsraum am DRK-Haus."
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Wiebke",
+      "nachname": "Focken",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Gruppenführer/-in"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5557947552"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Gruppenführer (DRK)"
+        },
+        {
+          "freitext": "Sprechfunker (BOS-Digitalfunk)"
+        }
+      ]
+    },
+    {
+      "vorname": "Jann",
+      "nachname": "Poppen",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Betreuungshelfer/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Betreuungshelfer"
+        }
+      ]
+    },
+    {
+      "vorname": "Hauke",
+      "nachname": "Harms",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Betreuungshelfer/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Betreuungshelfer"
+        },
+        {
+          "freitext": "Sanitätshelfer (San A/B)"
+        }
+      ]
+    },
+    {
+      "vorname": "Torben",
+      "nachname": "Poppen",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Betreuungshelfer/-in"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Betreuungshelfer"
+        }
+      ]
+    },
+    {
+      "vorname": "Imke",
+      "nachname": "Hayen",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Betreuungshelfer/-in"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Hinrich",
+      "nachname": "Eilers",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Betreuungshelfer/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Gerrit",
+      "nachname": "Dreesmann",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Betreuungshelfer/-in"
+        },
+        {
+          "freitext": "Materialerhaltung"
+        }
+      ],
+      "fahrerlaubnis": 6,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Truppführer"
+        }
+      ]
+    },
+    {
+      "vorname": "Insa",
+      "nachname": "Ahlers",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Sanitätshelfer/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Sanitätshelfer (San A/B)"
+        }
+      ]
+    },
+    {
+      "vorname": "Malte",
+      "nachname": "Ubben",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kraftfahrer/-in"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Kraftfahrer C1"
+        }
+      ]
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "MTW"
+      },
+      "kennzeichen": "MRL-RK 172",
+      "stanKonform": true,
+      "aenderungen": "Mannschaftstransportwagen — hauptamtlich besetzt (2. Betreuungsgruppe)",
+      "funkrufname": {
+        "kennwort": {
+          "code": 3
+        },
+        "eigenerStandort": false,
+        "ort": "Moorlande",
+        "teile": [
+          87,
+          17,
+          2
+        ]
+      }
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 9,
+    "dieselLiter": 60,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": true,
+    "ruhezeitErforderlich": true
+  }
+}

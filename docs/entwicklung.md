@@ -334,7 +334,8 @@ vorbelegen. Es gibt zwei Quellen:
   und Fahrzeuge (ohne Kennzeichen/Funkrufname) werden gesetzt. Die Einheitenliste
   ist nach Regelwerk gruppiert, weil unter derselben Organisation und demselben
   Bundesland mehrere nebeneinanderstehen können – in Niedersachsen etwa die
-  KatS-StAN und die Nds. Feuerwehrverordnung.
+  KatS-StAN, die Nds. Feuerwehrverordnung und (für das DRK) die Gliederung der
+  Bereitschaft.
 
 **Konvention – Landesvorlagen pflegen sich selbst:** Jeder Beispielbogen unter
 `examples/<bereich>/<bundesland>/*.json` wird beim Build per `import.meta.glob`
@@ -350,9 +351,13 @@ unbekannte Ordner werden sonst kapitalisiert angezeigt.
 
 Ein **neuer Bereich** ist die einzige Änderung, die Code braucht: Er muss in
 `BEREICHE` (in `landesvorlagen.ts`) eingetragen und in den Glob-Mustern ergänzt
-werden. Damit bleiben die organisationseigenen Beispiele (`examples/thw/`,
-`examples/dlrg/`) außen vor – sie gelten bundes- bzw. verbandsweit und sind keine
-Landesvorlagen.
+werden. Damit bleiben die organisationseigenen Beispiele ohne Landesgliederung
+(`examples/thw/`, `examples/dlrg/`) außen vor – sie gelten bundes- bzw.
+verbandsweit und sind keine Landesvorlagen. Ein Bereich muss nicht
+landesrechtlich sein: `examples/drk/niedersachsen/` (erzeugt von
+`scripts/drk-nds-beispielboegen.mts`) bildet die Gliederung einer
+DRK-Bereitschaft ab, die je Landesverband aufgestellt ist und deshalb ebenfalls
+an einem Bundesland hängt.
 
 ## Offene Punkte
 

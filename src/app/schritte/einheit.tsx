@@ -327,9 +327,9 @@ export function SchrittEinheit({ bogen, aendern }: SchrittProps) {
             </Feld>
           </div>
           <p className="hinweis">
-            Nach dem Vorbild der landesrechtlichen Einheiten des Bundeslands (Katastrophenschutz-Stärke,
-            Feuerwehrverordnung): Einheitstyp, Stärkeplätze (Namen offen) und Fahrzeuge werden vorbelegt
-            und lassen sich anschließend anpassen.
+            Nach dem Vorbild der Einheiten des Bundeslands (Katastrophenschutz-Stärke,
+            Feuerwehrverordnung, Verbandsgliederung): Einheitstyp, Stärkeplätze (Namen offen) und
+            Fahrzeuge werden vorbelegt und lassen sich anschließend anpassen.
           </p>
         </>
       )}

@@ -7,7 +7,7 @@
  *
  * Quelle & Konvention: jede Datei unter
  *   examples/<bereich>/<bundesland>/*.json
- * mit einem Bereich aus BEREICHE (Katastrophenschutz, Feuerwehr) wird beim Build
+ * mit einem Bereich aus BEREICHE (Katastrophenschutz, Feuerwehr, DRK) wird beim Build
  * per Glob eingelesen und steht dann als Vorlage der jeweiligen Organisation und
  * des jeweiligen Bundeslands zur Verfügung. Neue Bundesländer oder Einheiten
  * (z. B. aus künftigen StAN- oder Verordnungsunterlagen) erscheinen dadurch ohne
@@ -65,16 +65,21 @@ function fahrzeugAusVorlage(f: Fahrzeug): Fahrzeug {
 }
 
 /**
- * Landesrechtliche Bereiche in der Reihenfolge, in der sie in der Auswahl
+ * Bereiche (Regelwerke) in der Reihenfolge, in der sie in der Auswahl
  * erscheinen. Nur Ordner mit einer Bundesland-Ebene darunter gehören hierher —
- * die organisationseigenen Beispiele (examples/thw, examples/dlrg) sind bundes-
- * bzw. verbandsweit gültig und keine Landesvorlagen.
+ * die organisationseigenen Beispiele ohne Landesgliederung (examples/thw,
+ * examples/dlrg) sind bundes- bzw. verbandsweit gültig und keine Vorlagen des
+ * Bundeslands. Neben den landesrechtlichen Regelwerken (Katastrophenschutz,
+ * Feuerwehrverordnung) steht mit `drk` auch eine Verbandsgliederung hier: die
+ * Bereitschaften des DRK sind je Landesverband aufgestellt und damit ebenfalls
+ * an ein Bundesland gebunden.
  */
-const BEREICHE = ["katastrophenschutz", "feuerwehr"] as const;
+const BEREICHE = ["katastrophenschutz", "feuerwehr", "drk"] as const;
 
 const BEREICH_LABEL: Record<string, string> = {
   katastrophenschutz: "Katastrophenschutz",
   feuerwehr: "Feuerwehr (Landesrecht)",
+  drk: "DRK-Bereitschaft",
 };
 
 /** Lesbarer Name eines Bereichs-Ordners. */
@@ -86,7 +91,11 @@ export function bereichLabel(slug: string): string {
 // Der Pfad ist bewusst zweistufig (<bereich>/<bundesland>/datei.json) — daran
 // hängt die Ableitung von Bereich und Bundesland.
 const MODULE = import.meta.glob<Erfassungsbogen>(
-  ["../../examples/katastrophenschutz/*/*.json", "../../examples/feuerwehr/*/*.json"],
+  [
+    "../../examples/katastrophenschutz/*/*.json",
+    "../../examples/feuerwehr/*/*.json",
+    "../../examples/drk/*/*.json",
+  ],
   { eager: true, import: "default" },
 );
 

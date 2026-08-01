@@ -1,0 +1,262 @@
+{
+  "schemaVersion": 7,
+  "uebung": true,
+  "stand": 2735670,
+  "einheit": {
+    "organisation": 5,
+    "organisationName": "DRK-Kreisverband Moorlande e. V.",
+    "einheitsTyp": {
+      "freitext": "Betreuungsgruppe (Bereitschaft, BT-Kombi)"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Betreuungsgruppe (Bereitschaft, BT-Kombi)"
+        },
+        "name": "Moorlande"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Bereitschaft"
+        },
+        "name": "Moorlande"
+      },
+      {
+        "bezeichnung": {
+          "code": 2
+        },
+        "name": "Moorlande e. V.",
+        "kurz": "KV Moorlande",
+        "telefon": "5554714735",
+        "email": "einsatz@drk-moorlande.example"
+      },
+      {
+        "bezeichnung": {
+          "code": 3
+        },
+        "name": "Niedersachsen"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 1907,
+    "zeitraumBis": 1908,
+    "ortAuftrag": "Bombenfund im Stadtteil Moorlande-Süd — Evakuierung von rund 1.500 Anwohnenden: Betreuungsstelle in der Sporthalle, sanitätsdienstliche Versorgung und Transport nicht gehfähiger Personen; Bereitstellungsraum am DRK-Haus."
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Gesa",
+      "nachname": "Hinrichs",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Gruppenführer/-in"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5552151638"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Gruppenführer (DRK)"
+        },
+        {
+          "freitext": "Betreuungshelfer"
+        }
+      ]
+    },
+    {
+      "vorname": "Tjark",
+      "nachname": "Onken",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Betreuungshelfer/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Betreuungshelfer"
+        }
+      ]
+    },
+    {
+      "vorname": "Insa",
+      "nachname": "Onken",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Betreuungshelfer/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Betreuungshelfer"
+        }
+      ]
+    },
+    {
+      "vorname": "Maike",
+      "nachname": "Eilers",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Betreuungshelfer/-in"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Betreuungshelfer"
+        }
+      ]
+    },
+    {
+      "vorname": "Jens",
+      "nachname": "Dierks",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Betreuungshelfer/-in"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Sprechfunker (BOS-Digitalfunk)"
+        }
+      ]
+    },
+    {
+      "vorname": "Ansgar",
+      "nachname": "Janßen",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Betreuungshelfer/-in"
+        },
+        {
+          "freitext": "Kinderbetreuung"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Fabian",
+      "nachname": "Cordes",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Sanitätshelfer/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Sanitätshelfer (San A/B)"
+        }
+      ]
+    },
+    {
+      "vorname": "Meike",
+      "nachname": "Bohlen",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Fachkraft PSNV"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "PSNV-E (Betroffene)"
+        }
+      ]
+    },
+    {
+      "vorname": "Nils",
+      "nachname": "Bruns",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kraftfahrer/-in"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Kraftfahrer C1"
+        },
+        {
+          "freitext": "Sanitätshelfer (San A/B)"
+        }
+      ]
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "BT-Kombi"
+      },
+      "kennzeichen": "MRL-RK 161",
+      "stanKonform": true,
+      "aenderungen": "Kombifahrzeug Betreuung/Sanität, Betreuungssatz 50 Personen — KatS-gemeldet (1. Betreuungsgruppe / 1. Sanitätsgruppe)",
+      "funkrufname": {
+        "kennwort": {
+          "code": 3
+        },
+        "eigenerStandort": false,
+        "ort": "Moorlande",
+        "teile": [
+          87,
+          16,
+          1
+        ]
+      }
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 9,
+    "dieselLiter": 60,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": true,
+    "ruhezeitErforderlich": true
+  },
+  "sonstiges": "Der BT-Kombi wird laut Einsatzhandakte von der 1. Betreuungsgruppe und der 1. Sanitätsgruppe genutzt."
+}

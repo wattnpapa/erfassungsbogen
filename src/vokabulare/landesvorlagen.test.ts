@@ -30,6 +30,27 @@ describe("Landesvorlagen", () => {
     expect(kats.namen).toContain("Löschgruppe Katastrophenschutz (LG KatS)");
   });
 
+  it("führt die DRK-Bereitschaft als eigene Gruppe hinter den landesrechtlichen", () => {
+    const gruppen = landesvorlagenGruppen(OrganisationsTyp.DRK, "niedersachsen");
+
+    expect(gruppen.map((g) => g.bereich)).toEqual(["katastrophenschutz", "drk"]);
+    const drk = gruppen.find((g) => g.bereich === "drk")!;
+    expect(drk.namen).toContain("Verpflegungsgruppe (Bereitschaft)");
+    // Die Teileinheiten der Bereitschaft stehen nicht bei der KatS-StAN …
+    const kats = gruppen.find((g) => g.bereich === "katastrophenschutz")!;
+    expect(kats.namen).not.toContain("Verpflegungsgruppe (Bereitschaft)");
+    // … und die Vorlage bringt Stärkeplätze und Fahrzeuge mit.
+    const v = landesvorlage(OrganisationsTyp.DRK, "niedersachsen", "Verpflegungsgruppe (Bereitschaft)")!;
+    expect(v.personal).toHaveLength(9);
+    expect(v.fahrzeuge.map((f) => f.typ.freitext)).toEqual([
+      "MTW",
+      "Anh. Verpflegung",
+      "Anh. Feldküche",
+      "Anh. Kühl",
+    ]);
+    for (const f of v.fahrzeuge) expect(f.funkrufname).toBeUndefined();
+  });
+
   it("sortiert die Einheiten je Bereich alphabetisch", () => {
     for (const g of landesvorlagenGruppen(OrganisationsTyp.FEUERWEHR, "niedersachsen")) {
       expect(g.namen).toEqual([...g.namen].sort((a, b) => a.localeCompare(b, "de")));
@@ -78,6 +99,7 @@ describe("Landesvorlagen", () => {
   it("benennt Bereiche und Bundesländer lesbar, unbekannte kapitalisiert", () => {
     expect(bereichLabel("katastrophenschutz")).toBe("Katastrophenschutz");
     expect(bereichLabel("feuerwehr")).toBe("Feuerwehr (Landesrecht)");
+    expect(bereichLabel("drk")).toBe("DRK-Bereitschaft");
     expect(bereichLabel("technische-hilfe")).toBe("Technische Hilfe");
     expect(bundeslandLabel("niedersachsen")).toBe("Niedersachsen");
   });
