@@ -13,6 +13,7 @@ Funktionalität: Bogen per QR-Code einlesen
     Wenn ich auf "QR-Code scannen…" klicke
     Dann sehe ich den Dialog "QR-Code scannen"
     Und sehe ich den Hinweis "Ohne Kamera geht es weiter über ein Foto oder einen Screenshot des QR-Codes."
+    Und sehe ich den Datei-Knopf "QR aus Bild einlesen…"
     Und sehe ich die Schaltfläche "Kamera erneut versuchen"
     Wenn ich im Dialog "QR-Code scannen" auf "Abbrechen" klicke
     Dann sehe ich den Hinweis "Ohne Kamera geht es weiter über ein Foto oder einen Screenshot des QR-Codes." nicht

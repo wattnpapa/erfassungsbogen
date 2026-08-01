@@ -182,6 +182,19 @@ Then("sehe ich den Hinweis {string}", async function (this: EebWelt, text: strin
   await this.page.getByText(text).first().waitFor({ state: "visible" });
 });
 
+/**
+ * Datei-Eingaben tragen ihre Beschriftung am umschließenden `<label>`, nicht an
+ * einer Schaltfläche — „sehe ich die Schaltfläche" greift für sie nicht. Geprüft
+ * wird das Label: das `<input>` darin ist für das Auge weggeblendet (.nur-sr).
+ */
+Then("sehe ich den Datei-Knopf {string}", async function (this: EebWelt, beschriftung: string) {
+  await this.page
+    .locator("label.datei-knopf")
+    .filter({ hasText: beschriftung })
+    .first()
+    .waitFor({ state: "visible" });
+});
+
 Then("sehe ich den Hinweis {string} nicht", async function (this: EebWelt, text: string) {
   await this.page.getByText(text).first().waitFor({ state: "hidden" });
 });
