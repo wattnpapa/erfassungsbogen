@@ -320,3 +320,56 @@ describe("Neuen Einsatz anlegen", () => {
     expect(within(liste).getByText("THW Scanhausen")).toBeDefined();
   });
 });
+
+/**
+ * Meldekopf-Dauerscan: Der Scanner bleibt offen, jeder gelesene Bogen liegt
+ * sofort im Einsatz. Der Schließen-Knopf beendet dort nur den Durchgang — er
+ * darf deshalb nicht „Abbrechen" heißen. Ausnahme: Von einem mehrteiligen Bogen
+ * liegen erst einzelne Teile im Sammelstand; die gehen beim Schließen verloren,
+ * dann ist „Abbrechen" die ehrliche Beschriftung.
+ */
+describe("Meldekopf-Scan: Beschriftung des Schließen-Knopfes", () => {
+  afterEach(() => {
+    window.history.replaceState(null, "", window.location.pathname + window.location.search);
+    localStorage.clear();
+  });
+
+  /** Einsatz anlegen und den Kiosk-Scanner darin öffnen. */
+  async function scannerImEinsatz(nutzer: ReturnType<typeof userEvent.setup>): Promise<HTMLElement> {
+    await nutzer.click(screen.getByRole("button", { name: "Neuer Einsatz…" }));
+    const anlegen = await screen.findByRole("dialog", { name: "Neuen Einsatz anlegen" });
+    await nutzer.type(within(anlegen).getByLabelText("Name"), "Meldekopfhausen");
+    await nutzer.click(within(anlegen).getByRole("button", { name: "Einsatz anlegen" }));
+
+    await nutzer.click(await screen.findByRole("button", { name: "Bogen scannen…" }));
+    return screen.findByRole("dialog", { name: "QR-Code scannen" });
+  }
+
+  it("zeigt „Fertig“, solange kein angefangener Bogen im Sammelstand liegt", async () => {
+    const nutzer = userEvent.setup();
+    render(<App />);
+
+    const scanner = await scannerImEinsatz(nutzer);
+
+    expect(within(scanner).getByRole("button", { name: "Fertig" })).toBeDefined();
+    expect(within(scanner).queryByRole("button", { name: "Abbrechen" })).toBeNull();
+  });
+
+  it("wird zu „Abbrechen“, solange Teile eines unvollständigen Bogens im Sammelstand liegen", async () => {
+    const nutzer = userEvent.setup();
+    const teile = segmentPayloadUrls(encodePayload(bogenMitName("Teilhausen"), browserKompressor), 2);
+    render(<App />);
+
+    const scanner = await scannerImEinsatz(nutzer);
+
+    // Teil 1 von 2 — der Rest fehlt, Schließen würde ihn wegwerfen.
+    fragmentSetzen(teile[0]!);
+    expect(await within(scanner).findByRole("button", { name: "Abbrechen" })).toBeDefined();
+
+    // Teil 2 vervollständigt den Bogen: Er liegt jetzt im Einsatz, der Scanner
+    // bleibt für den nächsten offen — und der Knopf beendet wieder nur den Durchgang.
+    fragmentSetzen(teile[1]!);
+    expect(await within(scanner).findByRole("button", { name: "Fertig" })).toBeDefined();
+    expect(within(scanner).queryByRole("button", { name: "Abbrechen" })).toBeNull();
+  });
+});

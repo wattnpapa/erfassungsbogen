@@ -62,6 +62,12 @@ export function QrScannerWeb(props: {
   onAbbruch: () => void;
   /** Fortschritt bei Segmentierung, z. B. „Teil 1 von 2 gescannt". */
   fortschritt?: string;
+  /**
+   * Beschriftung des Schließen-Knopfes. Standard „Abbrechen" — beim
+   * Kiosk-Scan (Meldekopf) sind die Bögen aber schon aufgenommen, dort
+   * beendet der Knopf den Durchgang, statt etwas zurückzunehmen.
+   */
+  abbruchText?: string;
   /** Ausweg, wenn das Abfilmen nicht klappt: QR aus einem Foto/Screenshot lesen. */
   onBild?: (e: ChangeEvent<HTMLInputElement>) => void;
 }) {
@@ -183,7 +189,7 @@ export function QrScannerWeb(props: {
             <input type="file" accept="image/*" onChange={props.onBild} className="nur-sr" />
           </label>
         )}
-        <button type="button" onClick={props.onAbbruch}>Abbrechen</button>
+        <button type="button" onClick={props.onAbbruch}>{props.abbruchText ?? "Abbrechen"}</button>
       </div>
     </div>
   );

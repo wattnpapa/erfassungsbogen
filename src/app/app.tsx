@@ -293,6 +293,14 @@ function AppInhalt() {
   // Segmentierung: gesammelte Teile eines großen Bogens (Zustand als Ref, damit
   // der laufende Kamera-/Native-Scan darauf zugreift) + Fortschrittstext fürs Overlay.
   const segmentTeileRef = useRef<SegmentTeil[]>([]);
+  // Dasselbe fürs Rendern: liegen Teile eines noch UNvollständigen Bogens im
+  // Speicher, nimmt Schließen tatsächlich etwas zurück — das steht dann auch
+  // auf dem Knopf (siehe Kiosk-Scanner weiter unten).
+  const [segmenteOffen, setSegmenteOffen] = useState(false);
+  const setzeSegmentTeile = (teile: SegmentTeil[]) => {
+    segmentTeileRef.current = teile;
+    setSegmenteOffen(teile.length > 0);
+  };
   const [scanFortschritt, setScanFortschritt] = useState("");
 
   const vorlagenNeuLaden = () => setVorlagen(vorlagenLaden());
@@ -538,7 +546,7 @@ function AppInhalt() {
    */
   async function uebernehmeText(text: string, fehlertext: string): Promise<boolean> {
     if (istVorlageNutzlast(text)) {
-      segmentTeileRef.current = [];
+      setzeSegmentTeile([]);
       setScanFortschritt("");
       try {
         const b = decodeVorlagePayloadUrl(text, browserKompressor);
@@ -559,14 +567,14 @@ function AppInhalt() {
       try {
         const teil = parseSegmentUrl(text);
         const r = segmentSammeln(segmentTeileRef.current, teil);
-        segmentTeileRef.current = r.teile;
+        setzeSegmentTeile(r.teile);
         if (r.status === "vollständig") {
           // Signatur über den zusammengesetzten Payload prüfen (auch signierte
           // Bögen können segmentiert sein — die Teile ergeben ihn 1:1 wieder).
           const payload = segmentePayload(r.teile);
           const b = segmenteZuBogen(r.teile, browserKompressor);
           const status = await signaturVonPayload(payload);
-          segmentTeileRef.current = [];
+          setzeSegmentTeile([]);
           setScanFortschritt("");
           return uebernimmBogen(b, status, payload);
         }
@@ -585,7 +593,7 @@ function AppInhalt() {
       }
     }
     // Normaler Einzel-Bogen.
-    segmentTeileRef.current = [];
+    setzeSegmentTeile([]);
     setScanFortschritt("");
     try {
       const dekodiert = decodePayloadUrl(text, browserKompressor);
@@ -612,7 +620,7 @@ function AppInhalt() {
   function scanAbbrechen(auchSammelZiel: boolean) {
     setScannerOffen(false);
     if (auchSammelZiel) setSammelZiel(null);
-    segmentTeileRef.current = [];
+    setzeSegmentTeile([]);
     setScanFortschritt("");
     // Kiosk-Bilanz beim Schließen kurz bestätigen (der Zähler stand im Overlay).
     if (kioskZaehlerRef.current > 0) {
@@ -707,7 +715,7 @@ function AppInhalt() {
         const text = await qrScannen(anweisung);
         if (!text) {
           // Abbruch: angefangenen Sammelstand (und ein Kiosk-Sammelziel) verwerfen.
-          segmentTeileRef.current = [];
+          setzeSegmentTeile([]);
           setScanFortschritt("");
           setSammelZiel(null);
           if (kioskZaehlerRef.current > 0) {
@@ -952,8 +960,18 @@ function AppInhalt() {
             {fehler || meldung}
           </p>
         )}
+        {/* Kiosk-Scan: die aufgenommenen Bögen bleiben im Einsatz — der Knopf
+            beendet nur den Durchgang, deshalb „Fertig". Liegen aber Teile eines
+            noch unvollständigen Bogens im Sammelstand, gehen die beim Schließen
+            verloren — dann ist es ehrlicher weiterhin ein „Abbrechen". */}
         {scannerOffen && (
-          <QrScannerWeb onErgebnis={scanErgebnisWeb} fortschritt={scanFortschritt} onAbbruch={() => scanAbbrechen(true)} onBild={ladeQrBild} />
+          <QrScannerWeb
+            onErgebnis={scanErgebnisWeb}
+            fortschritt={scanFortschritt}
+            onAbbruch={() => scanAbbrechen(true)}
+            onBild={ladeQrBild}
+            abbruchText={segmenteOffen ? "Abbrechen" : "Fertig"}
+          />
         )}
         <Fusszeile onBogenOeffnen={oeffneBeispiel} />
       </>
