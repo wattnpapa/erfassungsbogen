@@ -42,6 +42,9 @@ Wer noch abwägt: [Papier oder digital?](https://erfassungsbogen.app/papier-oder
   auch komplett offline, es braucht keinen Server und keine Verbindung
   zwischen den Geräten. Wer den QR-Code mit der normalen Handykamera scannt,
   landet automatisch in der App bzw. auf der Webseite.
+- **Von Handy zu Handy**: liegt das andere Gerät daneben, geht der Bogen auch
+  per AirDrop (Apple) bzw. Quick Share (Android) hinüber — ohne Netz, ohne
+  Kopplung, ohne Kamera. Der Empfänger tippt den Link an und hat den Bogen.
 - **Speichern und laden**: der Bogen lässt sich als Datei sichern und
   weitergeben.
 - **Einsätze sammeln (Meldekopf)**: mehrere fremde Bögen unter einem Einsatz

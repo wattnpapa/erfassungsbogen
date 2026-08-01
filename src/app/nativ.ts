@@ -21,6 +21,31 @@ export function plattform(): string {
 }
 
 /**
+ * Ist ein System-Share-Sheet erreichbar? Nativ immer (Capacitor Share), im
+ * Browser nur mit Web Share API. Desktop-Chrome unter Linux und Electron haben
+ * keine — dort bleiben Zwischenablage und Download die Wege.
+ */
+export function shareSheetVerfuegbar(): boolean {
+  return istNativ() || (typeof navigator !== "undefined" && typeof navigator.share === "function");
+}
+
+/**
+ * Name des Nahbereichs-Dienstes der Plattform — allein für die Beschriftung,
+ * damit der Knopf das nennt, was der Nutzer im Share-Sheet dann auch sucht.
+ * Im Browser bleibt nur die Gerätekennung; sie entscheidet hier über ein Wort,
+ * nicht über eine Funktion, ein Fehlgriff kostet also nichts.
+ */
+export function nahbereichDienst(): "AirDrop" | "Quick Share" | null {
+  const p = plattform();
+  if (p === "ios") return "AirDrop";
+  if (p === "android") return "Quick Share";
+  const kennung = typeof navigator === "undefined" ? "" : navigator.userAgent;
+  if (/Android/.test(kennung)) return "Quick Share";
+  if (/iPhone|iPad|iPod|Mac OS X|Macintosh/.test(kennung)) return "AirDrop";
+  return null;
+}
+
+/**
  * Universal Links (iOS) / App Links (Android) empfangen: Der Callback
  * bekommt die volle URL (https://erfassungsbogen.app/#<Payload>) — beim
  * Kaltstart über die Launch-URL, bei bereits laufender App über appUrlOpen.

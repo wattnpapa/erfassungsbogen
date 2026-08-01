@@ -20,16 +20,23 @@ vi.mock("./pdf", () => ({
   einsatzPdfErzeugen: async () => {},
 }));
 
-// Ohne Capacitor: die Tests fahren die Browser-Variante der App.
-vi.mock("./nativ", () => ({
-  istNativ: () => false,
-  plattform: () => "web",
-  bogenLinksEmpfangen: () => () => {},
-  qrScannen: async () => "",
-  pdfTeilen: async () => {},
-  linkTeilen: async () => {},
-  textTeilen: async () => {},
-}));
+// Ohne Capacitor: die Tests fahren die Browser-Variante der App. Das
+// Share-Sheet richtet sich damit nach navigator.share — jsdom hat keins, die
+// Nahbereichs-Übergabe ist also standardmäßig aus (wie im Desktop-Browser).
+vi.mock("./nativ", async () => {
+  const echt = await vi.importActual<typeof import("./nativ")>("./nativ");
+  return {
+    istNativ: () => false,
+    plattform: () => "web",
+    bogenLinksEmpfangen: () => () => {},
+    qrScannen: async () => "",
+    pdfTeilen: async () => {},
+    linkTeilen: async () => {},
+    textTeilen: async () => {},
+    shareSheetVerfuegbar: () => typeof navigator.share === "function",
+    nahbereichDienst: echt.nahbereichDienst,
+  };
+});
 
 const { App } = await import("./app");
 
@@ -141,6 +148,41 @@ describe("Assistenten-Durchlauf", () => {
 
     expect(pdfErzeugen).toHaveBeenCalledTimes(1);
     expect(pdfErzeugen.mock.calls[0]![0].einheit.organisation).toBe(OrganisationsTyp.THW);
+  });
+
+  /** Übergabe-Dialog auf der Übersicht öffnen und zurückgeben. */
+  async function uebergabeDialog(nutzer: ReturnType<typeof userEvent.setup>): Promise<HTMLDialogElement> {
+    render(<App />);
+    await neuerBogenBis(nutzer, 5);
+    await nutzer.click(screen.getByRole("button", { name: "Bogen übergeben…" }));
+    return document.querySelector<HTMLDialogElement>("dialog[aria-label='Bogen übergeben']")!;
+  }
+
+  const NAHBEREICH = /Gerät in der Nähe|AirDrop|Quick Share/;
+
+  it("bietet die Übergabe ans Nachbargerät nicht an, wo es kein Share-Sheet gibt", async () => {
+    // Desktop-Browser ohne Web Share API (wie hier jsdom): der Knopf bliebe
+    // wirkungslos, also steht er gar nicht erst da.
+    const dialog = await uebergabeDialog(userEvent.setup());
+
+    expect(within(dialog).queryByRole("button", { name: NAHBEREICH })).toBeNull();
+  });
+
+  it("gibt den vollen Bogen-Link ans Share-Sheet, wenn eines da ist (AirDrop/Quick Share)", async () => {
+    const geteilt = vi.fn<(daten: ShareData) => Promise<void>>(async () => {});
+    Object.defineProperty(navigator, "share", { value: geteilt, configurable: true });
+    try {
+      const nutzer = userEvent.setup();
+      const dialog = await uebergabeDialog(nutzer);
+
+      await nutzer.click(within(dialog).getByRole("button", { name: NAHBEREICH }));
+
+      expect(geteilt).toHaveBeenCalledTimes(1);
+      // Der Link trägt den kompletten Payload — nicht nur einen QR-Teil.
+      expect(geteilt.mock.calls[0]![0].url).toContain("erfassungsbogen.app/#");
+    } finally {
+      Reflect.deleteProperty(navigator, "share");
+    }
   });
 
   it("öffnet einen Bogen-Link auch bei bereits geladener Seite (nur Fragmentwechsel)", async () => {

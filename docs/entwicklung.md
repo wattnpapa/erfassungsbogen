@@ -217,6 +217,26 @@ App, ohne App die Web-App (AASA/assetlinks unter
 [public/.well-known/](../public/.well-known/)). Datenschutzerklärung für die
 Stores: [public/datenschutz.html](../public/datenschutz.html).
 
+### Übergabe ans Nachbargerät (AirDrop / Quick Share)
+
+Der Übergabe-Dialog bietet neben QR, PDF und Link einen Weg „An Gerät in der
+Nähe senden": Er legt den vollständigen Bogen-Link ins System-Share-Sheet, wo
+AirDrop bzw. Quick Share stehen — beides läuft ohne Netz und ohne Kopplung, der
+Empfänger tippt den Link an und landet über den Universal/App Link in der App.
+Nativ übernimmt das Capacitor-Plugin, im Browser die Web Share API; ohne beides
+(Desktop-Chrome unter Linux, Electron) erscheint der Weg gar nicht erst
+(`shareSheetVerfuegbar()` in [src/app/nativ.ts](../src/app/nativ.ts)).
+
+**Warum kein NFC:** Die Web NFC API kann kein Handy-zu-Handy — `NDEFReader`
+liest und schreibt nur NFC-Tags, Peer-to-Peer ist nicht Teil der Spezifikation,
+und Android Beam (das einzige Verfahren, das das je konnte) ist seit Android 14
+entfernt. Dazu läuft Web NFC nur in Chromium auf Android; WebKit hat es nie
+bekommen, iOS fällt also komplett aus. Ein NFC-**Tag** als Datenträger ginge,
+wäre aber ein Rückschritt: gemessen über die 239 Beispielbögen liegt die
+signierte Nutzlast im Median bei 562 Bytes (p90 708, max 1837) — auf einen
+NTAG215 (~492 B nutzbar) passen 23 %, auf einen NTAG216 (~872 B) 93 %, während
+ein einzelner QR-Code heute schon mehr trägt.
+
 ## Datenmodell & QR-Codec (Schema v3)
 
 - [datenmodell.md](datenmodell.md) — Datenmodell und Binärformat „EEB2"

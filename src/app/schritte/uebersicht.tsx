@@ -41,7 +41,7 @@ import {
 import { absenderkarteLaden, type Absenderkarte } from "../absenderkarte";
 import { AbsenderkarteFeld } from "../absenderkarte-ui";
 import { geraeteKurzform, geraeteOeffentlichHex } from "../geraete-schluessel";
-import { istNativ, linkTeilen, textTeilen } from "../nativ";
+import { istNativ, linkTeilen, nahbereichDienst, shareSheetVerfuegbar, textTeilen } from "../nativ";
 import { frageJaNein, frageText, zeigeHinweis } from "../dialoge";
 import {
   MWD_LEGENDE,
@@ -122,6 +122,8 @@ export function Uebersicht(props: {
   // verworfen sobald der Bogen sich ändert (dann wäre sie veraltet).
   const [vorschauUrl, setVorschauUrl] = useState<string | null>(null);
   const [vorschauLaeuft, setVorschauLaeuft] = useState(false);
+  // Nahbereichs-Dienst des Systems (AirDrop/Quick Share) — nur Beschriftung.
+  const nahDienst = nahbereichDienst();
   const org = bogen.einheit.organisation;
   const s = staerke(bogen);
   const mwd = unterbringungMWD(bogen);
@@ -207,15 +209,41 @@ export function Uebersicht(props: {
     }
   }
 
+  /**
+   * Bogen-Link ins System-Share-Sheet geben (AirDrop, Quick Share, Messenger,
+   * Mail …). Nativ übernimmt das Capacitor-Plugin, im Browser die Web Share
+   * API — beide öffnen dasselbe Fenster des Betriebssystems.
+   */
+  async function linkInsShareSheet(url: string): Promise<void> {
+    const titel = `Erfassungsbogen ${einheitAnzeigename(bogen.einheit)}`;
+    if (istNativ()) await linkTeilen(titel, url);
+    else await navigator.share({ title: titel, text: titel, url });
+  }
+
+  /**
+   * Übergabe aufs Nachbargerät: AirDrop bzw. Quick Share stehen im Share-Sheet
+   * und arbeiten ohne Netz und ohne vorherige Kopplung. Der Link trägt den
+   * kompletten signierten Bogen — auch einen, der für einen einzelnen QR-Code
+   * zu groß wäre und sonst in Teilen gescannt werden müsste.
+   */
+  async function anGeraetInDerNaeheSenden() {
+    if (!qr) return;
+    setFehler("");
+    try {
+      await linkInsShareSheet(qr.vollUrl);
+    } catch (e) {
+      // Abbruch im Share-Dialog ist kein Fehler
+      if (e instanceof Error && e.name === "AbortError") return;
+      setFehler(`Senden: ${e instanceof Error ? e.message : e}`);
+    }
+  }
+
   async function bogenLinkTeilen() {
     if (!qr) return;
     const url = qr.vollUrl;
-    const titel = `Erfassungsbogen ${einheitAnzeigename(bogen.einheit)}`;
     try {
-      if (istNativ()) {
-        await linkTeilen(titel, url);
-      } else if (navigator.share) {
-        await navigator.share({ title: titel, text: titel, url });
+      if (shareSheetVerfuegbar()) {
+        await linkInsShareSheet(url);
       } else if (navigator.clipboard) {
         await navigator.clipboard.writeText(url);
         setLinkKopiert(true);
@@ -264,8 +292,9 @@ export function Uebersicht(props: {
                 {props.sammelAktion.label}
               </button>
             )}{" "}
-            {/* Ein Weg zum Ziel: PDF/QR/Link/Datei sind vier Transportarten
-                desselben Bogens — der Dialog bündelt sie mit Situationshilfe. */}
+            {/* Ein Weg zum Ziel: QR, Nahbereich (AirDrop/Quick Share), PDF, Link
+                und Datei tragen denselben Bogen — der Dialog bündelt sie mit
+                Situationshilfe, damit der Nutzer nicht raten muss. */}
             <button type="button" className={props.sammelAktion ? "" : "primaer"} onClick={() => teilenDialog.current?.showModal()}>
               Bogen übergeben…
             </button>{" "}
@@ -534,6 +563,20 @@ export function Uebersicht(props: {
             {qr?.segmentiert ? ` (${qr.teile.length} Teile nacheinander)` : ""}.
           </p>
         </div>
+        {/* Handy zu Handy ohne Papier und ohne Kamera. Nur dort anbieten, wo es
+            ein Share-Sheet gibt — sonst zeigte der Knopf ins Leere. */}
+        {shareSheetVerfuegbar() && (
+          <div className="teilen-weg">
+            <button type="button" onClick={anGeraetInDerNaeheSenden} disabled={!qr}>
+              {nahDienst ? `Per ${nahDienst} senden` : "An Gerät in der Nähe senden"}
+            </button>
+            <p className="hinweis">
+              Handy zu Handy: im Teilen-Fenster {nahDienst ?? "den Nahbereichs-Dienst"} wählen —
+              ohne Netz, ohne Kopplung. Der Link trägt den ganzen Bogen, auch einen für den
+              QR-Code zu großen.
+            </p>
+          </div>
+        )}
         <div className="teilen-weg">
           <button type="button" onClick={pdf} disabled={pdfLaeuft}>
             {pdfLaeuft ? "PDF wird erstellt…" : "PDF erzeugen"}
@@ -544,7 +587,9 @@ export function Uebersicht(props: {
           <button type="button" onClick={bogenLinkTeilen} disabled={!qr}>
             {linkKopiert ? "Link kopiert ✓" : "Link teilen"}
           </button>
-          <p className="hinweis">Derselbe Inhalt wie im QR-Code — öffnet den Bogen beim Antippen.</p>
+          <p className="hinweis">
+            Für Chat, Mail oder Notiz: derselbe Inhalt wie im QR-Code — öffnet den Bogen beim Antippen.
+          </p>
         </div>
         {/* Roh-JSON nur im Debug-Modus anbieten: fürs Publikum ist der Bogen
             ohnehin in jeder PDF eingebettet — ein separater JSON-Download
