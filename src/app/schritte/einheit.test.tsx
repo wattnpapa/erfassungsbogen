@@ -44,9 +44,12 @@ describe("Schritt Einheit", () => {
     // Ziffern only — die Eingabe filtert Trenn- und Leerzeichen heraus.
     expect((screen.getAllByLabelText("Telefon")[0] as HTMLInputElement).value).toBe("04413401050");
 
-    // Regionalstelle und Landesverband kommen als eigene Ebenen dazu.
+    // Regionalstelle und Landesverband kommen als eigene Ebenen dazu — je mit
+    // ihrem offiziellen Kürzel aus der Organisationskennzeichnung.
     const namen = screen.getAllByLabelText("Name") as HTMLInputElement[];
     expect(namen.map((f) => f.value)).toEqual(["Oldenburg", "Bremen, Niedersachsen"]);
+    const kuerzel = screen.getAllByLabelText("Kürzel") as HTMLInputElement[];
+    expect(kuerzel.map((f) => f.value)).toEqual(["OODE", "GOLD", "LVNI"]);
   });
 
   it("bildet den Anzeigenamen aus Organisation, Einheitstyp und Ebenenname", async () => {

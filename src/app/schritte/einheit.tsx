@@ -59,16 +59,17 @@ function useLandesvorlagen(): LandesvorlagenModul | null {
 
 /**
  * Setzt in der Hierarchie die (erste) Ebene mit `code` auf `name`; hängt sie
- * sonst an. Übergebene Kontaktfelder (Telefon/E-Mail) werden mitgeschrieben.
+ * sonst an. Übergebene Felder (Kürzel, Telefon, E-Mail) werden mitgeschrieben.
  */
 function ebeneNameSetzen(
   hierarchie: HierarchieEbene[],
   code: number,
   name: string,
-  kontakt?: { telefon?: string; email?: string },
+  kontakt?: { kurz?: string; telefon?: string; email?: string },
 ): HierarchieEbene[] {
   const felder = {
     name,
+    ...(kontakt?.kurz ? { kurz: kontakt.kurz } : {}),
     ...(kontakt?.telefon ? { telefon: kontakt.telefon } : {}),
     ...(kontakt?.email ? { email: kontakt.email } : {}),
   };
@@ -91,8 +92,8 @@ function ovInHierarchieUebernehmen(daten: OvDaten, hierarchie: HierarchieEbene[]
   if (struktur) {
     const rst = daten.THW_REGIONALSTELLEN_KONTAKT[struktur.regionalstelle];
     const lv = daten.THW_LANDESVERBAENDE_KONTAKT[struktur.landesverband];
-    neu = ebeneNameSetzen(neu, 2, struktur.regionalstelle, rst && { telefon: rst.telefon.replace(/\D/g, ""), email: rst.email });
-    neu = ebeneNameSetzen(neu, 3, struktur.landesverband, lv && { telefon: lv.telefon.replace(/\D/g, ""), email: lv.email });
+    neu = ebeneNameSetzen(neu, 2, struktur.regionalstelle, rst && { kurz: rst.kurz, telefon: rst.telefon.replace(/\D/g, ""), email: rst.email });
+    neu = ebeneNameSetzen(neu, 3, struktur.landesverband, lv && { kurz: lv.kurz, telefon: lv.telefon.replace(/\D/g, ""), email: lv.email });
   }
   return neu;
 }

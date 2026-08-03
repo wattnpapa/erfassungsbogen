@@ -1,8 +1,11 @@
 /**
  * Generiert src/vokabulare/thw-ov-regionalstruktur.ts:
  * die Zuordnung jedes THW-Ortsverbands zu seiner Regionalstelle und seinem
- * Landesverband (für das Autofill der Zugehörigkeit-Ebenen 2/3) sowie die
- * Kontaktdaten (Telefon/E-Mail) der Regionalstellen und Landesverbände.
+ * Landesverband (für das Autofill der Zugehörigkeit-Ebenen 2/3) sowie Kürzel
+ * und Kontaktdaten (Telefon/E-Mail) der Regionalstellen und Landesverbände.
+ *
+ * Die Kürzel stehen in RST_KUERZEL/LV_KUERZEL unten (offizielle Liste, nicht
+ * im THWiki); alles andere kommt aus dem THWiki.
  *
  * Quelle: THWiki (https://thwiki.org), MediaWiki-API. Aufbau:
  *   Kategorie:Regionalstelle → 66 "Regionalbereich <X>"-Kategorien;
@@ -65,6 +68,93 @@ const OVERRIDES = {
     regionalstelle: "Schleswig",
     landesverband: "Hamburg, Mecklenburg-Vorpommern, Schleswig-Holstein",
   },
+};
+
+/**
+ * Regionalstellenname (wie im THWiki, s. o.) → offizielles Kürzel.
+ * Quelle: Anlage 09 „Organisationskennzeichnung" zur Gerätedienstvorschrift
+ * THW, Stand 06.04.2020. Die Kürzel bleiben laut Anlage auch nach Umzug oder
+ * Umbenennung unverändert — daher z. B. RSt Neumünster = GITZ (früher Itzehoe).
+ */
+const RST_KUERZEL = {
+  Aachen: "GAAC",
+  Arnsberg: "GARN",
+  "Bad Kreuznach": "GBKN",
+  "Bad Tölz": "GTOE",
+  Bamberg: "GBAM",
+  Berlin: "GBER",
+  Biberach: "GBIB",
+  Bielefeld: "GBIE",
+  Bochum: "GBOC",
+  Braunschweig: "GBRA",
+  Bremen: "GHBN",
+  Buxtehude: "GBUX",
+  Chemnitz: "GCHE",
+  Darmstadt: "GDAR",
+  Dortmund: "GDOR",
+  Dresden: "GDRE",
+  "Düsseldorf": "GDUE",
+  Erfurt: "GERF",
+  "Frankfurt (Oder)": "GFOD",
+  "Frankfurt am Main": "GFRA",
+  Freiburg: "GFRE",
+  Gelnhausen: "GGEL",
+  Gelsenkirchen: "GGKN",
+  "Gießen": "GGIE",
+  "Göppingen": "GGOE",
+  "Göttingen": "GGOT",
+  Halle: "GHAL",
+  Hamburg: "GHHB",
+  Hannover: "GHAN",
+  Heilbronn: "GHBR",
+  Hof: "GHOF",
+  Homberg: "GHOM",
+  Ingolstadt: "GING",
+  Karlsruhe: "GKAR",
+  Karlstadt: "GKST",
+  Kempten: "GKEM",
+  Koblenz: "GKOB",
+  "Köln": "GKOE",
+  Leipzig: "GLEI",
+  Lingen: "GLIN",
+  "Lübeck": "GHLB",
+  Magdeburg: "GMGB",
+  Mannheim: "GMAN",
+  Merzig: "GMER",
+  "Mönchengladbach": "GMOE",
+  "Mühldorf": "GMUE",
+  "München": "GMUC",
+  "Münster": "GMST",
+  "Neumünster": "GITZ",
+  "Neustadt a.d.W.": "GNAW",
+  "Nürnberg": "GNUE",
+  Oldenburg: "GOLD",
+  Olpe: "GOLP",
+  Potsdam: "GPOT",
+  "Saarbrücken": "GSAA",
+  Schleswig: "GSLG",
+  Schwandorf: "GSCH",
+  Schwerin: "GSWN",
+  Stralsund: "GSTD",
+  Straubing: "GSTR",
+  Stuttgart: "GSTU",
+  Trier: "GTRI",
+  "Tübingen": "GTUE",
+  Verden: "GVER",
+  "Villingen-Schwenningen": "GVIS",
+  Wesel: "GWES",
+};
+
+/** Landesverbandsname (wie im THWiki) → offizielles Kürzel (Quelle wie RST_KUERZEL). */
+const LV_KUERZEL = {
+  "Baden-Württemberg": "LVBW",
+  Bayern: "LVBY",
+  "Berlin, Brandenburg, Sachsen-Anhalt": "LVBE",
+  "Bremen, Niedersachsen": "LVNI",
+  "Hamburg, Mecklenburg-Vorpommern, Schleswig-Holstein": "LVSH",
+  "Hessen, Rheinland-Pfalz, Saarland": "LVRP",
+  "Nordrhein-Westfalen": "LVNW",
+  "Sachsen, Thüringen": "LVTH",
 };
 
 /**
@@ -191,6 +281,22 @@ for (const [name, patch] of Object.entries(RST_KONTAKT_OVERRIDES)) {
   regionalstellenKontakt.set(name, { ...regionalstellenKontakt.get(name), ...patch });
 }
 
+/**
+ * Trägt die offiziellen Kürzel in die Kontakt-Tabelle ein. Beide Richtungen
+ * müssen aufgehen: eine Stelle ohne Kürzel wäre eine Lücke, ein Kürzel ohne
+ * Stelle ein Tippfehler oder eine THWiki-Umbenennung.
+ */
+function kuerzelZuordnen(kontakte, kuerzel, art) {
+  for (const [name, k] of kontakte) {
+    const kurz = kuerzel[name];
+    if (!kurz) throw new Error(`Kein Kürzel für ${art} ${name} — RST_KUERZEL/LV_KUERZEL ergänzen`);
+    kontakte.set(name, { kurz, ...k });
+  }
+  for (const name of Object.keys(kuerzel)) {
+    if (!kontakte.has(name)) throw new Error(`Kürzel für unbekannte(n) ${art} ${name}`);
+  }
+}
+
 // Kontaktdaten der Landesverbände aus ihren Kategorieseiten
 const landesverbaendeKontakt = new Map(); // Name → { telefon, email }
 for (const lvKat of landesverbaende) {
@@ -199,6 +305,9 @@ for (const lvKat of landesverbaende) {
   if (!kontakt.telefon && !kontakt.email) console.warn(`Keine Kontaktdaten für LV ${lv}`);
   landesverbaendeKontakt.set(lv, kontakt);
 }
+
+kuerzelZuordnen(regionalstellenKontakt, RST_KUERZEL, "RSt");
+kuerzelZuordnen(landesverbaendeKontakt, LV_KUERZEL, "LV");
 
 // 2) App-OV-Namen aus thw-ov.ts lesen (Reihenfolge beibehalten)
 const ovQuelle = readFileSync(OV_QUELLE, "utf-8");
@@ -236,19 +345,23 @@ const zeilen = zuordnung.map(
 const kontaktZeilen = (m) =>
   [...m.entries()]
     .sort(([a], [b]) => a.localeCompare(b, "de"))
-    .map(([name, k]) => `  ${JSON.stringify(name)}: { telefon: ${JSON.stringify(k.telefon)}, email: ${JSON.stringify(k.email)} },`)
+    .map(
+      ([name, k]) =>
+        `  ${JSON.stringify(name)}: { kurz: ${JSON.stringify(k.kurz)}, telefon: ${JSON.stringify(k.telefon)}, email: ${JSON.stringify(k.email)} },`,
+    )
     .join("\n");
 
 const datei = `/**
  * Zuordnung jedes THW-Ortsverbands zu Regionalstelle und Landesverband sowie
- * die Kontaktdaten der Regionalstellen und Landesverbände (für das Autofill
- * der Zugehörigkeit-Ebenen 2/3).
+ * Kürzel und Kontaktdaten der Regionalstellen und Landesverbände (für das
+ * Autofill der Zugehörigkeit-Ebenen 2/3).
  * Schlüssel von THW_OV_REGIONALSTRUKTUR ist der OV-Name aus thw-ov.ts
  * (THW_ORTSVERBAENDE[].name); Schlüssel der Kontakt-Tabellen sind die
  * Regionalstellen- bzw. Landesverbandsnamen aus THW_OV_REGIONALSTRUKTUR.
  *
  * GENERIERT — nicht von Hand bearbeiten.
- * Quelle: ${API} (THWiki), abgerufen ${new Date().toISOString().slice(0, 10)}.
+ * Quelle: ${API} (THWiki), abgerufen ${new Date().toISOString().slice(0, 10)};
+ * Kürzel aus Anlage 09 zur Gerätedienstvorschrift THW (Stand 06.04.2020).
  * Neu erzeugen mit:  node scripts/ov-regionalstruktur-generieren.mjs
  */
 
@@ -259,8 +372,10 @@ export interface OvRegionalstruktur {
   landesverband: string;
 }
 
-/** Kontaktdaten einer Regionalstelle oder eines Landesverbands. */
+/** Kürzel und Kontaktdaten einer Regionalstelle oder eines Landesverbands. */
 export interface StelleKontakt {
+  /** Offizielles Kürzel, z. B. "GAAC" (RSt Aachen), "LVNW" (LV Nordrhein-Westfalen). */
+  kurz: string;
   /** Telefon in nationaler Schreibweise, z. B. "0241 920322-0". */
   telefon: string;
   /** Poststellen-E-Mail, z. B. "Poststelle.RSt_Aachen@thw.de". */
