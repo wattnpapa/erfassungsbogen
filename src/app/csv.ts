@@ -18,9 +18,22 @@ export function deZahl(n: number): string {
   return Number.isInteger(n) ? String(n) : String(n).replace(".", ",");
 }
 
-/** CSV-Feld: quotet nur bei Trenner/Quote/Umbruch/Rand-Leerzeichen, verdoppelt interne Quotes. */
+/**
+ * Zeichen, die Excel & Co. am Zellanfang als Formelstart deuten. Ein fremder
+ * Bogen (gescannt/importiert) könnte so z. B. `=HYPERLINK(…)` oder eine
+ * DDE-Nutzlast einschleusen, die beim Doppelklick auf das CSV ausgeführt wird
+ * (CSV-Injection). Nur Textwerte sind betroffen — Zahlen laufen über `deZahl`.
+ */
+const FORMEL_START = /^[=+\-@\t\r]/;
+
+/**
+ * CSV-Feld: neutralisiert bei Texten einen führenden Formel-Auslöser mit einem
+ * vorangestellten `'` (Excel wertet die Zelle dann als Text), quotet bei
+ * Trenner/Quote/Umbruch/Rand-Leerzeichen und verdoppelt interne Quotes.
+ */
 export function csvFeld(v: string | number): string {
-  const s = typeof v === "number" ? deZahl(v) : v;
+  if (typeof v === "number") return deZahl(v);
+  const s = FORMEL_START.test(v) ? `'${v}` : v;
   return /[";\r\n]/.test(s) || s !== s.trim() ? `"${s.replace(/"/g, '""')}"` : s;
 }
 

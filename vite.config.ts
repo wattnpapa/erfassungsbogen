@@ -28,6 +28,46 @@ function bauStempel() {
 }
 
 /**
+ * Setzt im Build eine Content-Security-Policy als <meta> in den Kopf der
+ * index.html. Bewusst NUR im Build: der Vite-Dev-Server braucht den
+ * HMR-WebSocket und Inline-Eval, die eine strenge Policy blockieren würde.
+ *
+ * Die App lädt außer dem GoatCounter-Zählpixel (src/app/statistik.ts) keine
+ * Fremd-Herkunft, daher sind connect-/img-src auf 'self' + genau diesen Host
+ * begrenzt — Ausleitung woandershin ist damit unterbunden. Skript und Style
+ * liegen teils inline (Boot-Skelett, Design-Tokens, eingebettete Woff2-Schrift),
+ * deshalb dort 'unsafe-inline' und font-src data:. Das `file:`-Schema deckt den
+ * Electron-Build ab (dist über file:// geladen); im Web ist es wirkungslos, weil
+ * eine https-Seite keine file://-Ressourcen laden darf. Capacitor (iOS/Android)
+ * läuft unter capacitor://localhost bzw. https://localhost und fällt unter 'self'.
+ *
+ * Der eigentliche Härtungsgewinn: default-src 'self', object-src 'none',
+ * base-uri 'none' und die auf einen Host begrenzte Netz-Ausleitung.
+ */
+function contentSecurityPolicy(): Plugin {
+  const policy = [
+    "default-src 'self' file:",
+    "base-uri 'none'",
+    "object-src 'none'",
+    "form-action 'none'",
+    "script-src 'self' file: 'unsafe-inline'",
+    "style-src 'self' file: 'unsafe-inline'",
+    "img-src 'self' file: data: blob: https://erfassungsbogen.goatcounter.com",
+    "font-src 'self' file: data:",
+    "connect-src 'self' file: https://erfassungsbogen.goatcounter.com",
+  ].join("; ");
+  return {
+    name: "eeb-csp",
+    apply: "build",
+    transformIndexHtml(html: string) {
+      const meta = `<meta http-equiv="Content-Security-Policy" content="${policy}" />`;
+      // Möglichst früh im <head>, damit die Policy alle folgenden Ressourcen deckt.
+      return html.replace("<head>", `<head>\n${meta}`);
+    },
+  };
+}
+
+/**
  * Minifiziert den Inline-<style>-Block der index.html im Build. Das Design-Token-
  * CSS liegt bewusst inline (kein zweiter Request vor dem ersten Rendern), aber
  * Vite fasst Inline-CSS nicht an — unminifiziert gingen ~10 KB Kommentare und
@@ -102,6 +142,7 @@ export default defineConfig({
   plugins: [
     react(),
     bauStempel(),
+    contentSecurityPolicy(),
     inlineCssMinify(),
     fontCssInline(),
     // Service Worker nur für die im Browser aufgerufene Web-App (erfassungsbogen.app):

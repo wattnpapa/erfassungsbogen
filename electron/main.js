@@ -36,13 +36,15 @@ function fensterErstellen() {
     },
   });
 
-  // Berechtigungen (Kamera für den QR-Scan, Zwischenablage beim Link-Kopieren)
-  // ausdrücklich erteilen. Ohne Handler entscheidet das die Vorgabe der
-  // jeweiligen Electron-Version; im Fenster läuft ausschließlich die eigene,
-  // lokal geladene App, für die diese Zugriffe gewollt sind.
+  // Nur die tatsächlich benötigten Berechtigungen erteilen: Kamera („media")
+  // für den QR-Scan und die Zwischenablage beim Link-Kopieren. Alles andere
+  // (Standort, Mikrofon-Aufnahme über MIDI/USB, Benachrichtigungen …) wird
+  // abgelehnt — im Fenster läuft zwar ausschließlich die eigene, lokal geladene
+  // App, aber ein pauschales „ja zu allem" ist unnötig weit.
+  const ERLAUBTE_RECHTE = new Set(["media", "clipboard-read", "clipboard-sanitized-write"]);
   const sitzung = fenster.webContents.session;
-  sitzung.setPermissionRequestHandler((_inhalt, _recht, antwort) => antwort(true));
-  sitzung.setPermissionCheckHandler(() => true);
+  sitzung.setPermissionRequestHandler((_inhalt, recht, antwort) => antwort(ERLAUBTE_RECHTE.has(recht)));
+  sitzung.setPermissionCheckHandler((_inhalt, recht) => ERLAUBTE_RECHTE.has(recht));
 
   fenster.webContents.setWindowOpenHandler(({ url }) => {
     if (istExtern(url)) shell.openExternal(url);
