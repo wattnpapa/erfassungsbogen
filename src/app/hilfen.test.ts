@@ -45,6 +45,7 @@ import {
   qrErzeugen,
   schrittStatus,
   transportBilanz,
+  vokabSortiert,
   vokabText,
   vokabularFuer,
   zeitgruppe,
@@ -104,6 +105,32 @@ describe("vokabularFuer()", () => {
     expect(vokabularFuer(OrganisationsTyp.THW, "ebene").map((e) => e.kurz)).toEqual(["OV", "RB", "LV"]);
     expect(vokabularFuer(OrganisationsTyp.FEUERWEHR, "ebene").length).toBeGreaterThan(0);
     expect(vokabularFuer(OrganisationsTyp.POLIZEI, "ebene")).toEqual([]);
+  });
+});
+
+describe("vokabSortiert()", () => {
+  it("sortiert nach der angezeigten Kurzform, ohne die Tabelle zu verändern", () => {
+    const tabelle = vokabularFuer(OrganisationsTyp.THW, "einheitstyp");
+    const kurz = vokabSortiert(tabelle).map((t) => t.kurz);
+    expect(kurz).toEqual([...kurz].sort((a, b) => a.localeCompare(b, "de")));
+    // Die Codes bleiben das Datenformat: die Quelltabelle steht weiter in Code-Reihenfolge.
+    expect(tabelle.map((t) => t.code)).toEqual([...tabelle.map((t) => t.code)].sort((a, b) => a - b));
+  });
+
+  it("stellt Verwandtes zusammen, statt es über die StAN-Nummern zu verteilen", () => {
+    const kurz = vokabSortiert(vokabularFuer(OrganisationsTyp.THW, "einheitstyp")).map((t) => t.kurz);
+    const plaetze = kurz.map((k, i) => ({ kurz: k, platz: i })).filter((e) => e.kurz.startsWith("FGr Öl"));
+    expect(plaetze.length).toBe(3);
+    // Lückenlos hintereinander: letzter Platz minus erster = Anzahl − 1.
+    expect(plaetze[plaetze.length - 1]!.platz - plaetze[0]!.platz).toBe(2);
+  });
+
+  it("entscheidet bei gleicher Kurzform über den Namen", () => {
+    const sortiert = vokabSortiert([
+      { code: 2, kurz: "Tr", name: "Trupp Bergung" },
+      { code: 1, kurz: "Tr", name: "Trupp Ausbildung" },
+    ]);
+    expect(sortiert.map((t) => t.name)).toEqual(["Trupp Ausbildung", "Trupp Bergung"]);
   });
 });
 

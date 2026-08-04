@@ -99,6 +99,22 @@ export function vokabularFuer(
   }
 }
 
+/**
+ * Alphabetische Kopie einer Vokabular-Tabelle für Auswahllisten.
+ *
+ * Die Tabellen selbst stehen in Code-Reihenfolge — die Codes sind append-only,
+ * also landet jede Ergänzung hinten, und die StAN-Nummer sortiert nach
+ * Fachbereich statt nach Namen. In einer Klappliste mit 45 Einheitstypen oder
+ * 60 Funktionen sucht man so an der falschen Stelle. Sortiert wird nach dem
+ * angezeigten Text (Kurzform, bei Gleichstand Name), damit die Liste genau so
+ * läuft, wie sie dasteht. Die Codes bleiben unberührt — sie sind das Datenformat.
+ */
+export function vokabSortiert<T extends VokabularEintrag>(tabelle: T[]): T[] {
+  return [...tabelle].sort(
+    (a, b) => a.kurz.localeCompare(b.kurz, "de") || a.name.localeCompare(b.name, "de"),
+  );
+}
+
 export function vokabText(
   v: VokabularWert | undefined,
   tabelle: VokabularEintrag[],

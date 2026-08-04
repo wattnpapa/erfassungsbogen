@@ -7,7 +7,7 @@
 import { createContext, useContext, useState, type ComponentProps, type ReactNode } from "react";
 import { Erfassungsbogen, VokabularWert } from "../../model";
 import type { VokabularEintrag } from "../../vokabulare/thw";
-import { type Pruefpunkt } from "../hilfen";
+import { vokabSortiert, type Pruefpunkt } from "../hilfen";
 import { frageText } from "../dialoge";
 
 export type SchrittProps = {
@@ -65,7 +65,7 @@ export function VokabAuswahl(props: {
         }}
       >
         <option value="frei">Freitext…</option>
-        {tabelle.map((t) => (
+        {vokabSortiert(tabelle).map((t) => (
           <option key={t.code} value={t.code}>
             {t.kurz} – {t.name}
           </option>
@@ -124,7 +124,7 @@ export function VokabListe(props: {
         }}
       >
         <option value="">{hinzufuegenText}…</option>
-        {tabelle.map((t) => (
+        {vokabSortiert(tabelle).map((t) => (
           <option key={t.code} value={t.code}>
             {t.kurz} – {t.name}
           </option>
