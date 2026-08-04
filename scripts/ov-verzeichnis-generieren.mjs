@@ -44,6 +44,18 @@ function argumente(text) {
 
 const dekodiereString = (roh) => rot13(roh.replace(/^"|"$/g, "")).trim();
 
+/**
+ * Korrekturen gegenüber der Quelle, je OV-Name. Die Karte ist eine fremde,
+ * inoffizielle Sammlung und hinkt bei Umzügen und neuen Rufnummern hinterher.
+ * Was ein Ortsverband uns direkt meldet, gilt — und muss eine Neugenerierung
+ * überleben, sonst kehrt der alte Stand beim nächsten Lauf zurück.
+ */
+const KORREKTUREN = {
+  // Vom OV gemeldet (Matthias Hammel, 04.08.2026); Karte nennt noch 04721 22222.
+  // Das Einsatzhandy 0160 99677174 hat im Verzeichnis kein Feld.
+  Cuxhaven: { telefon: "04721 508500" },
+};
+
 const html = await (await fetch(QUELLE)).text();
 
 const eintraege = [];
@@ -70,6 +82,15 @@ for (const [, argText] of html.matchAll(/^createMarker\(([\s\S]*?)\);/gm)) {
 
 if (eintraege.length < 600) {
   throw new Error(`Nur ${eintraege.length} Ortsverbände gefunden — Seitenstruktur geändert?`);
+}
+
+for (const [name, felder] of Object.entries(KORREKTUREN)) {
+  const ov = eintraege.find((e) => e.name === name);
+  if (!ov) {
+    console.warn(`Korrektur ohne Ortsverband: ${name} — Eintrag umbenannt oder entfallen?`);
+    continue;
+  }
+  Object.assign(ov, felder);
 }
 
 // Namen müssen eindeutig sein, damit die Autovervollständigung exakt zuordnen kann.
