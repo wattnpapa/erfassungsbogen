@@ -341,9 +341,11 @@ export function EinsatzDetail(props: {
       <section className="karte">
         <h2>Einheiten ({gefiltert ? `${kopf.length} von ${alleEinheiten.length}` : alleEinheiten.length})</h2>
         {/* Ab einer Handvoll Meldungen trägt die Liste allein nicht mehr — bei
-            einer Großlage stehen hier 30–50 Einheiten. Bei ein, zwei Meldungen
-            wäre die Leiste nur Beiwerk, daher erst ab drei. */}
-        {alleEinheiten.length > 2 && (
+            einer Großlage stehen hier 30–50 Einheiten. Bei einer einzigen
+            Meldung wäre die Leiste nur Beiwerk, ab der zweiten steht sie
+            bereit: eine erst später auftauchende Leiste liest sich am Gerät
+            wie eine fehlende Funktion (Rückmeldung Anwender, August 2026). */}
+        {alleEinheiten.length > 1 && (
           <div className="zeile einheiten-filter">
             <label className="feld">
               Suche

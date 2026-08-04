@@ -325,6 +325,30 @@ Then("hebt sich jeder Text von seiner Fläche ab", async function (this: EebWelt
   }
 });
 
+/**
+ * Der Kontrastschritt oben prüft Schrift gegen Fläche — er merkt nicht, wenn
+ * eine dunkle Darstellung auf heller Fläche liegt und dabei sogar gut lesbar
+ * ist. Genau das passierte in der Android-App: Nacht und Feld belegten nur die
+ * App-Token, die Plattformpalette blieb hell, und der Nacht-Modus war weiß
+ * (Rückmeldung Anwender, August 2026). Gemessen wird deshalb die Grundfläche
+ * selbst — sie trägt die ganze Ansicht.
+ */
+const GRUNDFLAECHE_HELLIGKEIT = `(() => {
+  const z = (getComputedStyle(document.body).backgroundColor.match(/[\\d.]+/g) || []).map(Number);
+  const k = [z[0] || 0, z[1] || 0, z[2] || 0].map((v) => {
+    const n = v / 255;
+    return n <= 0.03928 ? n / 12.92 : Math.pow((n + 0.055) / 1.055, 2.4);
+  });
+  return 0.2126 * k[0] + 0.7152 * k[1] + 0.0722 * k[2];
+})()`;
+
+Then("liegt die App auf dunklem Grund", async function (this: EebWelt) {
+  const helligkeit: number = await this.page.evaluate(GRUNDFLAECHE_HELLIGKEIT);
+  if (helligkeit > 0.15) {
+    throw new Error(`Die Grundfläche ist hell (Helligkeit ${Math.round(helligkeit * 100) / 100}) — der Modus greift nur halb.`);
+  }
+});
+
 Then("heißt die heruntergeladene Datei wie {string}", async function (this: EebWelt, muster: string) {
   await bisWahr(async () => {
     const namen = this.downloads.map((d) => d.suggestedFilename());

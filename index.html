@@ -1620,6 +1620,12 @@
     /* Ohne Balken greift wieder der normale Abstand zwischen Kopf und Inhalt. */
     .platform-ios .seiten-kopf,
     .platform-android .seiten-kopf { padding-top: var(--r-4); }
+    /* Im Kopf gilt die Kopf-Schriftfarbe, nicht die Überschriftenfarbe der
+       Plattform: behält ein Modus den Balken (Dunkel: Kennfarbe, Nacht: warmes
+       Dunkel), stünde die Plattformfarbe sonst darauf — bei Nacht dunkel auf
+       dunkel, also unsichtbar. */
+    .platform-ios .seiten-kopf h1,
+    .platform-android .seiten-kopf h1 { color: var(--kopf-auf); }
     .platform-ios .seiten-kopf .schritte,
     .platform-android .seiten-kopf .schritte { gap: 0.3rem; margin: 0.5rem 0 0.5rem; }
     .platform-ios .seiten-kopf .autosave,
@@ -1745,6 +1751,32 @@
     .feld-modus ul.vorschlaege li small { opacity: 1; color: var(--text-2); }
     .feld-modus input[type="checkbox"], .feld-modus input[type="radio"] { width: 1.7rem; height: 1.7rem; }
     .feld-modus .stepper button { width: 3.75rem; min-height: 3.75rem; }
+    /* iOS und Android rechnen Fläche und Schrift aus ihrer eigenen Palette
+       (--ios-* / --md-*, siehe .platform-*): ohne diese Blöcke bliebe in der
+       App die Systempalette stehen, während die App-Token schon auf Feld
+       gestellt sind — genau das halb angewandte Bild, das der Feld-Modus
+       verhindern soll. Die Werte werden deshalb nicht doppelt gepflegt,
+       sondern aus den Modus-Token abgeleitet. */
+    .feld-modus.platform-ios {
+      --ios-fond:     var(--grund);
+      --ios-flaeche:  var(--flaeche);
+      --ios-text:     var(--text);
+      --ios-text-2:   var(--text-2);
+      /* Draußen trennt eine harte Linie, kein 29-%-Grau. */
+      --ios-trenner:  var(--linie);
+      --ios-fuellung: rgba(17, 19, 24, 0.1);
+    }
+    .feld-modus.platform-android {
+      --md-surface:                     var(--grund);
+      --md-surface-container-low:       var(--flaeche);
+      --md-surface-container:           var(--flaeche-2);
+      --md-surface-container-high:      var(--flaeche-2);
+      --md-surface-container-highest:   var(--flaeche-2);
+      --md-on-surface:          var(--text);
+      --md-on-surface-variant:  var(--text-2);
+      --md-outline:             var(--linie);
+      --md-outline-variant:     var(--linie);
+    }
 
     /* ---------------------------------------------------------------
        Dunkel-Modus: neutrale dunkle Darstellung — dieselbe Oberfläche,
@@ -1859,6 +1891,53 @@
     /* QR-Bilder und Vollbild bleiben hell — Scannbarkeit geht vor Dunkeladaption;
        fürs Vorzeigen wird ohnehin das Display der Gegenseite gebraucht. */
     .nacht-modus .qr-box img { background: #fff; padding: 8px; }
+    /* Dasselbe für die App-Plattformen: ohne diese Blöcke blieben in der iOS-
+       und Android-App die hellen Systemflächen stehen (Fläche #faf9fd, Schrift
+       #1a1b20) — der Nacht-Modus sah dort weiß aus, und die Kopfzeile trug
+       dunkle Schrift auf dunklem Balken. Die warmen Töne kommen aus den
+       Modus-Token oben, nur die Zwischenstufen der M3-Flächen sind eigene
+       Werte (zwischen --flaeche-2 und --linie). */
+    .nacht-modus.platform-ios {
+      --erledigt:     var(--gut);
+      --ios-fond:     var(--grund);
+      --ios-flaeche:  var(--flaeche);
+      --ios-text:     var(--text);
+      --ios-text-2:   var(--text-2);
+      --ios-trenner:  var(--linie);
+      --ios-fuellung: rgba(217, 205, 182, 0.14);
+      --ios-akzent:   var(--akzent-hell);
+      /* Die Füllung trägt weiße Schrift (button.primaer) — dafür der tiefere
+         Bernsteinton statt des Akzents selbst. */
+      --ios-akzent-flaeche: #6d4d10;
+      --ios-rot:            var(--alarm);
+      --ios-warnung-text:   var(--warn-text);
+      --ios-warnung-fond:   var(--warn-fond);
+      --ios-balken:    rgba(23, 21, 15, 0.85);
+      --ios-glas-rand: rgba(217, 205, 182, 0.12);
+      --ios-glanz:     rgba(255, 255, 255, 0.06);
+    }
+    .nacht-modus.platform-android {
+      --erledigt:   var(--gut);
+      --md-primary:    var(--akzent);
+      --md-on-primary: var(--auf-akzent);
+      --md-secondary-container:    var(--flaeche-2);
+      --md-on-secondary-container: var(--text);
+      --md-surface:                   var(--grund);
+      --md-surface-container-low:     var(--flaeche);
+      --md-surface-container:         var(--flaeche-2);
+      --md-surface-container-high:    #2b2720;
+      --md-surface-container-highest: #35301f;
+      --md-on-surface:          var(--text);
+      --md-on-surface-variant:  var(--text-2);
+      --md-outline:             var(--linie-stark);
+      --md-outline-variant:     var(--linie);
+      --md-error:         var(--alarm);
+      --md-warnung-text:  var(--warn-text);
+      --md-warnung-fond:  var(--warn-fond);
+      --md-druck:                rgba(217, 205, 182, 0.1);
+      --md-deaktiviert-flaeche:  rgba(217, 205, 182, 0.12);
+      --md-deaktiviert-text:     rgba(217, 205, 182, 0.38);
+    }
   </style>
 </head>
 <body>

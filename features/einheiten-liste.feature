@@ -15,7 +15,7 @@ Funktionalität: Einheitenliste durchsuchen, filtern und sortieren
     Und ich die Einheit "Feuerwehr" "Aschhausen" manuell in den Einsatz aufnehme
     Dann sehe ich die Überschrift "Einheiten (3)"
 
-  Szenario: Ab drei Meldungen steht die Filterleiste bereit
+  Szenario: Ab der zweiten Meldung steht die Filterleiste bereit
     Dann sehe ich den Text "Suche"
     Und führt die Einheitenliste genau 3 Einheiten
     Und führt die Einheitenliste "DLRG Wardenburg" an Stelle 1

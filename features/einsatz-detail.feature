@@ -161,6 +161,13 @@ Funktionalität: Einsatz-Sammlung führen (Meldekopf)
   Szenario: Bei einer einzigen Meldung bleibt die Filterleiste weg
     Dann sehe ich "Suche" nicht
 
+  # Am Handy fiel auf, dass die Leiste erst spät auftauchte und deshalb wie eine
+  # fehlende Funktion aussah — ab der zweiten Meldung steht sie da.
+  Szenario: Mit der zweiten Meldung erscheint die Filterleiste
+    Wenn ich die Einheit "DLRG" "Wardenburg" manuell in den Einsatz aufnehme
+    Dann sehe ich die Überschrift "Einheiten (2)"
+    Und sehe ich den Text "Suche"
+
   Szenario: Die Sammel-PDF bringt die ganze Sammlung auf ein leeres Gerät
     Wenn ich auf "Sammel-PDF (alle Bögen)" klicke und eine Datei erhalte
     Und ich auf "‹ Einsätze" klicke

@@ -29,6 +29,22 @@ Funktionalität: Darstellung, Datensicherung und Auskunft
     Dann ist der Anzeigemodus "Dunkel" aktiv
     Und hebt sich jeder Text von seiner Fläche ab
 
+  # Rückmeldung Anwender (August 2026): „Nacht ist aus irgendeinem Grund weiß."
+  # Feld und Nacht belegen die App-Token neu — die App-Anmutung rechnet aber aus
+  # ihrer eigenen Plattformpalette. Fehlt die zum Modus, bleibt dort die helle
+  # Systemfläche stehen, und die Kopfzeile trägt dunkle Schrift auf dunklem Balken.
+  Szenario: Feld und Nacht bleiben auch mit Android-Anmutung lesbar
+    Angenommen die App sich als Android-App zeigt
+    Und ich öffne die App
+    Wenn ich den Anzeigemodus "Feld" wähle
+    Dann hebt sich jeder Text von seiner Fläche ab
+    Wenn ich den Anzeigemodus "Nacht" wähle
+    Dann hebt sich jeder Text von seiner Fläche ab
+    Und liegt die App auf dunklem Grund
+    Wenn ich den Anzeigemodus "Dunkel" wähle
+    Dann hebt sich jeder Text von seiner Fläche ab
+    Und liegt die App auf dunklem Grund
+
   Szenario: Datensicherung erstellen
     Angenommen ich öffne die App
     Wenn ich auf "Datensicherung" klicke
