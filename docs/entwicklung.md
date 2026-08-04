@@ -119,7 +119,7 @@ Zusammenspiel:
 | [uebergabe.feature](../features/uebergabe.feature) | QR-Code und Vollbild, PDF-Vorschau, PDF-Download, Link teilen — samt Runde „Link erzeugen → öffnen → Herkunft belegt → gegengezeichnet" |
 | [vorlagen.feature](../features/vorlagen.feature) | Vorlage speichern, umbenennen, Papierkorb, Musterung (Abwesende streichen) |
 | [einsatz-sammlung.feature](../features/einsatz-sammlung.feature) | Einsatz anlegen (Dialog, Pflichtfeld, Enter, Esc, Abbruch), Bogen aufnehmen |
-| [einsatz-detail.feature](../features/einsatz-detail.feature) | Summen, Vollansicht, Abrücken, Zug-Etikett, Aufteilen/Zusammenführen, Folgemeldung/Historie/Diff, Sammel-PDF, CSV, Papierkorb |
+| [einsatz-detail.feature](../features/einsatz-detail.feature) | Summen, Vollansicht, Abrücken, Zug-Etikett, Aufteilen/Zusammenführen, Folgemeldung/Historie/Diff, Sammel-PDF, CSV (Übersicht und alle Daten), Papierkorb |
 | [einheiten-liste.feature](../features/einheiten-liste.feature) | Einheitenliste einer Großlage: Suche, Sortierung, Qualifikationsfilter — und dass die Summen davon unberührt bleiben |
 | [daten-und-anzeige.feature](../features/daten-und-anzeige.feature) | Anzeigemodus Dunkel/Feld/Nacht (auch bei dunklem Systemdesign), Datensicherung, „Alle Daten löschen", Pflichtangaben, Beispielbögen, kaputter Link |
 
@@ -191,6 +191,17 @@ localStorage-Hülle getrennt und unit-getestet.
   anwesenden Einheiten.
 - [src/app/einsatz-transport.ts](../src/app/einsatz-transport.ts) — Export/Import
   als JSON-Datei sowie Import aus dem in Sammel-PDFs eingebetteten JSON (pako).
+- [src/app/einsatz-csv.ts](../src/app/einsatz-csv.ts) — CSV-Übersicht für die
+  Lagekarte: eine Zeile je anwesender Einheit plus Summenzeile.
+- [src/app/bogen-csv.ts](../src/app/bogen-csv.ts) — CSV mit **allen** Feldern,
+  für den Einzelbogen wie für die ganze Sammlung. Langformat mit
+  `Satzart`-Spalte (Einheit / Person / Fahrzeug), weil ein Bogen nicht flach ist:
+  eine Einheit hat n Personen und m Fahrzeuge. Der Kontext-Block vorne
+  (Einsatz, Einheit, Teil, Zug, Stand, Übung) wiederholt sich auf jeder Zeile,
+  damit eine in Excel gefilterte Sicht für sich lesbar bleibt. Anders als die
+  Übersicht enthält er auch abgerückte/aufgegangene Einheiten — die
+  `Status`-Spalte hält sie auseinander. Formatgrundlagen (Semikolon, UTF-8-BOM,
+  Dezimalkomma für Excel(DE)) stehen in [src/app/csv.ts](../src/app/csv.ts).
 - [src/app/einsaetze-ui.tsx](../src/app/einsaetze-ui.tsx) — Liste, Detailansicht
   (Summen, Zwischensummen, Einheitenliste mit Suche/Sortierung und
   Status/Historie), Sammeln per Scan/Datei/manuell.

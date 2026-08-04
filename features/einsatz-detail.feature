@@ -133,9 +133,13 @@ Funktionalität: Einsatz-Sammlung führen (Meldekopf)
     Wenn ich auf "Sammel-PDF (alle Bögen)" klicke und eine Datei erhalte
     Dann heißt die heruntergeladene Datei wie "eeb-einsatz-*.pdf"
 
-  Szenario: CSV-Export für die Weiterverarbeitung
-    Wenn ich auf "Als CSV" klicke und eine Datei erhalte
+  Szenario: CSV-Übersicht für die Lagekarte
+    Wenn ich auf "Übersicht als CSV" klicke und eine Datei erhalte
     Dann heißt die heruntergeladene Datei wie "eeb-einsatz-*.csv"
+
+  Szenario: CSV mit allen Daten aller Bögen für die Auswertung
+    Wenn ich auf "Alle Daten als CSV" klicke und eine Datei erhalte
+    Dann heißt die heruntergeladene Datei wie "eeb-einsatz-*-alle-daten.csv"
 
   Szenario: Gelöschter Einsatz liegt im Papierkorb und kommt zurück
     Wenn ich auf "Einsatz löschen" klicke

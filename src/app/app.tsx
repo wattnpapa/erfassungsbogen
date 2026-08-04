@@ -43,6 +43,7 @@ import { ART_LABEL, EinsatzDetail, EinsatzListe } from "./einsaetze-ui";
 import { aktuelleMeldungen } from "./auswertung";
 import { boegenAusPdfBytes, einsatzAusDatei, einsatzAusPdfBytes, einsatzDateiInhalt } from "./einsatz-transport";
 import { einsatzCsvInhalt } from "./einsatz-csv";
+import { einsatzDetailCsvInhalt } from "./bogen-csv";
 import { QrScannerWeb } from "./qr-scanner-web";
 import { qrAusBild } from "./qr-bild";
 import { entwurfLaden, entwurfSpeichern, entwurfVerwerfen } from "./entwurf";
@@ -837,6 +838,14 @@ function AppInhalt() {
     await dateiAnbieten(`eeb-einsatz-${einsatzDateiname(s)}.csv`, einsatzCsvInhalt(s), "text/csv;charset=utf-8");
   }
 
+  async function exportiereEinsatzCsvDetail(s: Einsatzsammlung) {
+    await dateiAnbieten(
+      `eeb-einsatz-${einsatzDateiname(s)}-alle-daten.csv`,
+      einsatzDetailCsvInhalt(s),
+      "text/csv;charset=utf-8",
+    );
+  }
+
   async function sammelPdf(s: Einsatzsammlung) {
     const meldungen = aktuelleMeldungen(s.eintraege);
     if (meldungen.length === 0) {
@@ -952,6 +961,7 @@ function AppInhalt() {
           onDateiImport={(datei) => importiereBoegen(offenerEinsatz.id, datei)}
           onExport={() => exportiereEinsatz(offenerEinsatz)}
           onCsvExport={() => exportiereEinsatzCsv(offenerEinsatz)}
+          onCsvDetailExport={() => exportiereEinsatzCsvDetail(offenerEinsatz)}
           onSammelPdf={() => sammelPdf(offenerEinsatz)}
           onGeloescht={() => { setOffenerEinsatzId(null); einsaetzeNeuLaden(); setMeldung("Einsatz in den Papierkorb verschoben."); }}
         />

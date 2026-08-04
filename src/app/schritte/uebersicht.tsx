@@ -16,8 +16,10 @@ import {
 import { vorlageAnlegen } from "../vorlagen";
 import {
   QrSatz,
+  bogenDateiname,
   bogenSpeichern,
   datumDeutsch,
+  textAlsDatei,
   einheitAnzeigename,
   einheitOrt,
   funkrufText,
@@ -30,6 +32,7 @@ import {
   vokabularFuer,
 } from "../hilfen";
 import { debugAktiv } from "../debug-plattform";
+import { bogenCsvInhalt } from "../bogen-csv";
 import { einheitSymbolSvg, svgDataUrl } from "../taktische-zeichen";
 import {
   absenderLabel,
@@ -255,6 +258,16 @@ export function Uebersicht(props: {
       // Abbruch im Share-Dialog ist kein Fehler
       if (e instanceof Error && e.name === "AbortError") return;
       setFehler(`Link teilen: ${e instanceof Error ? e.message : e}`);
+    }
+  }
+
+  async function csv() {
+    setFehler("");
+    try {
+      await textAlsDatei(`eeb-${bogenDateiname(bogen)}.csv`, bogenCsvInhalt(bogen), "text/csv;charset=utf-8");
+    } catch (e) {
+      if (e instanceof Error && e.name === "AbortError") return; // Abbruch im Share-Dialog
+      setFehler(`CSV: ${e instanceof Error ? e.message : e}`);
     }
   }
 
@@ -589,6 +602,16 @@ export function Uebersicht(props: {
           </button>
           <p className="hinweis">
             Für Chat, Mail oder Notiz: derselbe Inhalt wie im QR-Code — öffnet den Bogen beim Antippen.
+          </p>
+        </div>
+        {/* Anders als die Wege darüber ist CSV eine Einbahnstraße: es trägt
+            keinen QR und lässt sich nicht zurücklesen. Steht trotzdem hier,
+            weil der Nutzer alle Ausgabewege an einer Stelle sucht. */}
+        <div className="teilen-weg">
+          <button type="button" onClick={csv}>Als CSV (Tabelle)</button>
+          <p className="hinweis">
+            Für Excel & Co.: alle erfassten Daten des Bogens — je eine Zeile für die Einheit,
+            jede Person und jedes Fahrzeug. Zum Auswerten, nicht zum Zurücklesen.
           </p>
         </div>
         {/* Roh-JSON nur im Debug-Modus anbieten: fürs Publikum ist der Bogen

@@ -361,20 +361,29 @@ function unveraendert(herkunft: Uint8Array, b: Erfassungsbogen): boolean {
 
 // ------------------------------------------------------------ Datei-Dialog
 
-export async function bogenSpeichern(b: Erfassungsbogen): Promise<void> {
-  const json = JSON.stringify(mitTransportVersion(b), null, 2);
-  const name = einheitAnzeigename(b.einheit).replace(/[^\wäöüÄÖÜß-]+/g, "_");
+/** Text als Datei anbieten — in der App übers Share-Sheet, im Browser als Download. */
+export async function textAlsDatei(dateiname: string, inhalt: string, mime: string): Promise<void> {
   if (istNativ()) {
-    // In der App gibt es keinen Browser-Download: JSON übers Share-Sheet anbieten
-    await textTeilen(`eeb-${name}.json`, json);
+    // In der App gibt es keinen Browser-Download: Inhalt übers Share-Sheet anbieten
+    await textTeilen(dateiname, inhalt);
     return;
   }
-  const blob = new Blob([json], { type: "application/json" });
+  const blob = new Blob([inhalt], { type: mime });
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
-  a.download = `eeb-${name}.json`;
+  a.download = dateiname;
   a.click();
   URL.revokeObjectURL(a.href);
+}
+
+/** Dateinamens-Rumpf aus dem Anzeigenamen der Einheit („THW_Oldenburg_NI_FGr_K_A"). */
+export function bogenDateiname(b: Erfassungsbogen): string {
+  return einheitAnzeigename(b.einheit).replace(/[^\wäöüÄÖÜß-]+/g, "_");
+}
+
+export async function bogenSpeichern(b: Erfassungsbogen): Promise<void> {
+  const json = JSON.stringify(mitTransportVersion(b), null, 2);
+  await textAlsDatei(`eeb-${bogenDateiname(b)}.json`, json, "application/json");
 }
 
 /**

@@ -205,10 +205,11 @@ export function EinsatzDetail(props: {
   onDateiImport: (datei: File) => void;
   onExport: () => void;
   onCsvExport: () => void;
+  onCsvDetailExport: () => void;
   onSammelPdf: () => void;
   onGeloescht: () => void;
 }) {
-  const { einsatz, onZurueck, onGeaendert, onScannen, onManuell, onDateiImport, onExport, onCsvExport, onSammelPdf, onGeloescht } = props;
+  const { einsatz, onZurueck, onGeaendert, onScannen, onManuell, onDateiImport, onExport, onCsvExport, onCsvDetailExport, onSammelPdf, onGeloescht } = props;
   const [suche, setSuche] = useState("");
   const [sortierung, setSortierung] = useState<EinheitenSortierung>("name");
   // "" = keine Einschränkung. Schlüssel siehe einheiten-liste.ts.
@@ -320,7 +321,16 @@ export function EinsatzDetail(props: {
         >
           Sammel-PDF (alle Bögen)
         </button>{" "}
-        <button type="button" onClick={onCsvExport}>Als CSV</button>{" "}
+        {/* Zwei CSV-Wege, weil zwei verschiedene Fragen dahinterstehen: die
+            Übersicht beantwortet „wie stark ist die Lage?" (eine Zeile je
+            Einheit, mit Summenzeile), der Detail-Export „wer und was genau ist
+            da?" (jede Person, jedes Fahrzeug einzeln). */}
+        <button type="button" onClick={onCsvExport} title="Eine Zeile je anwesender Einheit mit Stärke, Verpflegung, Unterbringung und Kraftstoff — plus Summenzeile. Für die Lagekarte.">
+          Übersicht als CSV
+        </button>{" "}
+        <button type="button" onClick={onCsvDetailExport} title="Alle Daten aller gemeldeten Einheiten: je Einheit eine Zeile, dazu eine Zeile pro Person und pro Fahrzeug. Für Auswertung in Excel.">
+          Alle Daten als CSV
+        </button>{" "}
         {/* Roh-JSON nur im Debug-Modus: fürs Publikum trägt die Sammel-PDF die
             Bögen als eingebettetes JSON — ein separater Export verwirrt nur. */}
         {debugAktiv() && (

@@ -3,10 +3,11 @@
  * aktuell anwesender Einheit (neueste Revision, nur anwesende — dieselbe
  * Auswahl wie die Summenleiste) plus eine Summenzeile.
  *
- * Bewusst OHNE neue Abhängigkeit: reines String-Building. Ausgabeformat auf
- * Excel(DE) getrimmt — Semikolon als Trenner, UTF-8-BOM, deutsche Dezimal-
- * kommas. Zahlen werden über {@link deZahl} formatiert, Felder über {@link feld}
- * bei Bedarf gequotet (Semikolon/Anführungszeichen/Zeilenumbruch).
+ * Die Kurzfassung für die Lagekarte — das Gegenstück mit ALLEN Feldern bis zur
+ * einzelnen Person steht in {@link einsatzDetailCsvInhalt} (bogen-csv.ts).
+ *
+ * Format und Feld-Quotierung kommen aus csv.ts (Excel(DE): Semikolon, BOM,
+ * Dezimalkomma).
  *
  * Enthält fremde Personendaten (nur Aggregate je Einheit, keine Namen) — bleibt
  * wie alle Exporte rein lokal.
@@ -15,11 +16,8 @@
 import { staerke, unterbringungMWD, verpflegung, type Erfassungsbogen } from "../model";
 import { einheitAnzeigename, orgLabel, vokabText, vokabularFuer, zeitgruppe } from "./hilfen";
 import { aktuelleMeldungen } from "./auswertung";
+import { csvDatei, csvZeile } from "./csv";
 import type { Einsatzsammlung, MeldeEintrag, MeldeQuelle } from "./einsaetze";
-
-const TRENNER = ";";
-/** Excel(DE) erkennt UTF-8 nur zuverlässig mit BOM; ohne BOM landen Umlaute falsch. */
-const BOM = "﻿";
 
 const QUELLE_LABEL: Record<MeldeQuelle, string> = {
   scan: "Scan",
@@ -52,21 +50,6 @@ const SPALTEN = [
   "Quelle",
 ] as const;
 
-/** Zahl deutsch: Ganzzahl bleibt schlicht, Bruch bekommt Dezimalkomma. */
-function deZahl(n: number): string {
-  return Number.isInteger(n) ? String(n) : String(n).replace(".", ",");
-}
-
-/** CSV-Feld: quotet nur bei Trenner/Quote/Umbruch/Rand-Leerzeichen, verdoppelt interne Quotes. */
-function feld(v: string | number): string {
-  const s = typeof v === "number" ? deZahl(v) : v;
-  return /[";\r\n]/.test(s) || s !== s.trim() ? `"${s.replace(/"/g, '""')}"` : s;
-}
-
-function zeile(werte: (string | number)[]): string {
-  return werte.map(feld).join(TRENNER);
-}
-
 /** Anzeigename wie in der Meldekopf-Oberfläche: Organisation + Standort + Einheitstyp. */
 function einheitName(b: Erfassungsbogen): string {
   return einheitAnzeigename(b.einheit);
@@ -84,7 +67,7 @@ function datenZeile(e: MeldeEintrag): string {
   const vp = verpflegung(b);
   const u = unterbringungMWD(b);
   const sb = b.sofortbedarf;
-  return zeile([
+  return csvZeile([
     einheitName(b),
     // Eigene Spalte statt Anhängsel am Namen: nach einer Aufteilung stehen
     // sonst zwei gleichnamige Zeilen da, und filtern lässt sich das auch nicht.
@@ -139,7 +122,7 @@ function summenZeile(meldungen: MeldeEintrag[]): string {
     acc.gemisch += b.sofortbedarf?.gemischLiter ?? 0;
     acc.fahrzeuge += b.fahrzeuge.length;
   }
-  return zeile([
+  return csvZeile([
     `Summe (${meldungen.length} Einheiten)`,
     "",
     "",
@@ -162,6 +145,5 @@ export function einsatzCsvInhalt(s: Einsatzsammlung): string {
   const meldungen = aktuelleMeldungen(s.eintraege).sort((a, b) =>
     einheitName(a.bogen).localeCompare(einheitName(b.bogen), "de"),
   );
-  const zeilen = [zeile([...SPALTEN]), ...meldungen.map(datenZeile), summenZeile(meldungen)];
-  return BOM + zeilen.join("\r\n") + "\r\n";
+  return csvDatei([csvZeile([...SPALTEN]), ...meldungen.map(datenZeile), summenZeile(meldungen)]);
 }

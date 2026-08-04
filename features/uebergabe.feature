@@ -1,8 +1,9 @@
 # language: de
-Funktionalität: Bogen übergeben — QR, PDF, Link
+Funktionalität: Bogen übergeben — QR, PDF, Link, CSV
   Als Einsatzkraft möchte ich den fertigen Bogen weitergeben können: als
-  QR-Code vom Display, als PDF im Papier-Layout oder als Link. Alle vier Wege
-  tragen denselben signierten Inhalt.
+  QR-Code vom Display, als PDF im Papier-Layout oder als Link. Alle drei Wege
+  tragen denselben signierten Inhalt. Die CSV-Tabelle steht daneben — sie ist
+  zum Auswerten da, nicht zum Zurücklesen.
 
   Grundlage:
     Angenommen ich öffne einen geteilten Bogen-Link eines alten Bogens
@@ -20,6 +21,7 @@ Funktionalität: Bogen übergeben — QR, PDF, Link
     Und sehe ich die Schaltfläche "QR-Code im Vollbild zeigen"
     Und sehe ich die Schaltfläche "PDF erzeugen"
     Und sehe ich die Schaltfläche "Link teilen"
+    Und sehe ich die Schaltfläche "Als CSV (Tabelle)"
     Wenn ich im Dialog auf "Schließen" klicke
     Dann ist kein Dialog offen
 
@@ -39,6 +41,11 @@ Funktionalität: Bogen übergeben — QR, PDF, Link
     Wenn ich auf "Bogen übergeben…" klicke
     Und ich auf "PDF erzeugen" klicke und eine Datei erhalte
     Dann heißt die heruntergeladene Datei wie "eeb-*.pdf"
+
+  Szenario: CSV liefert den Bogen als Tabelle für die Auswertung
+    Wenn ich auf "Bogen übergeben…" klicke
+    Und ich auf "Als CSV (Tabelle)" klicke und eine Datei erhalte
+    Dann heißt die heruntergeladene Datei wie "eeb-*.csv"
 
   Szenario: Link teilen legt den Bogen-Link in die Zwischenablage
     Wenn ich auf "Bogen übergeben…" klicke

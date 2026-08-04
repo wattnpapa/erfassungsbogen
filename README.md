@@ -47,6 +47,10 @@ Wer noch abwägt: [Papier oder digital?](https://erfassungsbogen.app/papier-oder
   Kopplung, ohne Kamera. Der Empfänger tippt den Link an und hat den Bogen.
 - **Speichern und laden**: der Bogen lässt sich als Datei sichern und
   weitergeben.
+- **Als Tabelle für Excel**: ein Bogen — oder ein ganzer Einsatz auf einmal —
+  geht als CSV heraus, mit allem, was drinsteht: je eine Zeile für die Einheit,
+  für jede Person und für jedes Fahrzeug. Für Verpflegungsabrechnung,
+  Personalnachweis oder eigene Auswertungen.
 - **Einsätze sammeln (Meldekopf)**: mehrere fremde Bögen unter einem Einsatz
   bündeln — per Scan, aus Datei/PDF, am Tablet manuell erfasst oder direkt aus
   der Übersicht eines gerade geöffneten Bogens („In Einsatz aufnehmen"). Die App
