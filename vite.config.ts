@@ -3,6 +3,7 @@ import { defineConfig, type Plugin } from "vite";
 import react from "@vitejs/plugin-react";
 import { VitePWA } from "vite-plugin-pwa";
 import { transform } from "esbuild";
+import { sitemapErzeugen } from "./scripts/sitemap";
 
 const { version } = JSON.parse(readFileSync(new URL("./package.json", import.meta.url), "utf8"));
 
@@ -23,6 +24,31 @@ function bauStempel() {
       return html
         .replaceAll("%APP_VERSION%", appVersion)
         .replaceAll("%BUILD_DATE%", new Date().toISOString().slice(0, 10));
+    },
+  };
+}
+
+/**
+ * Legt die sitemap.xml ins Bundle (siehe scripts/sitemap.ts). Sie entsteht im
+ * Build statt als Datei in public/ zu liegen, weil ihr <lastmod> aus der
+ * Git-Historie kommt — von Hand gepflegt wäre es nach dem nächsten Release
+ * falsch, und ein falsches Datum ist schlechter als keines.
+ *
+ * Nur im Build: der Dev-Server liefert public/ unverändert aus, und für die
+ * Sitemap gibt es dort niemanden, der sie lesen wollte.
+ */
+function sitemap(): Plugin {
+  // Die Wurzel liefert Vite; dort liegen public/ und die Git-Historie, aus der
+  // das Skript die lastmod-Daten liest.
+  let wurzel = process.cwd();
+  return {
+    name: "eeb-sitemap",
+    apply: "build",
+    configResolved(config) {
+      wurzel = config.root;
+    },
+    generateBundle() {
+      this.emitFile({ type: "asset", fileName: "sitemap.xml", source: sitemapErzeugen(wurzel) });
     },
   };
 }
@@ -142,6 +168,7 @@ export default defineConfig({
   plugins: [
     react(),
     bauStempel(),
+    sitemap(),
     contentSecurityPolicy(),
     inlineCssMinify(),
     fontCssInline(),

@@ -63,6 +63,14 @@ jobs:
       APP_BUILD_VERSION: ${{ needs.prepare.outputs.build_version }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          # Volle Historie: die sitemap.xml entsteht im Build und nimmt ihr
+          # <lastmod> je Seite aus dem letzten Commit, der sie geändert hat
+          # (scripts/sitemap.ts). Der flache Standard-Checkout kennt nur einen
+          # Commit und würde jeder Seite dessen Datum zuschreiben; das Skript
+          # merkt das und lässt <lastmod> dann ersatzlos weg. Ohne diese Zeile
+          # hätte die Sitemap also gar keine Datumsangaben mehr.
+          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version: 24

@@ -49,6 +49,31 @@ Deployment: jeder Push auf `main` baut die Seite und deployt sie auf
 GitHub Pages unter <https://erfassungsbogen.app>
 ([release.yml](../.github/workflows/release.yml)).
 
+### Sitemap (generiert)
+
+Die `sitemap.xml` liegt **nicht** in `public/`, sondern entsteht im Build
+([scripts/sitemap.ts](../scripts/sitemap.ts), eingehängt als Vite-Plugin
+`eeb-sitemap`). Sie führt die Startseite und jede Seite aus `public/*.html`
+außer der 404 — mit denselben Adressen wie deren `rel="canonical"`.
+
+`<lastmod>` ist das Datum des letzten Commits, der die jeweilige Seite geändert
+hat (für die Startseite: `index.html` oder irgendetwas unter `src/`, denn die
+Startseite *ist* die App). Von Hand gepflegt wäre dieses Datum nach dem
+nächsten Release falsch — dieselbe Überlegung wie beim `dateModified` der
+strukturierten Daten.
+
+- **Der CI-Checkout braucht `fetch-depth: 0`.** Ein flacher Klon liefert nicht
+  etwa keine Daten, sondern für *jede* Seite dasselbe: `git log` kennt dort nur
+  einen Commit und schreibt dessen Datum allen Dateien zu. Damit daraus kein
+  stilles Falschsignal wird, prüft das Skript die Historie vorab
+  (`istFlacherKlon()`) und lässt `<lastmod>` dann mit einer Warnung ganz weg —
+  lieber kein Datum als ein erfundenes. Die App-Builds (Electron, Capacitor)
+  checken flach aus und bauen weiter; dort ist die Sitemap ohnehin ungenutzt.
+- **Neue Seite in `public/`?** Nichts zu tun, sie landet mit `priority` 0.7
+  hinten in der Liste. Eine eigene Gewichtung oder eine andere Position bekommt
+  sie über die Tabelle `SEITEN` im Skript.
+- **Ansehen:** `npm run sitemap -- /tmp/sitemap.xml`.
+
 ### Offline (Service Worker)
 
 Die Web-App ist offline-fähig: ein Service Worker (Workbox über

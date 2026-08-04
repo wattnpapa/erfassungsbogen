@@ -30,6 +30,7 @@
     "electron:dev": "concurrently -k \"npm:dev\" \"wait-on tcp:5173 && cross-env VITE_DEV_SERVER_URL=http://localhost:5173 electron .\"",
     "electron:build": "vite build && electron-builder",
     "og": "node scripts/og-bild.mjs",
+    "sitemap": "node --import tsx scripts/sitemap.ts",
     "zeichen": "node --import tsx scripts/taktische-zeichen-holen.mts",
     "wasserzeichen": "node --import tsx scripts/uebung-wasserzeichen.mts"
   },

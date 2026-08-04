@@ -12,7 +12,9 @@ export default defineConfig({
         test: {
           name: "logik",
           environment: "node",
-          include: ["src/**/*.test.ts"],
+          // scripts/ ist mit dabei: die Build-Werkzeuge (etwa die Sitemap) sind
+          // reine Node-Logik und gehören in denselben Lauf wie der App-Kern.
+          include: ["src/**/*.test.ts", "scripts/**/*.test.ts"],
         },
       },
       {
