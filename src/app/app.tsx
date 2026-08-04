@@ -22,7 +22,15 @@ import {
   type SegmentTeil,
 } from "../codec";
 import { signaturLabel, signaturVonPayload, signaturVonText, type SignaturStatus } from "../signatur";
-import { SCHRITT_STATUS_TITEL, bogenLaden, browserKompressor, einheitAnzeigename, neuerBogen, schrittStatus } from "./hilfen";
+import {
+  SCHRITT_STATUS_TITEL,
+  bogenLaden,
+  browserKompressor,
+  bytesAlsDatei,
+  einheitAnzeigename,
+  neuerBogen,
+  schrittStatus,
+} from "./hilfen";
 import { jetztZeitpunkt, staerke } from "../model";
 import { bogenLinksEmpfangen, istNativ, qrScannen, textTeilen } from "./nativ";
 import { vorlageAnlegen, vorlagenLaden, vorlagenPapierkorb, type Vorlage } from "./vorlagen";
@@ -846,6 +854,19 @@ function AppInhalt() {
     );
   }
 
+  /**
+   * Einheitenliste im Fremdformat der Führungsstelle. Dynamisch geladen: der
+   * XLSX-Schreiber samt Stiltabelle wird nur beim Klick gebraucht (wie die PDF).
+   */
+  async function exportiereEinsatzOldenburg(s: Einsatzsammlung) {
+    try {
+      const { XLSX_MIME, einsatzOldenburgXlsx } = await import("./oldenburg-xlsx");
+      await bytesAlsDatei(`eeb-einsatz-${einsatzDateiname(s)}-oldenburg.xlsx`, einsatzOldenburgXlsx(s), XLSX_MIME);
+    } catch (e) {
+      setFehler(`Excel-Liste: ${e instanceof Error ? e.message : e}`);
+    }
+  }
+
   async function sammelPdf(s: Einsatzsammlung) {
     const meldungen = aktuelleMeldungen(s.eintraege);
     if (meldungen.length === 0) {
@@ -962,6 +983,7 @@ function AppInhalt() {
           onExport={() => exportiereEinsatz(offenerEinsatz)}
           onCsvExport={() => exportiereEinsatzCsv(offenerEinsatz)}
           onCsvDetailExport={() => exportiereEinsatzCsvDetail(offenerEinsatz)}
+          onOldenburgExport={() => exportiereEinsatzOldenburg(offenerEinsatz)}
           onSammelPdf={() => sammelPdf(offenerEinsatz)}
           onGeloescht={() => { setOffenerEinsatzId(null); einsaetzeNeuLaden(); setMeldung("Einsatz in den Papierkorb verschoben."); }}
         />

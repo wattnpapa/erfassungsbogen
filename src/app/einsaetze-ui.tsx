@@ -206,10 +206,11 @@ export function EinsatzDetail(props: {
   onExport: () => void;
   onCsvExport: () => void;
   onCsvDetailExport: () => void;
+  onOldenburgExport: () => void;
   onSammelPdf: () => void;
   onGeloescht: () => void;
 }) {
-  const { einsatz, onZurueck, onGeaendert, onScannen, onManuell, onDateiImport, onExport, onCsvExport, onCsvDetailExport, onSammelPdf, onGeloescht } = props;
+  const { einsatz, onZurueck, onGeaendert, onScannen, onManuell, onDateiImport, onExport, onCsvExport, onCsvDetailExport, onOldenburgExport, onSammelPdf, onGeloescht } = props;
   const [suche, setSuche] = useState("");
   const [sortierung, setSortierung] = useState<EinheitenSortierung>("name");
   // "" = keine Einschränkung. Schlüssel siehe einheiten-liste.ts.
@@ -330,6 +331,12 @@ export function EinsatzDetail(props: {
         </button>{" "}
         <button type="button" onClick={onCsvDetailExport} title="Alle Daten aller gemeldeten Einheiten: je Einheit eine Zeile, dazu eine Zeile pro Person und pro Fahrzeug. Für Auswertung in Excel.">
           Alle Daten als CSV
+        </button>{" "}
+        {/* Drittes Format, weil es keinem der beiden CSVs entspricht: eine
+            fremde Excel-Vorlage mit fester Spaltenfolge, in die die
+            Führungsstelle die Zeilen direkt einfügt. */}
+        <button type="button" onClick={onOldenburgExport} title="Einheitenliste im Format der Führungsstelle Oldenburg: je gemeldeter Einheit eine Zeile, Spalten und Formatierung wie in deren Excel-Vorlage.">
+          Excel-Liste (Format „Oldenburg")
         </button>{" "}
         {/* Roh-JSON nur im Debug-Modus: fürs Publikum trägt die Sammel-PDF die
             Bögen als eingebettetes JSON — ein separater Export verwirrt nur. */}

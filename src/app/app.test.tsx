@@ -30,7 +30,7 @@ vi.mock("./nativ", async () => {
     plattform: () => "web",
     bogenLinksEmpfangen: () => () => {},
     qrScannen: async () => "",
-    pdfTeilen: async () => {},
+    binaerTeilen: async () => {},
     linkTeilen: async () => {},
     textTeilen: async () => {},
     shareSheetVerfuegbar: () => typeof navigator.share === "function",

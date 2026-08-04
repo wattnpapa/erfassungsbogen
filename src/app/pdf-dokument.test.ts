@@ -5,7 +5,7 @@ import { describe, it, expect, vi } from "vitest";
 vi.mock("./nativ", () => ({
   istNativ: () => false,
   textTeilen: async () => {},
-  pdfTeilen: async () => {},
+  binaerTeilen: async () => {},
 }));
 
 import {

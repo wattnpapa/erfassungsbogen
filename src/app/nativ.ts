@@ -99,8 +99,8 @@ async function teilen(titel: string, uri: string): Promise<void> {
   }
 }
 
-/** PDF (Base64) in den Cache schreiben und übers Share-Sheet anbieten. */
-export async function pdfTeilen(dateiname: string, base64: string): Promise<void> {
+/** Binärdatei (Base64) in den Cache schreiben und übers Share-Sheet anbieten — PDF, XLSX, … */
+export async function binaerTeilen(dateiname: string, base64: string): Promise<void> {
   const datei = await Filesystem.writeFile({
     path: dateiname,
     data: base64,

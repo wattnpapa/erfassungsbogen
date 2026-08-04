@@ -15,7 +15,7 @@ import helvetica from "pdfmake/build/standard-fonts/Helvetica";
 import type { Erfassungsbogen } from "../model";
 import { base64UrlDekodieren } from "../codec";
 import { einheitAnzeigename, qrErzeugen } from "./hilfen";
-import { istNativ, pdfTeilen } from "./nativ";
+import { istNativ, binaerTeilen } from "./nativ";
 import { einsatzPdfDokument, pdfDokument, type SammelBogen } from "./pdf-dokument";
 import { einsatzDateiInhalt } from "./einsatz-transport";
 import { revisionen, type Einsatzsammlung, type MeldeEintrag } from "./einsaetze";
@@ -67,7 +67,7 @@ export async function pdfErzeugen(
   if (istNativ()) {
     // In der App gibt es keinen Browser-Download: PDF übers Share-Sheet anbieten
     const base64 = await pdfMake.createPdf(dd).getBase64();
-    await pdfTeilen(dateiname, base64);
+    await binaerTeilen(dateiname, base64);
   } else {
     pdfMake.createPdf(dd).download(dateiname);
   }
@@ -127,7 +127,7 @@ export async function einsatzPdfErzeugen(einsatz: Einsatzsammlung, meldungen: Me
   const dateiname = `eeb-einsatz-${(einsatz.name || "sammlung").replace(/[^\wäöüÄÖÜß-]+/g, "_")}.pdf`;
   if (istNativ()) {
     const base64 = await pdfMake.createPdf(dd).getBase64();
-    await pdfTeilen(dateiname, base64);
+    await binaerTeilen(dateiname, base64);
   } else {
     pdfMake.createPdf(dd).download(dateiname);
   }

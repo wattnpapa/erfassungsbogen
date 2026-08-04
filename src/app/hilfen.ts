@@ -44,7 +44,7 @@ import {
 import { gegengezeichnetePayloadBytes, signiertePayloadBytes } from "../signatur";
 import { absenderkarteLaden } from "./absenderkarte";
 import { geraeteSchluesselSicherstellen } from "./geraete-schluessel";
-import { istNativ, textTeilen } from "./nativ";
+import { binaerTeilen, istNativ, textTeilen } from "./nativ";
 import {
   FUNKRUF_KENNWOERTER,
   THW_EINHEITSTYPEN,
@@ -369,6 +369,35 @@ export async function textAlsDatei(dateiname: string, inhalt: string, mime: stri
     return;
   }
   const blob = new Blob([inhalt], { type: mime });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = dateiname;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+/**
+ * Bytes → Base64 (Standard-Alphabet, mit Füllzeichen) für die Capacitor-Ablage.
+ * Nicht das Base64url aus dem Codec: dort ersetzen `-_` die Zeichen `+/`, was
+ * beim Schreiben der Datei einen Byte-Salat ergäbe. In Blöcken, weil
+ * `String.fromCharCode(...)` mit einem sehr großen Array den Stack sprengt.
+ */
+function base64Aus(bytes: Uint8Array): string {
+  let s = "";
+  const block = 0x8000;
+  for (let i = 0; i < bytes.length; i += block) {
+    s += String.fromCharCode(...bytes.subarray(i, i + block));
+  }
+  return btoa(s);
+}
+
+/** Binärdatei anbieten — in der App übers Share-Sheet, im Browser als Download. */
+export async function bytesAlsDatei(dateiname: string, bytes: Uint8Array<ArrayBuffer>, mime: string): Promise<void> {
+  if (istNativ()) {
+    await binaerTeilen(dateiname, base64Aus(bytes));
+    return;
+  }
+  const blob = new Blob([bytes], { type: mime });
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
   a.download = dateiname;

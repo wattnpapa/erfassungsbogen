@@ -227,6 +227,25 @@ localStorage-Hülle getrennt und unit-getestet.
   Übersicht enthält er auch abgerückte/aufgegangene Einheiten — die
   `Status`-Spalte hält sie auseinander. Formatgrundlagen (Semikolon, UTF-8-BOM,
   Dezimalkomma für Excel(DE)) stehen in [src/app/csv.ts](../src/app/csv.ts).
+- [src/app/oldenburg-xlsx.ts](../src/app/oldenburg-xlsx.ts) — XLSX im **fremden**
+  Format „Oldenburg": die Einheitenliste der Führungsstelle, 38 Spalten (A–AL) in
+  fester Reihenfolge, Zeile 1 farbige Leiste mit `SUBTOTAL`-Summen, Zeile 2
+  Kopfzeile, ab Zeile 3 je Einheit eine Zeile. Für den Einzelbogen wie für die
+  ganze Sammlung. Spaltenfolge, Farben, Rahmen und das Datumsformat sind aus der
+  Vorlagendatei übernommen und **nicht verhandelbar** — der Empfänger fügt die
+  Zeilen in seine laufende Liste ein. Spalten, die der Führungsstelle gehören
+  (Ablösung, Anforderungs-ID, Zusagen, Rückführung, Schicht, FüSt.), bleiben
+  bewusst leer; die Datumsspalten darunter werden trotzdem vorformatiert
+  geschrieben, damit die Handeingabe dort richtig aussieht. Die Einheit wird über
+  ihren ausgeschriebenen Einheitstyp in Zug/Trupp/Gruppe/Person einsortiert
+  (Trupp vor Zug geprüft: „Zugtrupp Technischer Zug" ist ein Trupp).
+- [src/app/xlsx.ts](../src/app/xlsx.ts) — minimaler XLSX-Schreiber (ZIP + zwei
+  XML-Teile) für genau ein Blatt. Kein SheetJS/exceljs: die Kompression kommt aus
+  dem bereits vorhandenen `pako`, es entsteht keine neue Abhängigkeit. Texte
+  stehen als `inlineStr` direkt in der Zelle (keine `sharedStrings`), die
+  ZIP-Zeitstempel sind fest — gleicher Inhalt ergibt byteweise dieselbe Datei.
+  Beide Module werden per `import()` erst beim Klick geladen (eigener Chunk, wie
+  die PDF).
 - [src/app/einsaetze-ui.tsx](../src/app/einsaetze-ui.tsx) — Liste, Detailansicht
   (Summen, Zwischensummen, Einheitenliste mit Suche/Sortierung und
   Status/Historie), Sammeln per Scan/Datei/manuell.

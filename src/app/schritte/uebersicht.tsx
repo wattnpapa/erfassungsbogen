@@ -18,6 +18,7 @@ import {
   QrSatz,
   bogenDateiname,
   bogenSpeichern,
+  bytesAlsDatei,
   datumDeutsch,
   textAlsDatei,
   einheitAnzeigename,
@@ -268,6 +269,21 @@ export function Uebersicht(props: {
     } catch (e) {
       if (e instanceof Error && e.name === "AbortError") return; // Abbruch im Share-Dialog
       setFehler(`CSV: ${e instanceof Error ? e.message : e}`);
+    }
+  }
+
+  /**
+   * Fremdformat der Führungsstelle — dynamisch geladen, damit der
+   * XLSX-Schreiber samt Stiltabelle nicht im Start-Bundle liegt (wie bei der PDF).
+   */
+  async function oldenburgXlsx() {
+    setFehler("");
+    try {
+      const { XLSX_MIME, bogenOldenburgXlsx } = await import("../oldenburg-xlsx");
+      await bytesAlsDatei(`eeb-${bogenDateiname(bogen)}-oldenburg.xlsx`, bogenOldenburgXlsx(bogen), XLSX_MIME);
+    } catch (e) {
+      if (e instanceof Error && e.name === "AbortError") return; // Abbruch im Share-Dialog
+      setFehler(`Excel: ${e instanceof Error ? e.message : e}`);
     }
   }
 
@@ -612,6 +628,13 @@ export function Uebersicht(props: {
           <p className="hinweis">
             Für Excel & Co.: alle erfassten Daten des Bogens — je eine Zeile für die Einheit,
             jede Person und jedes Fahrzeug. Zum Auswerten, nicht zum Zurücklesen.
+          </p>
+        </div>
+        <div className="teilen-weg">
+          <button type="button" onClick={oldenburgXlsx}>Als Excel (Format „Oldenburg")</button>
+          <p className="hinweis">
+            Eine Zeile in der Einheitenliste der Führungsstelle — Spalten und Formatierung wie in
+            deren Vorlage. Zum Einfügen in die laufende Liste am Meldekopf.
           </p>
         </div>
         {/* Roh-JSON nur im Debug-Modus anbieten: fürs Publikum ist der Bogen
