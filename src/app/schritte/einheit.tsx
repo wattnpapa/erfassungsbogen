@@ -15,7 +15,7 @@ import { stanFahrzeugVorbelegung } from "../../vokabulare/thw-stan-fahrzeuge";
 import { stanPersonalVorbelegung } from "../../vokabulare/thw-stan-personal";
 import { ORG_OPTIONEN, einheitAnzeigename, ersteEbene, vokabularFuer } from "../hilfen";
 import { frageJaNein } from "../dialoge";
-import { Auswahl, Feld, VokabAuswahl, type SchrittProps } from "./bausteine";
+import { Auswahl, Feld, VokabAuswahl, VorschlagFeld, type SchrittProps } from "./bausteine";
 
 // Die beiden großen Datenpakete laden erst mit Schritt 1, nicht mit dem
 // Start-Bundle: das THW-OV-Verzeichnis (~190 KB Quelldaten) und die
@@ -99,10 +99,9 @@ function ovInHierarchieUebernehmen(daten: OvDaten, hierarchie: HierarchieEbene[]
 }
 
 /**
- * OV-Namensfeld mit eigener Vorschlagsliste aus dem OV-Verzeichnis. Bewusst
- * keine native <datalist>: Safari/iOS zeigt deren Vorschläge praktisch nicht.
- * Auswahl übernimmt Kürzel + Kontaktdaten; ein direkt eingetipptes Kürzel
- * ("OODE") wird beim Verlassen des Felds aufgelöst.
+ * OV-Namensfeld mit Vorschlagsliste aus dem OV-Verzeichnis. Auswahl übernimmt
+ * Kürzel + Kontaktdaten; ein direkt eingetipptes Kürzel ("OODE") wird beim
+ * Verlassen des Felds aufgelöst.
  */
 function OvVorschlagFeld(props: {
   wert: string;
@@ -113,78 +112,39 @@ function OvVorschlagFeld(props: {
   uebernehmen: (ov: ThwOrtsverband) => void;
 }) {
   const { wert, platzhalter, verzeichnis, tippen, uebernehmen } = props;
-  const [offen, setOffen] = useState(false);
-  const [aktiv, setAktiv] = useState(0);
 
   const suche = wert.trim().toLowerCase();
-  const treffer =
-    offen && suche
-      ? verzeichnis.filter(
+  const treffer = suche
+    ? verzeichnis
+        .filter(
           (o) => o.name.toLowerCase().includes(suche) || o.kurz.toLowerCase().startsWith(suche) || o.ort.toLowerCase().startsWith(suche),
         )
-          .sort((a, b) => Number(b.name.toLowerCase().startsWith(suche)) - Number(a.name.toLowerCase().startsWith(suche)))
-          .slice(0, 8)
-      : [];
-
-  const waehlen = (ov: ThwOrtsverband) => {
-    uebernehmen(ov);
-    setOffen(false);
-  };
+        .sort((a, b) => Number(b.name.toLowerCase().startsWith(suche)) - Number(a.name.toLowerCase().startsWith(suche)))
+        .slice(0, 8)
+    : [];
 
   return (
-    <span className="autocomplete">
-      <input
-        value={wert}
-        placeholder={platzhalter}
-        onChange={(ev) => {
-          tippen(ev.target.value);
-          setOffen(true);
-          setAktiv(0);
-        }}
-        onKeyDown={(ev) => {
-          if (treffer.length === 0) return;
-          if (ev.key === "ArrowDown") {
-            ev.preventDefault();
-            setAktiv((aktiv + 1) % treffer.length);
-          } else if (ev.key === "ArrowUp") {
-            ev.preventDefault();
-            setAktiv((aktiv + treffer.length - 1) % treffer.length);
-          } else if (ev.key === "Enter") {
-            ev.preventDefault();
-            const ov = treffer[aktiv];
-            if (ov) waehlen(ov);
-          } else if (ev.key === "Escape") {
-            setOffen(false);
-          }
-        }}
-        onBlur={() => {
-          setOffen(false);
-          const eingabe = wert.trim();
-          const ov = verzeichnis.find((o) => o.kurz === eingabe.toUpperCase() || o.name === eingabe);
-          if (ov) uebernehmen(ov);
-        }}
-      />
-      {treffer.length > 0 && (
-        <ul className="vorschlaege">
-          {treffer.map((o, k) => (
-            // onMouseDown statt onClick, damit die Auswahl vor dem blur greift
-            <li
-              key={o.name}
-              className={k === aktiv ? "aktiv" : undefined}
-              onMouseDown={(ev) => {
-                ev.preventDefault();
-                waehlen(o);
-              }}
-            >
-              {o.name}
-              <small>
-                {o.kurz} · {o.plz} {o.ort}
-              </small>
-            </li>
-          ))}
-        </ul>
+    <VorschlagFeld
+      wert={wert}
+      platzhalter={platzhalter}
+      treffer={treffer}
+      schluessel={(o) => o.name}
+      zeile={(o) => (
+        <>
+          {o.name}
+          <small>
+            {o.kurz} · {o.plz} {o.ort}
+          </small>
+        </>
       )}
-    </span>
+      tippen={tippen}
+      waehlen={uebernehmen}
+      verlassen={(eingabe) => {
+        const e = eingabe.trim();
+        const ov = verzeichnis.find((o) => o.kurz === e.toUpperCase() || o.name === e);
+        if (ov) uebernehmen(ov);
+      }}
+    />
   );
 }
 

@@ -5,6 +5,7 @@ import {
   THW_EMAIL_TEMPLATES,
   THW_FAHRZEUGTYPEN,
   THW_FUNKTIONEN,
+  THW_FUNKTIONEN_ALLE,
   THW_HIERARCHIE_EBENEN,
   type VokabularEintrag,
 } from "./thw";
@@ -17,6 +18,7 @@ const TABELLEN: [string, VokabularEintrag[]][] = [
   ["THW_HIERARCHIE_EBENEN", THW_HIERARCHIE_EBENEN],
   ["THW_EINHEITSTYPEN", THW_EINHEITSTYPEN],
   ["THW_FUNKTIONEN", THW_FUNKTIONEN],
+  ["THW_FUNKTIONEN_ALLE", THW_FUNKTIONEN_ALLE],
   ["THW_FAHRZEUGTYPEN", THW_FAHRZEUGTYPEN],
   ["FUNKRUF_KENNWOERTER", FUNKRUF_KENNWOERTER],
   ["THW_EMAIL_TEMPLATES", THW_EMAIL_TEMPLATES],
@@ -47,10 +49,23 @@ describe.each(TABELLEN)("Vokabular %s", (_name, tabelle) => {
   });
 });
 
-describe("THW_FUNKTIONEN", () => {
+describe("THW_FUNKTIONEN_ALLE", () => {
   it("kennzeichnet jede Funktion als 'funktion' oder 'zusatz'", () => {
-    for (const f of THW_FUNKTIONEN) {
+    for (const f of THW_FUNKTIONEN_ALLE) {
       expect(["funktion", "zusatz"]).toContain(f.art);
     }
+  });
+
+  it("enthält die Handredaktion vollständig und darüber hinaus die Funktionsliste", () => {
+    expect(THW_FUNKTIONEN_ALLE.slice(0, THW_FUNKTIONEN.length)).toEqual(THW_FUNKTIONEN);
+    expect(THW_FUNKTIONEN_ALLE.length).toBeGreaterThan(THW_FUNKTIONEN.length);
+  });
+
+  it("führt keine Funktion doppelt (sonst gäbe es zwei Codes für dieselbe Sache)", () => {
+    // Vergleich ohne Groß-/Kleinschreibung, Leerzeichen und Bindestriche —
+    // genau wie der Generator dedupliziert (scripts/thw-funktionen-vokabular.mts).
+    const namen = THW_FUNKTIONEN_ALLE.map((f) => f.name.toLowerCase().replace(/[\s\-.]/g, ""));
+    const doppelte = namen.filter((n, i) => namen.indexOf(n) !== i);
+    expect(doppelte).toEqual([]);
   });
 });

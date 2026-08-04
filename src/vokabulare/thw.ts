@@ -17,6 +17,8 @@
  *    Redaktion dieses Projekts.
  */
 
+import { THW_FUNKTIONEN_ERGAENZUNG } from "./thw-funktionen-ergaenzung";
+
 export interface VokabularEintrag {
   code: number;
   kurz: string;
@@ -194,6 +196,16 @@ export const THW_FUNKTIONEN: FunktionsEintrag[] = [
   { code: 100, kurz: "Kf ADR Stückgut", name: "Kraftfahrer/in CE ADR Stückgut", art: "zusatz" },
   { code: 101, kurz: "Kf ADR Tank", name: "Kraftfahrer/in CE ADR Tank", art: "zusatz" },
   { code: 102, kurz: "Kf ADR Kl. 1", name: "Kraftfahrer/in BE ADR Klasse 1", art: "zusatz" },
+];
+
+/**
+ * Alle THW-Funktionen: die Handredaktion oben (Codes 1–102, geläufige Funktionen
+ * mit eigenen Kurzformen) plus die vollständige Inlands-Funktionsliste des THW
+ * (Codes ab 200, generiert). Die Auswahl in der App arbeitet auf dieser Liste.
+ */
+export const THW_FUNKTIONEN_ALLE: FunktionsEintrag[] = [
+  ...THW_FUNKTIONEN,
+  ...THW_FUNKTIONEN_ERGAENZUNG,
 ];
 
 // -------------------------------------------------------------- Fahrzeugtypen

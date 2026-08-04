@@ -3,7 +3,7 @@
  * und die Meldekopf-Schnellerfassung (nur Stärke).
  */
 
-import { useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from "react";
+import { useEffect, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from "react";
 import {
   Ernaehrung,
   Geschlecht,
@@ -34,6 +34,25 @@ import {
   zahl,
   type SchrittProps,
 } from "./bausteine";
+
+// Die Berufsliste (700 Bezeichnungen, ~28 KB Quelldaten) hängt nicht im
+// Start-Bundle: sie wird erst gebraucht, wenn jemand Personal im Detail erfasst.
+// Einmal geladen bleibt das Modul im Cache, der useState-Startwert greift dann
+// sofort — ohne Nachlade-Flackern.
+let berufeCache: readonly string[] | null = null;
+
+/** Berufsbezeichnungen als Tipphilfe für die Zusatzqualifikationen. */
+function useBerufe(aktiv: boolean): readonly string[] {
+  const [berufe, setBerufe] = useState(berufeCache);
+  useEffect(() => {
+    if (!aktiv || berufe) return;
+    void import("../../vokabulare/berufe").then((m) => {
+      berufeCache = m.BERUFE;
+      setBerufe(berufeCache);
+    });
+  }, [aktiv, berufe]);
+  return berufe ?? [];
+}
 
 function KontakteEditor(props: { kontakte: Kontakt[]; aendern: (k: Kontakt[]) => void; thw: boolean }) {
   const { kontakte, aendern, thw } = props;
@@ -87,10 +106,11 @@ function KontakteEditor(props: { kontakte: Kontakt[]; aendern: (k: Kontakt[]) =>
 function PersonKarte(props: {
   person: Person;
   org: OrganisationsTyp;
+  berufe: readonly string[];
   aendern: (p: Person) => void;
   entfernen: () => void;
 }) {
-  const { person: p, org, aendern, entfernen } = props;
+  const { person: p, org, berufe, aendern, entfernen } = props;
   const set = (patch: Partial<Person>) => aendern({ ...p, ...patch });
   const funktionen = vokabularFuer(org, "funktion");
   return (
@@ -131,8 +151,17 @@ function PersonKarte(props: {
       <Feld titel="Funktionen / Zusatzfunktionen">
         <VokabListe werte={p.funktionen} aendern={(w) => set({ funktionen: w })} tabelle={funktionen} hinzufuegenText="Funktion" />
       </Feld>
+      {/* Zusatzqualifikationen kennen kein Code-Vokabular: Beruf, Lehrgang oder
+          externe Berechtigung wandern als Freitext in den Bogen. Die
+          Berufsbezeichnungen der KldB dienen nur als Tipphilfe. */}
       <Feld titel="Weitere Qualifikationen">
-        <VokabListe werte={p.zusatzqualifikationen} aendern={(w) => set({ zusatzqualifikationen: w })} tabelle={[]} hinzufuegenText="Qualifikation" />
+        <VokabListe
+          werte={p.zusatzqualifikationen}
+          aendern={(w) => set({ zusatzqualifikationen: w })}
+          tabelle={[]}
+          freitextVorschlaege={berufe}
+          hinzufuegenText="Qualifikation"
+        />
       </Feld>
       <h3>Erreichbarkeiten</h3>
       <KontakteEditor kontakte={p.kontakte} aendern={(k) => set({ kontakte: k })} thw={org === OrganisationsTyp.THW} />
@@ -254,6 +283,8 @@ export function SchrittPersonal({ bogen, aendern }: SchrittProps) {
   // Fokus beim Anlegen per Enter in die neue Zeile springen.
   const [schnell, setSchnell] = useState(false);
   const [fokusNeue, setFokusNeue] = useState(false);
+  // Nur die Detail-Karten zeigen Qualifikationen; die Schnelltabelle nicht.
+  const berufe = useBerufe(!nurStaerke && !schnell);
   const namenDialog = useRef<HTMLDialogElement>(null);
   const [namenText, setNamenText] = useState("");
   const namenVorschau = parseNamen(namenText);
@@ -430,6 +461,7 @@ export function SchrittPersonal({ bogen, aendern }: SchrittProps) {
             key={i}
             person={p}
             org={bogen.einheit.organisation}
+            berufe={berufe}
             aendern={(np) => aendern({ personal: bogen.personal.map((x, j) => (j === i ? np : x)) })}
             entfernen={() => aendern({ personal: bogen.personal.filter((_, j) => j !== i) })}
           />

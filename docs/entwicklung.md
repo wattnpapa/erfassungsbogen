@@ -406,6 +406,67 @@ Grundzeichen (Kfz, Anhänger, Boot …) in der Organisationsfarbe, beschriftet m
 dem Kurzzeichen. Die dritte Stufe entspricht dem, was der Bogen vor dem
 Umstieg immer gezeichnet hat.
 
+## Vorschlagsfelder (Suche mit Freitext-Ausweg)
+
+Listen, die zu lang für ein `<select>` sind, laufen über
+`VorschlagFeld` in [src/app/schritte/bausteine.tsx](../src/app/schritte/bausteine.tsx):
+ein Eingabefeld, das ab dem ersten Zeichen eine eigene Vorschlagsliste aufklappt
+(Pfeiltasten, Enter, Escape, Klick). Bewusst **keine** native `<datalist>` —
+Safari/iOS zeigt deren Vorschläge praktisch nicht. Gefiltert und sortiert wird
+vom Aufrufer, weil jede Liste nach eigenen Feldern sucht. Genutzt von:
+
+- **Ortsverband** (Schritt 1): Auswahl füllt Kürzel, Telefon, eMail sowie
+  Regionalstelle und Landesverband mit.
+- **Funktionen** (Schritt 3): trägt einen **Code** ein — kompakt im QR.
+- **Weitere Qualifikationen** (Schritt 3): trägt **Freitext** ein; die
+  Berufsliste ist reine Tipphilfe.
+
+Eigene Eingaben bleiben überall möglich: Enter ohne markierten Vorschlag
+übernimmt sie, der Knopf „+ eigener Text" auch dann, wenn die Liste Treffer
+zeigt.
+
+**Barrierefreiheit:** Das Feld folgt dem ARIA-Muster „Combobox mit
+Listen-Autovervollständigung" (ARIA 1.2) — `role="combobox"`,
+`aria-expanded`, `aria-autocomplete="list"`, dazu `role="listbox"` mit
+`role="option"`-Zeilen. Der Fokus bleibt immer im Eingabefeld; markiert wird über
+`aria-activedescendant`, weshalb die Zeilen kein `tabindex` tragen.
+`aria-controls` steht nur bei offener Liste — ein Verweis auf ein Element, das
+nicht im Dokument ist, wäre ein Fehler (axe: `aria-valid-attr-value`). Die
+Trefferzahl kommt über eine Statuszeile mit der Klasse `.nur-vorlesen`
+(aus dem Bild genommen, aber im Baum): dass sich die Anzahl beim Tippen ändert,
+verrät sonst nichts. Abgesichert in
+[src/app/schritte/personal.test.tsx](../src/app/schritte/personal.test.tsx) —
+dort gilt: Zeilen immer über die Listbox suchen, weil die nativen Auswahllisten
+der Personenkarte eigene `<option>`-Elemente mit derselben Rolle mitbringen.
+
+### Generierte Vokabulare dieser Felder
+
+| Ziel | Generator | Quelle |
+| --- | --- | --- |
+| [src/vokabulare/berufe.ts](../src/vokabulare/berufe.ts) — 700 Berufsbezeichnungen | `npm run vokabular:berufe` | `scripts/quellen/kldb-2010-berufe.csv` |
+| [src/vokabulare/thw-funktionen-ergaenzung.ts](../src/vokabulare/thw-funktionen-ergaenzung.ts) — 145 THW-Funktionen | `npm run vokabular:thw-funktionen` | `scripts/quellen/thw-funktionen.csv` |
+
+**Berufe** kommen aus der Klassifikation der Berufe 2010 (Ebene der
+Berufsuntergruppen). Deren amtliche Bezeichnungen sind auf 44 Zeichen gekürzt
+(„Berufe Maschinenb.&Betriebst.(son.spez.Tät.)"); der Generator löst die
+Abkürzungen auf und bricht ab, wenn eine unbekannte übrig bleibt — das
+Abkürzungsverzeichnis muss also vollständig bleiben. Sie tragen **keine Codes**:
+ein Beruf wandert als Freitext in den Bogen, damit das QR-Format unberührt
+bleibt.
+
+**THW-Funktionen** ergänzen die Handredaktion in `thw.ts` (Codes 1–102, geläufige
+Funktionen mit eigenen Kurzformen) um die Inlandsbereiche der THW-Funktionsliste
+(Codes ab 200, amtliche Kurzbezeichnungen). Abgelaufene Funktionen und die
+Auslandsbereiche (SEEBA, SEEWA, HCP …) bleiben draußen. `THW_FUNKTIONEN_ALLE`
+fügt beides zusammen — das nutzt die App.
+
+**Codes sind append-only.** Der Funktionsgenerator liest die bereits erzeugte
+Datei und behält jede vorhandene Bezeichnung→Code-Zuordnung; nur neue
+Bezeichnungen bekommen Codes hinter dem bisherigen Maximum. Fällt eine Funktion
+aus der Quelle, bleibt ihr Code reserviert (der Generator meldet das) — sonst
+würden gespeicherte Bögen und alte QR-Codes still umgedeutet. Dass keine
+Funktion doppelt geführt wird, sichert `src/vokabulare/thw.test.ts` ab.
+
 ## Offene Punkte
 
 Siehe [TODO.md](TODO.md) (Gerätetests, App Store Connect,

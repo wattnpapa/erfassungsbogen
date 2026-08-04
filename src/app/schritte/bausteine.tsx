@@ -4,11 +4,10 @@
  * einem einzelnen Schritt — alles hier wird von mehreren Schritten genutzt.
  */
 
-import { createContext, useContext, useState, type ComponentProps, type ReactNode } from "react";
+import { createContext, useContext, useId, useState, type ComponentProps, type ReactNode } from "react";
 import { Erfassungsbogen, VokabularWert } from "../../model";
 import type { VokabularEintrag } from "../../vokabulare/thw";
 import { vokabSortiert, type Pruefpunkt } from "../hilfen";
-import { frageText } from "../dialoge";
 
 export type SchrittProps = {
   bogen: Erfassungsbogen;
@@ -86,51 +85,233 @@ export function VokabAuswahl(props: {
   );
 }
 
+/**
+ * Eingabefeld mit eigener Vorschlagsliste — für Listen, die zu lang für ein
+ * <select> sind (Ortsverbände, THW-Funktionen, Berufe), aber Freitext erlauben
+ * müssen. Bewusst keine native <datalist>: Safari/iOS zeigt deren Vorschläge
+ * praktisch nicht.
+ *
+ * Das Filtern bleibt beim Aufrufer (`treffer`), weil jede Liste nach eigenen
+ * Feldern sucht und eigen sortiert; hier stecken nur Tastatur-, Maus- und
+ * Fokusverhalten, die überall gleich sein sollen.
+ *
+ * Barrierefreiheit — das Muster „Combobox mit Listen-Autovervollständigung"
+ * (ARIA 1.2). Ohne diese Rollen ist die Liste für Vorlesesoftware ein
+ * beliebiges <ul> irgendwo im Dokument: sie kündigt weder an, dass Vorschläge
+ * aufgeklappt sind, noch welcher gerade markiert ist.
+ *  - Der Fokus bleibt immer im Eingabefeld; markiert wird über
+ *    `aria-activedescendant`, nicht über echten Fokus (deshalb tragen die
+ *    Zeilen auch kein tabindex).
+ *  - `aria-controls` steht nur bei offener Liste, sonst zeigte die Referenz auf
+ *    ein Element, das gar nicht im Dokument ist.
+ *  - Die Trefferzahl kommt zusätzlich über eine Statuszeile: dass sich die
+ *    Anzahl beim Tippen ändert, verrät sonst nichts.
+ */
+export function VorschlagFeld<T>(props: {
+  wert: string;
+  platzhalter?: string;
+  beschriftung?: string;
+  /** Vorschläge zur aktuellen Eingabe, schon gefiltert und sortiert. */
+  treffer: T[];
+  /** Stabiler React-Key je Vorschlag. */
+  schluessel: (v: T) => string;
+  /** Darstellung einer Zeile der Vorschlagsliste. */
+  zeile: (v: T) => ReactNode;
+  tippen: (wert: string) => void;
+  waehlen: (v: T) => void;
+  /** Enter/Klick ohne markierten Vorschlag — übernimmt die Eingabe als Freitext. */
+  bestaetigen?: (wert: string) => void;
+  /** Beim Verlassen des Felds, z. B. ein direkt eingetipptes Kürzel auflösen. */
+  verlassen?: (wert: string) => void;
+  /** true: Feld läuft in einer Zeile mit (Chips), statt eine eigene zu füllen. */
+  imFluss?: boolean;
+}) {
+  const { wert, platzhalter, beschriftung, treffer, schluessel, zeile, tippen, waehlen, bestaetigen, verlassen, imFluss } = props;
+  const ausFeld = useContext(FeldTitel);
+  const [offen, setOffen] = useState(false);
+  const [aktiv, setAktiv] = useState(0);
+  // Mehrere Vorschlagsfelder stehen gleichzeitig auf einer Seite (Funktion und
+  // Qualifikation je Person) — die IDs müssen sich unterscheiden.
+  const id = useId();
+  const listeId = `${id}-liste`;
+  const zeilenId = (k: number) => `${id}-zeile-${k}`;
+
+  const sichtbar = offen ? treffer : [];
+  const aufgeklappt = sichtbar.length > 0;
+  const nehmen = (v: T) => {
+    waehlen(v);
+    setOffen(false);
+    setAktiv(0);
+  };
+
+  return (
+    <span className={imFluss ? "autocomplete im-fluss" : "autocomplete"}>
+      <input
+        // Wie bei <Auswahl>: im umschließenden <label> zählt sonst der ganze
+        // Textinhalt (hier die schon gesetzten Chips) als Feldname.
+        aria-label={beschriftung ?? ausFeld}
+        role="combobox"
+        aria-expanded={aufgeklappt}
+        aria-controls={aufgeklappt ? listeId : undefined}
+        aria-activedescendant={aufgeklappt ? zeilenId(aktiv) : undefined}
+        // "list": Vorschläge stehen in der Liste, der getippte Text wird nicht
+        // im Feld vervollständigt.
+        aria-autocomplete="list"
+        // Sonst legt sich die Autovervollständigung des Browsers über unsere.
+        autoComplete="off"
+        value={wert}
+        placeholder={platzhalter}
+        onChange={(ev) => {
+          tippen(ev.target.value);
+          setOffen(true);
+          setAktiv(0);
+        }}
+        onKeyDown={(ev) => {
+          if (ev.key === "Escape") {
+            setOffen(false);
+            return;
+          }
+          if (ev.key === "Enter") {
+            ev.preventDefault();
+            const v = sichtbar[aktiv];
+            if (v !== undefined) nehmen(v);
+            else bestaetigen?.(wert);
+            return;
+          }
+          if (ev.key !== "ArrowDown" && ev.key !== "ArrowUp") return;
+          if (!offen) {
+            // Nach Escape holt Pfeil-ab die Liste zurück, ohne neu zu tippen.
+            if (ev.key === "ArrowDown" && treffer.length > 0) {
+              ev.preventDefault();
+              setOffen(true);
+              setAktiv(0);
+            }
+            return;
+          }
+          if (sichtbar.length === 0) return;
+          ev.preventDefault();
+          setAktiv(
+            ev.key === "ArrowDown"
+              ? (aktiv + 1) % sichtbar.length
+              : (aktiv + sichtbar.length - 1) % sichtbar.length,
+          );
+        }}
+        onBlur={() => {
+          setOffen(false);
+          verlassen?.(wert);
+        }}
+      />
+      {aufgeklappt && (
+        <ul className="vorschlaege" id={listeId} role="listbox" aria-label={`Vorschläge zu ${beschriftung ?? ausFeld ?? "der Eingabe"}`}>
+          {sichtbar.map((v, k) => (
+            // onMouseDown statt onClick, damit die Auswahl vor dem blur greift
+            <li
+              key={schluessel(v)}
+              id={zeilenId(k)}
+              role="option"
+              // Markiert = das, was Enter nehmen würde; ohne dieses Flag nennt
+              // Vorlesesoftware die Zeile nur, ohne sie als gewählt auszuweisen.
+              aria-selected={k === aktiv}
+              className={k === aktiv ? "aktiv" : undefined}
+              onMouseDown={(ev) => {
+                ev.preventDefault();
+                nehmen(v);
+              }}
+            >
+              {zeile(v)}
+            </li>
+          ))}
+        </ul>
+      )}
+      <span className="nur-vorlesen" role="status">
+        {aufgeklappt ? `${sichtbar.length} ${sichtbar.length === 1 ? "Vorschlag" : "Vorschläge"}` : ""}
+      </span>
+    </span>
+  );
+}
+
+/** Ein Vorschlag der VokabListe — aus der Code-Tabelle oder als Freitext-Tipphilfe. */
+type Kandidat = { text: string; zusatz?: string; wert: VokabularWert };
+
 export function VokabListe(props: {
   werte: VokabularWert[];
   aendern: (w: VokabularWert[]) => void;
   tabelle: VokabularEintrag[];
   hinzufuegenText: string;
+  /**
+   * Tipphilfe für den Freitext-Weg (z. B. Berufsbezeichnungen). Ausgewähltes
+   * landet als Freitext im Bogen — anders als `tabelle`, die Codes vergibt.
+   */
+  freitextVorschlaege?: readonly string[];
 }) {
-  const { werte, aendern, tabelle, hinzufuegenText } = props;
+  const { werte, aendern, tabelle, hinzufuegenText, freitextVorschlaege } = props;
+  const [eingabe, setEingabe] = useState("");
+
+  const suche = eingabe.trim().toLowerCase();
+  const treffer: Kandidat[] = [];
+  if (suche) {
+    // vokabSortiert: gleiche Reihenfolge wie in den Auswahllisten der App,
+    // damit Gleichartiges beieinander steht („GrFü B", „GrFü BrB", „GrFü E").
+    for (const t of vokabSortiert(tabelle)) {
+      if (t.kurz.toLowerCase().includes(suche) || t.name.toLowerCase().includes(suche)) {
+        treffer.push({ text: t.kurz, zusatz: t.name, wert: { code: t.code } });
+      }
+    }
+    for (const s of freitextVorschlaege ?? []) {
+      if (s.toLowerCase().includes(suche)) treffer.push({ text: s, wert: { freitext: s } });
+    }
+    // Was mit der Eingabe beginnt, ist meist das Gemeinte — nach vorn. Zählt für
+    // beide Schreibweisen: die eine tippt „GrFü B", die andere „Gruppenführer".
+    const beginnt = (k: Kandidat) =>
+      Number(k.text.toLowerCase().startsWith(suche) || (k.zusatz?.toLowerCase().startsWith(suche) ?? false));
+    treffer.sort((a, b) => beginnt(b) - beginnt(a));
+  }
+
+  const hinzu = (w: VokabularWert) => {
+    aendern([...werte, w]);
+    setEingabe("");
+  };
+  const freitextHinzu = (text: string) => {
+    const t = text.trim();
+    if (t) hinzu({ freitext: t });
+  };
+
   return (
     <span className="chips">
       {werte.map((w, i) => (
         <span key={i} className="chip">
           {w.code != null ? (tabelle.find((t) => t.code === w.code)?.kurz ?? `#${w.code}`) : w.freitext}
-          <button type="button" onClick={() => aendern(werte.filter((_, j) => j !== i))}>×</button>
+          <button
+            type="button"
+            aria-label={`${w.code != null ? (tabelle.find((t) => t.code === w.code)?.kurz ?? `#${w.code}`) : w.freitext} entfernen`}
+            onClick={() => aendern(werte.filter((_, j) => j !== i))}
+          >
+            ×
+          </button>
         </span>
       ))}
-      <Auswahl
+      <VorschlagFeld
+        wert={eingabe}
         beschriftung={`${hinzufuegenText} hinzufügen`}
-        value=""
-        onChange={async (e) => {
-          // Das Feld gleich zurücksetzen: die Freitext-Abfrage läuft asynchron,
-          // solange dürfte sonst „Freitext…" als scheinbare Auswahl stehen.
-          const feld = e.currentTarget;
-          const v = feld.value;
-          feld.value = "";
-          if (!v) return;
-          if (v === "frei") {
-            const t = await frageText({
-              titel: hinzufuegenText,
-              label: "Freitext",
-              ok: "Hinzufügen",
-            });
-            if (t) aendern([...werte, { freitext: t }]);
-            return;
-          }
-          aendern([...werte, { code: Number(v) }]);
-        }}
-      >
-        <option value="">{hinzufuegenText}…</option>
-        {vokabSortiert(tabelle).map((t) => (
-          <option key={t.code} value={t.code}>
-            {t.kurz} – {t.name}
-          </option>
-        ))}
-        <option value="frei">Freitext…</option>
-      </Auswahl>
+        platzhalter={`${hinzufuegenText}…`}
+        imFluss
+        treffer={treffer.slice(0, 8)}
+        schluessel={(k) => (k.wert.code != null ? `c${k.wert.code}` : `f${k.text}`)}
+        zeile={(k) => (
+          <>
+            {k.text}
+            {k.zusatz && <small>{k.zusatz}</small>}
+          </>
+        )}
+        tippen={setEingabe}
+        waehlen={(k) => hinzu(k.wert)}
+        bestaetigen={freitextHinzu}
+      />
+      {/* Sichtbarer Weg für eigene Eingaben, auch wenn die Liste Treffer zeigt:
+          per Enter gewinnt dort der markierte Vorschlag. */}
+      <button type="button" disabled={eingabe.trim() === ""} onClick={() => freitextHinzu(eingabe)}>
+        + eigener Text
+      </button>
     </span>
   );
 }

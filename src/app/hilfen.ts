@@ -48,7 +48,7 @@ import { istNativ, textTeilen } from "./nativ";
 import {
   FUNKRUF_KENNWOERTER,
   THW_EINHEITSTYPEN,
-  THW_FUNKTIONEN,
+  THW_FUNKTIONEN_ALLE,
   THW_FAHRZEUGTYPEN,
   type VokabularEintrag,
 } from "../vokabulare/thw";
@@ -94,7 +94,7 @@ export function vokabularFuer(
   if (org !== OrganisationsTyp.THW) return [];
   switch (art) {
     case "einheitstyp": return THW_EINHEITSTYPEN;
-    case "funktion": return THW_FUNKTIONEN;
+    case "funktion": return THW_FUNKTIONEN_ALLE;
     case "fahrzeug": return THW_FAHRZEUGTYPEN;
   }
 }
