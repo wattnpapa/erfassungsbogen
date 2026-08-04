@@ -1,5 +1,5 @@
 /**
- * Suchen und Sortieren der Einheitenliste eines Einsatzes.
+ * Suchen, Filtern und Sortieren der Einheitenliste eines Einsatzes.
  *
  * Bei einer Großlage meldet sich ein Meldekopf 30–50 Einheiten in eine Liste;
  * fest alphabetisch und ungefiltert ist die dann nicht mehr zu überblicken.
@@ -11,15 +11,19 @@
  *    Einheit, Organisation, Ort/Zugehörigkeit, Zug- und Teil-Etikett,
  *    Kennzeichen und Funkrufname. Nicht über Personennamen: die Liste ist eine
  *    Einheitenliste, und die Namen stehen ausgeklappt in den Details.
+ *  - QUALIFIKATION: „welche Einheit hat mir Atemschutzgeräteträger gemeldet?"
+ *    Filtert auf Einheiten mit mindestens einer passenden Person und nennt
+ *    deren Namen. Siehe {@link qualifikationenImEinsatz}.
  *  - SORTIERUNG: umschaltbar, immer mit dem Anzeigenamen als letztem
  *    Vergleich, damit die Reihenfolge bei Gleichstand stabil bleibt.
  *
- * Beides betrifft NUR die Darstellung der Liste — die Summen des Einsatzes
+ * Alles davon betrifft NUR die Darstellung der Liste — die Summen des Einsatzes
  * (auswertung.ts) rechnen unverändert über alle anwesenden Einheiten.
  */
 
+import { OrganisationsTyp, type Person } from "../model";
 import type { MeldeEintrag } from "./einsaetze";
-import { einheitAnzeigename, einheitOrt, funkrufText, kennzeichenText, orgLabel } from "./hilfen";
+import { einheitAnzeigename, einheitOrt, funkrufText, kennzeichenText, orgLabel, vokabularFuer } from "./hilfen";
 
 export type EinheitenSortierung = "name" | "eintreffzeit" | "zug" | "organisation";
 
@@ -69,6 +73,107 @@ export function einheitenFiltern(eintraege: MeldeEintrag[], suche: string): Meld
   });
 }
 
+// ------------------------------------------------------- Qualifikationsfilter
+
+/**
+ * Eine Qualifikation, wie sie im Einsatz vorkommt.
+ *
+ * `schluessel` ist die normalisierte Kurzform („agt"), NICHT der Vokabular-Code.
+ * Grund: dieselbe Qualifikation erreicht den Meldekopf auf zwei Wegen — als
+ * THW-Code (32 = AGT) und als Freitext „AGT" aus einer Feuerwehr, die für ihre
+ * Funktionen noch kein Vokabular hat. Wer nach Atemschutz sucht, will beide
+ * sehen; ein Code-Schlüssel würde die Liste in zwei halbe Treffer zerlegen.
+ * Der Preis: zwei Organisationen, die dasselbe Kürzel unterschiedlich meinen,
+ * landen in einem Topf. Für einen Filter ist das die harmlosere Richtung —
+ * eine Person zu viel in der Liste sieht man, eine fehlende nicht.
+ */
+export interface QualiEintrag {
+  schluessel: string;
+  /** Beschriftung für die Auswahlliste: „AGT – Atemschutzgeräteträger/in". */
+  label: string;
+  /** Personen mit dieser Qualifikation (über alle übergebenen Meldungen). */
+  personen: number;
+  /** Einheiten, die mindestens eine solche Person gemeldet haben. */
+  einheiten: number;
+}
+
+/**
+ * Qualifikationen einer Person — Grundfunktion, Zusatzfunktion und die
+ * freien „weiteren Qualifikationen" in einem Topf. Für den Meldekopf ist beides
+ * dasselbe Bedürfnis: „wer kann X?"; ob es in der StAN eine Funktion oder eine
+ * Zusatzausbildung ist, entscheidet die Frage nicht.
+ */
+function qualisDerPerson(p: Person, org: OrganisationsTyp): { schluessel: string; label: string }[] {
+  const tabelle = vokabularFuer(org, "funktion");
+  const gefunden = new Map<string, string>();
+  for (const v of [...p.funktionen, ...p.zusatzqualifikationen]) {
+    if (v.code != null) {
+      const e = tabelle.find((t) => t.code === v.code);
+      // Unbekannter Code (Bogen aus einer neueren App-Fassung): bleibt filterbar,
+      // nur ohne Klartext — besser als stillschweigend zu verschwinden.
+      if (e) gefunden.set(normalisiere(e.kurz), `${e.kurz} – ${e.name}`);
+      else gefunden.set(`#${org}:${v.code}`, `#${v.code} (unbekannte Funktion)`);
+      continue;
+    }
+    const frei = (v.freitext ?? "").trim();
+    if (frei !== "") {
+      const s = normalisiere(frei);
+      // Vorhandene Beschriftung nicht überschreiben: die aus dem Vokabular
+      // („AGT – Atemschutzgeräteträger/in") sagt mehr als der Freitext „agt".
+      if (!gefunden.has(s)) gefunden.set(s, frei);
+    }
+  }
+  return [...gefunden].map(([schluessel, label]) => ({ schluessel, label }));
+}
+
+/**
+ * Alle im Einsatz gemeldeten Qualifikationen, alphabetisch, mit Trefferzahlen.
+ *
+ * Gezählt wird über genau die übergebenen Meldungen — üblicherweise die neueste
+ * Fassung je Einheit. Damit stimmen die Zahlen in der Auswahlliste mit dem, was
+ * die Liste darunter zeigt; abgerückte Einheiten zählen mit, solange sie
+ * angezeigt werden.
+ */
+export function qualifikationenImEinsatz(eintraege: MeldeEintrag[]): QualiEintrag[] {
+  const gesammelt = new Map<string, { label: string; personen: number; einheiten: number }>();
+  for (const e of eintraege) {
+    const org = e.bogen.einheit.organisation;
+    const inDieserEinheit = new Set<string>();
+    for (const p of e.bogen.personal) {
+      for (const { schluessel, label } of qualisDerPerson(p, org)) {
+        const bisher = gesammelt.get(schluessel);
+        if (bisher) {
+          bisher.personen += 1;
+          // Die informativere Beschriftung gewinnt (Vokabular vor Freitext).
+          if (label.includes(" – ") && !bisher.label.includes(" – ")) bisher.label = label;
+        } else {
+          gesammelt.set(schluessel, { label, personen: 1, einheiten: 0 });
+        }
+        inDieserEinheit.add(schluessel);
+      }
+    }
+    for (const s of inDieserEinheit) gesammelt.get(s)!.einheiten += 1;
+  }
+  return [...gesammelt]
+    .map(([schluessel, rest]) => ({ schluessel, ...rest }))
+    .sort((a, b) => a.label.localeCompare(b.label, "de"));
+}
+
+/** Personen einer Meldung, die die gesuchte Qualifikation tragen (Reihenfolge des Bogens). */
+export function personenMitQualifikation(e: MeldeEintrag, schluessel: string): Person[] {
+  if (schluessel === "") return [];
+  const org = e.bogen.einheit.organisation;
+  return e.bogen.personal.filter((p) => qualisDerPerson(p, org).some((q) => q.schluessel === schluessel));
+}
+
+/** Meldungen mit mindestens einer passenden Person. Leerer Schlüssel = keine Einschränkung. */
+export function nachQualifikationFiltern(eintraege: MeldeEintrag[], schluessel: string): MeldeEintrag[] {
+  if (schluessel === "") return eintraege;
+  return eintraege.filter((e) => personenMitQualifikation(e, schluessel).length > 0);
+}
+
+// ------------------------------------------------------------------ Sortierung
+
 function nameVergleich(a: MeldeEintrag, b: MeldeEintrag): number {
   return einheitAnzeigename(a.bogen.einheit).localeCompare(einheitAnzeigename(b.bogen.einheit), "de");
 }
@@ -110,11 +215,15 @@ export function einheitenSortieren(
   }
 }
 
-/** Anzeigeliste: erst suchen, dann sortieren. */
+/** Anzeigeliste: erst suchen, dann auf die Qualifikation einschränken, dann sortieren. */
 export function einheitenAnsicht(
   eintraege: MeldeEintrag[],
   suche: string,
   sortierung: EinheitenSortierung,
+  qualifikation = "",
 ): MeldeEintrag[] {
-  return einheitenSortieren(einheitenFiltern(eintraege, suche), sortierung);
+  return einheitenSortieren(
+    nachQualifikationFiltern(einheitenFiltern(eintraege, suche), qualifikation),
+    sortierung,
+  );
 }

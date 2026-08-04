@@ -1,5 +1,5 @@
 # language: de
-Funktionalität: Einheitenliste durchsuchen und sortieren
+Funktionalität: Einheitenliste durchsuchen, filtern und sortieren
   Bei einer Großlage stehen 30–50 Einheiten in der Sammlung. Wer dann eine
   bestimmte sucht, braucht Filter und Sortierung — und darf sich dabei nicht
   aus Versehen die Summen des Einsatzes verstellen: Die Kopfleiste zählt
@@ -45,6 +45,31 @@ Funktionalität: Einheitenliste durchsuchen und sortieren
     Und sehe ich den Hinweis "Keine Einheit passt zu"
     Wenn ich auf "Suche löschen" klicke
     Dann führt die Einheitenliste genau 3 Einheiten
+
+  # Wunsch aus Cuxhaven (August 2026): bei größeren Lagen die vorhandenen
+  # Einsatzkräfte nach Qualifikation finden. Der geteilte Bogen bringt eine
+  # Person mit der Funktion SGL mit, die beiden manuell erfassten Einheiten
+  # führen kein Personal.
+  Szenario: Der Qualifikationsfilter nennt die passenden Einsatzkräfte
+    Wenn ich das Feld "Qualifikation" auf "SGL – Sachgebietsleiter/in (1)" stelle
+    Dann sehe ich die Überschrift "Einheiten (1 von 3)"
+    Und führt die Einheitenliste genau 1 Einheiten
+    Und sehe ich den Text "1× SGL: Johannes Rudolph"
+    Und sehe ich den Hinweis "1 Einsatzkraft mit „SGL – Sachgebietsleiter/in“"
+    Und sehe ich den Hinweis "2 Meldungen führen keine Personen"
+
+  Szenario: Der Qualifikationsfilter lässt die Summen des Einsatzes unberührt
+    Wenn ich das Feld "Qualifikation" auf "SGL – Sachgebietsleiter/in (1)" stelle
+    Dann führt die Einheitenliste genau 1 Einheiten
+    Und meldet die Kopfleiste 3 Einheiten
+    Wenn ich auf "Filter aufheben" klicke
+    Dann führt die Einheitenliste genau 3 Einheiten
+
+  Szenario: Suche und Qualifikationsfilter greifen zusammen
+    Wenn ich das Feld "Qualifikation" auf "SGL – Sachgebietsleiter/in (1)" stelle
+    Und ich das Feld "Suche" mit "wardenburg" fülle
+    Dann führt die Einheitenliste genau 0 Einheiten
+    Und sehe ich den Hinweis "Keine Einheit passt zu"
 
   Szenario: Nach Eintreffzeit steht die jüngste Meldung oben
     Wenn ich das Feld "Sortierung" auf "Eintreffzeit (neueste zuerst)" stelle

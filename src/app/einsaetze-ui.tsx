@@ -56,7 +56,13 @@ import { AufteilenPanel } from "./aufteilen-ui";
 import { ZusammenfuehrenPanel } from "./zusammenfuehren-ui";
 import type { AufteilungsWahl } from "./aufteilen";
 import { aggregiere, aggregiereNachZug, type EinsatzSummen } from "./auswertung";
-import { SORTIERUNGEN, einheitenAnsicht, type EinheitenSortierung } from "./einheiten-liste";
+import {
+  SORTIERUNGEN,
+  einheitenAnsicht,
+  personenMitQualifikation,
+  qualifikationenImEinsatz,
+  type EinheitenSortierung,
+} from "./einheiten-liste";
 import { debugAktiv } from "./debug-plattform";
 import { Auswahl } from "./schritte/bausteine";
 import { SeitenKopf } from "./seiten-kopf";
@@ -205,14 +211,26 @@ export function EinsatzDetail(props: {
   const { einsatz, onZurueck, onGeaendert, onScannen, onManuell, onDateiImport, onExport, onCsvExport, onSammelPdf, onGeloescht } = props;
   const [suche, setSuche] = useState("");
   const [sortierung, setSortierung] = useState<EinheitenSortierung>("name");
+  // "" = keine Einschränkung. Schlüssel siehe einheiten-liste.ts.
+  const [quali, setQuali] = useState("");
   const sum = aggregiere(einsatz.eintraege);
   const zugGruppen = aggregiereNachZug(einsatz.eintraege);
   // Alle gemeldeten Einheiten (neueste Revision je Einheit) — Grundlage für die
-  // Gesamtzahl; `kopf` ist davon nur der gerade angezeigte Ausschnitt. Suche und
-  // Sortierung ändern die Summen oben bewusst nicht.
+  // Gesamtzahl; `kopf` ist davon nur der gerade angezeigte Ausschnitt. Suche,
+  // Filter und Sortierung ändern die Summen oben bewusst nicht.
   const alleEinheiten = neuesteJeEinheit(einsatz.eintraege);
-  const kopf = einheitenAnsicht(alleEinheiten, suche, sortierung);
+  const qualiListe = qualifikationenImEinsatz(alleEinheiten);
+  const gewaehlteQuali = qualiListe.find((q) => q.schluessel === quali);
+  const kopf = einheitenAnsicht(alleEinheiten, suche, sortierung, quali);
   const gefiltert = kopf.length !== alleEinheiten.length;
+  // Meldeköpfe melden oft nur die Stärke — dort steht keine Person und damit
+  // keine Qualifikation. Ohne diesen Hinweis sähe der Filter wie ein Fehler aus.
+  const ohnePersonen = alleEinheiten.filter(
+    (e) => e.bogen.personalErfassung === PersonalErfassung.NUR_STAERKE || e.bogen.personal.length === 0,
+  ).length;
+  // Kurzform für die Trefferzeile an der Karte: „AGT" statt der ganzen
+  // Beschriftung — die steht schon im Hinweis über der Liste.
+  const qualiKurz = gewaehlteQuali?.label.split(" – ")[0] ?? "";
 
   // Verschiebt nur in den Papierkorb (30 Tage wiederherstellbar über die
   // Einsatzliste) — daher kein confirm.
@@ -338,17 +356,71 @@ export function EinsatzDetail(props: {
                 ))}
               </Auswahl>
             </label>
+            {/* Erst anbieten, wenn überhaupt Qualifikationen gemeldet sind —
+                bei reinen Stärkemeldungen wäre die Liste leer. */}
+            {qualiListe.length > 0 && (
+              <label className="feld sortierung">
+                Qualifikation
+                <Auswahl
+                  beschriftung="Qualifikation"
+                  value={quali}
+                  onChange={(e) => setQuali(e.target.value)}
+                >
+                  <option value="">alle</option>
+                  {qualiListe.map((q) => (
+                    <option key={q.schluessel} value={q.schluessel}>
+                      {q.label} ({q.personen})
+                    </option>
+                  ))}
+                </Auswahl>
+              </label>
+            )}
           </div>
+        )}
+        {gewaehlteQuali && (
+          <p className="hinweis" role="status">
+            <strong>{gewaehlteQuali.personen}</strong>
+            {gewaehlteQuali.personen === 1 ? " Einsatzkraft" : " Einsatzkräfte"} mit {`„${gewaehlteQuali.label}“`}
+            {" in "}{gewaehlteQuali.einheiten} {gewaehlteQuali.einheiten === 1 ? "Einheit" : "Einheiten"}.
+            {ohnePersonen > 0 && (
+              <>
+                {" "}
+                {ohnePersonen === 1
+                  ? "Eine Meldung führt keine Personen und bleibt hier außen vor."
+                  : `${ohnePersonen} Meldungen führen keine Personen und bleiben hier außen vor.`}
+              </>
+            )}
+            {" "}
+            <button type="button" className="link" onClick={() => setQuali("")}>Filter aufheben</button>
+          </p>
         )}
         {alleEinheiten.length === 0 && <p className="hinweis">Noch keine Meldung. Bogen scannen oder manuell erfassen.</p>}
         {alleEinheiten.length > 0 && kopf.length === 0 && (
           <p className="hinweis">
-            Keine Einheit passt zu „{suche.trim()}“.{" "}
-            <button type="button" className="link" onClick={() => setSuche("")}>Suche löschen</button>
+            Keine Einheit passt zu{" "}
+            {[suche.trim() && `„${suche.trim()}“`, gewaehlteQuali && `„${gewaehlteQuali.label}“`]
+              .filter(Boolean)
+              .join(" und ")}
+            .{" "}
+            {suche.trim() !== "" && (
+              <button type="button" className="link" onClick={() => setSuche("")}>Suche löschen</button>
+            )}
+            {suche.trim() !== "" && gewaehlteQuali ? " · " : ""}
+            {gewaehlteQuali && (
+              <button type="button" className="link" onClick={() => setQuali("")}>Filter aufheben</button>
+            )}
           </p>
         )}
         {kopf.map((e) => (
-          <EinheitKarte key={e.einheitSchluessel} einsatzId={einsatz.id} kopf={e} alle={einsatz.eintraege} onGeaendert={onGeaendert} />
+          <EinheitKarte
+            key={e.einheitSchluessel}
+            einsatzId={einsatz.id}
+            kopf={e}
+            alle={einsatz.eintraege}
+            onGeaendert={onGeaendert}
+            qualifikation={quali}
+            qualifikationKurz={qualiKurz}
+          />
         ))}
       </section>
 
@@ -562,8 +634,15 @@ function EinheitKarte(props: {
   kopf: MeldeEintrag;
   alle: MeldeEintrag[];
   onGeaendert: () => void;
+  /** Aktiver Qualifikationsfilter ("" = keiner) — nennt die passenden Personen in der Zeile. */
+  qualifikation?: string;
+  /** Kurzform der gefilterten Qualifikation für die Trefferzeile („AGT"). */
+  qualifikationKurz?: string;
 }) {
-  const { einsatzId, kopf, alle, onGeaendert } = props;
+  const { einsatzId, kopf, alle, onGeaendert, qualifikation = "", qualifikationKurz = "" } = props;
+  // Die Namen gehören in die Zeile, nicht hinter einen Klick: die Frage lautet
+  // „wen habe ich?", und die Antwort ist der Name, nicht die Zahl.
+  const qualiPersonen = personenMitQualifikation(kopf, qualifikation);
   const [details, setDetails] = useState(false);
   const [historie, setHistorie] = useState(false);
   const [aenderungen, setAenderungen] = useState(false);
@@ -653,6 +732,14 @@ function EinheitKarte(props: {
             {aufgegangen ? " · zusammengeführt" : ""}
             {kopf.signatur ? <> · {signaturBadge(kopf)}</> : null}
           </span>
+          {qualiPersonen.length > 0 && (
+            <span className="muster-sub quali-treffer">
+              {qualiPersonen.length}× {qualifikationKurz}:{" "}
+              {qualiPersonen
+                .map((p) => [p.vorname, p.nachname].filter((t) => t.trim() !== "").join(" ").trim() || "(ohne Namen)")
+                .join(", ")}
+            </span>
+          )}
           {/* Folgemeldung: die Veränderung gehört in die Zeile, nicht erst hinter
               einen Klick — sie ist die Information der Schichtübergabe. */}
           {kurz && vorige && (
