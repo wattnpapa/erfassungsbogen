@@ -43,6 +43,7 @@ import { summiereBoegen, type EinsatzSummen } from "./auswertung";
 import { bogenDiff, diffZeilen } from "./meldung-diff";
 import { fahrzeugSymbolSvg } from "./taktische-zeichen";
 import { orgFarbe } from "./org-farben";
+import { UEBUNG_BREITE, UEBUNG_HOEHE, UEBUNG_PFAD } from "./uebung-wasserzeichen";
 
 // Grau der Kopfzeilen/Hinweiszeile exakt aus der THWin-Papiervorlage
 // (06-BrB_Erfassungsbogen.dotx): w:fill="D9D9D9".
@@ -52,9 +53,47 @@ const GRAU = "#d9d9d9";
 // gedecktes Signalrot, das sich von allen Organisations-Kennfarben abhebt.
 const UEBUNG_FARBE = "#b02a1e";
 
-/** Wasserzeichen „ÜBUNG" diagonal über jeder Seite (pdfmake-eingebaut). */
-function uebungsWasserzeichen(): TDocumentDefinitions["watermark"] {
-  return { text: "ÜBUNG", color: UEBUNG_FARBE, opacity: 0.08, bold: true, font: SCHRIFT };
+/**
+ * Wasserzeichen „ÜBUNG" diagonal über jeder Seite — bewusst NICHT über
+ * pdfmakes eingebautes `watermark`: das setzt echten PDF-Text, der beim
+ * Markieren und Kopieren aus der PDF mitten im Bogeninhalt landet. Stattdessen
+ * die Buchstabenkonturen als SVG-Grafik hinter dem Inhalt (siehe
+ * uebung-wasserzeichen.ts) — nicht markierbar und nicht kopierbar.
+ */
+function uebungsWasserzeichen(): TDocumentDefinitions["background"] {
+  // Pro Seite, weil die Sammel-PDF Quer- und Hochformat mischt.
+  return (_seite, groesse) => {
+    const { width: breite, height: hoehe } = groesse;
+    // Wie bei pdfmake entlang der Seitendiagonale.
+    const winkel = (Math.atan2(hoehe, breite) * 180) / Math.PI;
+    const diagonale = Math.hypot(breite, hoehe);
+    const cos = breite / diagonale;
+    const sin = hoehe / diagonale;
+    // Größtmögliches Wort, das gedreht noch ganz auf die Seite passt: das
+    // gedrehte Rechteck (Breite w, Höhe w·verhaeltnis) belegt
+    // w·cos + w·verhaeltnis·sin in der Breite und w·sin + w·verhaeltnis·cos in
+    // der Höhe. Die 0,96 lassen einen Hauch Luft zu den Seitenrändern.
+    const verhaeltnis = UEBUNG_HOEHE / UEBUNG_BREITE;
+    const wortBreite =
+      0.96 * Math.min(breite / (cos + verhaeltnis * sin), hoehe / (sin + verhaeltnis * cos));
+    const skala = wortBreite / UEBUNG_BREITE;
+    const wortHoehe = UEBUNG_HOEHE * skala;
+    // Vier Nachkommastellen, weil der Maßstab (Font-Einheiten → pt) selbst weit
+    // unter 1 liegt und gröberes Runden das Wort merklich stauchen würde.
+    const rund = (n: number) => Math.round(n * 10000) / 10000;
+    // Drehpunkt ist die Seitenmitte; im SVG zeigt die Y-Achse nach unten,
+    // darum dreht das negative Winkelmaß das Wort nach oben rechts.
+    const lage = [
+      `translate(${rund(breite / 2)} ${rund(hoehe / 2)})`,
+      `rotate(${rund(-winkel)})`,
+      `translate(${rund(-wortBreite / 2)} ${rund(-wortHoehe / 2)})`,
+      `scale(${rund(skala)})`,
+    ].join(" ");
+    return {
+      svg: `<svg xmlns="http://www.w3.org/2000/svg" width="${rund(breite)}" height="${rund(hoehe)}" viewBox="0 0 ${rund(breite)} ${rund(hoehe)}"><g transform="${lage}" fill="${UEBUNG_FARBE}" fill-opacity="0.08"><path d="${UEBUNG_PFAD}"/></g></svg>`,
+      width: breite,
+    };
+  };
 }
 
 /** Störer-Zeile über dem Bogenkopf — sichtbar auch beim Schwarzweiß-Druck. */
@@ -382,12 +421,12 @@ export function einsatzPdfDokument(
     pageMargins: SEITENRAENDER,
     defaultStyle: { fontSize: 8, font: SCHRIFT },
     info: { title: `Einsatz-Sammlung ${name}` },
-    // Ein Wasserzeichen gilt in pdfmake immer dokumentweit — es erscheint darum
-    // nur, wenn ausnahmslos jeder Bogen eine Übung ist. In gemischten Sammlungen
-    // bleiben die Übungsbögen über ihre Störer-Zeile und die Markierung in der
-    // Übersichtstabelle erkennbar.
+    // Das Wasserzeichen liegt dokumentweit hinter allen Seiten — es erscheint
+    // darum nur, wenn ausnahmslos jeder Bogen eine Übung ist. In gemischten
+    // Sammlungen bleiben die Übungsbögen über ihre Störer-Zeile und die
+    // Markierung in der Übersichtstabelle erkennbar.
     ...(boegenMitQr.length > 0 && boegenMitQr.every(({ bogen }) => bogen.uebung)
-      ? { watermark: uebungsWasserzeichen() }
+      ? { background: uebungsWasserzeichen() }
       : {}),
     files: {
       [EEB_EINSATZ_DATEINAME]: boegenAlsEingebetteteDatei(boegenMitQr.map((x) => x.bogen)),
@@ -628,7 +667,7 @@ export function pdfDokument(b: Erfassungsbogen, qr: QrSatz): TDocumentDefinition
     pageMargins: SEITENRAENDER,
     defaultStyle: { fontSize: 8, font: SCHRIFT },
     info: { title: `Erfassungsbogen ${typKurz || typName}` },
-    ...(b.uebung ? { watermark: uebungsWasserzeichen() } : {}),
+    ...(b.uebung ? { background: uebungsWasserzeichen() } : {}),
     // Maschinenlesbares JSON dokumentweit einbetten (ZUGFeRD-artig).
     files: { [EEB_JSON_DATEINAME]: bogenAlsEingebetteteDatei(b) },
     footer: (seite, gesamt) => ({

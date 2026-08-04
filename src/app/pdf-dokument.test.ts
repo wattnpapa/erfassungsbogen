@@ -238,12 +238,22 @@ describe("pdfDokument()", () => {
   it("kennzeichnet Übungsbögen mit Wasserzeichen und Störer-Zeile", () => {
     const b = { ...basisBogen(), uebung: true };
     const dd = pdfDokument(b, QR);
-    expect((dd.watermark as { text?: string })?.text).toBe("ÜBUNG");
+    // Das Wasserzeichen liegt als SVG-Kontur hinter der Seite (nicht als Text,
+    // sonst würde es beim Kopieren aus der PDF mitgenommen) — und pdfmakes
+    // Text-Wasserzeichen bleibt ungenutzt.
+    expect(dd.watermark).toBeUndefined();
+    const grund = (dd.background as (s: number, g: { width: number; height: number }) => { svg: string })(1, {
+      width: 595,
+      height: 842,
+    });
+    expect(grund.svg).toContain("<path d=");
+    expect(grund.svg).not.toContain("<text");
+    expect(grund.svg).not.toContain("ÜBUNG");
     // Die erste Inhaltszeile ist die Störer-Zeile — sichtbar auch dort, wo das
     // Wasserzeichen untergeht (Schwarzweiß-Kopie, blasser Druck).
     expect(JSON.stringify((dd.content as unknown[])[0])).toContain("ÜBUNG");
     // Echte Bögen bleiben unangetastet.
-    expect(pdfDokument(basisBogen(), QR).watermark).toBeUndefined();
+    expect(pdfDokument(basisBogen(), QR).background).toBeUndefined();
   });
 
   it("kodiert Umlaute im eingebetteten JSON UTF-8-sauber", () => {
