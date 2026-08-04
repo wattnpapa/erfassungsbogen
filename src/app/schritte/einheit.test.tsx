@@ -4,7 +4,7 @@
  * und die Sichtbarkeit der Landesvorlagen.
  */
 
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, beforeAll } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { SchrittBuehne } from "../../test/schritt-buehne";
@@ -13,6 +13,15 @@ import { SchrittEinheit } from "./einheit";
 const buehne = () => render(<SchrittBuehne komponente={SchrittEinheit} />);
 
 describe("Schritt Einheit", () => {
+  // Die Landesvorlagen ziehen über ihren eager-Glob sämtliche Beispielbögen
+  // herein (~300 KB); sie erst im Test zu laden hieße, deren Auflösung in die
+  // Wartezeit einer Zusicherung zu legen — unter paralleler Last reicht die
+  // Vorgabe von 1 s dafür nicht. Hier vorab geladen, ist das Modul beim Rendern
+  // im Cache und der Nachlade-Effekt der Komponente ist sofort fertig.
+  beforeAll(async () => {
+    await import("../../vokabulare/landesvorlagen");
+  });
+
   it("zeigt das Kürzelfeld nur beim THW", async () => {
     const nutzer = userEvent.setup();
     buehne();
@@ -70,8 +79,12 @@ describe("Schritt Einheit", () => {
 
     await nutzer.selectOptions(screen.getByLabelText("Organisation"), "Feuerwehr");
 
-    // findBy…: das Landesvorlagen-Datenpaket lädt asynchron nach (dynamischer Import).
-    const bundesland = await screen.findByLabelText("Landesvorlage – Bundesland");
+    // findBy…: das Landesvorlagen-Datenpaket lädt asynchron nach (dynamischer
+    // Import). Das Modul ist vorgewärmt (siehe beforeAll); die großzügige Frist
+    // deckt nur noch das Rendern auf einer ausgelasteten Maschine ab.
+    const bundesland = await screen.findByLabelText("Landesvorlage – Bundesland", undefined, {
+      timeout: 5000,
+    });
     expect(bundesland).toBeDefined();
     // Ohne gewähltes Bundesland bleibt die Einheitenauswahl gesperrt.
     expect((screen.getByLabelText("Landesvorlage – Einheit") as HTMLSelectElement).disabled).toBe(true);
