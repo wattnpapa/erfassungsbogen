@@ -360,6 +360,52 @@ landesrechtlich sein: `examples/drk/niedersachsen/` (erzeugt von
 DRK-Bereitschaft ab, die je Landesverband aufgestellt ist und deshalb ebenfalls
 an einem Bundesland hängt.
 
+## Taktische Zeichen (DV 102)
+
+Die Zeichen neben jedem Fahrzeug und der „Avatar" der Einheit stammen aus der
+Sammlung **[jonas-koeritz/Taktische-Zeichen](https://github.com/jonas-koeritz/Taktische-Zeichen)**
+(Release-Archiv unter CC0 1.0, Quellen unter CC BY 4.0).
+
+**Warum eingebacken und nicht als npm-Abhängigkeit:** Das Projekt liefert kein
+npm-Paket. Sein Repository hat keine `package.json`, die Zeichen sind
+Jinja2-Vorlagen, die zum Bauen j2cli, Inkscape und optipng brauchen —
+ausgeliefert wird ausschließlich ein Release-Zip mit fertigen SVG/PNG. Die
+einzigen npm-Pakete namens `taktische-zeichen-*` gehören zur Bibliothek von
+phjardas, die hier vorher im Einsatz war. Ein Nachladen zur Laufzeit scheidet
+ohnehin aus: die Zeichen müssen offline und synchron da sein (Oberfläche *und*
+PDF-Bau), und ein Download im Build würde offline-Builds brechen.
+
+Ablauf stattdessen:
+
+- [scripts/taktische-zeichen-holen.mts](../scripts/taktische-zeichen-holen.mts)
+  holt eine festgeschriebene Release-Version, wirft den je Datei eingebetteten
+  Base64-Font raus (26 kB → ~800 B) und schreibt alles in eine generierte Datei
+  [src/vokabulare/taktische-zeichen-symbole.ts](../src/vokabulare/taktische-zeichen-symbole.ts)
+  (375 Zeichen, ~300 kB roh / ~15 kB gzip).
+- **Von Hand aktualisieren:** `npm run zeichen -- v2.1.0`, dann Diff ansehen und
+  `npm test`. Ohne Argument gilt die im Skript festgeschriebene Version.
+- **Automatisch:** [.github/workflows/taktische-zeichen.yml](../.github/workflows/taktische-zeichen.yml)
+  schaut montags 04:00 UTC nach, ob es dort ein neueres Release gibt. Wenn ja:
+  neu holen, festgeschriebene Version mitziehen, Typecheck + Tests — und nur bei
+  Grün nach `main` committen. Weil ein Push mit dem `GITHUB_TOKEN` absichtlich
+  keine `on: push`-Workflows auslöst, stößt der Lauf `release.yml` zum Schluss
+  ausdrücklich per `workflow_dispatch` an (die dokumentierte Ausnahme; ein PAT
+  ist nicht nötig). Die Zusammenfassung des Laufs listet neue und weggefallene
+  Zeichen.
+
+Die Tests in [src/app/taktische-zeichen.test.ts](../src/app/taktische-zeichen.test.ts)
+sind das Sicherheitsnetz dieser Automatik: sie laufen über beide
+Zuordnungstabellen, prüfen für jede Organisation den Rückfallweg und schlagen
+an, wenn ein Zeichen wieder einen Font mitschleppt. Benennt die Sammlung etwas
+um, scheitert der Lauf — statt still aufs Grundzeichen zurückzufallen.
+
+Die Zuordnung liegt in [src/app/taktische-zeichen.ts](../src/app/taktische-zeichen.ts)
+und arbeitet in drei Stufen: fester THW-Vokabular-Code → benanntes Zeichen;
+sonst Namenssuche über Dateiname und Titel im Bereich der Organisation; sonst
+Grundzeichen (Kfz, Anhänger, Boot …) in der Organisationsfarbe, beschriftet mit
+dem Kurzzeichen. Die dritte Stufe entspricht dem, was der Bogen vor dem
+Umstieg immer gezeichnet hat.
+
 ## Offene Punkte
 
 Siehe [TODO.md](TODO.md) (Gerätetests, App Store Connect,

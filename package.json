@@ -27,7 +27,8 @@
     "ios:open": "cap open ios",
     "electron:dev": "concurrently -k \"npm:dev\" \"wait-on tcp:5173 && cross-env VITE_DEV_SERVER_URL=http://localhost:5173 electron .\"",
     "electron:build": "vite build && electron-builder",
-    "og": "node scripts/og-bild.mjs"
+    "og": "node scripts/og-bild.mjs",
+    "zeichen": "node --import tsx scripts/taktische-zeichen-holen.mts"
   },
   "keywords": [],
   "author": {
@@ -100,8 +101,7 @@
     "pdfmake": "^0.3.11",
     "qrcode": "^1.5.4",
     "react": "^19.2.7",
-    "react-dom": "^19.2.7",
-    "taktische-zeichen-core": "^0.10.0"
+    "react-dom": "^19.2.7"
   },
   "devDependencies": {
     "@capacitor/cli": "^8.4.1",
