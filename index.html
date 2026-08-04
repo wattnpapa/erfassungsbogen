@@ -100,7 +100,7 @@
   }
   </script>
   <script>
-    // Gespeicherten Anzeigemodus (Feld/Nacht) VOR dem ersten Malen anwenden:
+    // Gespeicherten Anzeigemodus (Dunkel/Feld/Nacht) VOR dem ersten Malen anwenden:
     // Das statische Start-Gerüst unten erscheint sofort mit dem HTML — ohne
     // diese Zeilen wäre es bis zum Laden des App-Bundles hell und würde im
     // Nachteinsatz genau die Blendung verursachen, die der Nacht-Modus
@@ -108,7 +108,7 @@
     try {
       var eebModus = localStorage.getItem("eeb.anzeigemodus.v1")
         || (localStorage.getItem("eeb.feldmodus.v1") === "1" ? "feld" : "");
-      if (eebModus === "feld" || eebModus === "nacht")
+      if (eebModus === "feld" || eebModus === "nacht" || eebModus === "dunkel")
         document.documentElement.classList.add(eebModus + "-modus");
     } catch (e) { /* Privatmodus/blockierter Speicher: Standard-Darstellung */ }
   </script>
@@ -785,6 +785,9 @@
     /* Kurzfassung in der Einheitenzeile: dieselbe Nebenzeile, aber lesbar statt
        abgeblendet — sie ist der eigentliche Übergabehinweis. */
     .muster-sub.diff-kurz { opacity: 1; color: var(--akzent); font-weight: 600; }
+    /* Treffer des Qualifikationsfilters: die Namen sind hier die Antwort auf die
+       Frage, also volle Deckkraft statt zurückgenommener Unterzeile. */
+    .muster-sub.quali-treffer { opacity: 1; color: var(--text); }
     .historie .diff-block { margin-bottom: 0.6rem; }
     /* minmax(0, …) statt blanker Spuren: sonst zwingt ein langes, nicht
        trennbares Wort (E-Mail-Adresse, Funkrufname) die Spalte breiter als die
@@ -996,7 +999,11 @@
          und größere, konzentrische Radien gemäß iOS-27-Feinschliff
        --------------------------------------------------------------- */
     .platform-ios {
-      color-scheme: light dark;
+      /* Bewusst NICHT „light dark": welches Farbschema gilt, entscheidet der
+         Anzeigemodus der App (Standard/Dunkel/Feld/Nacht), nicht die
+         Systemeinstellung des Geräts — sonst zeichnet das WebView Felder und
+         Flächen dunkel, während die App-Token noch hell rechnen. */
+      color-scheme: light;
       accent-color: var(--ios-akzent-flaeche);
       /* Werte der iOS-Systempalette (Light) plus Marken-Tint. */
       --ios-fond: #f2f2f7;                       /* systemGroupedBackground */
@@ -1014,24 +1021,24 @@
       --ios-glas-rand: rgba(0, 0, 0, 0.1);       /* abgedunkelte Glas-Kante */
       --ios-glanz: rgba(255, 255, 255, 0.5);     /* Specular Highlight */
     }
-    @media (prefers-color-scheme: dark) {
-      .platform-ios {
-        --erledigt: #34c759; /* systemGreen (dark), lesbar auf dunklem Tab */
-        --ios-fond: #000000;
-        --ios-flaeche: #1c1c1e;
-        --ios-text: #ffffff;
-        --ios-text-2: rgba(235, 235, 245, 0.6);
-        --ios-trenner: rgba(84, 84, 88, 0.6);
-        --ios-fuellung: rgba(118, 118, 128, 0.24);
-        --ios-akzent: var(--org-akzent-dunkel, #a8bdf2);        /* aufgehellter Org-Ton, lesbar auf Dunkel */
-        --ios-akzent-flaeche: var(--org-akzent, #3f63cc);       /* Grundton als Füllung (weiße Schrift bleibt lesbar) */
-        --ios-rot: #ff453a;
-        --ios-warnung-text: #ffd60a;
-        --ios-warnung-fond: rgba(255, 214, 10, 0.12);
-        --ios-balken: rgba(29, 29, 31, 0.8);
-        --ios-glas-rand: rgba(255, 255, 255, 0.12);
-        --ios-glanz: rgba(255, 255, 255, 0.14);
-      }
+    /* iOS-Systempalette (Dark) — greift im Dunkel-Modus der App. */
+    .dunkel-modus.platform-ios {
+      color-scheme: dark;
+      --erledigt: #34c759; /* systemGreen (dark), lesbar auf dunklem Tab */
+      --ios-fond: #000000;
+      --ios-flaeche: #1c1c1e;
+      --ios-text: #ffffff;
+      --ios-text-2: rgba(235, 235, 245, 0.6);
+      --ios-trenner: rgba(84, 84, 88, 0.6);
+      --ios-fuellung: rgba(118, 118, 128, 0.24);
+      --ios-akzent: var(--org-akzent-dunkel, #a8bdf2);        /* aufgehellter Org-Ton, lesbar auf Dunkel */
+      --ios-akzent-flaeche: var(--org-akzent, #3f63cc);       /* Grundton als Füllung (weiße Schrift bleibt lesbar) */
+      --ios-rot: #ff453a;
+      --ios-warnung-text: #ffd60a;
+      --ios-warnung-fond: rgba(255, 214, 10, 0.12);
+      --ios-balken: rgba(29, 29, 31, 0.8);
+      --ios-glas-rand: rgba(255, 255, 255, 0.12);
+      --ios-glanz: rgba(255, 255, 255, 0.14);
     }
 
     /* Grundfläche und Systemschrift; -apple-system-body skaliert mit der
@@ -1269,7 +1276,11 @@
        - Elevation über Flächentöne und M3-Schattenstufen
        --------------------------------------------------------------- */
     .platform-android {
-      color-scheme: light dark;
+      /* Bewusst NICHT „light dark" — siehe .platform-ios: das Farbschema
+         bestimmt der Anzeigemodus der App, nicht das System. Genau hier lag
+         der dunkle Hintergrund mit schwarzer Schrift auf Android-Geräten,
+         deren System auf „dunkel" steht. */
+      color-scheme: light;
       accent-color: var(--md-primary);
       /* Tonpalette aus dem Markenblau #12275e (Seed), Light Scheme.
          --md-primary folgt der Organisation (org-farben.ts), Fallback THW-Blau. */
@@ -1296,29 +1307,29 @@
       --md-schatten-2: 0 1px 2px rgba(0, 0, 0, 0.3), 0 2px 6px 2px rgba(0, 0, 0, 0.15);
       --md-schatten-3: 0 4px 8px 3px rgba(0, 0, 0, 0.15), 0 1px 3px rgba(0, 0, 0, 0.3);
     }
-    @media (prefers-color-scheme: dark) {
-      .platform-android {
-        --erledigt: #6cd18a; /* aufgehelltes Grün, lesbar auf dunkler Fläche */
-        --md-primary: var(--org-akzent-dunkel, #b4c5ff);
-        --md-on-primary: var(--org-akzent-tief, #0e2361);
-        --md-secondary-container: #3e4759;
-        --md-on-secondary-container: #dae2f9;
-        --md-surface: #121318;
-        --md-surface-container-low: #1a1b21;
-        --md-surface-container: #1e1f25;
-        --md-surface-container-high: #282a2f;
-        --md-surface-container-highest: #33353a;
-        --md-on-surface: #e2e2e9;
-        --md-on-surface-variant: #c4c6d0;
-        --md-outline: #8e9099;
-        --md-outline-variant: #44464f;
-        --md-error: #ffb4ab;
-        --md-warnung-text: #ffdf9e;
-        --md-warnung-fond: rgba(255, 223, 158, 0.12);
-        --md-druck: rgba(226, 226, 233, 0.1);
-        --md-deaktiviert-flaeche: rgba(226, 226, 233, 0.12);
-        --md-deaktiviert-text: rgba(226, 226, 233, 0.38);
-      }
+    /* M3-Tonpalette (Dark Scheme) — greift im Dunkel-Modus der App. */
+    .dunkel-modus.platform-android {
+      color-scheme: dark;
+      --erledigt: #6cd18a; /* aufgehelltes Grün, lesbar auf dunkler Fläche */
+      --md-primary: var(--org-akzent-dunkel, #b4c5ff);
+      --md-on-primary: var(--org-akzent-tief, #0e2361);
+      --md-secondary-container: #3e4759;
+      --md-on-secondary-container: #dae2f9;
+      --md-surface: #121318;
+      --md-surface-container-low: #1a1b21;
+      --md-surface-container: #1e1f25;
+      --md-surface-container-high: #282a2f;
+      --md-surface-container-highest: #33353a;
+      --md-on-surface: #e2e2e9;
+      --md-on-surface-variant: #c4c6d0;
+      --md-outline: #8e9099;
+      --md-outline-variant: #44464f;
+      --md-error: #ffb4ab;
+      --md-warnung-text: #ffdf9e;
+      --md-warnung-fond: rgba(255, 223, 158, 0.12);
+      --md-druck: rgba(226, 226, 233, 0.1);
+      --md-deaktiviert-flaeche: rgba(226, 226, 233, 0.12);
+      --md-deaktiviert-text: rgba(226, 226, 233, 0.38);
     }
 
     /* Grundfläche und Roboto; rem-Größen skalieren mit der Android-
@@ -1724,6 +1735,65 @@
     .feld-modus ul.vorschlaege li small { opacity: 1; color: var(--text-2); }
     .feld-modus input[type="checkbox"], .feld-modus input[type="radio"] { width: 1.7rem; height: 1.7rem; }
     .feld-modus .stepper button { width: 3.75rem; min-height: 3.75rem; }
+
+    /* ---------------------------------------------------------------
+       Dunkel-Modus: neutrale dunkle Darstellung — dieselbe Oberfläche,
+       nur invertierte Flächen- und Textwerte. Anders als der Nacht-Modus
+       bleibt sie farbneutral und behält die Kennfarbe im Kopfbalken; sie
+       ist die Wahl fürs abgedunkelte Büro oder den Dienstabend, nicht für
+       die Dunkeladaption.
+
+       Ausdrücklich gewählt statt automatisch: die Systemeinstellung des
+       Geräts schaltet die App NICHT um. Ein halb angewandtes Dunkel — dunkle
+       Fläche, schwarze Schrift — ist im Einsatz schlimmer als eine hell
+       gebliebene Oberfläche, und wer draußen mit Handschuhen arbeitet, will
+       ohnehin selbst entscheiden.
+       --------------------------------------------------------------- */
+    .dunkel-modus {
+      color-scheme: dark;
+      --grund:       #0f1116;
+      --flaeche:     #171a21;
+      --flaeche-2:   #21252e;
+      --text:        #e7eaf1;
+      --text-2:      #aab2c2;
+      --text-3:      #848da0;
+      --linie-fein:  #272c36;
+      --linie:       #3a414f;
+      --linie-stark: #525b6b;
+      /* Auf dunklem Grund trägt nicht der Grundton der Organisation, sondern
+         ihr aufgehellter Ton (org-farben.ts: `dunkel`); die Schrift darauf ist
+         entsprechend der tiefe Ton. Ohne offenen Bogen greift das THW-Blau. */
+      --akzent:      var(--org-akzent-dunkel, #a8bdf2);
+      --akzent-hell: var(--org-akzent-dunkel, #c6d4f8);
+      --auf-akzent:  var(--org-akzent-tief, #101a33);
+      --gut:         #6cd18a;
+      --alarm:       #ff9d94;
+      --warn-text:   #f0cf88;
+      --warn-fond:   #2a2416;
+      --warn-linie:  #6b5a2c;
+      /* Der Kopfbalken behält die Kennfarbe: die Org-Töne sind ohnehin dunkel
+         gehalten (weiße Schrift), also blendet er auch hier nicht — und die
+         Organisation bleibt auf den ersten Blick erkennbar. */
+      --kopf-fond:   var(--org-akzent, #12275e);
+      --kopf-auf:    #ffffff;
+      --kopf-kante-farbe: rgba(0, 0, 0, 0.5);
+    }
+    /* Der Fortschrittspunkt am aktiven Schritt liegt im Kopfbalken bzw. auf dem
+       Chip der Plattform-Layer — beide bleiben im Dunkel-Modus dunkel, also
+       trägt er die Kopf-Schriftfarbe statt der Schrift AUF der Akzentfläche
+       (die hier der tiefe Org-Ton ist und im Balken verschwände). */
+    .dunkel-modus .schritte button.aktiv .schritt-status { color: var(--kopf-auf); }
+    .dunkel-modus .rolle-badge.rolle-f { background: #2b2748; color: #c9c0ee; }
+    .dunkel-modus .rolle-badge.rolle-u { background: #1c2c25; color: #9fcbb2; }
+    .dunkel-modus .rolle-badge.rolle-m { background: var(--flaeche-2); color: var(--text-2); }
+    .dunkel-modus .signatur-herkunft.gueltig { background: #16261d; border-color: #2f5340; color: var(--gut); }
+    .dunkel-modus .signatur-herkunft.ungueltig { background: #2a1715; border-color: #5c2a24; color: var(--alarm); }
+    .dunkel-modus .signatur-badge.gueltig { color: var(--gut); }
+    .dunkel-modus .signatur-badge.ungueltig { color: var(--alarm); }
+    .dunkel-modus .vollstaendig-ok, .dunkel-modus .autosave { color: var(--gut); }
+    .dunkel-modus .offline-badge { color: var(--gut); border-color: var(--gut); }
+    /* QR-Bilder behalten ihre weiße Ruhezone — sonst sind sie unscannbar. */
+    .dunkel-modus .qr-box img { background: #fff; padding: 8px; }
 
     /* ---------------------------------------------------------------
        Nacht-Modus: gedimmte, warme Darstellung für Nachteinsätze (Zelt,

@@ -6,7 +6,7 @@
  * feste Pausen — ein `sleep` wäre entweder zu kurz (Flackern) oder zu lang.
  */
 
-import { When, Then } from "@cucumber/cucumber";
+import { Given, When, Then } from "@cucumber/cucumber";
 import { readFile } from "node:fs/promises";
 import type { Locator } from "playwright";
 import type { EebWelt } from "../support/welt";
@@ -60,6 +60,29 @@ async function bisWahr(pruefung: () => Promise<void>, dauerMs = 10_000): Promise
     }
   }
 }
+
+// --------------------------------------------------------------- Gerätewelt
+
+/**
+ * Systemweites dunkles Design des Geräts. Die App folgt ihm bewusst NICHT
+ * (siehe anzeige-modus.ts) — was hier geprüft wird: dass sie darüber nicht in
+ * eine halb dunkle Darstellung kippt (dunkle Fläche, schwarze Schrift).
+ */
+Given("mein Gerät auf dunkles Design eingestellt ist", async function (this: EebWelt) {
+  await this.page.emulateMedia({ colorScheme: "dark" });
+});
+
+/**
+ * Android-Anmutung im Browser — dieselbe Umschaltung, die die Debug-Leiste
+ * anbietet. Muss vor dem Öffnen der App stehen: die Plattform-Klasse setzt
+ * main.tsx beim Start.
+ */
+Given("die App sich als Android-App zeigt", async function (this: EebWelt) {
+  await this.page.addInitScript(() => {
+    localStorage.setItem("eeb-debug", "1");
+    localStorage.setItem("eeb-debug-plattform", "android");
+  });
+});
 
 // ------------------------------------------------------------------ Bedienen
 
@@ -233,6 +256,73 @@ Then("ist der Anzeigemodus {string} aktiv", async function (this: EebWelt, name:
       .getAttribute("aria-pressed");
     if (gedrueckt !== "true") throw new Error(`Anzeigemodus „${name}" ist nicht aktiv (aria-pressed=${gedrueckt})`);
   });
+});
+
+/**
+ * Jeder sichtbare Text muss sich in der Helligkeit von seiner tatsächlichen
+ * Fläche unterscheiden. Bewusst keine Kontrastzahl nach WCAG: gemessen wird
+ * gegen den einen Fehler, der eine Oberfläche unbenutzbar macht — dunkler
+ * Hintergrund mit dunkler Schrift (oder umgekehrt). Absichtlich
+ * zurücktretende Hinweistexte (--text-3) bleiben so heil, ein halb
+ * angewandtes Dunkel fällt durch.
+ */
+/**
+ * Bewusst als Zeichenkette an den Browser gegeben statt als Funktion: der
+ * tsx-Loader übersetzt Pfeilfunktionen mit einem `__name`-Helfer, den es in der
+ * Seite nicht gibt — eine so übergebene Funktion stirbt dort sofort.
+ */
+const HELLIGKEITS_PRUEFUNG = `(() => {
+  const zuRgb = (wert) => {
+    const z = (wert.match(/[\\d.]+/g) || []).map(Number);
+    return [z[0] || 0, z[1] || 0, z[2] || 0, z[3] === undefined ? 1 : z[3]];
+  };
+  // Relative Helligkeit nach WCAG 2.1 (mit Gamma-Korrektur).
+  const helligkeit = (f) => {
+    const k = [f[0], f[1], f[2]].map((v) => {
+      const n = v / 255;
+      return n <= 0.03928 ? n / 12.92 : Math.pow((n + 0.055) / 1.055, 2.4);
+    });
+    return 0.2126 * k[0] + 0.7152 * k[1] + 0.0722 * k[2];
+  };
+  // Fläche, auf der ein Element tatsächlich liegt — durchsichtige Eltern übersprungen.
+  const flaeche = (el) => {
+    for (let e = el; e; e = e.parentElement) {
+      const f = zuRgb(getComputedStyle(e).backgroundColor);
+      if (f[3] > 0.5) return f;
+    }
+    return [255, 255, 255, 1];
+  };
+  const maengel = [];
+  for (const el of document.querySelectorAll("#app *")) {
+    if (!(el instanceof HTMLElement) || el.offsetParent === null) continue;
+    // Nur Elemente mit eigenem Text; Container erben ihre Farbe ohnehin.
+    const eigen = Array.from(el.childNodes)
+      .filter((k) => k.nodeType === 3)
+      .map((k) => (k.textContent || "").trim())
+      .join(" ")
+      .trim();
+    if (eigen === "") continue;
+    const text = zuRgb(getComputedStyle(el).color);
+    if (text[3] < 0.5) continue; // absichtlich ausgeblendet
+    const abstand = Math.abs(helligkeit(text) - helligkeit(flaeche(el)));
+    if (abstand < 0.2) {
+      maengel.push({
+        text: eigen.slice(0, 40),
+        auswahl: el.tagName.toLowerCase() + "." + (el.className || "(ohne Klasse)"),
+        abstand: Math.round(abstand * 1000) / 1000,
+      });
+    }
+  }
+  return maengel;
+})()`;
+
+Then("hebt sich jeder Text von seiner Fläche ab", async function (this: EebWelt) {
+  const treffer: { text: string; auswahl: string; abstand: number }[] =
+    await this.page.evaluate(HELLIGKEITS_PRUEFUNG);
+  if (treffer.length > 0) {
+    const liste = treffer.slice(0, 5).map((t) => `„${t.text}“ (${t.auswahl}, Δ${t.abstand})`);
+    throw new Error(`${treffer.length} Text(e) gehen in ihrer Fläche unter: ${liste.join("; ")}`);
+  }
 });
 
 Then("heißt die heruntergeladene Datei wie {string}", async function (this: EebWelt, muster: string) {

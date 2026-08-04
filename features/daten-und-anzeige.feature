@@ -14,6 +14,21 @@ Funktionalität: Darstellung, Datensicherung und Auskunft
     Wenn ich den Anzeigemodus "Nacht" wähle
     Dann ist der Anzeigemodus "Nacht" aktiv
 
+  # Rückmeldung aus Cuxhaven (August 2026): auf einem Android-Gerät mit dunklem
+  # Systemdesign war der Hintergrund dunkel, die Schrift aber schwarz. Die App
+  # folgt dem Systemdesign nun nicht mehr — dunkel wird hier gewählt, nicht geerbt.
+  Szenario: Dunkles Systemdesign lässt die App lesbar
+    Angenommen mein Gerät auf dunkles Design eingestellt ist
+    Und die App sich als Android-App zeigt
+    Und ich öffne die App
+    Dann ist der Anzeigemodus "Standard" aktiv
+    Und hebt sich jeder Text von seiner Fläche ab
+    Wenn ich den Anzeigemodus "Dunkel" wähle
+    Dann hebt sich jeder Text von seiner Fläche ab
+    Wenn ich die Seite neu lade
+    Dann ist der Anzeigemodus "Dunkel" aktiv
+    Und hebt sich jeder Text von seiner Fläche ab
+
   Szenario: Datensicherung erstellen
     Angenommen ich öffne die App
     Wenn ich auf "Datensicherung" klicke
