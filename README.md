@@ -41,7 +41,9 @@ Wer noch abwägt: [Papier oder digital?](https://erfassungsbogen.app/papier-oder
 - **QR-Code scannen**: Kamera drauf, und der Bogen ist wieder in der App —
   auch komplett offline, es braucht keinen Server und keine Verbindung
   zwischen den Geräten. Wer den QR-Code mit der normalen Handykamera scannt,
-  landet automatisch in der App bzw. auf der Webseite.
+  landet automatisch in der App bzw. auf der Webseite. Am PC funktioniert
+  auch ein per USB angeschlossener Handscanner: Scan-Ansicht öffnen und
+  auslösen — ganz ohne Webcam.
 - **Von Handy zu Handy**: liegt das andere Gerät daneben, geht der Bogen auch
   per AirDrop (Apple) bzw. Quick Share (Android) hinüber — ohne Netz, ohne
   Kopplung, ohne Kamera. Der Empfänger tippt den Link an und hat den Bogen.

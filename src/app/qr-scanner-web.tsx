@@ -50,6 +50,15 @@ function istVerweigert(err: unknown): boolean {
   return err instanceof Error && (err.name === "NotAllowedError" || err.name === "SecurityError");
 }
 
+// USB-Handscanner melden sich als Tastatur („Keyboard-Wedge"): Sie tippen den
+// QR-Inhalt als sehr schnelle Tastenfolge und schließen werkseitig mit Enter
+// (manche mit Tab) ab. Menschliches Tippen hat deutlich größere Lücken —
+// alles über dieser Pause verwirft den Puffer.
+const HANDSCANNER_PAUSE_MS = 500;
+// Unter dieser Länge ist es kein Bogen-Payload (kürzester Link ist weit
+// länger) — versehentliche Tasten plus Enter lösen so keinen Scan aus.
+const HANDSCANNER_MINDESTLAENGE = 8;
+
 /**
  * Kamera anfordern. Eine gewählte Kamera geht vor, die Rückkamera ist Wunsch,
  * nicht Bedingung — jede Stufe darf scheitern, ohne den Scan zu beenden: Die
@@ -191,6 +200,38 @@ export function QrScannerWeb(props: {
     return stoppen;
   }, [versuch, wunschKamera]);
 
+  // Tastatur-Lauscher für USB-Handscanner: dicht aufeinanderfolgende Zeichen
+  // sammeln und beim Enter/Tab-Abschluss als Scan melden. Läuft unabhängig
+  // von der Kamera — gerade an PCs ohne (freigegebene) Webcam ist der
+  // Handscanner der einzige Weg. Capture-Phase, damit ein fokussierter Knopf
+  // das abschließende Enter nicht als Klick schluckt.
+  useEffect(() => {
+    let puffer = "";
+    let zuletzt = 0;
+    function beiTaste(e: KeyboardEvent) {
+      if (e.ctrlKey || e.metaKey || e.altKey) return; // Kurzbefehle unangetastet lassen
+      const jetzt = performance.now();
+      if (jetzt - zuletzt > HANDSCANNER_PAUSE_MS) puffer = "";
+      zuletzt = jetzt;
+      // Leertaste ausgenommen: Sie bedient fokussierte Knöpfe, und kein
+      // Payload-Zeichensatz (URL, Base41, Base64url) enthält Leerzeichen.
+      if (e.key.length === 1 && e.key !== " ") {
+        puffer += e.key;
+        // Sonst springt z. B. die Kamera-Auswahl bei Buchstaben mit.
+        e.preventDefault();
+        return;
+      }
+      if ((e.key === "Enter" || e.key === "Tab") && puffer.length >= HANDSCANNER_MINDESTLAENGE) {
+        e.preventDefault();
+        const text = puffer;
+        puffer = "";
+        propsRef.current.onErgebnis(text);
+      }
+    }
+    window.addEventListener("keydown", beiTaste, true);
+    return () => window.removeEventListener("keydown", beiTaste, true);
+  }, []);
+
   // Wert der Auswahl: die laufende Kamera, solange sie in der Liste steht —
   // sonst der Wunsch bzw. die erste Kamera, damit die Auswahl nie leer wirkt.
   const auswahl = [benutzteKamera, wunschKamera].find((id) => kameras.some((k) => k.id === id))
@@ -209,6 +250,7 @@ export function QrScannerWeb(props: {
                 {fehler.schritte.map((schritt) => <li key={schritt}>{schritt}</li>)}
               </ul>
             )}
+            <p>Ein angeschlossener USB-Handscanner liest den Code auch ohne Kamera — einfach auslösen.</p>
             {props.onBild && <p>Ohne Kamera geht es weiter über ein Foto oder einen Screenshot des QR-Codes.</p>}
           </div>
         )

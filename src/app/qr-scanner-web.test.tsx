@@ -7,7 +7,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { QrScannerWeb } from "./qr-scanner-web";
 
@@ -124,6 +124,53 @@ describe("QR-Scanner im Browser", () => {
       expect(getUserMedia).toHaveBeenLastCalledWith({ video: { deviceId: { exact: "vorn" } }, audio: false });
     });
     expect(localStorage.getItem("eeb-kamera")).toBe("vorn");
+  });
+
+  it("nimmt einen USB-Handscanner (Tastatur-Wedge) auch ohne Kamera an", async () => {
+    // Der harte Fall aus der Praxis: PC ohne Webcam-Freigabe, Scanner am USB.
+    mediaDevicesSetzen(undefined);
+    const onErgebnis = vi.fn();
+
+    render(<QrScannerWeb onErgebnis={onErgebnis} onAbbruch={() => {}} />);
+    await screen.findByText(/USB-Handscanner/);
+
+    const url = "https://erfassungsbogen.app/#0ABC$*-/:XYZ";
+    for (const zeichen of url) fireEvent.keyDown(window, { key: zeichen });
+    fireEvent.keyDown(window, { key: "Enter" });
+
+    expect(onErgebnis).toHaveBeenCalledExactlyOnceWith(url);
+  });
+
+  it("wertet langsames menschliches Tippen nicht als Scan", async () => {
+    mediaDevicesSetzen(undefined);
+    const onErgebnis = vi.fn();
+    // Uhr-Attrappe: zwischen menschlichen Tasten liegen >500 ms.
+    let uhr = 0;
+    const now = vi.spyOn(performance, "now").mockImplementation(() => (uhr += 600));
+
+    try {
+      render(<QrScannerWeb onErgebnis={onErgebnis} onAbbruch={() => {}} />);
+      await screen.findByText(/USB-Handscanner/);
+
+      for (const zeichen of "https://erfassungsbogen.app/#0ABC") fireEvent.keyDown(window, { key: zeichen });
+      fireEvent.keyDown(window, { key: "Enter" });
+    } finally {
+      now.mockRestore();
+    }
+
+    expect(onErgebnis).not.toHaveBeenCalled();
+  });
+
+  it("lässt Enter ohne Scan-Puffer für die Knöpfe durch", async () => {
+    mediaDevicesSetzen(undefined);
+    const onErgebnis = vi.fn();
+
+    render(<QrScannerWeb onErgebnis={onErgebnis} onAbbruch={() => {}} />);
+    await screen.findByText(/USB-Handscanner/);
+
+    // fireEvent liefert false, wenn preventDefault() gerufen wurde.
+    expect(fireEvent.keyDown(window, { key: "Enter" })).toBe(true);
+    expect(onErgebnis).not.toHaveBeenCalled();
   });
 
   it("zeigt ohne zweite Kamera keine Auswahl", async () => {
