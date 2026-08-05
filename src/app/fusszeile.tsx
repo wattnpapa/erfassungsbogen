@@ -6,7 +6,7 @@
 import { useEffect, useRef, useState, type ChangeEvent, type ReactNode, type RefObject } from "react";
 import { staerke, type Erfassungsbogen } from "../model";
 import { istNativ, textTeilen } from "./nativ";
-import { einheitOrt, migriereBogen, orgLabel, vokabText, vokabularFuer } from "./hilfen";
+import { blobAlsDownload, einheitOrt, migriereBogen, orgLabel, vokabText, vokabularFuer } from "./hilfen";
 import { einheitSymbolSvg, svgDataUrl } from "./taktische-zeichen";
 import { nutzungsKanal, statistikAbgewaehlt, statistikAbwaehlen } from "./statistik";
 import { AnzeigeSchalter } from "./anzeige-schalter";
@@ -441,12 +441,7 @@ export function Fusszeile({ onBogenOeffnen, kompakt = false }: {
       await textTeilen(name, inhalt);
       return;
     }
-    const blob = new Blob([inhalt], { type: "application/json" });
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = name;
-    a.click();
-    URL.revokeObjectURL(a.href);
+    blobAlsDownload(name, new Blob([inhalt], { type: "application/json" }));
   }
 
   async function sicherungImportieren(e: ChangeEvent<HTMLInputElement>) {

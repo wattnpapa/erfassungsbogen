@@ -5,12 +5,48 @@
  */
 
 import { describe, it, expect, beforeAll } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { useState } from "react";
+import { Dialogschicht } from "../dialoge";
+import { neuePerson, neuerBogen } from "../hilfen";
+import type { Erfassungsbogen } from "../../model";
 import { SchrittBuehne } from "../../test/schritt-buehne";
 import { SchrittEinheit } from "./einheit";
 
 const buehne = () => render(<SchrittBuehne komponente={SchrittEinheit} />);
+
+/**
+ * Bühne mit Ableseleiste: Schritt 1 zeigt Personal und Fahrzeuge nicht an, eine
+ * Landesvorlage ersetzt aber genau die. Damit der Test die Wirkung sehen kann,
+ * was der Schritt über `aendern` hinausschreibt, steht es hier als Text daneben
+ * — beobachtet wird also die Außenkante der Komponente, nicht ihr Inneres.
+ */
+function VorlagenBuehne({ start }: { start: Erfassungsbogen }) {
+  const [bogen, setBogen] = useState(start);
+  return (
+    <>
+      <SchrittEinheit bogen={bogen} aendern={(patch) => setBogen((b) => ({ ...b, ...patch }))} />
+      <p>
+        Personal: <output>{bogen.personal.map((p) => p.nachname || "—").join(", ") || "leer"}</output>
+        {" · "}Fahrzeuge: <output>{bogen.fahrzeuge.length}</output>
+      </p>
+      <Dialogschicht />
+    </>
+  );
+}
+
+/** Bogen mit einer benannten Person — sie macht sichtbar, ob ersetzt wurde. */
+function bogenMitPerson(): Erfassungsbogen {
+  const b = neuerBogen();
+  b.personal = [{ ...neuePerson(), vorname: "Thomas", nachname: "Lange" }];
+  return b;
+}
+
+/** Erste echte Auswahlmöglichkeit einer Liste (die erste ist der Platzhalter). */
+function ersteWahl(feld: HTMLSelectElement): string {
+  return [...feld.options].map((o) => o.value).find((v) => v !== "")!;
+}
 
 describe("Schritt Einheit", () => {
   // Die Landesvorlagen ziehen über ihren eager-Glob sämtliche Beispielbögen
@@ -127,5 +163,47 @@ describe("Schritt Einheit", () => {
     await nutzer.click(screen.getByRole("button", { name: "+ übergeordnete Ebene" }));
     const naechste = screen.getByLabelText("Ebene (übergeordnet)") as HTMLSelectElement;
     expect(naechste.selectedOptions[0]?.textContent).toContain("Landkreis");
+  });
+
+  /**
+   * Eine Landesvorlage wirft Personal und Fahrzeuge weg — deshalb die Rückfrage,
+   * sobald im Bogen schon etwas steht. Beide Richtungen müssen halten: Ohne
+   * Bestätigung darf nichts verloren gehen, mit Bestätigung muss die Vorlage
+   * wirklich ankommen (und nicht bloß der Dialog zugehen).
+   */
+  async function landesvorlageWaehlen(nutzer: ReturnType<typeof userEvent.setup>) {
+    render(<VorlagenBuehne start={bogenMitPerson()} />);
+    await nutzer.selectOptions(screen.getByLabelText("Organisation"), "Feuerwehr");
+
+    const bundesland = (await screen.findByLabelText("Landesvorlage – Bundesland", undefined, {
+      timeout: 5000,
+    })) as HTMLSelectElement;
+    await nutzer.selectOptions(bundesland, ersteWahl(bundesland));
+
+    const einheit = screen.getByLabelText("Landesvorlage – Einheit") as HTMLSelectElement;
+    await nutzer.selectOptions(einheit, ersteWahl(einheit));
+
+    return document.querySelector<HTMLDialogElement>("dialog[aria-label='Landesvorlage anwenden?']")!;
+  }
+
+  it("ersetzt Personal und Fahrzeuge durch die Landesvorlage — nach Bestätigung", async () => {
+    const nutzer = userEvent.setup();
+    const dialog = await landesvorlageWaehlen(nutzer);
+
+    await nutzer.click(within(dialog).getByRole("button", { name: "Ersetzen" }));
+
+    // Thomas Lange ist weg, und an seiner Stelle steht die Vorlage.
+    const personal = screen.getByText(/Personal:/);
+    expect(personal.textContent).not.toContain("Lange");
+    expect(personal.textContent).not.toContain("leer");
+  });
+
+  it("lässt bei „Abbrechen“ Personal und Fahrzeuge unangetastet", async () => {
+    const nutzer = userEvent.setup();
+    const dialog = await landesvorlageWaehlen(nutzer);
+
+    await nutzer.click(within(dialog).getByRole("button", { name: "Abbrechen" }));
+
+    expect(screen.getByText(/Personal:/).textContent).toContain("Lange");
   });
 });

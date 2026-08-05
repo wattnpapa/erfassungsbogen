@@ -20,7 +20,7 @@ import {
 import { parseNamen } from "../personal-schnell";
 import { beispielPersonen } from "../beispielnamen";
 import { stanPersonalVorbelegung } from "../../vokabulare/thw-stan-personal";
-import { FE_TEXT, neuePerson, plausibilitaet, vokabularFuer } from "../hilfen";
+import { FE_TEXT, neuePerson, plausibilitaet, vokabularFuer, vorbelegungGeladen } from "../hilfen";
 import { frageJaNein } from "../dialoge";
 import {
   Feld,
@@ -276,9 +276,11 @@ function benannte(personal: Person[]): Person[] {
   return personal.filter((p) => p.vorname.trim() !== "" || p.nachname.trim() !== "");
 }
 
+
 export function SchrittPersonal({ bogen, aendern }: SchrittProps) {
   const nurStaerke = bogen.personalErfassung === PersonalErfassung.NUR_STAERKE;
   const vorlage = stanPersonalVorbelegung(bogen.einheit.organisation, bogen.einheit.einheitsTyp);
+  const stanGeladen = vorbelegungGeladen(bogen.personal, vorlage);
   // Schnelleingabe: Tabellenansicht statt Detail-Karten; `fokusNeue` lässt den
   // Fokus beim Anlegen per Enter in die neue Zeile springen.
   const [schnell, setSchnell] = useState(false);
@@ -412,6 +414,12 @@ export function SchrittPersonal({ bogen, aendern }: SchrittProps) {
         <p>
           <button
             type="button"
+            disabled={stanGeladen}
+            title={
+              stanGeladen
+                ? "Die Sollplätze der StAN stehen schon genau so in der Liste — es gäbe nichts zu ersetzen."
+                : undefined
+            }
             onClick={async () => {
               if (
                 bogen.personal.length === 0 ||
@@ -427,6 +435,12 @@ export function SchrittPersonal({ bogen, aendern }: SchrittProps) {
           >
             StAN-Sollplätze laden ({vorlage.length} Personen)
           </button>
+          {/* Der Titel allein reicht nicht: auf dem Telefon gibt es kein
+              Mauszeiger-Fähnchen, und ein grauer Knopf ohne Begründung liest
+              sich wie ein Fehler. */}
+          {stanGeladen && (
+            <span className="hinweis"> Schon geladen — die {vorlage.length} Sollplätze stehen unten in der Liste.</span>
+          )}
         </p>
       )}
       {/* Ansichtswahl: Detail-Karten (alle Felder) oder Schnelleingabe-Tabelle

@@ -4,7 +4,7 @@
 
 import { Fahrzeug, OrganisationsTyp } from "../../model";
 import { stanFahrzeugVorbelegung } from "../../vokabulare/thw-stan-fahrzeuge";
-import { fahrzeugHinweise, neuesFahrzeug, transportBilanz, vokabularFuer } from "../hilfen";
+import { fahrzeugHinweise, neuesFahrzeug, transportBilanz, vokabularFuer, vorbelegungGeladen } from "../hilfen";
 import { fahrzeugSymbolSvg, svgDataUrl } from "../taktische-zeichen";
 import { frageJaNein } from "../dialoge";
 import {
@@ -123,6 +123,7 @@ function Transportbilanz({ bogen }: Pick<SchrittProps, "bogen">) {
 
 export function SchrittFahrzeuge({ bogen, aendern }: SchrittProps) {
   const vorlage = stanFahrzeugVorbelegung(bogen.einheit.organisation, bogen.einheit.einheitsTyp);
+  const stanGeladen = vorbelegungGeladen(bogen.fahrzeuge, vorlage);
   return (
     <section className="karte">
       <h2>4. Fahrzeuge</h2>
@@ -131,6 +132,12 @@ export function SchrittFahrzeuge({ bogen, aendern }: SchrittProps) {
         <p>
           <button
             type="button"
+            disabled={stanGeladen}
+            title={
+              stanGeladen
+                ? "Die Fahrzeuge der StAN stehen schon genau so in der Liste — es gäbe nichts zu ersetzen."
+                : undefined
+            }
             onClick={async () => {
               if (
                 bogen.fahrzeuge.length === 0 ||
@@ -146,6 +153,9 @@ export function SchrittFahrzeuge({ bogen, aendern }: SchrittProps) {
           >
             StAN-Vorbelegung laden ({vorlage.length} Fahrzeuge)
           </button>
+          {stanGeladen && (
+            <span className="hinweis"> Schon geladen — die {vorlage.length} Fahrzeuge stehen unten in der Liste.</span>
+          )}
         </p>
       )}
       {bogen.fahrzeuge.map((f, i) => (

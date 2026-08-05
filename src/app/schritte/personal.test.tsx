@@ -10,6 +10,7 @@ import userEvent from "@testing-library/user-event";
 import { SchrittBuehne } from "../../test/schritt-buehne";
 import { neuePerson, neuerBogen } from "../hilfen";
 import { SchrittPersonal } from "./personal";
+import { stanPersonalVorbelegung } from "../../vokabulare/thw-stan-personal";
 
 const buehne = () => render(<SchrittBuehne komponente={SchrittPersonal} />);
 
@@ -157,6 +158,58 @@ describe("Schritt Personal", () => {
 
     const werte = (within(screen.getByRole("table")).getAllByRole("textbox") as HTMLInputElement[]).map((f) => f.value);
     expect(werte).toEqual(["Max", "Muster"]);
+  });
+
+  /**
+   * Schritt 1 belegt das Personal beim Wählen des Einheitstyps schon mit der
+   * StAN vor. „StAN-Sollplätze laden" würde die Liste danach durch eine
+   * identische ersetzen: Rückfrage, Klick auf „Ersetzen" — und sichtbar
+   * passiert nichts. Genau so liest sich ein kaputter Knopf, deshalb ist er in
+   * diesem Zustand gesperrt und sagt auch, warum.
+   */
+  it("sperrt den StAN-Knopf, solange die Sollplätze schon genau so in der Liste stehen", () => {
+    const einheitsTyp = { code: 4 }; // B – Bergungsgruppe, StAN-Stärke -/2/7/9
+    const bogen = neuerBogen();
+    render(
+      <SchrittBuehne
+        komponente={SchrittPersonal}
+        bogen={{
+          ...bogen,
+          einheit: { ...bogen.einheit, einheitsTyp },
+          personal: stanPersonalVorbelegung(bogen.einheit.organisation, einheitsTyp),
+        }}
+      />,
+    );
+
+    expect(screen.getByRole("button", { name: /^StAN-Sollplätze laden/ })).toHaveProperty("disabled", true);
+    expect(screen.getByText(/Schon geladen/)).toBeDefined();
+  });
+
+  it("ersetzt nach einer Änderung wieder durch die Sollplätze", async () => {
+    const nutzer = userEvent.setup();
+    const einheitsTyp = { code: 4 };
+    const bogen = neuerBogen();
+    render(
+      <SchrittBuehne
+        komponente={SchrittPersonal}
+        bogen={{
+          ...bogen,
+          einheit: { ...bogen.einheit, einheitsTyp },
+          personal: [{ ...neuePerson(), vorname: "Thomas", nachname: "Lange" }],
+        }}
+      />,
+    );
+
+    const knopf = screen.getByRole("button", { name: /^StAN-Sollplätze laden/ });
+    expect(knopf).toHaveProperty("disabled", false);
+
+    await nutzer.click(knopf);
+    const dialog = document.querySelector<HTMLDialogElement>("dialog[aria-label='StAN-Sollplätze laden?']")!;
+    await nutzer.click(within(dialog).getByRole("button", { name: "Ersetzen" }));
+
+    expect(screen.getByLabelText("Stärke: 0 Führer, 2 Unterführer, 7 Mannschaft, 9 gesamt")).toBeDefined();
+    // Und jetzt steht die StAN so da wie sie ist — der Knopf hätte nichts mehr zu tun.
+    expect(screen.getByRole("button", { name: /^StAN-Sollplätze laden/ })).toHaveProperty("disabled", true);
   });
 
   it("versteckt den Beispielnamen-Weg bei echten Bögen vollständig", async () => {

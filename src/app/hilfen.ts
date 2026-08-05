@@ -361,6 +361,35 @@ function unveraendert(herkunft: Uint8Array, b: Erfassungsbogen): boolean {
 
 // ------------------------------------------------------------ Datei-Dialog
 
+/**
+ * Blob als Download anbieten — der eine Weg für alle Exporte im Browser.
+ *
+ * Zwei Feinheiten entscheiden darüber, ob überhaupt etwas passiert:
+ *
+ * - Der Anker hängt im Dokument. Ein losgelöstes Element klickt nicht jeder
+ *   Browser durch; wo es geht, ist es Kulanz, nicht Zusage.
+ * - Die Blob-URL wird erst später freigegeben. Der Klick startet den Download
+ *   nur, er wartet nicht auf ihn — wer die URL im selben Takt widerruft, zieht
+ *   ihm die Daten unter den Füßen weg. Das trifft ausgerechnet die Wege, die
+ *   vor dem Klick noch ein Modul nachladen (Excel), weil dort der Klick ein
+ *   Stück später fällt als bei CSV.
+ */
+export function blobAlsDownload(dateiname: string, blob: Blob): void {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = dateiname;
+  a.hidden = true;
+  document.body.append(a);
+  a.click();
+  // Großzügig bemessen: der Browser darf sich für den Start Zeit nehmen, ein
+  // paar Kilobyte länger im Speicher schaden nicht.
+  window.setTimeout(() => {
+    a.remove();
+    URL.revokeObjectURL(url);
+  }, 30_000);
+}
+
 /** Text als Datei anbieten — in der App übers Share-Sheet, im Browser als Download. */
 export async function textAlsDatei(dateiname: string, inhalt: string, mime: string): Promise<void> {
   if (istNativ()) {
@@ -368,12 +397,7 @@ export async function textAlsDatei(dateiname: string, inhalt: string, mime: stri
     await textTeilen(dateiname, inhalt);
     return;
   }
-  const blob = new Blob([inhalt], { type: mime });
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(blob);
-  a.download = dateiname;
-  a.click();
-  URL.revokeObjectURL(a.href);
+  blobAlsDownload(dateiname, new Blob([inhalt], { type: mime }));
 }
 
 /**
@@ -397,12 +421,24 @@ export async function bytesAlsDatei(dateiname: string, bytes: Uint8Array<ArrayBu
     await binaerTeilen(dateiname, base64Aus(bytes));
     return;
   }
-  const blob = new Blob([bytes], { type: mime });
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(blob);
-  a.download = dateiname;
-  a.click();
-  URL.revokeObjectURL(a.href);
+  blobAlsDownload(dateiname, new Blob([bytes], { type: mime }));
+}
+
+/**
+ * Steht eine Vorbelegung (StAN, Landesvorlage) schon genau so im Bogen?
+ *
+ * Der Grund für die Frage: Schritt 1 belegt Personal und Fahrzeuge beim Wählen
+ * des Einheitstyps bereits vor. Wer danach „StAN laden" drückt, ersetzt die
+ * Liste durch eine identische — die Rückfrage erscheint, „Ersetzen" ändert
+ * nichts, und das liest sich wie ein kaputter Knopf. In dem Zustand gehört der
+ * Knopf gesperrt.
+ *
+ * Verglichen wird über JSON: beide Listen kommen aus demselben Erzeuger, ihre
+ * Feldreihenfolge ist damit gleich. Ein Unterschied, den der Vergleich
+ * übersieht, lässt den Knopf nur aktiv — der harmlose Ausgang.
+ */
+export function vorbelegungGeladen<T>(liste: T[], vorlage: T[]): boolean {
+  return vorlage.length > 0 && JSON.stringify(liste) === JSON.stringify(vorlage);
 }
 
 /** Dateinamens-Rumpf aus dem Anzeigenamen der Einheit („THW_Oldenburg_NI_FGr_K_A"). */

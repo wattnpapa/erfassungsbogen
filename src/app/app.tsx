@@ -24,6 +24,7 @@ import {
 import { signaturLabel, signaturVonPayload, signaturVonText, type SignaturStatus } from "../signatur";
 import {
   SCHRITT_STATUS_TITEL,
+  blobAlsDownload,
   bogenLaden,
   browserKompressor,
   bytesAlsDatei,
@@ -826,12 +827,7 @@ function AppInhalt() {
       await textTeilen(dateiname, text);
       return;
     }
-    const blob = new Blob([text], { type: mime });
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = dateiname;
-    a.click();
-    URL.revokeObjectURL(a.href);
+    blobAlsDownload(dateiname, new Blob([text], { type: mime }));
   }
 
   function einsatzDateiname(s: Einsatzsammlung): string {
