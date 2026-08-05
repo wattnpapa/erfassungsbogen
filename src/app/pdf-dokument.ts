@@ -149,6 +149,25 @@ export const EEB_JSON_DATEINAME = "erfassungsbogen.json";
 
 const kasten = (ja: boolean) => (ja ? "[X]" : "[  ]");
 
+/**
+ * pdfmake bricht Zeilen nur an Leerzeichen um. Ein einziges überlanges Wort
+ * (typisch: E-Mail-Adressen wie „Poststelle.RSt_Vschwenningen@thw.de") setzt
+ * deshalb die Mindestbreite seiner Spalte — die Kopftabelle wird breiter als
+ * der Satzspiegel und ragt über den rechten Rand hinaus. Nullbreiten-
+ * Leerzeichen (U+200B) hinter den natürlichen Trennzeichen geben pdfmake
+ * unsichtbare Umbruchstellen; als Notbremse bekommen auch trennzeichenlose
+ * Endloswörter alle 20 Zeichen eine (20 Zeichen à 8 pt passen noch in die
+ * schmalste Sternspalte). Nur für Anzeigetext — nie für das eingebettete JSON
+ * oder die QR-Daten.
+ */
+export function weichUmbrechen(text: string): string {
+  return text.replace(/\S{19,}/g, (wort) =>
+    wort
+      .replace(/([@._\-/:])(?=.)/g, "$1\u200B")
+      .replace(/[^\u200B]{20}(?=[^\u200B])/g, "$&\u200B"),
+  );
+}
+
 /** pdfmake-Attachment inkl. der von pdfkit unterstützten AFRelationship (fehlt im Typ). */
 type EingebetteteDatei = Attachment & { relationship?: string };
 
@@ -543,9 +562,9 @@ export function pdfDokument(b: Erfassungsbogen, qr: QrSatz): TDocumentDefinition
   for (const h of b.einheit.hierarchie) {
     infoZeilen.push([
       { text: vokabText(h.bezeichnung, vokabularFuer(org, "ebene")) || "Ebene", bold: true },
-      { text: h.kurz ? `${h.name} (${h.kurz})` : h.name },
+      { text: weichUmbrechen(h.kurz ? `${h.name} (${h.kurz})` : h.name) },
       { text: "Telefon:\neMail:", bold: true },
-      { text: `${h.telefon ?? "—"}\n${h.email ?? "—"}` },
+      { text: weichUmbrechen(`${h.telefon ?? "—"}\n${h.email ?? "—"}`) },
     ]);
   }
   infoZeilen.push([
@@ -557,7 +576,7 @@ export function pdfDokument(b: Erfassungsbogen, qr: QrSatz): TDocumentDefinition
   infoZeilen.push([
     { text: "vorgesehener Einsatzort / Auftrag:", bold: true, colSpan: 2 },
     {},
-    { text: b.einsatz.ortAuftrag, colSpan: 2 },
+    { text: weichUmbrechen(b.einsatz.ortAuftrag), colSpan: 2 },
     {},
   ]);
   infoZeilen.push([
@@ -584,8 +603,8 @@ export function pdfDokument(b: Erfassungsbogen, qr: QrSatz): TDocumentDefinition
             colSpan: 3,
             text:
               f.stanKonform == null
-                ? `Änderungen bzw. Sondergerät: ${f.aenderungen ?? ""}`
-                : `Ausstattung nach StAN: ja ${kasten(f.stanKonform)} / nein ${kasten(!f.stanKonform)}\nÄnderungen bzw. Sondergerät: ${f.aenderungen ?? ""}`,
+                ? `Änderungen bzw. Sondergerät: ${weichUmbrechen(f.aenderungen ?? "")}`
+                : `Ausstattung nach StAN: ja ${kasten(f.stanKonform)} / nein ${kasten(!f.stanKonform)}\nÄnderungen bzw. Sondergerät: ${weichUmbrechen(f.aenderungen ?? "")}`,
           },
           {},
           {},
@@ -607,7 +626,7 @@ export function pdfDokument(b: Erfassungsbogen, qr: QrSatz): TDocumentDefinition
       .map((k) => {
         if (k.emailTemplate === 1) return "eMail: vorname.nachname@… (D)";
         const art = k.art === KontaktArt.EMAIL ? "eMail" : k.art === KontaktArt.MOBIL ? "Mobil" : "Telefon";
-        return `${art}: ${k.wert ?? ""} (${k.dienstlich ? "D" : "P"})`;
+        return `${art}: ${weichUmbrechen(k.wert ?? "")} (${k.dienstlich ? "D" : "P"})`;
       })
       .join("\n");
     personalZeilen.push([
@@ -627,7 +646,7 @@ export function pdfDokument(b: Erfassungsbogen, qr: QrSatz): TDocumentDefinition
     if (p.zusatzqualifikationen.length > 0) {
       qualiZeilen.push([
         { text: `${p.nachname}, ${p.vorname}` },
-        { text: p.zusatzqualifikationen.map((q) => q.freitext ?? `#${q.code}`).join(", ") },
+        { text: weichUmbrechen(p.zusatzqualifikationen.map((q) => q.freitext ?? `#${q.code}`).join(", ")) },
       ]);
     }
   }
@@ -699,7 +718,7 @@ export function pdfDokument(b: Erfassungsbogen, qr: QrSatz): TDocumentDefinition
                 margin: [6, 8, 6, 8],
               },
               {
-                text: [orgLabel(org), b.einheit.organisationName, typKurz].filter(Boolean).join("\n"),
+                text: weichUmbrechen([orgLabel(org), b.einheit.organisationName, typKurz].filter(Boolean).join("\n")),
                 bold: true,
                 color: farbe.akzent,
                 margin: [2, 8, 2, 8],
@@ -722,7 +741,7 @@ export function pdfDokument(b: Erfassungsbogen, qr: QrSatz): TDocumentDefinition
       { text: "weitere interne / externe Qualifikationen obiger Helfer/-innen:", margin: [0, 0, 0, 4] },
       { table: { widths: [180, "*"], body: qualiZeilen } },
       ...sofort,
-      ...(b.sonstiges ? [{ text: `Sonstiges: ${b.sonstiges}`, margin: [0, 8, 0, 0] } as Content] : []),
+      ...(b.sonstiges ? [{ text: `Sonstiges: ${weichUmbrechen(b.sonstiges)}`, margin: [0, 8, 0, 0] } as Content] : []),
 
       // ---- QR-Block ----
       // Kein fester Seitenumbruch mehr; als unbreakable-Gruppe zusammengehalten,

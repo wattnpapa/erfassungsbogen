@@ -208,6 +208,36 @@ describe("pdfDokument()", () => {
     expect(t).not.toContain("Sonstiges:");
   });
 
+  it("gibt überlangen Wörtern (E-Mail-Adressen) unsichtbare Umbruchstellen, damit die Kopftabelle nicht ausbricht", () => {
+    const b = basisBogen();
+    b.einheit.hierarchie.push({
+      bezeichnung: { freitext: "RB" },
+      name: "Villingen-Schwenningen",
+      telefon: "5558642829",
+      email: "Poststelle.RSt_Vschwenningen@thw.de",
+    });
+    b.einsatz.ortAuftrag = "Bereitstellungsraum-Laufenburg-Gesamtkoordinierung";
+    const t = texte(pdfDokument(b, QR).content).join("\n");
+    // Die lange Adresse muss mit Nullbreiten-Leerzeichen (U+200B) durchsetzt
+    // sein — nur so kann pdfmake sie umbrechen, statt die Spalte (und damit
+    // die Tabelle) über den Satzspiegel hinaus zu verbreitern.
+    expect(t).toContain("Poststelle.\u200BRSt_\u200BVschwenningen@\u200Bthw.\u200Bde");
+    expect(t).toContain("Bereitstellungsraum-\u200BLaufenburg-\u200BGesamtkoordinierung");
+    // Kurze Wörter bleiben unangetastet.
+    expect(t).toContain("ov@thw.de");
+  });
+
+  it("hält das eingebettete JSON frei von den Umbruch-Hilfszeichen", () => {
+    const b = basisBogen();
+    b.einheit.hierarchie[0]!.email = "Poststelle.RSt_Vschwenningen@thw.de";
+    const dd = pdfDokument(b, QR);
+    const datei = (dd as { files?: Record<string, { src: string }> }).files?.[EEB_JSON_DATEINAME];
+    const base64 = datei!.src.split(",")[1]!;
+    const json = new TextDecoder().decode(Uint8Array.from(atob(base64), (c) => c.charCodeAt(0)));
+    expect(json).toContain("Poststelle.RSt_Vschwenningen@thw.de");
+    expect(json).not.toContain("\u200B");
+  });
+
   it("markiert den Meldekopf-Modus (NUR_STAERKE) mit Hinweis und manueller Stärke", () => {
     const b = basisBogen();
     b.personalErfassung = PersonalErfassung.NUR_STAERKE;
