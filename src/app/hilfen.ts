@@ -690,6 +690,23 @@ export function pruefpunkte(b: Erfassungsbogen, mitFahrzeugen = true): Pruefpunk
   }
   if (mitFahrzeugen) {
     hinweise.push(...fahrzeugHinweise(b).map((text) => ({ text, schritt: S_FAHRZEUGE })));
+    // Fahrzeuge ohne Fahrer kommen nicht in den Einsatz: die StAN-Vorbelegung
+    // setzt bewusst keine Fahrerlaubnisklassen — vergisst der Bogen sie ganz,
+    // findet der Kraftfahrer-Filter am Meldekopf die Einheit nicht. Nur bei
+    // vollständiger Personalerfassung belastbar: die Stärke-Schnellerfassung
+    // kennt keine Klassen je Person.
+    const kraftfahrerErfasst = b.personal.some((p) => alleFahrerlaubnisse(p).length > 0);
+    if (
+      b.fahrzeuge.length > 0 &&
+      b.personal.length > 0 &&
+      b.personalErfassung === PersonalErfassung.VOLLSTAENDIG &&
+      !kraftfahrerErfasst
+    ) {
+      hinweise.push({
+        text: "Fahrzeuge erfasst, aber kein Kraftfahrer: Bei keiner Person ist eine Fahrerlaubnisklasse eingetragen.",
+        schritt: S_PERSONAL,
+      });
+    }
   }
   return hinweise;
 }

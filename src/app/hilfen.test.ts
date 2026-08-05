@@ -254,6 +254,8 @@ describe("plausibilitaet()", () => {
         person({
           staerkeRolle: StaerkeRolle.FUEHRER,
           geschlecht: Geschlecht.M,
+          // Mit Fahrzeug gehört ein Kraftfahrer zum stimmigen Bogen.
+          fahrerlaubnis: Fahrerlaubnis.B,
           kontakte: [{ art: KontaktArt.MOBIL, dienstlich: true, wert: "01711234567" }],
         }),
         person({ geschlecht: Geschlecht.W }),
@@ -316,6 +318,39 @@ describe("plausibilitaet()", () => {
     const unklar = bogen({ personal, fahrzeuge: [{ typ: { code: 24 } }] });
     expect(fahrzeugHinweise(unklar).some((h) => /Sitzplätze/.test(h))).toBe(false);
     expect(transportBilanz(unklar).unbekannt).toBe(1);
+  });
+
+  it("warnt bei Fahrzeugen ohne erfassten Kraftfahrer", () => {
+    // Die StAN-Vorbelegung setzt bewusst keine Fahrerlaubnisklassen — ohne den
+    // Hinweis findet der Kraftfahrer-Filter am Meldekopf die Einheit nicht.
+    const ohneKf = bogen({
+      personal: [person()],
+      fahrzeuge: [{ typ: { code: 8 }, kennzeichen: "THW-84397" }],
+    });
+    expect(plausibilitaet(ohneKf).some((h) => /kein Kraftfahrer/.test(h))).toBe(true);
+    // Auf der Personalseite (mitFahrzeugen=false) bleibt der Hinweis weg.
+    expect(plausibilitaet(ohneKf, false).some((h) => /kein Kraftfahrer/.test(h))).toBe(false);
+  });
+
+  it("warnt nicht, sobald eine Klasse erfasst ist — oder wo Klassen gar nicht erfasst werden", () => {
+    const mitKf = bogen({
+      personal: [person({ weitereFahrerlaubnisse: [Fahrerlaubnis.CE] })],
+      fahrzeuge: [{ typ: { code: 8 } }],
+    });
+    expect(plausibilitaet(mitKf).some((h) => /kein Kraftfahrer/.test(h))).toBe(false);
+
+    // Ohne Fahrzeuge braucht es keinen Fahrer, ohne Personal greift schon „Stärke ist 0".
+    expect(plausibilitaet(bogen({ personal: [person()] })).some((h) => /kein Kraftfahrer/.test(h))).toBe(false);
+    expect(plausibilitaet(bogen({ fahrzeuge: [{ typ: { code: 8 } }] })).some((h) => /kein Kraftfahrer/.test(h))).toBe(false);
+
+    // Die Stärke-Schnellerfassung kennt keine Klassen je Person — kein Fehlalarm.
+    const schnell = bogen({
+      personalErfassung: PersonalErfassung.NUR_STAERKE,
+      staerkeManuell: { fuehrer: 1, unterfuehrer: 2, mannschaft: 9, gesamt: 12 },
+      personal: [person()],
+      fahrzeuge: [{ typ: { code: 8 } }],
+    });
+    expect(plausibilitaet(schnell).some((h) => /kein Kraftfahrer/.test(h))).toBe(false);
   });
 
   it("nimmt die Sitzplatz-Warnung in die Gesamtübersicht auf, nicht auf die Personalseite", () => {
