@@ -6,6 +6,7 @@
 import { useEffect, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from "react";
 import {
   Ernaehrung,
+  Fahrerlaubnis,
   Geschlecht,
   Kontakt,
   KontaktArt,
@@ -13,6 +14,7 @@ import {
   Person,
   PersonalErfassung,
   StaerkeRolle,
+  alleFahrerlaubnisse,
   staerke,
   unterbringungMWD,
   verpflegung,
@@ -103,6 +105,75 @@ function KontakteEditor(props: { kontakte: Kontakt[]; aendern: (k: Kontakt[]) =>
   );
 }
 
+/**
+ * Fahrerlaubnis mit Mehrfachauswahl: die erste Klasse wie bisher (inkl. „—"),
+ * dahinter je weiterer Klasse eine eigene Auswahl mit ✕ und ein „+"-Knopf.
+ * Nötig, weil sich nicht alle Klassen gegenseitig einschließen — CE deckt BE
+ * ab, aber B + A (Pkw und Krad) sind nur als zwei Einträge abbildbar.
+ */
+function FahrerlaubnisFeld(props: { person: Person; set: (patch: Partial<Person>) => void }) {
+  const { person: p, set } = props;
+  const weitere = p.weitereFahrerlaubnisse ?? [];
+  const uebernehmen = (haupt: Fahrerlaubnis, rest: Fahrerlaubnis[]) => {
+    // Dubletten, „—" und die Hauptklasse raus; leer → Feld weglassen, damit
+    // der Bogen im QR die alte Schema-Version behält (transportSchemaVersion).
+    const bereinigt = [...new Set(rest)].filter((k) => k !== Fahrerlaubnis.NONE && k !== haupt);
+    set({
+      fahrerlaubnis: haupt,
+      weitereFahrerlaubnisse: haupt !== Fahrerlaubnis.NONE && bereinigt.length > 0 ? bereinigt : undefined,
+    });
+  };
+  // Vorschlag für „+": die erste noch nicht abgedeckte Klasse — praktisch
+  // meist A (Krad), die häufigste Zweitklasse neben B/C/CE.
+  const belegt = new Set(alleFahrerlaubnisse(p));
+  const frei = Object.keys(FE_TEXT)
+    .map(Number)
+    .filter((k) => k !== Fahrerlaubnis.NONE && !belegt.has(k));
+  const naechste = frei.includes(Fahrerlaubnis.A) ? Fahrerlaubnis.A : frei[0];
+  return (
+    <Feld titel="Fahrerlaubnis" schmal>
+      <Auswahl value={p.fahrerlaubnis} onChange={(e) => uebernehmen(Number(e.target.value), weitere)}>
+        {Object.entries(FE_TEXT).map(([wert, text]) => (
+          <option key={wert} value={wert}>{text}</option>
+        ))}
+      </Auswahl>
+      {weitere.map((k, i) => (
+        <span className="inline" key={i}>
+          <Auswahl
+            beschriftung={`Weitere Fahrerlaubnisklasse ${i + 1}`}
+            value={k}
+            onChange={(e) =>
+              uebernehmen(p.fahrerlaubnis, weitere.map((w, j) => (j === i ? Number(e.target.value) : w)))
+            }
+          >
+            {Object.entries(FE_TEXT)
+              .filter(([wert]) => Number(wert) !== Fahrerlaubnis.NONE)
+              .map(([wert, text]) => (
+                <option key={wert} value={wert}>{text}</option>
+              ))}
+          </Auswahl>
+          <button
+            type="button"
+            aria-label={`Fahrerlaubnisklasse ${FE_TEXT[k]} entfernen`}
+            onClick={() => uebernehmen(p.fahrerlaubnis, weitere.filter((_, j) => j !== i))}
+          >
+            ✕
+          </button>
+        </span>
+      ))}
+      {p.fahrerlaubnis !== Fahrerlaubnis.NONE && naechste != null && (
+        <button
+          type="button"
+          title="Weitere Klasse, die die vorhandenen nicht einschließen (z. B. B + A)"
+          onClick={() => uebernehmen(p.fahrerlaubnis, [...weitere, naechste])}
+        >
+          + Klasse
+        </button>
+      )}
+    </Feld>
+  );
+}
+
 function PersonKarte(props: {
   person: Person;
   org: OrganisationsTyp;
@@ -140,13 +211,7 @@ function PersonKarte(props: {
             <option value={Ernaehrung.VEGAN}>Vegan</option>
           </Auswahl>
         </Feld>
-        <Feld titel="Fahrerlaubnis" schmal>
-          <Auswahl value={p.fahrerlaubnis} onChange={(e) => set({ fahrerlaubnis: Number(e.target.value) })}>
-            {Object.entries(FE_TEXT).map(([wert, text]) => (
-              <option key={wert} value={wert}>{text}</option>
-            ))}
-          </Auswahl>
-        </Feld>
+        <FahrerlaubnisFeld person={p} set={set} />
       </div>
       <Feld titel="Funktionen / Zusatzfunktionen">
         <VokabListe werte={p.funktionen} aendern={(w) => set({ funktionen: w })} tabelle={funktionen} hinzufuegenText="Funktion" />

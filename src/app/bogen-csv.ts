@@ -37,10 +37,10 @@
 
 import {
   Ernaehrung,
-  Fahrerlaubnis,
   Geschlecht,
   PersonalErfassung,
   StaerkeRolle,
+  alleFahrerlaubnisse,
   staerke,
   unterbringungMWD,
   verpflegung,
@@ -289,8 +289,9 @@ function personSatz(b: Erfassungsbogen, k: Kontext, p: Person, nr: number): Satz
     Funktionen: p.funktionen.map((f) => vokabText(f, funktionen)).filter(Boolean).join(", "),
     // FE_TEXT schreibt „—" für „keine" — das ist Anzeige-Kosmetik. In einer
     // Tabelle gehört dahin die leere Zelle, sonst zählt jeder Filter den
-    // Gedankenstrich als Fahrerlaubnis mit.
-    Fahrerlaubnis: p.fahrerlaubnis === Fahrerlaubnis.NONE ? "" : FE_TEXT[p.fahrerlaubnis],
+    // Gedankenstrich als Fahrerlaubnis mit. Mehrere Klassen (B + A) stehen
+    // kommagetrennt in derselben Zelle.
+    Fahrerlaubnis: alleFahrerlaubnisse(p).map((k) => FE_TEXT[k]).join(", "),
     Geschlecht: GESCHLECHT_TEXT[p.geschlecht],
     "Ernährung": ERNAEHRUNG_TEXT[p.ernaehrung],
     Kontakte: p.kontakte.map(kontaktText).join(" / "),

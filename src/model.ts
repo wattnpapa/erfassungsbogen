@@ -9,7 +9,7 @@
  * React Native / Capacitor und Node.
  */
 
-export const SCHEMA_VERSION = 7;
+export const SCHEMA_VERSION = 8;
 
 /**
  * Schema-Version, die ein Transport (QR, JSON) für diesen Bogen fordern muss.
@@ -18,8 +18,12 @@ export const SCHEMA_VERSION = 7;
  * echte Übungsbögen fordern Schema 6 — ein alter Stand lehnt sie dann mit
  * einer klaren Meldung ab, statt sie unmarkiert als echten Bogen anzuzeigen.
  * Ein Stand mit Uhrzeit (Minuten ≠ Mitternacht) ist erst ab Schema 7 kodierbar.
+ * Eine Person mit mehr als einer Fahrerlaubnisklasse (B + A) erst ab Schema 8.
  */
-export function transportSchemaVersion(b: Pick<Erfassungsbogen, "uebung" | "stand">): number {
+export function transportSchemaVersion(
+  b: Pick<Erfassungsbogen, "uebung" | "stand" | "personal">,
+): number {
+  if (b.personal.some((p) => p.weitereFahrerlaubnisse?.length)) return 8;
   if (b.stand % MINUTEN_JE_TAG !== 0) return 7;
   return b.uebung ? 6 : 5;
 }
@@ -135,6 +139,12 @@ export enum Fahrerlaubnis {
   DE = 14,
 }
 
+/** Alle Fahrerlaubnisklassen einer Person (Haupt- + weitere), ohne NONE, ohne Dubletten. */
+export function alleFahrerlaubnisse(p: Pick<Person, "fahrerlaubnis" | "weitereFahrerlaubnisse">): Fahrerlaubnis[] {
+  const alle = [p.fahrerlaubnis, ...(p.weitereFahrerlaubnisse ?? [])];
+  return [...new Set(alle)].filter((k) => k !== Fahrerlaubnis.NONE);
+}
+
 export enum Geschlecht {
   M = 0,
   W = 1,
@@ -178,6 +188,12 @@ export interface Person {
   /** Anzeige-Funktionen im Vokabular der Organisation (THW: GrFü, SGL …; FW: Zugführer, AGT …). */
   funktionen: VokabularWert[];
   fahrerlaubnis: Fahrerlaubnis; // "Kf" ergibt sich implizit aus > NONE
+  /**
+   * Weitere Klassen NEBEN `fahrerlaubnis`, die sich nicht gegenseitig
+   * einschließen (B + A: Pkw und Krad). Nur gesetzt, wenn nicht leer — ein
+   * Bogen, der das Feld nutzt, fordert Schema 8 (transportSchemaVersion).
+   */
+  weitereFahrerlaubnisse?: Fahrerlaubnis[];
   geschlecht: Geschlecht; // → Unterbringung M/W/D wird abgeleitet
   ernaehrung: Ernaehrung; // → Verpflegung (vegetarisch/vegan) wird abgeleitet
   kontakte: Kontakt[]; // i. d. R. nur Führungskräfte

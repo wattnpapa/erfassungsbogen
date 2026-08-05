@@ -13,6 +13,7 @@ import {
   Ernaehrung,
   HierarchieEbene,
   Fahrerlaubnis,
+  alleFahrerlaubnisse,
   Fahrzeug,
   Kontakt,
   KontaktArt,
@@ -146,11 +147,41 @@ export const FE_TEXT: Record<Fahrerlaubnis, string> = {
   [Fahrerlaubnis.DE]: "DE",
 };
 
-/** "GrFü / Kf C, SGL" wie auf dem Papierbogen. */
+/**
+ * Klassen, die eine Klasse mit umfasst — § 6 Abs. 3 FeV plus Vorbesitz
+ * (CE gibt es nur mit C und B; die stehen also immer mit auf der Karte).
+ * Grundlage des Qualifikationsfilters: wer CE gemeldet hat, ist auch ein
+ * Treffer für „Kf B". Jede Klasse enthält sich selbst.
+ */
+export const FE_EINGESCHLOSSEN: Record<Fahrerlaubnis, readonly Fahrerlaubnis[]> = (() => {
+  const F = Fahrerlaubnis;
+  const t: Partial<Record<Fahrerlaubnis, readonly Fahrerlaubnis[]>> = {
+    [F.NONE]: [],
+    [F.AM]: [F.AM],
+    [F.A1]: [F.A1, F.AM],
+    [F.A2]: [F.A2, F.A1, F.AM],
+    [F.A]: [F.A, F.A2, F.A1, F.AM],
+    [F.B]: [F.B, F.AM],
+  };
+  const b = t[F.B]!;
+  t[F.BE] = [F.BE, ...b];
+  t[F.C1] = [F.C1, ...b];
+  t[F.C1E] = [F.C1E, F.C1, F.BE, ...b];
+  t[F.C] = [F.C, F.C1, ...b];
+  t[F.CE] = [F.CE, F.C, F.C1, F.C1E, F.BE, ...b];
+  t[F.D1] = [F.D1, ...b];
+  t[F.D1E] = [F.D1E, F.D1, F.BE, ...b];
+  t[F.D] = [F.D, F.D1, ...b];
+  t[F.DE] = [F.DE, F.D, F.D1, F.D1E, F.BE, ...b];
+  return t as Record<Fahrerlaubnis, readonly Fahrerlaubnis[]>;
+})();
+
+/** "GrFü / Kf C, SGL" wie auf dem Papierbogen; mehrere Klassen als „Kf B+A". */
 export function funktionsText(p: Person, org: OrganisationsTyp): string {
   const tabelle = vokabularFuer(org, "funktion");
   const [grund, ...rest] = p.funktionen.map((f) => vokabText(f, tabelle));
-  const kf = p.fahrerlaubnis !== Fahrerlaubnis.NONE ? `Kf ${FE_TEXT[p.fahrerlaubnis]}` : "";
+  const klassen = alleFahrerlaubnisse(p);
+  const kf = klassen.length > 0 ? `Kf ${klassen.map((k) => FE_TEXT[k]).join("+")}` : "";
   const zusatz = [kf, ...rest].filter(Boolean).join(", ");
   return [grund, zusatz].filter(Boolean).join(" / ");
 }

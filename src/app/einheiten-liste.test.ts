@@ -236,6 +236,47 @@ describe("qualifikationenImEinsatz", () => {
   });
 });
 
+// ------------------------------------------- Fahrerlaubnis als Qualifikation
+
+const kraftfahrerCE = mitPersonal(thwOldenburg, [
+  { ...person("Fricke", []), fahrerlaubnis: Fahrerlaubnis.CE },
+]);
+const kraftfahrerBundA = mitPersonal(fwMuenchen, [
+  { ...person("Grote", []), fahrerlaubnis: Fahrerlaubnis.B, weitereFahrerlaubnisse: [Fahrerlaubnis.A] },
+]);
+const fahrer = [kraftfahrerCE, kraftfahrerBundA, drkOhne];
+
+describe("Fahrerlaubnis im Qualifikationsfilter", () => {
+  it("bietet gemeldete Klassen und den Sammel-Eintrag „Kf“ an", () => {
+    const eintraege = qualifikationenImEinsatz(fahrer);
+    expect(eintraege.find((q) => q.schluessel === "kf")).toMatchObject({ personen: 2, einheiten: 2 });
+    expect(eintraege.find((q) => q.schluessel === "kf:ce")?.label).toBe("Kf CE – Fahrerlaubnisklasse CE");
+  });
+
+  it("zählt eingeschlossene Klassen mit: CE deckt B und BE ab", () => {
+    const eintraege = qualifikationenImEinsatz(fahrer);
+    // B: CE-Fahrer (Einschluss) + B-Fahrerin = 2; BE: nur über CE = 1.
+    expect(eintraege.find((q) => q.schluessel === "kf:b")).toMatchObject({ personen: 2, einheiten: 2 });
+    expect(eintraege.find((q) => q.schluessel === "kf:be")).toMatchObject({ personen: 1, einheiten: 1 });
+  });
+
+  it("nimmt weitere Klassen (B + A) auf, ohne dass A die B-Treffer verwässert", () => {
+    const schluessel = qualifikationenImEinsatz(fahrer).map((q) => q.schluessel);
+    expect(schluessel).toContain("kf:a");
+    expect(schluessel).not.toContain("kf:d"); // niemand hat Bus gemeldet
+  });
+
+  it("filtert Einheiten und nennt die Personen", () => {
+    expect(ids(nachQualifikationFiltern(fahrer, "kf:b"))).toEqual(["a", "b"]);
+    expect(ids(nachQualifikationFiltern(fahrer, "kf:ce"))).toEqual(["a"]);
+    expect(personenMitQualifikation(kraftfahrerBundA, "kf:a").map((p) => p.nachname)).toEqual(["Grote"]);
+  });
+
+  it("ohne Fahrerlaubnis kein Kf-Eintrag", () => {
+    expect(qualifikationenImEinsatz([drkOhne]).some((q) => q.schluessel.startsWith("kf"))).toBe(false);
+  });
+});
+
 describe("personenMitQualifikation", () => {
   it("nennt die Personen in der Reihenfolge des Bogens", () => {
     expect(personenMitQualifikation(thwMitAgt, "agt").map((p) => p.nachname)).toEqual(["Auer", "Bruns"]);

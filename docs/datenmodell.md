@@ -1,7 +1,8 @@
 # Datenmodell Einheiten-Erfassungsbogen (EEB)
 
-**Stufe 1** — Datenmodell und QR-Code-Kodierung. Stand: 2026-07-30, **Schema-Version 7**
-(v7 = `stand` minutengenau als Zeitpunkt statt Kalendertag; v6 = Übungs-Kennzeichnung
+**Stufe 1** — Datenmodell und QR-Code-Kodierung. Stand: 2026-08-05, **Schema-Version 8**
+(v8 = mehrere Fahrerlaubnisklassen je Person `weitereFahrerlaubnisse`; v7 = `stand`
+minutengenau als Zeitpunkt statt Kalendertag; v6 = Übungs-Kennzeichnung
 `uebung`; v5 = Einheitsname in der Hierarchie; v4 = ein einziges Kennzeichen-Feld;
 v3 = Ernährungsform je Person; v2 = organisationsübergreifend; v1 war THW-spezifisch).
 
@@ -25,6 +26,12 @@ Zeitpunkt (uint32, Minuten) kodiert; bis Schema 6 war er ein Kalendertag (uint16
 beim Herabschreiben rechnet `mitTransportVersion` auf Tage zurück. Da jede
 Bearbeitung den Stand minutengenau neu datiert, sind neue Bögen praktisch immer
 Schema 7 (+2 Bytes im QR). Beim Lesen älterer Versionen wird Mitternacht angenommen.
+
+Eine Person mit mehr als einer Fahrerlaubnisklasse (B + A — Klassen, die sich
+nicht gegenseitig einschließen) fordert Schema 8: die weiteren Klassen stehen
+als Varint-Zähler + je 1 Byte hinter dem Ernährungs-Byte. Bögen, in denen jede
+Person höchstens eine Klasse hat, bleiben bei Schema ≤ 7 lesbar (der Zähler
+wird dann gar nicht geschrieben).
 
 **Bewusste Ausnahme (v4):** Bis v3 stand das THW-Kennzeichen als Zahl im QR-Code
 (Flag 16 im Fahrzeug-Byte). Dieses Sonderformat ist entfallen; es gibt nur noch ein
@@ -74,7 +81,7 @@ RD: RTW, NEF). Deshalb:
 | Einheitstyp (FGr K (A), Löschzug, SEG …) | Text | 1 Byte Code im Org-Namensraum, Freitext-Ausweg |
 | Funktion (GrFü, Zugführer, AGT …) | „GrFü / Kf C, SGL" | Codes im Org-Namensraum, je 1 Byte |
 | Stärkerolle | — | 2 Bit explizit (Führer/Unterführer/Mannschaft) → Stärkemeldung org-unabhängig ableitbar |
-| Fahrerlaubnis (EU-Klassen AM…DE) | „Kf CE" | 4 Bit Enum; „Kf" implizit |
+| Fahrerlaubnis (EU-Klassen AM…DE) | „Kf CE" / „Kf B+A" | 4 Bit Enum; weitere Klassen ab Schema 8 (Varint + je 1 Byte); „Kf" implizit |
 | Geschlecht (M/W/D) | — | 2 Bit → Unterbringungszahlen **abgeleitet** |
 | Ernährung (Fleisch/Vegetarisch/Vegan) | — | 2 Bit → Verpflegungs-Zusammenfassung **abgeleitet** |
 | Fahrzeugtyp | „Anh Versorgung 2t" / „LF 20" | 1 Byte Code im Org-Namensraum |
@@ -158,6 +165,7 @@ ausgeschriebene Hierarchie der Normalfall.
 | staerkeRolle | Enum | Führer / Unterführer / Mannschaft (2 Bit) — org-unabhängig |
 | funktionen | `VokabularWert[]` | Anzeige-Funktionen im Org-Namensraum |
 | fahrerlaubnis | Enum | EU-Klassen (4 Bit) |
+| weitereFahrerlaubnisse | `Fahrerlaubnis[]?` | ab Schema 8: Klassen neben der Hauptklasse, die sich nicht gegenseitig einschließen (B + A); nur gesetzt, wenn nicht leer |
 | geschlecht | Enum | M/W/D (2 Bit) |
 | ernaehrung | Enum | Fleisch/Vegetarisch/Vegan (2 Bit) — Verpflegung wird **abgeleitet** |
 | kontakte | `Kontakt[]` | Art (Mobil/Festnetz/eMail), D/P-Flag, BCD bzw. Template |

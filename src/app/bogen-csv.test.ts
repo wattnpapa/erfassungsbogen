@@ -158,6 +158,15 @@ describe("bogenCsvInhalt()", () => {
     expect(spalte(csv, 3, "Ernährung")).toBe("Vegan");
   });
 
+  it("schreibt mehrere Fahrerlaubnisklassen kommagetrennt in eine Zelle", () => {
+    const csv = bogenCsvInhalt(
+      bogen("Oldenburg", {
+        personal: [person({ fahrerlaubnis: Fahrerlaubnis.B, weitereFahrerlaubnisse: [Fahrerlaubnis.A] })],
+      }),
+    );
+    expect(spalte(csv, 2, "Fahrerlaubnis")).toBe("B, A");
+  });
+
   it("schreibt Kontakte einer Person in ein Feld", () => {
     const csv = bogenCsvInhalt(
       bogen("Oldenburg", {

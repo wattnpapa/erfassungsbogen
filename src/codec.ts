@@ -169,12 +169,19 @@ function encodeKontakt(w: Writer, k: Kontakt): void {
   else w.bcd(k.wert ?? "");
 }
 
-function encodePerson(w: Writer, p: Person): void {
+function encodePerson(w: Writer, p: Person, version: number): void {
   w.str(p.vorname);
   w.str(p.nachname);
   // 4 Bit Fahrerlaubnis + 2 Bit Geschlecht + 2 Bit Stärkerolle
   w.u8(p.fahrerlaubnis | (p.geschlecht << 4) | (p.staerkeRolle << 6));
   w.u8(p.ernaehrung); // eigenes Byte (Vorbyte voll); komprimiert sich als 0-Serie weg
+  if (version >= 8) {
+    // Weitere Klassen neben der Hauptklasse (B + A). Meist 0 — das Zählbyte
+    // komprimiert sich in der 0-Serie weg.
+    const weitere = p.weitereFahrerlaubnisse ?? [];
+    w.varint(weitere.length);
+    for (const k of weitere) w.u8(k);
+  }
   w.varint(p.funktionen.length);
   for (const f of p.funktionen) w.vokab(f);
   w.varint(p.kontakte.length);
@@ -280,7 +287,7 @@ export function encodeBinaer(b: Erfassungsbogen): Uint8Array {
     w.u8(b.verpflegungManuell.vegan);
   }
   w.varint(b.personal.length);
-  for (const p of b.personal) encodePerson(w, p);
+  for (const p of b.personal) encodePerson(w, p, version);
 
   w.varint(b.fahrzeuge.length);
   for (const f of b.fahrzeuge) encodeFahrzeug(w, f);
@@ -320,6 +327,15 @@ function decodePerson(r: Reader, version: number): Person {
     kontakte: [],
     zusatzqualifikationen: [],
   };
+  if (version >= 8) {
+    // Nur bei Inhalt setzen: `weitereFahrerlaubnisse` ist optional, und ein
+    // leeres Feld soll den Roundtrip (encode → decode) nicht verändern.
+    const anzahl = r.varint();
+    if (anzahl > 0) {
+      p.weitereFahrerlaubnisse = [];
+      for (let i = 0; i < anzahl; i++) p.weitereFahrerlaubnisse.push(r.u8());
+    }
+  }
   for (let i = r.varint(); i > 0; i--) p.funktionen.push(r.vokab());
   for (let i = r.varint(); i > 0; i--) p.kontakte.push(decodeKontakt(r));
   for (let i = r.varint(); i > 0; i--) p.zusatzqualifikationen.push(r.vokab());

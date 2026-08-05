@@ -29,6 +29,7 @@ import {
   type Person,
 } from "../model";
 import {
+  FE_EINGESCHLOSSEN,
   bogenLaden,
   browserKompressor,
   datumDeutsch,
@@ -164,6 +165,32 @@ describe("funktionsText()", () => {
   it("lässt 'Kf' weg, wenn keine Fahrerlaubnis vorhanden ist", () => {
     const p = person({ funktionen: [{ code: 5 }], fahrerlaubnis: Fahrerlaubnis.NONE }); // He
     expect(funktionsText(p, OrganisationsTyp.THW)).toBe("He");
+  });
+
+  it("reiht mehrere Fahrerlaubnisklassen mit '+' aneinander", () => {
+    const p = person({
+      funktionen: [{ code: 3 }],
+      fahrerlaubnis: Fahrerlaubnis.B,
+      weitereFahrerlaubnisse: [Fahrerlaubnis.A],
+    });
+    expect(funktionsText(p, OrganisationsTyp.THW)).toBe("GrFü / Kf B+A");
+  });
+});
+
+describe("FE_EINGESCHLOSSEN", () => {
+  it("bildet § 6 Abs. 3 FeV samt Vorbesitz ab (Stichproben)", () => {
+    expect(FE_EINGESCHLOSSEN[Fahrerlaubnis.CE]).toEqual(
+      expect.arrayContaining([Fahrerlaubnis.CE, Fahrerlaubnis.C, Fahrerlaubnis.C1E, Fahrerlaubnis.BE, Fahrerlaubnis.B]),
+    );
+    expect(FE_EINGESCHLOSSEN[Fahrerlaubnis.B]).toEqual([Fahrerlaubnis.B, Fahrerlaubnis.AM]);
+    // Krad und Pkw schließen sich nicht gegenseitig ein.
+    expect(FE_EINGESCHLOSSEN[Fahrerlaubnis.A]).not.toContain(Fahrerlaubnis.B);
+    expect(FE_EINGESCHLOSSEN[Fahrerlaubnis.CE]).not.toContain(Fahrerlaubnis.A);
+    // Jede Klasse enthält sich selbst; NONE nichts.
+    for (const [k, liste] of Object.entries(FE_EINGESCHLOSSEN)) {
+      if (Number(k) !== Fahrerlaubnis.NONE) expect(liste).toContain(Number(k));
+    }
+    expect(FE_EINGESCHLOSSEN[Fahrerlaubnis.NONE]).toEqual([]);
   });
 });
 

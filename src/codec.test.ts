@@ -134,6 +134,16 @@ describe("Binär-Roundtrip (encodeBinaer/decodeBinaer)", () => {
     expect(encodeBinaer(basisBogen())[0]).toBe(7); // Stand 10:39 → Schema 7
   });
 
+  it("mehrere Fahrerlaubnisklassen fordern Schema 8 und überstehen den Roundtrip", () => {
+    const b = basisBogen();
+    b.personal[0]!.weitereFahrerlaubnisse = [Fahrerlaubnis.A, Fahrerlaubnis.D1];
+    expect(encodeBinaer(b)[0]).toBe(8);
+    gleich(decodeBinaer(encodeBinaer(b)), b);
+    // Eine Klasse allein bleibt bei der bisherigen Version — alte App-Stände
+    // können solche Bögen weiter lesen.
+    expect(encodeBinaer(basisBogen())[0]).toBe(7);
+  });
+
   it("erhält die Uhrzeit im Stand über den Roundtrip", () => {
     expect(decodeBinaer(encodeBinaer(basisBogen())).stand).toBe(zeitpunktAusIso("2026-05-14T10:39"));
   });

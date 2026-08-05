@@ -1,12 +1,14 @@
 import { describe, it, expect } from "vitest";
 import {
   Ernaehrung,
+  Fahrerlaubnis,
   Geschlecht,
   KontaktArt,
   MINUTEN_JE_TAG,
   PersonalErfassung,
   StaerkeRolle,
   SCHEMA_VERSION,
+  alleFahrerlaubnisse,
   ansprechpartner,
   datumAusIso,
   datumZuIso,
@@ -186,20 +188,41 @@ describe("ansprechpartner()", () => {
 });
 
 describe("Konstanten", () => {
-  it("SCHEMA_VERSION ist die aktuelle Version 7", () => {
-    expect(SCHEMA_VERSION).toBe(7);
+  it("SCHEMA_VERSION ist die aktuelle Version 8", () => {
+    expect(SCHEMA_VERSION).toBe(8);
     // Sanity: der Meldekopf-Modus ist als eigener Enum-Wert vorhanden.
     expect(PersonalErfassung.NUR_STAERKE).toBe(1);
   });
 
   it("transportSchemaVersion: kleinste tragende Version", () => {
     const mitternacht = 1000 * MINUTEN_JE_TAG;
-    expect(transportSchemaVersion({ uebung: true, stand: mitternacht })).toBe(6);
-    expect(transportSchemaVersion({ stand: mitternacht })).toBe(5);
-    expect(transportSchemaVersion({ uebung: undefined, stand: mitternacht })).toBe(5);
+    expect(transportSchemaVersion({ uebung: true, stand: mitternacht, personal: [] })).toBe(6);
+    expect(transportSchemaVersion({ stand: mitternacht, personal: [] })).toBe(5);
+    expect(transportSchemaVersion({ uebung: undefined, stand: mitternacht, personal: [] })).toBe(5);
     // Ein Stand mit Uhrzeit ist erst ab Schema 7 kodierbar — auch ohne Übungs-Flag.
-    expect(transportSchemaVersion({ stand: mitternacht + 639 })).toBe(7);
-    expect(transportSchemaVersion({ uebung: true, stand: mitternacht + 639 })).toBe(7);
+    expect(transportSchemaVersion({ stand: mitternacht + 639, personal: [] })).toBe(7);
+    expect(transportSchemaVersion({ uebung: true, stand: mitternacht + 639, personal: [] })).toBe(7);
+    // Mehr als eine Fahrerlaubnisklasse fordert Schema 8 — eine Klasse allein nicht.
+    const kf = (weitere?: Fahrerlaubnis[]) => ({
+      ...person(),
+      fahrerlaubnis: Fahrerlaubnis.B,
+      ...(weitere ? { weitereFahrerlaubnisse: weitere } : {}),
+    });
+    expect(transportSchemaVersion({ stand: mitternacht, personal: [kf()] })).toBe(5);
+    expect(transportSchemaVersion({ stand: mitternacht, personal: [kf([])] })).toBe(5);
+    expect(transportSchemaVersion({ stand: mitternacht, personal: [kf([Fahrerlaubnis.A])] })).toBe(8);
+    expect(transportSchemaVersion({ uebung: true, stand: mitternacht + 639, personal: [kf([Fahrerlaubnis.A])] })).toBe(8);
+  });
+
+  it("alleFahrerlaubnisse: Haupt- und weitere Klassen, ohne NONE und Dubletten", () => {
+    expect(alleFahrerlaubnisse({ fahrerlaubnis: Fahrerlaubnis.NONE })).toEqual([]);
+    expect(alleFahrerlaubnisse({ fahrerlaubnis: Fahrerlaubnis.B })).toEqual([Fahrerlaubnis.B]);
+    expect(
+      alleFahrerlaubnisse({ fahrerlaubnis: Fahrerlaubnis.B, weitereFahrerlaubnisse: [Fahrerlaubnis.A, Fahrerlaubnis.B] }),
+    ).toEqual([Fahrerlaubnis.B, Fahrerlaubnis.A]);
+    expect(
+      alleFahrerlaubnisse({ fahrerlaubnis: Fahrerlaubnis.NONE, weitereFahrerlaubnisse: [Fahrerlaubnis.A] }),
+    ).toEqual([Fahrerlaubnis.A]);
   });
 
   it("mitTransportVersion rechnet den Stand für alte Schemata auf Tage zurück", () => {

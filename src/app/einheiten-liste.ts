@@ -13,7 +13,8 @@
  *    Einheitenliste, und die Namen stehen ausgeklappt in den Details.
  *  - QUALIFIKATION: „welche Einheit hat mir Atemschutzgeräteträger gemeldet?"
  *    Filtert auf Einheiten mit mindestens einer passenden Person und nennt
- *    deren Namen. Siehe {@link qualifikationenImEinsatz}.
+ *    deren Namen. Fahrerlaubnisklassen zählen als Qualifikation mit („Kf CE"),
+ *    inklusive der eingeschlossenen Klassen. Siehe {@link qualifikationenImEinsatz}.
  *  - SORTIERUNG: umschaltbar, immer mit dem Anzeigenamen als letztem
  *    Vergleich, damit die Reihenfolge bei Gleichstand stabil bleibt.
  *
@@ -21,9 +22,9 @@
  * (auswertung.ts) rechnen unverändert über alle anwesenden Einheiten.
  */
 
-import { OrganisationsTyp, type Person } from "../model";
+import { OrganisationsTyp, alleFahrerlaubnisse, type Person } from "../model";
 import type { MeldeEintrag } from "./einsaetze";
-import { einheitAnzeigename, einheitOrt, funkrufText, kennzeichenText, orgLabel, vokabularFuer } from "./hilfen";
+import { FE_EINGESCHLOSSEN, FE_TEXT, einheitAnzeigename, einheitOrt, funkrufText, kennzeichenText, orgLabel, vokabularFuer } from "./hilfen";
 
 export type EinheitenSortierung = "name" | "eintreffzeit" | "zug" | "organisation";
 
@@ -121,6 +122,19 @@ function qualisDerPerson(p: Person, org: OrganisationsTyp): { schluessel: string
       // Vorhandene Beschriftung nicht überschreiben: die aus dem Vokabular
       // („AGT – Atemschutzgeräteträger/in") sagt mehr als der Freitext „agt".
       if (!gefunden.has(s)) gefunden.set(s, frei);
+    }
+  }
+  // Fahrerlaubnis: „welche Einheit hat mir CE-Kraftfahrer gemeldet?" ist
+  // dieselbe Meldekopf-Frage wie AGT. Je gemeldeter Klasse zählen auch die
+  // eingeschlossenen Klassen mit (FE_EINGESCHLOSSEN): wer CE hat, ist ein
+  // Treffer für „Kf B" — der Meldekopf fragt nach dem Fahrzeug, das er besetzen
+  // will, nicht nach dem Kartenaufdruck. Eigener Schlüsselraum „kf:…", damit
+  // eine Funktion mit Kürzel „B" nicht mit der Klasse B verschmilzt.
+  const klassen = alleFahrerlaubnisse(p);
+  if (klassen.length > 0) gefunden.set("kf", "Kf – Kraftfahrer/in (beliebige Klasse)");
+  for (const k of klassen) {
+    for (const e of FE_EINGESCHLOSSEN[k]) {
+      gefunden.set(`kf:${FE_TEXT[e].toLowerCase()}`, `Kf ${FE_TEXT[e]} – Fahrerlaubnisklasse ${FE_TEXT[e]}`);
     }
   }
   return [...gefunden].map(([schluessel, label]) => ({ schluessel, label }));

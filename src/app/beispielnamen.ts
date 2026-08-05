@@ -61,14 +61,20 @@ function zufallsErnaehrung(): Ernaehrung {
   ]);
 }
 
-function zufallsFahrerlaubnis(): Fahrerlaubnis {
-  return gewichtet([
+function zufallsFahrerlaubnis(): Pick<Person, "fahrerlaubnis" | "weitereFahrerlaubnisse"> {
+  const fahrerlaubnis = gewichtet([
     [Fahrerlaubnis.B, 55],
     [Fahrerlaubnis.BE, 15],
     [Fahrerlaubnis.CE, 15],
     [Fahrerlaubnis.C1E, 5],
     [Fahrerlaubnis.NONE, 10],
   ]);
+  // Jede/r zehnte Kraftfahrer/in hat zusätzlich Krad (A) — die häufigste
+  // Kombination, die sich nicht gegenseitig einschließt (B + A).
+  if (fahrerlaubnis !== Fahrerlaubnis.NONE && gewichtet([[true, 10], [false, 90]])) {
+    return { fahrerlaubnis, weitereFahrerlaubnisse: [Fahrerlaubnis.A] };
+  }
+  return { fahrerlaubnis };
 }
 
 function vorname(g: Geschlecht): string {
@@ -104,7 +110,7 @@ export function beispielPersonen(anzahl: number, bestehende: Person[] = []): Per
       nachname: aus(NACHNAMEN),
       geschlecht: g,
       ernaehrung: zufallsErnaehrung(),
-      fahrerlaubnis: zufallsFahrerlaubnis(),
+      ...zufallsFahrerlaubnis(),
       staerkeRolle: rolle,
     });
   }
