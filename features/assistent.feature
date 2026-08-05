@@ -106,6 +106,24 @@ Funktionalität: Bogen im Assistenten erfassen
     Und ich zum Schritt "6. Übersicht" wechsle
     Dann sehe ich die Überschrift "Personal (0)"
 
+  # Nicht alle Klassen schließen sich gegenseitig ein: B (Pkw) und A (Krad)
+  # brauchen zwei Einträge. Auf der Übersicht steht das wie auf dem
+  # Papierbogen als „Kf B+A".
+  Szenario: Mehrere Fahrerlaubnisklassen an einer Person erfassen
+    Wenn ich zum Schritt "3. Personal" wechsle
+    Und ich auf "+ Person hinzufügen" klicke
+    Und ich das Feld "Nachname" mit "Krause" fülle
+    Und ich das Feld "Fahrerlaubnis" auf "B" stelle
+    Und ich auf "+ Klasse" klicke
+    Und ich das Feld "Weitere Fahrerlaubnisklasse 1" auf "A" stelle
+    Und ich zum Schritt "6. Übersicht" wechsle
+    Dann sehe ich den Hinweis "Kf B+A"
+    Wenn ich zum Schritt "3. Personal" wechsle
+    Und ich auf "Fahrerlaubnisklasse A entfernen" klicke
+    Und ich zum Schritt "6. Übersicht" wechsle
+    Dann sehe ich den Hinweis "Kf B+A" nicht
+    Und sehe ich den Hinweis "Kf B"
+
   Szenario: Fertige Namensliste als Mehrzeilen-Text einfügen
     Wenn ich zum Schritt "3. Personal" wechsle
     Und ich auf "Namen einfügen…" klicke

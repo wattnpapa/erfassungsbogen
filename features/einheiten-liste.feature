@@ -71,6 +71,46 @@ Funktionalität: Einheitenliste durchsuchen, filtern und sortieren
     Dann führt die Einheitenliste genau 0 Einheiten
     Und sehe ich den Hinweis "Keine Einheit passt zu"
 
+  # „Welche Einheit hat mir Kraftfahrer gemeldet?" ist beim Besetzen eines
+  # Fahrzeugs dieselbe Frage wie die nach AGT oder SGL. Der geteilte Bogen
+  # bringt zwei Fahrer mit: Johannes Rudolph (Klasse C) und Tom Fischer
+  # (Klasse B); die beiden manuell erfassten Einheiten führen kein Personal.
+  Szenario: Der Kraftfahrer-Filter findet die Einheit mit Fahrern
+    Wenn ich das Feld "Qualifikation" auf "Kf – Kraftfahrer/in (beliebige Klasse) (2)" stelle
+    Dann sehe ich die Überschrift "Einheiten (1 von 3)"
+    Und führt die Einheitenliste genau 1 Einheiten
+    Und sehe ich den Hinweis "Kf: Johannes Rudolph, Tom Fischer"
+    Und sehe ich den Hinweis "2 Einsatzkräfte mit „Kf – Kraftfahrer/in (beliebige Klasse)“"
+
+  # Der Meldekopf fragt nach dem Fahrzeug, das er besetzen will, nicht nach dem
+  # Kartenaufdruck: wer C gemeldet hat, darf auch den Klasse-B-Transporter
+  # fahren (§ 6 Abs. 3 FeV) — und muss darum als Treffer für „Kf B" erscheinen.
+  Szenario: Wer Klasse C gemeldet hat, zählt auch als Kraftfahrer für Klasse B
+    Wenn ich das Feld "Qualifikation" auf "Kf B – Fahrerlaubnisklasse B (2)" stelle
+    Dann sehe ich den Hinweis "Kf B: Johannes Rudolph, Tom Fischer"
+    Wenn ich das Feld "Qualifikation" auf "Kf C – Fahrerlaubnisklasse C (1)" stelle
+    Dann sehe ich den Hinweis "Kf C: Johannes Rudolph"
+    Und sehe ich den Hinweis "Tom Fischer" nicht
+
+  # Die volle Runde des Zugtrupps: LKW-Fahrer wird mit dem Bogen erfasst und
+  # ist danach im Einsatz über seine Klasse auffindbar.
+  Szenario: Ein frisch erfasster CE-Fahrer ist sofort über den Filter auffindbar
+    Wenn ich auf "Einheit manuell erfassen…" klicke
+    Dann sehe ich den Schritt "1. Einheit"
+    Wenn ich das Feld "Organisation" auf "Feuerwehr" stelle
+    Und ich das Feld "Name (Pflicht)" mit "Hude" fülle
+    Und ich zum Schritt "3. Personal" wechsle
+    Und ich auf "+ Person hinzufügen" klicke
+    Und ich das Feld "Nachname" mit "Tabken" fülle
+    Und ich das Feld "Fahrerlaubnis" auf "CE" stelle
+    Und ich zum Schritt "6. Übersicht" wechsle
+    Und ich auf "In Einsatz übernehmen" klicke
+    Dann sehe ich die Überschrift "Einheiten (4)"
+    Wenn ich das Feld "Qualifikation" auf "Kf CE – Fahrerlaubnisklasse CE (1)" stelle
+    Dann sehe ich die Überschrift "Einheiten (1 von 4)"
+    Und führt die Einheitenliste "Feuerwehr Hude" an Stelle 1
+    Und führt die Einheitenliste "THW" nicht
+
   Szenario: Nach Eintreffzeit steht die jüngste Meldung oben
     Wenn ich das Feld "Sortierung" auf "Eintreffzeit (neueste zuerst)" stelle
     Dann führt die Einheitenliste "Feuerwehr Aschhausen" an Stelle 1

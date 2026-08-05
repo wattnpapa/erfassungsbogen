@@ -631,7 +631,7 @@ export function Uebersicht(props: {
           </p>
         </div>
         <div className="teilen-weg">
-          <button type="button" onClick={oldenburgXlsx}>Als Excel (Format „Oldenburg")</button>
+          <button type="button" onClick={oldenburgXlsx}>Als Excel (Format „Oldenburg“)</button>
           <p className="hinweis">
             Eine Zeile in der Einheitenliste der Führungsstelle — Spalten und Formatierung wie in
             deren Vorlage. Zum Einfügen in die laufende Liste am Meldekopf.

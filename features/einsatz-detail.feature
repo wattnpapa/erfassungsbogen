@@ -141,6 +141,10 @@ Funktionalität: Einsatz-Sammlung führen (Meldekopf)
     Wenn ich auf "Alle Daten als CSV" klicke und eine Datei erhalte
     Dann heißt die heruntergeladene Datei wie "eeb-einsatz-*-alle-daten.csv"
 
+  Szenario: Excel-Liste der Einheiten im Format „Oldenburg“
+    Wenn ich auf "Excel-Liste (Format „Oldenburg“)" klicke und eine Datei erhalte
+    Dann heißt die heruntergeladene Datei wie "eeb-einsatz-*-oldenburg.xlsx"
+
   Szenario: Gelöschter Einsatz liegt im Papierkorb und kommt zurück
     Wenn ich auf "Einsatz löschen" klicke
     Dann sehe ich die Schaltfläche "Neuen Bogen erstellen"

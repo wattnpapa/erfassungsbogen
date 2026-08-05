@@ -336,7 +336,7 @@ export function EinsatzDetail(props: {
             fremde Excel-Vorlage mit fester Spaltenfolge, in die die
             Führungsstelle die Zeilen direkt einfügt. */}
         <button type="button" onClick={onOldenburgExport} title="Einheitenliste im Format der Führungsstelle Oldenburg: je gemeldeter Einheit eine Zeile, Spalten und Formatierung wie in deren Excel-Vorlage.">
-          Excel-Liste (Format „Oldenburg")
+          Excel-Liste (Format „Oldenburg“)
         </button>{" "}
         {/* Roh-JSON nur im Debug-Modus: fürs Publikum trägt die Sammel-PDF die
             Bögen als eingebettetes JSON — ein separater Export verwirrt nur. */}
