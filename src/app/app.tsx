@@ -1016,6 +1016,9 @@ function AppInhalt() {
       <SeitenKopf variante="start-kopf">
         <div className="titelzeile">
           <h1>Digitaler Einheiten-Erfassungsbogen</h1>
+          {/* Feld/Nacht auch hier, nicht nur in der Fußzeile: Wer draußen
+              zuerst auf der Startseite landet, stellt die Anzeige sofort um. */}
+          <AnzeigeSchalter />
         </div>
       </SeitenKopf>
       <main id="inhalt" tabIndex={-1} className="start">

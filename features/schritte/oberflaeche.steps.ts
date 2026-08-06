@@ -91,7 +91,19 @@ When("ich das Feld {string} mit {string} fülle", async function (this: EebWelt,
 });
 
 When("ich das Feld {string} auf {string} stelle", async function (this: EebWelt, name: string, wert: string) {
-  await auswahl(this, name).selectOption({ label: wert });
+  const el = auswahl(this, name);
+  const tag = await el.evaluate((e) => e.tagName.toLowerCase());
+  if (tag === "select") {
+    await el.selectOption({ label: wert });
+    return;
+  }
+  // Combobox (lange Vokabular-Liste, z. B. Einheitstyp/Fahrzeugtyp): tippen
+  // filtert, dann den Vorschlag anklicken, der den vollen Wert trägt. Ein „–“
+  // trennt Kürzel und Name; über den Namen wird eine (B)/(C)-Variante eindeutig.
+  const [kurz, ...rest] = wert.split(" – ");
+  const name2 = rest.length > 0 ? rest.join(" – ") : wert;
+  await el.fill(kurz!);
+  await inhalt(this).locator("ul.vorschlaege li").filter({ hasText: name2 }).first().click();
 });
 
 When("ich {string} ankreuze", async function (this: EebWelt, name: string) {

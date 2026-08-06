@@ -340,10 +340,11 @@
        der Kennfarbe trennt die Kopf-Linie statt des Inhalts-Graus. */
     /* Der Titel darf den Umschalter nach einem Umbruch nicht zerquetschen: h1
        nimmt die volle erste Zeile, der Schalter rutscht darunter. Ab ~34rem
-       sitzt er wieder rechts neben dem Titel (margin-left:auto). */
-    .assistent-kopf .titelzeile h1 { flex: 1 1 14rem; }
-    .assistent-kopf .titelzeile .anzeige-schalter { margin-left: auto; border-color: var(--kopf-linie); }
-    .assistent-kopf .titelzeile .anzeige-schalter button + button { border-left-color: var(--kopf-linie); }
+       sitzt er wieder rechts neben dem Titel (margin-left:auto). Gilt in beiden
+       Kennfarben-Köpfen (Start + Assistent). */
+    .seiten-kopf .titelzeile h1 { flex: 1 1 14rem; }
+    .seiten-kopf .titelzeile .anzeige-schalter { margin-left: auto; border-color: var(--kopf-linie); }
+    .seiten-kopf .titelzeile .anzeige-schalter button + button { border-left-color: var(--kopf-linie); }
     /* Immer sichtbarer Rücksprung zur Startseite im Kopfbereich. */
     .zur-start {
       display: inline-flex; border: none; background: none;
@@ -636,12 +637,18 @@
     @media (max-width: 540px) {
       .abfrage-aktionen { flex-direction: column; align-items: stretch; }
     }
-    /* Übersichts-Aktionen: auf schmalen Screens volle Breite statt zerfranstem
-       rechtsbündigem Stapel (klare Hierarchie, große Tippziele). */
+    /* Übersichts-Aktionen: die eine primäre Aktion steht heraus, die
+       Nebenaktionen bilden ein eigenes, leicht abgesetztes Cluster. */
+    .kopfzeile > span.uebersicht-aktionen { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; }
+    .uebersicht-aktionen .neben-aktionen { display: inline-flex; flex-wrap: wrap; gap: 0.4rem; }
+    /* Feine Trennlinie zwischen Primär und Nebenaktionen — nur wo sie in einer
+       Zeile stehen; nach einem Umbruch entfällt sie. */
+    .uebersicht-aktionen .neben-aktionen { padding-left: 0.5rem; border-left: var(--strich) solid var(--linie-fein); }
     @media (max-width: 540px) {
       /* Kompakt umbrechend statt vier gestapelter Vollbreite-Knöpfe: die
          Offene-Punkte-Karte darunter bleibt so beim Öffnen im Blickfeld. */
-      .kopfzeile > span.uebersicht-aktionen { display: flex; flex-wrap: wrap; gap: 0.4rem; width: 100%; }
+      .kopfzeile > span.uebersicht-aktionen { width: 100%; }
+      .uebersicht-aktionen .neben-aktionen { border-left: none; padding-left: 0; width: 100%; }
     }
 
     /* Touch-Zähler (− / Zahl / +) für die Meldekopf-Schnellerfassung: große
@@ -755,6 +762,11 @@
     /* Signatur/Authentizität: Herkunftshinweis, Meldungs-Badge und QR-Optionen. */
     .signatur-optionen { margin-top: 0.6rem; text-align: left; font-size: 0.88rem; }
     .signatur-optionen label { display: inline-flex; align-items: center; gap: 0.35rem; }
+    /* Technik-Erklärung zum Echtheits-Siegel eingeklappt — am Vorzeige-Punkt
+       trägt der Kern, das Detail (Ed25519, Schlüssel teilen) auf Wunsch. */
+    .signatur-detail > summary { cursor: pointer; font-size: var(--t-xs); font-weight: 600; color: var(--text-2); }
+    .signatur-detail > summary:hover { color: var(--akzent); }
+    .signatur-detail > .hinweis { margin-top: 0.3rem; }
     /* Freiwillige Absenderangaben zur Signatur (Name/E-Mail/Telefon). */
     .absenderkarte { border: 1px solid var(--rand); border-radius: 0.4rem; padding: 0.5rem 0.7rem 0.7rem; margin-top: 0.5rem; }
     .absenderkarte label.feld { display: block; }

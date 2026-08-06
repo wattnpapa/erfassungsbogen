@@ -4,7 +4,7 @@
  * einem einzelnen Schritt — alles hier wird von mehreren Schritten genutzt.
  */
 
-import { createContext, useContext, useId, useState, type ComponentProps, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useId, useState, type ComponentProps, type ReactNode } from "react";
 import { Erfassungsbogen, VokabularWert } from "../../model";
 import type { VokabularEintrag } from "../../vokabulare/thw";
 import { vokabSortiert, type Pruefpunkt } from "../hilfen";
@@ -43,9 +43,15 @@ export function VokabAuswahl(props: {
   aendern: (v: VokabularWert) => void;
   tabelle: VokabularEintrag[];
   platzhalter: string;
+  /** Lange Listen (Einheitstyp, Fahrzeugtyp) als tippbare Combobox statt als
+      Bildlauf-Select — Freitext bleibt möglich, eine Auswahl setzt den Code. */
+  suchbar?: boolean;
 }) {
-  const { wert, aendern, tabelle, platzhalter } = props;
+  const { wert, aendern, tabelle, platzhalter, suchbar } = props;
   const titel = useContext(FeldTitel);
+  if (suchbar && tabelle.length > 0) {
+    return <VokabCombobox wert={wert} aendern={aendern} tabelle={tabelle} platzhalter={platzhalter} />;
+  }
   if (tabelle.length === 0) {
     return (
       <input
@@ -84,6 +90,85 @@ export function VokabAuswahl(props: {
         />
       )}
     </span>
+  );
+}
+
+/**
+ * Vokabular-Auswahl als tippbare Combobox (für lange Listen wie Einheitstyp
+ * oder Fahrzeugtyp). Baut auf {@link VorschlagFeld} auf und bewahrt die
+ * Freitext-Fähigkeit von {@link VokabAuswahl}: Tippen ist Freitext, das Wählen
+ * eines Vorschlags setzt den Code (Grundlage der StAN-Vorbelegung).
+ *
+ * Der Anzeigetext lebt lokal (`eingabe`), wird aber bei externer Änderung des
+ * Werts (Landesvorlage, Organisationswechsel) nachgezogen. Ein gewählter Code
+ * erscheint als „Kürzel – Name", ein Freitext unverändert — damit „steht im
+ * Feld … der Wert" exakt den freitextbasierten Vorlagenwert liest.
+ */
+function VokabCombobox(props: {
+  wert: VokabularWert;
+  aendern: (v: VokabularWert) => void;
+  tabelle: VokabularEintrag[];
+  platzhalter: string;
+}) {
+  const { wert, aendern, tabelle, platzhalter } = props;
+  const sortiert = vokabSortiert(tabelle);
+  const label = (t: VokabularEintrag) => `${t.kurz} – ${t.name}`;
+  const ausCode = wert.code != null ? sortiert.find((t) => t.code === wert.code) : undefined;
+  const anzeige = ausCode ? label(ausCode) : (wert.freitext ?? "");
+  const [eingabe, setEingabe] = useState(anzeige);
+  // Externe Werteänderung (Vorlage/Org-Wechsel) in die Anzeige übernehmen.
+  useEffect(() => {
+    setEingabe(anzeige);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [wert.code, wert.freitext]);
+
+  const suche = eingabe.trim().toLowerCase();
+  const treffer = (
+    suche
+      ? sortiert.filter(
+          (t) =>
+            t.kurz.toLowerCase().includes(suche) ||
+            t.name.toLowerCase().includes(suche) ||
+            label(t).toLowerCase().includes(suche),
+        )
+      : sortiert
+  ).slice(0, 8);
+
+  return (
+    <VorschlagFeld
+      wert={eingabe}
+      platzhalter={platzhalter}
+      treffer={treffer}
+      schluessel={(t) => String(t.code)}
+      zeile={(t) => (
+        <>
+          {t.kurz}
+          <small>{t.name}</small>
+        </>
+      )}
+      tippen={(v) => {
+        setEingabe(v);
+        aendern({ freitext: v });
+      }}
+      waehlen={(t) => {
+        setEingabe(label(t));
+        aendern({ code: t.code });
+      }}
+      bestaetigen={(v) => {
+        setEingabe(v);
+        aendern({ freitext: v });
+      }}
+      verlassen={(v) => {
+        // Direkt eingetipptes Kürzel/Label beim Verlassen zum Code auflösen.
+        const t = sortiert.find(
+          (x) => label(x) === v || x.kurz.toLowerCase() === v.trim().toLowerCase(),
+        );
+        if (t) {
+          setEingabe(label(t));
+          aendern({ code: t.code });
+        }
+      }}
+    />
   );
 }
 

@@ -98,7 +98,7 @@ Funktionalität: Bogen übergeben — QR, PDF, Link, CSV
     Und ich das Feld "Sonstiges (Freitext)" mit "nachträglich ergänzt" fülle
     Und ich zum Schritt "6. Übersicht" wechsle
     Dann sehe ich den Hinweis "Unveränderter Bogen von fremder Stelle:" nicht
-    Und sehe ich den Hinweis "Signiert mit dem Geräteschlüssel"
+    Und sehe ich den Hinweis "Signiert mit dem Echtheits-Siegel"
 
   Szenario: Der hinterlegte Absender reist mit zum Empfänger
     Wenn ich auf "‹ Startseite" klicke

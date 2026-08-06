@@ -247,6 +247,7 @@ export function SchrittEinheit({ bogen, aendern }: SchrittProps) {
             }}
             tabelle={vokabularFuer(e.organisation, "einheitstyp")}
             platzhalter="z. B. Löschzug, SEG Sanität"
+            suchbar
           />
         </Feld>
       </div>

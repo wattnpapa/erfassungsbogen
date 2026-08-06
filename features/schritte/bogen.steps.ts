@@ -145,10 +145,16 @@ Then("heißt die Auswahlliste genau {string}", async function (this: EebWelt, na
       `Keine Auswahlliste heißt „${name}“. Vorhandene Namen: ${await auswahlNamen(this)}`,
     );
   }
-  const gefunden = await feld.evaluateAll((el) => el.map((e) => e.tagName.toLowerCase()));
-  if (gefunden.length !== 1 || gefunden[0] !== "select") {
+  // Gültig ist ein natives <select> ODER eine ARIA-Combobox (langes Vokabular
+  // wie Einheitstyp läuft als tippbares Suchfeld) — beide tragen denselben
+  // zugänglichen Namen, und genau das prüft dieses Szenario.
+  const gefunden = await feld.evaluateAll((el) =>
+    el.map((e) => `${e.tagName.toLowerCase()}${e.getAttribute("role") ? `[role=${e.getAttribute("role")}]` : ""}`),
+  );
+  const einzeln = gefunden.length === 1 ? gefunden[0] : undefined;
+  if (einzeln !== "select" && einzeln !== "input[role=combobox]") {
     throw new Error(
-      `Erwartet: genau eine Auswahlliste namens „${name}“ — gefunden: [${gefunden.join(", ")}]`,
+      `Erwartet: genau eine Auswahlliste/Combobox namens „${name}“ — gefunden: [${gefunden.join(", ")}]`,
     );
   }
 });

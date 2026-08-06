@@ -316,25 +316,31 @@ export function Uebersicht(props: {
       <section className="karte">
         <div className="kopfzeile">
           <h2>Gesamtübersicht</h2>
+          {/* Eine primäre Aktion, klar herausgehoben; die selteneren Wege
+              stehen als Nebenaktionen abgesetzt daneben, statt als vier
+              gleichrangige Knöpfe um den Blick zu konkurrieren. */}
           <span className="uebersicht-aktionen">
-            {props.sammelAktion && (
+            {props.sammelAktion ? (
               <button type="button" className="primaer" onClick={props.sammelAktion.onUebernehmen}>
                 {props.sammelAktion.label}
               </button>
-            )}{" "}
-            {/* Ein Weg zum Ziel: QR, Nahbereich (AirDrop/Quick Share), PDF, Link
-                und Datei tragen denselben Bogen — der Dialog bündelt sie mit
-                Situationshilfe, damit der Nutzer nicht raten muss. */}
-            <button type="button" className={props.sammelAktion ? "" : "primaer"} onClick={() => teilenDialog.current?.showModal()}>
-              Bogen übergeben…
-            </button>{" "}
-            {!props.sammelAktion && props.onInEinsatzAufnehmen && (
-              <>
-                <button type="button" onClick={props.onInEinsatzAufnehmen}>In Einsatz aufnehmen…</button>{" "}
-              </>
+            ) : (
+              // Ein Weg zum Ziel: QR, Nahbereich (AirDrop/Quick Share), PDF,
+              // Link und Datei tragen denselben Bogen — der Dialog bündelt sie.
+              <button type="button" className="primaer" onClick={() => teilenDialog.current?.showModal()}>
+                Bogen übergeben…
+              </button>
             )}
-            <button type="button" onClick={alsVorlageSpeichern}>Als Vorlage speichern</button>{" "}
-            <button type="button" onClick={() => void bogenVerwerfen()}>Neuer Bogen</button>
+            <span className="neben-aktionen">
+              {props.sammelAktion && (
+                <button type="button" onClick={() => teilenDialog.current?.showModal()}>Bogen übergeben…</button>
+              )}
+              {!props.sammelAktion && props.onInEinsatzAufnehmen && (
+                <button type="button" onClick={props.onInEinsatzAufnehmen}>In Einsatz aufnehmen…</button>
+              )}
+              <button type="button" onClick={alsVorlageSpeichern}>Als Vorlage speichern</button>
+              <button type="button" onClick={() => void bogenVerwerfen()}>Neuer Bogen</button>
+            </span>
           </span>
         </div>
         {fehler && <p className="fehler">{fehler}</p>}
@@ -546,20 +552,29 @@ export function Uebersicht(props: {
               hier etwas bearbeitet wird, ist es ein eigener Bogen und wird allein selbst signiert.
             </p>
           )}
+          {/* Kern sichtbar, Technik im Ausklapper: am Vorzeige-Punkt zählt „wer
+              hat signiert", nicht Kurvenname und Byte-Zahl. „Echtheits-Siegel"
+              bleibt der Leitbegriff (auch auf der Startseite); Ed25519 & Co.
+              stehen nur noch unter „Was das Siegel belegt". */}
           <p className="hinweis">
-            {qr?.weitergeleitet ? "Gegengezeichnet" : "Signiert"} mit dem Geräteschlüssel (Ed25519,
-            +97 Byte). Dieses Gerät: <strong>{schluesselKurz ?? "Schlüssel wird erzeugt…"}</strong>
-            {schluesselKurz && (
-              <>
-                {" · "}
-                <button type="button" className="link" onClick={schluesselTeilen}>
-                  öffentlichen Schlüssel anzeigen/teilen
-                </button>
-              </>
-            )}
-            <br />
-            Belegt Herkunft/Integrität, nicht die Identität — der private Schlüssel bleibt auf dem Gerät.
+            {qr?.weitergeleitet ? "Gegengezeichnet" : "Signiert"} mit dem Echtheits-Siegel dieses
+            Geräts: <strong>{schluesselKurz ?? "Schlüssel wird erzeugt…"}</strong>
           </p>
+          <details className="signatur-detail">
+            <summary>Was das Siegel belegt</summary>
+            <p className="hinweis">
+              Es belegt Herkunft und Integrität, nicht die Identität — der private Schlüssel bleibt
+              auf dem Gerät. Technisch eine Ed25519-Signatur (+97 Byte je Bogen).
+              {schluesselKurz && (
+                <>
+                  {" · "}
+                  <button type="button" className="link" onClick={schluesselTeilen}>
+                    öffentlichen Schlüssel anzeigen/teilen
+                  </button>
+                </>
+              )}
+            </p>
+          </details>
           <AbsenderkarteFeld karte={absender} onGespeichert={setAbsender} />
         </div>
       </section>
