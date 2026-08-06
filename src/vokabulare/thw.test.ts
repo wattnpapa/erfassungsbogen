@@ -2,7 +2,6 @@ import { describe, it, expect } from "vitest";
 import {
   FUNKRUF_KENNWOERTER,
   THW_EINHEITSTYPEN,
-  THW_EMAIL_TEMPLATES,
   THW_FAHRZEUGTYPEN,
   THW_FUNKTIONEN,
   THW_FUNKTIONEN_ALLE,
@@ -21,7 +20,6 @@ const TABELLEN: [string, VokabularEintrag[]][] = [
   ["THW_FUNKTIONEN_ALLE", THW_FUNKTIONEN_ALLE],
   ["THW_FAHRZEUGTYPEN", THW_FAHRZEUGTYPEN],
   ["FUNKRUF_KENNWOERTER", FUNKRUF_KENNWOERTER],
-  ["THW_EMAIL_TEMPLATES", THW_EMAIL_TEMPLATES],
 ];
 
 describe.each(TABELLEN)("Vokabular %s", (_name, tabelle) => {
