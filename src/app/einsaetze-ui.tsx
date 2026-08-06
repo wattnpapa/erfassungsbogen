@@ -8,7 +8,7 @@
  * Reine Anzeige + Aufruf der Store-/Auswertungslogik (einsaetze.ts, auswertung.ts).
  */
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   PersonalErfassung,
   datumZuIso,
@@ -254,11 +254,11 @@ export function EinsatzDetail(props: {
     </SeitenKopf>
     <main id="inhalt" tabIndex={-1} className="einsatz-detail">
       <section className="karte staerke-leiste">
-        <div><strong>{sum.einheiten}</strong><span>Einheiten</span></div>
-        <div><strong>{sum.staerke.fuehrer}</strong><span>Führer</span></div>
-        <div><strong>{sum.staerke.unterfuehrer}</strong><span>Unterf.</span></div>
-        <div><strong>{sum.staerke.mannschaft}</strong><span>Mannsch.</span></div>
-        <div className="gesamt"><strong>{sum.staerke.gesamt}</strong><span>Gesamt</span></div>
+        <div><Zaehlwert wert={sum.einheiten} /><span>Einheiten</span></div>
+        <div><Zaehlwert wert={sum.staerke.fuehrer} /><span>Führer</span></div>
+        <div><Zaehlwert wert={sum.staerke.unterfuehrer} /><span>Unterf.</span></div>
+        <div><Zaehlwert wert={sum.staerke.mannschaft} /><span>Mannsch.</span></div>
+        <div className="gesamt"><Zaehlwert wert={sum.staerke.gesamt} /><span>Gesamt</span></div>
       </section>
 
       <section className="karte">
@@ -449,6 +449,26 @@ export function EinsatzDetail(props: {
     </main>
     </>
   );
+}
+
+/**
+ * Zahl der Stärke-Leiste. Ändert eine neue Meldung den Wert, quittiert die
+ * Zahl das mit dem Aufblitzen aus index.html (.zahl-geaendert) — bewusst über
+ * das DOM statt über einen key: beim ersten Malen der Ansicht bleibt alles
+ * still, und bei schnellen Folgemeldungen (Kiosk-Scan) setzt die Animation
+ * dank Reflow auch dann neu an, wenn die Klasse schon gesetzt war.
+ */
+function Zaehlwert({ wert }: { wert: number }) {
+  const element = useRef<HTMLElement>(null);
+  const vorher = useRef(wert);
+  useEffect(() => {
+    if (vorher.current === wert || !element.current) return;
+    vorher.current = wert;
+    element.current.classList.remove("zahl-geaendert");
+    void element.current.offsetWidth;
+    element.current.classList.add("zahl-geaendert");
+  }, [wert]);
+  return <strong ref={element}>{wert}</strong>;
 }
 
 /**

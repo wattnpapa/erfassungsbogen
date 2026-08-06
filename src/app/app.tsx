@@ -1063,9 +1063,9 @@ function AppInhalt() {
         {/* Rückmeldungen stehen ÜBER den Aktionen: „Entwurf … wiederhergestellt"
             erklärt die Karte darüber, und unter den Knöpfen klebte der Kasten
             optisch an der Knopfreihe, statt ein eigener Block zu sein. */}
-        {meldung && <p className="meldung" role="status">{meldung}</p>}
+        {meldung && <p className="meldung" role="status" key={meldung}>{meldung}</p>}
         {fehler && <p className="fehler">{fehler}</p>}
-        {scanFortschritt && !scannerOffen && <p className="meldung" role="status">{scanFortschritt}</p>}
+        {scanFortschritt && !scannerOffen && <p className="meldung" role="status" key={scanFortschritt}>{scanFortschritt}</p>}
         {/* Zwei-Wege-Weiche: beide bestätigten Nutzergruppen (PRODUCT.md) mit
             gleichem Gewicht — die Einheit mit eigenem Bogen links, der
             Meldekopf rechts. Vorher gab es nur EINEN Primärknopf („Neuen
@@ -1266,7 +1266,7 @@ function AppInhalt() {
           dorthin, wo die Aktion ausgelöst wurde. Ohne diese Zeile blieben sie
           im Assistenten unsichtbar und tauchten später unvermittelt auf der
           Startseite auf. */}
-      {meldung && <p className="meldung" role="status">{meldung}</p>}
+      {meldung && <p className="meldung" role="status" key={meldung}>{meldung}</p>}
       {schritt === 0 && <SchrittEinheit bogen={bogen} aendern={aendern} />}
       {schritt === 1 && <SchrittEinsatz bogen={bogen} aendern={aendern} />}
       {schritt === 2 && <SchrittPersonal bogen={bogen} aendern={aendern} geheZu={setSchritt} />}
