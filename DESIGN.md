@@ -26,35 +26,51 @@ colors:
 typography:
   display:
     fontFamily: "Archivo Variable, Archivo, system-ui, sans-serif"
-    fontSize: "1.625rem"
+    fontSize: "1.75rem"
     fontWeight: 700
     lineHeight: 1.15
     letterSpacing: "-0.02em"
   headline:
     fontFamily: "Archivo Variable, Archivo, system-ui, sans-serif"
-    fontSize: "1.3125rem"
+    fontSize: "1.375rem"
     fontWeight: 700
     lineHeight: 1.2
     letterSpacing: "-0.015em"
   title:
     fontFamily: "Archivo Variable, Archivo, system-ui, sans-serif"
-    fontSize: "0.9375rem"
+    fontSize: "1.125rem"
+    fontWeight: 700
+    lineHeight: 1.5
+  subtitle:
+    fontFamily: "Archivo Variable, Archivo, system-ui, sans-serif"
+    fontSize: "1rem"
     fontWeight: 700
     lineHeight: 1.5
   body:
     fontFamily: "Archivo Variable, Archivo, system-ui, sans-serif"
-    fontSize: "0.9375rem"
+    fontSize: "1rem"
+    fontWeight: 400
+    lineHeight: 1.5
+  nebentext:
+    fontFamily: "Archivo Variable, Archivo, system-ui, sans-serif"
+    fontSize: "0.875rem"
     fontWeight: 400
     lineHeight: 1.5
   label:
     fontFamily: "Archivo Variable, Archivo, system-ui, sans-serif"
-    fontSize: "0.75rem"
+    fontSize: "0.8125rem"
     fontWeight: 600
     lineHeight: 1.5
   daten:
     fontFamily: "ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, monospace"
-    fontSize: "0.9375rem"
+    fontSize: "1rem"
     fontWeight: 400
+  zahl:
+    fontFamily: "ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, monospace"
+    fontSize: "2rem"
+    fontWeight: 700
+    lineHeight: 1.05
+    letterSpacing: "-0.02em"
 rounded:
   none: "0px"
 spacing:
@@ -154,17 +170,30 @@ Signalfarben — bewusst getrennt von der Kennfarbe, damit „erledigt" und „A
 **Character:** Eine technische Grotesk in DIN-Tradition — liest sich wie ein sauber gesetztes amtliches Formular, nicht wie eine Marketing-Seite. Hierarchie entsteht über Gewicht (700 vs. 400) und Größe, nie über Farbe.
 
 ### Hierarchy
-- **Display** (700, 1.625rem/`--t-2xl`, lh 1.15, ls −0.02em): `h1`, eine je Ansicht; `text-wrap: balance`.
-- **Headline** (700, 1.3125rem/`--t-xl`, lh 1.2, ls −0.015em): `h2`-Abschnittsüberschriften, ohne Linie, ohne Farbe.
-- **Title** (700, 0.9375rem/`--t-m`): `h3`-Gruppentitel innerhalb von Karten.
-- **Body** (400, 0.9375rem/`--t-m`, lh 1.5): Fließtext; Einleitungen max. 48ch.
-- **Label** (600, 0.75rem/`--t-xs`, Farbe `--text-2`): Feldbeschriftungen (`label.feld`) — halbfett und dunkel statt hellgrau, damit der Feldname draußen so sicher lesbar ist wie sein Inhalt.
-- **Daten** (Mono, 0.9375rem): Stärken, Kennzeichen, alles Tabellarische.
+
+Sechs Grade (`--t-xs` … `--t-2xl`) plus die Zählwert-Figur. Der Fließtext steht auf 1rem: 0.9375rem war am Schreibtisch elegant und in der maßgeblichen Nutzungssituation zu klein — der Feld-Modus musste die ganze Seite auf 112 % heben, nur um wieder auf ein normales Lesemaß zu kommen.
+
+- **Display** (700, 1.75rem/`--t-2xl`, lh 1.15, ls −0.02em): `h1`, eine je Ansicht; `text-wrap: balance`. Auf der Startseite `clamp(--t-xl, 4vw, --t-2xl)`.
+- **Headline** (700, 1.375rem/`--t-xl`, lh 1.2, ls −0.015em): `h2`-Abschnittsüberschriften, ohne Linie, ohne Farbe.
+- **Title** (700, 1.125rem/`--t-l`): `h3`-Gruppentitel innerhalb von Karten. Auch der Eintragstitel (`.einheit-name`) und die Einleitung der Startseite stehen hier.
+- **Subtitle** (700, 1rem/`--t-m`): `h4` — die Untergliederung in Aufteilen-Feld, Bogen-Details und Diff-Block.
+- **Body** (400, 1rem/`--t-m`, lh 1.5): Fließtext und alle Eingaben; Einleitungen max. 48ch.
+- **Nebentext** (400, 0.875rem/`--t-s`, Farbe `--text-2`): Nebenzeilen, Tabellen, Fußzeile, `h5`.
+- **Label** (600, 0.8125rem/`--t-xs`, Farbe `--text-2`): Feldbeschriftungen (`label.feld`) — halbfett und dunkel statt hellgrau, damit der Feldname draußen so sicher lesbar ist wie sein Inhalt.
+- **Versalzeile** (Mono, 700, 0.8125rem/`--t-xs`, ls 0.1em, uppercase, `--text-2`): Spaltenköpfe der Übersichtstabelle, die Beschriftungen unter den Stärkezahlen, die Fußzeilen-Gruppentitel — überall dieselbe Meldevordruck-Anmutung.
+- **Daten** (Mono, 1rem): Kennzeichen, Funkrufnamen, alles Tabellarische.
+- **Zählwert** (Mono, 700, 2rem/`--t-zahl`, lh 1.05, ls −0.02em, tabular-nums): die Stärke.
 
 ### Named Rules
-**Die Gewichts-Regel.** Hierarchie trägt Gewicht, nicht Farbe. Farbige Überschriften sind verboten; die Kennfarbe bleibt Aktionen vorbehalten.
+**Die Gewichts-Regel.** Hierarchie trägt Gewicht, nicht Farbe. Farbige Überschriften sind verboten; die Kennfarbe bleibt Aktionen vorbehalten. (Betraf zuletzt `h4` in Aufteilen-Feld, Bogen-Details und Diff-Block sowie die QR-Teil-Beschriftung — alle jetzt in Textfarbe.)
 
-**Die Feld-Modus-Schrift-Regel.** Der Feld-Modus hebt die Grundschrift auf 112 % und die kleinsten Grade an (`--t-xs` → 0.8125rem); nichts läuft draußen über Opacity oder Grauwerte zurück.
+**Die Zählwert-Regel.** Die Stärke ist die eine Zahl, wegen der der Bogen gelesen wird. Sie steht überall in `--t-zahl`, dicktengleich, fett — in der Gesamtübersicht wie in der Stärke-Leiste der Einsatz-Sammlung. Zwei Grade für dieselbe Auskunft lesen sich als zwei verschiedene Auskünfte.
+
+**Die Ein-Leiter-Regel.** Kein Bauteil setzt einen eigenen Schriftgrad. Jede Größe kommt aus `--t-*`; braucht eine Rolle wirklich einen neuen Grad, wird er als Token angelegt und hier eingetragen. Zwischenwerte wie 0.78rem, 0.88rem oder 0.92rem sehen im Einzelfall richtig aus und ergeben über eine Ansicht hinweg eine Leiter ohne Stufen — und sie entziehen sich der Feld-Modus-Korrektur.
+
+**Die Feld-Modus-Schrift-Regel.** Der Feld-Modus hebt die Grundschrift auf 112 % und zusätzlich die beiden kleinsten Grade um je einen Schritt (`--t-xs` → 0.875rem, `--t-s` → 0.9375rem), weil sie draußen zuerst wegbrechen; nichts läuft dort über Opacity oder Grauwerte zurück.
+
+**Die Dunkel-Ausgleichs-Regel.** Helle Schrift auf dunklem Grund läuft optisch zu. Dunkel- und Nacht-Modus gleichen das auf derselben Leiter aus — 0.006em Sperrung und lh 1.55 —, statt einen zweiten Satz Grade zu erfinden.
 
 ## Layout
 
@@ -266,3 +295,6 @@ Kästchenzeile für den segmentierten Transport (`teil-quittung.tsx`): je Teil e
 - **Don't** Schrift vom CDN laden — Archivo liegt im Bundle und muss offline verfügbar bleiben (PWA-Precache).
 - **Don't** in Spaltenrichtung `flex-wrap: wrap` mit einem Kind auf `flex-basis: 100%` kombinieren — der Umbruch geht dann in eine ZWEITE SPALTE und die Knöpfe laufen aus der Karte heraus. Regeln mit voller Hauptachsen-Basis gehören in eine `min-width`-Abfrage.
 - **Don't** dieselbe Zahl in zwei Größen setzen: die Stärke trägt überall die dicktengleiche Zählwert-Figur (Übersicht wie Einsatz-Sammlung).
+- **Don't** einen Schriftgrad direkt in ein Bauteil schreiben (0.9rem, 0.92rem, 0.6rem …) — nur `var(--t-*)`. Zwischenwerte entziehen sich der Feld-Modus-Korrektur und ergeben über eine Ansicht hinweg eine Leiter ohne Stufen (Ein-Leiter-Regel).
+- **Don't** Text über `opacity` zurücknehmen — dafür gibt es `--text-2`. Opacity trifft auch den Feld-Modus, in dem ausdrücklich nichts zurücktritt. (Ausgenommen: deaktivierte Knöpfe und durchgestrichene Einträge, die als Ganzes zurückgestellt sind.)
+- **Don't** eine Stärkeangabe umbrechen lassen — `0 / 2 / 6 / 8` ist eine Angabe, kein Satz. Wird es eng, gibt die Zeile nach oder der Grad rückt eine Stufe zurück, nie die Zahl selbst.

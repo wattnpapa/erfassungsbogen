@@ -183,12 +183,21 @@
       --schrift: "Archivo Variable", Archivo, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
       --schrift-daten: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
 
-      --t-xs:  0.75rem;
-      --t-s:   0.8125rem;
-      --t-m:   0.9375rem;
-      --t-l:   1.0625rem;
-      --t-xl:  1.3125rem;
-      --t-2xl: 1.625rem;
+      /* Sechs Grade, jeder mit genau einer Aufgabe. Der Fließtext steht auf
+         1rem: 15 px waren am Schreibtisch elegant und draußen zu klein —
+         der Feld-Modus musste die ganze Seite auf 112 % heben, um das
+         wieder einzuholen. Die Rolle heißt jetzt, was sie ist, und der
+         Feld-Modus korrigiert nur noch die beiden kleinsten Grade. */
+      --t-xs:  0.8125rem; /* gesperrte Versalzeile, Fußzeile, Etiketten */
+      --t-s:   0.875rem;  /* Nebentext, Tabellen, Kartenfußnoten */
+      --t-m:   1rem;      /* Fließtext, Eingaben, h4 */
+      --t-l:   1.125rem;  /* Einleitung, Eintragstitel, h3 */
+      --t-xl:  1.375rem;  /* h2, Zählwerte im Stepper */
+      --t-2xl: 1.75rem;   /* h1 */
+      /* Die Zählwert-Figur: die Stärke — die eine Zahl, wegen der der Bogen
+         gelesen wird. Sie steht in der Übersicht wie in der Einsatz-Sammlung
+         im selben Grad, sonst liest sich dieselbe Auskunft zweimal anders. */
+      --t-zahl: 2rem;
 
       --r-1: 0.25rem;
       --r-2: 0.5rem;
@@ -219,6 +228,13 @@
       --grau: var(--grund);
       --fehler: var(--alarm);
       --erledigt: var(--gut);
+    }
+    /* Ein Grad, ein Schritt: auf dem Telefon rückt die Zählwert-Figur eine
+       Stufe zurück — in der Gesamtübersicht und in der Stärke-Leiste
+       gleichzeitig, damit dieselbe Auskunft nie in zwei Größen nebeneinander
+       steht. Als Token statt je Bauteil, sonst laufen die beiden auseinander. */
+    @media (max-width: 30rem) {
+      :root { --t-zahl: 1.625rem; }
     }
     * { box-sizing: border-box; }
     body {
@@ -254,7 +270,14 @@
       line-height: 1.2; color: var(--text); margin: 0 0 var(--r-3);
       border: none; padding: 0; text-wrap: balance;
     }
-    h3 { font-size: var(--t-m); font-weight: 700; color: var(--text); margin: var(--r-4) 0 var(--r-1); }
+    /* Die Leiter läuft ohne Sprung durch: 28 – 22 – 18 – 16 px, jede Stufe
+       fett und in Textfarbe. h3 stand bisher im Grad des Fließtexts und
+       unterschied sich nur im Gewicht; h4 und h5 gab es überhaupt nur als
+       Ausnahme in einzelnen Karten — kleiner als der Text, den sie
+       überschreiben, und in der Kennfarbe. Beides ist hier aufgelöst. */
+    h3 { font-size: var(--t-l); font-weight: 700; color: var(--text); margin: var(--r-4) 0 var(--r-1); }
+    h4 { font-size: var(--t-m); font-weight: 700; color: var(--text); margin: var(--r-4) 0 var(--r-1); }
+    h5 { font-size: var(--t-s); font-weight: 700; color: var(--text); margin: var(--r-3) 0 var(--r-1); }
     /* Startseite linksbündig: ein Satzspiegel mit fester linker Kante wirkt
        verbindlicher als die zentrierte Mittelachse. */
     .start { text-align: left; }
@@ -467,7 +490,7 @@
     /* Startseite: der Titel ist hier die Hauptsache und darf größer stehen —
        der Kopf ist zugleich der Seitenaufmacher. */
     .seiten-kopf.start-kopf .kopf-inhalt { padding-bottom: var(--r-4); }
-    .seiten-kopf.start-kopf h1 { font-size: clamp(1.5rem, 4vw, 2rem); }
+    .seiten-kopf.start-kopf h1 { font-size: clamp(var(--t-xl), 4vw, var(--t-2xl)); }
     /* Das taktische Zeichen liegt auf der Kennfarbe. Ohne helle Unterlage
        verschwindet ein gleichfarbiges Symbol (THW-Blau auf THW-Blau) im
        Balken — die Zeichen sind ohnehin für weißes Papier gezeichnet. */
@@ -528,6 +551,10 @@
     input[type="checkbox"], input[type="radio"] {
       accent-color: var(--akzent); width: 1.1rem; height: 1.1rem; min-height: 0; padding: 0;
     }
+    /* Zahlenfelder und errechnete Werte stehen in den Formularen spaltenweise
+       untereinander (Stärke je Rolle, Summen). Dicktengleiche Ziffern halten
+       sie in der Flucht, statt die Zeile bei jeder Eingabe zucken zu lassen. */
+    input[type="number"], output.abgeleitet { font-variant-numeric: tabular-nums; }
     input::placeholder, textarea::placeholder { color: var(--text-3); }
     input:focus, select:focus, textarea:focus {
       outline: var(--fokus) solid var(--akzent); outline-offset: 0; border-color: var(--akzent);
@@ -559,7 +586,7 @@
     @media (min-width: 48rem) {
       .zeile > .zeilen-knopf-leer { display: block; flex: 0 0 2.75rem; }
     }
-    .inline { display: inline-flex; align-items: center; gap: 0.4rem; margin: 0.6rem 0.8rem 0 0; font-size: 0.9rem; }
+    .inline { display: inline-flex; align-items: center; gap: 0.4rem; margin: 0.6rem 0.8rem 0 0; font-size: var(--t-m); }
     /* Nur für Vorlesesoftware: aus dem Bild genommen, aber im Baum und damit
        vorlesbar. Kein display:none und kein visibility:hidden – die nähme jede
        Vorlesesoftware mit heraus. */
@@ -704,9 +731,20 @@
       align-items: baseline; gap: 0.15rem var(--r-5); font-size: var(--t-s); color: var(--text-2);
     }
     .einheit-kopf.leitzeile .einheit-staerke strong {
-      font-family: var(--schrift-daten); font-size: 1.5rem; line-height: 1.05;
+      font-family: var(--schrift-daten); font-size: var(--t-zahl); line-height: 1.05;
       font-weight: 700; letter-spacing: -0.01em; font-variant-numeric: tabular-nums;
       color: var(--text);
+      /* „0 / 2 / 6 / 8" ist eine Angabe, kein Satz: sie darf nie zwischen zwei
+         Zahlen umbrechen. Statt der Zahl gibt die Zeile nach — siehe die
+         Ausnahme für schmale Fenster weiter unten. */
+      white-space: nowrap;
+    }
+    /* Auf dem Telefon teilt sich das taktische Zeichen die Zeile nicht mehr mit
+       der Zahl: Name und Stärke bekommen die volle Kartenbreite, sonst passt die
+       ungebrochene Angabe im Feld-Modus nicht mehr hinein. */
+    @media (max-width: 30rem) {
+      .einheit-kopf.leitzeile { flex-wrap: wrap; }
+      .einheit-kopf.leitzeile > div { flex: 1 1 100%; }
     }
     img.fahrzeug-symbol { height: 2.4rem; width: auto; float: left; margin: 0.1rem 0.8rem 0.2rem 0; }
     /* Umflossen wird nur, wo Platz dafür ist: auf dem Telefon steht das
@@ -717,9 +755,9 @@
     /* In der Kopfzeile ist das Zeichen ein Glied der Zeile, kein Float: es
        führt den Eintrag an und die Kopflinie läuft darunter durch. */
     .eintrag-kopf > img.fahrzeug-symbol { float: none; flex: 0 0 auto; margin: 0 0 0.35rem; }
-    .legende { opacity: 0.75; }
+    .legende { color: var(--text-2); }
     /* Autosave-Anzeige im Assistenten-Kopf: leise Bestätigung statt Sorge. */
-    .autosave { margin: -0.5rem 0 0.8rem; font-size: 0.78rem; color: var(--erledigt); }
+    .autosave { margin: -0.5rem 0 0.8rem; font-size: var(--t-xs); color: var(--erledigt); }
     /* Startseite: Offline-Versprechen als grünes Badge unter dem Untertitel. */
     .offline-badge {
       display: inline-block; margin: var(--r-3) 0 0; padding: 0.3rem 0.7rem;
@@ -819,11 +857,11 @@
     .stepper { display: inline-flex; align-items: stretch; gap: 0.4rem; }
     .stepper button {
       width: 3.25rem; min-height: 3.25rem; padding: 0;
-      font-size: 1.6rem; line-height: 1;
+      font-size: var(--t-xl); line-height: 1;
       display: flex; align-items: center; justify-content: center;
     }
     .stepper input {
-      width: 3.75rem; text-align: center; font-size: 1.4rem;
+      width: 3.75rem; text-align: center; font-size: var(--t-xl);
       font-variant-numeric: tabular-nums; -moz-appearance: textfield; appearance: textfield;
     }
     .stepper input::-webkit-outer-spin-button,
@@ -883,12 +921,16 @@
       }
     }
     .staerke-leiste strong {
-      font-size: 1.75rem; line-height: 1.05; font-weight: 700;
+      font-size: var(--t-zahl); line-height: 1.05; font-weight: 700;
       letter-spacing: -0.02em; font-variant-numeric: tabular-nums;
     }
     .staerke-leiste > div.gesamt strong { color: var(--akzent); }
+    /* Die Beschriftung unter der Zahl stand auf 0.6rem — 9,6 px, und selbst im
+       Feld-Modus nur knapp 11. Sie sagt, WELCHE Zahl da steht; unlesbar ist sie
+       wertlos. Jetzt trägt sie den kleinsten Grad der Leiter, und die Sperrung
+       macht die Versalzeile trotzdem als Beschriftung kenntlich. */
     .staerke-leiste span {
-      font-family: var(--schrift-daten); font-size: 0.6rem; letter-spacing: 0.12em;
+      font-family: var(--schrift-daten); font-size: var(--t-xs); letter-spacing: 0.1em;
       text-transform: uppercase; color: var(--text-2); opacity: 1;
     }
     .muster-zeile { display: flex; align-items: center; gap: 0.7rem; padding: 0.55rem 0.2rem; border-top: 1px solid var(--rand); cursor: pointer; min-height: 44px; }
@@ -896,16 +938,19 @@
     .muster-zeile.gestrichen { opacity: 0.45; }
     .muster-zeile.gestrichen .muster-name { text-decoration: line-through; }
     .muster-text { display: flex; flex-direction: column; min-width: 0; }
-    .muster-name { font-size: 0.95rem; }
-    .muster-sub { font-size: 0.8rem; opacity: 0.65; }
-    .rolle-badge { flex: 0 0 auto; width: 1.5rem; height: 1.5rem; border-radius: 0.35rem; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 600; }
+    .muster-name { font-size: var(--t-m); }
+    /* Nebenzeile über Farbe zurücknehmen, nicht über Deckkraft: Opacity trifft
+       auch den Feld-Modus, der ausdrücklich nichts zurücktreten lässt — und ein
+       abgeblendetes Schwarz ist draußen in der Sonne einfach weg. */
+    .muster-sub { font-size: var(--t-s); color: var(--text-2); }
+    .rolle-badge { flex: 0 0 auto; width: 1.5rem; height: 1.5rem; border-radius: 0.35rem; display: flex; align-items: center; justify-content: center; font-size: var(--t-s); font-weight: 700; }
     .rolle-badge.rolle-f { background: #ede9fb; color: #3a2f7a; }
     .rolle-badge.rolle-u { background: #e2f3ec; color: #1c5c44; }
     .rolle-badge.rolle-m { background: #eceef3; color: #3a3f4a; }
     .muster-start { width: 100%; }
     .update-banner {
       display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 0.75rem;
-      background: var(--blau); color: #fff; padding: 0.5rem 1rem; font-size: 0.9rem;
+      background: var(--blau); color: #fff; padding: 0.5rem 1rem; font-size: var(--t-s);
     }
     .update-banner .primaer { background: #fff; color: var(--blau); border-color: #fff; }
     .update-banner .link { color: #cdd6f4; }
@@ -960,9 +1005,11 @@
     /* Segmentierung: mehrere QR-Teile nebeneinander mit „Teil x / n". */
     .qr-teile { display: flex; flex-wrap: wrap; gap: 1rem; justify-content: center; margin: 0.6rem 0; }
     .qr-teile figure { margin: 0; max-width: 200px; }
-    .qr-teile figcaption { font-size: 0.85rem; font-weight: 600; color: var(--blau); margin-top: 0.2rem; }
+    /* „Teil 2 / 3" ordnet die Codes, es ist keine Aktion — also Gewicht statt
+       Kennfarbe (die Kennfarbe gehört dem Kopfbalken und dem Primärknopf). */
+    .qr-teile figcaption { font-size: var(--t-s); font-weight: 700; color: var(--text); margin-top: 0.2rem; }
     /* Signatur/Authentizität: Herkunftshinweis, Meldungs-Badge und QR-Optionen. */
-    .signatur-optionen { margin-top: 0.6rem; text-align: left; font-size: 0.88rem; }
+    .signatur-optionen { margin-top: 0.6rem; text-align: left; font-size: var(--t-s); }
     .signatur-optionen label { display: inline-flex; align-items: center; gap: 0.35rem; }
     /* Technik-Erklärung zum Echtheits-Siegel eingeklappt — am Vorzeige-Punkt
        trägt der Kern, das Detail (Ed25519, Schlüssel teilen) auf Wunsch. */
@@ -973,7 +1020,7 @@
     .absenderkarte { border: 1px solid var(--rand); border-radius: 0.4rem; padding: 0.5rem 0.7rem 0.7rem; margin-top: 0.5rem; }
     .absenderkarte label.feld { display: block; }
     .absenderkarte .zeile > label.feld { flex: 1 1 12rem; }
-    .signatur-herkunft { font-size: 0.9rem; border: 1px solid var(--rand); border-radius: 0.4rem; padding: 0.4rem 0.6rem; margin: 0.4rem 0; }
+    .signatur-herkunft { font-size: var(--t-s); border: 1px solid var(--rand); border-radius: 0.4rem; padding: 0.4rem 0.6rem; margin: 0.4rem 0; }
     .signatur-herkunft.gueltig { background: var(--gut-fond); border-color: var(--gut-linie); color: var(--gut); }
     .signatur-herkunft.ungueltig { background: var(--alarm-fond); border-color: var(--alarm-linie); color: var(--alarm); }
     .signatur-badge { white-space: nowrap; font-weight: 600; }
@@ -986,7 +1033,7 @@
       display: inline-block; margin-left: 0.4rem; padding: 0 0.35rem;
       background: var(--warn-fond); color: var(--warn-text);
       border: 1px solid var(--warn-linie); border-radius: 0.35rem;
-      font-size: 0.75rem; font-weight: 700; letter-spacing: 0.06em;
+      font-size: var(--t-xs); font-weight: 700; letter-spacing: 0.06em;
       vertical-align: 0.1em;
     }
     /* Meldungen, die nicht mitzählen (abgerückt oder in eine andere Meldung
@@ -1010,15 +1057,15 @@
     .zug-badge, .teil-badge {
       display: inline-block; margin-left: 0.4rem; padding: 0 0.35rem;
       border: 1px solid var(--rand); border-radius: 0.35rem;
-      font-size: 0.75rem; font-weight: 600; color: var(--text-2);
+      font-size: var(--t-xs); font-weight: 600; color: var(--text-2);
       vertical-align: 0.1em; white-space: nowrap;
     }
     .teil-badge { border-color: var(--akzent); color: var(--akzent); }
     /* Aufteilen-Feld in der Einheitenkarte: gleiche Handschrift wie die
        ausklappbare Vollansicht, damit die Karte nicht in Kästen zerfällt. */
     .aufteilen-panel { margin-top: 0.6rem; border-top: 1px solid var(--rand); padding-top: 0.4rem; }
-    .aufteilen-panel h4 { margin: 0 0 0.2rem; font-size: 0.9rem; color: var(--blau); }
-    .aufteilen-panel h5 { margin: 0.7rem 0 0; font-size: 0.85rem; }
+    .aufteilen-panel h4 { margin: 0 0 0.2rem; }
+    .aufteilen-panel h5 { margin: 0.7rem 0 0; }
     .aufteilen-panel .muster-zeile { cursor: default; }
     .aufteilen-vorschau { margin: 0.5rem 0 0.2rem; font-variant-numeric: tabular-nums; }
     .aufteilen-fehler { color: var(--alarm); opacity: 1; }
@@ -1030,15 +1077,15 @@
     .zeile.einheiten-filter > label.feld.sortierung { flex: 0 1 15rem; }
     /* Ausklappbare Vollansicht einer gemeldeten Einheit in der Einsatz-Sammlung. */
     .bogen-details { margin-top: 0.6rem; border-top: 1px solid var(--rand); padding-top: 0.4rem; }
-    .bogen-details h4 { margin: 0.8rem 0 0.2rem; font-size: 0.9rem; color: var(--blau); }
+    .bogen-details h4 { margin: 0.8rem 0 0.2rem; }
     .bogen-details h4:first-child { margin-top: 0; }
     /* Änderungen gegenüber der vorherigen Meldung („Folgemeldung"): Bewegung
        statt Bestand — durchgestrichener Altwert, hervorgehobener Neuwert,
        Zu-/Abgänge in den Signalfarben (die der Nacht-Modus mitzieht). */
     .diff-block { margin-top: 0.6rem; border-top: 1px solid var(--rand); padding-top: 0.4rem; }
-    .diff-block h4 { margin: 0.7rem 0 0.15rem; font-size: 0.9rem; color: var(--blau); }
+    .diff-block h4 { margin: 0.7rem 0 0.15rem; }
     .diff-block > .hinweis { margin: 0 0 0.2rem; }
-    ul.diff-liste { margin: 0.1rem 0; padding-left: 1.1rem; font-size: 0.92rem; }
+    ul.diff-liste { margin: 0.1rem 0; padding-left: 1.1rem; font-size: var(--t-s); }
     ul.diff-liste li { overflow-wrap: anywhere; }
     .diff-feld { color: var(--text-2); }
     .diff-vorher { text-decoration: line-through; color: var(--text-2); }
@@ -1048,20 +1095,22 @@
     .diff-zeichen { font-weight: 700; font-family: var(--schrift-daten); }
     /* Kurzfassung in der Einheitenzeile: dieselbe Nebenzeile, aber lesbar statt
        abgeblendet — sie ist der eigentliche Übergabehinweis. */
-    .muster-sub.diff-kurz { opacity: 1; color: var(--akzent); font-weight: 600; }
+    .muster-sub.diff-kurz { color: var(--akzent); font-weight: 600; }
     /* Treffer des Qualifikationsfilters: die Namen sind hier die Antwort auf die
        Frage, also volle Deckkraft statt zurückgenommener Unterzeile. */
-    .muster-sub.quali-treffer { opacity: 1; color: var(--text); }
+    .muster-sub.quali-treffer { color: var(--text); }
     .historie .diff-block { margin-bottom: 0.6rem; }
     /* minmax(0, …) statt blanker Spuren: sonst zwingt ein langes, nicht
        trennbares Wort (E-Mail-Adresse, Funkrufname) die Spalte breiter als die
        Karte und die ganze Ansicht läuft auf dem Telefon nach rechts aus. */
     dl.paare {
       display: grid; grid-template-columns: minmax(0, max-content) minmax(0, 1fr);
-      gap: 0.2rem 1rem; margin: 0.4rem 0; font-size: 0.92rem;
+      gap: 0.2rem 1rem; margin: 0.4rem 0; font-size: var(--t-s);
     }
     dl.paare dt { color: var(--text-2); }
-    dl.paare dd { margin: 0; overflow-wrap: anywhere; }
+    /* In den Wertspalten stehen Stärken, Kennzeichen und Funkrufnamen
+       untereinander — dicktengleich fluchten die Ziffern, statt zu tanzen. */
+    dl.paare dd { margin: 0; overflow-wrap: anywhere; font-variant-numeric: tabular-nums; }
     /* Seiten-Fußzeile: margin-top auto = ans Viewport-Ende; Abstand unten,
        damit die fixe Schritt-Navigation sie nicht verdeckt. */
     /* Seiten-Fußzeile: statt einer zentrierten Reihe gleich gewichteter Links
@@ -1080,7 +1129,11 @@
       padding: var(--r-5) var(--r-4) 5rem;
       display: flex; flex-direction: column; gap: var(--r-4);
       border-top: var(--strich) solid var(--linie);
-      font-size: var(--t-xs); color: var(--text-2);
+      /* Nebentext, nicht Kleingedrucktes: die Fußzeile trägt die Links, über
+         die man Anleitung und Impressum findet. Die Gruppentitel darüber
+         stehen einen Grad kleiner, gesperrt und fett — Sperrung und Gewicht
+         trennen sie, nicht ein weiterer Schritt nach unten. */
+      font-size: var(--t-s); color: var(--text-2);
     }
     .fuss-gruppen {
       display: grid; gap: var(--r-4) var(--r-5);
@@ -1088,7 +1141,7 @@
     }
     .fuss-gruppe { display: flex; flex-direction: column; align-items: flex-start; gap: 0.35rem; }
     .fuss-titel {
-      font-family: var(--schrift-daten); font-size: 0.6rem; letter-spacing: 0.12em;
+      font-family: var(--schrift-daten); font-size: var(--t-xs); font-weight: 700; letter-spacing: 0.1em;
       /* --text-2 statt --text-3: die winzige Versalzeile braucht 4,5:1 Kontrast
          (WCAG AA), --text-3 schafft auf dem Seitengrund nur knapp 3:1. */
       text-transform: uppercase; color: var(--text-2);
@@ -1417,6 +1470,10 @@
       padding-bottom: 0;
     }
     .platform-ios h3 { font: -apple-system-headline; color: var(--ios-text); }
+    /* Die beiden Untergliederungen laufen unter dem Headline-Grad weiter, damit
+       auch sie an Dynamic Type hängen statt an einem festen rem-Wert. */
+    .platform-ios h4 { font: -apple-system-subheadline; font-weight: 600; color: var(--ios-text); }
+    .platform-ios h5 { font: -apple-system-footnote; font-weight: 600; color: var(--ios-text); }
     .platform-ios label.feld { font: -apple-system-subheadline; color: var(--ios-text-2); }
     .platform-ios .inline { font: -apple-system-subheadline; min-height: 44px; }
     .platform-ios .hinweis { font: -apple-system-footnote; color: var(--ios-text-2); }
@@ -1716,6 +1773,18 @@
       font-weight: 500;
       letter-spacing: 0.009375em;
       color: var(--md-on-surface);
+    }
+    .platform-android h4 {
+      font-size: 0.875rem;           /* title-small */
+      font-weight: 500;
+      letter-spacing: 0.00714em;
+      color: var(--md-on-surface);
+    }
+    .platform-android h5 {
+      font-size: 0.875rem;           /* label-large */
+      font-weight: 500;
+      letter-spacing: 0.00714em;
+      color: var(--md-on-surface-variant);
     }
     .platform-android label.feld {
       font-size: 0.875rem;           /* body-medium */
@@ -2084,14 +2153,17 @@
       --strich-stark: 2px;
       --fokus:        4px;
       --ziel:         0.75rem; /* zieht alle Tippziele von 36 auf 48 px */
-      --t-xs: 0.8125rem;
-      --t-s:  0.875rem;
+      /* Die 112 % heben die ganze Leiter; die beiden kleinsten Grade bekommen
+         zusätzlich je einen Schritt, weil sie draußen zuerst wegbrechen —
+         gesperrte Versalzeilen und Nebentext stehen dann bei 16 bzw. 17 px. */
+      --t-xs: 0.875rem;
+      --t-s:  0.9375rem;
     }
     /* Draußen darf nichts „zurücktreten": Beschriftungen fett und schwarz,
-       nichts läuft über Transparenz oder Grauwerte. */
+       nichts läuft über Transparenz oder Grauwerte. Die Nebenzeilen brauchen
+       hier keinen eigenen Block mehr — sie treten seit dem Typografie-Pass
+       ohnehin über --text-2 zurück, und der ist im Feld-Modus fast schwarz. */
     .feld-modus label.feld { color: var(--text); font-weight: 700; }
-    .feld-modus .muster-sub, .feld-modus .staerke-leiste span,
-    .feld-modus ul.vorschlaege li small { opacity: 1; color: var(--text-2); }
     .feld-modus input[type="checkbox"], .feld-modus input[type="radio"] { width: 1.7rem; height: 1.7rem; }
     .feld-modus .stepper button { width: 3.75rem; min-height: 3.75rem; }
     /* iOS und Android rechnen Fläche und Schrift aus ihrer eigenen Palette
@@ -2179,6 +2251,12 @@
     .dunkel-modus .offline-badge { color: var(--gut); border-color: var(--gut); }
     /* QR-Bilder behalten ihre weiße Ruhezone — sonst sind sie unscannbar. */
     .dunkel-modus .qr-box img { background: #fff; padding: 8px; }
+
+    /* Helle Schrift auf dunklem Grund läuft optisch zu: die Punzen füllen sich,
+       Zeilen rücken zusammen. Beides wird auf derselben Leiter ausgeglichen,
+       ohne einen zweiten Satz Grade zu erfinden — eine Spur Sperrung und ein
+       Hauch mehr Durchschuss. Gilt für beide dunklen Modi. */
+    .dunkel-modus body, .nacht-modus body { letter-spacing: 0.006em; line-height: 1.55; }
 
     /* ---------------------------------------------------------------
        Nacht-Modus: gedimmte, warme Darstellung für Nachteinsätze (Zelt,
