@@ -54,6 +54,7 @@ import { boegenAusPdfBytes, einsatzAusDatei, einsatzAusPdfBytes, einsatzDateiInh
 import { einsatzCsvInhalt } from "./einsatz-csv";
 import { einsatzDetailCsvInhalt } from "./bogen-csv";
 import { QrScannerWeb } from "./qr-scanner-web";
+import { TeilQuittung, fehlendeTeile, fehltNochSatz } from "./teil-quittung";
 import { qrAusBild } from "./qr-bild";
 import { entwurfLaden, entwurfSpeichern, entwurfVerwerfen } from "./entwurf";
 import { SeitenKopf } from "./seiten-kopf";
@@ -304,13 +305,15 @@ function AppInhalt() {
   // Segmentierung: gesammelte Teile eines großen Bogens (Zustand als Ref, damit
   // der laufende Kamera-/Native-Scan darauf zugreift) + Fortschrittstext fürs Overlay.
   const segmentTeileRef = useRef<SegmentTeil[]>([]);
-  // Dasselbe fürs Rendern: liegen Teile eines noch UNvollständigen Bogens im
+  // Dasselbe fürs Rendern: der Sammelstand speist die Kästchenzeile
+  // (TeilQuittung), und liegen Teile eines noch UNvollständigen Bogens im
   // Speicher, nimmt Schließen tatsächlich etwas zurück — das steht dann auch
   // auf dem Knopf (siehe Kiosk-Scanner weiter unten).
-  const [segmenteOffen, setSegmenteOffen] = useState(false);
+  const [segmentStand, setSegmentStand] = useState<SegmentTeil[]>([]);
+  const segmenteOffen = segmentStand.length > 0;
   const setzeSegmentTeile = (teile: SegmentTeil[]) => {
     segmentTeileRef.current = teile;
-    setSegmenteOffen(teile.length > 0);
+    setSegmentStand(teile);
   };
   const [scanFortschritt, setScanFortschritt] = useState("");
 
@@ -590,12 +593,16 @@ function AppInhalt() {
           return uebernimmBogen(b, status, payload);
         }
         setFehler("");
+        // Die fehlenden Teile ausdrücklich benennen, statt sie ausrechnen zu
+        // lassen: „es fehlt noch Teil 4" ist im Feld die Anweisung, „3 von 5"
+        // nur ein Zwischenstand. Die Kästchenzeile zeigt dasselbe fürs Auge.
+        const fehlt = fehltNochSatz(r.teile);
         setScanFortschritt(
           r.status === "duplikat"
-            ? `Teil ${teil.teilNr} war schon dabei — ${r.haben} von ${r.anzahl} Teilen gescannt.`
+            ? `Teil ${teil.teilNr} war schon dabei — ${fehlt}.`
             : r.status === "fremd"
-              ? `Anderer Bogen erkannt — neu begonnen (Teil ${teil.teilNr} von ${r.anzahl}).`
-              : `Teil ${r.haben} von ${r.anzahl} gescannt — bitte die übrigen Teile zeigen.`,
+              ? `Anderer Bogen erkannt — neu begonnen (Teil ${teil.teilNr} von ${r.anzahl}); ${fehlt}.`
+              : `Teil ${r.haben} von ${r.anzahl} gescannt — ${fehlt}.`,
         );
         return false;
       } catch {
@@ -719,9 +726,14 @@ function AppInhalt() {
       // bei mehreren Teilen so lange, bis alle gescannt sind oder abgebrochen wird.
       for (;;) {
         const teile = segmentTeileRef.current;
+        // Der native Scanner nimmt nur eine Textzeile an — dort ist der Satz
+        // die einzige Auskunft und nennt deshalb den nächsten fehlenden Teil
+        // als Anweisung (im Web-Overlay zeigt zusätzlich die Kästchenzeile,
+        // was noch aussteht).
+        const fehlen = fehlendeTeile(teile);
         const anweisung =
-          teile.length > 0
-            ? `Teil ${teile.length} von ${teile[0]!.anzahl} gescannt — nächsten Teil in den Rahmen halten`
+          teile.length > 0 && fehlen.length > 0
+            ? `Teil ${teile.length} von ${teile[0]!.anzahl} gescannt — jetzt Teil ${fehlen[0]} in den Rahmen halten`
             : "QR-Code des Erfassungsbogens in den Rahmen halten";
         const text = await qrScannen(anweisung);
         if (!text) {
@@ -999,6 +1011,7 @@ function AppInhalt() {
             fortschritt={scanFortschritt}
             onAbbruch={() => scanAbbrechen(true)}
             onBild={ladeQrBild}
+            teile={segmentStand}
             abbruchText={segmenteOffen ? "Abbrechen" : "Fertig"}
           />
         )}
@@ -1065,7 +1078,15 @@ function AppInhalt() {
             optisch an der Knopfreihe, statt ein eigener Block zu sein. */}
         {meldung && <p className="meldung" role="status" key={meldung}>{meldung}</p>}
         {fehler && <p className="fehler">{fehler}</p>}
-        {scanFortschritt && !scannerOffen && <p className="meldung" role="status" key={scanFortschritt}>{scanFortschritt}</p>}
+        {/* Ohne Kamera-Overlay (nativer Scan, „QR aus Bild einlesen") steht der
+            Fortschritt hier — mit derselben Kästchenzeile, damit auch dieser
+            Weg zeigt, welcher Teil noch aussteht. */}
+        {scanFortschritt && !scannerOffen && (
+          <>
+            <p className="meldung" role="status" key={scanFortschritt}>{scanFortschritt}</p>
+            <TeilQuittung teile={segmentStand} />
+          </>
+        )}
         {/* Zwei-Wege-Weiche: beide bestätigten Nutzergruppen (PRODUCT.md) mit
             gleichem Gewicht — die Einheit mit eigenem Bogen links, der
             Meldekopf rechts. Vorher gab es nur EINEN Primärknopf („Neuen
@@ -1135,7 +1156,7 @@ function AppInhalt() {
           </section>
         </div>
         {scannerOffen && (
-          <QrScannerWeb onErgebnis={scanErgebnisWeb} fortschritt={scanFortschritt} onAbbruch={() => scanAbbrechen(false)} onBild={ladeQrBild} />
+          <QrScannerWeb onErgebnis={scanErgebnisWeb} fortschritt={scanFortschritt} onAbbruch={() => scanAbbrechen(false)} onBild={ladeQrBild} teile={segmentStand} />
         )}
         {/* Erststart ohne Daten: das Grundprinzip prominent direkt unter den
             Aktionen erklären — der USP steckt sonst nur im Untertitel. Mit

@@ -7,6 +7,8 @@
 import { useEffect, useRef, useState, type ChangeEvent } from "react";
 import type jsQRTyp from "jsqr";
 import { gemerkteKamera, kameraListe, merkeKamera, type Kamera } from "./kamera";
+import { TeilQuittung } from "./teil-quittung";
+import type { SegmentTeil } from "../codec";
 
 /** Was schiefging (ein Satz) und was dagegen hilft (kurze Schritte). */
 type KameraFehler = { text: string; schritte?: string[] };
@@ -86,6 +88,11 @@ export function QrScannerWeb(props: {
   onAbbruch: () => void;
   /** Fortschritt bei Segmentierung, z. B. „Teil 1 von 2 gescannt". */
   fortschritt?: string;
+  /**
+   * Sammelstand eines mehrteiligen Bogens — wird als Kästchenzeile unter dem
+   * Hinweis gezeigt, damit beim Abfilmen sichtbar ist, welcher Teil noch fehlt.
+   */
+  teile?: SegmentTeil[];
   /**
    * Beschriftung des Schließen-Knopfes. Standard „Abbrechen" — beim
    * Kiosk-Scan (Meldekopf) sind die Bögen aber schon aufgenommen, dort
@@ -254,7 +261,14 @@ export function QrScannerWeb(props: {
             {props.onBild && <p>Ohne Kamera geht es weiter über ein Foto oder einen Screenshot des QR-Codes.</p>}
           </div>
         )
-        : <p className="scanner-text">{props.fortschritt || "QR-Code des Erfassungsbogens vor die Kamera halten"}</p>}
+        : (
+          <div className="scanner-text">
+            {/* role="status": der Fortschritt wechselt mit jedem gelesenen Teil
+                — ohne Ansage wüsste ein Screenreader im Overlay nichts davon. */}
+            <p role="status">{props.fortschritt || "QR-Code des Erfassungsbogens vor die Kamera halten"}</p>
+            <TeilQuittung teile={props.teile ?? []} />
+          </div>
+        )}
       {!fehler && <div className="scanner-rahmen" aria-hidden="true" />}
       <div className="scanner-aktionen">
         {kameras.length > 1 && !fehler && (

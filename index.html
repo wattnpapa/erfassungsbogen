@@ -1028,6 +1028,42 @@
       table.uebersicht.beispiele td.zahl::before { content: "Stärke "; color: var(--text-2); }
       .beispiel-aktionen { gap: 1.2rem; padding-top: 0.3rem; }
     }
+    /* Teil-Quittung: Kästchenzeile des mehrteiligen QR-Transports (siehe
+       teil-quittung.tsx). Ein gefülltes Kästchen sagt auf einem amtlichen Bogen
+       genau das, was hier gemeint ist: eingegangen. Offene Teile bleiben leer.
+       Die Farben laufen über eigene Kanäle, weil die Zeile in zwei Welten steht
+       — auf den Token-Flächen der App und im Scanner-Overlay über dem
+       Kamerabild, wo (wie beim übrigen Overlay-Text) nur Weiß auf Schwarz
+       trägt. */
+    .teil-quittung {
+      --quittung-linie: var(--linie-stark);
+      --quittung-ein: var(--gut);
+      /* --grund statt Weiß: Kennzeichenfarbe und Grund sind in jeder Belegung
+         gegenläufig hell/dunkel — damit trägt die Schrift im gefüllten Kästchen
+         auch im aufgehellten Grün des Dunkel- und Nacht-Modus. */
+      --quittung-auf-ein: var(--grund);
+      --quittung-text: var(--text-2);
+      list-style: none; margin: var(--r-3) 0 0; padding: 0;
+      display: flex; flex-wrap: wrap; gap: var(--r-2);
+    }
+    .teil-quittung > li {
+      /* Kästchengröße in em: die 112-%-Schrift des Feld-Modus vergrößert die
+         Zeile mit, ohne eigenen Modus-Block. Keine Trefferfläche — deshalb
+         bewusst ohne --ziel. */
+      font-family: var(--schrift-daten); font-size: var(--t-s); font-weight: 700;
+      min-width: 2.2em; min-height: 2.2em;
+      display: flex; align-items: center; justify-content: center;
+      border: var(--strich-stark) solid var(--quittung-linie);
+      border-radius: var(--radius); color: var(--quittung-text);
+    }
+    /* Abgestempelt. Der Unterschied liegt in der Füllung, nicht nur in der
+       Farbe — sonst wäre der Stand allein farbig kodiert. Es ist derselbe
+       Eingangsstempel wie bei den Rückmeldungen: der Teil kommt an. */
+    .teil-quittung > li.ein {
+      background: var(--quittung-ein); border-color: var(--quittung-ein);
+      color: var(--quittung-auf-ein);
+      animation: stempel var(--dauer-2) var(--kurve);
+    }
     .scanner {
       position: fixed; inset: 0; z-index: 100; background: #000;
       display: flex; flex-direction: column; align-items: center;
@@ -1046,6 +1082,7 @@
       max-width: 34rem;
       text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
     }
+    .scanner-text > p { margin: 0; }
     .scanner-text.fehler { color: #ffb4ab; display: grid; gap: 0.6rem; }
     .scanner-text.fehler p { margin: 0; }
     /* Die zwei Freigabe-Stellen sind eine Anleitung, keine Fließtextwand:
@@ -1053,6 +1090,17 @@
     .scanner-schritte {
       margin: 0; padding-left: 1.2rem; text-align: left;
       display: grid; gap: 0.4rem;
+    }
+    /* Die Quittung im Overlay: über dem Kamerabild trägt kein Rollen-Token,
+       deshalb dieselbe Weiß-auf-Video-Sprache wie der Overlay-Text. Zentriert,
+       weil sie hier unter dem mittigen Hinweis steht — nicht auf dem
+       linksbündigen Satzspiegel der Startseite. */
+    .scanner .teil-quittung {
+      --quittung-linie: rgba(255, 255, 255, 0.9);
+      --quittung-ein: #fff;
+      --quittung-auf-ein: #000;
+      --quittung-text: #fff;
+      justify-content: center; margin-top: var(--r-2);
     }
     .scanner-rahmen {
       width: min(65vw, 55vh); aspect-ratio: 1;
