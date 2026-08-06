@@ -192,7 +192,8 @@ export function kennzeichenText(f: Fahrzeug): string {
 
 /** Erreichbarkeit einer Person wie im Bogenkopf/PDF ("Mobil: … (D)"). */
 export function kontaktText(k: Kontakt): string {
-  if (k.emailTemplate === 1) return "eMail: Standard (D)";
+  // Alte Bögen konnten statt einer Adresse ein Template tragen (siehe Kontakt).
+  if (k.emailTemplate != null) return `eMail: — (${k.dienstlich ? "D" : "P"})`;
   const art = k.art === KontaktArt.EMAIL ? "eMail" : k.art === KontaktArt.MOBIL ? "Mobil" : "Tel";
   return `${art}: ${k.wert ?? ""} (${k.dienstlich ? "D" : "P"})`;
 }

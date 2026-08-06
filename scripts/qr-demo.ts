@@ -82,7 +82,7 @@ const bogen: Erfassungsbogen = {
       ...P("Johannes", "Rudolph", R.UNTERFUEHRER, [V(3), V(7)], FE.C, G.M),
       kontakte: [
         { art: KontaktArt.MOBIL, dienstlich: false, wert: "01701234501" },
-        { art: KontaktArt.EMAIL, dienstlich: true, emailTemplate: 1 },
+        { art: KontaktArt.EMAIL, dienstlich: true, wert: "johannes.rudolph@example.org" },
       ],
     },
     P("Jonas", "Bergmann", R.UNTERFUEHRER, [V(4), V(35)], FE.B, G.M, "01701234502"),

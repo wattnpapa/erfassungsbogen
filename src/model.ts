@@ -169,10 +169,16 @@ export interface Kontakt {
   dienstlich: boolean; // D = dienstlich / P = privat
   /**
    * MOBIL/FESTNETZ: nur Ziffern, z. B. "01712345678" (QR: BCD-gepackt).
-   * EMAIL: Freitext ODER weglassbar, wenn emailTemplate gesetzt.
+   * EMAIL: Freitext ODER weglassbar, wenn (alt) emailTemplate gesetzt ist.
    */
   wert?: string;
-  /** Organisationsspezifisches Adress-Template, z. B. THW 1 = vorname.nachname@thw-<ov-slug>.de */
+  /**
+   * Nur noch für alte Bögen: früher konnte statt der Adresse ein
+   * organisationsweites Template hinterlegt werden (THW 1 =
+   * vorname.nachname@thw-<ov-slug>.de). So eine Standardadresse gibt es nicht,
+   * das Feld wird nicht mehr erzeugt — Decoder und Anzeige lesen es weiter,
+   * damit alte QR-Codes und Dateien gültig bleiben.
+   */
   emailTemplate?: number;
 }
 

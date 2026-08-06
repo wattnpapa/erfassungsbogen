@@ -624,7 +624,8 @@ export function pdfDokument(b: Erfassungsbogen, qr: QrSatz): TDocumentDefinition
   for (const p of b.personal) {
     const kontakte = p.kontakte
       .map((k) => {
-        if (k.emailTemplate === 1) return "eMail: vorname.nachname@… (D)";
+        // Alte Bögen konnten statt einer Adresse ein Template tragen (siehe Kontakt).
+        if (k.emailTemplate != null) return `eMail: — (${k.dienstlich ? "D" : "P"})`;
         const art = k.art === KontaktArt.EMAIL ? "eMail" : k.art === KontaktArt.MOBIL ? "Mobil" : "Telefon";
         return `${art}: ${weichUmbrechen(k.wert ?? "")} (${k.dienstlich ? "D" : "P"})`;
       })
