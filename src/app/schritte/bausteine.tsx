@@ -12,6 +12,8 @@ import { vokabSortiert, type Pruefpunkt } from "../hilfen";
 export type SchrittProps = {
   bogen: Erfassungsbogen;
   aendern: (patch: Partial<Erfassungsbogen>) => void;
+  /** Sprung zu einem anderen Assistenten-Schritt — Hinweise, die dorthin zeigen, werden damit antippbar. */
+  geheZu?: (schritt: number) => void;
 };
 
 /** Feldname des umschließenden <Feld> — Auswahllisten beschriften sich daraus. */
@@ -374,14 +376,38 @@ export function Stepper(props: { titel: string; wert: number; setzen: (n: number
   );
 }
 
-/** Plausibilitätshinweise (nicht blockierend). */
-export function Hinweise({ hinweise }: { hinweise: string[] }) {
+/**
+ * Plausibilitätshinweise (nicht blockierend). Ein Warnmuster wie in der
+ * Übersicht: Punkte, die auf einen ANDEREN Schritt zeigen, sind antippbar und
+ * springen dorthin — vorher waren sie hier Sackgassen, und man lernte erst in
+ * der Übersicht, dass Warnungen klickbar sein können. `role="status"`, damit
+ * Vorlesesoftware neu auftauchende Hinweise aktiv mitbekommt.
+ */
+export function Hinweise(props: {
+  /** Nur-Text-Hinweise, die den aktuellen Schritt selbst betreffen. */
+  hinweise?: string[];
+  /** Hinweise mit Schrittbezug (pruefpunkte()). */
+  punkte?: Pruefpunkt[];
+  aktuellerSchritt?: number;
+  geheZu?: (schritt: number) => void;
+}) {
+  const { hinweise = [], punkte = [], aktuellerSchritt, geheZu } = props;
+  if (hinweise.length === 0 && punkte.length === 0) return null;
   return (
-    <>
+    <div role="status">
       {hinweise.map((h) => (
         <p key={h} className="warnung">⚠ {h}</p>
       ))}
-    </>
+      {punkte.map((p) =>
+        geheZu && p.schritt !== aktuellerSchritt ? (
+          <p key={p.text} className="warnung">
+            ⚠ <button type="button" className="link" onClick={() => geheZu(p.schritt)}>{p.text}</button>
+          </p>
+        ) : (
+          <p key={p.text} className="warnung">⚠ {p.text}</p>
+        ),
+      )}
+    </div>
   );
 }
 

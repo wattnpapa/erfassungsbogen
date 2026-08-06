@@ -59,6 +59,12 @@ When("ich auf {string} klicke", async function (this: EebWelt, name: string) {
   await schaltflaeche(this, name).click();
 });
 
+// <summary> ist kein Button — der Ausklapper („Weitere Formate" im
+// Übergeben-Dialog) braucht deshalb einen eigenen Schritt.
+When("ich {string} aufklappe", async function (this: EebWelt, text: string) {
+  await this.page.locator("summary", { hasText: text }).click();
+});
+
 When("ich in der Vorschlagsliste {string} wähle", async function (this: EebWelt, name: string) {
   // onMouseDown statt Klick: die Liste wählt vor dem blur aus (siehe
   // OvVorschlagFeld in schritte/einheit.tsx).

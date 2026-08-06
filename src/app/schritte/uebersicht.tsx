@@ -26,6 +26,7 @@ import {
   funkrufText,
   funktionsText,
   kennzeichenText,
+  kontaktText,
   orgLabel,
   pruefpunkte,
   qrErzeugen,
@@ -429,13 +430,7 @@ export function Uebersicht(props: {
                 <td>{funktionsText(p, org) || "—"}</td>
                 <td>{p.nachname}{p.nachname && p.vorname ? ", " : ""}{p.vorname}</td>
                 <td>
-                  {p.kontakte
-                    .map((k) =>
-                      k.emailTemplate === 1
-                        ? "eMail: Standard (D)"
-                        : `${k.art === KontaktArt.EMAIL ? "eMail" : k.art === KontaktArt.MOBIL ? "Mobil" : "Tel"}: ${k.wert ?? ""} (${k.dienstlich ? "D" : "P"})`,
-                    )
-                    .join(" · ")}
+                  {p.kontakte.map(kontaktText).join(" · ")}
                 </td>
               </tr>
             ))}
@@ -612,40 +607,47 @@ export function Uebersicht(props: {
           </button>
           <p className="hinweis">Zum Drucken oder Versenden — Papier-Layout, QR-Code auf der letzten Seite.</p>
         </div>
-        <div className="teilen-weg">
-          <button type="button" onClick={bogenLinkTeilen} disabled={!qr}>
-            {linkKopiert ? "Link kopiert ✓" : "Link teilen"}
-          </button>
-          <p className="hinweis">
-            Für Chat, Mail oder Notiz: derselbe Inhalt wie im QR-Code — öffnet den Bogen beim Antippen.
-          </p>
-        </div>
-        {/* Anders als die Wege darüber ist CSV eine Einbahnstraße: es trägt
-            keinen QR und lässt sich nicht zurücklesen. Steht trotzdem hier,
-            weil der Nutzer alle Ausgabewege an einer Stelle sucht. */}
-        <div className="teilen-weg">
-          <button type="button" onClick={csv}>Als CSV (Tabelle)</button>
-          <p className="hinweis">
-            Für Excel & Co.: alle erfassten Daten des Bogens — je eine Zeile für die Einheit,
-            jede Person und jedes Fahrzeug. Zum Auswerten, nicht zum Zurücklesen.
-          </p>
-        </div>
-        <div className="teilen-weg">
-          <button type="button" onClick={oldenburgXlsx}>Als Excel (Format „Oldenburg“)</button>
-          <p className="hinweis">
-            Eine Zeile in der Einheitenliste der Führungsstelle — Spalten und Formatierung wie in
-            deren Vorlage. Zum Einfügen in die laufende Liste am Meldekopf.
-          </p>
-        </div>
-        {/* Roh-JSON nur im Debug-Modus anbieten: fürs Publikum ist der Bogen
-            ohnehin in jeder PDF eingebettet — ein separater JSON-Download
-            verwirrt mehr, als er nützt. */}
-        {debugAktiv() && (
+        {/* Zweite Stufe: Vor Ort zählen fast immer QR-Vollbild, Nahbereich
+            oder PDF (oben). Link/CSV/Excel sind Chat- bzw. Führungsstellen-
+            Aufgaben — eingeklappt bleiben es am Entscheidungspunkt ≤4 sichtbare
+            Optionen, und alle Ausgabewege sind trotzdem an EINER Stelle. */}
+        <details className="teilen-weitere">
+          <summary>Weitere Formate (Link, Tabelle, Excel)</summary>
           <div className="teilen-weg">
-            <button type="button" onClick={() => bogenSpeichern(bogen)}>Als Datei speichern (Debug)</button>
-            <p className="hinweis">Roh-JSON des Bogens — nur im Debug-Modus sichtbar.</p>
+            <button type="button" onClick={bogenLinkTeilen} disabled={!qr}>
+              {linkKopiert ? "Link kopiert ✓" : "Link teilen"}
+            </button>
+            <p className="hinweis">
+              Für Chat, Mail oder Notiz: derselbe Inhalt wie im QR-Code — öffnet den Bogen beim Antippen.
+            </p>
           </div>
-        )}
+          {/* Anders als die Wege darüber ist CSV eine Einbahnstraße: es trägt
+              keinen QR und lässt sich nicht zurücklesen. Steht trotzdem hier,
+              weil der Nutzer alle Ausgabewege an einer Stelle sucht. */}
+          <div className="teilen-weg">
+            <button type="button" onClick={csv}>Als CSV (Tabelle)</button>
+            <p className="hinweis">
+              Für Excel & Co.: alle erfassten Daten des Bogens — je eine Zeile für die Einheit,
+              jede Person und jedes Fahrzeug. Zum Auswerten, nicht zum Zurücklesen.
+            </p>
+          </div>
+          <div className="teilen-weg">
+            <button type="button" onClick={oldenburgXlsx}>Als Excel (Format „Oldenburg“)</button>
+            <p className="hinweis">
+              Eine Zeile in der Einheitenliste der Führungsstelle — Spalten und Formatierung wie in
+              deren Vorlage. Zum Einfügen in die laufende Liste am Meldekopf.
+            </p>
+          </div>
+          {/* Roh-JSON nur im Debug-Modus anbieten: fürs Publikum ist der Bogen
+              ohnehin in jeder PDF eingebettet — ein separater JSON-Download
+              verwirrt mehr, als er nützt. */}
+          {debugAktiv() && (
+            <div className="teilen-weg">
+              <button type="button" onClick={() => bogenSpeichern(bogen)}>Als Datei speichern (Debug)</button>
+              <p className="hinweis">Roh-JSON des Bogens — nur im Debug-Modus sichtbar.</p>
+            </div>
+          )}
+        </details>
         {fehler && <p className="fehler">{fehler}</p>}
       </dialog>
 

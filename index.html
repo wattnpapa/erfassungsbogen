@@ -257,6 +257,21 @@
     .aktionen > button, .aktionen > .datei-knopf {
       min-height: calc(2.75rem + var(--ziel)); padding: 0.6rem 1.1rem; font-size: var(--t-m);
     }
+    /* Zwei-Wege-Weiche der Startseite: beide Nutzergruppen (eigener Bogen /
+       Meldekopf) gleichgewichtig nebeneinander, auf schmalen Fenstern
+       untereinander. Bewusst nur Rollen-Token — so greifen Dunkel-, Feld- und
+       Nacht-Modus ohne eigene Blöcke. */
+    .weiche { display: flex; gap: var(--r-4); flex-wrap: wrap; align-items: stretch; margin-top: var(--r-5); }
+    .weiche > .weiche-weg {
+      flex: 1 1 22rem; min-width: 0; margin: 0;
+      background: var(--flaeche); border: var(--strich) solid var(--linie);
+      padding: var(--r-4); display: flex; flex-direction: column;
+    }
+    .weiche > .weiche-weg > h2 { font-size: var(--t-l); margin: 0 0 var(--r-1); }
+    .weiche > .weiche-weg > .hinweis { margin: 0 0 var(--r-2); }
+    /* margin-top:auto statt fixem Abstand: die Knopfreihen beider Wege stehen
+       auf gleicher Höhe, auch wenn ein Hinweistext länger ist. */
+    .weiche > .weiche-weg > .aktionen { margin-top: auto; padding-top: var(--r-3); }
     button, .datei-knopf {
       font: inherit; font-size: var(--t-s); font-weight: 600;
       padding: 0.5rem 0.9rem;
@@ -321,6 +336,14 @@
     }
     .anzeige-schalter button + button { border-left: var(--strich) solid var(--linie); }
     .anzeige-schalter button.aktiv { background: var(--akzent); color: var(--auf-akzent); }
+    /* Im Assistenten-Kopf sitzt der Umschalter rechts in der Titelzeile — auf
+       der Kennfarbe trennt die Kopf-Linie statt des Inhalts-Graus. */
+    /* Der Titel darf den Umschalter nach einem Umbruch nicht zerquetschen: h1
+       nimmt die volle erste Zeile, der Schalter rutscht darunter. Ab ~34rem
+       sitzt er wieder rechts neben dem Titel (margin-left:auto). */
+    .assistent-kopf .titelzeile h1 { flex: 1 1 14rem; }
+    .assistent-kopf .titelzeile .anzeige-schalter { margin-left: auto; border-color: var(--kopf-linie); }
+    .assistent-kopf .titelzeile .anzeige-schalter button + button { border-left-color: var(--kopf-linie); }
     /* Immer sichtbarer Rücksprung zur Startseite im Kopfbereich. */
     .zur-start {
       display: inline-flex; border: none; background: none;
@@ -509,6 +532,9 @@
       color: var(--warn-text); background: var(--warn-fond); border: var(--strich) solid var(--warn-linie);
       border-radius: var(--radius); padding: 0.5rem 0.7rem; font-size: var(--t-s);
     }
+    /* Antippbare Warnpunkte (Sprung zum betroffenen Schritt) tragen die
+       Warnfarbe, nicht das Link-Blau — wie in der Vollständigkeits-Checkliste. */
+    .warnung button.link { color: inherit; text-align: left; }
     .hinweis { font-size: var(--t-xs); color: var(--text-2); }
     /* Vollständigkeits-Checkliste (Übersicht): EINE Box statt gestapelter
        Warnungen; jeder Punkt ist ein Link und springt zum passenden Schritt. */
@@ -526,7 +552,7 @@
     .vollstaendig-ok { color: var(--erledigt); font-size: 0.9rem; font-weight: 600; }
     /* Taktische Zeichen in der Oberfläche: Einheiten-„Avatar" im Kopf und in
        der Übersicht, Fahrzeug-Symbol (DV 102) in der Fahrzeugkarte. */
-    .titelzeile { display: flex; align-items: center; gap: 0.6rem; }
+    .titelzeile { display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; }
     .titelzeile h1 { min-width: 0; }
     img.einheit-avatar { height: 2.4rem; width: auto; flex: 0 0 auto; }
     img.einheit-avatar.gross { height: 3.4rem; }
@@ -589,6 +615,11 @@
     .pdf-rahmen { width: 100%; height: 32rem; border: 1px solid var(--rand); border-radius: 0.3rem; margin-top: 0.6rem; }
     /* „Bogen übergeben"-Dialog: je Transportweg ein voller Knopf + Situationshilfe. */
     .teilen-dialog .teilen-weg { margin: 0.9rem 0; }
+    /* Zweite Stufe des Übergeben-Dialogs: Link/CSV/Excel eingeklappt, damit am
+       Entscheidungspunkt die Vor-Ort-Wege (QR, Nahbereich, PDF) tragen. */
+    .teilen-dialog .teilen-weitere { margin: 0.9rem 0 0; border-top: var(--strich) solid var(--linie-fein); padding-top: 0.6rem; }
+    .teilen-dialog .teilen-weitere > summary { cursor: pointer; font-size: var(--t-s); font-weight: 600; color: var(--text-2); }
+    .teilen-dialog .teilen-weitere > summary:hover { color: var(--akzent); }
     .teilen-dialog .teilen-weg button { width: 100%; }
     .teilen-dialog .teilen-weg .hinweis { margin: 0.25rem 0 0; }
     /* Eigene Abfragen (Eingabe/Rückfrage/Hinweis) statt window.prompt & Co. —
@@ -608,8 +639,9 @@
     /* Übersichts-Aktionen: auf schmalen Screens volle Breite statt zerfranstem
        rechtsbündigem Stapel (klare Hierarchie, große Tippziele). */
     @media (max-width: 540px) {
-      .kopfzeile > span.uebersicht-aktionen { flex-direction: column; align-items: stretch; width: 100%; }
-      .uebersicht-aktionen button { width: 100%; }
+      /* Kompakt umbrechend statt vier gestapelter Vollbreite-Knöpfe: die
+         Offene-Punkte-Karte darunter bleibt so beim Öffnen im Blickfeld. */
+      .kopfzeile > span.uebersicht-aktionen { display: flex; flex-wrap: wrap; gap: 0.4rem; width: 100%; }
     }
 
     /* Touch-Zähler (− / Zahl / +) für die Meldekopf-Schnellerfassung: große

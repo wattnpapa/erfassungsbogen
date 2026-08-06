@@ -23,6 +23,12 @@ export function SchrittEinsatz({ bogen, aendern }: SchrittProps) {
   return (
     <section className="karte">
       <h2>2. Einsatz</h2>
+      {/* Abgrenzung zur „Einsatz-Sammlung" der Startseite: hier geht es um den
+          Auftrag der EIGENEN Einheit, nicht ums Sammeln fremder Bögen. */}
+      <p className="hinweis">
+        Wofür deine Einheit gemeldet wird — Einsatz oder Übung. „Zeitraum bis" darf offen
+        bleiben, solange das Ende noch nicht feststeht.
+      </p>
       <div className="zeile">
         <Feld titel="Zeitraum von" schmal>
           <input type="date" value={datumZuIso(ez.zeitraumVon)} onChange={(e) => setEz({ zeitraumVon: datumAusIso(e.target.value) })} />

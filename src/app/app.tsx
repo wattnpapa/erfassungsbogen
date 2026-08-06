@@ -32,7 +32,7 @@ import {
   neuerBogen,
   schrittStatus,
 } from "./hilfen";
-import { jetztZeitpunkt, staerke } from "../model";
+import { PersonalErfassung, jetztZeitpunkt, staerke } from "../model";
 import { bogenLinksEmpfangen, istNativ, qrScannen, textTeilen } from "./nativ";
 import { vorlageAnlegen, vorlagenLaden, vorlagenPapierkorb, type Vorlage } from "./vorlagen";
 import { Musterung, VorlagenListe } from "./vorlagen-ui";
@@ -57,6 +57,7 @@ import { QrScannerWeb } from "./qr-scanner-web";
 import { qrAusBild } from "./qr-bild";
 import { entwurfLaden, entwurfSpeichern, entwurfVerwerfen } from "./entwurf";
 import { SeitenKopf } from "./seiten-kopf";
+import { AnzeigeSchalter } from "./anzeige-schalter";
 import { orgFarbe, wendeOrgAkzentAn } from "./org-farben";
 import { einheitSymbolSvg, svgDataUrl } from "./taktische-zeichen";
 import { Fusszeile } from "./fusszeile";
@@ -1062,27 +1063,73 @@ function AppInhalt() {
         {meldung && <p className="meldung" role="status">{meldung}</p>}
         {fehler && <p className="fehler">{fehler}</p>}
         {scanFortschritt && !scannerOffen && <p className="meldung" role="status">{scanFortschritt}</p>}
-        <div className="aktionen">
-          <button type="button" className={bogen ? "" : "primaer"} onClick={() => { setMeldung(""); setBogen(neuerBogen()); setzeEmpfang(null); setSchritt(0); setZeigeStart(false); }}>
-            Neuen Bogen erstellen
-          </button>
-          <button type="button" onClick={scanneQr}>QR-Code scannen…</button>
-          {/* Im Web sitzt „QR aus Bild einlesen" im Scanner-Overlay, wo es gebraucht
-              wird. Nativ scannt eine System-Oberfläche ohne eigene Knöpfe — dort
-              bleibt der Ausweg deshalb hier auf der Startseite. */}
-          {istNativ() && (
-            <label className="datei-knopf">
-              QR aus Bild einlesen…
-              <input type="file" accept="image/*" onChange={ladeQrBild} className="nur-sr" />
-            </label>
-          )}
-          {/* Das Feld ist nur fürs Auge weg (.nur-sr), nicht per `hidden`: sonst
-              fällt der Knopf komplett aus der Tabfolge und ist ausschließlich
-              mit der Maus bedienbar. */}
-          <label className="datei-knopf">
-            Aus Datei laden…
-            <input type="file" accept=".json,application/json" onChange={ladeDatei} className="nur-sr" />
-          </label>
+        {/* Zwei-Wege-Weiche: beide bestätigten Nutzergruppen (PRODUCT.md) mit
+            gleichem Gewicht — die Einheit mit eigenem Bogen links, der
+            Meldekopf rechts. Vorher gab es nur EINEN Primärknopf („Neuen
+            Bogen erstellen"), und wer sammeln wollte, wählte am Meldekopf
+            regelmäßig den falschen Einstieg. */}
+        <div className="weiche">
+          <section className="weiche-weg" aria-labelledby="weg-eigener-bogen">
+            <h2 id="weg-eigener-bogen">Meinen Bogen ausfüllen</h2>
+            <p className="hinweis">
+              Für Einheiten, die ihre eigene Stärkemeldung erfassen, drucken und weitergeben.
+            </p>
+            <div className="aktionen">
+              <button type="button" className={bogen ? "" : "primaer"} onClick={() => { setMeldung(""); setBogen(neuerBogen()); setzeEmpfang(null); setSchritt(0); setZeigeStart(false); }}>
+                Neuen Bogen erstellen
+              </button>
+              <button type="button" onClick={scanneQr}>QR-Code scannen…</button>
+              {/* Im Web sitzt „QR aus Bild einlesen" im Scanner-Overlay, wo es gebraucht
+                  wird. Nativ scannt eine System-Oberfläche ohne eigene Knöpfe — dort
+                  bleibt der Ausweg deshalb hier auf der Startseite. */}
+              {istNativ() && (
+                <label className="datei-knopf">
+                  QR aus Bild einlesen…
+                  <input type="file" accept="image/*" onChange={ladeQrBild} className="nur-sr" />
+                </label>
+              )}
+              {/* Das Feld ist nur fürs Auge weg (.nur-sr), nicht per `hidden`: sonst
+                  fällt der Knopf komplett aus der Tabfolge und ist ausschließlich
+                  mit der Maus bedienbar. */}
+              <label className="datei-knopf">
+                Aus Datei laden…
+                <input type="file" accept=".json,application/json" onChange={ladeDatei} className="nur-sr" />
+              </label>
+            </div>
+          </section>
+          <section className="weiche-weg" aria-labelledby="weg-meldekopf">
+            <h2 id="weg-meldekopf">Bögen sammeln (Meldekopf)</h2>
+            <p className="hinweis">
+              Für Meldeköpfe, Bereitstellungsräume und Zugführer: eintreffende Bögen bündeln
+              — Stärke und Sofortbedarf laufend zusammengezählt.
+            </p>
+            <div className="aktionen">
+              <button type="button" className="primaer" onClick={neuerEinsatz}>Neuer Einsatz…</button>
+              {/* Direkter Einstieg in die Meldekopf-Schnellerfassung: vorher nur
+                  als Radio in Schritt 3 erreichbar — unter Zeitdruck fand ihn
+                  dort niemand. */}
+              <button
+                type="button"
+                onClick={() => {
+                  setMeldung("");
+                  setBogen({
+                    ...neuerBogen(),
+                    personalErfassung: PersonalErfassung.NUR_STAERKE,
+                    staerkeManuell: { fuehrer: 0, unterfuehrer: 0, mannschaft: 0, gesamt: 0 },
+                  });
+                  setzeEmpfang(null);
+                  setSchritt(0);
+                  setZeigeStart(false);
+                }}
+              >
+                Einheit schnell erfassen (nur Stärke)…
+              </button>
+              <label className="datei-knopf">
+                Einsatz importieren…
+                <input type="file" accept=".json,application/json,.pdf,application/pdf" className="nur-sr" onChange={importiereEinsatzDatei} />
+              </label>
+            </div>
+          </section>
         </div>
         {scannerOffen && (
           <QrScannerWeb onErgebnis={scanErgebnisWeb} fortschritt={scanFortschritt} onAbbruch={() => scanAbbrechen(false)} onBild={ladeQrBild} />
@@ -1103,17 +1150,11 @@ function AppInhalt() {
             />
           </section>
         )}
+        {/* Anlegen/Import sitzen oben in der Weiche; hier steht die Liste der
+            laufenden Sammlungen. Die Überschrift bleibt wörtlich bestehen —
+            E2E-Szenarien und Anleitung verweisen auf sie. */}
         <section className="start-vorlagen">
-          <div className="kopfzeile">
-            <h2>Einsatz-Sammlung (Meldekopf)</h2>
-            <span>
-              <button type="button" onClick={neuerEinsatz}>Neuer Einsatz…</button>{" "}
-              <label className="datei-knopf">
-                Einsatz importieren…
-                <input type="file" accept=".json,application/json,.pdf,application/pdf" className="nur-sr" onChange={importiereEinsatzDatei} />
-              </label>
-            </span>
-          </div>
+          <h2>Einsatz-Sammlung (Meldekopf)</h2>
           <p className="hinweis">
             Fremde Bögen zu einem Einsatz/einer Übung sammeln (scannen oder manuell) — mit Stärke-Summen über alle anwesenden Einheiten.
           </p>
@@ -1125,20 +1166,17 @@ function AppInhalt() {
         </section>
         {/* Absender einmal einrichten, bevor der erste Bogen entsteht: hier auf
             der Startseite gefunden, gilt die Angabe für jeden späteren Transport.
-            Ohne hinterlegte Karte gleich aufgeklappt — ein Link allein würde die
-            Funktion an dieser Stelle verstecken. */}
+            Zugeklappt, bis man ihn braucht — der sichtbare „hinterlegen…"-Link
+            reicht als Einstieg; die dauerhaft offene Karte zeigte sonst ein
+            „Übernehmen/Abbrechen"-Paar, obwohl niemand etwas begonnen hatte. */}
         <section className="start-vorlagen">
           <h2>Absender für übergebene Bögen</h2>
           <p className="hinweis">
-            Jeder Bogen wird mit dem Geräteschlüssel signiert. Wer hier freiwillig Name und
-            Rückkanal hinterlegt, macht daraus einen Absender, den die Gegenstelle bei
-            Rückfragen auch erreichen kann.
+            Jeder übergebene Bogen trägt automatisch ein Echtheits-Siegel dieses Geräts.
+            Wer freiwillig Name und Rückkanal hinterlegt, macht daraus einen Absender,
+            den die Gegenstelle bei Rückfragen auch erreichen kann.
           </p>
-          <AbsenderkarteFeld
-            karte={absender}
-            onGespeichert={setAbsender}
-            startOffen={!absenderkarteGefuellt(absender)}
-          />
+          <AbsenderkarteFeld karte={absender} onGespeichert={setAbsender} />
         </section>
         {/* Mit vorhandenen Daten bleibt die Erklärung erreichbar — am Ende der
             Startseite, über der Fußzeile, statt den Arbeitsbereich zu verdrängen. */}
@@ -1177,6 +1215,10 @@ function AppInhalt() {
           aria-hidden="true"
         />
         <h1>Einheiten-Erfassungsbogen</h1>
+        {/* Feld/Nacht direkt am Formular: Wer beim Ausfüllen in die Sonne oder
+            ins Dunkel gerät, darf dafür nicht zur Startseiten-Fußzeile
+            zurückmüssen — das ist exakt die maßgebliche Einsatzsituation. */}
+        <AnzeigeSchalter />
       </div>
       {/* Der aktive Schritt steht nicht nur als CSS-Klasse da: ohne
           aria-current="step" liest eine Vorlesesoftware sechs gleichwertige
@@ -1224,7 +1266,7 @@ function AppInhalt() {
       {meldung && <p className="meldung" role="status">{meldung}</p>}
       {schritt === 0 && <SchrittEinheit bogen={bogen} aendern={aendern} />}
       {schritt === 1 && <SchrittEinsatz bogen={bogen} aendern={aendern} />}
-      {schritt === 2 && <SchrittPersonal bogen={bogen} aendern={aendern} />}
+      {schritt === 2 && <SchrittPersonal bogen={bogen} aendern={aendern} geheZu={setSchritt} />}
       {schritt === 3 && <SchrittFahrzeuge bogen={bogen} aendern={aendern} />}
       {schritt === 4 && <SchrittSofortbedarf bogen={bogen} aendern={aendern} />}
       {schritt === UEBERSICHT && (

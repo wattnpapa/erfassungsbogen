@@ -334,7 +334,7 @@ export function SchrittEinheit({ bogen, aendern }: SchrittProps) {
                 // Viele kennen ihr OV-Kürzel und tippen es ein – dieselbe Vorschlagsliste wie beim OV-Namen.
                 <OvVorschlagFeld
                   wert={h.kurz ?? ""}
-                  platzhalter="OODE"
+                  platzhalter="z. B. OODE"
                   verzeichnis={ovVerzeichnis}
                   tippen={(kurz) =>
                     setE({ hierarchie: e.hierarchie.map((x, j) => (j === i ? { ...x, kurz: kurz.toUpperCase() || undefined } : x)) })
@@ -344,7 +344,7 @@ export function SchrittEinheit({ bogen, aendern }: SchrittProps) {
               ) : (
                 <input
                   value={h.kurz ?? ""}
-                  placeholder="OODE"
+                  placeholder="z. B. OODE"
                   onChange={(ev) =>
                     setE({ hierarchie: e.hierarchie.map((x, j) => (j === i ? { ...x, kurz: ev.target.value.toUpperCase() || undefined } : x)) })
                   }
@@ -360,7 +360,7 @@ export function SchrittEinheit({ bogen, aendern }: SchrittProps) {
               }
             />
           </Feld>
-          <Feld titel="eMail">
+          <Feld titel="E-Mail">
             <input
               value={h.email ?? ""}
               onChange={(ev) => setE({ hierarchie: e.hierarchie.map((x, j) => (j === i ? { ...x, email: ev.target.value || undefined } : x)) })}

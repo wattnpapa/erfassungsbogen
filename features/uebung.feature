@@ -47,6 +47,7 @@ Funktionalität: Übungs-Kennzeichnung des Bogens
   Szenario: Die Übung reist im Link mit auf das nächste Gerät
     Wenn ich zum Schritt "6. Übersicht" wechsle
     Und ich auf "Bogen übergeben…" klicke
+    Und ich "Weitere Formate" aufklappe
     Und ich im Dialog auf "Link teilen" klicke
     Und ich den Link aus der Zwischenablage öffne
     Dann sehe ich die Übersicht mit dem Standort "Musterhausen"

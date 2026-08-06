@@ -1,0 +1,134 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-08-06T00:00:00+02:00",
+  "title": "Design System: Erfassungsbogen",
+  "extensions": {
+    "colorMeta": {
+      "akzent": { "role": "primary", "displayName": "Ultramarin-Dienstblau", "canonical": "#12275e", "tonalRamp": ["oklch(15% 0.09 265)", "oklch(25% 0.09 265)", "oklch(35% 0.09 265)", "oklch(45% 0.09 265)", "oklch(58% 0.09 265)", "oklch(70% 0.07 265)", "oklch(84% 0.05 265)", "oklch(95% 0.02 265)"] },
+      "akzent-hell": { "role": "primary", "displayName": "Dienstblau, aufgehellt", "canonical": "#1d3d8f" },
+      "auf-akzent": { "role": "primary", "displayName": "Weiß auf Kennfarbe", "canonical": "#ffffff" },
+      "grund": { "role": "neutral", "displayName": "Blaukühles Papierweiß", "canonical": "#f3f5f9", "tonalRamp": ["#11141b", "#2a2f3c", "#5c6478", "#8b94a9", "#bcc3d3", "#d7dce7", "#e8ebf2", "#f3f5f9"] },
+      "flaeche": { "role": "neutral", "displayName": "Formularweiß", "canonical": "#ffffff" },
+      "flaeche-2": { "role": "neutral", "displayName": "Zweite Fläche", "canonical": "#e8ebf2" },
+      "text": { "role": "neutral", "displayName": "Tintenschwarz", "canonical": "#11141b" },
+      "text-2": { "role": "neutral", "displayName": "Aktenschrift-Grau", "canonical": "#5c6478" },
+      "text-3": { "role": "neutral", "displayName": "Hinweis-Grau", "canonical": "#8b94a9" },
+      "linie-fein": { "role": "neutral", "displayName": "Feine Linie", "canonical": "#d7dce7" },
+      "linie": { "role": "neutral", "displayName": "Linie", "canonical": "#bcc3d3" },
+      "linie-stark": { "role": "neutral", "displayName": "Starke Linie", "canonical": "#8b94a9" },
+      "gut": { "role": "tertiary", "displayName": "Einsatzgrün", "canonical": "#146b3a", "tonalRamp": ["oklch(15% 0.08 155)", "oklch(25% 0.09 155)", "oklch(35% 0.1 155)", "oklch(45% 0.11 155)", "oklch(58% 0.11 155)", "oklch(70% 0.1 155)", "oklch(84% 0.07 155)", "oklch(95% 0.03 155)"] },
+      "warn-text": { "role": "tertiary", "displayName": "Warnbraun", "canonical": "#6d4700" },
+      "warn-fond": { "role": "tertiary", "displayName": "Aktengelb", "canonical": "#fdf4dd" },
+      "warn-linie": { "role": "tertiary", "displayName": "Warnlinie", "canonical": "#ddbe79" },
+      "alarm": { "role": "tertiary", "displayName": "Alarmrot", "canonical": "#a4231c", "tonalRamp": ["oklch(15% 0.1 30)", "oklch(25% 0.12 30)", "oklch(35% 0.14 30)", "oklch(46% 0.15 30)", "oklch(58% 0.15 30)", "oklch(70% 0.12 30)", "oklch(84% 0.07 30)", "oklch(95% 0.03 30)"] }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display (h1)", "purpose": "Eine Ansichts-Überschrift je Seite; text-wrap: balance." },
+      "headline": { "displayName": "Headline (h2)", "purpose": "Abschnittsüberschriften — Gewicht statt Farbe." },
+      "title": { "displayName": "Title (h3)", "purpose": "Gruppentitel innerhalb von Karten." },
+      "body": { "displayName": "Body", "purpose": "Fließtext; Einleitungen max. 48ch." },
+      "label": { "displayName": "Feldbeschriftung", "purpose": "label.feld — halbfett und dunkel, im Feld draußen sicher lesbar." },
+      "daten": { "displayName": "Daten (Mono)", "purpose": "Dicktengleiche Daten: Stärken, Kennzeichen, Tabellarisches." }
+    },
+    "shadows": [
+      { "name": "vorschlagsliste", "value": "0 4px 12px rgba(0,0,0,0.15)", "purpose": "Autocomplete-Dropdown über dem Formular — der einzige Nicht-Overlay-Schatten." },
+      { "name": "overlay-mittel", "value": "0 8px 24px rgba(0,0,0,0.25)", "purpose": "Leichte modale Ebenen." },
+      { "name": "overlay-schwer", "value": "0 24px 64px rgba(0,0,0,0.35)", "purpose": "Große Dialoge." }
+    ],
+    "motion": [],
+    "breakpoints": []
+  },
+  "components": [
+    {
+      "name": "Standard-Knopf",
+      "kind": "button",
+      "refersTo": "button-default",
+      "description": "Rechteckiger Werkzeug-Knopf: Rahmen statt Füllung, Hover in der Kennfarbe.",
+      "html": "<button class=\"ds-knopf\">Bogen laden</button>",
+      "css": ".ds-knopf { font-family: 'Archivo Variable', Archivo, system-ui, sans-serif; font-size: 0.8125rem; font-weight: 600; padding: 0.5rem 0.9rem; min-height: 2.25rem; display: inline-flex; align-items: center; justify-content: center; gap: 0.4rem; border: 1px solid var(--linie-stark, #8b94a9); border-radius: 0; background: var(--flaeche, #ffffff); color: var(--text, #11141b); cursor: pointer; appearance: none; } .ds-knopf:hover { border-color: var(--akzent, #12275e); color: var(--akzent, #12275e); } .ds-knopf:focus-visible { outline: 3px solid var(--akzent, #12275e); outline-offset: 1px; }"
+    },
+    {
+      "name": "Primär-Knopf",
+      "kind": "button",
+      "refersTo": "button-primaer",
+      "description": "Die eine primäre Aktion je Ansicht — Kennfarbe als Fläche.",
+      "html": "<button class=\"ds-knopf-primaer\">PDF erzeugen</button>",
+      "css": ".ds-knopf-primaer { font-family: 'Archivo Variable', Archivo, system-ui, sans-serif; font-size: 0.8125rem; font-weight: 600; padding: 0.5rem 0.9rem; min-height: 2.25rem; display: inline-flex; align-items: center; justify-content: center; border: 1px solid var(--akzent, #12275e); border-radius: 0; background: var(--akzent, #12275e); color: var(--auf-akzent, #ffffff); cursor: pointer; appearance: none; } .ds-knopf-primaer:hover { background: var(--akzent-hell, #1d3d8f); border-color: var(--akzent-hell, #1d3d8f); } .ds-knopf-primaer:focus-visible { outline: 3px solid var(--akzent, #12275e); outline-offset: 1px; }"
+    },
+    {
+      "name": "Eingabefeld mit Beschriftung",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Feldbeschriftung halbfett über rechteckigem Eingabefeld; Fokus in der Kennfarbe.",
+      "html": "<label class=\"ds-feld\">Funkrufname<input class=\"ds-eingabe\" type=\"text\" placeholder=\"Heros Oldenburg 21/25\"></label>",
+      "css": ".ds-feld { display: block; font-family: 'Archivo Variable', Archivo, system-ui, sans-serif; font-size: 0.75rem; font-weight: 600; color: var(--text-2, #5c6478); } .ds-eingabe { display: block; width: 100%; margin-top: 0.25rem; font: inherit; font-size: 0.9375rem; font-weight: 400; color: var(--text, #11141b); padding: 0.45rem 0.55rem; min-height: 2.25rem; border: 1px solid var(--linie-stark, #8b94a9); border-radius: 0; background: var(--flaeche, #ffffff); box-sizing: border-box; } .ds-eingabe::placeholder { color: var(--text-3, #8b94a9); } .ds-eingabe:focus { outline: 3px solid var(--akzent, #12275e); outline-offset: 0; border-color: var(--akzent, #12275e); }"
+    },
+    {
+      "name": "Karte",
+      "kind": "card",
+      "refersTo": "karte",
+      "description": "Schattenlose Formularkarte: Rahmen und Weißraum statt schwebender Kachel.",
+      "html": "<section class=\"ds-karte\"><h3 class=\"ds-karte-titel\">Einheit</h3><p class=\"ds-karte-text\">Fachgruppe Wassergefahren, OV Oldenburg — Stärke 0/2/7//9.</p></section>",
+      "css": ".ds-karte { background: var(--flaeche, #ffffff); border: 1px solid var(--linie, #bcc3d3); border-radius: 0; padding: 1rem; font-family: 'Archivo Variable', Archivo, system-ui, sans-serif; } .ds-karte-titel { font-size: 0.9375rem; font-weight: 700; color: var(--text, #11141b); margin: 0 0 0.25rem; } .ds-karte-text { font-size: 0.9375rem; color: var(--text, #11141b); margin: 0; }"
+    },
+    {
+      "name": "Seitenkopf",
+      "kind": "nav",
+      "refersTo": "kopf",
+      "description": "Kopfbalken in der Kennfarbe mit harter 4-px-Unterkante und Schrittleiste.",
+      "html": "<header class=\"ds-kopf\"><span class=\"ds-kopf-titel\">Erfassungsbogen</span><nav class=\"ds-kopf-schritte\"><button class=\"ds-schritt aktiv\">Einheit</button><button class=\"ds-schritt\">Personal</button><button class=\"ds-schritt\">Fahrzeuge</button></nav></header>",
+      "css": ".ds-kopf { background: var(--kopf-fond, #12275e); color: var(--kopf-auf, #ffffff); padding: 0.75rem 1rem 0; border-bottom: 4px solid rgba(0,0,0,0.35); font-family: 'Archivo Variable', Archivo, system-ui, sans-serif; } .ds-kopf-titel { font-size: 1.0625rem; font-weight: 700; display: block; margin-bottom: 0.5rem; } .ds-kopf-schritte { display: flex; gap: 0.75rem; } .ds-schritt { font: inherit; font-size: 0.8125rem; font-weight: 600; background: transparent; border: none; border-bottom: 3px solid transparent; color: rgba(255,255,255,0.78); padding: 0.4rem 0.2rem; cursor: pointer; } .ds-schritt.aktiv { color: var(--kopf-auf, #ffffff); border-bottom-color: var(--kopf-auf, #ffffff); } .ds-schritt:hover { color: var(--kopf-auf, #ffffff); } .ds-schritt:focus-visible { outline: 3px solid var(--kopf-auf, #ffffff); outline-offset: 1px; }"
+    },
+    {
+      "name": "Vorschlagsliste",
+      "kind": "custom",
+      "refersTo": "vorschlaege",
+      "description": "Autocomplete-Dropdown — der einzige Nicht-Overlay-Schatten des Systems.",
+      "html": "<ul class=\"ds-vorschlaege\"><li class=\"aktiv\">Fachgruppe Wassergefahren <small>THW</small></li><li>Fachgruppe Räumen <small>THW</small></li><li>Löschgruppe <small>Feuerwehr</small></li></ul>",
+      "css": ".ds-vorschlaege { margin: 0; padding: 0; list-style: none; background: var(--flaeche, #ffffff); border: 1px solid var(--linie-stark, #8b94a9); border-radius: 0; box-shadow: 0 4px 12px rgba(0,0,0,0.15); max-width: 20rem; font-family: 'Archivo Variable', Archivo, system-ui, sans-serif; } .ds-vorschlaege li { padding: 0.45rem 0.6rem; cursor: pointer; font-size: 0.9375rem; color: var(--text, #11141b); } .ds-vorschlaege li.aktiv, .ds-vorschlaege li:hover { background: var(--flaeche-2, #e8ebf2); } .ds-vorschlaege li small { color: var(--text-2, #5c6478); margin-left: 0.3rem; }"
+    },
+    {
+      "name": "Abgeleiteter Wert",
+      "kind": "custom",
+      "refersTo": "abgeleitet",
+      "description": "Errechnete, nicht editierbare Werte: gestrichelter Rahmen auf zweiter Fläche.",
+      "html": "<label class=\"ds-feld\">Gesamtstärke<output class=\"ds-abgeleitet\">0/2/7//9</output></label>",
+      "css": ".ds-abgeleitet { display: block; margin-top: 0.25rem; padding: 0.45rem 0.55rem; border: 1px dashed var(--linie, #bcc3d3); border-radius: 0; background: var(--flaeche-2, #e8ebf2); color: var(--text-2, #5c6478); font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace; font-size: 0.9375rem; box-sizing: border-box; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "Amtlich, aber wach",
+    "overview": "Die Oberfläche ist ein Behördenformular, das digital wurde — und dabei wach geblieben ist. Kantig, verbindlich, papiernah: alles steht wie gedruckt, nichts schwebt, nichts glänzt. Zugleich ist jedes Detail auf den Einsatz draußen gerechnet: große Tippziele, harte Linien statt zarter Grautöne, drei ausdrücklich wählbare Anzeigemodi (Dunkel, Feld, Nacht). Die Stimmung: nüchtern, verbindlich, robust, unaufgeregt. Technisch trägt das System eine einzige Token-Quelle (Inline-<style> in index.html): Rollen-Token statt Rohwerten; die Anzeigemodi und die Plattform-Layer belegen dieselben Token neu, statt Komponenten zu überschreiben. Die Kennfarbe der Organisation färbt Kopfbalken und Primäraktionen; ohne offenen Bogen greift das THW-Blau.",
+    "keyCharacteristics": [
+      "Rechteckig und kantenbetont — Behördenformular, nicht App-Kachel (Radius überall 0)",
+      "Rahmen und Weißraum tragen die Struktur, nicht Schatten",
+      "Rollen-Token als einzige Quelle; Modi und Plattformen belegen sie nur neu",
+      "Überschriften tragen Gewicht statt Farbe; die Kennfarbe bleibt selten und dadurch signalstark",
+      "Für draußen gebaut: Feld-Modus mit 112 % Schrift, 2-px-Linien und 48-px-Tippzielen"
+    ],
+    "rules": [
+      { "name": "Die Kennfarben-Regel", "body": "Die Kennfarbe gehört dem Kopfbalken und der primären Aktion. Überschriften tragen Gewicht statt Farbe — so verliert die Kennfarbe nie ihre Signalwirkung.", "section": "colors" },
+      { "name": "Die Signal-Regel", "body": "--gut, --warn-* und --alarm sind organisationsunabhängig konstant. Eine DRK-rote Oberfläche darf „Fehler" nie mit der Hausfarbe verwechselbar machen.", "section": "colors" },
+      { "name": "Die Modus-Regel", "body": "Neue Farben werden nie als Rohwert in eine Komponente geschrieben, sondern als Rollen-Token angelegt und in allen vier Belegungen (Hell, Dunkel, Feld, Nacht) definiert.", "section": "colors" },
+      { "name": "Die Gewichts-Regel", "body": "Hierarchie trägt Gewicht, nicht Farbe. Farbige Überschriften sind verboten; die Kennfarbe bleibt Aktionen vorbehalten.", "section": "typography" },
+      { "name": "Die Feld-Modus-Schrift-Regel", "body": "Der Feld-Modus hebt die Grundschrift auf 112 % und die kleinsten Grade an; nichts läuft draußen über Opacity oder Grauwerte zurück.", "section": "typography" },
+      { "name": "Die Flach-im-Stand-Regel", "body": "Eine Fläche bekommt nur dann einen Schatten, wenn sie tatsächlich über dem Inhalt schwebt (Dropdown, Dialog). Karten, Knöpfe und Eingaben bleiben schattenlos.", "section": "elevation" },
+      { "name": "Die Null-Radius-Regel", "body": "Kein Element bekommt einen eigenen border-radius. Alles referenziert var(--radius), und der ist 0. Die Plattform-Layer dürfen ihn systemkonform neu belegen — nie die Komponente selbst.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do neue Farben als Rollen-Token in index.html anlegen und in allen vier Belegungen (Hell, Dunkel, Feld, Nacht) definieren — plus, wo nötig, in den Plattform-Layern --ios-*/--md-*.",
+      "Do Trefferflächen über calc(… + var(--ziel)) bauen, damit der Feld-Modus sie automatisch auf 48px zieht.",
+      "Do Fokus sichtbar und einheitlich halten: outline: var(--fokus) solid var(--akzent).",
+      "Do Daten (Stärken, Kennzeichen) in --schrift-daten (Monospace) setzen.",
+      "Do die Kennfarbe der Organisation über wendeOrgAkzentAn() (org-farben.ts) beziehen — nie eine Org-Farbe hart in CSS schreiben."
+    ],
+    "donts": [
+      "Don't border-radius mit eigenem Wert setzen — nur var(--radius) (Null-Radius-Regel).",
+      "Don't Schatten an ruhende Flächen hängen; Schatten nur an Dropdown/Dialog (Flach-im-Stand-Regel).",
+      "Don't prefers-color-scheme auswerten — die Modi schalten ausschließlich über den Schalter und die <html>-Klasse.",
+      "Don't Text über Opacity oder helle Grauwerte zurücktreten lassen, wo der Feld-Modus greift — dort gilt: nichts tritt zurück.",
+      "Don't Verläufe, schwebende Kacheln, runde Ecken oder verspielte Illustrationen einführen (bestätigte Anti-Referenz: Consumer-App-Ästhetik).",
+      "Don't Schrift vom CDN laden — Archivo liegt im Bundle und muss offline verfügbar bleiben (PWA-Precache)."
+    ]
+  }
+}

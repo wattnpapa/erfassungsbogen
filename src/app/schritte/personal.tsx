@@ -22,7 +22,7 @@ import {
 import { parseNamen } from "../personal-schnell";
 import { beispielPersonen } from "../beispielnamen";
 import { stanPersonalVorbelegung } from "../../vokabulare/thw-stan-personal";
-import { FE_TEXT, neuePerson, plausibilitaet, vokabularFuer, vorbelegungGeladen } from "../hilfen";
+import { FE_TEXT, neuePerson, pruefpunkte, vokabularFuer, vorbelegungGeladen } from "../hilfen";
 import { frageJaNein } from "../dialoge";
 import {
   Feld,
@@ -56,8 +56,8 @@ function useBerufe(aktiv: boolean): readonly string[] {
   return berufe ?? [];
 }
 
-function KontakteEditor(props: { kontakte: Kontakt[]; aendern: (k: Kontakt[]) => void; thw: boolean }) {
-  const { kontakte, aendern, thw } = props;
+function KontakteEditor(props: { kontakte: Kontakt[]; aendern: (k: Kontakt[]) => void }) {
+  const { kontakte, aendern } = props;
   const set = (i: number, p: Partial<Kontakt>) => aendern(kontakte.map((k, j) => (j === i ? { ...k, ...p } : k)));
   return (
     <div>
@@ -70,27 +70,20 @@ function KontakteEditor(props: { kontakte: Kontakt[]; aendern: (k: Kontakt[]) =>
             >
               <option value={KontaktArt.MOBIL}>Mobil</option>
               <option value={KontaktArt.FESTNETZ}>Festnetz</option>
-              <option value={KontaktArt.EMAIL}>eMail</option>
+              <option value={KontaktArt.EMAIL}>E-Mail</option>
             </Auswahl>
           </Feld>
-          {k.art === KontaktArt.EMAIL && thw && (
-            <label className="inline">
-              <input
-                type="checkbox"
-                checked={k.emailTemplate === 1}
-                onChange={(e) => set(i, { emailTemplate: e.target.checked ? 1 : undefined, wert: e.target.checked ? undefined : "" })}
-              />
-              THW-Standardadresse
-            </label>
-          )}
-          {!(k.art === KontaktArt.EMAIL && k.emailTemplate === 1) && (
-            <Feld titel={k.art === KontaktArt.EMAIL ? "Adresse" : "Nummer"}>
-              <input
-                value={k.wert ?? ""}
-                onChange={(e) => set(i, { wert: k.art === KontaktArt.EMAIL ? e.target.value : e.target.value.replace(/\D/g, "") })}
-              />
-            </Feld>
-          )}
+          <Feld titel={k.art === KontaktArt.EMAIL ? "Adresse" : "Nummer"}>
+            <input
+              value={k.wert ?? ""}
+              onChange={(e) =>
+                set(i, {
+                  emailTemplate: undefined,
+                  wert: k.art === KontaktArt.EMAIL ? e.target.value : e.target.value.replace(/\D/g, ""),
+                })
+              }
+            />
+          </Feld>
           <label className="inline">
             <input type="checkbox" checked={k.dienstlich} onChange={(e) => set(i, { dienstlich: e.target.checked })} />
             dienstlich
@@ -229,7 +222,7 @@ function PersonKarte(props: {
         />
       </Feld>
       <h3>Erreichbarkeiten</h3>
-      <KontakteEditor kontakte={p.kontakte} aendern={(k) => set({ kontakte: k })} thw={org === OrganisationsTyp.THW} />
+      <KontakteEditor kontakte={p.kontakte} aendern={(k) => set({ kontakte: k })} />
     </div>
   );
 }
@@ -342,7 +335,7 @@ function benannte(personal: Person[]): Person[] {
 }
 
 
-export function SchrittPersonal({ bogen, aendern }: SchrittProps) {
+export function SchrittPersonal({ bogen, aendern, geheZu }: SchrittProps) {
   const nurStaerke = bogen.personalErfassung === PersonalErfassung.NUR_STAERKE;
   const vorlage = stanPersonalVorbelegung(bogen.einheit.organisation, bogen.einheit.einheitsTyp);
   const stanGeladen = vorbelegungGeladen(bogen.personal, vorlage);
@@ -473,7 +466,9 @@ export function SchrittPersonal({ bogen, aendern }: SchrittProps) {
         </p>
       )}
 
-      <Hinweise hinweise={plausibilitaet(bogen, false)} />
+      {/* Schritt-Index 2 = Personal (siehe SCHRITTE in app.tsx): Punkte
+          anderer Schritte (Zugehörigkeit, Ort/Auftrag) springen dorthin. */}
+      <Hinweise punkte={pruefpunkte(bogen, false)} aktuellerSchritt={2} geheZu={geheZu} />
 
       {!nurStaerke && vorlage.length > 0 && (
         <p>

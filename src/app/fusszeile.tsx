@@ -550,8 +550,11 @@ export function Fusszeile({ onBogenOeffnen, kompakt = false }: {
           <a href={REPO} target="_blank" rel="noopener noreferrer">Open Source auf GitHub</a>
           <a href="https://sprechfunk-uebung.de/" target="_blank" rel="noopener noreferrer">Sprechfunk-Übungsgenerator</a>
         </nav>
-        <nav className="fuss-gruppe" aria-label="Für Ihre Organisation">
-          <span className="fuss-titel">Für Ihre Organisation</span>
+        {/* Registerentscheidung der Oberfläche: Du — wie an allen anderen
+            Stellen (Absenderkarte, Hinweise); ein einzelnes „Sie" wirkte hier
+            wie ein Riss im amtlich-präzisen Ton. */}
+        <nav className="fuss-gruppe" aria-label="Für deine Organisation">
+          <span className="fuss-titel">Für deine Organisation</span>
           <a href="https://erfassungsbogen.app/thw.html" target="_blank" rel="noopener noreferrer">THW</a>
           <a href="https://erfassungsbogen.app/feuerwehr.html" target="_blank" rel="noopener noreferrer">Feuerwehr</a>
           <a href="https://erfassungsbogen.app/dlrg.html" target="_blank" rel="noopener noreferrer">DLRG</a>

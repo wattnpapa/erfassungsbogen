@@ -15,12 +15,16 @@ Funktionalität: Bogen übergeben — QR, PDF, Link, CSV
     Und sehe ich den Hinweis "Signiert (EEB2C"
     Und sehe ich "Schlüssel wird erzeugt…" nicht
 
+  # Vor Ort tragen QR und PDF; Link/CSV/Excel stehen eingeklappt unter
+  # „Weitere Formate" — alle Wege bleiben an einer Stelle, aber der
+  # Entscheidungspunkt zeigt nicht mehr sechs gleichrangige Knöpfe.
   Szenario: Der Übergabe-Dialog bündelt alle Wege
     Wenn ich auf "Bogen übergeben…" klicke
     Dann sehe ich den Dialog "Bogen übergeben"
     Und sehe ich die Schaltfläche "QR-Code im Vollbild zeigen"
     Und sehe ich die Schaltfläche "PDF erzeugen"
-    Und sehe ich die Schaltfläche "Link teilen"
+    Wenn ich "Weitere Formate" aufklappe
+    Dann sehe ich die Schaltfläche "Link teilen"
     Und sehe ich die Schaltfläche "Als CSV (Tabelle)"
     Und sehe ich die Schaltfläche "Als Excel (Format „Oldenburg“)"
     Wenn ich im Dialog auf "Schließen" klicke
@@ -45,6 +49,7 @@ Funktionalität: Bogen übergeben — QR, PDF, Link, CSV
 
   Szenario: CSV liefert den Bogen als Tabelle für die Auswertung
     Wenn ich auf "Bogen übergeben…" klicke
+    Und ich "Weitere Formate" aufklappe
     Und ich auf "Als CSV (Tabelle)" klicke und eine Datei erhalte
     Dann heißt die heruntergeladene Datei wie "eeb-*.csv"
 
@@ -52,11 +57,13 @@ Funktionalität: Bogen übergeben — QR, PDF, Link, CSV
   # Bogen muss dort als Zeile ankommen, nicht als weiteres PDF.
   Szenario: Excel liefert den Bogen im Format „Oldenburg“
     Wenn ich auf "Bogen übergeben…" klicke
+    Und ich "Weitere Formate" aufklappe
     Und ich auf "Als Excel (Format „Oldenburg“)" klicke und eine Datei erhalte
     Dann heißt die heruntergeladene Datei wie "eeb-*-oldenburg.xlsx"
 
   Szenario: Link teilen legt den Bogen-Link in die Zwischenablage
     Wenn ich auf "Bogen übergeben…" klicke
+    Und ich "Weitere Formate" aufklappe
     Und ich im Dialog auf "Link teilen" klicke
     Dann liegt der Bogen-Link in der Zwischenablage
 
@@ -68,6 +75,7 @@ Funktionalität: Bogen übergeben — QR, PDF, Link, CSV
     Und ich das Feld "Sonstiges (Freitext)" mit "eigener Stand" fülle
     Und ich zum Schritt "6. Übersicht" wechsle
     Und ich auf "Bogen übergeben…" klicke
+    Und ich "Weitere Formate" aufklappe
     Und ich im Dialog auf "Link teilen" klicke
     Und ich den Link aus der Zwischenablage öffne
     Dann sehe ich die Übersicht mit dem Standort "Oldenburg - Ni"
@@ -82,6 +90,7 @@ Funktionalität: Bogen übergeben — QR, PDF, Link, CSV
     Und ich das Feld "Sonstiges (Freitext)" mit "eigener Stand" fülle
     Und ich zum Schritt "6. Übersicht" wechsle
     Und ich auf "Bogen übergeben…" klicke
+    Und ich "Weitere Formate" aufklappe
     Und ich im Dialog auf "Link teilen" klicke
     Und ich den Link aus der Zwischenablage öffne
     Dann sehe ich den Hinweis "Unveränderter Bogen von fremder Stelle:"
@@ -93,11 +102,13 @@ Funktionalität: Bogen übergeben — QR, PDF, Link, CSV
 
   Szenario: Der hinterlegte Absender reist mit zum Empfänger
     Wenn ich auf "‹ Startseite" klicke
+    Und ich auf "Name/Kontakt hinterlegen…" klicke
     Und ich das Feld "Name" mit "Max Mustermann" fülle
     Und ich das Feld "Telefon" mit "0170 1234567" fülle
     Und ich auf "Übernehmen" klicke
     Und ich auf "Fortsetzen" klicke
     Und ich auf "Bogen übergeben…" klicke
+    Und ich "Weitere Formate" aufklappe
     Und ich im Dialog auf "Link teilen" klicke
     Und ich den Link aus der Zwischenablage öffne
     Dann sehe ich den Hinweis "Empfangen als:"
