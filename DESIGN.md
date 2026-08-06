@@ -168,9 +168,21 @@ Signalfarben — bewusst getrennt von der Kennfarbe, damit „erledigt" und „A
 
 ## Layout
 
-Eine zentrierte Inhaltsspalte (`main`, max-width 60rem, Padding `--r-5`/`--r-4`, unten 6rem Freiraum für die Fußzeile). Formulare als umbruchfähige Zeilen (`.zeile`: Flex, `gap 0.8rem`, `flex-wrap`; Felder `flex: 1 1 10rem`, schmale Felder `0 1 7rem`) — das Layout skaliert vom Telefon bis zum Desktop ohne eigene Breakpoint-Kaskade. Startseite linksbündig: ein Satzspiegel mit fester linker Kante wirkt verbindlicher als die zentrierte Mittelachse.
+Eine zentrierte Inhaltsspalte (`main`, max-width 60rem, Padding `--r-5`/`--r-4`, unten 6rem Freiraum für die fixe Schritt-Navigation). Formulare als umbruchfähige Zeilen (`.zeile`: Flex, `gap 0.8rem`, `flex-wrap`; Felder `flex: 1 1 10rem`, schmale Felder `0 1 7rem`) — das Layout trägt sich vom Telefon bis zum Desktop überwiegend aus dem Umbruch selbst. Startseite linksbündig: ein Satzspiegel mit fester linker Kante wirkt verbindlicher als die zentrierte Mittelachse.
 
-Der Rhythmus kommt aus der `--r-1`…`--r-6`-Skala (0.25–2rem); Karten stapeln mit `--r-4`-Abstand. Tippziele: Grundmaß 2.25rem, plus globaler Zuschlag `--ziel` (0 im Standard, 0.75rem im Feld-Modus → 48-px-Ziele; Stepper-Knöpfe dort 3.75rem).
+Der Rhythmus kommt aus der `--r-1`…`--r-6`-Skala (0.25–2rem), und er ist gestaffelt: eng innerhalb einer Gruppe, `--r-4` zwischen Karten, `--r-6` als Absatz zwischen zwei Zwecken. Karten sind nicht automatisch je eine Reihe — zwei knappe Karten paaren sich ab 48rem zu einem Block (`.karten-paar`), statt halbleer über die volle Breite zu laufen. Tippziele: Grundmaß 2.25rem, plus globaler Zuschlag `--ziel` (0 im Standard, 0.75rem im Feld-Modus → 48-px-Ziele; Stepper-Knöpfe dort 3.75rem).
+
+Vier benannte Umbruchpunkte, jeder an einer Inhaltsgrenze statt an einer Gerätebreite: **30rem** (Knopfreihen werden zur Spalte voller Breite, die Stärke-Leiste auf zwei Spalten), **40rem** (rollbare Tabellen laufen bis an die Kartenkante), **48rem** (Kartenpaarung), **540px** (Aktionsgruppen in Kartenköpfen brechen linksbündig um).
+
+### Named Rules
+
+**Die Absatz-Regel.** Gleichmäßig gestapelte Karten sind keine Gliederung. Ein Wechsel des Zwecks bekommt einen doppelten Kartenabstand (`--r-6`) als sichtbaren Absatz — in der Übersicht genau einen: dort, wo das Nachlesen aufhört und das Weitergeben anfängt. Weißraum trägt die Struktur, keine Trennlinie und kein Kasten.
+
+**Die Leerspalten-Regel.** Eine Spalte, die für den ganzen Bogen leer ist, wird nicht gezeigt. Optionale Angaben ohne Inhalt sind keine Information — sie kosten auf dem Telefon genau die Breite, die der eigentlichen Auskunft fehlt.
+
+**Die Zeilentrenner-Regel.** Wiederholte Einträge einer Liste trennt eine Haarlinie plus Innenabstand, kein Kasten je Eintrag. Ohne sie liegt der Abstand innerhalb eines Eintrags so groß wie der zwischen zweien, und bei 30–50 Meldungen einer Großlage verschwimmt die Liste zu einer Fläche.
+
+**Die Navigationsraum-Regel.** Die 6rem Fußraum unter `main` halten die fixe Schritt-Navigation frei und gelten nur, wo sie erscheint; Startseite und Übersicht ziehen sie auf `--r-6` zurück (`main.start`, `main.ohne-nav`). Bewusst als Abzug statt als Zuschlag: eine vergessene Ansicht behält den großen Wert und verdeckt nichts.
 
 ## Elevation & Depth
 
@@ -238,6 +250,8 @@ Kästchenzeile für den segmentierten Transport (`teil-quittung.tsx`): je Teil e
 - **Do** Fokus sichtbar und einheitlich halten: `outline: var(--fokus) solid var(--akzent)`.
 - **Do** Daten (Stärken, Kennzeichen) in `--schrift-daten` (Monospace) setzen.
 - **Do** die Kennfarbe der Organisation über `wendeOrgAkzentAn()` (org-farben.ts) beziehen — nie eine Org-Farbe hart in CSS schreiben.
+- **Do** Abstände nach Bedeutung staffeln: eng innerhalb einer Gruppe, `--r-4` zwischen Karten, `--r-6` als Absatz zwischen Zwecken (Absatz-Regel).
+- **Do** knappe Karten paaren, statt sie halbleer über die volle Breite laufen zu lassen (`.karten-paar` ab 48rem).
 
 ### Don't:
 - **Don't** `border-radius` mit eigenem Wert setzen — nur `var(--radius)` (Null-Radius-Regel).
@@ -246,3 +260,5 @@ Kästchenzeile für den segmentierten Transport (`teil-quittung.tsx`): je Teil e
 - **Don't** Text über Opacity oder helle Grauwerte zurücktreten lassen, wo der Feld-Modus greift — dort gilt: nichts tritt zurück.
 - **Don't** Verläufe, schwebende Kacheln, runde Ecken oder verspielte Illustrationen einführen (bestätigte Anti-Referenz: Consumer-App-Ästhetik).
 - **Don't** Schrift vom CDN laden — Archivo liegt im Bundle und muss offline verfügbar bleiben (PWA-Precache).
+- **Don't** in Spaltenrichtung `flex-wrap: wrap` mit einem Kind auf `flex-basis: 100%` kombinieren — der Umbruch geht dann in eine ZWEITE SPALTE und die Knöpfe laufen aus der Karte heraus. Regeln mit voller Hauptachsen-Basis gehören in eine `min-width`-Abfrage.
+- **Don't** dieselbe Zahl in zwei Größen setzen: die Stärke trägt überall die dicktengleiche Zählwert-Figur (Übersicht wie Einsatz-Sammlung).
