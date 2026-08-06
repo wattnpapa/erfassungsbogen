@@ -537,6 +537,28 @@
     .zeile > label.feld { flex: 1 1 10rem; margin-top: 0.4rem; min-width: 0; }
     select { min-width: 0; }
     .zeile > label.feld.schmal { flex: 0 1 7rem; }
+    /* Zwischenmaß für Auswahlfelder, deren Optionstext länger ist als „schmal"
+       (7rem) trägt — „OV – Ortsverband" wurde dort mitten im Wort abgeschnitten. */
+    .zeile > label.feld.mittel { flex: 0 1 12rem; }
+    /* Wiederholte Zeilen mit optionalem ✕: fehlt der Knopf in der ersten Zeile,
+       verschieben sich darunter alle Spalten um seine Breite und die Liste
+       liest sich nicht mehr als Spalten. Der leere Platz hält sie in der Flucht. */
+    .zeile > .zeilen-knopf { flex: 0 0 2.75rem; padding-inline: 0; }
+    /* Sobald die Ebenen-Zeilen stapeln, tragen die Spalten die Gliederung nicht
+       mehr: dann trennt eine Haarlinie eine Stelle von der nächsten, sonst
+       laufen Ortsverband, Regionalbereich und Landesverband ineinander. */
+    @media (max-width: 47.999rem) {
+      .ebenen-zeile + .ebenen-zeile {
+        margin-top: var(--r-3); padding-top: var(--r-3);
+        border-top: var(--strich) solid var(--linie-fein);
+      }
+    }
+    /* Nur solange die Zeile eine Zeile ist: sobald sie umbricht, wäre der
+       reservierte Platz eine leere Zeile ohne Zweck. */
+    .zeile > .zeilen-knopf-leer { display: none; }
+    @media (min-width: 48rem) {
+      .zeile > .zeilen-knopf-leer { display: block; flex: 0 0 2.75rem; }
+    }
     .inline { display: inline-flex; align-items: center; gap: 0.4rem; margin: 0.6rem 0.8rem 0 0; font-size: 0.9rem; }
     /* Nur für Vorlesesoftware: aus dem Bild genommen, aber im Baum und damit
        vorlesbar. Kein display:none und kein visibility:hidden – die nähme jede
@@ -578,6 +600,34 @@
     .chip button { border: none; padding: 0 0.2rem; min-height: 0; background: none; font-weight: bold; }
     .karte .entfernen { float: right; color: var(--alarm); border-color: var(--alarm); font-size: var(--t-xs); }
     .karte .entfernen:hover { color: var(--alarm); border-color: var(--alarm); background: var(--flaeche-2); }
+    /* Wiederholte Einträge (Person, Fahrzeug) bekommen einen Kopf: links steht,
+       wer oder was der Eintrag ist, rechts die Aktion, die ihn entfernt. Ohne
+       ihn liegt in einer Neun-Personen-Liste alles gleich schwer, und die
+       lauteste Marke je Eintrag ist neunmal ein rot gerahmter Löschknopf.
+       Der Knopf steht im Kopf statt im Float — so bleibt er auch beim Umbruch
+       HINTER der Kennung, statt auf dem Telefon über den Namen zu rutschen. */
+    .eintrag-kopf { padding-bottom: var(--r-3); border-bottom: var(--strich) solid var(--linie-fein); }
+    .eintrag-kopf > .entfernen { float: none; margin-left: auto; }
+    .eintrag-kopf + * { margin-top: var(--r-2); }
+    /* Zwischen zwei Einträgen muss mehr Luft stehen als zwischen zwei Gruppen
+       innerhalb eines Eintrags — sonst verschwimmt die Liste zur Fläche. */
+    .karte.eintrag { margin-bottom: var(--r-5); }
+    .karte.eintrag:last-of-type { margin-bottom: var(--r-4); }
+    /* Rumpf einer Personen-Karte: gestapelt auf dem Telefon, zweispaltig,
+       sobald die Karte breit genug ist. Links die feststehenden Merkmale,
+       rechts Können und Erreichbarkeit — beides für sich kurz, untereinander
+       aber zehn Zeilen bei halb leerer rechter Kartenhälfte. Die Lesefolge
+       (DOM wie Tabreihenfolge) bleibt links vor rechts. */
+    .person-koerper > * + * { margin-top: var(--r-3); }
+    /* Ein Knopf unmittelbar unter einem Feld stößt sonst ohne Fuge an dessen
+       Kante und liest sich wie ein abgerissenes Stück des Eingabefelds. */
+    label.feld.fahrerlaubnis > button, .kontakte > button { margin-top: var(--r-2); }
+    @media (min-width: 52rem) {
+      .person-koerper { display: grid; grid-template-columns: minmax(0, 17rem) minmax(0, 1fr); gap: 0 var(--r-5); }
+      .person-koerper > * + * { margin-top: 0; }
+      /* Der Rumpf beginnt links wie rechts auf derselben Höhe. */
+      .person-koerper > * > :first-child { margin-top: 0; }
+    }
     /* Auf dem Telefon ist neben einem schwebenden Knopf keine Spalte mehr übrig:
        Feldzeilen bilden einen eigenen Blockkontext und schrumpfen auf den Rest
        zwischen den Floats — aus Eingabefeldern werden Streifen von 50 px. Auf
@@ -664,6 +714,9 @@
     @media (max-width: 30rem) {
       img.fahrzeug-symbol { float: none; display: block; margin: 0 0 var(--r-1); }
     }
+    /* In der Kopfzeile ist das Zeichen ein Glied der Zeile, kein Float: es
+       führt den Eintrag an und die Kopflinie läuft darunter durch. */
+    .eintrag-kopf > img.fahrzeug-symbol { float: none; flex: 0 0 auto; margin: 0 0 0.35rem; }
     .legende { opacity: 0.75; }
     /* Autosave-Anzeige im Assistenten-Kopf: leise Bestätigung statt Sorge. */
     .autosave { margin: -0.5rem 0 0.8rem; font-size: 0.78rem; color: var(--erledigt); }

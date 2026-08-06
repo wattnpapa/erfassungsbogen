@@ -303,8 +303,11 @@ export function SchrittEinheit({ bogen, aendern }: SchrittProps) {
         Aus Name, Organisation und Einheitstyp bildet sich die Bezeichnung auf dem Bogen: <b>{einheitAnzeigename(e)}</b>
       </p>
       {e.hierarchie.map((h, i) => (
-        <div className="zeile" key={i}>
-          <Feld titel={i === 0 ? "Ebene (eigene Einheit)" : "Ebene (übergeordnet)"} schmal>
+        <div className="zeile ebenen-zeile" key={i}>
+          {/* „mittel" statt „schmal": in 7rem wurde „OV – Ortsverband" mitten
+              im Wort abgeschnitten — die Ebene ist die Spalte, an der man die
+              Zeile überhaupt erst zuordnet. */}
+          <Feld titel={i === 0 ? "Ebene (eigene Einheit)" : "Ebene (übergeordnet)"} klasse="mittel">
             <VokabAuswahl
               wert={h.bezeichnung}
               aendern={(v) => setE({ hierarchie: e.hierarchie.map((x, j) => (j === i ? { ...x, bezeichnung: v } : x)) })}
@@ -367,9 +370,13 @@ export function SchrittEinheit({ bogen, aendern }: SchrittProps) {
               onChange={(ev) => setE({ hierarchie: e.hierarchie.map((x, j) => (j === i ? { ...x, email: ev.target.value || undefined } : x)) })}
             />
           </Feld>
-          {/* Die unterste Ebene ist die Einheit selbst und bleibt stehen. */}
-          {i > 0 && (
-            <button type="button" onClick={() => setE({ hierarchie: e.hierarchie.filter((_, j) => j !== i) })}>✕</button>
+          {/* Die unterste Ebene ist die Einheit selbst und bleibt stehen. Ihr
+              Platz bleibt trotzdem reserviert — sonst stünde die E-Mail-Spalte
+              der ersten Zeile um eine Knopfbreite weiter als die darunter. */}
+          {i > 0 ? (
+            <button type="button" className="zeilen-knopf" onClick={() => setE({ hierarchie: e.hierarchie.filter((_, j) => j !== i) })}>✕</button>
+          ) : (
+            <span className="zeilen-knopf-leer" aria-hidden="true" />
           )}
         </div>
       ))}

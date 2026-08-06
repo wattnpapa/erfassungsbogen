@@ -60,7 +60,7 @@ function KontakteEditor(props: { kontakte: Kontakt[]; aendern: (k: Kontakt[]) =>
   const { kontakte, aendern } = props;
   const set = (i: number, p: Partial<Kontakt>) => aendern(kontakte.map((k, j) => (j === i ? { ...k, ...p } : k)));
   return (
-    <div>
+    <div className="kontakte">
       {kontakte.map((k, i) => (
         <div className="zeile" key={i}>
           <Feld titel="Art" schmal>
@@ -92,7 +92,7 @@ function KontakteEditor(props: { kontakte: Kontakt[]; aendern: (k: Kontakt[]) =>
         </div>
       ))}
       <button type="button" onClick={() => aendern([...kontakte, { art: KontaktArt.MOBIL, dienstlich: false, wert: "" }])}>
-        + Kontakt
+        {kontakte.length > 0 ? "+ Kontakt" : "+ Erreichbarkeit"}
       </button>
     </div>
   );
@@ -124,7 +124,7 @@ function FahrerlaubnisFeld(props: { person: Person; set: (patch: Partial<Person>
     .filter((k) => k !== Fahrerlaubnis.NONE && !belegt.has(k));
   const naechste = frei.includes(Fahrerlaubnis.A) ? Fahrerlaubnis.A : frei[0];
   return (
-    <Feld titel="Fahrerlaubnis" schmal>
+    <Feld titel="Fahrerlaubnis" schmal klasse="fahrerlaubnis">
       <Auswahl value={p.fahrerlaubnis} onChange={(e) => uebernehmen(Number(e.target.value), weitere)}>
         {Object.entries(FE_TEXT).map(([wert, text]) => (
           <option key={wert} value={wert}>{text}</option>
@@ -178,51 +178,72 @@ function PersonKarte(props: {
   const set = (patch: Partial<Person>) => aendern({ ...p, ...patch });
   const funktionen = vokabularFuer(org, "funktion");
   return (
-    <div className="karte">
-      <button type="button" className="entfernen" onClick={entfernen}>Person entfernen</button>
-      <div className="zeile">
+    <div className="karte eintrag">
+      {/* Kopf des Eintrags: wer die Person ist und welche Stärkerolle sie vor
+          Ort ausfüllt — die einzige Auskunft, nach der man in einer Liste von
+          zwölf Personen sucht. Sie steht darum allein in der breitesten Zeile,
+          nicht als drittes von sechs gleich schmalen Feldern. */}
+      <div className="zeile eintrag-kopf">
         <Feld titel="Vorname"><input value={p.vorname} onChange={(e) => set({ vorname: e.target.value })} /></Feld>
         <Feld titel="Nachname"><input value={p.nachname} onChange={(e) => set({ nachname: e.target.value })} /></Feld>
-        <Feld titel="Stärkerolle (vor Ort)" schmal>
+        <Feld titel="Stärkerolle (vor Ort)" klasse="mittel">
           <Auswahl value={p.staerkeRolle} onChange={(e) => set({ staerkeRolle: Number(e.target.value) })}>
             <option value={StaerkeRolle.FUEHRER}>Führer/in</option>
             <option value={StaerkeRolle.UNTERFUEHRER}>Unterführer/in</option>
             <option value={StaerkeRolle.MANNSCHAFT}>Mannschaft</option>
           </Auswahl>
         </Feld>
-        <Feld titel="Geschlecht" schmal>
-          <Auswahl value={p.geschlecht} onChange={(e) => set({ geschlecht: Number(e.target.value) })}>
-            <option value={Geschlecht.M}>M</option>
-            <option value={Geschlecht.W}>W</option>
-            <option value={Geschlecht.D}>D</option>
-          </Auswahl>
-        </Feld>
-        <Feld titel="Ernährung" schmal>
-          <Auswahl value={p.ernaehrung} onChange={(e) => set({ ernaehrung: Number(e.target.value) })}>
-            <option value={Ernaehrung.FLEISCH}>Fleisch</option>
-            <option value={Ernaehrung.VEGETARISCH}>Vegetarisch</option>
-            <option value={Ernaehrung.VEGAN}>Vegan</option>
-          </Auswahl>
-        </Feld>
-        <FahrerlaubnisFeld person={p} set={set} />
+        <button type="button" className="entfernen" onClick={entfernen}>Person entfernen</button>
       </div>
-      <Feld titel="Funktionen / Zusatzfunktionen">
-        <VokabListe werte={p.funktionen} aendern={(w) => set({ funktionen: w })} tabelle={funktionen} hinzufuegenText="Funktion" />
-      </Feld>
-      {/* Zusatzqualifikationen kennen kein Code-Vokabular: Beruf, Lehrgang oder
-          externe Berechtigung wandern als Freitext in den Bogen. Die
-          Berufsbezeichnungen der KldB dienen nur als Tipphilfe. */}
-      <Feld titel="Weitere Qualifikationen">
-        <VokabListe
-          werte={p.zusatzqualifikationen}
-          aendern={(w) => set({ zusatzqualifikationen: w })}
-          tabelle={[]}
-          freitextVorschlaege={berufe}
-          hinzufuegenText="Qualifikation"
-        />
-      </Feld>
-      <h3>Erreichbarkeiten</h3>
-      <KontakteEditor kontakte={p.kontakte} aendern={(k) => set({ kontakte: k })} />
+      {/* Rumpf des Eintrags in zwei Spalten, sobald die Karte breit genug ist:
+          links die feststehenden Merkmale der Person, rechts, was sie kann und
+          wie man sie erreicht. Untereinander gestapelt braucht eine Person auf
+          dem Desktop zehn Zeilen bei halb leerer rechter Kartenhälfte — bei
+          zwölf Personen scrollt der Zugführer durch viereinhalb Bildschirme
+          Weißraum. Die Lesefolge bleibt dieselbe: erst links, dann rechts. */}
+      <div className="person-koerper">
+        <div className="person-merkmale">
+          <div className="zeile">
+            <Feld titel="Geschlecht" schmal>
+              <Auswahl value={p.geschlecht} onChange={(e) => set({ geschlecht: Number(e.target.value) })}>
+                <option value={Geschlecht.M}>M</option>
+                <option value={Geschlecht.W}>W</option>
+                <option value={Geschlecht.D}>D</option>
+              </Auswahl>
+            </Feld>
+            <Feld titel="Ernährung" schmal>
+              <Auswahl value={p.ernaehrung} onChange={(e) => set({ ernaehrung: Number(e.target.value) })}>
+                <option value={Ernaehrung.FLEISCH}>Fleisch</option>
+                <option value={Ernaehrung.VEGETARISCH}>Vegetarisch</option>
+                <option value={Ernaehrung.VEGAN}>Vegan</option>
+              </Auswahl>
+            </Feld>
+            <FahrerlaubnisFeld person={p} set={set} />
+          </div>
+        </div>
+        <div className="person-faehigkeiten">
+          <Feld titel="Funktionen / Zusatzfunktionen">
+            <VokabListe werte={p.funktionen} aendern={(w) => set({ funktionen: w })} tabelle={funktionen} hinzufuegenText="Funktion" />
+          </Feld>
+          {/* Zusatzqualifikationen kennen kein Code-Vokabular: Beruf, Lehrgang oder
+              externe Berechtigung wandern als Freitext in den Bogen. Die
+              Berufsbezeichnungen der KldB dienen nur als Tipphilfe. */}
+          <Feld titel="Weitere Qualifikationen">
+            <VokabListe
+              werte={p.zusatzqualifikationen}
+              aendern={(w) => set({ zusatzqualifikationen: w })}
+              tabelle={[]}
+              freitextVorschlaege={berufe}
+              hinzufuegenText="Qualifikation"
+            />
+          </Feld>
+          {/* Die Überschrift trägt erst, wenn etwas darunter steht: bei zwölf
+              Personen ohne hinterlegte Nummer sind es zwölf fette Zeilen, die
+              nichts melden. Ohne Einträge sagt der Knopf selbst, worum es geht. */}
+          {p.kontakte.length > 0 && <h3>Erreichbarkeiten</h3>}
+          <KontakteEditor kontakte={p.kontakte} aendern={(k) => set({ kontakte: k })} />
+        </div>
+      </div>
     </div>
   );
 }

@@ -25,11 +25,14 @@ function FahrzeugKarte(props: {
   const { fahrzeug: f, org, aendern, entfernen } = props;
   const set = (patch: Partial<Fahrzeug>) => aendern({ ...f, ...patch });
   return (
-    <div className="karte">
-      <button type="button" className="entfernen" onClick={entfernen}>Fahrzeug entfernen</button>
-      {/* Taktisches Zeichen (DV 102) wie auf dem PDF — bestätigt die Typauswahl auf einen Blick. */}
-      <img className="fahrzeug-symbol" src={svgDataUrl(fahrzeugSymbolSvg(f, org))} alt="" aria-hidden="true" />
-      <div className="zeile">
+    <div className="karte eintrag">
+      {/* Kopf des Eintrags: Zeichen, Typ und Kennzeichen sagen, welches Fahrzeug
+          das ist; alles Weitere ist Beschreibung. Das taktische Zeichen (DV 102)
+          steht als Glied der Kopfzeile darin statt als Float daneben — sonst
+          setzte die Kopflinie erst rechts vom Zeichen an. Der Löschknopf steht
+          am Ende der Zeile, beim Umbruch hinter dem Kennzeichen statt darüber. */}
+      <div className="zeile eintrag-kopf">
+        <img className="fahrzeug-symbol" src={svgDataUrl(fahrzeugSymbolSvg(f, org))} alt="" aria-hidden="true" />
         <Feld titel="Fahrzeugtyp">
           <VokabAuswahl wert={f.typ} aendern={(v) => set({ typ: v })} tabelle={vokabularFuer(org, "fahrzeug")} platzhalter="z. B. MzKW, LF 20" suchbar />
         </Feld>
@@ -50,6 +53,7 @@ function FahrzeugKarte(props: {
             <option value="nein">nein</option>
           </Auswahl>
         </Feld>
+        <button type="button" className="entfernen" onClick={entfernen}>Fahrzeug entfernen</button>
       </div>
       <div className="zeile">
         <label className="inline">
@@ -64,7 +68,8 @@ function FahrzeugKarte(props: {
         </label>
         {f.funkrufname && (
           <>
-            <Feld titel="Kennwort" schmal>
+            {/* „mittel": Kennwörter wie „Heros – Heros" wurden in 7rem abgeschnitten. */}
+            <Feld titel="Kennwort" klasse="mittel">
               <VokabAuswahl
                 wert={f.funkrufname.kennwort}
                 aendern={(v) => set({ funkrufname: { ...f.funkrufname!, kennwort: v } })}

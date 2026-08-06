@@ -417,9 +417,9 @@ export function VokabListe(props: {
   );
 }
 
-export function Feld(props: { titel: string; schmal?: boolean; children: ReactNode }) {
+export function Feld(props: { titel: string; schmal?: boolean; klasse?: string; children: ReactNode }) {
   return (
-    <label className={`feld${props.schmal ? " schmal" : ""}`}>
+    <label className={["feld", props.schmal ? "schmal" : "", props.klasse ?? ""].filter(Boolean).join(" ")}>
       {props.titel}
       <FeldTitel.Provider value={props.titel}>{props.children}</FeldTitel.Provider>
     </label>

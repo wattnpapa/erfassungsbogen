@@ -182,6 +182,10 @@ Vier benannte Umbruchpunkte, jeder an einer Inhaltsgrenze statt an einer Geräte
 
 **Die Zeilentrenner-Regel.** Wiederholte Einträge einer Liste trennt eine Haarlinie plus Innenabstand, kein Kasten je Eintrag. Ohne sie liegt der Abstand innerhalb eines Eintrags so groß wie der zwischen zweien, und bei 30–50 Meldungen einer Großlage verschwimmt die Liste zu einer Fläche.
 
+**Die Eintragskopf-Regel.** Ein wiederholter Formulareintrag (Person, Fahrzeug) beginnt mit einer Kopfzeile (`.zeile.eintrag-kopf`): links steht die Kennung — der Name, das taktische Zeichen samt Typ —, rechts die Aktion, die den Eintrag entfernt, darunter eine Haarlinie. Der Löschknopf steht **in** dieser Zeile statt als `float: right` darüber; sonst rutscht er beim Umbruch auf dem Telefon über die Kennung und ist das Erste, was man je Eintrag liest. Zwischen zwei Einträgen steht `--r-5`, mehr als jeder Abstand innerhalb eines Eintrags (`.karte.eintrag`).
+
+**Die Spaltenflucht-Regel.** Wiederholte Zeilen bleiben in der Flucht, auch wenn eine davon einen Knopf nicht braucht: der Platz des fehlenden ✕ bleibt reserviert (`.zeilen-knopf-leer`), solange die Zeile eine Zeile ist. Und ein Auswahlfeld bekommt die Spaltenbreite seines längsten Optionstexts (`.mittel`, 12rem) — „OV – Ortsverband" mitten im Wort abgeschnitten kostet genau die Auskunft, an der man die Zeile zuordnet.
+
 **Die Navigationsraum-Regel.** Die 6rem Fußraum unter `main` halten die fixe Schritt-Navigation frei und gelten nur, wo sie erscheint; Startseite und Übersicht ziehen sie auf `--r-6` zurück (`main.start`, `main.ohne-nav`). Bewusst als Abzug statt als Zuschlag: eine vergessene Ansicht behält den großen Wert und verdeckt nichts.
 
 ## Elevation & Depth
