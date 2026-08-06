@@ -9,6 +9,21 @@ Funktionalität: Bogen im Assistenten erfassen
     Wenn ich auf "Neuen Bogen erstellen" klicke
     Dann sehe ich den Schritt "1. Einheit"
 
+  # Regressionsschutz für den Runde-3-Fix: die Auswahl-Combobox muss die volle
+  # Liste schon beim Antippen zeigen (Handschuhe/Tablet am Meldekopf), nicht
+  # erst, wenn getippt wird.
+  Szenario: Die Einheitstyp-Auswahl öffnet die Liste schon beim Antippen
+    Wenn ich das Feld "Einheitstyp" anklicke
+    Dann sehe ich den Text "Bergungsgruppe"
+
+  # Ein Plausibilitätshinweis, der ein anderes Feld betrifft, ist ein Sprung
+  # dorthin — nicht nur in der Übersicht, sondern auch mitten im Schritt.
+  Szenario: Ein Hinweis im Schritt springt zum betroffenen Schritt
+    Wenn ich zum Schritt "3. Personal" wechsle
+    Dann sehe ich den Hinweis "Ort/Auftrag ist noch leer."
+    Wenn ich auf "Ort/Auftrag ist noch leer." klicke
+    Dann sehe ich den Schritt "2. Einsatz"
+
   Szenario: Der Assistent führt durch alle sechs Schritte
     Dann ist die Schaltfläche "← Zurück" gesperrt
     Wenn ich auf "Weiter →" klicke

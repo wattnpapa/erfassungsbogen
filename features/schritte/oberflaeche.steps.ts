@@ -110,6 +110,19 @@ When("ich {string} ankreuze", async function (this: EebWelt, name: string) {
   await inhalt(this).getByLabel(name, { exact: true }).check();
 });
 
+// Reines Antippen/Fokussieren eines Feldes (ohne zu tippen) — für die
+// Auswahl-Combobox, die ihre Liste schon auf Tap öffnen soll.
+When("ich das Feld {string} anklicke", async function (this: EebWelt, name: string) {
+  await auswahl(this, name).click();
+});
+
+Then("ist {string} ausgewählt", async function (this: EebWelt, name: string) {
+  const feld = inhalt(this).getByLabel(name, { exact: true });
+  await bisWahr(async () => {
+    if (!(await feld.isChecked())) throw new Error(`„${name}" ist nicht ausgewählt`);
+  });
+});
+
 When("ich {string} abwähle", async function (this: EebWelt, name: string) {
   await inhalt(this).getByLabel(name, { exact: true }).uncheck();
 });
