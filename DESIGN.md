@@ -15,10 +15,14 @@ colors:
   linie: "#bcc3d3"
   linie-stark: "#8b94a9"
   gut: "#146b3a"
+  gut-fond: "#e8f4ed"
+  gut-linie: "#a9d3bc"
   warn-text: "#6d4700"
   warn-fond: "#fdf4dd"
   warn-linie: "#ddbe79"
   alarm: "#a4231c"
+  alarm-fond: "#fdecea"
+  alarm-linie: "#eaa79d"
 typography:
   display:
     fontFamily: "Archivo Variable, Archivo, system-ui, sans-serif"
@@ -130,15 +134,15 @@ Eine kühle, leicht ins Blaue gekippte Neutralpalette unter einer einzigen, orga
 - **Linienwerte** (#d7dce7 fein / #bcc3d3 normal): Kartenrahmen, Trenner.
 
 ### Tertiary
-Signalfarben — bewusst getrennt von der Kennfarbe, damit „erledigt" und „Achtung" in jeder Organisation gleich aussehen:
-- **Einsatzgrün** (#146b3a): erledigt, gültig, Offline-Zusage (`--gut`).
+Signalfarben — bewusst getrennt von der Kennfarbe, damit „erledigt" und „Achtung" in jeder Organisation gleich aussehen. Jedes Signal trägt dieselbe Dreier-Rolle (Text, Fond, Linie), damit ein Zustand überall als derselbe Kasten erscheinen kann:
+- **Einsatzgrün** (#146b3a auf #e8f4ed, Linie #a9d3bc): erledigt, gültig, Offline-Zusage, „bereit zur Weitergabe" (`--gut`, `--gut-fond`, `--gut-linie`).
 - **Warnbraun auf Aktengelb** (#6d4700 auf #fdf4dd, Linie #ddbe79): Warnhinweise (`--warn-*`).
-- **Alarmrot** (#a4231c): Fehler und Alarme (`--alarm`).
+- **Alarmrot** (#a4231c auf #fdecea, Linie #eaa79d): Fehler, Alarme, gebrochene Signaturen (`--alarm`, `--alarm-fond`, `--alarm-linie`).
 
 ### Named Rules
 **Die Kennfarben-Regel.** Die Kennfarbe gehört dem Kopfbalken und der primären Aktion. Überschriften tragen Gewicht statt Farbe — so verliert die Kennfarbe nie ihre Signalwirkung.
 
-**Die Signal-Regel.** `--gut`, `--warn-*` und `--alarm` sind organisationsunabhängig konstant. Eine DRK-rote Oberfläche darf „Fehler" nie mit der Hausfarbe verwechselbar machen.
+**Die Signal-Regel.** `--gut(-*)`, `--warn-*` und `--alarm(-*)` sind organisationsunabhängig konstant. Eine DRK-rote Oberfläche darf „Fehler" nie mit der Hausfarbe verwechselbar machen.
 
 **Die Modus-Regel.** Neue Farben werden nie als Rohwert in eine Komponente geschrieben, sondern als Rollen-Token angelegt und in allen vier Belegungen (Hell, Dunkel, Feld, Nacht) definiert — sonst entsteht das „halb angewandte Dunkel", das die Modi ausdrücklich verhindern.
 
@@ -216,6 +220,9 @@ Komponenten-Gefühl (bestätigt): **robust und werkzeughaft — gebaut für Hand
 
 ### Autocomplete / Vorschlagsliste (Signature Component)
 Absolut positionierte Liste unter dem Feld: weiße Fläche, 1px-Rahmen `--linie-stark`, der einzige Nicht-Overlay-Schatten des Systems (0 4px 12px), aktive Zeile auf `--flaeche-2`. Vorschläge tragen Zweittext als `small` in `--text-2`.
+
+### Teil-Quittung (mehrteiliger QR-Transport)
+Kästchenzeile für den segmentierten Transport (`teil-quittung.tsx`): je Teil ein Kästchen in `--schrift-daten`, Größe in `em` (die 112-%-Schrift des Feld-Modus vergrößert sie mit, ohne eigenen Modus-Block). Eingegangene Teile sind gefüllt (`--gut`, Schrift `--grund` — beide sind in jeder Belegung gegenläufig hell/dunkel, deshalb trägt die Schrift auch im aufgehellten Grün von Dunkel und Nacht), offene bleiben leer mit Linie `--linie-stark`. Der Unterschied liegt in der **Füllung**, nicht allein in der Farbe. Die Farben laufen über eigene Kanäle (`--quittung-*`), weil die Zeile in zwei Welten steht: auf den Token-Flächen und im Scanner-Overlay über dem Kamerabild, wo sie — wie der übrige Overlay-Text — auf Weiß/Schwarz umschaltet. Der Fortschrittssatz daneben bleibt die maßgebliche Auskunft (Screenreader, nativer System-Scanner); die Zeile ist `aria-hidden`.
 
 ### Anzeigemodi (Systemverhalten, nicht Komponente)
 - **Dunkel** (`.dunkel-modus`): neutrale Invertierung (#0f1116/#171a21), Kennfarbe wechselt auf den aufgehellten Org-Ton (`--org-akzent-dunkel`), Kopfbalken behält die Kennfarbe.

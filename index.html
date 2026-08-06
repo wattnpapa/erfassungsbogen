@@ -150,12 +150,18 @@
       --auf-akzent:  #ffffff;
 
       /* Signalfarben — bewusst getrennt von der Kennfarbe, damit „erledigt"
-         und „Achtung" in jeder Organisation gleich aussehen. */
-      --gut:        #146b3a;
-      --warn-text:  #6d4700;
-      --warn-fond:  #fdf4dd;
-      --warn-linie: #ddbe79;
-      --alarm:      #a4231c;
+         und „Achtung" in jeder Organisation gleich aussehen. Alle drei Signale
+         tragen dieselbe Dreier-Rolle (Text, Fond, Linie), damit ein Zustand
+         überall als derselbe Kasten erscheinen kann. */
+      --gut:         #146b3a;
+      --gut-fond:    #e8f4ed;
+      --gut-linie:   #a9d3bc;
+      --warn-text:   #6d4700;
+      --warn-fond:   #fdf4dd;
+      --warn-linie:  #ddbe79;
+      --alarm:       #a4231c;
+      --alarm-fond:  #fdecea;
+      --alarm-linie: #eaa79d;
 
       /* Form: rechteckig und kantenbetont — Behördenformular, nicht App-Kachel. */
       --radius:       0px;
@@ -586,7 +592,15 @@
     .vollstaendigkeit li { margin: 0.15rem 0; position: relative; }
     .vollstaendigkeit li::before { content: "•"; position: absolute; left: -0.9em; }
     .vollstaendigkeit button.link { color: inherit; text-align: left; }
-    .vollstaendig-ok { color: var(--erledigt); font-size: 0.9rem; font-weight: 600; }
+    /* Das Gegenstück zur Checkliste: „bereit zur Weitergabe" trägt dasselbe
+       Kasten-Gewicht wie „offene Punkte" — nur eben im Erledigt-Grün. Als
+       max-content-Stempel statt Vollbreite: die Entwarnung informiert, sie
+       muss nicht die Karte füllen wie eine Aufgabenliste. */
+    .vollstaendig-ok {
+      color: var(--gut); background: var(--gut-fond); border: var(--strich) solid var(--gut-linie);
+      border-radius: var(--radius); padding: 0.5rem 0.7rem; font-size: var(--t-s); font-weight: 600;
+      margin: 0.6rem 0; width: max-content; max-width: 100%;
+    }
     /* Taktische Zeichen in der Oberfläche: Einheiten-„Avatar" im Kopf und in
        der Übersicht, Fahrzeug-Symbol (DV 102) in der Fahrzeugkarte. */
     .titelzeile { display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; }
@@ -815,11 +829,11 @@
     .absenderkarte label.feld { display: block; }
     .absenderkarte .zeile > label.feld { flex: 1 1 12rem; }
     .signatur-herkunft { font-size: 0.9rem; border: 1px solid var(--rand); border-radius: 0.4rem; padding: 0.4rem 0.6rem; margin: 0.4rem 0; }
-    .signatur-herkunft.gueltig { background: #e8f6ee; border-color: #b6dfc6; color: #1c5c44; }
-    .signatur-herkunft.ungueltig { background: #fdecea; border-color: #f3b6ae; color: #8a1c12; }
+    .signatur-herkunft.gueltig { background: var(--gut-fond); border-color: var(--gut-linie); color: var(--gut); }
+    .signatur-herkunft.ungueltig { background: var(--alarm-fond); border-color: var(--alarm-linie); color: var(--alarm); }
     .signatur-badge { white-space: nowrap; font-weight: 600; }
-    .signatur-badge.gueltig { color: #1c5c44; }
-    .signatur-badge.ungueltig { color: #8a1c12; }
+    .signatur-badge.gueltig { color: var(--gut); }
+    .signatur-badge.ungueltig { color: var(--alarm); }
     /* Übungs-Kennzeichen an Meldungen in der Einsatz-Sammlung — gleiche
        Farbwelt wie der Störer im Assistenten (Warn-Tokens), damit „Übung"
        überall dieselbe Handschrift trägt. */
@@ -1925,7 +1939,11 @@
       --akzent-hell: var(--org-akzent-dunkel, #c6d4f8);
       --auf-akzent:  var(--org-akzent-tief, #101a33);
       --gut:         #6cd18a;
+      --gut-fond:    #16261d;
+      --gut-linie:   #2f5340;
       --alarm:       #ff9d94;
+      --alarm-fond:  #2a1715;
+      --alarm-linie: #5c2a24;
       --warn-text:   #f0cf88;
       --warn-fond:   #2a2416;
       --warn-linie:  #6b5a2c;
@@ -1944,10 +1962,6 @@
     .dunkel-modus .rolle-badge.rolle-f { background: #2b2748; color: #c9c0ee; }
     .dunkel-modus .rolle-badge.rolle-u { background: #1c2c25; color: #9fcbb2; }
     .dunkel-modus .rolle-badge.rolle-m { background: var(--flaeche-2); color: var(--text-2); }
-    .dunkel-modus .signatur-herkunft.gueltig { background: #16261d; border-color: #2f5340; color: var(--gut); }
-    .dunkel-modus .signatur-herkunft.ungueltig { background: #2a1715; border-color: #5c2a24; color: var(--alarm); }
-    .dunkel-modus .signatur-badge.gueltig { color: var(--gut); }
-    .dunkel-modus .signatur-badge.ungueltig { color: var(--alarm); }
     .dunkel-modus .vollstaendig-ok, .dunkel-modus .autosave { color: var(--gut); }
     .dunkel-modus .offline-badge { color: var(--gut); border-color: var(--gut); }
     /* QR-Bilder behalten ihre weiße Ruhezone — sonst sind sie unscannbar. */
@@ -1979,7 +1993,11 @@
       --akzent-hell: #c9932c;
       --auf-akzent:  #100d07;
       --gut:         #8fae63;
+      --gut-fond:    #1d241a;
+      --gut-linie:   #40523a;
       --alarm:       #e08a7e;
+      --alarm-fond:  #291410;
+      --alarm-linie: #5e2f26;
       --warn-text:   #d9b96a;
       --warn-fond:   #2a2415;
       --warn-linie:  #6b501c;
@@ -2002,8 +2020,6 @@
     .nacht-modus .rolle-badge.rolle-f { background: #2a2440; color: #c3b6ea; }
     .nacht-modus .rolle-badge.rolle-u { background: #1d2a22; color: #9fcbb2; }
     .nacht-modus .rolle-badge.rolle-m { background: var(--flaeche-2); color: var(--text-2); }
-    .nacht-modus .signatur-herkunft.gueltig { background: #1d241a; border-color: #40523a; color: var(--gut); }
-    .nacht-modus .signatur-badge.gueltig { color: var(--gut); }
     /* QR-Bilder und Vollbild bleiben hell — Scannbarkeit geht vor Dunkeladaption;
        fürs Vorzeigen wird ohnehin das Display der Gegenseite gebraucht. */
     .nacht-modus .qr-box img { background: #fff; padding: 8px; }
