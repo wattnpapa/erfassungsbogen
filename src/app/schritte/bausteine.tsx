@@ -138,6 +138,7 @@ function VokabCombobox(props: {
     <VorschlagFeld
       wert={eingabe}
       platzhalter={platzhalter}
+      picker
       treffer={treffer}
       schluessel={(t) => String(t.code)}
       zeile={(t) => (
@@ -212,8 +213,15 @@ export function VorschlagFeld<T>(props: {
   verlassen?: (wert: string) => void;
   /** true: Feld läuft in einer Zeile mit (Chips), statt eine eigene zu füllen. */
   imFluss?: boolean;
+  /**
+   * true: Auswahl-Combobox (Einheitstyp/Fahrzeugtyp) — trägt ein ▾ als
+   * Picker-Hinweis. Öffnen auf Fokus/Tap gilt ohnehin für alle Felder; das
+   * Chevron sagt nur denen, wo eine Auswahl das Ziel ist (nicht bei reinen
+   * Suchfeldern wie dem OV-Namen), dass hier eine Liste wartet.
+   */
+  picker?: boolean;
 }) {
-  const { wert, platzhalter, beschriftung, treffer, schluessel, zeile, tippen, waehlen, bestaetigen, verlassen, imFluss } = props;
+  const { wert, platzhalter, beschriftung, treffer, schluessel, zeile, tippen, waehlen, bestaetigen, verlassen, imFluss, picker } = props;
   const ausFeld = useContext(FeldTitel);
   const [offen, setOffen] = useState(false);
   const [aktiv, setAktiv] = useState(0);
@@ -232,7 +240,7 @@ export function VorschlagFeld<T>(props: {
   };
 
   return (
-    <span className={imFluss ? "autocomplete im-fluss" : "autocomplete"}>
+    <span className={["autocomplete", imFluss ? "im-fluss" : "", picker ? "picker" : ""].filter(Boolean).join(" ")}>
       <input
         // Wie bei <Auswahl>: im umschließenden <label> zählt sonst der ganze
         // Textinhalt (hier die schon gesetzten Chips) als Feldname.
@@ -253,6 +261,12 @@ export function VorschlagFeld<T>(props: {
           setOffen(true);
           setAktiv(0);
         }}
+        // Antippen/Fokussieren zeigt die Liste, ohne dass erst getippt werden
+        // muss — ein Native-Select öffnete auf Tap, das darf die Combobox nicht
+        // verlieren (Meldekopf am Tablet, Handschuhe). Zeigt nur etwas, wenn der
+        // Aufrufer für die aktuelle Eingabe Treffer liefert (leeres Suchfeld: keine).
+        onFocus={() => setOffen(true)}
+        onClick={() => setOffen(true)}
         onKeyDown={(ev) => {
           if (ev.key === "Escape") {
             setOffen(false);

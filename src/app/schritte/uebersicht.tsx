@@ -520,13 +520,12 @@ export function Uebersicht(props: {
                   </figure>
                 ))}
               </div>
-              <p className="hinweis">Signiert (EEB2C{stufenText(qr)}).</p>
             </>
           ) : (
             <>
               <img src={qr.teile[0]!.datenUrl} alt="EEB2-QR-Code" />
               <p className="hinweis">
-                Signiert (EEB2C{stufenText(qr)}) — öffnet beim Scannen mit der Kamera die App; dieser Code steht auch auf der letzten PDF-Seite.
+                Öffnet beim Scannen mit der Kamera die App; dieser Code steht auch auf der letzten PDF-Seite.
               </p>
             </>
           )
@@ -534,13 +533,9 @@ export function Uebersicht(props: {
         ) : (
           <p className="hinweis">QR-Code wird erzeugt…</p>
         )}
-        {qr && (
-          <p>
-            <button type="button" onClick={() => { setVollbildTeil(0); setVollbild(true); }}>
-              Vollbild anzeigen
-            </button>
-          </p>
-        )}
+        {/* Kein zweiter „Vollbild"-Knopf hier: die QR-Box ist Nachweis- und
+            Signaturfläche, der Vorzeige-Weg läuft über „Bogen übergeben…" →
+            „QR-Code im Vollbild zeigen" (eine primäre Tür). */}
         <div className="signatur-optionen">
           {/* Beim Weiterreichen ist die wichtigste Aussage, WESSEN Signatur der
               Code trägt — sonst hielte der nächste Empfänger dieses Gerät für
@@ -564,7 +559,7 @@ export function Uebersicht(props: {
             <summary>Was das Siegel belegt</summary>
             <p className="hinweis">
               Es belegt Herkunft und Integrität, nicht die Identität — der private Schlüssel bleibt
-              auf dem Gerät. Technisch eine Ed25519-Signatur (+97 Byte je Bogen).
+              auf dem Gerät. Technisch eine Ed25519-Signatur (+97 Byte je Bogen){qr ? ` · Format EEB2C${stufenText(qr)}` : ""}.
               {schluesselKurz && (
                 <>
                   {" · "}

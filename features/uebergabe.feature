@@ -12,7 +12,7 @@ Funktionalität: Bogen übergeben — QR, PDF, Link, CSV
   Szenario: Die Übersicht erzeugt den QR-Code und nennt den Geräteschlüssel
     Dann sehe ich die Überschrift "QR-Code (Offline-Transport)"
     Und sehe ich das Bild "EEB2-QR-Code"
-    Und sehe ich den Hinweis "Signiert (EEB2C"
+    Und sehe ich den Hinweis "Signiert mit dem Echtheits-Siegel"
     Und sehe ich "Schlüssel wird erzeugt…" nicht
 
   # Vor Ort tragen QR und PDF; Link/CSV/Excel stehen eingeklappt unter

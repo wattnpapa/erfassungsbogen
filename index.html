@@ -488,6 +488,14 @@
     }
     .autocomplete { position: relative; display: block; }
     .autocomplete > input { display: block; width: 100%; margin-top: 0.15rem; }
+    /* Picker-Combobox (Einheitstyp/Fahrzeugtyp): ein ▾ signalisiert „hier
+       wartet eine Liste" — dieselbe Glyphen-Sprache wie ‹ ✕ ✓ • der App.
+       Rein dekorativ (die Liste öffnet auf Tap/Fokus, nicht über das Zeichen). */
+    .autocomplete.picker > input { padding-right: 1.9rem; }
+    .autocomplete.picker::after {
+      content: "▾"; position: absolute; right: 0.7rem; top: 50%; transform: translateY(-40%);
+      color: var(--text-2); pointer-events: none; font-size: 0.9em;
+    }
     /* Variante für Vorschlagsfelder, die in einer Zeile mit Chips stehen. */
     .autocomplete.im-fluss { display: inline-block; }
     .autocomplete.im-fluss > input { width: 12rem; max-width: 100%; margin-top: 0; }
@@ -641,14 +649,15 @@
        Nebenaktionen bilden ein eigenes, leicht abgesetztes Cluster. */
     .kopfzeile > span.uebersicht-aktionen { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; }
     .uebersicht-aktionen .neben-aktionen { display: inline-flex; flex-wrap: wrap; gap: 0.4rem; }
-    /* Feine Trennlinie zwischen Primär und Nebenaktionen — nur wo sie in einer
-       Zeile stehen; nach einem Umbruch entfällt sie. */
-    .uebersicht-aktionen .neben-aktionen { padding-left: 0.5rem; border-left: var(--strich) solid var(--linie-fein); }
+    /* Nebenaktionen deutlich abgesetzt: spürbarer Spalt plus Trennlinie in der
+       kräftigeren Linienfarbe — Fill-vs-Outline allein trug die Trennung im
+       Live-Bild zu leise. */
+    .uebersicht-aktionen .neben-aktionen { margin-left: var(--r-3); padding-left: var(--r-3); border-left: var(--strich-stark) solid var(--linie); }
     @media (max-width: 540px) {
       /* Kompakt umbrechend statt vier gestapelter Vollbreite-Knöpfe: die
          Offene-Punkte-Karte darunter bleibt so beim Öffnen im Blickfeld. */
       .kopfzeile > span.uebersicht-aktionen { width: 100%; }
-      .uebersicht-aktionen .neben-aktionen { border-left: none; padding-left: 0; width: 100%; }
+      .uebersicht-aktionen .neben-aktionen { border-left: none; margin-left: 0; padding-left: 0; width: 100%; }
     }
 
     /* Touch-Zähler (− / Zahl / +) für die Meldekopf-Schnellerfassung: große
