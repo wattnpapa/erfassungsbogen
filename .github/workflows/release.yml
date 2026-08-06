@@ -8,6 +8,19 @@ on:
     branches: [main]
   workflow_dispatch:
 
+# Ein Commit wird genau einmal gebaut und ausgeliefert. Kam derselbe Push
+# doppelt an (am 6.8.2026 zweimal dieselbe SHA im Abstand einer Sekunde),
+# liefen zwei vollständige Läufe — und beide wollten dieselbe SHA nach Pages
+# deployen. GitHub Pages führt ein Deployment je Commit: das zweite riss dem
+# ersten den Platz weg, „Deployment cancelled", die Seite blieb auf dem alten
+# Stand stehen. Der Schlüssel ist bewusst die SHA und nicht der Branch: so
+# räumt ein Doppel-Lauf sich selbst weg, während zwei echte Pushes hinter-
+# einander unangetastet durchlaufen — ein abgebrochener Lauf hätte hier ein
+# halb hochgeladenes Release zur Folge.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.sha }}
+  cancel-in-progress: true
+
 permissions:
   contents: write
 
