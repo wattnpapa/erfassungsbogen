@@ -15,6 +15,9 @@
  * (z. B. Gabelstapler) bekommen KEINE Kennzahl → kein Funkrufname.
  *
  * Bewusste Lücken/Entscheidungen:
+ *  - FGr N, SB (B) und BrB standen anfangs ohne Trägerfahrzeug da, weil der
+ *    MzGW im Vokabular fehlte (Issue #6). Er ist nachgetragen — je ein
+ *    Fahrzeug, Kennzahl 55.
  *  - FGr SB (A) (Code 18): Ausstattung nicht maschinell extrahierbar → keine Vorbelegung.
  *  - ZTr FZ Log (Code 36): StAN listet zusätzlich "3x FüKW FGr-spezifisch";
  *    vorbelegt wird nur der eigene FüKW. TODO(frage) bei Gelegenheit klären.
@@ -53,13 +56,13 @@ export const THW_STAN_FAHRZEUGE: Record<number, StanFahrzeug[]> = {
   8: [fk(7, 42), fk(18, 73), f(45), f(46)], // R (C): Teleskoplader
   9: [fk(10, 46), fk(22, 81, 82)], // W (A): LKW Lkr gl (mittel), 2x MzAB
   10: [fk(10, 46), f(44)], // W (B): LKW Lkr gl, Anh Plattform
-  11: [fk(20, 47), f(44)], // BrB: Mobilkran, Anh Plattform
+  11: [fk(26, 55), fk(20, 47), f(44)], // BrB: MzGW, Mobilkran, Anh Plattform
   12: [fk(23, 25), ft("Anh FGr O")], // O (A): MTW TZ, Anhänger FGr O
   13: [fk(23, 25), ft("Anh FGr O")], // O (B)
   14: [fk(23, 25)], // O (C): MTW TZ
   15: [fk(5, 25), ft("Anh FGr Sp")], // Sp: MTW FGr, Anhänger FGr Sp
-  16: [f(21), f(44), f(47)], // N: Gabelstapler (keine Funkstelle), Anh Plattform, Anh NEA mittel
-  19: [fk(19, 74), f(44)], // SB (B): Schreitbagger, Anh Plattform
+  16: [fk(26, 55), f(21), f(44), f(47)], // N: MzGW, Gabelstapler (keine Funkstelle), Anh Plattform, Anh NEA mittel
+  19: [fk(26, 55), fk(19, 74), f(44)], // SB (B): MzGW, Schreitbagger, Anh Plattform
   20: [fk(23, 25)], // Tr ESS: MTW TZ
   21: [fk(24, 25)], // Tr MHP: MTW gl
   22: [fk(23, 25)], // Tr UL: MTW TZ

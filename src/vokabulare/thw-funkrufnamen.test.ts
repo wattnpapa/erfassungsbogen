@@ -129,6 +129,16 @@ describe("stanFahrzeugVorbelegung — Funkrufname", () => {
     expect(mtw.map((f) => f.funkrufname!.teile)).toEqual([[19, 25], [19, 26]]);
   });
 
+  it("stellt FGr N, SB (B) und BrB ihren MzGW voran (Kennzahl 55)", () => {
+    // Die drei Fachgruppen, die den MzGW führen — er ist ihr Trägerfahrzeug
+    // und steht deshalb an erster Stelle der Vorbelegung.
+    for (const [kurz, teileinheit] of [["FGr N", 24], ["FGr SB (B)", 39], ["FGr BrB", 54]] as const) {
+      const erstes = stanFahrzeugVorbelegung(OrganisationsTyp.THW, einheitsTyp(kurz))[0]!;
+      expect(erstes.typ, kurz).toEqual({ code: 26 });
+      expect(erstes.funkrufname?.teile, kurz).toEqual([teileinheit, 55]);
+    }
+  });
+
   it("gibt der FGr BT keinen Funkrufnamen (nicht in der Taschenkarte)", () => {
     const fahrzeuge = stanFahrzeugVorbelegung(OrganisationsTyp.THW, einheitsTyp("FGr BT"));
     expect(fahrzeuge.every((f) => f.funkrufname == null)).toBe(true);
