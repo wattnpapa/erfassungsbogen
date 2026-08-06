@@ -1153,6 +1153,18 @@
         animation-duration: 0ms !important;
       }
     }
+    /* Der Wechsel des Anzeigemodus springt — hier erklärt Bewegung keinen
+       Zustand, sie verdeckt ihn. Knöpfe überblenden ihre Schriftfarbe
+       (`transition: color` weiter oben), der Seitengrund schlägt dagegen
+       sofort um. Ein Knopf ohne eigene Fläche („Impressum",
+       „Datensicherung") trägt für die Dauer des Übergangs also noch die
+       Schrift des alten Modus auf dem Grund des neuen — gemessen ein
+       Helligkeitsabstand von 0,007, praktisch unsichtbar.
+       anzeige-modus.ts setzt die Klasse für einen Frame um die Umschaltung. */
+    .modus-wechsel, .modus-wechsel *, .modus-wechsel *::before,
+    .modus-wechsel *::after, .modus-wechsel ::backdrop {
+      transition-duration: 0ms !important;
+    }
 
     /* ---------------------------------------------------------------
        Safe-Area (Notch, Statusleiste, Home-Indicator). env() ist auf

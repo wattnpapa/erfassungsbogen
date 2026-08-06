@@ -56,8 +56,25 @@ export const ANZEIGE_MODUS_EVENT = "eeb-anzeigemodus";
 
 export function anzeigeModusSetzen(m: AnzeigeModus): void {
   speicher()?.setItem(SPEICHER_SCHLUESSEL, m);
-  anwenden(m);
+  ohneUebergang(() => anwenden(m));
   window.dispatchEvent(new CustomEvent<AnzeigeModus>(ANZEIGE_MODUS_EVENT, { detail: m }));
+}
+
+/**
+ * Die Umschaltung springt: Knöpfe überblenden ihre Schriftfarbe, der
+ * Seitengrund schlägt sofort um. Für die Dauer des Übergangs stünde die
+ * Schrift des alten Modus auf dem Grund des neuen — bei Knöpfen ohne eigene
+ * Fläche („Impressum") ist sie dabei praktisch unsichtbar. Die Klasse
+ * `modus-wechsel` (index.html) setzt alle Übergänge auf 0 ms; der erzwungene
+ * Stilabruf übernimmt die neuen Farben noch im selben Frame, danach darf sich
+ * die Oberfläche wieder bewegen.
+ */
+function ohneUebergang(umschalten: () => void): void {
+  const klassen = document.documentElement.classList;
+  klassen.add("modus-wechsel");
+  umschalten();
+  void document.documentElement.offsetHeight; // Stil jetzt berechnen
+  requestAnimationFrame(() => klassen.remove("modus-wechsel"));
 }
 
 /** Beim App-Start die gespeicherte Wahl anwenden (vor dem ersten Render). */
