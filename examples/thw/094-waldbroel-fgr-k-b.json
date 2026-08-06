@@ -1,7 +1,7 @@
 {
-  "schemaVersion": 6,
+  "schemaVersion": 8,
   "uebung": true,
-  "stand": 2389,
+  "stand": 3440864,
   "einheit": {
     "organisation": 1,
     "einheitsTyp": {
@@ -43,70 +43,29 @@
   "personalErfassung": 0,
   "personal": [
     {
-      "vorname": "Jannik",
-      "nachname": "Lorenz",
+      "vorname": "Markus",
+      "nachname": "Busch",
       "staerkeRolle": 1,
       "funktionen": [
         {
           "code": 3
-        },
-        {
-          "code": 34
         }
       ],
-      "fahrerlaubnis": 10,
+      "fahrerlaubnis": 9,
       "geschlecht": 0,
       "ernaehrung": 0,
       "kontakte": [
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "5551517770"
-        },
-        {
-          "art": 2,
-          "dienstlich": true,
-          "emailTemplate": 1
+          "wert": "5553414378"
         }
       ],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Svenja",
-      "nachname": "Graf",
-      "staerkeRolle": 1,
-      "funktionen": [
-        {
-          "code": 4
-        },
-        {
-          "code": 31
-        }
-      ],
-      "fahrerlaubnis": 5,
-      "geschlecht": 1,
-      "ernaehrung": 0,
-      "kontakte": [],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Andreas",
-      "nachname": "Jung",
-      "staerkeRolle": 1,
-      "funktionen": [
-        {
-          "code": 4
-        }
-      ],
-      "fahrerlaubnis": 9,
-      "geschlecht": 0,
-      "ernaehrung": 1,
-      "kontakte": [],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Uwe",
-      "nachname": "Schmidt",
+      "vorname": "Jan",
+      "nachname": "Neumann",
       "staerkeRolle": 1,
       "funktionen": [
         {
@@ -115,13 +74,60 @@
       ],
       "fahrerlaubnis": 10,
       "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5551858515"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Funkamateur (extern)"
+        }
+      ]
+    },
+    {
+      "vorname": "Dominik",
+      "nachname": "Scholz",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "code": 4
+        },
+        {
+          "code": 34
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Elektrofachkraft (Beruf)"
+        }
+      ]
+    },
+    {
+      "vorname": "Diana",
+      "nachname": "Köhler",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "code": 4
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 1,
       "ernaehrung": 0,
       "kontakte": [],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Dennis",
-      "nachname": "Müller",
+      "vorname": "Kevin",
+      "nachname": "Berger",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -131,15 +137,19 @@
           "code": 34
         }
       ],
-      "fahrerlaubnis": 0,
+      "fahrerlaubnis": 10,
       "geschlecht": 0,
-      "ernaehrung": 1,
+      "ernaehrung": 0,
       "kontakte": [],
-      "zusatzqualifikationen": []
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Gesundheits- und Krankenpfleger (Beruf)"
+        }
+      ]
     },
     {
-      "vorname": "Jan",
-      "nachname": "Friedrich",
+      "vorname": "Lukas",
+      "nachname": "Seidel",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -147,72 +157,39 @@
         },
         {
           "code": 53
-        },
-        {
-          "code": 31
-        }
-      ],
-      "fahrerlaubnis": 0,
-      "geschlecht": 0,
-      "ernaehrung": 0,
-      "kontakte": [],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Jens",
-      "nachname": "Ebert",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
-        }
-      ],
-      "fahrerlaubnis": 0,
-      "geschlecht": 0,
-      "ernaehrung": 0,
-      "kontakte": [],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Martin",
-      "nachname": "Thiel",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
-        },
-        {
-          "code": 30
-        }
-      ],
-      "fahrerlaubnis": 9,
-      "geschlecht": 0,
-      "ernaehrung": 0,
-      "kontakte": [],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Stefanie",
-      "nachname": "Franke",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
         }
       ],
       "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Silke",
+      "nachname": "Menzel",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        }
+      ],
+      "fahrerlaubnis": 10,
       "geschlecht": 1,
       "ernaehrung": 0,
       "kontakte": [],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Sebastian",
-      "nachname": "Schwarz",
+      "vorname": "Karsten",
+      "nachname": "Reuter",
       "staerkeRolle": 0,
       "funktionen": [
         {
           "code": 5
+        },
+        {
+          "code": 34
         }
       ],
       "fahrerlaubnis": 10,
@@ -222,30 +199,64 @@
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Jonas",
-      "nachname": "Hoffmann",
+      "vorname": "Markus",
+      "nachname": "Weiß",
       "staerkeRolle": 0,
       "funktionen": [
         {
           "code": 5
         }
       ],
-      "fahrerlaubnis": 9,
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Tischler (Beruf)"
+        }
+      ]
+    },
+    {
+      "vorname": "Kai",
+      "nachname": "Lenz",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        }
+      ],
+      "fahrerlaubnis": 0,
       "geschlecht": 0,
       "ernaehrung": 1,
       "kontakte": [],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Torben",
-      "nachname": "Krämer",
+      "vorname": "Svenja",
+      "nachname": "Günther",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Lukas",
+      "nachname": "Schubert",
       "staerkeRolle": 0,
       "funktionen": [
         {
           "code": 5
         },
         {
-          "code": 30
+          "code": 34
         }
       ],
       "fahrerlaubnis": 0,
@@ -255,15 +266,15 @@
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Thorsten",
-      "nachname": "Richter",
+      "vorname": "Kevin",
+      "nachname": "Reuter",
       "staerkeRolle": 0,
       "funktionen": [
         {
           "code": 5
         }
       ],
-      "fahrerlaubnis": 0,
+      "fahrerlaubnis": 5,
       "geschlecht": 0,
       "ernaehrung": 0,
       "kontakte": [],
@@ -276,7 +287,7 @@
         "code": 1
       },
       "stanKonform": true,
-      "kennzeichen": "THW-80338",
+      "kennzeichen": "THW-80349",
       "funkrufname": {
         "kennwort": {
           "code": 1
@@ -293,7 +304,7 @@
         "code": 5
       },
       "stanKonform": true,
-      "kennzeichen": "THW-80339",
+      "kennzeichen": "THW-80350",
       "funkrufname": {
         "kennwort": {
           "code": 1
@@ -310,7 +321,7 @@
         "code": 5
       },
       "stanKonform": true,
-      "kennzeichen": "THW-80340",
+      "kennzeichen": "THW-80351",
       "funkrufname": {
         "kennwort": {
           "code": 1
@@ -327,21 +338,21 @@
         "code": 40
       },
       "stanKonform": true,
-      "kennzeichen": "THW-80341"
+      "kennzeichen": "THW-80352"
     },
     {
       "typ": {
         "code": 41
       },
       "stanKonform": true,
-      "kennzeichen": "THW-80342"
+      "kennzeichen": "THW-80353"
     },
     {
       "typ": {
         "freitext": "Fahrzeuge/Anhänger Richtfunk"
       },
       "stanKonform": true,
-      "kennzeichen": "THW-80343"
+      "kennzeichen": "THW-80354"
     }
   ],
   "sofortbedarf": {
@@ -349,7 +360,7 @@
     "dieselLiter": 100,
     "benzinLiter": 0,
     "gemischLiter": 0,
-    "unterbringung": false,
+    "unterbringung": true,
     "ruhezeitErforderlich": true
   }
 }

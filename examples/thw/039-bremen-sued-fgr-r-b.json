@@ -1,7 +1,7 @@
 {
-  "schemaVersion": 6,
+  "schemaVersion": 8,
   "uebung": true,
-  "stand": 2388,
+  "stand": 3439302,
   "einheit": {
     "organisation": 1,
     "einheitsTyp": {
@@ -38,43 +38,20 @@
   "einsatz": {
     "zeitraumVon": 2388,
     "zeitraumBis": 2389,
-    "ortAuftrag": "Hochwasser Bremen — Beseitigung Treibgut"
+    "ortAuftrag": "Unwetterschäden Bremen — Räumen Verkehrswege"
   },
   "personalErfassung": 0,
   "personal": [
     {
-      "vorname": "Birgit",
-      "nachname": "Sommer",
+      "vorname": "Stefan",
+      "nachname": "Krüger",
       "staerkeRolle": 1,
       "funktionen": [
         {
           "code": 3
-        }
-      ],
-      "fahrerlaubnis": 10,
-      "geschlecht": 1,
-      "ernaehrung": 0,
-      "kontakte": [
-        {
-          "art": 0,
-          "dienstlich": false,
-          "wert": "5558111297"
         },
         {
-          "art": 2,
-          "dienstlich": true,
-          "emailTemplate": 1
-        }
-      ],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Daniel",
-      "nachname": "Ziegler",
-      "staerkeRolle": 1,
-      "funktionen": [
-        {
-          "code": 4
+          "code": 41
         }
       ],
       "fahrerlaubnis": 9,
@@ -84,14 +61,29 @@
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "5555659007"
+          "wert": "5551510258"
         }
       ],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Robert",
-      "nachname": "Friedrich",
+      "vorname": "Matthias",
+      "nachname": "Haas",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "code": 4
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Melanie",
+      "nachname": "Schneider",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -104,63 +96,63 @@
           "code": 38
         }
       ],
-      "fahrerlaubnis": 9,
+      "fahrerlaubnis": 0,
+      "geschlecht": 1,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Lukas",
+      "nachname": "Sauer",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        }
+      ],
+      "fahrerlaubnis": 5,
       "geschlecht": 0,
       "ernaehrung": 0,
       "kontakte": [],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Frank",
-      "nachname": "Heinrich",
+      "vorname": "Katharina",
+      "nachname": "Ziegler",
       "staerkeRolle": 0,
       "funktionen": [
         {
           "code": 5
         },
         {
-          "code": 38
+          "code": 31
         }
       ],
-      "fahrerlaubnis": 9,
-      "geschlecht": 0,
-      "ernaehrung": 0,
-      "kontakte": [],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Sarah",
-      "nachname": "Keller",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
-        }
-      ],
-      "fahrerlaubnis": 9,
+      "fahrerlaubnis": 10,
       "geschlecht": 1,
       "ernaehrung": 0,
       "kontakte": [],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Daniel",
-      "nachname": "Jäger",
+      "vorname": "Hanna",
+      "nachname": "Menzel",
       "staerkeRolle": 0,
       "funktionen": [
         {
           "code": 5
         }
       ],
-      "fahrerlaubnis": 0,
-      "geschlecht": 0,
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
       "ernaehrung": 0,
       "kontakte": [],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Martin",
-      "nachname": "Vogt",
+      "vorname": "Kevin",
+      "nachname": "Kraus",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -170,39 +162,6 @@
           "code": 39
         }
       ],
-      "fahrerlaubnis": 5,
-      "geschlecht": 0,
-      "ernaehrung": 0,
-      "kontakte": [],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Nadine",
-      "nachname": "Peters",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
-        },
-        {
-          "code": 38
-        }
-      ],
-      "fahrerlaubnis": 5,
-      "geschlecht": 1,
-      "ernaehrung": 0,
-      "kontakte": [],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Jens",
-      "nachname": "Wagner",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
-        }
-      ],
       "fahrerlaubnis": 0,
       "geschlecht": 0,
       "ernaehrung": 0,
@@ -210,15 +169,33 @@
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Henrik",
-      "nachname": "Voigt",
+      "vorname": "Stefanie",
+      "nachname": "Keller",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        },
+        {
+          "code": 31
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Andreas",
+      "nachname": "Otto",
       "staerkeRolle": 0,
       "funktionen": [
         {
           "code": 5
         }
       ],
-      "fahrerlaubnis": 5,
+      "fahrerlaubnis": 10,
       "geschlecht": 0,
       "ernaehrung": 0,
       "kontakte": [],
@@ -228,10 +205,10 @@
   "fahrzeuge": [
     {
       "typ": {
-        "code": 7
+        "code": 17
       },
       "stanKonform": true,
-      "kennzeichen": "THW-80197",
+      "kennzeichen": "auf Anh Tieflader",
       "funkrufname": {
         "kennwort": {
           "code": 1
@@ -239,7 +216,7 @@
         "eigenerStandort": true,
         "teile": [
           41,
-          42
+          72
         ]
       }
     },
@@ -248,23 +225,23 @@
         "code": 45
       },
       "stanKonform": true,
-      "kennzeichen": "THW-80198"
+      "kennzeichen": "THW-80199"
     },
     {
       "typ": {
         "code": 46
       },
       "stanKonform": true,
-      "kennzeichen": "THW-80199"
+      "kennzeichen": "THW-80200"
     }
   ],
   "sofortbedarf": {
-    "verpflegungPersonen": 10,
+    "verpflegungPersonen": 9,
     "dieselLiter": 80,
     "benzinLiter": 0,
     "gemischLiter": 5,
     "unterbringung": false,
-    "ruhezeitErforderlich": false
+    "ruhezeitErforderlich": true
   },
-  "sonstiges": "1 Helfer über StAN-Soll (Reserve aktiviert). Radlader in Instandsetzung — nicht mit ausgerückt."
+  "sonstiges": "LKW Kipper in Instandsetzung — nicht mit ausgerückt."
 }

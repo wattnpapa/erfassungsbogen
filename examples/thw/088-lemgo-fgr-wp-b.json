@@ -1,7 +1,7 @@
 {
-  "schemaVersion": 6,
+  "schemaVersion": 8,
   "uebung": true,
-  "stand": 2389,
+  "stand": 3439456,
   "einheit": {
     "organisation": 1,
     "einheitsTyp": {
@@ -36,71 +36,72 @@
     ]
   },
   "einsatz": {
-    "zeitraumVon": 2389,
-    "zeitraumBis": 2392,
+    "zeitraumVon": 2388,
+    "zeitraumBis": 2389,
     "ortAuftrag": "Hochwasser Lemgo — Wasserförderung 15.000 l/min"
   },
   "personalErfassung": 0,
   "personal": [
     {
-      "vorname": "Tim",
-      "nachname": "Voigt",
+      "vorname": "Ralf",
+      "nachname": "Reuter",
       "staerkeRolle": 1,
       "funktionen": [
         {
           "code": 3
+        },
+        {
+          "code": 49
         }
       ],
       "fahrerlaubnis": 9,
       "geschlecht": 0,
-      "ernaehrung": 1,
+      "ernaehrung": 2,
       "kontakte": [
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "5559158597"
-        },
-        {
-          "art": 2,
-          "dienstlich": true,
-          "emailTemplate": 1
+          "wert": "5559646534"
         }
       ],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Joachim",
-      "nachname": "Geiger",
+      "vorname": "Marco",
+      "nachname": "Huber",
       "staerkeRolle": 1,
       "funktionen": [
         {
           "code": 4
+        },
+        {
+          "code": 51
         }
       ],
       "fahrerlaubnis": 10,
       "geschlecht": 0,
-      "ernaehrung": 2,
-      "kontakte": [],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Stefanie",
-      "nachname": "Ziegler",
-      "staerkeRolle": 1,
-      "funktionen": [
-        {
-          "code": 4
-        }
-      ],
-      "fahrerlaubnis": 10,
-      "geschlecht": 1,
       "ernaehrung": 0,
       "kontakte": [],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Jonas",
-      "nachname": "Brandt",
+      "vorname": "Moritz",
+      "nachname": "Haas",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "code": 4
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Christian",
+      "nachname": "Richter",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -112,46 +113,43 @@
       ],
       "fahrerlaubnis": 0,
       "geschlecht": 0,
-      "ernaehrung": 0,
+      "ernaehrung": 2,
       "kontakte": [],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Florian",
-      "nachname": "Koch",
+      "vorname": "Anja",
+      "nachname": "Lehmann",
       "staerkeRolle": 0,
       "funktionen": [
         {
           "code": 5
         }
       ],
-      "fahrerlaubnis": 5,
-      "geschlecht": 0,
-      "ernaehrung": 0,
-      "kontakte": [],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Felix",
-      "nachname": "Vogt",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
-        },
-        {
-          "code": 49
-        }
-      ],
-      "fahrerlaubnis": 5,
-      "geschlecht": 0,
+      "fahrerlaubnis": 10,
+      "geschlecht": 1,
       "ernaehrung": 1,
       "kontakte": [],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Christina",
-      "nachname": "Maier",
+      "vorname": "Dominik",
+      "nachname": "Vogt",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Simon",
+      "nachname": "Graf",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -159,14 +157,44 @@
         }
       ],
       "fahrerlaubnis": 9,
-      "geschlecht": 1,
+      "geschlecht": 0,
       "ernaehrung": 0,
       "kontakte": [],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Kai",
-      "nachname": "Arnold",
+      "vorname": "Robert",
+      "nachname": "Marx",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 2,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Matthias",
+      "nachname": "Ebert",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Tobias",
+      "nachname": "Krämer",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -177,53 +205,75 @@
       "geschlecht": 0,
       "ernaehrung": 0,
       "kontakte": [],
-      "zusatzqualifikationen": []
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Feuerwehr-Doppelmitglied (AGT)"
+        }
+      ]
     },
     {
-      "vorname": "Lars",
-      "nachname": "Richter",
+      "vorname": "Patrick",
+      "nachname": "Busch",
       "staerkeRolle": 0,
       "funktionen": [
         {
           "code": 5
         }
       ],
-      "fahrerlaubnis": 5,
+      "fahrerlaubnis": 10,
       "geschlecht": 0,
       "ernaehrung": 0,
       "kontakte": [],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Joachim",
-      "nachname": "Franke",
+      "vorname": "Simon",
+      "nachname": "Scherer",
       "staerkeRolle": 0,
       "funktionen": [
         {
           "code": 5
         },
         {
-          "code": 49
+          "code": 30
         }
       ],
-      "fahrerlaubnis": 5,
+      "fahrerlaubnis": 0,
       "geschlecht": 0,
-      "ernaehrung": 1,
+      "ernaehrung": 0,
       "kontakte": [],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Stefan",
-      "nachname": "Ziegler",
+      "vorname": "Ralf",
+      "nachname": "Kraus",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        },
+        {
+          "code": 31
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Karsten",
+      "nachname": "Seidel",
       "staerkeRolle": 0,
       "funktionen": [
         {
           "code": 5
         }
       ],
-      "fahrerlaubnis": 5,
+      "fahrerlaubnis": 0,
       "geschlecht": 0,
-      "ernaehrung": 1,
+      "ernaehrung": 0,
       "kontakte": [],
       "zusatzqualifikationen": []
     }
@@ -234,7 +284,7 @@
         "code": 8
       },
       "stanKonform": true,
-      "kennzeichen": "THW-80326",
+      "kennzeichen": "THW-80336",
       "funkrufname": {
         "kennwort": {
           "code": 1
@@ -251,7 +301,7 @@
         "code": 6
       },
       "stanKonform": true,
-      "kennzeichen": "THW-80327",
+      "kennzeichen": "THW-80337",
       "funkrufname": {
         "kennwort": {
           "code": 1
@@ -265,19 +315,26 @@
     },
     {
       "typ": {
+        "code": 51
+      },
+      "stanKonform": true,
+      "kennzeichen": "THW-80338"
+    },
+    {
+      "typ": {
         "code": 43
       },
       "stanKonform": true,
-      "kennzeichen": "THW-80329"
+      "kennzeichen": "THW-80339"
     }
   ],
   "sofortbedarf": {
-    "verpflegungPersonen": 11,
-    "dieselLiter": 120,
+    "verpflegungPersonen": 14,
+    "dieselLiter": 220,
     "benzinLiter": 0,
     "gemischLiter": 0,
     "unterbringung": false,
-    "ruhezeitErforderlich": true
+    "ruhezeitErforderlich": false
   },
-  "sonstiges": "1 Sollplätze unbesetzt. Anh SwPu mittel in Instandsetzung — nicht mit ausgerückt."
+  "sonstiges": "2 Helfer über StAN-Soll (Reserve aktiviert)."
 }

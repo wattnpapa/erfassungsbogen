@@ -1,7 +1,7 @@
 {
-  "schemaVersion": 6,
+  "schemaVersion": 8,
   "uebung": true,
-  "stand": 2388,
+  "stand": 3442466,
   "einheit": {
     "organisation": 1,
     "einheitsTyp": {
@@ -36,15 +36,15 @@
     ]
   },
   "einsatz": {
-    "zeitraumVon": 2388,
-    "zeitraumBis": 2390,
+    "zeitraumVon": 2390,
+    "zeitraumBis": 2393,
     "ortAuftrag": "Eisgang/Verklausung bei Oelde — Sprengvorbereitung"
   },
   "personalErfassung": 0,
   "personal": [
     {
-      "vorname": "Kai",
-      "nachname": "Kaiser",
+      "vorname": "Erik",
+      "nachname": "Voigt",
       "staerkeRolle": 1,
       "funktionen": [
         {
@@ -53,24 +53,23 @@
       ],
       "fahrerlaubnis": 10,
       "geschlecht": 0,
-      "ernaehrung": 0,
+      "ernaehrung": 2,
       "kontakte": [
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "5550099023"
-        },
-        {
-          "art": 2,
-          "dienstlich": true,
-          "emailTemplate": 1
+          "wert": "5559343386"
         }
       ],
-      "zusatzqualifikationen": []
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Motorsägenschein AS Baum I (extern)"
+        }
+      ]
     },
     {
-      "vorname": "Thorsten",
-      "nachname": "Becker",
+      "vorname": "Ralf",
+      "nachname": "Werner",
       "staerkeRolle": 1,
       "funktionen": [
         {
@@ -79,19 +78,19 @@
       ],
       "fahrerlaubnis": 10,
       "geschlecht": 0,
-      "ernaehrung": 0,
+      "ernaehrung": 2,
       "kontakte": [
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "5554188328"
+          "wert": "5558540680"
         }
       ],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Julian",
-      "nachname": "Scherer",
+      "vorname": "Carina",
+      "nachname": "Schulz",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -101,15 +100,36 @@
           "code": 57
         }
       ],
-      "fahrerlaubnis": 9,
-      "geschlecht": 0,
-      "ernaehrung": 1,
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 0,
       "kontakte": [],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Markus",
-      "nachname": "Werner",
+      "vorname": "Ulrike",
+      "nachname": "Ziegler",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        },
+        {
+          "code": 58
+        },
+        {
+          "code": 31
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Nicole",
+      "nachname": "Krämer",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -119,30 +139,15 @@
           "code": 58
         }
       ],
-      "fahrerlaubnis": 0,
-      "geschlecht": 0,
+      "fahrerlaubnis": 9,
+      "geschlecht": 1,
       "ernaehrung": 0,
       "kontakte": [],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Lukas",
-      "nachname": "Reuter",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
-        }
-      ],
-      "fahrerlaubnis": 0,
-      "geschlecht": 0,
-      "ernaehrung": 0,
-      "kontakte": [],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Franziska",
-      "nachname": "Schmitt",
+      "vorname": "Patrick",
+      "nachname": "Wenzel",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -150,14 +155,10 @@
         }
       ],
       "fahrerlaubnis": 5,
-      "geschlecht": 1,
+      "geschlecht": 0,
       "ernaehrung": 0,
       "kontakte": [],
-      "zusatzqualifikationen": [
-        {
-          "freitext": "Funkamateur (extern)"
-        }
-      ]
+      "zusatzqualifikationen": []
     }
   ],
   "fahrzeuge": [
@@ -166,7 +167,7 @@
         "code": 5
       },
       "stanKonform": true,
-      "kennzeichen": "THW-80332",
+      "kennzeichen": "THW-80342",
       "funkrufname": {
         "kennwort": {
           "code": 1
@@ -183,7 +184,7 @@
         "freitext": "Anh FGr Sp"
       },
       "stanKonform": true,
-      "kennzeichen": "THW-80333"
+      "kennzeichen": "THW-80343"
     }
   ],
   "sofortbedarf": {

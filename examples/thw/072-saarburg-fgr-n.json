@@ -1,7 +1,7 @@
 {
-  "schemaVersion": 6,
+  "schemaVersion": 8,
   "uebung": true,
-  "stand": 2389,
+  "stand": 3441311,
   "einheit": {
     "organisation": 1,
     "einheitsTyp": {
@@ -37,14 +37,14 @@
   },
   "einsatz": {
     "zeitraumVon": 2389,
-    "zeitraumBis": 2390,
-    "ortAuftrag": "Unwetter Saarburg — Notversorgung kritische Infrastruktur"
+    "zeitraumBis": 2391,
+    "ortAuftrag": "Stromausfall Saarburg — Notstromeinspeisung"
   },
   "personalErfassung": 0,
   "personal": [
     {
-      "vorname": "Julian",
-      "nachname": "Reuter",
+      "vorname": "Henrik",
+      "nachname": "Busch",
       "staerkeRolle": 1,
       "funktionen": [
         {
@@ -58,37 +58,35 @@
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "5556800903"
-        },
-        {
-          "art": 2,
-          "dienstlich": true,
-          "emailTemplate": 1
+          "wert": "5558149847"
         }
       ],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Robert",
-      "nachname": "Albrecht",
+      "vorname": "Lukas",
+      "nachname": "Klein",
       "staerkeRolle": 1,
       "funktionen": [
         {
           "code": 4
-        },
-        {
-          "code": 49
         }
       ],
-      "fahrerlaubnis": 10,
+      "fahrerlaubnis": 9,
       "geschlecht": 0,
       "ernaehrung": 0,
-      "kontakte": [],
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5552429105"
+        }
+      ],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Florian",
-      "nachname": "Peters",
+      "vorname": "Maren",
+      "nachname": "Schmitt",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -98,15 +96,15 @@
           "code": 49
         }
       ],
-      "fahrerlaubnis": 9,
-      "geschlecht": 0,
+      "fahrerlaubnis": 0,
+      "geschlecht": 1,
       "ernaehrung": 0,
       "kontakte": [],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Jonas",
-      "nachname": "Braun",
+      "vorname": "Thomas",
+      "nachname": "Werner",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -114,20 +112,50 @@
         },
         {
           "code": 51
-        },
-        {
-          "code": 49
         }
       ],
       "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Sandra",
+      "nachname": "Berger",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        },
+        {
+          "code": 51
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Karsten",
+      "nachname": "Hoffmann",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        }
+      ],
+      "fahrerlaubnis": 5,
       "geschlecht": 0,
       "ernaehrung": 0,
       "kontakte": [],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Felix",
-      "nachname": "Scherer",
+      "vorname": "Marcel",
+      "nachname": "Lehmann",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -137,15 +165,15 @@
           "code": 90
         }
       ],
-      "fahrerlaubnis": 5,
+      "fahrerlaubnis": 9,
       "geschlecht": 0,
-      "ernaehrung": 0,
+      "ernaehrung": 1,
       "kontakte": [],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Silke",
-      "nachname": "Albrecht",
+      "vorname": "Henrik",
+      "nachname": "Lutz",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -153,65 +181,30 @@
         }
       ],
       "fahrerlaubnis": 0,
-      "geschlecht": 1,
-      "ernaehrung": 1,
-      "kontakte": [],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Heiko",
-      "nachname": "Becker",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
-        }
-      ],
-      "fahrerlaubnis": 9,
       "geschlecht": 0,
       "ernaehrung": 0,
       "kontakte": [],
       "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Simon",
-      "nachname": "Fischer",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
-        }
-      ],
-      "fahrerlaubnis": 9,
-      "geschlecht": 0,
-      "ernaehrung": 0,
-      "kontakte": [],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Ulrike",
-      "nachname": "Haas",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
-        },
-        {
-          "code": 51
-        }
-      ],
-      "fahrerlaubnis": 5,
-      "geschlecht": 1,
-      "ernaehrung": 0,
-      "kontakte": [],
-      "zusatzqualifikationen": [
-        {
-          "freitext": "Motorsägenschein AS Baum I (extern)"
-        }
-      ]
     }
   ],
   "fahrzeuge": [
+    {
+      "typ": {
+        "code": 26
+      },
+      "stanKonform": true,
+      "kennzeichen": "THW-80291",
+      "funkrufname": {
+        "kennwort": {
+          "code": 1
+        },
+        "eigenerStandort": true,
+        "teile": [
+          24,
+          55
+        ]
+      }
+    },
     {
       "typ": {
         "code": 21
@@ -224,41 +217,23 @@
         "code": 44
       },
       "stanKonform": true,
-      "kennzeichen": "THW-80285"
+      "kennzeichen": "THW-80292"
     },
     {
       "typ": {
         "code": 47
       },
       "stanKonform": true,
-      "kennzeichen": "THW-80286"
-    },
-    {
-      "typ": {
-        "freitext": "MzKW"
-      },
-      "kennzeichen": "THW-80287",
-      "stanKonform": false,
-      "aenderungen": "OV-eigenes Fahrzeug, zusätzlich zur StAN",
-      "funkrufname": {
-        "kennwort": {
-          "code": 1
-        },
-        "eigenerStandort": true,
-        "teile": [
-          24,
-          54
-        ]
-      }
+      "kennzeichen": "THW-80293"
     }
   ],
   "sofortbedarf": {
-    "verpflegungPersonen": 9,
-    "dieselLiter": 170,
+    "verpflegungPersonen": 8,
+    "dieselLiter": 120,
     "benzinLiter": 0,
     "gemischLiter": 0,
-    "unterbringung": false,
-    "ruhezeitErforderlich": false
+    "unterbringung": true,
+    "ruhezeitErforderlich": true
   },
-  "sonstiges": "MzKW zusätzlich über StAN-Soll dabei."
+  "sonstiges": "1 Sollplätze unbesetzt."
 }

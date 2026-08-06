@@ -1,7 +1,7 @@
 {
-  "schemaVersion": 6,
+  "schemaVersion": 8,
   "uebung": true,
-  "stand": 2389,
+  "stand": 3442539,
   "einheit": {
     "organisation": 1,
     "einheitsTyp": {
@@ -36,51 +36,40 @@
     ]
   },
   "einsatz": {
-    "zeitraumVon": 2389,
-    "zeitraumBis": 2390,
+    "zeitraumVon": 2390,
+    "zeitraumBis": 2391,
     "ortAuftrag": "Sturmtief »Quirin« Altena — Führung Technischer Zug"
   },
   "personalErfassung": 0,
   "personal": [
     {
-      "vorname": "Svenja",
-      "nachname": "Braun",
+      "vorname": "Julian",
+      "nachname": "Ebert",
       "staerkeRolle": 2,
       "funktionen": [
         {
           "code": 1
-        },
-        {
-          "code": 31
         }
       ],
-      "fahrerlaubnis": 5,
-      "geschlecht": 1,
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
       "ernaehrung": 0,
       "kontakte": [
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "5555699098"
-        },
-        {
-          "art": 2,
-          "dienstlich": true,
-          "emailTemplate": 1
+          "wert": "5554995512"
         }
       ],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Peter",
-      "nachname": "Ziegler",
+      "vorname": "Matthias",
+      "nachname": "Schneider",
       "staerkeRolle": 1,
       "funktionen": [
         {
           "code": 2
-        },
-        {
-          "code": 30
         }
       ],
       "fahrerlaubnis": 9,
@@ -90,14 +79,14 @@
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "5551984614"
+          "wert": "5550610710"
         }
       ],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Kevin",
-      "nachname": "Meyer",
+      "vorname": "Dirk",
+      "nachname": "Roth",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -112,54 +101,64 @@
       ],
       "fahrerlaubnis": 9,
       "geschlecht": 0,
+      "ernaehrung": 2,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Philipp",
+      "nachname": "Fischer",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
       "ernaehrung": 0,
       "kontakte": [],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Ole",
-      "nachname": "Lenz",
+      "vorname": "Jens",
+      "nachname": "Berger",
       "staerkeRolle": 0,
       "funktionen": [
         {
           "code": 5
+        },
+        {
+          "code": 31
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Leon",
+      "nachname": "Braun",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        },
+        {
+          "code": 31
         }
       ],
       "fahrerlaubnis": 9,
       "geschlecht": 0,
       "ernaehrung": 0,
       "kontakte": [],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Tim",
-      "nachname": "Hahn",
-      "staerkeRolle": 0,
-      "funktionen": [
+      "zusatzqualifikationen": [
         {
-          "code": 5
+          "freitext": "Funkamateur (extern)"
         }
-      ],
-      "fahrerlaubnis": 10,
-      "geschlecht": 0,
-      "ernaehrung": 0,
-      "kontakte": [],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Jan",
-      "nachname": "Menzel",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
-        }
-      ],
-      "fahrerlaubnis": 5,
-      "geschlecht": 0,
-      "ernaehrung": 2,
-      "kontakte": [],
-      "zusatzqualifikationen": []
+      ]
     }
   ],
   "fahrzeuge": [
@@ -168,7 +167,7 @@
         "code": 2
       },
       "stanKonform": true,
-      "kennzeichen": "THW-80296",
+      "kennzeichen": "THW-80304",
       "funkrufname": {
         "kennwort": {
           "code": 1
@@ -179,6 +178,14 @@
           10
         ]
       }
+    },
+    {
+      "typ": {
+        "freitext": "Anh OV (Plane)"
+      },
+      "kennzeichen": "THW-80305",
+      "stanKonform": false,
+      "aenderungen": "OV-eigenes Fahrzeug, zusätzlich zur StAN"
     }
   ],
   "sofortbedarf": {
@@ -189,5 +196,5 @@
     "unterbringung": false,
     "ruhezeitErforderlich": false
   },
-  "sonstiges": "2 Helfer über StAN-Soll (Reserve aktiviert)."
+  "sonstiges": "2 Helfer über StAN-Soll (Reserve aktiviert). Anh OV (Plane) zusätzlich über StAN-Soll dabei."
 }

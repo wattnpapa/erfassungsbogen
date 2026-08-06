@@ -1,7 +1,7 @@
 {
-  "schemaVersion": 6,
+  "schemaVersion": 8,
   "uebung": true,
-  "stand": 2388,
+  "stand": 3439260,
   "einheit": {
     "organisation": 1,
     "einheitsTyp": {
@@ -43,8 +43,8 @@
   "personalErfassung": 0,
   "personal": [
     {
-      "vorname": "Kevin",
-      "nachname": "Ebert",
+      "vorname": "Sandra",
+      "nachname": "Otto",
       "staerkeRolle": 2,
       "funktionen": [
         {
@@ -55,18 +55,13 @@
         }
       ],
       "fahrerlaubnis": 9,
-      "geschlecht": 0,
-      "ernaehrung": 1,
+      "geschlecht": 1,
+      "ernaehrung": 0,
       "kontakte": [
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "5551968418"
-        },
-        {
-          "art": 2,
-          "dienstlich": true,
-          "emailTemplate": 1
+          "wert": "5558758679"
         }
       ],
       "zusatzqualifikationen": [
@@ -80,7 +75,7 @@
     },
     {
       "vorname": "Felix",
-      "nachname": "Thiel",
+      "nachname": "Braun",
       "staerkeRolle": 1,
       "funktionen": [
         {
@@ -92,17 +87,12 @@
       ],
       "fahrerlaubnis": 10,
       "geschlecht": 0,
-      "ernaehrung": 0,
+      "ernaehrung": 1,
       "kontakte": [
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "5553852864"
-        },
-        {
-          "art": 2,
-          "dienstlich": true,
-          "emailTemplate": 1
+          "wert": "5554814493"
         }
       ],
       "zusatzqualifikationen": [
@@ -115,8 +105,8 @@
       ]
     },
     {
-      "vorname": "Dominik",
-      "nachname": "Lorenz",
+      "vorname": "Tim",
+      "nachname": "Wolf",
       "staerkeRolle": 1,
       "funktionen": [
         {
@@ -128,17 +118,12 @@
       ],
       "fahrerlaubnis": 9,
       "geschlecht": 0,
-      "ernaehrung": 1,
+      "ernaehrung": 0,
       "kontakte": [
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "5551530896"
-        },
-        {
-          "art": 2,
-          "dienstlich": true,
-          "emailTemplate": 1
+          "wert": "5552289512"
         }
       ],
       "zusatzqualifikationen": [
@@ -151,8 +136,8 @@
       ]
     },
     {
-      "vorname": "Nadine",
-      "nachname": "Schäfer",
+      "vorname": "Dominik",
+      "nachname": "Peters",
       "staerkeRolle": 1,
       "funktionen": [
         {
@@ -162,9 +147,9 @@
           "code": 36
         }
       ],
-      "fahrerlaubnis": 10,
-      "geschlecht": 1,
-      "ernaehrung": 2,
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
       "kontakte": [
         {
           "art": 0,
@@ -182,8 +167,8 @@
       ]
     },
     {
-      "vorname": "Jens",
-      "nachname": "Baumann",
+      "vorname": "Tanja",
+      "nachname": "Schmidt",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -193,9 +178,9 @@
           "code": 38
         }
       ],
-      "fahrerlaubnis": 5,
-      "geschlecht": 0,
-      "ernaehrung": 1,
+      "fahrerlaubnis": 9,
+      "geschlecht": 1,
+      "ernaehrung": 0,
       "kontakte": [
         {
           "art": 0,
@@ -213,8 +198,8 @@
       ]
     },
     {
-      "vorname": "Philipp",
-      "nachname": "Engel",
+      "vorname": "Dominik",
+      "nachname": "Arnold",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -224,9 +209,9 @@
           "code": 41
         }
       ],
-      "fahrerlaubnis": 10,
+      "fahrerlaubnis": 5,
       "geschlecht": 0,
-      "ernaehrung": 2,
+      "ernaehrung": 0,
       "kontakte": [
         {
           "art": 0,
@@ -244,8 +229,8 @@
       ]
     },
     {
-      "vorname": "Daniel",
-      "nachname": "Fischer",
+      "vorname": "Paul",
+      "nachname": "Haas",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -255,9 +240,9 @@
           "code": 49
         }
       ],
-      "fahrerlaubnis": 0,
+      "fahrerlaubnis": 10,
       "geschlecht": 0,
-      "ernaehrung": 2,
+      "ernaehrung": 0,
       "kontakte": [
         {
           "art": 0,
@@ -275,8 +260,8 @@
       ]
     },
     {
-      "vorname": "Joachim",
-      "nachname": "Thiel",
+      "vorname": "Jonas",
+      "nachname": "Günther",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -286,9 +271,9 @@
           "code": 51
         }
       ],
-      "fahrerlaubnis": 5,
+      "fahrerlaubnis": 10,
       "geschlecht": 0,
-      "ernaehrung": 0,
+      "ernaehrung": 1,
       "kontakte": [
         {
           "art": 0,
@@ -306,8 +291,8 @@
       ]
     },
     {
-      "vorname": "Markus",
-      "nachname": "Schäfer",
+      "vorname": "Franziska",
+      "nachname": "Thiel",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -317,8 +302,8 @@
           "code": 67
         }
       ],
-      "fahrerlaubnis": 0,
-      "geschlecht": 0,
+      "fahrerlaubnis": 9,
+      "geschlecht": 1,
       "ernaehrung": 0,
       "kontakte": [
         {
@@ -337,8 +322,8 @@
       ]
     },
     {
-      "vorname": "Niklas",
-      "nachname": "Schwarz",
+      "vorname": "Florian",
+      "nachname": "Keller",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -348,9 +333,9 @@
           "code": 30
         }
       ],
-      "fahrerlaubnis": 0,
+      "fahrerlaubnis": 5,
       "geschlecht": 0,
-      "ernaehrung": 0,
+      "ernaehrung": 1,
       "kontakte": [
         {
           "art": 0,
@@ -368,8 +353,8 @@
       ]
     },
     {
-      "vorname": "Markus",
-      "nachname": "Baumann",
+      "vorname": "Erik",
+      "nachname": "Winkler",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -379,9 +364,9 @@
           "code": 31
         }
       ],
-      "fahrerlaubnis": 5,
+      "fahrerlaubnis": 0,
       "geschlecht": 0,
-      "ernaehrung": 0,
+      "ernaehrung": 2,
       "kontakte": [
         {
           "art": 0,
@@ -399,8 +384,8 @@
       ]
     },
     {
-      "vorname": "Paul",
-      "nachname": "Haas",
+      "vorname": "Thomas",
+      "nachname": "Klein",
       "staerkeRolle": 1,
       "funktionen": [
         {
@@ -417,12 +402,7 @@
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "5554588661"
-        },
-        {
-          "art": 2,
-          "dienstlich": true,
-          "emailTemplate": 1
+          "wert": "5553446953"
         }
       ],
       "zusatzqualifikationen": [
@@ -435,8 +415,8 @@
       ]
     },
     {
-      "vorname": "Marcel",
-      "nachname": "Maier",
+      "vorname": "Jannik",
+      "nachname": "Horn",
       "staerkeRolle": 1,
       "funktionen": [
         {
@@ -448,7 +428,7 @@
       ],
       "fahrerlaubnis": 10,
       "geschlecht": 0,
-      "ernaehrung": 0,
+      "ernaehrung": 2,
       "kontakte": [
         {
           "art": 0,
@@ -466,8 +446,8 @@
       ]
     },
     {
-      "vorname": "Marie",
-      "nachname": "Werner",
+      "vorname": "Michael",
+      "nachname": "Böhm",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -477,8 +457,8 @@
           "code": 38
         }
       ],
-      "fahrerlaubnis": 0,
-      "geschlecht": 1,
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
       "ernaehrung": 0,
       "kontakte": [
         {
@@ -497,8 +477,8 @@
       ]
     },
     {
-      "vorname": "Torben",
-      "nachname": "Pfeiffer",
+      "vorname": "Jana",
+      "nachname": "Scherer",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -508,9 +488,9 @@
           "code": 41
         }
       ],
-      "fahrerlaubnis": 5,
-      "geschlecht": 0,
-      "ernaehrung": 0,
+      "fahrerlaubnis": 10,
+      "geschlecht": 1,
+      "ernaehrung": 2,
       "kontakte": [
         {
           "art": 0,
@@ -528,8 +508,8 @@
       ]
     },
     {
-      "vorname": "Florian",
-      "nachname": "Arnold",
+      "vorname": "Karsten",
+      "nachname": "Fischer",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -559,8 +539,8 @@
       ]
     },
     {
-      "vorname": "Tim",
-      "nachname": "Ebert",
+      "vorname": "Andreas",
+      "nachname": "Maier",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -570,9 +550,9 @@
           "code": 51
         }
       ],
-      "fahrerlaubnis": 0,
+      "fahrerlaubnis": 5,
       "geschlecht": 0,
-      "ernaehrung": 1,
+      "ernaehrung": 0,
       "kontakte": [
         {
           "art": 0,
@@ -590,8 +570,8 @@
       ]
     },
     {
-      "vorname": "Kai",
-      "nachname": "Lenz",
+      "vorname": "Ole",
+      "nachname": "Brandt",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -601,7 +581,7 @@
           "code": 67
         }
       ],
-      "fahrerlaubnis": 9,
+      "fahrerlaubnis": 0,
       "geschlecht": 0,
       "ernaehrung": 0,
       "kontakte": [
@@ -621,8 +601,8 @@
       ]
     },
     {
-      "vorname": "Kevin",
-      "nachname": "Bergmann",
+      "vorname": "Carina",
+      "nachname": "Winter",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -632,9 +612,9 @@
           "code": 30
         }
       ],
-      "fahrerlaubnis": 0,
-      "geschlecht": 0,
-      "ernaehrung": 0,
+      "fahrerlaubnis": 10,
+      "geschlecht": 1,
+      "ernaehrung": 1,
       "kontakte": [
         {
           "art": 0,
@@ -652,8 +632,8 @@
       ]
     },
     {
-      "vorname": "Karsten",
-      "nachname": "Berger",
+      "vorname": "Simon",
+      "nachname": "Wolf",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -665,7 +645,7 @@
       ],
       "fahrerlaubnis": 0,
       "geschlecht": 0,
-      "ernaehrung": 1,
+      "ernaehrung": 0,
       "kontakte": [
         {
           "art": 0,
@@ -683,8 +663,8 @@
       ]
     },
     {
-      "vorname": "Marco",
-      "nachname": "Berger",
+      "vorname": "Jens",
+      "nachname": "Arnold",
       "staerkeRolle": 1,
       "funktionen": [
         {
@@ -701,12 +681,7 @@
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "5554356110"
-        },
-        {
-          "art": 2,
-          "dienstlich": true,
-          "emailTemplate": 1
+          "wert": "5553859804"
         }
       ],
       "zusatzqualifikationen": [
@@ -719,8 +694,8 @@
       ]
     },
     {
-      "vorname": "Dominik",
-      "nachname": "Ludwig",
+      "vorname": "Niklas",
+      "nachname": "Dietrich",
       "staerkeRolle": 1,
       "funktionen": [
         {
@@ -730,9 +705,9 @@
           "code": 36
         }
       ],
-      "fahrerlaubnis": 10,
+      "fahrerlaubnis": 9,
       "geschlecht": 0,
-      "ernaehrung": 0,
+      "ernaehrung": 1,
       "kontakte": [
         {
           "art": 0,
@@ -750,8 +725,8 @@
       ]
     },
     {
-      "vorname": "Sabine",
-      "nachname": "Kuhn",
+      "vorname": "Ines",
+      "nachname": "Krämer",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -761,9 +736,9 @@
           "code": 38
         }
       ],
-      "fahrerlaubnis": 0,
+      "fahrerlaubnis": 5,
       "geschlecht": 1,
-      "ernaehrung": 2,
+      "ernaehrung": 1,
       "kontakte": [
         {
           "art": 0,
@@ -781,8 +756,8 @@
       ]
     },
     {
-      "vorname": "Torben",
-      "nachname": "Weiß",
+      "vorname": "Sven",
+      "nachname": "Stein",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -792,9 +767,9 @@
           "code": 41
         }
       ],
-      "fahrerlaubnis": 5,
+      "fahrerlaubnis": 9,
       "geschlecht": 0,
-      "ernaehrung": 2,
+      "ernaehrung": 0,
       "kontakte": [
         {
           "art": 0,
@@ -812,8 +787,8 @@
       ]
     },
     {
-      "vorname": "Sabine",
-      "nachname": "Engel",
+      "vorname": "Joachim",
+      "nachname": "Franke",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -823,8 +798,8 @@
           "code": 49
         }
       ],
-      "fahrerlaubnis": 5,
-      "geschlecht": 1,
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
       "ernaehrung": 0,
       "kontakte": [
         {
@@ -843,8 +818,8 @@
       ]
     },
     {
-      "vorname": "Ralf",
-      "nachname": "Kraus",
+      "vorname": "Joachim",
+      "nachname": "Möller",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -854,9 +829,9 @@
           "code": 51
         }
       ],
-      "fahrerlaubnis": 5,
+      "fahrerlaubnis": 0,
       "geschlecht": 0,
-      "ernaehrung": 1,
+      "ernaehrung": 0,
       "kontakte": [
         {
           "art": 0,
@@ -874,8 +849,8 @@
       ]
     },
     {
-      "vorname": "Tim",
-      "nachname": "Engel",
+      "vorname": "Niklas",
+      "nachname": "Lutz",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -885,7 +860,7 @@
           "code": 67
         }
       ],
-      "fahrerlaubnis": 5,
+      "fahrerlaubnis": 10,
       "geschlecht": 0,
       "ernaehrung": 0,
       "kontakte": [
@@ -905,8 +880,8 @@
       ]
     },
     {
-      "vorname": "Simon",
-      "nachname": "Pfeiffer",
+      "vorname": "Marco",
+      "nachname": "Jäger",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -936,8 +911,8 @@
       ]
     },
     {
-      "vorname": "Erik",
-      "nachname": "Meyer",
+      "vorname": "Ole",
+      "nachname": "Wolf",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -947,7 +922,7 @@
           "code": 31
         }
       ],
-      "fahrerlaubnis": 5,
+      "fahrerlaubnis": 9,
       "geschlecht": 0,
       "ernaehrung": 0,
       "kontakte": [
@@ -967,8 +942,8 @@
       ]
     },
     {
-      "vorname": "Jannik",
-      "nachname": "Vogel",
+      "vorname": "Anna",
+      "nachname": "Krämer",
       "staerkeRolle": 1,
       "funktionen": [
         {
@@ -978,19 +953,14 @@
           "code": 32
         }
       ],
-      "fahrerlaubnis": 10,
-      "geschlecht": 0,
-      "ernaehrung": 0,
+      "fahrerlaubnis": 9,
+      "geschlecht": 1,
+      "ernaehrung": 2,
       "kontakte": [
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "5556473726"
-        },
-        {
-          "art": 2,
-          "dienstlich": true,
-          "emailTemplate": 1
+          "wert": "5553247520"
         }
       ],
       "zusatzqualifikationen": [
@@ -1003,8 +973,8 @@
       ]
     },
     {
-      "vorname": "Sandra",
-      "nachname": "Otto",
+      "vorname": "Joachim",
+      "nachname": "Menzel",
       "staerkeRolle": 1,
       "funktionen": [
         {
@@ -1015,8 +985,8 @@
         }
       ],
       "fahrerlaubnis": 9,
-      "geschlecht": 1,
-      "ernaehrung": 0,
+      "geschlecht": 0,
+      "ernaehrung": 1,
       "kontakte": [
         {
           "art": 0,
@@ -1034,8 +1004,8 @@
       ]
     },
     {
-      "vorname": "Lars",
-      "nachname": "Fuchs",
+      "vorname": "Uwe",
+      "nachname": "Herrmann",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -1045,7 +1015,7 @@
           "code": 38
         }
       ],
-      "fahrerlaubnis": 5,
+      "fahrerlaubnis": 0,
       "geschlecht": 0,
       "ernaehrung": 0,
       "kontakte": [
@@ -1065,8 +1035,8 @@
       ]
     },
     {
-      "vorname": "Robert",
-      "nachname": "Lang",
+      "vorname": "Jan",
+      "nachname": "Pohl",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -1078,7 +1048,7 @@
       ],
       "fahrerlaubnis": 9,
       "geschlecht": 0,
-      "ernaehrung": 2,
+      "ernaehrung": 0,
       "kontakte": [
         {
           "art": 0,
@@ -1096,8 +1066,8 @@
       ]
     },
     {
-      "vorname": "Tim",
-      "nachname": "Wolf",
+      "vorname": "Julian",
+      "nachname": "Engel",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -1127,8 +1097,8 @@
       ]
     },
     {
-      "vorname": "Julian",
-      "nachname": "Schröder",
+      "vorname": "Lukas",
+      "nachname": "Krüger",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -1138,7 +1108,7 @@
           "code": 51
         }
       ],
-      "fahrerlaubnis": 0,
+      "fahrerlaubnis": 10,
       "geschlecht": 0,
       "ernaehrung": 0,
       "kontakte": [
@@ -1158,8 +1128,8 @@
       ]
     },
     {
-      "vorname": "Fabian",
-      "nachname": "Günther",
+      "vorname": "Lukas",
+      "nachname": "Busch",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -1169,9 +1139,9 @@
           "code": 67
         }
       ],
-      "fahrerlaubnis": 0,
+      "fahrerlaubnis": 5,
       "geschlecht": 0,
-      "ernaehrung": 1,
+      "ernaehrung": 0,
       "kontakte": [
         {
           "art": 0,
@@ -1189,8 +1159,8 @@
       ]
     },
     {
-      "vorname": "Florian",
-      "nachname": "Schulz",
+      "vorname": "Birgit",
+      "nachname": "Köhler",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -1200,8 +1170,8 @@
           "code": 30
         }
       ],
-      "fahrerlaubnis": 0,
-      "geschlecht": 0,
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
       "ernaehrung": 0,
       "kontakte": [
         {
@@ -1220,8 +1190,8 @@
       ]
     },
     {
-      "vorname": "Lena",
-      "nachname": "Schmitt",
+      "vorname": "Ole",
+      "nachname": "Neumann",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -1231,8 +1201,8 @@
           "code": 31
         }
       ],
-      "fahrerlaubnis": 9,
-      "geschlecht": 1,
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
       "ernaehrung": 0,
       "kontakte": [
         {
@@ -1256,7 +1226,7 @@
       "typ": {
         "code": 24
       },
-      "kennzeichen": "THW-80360",
+      "kennzeichen": "THW-80373",
       "funkrufname": {
         "kennwort": {
           "code": 1
@@ -1273,7 +1243,7 @@
       "typ": {
         "code": 4
       },
-      "kennzeichen": "THW-80361",
+      "kennzeichen": "THW-80374",
       "funkrufname": {
         "kennwort": {
           "code": 1
@@ -1290,7 +1260,7 @@
       "typ": {
         "freitext": "MzKW"
       },
-      "kennzeichen": "THW-80362",
+      "kennzeichen": "THW-80375",
       "funkrufname": {
         "kennwort": {
           "code": 1
@@ -1326,7 +1296,7 @@
       "typ": {
         "code": 4
       },
-      "kennzeichen": "THW-80363",
+      "kennzeichen": "THW-80376",
       "funkrufname": {
         "kennwort": {
           "code": 1
@@ -1343,7 +1313,7 @@
       "typ": {
         "code": 7
       },
-      "kennzeichen": "THW-80364",
+      "kennzeichen": "THW-80377",
       "funkrufname": {
         "kennwort": {
           "code": 1
@@ -1360,7 +1330,7 @@
       "typ": {
         "code": 8
       },
-      "kennzeichen": "THW-80365",
+      "kennzeichen": "THW-80378",
       "funkrufname": {
         "kennwort": {
           "code": 1
@@ -1378,7 +1348,7 @@
       "typ": {
         "code": 45
       },
-      "kennzeichen": "THW-80366",
+      "kennzeichen": "THW-80379",
       "stanKonform": true,
       "aenderungen": "Tieflader für Bagger"
     },
@@ -1386,7 +1356,7 @@
       "typ": {
         "code": 47
       },
-      "kennzeichen": "THW-80367",
+      "kennzeichen": "THW-80380",
       "stanKonform": true,
       "aenderungen": "NEA 50 kVA für Baustellenbeleuchtung"
     },
@@ -1394,7 +1364,7 @@
       "typ": {
         "code": 43
       },
-      "kennzeichen": "THW-80368",
+      "kennzeichen": "THW-80381",
       "stanKonform": true,
       "aenderungen": "Verpflegungs- und Sanitätsausstattung"
     }

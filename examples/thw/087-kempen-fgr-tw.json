@@ -1,7 +1,7 @@
 {
-  "schemaVersion": 6,
+  "schemaVersion": 8,
   "uebung": true,
-  "stand": 2389,
+  "stand": 3440010,
   "einheit": {
     "organisation": 1,
     "einheitsTyp": {
@@ -36,83 +36,72 @@
     ]
   },
   "einsatz": {
-    "zeitraumVon": 2389,
-    "zeitraumBis": 2390,
+    "zeitraumVon": 2388,
+    "zeitraumBis": 2391,
     "ortAuftrag": "Trinkwassernotversorgung Kempen — TWAA-Betrieb"
   },
   "personalErfassung": 0,
   "personal": [
     {
-      "vorname": "Dennis",
-      "nachname": "Jäger",
+      "vorname": "Frank",
+      "nachname": "Ebert",
       "staerkeRolle": 1,
       "funktionen": [
         {
           "code": 3
-        },
-        {
-          "code": 31
         }
       ],
-      "fahrerlaubnis": 5,
+      "fahrerlaubnis": 10,
       "geschlecht": 0,
       "ernaehrung": 0,
       "kontakte": [
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "5559184223"
-        },
-        {
-          "art": 2,
-          "dienstlich": true,
-          "emailTemplate": 1
+          "wert": "5550114248"
         }
       ],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Marcel",
-      "nachname": "Schmitt",
+      "vorname": "Ralf",
+      "nachname": "Arnold",
       "staerkeRolle": 1,
       "funktionen": [
         {
           "code": 4
-        },
-        {
-          "code": 31
         }
       ],
-      "fahrerlaubnis": 10,
+      "fahrerlaubnis": 9,
       "geschlecht": 0,
-      "ernaehrung": 1,
+      "ernaehrung": 2,
       "kontakte": [
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "5556337655"
+          "wert": "5558363679"
         }
       ],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Christina",
-      "nachname": "Reuter",
+      "vorname": "Svenja",
+      "nachname": "Meyer",
       "staerkeRolle": 1,
       "funktionen": [
         {
           "code": 4
         }
       ],
-      "fahrerlaubnis": 5,
+      "fahrerlaubnis": 10,
       "geschlecht": 1,
-      "ernaehrung": 1,
+      "ernaehrung": 0,
       "kontakte": [],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Sven",
-      "nachname": "Becker",
+      "vorname": "Martin",
+      "nachname": "Vogel",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -120,20 +109,17 @@
         },
         {
           "code": 52
-        },
-        {
-          "code": 85
         }
       ],
       "fahrerlaubnis": 0,
       "geschlecht": 0,
-      "ernaehrung": 1,
+      "ernaehrung": 0,
       "kontakte": [],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Tobias",
-      "nachname": "Jung",
+      "vorname": "Laura",
+      "nachname": "Ziegler",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -144,14 +130,29 @@
         }
       ],
       "fahrerlaubnis": 0,
-      "geschlecht": 0,
+      "geschlecht": 1,
       "ernaehrung": 1,
       "kontakte": [],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Henrik",
-      "nachname": "Vogt",
+      "vorname": "Ralf",
+      "nachname": "Fischer",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Christina",
+      "nachname": "König",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -161,100 +162,15 @@
           "code": 31
         }
       ],
-      "fahrerlaubnis": 0,
-      "geschlecht": 0,
-      "ernaehrung": 1,
-      "kontakte": [],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Ulrike",
-      "nachname": "Schmitt",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
-        },
-        {
-          "code": 52
-        }
-      ],
-      "fahrerlaubnis": 9,
+      "fahrerlaubnis": 5,
       "geschlecht": 1,
       "ernaehrung": 0,
       "kontakte": [],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Niklas",
-      "nachname": "Kuhn",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
-        }
-      ],
-      "fahrerlaubnis": 10,
-      "geschlecht": 0,
-      "ernaehrung": 0,
-      "kontakte": [],
-      "zusatzqualifikationen": [
-        {
-          "freitext": "Tischler (Beruf)"
-        }
-      ]
-    },
-    {
-      "vorname": "Peter",
-      "nachname": "Fuchs",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
-        },
-        {
-          "code": 31
-        }
-      ],
-      "fahrerlaubnis": 5,
-      "geschlecht": 0,
-      "ernaehrung": 0,
-      "kontakte": [],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Joachim",
-      "nachname": "Marx",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
-        }
-      ],
-      "fahrerlaubnis": 10,
-      "geschlecht": 0,
-      "ernaehrung": 0,
-      "kontakte": [],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Georg",
-      "nachname": "Friedrich",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
-        }
-      ],
-      "fahrerlaubnis": 10,
-      "geschlecht": 0,
-      "ernaehrung": 0,
-      "kontakte": [],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Matthias",
-      "nachname": "Schmidt",
+      "vorname": "Carina",
+      "nachname": "Wolf",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -262,14 +178,14 @@
         }
       ],
       "fahrerlaubnis": 5,
-      "geschlecht": 0,
+      "geschlecht": 1,
       "ernaehrung": 0,
       "kontakte": [],
       "zusatzqualifikationen": []
     },
     {
       "vorname": "Svenja",
-      "nachname": "Sauer",
+      "nachname": "Thiel",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -278,56 +194,17 @@
       ],
       "fahrerlaubnis": 5,
       "geschlecht": 1,
-      "ernaehrung": 2,
-      "kontakte": [],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Erik",
-      "nachname": "Weber",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
-        },
-        {
-          "code": 85
-        }
-      ],
-      "fahrerlaubnis": 9,
-      "geschlecht": 0,
       "ernaehrung": 0,
       "kontakte": [],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Henrik",
-      "nachname": "Graf",
+      "vorname": "Patrick",
+      "nachname": "Heinrich",
       "staerkeRolle": 0,
       "funktionen": [
         {
           "code": 5
-        },
-        {
-          "code": 31
-        }
-      ],
-      "fahrerlaubnis": 5,
-      "geschlecht": 0,
-      "ernaehrung": 0,
-      "kontakte": [],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Jan",
-      "nachname": "Huber",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
-        },
-        {
-          "code": 52
         }
       ],
       "fahrerlaubnis": 10,
@@ -337,8 +214,8 @@
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Julia",
-      "nachname": "Schubert",
+      "vorname": "Simon",
+      "nachname": "Schulz",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -346,33 +223,69 @@
         }
       ],
       "fahrerlaubnis": 9,
-      "geschlecht": 1,
-      "ernaehrung": 0,
-      "kontakte": [],
-      "zusatzqualifikationen": [
-        {
-          "freitext": "Tischler (Beruf)"
-        }
-      ]
-    },
-    {
-      "vorname": "Hannes",
-      "nachname": "Friedrich",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
-        }
-      ],
-      "fahrerlaubnis": 5,
       "geschlecht": 0,
       "ernaehrung": 0,
       "kontakte": [],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Torben",
-      "nachname": "Richter",
+      "vorname": "Kai",
+      "nachname": "Vogel",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        },
+        {
+          "code": 84
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Berufskraftfahrer (Beruf)"
+        }
+      ]
+    },
+    {
+      "vorname": "Dominik",
+      "nachname": "Krüger",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Hanna",
+      "nachname": "Schubert",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        },
+        {
+          "code": 30
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Tim",
+      "nachname": "Werner",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -381,6 +294,84 @@
       ],
       "fahrerlaubnis": 0,
       "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Christina",
+      "nachname": "Wenzel",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        },
+        {
+          "code": 52
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Sven",
+      "nachname": "Hartmann",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Alexander",
+      "nachname": "Roth",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Ole",
+      "nachname": "Scherer",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Sandra",
+      "nachname": "Müller",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 1,
       "ernaehrung": 0,
       "kontakte": [],
       "zusatzqualifikationen": []
@@ -392,7 +383,7 @@
         "code": 8
       },
       "stanKonform": true,
-      "kennzeichen": "THW-80321",
+      "kennzeichen": "THW-80332",
       "funkrufname": {
         "kennwort": {
           "code": 1
@@ -409,7 +400,7 @@
         "code": 8
       },
       "stanKonform": true,
-      "kennzeichen": "THW-80322",
+      "kennzeichen": "THW-80333",
       "funkrufname": {
         "kennwort": {
           "code": 1
@@ -426,31 +417,23 @@
         "code": 53
       },
       "stanKonform": true,
-      "kennzeichen": "THW-80323"
+      "kennzeichen": "THW-80334"
     },
     {
       "typ": {
         "code": 54
       },
       "stanKonform": true,
-      "kennzeichen": "THW-80324"
-    },
-    {
-      "typ": {
-        "freitext": "Anh OV (Plane)"
-      },
-      "kennzeichen": "THW-80325",
-      "stanKonform": false,
-      "aenderungen": "OV-eigenes Fahrzeug, zusätzlich zur StAN"
+      "kennzeichen": "THW-80335"
     }
   ],
   "sofortbedarf": {
-    "verpflegungPersonen": 19,
+    "verpflegungPersonen": 20,
     "dieselLiter": 140,
     "benzinLiter": 0,
     "gemischLiter": 0,
     "unterbringung": false,
     "ruhezeitErforderlich": false
   },
-  "sonstiges": "1 Helfer über StAN-Soll (Reserve aktiviert). Anh OV (Plane) zusätzlich über StAN-Soll dabei."
+  "sonstiges": "2 Helfer über StAN-Soll (Reserve aktiviert)."
 }

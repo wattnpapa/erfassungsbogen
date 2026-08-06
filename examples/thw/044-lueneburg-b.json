@@ -1,7 +1,7 @@
 {
-  "schemaVersion": 6,
+  "schemaVersion": 8,
   "uebung": true,
-  "stand": 2389,
+  "stand": 3439984,
   "einheit": {
     "organisation": 1,
     "einheitsTyp": {
@@ -36,15 +36,15 @@
     ]
   },
   "einsatz": {
-    "zeitraumVon": 2389,
-    "zeitraumBis": 2391,
+    "zeitraumVon": 2388,
+    "zeitraumBis": 2392,
     "ortAuftrag": "Gebäudeschaden Lüneburg — Abstützen, Räumen"
   },
   "personalErfassung": 0,
   "personal": [
     {
-      "vorname": "Moritz",
-      "nachname": "Engel",
+      "vorname": "Philipp",
+      "nachname": "Sommer",
       "staerkeRolle": 1,
       "funktionen": [
         {
@@ -58,19 +58,14 @@
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "5555616927"
-        },
-        {
-          "art": 2,
-          "dienstlich": true,
-          "emailTemplate": 1
+          "wert": "5550098454"
         }
       ],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Simon",
-      "nachname": "Seidel",
+      "vorname": "Lars",
+      "nachname": "Braun",
       "staerkeRolle": 1,
       "funktionen": [
         {
@@ -79,19 +74,19 @@
       ],
       "fahrerlaubnis": 5,
       "geschlecht": 0,
-      "ernaehrung": 0,
+      "ernaehrung": 2,
       "kontakte": [
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "5553824367"
+          "wert": "5556128462"
         }
       ],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Silke",
-      "nachname": "Jung",
+      "vorname": "Georg",
+      "nachname": "Schmitt",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -102,14 +97,14 @@
         }
       ],
       "fahrerlaubnis": 0,
-      "geschlecht": 1,
+      "geschlecht": 0,
       "ernaehrung": 0,
       "kontakte": [],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Dirk",
-      "nachname": "Wenzel",
+      "vorname": "Sarah",
+      "nachname": "Schäfer",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -117,70 +112,47 @@
         },
         {
           "code": 32
+        },
+        {
+          "code": 59
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Julian",
+      "nachname": "Walter",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
         }
       ],
       "fahrerlaubnis": 0,
       "geschlecht": 0,
       "ernaehrung": 0,
       "kontakte": [],
-      "zusatzqualifikationen": [
-        {
-          "freitext": "Gesundheits- und Krankenpfleger (Beruf)"
-        }
-      ]
-    },
-    {
-      "vorname": "David",
-      "nachname": "Werner",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
-        }
-      ],
-      "fahrerlaubnis": 10,
-      "geschlecht": 0,
-      "ernaehrung": 0,
-      "kontakte": [],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Patrick",
-      "nachname": "Herrmann",
+      "vorname": "Diana",
+      "nachname": "Jäger",
       "staerkeRolle": 0,
       "funktionen": [
         {
           "code": 5
         },
         {
-          "code": 59
-        }
-      ],
-      "fahrerlaubnis": 5,
-      "geschlecht": 0,
-      "ernaehrung": 0,
-      "kontakte": [],
-      "zusatzqualifikationen": [
-        {
-          "freitext": "Gesundheits- und Krankenpfleger (Beruf)"
-        }
-      ]
-    },
-    {
-      "vorname": "Ralf",
-      "nachname": "Arnold",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
-        },
-        {
-          "code": 59
+          "code": 38
         }
       ],
       "fahrerlaubnis": 10,
-      "geschlecht": 0,
-      "ernaehrung": 0,
+      "geschlecht": 1,
+      "ernaehrung": 1,
       "kontakte": [],
       "zusatzqualifikationen": []
     }
@@ -202,15 +174,40 @@
           51
         ]
       }
+    },
+    {
+      "typ": {
+        "code": 43
+      },
+      "stanKonform": true,
+      "kennzeichen": "THW-80213"
+    },
+    {
+      "typ": {
+        "freitext": "PKW OV"
+      },
+      "kennzeichen": "THW-80214",
+      "stanKonform": false,
+      "aenderungen": "OV-eigenes Fahrzeug, zusätzlich zur StAN",
+      "funkrufname": {
+        "kennwort": {
+          "code": 1
+        },
+        "eigenerStandort": true,
+        "teile": [
+          22,
+          21
+        ]
+      }
     }
   ],
   "sofortbedarf": {
-    "verpflegungPersonen": 7,
-    "dieselLiter": 60,
+    "verpflegungPersonen": 6,
+    "dieselLiter": 80,
     "benzinLiter": 0,
-    "gemischLiter": 10,
+    "gemischLiter": 5,
     "unterbringung": true,
-    "ruhezeitErforderlich": false
+    "ruhezeitErforderlich": true
   },
-  "sonstiges": "2 Sollplätze unbesetzt. Anh Plane/Spriegel in Instandsetzung — nicht mit ausgerückt."
+  "sonstiges": "3 Sollplätze unbesetzt. PKW OV zusätzlich über StAN-Soll dabei."
 }

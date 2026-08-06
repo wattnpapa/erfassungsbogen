@@ -1,7 +1,7 @@
 {
-  "schemaVersion": 6,
+  "schemaVersion": 8,
   "uebung": true,
-  "stand": 2388,
+  "stand": 3442479,
   "einheit": {
     "organisation": 1,
     "einheitsTyp": {
@@ -36,22 +36,19 @@
     ]
   },
   "einsatz": {
-    "zeitraumVon": 2388,
-    "zeitraumBis": 2390,
-    "ortAuftrag": "Gebäudeschaden BadWildungen — Abstützen, Räumen"
+    "zeitraumVon": 2390,
+    "zeitraumBis": 2394,
+    "ortAuftrag": "Hochwasser BadWildungen — Sandsackverbau, Deichsicherung"
   },
   "personalErfassung": 0,
   "personal": [
     {
-      "vorname": "Ulrike",
-      "nachname": "Lang",
+      "vorname": "Hanna",
+      "nachname": "Schubert",
       "staerkeRolle": 1,
       "funktionen": [
         {
           "code": 3
-        },
-        {
-          "code": 32
         }
       ],
       "fahrerlaubnis": 9,
@@ -61,43 +58,29 @@
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "5558536718"
-        },
-        {
-          "art": 2,
-          "dienstlich": true,
-          "emailTemplate": 1
+          "wert": "5551556233"
         }
       ],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Christian",
-      "nachname": "Maier",
+      "vorname": "Sven",
+      "nachname": "Graf",
       "staerkeRolle": 1,
       "funktionen": [
         {
           "code": 4
-        },
-        {
-          "code": 30
         }
       ],
-      "fahrerlaubnis": 9,
+      "fahrerlaubnis": 10,
       "geschlecht": 0,
       "ernaehrung": 0,
-      "kontakte": [
-        {
-          "art": 0,
-          "dienstlich": false,
-          "wert": "5558804729"
-        }
-      ],
+      "kontakte": [],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Pascal",
-      "nachname": "Kaiser",
+      "vorname": "Carina",
+      "nachname": "Friedrich",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -107,15 +90,15 @@
           "code": 38
         }
       ],
-      "fahrerlaubnis": 5,
-      "geschlecht": 0,
+      "fahrerlaubnis": 0,
+      "geschlecht": 1,
       "ernaehrung": 0,
       "kontakte": [],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Ulrike",
-      "nachname": "Vogel",
+      "vorname": "Lars",
+      "nachname": "Reuter",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -125,19 +108,19 @@
           "code": 32
         }
       ],
-      "fahrerlaubnis": 0,
-      "geschlecht": 1,
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
       "ernaehrung": 0,
       "kontakte": [],
       "zusatzqualifikationen": [
         {
-          "freitext": "Feuerwehr-Doppelmitglied (AGT)"
+          "freitext": "Rettungssanitäter (extern)"
         }
       ]
     },
     {
-      "vorname": "Markus",
-      "nachname": "Horn",
+      "vorname": "Patrick",
+      "nachname": "Keller",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -148,11 +131,48 @@
       "geschlecht": 0,
       "ernaehrung": 0,
       "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Motorsägenschein AS Baum I (extern)"
+        }
+      ]
+    },
+    {
+      "vorname": "Vanessa",
+      "nachname": "Ludwig",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 1,
+      "ernaehrung": 1,
+      "kontakte": [],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Moritz",
-      "nachname": "Wagner",
+      "vorname": "Torben",
+      "nachname": "Bauer",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        },
+        {
+          "code": 38
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 2,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Fabian",
+      "nachname": "Schulz",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -166,48 +186,15 @@
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Patrick",
-      "nachname": "Lutz",
+      "vorname": "Sandra",
+      "nachname": "Schmidt",
       "staerkeRolle": 0,
       "funktionen": [
         {
           "code": 5
         }
       ],
-      "fahrerlaubnis": 10,
-      "geschlecht": 0,
-      "ernaehrung": 1,
-      "kontakte": [],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Paul",
-      "nachname": "Walter",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
-        }
-      ],
-      "fahrerlaubnis": 9,
-      "geschlecht": 0,
-      "ernaehrung": 0,
-      "kontakte": [],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Kerstin",
-      "nachname": "Wagner",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
-        },
-        {
-          "code": 31
-        }
-      ],
-      "fahrerlaubnis": 9,
+      "fahrerlaubnis": 0,
       "geschlecht": 1,
       "ernaehrung": 0,
       "kontakte": [],
@@ -220,7 +207,7 @@
         "code": 4
       },
       "stanKonform": true,
-      "kennzeichen": "THW-80257",
+      "kennzeichen": "THW-80260",
       "funkrufname": {
         "kennwort": {
           "code": 1
@@ -237,15 +224,15 @@
         "code": 43
       },
       "stanKonform": true,
-      "kennzeichen": "THW-80258"
+      "kennzeichen": "THW-80261"
     }
   ],
   "sofortbedarf": {
     "verpflegungPersonen": 9,
     "dieselLiter": 60,
     "benzinLiter": 0,
-    "gemischLiter": 10,
-    "unterbringung": true,
+    "gemischLiter": 5,
+    "unterbringung": false,
     "ruhezeitErforderlich": false
   }
 }

@@ -1,7 +1,7 @@
 {
-  "schemaVersion": 6,
+  "schemaVersion": 8,
   "uebung": true,
-  "stand": 2389,
+  "stand": 3442508,
   "einheit": {
     "organisation": 1,
     "einheitsTyp": {
@@ -36,69 +36,43 @@
     ]
   },
   "einsatz": {
-    "zeitraumVon": 2389,
+    "zeitraumVon": 2390,
     "zeitraumBis": 2392,
     "ortAuftrag": "Flächenlage Füssen — Weitverkehrsanbindung, Kommunikation"
   },
   "personalErfassung": 0,
   "personal": [
     {
-      "vorname": "Jonas",
-      "nachname": "Ludwig",
+      "vorname": "Stefan",
+      "nachname": "Engel",
       "staerkeRolle": 1,
       "funktionen": [
         {
           "code": 3
-        },
-        {
-          "code": 34
         }
       ],
-      "fahrerlaubnis": 10,
+      "fahrerlaubnis": 9,
       "geschlecht": 0,
       "ernaehrung": 0,
       "kontakte": [
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "5551495611"
+          "wert": "5553852268"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Florian",
+      "nachname": "Günther",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "code": 4
         },
         {
-          "art": 2,
-          "dienstlich": true,
-          "emailTemplate": 1
-        }
-      ],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Marcel",
-      "nachname": "Busch",
-      "staerkeRolle": 1,
-      "funktionen": [
-        {
-          "code": 4
-        }
-      ],
-      "fahrerlaubnis": 10,
-      "geschlecht": 0,
-      "ernaehrung": 0,
-      "kontakte": [
-        {
-          "art": 0,
-          "dienstlich": false,
-          "wert": "5558367820"
-        }
-      ],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Dominik",
-      "nachname": "Friedrich",
-      "staerkeRolle": 1,
-      "funktionen": [
-        {
-          "code": 4
+          "code": 53
         }
       ],
       "fahrerlaubnis": 9,
@@ -108,8 +82,23 @@
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Moritz",
-      "nachname": "Vogt",
+      "vorname": "Nadine",
+      "nachname": "Menzel",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "code": 4
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Karsten",
+      "nachname": "Busch",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -119,15 +108,15 @@
           "code": 34
         }
       ],
-      "fahrerlaubnis": 0,
+      "fahrerlaubnis": 9,
       "geschlecht": 0,
       "ernaehrung": 0,
       "kontakte": [],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Florian",
-      "nachname": "Lenz",
+      "vorname": "Birgit",
+      "nachname": "Vogt",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -135,14 +124,14 @@
         }
       ],
       "fahrerlaubnis": 5,
-      "geschlecht": 0,
+      "geschlecht": 1,
       "ernaehrung": 1,
       "kontakte": [],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Stefan",
-      "nachname": "Huber",
+      "vorname": "Dirk",
+      "nachname": "Geiger",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -156,15 +145,30 @@
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Hannes",
-      "nachname": "Graf",
+      "vorname": "Uwe",
+      "nachname": "Ludwig",
       "staerkeRolle": 0,
       "funktionen": [
         {
           "code": 5
         },
         {
-          "code": 31
+          "code": 53
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Jannik",
+      "nachname": "Engel",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
         }
       ],
       "fahrerlaubnis": 5,
@@ -180,7 +184,7 @@
         "code": 1
       },
       "stanKonform": true,
-      "kennzeichen": "THW-80146",
+      "kennzeichen": "THW-80149",
       "funkrufname": {
         "kennwort": {
           "code": 1
@@ -194,26 +198,43 @@
     },
     {
       "typ": {
+        "code": 5
+      },
+      "stanKonform": true,
+      "kennzeichen": "THW-80150",
+      "funkrufname": {
+        "kennwort": {
+          "code": 1
+        },
+        "eigenerStandort": true,
+        "teile": [
+          18,
+          25
+        ]
+      }
+    },
+    {
+      "typ": {
         "code": 40
       },
       "stanKonform": true,
-      "kennzeichen": "THW-80148"
+      "kennzeichen": "THW-80151"
     },
     {
       "typ": {
         "code": 41
       },
       "stanKonform": true,
-      "kennzeichen": "THW-80149"
+      "kennzeichen": "THW-80152"
     }
   ],
   "sofortbedarf": {
-    "verpflegungPersonen": 7,
-    "dieselLiter": 40,
+    "verpflegungPersonen": 8,
+    "dieselLiter": 70,
     "benzinLiter": 0,
     "gemischLiter": 0,
     "unterbringung": true,
     "ruhezeitErforderlich": false
   },
-  "sonstiges": "2 Sollplätze unbesetzt. MTW FGr in Instandsetzung — nicht mit ausgerückt."
+  "sonstiges": "1 Sollplätze unbesetzt."
 }

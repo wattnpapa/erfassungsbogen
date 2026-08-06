@@ -1,7 +1,7 @@
 {
-  "schemaVersion": 6,
+  "schemaVersion": 8,
   "uebung": true,
-  "stand": 2389,
+  "stand": 3440016,
   "einheit": {
     "organisation": 1,
     "einheitsTyp": {
@@ -36,40 +36,36 @@
     ]
   },
   "einsatz": {
-    "zeitraumVon": 2389,
+    "zeitraumVon": 2388,
     "zeitraumBis": 2390,
     "ortAuftrag": "Gebäudeeinsturz Biberach/Riß — technische Ortung"
   },
   "personalErfassung": 0,
   "personal": [
     {
-      "vorname": "Tim",
-      "nachname": "Krämer",
+      "vorname": "Maren",
+      "nachname": "Werner",
       "staerkeRolle": 1,
       "funktionen": [
         {
           "code": 3
-        },
-        {
-          "code": 62
         }
       ],
       "fahrerlaubnis": 10,
-      "geschlecht": 0,
+      "geschlecht": 1,
       "ernaehrung": 0,
       "kontakte": [
         {
           "art": 0,
           "dienstlich": false,
           "wert": "5556747832"
-        },
-        {
-          "art": 2,
-          "dienstlich": true,
-          "emailTemplate": 1
         }
       ],
-      "zusatzqualifikationen": []
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Berufskraftfahrer (Beruf)"
+        }
+      ]
     },
     {
       "vorname": "Michael",
@@ -83,13 +79,7 @@
       "fahrerlaubnis": 10,
       "geschlecht": 0,
       "ernaehrung": 0,
-      "kontakte": [
-        {
-          "art": 0,
-          "dienstlich": false,
-          "wert": "5555482910"
-        }
-      ],
+      "kontakte": [],
       "zusatzqualifikationen": []
     },
     {
@@ -119,7 +109,7 @@
           "code": 5
         },
         {
-          "code": 62
+          "code": 31
         }
       ],
       "fahrerlaubnis": 5,
@@ -184,9 +174,6 @@
       "funktionen": [
         {
           "code": 5
-        },
-        {
-          "code": 62
         }
       ],
       "fahrerlaubnis": 9,
@@ -202,11 +189,48 @@
       "funktionen": [
         {
           "code": 5
+        },
+        {
+          "code": 31
         }
       ],
       "fahrerlaubnis": 10,
       "geschlecht": 0,
       "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Stefanie",
+      "nachname": "Koch",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Feuerwehr-Doppelmitglied (AGT)"
+        }
+      ]
+    },
+    {
+      "vorname": "Marcel",
+      "nachname": "Kuhn",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 1,
       "kontakte": [],
       "zusatzqualifikationen": []
     }
@@ -231,6 +255,13 @@
     },
     {
       "typ": {
+        "freitext": "Anh FGr O"
+      },
+      "stanKonform": true,
+      "kennzeichen": "THW-80104"
+    },
+    {
+      "typ": {
         "freitext": "PKW OV"
       },
       "kennzeichen": "THW-80105",
@@ -249,12 +280,12 @@
     }
   ],
   "sofortbedarf": {
-    "verpflegungPersonen": 9,
+    "verpflegungPersonen": 11,
     "dieselLiter": 50,
     "benzinLiter": 0,
     "gemischLiter": 0,
-    "unterbringung": false,
-    "ruhezeitErforderlich": false
+    "unterbringung": true,
+    "ruhezeitErforderlich": true
   },
-  "sonstiges": "Anh FGr O in Instandsetzung — nicht mit ausgerückt. PKW OV zusätzlich über StAN-Soll dabei."
+  "sonstiges": "2 Helfer über StAN-Soll (Reserve aktiviert). PKW OV zusätzlich über StAN-Soll dabei."
 }

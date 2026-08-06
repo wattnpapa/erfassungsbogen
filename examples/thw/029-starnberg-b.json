@@ -1,7 +1,7 @@
 {
-  "schemaVersion": 6,
+  "schemaVersion": 8,
   "uebung": true,
-  "stand": 2390,
+  "stand": 3439095,
   "einheit": {
     "organisation": 1,
     "einheitsTyp": {
@@ -36,68 +36,51 @@
     ]
   },
   "einsatz": {
-    "zeitraumVon": 2390,
+    "zeitraumVon": 2388,
     "zeitraumBis": 2392,
-    "ortAuftrag": "Gebäudeschaden Starnberg — Abstützen, Räumen"
+    "ortAuftrag": "Sturmtief »Quirin« Starnberg — Beräumung, Sicherung"
   },
   "personalErfassung": 0,
   "personal": [
     {
-      "vorname": "Kai",
-      "nachname": "König",
+      "vorname": "Michael",
+      "nachname": "Baumann",
       "staerkeRolle": 1,
       "funktionen": [
         {
           "code": 3
-        },
-        {
-          "code": 32
         }
       ],
-      "fahrerlaubnis": 9,
+      "fahrerlaubnis": 10,
       "geschlecht": 0,
-      "ernaehrung": 0,
+      "ernaehrung": 2,
       "kontakte": [
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "5550753243"
-        },
-        {
-          "art": 2,
-          "dienstlich": true,
-          "emailTemplate": 1
+          "wert": "5552030328"
         }
       ],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Stefan",
-      "nachname": "Wenzel",
+      "vorname": "Marco",
+      "nachname": "Berger",
       "staerkeRolle": 1,
       "funktionen": [
         {
           "code": 4
-        },
-        {
-          "code": 30
         }
       ],
       "fahrerlaubnis": 10,
       "geschlecht": 0,
       "ernaehrung": 0,
-      "kontakte": [
-        {
-          "art": 0,
-          "dienstlich": false,
-          "wert": "5558910237"
-        }
-      ],
+      "kontakte": [],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Sonja",
-      "nachname": "Haas",
+      "vorname": "Uwe",
+      "nachname": "Menzel",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -108,13 +91,13 @@
         }
       ],
       "fahrerlaubnis": 0,
-      "geschlecht": 1,
+      "geschlecht": 0,
       "ernaehrung": 0,
       "kontakte": [],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Dominik",
+      "vorname": "Torben",
       "nachname": "Schubert",
       "staerkeRolle": 0,
       "funktionen": [
@@ -123,6 +106,9 @@
         },
         {
           "code": 32
+        },
+        {
+          "code": 38
         }
       ],
       "fahrerlaubnis": 5,
@@ -132,15 +118,27 @@
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Hanna",
-      "nachname": "Ziegler",
+      "vorname": "Christian",
+      "nachname": "Schäfer",
       "staerkeRolle": 0,
       "funktionen": [
         {
           "code": 5
-        },
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Maren",
+      "nachname": "Berger",
+      "staerkeRolle": 0,
+      "funktionen": [
         {
-          "code": 32
+          "code": 5
         }
       ],
       "fahrerlaubnis": 0,
@@ -150,15 +148,15 @@
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Kevin",
-      "nachname": "Maier",
+      "vorname": "Kai",
+      "nachname": "Scholz",
       "staerkeRolle": 0,
       "funktionen": [
         {
           "code": 5
         }
       ],
-      "fahrerlaubnis": 0,
+      "fahrerlaubnis": 5,
       "geschlecht": 0,
       "ernaehrung": 0,
       "kontakte": [],
@@ -171,7 +169,7 @@
         "code": 4
       },
       "stanKonform": true,
-      "kennzeichen": "THW-80169",
+      "kennzeichen": "THW-80172",
       "funkrufname": {
         "kennwort": {
           "code": 1
@@ -188,16 +186,16 @@
         "code": 43
       },
       "stanKonform": true,
-      "kennzeichen": "THW-80170"
+      "kennzeichen": "THW-80173"
     }
   ],
   "sofortbedarf": {
-    "verpflegungPersonen": 6,
+    "verpflegungPersonen": 7,
     "dieselLiter": 60,
     "benzinLiter": 0,
-    "gemischLiter": 5,
+    "gemischLiter": 10,
     "unterbringung": true,
-    "ruhezeitErforderlich": false
+    "ruhezeitErforderlich": true
   },
-  "sonstiges": "3 Sollplätze unbesetzt."
+  "sonstiges": "2 Sollplätze unbesetzt."
 }

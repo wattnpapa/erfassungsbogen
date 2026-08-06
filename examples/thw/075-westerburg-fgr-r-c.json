@@ -1,7 +1,7 @@
 {
-  "schemaVersion": 6,
+  "schemaVersion": 8,
   "uebung": true,
-  "stand": 2388,
+  "stand": 3439444,
   "einheit": {
     "organisation": 1,
     "einheitsTyp": {
@@ -43,44 +43,37 @@
   "personalErfassung": 0,
   "personal": [
     {
-      "vorname": "Tobias",
-      "nachname": "Otto",
+      "vorname": "Paul",
+      "nachname": "Fischer",
       "staerkeRolle": 1,
       "funktionen": [
         {
           "code": 3
-        },
-        {
-          "code": 30
         }
       ],
-      "fahrerlaubnis": 5,
+      "fahrerlaubnis": 10,
       "geschlecht": 0,
-      "ernaehrung": 2,
+      "ernaehrung": 1,
       "kontakte": [
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "5559367029"
-        },
-        {
-          "art": 2,
-          "dienstlich": true,
-          "emailTemplate": 1
+          "wert": "5558022344"
         }
       ],
-      "zusatzqualifikationen": []
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungssanitäter (extern)"
+        }
+      ]
     },
     {
-      "vorname": "Alexander",
-      "nachname": "Kern",
+      "vorname": "Peter",
+      "nachname": "Meyer",
       "staerkeRolle": 1,
       "funktionen": [
         {
           "code": 4
-        },
-        {
-          "code": 30
         }
       ],
       "fahrerlaubnis": 9,
@@ -90,14 +83,14 @@
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "5559422540"
+          "wert": "5553647462"
         }
       ],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Tim",
-      "nachname": "Bergmann",
+      "vorname": "Uwe",
+      "nachname": "Maier",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -107,15 +100,15 @@
           "code": 42
         }
       ],
-      "fahrerlaubnis": 5,
+      "fahrerlaubnis": 9,
       "geschlecht": 0,
       "ernaehrung": 0,
       "kontakte": [],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Frank",
-      "nachname": "Becker",
+      "vorname": "Marco",
+      "nachname": "Engel",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -129,12 +122,78 @@
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Patrick",
-      "nachname": "Haas",
+      "vorname": "Bernd",
+      "nachname": "Schwarz",
       "staerkeRolle": 0,
       "funktionen": [
         {
           "code": 5
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Paul",
+      "nachname": "Menzel",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        },
+        {
+          "code": 30
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Erik",
+      "nachname": "Weiß",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Ulrike",
+      "nachname": "Marx",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Matthias",
+      "nachname": "Scholz",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        },
+        {
+          "code": 31
         }
       ],
       "fahrerlaubnis": 10,
@@ -144,30 +203,15 @@
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Tim",
-      "nachname": "Vogel",
+      "vorname": "Kai",
+      "nachname": "Lang",
       "staerkeRolle": 0,
       "funktionen": [
         {
           "code": 5
         }
       ],
-      "fahrerlaubnis": 10,
-      "geschlecht": 0,
-      "ernaehrung": 0,
-      "kontakte": [],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Niklas",
-      "nachname": "Ziegler",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
-        }
-      ],
-      "fahrerlaubnis": 10,
+      "fahrerlaubnis": 5,
       "geschlecht": 0,
       "ernaehrung": 0,
       "kontakte": [],
@@ -180,7 +224,7 @@
         "code": 7
       },
       "stanKonform": true,
-      "kennzeichen": "THW-80290",
+      "kennzeichen": "THW-80298",
       "funkrufname": {
         "kennwort": {
           "code": 1
@@ -214,23 +258,41 @@
         "code": 45
       },
       "stanKonform": true,
-      "kennzeichen": "THW-80291"
+      "kennzeichen": "THW-80299"
     },
     {
       "typ": {
         "code": 46
       },
       "stanKonform": true,
-      "kennzeichen": "THW-80292"
+      "kennzeichen": "THW-80300"
+    },
+    {
+      "typ": {
+        "freitext": "MTW OV"
+      },
+      "kennzeichen": "THW-80301",
+      "stanKonform": false,
+      "aenderungen": "OV-eigenes Fahrzeug, zusätzlich zur StAN",
+      "funkrufname": {
+        "kennwort": {
+          "code": 1
+        },
+        "eigenerStandort": true,
+        "teile": [
+          43,
+          25
+        ]
+      }
     }
   ],
   "sofortbedarf": {
-    "verpflegungPersonen": 7,
-    "dieselLiter": 140,
+    "verpflegungPersonen": 10,
+    "dieselLiter": 170,
     "benzinLiter": 0,
     "gemischLiter": 10,
     "unterbringung": false,
-    "ruhezeitErforderlich": true
+    "ruhezeitErforderlich": false
   },
-  "sonstiges": "2 Sollplätze unbesetzt."
+  "sonstiges": "1 Helfer über StAN-Soll (Reserve aktiviert). MTW OV zusätzlich über StAN-Soll dabei."
 }

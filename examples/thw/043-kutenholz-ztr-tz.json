@@ -1,7 +1,7 @@
 {
-  "schemaVersion": 6,
+  "schemaVersion": 8,
   "uebung": true,
-  "stand": 2390,
+  "stand": 3439851,
   "einheit": {
     "organisation": 1,
     "einheitsTyp": {
@@ -36,15 +36,15 @@
     ]
   },
   "einsatz": {
-    "zeitraumVon": 2390,
-    "zeitraumBis": 2393,
+    "zeitraumVon": 2388,
+    "zeitraumBis": 2392,
     "ortAuftrag": "Hochwasserlage Kutenholz — Führung Technischer Zug"
   },
   "personalErfassung": 0,
   "personal": [
     {
-      "vorname": "Nadine",
-      "nachname": "Brunner",
+      "vorname": "Jonas",
+      "nachname": "Hoffmann",
       "staerkeRolle": 2,
       "funktionen": [
         {
@@ -52,53 +52,35 @@
         }
       ],
       "fahrerlaubnis": 10,
-      "geschlecht": 1,
+      "geschlecht": 0,
       "ernaehrung": 1,
       "kontakte": [
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "5552844791"
-        },
-        {
-          "art": 2,
-          "dienstlich": true,
-          "emailTemplate": 1
-        }
-      ],
-      "zusatzqualifikationen": [
-        {
-          "freitext": "Landwirt — Erfahrung Großgeräte"
-        }
-      ]
-    },
-    {
-      "vorname": "Thomas",
-      "nachname": "Franke",
-      "staerkeRolle": 1,
-      "funktionen": [
-        {
-          "code": 2
-        },
-        {
-          "code": 34
-        }
-      ],
-      "fahrerlaubnis": 10,
-      "geschlecht": 0,
-      "ernaehrung": 0,
-      "kontakte": [
-        {
-          "art": 0,
-          "dienstlich": false,
-          "wert": "5557817275"
+          "wert": "5553275097"
         }
       ],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Heiko",
-      "nachname": "Peters",
+      "vorname": "Maren",
+      "nachname": "Braun",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "code": 2
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Ulrike",
+      "nachname": "Maier",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -108,51 +90,29 @@
           "code": 30
         }
       ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Marcel",
+      "nachname": "Weiß",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        },
+        {
+          "code": 31
+        }
+      ],
       "fahrerlaubnis": 9,
-      "geschlecht": 0,
-      "ernaehrung": 1,
-      "kontakte": [],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Joachim",
-      "nachname": "Werner",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
-        },
-        {
-          "code": 31
-        }
-      ],
-      "fahrerlaubnis": 0,
-      "geschlecht": 0,
-      "ernaehrung": 2,
-      "kontakte": [],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Christian",
-      "nachname": "Wagner",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
-        },
-        {
-          "code": 31
-        }
-      ],
-      "fahrerlaubnis": 5,
       "geschlecht": 0,
       "ernaehrung": 0,
       "kontakte": [],
-      "zusatzqualifikationen": [
-        {
-          "freitext": "Feuerwehr-Doppelmitglied (AGT)"
-        }
-      ]
+      "zusatzqualifikationen": []
     }
   ],
   "fahrzeuge": [
@@ -175,7 +135,7 @@
     },
     {
       "typ": {
-        "freitext": "PKW OV"
+        "freitext": "MzKW"
       },
       "kennzeichen": "THW-80211",
       "stanKonform": false,
@@ -187,18 +147,18 @@
         "eigenerStandort": true,
         "teile": [
           21,
-          21
+          54
         ]
       }
     }
   ],
   "sofortbedarf": {
-    "verpflegungPersonen": 5,
-    "dieselLiter": 50,
+    "verpflegungPersonen": 4,
+    "dieselLiter": 80,
     "benzinLiter": 0,
     "gemischLiter": 0,
-    "unterbringung": false,
+    "unterbringung": true,
     "ruhezeitErforderlich": false
   },
-  "sonstiges": "1 Helfer über StAN-Soll (Reserve aktiviert). PKW OV zusätzlich über StAN-Soll dabei."
+  "sonstiges": "MzKW zusätzlich über StAN-Soll dabei."
 }

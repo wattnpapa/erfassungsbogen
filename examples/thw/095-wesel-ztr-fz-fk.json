@@ -1,7 +1,7 @@
 {
-  "schemaVersion": 6,
+  "schemaVersion": 8,
   "uebung": true,
-  "stand": 2389,
+  "stand": 3439144,
   "einheit": {
     "organisation": 1,
     "einheitsTyp": {
@@ -36,15 +36,15 @@
     ]
   },
   "einsatz": {
-    "zeitraumVon": 2389,
-    "zeitraumBis": 2393,
+    "zeitraumVon": 2388,
+    "zeitraumBis": 2391,
     "ortAuftrag": "Einsatzabschnitt Wesel — Führung Fachzug F/K"
   },
   "personalErfassung": 0,
   "personal": [
     {
-      "vorname": "Sven",
-      "nachname": "Herrmann",
+      "vorname": "Karsten",
+      "nachname": "Lorenz",
       "staerkeRolle": 2,
       "funktionen": [
         {
@@ -58,40 +58,35 @@
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "5553391886"
-        },
-        {
-          "art": 2,
-          "dienstlich": true,
-          "emailTemplate": 1
+          "wert": "5556768240"
         }
       ],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Pascal",
-      "nachname": "Braun",
+      "vorname": "David",
+      "nachname": "Dietrich",
       "staerkeRolle": 1,
       "funktionen": [
         {
           "code": 2
         }
       ],
-      "fahrerlaubnis": 10,
+      "fahrerlaubnis": 9,
       "geschlecht": 0,
       "ernaehrung": 0,
       "kontakte": [
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "5551364745"
+          "wert": "5558057061"
         }
       ],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Nadine",
-      "nachname": "Heinrich",
+      "vorname": "Jannik",
+      "nachname": "Otto",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -101,15 +96,15 @@
           "code": 30
         }
       ],
-      "fahrerlaubnis": 5,
-      "geschlecht": 1,
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
       "ernaehrung": 0,
       "kontakte": [],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Dirk",
-      "nachname": "Geiger",
+      "vorname": "Paul",
+      "nachname": "Hahn",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -118,22 +113,7 @@
       ],
       "fahrerlaubnis": 0,
       "geschlecht": 0,
-      "ernaehrung": 1,
-      "kontakte": [],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Kai",
-      "nachname": "Schulz",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
-        }
-      ],
-      "fahrerlaubnis": 0,
-      "geschlecht": 0,
-      "ernaehrung": 2,
+      "ernaehrung": 0,
       "kontakte": [],
       "zusatzqualifikationen": []
     }
@@ -144,7 +124,7 @@
         "code": 2
       },
       "stanKonform": true,
-      "kennzeichen": "THW-80344",
+      "kennzeichen": "THW-80355",
       "funkrufname": {
         "kennwort": {
           "code": 1
@@ -158,20 +138,30 @@
     },
     {
       "typ": {
-        "freitext": "Anh OV (Plane)"
+        "freitext": "MzKW"
       },
-      "kennzeichen": "THW-80345",
+      "kennzeichen": "THW-80356",
       "stanKonform": false,
-      "aenderungen": "OV-eigenes Fahrzeug, zusätzlich zur StAN"
+      "aenderungen": "OV-eigenes Fahrzeug, zusätzlich zur StAN",
+      "funkrufname": {
+        "kennwort": {
+          "code": 1
+        },
+        "eigenerStandort": true,
+        "teile": [
+          16,
+          54
+        ]
+      }
     }
   ],
   "sofortbedarf": {
-    "verpflegungPersonen": 5,
-    "dieselLiter": 30,
+    "verpflegungPersonen": 4,
+    "dieselLiter": 80,
     "benzinLiter": 0,
     "gemischLiter": 0,
     "unterbringung": true,
     "ruhezeitErforderlich": false
   },
-  "sonstiges": "1 Helfer über StAN-Soll (Reserve aktiviert). Anh OV (Plane) zusätzlich über StAN-Soll dabei."
+  "sonstiges": "MzKW zusätzlich über StAN-Soll dabei."
 }

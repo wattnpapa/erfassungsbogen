@@ -1,7 +1,7 @@
 {
-  "schemaVersion": 6,
+  "schemaVersion": 8,
   "uebung": true,
-  "stand": 2389,
+  "stand": 3441230,
   "einheit": {
     "organisation": 1,
     "einheitsTyp": {
@@ -37,58 +37,39 @@
   },
   "einsatz": {
     "zeitraumVon": 2389,
-    "zeitraumBis": 2392,
-    "ortAuftrag": "Hochwasser Cottbus — Notinstandsetzung Infrastruktur"
+    "zeitraumBis": 2393,
+    "ortAuftrag": "Stromausfall Cottbus — Anschluss Notstromnetz"
   },
   "personalErfassung": 0,
   "personal": [
     {
-      "vorname": "Dennis",
-      "nachname": "Wolf",
+      "vorname": "Felix",
+      "nachname": "Friedrich",
       "staerkeRolle": 1,
       "funktionen": [
         {
           "code": 3
-        },
-        {
-          "code": 90
         }
       ],
-      "fahrerlaubnis": 9,
+      "fahrerlaubnis": 10,
       "geschlecht": 0,
-      "ernaehrung": 1,
+      "ernaehrung": 0,
       "kontakte": [
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "5553780101"
-        },
-        {
-          "art": 2,
-          "dienstlich": true,
-          "emailTemplate": 1
+          "wert": "5554255033"
         }
       ],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Thomas",
-      "nachname": "Sommer",
-      "staerkeRolle": 1,
-      "funktionen": [
+      "zusatzqualifikationen": [
         {
-          "code": 4
+          "freitext": "Funkamateur (extern)"
         }
-      ],
-      "fahrerlaubnis": 9,
-      "geschlecht": 0,
-      "ernaehrung": 1,
-      "kontakte": [],
-      "zusatzqualifikationen": []
+      ]
     },
     {
-      "vorname": "Anja",
-      "nachname": "Schröder",
+      "vorname": "Sven",
+      "nachname": "Busch",
       "staerkeRolle": 1,
       "funktionen": [
         {
@@ -96,14 +77,29 @@
         }
       ],
       "fahrerlaubnis": 10,
-      "geschlecht": 1,
+      "geschlecht": 0,
       "ernaehrung": 0,
       "kontakte": [],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Marco",
-      "nachname": "Seidel",
+      "vorname": "Peter",
+      "nachname": "Reuter",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "code": 4
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Torben",
+      "nachname": "Roth",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -120,8 +116,29 @@
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Leon",
-      "nachname": "Vogel",
+      "vorname": "Frank",
+      "nachname": "Schmidt",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        },
+        {
+          "code": 89
+        },
+        {
+          "code": 31
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Jannik",
+      "nachname": "Roth",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -131,22 +148,19 @@
           "code": 89
         }
       ],
-      "fahrerlaubnis": 9,
+      "fahrerlaubnis": 0,
       "geschlecht": 0,
       "ernaehrung": 0,
       "kontakte": [],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Paul",
-      "nachname": "Ludwig",
+      "vorname": "Patrick",
+      "nachname": "Fischer",
       "staerkeRolle": 0,
       "funktionen": [
         {
           "code": 5
-        },
-        {
-          "code": 90
         }
       ],
       "fahrerlaubnis": 10,
@@ -156,8 +170,41 @@
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Henrik",
-      "nachname": "Krüger",
+      "vorname": "Kai",
+      "nachname": "Möller",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        },
+        {
+          "code": 49
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Christina",
+      "nachname": "Franke",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Sven",
+      "nachname": "Lorenz",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -168,26 +215,15 @@
       "geschlecht": 0,
       "ernaehrung": 0,
       "kontakte": [],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "David",
-      "nachname": "Peters",
-      "staerkeRolle": 0,
-      "funktionen": [
+      "zusatzqualifikationen": [
         {
-          "code": 5
+          "freitext": "Elektrofachkraft (Beruf)"
         }
-      ],
-      "fahrerlaubnis": 5,
-      "geschlecht": 0,
-      "ernaehrung": 0,
-      "kontakte": [],
-      "zusatzqualifikationen": []
+      ]
     },
     {
-      "vorname": "Dirk",
-      "nachname": "Herrmann",
+      "vorname": "Peter",
+      "nachname": "Meyer",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -204,23 +240,8 @@
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Katrin",
-      "nachname": "Haas",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
-        }
-      ],
-      "fahrerlaubnis": 5,
-      "geschlecht": 1,
-      "ernaehrung": 0,
-      "kontakte": [],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Karsten",
-      "nachname": "Bauer",
+      "vorname": "Martin",
+      "nachname": "Geiger",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -230,28 +251,13 @@
           "code": 49
         }
       ],
-      "fahrerlaubnis": 0,
+      "fahrerlaubnis": 9,
       "geschlecht": 0,
-      "ernaehrung": 0,
-      "kontakte": [],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Hanna",
-      "nachname": "Kuhn",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
-        }
-      ],
-      "fahrerlaubnis": 10,
-      "geschlecht": 1,
-      "ernaehrung": 0,
+      "ernaehrung": 1,
       "kontakte": [],
       "zusatzqualifikationen": [
         {
-          "freitext": "Rettungssanitäter (extern)"
+          "freitext": "Motorsägenschein AS Baum I (extern)"
         }
       ]
     }
@@ -262,7 +268,7 @@
         "code": 6
       },
       "stanKonform": true,
-      "kennzeichen": "THW-80181",
+      "kennzeichen": "THW-80182",
       "funkrufname": {
         "kennwort": {
           "code": 1
@@ -279,7 +285,7 @@
         "code": 5
       },
       "stanKonform": true,
-      "kennzeichen": "THW-80182",
+      "kennzeichen": "THW-80183",
       "funkrufname": {
         "kennwort": {
           "code": 1
@@ -296,7 +302,7 @@
         "freitext": "Anh FGr I"
       },
       "stanKonform": true,
-      "kennzeichen": "THW-80183"
+      "kennzeichen": "THW-80184"
     }
   ],
   "sofortbedarf": {
@@ -304,7 +310,7 @@
     "dieselLiter": 80,
     "benzinLiter": 0,
     "gemischLiter": 0,
-    "unterbringung": false,
-    "ruhezeitErforderlich": true
+    "unterbringung": true,
+    "ruhezeitErforderlich": false
   }
 }

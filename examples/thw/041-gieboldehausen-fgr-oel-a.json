@@ -1,7 +1,7 @@
 {
-  "schemaVersion": 6,
+  "schemaVersion": 8,
   "uebung": true,
-  "stand": 2388,
+  "stand": 3442219,
   "einheit": {
     "organisation": 1,
     "einheitsTyp": {
@@ -36,41 +36,64 @@
     ]
   },
   "einsatz": {
-    "zeitraumVon": 2388,
+    "zeitraumVon": 2390,
     "zeitraumBis": 2391,
     "ortAuftrag": "Ölschaden Hafen Gieboldehausen — Ölsperren, Separation"
   },
   "personalErfassung": 0,
   "personal": [
     {
-      "vorname": "Anja",
-      "nachname": "Baumann",
+      "vorname": "Niklas",
+      "nachname": "Herrmann",
       "staerkeRolle": 1,
       "funktionen": [
         {
           "code": 3
+        },
+        {
+          "code": 30
         }
       ],
       "fahrerlaubnis": 9,
-      "geschlecht": 1,
+      "geschlecht": 0,
       "ernaehrung": 0,
       "kontakte": [
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "5550157682"
-        },
+          "wert": "5559955846"
+        }
+      ],
+      "zusatzqualifikationen": [
         {
-          "art": 2,
-          "dienstlich": true,
-          "emailTemplate": 1
+          "freitext": "Motorsägenschein AS Baum I (extern)"
+        }
+      ]
+    },
+    {
+      "vorname": "Sven",
+      "nachname": "Scherer",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "code": 4
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5555410906"
         }
       ],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Martin",
-      "nachname": "Hartmann",
+      "vorname": "Melanie",
+      "nachname": "Baumann",
       "staerkeRolle": 1,
       "funktionen": [
         {
@@ -78,6 +101,54 @@
         }
       ],
       "fahrerlaubnis": 9,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Frank",
+      "nachname": "Maier",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "code": 4
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Jonas",
+      "nachname": "Werner",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        },
+        {
+          "code": 55
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Pascal",
+      "nachname": "Becker",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        }
+      ],
+      "fahrerlaubnis": 5,
       "geschlecht": 0,
       "ernaehrung": 0,
       "kontakte": [],
@@ -88,162 +159,12 @@
       ]
     },
     {
-      "vorname": "Nadine",
-      "nachname": "Heinrich",
-      "staerkeRolle": 1,
-      "funktionen": [
-        {
-          "code": 4
-        }
-      ],
-      "fahrerlaubnis": 5,
-      "geschlecht": 1,
-      "ernaehrung": 1,
-      "kontakte": [],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Dominik",
-      "nachname": "Busch",
-      "staerkeRolle": 1,
-      "funktionen": [
-        {
-          "code": 4
-        },
-        {
-          "code": 55
-        }
-      ],
-      "fahrerlaubnis": 9,
-      "geschlecht": 0,
-      "ernaehrung": 0,
-      "kontakte": [],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Thomas",
-      "nachname": "Richter",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
-        },
-        {
-          "code": 55
-        }
-      ],
-      "fahrerlaubnis": 0,
-      "geschlecht": 0,
-      "ernaehrung": 0,
-      "kontakte": [],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Marie",
-      "nachname": "Lehmann",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
-        }
-      ],
-      "fahrerlaubnis": 5,
-      "geschlecht": 1,
-      "ernaehrung": 2,
-      "kontakte": [],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Pascal",
-      "nachname": "Krämer",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
-        }
-      ],
-      "fahrerlaubnis": 5,
-      "geschlecht": 0,
-      "ernaehrung": 0,
-      "kontakte": [],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Bernd",
-      "nachname": "Schäfer",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
-        }
-      ],
-      "fahrerlaubnis": 5,
-      "geschlecht": 0,
-      "ernaehrung": 0,
-      "kontakte": [],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Marco",
-      "nachname": "Pohl",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
-        },
-        {
-          "code": 30
-        }
-      ],
-      "fahrerlaubnis": 5,
-      "geschlecht": 0,
-      "ernaehrung": 0,
-      "kontakte": [],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Tim",
-      "nachname": "Haas",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
-        }
-      ],
-      "fahrerlaubnis": 10,
-      "geschlecht": 0,
-      "ernaehrung": 0,
-      "kontakte": [],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Bernd",
-      "nachname": "Maier",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
-        },
-        {
-          "code": 54
-        }
-      ],
-      "fahrerlaubnis": 0,
-      "geschlecht": 0,
-      "ernaehrung": 0,
-      "kontakte": [],
-      "zusatzqualifikationen": []
-    },
-    {
       "vorname": "Lars",
       "nachname": "Menzel",
       "staerkeRolle": 0,
       "funktionen": [
         {
           "code": 5
-        },
-        {
-          "code": 55
         }
       ],
       "fahrerlaubnis": 0,
@@ -291,7 +212,7 @@
           "code": 5
         },
         {
-          "code": 30
+          "code": 31
         }
       ],
       "fahrerlaubnis": 10,
@@ -329,6 +250,87 @@
       "ernaehrung": 0,
       "kontakte": [],
       "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Lars",
+      "nachname": "Fuchs",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Pascal",
+      "nachname": "Sommer",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Simon",
+      "nachname": "Kraus",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        },
+        {
+          "code": 55
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Laura",
+      "nachname": "Ernst",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        },
+        {
+          "code": 31
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Melanie",
+      "nachname": "Weber",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
     }
   ],
   "fahrzeuge": [
@@ -337,7 +339,7 @@
         "code": 11
       },
       "stanKonform": true,
-      "kennzeichen": "THW-80203",
+      "kennzeichen": "THW-80204",
       "funkrufname": {
         "kennwort": {
           "code": 1
@@ -354,7 +356,7 @@
         "code": 9
       },
       "stanKonform": true,
-      "kennzeichen": "THW-80204",
+      "kennzeichen": "THW-80205",
       "funkrufname": {
         "kennwort": {
           "code": 1
@@ -371,34 +373,16 @@
         "code": 44
       },
       "stanKonform": true,
-      "kennzeichen": "THW-80205"
-    },
-    {
-      "typ": {
-        "freitext": "MzKW"
-      },
-      "kennzeichen": "THW-80206",
-      "stanKonform": false,
-      "aenderungen": "OV-eigenes Fahrzeug, zusätzlich zur StAN",
-      "funkrufname": {
-        "kennwort": {
-          "code": 1
-        },
-        "eigenerStandort": true,
-        "teile": [
-          55,
-          54
-        ]
-      }
+      "kennzeichen": "THW-80206"
     }
   ],
   "sofortbedarf": {
     "verpflegungPersonen": 17,
-    "dieselLiter": 210,
+    "dieselLiter": 160,
     "benzinLiter": 0,
     "gemischLiter": 0,
-    "unterbringung": true,
-    "ruhezeitErforderlich": true
+    "unterbringung": false,
+    "ruhezeitErforderlich": false
   },
-  "sonstiges": "1 Sollplätze unbesetzt. MzKW zusätzlich über StAN-Soll dabei."
+  "sonstiges": "1 Sollplätze unbesetzt."
 }

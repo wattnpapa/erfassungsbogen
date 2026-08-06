@@ -1,7 +1,7 @@
 {
-  "schemaVersion": 6,
+  "schemaVersion": 8,
   "uebung": true,
-  "stand": 2390,
+  "stand": 3439354,
   "einheit": {
     "organisation": 1,
     "einheitsTyp": {
@@ -36,15 +36,15 @@
     ]
   },
   "einsatz": {
-    "zeitraumVon": 2390,
-    "zeitraumBis": 2391,
-    "ortAuftrag": "Bereitstellungsraum Neustadt — Verpflegung Einsatzkräfte"
+    "zeitraumVon": 2388,
+    "zeitraumBis": 2389,
+    "ortAuftrag": "Flächenlage Neustadt — Verpflegung 250 Portionen/Ausgabe"
   },
   "personalErfassung": 0,
   "personal": [
     {
-      "vorname": "Michael",
-      "nachname": "Schubert",
+      "vorname": "Miriam",
+      "nachname": "Brunner",
       "staerkeRolle": 1,
       "funktionen": [
         {
@@ -52,137 +52,56 @@
         }
       ],
       "fahrerlaubnis": 9,
-      "geschlecht": 0,
+      "geschlecht": 1,
       "ernaehrung": 0,
       "kontakte": [
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "5556654744"
-        },
-        {
-          "art": 2,
-          "dienstlich": true,
-          "emailTemplate": 1
+          "wert": "5558844588"
         }
       ],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Georg",
-      "nachname": "Scholz",
+      "vorname": "Robert",
+      "nachname": "Wenzel",
       "staerkeRolle": 1,
       "funktionen": [
         {
           "code": 4
+        },
+        {
+          "code": 31
         }
       ],
       "fahrerlaubnis": 10,
       "geschlecht": 0,
-      "ernaehrung": 2,
-      "kontakte": [
-        {
-          "art": 0,
-          "dienstlich": false,
-          "wert": "5550178803"
-        }
-      ],
+      "ernaehrung": 0,
+      "kontakte": [],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Lars",
-      "nachname": "Hoffmann",
+      "vorname": "Katrin",
+      "nachname": "Engel",
       "staerkeRolle": 1,
       "funktionen": [
         {
           "code": 4
-        }
-      ],
-      "fahrerlaubnis": 10,
-      "geschlecht": 0,
-      "ernaehrung": 0,
-      "kontakte": [],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Carina",
-      "nachname": "Dietrich",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
         },
         {
-          "code": 86
-        },
-        {
-          "code": 85
-        }
-      ],
-      "fahrerlaubnis": 9,
-      "geschlecht": 1,
-      "ernaehrung": 2,
-      "kontakte": [],
-      "zusatzqualifikationen": [
-        {
-          "freitext": "Elektrofachkraft (Beruf)"
-        }
-      ]
-    },
-    {
-      "vorname": "Heiko",
-      "nachname": "Kraus",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
-        },
-        {
-          "code": 85
-        },
-        {
-          "code": 86
-        }
-      ],
-      "fahrerlaubnis": 9,
-      "geschlecht": 0,
-      "ernaehrung": 0,
-      "kontakte": [],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Moritz",
-      "nachname": "Schwarz",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
-        }
-      ],
-      "fahrerlaubnis": 9,
-      "geschlecht": 0,
-      "ernaehrung": 0,
-      "kontakte": [],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Lena",
-      "nachname": "Wolf",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
+          "code": 47
         }
       ],
       "fahrerlaubnis": 10,
       "geschlecht": 1,
-      "ernaehrung": 0,
+      "ernaehrung": 1,
       "kontakte": [],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Jannik",
-      "nachname": "Franke",
+      "vorname": "Dirk",
+      "nachname": "Schmidt",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -190,6 +109,9 @@
         },
         {
           "code": 86
+        },
+        {
+          "code": 30
         }
       ],
       "fahrerlaubnis": 5,
@@ -199,15 +121,36 @@
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Torben",
-      "nachname": "Ludwig",
+      "vorname": "Tim",
+      "nachname": "Kuhn",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        },
+        {
+          "code": 85
+        },
+        {
+          "code": 86
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 2,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Frank",
+      "nachname": "Fischer",
       "staerkeRolle": 0,
       "funktionen": [
         {
           "code": 5
         }
       ],
-      "fahrerlaubnis": 9,
+      "fahrerlaubnis": 5,
       "geschlecht": 0,
       "ernaehrung": 0,
       "kontakte": [],
@@ -215,7 +158,26 @@
     },
     {
       "vorname": "Julia",
-      "nachname": "Lang",
+      "nachname": "Engel",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Feuerwehr-Doppelmitglied (AGT)"
+        }
+      ]
+    },
+    {
+      "vorname": "Sonja",
+      "nachname": "Neumann",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -224,57 +186,31 @@
       ],
       "fahrerlaubnis": 9,
       "geschlecht": 1,
-      "ernaehrung": 2,
+      "ernaehrung": 1,
       "kontakte": [],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Silke",
-      "nachname": "Krämer",
+      "vorname": "Niklas",
+      "nachname": "Schneider",
       "staerkeRolle": 0,
       "funktionen": [
         {
           "code": 5
         },
         {
-          "code": 30
+          "code": 47
         }
       ],
       "fahrerlaubnis": 0,
-      "geschlecht": 1,
-      "ernaehrung": 2,
-      "kontakte": [],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Miriam",
-      "nachname": "Brunner",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
-        }
-      ],
-      "fahrerlaubnis": 5,
-      "geschlecht": 1,
-      "ernaehrung": 0,
-      "kontakte": [],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Robert",
-      "nachname": "Hartmann",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
-        }
-      ],
-      "fahrerlaubnis": 10,
       "geschlecht": 0,
       "ernaehrung": 1,
       "kontakte": [],
-      "zusatzqualifikationen": []
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Tischler (Beruf)"
+        }
+      ]
     }
   ],
   "fahrzeuge": [
@@ -283,7 +219,7 @@
         "code": 8
       },
       "stanKonform": true,
-      "kennzeichen": "THW-80245",
+      "kennzeichen": "THW-80246",
       "funkrufname": {
         "kennwort": {
           "code": 1
@@ -300,7 +236,7 @@
         "code": 5
       },
       "stanKonform": true,
-      "kennzeichen": "THW-80246",
+      "kennzeichen": "THW-80247",
       "funkrufname": {
         "kennwort": {
           "code": 1
@@ -317,16 +253,16 @@
         "freitext": "Anhänger"
       },
       "stanKonform": true,
-      "kennzeichen": "THW-80247"
+      "kennzeichen": "THW-80248"
     }
   ],
   "sofortbedarf": {
-    "verpflegungPersonen": 13,
+    "verpflegungPersonen": 9,
     "dieselLiter": 100,
     "benzinLiter": 0,
     "gemischLiter": 0,
     "unterbringung": false,
-    "ruhezeitErforderlich": false
+    "ruhezeitErforderlich": true
   },
-  "sonstiges": "1 Helfer über StAN-Soll (Reserve aktiviert)."
+  "sonstiges": "3 Sollplätze unbesetzt."
 }

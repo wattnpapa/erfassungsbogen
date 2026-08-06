@@ -1,7 +1,7 @@
 {
-  "schemaVersion": 6,
+  "schemaVersion": 8,
   "uebung": true,
-  "stand": 2389,
+  "stand": 3439955,
   "einheit": {
     "organisation": 1,
     "einheitsTyp": {
@@ -36,65 +36,51 @@
     ]
   },
   "einsatz": {
-    "zeitraumVon": 2389,
-    "zeitraumBis": 2393,
+    "zeitraumVon": 2388,
+    "zeitraumBis": 2390,
     "ortAuftrag": "Unwetterschäden Bochum — Räumen Verkehrswege"
   },
   "personalErfassung": 0,
   "personal": [
     {
-      "vorname": "Jana",
-      "nachname": "Hartmann",
+      "vorname": "Paul",
+      "nachname": "Horn",
       "staerkeRolle": 1,
       "funktionen": [
         {
           "code": 3
-        },
-        {
-          "code": 30
         }
       ],
       "fahrerlaubnis": 10,
-      "geschlecht": 1,
-      "ernaehrung": 1,
+      "geschlecht": 0,
+      "ernaehrung": 0,
       "kontakte": [
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "5557697578"
-        },
-        {
-          "art": 2,
-          "dienstlich": true,
-          "emailTemplate": 1
+          "wert": "5550242060"
         }
       ],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Joachim",
-      "nachname": "Dietrich",
+      "vorname": "Robert",
+      "nachname": "Kuhn",
       "staerkeRolle": 1,
       "funktionen": [
         {
           "code": 4
         }
       ],
-      "fahrerlaubnis": 9,
+      "fahrerlaubnis": 10,
       "geschlecht": 0,
-      "ernaehrung": 0,
-      "kontakte": [
-        {
-          "art": 0,
-          "dienstlich": false,
-          "wert": "5554630300"
-        }
-      ],
+      "ernaehrung": 2,
+      "kontakte": [],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Philipp",
-      "nachname": "Schubert",
+      "vorname": "Birgit",
+      "nachname": "Sauer",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -105,65 +91,55 @@
         }
       ],
       "fahrerlaubnis": 0,
-      "geschlecht": 0,
-      "ernaehrung": 0,
+      "geschlecht": 1,
+      "ernaehrung": 1,
       "kontakte": [],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Tim",
-      "nachname": "Keller",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
-        },
-        {
-          "code": 39
-        }
-      ],
-      "fahrerlaubnis": 0,
-      "geschlecht": 0,
-      "ernaehrung": 0,
-      "kontakte": [],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Jonas",
-      "nachname": "Lenz",
+      "vorname": "Ulrike",
+      "nachname": "Braun",
       "staerkeRolle": 0,
       "funktionen": [
         {
           "code": 5
         }
       ],
-      "fahrerlaubnis": 0,
-      "geschlecht": 0,
-      "ernaehrung": 0,
-      "kontakte": [],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Miriam",
-      "nachname": "Lenz",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
-        },
-        {
-          "code": 41
-        }
-      ],
-      "fahrerlaubnis": 9,
+      "fahrerlaubnis": 5,
       "geschlecht": 1,
       "ernaehrung": 0,
       "kontakte": [],
-      "zusatzqualifikationen": []
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Berufskraftfahrer (Beruf)"
+        }
+      ]
     },
     {
-      "vorname": "Daniel",
-      "nachname": "Otto",
+      "vorname": "Ole",
+      "nachname": "Franke",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        },
+        {
+          "code": 30
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Landwirt — Erfahrung Großgeräte"
+        }
+      ]
+    },
+    {
+      "vorname": "Niklas",
+      "nachname": "Scholz",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -173,21 +149,6 @@
           "code": 31
         }
       ],
-      "fahrerlaubnis": 0,
-      "geschlecht": 0,
-      "ernaehrung": 0,
-      "kontakte": [],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Kevin",
-      "nachname": "Marx",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
-        }
-      ],
       "fahrerlaubnis": 5,
       "geschlecht": 0,
       "ernaehrung": 0,
@@ -195,8 +156,8 @@
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Markus",
-      "nachname": "Reuter",
+      "vorname": "Christina",
+      "nachname": "Schulte",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -204,6 +165,36 @@
         }
       ],
       "fahrerlaubnis": 0,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Nicole",
+      "nachname": "Schneider",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 2,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Ralf",
+      "nachname": "Baumann",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        }
+      ],
+      "fahrerlaubnis": 9,
       "geschlecht": 0,
       "ernaehrung": 0,
       "kontakte": [],
@@ -216,7 +207,7 @@
         "code": 7
       },
       "stanKonform": true,
-      "kennzeichen": "THW-80299",
+      "kennzeichen": "THW-80308",
       "funkrufname": {
         "kennwort": {
           "code": 1
@@ -250,14 +241,14 @@
         "code": 45
       },
       "stanKonform": true,
-      "kennzeichen": "THW-80300"
+      "kennzeichen": "THW-80309"
     },
     {
       "typ": {
         "code": 46
       },
       "stanKonform": true,
-      "kennzeichen": "THW-80301"
+      "kennzeichen": "THW-80310"
     }
   ],
   "sofortbedarf": {
@@ -265,7 +256,7 @@
     "dieselLiter": 180,
     "benzinLiter": 0,
     "gemischLiter": 10,
-    "unterbringung": false,
+    "unterbringung": true,
     "ruhezeitErforderlich": false
   }
 }

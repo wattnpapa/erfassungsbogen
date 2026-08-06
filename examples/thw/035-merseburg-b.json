@@ -1,7 +1,7 @@
 {
-  "schemaVersion": 6,
+  "schemaVersion": 8,
   "uebung": true,
-  "stand": 2389,
+  "stand": 3439432,
   "einheit": {
     "organisation": 1,
     "einheitsTyp": {
@@ -36,141 +36,55 @@
     ]
   },
   "einsatz": {
-    "zeitraumVon": 2389,
-    "zeitraumBis": 2391,
+    "zeitraumVon": 2388,
+    "zeitraumBis": 2389,
     "ortAuftrag": "Hochwasser Merseburg (Saale) — Sandsackverbau, Deichsicherung"
   },
   "personalErfassung": 0,
   "personal": [
     {
-      "vorname": "Miriam",
-      "nachname": "Pfeiffer",
+      "vorname": "Vanessa",
+      "nachname": "Friedrich",
       "staerkeRolle": 1,
       "funktionen": [
         {
           "code": 3
+        },
+        {
+          "code": 59
         }
       ],
-      "fahrerlaubnis": 10,
+      "fahrerlaubnis": 9,
       "geschlecht": 1,
-      "ernaehrung": 0,
+      "ernaehrung": 1,
       "kontakte": [
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "5553394435"
-        },
-        {
-          "art": 2,
-          "dienstlich": true,
-          "emailTemplate": 1
+          "wert": "5558728156"
         }
       ],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Hanna",
-      "nachname": "Scherer",
+      "vorname": "Dirk",
+      "nachname": "Wenzel",
       "staerkeRolle": 1,
       "funktionen": [
         {
           "code": 4
         }
       ],
-      "fahrerlaubnis": 5,
-      "geschlecht": 1,
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
       "ernaehrung": 0,
       "kontakte": [
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "5555694851"
+          "wert": "5559981606"
         }
       ],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Hannes",
-      "nachname": "Müller",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
-        },
-        {
-          "code": 38
-        }
-      ],
-      "fahrerlaubnis": 0,
-      "geschlecht": 0,
-      "ernaehrung": 0,
-      "kontakte": [],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Nadine",
-      "nachname": "Ziegler",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
-        },
-        {
-          "code": 32
-        }
-      ],
-      "fahrerlaubnis": 0,
-      "geschlecht": 1,
-      "ernaehrung": 0,
-      "kontakte": [],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Heiko",
-      "nachname": "Albrecht",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
-        },
-        {
-          "code": 59
-        }
-      ],
-      "fahrerlaubnis": 0,
-      "geschlecht": 0,
-      "ernaehrung": 2,
-      "kontakte": [],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Sven",
-      "nachname": "Vogt",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
-        }
-      ],
-      "fahrerlaubnis": 10,
-      "geschlecht": 0,
-      "ernaehrung": 0,
-      "kontakte": [],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Dirk",
-      "nachname": "Wenzel",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
-        }
-      ],
-      "fahrerlaubnis": 10,
-      "geschlecht": 0,
-      "ernaehrung": 0,
-      "kontakte": [],
       "zusatzqualifikationen": []
     },
     {
@@ -180,6 +94,9 @@
       "funktionen": [
         {
           "code": 5
+        },
+        {
+          "code": 38
         }
       ],
       "fahrerlaubnis": 0,
@@ -197,7 +114,7 @@
           "code": 5
         },
         {
-          "code": 59
+          "code": 32
         }
       ],
       "fahrerlaubnis": 0,
@@ -213,6 +130,9 @@
       "funktionen": [
         {
           "code": 5
+        },
+        {
+          "code": 38
         }
       ],
       "fahrerlaubnis": 9,
@@ -228,12 +148,87 @@
       "funktionen": [
         {
           "code": 5
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Tim",
+      "nachname": "Neumann",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Simon",
+      "nachname": "Kraus",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 2,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Verena",
+      "nachname": "Geiger",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Karsten",
+      "nachname": "Ziegler",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Marco",
+      "nachname": "Berger",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
         },
         {
           "code": 59
         }
       ],
-      "fahrerlaubnis": 10,
+      "fahrerlaubnis": 0,
       "geschlecht": 0,
       "ernaehrung": 0,
       "kontakte": [],
@@ -260,19 +255,30 @@
     },
     {
       "typ": {
-        "code": 43
+        "freitext": "MTW OV"
       },
-      "stanKonform": true,
-      "kennzeichen": "THW-80189"
+      "kennzeichen": "THW-80190",
+      "stanKonform": false,
+      "aenderungen": "OV-eigenes Fahrzeug, zusätzlich zur StAN",
+      "funkrufname": {
+        "kennwort": {
+          "code": 1
+        },
+        "eigenerStandort": true,
+        "teile": [
+          22,
+          25
+        ]
+      }
     }
   ],
   "sofortbedarf": {
     "verpflegungPersonen": 11,
-    "dieselLiter": 60,
+    "dieselLiter": 90,
     "benzinLiter": 0,
     "gemischLiter": 5,
-    "unterbringung": true,
+    "unterbringung": false,
     "ruhezeitErforderlich": false
   },
-  "sonstiges": "2 Helfer über StAN-Soll (Reserve aktiviert)."
+  "sonstiges": "2 Helfer über StAN-Soll (Reserve aktiviert). Anh Plane/Spriegel in Instandsetzung — nicht mit ausgerückt. MTW OV zusätzlich über StAN-Soll dabei."
 }

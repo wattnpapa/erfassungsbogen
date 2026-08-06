@@ -1,7 +1,7 @@
 {
-  "schemaVersion": 6,
+  "schemaVersion": 8,
   "uebung": true,
-  "stand": 2389,
+  "stand": 3442884,
   "einheit": {
     "organisation": 1,
     "einheitsTyp": {
@@ -23,7 +23,7 @@
         },
         "name": "Bamberg",
         "telefon": "5551378086",
-        "email": "Poststelle.RSt_Bamberg@thw.de"
+        "email": "Poststelle.Rst_Bamberg@thw.de"
       },
       {
         "bezeichnung": {
@@ -36,15 +36,15 @@
     ]
   },
   "einsatz": {
-    "zeitraumVon": 2389,
-    "zeitraumBis": 2393,
-    "ortAuftrag": "Hochwasser Bamberg — Personenrettung, Transport"
+    "zeitraumVon": 2390,
+    "zeitraumBis": 2391,
+    "ortAuftrag": "Hochwasserlage Bamberg — Deichverteidigung, Bootsbetrieb"
   },
   "personalErfassung": 0,
   "personal": [
     {
-      "vorname": "Svenja",
-      "nachname": "Fuchs",
+      "vorname": "Kevin",
+      "nachname": "Schmitt",
       "staerkeRolle": 1,
       "funktionen": [
         {
@@ -52,64 +52,50 @@
         }
       ],
       "fahrerlaubnis": 10,
-      "geschlecht": 1,
-      "ernaehrung": 1,
-      "kontakte": [
-        {
-          "art": 0,
-          "dienstlich": false,
-          "wert": "5555378752"
-        },
-        {
-          "art": 2,
-          "dienstlich": true,
-          "emailTemplate": 1
-        }
-      ],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Ralf",
-      "nachname": "Wolf",
-      "staerkeRolle": 1,
-      "funktionen": [
-        {
-          "code": 4
-        },
-        {
-          "code": 31
-        }
-      ],
-      "fahrerlaubnis": 10,
       "geschlecht": 0,
-      "ernaehrung": 1,
+      "ernaehrung": 0,
       "kontakte": [
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "5553032387"
+          "wert": "5553840470"
         }
       ],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Kevin",
-      "nachname": "Schmitt",
+      "vorname": "Hannes",
+      "nachname": "Schulte",
       "staerkeRolle": 1,
       "funktionen": [
         {
           "code": 4
         }
       ],
-      "fahrerlaubnis": 10,
+      "fahrerlaubnis": 5,
       "geschlecht": 0,
       "ernaehrung": 0,
       "kontakte": [],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Anja",
-      "nachname": "Klein",
+      "vorname": "Sven",
+      "nachname": "Arnold",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "code": 4
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Thomas",
+      "nachname": "Brunner",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -117,17 +103,20 @@
         },
         {
           "code": 36
+        },
+        {
+          "code": 39
         }
       ],
-      "fahrerlaubnis": 5,
-      "geschlecht": 1,
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
       "ernaehrung": 0,
       "kontakte": [],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Felix",
-      "nachname": "Braun",
+      "vorname": "Dominik",
+      "nachname": "Fischer",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -139,16 +128,12 @@
       ],
       "fahrerlaubnis": 9,
       "geschlecht": 0,
-      "ernaehrung": 1,
+      "ernaehrung": 0,
       "kontakte": [],
-      "zusatzqualifikationen": [
-        {
-          "freitext": "Gesundheits- und Krankenpfleger (Beruf)"
-        }
-      ]
+      "zusatzqualifikationen": []
     },
     {
-      "vorname": "Vanessa",
+      "vorname": "Maren",
       "nachname": "Meyer",
       "staerkeRolle": 0,
       "funktionen": [
@@ -156,15 +141,15 @@
           "code": 5
         }
       ],
-      "fahrerlaubnis": 10,
+      "fahrerlaubnis": 5,
       "geschlecht": 1,
       "ernaehrung": 0,
       "kontakte": [],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Dennis",
-      "nachname": "Schulz",
+      "vorname": "Laura",
+      "nachname": "Weber",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -172,6 +157,46 @@
         }
       ],
       "fahrerlaubnis": 0,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Jan",
+      "nachname": "Busch",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        },
+        {
+          "code": 31
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Tischler (Beruf)"
+        }
+      ]
+    },
+    {
+      "vorname": "Lars",
+      "nachname": "Groß",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        },
+        {
+          "code": 36
+        }
+      ],
+      "fahrerlaubnis": 5,
       "geschlecht": 0,
       "ernaehrung": 0,
       "kontakte": [],
@@ -179,41 +204,36 @@
     },
     {
       "vorname": "Karsten",
-      "nachname": "Böhm",
+      "nachname": "Bauer",
       "staerkeRolle": 0,
       "funktionen": [
         {
           "code": 5
+        },
+        {
+          "code": 31
         }
       ],
-      "fahrerlaubnis": 5,
+      "fahrerlaubnis": 0,
       "geschlecht": 0,
       "ernaehrung": 0,
       "kontakte": [],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Moritz",
-      "nachname": "Engel",
-      "staerkeRolle": 0,
-      "funktionen": [
+      "zusatzqualifikationen": [
         {
-          "code": 5
+          "freitext": "Landwirt — Erfahrung Großgeräte"
         }
-      ],
-      "fahrerlaubnis": 5,
-      "geschlecht": 0,
-      "ernaehrung": 1,
-      "kontakte": [],
-      "zusatzqualifikationen": []
+      ]
     },
     {
-      "vorname": "Frank",
-      "nachname": "Horn",
+      "vorname": "Jannik",
+      "nachname": "Schröder",
       "staerkeRolle": 0,
       "funktionen": [
         {
           "code": 5
+        },
+        {
+          "code": 31
         }
       ],
       "fahrerlaubnis": 0,
@@ -229,7 +249,7 @@
         "code": 10
       },
       "stanKonform": true,
-      "kennzeichen": "THW-80138",
+      "kennzeichen": "THW-80139",
       "funkrufname": {
         "kennwort": {
           "code": 1
@@ -254,18 +274,53 @@
         "eigenerStandort": true,
         "teile": [
           36,
+          81
+        ]
+      }
+    },
+    {
+      "typ": {
+        "code": 22
+      },
+      "stanKonform": true,
+      "kennzeichen": "auf Anh",
+      "funkrufname": {
+        "kennwort": {
+          "code": 1
+        },
+        "eigenerStandort": true,
+        "teile": [
+          36,
           82
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "MzKW"
+      },
+      "kennzeichen": "THW-80140",
+      "stanKonform": false,
+      "aenderungen": "OV-eigenes Fahrzeug, zusätzlich zur StAN",
+      "funkrufname": {
+        "kennwort": {
+          "code": 1
+        },
+        "eigenerStandort": true,
+        "teile": [
+          36,
+          54
         ]
       }
     }
   ],
   "sofortbedarf": {
-    "verpflegungPersonen": 10,
-    "dieselLiter": 80,
-    "benzinLiter": 40,
+    "verpflegungPersonen": 11,
+    "dieselLiter": 130,
+    "benzinLiter": 80,
     "gemischLiter": 0,
     "unterbringung": false,
     "ruhezeitErforderlich": false
   },
-  "sonstiges": "2 Sollplätze unbesetzt. MzAB in Instandsetzung — nicht mit ausgerückt."
+  "sonstiges": "1 Sollplätze unbesetzt. MzKW zusätzlich über StAN-Soll dabei."
 }

@@ -1,7 +1,7 @@
 {
-  "schemaVersion": 6,
+  "schemaVersion": 8,
   "uebung": true,
-  "stand": 2389,
+  "stand": 3440006,
   "einheit": {
     "organisation": 1,
     "einheitsTyp": {
@@ -36,62 +36,60 @@
     ]
   },
   "einsatz": {
-    "zeitraumVon": 2389,
-    "zeitraumBis": 2390,
-    "ortAuftrag": "Gebäudeschaden Syke — Abstützen, Räumen"
+    "zeitraumVon": 2388,
+    "zeitraumBis": 2392,
+    "ortAuftrag": "Sturmtief »Quirin« Syke — Beräumung, Sicherung"
   },
   "personalErfassung": 0,
   "personal": [
     {
-      "vorname": "Daniel",
-      "nachname": "Meyer",
+      "vorname": "Jan",
+      "nachname": "Bergmann",
       "staerkeRolle": 1,
       "funktionen": [
         {
           "code": 3
         }
       ],
-      "fahrerlaubnis": 9,
+      "fahrerlaubnis": 10,
       "geschlecht": 0,
       "ernaehrung": 0,
       "kontakte": [
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "5552887173"
-        },
-        {
-          "art": 2,
-          "dienstlich": true,
-          "emailTemplate": 1
+          "wert": "5555885909"
         }
       ],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Tobias",
-      "nachname": "Neumann",
+      "vorname": "Florian",
+      "nachname": "Schröder",
       "staerkeRolle": 1,
       "funktionen": [
         {
           "code": 4
+        },
+        {
+          "code": 31
         }
       ],
-      "fahrerlaubnis": 9,
+      "fahrerlaubnis": 10,
       "geschlecht": 0,
       "ernaehrung": 0,
       "kontakte": [
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "5551318904"
+          "wert": "5553140486"
         }
       ],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Christian",
-      "nachname": "Berger",
+      "vorname": "Robert",
+      "nachname": "Haas",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -99,20 +97,75 @@
         },
         {
           "code": 38
-        },
-        {
-          "code": 30
         }
       ],
-      "fahrerlaubnis": 5,
+      "fahrerlaubnis": 10,
       "geschlecht": 0,
       "ernaehrung": 0,
       "kontakte": [],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Dominik",
-      "nachname": "Reuter",
+      "vorname": "Ralf",
+      "nachname": "Marx",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        },
+        {
+          "code": 32
+        },
+        {
+          "code": 59
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Gesundheits- und Krankenpfleger (Beruf)"
+        }
+      ]
+    },
+    {
+      "vorname": "Miriam",
+      "nachname": "Peters",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        },
+        {
+          "code": 31
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Jens",
+      "nachname": "Günther",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Jana",
+      "nachname": "Winkler",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -122,19 +175,15 @@
           "code": 32
         }
       ],
-      "fahrerlaubnis": 0,
-      "geschlecht": 0,
-      "ernaehrung": 0,
+      "fahrerlaubnis": 9,
+      "geschlecht": 1,
+      "ernaehrung": 1,
       "kontakte": [],
-      "zusatzqualifikationen": [
-        {
-          "freitext": "Zimmerer (Beruf)"
-        }
-      ]
+      "zusatzqualifikationen": []
     },
     {
-      "vorname": "Jens",
-      "nachname": "Schwarz",
+      "vorname": "Karsten",
+      "nachname": "Becker",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -143,32 +192,24 @@
       ],
       "fahrerlaubnis": 0,
       "geschlecht": 0,
-      "ernaehrung": 2,
+      "ernaehrung": 1,
       "kontakte": [],
-      "zusatzqualifikationen": [
-        {
-          "freitext": "Motorsägenschein AS Baum I (extern)"
-        }
-      ]
+      "zusatzqualifikationen": []
     },
     {
-      "vorname": "Ralf",
-      "nachname": "Marx",
+      "vorname": "Martin",
+      "nachname": "Roth",
       "staerkeRolle": 0,
       "funktionen": [
         {
           "code": 5
         }
       ],
-      "fahrerlaubnis": 10,
+      "fahrerlaubnis": 0,
       "geschlecht": 0,
-      "ernaehrung": 0,
+      "ernaehrung": 1,
       "kontakte": [],
-      "zusatzqualifikationen": [
-        {
-          "freitext": "Gesundheits- und Krankenpfleger (Beruf)"
-        }
-      ]
+      "zusatzqualifikationen": []
     }
   ],
   "fahrzeuge": [
@@ -177,7 +218,7 @@
         "code": 4
       },
       "stanKonform": true,
-      "kennzeichen": "THW-80220",
+      "kennzeichen": "THW-80221",
       "funkrufname": {
         "kennwort": {
           "code": 1
@@ -188,15 +229,30 @@
           51
         ]
       }
+    },
+    {
+      "typ": {
+        "code": 43
+      },
+      "stanKonform": true,
+      "kennzeichen": "THW-80222"
+    },
+    {
+      "typ": {
+        "freitext": "Anh OV (Plane)"
+      },
+      "kennzeichen": "THW-80223",
+      "stanKonform": false,
+      "aenderungen": "OV-eigenes Fahrzeug, zusätzlich zur StAN"
     }
   ],
   "sofortbedarf": {
-    "verpflegungPersonen": 6,
+    "verpflegungPersonen": 9,
     "dieselLiter": 60,
     "benzinLiter": 0,
     "gemischLiter": 10,
-    "unterbringung": false,
-    "ruhezeitErforderlich": true
+    "unterbringung": true,
+    "ruhezeitErforderlich": false
   },
-  "sonstiges": "3 Sollplätze unbesetzt. Anh Plane/Spriegel in Instandsetzung — nicht mit ausgerückt."
+  "sonstiges": "Anh OV (Plane) zusätzlich über StAN-Soll dabei."
 }

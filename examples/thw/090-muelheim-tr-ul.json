@@ -1,7 +1,7 @@
 {
-  "schemaVersion": 6,
+  "schemaVersion": 8,
   "uebung": true,
-  "stand": 2390,
+  "stand": 3441025,
   "einheit": {
     "organisation": 1,
     "einheitsTyp": {
@@ -36,41 +36,39 @@
     ]
   },
   "einsatz": {
-    "zeitraumVon": 2390,
+    "zeitraumVon": 2389,
     "zeitraumBis": 2392,
     "ortAuftrag": "Vermisstensuche MülheimanderRuhr — Erkundung mit UAS"
   },
   "personalErfassung": 0,
   "personal": [
     {
-      "vorname": "Marco",
-      "nachname": "Ebert",
+      "vorname": "Dirk",
+      "nachname": "Lutz",
       "staerkeRolle": 1,
       "funktionen": [
         {
           "code": 4
+        },
+        {
+          "code": 83
         }
       ],
       "fahrerlaubnis": 9,
       "geschlecht": 0,
-      "ernaehrung": 0,
+      "ernaehrung": 1,
       "kontakte": [
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "5555507538"
-        },
-        {
-          "art": 2,
-          "dienstlich": true,
-          "emailTemplate": 1
+          "wert": "5556965790"
         }
       ],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Ralf",
-      "nachname": "Becker",
+      "vorname": "Joachim",
+      "nachname": "Zimmermann",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -78,20 +76,39 @@
         },
         {
           "code": 82
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Hannes",
+      "nachname": "Richter",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
         },
         {
-          "code": 30
+          "code": 82
         }
       ],
       "fahrerlaubnis": 5,
       "geschlecht": 0,
       "ernaehrung": 0,
       "kontakte": [],
-      "zusatzqualifikationen": []
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Gesundheits- und Krankenpfleger (Beruf)"
+        }
+      ]
     },
     {
-      "vorname": "Kai",
-      "nachname": "Wolf",
+      "vorname": "Katrin",
+      "nachname": "Friedrich",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -99,41 +116,23 @@
         }
       ],
       "fahrerlaubnis": 0,
-      "geschlecht": 0,
-      "ernaehrung": 2,
-      "kontakte": [],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Julia",
-      "nachname": "Hoffmann",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
-        },
-        {
-          "code": 30
-        }
-      ],
-      "fahrerlaubnis": 9,
       "geschlecht": 1,
       "ernaehrung": 0,
       "kontakte": [],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Martin",
-      "nachname": "Klein",
+      "vorname": "Maren",
+      "nachname": "Wenzel",
       "staerkeRolle": 0,
       "funktionen": [
         {
           "code": 5
         }
       ],
-      "fahrerlaubnis": 0,
-      "geschlecht": 0,
-      "ernaehrung": 1,
+      "fahrerlaubnis": 10,
+      "geschlecht": 1,
+      "ernaehrung": 0,
       "kontakte": [],
       "zusatzqualifikationen": []
     }
@@ -144,7 +143,7 @@
         "code": 23
       },
       "stanKonform": true,
-      "kennzeichen": "THW-80331",
+      "kennzeichen": "THW-80341",
       "funkrufname": {
         "kennwort": {
           "code": 1
@@ -163,7 +162,7 @@
     "benzinLiter": 0,
     "gemischLiter": 0,
     "unterbringung": false,
-    "ruhezeitErforderlich": false
+    "ruhezeitErforderlich": true
   },
   "sonstiges": "1 Helfer über StAN-Soll (Reserve aktiviert)."
 }

@@ -1,7 +1,7 @@
 {
-  "schemaVersion": 6,
+  "schemaVersion": 8,
   "uebung": true,
-  "stand": 2389,
+  "stand": 3440862,
   "einheit": {
     "organisation": 1,
     "einheitsTyp": {
@@ -37,47 +37,135 @@
   },
   "einsatz": {
     "zeitraumVon": 2389,
-    "zeitraumBis": 2393,
-    "ortAuftrag": "Trinkwassernotstand Hilpoltstein — Notinstandsetzung"
+    "zeitraumBis": 2390,
+    "ortAuftrag": "Unwetter Hilpoltstein — Notversorgung kritische Infrastruktur"
   },
   "personalErfassung": 0,
   "personal": [
     {
-      "vorname": "Hannes",
-      "nachname": "Lehmann",
+      "vorname": "Felix",
+      "nachname": "Busch",
       "staerkeRolle": 1,
       "funktionen": [
         {
           "code": 3
         },
         {
-          "code": 30
+          "code": 51
         }
       ],
       "fahrerlaubnis": 5,
       "geschlecht": 0,
-      "ernaehrung": 0,
+      "ernaehrung": 1,
       "kontakte": [
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "5550132427"
-        },
-        {
-          "art": 2,
-          "dienstlich": true,
-          "emailTemplate": 1
+          "wert": "5556290259"
         }
       ],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Ralf",
-      "nachname": "Schneider",
+      "vorname": "Sandra",
+      "nachname": "Peters",
       "staerkeRolle": 1,
       "funktionen": [
         {
           "code": 4
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5557802329"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Melanie",
+      "nachname": "Winter",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        },
+        {
+          "code": 49
+        },
+        {
+          "code": 30
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Ulrike",
+      "nachname": "Schulte",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        },
+        {
+          "code": 51
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Sebastian",
+      "nachname": "Vogel",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        },
+        {
+          "code": 49
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Henrik",
+      "nachname": "Kraus",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Niklas",
+      "nachname": "Wenzel",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
         },
         {
           "code": 31
@@ -90,44 +178,8 @@
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Lars",
-      "nachname": "Wagner",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
-        },
-        {
-          "code": 49
-        }
-      ],
-      "fahrerlaubnis": 5,
-      "geschlecht": 0,
-      "ernaehrung": 0,
-      "kontakte": [],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Felix",
-      "nachname": "Busch",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
-        },
-        {
-          "code": 51
-        }
-      ],
-      "fahrerlaubnis": 10,
-      "geschlecht": 0,
-      "ernaehrung": 1,
-      "kontakte": [],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Bernd",
-      "nachname": "Sauer",
+      "vorname": "Stefan",
+      "nachname": "Keller",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -137,41 +189,28 @@
       "fahrerlaubnis": 0,
       "geschlecht": 0,
       "ernaehrung": 0,
-      "kontakte": [],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Lena",
-      "nachname": "Marx",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
-        }
-      ],
-      "fahrerlaubnis": 0,
-      "geschlecht": 1,
-      "ernaehrung": 0,
-      "kontakte": [],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Alexander",
-      "nachname": "Menzel",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
-        }
-      ],
-      "fahrerlaubnis": 0,
-      "geschlecht": 0,
-      "ernaehrung": 2,
       "kontakte": [],
       "zusatzqualifikationen": []
     }
   ],
   "fahrzeuge": [
+    {
+      "typ": {
+        "code": 26
+      },
+      "stanKonform": true,
+      "kennzeichen": "THW-80153",
+      "funkrufname": {
+        "kennwort": {
+          "code": 1
+        },
+        "eigenerStandort": true,
+        "teile": [
+          24,
+          55
+        ]
+      }
+    },
     {
       "typ": {
         "code": 21
@@ -184,24 +223,23 @@
         "code": 44
       },
       "stanKonform": true,
-      "kennzeichen": "THW-80150"
+      "kennzeichen": "THW-80154"
     },
     {
       "typ": {
-        "freitext": "Anh OV (Plane)"
+        "code": 47
       },
-      "kennzeichen": "THW-80152",
-      "stanKonform": false,
-      "aenderungen": "OV-eigenes Fahrzeug, zusätzlich zur StAN"
+      "stanKonform": true,
+      "kennzeichen": "THW-80155"
     }
   ],
   "sofortbedarf": {
-    "verpflegungPersonen": 7,
-    "dieselLiter": 20,
+    "verpflegungPersonen": 8,
+    "dieselLiter": 120,
     "benzinLiter": 0,
     "gemischLiter": 0,
-    "unterbringung": true,
+    "unterbringung": false,
     "ruhezeitErforderlich": false
   },
-  "sonstiges": "2 Sollplätze unbesetzt. Anh NEA mittel in Instandsetzung — nicht mit ausgerückt. Anh OV (Plane) zusätzlich über StAN-Soll dabei."
+  "sonstiges": "1 Sollplätze unbesetzt."
 }

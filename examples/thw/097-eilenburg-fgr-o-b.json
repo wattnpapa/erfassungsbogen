@@ -1,7 +1,7 @@
 {
-  "schemaVersion": 6,
+  "schemaVersion": 8,
   "uebung": true,
-  "stand": 2390,
+  "stand": 3439330,
   "einheit": {
     "organisation": 1,
     "einheitsTyp": {
@@ -36,15 +36,15 @@
     ]
   },
   "einsatz": {
-    "zeitraumVon": 2390,
-    "zeitraumBis": 2391,
+    "zeitraumVon": 2388,
+    "zeitraumBis": 2392,
     "ortAuftrag": "Gebäudeeinsturz Eilenburg — technische Ortung"
   },
   "personalErfassung": 0,
   "personal": [
     {
-      "vorname": "Tanja",
-      "nachname": "Lenz",
+      "vorname": "Frank",
+      "nachname": "Fischer",
       "staerkeRolle": 1,
       "funktionen": [
         {
@@ -54,47 +54,127 @@
           "code": 30
         }
       ],
-      "fahrerlaubnis": 10,
-      "geschlecht": 1,
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
       "ernaehrung": 0,
       "kontakte": [
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "5554133509"
-        },
-        {
-          "art": 2,
-          "dienstlich": true,
-          "emailTemplate": 1
+          "wert": "5551372636"
         }
       ],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Frank",
-      "nachname": "Fischer",
+      "vorname": "Bernd",
+      "nachname": "Baumann",
       "staerkeRolle": 1,
       "funktionen": [
         {
           "code": 4
         }
       ],
-      "fahrerlaubnis": 10,
+      "fahrerlaubnis": 9,
       "geschlecht": 0,
-      "ernaehrung": 2,
+      "ernaehrung": 1,
       "kontakte": [
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "5558830381"
+          "wert": "5550220142"
         }
       ],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Philipp",
-      "nachname": "Becker",
+      "vorname": "Frank",
+      "nachname": "Klein",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        },
+        {
+          "code": 46
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Lars",
+      "nachname": "Scherer",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Tim",
+      "nachname": "Heinrich",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Zimmerer (Beruf)"
+        }
+      ]
+    },
+    {
+      "vorname": "Florian",
+      "nachname": "Scherer",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Sebastian",
+      "nachname": "Sommer",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        },
+        {
+          "code": 62
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Pascal",
+      "nachname": "Seidel",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -111,131 +191,19 @@
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Moritz",
-      "nachname": "Koch",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
-        }
-      ],
-      "fahrerlaubnis": 5,
-      "geschlecht": 0,
-      "ernaehrung": 0,
-      "kontakte": [],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Felix",
-      "nachname": "Günther",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
-        }
-      ],
-      "fahrerlaubnis": 9,
-      "geschlecht": 0,
-      "ernaehrung": 1,
-      "kontakte": [],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Heiko",
-      "nachname": "Brunner",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
-        }
-      ],
-      "fahrerlaubnis": 0,
-      "geschlecht": 0,
-      "ernaehrung": 1,
-      "kontakte": [],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Antje",
-      "nachname": "Lorenz",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
-        }
-      ],
-      "fahrerlaubnis": 5,
-      "geschlecht": 1,
-      "ernaehrung": 0,
-      "kontakte": [],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Marco",
-      "nachname": "Keller",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
-        }
-      ],
-      "fahrerlaubnis": 9,
-      "geschlecht": 0,
-      "ernaehrung": 0,
-      "kontakte": [],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Claudia",
-      "nachname": "Bergmann",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
-        }
-      ],
-      "fahrerlaubnis": 9,
-      "geschlecht": 1,
-      "ernaehrung": 0,
-      "kontakte": [],
-      "zusatzqualifikationen": [
-        {
-          "freitext": "Gesundheits- und Krankenpfleger (Beruf)"
-        }
-      ]
-    },
-    {
-      "vorname": "Leon",
-      "nachname": "Brunner",
+      "vorname": "Marie",
+      "nachname": "Franke",
       "staerkeRolle": 0,
       "funktionen": [
         {
           "code": 5
         },
         {
-          "code": 30
-        }
-      ],
-      "fahrerlaubnis": 9,
-      "geschlecht": 0,
-      "ernaehrung": 0,
-      "kontakte": [],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Dirk",
-      "nachname": "Peters",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
-        },
-        {
-          "code": 31
+          "code": 46
         }
       ],
       "fahrerlaubnis": 0,
-      "geschlecht": 0,
+      "geschlecht": 1,
       "ernaehrung": 0,
       "kontakte": [],
       "zusatzqualifikationen": []
@@ -247,7 +215,7 @@
         "code": 23
       },
       "stanKonform": true,
-      "kennzeichen": "THW-80349",
+      "kennzeichen": "THW-80360",
       "funkrufname": {
         "kennwort": {
           "code": 1
@@ -264,24 +232,24 @@
         "freitext": "Anh FGr O"
       },
       "stanKonform": true,
-      "kennzeichen": "THW-80350"
+      "kennzeichen": "THW-80361"
     },
     {
       "typ": {
         "freitext": "Anh OV (Plane)"
       },
-      "kennzeichen": "THW-80351",
+      "kennzeichen": "THW-80362",
       "stanKonform": false,
       "aenderungen": "OV-eigenes Fahrzeug, zusätzlich zur StAN"
     }
   ],
   "sofortbedarf": {
-    "verpflegungPersonen": 11,
+    "verpflegungPersonen": 9,
     "dieselLiter": 30,
     "benzinLiter": 0,
     "gemischLiter": 0,
     "unterbringung": false,
-    "ruhezeitErforderlich": false
+    "ruhezeitErforderlich": true
   },
-  "sonstiges": "2 Helfer über StAN-Soll (Reserve aktiviert). Anh OV (Plane) zusätzlich über StAN-Soll dabei."
+  "sonstiges": "Anh OV (Plane) zusätzlich über StAN-Soll dabei."
 }

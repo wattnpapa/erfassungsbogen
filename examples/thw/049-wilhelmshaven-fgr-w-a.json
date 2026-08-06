@@ -1,7 +1,7 @@
 {
-  "schemaVersion": 6,
+  "schemaVersion": 8,
   "uebung": true,
-  "stand": 2389,
+  "stand": 3439866,
   "einheit": {
     "organisation": 1,
     "einheitsTyp": {
@@ -36,45 +36,19 @@
     ]
   },
   "einsatz": {
-    "zeitraumVon": 2389,
-    "zeitraumBis": 2393,
-    "ortAuftrag": "Hochwasser Wilhelmshaven — Personenrettung, Transport"
+    "zeitraumVon": 2388,
+    "zeitraumBis": 2390,
+    "ortAuftrag": "Hochwasserlage Wilhelmshaven — Deichverteidigung, Bootsbetrieb"
   },
   "personalErfassung": 0,
   "personal": [
     {
-      "vorname": "Alexander",
-      "nachname": "Groß",
+      "vorname": "Jan",
+      "nachname": "Reuter",
       "staerkeRolle": 1,
       "funktionen": [
         {
           "code": 3
-        }
-      ],
-      "fahrerlaubnis": 10,
-      "geschlecht": 0,
-      "ernaehrung": 0,
-      "kontakte": [
-        {
-          "art": 0,
-          "dienstlich": false,
-          "wert": "5554720313"
-        },
-        {
-          "art": 2,
-          "dienstlich": true,
-          "emailTemplate": 1
-        }
-      ],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Dominik",
-      "nachname": "Schneider",
-      "staerkeRolle": 1,
-      "funktionen": [
-        {
-          "code": 4
         },
         {
           "code": 31
@@ -87,29 +61,71 @@
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "5552460764"
+          "wert": "5557178281"
         }
       ],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Uwe",
-      "nachname": "Kraus",
+      "vorname": "Jens",
+      "nachname": "Sommer",
       "staerkeRolle": 1,
       "funktionen": [
         {
           "code": 4
         }
       ],
-      "fahrerlaubnis": 5,
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5552887817"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Lukas",
+      "nachname": "Peters",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "code": 4
+        },
+        {
+          "code": 36
+        }
+      ],
+      "fahrerlaubnis": 10,
       "geschlecht": 0,
       "ernaehrung": 0,
       "kontakte": [],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Kevin",
-      "nachname": "Pohl",
+      "vorname": "David",
+      "nachname": "Bergmann",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        },
+        {
+          "code": 36
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Laura",
+      "nachname": "Geiger",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -120,84 +136,54 @@
         }
       ],
       "fahrerlaubnis": 0,
-      "geschlecht": 0,
-      "ernaehrung": 0,
-      "kontakte": [],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Thorsten",
-      "nachname": "Lenz",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
-        },
-        {
-          "code": 36
-        }
-      ],
-      "fahrerlaubnis": 10,
-      "geschlecht": 0,
-      "ernaehrung": 0,
-      "kontakte": [],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Sebastian",
-      "nachname": "Berger",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
-        }
-      ],
-      "fahrerlaubnis": 5,
-      "geschlecht": 0,
-      "ernaehrung": 0,
-      "kontakte": [],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Michael",
-      "nachname": "Groß",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
-        }
-      ],
-      "fahrerlaubnis": 9,
-      "geschlecht": 0,
-      "ernaehrung": 0,
-      "kontakte": [],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Antje",
-      "nachname": "Möller",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
-        }
-      ],
-      "fahrerlaubnis": 10,
       "geschlecht": 1,
       "ernaehrung": 0,
       "kontakte": [],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Felix",
-      "nachname": "Berger",
+      "vorname": "Henrik",
+      "nachname": "Arnold",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Dirk",
+      "nachname": "Lehmann",
       "staerkeRolle": 0,
       "funktionen": [
         {
           "code": 5
         },
         {
-          "code": 30
+          "code": 37
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Thomas",
+      "nachname": "Keller",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        },
+        {
+          "code": 39
         }
       ],
       "fahrerlaubnis": 5,
@@ -207,8 +193,23 @@
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Andreas",
-      "nachname": "Fischer",
+      "vorname": "Sabine",
+      "nachname": "Lang",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Simon",
+      "nachname": "Schäfer",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -218,30 +219,30 @@
           "code": 31
         }
       ],
-      "fahrerlaubnis": 9,
+      "fahrerlaubnis": 10,
       "geschlecht": 0,
       "ernaehrung": 0,
       "kontakte": [],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Lena",
-      "nachname": "Günther",
+      "vorname": "Daniel",
+      "nachname": "Kuhn",
       "staerkeRolle": 0,
       "funktionen": [
         {
           "code": 5
         }
       ],
-      "fahrerlaubnis": 9,
-      "geschlecht": 1,
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
       "ernaehrung": 0,
       "kontakte": [],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Jens",
-      "nachname": "Lehmann",
+      "vorname": "Niklas",
+      "nachname": "Pohl",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -250,11 +251,11 @@
       ],
       "fahrerlaubnis": 5,
       "geschlecht": 0,
-      "ernaehrung": 2,
+      "ernaehrung": 1,
       "kontakte": [],
       "zusatzqualifikationen": [
         {
-          "freitext": "Gesundheits- und Krankenpfleger (Beruf)"
+          "freitext": "Landwirt — Erfahrung Großgeräte"
         }
       ]
     }
@@ -265,7 +266,7 @@
         "code": 10
       },
       "stanKonform": true,
-      "kennzeichen": "THW-80222",
+      "kennzeichen": "THW-80224",
       "funkrufname": {
         "kennwort": {
           "code": 1
@@ -317,7 +318,7 @@
     "dieselLiter": 80,
     "benzinLiter": 80,
     "gemischLiter": 0,
-    "unterbringung": true,
-    "ruhezeitErforderlich": true
+    "unterbringung": false,
+    "ruhezeitErforderlich": false
   }
 }

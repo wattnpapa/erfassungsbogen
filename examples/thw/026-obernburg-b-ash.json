@@ -1,7 +1,7 @@
 {
-  "schemaVersion": 6,
+  "schemaVersion": 8,
   "uebung": true,
-  "stand": 2388,
+  "stand": 3439699,
   "einheit": {
     "organisation": 1,
     "einheitsTyp": {
@@ -37,18 +37,21 @@
   },
   "einsatz": {
     "zeitraumVon": 2388,
-    "zeitraumBis": 2391,
-    "ortAuftrag": "Einsturzgefahr Wohngebäude Obernburg — Abstützsystem Holz"
+    "zeitraumBis": 2392,
+    "ortAuftrag": "Gebäudeschaden nach Explosion Obernburg — Abstützen"
   },
   "personalErfassung": 0,
   "personal": [
     {
-      "vorname": "Georg",
-      "nachname": "Koch",
+      "vorname": "Alexander",
+      "nachname": "Schulte",
       "staerkeRolle": 1,
       "funktionen": [
         {
           "code": 3
+        },
+        {
+          "code": 59
         }
       ],
       "fahrerlaubnis": 10,
@@ -58,120 +61,33 @@
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "5557731157"
-        },
-        {
-          "art": 2,
-          "dienstlich": true,
-          "emailTemplate": 1
+          "wert": "5551582643"
         }
       ],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Heiko",
-      "nachname": "Arnold",
-      "staerkeRolle": 1,
-      "funktionen": [
-        {
-          "code": 4
-        }
-      ],
-      "fahrerlaubnis": 9,
-      "geschlecht": 0,
-      "ernaehrung": 1,
-      "kontakte": [
-        {
-          "art": 0,
-          "dienstlich": false,
-          "wert": "5555982667"
-        }
-      ],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Niklas",
-      "nachname": "Schubert",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
-        },
-        {
-          "code": 38
-        }
-      ],
-      "fahrerlaubnis": 0,
-      "geschlecht": 0,
-      "ernaehrung": 0,
-      "kontakte": [],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Kerstin",
-      "nachname": "Hoffmann",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
-        },
-        {
-          "code": 32
-        }
-      ],
-      "fahrerlaubnis": 10,
-      "geschlecht": 1,
-      "ernaehrung": 0,
-      "kontakte": [],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Dirk",
-      "nachname": "Engel",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
-        }
-      ],
-      "fahrerlaubnis": 5,
-      "geschlecht": 0,
-      "ernaehrung": 1,
-      "kontakte": [],
-      "zusatzqualifikationen": [
-        {
-          "freitext": "Gesundheits- und Krankenpfleger (Beruf)"
-        }
-      ]
-    },
-    {
-      "vorname": "Dirk",
-      "nachname": "Walter",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
-        }
-      ],
-      "fahrerlaubnis": 0,
-      "geschlecht": 0,
-      "ernaehrung": 0,
-      "kontakte": [],
       "zusatzqualifikationen": []
     },
     {
       "vorname": "Kai",
       "nachname": "Vogel",
-      "staerkeRolle": 0,
+      "staerkeRolle": 1,
       "funktionen": [
         {
-          "code": 5
+          "code": 4
+        },
+        {
+          "code": 59
         }
       ],
-      "fahrerlaubnis": 0,
+      "fahrerlaubnis": 10,
       "geschlecht": 0,
       "ernaehrung": 0,
-      "kontakte": [],
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5557222156"
+        }
+      ],
       "zusatzqualifikationen": []
     },
     {
@@ -181,6 +97,12 @@
       "funktionen": [
         {
           "code": 5
+        },
+        {
+          "code": 38
+        },
+        {
+          "code": 32
         }
       ],
       "fahrerlaubnis": 9,
@@ -199,6 +121,9 @@
         },
         {
           "code": 32
+        },
+        {
+          "code": 30
         }
       ],
       "fahrerlaubnis": 9,
@@ -214,6 +139,9 @@
       "funktionen": [
         {
           "code": 5
+        },
+        {
+          "code": 32
         }
       ],
       "fahrerlaubnis": 5,
@@ -235,7 +163,7 @@
           "code": 5
         },
         {
-          "code": 38
+          "code": 31
         }
       ],
       "fahrerlaubnis": 0,
@@ -288,6 +216,21 @@
       "ernaehrung": 0,
       "kontakte": [],
       "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Jannik",
+      "nachname": "Vogt",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
     }
   ],
   "fahrzeuge": [
@@ -296,7 +239,7 @@
         "code": 4
       },
       "stanKonform": true,
-      "kennzeichen": "THW-80161",
+      "kennzeichen": "THW-80164",
       "funkrufname": {
         "kennwort": {
           "code": 1
@@ -313,41 +256,16 @@
         "code": 43
       },
       "stanKonform": true,
-      "kennzeichen": "THW-80162"
-    },
-    {
-      "typ": {
-        "code": 55
-      },
-      "stanKonform": true,
-      "kennzeichen": "THW-80163"
-    },
-    {
-      "typ": {
-        "freitext": "MzKW"
-      },
-      "kennzeichen": "THW-80164",
-      "stanKonform": false,
-      "aenderungen": "OV-eigenes Fahrzeug, zusätzlich zur StAN",
-      "funkrufname": {
-        "kennwort": {
-          "code": 1
-        },
-        "eigenerStandort": true,
-        "teile": [
-          22,
-          54
-        ]
-      }
+      "kennzeichen": "THW-80165"
     }
   ],
   "sofortbedarf": {
-    "verpflegungPersonen": 14,
-    "dieselLiter": 110,
+    "verpflegungPersonen": 10,
+    "dieselLiter": 60,
     "benzinLiter": 0,
     "gemischLiter": 5,
     "unterbringung": true,
     "ruhezeitErforderlich": false
   },
-  "sonstiges": "2 Helfer über StAN-Soll (Reserve aktiviert). MzKW zusätzlich über StAN-Soll dabei."
+  "sonstiges": "2 Sollplätze unbesetzt. Anh ASH in Instandsetzung — nicht mit ausgerückt."
 }

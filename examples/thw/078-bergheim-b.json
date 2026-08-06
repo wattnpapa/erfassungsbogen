@@ -1,7 +1,7 @@
 {
-  "schemaVersion": 6,
+  "schemaVersion": 8,
   "uebung": true,
-  "stand": 2388,
+  "stand": 3439992,
   "einheit": {
     "organisation": 1,
     "einheitsTyp": {
@@ -37,43 +37,35 @@
   },
   "einsatz": {
     "zeitraumVon": 2388,
-    "zeitraumBis": 2390,
-    "ortAuftrag": "Gebäudeschaden Bergheim — Abstützen, Räumen"
+    "zeitraumBis": 2391,
+    "ortAuftrag": "Sturmtief »Quirin« Bergheim — Beräumung, Sicherung"
   },
   "personalErfassung": 0,
   "personal": [
     {
-      "vorname": "Thorsten",
-      "nachname": "Zimmermann",
+      "vorname": "Lisa",
+      "nachname": "Jung",
       "staerkeRolle": 1,
       "funktionen": [
         {
           "code": 3
-        },
-        {
-          "code": 38
         }
       ],
-      "fahrerlaubnis": 10,
-      "geschlecht": 0,
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
       "ernaehrung": 0,
       "kontakte": [
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "5557787696"
-        },
-        {
-          "art": 2,
-          "dienstlich": true,
-          "emailTemplate": 1
+          "wert": "5552665316"
         }
       ],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Paul",
-      "nachname": "Pohl",
+      "vorname": "Melanie",
+      "nachname": "Meyer",
       "staerkeRolle": 1,
       "funktionen": [
         {
@@ -81,14 +73,14 @@
         }
       ],
       "fahrerlaubnis": 10,
-      "geschlecht": 0,
+      "geschlecht": 1,
       "ernaehrung": 0,
       "kontakte": [],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Florian",
-      "nachname": "Zimmermann",
+      "vorname": "Karsten",
+      "nachname": "Krüger",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -96,27 +88,6 @@
         },
         {
           "code": 38
-        }
-      ],
-      "fahrerlaubnis": 5,
-      "geschlecht": 0,
-      "ernaehrung": 0,
-      "kontakte": [],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Paul",
-      "nachname": "Bergmann",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
-        },
-        {
-          "code": 32
-        },
-        {
-          "code": 30
         }
       ],
       "fahrerlaubnis": 9,
@@ -126,8 +97,8 @@
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Markus",
-      "nachname": "Schäfer",
+      "vorname": "Simon",
+      "nachname": "Braun",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -137,15 +108,15 @@
           "code": 32
         }
       ],
-      "fahrerlaubnis": 10,
+      "fahrerlaubnis": 0,
       "geschlecht": 0,
       "ernaehrung": 0,
       "kontakte": [],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Marcel",
-      "nachname": "Richter",
+      "vorname": "Uwe",
+      "nachname": "Klein",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -159,7 +130,44 @@
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Florian",
+      "vorname": "Hannes",
+      "nachname": "Kern",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        },
+        {
+          "code": 31
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Elektrofachkraft (Beruf)"
+        }
+      ]
+    },
+    {
+      "vorname": "Felix",
+      "nachname": "Hoffmann",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Dirk",
       "nachname": "Jäger",
       "staerkeRolle": 0,
       "funktionen": [
@@ -171,11 +179,15 @@
       "geschlecht": 0,
       "ernaehrung": 0,
       "kontakte": [],
-      "zusatzqualifikationen": []
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Motorsägenschein AS Baum I (extern)"
+        }
+      ]
     },
     {
-      "vorname": "Ole",
-      "nachname": "Schäfer",
+      "vorname": "Melanie",
+      "nachname": "Kaiser",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -183,23 +195,8 @@
         }
       ],
       "fahrerlaubnis": 5,
-      "geschlecht": 0,
-      "ernaehrung": 0,
-      "kontakte": [],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Patrick",
-      "nachname": "Pohl",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
-        }
-      ],
-      "fahrerlaubnis": 5,
-      "geschlecht": 0,
-      "ernaehrung": 0,
+      "geschlecht": 1,
+      "ernaehrung": 2,
       "kontakte": [],
       "zusatzqualifikationen": []
     }
@@ -210,7 +207,7 @@
         "code": 4
       },
       "stanKonform": true,
-      "kennzeichen": "THW-80297",
+      "kennzeichen": "THW-80306",
       "funkrufname": {
         "kennwort": {
           "code": 1
@@ -227,15 +224,15 @@
         "code": 43
       },
       "stanKonform": true,
-      "kennzeichen": "THW-80298"
+      "kennzeichen": "THW-80307"
     }
   ],
   "sofortbedarf": {
     "verpflegungPersonen": 9,
     "dieselLiter": 60,
     "benzinLiter": 0,
-    "gemischLiter": 5,
+    "gemischLiter": 10,
     "unterbringung": true,
-    "ruhezeitErforderlich": true
+    "ruhezeitErforderlich": false
   }
 }

@@ -1,7 +1,7 @@
 {
-  "schemaVersion": 6,
+  "schemaVersion": 8,
   "uebung": true,
-  "stand": 2388,
+  "stand": 3442614,
   "einheit": {
     "organisation": 1,
     "einheitsTyp": {
@@ -36,44 +36,61 @@
     ]
   },
   "einsatz": {
-    "zeitraumVon": 2388,
-    "zeitraumBis": 2389,
+    "zeitraumVon": 2390,
+    "zeitraumBis": 2392,
     "ortAuftrag": "Bereitstellungsraum Hamburg — Materialwirtschaft, Instandhaltung"
   },
   "personalErfassung": 0,
   "personal": [
     {
-      "vorname": "Andreas",
-      "nachname": "Lehmann",
+      "vorname": "Thomas",
+      "nachname": "Köhler",
       "staerkeRolle": 1,
       "funktionen": [
         {
           "code": 3
-        },
-        {
-          "code": 30
         }
       ],
-      "fahrerlaubnis": 9,
+      "fahrerlaubnis": 10,
       "geschlecht": 0,
       "ernaehrung": 0,
       "kontakte": [
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "5557928503"
-        },
+          "wert": "5551447766"
+        }
+      ],
+      "zusatzqualifikationen": [
         {
-          "art": 2,
-          "dienstlich": true,
-          "emailTemplate": 1
+          "freitext": "Rettungssanitäter (extern)"
+        }
+      ]
+    },
+    {
+      "vorname": "Erik",
+      "nachname": "Winkler",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "code": 4
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5552834479"
         }
       ],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Kai",
-      "nachname": "Herrmann",
+      "vorname": "Daniel",
+      "nachname": "Neumann",
       "staerkeRolle": 1,
       "funktionen": [
         {
@@ -84,18 +101,19 @@
       "geschlecht": 0,
       "ernaehrung": 0,
       "kontakte": [],
-      "zusatzqualifikationen": []
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Zimmerer (Beruf)"
+        }
+      ]
     },
     {
-      "vorname": "Peter",
-      "nachname": "Weber",
+      "vorname": "Andreas",
+      "nachname": "Keller",
       "staerkeRolle": 1,
       "funktionen": [
         {
           "code": 4
-        },
-        {
-          "code": 39
         }
       ],
       "fahrerlaubnis": 10,
@@ -105,27 +123,8 @@
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Miriam",
-      "nachname": "Haas",
-      "staerkeRolle": 1,
-      "funktionen": [
-        {
-          "code": 4
-        }
-      ],
-      "fahrerlaubnis": 10,
-      "geschlecht": 1,
-      "ernaehrung": 0,
-      "kontakte": [],
-      "zusatzqualifikationen": [
-        {
-          "freitext": "Feuerwehr-Doppelmitglied (AGT)"
-        }
-      ]
-    },
-    {
-      "vorname": "Tobias",
-      "nachname": "Vogt",
+      "vorname": "Lena",
+      "nachname": "Becker",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -135,15 +134,15 @@
           "code": 47
         }
       ],
-      "fahrerlaubnis": 5,
-      "geschlecht": 0,
+      "fahrerlaubnis": 9,
+      "geschlecht": 1,
       "ernaehrung": 0,
       "kontakte": [],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Julian",
-      "nachname": "Bauer",
+      "vorname": "Henrik",
+      "nachname": "Schäfer",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -163,26 +162,112 @@
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Kevin",
-      "nachname": "Maier",
+      "vorname": "Georg",
+      "nachname": "Hoffmann",
       "staerkeRolle": 0,
       "funktionen": [
         {
           "code": 5
-        },
-        {
-          "code": 31
         }
       ],
-      "fahrerlaubnis": 10,
+      "fahrerlaubnis": 0,
       "geschlecht": 0,
       "ernaehrung": 0,
       "kontakte": [],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Jannik",
-      "nachname": "Schulz",
+      "vorname": "Ole",
+      "nachname": "Maier",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Gesundheits- und Krankenpfleger (Beruf)"
+        }
+      ]
+    },
+    {
+      "vorname": "Melanie",
+      "nachname": "König",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Verena",
+      "nachname": "Krämer",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        },
+        {
+          "code": 66
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Funkamateur (extern)"
+        }
+      ]
+    },
+    {
+      "vorname": "Kevin",
+      "nachname": "Lang",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        },
+        {
+          "code": 88
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Fabian",
+      "nachname": "Thiel",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Daniel",
+      "nachname": "Schäfer",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -196,16 +281,31 @@
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Peter",
-      "nachname": "Baumann",
+      "vorname": "Henrik",
+      "nachname": "Wagner",
       "staerkeRolle": 0,
       "funktionen": [
         {
           "code": 5
         }
       ],
-      "fahrerlaubnis": 0,
+      "fahrerlaubnis": 5,
       "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Diana",
+      "nachname": "Hahn",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
       "ernaehrung": 0,
       "kontakte": [],
       "zusatzqualifikationen": [
@@ -215,72 +315,34 @@
       ]
     },
     {
-      "vorname": "Pascal",
-      "nachname": "Krüger",
+      "vorname": "Birgit",
+      "nachname": "Günther",
       "staerkeRolle": 0,
       "funktionen": [
         {
           "code": 5
         },
         {
-          "code": 39
-        }
-      ],
-      "fahrerlaubnis": 0,
-      "geschlecht": 0,
-      "ernaehrung": 0,
-      "kontakte": [],
-      "zusatzqualifikationen": [
-        {
-          "freitext": "Gesundheits- und Krankenpfleger (Beruf)"
-        }
-      ]
-    },
-    {
-      "vorname": "Julian",
-      "nachname": "Kraus",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
-        }
-      ],
-      "fahrerlaubnis": 0,
-      "geschlecht": 0,
-      "ernaehrung": 0,
-      "kontakte": [],
-      "zusatzqualifikationen": [
-        {
-          "freitext": "Gesundheits- und Krankenpfleger (Beruf)"
-        }
-      ]
-    },
-    {
-      "vorname": "Karsten",
-      "nachname": "Haas",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
-        }
-      ],
-      "fahrerlaubnis": 0,
-      "geschlecht": 0,
-      "ernaehrung": 0,
-      "kontakte": [],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Maren",
-      "nachname": "Sauer",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
+          "code": 30
         }
       ],
       "fahrerlaubnis": 5,
       "geschlecht": 1,
+      "ernaehrung": 2,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Dominik",
+      "nachname": "Schmitt",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
       "ernaehrung": 0,
       "kontakte": [],
       "zusatzqualifikationen": []
@@ -292,7 +354,7 @@
         "code": 9
       },
       "stanKonform": true,
-      "kennzeichen": "THW-80230",
+      "kennzeichen": "THW-80232",
       "funkrufname": {
         "kennwort": {
           "code": 1
@@ -309,7 +371,7 @@
         "code": 10
       },
       "stanKonform": true,
-      "kennzeichen": "THW-80231",
+      "kennzeichen": "THW-80233",
       "funkrufname": {
         "kennwort": {
           "code": 1
@@ -326,7 +388,7 @@
         "code": 12
       },
       "stanKonform": true,
-      "kennzeichen": "THW-80232",
+      "kennzeichen": "THW-80234",
       "funkrufname": {
         "kennwort": {
           "code": 1
@@ -343,7 +405,7 @@
         "code": 6
       },
       "stanKonform": true,
-      "kennzeichen": "THW-80233",
+      "kennzeichen": "THW-80235",
       "funkrufname": {
         "kennwort": {
           "code": 1
@@ -360,7 +422,7 @@
         "code": 15
       },
       "stanKonform": true,
-      "kennzeichen": "THW-80234",
+      "kennzeichen": "THW-80236",
       "funkrufname": {
         "kennwort": {
           "code": 1
@@ -384,30 +446,30 @@
         "code": 44
       },
       "stanKonform": true,
-      "kennzeichen": "THW-80235"
+      "kennzeichen": "THW-80237"
     },
     {
       "typ": {
         "freitext": "Anh FGr Log-MW"
       },
       "stanKonform": true,
-      "kennzeichen": "THW-80236"
+      "kennzeichen": "THW-80238"
     },
     {
       "typ": {
         "freitext": "Anhänger"
       },
       "stanKonform": true,
-      "kennzeichen": "THW-80237"
+      "kennzeichen": "THW-80239"
     }
   ],
   "sofortbedarf": {
-    "verpflegungPersonen": 13,
+    "verpflegungPersonen": 17,
     "dieselLiter": 335,
     "benzinLiter": 0,
     "gemischLiter": 0,
     "unterbringung": false,
     "ruhezeitErforderlich": true
   },
-  "sonstiges": "3 Sollplätze unbesetzt."
+  "sonstiges": "1 Helfer über StAN-Soll (Reserve aktiviert)."
 }

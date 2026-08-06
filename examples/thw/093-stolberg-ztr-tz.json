@@ -1,7 +1,7 @@
 {
-  "schemaVersion": 6,
+  "schemaVersion": 8,
   "uebung": true,
-  "stand": 2389,
+  "stand": 3439888,
   "einheit": {
     "organisation": 1,
     "einheitsTyp": {
@@ -36,15 +36,15 @@
     ]
   },
   "einsatz": {
-    "zeitraumVon": 2389,
-    "zeitraumBis": 2393,
+    "zeitraumVon": 2388,
+    "zeitraumBis": 2391,
     "ortAuftrag": "Sturmtief »Quirin« Stolberg — Führung Technischer Zug"
   },
   "personalErfassung": 0,
   "personal": [
     {
-      "vorname": "Matthias",
-      "nachname": "Schmitt",
+      "vorname": "Joachim",
+      "nachname": "Voigt",
       "staerkeRolle": 2,
       "funktionen": [
         {
@@ -61,19 +61,14 @@
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "5559801611"
-        },
-        {
-          "art": 2,
-          "dienstlich": true,
-          "emailTemplate": 1
+          "wert": "5552117880"
         }
       ],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Stefan",
-      "nachname": "Scherer",
+      "vorname": "Sarah",
+      "nachname": "Heinrich",
       "staerkeRolle": 1,
       "funktionen": [
         {
@@ -81,14 +76,20 @@
         }
       ],
       "fahrerlaubnis": 10,
-      "geschlecht": 0,
-      "ernaehrung": 2,
-      "kontakte": [],
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5557997269"
+        }
+      ],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Dennis",
-      "nachname": "Günther",
+      "vorname": "Kai",
+      "nachname": "Marx",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -96,20 +97,17 @@
         },
         {
           "code": 30
-        },
-        {
-          "code": 31
         }
       ],
-      "fahrerlaubnis": 0,
+      "fahrerlaubnis": 5,
       "geschlecht": 0,
       "ernaehrung": 0,
       "kontakte": [],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Christian",
-      "nachname": "Schubert",
+      "vorname": "Tanja",
+      "nachname": "Bauer",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -117,8 +115,8 @@
         }
       ],
       "fahrerlaubnis": 0,
-      "geschlecht": 0,
-      "ernaehrung": 0,
+      "geschlecht": 1,
+      "ernaehrung": 2,
       "kontakte": [],
       "zusatzqualifikationen": []
     }
@@ -129,7 +127,7 @@
         "code": 2
       },
       "stanKonform": true,
-      "kennzeichen": "THW-80336",
+      "kennzeichen": "THW-80347",
       "funkrufname": {
         "kennwort": {
           "code": 1
@@ -143,9 +141,9 @@
     },
     {
       "typ": {
-        "freitext": "MzKW"
+        "freitext": "PKW OV"
       },
-      "kennzeichen": "THW-80337",
+      "kennzeichen": "THW-80348",
       "stanKonform": false,
       "aenderungen": "OV-eigenes Fahrzeug, zusätzlich zur StAN",
       "funkrufname": {
@@ -155,18 +153,18 @@
         "eigenerStandort": true,
         "teile": [
           21,
-          54
+          21
         ]
       }
     }
   ],
   "sofortbedarf": {
     "verpflegungPersonen": 4,
-    "dieselLiter": 80,
+    "dieselLiter": 50,
     "benzinLiter": 0,
     "gemischLiter": 0,
-    "unterbringung": true,
+    "unterbringung": false,
     "ruhezeitErforderlich": false
   },
-  "sonstiges": "MzKW zusätzlich über StAN-Soll dabei."
+  "sonstiges": "PKW OV zusätzlich über StAN-Soll dabei."
 }

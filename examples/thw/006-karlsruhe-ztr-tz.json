@@ -1,7 +1,7 @@
 {
-  "schemaVersion": 6,
+  "schemaVersion": 8,
   "uebung": true,
-  "stand": 2390,
+  "stand": 3440622,
   "einheit": {
     "organisation": 1,
     "einheitsTyp": {
@@ -36,15 +36,15 @@
     ]
   },
   "einsatz": {
-    "zeitraumVon": 2390,
-    "zeitraumBis": 2392,
-    "ortAuftrag": "Sturmtief »Quirin« Karlsruhe — Führung Technischer Zug"
+    "zeitraumVon": 2389,
+    "zeitraumBis": 2390,
+    "ortAuftrag": "Hochwasserlage Karlsruhe — Führung Technischer Zug"
   },
   "personalErfassung": 0,
   "personal": [
     {
-      "vorname": "Lisa",
-      "nachname": "Groß",
+      "vorname": "Maren",
+      "nachname": "Brandt",
       "staerkeRolle": 2,
       "funktionen": [
         {
@@ -53,45 +53,34 @@
       ],
       "fahrerlaubnis": 10,
       "geschlecht": 1,
-      "ernaehrung": 0,
+      "ernaehrung": 1,
       "kontakte": [
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "5553920412"
-        },
-        {
-          "art": 2,
-          "dienstlich": true,
-          "emailTemplate": 1
+          "wert": "5554331002"
         }
       ],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Joachim",
-      "nachname": "Bergmann",
+      "vorname": "Ole",
+      "nachname": "Geiger",
       "staerkeRolle": 1,
       "funktionen": [
         {
           "code": 2
         }
       ],
-      "fahrerlaubnis": 9,
+      "fahrerlaubnis": 10,
       "geschlecht": 0,
       "ernaehrung": 0,
-      "kontakte": [
-        {
-          "art": 0,
-          "dienstlich": false,
-          "wert": "5550621323"
-        }
-      ],
+      "kontakte": [],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Diana",
-      "nachname": "Schubert",
+      "vorname": "Tobias",
+      "nachname": "Ludwig",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -102,14 +91,14 @@
         }
       ],
       "fahrerlaubnis": 9,
-      "geschlecht": 1,
-      "ernaehrung": 1,
+      "geschlecht": 0,
+      "ernaehrung": 0,
       "kontakte": [],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Ralf",
-      "nachname": "Lutz",
+      "vorname": "Marcel",
+      "nachname": "Kaiser",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -118,7 +107,7 @@
       ],
       "fahrerlaubnis": 5,
       "geschlecht": 0,
-      "ernaehrung": 0,
+      "ernaehrung": 1,
       "kontakte": [],
       "zusatzqualifikationen": []
     }
@@ -143,20 +132,30 @@
     },
     {
       "typ": {
-        "freitext": "Anh OV (Plane)"
+        "freitext": "PKW OV"
       },
       "kennzeichen": "THW-80113",
       "stanKonform": false,
-      "aenderungen": "OV-eigenes Fahrzeug, zusätzlich zur StAN"
+      "aenderungen": "OV-eigenes Fahrzeug, zusätzlich zur StAN",
+      "funkrufname": {
+        "kennwort": {
+          "code": 1
+        },
+        "eigenerStandort": true,
+        "teile": [
+          21,
+          21
+        ]
+      }
     }
   ],
   "sofortbedarf": {
     "verpflegungPersonen": 4,
-    "dieselLiter": 30,
+    "dieselLiter": 50,
     "benzinLiter": 0,
     "gemischLiter": 0,
-    "unterbringung": true,
+    "unterbringung": false,
     "ruhezeitErforderlich": false
   },
-  "sonstiges": "Anh OV (Plane) zusätzlich über StAN-Soll dabei."
+  "sonstiges": "PKW OV zusätzlich über StAN-Soll dabei."
 }

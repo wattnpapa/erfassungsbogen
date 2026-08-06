@@ -1,7 +1,7 @@
 {
-  "schemaVersion": 6,
+  "schemaVersion": 8,
   "uebung": true,
-  "stand": 2390,
+  "stand": 3439129,
   "einheit": {
     "organisation": 1,
     "einheitsTyp": {
@@ -36,15 +36,15 @@
     ]
   },
   "einsatz": {
-    "zeitraumVon": 2390,
-    "zeitraumBis": 2391,
+    "zeitraumVon": 2388,
+    "zeitraumBis": 2392,
     "ortAuftrag": "Hochwasser Plauen — Großpumpeneinsatz Polder"
   },
   "personalErfassung": 0,
   "personal": [
     {
-      "vorname": "Hannes",
-      "nachname": "Voigt",
+      "vorname": "Katrin",
+      "nachname": "Zimmermann",
       "staerkeRolle": 1,
       "funktionen": [
         {
@@ -52,89 +52,45 @@
         }
       ],
       "fahrerlaubnis": 10,
-      "geschlecht": 0,
-      "ernaehrung": 0,
-      "kontakte": [
-        {
-          "art": 0,
-          "dienstlich": false,
-          "wert": "5555727054"
-        },
-        {
-          "art": 2,
-          "dienstlich": true,
-          "emailTemplate": 1
-        }
-      ],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Laura",
-      "nachname": "Ziegler",
-      "staerkeRolle": 1,
-      "funktionen": [
-        {
-          "code": 4
-        }
-      ],
-      "fahrerlaubnis": 9,
       "geschlecht": 1,
       "ernaehrung": 0,
       "kontakte": [
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "5554496475"
+          "wert": "5557042958"
         }
       ],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Nadine",
-      "nachname": "Klein",
+      "vorname": "Kevin",
+      "nachname": "Baumann",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "code": 4
+        },
+        {
+          "code": 49
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Dennis",
+      "nachname": "Krämer",
       "staerkeRolle": 1,
       "funktionen": [
         {
           "code": 4
         }
       ],
-      "fahrerlaubnis": 9,
-      "geschlecht": 1,
-      "ernaehrung": 2,
-      "kontakte": [],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Philipp",
-      "nachname": "Huber",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
-        },
-        {
-          "code": 51
-        },
-        {
-          "code": 30
-        }
-      ],
-      "fahrerlaubnis": 5,
-      "geschlecht": 0,
-      "ernaehrung": 2,
-      "kontakte": [],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Robert",
-      "nachname": "Brandt",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
-        }
-      ],
-      "fahrerlaubnis": 9,
+      "fahrerlaubnis": 10,
       "geschlecht": 0,
       "ernaehrung": 0,
       "kontakte": [],
@@ -142,29 +98,7 @@
     },
     {
       "vorname": "Jannik",
-      "nachname": "Graf",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
-        },
-        {
-          "code": 30
-        }
-      ],
-      "fahrerlaubnis": 10,
-      "geschlecht": 0,
-      "ernaehrung": 0,
-      "kontakte": [],
-      "zusatzqualifikationen": [
-        {
-          "freitext": "Zimmerer (Beruf)"
-        }
-      ]
-    },
-    {
-      "vorname": "Anna",
-      "nachname": "Müller",
+      "nachname": "Walter",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -175,14 +109,14 @@
         }
       ],
       "fahrerlaubnis": 9,
-      "geschlecht": 1,
-      "ernaehrung": 2,
+      "geschlecht": 0,
+      "ernaehrung": 0,
       "kontakte": [],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Jonas",
-      "nachname": "Schäfer",
+      "vorname": "Moritz",
+      "nachname": "Schwarz",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -193,51 +127,103 @@
       "geschlecht": 0,
       "ernaehrung": 0,
       "kontakte": [],
-      "zusatzqualifikationen": []
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Tischler (Beruf)"
+        }
+      ]
     },
     {
-      "vorname": "Pascal",
-      "nachname": "Huber",
+      "vorname": "Ole",
+      "nachname": "Keller",
       "staerkeRolle": 0,
       "funktionen": [
         {
           "code": 5
         }
       ],
-      "fahrerlaubnis": 0,
+      "fahrerlaubnis": 9,
       "geschlecht": 0,
-      "ernaehrung": 2,
+      "ernaehrung": 0,
       "kontakte": [],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Heiko",
-      "nachname": "Pohl",
+      "vorname": "Sven",
+      "nachname": "Meyer",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Paul",
+      "nachname": "Roth",
       "staerkeRolle": 0,
       "funktionen": [
         {
           "code": 5
         },
         {
-          "code": 49
+          "code": 31
         }
       ],
-      "fahrerlaubnis": 0,
+      "fahrerlaubnis": 9,
       "geschlecht": 0,
       "ernaehrung": 0,
       "kontakte": [],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Florian",
-      "nachname": "Scherer",
+      "vorname": "Lisa",
+      "nachname": "Müller",
       "staerkeRolle": 0,
       "funktionen": [
         {
           "code": 5
         }
       ],
-      "fahrerlaubnis": 0,
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Marcel",
+      "nachname": "Schwarz",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        },
+        {
+          "code": 51
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Tim",
+      "nachname": "Weiß",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        }
+      ],
+      "fahrerlaubnis": 5,
       "geschlecht": 0,
       "ernaehrung": 0,
       "kontakte": [],
@@ -250,7 +236,7 @@
         "code": 6
       },
       "stanKonform": true,
-      "kennzeichen": "THW-80355",
+      "kennzeichen": "THW-80367",
       "funkrufname": {
         "kennwort": {
           "code": 1
@@ -267,23 +253,41 @@
         "code": 52
       },
       "stanKonform": true,
-      "kennzeichen": "THW-80356"
+      "kennzeichen": "THW-80368"
     },
     {
       "typ": {
         "code": 43
       },
       "stanKonform": true,
-      "kennzeichen": "THW-80357"
+      "kennzeichen": "THW-80369"
+    },
+    {
+      "typ": {
+        "freitext": "MTW OV"
+      },
+      "kennzeichen": "THW-80370",
+      "stanKonform": false,
+      "aenderungen": "OV-eigenes Fahrzeug, zusätzlich zur StAN",
+      "funkrufname": {
+        "kennwort": {
+          "code": 1
+        },
+        "eigenerStandort": true,
+        "teile": [
+          49,
+          25
+        ]
+      }
     }
   ],
   "sofortbedarf": {
     "verpflegungPersonen": 11,
-    "dieselLiter": 200,
+    "dieselLiter": 230,
     "benzinLiter": 0,
     "gemischLiter": 0,
-    "unterbringung": false,
-    "ruhezeitErforderlich": true
+    "unterbringung": true,
+    "ruhezeitErforderlich": false
   },
-  "sonstiges": "1 Sollplätze unbesetzt. LKW Lbw in Instandsetzung — nicht mit ausgerückt."
+  "sonstiges": "1 Sollplätze unbesetzt. LKW Lbw in Instandsetzung — nicht mit ausgerückt. MTW OV zusätzlich über StAN-Soll dabei."
 }

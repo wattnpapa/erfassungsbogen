@@ -1,7 +1,7 @@
 {
-  "schemaVersion": 6,
+  "schemaVersion": 8,
   "uebung": true,
-  "stand": 2389,
+  "stand": 3442043,
   "einheit": {
     "organisation": 1,
     "einheitsTyp": {
@@ -36,15 +36,15 @@
     ]
   },
   "einsatz": {
-    "zeitraumVon": 2389,
-    "zeitraumBis": 2390,
+    "zeitraumVon": 2390,
+    "zeitraumBis": 2393,
     "ortAuftrag": "Flächenlage Weiden — Weitverkehrsanbindung, Kommunikation"
   },
   "personalErfassung": 0,
   "personal": [
     {
-      "vorname": "Simon",
-      "nachname": "Roth",
+      "vorname": "Sonja",
+      "nachname": "Menzel",
       "staerkeRolle": 1,
       "funktionen": [
         {
@@ -52,116 +52,24 @@
         }
       ],
       "fahrerlaubnis": 10,
-      "geschlecht": 0,
-      "ernaehrung": 1,
+      "geschlecht": 1,
+      "ernaehrung": 2,
       "kontakte": [
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "5555669181"
-        },
-        {
-          "art": 2,
-          "dienstlich": true,
-          "emailTemplate": 1
+          "wert": "5552841685"
         }
       ],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Peter",
-      "nachname": "Hartmann",
+      "vorname": "Heiko",
+      "nachname": "Lorenz",
       "staerkeRolle": 1,
       "funktionen": [
         {
           "code": 4
-        }
-      ],
-      "fahrerlaubnis": 10,
-      "geschlecht": 0,
-      "ernaehrung": 0,
-      "kontakte": [
-        {
-          "art": 0,
-          "dienstlich": false,
-          "wert": "5555166778"
-        }
-      ],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Michael",
-      "nachname": "Becker",
-      "staerkeRolle": 1,
-      "funktionen": [
-        {
-          "code": 4
-        }
-      ],
-      "fahrerlaubnis": 10,
-      "geschlecht": 0,
-      "ernaehrung": 0,
-      "kontakte": [],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Alexander",
-      "nachname": "Seidel",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
-        },
-        {
-          "code": 34
-        }
-      ],
-      "fahrerlaubnis": 5,
-      "geschlecht": 0,
-      "ernaehrung": 0,
-      "kontakte": [],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Dirk",
-      "nachname": "Krämer",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
-        },
-        {
-          "code": 34
-        }
-      ],
-      "fahrerlaubnis": 0,
-      "geschlecht": 0,
-      "ernaehrung": 0,
-      "kontakte": [],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Dennis",
-      "nachname": "Müller",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
-        }
-      ],
-      "fahrerlaubnis": 9,
-      "geschlecht": 0,
-      "ernaehrung": 0,
-      "kontakte": [],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Thomas",
-      "nachname": "Groß",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
         },
         {
           "code": 30
@@ -174,27 +82,26 @@
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Ole",
-      "nachname": "Wenzel",
-      "staerkeRolle": 0,
+      "vorname": "Robert",
+      "nachname": "Sommer",
+      "staerkeRolle": 1,
       "funktionen": [
         {
-          "code": 5
+          "code": 4
+        },
+        {
+          "code": 30
         }
       ],
-      "fahrerlaubnis": 0,
+      "fahrerlaubnis": 9,
       "geschlecht": 0,
-      "ernaehrung": 1,
+      "ernaehrung": 0,
       "kontakte": [],
-      "zusatzqualifikationen": [
-        {
-          "freitext": "Tischler (Beruf)"
-        }
-      ]
+      "zusatzqualifikationen": []
     },
     {
-      "vorname": "Peter",
-      "nachname": "Otto",
+      "vorname": "Kai",
+      "nachname": "Krämer",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -208,18 +115,70 @@
       "geschlecht": 0,
       "ernaehrung": 1,
       "kontakte": [],
-      "zusatzqualifikationen": []
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Tischler (Beruf)"
+        }
+      ]
     },
     {
-      "vorname": "Alexander",
-      "nachname": "Schubert",
+      "vorname": "Tanja",
+      "nachname": "König",
       "staerkeRolle": 0,
       "funktionen": [
         {
           "code": 5
         }
       ],
-      "fahrerlaubnis": 10,
+      "fahrerlaubnis": 9,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Felix",
+      "nachname": "Schmitt",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        },
+        {
+          "code": 34
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Dirk",
+      "nachname": "Voigt",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Dirk",
+      "nachname": "Schneider",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        }
+      ],
+      "fahrerlaubnis": 0,
       "geschlecht": 0,
       "ernaehrung": 0,
       "kontakte": [],
@@ -232,7 +191,7 @@
         "code": 1
       },
       "stanKonform": true,
-      "kennzeichen": "THW-80171",
+      "kennzeichen": "THW-80174",
       "funkrufname": {
         "kennwort": {
           "code": 1
@@ -249,7 +208,7 @@
         "code": 5
       },
       "stanKonform": true,
-      "kennzeichen": "THW-80172",
+      "kennzeichen": "THW-80175",
       "funkrufname": {
         "kennwort": {
           "code": 1
@@ -263,44 +222,19 @@
     },
     {
       "typ": {
-        "code": 40
-      },
-      "stanKonform": true,
-      "kennzeichen": "THW-80173"
-    },
-    {
-      "typ": {
         "code": 41
       },
       "stanKonform": true,
-      "kennzeichen": "THW-80174"
-    },
-    {
-      "typ": {
-        "freitext": "MzKW"
-      },
-      "kennzeichen": "THW-80175",
-      "stanKonform": false,
-      "aenderungen": "OV-eigenes Fahrzeug, zusätzlich zur StAN",
-      "funkrufname": {
-        "kennwort": {
-          "code": 1
-        },
-        "eigenerStandort": true,
-        "teile": [
-          18,
-          54
-        ]
-      }
+      "kennzeichen": "THW-80177"
     }
   ],
   "sofortbedarf": {
-    "verpflegungPersonen": 10,
-    "dieselLiter": 120,
+    "verpflegungPersonen": 8,
+    "dieselLiter": 70,
     "benzinLiter": 0,
     "gemischLiter": 0,
-    "unterbringung": false,
+    "unterbringung": true,
     "ruhezeitErforderlich": false
   },
-  "sonstiges": "1 Helfer über StAN-Soll (Reserve aktiviert). MzKW zusätzlich über StAN-Soll dabei."
+  "sonstiges": "1 Sollplätze unbesetzt. Anh 2t in Instandsetzung — nicht mit ausgerückt."
 }

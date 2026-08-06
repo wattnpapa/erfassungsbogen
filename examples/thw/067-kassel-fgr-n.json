@@ -1,7 +1,7 @@
 {
-  "schemaVersion": 6,
+  "schemaVersion": 8,
   "uebung": true,
-  "stand": 2390,
+  "stand": 3439572,
   "einheit": {
     "organisation": 1,
     "einheitsTyp": {
@@ -36,102 +36,40 @@
     ]
   },
   "einsatz": {
-    "zeitraumVon": 2390,
-    "zeitraumBis": 2391,
-    "ortAuftrag": "Stromausfall Kassel — Notstromeinspeisung"
+    "zeitraumVon": 2388,
+    "zeitraumBis": 2389,
+    "ortAuftrag": "Unwetter Kassel — Notversorgung kritische Infrastruktur"
   },
   "personalErfassung": 0,
   "personal": [
     {
-      "vorname": "Marcel",
-      "nachname": "Vogt",
+      "vorname": "Tim",
+      "nachname": "Schulte",
       "staerkeRolle": 1,
       "funktionen": [
         {
           "code": 3
-        },
-        {
-          "code": 49
         }
       ],
       "fahrerlaubnis": 9,
       "geschlecht": 0,
-      "ernaehrung": 1,
+      "ernaehrung": 0,
       "kontakte": [
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "5559447945"
-        },
-        {
-          "art": 2,
-          "dienstlich": true,
-          "emailTemplate": 1
+          "wert": "5557315534"
         }
       ],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Ulrike",
-      "nachname": "Brunner",
+      "vorname": "Karsten",
+      "nachname": "Weber",
       "staerkeRolle": 1,
       "funktionen": [
         {
           "code": 4
-        }
-      ],
-      "fahrerlaubnis": 9,
-      "geschlecht": 1,
-      "ernaehrung": 0,
-      "kontakte": [],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Jannik",
-      "nachname": "Ernst",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
-        },
-        {
-          "code": 49
-        },
-        {
-          "code": 31
-        }
-      ],
-      "fahrerlaubnis": 5,
-      "geschlecht": 0,
-      "ernaehrung": 2,
-      "kontakte": [],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Franziska",
-      "nachname": "Lang",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
-        },
-        {
-          "code": 51
-        }
-      ],
-      "fahrerlaubnis": 9,
-      "geschlecht": 1,
-      "ernaehrung": 0,
-      "kontakte": [],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Erik",
-      "nachname": "Hahn",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
         }
       ],
       "fahrerlaubnis": 10,
@@ -141,8 +79,26 @@
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Niklas",
-      "nachname": "Günther",
+      "vorname": "Leon",
+      "nachname": "Kraus",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        },
+        {
+          "code": 49
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Daniel",
+      "nachname": "Ebert",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -152,43 +108,139 @@
           "code": 51
         }
       ],
-      "fahrerlaubnis": 5,
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Berufskraftfahrer (Beruf)"
+        }
+      ]
+    },
+    {
+      "vorname": "Martin",
+      "nachname": "Krüger",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        }
+      ],
+      "fahrerlaubnis": 9,
       "geschlecht": 0,
       "ernaehrung": 0,
       "kontakte": [],
       "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Thorsten",
+      "nachname": "Groß",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Christina",
+      "nachname": "Dietrich",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Marco",
+      "nachname": "Seidel",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Funkamateur (extern)"
+        }
+      ]
     }
   ],
   "fahrzeuge": [
     {
       "typ": {
-        "code": 21
+        "code": 26
       },
       "stanKonform": true,
-      "kennzeichen": "auf LKW verlastet"
+      "kennzeichen": "THW-80278",
+      "funkrufname": {
+        "kennwort": {
+          "code": 1
+        },
+        "eigenerStandort": true,
+        "teile": [
+          24,
+          55
+        ]
+      }
     },
     {
       "typ": {
         "code": 44
       },
       "stanKonform": true,
-      "kennzeichen": "THW-80274"
+      "kennzeichen": "THW-80279"
     },
     {
       "typ": {
         "code": 47
       },
       "stanKonform": true,
-      "kennzeichen": "THW-80275"
+      "kennzeichen": "THW-80280"
+    },
+    {
+      "typ": {
+        "freitext": "MTW OV"
+      },
+      "kennzeichen": "THW-80281",
+      "stanKonform": false,
+      "aenderungen": "OV-eigenes Fahrzeug, zusätzlich zur StAN",
+      "funkrufname": {
+        "kennwort": {
+          "code": 1
+        },
+        "eigenerStandort": true,
+        "teile": [
+          24,
+          25
+        ]
+      }
     }
   ],
   "sofortbedarf": {
-    "verpflegungPersonen": 6,
-    "dieselLiter": 120,
+    "verpflegungPersonen": 8,
+    "dieselLiter": 130,
     "benzinLiter": 0,
     "gemischLiter": 0,
     "unterbringung": false,
-    "ruhezeitErforderlich": true
+    "ruhezeitErforderlich": false
   },
-  "sonstiges": "3 Sollplätze unbesetzt."
+  "sonstiges": "1 Sollplätze unbesetzt. Gabelstapler in Instandsetzung — nicht mit ausgerückt. MTW OV zusätzlich über StAN-Soll dabei."
 }

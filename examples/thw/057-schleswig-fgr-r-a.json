@@ -1,7 +1,7 @@
 {
-  "schemaVersion": 6,
+  "schemaVersion": 8,
   "uebung": true,
-  "stand": 2389,
+  "stand": 3441309,
   "einheit": {
     "organisation": 1,
     "einheitsTyp": {
@@ -37,14 +37,14 @@
   },
   "einsatz": {
     "zeitraumVon": 2389,
-    "zeitraumBis": 2392,
+    "zeitraumBis": 2391,
     "ortAuftrag": "Erdrutsch bei Schleswig — Räumen, Freilegen"
   },
   "personalErfassung": 0,
   "personal": [
     {
-      "vorname": "Birgit",
-      "nachname": "Schwarz",
+      "vorname": "Tobias",
+      "nachname": "Pfeiffer",
       "staerkeRolle": 1,
       "funktionen": [
         {
@@ -52,50 +52,44 @@
         }
       ],
       "fahrerlaubnis": 9,
-      "geschlecht": 1,
+      "geschlecht": 0,
       "ernaehrung": 0,
       "kontakte": [
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "5559555288"
-        },
-        {
-          "art": 2,
-          "dienstlich": true,
-          "emailTemplate": 1
-        }
-      ],
-      "zusatzqualifikationen": [
-        {
-          "freitext": "Tischler (Beruf)"
-        }
-      ]
-    },
-    {
-      "vorname": "Andreas",
-      "nachname": "Stein",
-      "staerkeRolle": 1,
-      "funktionen": [
-        {
-          "code": 4
-        }
-      ],
-      "fahrerlaubnis": 10,
-      "geschlecht": 0,
-      "ernaehrung": 2,
-      "kontakte": [
-        {
-          "art": 0,
-          "dienstlich": false,
-          "wert": "5551450772"
+          "wert": "5557695717"
         }
       ],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Marie",
-      "nachname": "Groß",
+      "vorname": "Tim",
+      "nachname": "Winkler",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "code": 4
+        },
+        {
+          "code": 31
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5552659189"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Bernd",
+      "nachname": "Wenzel",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -106,14 +100,137 @@
         }
       ],
       "fahrerlaubnis": 5,
-      "geschlecht": 1,
-      "ernaehrung": 1,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Landwirt — Erfahrung Großgeräte"
+        }
+      ]
+    },
+    {
+      "vorname": "Felix",
+      "nachname": "Sommer",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
       "kontakte": [],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Matthias",
-      "nachname": "Schwarz",
+      "vorname": "Martin",
+      "nachname": "Dietrich",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Leon",
+      "nachname": "Weiß",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        },
+        {
+          "code": 31
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Ole",
+      "nachname": "Vogel",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        },
+        {
+          "code": 41
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Motorsägenschein AS Baum I (extern)"
+        }
+      ]
+    },
+    {
+      "vorname": "Pascal",
+      "nachname": "Walter",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Funkamateur (extern)"
+        }
+      ]
+    },
+    {
+      "vorname": "Georg",
+      "nachname": "Lorenz",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Georg",
+      "nachname": "Friedrich",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Dirk",
+      "nachname": "Otto",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -125,116 +242,7 @@
       ],
       "fahrerlaubnis": 9,
       "geschlecht": 0,
-      "ernaehrung": 0,
-      "kontakte": [],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Alexander",
-      "nachname": "Fischer",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
-        }
-      ],
-      "fahrerlaubnis": 0,
-      "geschlecht": 0,
-      "ernaehrung": 0,
-      "kontakte": [],
-      "zusatzqualifikationen": [
-        {
-          "freitext": "Tischler (Beruf)"
-        }
-      ]
-    },
-    {
-      "vorname": "Svenja",
-      "nachname": "Sommer",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
-        }
-      ],
-      "fahrerlaubnis": 5,
-      "geschlecht": 1,
-      "ernaehrung": 0,
-      "kontakte": [],
-      "zusatzqualifikationen": [
-        {
-          "freitext": "Landwirt — Erfahrung Großgeräte"
-        }
-      ]
-    },
-    {
-      "vorname": "Jens",
-      "nachname": "Schmitt",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
-        }
-      ],
-      "fahrerlaubnis": 5,
-      "geschlecht": 0,
-      "ernaehrung": 0,
-      "kontakte": [],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Sarah",
-      "nachname": "Otto",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
-        },
-        {
-          "code": 30
-        }
-      ],
-      "fahrerlaubnis": 0,
-      "geschlecht": 1,
-      "ernaehrung": 1,
-      "kontakte": [],
-      "zusatzqualifikationen": [
-        {
-          "freitext": "Berufskraftfahrer (Beruf)"
-        }
-      ]
-    },
-    {
-      "vorname": "Thorsten",
-      "nachname": "Schubert",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
-        }
-      ],
-      "fahrerlaubnis": 0,
-      "geschlecht": 0,
-      "ernaehrung": 1,
-      "kontakte": [],
-      "zusatzqualifikationen": [
-        {
-          "freitext": "Feuerwehr-Doppelmitglied (AGT)"
-        }
-      ]
-    },
-    {
-      "vorname": "Hannes",
-      "nachname": "Keller",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
-        }
-      ],
-      "fahrerlaubnis": 0,
-      "geschlecht": 0,
-      "ernaehrung": 0,
+      "ernaehrung": 2,
       "kontakte": [],
       "zusatzqualifikationen": []
     }
@@ -276,19 +284,44 @@
     },
     {
       "typ": {
+        "code": 45
+      },
+      "stanKonform": true,
+      "kennzeichen": "THW-80251"
+    },
+    {
+      "typ": {
         "code": 46
       },
       "stanKonform": true,
       "kennzeichen": "THW-80252"
+    },
+    {
+      "typ": {
+        "freitext": "MTW OV"
+      },
+      "kennzeichen": "THW-80253",
+      "stanKonform": false,
+      "aenderungen": "OV-eigenes Fahrzeug, zusätzlich zur StAN",
+      "funkrufname": {
+        "kennwort": {
+          "code": 1
+        },
+        "eigenerStandort": true,
+        "teile": [
+          42,
+          25
+        ]
+      }
     }
   ],
   "sofortbedarf": {
-    "verpflegungPersonen": 10,
-    "dieselLiter": 180,
+    "verpflegungPersonen": 11,
+    "dieselLiter": 210,
     "benzinLiter": 0,
-    "gemischLiter": 10,
-    "unterbringung": true,
+    "gemischLiter": 5,
+    "unterbringung": false,
     "ruhezeitErforderlich": true
   },
-  "sonstiges": "1 Helfer über StAN-Soll (Reserve aktiviert). Anh Tieflader in Instandsetzung — nicht mit ausgerückt."
+  "sonstiges": "2 Helfer über StAN-Soll (Reserve aktiviert). MTW OV zusätzlich über StAN-Soll dabei."
 }

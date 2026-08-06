@@ -1,7 +1,7 @@
 {
-  "schemaVersion": 6,
+  "schemaVersion": 8,
   "uebung": true,
-  "stand": 2388,
+  "stand": 3439712,
   "einheit": {
     "organisation": 1,
     "einheitsTyp": {
@@ -37,86 +37,42 @@
   },
   "einsatz": {
     "zeitraumVon": 2388,
-    "zeitraumBis": 2392,
+    "zeitraumBis": 2389,
     "ortAuftrag": "Hochwasserlage Crailsheim — Deichverteidigung, Bootsbetrieb"
   },
   "personalErfassung": 0,
   "personal": [
     {
-      "vorname": "Thorsten",
-      "nachname": "Schmidt",
+      "vorname": "Hanna",
+      "nachname": "Wagner",
       "staerkeRolle": 1,
       "funktionen": [
         {
           "code": 3
-        },
-        {
-          "code": 36
         }
       ],
       "fahrerlaubnis": 9,
-      "geschlecht": 0,
-      "ernaehrung": 0,
+      "geschlecht": 1,
+      "ernaehrung": 1,
       "kontakte": [
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "5558416057"
-        },
-        {
-          "art": 2,
-          "dienstlich": true,
-          "emailTemplate": 1
+          "wert": "5552314332"
         }
       ],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Jonas",
-      "nachname": "Günther",
-      "staerkeRolle": 1,
-      "funktionen": [
-        {
-          "code": 4
-        }
-      ],
-      "fahrerlaubnis": 10,
-      "geschlecht": 0,
-      "ernaehrung": 0,
-      "kontakte": [
-        {
-          "art": 0,
-          "dienstlich": false,
-          "wert": "5555539086"
-        }
-      ],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Robert",
-      "nachname": "Engel",
-      "staerkeRolle": 1,
-      "funktionen": [
-        {
-          "code": 4
-        }
-      ],
-      "fahrerlaubnis": 10,
-      "geschlecht": 0,
-      "ernaehrung": 0,
-      "kontakte": [],
       "zusatzqualifikationen": []
     },
     {
       "vorname": "Hannes",
       "nachname": "Fuchs",
-      "staerkeRolle": 0,
+      "staerkeRolle": 1,
       "funktionen": [
         {
-          "code": 5
+          "code": 4
         },
         {
-          "code": 36
+          "code": 31
         }
       ],
       "fahrerlaubnis": 9,
@@ -128,13 +84,10 @@
     {
       "vorname": "Lukas",
       "nachname": "Roth",
-      "staerkeRolle": 0,
+      "staerkeRolle": 1,
       "funktionen": [
         {
-          "code": 5
-        },
-        {
-          "code": 36
+          "code": 4
         }
       ],
       "fahrerlaubnis": 9,
@@ -150,6 +103,9 @@
       "funktionen": [
         {
           "code": 5
+        },
+        {
+          "code": 36
         }
       ],
       "fahrerlaubnis": 5,
@@ -167,7 +123,7 @@
           "code": 5
         },
         {
-          "code": 31
+          "code": 36
         }
       ],
       "fahrerlaubnis": 9,
@@ -198,6 +154,9 @@
       "funktionen": [
         {
           "code": 5
+        },
+        {
+          "code": 39
         }
       ],
       "fahrerlaubnis": 5,
@@ -243,9 +202,6 @@
       "funktionen": [
         {
           "code": 5
-        },
-        {
-          "code": 31
         }
       ],
       "fahrerlaubnis": 0,
@@ -257,6 +213,36 @@
           "freitext": "Tischler (Beruf)"
         }
       ]
+    },
+    {
+      "vorname": "Dominik",
+      "nachname": "Vogel",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Andreas",
+      "nachname": "Meyer",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
     }
   ],
   "fahrzeuge": [
@@ -317,7 +303,7 @@
     "dieselLiter": 80,
     "benzinLiter": 80,
     "gemischLiter": 0,
-    "unterbringung": true,
-    "ruhezeitErforderlich": false
+    "unterbringung": false,
+    "ruhezeitErforderlich": true
   }
 }

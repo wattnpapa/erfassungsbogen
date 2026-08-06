@@ -1,7 +1,7 @@
 {
-  "schemaVersion": 6,
+  "schemaVersion": 8,
   "uebung": true,
-  "stand": 2388,
+  "stand": 3442118,
   "einheit": {
     "organisation": 1,
     "einheitsTyp": {
@@ -36,15 +36,15 @@
     ]
   },
   "einsatz": {
-    "zeitraumVon": 2388,
-    "zeitraumBis": 2389,
-    "ortAuftrag": "Sturmtief »Quirin« Rathenow — Beräumung, Sicherung"
+    "zeitraumVon": 2390,
+    "zeitraumBis": 2392,
+    "ortAuftrag": "Hochwasser Rathenow — Sandsackverbau, Deichsicherung"
   },
   "personalErfassung": 0,
   "personal": [
     {
-      "vorname": "Henrik",
-      "nachname": "König",
+      "vorname": "Christian",
+      "nachname": "Braun",
       "staerkeRolle": 1,
       "funktionen": [
         {
@@ -58,34 +58,38 @@
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "5559437174"
-        },
-        {
-          "art": 2,
-          "dienstlich": true,
-          "emailTemplate": 1
+          "wert": "5554415324"
         }
       ],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Jens",
-      "nachname": "Lehmann",
+      "vorname": "Uwe",
+      "nachname": "Schneider",
       "staerkeRolle": 1,
       "funktionen": [
         {
           "code": 4
+        },
+        {
+          "code": 30
         }
       ],
       "fahrerlaubnis": 10,
       "geschlecht": 0,
-      "ernaehrung": 0,
-      "kontakte": [],
+      "ernaehrung": 1,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5551217967"
+        }
+      ],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Ulrike",
-      "nachname": "Kaiser",
+      "vorname": "Michael",
+      "nachname": "Hoffmann",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -93,75 +97,20 @@
         },
         {
           "code": 38
-        }
-      ],
-      "fahrerlaubnis": 5,
-      "geschlecht": 1,
-      "ernaehrung": 0,
-      "kontakte": [],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Ulrike",
-      "nachname": "Voigt",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
-        },
-        {
-          "code": 32
-        }
-      ],
-      "fahrerlaubnis": 5,
-      "geschlecht": 1,
-      "ernaehrung": 0,
-      "kontakte": [],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Dennis",
-      "nachname": "Ziegler",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
-        },
-        {
-          "code": 38
-        }
-      ],
-      "fahrerlaubnis": 0,
-      "geschlecht": 0,
-      "ernaehrung": 2,
-      "kontakte": [],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Jens",
-      "nachname": "Werner",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
         },
         {
           "code": 31
         }
       ],
-      "fahrerlaubnis": 0,
+      "fahrerlaubnis": 5,
       "geschlecht": 0,
       "ernaehrung": 0,
       "kontakte": [],
-      "zusatzqualifikationen": [
-        {
-          "freitext": "Feuerwehr-Doppelmitglied (AGT)"
-        }
-      ]
+      "zusatzqualifikationen": []
     },
     {
-      "vorname": "Robert",
-      "nachname": "Braun",
+      "vorname": "Pascal",
+      "nachname": "Schmidt",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -171,6 +120,39 @@
           "code": 32
         }
       ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Sandra",
+      "nachname": "Geiger",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Stefan",
+      "nachname": "Ebert",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        },
+        {
+          "code": 30
+        }
+      ],
       "fahrerlaubnis": 0,
       "geschlecht": 0,
       "ernaehrung": 0,
@@ -178,8 +160,45 @@
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Joachim",
-      "nachname": "Walter",
+      "vorname": "Claudia",
+      "nachname": "Scherer",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        },
+        {
+          "code": 32
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Ines",
+      "nachname": "Wolf",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 2,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Gesundheits- und Krankenpfleger (Beruf)"
+        }
+      ]
+    },
+    {
+      "vorname": "Christian",
+      "nachname": "Lang",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -188,7 +207,7 @@
       ],
       "fahrerlaubnis": 10,
       "geschlecht": 0,
-      "ernaehrung": 0,
+      "ernaehrung": 1,
       "kontakte": [],
       "zusatzqualifikationen": []
     }
@@ -199,7 +218,7 @@
         "code": 4
       },
       "stanKonform": true,
-      "kennzeichen": "THW-80190",
+      "kennzeichen": "THW-80191",
       "funkrufname": {
         "kennwort": {
           "code": 1
@@ -210,40 +229,15 @@
           51
         ]
       }
-    },
-    {
-      "typ": {
-        "code": 43
-      },
-      "stanKonform": true,
-      "kennzeichen": "THW-80191"
-    },
-    {
-      "typ": {
-        "freitext": "PKW OV"
-      },
-      "kennzeichen": "THW-80192",
-      "stanKonform": false,
-      "aenderungen": "OV-eigenes Fahrzeug, zusätzlich zur StAN",
-      "funkrufname": {
-        "kennwort": {
-          "code": 1
-        },
-        "eigenerStandort": true,
-        "teile": [
-          22,
-          21
-        ]
-      }
     }
   ],
   "sofortbedarf": {
-    "verpflegungPersonen": 8,
-    "dieselLiter": 80,
+    "verpflegungPersonen": 9,
+    "dieselLiter": 60,
     "benzinLiter": 0,
     "gemischLiter": 10,
-    "unterbringung": false,
+    "unterbringung": true,
     "ruhezeitErforderlich": false
   },
-  "sonstiges": "1 Sollplätze unbesetzt. PKW OV zusätzlich über StAN-Soll dabei."
+  "sonstiges": "Anh Plane/Spriegel in Instandsetzung — nicht mit ausgerückt."
 }

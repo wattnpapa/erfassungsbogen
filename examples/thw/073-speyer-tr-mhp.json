@@ -1,7 +1,7 @@
 {
-  "schemaVersion": 6,
+  "schemaVersion": 8,
   "uebung": true,
-  "stand": 2388,
+  "stand": 3441167,
   "einheit": {
     "organisation": 1,
     "einheitsTyp": {
@@ -36,15 +36,15 @@
     ]
   },
   "einsatz": {
-    "zeitraumVon": 2388,
-    "zeitraumBis": 2390,
+    "zeitraumVon": 2389,
+    "zeitraumBis": 2391,
     "ortAuftrag": "Hochwasser Speyer — mobile Pegelüberwachung"
   },
   "personalErfassung": 0,
   "personal": [
     {
-      "vorname": "Jens",
-      "nachname": "Kraus",
+      "vorname": "Lars",
+      "nachname": "Scholz",
       "staerkeRolle": 1,
       "funktionen": [
         {
@@ -58,19 +58,29 @@
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "5550903643"
-        },
-        {
-          "art": 2,
-          "dienstlich": true,
-          "emailTemplate": 1
+          "wert": "5559945763"
         }
       ],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Patrick",
-      "nachname": "Scholz",
+      "vorname": "Tim",
+      "nachname": "Arnold",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Heiko",
+      "nachname": "König",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -84,18 +94,15 @@
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Pascal",
-      "nachname": "Schmidt",
+      "vorname": "Florian",
+      "nachname": "Klein",
       "staerkeRolle": 0,
       "funktionen": [
         {
           "code": 5
-        },
-        {
-          "code": 30
         }
       ],
-      "fahrerlaubnis": 5,
+      "fahrerlaubnis": 0,
       "geschlecht": 0,
       "ernaehrung": 0,
       "kontakte": [],
@@ -108,7 +115,7 @@
         "code": 24
       },
       "stanKonform": true,
-      "kennzeichen": "THW-80288",
+      "kennzeichen": "THW-80294",
       "funkrufname": {
         "kennwort": {
           "code": 1
@@ -119,15 +126,23 @@
           25
         ]
       }
+    },
+    {
+      "typ": {
+        "freitext": "Anh OV (Plane)"
+      },
+      "kennzeichen": "THW-80295",
+      "stanKonform": false,
+      "aenderungen": "OV-eigenes Fahrzeug, zusätzlich zur StAN"
     }
   ],
   "sofortbedarf": {
-    "verpflegungPersonen": 3,
+    "verpflegungPersonen": 4,
     "dieselLiter": 30,
     "benzinLiter": 0,
     "gemischLiter": 0,
     "unterbringung": false,
-    "ruhezeitErforderlich": true
+    "ruhezeitErforderlich": false
   },
-  "sonstiges": "1 Sollplätze unbesetzt."
+  "sonstiges": "Anh OV (Plane) zusätzlich über StAN-Soll dabei."
 }

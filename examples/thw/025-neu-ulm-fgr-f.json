@@ -1,7 +1,7 @@
 {
-  "schemaVersion": 6,
+  "schemaVersion": 8,
   "uebung": true,
-  "stand": 2389,
+  "stand": 3439458,
   "einheit": {
     "organisation": 1,
     "einheitsTyp": {
@@ -36,83 +36,73 @@
     ]
   },
   "einsatz": {
-    "zeitraumVon": 2389,
-    "zeitraumBis": 2391,
+    "zeitraumVon": 2388,
+    "zeitraumBis": 2392,
     "ortAuftrag": "Einsatzabschnitt Neu-Ulm — Führungsunterstützung, Lage"
   },
   "personalErfassung": 0,
   "personal": [
     {
-      "vorname": "Silke",
-      "nachname": "Zimmermann",
+      "vorname": "Torben",
+      "nachname": "Albrecht",
       "staerkeRolle": 1,
       "funktionen": [
         {
           "code": 3
+        },
+        {
+          "code": 30
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5550990762"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Feuerwehr-Doppelmitglied (AGT)"
+        }
+      ]
+    },
+    {
+      "vorname": "Sandra",
+      "nachname": "Reuter",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "code": 4
         }
       ],
       "fahrerlaubnis": 9,
       "geschlecht": 1,
       "ernaehrung": 0,
-      "kontakte": [
-        {
-          "art": 0,
-          "dienstlich": false,
-          "wert": "5552797587"
-        },
-        {
-          "art": 2,
-          "dienstlich": true,
-          "emailTemplate": 1
-        }
-      ],
+      "kontakte": [],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Julian",
-      "nachname": "Weber",
+      "vorname": "Kerstin",
+      "nachname": "Peters",
       "staerkeRolle": 1,
       "funktionen": [
         {
           "code": 4
-        },
-        {
-          "code": 35
         }
       ],
       "fahrerlaubnis": 10,
-      "geschlecht": 0,
-      "ernaehrung": 0,
-      "kontakte": [
-        {
-          "art": 0,
-          "dienstlich": false,
-          "wert": "5559126826"
-        }
-      ],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Jens",
-      "nachname": "Becker",
-      "staerkeRolle": 1,
-      "funktionen": [
-        {
-          "code": 4
-        },
-        {
-          "code": 35
-        }
-      ],
-      "fahrerlaubnis": 10,
-      "geschlecht": 0,
+      "geschlecht": 1,
       "ernaehrung": 0,
       "kontakte": [],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Hannes",
-      "nachname": "Lenz",
+      "vorname": "Kevin",
+      "nachname": "Brunner",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -129,8 +119,8 @@
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Anja",
-      "nachname": "Schubert",
+      "vorname": "Frank",
+      "nachname": "Meyer",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -140,15 +130,15 @@
           "code": 35
         }
       ],
-      "fahrerlaubnis": 9,
-      "geschlecht": 1,
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
       "ernaehrung": 2,
       "kontakte": [],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Alexander",
-      "nachname": "Menzel",
+      "vorname": "Sonja",
+      "nachname": "Haas",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -156,24 +146,24 @@
         }
       ],
       "fahrerlaubnis": 5,
-      "geschlecht": 0,
+      "geschlecht": 1,
       "ernaehrung": 0,
       "kontakte": [],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Felix",
-      "nachname": "Herrmann",
+      "vorname": "Jannik",
+      "nachname": "Ludwig",
       "staerkeRolle": 0,
       "funktionen": [
         {
           "code": 5
         },
         {
-          "code": 71
+          "code": 30
         }
       ],
-      "fahrerlaubnis": 0,
+      "fahrerlaubnis": 9,
       "geschlecht": 0,
       "ernaehrung": 0,
       "kontakte": [],
@@ -186,7 +176,7 @@
         "code": 3
       },
       "stanKonform": true,
-      "kennzeichen": "THW-80159",
+      "kennzeichen": "THW-80162",
       "funkrufname": {
         "kennwort": {
           "code": 1
@@ -203,7 +193,7 @@
         "code": 42
       },
       "stanKonform": true,
-      "kennzeichen": "THW-80160"
+      "kennzeichen": "THW-80163"
     }
   ],
   "sofortbedarf": {

@@ -1,7 +1,7 @@
 {
-  "schemaVersion": 6,
+  "schemaVersion": 8,
   "uebung": true,
-  "stand": 2388,
+  "stand": 3440817,
   "einheit": {
     "organisation": 1,
     "einheitsTyp": {
@@ -36,15 +36,15 @@
     ]
   },
   "einsatz": {
-    "zeitraumVon": 2388,
+    "zeitraumVon": 2389,
     "zeitraumBis": 2390,
-    "ortAuftrag": "Sturmtief »Quirin« Regen — Beräumung, Sicherung"
+    "ortAuftrag": "Gebäudeschaden Regen — Abstützen, Räumen"
   },
   "personalErfassung": 0,
   "personal": [
     {
-      "vorname": "Joachim",
-      "nachname": "Menzel",
+      "vorname": "Ole",
+      "nachname": "Engel",
       "staerkeRolle": 1,
       "funktionen": [
         {
@@ -53,45 +53,51 @@
       ],
       "fahrerlaubnis": 10,
       "geschlecht": 0,
-      "ernaehrung": 2,
+      "ernaehrung": 1,
       "kontakte": [
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "5555105255"
-        },
-        {
-          "art": 2,
-          "dienstlich": true,
-          "emailTemplate": 1
+          "wert": "5555484283"
         }
       ],
-      "zusatzqualifikationen": []
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Elektrofachkraft (Beruf)"
+        }
+      ]
     },
     {
-      "vorname": "Thomas",
-      "nachname": "Dietrich",
+      "vorname": "Martin",
+      "nachname": "Lenz",
       "staerkeRolle": 1,
       "funktionen": [
         {
           "code": 4
+        },
+        {
+          "code": 38
         }
       ],
       "fahrerlaubnis": 9,
       "geschlecht": 0,
-      "ernaehrung": 0,
+      "ernaehrung": 1,
       "kontakte": [
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "5551446139"
+          "wert": "5555458903"
         }
       ],
-      "zusatzqualifikationen": []
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Zimmerer (Beruf)"
+        }
+      ]
     },
     {
-      "vorname": "Felix",
-      "nachname": "Marx",
+      "vorname": "Karsten",
+      "nachname": "Kuhn",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -101,15 +107,19 @@
           "code": 38
         }
       ],
-      "fahrerlaubnis": 9,
+      "fahrerlaubnis": 10,
       "geschlecht": 0,
-      "ernaehrung": 2,
+      "ernaehrung": 0,
       "kontakte": [],
-      "zusatzqualifikationen": []
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Motorsägenschein AS Baum I (extern)"
+        }
+      ]
     },
     {
-      "vorname": "Diana",
-      "nachname": "Schulz",
+      "vorname": "Anja",
+      "nachname": "Fuchs",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -117,39 +127,57 @@
         },
         {
           "code": 32
+        },
+        {
+          "code": 59
         }
       ],
-      "fahrerlaubnis": 0,
+      "fahrerlaubnis": 5,
       "geschlecht": 1,
       "ernaehrung": 0,
       "kontakte": [],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Philipp",
-      "nachname": "Sommer",
+      "vorname": "Christina",
+      "nachname": "Müller",
       "staerkeRolle": 0,
       "funktionen": [
         {
           "code": 5
         }
       ],
-      "fahrerlaubnis": 5,
+      "fahrerlaubnis": 10,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Marco",
+      "nachname": "Peters",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        }
+      ],
+      "fahrerlaubnis": 9,
       "geschlecht": 0,
       "ernaehrung": 0,
       "kontakte": [],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Christian",
-      "nachname": "Keller",
+      "vorname": "Pascal",
+      "nachname": "Walter",
       "staerkeRolle": 0,
       "funktionen": [
         {
           "code": 5
         },
         {
-          "code": 31
+          "code": 59
         }
       ],
       "fahrerlaubnis": 0,
@@ -159,8 +187,8 @@
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Lars",
-      "nachname": "Böhm",
+      "vorname": "Stefan",
+      "nachname": "Friedrich",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -171,37 +199,18 @@
       "geschlecht": 0,
       "ernaehrung": 0,
       "kontakte": [],
-      "zusatzqualifikationen": [
-        {
-          "freitext": "Rettungssanitäter (extern)"
-        }
-      ]
-    },
-    {
-      "vorname": "Bernd",
-      "nachname": "Sauer",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
-        }
-      ],
-      "fahrerlaubnis": 0,
-      "geschlecht": 0,
-      "ernaehrung": 0,
-      "kontakte": [],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Michael",
-      "nachname": "Möller",
+      "vorname": "Karsten",
+      "nachname": "Herrmann",
       "staerkeRolle": 0,
       "funktionen": [
         {
           "code": 5
         }
       ],
-      "fahrerlaubnis": 5,
+      "fahrerlaubnis": 9,
       "geschlecht": 0,
       "ernaehrung": 0,
       "kontakte": [],
@@ -214,7 +223,7 @@
         "code": 4
       },
       "stanKonform": true,
-      "kennzeichen": "THW-80165",
+      "kennzeichen": "THW-80167",
       "funkrufname": {
         "kennwort": {
           "code": 1
@@ -231,7 +240,7 @@
         "code": 43
       },
       "stanKonform": true,
-      "kennzeichen": "THW-80166"
+      "kennzeichen": "THW-80168"
     }
   ],
   "sofortbedarf": {
@@ -239,7 +248,7 @@
     "dieselLiter": 60,
     "benzinLiter": 0,
     "gemischLiter": 10,
-    "unterbringung": true,
+    "unterbringung": false,
     "ruhezeitErforderlich": true
   }
 }

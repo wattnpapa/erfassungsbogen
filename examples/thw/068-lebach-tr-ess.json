@@ -1,7 +1,7 @@
 {
-  "schemaVersion": 6,
+  "schemaVersion": 8,
   "uebung": true,
-  "stand": 2389,
+  "stand": 3439965,
   "einheit": {
     "organisation": 1,
     "einheitsTyp": {
@@ -36,55 +36,35 @@
     ]
   },
   "einsatz": {
-    "zeitraumVon": 2389,
-    "zeitraumBis": 2393,
+    "zeitraumVon": 2388,
+    "zeitraumBis": 2391,
     "ortAuftrag": "Unwetterlage Lebach — Einsatzstellensicherung"
   },
   "personalErfassung": 0,
   "personal": [
     {
-      "vorname": "Peter",
-      "nachname": "Lehmann",
+      "vorname": "Heiko",
+      "nachname": "Ebert",
       "staerkeRolle": 1,
       "funktionen": [
         {
           "code": 4
         }
       ],
-      "fahrerlaubnis": 10,
+      "fahrerlaubnis": 9,
       "geschlecht": 0,
       "ernaehrung": 0,
       "kontakte": [
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "5551028559"
-        },
-        {
-          "art": 2,
-          "dienstlich": true,
-          "emailTemplate": 1
+          "wert": "5550722392"
         }
       ],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Melanie",
-      "nachname": "Lorenz",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
-        }
-      ],
-      "fahrerlaubnis": 0,
-      "geschlecht": 1,
-      "ernaehrung": 1,
-      "kontakte": [],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Leon",
+      "vorname": "Florian",
       "nachname": "Schröder",
       "staerkeRolle": 0,
       "funktionen": [
@@ -92,7 +72,7 @@
           "code": 5
         },
         {
-          "code": 30
+          "code": 31
         }
       ],
       "fahrerlaubnis": 0,
@@ -100,6 +80,25 @@
       "ernaehrung": 0,
       "kontakte": [],
       "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Stefan",
+      "nachname": "Roth",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Tischler (Beruf)"
+        }
+      ]
     }
   ],
   "fahrzeuge": [
@@ -108,7 +107,7 @@
         "code": 23
       },
       "stanKonform": true,
-      "kennzeichen": "THW-80276",
+      "kennzeichen": "THW-80282",
       "funkrufname": {
         "kennwort": {
           "code": 1

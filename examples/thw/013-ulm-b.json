@@ -1,7 +1,7 @@
 {
-  "schemaVersion": 6,
+  "schemaVersion": 8,
   "uebung": true,
-  "stand": 2390,
+  "stand": 3442282,
   "einheit": {
     "organisation": 1,
     "einheitsTyp": {
@@ -37,14 +37,14 @@
   },
   "einsatz": {
     "zeitraumVon": 2390,
-    "zeitraumBis": 2393,
-    "ortAuftrag": "Hochwasser Ulm — Sandsackverbau, Deichsicherung"
+    "zeitraumBis": 2394,
+    "ortAuftrag": "Gebäudeschaden Ulm — Abstützen, Räumen"
   },
   "personalErfassung": 0,
   "personal": [
     {
-      "vorname": "Nadine",
-      "nachname": "Hartmann",
+      "vorname": "Karsten",
+      "nachname": "Lehmann",
       "staerkeRolle": 1,
       "funktionen": [
         {
@@ -52,29 +52,27 @@
         }
       ],
       "fahrerlaubnis": 9,
-      "geschlecht": 1,
+      "geschlecht": 0,
       "ernaehrung": 0,
       "kontakte": [
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "5550659550"
-        },
-        {
-          "art": 2,
-          "dienstlich": true,
-          "emailTemplate": 1
+          "wert": "5556134834"
         }
       ],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Ralf",
-      "nachname": "Winkler",
+      "vorname": "Moritz",
+      "nachname": "Herrmann",
       "staerkeRolle": 1,
       "funktionen": [
         {
           "code": 4
+        },
+        {
+          "code": 30
         }
       ],
       "fahrerlaubnis": 10,
@@ -84,14 +82,14 @@
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "5555946912"
+          "wert": "5557289103"
         }
       ],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Philipp",
-      "nachname": "Huber",
+      "vorname": "Karsten",
+      "nachname": "Hartmann",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -99,17 +97,20 @@
         },
         {
           "code": 38
+        },
+        {
+          "code": 32
         }
       ],
-      "fahrerlaubnis": 10,
+      "fahrerlaubnis": 5,
       "geschlecht": 0,
       "ernaehrung": 0,
       "kontakte": [],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Leon",
-      "nachname": "Meyer",
+      "vorname": "Uwe",
+      "nachname": "Brandt",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -126,8 +127,8 @@
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Erik",
-      "nachname": "Weber",
+      "vorname": "Thomas",
+      "nachname": "Kern",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -141,23 +142,23 @@
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Patrick",
-      "nachname": "Dietrich",
+      "vorname": "Martin",
+      "nachname": "Schneider",
       "staerkeRolle": 0,
       "funktionen": [
         {
           "code": 5
         }
       ],
-      "fahrerlaubnis": 10,
+      "fahrerlaubnis": 9,
       "geschlecht": 0,
       "ernaehrung": 1,
       "kontakte": [],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Stefanie",
-      "nachname": "Richter",
+      "vorname": "Verena",
+      "nachname": "Weiß",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -166,20 +167,17 @@
       ],
       "fahrerlaubnis": 5,
       "geschlecht": 1,
-      "ernaehrung": 1,
+      "ernaehrung": 0,
       "kontakte": [],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Jannik",
-      "nachname": "Braun",
+      "vorname": "Michael",
+      "nachname": "Vogel",
       "staerkeRolle": 0,
       "funktionen": [
         {
           "code": 5
-        },
-        {
-          "code": 31
         }
       ],
       "fahrerlaubnis": 0,
@@ -220,8 +218,8 @@
     "dieselLiter": 60,
     "benzinLiter": 0,
     "gemischLiter": 10,
-    "unterbringung": true,
-    "ruhezeitErforderlich": false
+    "unterbringung": false,
+    "ruhezeitErforderlich": true
   },
   "sonstiges": "1 Sollplätze unbesetzt."
 }

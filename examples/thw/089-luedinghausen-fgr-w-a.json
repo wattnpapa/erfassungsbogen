@@ -1,7 +1,7 @@
 {
-  "schemaVersion": 6,
+  "schemaVersion": 8,
   "uebung": true,
-  "stand": 2390,
+  "stand": 3441287,
   "einheit": {
     "organisation": 1,
     "einheitsTyp": {
@@ -36,87 +36,40 @@
     ]
   },
   "einsatz": {
-    "zeitraumVon": 2390,
-    "zeitraumBis": 2394,
-    "ortAuftrag": "Hochwasser Lüdinghausen — Personenrettung, Transport"
+    "zeitraumVon": 2389,
+    "zeitraumBis": 2391,
+    "ortAuftrag": "Hochwasserlage Lüdinghausen — Deichverteidigung, Bootsbetrieb"
   },
   "personalErfassung": 0,
   "personal": [
     {
-      "vorname": "Jan",
-      "nachname": "Brandt",
+      "vorname": "Kai",
+      "nachname": "Bauer",
       "staerkeRolle": 1,
       "funktionen": [
         {
           "code": 3
         }
       ],
-      "fahrerlaubnis": 10,
-      "geschlecht": 0,
-      "ernaehrung": 2,
-      "kontakte": [
-        {
-          "art": 0,
-          "dienstlich": false,
-          "wert": "5557110818"
-        },
-        {
-          "art": 2,
-          "dienstlich": true,
-          "emailTemplate": 1
-        }
-      ],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Hannes",
-      "nachname": "Dietrich",
-      "staerkeRolle": 1,
-      "funktionen": [
-        {
-          "code": 4
-        }
-      ],
-      "fahrerlaubnis": 10,
+      "fahrerlaubnis": 9,
       "geschlecht": 0,
       "ernaehrung": 0,
       "kontakte": [
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "5559525733"
+          "wert": "5557031627"
         }
       ],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Nicole",
-      "nachname": "Engel",
-      "staerkeRolle": 1,
-      "funktionen": [
-        {
-          "code": 4
-        },
-        {
-          "code": 36
-        }
-      ],
-      "fahrerlaubnis": 10,
-      "geschlecht": 1,
-      "ernaehrung": 0,
-      "kontakte": [],
       "zusatzqualifikationen": []
     },
     {
       "vorname": "Pascal",
-      "nachname": "Lang",
-      "staerkeRolle": 0,
+      "nachname": "Hahn",
+      "staerkeRolle": 1,
       "funktionen": [
         {
-          "code": 5
-        },
-        {
-          "code": 36
+          "code": 4
         },
         {
           "code": 39
@@ -124,13 +77,32 @@
       ],
       "fahrerlaubnis": 9,
       "geschlecht": 0,
-      "ernaehrung": 1,
+      "ernaehrung": 0,
       "kontakte": [],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Martin",
-      "nachname": "Schröder",
+      "vorname": "Laura",
+      "nachname": "Ernst",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "code": 4
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Tischler (Beruf)"
+        }
+      ]
+    },
+    {
+      "vorname": "Philipp",
+      "nachname": "Pfeiffer",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -142,76 +114,53 @@
       ],
       "fahrerlaubnis": 0,
       "geschlecht": 0,
-      "ernaehrung": 0,
+      "ernaehrung": 1,
       "kontakte": [],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Tobias",
-      "nachname": "Keller",
-      "staerkeRolle": 0,
-      "funktionen": [
+      "zusatzqualifikationen": [
         {
-          "code": 5
+          "freitext": "Berufskraftfahrer (Beruf)"
         }
-      ],
-      "fahrerlaubnis": 0,
-      "geschlecht": 0,
-      "ernaehrung": 0,
-      "kontakte": [],
-      "zusatzqualifikationen": []
+      ]
     },
     {
-      "vorname": "Vanessa",
-      "nachname": "Lang",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
-        }
-      ],
-      "fahrerlaubnis": 0,
-      "geschlecht": 1,
-      "ernaehrung": 0,
-      "kontakte": [],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Katharina",
-      "nachname": "Walter",
+      "vorname": "Karsten",
+      "nachname": "Bauer",
       "staerkeRolle": 0,
       "funktionen": [
         {
           "code": 5
         },
         {
-          "code": 30
+          "code": 36
+        },
+        {
+          "code": 31
         }
       ],
       "fahrerlaubnis": 0,
-      "geschlecht": 1,
-      "ernaehrung": 0,
-      "kontakte": [],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Christian",
-      "nachname": "Thiel",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
-        }
-      ],
-      "fahrerlaubnis": 9,
       "geschlecht": 0,
       "ernaehrung": 0,
       "kontakte": [],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Dirk",
-      "nachname": "Schmitt",
+      "vorname": "Felix",
+      "nachname": "Groß",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Kerstin",
+      "nachname": "Wagner",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -219,21 +168,18 @@
         }
       ],
       "fahrerlaubnis": 5,
-      "geschlecht": 0,
-      "ernaehrung": 0,
+      "geschlecht": 1,
+      "ernaehrung": 1,
       "kontakte": [],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Paul",
-      "nachname": "Scholz",
+      "vorname": "Hannes",
+      "nachname": "Schäfer",
       "staerkeRolle": 0,
       "funktionen": [
         {
           "code": 5
-        },
-        {
-          "code": 30
         }
       ],
       "fahrerlaubnis": 9,
@@ -243,15 +189,57 @@
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Pascal",
-      "nachname": "Wolf",
+      "vorname": "David",
+      "nachname": "Hoffmann",
       "staerkeRolle": 0,
       "funktionen": [
         {
           "code": 5
-        },
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 2,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Fabian",
+      "nachname": "Berger",
+      "staerkeRolle": 0,
+      "funktionen": [
         {
-          "code": 30
+          "code": 5
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Uwe",
+      "nachname": "Jung",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Julian",
+      "nachname": "Günther",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
         }
       ],
       "fahrerlaubnis": 9,
@@ -267,7 +255,7 @@
         "code": 10
       },
       "stanKonform": true,
-      "kennzeichen": "THW-80330",
+      "kennzeichen": "THW-80340",
       "funkrufname": {
         "kennwort": {
           "code": 1
@@ -320,6 +308,6 @@
     "benzinLiter": 80,
     "gemischLiter": 0,
     "unterbringung": true,
-    "ruhezeitErforderlich": false
+    "ruhezeitErforderlich": true
   }
 }

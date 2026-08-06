@@ -1,7 +1,7 @@
 {
-  "schemaVersion": 6,
+  "schemaVersion": 8,
   "uebung": true,
-  "stand": 2389,
+  "stand": 3439835,
   "einheit": {
     "organisation": 1,
     "einheitsTyp": {
@@ -36,65 +36,67 @@
     ]
   },
   "einsatz": {
-    "zeitraumVon": 2389,
-    "zeitraumBis": 2393,
-    "ortAuftrag": "Unwetter Schleiden — Notversorgung kritische Infrastruktur"
+    "zeitraumVon": 2388,
+    "zeitraumBis": 2391,
+    "ortAuftrag": "Stromausfall Schleiden — Notstromeinspeisung"
   },
   "personalErfassung": 0,
   "personal": [
     {
-      "vorname": "Verena",
-      "nachname": "Wagner",
+      "vorname": "Fabian",
+      "nachname": "Thiel",
       "staerkeRolle": 1,
       "funktionen": [
         {
           "code": 3
-        }
-      ],
-      "fahrerlaubnis": 9,
-      "geschlecht": 1,
-      "ernaehrung": 0,
-      "kontakte": [
-        {
-          "art": 0,
-          "dienstlich": false,
-          "wert": "5554305301"
         },
         {
-          "art": 2,
-          "dienstlich": true,
-          "emailTemplate": 1
+          "code": 31
         }
       ],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Karsten",
-      "nachname": "Bauer",
-      "staerkeRolle": 1,
-      "funktionen": [
-        {
-          "code": 4
-        },
-        {
-          "code": 90
-        }
-      ],
-      "fahrerlaubnis": 10,
+      "fahrerlaubnis": 5,
       "geschlecht": 0,
       "ernaehrung": 0,
       "kontakte": [
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "5554250939"
+          "wert": "5555524695"
         }
       ],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Felix",
-      "nachname": "Groß",
+      "vorname": "Niklas",
+      "nachname": "Bergmann",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "code": 4
+        },
+        {
+          "code": 51
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5550190767"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungssanitäter (extern)"
+        }
+      ]
+    },
+    {
+      "vorname": "Tanja",
+      "nachname": "Huber",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -102,17 +104,24 @@
         },
         {
           "code": 49
+        },
+        {
+          "code": 31
         }
       ],
-      "fahrerlaubnis": 0,
-      "geschlecht": 0,
-      "ernaehrung": 0,
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 1,
       "kontakte": [],
-      "zusatzqualifikationen": []
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Feuerwehr-Doppelmitglied (AGT)"
+        }
+      ]
     },
     {
-      "vorname": "Kerstin",
-      "nachname": "Wagner",
+      "vorname": "Felix",
+      "nachname": "Ludwig",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -120,50 +129,35 @@
         },
         {
           "code": 51
+        },
+        {
+          "code": 90
         }
       ],
       "fahrerlaubnis": 5,
-      "geschlecht": 1,
-      "ernaehrung": 1,
-      "kontakte": [],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Hannes",
-      "nachname": "Schäfer",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
-        },
-        {
-          "code": 30
-        }
-      ],
-      "fahrerlaubnis": 9,
       "geschlecht": 0,
       "ernaehrung": 0,
       "kontakte": [],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "David",
-      "nachname": "Hoffmann",
+      "vorname": "Nadine",
+      "nachname": "Stein",
       "staerkeRolle": 0,
       "funktionen": [
         {
           "code": 5
         }
       ],
-      "fahrerlaubnis": 9,
-      "geschlecht": 0,
-      "ernaehrung": 2,
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 0,
       "kontakte": [],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Fabian",
-      "nachname": "Berger",
+      "vorname": "Philipp",
+      "nachname": "Braun",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -177,8 +171,48 @@
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Uwe",
-      "nachname": "Jung",
+      "vorname": "Heiko",
+      "nachname": "Franke",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        },
+        {
+          "code": 90
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Sven",
+      "nachname": "Schwarz",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        },
+        {
+          "code": 90
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungssanitäter (extern)"
+        }
+      ]
+    },
+    {
+      "vorname": "Erik",
+      "nachname": "Pohl",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -190,24 +224,26 @@
       "ernaehrung": 0,
       "kontakte": [],
       "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Julian",
-      "nachname": "Günther",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
-        }
-      ],
-      "fahrerlaubnis": 9,
-      "geschlecht": 0,
-      "ernaehrung": 0,
-      "kontakte": [],
-      "zusatzqualifikationen": []
     }
   ],
   "fahrzeuge": [
+    {
+      "typ": {
+        "code": 26
+      },
+      "stanKonform": true,
+      "kennzeichen": "THW-80344",
+      "funkrufname": {
+        "kennwort": {
+          "code": 1
+        },
+        "eigenerStandort": true,
+        "teile": [
+          24,
+          55
+        ]
+      }
+    },
     {
       "typ": {
         "code": 21
@@ -220,14 +256,14 @@
         "code": 44
       },
       "stanKonform": true,
-      "kennzeichen": "THW-80334"
+      "kennzeichen": "THW-80345"
     },
     {
       "typ": {
         "code": 47
       },
       "stanKonform": true,
-      "kennzeichen": "THW-80335"
+      "kennzeichen": "THW-80346"
     }
   ],
   "sofortbedarf": {

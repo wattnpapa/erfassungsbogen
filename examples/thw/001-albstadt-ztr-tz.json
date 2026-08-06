@@ -1,7 +1,7 @@
 {
-  "schemaVersion": 6,
+  "schemaVersion": 8,
   "uebung": true,
-  "stand": 2389,
+  "stand": 3440645,
   "einheit": {
     "organisation": 1,
     "einheitsTyp": {
@@ -38,7 +38,7 @@
   "einsatz": {
     "zeitraumVon": 2389,
     "zeitraumBis": 2390,
-    "ortAuftrag": "Sturmtief »Quirin« Albstadt — Führung Technischer Zug"
+    "ortAuftrag": "Hochwasserlage Albstadt — Führung Technischer Zug"
   },
   "personalErfassung": 0,
   "personal": [
@@ -59,11 +59,6 @@
           "art": 0,
           "dienstlich": false,
           "wert": "5556968346"
-        },
-        {
-          "art": 2,
-          "dienstlich": true,
-          "emailTemplate": 1
         }
       ],
       "zusatzqualifikationen": []
@@ -169,7 +164,7 @@
     "benzinLiter": 0,
     "gemischLiter": 0,
     "unterbringung": false,
-    "ruhezeitErforderlich": true
+    "ruhezeitErforderlich": false
   },
   "sonstiges": "MzKW zusätzlich über StAN-Soll dabei."
 }

@@ -1,7 +1,7 @@
 {
-  "schemaVersion": 6,
+  "schemaVersion": 8,
   "uebung": true,
-  "stand": 2390,
+  "stand": 3440831,
   "einheit": {
     "organisation": 1,
     "einheitsTyp": {
@@ -36,15 +36,15 @@
     ]
   },
   "einsatz": {
-    "zeitraumVon": 2390,
-    "zeitraumBis": 2392,
+    "zeitraumVon": 2389,
+    "zeitraumBis": 2390,
     "ortAuftrag": "Gebäudeeinsturz Müllheim — schwere Bergung, Schreitbagger"
   },
   "personalErfassung": 0,
   "personal": [
     {
-      "vorname": "Ole",
-      "nachname": "Wagner",
+      "vorname": "Frank",
+      "nachname": "Roth",
       "staerkeRolle": 1,
       "funktionen": [
         {
@@ -58,26 +58,18 @@
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "5558845969"
-        },
-        {
-          "art": 2,
-          "dienstlich": true,
-          "emailTemplate": 1
+          "wert": "5551038836"
         }
       ],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Lukas",
-      "nachname": "Lehmann",
+      "vorname": "Bernd",
+      "nachname": "Keller",
       "staerkeRolle": 1,
       "funktionen": [
         {
           "code": 4
-        },
-        {
-          "code": 31
         }
       ],
       "fahrerlaubnis": 10,
@@ -87,8 +79,8 @@
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Katrin",
-      "nachname": "Hoffmann",
+      "vorname": "Markus",
+      "nachname": "Schulz",
       "staerkeRolle": 1,
       "funktionen": [
         {
@@ -96,14 +88,14 @@
         }
       ],
       "fahrerlaubnis": 9,
-      "geschlecht": 1,
+      "geschlecht": 0,
       "ernaehrung": 0,
       "kontakte": [],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Ralf",
-      "nachname": "Richter",
+      "vorname": "Thomas",
+      "nachname": "Hoffmann",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -111,132 +103,6 @@
         },
         {
           "code": 43
-        }
-      ],
-      "fahrerlaubnis": 0,
-      "geschlecht": 0,
-      "ernaehrung": 0,
-      "kontakte": [],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Henrik",
-      "nachname": "Pohl",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
-        }
-      ],
-      "fahrerlaubnis": 0,
-      "geschlecht": 0,
-      "ernaehrung": 0,
-      "kontakte": [],
-      "zusatzqualifikationen": [
-        {
-          "freitext": "Rettungssanitäter (extern)"
-        }
-      ]
-    },
-    {
-      "vorname": "Lisa",
-      "nachname": "Kaiser",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
-        },
-        {
-          "code": 31
-        }
-      ],
-      "fahrerlaubnis": 0,
-      "geschlecht": 1,
-      "ernaehrung": 0,
-      "kontakte": [],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Bernd",
-      "nachname": "Jäger",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
-        }
-      ],
-      "fahrerlaubnis": 9,
-      "geschlecht": 0,
-      "ernaehrung": 0,
-      "kontakte": [],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Dirk",
-      "nachname": "Scholz",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
-        }
-      ],
-      "fahrerlaubnis": 9,
-      "geschlecht": 0,
-      "ernaehrung": 1,
-      "kontakte": [],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Nadine",
-      "nachname": "Walter",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
-        },
-        {
-          "code": 38
-        }
-      ],
-      "fahrerlaubnis": 5,
-      "geschlecht": 1,
-      "ernaehrung": 0,
-      "kontakte": [],
-      "zusatzqualifikationen": [
-        {
-          "freitext": "Funkamateur (extern)"
-        }
-      ]
-    },
-    {
-      "vorname": "Thorsten",
-      "nachname": "Neumann",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
-        }
-      ],
-      "fahrerlaubnis": 0,
-      "geschlecht": 0,
-      "ernaehrung": 0,
-      "kontakte": [],
-      "zusatzqualifikationen": [
-        {
-          "freitext": "Funkamateur (extern)"
-        }
-      ]
-    },
-    {
-      "vorname": "David",
-      "nachname": "Menzel",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
-        },
-        {
-          "code": 32
         }
       ],
       "fahrerlaubnis": 5,
@@ -250,8 +116,107 @@
       ]
     },
     {
-      "vorname": "Patrick",
-      "nachname": "Hahn",
+      "vorname": "Felix",
+      "nachname": "Lutz",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        },
+        {
+          "code": 31
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Sabine",
+      "nachname": "Becker",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Henrik",
+      "nachname": "Dietrich",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Erik",
+      "nachname": "Reuter",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        },
+        {
+          "code": 38
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Miriam",
+      "nachname": "Lenz",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Alexander",
+      "nachname": "Peters",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        },
+        {
+          "code": 32
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Matthias",
+      "nachname": "Berger",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -261,7 +226,22 @@
           "code": 43
         }
       ],
-      "fahrerlaubnis": 5,
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Kevin",
+      "nachname": "Keller",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        }
+      ],
+      "fahrerlaubnis": 0,
       "geschlecht": 0,
       "ernaehrung": 0,
       "kontakte": [],
@@ -269,6 +249,23 @@
     }
   ],
   "fahrzeuge": [
+    {
+      "typ": {
+        "code": 26
+      },
+      "stanKonform": true,
+      "kennzeichen": "THW-80115",
+      "funkrufname": {
+        "kennwort": {
+          "code": 1
+        },
+        "eigenerStandort": true,
+        "teile": [
+          39,
+          55
+        ]
+      }
+    },
     {
       "typ": {
         "code": 19
@@ -291,15 +288,15 @@
         "code": 44
       },
       "stanKonform": true,
-      "kennzeichen": "THW-80115"
+      "kennzeichen": "THW-80116"
     }
   ],
   "sofortbedarf": {
     "verpflegungPersonen": 12,
     "dieselLiter": 60,
     "benzinLiter": 0,
-    "gemischLiter": 5,
-    "unterbringung": true,
+    "gemischLiter": 10,
+    "unterbringung": false,
     "ruhezeitErforderlich": true
   }
 }

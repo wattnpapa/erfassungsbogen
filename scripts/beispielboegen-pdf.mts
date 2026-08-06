@@ -453,7 +453,6 @@ function personenFabrik(): PersonenFabrik {
           dienstlich: false,
           wert: fakeTelefon(`01${ganz(5, 7)}${ganz(1, 9)}${String(ganz(0, 9999999)).padStart(7, "0")}`),
         });
-        person.kontakte.push({ art: KontaktArt.EMAIL, dienstlich: true, emailTemplate: 1 });
       }
       return person;
     },
@@ -760,7 +759,10 @@ function grossbogenBauen(): BeispielBogen {
     { typ: { code: 43 }, kennzeichen: thwKennzeichen(naechstesKennzeichen++), stanKonform: true, aenderungen: "Verpflegungs- und Sanitätsausstattung" },
   ];
 
-  const stand = datumAusIso("2026-07-16");
+  // Wie bei den übrigen Bögen: `tag` zählt Tage (Einsatzzeitraum), `stand`
+  // Minuten (Schema 7). Feste Uhrzeit — dieser eine Bogen soll nicht würfeln.
+  const tag = datumAusIso("2026-07-16");
+  const stand = tag * MINUTEN_JE_TAG + 9 * 60;
   const bogen: Erfassungsbogen = {
     schemaVersion: SCHEMA_VERSION,
     uebung: true, // Beispielbogen: überall als Übung gekennzeichnet (Störer, PDF-Wasserzeichen)
@@ -772,7 +774,7 @@ function grossbogenBauen(): BeispielBogen {
     },
     einsatz: {
       zeitraumVon: tag,
-      zeitraumBis: stand + 7,
+      zeitraumBis: tag + 7,
       ortAuftrag:
         `Großschadenslage nach Starkregen und Hangrutsch im Landkreis ${ov.ort} — ` +
         "Verstärkter Bergungszug mit Schwerer Bergung: Menschenrettung aus verschütteten " +

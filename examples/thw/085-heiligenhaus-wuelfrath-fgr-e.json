@@ -1,7 +1,7 @@
 {
-  "schemaVersion": 6,
+  "schemaVersion": 8,
   "uebung": true,
-  "stand": 2388,
+  "stand": 3439316,
   "einheit": {
     "organisation": 1,
     "einheitsTyp": {
@@ -43,15 +43,12 @@
   "personalErfassung": 0,
   "personal": [
     {
-      "vorname": "Georg",
-      "nachname": "Schröder",
+      "vorname": "Andreas",
+      "nachname": "Otto",
       "staerkeRolle": 1,
       "funktionen": [
         {
           "code": 3
-        },
-        {
-          "code": 49
         }
       ],
       "fahrerlaubnis": 10,
@@ -61,19 +58,14 @@
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "5558501777"
-        },
-        {
-          "art": 2,
-          "dienstlich": true,
-          "emailTemplate": 1
+          "wert": "5550389631"
         }
       ],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Kai",
-      "nachname": "Stein",
+      "vorname": "Philipp",
+      "nachname": "Müller",
       "staerkeRolle": 1,
       "funktionen": [
         {
@@ -82,13 +74,19 @@
       ],
       "fahrerlaubnis": 9,
       "geschlecht": 0,
-      "ernaehrung": 0,
-      "kontakte": [],
+      "ernaehrung": 1,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5554746108"
+        }
+      ],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Christian",
-      "nachname": "Schneider",
+      "vorname": "David",
+      "nachname": "Maier",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -98,15 +96,15 @@
           "code": 49
         }
       ],
-      "fahrerlaubnis": 9,
+      "fahrerlaubnis": 0,
       "geschlecht": 0,
       "ernaehrung": 0,
       "kontakte": [],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Niklas",
-      "nachname": "Winter",
+      "vorname": "Michael",
+      "nachname": "Kraus",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -114,46 +112,79 @@
         },
         {
           "code": 90
+        },
+        {
+          "code": 31
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Patrick",
+      "nachname": "Baumann",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Berufskraftfahrer (Beruf)"
+        }
+      ]
+    },
+    {
+      "vorname": "Thomas",
+      "nachname": "Vogel",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 2,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Ines",
+      "nachname": "Walter",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
         },
         {
           "code": 30
         }
       ],
-      "fahrerlaubnis": 9,
-      "geschlecht": 0,
-      "ernaehrung": 2,
-      "kontakte": [],
-      "zusatzqualifikationen": [
-        {
-          "freitext": "Elektrofachkraft (Beruf)"
-        }
-      ]
-    },
-    {
-      "vorname": "Simon",
-      "nachname": "Schubert",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
-        }
-      ],
-      "fahrerlaubnis": 5,
-      "geschlecht": 0,
+      "fahrerlaubnis": 0,
+      "geschlecht": 1,
       "ernaehrung": 0,
       "kontakte": [],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Sven",
-      "nachname": "Maier",
+      "vorname": "Frank",
+      "nachname": "Thiel",
       "staerkeRolle": 0,
       "funktionen": [
         {
           "code": 5
         },
         {
-          "code": 90
+          "code": 31
         }
       ],
       "fahrerlaubnis": 5,
@@ -163,8 +194,23 @@
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Georg",
-      "nachname": "Kaiser",
+      "vorname": "Fabian",
+      "nachname": "Schwarz",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Sebastian",
+      "nachname": "Scherer",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -184,7 +230,7 @@
         "code": 8
       },
       "stanKonform": true,
-      "kennzeichen": "THW-80315",
+      "kennzeichen": "THW-80326",
       "funkrufname": {
         "kennwort": {
           "code": 1
@@ -201,23 +247,16 @@
         "code": 48
       },
       "stanKonform": true,
-      "kennzeichen": "THW-80316"
-    },
-    {
-      "typ": {
-        "code": 49
-      },
-      "stanKonform": true,
-      "kennzeichen": "THW-80317"
+      "kennzeichen": "THW-80327"
     }
   ],
   "sofortbedarf": {
-    "verpflegungPersonen": 7,
-    "dieselLiter": 570,
+    "verpflegungPersonen": 10,
+    "dieselLiter": 270,
     "benzinLiter": 0,
     "gemischLiter": 0,
-    "unterbringung": false,
+    "unterbringung": true,
     "ruhezeitErforderlich": false
   },
-  "sonstiges": "2 Sollplätze unbesetzt."
+  "sonstiges": "1 Helfer über StAN-Soll (Reserve aktiviert). Anh NEA sehr groß in Instandsetzung — nicht mit ausgerückt."
 }

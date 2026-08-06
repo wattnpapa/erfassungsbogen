@@ -1,7 +1,7 @@
 {
-  "schemaVersion": 6,
+  "schemaVersion": 8,
   "uebung": true,
-  "stand": 2390,
+  "stand": 3442523,
   "einheit": {
     "organisation": 1,
     "einheitsTyp": {
@@ -43,8 +43,8 @@
   "personalErfassung": 0,
   "personal": [
     {
-      "vorname": "Jan",
-      "nachname": "Pohl",
+      "vorname": "Thomas",
+      "nachname": "Scherer",
       "staerkeRolle": 1,
       "funktionen": [
         {
@@ -61,40 +61,33 @@
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "5553470411"
-        },
-        {
-          "art": 2,
-          "dienstlich": true,
-          "emailTemplate": 1
+          "wert": "5557788426"
         }
       ],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "David",
-      "nachname": "Menzel",
+      "vorname": "Sonja",
+      "nachname": "Heinrich",
       "staerkeRolle": 1,
       "funktionen": [
         {
           "code": 4
         }
       ],
-      "fahrerlaubnis": 10,
-      "geschlecht": 0,
+      "fahrerlaubnis": 9,
+      "geschlecht": 1,
       "ernaehrung": 0,
-      "kontakte": [
+      "kontakte": [],
+      "zusatzqualifikationen": [
         {
-          "art": 0,
-          "dienstlich": false,
-          "wert": "5557339801"
+          "freitext": "Tischler (Beruf)"
         }
-      ],
-      "zusatzqualifikationen": []
+      ]
     },
     {
-      "vorname": "Ralf",
-      "nachname": "Ebert",
+      "vorname": "Stefan",
+      "nachname": "Jung",
       "staerkeRolle": 1,
       "funktionen": [
         {
@@ -103,13 +96,13 @@
       ],
       "fahrerlaubnis": 10,
       "geschlecht": 0,
-      "ernaehrung": 2,
+      "ernaehrung": 1,
       "kontakte": [],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Jannik",
-      "nachname": "Jäger",
+      "vorname": "Henrik",
+      "nachname": "König",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -129,8 +122,8 @@
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Julian",
-      "nachname": "Schmidt",
+      "vorname": "Daniel",
+      "nachname": "Marx",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -140,26 +133,15 @@
           "code": 36
         }
       ],
-      "fahrerlaubnis": 9,
+      "fahrerlaubnis": 0,
       "geschlecht": 0,
-      "ernaehrung": 1,
-      "kontakte": [],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Maren",
-      "nachname": "Becker",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
-        }
-      ],
-      "fahrerlaubnis": 5,
-      "geschlecht": 1,
       "ernaehrung": 0,
       "kontakte": [],
-      "zusatzqualifikationen": []
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungssanitäter (extern)"
+        }
+      ]
     },
     {
       "vorname": "Erik",
@@ -183,9 +165,6 @@
       "funktionen": [
         {
           "code": 5
-        },
-        {
-          "code": 31
         }
       ],
       "fahrerlaubnis": 10,
@@ -221,7 +200,7 @@
           "code": 5
         },
         {
-          "code": 37
+          "code": 31
         }
       ],
       "fahrerlaubnis": 0,
@@ -237,6 +216,9 @@
       "funktionen": [
         {
           "code": 5
+        },
+        {
+          "code": 37
         }
       ],
       "fahrerlaubnis": 5,
@@ -257,21 +239,6 @@
       "fahrerlaubnis": 0,
       "geschlecht": 1,
       "ernaehrung": 0,
-      "kontakte": [],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Joachim",
-      "nachname": "Lehmann",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
-        }
-      ],
-      "fahrerlaubnis": 5,
-      "geschlecht": 0,
-      "ernaehrung": 1,
       "kontakte": [],
       "zusatzqualifikationen": []
     }
@@ -296,20 +263,37 @@
     },
     {
       "typ": {
-        "freitext": "Anh OV (Plane)"
+        "code": 44
+      },
+      "stanKonform": true,
+      "kennzeichen": "THW-80123"
+    },
+    {
+      "typ": {
+        "freitext": "MzKW"
       },
       "kennzeichen": "THW-80124",
       "stanKonform": false,
-      "aenderungen": "OV-eigenes Fahrzeug, zusätzlich zur StAN"
+      "aenderungen": "OV-eigenes Fahrzeug, zusätzlich zur StAN",
+      "funkrufname": {
+        "kennwort": {
+          "code": 1
+        },
+        "eigenerStandort": true,
+        "teile": [
+          37,
+          54
+        ]
+      }
     }
   ],
   "sofortbedarf": {
-    "verpflegungPersonen": 13,
-    "dieselLiter": 80,
+    "verpflegungPersonen": 11,
+    "dieselLiter": 130,
     "benzinLiter": 0,
     "gemischLiter": 0,
     "unterbringung": true,
-    "ruhezeitErforderlich": true
+    "ruhezeitErforderlich": false
   },
-  "sonstiges": "1 Helfer über StAN-Soll (Reserve aktiviert). Anh Plattform in Instandsetzung — nicht mit ausgerückt. Anh OV (Plane) zusätzlich über StAN-Soll dabei."
+  "sonstiges": "1 Sollplätze unbesetzt. MzKW zusätzlich über StAN-Soll dabei."
 }

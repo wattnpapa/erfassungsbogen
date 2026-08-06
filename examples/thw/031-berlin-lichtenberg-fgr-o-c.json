@@ -1,7 +1,7 @@
 {
-  "schemaVersion": 6,
+  "schemaVersion": 8,
   "uebung": true,
-  "stand": 2388,
+  "stand": 3442023,
   "einheit": {
     "organisation": 1,
     "einheitsTyp": {
@@ -36,91 +36,43 @@
     ]
   },
   "einsatz": {
-    "zeitraumVon": 2388,
-    "zeitraumBis": 2392,
+    "zeitraumVon": 2390,
+    "zeitraumBis": 2393,
     "ortAuftrag": "Gebäudeschaden Berlin — Ortung, Erkundung"
   },
   "personalErfassung": 0,
   "personal": [
     {
-      "vorname": "Lars",
-      "nachname": "Vogel",
+      "vorname": "Florian",
+      "nachname": "Dietrich",
       "staerkeRolle": 1,
       "funktionen": [
         {
           "code": 3
-        }
-      ],
-      "fahrerlaubnis": 9,
-      "geschlecht": 0,
-      "ernaehrung": 0,
-      "kontakte": [
-        {
-          "art": 0,
-          "dienstlich": false,
-          "wert": "5556439763"
-        },
-        {
-          "art": 2,
-          "dienstlich": true,
-          "emailTemplate": 1
-        }
-      ],
-      "zusatzqualifikationen": [
-        {
-          "freitext": "Zimmerer (Beruf)"
-        }
-      ]
-    },
-    {
-      "vorname": "Alexander",
-      "nachname": "Köhler",
-      "staerkeRolle": 1,
-      "funktionen": [
-        {
-          "code": 4
-        }
-      ],
-      "fahrerlaubnis": 9,
-      "geschlecht": 0,
-      "ernaehrung": 0,
-      "kontakte": [
-        {
-          "art": 0,
-          "dienstlich": false,
-          "wert": "5556607896"
-        }
-      ],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Christian",
-      "nachname": "Thiel",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
         },
         {
           "code": 46
         }
       ],
-      "fahrerlaubnis": 0,
+      "fahrerlaubnis": 9,
       "geschlecht": 0,
-      "ernaehrung": 1,
-      "kontakte": [],
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5557238331"
+        }
+      ],
       "zusatzqualifikationen": []
     },
     {
       "vorname": "Stefan",
       "nachname": "Huber",
-      "staerkeRolle": 0,
+      "staerkeRolle": 1,
       "funktionen": [
         {
-          "code": 5
-        },
-        {
-          "code": 31
+          "code": 4
         }
       ],
       "fahrerlaubnis": 9,
@@ -138,7 +90,25 @@
           "code": 5
         },
         {
-          "code": 30
+          "code": 46
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Karsten",
+      "nachname": "Ebert",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        },
+        {
+          "code": 46
         }
       ],
       "fahrerlaubnis": 9,
@@ -154,7 +124,7 @@
         "code": 23
       },
       "stanKonform": true,
-      "kennzeichen": "THW-80176",
+      "kennzeichen": "THW-80178",
       "funkrufname": {
         "kennwort": {
           "code": 1
@@ -165,33 +135,15 @@
           25
         ]
       }
-    },
-    {
-      "typ": {
-        "freitext": "PKW OV"
-      },
-      "kennzeichen": "THW-80177",
-      "stanKonform": false,
-      "aenderungen": "OV-eigenes Fahrzeug, zusätzlich zur StAN",
-      "funkrufname": {
-        "kennwort": {
-          "code": 1
-        },
-        "eigenerStandort": true,
-        "teile": [
-          46,
-          21
-        ]
-      }
     }
   ],
   "sofortbedarf": {
-    "verpflegungPersonen": 5,
-    "dieselLiter": 50,
+    "verpflegungPersonen": 4,
+    "dieselLiter": 30,
     "benzinLiter": 0,
     "gemischLiter": 0,
-    "unterbringung": true,
-    "ruhezeitErforderlich": true
+    "unterbringung": false,
+    "ruhezeitErforderlich": false
   },
-  "sonstiges": "1 Sollplätze unbesetzt. PKW OV zusätzlich über StAN-Soll dabei."
+  "sonstiges": "2 Sollplätze unbesetzt."
 }

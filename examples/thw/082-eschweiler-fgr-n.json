@@ -1,7 +1,7 @@
 {
-  "schemaVersion": 6,
+  "schemaVersion": 8,
   "uebung": true,
-  "stand": 2390,
+  "stand": 3442450,
   "einheit": {
     "organisation": 1,
     "einheitsTyp": {
@@ -37,14 +37,14 @@
   },
   "einsatz": {
     "zeitraumVon": 2390,
-    "zeitraumBis": 2394,
+    "zeitraumBis": 2392,
     "ortAuftrag": "Stromausfall Eschweiler — Notstromeinspeisung"
   },
   "personalErfassung": 0,
   "personal": [
     {
-      "vorname": "Patrick",
-      "nachname": "Fuchs",
+      "vorname": "Fabian",
+      "nachname": "Geiger",
       "staerkeRolle": 1,
       "funktionen": [
         {
@@ -58,40 +58,35 @@
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "5556967540"
-        },
-        {
-          "art": 2,
-          "dienstlich": true,
-          "emailTemplate": 1
+          "wert": "5556304173"
         }
       ],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Fabian",
-      "nachname": "Busch",
+      "vorname": "Lars",
+      "nachname": "Werner",
       "staerkeRolle": 1,
       "funktionen": [
         {
           "code": 4
         }
       ],
-      "fahrerlaubnis": 9,
+      "fahrerlaubnis": 10,
       "geschlecht": 0,
       "ernaehrung": 1,
       "kontakte": [
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "5554092186"
+          "wert": "5552348227"
         }
       ],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Dominik",
-      "nachname": "Franke",
+      "vorname": "Matthias",
+      "nachname": "Kraus",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -99,17 +94,96 @@
         },
         {
           "code": 49
+        },
+        {
+          "code": 30
         }
       ],
-      "fahrerlaubnis": 10,
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Paul",
+      "nachname": "Engel",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        },
+        {
+          "code": 51
+        },
+        {
+          "code": 90
+        }
+      ],
+      "fahrerlaubnis": 5,
       "geschlecht": 0,
       "ernaehrung": 0,
       "kontakte": [],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Michael",
-      "nachname": "Otto",
+      "vorname": "Pascal",
+      "nachname": "Lorenz",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        },
+        {
+          "code": 30
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Julia",
+      "nachname": "Jäger",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Lars",
+      "nachname": "Lutz",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        },
+        {
+          "code": 30
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Berufskraftfahrer (Beruf)"
+        }
+      ]
+    },
+    {
+      "vorname": "Joachim",
+      "nachname": "Friedrich",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -121,88 +195,29 @@
       ],
       "fahrerlaubnis": 5,
       "geschlecht": 0,
-      "ernaehrung": 1,
-      "kontakte": [],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Leon",
-      "nachname": "Krüger",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
-        },
-        {
-          "code": 51
-        }
-      ],
-      "fahrerlaubnis": 0,
-      "geschlecht": 0,
-      "ernaehrung": 2,
-      "kontakte": [],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Felix",
-      "nachname": "Lenz",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
-        },
-        {
-          "code": 90
-        }
-      ],
-      "fahrerlaubnis": 10,
-      "geschlecht": 0,
-      "ernaehrung": 0,
-      "kontakte": [],
-      "zusatzqualifikationen": [
-        {
-          "freitext": "Rettungssanitäter (extern)"
-        }
-      ]
-    },
-    {
-      "vorname": "Moritz",
-      "nachname": "Zimmermann",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
-        },
-        {
-          "code": 31
-        }
-      ],
-      "fahrerlaubnis": 10,
-      "geschlecht": 0,
-      "ernaehrung": 2,
-      "kontakte": [],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Carina",
-      "nachname": "Vogt",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
-        },
-        {
-          "code": 31
-        }
-      ],
-      "fahrerlaubnis": 9,
-      "geschlecht": 1,
       "ernaehrung": 0,
       "kontakte": [],
       "zusatzqualifikationen": []
     }
   ],
   "fahrzeuge": [
+    {
+      "typ": {
+        "code": 26
+      },
+      "stanKonform": true,
+      "kennzeichen": "THW-80318",
+      "funkrufname": {
+        "kennwort": {
+          "code": 1
+        },
+        "eigenerStandort": true,
+        "teile": [
+          24,
+          55
+        ]
+      }
+    },
     {
       "typ": {
         "code": 21
@@ -215,14 +230,14 @@
         "code": 44
       },
       "stanKonform": true,
-      "kennzeichen": "THW-80308"
+      "kennzeichen": "THW-80319"
     },
     {
       "typ": {
         "code": 47
       },
       "stanKonform": true,
-      "kennzeichen": "THW-80309"
+      "kennzeichen": "THW-80320"
     }
   ],
   "sofortbedarf": {

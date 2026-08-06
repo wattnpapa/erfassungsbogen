@@ -1,7 +1,7 @@
 {
-  "schemaVersion": 6,
+  "schemaVersion": 8,
   "uebung": true,
-  "stand": 2390,
+  "stand": 3441374,
   "einheit": {
     "organisation": 1,
     "einheitsTyp": {
@@ -36,63 +36,51 @@
     ]
   },
   "einsatz": {
-    "zeitraumVon": 2390,
+    "zeitraumVon": 2389,
     "zeitraumBis": 2392,
     "ortAuftrag": "Gebäudeschaden Andernach — Abstützen, Räumen"
   },
   "personalErfassung": 0,
   "personal": [
     {
-      "vorname": "Ines",
-      "nachname": "Meyer",
+      "vorname": "Jana",
+      "nachname": "Böhm",
       "staerkeRolle": 1,
       "funktionen": [
         {
           "code": 3
         }
       ],
-      "fahrerlaubnis": 10,
+      "fahrerlaubnis": 9,
       "geschlecht": 1,
-      "ernaehrung": 1,
+      "ernaehrung": 0,
       "kontakte": [
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "5552784231"
-        },
-        {
-          "art": 2,
-          "dienstlich": true,
-          "emailTemplate": 1
+          "wert": "5552507884"
         }
       ],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Nadine",
-      "nachname": "Schubert",
+      "vorname": "Pascal",
+      "nachname": "Kaiser",
       "staerkeRolle": 1,
       "funktionen": [
         {
           "code": 4
-        },
-        {
-          "code": 32
         }
       ],
       "fahrerlaubnis": 9,
-      "geschlecht": 1,
+      "geschlecht": 0,
       "ernaehrung": 0,
       "kontakte": [],
-      "zusatzqualifikationen": [
-        {
-          "freitext": "Tischler (Beruf)"
-        }
-      ]
+      "zusatzqualifikationen": []
     },
     {
-      "vorname": "Anna",
-      "nachname": "Berger",
+      "vorname": "Ulrike",
+      "nachname": "Vogel",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -106,11 +94,15 @@
       "geschlecht": 1,
       "ernaehrung": 0,
       "kontakte": [],
-      "zusatzqualifikationen": []
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Feuerwehr-Doppelmitglied (AGT)"
+        }
+      ]
     },
     {
-      "vorname": "Marco",
-      "nachname": "Becker",
+      "vorname": "Markus",
+      "nachname": "Horn",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -127,8 +119,8 @@
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Ines",
-      "nachname": "Baumann",
+      "vorname": "Moritz",
+      "nachname": "Wagner",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -138,6 +130,54 @@
           "code": 31
         }
       ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Patrick",
+      "nachname": "Lutz",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Paul",
+      "nachname": "Walter",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Kerstin",
+      "nachname": "Wagner",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        },
+        {
+          "code": 38
+        }
+      ],
       "fahrerlaubnis": 9,
       "geschlecht": 1,
       "ernaehrung": 0,
@@ -145,8 +185,8 @@
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "David",
-      "nachname": "Böhm",
+      "vorname": "Julian",
+      "nachname": "Baumann",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -160,8 +200,8 @@
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Sabine",
-      "nachname": "Ernst",
+      "vorname": "Kai",
+      "nachname": "Seidel",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -169,52 +209,7 @@
         }
       ],
       "fahrerlaubnis": 5,
-      "geschlecht": 1,
-      "ernaehrung": 0,
-      "kontakte": [],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Jannik",
-      "nachname": "Ebert",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
-        }
-      ],
-      "fahrerlaubnis": 10,
       "geschlecht": 0,
-      "ernaehrung": 0,
-      "kontakte": [],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Kerstin",
-      "nachname": "Baumann",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
-        }
-      ],
-      "fahrerlaubnis": 10,
-      "geschlecht": 1,
-      "ernaehrung": 0,
-      "kontakte": [],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Melanie",
-      "nachname": "Jäger",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
-        }
-      ],
-      "fahrerlaubnis": 5,
-      "geschlecht": 1,
       "ernaehrung": 0,
       "kontakte": [],
       "zusatzqualifikationen": []
@@ -226,7 +221,7 @@
         "code": 4
       },
       "stanKonform": true,
-      "kennzeichen": "THW-80255",
+      "kennzeichen": "THW-80257",
       "funkrufname": {
         "kennwort": {
           "code": 1
@@ -243,16 +238,34 @@
         "code": 43
       },
       "stanKonform": true,
-      "kennzeichen": "THW-80256"
+      "kennzeichen": "THW-80258"
+    },
+    {
+      "typ": {
+        "freitext": "PKW OV"
+      },
+      "kennzeichen": "THW-80259",
+      "stanKonform": false,
+      "aenderungen": "OV-eigenes Fahrzeug, zusätzlich zur StAN",
+      "funkrufname": {
+        "kennwort": {
+          "code": 1
+        },
+        "eigenerStandort": true,
+        "teile": [
+          22,
+          21
+        ]
+      }
     }
   ],
   "sofortbedarf": {
     "verpflegungPersonen": 10,
-    "dieselLiter": 60,
+    "dieselLiter": 80,
     "benzinLiter": 0,
-    "gemischLiter": 10,
-    "unterbringung": false,
+    "gemischLiter": 5,
+    "unterbringung": true,
     "ruhezeitErforderlich": false
   },
-  "sonstiges": "1 Helfer über StAN-Soll (Reserve aktiviert)."
+  "sonstiges": "1 Helfer über StAN-Soll (Reserve aktiviert). PKW OV zusätzlich über StAN-Soll dabei."
 }

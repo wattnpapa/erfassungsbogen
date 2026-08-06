@@ -1,7 +1,7 @@
 {
-  "schemaVersion": 6,
+  "schemaVersion": 8,
   "uebung": true,
-  "stand": 2389,
+  "stand": 3440963,
   "einheit": {
     "organisation": 1,
     "einheitsTyp": {
@@ -37,14 +37,14 @@
   },
   "einsatz": {
     "zeitraumVon": 2389,
-    "zeitraumBis": 2390,
-    "ortAuftrag": "Flächenlage Langenhagen — Elektroversorgung Bereitstellungsraum"
+    "zeitraumBis": 2393,
+    "ortAuftrag": "Stromausfall Langenhagen — Netzersatzbetrieb Klinikum"
   },
   "personalErfassung": 0,
   "personal": [
     {
-      "vorname": "Markus",
-      "nachname": "Möller",
+      "vorname": "Peter",
+      "nachname": "Brunner",
       "staerkeRolle": 1,
       "funktionen": [
         {
@@ -58,40 +58,29 @@
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "5551861942"
-        },
-        {
-          "art": 2,
-          "dienstlich": true,
-          "emailTemplate": 1
+          "wert": "5551762681"
         }
       ],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Simon",
-      "nachname": "Lorenz",
+      "vorname": "Joachim",
+      "nachname": "Böhm",
       "staerkeRolle": 1,
       "funktionen": [
         {
           "code": 4
         }
       ],
-      "fahrerlaubnis": 9,
+      "fahrerlaubnis": 10,
       "geschlecht": 0,
       "ernaehrung": 0,
-      "kontakte": [
-        {
-          "art": 0,
-          "dienstlich": false,
-          "wert": "5556774856"
-        }
-      ],
+      "kontakte": [],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Birgit",
-      "nachname": "Franke",
+      "vorname": "Thorsten",
+      "nachname": "Winter",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -102,14 +91,14 @@
         }
       ],
       "fahrerlaubnis": 10,
-      "geschlecht": 1,
+      "geschlecht": 0,
       "ernaehrung": 0,
       "kontakte": [],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Simon",
-      "nachname": "Dietrich",
+      "vorname": "Lisa",
+      "nachname": "Schulte",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -117,55 +106,72 @@
         },
         {
           "code": 90
-        }
-      ],
-      "fahrerlaubnis": 10,
-      "geschlecht": 0,
-      "ernaehrung": 0,
-      "kontakte": [],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Antje",
-      "nachname": "Herrmann",
-      "staerkeRolle": 0,
-      "funktionen": [
+        },
         {
-          "code": 5
+          "code": 49
         }
       ],
-      "fahrerlaubnis": 10,
+      "fahrerlaubnis": 0,
       "geschlecht": 1,
       "ernaehrung": 0,
       "kontakte": [],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Lars",
-      "nachname": "Ziegler",
+      "vorname": "Paul",
+      "nachname": "Jung",
       "staerkeRolle": 0,
       "funktionen": [
         {
           "code": 5
         }
       ],
-      "fahrerlaubnis": 0,
+      "fahrerlaubnis": 5,
       "geschlecht": 0,
-      "ernaehrung": 1,
+      "ernaehrung": 0,
       "kontakte": [],
-      "zusatzqualifikationen": [
-        {
-          "freitext": "Funkamateur (extern)"
-        }
-      ]
+      "zusatzqualifikationen": []
     },
     {
-      "vorname": "Daniel",
-      "nachname": "Jäger",
+      "vorname": "Joachim",
+      "nachname": "Winter",
       "staerkeRolle": 0,
       "funktionen": [
         {
           "code": 5
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 2,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Melanie",
+      "nachname": "Wenzel",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Robert",
+      "nachname": "Herrmann",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        },
+        {
+          "code": 30
         }
       ],
       "fahrerlaubnis": 0,
@@ -175,30 +181,15 @@
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Tobias",
-      "nachname": "Vogt",
+      "vorname": "Simon",
+      "nachname": "Albrecht",
       "staerkeRolle": 0,
       "funktionen": [
         {
           "code": 5
         }
       ],
-      "fahrerlaubnis": 0,
-      "geschlecht": 0,
-      "ernaehrung": 0,
-      "kontakte": [],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Ralf",
-      "nachname": "Böhm",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
-        }
-      ],
-      "fahrerlaubnis": 0,
+      "fahrerlaubnis": 5,
       "geschlecht": 0,
       "ernaehrung": 0,
       "kontakte": [],
@@ -244,6 +235,6 @@
     "benzinLiter": 0,
     "gemischLiter": 0,
     "unterbringung": false,
-    "ruhezeitErforderlich": false
+    "ruhezeitErforderlich": true
   }
 }

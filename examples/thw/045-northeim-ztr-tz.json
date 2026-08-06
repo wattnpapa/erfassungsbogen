@@ -1,7 +1,7 @@
 {
-  "schemaVersion": 6,
+  "schemaVersion": 8,
   "uebung": true,
-  "stand": 2388,
+  "stand": 3440016,
   "einheit": {
     "organisation": 1,
     "einheitsTyp": {
@@ -37,68 +37,53 @@
   },
   "einsatz": {
     "zeitraumVon": 2388,
-    "zeitraumBis": 2390,
+    "zeitraumBis": 2391,
     "ortAuftrag": "Sturmtief »Quirin« Northeim — Führung Technischer Zug"
   },
   "personalErfassung": 0,
   "personal": [
     {
-      "vorname": "Vanessa",
-      "nachname": "Neumann",
+      "vorname": "Robert",
+      "nachname": "Krämer",
       "staerkeRolle": 2,
       "funktionen": [
         {
           "code": 1
-        },
-        {
-          "code": 30
         }
       ],
       "fahrerlaubnis": 10,
-      "geschlecht": 1,
+      "geschlecht": 0,
       "ernaehrung": 0,
       "kontakte": [
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "5556128462"
-        },
-        {
-          "art": 2,
-          "dienstlich": true,
-          "emailTemplate": 1
+          "wert": "5554786926"
         }
       ],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Erik",
-      "nachname": "Ernst",
+      "vorname": "Lena",
+      "nachname": "Wenzel",
       "staerkeRolle": 1,
       "funktionen": [
         {
           "code": 2
+        },
+        {
+          "code": 31
         }
       ],
       "fahrerlaubnis": 10,
-      "geschlecht": 0,
-      "ernaehrung": 2,
-      "kontakte": [
-        {
-          "art": 0,
-          "dienstlich": false,
-          "wert": "5552441291"
-        }
-      ],
-      "zusatzqualifikationen": [
-        {
-          "freitext": "Feuerwehr-Doppelmitglied (AGT)"
-        }
-      ]
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
     },
     {
-      "vorname": "Kai",
-      "nachname": "Maier",
+      "vorname": "Christian",
+      "nachname": "Günther",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -106,25 +91,28 @@
         },
         {
           "code": 30
+        },
+        {
+          "code": 34
         }
       ],
-      "fahrerlaubnis": 0,
+      "fahrerlaubnis": 5,
       "geschlecht": 0,
       "ernaehrung": 0,
       "kontakte": [],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Frank",
-      "nachname": "Brunner",
+      "vorname": "Svenja",
+      "nachname": "Hahn",
       "staerkeRolle": 0,
       "funktionen": [
         {
           "code": 5
         }
       ],
-      "fahrerlaubnis": 5,
-      "geschlecht": 0,
+      "fahrerlaubnis": 0,
+      "geschlecht": 1,
       "ernaehrung": 0,
       "kontakte": [],
       "zusatzqualifikationen": []
@@ -136,7 +124,7 @@
         "code": 2
       },
       "stanKonform": true,
-      "kennzeichen": "THW-80214",
+      "kennzeichen": "THW-80215",
       "funkrufname": {
         "kennwort": {
           "code": 1
@@ -155,6 +143,6 @@
     "benzinLiter": 0,
     "gemischLiter": 0,
     "unterbringung": true,
-    "ruhezeitErforderlich": true
+    "ruhezeitErforderlich": false
   }
 }

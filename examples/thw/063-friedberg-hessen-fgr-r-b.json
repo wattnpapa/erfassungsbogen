@@ -1,7 +1,7 @@
 {
-  "schemaVersion": 6,
+  "schemaVersion": 8,
   "uebung": true,
-  "stand": 2388,
+  "stand": 3442143,
   "einheit": {
     "organisation": 1,
     "einheitsTyp": {
@@ -36,60 +36,64 @@
     ]
   },
   "einsatz": {
-    "zeitraumVon": 2388,
+    "zeitraumVon": 2390,
     "zeitraumBis": 2392,
-    "ortAuftrag": "Unwetterschäden Friedberg — Räumen Verkehrswege"
+    "ortAuftrag": "Hochwasser Friedberg — Beseitigung Treibgut"
   },
   "personalErfassung": 0,
   "personal": [
     {
-      "vorname": "Niklas",
-      "nachname": "Sommer",
+      "vorname": "Karsten",
+      "nachname": "Weiß",
       "staerkeRolle": 1,
       "funktionen": [
         {
           "code": 3
+        },
+        {
+          "code": 41
         }
       ],
-      "fahrerlaubnis": 10,
+      "fahrerlaubnis": 9,
       "geschlecht": 0,
       "ernaehrung": 0,
       "kontakte": [
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "5550201081"
-        },
-        {
-          "art": 2,
-          "dienstlich": true,
-          "emailTemplate": 1
+          "wert": "5550464337"
         }
       ],
       "zusatzqualifikationen": [
         {
-          "freitext": "Gesundheits- und Krankenpfleger (Beruf)"
+          "freitext": "Zimmerer (Beruf)"
         }
       ]
     },
     {
-      "vorname": "Jannik",
-      "nachname": "Hoffmann",
+      "vorname": "Fabian",
+      "nachname": "Schulte",
       "staerkeRolle": 1,
       "funktionen": [
         {
           "code": 4
         }
       ],
-      "fahrerlaubnis": 10,
+      "fahrerlaubnis": 9,
       "geschlecht": 0,
       "ernaehrung": 2,
-      "kontakte": [],
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5557096611"
+        }
+      ],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Karsten",
-      "nachname": "Richter",
+      "vorname": "Erik",
+      "nachname": "Lehmann",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -99,86 +103,37 @@
           "code": 41
         }
       ],
-      "fahrerlaubnis": 5,
+      "fahrerlaubnis": 10,
       "geschlecht": 0,
       "ernaehrung": 0,
       "kontakte": [],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Henrik",
-      "nachname": "Fischer",
+      "vorname": "Vanessa",
+      "nachname": "Schwarz",
       "staerkeRolle": 0,
       "funktionen": [
         {
           "code": 5
         }
       ],
-      "fahrerlaubnis": 0,
-      "geschlecht": 0,
+      "fahrerlaubnis": 9,
+      "geschlecht": 1,
       "ernaehrung": 0,
       "kontakte": [],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Silke",
-      "nachname": "Richter",
+      "vorname": "Ralf",
+      "nachname": "Bauer",
       "staerkeRolle": 0,
       "funktionen": [
         {
           "code": 5
         },
         {
-          "code": 31
-        }
-      ],
-      "fahrerlaubnis": 5,
-      "geschlecht": 1,
-      "ernaehrung": 1,
-      "kontakte": [],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Philipp",
-      "nachname": "Jäger",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
-        }
-      ],
-      "fahrerlaubnis": 0,
-      "geschlecht": 0,
-      "ernaehrung": 0,
-      "kontakte": [],
-      "zusatzqualifikationen": [
-        {
-          "freitext": "Feuerwehr-Doppelmitglied (AGT)"
-        }
-      ]
-    },
-    {
-      "vorname": "Niklas",
-      "nachname": "Busch",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
-        }
-      ],
-      "fahrerlaubnis": 5,
-      "geschlecht": 0,
-      "ernaehrung": 0,
-      "kontakte": [],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "David",
-      "nachname": "Werner",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
+          "code": 39
         }
       ],
       "fahrerlaubnis": 10,
@@ -188,8 +143,8 @@
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Markus",
-      "nachname": "Sauer",
+      "vorname": "Alexander",
+      "nachname": "Vogt",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -198,6 +153,51 @@
       ],
       "fahrerlaubnis": 0,
       "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Uwe",
+      "nachname": "Lang",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Georg",
+      "nachname": "Bauer",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
+      "ernaehrung": 2,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Maren",
+      "nachname": "Marx",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 1,
       "ernaehrung": 0,
       "kontakte": [],
       "zusatzqualifikationen": []
@@ -209,7 +209,7 @@
         "code": 7
       },
       "stanKonform": true,
-      "kennzeichen": "THW-80264",
+      "kennzeichen": "THW-80268",
       "funkrufname": {
         "kennwort": {
           "code": 1
@@ -243,14 +243,14 @@
         "code": 45
       },
       "stanKonform": true,
-      "kennzeichen": "THW-80265"
+      "kennzeichen": "THW-80269"
     },
     {
       "typ": {
         "code": 46
       },
       "stanKonform": true,
-      "kennzeichen": "THW-80266"
+      "kennzeichen": "THW-80270"
     }
   ],
   "sofortbedarf": {
@@ -258,7 +258,7 @@
     "dieselLiter": 160,
     "benzinLiter": 0,
     "gemischLiter": 10,
-    "unterbringung": false,
-    "ruhezeitErforderlich": true
+    "unterbringung": true,
+    "ruhezeitErforderlich": false
   }
 }

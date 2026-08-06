@@ -1,7 +1,7 @@
 {
-  "schemaVersion": 6,
+  "schemaVersion": 8,
   "uebung": true,
-  "stand": 2388,
+  "stand": 3439106,
   "einheit": {
     "organisation": 1,
     "einheitsTyp": {
@@ -37,50 +37,33 @@
   },
   "einsatz": {
     "zeitraumVon": 2388,
-    "zeitraumBis": 2392,
+    "zeitraumBis": 2390,
     "ortAuftrag": "Unwetterlage Peine — Einsatzstellensicherung"
   },
   "personalErfassung": 0,
   "personal": [
     {
-      "vorname": "Antje",
-      "nachname": "Klein",
+      "vorname": "Dennis",
+      "nachname": "Brunner",
       "staerkeRolle": 1,
       "funktionen": [
         {
           "code": 4
+        },
+        {
+          "code": 30
         }
       ],
-      "fahrerlaubnis": 9,
-      "geschlecht": 1,
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
       "ernaehrung": 0,
       "kontakte": [
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "5552398894"
-        },
-        {
-          "art": 2,
-          "dienstlich": true,
-          "emailTemplate": 1
+          "wert": "5559679352"
         }
       ],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Fabian",
-      "nachname": "Ziegler",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
-        }
-      ],
-      "fahrerlaubnis": 5,
-      "geschlecht": 0,
-      "ernaehrung": 0,
-      "kontakte": [],
       "zusatzqualifikationen": [
         {
           "freitext": "Elektrofachkraft (Beruf)"
@@ -88,56 +71,34 @@
       ]
     },
     {
-      "vorname": "Heiko",
-      "nachname": "Groß",
+      "vorname": "Sven",
+      "nachname": "Kaiser",
       "staerkeRolle": 0,
       "funktionen": [
         {
           "code": 5
         }
       ],
-      "fahrerlaubnis": 5,
+      "fahrerlaubnis": 10,
       "geschlecht": 0,
       "ernaehrung": 0,
       "kontakte": [],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Anja",
-      "nachname": "Berger",
+      "vorname": "Ralf",
+      "nachname": "Kuhn",
       "staerkeRolle": 0,
       "funktionen": [
         {
           "code": 5
         }
       ],
-      "fahrerlaubnis": 0,
-      "geschlecht": 1,
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
       "ernaehrung": 0,
       "kontakte": [],
       "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Sarah",
-      "nachname": "Voigt",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
-        },
-        {
-          "code": 30
-        }
-      ],
-      "fahrerlaubnis": 5,
-      "geschlecht": 1,
-      "ernaehrung": 1,
-      "kontakte": [],
-      "zusatzqualifikationen": [
-        {
-          "freitext": "Gesundheits- und Krankenpfleger (Beruf)"
-        }
-      ]
     }
   ],
   "fahrzeuge": [
@@ -146,7 +107,7 @@
         "code": 23
       },
       "stanKonform": true,
-      "kennzeichen": "THW-80215",
+      "kennzeichen": "THW-80216",
       "funkrufname": {
         "kennwort": {
           "code": 1
@@ -160,9 +121,9 @@
     },
     {
       "typ": {
-        "freitext": "MTW OV"
+        "freitext": "MzKW"
       },
-      "kennzeichen": "THW-80216",
+      "kennzeichen": "THW-80217",
       "stanKonform": false,
       "aenderungen": "OV-eigenes Fahrzeug, zusätzlich zur StAN",
       "funkrufname": {
@@ -172,18 +133,18 @@
         "eigenerStandort": true,
         "teile": [
           75,
-          26
+          54
         ]
       }
     }
   ],
   "sofortbedarf": {
-    "verpflegungPersonen": 5,
-    "dieselLiter": 60,
+    "verpflegungPersonen": 3,
+    "dieselLiter": 80,
     "benzinLiter": 0,
     "gemischLiter": 0,
-    "unterbringung": true,
+    "unterbringung": false,
     "ruhezeitErforderlich": false
   },
-  "sonstiges": "1 Helfer über StAN-Soll (Reserve aktiviert). MTW OV zusätzlich über StAN-Soll dabei."
+  "sonstiges": "1 Sollplätze unbesetzt. MzKW zusätzlich über StAN-Soll dabei."
 }

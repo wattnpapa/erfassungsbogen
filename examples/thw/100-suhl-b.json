@@ -1,7 +1,7 @@
 {
-  "schemaVersion": 6,
+  "schemaVersion": 8,
   "uebung": true,
-  "stand": 2389,
+  "stand": 3441306,
   "einheit": {
     "organisation": 1,
     "einheitsTyp": {
@@ -38,39 +38,38 @@
   "einsatz": {
     "zeitraumVon": 2389,
     "zeitraumBis": 2391,
-    "ortAuftrag": "Sturmtief »Quirin« Suhl — Beräumung, Sicherung"
+    "ortAuftrag": "Hochwasser Suhl — Sandsackverbau, Deichsicherung"
   },
   "personalErfassung": 0,
   "personal": [
     {
-      "vorname": "Katharina",
-      "nachname": "Schneider",
+      "vorname": "Michael",
+      "nachname": "Jäger",
       "staerkeRolle": 1,
       "funktionen": [
         {
           "code": 3
         }
       ],
-      "fahrerlaubnis": 10,
-      "geschlecht": 1,
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
       "ernaehrung": 0,
       "kontakte": [
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "5557449448"
-        },
-        {
-          "art": 2,
-          "dienstlich": true,
-          "emailTemplate": 1
+          "wert": "5556516033"
         }
       ],
-      "zusatzqualifikationen": []
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungssanitäter (extern)"
+        }
+      ]
     },
     {
-      "vorname": "Erik",
-      "nachname": "Winkler",
+      "vorname": "Christian",
+      "nachname": "Fischer",
       "staerkeRolle": 1,
       "funktionen": [
         {
@@ -79,23 +78,19 @@
       ],
       "fahrerlaubnis": 9,
       "geschlecht": 0,
-      "ernaehrung": 2,
+      "ernaehrung": 0,
       "kontakte": [
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "5559689515"
+          "wert": "5553845334"
         }
       ],
-      "zusatzqualifikationen": [
-        {
-          "freitext": "Elektrofachkraft (Beruf)"
-        }
-      ]
+      "zusatzqualifikationen": []
     },
     {
-      "vorname": "Georg",
-      "nachname": "Schulte",
+      "vorname": "Christian",
+      "nachname": "Hahn",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -105,19 +100,19 @@
           "code": 38
         }
       ],
-      "fahrerlaubnis": 5,
+      "fahrerlaubnis": 0,
       "geschlecht": 0,
       "ernaehrung": 0,
       "kontakte": [],
       "zusatzqualifikationen": [
         {
-          "freitext": "Gesundheits- und Krankenpfleger (Beruf)"
+          "freitext": "Tischler (Beruf)"
         }
       ]
     },
     {
-      "vorname": "Moritz",
-      "nachname": "Hahn",
+      "vorname": "Jan",
+      "nachname": "Engel",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -125,9 +120,6 @@
         },
         {
           "code": 32
-        },
-        {
-          "code": 59
         }
       ],
       "fahrerlaubnis": 5,
@@ -137,23 +129,38 @@
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Sandra",
-      "nachname": "Hartmann",
+      "vorname": "Fabian",
+      "nachname": "Schmidt",
       "staerkeRolle": 0,
       "funktionen": [
         {
           "code": 5
         }
       ],
-      "fahrerlaubnis": 9,
-      "geschlecht": 1,
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
       "ernaehrung": 0,
       "kontakte": [],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Henrik",
-      "nachname": "Schäfer",
+      "vorname": "Julian",
+      "nachname": "Winter",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Alexander",
+      "nachname": "Scherer",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -167,45 +174,30 @@
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Jonas",
-      "nachname": "Schulte",
+      "vorname": "Jannik",
+      "nachname": "Schulz",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Thorsten",
+      "nachname": "Werner",
       "staerkeRolle": 0,
       "funktionen": [
         {
           "code": 5
         },
         {
-          "code": 30
-        }
-      ],
-      "fahrerlaubnis": 0,
-      "geschlecht": 0,
-      "ernaehrung": 0,
-      "kontakte": [],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Erik",
-      "nachname": "Richter",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
-        }
-      ],
-      "fahrerlaubnis": 0,
-      "geschlecht": 0,
-      "ernaehrung": 0,
-      "kontakte": [],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Marcel",
-      "nachname": "Wagner",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
+          "code": 32
         }
       ],
       "fahrerlaubnis": 0,
@@ -221,7 +213,7 @@
         "code": 4
       },
       "stanKonform": true,
-      "kennzeichen": "THW-80358",
+      "kennzeichen": "THW-80371",
       "funkrufname": {
         "kennwort": {
           "code": 1
@@ -238,7 +230,7 @@
         "code": 43
       },
       "stanKonform": true,
-      "kennzeichen": "THW-80359"
+      "kennzeichen": "THW-80372"
     }
   ],
   "sofortbedarf": {
@@ -246,7 +238,7 @@
     "dieselLiter": 60,
     "benzinLiter": 0,
     "gemischLiter": 5,
-    "unterbringung": true,
+    "unterbringung": false,
     "ruhezeitErforderlich": false
   }
 }

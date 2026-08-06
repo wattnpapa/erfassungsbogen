@@ -1,7 +1,7 @@
 {
-  "schemaVersion": 6,
+  "schemaVersion": 8,
   "uebung": true,
-  "stand": 2390,
+  "stand": 3442280,
   "einheit": {
     "organisation": 1,
     "einheitsTyp": {
@@ -37,18 +37,21 @@
   },
   "einsatz": {
     "zeitraumVon": 2390,
-    "zeitraumBis": 2393,
-    "ortAuftrag": "Hochwasser Melsungen — Notinstandsetzung Infrastruktur"
+    "zeitraumBis": 2391,
+    "ortAuftrag": "Stromausfall Melsungen — Anschluss Notstromnetz"
   },
   "personalErfassung": 0,
   "personal": [
     {
-      "vorname": "Frank",
-      "nachname": "Berger",
+      "vorname": "Philipp",
+      "nachname": "Köhler",
       "staerkeRolle": 1,
       "funktionen": [
         {
           "code": 3
+        },
+        {
+          "code": 31
         }
       ],
       "fahrerlaubnis": 10,
@@ -58,58 +61,47 @@
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "5552614633"
-        },
-        {
-          "art": 2,
-          "dienstlich": true,
-          "emailTemplate": 1
+          "wert": "5556146841"
         }
       ],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Matthias",
-      "nachname": "Bergmann",
+      "vorname": "Lars",
+      "nachname": "Bauer",
       "staerkeRolle": 1,
       "funktionen": [
         {
           "code": 4
         },
         {
-          "code": 30
-        }
-      ],
-      "fahrerlaubnis": 10,
-      "geschlecht": 0,
-      "ernaehrung": 2,
-      "kontakte": [
-        {
-          "art": 0,
-          "dienstlich": false,
-          "wert": "5554668220"
-        }
-      ],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Carina",
-      "nachname": "Lutz",
-      "staerkeRolle": 1,
-      "funktionen": [
-        {
-          "code": 4
+          "code": 90
         }
       ],
       "fahrerlaubnis": 9,
-      "geschlecht": 1,
+      "geschlecht": 0,
       "ernaehrung": 0,
       "kontakte": [],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Lisa",
-      "nachname": "Keller",
+      "vorname": "Thorsten",
+      "nachname": "Lenz",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "code": 4
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Claudia",
+      "nachname": "Seidel",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -121,17 +113,13 @@
       ],
       "fahrerlaubnis": 10,
       "geschlecht": 1,
-      "ernaehrung": 0,
+      "ernaehrung": 2,
       "kontakte": [],
-      "zusatzqualifikationen": [
-        {
-          "freitext": "Berufskraftfahrer (Beruf)"
-        }
-      ]
+      "zusatzqualifikationen": []
     },
     {
-      "vorname": "Felix",
-      "nachname": "Ebert",
+      "vorname": "Sven",
+      "nachname": "Reuter",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -145,15 +133,41 @@
       "geschlecht": 0,
       "ernaehrung": 0,
       "kontakte": [],
-      "zusatzqualifikationen": [
-        {
-          "freitext": "Feuerwehr-Doppelmitglied (AGT)"
-        }
-      ]
+      "zusatzqualifikationen": []
     },
     {
-      "vorname": "Marco",
-      "nachname": "Seidel",
+      "vorname": "Hannes",
+      "nachname": "König",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 2,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Alexander",
+      "nachname": "Schulte",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Ole",
+      "nachname": "Pfeiffer",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -166,58 +180,28 @@
       "kontakte": [],
       "zusatzqualifikationen": [
         {
-          "freitext": "Funkamateur (extern)"
+          "freitext": "Berufskraftfahrer (Beruf)"
         }
       ]
     },
     {
-      "vorname": "Andreas",
-      "nachname": "Schröder",
+      "vorname": "Bernd",
+      "nachname": "Heinrich",
       "staerkeRolle": 0,
       "funktionen": [
         {
           "code": 5
         }
       ],
-      "fahrerlaubnis": 0,
+      "fahrerlaubnis": 9,
       "geschlecht": 0,
-      "ernaehrung": 0,
+      "ernaehrung": 2,
       "kontakte": [],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Philipp",
-      "nachname": "Walter",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
-        }
-      ],
-      "fahrerlaubnis": 5,
-      "geschlecht": 0,
-      "ernaehrung": 1,
-      "kontakte": [],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Ralf",
-      "nachname": "Neumann",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
-        }
-      ],
-      "fahrerlaubnis": 0,
-      "geschlecht": 0,
-      "ernaehrung": 0,
-      "kontakte": [],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Florian",
-      "nachname": "Lorenz",
+      "vorname": "Daniel",
+      "nachname": "Herrmann",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -227,21 +211,6 @@
           "code": 90
         }
       ],
-      "fahrerlaubnis": 0,
-      "geschlecht": 0,
-      "ernaehrung": 0,
-      "kontakte": [],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Heiko",
-      "nachname": "Winter",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
-        }
-      ],
       "fahrerlaubnis": 9,
       "geschlecht": 0,
       "ernaehrung": 0,
@@ -249,16 +218,38 @@
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Markus",
-      "nachname": "Dietrich",
+      "vorname": "Philipp",
+      "nachname": "Scherer",
       "staerkeRolle": 0,
       "funktionen": [
         {
           "code": 5
         }
       ],
-      "fahrerlaubnis": 0,
+      "fahrerlaubnis": 10,
       "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Elektrofachkraft (Beruf)"
+        }
+      ]
+    },
+    {
+      "vorname": "Lena",
+      "nachname": "Dietrich",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        },
+        {
+          "code": 30
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 1,
       "ernaehrung": 0,
       "kontakte": [],
       "zusatzqualifikationen": []
@@ -270,7 +261,7 @@
         "code": 6
       },
       "stanKonform": true,
-      "kennzeichen": "THW-80277",
+      "kennzeichen": "THW-80283",
       "funkrufname": {
         "kennwort": {
           "code": 1
@@ -287,7 +278,7 @@
         "code": 5
       },
       "stanKonform": true,
-      "kennzeichen": "THW-80278",
+      "kennzeichen": "THW-80284",
       "funkrufname": {
         "kennwort": {
           "code": 1
@@ -304,7 +295,7 @@
         "freitext": "Anh FGr I"
       },
       "stanKonform": true,
-      "kennzeichen": "THW-80279"
+      "kennzeichen": "THW-80285"
     }
   ],
   "sofortbedarf": {
@@ -312,7 +303,7 @@
     "dieselLiter": 80,
     "benzinLiter": 0,
     "gemischLiter": 0,
-    "unterbringung": true,
-    "ruhezeitErforderlich": false
+    "unterbringung": false,
+    "ruhezeitErforderlich": true
   }
 }

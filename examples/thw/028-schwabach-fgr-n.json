@@ -1,7 +1,7 @@
 {
-  "schemaVersion": 6,
+  "schemaVersion": 8,
   "uebung": true,
-  "stand": 2390,
+  "stand": 3442218,
   "einheit": {
     "organisation": 1,
     "einheitsTyp": {
@@ -37,62 +37,59 @@
   },
   "einsatz": {
     "zeitraumVon": 2390,
-    "zeitraumBis": 2392,
-    "ortAuftrag": "Unwetter Schwabach — Notversorgung kritische Infrastruktur"
+    "zeitraumBis": 2391,
+    "ortAuftrag": "Trinkwassernotstand Schwabach — Notinstandsetzung"
   },
   "personalErfassung": 0,
   "personal": [
     {
-      "vorname": "Frank",
-      "nachname": "Schäfer",
+      "vorname": "Martin",
+      "nachname": "Arnold",
       "staerkeRolle": 1,
       "funktionen": [
         {
           "code": 3
+        },
+        {
+          "code": 30
         }
       ],
-      "fahrerlaubnis": 9,
+      "fahrerlaubnis": 5,
       "geschlecht": 0,
       "ernaehrung": 0,
       "kontakte": [
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "5558456346"
-        },
-        {
-          "art": 2,
-          "dienstlich": true,
-          "emailTemplate": 1
+          "wert": "5554263885"
         }
       ],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Jannik",
-      "nachname": "Vogel",
+      "vorname": "Robert",
+      "nachname": "Klein",
       "staerkeRolle": 1,
       "funktionen": [
         {
           "code": 4
-        },
-        {
-          "code": 51
         }
       ],
-      "fahrerlaubnis": 10,
+      "fahrerlaubnis": 9,
       "geschlecht": 0,
       "ernaehrung": 1,
-      "kontakte": [],
-      "zusatzqualifikationen": [
+      "kontakte": [
         {
-          "freitext": "Rettungssanitäter (extern)"
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5557235469"
         }
-      ]
+      ],
+      "zusatzqualifikationen": []
     },
     {
-      "vorname": "Heiko",
-      "nachname": "Winkler",
+      "vorname": "Philipp",
+      "nachname": "Kern",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -102,54 +99,6 @@
           "code": 49
         }
       ],
-      "fahrerlaubnis": 0,
-      "geschlecht": 0,
-      "ernaehrung": 0,
-      "kontakte": [],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Thomas",
-      "nachname": "Müller",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
-        },
-        {
-          "code": 51
-        }
-      ],
-      "fahrerlaubnis": 0,
-      "geschlecht": 0,
-      "ernaehrung": 1,
-      "kontakte": [],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Erik",
-      "nachname": "Seidel",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
-        }
-      ],
-      "fahrerlaubnis": 0,
-      "geschlecht": 0,
-      "ernaehrung": 0,
-      "kontakte": [],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Matthias",
-      "nachname": "Schulz",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
-        }
-      ],
       "fahrerlaubnis": 5,
       "geschlecht": 0,
       "ernaehrung": 0,
@@ -157,8 +106,8 @@
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Marcel",
-      "nachname": "Schmitt",
+      "vorname": "Patrick",
+      "nachname": "Menzel",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -166,6 +115,9 @@
         },
         {
           "code": 51
+        },
+        {
+          "code": 90
         }
       ],
       "fahrerlaubnis": 0,
@@ -175,7 +127,70 @@
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Alexander",
+      "vorname": "Kai",
+      "nachname": "Franke",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "David",
+      "nachname": "Pohl",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        },
+        {
+          "code": 31
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Stefan",
+      "nachname": "Wenzel",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Frank",
+      "nachname": "Ludwig",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Frank",
       "nachname": "Groß",
       "staerkeRolle": 0,
       "funktionen": [
@@ -183,36 +198,31 @@
           "code": 5
         }
       ],
-      "fahrerlaubnis": 5,
+      "fahrerlaubnis": 0,
       "geschlecht": 0,
-      "ernaehrung": 1,
-      "kontakte": [],
-      "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Vanessa",
-      "nachname": "Sommer",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
-        },
-        {
-          "code": 30
-        }
-      ],
-      "fahrerlaubnis": 5,
-      "geschlecht": 1,
       "ernaehrung": 0,
       "kontakte": [],
-      "zusatzqualifikationen": [
-        {
-          "freitext": "Funkamateur (extern)"
-        }
-      ]
+      "zusatzqualifikationen": []
     }
   ],
   "fahrzeuge": [
+    {
+      "typ": {
+        "code": 26
+      },
+      "stanKonform": true,
+      "kennzeichen": "THW-80169",
+      "funkrufname": {
+        "kennwort": {
+          "code": 1
+        },
+        "eigenerStandort": true,
+        "teile": [
+          24,
+          55
+        ]
+      }
+    },
     {
       "typ": {
         "code": 21
@@ -225,14 +235,14 @@
         "code": 44
       },
       "stanKonform": true,
-      "kennzeichen": "THW-80167"
+      "kennzeichen": "THW-80170"
     },
     {
       "typ": {
         "code": 47
       },
       "stanKonform": true,
-      "kennzeichen": "THW-80168"
+      "kennzeichen": "THW-80171"
     }
   ],
   "sofortbedarf": {
@@ -240,7 +250,7 @@
     "dieselLiter": 120,
     "benzinLiter": 0,
     "gemischLiter": 0,
-    "unterbringung": true,
-    "ruhezeitErforderlich": true
+    "unterbringung": false,
+    "ruhezeitErforderlich": false
   }
 }

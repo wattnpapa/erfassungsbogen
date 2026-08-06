@@ -1,7 +1,7 @@
 {
-  "schemaVersion": 6,
+  "schemaVersion": 8,
   "uebung": true,
-  "stand": 2390,
+  "stand": 3439701,
   "einheit": {
     "organisation": 1,
     "einheitsTyp": {
@@ -36,40 +36,35 @@
     ]
   },
   "einsatz": {
-    "zeitraumVon": 2390,
+    "zeitraumVon": 2388,
     "zeitraumBis": 2391,
-    "ortAuftrag": "Hochwasserlage Pasewalk — Führung Technischer Zug"
+    "ortAuftrag": "Sturmtief »Quirin« Pasewalk — Führung Technischer Zug"
   },
   "personalErfassung": 0,
   "personal": [
     {
-      "vorname": "Julia",
-      "nachname": "Graf",
+      "vorname": "Marie",
+      "nachname": "Groß",
       "staerkeRolle": 2,
       "funktionen": [
         {
           "code": 1
         }
       ],
-      "fahrerlaubnis": 10,
+      "fahrerlaubnis": 9,
       "geschlecht": 1,
       "ernaehrung": 1,
       "kontakte": [
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "5554135834"
-        },
-        {
-          "art": 2,
-          "dienstlich": true,
-          "emailTemplate": 1
+          "wert": "5555503809"
         }
       ],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Dennis",
+      "vorname": "Kevin",
       "nachname": "Menzel",
       "staerkeRolle": 1,
       "funktionen": [
@@ -80,16 +75,18 @@
       "fahrerlaubnis": 9,
       "geschlecht": 0,
       "ernaehrung": 0,
-      "kontakte": [],
-      "zusatzqualifikationen": [
+      "kontakte": [
         {
-          "freitext": "Tischler (Beruf)"
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5551573393"
         }
-      ]
+      ],
+      "zusatzqualifikationen": []
     },
     {
-      "vorname": "Verena",
-      "nachname": "Keller",
+      "vorname": "Ines",
+      "nachname": "Böhm",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -99,22 +96,58 @@
           "code": 30
         }
       ],
-      "fahrerlaubnis": 0,
+      "fahrerlaubnis": 10,
       "geschlecht": 1,
-      "ernaehrung": 1,
+      "ernaehrung": 0,
       "kontakte": [],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Ole",
-      "nachname": "Menzel",
+      "vorname": "Lars",
+      "nachname": "Kaiser",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        },
+        {
+          "code": 34
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Paul",
+      "nachname": "Köhler",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        },
+        {
+          "code": 34
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Matthias",
+      "nachname": "Bergmann",
       "staerkeRolle": 0,
       "funktionen": [
         {
           "code": 5
         }
       ],
-      "fahrerlaubnis": 5,
+      "fahrerlaubnis": 9,
       "geschlecht": 0,
       "ernaehrung": 0,
       "kontakte": [],
@@ -127,7 +160,7 @@
         "code": 2
       },
       "stanKonform": true,
-      "kennzeichen": "THW-80248",
+      "kennzeichen": "THW-80249",
       "funkrufname": {
         "kennwort": {
           "code": 1
@@ -138,23 +171,15 @@
           10
         ]
       }
-    },
-    {
-      "typ": {
-        "freitext": "Anh OV (Plane)"
-      },
-      "kennzeichen": "THW-80249",
-      "stanKonform": false,
-      "aenderungen": "OV-eigenes Fahrzeug, zusätzlich zur StAN"
     }
   ],
   "sofortbedarf": {
-    "verpflegungPersonen": 4,
+    "verpflegungPersonen": 6,
     "dieselLiter": 30,
     "benzinLiter": 0,
     "gemischLiter": 0,
     "unterbringung": false,
-    "ruhezeitErforderlich": true
+    "ruhezeitErforderlich": false
   },
-  "sonstiges": "Anh OV (Plane) zusätzlich über StAN-Soll dabei."
+  "sonstiges": "2 Helfer über StAN-Soll (Reserve aktiviert)."
 }

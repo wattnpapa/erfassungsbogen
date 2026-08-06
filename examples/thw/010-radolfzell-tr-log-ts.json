@@ -1,7 +1,7 @@
 {
-  "schemaVersion": 6,
+  "schemaVersion": 8,
   "uebung": true,
-  "stand": 2390,
+  "stand": 3442163,
   "einheit": {
     "organisation": 1,
     "einheitsTyp": {
@@ -37,7 +37,7 @@
   },
   "einsatz": {
     "zeitraumVon": 2390,
-    "zeitraumBis": 2391,
+    "zeitraumBis": 2392,
     "ortAuftrag": "Schwertransport Pumpentechnik nach Radolfzell"
   },
   "personalErfassung": 0,
@@ -62,11 +62,6 @@
           "art": 0,
           "dienstlich": false,
           "wert": "5552621303"
-        },
-        {
-          "art": 2,
-          "dienstlich": true,
-          "emailTemplate": 1
         }
       ],
       "zusatzqualifikationen": []
@@ -129,8 +124,8 @@
     "dieselLiter": 120,
     "benzinLiter": 0,
     "gemischLiter": 0,
-    "unterbringung": false,
-    "ruhezeitErforderlich": false
+    "unterbringung": true,
+    "ruhezeitErforderlich": true
   },
   "sonstiges": "1 Sollplätze unbesetzt. Auflieger in Instandsetzung — nicht mit ausgerückt."
 }

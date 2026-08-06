@@ -1,7 +1,7 @@
 {
-  "schemaVersion": 6,
+  "schemaVersion": 8,
   "uebung": true,
-  "stand": 2388,
+  "stand": 3439122,
   "einheit": {
     "organisation": 1,
     "einheitsTyp": {
@@ -37,64 +37,56 @@
   },
   "einsatz": {
     "zeitraumVon": 2388,
-    "zeitraumBis": 2389,
+    "zeitraumBis": 2391,
     "ortAuftrag": "Bereitstellungsraum Laufenburg — Führung Fachzug Logistik"
   },
   "personalErfassung": 0,
   "personal": [
     {
-      "vorname": "Simon",
-      "nachname": "Werner",
+      "vorname": "Tobias",
+      "nachname": "Schulz",
       "staerkeRolle": 2,
       "funktionen": [
         {
           "code": 1
         }
       ],
-      "fahrerlaubnis": 9,
+      "fahrerlaubnis": 10,
       "geschlecht": 0,
-      "ernaehrung": 2,
+      "ernaehrung": 0,
       "kontakte": [
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "5552560231"
-        },
-        {
-          "art": 2,
-          "dienstlich": true,
-          "emailTemplate": 1
+          "wert": "5554179039"
         }
       ],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Peter",
-      "nachname": "Herrmann",
+      "vorname": "Thorsten",
+      "nachname": "König",
       "staerkeRolle": 1,
       "funktionen": [
         {
           "code": 2
-        },
-        {
-          "code": 67
         }
       ],
-      "fahrerlaubnis": 5,
+      "fahrerlaubnis": 9,
       "geschlecht": 0,
-      "ernaehrung": 1,
+      "ernaehrung": 0,
       "kontakte": [
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "5556452031"
+          "wert": "5557940840"
         }
       ],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Fabian",
-      "nachname": "Kern",
+      "vorname": "Kerstin",
+      "nachname": "Hartmann",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -105,21 +97,21 @@
         }
       ],
       "fahrerlaubnis": 0,
-      "geschlecht": 0,
+      "geschlecht": 1,
       "ernaehrung": 0,
       "kontakte": [],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "David",
-      "nachname": "Marx",
+      "vorname": "Jonas",
+      "nachname": "Sommer",
       "staerkeRolle": 0,
       "funktionen": [
         {
           "code": 5
         }
       ],
-      "fahrerlaubnis": 10,
+      "fahrerlaubnis": 5,
       "geschlecht": 0,
       "ernaehrung": 0,
       "kontakte": [],
@@ -150,7 +142,7 @@
     "dieselLiter": 30,
     "benzinLiter": 0,
     "gemischLiter": 0,
-    "unterbringung": false,
-    "ruhezeitErforderlich": true
+    "unterbringung": true,
+    "ruhezeitErforderlich": false
   }
 }

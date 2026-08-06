@@ -1,7 +1,7 @@
 {
-  "schemaVersion": 6,
+  "schemaVersion": 8,
   "uebung": true,
-  "stand": 2390,
+  "stand": 3441027,
   "einheit": {
     "organisation": 1,
     "einheitsTyp": {
@@ -36,15 +36,15 @@
     ]
   },
   "einsatz": {
-    "zeitraumVon": 2390,
-    "zeitraumBis": 2391,
+    "zeitraumVon": 2389,
+    "zeitraumBis": 2390,
     "ortAuftrag": "Unwetter Büren — Notversorgung kritische Infrastruktur"
   },
   "personalErfassung": 0,
   "personal": [
     {
-      "vorname": "Niklas",
-      "nachname": "Zimmermann",
+      "vorname": "Georg",
+      "nachname": "Koch",
       "staerkeRolle": 1,
       "funktionen": [
         {
@@ -53,24 +53,19 @@
       ],
       "fahrerlaubnis": 10,
       "geschlecht": 0,
-      "ernaehrung": 0,
+      "ernaehrung": 2,
       "kontakte": [
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "5553608287"
-        },
-        {
-          "art": 2,
-          "dienstlich": true,
-          "emailTemplate": 1
+          "wert": "5553460542"
         }
       ],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Niklas",
-      "nachname": "Lehmann",
+      "vorname": "Erik",
+      "nachname": "Horn",
       "staerkeRolle": 1,
       "funktionen": [
         {
@@ -80,18 +75,12 @@
       "fahrerlaubnis": 10,
       "geschlecht": 0,
       "ernaehrung": 0,
-      "kontakte": [
-        {
-          "art": 0,
-          "dienstlich": false,
-          "wert": "5555251905"
-        }
-      ],
+      "kontakte": [],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Jana",
-      "nachname": "Friedrich",
+      "vorname": "Lea",
+      "nachname": "Roth",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -108,8 +97,8 @@
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Julia",
-      "nachname": "Seidel",
+      "vorname": "Fabian",
+      "nachname": "Menzel",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -117,20 +106,17 @@
         },
         {
           "code": 51
-        },
-        {
-          "code": 49
         }
       ],
-      "fahrerlaubnis": 0,
-      "geschlecht": 1,
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
       "ernaehrung": 0,
       "kontakte": [],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Melanie",
-      "nachname": "Kaiser",
+      "vorname": "Torben",
+      "nachname": "Hoffmann",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -138,14 +124,33 @@
         }
       ],
       "fahrerlaubnis": 5,
-      "geschlecht": 1,
-      "ernaehrung": 2,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Landwirt — Erfahrung Großgeräte"
+        }
+      ]
+    },
+    {
+      "vorname": "Thorsten",
+      "nachname": "Haas",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "code": 5
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
       "kontakte": [],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Lukas",
-      "nachname": "Vogt",
+      "vorname": "Patrick",
+      "nachname": "Fuchs",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -157,24 +162,26 @@
       "ernaehrung": 0,
       "kontakte": [],
       "zusatzqualifikationen": []
-    },
-    {
-      "vorname": "Katrin",
-      "nachname": "Wenzel",
-      "staerkeRolle": 0,
-      "funktionen": [
-        {
-          "code": 5
-        }
-      ],
-      "fahrerlaubnis": 5,
-      "geschlecht": 1,
-      "ernaehrung": 0,
-      "kontakte": [],
-      "zusatzqualifikationen": []
     }
   ],
   "fahrzeuge": [
+    {
+      "typ": {
+        "code": 26
+      },
+      "stanKonform": true,
+      "kennzeichen": "THW-80311",
+      "funkrufname": {
+        "kennwort": {
+          "code": 1
+        },
+        "eigenerStandort": true,
+        "teile": [
+          24,
+          55
+        ]
+      }
+    },
     {
       "typ": {
         "code": 21
@@ -184,19 +191,19 @@
     },
     {
       "typ": {
-        "code": 47
+        "code": 44
       },
       "stanKonform": true,
-      "kennzeichen": "THW-80303"
+      "kennzeichen": "THW-80312"
     }
   ],
   "sofortbedarf": {
     "verpflegungPersonen": 7,
-    "dieselLiter": 120,
+    "dieselLiter": 20,
     "benzinLiter": 0,
     "gemischLiter": 0,
     "unterbringung": false,
-    "ruhezeitErforderlich": true
+    "ruhezeitErforderlich": false
   },
-  "sonstiges": "2 Sollplätze unbesetzt. Anh Plattform in Instandsetzung — nicht mit ausgerückt."
+  "sonstiges": "2 Sollplätze unbesetzt. Anh NEA mittel in Instandsetzung — nicht mit ausgerückt."
 }

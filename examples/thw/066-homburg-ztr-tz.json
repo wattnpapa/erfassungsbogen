@@ -1,7 +1,7 @@
 {
-  "schemaVersion": 6,
+  "schemaVersion": 8,
   "uebung": true,
-  "stand": 2390,
+  "stand": 3442485,
   "einheit": {
     "organisation": 1,
     "einheitsTyp": {
@@ -37,18 +37,21 @@
   },
   "einsatz": {
     "zeitraumVon": 2390,
-    "zeitraumBis": 2393,
+    "zeitraumBis": 2392,
     "ortAuftrag": "Sturmtief »Quirin« Homburg — Führung Technischer Zug"
   },
   "personalErfassung": 0,
   "personal": [
     {
-      "vorname": "Jan",
-      "nachname": "Menzel",
+      "vorname": "Bernd",
+      "nachname": "Dietrich",
       "staerkeRolle": 2,
       "funktionen": [
         {
           "code": 1
+        },
+        {
+          "code": 31
         }
       ],
       "fahrerlaubnis": 10,
@@ -58,40 +61,33 @@
         {
           "art": 0,
           "dienstlich": false,
-          "wert": "5555121481"
-        },
-        {
-          "art": 2,
-          "dienstlich": true,
-          "emailTemplate": 1
+          "wert": "5552442599"
         }
       ],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Marie",
-      "nachname": "Lutz",
+      "vorname": "David",
+      "nachname": "Hahn",
       "staerkeRolle": 1,
       "funktionen": [
         {
           "code": 2
         }
       ],
-      "fahrerlaubnis": 10,
-      "geschlecht": 1,
-      "ernaehrung": 0,
-      "kontakte": [
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": [
         {
-          "art": 0,
-          "dienstlich": false,
-          "wert": "5559420798"
+          "freitext": "Zimmerer (Beruf)"
         }
-      ],
-      "zusatzqualifikationen": []
+      ]
     },
     {
-      "vorname": "Stefanie",
-      "nachname": "Koch",
+      "vorname": "Claudia",
+      "nachname": "Richter",
       "staerkeRolle": 0,
       "funktionen": [
         {
@@ -101,24 +97,24 @@
           "code": 30
         }
       ],
-      "fahrerlaubnis": 10,
+      "fahrerlaubnis": 5,
       "geschlecht": 1,
-      "ernaehrung": 1,
+      "ernaehrung": 0,
       "kontakte": [],
       "zusatzqualifikationen": []
     },
     {
-      "vorname": "Franziska",
-      "nachname": "Schröder",
+      "vorname": "Matthias",
+      "nachname": "Fischer",
       "staerkeRolle": 0,
       "funktionen": [
         {
           "code": 5
         }
       ],
-      "fahrerlaubnis": 5,
-      "geschlecht": 1,
-      "ernaehrung": 0,
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 1,
       "kontakte": [],
       "zusatzqualifikationen": []
     }
@@ -129,7 +125,7 @@
         "code": 2
       },
       "stanKonform": true,
-      "kennzeichen": "THW-80273",
+      "kennzeichen": "THW-80277",
       "funkrufname": {
         "kennwort": {
           "code": 1
@@ -148,6 +144,6 @@
     "benzinLiter": 0,
     "gemischLiter": 0,
     "unterbringung": false,
-    "ruhezeitErforderlich": true
+    "ruhezeitErforderlich": false
   }
 }
