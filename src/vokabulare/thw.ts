@@ -9,7 +9,10 @@
  *
  * Redaktionsentscheidungen (Johannes, 2026-07-10):
  *  - StAN OV (00-01) wird nicht aufgenommen; OV-spezifische Einheiten und
- *    Fahrzeuge (z. B. MzKW, MTW OV, Anh OV) laufen über den Freitext-Ausweg.
+ *    Fahrzeuge (z. B. MTW OV, Anh OV) laufen über den Freitext-Ausweg.
+ *    Ausnahme: MzKW und MzGW stehen im Vokabular — sie tragen den Technischen
+ *    Zug (FGr N, FGr SB, FGr BrB) und wurden ohne Eintrag ständig vermisst
+ *    (Issue #6).
  *  - Ältere Bezeichnungen aus 02-00 STAN TZ (B1, B2, Bel, …) werden ignoriert;
  *    maßgeblich sind die Einzel-StAN dieser Lieferung.
  *  - Fb-Kürzel (z. B. "Fb Fü K_A") werden nicht abgebildet.
@@ -210,12 +213,12 @@ export const THW_FUNKTIONEN_ALLE: FunktionsEintrag[] = [
 
 // -------------------------------------------------------------- Fahrzeugtypen
 // Aus den Ausstattungs-Kapiteln der StAN-Einzeldokumente 2026 (Kurzzeichen wo
-// vorhanden). OV-Fahrzeuge (MzKW, MTW OV, Anh OV, …) bewusst nicht enthalten
-// — dafür den Freitext-Ausweg nutzen (s. Kopf).
+// vorhanden), ergänzt um MzKW und MzGW (Issue #6). Reine OV-Fahrzeuge (MTW OV,
+// Anh OV, …) bleiben draußen — dafür den Freitext-Ausweg nutzen (s. Kopf).
 //
 // `sitzplaetze` = Sitzplätze inkl. Fahrer/in nach den Fahrzeugbeschreibungen
 // des THW (thw.de/Ausstattung) bzw. der jeweiligen Serienbeschaffung:
-// GKW 1+8, MTW 1+8, MLW IV 1/6, FmKW 1+6, FüKW 1+5, FüKomKW 1+2,
+// GKW 1+8, MTW 1+8, MLW IV 1/6, MzKW 1+6, MzGW 1+6, FmKW 1+6, FüKW 1+5, FüKomKW 1+2,
 // MTW FGr 5 (Kleinbus, 3,2 t), LKW 7 t (Kipper/Lbw/Lkr/WLF) 1+2.
 // Baumaschinen und Kran zählen nur ihre Bedienplätze, Anhänger 0. Das MzAB
 // steht mit 0, weil es niemanden auf der Straße befördert (es reist auf dem
@@ -247,6 +250,8 @@ export const THW_FAHRZEUGTYPEN: VokabularEintrag[] = [
   { code: 22, kurz: "MzAB", name: "Mehrzweckarbeitsboot", sitzplaetze: 0 },
   { code: 23, kurz: "MTW TZ", name: "Mannschaftstransportwagen Technischer Zug", sitzplaetze: 9 },
   { code: 24, kurz: "MTW gl", name: "Mannschaftstransportwagen geländegängig" },
+  { code: 25, kurz: "MzKW", name: "Mehrzweckkraftwagen", sitzplaetze: 7 },
+  { code: 26, kurz: "MzGW", name: "Mehrzweckgerätewagen", sitzplaetze: 7 },
   { code: 40, kurz: "Anh 2t", name: "Anhänger (2 t Nutzlast)", sitzplaetze: 0 },
   { code: 41, kurz: "Anh K", name: "Anhänger mit Spezialaufbau für FGr K (1 t Nutzlast)", sitzplaetze: 0 },
   { code: 42, kurz: "Anh FüLa", name: "Anhänger Führung und Lage", sitzplaetze: 0 },
@@ -276,11 +281,4 @@ export const FUNKRUF_KENNWOERTER: VokabularEintrag[] = [
   { code: 5, kurz: "Johannes", name: "Johannes (MHD)" },
   { code: 6, kurz: "Sama", name: "Sama (ASB)" },
   { code: 7, kurz: "Pelikan", name: "Pelikan (DLRG)" },
-];
-
-// ------------------------------------------------------------ Email-Templates
-
-export const THW_EMAIL_TEMPLATES: VokabularEintrag[] = [
-  { code: 1, kurz: "person", name: "vorname.nachname@thw-<ov-slug>.de" },
-  { code: 2, kurz: "ov", name: "ov-<ov-slug>@thw.de" },
 ];

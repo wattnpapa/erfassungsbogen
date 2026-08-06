@@ -273,6 +273,8 @@ export const THW_FAHRZEUG_ZEICHEN: Record<number, string> = {
   22: "Mehrzweckarbeitsboot",
   23: "MTW-TZ",
   24: "MTW",
+  25: "MzKW",
+  26: "MzGW",
   40: "Anhänger_2t",
   41: "Anhänger_K_1t",
   42: "Anhänger_FüLa",

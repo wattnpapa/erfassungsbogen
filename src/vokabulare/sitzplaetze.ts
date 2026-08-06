@@ -39,8 +39,11 @@ import type { VokabularEintrag } from "./thw";
 export const SITZPLAETZE_FREITEXT: { muster: RegExp; plaetze: number }[] = [
   // Anhänger, Auflieger, Abrollbehälter — befördern niemanden.
   { muster: /^(anh|ab|fwa)\b|anhänger|auflieger|abrollbehälter/, plaetze: 0 },
-  // Mannschaftstransport: Gruppenbesatzung (MzKW/MTW/MTF, auch OV-Fahrzeuge).
-  { muster: /^(mtw|mtf|mzkw|mzf|btkw)\b/, plaetze: 9 },
+  // THW-Doppelkabine 1+6: MzKW und sein Nachfolger MzGW (vor „mtw…", damit die
+  // Kurzzeichen nicht in der Gruppenbesatzung darunter landen).
+  { muster: /^(mzkw|mzgw)\b/, plaetze: 7 },
+  // Mannschaftstransport: Gruppenbesatzung (MTW/MTF, auch OV-Fahrzeuge).
+  { muster: /^(mtw|mtf|mzf|btkw)\b/, plaetze: 9 },
   // Einsatzleitwagen: ELW 2 als Führungsfahrzeug größer als ELW 1.
   { muster: /^elw\s*2/, plaetze: 7 },
   { muster: /^elw/, plaetze: 4 },

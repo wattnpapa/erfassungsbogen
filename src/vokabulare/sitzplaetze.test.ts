@@ -23,7 +23,15 @@ describe("sitzplaetzeFuer()", () => {
 
   it("greift bei Freitext-Fahrzeugen auf die Kurzzeichen-Tabelle zurück", () => {
     expect(sitzplaetzeFuer(text("LF 20"), THW_FAHRZEUGTYPEN)).toBe(9);
-    expect(sitzplaetzeFuer(text("MzKW"), THW_FAHRZEUGTYPEN)).toBe(9);
+    expect(sitzplaetzeFuer(text("MTW OV"), THW_FAHRZEUGTYPEN)).toBe(9);
+  });
+
+  it("zählt MzKW und MzGW mit ihrer Doppelkabine (1+6)", () => {
+    expect(sitzplaetzeFuer(code(25), THW_FAHRZEUGTYPEN)).toBe(7); // MzKW
+    expect(sitzplaetzeFuer(code(26), THW_FAHRZEUGTYPEN)).toBe(7); // MzGW
+    // Auch als Freitext geschrieben — nicht als Gruppenbesatzung durchrutschen.
+    expect(sitzplaetzeFuer(text("MzKW"), THW_FAHRZEUGTYPEN)).toBe(7);
+    expect(sitzplaetzeFuer(text("MzGW"), THW_FAHRZEUGTYPEN)).toBe(7);
   });
 });
 
