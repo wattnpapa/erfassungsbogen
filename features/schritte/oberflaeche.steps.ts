@@ -231,6 +231,24 @@ Then("sehe ich den Hinweis {string}", async function (this: EebWelt, text: strin
 });
 
 /**
+ * Beschriftete Paare (`dl.paare`): Begriff und Wert stehen in getrennten
+ * Elementen, „sehe ich den Hinweis" greift daher nicht über beide. Geprüft wird
+ * der Wert, der zum genannten Begriff gehört — nicht irgendein Vorkommen der
+ * Zahl auf der Seite.
+ */
+Then(
+  "sehe ich zu {string} den Wert {string}",
+  async function (this: EebWelt, begriff: string, wert: string) {
+    await this.page
+      .locator("dl.paare dt", { hasText: begriff })
+      .first()
+      .locator("xpath=following-sibling::dd[1]")
+      .filter({ hasText: wert })
+      .waitFor({ state: "visible" });
+  },
+);
+
+/**
  * Datei-Eingaben tragen ihre Beschriftung am umschließenden `<label>`, nicht an
  * einer Schaltfläche — „sehe ich die Schaltfläche" greift für sie nicht. Geprüft
  * wird das Label: das `<input>` darin ist für das Auge weggeblendet (.nur-sr).

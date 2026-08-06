@@ -263,18 +263,32 @@ export function EinsatzDetail(props: {
 
       <section className="karte">
         <h2>Bedarf (anwesende Einheiten)</h2>
-        <p>
-          Verpflegung: <strong>{sum.verpflegung.gesamt}</strong>
-          {" "}({sum.verpflegung.vegetarisch} vegetarisch / {sum.verpflegung.vegan} vegan)
-          {" · "}Unterbringung: M {sum.unterbringung.m} / W {sum.unterbringung.w} / D {sum.unterbringung.d}
-          {sum.unterbringungBenoetigt > 0 ? ` · ${sum.unterbringungBenoetigt}× angefordert` : ""}
-        </p>
-        <p>
-          Kraftstoff: Diesel {sum.kraftstoff.dieselLiter} l · Benzin {sum.kraftstoff.benzinLiter} l
-          {sum.kraftstoff.gemischLiter > 0 ? ` · Gemisch ${sum.kraftstoff.gemischLiter} l` : ""}
-          {" · "}Fahrzeuge: {sum.fahrzeuge}
-          {sum.ruhezeitErforderlich > 0 ? ` · Ruhezeit: ${sum.ruhezeitErforderlich}×` : ""}
-        </p>
+        {/* Vier Bedarfsarten als beschriftete Paare statt als zwei Sätze: nach
+            diesen Zahlen wird gezielt gesucht („wie viel Diesel?"), nicht
+            gelesen. Im Fließtext lag jede Zahl an einer anderen Stelle der
+            Zeile und war nur über den davorstehenden Begriff zu finden. */}
+        <dl className="paare">
+          <dt>Verpflegung</dt>
+          <dd>
+            <strong>{sum.verpflegung.gesamt}</strong>
+            {" "}({sum.verpflegung.vegetarisch} vegetarisch / {sum.verpflegung.vegan} vegan)
+          </dd>
+          <dt>Unterbringung</dt>
+          <dd>
+            M {sum.unterbringung.m} / W {sum.unterbringung.w} / D {sum.unterbringung.d}
+            {sum.unterbringungBenoetigt > 0 ? ` · ${sum.unterbringungBenoetigt}× angefordert` : ""}
+          </dd>
+          <dt>Kraftstoff</dt>
+          <dd>
+            Diesel {sum.kraftstoff.dieselLiter} l · Benzin {sum.kraftstoff.benzinLiter} l
+            {sum.kraftstoff.gemischLiter > 0 ? ` · Gemisch ${sum.kraftstoff.gemischLiter} l` : ""}
+          </dd>
+          <dt>Fahrzeuge</dt>
+          <dd>
+            {sum.fahrzeuge}
+            {sum.ruhezeitErforderlich > 0 ? ` · Ruhezeit: ${sum.ruhezeitErforderlich}×` : ""}
+          </dd>
+        </dl>
       </section>
 
       {zugGruppen.length > 1 && (
@@ -314,7 +328,11 @@ export function EinsatzDetail(props: {
         </label>
       </div>
 
-      <div className="vorlage-aktionen" style={{ marginBottom: "0.5rem" }}>
+      {/* Zweite Reihe: was aus der Sammlung herausgeht. Die erste nimmt Bögen
+          auf. Der Sprung zwischen den Reihen muss größer sein als der zwischen
+          den Knöpfen, sonst liest sich die Aufteilung als zufälliger Umbruch
+          einer einzigen Reihe aus sieben gleichrangigen Knöpfen. */}
+      <div className="vorlage-aktionen einsatz-ausgaben">
         <button
           type="button"
           onClick={onSammelPdf}

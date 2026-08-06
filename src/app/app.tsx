@@ -1282,7 +1282,9 @@ function AppInhalt() {
         <strong>ÜBUNG</strong> — Dieser Bogen ist als Übung gekennzeichnet und beschreibt keinen echten Einsatz.
       </div>
     )}
-    <main id="inhalt" tabIndex={-1}>
+    {/* Die Übersicht ist der einzige Schritt ohne fixe Schritt-Navigation
+        (siehe unten) — sie braucht deshalb auch nicht den Freiraum dafür. */}
+    <main id="inhalt" tabIndex={-1} className={schritt === UEBERSICHT ? "ohne-nav" : undefined}>
       {/* Rückmeldungen (Vorlage gespeichert, Beispielbogen geöffnet …) gehören
           dorthin, wo die Aktion ausgelöst wurde. Ohne diese Zeile blieben sie
           im Assistenten unsichtbar und tauchten später unvermittelt auf der

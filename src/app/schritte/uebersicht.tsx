@@ -133,6 +133,16 @@ export function Uebersicht(props: {
   const s = staerke(bogen);
   const mwd = unterbringungMWD(bogen);
   const vp = verpflegung(bogen);
+  /**
+   * Spalten, die für diesen Bogen nirgends etwas enthalten, werden nicht
+   * gezeigt. Sonst nimmt „Erreichbarkeit" ein Drittel der Personaltabelle für
+   * acht leere Zellen ein und drückt die Tabelle auf dem Telefon über den
+   * Kartenrand — die eigentliche Auskunft wird abgeschnitten, damit Leere
+   * Platz bekommt. Optionale Angaben ohne Inhalt sind keine Information.
+   */
+  const zeigeErreichbarkeit = bogen.personal.some((p) => p.kontakte.some((k) => kontaktText(k) !== ""));
+  const zeigeFunkruf = bogen.fahrzeuge.some((f) => funkrufText(f, einheitOrt(bogen.einheit)) !== "");
+  const zeigeAenderungen = bogen.fahrzeuge.some((f) => (f.aenderungen ?? "") !== "");
 
   useEffect(() => {
     let aktiv = true;
@@ -373,31 +383,40 @@ export function Uebersicht(props: {
             )}
           </p>
         )}
-        <Vollstaendigkeit punkte={pruefpunkte(bogen)} geheZu={geheZu} />
-        <div className="einheit-kopf">
+        {/* Erst wer, dann wie es um den Bogen steht: das taktische Zeichen mit
+            Name und Stärke ist die Auskunft, wegen der die Ansicht geöffnet
+            wird — die Vollständigkeitsprüfung ist ihr Befund und steht danach. */}
+        <div className="einheit-kopf leitzeile">
           <img
             className="einheit-avatar gross"
             src={svgDataUrl(einheitSymbolSvg(bogen.einheit))}
             alt="Taktisches Zeichen der Einheit"
           />
           <div>
-            <p>
-              <strong>{orgLabel(org)}</strong>
+            <p className="einheit-name">
+              {orgLabel(org)}
               {" · "}{vokabText(bogen.einheit.einheitsTyp, vokabularFuer(org, "einheitstyp"), "name") || "(Einheitstyp offen)"}
               {" · "}{einheitOrt(bogen.einheit) || "(Standort offen)"}
             </p>
-            <p>
-              Stärke:{" "}
-              <strong title={STAERKE_LEGENDE} aria-label={`Stärke: ${staerkeVorlesen(s)}`}>
-                {s.fuehrer} / {s.unterfuehrer} / {s.mannschaft} / {s.gesamt}
-              </strong>
-              {" · "}
+            <p className="einheit-staerke">
+              <span>
+                Stärke{" "}
+                <strong title={STAERKE_LEGENDE} aria-label={`Stärke: ${staerkeVorlesen(s)}`}>
+                  {s.fuehrer} / {s.unterfuehrer} / {s.mannschaft} / {s.gesamt}
+                </strong>
+              </span>
               <span title={MWD_LEGENDE}>Unterbringung: M {mwd.m} / W {mwd.w} / D {mwd.d}</span>
             </p>
           </div>
         </div>
+        <Vollstaendigkeit punkte={pruefpunkte(bogen)} geheZu={geheZu} />
       </section>
 
+      {/* Einheit und Einsatz beantworten zusammen „wer, wo, wann" und tragen je
+          nur eine Handvoll kurzer Paare. Als volle Kartenbreite standen sie zu
+          knapp der Hälfte leer und der Blick musste zweimal ganz nach links
+          zurück; nebeneinander bilden sie einen Block. Schmal stapeln sie. */}
+      <div className="karten-paar">
       {abschnitt("Einheit", 0, (
         <dl className="paare">
           <dt>Organisation</dt><dd>{orgLabel(org)}{bogen.einheit.organisationName ? ` — ${bogen.einheit.organisationName}` : ""}</dd>
@@ -423,21 +442,24 @@ export function Uebersicht(props: {
           </dd>
         </dl>
       ))}
+      </div>
 
       {abschnitt(`Personal (${bogen.personal.length})`, 2, (
         <div className="tabellen-scroll">
         <table className="uebersicht">
           <thead>
-            <tr><th>Funktion / Zusatzfunktion</th><th>Name, Vorname</th><th>Erreichbarkeit</th></tr>
+            <tr>
+              <th>Funktion / Zusatzfunktion</th>
+              <th>Name, Vorname</th>
+              {zeigeErreichbarkeit && <th>Erreichbarkeit</th>}
+            </tr>
           </thead>
           <tbody>
             {bogen.personal.map((p, i) => (
               <tr key={i}>
                 <td>{funktionsText(p, org) || "—"}</td>
                 <td>{p.nachname}{p.nachname && p.vorname ? ", " : ""}{p.vorname}</td>
-                <td>
-                  {p.kontakte.map(kontaktText).join(" · ")}
-                </td>
+                {zeigeErreichbarkeit && <td>{p.kontakte.map(kontaktText).join(" · ")}</td>}
               </tr>
             ))}
           </tbody>
@@ -449,16 +471,22 @@ export function Uebersicht(props: {
         <div className="tabellen-scroll">
         <table className="uebersicht">
           <thead>
-            <tr><th>Typ</th><th>Kennzeichen</th><th>Funkrufname</th><th>StAN</th><th>Änderungen</th></tr>
+            <tr>
+              <th>Typ</th>
+              <th>Kennzeichen</th>
+              {zeigeFunkruf && <th>Funkrufname</th>}
+              <th>StAN</th>
+              {zeigeAenderungen && <th>Änderungen</th>}
+            </tr>
           </thead>
           <tbody>
             {bogen.fahrzeuge.map((f, i) => (
               <tr key={i}>
                 <td>{vokabText(f.typ, vokabularFuer(org, "fahrzeug")) || "—"}</td>
                 <td>{kennzeichenText(f)}</td>
-                <td>{funkrufText(f, einheitOrt(bogen.einheit))}</td>
+                {zeigeFunkruf && <td>{funkrufText(f, einheitOrt(bogen.einheit))}</td>}
                 <td>{f.stanKonform == null ? "—" : f.stanKonform ? "ja" : "nein"}</td>
-                <td>{f.aenderungen ?? ""}</td>
+                {zeigeAenderungen && <td>{f.aenderungen ?? ""}</td>}
               </tr>
             ))}
           </tbody>
@@ -482,6 +510,11 @@ export function Uebersicht(props: {
         </dl>
       ))}
 
+      {/* Ab hier verlässt der Bogen das Gerät: Vorschau und QR gehören zusammen
+          und nicht mehr zu den Datenabschnitten darüber. Der größere Abstand
+          davor ist der einzige Absatz der Ansicht — ohne ihn stapeln sich acht
+          gleich weit auseinanderstehende Karten ohne erkennbare Gliederung. */}
+      <div className="transport-gruppe">
       {/* Eingebettete PDF-Vorschau: man sieht, was der Meldekopf bekommt, bevor
           gedruckt wird. Nur im Browser — die native App zeigt PDFs im Share-Sheet,
           und mobile WebViews rendern eingebettete PDFs nicht zuverlässig. */}
@@ -573,6 +606,7 @@ export function Uebersicht(props: {
           <AbsenderkarteFeld karte={absender} onGespeichert={setAbsender} />
         </div>
       </section>
+      </div>
 
       <dialog ref={teilenDialog} aria-label="Bogen übergeben" className="teilen-dialog">
         <div className="kopfzeile">

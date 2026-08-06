@@ -93,8 +93,8 @@ Funktionalität: Einsatzweg einer Fachgruppe — Vorbereitung, Fahrt, Meldekopf
     Und ich im Dialog auf "Einsatz anlegen" klicke
     Dann sehe ich die Überschrift "Einheiten (1)"
     Und sehe ich den Hinweis "Stärke 0 / 3 / 9 / 12"
-    Und sehe ich den Hinweis "Kraftstoff: Diesel 400 l"
-    Und sehe ich den Hinweis "Fahrzeuge: 4"
+    Und sehe ich zu "Kraftstoff" den Wert "Diesel 400 l"
+    Und sehe ich zu "Fahrzeuge" den Wert "4"
 
   # Am Bereitstellungsraum gibt es kein WLAN und oft kein Netz: die volle
   # QR-Runde — erzeugen, als Bild abnehmen, einlesen — muss offline laufen.

@@ -232,6 +232,13 @@
     }
     #app { min-height: 100dvh; display: flex; flex-direction: column; }
     main { width: 100%; max-width: 60rem; margin: 0 auto; padding: var(--r-5) var(--r-4) 6rem; }
+    /* Die 6rem unten halten die fixe Schritt-Navigation frei. Wo sie gar nicht
+       erscheint (Startseite, Übersicht), ist das ein leeres Drittel Bildschirm
+       zwischen letztem Inhalt und Fußzeile — dort reicht der normale Abstand.
+       Bewusst als Abzug statt als Zuschlag: eine vergessene Ansicht behält den
+       großen Wert und verdeckt nichts. */
+    main.start, main.ohne-nav { padding-bottom: var(--r-6); }
+    main.start ~ footer.seite, main.ohne-nav ~ footer.seite { padding-bottom: var(--r-6); }
     /* Hinweistext ohne JavaScript — gleiche Maße wie <main>, damit die Seite
        auch in diesem Zustand nicht wie ein Fehler aussieht. */
     .ohne-js { width: 100%; max-width: 40rem; margin: 0 auto; padding: var(--r-5) var(--r-4); }
@@ -272,6 +279,17 @@
     .aktionen > button, .aktionen > .datei-knopf {
       min-height: calc(2.75rem + var(--ziel)); padding: 0.6rem 1.1rem; font-size: var(--t-m);
     }
+    /* Auf dem Telefon füllen Knopfreihen die Spalte, statt in verschieden
+       breiten Blöcken mit ausgefranster rechter Kante zu stehen: eine feste
+       Kante liest sich als Liste, und jedes Ziel wird so breit wie möglich —
+       genau das, was Handschuhe und Zeitdruck brauchen. */
+    @media (max-width: 30rem) {
+      /* nowrap ist hier Pflicht, nicht Geschmack: in Spaltenrichtung bricht
+         `wrap` in eine ZWEITE SPALTE um, und ein Kind mit flex-basis:100%
+         (siehe .weiche unten) füllt die erste allein — die Knöpfe stünden
+         nebeneinander aus der Karte heraus statt untereinander darin. */
+      .aktionen { flex-direction: column; flex-wrap: nowrap; align-items: stretch; }
+    }
     /* Zwei-Wege-Weiche der Startseite: beide Nutzergruppen (eigener Bogen /
        Meldekopf) gleichgewichtig nebeneinander, auf schmalen Fenstern
        untereinander. Bewusst nur Rollen-Token — so greifen Dunkel-, Feld- und
@@ -296,6 +314,16 @@
     /* margin-top:auto statt fixem Abstand: die Knopfreihen beider Wege stehen
        auf gleicher Höhe, auch wenn ein Hinweistext länger ist. */
     .weiche > .weiche-weg > .aktionen { margin-top: auto; padding-top: var(--r-3); }
+    /* Die Hauptaktion belegt eine eigene Zeile über volle Kartenbreite. Sonst
+       entscheidet die Textlänge über den Umbruch: „Neuen Bogen erstellen" ließ
+       den Nachbarknopf neben sich, „Neuer Einsatz…" nicht — die beiden Wege
+       standen dadurch verschieden gebaut nebeneinander, obwohl sie
+       gleichrangig sind. So beginnt jeder Weg mit derselben Figur.
+       Nur in Zeilenrichtung: schmal ist .aktionen eine Spalte, dort meint
+       flex-basis:100% die HÖHE und bläht den Knopf auf. */
+    @media (min-width: 30.01rem) {
+      .weiche > .weiche-weg > .aktionen > .primaer { flex: 0 0 100%; }
+    }
     button, .datei-knopf {
       font: inherit; font-size: var(--t-s); font-weight: 600;
       padding: 0.5rem 0.9rem;
@@ -609,6 +637,27 @@
     img.einheit-avatar.gross { height: 3.4rem; }
     .einheit-kopf { display: flex; align-items: center; gap: 0.9rem; }
     .einheit-kopf > div { min-width: 0; }
+    /* Kopf der Gesamtübersicht: welche Einheit, wie stark. Das ist die Auskunft,
+       die am Meldekopf zuerst gebraucht wird — sie stand bisher als Fließtext
+       unter vier Knöpfen und war damit das Leiseste auf der Seite. Jetzt trägt
+       sie den Kartenkopf: Name als Zeilentitel, die Stärke dicktengleich und
+       groß wie die Zählwerte der Einsatz-Sammlung, damit dieselbe Zahl überall
+       gleich aussieht. */
+    .einheit-kopf.leitzeile { gap: var(--r-4); margin: var(--r-4) 0 var(--r-3); }
+    .einheit-kopf.leitzeile img.einheit-avatar { height: 4.2rem; }
+    .einheit-kopf.leitzeile .einheit-name {
+      margin: 0; font-size: var(--t-l); font-weight: 700; line-height: 1.25;
+      letter-spacing: -0.01em; overflow-wrap: break-word;
+    }
+    .einheit-kopf.leitzeile .einheit-staerke {
+      margin: var(--r-1) 0 0; display: flex; flex-wrap: wrap;
+      align-items: baseline; gap: 0.15rem var(--r-5); font-size: var(--t-s); color: var(--text-2);
+    }
+    .einheit-kopf.leitzeile .einheit-staerke strong {
+      font-family: var(--schrift-daten); font-size: 1.5rem; line-height: 1.05;
+      font-weight: 700; letter-spacing: -0.01em; font-variant-numeric: tabular-nums;
+      color: var(--text);
+    }
     img.fahrzeug-symbol { height: 2.4rem; width: auto; float: left; margin: 0.1rem 0.8rem 0.2rem 0; }
     /* Umflossen wird nur, wo Platz dafür ist: auf dem Telefon steht das
        Fahrzeugsymbol über den Feldern statt neben ihnen. */
@@ -649,7 +698,11 @@
     /* Erststart-Onboarding: drei Schritte erklären den Offline-QR-Transport. */
     .onboarding { margin-top: var(--r-6); }
     .onboarding h2 { border: none; text-align: left; }
-    .onboarding-schritte { display: flex; gap: var(--r-5); justify-content: flex-start; flex-wrap: wrap; }
+    /* Gestapelt (Telefon) braucht der Abstand zwischen zwei Schritten deutlich
+       mehr Luft als der zwischen Zeichen, Titel und Erklärung eines Schritts —
+       sonst stehen neun Zeilen gleichmäßig untereinander und die Dreiteilung
+       ist nur noch an der Nummer zu erkennen. Nebeneinander trennt die Spalte. */
+    .onboarding-schritte { display: flex; gap: var(--r-6) var(--r-5); justify-content: flex-start; flex-wrap: wrap; }
     .onboarding-schritt {
       flex: 1 1 12rem; max-width: 16rem; display: flex; flex-direction: column;
       align-items: flex-start; text-align: left; gap: 0.25rem;
@@ -697,8 +750,10 @@
     .uebersicht-aktionen .neben-aktionen { margin-left: var(--r-3); padding-left: var(--r-3); border-left: var(--strich-stark) solid var(--linie); }
     @media (max-width: 540px) {
       /* Kompakt umbrechend statt vier gestapelter Vollbreite-Knöpfe: die
-         Offene-Punkte-Karte darunter bleibt so beim Öffnen im Blickfeld. */
-      .kopfzeile > span.uebersicht-aktionen { width: 100%; }
+         Offene-Punkte-Karte darunter bleibt so beim Öffnen im Blickfeld.
+         Linksbündig statt rechts: unter dem Titel wechselte die Gruppe sonst
+         die Kante, und jede der drei Knopfzeilen begann woanders. */
+      .kopfzeile > span.uebersicht-aktionen { width: 100%; justify-content: flex-start; }
       .uebersicht-aktionen .neben-aktionen { border-left: none; margin-left: 0; padding-left: 0; width: 100%; }
     }
 
@@ -736,11 +791,17 @@
        „Löschen" bleibt rechts, klappt bei Platzmangel sauber in die nächste Zeile. */
     .vorlage-aktionen { margin-top: 0.6rem; display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; }
     .vorlage-aktionen .entfernen { float: none; margin-left: auto; }
+    /* Ausgabewege der Einsatz-Sammlung (siehe einsaetze-ui.tsx). */
+    .einsatz-ausgaben { margin-top: var(--r-4); margin-bottom: var(--r-5); }
     /* Stärke als Instrumentenleiste: die Zahl ist das Fachliche, also groß und
        dicktengleich; die Beschriftung tritt als gesperrte Versalzeile zurück.
        Die Gesamtsumme trägt als einzige die Kennfarbe. */
+    /* Fünf Felder, nicht vier: „Einheiten" ist eine Anzahl, danach folgt die
+       Stärke in ihrer festen Reihenfolge F / U / M / Gesamt. Mit vier Spalten
+       fiel „Gesamt" — die Zahl, wegen der die Leiste da ist — als Waise in eine
+       zweite Zeile. Die Reihenfolge bleibt unangetastet: sie ist Fachsprache. */
     .staerke-leiste {
-      display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; text-align: left;
+      display: grid; grid-template-columns: repeat(5, 1fr); gap: 0; text-align: left;
       border: var(--strich) solid var(--linie); background: var(--flaeche);
     }
     .staerke-leiste > div {
@@ -748,9 +809,14 @@
       padding: var(--r-2) var(--r-3); border-left: var(--strich) solid var(--linie-fein);
     }
     .staerke-leiste > div:first-child { border-left: none; }
-    /* Auf dem Telefon passen vier Zahlenfelder nicht nebeneinander — im
+    /* Kräftigere Linie vor „Führer": links davon die Anzahl der Meldungen,
+       rechts davon eine Stärkeangabe. Vier gleiche Haarlinien lasen die fünf
+       Zahlen als eine Reihe gleicher Dinge. */
+    .staerke-leiste > div:nth-child(2) { border-left-color: var(--linie); }
+    /* Auf dem Telefon passen fünf Zahlenfelder nicht nebeneinander — im
        Feld-Modus sprengten sie die Karte. Zwei feste Spalten, und die
-       Trennlinien laufen dann auch zwischen den Zeilen. */
+       Trennlinien laufen dann auch zwischen den Zeilen; „Gesamt" schließt als
+       volle Zeile ab wie die Summenzeile eines Vordrucks. */
     @media (max-width: 30rem) {
       .staerke-leiste { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .staerke-leiste > div {
@@ -759,12 +825,15 @@
       }
       .staerke-leiste > div:nth-child(odd) { border-left: none; }
       .staerke-leiste > div:nth-child(-n + 2) { border-top: none; }
+      .staerke-leiste > div.gesamt {
+        grid-column: 1 / -1; border-left: none; border-top-color: var(--linie);
+      }
     }
     .staerke-leiste strong {
       font-size: 1.75rem; line-height: 1.05; font-weight: 700;
       letter-spacing: -0.02em; font-variant-numeric: tabular-nums;
     }
-    .staerke-leiste > div:last-child strong { color: var(--akzent); }
+    .staerke-leiste > div.gesamt strong { color: var(--akzent); }
     .staerke-leiste span {
       font-family: var(--schrift-daten); font-size: 0.6rem; letter-spacing: 0.12em;
       text-transform: uppercase; color: var(--text-2); opacity: 1;
@@ -788,8 +857,26 @@
     .update-banner .primaer { background: #fff; color: var(--blau); border-color: #fff; }
     .update-banner .link { color: #cdd6f4; }
     .update-banner .fehler { color: #ffb4ab; flex-basis: 100%; }
-    /* Breite Tabellen rollen im eigenen Bereich statt das Layout zu sprengen. */
+    /* Zwei knappe Karten als ein Block. Der Umbruchpunkt liegt bewusst bei
+       48rem und nicht bei einer Gerätebreite: ab da bleiben beiden Spalten
+       genug Zeichen je Zeile, darunter stapeln sie wie jede andere Karte. */
+    .karten-paar { display: grid; gap: var(--r-4); margin-bottom: var(--r-4); }
+    .karten-paar > .karte { margin-bottom: 0; }
+    @media (min-width: 48rem) {
+      .karten-paar { grid-template-columns: 1fr 1fr; }
+    }
+    /* Der einzige Absatz der Übersicht: hier hört das Nachlesen auf und das
+       Weitergeben fängt an. Doppelter Kartenabstand statt einer Trennlinie —
+       Weißraum trägt die Struktur (siehe Karten/Elevation). */
+    .transport-gruppe { margin-top: var(--r-6); }
+    /* Breite Tabellen rollen im eigenen Bereich statt das Layout zu sprengen.
+       Auf schmalen Fenstern läuft der Rollbereich bis an die Kartenkante: der
+       Schnitt liegt dann sichtbar am Rand („da geht es weiter") statt mitten
+       in der Karte, wo er wie abgeschnittener Inhalt aussieht. */
     .tabellen-scroll { overflow-x: auto; }
+    @media (max-width: 40rem) {
+      .karte > .tabellen-scroll { margin-inline: calc(-1 * var(--r-4)); padding-inline: var(--r-4); }
+    }
     /* Übersichtstabelle: Zahlen in Tabellenbreite, Spaltenköpfe als gesperrte
        Versalzeile — Meldevordruck-Anmutung statt Web-Tabelle. */
     table.uebersicht { width: 100%; border-collapse: collapse; font-size: var(--t-s); font-variant-numeric: tabular-nums; }
@@ -810,6 +897,11 @@
     /* Aktionsgruppen mit mehreren Knöpfen (als <span> im Kopf) umbrechen als
        Flex-Zeile, statt schmal auf dem Handy seitlich aus dem Bild zu laufen. */
     .kopfzeile > span { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: baseline; justify-content: flex-end; }
+    /* Nur der Code selbst steht mittig — er ist ein Bild, das vorgehalten wird.
+       Überschrift, Siegelangabe und Absenderfeld bleiben auf der linken Kante
+       wie in jeder anderen Karte; zentriert wechselte der Satzspiegel mitten
+       in der Ansicht die Achse und die Karte las sich als fremdes Element. */
+    .qr-box > h2 { text-align: left; }
     .qr-box { text-align: center; }
     .qr-box img { max-width: 260px; width: 100%; image-rendering: pixelated; border: 1px solid var(--rand); }
     /* Segmentierung: mehrere QR-Teile nebeneinander mit „Teil x / n". */
@@ -848,6 +940,14 @@
        aufgegangen), treten zurück — dieselbe Handschrift wie die gestrichenen
        Zeilen der Musterung. Die Nebenzeile sagt, welcher der beiden Fälle es
        ist; der Name bleibt lesbar, nur eben durchgestrichen. */
+    /* Jede gemeldete Einheit ist ein eigener Eintrag mit Name, Kennzahlen und
+       einer Knopfreihe. Ohne Trennlinie lag der Abstand innerhalb eines
+       Eintrags so groß wie der zwischen zweien: bei 30–50 Meldungen einer
+       Großlage verschwamm die Liste zu einer Fläche, und die Knöpfe waren
+       keiner Einheit mehr sicher zuzuordnen. Die Linie ist das Papier-Mittel
+       dafür — kein Kasten um jeden Eintrag. */
+    .einheit-zeile { border-top: var(--strich) solid var(--linie-fein); padding: var(--r-3) 0 var(--r-2); }
+    .einheit-zeile:first-of-type { border-top: none; padding-top: var(--r-1); }
     .einheit-zeile.gestrichen { opacity: 0.55; }
     .einheit-zeile.gestrichen .muster-name { text-decoration: line-through; }
     /* Zug- und Teil-Kennzeichnung an einer gemeldeten Einheit. Ruhiger als der

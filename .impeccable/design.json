@@ -1,42 +1,201 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-08-06T00:00:00+02:00",
+  "generatedAt": "2026-08-06T14:29:46.078Z",
   "title": "Design System: Erfassungsbogen",
   "extensions": {
     "colorMeta": {
-      "akzent": { "role": "primary", "displayName": "Ultramarin-Dienstblau", "canonical": "#12275e", "tonalRamp": ["oklch(15% 0.09 265)", "oklch(25% 0.09 265)", "oklch(35% 0.09 265)", "oklch(45% 0.09 265)", "oklch(58% 0.09 265)", "oklch(70% 0.07 265)", "oklch(84% 0.05 265)", "oklch(95% 0.02 265)"] },
-      "akzent-hell": { "role": "primary", "displayName": "Dienstblau, aufgehellt", "canonical": "#1d3d8f" },
-      "auf-akzent": { "role": "primary", "displayName": "Weiß auf Kennfarbe", "canonical": "#ffffff" },
-      "grund": { "role": "neutral", "displayName": "Blaukühles Papierweiß", "canonical": "#f3f5f9", "tonalRamp": ["#11141b", "#2a2f3c", "#5c6478", "#8b94a9", "#bcc3d3", "#d7dce7", "#e8ebf2", "#f3f5f9"] },
-      "flaeche": { "role": "neutral", "displayName": "Formularweiß", "canonical": "#ffffff" },
-      "flaeche-2": { "role": "neutral", "displayName": "Zweite Fläche", "canonical": "#e8ebf2" },
-      "text": { "role": "neutral", "displayName": "Tintenschwarz", "canonical": "#11141b" },
-      "text-2": { "role": "neutral", "displayName": "Aktenschrift-Grau", "canonical": "#5c6478" },
-      "text-3": { "role": "neutral", "displayName": "Hinweis-Grau", "canonical": "#8b94a9" },
-      "linie-fein": { "role": "neutral", "displayName": "Feine Linie", "canonical": "#d7dce7" },
-      "linie": { "role": "neutral", "displayName": "Linie", "canonical": "#bcc3d3" },
-      "linie-stark": { "role": "neutral", "displayName": "Starke Linie", "canonical": "#8b94a9" },
-      "gut": { "role": "tertiary", "displayName": "Einsatzgrün", "canonical": "#146b3a", "tonalRamp": ["oklch(15% 0.08 155)", "oklch(25% 0.09 155)", "oklch(35% 0.1 155)", "oklch(45% 0.11 155)", "oklch(58% 0.11 155)", "oklch(70% 0.1 155)", "oklch(84% 0.07 155)", "oklch(95% 0.03 155)"] },
-      "warn-text": { "role": "tertiary", "displayName": "Warnbraun", "canonical": "#6d4700" },
-      "warn-fond": { "role": "tertiary", "displayName": "Aktengelb", "canonical": "#fdf4dd" },
-      "warn-linie": { "role": "tertiary", "displayName": "Warnlinie", "canonical": "#ddbe79" },
-      "alarm": { "role": "tertiary", "displayName": "Alarmrot", "canonical": "#a4231c", "tonalRamp": ["oklch(15% 0.1 30)", "oklch(25% 0.12 30)", "oklch(35% 0.14 30)", "oklch(46% 0.15 30)", "oklch(58% 0.15 30)", "oklch(70% 0.12 30)", "oklch(84% 0.07 30)", "oklch(95% 0.03 30)"] }
+      "akzent": {
+        "role": "primary",
+        "displayName": "Ultramarin-Dienstblau",
+        "canonical": "#12275e",
+        "tonalRamp": [
+          "oklch(15% 0.09 265)",
+          "oklch(25% 0.09 265)",
+          "oklch(35% 0.09 265)",
+          "oklch(45% 0.09 265)",
+          "oklch(58% 0.09 265)",
+          "oklch(70% 0.07 265)",
+          "oklch(84% 0.05 265)",
+          "oklch(95% 0.02 265)"
+        ]
+      },
+      "akzent-hell": {
+        "role": "primary",
+        "displayName": "Dienstblau, aufgehellt",
+        "canonical": "#1d3d8f"
+      },
+      "auf-akzent": {
+        "role": "primary",
+        "displayName": "Weiß auf Kennfarbe",
+        "canonical": "#ffffff"
+      },
+      "grund": {
+        "role": "neutral",
+        "displayName": "Blaukühles Papierweiß",
+        "canonical": "#f3f5f9",
+        "tonalRamp": [
+          "#11141b",
+          "#2a2f3c",
+          "#5c6478",
+          "#8b94a9",
+          "#bcc3d3",
+          "#d7dce7",
+          "#e8ebf2",
+          "#f3f5f9"
+        ]
+      },
+      "flaeche": {
+        "role": "neutral",
+        "displayName": "Formularweiß",
+        "canonical": "#ffffff"
+      },
+      "flaeche-2": {
+        "role": "neutral",
+        "displayName": "Zweite Fläche",
+        "canonical": "#e8ebf2"
+      },
+      "text": {
+        "role": "neutral",
+        "displayName": "Tintenschwarz",
+        "canonical": "#11141b"
+      },
+      "text-2": {
+        "role": "neutral",
+        "displayName": "Aktenschrift-Grau",
+        "canonical": "#5c6478"
+      },
+      "text-3": {
+        "role": "neutral",
+        "displayName": "Hinweis-Grau",
+        "canonical": "#8b94a9"
+      },
+      "linie-fein": {
+        "role": "neutral",
+        "displayName": "Feine Linie",
+        "canonical": "#d7dce7"
+      },
+      "linie": {
+        "role": "neutral",
+        "displayName": "Linie",
+        "canonical": "#bcc3d3"
+      },
+      "linie-stark": {
+        "role": "neutral",
+        "displayName": "Starke Linie",
+        "canonical": "#8b94a9"
+      },
+      "gut": {
+        "role": "tertiary",
+        "displayName": "Einsatzgrün",
+        "canonical": "#146b3a",
+        "tonalRamp": [
+          "oklch(15% 0.08 155)",
+          "oklch(25% 0.09 155)",
+          "oklch(35% 0.1 155)",
+          "oklch(45% 0.11 155)",
+          "oklch(58% 0.11 155)",
+          "oklch(70% 0.1 155)",
+          "oklch(84% 0.07 155)",
+          "oklch(95% 0.03 155)"
+        ]
+      },
+      "warn-text": {
+        "role": "tertiary",
+        "displayName": "Warnbraun",
+        "canonical": "#6d4700"
+      },
+      "warn-fond": {
+        "role": "tertiary",
+        "displayName": "Aktengelb",
+        "canonical": "#fdf4dd"
+      },
+      "warn-linie": {
+        "role": "tertiary",
+        "displayName": "Warnlinie",
+        "canonical": "#ddbe79"
+      },
+      "alarm": {
+        "role": "tertiary",
+        "displayName": "Alarmrot",
+        "canonical": "#a4231c",
+        "tonalRamp": [
+          "oklch(15% 0.1 30)",
+          "oklch(25% 0.12 30)",
+          "oklch(35% 0.14 30)",
+          "oklch(46% 0.15 30)",
+          "oklch(58% 0.15 30)",
+          "oklch(70% 0.12 30)",
+          "oklch(84% 0.07 30)",
+          "oklch(95% 0.03 30)"
+        ]
+      }
     },
     "typographyMeta": {
-      "display": { "displayName": "Display (h1)", "purpose": "Eine Ansichts-Überschrift je Seite; text-wrap: balance." },
-      "headline": { "displayName": "Headline (h2)", "purpose": "Abschnittsüberschriften — Gewicht statt Farbe." },
-      "title": { "displayName": "Title (h3)", "purpose": "Gruppentitel innerhalb von Karten." },
-      "body": { "displayName": "Body", "purpose": "Fließtext; Einleitungen max. 48ch." },
-      "label": { "displayName": "Feldbeschriftung", "purpose": "label.feld — halbfett und dunkel, im Feld draußen sicher lesbar." },
-      "daten": { "displayName": "Daten (Mono)", "purpose": "Dicktengleiche Daten: Stärken, Kennzeichen, Tabellarisches." }
+      "display": {
+        "displayName": "Display (h1)",
+        "purpose": "Eine Ansichts-Überschrift je Seite; text-wrap: balance."
+      },
+      "headline": {
+        "displayName": "Headline (h2)",
+        "purpose": "Abschnittsüberschriften — Gewicht statt Farbe."
+      },
+      "title": {
+        "displayName": "Title (h3)",
+        "purpose": "Gruppentitel innerhalb von Karten."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Fließtext; Einleitungen max. 48ch."
+      },
+      "label": {
+        "displayName": "Feldbeschriftung",
+        "purpose": "label.feld — halbfett und dunkel, im Feld draußen sicher lesbar."
+      },
+      "daten": {
+        "displayName": "Daten (Mono)",
+        "purpose": "Dicktengleiche Daten: Stärken, Kennzeichen, Tabellarisches."
+      }
     },
     "shadows": [
-      { "name": "vorschlagsliste", "value": "0 4px 12px rgba(0,0,0,0.15)", "purpose": "Autocomplete-Dropdown über dem Formular — der einzige Nicht-Overlay-Schatten." },
-      { "name": "overlay-mittel", "value": "0 8px 24px rgba(0,0,0,0.25)", "purpose": "Leichte modale Ebenen." },
-      { "name": "overlay-schwer", "value": "0 24px 64px rgba(0,0,0,0.35)", "purpose": "Große Dialoge." }
+      {
+        "name": "vorschlagsliste",
+        "value": "0 4px 12px rgba(0,0,0,0.15)",
+        "purpose": "Autocomplete-Dropdown über dem Formular — der einzige Nicht-Overlay-Schatten."
+      },
+      {
+        "name": "overlay-mittel",
+        "value": "0 8px 24px rgba(0,0,0,0.25)",
+        "purpose": "Leichte modale Ebenen."
+      },
+      {
+        "name": "overlay-schwer",
+        "value": "0 24px 64px rgba(0,0,0,0.35)",
+        "purpose": "Große Dialoge."
+      }
     ],
     "motion": [],
-    "breakpoints": []
+    "breakpoints": [
+      {
+        "name": "telefon",
+        "value": "30rem",
+        "purpose": "Knopfreihen (.aktionen) werden zur Spalte voller Breite; die Stärke-Leiste bricht auf zwei Spalten mit „Gesamt“ als voller Schlusszeile."
+      },
+      {
+        "name": "tabelle",
+        "value": "40rem",
+        "purpose": "Rollbare Tabellen laufen bis an die Kartenkante, damit der Schnitt am Rand sichtbar wird statt mitten in der Karte."
+      },
+      {
+        "name": "paarung",
+        "value": "48rem",
+        "purpose": "Zwei knappe Karten (Einheit/Einsatz) stellen sich nebeneinander; darunter stapeln sie."
+      },
+      {
+        "name": "aktionen",
+        "value": "540px",
+        "purpose": "Aktionsgruppen in Kartenköpfen und Dialogfüßen brechen linksbündig um."
+      }
+    ]
   },
   "components": [
     {
@@ -107,20 +266,70 @@
       "Für draußen gebaut: Feld-Modus mit 112 % Schrift, 2-px-Linien und 48-px-Tippzielen"
     ],
     "rules": [
-      { "name": "Die Kennfarben-Regel", "body": "Die Kennfarbe gehört dem Kopfbalken und der primären Aktion. Überschriften tragen Gewicht statt Farbe — so verliert die Kennfarbe nie ihre Signalwirkung.", "section": "colors" },
-      { "name": "Die Signal-Regel", "body": "--gut, --warn-* und --alarm sind organisationsunabhängig konstant. Eine DRK-rote Oberfläche darf „Fehler" nie mit der Hausfarbe verwechselbar machen.", "section": "colors" },
-      { "name": "Die Modus-Regel", "body": "Neue Farben werden nie als Rohwert in eine Komponente geschrieben, sondern als Rollen-Token angelegt und in allen vier Belegungen (Hell, Dunkel, Feld, Nacht) definiert.", "section": "colors" },
-      { "name": "Die Gewichts-Regel", "body": "Hierarchie trägt Gewicht, nicht Farbe. Farbige Überschriften sind verboten; die Kennfarbe bleibt Aktionen vorbehalten.", "section": "typography" },
-      { "name": "Die Feld-Modus-Schrift-Regel", "body": "Der Feld-Modus hebt die Grundschrift auf 112 % und die kleinsten Grade an; nichts läuft draußen über Opacity oder Grauwerte zurück.", "section": "typography" },
-      { "name": "Die Flach-im-Stand-Regel", "body": "Eine Fläche bekommt nur dann einen Schatten, wenn sie tatsächlich über dem Inhalt schwebt (Dropdown, Dialog). Karten, Knöpfe und Eingaben bleiben schattenlos.", "section": "elevation" },
-      { "name": "Die Null-Radius-Regel", "body": "Kein Element bekommt einen eigenen border-radius. Alles referenziert var(--radius), und der ist 0. Die Plattform-Layer dürfen ihn systemkonform neu belegen — nie die Komponente selbst.", "section": "elevation" }
+      {
+        "name": "Die Kennfarben-Regel",
+        "body": "Die Kennfarbe gehört dem Kopfbalken und der primären Aktion. Überschriften tragen Gewicht statt Farbe — so verliert die Kennfarbe nie ihre Signalwirkung.",
+        "section": "colors"
+      },
+      {
+        "name": "Die Signal-Regel",
+        "body": "--gut, --warn-* und --alarm sind organisationsunabhängig konstant. Eine DRK-rote Oberfläche darf „Fehler“ nie mit der Hausfarbe verwechselbar machen.",
+        "section": "colors"
+      },
+      {
+        "name": "Die Modus-Regel",
+        "body": "Neue Farben werden nie als Rohwert in eine Komponente geschrieben, sondern als Rollen-Token angelegt und in allen vier Belegungen (Hell, Dunkel, Feld, Nacht) definiert.",
+        "section": "colors"
+      },
+      {
+        "name": "Die Gewichts-Regel",
+        "body": "Hierarchie trägt Gewicht, nicht Farbe. Farbige Überschriften sind verboten; die Kennfarbe bleibt Aktionen vorbehalten.",
+        "section": "typography"
+      },
+      {
+        "name": "Die Feld-Modus-Schrift-Regel",
+        "body": "Der Feld-Modus hebt die Grundschrift auf 112 % und die kleinsten Grade an; nichts läuft draußen über Opacity oder Grauwerte zurück.",
+        "section": "typography"
+      },
+      {
+        "name": "Die Flach-im-Stand-Regel",
+        "body": "Eine Fläche bekommt nur dann einen Schatten, wenn sie tatsächlich über dem Inhalt schwebt (Dropdown, Dialog). Karten, Knöpfe und Eingaben bleiben schattenlos.",
+        "section": "elevation"
+      },
+      {
+        "name": "Die Null-Radius-Regel",
+        "body": "Kein Element bekommt einen eigenen border-radius. Alles referenziert var(--radius), und der ist 0. Die Plattform-Layer dürfen ihn systemkonform neu belegen — nie die Komponente selbst.",
+        "section": "elevation"
+      },
+      {
+        "name": "Die Absatz-Regel",
+        "section": "layout",
+        "body": "Gleichmäßig gestapelte Karten sind keine Gliederung. Ein Wechsel des Zwecks bekommt einen doppelten Kartenabstand (--r-6) als sichtbaren Absatz — in der Übersicht genau einen: dort, wo das Nachlesen aufhört und das Weitergeben anfängt. Weißraum trägt die Struktur, keine Trennlinie und kein Kasten."
+      },
+      {
+        "name": "Die Leerspalten-Regel",
+        "section": "layout",
+        "body": "Eine Spalte, die für den ganzen Bogen leer ist, wird nicht gezeigt. Optionale Angaben ohne Inhalt sind keine Information — sie kosten auf dem Telefon genau die Breite, die der eigentlichen Auskunft fehlt."
+      },
+      {
+        "name": "Die Navigationsraum-Regel",
+        "section": "layout",
+        "body": "Die 6rem Fußraum unter <main> halten die fixe Schritt-Navigation frei und gelten nur, wo sie erscheint. Startseite und Übersicht (main.start, main.ohne-nav) ziehen sie auf --r-6 zurück. Bewusst als Abzug statt als Zuschlag: eine vergessene Ansicht behält den großen Wert und verdeckt nichts."
+      },
+      {
+        "name": "Die Zeilentrenner-Regel",
+        "section": "layout",
+        "body": "Wiederholte Einträge einer Liste (gemeldete Einheiten) trennt eine Haarlinie plus Innenabstand, kein Kasten je Eintrag. Ohne sie liegt der Abstand innerhalb eines Eintrags so groß wie der zwischen zweien, und bei 30–50 Meldungen einer Großlage verschwimmt die Liste zu einer Fläche."
+      }
     ],
     "dos": [
       "Do neue Farben als Rollen-Token in index.html anlegen und in allen vier Belegungen (Hell, Dunkel, Feld, Nacht) definieren — plus, wo nötig, in den Plattform-Layern --ios-*/--md-*.",
       "Do Trefferflächen über calc(… + var(--ziel)) bauen, damit der Feld-Modus sie automatisch auf 48px zieht.",
       "Do Fokus sichtbar und einheitlich halten: outline: var(--fokus) solid var(--akzent).",
       "Do Daten (Stärken, Kennzeichen) in --schrift-daten (Monospace) setzen.",
-      "Do die Kennfarbe der Organisation über wendeOrgAkzentAn() (org-farben.ts) beziehen — nie eine Org-Farbe hart in CSS schreiben."
+      "Do die Kennfarbe der Organisation über wendeOrgAkzentAn() (org-farben.ts) beziehen — nie eine Org-Farbe hart in CSS schreiben.",
+      "**Do** Abstände nach Bedeutung staffeln: eng innerhalb einer Gruppe, --r-4 zwischen Karten, --r-6 als Absatz zwischen Zwecken.",
+      "**Do** knappe Karten paaren, statt sie halbleer über die volle Breite laufen zu lassen (.karten-paar ab 48rem)."
     ],
     "donts": [
       "Don't border-radius mit eigenem Wert setzen — nur var(--radius) (Null-Radius-Regel).",
@@ -128,7 +337,9 @@
       "Don't prefers-color-scheme auswerten — die Modi schalten ausschließlich über den Schalter und die <html>-Klasse.",
       "Don't Text über Opacity oder helle Grauwerte zurücktreten lassen, wo der Feld-Modus greift — dort gilt: nichts tritt zurück.",
       "Don't Verläufe, schwebende Kacheln, runde Ecken oder verspielte Illustrationen einführen (bestätigte Anti-Referenz: Consumer-App-Ästhetik).",
-      "Don't Schrift vom CDN laden — Archivo liegt im Bundle und muss offline verfügbar bleiben (PWA-Precache)."
+      "Don't Schrift vom CDN laden — Archivo liegt im Bundle und muss offline verfügbar bleiben (PWA-Precache).",
+      "**Don’t** in Spaltenrichtung `flex-wrap: wrap` mit einem Kind auf `flex-basis: 100%` kombinieren — der Umbruch geht dann in eine ZWEITE SPALTE und die Knöpfe laufen aus der Karte heraus. Regeln mit voller Hauptachsen-Basis gehören in eine `min-width`-Abfrage.",
+      "**Don’t** dieselbe Zahl in zwei Größen setzen: die Stärke trägt überall die dicktengleiche Zählwert-Figur (Übersicht wie Einsatz-Sammlung)."
     ]
   }
 }
