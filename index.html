@@ -160,6 +160,20 @@
          Kennfarbe in allen Modi, also trägt dieser Ton sie ebenfalls. */
       --gut-auf-kopf: #8fe0ab;
 
+      /* Schrift AUF der Kennfarbe, zweite Stufe: Links und Fehler im
+         Aktualisierungsband. Weiß trägt dort die Aussage, diese beiden
+         ordnen sich unter — als Token, damit sie nicht je Bauteil neu
+         erfunden werden. */
+      --auf-akzent-2:     #cdd6f4;
+      --alarm-auf-akzent: #ffb4ab;
+      /* Der Vollbild-QR ist bewusst modusunabhängig hell: ein Code auf
+         dunklem Grund ist unscannbar, und genau dafür wird das Vollbild
+         geöffnet. Konstanten, die als Konstanten benannt sind — nicht
+         Rohwerte, die den Modus vergessen haben. */
+      --qr-flaeche: #ffffff;
+      --qr-text:    #000000;
+      --qr-text-2:  #1a1c22;
+
       /* Kennfarbe der Organisation: org-farben.ts setzt --org-akzent* auf
          <html>; ohne offenen Bogen greift das THW-Blau. */
       --akzent:      var(--org-akzent, #12275e);
@@ -820,11 +834,17 @@
       border: var(--strich) solid var(--gut); border-radius: var(--radius); background: transparent;
       color: var(--gut); font-size: var(--t-s); font-weight: 600;
     }
-    /* „Weiter, wo du warst": Entwurfs-Karte mit Kennfarbe der Organisation. */
+    /* „Weiter, wo du warst": die Entwurfs-Karte trägt die schwere Deckzeile
+       des gedruckten Formularabschnitts — dieselbe 4-px-Kante wie die Weiche
+       und der Seitenkopf. Vorher lag der Streifen links und in der Kennfarbe:
+       das ist der Akzentbalken der Consumer-Oberflächen, nicht die Handschrift
+       dieses Bogens, und er verbrauchte nebenbei die Kennfarbe, die laut
+       Kennfarben-Regel dem Kopf und der primären Aktion gehört. */
     .entwurf-karte {
       display: flex; align-items: center; gap: 0.9rem; text-align: left;
       max-width: 40rem; margin: var(--r-5) 0 0; padding: var(--r-3) var(--r-4);
-      background: var(--flaeche); border: var(--strich) solid var(--linie); border-left: 6px solid var(--akzent);
+      background: var(--flaeche); border: var(--strich) solid var(--linie);
+      border-top: 4px solid var(--text);
       border-radius: var(--radius);
     }
     .entwurf-karte .entwurf-text { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 0.1rem; }
@@ -924,7 +944,8 @@
     .stepper input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
 
     /* Vorlagen & Musterung */
-    .meldung { text-align: left; background: var(--flaeche); border: var(--strich) solid var(--linie); border-left: 3px solid var(--akzent); border-radius: var(--radius); padding: 0.5rem 0.75rem; margin: var(--r-3) 0; max-width: 60rem; font-size: var(--t-s); }
+    /* Wie die Entwurfs-Karte: Deckzeile oben statt Akzentstreifen links. */
+    .meldung { text-align: left; background: var(--flaeche); border: var(--strich) solid var(--linie); border-top: 4px solid var(--text); border-radius: var(--radius); padding: 0.5rem 0.75rem; margin: var(--r-3) 0; max-width: 60rem; font-size: var(--t-s); }
     /* Der Eingangsstempel: Rückmeldungen („Meldung aufgenommen", „Vorlage
        gespeichert") setzen sich wie ein Stempel aufs Formular — minimal
        größer ansetzend, entschieden abbremsend, kein Nachfedern. Die
@@ -1006,11 +1027,11 @@
     .muster-start { width: 100%; }
     .update-banner {
       display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 0.75rem;
-      background: var(--blau); color: #fff; padding: 0.5rem 1rem; font-size: var(--t-s);
+      background: var(--blau); color: var(--auf-akzent); padding: 0.5rem 1rem; font-size: var(--t-s);
     }
-    .update-banner .primaer { background: #fff; color: var(--blau); border-color: #fff; }
-    .update-banner .link { color: #cdd6f4; }
-    .update-banner .fehler { color: #ffb4ab; flex-basis: 100%; }
+    .update-banner .primaer { background: var(--auf-akzent); color: var(--blau); border-color: var(--auf-akzent); }
+    .update-banner .link { color: var(--auf-akzent-2); }
+    .update-banner .fehler { color: var(--alarm-auf-akzent); flex-basis: 100%; }
     /* Zwei knappe Karten als ein Block. Der Umbruchpunkt liegt bewusst bei
        48rem und nicht bei einer Gerätebreite: ab da bleiben beiden Spalten
        genug Zeichen je Zeile, darunter stapeln sie wie jede andere Karte. */
@@ -1339,6 +1360,9 @@
       color: var(--quittung-auf-ein);
       animation: stempel var(--dauer-2) var(--kurve);
     }
+    /* Schwarz, Weiß und der Textschatten sind hier bewusst modusunabhängige
+       Rohwerte: hinter der Fläche läuft ein Kamerabild, kein Formular — es
+       gibt keine Belegung, die ein Anzeigemodus daran sinnvoll änderte. */
     .scanner {
       position: fixed; inset: 0; z-index: 100; background: #000;
       display: flex; flex-direction: column; align-items: center;
@@ -1358,7 +1382,9 @@
       text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
     }
     .scanner-text > p { margin: 0; }
-    .scanner-text.fehler { color: #ffb4ab; display: grid; gap: 0.6rem; }
+    /* Derselbe Ton wie im Aktualisierungsband: Alarmschrift auf dunkler
+       Fläche, einmal benannt statt zweimal getippt. */
+    .scanner-text.fehler { color: var(--alarm-auf-akzent); display: grid; gap: 0.6rem; }
     .scanner-text.fehler p { margin: 0; }
     /* Die zwei Freigabe-Stellen sind eine Anleitung, keine Fließtextwand:
        links ausgerichtet und aufgezählt bleiben sie im Einsatz lesbar. */
@@ -1379,7 +1405,7 @@
     }
     .scanner-rahmen {
       width: min(65vw, 55vh); aspect-ratio: 1;
-      border: 3px solid rgba(255, 255, 255, 0.9); border-radius: 1rem;
+      border: 3px solid rgba(255, 255, 255, 0.9); border-radius: var(--radius);
     }
     .scanner-aktionen {
       display: flex; flex-direction: column; align-items: center; gap: 0.75rem;
@@ -2192,9 +2218,9 @@
       width: min(92vw, 68vh); max-width: none;
       image-rendering: pixelated; border: none;
     }
-    .qr-vollbild p { margin: 0; color: #000; text-align: center; }
+    .qr-vollbild p { margin: 0; color: var(--qr-text); text-align: center; }
     .qr-vollbild-nav { display: flex; gap: 0.8rem; flex-wrap: wrap; justify-content: center; }
-    .qr-vollbild-nav button { background: #fff; color: #1a1c22; border: 1px solid var(--rand); }
+    .qr-vollbild-nav button { background: var(--qr-flaeche); color: var(--qr-text-2); border: 1px solid var(--rand); }
     .qr-vollbild-nav button.primaer { background: var(--blau); color: #fff; }
 
     /* Papierkorb-Karten (gelöschte Vorlagen/Einsätze): sichtbar zurückgestuft. */

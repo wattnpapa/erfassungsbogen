@@ -156,6 +156,14 @@ Signalfarben — bewusst getrennt von der Kennfarbe, damit „erledigt" und „A
 - **Warnbraun auf Aktengelb** (#6d4700 auf #fdf4dd, Linie #ddbe79): Warnhinweise (`--warn-*`).
 - **Alarmrot** (#a4231c auf #fdecea, Linie #eaa79d): Fehler, Alarme, gebrochene Signaturen (`--alarm`, `--alarm-fond`, `--alarm-linie`).
 
+### Konstanten auf gefüllten Flächen
+Töne, die auf einer gefüllten Fläche stehen und deshalb keinem Anzeigemodus folgen — als Token benannt, damit sie nicht je Bauteil neu erfunden werden:
+- **Zweitschrift auf der Kennfarbe** (#cdd6f4, `--auf-akzent-2`): Links im Aktualisierungsband; 10,4:1 auf THW-Blau.
+- **Alarmschrift auf dunkler Fläche** (#ffb4ab, `--alarm-auf-akzent`): Fehler im Aktualisierungsband und über dem Kamerabild; 8,9:1.
+- **Erledigt auf der Kennfarbe** (#8fe0ab, `--gut-auf-kopf`): der Haken in der Schrittleiste — `--gut` ist für weißes Papier gerechnet und verschwände im Balken.
+- **Vollbild-QR** (`--qr-flaeche` #ffffff, `--qr-text` #000000, `--qr-text-2` #1a1c22): bewusst modusunabhängig hell. Ein Code auf dunklem Grund ist unscannbar, und genau dafür wird das Vollbild geöffnet.
+- **Kamerafläche** (#000 mit weißer Schrift): hinter der Fläche läuft ein Kamerabild, kein Formular — bewusst als Rohwert, es gibt keine Belegung, die ein Modus daran sinnvoll änderte.
+
 ### Named Rules
 **Die Kennfarben-Regel.** Die Kennfarbe gehört dem Kopfbalken und der primären Aktion. Überschriften tragen Gewicht statt Farbe — so verliert die Kennfarbe nie ihre Signalwirkung.
 
@@ -233,6 +241,8 @@ Flach im Stand: Karten und Knöpfe liegen schattenlos auf dem Grund, getrennt du
 - **Dialoge/Overlays** (`0 8px 24px rgba(0,0,0,0.25)` bis `0 24px 64px rgba(0,0,0,0.35)`): modale Ebenen, gestaffelt nach Gewicht.
 
 ### Named Rules
+**Die Deckzeilen-Regel.** Eine Karte, die sich vom Stapel abheben soll, bekommt die schwere 4-px-Oberkante des gedruckten Formularabschnitts (`.weiche-weg`, `.entwurf-karte`, `.meldung`) — nie einen farbigen Streifen an der linken Flanke. Der Seitenstreifen ist die Handschrift der Consumer-Oberflächen; die Deckzeile ist die des Vordrucks. Sie steht in `--text`, nicht in der Kennfarbe: die gehört laut Kennfarben-Regel dem Kopfbalken und der primären Aktion.
+
 **Die Flach-im-Stand-Regel.** Eine Fläche bekommt nur dann einen Schatten, wenn sie tatsächlich über dem Inhalt schwebt (Dropdown, Dialog). Karten, Knöpfe und Eingaben bleiben schattenlos.
 
 ## Shapes
