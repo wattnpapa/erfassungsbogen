@@ -746,6 +746,15 @@
       .einheit-kopf.leitzeile { flex-wrap: wrap; }
       .einheit-kopf.leitzeile > div { flex: 1 1 100%; }
     }
+    /* Unterhalb der Telefonbreite — kleines Gerät, hochgestellte Textgröße,
+       200-%-Zoom — reicht auch die volle Kartenbreite für die ungebrochene
+       Angabe nicht mehr. Dann gibt der Grad nach, nicht die Zahl: `min()`
+       bindet ihn an die Fensterbreite, statt ihn an einer weiteren festen
+       Stufe abzuschneiden. Ab 352 px greift wieder allein `--t-zahl`, die
+       Telefondarstellung bleibt also unverändert. */
+    @media (max-width: 22rem) {
+      .einheit-kopf.leitzeile .einheit-staerke strong { font-size: min(var(--t-zahl), 6.5vw); }
+    }
     img.fahrzeug-symbol { height: 2.4rem; width: auto; float: left; margin: 0.1rem 0.8rem 0.2rem 0; }
     /* Umflossen wird nur, wo Platz dafür ist: auf dem Telefon steht das
        Fahrzeugsymbol über den Feldern statt neben ihnen. */
@@ -972,6 +981,15 @@
        Schnitt liegt dann sichtbar am Rand („da geht es weiter") statt mitten
        in der Karte, wo er wie abgeschnittener Inhalt aussieht. */
     .tabellen-scroll { overflow-x: auto; }
+    /* Der Rollbereich nimmt den Fokus an, sobald wirklich etwas verdeckt ist
+       (tabellen-scroll.tsx) — sonst wäre der abgeschnittene Teil für alle
+       unerreichbar, die nicht wischen können. Die Fokusregeln oben greifen nur
+       für button/a, also braucht der Bereich seinen eigenen Ring; ohne ihn
+       stünde der Fokus unsichtbar irgendwo in der Karte. */
+    .tabellen-scroll:focus-visible {
+      outline: var(--fokus) solid var(--akzent);
+      outline-offset: 2px;
+    }
     @media (max-width: 40rem) {
       .karte > .tabellen-scroll { margin-inline: calc(-1 * var(--r-4)); padding-inline: var(--r-4); }
     }

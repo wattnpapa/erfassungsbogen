@@ -189,6 +189,8 @@ Sechs Grade (`--t-xs` … `--t-2xl`) plus die Zählwert-Figur. Der Fließtext st
 
 **Die Zählwert-Regel.** Die Stärke ist die eine Zahl, wegen der der Bogen gelesen wird. Sie steht überall in `--t-zahl`, dicktengleich, fett — in der Gesamtübersicht wie in der Stärke-Leiste der Einsatz-Sammlung. Zwei Grade für dieselbe Auskunft lesen sich als zwei verschiedene Auskünfte.
 
+Die Angabe bricht nie um: `0 / 2 / 6 / 8` ist eine Auskunft, kein Satz. Wird es eng, gibt in dieser Reihenfolge nach — erst die Zeile (unter 30rem bekommt der Textblock die volle Kartenbreite, das taktische Zeichen rückt darüber), dann das Token (`--t-zahl` eine Stufe zurück), zuletzt unter 22rem der Grad selbst über `min(var(--t-zahl), 6.5vw)`. Nie die Zahl.
+
 **Die Ein-Leiter-Regel.** Kein Bauteil setzt einen eigenen Schriftgrad. Jede Größe kommt aus `--t-*`; braucht eine Rolle wirklich einen neuen Grad, wird er als Token angelegt und hier eingetragen. Zwischenwerte wie 0.78rem, 0.88rem oder 0.92rem sehen im Einzelfall richtig aus und ergeben über eine Ansicht hinweg eine Leiter ohne Stufen — und sie entziehen sich der Feld-Modus-Korrektur.
 
 **Die Feld-Modus-Schrift-Regel.** Der Feld-Modus hebt die Grundschrift auf 112 % und zusätzlich die beiden kleinsten Grade um je einen Schritt (`--t-xs` → 0.875rem, `--t-s` → 0.9375rem), weil sie draußen zuerst wegbrechen; nichts läuft dort über Opacity oder Grauwerte zurück.
@@ -216,6 +218,10 @@ Vier benannte Umbruchpunkte, jeder an einer Inhaltsgrenze statt an einer Geräte
 **Die Spaltenflucht-Regel.** Wiederholte Zeilen bleiben in der Flucht, auch wenn eine davon einen Knopf nicht braucht: der Platz des fehlenden ✕ bleibt reserviert (`.zeilen-knopf-leer`), solange die Zeile eine Zeile ist. Und ein Auswahlfeld bekommt die Spaltenbreite seines längsten Optionstexts (`.mittel`, 12rem) — „OV – Ortsverband" mitten im Wort abgeschnitten kostet genau die Auskunft, an der man die Zeile zuordnet.
 
 **Die Navigationsraum-Regel.** Die 6rem Fußraum unter `main` halten die fixe Schritt-Navigation frei und gelten nur, wo sie erscheint; Startseite und Übersicht ziehen sie auf `--r-6` zurück (`main.start`, `main.ohne-nav`). Bewusst als Abzug statt als Zuschlag: eine vergessene Ansicht behält den großen Wert und verdeckt nichts.
+
+**Die Rollbereich-Regel.** Eine Tabelle, die seitlich rollt, ist ohne Tastaturzugang für alle abgeschnitten, die nicht wischen können — die Spalte „Erreichbarkeit" existiert dann schlicht nicht mehr. Rollbereiche laufen deshalb über `<TabellenScroll>` (`tabellen-scroll.tsx`), das `tabindex`, `role="region"` und eine Beschriftung vergibt — aber nur, solange wirklich etwas verdeckt ist. Fest gesetzt stünde am Breitbild vor jeder Tabelle ein Tabstopp ohne Zweck.
+
+**Die Leere-Tabelle-Regel.** Eine Tabelle ohne Zeilen wird nicht als Kopfzeile über nichts gezeigt. Eine leere Versalzeile liest sich wie abgeschnittener Inhalt; stattdessen steht dort ein Satz, der sagt, was fehlt („Kein Personal erfasst.") — derselbe in der Gesamtübersicht wie in der Einsatz-Sammlung.
 
 ## Elevation & Depth
 

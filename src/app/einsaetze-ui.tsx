@@ -67,6 +67,7 @@ import { debugAktiv } from "./debug-plattform";
 import { Auswahl } from "./schritte/bausteine";
 import { SeitenKopf } from "./seiten-kopf";
 import { frageJaNein } from "./dialoge";
+import { TabellenScroll } from "./tabellen-scroll";
 
 export const ART_LABEL: Record<EinsatzArt, string> = {
   [EinsatzArt.EINSATZ]: "Einsatz",
@@ -511,11 +512,14 @@ function BogenDetails({ bogen }: { bogen: Erfassungsbogen }) {
         <dd>{orgLabel(org)}{bogen.einheit.organisationName ? ` — ${bogen.einheit.organisationName}` : ""}</dd>
         <dt>Einheitstyp</dt>
         <dd>{vokabText(bogen.einheit.einheitsTyp, vokabularFuer(org, "einheitstyp"), "name") || "—"}</dd>
+        {/* <div> statt <span>: nur <div> ist in einer Definitionsliste als
+            Gruppierung zulässig, sonst verliert Vorlesesoftware den Bezug
+            zwischen Ebene und Name. */}
         {bogen.einheit.hierarchie.map((h, i) => (
-          <span key={i} style={{ display: "contents" }}>
+          <div key={i} style={{ display: "contents" }}>
             <dt>{vokabText(h.bezeichnung, vokabularFuer(org, "ebene")) || "Ebene"}</dt>
             <dd>{h.name}{h.kurz ? ` (${h.kurz})` : ""}{h.telefon ? ` · ${h.telefon}` : ""}{h.email ? ` · ${h.email}` : ""}</dd>
-          </span>
+          </div>
         ))}
       </dl>
 
@@ -539,7 +543,7 @@ function BogenDetails({ bogen }: { bogen: Erfassungsbogen }) {
         </p>
       )}
       {bogen.personal.length > 0 ? (
-        <div className="tabellen-scroll">
+        <TabellenScroll titel="Personal">
           <table className="uebersicht">
             <thead>
               <tr><th>Funktion / Zusatzfunktion</th><th>Name, Vorname</th><th>Erreichbarkeit</th></tr>
@@ -554,7 +558,7 @@ function BogenDetails({ bogen }: { bogen: Erfassungsbogen }) {
               ))}
             </tbody>
           </table>
-        </div>
+        </TabellenScroll>
       ) : (
         !nurStaerke && <p className="hinweis">Kein Personal erfasst.</p>
       )}
@@ -562,7 +566,7 @@ function BogenDetails({ bogen }: { bogen: Erfassungsbogen }) {
 
       <h4>Fahrzeuge ({bogen.fahrzeuge.length})</h4>
       {bogen.fahrzeuge.length > 0 ? (
-        <div className="tabellen-scroll">
+        <TabellenScroll titel="Fahrzeuge">
           <table className="uebersicht">
             <thead>
               <tr><th>Typ</th><th>Kennzeichen</th><th>Funkrufname</th><th>StAN</th><th>Änderungen</th></tr>
@@ -579,7 +583,7 @@ function BogenDetails({ bogen }: { bogen: Erfassungsbogen }) {
               ))}
             </tbody>
           </table>
-        </div>
+        </TabellenScroll>
       ) : (
         <p className="hinweis">Keine Fahrzeuge erfasst.</p>
       )}

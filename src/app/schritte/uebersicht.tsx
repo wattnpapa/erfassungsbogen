@@ -14,6 +14,7 @@ import {
   zeitpunktZuIso,
 } from "../../model";
 import { vorlageAnlegen } from "../vorlagen";
+import { TabellenScroll } from "../tabellen-scroll";
 import {
   QrSatz,
   bogenDateiname,
@@ -421,11 +422,15 @@ export function Uebersicht(props: {
         <dl className="paare">
           <dt>Organisation</dt><dd>{orgLabel(org)}{bogen.einheit.organisationName ? ` — ${bogen.einheit.organisationName}` : ""}</dd>
           <dt>Einheitstyp</dt><dd>{vokabText(bogen.einheit.einheitsTyp, vokabularFuer(org, "einheitstyp"), "name") || "—"}</dd>
+          {/* <div> statt <span>: in einer Definitionsliste ist nur <div> als
+              Gruppierung zulässig, und Vorlesesoftware verliert sonst den
+              Bezug zwischen Ebene und Name. `display: contents` hält die
+              Paare weiterhin im Raster der Liste. */}
           {bogen.einheit.hierarchie.map((h, i) => (
-            <span key={i} style={{ display: "contents" }}>
+            <div key={i} style={{ display: "contents" }}>
               <dt>{vokabText(h.bezeichnung, vokabularFuer(org, "ebene")) || "Ebene"}</dt>
               <dd>{h.name}{h.kurz ? ` (${h.kurz})` : ""}{h.telefon ? ` · ${h.telefon}` : ""}{h.email ? ` · ${h.email}` : ""}</dd>
-            </span>
+            </div>
           ))}
         </dl>
       ))}
@@ -444,8 +449,14 @@ export function Uebersicht(props: {
       ))}
       </div>
 
-      {abschnitt(`Personal (${bogen.personal.length})`, 2, (
-        <div className="tabellen-scroll">
+      {/* Leer trug die Karte bisher nur die Spaltenköpfe — eine Versalzeile
+          über nichts, die aussieht, als sei die Tabelle abgeschnitten. Ein
+          Satz sagt stattdessen, was fehlt; dieselbe Auskunft wie in der
+          Einsatz-Sammlung, damit „nichts erfasst" überall gleich klingt. */}
+      {abschnitt(`Personal (${bogen.personal.length})`, 2, bogen.personal.length === 0 ? (
+        <p className="hinweis">Kein Personal erfasst.</p>
+      ) : (
+        <TabellenScroll titel="Personal">
         <table className="uebersicht">
           <thead>
             <tr>
@@ -464,11 +475,13 @@ export function Uebersicht(props: {
             ))}
           </tbody>
         </table>
-        </div>
+        </TabellenScroll>
       ))}
 
-      {abschnitt(`Fahrzeuge (${bogen.fahrzeuge.length})`, 3, (
-        <div className="tabellen-scroll">
+      {abschnitt(`Fahrzeuge (${bogen.fahrzeuge.length})`, 3, bogen.fahrzeuge.length === 0 ? (
+        <p className="hinweis">Keine Fahrzeuge erfasst.</p>
+      ) : (
+        <TabellenScroll titel="Fahrzeuge">
         <table className="uebersicht">
           <thead>
             <tr>
@@ -491,7 +504,7 @@ export function Uebersicht(props: {
             ))}
           </tbody>
         </table>
-        </div>
+        </TabellenScroll>
       ))}
 
       {abschnitt("Sofortbedarf & Sonstiges", 4, (

@@ -24,6 +24,7 @@ import { beispielPersonen } from "../beispielnamen";
 import { stanPersonalVorbelegung } from "../../vokabulare/thw-stan-personal";
 import { FE_TEXT, neuePerson, pruefpunkte, vokabularFuer, vorbelegungGeladen } from "../hilfen";
 import { frageJaNein } from "../dialoge";
+import { TabellenScroll } from "../tabellen-scroll";
 import {
   Feld,
   Auswahl,
@@ -282,7 +283,7 @@ function PersonalSchnellTabelle(props: {
   }
 
   return (
-    <div className="tabellen-scroll">
+    <TabellenScroll titel="Personal-Schnelleingabe">
       <table className="uebersicht schnell-tabelle">
         <thead>
           <tr><th>Vorname</th><th>Nachname</th><th>Stärkerolle</th><th>Geschlecht</th><th aria-label="Entfernen" /></tr>
@@ -342,7 +343,7 @@ function PersonalSchnellTabelle(props: {
           ))}
         </tbody>
       </table>
-    </div>
+    </TabellenScroll>
   );
 }
 
