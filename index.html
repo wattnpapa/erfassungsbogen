@@ -270,7 +270,7 @@
       -webkit-font-smoothing: antialiased;
     }
     #app { min-height: 100dvh; display: flex; flex-direction: column; }
-    main { width: 100%; max-width: 60rem; margin: 0 auto; padding: var(--r-5) var(--r-4) 6rem; }
+    main { width: 100%; max-width: 60rem; margin: 0 auto; padding: var(--r-5) var(--r-4) calc(6rem + env(safe-area-inset-bottom)); }
     /* Die 6rem unten halten die fixe Schritt-Navigation frei. Wo sie gar nicht
        erscheint (Startseite, Übersicht), ist das ein leeres Drittel Bildschirm
        zwischen letztem Inhalt und Fußzeile — dort reicht der normale Abstand.
@@ -382,9 +382,9 @@
       /* Nur Farben, nie Maße: der Knopf steht wie gedruckt, die Farbe folgt. */
       transition: color var(--dauer-1), border-color var(--dauer-1), background-color var(--dauer-1);
     }
-    button:hover, .datei-knopf:hover { border-color: var(--akzent); color: var(--akzent); }
+    @media (hover: hover) { button:hover, .datei-knopf:hover { border-color: var(--akzent); color: var(--akzent); } }
     button.primaer, .datei-knopf.primaer { background: var(--akzent); color: var(--auf-akzent); border-color: var(--akzent); }
-    button.primaer:hover { background: var(--akzent-hell); border-color: var(--akzent-hell); color: var(--auf-akzent); }
+    @media (hover: hover) { button.primaer:hover { background: var(--akzent-hell); border-color: var(--akzent-hell); color: var(--auf-akzent); } }
     button:disabled { opacity: 0.4; cursor: default; }
     /* Sichtbarer Tastaturfokus in der Kennfarbe — überall gleich. */
     button:focus-visible, .datei-knopf:focus-within, a:focus-visible {
@@ -416,7 +416,7 @@
       font-size: var(--t-s); font-weight: 600; text-decoration: none;
       min-height: 0; transition: top var(--dauer-1) ease-out;
     }
-    .sprungmarke:hover { background: var(--flaeche); color: var(--akzent); }
+    @media (hover: hover) { .sprungmarke:hover { background: var(--flaeche); color: var(--akzent); } }
     .sprungmarke:focus { top: var(--r-2); }
     /* Der Sprung setzt den Fokus auf <main>; dort ist der Rahmen überflüssig. */
     main:focus { outline: none; }
@@ -451,7 +451,7 @@
       padding: 0.2rem 0; margin-top: 0; min-height: 0;
       color: var(--akzent); font-size: var(--t-m); font-weight: 600; cursor: pointer;
     }
-    .zur-start:hover { border: none; background: none; text-decoration: underline; }
+    @media (hover: hover) { .zur-start:hover { border: none; background: none; text-decoration: underline; } }
 
     /* ---------------------------------------------------------------
        Seitenkopf: jede Web-Ansicht beginnt mit derselben Kopfleiste über
@@ -491,7 +491,7 @@
     .seiten-kopf h1 { color: var(--kopf-auf); font-size: var(--t-xl); margin: 0; }
     .seiten-kopf .hinweis { color: var(--kopf-auf-2); margin: var(--r-1) 0 0; }
     .seiten-kopf .zur-start { color: var(--kopf-auf); opacity: 0.85; }
-    .seiten-kopf .zur-start:hover { opacity: 1; }
+    @media (hover: hover) { .seiten-kopf .zur-start:hover { opacity: 1; } }
     .seiten-kopf .autosave { color: var(--kopf-auf-2); margin: 0; padding: 0 0 var(--r-3); animation: einblenden var(--dauer-2) ease-out; }
     /* Übungs-Störer: volle Fensterbreite direkt unter dem Kopf, Text auf dem
        Satzspiegel. Schraffur wie ein Absperrband — deutlich anders als jede
@@ -534,7 +534,7 @@
          verlischt am alten; das genügt, um den Wechsel lesbar zu machen. */
       transition: color var(--dauer-1), border-bottom-color var(--dauer-1);
     }
-    .schritte button:hover { background: none; color: var(--kopf-auf); border-bottom-color: var(--kopf-linie); }
+    @media (hover: hover) { .schritte button:hover { background: none; color: var(--kopf-auf); border-bottom-color: var(--kopf-linie); } }
     .schritte button.aktiv { background: none; color: var(--kopf-auf); border-bottom-color: var(--kopf-auf); }
     .schritte button.status-ok:not(.aktiv) { background: none; border-bottom-color: transparent; }
     /* Dezenter Füllstand je Schritt: ✓ = ausgefüllt, • = begonnen. Reiner
@@ -641,7 +641,7 @@
     }
     ul.vorschlaege li { padding: 0.45rem 0.6rem; cursor: pointer; font-size: var(--t-m); }
     ul.vorschlaege li small { color: var(--text-2); margin-left: 0.3rem; }
-    ul.vorschlaege li.aktiv, ul.vorschlaege li:hover { background: var(--flaeche-2); }
+    @media (hover: hover) { ul.vorschlaege li.aktiv, ul.vorschlaege li:hover { background: var(--flaeche-2); } }
     .chips { display: flex; flex-wrap: wrap; gap: 0.3rem; align-items: center; margin-top: 0.2rem; }
     .chip {
       background: var(--flaeche-2); border: var(--strich) solid var(--linie); border-radius: var(--radius);
@@ -649,7 +649,7 @@
     }
     .chip button { border: none; padding: 0 0.2rem; min-height: 0; background: none; font-weight: bold; }
     .karte .entfernen { float: right; color: var(--alarm); border-color: var(--alarm); font-size: var(--t-xs); }
-    .karte .entfernen:hover { color: var(--alarm); border-color: var(--alarm); background: var(--flaeche-2); }
+    @media (hover: hover) { .karte .entfernen:hover { color: var(--alarm); border-color: var(--alarm); background: var(--flaeche-2); } }
     /* Wiederholte Einträge (Person, Fahrzeug) bekommen einen Kopf: links steht,
        wer oder was der Eintrag ist, rechts die Aktion, die ihn entfernt. Ohne
        ihn liegt in einer Neun-Personen-Liste alles gleich schwer, und die
@@ -690,13 +690,37 @@
        Alarmfarbe in Rahmen und Text, aber keine gefüllte Signalfläche — die
        gehört in dieser App der einen primären Aktion einer Ansicht. */
     button.gefahr { color: var(--alarm); border-color: var(--alarm); }
-    button.gefahr:hover:not(:disabled) { color: var(--alarm); border-color: var(--alarm); background: var(--flaeche-2); }
+    @media (hover: hover) { button.gefahr:hover:not(:disabled) { color: var(--alarm); border-color: var(--alarm); background: var(--flaeche-2); } }
     footer.nav {
       position: fixed; bottom: 0; left: 0; right: 0; background: var(--flaeche);
-      border-top: var(--strich-stark) solid var(--linie); padding: 0.7rem 1rem;
+      border-top: var(--strich-stark) solid var(--linie);
       display: flex; justify-content: space-between; gap: 1rem;
+      /* Die Safe-Area gehört in die Web-Schicht, nicht nur in .platform-ios:
+         diese Klasse setzt allein die Capacitor-App. Als Startbildschirm-App
+         (PWA, standalone) läuft dieselbe Seite ohne sie — und dort lag „Weiter"
+         auf einem Telefon mit Home-Indikator unter dem Balken. max() statt
+         Addition, damit der Knopf am Rechner nicht grundlos abrückt. */
+      padding: 0.7rem 1rem;
+      padding-bottom: max(0.7rem, env(safe-area-inset-bottom));
+      padding-left: max(1rem, env(safe-area-inset-left));
+      padding-right: max(1rem, env(safe-area-inset-right));
     }
     footer.nav .platzhalter { flex: 1; }
+    /* Quer am Telefon — das Gerät in der Fahrzeughalterung, eine der
+       maßgeblichen Nutzungssituationen — blieben von 390 px Höhe nach
+       Kopfbalken, Anzeigewahl, Speicherzeile, Schrittleiste und Übungsband
+       rund 90 px für das Formular selbst: ein Feld. Auf niedrigen Fenstern
+       rückt der Kopf deshalb zusammen. Was verschwindet, ist die
+       Speicherzeile — eine Zusicherung, keine Auskunft; das Übungsband
+       bleibt, es ist eine rechtlich erhebliche Kennzeichnung. */
+    @media (orientation: landscape) and (max-height: 30rem) {
+      .seiten-kopf { --kopf-innen: var(--r-1) var(--r-4); --kopf-kante: 2px; }
+      .seiten-kopf .autosave { display: none; }
+      .uebungs-band { padding-block: 0.1rem; }
+      main { padding-top: var(--r-3); }
+      footer.nav { padding-top: 0.35rem; padding-bottom: max(0.35rem, env(safe-area-inset-bottom)); }
+      footer.nav button { min-height: calc(2.25rem + var(--ziel)); }
+    }
     footer.nav button { min-height: calc(2.6rem + var(--ziel)); padding: 0.55rem 1.1rem; font-size: var(--t-m); }
     .fehler { color: var(--alarm); }
     .warnung {
@@ -846,7 +870,7 @@
        Entscheidungspunkt die Vor-Ort-Wege (QR, Nahbereich, PDF) tragen. */
     .teilen-dialog .teilen-weitere { margin: 0.9rem 0 0; border-top: var(--strich) solid var(--linie-fein); padding-top: 0.6rem; }
     .teilen-dialog .teilen-weitere > summary { cursor: pointer; font-size: var(--t-s); font-weight: 600; color: var(--text-2); }
-    .teilen-dialog .teilen-weitere > summary:hover { color: var(--akzent); }
+    @media (hover: hover) { .teilen-dialog .teilen-weitere > summary:hover { color: var(--akzent); } }
     .teilen-dialog .teilen-weg button { width: 100%; }
     .teilen-dialog .teilen-weg .hinweis { margin: 0.25rem 0 0; }
     /* Eigene Abfragen (Eingabe/Rückfrage/Hinweis) statt window.prompt & Co. —
@@ -1055,7 +1079,7 @@
     /* Technik-Erklärung zum Echtheits-Siegel eingeklappt — am Vorzeige-Punkt
        trägt der Kern, das Detail (Ed25519, Schlüssel teilen) auf Wunsch. */
     .signatur-detail > summary { cursor: pointer; font-size: var(--t-xs); font-weight: 600; color: var(--text-2); }
-    .signatur-detail > summary:hover { color: var(--akzent); }
+    @media (hover: hover) { .signatur-detail > summary:hover { color: var(--akzent); } }
     .signatur-detail > .hinweis { margin-top: 0.3rem; }
     /* Freiwillige Absenderangaben zur Signatur (Name/E-Mail/Telefon). */
     .absenderkarte { border: 1px solid var(--rand); border-radius: var(--radius); padding: 0.5rem 0.7rem 0.7rem; margin-top: 0.5rem; }
@@ -1194,14 +1218,16 @@
       color: var(--text); font-size: var(--t-s);
       text-decoration: underline; text-decoration-color: var(--linie); text-underline-offset: 0.2em;
     }
-    footer.seite .fuss-gruppe a:hover,
-    footer.seite .fuss-gruppe button.link:hover {
-      color: var(--akzent); text-decoration-color: currentColor;
+    @media (hover: hover) {
+      footer.seite .fuss-gruppe a:hover,
+      footer.seite .fuss-gruppe button.link:hover {
+        color: var(--akzent); text-decoration-color: currentColor;
+      }
     }
     /* „Alle Daten löschen" steht zwischen ruhigen Links — es darf nicht
        schreien, muss aber vor dem Klick als etwas anderes erkennbar sein. */
     footer.seite .fuss-gruppe button.link.gefahr,
-    footer.seite .fuss-gruppe button.link.gefahr:hover { color: var(--alarm); }
+    @media (hover: hover) { footer.seite .fuss-gruppe button.link.gefahr:hover { color: var(--alarm); } }
     .fuss-marke { margin: 0; color: var(--text-2); }
     footer.seite a { color: var(--akzent-hell); }
     /* Schmale Variante im Assistenten: eine Zeile mit den Angaben, die auf
@@ -1221,9 +1247,11 @@
       color: var(--text-2); font-size: var(--t-xs);
       text-decoration: underline; text-decoration-color: var(--linie); text-underline-offset: 0.2em;
     }
-    footer.seite.fuss-schmal a:hover,
-    footer.seite.fuss-schmal button.link:hover {
-      color: var(--akzent); text-decoration-color: currentColor;
+    @media (hover: hover) {
+      footer.seite.fuss-schmal a:hover,
+      footer.seite.fuss-schmal button.link:hover {
+        color: var(--akzent); text-decoration-color: currentColor;
+      }
     }
     button.link {
       border: none; background: none; padding: 0; font-size: inherit;
@@ -1231,7 +1259,7 @@
       color: var(--akzent-hell); text-decoration: underline; cursor: pointer;
       text-align: inherit;
     }
-    button.link:hover { border: none; background: none; color: var(--akzent); }
+    @media (hover: hover) { button.link:hover { border: none; background: none; color: var(--akzent); } }
     /* Beispiel-Liste: eigener Aufzählungspunkt mit hängendem Einzug, damit
        lange Namen (Button-Links) sauber links umbrechen und der Punkt an der
        ersten Zeile bleibt. Der Standard-Marker sitzt bei umbrechenden
