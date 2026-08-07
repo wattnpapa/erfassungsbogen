@@ -1035,11 +1035,18 @@ function AppInhalt() {
         </div>
       </SeitenKopf>
       <main id="inhalt" tabIndex={-1} className="start">
-        <p>
-          Das kostenlose Online-Tool für BOS-Einheiten und Hilfsorganisationen:
-          Bogen digital erfassen, als PDF drucken, als Datei teilen – und per
-          QR-Code ohne Internetverbindung von Gerät zu Gerät übertragen.
-        </p>
+        {/* Die Werbezeile erklärt das Prinzip für den ersten Besuch. Mit
+            eigenem Entwurf, Vorlagen oder Einsätzen ist sie längst bekannt und
+            drängt sich nur noch vor die Karte, um die es jetzt geht — das
+            Offline-Versprechen bleibt als schmales Badge stehen, der Satz
+            entfällt (wie „So funktioniert's" unten). */}
+        {erststart && (
+          <p>
+            Das kostenlose Online-Tool für BOS-Einheiten und Hilfsorganisationen:
+            Bogen digital erfassen, als PDF drucken, als Datei teilen – und per
+            QR-Code ohne Internetverbindung von Gerät zu Gerät übertragen.
+          </p>
+        )}
         <p className="offline-badge">✓ Funktioniert komplett offline — alle Daten bleiben auf diesem Gerät.</p>
         {/* „Weiter, wo du warst": der Entwurf als Karte mit taktischem Zeichen,
             Kennfarbe der Organisation und Stärke — der häufigste Weg zurück in

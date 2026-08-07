@@ -323,12 +323,17 @@
        breiten Fenstern einzeilig (max-content), darf aber nie über den Rand
        hinauslaufen: auf dem Telefon bricht es innerhalb der Fensterbreite um. */
     .start > p.offline-badge { max-width: 100%; width: max-content; font-size: var(--t-s); }
-    /* Rückmeldungen sind Kästen, keine Einleitungsabsätze: `.start > p` drückte
-       ihnen sonst dessen Schriftgrad UND `margin-top: 0` auf — der Kasten klebte
-       dadurch ohne jeden Abstand am Nachbarn. Gleicher Oberabstand wie die
-       Knopfreihe, damit er als eigener Block steht. */
+    /* Rückmeldungen bleiben hier Text, keine zweite Deckzeile: die allgemeine
+       `.meldung`-Kartenoptik (Rahmen, Deckkante, Stempel-Animation) ist für
+       Stellen gedacht, an denen sie die einzige Karte weit und breit ist. Auf
+       der Startseite steht direkt daneben die Entwurfs- oder Vorlagen-Karte
+       mit derselben schweren 4-px-Kante — zwei gleich schwere Kästen stapeln
+       sich dann als Zwillingspaar, obwohl nur einer etwas zum Tun anbietet.
+       Eine schlichte Zeile in Textfarbe genügt: Karte und Weiche darüber und
+       darunter tragen die eigentliche Bestätigung längst sichtbar mit. */
     .start > p.meldung, .start > p.fehler {
       font-size: var(--t-s); margin: var(--r-5) 0 0;
+      background: none; border: none; border-radius: 0; padding: 0; animation: none;
       /* Wie das Offline-Etikett darüber: so breit wie der Satz, nie breiter als
          die Spalte — ein Ein-Zeiler soll keinen 900-px-Balken aufspannen. */
       width: max-content; max-width: 100%;
