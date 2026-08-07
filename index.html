@@ -129,6 +129,11 @@
       --n-200: #d7dce7;
       --n-300: #bcc3d3;
       --n-400: #8b94a9;
+      /* Eigener Schritt für den Dritttext: --n-400 trägt als Linie genug,
+         als Schrift auf Weiß nur 3,04:1 und verfehlt damit AA. Die Linie
+         soll aber nicht mitdunkeln — deshalb ein Zwischenwert statt einer
+         Korrektur an --n-400. */
+      --n-450: #6b7488;
       --n-500: #5c6478;
       --n-900: #11141b;
 
@@ -138,10 +143,22 @@
       --flaeche-2:   var(--n-100);
       --text:        var(--n-900);
       --text-2:      var(--n-500);
-      --text-3:      var(--n-400);
+      --text-3:      var(--n-450);
       --linie-fein:  var(--n-200);
       --linie:       var(--n-300);
       --linie-stark: var(--n-400);
+
+      /* Rollen-Etiketten der Musterung (Führer / Unterführer / Mannschaft).
+         Als Token statt als Rohwert im Bauteil, damit Dunkel und Nacht sie
+         wie jede andere Fläche neu belegen — die Modus-Regel gilt auch für
+         die kleinen Farbfelder. */
+      --rolle-f-fond: #ede9fb; --rolle-f-text: #3a2f7a;
+      --rolle-u-fond: #e2f3ec; --rolle-u-text: #1c5c44;
+      --rolle-m-fond: #eceef3; --rolle-m-text: #3a3f4a;
+      /* Erledigt-Haken auf der Kennfarbe: --gut ist für weißes Papier
+         gerechnet und verschwindet im Kopfbalken. Der Balken behält seine
+         Kennfarbe in allen Modi, also trägt dieser Ton sie ebenfalls. */
+      --gut-auf-kopf: #8fe0ab;
 
       /* Kennfarbe der Organisation: org-farben.ts setzt --org-akzent* auf
          <html>; ohne offenen Bogen greift das THW-Blau. */
@@ -517,7 +534,7 @@
     /* Dezenter Füllstand je Schritt: ✓ = ausgefüllt, • = begonnen. Reiner
        Orientierungshelfer, blockiert nichts. */
     .schritte .schritt-status { margin-left: 0.35em; font-weight: 700; font-size: 0.95em; line-height: 1; }
-    .schritte button.status-ok .schritt-status { color: #8fe0ab; }
+    .schritte button.status-ok .schritt-status { color: var(--gut-auf-kopf); }
     .schritte button.status-begonnen .schritt-status { color: rgba(255, 255, 255, 0.75); }
     .schritte button.aktiv .schritt-status { color: var(--auf-akzent); }
     /* Karten: Kante statt Schatten. Die Trennung entsteht über Linie und
@@ -816,7 +833,7 @@
     .schnell-tabelle td input, .schnell-tabelle td select { width: 100%; min-width: 5.5rem; }
     .schnell-tabelle td:last-child button { border: none; background: none; font-weight: bold; }
     /* Eingebettete PDF-Vorschau (Übersicht, nur Browser/Desktop). */
-    .pdf-rahmen { width: 100%; height: 32rem; border: 1px solid var(--rand); border-radius: 0.3rem; margin-top: 0.6rem; }
+    .pdf-rahmen { width: 100%; height: 32rem; border: 1px solid var(--rand); border-radius: var(--radius); margin-top: 0.6rem; }
     /* „Bogen übergeben"-Dialog: je Transportweg ein voller Knopf + Situationshilfe. */
     .teilen-dialog .teilen-weg { margin: 0.9rem 0; }
     /* Zweite Stufe des Übergeben-Dialogs: Link/CSV/Excel eingeklappt, damit am
@@ -952,10 +969,10 @@
        auch den Feld-Modus, der ausdrücklich nichts zurücktreten lässt — und ein
        abgeblendetes Schwarz ist draußen in der Sonne einfach weg. */
     .muster-sub { font-size: var(--t-s); color: var(--text-2); }
-    .rolle-badge { flex: 0 0 auto; width: 1.5rem; height: 1.5rem; border-radius: 0.35rem; display: flex; align-items: center; justify-content: center; font-size: var(--t-s); font-weight: 700; }
-    .rolle-badge.rolle-f { background: #ede9fb; color: #3a2f7a; }
-    .rolle-badge.rolle-u { background: #e2f3ec; color: #1c5c44; }
-    .rolle-badge.rolle-m { background: #eceef3; color: #3a3f4a; }
+    .rolle-badge { flex: 0 0 auto; width: 1.5rem; height: 1.5rem; border-radius: var(--radius); display: flex; align-items: center; justify-content: center; font-size: var(--t-s); font-weight: 700; }
+    .rolle-badge.rolle-f { background: var(--rolle-f-fond); color: var(--rolle-f-text); }
+    .rolle-badge.rolle-u { background: var(--rolle-u-fond); color: var(--rolle-u-text); }
+    .rolle-badge.rolle-m { background: var(--rolle-m-fond); color: var(--rolle-m-text); }
     .muster-start { width: 100%; }
     .update-banner {
       display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 0.75rem;
@@ -1035,10 +1052,10 @@
     .signatur-detail > summary:hover { color: var(--akzent); }
     .signatur-detail > .hinweis { margin-top: 0.3rem; }
     /* Freiwillige Absenderangaben zur Signatur (Name/E-Mail/Telefon). */
-    .absenderkarte { border: 1px solid var(--rand); border-radius: 0.4rem; padding: 0.5rem 0.7rem 0.7rem; margin-top: 0.5rem; }
+    .absenderkarte { border: 1px solid var(--rand); border-radius: var(--radius); padding: 0.5rem 0.7rem 0.7rem; margin-top: 0.5rem; }
     .absenderkarte label.feld { display: block; }
     .absenderkarte .zeile > label.feld { flex: 1 1 12rem; }
-    .signatur-herkunft { font-size: var(--t-s); border: 1px solid var(--rand); border-radius: 0.4rem; padding: 0.4rem 0.6rem; margin: 0.4rem 0; }
+    .signatur-herkunft { font-size: var(--t-s); border: 1px solid var(--rand); border-radius: var(--radius); padding: 0.4rem 0.6rem; margin: 0.4rem 0; }
     .signatur-herkunft.gueltig { background: var(--gut-fond); border-color: var(--gut-linie); color: var(--gut); }
     .signatur-herkunft.ungueltig { background: var(--alarm-fond); border-color: var(--alarm-linie); color: var(--alarm); }
     .signatur-badge { white-space: nowrap; font-weight: 600; }
@@ -1050,7 +1067,7 @@
     .uebung-badge {
       display: inline-block; margin-left: 0.4rem; padding: 0 0.35rem;
       background: var(--warn-fond); color: var(--warn-text);
-      border: 1px solid var(--warn-linie); border-radius: 0.35rem;
+      border: 1px solid var(--warn-linie); border-radius: var(--radius);
       font-size: var(--t-xs); font-weight: 700; letter-spacing: 0.06em;
       vertical-align: 0.1em;
     }
@@ -1074,7 +1091,7 @@
        gleichnamige Zeilen unterscheidet. */
     .zug-badge, .teil-badge {
       display: inline-block; margin-left: 0.4rem; padding: 0 0.35rem;
-      border: 1px solid var(--rand); border-radius: 0.35rem;
+      border: 1px solid var(--rand); border-radius: var(--radius);
       font-size: var(--t-xs); font-weight: 600; color: var(--text-2);
       vertical-align: 0.1em; white-space: nowrap;
     }
@@ -2262,9 +2279,11 @@
        trägt er die Kopf-Schriftfarbe statt der Schrift AUF der Akzentfläche
        (die hier der tiefe Org-Ton ist und im Balken verschwände). */
     .dunkel-modus .schritte button.aktiv .schritt-status { color: var(--kopf-auf); }
-    .dunkel-modus .rolle-badge.rolle-f { background: #2b2748; color: #c9c0ee; }
-    .dunkel-modus .rolle-badge.rolle-u { background: #1c2c25; color: #9fcbb2; }
-    .dunkel-modus .rolle-badge.rolle-m { background: var(--flaeche-2); color: var(--text-2); }
+    .dunkel-modus {
+      --rolle-f-fond: #2b2748; --rolle-f-text: #c9c0ee;
+      --rolle-u-fond: #1c2c25; --rolle-u-text: #9fcbb2;
+      --rolle-m-fond: var(--flaeche-2); --rolle-m-text: var(--text-2);
+    }
     .dunkel-modus .vollstaendig-ok, .dunkel-modus .autosave { color: var(--gut); }
     .dunkel-modus .offline-badge { color: var(--gut); border-color: var(--gut); }
     /* QR-Bilder behalten ihre weiße Ruhezone — sonst sind sie unscannbar. */
@@ -2326,9 +2345,11 @@
     .nacht-modus .schritte button.status-begonnen .schritt-status { color: var(--akzent-hell); }
     .nacht-modus .vollstaendig-ok, .nacht-modus .autosave { color: var(--gut); }
     .nacht-modus .offline-badge { color: var(--gut); border-color: var(--gut); }
-    .nacht-modus .rolle-badge.rolle-f { background: #2a2440; color: #c3b6ea; }
-    .nacht-modus .rolle-badge.rolle-u { background: #1d2a22; color: #9fcbb2; }
-    .nacht-modus .rolle-badge.rolle-m { background: var(--flaeche-2); color: var(--text-2); }
+    .nacht-modus {
+      --rolle-f-fond: #2a2440; --rolle-f-text: #c3b6ea;
+      --rolle-u-fond: #1d2a22; --rolle-u-text: #9fcbb2;
+      --rolle-m-fond: var(--flaeche-2); --rolle-m-text: var(--text-2);
+    }
     /* QR-Bilder und Vollbild bleiben hell — Scannbarkeit geht vor Dunkeladaption;
        fürs Vorzeigen wird ohnehin das Display der Gegenseite gebraucht. */
     .nacht-modus .qr-box img { background: #fff; padding: 8px; }

@@ -10,7 +10,7 @@ colors:
   flaeche-2: "#e8ebf2"
   text: "#11141b"
   text-2: "#5c6478"
-  text-3: "#8b94a9"
+  text-3: "#6b7488"
   linie-fein: "#d7dce7"
   linie: "#bcc3d3"
   linie-stark: "#8b94a9"
@@ -146,7 +146,8 @@ Eine kühle, leicht ins Blaue gekippte Neutralpalette unter einer einzigen, orga
 - **Zweite Fläche** (#e8ebf2): abgesetzte Bereiche, Hover in Listen (`--flaeche-2`).
 - **Tintenschwarz** (#11141b): Fließtext und Überschriften (`--text`).
 - **Aktenschrift-Grau** (#5c6478): Zweittext, Beschriftungen (`--text-2`).
-- **Hinweis-Grau** (#8b94a9): Dritttext, Platzhalter (`--text-3`) — dient zugleich als starke Linie (`--linie-stark`) an Eingaben und Knöpfen.
+- **Hinweis-Grau** (#8b94a9): starke Linie (`--linie-stark`) an Eingaben und Knöpfen.
+- **Platzhalter-Grau** (#6b7488, `--n-450`): Dritttext und Platzhalter (`--text-3`). Eigener Schritt, weil #8b94a9 als Linie trägt, als Schrift auf Weiß aber nur 3,04:1 erreicht und AA verfehlt; die Linie soll dabei nicht mitdunkeln.
 - **Linienwerte** (#d7dce7 fein / #bcc3d3 normal): Kartenrahmen, Trenner.
 
 ### Tertiary
