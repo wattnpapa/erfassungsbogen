@@ -86,7 +86,7 @@ components:
     textColor: "{colors.text}"
     rounded: "{rounded.none}"
     padding: "0.5rem 0.9rem"
-    height: "2.25rem"
+    height: "2.75rem"
   button-default-hover:
     backgroundColor: "{colors.flaeche}"
     textColor: "{colors.akzent}"
@@ -95,7 +95,7 @@ components:
     textColor: "{colors.auf-akzent}"
     rounded: "{rounded.none}"
     padding: "0.5rem 0.9rem"
-    height: "2.25rem"
+    height: "2.75rem"
   button-primaer-hover:
     backgroundColor: "{colors.akzent-hell}"
     textColor: "{colors.auf-akzent}"
@@ -104,7 +104,7 @@ components:
     textColor: "{colors.text}"
     rounded: "{rounded.none}"
     padding: "0.45rem 0.55rem"
-    height: "2.25rem"
+    height: "2.75rem"
   karte:
     backgroundColor: "{colors.flaeche}"
     textColor: "{colors.text}"
@@ -202,7 +202,7 @@ Die Angabe bricht nie um: `0 / 2 / 6 / 8` ist eine Auskunft, kein Satz. Wird es 
 
 Eine zentrierte Inhaltsspalte (`main`, max-width 60rem, Padding `--r-5`/`--r-4`, unten 6rem Freiraum für die fixe Schritt-Navigation). Formulare als umbruchfähige Zeilen (`.zeile`: Flex, `gap 0.8rem`, `flex-wrap`; Felder `flex: 1 1 10rem`, schmale Felder `0 1 7rem`) — das Layout trägt sich vom Telefon bis zum Desktop überwiegend aus dem Umbruch selbst. Startseite linksbündig: ein Satzspiegel mit fester linker Kante wirkt verbindlicher als die zentrierte Mittelachse.
 
-Der Rhythmus kommt aus der `--r-1`…`--r-6`-Skala (0.25–2rem), und er ist gestaffelt: eng innerhalb einer Gruppe, `--r-4` zwischen Karten, `--r-6` als Absatz zwischen zwei Zwecken. Karten sind nicht automatisch je eine Reihe — zwei knappe Karten paaren sich ab 48rem zu einem Block (`.karten-paar`), statt halbleer über die volle Breite zu laufen. Tippziele: Grundmaß 2.25rem, plus globaler Zuschlag `--ziel` (0 im Standard, 0.75rem im Feld-Modus → 48-px-Ziele; Stepper-Knöpfe dort 3.75rem).
+Der Rhythmus kommt aus der `--r-1`…`--r-6`-Skala (0.25–2rem), und er ist gestaffelt: eng innerhalb einer Gruppe, `--r-4` zwischen Karten, `--r-6` als Absatz zwischen zwei Zwecken. Karten sind nicht automatisch je eine Reihe — zwei knappe Karten paaren sich ab 48rem zu einem Block (`.karten-paar`), statt halbleer über die volle Breite zu laufen. Tippziele: Grundmaß `--ziel-basis` (2.75rem = 44 px, die Fingergröße von HIG und Material), plus globaler Zuschlag `--ziel` (0 im Standard, 0.25rem im Feld-Modus → 48-px-Ziele; Stepper-Knöpfe dort 3.75rem).
 
 Vier benannte Umbruchpunkte, jeder an einer Inhaltsgrenze statt an einer Gerätebreite: **30rem** (Knopfreihen werden zur Spalte voller Breite, die Stärke-Leiste auf zwei Spalten), **40rem** (rollbare Tabellen laufen bis an die Kartenkante), **48rem** (Kartenpaarung), **540px** (Aktionsgruppen in Kartenköpfen brechen linksbündig um).
 
@@ -248,13 +248,13 @@ Komponenten-Gefühl (bestätigt): **robust und werkzeughaft — gebaut für Hand
 
 ### Buttons
 - **Shape:** rechteckig (0px), Rahmen 1px `--linie-stark`.
-- **Default:** Fläche `--flaeche`, Text `--text`, 600, Padding 0.5rem 0.9rem, min-height 2.25rem + `--ziel`; `-webkit-appearance: none` (iOS-WKWebView tönt Button-Text sonst systemblau).
+- **Default:** Fläche `--flaeche`, Text `--text`, 600, Padding 0.5rem 0.9rem, min-height `--ziel-basis` + `--ziel`; `-webkit-appearance: none` (iOS-WKWebView tönt Button-Text sonst systemblau).
 - **Hover / Focus:** Hover färbt Rahmen und Text in die Kennfarbe; Tastaturfokus überall gleich: `outline: var(--fokus) solid var(--akzent)` (3px, im Feld-Modus 4px).
 - **Primär (`button.primaer`):** Kennfarbe als Fläche, weiße Schrift; Hover hellt zur `--akzent-hell` auf. Eine primäre Aktion je Ansicht.
 - **Disabled:** `opacity: 0.4` — die einzige zulässige Opacity-Abschwächung (der Feld-Modus hebt andere auf).
 
 ### Inputs / Fields
-- **Style:** weiße Fläche, 1px-Rahmen `--linie-stark`, 0px Radius, Padding 0.45rem 0.55rem, min-height 2.25rem + `--ziel`.
+- **Style:** weiße Fläche, 1px-Rahmen `--linie-stark`, 0px Radius, Padding 0.45rem 0.55rem, min-height `--ziel-basis` + `--ziel`.
 - **Beschriftung:** `label.feld` über dem Feld (0.75rem, 600, `--text-2`); Feld füllt die Spaltenbreite.
 - **Focus:** Fokusring in der Kennfarbe plus Rahmenfarbe `--akzent`.
 - **Abgeleitet:** `output.abgeleitet` gestrichelt auf `--flaeche-2` — sichtbar „errechnet, nicht eingetippt".

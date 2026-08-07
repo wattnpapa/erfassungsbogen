@@ -185,6 +185,12 @@
       --strich:       1px;
       --strich-stark: 1px;
       --fokus:        3px;
+      /* Grundmaß jedes Tippziels. 2.25rem (36 px) lag über der WCAG-Schwelle
+         (24 px), aber unter dem, was Apple (44) und Material (48) für den
+         Finger ansetzen — und die maßgebliche Nutzungssituation dieses
+         Produkts ist nicht der Schreibtisch, sondern der Bereitstellungsraum
+         unter Zeitdruck. Der Feld-Modus bleibt der Sprung darüber hinaus. */
+      --ziel-basis:   2.75rem;
       --ziel:         0rem; /* Zuschlag auf alle Tippziele; der Feld-Modus erhöht ihn */
 
       /* Bewegung: erklärt Zustand und quittiert Aktionen — nie Dekoration.
@@ -367,7 +373,7 @@
     button, .datei-knopf {
       font: inherit; font-size: var(--t-s); font-weight: 600;
       padding: 0.5rem 0.9rem;
-      min-height: calc(2.25rem + var(--ziel));
+      min-height: calc(var(--ziel-basis) + var(--ziel));
       display: inline-flex; align-items: center; justify-content: center; gap: 0.4rem;
       border: var(--strich-stark) solid var(--linie-stark);
       border-radius: var(--radius); background: var(--flaeche); cursor: pointer;
@@ -563,7 +569,7 @@
       transition: border-color var(--dauer-1);
     }
     input:not([type="checkbox"]):not([type="radio"]):not([type="file"]), select, textarea {
-      min-height: calc(2.25rem + var(--ziel));
+      min-height: calc(var(--ziel-basis) + var(--ziel));
     }
     input[type="checkbox"], input[type="radio"] {
       accent-color: var(--akzent); width: 1.1rem; height: 1.1rem; min-height: 0; padding: 0;
@@ -2187,7 +2193,7 @@
       --strich:       2px;
       --strich-stark: 2px;
       --fokus:        4px;
-      --ziel:         0.75rem; /* zieht alle Tippziele von 36 auf 48 px */
+      --ziel:         0.25rem; /* zieht alle Tippziele von 44 auf 48 px */
       /* Die 112 % heben die ganze Leiter; die beiden kleinsten Grade bekommen
          zusätzlich je einen Schritt, weil sie draußen zuerst wegbrechen —
          gesperrte Versalzeilen und Nebentext stehen dann bei 16 bzw. 17 px. */
