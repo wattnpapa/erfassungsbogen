@@ -1,0 +1,436 @@
+{
+  "schemaVersion": 8,
+  "uebung": true,
+  "stand": 3376643,
+  "einheit": {
+    "organisation": 5,
+    "organisationName": "Deutsches Rotes Kreuz Kreisverband St. Wendel e.V.",
+    "einheitsTyp": {
+      "freitext": "Patiententransport-Gruppe Arzt (PT-GA 5 DRK SAL)"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Fachdienst Sanitätsdienst"
+        },
+        "name": "St. Wendel"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "DRK-Kreisverband"
+        },
+        "name": "St. Wendel"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "DRK-Landesverband"
+        },
+        "name": "Saarland"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2344,
+    "zeitraumBis": 2347,
+    "ortAuftrag": "Sekundärverlegung St. Wendel — Transportkapazität für fünf Patienten mit Arztbegleitung"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Stefan",
+      "nachname": "Schmitt",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "Zugführer/-in (Führer PT-GA 5)"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5551205913"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungssanitäter"
+        }
+      ]
+    },
+    {
+      "vorname": "Sascha",
+      "nachname": "Schäfer",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "Notarzt/Notärztin"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Volker",
+      "nachname": "Krein",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Fahrzeugführer/-in RTW"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungsassistent/Notfallsanitäter"
+        }
+      ]
+    },
+    {
+      "vorname": "Thomas",
+      "nachname": "Britz",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Fahrzeugführer/-in NEF"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungsassistent/Notfallsanitäter"
+        }
+      ]
+    },
+    {
+      "vorname": "Manfred",
+      "nachname": "Weber",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kraftfahrer/-in/Sprechfunker/-in Führung"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Simone",
+      "nachname": "Meyer",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Fahrer/-in RTW"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungssanitäter"
+        }
+      ]
+    },
+    {
+      "vorname": "Thomas",
+      "nachname": "Backes",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Fahrzeugführer/-in KTW"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungssanitäter"
+        }
+      ]
+    },
+    {
+      "vorname": "Jasmin",
+      "nachname": "Bohr",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Fahrzeugführer/-in KTW"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungssanitäter"
+        }
+      ]
+    },
+    {
+      "vorname": "Karin",
+      "nachname": "Schuh",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Fahrzeugführer/-in KTW"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungssanitäter"
+        }
+      ]
+    },
+    {
+      "vorname": "Lars",
+      "nachname": "Sartor",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Fahrzeugführer/-in KTW"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungssanitäter"
+        }
+      ]
+    },
+    {
+      "vorname": "Volker",
+      "nachname": "Thiel",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kraftfahrer/-in KTW"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Elke",
+      "nachname": "Ney",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kraftfahrer/-in KTW"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Notfallsanitäter (extern)"
+        }
+      ]
+    },
+    {
+      "vorname": "Paul",
+      "nachname": "Meyer",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kraftfahrer/-in KTW"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 2,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Bernd",
+      "nachname": "Marx",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kraftfahrer/-in KTW"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "RTW"
+      },
+      "aenderungen": "Rettungswagen (DIN EN 1789 Typ C)",
+      "kennzeichen": "WND-DRK 116",
+      "funkrufname": {
+        "kennwort": {
+          "code": 3
+        },
+        "eigenerStandort": false,
+        "ort": "St. Wendel",
+        "teile": [
+          0,
+          83,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "KTW"
+      },
+      "aenderungen": "Krankentransportwagen (DIN EN 1789 Typ B)",
+      "kennzeichen": "WND-DRK 117",
+      "funkrufname": {
+        "kennwort": {
+          "code": 3
+        },
+        "eigenerStandort": false,
+        "ort": "St. Wendel",
+        "teile": [
+          0,
+          85,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "KTW"
+      },
+      "aenderungen": "Krankentransportwagen (DIN EN 1789 Typ B)",
+      "kennzeichen": "WND-DRK 118",
+      "funkrufname": {
+        "kennwort": {
+          "code": 3
+        },
+        "eigenerStandort": false,
+        "ort": "St. Wendel",
+        "teile": [
+          0,
+          85,
+          2
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "KTW"
+      },
+      "aenderungen": "Krankentransportwagen (DIN EN 1789 Typ B)",
+      "kennzeichen": "WND-DRK 119",
+      "funkrufname": {
+        "kennwort": {
+          "code": 3
+        },
+        "eigenerStandort": false,
+        "ort": "St. Wendel",
+        "teile": [
+          0,
+          85,
+          3
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "KTW"
+      },
+      "aenderungen": "Krankentransportwagen (DIN EN 1789 Typ B)",
+      "kennzeichen": "WND-DRK 120",
+      "funkrufname": {
+        "kennwort": {
+          "code": 3
+        },
+        "eigenerStandort": false,
+        "ort": "St. Wendel",
+        "teile": [
+          0,
+          85,
+          4
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "KdoW"
+      },
+      "aenderungen": "Kommandowagen — Führungsfahrzeug (alt. ELW 1)",
+      "kennzeichen": "WND-DRK 121",
+      "funkrufname": {
+        "kennwort": {
+          "code": 3
+        },
+        "eigenerStandort": false,
+        "ort": "St. Wendel",
+        "teile": [
+          0,
+          10,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "NEF"
+      },
+      "aenderungen": "Notarzt-Einsatzfahrzeug (optional nach DRK-SAL-Konzept)",
+      "kennzeichen": "WND-DRK 122",
+      "funkrufname": {
+        "kennwort": {
+          "code": 3
+        },
+        "eigenerStandort": false,
+        "ort": "St. Wendel",
+        "teile": [
+          0,
+          82,
+          1
+        ]
+      }
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 14,
+    "dieselLiter": 315,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": true,
+    "ruhezeitErforderlich": false
+  },
+  "sonstiges": "Stärke 2/2/10/14, 1 RTW + 4 KTW + 1 KdoW/ELW 1 + 1 NEF (optional) nach „Die Patiententransportkomponenten des DRK im Saarland\", Landesausschuss der Bereitschaften (17.11.2020, Version 28.09.2024)."
+}

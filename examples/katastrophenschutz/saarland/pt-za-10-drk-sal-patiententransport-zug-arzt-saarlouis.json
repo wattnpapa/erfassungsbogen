@@ -1,0 +1,766 @@
+{
+  "schemaVersion": 8,
+  "uebung": true,
+  "stand": 3375931,
+  "einheit": {
+    "organisation": 5,
+    "organisationName": "Deutsches Rotes Kreuz Kreisverband Saarlouis e.V.",
+    "einheitsTyp": {
+      "freitext": "Patiententransport-Zug Arzt (PT-ZA 10 DRK SAL)"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Fachdienst Sanitätsdienst"
+        },
+        "name": "Saarlouis"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "DRK-Kreisverband"
+        },
+        "name": "Saarlouis"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "DRK-Landesverband"
+        },
+        "name": "Saarland"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2344,
+    "zeitraumBis": 2347,
+    "ortAuftrag": "Sekundärverlegung Saarlouis — überörtliche Transportkapazität für zehn Patienten mit Arztbegleitung"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Werner",
+      "nachname": "Dorn",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "Zugführer/-in (Führer PT-ZA 10)"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5552593809"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungssanitäter"
+        }
+      ]
+    },
+    {
+      "vorname": "Sebastian",
+      "nachname": "Schwarz",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "Notarzt/Notärztin"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Patrick",
+      "nachname": "Rubly",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "Notarzt/Notärztin"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Matthias",
+      "nachname": "Bender",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Fahrzeugführer/-in RTW"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungsassistent/Notfallsanitäter"
+        }
+      ]
+    },
+    {
+      "vorname": "Dieter",
+      "nachname": "Krein",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Fahrzeugführer/-in RTW"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungsassistent/Notfallsanitäter"
+        }
+      ]
+    },
+    {
+      "vorname": "Julia",
+      "nachname": "Mathes",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Fahrzeugführer/-in RTW"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungsassistent/Notfallsanitäter"
+        }
+      ]
+    },
+    {
+      "vorname": "Marc",
+      "nachname": "Heck",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Fahrzeugführer/-in RTW"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungsassistent/Notfallsanitäter"
+        }
+      ]
+    },
+    {
+      "vorname": "Markus",
+      "nachname": "Schuh",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Fahrzeugführer/-in NEF"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungsassistent/Notfallsanitäter"
+        }
+      ]
+    },
+    {
+      "vorname": "Maria",
+      "nachname": "Meyer",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Fahrzeugführer/-in NEF"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungsassistent/Notfallsanitäter"
+        }
+      ]
+    },
+    {
+      "vorname": "Manuela",
+      "nachname": "Jung",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kraftfahrer/-in/Sprechfunker/-in Führung"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 1,
+      "ernaehrung": 2,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Patrick",
+      "nachname": "Bohr",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Fahrer/-in RTW"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungssanitäter"
+        }
+      ]
+    },
+    {
+      "vorname": "Christian",
+      "nachname": "Simon",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Fahrer/-in RTW"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungssanitäter"
+        }
+      ]
+    },
+    {
+      "vorname": "Angelika",
+      "nachname": "Kihm",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Fahrer/-in RTW"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungssanitäter"
+        }
+      ]
+    },
+    {
+      "vorname": "Heike",
+      "nachname": "Schmidt",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Fahrer/-in RTW"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungssanitäter"
+        }
+      ]
+    },
+    {
+      "vorname": "René",
+      "nachname": "Dorn",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Fahrzeugführer/-in KTW"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungssanitäter"
+        }
+      ]
+    },
+    {
+      "vorname": "Marco",
+      "nachname": "Kihm",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Fahrzeugführer/-in KTW"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungssanitäter"
+        }
+      ]
+    },
+    {
+      "vorname": "Sandra",
+      "nachname": "Metz",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Fahrzeugführer/-in KTW"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungssanitäter"
+        }
+      ]
+    },
+    {
+      "vorname": "Jürgen",
+      "nachname": "Thiel",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Fahrzeugführer/-in KTW"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungssanitäter"
+        }
+      ]
+    },
+    {
+      "vorname": "Claudia",
+      "nachname": "Fried",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Fahrzeugführer/-in KTW"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungssanitäter"
+        }
+      ]
+    },
+    {
+      "vorname": "Ralf",
+      "nachname": "Mathes",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Fahrzeugführer/-in KTW"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungssanitäter"
+        }
+      ]
+    },
+    {
+      "vorname": "Dirk",
+      "nachname": "Wies",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kraftfahrer/-in KTW"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Angelika",
+      "nachname": "Koch",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kraftfahrer/-in KTW"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 1,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Bernd",
+      "nachname": "Sartor",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kraftfahrer/-in KTW"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Hans",
+      "nachname": "Fried",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kraftfahrer/-in KTW"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "René",
+      "nachname": "Lorig",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kraftfahrer/-in KTW"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungssanitäter (extern)"
+        }
+      ]
+    },
+    {
+      "vorname": "Christian",
+      "nachname": "Kohl",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kraftfahrer/-in KTW"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "RTW"
+      },
+      "aenderungen": "Rettungswagen (DIN EN 1789 Typ C)",
+      "kennzeichen": "SLS-DRK 134",
+      "funkrufname": {
+        "kennwort": {
+          "code": 3
+        },
+        "eigenerStandort": false,
+        "ort": "Saarlouis",
+        "teile": [
+          0,
+          83,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "RTW"
+      },
+      "aenderungen": "Rettungswagen (DIN EN 1789 Typ C)",
+      "kennzeichen": "SLS-DRK 135",
+      "funkrufname": {
+        "kennwort": {
+          "code": 3
+        },
+        "eigenerStandort": false,
+        "ort": "Saarlouis",
+        "teile": [
+          0,
+          83,
+          2
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "RTW"
+      },
+      "aenderungen": "Rettungswagen (DIN EN 1789 Typ C)",
+      "kennzeichen": "SLS-DRK 136",
+      "funkrufname": {
+        "kennwort": {
+          "code": 3
+        },
+        "eigenerStandort": false,
+        "ort": "Saarlouis",
+        "teile": [
+          0,
+          83,
+          3
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "RTW"
+      },
+      "aenderungen": "Rettungswagen (DIN EN 1789 Typ C)",
+      "kennzeichen": "SLS-DRK 137",
+      "funkrufname": {
+        "kennwort": {
+          "code": 3
+        },
+        "eigenerStandort": false,
+        "ort": "Saarlouis",
+        "teile": [
+          0,
+          83,
+          4
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "KTW"
+      },
+      "aenderungen": "Krankentransportwagen (DIN EN 1789 Typ B)",
+      "kennzeichen": "SLS-DRK 138",
+      "funkrufname": {
+        "kennwort": {
+          "code": 3
+        },
+        "eigenerStandort": false,
+        "ort": "Saarlouis",
+        "teile": [
+          0,
+          85,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "KTW"
+      },
+      "aenderungen": "Krankentransportwagen (DIN EN 1789 Typ B)",
+      "kennzeichen": "SLS-DRK 139",
+      "funkrufname": {
+        "kennwort": {
+          "code": 3
+        },
+        "eigenerStandort": false,
+        "ort": "Saarlouis",
+        "teile": [
+          0,
+          85,
+          2
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "KTW"
+      },
+      "aenderungen": "Krankentransportwagen (DIN EN 1789 Typ B)",
+      "kennzeichen": "SLS-DRK 140",
+      "funkrufname": {
+        "kennwort": {
+          "code": 3
+        },
+        "eigenerStandort": false,
+        "ort": "Saarlouis",
+        "teile": [
+          0,
+          85,
+          3
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "KTW"
+      },
+      "aenderungen": "Krankentransportwagen (DIN EN 1789 Typ B)",
+      "kennzeichen": "SLS-DRK 141",
+      "funkrufname": {
+        "kennwort": {
+          "code": 3
+        },
+        "eigenerStandort": false,
+        "ort": "Saarlouis",
+        "teile": [
+          0,
+          85,
+          4
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "KTW"
+      },
+      "aenderungen": "Krankentransportwagen (DIN EN 1789 Typ B)",
+      "kennzeichen": "SLS-DRK 142",
+      "funkrufname": {
+        "kennwort": {
+          "code": 3
+        },
+        "eigenerStandort": false,
+        "ort": "Saarlouis",
+        "teile": [
+          0,
+          85,
+          5
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "KTW"
+      },
+      "aenderungen": "Krankentransportwagen (DIN EN 1789 Typ B)",
+      "kennzeichen": "SLS-DRK 143",
+      "funkrufname": {
+        "kennwort": {
+          "code": 3
+        },
+        "eigenerStandort": false,
+        "ort": "Saarlouis",
+        "teile": [
+          0,
+          85,
+          6
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "KdoW"
+      },
+      "aenderungen": "Kommandowagen — Führungsfahrzeug (alt. ELW 1)",
+      "kennzeichen": "SLS-DRK 144",
+      "funkrufname": {
+        "kennwort": {
+          "code": 3
+        },
+        "eigenerStandort": false,
+        "ort": "Saarlouis",
+        "teile": [
+          0,
+          10,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "NEF"
+      },
+      "aenderungen": "Notarzt-Einsatzfahrzeug (optional nach DRK-SAL-Konzept)",
+      "kennzeichen": "SLS-DRK 145",
+      "funkrufname": {
+        "kennwort": {
+          "code": 3
+        },
+        "eigenerStandort": false,
+        "ort": "Saarlouis",
+        "teile": [
+          0,
+          82,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "NEF"
+      },
+      "aenderungen": "Notarzt-Einsatzfahrzeug (optional nach DRK-SAL-Konzept)",
+      "kennzeichen": "SLS-DRK 146",
+      "funkrufname": {
+        "kennwort": {
+          "code": 3
+        },
+        "eigenerStandort": false,
+        "ort": "Saarlouis",
+        "teile": [
+          0,
+          82,
+          2
+        ]
+      }
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 26,
+    "dieselLiter": 585,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": true,
+    "ruhezeitErforderlich": false
+  },
+  "sonstiges": "Stärke 3/6/17/26, 4 RTW + 6 KTW + 1 KdoW/ELW 1 + 2 NEF (optional) nach „Die Patiententransportkomponenten des DRK im Saarland\", Landesausschuss der Bereitschaften (17.11.2020, Version 28.09.2024)."
+}

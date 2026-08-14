@@ -1,0 +1,75 @@
+{
+  "schemaVersion": 8,
+  "uebung": true,
+  "stand": 3375813,
+  "einheit": {
+    "organisation": 5,
+    "organisationName": "Deutsches Rotes Kreuz Kreisverband Saarbrücken e.V.",
+    "einheitsTyp": {
+      "freitext": "Betreuer vor Ort (BvO)"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Fachdienst Betreuungsdienst"
+        },
+        "name": "Saarbrücken"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "DRK-Kreisverband"
+        },
+        "name": "Saarbrücken"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "DRK-Landesverband"
+        },
+        "name": "Saarland"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2344,
+    "zeitraumBis": 2347,
+    "ortAuftrag": "Kleinschadenslage Saarbrücken — Erstversorgung von bis zu 30 Betroffenen"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Norbert",
+      "nachname": "Scherer",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Betreuer/-in vor Ort"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5556604706"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Koch (Beruf)"
+        }
+      ]
+    }
+  ],
+  "fahrzeuge": [],
+  "sofortbedarf": {
+    "verpflegungPersonen": 1,
+    "dieselLiter": 0,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": true,
+    "ruhezeitErforderlich": false
+  },
+  "sonstiges": "Stärke -/-/1/1 nach „Mindestanforderungen an Strukturen des DRK-Betreuungsdienstes im LV Saarland\" (Landesausschuss der Bereitschaften, 01.03.2015). Kein Fahrzeug vorgesehen — der BvO wird gezielt personenungebunden und schnell verfügbar gehalten (Quelle: \"nicht unbedingt aus dem Betreuungsdienst\" rekrutiert)."
+}

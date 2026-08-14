@@ -1,0 +1,170 @@
+{
+  "schemaVersion": 8,
+  "uebung": true,
+  "stand": 3374454,
+  "einheit": {
+    "organisation": 5,
+    "organisationName": "Deutsches Rotes Kreuz Kreisverband Saarlouis e.V.",
+    "einheitsTyp": {
+      "freitext": "Betreuungsstaffel (Betreuungsstaffel)"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Fachdienst Betreuungsdienst"
+        },
+        "name": "Saarlouis"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "DRK-Kreisverband"
+        },
+        "name": "Saarlouis"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "DRK-Landesverband"
+        },
+        "name": "Saarland"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2343,
+    "zeitraumBis": 2345,
+    "ortAuftrag": "Evakuierung Saarlouis — Erstversorgung von bis zu 100 Betroffenen"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Roland",
+      "nachname": "Fixemer",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Staffelführer/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5550529557"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Helmut",
+      "nachname": "Scherer",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kraftfahrer/-in/Sprechfunker/-in"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Bernd",
+      "nachname": "Ecker",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Helfer/-in Betreuungsdienst"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 2,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Betreuungshelfer/-in"
+        }
+      ]
+    },
+    {
+      "vorname": "Michael",
+      "nachname": "Leiner",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Helfer/-in Betreuungsdienst"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Heiko",
+      "nachname": "Kalbfell",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Helfer/-in Betreuungsdienst"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Simone",
+      "nachname": "Dorn",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Helfer/-in Betreuungsdienst"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 1,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "MTW-Z"
+      },
+      "aenderungen": "Mannschaftstransportwagen mit Zusatzfunktion — Betreuung",
+      "kennzeichen": "SLS-DRK 147",
+      "funkrufname": {
+        "kennwort": {
+          "code": 3
+        },
+        "eigenerStandort": false,
+        "ort": "Saarlouis",
+        "teile": [
+          0,
+          17,
+          1
+        ]
+      }
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 6,
+    "dieselLiter": 45,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": false,
+    "ruhezeitErforderlich": false
+  },
+  "sonstiges": "Stärke -/1/5/6 nach „Mindestanforderungen an Strukturen des DRK-Betreuungsdienstes im LV Saarland\" (Landesausschuss der Bereitschaften, 01.03.2015). Fahrzeugtyp nicht in der DRK-SAL-Konzeption genannt — beispielhaft nach der generischen Ausstattung der KatOrgVO belegt."
+}

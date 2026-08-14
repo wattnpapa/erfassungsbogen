@@ -1,0 +1,423 @@
+{
+  "schemaVersion": 8,
+  "uebung": true,
+  "stand": 3377810,
+  "einheit": {
+    "organisation": 5,
+    "organisationName": "Deutsches Rotes Kreuz Kreisverband Neunkirchen e.V.",
+    "einheitsTyp": {
+      "freitext": "Behandlungsplatz 10 — Basismodul (BHP 10 DRK SAL)"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Fachdienst Sanitätsdienst"
+        },
+        "name": "Neunkirchen"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "DRK-Kreisverband"
+        },
+        "name": "Neunkirchen"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "DRK-Landesverband"
+        },
+        "name": "Saarland"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2345,
+    "zeitraumBis": 2347,
+    "ortAuftrag": "Sanitätswachdienst Neunkirchen — Aufbau und Betrieb eines Behandlungsplatzes 10 (BHP 10)"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Sarah",
+      "nachname": "Schäfer",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "Zugführer/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5550488631"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Zugführer"
+        }
+      ]
+    },
+    {
+      "vorname": "Sarah",
+      "nachname": "Zimmer",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "Notarzt/Notärztin"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5555445529"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Lukas",
+      "nachname": "Bender",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Führungsgehilfe/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Technik und Sicherheit"
+        }
+      ]
+    },
+    {
+      "vorname": "Christiane",
+      "nachname": "Metz",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Führungsgehilfe/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Technik und Sicherheit"
+        }
+      ]
+    },
+    {
+      "vorname": "Heike",
+      "nachname": "Weiler",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Helfer/-in Technik und Sicherheit"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Anja",
+      "nachname": "Hammer",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Helfer/-in Technik und Sicherheit"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Andrea",
+      "nachname": "Lang",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Staffelführer/-in Sanitätsstaffel"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Gruppenführerausbildung"
+        }
+      ]
+    },
+    {
+      "vorname": "Kerstin",
+      "nachname": "Dietz",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Staffelführer/-in Sanitätsstaffel"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Gruppenführerausbildung"
+        }
+      ]
+    },
+    {
+      "vorname": "Doris",
+      "nachname": "Schmidt",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kraftfahrer/-in Sanitätsstaffel"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Matthias",
+      "nachname": "Kihm",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kraftfahrer/-in Sanitätsstaffel"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Matthias",
+      "nachname": "Faust",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Rettungssanitäter/-in Sanitätsstaffel"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungssanitäter"
+        }
+      ]
+    },
+    {
+      "vorname": "Karin",
+      "nachname": "Bohr",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Rettungssanitäter/-in Sanitätsstaffel"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungssanitäter"
+        }
+      ]
+    },
+    {
+      "vorname": "Tobias",
+      "nachname": "Hammer",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Rettungssanitäter/-in Sanitätsstaffel"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungssanitäter"
+        }
+      ]
+    },
+    {
+      "vorname": "Michael",
+      "nachname": "Rubly",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Rettungssanitäter/-in Sanitätsstaffel"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungssanitäter"
+        }
+      ]
+    },
+    {
+      "vorname": "Hans",
+      "nachname": "Faust",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Rettungssanitäter/-in Sanitätsstaffel"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungssanitäter"
+        }
+      ]
+    },
+    {
+      "vorname": "Michael",
+      "nachname": "Schmitt",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Rettungssanitäter/-in Sanitätsstaffel"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungssanitäter"
+        }
+      ]
+    },
+    {
+      "vorname": "Wolfgang",
+      "nachname": "Kihm",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Rettungssanitäter/-in Sanitätsstaffel"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 2,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungssanitäter"
+        }
+      ]
+    },
+    {
+      "vorname": "Matthias",
+      "nachname": "Reinert",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Rettungssanitäter/-in Sanitätsstaffel"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungssanitäter"
+        }
+      ]
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "GW-San"
+      },
+      "aenderungen": "Gerätewagen-Sanitätsdienst — Behandlung",
+      "kennzeichen": "NK-DRK 102",
+      "funkrufname": {
+        "kennwort": {
+          "code": 3
+        },
+        "eigenerStandort": false,
+        "ort": "Neunkirchen",
+        "teile": [
+          0,
+          61,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "MTW-Z"
+      },
+      "aenderungen": "Mannschaftstransportwagen mit Zusatzfunktion — Sanitätsdienst",
+      "kennzeichen": "NK-DRK 103",
+      "funkrufname": {
+        "kennwort": {
+          "code": 3
+        },
+        "eigenerStandort": false,
+        "ort": "Neunkirchen",
+        "teile": [
+          0,
+          17,
+          1
+        ]
+      }
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 18,
+    "dieselLiter": 115,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": true,
+    "ruhezeitErforderlich": false
+  },
+  "sonstiges": "Basismodul-Stärke 2/4/12/18 (Führung 2/2/-/4, Technik/Sicherheit -/-/2/2, zwei Sanitätsstaffeln á -/1/5/6) nach „Der Behandlungsplatz 10 (BHP 10 SAL)\" (DRK-Landesverband Saarland e.V., Landesausschuss der Bereitschaften (16.02.2014)). Fahrzeugtyp nicht in der DRK-SAL-Konzeption genannt — beispielhaft nach der generischen Ausstattung der KatOrgVO belegt."
+}

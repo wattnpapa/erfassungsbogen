@@ -1,0 +1,656 @@
+{
+  "schemaVersion": 8,
+  "uebung": true,
+  "stand": 3377838,
+  "einheit": {
+    "organisation": 5,
+    "organisationName": "Deutsches Rotes Kreuz Kreisverband Homburg e.V.",
+    "einheitsTyp": {
+      "freitext": "Patiententransport-Zug (PT-Z 10 DRK SAL)"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Fachdienst Sanitätsdienst"
+        },
+        "name": "Homburg"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "DRK-Kreisverband"
+        },
+        "name": "Homburg"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "DRK-Landesverband"
+        },
+        "name": "Saarland"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2345,
+    "zeitraumBis": 2349,
+    "ortAuftrag": "Sekundärverlegung Homburg — überörtlich zusammengestellte Transportkapazität für zehn Patienten"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Nadine",
+      "nachname": "Dillinger",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "Zugführer/-in (Führer PT-Z 10)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5552787665"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungssanitäter"
+        }
+      ]
+    },
+    {
+      "vorname": "Roland",
+      "nachname": "Wagner",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Fahrzeugführer/-in RTW"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungsassistent/Notfallsanitäter"
+        }
+      ]
+    },
+    {
+      "vorname": "Stefan",
+      "nachname": "Krebs",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Fahrzeugführer/-in RTW"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungsassistent/Notfallsanitäter"
+        }
+      ]
+    },
+    {
+      "vorname": "Marco",
+      "nachname": "Thiel",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Fahrzeugführer/-in RTW"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungsassistent/Notfallsanitäter"
+        }
+      ]
+    },
+    {
+      "vorname": "Bernd",
+      "nachname": "Hammer",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Fahrzeugführer/-in RTW"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungsassistent/Notfallsanitäter"
+        }
+      ]
+    },
+    {
+      "vorname": "Paul",
+      "nachname": "Gerber",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kraftfahrer/-in/Sprechfunker/-in Führung"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Jens",
+      "nachname": "Hary",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Fahrer/-in RTW"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungssanitäter"
+        }
+      ]
+    },
+    {
+      "vorname": "Markus",
+      "nachname": "Metz",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Fahrer/-in RTW"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungssanitäter"
+        }
+      ]
+    },
+    {
+      "vorname": "Helmut",
+      "nachname": "Lang",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Fahrer/-in RTW"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungssanitäter"
+        }
+      ]
+    },
+    {
+      "vorname": "Marc",
+      "nachname": "Klein",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Fahrer/-in RTW"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungssanitäter"
+        }
+      ]
+    },
+    {
+      "vorname": "René",
+      "nachname": "Bock",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Fahrzeugführer/-in KTW"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungssanitäter"
+        }
+      ]
+    },
+    {
+      "vorname": "Karin",
+      "nachname": "Wies",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Fahrzeugführer/-in KTW"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungssanitäter"
+        }
+      ]
+    },
+    {
+      "vorname": "Karin",
+      "nachname": "Metz",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Fahrzeugführer/-in KTW"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungssanitäter"
+        }
+      ]
+    },
+    {
+      "vorname": "Christian",
+      "nachname": "Klein",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Fahrzeugführer/-in KTW"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungssanitäter"
+        }
+      ]
+    },
+    {
+      "vorname": "Beate",
+      "nachname": "Klein",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Fahrzeugführer/-in KTW"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungssanitäter"
+        }
+      ]
+    },
+    {
+      "vorname": "Volker",
+      "nachname": "Fried",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Fahrzeugführer/-in KTW"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungssanitäter"
+        }
+      ]
+    },
+    {
+      "vorname": "Klaus",
+      "nachname": "Ecker",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kraftfahrer/-in KTW"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Lars",
+      "nachname": "Backes",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kraftfahrer/-in KTW"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Matthias",
+      "nachname": "Backes",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kraftfahrer/-in KTW"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Gabriele",
+      "nachname": "Thiel",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kraftfahrer/-in KTW"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Norbert",
+      "nachname": "Schneider",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kraftfahrer/-in KTW"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Sascha",
+      "nachname": "Zimmer",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kraftfahrer/-in KTW"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 2,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "RTW"
+      },
+      "aenderungen": "Rettungswagen (DIN EN 1789 Typ C)",
+      "kennzeichen": "HOM-DRK 123",
+      "funkrufname": {
+        "kennwort": {
+          "code": 3
+        },
+        "eigenerStandort": false,
+        "ort": "Saarpfalz-Kreis",
+        "teile": [
+          0,
+          83,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "RTW"
+      },
+      "aenderungen": "Rettungswagen (DIN EN 1789 Typ C)",
+      "kennzeichen": "HOM-DRK 124",
+      "funkrufname": {
+        "kennwort": {
+          "code": 3
+        },
+        "eigenerStandort": false,
+        "ort": "Saarpfalz-Kreis",
+        "teile": [
+          0,
+          83,
+          2
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "RTW"
+      },
+      "aenderungen": "Rettungswagen (DIN EN 1789 Typ C)",
+      "kennzeichen": "HOM-DRK 125",
+      "funkrufname": {
+        "kennwort": {
+          "code": 3
+        },
+        "eigenerStandort": false,
+        "ort": "Saarpfalz-Kreis",
+        "teile": [
+          0,
+          83,
+          3
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "RTW"
+      },
+      "aenderungen": "Rettungswagen (DIN EN 1789 Typ C)",
+      "kennzeichen": "HOM-DRK 126",
+      "funkrufname": {
+        "kennwort": {
+          "code": 3
+        },
+        "eigenerStandort": false,
+        "ort": "Saarpfalz-Kreis",
+        "teile": [
+          0,
+          83,
+          4
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "KTW"
+      },
+      "aenderungen": "Krankentransportwagen (DIN EN 1789 Typ B)",
+      "kennzeichen": "HOM-DRK 127",
+      "funkrufname": {
+        "kennwort": {
+          "code": 3
+        },
+        "eigenerStandort": false,
+        "ort": "Saarpfalz-Kreis",
+        "teile": [
+          0,
+          85,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "KTW"
+      },
+      "aenderungen": "Krankentransportwagen (DIN EN 1789 Typ B)",
+      "kennzeichen": "HOM-DRK 128",
+      "funkrufname": {
+        "kennwort": {
+          "code": 3
+        },
+        "eigenerStandort": false,
+        "ort": "Saarpfalz-Kreis",
+        "teile": [
+          0,
+          85,
+          2
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "KTW"
+      },
+      "aenderungen": "Krankentransportwagen (DIN EN 1789 Typ B)",
+      "kennzeichen": "HOM-DRK 129",
+      "funkrufname": {
+        "kennwort": {
+          "code": 3
+        },
+        "eigenerStandort": false,
+        "ort": "Saarpfalz-Kreis",
+        "teile": [
+          0,
+          85,
+          3
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "KTW"
+      },
+      "aenderungen": "Krankentransportwagen (DIN EN 1789 Typ B)",
+      "kennzeichen": "HOM-DRK 130",
+      "funkrufname": {
+        "kennwort": {
+          "code": 3
+        },
+        "eigenerStandort": false,
+        "ort": "Saarpfalz-Kreis",
+        "teile": [
+          0,
+          85,
+          4
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "KTW"
+      },
+      "aenderungen": "Krankentransportwagen (DIN EN 1789 Typ B)",
+      "kennzeichen": "HOM-DRK 131",
+      "funkrufname": {
+        "kennwort": {
+          "code": 3
+        },
+        "eigenerStandort": false,
+        "ort": "Saarpfalz-Kreis",
+        "teile": [
+          0,
+          85,
+          5
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "KTW"
+      },
+      "aenderungen": "Krankentransportwagen (DIN EN 1789 Typ B)",
+      "kennzeichen": "HOM-DRK 132",
+      "funkrufname": {
+        "kennwort": {
+          "code": 3
+        },
+        "eigenerStandort": false,
+        "ort": "Saarpfalz-Kreis",
+        "teile": [
+          0,
+          85,
+          6
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "KdoW"
+      },
+      "aenderungen": "Kommandowagen — Führungsfahrzeug (alt. ELW 1)",
+      "kennzeichen": "HOM-DRK 133",
+      "funkrufname": {
+        "kennwort": {
+          "code": 3
+        },
+        "eigenerStandort": false,
+        "ort": "Saarpfalz-Kreis",
+        "teile": [
+          0,
+          10,
+          1
+        ]
+      }
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 22,
+    "dieselLiter": 495,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": true,
+    "ruhezeitErforderlich": true
+  },
+  "sonstiges": "Stärke 1/4/17/22, 4 RTW + 6 KTW + 1 KdoW/ELW 1 nach „Die Patiententransportkomponenten des DRK im Saarland\", Landesausschuss der Bereitschaften (17.11.2020, Version 28.09.2024)."
+}

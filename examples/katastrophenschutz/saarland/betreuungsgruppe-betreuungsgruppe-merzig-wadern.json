@@ -1,0 +1,281 @@
+{
+  "schemaVersion": 8,
+  "uebung": true,
+  "stand": 3376326,
+  "einheit": {
+    "organisation": 5,
+    "organisationName": "Deutsches Rotes Kreuz Kreisverband Merzig-Wadern e.V.",
+    "einheitsTyp": {
+      "freitext": "Betreuungsgruppe (Betreuungsgruppe)"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Fachdienst Betreuungsdienst"
+        },
+        "name": "Merzig-Wadern"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "DRK-Kreisverband"
+        },
+        "name": "Merzig-Wadern"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "DRK-Landesverband"
+        },
+        "name": "Saarland"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2344,
+    "zeitraumBis": 2348,
+    "ortAuftrag": "Evakuierung Merzig-Wadern — Erstversorgung von bis zu 200 Betroffenen"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Jens",
+      "nachname": "Krebs",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Staffelführer/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5559335329"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Kerstin",
+      "nachname": "Simon",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Staffelführer/-in"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5556164127"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Matthias",
+      "nachname": "Metz",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kraftfahrer/-in/Sprechfunker/-in"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Helmut",
+      "nachname": "Meyer",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kraftfahrer/-in/Sprechfunker/-in"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Jürgen",
+      "nachname": "Fried",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Helfer/-in Betreuungsdienst"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Maria",
+      "nachname": "Dorn",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Helfer/-in Betreuungsdienst"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 2,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Mario",
+      "nachname": "Koch",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Helfer/-in Betreuungsdienst"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Doris",
+      "nachname": "Rubly",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Helfer/-in Betreuungsdienst"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Markus",
+      "nachname": "Rubly",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Helfer/-in Betreuungsdienst"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Paul",
+      "nachname": "Dillinger",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Helfer/-in Betreuungsdienst"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Marc",
+      "nachname": "Leiner",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Helfer/-in Betreuungsdienst"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Beate",
+      "nachname": "Fixemer",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Helfer/-in Betreuungsdienst"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "MTW-Z"
+      },
+      "aenderungen": "Mannschaftstransportwagen mit Zusatzfunktion — Betreuung",
+      "kennzeichen": "MZG-DRK 148",
+      "funkrufname": {
+        "kennwort": {
+          "code": 3
+        },
+        "eigenerStandort": false,
+        "ort": "Merzig-Wadern",
+        "teile": [
+          0,
+          17,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "MTW-Z"
+      },
+      "aenderungen": "Mannschaftstransportwagen mit Zusatzfunktion — Betreuung",
+      "kennzeichen": "MZG-DRK 149",
+      "funkrufname": {
+        "kennwort": {
+          "code": 3
+        },
+        "eigenerStandort": false,
+        "ort": "Merzig-Wadern",
+        "teile": [
+          0,
+          17,
+          2
+        ]
+      }
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 12,
+    "dieselLiter": 90,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": true,
+    "ruhezeitErforderlich": false
+  },
+  "sonstiges": "Stärke -/2/10/12 (zwei Betreuungsstaffeln) nach „Mindestanforderungen an Strukturen des DRK-Betreuungsdienstes im LV Saarland\" (Landesausschuss der Bereitschaften, 01.03.2015). Fahrzeugtyp nicht in der DRK-SAL-Konzeption genannt — beispielhaft nach der generischen Ausstattung der KatOrgVO belegt."
+}

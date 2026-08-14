@@ -1,0 +1,683 @@
+{
+  "schemaVersion": 8,
+  "uebung": true,
+  "stand": 3375142,
+  "einheit": {
+    "organisation": 5,
+    "organisationName": "Deutsches Rotes Kreuz Kreisverband Homburg e.V.",
+    "einheitsTyp": {
+      "freitext": "DRK-Einsatzeinheit (Sanität + Betreuung) (DRK-Einsatzeinheit)"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Fachdienst Sanitäts- und Betreuungsdienst"
+        },
+        "name": "Homburg"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "DRK-Kreisverband"
+        },
+        "name": "Homburg"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "DRK-Landesverband"
+        },
+        "name": "Saarland"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2343,
+    "zeitraumBis": 2344,
+    "ortAuftrag": "Großschadenslage Homburg — multifunktionaler Einsatz mit sanitäts- und betreuungsdienstlichem Anteil"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Christian",
+      "nachname": "Groß",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "Einheitenführer/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5559550151"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Marc",
+      "nachname": "Bohr",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Führungsassistent/-in"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5554390887"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Andrea",
+      "nachname": "Britz",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kraftfahrer/-in/Sprechfunker/-in Führung"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Mario",
+      "nachname": "Lauer",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kraftfahrer/-in/Sprechfunker/-in Führung"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Katja",
+      "nachname": "Becker",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Gruppenführer/-in Sanitätsgruppe"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Sprechfunker"
+        }
+      ]
+    },
+    {
+      "vorname": "Helmut",
+      "nachname": "Hary",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Sanitätshelfer/-in Sanitätsgruppe"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 2,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungssanitäter"
+        }
+      ]
+    },
+    {
+      "vorname": "Dieter",
+      "nachname": "Schwarz",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Sanitätshelfer/-in Sanitätsgruppe"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungssanitäter"
+        }
+      ]
+    },
+    {
+      "vorname": "Frank",
+      "nachname": "Simon",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Sanitätshelfer/-in Sanitätsgruppe"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 2,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungssanitäter"
+        }
+      ]
+    },
+    {
+      "vorname": "Christiane",
+      "nachname": "Thome",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Sanitätshelfer/-in Sanitätsgruppe"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungssanitäter"
+        }
+      ]
+    },
+    {
+      "vorname": "Hans",
+      "nachname": "Bauer",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Sanitätshelfer/-in Sanitätsgruppe"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 2,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungssanitäter"
+        }
+      ]
+    },
+    {
+      "vorname": "Marco",
+      "nachname": "Bender",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Sanitätshelfer/-in Sanitätsgruppe"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungssanitäter"
+        }
+      ]
+    },
+    {
+      "vorname": "Mario",
+      "nachname": "Rubly",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Sanitätshelfer/-in Sanitätsgruppe"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungssanitäter"
+        }
+      ]
+    },
+    {
+      "vorname": "Christian",
+      "nachname": "Petry",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Sanitätshelfer/-in Sanitätsgruppe"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungssanitäter"
+        }
+      ]
+    },
+    {
+      "vorname": "Manuela",
+      "nachname": "Lang",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Staffelführer/-in Betreuungsstaffel"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Nicole",
+      "nachname": "Groß",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Staffelführer/-in Betreuungsstaffel"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Georg",
+      "nachname": "Dorn",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kraftfahrer/-in Betreuungsstaffel"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Jan",
+      "nachname": "Jung",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kraftfahrer/-in Betreuungsstaffel"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Patrick",
+      "nachname": "Petry",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Helfer/-in Betreuungsstaffel"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Katja",
+      "nachname": "Lorig",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Helfer/-in Betreuungsstaffel"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Tanja",
+      "nachname": "Kohl",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Helfer/-in Betreuungsstaffel"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 1,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Notfallsanitäter (extern)"
+        }
+      ]
+    },
+    {
+      "vorname": "Klaus",
+      "nachname": "Meyer",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Helfer/-in Betreuungsstaffel"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Patrick",
+      "nachname": "Marx",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Helfer/-in Betreuungsstaffel"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Stefan",
+      "nachname": "Backes",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Helfer/-in Betreuungsstaffel"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Jan",
+      "nachname": "Britz",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Helfer/-in Betreuungsstaffel"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Notfallsanitäter (extern)"
+        }
+      ]
+    },
+    {
+      "vorname": "Marco",
+      "nachname": "Wendel",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Helfer/-in Betreuungsstaffel"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Jochen",
+      "nachname": "Hoffmann",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Truppführer/-in Verpflegungstrupp"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Notfallsanitäter (extern)"
+        }
+      ]
+    },
+    {
+      "vorname": "Tobias",
+      "nachname": "Petry",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Helfer/-in Verpflegungsdienst"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Koch (Beruf)"
+        }
+      ]
+    },
+    {
+      "vorname": "Susanne",
+      "nachname": "Weiler",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Truppführer/-in Technischer Trupp"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 1,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Stefan",
+      "nachname": "Dillinger",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Helfer/-in Technik und Sicherheit"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Roland",
+      "nachname": "Petry",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Helfer/-in Technik und Sicherheit"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungssanitäter (extern)"
+        }
+      ]
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "KdoW"
+      },
+      "aenderungen": "Kommandowagen — Führung",
+      "kennzeichen": "HOM-DRK 163",
+      "funkrufname": {
+        "kennwort": {
+          "code": 3
+        },
+        "eigenerStandort": false,
+        "ort": "Saarpfalz-Kreis",
+        "teile": [
+          0,
+          10,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "GW-San"
+      },
+      "aenderungen": "Gerätewagen-Sanitätsdienst — Sanitätsgruppe",
+      "kennzeichen": "HOM-DRK 164",
+      "funkrufname": {
+        "kennwort": {
+          "code": 3
+        },
+        "eigenerStandort": false,
+        "ort": "Saarpfalz-Kreis",
+        "teile": [
+          0,
+          61,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "MTW-Z"
+      },
+      "aenderungen": "Mannschaftstransportwagen mit Zusatzfunktion — Betreuung",
+      "kennzeichen": "HOM-DRK 165",
+      "funkrufname": {
+        "kennwort": {
+          "code": 3
+        },
+        "eigenerStandort": false,
+        "ort": "Saarpfalz-Kreis",
+        "teile": [
+          0,
+          17,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "MTW-Z"
+      },
+      "aenderungen": "Mannschaftstransportwagen mit Zusatzfunktion — Betreuung",
+      "kennzeichen": "HOM-DRK 166",
+      "funkrufname": {
+        "kennwort": {
+          "code": 3
+        },
+        "eigenerStandort": false,
+        "ort": "Saarpfalz-Kreis",
+        "teile": [
+          0,
+          17,
+          2
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "GW-Verpfl"
+      },
+      "aenderungen": "Gerätewagen-Verpflegung",
+      "kennzeichen": "HOM-DRK 167",
+      "funkrufname": {
+        "kennwort": {
+          "code": 3
+        },
+        "eigenerStandort": false,
+        "ort": "Saarpfalz-Kreis",
+        "teile": [
+          0,
+          64,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "MTW"
+      },
+      "aenderungen": "Mannschaftstransportwagen — Technischer Trupp",
+      "kennzeichen": "HOM-DRK 168",
+      "funkrufname": {
+        "kennwort": {
+          "code": 3
+        },
+        "eigenerStandort": false,
+        "ort": "Saarpfalz-Kreis",
+        "teile": [
+          0,
+          18,
+          1
+        ]
+      }
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 30,
+    "dieselLiter": 320,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": false,
+    "ruhezeitErforderlich": false
+  },
+  "sonstiges": "Stärke 1/6/23/30 (Führungstrupp 1/1/2/4, Sanitätsgruppe -/1/8/9, zwei Betreuungsstaffeln á -/1/5/6, Verpflegungstrupp -/1/1/2, Technischer Trupp -/1/2/3) nach „Mindestanforderungen an Strukturen des DRK-Betreuungsdienstes im LV Saarland\" (Landesausschuss der Bereitschaften, 01.03.2015). Fahrzeugtyp nicht in der DRK-SAL-Konzeption genannt — beispielhaft nach der generischen Ausstattung der KatOrgVO belegt."
+}

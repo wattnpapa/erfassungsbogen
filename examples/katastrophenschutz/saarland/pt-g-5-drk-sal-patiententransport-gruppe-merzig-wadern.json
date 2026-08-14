@@ -1,0 +1,383 @@
+{
+  "schemaVersion": 8,
+  "uebung": true,
+  "stand": 3376236,
+  "einheit": {
+    "organisation": 5,
+    "organisationName": "Deutsches Rotes Kreuz Kreisverband Merzig-Wadern e.V.",
+    "einheitsTyp": {
+      "freitext": "Patiententransport-Gruppe (PT-G 5 DRK SAL)"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Fachdienst Sanitätsdienst"
+        },
+        "name": "Merzig-Wadern"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "DRK-Kreisverband"
+        },
+        "name": "Merzig-Wadern"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "DRK-Landesverband"
+        },
+        "name": "Saarland"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2344,
+    "zeitraumBis": 2345,
+    "ortAuftrag": "Sekundärverlegung Merzig-Wadern — Bereitstellung von Transportkapazität für fünf Patienten"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Matthias",
+      "nachname": "Petry",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "Zugführer/-in (Führer PT-G 5)"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5557203266"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungssanitäter"
+        }
+      ]
+    },
+    {
+      "vorname": "Lars",
+      "nachname": "Britz",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Fahrzeugführer/-in RTW"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungsassistent/Notfallsanitäter"
+        }
+      ]
+    },
+    {
+      "vorname": "Andreas",
+      "nachname": "Koch",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kraftfahrer/-in/Sprechfunker/-in Führung"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Frank",
+      "nachname": "Ecker",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Fahrer/-in RTW"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungssanitäter"
+        }
+      ]
+    },
+    {
+      "vorname": "Paul",
+      "nachname": "Wies",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Fahrzeugführer/-in KTW"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungssanitäter"
+        }
+      ]
+    },
+    {
+      "vorname": "Sebastian",
+      "nachname": "Ecker",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Fahrzeugführer/-in KTW"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungssanitäter"
+        }
+      ]
+    },
+    {
+      "vorname": "Marion",
+      "nachname": "Krein",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Fahrzeugführer/-in KTW"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungssanitäter"
+        }
+      ]
+    },
+    {
+      "vorname": "Hans",
+      "nachname": "Metz",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Fahrzeugführer/-in KTW"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungssanitäter"
+        }
+      ]
+    },
+    {
+      "vorname": "Helmut",
+      "nachname": "Dillinger",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kraftfahrer/-in KTW"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "René",
+      "nachname": "Schmitt",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kraftfahrer/-in KTW"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 2,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Lars",
+      "nachname": "Ecker",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kraftfahrer/-in KTW"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Koch (Beruf)"
+        }
+      ]
+    },
+    {
+      "vorname": "Ralf",
+      "nachname": "Groß",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kraftfahrer/-in KTW"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "RTW"
+      },
+      "aenderungen": "Rettungswagen (DIN EN 1789 Typ C)",
+      "kennzeichen": "MZG-DRK 110",
+      "funkrufname": {
+        "kennwort": {
+          "code": 3
+        },
+        "eigenerStandort": false,
+        "ort": "Merzig-Wadern",
+        "teile": [
+          0,
+          83,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "KTW"
+      },
+      "aenderungen": "Krankentransportwagen (DIN EN 1789 Typ B)",
+      "kennzeichen": "MZG-DRK 111",
+      "funkrufname": {
+        "kennwort": {
+          "code": 3
+        },
+        "eigenerStandort": false,
+        "ort": "Merzig-Wadern",
+        "teile": [
+          0,
+          85,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "KTW"
+      },
+      "aenderungen": "Krankentransportwagen (DIN EN 1789 Typ B)",
+      "kennzeichen": "MZG-DRK 112",
+      "funkrufname": {
+        "kennwort": {
+          "code": 3
+        },
+        "eigenerStandort": false,
+        "ort": "Merzig-Wadern",
+        "teile": [
+          0,
+          85,
+          2
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "KTW"
+      },
+      "aenderungen": "Krankentransportwagen (DIN EN 1789 Typ B)",
+      "kennzeichen": "MZG-DRK 113",
+      "funkrufname": {
+        "kennwort": {
+          "code": 3
+        },
+        "eigenerStandort": false,
+        "ort": "Merzig-Wadern",
+        "teile": [
+          0,
+          85,
+          3
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "KTW"
+      },
+      "aenderungen": "Krankentransportwagen (DIN EN 1789 Typ B)",
+      "kennzeichen": "MZG-DRK 114",
+      "funkrufname": {
+        "kennwort": {
+          "code": 3
+        },
+        "eigenerStandort": false,
+        "ort": "Merzig-Wadern",
+        "teile": [
+          0,
+          85,
+          4
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "KdoW"
+      },
+      "aenderungen": "Kommandowagen — Führungsfahrzeug (alt. ELW 1)",
+      "kennzeichen": "MZG-DRK 115",
+      "funkrufname": {
+        "kennwort": {
+          "code": 3
+        },
+        "eigenerStandort": false,
+        "ort": "Merzig-Wadern",
+        "teile": [
+          0,
+          10,
+          1
+        ]
+      }
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 12,
+    "dieselLiter": 270,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": false,
+    "ruhezeitErforderlich": true
+  },
+  "sonstiges": "Stärke 1/1/10/12, 1 RTW + 4 KTW + 1 KdoW/ELW 1 nach „Die Patiententransportkomponenten des DRK im Saarland\", Landesausschuss der Bereitschaften (17.11.2020, Version 28.09.2024)."
+}

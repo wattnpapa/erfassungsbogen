@@ -17,6 +17,7 @@
     "beispiele:kats-by": "node --import tsx scripts/kats-bayern-beispielboegen.mts",
     "beispiele:kats-be": "node --import tsx scripts/kats-berlin-beispielboegen.mts",
     "beispiele:kats-nw": "node --import tsx scripts/kats-nrw-beispielboegen.mts",
+    "beispiele:kats-sl": "node --import tsx scripts/kats-saarland-beispielboegen.mts",
     "beispiele:dlrg": "node --import tsx scripts/dlrg-beispielboegen.mts",
     "beispiele:fw-nds": "node --import tsx scripts/fw-nds-beispielboegen.mts",
     "beispiele:drk-nds": "node --import tsx scripts/drk-nds-beispielboegen.mts",
