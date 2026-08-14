@@ -1,0 +1,145 @@
+{
+  "schemaVersion": 8,
+  "uebung": true,
+  "stand": 3314723,
+  "einheit": {
+    "organisation": 7,
+    "organisationName": "Malteser Hilfsdienst Hanse- und Universitätsstadt Rostock",
+    "einheitsTyp": {
+      "freitext": "Verpflegungstransporttrupp (VtTr)"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "KSE"
+        },
+        "name": "Betreuungszug (BtZ)"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "MHD-Kreisverband"
+        },
+        "name": "Rostock"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Untere KatS-Behörde"
+        },
+        "name": "Hanse- und Universitätsstadt Rostock"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2301,
+    "zeitraumBis": 2303,
+    "ortAuftrag": "Flächenlage Rostock — Verpflegungsausgabe an Betroffene und Einsatzkräfte"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Enrico",
+      "nachname": "Neumann",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Truppführer/-in"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5553794733"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Gesundheits- und Krankenpfleger (Beruf)"
+        }
+      ]
+    },
+    {
+      "vorname": "Sven",
+      "nachname": "Behrens",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Verpflegungshelfer/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Marco",
+      "nachname": "Löffler",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Verpflegungshelfer/-in"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Simone",
+      "nachname": "Löffler",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Verpflegungshelfer/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "MTW-V"
+      },
+      "aenderungen": "Mannschaftstransportwagen Verpflegung",
+      "kennzeichen": "HRO-2022",
+      "funkrufname": {
+        "kennwort": {
+          "code": 5
+        },
+        "eigenerStandort": false,
+        "ort": "Rostock",
+        "teile": [
+          2
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "TA-V"
+      },
+      "aenderungen": "Tandemanhänger Verpflegung",
+      "kennzeichen": "TA-V"
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 4,
+    "dieselLiter": 45,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": false,
+    "ruhezeitErforderlich": false
+  },
+  "sonstiges": "Sollstärke 0/1/3/4 (Führer/Unterführer/Mannschaft/Gesamt) nach LPBK M-V, Festlegungen zu den Grundstrukturen im KatS M-V v. 15.03.2020, Erlass Nr. 4.7, Abb. 8 — Teileinheit von Betreuungszug (BtZ) — 1/7/23/31. Funkrufname mit fiktiver, rein fortlaufender Ordnungsnummer — für M-V konnte kein amtlicher OPTA-/Kennzahlenkatalog verifiziert werden."
+}

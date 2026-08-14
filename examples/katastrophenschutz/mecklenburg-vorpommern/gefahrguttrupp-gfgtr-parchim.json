@@ -1,0 +1,98 @@
+{
+  "schemaVersion": 8,
+  "uebung": true,
+  "stand": 3317568,
+  "einheit": {
+    "organisation": 2,
+    "organisationName": "Feuerwehr Landkreis Ludwigslust-Parchim",
+    "einheitsTyp": {
+      "freitext": "Gefahrguttrupp (GfGTr)"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "KSE"
+        },
+        "name": "CBRN-Zug (CBRN-Z)"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Untere KatS-Behörde"
+        },
+        "name": "Landkreis Ludwigslust-Parchim"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2303,
+    "zeitraumBis": 2304,
+    "ortAuftrag": "Gefahrgutunglück Parchim — Unterstützung der Gefahrenbekämpfung"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Jan",
+      "nachname": "Fischer",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Truppführer/-in"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5552922410"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Patrick",
+      "nachname": "Pohl",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmitglied"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "GW-G"
+      },
+      "aenderungen": "Gerätewagen Gefahrgut (bis auf Weiteres GW-G1/GW-G2)",
+      "kennzeichen": "LUP-2026",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Parchim",
+        "teile": [
+          5
+        ]
+      }
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 2,
+    "dieselLiter": 70,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": false,
+    "ruhezeitErforderlich": false
+  },
+  "sonstiges": "Sollstärke 0/1/1/2 (Führer/Unterführer/Mannschaft/Gesamt) nach LPBK M-V, Festlegungen zu den Grundstrukturen im KatS M-V v. 15.03.2020, Erlass Nr. 4.8, Abb. 9 — Teileinheit von CBRN-Zug (CBRN-Z) — 1/5/18/24. Funkrufname mit fiktiver, rein fortlaufender Ordnungsnummer — für M-V konnte kein amtlicher OPTA-/Kennzahlenkatalog verifiziert werden."
+}

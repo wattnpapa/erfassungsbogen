@@ -1,0 +1,169 @@
+{
+  "schemaVersion": 8,
+  "uebung": true,
+  "stand": 3320484,
+  "einheit": {
+    "organisation": 2,
+    "organisationName": "Feuerwehr Landkreis Ludwigslust-Parchim",
+    "einheitsTyp": {
+      "freitext": "Dekontaminationsstaffel (DekonSt)"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "KSE"
+        },
+        "name": "CBRN-Zug (CBRN-Z)"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Untere KatS-Behörde"
+        },
+        "name": "Landkreis Ludwigslust-Parchim"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2305,
+    "zeitraumBis": 2309,
+    "ortAuftrag": "CBRN-Lage Ludwigslust — Dekontamination von Einsatzkräften und Betroffenen"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Sabine",
+      "nachname": "Dahl",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Staffelführer/-in"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5552642627"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Bettina",
+      "nachname": "Kasten",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Dekon-Helfer/-in"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Christin",
+      "nachname": "Marquardt",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Dekon-Helfer/-in"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Gesundheits- und Krankenpfleger (Beruf)"
+        }
+      ]
+    },
+    {
+      "vorname": "Enrico",
+      "nachname": "Zimmermann",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Dekon-Helfer/-in"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 2,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Martin",
+      "nachname": "Jarchow",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Dekon-Helfer/-in"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Paul",
+      "nachname": "Hartmann",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Dekon-Helfer/-in"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "GW-Dekon-P"
+      },
+      "aenderungen": "Gerätewagen Dekontamination Personal",
+      "kennzeichen": "LUP-2025",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Ludwigslust",
+        "teile": [
+          4
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "TA-DKS"
+      },
+      "aenderungen": "Tandemanhänger Dekontaminationsschleuse",
+      "kennzeichen": "TA-DKS"
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 6,
+    "dieselLiter": 70,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": false,
+    "ruhezeitErforderlich": true
+  },
+  "sonstiges": "Sollstärke 0/1/5/6 (Führer/Unterführer/Mannschaft/Gesamt) nach LPBK M-V, Festlegungen zu den Grundstrukturen im KatS M-V v. 15.03.2020, Erlass Nr. 4.8, Abb. 9 — Teileinheit von CBRN-Zug (CBRN-Z) — 1/5/18/24. Funkrufname mit fiktiver, rein fortlaufender Ordnungsnummer — für M-V konnte kein amtlicher OPTA-/Kennzahlenkatalog verifiziert werden."
+}
