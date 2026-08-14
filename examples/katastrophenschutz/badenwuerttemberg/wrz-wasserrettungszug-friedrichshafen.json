@@ -1,0 +1,570 @@
+{
+  "schemaVersion": 8,
+  "uebung": true,
+  "stand": 3441120,
+  "einheit": {
+    "organisation": 9,
+    "organisationName": "DLRG Bodenseekreis",
+    "einheitsTyp": {
+      "freitext": "Wasserrettungszug (WRZ)"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Regierungsbezirk Tübingen"
+        },
+        "name": "Bodenseekreis"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "DLRG-Kreisverband"
+        },
+        "name": "Bodenseekreis"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Untere KatS-Behörde"
+        },
+        "name": "Bodenseekreis"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2389,
+    "zeitraumBis": 2390,
+    "ortAuftrag": "Hochwasser Friedrichshafen — Menschenrettung aus Wassergefahren am Bodensee"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Moritz",
+      "nachname": "Haas",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "Zugführer/-in (Führungstrupp)"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 2,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5554033458"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Simone",
+      "nachname": "Schwarz",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Zugtruppführer/-in (Führungstrupp)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5558205502"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Karl",
+      "nachname": "Weiß",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Sprechfunker/-in (Führungstrupp)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Sprechfunker"
+        }
+      ]
+    },
+    {
+      "vorname": "Franziska",
+      "nachname": "Egger",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Sprechfunker/-in (Führungstrupp)"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Sprechfunker"
+        }
+      ]
+    },
+    {
+      "vorname": "Robert",
+      "nachname": "Jäger",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Gruppenführer/-in (Strömungsrettergruppe)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Jonas",
+      "nachname": "Weber",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Strömungsretter/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Strömungsretter"
+        }
+      ]
+    },
+    {
+      "vorname": "Heidi",
+      "nachname": "Stein",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Strömungsretter/-in"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Strömungsretter"
+        }
+      ]
+    },
+    {
+      "vorname": "Claudia",
+      "nachname": "Deuschle",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Strömungsretter/-in"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Strömungsretter"
+        }
+      ]
+    },
+    {
+      "vorname": "Dominik",
+      "nachname": "Geiger",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Strömungsretter/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Strömungsretter"
+        }
+      ]
+    },
+    {
+      "vorname": "Elke",
+      "nachname": "Huber",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Strömungsretter/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Strömungsretter"
+        }
+      ]
+    },
+    {
+      "vorname": "Matthias",
+      "nachname": "Krause",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Gruppenführer/-in (Bootsgruppe)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Moritz",
+      "nachname": "Hauser",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Bootsführer/-in"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Bootsführerschein Binnen"
+        }
+      ]
+    },
+    {
+      "vorname": "Robert",
+      "nachname": "Fischer",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Rettungsschwimmer/-in (Bootsgruppe)"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 2,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungsschwimmabzeichen Silber"
+        }
+      ]
+    },
+    {
+      "vorname": "Jochen",
+      "nachname": "Schmid",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Rettungsschwimmer/-in (Bootsgruppe)"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungsschwimmabzeichen Silber"
+        }
+      ]
+    },
+    {
+      "vorname": "Silvia",
+      "nachname": "Huber",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Rettungsschwimmer/-in (Bootsgruppe)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungsschwimmabzeichen Silber"
+        }
+      ]
+    },
+    {
+      "vorname": "Melanie",
+      "nachname": "Schwarz",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Gruppenführer/-in (Tauchgruppe)"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 1,
+      "ernaehrung": 2,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Sebastian",
+      "nachname": "Baumann",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Rettungstaucher/-in"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungstaucher"
+        }
+      ]
+    },
+    {
+      "vorname": "Leon",
+      "nachname": "Groh",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Rettungstaucher/-in"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungstaucher"
+        }
+      ]
+    },
+    {
+      "vorname": "Ralf",
+      "nachname": "Schneider",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Rettungstaucher/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungstaucher"
+        }
+      ]
+    },
+    {
+      "vorname": "Renate",
+      "nachname": "Farrenkopf",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Rettungstaucher/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungstaucher"
+        }
+      ]
+    },
+    {
+      "vorname": "Norbert",
+      "nachname": "Gruber",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Rettungstaucher/-in"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungstaucher"
+        }
+      ]
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "KdoW"
+      },
+      "aenderungen": "Kommandowagen (Führungstrupp)",
+      "kennzeichen": "FN-2058",
+      "funkrufname": {
+        "kennwort": {
+          "code": 7
+        },
+        "eigenerStandort": false,
+        "ort": "Bodenseekreis",
+        "teile": [
+          12,
+          10,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "GW-W"
+      },
+      "aenderungen": "Gerätewagen Wasserrettung",
+      "kennzeichen": "FN-2059",
+      "funkrufname": {
+        "kennwort": {
+          "code": 7
+        },
+        "eigenerStandort": false,
+        "ort": "Bodenseekreis",
+        "teile": [
+          12,
+          70,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "GW-StrR"
+      },
+      "aenderungen": "Gerätewagen Strömungsrettung",
+      "kennzeichen": "FN-2060",
+      "funkrufname": {
+        "kennwort": {
+          "code": 7
+        },
+        "eigenerStandort": false,
+        "ort": "Bodenseekreis",
+        "teile": [
+          12,
+          72,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "GW-Boot"
+      },
+      "aenderungen": "Gerätewagen mit Mehrzweckboot",
+      "kennzeichen": "FN-2061",
+      "funkrufname": {
+        "kennwort": {
+          "code": 7
+        },
+        "eigenerStandort": false,
+        "ort": "Bodenseekreis",
+        "teile": [
+          12,
+          73,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "GW-Tauchen"
+      },
+      "aenderungen": "Gerätewagen Tauchen",
+      "kennzeichen": "FN-2062",
+      "funkrufname": {
+        "kennwort": {
+          "code": 7
+        },
+        "eigenerStandort": false,
+        "ort": "Bodenseekreis",
+        "teile": [
+          12,
+          74,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "MTW"
+      },
+      "aenderungen": "Mannschaftstransportwagen",
+      "kennzeichen": "FN-2063",
+      "funkrufname": {
+        "kennwort": {
+          "code": 7
+        },
+        "eigenerStandort": false,
+        "ort": "Bodenseekreis",
+        "teile": [
+          12,
+          19,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "Anh Boot"
+      },
+      "aenderungen": "Bootsanhänger",
+      "kennzeichen": "Anh Boot"
+    },
+    {
+      "typ": {
+        "freitext": "Anh Tauchen"
+      },
+      "aenderungen": "Anhänger Tauchgerät",
+      "kennzeichen": "Anh Tauchen"
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 21,
+    "dieselLiter": 510,
+    "benzinLiter": 0,
+    "gemischLiter": 10,
+    "unterbringung": false,
+    "ruhezeitErforderlich": false
+  },
+  "sonstiges": "Stärke 1/4/16/21 (einfache Besetzung; alle Einheiten werden in Doppelbesetzung vorgehalten) nach VwV KatSD Baden-Württemberg vom 24.09.2012 (GABl. Nr. 12/2012, S. 802), Anlage 4. Landesweit sind 10 Einheiten dieses Typs vorgesehen. Die Landkreis-Zuordnung dieses Beispiels ist exemplarisch gewählt, nicht der Verordnungstabelle Zeile für Zeile entnommen — Stärke und Fahrzeuge dagegen sind verordnungsgenau. Die Funkkennziffern der Fahrzeuge sind plausibel, aber nicht vollständig amtlich belegt (siehe README)."
+}
