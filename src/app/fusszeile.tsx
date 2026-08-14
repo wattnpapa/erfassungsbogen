@@ -27,6 +27,7 @@ const VORLAGE = "https://erfassungsbogen.app/vorlage.html";
 // sichtbar bleiben.
 const ORDNER_LABEL: Record<string, string> = {
   thw: "THW",
+  bbk: "BBK (Bundeseinheiten)",
   feuerwehr: "Feuerwehr",
   polizei: "Polizei",
   bundespolizei: "Bundespolizei",
@@ -563,6 +564,7 @@ export function Fusszeile({ onBogenOeffnen, kompakt = false }: {
           <a href="https://erfassungsbogen.app/malteser.html" target="_blank" rel="noopener noreferrer">Malteser</a>
           <a href="https://erfassungsbogen.app/asb.html" target="_blank" rel="noopener noreferrer">ASB</a>
           <a href="https://erfassungsbogen.app/katastrophenschutz.html" target="_blank" rel="noopener noreferrer">Katastrophenschutz</a>
+          <a href="https://erfassungsbogen.app/bbk.html" target="_blank" rel="noopener noreferrer">Bundeseinheiten (BBK)</a>
           <a href="https://erfassungsbogen.app/meldekopf.html" target="_blank" rel="noopener noreferrer">Meldekopf</a>
         </nav>
         <div className="fuss-gruppe">

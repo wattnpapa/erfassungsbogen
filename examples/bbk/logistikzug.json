@@ -1,0 +1,350 @@
+{
+  "schemaVersion": 8,
+  "uebung": true,
+  "stand": 3044700,
+  "einheit": {
+    "organisation": 2,
+    "organisationName": "Berufsfeuerwehr Nordwede — MTF-Standort (Bundesausstattung)",
+    "einheitsTyp": {
+      "freitext": "Logistikzug (MTF)"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Logistikzug (MTF)"
+        },
+        "name": "Nordwede"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "MTF-Standort"
+        },
+        "name": "Berufsfeuerwehr Nordwede",
+        "telefon": "5551913035",
+        "email": "mtf@feuerwehr-nordwede.example"
+      },
+      {
+        "bezeichnung": {
+          "code": 1
+        },
+        "name": "Nordwede"
+      },
+      {
+        "bezeichnung": {
+          "code": 2
+        },
+        "name": "Landkreis Moorwehde"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2140,
+    "zeitraumBis": 2142,
+    "ortAuftrag": "Chemieunfall im Tanklager Nordwede-Hafen — Massenanfall von Verletzten mit CBRN-Komponente: Behandlungsplatz, Verletztendekontamination und weiträumiger Patiententransport in umliegende Kliniken; überörtliche Alarmierung der MTF durch die Leitstelle des Landkreises."
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Felix",
+      "nachname": "Tietjen",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "ZFü Log Z — Zugführer Logistikzug"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5559292342"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Hannah",
+      "nachname": "Dircksen",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "He GW Log Bt — Helfer GW Logistik Betreuung"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Lena",
+      "nachname": "Sievers",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kf GW Log Bt"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Katrin",
+      "nachname": "Vogt",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "stv. ZFü Log Z — stellvertretender Zugführer Logistikzug"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Elke",
+      "nachname": "Tietjen",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "GrFü Log VV — Gruppenführer Logistik, Versorgung Verbrauchsmaterial"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Isabell",
+      "nachname": "Isernhagen",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "stv. GrFü Log VV"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Oliver",
+      "nachname": "Tietjen",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "He Log BG — Helfer Logistik, Betriebsstoffausgabe/Gerätewartung"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Isabell",
+      "nachname": "Hansen",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "He GW Log VV — Helfer GW Logistik Versorgung Verbrauchsmaterial"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Jana",
+      "nachname": "Sievers",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kf GW Log VV"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Hendrik",
+      "nachname": "Ubben",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "GrFü Log VE — Gruppenführer Logistik, Versorgung Einsatzkräfte"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Britta",
+      "nachname": "Sievers",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "stv. GrFü Log VE"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Benedikt",
+      "nachname": "Quast",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "SpFu Log Z — Sprechfunker im Logistikzug"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Benedikt",
+      "nachname": "Kock",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "He Log RB — Helfer Logistik, Ruhebereich Einsatzkräfte"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Gabriele",
+      "nachname": "Wiechers",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "He GW Log VE — Helfer GW Logistik Versorgung Einsatzkräfte"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Patrick",
+      "nachname": "Isernhagen",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kf GW Log VE"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "GW Log Bt"
+      },
+      "kennzeichen": "NWD-FW 1024",
+      "stanKonform": true,
+      "aenderungen": "Gerätewagen Logistik Betreuung — Unterkünfte/Verpflegung für Einsatzkräfte",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Nordwede",
+        "teile": [
+          77,
+          60,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "GW Log VV"
+      },
+      "kennzeichen": "NWD-FW 1025",
+      "stanKonform": true,
+      "aenderungen": "Gerätewagen Logistik Versorgung Verbrauchsmaterial",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Nordwede",
+        "teile": [
+          77,
+          61,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "GW Log VE"
+      },
+      "kennzeichen": "NWD-FW 1026",
+      "stanKonform": true,
+      "aenderungen": "Gerätewagen Logistik Versorgung Einsatzkräfte — mobile Versorgungsstelle",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Nordwede",
+        "teile": [
+          77,
+          62,
+          1
+        ]
+      }
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 15,
+    "dieselLiter": 280,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": true,
+    "ruhezeitErforderlich": true
+  },
+  "sonstiges": "Versorgt die eingesetzten MTF-Kräfte (Verpflegung, Ruhebereich, Betriebsstoff, Gerätewartung) und unterstützt bei Abholung/Transport von Nachschub."
+}

@@ -1,0 +1,709 @@
+{
+  "schemaVersion": 8,
+  "uebung": true,
+  "stand": 3044700,
+  "einheit": {
+    "organisation": 2,
+    "organisationName": "Berufsfeuerwehr Nordwede — MTF-Standort (Bundesausstattung)",
+    "einheitsTyp": {
+      "freitext": "Dekontaminationszug für Verletzte (MTF)"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Dekontaminationszug für Verletzte (MTF)"
+        },
+        "name": "Nordwede"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "MTF-Standort"
+        },
+        "name": "Berufsfeuerwehr Nordwede",
+        "telefon": "5551913035",
+        "email": "mtf@feuerwehr-nordwede.example"
+      },
+      {
+        "bezeichnung": {
+          "code": 1
+        },
+        "name": "Nordwede"
+      },
+      {
+        "bezeichnung": {
+          "code": 2
+        },
+        "name": "Landkreis Moorwehde"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2140,
+    "zeitraumBis": 2142,
+    "ortAuftrag": "Chemieunfall im Tanklager Nordwede-Hafen — Massenanfall von Verletzten mit CBRN-Komponente: Behandlungsplatz, Verletztendekontamination und weiträumiger Patiententransport in umliegende Kliniken; überörtliche Alarmierung der MTF durch die Leitstelle des Landkreises."
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Petra",
+      "nachname": "Janssen",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "ZFü Dekon V Z — Zugführer Dekontaminationszug für Verletzte"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5550943753"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Thorsten",
+      "nachname": "Tietjen",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "stv. ZFü Dekon V Z"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Melanie",
+      "nachname": "Petersen",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "Arzt EV — Arzt Erstversorgung"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Notarzt"
+        }
+      ]
+    },
+    {
+      "vorname": "Anja",
+      "nachname": "Janssen",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "GrFü SiTr — Gruppenführer Sicherheitstrupp"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Jana",
+      "nachname": "Bartels",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "RS EV — Rettungssanitäter Erstversorgung Schwarzbereich (1)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Gunnar",
+      "nachname": "Nolte",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "RS EV — Rettungssanitäter Erstversorgung Schwarzbereich (2)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Britta",
+      "nachname": "Meinders",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "San EV — Sanitäter Erstversorgung Schwarzbereich (1)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Ute",
+      "nachname": "Freytag",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "San EV — Sanitäter Erstversorgung Schwarzbereich (2)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Dennis",
+      "nachname": "Isernhagen",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kf MTW Fü Dekon V"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Volker",
+      "nachname": "Claasen",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "GrFü EV — Gruppenführer Erstversorgung Schwarzbereich"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Niklas",
+      "nachname": "Dircksen",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "RS EV — Rettungssanitäter Erstversorgung Schwarzbereich (2)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Diana",
+      "nachname": "Janssen",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "San EV — Sanitäter Erstversorgung Schwarzbereich (3)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Volker",
+      "nachname": "Tietjen",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "San SHS — Sanitäter Selbsthilfestation (1)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Markus",
+      "nachname": "Grote",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "San SHS — Sanitäter Selbsthilfestation (2)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Felix",
+      "nachname": "Kock",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Maschinist GW Dekon EV"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Benedikt",
+      "nachname": "Claasen",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "GrFü At — Gruppenführer Abtrocknung"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Lena",
+      "nachname": "Nolte",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "RS At — Rettungssanitäter Abtrocknung"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Andreas",
+      "nachname": "Ohlmann",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "San At — Sanitäter Abtrocknung"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Lena",
+      "nachname": "Kock",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "San NDekon — Sanitäter Nassdekontamination (1)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Gabriele",
+      "nachname": "Ehlers",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "San NDekon — Sanitäter Nassdekontamination (2)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Jonas",
+      "nachname": "Reimers",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "San NDekon — Sanitäter Nassdekontamination (3)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Erik",
+      "nachname": "Kock",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "San Du — Sanitäter Duschen (1)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Diana",
+      "nachname": "Ubben",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "San Du — Sanitäter Duschen (2)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Steffen",
+      "nachname": "Sievers",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kf MTW Dekon V"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Ingo",
+      "nachname": "Hansen",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "GrFü NDekon — Gruppenführer Nassdekontamination"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Dennis",
+      "nachname": "Meinders",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "RS NDekon — Rettungssanitäter Nassdekontamination (1)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Isabell",
+      "nachname": "Bartels",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "RS NDekon — Rettungssanitäter Nassdekontamination (2)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Carolin",
+      "nachname": "Dircksen",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "San NDekon — Sanitäter Nassdekontamination (2) (1)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Jonas",
+      "nachname": "Dircksen",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "San NDekon — Sanitäter Nassdekontamination (2) (2)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Markus",
+      "nachname": "Tietjen",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Maschinist GW Dekon V"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Diana",
+      "nachname": "Ohlmann",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "GrFü Dekon P — Gruppenführer Dekon Personal"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Nadine",
+      "nachname": "Grote",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "San Gro P — Sanitäter Grobreinigung Personal (1)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Franziska",
+      "nachname": "Nolte",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "San Gro P — Sanitäter Grobreinigung Personal (2)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Andreas",
+      "nachname": "Wiechers",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "San Ank — Sanitäter Ankleiden (1)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Yvonne",
+      "nachname": "Wiechers",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "San Ank — Sanitäter Ankleiden (2)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Benedikt",
+      "nachname": "Ehlers",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Maschinist GW Dekon P"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "MTW Fü Dekon V"
+      },
+      "kennzeichen": "NWD-FW 1019",
+      "stanKonform": true,
+      "aenderungen": "Führungsfahrzeug des Dekon-Zugs, transportiert die Zugführung",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Nordwede",
+        "teile": [
+          77,
+          50,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "MTW Dekon V"
+      },
+      "kennzeichen": "NWD-FW 1020",
+      "stanKonform": true,
+      "aenderungen": "transportiert Abtrocknung/Duschen/Nassdekon-Personal",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Nordwede",
+        "teile": [
+          77,
+          51,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "GW Dekon EV"
+      },
+      "kennzeichen": "NWD-FW 1021",
+      "stanKonform": true,
+      "aenderungen": "Gerätewagen Dekontamination Erstversorgung Schwarzbereich",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Nordwede",
+        "teile": [
+          77,
+          52,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "GW Dekon V"
+      },
+      "kennzeichen": "NWD-FW 1022",
+      "stanKonform": true,
+      "aenderungen": "Gerätewagen Dekontamination für Verletzte — Nassdekon-Ausstattung",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Nordwede",
+        "teile": [
+          77,
+          53,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "GW Dekon P"
+      },
+      "kennzeichen": "NWD-FW 1023",
+      "stanKonform": true,
+      "aenderungen": "Gerätewagen Dekontamination Personal",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Nordwede",
+        "teile": [
+          77,
+          54,
+          1
+        ]
+      }
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 36,
+    "dieselLiter": 360,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": true,
+    "ruhezeitErforderlich": true
+  },
+  "sonstiges": "Baut die Verletzten-Dekontaminationsstrecke auf (Erstversorgung Schwarzbereich → Nassdekontamination → Dekon Personal) und betreibt sie im Schichtbetrieb."
+}

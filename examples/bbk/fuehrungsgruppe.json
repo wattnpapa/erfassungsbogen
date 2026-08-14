@@ -1,0 +1,244 @@
+{
+  "schemaVersion": 8,
+  "uebung": true,
+  "stand": 3044700,
+  "einheit": {
+    "organisation": 2,
+    "organisationName": "Berufsfeuerwehr Nordwede — MTF-Standort (Bundesausstattung)",
+    "einheitsTyp": {
+      "freitext": "Führungsgruppe (MTF)"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Führungsgruppe (MTF)"
+        },
+        "name": "Nordwede"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "MTF-Standort"
+        },
+        "name": "Berufsfeuerwehr Nordwede",
+        "telefon": "5551913035",
+        "email": "mtf@feuerwehr-nordwede.example"
+      },
+      {
+        "bezeichnung": {
+          "code": 1
+        },
+        "name": "Nordwede"
+      },
+      {
+        "bezeichnung": {
+          "code": 2
+        },
+        "name": "Landkreis Moorwehde"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2140,
+    "zeitraumBis": 2142,
+    "ortAuftrag": "Chemieunfall im Tanklager Nordwede-Hafen — Massenanfall von Verletzten mit CBRN-Komponente: Behandlungsplatz, Verletztendekontamination und weiträumiger Patiententransport in umliegende Kliniken; überörtliche Alarmierung der MTF durch die Leitstelle des Landkreises."
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Sabrina",
+      "nachname": "Janssen",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "AFü MTF — Abteilungsführer Medizinische Task Force"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5552707216"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Thorsten",
+      "nachname": "Hansen",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "stv. AFü MTF — stellvertretender Abteilungsführer MTF"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 2,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Patrick",
+      "nachname": "Tietjen",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "ML MTF — Medizinischer Leiter MTF"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Notarzt"
+        }
+      ]
+    },
+    {
+      "vorname": "Melanie",
+      "nachname": "Quast",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "FüAss Dekon V Z — Führungsassistent Dekontaminationszug für Verletzte"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Franziska",
+      "nachname": "Dircksen",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "FüAss PtGr — Führungsassistent Patiententransportgruppe"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Gunnar",
+      "nachname": "Reimers",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "FüAss BeB — Führungsassistent Behandlungsbereitschaft"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Patrick",
+      "nachname": "Janssen",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "SpFu FüGr — Sprechfunker Führungsgruppe"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 2,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Isabell",
+      "nachname": "Reimers",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kf KdoW — Kraftfahrer Kommandowagen"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Thorsten",
+      "nachname": "Reimers",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Me/Kf FüKW — Melder/Kraftfahrer Führungskraftwagen"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "KdoW"
+      },
+      "kennzeichen": "NWD-FW 1001",
+      "stanKonform": true,
+      "aenderungen": "Kommandowagen der Führungsgruppe",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Nordwede",
+        "teile": [
+          77,
+          10,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "FüKW"
+      },
+      "kennzeichen": "NWD-FW 1002",
+      "stanKonform": true,
+      "aenderungen": "Führungskraftwagen — mobile Führungsstelle",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Nordwede",
+        "teile": [
+          77,
+          11,
+          1
+        ]
+      }
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 9,
+    "dieselLiter": 120,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": true,
+    "ruhezeitErforderlich": true
+  },
+  "sonstiges": "Führt die MTF und ihre Teileinheiten; stellt bei Vollalarmierung die sanitätsdienstliche Einsatzleitung vor Ort, bleibt aber dem Stab unterstellt."
+}

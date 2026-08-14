@@ -21,6 +21,7 @@
     "beispiele:dlrg": "node --import tsx scripts/dlrg-beispielboegen.mts",
     "beispiele:fw-nds": "node --import tsx scripts/fw-nds-beispielboegen.mts",
     "beispiele:drk-nds": "node --import tsx scripts/drk-nds-beispielboegen.mts",
+    "beispiele:bbk": "node --import tsx scripts/bbk-bundeseinheiten-beispielboegen.mts",
     "vokabular:berufe": "node --import tsx scripts/berufe-vokabular.mts",
     "vokabular:thw-funktionen": "node --import tsx scripts/thw-funktionen-vokabular.mts",
     "icons": "node scripts/render-icons.mjs",

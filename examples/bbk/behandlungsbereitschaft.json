@@ -1,0 +1,1295 @@
+{
+  "schemaVersion": 8,
+  "uebung": true,
+  "stand": 3044700,
+  "einheit": {
+    "organisation": 2,
+    "organisationName": "Berufsfeuerwehr Nordwede — MTF-Standort (Bundesausstattung)",
+    "einheitsTyp": {
+      "freitext": "Behandlungsbereitschaft (MTF)"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Behandlungsbereitschaft (MTF)"
+        },
+        "name": "Nordwede"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "MTF-Standort"
+        },
+        "name": "Berufsfeuerwehr Nordwede",
+        "telefon": "5551913035",
+        "email": "mtf@feuerwehr-nordwede.example"
+      },
+      {
+        "bezeichnung": {
+          "code": 1
+        },
+        "name": "Nordwede"
+      },
+      {
+        "bezeichnung": {
+          "code": 2
+        },
+        "name": "Landkreis Moorwehde"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2140,
+    "zeitraumBis": 2142,
+    "ortAuftrag": "Chemieunfall im Tanklager Nordwede-Hafen — Massenanfall von Verletzten mit CBRN-Komponente: Behandlungsplatz, Verletztendekontamination und weiträumiger Patiententransport in umliegende Kliniken; überörtliche Alarmierung der MTF durch die Leitstelle des Landkreises."
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Katrin",
+      "nachname": "Nolte",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "BFü BeB — Bereitschaftsführer Behandlungsbereitschaft"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5554860277"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Elke",
+      "nachname": "Vogt",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "stv. BFü BeB — stellvertretender Bereitschaftsführer BeB"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Hendrik",
+      "nachname": "Wiechers",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "ML BeB — Medizinischer Leiter Behandlungsbereitschaft"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Notarzt"
+        }
+      ]
+    },
+    {
+      "vorname": "Niklas",
+      "nachname": "Janssen",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kf MTW Beh 1 Fü"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Robert",
+      "nachname": "Bartels",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "ZFü ES — Zugführer Eingangssichtung"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Andreas",
+      "nachname": "Ubben",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "Arzt St 1 — Arzt Sichtungsstelle 1"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Notarzt"
+        }
+      ]
+    },
+    {
+      "vorname": "Gunnar",
+      "nachname": "Quast",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "Arzt St 2 — Arzt Sichtungsstelle 2"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Notarzt"
+        }
+      ]
+    },
+    {
+      "vorname": "Carolin",
+      "nachname": "Nolte",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "RS St 1 — Rettungssanitäter Sichtungsstelle 1"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Tanja",
+      "nachname": "Grote",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "San St 1 — Sanitäter Sichtungsstelle 1"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Yvonne",
+      "nachname": "Nolte",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "RS St 2 — Rettungssanitäter Sichtungsstelle 2"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Volker",
+      "nachname": "Petersen",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "San St 2 — Sanitäter Sichtungsstelle 2"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Karsten",
+      "nachname": "Ahrens",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "GrFü InTr — Gruppenführer Interner Patiententransport"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Felix",
+      "nachname": "Sievers",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "stv. GrFü InTr"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Thorsten",
+      "nachname": "Janssen",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "San InTr — Sanitäter Interner Patiententransport (1)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Gabriele",
+      "nachname": "Bartels",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "San InTr — Sanitäter Interner Patiententransport (2)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Andreas",
+      "nachname": "Freytag",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "San InTr — Sanitäter Interner Patiententransport (3)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Patrick",
+      "nachname": "Ahrens",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kf GW Beh InTr"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Benedikt",
+      "nachname": "Tietjen",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "FüAss VSN — Führungsassistent Versorgungsnachweis"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Robert",
+      "nachname": "Wiechers",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "FüHe VSN — Führungshelfer Versorgungsnachweis"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Nadine",
+      "nachname": "Petersen",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "GrFü BhS A — Gruppenführer Behandlungsstelle A"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Robert",
+      "nachname": "Dircksen",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "stv. GrFü BhS A"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Britta",
+      "nachname": "Petersen",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Arzt BhS A"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Notarzt"
+        }
+      ]
+    },
+    {
+      "vorname": "Dennis",
+      "nachname": "Ahrens",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "RS BhS A"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Isabell",
+      "nachname": "Kock",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "San BhS A"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Dennis",
+      "nachname": "Petersen",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kf GW San BhS A"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Vera",
+      "nachname": "Tietjen",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "GrFü BhS B — Gruppenführer Behandlungsstelle B"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Erik",
+      "nachname": "Ahrens",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "stv. GrFü BhS B"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Robert",
+      "nachname": "Ahrens",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Arzt BhS B"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Notarzt"
+        }
+      ]
+    },
+    {
+      "vorname": "Dennis",
+      "nachname": "Ehlers",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "RS BhS B"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Carsten",
+      "nachname": "Petersen",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "San BhS B"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Katrin",
+      "nachname": "Wiechers",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kf GW San BhS B"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 1,
+      "ernaehrung": 2,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Sabrina",
+      "nachname": "Isernhagen",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "GrFü BhS C — Gruppenführer Behandlungsstelle C"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Dennis",
+      "nachname": "Dircksen",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "stv. GrFü BhS C"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Benedikt",
+      "nachname": "Bartels",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Arzt BhS C"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 2,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Notarzt"
+        }
+      ]
+    },
+    {
+      "vorname": "Dennis",
+      "nachname": "Bartels",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "RS BhS C"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Felix",
+      "nachname": "Meinders",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "San BhS C"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Vera",
+      "nachname": "Ehlers",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kf GW San BhS C"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Oliver",
+      "nachname": "Meinders",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "GrFü BhS D — Gruppenführer Behandlungsstelle D"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Markus",
+      "nachname": "Isernhagen",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "stv. GrFü BhS D"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Thorsten",
+      "nachname": "Ubben",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Arzt BhS D"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Notarzt"
+        }
+      ]
+    },
+    {
+      "vorname": "Gabriele",
+      "nachname": "Meinders",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "RS BhS D"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Jonas",
+      "nachname": "Petersen",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "San BhS D"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Steffen",
+      "nachname": "Nolte",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kf GW San BhS D"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Dennis",
+      "nachname": "Tietjen",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "GrFü BhS E — Gruppenführer Behandlungsstelle E"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Hannah",
+      "nachname": "Lehmann",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "stv. GrFü BhS E"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Hannah",
+      "nachname": "Isernhagen",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Arzt BhS E"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Notarzt"
+        }
+      ]
+    },
+    {
+      "vorname": "Lennart",
+      "nachname": "Bartels",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "RS BhS E"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Steffen",
+      "nachname": "Janssen",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "San BhS E"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Hendrik",
+      "nachname": "Claasen",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kf GW San BhS E"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 2,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Niklas",
+      "nachname": "Petersen",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "GrFü BhS F — Gruppenführer Behandlungsstelle F"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Hendrik",
+      "nachname": "Dircksen",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "stv. GrFü BhS F"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 2,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Anja",
+      "nachname": "Meinders",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Arzt BhS F"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Notarzt"
+        }
+      ]
+    },
+    {
+      "vorname": "Erik",
+      "nachname": "Vogt",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "RS BhS F"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Yvonne",
+      "nachname": "Petersen",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "San BhS F"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 2,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Ingo",
+      "nachname": "Nolte",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kf GW San BhS F"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Tanja",
+      "nachname": "Hansen",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "GrFü BhS G — Gruppenführer Behandlungsstelle G"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Markus",
+      "nachname": "Petersen",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "stv. GrFü BhS G"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Vera",
+      "nachname": "Vogt",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Arzt BhS G"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Notarzt"
+        }
+      ]
+    },
+    {
+      "vorname": "Thorsten",
+      "nachname": "Quast",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "RS BhS G"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Erik",
+      "nachname": "Dircksen",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "San BhS G"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Oliver",
+      "nachname": "Kock",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kf GW San BhS G"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Ingo",
+      "nachname": "Reimers",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "GrFü TA — Gruppenführer Totenablage"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Tanja",
+      "nachname": "Sievers",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "San TA — Sanitäter Totenablage"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Isabell",
+      "nachname": "Vogt",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "GrFü AD/PtO — Gruppenführer Ausgangsdokumentation/Patiententransportorganisation"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Volker",
+      "nachname": "Freytag",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "RS AD/PtO — Rettungssanitäter AD/PtO"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Carsten",
+      "nachname": "Lehmann",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kf MTW Beh 2 PtO"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "MTW Beh 1 (Fü)"
+      },
+      "kennzeichen": "NWD-FW 1003",
+      "stanKonform": true,
+      "aenderungen": "Führungsfahrzeug BeB — transportiert Fü BeB, VSN",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Nordwede",
+        "teile": [
+          77,
+          20,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "MTW Beh 2 (PtO)"
+      },
+      "kennzeichen": "NWD-FW 1004",
+      "stanKonform": true,
+      "aenderungen": "transportiert Eingangssichtung, Totenablage, AD/PtO",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Nordwede",
+        "teile": [
+          77,
+          21,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "GW San (BhS A)"
+      },
+      "kennzeichen": "NWD-FW 1005",
+      "stanKonform": true,
+      "aenderungen": "betreibt die Behandlungsstelle A",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Nordwede",
+        "teile": [
+          77,
+          30,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "GW San (BhS B)"
+      },
+      "kennzeichen": "NWD-FW 1006",
+      "stanKonform": true,
+      "aenderungen": "betreibt die Behandlungsstelle B",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Nordwede",
+        "teile": [
+          77,
+          30,
+          2
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "GW San (BhS C)"
+      },
+      "kennzeichen": "NWD-FW 1007",
+      "stanKonform": true,
+      "aenderungen": "betreibt die Behandlungsstelle C",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Nordwede",
+        "teile": [
+          77,
+          30,
+          3
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "GW San (BhS D)"
+      },
+      "kennzeichen": "NWD-FW 1008",
+      "stanKonform": true,
+      "aenderungen": "betreibt die Behandlungsstelle D",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Nordwede",
+        "teile": [
+          77,
+          30,
+          4
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "GW San (BhS E)"
+      },
+      "kennzeichen": "NWD-FW 1009",
+      "stanKonform": true,
+      "aenderungen": "betreibt die Behandlungsstelle E",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Nordwede",
+        "teile": [
+          77,
+          30,
+          5
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "GW San (BhS F)"
+      },
+      "kennzeichen": "NWD-FW 1010",
+      "stanKonform": true,
+      "aenderungen": "betreibt die Behandlungsstelle F",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Nordwede",
+        "teile": [
+          77,
+          30,
+          6
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "GW San (BhS G)"
+      },
+      "kennzeichen": "NWD-FW 1011",
+      "stanKonform": true,
+      "aenderungen": "betreibt die Behandlungsstelle G",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Nordwede",
+        "teile": [
+          77,
+          30,
+          7
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "GW Beh"
+      },
+      "kennzeichen": "NWD-FW 1012",
+      "stanKonform": true,
+      "aenderungen": "Zusatzausstattung Führung/ES/VSN/InTr/TA/AD-PtO",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Nordwede",
+        "teile": [
+          77,
+          25,
+          1
+        ]
+      }
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 66,
+    "dieselLiter": 600,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": true,
+    "ruhezeitErforderlich": true
+  },
+  "sonstiges": "Betreibt den Behandlungsplatz MTF (BHP MTF) mit sieben sichtungskategorieunabhängigen Behandlungsstellen. Taktische Führung durch BFü BeB/stv. BFü BeB, fachliche (medizinische) Führung durch ML BeB und den Führungsassistenten Versorgungsnachweis."
+}

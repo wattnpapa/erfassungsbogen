@@ -1,0 +1,365 @@
+{
+  "schemaVersion": 8,
+  "uebung": true,
+  "stand": 3044700,
+  "einheit": {
+    "organisation": 2,
+    "organisationName": "Berufsfeuerwehr Nordwede — MTF-Standort (Bundesausstattung)",
+    "einheitsTyp": {
+      "freitext": "Patiententransportgruppe (MTF)"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Patiententransportgruppe (MTF)"
+        },
+        "name": "Nordwede"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "MTF-Standort"
+        },
+        "name": "Berufsfeuerwehr Nordwede",
+        "telefon": "5551913035",
+        "email": "mtf@feuerwehr-nordwede.example"
+      },
+      {
+        "bezeichnung": {
+          "code": 1
+        },
+        "name": "Nordwede"
+      },
+      {
+        "bezeichnung": {
+          "code": 2
+        },
+        "name": "Landkreis Moorwehde"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2140,
+    "zeitraumBis": 2142,
+    "ortAuftrag": "Chemieunfall im Tanklager Nordwede-Hafen — Massenanfall von Verletzten mit CBRN-Komponente: Behandlungsplatz, Verletztendekontamination und weiträumiger Patiententransport in umliegende Kliniken; überörtliche Alarmierung der MTF durch die Leitstelle des Landkreises."
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Sabrina",
+      "nachname": "Hansen",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "GrFü PtGr — Gruppenführer Patiententransportgruppe (RS KTW 1)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5553930736"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Tanja",
+      "nachname": "Tietjen",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kf KTW PtGr (1)"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Volker",
+      "nachname": "Reimers",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "stv. GrFü PtGr — stellvertretender Gruppenführer PtGr (RS KTW 2)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Ute",
+      "nachname": "Ohlmann",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kf KTW PtGr (2)"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Ingo",
+      "nachname": "Ohlmann",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "RS PtGr — Rettungssanitäter KTW 3"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Elke",
+      "nachname": "Janssen",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kf KTW PtGr (3)"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 1,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Robert",
+      "nachname": "Tietjen",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "RS PtGr — Rettungssanitäter KTW 4"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 2,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Gabriele",
+      "nachname": "Petersen",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kf KTW PtGr (4)"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Niklas",
+      "nachname": "Ubben",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "RS PtGr — Rettungssanitäter KTW 5"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Jonas",
+      "nachname": "Ohlmann",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kf KTW PtGr (5)"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Elke",
+      "nachname": "Dircksen",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "RS PtGr — Rettungssanitäter KTW 6"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Robert",
+      "nachname": "Petersen",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kf KTW PtGr (6)"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "KTW B / KTW 4-Tr."
+      },
+      "kennzeichen": "NWD-FW 1013",
+      "stanKonform": true,
+      "aenderungen": "Krankentransportwagen 1 der Patiententransportgruppe",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Nordwede",
+        "teile": [
+          77,
+          40,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "KTW B / KTW 4-Tr."
+      },
+      "kennzeichen": "NWD-FW 1014",
+      "stanKonform": true,
+      "aenderungen": "Krankentransportwagen 2 der Patiententransportgruppe",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Nordwede",
+        "teile": [
+          77,
+          40,
+          2
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "KTW B / KTW 4-Tr."
+      },
+      "kennzeichen": "NWD-FW 1015",
+      "stanKonform": true,
+      "aenderungen": "Krankentransportwagen 3 der Patiententransportgruppe",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Nordwede",
+        "teile": [
+          77,
+          40,
+          3
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "KTW B / KTW 4-Tr."
+      },
+      "kennzeichen": "NWD-FW 1016",
+      "stanKonform": true,
+      "aenderungen": "Krankentransportwagen 4 der Patiententransportgruppe",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Nordwede",
+        "teile": [
+          77,
+          40,
+          4
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "KTW B / KTW 4-Tr."
+      },
+      "kennzeichen": "NWD-FW 1017",
+      "stanKonform": true,
+      "aenderungen": "Krankentransportwagen 5 der Patiententransportgruppe",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Nordwede",
+        "teile": [
+          77,
+          40,
+          5
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "KTW B / KTW 4-Tr."
+      },
+      "kennzeichen": "NWD-FW 1018",
+      "stanKonform": true,
+      "aenderungen": "Krankentransportwagen 6 der Patiententransportgruppe",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Nordwede",
+        "teile": [
+          77,
+          40,
+          6
+        ]
+      }
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 12,
+    "dieselLiter": 360,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": true,
+    "ruhezeitErforderlich": true
+  },
+  "sonstiges": "Sechs gleich ausgestattete KTW; GrFü und stv. GrFü sind zugleich RS auf KTW 1 bzw. KTW 2."
+}
