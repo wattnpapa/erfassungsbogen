@@ -1,0 +1,108 @@
+{
+  "schemaVersion": 8,
+  "uebung": true,
+  "stand": 3441290,
+  "einheit": {
+    "organisation": 2,
+    "organisationName": "Feuerwehr-Hilfeleistungskontingent Stadt Würzburg",
+    "einheitsTyp": {
+      "freitext": "Grundkomponente „Sanitätsdienst” (Eigenschutz) (Feuerwehr-Hilfeleistungskontingent (Grundkomponenten))"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Regierungsbezirk"
+        },
+        "name": "Unterfranken"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Untere KatS-Behörde"
+        },
+        "name": "Stadt Würzburg"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2389,
+    "zeitraumBis": 2393,
+    "ortAuftrag": "Kontingenteinsatz — sanitätsdienstlicher Eigenschutz der Einsatzkräfte in Würzburg"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Korbinian",
+      "nachname": "Lindner",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Rettungssanitäter/-in (Fahrzeugführer/-in)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5554420518"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungssanitäter"
+        }
+      ]
+    },
+    {
+      "vorname": "Patrick",
+      "nachname": "Wolf",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Rettungssanitäter/-in"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungssanitäter"
+        }
+      ]
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "RTW"
+      },
+      "aenderungen": "Rettungswagen für den Eigenschutz des Kontingents",
+      "kennzeichen": "WÜ-2012",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Stadt Würzburg",
+        "teile": [
+          10,
+          60,
+          1
+        ]
+      }
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 2,
+    "dieselLiter": 45,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": false,
+    "ruhezeitErforderlich": false
+  },
+  "sonstiges": "Stärke 0/1/1/2 nach Feuerwehr-Hilfeleistungskontingente Bayern, dokumentiert von der Freiwilligen Feuerwehr München (https://www.ffw-muenchen.de/ueber-uns/hilfeleistungskontingente/). Diese Grundkomponente wird in allen vier Kontingenttypen baugleich gestellt."
+}

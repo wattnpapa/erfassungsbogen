@@ -1,0 +1,126 @@
+{
+  "schemaVersion": 8,
+  "uebung": true,
+  "stand": 3439629,
+  "einheit": {
+    "organisation": 5,
+    "organisationName": "Bayerisches Rotes Kreuz — Kreisverband Stadt Kempten",
+    "einheitsTyp": {
+      "freitext": "SEG Bt — Verpflegungstrupp (BRK Schnell-Einsatz-Gruppe Betreuung (SEG Bt))"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Regierungsbezirk"
+        },
+        "name": "Schwaben"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "BRK-Kreisverband"
+        },
+        "name": "Stadt Kempten"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2388,
+    "zeitraumBis": 2390,
+    "ortAuftrag": "Evakuierung Kempten (Allgäu) — Kalt-/Warmverpflegung für bis zu 200 bzw. 100 Personen je Kochgang"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Norbert",
+      "nachname": "Lindner",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Koch/Köchin (Truppführer/-in Verpflegung)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5556263677"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Koch (Beruf)"
+        }
+      ]
+    },
+    {
+      "vorname": "Norbert",
+      "nachname": "Vogl",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Helfer/-in Verpflegung"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 2,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Simon",
+      "nachname": "Wimmer",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Helfer/-in Verpflegung"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "BtLKW"
+      },
+      "aenderungen": "Betreuungs-Lastkraftwagen (Typ 811/37 Eco-Power o. ä.)",
+      "kennzeichen": "KE-2063",
+      "funkrufname": {
+        "kennwort": {
+          "code": 3
+        },
+        "eigenerStandort": false,
+        "ort": "Stadt Kempten",
+        "teile": [
+          14,
+          64,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "FKH"
+      },
+      "aenderungen": "Feldkochherd",
+      "kennzeichen": "Anh FKH"
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 3,
+    "dieselLiter": 0,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": false,
+    "ruhezeitErforderlich": false
+  },
+  "sonstiges": "Stärke 0/1/2/3 nach Handbuch für Einsatzkräfte in den Bereitschaften, Kreisverband Höchstadt (Stand 15.03.2005), Kapitel 3.3 Betreuungsdienst / 4.1 Sanitätsdienst. Die Quelle nennt Gesamtstärke und Fahrzeugliste der Komponente; die Verteilung auf einzelne Funktionen (wer genau Gruppenführer, Maschinist oder Truppmann ist) ist ein plausibles, in sich stimmiges Modell und nicht wörtlich der Quelle entnommen. Quelle: Handbuch für Einsatzkräfte in den Bereitschaften, Kap. 3.3 (Personalstärke 1/2)."
+}

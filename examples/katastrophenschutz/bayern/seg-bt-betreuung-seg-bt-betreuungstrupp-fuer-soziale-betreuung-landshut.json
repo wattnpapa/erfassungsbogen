@@ -1,0 +1,273 @@
+{
+  "schemaVersion": 8,
+  "uebung": true,
+  "stand": 3442087,
+  "einheit": {
+    "organisation": 5,
+    "organisationName": "Bayerisches Rotes Kreuz — Kreisverband Stadt Landshut",
+    "einheitsTyp": {
+      "freitext": "SEG Bt — Betreuungstrupp für soziale Betreuung (BRK Schnell-Einsatz-Gruppe Betreuung (SEG Bt))"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Regierungsbezirk"
+        },
+        "name": "Niederbayern"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "BRK-Kreisverband"
+        },
+        "name": "Stadt Landshut"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2390,
+    "zeitraumBis": 2392,
+    "ortAuftrag": "Evakuierung Landshut — Betreuung von ca. 500 hilfsbedürftigen Personen, vorübergehende Unterbringung"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Anna",
+      "nachname": "Fischer",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Truppführer/-in Betreuung"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5550996639"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Toni",
+      "nachname": "Schmidbauer",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Betreuungshelfer/-in"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Marcus",
+      "nachname": "Huber",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Betreuungshelfer/-in"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Sebastian",
+      "nachname": "Steiner",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Betreuungshelfer/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Andreas",
+      "nachname": "Moser",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Betreuungshelfer/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Stefanie",
+      "nachname": "Maier",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Betreuungshelfer/-in"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Ludwig",
+      "nachname": "Hofer",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Betreuungshelfer/-in"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Benedikt",
+      "nachname": "Moser",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Betreuungshelfer/-in"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Ingrid",
+      "nachname": "Riedl",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Betreuungshelfer/-in"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungssanitäter (extern)"
+        }
+      ]
+    },
+    {
+      "vorname": "Markus",
+      "nachname": "Gschwendtner",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Betreuungshelfer/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Philipp",
+      "nachname": "Schneider",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Betreuungshelfer/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Christian",
+      "nachname": "Seidl",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Betreuungshelfer/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "Bt-Kombi"
+      },
+      "aenderungen": "Einsatzfahrzeug Soziale Betreuung (MB 312D/35 Sprinter o. ä.)",
+      "kennzeichen": "LA-2061",
+      "funkrufname": {
+        "kennwort": {
+          "code": 3
+        },
+        "eigenerStandort": false,
+        "ort": "Stadt Landshut",
+        "teile": [
+          12,
+          63,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "Bt-Kombi"
+      },
+      "aenderungen": "Einsatzfahrzeug Soziale Betreuung (MB 312D/35 Sprinter o. ä.)",
+      "kennzeichen": "LA-2062",
+      "funkrufname": {
+        "kennwort": {
+          "code": 3
+        },
+        "eigenerStandort": false,
+        "ort": "Stadt Landshut",
+        "teile": [
+          12,
+          63,
+          2
+        ]
+      }
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 12,
+    "dieselLiter": 90,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": true,
+    "ruhezeitErforderlich": false
+  },
+  "sonstiges": "Stärke 0/1/11/12 nach Handbuch für Einsatzkräfte in den Bereitschaften, Kreisverband Höchstadt (Stand 15.03.2005), Kapitel 3.3 Betreuungsdienst / 4.1 Sanitätsdienst. Die Quelle nennt Gesamtstärke und Fahrzeugliste der Komponente; die Verteilung auf einzelne Funktionen (wer genau Gruppenführer, Maschinist oder Truppmann ist) ist ein plausibles, in sich stimmiges Modell und nicht wörtlich der Quelle entnommen. Quelle: Handbuch für Einsatzkräfte in den Bereitschaften, Kap. 3.3 (Personalstärke 1/11)."
+}

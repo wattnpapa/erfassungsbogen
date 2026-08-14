@@ -1,0 +1,1216 @@
+{
+  "schemaVersion": 8,
+  "uebung": true,
+  "stand": 3439298,
+  "einheit": {
+    "organisation": 2,
+    "organisationName": "Feuerwehr-Hilfeleistungskontingent Stadt Ingolstadt",
+    "einheitsTyp": {
+      "freitext": "Spezialkomponente „ABC-Abwehr” (Feuerwehr-Hilfeleistungskontingent ABC-Abwehr)"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Regierungsbezirk"
+        },
+        "name": "Oberbayern"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Untere KatS-Behörde"
+        },
+        "name": "Stadt Ingolstadt"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2388,
+    "zeitraumBis": 2389,
+    "ortAuftrag": "ABC-Gefahrenlage Ingolstadt — Erkunden, Absperren und Dekontamination mit dem Kontingent ABC-Abwehr"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Manuel",
+      "nachname": "Hofer",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "Kontingentteilführer/-in Spezialkomponente"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5551255819"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Georg",
+      "nachname": "Lindner",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "Zugführer/-in"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Georg",
+      "nachname": "Pichler",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Gruppenführer/-in Löschfahrzeug"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Johann",
+      "nachname": "Maurer",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Gruppenführer/-in Löschfahrzeug"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Patrick",
+      "nachname": "Scharrer",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Truppführer/-in Rettungswagen"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungssanitäter"
+        }
+      ]
+    },
+    {
+      "vorname": "Sabine",
+      "nachname": "Sailer",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Rettungssanitäter/-in"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 1,
+      "ernaehrung": 2,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungssanitäter"
+        }
+      ]
+    },
+    {
+      "vorname": "Wolfgang",
+      "nachname": "Scharrer",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Truppführer/-in Gefahrgut/Rüstwagen/Dekon/CBRN-Erkundung/Absperrung/Ausrüstungslogistik/ABC-Ausrüstung"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Philipp",
+      "nachname": "Gruber",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Truppführer/-in Gefahrgut/Rüstwagen/Dekon/CBRN-Erkundung/Absperrung/Ausrüstungslogistik/ABC-Ausrüstung"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Funkamateur (extern)"
+        }
+      ]
+    },
+    {
+      "vorname": "Sepp",
+      "nachname": "Kellner",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Truppführer/-in Gefahrgut/Rüstwagen/Dekon/CBRN-Erkundung/Absperrung/Ausrüstungslogistik/ABC-Ausrüstung"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Elektrofachkraft (Beruf)"
+        }
+      ]
+    },
+    {
+      "vorname": "Johann",
+      "nachname": "Sailer",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Truppführer/-in Gefahrgut/Rüstwagen/Dekon/CBRN-Erkundung/Absperrung/Ausrüstungslogistik/ABC-Ausrüstung"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Thomas",
+      "nachname": "Vogl",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Truppführer/-in Gefahrgut/Rüstwagen/Dekon/CBRN-Erkundung/Absperrung/Ausrüstungslogistik/ABC-Ausrüstung"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Berufskraftfahrer (Beruf)"
+        }
+      ]
+    },
+    {
+      "vorname": "Rudolf",
+      "nachname": "Lindner",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Truppführer/-in Gefahrgut/Rüstwagen/Dekon/CBRN-Erkundung/Absperrung/Ausrüstungslogistik/ABC-Ausrüstung"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Claudia",
+      "nachname": "Baumgartner",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Truppführer/-in Gefahrgut/Rüstwagen/Dekon/CBRN-Erkundung/Absperrung/Ausrüstungslogistik/ABC-Ausrüstung"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Simone",
+      "nachname": "Obermeier",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmann/Truppfrau ABC-Abwehr"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Chemikalienschutzanzug-Träger"
+        }
+      ]
+    },
+    {
+      "vorname": "Rudolf",
+      "nachname": "Steiner",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmann/Truppfrau ABC-Abwehr"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Chemikalienschutzanzug-Träger"
+        }
+      ]
+    },
+    {
+      "vorname": "Markus",
+      "nachname": "Müller",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmann/Truppfrau ABC-Abwehr"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 2,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Chemikalienschutzanzug-Träger"
+        }
+      ]
+    },
+    {
+      "vorname": "Andreas",
+      "nachname": "Vogl",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmann/Truppfrau ABC-Abwehr"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Chemikalienschutzanzug-Träger"
+        }
+      ]
+    },
+    {
+      "vorname": "Benedikt",
+      "nachname": "Baumgartner",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmann/Truppfrau ABC-Abwehr"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Chemikalienschutzanzug-Träger"
+        }
+      ]
+    },
+    {
+      "vorname": "Stefan",
+      "nachname": "Vogl",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmann/Truppfrau ABC-Abwehr"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Chemikalienschutzanzug-Träger"
+        }
+      ]
+    },
+    {
+      "vorname": "Kathrin",
+      "nachname": "Reindl",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmann/Truppfrau ABC-Abwehr"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 1,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Chemikalienschutzanzug-Träger"
+        }
+      ]
+    },
+    {
+      "vorname": "Franz",
+      "nachname": "Aigner",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmann/Truppfrau ABC-Abwehr"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 2,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Chemikalienschutzanzug-Träger"
+        }
+      ]
+    },
+    {
+      "vorname": "Quirin",
+      "nachname": "Schmidbauer",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmann/Truppfrau ABC-Abwehr"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Chemikalienschutzanzug-Träger"
+        }
+      ]
+    },
+    {
+      "vorname": "Michael",
+      "nachname": "Schmidbauer",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmann/Truppfrau ABC-Abwehr"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Chemikalienschutzanzug-Träger"
+        }
+      ]
+    },
+    {
+      "vorname": "Katrin",
+      "nachname": "Moser",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmann/Truppfrau ABC-Abwehr"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Chemikalienschutzanzug-Träger"
+        }
+      ]
+    },
+    {
+      "vorname": "Norbert",
+      "nachname": "Stauber",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmann/Truppfrau ABC-Abwehr"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Chemikalienschutzanzug-Träger"
+        }
+      ]
+    },
+    {
+      "vorname": "Georg",
+      "nachname": "Stöckl",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmann/Truppfrau ABC-Abwehr"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Chemikalienschutzanzug-Träger"
+        }
+      ]
+    },
+    {
+      "vorname": "Wolfgang",
+      "nachname": "Obermeier",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmann/Truppfrau ABC-Abwehr"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Chemikalienschutzanzug-Träger"
+        }
+      ]
+    },
+    {
+      "vorname": "Korbinian",
+      "nachname": "Wolf",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmann/Truppfrau ABC-Abwehr"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Chemikalienschutzanzug-Träger"
+        }
+      ]
+    },
+    {
+      "vorname": "Sebastian",
+      "nachname": "Gschwendtner",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmann/Truppfrau ABC-Abwehr"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Chemikalienschutzanzug-Träger"
+        }
+      ]
+    },
+    {
+      "vorname": "Markus",
+      "nachname": "Brunner",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmann/Truppfrau ABC-Abwehr"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Chemikalienschutzanzug-Träger"
+        }
+      ]
+    },
+    {
+      "vorname": "Korbinian",
+      "nachname": "Stauber",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmann/Truppfrau ABC-Abwehr"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Chemikalienschutzanzug-Träger"
+        }
+      ]
+    },
+    {
+      "vorname": "Florian",
+      "nachname": "Moser",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmann/Truppfrau ABC-Abwehr"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Chemikalienschutzanzug-Träger"
+        }
+      ]
+    },
+    {
+      "vorname": "Hans",
+      "nachname": "Mayer",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmann/Truppfrau ABC-Abwehr"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Chemikalienschutzanzug-Träger"
+        }
+      ]
+    },
+    {
+      "vorname": "Susanne",
+      "nachname": "Pöllinger",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmann/Truppfrau ABC-Abwehr"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Chemikalienschutzanzug-Träger"
+        }
+      ]
+    },
+    {
+      "vorname": "Sepp",
+      "nachname": "Sommer",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmann/Truppfrau ABC-Abwehr"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Chemikalienschutzanzug-Träger"
+        }
+      ]
+    },
+    {
+      "vorname": "Robert",
+      "nachname": "Klein",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmann/Truppfrau ABC-Abwehr"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Chemikalienschutzanzug-Träger"
+        }
+      ]
+    },
+    {
+      "vorname": "Thomas",
+      "nachname": "Stöckl",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmann/Truppfrau ABC-Abwehr"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Chemikalienschutzanzug-Träger"
+        }
+      ]
+    },
+    {
+      "vorname": "Veronika",
+      "nachname": "Berger",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmann/Truppfrau ABC-Abwehr"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Chemikalienschutzanzug-Träger"
+        }
+      ]
+    },
+    {
+      "vorname": "Toni",
+      "nachname": "Hofmann",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmann/Truppfrau ABC-Abwehr"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Chemikalienschutzanzug-Träger"
+        }
+      ]
+    },
+    {
+      "vorname": "Christian",
+      "nachname": "Schmid",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmann/Truppfrau ABC-Abwehr"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 2,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Chemikalienschutzanzug-Träger"
+        }
+      ]
+    },
+    {
+      "vorname": "Georg",
+      "nachname": "Mayer",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmann/Truppfrau ABC-Abwehr"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 2,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Chemikalienschutzanzug-Träger"
+        }
+      ]
+    },
+    {
+      "vorname": "Simon",
+      "nachname": "Reindl",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmann/Truppfrau ABC-Abwehr"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Chemikalienschutzanzug-Träger"
+        }
+      ]
+    },
+    {
+      "vorname": "Andrea",
+      "nachname": "Hofer",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmann/Truppfrau ABC-Abwehr"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Chemikalienschutzanzug-Träger"
+        }
+      ]
+    },
+    {
+      "vorname": "Andrea",
+      "nachname": "Müller",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmann/Truppfrau ABC-Abwehr"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Chemikalienschutzanzug-Träger"
+        }
+      ]
+    },
+    {
+      "vorname": "Manuel",
+      "nachname": "Scharrer",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmann/Truppfrau ABC-Abwehr"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Chemikalienschutzanzug-Träger"
+        }
+      ]
+    },
+    {
+      "vorname": "Georg",
+      "nachname": "Pöllinger",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmann/Truppfrau ABC-Abwehr"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Chemikalienschutzanzug-Träger"
+        }
+      ]
+    },
+    {
+      "vorname": "Patrick",
+      "nachname": "Sailer",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmann/Truppfrau ABC-Abwehr"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Chemikalienschutzanzug-Träger"
+        }
+      ]
+    },
+    {
+      "vorname": "Franz",
+      "nachname": "Ziegler",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmann/Truppfrau ABC-Abwehr"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Chemikalienschutzanzug-Träger"
+        }
+      ]
+    },
+    {
+      "vorname": "Bianca",
+      "nachname": "Fischer",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmann/Truppfrau ABC-Abwehr"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Chemikalienschutzanzug-Träger"
+        }
+      ]
+    },
+    {
+      "vorname": "Waltraud",
+      "nachname": "Kraler",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmann/Truppfrau ABC-Abwehr"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Chemikalienschutzanzug-Träger"
+        }
+      ]
+    },
+    {
+      "vorname": "Michael",
+      "nachname": "Winkler",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmann/Truppfrau ABC-Abwehr"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Chemikalienschutzanzug-Träger"
+        }
+      ]
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "ELW"
+      },
+      "aenderungen": "Einsatzleitwagen (Kontingentteilführung)",
+      "kennzeichen": "IN-2041",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Stadt Ingolstadt",
+        "teile": [
+          12,
+          11,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "ELW"
+      },
+      "aenderungen": "Einsatzleitwagen (Zugführung)",
+      "kennzeichen": "IN-2042",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Stadt Ingolstadt",
+        "teile": [
+          12,
+          11,
+          2
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "HLF 20/16"
+      },
+      "aenderungen": "(Hilfeleistungs-)Löschfahrzeug",
+      "kennzeichen": "IN-2043",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Stadt Ingolstadt",
+        "teile": [
+          12,
+          20,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "HLF 20/16"
+      },
+      "aenderungen": "(Hilfeleistungs-)Löschfahrzeug",
+      "kennzeichen": "IN-2044",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Stadt Ingolstadt",
+        "teile": [
+          12,
+          20,
+          2
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "RTW"
+      },
+      "aenderungen": "Rettungswagen",
+      "kennzeichen": "IN-2045",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Stadt Ingolstadt",
+        "teile": [
+          12,
+          60,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "GW-Gefahrgut"
+      },
+      "aenderungen": "Gerätewagen Gefahrgut",
+      "kennzeichen": "IN-2046",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Stadt Ingolstadt",
+        "teile": [
+          12,
+          44,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "RW"
+      },
+      "aenderungen": "Rüstwagen",
+      "kennzeichen": "IN-2047",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Stadt Ingolstadt",
+        "teile": [
+          12,
+          42,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "GW-Dekon-P"
+      },
+      "aenderungen": "Gerätewagen Dekontamination Personen",
+      "kennzeichen": "IN-2048",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Stadt Ingolstadt",
+        "teile": [
+          12,
+          53,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "CBRN-ErkW"
+      },
+      "aenderungen": "CBRN-Erkundungswagen",
+      "kennzeichen": "IN-2049",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Stadt Ingolstadt",
+        "teile": [
+          12,
+          54,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "GW-AS"
+      },
+      "aenderungen": "Gerätewagen Absperrung/Sicherung",
+      "kennzeichen": "IN-2050",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Stadt Ingolstadt",
+        "teile": [
+          12,
+          55,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "GW-AL"
+      },
+      "aenderungen": "Gerätewagen Ausrüstung/Logistik",
+      "kennzeichen": "IN-2051",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Stadt Ingolstadt",
+        "teile": [
+          12,
+          56,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "LKW"
+      },
+      "aenderungen": "Lastkraftwagen mit Ausrüstung ABC (CSA, Spritzschutzanzüge, Hochdruckreiniger)",
+      "kennzeichen": "IN-2052",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Stadt Ingolstadt",
+        "teile": [
+          12,
+          45,
+          1
+        ]
+      }
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 51,
+    "dieselLiter": 745,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": false,
+    "ruhezeitErforderlich": false
+  },
+  "sonstiges": "Stärke 2/10/39/51 nach Feuerwehr-Hilfeleistungskontingente Bayern, dokumentiert von der Freiwilligen Feuerwehr München (https://www.ffw-muenchen.de/ueber-uns/hilfeleistungskontingente/). Die Quelle nennt Gesamtstärke und Fahrzeugliste der Komponente; die Verteilung auf einzelne Funktionen (wer genau Gruppenführer, Maschinist oder Truppmann ist) ist ein plausibles, in sich stimmiges Modell und nicht wörtlich der Quelle entnommen."
+}

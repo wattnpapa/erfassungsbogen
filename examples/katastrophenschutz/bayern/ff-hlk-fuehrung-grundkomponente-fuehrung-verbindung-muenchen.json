@@ -1,0 +1,397 @@
+{
+  "schemaVersion": 8,
+  "uebung": true,
+  "stand": 3439139,
+  "einheit": {
+    "organisation": 2,
+    "organisationName": "Feuerwehr-Hilfeleistungskontingent Landeshauptstadt München",
+    "einheitsTyp": {
+      "freitext": "Grundkomponente „Führung/Verbindung” (Feuerwehr-Hilfeleistungskontingent (Grundkomponenten))"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Regierungsbezirk"
+        },
+        "name": "Oberbayern"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Untere KatS-Behörde"
+        },
+        "name": "Landeshauptstadt München"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2388,
+    "zeitraumBis": 2391,
+    "ortAuftrag": "Kontingenteinsatz — Kontingentführung stellt Verbindung zur Schadensstelle und zur Logistik in München her"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Ludwig",
+      "nachname": "Pichler",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "Kontingentführer/-in"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
+      "ernaehrung": 2,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5558367592"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Daniel",
+      "nachname": "Hofmann",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "stellv. Kontingentführer/-in"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5555067522"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Julia",
+      "nachname": "Huber",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Verwaltungsbeamter/-in"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Gabriele",
+      "nachname": "Hofmann",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "Sachgebietsleiter/-in S1 (Personal)"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Thomas",
+      "nachname": "Lechner",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "Sachgebietsleiter/-in S2/3 (Lage/Einsatz)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Hans",
+      "nachname": "Schneider",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "Sachgebietsleiter/-in S4 (Versorgung)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Monika",
+      "nachname": "Frank",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "Sachgebietsleiter/-in S5 (Presse-/Öffentlichkeitsarbeit)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Resi",
+      "nachname": "Schmid",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "Sachgebietsleiter/-in S6 (Führungsunterstützung/IuK)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Florian",
+      "nachname": "Obermeier",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Helfer/-in Unterstützungsgruppe Kontingentführung"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Sprechfunker"
+        }
+      ]
+    },
+    {
+      "vorname": "Philipp",
+      "nachname": "Winkler",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Helfer/-in Unterstützungsgruppe Kontingentführung"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Sprechfunker"
+        }
+      ]
+    },
+    {
+      "vorname": "Franz",
+      "nachname": "Gruber",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Helfer/-in Unterstützungsgruppe Kontingentführung"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Sprechfunker"
+        }
+      ]
+    },
+    {
+      "vorname": "Max",
+      "nachname": "Fischer",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Helfer/-in Unterstützungsgruppe Kontingentführung"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Sprechfunker"
+        }
+      ]
+    },
+    {
+      "vorname": "Tobias",
+      "nachname": "Brunner",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Helfer/-in Unterstützungsgruppe Kontingentführung"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Sprechfunker"
+        }
+      ]
+    },
+    {
+      "vorname": "Maximilian",
+      "nachname": "Huber",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kradmelder/-in"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
+      "ernaehrung": 2,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Markus",
+      "nachname": "Schneider",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kradmelder/-in"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "KdoW"
+      },
+      "aenderungen": "Kommandowagen",
+      "kennzeichen": "M-2001",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Landeshauptstadt München",
+        "teile": [
+          10,
+          10,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "KdoW"
+      },
+      "aenderungen": "Kommandowagen",
+      "kennzeichen": "M-2002",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Landeshauptstadt München",
+        "teile": [
+          10,
+          10,
+          2
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "GW-IuK"
+      },
+      "aenderungen": "Gerätewagen Informations- und Kommunikationstechnik",
+      "kennzeichen": "M-2003",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Landeshauptstadt München",
+        "teile": [
+          10,
+          30,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "Kraftrad"
+      },
+      "aenderungen": "Kraftrad Kradmelder",
+      "kennzeichen": "M-2004",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Landeshauptstadt München",
+        "teile": [
+          10,
+          95,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "Kraftrad"
+      },
+      "aenderungen": "Kraftrad Kradmelder",
+      "kennzeichen": "M-2005",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Landeshauptstadt München",
+        "teile": [
+          10,
+          95,
+          2
+        ]
+      }
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 15,
+    "dieselLiter": 160,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": true,
+    "ruhezeitErforderlich": false
+  },
+  "sonstiges": "Stärke 7/1/7/15 nach Feuerwehr-Hilfeleistungskontingente Bayern, dokumentiert von der Freiwilligen Feuerwehr München (https://www.ffw-muenchen.de/ueber-uns/hilfeleistungskontingente/). Die Quelle nennt Gesamtstärke und Fahrzeugliste der Komponente; die Verteilung auf einzelne Funktionen (wer genau Gruppenführer, Maschinist oder Truppmann ist) ist ein plausibles, in sich stimmiges Modell und nicht wörtlich der Quelle entnommen. Die Grundkomponente „Führung/Verbindung“ wird laut Quelle in jedem der vier Kontingenttypen Standard, Hochwasser/Pumpen, Sturmschaden/Dachsicherung und ABC-Abwehr baugleich gestellt — hier deshalb nur einmal abgebildet."
+}
