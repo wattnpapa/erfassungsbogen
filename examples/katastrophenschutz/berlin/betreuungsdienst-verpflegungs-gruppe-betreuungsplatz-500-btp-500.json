@@ -1,0 +1,232 @@
+{
+  "schemaVersion": 8,
+  "uebung": true,
+  "stand": 3396293,
+  "einheit": {
+    "organisation": 7,
+    "organisationName": "Malteser Hilfsdienst Berlin",
+    "einheitsTyp": {
+      "freitext": "Verpflegungs-Gruppe (Betreuungsplatz 500 (BTP 500))"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Fachdienst Betreuungsdienst"
+        },
+        "name": "Betreuungsplatz 500 (BTP 500)"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "MHD-Kreisverband"
+        },
+        "name": "Neukölln"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Landesverband"
+        },
+        "name": "Berlin"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2358,
+    "zeitraumBis": 2359,
+    "ortAuftrag": "Evakuierung Neukölln — Verpflegung von Betroffenen und Einsatzkräften"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Robert",
+      "nachname": "Schmidt",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Gruppenführer/-in"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5554247625"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Anke",
+      "nachname": "Jahnke",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kraftfahrer/-in"
+        }
+      ],
+      "fahrerlaubnis": 8,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Jan",
+      "nachname": "Bethke",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Feldkoch/-köchin"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Koch (Beruf)"
+        }
+      ]
+    },
+    {
+      "vorname": "Frank",
+      "nachname": "Draheim",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Helfer/-in Verpflegung"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Patrick",
+      "nachname": "Weber",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Helfer/-in Verpflegung"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Tobias",
+      "nachname": "Dittrich",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Helfer/-in Verpflegung"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Tobias",
+      "nachname": "Wenzel",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Helfer/-in Verpflegung"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Jana",
+      "nachname": "Pätzold",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Helfer/-in Verpflegung"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Manuela",
+      "nachname": "Ulrich",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Helfer/-in Verpflegung"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 1,
+      "ernaehrung": 2,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "GW Bt"
+      },
+      "aenderungen": "Gerätewagen Betreuung",
+      "kennzeichen": "B-KatS 1008",
+      "funkrufname": {
+        "kennwort": {
+          "code": 5
+        },
+        "eigenerStandort": false,
+        "ort": "Neukölln",
+        "teile": [
+          1800,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "FKH"
+      },
+      "aenderungen": "Feldkochherd",
+      "kennzeichen": "B-KatS 1009",
+      "funkrufname": {
+        "kennwort": {
+          "code": 5
+        },
+        "eigenerStandort": false,
+        "ort": "Neukölln",
+        "teile": [
+          1800,
+          2
+        ]
+      }
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 9,
+    "dieselLiter": 100,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": false,
+    "ruhezeitErforderlich": false
+  },
+  "sonstiges": "Einfache Besetzung nach KatSD-VO Berlin, Anlage zu § 8: 0/1/8/9. Landesweit 14 Teileinheiten dieses Typs (28 Fahrzeuge), 252 Helfer bei doppelter Besetzung laut Anlage. Träger dieser Teileinheit ist redaktionell gewählt (die Verordnung nennt außer für den Brandschutzdienst keinen Träger je Teileinheit), siehe README."
+}

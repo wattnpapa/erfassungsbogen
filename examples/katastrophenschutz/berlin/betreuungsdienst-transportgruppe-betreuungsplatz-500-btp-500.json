@@ -1,0 +1,108 @@
+{
+  "schemaVersion": 8,
+  "uebung": true,
+  "stand": 3395333,
+  "einheit": {
+    "organisation": 8,
+    "organisationName": "Arbeiter-Samariter-Bund Berlin",
+    "einheitsTyp": {
+      "freitext": "Transportgruppe (Betreuungsplatz 500 (BTP 500))"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Fachdienst Betreuungsdienst"
+        },
+        "name": "Betreuungsplatz 500 (BTP 500)"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "ASB-Kreisverband"
+        },
+        "name": "Treptow-Köpenick"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Landesverband"
+        },
+        "name": "Berlin"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2357,
+    "zeitraumBis": 2358,
+    "ortAuftrag": "Evakuierung Treptow-Köpenick — Transport hilfsbedürftiger Personen"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Beate",
+      "nachname": "Pohl",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Rettungssanitäter/-in"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 1,
+      "ernaehrung": 1,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5554107449"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungssanitäter"
+        }
+      ]
+    },
+    {
+      "vorname": "Susanne",
+      "nachname": "Bergmann",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kraftfahrer/-in"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "KTW Typ B"
+      },
+      "aenderungen": "Notfallkrankenwagen",
+      "kennzeichen": "B-KatS 1010",
+      "funkrufname": {
+        "kennwort": {
+          "code": 6
+        },
+        "eigenerStandort": false,
+        "ort": "Treptow-Köpenick",
+        "teile": [
+          1900
+        ]
+      }
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 2,
+    "dieselLiter": 40,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": false,
+    "ruhezeitErforderlich": true
+  },
+  "sonstiges": "Einfache Besetzung nach KatSD-VO Berlin, Anlage zu § 8: 0/0/2/2. Landesweit 14 Teileinheiten dieses Typs (14 Fahrzeuge), 56 Helfer bei doppelter Besetzung laut Anlage. Träger dieser Teileinheit ist redaktionell gewählt (die Verordnung nennt außer für den Brandschutzdienst keinen Träger je Teileinheit), siehe README."
+}

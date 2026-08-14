@@ -1,0 +1,134 @@
+{
+  "schemaVersion": 8,
+  "uebung": true,
+  "stand": 3394539,
+  "einheit": {
+    "organisation": 5,
+    "organisationName": "Deutsches Rotes Kreuz Berlin",
+    "einheitsTyp": {
+      "freitext": "Gruppe Technik und Sicherheit (Behandlungsplatz 25 (BHP 25))"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Fachdienst Sanitätsdienst"
+        },
+        "name": "Behandlungsplatz 25 (BHP 25)"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "DRK-Kreisverband"
+        },
+        "name": "Charlottenburg-Wilmersdorf"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Landesverband"
+        },
+        "name": "Berlin"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2357,
+    "zeitraumBis": 2358,
+    "ortAuftrag": "MANV Charlottenburg-Wilmersdorf — Ausleuchten, Absichern und technischer Betrieb des Behandlungsplatzes"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Volker",
+      "nachname": "Görlitz",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Unterführer/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5559759016"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Sven",
+      "nachname": "Ebert",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kraftfahrer/-in"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Sven",
+      "nachname": "Schulze",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Helfer/-in Technik und Sicherheit"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Ines",
+      "nachname": "Günther",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Helfer/-in Technik und Sicherheit"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "Lkw TeSi"
+      },
+      "aenderungen": "Lastkraftwagen technische Sicherheit",
+      "kennzeichen": "B-KatS 1017",
+      "funkrufname": {
+        "kennwort": {
+          "code": 3
+        },
+        "eigenerStandort": false,
+        "ort": "Charlottenburg-Wilmersdorf",
+        "teile": [
+          1400
+        ]
+      }
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 4,
+    "dieselLiter": 90,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": false,
+    "ruhezeitErforderlich": true
+  },
+  "sonstiges": "Einfache Besetzung nach KatSD-VO Berlin, Anlage zu § 8: 0/1/3/4. Landesweit 7 Teileinheiten dieses Typs (7 Fahrzeuge), 56 Helfer bei doppelter Besetzung laut Anlage. Träger dieser Teileinheit ist redaktionell gewählt (die Verordnung nennt außer für den Brandschutzdienst keinen Träger je Teileinheit), siehe README."
+}

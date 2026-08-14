@@ -1,0 +1,119 @@
+{
+  "schemaVersion": 8,
+  "uebung": true,
+  "stand": 3396518,
+  "einheit": {
+    "organisation": 5,
+    "organisationName": "Deutsches Rotes Kreuz Berlin",
+    "einheitsTyp": {
+      "freitext": "Logistik-Gruppe (Betreuungsplatz 500 (BTP 500))"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Fachdienst Betreuungsdienst"
+        },
+        "name": "Betreuungsplatz 500 (BTP 500)"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "DRK-Kreisverband"
+        },
+        "name": "Steglitz-Zehlendorf"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Landesverband"
+        },
+        "name": "Berlin"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2358,
+    "zeitraumBis": 2361,
+    "ortAuftrag": "Evakuierung Steglitz-Zehlendorf — Materialnachschub für den Betreuungsplatz"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Heike",
+      "nachname": "Lindner",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kraftfahrer/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5557253533"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "René",
+      "nachname": "Lange",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Helfer/-in Logistik"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Volker",
+      "nachname": "Krause",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Helfer/-in Logistik"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "GW Log Bt"
+      },
+      "aenderungen": "Gerätewagen Logistik/Betreuung",
+      "kennzeichen": "B-KatS 1006",
+      "funkrufname": {
+        "kennwort": {
+          "code": 3
+        },
+        "eigenerStandort": false,
+        "ort": "Steglitz-Zehlendorf",
+        "teile": [
+          1600
+        ]
+      }
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 3,
+    "dieselLiter": 60,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": true,
+    "ruhezeitErforderlich": true
+  },
+  "sonstiges": "Einfache Besetzung nach KatSD-VO Berlin, Anlage zu § 8: 0/0/3/3. Landesweit 7 Teileinheiten dieses Typs (7 Fahrzeuge), 42 Helfer bei doppelter Besetzung laut Anlage. Träger dieser Teileinheit ist redaktionell gewählt (die Verordnung nennt außer für den Brandschutzdienst keinen Träger je Teileinheit), siehe README."
+}

@@ -1,0 +1,125 @@
+{
+  "schemaVersion": 8,
+  "uebung": true,
+  "stand": 3398025,
+  "einheit": {
+    "organisation": 5,
+    "organisationName": "Deutsches Rotes Kreuz Berlin",
+    "einheitsTyp": {
+      "freitext": "Führungs-Trupp (Patiententransportzug 10 (PTZ 10))"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Fachdienst Sanitätsdienst"
+        },
+        "name": "Patiententransportzug 10 (PTZ 10)"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "DRK-Kreisverband"
+        },
+        "name": "Spandau"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Landesverband"
+        },
+        "name": "Berlin"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2359,
+    "zeitraumBis": 2363,
+    "ortAuftrag": "MANV Spandau — Führung eines Patiententransportzuges 10"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Lars",
+      "nachname": "Schmidt",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "Führer/-in"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5551048557"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Norbert",
+      "nachname": "Thiele",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Unterführer/-in"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5559775799"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Erik",
+      "nachname": "Noack",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kraftfahrer/-in"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "KdoW"
+      },
+      "aenderungen": "Kommandowagen",
+      "kennzeichen": "B-KatS 1018",
+      "funkrufname": {
+        "kennwort": {
+          "code": 3
+        },
+        "eigenerStandort": false,
+        "ort": "Spandau",
+        "teile": [
+          1500
+        ]
+      }
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 3,
+    "dieselLiter": 40,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": true,
+    "ruhezeitErforderlich": true
+  },
+  "sonstiges": "Einfache Besetzung nach KatSD-VO Berlin, Anlage zu § 8: 1/1/1/3. Landesweit 7 Teileinheiten dieses Typs (7 Fahrzeuge), 42 Helfer bei doppelter Besetzung laut Anlage. Träger dieser Teileinheit ist redaktionell gewählt (die Verordnung nennt außer für den Brandschutzdienst keinen Träger je Teileinheit), siehe README."
+}

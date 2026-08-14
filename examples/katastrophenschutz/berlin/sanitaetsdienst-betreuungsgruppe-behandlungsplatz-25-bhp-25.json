@@ -1,0 +1,168 @@
+{
+  "schemaVersion": 8,
+  "uebung": true,
+  "stand": 3396391,
+  "einheit": {
+    "organisation": 7,
+    "organisationName": "Malteser Hilfsdienst Berlin",
+    "einheitsTyp": {
+      "freitext": "Betreuungsgruppe (Behandlungsplatz 25 (BHP 25))"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Fachdienst Sanitätsdienst"
+        },
+        "name": "Behandlungsplatz 25 (BHP 25)"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "MHD-Kreisverband"
+        },
+        "name": "Pankow"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Landesverband"
+        },
+        "name": "Berlin"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2358,
+    "zeitraumBis": 2359,
+    "ortAuftrag": "MANV Pankow — Betreuen unverletzt Betroffener am Behandlungsplatz"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Jana",
+      "nachname": "Brandt",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Gruppenführer/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 1,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5550957768"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Anke",
+      "nachname": "Zimmermann",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kraftfahrer/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Dirk",
+      "nachname": "Kaiser",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Betreuungshelfer/-in"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Sabine",
+      "nachname": "Wegner",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Betreuungshelfer/-in"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Patrick",
+      "nachname": "Hennig",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Betreuungshelfer/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungssanitäter (extern)"
+        }
+      ]
+    },
+    {
+      "vorname": "Erik",
+      "nachname": "Köhler",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Betreuungshelfer/-in"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "Bt-Kombi"
+      },
+      "aenderungen": "Betreuungs-Kombi",
+      "kennzeichen": "B-KatS 1016",
+      "funkrufname": {
+        "kennwort": {
+          "code": 5
+        },
+        "eigenerStandort": false,
+        "ort": "Pankow",
+        "teile": [
+          1300
+        ]
+      }
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 6,
+    "dieselLiter": 40,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": false,
+    "ruhezeitErforderlich": false
+  },
+  "sonstiges": "Einfache Besetzung nach KatSD-VO Berlin, Anlage zu § 8: 0/1/5/6. Landesweit 14 Teileinheiten dieses Typs (14 Fahrzeuge), 168 Helfer bei doppelter Besetzung laut Anlage. Träger dieser Teileinheit ist redaktionell gewählt (die Verordnung nennt außer für den Brandschutzdienst keinen Träger je Teileinheit), siehe README."
+}

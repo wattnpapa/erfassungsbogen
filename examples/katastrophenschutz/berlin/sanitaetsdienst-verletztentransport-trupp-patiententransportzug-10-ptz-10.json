@@ -1,0 +1,108 @@
+{
+  "schemaVersion": 8,
+  "uebung": true,
+  "stand": 3396009,
+  "einheit": {
+    "organisation": 5,
+    "organisationName": "Deutsches Rotes Kreuz Berlin",
+    "einheitsTyp": {
+      "freitext": "Verletztentransport-Trupp (Patiententransportzug 10 (PTZ 10))"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Fachdienst Sanitätsdienst"
+        },
+        "name": "Patiententransportzug 10 (PTZ 10)"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "DRK-Kreisverband"
+        },
+        "name": "Steglitz-Zehlendorf"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Landesverband"
+        },
+        "name": "Berlin"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2358,
+    "zeitraumBis": 2359,
+    "ortAuftrag": "MANV Steglitz-Zehlendorf — Transport von Verletzten nach ärztlicher Festlegung"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Sabine",
+      "nachname": "Hagen",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Unterführer/-in / Rettungssanitäter/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5559985965"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungssanitäter"
+        }
+      ]
+    },
+    {
+      "vorname": "Frank",
+      "nachname": "Wolf",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kraftfahrer/-in"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "KTW Typ B"
+      },
+      "aenderungen": "Notfallkrankenwagen",
+      "kennzeichen": "B-KatS 1019",
+      "funkrufname": {
+        "kennwort": {
+          "code": 3
+        },
+        "eigenerStandort": false,
+        "ort": "Steglitz-Zehlendorf",
+        "teile": [
+          1600
+        ]
+      }
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 2,
+    "dieselLiter": 40,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": false,
+    "ruhezeitErforderlich": true
+  },
+  "sonstiges": "Einfache Besetzung nach KatSD-VO Berlin, Anlage zu § 8: 0/1/1/2. Landesweit 35 Teileinheiten dieses Typs (35 Fahrzeuge), 140 Helfer bei doppelter Besetzung laut Anlage. Träger dieser Teileinheit ist redaktionell gewählt (die Verordnung nennt außer für den Brandschutzdienst keinen Träger je Teileinheit), siehe README."
+}
