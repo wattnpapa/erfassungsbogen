@@ -1,0 +1,466 @@
+{
+  "schemaVersion": 8,
+  "uebung": true,
+  "stand": 3375087,
+  "einheit": {
+    "organisation": 2,
+    "organisationName": "Feuerwehr Koblenz",
+    "einheitsTyp": {
+      "freitext": "CBRN-Schutz – radioaktiver Kontaminationsnachweis (CBRN-03)"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Fähigkeitsmodul"
+        },
+        "name": "CBRN-03 · CBRN-Schutz"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Untere Katastrophenschutzbehörde"
+        },
+        "name": "Stadt Koblenz"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2343,
+    "zeitraumBis": 2344,
+    "ortAuftrag": "Strahlenschutzeinsatz Koblenz — Dekontaminationsstelle für 50 Personen pro Stunde"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Ursula",
+      "nachname": "Schröder",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "ZF"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5550045176"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Lea",
+      "nachname": "Bauer",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "ZF"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Erika",
+      "nachname": "Müller",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "GF"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Peter",
+      "nachname": "Schneider",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "GF"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Tim",
+      "nachname": "May",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "GF"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Heiko",
+      "nachname": "Kremer",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Führungshilfspersonal"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Marion",
+      "nachname": "Merz",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Führungshilfspersonal"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Gesundheits- und Krankenpfleger (Beruf)"
+        }
+      ]
+    },
+    {
+      "vorname": "Anna",
+      "nachname": "Schuster",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "CSA"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Anja",
+      "nachname": "Brenner",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "CSA"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Koch (Beruf)"
+        }
+      ]
+    },
+    {
+      "vorname": "Ralf",
+      "nachname": "Blum",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "CSA"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Berufskraftfahrer (Beruf)"
+        }
+      ]
+    },
+    {
+      "vorname": "Sandra",
+      "nachname": "Ludwig",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "CSA"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Stefanie",
+      "nachname": "Jung",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmann/Truppfrau"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Lea",
+      "nachname": "Nickel",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmann/Truppfrau"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Uwe",
+      "nachname": "Ebert",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmann/Truppfrau"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Elektrofachkraft (Beruf)"
+        }
+      ]
+    },
+    {
+      "vorname": "Renate",
+      "nachname": "Krämer",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmann/Truppfrau"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Sebastian",
+      "nachname": "Freund",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmann/Truppfrau"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Andreas",
+      "nachname": "Meier",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmann/Truppfrau"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Rüdiger",
+      "nachname": "Bauer",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmann/Truppfrau"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Uwe",
+      "nachname": "Ludwig",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmann/Truppfrau"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Rüdiger",
+      "nachname": "Metzger",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmann/Truppfrau"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Sandra",
+      "nachname": "Jung",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmann/Truppfrau"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 1,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Helga",
+      "nachname": "Sauer",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmann/Truppfrau"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Michael",
+      "nachname": "Schmidt",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmann/Truppfrau"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Daniel",
+      "nachname": "Merz",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmann/Truppfrau"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Gerd",
+      "nachname": "Berg",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmann/Truppfrau"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "ELW 1"
+      },
+      "kennzeichen": "KO-3056"
+    },
+    {
+      "typ": {
+        "freitext": "MZF-Dekon"
+      },
+      "kennzeichen": "KO-3057"
+    },
+    {
+      "typ": {
+        "freitext": "MZF-Dekon"
+      },
+      "kennzeichen": "KO-3058"
+    },
+    {
+      "typ": {
+        "freitext": "LF 20 KatS"
+      },
+      "kennzeichen": "KO-3059"
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 25,
+    "dieselLiter": 255,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": false,
+    "ruhezeitErforderlich": false
+  },
+  "sonstiges": "Fähigkeitsmodul CBRN-03 „CBRN-Schutz – radioaktiver Kontaminationsnachweis\", Umsetzung Standard (I) nach Handlungsanweisung zum Vollzug der Anlage 1 der KatS-LVO (LfBK Rheinland-Pfalz, Stand 18.11.2025). Personalstärke 2/3/20/25 (Führer/Unterführer/Mannschaft/Gesamt) exakt nach Handlungsanweisung; nicht namentlich benannte Stellen sind generisch aufgefüllt. Trägerorganisation frei (aber plausibel) gewählt — die Handlungsanweisung regelt außer bei CBRN-04 keinen Träger. Abmarschbereit nach 90 Minuten."
+}

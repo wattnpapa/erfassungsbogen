@@ -1,0 +1,214 @@
+{
+  "schemaVersion": 8,
+  "uebung": true,
+  "stand": 3452252,
+  "einheit": {
+    "organisation": 6,
+    "organisationName": "Johanniter-Unfall-Hilfe Kaiserslautern",
+    "einheitsTyp": {
+      "freitext": "Sanitätsdienst - Transport (SAN-02)"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Fähigkeitsmodul"
+        },
+        "name": "SAN-02 · Sanitätsdienst"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Untere Katastrophenschutzbehörde"
+        },
+        "name": "Stadt Kaiserslautern"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2397,
+    "zeitraumBis": 2398,
+    "ortAuftrag": "MANV Kaiserslautern — zeitgleicher Transport von 5 Verletzten/Erkrankten"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Doris",
+      "nachname": "Martin",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "Arzt/Ärztin"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5555913319"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Niklas",
+      "nachname": "Peters",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "GF"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Elke",
+      "nachname": "Theobald",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "RettSan"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Sprechfunker"
+        }
+      ]
+    },
+    {
+      "vorname": "Eva",
+      "nachname": "Kaiser",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "RettSan"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 1,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Tim",
+      "nachname": "Brenner",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Sanitäter"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Lena",
+      "nachname": "Faber",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Sanitäter"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 1,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Jan",
+      "nachname": "Peters",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Sanitäter"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Jens",
+      "nachname": "May",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Sanitäter"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Markus",
+      "nachname": "Pfeiffer",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Sanitäter"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "KdoW"
+      },
+      "kennzeichen": "KL-3066"
+    },
+    {
+      "typ": {
+        "freitext": "RTW"
+      },
+      "kennzeichen": "KL-3067"
+    },
+    {
+      "typ": {
+        "freitext": "KTW"
+      },
+      "kennzeichen": "KL-3068"
+    },
+    {
+      "typ": {
+        "freitext": "KTW"
+      },
+      "kennzeichen": "KL-3069"
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 9,
+    "dieselLiter": 180,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": false,
+    "ruhezeitErforderlich": true
+  },
+  "sonstiges": "Fähigkeitsmodul SAN-02 „Sanitätsdienst - Transport\", Umsetzung Standard (I) nach Handlungsanweisung zum Vollzug der Anlage 1 der KatS-LVO (LfBK Rheinland-Pfalz, Stand 18.11.2025). Personalstärke 1/1/7/9 (Führer/Unterführer/Mannschaft/Gesamt) exakt nach Handlungsanweisung; nicht namentlich benannte Stellen sind generisch aufgefüllt. Trägerorganisation frei (aber plausibel) gewählt — die Handlungsanweisung regelt außer bei CBRN-04 keinen Träger. Zusatzmaterial lt. Handlungsanweisung: Notfallrucksack und PA-Karten. Abmarschbereit nach 30 Minuten."
+}

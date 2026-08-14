@@ -1,0 +1,383 @@
+{
+  "schemaVersion": 8,
+  "uebung": true,
+  "stand": 3450668,
+  "einheit": {
+    "organisation": 2,
+    "organisationName": "Feuerwehr Alzey-Worms",
+    "einheitsTyp": {
+      "freitext": "Brandbekämpfung – Wassertransport zum Einsatzraum (B-Schlauch) (BS-03)"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Fähigkeitsmodul"
+        },
+        "name": "BS-03 · Brandschutz"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Untere Katastrophenschutzbehörde"
+        },
+        "name": "Landkreis Alzey-Worms"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2396,
+    "zeitraumBis": 2400,
+    "ortAuftrag": "Großbrand Alzey — Löschwasserförderstrecke über 2.000 m"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Volker",
+      "nachname": "Werner",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "ZF"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5555953434"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Frank",
+      "nachname": "May",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "GF"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Ralf",
+      "nachname": "Müller",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "GF"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Gesundheits- und Krankenpfleger (Beruf)"
+        }
+      ]
+    },
+    {
+      "vorname": "Michael",
+      "nachname": "Weiler",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmann/Truppfrau"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Christiane",
+      "nachname": "Seibert",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmann/Truppfrau"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 1,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Jochen",
+      "nachname": "Blum",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmann/Truppfrau"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Lukas",
+      "nachname": "Lehnert",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmann/Truppfrau"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Patrick",
+      "nachname": "Schmitt",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmann/Truppfrau"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Tobias",
+      "nachname": "Huber",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmann/Truppfrau"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Sebastian",
+      "nachname": "Klöckner",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmann/Truppfrau"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Patrick",
+      "nachname": "Fischer",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmann/Truppfrau"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Sven",
+      "nachname": "Fischer",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmann/Truppfrau"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Hannelore",
+      "nachname": "Hoffmann",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmann/Truppfrau"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 1,
+      "ernaehrung": 2,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Michael",
+      "nachname": "Hohl",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmann/Truppfrau"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Paul",
+      "nachname": "Hoffmann",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmann/Truppfrau"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Jochen",
+      "nachname": "Weber",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmann/Truppfrau"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Gesundheits- und Krankenpfleger (Beruf)"
+        }
+      ]
+    },
+    {
+      "vorname": "Jochen",
+      "nachname": "Schneider",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmann/Truppfrau"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Tobias",
+      "nachname": "Kaiser",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmann/Truppfrau"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Monika",
+      "nachname": "Schäfer",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmann/Truppfrau"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Frank",
+      "nachname": "Haas",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmann/Truppfrau"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "MTF-Fü"
+      },
+      "kennzeichen": "AZ-3029"
+    },
+    {
+      "typ": {
+        "freitext": "LF 20 KatS"
+      },
+      "kennzeichen": "AZ-3030"
+    },
+    {
+      "typ": {
+        "freitext": "SW KatS"
+      },
+      "kennzeichen": "AZ-3031"
+    },
+    {
+      "typ": {
+        "freitext": "MTF"
+      },
+      "kennzeichen": "AZ-3032"
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 20,
+    "dieselLiter": 280,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": true,
+    "ruhezeitErforderlich": false
+  },
+  "sonstiges": "Fähigkeitsmodul BS-03 „Brandbekämpfung – Wassertransport zum Einsatzraum (B-Schlauch)\", Umsetzung Standard (I) nach Handlungsanweisung zum Vollzug der Anlage 1 der KatS-LVO (LfBK Rheinland-Pfalz, Stand 18.11.2025). Personalstärke 1/2/17/20 (Führer/Unterführer/Mannschaft/Gesamt) exakt nach Handlungsanweisung; nicht namentlich benannte Stellen sind generisch aufgefüllt. Trägerorganisation frei (aber plausibel) gewählt — die Handlungsanweisung regelt außer bei CBRN-04 keinen Träger. Abmarschbereit nach 30 Minuten."
+}

@@ -1,0 +1,429 @@
+{
+  "schemaVersion": 8,
+  "uebung": true,
+  "stand": 3386584,
+  "einheit": {
+    "organisation": 9,
+    "organisationName": "DLRG Pirmasens",
+    "einheitsTyp": {
+      "freitext": "Wasserrettung - Fließgewässer (WR-01)"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Fähigkeitsmodul"
+        },
+        "name": "WR-01 · Wasserrettung"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Untere Katastrophenschutzbehörde"
+        },
+        "name": "Stadt Pirmasens"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2351,
+    "zeitraumBis": 2353,
+    "ortAuftrag": "Hochwasser Pirmasens — Rettung und Evakuierung in Fließgewässern"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Peter",
+      "nachname": "Dietz",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "ZF"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5557578725"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Klaus",
+      "nachname": "Christ",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "ZF"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Susanne",
+      "nachname": "Freund",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "GF"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Marco",
+      "nachname": "Koch",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "GF"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Daniel",
+      "nachname": "Scholl",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Führungshilfspersonal"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Silke",
+      "nachname": "Weber",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Führungshilfspersonal"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Ursula",
+      "nachname": "Peters",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Bootsführer/-in"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Daniel",
+      "nachname": "Görg",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Bootsführer/-in"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 2,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Manfred",
+      "nachname": "Faber",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Bootsführer/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Thomas",
+      "nachname": "Peters",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Bootsführer/-in"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Berufskraftfahrer (Beruf)"
+        }
+      ]
+    },
+    {
+      "vorname": "Jochen",
+      "nachname": "Keller",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Strömungs-/Fließwasserretter/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Barbara",
+      "nachname": "Brenner",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Strömungs-/Fließwasserretter/-in"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 1,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Berufskraftfahrer (Beruf)"
+        }
+      ]
+    },
+    {
+      "vorname": "Barbara",
+      "nachname": "Huber",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Strömungs-/Fließwasserretter/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Jonas",
+      "nachname": "Braun",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Strömungs-/Fließwasserretter/-in"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Gesundheits- und Krankenpfleger (Beruf)"
+        }
+      ]
+    },
+    {
+      "vorname": "Beate",
+      "nachname": "Görg",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Strömungs-/Fließwasserretter/-in"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Robert",
+      "nachname": "Merz",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Strömungs-/Fließwasserretter/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Ursula",
+      "nachname": "Haas",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Personen als Wasserretter"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Robert",
+      "nachname": "Dörr",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Personen als Wasserretter"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Kerstin",
+      "nachname": "Winter",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmann/Truppfrau"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Jürgen",
+      "nachname": "Zorn",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmann/Truppfrau"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Jens",
+      "nachname": "Bauer",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmann/Truppfrau"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Lukas",
+      "nachname": "Weber",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmann/Truppfrau"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "MTF-Fü"
+      },
+      "kennzeichen": "PS-3081"
+    },
+    {
+      "typ": {
+        "freitext": "GW-WR Boot"
+      },
+      "kennzeichen": "PS-3082"
+    },
+    {
+      "typ": {
+        "freitext": "MZB"
+      },
+      "kennzeichen": "PS-3083"
+    },
+    {
+      "typ": {
+        "freitext": "MTF/EGF"
+      },
+      "kennzeichen": "PS-3084"
+    },
+    {
+      "typ": {
+        "freitext": "RTB 2"
+      },
+      "kennzeichen": "PS-3085"
+    },
+    {
+      "typ": {
+        "freitext": "GW-WR SR"
+      },
+      "kennzeichen": "PS-3086"
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 22,
+    "dieselLiter": 320,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": true,
+    "ruhezeitErforderlich": false
+  },
+  "sonstiges": "Fähigkeitsmodul WR-01 „Wasserrettung - Fließgewässer\", Umsetzung Standard (I) nach Handlungsanweisung zum Vollzug der Anlage 1 der KatS-LVO (LfBK Rheinland-Pfalz, Stand 18.11.2025). Personalstärke 2/2/18/22 (Führer/Unterführer/Mannschaft/Gesamt) exakt nach Handlungsanweisung; nicht namentlich benannte Stellen sind generisch aufgefüllt. Trägerorganisation frei (aber plausibel) gewählt — die Handlungsanweisung regelt außer bei CBRN-04 keinen Träger. Zusatzmaterial lt. Handlungsanweisung: Raft. Abmarschbereit nach 45 Minuten."
+}

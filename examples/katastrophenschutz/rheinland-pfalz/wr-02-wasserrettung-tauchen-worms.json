@@ -1,0 +1,191 @@
+{
+  "schemaVersion": 8,
+  "uebung": true,
+  "stand": 3425112,
+  "einheit": {
+    "organisation": 9,
+    "organisationName": "DLRG Worms",
+    "einheitsTyp": {
+      "freitext": "Wasserrettung - Tauchen (WR-02)"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Fähigkeitsmodul"
+        },
+        "name": "WR-02 · Wasserrettung"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Untere Katastrophenschutzbehörde"
+        },
+        "name": "Stadt Worms"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2378,
+    "zeitraumBis": 2379,
+    "ortAuftrag": "Vermisstensuche Worms — Rettung und Bergung von Personen und Sachwerten im Gewässer"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Ralf",
+      "nachname": "Kremer",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Taucheinsatzführer/-führerin"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5554956601"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Volker",
+      "nachname": "Hein",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Signalmann/Signalfrau"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungssanitäter (extern)"
+        }
+      ]
+    },
+    {
+      "vorname": "Bernd",
+      "nachname": "Altmeier",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Feuerwehrtaucher/-taucherin"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Gesundheits- und Krankenpfleger (Beruf)"
+        }
+      ]
+    },
+    {
+      "vorname": "Marion",
+      "nachname": "Winter",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Sicherheitstaucher/-taucherin"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Sabine",
+      "nachname": "Bach",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "ROV-Operator/-Operatorin"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Julia",
+      "nachname": "Jost",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "ROV-Beobachter/-Beobachterin"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 1,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Dieter",
+      "nachname": "Theobald",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "ROV-Steuerer/-Steuererin"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Jürgen",
+      "nachname": "Dörr",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Feuerwehrtaucher/-taucherin"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "GW-WR Tauchen"
+      },
+      "kennzeichen": "WO-3087"
+    },
+    {
+      "typ": {
+        "freitext": "MTF"
+      },
+      "kennzeichen": "WO-3088"
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 8,
+    "dieselLiter": 115,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": false,
+    "ruhezeitErforderlich": false
+  },
+  "sonstiges": "Fähigkeitsmodul WR-02 „Wasserrettung - Tauchen\", Umsetzung Standard (I) nach Handlungsanweisung zum Vollzug der Anlage 1 der KatS-LVO (LfBK Rheinland-Pfalz, Stand 18.11.2025). Personalstärke 0/2/6/8 (Führer/Unterführer/Mannschaft/Gesamt) exakt nach Handlungsanweisung; nicht namentlich benannte Stellen sind generisch aufgefüllt. Trägerorganisation frei (aber plausibel) gewählt — die Handlungsanweisung regelt außer bei CBRN-04 keinen Träger. Zusatzmaterial lt. Handlungsanweisung: Kommunikationseinheit für unter Wasser (Tauchertelefon), ROV (Tauchroboter). Abmarschbereit nach 45 Minuten."
+}
