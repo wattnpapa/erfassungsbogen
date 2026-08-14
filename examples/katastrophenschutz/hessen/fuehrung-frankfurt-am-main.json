@@ -1,0 +1,149 @@
+{
+  "schemaVersion": 8,
+  "uebung": true,
+  "stand": 3287389,
+  "einheit": {
+    "organisation": 5,
+    "organisationName": "Deutsches Rotes Kreuz — Kreisverband Stadt Frankfurt am Main",
+    "einheitsTyp": {
+      "freitext": "Führung"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Aufgabenbereich"
+        },
+        "name": "Kreisauskunftsbüro (KAB)"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Landkreis/kreisfreie Stadt"
+        },
+        "name": "Stadt Frankfurt am Main"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Kreisverband"
+        },
+        "name": "DRK-Kreisverband Stadt Frankfurt am Main"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2282,
+    "zeitraumBis": 2286,
+    "ortAuftrag": "Großschadenslage Frankfurt am Main — Führung Kreisauskunftsbüro"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Lea",
+      "nachname": "Hess",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "Leiter/-in KAB"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5551592338"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Felix",
+      "nachname": "Kuhn",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Führungsassistent/-in"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
+      "ernaehrung": 2,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5550967520"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Funkamateur (extern)"
+        }
+      ]
+    },
+    {
+      "vorname": "Jana",
+      "nachname": "Peters",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Sprechfunker/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Lena",
+      "nachname": "Hahn",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kraftfahrer/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Motorsägenschein AS Baum I (extern)"
+        }
+      ]
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "ELW 1"
+      },
+      "aenderungen": "Einsatzleitwagen 1",
+      "kennzeichen": "F-2031",
+      "funkrufname": {
+        "kennwort": {
+          "code": 3
+        },
+        "eigenerStandort": false,
+        "ort": "Stadt Frankfurt am Main",
+        "teile": [
+          2,
+          11
+        ]
+      }
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 4,
+    "dieselLiter": 70,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": false,
+    "ruhezeitErforderlich": true
+  },
+  "sonstiges": "Sollstärke 1/1/2/4 (Führer/Unterführer/Mannschaft/Gesamt) nach Konzept „Katastrophenschutz in Hessen” (HMdIS, Anlage 2.1, 01.01.2016/2024), Anlage 2.20 — Teileinheit von Kreisauskunftsbüro (KAB) — 1/5/18/24. Funkrufname: Standortkennzahl fiktiv fortlaufend, Fahrzeugkennzahl amtlich nach Anlage I des Funkrufnamenkatalogs 2011."
+}

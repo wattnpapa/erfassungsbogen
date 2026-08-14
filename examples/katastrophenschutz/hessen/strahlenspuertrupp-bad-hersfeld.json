@@ -1,0 +1,114 @@
+{
+  "schemaVersion": 8,
+  "uebung": true,
+  "stand": 3286980,
+  "einheit": {
+    "organisation": 2,
+    "organisationName": "Feuerwehr Kreis Hersfeld-Rotenburg",
+    "einheitsTyp": {
+      "freitext": "Strahlenspürtrupp"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Aufgabenbereich"
+        },
+        "name": "GABC-Mess-Gruppe (GABCMGr)"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Landkreis/kreisfreie Stadt"
+        },
+        "name": "Kreis Hersfeld-Rotenburg"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2282,
+    "zeitraumBis": 2283,
+    "ortAuftrag": "Kerntechnischer Unfall Bad Hersfeld — Strahlenmessung"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Uwe",
+      "nachname": "Kirsch",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Truppführer/-in"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5555234098"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Dominik",
+      "nachname": "Kern",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Helfer/-in"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Karsten",
+      "nachname": "Lehmann",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kraftfahrer/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "GW-StrSpTr"
+      },
+      "aenderungen": "Gerätewagen Strahlenspürtrupp",
+      "kennzeichen": "HEF-2018",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Kreis Hersfeld-Rotenburg",
+        "teile": [
+          1,
+          71
+        ]
+      }
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 3,
+    "dieselLiter": 70,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": false,
+    "ruhezeitErforderlich": true
+  },
+  "sonstiges": "Sollstärke 0/1/2/3 (Führer/Unterführer/Mannschaft/Gesamt) nach Konzept „Katastrophenschutz in Hessen” (HMdIS, Anlage 2.1, 01.01.2016/2024), Anlage 2.12 — Teileinheit von GABC-Mess-Gruppe (GABCMGr) — 0/2/6/8. Funkrufname: Standortkennzahl fiktiv fortlaufend, Fahrzeugkennzahl amtlich nach Anlage I des Funkrufnamenkatalogs 2011."
+}

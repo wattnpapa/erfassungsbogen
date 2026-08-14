@@ -1,0 +1,210 @@
+{
+  "schemaVersion": 8,
+  "uebung": true,
+  "stand": 3291224,
+  "einheit": {
+    "organisation": 2,
+    "organisationName": "Feuerwehr Kreis Bergstraße",
+    "einheitsTyp": {
+      "freitext": "Führungsgruppe TEL"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Aufgabenbereich"
+        },
+        "name": "Führungsgruppe TEL (FüGrTEL)"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Landkreis/kreisfreie Stadt"
+        },
+        "name": "Kreis Bergstraße"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2285,
+    "zeitraumBis": 2289,
+    "ortAuftrag": "Großschadenslage Heppenheim — Technische Einsatzleitung"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Daniel",
+      "nachname": "Wagner",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "Leiter/-in FüGrTEL"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5554726984"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Thorsten",
+      "nachname": "Krebs",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Führungsassistent/-in"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5554343938"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Verena",
+      "nachname": "Reuter",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Führungsassistent/-in"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 1,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Julian",
+      "nachname": "Hess",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Führungsassistent/-in"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Sven",
+      "nachname": "Groß",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Lagekartenführer/-in"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 2,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Joachim",
+      "nachname": "Fuchs",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Melder/-in"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Maren",
+      "nachname": "Krüger",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Melder/-in"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Jannik",
+      "nachname": "Koch",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Melder/-in"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 2,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Andreas",
+      "nachname": "Hartmann",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Melder/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "ELW 2"
+      },
+      "aenderungen": "Einsatzleitwagen 2",
+      "kennzeichen": "HP-2001",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Kreis Bergstraße",
+        "teile": [
+          1,
+          12
+        ]
+      }
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 9,
+    "dieselLiter": 70,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": false,
+    "ruhezeitErforderlich": false
+  },
+  "sonstiges": "Sollstärke 1/4/4/9 (Führer/Unterführer/Mannschaft/Gesamt) nach Konzept „Katastrophenschutz in Hessen” (HMdIS, Anlage 2.1, 01.01.2016/2024), Anlage 2.5 — Teileinheit von Führungsgruppe TEL (FüGrTEL) — 1/4/4/9. Funkrufname: Standortkennzahl fiktiv fortlaufend, Fahrzeugkennzahl amtlich nach Anlage I des Funkrufnamenkatalogs 2011."
+}

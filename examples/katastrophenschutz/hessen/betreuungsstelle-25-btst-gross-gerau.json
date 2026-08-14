@@ -1,0 +1,222 @@
+{
+  "schemaVersion": 8,
+  "uebung": true,
+  "stand": 3286691,
+  "einheit": {
+    "organisation": 7,
+    "organisationName": "Malteser Hilfsdienst — Kreisverband Kreis Groß-Gerau",
+    "einheitsTyp": {
+      "freitext": "Betreuungsstelle 25 (BtSt)"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Aufgabenbereich"
+        },
+        "name": "Betreuungsstelle 25 (BtSt)"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Landkreis/kreisfreie Stadt"
+        },
+        "name": "Kreis Groß-Gerau"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Kreisverband"
+        },
+        "name": "MHD-Kreisverband Kreis Groß-Gerau"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2282,
+    "zeitraumBis": 2286,
+    "ortAuftrag": "Evakuierung Groß-Gerau — ortsfeste Betreuungsstelle für 25 Betroffene"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Dennis",
+      "nachname": "Otto",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Gruppenführer/-in"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5559367753"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Silke",
+      "nachname": "Peters",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Melder/-in"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Peter",
+      "nachname": "Vogel",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Truppführer/-in"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Funkamateur (extern)"
+        }
+      ]
+    },
+    {
+      "vorname": "Andreas",
+      "nachname": "Bauer",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Truppführer/-in"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "IT-Fachkraft (Beruf)"
+        }
+      ]
+    },
+    {
+      "vorname": "Andreas",
+      "nachname": "Krebs",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Truppführer/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Sven",
+      "nachname": "Franke",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Helfer/-in"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Frank",
+      "nachname": "Schäfer",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Helfer/-in"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Stefan",
+      "nachname": "Kaiser",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Helfer/-in"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Dirk",
+      "nachname": "Kern",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Gerätewart/-in"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "IT-Fachkraft (Beruf)"
+        }
+      ]
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "BtKombi"
+      },
+      "aenderungen": "Betreuungskombi Katastrophenschutz",
+      "kennzeichen": "GG-2030",
+      "funkrufname": {
+        "kennwort": {
+          "code": 5
+        },
+        "eigenerStandort": false,
+        "ort": "Kreis Groß-Gerau",
+        "teile": [
+          2,
+          18
+        ]
+      }
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 9,
+    "dieselLiter": 0,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": false,
+    "ruhezeitErforderlich": false
+  },
+  "sonstiges": "Sollstärke 0/5/4/9 (Führer/Unterführer/Mannschaft/Gesamt) nach Konzept „Katastrophenschutz in Hessen” (HMdIS, Anlage 2.1, 01.01.2016/2024), Anlage 2.19 — Teileinheit von Betreuungsstelle 25 (BtSt) — 0/5/4/9. Funkrufname: Standortkennzahl fiktiv fortlaufend, Fahrzeugkennzahl amtlich nach Anlage I des Funkrufnamenkatalogs 2011."
+}

@@ -1,0 +1,655 @@
+{
+  "schemaVersion": 8,
+  "uebung": true,
+  "stand": 3441331,
+  "einheit": {
+    "organisation": 5,
+    "organisationName": "Bergwacht Baden-Württemberg (DRK) — Landkreis Waldshut",
+    "einheitsTyp": {
+      "freitext": "Bergrettungszug (BRZ)"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Regierungsbezirk Freiburg"
+        },
+        "name": "Waldshut"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Bergwacht-Bereitschaft"
+        },
+        "name": "Waldshut-Tiengen"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Untere KatS-Behörde"
+        },
+        "name": "Landkreis Waldshut"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2389,
+    "zeitraumBis": 2392,
+    "ortAuftrag": "Vermisstensuche/Absturz Waldshut-Tiengen — Bergrettung im unwegsamen Gelände"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Marc",
+      "nachname": "Wolf",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "Zugführer/-in (Zugtrupp)"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
+      "ernaehrung": 2,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5559756158"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Fabian",
+      "nachname": "Geiger",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "stellv. Zugführer/-in (Zugtrupp)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 2,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5558079858"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Verena",
+      "nachname": "Braun",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Sprechfunker/-in (Zugtrupp)"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Sprechfunker"
+        }
+      ]
+    },
+    {
+      "vorname": "Daniel",
+      "nachname": "Wolf",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Sprechfunker/-in (Zugtrupp)"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Sprechfunker"
+        }
+      ]
+    },
+    {
+      "vorname": "Thomas",
+      "nachname": "Berger",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Gruppenführer/-in (Rettungsgruppe)"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Sebastian",
+      "nachname": "Haas",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Gruppenführer/-in (Rettungsgruppe)"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Leon",
+      "nachname": "Beck",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Gruppenführer/-in (Rettungsgruppe)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Funkamateur (extern)"
+        }
+      ]
+    },
+    {
+      "vorname": "Brigitte",
+      "nachname": "Schmitt",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Bergretter/-in"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 1,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Bergwacht-Einsatzausbildung"
+        }
+      ]
+    },
+    {
+      "vorname": "Klaus",
+      "nachname": "Weiß",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Bergretter/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Bergwacht-Einsatzausbildung"
+        }
+      ]
+    },
+    {
+      "vorname": "Robert",
+      "nachname": "Herrmann",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Bergretter/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Bergwacht-Einsatzausbildung"
+        }
+      ]
+    },
+    {
+      "vorname": "Doris",
+      "nachname": "Berger",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Bergretter/-in"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 1,
+      "ernaehrung": 2,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Bergwacht-Einsatzausbildung"
+        }
+      ]
+    },
+    {
+      "vorname": "Beate",
+      "nachname": "Baumann",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Bergretter/-in"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 1,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Bergwacht-Einsatzausbildung"
+        }
+      ]
+    },
+    {
+      "vorname": "Martin",
+      "nachname": "Gruber",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Bergretter/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Bergwacht-Einsatzausbildung"
+        }
+      ]
+    },
+    {
+      "vorname": "Petra",
+      "nachname": "Faller",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Bergretter/-in"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Bergwacht-Einsatzausbildung"
+        }
+      ]
+    },
+    {
+      "vorname": "Lena",
+      "nachname": "Geiger",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Bergretter/-in"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 1,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Bergwacht-Einsatzausbildung"
+        }
+      ]
+    },
+    {
+      "vorname": "Martin",
+      "nachname": "Beck",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Bergretter/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Bergwacht-Einsatzausbildung"
+        }
+      ]
+    },
+    {
+      "vorname": "Marc",
+      "nachname": "Koch",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Bergretter/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Bergwacht-Einsatzausbildung"
+        }
+      ]
+    },
+    {
+      "vorname": "Christine",
+      "nachname": "Gaiser",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Bergretter/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Bergwacht-Einsatzausbildung"
+        }
+      ]
+    },
+    {
+      "vorname": "Markus",
+      "nachname": "Sailer",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Bergretter/-in"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Bergwacht-Einsatzausbildung"
+        }
+      ]
+    },
+    {
+      "vorname": "Barbara",
+      "nachname": "Geiger",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Bergretter/-in"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 1,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Bergwacht-Einsatzausbildung"
+        }
+      ]
+    },
+    {
+      "vorname": "Daniel",
+      "nachname": "Jäger",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Bergretter/-in"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Bergwacht-Einsatzausbildung"
+        }
+      ]
+    },
+    {
+      "vorname": "Erika",
+      "nachname": "Kern",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Bergretter/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Bergwacht-Einsatzausbildung"
+        }
+      ]
+    },
+    {
+      "vorname": "Ingrid",
+      "nachname": "Farrenkopf",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Bergretter/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Bergwacht-Einsatzausbildung"
+        }
+      ]
+    },
+    {
+      "vorname": "Robert",
+      "nachname": "Schwarz",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Bergretter/-in"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Bergwacht-Einsatzausbildung"
+        }
+      ]
+    },
+    {
+      "vorname": "David",
+      "nachname": "Herrmann",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Bergretter/-in"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Bergwacht-Einsatzausbildung"
+        }
+      ]
+    },
+    {
+      "vorname": "Lukas",
+      "nachname": "Roth",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Bergretter/-in"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Bergwacht-Einsatzausbildung"
+        }
+      ]
+    },
+    {
+      "vorname": "Uwe",
+      "nachname": "Weber",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Bergretter/-in"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Bergwacht-Einsatzausbildung"
+        }
+      ]
+    },
+    {
+      "vorname": "Jens",
+      "nachname": "Schmid",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Bergretter/-in"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 2,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Bergwacht-Einsatzausbildung"
+        }
+      ]
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "KdoW (Bergrettung)"
+      },
+      "aenderungen": "Bergrettungsfahrzeug als Kommandowagen (Zugtrupp)",
+      "kennzeichen": "WT-2052",
+      "funkrufname": {
+        "kennwort": {
+          "freitext": "Bergwacht"
+        },
+        "eigenerStandort": false,
+        "ort": "Waldshut",
+        "teile": [
+          18,
+          10,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "Bergrettungsfahrzeug gl."
+      },
+      "aenderungen": "geländegängiges Bergrettungsfahrzeug (je Rettungsgruppe)",
+      "kennzeichen": "WT-2053",
+      "funkrufname": {
+        "kennwort": {
+          "freitext": "Bergwacht"
+        },
+        "eigenerStandort": false,
+        "ort": "Waldshut",
+        "teile": [
+          18,
+          71,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "Bergrettungsfahrzeug gl."
+      },
+      "aenderungen": "geländegängiges Bergrettungsfahrzeug (je Rettungsgruppe)",
+      "kennzeichen": "WT-2054",
+      "funkrufname": {
+        "kennwort": {
+          "freitext": "Bergwacht"
+        },
+        "eigenerStandort": false,
+        "ort": "Waldshut",
+        "teile": [
+          18,
+          71,
+          2
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "Bergrettungsfahrzeug gl."
+      },
+      "aenderungen": "geländegängiges Bergrettungsfahrzeug (je Rettungsgruppe)",
+      "kennzeichen": "WT-2055",
+      "funkrufname": {
+        "kennwort": {
+          "freitext": "Bergwacht"
+        },
+        "eigenerStandort": false,
+        "ort": "Waldshut",
+        "teile": [
+          18,
+          71,
+          3
+        ]
+      }
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 28,
+    "dieselLiter": 45,
+    "benzinLiter": 0,
+    "gemischLiter": 5,
+    "unterbringung": false,
+    "ruhezeitErforderlich": true
+  },
+  "sonstiges": "Stärke 2/3/23/28 (einfache Besetzung; alle Einheiten werden in Doppelbesetzung vorgehalten) nach VwV KatSD Baden-Württemberg vom 24.09.2012 (GABl. Nr. 12/2012, S. 802), Anlage 3. Landesweit sind 6 Einheiten dieses Typs vorgesehen. Die Landkreis-Zuordnung dieses Beispiels ist exemplarisch gewählt, nicht der Verordnungstabelle Zeile für Zeile entnommen — Stärke und Fahrzeuge dagegen sind verordnungsgenau. Die Funkkennziffern der Fahrzeuge sind plausibel, aber nicht vollständig amtlich belegt (siehe README)."
+}

@@ -1,0 +1,157 @@
+{
+  "schemaVersion": 8,
+  "uebung": true,
+  "stand": 3448084,
+  "einheit": {
+    "organisation": 2,
+    "organisationName": "Feuerwehr Trier",
+    "einheitsTyp": {
+      "freitext": "Logistik – Treibstoffversorgung (LOG-02)"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Fähigkeitsmodul"
+        },
+        "name": "LOG-02 · Logistik"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Untere Katastrophenschutzbehörde"
+        },
+        "name": "Stadt Trier"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2394,
+    "zeitraumBis": 2395,
+    "ortAuftrag": "Flächenlage Trier — mobile Treibstoffversorgung im Einsatz"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Dirk",
+      "nachname": "Schuster",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "GF"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5556008233"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Werner",
+      "nachname": "Simon",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kraftfahrer/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Elektrofachkraft (Beruf)"
+        }
+      ]
+    },
+    {
+      "vorname": "Robert",
+      "nachname": "Hohl",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kraftfahrer/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Lukas",
+      "nachname": "Bergmann",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kraftfahrer/-in"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Thomas",
+      "nachname": "Bergmann",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kraftfahrer/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Norbert",
+      "nachname": "Faber",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kraftfahrer/-in"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "GW-L 1"
+      },
+      "kennzeichen": "TR-3099"
+    },
+    {
+      "typ": {
+        "freitext": "GW-L 1"
+      },
+      "kennzeichen": "TR-3100"
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 6,
+    "dieselLiter": 140,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": false,
+    "ruhezeitErforderlich": false
+  },
+  "sonstiges": "Fähigkeitsmodul LOG-02 „Logistik – Treibstoffversorgung\", Umsetzung Standard (I) nach Handlungsanweisung zum Vollzug der Anlage 1 der KatS-LVO (LfBK Rheinland-Pfalz, Stand 18.11.2025). Personalstärke 0/1/5/6 (Führer/Unterführer/Mannschaft/Gesamt) exakt nach Handlungsanweisung; nicht namentlich benannte Stellen sind generisch aufgefüllt. Trägerorganisation frei (aber plausibel) gewählt — die Handlungsanweisung regelt außer bei CBRN-04 keinen Träger. Zusatzmaterial lt. Handlungsanweisung: 10 Kanister leer je 20 l (DIN 7274). Abmarschbereit nach 60 Minuten."
+}

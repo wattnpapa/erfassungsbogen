@@ -1,0 +1,220 @@
+{
+  "schemaVersion": 8,
+  "uebung": true,
+  "stand": 3286578,
+  "einheit": {
+    "organisation": 2,
+    "organisationName": "Feuerwehr Main-Taunus-Kreis",
+    "einheitsTyp": {
+      "freitext": "2. Löschgruppe"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Aufgabenbereich"
+        },
+        "name": "Löschzug (LZ)"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Landkreis/kreisfreie Stadt"
+        },
+        "name": "Main-Taunus-Kreis"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2282,
+    "zeitraumBis": 2286,
+    "ortAuftrag": "Großbrand Hofheim am Taunus — Brandbekämpfung, Wasserversorgung"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Jana",
+      "nachname": "Vogel",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Gruppenführer/-in"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5554546720"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Thomas",
+      "nachname": "König",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Melder/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Georg",
+      "nachname": "Herbst",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppführer/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Atemschutzgeräteträger"
+        }
+      ]
+    },
+    {
+      "vorname": "Julia",
+      "nachname": "Kern",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppführer/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Atemschutzgeräteträger"
+        }
+      ]
+    },
+    {
+      "vorname": "Verena",
+      "nachname": "Lehmann",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmitglied"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Motorsägenschein AS Baum I (extern)"
+        }
+      ]
+    },
+    {
+      "vorname": "Laura",
+      "nachname": "Schulz",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmitglied"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Antje",
+      "nachname": "Hartmann",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmitglied"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Moritz",
+      "nachname": "Lehmann",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmitglied"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Motorsägenschein AS Baum I (extern)"
+        }
+      ]
+    },
+    {
+      "vorname": "Peter",
+      "nachname": "Ernst",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Maschinist/-in"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "LF-KatS"
+      },
+      "aenderungen": "Löschgruppenfahrzeug Katastrophenschutz (Bund)",
+      "kennzeichen": "MTK-2006",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Main-Taunus-Kreis",
+        "teile": [
+          1,
+          45
+        ]
+      }
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 9,
+    "dieselLiter": 90,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": false,
+    "ruhezeitErforderlich": false
+  },
+  "sonstiges": "Sollstärke 0/1/8/9 (Führer/Unterführer/Mannschaft/Gesamt) nach Konzept „Katastrophenschutz in Hessen” (HMdIS, Anlage 2.1, 01.01.2016/2024), Anlage 2.9 — Teileinheit von Löschzug (LZ) — 1/4/20/25. Funkrufname: Standortkennzahl fiktiv fortlaufend, Fahrzeugkennzahl amtlich nach Anlage I des Funkrufnamenkatalogs 2011."
+}

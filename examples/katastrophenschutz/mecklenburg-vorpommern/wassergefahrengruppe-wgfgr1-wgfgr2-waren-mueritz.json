@@ -1,0 +1,172 @@
+{
+  "schemaVersion": 8,
+  "uebung": true,
+  "stand": 3318137,
+  "einheit": {
+    "organisation": 9,
+    "organisationName": "DLRG Landkreis Mecklenburgische Seenplatte",
+    "einheitsTyp": {
+      "freitext": "Wassergefahrengruppe (WGfGr1/WGfGr2)"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "KSE"
+        },
+        "name": "Wassergefahrenzug (WGfZ)"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "DLRG-Kreisverband"
+        },
+        "name": "Mecklenburgische Seenplatte"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Untere KatS-Behörde"
+        },
+        "name": "Landkreis Mecklenburgische Seenplatte"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2304,
+    "zeitraumBis": 2307,
+    "ortAuftrag": "Hochwasser Waren (Müritz) — Personenrettung und Bootstransport"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Carsten",
+      "nachname": "Werner",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Gruppenführer/-in"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5555355459"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Karsten",
+      "nachname": "Thiel",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Bootsführer/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Bootsführerschein Binnen"
+        }
+      ]
+    },
+    {
+      "vorname": "Uwe",
+      "nachname": "Harder",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Wasserrettungshelfer/-in"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungsschwimmer"
+        }
+      ]
+    },
+    {
+      "vorname": "Uwe",
+      "nachname": "Jarchow",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Wasserrettungshelfer/-in"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungsschwimmer"
+        }
+      ]
+    },
+    {
+      "vorname": "Steffi",
+      "nachname": "Wendt",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Wasserrettungshelfer/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 2,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungsschwimmer"
+        }
+      ]
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "GW-WGf"
+      },
+      "aenderungen": "Gerätewagen Wassergefahren",
+      "kennzeichen": "MSE-2029",
+      "funkrufname": {
+        "kennwort": {
+          "code": 7
+        },
+        "eigenerStandort": false,
+        "ort": "Waren (Müritz)",
+        "teile": [
+          9
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "MZB"
+      },
+      "aenderungen": "Mehrzweckboot auf Anhänger",
+      "kennzeichen": "Anh-MZB"
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 5,
+    "dieselLiter": 70,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": true,
+    "ruhezeitErforderlich": false
+  },
+  "sonstiges": "Sollstärke 0/1/4/5 (Führer/Unterführer/Mannschaft/Gesamt) nach LPBK M-V, Festlegungen zu den Grundstrukturen im KatS M-V v. 15.03.2020, Erlass Nr. 4.9, Abb. 10 — Teileinheit von Wassergefahrenzug (WGfZ) — 1/4/14/19. Funkrufname mit fiktiver, rein fortlaufender Ordnungsnummer — für M-V konnte kein amtlicher OPTA-/Kennzahlenkatalog verifiziert werden."
+}

@@ -1,0 +1,135 @@
+{
+  "schemaVersion": 8,
+  "uebung": true,
+  "stand": 3289661,
+  "einheit": {
+    "organisation": 7,
+    "organisationName": "Malteser Hilfsdienst — Kreisverband Werra-Meißner-Kreis",
+    "einheitsTyp": {
+      "freitext": "Zugtrupp (ZTr)"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Aufgabenbereich"
+        },
+        "name": "Betreuungszug (BtZ)"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Landkreis/kreisfreie Stadt"
+        },
+        "name": "Werra-Meißner-Kreis"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Kreisverband"
+        },
+        "name": "MHD-Kreisverband Werra-Meißner-Kreis"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2284,
+    "zeitraumBis": 2288,
+    "ortAuftrag": "Evakuierung Eschwege — Führung Betreuungszug"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Dennis",
+      "nachname": "Seibert",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "Zugführer/-in"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5553651880"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Fabian",
+      "nachname": "Hess",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "stellv. Zugführer/-in"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Vanessa",
+      "nachname": "Wagner",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Melder/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Frank",
+      "nachname": "Krebs",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kraftfahrer/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "ELW 1"
+      },
+      "aenderungen": "Einsatzleitwagen 1",
+      "kennzeichen": "ESW-2025",
+      "funkrufname": {
+        "kennwort": {
+          "code": 5
+        },
+        "eigenerStandort": false,
+        "ort": "Werra-Meißner-Kreis",
+        "teile": [
+          1,
+          11
+        ]
+      }
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 4,
+    "dieselLiter": 70,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": true,
+    "ruhezeitErforderlich": true
+  },
+  "sonstiges": "Sollstärke 1/1/2/4 (Führer/Unterführer/Mannschaft/Gesamt) nach Konzept „Katastrophenschutz in Hessen” (HMdIS, Anlage 2.1, 01.01.2016/2024), Anlage 2.18 — Teileinheit von Betreuungszug (BtZ) — 1/8/16/25. Funkrufname: Standortkennzahl fiktiv fortlaufend, Fahrzeugkennzahl amtlich nach Anlage I des Funkrufnamenkatalogs 2011."
+}

@@ -1,0 +1,132 @@
+{
+  "schemaVersion": 8,
+  "uebung": true,
+  "stand": 3461008,
+  "einheit": {
+    "organisation": 2,
+    "organisationName": "Feuerwehr Speyer",
+    "einheitsTyp": {
+      "freitext": "Rettung aus unwegsamem Gelände - SRHT (RG-01)"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Fähigkeitsmodul"
+        },
+        "name": "RG-01 · Rettung aus unwegsamem Gelände"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Untere Katastrophenschutzbehörde"
+        },
+        "name": "Stadt Speyer"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2403,
+    "zeitraumBis": 2404,
+    "ortAuftrag": "Höhen-/Tiefenrettung Speyer — Seilunterstütztes Arbeiten im unwegsamen Gelände"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Uwe",
+      "nachname": "Theobald",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Ausbilder/Ausbilderin SRHT"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5555888776"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Marco",
+      "nachname": "Decker",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Höhenretter/-retterinnen"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Lars",
+      "nachname": "Wolf",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Höhenretter/-retterinnen"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Hannelore",
+      "nachname": "Schröder",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Höhenretter/-retterinnen"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Christian",
+      "nachname": "Martin",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Höhenretter/-retterinnen"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "GW-HR Höhenrettung"
+      },
+      "kennzeichen": "SP-3089"
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 5,
+    "dieselLiter": 70,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": false,
+    "ruhezeitErforderlich": true
+  },
+  "sonstiges": "Fähigkeitsmodul RG-01 „Rettung aus unwegsamem Gelände - SRHT\", Umsetzung Standard (I) nach Handlungsanweisung zum Vollzug der Anlage 1 der KatS-LVO (LfBK Rheinland-Pfalz, Stand 18.11.2025). Personalstärke 0/1/4/5 (Führer/Unterführer/Mannschaft/Gesamt) exakt nach Handlungsanweisung; nicht namentlich benannte Stellen sind generisch aufgefüllt. Trägerorganisation frei (aber plausibel) gewählt — die Handlungsanweisung regelt außer bei CBRN-04 keinen Träger. Abmarschbereit nach 45 Minuten."
+}

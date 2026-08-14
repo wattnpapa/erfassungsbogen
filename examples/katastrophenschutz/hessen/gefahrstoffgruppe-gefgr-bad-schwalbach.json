@@ -1,0 +1,226 @@
+{
+  "schemaVersion": 8,
+  "uebung": true,
+  "stand": 3289357,
+  "einheit": {
+    "organisation": 2,
+    "organisationName": "Feuerwehr Rheingau-Taunus-Kreis",
+    "einheitsTyp": {
+      "freitext": "Gefahrstoffgruppe (GefGr)"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Aufgabenbereich"
+        },
+        "name": "Gefahrstoff-ABC-Zug (GABCZ)"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Landkreis/kreisfreie Stadt"
+        },
+        "name": "Rheingau-Taunus-Kreis"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2284,
+    "zeitraumBis": 2287,
+    "ortAuftrag": "Gefahrstofffreisetzung Bad Schwalbach — Erkundung, Absperrung, Erstmaßnahmen"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Jana",
+      "nachname": "Weber",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Gruppenführer/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 1,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5552761666"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Julian",
+      "nachname": "Sommer",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Melder/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5559403054"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Koch (Beruf)"
+        }
+      ]
+    },
+    {
+      "vorname": "Fabian",
+      "nachname": "Ziegler",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppführer/-in"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "ABC-Lehrgang"
+        }
+      ]
+    },
+    {
+      "vorname": "Lars",
+      "nachname": "Werner",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppführer/-in"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "ABC-Lehrgang"
+        }
+      ]
+    },
+    {
+      "vorname": "Melanie",
+      "nachname": "Zimmermann",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppführer/-in"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "ABC-Lehrgang"
+        }
+      ]
+    },
+    {
+      "vorname": "Karsten",
+      "nachname": "Klein",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmitglied"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Simon",
+      "nachname": "Neumann",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmitglied"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Miriam",
+      "nachname": "Lang",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmitglied"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 1,
+      "ernaehrung": 2,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "David",
+      "nachname": "Koch",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Maschinist/-in"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "LF 10/6"
+      },
+      "aenderungen": "Löschgruppenfahrzeug LF 10/6",
+      "kennzeichen": "RÜD-2009",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Rheingau-Taunus-Kreis",
+        "teile": [
+          1,
+          43
+        ]
+      }
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 9,
+    "dieselLiter": 90,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": false,
+    "ruhezeitErforderlich": false
+  },
+  "sonstiges": "Sollstärke 0/2/7/9 (Führer/Unterführer/Mannschaft/Gesamt) nach Konzept „Katastrophenschutz in Hessen” (HMdIS, Anlage 2.1, 01.01.2016/2024), Anlage 2.13 — Teileinheit von Gefahrstoff-ABC-Zug (GABCZ) — 1/5/16/22. Funkrufname: Standortkennzahl fiktiv fortlaufend, Fahrzeugkennzahl amtlich nach Anlage I des Funkrufnamenkatalogs 2011."
+}

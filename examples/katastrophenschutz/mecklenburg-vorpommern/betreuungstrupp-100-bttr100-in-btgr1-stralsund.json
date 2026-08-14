@@ -1,0 +1,138 @@
+{
+  "schemaVersion": 8,
+  "uebung": true,
+  "stand": 3319986,
+  "einheit": {
+    "organisation": 8,
+    "organisationName": "Arbeiter-Samariter-Bund Landkreis Vorpommern-Rügen",
+    "einheitsTyp": {
+      "freitext": "Betreuungstrupp 100 (BtTr100, in BtGr1)"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "KSE"
+        },
+        "name": "Betreuungszug (BtZ)"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "ASB-Kreisverband"
+        },
+        "name": "Vorpommern-Rügen"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Untere KatS-Behörde"
+        },
+        "name": "Landkreis Vorpommern-Rügen"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2305,
+    "zeitraumBis": 2306,
+    "ortAuftrag": "Evakuierung Stralsund — Betreuung von bis zu 100 Betroffenen"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Hannes",
+      "nachname": "Buck",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Truppführer/-in"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5559569052"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Elektrofachkraft (Beruf)"
+        }
+      ]
+    },
+    {
+      "vorname": "Kay",
+      "nachname": "Lehmann",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Betreuungshelfer/-in"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Jens",
+      "nachname": "Jarchow",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Betreuungshelfer/-in"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Tobias",
+      "nachname": "Kähler",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Betreuungshelfer/-in"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "GW-B"
+      },
+      "aenderungen": "Gerätewagen Betreuung mit zwei Betreuungssätzen für je 50 Betroffene (Bt50)",
+      "kennzeichen": "VR-2019",
+      "funkrufname": {
+        "kennwort": {
+          "code": 6
+        },
+        "eigenerStandort": false,
+        "ort": "Stralsund",
+        "teile": [
+          1
+        ]
+      }
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 4,
+    "dieselLiter": 70,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": false,
+    "ruhezeitErforderlich": false
+  },
+  "sonstiges": "Sollstärke 0/1/3/4 (Führer/Unterführer/Mannschaft/Gesamt) nach LPBK M-V, Festlegungen zu den Grundstrukturen im KatS M-V v. 15.03.2020, Erlass Nr. 4.7, Abb. 8 — Teileinheit von Betreuungszug (BtZ) — 1/7/23/31. Funkrufname mit fiktiver, rein fortlaufender Ordnungsnummer — für M-V konnte kein amtlicher OPTA-/Kennzahlenkatalog verifiziert werden."
+}

@@ -1,0 +1,114 @@
+{
+  "schemaVersion": 8,
+  "uebung": true,
+  "stand": 3290126,
+  "einheit": {
+    "organisation": 2,
+    "organisationName": "Feuerwehr Kreis Limburg-Weilburg",
+    "einheitsTyp": {
+      "freitext": "Technische Hilfeleistungs-Einheit (THE)"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Aufgabenbereich"
+        },
+        "name": "Technische Hilfeleistungs-Einheit (THE)"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Landkreis/kreisfreie Stadt"
+        },
+        "name": "Kreis Limburg-Weilburg"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2284,
+    "zeitraumBis": 2285,
+    "ortAuftrag": "Gebäudeeinsturz Limburg an der Lahn — technische Hilfeleistung, Bergung"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Katrin",
+      "nachname": "Hess",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Truppführer/-in"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5551529852"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Philipp",
+      "nachname": "Weber",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmitglied"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Bernd",
+      "nachname": "Stein",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Maschinist/-in"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "RW"
+      },
+      "aenderungen": "Rüstwagen",
+      "kennzeichen": "LM-2042",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Kreis Limburg-Weilburg",
+        "teile": [
+          2,
+          52
+        ]
+      }
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 3,
+    "dieselLiter": 0,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": false,
+    "ruhezeitErforderlich": false
+  },
+  "sonstiges": "Sollstärke 0/1/2/3 (Führer/Unterführer/Mannschaft/Gesamt) nach Konzept „Katastrophenschutz in Hessen” (HMdIS, Anlage 2.1, 01.01.2016/2024), Anlage 2.22 — Teileinheit von Technische Hilfeleistungs-Einheit (THE) — 0/1/2/3. Funkrufname: Standortkennzahl fiktiv fortlaufend, Fahrzeugkennzahl amtlich nach Anlage I des Funkrufnamenkatalogs 2011."
+}

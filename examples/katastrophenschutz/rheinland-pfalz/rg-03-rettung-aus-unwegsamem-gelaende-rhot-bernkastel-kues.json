@@ -1,0 +1,168 @@
+{
+  "schemaVersion": 8,
+  "uebung": true,
+  "stand": 3393653,
+  "einheit": {
+    "organisation": 5,
+    "organisationName": "Deutsches Rotes Kreuz Bernkastel-Wittlich",
+    "einheitsTyp": {
+      "freitext": "Rettung aus unwegsamem Gelände - RHOT (RG-03)"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Fähigkeitsmodul"
+        },
+        "name": "RG-03 · Rettung aus unwegsamem Gelände"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Untere Katastrophenschutzbehörde"
+        },
+        "name": "Landkreis Bernkastel-Wittlich"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2356,
+    "zeitraumBis": 2358,
+    "ortAuftrag": "Vermisstensuche Bernkastel-Kues — biologische und technische Ortung verschütteter Personen"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Anja",
+      "nachname": "Hoffmann",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "GF"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5557116476"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Gabriele",
+      "nachname": "Ludwig",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Hundeführer/-führerin"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Gabriele",
+      "nachname": "Koch",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Hundeführer/-führerin"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 2,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Dieter",
+      "nachname": "Dörr",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Hundeführer/-führerin"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Markus",
+      "nachname": "Keller",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Personen technische Ortung (Drohnenpiloten/-innen)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Sebastian",
+      "nachname": "Meyer",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Personen technische Ortung (Drohnenpiloten/-innen)"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Gerd",
+      "nachname": "Weiler",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Personen technische Ortung (Drohnenpiloten/-innen)"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 2,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "Fahrzeug für biologische Ortung"
+      },
+      "kennzeichen": "WIL-3091"
+    },
+    {
+      "typ": {
+        "freitext": "Fahrzeug für technische Ortung"
+      },
+      "kennzeichen": "WIL-3092"
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 7,
+    "dieselLiter": 0,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": true,
+    "ruhezeitErforderlich": false
+  },
+  "sonstiges": "Fähigkeitsmodul RG-03 „Rettung aus unwegsamem Gelände - RHOT\", Umsetzung Standard (I) nach Handlungsanweisung zum Vollzug der Anlage 1 der KatS-LVO (LfBK Rheinland-Pfalz, Stand 18.11.2025). Personalstärke 0/1/6/7 (Führer/Unterführer/Mannschaft/Gesamt) exakt nach Handlungsanweisung; nicht namentlich benannte Stellen sind generisch aufgefüllt. Trägerorganisation frei (aber plausibel) gewählt — die Handlungsanweisung regelt außer bei CBRN-04 keinen Träger. Zusatzmaterial lt. Handlungsanweisung: Endoskopkamera, Bodenhorchgeräte, Drohne mit WBK, Kernbohrgerät, 3 Trümmersuchhunde. Abmarschbereit nach 30 Minuten."
+}

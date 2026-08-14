@@ -1,0 +1,260 @@
+{
+  "schemaVersion": 8,
+  "uebung": true,
+  "stand": 3289524,
+  "einheit": {
+    "organisation": 5,
+    "organisationName": "Deutsches Rotes Kreuz — Kreisverband Kreis Waldeck-Frankenberg",
+    "einheitsTyp": {
+      "freitext": "Transportgruppe"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Aufgabenbereich"
+        },
+        "name": "Sanitätszug (SanZ)"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Landkreis/kreisfreie Stadt"
+        },
+        "name": "Kreis Waldeck-Frankenberg"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Kreisverband"
+        },
+        "name": "DRK-Kreisverband Kreis Waldeck-Frankenberg"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2284,
+    "zeitraumBis": 2286,
+    "ortAuftrag": "MANV Korbach — Transport von Verletzten und Erkrankten"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Kevin",
+      "nachname": "Otto",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Gruppenführer/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5555581393"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Julian",
+      "nachname": "Hofmann",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Truppführer/-in"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5553695954"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungssanitäter (extern)"
+        }
+      ]
+    },
+    {
+      "vorname": "Marcel",
+      "nachname": "Best",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Truppführer/-in"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Hannes",
+      "nachname": "Fuchs",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Rettungssanitäter/-in"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Florian",
+      "nachname": "Neumann",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Rettungssanitäter/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Torben",
+      "nachname": "Kern",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Rettungssanitäter/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Sarah",
+      "nachname": "Klein",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kraftfahrer/-in"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Dirk",
+      "nachname": "Schuster",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kraftfahrer/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Florian",
+      "nachname": "Bender",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kraftfahrer/-in"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Gesundheits- und Krankenpfleger (Beruf)"
+        }
+      ]
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "KTW"
+      },
+      "aenderungen": "Krankentransportwagen",
+      "kennzeichen": "KB-2022",
+      "funkrufname": {
+        "kennwort": {
+          "code": 3
+        },
+        "eigenerStandort": false,
+        "ort": "Kreis Waldeck-Frankenberg",
+        "teile": [
+          1,
+          93
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "KTW"
+      },
+      "aenderungen": "Krankentransportwagen",
+      "kennzeichen": "KB-2023",
+      "funkrufname": {
+        "kennwort": {
+          "code": 3
+        },
+        "eigenerStandort": false,
+        "ort": "Kreis Waldeck-Frankenberg",
+        "teile": [
+          2,
+          93
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "RTW"
+      },
+      "aenderungen": "Rettungswagen",
+      "kennzeichen": "KB-2024",
+      "funkrufname": {
+        "kennwort": {
+          "code": 3
+        },
+        "eigenerStandort": false,
+        "ort": "Kreis Waldeck-Frankenberg",
+        "teile": [
+          3,
+          83
+        ]
+      }
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 9,
+    "dieselLiter": 90,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": true,
+    "ruhezeitErforderlich": false
+  },
+  "sonstiges": "Sollstärke 0/3/6/9 (Führer/Unterführer/Mannschaft/Gesamt) nach Konzept „Katastrophenschutz in Hessen” (HMdIS, Anlage 2.1, 01.01.2016/2024), Anlage 2.16 — Teileinheit von Sanitätszug (SanZ) — 1/8/16/25. Funkrufname: Standortkennzahl fiktiv fortlaufend, Fahrzeugkennzahl amtlich nach Anlage I des Funkrufnamenkatalogs 2011."
+}

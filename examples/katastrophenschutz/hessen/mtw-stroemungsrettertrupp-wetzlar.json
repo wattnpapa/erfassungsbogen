@@ -1,0 +1,173 @@
+{
+  "schemaVersion": 8,
+  "uebung": true,
+  "stand": 3288648,
+  "einheit": {
+    "organisation": 9,
+    "organisationName": "DLRG — Kreisverband Lahn-Dill-Kreis",
+    "einheitsTyp": {
+      "freitext": "MTW-Strömungsrettertrupp"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Aufgabenbereich"
+        },
+        "name": "Erweiterte Wasserrettungsgruppe (EWRGr)"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Landkreis/kreisfreie Stadt"
+        },
+        "name": "Lahn-Dill-Kreis"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Kreisverband"
+        },
+        "name": "DLRG-Kreisverband Lahn-Dill-Kreis"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2283,
+    "zeitraumBis": 2284,
+    "ortAuftrag": "Wasserunfall Wetzlar — erweiterte Wasserrettung, Strömungsrettung"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Katrin",
+      "nachname": "Hofmann",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Bootsführer/-in"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5550748152"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Bootsführerschein Binnen"
+        }
+      ]
+    },
+    {
+      "vorname": "Karsten",
+      "nachname": "Kuhn",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Strömungsretter/-in"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Matthias",
+      "nachname": "Kaiser",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Strömungsretter/-in"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Ralf",
+      "nachname": "Neumann",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Strömungsretter/-in"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Motorsägenschein AS Baum I (extern)"
+        }
+      ]
+    },
+    {
+      "vorname": "Moritz",
+      "nachname": "Lang",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Strömungsretter/-in"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Alexander",
+      "nachname": "Roth",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kraftfahrer/-in"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "MTW"
+      },
+      "aenderungen": "Mannschaftstransportwagen mit Rettungsboot",
+      "kennzeichen": "LDK-2041",
+      "funkrufname": {
+        "kennwort": {
+          "code": 7
+        },
+        "eigenerStandort": false,
+        "ort": "Lahn-Dill-Kreis",
+        "teile": [
+          2,
+          19
+        ]
+      }
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 6,
+    "dieselLiter": 45,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": false,
+    "ruhezeitErforderlich": true
+  },
+  "sonstiges": "Sollstärke 0/1/5/6 (Führer/Unterführer/Mannschaft/Gesamt) nach Konzept „Katastrophenschutz in Hessen” (HMdIS, Anlage 2.1, 01.01.2016/2024), Anlage 2.21 — Teileinheit von Erweiterte Wasserrettungsgruppe (EWRGr) — 0/2/10/12. Funkrufname: Standortkennzahl fiktiv fortlaufend, Fahrzeugkennzahl amtlich nach Anlage I des Funkrufnamenkatalogs 2011."
+}

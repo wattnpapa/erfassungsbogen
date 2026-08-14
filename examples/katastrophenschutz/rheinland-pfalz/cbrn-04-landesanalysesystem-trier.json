@@ -1,0 +1,159 @@
+{
+  "schemaVersion": 8,
+  "uebung": true,
+  "stand": 3454096,
+  "einheit": {
+    "organisation": 2,
+    "organisationName": "Feuerwehr Trier",
+    "einheitsTyp": {
+      "freitext": "Landesanalysesystem (CBRN-04)"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Fähigkeitsmodul"
+        },
+        "name": "CBRN-04 · CBRN-Schutz"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Untere Katastrophenschutzbehörde"
+        },
+        "name": "Stadt Trier"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2398,
+    "zeitraumBis": 2400,
+    "ortAuftrag": "Stoffidentifikation Trier — Landesanalysesystem (stationär bei der BF Ludwigshafen)"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Manfred",
+      "nachname": "Schäfer",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "VF"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5552413106"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Ralf",
+      "nachname": "Kraus",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "GF"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Martin",
+      "nachname": "Freund",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Systembediener Analytik"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Dirk",
+      "nachname": "Jost",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Systembediener Analytik"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Andreas",
+      "nachname": "Decker",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Mess- und Probenentnahmefachkräfte"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Angelika",
+      "nachname": "Roth",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Mess- und Probenentnahmefachkräfte"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "ELW 1"
+      },
+      "kennzeichen": "TR-3060"
+    },
+    {
+      "typ": {
+        "freitext": "GW-Mess"
+      },
+      "kennzeichen": "TR-3061"
+    },
+    {
+      "typ": {
+        "freitext": "CBRN-ErkKW"
+      },
+      "kennzeichen": "TR-3062"
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 6,
+    "dieselLiter": 115,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": true,
+    "ruhezeitErforderlich": false
+  },
+  "sonstiges": "Fähigkeitsmodul CBRN-04 „Landesanalysesystem\", Umsetzung Standard (I) nach Handlungsanweisung zum Vollzug der Anlage 1 der KatS-LVO (LfBK Rheinland-Pfalz, Stand 18.11.2025). Personalstärke 1/1/4/6 (Führer/Unterführer/Mannschaft/Gesamt) exakt nach Handlungsanweisung; nicht namentlich benannte Stellen sind generisch aufgefüllt. Trägerorganisation frei (aber plausibel) gewählt — die Handlungsanweisung regelt außer bei CBRN-04 keinen Träger. Zusatzmaterial lt. Handlungsanweisung: Ergänzungsausstattung Messtechnik und Probenahme. Abmarschbereit nach 60 Minuten."
+}

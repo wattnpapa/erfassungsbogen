@@ -1,0 +1,121 @@
+{
+  "schemaVersion": 8,
+  "uebung": true,
+  "stand": 3320171,
+  "einheit": {
+    "organisation": 2,
+    "organisationName": "Feuerwehr Landkreis Rostock",
+    "einheitsTyp": {
+      "freitext": "Führungsunterstützungstrupp (FüUstgTr)"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "KSE"
+        },
+        "name": "Führungsunterstützungsgruppe (FüUstgGr)"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Untere KatS-Behörde"
+        },
+        "name": "Landkreis Rostock"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2305,
+    "zeitraumBis": 2308,
+    "ortAuftrag": "Führung Verband Bad Doberan — Fernmeldeverbindungen für die Einsatzleitung"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Lukas",
+      "nachname": "Grabow",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Truppführer/-in (Führungsunterstützung)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5551777725"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Dirk",
+      "nachname": "Schulz",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Fernmelder/-in"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Sprechfunker"
+        }
+      ]
+    },
+    {
+      "vorname": "Holger",
+      "nachname": "Bauer",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Fernmelder/-in"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Sprechfunker"
+        }
+      ]
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "ELW 2"
+      },
+      "aenderungen": "Einsatzleitwagen 2",
+      "kennzeichen": "LRO-2002",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Bad Doberan",
+        "teile": [
+          1
+        ]
+      }
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 3,
+    "dieselLiter": 70,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": true,
+    "ruhezeitErforderlich": false
+  },
+  "sonstiges": "Sollstärke 0/1/2/3 (Führer/Unterführer/Mannschaft/Gesamt) nach LPBK M-V, Festlegungen zu den Grundstrukturen im KatS M-V v. 15.03.2020, Erlass Nr. 4.2.1, Abb. 1 — Teileinheit von Führungsunterstützungsgruppe (FüUstgGr) — 4/1/2/7. Funkrufname mit fiktiver, rein fortlaufender Ordnungsnummer — für M-V konnte kein amtlicher OPTA-/Kennzahlenkatalog verifiziert werden."
+}

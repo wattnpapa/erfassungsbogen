@@ -1,0 +1,156 @@
+{
+  "schemaVersion": 8,
+  "uebung": true,
+  "stand": 3287893,
+  "einheit": {
+    "organisation": 2,
+    "organisationName": "Feuerwehr Wetteraukreis",
+    "einheitsTyp": {
+      "freitext": "Gerätegruppe, Trupp 2"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Aufgabenbereich"
+        },
+        "name": "Gefahrstoff-ABC-Zug (GABCZ)"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Landkreis/kreisfreie Stadt"
+        },
+        "name": "Wetteraukreis"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2283,
+    "zeitraumBis": 2286,
+    "ortAuftrag": "Gefahrstofffreisetzung Friedberg (Hessen) — Kühlen, Verdünnen"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Dirk",
+      "nachname": "Richter",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Truppführer/-in"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
+      "ernaehrung": 2,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5552641222"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Katharina",
+      "nachname": "Vogel",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Helfer/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "ABC-Lehrgang"
+        }
+      ]
+    },
+    {
+      "vorname": "Hannes",
+      "nachname": "Becker",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Helfer/-in"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "ABC-Lehrgang"
+        }
+      ]
+    },
+    {
+      "vorname": "Tobias",
+      "nachname": "Zimmermann",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Helfer/-in"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "ABC-Lehrgang"
+        }
+      ]
+    },
+    {
+      "vorname": "Joachim",
+      "nachname": "Becker",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Maschinist/-in"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 2,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "TLF 4000"
+      },
+      "aenderungen": "Tanklöschfahrzeug 4000",
+      "kennzeichen": "FB-2011",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Wetteraukreis",
+        "teile": [
+          1,
+          19
+        ]
+      }
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 5,
+    "dieselLiter": 90,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": true,
+    "ruhezeitErforderlich": false
+  },
+  "sonstiges": "Sollstärke 0/1/4/5 (Führer/Unterführer/Mannschaft/Gesamt) nach Konzept „Katastrophenschutz in Hessen” (HMdIS, Anlage 2.1, 01.01.2016/2024), Anlage 2.13 — Teileinheit von Gefahrstoff-ABC-Zug (GABCZ) — 1/5/16/22. Funkrufname: Standortkennzahl fiktiv fortlaufend, Fahrzeugkennzahl amtlich nach Anlage I des Funkrufnamenkatalogs 2011."
+}

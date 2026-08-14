@@ -1,0 +1,219 @@
+{
+  "schemaVersion": 8,
+  "uebung": true,
+  "stand": 3432438,
+  "einheit": {
+    "organisation": 2,
+    "organisationName": "Feuerwehr Neuwied",
+    "einheitsTyp": {
+      "freitext": "Logistik - Personentransport (LOG-05)"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Fähigkeitsmodul"
+        },
+        "name": "LOG-05 · Logistik"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Untere Katastrophenschutzbehörde"
+        },
+        "name": "Landkreis Neuwied"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2383,
+    "zeitraumBis": 2387,
+    "ortAuftrag": "Evakuierung Neuwied — gleichzeitiger Transport von 50 Personen"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Karl",
+      "nachname": "Faber",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "GF"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5550783693"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Sabine",
+      "nachname": "Bauer",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kraftfahrer/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Niklas",
+      "nachname": "Sauer",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kraftfahrer/-in"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Sebastian",
+      "nachname": "Roth",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kraftfahrer/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Marco",
+      "nachname": "Weis",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kraftfahrer/-in"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Martin",
+      "nachname": "Christ",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kraftfahrer/-in"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Norbert",
+      "nachname": "Wolf",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kraftfahrer/-in"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Paul",
+      "nachname": "Jung",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kraftfahrer/-in"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "KdoW"
+      },
+      "kennzeichen": "NR-3104"
+    },
+    {
+      "typ": {
+        "freitext": "MTF"
+      },
+      "kennzeichen": "NR-3105"
+    },
+    {
+      "typ": {
+        "freitext": "MTF"
+      },
+      "kennzeichen": "NR-3106"
+    },
+    {
+      "typ": {
+        "freitext": "MTF"
+      },
+      "kennzeichen": "NR-3107"
+    },
+    {
+      "typ": {
+        "freitext": "MTF"
+      },
+      "kennzeichen": "NR-3108"
+    },
+    {
+      "typ": {
+        "freitext": "MTF"
+      },
+      "kennzeichen": "NR-3109"
+    },
+    {
+      "typ": {
+        "freitext": "MTF"
+      },
+      "kennzeichen": "NR-3110"
+    },
+    {
+      "typ": {
+        "freitext": "MTF"
+      },
+      "kennzeichen": "NR-3111"
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 8,
+    "dieselLiter": 360,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": true,
+    "ruhezeitErforderlich": false
+  },
+  "sonstiges": "Fähigkeitsmodul LOG-05 „Logistik - Personentransport\", Umsetzung Standard (I) nach Handlungsanweisung zum Vollzug der Anlage 1 der KatS-LVO (LfBK Rheinland-Pfalz, Stand 18.11.2025). Personalstärke 0/1/7/8 (Führer/Unterführer/Mannschaft/Gesamt) exakt nach Handlungsanweisung; nicht namentlich benannte Stellen sind generisch aufgefüllt. Trägerorganisation frei (aber plausibel) gewählt — die Handlungsanweisung regelt außer bei CBRN-04 keinen Träger. Abmarschbereit nach 60 Minuten."
+}

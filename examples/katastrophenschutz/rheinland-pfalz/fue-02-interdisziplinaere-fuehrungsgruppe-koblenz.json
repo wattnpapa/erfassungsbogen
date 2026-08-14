@@ -1,0 +1,218 @@
+{
+  "schemaVersion": 8,
+  "uebung": true,
+  "stand": 3456654,
+  "einheit": {
+    "organisation": 2,
+    "organisationName": "Feuerwehr Koblenz",
+    "einheitsTyp": {
+      "freitext": "Interdisziplinäre Führungsgruppe (FÜ-02)"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Fähigkeitsmodul"
+        },
+        "name": "FÜ-02 · Führung"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Untere Katastrophenschutzbehörde"
+        },
+        "name": "Stadt Koblenz"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2400,
+    "zeitraumBis": 2401,
+    "ortAuftrag": "Flächenlage Koblenz — fachdienstübergreifende Befehlsstelle Führungsstufe C"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Ute",
+      "nachname": "Schäfer",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "VF"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5558367620"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Heiko",
+      "nachname": "Ludwig",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "VF"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Martina",
+      "nachname": "Huber",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "ZF"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Lukas",
+      "nachname": "Bender",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "ZF"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Sven",
+      "nachname": "Keller",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "ZF"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Jochen",
+      "nachname": "Vogel",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Führungshilfspersonal"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Koch (Beruf)"
+        }
+      ]
+    },
+    {
+      "vorname": "Martina",
+      "nachname": "Bach",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Führungshilfspersonal"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Berufskraftfahrer (Beruf)"
+        }
+      ]
+    },
+    {
+      "vorname": "Jan",
+      "nachname": "Werner",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Führungshilfspersonal"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Dirk",
+      "nachname": "Decker",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Führungshilfspersonal"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "KdoW"
+      },
+      "kennzeichen": "KO-3003"
+    },
+    {
+      "typ": {
+        "freitext": "ELW 2"
+      },
+      "kennzeichen": "KO-3004"
+    },
+    {
+      "typ": {
+        "freitext": "MZF 1"
+      },
+      "kennzeichen": "KO-3005"
+    },
+    {
+      "typ": {
+        "freitext": "MTF"
+      },
+      "kennzeichen": "KO-3006"
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 9,
+    "dieselLiter": 205,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": false,
+    "ruhezeitErforderlich": true
+  },
+  "sonstiges": "Fähigkeitsmodul FÜ-02 „Interdisziplinäre Führungsgruppe\", Umsetzung Standard (I) nach Handlungsanweisung zum Vollzug der Anlage 1 der KatS-LVO (LfBK Rheinland-Pfalz, Stand 18.11.2025). Personalstärke 5/0/4/9 (Führer/Unterführer/Mannschaft/Gesamt) exakt nach Handlungsanweisung; nicht namentlich benannte Stellen sind generisch aufgefüllt. Trägerorganisation frei (aber plausibel) gewählt — die Handlungsanweisung regelt außer bei CBRN-04 keinen Träger. Abmarschbereit nach 45 Minuten."
+}

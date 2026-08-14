@@ -1,0 +1,141 @@
+{
+  "schemaVersion": 8,
+  "uebung": true,
+  "stand": 3288614,
+  "einheit": {
+    "organisation": 9,
+    "organisationName": "DLRG — Kreisverband Stadt Offenbach am Main",
+    "einheitsTyp": {
+      "freitext": "Zugtrupp (ZTr)"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Aufgabenbereich"
+        },
+        "name": "Wasserrettungszug (WRZ)"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Landkreis/kreisfreie Stadt"
+        },
+        "name": "Stadt Offenbach am Main"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Kreisverband"
+        },
+        "name": "DLRG-Kreisverband Stadt Offenbach am Main"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2283,
+    "zeitraumBis": 2284,
+    "ortAuftrag": "Hochwasser Offenbach am Main — Führung Wasserrettungszug"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Bernd",
+      "nachname": "Neumann",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "Zugführer/-in"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 2,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5555908597"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "David",
+      "nachname": "Kirsch",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "stellv. Zugführer/-in"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 2,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5558462969"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Moritz",
+      "nachname": "Kirsch",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Melder/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Lars",
+      "nachname": "Franke",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kraftfahrer/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "ELW 1"
+      },
+      "aenderungen": "Einsatzleitwagen 1",
+      "kennzeichen": "OF-2036",
+      "funkrufname": {
+        "kennwort": {
+          "code": 7
+        },
+        "eigenerStandort": false,
+        "ort": "Stadt Offenbach am Main",
+        "teile": [
+          2,
+          11
+        ]
+      }
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 4,
+    "dieselLiter": 70,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": false,
+    "ruhezeitErforderlich": false
+  },
+  "sonstiges": "Sollstärke 1/1/2/4 (Führer/Unterführer/Mannschaft/Gesamt) nach Konzept „Katastrophenschutz in Hessen” (HMdIS, Anlage 2.1, 01.01.2016/2024), Anlage 2.21 — Teileinheit von Wasserrettungszug (WRZ) — 1/5/19/25. Funkrufname: Standortkennzahl fiktiv fortlaufend, Fahrzeugkennzahl amtlich nach Anlage I des Funkrufnamenkatalogs 2011."
+}

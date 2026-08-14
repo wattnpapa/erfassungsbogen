@@ -1,0 +1,110 @@
+{
+  "schemaVersion": 8,
+  "uebung": true,
+  "stand": 3408857,
+  "einheit": {
+    "organisation": 2,
+    "organisationName": "Feuerwehr Neuwied",
+    "einheitsTyp": {
+      "freitext": "Führung – Bildgebende Fernerkundung (FÜ-06)"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Fähigkeitsmodul"
+        },
+        "name": "FÜ-06 · Führung"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Untere Katastrophenschutzbehörde"
+        },
+        "name": "Landkreis Neuwied"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2367,
+    "zeitraumBis": 2370,
+    "ortAuftrag": "Lageerkundung Neuwied — Bildgebende Fernerkundung aus der Luft"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Silke",
+      "nachname": "Schmidt",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "GF & Luftraumbeobachter/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5559812587"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Koch (Beruf)"
+        }
+      ]
+    },
+    {
+      "vorname": "Manuela",
+      "nachname": "Lang",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Drohnenpilot/-in"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Gesundheits- und Krankenpfleger (Beruf)"
+        }
+      ]
+    },
+    {
+      "vorname": "Volker",
+      "nachname": "Reinhardt",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Luftbildauswerter/-in"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
+      "ernaehrung": 2,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "MTF"
+      },
+      "kennzeichen": "NR-3021"
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 3,
+    "dieselLiter": 45,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": false,
+    "ruhezeitErforderlich": false
+  },
+  "sonstiges": "Fähigkeitsmodul FÜ-06 „Führung – Bildgebende Fernerkundung\", Umsetzung Standard (I) nach Handlungsanweisung zum Vollzug der Anlage 1 der KatS-LVO (LfBK Rheinland-Pfalz, Stand 18.11.2025). Personalstärke 0/1/2/3 (Führer/Unterführer/Mannschaft/Gesamt) exakt nach Handlungsanweisung; nicht namentlich benannte Stellen sind generisch aufgefüllt. Trägerorganisation frei (aber plausibel) gewählt — die Handlungsanweisung regelt außer bei CBRN-04 keinen Träger. Zusatzmaterial lt. Handlungsanweisung: UAV, Bodenstation. Abmarschbereit nach 45 Minuten."
+}

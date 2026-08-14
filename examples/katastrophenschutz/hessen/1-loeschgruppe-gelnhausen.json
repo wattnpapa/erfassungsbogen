@@ -1,0 +1,212 @@
+{
+  "schemaVersion": 8,
+  "uebung": true,
+  "stand": 3287999,
+  "einheit": {
+    "organisation": 2,
+    "organisationName": "Feuerwehr Main-Kinzig-Kreis",
+    "einheitsTyp": {
+      "freitext": "1. Löschgruppe"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Aufgabenbereich"
+        },
+        "name": "Löschzug (LZ)"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Landkreis/kreisfreie Stadt"
+        },
+        "name": "Main-Kinzig-Kreis"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2283,
+    "zeitraumBis": 2284,
+    "ortAuftrag": "Großbrand Gelnhausen — Brandbekämpfung, Menschenrettung"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Leon",
+      "nachname": "Lang",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Gruppenführer/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5554809596"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Anja",
+      "nachname": "Vogel",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Melder/-in"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 1,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Kerstin",
+      "nachname": "Wagner",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppführer/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Atemschutzgeräteträger"
+        }
+      ]
+    },
+    {
+      "vorname": "Ralf",
+      "nachname": "Wagner",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppführer/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Atemschutzgeräteträger"
+        }
+      ]
+    },
+    {
+      "vorname": "Jonas",
+      "nachname": "Jung",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmitglied"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Hanna",
+      "nachname": "Krüger",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmitglied"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Lea",
+      "nachname": "Klein",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmitglied"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Stefan",
+      "nachname": "Ernst",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmitglied"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Philipp",
+      "nachname": "Fuchs",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Maschinist/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 2,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "LF 10/6"
+      },
+      "aenderungen": "Löschgruppenfahrzeug LF 10/6",
+      "kennzeichen": "MKK-2005",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Main-Kinzig-Kreis",
+        "teile": [
+          1,
+          43
+        ]
+      }
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 9,
+    "dieselLiter": 90,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": false,
+    "ruhezeitErforderlich": false
+  },
+  "sonstiges": "Sollstärke 0/1/8/9 (Führer/Unterführer/Mannschaft/Gesamt) nach Konzept „Katastrophenschutz in Hessen” (HMdIS, Anlage 2.1, 01.01.2016/2024), Anlage 2.9 — Teileinheit von Löschzug (LZ) — 1/4/20/25. Funkrufname: Standortkennzahl fiktiv fortlaufend, Fahrzeugkennzahl amtlich nach Anlage I des Funkrufnamenkatalogs 2011."
+}

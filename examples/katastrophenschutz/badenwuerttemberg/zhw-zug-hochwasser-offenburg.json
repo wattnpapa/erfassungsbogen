@@ -1,0 +1,416 @@
+{
+  "schemaVersion": 8,
+  "uebung": true,
+  "stand": 3441155,
+  "einheit": {
+    "organisation": 2,
+    "organisationName": "Feuerwehr Ortenaukreis",
+    "einheitsTyp": {
+      "freitext": "Zug Hochwasser (ZHW)"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Regierungsbezirk Freiburg"
+        },
+        "name": "Ortenaukreis"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Untere KatS-Behörde"
+        },
+        "name": "Ortenaukreis"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2389,
+    "zeitraumBis": 2393,
+    "ortAuftrag": "Hochwasser Offenburg — Lenzeinsatz und Deichverteidigung"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Leon",
+      "nachname": "Geiger",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "Zugführer/-in"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5556456354"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Reiner",
+      "nachname": "Weber",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Gruppenführer/-in (LF)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Lukas",
+      "nachname": "Bihler",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Gruppenführer/-in (RW)"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 2,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Frank",
+      "nachname": "Kuhn",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Truppführer/-in (GW-T/GW-L)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Rolf",
+      "nachname": "Häfele",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Truppführer/-in (MTW)"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
+      "ernaehrung": 2,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Sarah",
+      "nachname": "Müller",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmann/Truppfrau (Schmutzwasserpumpen, Sandsackverbau)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Sarah",
+      "nachname": "Beck",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmann/Truppfrau (Schmutzwasserpumpen, Sandsackverbau)"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Peter",
+      "nachname": "Schmidt",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmann/Truppfrau (Schmutzwasserpumpen, Sandsackverbau)"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Hans",
+      "nachname": "Rapp",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmann/Truppfrau (Schmutzwasserpumpen, Sandsackverbau)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Stefan",
+      "nachname": "Schmid",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmann/Truppfrau (Schmutzwasserpumpen, Sandsackverbau)"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Reiner",
+      "nachname": "Schuster",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmann/Truppfrau (Schmutzwasserpumpen, Sandsackverbau)"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Frank",
+      "nachname": "Gruber",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmann/Truppfrau (Schmutzwasserpumpen, Sandsackverbau)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Tim",
+      "nachname": "Weber",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmann/Truppfrau (Schmutzwasserpumpen, Sandsackverbau)"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Jochen",
+      "nachname": "Frey",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmann/Truppfrau (Schmutzwasserpumpen, Sandsackverbau)"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 2,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Ralf",
+      "nachname": "Beck",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Maschinist/-in"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Jens",
+      "nachname": "Fritz",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Maschinist/-in"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Lukas",
+      "nachname": "Faller",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kraftfahrer/-in"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Verena",
+      "nachname": "Krause",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kraftfahrer/-in"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "KdoW"
+      },
+      "aenderungen": "Kommandowagen (Zugführer)",
+      "kennzeichen": "OG-2020",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Ortenaukreis",
+        "teile": [
+          16,
+          10,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "(H)LF 20/16"
+      },
+      "aenderungen": "Löschgruppenfahrzeug (H)LF 20 bzw. 16",
+      "kennzeichen": "OG-2021",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Ortenaukreis",
+        "teile": [
+          16,
+          20,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "RW"
+      },
+      "aenderungen": "Rüstwagen",
+      "kennzeichen": "OG-2022",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Ortenaukreis",
+        "teile": [
+          16,
+          40,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "MTW"
+      },
+      "aenderungen": "Mannschaftstransportwagen",
+      "kennzeichen": "OG-2023",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Ortenaukreis",
+        "teile": [
+          16,
+          19,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "GW-T/GW-L"
+      },
+      "aenderungen": "Gerätewagen Transport/Logistik",
+      "kennzeichen": "OG-2024",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Ortenaukreis",
+        "teile": [
+          16,
+          30,
+          1
+        ]
+      }
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 18,
+    "dieselLiter": 230,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": true,
+    "ruhezeitErforderlich": true
+  },
+  "sonstiges": "Stärke 1/4/13/18 (einfache Besetzung; alle Einheiten werden in Doppelbesetzung vorgehalten) nach VwV KatSD Baden-Württemberg vom 24.09.2012 (GABl. Nr. 12/2012, S. 802), Anlage 2. Landesweit sind 36 Einheiten dieses Typs vorgesehen. Die Landkreis-Zuordnung dieses Beispiels ist exemplarisch gewählt, nicht der Verordnungstabelle Zeile für Zeile entnommen — Stärke und Fahrzeuge dagegen sind verordnungsgenau. Die Funkkennziffern der Fahrzeuge sind plausibel, aber nicht vollständig amtlich belegt (siehe README)."
+}

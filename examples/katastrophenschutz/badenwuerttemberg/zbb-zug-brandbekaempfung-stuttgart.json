@@ -1,0 +1,481 @@
+{
+  "schemaVersion": 8,
+  "uebung": true,
+  "stand": 3440614,
+  "einheit": {
+    "organisation": 2,
+    "organisationName": "Feuerwehr Stadt Stuttgart",
+    "einheitsTyp": {
+      "freitext": "Zug Brandbekämpfung (ZBB)"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Regierungsbezirk Stuttgart"
+        },
+        "name": "Stuttgart"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Untere KatS-Behörde"
+        },
+        "name": "Stadt Stuttgart"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2389,
+    "zeitraumBis": 2393,
+    "ortAuftrag": "Großbrand Stuttgart — Löschangriff im Zugverband"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Jonas",
+      "nachname": "Becker",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "Zugführer/-in"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5559670896"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Lea",
+      "nachname": "Kohler",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Gruppenführer/-in (LF)"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5550250794"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Moritz",
+      "nachname": "Wagner",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Gruppenführer/-in (LF)"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Tobias",
+      "nachname": "Kraus",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Truppführer/-in (MTW)"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Heiko",
+      "nachname": "Herrmann",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmann/Truppfrau"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Atemschutzgeräteträger"
+        }
+      ]
+    },
+    {
+      "vorname": "Nadine",
+      "nachname": "Beck",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmann/Truppfrau"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Atemschutzgeräteträger"
+        }
+      ]
+    },
+    {
+      "vorname": "Patrick",
+      "nachname": "Müller",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmann/Truppfrau"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Atemschutzgeräteträger"
+        }
+      ]
+    },
+    {
+      "vorname": "Michael",
+      "nachname": "Gaiser",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmann/Truppfrau"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Atemschutzgeräteträger"
+        }
+      ]
+    },
+    {
+      "vorname": "Florian",
+      "nachname": "Groh",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmann/Truppfrau"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Atemschutzgeräteträger"
+        }
+      ]
+    },
+    {
+      "vorname": "Markus",
+      "nachname": "Farrenkopf",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmann/Truppfrau"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Atemschutzgeräteträger"
+        }
+      ]
+    },
+    {
+      "vorname": "Dennis",
+      "nachname": "Schmitt",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmann/Truppfrau"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Atemschutzgeräteträger"
+        }
+      ]
+    },
+    {
+      "vorname": "Dennis",
+      "nachname": "Jäger",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmann/Truppfrau"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Atemschutzgeräteträger"
+        }
+      ]
+    },
+    {
+      "vorname": "Peter",
+      "nachname": "Hauser",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmann/Truppfrau"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Atemschutzgeräteträger"
+        }
+      ]
+    },
+    {
+      "vorname": "Ingrid",
+      "nachname": "Schneider",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmann/Truppfrau"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Atemschutzgeräteträger"
+        }
+      ]
+    },
+    {
+      "vorname": "Ulrike",
+      "nachname": "Renz",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmann/Truppfrau"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Atemschutzgeräteträger"
+        }
+      ]
+    },
+    {
+      "vorname": "Andreas",
+      "nachname": "Haas",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmann/Truppfrau"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Atemschutzgeräteträger"
+        }
+      ]
+    },
+    {
+      "vorname": "Simon",
+      "nachname": "Lang",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Maschinist/-in"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Sonja",
+      "nachname": "Groh",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Maschinist/-in"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 1,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Sven",
+      "nachname": "Seitz",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kraftfahrer/-in"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Jana",
+      "nachname": "Becker",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kraftfahrer/-in"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 1,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "KdoW"
+      },
+      "aenderungen": "Kommandowagen (Zugführer)",
+      "kennzeichen": "S-2006",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Stuttgart",
+        "teile": [
+          10,
+          10,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "(H)LF 20/16"
+      },
+      "aenderungen": "Löschgruppenfahrzeug (H)LF 20 bzw. 16",
+      "kennzeichen": "S-2007",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Stuttgart",
+        "teile": [
+          10,
+          20,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "(H)LF 20/16"
+      },
+      "aenderungen": "Löschgruppenfahrzeug (H)LF 20 bzw. 16",
+      "kennzeichen": "S-2008",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Stuttgart",
+        "teile": [
+          10,
+          20,
+          2
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "MTW"
+      },
+      "aenderungen": "Mannschaftstransportwagen",
+      "kennzeichen": "S-2009",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Stuttgart",
+        "teile": [
+          10,
+          19,
+          1
+        ]
+      }
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 20,
+    "dieselLiter": 90,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": false,
+    "ruhezeitErforderlich": false
+  },
+  "sonstiges": "Stärke 1/3/16/20 (einfache Besetzung; alle Einheiten werden in Doppelbesetzung vorgehalten) nach VwV KatSD Baden-Württemberg vom 24.09.2012 (GABl. Nr. 12/2012, S. 802), Anlage 2. Landesweit sind 50 Einheiten dieses Typs vorgesehen. Die Landkreis-Zuordnung dieses Beispiels ist exemplarisch gewählt, nicht der Verordnungstabelle Zeile für Zeile entnommen — Stärke und Fahrzeuge dagegen sind verordnungsgenau. Die Funkkennziffern der Fahrzeuge sind plausibel, aber nicht vollständig amtlich belegt (siehe README)."
+}

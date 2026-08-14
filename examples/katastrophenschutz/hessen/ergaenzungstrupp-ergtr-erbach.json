@@ -1,0 +1,114 @@
+{
+  "schemaVersion": 8,
+  "uebung": true,
+  "stand": 3290134,
+  "einheit": {
+    "organisation": 2,
+    "organisationName": "Feuerwehr Odenwaldkreis",
+    "einheitsTyp": {
+      "freitext": "Ergänzungstrupp (ErgTr)"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Aufgabenbereich"
+        },
+        "name": "Löschzug (LZ)"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Landkreis/kreisfreie Stadt"
+        },
+        "name": "Odenwaldkreis"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2284,
+    "zeitraumBis": 2285,
+    "ortAuftrag": "Großbrand Erbach — Wasserförderung über lange Wegstrecke"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Sabine",
+      "nachname": "Graf",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Truppführer/-in"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 1,
+      "ernaehrung": 2,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5553357241"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Uwe",
+      "nachname": "Hess",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmitglied"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Lars",
+      "nachname": "Keller",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Maschinist/-in"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "SW-KatS"
+      },
+      "aenderungen": "Schlauchwagen 2000 Katastrophenschutz",
+      "kennzeichen": "ERB-2007",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Odenwaldkreis",
+        "teile": [
+          1,
+          62
+        ]
+      }
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 3,
+    "dieselLiter": 90,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": false,
+    "ruhezeitErforderlich": false
+  },
+  "sonstiges": "Sollstärke 0/1/2/3 (Führer/Unterführer/Mannschaft/Gesamt) nach Konzept „Katastrophenschutz in Hessen” (HMdIS, Anlage 2.1, 01.01.2016/2024), Anlage 2.9 — Teileinheit von Löschzug (LZ) — 1/4/20/25. Funkrufname: Standortkennzahl fiktiv fortlaufend, Fahrzeugkennzahl amtlich nach Anlage I des Funkrufnamenkatalogs 2011."
+}

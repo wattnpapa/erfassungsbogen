@@ -1,0 +1,151 @@
+{
+  "schemaVersion": 8,
+  "uebung": true,
+  "stand": 3444922,
+  "einheit": {
+    "organisation": 2,
+    "organisationName": "Feuerwehr Eifelkreis Bitburg-Prüm",
+    "einheitsTyp": {
+      "freitext": "VOST - Virtual Operations Support Team (BM-01)"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Fähigkeitsmodul"
+        },
+        "name": "BM-01 · Bevölkerungsinformation"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Untere Katastrophenschutzbehörde"
+        },
+        "name": "Landkreis Eifelkreis Bitburg-Prüm"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2392,
+    "zeitraumBis": 2393,
+    "ortAuftrag": "Großschadenslage Bitburg — digitale Lagebild-Auswertung sozialer Medien"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Dennis",
+      "nachname": "Müller",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "ZF mit Kenntnissen in der Stabsarbeit"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5550379431"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Funkamateur (extern)"
+        }
+      ]
+    },
+    {
+      "vorname": "Lukas",
+      "nachname": "Klöckner",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Helfer/-in VOST"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Stefanie",
+      "nachname": "Seibert",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Helfer/-in VOST"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Wolfgang",
+      "nachname": "Lehnert",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Helfer/-in VOST"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Niklas",
+      "nachname": "Zimmermann",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Helfer/-in VOST"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Lars",
+      "nachname": "Jost",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Helfer/-in VOST"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 2,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "MTF"
+      },
+      "kennzeichen": "BIT-3113"
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 6,
+    "dieselLiter": 45,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": false,
+    "ruhezeitErforderlich": false
+  },
+  "sonstiges": "Fähigkeitsmodul BM-01 „VOST - Virtual Operations Support Team\", Umsetzung Standard (I) nach Handlungsanweisung zum Vollzug der Anlage 1 der KatS-LVO (LfBK Rheinland-Pfalz, Stand 18.11.2025). Personalstärke 1/0/5/6 (Führer/Unterführer/Mannschaft/Gesamt) exakt nach Handlungsanweisung; nicht namentlich benannte Stellen sind generisch aufgefüllt. Trägerorganisation frei (aber plausibel) gewählt — die Handlungsanweisung regelt außer bei CBRN-04 keinen Träger. Zusatzmaterial lt. Handlungsanweisung: IT-Arbeitsplatz für jede Funktion. Abmarschbereit nach 60 Minuten."
+}

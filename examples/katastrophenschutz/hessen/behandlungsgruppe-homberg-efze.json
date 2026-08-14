@@ -1,0 +1,285 @@
+{
+  "schemaVersion": 8,
+  "uebung": true,
+  "stand": 3286533,
+  "einheit": {
+    "organisation": 5,
+    "organisationName": "Deutsches Rotes Kreuz — Kreisverband Schwalm-Eder-Kreis",
+    "einheitsTyp": {
+      "freitext": "Behandlungsgruppe"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Aufgabenbereich"
+        },
+        "name": "Sanitätszug (SanZ)"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Landkreis/kreisfreie Stadt"
+        },
+        "name": "Schwalm-Eder-Kreis"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Kreisverband"
+        },
+        "name": "DRK-Kreisverband Schwalm-Eder-Kreis"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2282,
+    "zeitraumBis": 2285,
+    "ortAuftrag": "MANV Homberg (Efze) — Sichtung, Behandlung, Herstellung der Transportfähigkeit"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Joachim",
+      "nachname": "Lehmann",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Gruppenführer/-in"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5555796609"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Henrik",
+      "nachname": "Hess",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Rettungsassistent/-in (Notarzt-Vertretung)"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Notarzt"
+        }
+      ]
+    },
+    {
+      "vorname": "Katharina",
+      "nachname": "Hofmann",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Truppführer/-in"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungssanitäter"
+        }
+      ]
+    },
+    {
+      "vorname": "Uwe",
+      "nachname": "Schulz",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Truppführer/-in"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungssanitäter"
+        }
+      ]
+    },
+    {
+      "vorname": "Sebastian",
+      "nachname": "Klein",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Rettungssanitäter/-in"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Dirk",
+      "nachname": "Lang",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Rettungssanitäter/-in"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Marco",
+      "nachname": "Herbst",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Rettungssanitäter/-in"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Melanie",
+      "nachname": "Lorenz",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Rettungssanitäter/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Dennis",
+      "nachname": "Braun",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Rettungssanitäter/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Christina",
+      "nachname": "Hofmann",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Rettungssanitäter/-in"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Diana",
+      "nachname": "Klein",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kraftfahrer/-in"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Sarah",
+      "nachname": "Weber",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kraftfahrer/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "GW-San"
+      },
+      "aenderungen": "Gerätewagen Sanität",
+      "kennzeichen": "HR-2020",
+      "funkrufname": {
+        "kennwort": {
+          "code": 3
+        },
+        "eigenerStandort": false,
+        "ort": "Schwalm-Eder-Kreis",
+        "teile": [
+          1,
+          96
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "KTW"
+      },
+      "aenderungen": "Krankentransportwagen",
+      "kennzeichen": "HR-2021",
+      "funkrufname": {
+        "kennwort": {
+          "code": 3
+        },
+        "eigenerStandort": false,
+        "ort": "Schwalm-Eder-Kreis",
+        "teile": [
+          2,
+          93
+        ]
+      }
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 12,
+    "dieselLiter": 115,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": true,
+    "ruhezeitErforderlich": false
+  },
+  "sonstiges": "Sollstärke 0/4/8/12 (Führer/Unterführer/Mannschaft/Gesamt) nach Konzept „Katastrophenschutz in Hessen” (HMdIS, Anlage 2.1, 01.01.2016/2024), Anlage 2.16 — Teileinheit von Sanitätszug (SanZ) — 1/8/16/25. Funkrufname: Standortkennzahl fiktiv fortlaufend, Fahrzeugkennzahl amtlich nach Anlage I des Funkrufnamenkatalogs 2011."
+}

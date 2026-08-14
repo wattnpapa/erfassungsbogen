@@ -1,0 +1,184 @@
+{
+  "schemaVersion": 8,
+  "uebung": true,
+  "stand": 3397379,
+  "einheit": {
+    "organisation": 6,
+    "organisationName": "Johanniter-Unfall-Hilfe Alzey-Worms",
+    "einheitsTyp": {
+      "freitext": "Betreuung – Betreuungsplatz 500 (BT-03)"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Fähigkeitsmodul"
+        },
+        "name": "BT-03 · Betreuungsdienst"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Untere Katastrophenschutzbehörde"
+        },
+        "name": "Landkreis Alzey-Worms"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2359,
+    "zeitraumBis": 2362,
+    "ortAuftrag": "Großschadenslage Alzey — Leitung eines Betreuungsplatzes für 500 Betroffene"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Volker",
+      "nachname": "Lehnert",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "VF"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5555522227"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Berufskraftfahrer (Beruf)"
+        }
+      ]
+    },
+    {
+      "vorname": "Frank",
+      "nachname": "Müller",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "ZF"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Sebastian",
+      "nachname": "Krämer",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "ZF"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Anna",
+      "nachname": "Dörr",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Führungshilfspersonal"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Iris",
+      "nachname": "Flesch",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Führungshilfspersonal"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Gisela",
+      "nachname": "Haas",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Führungshilfspersonal"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 1,
+      "ernaehrung": 2,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Tobias",
+      "nachname": "Metzger",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Helfer/-in Betreuungsplatz"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "KdoW"
+      },
+      "kennzeichen": "AZ-3077"
+    },
+    {
+      "typ": {
+        "freitext": "ELW 1"
+      },
+      "kennzeichen": "AZ-3078"
+    },
+    {
+      "typ": {
+        "freitext": "LKW zGM 18 t"
+      },
+      "kennzeichen": "AZ-3079"
+    },
+    {
+      "typ": {
+        "freitext": "Mitnahmestapler"
+      },
+      "kennzeichen": "AZ-3080"
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 7,
+    "dieselLiter": 210,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": false,
+    "ruhezeitErforderlich": false
+  },
+  "sonstiges": "Fähigkeitsmodul BT-03 „Betreuung – Betreuungsplatz 500\", Umsetzung Standard (I) nach Handlungsanweisung zum Vollzug der Anlage 1 der KatS-LVO (LfBK Rheinland-Pfalz, Stand 18.11.2025). Personalstärke 3/0/4/7 (Führer/Unterführer/Mannschaft/Gesamt) exakt nach Handlungsanweisung; nicht namentlich benannte Stellen sind generisch aufgefüllt. Trägerorganisation frei (aber plausibel) gewählt — die Handlungsanweisung regelt außer bei CBRN-04 keinen Träger. Zusatzmaterial lt. Handlungsanweisung: Betreuungsmaterial. Abmarschbereit nach 60 Minuten."
+}

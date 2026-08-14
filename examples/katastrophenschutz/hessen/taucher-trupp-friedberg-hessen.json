@@ -1,0 +1,236 @@
+{
+  "schemaVersion": 8,
+  "uebung": true,
+  "stand": 3286855,
+  "einheit": {
+    "organisation": 9,
+    "organisationName": "DLRG — Kreisverband Wetteraukreis",
+    "einheitsTyp": {
+      "freitext": "Taucher-Trupp"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Aufgabenbereich"
+        },
+        "name": "Wasserrettungszug (WRZ)"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Landkreis/kreisfreie Stadt"
+        },
+        "name": "Wetteraukreis"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Kreisverband"
+        },
+        "name": "DLRG-Kreisverband Wetteraukreis"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2282,
+    "zeitraumBis": 2286,
+    "ortAuftrag": "Wasserunfall Friedberg (Hessen) — Tauchen, Bergung"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Karsten",
+      "nachname": "Bauer",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Gruppenführer/-in"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5550036096"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Silke",
+      "nachname": "Klein",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Einsatztaucher/-in"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5551281136"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Einsatztaucher"
+        }
+      ]
+    },
+    {
+      "vorname": "Matthias",
+      "nachname": "Weiß",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Einsatztaucher/-in"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Einsatztaucher"
+        }
+      ]
+    },
+    {
+      "vorname": "Jan",
+      "nachname": "Keller",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Einsatztaucher/-in"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Einsatztaucher"
+        }
+      ]
+    },
+    {
+      "vorname": "Ralf",
+      "nachname": "Krüger",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Einsatztaucher/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Einsatztaucher"
+        }
+      ]
+    },
+    {
+      "vorname": "Felix",
+      "nachname": "Engel",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Einsatztaucher/-in"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Einsatztaucher"
+        }
+      ]
+    },
+    {
+      "vorname": "Kai",
+      "nachname": "Neumann",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Signalmann/-frau"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Lars",
+      "nachname": "Kirsch",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kraftfahrer/-in"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Lukas",
+      "nachname": "Becker",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Helfer/-in"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "GW-Taucher"
+      },
+      "aenderungen": "Gerätewagen Taucher mit Rettungsboot",
+      "kennzeichen": "FB-2039",
+      "funkrufname": {
+        "kennwort": {
+          "code": 7
+        },
+        "eigenerStandort": false,
+        "ort": "Wetteraukreis",
+        "teile": [
+          2,
+          57
+        ]
+      }
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 9,
+    "dieselLiter": 70,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": true,
+    "ruhezeitErforderlich": false
+  },
+  "sonstiges": "Sollstärke 0/2/7/9 (Führer/Unterführer/Mannschaft/Gesamt) nach Konzept „Katastrophenschutz in Hessen” (HMdIS, Anlage 2.1, 01.01.2016/2024), Anlage 2.21 — Teileinheit von Wasserrettungszug (WRZ) — 1/5/19/25. Funkrufname: Standortkennzahl fiktiv fortlaufend, Fahrzeugkennzahl amtlich nach Anlage I des Funkrufnamenkatalogs 2011."
+}

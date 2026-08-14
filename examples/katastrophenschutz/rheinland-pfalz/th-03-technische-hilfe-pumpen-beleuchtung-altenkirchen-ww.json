@@ -1,0 +1,106 @@
+{
+  "schemaVersion": 8,
+  "uebung": true,
+  "stand": 3380644,
+  "einheit": {
+    "organisation": 2,
+    "organisationName": "Feuerwehr Altenkirchen",
+    "einheitsTyp": {
+      "freitext": "Technische Hilfe - Pumpen/Beleuchtung (TH-03)"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Fähigkeitsmodul"
+        },
+        "name": "TH-03 · Technische Hilfe"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Untere Katastrophenschutzbehörde"
+        },
+        "name": "Landkreis Altenkirchen"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2347,
+    "zeitraumBis": 2351,
+    "ortAuftrag": "Starkregenereignis Altenkirchen (Ww.) — Pump- und Beleuchtungsarbeiten an fünf Stellen"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "René",
+      "nachname": "Schröder",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "GF"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5553450974"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Anna",
+      "nachname": "Herber",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Maschinist/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Manfred",
+      "nachname": "Decker",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Maschinist/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Elektrofachkraft (Beruf)"
+        }
+      ]
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "WLF mit AB-Starkregen (Land)"
+      },
+      "kennzeichen": "AK-3045"
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 3,
+    "dieselLiter": 120,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": true,
+    "ruhezeitErforderlich": true
+  },
+  "sonstiges": "Fähigkeitsmodul TH-03 „Technische Hilfe - Pumpen/Beleuchtung\", Umsetzung Standard (I) nach Handlungsanweisung zum Vollzug der Anlage 1 der KatS-LVO (LfBK Rheinland-Pfalz, Stand 18.11.2025). Personalstärke 0/1/2/3 (Führer/Unterführer/Mannschaft/Gesamt) exakt nach Handlungsanweisung; nicht namentlich benannte Stellen sind generisch aufgefüllt. Trägerorganisation frei (aber plausibel) gewählt — die Handlungsanweisung regelt außer bei CBRN-04 keinen Träger. Abmarschbereit nach 60 Minuten."
+}

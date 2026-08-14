@@ -1,0 +1,191 @@
+{
+  "schemaVersion": 8,
+  "uebung": true,
+  "stand": 3439485,
+  "einheit": {
+    "organisation": 5,
+    "organisationName": "Rettungshundestaffel Landkreis Biberach (DRK)",
+    "einheitsTyp": {
+      "freitext": "Rettungshundestaffel (RHS)"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Regierungsbezirk Tübingen"
+        },
+        "name": "Biberach"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Untere KatS-Behörde"
+        },
+        "name": "Landkreis Biberach"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2388,
+    "zeitraumBis": 2390,
+    "ortAuftrag": "Vermisstensuche Biberach an der Riß — Flächen- und Trümmersuche mit Rettungshunden"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Julia",
+      "nachname": "Fritz",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Gruppenführer/-in"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5552868828"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Dennis",
+      "nachname": "Fischer",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Hundeführer/-in"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungshundeführer"
+        }
+      ]
+    },
+    {
+      "vorname": "Lukas",
+      "nachname": "Braun",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Hundeführer/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungshundeführer"
+        }
+      ]
+    },
+    {
+      "vorname": "Patrick",
+      "nachname": "Krause",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Hundeführer/-in"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungshundeführer"
+        }
+      ]
+    },
+    {
+      "vorname": "Hans",
+      "nachname": "Kohler",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Suchgruppenhelfer/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungssanitäter (extern)"
+        }
+      ]
+    },
+    {
+      "vorname": "Paul",
+      "nachname": "Bauer",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Suchgruppenhelfer/-in"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Werner",
+      "nachname": "Wagner",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Suchgruppenhelfer/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "MTW"
+      },
+      "aenderungen": "Mannschaftstransportwagen",
+      "kennzeichen": "BC-2057",
+      "funkrufname": {
+        "kennwort": {
+          "freitext": "Antonius"
+        },
+        "eigenerStandort": false,
+        "ort": "Biberach",
+        "teile": [
+          10,
+          19,
+          1
+        ]
+      }
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 7,
+    "dieselLiter": 45,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": false,
+    "ruhezeitErforderlich": false
+  },
+  "sonstiges": "Stärke 0/1/6/7 (einfache Besetzung; alle Einheiten werden in Doppelbesetzung vorgehalten) nach VwV KatSD Baden-Württemberg vom 24.09.2012 (GABl. Nr. 12/2012, S. 802), Anlage 3. Landesweit sind 5 Einheiten dieses Typs vorgesehen. Die Landkreis-Zuordnung dieses Beispiels ist exemplarisch gewählt, nicht der Verordnungstabelle Zeile für Zeile entnommen — Stärke und Fahrzeuge dagegen sind verordnungsgenau. Die Funkkennziffern der Fahrzeuge sind plausibel, aber nicht vollständig amtlich belegt (siehe README)."
+}

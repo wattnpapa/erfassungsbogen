@@ -1,0 +1,208 @@
+{
+  "schemaVersion": 8,
+  "uebung": true,
+  "stand": 3382991,
+  "einheit": {
+    "organisation": 7,
+    "organisationName": "Malteser Hilfsdienst Koblenz",
+    "einheitsTyp": {
+      "freitext": "Verpflegung-Getränke (V-02)"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Fähigkeitsmodul"
+        },
+        "name": "V-02 · Verpflegung"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Untere Katastrophenschutzbehörde"
+        },
+        "name": "Stadt Koblenz"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2349,
+    "zeitraumBis": 2352,
+    "ortAuftrag": "Flächenlage Koblenz — Ausgabe von 1.500 Heiß-/Kaltgetränken pro Stunde"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Eva",
+      "nachname": "Winter",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "GF"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5553141731"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Hannelore",
+      "nachname": "Berg",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Feldkoch/Feldköchin"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Gesundheits- und Krankenpfleger (Beruf)"
+        }
+      ]
+    },
+    {
+      "vorname": "Frank",
+      "nachname": "Wolf",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Verpflegungshelfer/-helferinnen"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Ute",
+      "nachname": "Flesch",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Verpflegungshelfer/-helferinnen"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Bernd",
+      "nachname": "Reinhardt",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Verpflegungshelfer/-helferinnen"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Peter",
+      "nachname": "Scholl",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Verpflegungshelfer/-helferinnen"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Ursula",
+      "nachname": "May",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Verpflegungshelfer/-helferinnen"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Michael",
+      "nachname": "Meyer",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Verpflegungshelfer/-helferinnen"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Hans",
+      "nachname": "Merz",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Verpflegungshelfer/-helferinnen"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "GW-Verpflegung"
+      },
+      "kennzeichen": "KO-3096"
+    },
+    {
+      "typ": {
+        "freitext": "FKH"
+      },
+      "kennzeichen": "KO-3097"
+    },
+    {
+      "typ": {
+        "freitext": "EGF/MTF"
+      },
+      "kennzeichen": "KO-3098"
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 9,
+    "dieselLiter": 115,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": false,
+    "ruhezeitErforderlich": false
+  },
+  "sonstiges": "Fähigkeitsmodul V-02 „Verpflegung-Getränke\", Umsetzung Standard (I) nach Handlungsanweisung zum Vollzug der Anlage 1 der KatS-LVO (LfBK Rheinland-Pfalz, Stand 18.11.2025). Personalstärke 0/1/8/9 (Führer/Unterführer/Mannschaft/Gesamt) exakt nach Handlungsanweisung; nicht namentlich benannte Stellen sind generisch aufgefüllt. Trägerorganisation frei (aber plausibel) gewählt — die Handlungsanweisung regelt außer bei CBRN-04 keinen Träger. Zusatzmaterial lt. Handlungsanweisung: Getränke. Abmarschbereit nach 60 Minuten."
+}

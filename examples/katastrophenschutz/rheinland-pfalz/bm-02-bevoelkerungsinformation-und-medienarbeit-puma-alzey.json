@@ -1,0 +1,153 @@
+{
+  "schemaVersion": 8,
+  "uebung": true,
+  "stand": 3438077,
+  "einheit": {
+    "organisation": 2,
+    "organisationName": "Feuerwehr Alzey-Worms",
+    "einheitsTyp": {
+      "freitext": "Bevölkerungsinformation und Medienarbeit - PuMA (BM-02)"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Fähigkeitsmodul"
+        },
+        "name": "BM-02 · Bevölkerungsinformation"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Untere Katastrophenschutzbehörde"
+        },
+        "name": "Landkreis Alzey-Worms"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2387,
+    "zeitraumBis": 2388,
+    "ortAuftrag": "Ereignis mit besonderer Medienrelevanz Alzey — Presse- und Medienarbeit (PuMA)"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Rainer",
+      "nachname": "Fischer",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "Führungskraft der Teileinheit (auch S5)"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5553641718"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Marco",
+      "nachname": "Zimmermann",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "ZF mit Qualifikation S5"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Marco",
+      "nachname": "Ebert",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "ZF mit Qualifikation S5"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Sven",
+      "nachname": "Ebert",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "ZF mit Qualifikation S5"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Manfred",
+      "nachname": "Wolf",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "IuK/Technik"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Gerd",
+      "nachname": "Meier",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "IuK/Technik"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "MTF"
+      },
+      "kennzeichen": "AZ-3114"
+    },
+    {
+      "typ": {
+        "freitext": "MZF 1"
+      },
+      "kennzeichen": "AZ-3115"
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 6,
+    "dieselLiter": 115,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": false,
+    "ruhezeitErforderlich": false
+  },
+  "sonstiges": "Fähigkeitsmodul BM-02 „Bevölkerungsinformation und Medienarbeit - PuMA\", Umsetzung Standard (I) nach Handlungsanweisung zum Vollzug der Anlage 1 der KatS-LVO (LfBK Rheinland-Pfalz, Stand 18.11.2025). Personalstärke 4/0/2/6 (Führer/Unterführer/Mannschaft/Gesamt) exakt nach Handlungsanweisung; nicht namentlich benannte Stellen sind generisch aufgefüllt. Trägerorganisation frei (aber plausibel) gewählt — die Handlungsanweisung regelt außer bei CBRN-04 keinen Träger. Zusatzmaterial lt. Handlungsanweisung: Material zum Aufbau einer Pressestelle/-konferenz. Abmarschbereit nach 60 Minuten."
+}

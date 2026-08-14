@@ -1,0 +1,143 @@
+{
+  "schemaVersion": 8,
+  "uebung": true,
+  "stand": 3290876,
+  "einheit": {
+    "organisation": 2,
+    "organisationName": "Feuerwehr Kreis Gießen",
+    "einheitsTyp": {
+      "freitext": "Zugtrupp (ZTr)"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Aufgabenbereich"
+        },
+        "name": "Gefahrstoff-Dekontaminations-Zug (GDekonZ)"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Landkreis/kreisfreie Stadt"
+        },
+        "name": "Kreis Gießen"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2285,
+    "zeitraumBis": 2288,
+    "ortAuftrag": "Gefahrstofffreisetzung Gießen — Führung Dekontaminations-Zug"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Bernd",
+      "nachname": "Scherer",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "Zugführer/-in"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5554304563"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Robert",
+      "nachname": "Keller",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "stellv. Zugführer/-in"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5557311820"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Koch (Beruf)"
+        }
+      ]
+    },
+    {
+      "vorname": "Matthias",
+      "nachname": "Hahn",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Melder/-in"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Funkamateur (extern)"
+        }
+      ]
+    },
+    {
+      "vorname": "Dennis",
+      "nachname": "Schneider",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kraftfahrer/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 2,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "ELW 1"
+      },
+      "aenderungen": "Einsatzleitwagen 1",
+      "kennzeichen": "GI-2012",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Kreis Gießen",
+        "teile": [
+          1,
+          11
+        ]
+      }
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 4,
+    "dieselLiter": 70,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": false,
+    "ruhezeitErforderlich": true
+  },
+  "sonstiges": "Sollstärke 1/1/2/4 (Führer/Unterführer/Mannschaft/Gesamt) nach Konzept „Katastrophenschutz in Hessen” (HMdIS, Anlage 2.1, 01.01.2016/2024), Anlage 2.14 — Teileinheit von Gefahrstoff-Dekontaminations-Zug (GDekonZ) — 1/4/17/22. Funkrufname: Standortkennzahl fiktiv fortlaufend, Fahrzeugkennzahl amtlich nach Anlage I des Funkrufnamenkatalogs 2011."
+}

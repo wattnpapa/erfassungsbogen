@@ -1,0 +1,137 @@
+{
+  "schemaVersion": 8,
+  "uebung": true,
+  "stand": 3291350,
+  "einheit": {
+    "organisation": 2,
+    "organisationName": "Feuerwehr Hochtaunuskreis",
+    "einheitsTyp": {
+      "freitext": "Zugtrupp (ZTr)"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Aufgabenbereich"
+        },
+        "name": "Löschzug (LZ)"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Landkreis/kreisfreie Stadt"
+        },
+        "name": "Hochtaunuskreis"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2285,
+    "zeitraumBis": 2287,
+    "ortAuftrag": "Großbrand Bad Homburg — Führung Löschzug"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Diana",
+      "nachname": "Vogel",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "Zugführer/-in"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5557229495"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Gesundheits- und Krankenpfleger (Beruf)"
+        }
+      ]
+    },
+    {
+      "vorname": "Lars",
+      "nachname": "Engel",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "stellv. Zugführer/-in"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Elektrofachkraft (Beruf)"
+        }
+      ]
+    },
+    {
+      "vorname": "Leon",
+      "nachname": "Neumann",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Melder/-in"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Peter",
+      "nachname": "Richter",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kraftfahrer/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "ELW 1"
+      },
+      "aenderungen": "Einsatzleitwagen 1",
+      "kennzeichen": "HG-2004",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Hochtaunuskreis",
+        "teile": [
+          1,
+          11
+        ]
+      }
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 4,
+    "dieselLiter": 70,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": true,
+    "ruhezeitErforderlich": false
+  },
+  "sonstiges": "Sollstärke 1/1/2/4 (Führer/Unterführer/Mannschaft/Gesamt) nach Konzept „Katastrophenschutz in Hessen” (HMdIS, Anlage 2.1, 01.01.2016/2024), Anlage 2.9 — Teileinheit von Löschzug (LZ) — 1/4/20/25. Funkrufname: Standortkennzahl fiktiv fortlaufend, Fahrzeugkennzahl amtlich nach Anlage I des Funkrufnamenkatalogs 2011."
+}

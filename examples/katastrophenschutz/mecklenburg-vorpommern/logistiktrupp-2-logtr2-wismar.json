@@ -1,0 +1,134 @@
+{
+  "schemaVersion": 8,
+  "uebung": true,
+  "stand": 3315914,
+  "einheit": {
+    "organisation": 2,
+    "organisationName": "Feuerwehr Landkreis Nordwestmecklenburg",
+    "einheitsTyp": {
+      "freitext": "Logistiktrupp 2 (LogTr2)"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "KSE"
+        },
+        "name": "Logistikgruppe (LogGr)"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Untere KatS-Behörde"
+        },
+        "name": "Landkreis Nordwestmecklenburg"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2302,
+    "zeitraumBis": 2303,
+    "ortAuftrag": "Hochwasser Wismar — Materialtransport und Ersatzstromversorgung"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Lea",
+      "nachname": "Höpner",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Truppführer/-in"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5550890743"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Doreen",
+      "nachname": "Ahrens",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Technikhelfer/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Frank",
+      "nachname": "Rudolph",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Technikhelfer/-in"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "WLF"
+      },
+      "aenderungen": "Wechselladerfahrzeug",
+      "kennzeichen": "NWM-2015",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Wismar",
+        "teile": [
+          2
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "AB-Logistik"
+      },
+      "aenderungen": "Abrollbehälter Logistik",
+      "kennzeichen": "auf WLF"
+    },
+    {
+      "typ": {
+        "freitext": "AB-Mulde"
+      },
+      "aenderungen": "Abrollbehälter Mulde",
+      "kennzeichen": "auf WLF"
+    },
+    {
+      "typ": {
+        "freitext": "NEA"
+      },
+      "aenderungen": "Netzersatzanlage",
+      "kennzeichen": "Anh NEA"
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 3,
+    "dieselLiter": 90,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": false,
+    "ruhezeitErforderlich": false
+  },
+  "sonstiges": "Sollstärke 0/1/2/3 (Führer/Unterführer/Mannschaft/Gesamt) nach LPBK M-V, Festlegungen zu den Grundstrukturen im KatS M-V v. 15.03.2020, Erlass Nr. 4.5, Abb. 5 — Teileinheit von Logistikgruppe (LogGr) — 0/2/4/6. Funkrufname mit fiktiver, rein fortlaufender Ordnungsnummer — für M-V konnte kein amtlicher OPTA-/Kennzahlenkatalog verifiziert werden."
+}

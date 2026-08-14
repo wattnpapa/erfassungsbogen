@@ -1,0 +1,168 @@
+{
+  "schemaVersion": 8,
+  "uebung": true,
+  "stand": 3318275,
+  "einheit": {
+    "organisation": 5,
+    "organisationName": "Deutsches Rotes Kreuz Landkreis Nordwestmecklenburg",
+    "einheitsTyp": {
+      "freitext": "Registrierungseinheit (RegE)"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "KSE"
+        },
+        "name": "Registrierungseinheit (RegE)"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "DRK-Kreisverband"
+        },
+        "name": "Nordwestmecklenburg"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Untere KatS-Behörde"
+        },
+        "name": "Landkreis Nordwestmecklenburg"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2304,
+    "zeitraumBis": 2308,
+    "ortAuftrag": "Evakuierung Grevesmühlen — Registrierung Betroffener in der Notunterkunft"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Patrick",
+      "nachname": "Below",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Gruppenführer/-in"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5558825102"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Daniel",
+      "nachname": "Meincke",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Registrierungshelfer/-in"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Marco",
+      "nachname": "Werner",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Registrierungshelfer/-in"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Lukas",
+      "nachname": "Papenfuß",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Registrierungshelfer/-in"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Michael",
+      "nachname": "Stein",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Registrierungshelfer/-in"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Christian",
+      "nachname": "Papenfuß",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Registrierungshelfer/-in"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Koch (Beruf)"
+        }
+      ]
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "MTW-RegE"
+      },
+      "aenderungen": "Mannschaftstransportwagen Registrierungseinheit",
+      "kennzeichen": "NWM-2031",
+      "funkrufname": {
+        "kennwort": {
+          "code": 3
+        },
+        "eigenerStandort": false,
+        "ort": "Grevesmühlen",
+        "teile": [
+          3
+        ]
+      }
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 6,
+    "dieselLiter": 45,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": true,
+    "ruhezeitErforderlich": false
+  },
+  "sonstiges": "Sollstärke 0/1/5/6 (Führer/Unterführer/Mannschaft/Gesamt) nach LPBK M-V, Festlegungen zu den Grundstrukturen im KatS M-V v. 15.03.2020, Erlass Nr. 4.10, Abb. 11 — Teileinheit von Registrierungseinheit (RegE) — 0/1/5/6. Funkrufname mit fiktiver, rein fortlaufender Ordnungsnummer — für M-V konnte kein amtlicher OPTA-/Kennzahlenkatalog verifiziert werden."
+}

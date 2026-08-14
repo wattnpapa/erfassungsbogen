@@ -1,0 +1,159 @@
+{
+  "schemaVersion": 8,
+  "uebung": true,
+  "stand": 3448640,
+  "einheit": {
+    "organisation": 7,
+    "organisationName": "Malteser Hilfsdienst Bad Kreuznach",
+    "einheitsTyp": {
+      "freitext": "Betreuung – Soziale Betreuung (BT-01)"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Fähigkeitsmodul"
+        },
+        "name": "BT-01 · Betreuungsdienst"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Untere Katastrophenschutzbehörde"
+        },
+        "name": "Landkreis Bad Kreuznach"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2394,
+    "zeitraumBis": 2398,
+    "ortAuftrag": "Evakuierung Bad Kreuznach — soziale Betreuung von 150 Betroffenen in der Soforthilfephase"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Peter",
+      "nachname": "Hohl",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "GF"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5557733260"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Sprechfunker"
+        }
+      ]
+    },
+    {
+      "vorname": "Matthias",
+      "nachname": "Fischer",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "BT-Helfer"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "René",
+      "nachname": "Zorn",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "BT-Helfer"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Motorsägenschein (extern)"
+        }
+      ]
+    },
+    {
+      "vorname": "Dirk",
+      "nachname": "Bergmann",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "BT-Helfer"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Doris",
+      "nachname": "Jost",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "BT-Helfer"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungssanitäter (extern)"
+        }
+      ]
+    },
+    {
+      "vorname": "Jens",
+      "nachname": "Sauer",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "BT-Helfer"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "EGF/MTF"
+      },
+      "kennzeichen": "KH-3074"
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 6,
+    "dieselLiter": 45,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": true,
+    "ruhezeitErforderlich": true
+  },
+  "sonstiges": "Fähigkeitsmodul BT-01 „Betreuung – Soziale Betreuung\", Umsetzung Standard (I) nach Handlungsanweisung zum Vollzug der Anlage 1 der KatS-LVO (LfBK Rheinland-Pfalz, Stand 18.11.2025). Personalstärke 0/1/5/6 (Führer/Unterführer/Mannschaft/Gesamt) exakt nach Handlungsanweisung; nicht namentlich benannte Stellen sind generisch aufgefüllt. Trägerorganisation frei (aber plausibel) gewählt — die Handlungsanweisung regelt außer bei CBRN-04 keinen Träger. Abmarschbereit nach 30 Minuten."
+}

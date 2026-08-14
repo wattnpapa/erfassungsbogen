@@ -1,0 +1,141 @@
+{
+  "schemaVersion": 8,
+  "uebung": true,
+  "stand": 3292244,
+  "einheit": {
+    "organisation": 5,
+    "organisationName": "Deutsches Rotes Kreuz — Kreisverband Stadt Kassel",
+    "einheitsTyp": {
+      "freitext": "Zugtrupp (ZTr)"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Aufgabenbereich"
+        },
+        "name": "Sanitätszug (SanZ)"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Landkreis/kreisfreie Stadt"
+        },
+        "name": "Stadt Kassel"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Kreisverband"
+        },
+        "name": "DRK-Kreisverband Stadt Kassel"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2286,
+    "zeitraumBis": 2290,
+    "ortAuftrag": "MANV Kassel — Führung Sanitätszug"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Dirk",
+      "nachname": "Otto",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "Zugführer/-in"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5552164666"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Fabian",
+      "nachname": "Lang",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "stellv. Zugführer/-in"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5552913981"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Tobias",
+      "nachname": "Schwarz",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Melder/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Peter",
+      "nachname": "Peters",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kraftfahrer/-in"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "ELW 1"
+      },
+      "aenderungen": "Einsatzleitwagen 1",
+      "kennzeichen": "KS-2019",
+      "funkrufname": {
+        "kennwort": {
+          "code": 3
+        },
+        "eigenerStandort": false,
+        "ort": "Stadt Kassel",
+        "teile": [
+          1,
+          11
+        ]
+      }
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 4,
+    "dieselLiter": 70,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": false,
+    "ruhezeitErforderlich": true
+  },
+  "sonstiges": "Sollstärke 1/1/2/4 (Führer/Unterführer/Mannschaft/Gesamt) nach Konzept „Katastrophenschutz in Hessen” (HMdIS, Anlage 2.1, 01.01.2016/2024), Anlage 2.16 — Teileinheit von Sanitätszug (SanZ) — 1/8/16/25. Funkrufname: Standortkennzahl fiktiv fortlaufend, Fahrzeugkennzahl amtlich nach Anlage I des Funkrufnamenkatalogs 2011."
+}

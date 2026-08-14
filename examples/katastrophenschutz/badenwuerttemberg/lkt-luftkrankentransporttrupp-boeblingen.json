@@ -1,0 +1,139 @@
+{
+  "schemaVersion": 8,
+  "uebung": true,
+  "stand": 3440769,
+  "einheit": {
+    "organisation": 6,
+    "organisationName": "Johanniter-Unfall-Hilfe Landkreis Böblingen",
+    "einheitsTyp": {
+      "freitext": "Luftkrankentransporttrupp (LKT)"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Regierungsbezirk Stuttgart"
+        },
+        "name": "Böblingen"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "JUH-Kreisverband"
+        },
+        "name": "Böblingen"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Untere KatS-Behörde"
+        },
+        "name": "Landkreis Böblingen"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2389,
+    "zeitraumBis": 2390,
+    "ortAuftrag": "Verlegung Böblingen — Luftkrankentransport zwischen Kliniken"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Stefan",
+      "nachname": "Müller",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "Ärztin/Arzt"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5550013704"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Notarzt"
+        }
+      ]
+    },
+    {
+      "vorname": "Norbert",
+      "nachname": "Fischer",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Rettungsassistent/-in"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5554074659"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungsassistent"
+        }
+      ]
+    },
+    {
+      "vorname": "Jochen",
+      "nachname": "Koch",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Pilot/-in"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Hubschrauberpilot (Beruf)"
+        }
+      ]
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "RTH"
+      },
+      "aenderungen": "Rettungshubschrauber (Luftfahrzeugkennzeichen statt Kfz-Kennzeichen)",
+      "kennzeichen": "BB-2056",
+      "funkrufname": {
+        "kennwort": {
+          "code": 4
+        },
+        "eigenerStandort": false,
+        "ort": "Böblingen",
+        "teile": [
+          14,
+          90,
+          1
+        ]
+      }
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 3,
+    "dieselLiter": 0,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": false,
+    "ruhezeitErforderlich": true
+  },
+  "sonstiges": "Stärke 1/1/1/3 (einfache Besetzung; alle Einheiten werden in Doppelbesetzung vorgehalten) nach VwV KatSD Baden-Württemberg vom 24.09.2012 (GABl. Nr. 12/2012, S. 802), Anlage 3. Landesweit sind 7 Einheiten dieses Typs vorgesehen. Die Landkreis-Zuordnung dieses Beispiels ist exemplarisch gewählt, nicht der Verordnungstabelle Zeile für Zeile entnommen — Stärke und Fahrzeuge dagegen sind verordnungsgenau. Die Funkkennziffern der Fahrzeuge sind plausibel, aber nicht vollständig amtlich belegt (siehe README)."
+}

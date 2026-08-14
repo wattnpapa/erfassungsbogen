@@ -1,0 +1,117 @@
+{
+  "schemaVersion": 8,
+  "uebung": true,
+  "stand": 3319694,
+  "einheit": {
+    "organisation": 2,
+    "organisationName": "Feuerwehr Landkreis Rostock",
+    "einheitsTyp": {
+      "freitext": "Erkundungstrupp Luft (ErkTr-L)"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "KSE"
+        },
+        "name": "Erkundungstrupp Luft (ErkTr-L)"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Untere KatS-Behörde"
+        },
+        "name": "Landkreis Rostock"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2305,
+    "zeitraumBis": 2308,
+    "ortAuftrag": "Vermisstensuche Güstrow — Luftbilderkundung mit ULS"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Holger",
+      "nachname": "Thiel",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Truppführer/-in"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5553770970"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Carola",
+      "nachname": "Köhn",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Steuerer/-in Unbemanntes Luftfahrtsystem (ULS)"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "UAS-Steuerberechtigung"
+        }
+      ]
+    },
+    {
+      "vorname": "Enrico",
+      "nachname": "Jahnke",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Beobachter/-in / Kraftfahrer/-in"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "MZF"
+      },
+      "aenderungen": "Mehrzweckfahrzeug mit Unbemanntem Luftfahrtsystem (ULS)",
+      "kennzeichen": "LRO-2003",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Güstrow",
+        "teile": [
+          2
+        ]
+      }
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 3,
+    "dieselLiter": 70,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": true,
+    "ruhezeitErforderlich": true
+  },
+  "sonstiges": "Sollstärke 0/1/2/3 (Führer/Unterführer/Mannschaft/Gesamt) nach LPBK M-V, Festlegungen zu den Grundstrukturen im KatS M-V v. 15.03.2020, Erlass Nr. 4.2.2, Abb. 2 — Teileinheit von Erkundungstrupp Luft (ErkTr-L) — 0/1/2/3. Funkrufname mit fiktiver, rein fortlaufender Ordnungsnummer — für M-V konnte kein amtlicher OPTA-/Kennzahlenkatalog verifiziert werden."
+}

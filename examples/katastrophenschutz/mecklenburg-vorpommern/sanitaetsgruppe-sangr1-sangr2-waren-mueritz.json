@@ -1,0 +1,182 @@
+{
+  "schemaVersion": 8,
+  "uebung": true,
+  "stand": 3316949,
+  "einheit": {
+    "organisation": 5,
+    "organisationName": "Deutsches Rotes Kreuz Landkreis Mecklenburgische Seenplatte",
+    "einheitsTyp": {
+      "freitext": "Sanitätsgruppe (SanGr1/SanGr2)"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "KSE"
+        },
+        "name": "Sanitätszug (SanZ)"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "DRK-Kreisverband"
+        },
+        "name": "Mecklenburgische Seenplatte"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Untere KatS-Behörde"
+        },
+        "name": "Landkreis Mecklenburgische Seenplatte"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2303,
+    "zeitraumBis": 2306,
+    "ortAuftrag": "MANV Waren (Müritz) — Sichtung, Behandlung, Herstellung der Transportfähigkeit"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Franziska",
+      "nachname": "Sommer",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "Ärztin/Arzt"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 2,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5553914957"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Notarzt"
+        }
+      ]
+    },
+    {
+      "vorname": "Jens",
+      "nachname": "Höpner",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Gruppenführer/-in"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5558044668"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Wolfgang",
+      "nachname": "Höpner",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Rettungssanitäter/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungssanitäter"
+        }
+      ]
+    },
+    {
+      "vorname": "Sven",
+      "nachname": "Werner",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Rettungssanitäter/-in"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungssanitäter"
+        }
+      ]
+    },
+    {
+      "vorname": "Christin",
+      "nachname": "Wegner",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Rettungssanitäter/-in bzw. Sanitätshelfer/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Ines",
+      "nachname": "Radloff",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Rettungssanitäter/-in bzw. Sanitätshelfer/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "GW-San"
+      },
+      "aenderungen": "Gerätewagen Sanität",
+      "kennzeichen": "MSE-2008",
+      "funkrufname": {
+        "kennwort": {
+          "code": 3
+        },
+        "eigenerStandort": false,
+        "ort": "Waren (Müritz)",
+        "teile": [
+          2
+        ]
+      }
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 6,
+    "dieselLiter": 70,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": true,
+    "ruhezeitErforderlich": false
+  },
+  "sonstiges": "Sollstärke 1/1/4/6 (Führer/Unterführer/Mannschaft/Gesamt) nach LPBK M-V, Festlegungen zu den Grundstrukturen im KatS M-V v. 15.03.2020, Erlass Nr. 4.4, Abb. 4 — Teileinheit von Sanitätszug (SanZ) — 3/4/19/26. Funkrufname mit fiktiver, rein fortlaufender Ordnungsnummer — für M-V konnte kein amtlicher OPTA-/Kennzahlenkatalog verifiziert werden."
+}

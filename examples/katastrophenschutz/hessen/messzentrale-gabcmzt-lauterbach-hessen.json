@@ -1,0 +1,175 @@
+{
+  "schemaVersion": 8,
+  "uebung": true,
+  "stand": 3292988,
+  "einheit": {
+    "organisation": 2,
+    "organisationName": "Feuerwehr Vogelsbergkreis",
+    "einheitsTyp": {
+      "freitext": "Messzentrale (GABCMZt)"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Aufgabenbereich"
+        },
+        "name": "GABC-Messzentrale (GABCMZt)"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Landkreis/kreisfreie Stadt"
+        },
+        "name": "Vogelsbergkreis"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2286,
+    "zeitraumBis": 2288,
+    "ortAuftrag": "Gefahrstofffreisetzung Lauterbach (Hessen) — Auswertung Messwerte, Lagedarstellung"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Jana",
+      "nachname": "Werner",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Gruppenführer/-in"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 1,
+      "ernaehrung": 1,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5553780783"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Jonas",
+      "nachname": "Seibert",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Führungshilfspersonal"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Berufskraftfahrer (Beruf)"
+        }
+      ]
+    },
+    {
+      "vorname": "Dennis",
+      "nachname": "Krüger",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Führungshilfspersonal"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Jana",
+      "nachname": "Keller",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Fernmelder/-in"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Sprechfunker"
+        }
+      ]
+    },
+    {
+      "vorname": "Fabian",
+      "nachname": "Bender",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Fernmelder/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Sprechfunker"
+        }
+      ]
+    },
+    {
+      "vorname": "Kai",
+      "nachname": "Lang",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Fernmelder/-in"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 2,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Sprechfunker"
+        }
+      ]
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "GW-IuK"
+      },
+      "aenderungen": "als mobile Messzentrale ausgestattet",
+      "kennzeichen": "VB-2016",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Vogelsbergkreis",
+        "teile": [
+          1,
+          14
+        ]
+      }
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 6,
+    "dieselLiter": 70,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": false,
+    "ruhezeitErforderlich": false
+  },
+  "sonstiges": "Sollstärke 0/1/5/6 (Führer/Unterführer/Mannschaft/Gesamt) nach Konzept „Katastrophenschutz in Hessen” (HMdIS, Anlage 2.1, 01.01.2016/2024), Anlage 2.10 — Teileinheit von GABC-Messzentrale (GABCMZt) — 0/1/5/6. Funkrufname: Standortkennzahl fiktiv fortlaufend, Fahrzeugkennzahl amtlich nach Anlage I des Funkrufnamenkatalogs 2011."
+}
