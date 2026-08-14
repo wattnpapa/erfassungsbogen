@@ -1,0 +1,276 @@
+{
+  "schemaVersion": 8,
+  "uebung": true,
+  "stand": 3376403,
+  "einheit": {
+    "organisation": 5,
+    "organisationName": "Deutsches Rotes Kreuz Kreis Paderborn",
+    "einheitsTyp": {
+      "freitext": "Teileinheit Sanität (TE San) (Einsatzeinheit NRW)"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Einsatzeinheit NRW"
+        },
+        "name": "Teileinheit Sanität (TE San)"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "DRK-Kreisverband"
+        },
+        "name": "Kreis Paderborn"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Untere Katastrophenschutzbehörde"
+        },
+        "name": "Kreis Paderborn"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2344,
+    "zeitraumBis": 2348,
+    "ortAuftrag": "MANV Paderborn — sanitätsdienstliche Erstversorgung und Patiententransport"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Patrick",
+      "nachname": "Scholz",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Gruppenführer/-in mit Rettungshelfer-Ausbildung"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5557311865"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Kerstin",
+      "nachname": "Kremer",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Rettungssanitäter/-in"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungssanitäter"
+        }
+      ]
+    },
+    {
+      "vorname": "Ines",
+      "nachname": "Scholz",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Rettungssanitäter/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungssanitäter"
+        }
+      ]
+    },
+    {
+      "vorname": "Jana",
+      "nachname": "Krause",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Rettungssanitäter/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungssanitäter"
+        }
+      ]
+    },
+    {
+      "vorname": "Patrick",
+      "nachname": "Hagen",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Rettungshelfer/-in"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Sebastian",
+      "nachname": "Grimm",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Rettungshelfer/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 2,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Steffen",
+      "nachname": "Heinemann",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Rettungshelfer/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Sven",
+      "nachname": "Schulz",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Rettungshelfer/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Lars",
+      "nachname": "Grabow",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Rettungshelfer/-in"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Carsten",
+      "nachname": "Meier",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Rettungshelfer/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "GW-San"
+      },
+      "aenderungen": "Gerätewagen Sanität",
+      "kennzeichen": "PB-KS 1002",
+      "funkrufname": {
+        "kennwort": {
+          "code": 3
+        },
+        "eigenerStandort": false,
+        "ort": "Kreis Paderborn",
+        "teile": [
+          1200,
+          95,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "KTW-B"
+      },
+      "aenderungen": "Krankentransportwagen Typ B",
+      "kennzeichen": "PB-KS 1003",
+      "funkrufname": {
+        "kennwort": {
+          "code": 3
+        },
+        "eigenerStandort": false,
+        "ort": "Kreis Paderborn",
+        "teile": [
+          1200,
+          85,
+          2
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "KTW-B"
+      },
+      "aenderungen": "Krankentransportwagen Typ B",
+      "kennzeichen": "PB-KS 1004",
+      "funkrufname": {
+        "kennwort": {
+          "code": 3
+        },
+        "eigenerStandort": false,
+        "ort": "Kreis Paderborn",
+        "teile": [
+          1200,
+          85,
+          3
+        ]
+      }
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 10,
+    "dieselLiter": 140,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": false,
+    "ruhezeitErforderlich": false
+  },
+  "sonstiges": "Sollstärke nach VüH-SanBt NRW, Version 2.1 (15.11.2024): 0/1/9/10. Träger dieser Teileinheit/dieses Moduls ist redaktionell gewählt (das Dokument nennt für den BHP 50 NRW keine Organisation je Modul, für die Einsatzeinheit NRW lässt es unterschiedliche Hilfsorganisationen je Teileinheit ausdrücklich zu), siehe README."
+}

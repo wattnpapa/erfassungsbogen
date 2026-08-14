@@ -1,0 +1,181 @@
+{
+  "schemaVersion": 8,
+  "uebung": true,
+  "stand": 3374785,
+  "einheit": {
+    "organisation": 5,
+    "organisationName": "Deutsches Rotes Kreuz Hochsauerlandkreis",
+    "einheitsTyp": {
+      "freitext": "Führungsstaffel (BHP 50 NRW)"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "BHP 50 NRW"
+        },
+        "name": "Führungsstaffel"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "DRK-Kreisverband"
+        },
+        "name": "Hochsauerlandkreis"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Untere Katastrophenschutzbehörde"
+        },
+        "name": "Hochsauerlandkreis"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2343,
+    "zeitraumBis": 2345,
+    "ortAuftrag": "MANV Meschede — Führung des Behandlungsplatzes 50 NRW"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Peter",
+      "nachname": "Kruse",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "Verbandsführer/-in"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5557996773"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Organisatorische/r Leiter/-in Rettungsdienst"
+        }
+      ]
+    },
+    {
+      "vorname": "Olaf",
+      "nachname": "Hermes",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "Leitende/r Notarzt/-ärztin (LNA)"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Leitender Notarzt"
+        }
+      ]
+    },
+    {
+      "vorname": "Volker",
+      "nachname": "Haase",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "Organisatorische/r Leiter/-in Rettungsdienst (OrgL RD)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "OrgL Rettungsdienst"
+        }
+      ]
+    },
+    {
+      "vorname": "Thomas",
+      "nachname": "Klein",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Gruppenführer/-in"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Thomas",
+      "nachname": "Wagner",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Helfer/-in Führung"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Markus",
+      "nachname": "Günther",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Helfer/-in Führung"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Gesundheits- und Krankenpfleger (Beruf)"
+        }
+      ]
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "ELW 2"
+      },
+      "aenderungen": "Einsatzleitwagen 2",
+      "kennzeichen": "HSK-KS 1009",
+      "funkrufname": {
+        "kennwort": {
+          "code": 3
+        },
+        "eigenerStandort": false,
+        "ort": "Hochsauerlandkreis",
+        "teile": [
+          1500,
+          12
+        ]
+      }
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 6,
+    "dieselLiter": 40,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": false,
+    "ruhezeitErforderlich": true
+  },
+  "sonstiges": "Sollstärke nach VüH-SanBt NRW, Version 2.1 (15.11.2024): 3/1/2/6. Träger dieser Teileinheit/dieses Moduls ist redaktionell gewählt (das Dokument nennt für den BHP 50 NRW keine Organisation je Modul, für die Einsatzeinheit NRW lässt es unterschiedliche Hilfsorganisationen je Teileinheit ausdrücklich zu), siehe README."
+}

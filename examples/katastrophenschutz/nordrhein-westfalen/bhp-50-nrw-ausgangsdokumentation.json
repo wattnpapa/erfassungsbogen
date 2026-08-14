@@ -1,0 +1,135 @@
+{
+  "schemaVersion": 8,
+  "uebung": true,
+  "stand": 3374939,
+  "einheit": {
+    "organisation": 8,
+    "organisationName": "Arbeiter-Samariter-Bund Kreis Lippe",
+    "einheitsTyp": {
+      "freitext": "Ausgangsdokumentation (BHP 50 NRW)"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "BHP 50 NRW"
+        },
+        "name": "Ausgangsdokumentation"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "ASB-Kreisverband"
+        },
+        "name": "Kreis Lippe"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Untere Katastrophenschutzbehörde"
+        },
+        "name": "Kreis Lippe"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2343,
+    "zeitraumBis": 2347,
+    "ortAuftrag": "MANV Detmold — Schnittstelle zur Transportorganisation und Patientendokumentation"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Ralf",
+      "nachname": "Winkler",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Gruppenführer/-in"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5554549769"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Torsten",
+      "nachname": "Lange",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Helfer/-in Ausgangsdokumentation"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Hendrik",
+      "nachname": "Wolf",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Helfer/-in Ausgangsdokumentation"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Melanie",
+      "nachname": "Cremer",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Helfer/-in Ausgangsdokumentation"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "ELW 1"
+      },
+      "aenderungen": "Einsatzleitwagen 1",
+      "kennzeichen": "LIP-KS 1026",
+      "funkrufname": {
+        "kennwort": {
+          "code": 6
+        },
+        "eigenerStandort": false,
+        "ort": "Kreis Lippe",
+        "teile": [
+          2300,
+          11
+        ]
+      }
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 4,
+    "dieselLiter": 40,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": false,
+    "ruhezeitErforderlich": false
+  },
+  "sonstiges": "Sollstärke nach VüH-SanBt NRW, Version 2.1 (15.11.2024): 0/1/3/4. Träger dieser Teileinheit/dieses Moduls ist redaktionell gewählt (das Dokument nennt für den BHP 50 NRW keine Organisation je Modul, für die Einsatzeinheit NRW lässt es unterschiedliche Hilfsorganisationen je Teileinheit ausdrücklich zu), siehe README."
+}

@@ -1,0 +1,139 @@
+{
+  "schemaVersion": 8,
+  "uebung": true,
+  "stand": 3377860,
+  "einheit": {
+    "organisation": 5,
+    "organisationName": "Deutsches Rotes Kreuz Kreis Soest",
+    "einheitsTyp": {
+      "freitext": "Teileinheit Führung (TE Fü) (Einsatzeinheit NRW)"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Einsatzeinheit NRW"
+        },
+        "name": "Teileinheit Führung (TE Fü)"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "DRK-Kreisverband"
+        },
+        "name": "Kreis Soest"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Untere Katastrophenschutzbehörde"
+        },
+        "name": "Kreis Soest"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2345,
+    "zeitraumBis": 2347,
+    "ortAuftrag": "Überörtliche Hilfe Soest — Führung der Einsatzeinheit NRW"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Heinz",
+      "nachname": "Lücke",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "Zugführer/-in"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5556696398"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Axel",
+      "nachname": "Hermes",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Gruppenführer/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Sprechfunker"
+        }
+      ]
+    },
+    {
+      "vorname": "Mandy",
+      "nachname": "Becker",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Führungsgehilfe/-in"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Sabine",
+      "nachname": "Fischer",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Führungsgehilfe/-in"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "KdoW"
+      },
+      "aenderungen": "Kommandowagen",
+      "kennzeichen": "SO-KS 1001",
+      "funkrufname": {
+        "kennwort": {
+          "code": 3
+        },
+        "eigenerStandort": false,
+        "ort": "Kreis Soest",
+        "teile": [
+          1100,
+          10
+        ]
+      }
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 4,
+    "dieselLiter": 40,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": true,
+    "ruhezeitErforderlich": false
+  },
+  "sonstiges": "Sollstärke nach VüH-SanBt NRW, Version 2.1 (15.11.2024): 1/1/2/4. Träger dieser Teileinheit/dieses Moduls ist redaktionell gewählt (das Dokument nennt für den BHP 50 NRW keine Organisation je Modul, für die Einsatzeinheit NRW lässt es unterschiedliche Hilfsorganisationen je Teileinheit ausdrücklich zu), siehe README."
+}
