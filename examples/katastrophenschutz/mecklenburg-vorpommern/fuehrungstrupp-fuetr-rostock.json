@@ -1,0 +1,142 @@
+{
+  "schemaVersion": 8,
+  "uebung": true,
+  "stand": 3318662,
+  "einheit": {
+    "organisation": 2,
+    "organisationName": "Feuerwehr Hanse- und Universitätsstadt Rostock",
+    "einheitsTyp": {
+      "freitext": "Führungstrupp (FüTr)"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "KSE"
+        },
+        "name": "Führungsunterstützungsgruppe (FüUstgGr)"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Untere KatS-Behörde"
+        },
+        "name": "Hanse- und Universitätsstadt Rostock"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2304,
+    "zeitraumBis": 2306,
+    "ortAuftrag": "Führung Verband Rostock — Aufbau der (Unter-)Einsatzabschnittsleitung"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Matthias",
+      "nachname": "Garbe",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "Führungskraft (Leitung FüTr)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5556157060"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Funkamateur (extern)"
+        }
+      ]
+    },
+    {
+      "vorname": "Kay",
+      "nachname": "Sommer",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "Führungskraft S2 (Lage)"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5554943415"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungssanitäter (extern)"
+        }
+      ]
+    },
+    {
+      "vorname": "Ronny",
+      "nachname": "Bauer",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "Führungskraft S3 (Einsatz)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Wolfgang",
+      "nachname": "Schröder",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "Führungskraft S1/4/6 (Sachgebiete)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "ELW 1"
+      },
+      "aenderungen": "Einsatzleitwagen 1",
+      "kennzeichen": "HRO-2001",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Rostock",
+        "teile": [
+          1
+        ]
+      }
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 4,
+    "dieselLiter": 70,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": true,
+    "ruhezeitErforderlich": false
+  },
+  "sonstiges": "Sollstärke 4/0/0/4 (Führer/Unterführer/Mannschaft/Gesamt) nach LPBK M-V, Festlegungen zu den Grundstrukturen im KatS M-V v. 15.03.2020, Erlass Nr. 4.2.1, Abb. 1 — Teileinheit von Führungsunterstützungsgruppe (FüUstgGr) — 4/1/2/7. Funkrufname mit fiktiver, rein fortlaufender Ordnungsnummer — für M-V konnte kein amtlicher OPTA-/Kennzahlenkatalog verifiziert werden."
+}

@@ -1,0 +1,124 @@
+{
+  "schemaVersion": 8,
+  "uebung": true,
+  "stand": 3315726,
+  "einheit": {
+    "organisation": 2,
+    "organisationName": "Feuerwehr Landkreis Nordwestmecklenburg",
+    "einheitsTyp": {
+      "freitext": "Logistiktrupp 1 (LogTr1)"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "KSE"
+        },
+        "name": "Logistikgruppe (LogGr)"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Untere KatS-Behörde"
+        },
+        "name": "Landkreis Nordwestmecklenburg"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2302,
+    "zeitraumBis": 2304,
+    "ortAuftrag": "Stromausfall Grevesmühlen — Ersatzstromversorgung für ausgewählte Verbraucher"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Peter",
+      "nachname": "Voß",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Truppführer/-in"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5554845610"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Torsten",
+      "nachname": "Kähler",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Elektrofachkraft"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Elektrofachkraft (Beruf)"
+        }
+      ]
+    },
+    {
+      "vorname": "Daniel",
+      "nachname": "Retzlaff",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Technikhelfer/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "GW-KatS"
+      },
+      "aenderungen": "Gerätewagen Katastrophenschutz",
+      "kennzeichen": "NWM-2014",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Grevesmühlen",
+        "teile": [
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "NEA"
+      },
+      "aenderungen": "Netzersatzanlage",
+      "kennzeichen": "Anh NEA"
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 3,
+    "dieselLiter": 70,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": true,
+    "ruhezeitErforderlich": false
+  },
+  "sonstiges": "Sollstärke 0/1/2/3 (Führer/Unterführer/Mannschaft/Gesamt) nach LPBK M-V, Festlegungen zu den Grundstrukturen im KatS M-V v. 15.03.2020, Erlass Nr. 4.5, Abb. 5 — Teileinheit von Logistikgruppe (LogGr) — 0/2/4/6. Funkrufname mit fiktiver, rein fortlaufender Ordnungsnummer — für M-V konnte kein amtlicher OPTA-/Kennzahlenkatalog verifiziert werden."
+}

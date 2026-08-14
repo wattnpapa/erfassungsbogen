@@ -58,6 +58,7 @@ const SEITEN: Record<string, string> = {
   "katastrophenschutz-thueringen.html": "0.6",
   "katastrophenschutz-baden-wuerttemberg.html": "0.6",
   "katastrophenschutz-rheinland-pfalz.html": "0.6",
+  "katastrophenschutz-mecklenburg-vorpommern.html": "0.6",
   "meldekopf.html": "0.7",
   "papier-oder-digital.html": "0.6",
   "impressum.html": "0.3",

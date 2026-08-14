@@ -1,0 +1,146 @@
+{
+  "schemaVersion": 8,
+  "uebung": true,
+  "stand": 3315594,
+  "einheit": {
+    "organisation": 6,
+    "organisationName": "Johanniter-Unfall-Hilfe Landeshauptstadt Schwerin",
+    "einheitsTyp": {
+      "freitext": "PSNV-Trupp Betroffene (PSNV-B-Tr)"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "KSE"
+        },
+        "name": "PSNV-Trupp Betroffene (PSNV-B-Tr)"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "JUH-Kreisverband"
+        },
+        "name": "Schwerin"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Untere KatS-Behörde"
+        },
+        "name": "Landeshauptstadt Schwerin"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2302,
+    "zeitraumBis": 2303,
+    "ortAuftrag": "Schadenslage Schwerin — psychosoziale Notfallversorgung Betroffener"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Torsten",
+      "nachname": "Becker",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Gruppenführer/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5554129722"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Steffen",
+      "nachname": "Struck",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "PSNV-Kraft (Betroffene)"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "PSNV-Ausbildung"
+        }
+      ]
+    },
+    {
+      "vorname": "Daniel",
+      "nachname": "Struck",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "PSNV-Kraft (Betroffene)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "PSNV-Ausbildung"
+        }
+      ]
+    },
+    {
+      "vorname": "Uwe",
+      "nachname": "Neumann",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "PSNV-Kraft (Betroffene)"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "PSNV-Ausbildung"
+        }
+      ]
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "MTW-PSNV"
+      },
+      "aenderungen": "Mannschaftstransportwagen Psychosoziale Notfallversorgung",
+      "kennzeichen": "SN-2016",
+      "funkrufname": {
+        "kennwort": {
+          "code": 4
+        },
+        "eigenerStandort": false,
+        "ort": "Schwerin",
+        "teile": [
+          1
+        ]
+      }
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 4,
+    "dieselLiter": 45,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": false,
+    "ruhezeitErforderlich": false
+  },
+  "sonstiges": "Sollstärke 0/1/3/4 (Führer/Unterführer/Mannschaft/Gesamt) nach LPBK M-V, Festlegungen zu den Grundstrukturen im KatS M-V v. 15.03.2020, Erlass Nr. 4.6.1, Abb. 6 — Teileinheit von PSNV-Trupp Betroffene (PSNV-B-Tr) — 0/1/3/4. Funkrufname mit fiktiver, rein fortlaufender Ordnungsnummer — für M-V konnte kein amtlicher OPTA-/Kennzahlenkatalog verifiziert werden."
+}
