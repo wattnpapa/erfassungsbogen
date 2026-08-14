@@ -1,0 +1,117 @@
+{
+  "schemaVersion": 8,
+  "uebung": true,
+  "stand": 3394877,
+  "einheit": {
+    "organisation": 2,
+    "organisationName": "Berliner Feuerwehr",
+    "einheitsTyp": {
+      "freitext": "Schlauchtrupp (Feuerwehr-Bereitschaft (FwB))"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Fachdienst Brandschutzdienst"
+        },
+        "name": "Feuerwehr-Bereitschaft (FwB)"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Bezirk"
+        },
+        "name": "Lichtenberg"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2357,
+    "zeitraumBis": 2358,
+    "ortAuftrag": "Großbrand Lichtenberg — Löschwasserförderung über lange Wegstrecke"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Nico",
+      "nachname": "Thiele",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Truppführer/-in"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5555836512"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Atemschutzgeräteträger"
+        }
+      ]
+    },
+    {
+      "vorname": "Bernd",
+      "nachname": "Reimann",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kraftfahrer/-in"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 2,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Ralf",
+      "nachname": "Günther",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Helfer/-in Schlauchtrupp"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "SW KatS"
+      },
+      "aenderungen": "Schlauchwagen Katastrophenschutz",
+      "kennzeichen": "B-KatS 1012",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Lichtenberg",
+        "teile": [
+          2100
+        ]
+      }
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 3,
+    "dieselLiter": 90,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": false,
+    "ruhezeitErforderlich": true
+  },
+  "sonstiges": "Einfache Besetzung nach KatSD-VO Berlin, Anlage zu § 8: 0/1/2/3. Landesweit 12 Teileinheiten dieses Typs (12 Fahrzeuge), 72 Helfer bei doppelter Besetzung laut Anlage. Träger dieser Teileinheit ist redaktionell gewählt (die Verordnung nennt außer für den Brandschutzdienst keinen Träger je Teileinheit), siehe README."
+}

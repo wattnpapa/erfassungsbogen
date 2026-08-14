@@ -1,0 +1,128 @@
+{
+  "schemaVersion": 8,
+  "uebung": true,
+  "stand": 3395351,
+  "einheit": {
+    "organisation": 2,
+    "organisationName": "Berliner Feuerwehr",
+    "einheitsTyp": {
+      "freitext": "Erkundungs-Trupp (ABC-Dienst (landesweit))"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Fachdienst ABC-Dienst"
+        },
+        "name": "ABC-Dienst (landesweit)"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Bezirk"
+        },
+        "name": "Friedrichshain-Kreuzberg"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2357,
+    "zeitraumBis": 2359,
+    "ortAuftrag": "ABC-Gefahrenlage Friedrichshain-Kreuzberg — Erkunden, Spüren und Messen kontaminierter Bereiche"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Carsten",
+      "nachname": "Riedel",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Truppführer/-in"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5557239829"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Axel",
+      "nachname": "Görlitz",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kraftfahrer/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 2,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Sven",
+      "nachname": "Marquardt",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Helfer/-in Erkundung"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Robert",
+      "nachname": "Hempel",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Helfer/-in Erkundung"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "ABC-ErkKW"
+      },
+      "aenderungen": "ABC-Erkundungskraftwagen",
+      "kennzeichen": "B-KatS 1002",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Friedrichshain-Kreuzberg",
+        "teile": [
+          1200
+        ]
+      }
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 4,
+    "dieselLiter": 40,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": false,
+    "ruhezeitErforderlich": false
+  },
+  "sonstiges": "Einfache Besetzung nach KatSD-VO Berlin, Anlage zu § 8: 0/1/3/4. Landesweit 14 Teileinheiten dieses Typs (14 Fahrzeuge), 112 Helfer bei doppelter Besetzung laut Anlage. Träger dieser Teileinheit ist redaktionell gewählt (die Verordnung nennt außer für den Brandschutzdienst keinen Träger je Teileinheit), siehe README."
+}
