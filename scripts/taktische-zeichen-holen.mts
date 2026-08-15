@@ -69,6 +69,27 @@ const ORDNER = [
   "Zoll_Einheiten",
 ];
 
+/**
+ * Tippfehler der Quellsammlung, die nur im Dateinamen stecken. Der Schlüssel
+ * wird beim Einlesen korrigiert, damit eine Suche im Quelltext nach dem richtig
+ * geschriebenen Namen das Zeichen auch findet — sonst geht der Grep ins Leere.
+ * Die Zuordnung in src/app/taktische-zeichen.ts benutzt die korrigierte Form.
+ *
+ * Räumt die Sammlung den Tippfehler in einem späteren Release selbst auf, greift
+ * die Ersetzung schlicht nicht mehr und der Eintrag kann hier entfallen.
+ */
+const SCHLUESSEL_KORREKTUR: [string, string][] = [
+  // „Wassser" mit drei s; der <title> derselben Datei schreibt es korrekt.
+  ["FGr_Wassserschaden-Pumpen", "FGr_Wasserschaden-Pumpen"],
+];
+
+function schluesselKorrigieren(schluessel: string): string {
+  for (const [falsch, richtig] of SCHLUESSEL_KORREKTUR) {
+    if (schluessel.includes(falsch)) return schluessel.replace(falsch, richtig);
+  }
+  return schluessel;
+}
+
 function aufbereiten(roh: string): { svg: string; titel: string } {
   const titel = roh.match(/<title>([\s\S]*?)<\/title>/)?.[1].trim() ?? "";
   let svg = roh
@@ -101,7 +122,7 @@ try {
       continue;
     }
     for (const datei of dateien) {
-      const schluessel = `${ordner}/${datei.replace(/\.svg$/, "")}`;
+      const schluessel = schluesselKorrigieren(`${ordner}/${datei.replace(/\.svg$/, "")}`);
       const roh = readFileSync(join(pfad, datei), "utf8");
       const { svg, titel: t } = aufbereiten(roh);
       symbole.push([schluessel, svg]);

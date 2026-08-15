@@ -293,8 +293,10 @@ export const THW_FAHRZEUG_ZEICHEN: Record<number, string> = {
 /**
  * THW-Einheitstyp (Code aus THW_EINHEITSTYPEN) → Zeichen in THW_Einheiten.
  * Die Ortungs-Typen der Sammlung heißen nach ihrer Ausstattung: (A) ist
- * biologisch und technisch, (B) biologisch, (C) technisch. Der Dateiname
- * „Wassserschaden" ist ein Tippfehler der Sammlung und bleibt so stehen.
+ * biologisch und technisch, (B) biologisch, (C) technisch. Die Dateinamen der
+ * Fachgruppe Wasserschaden/Pumpen schreibt die Sammlung mit drei s; der
+ * Tippfehler wird beim Holen in scripts/taktische-zeichen-holen.mts begradigt
+ * (SCHLUESSEL_KORREKTUR), hier steht deshalb die richtige Schreibweise.
  */
 export const THW_EINHEIT_ZEICHEN: Record<number, string> = {
   1: "Media_Team",
@@ -323,9 +325,9 @@ export const THW_EINHEIT_ZEICHEN: Record<number, string> = {
   24: "FGr_Infrastruktur",
   25: "FGr_Elektroversorgung",
   26: "FGr_Trinkwasser",
-  27: "FGr_Wassserschaden-Pumpen_A",
-  28: "FGr_Wassserschaden-Pumpen_B",
-  29: "FGr_Wassserschaden-Pumpen_C",
+  27: "FGr_Wasserschaden-Pumpen_A",
+  28: "FGr_Wasserschaden-Pumpen_B",
+  29: "FGr_Wasserschaden-Pumpen_C",
   30: "FGr_Ölschaden_A",
   31: "FGr_Ölschaden_B",
   32: "FGr_Ölschaden_C",
