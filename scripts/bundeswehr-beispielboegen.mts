@@ -67,6 +67,47 @@
  *    RESQ63/RESQ87 stammen aus der Rechercheliste des Nutzers und decken sich
  *    mit den in Presseartikeln genannten Rufzeichen "RESCUE 41/63/87".
  *
+ * PIONIERTRUPPE (Panzerpionierzug, Schwimmbrückenzug M3, Pioniermaschinenzug)
+ * — Ergänzung vom 15.08.2026, auf Nutzerwunsch ("Hochwassereinsätze/
+ * Katastrophenschutz"). Anders als bei KVK/BVK und SAR-Kommando gibt es für
+ * die Pioniertruppe KEINE öffentlich belegte Dienstposten-/Funktionsliste des
+ * ganzen Zuges — nur einzelne, für sich genommen belegte Eckdaten:
+ *   - Panzerpionierzug: bundeswehr.de "Zugführer eines Pionierzuges"
+ *     (https://www.bundeswehr.de/de/auftrag/einsaetze/missionen/ich-bin-im-einsatz/efp-zugfuehrer-pioniere-5787548),
+ *     Zitat: "Meine 43 Soldatinnen und Soldaten stellen unter meiner Führung
+ *     die Pionierunterstützung für die erste Kampfkompanie sicher." Gerät
+ *     laut selber Quelle: Transportpanzer Fuchs, Pionierpanzer Dachs,
+ *     Brückenlegepanzer Leguan, Minenverlegesystem 85, Walzen-/Radlader.
+ *     Die Aufteilung der 43 Dienstposten auf Zugtrupp/Gruppen ist NICHT
+ *     Teil der Quelle und daher hier eine plausible, aber erfundene
+ *     Strukturskizze (Zugführer, Zugtruppführer + Kraftfahrer, 3 Gruppen)
+ *     — siehe `sonstiges` im Bogen für den expliziten Hinweis.
+ *   - Schwimmbrückenzug (M3): bundeswehr.de "Schwimmschnellbrücke Amphibie
+ *     M3" (https://www.bundeswehr.de/de/ausruestung-technik-bundeswehr/landsysteme-bundeswehr/schwimmschnellbruecke-amphibie-m3),
+ *     Zitat: "Mit nur drei Mann Besatzung wird aus der schwimmenden Amphibie
+ *     ein Teil einer Schwimmbrücke oder Fähre" (Funktionen: Landfahrer,
+ *     Wasserfahrer, Schwimmbrückenpionier) und "Eine 100 Meter lange
+ *     Schwimmbrücke wird mit acht Amphibien in weniger als 20 Minuten
+ *     gebaut." → 8 Fahrzeuge × 3 Besatzung = 24 Personen, quellenscharf.
+ *     Nur die Zugführung (1 Person) ist strukturell ergänzt, nicht
+ *     einzelquellenbelegt. Das M3-Fahrzeug wird laut Quelle für "Rad- und
+ *     Kettenfahrzeugen einen schnellen Übergang über mittlere bis breite
+ *     Gewässer" eingesetzt — Hochwasser wird auf der Seite nicht wörtlich
+ *     genannt, ist aber ein Standardanwendungsfall für Fährbetrieb bei
+ *     überfluteten Straßen/Brücken.
+ *   - Pioniermaschinenzug: Wikipedia "Panzerpioniere (Bundeswehr)" nennt für
+ *     die 4. Kompanie (Pioniermaschinenkompanie) eines Panzerpionier­
+ *     bataillons u. a. einen "Pioniermaschinenzug mit ungepanzerten
+ *     Erdbaumaschinen wie Baggern und Radladern" sowie einen
+ *     Faltfestbrückenzug — ohne Personalstärke. Die hier verwendete
+ *     Zugstärke (24) ist NICHT quellenbelegt, sondern eine grobe Schätzung
+ *     in der Größenordnung der beiden anderen (sourced) Pionierzüge; das
+ *     steht ausdrücklich in `sonstiges`.
+ * Alle drei Bögen bilden — wie KVK/BVK/SAR — die REALE Stehende-Struktur
+ * fiktiv in der Hochwasserlage Moorwehde/Moorgau ab (Bataillonsbezeichnung
+ * "Panzerpionierbataillon 700" ist frei erfunden, um keine reale
+ * Truppenteil-Nummer mit erfundenem Personal zu verknüpfen).
+ *
  * MODELLIERUNGSENTSCHEIDUNG FUNKRUFNAME: Militärische Rufnamen folgen keinem
  * Landes-Funkrufname-Schema wie bei BOS-Fahrzeugen (Kennwort + Ort + Kennzahl,
  * siehe Funkrufname in src/model.ts). Für die SAR-Hubschrauber wird das Feld
@@ -221,6 +262,20 @@ function hierarchieVerbindungskommando(ebene: "KVK" | "BVK"): HierarchieEbene[] 
           email: "bvk-moorgau@bundeswehr.example",
         },
       ];
+}
+
+const PIONIERBATAILLON = "Panzerpionierbataillon 700 (fiktiv)"; // frei erfunden, s. Kopfkommentar
+
+function hierarchiePionier(kompanie: string): HierarchieEbene[] {
+  return [
+    { bezeichnung: { freitext: "Zug" }, name: kompanie },
+    {
+      bezeichnung: { freitext: "Panzerpionierbataillon" },
+      name: PIONIERBATAILLON,
+      telefon: fakeTelefon("05119876520"),
+      email: "stab@pzpibtl700.bundeswehr.example",
+    },
+  ];
 }
 
 function hierarchieSar(standort: string): HierarchieEbene[] {
@@ -403,6 +458,154 @@ function sarKommando(opt: { datei: string; standort: string; rufzeichen: number;
   };
 }
 
+// -------------------------------------------------------------- Pioniertruppe
+// Siehe Kopfkommentar für die Quellenlage je Zugtyp.
+
+let fahrzeugNr = 1;
+function pionierFahrzeug(typ: string, aenderungen?: string): Fahrzeug {
+  const kennung = `HEER-${String(1000 + fahrzeugNr++)}`; // fiktiv, kein militärisches Kennzeichenschema öffentlich modelliert
+  return { typ: { freitext: typ }, kennzeichen: kennung, stanKonform: true, ...(aenderungen ? { aenderungen } : {}) };
+}
+
+/**
+ * Panzerpionierzug — 43 Dienstposten laut bundeswehr.de (siehe Kopfkommentar).
+ * Aufteilung Zugtrupp/Gruppen ist NICHT quellenbelegt (erfundene Skizze).
+ */
+function panzerpionierzug(): Bauplan {
+  const personal: Person[] = [
+    person({ rolle: R.FUEHRER, funktion: "Zugführer Panzerpionierzug", fe: FE.C, kontakt: true }),
+    person({ rolle: R.UNTERFUEHRER, funktion: "Zugtruppführer (stv. Zugführer)", fe: FE.C }),
+    person({ rolle: R.MANNSCHAFT, funktion: "Kraftfahrer Zugtrupp", fe: FE.C }),
+  ];
+  let rest = 43 - personal.length; // 40, auf 3 Gruppen verteilen
+  for (let g = 1; g <= 3; g++) {
+    const groesse = g < 3 ? Math.ceil(rest / (4 - g)) : rest;
+    rest -= groesse;
+    personal.push(person({ rolle: R.UNTERFUEHRER, funktion: `Gruppenführer ${g}. Gruppe`, fe: FE.C }));
+    for (let i = 1; i < groesse; i++) {
+      personal.push(
+        person({
+          rolle: R.MANNSCHAFT,
+          funktion: i % 3 === 0 ? `Kraftfahrer ${g}. Gruppe` : `Pionier ${g}. Gruppe`,
+          fe: i % 3 === 0 ? FE.C : FE.B,
+        }),
+      );
+    }
+  }
+  return {
+    datei: "panzerpionierzug",
+    einheitsTyp: "Panzerpionierzug",
+    personal,
+    fahrzeuge: [
+      pionierFahrzeug("Transportpanzer Fuchs"),
+      pionierFahrzeug("Transportpanzer Fuchs"),
+      pionierFahrzeug("Pionierpanzer Dachs", "Räum-/Grabarbeiten, Dammsicherung"),
+      pionierFahrzeug("Brückenlegepanzer Leguan", "Überbrückung unterspülter Wege"),
+      pionierFahrzeug("Radlader"),
+    ],
+    hierarchie: hierarchiePionier("Panzerpionierzug"),
+    einsatzOrt:
+      "Hochwasserlage im Landkreis Moorwehde — Herstellen/Sichern von Deichübergängen, " +
+      "Räumen unterspülter Wege und Beseitigen von Hindernissen im Zufahrtsbereich der " +
+      "zivilen Einsatzkräfte, Bau eines Behelfsübergangs mit dem Brückenlegepanzer.",
+    sonstiges:
+      `Zugstärke (43) laut bundeswehr.de „Zugführer eines Pionierzuges": „Meine 43 ` +
+      `Soldatinnen und Soldaten stellen unter meiner Führung die Pionierunterstützung […] ` +
+      `sicher." Ausrüstung laut derselben Quelle (Transportpanzer Fuchs, Pionierpanzer ` +
+      `Dachs, Brückenlegepanzer Leguan, Minenverlegesystem 85, Walzen-/Radlader). Die ` +
+      `Aufteilung in Zugtrupp und 3 Gruppen ist NICHT Teil der Quelle, sondern eine ` +
+      `plausible, aber erfundene Strukturskizze (keine veröffentlichte Zug-STAN).`,
+  };
+}
+
+/**
+ * Schwimmbrückenzug (M3) — Besatzung 3/Fahrzeug (Landfahrer, Wasserfahrer,
+ * Schwimmbrückenpionier), 8 Fahrzeuge für eine 100-m-Brücke = 24 Personen,
+ * beides wörtlich bundeswehr.de-belegt (siehe Kopfkommentar). Nur die
+ * Zugführung (1 Person) ist strukturell ergänzt.
+ */
+function schwimmbrueckenzug(): Bauplan {
+  const personal: Person[] = [
+    person({ rolle: R.FUEHRER, funktion: "Zugführer Schwimmbrückenzug", fe: FE.C, kontakt: true }),
+  ];
+  const fahrzeuge: Fahrzeug[] = [];
+  for (let i = 1; i <= 8; i++) {
+    personal.push(
+      person({ rolle: R.UNTERFUEHRER, funktion: `Landfahrer M3 Nr. ${i}`, fe: FE.C }),
+      person({ rolle: R.MANNSCHAFT, funktion: `Wasserfahrer M3 Nr. ${i}`, fe: FE.C }),
+      person({ rolle: R.MANNSCHAFT, funktion: `Schwimmbrückenpionier M3 Nr. ${i}`, fe: FE.B }),
+    );
+    fahrzeuge.push(pionierFahrzeug("Amphibisches Brücken- und Übersetzfahrzeug M3", i === 1 ? "Teil einer 100-m-Schwimmbrücke/Fähre" : undefined));
+  }
+  return {
+    datei: "schwimmbrueckenzug-m3",
+    einheitsTyp: "Schwimmbrückenzug (M3)",
+    personal,
+    fahrzeuge,
+    hierarchie: hierarchiePionier("Schwimmbrückenzug (M3)"),
+    einsatzOrt:
+      "Hochwasserlage im Landkreis Moorwehde — Fährbetrieb über eine überflutete " +
+      "Kreisstraße zur Versorgung eines abgeschnittenen Ortsteils sowie Bau einer " +
+      "100-m-Schwimmbrücke für den Rad- und Kettenfahrzeugverkehr der Einsatzkräfte, " +
+      "nachdem eine Behelfsbrücke unterspült wurde.",
+    sonstiges:
+      `Quelle bundeswehr.de „Schwimmschnellbrücke Amphibie M3": „Mit nur drei Mann ` +
+      `Besatzung wird aus der schwimmenden Amphibie ein Teil einer Schwimmbrücke oder ` +
+      `Fähre" (Landfahrer, Wasserfahrer, Schwimmbrückenpionier) und „Eine 100 Meter ` +
+      `lange Schwimmbrücke wird mit acht Amphibien in weniger als 20 Minuten gebaut." ` +
+      `→ 8 × 3 = 24 Personen, quellenscharf. Nur die Zugführung (1 Person) ist ` +
+      `strukturell ergänzt, nicht einzelquellenbelegt. Hochwasser ist auf der ` +
+      `Bundeswehr-Seite nicht wörtlich als Einsatzfall genannt, aber Standard-` +
+      `Anwendungsfall für Fährbetrieb bei überfluteten Wegen/Brücken.`,
+  };
+}
+
+/**
+ * Pioniermaschinenzug — Kompanie-Gliederung laut Wikipedia „Panzerpioniere
+ * (Bundeswehr)" ("Pioniermaschinenzug mit ungepanzerten Erdbaumaschinen wie
+ * Baggern und Radladern"), Personalstärke NICHT quellenbelegt (Schätzung).
+ */
+function pioniermaschinenzug(): Bauplan {
+  const personal: Person[] = [
+    person({ rolle: R.FUEHRER, funktion: "Zugführer Pioniermaschinenzug", fe: FE.C, kontakt: true }),
+    person({ rolle: R.UNTERFUEHRER, funktion: "Zugtruppführer (stv. Zugführer)", fe: FE.C }),
+  ];
+  for (let i = 1; i <= 8; i++) {
+    personal.push(person({ rolle: R.UNTERFUEHRER, funktion: `Pioniermaschinenführer Bagger ${i}`, fe: FE.C }));
+    personal.push(person({ rolle: R.MANNSCHAFT, funktion: `Kraftfahrer/Einweiser ${i}`, fe: FE.C }));
+  }
+  personal.push(
+    person({ rolle: R.MANNSCHAFT, funktion: "Bohrgerätebediener Faltfestbrückenzug", fe: FE.C }),
+    person({ rolle: R.MANNSCHAFT, funktion: "Kraftfahrer Faltfestbrückentransporter", fe: FE.C }),
+  );
+  return {
+    datei: "pioniermaschinenzug",
+    einheitsTyp: "Pioniermaschinenzug",
+    personal,
+    fahrzeuge: [
+      pionierFahrzeug("Bagger (Pioniermaschine)", "Deichverstärkung, Dammbau"),
+      pionierFahrzeug("Bagger (Pioniermaschine)", "Deichverstärkung, Dammbau"),
+      pionierFahrzeug("Radlader"),
+      pionierFahrzeug("Radlader"),
+      pionierFahrzeug("Faltfestbrücke (Transportfahrzeug)"),
+    ],
+    hierarchie: hierarchiePionier("Pioniermaschinenzug"),
+    einsatzOrt:
+      "Hochwasserlage im Landkreis Moorwehde — Deichverstärkung und Dammbau mit " +
+      "Erdbaumaschinen entlang des gefährdeten Flussabschnitts, Unterstützung beim " +
+      "Verlegen einer Faltfestbrücke als Ersatz für einen gesperrten Kreisverkehrsweg.",
+    sonstiges:
+      `Kompanie-Gliederung laut Wikipedia „Panzerpioniere (Bundeswehr)": Die ` +
+      `Pioniermaschinenkompanie eines Panzerpionierbataillons enthält u. a. einen ` +
+      `„Pioniermaschinenzug mit ungepanzerten Erdbaumaschinen wie Baggern und ` +
+      `Radladern" sowie einen Faltfestbrückenzug. Anders als beim Panzerpionierzug ` +
+      `(43, bundeswehr.de) und dem Schwimmbrückenzug M3 (24, bundeswehr.de) ist für ` +
+      `diesen Zugtyp KEINE Personalstärke veröffentlicht — die hier angesetzten 20 ` +
+      `Dienstposten sind eine grobe Schätzung in vergleichbarer Größenordnung, keine ` +
+      `Quellenangabe.`,
+  };
+}
+
 // ------------------------------------------------------------------ Bögen
 
 const baeuplane: Bauplan[] = [
@@ -427,6 +630,9 @@ const baeuplane: Bauplan[] = [
   sarKommando({ datei: "sar-kommando-noervenich", standort: "Nörvenich", rufzeichen: 41 }),
   sarKommando({ datei: "sar-kommando-niederstetten", standort: "Niederstetten", rufzeichen: 63, mitBergrettung: true }),
   sarKommando({ datei: "sar-kommando-holzdorf-schoenewalde", standort: "Holzdorf/Schönewalde", rufzeichen: 87 }),
+  panzerpionierzug(),
+  schwimmbrueckenzug(),
+  pioniermaschinenzug(),
 ];
 
 // ------------------------------------------------------------- QR-Erzeugung
@@ -567,8 +773,25 @@ mit Einzelnachweis auf bundeswehr.de) belegt:
 - **SAR-Kommando (Heer) Nörvenich/Niederstetten/Holzdorf-Schönewalde:**
   Hubschrauber-Crew mit 2 Hubschrauberführern + 1 Luftrettungsmeister (HHO).
 
+Für die **Pioniertruppe** (Ergänzung 2026-08, Hochwasser-/Katastrophenschutz-Bezug)
+gibt es keine vergleichbare Dienstposten-Gesamtliste, aber einzelne belegte
+Eckdaten auf bundeswehr.de:
+
+- **Panzerpionierzug:** 43 Dienstposten laut bundeswehr.de-Karriereportal
+  ("Zugführer eines Pionierzuges"); die Aufteilung in Zugtrupp/Gruppen ist
+  eine erfundene, aber plausible Strukturskizze.
+- **Schwimmbrückenzug (M3):** Besatzung 3/Fahrzeug (Landfahrer, Wasserfahrer,
+  Schwimmbrückenpionier) × 8 Fahrzeuge für eine 100-m-Brücke = 24 Personen,
+  beides wörtlich bundeswehr.de-belegt; nur die Zugführung ist ergänzt.
+- **Pioniermaschinenzug:** Kompanie-Gliederung laut Wikipedia
+  ("Pioniermaschinenzug mit … Baggern und Radladern"), Personalstärke (20)
+  mangels Quelle geschätzt.
+
 Quellen: [Wikipedia „Verbindungskommando"](https://de.wikipedia.org/wiki/Verbindungskommando),
-[Wikipedia „SAR-Dienst für Luftfahrzeuge in Deutschland"](https://de.wikipedia.org/wiki/SAR-Dienst_f%C3%BCr_Luftfahrzeuge_in_Deutschland).
+[Wikipedia „SAR-Dienst für Luftfahrzeuge in Deutschland"](https://de.wikipedia.org/wiki/SAR-Dienst_f%C3%BCr_Luftfahrzeuge_in_Deutschland),
+[bundeswehr.de „Zugführer eines Pionierzuges"](https://www.bundeswehr.de/de/auftrag/einsaetze/missionen/ich-bin-im-einsatz/efp-zugfuehrer-pioniere-5787548),
+[bundeswehr.de „Schwimmschnellbrücke Amphibie M3"](https://www.bundeswehr.de/de/ausruestung-technik-bundeswehr/landsysteme-bundeswehr/schwimmschnellbruecke-amphibie-m3),
+[Wikipedia „Panzerpioniere (Bundeswehr)"](https://de.wikipedia.org/wiki/Panzerpioniere_(Bundeswehr)).
 
 **Anders als die KatS-StAN der Länder oder das BBK-Rahmenkonzept MTF ist hier
 KEINE vollständige Personalstärke je Einheit dokumentiert** — die Bögen bilden

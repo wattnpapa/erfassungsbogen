@@ -1,0 +1,484 @@
+{
+  "schemaVersion": 8,
+  "uebung": true,
+  "stand": 3044700,
+  "einheit": {
+    "organisation": 10,
+    "einheitsTyp": {
+      "freitext": "Schwimmbrückenzug (M3)"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Zug"
+        },
+        "name": "Schwimmbrückenzug (M3)"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Panzerpionierbataillon"
+        },
+        "name": "Panzerpionierbataillon 700 (fiktiv)",
+        "telefon": "5554305341",
+        "email": "stab@pzpibtl700.bundeswehr.example"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2140,
+    "zeitraumBis": 2142,
+    "ortAuftrag": "Hochwasserlage im Landkreis Moorwehde — Fährbetrieb über eine überflutete Kreisstraße zur Versorgung eines abgeschnittenen Ortsteils sowie Bau einer 100-m-Schwimmbrücke für den Rad- und Kettenfahrzeugverkehr der Einsatzkräfte, nachdem eine Behelfsbrücke unterspült wurde."
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Tanja",
+      "nachname": "Freytag",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "Zugführer Schwimmbrückenzug"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 1,
+      "ernaehrung": 2,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5554614492"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Ute",
+      "nachname": "Vogt",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Landfahrer M3 Nr. 1"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Steffen",
+      "nachname": "Quast",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Wasserfahrer M3 Nr. 1"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Hannah",
+      "nachname": "Ehlers",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Schwimmbrückenpionier M3 Nr. 1"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Lennart",
+      "nachname": "Quast",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Landfahrer M3 Nr. 2"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Franziska",
+      "nachname": "Ohlmann",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Wasserfahrer M3 Nr. 2"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Karsten",
+      "nachname": "Vogt",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Schwimmbrückenpionier M3 Nr. 2"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Volker",
+      "nachname": "Ahrens",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Landfahrer M3 Nr. 3"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Volker",
+      "nachname": "Quast",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Wasserfahrer M3 Nr. 3"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Benedikt",
+      "nachname": "Wiechers",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Schwimmbrückenpionier M3 Nr. 3"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Gunnar",
+      "nachname": "Sievers",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Landfahrer M3 Nr. 4"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Ingo",
+      "nachname": "Tietjen",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Wasserfahrer M3 Nr. 4"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Hendrik",
+      "nachname": "Vogt",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Schwimmbrückenpionier M3 Nr. 4"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Jonas",
+      "nachname": "Nolte",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Landfahrer M3 Nr. 5"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Isabell",
+      "nachname": "Quast",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Wasserfahrer M3 Nr. 5"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Hendrik",
+      "nachname": "Petersen",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Schwimmbrückenpionier M3 Nr. 5"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Carsten",
+      "nachname": "Isernhagen",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Landfahrer M3 Nr. 6"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Jonas",
+      "nachname": "Ohlmann",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Wasserfahrer M3 Nr. 6"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Franziska",
+      "nachname": "Vogt",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Schwimmbrückenpionier M3 Nr. 6"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Thorsten",
+      "nachname": "Sievers",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Landfahrer M3 Nr. 7"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Erik",
+      "nachname": "Isernhagen",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Wasserfahrer M3 Nr. 7"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Katrin",
+      "nachname": "Wiechers",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Schwimmbrückenpionier M3 Nr. 7"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Jonas",
+      "nachname": "Grote",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Landfahrer M3 Nr. 8"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Ute",
+      "nachname": "Wiechers",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Wasserfahrer M3 Nr. 8"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Hendrik",
+      "nachname": "Reimers",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Schwimmbrückenpionier M3 Nr. 8"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "Amphibisches Brücken- und Übersetzfahrzeug M3"
+      },
+      "kennzeichen": "HEER-1006",
+      "stanKonform": true,
+      "aenderungen": "Teil einer 100-m-Schwimmbrücke/Fähre"
+    },
+    {
+      "typ": {
+        "freitext": "Amphibisches Brücken- und Übersetzfahrzeug M3"
+      },
+      "kennzeichen": "HEER-1007",
+      "stanKonform": true
+    },
+    {
+      "typ": {
+        "freitext": "Amphibisches Brücken- und Übersetzfahrzeug M3"
+      },
+      "kennzeichen": "HEER-1008",
+      "stanKonform": true
+    },
+    {
+      "typ": {
+        "freitext": "Amphibisches Brücken- und Übersetzfahrzeug M3"
+      },
+      "kennzeichen": "HEER-1009",
+      "stanKonform": true
+    },
+    {
+      "typ": {
+        "freitext": "Amphibisches Brücken- und Übersetzfahrzeug M3"
+      },
+      "kennzeichen": "HEER-1010",
+      "stanKonform": true
+    },
+    {
+      "typ": {
+        "freitext": "Amphibisches Brücken- und Übersetzfahrzeug M3"
+      },
+      "kennzeichen": "HEER-1011",
+      "stanKonform": true
+    },
+    {
+      "typ": {
+        "freitext": "Amphibisches Brücken- und Übersetzfahrzeug M3"
+      },
+      "kennzeichen": "HEER-1012",
+      "stanKonform": true
+    },
+    {
+      "typ": {
+        "freitext": "Amphibisches Brücken- und Übersetzfahrzeug M3"
+      },
+      "kennzeichen": "HEER-1013",
+      "stanKonform": true
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 25,
+    "dieselLiter": 0,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": false,
+    "ruhezeitErforderlich": false
+  },
+  "sonstiges": "Quelle bundeswehr.de „Schwimmschnellbrücke Amphibie M3\": „Mit nur drei Mann Besatzung wird aus der schwimmenden Amphibie ein Teil einer Schwimmbrücke oder Fähre\" (Landfahrer, Wasserfahrer, Schwimmbrückenpionier) und „Eine 100 Meter lange Schwimmbrücke wird mit acht Amphibien in weniger als 20 Minuten gebaut.\" → 8 × 3 = 24 Personen, quellenscharf. Nur die Zugführung (1 Person) ist strukturell ergänzt, nicht einzelquellenbelegt. Hochwasser ist auf der Bundeswehr-Seite nicht wörtlich als Einsatzfall genannt, aber Standard-Anwendungsfall für Fährbetrieb bei überfluteten Wegen/Brücken."
+}

@@ -1,0 +1,389 @@
+{
+  "schemaVersion": 8,
+  "uebung": true,
+  "stand": 3044700,
+  "einheit": {
+    "organisation": 10,
+    "einheitsTyp": {
+      "freitext": "Pioniermaschinenzug"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Zug"
+        },
+        "name": "Pioniermaschinenzug"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Panzerpionierbataillon"
+        },
+        "name": "Panzerpionierbataillon 700 (fiktiv)",
+        "telefon": "5554305341",
+        "email": "stab@pzpibtl700.bundeswehr.example"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2140,
+    "zeitraumBis": 2142,
+    "ortAuftrag": "Hochwasserlage im Landkreis Moorwehde — Deichverstärkung und Dammbau mit Erdbaumaschinen entlang des gefährdeten Flussabschnitts, Unterstützung beim Verlegen einer Faltfestbrücke als Ersatz für einen gesperrten Kreisverkehrsweg."
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Patrick",
+      "nachname": "Ehlers",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "Zugführer Pioniermaschinenzug"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5553624656"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Gabriele",
+      "nachname": "Janssen",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Zugtruppführer (stv. Zugführer)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Elke",
+      "nachname": "Ehlers",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Pioniermaschinenführer Bagger 1"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Patrick",
+      "nachname": "Dircksen",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kraftfahrer/Einweiser 1"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Thorsten",
+      "nachname": "Dircksen",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Pioniermaschinenführer Bagger 2"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Ute",
+      "nachname": "Reimers",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kraftfahrer/Einweiser 2"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 1,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Carolin",
+      "nachname": "Sievers",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Pioniermaschinenführer Bagger 3"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 1,
+      "ernaehrung": 2,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Gunnar",
+      "nachname": "Reimers",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kraftfahrer/Einweiser 3"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Lennart",
+      "nachname": "Wiechers",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Pioniermaschinenführer Bagger 4"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Thorsten",
+      "nachname": "Lehmann",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kraftfahrer/Einweiser 4"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Melanie",
+      "nachname": "Nolte",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Pioniermaschinenführer Bagger 5"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 1,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Oliver",
+      "nachname": "Janssen",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kraftfahrer/Einweiser 5"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Carolin",
+      "nachname": "Isernhagen",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Pioniermaschinenführer Bagger 6"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Carolin",
+      "nachname": "Meinders",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kraftfahrer/Einweiser 6"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Patrick",
+      "nachname": "Kock",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Pioniermaschinenführer Bagger 7"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Carsten",
+      "nachname": "Meinders",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kraftfahrer/Einweiser 7"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Ingo",
+      "nachname": "Hansen",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Pioniermaschinenführer Bagger 8"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Hannah",
+      "nachname": "Lehmann",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kraftfahrer/Einweiser 8"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Patrick",
+      "nachname": "Grote",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Bohrgerätebediener Faltfestbrückenzug"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Gunnar",
+      "nachname": "Ohlmann",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kraftfahrer Faltfestbrückentransporter"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "Bagger (Pioniermaschine)"
+      },
+      "kennzeichen": "HEER-1014",
+      "stanKonform": true,
+      "aenderungen": "Deichverstärkung, Dammbau"
+    },
+    {
+      "typ": {
+        "freitext": "Bagger (Pioniermaschine)"
+      },
+      "kennzeichen": "HEER-1015",
+      "stanKonform": true,
+      "aenderungen": "Deichverstärkung, Dammbau"
+    },
+    {
+      "typ": {
+        "freitext": "Radlader"
+      },
+      "kennzeichen": "HEER-1016",
+      "stanKonform": true
+    },
+    {
+      "typ": {
+        "freitext": "Radlader"
+      },
+      "kennzeichen": "HEER-1017",
+      "stanKonform": true
+    },
+    {
+      "typ": {
+        "freitext": "Faltfestbrücke (Transportfahrzeug)"
+      },
+      "kennzeichen": "HEER-1018",
+      "stanKonform": true
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 20,
+    "dieselLiter": 0,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": false,
+    "ruhezeitErforderlich": false
+  },
+  "sonstiges": "Kompanie-Gliederung laut Wikipedia „Panzerpioniere (Bundeswehr)\": Die Pioniermaschinenkompanie eines Panzerpionierbataillons enthält u. a. einen „Pioniermaschinenzug mit ungepanzerten Erdbaumaschinen wie Baggern und Radladern\" sowie einen Faltfestbrückenzug. Anders als beim Panzerpionierzug (43, bundeswehr.de) und dem Schwimmbrückenzug M3 (24, bundeswehr.de) ist für diesen Zugtyp KEINE Personalstärke veröffentlicht — die hier angesetzten 20 Dienstposten sind eine grobe Schätzung in vergleichbarer Größenordnung, keine Quellenangabe."
+}
