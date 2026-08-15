@@ -1,0 +1,111 @@
+{
+  "schemaVersion": 8,
+  "uebung": true,
+  "stand": 3044700,
+  "einheit": {
+    "organisation": 10,
+    "einheitsTyp": {
+      "freitext": "SAR-Kommando Holzdorf/Schönewalde"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "SAR-Kommando"
+        },
+        "name": "Holzdorf/Schönewalde"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "unterstelltes Regiment"
+        },
+        "name": "Transporthubschrauberregiment 30",
+        "telefon": "5555785399",
+        "email": "sar-holzdorfschnewalde@bundeswehr.example"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "SAR-Leitstelle"
+        },
+        "name": "SAR-Leitstelle Münster (RCC Münster)"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2140,
+    "zeitraumBis": 2142,
+    "ortAuftrag": "Hochwasserlage — Suche und Rettung eingeschlossener Personen sowie Unterstützung der zivilen Rettungskette bei Evakuierung und Patiententransport aus nicht mehr erreichbaren Ortsteilen; Anforderung über die SAR-Leitstelle Münster im Rahmen der dringenden Eilhilfe."
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Andreas",
+      "nachname": "Sievers",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "Hubschrauberführer (Kommandant)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 2,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5558479538"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Hendrik",
+      "nachname": "Tietjen",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "Hubschrauberführer (Copilot)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Volker",
+      "nachname": "Isernhagen",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Luftrettungsmeister — Rettungsassistent/Notfallsanitäter, zugleich HHO (Helicopter Hoist Operator)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "SAR-Hubschrauber H145 LUH SAR"
+      },
+      "kennzeichen": "84+14",
+      "stanKonform": true,
+      "aenderungen": "SAR-Grundausstattung (medizinische Ausrüstung, Rettungswinde)"
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 3,
+    "dieselLiter": 0,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": false,
+    "ruhezeitErforderlich": false
+  },
+  "sonstiges": "Rufzeichen \"Rescue 87\" (RESQ87). Quelle für die Crew-Zusammensetzung: Wikipedia „SAR-Dienst für Luftfahrzeuge in Deutschland\" — „Im Bereich des Heeres werden die SAR-Hubschrauber regulär mit drei Crew-Mitgliedern besetzt: zwei Hubschrauberführer, einem Luftrettungsmeister (Rettungsassistent/Notfallsanitäter), zugleich HHO.\" Luftfahrzeugkennungen sind frei erfunden (Bundeswehr veröffentlicht keine taktischen Kennzeichen für SAR-Zwecke)."
+}

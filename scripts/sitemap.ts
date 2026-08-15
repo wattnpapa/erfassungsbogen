@@ -49,6 +49,7 @@ const SEITEN: Record<string, string> = {
   "dlrg.html": "0.7",
   "drk.html": "0.7",
   "bbk.html": "0.7",
+  "bundeswehr.html": "0.7",
   "johanniter.html": "0.7",
   "malteser.html": "0.7",
   "asb.html": "0.7",

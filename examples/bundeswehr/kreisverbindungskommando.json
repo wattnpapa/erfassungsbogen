@@ -1,0 +1,115 @@
+{
+  "schemaVersion": 8,
+  "uebung": true,
+  "stand": 3044700,
+  "einheit": {
+    "organisation": 10,
+    "einheitsTyp": {
+      "freitext": "Kreisverbindungskommando (KVK)"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Kreisverbindungskommando"
+        },
+        "name": "Landkreis Moorwehde"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "übergeordnetes Landeskommando"
+        },
+        "name": "Landeskommando (fiktiv)",
+        "telefon": "5553263621",
+        "email": "kvk-moorwehde@bundeswehr.example"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2140,
+    "zeitraumBis": 2142,
+    "ortAuftrag": "Unwetterlage mit Hochwasser im Landkreis Moorwehde — Beratung des zivilen Krisenstabs zu Möglichkeiten und Grenzen der Amtshilfe durch die Bundeswehr, Übertragung der zivilen Schadenslage in ein militärisches Lagebild, Koordination angeforderter Kräfte mit dem Landeskommando."
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Gunnar",
+      "nachname": "Ahrens",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "BeaBwZMZ — Beauftragter der Bundeswehr für die Zivil-Militärische Zusammenarbeit (Oberstleutnant d. R.)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5551330675"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Markus",
+      "nachname": "Vogt",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "stv. BeaBwZMZ — stellvertretender Beauftragter für Zivil-Militärische Zusammenarbeit"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Carolin",
+      "nachname": "Petersen",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "SanStOffz ZMZ GesVers — Beauftragter Sanitätsstabsoffizier für ZMZ im Gesundheitswesen (Oberfeldarzt d. R.)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Arzt"
+        }
+      ]
+    },
+    {
+      "vorname": "Franziska",
+      "nachname": "Sievers",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "SanFw Ass FüMgmt GesVers — Sanitätsfeldwebel, Assistent Führungsmanagement Gesundheitsversorgung (Stabsfeldwebel d. R.)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    }
+  ],
+  "fahrzeuge": [],
+  "sofortbedarf": {
+    "verpflegungPersonen": 4,
+    "dieselLiter": 0,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": false,
+    "ruhezeitErforderlich": false
+  },
+  "sonstiges": "Quelle (Wikipedia „Verbindungskommando\", zitiert bundeswehr.de „Landeskommando. Auftrag/Dienststellen\"): Das KVK umfasst insgesamt 13 Dienstposten, davon 2 Sanitätssoldaten. Öffentlich mit Funktionstitel benannt sind nur die hier abgebildeten 4 Positionen (Leiter, Stellvertreter, Sanitätsstabsoffizier, Sanitätsfeldwebel); die übrigen 9 Dienstposten („erfahrene Reserveoffiziere und -unteroffiziere\") sind ohne veröffentlichten Einzeltitel und daher hier bewusst nicht mit erfundenen Funktionen aufgefüllt. Reale KVK/BVK sind laut Quelle regelmäßig nicht voll besetzt."
+}
