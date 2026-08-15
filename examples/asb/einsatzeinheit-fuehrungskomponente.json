@@ -1,0 +1,159 @@
+{
+  "schemaVersion": 8,
+  "uebung": true,
+  "stand": 2951130,
+  "einheit": {
+    "organisation": 8,
+    "organisationName": "ASB-Kreisverband Rheindorf e. V.",
+    "einheitsTyp": {
+      "freitext": "Führungskomponente (Einsatzeinheit)"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Führungskomponente (Einsatzeinheit)"
+        },
+        "name": "Rheindorf"
+      },
+      {
+        "bezeichnung": {
+          "code": 2
+        },
+        "name": "Rheindorf e. V.",
+        "kurz": "KV Rheindorf",
+        "telefon": "5559334472",
+        "email": "einsatz@asb-rheindorf.example"
+      },
+      {
+        "bezeichnung": {
+          "code": 4
+        },
+        "name": "Nordrhein-Westfalen"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2075,
+    "zeitraumBis": 2076,
+    "ortAuftrag": "Starkregen und lokale Überflutung in Rheindorf-Süd — rund 300 Betroffene ohne Strom und Trinkwasser; Betreuungsstelle in der Stadthalle, ambulante Erstversorgung vor Ort, Einsatzleitung durch die Kreisleitstelle."
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Heinz",
+      "nachname": "Klophaus",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "Zugführer/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5554833070"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Zugführer (ASB)"
+        }
+      ]
+    },
+    {
+      "vorname": "Björn",
+      "nachname": "Bösch",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Führungsassistent/-in (IuK)"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Gruppenführer (ASB)"
+        },
+        {
+          "freitext": "Sprechfunker (BOS-Digitalfunk)"
+        }
+      ]
+    },
+    {
+      "vorname": "Jana",
+      "nachname": "Wolter",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Führungsgehilfe/-in (IuK)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Sprechfunker (BOS-Digitalfunk)"
+        }
+      ]
+    },
+    {
+      "vorname": "Axel",
+      "nachname": "Neuenhaus",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Führungsgehilfe/-in (IuK), Kraftfahrer/-in"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Sprechfunker (BOS-Digitalfunk)"
+        }
+      ]
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "ELW 1"
+      },
+      "kennzeichen": "SG-AB 1001",
+      "stanKonform": true,
+      "aenderungen": "Einsatzleitwagen — Führungsstelle der Einsatzeinheit mit zwei Digitalfunk-Arbeitsplätzen",
+      "funkrufname": {
+        "kennwort": {
+          "code": 6
+        },
+        "eigenerStandort": false,
+        "ort": "Rheindorf",
+        "teile": [
+          41,
+          19,
+          1
+        ]
+      }
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 4,
+    "dieselLiter": 60,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": true,
+    "ruhezeitErforderlich": true
+  },
+  "sonstiges": "Führt und disponiert die drei Fachkomponenten der Einsatzeinheit; sorgt für die lückenlose Einsatzdokumentation."
+}

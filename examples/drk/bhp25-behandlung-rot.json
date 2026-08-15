@@ -1,0 +1,232 @@
+{
+  "schemaVersion": 8,
+  "uebung": true,
+  "stand": 2831640,
+  "einheit": {
+    "organisation": 5,
+    "organisationName": "DRK-Kreisverband Buchenrode e. V.",
+    "einheitsTyp": {
+      "freitext": "Behandlung Kat. ROT (BHP 25)"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Behandlung Kat. ROT (BHP 25)"
+        },
+        "name": "Buchenrode"
+      },
+      {
+        "bezeichnung": {
+          "code": 2
+        },
+        "name": "Buchenrode e. V.",
+        "kurz": "KV Buchenrode",
+        "telefon": "5557575153",
+        "email": "einsatz@drk-buchenrode.example"
+      },
+      {
+        "bezeichnung": {
+          "code": 3
+        },
+        "name": "Saarland"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 1991,
+    "zeitraumBis": 1992,
+    "ortAuftrag": "Massenkarambolage auf der A-Ost bei Buchenrode — rund 40 Verletzte in drei Sichtungskategorien; Behandlungsplatz auf dem Rastplatz Buchenrode-Nord, Voralarmierung der SEG Sanität über die Leitstelle."
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Manfred",
+      "nachname": "Hoffmann",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "Notärztin/Notarzt Behandlung ROT"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5554376291"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Notärztin/Notarzt"
+        }
+      ]
+    },
+    {
+      "vorname": "Jochen",
+      "nachname": "Theobald",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "Notärztin/Notarzt Behandlung ROT"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Notärztin/Notarzt"
+        }
+      ]
+    },
+    {
+      "vorname": "Norbert",
+      "nachname": "Ecker",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Rettungsassistent/-in Behandlung ROT"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungsassistent"
+        }
+      ]
+    },
+    {
+      "vorname": "Rainer",
+      "nachname": "Kiefer",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Rettungsassistent/-in Behandlung ROT"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungsassistent"
+        }
+      ]
+    },
+    {
+      "vorname": "Stefan",
+      "nachname": "Jochum",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Rettungsassistent/-in Behandlung ROT"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungsassistent"
+        }
+      ]
+    },
+    {
+      "vorname": "Stefan",
+      "nachname": "Lauer",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Rettungssanitäter/-in Behandlung ROT"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungssanitäter"
+        }
+      ]
+    },
+    {
+      "vorname": "Klaus",
+      "nachname": "Zewe",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Rettungssanitäter/-in Behandlung ROT"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungssanitäter"
+        }
+      ]
+    },
+    {
+      "vorname": "Georg",
+      "nachname": "Recktenwald",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Rettungssanitäter/-in Behandlung ROT"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungssanitäter"
+        }
+      ]
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "GW-San"
+      },
+      "kennzeichen": "SB-RK 1005",
+      "stanKonform": true,
+      "aenderungen": "Behandlungszelt Kategorie ROT — überwiegend rettungsdienstlich/intensivmedizinisch erfahrenes Personal",
+      "funkrufname": {
+        "kennwort": {
+          "code": 3
+        },
+        "eigenerStandort": false,
+        "ort": "Buchenrode",
+        "teile": [
+          55,
+          96,
+          2
+        ]
+      }
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 8,
+    "dieselLiter": 60,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": true,
+    "ruhezeitErforderlich": true
+  },
+  "sonstiges": "Versorgt bis zu zehn Schwerstverletzte; Transport erst nach Stabilisierung der Vitalfunktionen."
+}

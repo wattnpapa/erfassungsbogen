@@ -1,0 +1,156 @@
+{
+  "schemaVersion": 8,
+  "uebung": true,
+  "stand": 2831640,
+  "einheit": {
+    "organisation": 5,
+    "organisationName": "DRK-Kreisverband Buchenrode e. V.",
+    "einheitsTyp": {
+      "freitext": "Führungstrupp (BHP 25)"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Führungstrupp (BHP 25)"
+        },
+        "name": "Buchenrode"
+      },
+      {
+        "bezeichnung": {
+          "code": 2
+        },
+        "name": "Buchenrode e. V.",
+        "kurz": "KV Buchenrode",
+        "telefon": "5557575153",
+        "email": "einsatz@drk-buchenrode.example"
+      },
+      {
+        "bezeichnung": {
+          "code": 3
+        },
+        "name": "Saarland"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 1991,
+    "zeitraumBis": 1992,
+    "ortAuftrag": "Massenkarambolage auf der A-Ost bei Buchenrode — rund 40 Verletzte in drei Sichtungskategorien; Behandlungsplatz auf dem Rastplatz Buchenrode-Nord, Voralarmierung der SEG Sanität über die Leitstelle."
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Gabi",
+      "nachname": "Conrad",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "Verbandsführer/-in BHP 25"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5551046348"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Verbandführer"
+        }
+      ]
+    },
+    {
+      "vorname": "Sabine",
+      "nachname": "Peifer",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "Leitende/-r Notärztin/Notarzt (LNA)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Leitender Notarzt"
+        }
+      ]
+    },
+    {
+      "vorname": "Bastian",
+      "nachname": "Peifer",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Zugtruppführer/-in"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Gruppenführer (DRK)"
+        }
+      ]
+    },
+    {
+      "vorname": "Doris",
+      "nachname": "Ecker",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kraftfahrer/-in, Sprechfunker/-in"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Sprechfunker (BOS-Digitalfunk)"
+        }
+      ]
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "KdoW"
+      },
+      "kennzeichen": "SB-RK 1003",
+      "stanKonform": true,
+      "aenderungen": "Kommandowagen des Verbandsführers BHP 25",
+      "funkrufname": {
+        "kennwort": {
+          "code": 3
+        },
+        "eigenerStandort": false,
+        "ort": "Buchenrode",
+        "teile": [
+          55,
+          10,
+          1
+        ]
+      }
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 4,
+    "dieselLiter": 60,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": true,
+    "ruhezeitErforderlich": true
+  },
+  "sonstiges": "Führt den BHP 25 und seine sechs Behandlungsteileinheiten; Verbandsführer und LNA teilen sich die taktische bzw. medizinische Führung."
+}

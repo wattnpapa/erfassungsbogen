@@ -1,0 +1,310 @@
+{
+  "schemaVersion": 8,
+  "uebung": true,
+  "stand": 2951130,
+  "einheit": {
+    "organisation": 8,
+    "organisationName": "ASB-Kreisverband Rheindorf e. V.",
+    "einheitsTyp": {
+      "freitext": "Sanitätsgruppe (Einsatzeinheit)"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Sanitätsgruppe (Einsatzeinheit)"
+        },
+        "name": "Rheindorf"
+      },
+      {
+        "bezeichnung": {
+          "code": 2
+        },
+        "name": "Rheindorf e. V.",
+        "kurz": "KV Rheindorf",
+        "telefon": "5559334472",
+        "email": "einsatz@asb-rheindorf.example"
+      },
+      {
+        "bezeichnung": {
+          "code": 4
+        },
+        "name": "Nordrhein-Westfalen"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2075,
+    "zeitraumBis": 2076,
+    "ortAuftrag": "Starkregen und lokale Überflutung in Rheindorf-Süd — rund 300 Betroffene ohne Strom und Trinkwasser; Betreuungsstelle in der Stadthalle, ambulante Erstversorgung vor Ort, Einsatzleitung durch die Kreisleitstelle."
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Lieselotte",
+      "nachname": "Reifenrath",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "Ärztin/Arzt (GW-San)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5555435043"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Notärztin/Notarzt"
+        }
+      ]
+    },
+    {
+      "vorname": "Petra",
+      "nachname": "Cremer",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Gruppenführer/-in Sanitätsdienst (GW-San)"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Gruppenführer (ASB)"
+        }
+      ]
+    },
+    {
+      "vorname": "Ralf",
+      "nachname": "Steegmann",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Rettungshelfer/-in (GW-San)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungshelfer"
+        }
+      ]
+    },
+    {
+      "vorname": "Carsten",
+      "nachname": "Michels",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Rettungshelfer/-in (GW-San)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungshelfer"
+        }
+      ]
+    },
+    {
+      "vorname": "Edith",
+      "nachname": "Halfmann",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Rettungshelfer/-in (GW-San)"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 1,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungshelfer"
+        }
+      ]
+    },
+    {
+      "vorname": "Heinz",
+      "nachname": "Michels",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Rettungshelfer/-in (GW-San)"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungshelfer"
+        }
+      ]
+    },
+    {
+      "vorname": "Ines",
+      "nachname": "Feldmann",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Fahrer/-in KTW"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungshelfer"
+        }
+      ]
+    },
+    {
+      "vorname": "Monika",
+      "nachname": "Thelen",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Transportführer/-in KTW"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungssanitäter"
+        }
+      ]
+    },
+    {
+      "vorname": "Carsten",
+      "nachname": "Reifenrath",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Fahrer/-in RTW"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungssanitäter"
+        }
+      ]
+    },
+    {
+      "vorname": "Gundula",
+      "nachname": "Feldmann",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Transportführer/-in RTW"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Notfallsanitäter"
+        }
+      ]
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "GW-San"
+      },
+      "kennzeichen": "SG-AB 1002",
+      "stanKonform": true,
+      "aenderungen": "Gerätewagen Sanitätsdienst (GWSan 25) des Landes NRW — aufblasbares Zelt, Notstrom, Beleuchtung",
+      "funkrufname": {
+        "kennwort": {
+          "code": 6
+        },
+        "eigenerStandort": false,
+        "ort": "Rheindorf",
+        "teile": [
+          41,
+          96,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "KTW B (Notfall-KTW)"
+      },
+      "kennzeichen": "SG-AB 1003",
+      "stanKonform": true,
+      "aenderungen": "Krankentransportwagen mit Erweiterung zum Rettungswagen-Ersatz (Zivilschutzfahrzeug KTW4)",
+      "funkrufname": {
+        "kennwort": {
+          "code": 6
+        },
+        "eigenerStandort": false,
+        "ort": "Rheindorf",
+        "teile": [
+          41,
+          92,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "RTW"
+      },
+      "kennzeichen": "SG-AB 1004",
+      "stanKonform": true,
+      "aenderungen": "Rettungswagen der Sanitätsgruppe",
+      "funkrufname": {
+        "kennwort": {
+          "code": 6
+        },
+        "eigenerStandort": false,
+        "ort": "Rheindorf",
+        "teile": [
+          41,
+          83,
+          1
+        ]
+      }
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 10,
+    "dieselLiter": 180,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": true,
+    "ruhezeitErforderlich": true
+  },
+  "sonstiges": "Grundmodul GW-San (Arzt, Gruppenführer, vier Rettungshelfer) versorgt und stabilisiert Verletzte; KTW-B und RTW ergänzen die Sanitätsgruppe um eine Transportkomponente (in einigen Regionalverbänden auch als eigenständige „Rettungsgruppe” bezeichnet)."
+}
