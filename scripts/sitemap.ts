@@ -24,7 +24,7 @@
  */
 
 import { execFileSync } from "node:child_process";
-import { mkdirSync, readdirSync, realpathSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readdirSync, realpathSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -45,6 +45,11 @@ const SEITEN: Record<string, string> = {
   "anleitung.html": "0.8",
   "vorlage.html": "0.8",
   "thw.html": "0.7",
+  // Longtail-Unterseiten zu einzelnen THW-Fachgruppen: hängen inhaltlich an
+  // thw.html und stehen darum eine Stufe darunter.
+  "thw-fachgruppe-notversorgung-erfassungsbogen.html": "0.6",
+  "thw-fachgruppe-raeumen-erfassungsbogen.html": "0.6",
+  "thw-fachgruppe-wasserschaden-pumpen-erfassungsbogen.html": "0.6",
   "feuerwehr.html": "0.7",
   "dlrg.html": "0.7",
   "drk.html": "0.7",
@@ -67,9 +72,24 @@ const SEITEN: Record<string, string> = {
   "katastrophenschutz-nordrhein-westfalen.html": "0.6",
   "katastrophenschutz-saarland.html": "0.6",
   "meldekopf.html": "0.7",
+  "staerkemeldung-feuerwehr.html": "0.7",
   "papier-oder-digital.html": "0.6",
+  "open-source-datenschutz.html": "0.5",
   "impressum.html": "0.3",
   "datenschutz.html": "0.3",
+};
+
+/**
+ * Adressen, die keine HTML-Seite sind, aber trotzdem in den Index gehören:
+ * Downloads, auf die von den Textseiten verwiesen wird. Sie tragen kein
+ * `rel="canonical"` — die Deckungsprüfung im Test gilt darum nur für die
+ * HTML-Seiten, und diese Einträge werden dort gesondert geprüft.
+ *
+ * Der Schlüssel ist der Pfad unterhalb von public/ (mit Unterordner), damit
+ * `quellen()` daraus wie bei jeder Seite die Datei für das `lastmod` ableitet.
+ */
+export const DATEIEN: Record<string, string> = {
+  "downloads/einheiten-erfassungsbogen-blanko.pdf": "0.5",
 };
 
 /** Gewichtung für Seiten, die (noch) nicht in SEITEN stehen. */
@@ -103,25 +123,33 @@ export function quellen(seite: string): string[] {
 
 /**
  * Stellt die Einträge der Sitemap zusammen: erst die bekannten Seiten in der
- * Reihenfolge von SEITEN, danach alphabetisch alles Neue aus public/.
+ * Reihenfolge von SEITEN, dann alphabetisch alles Neue aus public/, zuletzt die
+ * verlinkten Downloads aus DATEIEN.
  *
- * @param dateien Verzeichnisinhalt von public/ (nur die .html-Dateien zählen).
+ * @param dateien Inhalt von public/, Unterordner-Dateien mit ihrem Pfad
+ *   (z. B. "downloads/x.pdf"). Gewertet werden die .html-Dateien der obersten
+ *   Ebene und die in DATEIEN eingetragenen Downloads.
  * @param datum Liefert das lastmod zu den Quelldateien einer Seite.
  */
 export function eintraegeSammeln(
   dateien: string[],
   datum: (quellen: string[]) => string | undefined,
 ): SitemapEintrag[] {
-  const vorhanden = dateien.filter((d) => d.endsWith(".html") && !AUSGENOMMEN.has(d));
+  const vorhanden = dateien.filter(
+    (d) => d.endsWith(".html") && !d.includes("/") && !AUSGENOMMEN.has(d),
+  );
   const neu = vorhanden.filter((d) => !(d in SEITEN)).sort();
   // Die Startseite steckt nicht in public/ und ist immer dabei; eine gelöschte
   // Textseite fliegt dagegen aus der Sitemap, auch wenn sie hier noch steht.
   const bekannt = Object.keys(SEITEN).filter((s) => s === "" || vorhanden.includes(s));
+  // Downloads nur, solange die Datei wirklich liegt — ein 404 in der Sitemap
+  // ist schlimmer als ein fehlender Eintrag.
+  const downloads = Object.keys(DATEIEN).filter((d) => dateien.includes(d));
 
-  return [...bekannt, ...neu].map((seite) => ({
+  return [...bekannt, ...neu, ...downloads].map((seite) => ({
     loc: `${BASIS}/${seite}`,
     lastmod: datum(quellen(seite)),
-    priority: SEITEN[seite] ?? STANDARD_PRIORITAET,
+    priority: SEITEN[seite] ?? DATEIEN[seite] ?? STANDARD_PRIORITAET,
   }));
 }
 
@@ -166,7 +194,8 @@ export function sitemapXml(eintraege: SitemapEintrag[]): string {
   return `<?xml version="1.0" encoding="UTF-8"?>
 <!-- GENERIERT von scripts/sitemap.ts — nicht von Hand ändern.
      Die App selbst ist eine einzige Seite mit Hash-Routing; als eigenständige
-     Adressen gibt es nur sie und die statischen Textseiten aus public/.
+     Adressen gibt es nur sie, die statischen Textseiten aus public/ und die
+     dort verlinkten Downloads.
      <lastmod> ist das Datum des letzten Commits, der die jeweilige Seite
      geändert hat (für die Startseite: index.html oder irgendetwas unter src/). -->
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
@@ -211,7 +240,12 @@ export function istFlacherKlon(wurzel: string): boolean {
  *   Pfad-Nebenwirkung beim Laden ist überall gleich einsetzbar.
  */
 export function eintraegeErzeugen(wurzel: string): SitemapEintrag[] {
-  const dateien = readdirSync(join(wurzel, "public"));
+  // Neben der obersten Ebene von public/ auch die verlinkten Downloads melden —
+  // aber nur die, die es tatsächlich gibt (siehe DATEIEN).
+  const dateien = [
+    ...readdirSync(join(wurzel, "public")),
+    ...Object.keys(DATEIEN).filter((d) => existsSync(join(wurzel, "public", d))),
+  ];
   if (istFlacherKlon(wurzel)) {
     console.warn(
       "sitemap.xml: flache Git-Historie — <lastmod> wird weggelassen." +

@@ -1,0 +1,356 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Open Source und Technik – Einheiten-Erfassungsbogen</title>
+  <meta name="description" content="Technische Referenz zum Einheiten-Erfassungsbogen: quelloffen unter EUPL-1.2, Daten im lokalen Gerätespeicher, Offline-Betrieb, QR-Format, Signatur und CSP.">
+  <link rel="canonical" href="https://erfassungsbogen.app/open-source-datenschutz.html">
+  <link rel="icon" href="./icon.svg" type="image/svg+xml">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Open Source und Technik – Einheiten-Erfassungsbogen">
+  <meta property="og:description" content="Wie die App technisch arbeitet: quelloffen, lokal speichernd, offline-fähig — mit Quellenangabe für jede Aussage.">
+  <meta property="og:url" content="https://erfassungsbogen.app/open-source-datenschutz.html">
+  <meta property="og:image" content="https://erfassungsbogen.app/og-bild.jpg">
+  <meta property="og:locale" content="de_DE">
+  <style>
+    :root {
+      --blau: #12275e;
+      --blau-hell: #1d3d8f;
+      --rand: #c9cede;
+      --grau: #f2f3f7;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      color: #1a1c22;
+      background: var(--grau);
+      line-height: 1.5;
+    }
+    main {
+      max-width: 40rem;
+      margin: 0 auto;
+      padding: 1.5rem 1rem 4rem;
+    }
+    h1 { color: var(--blau); font-size: 1.4rem; margin: 0.5rem 0 1rem; }
+    h2 { color: var(--blau); font-size: 1.1rem; border-bottom: 2px solid var(--blau); padding-bottom: 0.2rem; margin-top: 1.5rem; }
+    h3 { color: var(--blau); font-size: 0.98rem; margin: 1.2rem 0 0.3rem; }
+    a { color: var(--blau-hell); }
+    ul { padding-left: 1.2rem; }
+    li { margin-bottom: 0.35rem; }
+    code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 0.9em; background: #fff; border: 1px solid var(--rand); border-radius: 3px; padding: 0 0.25em; }
+    pre { background: #fff; border: 1px solid var(--rand); border-radius: 4px; padding: 0.7rem; overflow-x: auto; font-size: 0.8rem; line-height: 1.45; }
+    pre code { border: 0; background: none; padding: 0; }
+    .hinweis { background: #fff; border-left: 4px solid var(--blau); padding: 0.7rem 0.9rem; margin: 1rem 0; }
+    table { border-collapse: collapse; width: 100%; font-size: 0.9rem; }
+    th, td { border: 1px solid var(--rand); padding: 0.35rem 0.5rem; text-align: left; vertical-align: top; }
+    th { background: #fff; }
+    .tabellenrahmen { overflow-x: auto; }
+    footer { margin-top: 2.5rem; padding-top: 1rem; border-top: 1px solid var(--rand); font-size: 0.85rem; color: #555; }
+/* NAV:CSS:START */
+    .kopfnav { background: #fff; border-bottom: 1px solid var(--rand); }
+    .kopfnav-inner { max-width: 60rem; margin: 0 auto; padding: 0.7rem 1rem; display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 1.2rem; }
+    .kopfnav-logo { font-weight: 700; color: var(--blau); text-decoration: none; font-size: 0.95rem; margin-right: auto; }
+    .kopfnav-links { display: flex; flex-wrap: wrap; gap: 0.3rem 0.9rem; }
+    .kopfnav-links a { color: #444; text-decoration: none; font-size: 0.82rem; white-space: nowrap; }
+    .kopfnav-links a:hover { color: var(--blau-hell); text-decoration: underline; }
+    .kopfnav-links a.aktiv { color: var(--blau); font-weight: 600; }
+    /* NAV:CSS:END */
+  </style>
+</head>
+<body>
+  <!-- NAV:START -->
+  <header class="kopfnav">
+    <div class="kopfnav-inner">
+      <a href="./" class="kopfnav-logo">Erfassungsbogen</a>
+      <nav class="kopfnav-links" aria-label="Hauptnavigation">
+        <a href="./katastrophenschutz.html">Katastrophenschutz</a>
+        <a href="./thw.html">THW</a>
+        <a href="./feuerwehr.html">Feuerwehr</a>
+        <a href="./dlrg.html">DLRG</a>
+        <a href="./drk.html">DRK</a>
+        <a href="./johanniter.html">Johanniter</a>
+        <a href="./malteser.html">Malteser</a>
+        <a href="./asb.html">ASB</a>
+        <a href="./bbk.html">BBK</a>
+        <a href="./bundeswehr.html">Bundeswehr</a>
+        <a href="./meldekopf.html">Meldekopf</a>
+        <a href="./anleitung.html">Anleitung</a>
+      </nav>
+    </div>
+  </header>
+  <!-- NAV:END -->
+
+  <main>
+    <h1>Open Source und Technik des Einheiten-Erfassungsbogens</h1>
+    <p>
+      Diese Seite beschreibt, wie der digitale Einheiten-Erfassungsbogen technisch
+      gebaut ist: woraus die Anwendung besteht, wo Eingaben liegen, wann überhaupt
+      etwas das Gerät verlässt und wie das Datenformat aussieht. Sie richtet sich an
+      alle, die das Werkzeug in einer Behörde oder Hilfsorganisation prüfen wollen,
+      bevor sie es einsetzen oder empfehlen.
+    </p>
+    <div class="hinweis">
+      <p style="margin:0">
+        <strong>Abgrenzung:</strong> Rechtlich verbindlich ist die
+        <a href="./datenschutz.html">Datenschutzerklärung</a> — dort stehen
+        Verantwortlicher, Rechtsgrundlagen, Betroffenenrechte und der Widerspruch
+        gegen die Reichweitenmessung. Diese Seite ist die technische Ergänzung
+        dazu und ersetzt sie nicht. Jede Aussage hier lässt sich im
+        <a href="https://github.com/wattnpapa/erfassungsbogen">Quellcode</a>
+        nachlesen; die Fundstelle steht jeweils dabei.
+      </p>
+    </div>
+
+    <h2>Aufbau der Anwendung</h2>
+    <p>
+      Die Anwendung ist eine Web-App aus React und TypeScript, gebaut mit Vite. Es
+      gibt keinen Anwendungsserver und keine Datenbank im Hintergrund — der gesamte
+      Programmablauf, einschließlich PDF-Erzeugung und QR-Codierung, läuft im
+      Browser beziehungsweise in der App auf dem Gerät.
+    </p>
+    <div class="tabellenrahmen">
+      <table>
+        <thead>
+          <tr><th>Fassung</th><th>Technik</th><th>Herkunft der Dateien</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Web / installierte PWA</td>
+            <td>Vite-Build, Service Worker über <code>vite-plugin-pwa</code></td>
+            <td>erfassungsbogen.app (GitHub Pages)</td>
+          </tr>
+          <tr>
+            <td>Windows, macOS, Linux</td>
+            <td>Electron; dieselbe Web-App im Paket</td>
+            <td>lokal aus dem Installationspaket (<code>file://</code>)</td>
+          </tr>
+          <tr>
+            <td>iOS, Android</td>
+            <td>Capacitor; dieselbe Web-App im App-Paket</td>
+            <td>lokal aus dem App-Paket</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p>
+      Der Electron-Hauptprozess lädt ausschließlich das mitgelieferte Bundle und
+      betreibt das Fenster ohne Node-Zugriff (<code>contextIsolation</code>,
+      <code>sandbox</code>, kein <code>nodeIntegration</code>); erteilt werden nur
+      die Berechtigungen für Kamera und Zwischenablage, alle anderen Anfragen lehnt
+      der Hauptprozess ab (<code>electron/main.js</code>). Externe Links öffnet er im
+      Systembrowser statt im App-Fenster.
+    </p>
+
+    <h2>Wo die eingegebenen Daten liegen</h2>
+    <p>
+      Alle Angaben eines Bogens werden im lokalen Speicher (<code>localStorage</code>)
+      des Browsers beziehungsweise der App gehalten. Eine IndexedDB wird nicht
+      verwendet, Cookies werden nicht gesetzt. Gespeichert sind unter anderem:
+    </p>
+    <ul>
+      <li>der aktuelle Bogen-Entwurf (<code>eeb.entwurf.v1</code>)</li>
+      <li>eigene Vorlagen (<code>eeb.vorlagen.v1</code>)</li>
+      <li>Einsatz-Sammlungen des Meldekopf-Betriebs (<code>eeb.einsaetze.v1</code>)</li>
+      <li>die Absenderkarte, sofern ausgefüllt (<code>eeb.absenderkarte.v1</code>)</li>
+      <li>der private Geräteschlüssel der Signatur (<code>eeb.geraeteschluessel.v1</code>)</li>
+      <li>der gewählte Anzeigemodus (<code>eeb.anzeigemodus.v1</code>)</li>
+      <li>ein etwaiger Widerspruch gegen die Reichweitenmessung (<code>skipgc</code>)</li>
+    </ul>
+    <p>
+      Diese Einträge werden nicht an einen Server übertragen. Löschen lassen sie sich
+      über „Alle Daten löschen“ in der Fußzeile der App, über das Löschen der
+      Websitedaten im Browser oder durch Deinstallation. „Datensicherung“ in derselben
+      Fußzeile gibt sie als Datei aus und spielt sie wieder ein.
+    </p>
+
+    <h2>Wann Daten das Gerät verlassen</h2>
+    <p>
+      Bogeninhalte verlassen das Gerät nur, wenn sie selbst weitergegeben werden — als
+      PDF, als Datei, als QR-Code oder als Link. Unabhängig davon gibt es aber
+      Verbindungen, die die Anwendung von sich aus aufbaut. Sie sind hier vollständig
+      aufgeführt:
+    </p>
+
+    <h3>1. Auslieferung der Website</h3>
+    <p>
+      Die Web-Fassung wird über GitHub Pages ausgeliefert. Beim Aufruf verarbeitet
+      GitHub die üblichen Verbindungsdaten (unter anderem die IP-Adresse) in
+      Server-Logs. Die installierten Fassungen (Desktop, iOS, Android) laden ihre
+      Dateien aus dem eigenen Paket und rufen dafür nichts ab. In der Web-Fassung
+      werden einzelne Bestandteile — etwa ein angeklickter Beispielbogen — bei Bedarf
+      von derselben Adresse nachgeladen.
+    </p>
+
+    <h3>2. Reichweitenmessung (GoatCounter)</h3>
+    <p>
+      Bei jedem Kaltstart sendet die Anwendung einen einzelnen Zählimpuls an
+      <code>erfassungsbogen.goatcounter.com</code> (<code>src/app/statistik.ts</code>).
+      Das gilt auf allen Plattformen, also auch in der Desktop- und in der Mobil-App.
+      Übertragen werden dabei nur drei Angaben:
+    </p>
+    <ul>
+      <li>ein Zählpfad, der die Nutzungsart benennt (<code>/browser/ios</code>,
+        <code>/pwa/android</code>, <code>/app/desktop</code> und so weiter),</li>
+      <li>ein dazu passender Titel,</li>
+      <li>im Browser die verweisende Seite (<code>document.referrer</code>); in den
+        installierten Fassungen bleibt dieses Feld leer.</li>
+    </ul>
+    <p>
+      Der Zählimpuls trägt bewusst weder <code>location.search</code> noch das
+      Adressfragment, weil die App Bogendaten im Fragment transportiert. Es wird kein
+      Fremdskript nachgeladen — die Zähl-URL wird selbst gebaut und per
+      <code>sendBeacon</code>, ersatzweise als Bildabruf, abgesetzt. In der lokalen
+      Entwicklung (localhost) unterbleibt der Impuls. Ohne Internetverbindung schlägt
+      er still fehl.
+    </p>
+    <p>
+      Widerspruch: in der App unter „Datenschutz“ die Option <em>Nicht mitzählen</em>
+      aktivieren; sie setzt den Eintrag <code>skipgc</code> im lokalen Speicher, und
+      der Zählimpuls unterbleibt ab dem nächsten Start. Welche Angaben GoatCounter
+      darüber hinaus aus der Verbindung ableitet und auf welcher Rechtsgrundlage das
+      geschieht, steht in der <a href="./datenschutz.html">Datenschutzerklärung</a>.
+    </p>
+
+    <h3>3. Prüfung auf neue Versionen</h3>
+    <ul>
+      <li>
+        <strong>Android</strong> (per Datei verteilte APK): beim Start wird
+        <code>api.github.com</code> nach dem neuesten Release gefragt; erst nach
+        einem Tippen auf „Aktualisieren“ wird die APK von GitHub geladen
+        (<code>src/app/aktualisierung.tsx</code>).
+      </li>
+      <li>
+        <strong>Desktop</strong>: der Electron-Updater prüft im installierten Zustand
+        gegen die GitHub-Releases und lädt ein Update im Hintergrund; installiert wird
+        es nach Rückfrage beziehungsweise beim Beenden (<code>electron/main.js</code>).
+      </li>
+      <li>
+        <strong>Web und PWA</strong>: der Service Worker lädt eine neue Fassung im
+        Hintergrund von derselben Adresse und meldet sie; neu geladen wird erst auf
+        Klick, damit ein offener Bogen nicht verlorengeht.
+      </li>
+      <li>
+        <strong>iOS</strong>: keine eigene Update-Prüfung in der App.
+      </li>
+    </ul>
+    <p>
+      Bogeninhalte werden bei keiner dieser Verbindungen übertragen.
+    </p>
+
+    <h2>Offline-Betrieb</h2>
+    <p>
+      Die Web-Fassung registriert einen Service Worker, der die App-Shell —
+      JavaScript, CSS, HTML, Icons, Manifest und die eingebettete Schrift — in den
+      Vorrat legt. Nach dem ersten Aufruf startet die Seite damit ohne Netz. Der
+      Service Worker läuft im Modus „prompt“: eine neue Fassung wird erst nach
+      Bestätigung aktiviert, nie automatisch mitten in der Arbeit. In der Electron-
+      und der Capacitor-Fassung wird er bewusst nicht registriert; dort liegt die App
+      ohnehin lokal (Konfiguration in <code>vite.config.ts</code>).
+    </p>
+
+    <h2>Datenformat und Signatur</h2>
+    <p>
+      Ein Bogen wird für die Weitergabe binär codiert (<code>src/codec.ts</code>):
+      feste Feldreihenfolge, Varint-Längen, UTF-8-Strings, anschließend Deflate. Das
+      Ergebnis trägt die Kennung <code>EEB2</code>, in signierter Form
+      <code>EEB2C</code>. Für den Transport wird es als Text codiert — Base64url oder
+      das platzsparendere Base41 — und steckt im QR-Code, in der Datei und, bei einem
+      Link, hinter dem <code>#</code> der Adresse. Was hinter dem <code>#</code> steht,
+      sendet ein Browser nicht an den Server.
+    </p>
+    <p>
+      Jeder weitergegebene Bogen wird mit einem Ed25519-Schlüssel des ausstellenden
+      Geräts signiert; wird ein bereits signierter Bogen unverändert weitergereicht,
+      hängt die App eine weitere Stufe an die Kette an. Verwendet wird
+      <code>@noble/ed25519</code> statt der Ed25519-Funktion der WebCrypto-API, weil
+      diese in älteren WebViews und in Electron nicht überall vorhanden ist. Der
+      private Schlüssel wird auf dem Gerät erzeugt und erscheint nie in QR-Code, Link
+      oder Datei (<code>src/app/geraete-schluessel.ts</code>, <code>src/signatur.ts</code>).
+    </p>
+    <p>
+      Das Vertrauensmodell ist bewusst schlicht: Die Prüfung belegt, dass der Bogen
+      seit der Signatur unverändert ist und von diesem Schlüssel stammt. Sie belegt
+      <em>nicht</em>, welche Person oder Dienststelle hinter dem Schlüssel steht — es
+      gibt keine Zertifikatsstelle. Eine fehlgeschlagene Prüfung blockiert das
+      Einlesen nicht; sie erscheint als Anzeigestatus.
+    </p>
+
+    <h2>Content-Security-Policy</h2>
+    <p>
+      Der Build setzt eine Content-Security-Policy als <code>&lt;meta&gt;</code> in den
+      Kopf der Seite (Plugin in <code>vite.config.ts</code>). Sie begrenzt Netzzugriffe
+      auf die eigene Herkunft und genau einen fremden Host, den Zähl-Endpunkt:
+    </p>
+    <pre><code>default-src 'self' file:
+base-uri 'none'
+object-src 'none'
+form-action 'none'
+script-src 'self' file: 'unsafe-inline'
+style-src 'self' file: 'unsafe-inline'
+img-src 'self' file: data: blob: https://erfassungsbogen.goatcounter.com
+font-src 'self' file: data:
+connect-src 'self' file: https://erfassungsbogen.goatcounter.com</code></pre>
+    <p>
+      <code>'unsafe-inline'</code> steht dort, weil Start-Gerüst, Design-Token und die
+      eingebettete Schrift inline im Dokument liegen. Der Vite-Entwicklungsserver
+      bekommt die Policy nicht — er braucht Verbindungen, die sie blockieren würde.
+      Der praktische Gewinn liegt in <code>default-src 'self'</code>,
+      <code>object-src 'none'</code>, <code>base-uri 'none'</code> und dem auf einen
+      Host begrenzten <code>connect-src</code>: Eine Ausleitung von Daten an eine
+      andere Adresse ist damit unterbunden.
+    </p>
+
+    <h2>Quellcode, Lizenz und Releases</h2>
+    <ul>
+      <li>Quellcode:
+        <a href="https://github.com/wattnpapa/erfassungsbogen">github.com/wattnpapa/erfassungsbogen</a></li>
+      <li>Lizenz:
+        <a href="https://github.com/wattnpapa/erfassungsbogen/blob/main/LICENSE">EUPL-1.2</a></li>
+      <li>Fertige Fassungen für Windows, macOS, Linux und Android:
+        <a href="https://github.com/wattnpapa/erfassungsbogen/releases">Releases</a></li>
+      <li>Blanko-Bogen zum Ausdrucken:
+        <a href="./downloads/einheiten-erfassungsbogen-blanko.pdf">PDF-Vorlage</a>
+        (siehe <a href="./vorlage.html">Aufbau des Bogens</a>)</li>
+    </ul>
+    <p>
+      Der Quellcode ist vollständig einsehbar; wer die Aussagen dieser Seite prüfen
+      will, findet die genannten Dateien dort unter denselben Pfaden. Fehler und
+      Verbesserungsvorschläge nimmt das GitHub-Projekt entgegen.
+    </p>
+
+    <h2>Projekt und Autor</h2>
+    <p>
+      Der Einheiten-Erfassungsbogen ist ein privates, nicht gewerbliches Projekt von
+      Johannes Rudolph, entstanden aus der ehrenamtlichen Arbeit im Technischen
+      Hilfswerk. Es besteht keine Verbindung zu einer Behörde oder Hilfsorganisation;
+      genannte Organisationen und ihre Bezeichnungen dienen allein der fachlichen
+      Zuordnung der Vorlagen.
+    </p>
+    <p>
+      Kontakt für Fragen, Fehler und Wünsche:
+      <a href="mailto:johannes.rudolph@thw-oldenburg.de">johannes.rudolph@thw-oldenburg.de</a>.
+      Anschrift und Anbieterkennzeichnung stehen im
+      <a href="./impressum.html">Impressum</a>.
+    </p>
+
+    <footer>
+      <a href="./">Zurück zur App</a> ·
+      <a href="./anleitung.html">Anleitung</a> ·
+      <a href="./datenschutz.html">Datenschutz</a> ·
+      <a href="./impressum.html">Impressum</a>
+    </footer>
+  </main>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Erfassungsbogen.app", "item": "https://erfassungsbogen.app/" },
+      { "@type": "ListItem", "position": 2, "name": "Open Source und Technik", "item": "https://erfassungsbogen.app/open-source-datenschutz.html" }
+    ]
+  }
+  </script>
+</body>
+</html>

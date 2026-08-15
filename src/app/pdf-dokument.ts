@@ -16,6 +16,7 @@
 import type { Attachment, Content, TDocumentDefinitions, TableCell } from "pdfmake/interfaces";
 import {
   Erfassungsbogen,
+  Fahrzeug,
   KontaktArt,
   OrganisationsTyp,
   PersonalErfassung,
@@ -540,8 +541,31 @@ function qrBlock(qr: QrSatz, akzent: string): Content {
   return { stack: seiten };
 }
 
-/** Bogen + fertiger QR-Satz → pdfmake-DocDefinition (Papier-Layout). */
-export function pdfDokument(b: Erfassungsbogen, qr: QrSatz): TDocumentDefinitions {
+/**
+ * Zeilenzahlen des Blanko-Vordrucks (leerer Bogen zum Ausfüllen mit der Hand).
+ * Die Anzahl ist bewusst nicht fest verdrahtet: wie viele Fahrzeug- und
+ * Personalzeilen sinnvoll sind, hängt am Papierformat und nicht am Layoutcode.
+ */
+export interface BlankoZeilen {
+  fahrzeuge: number;
+  personal: number;
+  qualifikationen: number;
+}
+
+/** Fahrzeug ohne Angaben — Platzhalter für die Fahrzeugblöcke des Blanko-Vordrucks. */
+const BLANKO_FAHRZEUG: Fahrzeug = { typ: { freitext: "" } };
+
+/**
+ * Bogen + QR-Satz → pdfmake-DocDefinition (Papier-Layout).
+ *
+ * `qr = null` lässt den QR-Block weg — ein Bogen ohne Inhalt hat nichts zu
+ * transportieren. `blanko` schaltet auf den Vordruck um: alle abgeleiteten
+ * Werte (Stärke, Sofortbedarf-Zahlen) werden zu Ausfülllinien, und statt der
+ * leeren Datenlisten entstehen leere Zeilen. Ohne `blanko` würde derselbe
+ * leere Bogen „0 / 0 / 0 / 0" und „01.01.2020" drucken — auf einem Vordruck
+ * sind das falsche Angaben, keine Leerstellen.
+ */
+export function pdfDokument(b: Erfassungsbogen, qr: QrSatz | null, blanko?: BlankoZeilen): TDocumentDefinitions {
   const org = b.einheit.organisation;
   const farbe = orgFarbe(org);
   const typName = vokabText(b.einheit.einheitsTyp, vokabularFuer(org, "einheitstyp"), "name") || "Einheit";
@@ -551,10 +575,19 @@ export function pdfDokument(b: Erfassungsbogen, qr: QrSatz): TDocumentDefinition
   const vp = verpflegung(b);
   const ansprech = b.personal[0];
 
+  // Ausfülllinie statt eines errechneten Werts (nur Vordruck). Bewusst kurz:
+  // vier Stärkezahlen nebeneinander müssen in eine Tabellenzelle passen, ohne
+  // dass die letzte in die zweite Zeile rutscht.
+  const linie = "____";
+  /** Zahl im ausgefüllten Bogen, Ausfülllinie im Vordruck. */
+  const zahl = (n: number) => (blanko ? linie : String(n));
+  /** Leere Tabellenzeile mit Schreibhöhe — die Ränder bilden die Ausfülllinien. */
+  const leerZelle = (): TableCell => ({ text: " ", margin: [0, 5, 0, 5] as [number, number, number, number] });
+
   const infoZeilen: TableCell[][] = [
     [
       { text: "Stärke:", bold: true },
-      { text: `${s.fuehrer} / ${s.unterfuehrer} / ${s.mannschaft} / ${s.gesamt}` },
+      { text: `${zahl(s.fuehrer)} / ${zahl(s.unterfuehrer)} / ${zahl(s.mannschaft)} / ${zahl(s.gesamt)}` },
       { text: "Ansprechpartner/in:", bold: true },
       { text: ansprech ? `${ansprech.vorname} ${ansprech.nachname}` : "" },
     ],
@@ -570,7 +603,12 @@ export function pdfDokument(b: Erfassungsbogen, qr: QrSatz): TDocumentDefinition
   infoZeilen.push([
     { text: "vorgesehener Einsatzzeitraum:", bold: true, colSpan: 2 },
     {},
-    { text: `${datumDeutsch(datumZuIso(b.einsatz.zeitraumVon))} – ${datumDeutsch(datumZuIso(b.einsatz.zeitraumBis))}`, colSpan: 2 },
+    {
+      text: blanko
+        ? `${linie}______  –  ${linie}______`
+        : `${datumDeutsch(datumZuIso(b.einsatz.zeitraumVon))} – ${datumDeutsch(datumZuIso(b.einsatz.zeitraumBis))}`,
+      colSpan: 2,
+    },
     {},
   ]);
   infoZeilen.push([
@@ -586,23 +624,26 @@ export function pdfDokument(b: Erfassungsbogen, qr: QrSatz): TDocumentDefinition
     { text: b.einsatz.einsatzende != null ? zeitpunktZuIso(b.einsatz.einsatzende).replace("T", " ") : "" },
   ]);
 
-  const fahrzeuge: Content[] = b.fahrzeuge.map((f): Content => ({
+  const fahrzeugBlock = (f: Fahrzeug): Content => ({
     table: {
       // Erste Spalte: taktisches Zeichen (DV 102), zeilenübergreifend links.
       widths: [56, "*", "*", "*"],
       body: [
         [
           { svg: fahrzeugSymbolSvg(f, org), width: 50, rowSpan: 2, alignment: "center", margin: [2, 6, 2, 6] as [number, number, number, number] },
-          { text: vokabText(f.typ, vokabularFuer(org, "fahrzeug")) || "Fahrzeug", bold: true },
-          { text: kennzeichenText(f), bold: true },
-          { text: f.funkrufname ? `FuRn: ${funkrufText(f, einheitOrt(b.einheit))}` : "" },
+          // Im Vordruck stehen hier die Feldnamen — sonst wäre die Zeile eine
+          // beschriftungslose Leerzeile, in der niemand weiß, was hingehört.
+          { text: blanko ? "Fahrzeug:" : vokabText(f.typ, vokabularFuer(org, "fahrzeug")) || "Fahrzeug", bold: true },
+          { text: blanko ? "Kennzeichen:" : kennzeichenText(f), bold: true },
+          { text: blanko ? "Funkrufname:" : f.funkrufname ? `FuRn: ${funkrufText(f, einheitOrt(b.einheit))}` : "" },
         ],
         [
           {}, // von rowSpan des Zeichens belegt
           {
             colSpan: 3,
-            text:
-              f.stanKonform == null
+            text: blanko
+              ? `Ausstattung nach StAN: ja ${kasten(false)} / nein ${kasten(false)}\nÄnderungen bzw. Sondergerät:`
+              : f.stanKonform == null
                 ? `Änderungen bzw. Sondergerät: ${weichUmbrechen(f.aenderungen ?? "")}`
                 : `Ausstattung nach StAN: ja ${kasten(f.stanKonform)} / nein ${kasten(!f.stanKonform)}\nÄnderungen bzw. Sondergerät: ${weichUmbrechen(f.aenderungen ?? "")}`,
           },
@@ -612,7 +653,10 @@ export function pdfDokument(b: Erfassungsbogen, qr: QrSatz): TDocumentDefinition
       ],
     },
     margin: [0, 0, 0, 6] as [number, number, number, number],
-  }));
+  });
+  const fahrzeuge: Content[] = blanko
+    ? Array.from({ length: blanko.fahrzeuge }, () => fahrzeugBlock(BLANKO_FAHRZEUG))
+    : b.fahrzeuge.map(fahrzeugBlock);
 
   const personalZeilen: TableCell[][] = [
     [
@@ -621,7 +665,10 @@ export function pdfDokument(b: Erfassungsbogen, qr: QrSatz): TDocumentDefinition
       { text: "D = dienstlich / P = privat", bold: true, fillColor: GRAU },
     ],
   ];
-  for (const p of b.personal) {
+  for (let i = 0; blanko && i < blanko.personal; i++) {
+    personalZeilen.push([leerZelle(), leerZelle(), leerZelle()]);
+  }
+  for (const p of blanko ? [] : b.personal) {
     const kontakte = p.kontakte
       .map((k) => {
         // Alte Bögen konnten statt einer Adresse ein Template tragen (siehe Kontakt).
@@ -643,7 +690,10 @@ export function pdfDokument(b: Erfassungsbogen, qr: QrSatz): TDocumentDefinition
       { text: "Qualifikation", bold: true, fillColor: GRAU },
     ],
   ];
-  for (const p of b.personal) {
+  for (let i = 0; blanko && i < blanko.qualifikationen; i++) {
+    qualiZeilen.push([leerZelle(), leerZelle()]);
+  }
+  for (const p of blanko ? [] : b.personal) {
     if (p.zusatzqualifikationen.length > 0) {
       qualiZeilen.push([
         { text: `${p.nachname}, ${p.vorname}` },
@@ -664,15 +714,15 @@ export function pdfDokument(b: Erfassungsbogen, qr: QrSatz): TDocumentDefinition
             {
               stack: [
                 { text: "Sofortbedarf:", bold: true, decoration: "underline" },
-                { text: `${kasten(sb.verpflegungPersonen > 0)} Verpflegung für ${sb.verpflegungPersonen} Personen, davon ${vp.vegetarisch} vegetarisch, ${vp.vegan} vegan` },
-                { text: `${kasten(sb.dieselLiter + sb.benzinLiter + sb.gemischLiter > 0)} Betriebsstoff: ${sb.dieselLiter} l Diesel / ${sb.benzinLiter} l Benzin / ${sb.gemischLiter} l Gemisch` },
+                { text: `${kasten(sb.verpflegungPersonen > 0)} Verpflegung für ${zahl(sb.verpflegungPersonen)} Personen, davon ${zahl(vp.vegetarisch)} vegetarisch, ${zahl(vp.vegan)} vegan` },
+                { text: `${kasten(sb.dieselLiter + sb.benzinLiter + sb.gemischLiter > 0)} Betriebsstoff: ${zahl(sb.dieselLiter)} l Diesel / ${zahl(sb.benzinLiter)} l Benzin / ${zahl(sb.gemischLiter)} l Gemisch` },
               ],
             },
             {
               stack: [
                 { text: `${kasten(sb.unterbringung)}  Unterbringung` },
                 { text: `${kasten(sb.ruhezeitErforderlich)}  Ruhezeit erforderlich` },
-                { text: `Anzahl Unterbringung/WC/Dusche:\nM ${mwd.m} / W ${mwd.w} / D ${mwd.d}` },
+                { text: `Anzahl Unterbringung/WC/Dusche:\nM ${zahl(mwd.m)} / W ${zahl(mwd.w)} / D ${zahl(mwd.d)}` },
               ],
             },
           ],
@@ -688,11 +738,12 @@ export function pdfDokument(b: Erfassungsbogen, qr: QrSatz): TDocumentDefinition
     defaultStyle: { fontSize: 8, font: SCHRIFT },
     info: { title: `Erfassungsbogen ${typKurz || typName}` },
     ...(b.uebung ? { background: uebungsWasserzeichen() } : {}),
-    // Maschinenlesbares JSON dokumentweit einbetten (ZUGFeRD-artig).
-    files: { [EEB_JSON_DATEINAME]: bogenAlsEingebetteteDatei(b) },
+    // Maschinenlesbares JSON dokumentweit einbetten (ZUGFeRD-artig). Am
+    // Vordruck hinge dort ein leerer Bogen — ein Anhang ohne jede Aussage.
+    ...(blanko ? {} : { files: { [EEB_JSON_DATEINAME]: bogenAlsEingebetteteDatei(b) } }),
     footer: (seite, gesamt) => ({
       columns: [
-        { text: `Stand: ${zeitgruppe(b.stand)}`, margin: [40, 0, 0, 0] },
+        { text: blanko ? "Stand:" : `Stand: ${zeitgruppe(b.stand)}`, margin: [40, 0, 0, 0] },
         { text: `${seite} / ${gesamt}`, alignment: "right", margin: [0, 0, 40, 0] },
       ],
       fontSize: 8,
@@ -711,7 +762,9 @@ export function pdfDokument(b: Erfassungsbogen, qr: QrSatz): TDocumentDefinition
           body: [
             [
               {
-                text: `Erfassungsbogen ${typName}`,
+                // Der Vordruck gehört keiner Organisation — der Einheitstyp
+                // wird erst beim Ausfüllen bekannt.
+                text: blanko ? "Erfassungsbogen" : `Erfassungsbogen ${typName}`,
                 color: farbe.schrift,
                 fillColor: farbe.balken,
                 bold: true,
@@ -719,7 +772,9 @@ export function pdfDokument(b: Erfassungsbogen, qr: QrSatz): TDocumentDefinition
                 margin: [6, 8, 6, 8],
               },
               {
-                text: weichUmbrechen([orgLabel(org), b.einheit.organisationName, typKurz].filter(Boolean).join("\n")),
+                text: blanko
+                  ? "Organisation:\nEinheit:"
+                  : weichUmbrechen([orgLabel(org), b.einheit.organisationName, typKurz].filter(Boolean).join("\n")),
                 bold: true,
                 color: farbe.akzent,
                 margin: [2, 8, 2, 8],
@@ -748,7 +803,7 @@ export function pdfDokument(b: Erfassungsbogen, qr: QrSatz): TDocumentDefinition
       // Kein fester Seitenumbruch mehr; als unbreakable-Gruppe zusammengehalten,
       // damit der QR-Code nicht über eine Seitengrenze zerrissen wird. Passt der
       // Block nicht mehr, rückt er als Ganzes auf die nächste Seite.
-      qrBlock(qr, farbe.akzent),
+      ...(qr ? [qrBlock(qr, farbe.akzent)] : []),
     ],
   };
 }

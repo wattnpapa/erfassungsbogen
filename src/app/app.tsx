@@ -6,7 +6,8 @@
  * Tests rendern, ohne dass ein Wurzelknoten oder Plattform-Seiteneffekte nötig sind.
  */
 
-import { useEffect, useRef, useState, type ChangeEvent } from "react";
+import { Fragment, useEffect, useRef, useState, type ChangeEvent } from "react";
+import { START_ABSCHNITTE, type Teil } from "./start-inhalt";
 import type { Erfassungsbogen } from "../model";
 import {
   base64UrlKodieren,
@@ -220,6 +221,55 @@ function SoFunktionierts() {
         </div>
       </div>
     </section>
+  );
+}
+
+/**
+ * Der erklärende Text am Ende der Startseite. Er entsteht aus derselben Quelle
+ * wie der statische Block in index.html (start-inhalt.ts) — deshalb steht nach
+ * dem React-Mount Zeichen für Zeichen dasselbe da wie vorher im Gerüst.
+ * Position: unter dem Arbeitsbereich. Wer die App benutzen will, soll die
+ * Weiche „eigener Bogen / Meldekopf" oben finden; wer wissen will, was das
+ * hier ist, liest weiter.
+ */
+function StartInhalt() {
+  return (
+    <section className="start-seo" aria-label="Über den digitalen Erfassungsbogen">
+      {START_ABSCHNITTE.map((abschnitt) => (
+        <Fragment key={abschnitt.titel}>
+          <h2>{abschnitt.titel}</h2>
+          {abschnitt.bloecke.map((block, i) =>
+            block.art === "absatz" ? (
+              <p key={i}>{teile(block.teile)}</p>
+            ) : block.art === "liste" ? (
+              <ul key={i}>
+                {block.punkte.map((punkt, j) => (
+                  <li key={j}>{teile(punkt)}</li>
+                ))}
+              </ul>
+            ) : (
+              <Fragment key={i}>
+                <h3>{block.frage}</h3>
+                <p>{teile(block.antwort)}</p>
+              </Fragment>
+            ),
+          )}
+        </Fragment>
+      ))}
+    </section>
+  );
+}
+
+/** Fließtext mit eingestreuten Verweisen — wie teileHtml() in start-inhalt.ts. */
+function teile(stuecke: Teil[]) {
+  return stuecke.map((stueck, i) =>
+    typeof stueck === "string" ? (
+      <Fragment key={i}>{stueck}</Fragment>
+    ) : (
+      <a key={i} href={stueck.ziel}>
+        {stueck.text}
+      </a>
+    ),
   );
 }
 
@@ -1212,6 +1262,10 @@ function AppInhalt() {
         {/* Mit vorhandenen Daten bleibt die Erklärung erreichbar — am Ende der
             Startseite, über der Fußzeile, statt den Arbeitsbereich zu verdrängen. */}
         {!erststart && <SoFunktionierts />}
+        {/* Der erklärende Text steht in JEDEM Fall — er ist im statischen
+            Gerüst von index.html schon da, und was dort steht, muss nach dem
+            Mount unverändert stehen bleiben. */}
+        <StartInhalt />
       </main>
       <Fusszeile onBogenOeffnen={oeffneBeispiel} />
       </>

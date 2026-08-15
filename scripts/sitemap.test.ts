@@ -7,6 +7,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterAll, describe, expect, it, vi } from "vitest";
 import {
+  DATEIEN,
   eintraegeErzeugen,
   eintraegeSammeln,
   istFlacherKlon,
@@ -18,8 +19,15 @@ import {
 
 const WURZEL = join(import.meta.dirname, "..");
 
-/** Verzeichnisinhalt von public/ wie readdirSync ihn liefert (unsortiert). */
-const PUBLIC_ECHT = readdirSync(join(WURZEL, "public"));
+/**
+ * Verzeichnisinhalt von public/ wie readdirSync ihn liefert (unsortiert),
+ * dazu die verlinkten Downloads mit ihrem Pfad — genau die Liste, die auch
+ * eintraegeErzeugen zusammenstellt.
+ */
+const PUBLIC_ECHT = [...readdirSync(join(WURZEL, "public")), ...Object.keys(DATEIEN)];
+
+/** Adressen der Nicht-HTML-Einträge (Downloads) — sie haben kein Canonical. */
+const DATEI_ADRESSEN = Object.keys(DATEIEN).map((d) => `https://erfassungsbogen.app/${d}`);
 
 /** Fester Datumsgeber, damit die Sammellogik ohne git prüfbar bleibt. */
 const FESTES_DATUM = () => "2026-01-31";
@@ -66,12 +74,38 @@ describe("eintraegeSammeln", () => {
     expect(werte["https://erfassungsbogen.app/datenschutz.html"]).toBe("0.3");
   });
 
-  it("hängt eine neue Seite hinten mit 0.7 an", () => {
+  it("hängt eine neue Seite hinter die bekannten Seiten mit 0.7 an", () => {
     const eintraege = eintraegeSammeln([...PUBLIC_ECHT, "bergwacht.html"], FESTES_DATUM);
-    expect(eintraege[eintraege.length - 1]).toMatchObject({
+    const seiten = eintraege.filter((e) => !DATEI_ADRESSEN.includes(e.loc));
+    expect(seiten[seiten.length - 1]).toMatchObject({
       loc: "https://erfassungsbogen.app/bergwacht.html",
       priority: "0.7",
     });
+  });
+
+  it("nimmt die verlinkten Downloads auf — aber nur, solange die Datei da ist", () => {
+    const eintraege = eintraegeSammeln(PUBLIC_ECHT, FESTES_DATUM);
+    // Die Downloads stehen am Ende, hinter allen Seiten.
+    expect(eintraege.slice(-DATEI_ADRESSEN.length).map((e) => e.loc)).toEqual(DATEI_ADRESSEN);
+    for (const [datei, prioritaet] of Object.entries(DATEIEN)) {
+      const eintrag = eintraege.find((e) => e.loc.endsWith(`/${datei}`));
+      expect(eintrag, `${datei} fehlt in der Sitemap`).toBeDefined();
+      expect(eintrag!.priority).toBe(prioritaet);
+      // lastmod kommt aus genau dieser Datei, nicht aus dem Ordner.
+      expect(quellen(datei)).toEqual([`public/${datei}`]);
+    }
+    // Fehlt die Datei in public/, darf auch kein Eintrag entstehen.
+    const ohneDownloads = eintraegeSammeln(
+      PUBLIC_ECHT.filter((d) => !(d in DATEIEN)),
+      FESTES_DATUM,
+    ).map((e) => e.loc);
+    for (const adresse of DATEI_ADRESSEN) expect(ohneDownloads).not.toContain(adresse);
+  });
+
+  it("hält jede gelistete Download-Datei auch wirklich in public/ vor", () => {
+    for (const datei of Object.keys(DATEIEN)) {
+      expect(() => readFileSync(join(WURZEL, "public", datei)), `${datei} fehlt`).not.toThrow();
+    }
   });
 
   it("lässt eine gelöschte Seite weg, auch wenn sie noch in der priority-Tabelle steht", () => {
@@ -88,7 +122,12 @@ describe("eintraegeSammeln", () => {
       expect(adresse, `${datei} hat kein rel="canonical"`).toBeDefined();
       erwartet.add(adresse);
     }
-    const locs = eintraegeSammeln(PUBLIC_ECHT, FESTES_DATUM).map((e) => e.loc);
+    // Downloads tragen kein Canonical und werden darum getrennt geprüft (siehe
+    // den Test darüber); für die HTML-Seiten muss die Deckung exakt bleiben:
+    // keine Seite ohne Sitemap-Eintrag, kein Eintrag ohne Seite, keine Dublette.
+    const locs = eintraegeSammeln(PUBLIC_ECHT, FESTES_DATUM)
+      .map((e) => e.loc)
+      .filter((loc) => !DATEI_ADRESSEN.includes(loc));
     expect(new Set(locs)).toEqual(erwartet);
     expect(locs).toHaveLength(erwartet.size);
   });
@@ -246,7 +285,10 @@ describe("sitemapErzeugen (mit echtem git-Aufruf)", () => {
   it("liefert für die echten Seiten ein gültiges Dokument", () => {
     expect(doc.querySelectorAll("url").length).toBeGreaterThanOrEqual(PUBLIC_ECHT.filter((d) => d.endsWith(".html")).length);
     for (const loc of doc.querySelectorAll("loc")) {
-      expect(loc.textContent).toMatch(/^https:\/\/erfassungsbogen\.app\/([a-z0-9-]+\.html)?$/);
+      // Startseite, Textseite oder ein verlinkter Download aus einem Unterordner.
+      expect(loc.textContent).toMatch(
+        /^https:\/\/erfassungsbogen\.app\/([a-z0-9-]+\.html|[a-z0-9-]+\/[a-z0-9-]+\.[a-z0-9]+)?$/,
+      );
     }
   });
 

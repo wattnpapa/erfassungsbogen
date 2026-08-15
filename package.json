@@ -25,6 +25,7 @@
     "beispiele:bundeswehr": "node --import tsx scripts/bundeswehr-beispielboegen.mts",
     "beispiele:drk-san": "node --import tsx scripts/drk-sanitaetsdienst-beispielboegen.mts",
     "beispiele:asb-san": "node --import tsx scripts/asb-sanitaetsdienst-beispielboegen.mts",
+    "blanko-pdf": "node --import tsx scripts/blanko-pdf.mts",
     "vokabular:berufe": "node --import tsx scripts/berufe-vokabular.mts",
     "vokabular:thw-funktionen": "node --import tsx scripts/thw-funktionen-vokabular.mts",
     "icons": "node scripts/render-icons.mjs",

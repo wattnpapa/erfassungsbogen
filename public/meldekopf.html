@@ -3,13 +3,13 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Meldekopf digital – Kräfteerfassung ohne Internet</title>
-  <meta name="description" content="Meldekopf digital führen: eintreffende Einheiten per QR-Code scannen, Stärke laufend summieren, alles als Sammel-PDF weitergeben. Kostenlos und offline.">
+  <title>Meldekopf digital: Kräfteerfassung im Bereitstellungsraum</title>
+  <meta name="description" content="Eintreffende Einheiten am Bereitstellungsraum erfassen, Stärke automatisch summieren und Kräfteübersichten erstellen. Kostenlos und vollständig offline.">
   <link rel="canonical" href="https://erfassungsbogen.app/meldekopf.html">
   <link rel="icon" href="./icon.svg" type="image/svg+xml">
   <meta property="og:type" content="article">
-  <meta property="og:title" content="Meldekopf digital – Kräfteerfassung ohne Internet">
-  <meta property="og:description" content="Eintreffende Einheiten scannen statt stapeln: Stärke-Summen auf einen Blick, Folgemeldungen im Vergleich, Sammel-PDF für die nächste Führungsstelle — alles offline am Tablet.">
+  <meta property="og:title" content="Meldekopf digital: Kräfteerfassung im Bereitstellungsraum">
+  <meta property="og:description" content="Eintreffende Einheiten scannen statt stapeln: Kräfte und Mittel auf einen Blick, Stärkeübersicht ohne Rechnen, Sammel-PDF für die nächste Führungsstelle — alles offline am Tablet.">
   <meta property="og:url" content="https://erfassungsbogen.app/meldekopf.html">
   <meta property="og:image" content="https://erfassungsbogen.app/og-bild.jpg">
   <meta property="og:image:width" content="1200">
@@ -70,10 +70,10 @@
   <!-- NAV:END -->
 
   <main>
-    <h1>Meldekopf digital: Kräfteerfassung ohne Internet</h1>
+    <h1>Meldekopf digital: Kräfteerfassung im Bereitstellungsraum</h1>
 
     <figure class="zeichen">
-      <img src="./bilder/taktisches-zeichen-meldekopf.svg" width="88" height="88" loading="lazy"
+      <img src="./bilder/taktisches-zeichen-meldekopf.svg" width="88" height="88" fetchpriority="high" decoding="async"
         alt="Taktisches Zeichen „Meldekopf“ nach DV 102: gelber Kreis mit schwarzem „M“.">
       <figcaption>
         Taktisches Zeichen „Meldekopf“. Grafik: Thiemo Schuff, Lizenz CC BY-SA 3.0,
@@ -82,12 +82,13 @@
     </figure>
 
     <p>
-      Am Meldekopf entscheidet sich, ob eine Lage führbar ist: Hier treffen die
-      Einheiten ein, hier entsteht das Bild, wer mit welcher Stärke und welchem
+      Am Meldekopf entscheidet sich, ob eine Lage führbar ist: Hier melden sich
+      die eintreffenden Einheiten an, hier entsteht die Übersicht über Kräfte
+      und Mittel — wer mit welcher Stärke, welchen Einsatzmitteln und welchem
       Bedarf bereitsteht. Auf Papier heißt das: Bögen stapeln, Stärken mit dem
       Taschenrechner addieren, bei jeder Neumeldung von vorn. Diese App macht
       daraus einen Scan — und sie tut das bewusst ohne Server, ohne Anmeldung
-      und ohne Internet, denn genau darauf ist am Bereitstellungsraum kein
+      und ohne Internet, denn genau darauf ist im Bereitstellungsraum kein
       Verlass.
     </p>
 
@@ -124,14 +125,17 @@
       </li>
     </ul>
 
-    <h2>Stärke und Bedarf: immer aktuell summiert</h2>
+    <h2>Stärkeübersicht: immer aktuell summiert</h2>
     <p>
       Die App zählt Führer, Unterführer, Mannschaft und Gesamtstärke über alle
       anwesenden Einheiten laufend zusammen und bildet Zwischensummen je Zug —
       die Frage „Wie viele Kräfte stehen bereit?" kannst du damit jederzeit ohne
-      Rechnen beantworten. Auch der Sofortbedarf (Verpflegung, Unterkunft,
-      Kraftstoff, Material) wird über alle Einheiten gesammelt statt in
-      zwanzig Einzelbögen zu stecken.
+      Rechnen beantworten. Wie eine einzelne Meldung aufgebaut ist, aus der
+      diese Summe entsteht, erklärt die Seite
+      <a href="./staerkemeldung-feuerwehr.html">Stärkemeldung der Feuerwehr</a>.
+      Auch der Sofortbedarf (Verpflegung, Unterkunft, Kraftstoff, Material)
+      wird über alle Einheiten gesammelt statt in zwanzig Einzelbögen zu
+      stecken.
     </p>
 
     <h2>Folgemeldungen und Schichtübergabe</h2>
@@ -144,11 +148,12 @@
       Zeile je Einheit — das ist die Schichtübergabe auf einem Blatt.
     </p>
 
-    <h2>Weitergabe an die nächste Führungsstelle</h2>
+    <h2>Kräfteübersicht weitergeben</h2>
     <p>
       Den gesamten Einsatz druckst du als Sammel-PDF oder gibst ihn als Datei
-      weiter; die Tabellen exportierst du bei Bedarf als CSV für die
-      Stabsarbeit. Und wenn du prüfen willst, woher ein Bogen stammt: Bögen
+      weiter — eine Kräfteübersicht mit einer Zeile je Einheit und den Summen
+      darunter, wie die nächste Führungsstelle sie braucht; die Tabellen
+      exportierst du bei Bedarf als CSV für die Stabsarbeit. Und wenn du prüfen willst, woher ein Bogen stammt: Bögen
       können eine Ed25519-Signatur tragen, freiwillige Absenderangaben machen
       Rückfragen möglich.
     </p>
@@ -171,13 +176,26 @@
       <li>Gib Sammel-PDF oder Datei an die nächste Führungsstelle.</li>
     </ol>
     <p>
-      Für die meldenden Einheiten gibt es passende Einstiege mit Vorbelegungen:
-      <a href="./thw.html">THW</a>, <a href="./feuerwehr.html">Feuerwehr</a>,
-      <a href="./dlrg.html">DLRG</a> und der
+      Damit die Einheiten schon mit fertigem Bogen anrücken, gibt es passende
+      Einstiege mit Vorbelegungen — etwa um
+      <a href="./feuerwehr.html">Feuerwehr-Einheiten erfassen</a> zu lassen
+      oder <a href="./thw.html">THW-Einheiten erfassen</a> zu lassen; ebenso
+      für <a href="./dlrg.html">DLRG</a> und den
       <a href="./katastrophenschutz.html">Katastrophenschutz der Länder</a>.
     </p>
 
     <h2>Häufige Fragen</h2>
+
+    <h3>Taugt das für die Kräfteerfassung im Bereitstellungsraum?</h3>
+    <p>
+      Dafür ist es gebaut. Der Bereitstellungsraum ist die Stelle, an der
+      Einheiten warten, bis sie eingeteilt werden — und genau dort brauchst du
+      eine belastbare Übersicht über Kräfte und Mittel: welche Einheiten da
+      sind, mit welcher Stärke, mit welchen Einsatzmitteln und wie lange sie
+      noch ohne Ablösung durchhalten. Ob du am Meldekopf, im
+      Bereitstellungsraum oder als Zugführer die Einheiten deines Abschnitts
+      führst, ändert am Ablauf nichts.
+    </p>
 
     <h3>Braucht der Meldekopf dafür Internet?</h3>
     <p>
@@ -203,6 +221,7 @@
     <footer>
       <a href="./">Zurück zur App</a> ·
       <a href="./anleitung.html">Anleitung</a> ·
+      <a href="./staerkemeldung-feuerwehr.html">Stärkemeldung Feuerwehr</a> ·
       <a href="./thw.html">THW</a> ·
       <a href="./feuerwehr.html">Feuerwehr</a> ·
       <a href="./dlrg.html">DLRG</a> ·
@@ -224,13 +243,18 @@
         "@type": "BreadcrumbList",
         "itemListElement": [
           { "@type": "ListItem", "position": 1, "name": "Erfassungsbogen.app", "item": "https://erfassungsbogen.app/" },
-          { "@type": "ListItem", "position": 2, "name": "Meldekopf digital", "item": "https://erfassungsbogen.app/meldekopf.html" }
+          { "@type": "ListItem", "position": 2, "name": "Meldekopf digital: Kräfteerfassung im Bereitstellungsraum", "item": "https://erfassungsbogen.app/meldekopf.html" }
         ]
       },
       {
         "@type": "FAQPage",
         "inLanguage": "de",
         "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "Taugt die App für die Kräfteerfassung im Bereitstellungsraum?",
+            "acceptedAnswer": { "@type": "Answer", "text": "Dafür ist sie gebaut. Im Bereitstellungsraum warten Einheiten, bis sie eingeteilt werden — dort braucht es eine belastbare Übersicht über Kräfte und Mittel: welche Einheiten da sind, mit welcher Stärke, mit welchen Einsatzmitteln und wie lange sie ohne Ablösung durchhalten. Ob am Meldekopf, im Bereitstellungsraum oder als Zugführer im eigenen Abschnitt — der Ablauf ist derselbe." }
+          },
           {
             "@type": "Question",
             "name": "Braucht der digitale Meldekopf Internet?",

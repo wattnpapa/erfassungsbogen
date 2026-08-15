@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>Einheiten-Erfassungsbogen – digitale Stärkemeldung für BOS</title>
+  <title>Einheiten-Erfassungsbogen digital – kostenlos &amp; offline</title>
   <link rel="icon" type="image/svg+xml" href="./icon.svg" />
   <link rel="icon" type="image/png" sizes="32x32" href="./icons/icon-32.png" />
   <link rel="apple-touch-icon" href="./apple-touch-icon.png" />
@@ -99,6 +99,62 @@
     ]
   }
   </script>
+
+  <!-- FAQ-Auszeichnung zum sichtbaren Abschnitt „Häufige Fragen" weiter unten.
+       Erzeugt aus derselben Quelle wie der sichtbare Text (src/app/start-inhalt.ts),
+       damit Markup und Seiteninhalt nicht auseinanderlaufen können. Nachziehen:
+       node --import tsx scripts/start-inhalt.mts -->
+  <!-- start-faq:anfang (erzeugt aus src/app/start-inhalt.ts — nicht von Hand ändern) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "@id": "https://erfassungsbogen.app/#faq",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "Was kostet der digitale Erfassungsbogen?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Nichts. Die App ist kostenlos und als freie Software unter der EUPL-1.2 veröffentlicht — ohne Anmeldung, ohne Konto, ohne Testzeitraum."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Funktioniert die Stärkemeldung ohne Internet?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Ja. Nach dem ersten Aufruf lädt die Seite aus dem Gerätespeicher, und die Übergabe kommt ohne Netz aus: Ein Gerät zeigt den QR-Code, das andere liest ihn ein. Es wird weder eine Verbindung noch eine Kopplung der Geräte gebraucht."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Wo werden die eingegebenen Daten gespeichert?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Auf dem Gerät, mit dem der Bogen ausgefüllt wird — im Speicher des Browsers beziehungsweise der App. Sie verlassen das Gerät nur, wenn ein Bogen bewusst als PDF, Datei oder QR-Code weitergegeben wird. Einzelheiten stehen im Datenschutzhinweis."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Wie kommt der ausgefüllte Bogen zum Meldekopf?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Auf drei Wegen: als QR-Code vom Bildschirm oder vom PDF-Ausdruck, als Datei (etwa über AirDrop, Quick Share oder einen USB-Stick) — oder klassisch als Ausdruck auf Papier. Was am Meldekopf damit passiert, beschreibt die Seite Meldekopf digital."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Passt das PDF zum Erfassungsbogen unserer Organisation?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Das PDF folgt dem Aufbau des gewohnten Papierbogens, damit der Ausdruck in bestehende Meldewege passt. Welche Felder das sind und wie ein Blanko-Bogen aussieht, zeigt die Seite Vorlage und Aufbau des Bogens."
+        }
+      }
+    ]
+  }
+  </script>
+  <!-- start-faq:ende -->
   <script>
     // Gespeicherten Anzeigemodus (Dunkel/Feld/Nacht) VOR dem ersten Malen anwenden:
     // Das statische Start-Gerüst unten erscheint sofort mit dem HTML — ohne
@@ -838,6 +894,36 @@
       display: inline-block; margin: var(--r-3) 0 0; padding: 0.3rem 0.7rem;
       border: var(--strich) solid var(--gut); border-radius: var(--radius); background: transparent;
       color: var(--gut); font-size: var(--t-s); font-weight: 600;
+    }
+    /* Erklärender Fließtext am Ende der Startseite (Quelle: start-inhalt.ts).
+       Er steht bewusst UNTER dem Arbeitsbereich: die Weiche „eigener Bogen /
+       Meldekopf" ist die Aufgabe der Seite und darf nicht nach unten rutschen,
+       nur damit ein Text weiter oben steht. Reine Rollen-Token, damit Dunkel-,
+       Feld- und Nacht-Modus ohne eigene Blöcke greifen. */
+    .start-seo {
+      max-width: 44rem; margin: var(--r-6) 0 0;
+      border-top: var(--strich) solid var(--linie); padding-top: var(--r-5);
+    }
+    .start-seo > h2 { margin-top: var(--r-6); }
+    .start-seo > h2:first-child { margin-top: 0; }
+    .start-seo > h3 { margin-top: var(--r-4); }
+    .start-seo p, .start-seo ul { margin: 0 0 var(--r-3); color: var(--text-2); }
+    .start-seo ul { padding-left: 1.2rem; }
+    .start-seo li { margin-bottom: var(--r-2); }
+    .start-seo a { color: var(--akzent-hell); }
+    /* Nur im statischen Gerüst: Der Text darunter steht dort schon, während
+       der Arbeitsbereich noch fehlt (den zeichnet erst React). Ohne diese
+       reservierte Höhe stünde er beim ersten Bild oben im Bild und spränge
+       beim Mount um eine ganze Seite nach unten — genau der Layout-Sprung,
+       den CLS misst. Mit ihr liegt er vorher wie nachher unterhalb des
+       sichtbaren Ausschnitts, und nichts bewegt sich im Bild. */
+    .start-platzhalter { min-height: 100vh; }
+    /* Auf breiten Fenstern stehen die beiden Wege der Weiche nebeneinander,
+       der Arbeitsbereich wird dadurch flacher als eine Fensterhöhe. Dann
+       trifft ein fester Wert ihn genauer als 100vh: der Text darunter steht
+       vorher wie nachher auf praktisch derselben Höhe. */
+    @media (min-width: 48rem) {
+      .start-platzhalter { min-height: 52rem; }
     }
     /* „Weiter, wo du warst": die Entwurfs-Karte trägt die schwere Deckzeile
        des gedruckten Formularabschnitts — dieselbe 4-px-Kante wie die Weiche
@@ -2490,6 +2576,47 @@
         QR-Code ohne Internetverbindung von Gerät zu Gerät übertragen.
       </p>
       <p class="offline-badge">✓ Funktioniert komplett offline — alle Daten bleiben auf diesem Gerät.</p>
+      <!-- Leerer Platz für den Arbeitsbereich (Weiche, Vorlagen, Einsätze), den
+           erst React zeichnet: Er hält den Text darunter unterhalb des
+           sichtbaren Ausschnitts, sodass beim Mount nichts im Bild springt. -->
+      <div class="start-platzhalter" aria-hidden="true"></div>
+      <!-- Derselbe Text, den die React-Startseite unten zeigt — erzeugt aus
+           src/app/start-inhalt.ts, damit beide Pfade nicht auseinanderlaufen
+           (Prüfung: src/test/start-inhalt.test.ts). -->
+      <!-- start-inhalt:anfang (erzeugt aus src/app/start-inhalt.ts — nicht von Hand ändern) -->
+      <section class="start-seo" aria-label="Über den digitalen Erfassungsbogen">
+        <h2>Für Einsatz, Übung und Bereitstellungsraum</h2>
+        <p>Der Einheiten-Erfassungsbogen hält fest, wer mit welcher Stärke, welchen Fahrzeugen und welchem Sofortbedarf im Einsatz ist. Diese Web-App bildet genau diesen Bogen digital ab: Ein Assistent führt durch Einheit, Einsatz, Personal, Fahrzeuge und Sofortbedarf, die Gesamtübersicht lässt sich danach jederzeit nachbearbeiten. Am Ende steht ein PDF im gewohnten Papier-Layout — <a href="./vorlage.html">Aufbau des Bogens und Blanko-Vorlage</a>.</p>
+        <p>Bögen, die zu einer Übung gehören, werden als Übung gekennzeichnet; die Kennzeichnung bleibt bis ins PDF und in den QR-Code erhalten. So wird eine Übungsmeldung am Meldekopf nicht versehentlich zur Lage gezählt.</p>
+        <h2>So funktioniert die digitale Stärkemeldung</h2>
+        <ul>
+          <li>Ausfüllen: Die Stärke wird als Führer, Unterführer, Mannschaft und Gesamtzahl geführt; taktische Zeichen und Funkrufnamen sind hinterlegt und werden vorgeschlagen.</li>
+          <li>Ausgeben: Das PDF folgt dem gewohnten Papierbogen — und trägt den kompletten Bogeninhalt zusätzlich als QR-Code auf der letzten Seite.</li>
+          <li>Übergeben: Die Gegenstelle liest den QR-Code mit der Kamera oder einem USB-Handscanner ein, oder sie bekommt den Bogen als Datei. Ohne Netz, ohne Server, ohne Kopplung der Geräte.</li>
+        </ul>
+        <p>Jeden Schritt erklärt die <a href="./anleitung.html">Anleitung zum Erfassungsbogen</a>; wie sich das Verfahren zum Papierbogen verhält, steht in <a href="./papier-oder-digital.html">Papier oder digital?</a>.</p>
+        <h2>Für welche Organisationen?</h2>
+        <p>Der Bogen ist BOS-übergreifend gebaut: Organisation, Einheit und Teileinheit sind Angaben im Bogen, keine feste Struktur. Eigene Seiten mit Beispielen und Hinweisen gibt es für den <a href="./thw.html">Erfassungsbogen im THW</a>, die <a href="./feuerwehr.html">Feuerwehr</a>, die <a href="./dlrg.html">DLRG</a>, das <a href="./drk.html">DRK</a>, die <a href="./johanniter.html">Johanniter</a>, die <a href="./malteser.html">Malteser</a>, den <a href="./asb.html">ASB</a> und den <a href="./katastrophenschutz.html">Katastrophenschutz der Länder</a>. Für die Feuerwehr ist der Aufbau der <a href="./staerkemeldung-feuerwehr.html">Stärkemeldung mit Beispiel</a> gesondert beschrieben.</p>
+        <p>Als Vorbelegung liegen Beispielbögen bereit — vom THW-Zug nach StAN über die Einheiten der niedersächsischen Feuerwehrverordnung bis zu den Katastrophenschutzeinheiten der Länder sowie Einheiten von DRK und DLRG. Sie lassen sich anwenden und anpassen; eigene Vorlagen speichert die App auf dem Gerät und gibt sie wie einen Bogen per QR-Code weiter.</p>
+        <h2>Offline statt Cloud</h2>
+        <p>Alle Daten bleiben auf dem Gerät. Es gibt keinen Server, an den ein Bogen geschickt würde, keine Anmeldung und kein Konto. Nach dem ersten Aufruf läuft die Seite offline und lässt sich auf dem Startbildschirm ablegen; daneben gibt es Fassungen für Windows, macOS, Linux und Android. Wie gezählt wird, wer die Seite aufruft, steht im <a href="./datenschutz.html">Datenschutzhinweis</a>.</p>
+        <p>Die App ist kostenlos und quelloffen unter der EUPL-1.2. Ein übergebener Bogen trägt ein Echtheits-Siegel des ausstellenden Geräts, das die Gegenstelle beim Einlesen prüft — wer möchte, hinterlegt zusätzlich Name und Rückkanal als Absender.</p>
+        <h2>Vom Erfassungsbogen zur Kräfteübersicht</h2>
+        <p>Am <a href="./meldekopf.html">Meldekopf</a>, im Bereitstellungsraum und beim Zugführer laufen viele Bögen zusammen. Dafür gibt es die Einsatz-Sammlung: Eintreffende Bögen werden gescannt oder als Datei übernommen, die Stärke aller anwesenden Einheiten wird laufend summiert — mit Zwischensummen je Zug. Wer eine Einheit nur durchwinken muss, nimmt die Schnellerfassung mit Stärke, Führungskraft und Fahrzeugen.</p>
+        <p>Jede Meldung landet in einer Historie; ein Vergleich zeigt zur Schichtübergabe, was sich seit der letzten Meldung geändert hat. Für die Weitermeldung erzeugt die Sammlung ein Sammel-PDF, eine CSV-Liste je Einsatz und eine Excel-Liste im Format „Oldenburg“.</p>
+        <h2>Häufige Fragen</h2>
+        <h3>Was kostet der digitale Erfassungsbogen?</h3>
+        <p>Nichts. Die App ist kostenlos und als freie Software unter der EUPL-1.2 veröffentlicht — ohne Anmeldung, ohne Konto, ohne Testzeitraum.</p>
+        <h3>Funktioniert die Stärkemeldung ohne Internet?</h3>
+        <p>Ja. Nach dem ersten Aufruf lädt die Seite aus dem Gerätespeicher, und die Übergabe kommt ohne Netz aus: Ein Gerät zeigt den QR-Code, das andere liest ihn ein. Es wird weder eine Verbindung noch eine Kopplung der Geräte gebraucht.</p>
+        <h3>Wo werden die eingegebenen Daten gespeichert?</h3>
+        <p>Auf dem Gerät, mit dem der Bogen ausgefüllt wird — im Speicher des Browsers beziehungsweise der App. Sie verlassen das Gerät nur, wenn ein Bogen bewusst als PDF, Datei oder QR-Code weitergegeben wird. Einzelheiten stehen im <a href="./datenschutz.html">Datenschutzhinweis</a>.</p>
+        <h3>Wie kommt der ausgefüllte Bogen zum Meldekopf?</h3>
+        <p>Auf drei Wegen: als QR-Code vom Bildschirm oder vom PDF-Ausdruck, als Datei (etwa über AirDrop, Quick Share oder einen USB-Stick) — oder klassisch als Ausdruck auf Papier. Was am Meldekopf damit passiert, beschreibt die Seite <a href="./meldekopf.html">Meldekopf digital</a>.</p>
+        <h3>Passt das PDF zum Erfassungsbogen unserer Organisation?</h3>
+        <p>Das PDF folgt dem Aufbau des gewohnten Papierbogens, damit der Ausdruck in bestehende Meldewege passt. Welche Felder das sind und wie ein Blanko-Bogen aussieht, zeigt die Seite <a href="./vorlage.html">Vorlage und Aufbau des Bogens</a>.</p>
+      </section>
+      <!-- start-inhalt:ende -->
     </main>
   </div>
   <!-- Ohne JavaScript bleibt der Bildschirm sonst leer — wer hier landet (auch
@@ -2497,7 +2624,13 @@
        die lesbaren Texte stehen. -->
   <noscript>
     <div class="ohne-js">
-      <h1>Digitaler Einheiten-Erfassungsbogen</h1>
+      <!-- H2, nicht H1: <noscript> steht im selben Dokument wie das Start-Gerüst
+           oben, dessen H1 die Seitenüberschrift ist. Ein zweites H1 im Quelltext
+           macht die Überschriftenhierarchie mehrdeutig — für Suchmaschinen wie
+           für Screenreader, die den noscript-Inhalt bei aktivem JS zwar nicht
+           vorlesen, ihn aber im Quelltext haben. Der Text bleibt vollständig
+           erhalten; er ist der Einstieg für Crawler und JS-lose Besucher. -->
+      <h2>Digitaler Einheiten-Erfassungsbogen</h2>
       <p>
         Der digitale Einheiten-Erfassungsbogen — das kostenlose Online-Tool für
         alle BOS und Hilfsorganisationen: Feuerwehr, THW, Polizei, DRK/JUH/MHD/ASB,

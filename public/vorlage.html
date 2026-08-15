@@ -3,13 +3,13 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Einheiten-Erfassungsbogen: Vorlage, Aufbau und Blanko-PDF</title>
-  <meta name="description" content="Welche Felder der Einheiten-Erfassungsbogen enthält — und wie sich ein leerer Bogen als PDF im Papier-Layout ausdrucken lässt. Kostenlos, ohne Anmeldung.">
+  <title>Einheiten-Erfassungsbogen: Blanko-PDF &amp; digitale Vorlage</title>
+  <meta name="description" content="Blanko-Erfassungsbogen als PDF herunterladen und ausdrucken (2 Seiten, A4) — oder denselben Bogen digital ausfüllen. Alle Felder erklärt. Kostenlos, ohne Anmeldung.">
   <link rel="canonical" href="https://erfassungsbogen.app/vorlage.html">
   <link rel="icon" href="./icon.svg" type="image/svg+xml">
   <meta property="og:type" content="article">
-  <meta property="og:title" content="Einheiten-Erfassungsbogen: Vorlage, Aufbau und Blanko-PDF">
-  <meta property="og:description" content="Alle Felder des Erfassungsbogens im Überblick — und wie ein leerer oder vorbelegter Bogen als PDF entsteht.">
+  <meta property="og:title" content="Einheiten-Erfassungsbogen: Blanko-PDF &amp; digitale Vorlage">
+  <meta property="og:description" content="Den leeren Erfassungsbogen als PDF herunterladen und ausdrucken — oder ihn digital ausfüllen und per QR-Code weitergeben.">
   <meta property="og:url" content="https://erfassungsbogen.app/vorlage.html">
   <meta property="og:image" content="https://erfassungsbogen.app/og-bild.jpg">
   <meta property="og:image:width" content="1200">
@@ -52,6 +52,12 @@
       text-decoration: none;
       font-weight: 600;
     }
+    /* Papier und Bildschirm sind zwei gleichwertige Wege zum selben Bogen —
+       deshalb stehen beide Knöpfe nebeneinander und gleich groß. Der zweite ist
+       nur invertiert, damit man sie auseinanderhält, nicht abgestuft. */
+    .wege { display: flex; flex-wrap: wrap; gap: 0.6rem; margin: 1rem 0 0.4rem; }
+    .start.papier { background: #fff; color: var(--blau); border: 2px solid var(--blau); }
+    .wege-hinweis { font-size: 0.85rem; color: #555; margin: 0.2rem 0 0; }
     /* Die Feldtabelle ist der eigentliche Inhalt der Seite — auf dem Telefon
        darf sie scrollen, statt die Seite in die Breite zu ziehen. */
     .tabelle { overflow-x: auto; }
@@ -94,17 +100,21 @@
   <!-- NAV:END -->
 
   <main>
-    <h1>Einheiten-Erfassungsbogen: Vorlage, Aufbau und Blanko-PDF</h1>
+    <h1>Einheiten-Erfassungsbogen: Blanko-PDF und digitale Vorlage</h1>
 
     <p>
       Der Einheiten-Erfassungsbogen ist das Formular, mit dem eine eintreffende
       Einheit am Meldekopf oder im Bereitstellungsraum erfasst wird: wer ist da,
       in welcher Stärke, mit welchen Fahrzeugen, und was wird sofort gebraucht.
-      Diese Seite beschreibt, welche Felder dazugehören — und wie du den Bogen
-      leer ausdruckst oder gleich am Gerät ausfüllst.
+      Du bekommst ihn hier auf beiden Wegen — als leeren Vordruck zum Ausdrucken
+      und als digitale Vorlage zum Ausfüllen am Gerät.
     </p>
 
-    <p><a class="start" href="./">Bogen jetzt ausfüllen</a></p>
+    <div class="wege">
+      <a class="start papier" href="./downloads/einheiten-erfassungsbogen-blanko.pdf" download>Blanko-PDF herunterladen</a>
+      <a class="start" href="./">Digital ausfüllen</a>
+    </div>
+    <p class="wege-hinweis">PDF, 2 Seiten A4, rund 11 kB — ohne Anmeldung, ohne Wasserzeichen.</p>
 
     <h2>Wofür der Bogen gebraucht wird</h2>
     <p>
@@ -173,20 +183,35 @@
       </table>
     </div>
 
-    <h2>Leeren Bogen als PDF ausdrucken</h2>
+    <h2>Blanko-Bogen als PDF herunterladen</h2>
     <p>
-      Brauchst du den Bogen auf Papier — als Vordruck im Fahrzeug oder als Reserve
-      im Meldekopf —, erzeugst du ihn in der App und druckst ihn aus: Bogen öffnen,
-      die Felder überspringen, PDF ausgeben. Es folgt dem gewohnten Papier-Layout,
-      du kannst es unverändert in den Papierlauf geben.
+      Der <a href="./downloads/einheiten-erfassungsbogen-blanko.pdf" download>leere
+      Erfassungsbogen als PDF</a> ist ein Vordruck zum Ausdrucken und Ausfüllen mit
+      dem Kugelschreiber: zwei Seiten A4 im gewohnten Papier-Layout, mit Platz für
+      vier Fahrzeuge und 36 Helferinnen und Helfer. Er eignet sich als Reserve in der
+      Fahrzeugmappe, als Stapel im Meldekopf und für alle Fälle, in denen kein Gerät
+      zur Hand ist.
     </p>
     <p>
-      Bewusst liegt hier kein fertiges Blanko-PDF zum Herunterladen: Der Ausdruck
-      entsteht immer aus dem aktuellen Layout, sodass eine Datei aus dem Netz nicht
-      still veralten kann. Der Umweg über die App kostet dich einen Klick — und wenn
-      du sie einmal offen hast, merkst du meist, dass Ausfüllen am Gerät schneller
-      geht als Abschreiben.
+      Die Datei entsteht aus demselben Layout wie jede PDF der App und wird bei
+      Layout-Änderungen neu erzeugt — der Ausdruck bleibt also mit den digital
+      erzeugten Bögen deckungsgleich. Anders als bei einem ausgefüllten Bogen trägt
+      der Vordruck keinen QR-Code: er hat noch keinen Inhalt, den er weitergeben
+      könnte.
     </p>
+
+    <h2>Denselben Bogen digital ausfüllen</h2>
+    <p>
+      Am Gerät ausgefüllt rechnet der Bogen die Stärke selbst zusammen, kennt die
+      Fahrzeugtypen und taktischen Zeichen und druckt am Ende dieselbe PDF — dann
+      mit QR-Code auf der letzten Seite. Was besser passt, hängt an der Lage; die
+      Abwägung steht in
+      <a href="./papier-oder-digital.html">Papier oder digital?</a>.
+    </p>
+    <div class="wege">
+      <a class="start papier" href="./downloads/einheiten-erfassungsbogen-blanko.pdf" download>Blanko-PDF herunterladen</a>
+      <a class="start" href="./">Digital ausfüllen</a>
+    </div>
 
     <h2>Vorbelegte Vorlagen statt leerem Blatt</h2>
     <p>
@@ -242,8 +267,8 @@
   {
     "@context": "https://schema.org",
     "@type": "WebPage",
-    "name": "Einheiten-Erfassungsbogen: Vorlage, Aufbau und Blanko-PDF",
-    "description": "Alle Felder des Einheiten-Erfassungsbogens im Überblick — Einheit, Einsatz, Stärkemeldung, Fahrzeuge und Sofortbedarf — sowie der Weg zum ausgedruckten Bogen im Papier-Layout.",
+    "name": "Einheiten-Erfassungsbogen: Blanko-PDF und digitale Vorlage",
+    "description": "Der leere Einheiten-Erfassungsbogen als PDF zum Ausdrucken sowie alle Felder des Bogens im Überblick — Einheit, Einsatz, Stärkemeldung, Fahrzeuge und Sofortbedarf.",
     "url": "https://erfassungsbogen.app/vorlage.html",
     "inLanguage": "de",
     "isPartOf": { "@type": "WebSite", "name": "Erfassungsbogen.app", "url": "https://erfassungsbogen.app/" },
@@ -257,7 +282,7 @@
     "@type": "BreadcrumbList",
     "itemListElement": [
       { "@type": "ListItem", "position": 1, "name": "Erfassungsbogen.app", "item": "https://erfassungsbogen.app/" },
-      { "@type": "ListItem", "position": 2, "name": "Vorlage und Aufbau des Bogens", "item": "https://erfassungsbogen.app/vorlage.html" }
+      { "@type": "ListItem", "position": 2, "name": "Blanko-PDF und Vorlage des Bogens", "item": "https://erfassungsbogen.app/vorlage.html" }
     ]
   }
   </script>

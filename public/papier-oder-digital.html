@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Papier-Erfassungsbogen oder digital? Ein ehrlicher Vergleich</title>
-  <meta name="description" content="Papierbogen, Excel oder App: Was eignet sich für die Stärkemeldung im Einsatz? Ein ehrlicher Vergleich von Lesbarkeit, Übergabe und Ausfallsicherheit.">
+  <title>Einheiten-Erfassungsbogen: Papier oder digital?</title>
+  <meta name="description" content="Papierbogen, Excel-Tabelle oder App für die Stärkemeldung im Einsatz — verglichen an Lesbarkeit, Summenbildung, Übergabe und Ausfallsicherheit.">
   <link rel="canonical" href="https://erfassungsbogen.app/papier-oder-digital.html">
   <link rel="icon" href="./icon.svg" type="image/svg+xml">
   <meta property="og:type" content="article">
@@ -32,6 +32,7 @@
     figure img { display: block; width: 100%; height: auto; border: 1px solid var(--rand); background: #fff; }
     figcaption { font-size: 0.85rem; color: #555; margin-top: 0.4rem; }
     table { border-collapse: collapse; width: 100%; margin-top: 0.6rem; font-size: 0.95rem; }
+    .tabellenrahmen { overflow-x: auto; }
     th, td { border: 1px solid var(--rand); padding: 0.4rem 0.6rem; text-align: left; vertical-align: top; }
     th { background: #e7eaf3; }
     footer { margin-top: 2.5rem; padding-top: 1rem; border-top: 1px solid var(--rand); font-size: 0.85rem; color: #555; }
@@ -81,49 +82,49 @@
     </p>
 
     <h2>Der Vergleich im Überblick</h2>
-    <table>
-      <tr><th></th><th>Papierbogen</th><th>Digitaler Bogen (diese App)</th></tr>
+    <div class="tabellenrahmen"><table>
+      <thead><tr><td></td><th scope="col">Papierbogen</th><th scope="col">Digitaler Bogen (diese App)</th></tr></thead><tbody>
       <tr>
-        <td><strong>Ausfüllen</strong></td>
+        <th scope="row">Ausfüllen</th>
         <td>Handschrift auf der Motorhaube, jedes Mal von vorn</td>
         <td>Vorlagen, Beispielbögen und Vorbelegungen; beim nächsten Mal passt du nur an</td>
       </tr>
       <tr>
-        <td><strong>Lesbarkeit</strong></td>
+        <th scope="row">Lesbarkeit</th>
         <td>Hängt von Handschrift, Wetter und Eile ab</td>
         <td>Immer druckschriftlich — als PDF im gewohnten Papier-Layout</td>
       </tr>
       <tr>
-        <td><strong>Stärke-Summen</strong></td>
+        <th scope="row">Stärke-Summen</th>
         <td>Taschenrechner am Meldekopf, bei jeder Änderung neu</td>
         <td>Laufend summiert über alle Einheiten, mit Zwischensummen je Zug</td>
       </tr>
       <tr>
-        <td><strong>Übergabe</strong></td>
+        <th scope="row">Übergabe</th>
         <td>Blatt wechselt die Hand; die Gegenstelle tippt ab oder heftet ab</td>
         <td>QR-Code scannen — der komplette Bogen ist im Gerät der Gegenstelle, ohne Internet</td>
       </tr>
       <tr>
-        <td><strong>Folgemeldung</strong></td>
+        <th scope="row">Folgemeldung</th>
         <td>Neues Blatt; was sich geändert hat, muss jemand vergleichen</td>
         <td>Die App zeigt die Änderung: Stärke 12 → 9, Fahrzeug abgemeldet</td>
       </tr>
       <tr>
-        <td><strong>Ausfallsicherheit</strong></td>
+        <th scope="row">Ausfallsicherheit</th>
         <td>Funktioniert immer — solange ein Stift da ist</td>
         <td>Offline nach dem ersten Aufruf; braucht ein geladenes Gerät. Deshalb: druck das PDF und führ Papier mit</td>
       </tr>
       <tr>
-        <td><strong>Datenschutz</strong></td>
+        <th scope="row">Datenschutz</th>
         <td>Das Blatt liegt, wo es liegt</td>
         <td>Alles bleibt lokal auf deinem Gerät — kein Server, keine Cloud, keine Konten</td>
       </tr>
       <tr>
-        <td><strong>Kosten</strong></td>
+        <th scope="row">Kosten</th>
         <td>Druck und Ablage</td>
         <td>Kostenlos, freie Software (EUPL-1.2)</td>
       </tr>
-    </table>
+    </tbody></table></div>
 
     <h2>Die ehrliche Antwort: kein Entweder-oder</h2>
     <p>
@@ -137,7 +138,7 @@
     </p>
 
     <figure>
-      <img src="./screenshots/qr-code-uebergabe.png" width="390" height="844" loading="lazy"
+      <img src="./screenshots/qr-code-uebergabe.png" width="390" height="844" fetchpriority="high" decoding="async"
         alt="QR-Code-Übergabe eines Erfassungsbogens: die App zeigt den signierten QR-Code für den Offline-Transport, den die Gegenstelle direkt vom Bildschirm scannt."
         style="max-width: 17rem;">
       <figcaption>

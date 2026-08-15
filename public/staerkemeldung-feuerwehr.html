@@ -1,0 +1,374 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Stärkemeldung Feuerwehr – Aufbau, Beispiel und digitale Erfassung</title>
+  <meta name="description" content="Was eine Stärkemeldung der Feuerwehr enthält, wie die Stärke geschrieben wird und wie du sie digital erfasst und weitergibst. Mit Beispiel, kostenlos und offline.">
+  <link rel="canonical" href="https://erfassungsbogen.app/staerkemeldung-feuerwehr.html">
+  <link rel="icon" href="./icon.svg" type="image/svg+xml">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Stärkemeldung der Feuerwehr: Aufbau, Beispiel und digitale Erfassung">
+  <meta property="og:description" content="Führer, Unterführer, Mannschaft, Gesamt: Wie eine Stärkemeldung aufgebaut ist, wie sie abgesetzt wird und wie sich Stärkeänderungen im Einsatzverlauf sauber nachführen lassen.">
+  <meta property="og:url" content="https://erfassungsbogen.app/staerkemeldung-feuerwehr.html">
+  <meta property="og:image" content="https://erfassungsbogen.app/og-bild.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:locale" content="de_DE">
+  <meta name="twitter:card" content="summary_large_image">
+  <style>
+    :root { --blau: #12275e; --blau-hell: #1d3d8f; --rand: #c9cede; --grau: #f2f3f7; }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; color: #1a1c22; background: var(--grau); line-height: 1.5; }
+    main { max-width: 44rem; margin: 0 auto; padding: 1.5rem 1rem 4rem; }
+    h1 { color: var(--blau); font-size: 1.4rem; margin: 0.5rem 0 1rem; }
+    h2 { color: var(--blau); font-size: 1.1rem; border-bottom: 2px solid var(--blau); padding-bottom: 0.2rem; margin-top: 2rem; }
+    h3 { font-size: 1rem; margin: 1.4rem 0 0.3rem; }
+    a { color: var(--blau-hell); }
+    ol, ul { padding-left: 1.2rem; }
+    li { margin-bottom: 0.4rem; }
+    .start { display: inline-block; margin: 0.5rem 0 0.5rem; padding: 0.6rem 1.1rem; background: var(--blau); color: #fff; border-radius: 6px; text-decoration: none; font-weight: 600; }
+    figure { margin: 1.2rem 0; }
+    figure img { display: block; width: 100%; height: auto; border: 1px solid var(--rand); background: #fff; }
+    figure.foto img { height: 260px; object-fit: cover; }
+    figcaption { font-size: 0.85rem; color: #555; margin-top: 0.4rem; }
+    /* Beispielmeldung: als Block abgesetzt, damit der Wortlaut vom Fließtext
+       unterscheidbar bleibt — auch ohne Farbwahrnehmung. */
+    blockquote.meldung { margin: 1rem 0; padding: 0.8rem 1rem; background: #fff; border-left: 4px solid var(--blau); }
+    blockquote.meldung p { margin: 0.3rem 0; }
+    /* Breite Tabellen dürfen scrollen, die Seite selbst nicht. */
+    .tabelle { overflow-x: auto; }
+    table { border-collapse: collapse; width: 100%; background: #fff; font-size: 0.92rem; }
+    th, td { border: 1px solid var(--rand); padding: 0.4rem 0.6rem; text-align: left; }
+    th { background: var(--grau); }
+    footer { margin-top: 2.5rem; padding-top: 1rem; border-top: 1px solid var(--rand); font-size: 0.85rem; color: #555; }
+/* NAV:CSS:START */
+    .kopfnav { background: #fff; border-bottom: 1px solid var(--rand); }
+    .kopfnav-inner { max-width: 60rem; margin: 0 auto; padding: 0.7rem 1rem; display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 1.2rem; }
+    .kopfnav-logo { font-weight: 700; color: var(--blau); text-decoration: none; font-size: 0.95rem; margin-right: auto; }
+    .kopfnav-links { display: flex; flex-wrap: wrap; gap: 0.3rem 0.9rem; }
+    .kopfnav-links a { color: #444; text-decoration: none; font-size: 0.82rem; white-space: nowrap; }
+    .kopfnav-links a:hover { color: var(--blau-hell); text-decoration: underline; }
+    .kopfnav-links a.aktiv { color: var(--blau); font-weight: 600; }
+    /* NAV:CSS:END */
+  </style>
+</head>
+<body>
+  <!-- NAV:START -->
+  <header class="kopfnav">
+    <div class="kopfnav-inner">
+      <a href="./" class="kopfnav-logo">Erfassungsbogen</a>
+      <nav class="kopfnav-links" aria-label="Hauptnavigation">
+        <a href="./katastrophenschutz.html">Katastrophenschutz</a>
+        <a href="./thw.html">THW</a>
+        <a href="./feuerwehr.html">Feuerwehr</a>
+        <a href="./dlrg.html">DLRG</a>
+        <a href="./drk.html">DRK</a>
+        <a href="./johanniter.html">Johanniter</a>
+        <a href="./malteser.html">Malteser</a>
+        <a href="./asb.html">ASB</a>
+        <a href="./bbk.html">BBK</a>
+        <a href="./bundeswehr.html">Bundeswehr</a>
+        <a href="./meldekopf.html">Meldekopf</a>
+        <a href="./anleitung.html">Anleitung</a>
+      </nav>
+    </div>
+  </header>
+  <!-- NAV:END -->
+
+  <main>
+    <h1>Stärkemeldung der Feuerwehr: Aufbau, Beispiel und digitale Erfassung</h1>
+
+    <p>
+      Die Stärkemeldung beantwortet die erste Frage jeder Einsatzleitung: Wer
+      ist da, und mit wie vielen Kräften? Sie ist die knappste Form der
+      Auskunft über eine Einheit — wenige Zahlen, aus denen sich ergibt, ob
+      ein Auftrag vergeben werden kann, wie viele Trupps zur Verfügung stehen
+      und wie viel Verpflegung und Unterkunft später gebraucht wird. Diese
+      Seite erklärt, woraus eine Stärkemeldung besteht, zeigt ein Beispiel und
+      beschreibt, wie du sie ohne Zettelwirtschaft erfasst und weitergibst.
+    </p>
+
+    <p><a class="start" href="./">Stärkemeldung direkt erfassen</a></p>
+
+    <h2>Wozu die Stärkemeldung dient</h2>
+    <p>
+      Eine Einheit meldet ihre Stärke, wenn sie einem anderen Führungsbereich
+      unterstellt wird oder dort eintrifft: beim Einrücken in den
+      Bereitstellungsraum, bei der Anmeldung am Meldekopf, beim Übergang in
+      die überörtliche Hilfe. Die Einsatzleitung führt aus diesen Meldungen
+      ihre Übersicht über Kräfte und Mittel — ohne sie weiß sie zwar, dass
+      Fahrzeuge stehen, aber nicht, wie viele Einsatzkräfte sie tatsächlich
+      einteilen kann.
+    </p>
+    <p>
+      Deshalb gehört zur Meldung fast immer mehr als die reine Zahl: die
+      Bezeichnung der Einheit, ihre Führungskraft samt Erreichbarkeit, die
+      mitgeführten Fahrzeuge und — wenn ein längerer Einsatz absehbar ist —
+      der Bedarf an Verpflegung, Kraftstoff, Unterkunft und Ruhezeit.
+    </p>
+
+    <h2>Wie die Stärke aufgebaut ist</h2>
+    <p>
+      Gezählt wird nach der Stellung in der Einheit, nicht nach der höchsten
+      Ausbildung: Wer die Einheit führt, zählt als Führer; wer eine
+      Teileinheit oder einen Trupp führt, als Unterführer; alle übrigen
+      Einsatzkräfte bilden die Mannschaft. Die letzte Zahl ist die
+      Gesamtstärke und damit immer die Summe der vorangehenden.
+    </p>
+    <div class="tabelle">
+      <table>
+        <thead>
+          <tr><th scope="col">Stelle</th><th scope="col">Bedeutung</th><th scope="col">Beispiele</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Führer</td><td>Führung der gemeldeten Einheit</td><td>Zugführerin, Gruppenführer</td></tr>
+          <tr><td>Unterführer</td><td>Führung einer Teileinheit oder eines Trupps</td><td>Gruppenführer im Zug, Truppführerin</td></tr>
+          <tr><td>Mannschaft</td><td>alle weiteren Einsatzkräfte</td><td>Maschinist, Melderin, Truppmitglied</td></tr>
+          <tr><td>Gesamt</td><td>Summe der drei Zahlen</td><td>—</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>
+      Für die Schreibweise gibt es zwei verbreitete Formen. In der Feuerwehr
+      ist die dreiteilige Angabe üblich, die Unterführer nicht eigens
+      ausweist: eine Gruppe wird dann als <strong>1/8/9</strong> gemeldet.
+      Im Katastrophenschutz und in der überörtlichen Hilfe wird häufig
+      vierteilig gemeldet, mit den Unterführern als eigener Zahl und der
+      Gesamtstärke hinter einem doppelten Schrägstrich —
+      <strong>1/3/5//9</strong> beschreibt dieselbe Gruppe. Welche Form bei
+      dir gilt, richtet sich nach den Regelungen deines Landes und deiner
+      Führungsebene; die Zahlen dahinter sind dieselben, denn Unterführer und
+      Mannschaft der vierteiligen Form ergeben zusammen die Mannschaft der
+      dreiteiligen.
+    </p>
+
+    <h3>Übliche Stärken taktischer Einheiten</h3>
+    <p>
+      Die Sollstärke der taktischen Einheiten ist Landesrecht. In
+      Niedersachsen etwa legt die Niedersächsische Feuerwehrverordnung die
+      Funktionen so fest:
+    </p>
+    <div class="tabelle">
+      <table>
+        <thead>
+          <tr><th scope="col">Einheit</th><th scope="col">Funktionen</th><th scope="col">Zusammensetzung</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Selbständiger Trupp</td><td>3</td><td>Truppführung, Maschinist, ein weiteres Truppmitglied</td></tr>
+          <tr><td>Staffel</td><td>6</td><td>Staffelführung, Maschinist, zwei Trupps</td></tr>
+          <tr><td>Gruppe</td><td>9</td><td>Gruppenführung, Maschinist, Melder, drei Trupps</td></tr>
+          <tr><td>Zug</td><td>22</td><td>Zugführung und Zugtrupp sowie die Teileinheiten des Zuges</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>
+      Gemeldet wird aber nie die Sollstärke, sondern die tatsächlich
+      angetretene: Rückt eine Gruppe mit acht Kräften aus, lautet die Meldung
+      auf acht. Fertige Bögen für die Einheiten mehrerer Bundesländer — mit
+      den jeweiligen Sollstärken als Ausgangspunkt — findest du unter
+      <a href="./katastrophenschutz.html">Katastrophenschutz der Länder</a>.
+    </p>
+
+    <h2>Beispiel für eine Stärkemeldung</h2>
+    <p>
+      So könnte die Anmeldung einer Löschgruppe am Bereitstellungsraum
+      klingen — kurz, in fester Reihenfolge, ohne Rückfragen:
+    </p>
+    <blockquote class="meldung">
+      <p>
+        „Löschgruppe Musterdorf, eingetroffen Bereitstellungsraum Nord,
+        Stärke 1/8/9. Ein Löschgruppenfahrzeug. Führung: Gruppenführer
+        Schmidt, erreichbar über Funk. Verpflegung für neun Kräfte ab
+        18 Uhr erforderlich, Ruhezeit heute nicht nötig."
+      </p>
+    </blockquote>
+    <p>
+      Enthalten sind damit die vier Angaben, die die aufnehmende Stelle
+      braucht: Wer meldet sich, wo, mit welcher Stärke und welchen
+      Einsatzmitteln — und was die Einheit selbst benötigt. Ist eine
+      Einsatzstelle laut oder der Funkverkehr dicht, ersetzt der ausgefüllte
+      Erfassungsbogen diese Meldung: Er trägt dieselben Angaben schriftlich
+      und lückenlos.
+    </p>
+
+    <figure>
+      <img src="./screenshots/feuerwehr-erfassungsbogen.png" width="390" height="844" fetchpriority="high" decoding="async"
+        alt="Feuerwehr-Erfassungsbogen digital auf dem Smartphone: ausgefüllter Bogen einer Löschgruppe mit Stärke 0/1/8/9 und Übergabe-Aktionen in der Gesamtübersicht."
+        style="max-width: 17rem;">
+      <figcaption>
+        Ein Löschgruppen-Bogen auf dem Diensthandy: Die Stärke entsteht aus den
+        erfassten Funktionen und wird nicht von Hand zusammengezählt.
+      </figcaption>
+    </figure>
+
+    <h2>Wenn sich die Stärke im Einsatzverlauf ändert</h2>
+    <p>
+      Eine Stärkemeldung ist eine Momentaufnahme. Sie ändert sich, sobald
+      Kräfte nachrücken, ein Trupp zur Nachbareinheit abgestellt wird, eine
+      Einsatzkraft ausfällt oder die Schicht wechselt. Jede dieser Änderungen
+      gehört an die Stelle gemeldet, die die Übersicht führt — sonst plant die
+      Einsatzleitung mit Kräften, die längst nicht mehr da sind.
+    </p>
+    <p>
+      Wichtig ist dabei, dass die alte Meldung nicht einfach verschwindet: Für
+      die Einsatzdokumentation muss später nachvollziehbar bleiben, wer wann
+      mit welcher Stärke vor Ort war. In dieser App bleibt deshalb jede
+      Meldung als eigene Fassung erhalten; eine neue Meldung wird gestapelt
+      statt überschrieben, und die App zeigt den Unterschied zur vorherigen
+      Fassung — etwa „Stärke 12 → 9" oder „Fahrzeug abgemeldet".
+    </p>
+
+    <h2>Übergabe an Meldekopf und Bereitstellungsraum</h2>
+    <p>
+      Am Bereitstellungsraum treffen viele solcher Meldungen zusammen, oft in
+      kurzer Folge und von Einheiten verschiedener Organisationen. Wer sie
+      entgegennimmt, muss sie nicht nur notieren, sondern laufend
+      zusammenzählen — die Frage „Wie viele Kräfte stehen bereit?" kommt
+      verlässlich und selten mit Vorwarnung. Wie sich das digital führen
+      lässt, beschreibt die Seite
+      <a href="./meldekopf.html">Meldekopf digital: Kräfteerfassung im Bereitstellungsraum</a>.
+    </p>
+
+    <h2>Stärkemeldung digital erfassen und weitergeben</h2>
+    <p>
+      Der <a href="./feuerwehr.html">digitale Erfassungsbogen für die
+      Feuerwehr</a> nimmt dir dabei drei Dinge ab:
+    </p>
+    <ul>
+      <li>
+        <strong>Rechnen:</strong> Du erfasst die Kräfte mit ihrer Funktion,
+        die Stärke ergibt sich daraus. Kommt jemand hinzu oder fällt aus,
+        stimmen die Zahlen sofort — auch die Gesamtstärke.
+      </li>
+      <li>
+        <strong>Abtippen:</strong> Statt die Meldung durchzufunken und
+        gegenüber neu erfassen zu lassen, gibst du den kompletten Bogen per
+        QR-Code weiter. Er steht auf der letzten PDF-Seite und enthält die
+        Daten selbst, nicht bloß einen Link — die Übergabe funktioniert daher
+        ohne Netz und ohne Server.
+      </li>
+      <li>
+        <strong>Nachpflegen:</strong> Ändert sich die Stärke, änderst du den
+        Bogen und gibst ihn erneut weiter. Die aufnehmende Stelle erkennt die
+        Einheit wieder und sieht die Änderung statt einer Doppelmeldung.
+      </li>
+    </ul>
+    <p>
+      Muss es schneller gehen, kannst du auch nur die Stärkezahlen erfassen —
+      Führer, Unterführer, Mannschaft und eine Führungskraft zum Rückfragen —
+      ohne jede Person einzeln aufzunehmen. Das ist der Weg für Einheiten, die
+      ohne eigenen Bogen eintreffen.
+    </p>
+    <p>
+      Das erzeugte PDF folgt dem gewohnten Layout des
+      Einheiten-Erfassungsbogens und kann unverändert in den Papierlauf gehen;
+      welche Felder es enthält, zeigt die
+      <a href="./vorlage.html">Übersicht über Vorlage und Aufbau</a>. Die App
+      ist kostenlos, kommt ohne Konto aus und arbeitet nach dem ersten Aufruf
+      vollständig offline.
+    </p>
+
+    <p><a class="start" href="./">Stärkemeldung direkt erfassen</a></p>
+
+    <figure class="foto">
+      <img src="./bilder/feuerwehr-loeschgruppenfahrzeug-reinsfeld.jpg" width="960" height="720" loading="lazy"
+        alt="Löschgruppenfahrzeug der Freiwilligen Feuerwehr Reinsfeld, Verbandsgemeinde Hermeskeil.">
+      <figcaption>
+        Löschgruppenfahrzeug der Freiwilligen Feuerwehr Reinsfeld. Foto: Alf van Beem, Lizenz CC0,
+        <a href="https://commons.wikimedia.org/wiki/File:Mercedes,_Schlingmann,_Verbandsgemeinde_Hermeskeil,_Freiwillige_Feuerwehr_Reinsfeld,_bild_2.JPG">Wikimedia Commons</a>.
+      </figcaption>
+    </figure>
+
+    <h2>Häufige Fragen zur Stärkemeldung</h2>
+
+    <h3>Was bedeuten die Zahlen 1/8/9?</h3>
+    <p>
+      Die erste Zahl nennt die Führungskräfte, die zweite die übrigen
+      Einsatzkräfte, die dritte die Gesamtstärke. 1/8/9 ist damit eine
+      Einheit mit einem Führer und acht weiteren Kräften — die übliche Stärke
+      einer Gruppe. In der vierteiligen Schreibweise werden die Unterführer
+      eigens ausgewiesen; die Gesamtzahl bleibt dieselbe.
+    </p>
+
+    <h3>Zählt der Fahrzeugführer als Führer oder als Unterführer?</h3>
+    <p>
+      Das hängt davon ab, was gemeldet wird. Meldet sich eine Gruppe allein,
+      ist ihre Gruppenführerin die Führerin der gemeldeten Einheit. Rückt
+      dieselbe Gruppe als Teil eines Zuges ein, führt der Zugführer die
+      Einheit — die Gruppenführerin zählt dann als Unterführerin. Maßgeblich
+      ist die Stellung in der gemeldeten Einheit, nicht die Ausbildung.
+    </p>
+
+    <h3>Muss ich für die Stärkemeldung alle Namen erfassen?</h3>
+    <p>
+      Für die Meldung selbst nicht — dafür genügen die Zahlen und eine
+      erreichbare Führungskraft. Namen, Funktionen und Qualifikationen sind
+      für die eigene Einheit und für längere Einsätze nützlich, in dieser App
+      aber optional.
+    </p>
+
+    <h3>Gilt die Stärkemeldung bundesweit gleich?</h3>
+    <p>
+      Das Feuerwehrrecht ist Landesrecht: Sollstärken, Bezeichnungen der
+      Einheiten und die vorgeschriebene Form der Meldung können sich von Land
+      zu Land unterscheiden. Der Aufbau — Führung, Unterführung, Mannschaft,
+      Gesamtstärke — ist dagegen überall derselbe, und genau diese Struktur
+      bildet der Erfassungsbogen ab.
+    </p>
+
+    <footer>
+      <a href="./">Zurück zur App</a> ·
+      <a href="./feuerwehr.html">Feuerwehr</a> ·
+      <a href="./meldekopf.html">Meldekopf digital</a> ·
+      <a href="./anleitung.html">Anleitung</a> ·
+      <a href="./vorlage.html">Vorlage und Aufbau</a> ·
+      <a href="./katastrophenschutz.html">Katastrophenschutz</a> ·
+      <a href="./papier-oder-digital.html">Papier oder digital?</a> ·
+      <a href="./impressum.html">Impressum</a>
+    </footer>
+  </main>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          { "@type": "ListItem", "position": 1, "name": "Erfassungsbogen.app", "item": "https://erfassungsbogen.app/" },
+          { "@type": "ListItem", "position": 2, "name": "Digitaler Erfassungsbogen für die Feuerwehr", "item": "https://erfassungsbogen.app/feuerwehr.html" },
+          { "@type": "ListItem", "position": 3, "name": "Stärkemeldung der Feuerwehr", "item": "https://erfassungsbogen.app/staerkemeldung-feuerwehr.html" }
+        ]
+      },
+      {
+        "@type": "FAQPage",
+        "inLanguage": "de",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "Was bedeuten die Zahlen 1/8/9 bei einer Stärkemeldung?",
+            "acceptedAnswer": { "@type": "Answer", "text": "Die erste Zahl nennt die Führungskräfte, die zweite die übrigen Einsatzkräfte, die dritte die Gesamtstärke. 1/8/9 ist damit eine Einheit mit einem Führer und acht weiteren Kräften — die übliche Stärke einer Gruppe. In der vierteiligen Schreibweise werden die Unterführer eigens ausgewiesen; die Gesamtzahl bleibt dieselbe." }
+          },
+          {
+            "@type": "Question",
+            "name": "Zählt der Fahrzeugführer als Führer oder als Unterführer?",
+            "acceptedAnswer": { "@type": "Answer", "text": "Maßgeblich ist die Stellung in der gemeldeten Einheit, nicht die Ausbildung. Meldet sich eine Gruppe allein, ist ihre Gruppenführerin die Führerin der Einheit. Rückt dieselbe Gruppe als Teil eines Zuges ein, führt der Zugführer die Einheit — die Gruppenführerin zählt dann als Unterführerin." }
+          },
+          {
+            "@type": "Question",
+            "name": "Muss ich für die Stärkemeldung alle Namen erfassen?",
+            "acceptedAnswer": { "@type": "Answer", "text": "Für die Meldung selbst nicht — dafür genügen die Zahlen und eine erreichbare Führungskraft. Namen, Funktionen und Qualifikationen sind für die eigene Einheit und für längere Einsätze nützlich, in dieser App aber optional." }
+          },
+          {
+            "@type": "Question",
+            "name": "Gilt die Stärkemeldung der Feuerwehr bundesweit gleich?",
+            "acceptedAnswer": { "@type": "Answer", "text": "Das Feuerwehrrecht ist Landesrecht: Sollstärken, Bezeichnungen der Einheiten und die vorgeschriebene Form der Meldung können sich von Land zu Land unterscheiden. Der Aufbau — Führung, Unterführung, Mannschaft, Gesamtstärke — ist dagegen überall derselbe." }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+</body>
+</html>
