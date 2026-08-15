@@ -29,9 +29,40 @@
     li { margin-bottom: 0.4rem; }
     .start { display: inline-block; margin: 0.5rem 0 0.5rem; padding: 0.6rem 1.1rem; background: var(--blau); color: #fff; border-radius: 6px; text-decoration: none; font-weight: 600; }
     footer { margin-top: 2.5rem; padding-top: 1rem; border-top: 1px solid var(--rand); font-size: 0.85rem; color: #555; }
+/* NAV:CSS:START */
+    .kopfnav { background: #fff; border-bottom: 1px solid var(--rand); }
+    .kopfnav-inner { max-width: 60rem; margin: 0 auto; padding: 0.7rem 1rem; display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 1.2rem; }
+    .kopfnav-logo { font-weight: 700; color: var(--blau); text-decoration: none; font-size: 0.95rem; margin-right: auto; }
+    .kopfnav-links { display: flex; flex-wrap: wrap; gap: 0.3rem 0.9rem; }
+    .kopfnav-links a { color: #444; text-decoration: none; font-size: 0.82rem; white-space: nowrap; }
+    .kopfnav-links a:hover { color: var(--blau-hell); text-decoration: underline; }
+    .kopfnav-links a.aktiv { color: var(--blau); font-weight: 600; }
+    /* NAV:CSS:END */
   </style>
 </head>
 <body>
+  <!-- NAV:START -->
+  <header class="kopfnav">
+    <div class="kopfnav-inner">
+      <a href="./" class="kopfnav-logo">Erfassungsbogen</a>
+      <nav class="kopfnav-links" aria-label="Hauptnavigation">
+        <a href="./katastrophenschutz.html" class="aktiv">Katastrophenschutz</a>
+        <a href="./thw.html">THW</a>
+        <a href="./feuerwehr.html">Feuerwehr</a>
+        <a href="./dlrg.html">DLRG</a>
+        <a href="./drk.html">DRK</a>
+        <a href="./johanniter.html">Johanniter</a>
+        <a href="./malteser.html">Malteser</a>
+        <a href="./asb.html">ASB</a>
+        <a href="./bbk.html">BBK</a>
+        <a href="./bundeswehr.html">Bundeswehr</a>
+        <a href="./meldekopf.html">Meldekopf</a>
+        <a href="./anleitung.html">Anleitung</a>
+      </nav>
+    </div>
+  </header>
+  <!-- NAV:END -->
+
   <main>
     <h1>Einheiten-Erfassungsbogen für den Katastrophenschutz Niedersachsen</h1>
 
