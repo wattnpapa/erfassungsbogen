@@ -1,0 +1,170 @@
+{
+  "schemaVersion": 8,
+  "uebung": true,
+  "stand": 2831640,
+  "einheit": {
+    "organisation": 5,
+    "organisationName": "DRK-Kreisverband Buchenrode e. V.",
+    "einheitsTyp": {
+      "freitext": "Behandlung Kat. GELB (BHP 25)"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Behandlung Kat. GELB (BHP 25)"
+        },
+        "name": "Buchenrode"
+      },
+      {
+        "bezeichnung": {
+          "code": 2
+        },
+        "name": "Buchenrode e. V.",
+        "kurz": "KV Buchenrode",
+        "telefon": "5557575153",
+        "email": "einsatz@drk-buchenrode.example"
+      },
+      {
+        "bezeichnung": {
+          "code": 3
+        },
+        "name": "Saarland"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 1991,
+    "zeitraumBis": 1992,
+    "ortAuftrag": "Massenkarambolage auf der A-Ost bei Buchenrode — rund 40 Verletzte in drei Sichtungskategorien; Behandlungsplatz auf dem Rastplatz Buchenrode-Nord, Voralarmierung der SEG Sanität über die Leitstelle."
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Heike",
+      "nachname": "Wagner",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Gruppenführer/-in Behandlung GELB"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5553769536"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Gruppenführer (DRK)"
+        },
+        {
+          "freitext": "Rettungsassistent"
+        }
+      ]
+    },
+    {
+      "vorname": "Achim",
+      "nachname": "Dewes",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Rettungsassistent/-in Behandlung GELB"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungsassistent"
+        }
+      ]
+    },
+    {
+      "vorname": "Elke",
+      "nachname": "Kiefer",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Rettungssanitäter/-in Behandlung GELB"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungssanitäter"
+        }
+      ]
+    },
+    {
+      "vorname": "Daniel",
+      "nachname": "Peifer",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Sanitätshelfer/-in Behandlung GELB"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Sabine",
+      "nachname": "Neu",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Sanitätshelfer/-in Behandlung GELB"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "MTW"
+      },
+      "kennzeichen": "SB-RK 1006",
+      "stanKonform": true,
+      "aenderungen": "Behandlungszelt Kategorie GELB — überwiegend rettungsdienstlich erfahrenes Personal",
+      "funkrufname": {
+        "kennwort": {
+          "code": 3
+        },
+        "eigenerStandort": false,
+        "ort": "Buchenrode",
+        "teile": [
+          55,
+          17,
+          3
+        ]
+      }
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 5,
+    "dieselLiter": 60,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": true,
+    "ruhezeitErforderlich": true
+  },
+  "sonstiges": "Versorgt bis zu fünf mittelschwer Verletzte mit sofortiger Behandlungs- und Transportpriorität."
+}

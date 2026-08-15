@@ -1,0 +1,151 @@
+{
+  "schemaVersion": 8,
+  "uebung": true,
+  "stand": 2831640,
+  "einheit": {
+    "organisation": 5,
+    "organisationName": "DRK-Kreisverband Buchenrode e. V.",
+    "einheitsTyp": {
+      "freitext": "Logistiktrupp (BHP 25)"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Logistiktrupp (BHP 25)"
+        },
+        "name": "Buchenrode"
+      },
+      {
+        "bezeichnung": {
+          "code": 2
+        },
+        "name": "Buchenrode e. V.",
+        "kurz": "KV Buchenrode",
+        "telefon": "5557575153",
+        "email": "einsatz@drk-buchenrode.example"
+      },
+      {
+        "bezeichnung": {
+          "code": 3
+        },
+        "name": "Saarland"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 1991,
+    "zeitraumBis": 1992,
+    "ortAuftrag": "Massenkarambolage auf der A-Ost bei Buchenrode — rund 40 Verletzte in drei Sichtungskategorien; Behandlungsplatz auf dem Rastplatz Buchenrode-Nord, Voralarmierung der SEG Sanität über die Leitstelle."
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Achim",
+      "nachname": "Neu",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Gruppenführer/-in Logistiktrupp"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
+      "ernaehrung": 2,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5557605119"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Gruppenführer (DRK)"
+        },
+        {
+          "freitext": "Fachdienst Technik und Sicherheit"
+        }
+      ]
+    },
+    {
+      "vorname": "Waltraud",
+      "nachname": "Schuh",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Helfer/-in Technik und Sicherheit"
+        }
+      ],
+      "fahrerlaubnis": 6,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Daniel",
+      "nachname": "Conrad",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Helfer/-in Technik und Sicherheit"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Christian",
+      "nachname": "Peifer",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Helfer/-in Technik und Sicherheit, Kraftfahrer/-in"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Kraftfahrer CE"
+        }
+      ]
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "GW-Logistik"
+      },
+      "kennzeichen": "SB-RK 1009",
+      "stanKonform": true,
+      "aenderungen": "Zeltbau, Stromversorgung, Ausleuchtung und Materialtransport für den gesamten BHP 25",
+      "funkrufname": {
+        "kennwort": {
+          "code": 3
+        },
+        "eigenerStandort": false,
+        "ort": "Buchenrode",
+        "teile": [
+          55,
+          64,
+          1
+        ]
+      }
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 4,
+    "dieselLiter": 180,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": true,
+    "ruhezeitErforderlich": true
+  },
+  "sonstiges": "Versorgt technisch alle Teileinheiten des BHP 25 mit Strom, Licht und Material; verpflichtende Fachdienstausbildung Technik und Sicherheit."
+}

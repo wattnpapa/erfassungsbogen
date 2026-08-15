@@ -1,0 +1,273 @@
+{
+  "schemaVersion": 8,
+  "uebung": true,
+  "stand": 2831640,
+  "einheit": {
+    "organisation": 5,
+    "organisationName": "DRK-Kreisverband Buchenrode e. V.",
+    "einheitsTyp": {
+      "freitext": "Schnelleinsatzgruppe Sanität (SEG San)"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Schnelleinsatzgruppe Sanität (SEG San)"
+        },
+        "name": "Buchenrode"
+      },
+      {
+        "bezeichnung": {
+          "code": 2
+        },
+        "name": "Buchenrode e. V.",
+        "kurz": "KV Buchenrode",
+        "telefon": "5557575153",
+        "email": "einsatz@drk-buchenrode.example"
+      },
+      {
+        "bezeichnung": {
+          "code": 3
+        },
+        "name": "Saarland"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 1991,
+    "zeitraumBis": 1992,
+    "ortAuftrag": "Massenkarambolage auf der A-Ost bei Buchenrode — rund 40 Verletzte in drei Sichtungskategorien; Behandlungsplatz auf dem Rastplatz Buchenrode-Nord, Voralarmierung der SEG Sanität über die Leitstelle."
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Heike",
+      "nachname": "Dewes",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "Gruppenführer/-in SEG San"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 1,
+      "ernaehrung": 2,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5553189713"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Gruppenführer (DRK)"
+        },
+        {
+          "freitext": "Rettungssanitäter"
+        }
+      ]
+    },
+    {
+      "vorname": "Bastian",
+      "nachname": "Dewes",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Ärztin/Arzt SEG San"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Notärztin/Notarzt"
+        }
+      ]
+    },
+    {
+      "vorname": "Christel",
+      "nachname": "Conrad",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Rettungssanitäter/-in"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungssanitäter"
+        }
+      ]
+    },
+    {
+      "vorname": "Klaus",
+      "nachname": "Ost",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Rettungssanitäter/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungssanitäter"
+        }
+      ]
+    },
+    {
+      "vorname": "Gabi",
+      "nachname": "Backes",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Rettungssanitäter/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungssanitäter"
+        }
+      ]
+    },
+    {
+      "vorname": "Frank",
+      "nachname": "Lauer",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Sanitätshelfer/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Jochen",
+      "nachname": "Follmann",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Sanitätshelfer/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Nicole",
+      "nachname": "Recktenwald",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Sanitätshelfer/-in"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 1,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Karin",
+      "nachname": "Recktenwald",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Sanitätshelfer/-in"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Peter",
+      "nachname": "Lauer",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Sanitätshelfer/-in, Kraftfahrer/-in"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "GW-San"
+      },
+      "kennzeichen": "SB-RK 1001",
+      "stanKonform": true,
+      "aenderungen": "Gerätewagen Sanitätsdienst — Erstversorgung von 2–3 Schwer- und 4–5 Mittelschwerverletzten",
+      "funkrufname": {
+        "kennwort": {
+          "code": 3
+        },
+        "eigenerStandort": false,
+        "ort": "Buchenrode",
+        "teile": [
+          55,
+          96,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "MTW"
+      },
+      "kennzeichen": "SB-RK 1002",
+      "stanKonform": true,
+      "aenderungen": "Mannschaftstransport der SEG, Materialreserve für 12 Leichtverletzte",
+      "funkrufname": {
+        "kennwort": {
+          "code": 3
+        },
+        "eigenerStandort": false,
+        "ort": "Buchenrode",
+        "teile": [
+          55,
+          17,
+          1
+        ]
+      }
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 10,
+    "dieselLiter": 120,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": true,
+    "ruhezeitErforderlich": true
+  },
+  "sonstiges": "Führungstrupp und Sanitätsgruppe der DRK-Einsatzeinheit, gemeinsam als Schnelleinsatzgruppe (SEG) vorab alarmiert. In Zusammenarbeit mit einem Notarzt sowie zwei RTW- und einer KTW-Besatzung des Rettungsdienstes versorgt die SEG bis zu 2–3 Schwer-, 4–5 Mittelschwer- und 12 Leichtverletzte."
+}

@@ -1,0 +1,404 @@
+{
+  "schemaVersion": 8,
+  "uebung": true,
+  "stand": 2951130,
+  "einheit": {
+    "organisation": 8,
+    "organisationName": "ASB-Kreisverband Rheindorf e. V.",
+    "einheitsTyp": {
+      "freitext": "Betreuungskomponente (Einsatzeinheit)"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Betreuungskomponente (Einsatzeinheit)"
+        },
+        "name": "Rheindorf"
+      },
+      {
+        "bezeichnung": {
+          "code": 2
+        },
+        "name": "Rheindorf e. V.",
+        "kurz": "KV Rheindorf",
+        "telefon": "5559334472",
+        "email": "einsatz@asb-rheindorf.example"
+      },
+      {
+        "bezeichnung": {
+          "code": 4
+        },
+        "name": "Nordrhein-Westfalen"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2075,
+    "zeitraumBis": 2076,
+    "ortAuftrag": "Starkregen und lokale Überflutung in Rheindorf-Süd — rund 300 Betroffene ohne Strom und Trinkwasser; Betreuungsstelle in der Stadthalle, ambulante Erstversorgung vor Ort, Einsatzleitung durch die Kreisleitstelle."
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Guido",
+      "nachname": "Bösch",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Gruppenführer/-in Betreuungsdienst"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5552061739"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Gruppenführer (ASB)"
+        },
+        {
+          "freitext": "Betreuungshelfer"
+        }
+      ]
+    },
+    {
+      "vorname": "Edith",
+      "nachname": "Thelen",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Truppführer/-in Betreuung (1)"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Betreuungshelfer"
+        }
+      ]
+    },
+    {
+      "vorname": "Carsten",
+      "nachname": "Esser",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Truppführer/-in Betreuung (2)"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Betreuungshelfer"
+        }
+      ]
+    },
+    {
+      "vorname": "Frank",
+      "nachname": "Neuenhaus",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Betreuungshelfer/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 2,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Betreuungshelfer"
+        }
+      ]
+    },
+    {
+      "vorname": "Carsten",
+      "nachname": "Gerhards",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Betreuungshelfer/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Betreuungshelfer"
+        }
+      ]
+    },
+    {
+      "vorname": "Olaf",
+      "nachname": "Quirmbach",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Betreuungshelfer/-in"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Betreuungshelfer"
+        }
+      ]
+    },
+    {
+      "vorname": "Olaf",
+      "nachname": "Dahlmann",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Betreuungshelfer/-in"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Betreuungshelfer"
+        }
+      ]
+    },
+    {
+      "vorname": "Gundula",
+      "nachname": "Overath",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Betreuungshelfer/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Betreuungshelfer"
+        }
+      ]
+    },
+    {
+      "vorname": "Dietmar",
+      "nachname": "Ingendahl",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Betreuungshelfer/-in, Kinderbetreuung"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Axel",
+      "nachname": "Klophaus",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Betreuungshelfer/-in"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 2,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Dagmar",
+      "nachname": "Thelen",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Betreuungshelfer/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Jürgen",
+      "nachname": "Gerhards",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Betreuungshelfer/-in, Materialerhaltung"
+        }
+      ],
+      "fahrerlaubnis": 6,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Ecki",
+      "nachname": "Vieten",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Betreuungshelfer/-in"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Olaf",
+      "nachname": "Halfmann",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Betreuungshelfer/-in"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Jürgen",
+      "nachname": "Esser",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kraftfahrer/-in BtLKW"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Kraftfahrer CE"
+        }
+      ]
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "BT-Kombi"
+      },
+      "kennzeichen": "SG-AB 1005",
+      "stanKonform": true,
+      "aenderungen": "1. Betreuungskombi — Notunterkunft/Verpflegung",
+      "funkrufname": {
+        "kennwort": {
+          "code": 6
+        },
+        "eigenerStandort": false,
+        "ort": "Rheindorf",
+        "teile": [
+          41,
+          16,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "BT-Kombi"
+      },
+      "kennzeichen": "SG-AB 1006",
+      "stanKonform": true,
+      "aenderungen": "2. Betreuungskombi",
+      "funkrufname": {
+        "kennwort": {
+          "code": 6
+        },
+        "eigenerStandort": false,
+        "ort": "Rheindorf",
+        "teile": [
+          41,
+          16,
+          2
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "Anh. Betreuung"
+      },
+      "kennzeichen": "SG-AB 1007",
+      "stanKonform": true,
+      "aenderungen": "Betreuungsanhänger — Zusatzmaterial",
+      "funkrufname": {
+        "kennwort": {
+          "code": 6
+        },
+        "eigenerStandort": false,
+        "ort": "Rheindorf",
+        "teile": [
+          41,
+          16,
+          3
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "BtLKW"
+      },
+      "kennzeichen": "SG-AB 1008",
+      "stanKonform": true,
+      "aenderungen": "Betreuungslastkraftwagen, optional mit Feldküche",
+      "funkrufname": {
+        "kennwort": {
+          "code": 6
+        },
+        "eigenerStandort": false,
+        "ort": "Rheindorf",
+        "teile": [
+          41,
+          65,
+          1
+        ]
+      }
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 15,
+    "dieselLiter": 300,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": true,
+    "ruhezeitErforderlich": true
+  },
+  "sonstiges": "Personalstärkste Komponente der Einsatzeinheit: Errichtung von Notunterkünften, Verpflegung von Betroffenen und Einsatzkräften, Ausgabe von Kleidung/Hygieneartikeln, psychosoziale Notfallversorgung."
+}

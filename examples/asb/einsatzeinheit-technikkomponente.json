@@ -1,0 +1,151 @@
+{
+  "schemaVersion": 8,
+  "uebung": true,
+  "stand": 2951130,
+  "einheit": {
+    "organisation": 8,
+    "organisationName": "ASB-Kreisverband Rheindorf e. V.",
+    "einheitsTyp": {
+      "freitext": "Technikkomponente (Einsatzeinheit)"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Technikkomponente (Einsatzeinheit)"
+        },
+        "name": "Rheindorf"
+      },
+      {
+        "bezeichnung": {
+          "code": 2
+        },
+        "name": "Rheindorf e. V.",
+        "kurz": "KV Rheindorf",
+        "telefon": "5559334472",
+        "email": "einsatz@asb-rheindorf.example"
+      },
+      {
+        "bezeichnung": {
+          "code": 4
+        },
+        "name": "Nordrhein-Westfalen"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2075,
+    "zeitraumBis": 2076,
+    "ortAuftrag": "Starkregen und lokale Überflutung in Rheindorf-Süd — rund 300 Betroffene ohne Strom und Trinkwasser; Betreuungsstelle in der Stadthalle, ambulante Erstversorgung vor Ort, Einsatzleitung durch die Kreisleitstelle."
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Torsten",
+      "nachname": "Wolter",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Gruppenführer/-in Technik und Sicherheit"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5550104713"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Gruppenführer (ASB)"
+        },
+        {
+          "freitext": "Fachdienst Technik und Sicherheit"
+        }
+      ]
+    },
+    {
+      "vorname": "Heinz",
+      "nachname": "Thelen",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Helfer/-in Technik und Sicherheit"
+        }
+      ],
+      "fahrerlaubnis": 6,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Torsten",
+      "nachname": "Steegmann",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Helfer/-in Technik und Sicherheit"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Uwe",
+      "nachname": "Michels",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Helfer/-in Technik und Sicherheit, Kraftfahrer/-in"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Kraftfahrer CE"
+        }
+      ]
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "GW-Technik"
+      },
+      "kennzeichen": "SG-AB 1009",
+      "stanKonform": true,
+      "aenderungen": "Zeltbau, Stromversorgung, Ausleuchtung und Wasserversorgung für die gesamte Einsatzeinheit",
+      "funkrufname": {
+        "kennwort": {
+          "code": 6
+        },
+        "eigenerStandort": false,
+        "ort": "Rheindorf",
+        "teile": [
+          41,
+          64,
+          1
+        ]
+      }
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 4,
+    "dieselLiter": 160,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": true,
+    "ruhezeitErforderlich": true
+  },
+  "sonstiges": "Unterstützt zu Einsatzbeginn beim Zeltbau, stellt Strom-/Wasserversorgung und Ausleuchtung her; überwacht während des Einsatzes die Arbeitssicherheit."
+}
