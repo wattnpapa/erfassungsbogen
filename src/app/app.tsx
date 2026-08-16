@@ -34,7 +34,7 @@ import {
   schrittStatus,
 } from "./hilfen";
 import { PersonalErfassung, jetztZeitpunkt, staerke } from "../model";
-import { bogenLinksEmpfangen, istNativ, qrScannen, textTeilen } from "./nativ";
+import { bogenLinksEmpfangen, imWebBrowser, istNativ, qrScannen, textTeilen } from "./nativ";
 import { vorlageAnlegen, vorlagenLaden, vorlagenPapierkorb, type Vorlage } from "./vorlagen";
 import { Musterung, VorlagenListe } from "./vorlagen-ui";
 import { absenderkarteGefuellt, absenderkarteLaden, type Absenderkarte } from "./absenderkarte";
@@ -1262,10 +1262,17 @@ function AppInhalt() {
         {/* Mit vorhandenen Daten bleibt die Erklärung erreichbar — am Ende der
             Startseite, über der Fußzeile, statt den Arbeitsbereich zu verdrängen. */}
         {!erststart && <SoFunktionierts />}
-        {/* Der erklärende Text steht in JEDEM Fall — er ist im statischen
-            Gerüst von index.html schon da, und was dort steht, muss nach dem
-            Mount unverändert stehen bleiben. */}
-        <StartInhalt />
+        {/* Der erklärende Text ist Web-Inhalt: Er beantwortet „was ist das
+            hier?" für den ersten Besuch und trägt die Startseite in den
+            Suchmaschinen. Deshalb zwei Bedingungen:
+              - nur im Browser — wer die App installiert hat, weiß es bereits
+                (die Frühweiche in index.html blendet ihn dort schon vor dem
+                Mount aus, sonst blitzte er im Gerüst kurz auf);
+              - nur beim Erststart — sobald Entwurf, Vorlagen oder Einsätze da
+                sind, ist die Startseite Arbeitsfläche und kein Prospekt mehr.
+            Im Browser-Erststart steht damit nach dem Mount Zeichen für Zeichen
+            dasselbe wie im statischen Gerüst von index.html. */}
+        {erststart && imWebBrowser() && <StartInhalt />}
       </main>
       <Fusszeile onBogenOeffnen={oeffneBeispiel} />
       </>

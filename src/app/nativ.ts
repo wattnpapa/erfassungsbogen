@@ -21,6 +21,26 @@ export function plattform(): string {
 }
 
 /**
+ * Läuft die Oberfläche in einem echten Browser-Tab (oder als PWA) — und nicht
+ * in einer installierten Fassung? Gegenstück zu den drei App-Wegen:
+ *   - Capacitor (iOS/Android) meldet sich über die native Brücke,
+ *   - Electron lädt das Bundle im Paket über file://.
+ * Bewusst NICHT über „Electron/" in der Gerätekennung: die tragen auch
+ * gewöhnliche Browser-Hüllen auf Chromium-Basis, die den Text zeigen sollen.
+ * Der Electron-Dev-Lauf gegen den Vite-Server gilt damit als Browser — ein
+ * Fall, den nur die Entwicklung kennt.
+ * Gebraucht für Inhalte, die es nur im Web gibt: der erklärende Text der
+ * Startseite richtet sich an Suchmaschinen und an Erstbesucher — in der
+ * installierten App ist die Frage „was ist das hier?" längst beantwortet.
+ * Muss mit der Frühweiche in index.html (Klasse `als-app`) zusammenpassen.
+ */
+export function imWebBrowser(): boolean {
+  if (typeof window === "undefined") return false;
+  if (istNativ()) return false;
+  return window.location.protocol !== "file:" && window.location.protocol !== "capacitor:";
+}
+
+/**
  * Ist ein System-Share-Sheet erreichbar? Nativ immer (Capacitor Share), im
  * Browser nur mit Web Share API. Desktop-Chrome unter Linux und Electron haben
  * keine — dort bleiben Zwischenablage und Download die Wege.

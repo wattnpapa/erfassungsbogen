@@ -167,6 +167,19 @@
       if (eebModus === "feld" || eebModus === "nacht" || eebModus === "dunkel")
         document.documentElement.classList.add(eebModus + "-modus");
     } catch (e) { /* Privatmodus/blockierter Speicher: Standard-Darstellung */ }
+
+    // Installierte Fassung (Desktop-App, iOS, Android) VOR dem ersten Malen
+    // kennzeichnen: Der erklärende Text unten ist Web-Inhalt für Erstbesucher
+    // und Suchmaschinen. React blendet ihn dort ohnehin aus (imWebBrowser() in
+    // nativ.ts) — ohne diese Klasse stünde er aber bis zum Mount im Gerüst und
+    // blitzte beim App-Start kurz auf. Dieselben Merkmale wie dort: native
+    // Brücke (Capacitor) oder das Paket-Schema der Desktop-App.
+    try {
+      var eebNativ = window.Capacitor && typeof window.Capacitor.isNativePlatform === "function"
+        && window.Capacitor.isNativePlatform();
+      if (eebNativ || location.protocol === "file:" || location.protocol === "capacitor:")
+        document.documentElement.classList.add("als-app");
+    } catch (e) { /* Im Zweifel bleibt es beim Web-Verhalten. */ }
   </script>
   <style>
     /* ===============================================================
@@ -911,6 +924,11 @@
     .start-seo ul { padding-left: 1.2rem; }
     .start-seo li { margin-bottom: var(--r-2); }
     .start-seo a { color: var(--akzent-hell); }
+    /* In der installierten Fassung (Klasse aus der Frühweiche im Kopf) gibt es
+       den Text nicht — dann trägt auch der Platzhalter darunter nichts mehr,
+       der nur seinen Sprung verhindern sollte. */
+    .als-app .start-seo,
+    .als-app .start-platzhalter { display: none; }
     /* Nur im statischen Gerüst: Der Text darunter steht dort schon, während
        der Arbeitsbereich noch fehlt (den zeichnet erst React). Ohne diese
        reservierte Höhe stünde er beim ersten Bild oben im Bild und spränge

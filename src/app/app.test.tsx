@@ -37,6 +37,7 @@ vi.mock("./nativ", async () => {
   return {
     istNativ: () => false,
     plattform: () => "web",
+    imWebBrowser: () => true,
     bogenLinksEmpfangen: () => () => {},
     qrScannen: async () => "",
     binaerTeilen: async () => {},
@@ -129,6 +130,23 @@ describe("Assistenten-Durchlauf", () => {
     await nutzer.click(screen.getByRole("button", { name: "Neuen Bogen erstellen" }));
 
     expect(screen.getByRole("heading", { name: "1. Einheit" })).toBeDefined();
+  });
+
+  /**
+   * Der erklärende Text ist Prospekt, nicht Arbeitsfläche: Er beantwortet den
+   * ersten Besuch im Browser. Wer schon Daten auf dem Gerät hat, hat die
+   * Antwort — dann darf er die Startseite nicht mehr verlängern. (Die zweite
+   * Bedingung, „nur im Browser", steckt in imWebBrowser(); oben mitgemockt.)
+   */
+  it("zeigt den erklärenden Text nur beim Erststart", async () => {
+    const leer = render(<App />);
+    expect(screen.getByRole("region", { name: "Über den digitalen Erfassungsbogen" })).toBeDefined();
+    leer.unmount();
+
+    einsatzImSpeicherAnlegen("Sammelhausen", EinsatzArt.EINSATZ);
+    render(<App />);
+    await screen.findByRole("heading", { name: "Einsatz-Sammlung (Meldekopf)" });
+    expect(screen.queryByRole("region", { name: "Über den digitalen Erfassungsbogen" })).toBeNull();
   });
 
   it("führt Schritt für Schritt bis zur Übersicht und zeigt die erfasste Einheit", async () => {
