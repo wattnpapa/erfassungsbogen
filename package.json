@@ -47,8 +47,11 @@
     "content-nav": "node --import tsx scripts/content-nav.mts",
     "content-hinweis": "node --import tsx scripts/content-hinweis.mts",
     "content-laender": "node --import tsx scripts/content-laender.mts",
+    "content-laenderkarte": "node --import tsx scripts/content-laenderkarte.mts",
     "zeichen": "node --import tsx scripts/taktische-zeichen-holen.mts",
-    "wasserzeichen": "node --import tsx scripts/uebung-wasserzeichen.mts"
+    "wasserzeichen": "node --import tsx scripts/uebung-wasserzeichen.mts",
+    "bilder-webp": "node --import tsx scripts/bilder-webp.mts",
+    "content-stil": "node --import tsx scripts/content-stil.mts"
   },
   "keywords": [],
   "author": {

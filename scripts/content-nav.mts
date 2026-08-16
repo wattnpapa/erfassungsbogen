@@ -214,6 +214,7 @@ function navHtml(datei: string): string {
         </span>`;
   }).join("\n        ");
   return `<!-- NAV:START -->
+  <a class="sprunglink" href="#inhalt">Zum Inhalt springen</a>
   <header class="kopfnav">
     <div class="kopfnav-inner">
       <a href="./" class="kopfnav-logo">Erfassungsbogen</a>
@@ -242,17 +243,33 @@ function fussNavHtml(datei: string): string {
 }
 
 const NAV_CSS = `/* NAV:CSS:START */
+    /* Sprunglink: sitzt außerhalb des Sichtfelds und kommt beim ersten Tabstopp
+       hervor. Ohne ihn tabbt man auf jeder Seite durch Logo und acht Nav-Einträge,
+       bevor der Text beginnt (WCAG 2.4.1). Nicht mit display:none oder
+       visibility:hidden verstecken — dann wäre er auch für die Tastatur weg. */
+    .sprunglink { position: absolute; left: -9999px; top: 0; z-index: 40; padding: 0.6rem 1rem; background: var(--blau); color: #fff; text-decoration: none; font-weight: 600; }
+    .sprunglink:focus { left: 0; }
     .kopfnav { background: #fff; border-bottom: 1px solid var(--rand); }
-    .kopfnav-inner { max-width: 60rem; margin: 0 auto; padding: 0.7rem 1rem; display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 1.2rem; }
+    /* Dieselbe Breite wie main: Ein 60rem breiter Kopf über einer 44rem breiten
+       Textspalte setzt zwei verschiedene linke Kanten auf eine Seite, die sonst
+       durchgehend linksbündig steht. */
+    .kopfnav-inner { max-width: 44rem; margin: 0 auto; padding: 0.7rem 1rem; display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 1.2rem; }
     .kopfnav-logo { font-weight: 700; color: var(--blau); text-decoration: none; font-size: 0.95rem; margin-right: auto; }
     .kopfnav-links { display: flex; flex-wrap: wrap; align-items: center; gap: 0.3rem 0.9rem; }
-    .kopfnav-links a { color: #444; text-decoration: none; font-size: 0.82rem; white-space: nowrap; }
+    /* Senkrechtes Polster statt reiner Zeilenhöhe: Ohne es sind die Nav-Links
+       19,7 px hoch und verfehlen die 24 px aus WCAG 2.5.8. Die Ausnahme für
+       Links im Fließtext greift hier nicht — das ist eine Linkreihe, kein Satz.
+       (Die punktgetrennte Fußnav ist ein Textblock und fällt unter die Ausnahme.) */
+    .kopfnav-links a { display: inline-block; padding: 0.28rem 0; color: #444; text-decoration: none; font-size: 0.82rem; white-space: nowrap; }
     .kopfnav-links a:hover { color: var(--blau-hell); text-decoration: underline; }
     .kopfnav-links a.aktiv { color: var(--blau); font-weight: 600; }
     .kopfnav-eintrag { position: relative; display: inline-flex; }
-    .kopfnav-unter { position: absolute; top: 100%; left: -0.6rem; z-index: 30; display: none; grid-template-columns: 1fr; gap: 0.05rem; margin-top: 0.55rem; padding: 0.4rem; background: #fff; border: 1px solid var(--rand); border-radius: 6px; box-shadow: 0 6px 18px rgba(18, 39, 94, 0.13); }
+    /* Rechteckig wie alles andere (Null-Radius-Regel). Der Schatten bleibt: Das
+       Menü schwebt tatsächlich über dem Inhalt, und genau dafür lässt die
+       Flach-im-Stand-Regel ihn zu — im Wert des dokumentierten Dropdown-Schattens. */
+    .kopfnav-unter { position: absolute; top: 100%; left: -0.6rem; z-index: 30; display: none; grid-template-columns: 1fr; gap: 0.05rem; margin-top: 0.55rem; padding: 0.4rem; background: #fff; border: 1px solid var(--rand); border-radius: 0; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); }
     .kopfnav-unter-breit { grid-template-columns: 1fr 1fr; }
-    .kopfnav-unter a { display: block; padding: 0.28rem 0.6rem; border-radius: 4px; }
+    .kopfnav-unter a { display: block; padding: 0.35rem 0.6rem; border-radius: 0; }
     .kopfnav-unter a:hover { background: var(--grau); text-decoration: none; }
     /* Der unsichtbare Streifen überbrückt den Abstand zwischen Eintrag und
        Menü — ohne ihn klappt das Menü beim Hinüberfahren wieder zu. */
@@ -301,6 +318,11 @@ function inject(inhalt: string, datei: string): string {
     neu = neu.replace(navBlockMuster, navHtml(datei));
   } else {
     neu = neu.replace("<body>\n", `<body>\n  ${navHtml(datei)}\n\n`);
+  }
+
+  // Sprungziel für den Sprunglink. Ohne id am <main> zeigt er ins Leere.
+  if (!/<main[^>]*\bid="inhalt"/.test(neu)) {
+    neu = neu.replace(/<main(\s|>)/, '<main id="inhalt"$1');
   }
 
   // Fußzeilen-Links ersetzen — aber nur, wenn dort nichts als Links steht.
