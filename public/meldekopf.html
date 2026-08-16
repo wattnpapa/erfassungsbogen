@@ -22,6 +22,7 @@
     body { margin: 0; font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; color: #1a1c22; background: var(--grau); line-height: 1.5; }
     main { max-width: 44rem; margin: 0 auto; padding: 1.5rem 1rem 4rem; }
     h1 { color: var(--blau); font-size: 1.4rem; margin: 0.5rem 0 1rem; }
+    h2 { clear: both; }
     h2 { color: var(--blau); font-size: 1.1rem; border-bottom: 2px solid var(--blau); padding-bottom: 0.2rem; margin-top: 2rem; }
     h3 { font-size: 1rem; margin: 1.4rem 0 0.3rem; }
     a { color: var(--blau-hell); }
@@ -31,8 +32,14 @@
     figure { margin: 1.2rem 0; }
     figure img { display: block; width: 100%; height: auto; border: 1px solid var(--rand); background: #fff; }
     figure.foto img { height: 260px; object-fit: cover; }
-    figure.zeichen { width: 5.5rem; }
-    figure.zeichen img { width: 5.5rem; height: 5.5rem; border: none; background: none; }
+    figure.zeichen { float: right; width: 8rem; margin: 0.6rem 0 0.8rem 1.5rem; text-align: center; }
+    figure.zeichen img { width: 5.5rem; height: 5.5rem; border: none; background: none; margin: 0 auto; }
+    figure.zeichen figcaption { font-size: 0.72rem; line-height: 1.35; }
+    @media (max-width: 34rem) {
+      figure.zeichen { float: none; width: auto; margin: 0.8rem 0 1.2rem; text-align: left; }
+      figure.zeichen img { margin: 0; }
+      figure.zeichen figcaption { font-size: 0.8rem; }
+    }
     figcaption { font-size: 0.85rem; color: #555; margin-top: 0.4rem; }
     footer { margin-top: 2.5rem; padding-top: 1rem; border-top: 1px solid var(--rand); font-size: 0.85rem; color: #555; }
 /* NAV:CSS:START */
