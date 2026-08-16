@@ -45,8 +45,19 @@ const HINWEIS_HTML = `<!-- HINWEIS:START -->
       </p>
       <!-- HINWEIS:END -->`;
 
+/**
+ * Farbe bewusst #5c6478 statt eines helleren Grautons: #777 erreicht auf dem
+ * Seitengrund #f2f3f7 nur 4,04:1 und verfehlt damit WCAG AA (4,5:1) —
+ * ausgerechnet beim rechtlichen Hinweis, der am ehesten lesbar sein muss.
+ *
+ * #5c6478 ist der Wert, den die App als `--text-2` für Zweittext führt, und
+ * erreicht hier 5,39:1. Nicht `--text-3` (#6b7488): der ist gegen die weiße
+ * Fläche `--flaeche` gerechnet (4,69:1) und fällt auf dem dunkleren Seitengrund
+ * dieser Seiten auf 4,23:1 zurück — knapp unter AA. Die Fußzeile steht auf
+ * `--grund`, nicht auf einer Karte.
+ */
 const HINWEIS_CSS = `/* HINWEIS:CSS:START */
-    .marken-hinweis { margin: 1rem 0 0; font-size: 0.78rem; line-height: 1.45; color: #777; }
+    .marken-hinweis { margin: 1rem 0 0; font-size: 0.78rem; line-height: 1.45; color: #5c6478; }
     /* HINWEIS:CSS:END */`;
 
 function inject(inhalt: string): string {

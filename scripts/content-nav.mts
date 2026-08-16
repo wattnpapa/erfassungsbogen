@@ -29,7 +29,8 @@
  * Bewusst ohne JavaScript zur Laufzeit: Die Seiten müssen offline und ohne
  * Skript funktionieren (gleiche Prämisse wie der Rest der App). Die Nav ist
  * eine reine Flexbox-Zeile, die bei schmaler Breite umbricht — kein
- * Hamburger-Menü, kein Toggle.
+ * Hamburger-Menü, kein Toggle. Die Aufklapp-Menüs der Einträge mit
+ * Unterpunkten hängen ebenfalls nur an CSS (`:hover`, `:focus-within`).
  */
 
 import { readFileSync, readdirSync, writeFileSync } from "node:fs";
@@ -53,6 +54,15 @@ interface NavEintrag {
   href: string;
   label: string;
   aktivWenn: (datei: string) => boolean;
+  /**
+   * Unterpunkte, die als Aufklapp-Menü unter dem Eintrag erscheinen. Rein per
+   * CSS (`:hover`/`:focus-within`) — kein Skript zur Laufzeit. Auf Geräten ohne
+   * echten Zeiger bleibt das Menü zu; dort führt der Eintrag selbst auf die
+   * Seite, die genau diese Unterpunkte auflistet.
+   */
+  unter?: { href: string; label: string }[];
+  /** Menü zweispaltig setzen (nur sinnvoll bei sehr vielen Unterpunkten). */
+  zweispaltig?: boolean;
 }
 
 /** Seiten, die auf der Übersicht unter „Hilfsorganisationen“ stehen. */
@@ -80,17 +90,80 @@ const UNTER_UEBERSICHT = new Set([
   "datenschutz.html",
 ]);
 
+/** Die zwölf Länderseiten in der Reihenfolge der Übersicht. */
+const LAENDER: { href: string; label: string }[] = [
+  { href: "./katastrophenschutz-baden-wuerttemberg.html", label: "Baden-Württemberg" },
+  { href: "./katastrophenschutz-bayern.html", label: "Bayern" },
+  { href: "./katastrophenschutz-berlin.html", label: "Berlin" },
+  { href: "./katastrophenschutz-brandenburg.html", label: "Brandenburg" },
+  { href: "./katastrophenschutz-hessen.html", label: "Hessen" },
+  { href: "./katastrophenschutz-mecklenburg-vorpommern.html", label: "Mecklenburg-Vorpommern" },
+  { href: "./katastrophenschutz-niedersachsen.html", label: "Niedersachsen" },
+  { href: "./katastrophenschutz-nordrhein-westfalen.html", label: "Nordrhein-Westfalen" },
+  { href: "./katastrophenschutz-rheinland-pfalz.html", label: "Rheinland-Pfalz" },
+  { href: "./katastrophenschutz-saarland.html", label: "Saarland" },
+  { href: "./katastrophenschutz-sachsen.html", label: "Sachsen" },
+  { href: "./katastrophenschutz-thueringen.html", label: "Thüringen" },
+];
+
+/**
+ * „Alle Themen“ steht vorn: Es ist der Einstieg in den gesamten Textbereich,
+ * und sein Menü führt die Seiten, die keinen eigenen Kopf-Eintrag haben.
+ */
 const NAV: NavEintrag[] = [
-  { href: "./katastrophenschutz.html", label: "Katastrophenschutz", aktivWenn: (d) => d.startsWith("katastrophenschutz") },
-  { href: "./thw.html", label: "THW", aktivWenn: (d) => d.startsWith("thw") },
-  { href: "./feuerwehr.html", label: "Feuerwehr", aktivWenn: (d) => d === "feuerwehr.html" || d === "staerkemeldung-feuerwehr.html" },
+  {
+    href: "./uebersicht.html",
+    label: "Alle Themen",
+    aktivWenn: (d) => UNTER_UEBERSICHT.has(d),
+    unter: [
+      { href: "./vorlage.html", label: "Vorlage und Blanko-PDF" },
+      { href: "./papier-oder-digital.html", label: "Papier oder digital?" },
+      { href: "./bbk.html", label: "BBK" },
+      { href: "./bundeswehr.html", label: "Bundeswehr" },
+      { href: "./open-source-datenschutz.html", label: "Open Source und Datenschutz" },
+      { href: "./impressum.html", label: "Impressum" },
+    ],
+  },
+  {
+    href: "./katastrophenschutz.html",
+    label: "Katastrophenschutz",
+    aktivWenn: (d) => d.startsWith("katastrophenschutz"),
+    unter: LAENDER,
+    zweispaltig: true,
+  },
+  {
+    href: "./thw.html",
+    label: "THW",
+    aktivWenn: (d) => d.startsWith("thw"),
+    unter: [
+      { href: "./thw-fachgruppe-raeumen-erfassungsbogen.html", label: "Fachgruppe Räumen" },
+      { href: "./thw-fachgruppe-notversorgung-erfassungsbogen.html", label: "Fachgruppe Notversorgung" },
+      { href: "./thw-fachgruppe-wasserschaden-pumpen-erfassungsbogen.html", label: "Fachgruppe Wasserschaden/Pumpen" },
+    ],
+  },
+  {
+    href: "./feuerwehr.html",
+    label: "Feuerwehr",
+    aktivWenn: (d) => d === "feuerwehr.html" || d === "staerkemeldung-feuerwehr.html",
+    unter: [{ href: "./staerkemeldung-feuerwehr.html", label: "Stärkemeldung mit Beispiel" }],
+  },
   // Es gibt keine eigene Seite „Hilfsorganisationen“; der Abschnitt der
   // Übersicht ist die ehrlichste Zieladresse — er listet genau die fünf Seiten,
   // die der Eintrag verspricht.
-  { href: "./uebersicht.html#hilfsorganisationen", label: "Hilfsorganisationen", aktivWenn: (d) => HILFSORGANISATIONEN.has(d) },
+  {
+    href: "./uebersicht.html#hilfsorganisationen",
+    label: "Hilfsorganisationen",
+    aktivWenn: (d) => HILFSORGANISATIONEN.has(d),
+    unter: [
+      { href: "./drk.html", label: "DRK" },
+      { href: "./johanniter.html", label: "Johanniter" },
+      { href: "./malteser.html", label: "Malteser" },
+      { href: "./asb.html", label: "ASB" },
+      { href: "./dlrg.html", label: "DLRG" },
+    ],
+  },
   { href: "./meldekopf.html", label: "Meldekopf", aktivWenn: (d) => d === "meldekopf.html" },
   { href: "./anleitung.html", label: "Anleitung", aktivWenn: (d) => d === "anleitung.html" },
-  { href: "./uebersicht.html", label: "Alle Themen", aktivWenn: (d) => UNTER_UEBERSICHT.has(d) },
 ];
 
 /**
@@ -124,7 +197,21 @@ const FUSSNAV: { href: string; label: string }[] = [
 function navHtml(datei: string): string {
   const links = NAV.map((e) => {
     const klasse = e.aktivWenn(datei) ? ' class="aktiv"' : "";
-    return `<a href="${e.href}"${klasse}>${e.label}</a>`;
+    const hauptlink = `<a href="${e.href}"${klasse}>${e.label}</a>`;
+    if (!e.unter) return hauptlink;
+    const unterlinks = e.unter
+      .map((u) => {
+        const uKlasse = u.href === `./${datei}` ? ' class="aktiv"' : "";
+        return `<a href="${u.href}"${uKlasse}>${u.label}</a>`;
+      })
+      .join("\n            ");
+    const menuKlasse = e.zweispaltig ? "kopfnav-unter kopfnav-unter-breit" : "kopfnav-unter";
+    return `<span class="kopfnav-eintrag">
+          ${hauptlink}
+          <span class="${menuKlasse}">
+            ${unterlinks}
+          </span>
+        </span>`;
   }).join("\n        ");
   return `<!-- NAV:START -->
   <header class="kopfnav">
@@ -158,10 +245,25 @@ const NAV_CSS = `/* NAV:CSS:START */
     .kopfnav { background: #fff; border-bottom: 1px solid var(--rand); }
     .kopfnav-inner { max-width: 60rem; margin: 0 auto; padding: 0.7rem 1rem; display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 1.2rem; }
     .kopfnav-logo { font-weight: 700; color: var(--blau); text-decoration: none; font-size: 0.95rem; margin-right: auto; }
-    .kopfnav-links { display: flex; flex-wrap: wrap; gap: 0.3rem 0.9rem; }
+    .kopfnav-links { display: flex; flex-wrap: wrap; align-items: center; gap: 0.3rem 0.9rem; }
     .kopfnav-links a { color: #444; text-decoration: none; font-size: 0.82rem; white-space: nowrap; }
     .kopfnav-links a:hover { color: var(--blau-hell); text-decoration: underline; }
     .kopfnav-links a.aktiv { color: var(--blau); font-weight: 600; }
+    .kopfnav-eintrag { position: relative; display: inline-flex; }
+    .kopfnav-unter { position: absolute; top: 100%; left: -0.6rem; z-index: 30; display: none; grid-template-columns: 1fr; gap: 0.05rem; margin-top: 0.55rem; padding: 0.4rem; background: #fff; border: 1px solid var(--rand); border-radius: 6px; box-shadow: 0 6px 18px rgba(18, 39, 94, 0.13); }
+    .kopfnav-unter-breit { grid-template-columns: 1fr 1fr; }
+    .kopfnav-unter a { display: block; padding: 0.28rem 0.6rem; border-radius: 4px; }
+    .kopfnav-unter a:hover { background: var(--grau); text-decoration: none; }
+    /* Der unsichtbare Streifen überbrückt den Abstand zwischen Eintrag und
+       Menü — ohne ihn klappt das Menü beim Hinüberfahren wieder zu. */
+    .kopfnav-unter::before { content: ""; position: absolute; left: 0; right: 0; top: -0.6rem; height: 0.6rem; }
+    .kopfnav-eintrag:focus-within .kopfnav-unter { display: grid; }
+    /* Nur mit echtem Zeiger aufklappen: Auf Touchgeräten würde der erste Tipp
+       sonst das Menü öffnen, statt dem Link zu folgen. Dort führt der Eintrag
+       auf die Seite, die dieselben Unterpunkte ohnehin auflistet. */
+    @media (hover: hover) and (pointer: fine) {
+      .kopfnav-eintrag:hover .kopfnav-unter { display: grid; }
+    }
     .fussnav { display: inline; }
     .fussnav a { white-space: nowrap; }
     /* NAV:CSS:END */`;

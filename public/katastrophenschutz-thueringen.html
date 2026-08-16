@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Katastrophenschutz Thüringen: Erfassungsbogen nach ThürKatSVO</title>
-  <meta name="description" content="Erfassungsbogen für den Katastrophenschutz Thüringen: 45 Beispielbögen nach der ThürKatSVO, Funkrufnamen mit dem Kennwort „Kater" vorbelegt. Kostenlos, offline, per QR-Code.">
+  <title>Katastrophenschutz Thüringen: Vorlagen nach ThürKatSVO</title>
+  <meta name="description" content="Erfassungsbogen für den Katastrophenschutz Thüringen: 45 Beispielbögen nach der ThürKatSVO, Funkrufnamen mit dem Kennwort „Kater“. Kostenlos und offline.">
   <link rel="canonical" href="https://erfassungsbogen.app/katastrophenschutz-thueringen.html">
   <link rel="icon" href="./icon.svg" type="image/svg+xml">
   <meta property="og:type" content="article">
@@ -37,15 +37,30 @@
     .kopfnav { background: #fff; border-bottom: 1px solid var(--rand); }
     .kopfnav-inner { max-width: 60rem; margin: 0 auto; padding: 0.7rem 1rem; display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 1.2rem; }
     .kopfnav-logo { font-weight: 700; color: var(--blau); text-decoration: none; font-size: 0.95rem; margin-right: auto; }
-    .kopfnav-links { display: flex; flex-wrap: wrap; gap: 0.3rem 0.9rem; }
+    .kopfnav-links { display: flex; flex-wrap: wrap; align-items: center; gap: 0.3rem 0.9rem; }
     .kopfnav-links a { color: #444; text-decoration: none; font-size: 0.82rem; white-space: nowrap; }
     .kopfnav-links a:hover { color: var(--blau-hell); text-decoration: underline; }
     .kopfnav-links a.aktiv { color: var(--blau); font-weight: 600; }
+    .kopfnav-eintrag { position: relative; display: inline-flex; }
+    .kopfnav-unter { position: absolute; top: 100%; left: -0.6rem; z-index: 30; display: none; grid-template-columns: 1fr; gap: 0.05rem; margin-top: 0.55rem; padding: 0.4rem; background: #fff; border: 1px solid var(--rand); border-radius: 6px; box-shadow: 0 6px 18px rgba(18, 39, 94, 0.13); }
+    .kopfnav-unter-breit { grid-template-columns: 1fr 1fr; }
+    .kopfnav-unter a { display: block; padding: 0.28rem 0.6rem; border-radius: 4px; }
+    .kopfnav-unter a:hover { background: var(--grau); text-decoration: none; }
+    /* Der unsichtbare Streifen überbrückt den Abstand zwischen Eintrag und
+       Menü — ohne ihn klappt das Menü beim Hinüberfahren wieder zu. */
+    .kopfnav-unter::before { content: ""; position: absolute; left: 0; right: 0; top: -0.6rem; height: 0.6rem; }
+    .kopfnav-eintrag:focus-within .kopfnav-unter { display: grid; }
+    /* Nur mit echtem Zeiger aufklappen: Auf Touchgeräten würde der erste Tipp
+       sonst das Menü öffnen, statt dem Link zu folgen. Dort führt der Eintrag
+       auf die Seite, die dieselben Unterpunkte ohnehin auflistet. */
+    @media (hover: hover) and (pointer: fine) {
+      .kopfnav-eintrag:hover .kopfnav-unter { display: grid; }
+    }
     .fussnav { display: inline; }
     .fussnav a { white-space: nowrap; }
     /* NAV:CSS:END */
 /* HINWEIS:CSS:START */
-    .marken-hinweis { margin: 1rem 0 0; font-size: 0.78rem; line-height: 1.45; color: #777; }
+    .marken-hinweis { margin: 1rem 0 0; font-size: 0.78rem; line-height: 1.45; color: #5c6478; }
     /* HINWEIS:CSS:END */
   </style>
 </head>
@@ -55,13 +70,60 @@
     <div class="kopfnav-inner">
       <a href="./" class="kopfnav-logo">Erfassungsbogen</a>
       <nav class="kopfnav-links" aria-label="Hauptnavigation">
-        <a href="./katastrophenschutz.html" class="aktiv">Katastrophenschutz</a>
-        <a href="./thw.html">THW</a>
-        <a href="./feuerwehr.html">Feuerwehr</a>
-        <a href="./uebersicht.html#hilfsorganisationen">Hilfsorganisationen</a>
+        <span class="kopfnav-eintrag">
+          <a href="./uebersicht.html">Alle Themen</a>
+          <span class="kopfnav-unter">
+            <a href="./vorlage.html">Vorlage und Blanko-PDF</a>
+            <a href="./papier-oder-digital.html">Papier oder digital?</a>
+            <a href="./bbk.html">BBK</a>
+            <a href="./bundeswehr.html">Bundeswehr</a>
+            <a href="./open-source-datenschutz.html">Open Source und Datenschutz</a>
+            <a href="./impressum.html">Impressum</a>
+          </span>
+        </span>
+        <span class="kopfnav-eintrag">
+          <a href="./katastrophenschutz.html" class="aktiv">Katastrophenschutz</a>
+          <span class="kopfnav-unter kopfnav-unter-breit">
+            <a href="./katastrophenschutz-baden-wuerttemberg.html">Baden-Württemberg</a>
+            <a href="./katastrophenschutz-bayern.html">Bayern</a>
+            <a href="./katastrophenschutz-berlin.html">Berlin</a>
+            <a href="./katastrophenschutz-brandenburg.html">Brandenburg</a>
+            <a href="./katastrophenschutz-hessen.html">Hessen</a>
+            <a href="./katastrophenschutz-mecklenburg-vorpommern.html">Mecklenburg-Vorpommern</a>
+            <a href="./katastrophenschutz-niedersachsen.html">Niedersachsen</a>
+            <a href="./katastrophenschutz-nordrhein-westfalen.html">Nordrhein-Westfalen</a>
+            <a href="./katastrophenschutz-rheinland-pfalz.html">Rheinland-Pfalz</a>
+            <a href="./katastrophenschutz-saarland.html">Saarland</a>
+            <a href="./katastrophenschutz-sachsen.html">Sachsen</a>
+            <a href="./katastrophenschutz-thueringen.html" class="aktiv">Thüringen</a>
+          </span>
+        </span>
+        <span class="kopfnav-eintrag">
+          <a href="./thw.html">THW</a>
+          <span class="kopfnav-unter">
+            <a href="./thw-fachgruppe-raeumen-erfassungsbogen.html">Fachgruppe Räumen</a>
+            <a href="./thw-fachgruppe-notversorgung-erfassungsbogen.html">Fachgruppe Notversorgung</a>
+            <a href="./thw-fachgruppe-wasserschaden-pumpen-erfassungsbogen.html">Fachgruppe Wasserschaden/Pumpen</a>
+          </span>
+        </span>
+        <span class="kopfnav-eintrag">
+          <a href="./feuerwehr.html">Feuerwehr</a>
+          <span class="kopfnav-unter">
+            <a href="./staerkemeldung-feuerwehr.html">Stärkemeldung mit Beispiel</a>
+          </span>
+        </span>
+        <span class="kopfnav-eintrag">
+          <a href="./uebersicht.html#hilfsorganisationen">Hilfsorganisationen</a>
+          <span class="kopfnav-unter">
+            <a href="./drk.html">DRK</a>
+            <a href="./johanniter.html">Johanniter</a>
+            <a href="./malteser.html">Malteser</a>
+            <a href="./asb.html">ASB</a>
+            <a href="./dlrg.html">DLRG</a>
+          </span>
+        </span>
         <a href="./meldekopf.html">Meldekopf</a>
         <a href="./anleitung.html">Anleitung</a>
-        <a href="./uebersicht.html">Alle Themen</a>
       </nav>
     </div>
   </header>
@@ -159,22 +221,27 @@
       kein amtliches Dokument. Maßgeblich bleibt die Landesregelung; deshalb
       kannst du jede Vorbelegung frei anpassen.
     </p>
-
+    <!-- LAENDER:START -->
     <h3>Was ist mit anderen Bundesländern?</h3>
     <p>
       Weitere Landesvorlagen liegen für
-      <a href="./katastrophenschutz-niedersachsen.html">Niedersachsen</a>,
-      <a href="./katastrophenschutz-sachsen.html">Sachsen</a>,
-      <a href="./katastrophenschutz-brandenburg.html">Brandenburg</a>,
       <a href="./katastrophenschutz-baden-wuerttemberg.html">Baden-Württemberg</a>,
+      <a href="./katastrophenschutz-bayern.html">Bayern</a>,
+      <a href="./katastrophenschutz-berlin.html">Berlin</a>,
+      <a href="./katastrophenschutz-brandenburg.html">Brandenburg</a>,
+      <a href="./katastrophenschutz-hessen.html">Hessen</a>,
+      <a href="./katastrophenschutz-mecklenburg-vorpommern.html">Mecklenburg-Vorpommern</a>,
+      <a href="./katastrophenschutz-niedersachsen.html">Niedersachsen</a>,
+      <a href="./katastrophenschutz-nordrhein-westfalen.html">Nordrhein-Westfalen</a>,
       <a href="./katastrophenschutz-rheinland-pfalz.html">Rheinland-Pfalz</a>,
-      <a href="./katastrophenschutz-mecklenburg-vorpommern.html">Mecklenburg-Vorpommern</a> und
-      <a href="./katastrophenschutz-hessen.html">Hessen</a> bereit —
-      eine Übersicht gibt die Seite
+      <a href="./katastrophenschutz-saarland.html">Saarland</a> und
+      <a href="./katastrophenschutz-sachsen.html">Sachsen</a>
+      bereit — eine Übersicht gibt die Seite
       <a href="./katastrophenschutz.html">Katastrophenschutz der Länder</a>.
       Fehlt deins, kannst du jeden Bogen frei ausfüllen und selbst als Vorlage
       speichern.
     </p>
+    <!-- LAENDER:END -->
 
     <footer>
       <!-- FUSSNAV:START -->
