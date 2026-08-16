@@ -105,7 +105,9 @@ export const START_ABSCHNITTE: Abschnitt[] = [
           { text: "Katastrophenschutz der Länder", ziel: "./katastrophenschutz.html" },
           ". Für die Feuerwehr ist der Aufbau der ",
           { text: "Stärkemeldung mit Beispiel", ziel: "./staerkemeldung-feuerwehr.html" },
-          " gesondert beschrieben.",
+          " gesondert beschrieben. Alle Themenseiten — auch die zu BBK und Bundeswehr sowie die zwölf Länderseiten zum Katastrophenschutz — stehen in der ",
+          { text: "Übersicht", ziel: "./uebersicht.html" },
+          ".",
         ],
       },
       {

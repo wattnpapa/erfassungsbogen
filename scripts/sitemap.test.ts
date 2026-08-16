@@ -62,10 +62,11 @@ describe("eintraegeSammeln", () => {
 
   it("hält die gewollte Reihenfolge und die priority-Werte der bisherigen Sitemap", () => {
     const eintraege = eintraegeSammeln(PUBLIC_ECHT, FESTES_DATUM);
-    expect(eintraege.slice(0, 4).map((e) => [e.loc, e.priority])).toEqual([
+    expect(eintraege.slice(0, 5).map((e) => [e.loc, e.priority])).toEqual([
       ["https://erfassungsbogen.app/", "1.0"],
       ["https://erfassungsbogen.app/anleitung.html", "0.8"],
       ["https://erfassungsbogen.app/vorlage.html", "0.8"],
+      ["https://erfassungsbogen.app/uebersicht.html", "0.8"],
       ["https://erfassungsbogen.app/thw.html", "0.7"],
     ]);
     const werte = Object.fromEntries(eintraege.map((e) => [e.loc, e.priority]));

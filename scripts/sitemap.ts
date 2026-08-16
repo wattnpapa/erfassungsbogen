@@ -44,6 +44,9 @@ const SEITEN: Record<string, string> = {
   "": "1.0",
   "anleitung.html": "0.8",
   "vorlage.html": "0.8",
+  // Verzeichnis aller Themenseiten: von jeder Seite aus verlinkt und damit der
+  // Einstieg, über den ein Crawler den ganzen Textbereich erreicht.
+  "uebersicht.html": "0.8",
   "thw.html": "0.7",
   // Longtail-Unterseiten zu einzelnen THW-Fachgruppen: hängen inhaltlich an
   // thw.html und stehen darum eine Stufe darunter.

@@ -1,18 +1,30 @@
 /**
- * Fügt eine einheitliche Kopfnavigation in alle statischen Content-Seiten
- * unter public/ ein (bzw. aktualisiert sie, falls schon vorhanden).
+ * Fügt eine einheitliche Kopf- und Fußnavigation in alle statischen
+ * Content-Seiten unter public/ ein (bzw. aktualisiert sie, falls schon
+ * vorhanden).
  *
  * Warum ein Skript statt von Hand pflegen: public/*.html sind unabhängige,
  * eigenständige Dateien ohne Server-Side-Includes oder Build-Templating —
  * jede Seite trägt ihr eigenes <style> und <body>. Ohne dieses Skript müsste
  * jede neue Organisations- oder Länderseite die Navigation manuell abtippen,
- * und ein Nav-Änderung (neuer Link, neue Reihenfolge) 27 Handbearbeitungen
- * nach sich ziehen. Das Skript injiziert stattdessen einen markierten Block
- * (`<!-- NAV:START -->` … `<!-- NAV:END -->`) direkt nach `<body>` sowie einen
+ * und ein Nav-Änderung (neuer Link, neue Reihenfolge) 33 Handbearbeitungen
+ * nach sich ziehen. Das Skript injiziert stattdessen markierte Blöcke
+ * (`<!-- NAV:START -->` … `<!-- NAV:END -->` nach `<body>`,
+ * `<!-- FUSSNAV:START -->` … `<!-- FUSSNAV:END -->` im `<footer>`) sowie einen
  * zugehörigen `<!-- NAV:CSS:START -->`-Block am Ende des Style-Tags — beim
  * erneuten Lauf werden bestehende Blöcke ersetzt, nicht verdoppelt.
  *
  * Aufruf (Node ≥ 22): npm run content-nav
+ *
+ * Aufteilung zwischen den beiden Navigationen: Die Kopfzeile trägt nur die
+ * sieben Einstiege, die auf jedem Handy in eine oder zwei Zeilen passen — mehr
+ * Einträge sind keine Navigation mehr, sondern eine Linkwolke. Alles Weitere
+ * hängt an uebersicht.html, dem einen vollständigen Verzeichnis; die Fußzeile
+ * wiederholt die Hauptseiten, damit jede Seite von jeder anderen aus in
+ * höchstens zwei Klicks erreichbar bleibt. Die Longtail-Seiten (12 Länder,
+ * 3 THW-Fachgruppen) stehen bewusst nur auf der Übersicht und ihrer jeweiligen
+ * Elternseite — sie in jede Fußzeile zu kippen, verwässert die interne
+ * Verlinkung, statt sie zu stärken.
  *
  * Bewusst ohne JavaScript zur Laufzeit: Die Seiten müssen offline und ohne
  * Skript funktionieren (gleiche Prämisse wie der Rest der App). Die Nav ist
@@ -33,8 +45,9 @@ const AUSGENOMMEN = new Set(["404.html"]);
 /**
  * Nav-Einträge in Anzeige-Reihenfolge. `aktivWenn` bestimmt, für welche
  * Dateien der Link als aktuelle Seite hervorgehoben wird — bei
- * "katastrophenschutz" zählen auch alle Länder-Unterseiten dazu, damit die
- * Zugehörigkeit beim Klicken durch die 12 Länderseiten erkennbar bleibt.
+ * "Katastrophenschutz" zählen auch alle Länder-Unterseiten dazu, bei "THW" die
+ * Fachgruppen-Seiten, damit die Zugehörigkeit beim Klicken in die Tiefe
+ * erkennbar bleibt.
  */
 interface NavEintrag {
   href: string;
@@ -42,19 +55,70 @@ interface NavEintrag {
   aktivWenn: (datei: string) => boolean;
 }
 
+/** Seiten, die auf der Übersicht unter „Hilfsorganisationen“ stehen. */
+const HILFSORGANISATIONEN = new Set([
+  "drk.html",
+  "johanniter.html",
+  "malteser.html",
+  "asb.html",
+  "dlrg.html",
+]);
+
+/**
+ * Seiten ohne eigenen Kopf-Eintrag: Sie hängen an der Übersicht, und dort soll
+ * die Markierung stehen, damit nie ein Eintrag als aktiv erscheint, der die
+ * Seite gar nicht enthält.
+ */
+const UNTER_UEBERSICHT = new Set([
+  "uebersicht.html",
+  "vorlage.html",
+  "papier-oder-digital.html",
+  "open-source-datenschutz.html",
+  "bbk.html",
+  "bundeswehr.html",
+  "impressum.html",
+  "datenschutz.html",
+]);
+
 const NAV: NavEintrag[] = [
   { href: "./katastrophenschutz.html", label: "Katastrophenschutz", aktivWenn: (d) => d.startsWith("katastrophenschutz") },
-  { href: "./thw.html", label: "THW", aktivWenn: (d) => d === "thw.html" },
-  { href: "./feuerwehr.html", label: "Feuerwehr", aktivWenn: (d) => d === "feuerwehr.html" },
-  { href: "./dlrg.html", label: "DLRG", aktivWenn: (d) => d === "dlrg.html" },
-  { href: "./drk.html", label: "DRK", aktivWenn: (d) => d === "drk.html" },
-  { href: "./johanniter.html", label: "Johanniter", aktivWenn: (d) => d === "johanniter.html" },
-  { href: "./malteser.html", label: "Malteser", aktivWenn: (d) => d === "malteser.html" },
-  { href: "./asb.html", label: "ASB", aktivWenn: (d) => d === "asb.html" },
-  { href: "./bbk.html", label: "BBK", aktivWenn: (d) => d === "bbk.html" },
-  { href: "./bundeswehr.html", label: "Bundeswehr", aktivWenn: (d) => d === "bundeswehr.html" },
+  { href: "./thw.html", label: "THW", aktivWenn: (d) => d.startsWith("thw") },
+  { href: "./feuerwehr.html", label: "Feuerwehr", aktivWenn: (d) => d === "feuerwehr.html" || d === "staerkemeldung-feuerwehr.html" },
+  // Es gibt keine eigene Seite „Hilfsorganisationen“; der Abschnitt der
+  // Übersicht ist die ehrlichste Zieladresse — er listet genau die fünf Seiten,
+  // die der Eintrag verspricht.
+  { href: "./uebersicht.html#hilfsorganisationen", label: "Hilfsorganisationen", aktivWenn: (d) => HILFSORGANISATIONEN.has(d) },
   { href: "./meldekopf.html", label: "Meldekopf", aktivWenn: (d) => d === "meldekopf.html" },
   { href: "./anleitung.html", label: "Anleitung", aktivWenn: (d) => d === "anleitung.html" },
+  { href: "./uebersicht.html", label: "Alle Themen", aktivWenn: (d) => UNTER_UEBERSICHT.has(d) },
+];
+
+/**
+ * Fußzeilen-Links: die Hauptseiten aller Bereiche, damit von jeder Seite aus
+ * jede andere in höchstens zwei Klicks erreichbar ist. „Zurück zur App“ steht
+ * vorn, das Rechtliche hinten.
+ */
+const FUSSNAV: { href: string; label: string }[] = [
+  { href: "./", label: "Zurück zur App" },
+  { href: "./uebersicht.html", label: "Alle Themen" },
+  { href: "./anleitung.html", label: "Anleitung" },
+  { href: "./vorlage.html", label: "Vorlage und Blanko-PDF" },
+  { href: "./meldekopf.html", label: "Meldekopf digital" },
+  { href: "./katastrophenschutz.html", label: "Katastrophenschutz" },
+  { href: "./thw.html", label: "THW" },
+  { href: "./feuerwehr.html", label: "Feuerwehr" },
+  { href: "./staerkemeldung-feuerwehr.html", label: "Stärkemeldung" },
+  { href: "./drk.html", label: "DRK" },
+  { href: "./johanniter.html", label: "Johanniter" },
+  { href: "./malteser.html", label: "Malteser" },
+  { href: "./asb.html", label: "ASB" },
+  { href: "./dlrg.html", label: "DLRG" },
+  { href: "./bbk.html", label: "BBK" },
+  { href: "./bundeswehr.html", label: "Bundeswehr" },
+  { href: "./papier-oder-digital.html", label: "Papier oder digital?" },
+  { href: "./open-source-datenschutz.html", label: "Open Source und Datenschutz" },
+  { href: "./datenschutz.html", label: "Datenschutz" },
+  { href: "./impressum.html", label: "Impressum" },
 ];
 
 function navHtml(datei: string): string {
@@ -74,6 +138,22 @@ function navHtml(datei: string): string {
   <!-- NAV:END -->`;
 }
 
+/**
+ * Fußzeilen-Links als eine `·`-getrennte Zeile. Der Link auf die Seite selbst
+ * fällt weg: Ein Verweis auf die gerade offene Seite ist für den Leser nutzlos
+ * und für die interne Verlinkung wertlos.
+ */
+function fussNavHtml(datei: string): string {
+  const links = FUSSNAV.filter((e) => e.href !== `./${datei}`)
+    .map((e) => `<a href="${e.href}">${e.label}</a>`)
+    .join("\n        ·\n        ");
+  return `<!-- FUSSNAV:START -->
+      <nav class="fussnav" aria-label="Weitere Seiten">
+        ${links}
+      </nav>
+      <!-- FUSSNAV:END -->`;
+}
+
 const NAV_CSS = `/* NAV:CSS:START */
     .kopfnav { background: #fff; border-bottom: 1px solid var(--rand); }
     .kopfnav-inner { max-width: 60rem; margin: 0 auto; padding: 0.7rem 1rem; display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 1.2rem; }
@@ -82,7 +162,33 @@ const NAV_CSS = `/* NAV:CSS:START */
     .kopfnav-links a { color: #444; text-decoration: none; font-size: 0.82rem; white-space: nowrap; }
     .kopfnav-links a:hover { color: var(--blau-hell); text-decoration: underline; }
     .kopfnav-links a.aktiv { color: var(--blau); font-weight: 600; }
+    .fussnav { display: inline; }
+    .fussnav a { white-space: nowrap; }
     /* NAV:CSS:END */`;
+
+/**
+ * Inhalt der Fußzeile bis zum Markenhinweis bzw. `</footer>`. Group 1 ist das
+ * öffnende `<footer>`-Tag, Group 2 der zu ersetzende Bereich, Group 3 das Ende.
+ */
+const FUSS_MUSTER = /(<footer[^>]*>)([\s\S]*?)\s*(<!-- HINWEIS:START -->|<\/footer>)/;
+
+/**
+ * Darf der bisherige Fußzeilen-Inhalt überschrieben werden?
+ *
+ * Historisch stand dort auf jeder Seite eine von Hand gepflegte Linkzeile —
+ * genau die soll dieses Skript ablösen. Ein Fußbereich, der darüber hinaus Text
+ * enthält, wäre dagegen echter Seiteninhalt; ihn wortlos zu löschen, wäre der
+ * schlimmste Fehler, den dieses Skript machen kann. Darum wird nur ersetzt, was
+ * nachweislich nur aus Links, Trennzeichen und dem eigenen Block besteht.
+ */
+function nurLinks(inhalt: string): boolean {
+  const rest = inhalt
+    .replace(/<!-- FUSSNAV:START -->[\s\S]*?<!-- FUSSNAV:END -->/g, "")
+    .replace(/<nav[^>]*>|<\/nav>/g, "")
+    .replace(/<a\s[^>]*>[\s\S]*?<\/a>/g, "")
+    .replace(/·/g, "");
+  return rest.trim() === "";
+}
 
 function inject(inhalt: string, datei: string): string {
   let neu = inhalt;
@@ -93,6 +199,16 @@ function inject(inhalt: string, datei: string): string {
     neu = neu.replace(navBlockMuster, navHtml(datei));
   } else {
     neu = neu.replace("<body>\n", `<body>\n  ${navHtml(datei)}\n\n`);
+  }
+
+  // Fußzeilen-Links ersetzen — aber nur, wenn dort nichts als Links steht.
+  const treffer = neu.match(FUSS_MUSTER);
+  if (!treffer) {
+    console.warn(`Fußnavigation übersprungen (kein <footer>): ${datei}`);
+  } else if (!nurLinks(treffer[2])) {
+    console.warn(`Fußnavigation übersprungen (Fußzeile enthält eigenen Inhalt): ${datei}`);
+  } else {
+    neu = neu.replace(FUSS_MUSTER, `$1\n      ${fussNavHtml(datei)}\n      $3`);
   }
 
   // Bestehenden CSS-Block ersetzen oder vor </style> einfügen.

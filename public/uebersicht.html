@@ -1,0 +1,285 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Übersicht: alle Seiten zum Einheiten-Erfassungsbogen</title>
+  <meta name="description" content="Alle Themenseiten zum Einheiten-Erfassungsbogen auf einen Blick: Feuerwehr, THW, Hilfsorganisationen, Katastrophenschutz der Länder, Meldekopf und Vorlagen.">
+  <link rel="canonical" href="https://erfassungsbogen.app/uebersicht.html">
+  <link rel="icon" href="./icon.svg" type="image/svg+xml">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Übersicht: alle Seiten zum Einheiten-Erfassungsbogen">
+  <meta property="og:description" content="Der Einstieg in alle Themenseiten: Organisationen, Katastrophenschutz der Länder, Meldekopf, Vorlagen und Grundlagen zum Einheiten-Erfassungsbogen.">
+  <meta property="og:url" content="https://erfassungsbogen.app/uebersicht.html">
+  <meta property="og:image" content="https://erfassungsbogen.app/og-bild.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:locale" content="de_DE">
+  <meta name="twitter:card" content="summary_large_image">
+  <style>
+    :root { --blau: #12275e; --blau-hell: #1d3d8f; --rand: #c9cede; --grau: #f2f3f7; }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; color: #1a1c22; background: var(--grau); line-height: 1.5; }
+    main { max-width: 44rem; margin: 0 auto; padding: 1.5rem 1rem 4rem; }
+    h1 { color: var(--blau); font-size: 1.4rem; margin: 0.5rem 0 1rem; }
+    h2 { color: var(--blau); font-size: 1.1rem; border-bottom: 2px solid var(--blau); padding-bottom: 0.2rem; margin-top: 2rem; }
+    h3 { font-size: 1rem; margin: 1.4rem 0 0.3rem; }
+    a { color: var(--blau-hell); }
+    ol, ul { padding-left: 1.2rem; }
+    li { margin-bottom: 0.4rem; }
+    .start { display: inline-block; margin: 0.5rem 0 0.5rem; padding: 0.6rem 1.1rem; background: var(--blau); color: #fff; border-radius: 6px; text-decoration: none; font-weight: 600; }
+    footer { margin-top: 2.5rem; padding-top: 1rem; border-top: 1px solid var(--rand); font-size: 0.85rem; color: #555; }
+    /* Kachelliste: je Eintrag ein Link mit erklärender Zeile darunter. Bewusst
+       eine <ul> und kein Raster aus <div>, damit die Seite ohne CSS immer noch
+       eine lesbare, verschachtelte Liste bleibt. */
+    .themenliste { list-style: none; padding: 0; margin: 0.8rem 0 0; display: grid; gap: 0.6rem; grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr)); }
+    .themenliste li { margin: 0; background: #fff; border: 1px solid var(--rand); border-radius: 6px; padding: 0.6rem 0.8rem; }
+    .themenliste a { font-weight: 600; text-decoration: none; }
+    .themenliste a:hover { text-decoration: underline; }
+    .themenliste span { display: block; font-size: 0.85rem; color: #555; margin-top: 0.15rem; }
+    /* Die Länderliste ist eine reine Namensliste — dort wäre je Eintrag eine
+       Erklärzeile nur Rauschen, darum enger gesetzt. */
+    .laenderliste { list-style: none; padding: 0; margin: 0.8rem 0 0; display: flex; flex-wrap: wrap; gap: 0.4rem 0.5rem; }
+    .laenderliste li { margin: 0; }
+    .laenderliste a { display: inline-block; background: #fff; border: 1px solid var(--rand); border-radius: 6px; padding: 0.3rem 0.7rem; font-size: 0.9rem; text-decoration: none; }
+    .laenderliste a:hover { text-decoration: underline; }
+/* NAV:CSS:START */
+    .kopfnav { background: #fff; border-bottom: 1px solid var(--rand); }
+    .kopfnav-inner { max-width: 60rem; margin: 0 auto; padding: 0.7rem 1rem; display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 1.2rem; }
+    .kopfnav-logo { font-weight: 700; color: var(--blau); text-decoration: none; font-size: 0.95rem; margin-right: auto; }
+    .kopfnav-links { display: flex; flex-wrap: wrap; gap: 0.3rem 0.9rem; }
+    .kopfnav-links a { color: #444; text-decoration: none; font-size: 0.82rem; white-space: nowrap; }
+    .kopfnav-links a:hover { color: var(--blau-hell); text-decoration: underline; }
+    .kopfnav-links a.aktiv { color: var(--blau); font-weight: 600; }
+    .fussnav { display: inline; }
+    .fussnav a { white-space: nowrap; }
+    /* NAV:CSS:END */
+/* HINWEIS:CSS:START */
+    .marken-hinweis { margin: 1rem 0 0; font-size: 0.78rem; line-height: 1.45; color: #777; }
+    /* HINWEIS:CSS:END */
+  </style>
+</head>
+<body>
+  <!-- NAV:START -->
+  <header class="kopfnav">
+    <div class="kopfnav-inner">
+      <a href="./" class="kopfnav-logo">Erfassungsbogen</a>
+      <nav class="kopfnav-links" aria-label="Hauptnavigation">
+        <a href="./katastrophenschutz.html">Katastrophenschutz</a>
+        <a href="./thw.html">THW</a>
+        <a href="./feuerwehr.html">Feuerwehr</a>
+        <a href="./uebersicht.html#hilfsorganisationen">Hilfsorganisationen</a>
+        <a href="./meldekopf.html">Meldekopf</a>
+        <a href="./anleitung.html">Anleitung</a>
+        <a href="./uebersicht.html" class="aktiv">Alle Themen</a>
+      </nav>
+    </div>
+  </header>
+  <!-- NAV:END -->
+
+  <main>
+    <h1>Übersicht: alle Seiten zum Einheiten-Erfassungsbogen</h1>
+
+    <p>
+      Der Einheiten-Erfassungsbogen ist das Formular, mit dem eine eintreffende
+      Einheit am Meldekopf oder im Bereitstellungsraum erfasst wird: wer ist da,
+      in welcher Stärke, mit welchen Fahrzeugen und was wird sofort gebraucht.
+      Diese Seite sammelt alle Themenseiten dazu — nach Organisation, nach
+      Bundesland und nach Aufgabe. Wer den Bogen einfach ausfüllen will, braucht
+      keine davon und kann direkt in die App.
+    </p>
+
+    <p><a class="start" href="./">Bogen digital ausfüllen</a></p>
+
+    <h2>Loslegen</h2>
+    <ul class="themenliste">
+      <li>
+        <a href="./vorlage.html">Vorlage und Blanko-PDF</a>
+        <span>Aufbau des Bogens, Feld für Feld — als leerer Vordruck zum Ausdrucken und als digitale Vorlage.</span>
+      </li>
+      <li>
+        <a href="./anleitung.html">Anleitung</a>
+        <span>Von der ersten Eingabe bis zur Übergabe per QR-Code: der vollständige Ablauf.</span>
+      </li>
+      <li>
+        <a href="./meldekopf.html">Meldekopf digital</a>
+        <span>Fremde Bögen zu einem Einsatz sammeln und Stärke sowie Sofortbedarf laufend zusammenzählen.</span>
+      </li>
+      <li>
+        <a href="./papier-oder-digital.html">Papier oder digital?</a>
+        <span>Papierbogen, Excel-Tabelle oder App — verglichen an Lesbarkeit, Summen, Übergabe und Ausfallsicherheit.</span>
+      </li>
+    </ul>
+
+    <h2 id="feuerwehr">Feuerwehr</h2>
+    <ul class="themenliste">
+      <li>
+        <a href="./feuerwehr.html">Erfassungsbogen bei der Feuerwehr</a>
+        <span>Löschzug, Bereitschaft und überörtliche Hilfe: Erfassung mit Funkrufnamen und Fahrzeugen.</span>
+      </li>
+      <li>
+        <a href="./staerkemeldung-feuerwehr.html">Stärkemeldung mit Beispiel</a>
+        <span>Wie die Meldung 1/2/9/12 aufgebaut ist und wie sie sich über mehrere Einheiten summiert.</span>
+      </li>
+    </ul>
+
+    <h2 id="thw">THW</h2>
+    <ul class="themenliste">
+      <li>
+        <a href="./thw.html">Erfassungsbogen im THW</a>
+        <span>Ortsverband, Zug und Fachgruppe erfassen — mit Vorbelegung nach StAN und THW-Funkrufnamen.</span>
+      </li>
+      <li>
+        <a href="./thw-fachgruppe-raeumen-erfassungsbogen.html">Fachgruppe Räumen</a>
+        <span>Beispielbogen der FGr R mit Sollstärke, Fahrzeugen und Gerät.</span>
+      </li>
+      <li>
+        <a href="./thw-fachgruppe-notversorgung-erfassungsbogen.html">Fachgruppe Notversorgung</a>
+        <span>Beispielbogen der FGr N: Notversorgung und Notinstandsetzung.</span>
+      </li>
+      <li>
+        <a href="./thw-fachgruppe-wasserschaden-pumpen-erfassungsbogen.html">Fachgruppe Wasserschaden/Pumpen</a>
+        <span>Beispielbogen der FGr WP mit Pumpenleistung und Besatzung.</span>
+      </li>
+    </ul>
+
+    <h2 id="hilfsorganisationen">Hilfsorganisationen</h2>
+    <ul class="themenliste">
+      <li>
+        <a href="./drk.html">DRK</a>
+        <span>Bereitschaften, Schnelleinsatzgruppen und Betreuungsdienst des Deutschen Roten Kreuzes.</span>
+      </li>
+      <li>
+        <a href="./johanniter.html">Johanniter</a>
+        <span>Sanitäts- und Betreuungseinheiten der Johanniter-Unfall-Hilfe.</span>
+      </li>
+      <li>
+        <a href="./malteser.html">Malteser</a>
+        <span>Einsatzeinheiten und SEG des Malteser Hilfsdienstes.</span>
+      </li>
+      <li>
+        <a href="./asb.html">ASB</a>
+        <span>Sanitätsdienst und Katastrophenschutz-Einheiten des Arbeiter-Samariter-Bundes.</span>
+      </li>
+      <li>
+        <a href="./dlrg.html">DLRG</a>
+        <span>Wasserrettungszüge, Boote und Taucher der Deutschen Lebens-Rettungs-Gesellschaft.</span>
+      </li>
+    </ul>
+
+    <h2 id="bund">Einheiten des Bundes</h2>
+    <ul class="themenliste">
+      <li>
+        <a href="./bbk.html">BBK</a>
+        <span>Ergänzung des Bundes im Zivilschutz: Löschgruppenfahrzeuge, Betreuung und Dekontamination.</span>
+      </li>
+      <li>
+        <a href="./bundeswehr.html">Bundeswehr</a>
+        <span>Amtshilfe und zivil-militärische Zusammenarbeit: Kräfte in einer BOS-Lage erfassen.</span>
+      </li>
+    </ul>
+
+    <h2 id="katastrophenschutz">Katastrophenschutz der Länder</h2>
+    <p>
+      Wie eine Katastrophenschutzeinheit gegliedert ist, regelt jedes Bundesland
+      selbst. Die <a href="./katastrophenschutz.html">Übersicht zum
+      Katastrophenschutz</a> erklärt das gemeinsame Grundmuster; die Länderseiten
+      nennen die Einheiten und Sollstärken der jeweiligen Verordnung.
+    </p>
+    <ul class="laenderliste">
+      <li><a href="./katastrophenschutz-baden-wuerttemberg.html">Baden-Württemberg</a></li>
+      <li><a href="./katastrophenschutz-bayern.html">Bayern</a></li>
+      <li><a href="./katastrophenschutz-berlin.html">Berlin</a></li>
+      <li><a href="./katastrophenschutz-brandenburg.html">Brandenburg</a></li>
+      <li><a href="./katastrophenschutz-hessen.html">Hessen</a></li>
+      <li><a href="./katastrophenschutz-mecklenburg-vorpommern.html">Mecklenburg-Vorpommern</a></li>
+      <li><a href="./katastrophenschutz-niedersachsen.html">Niedersachsen</a></li>
+      <li><a href="./katastrophenschutz-nordrhein-westfalen.html">Nordrhein-Westfalen</a></li>
+      <li><a href="./katastrophenschutz-rheinland-pfalz.html">Rheinland-Pfalz</a></li>
+      <li><a href="./katastrophenschutz-saarland.html">Saarland</a></li>
+      <li><a href="./katastrophenschutz-sachsen.html">Sachsen</a></li>
+      <li><a href="./katastrophenschutz-thueringen.html">Thüringen</a></li>
+    </ul>
+
+    <h2 id="grundlagen">Grundlagen und Rechtliches</h2>
+    <ul class="themenliste">
+      <li>
+        <a href="./open-source-datenschutz.html">Open Source und Datenschutz</a>
+        <span>Warum der Bogen ohne Server auskommt und was das für personenbezogene Daten bedeutet.</span>
+      </li>
+      <li>
+        <a href="./datenschutz.html">Datenschutzhinweis</a>
+        <span>Was beim Aufruf dieser Seite gezählt wird — und was nicht.</span>
+      </li>
+      <li>
+        <a href="./impressum.html">Impressum</a>
+        <span>Verantwortlich für Inhalt und Betrieb dieser Seite.</span>
+      </li>
+    </ul>
+
+    <footer>
+      <!-- FUSSNAV:START -->
+      <nav class="fussnav" aria-label="Weitere Seiten">
+        <a href="./">Zurück zur App</a>
+        ·
+        <a href="./anleitung.html">Anleitung</a>
+        ·
+        <a href="./vorlage.html">Vorlage und Blanko-PDF</a>
+        ·
+        <a href="./meldekopf.html">Meldekopf digital</a>
+        ·
+        <a href="./katastrophenschutz.html">Katastrophenschutz</a>
+        ·
+        <a href="./thw.html">THW</a>
+        ·
+        <a href="./feuerwehr.html">Feuerwehr</a>
+        ·
+        <a href="./staerkemeldung-feuerwehr.html">Stärkemeldung</a>
+        ·
+        <a href="./drk.html">DRK</a>
+        ·
+        <a href="./johanniter.html">Johanniter</a>
+        ·
+        <a href="./malteser.html">Malteser</a>
+        ·
+        <a href="./asb.html">ASB</a>
+        ·
+        <a href="./dlrg.html">DLRG</a>
+        ·
+        <a href="./bbk.html">BBK</a>
+        ·
+        <a href="./bundeswehr.html">Bundeswehr</a>
+        ·
+        <a href="./papier-oder-digital.html">Papier oder digital?</a>
+        ·
+        <a href="./open-source-datenschutz.html">Open Source und Datenschutz</a>
+        ·
+        <a href="./datenschutz.html">Datenschutz</a>
+        ·
+        <a href="./impressum.html">Impressum</a>
+      </nav>
+      <!-- FUSSNAV:END -->
+        <!-- HINWEIS:START -->
+      <p class="marken-hinweis">
+        Der Einheiten-Erfassungsbogen ist ein unabhängiges, privates Projekt.
+        Es besteht keine Zusammenarbeit mit den hier genannten Organisationen
+        und Behörden und keine Unterstützung durch sie. Namen, Logos und Marken
+        gehören ihren jeweiligen Inhabern und werden ausschließlich zur
+        Bezeichnung der jeweiligen Organisation verwendet.
+      </p>
+      <!-- HINWEIS:END -->
+    </footer>
+  </main>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Erfassungsbogen.app", "item": "https://erfassungsbogen.app/" },
+      { "@type": "ListItem", "position": 2, "name": "Übersicht", "item": "https://erfassungsbogen.app/uebersicht.html" }
+    ]
+  }
+  </script>
+</body>
+</html>
