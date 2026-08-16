@@ -31,6 +31,14 @@
     figure { margin: 1.2rem 0; }
     figure img { display: block; width: 100%; height: auto; border: 1px solid var(--rand); background: #fff; }
     figure.foto img { height: 260px; object-fit: cover; }
+    figure.zeichen { float: right; width: 8rem; margin: 0.6rem 0 0.8rem 1.5rem; text-align: center; }
+    figure.zeichen img { width: 5.5rem; height: 5.5rem; border: none; background: none; margin: 0 auto; }
+    figure.zeichen figcaption { font-size: 0.72rem; line-height: 1.35; }
+    @media (max-width: 34rem) {
+      figure.zeichen { float: none; width: auto; margin: 0.8rem 0 1.2rem; text-align: left; }
+      figure.zeichen img { margin: 0; }
+      figure.zeichen figcaption { font-size: 0.8rem; }
+    }
     figcaption { font-size: 0.85rem; color: #555; margin-top: 0.4rem; }
     footer { margin-top: 2.5rem; padding-top: 1rem; border-top: 1px solid var(--rand); font-size: 0.85rem; color: #555; }
 /* NAV:CSS:START */
@@ -69,6 +77,15 @@
 
   <main>
     <h1>Digitaler Einheiten-Erfassungsbogen für die Feuerwehr</h1>
+
+    <figure class="zeichen">
+      <img src="./bilder/taktisches-zeichen-loeschzug.svg" width="256" height="256" fetchpriority="high" decoding="async"
+        alt="Taktisches Zeichen eines Löschzuges der Feuerwehr.">
+      <figcaption>
+        Taktisches Zeichen „Löschzug“. Quelle: Zeichensammlung
+        jonas-koeritz/Taktische-Zeichen (CC0 1.0), im Programm eingebacken.
+      </figcaption>
+    </figure>
 
     <p>
       Ob eine Bereitschaft des Landkreises auf dem Marsch ist, ein Zug in der überörtlichen
