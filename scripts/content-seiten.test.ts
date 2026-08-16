@@ -40,7 +40,7 @@ describe("Content-Seiten unter public/", () => {
     const bloecke = [...html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)];
     expect(bloecke.length).toBeGreaterThan(0);
     for (const [, roh] of bloecke) {
-      expect(() => JSON.parse(roh)).not.toThrow();
+      expect(() => JSON.parse(roh ?? "")).not.toThrow();
     }
   });
 
@@ -54,7 +54,7 @@ describe("Content-Seiten unter public/", () => {
   it.each(SEITEN)("%s: eingebundene Bilder liegen im Verzeichnis", (datei) => {
     const html = lies(datei);
     const quellen = [...new Set([...html.matchAll(/src="\.\/([^"]+)"/g)].map((m) => m[1]))];
-    const fehlend = quellen.filter((q) => !existsSync(join(PUBLIC, q)));
+    const fehlend = quellen.filter((q) => q && !existsSync(join(PUBLIC, q)));
     expect(fehlend).toEqual([]);
   });
 
