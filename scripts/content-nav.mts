@@ -260,7 +260,7 @@ const NAV_CSS = `/* NAV:CSS:START */
        19,7 px hoch und verfehlen die 24 px aus WCAG 2.5.8. Die Ausnahme für
        Links im Fließtext greift hier nicht — das ist eine Linkreihe, kein Satz.
        (Die punktgetrennte Fußnav ist ein Textblock und fällt unter die Ausnahme.) */
-    .kopfnav-links a { display: inline-block; padding: 0.28rem 0; color: #444; text-decoration: none; font-size: 0.82rem; white-space: nowrap; }
+    .kopfnav-links a { display: inline-block; padding: 0.28rem 0; color: #5c6478; text-decoration: none; font-size: 0.82rem; white-space: nowrap; }
     .kopfnav-links a:hover { color: var(--blau-hell); text-decoration: underline; }
     .kopfnav-links a.aktiv { color: var(--blau); font-weight: 600; }
     .kopfnav-eintrag { position: relative; display: inline-flex; }
