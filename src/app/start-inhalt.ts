@@ -111,7 +111,9 @@ export const START_ABSCHNITTE: Abschnitt[] = [
       {
         art: "absatz",
         teile: [
-          "Als Vorbelegung liegen Beispielbögen bereit — vom THW-Zug nach StAN über die Einheiten der niedersächsischen Feuerwehrverordnung bis zu den Katastrophenschutzeinheiten der Länder sowie Einheiten von DRK und DLRG. Sie lassen sich anwenden und anpassen; eigene Vorlagen speichert die App auf dem Gerät und gibt sie wie einen Bogen per QR-Code weiter.",
+          "Als Vorbelegung liegen Beispielbögen bereit — vom THW-Zug nach StAN über die Einheiten der niedersächsischen Feuerwehrverordnung bis zu den Katastrophenschutzeinheiten der Länder sowie Einheiten von DRK und DLRG. Sie lassen sich anwenden und anpassen; eigene Vorlagen speichert die App auf dem Gerät und gibt sie wie einen Bogen per QR-Code weiter. Wie eine solche Vorbelegung im Einzelnen aussieht, zeigt die Seite zur ",
+          { text: "Fachgruppe Räumen", ziel: "./thw-fachgruppe-raeumen-erfassungsbogen.html" },
+          ".",
         ],
       },
     ],

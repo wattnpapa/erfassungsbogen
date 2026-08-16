@@ -45,6 +45,7 @@
     "og": "node scripts/og-bild.mjs",
     "sitemap": "node --import tsx scripts/sitemap.ts",
     "content-nav": "node --import tsx scripts/content-nav.mts",
+    "content-hinweis": "node --import tsx scripts/content-hinweis.mts",
     "zeichen": "node --import tsx scripts/taktische-zeichen-holen.mts",
     "wasserzeichen": "node --import tsx scripts/uebung-wasserzeichen.mts"
   },
