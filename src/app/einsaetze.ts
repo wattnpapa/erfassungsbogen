@@ -136,6 +136,56 @@ export interface Einsatzsammlung {
   eintraege: MeldeEintrag[];
 }
 
+// ------------------------------------------------------ Ruhende Sammlungen
+
+/**
+ * Einsatz-Sammlungen räumen sich selbst auf: 90 Tage ohne Änderung, dann weg.
+ *
+ * Eine Sammlung enthält FREMDE Personendaten — Namen und Funktionen gemeldeter
+ * Kräfte, die diese Kräfte einem Meldekopf für einen Einsatz gegeben haben und
+ * nicht für die Ablage danach. Nach dem Einsatz fehlt der Zweck (Art. 5 Abs. 1
+ * lit. e DSGVO), aber niemand räumt am Meldekopf-Tablet von sich aus auf.
+ * Deshalb löscht die App hier automatisch — anders als beim EIGENEN Bogen und
+ * den eigenen Vorlagen, die genau dafür da sind, liegen zu bleiben.
+ *
+ * Ab Tag 60 kündigt die Liste die Löschung an, damit der Zeitpunkt niemanden
+ * überrascht: 30 Tage sind genug, um eine Sammlung zu exportieren, wenn sie
+ * für die Nachbereitung noch gebraucht wird. Jede Änderung setzt die Uhr
+ * zurück — eine Sammlung, an der noch gearbeitet wird, altert nicht.
+ */
+export const AUFRAEUM_HINWEIS_MS = 60 * 24 * 60 * 60 * 1000; // 60 Tage
+export const AUFRAEUM_FRIST_MS = 90 * 24 * 60 * 60 * 1000; // 90 Tage
+
+const TAG_MS = 24 * 60 * 60 * 1000;
+
+/**
+ * Tage bis zur automatischen Löschung, sobald die Ankündigungsfrist läuft —
+ * sonst `null`. Getrennt vom UI, damit die Fristen prüfbar bleiben.
+ */
+export function tageBisAufraeumen(s: Einsatzsammlung, jetzt = Date.now()): number | null {
+  const ruht = jetzt - s.geaendert;
+  if (ruht < AUFRAEUM_HINWEIS_MS) return null;
+  return Math.max(0, Math.ceil((AUFRAEUM_FRIST_MS - ruht) / TAG_MS));
+}
+
+/**
+ * Abgelaufene Sammlungen entfernen — endgültig, nicht in den Papierkorb.
+ *
+ * Der Papierkorb schützt vor dem Fehltipp eines Menschen; hier hat niemand
+ * getippt, und weitere 30 Tage Aufbewahrung wären genau das, was die Frist
+ * verhindern soll. Papierkorb-Einträge lässt die Regel in Ruhe: die haben mit
+ * `geloeschtAm` schon ihre eigene, kürzere Uhr (siehe papierkorb.ts).
+ */
+export function ruhendeBereinigt(
+  liste: Einsatzsammlung[],
+  jetzt = Date.now(),
+): { liste: Einsatzsammlung[]; entfernt: number } {
+  const behalten = liste.filter(
+    (s) => s.geloeschtAm != null || jetzt - s.geaendert < AUFRAEUM_FRIST_MS,
+  );
+  return { liste: behalten, entfernt: liste.length - behalten.length };
+}
+
 // ----------------------------------------------- Fingerabdruck & Hash (rein)
 
 /** Normalisiert Freitext für den Vergleich: klein, getrimmt, Whitespace kollabiert. */
@@ -279,12 +329,19 @@ function speicher(): Storage | null {
  * Komplette Liste inkl. Papierkorb — Basis aller Mutationen, damit beim
  * Zurückschreiben keine Papierkorb-Einträge verloren gehen. Abgelaufene
  * Einträge werden hier endgültig bereinigt (und der Stand persistiert).
+ *
+ * Zwei Uhren laufen: der Papierkorb (30 Tage seit dem Löschen) und die
+ * Aufräumfrist ruhender Sammlungen (90 Tage ohne Änderung, siehe
+ * AUFRAEUM_FRIST_MS). Beide greifen hier, weil jeder Lesepfad durch diese
+ * Funktion läuft — eine Sammlung kann also nicht an der Frist vorbei liegen
+ * bleiben, egal über welchen Weg die App sie anfasst.
  */
 function alleEinsaetzeLaden(): Einsatzsammlung[] {
   const s = speicher();
   if (!s) return [];
-  const r = papierkorbBereinigt(einsaetzeAusJson(s.getItem(SPEICHER_SCHLUESSEL)));
-  if (r.entfernt > 0) einsaetzeSpeichern(r.liste);
+  const nachPapierkorb = papierkorbBereinigt(einsaetzeAusJson(s.getItem(SPEICHER_SCHLUESSEL)));
+  const r = ruhendeBereinigt(nachPapierkorb.liste);
+  if (nachPapierkorb.entfernt > 0 || r.entfernt > 0) einsaetzeSpeichern(r.liste);
   return r.liste;
 }
 

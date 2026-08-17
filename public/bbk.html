@@ -17,41 +17,77 @@
   <meta property="og:locale" content="de_DE">
   <meta name="twitter:card" content="summary_large_image">
   <style>
-    :root { --blau: #12275e; --blau-hell: #1d3d8f; --rand: #c9cede; --grau: #f2f3f7; }
+    @font-face {
+      font-family: "Archivo Variable";
+      font-style: normal;
+      font-weight: 100 900;
+      font-display: swap;
+      src: url("./schrift/archivo-latin-wght-normal.woff2") format("woff2-variations"),
+           url("./schrift/archivo-latin-wght-normal.woff2") format("woff2");
+      unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+    }
+    :root { --blau: #12275e; --blau-hell: #1d3d8f; --rand: #c9cede; --grau: #f2f3f7; --text: #11141b; }
     * { box-sizing: border-box; }
-    body { margin: 0; font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; color: #1a1c22; background: var(--grau); line-height: 1.5; }
+    body { margin: 0; font-family: "Archivo Variable", -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; color: var(--text); background: var(--grau); line-height: 1.5; }
     main { max-width: 44rem; margin: 0 auto; padding: 1.5rem 1rem 4rem; }
-    h1 { color: var(--blau); font-size: 1.4rem; margin: 0.5rem 0 1rem; }
-    h2 { color: var(--blau); font-size: 1.1rem; border-bottom: 2px solid var(--blau); padding-bottom: 0.2rem; margin-top: 2rem; }
-    h3 { font-size: 1rem; margin: 1.4rem 0 0.3rem; }
+    h1 { text-wrap: balance; color: var(--text); font-size: 1.75rem; margin: 0.5rem 0 1rem; }
+    h2 { color: var(--text); font-size: 1.375rem; border-bottom: 1px solid var(--rand); padding-bottom: 0.2rem; margin-top: 2rem; }
+    h3 { font-size: 1.125rem; margin: 1.4rem 0 0.3rem; }
     a { color: var(--blau-hell); }
     ol, ul { padding-left: 1.2rem; }
     li { margin-bottom: 0.4rem; }
     .start { display: inline-block; margin: 0.5rem 0 0.5rem; padding: 0.6rem 1.1rem; background: var(--blau); color: #fff; border-radius: 0; text-decoration: none; font-weight: 600; }
     figure { margin: 1.2rem 0; }
     figure img { display: block; width: 100%; height: auto; border: 1px solid var(--rand); background: #fff; }
-    figure.foto img { height: 260px; object-fit: cover; }
-    figcaption { font-size: 0.85rem; color: #5c6478; margin-top: 0.4rem; }
-    footer { margin-top: 2.5rem; padding-top: 1rem; border-top: 1px solid var(--rand); font-size: 0.85rem; color: #5c6478; }
+    figure.foto img { width: 100%; height: auto; }
+    figcaption { max-width: 60ch; font-size: 0.875rem; color: #5c6478; margin-top: 0.4rem; }
+    footer { margin-top: 2.5rem; padding-top: 1rem; border-top: 1px solid var(--rand); font-size: 0.875rem; color: #5c6478; }
 /* NAV:CSS:START */
     /* Sprunglink: sitzt außerhalb des Sichtfelds und kommt beim ersten Tabstopp
        hervor. Ohne ihn tabbt man auf jeder Seite durch Logo und acht Nav-Einträge,
        bevor der Text beginnt (WCAG 2.4.1). Nicht mit display:none oder
-       visibility:hidden verstecken — dann wäre er auch für die Tastatur weg. */
-    .sprunglink { position: absolute; left: -9999px; top: 0; z-index: 40; padding: 0.6rem 1rem; background: var(--blau); color: #fff; text-decoration: none; font-weight: 600; }
+       visibility:hidden verstecken — dann wäre er auch für die Tastatur weg.
+       Höhe aus --ziel-basis (2.75rem): mit 0.6rem Polster kam er auf 43 px und
+       verfehlte das Maß um einen Pixel. Er liegt absolut und kostet die Seite
+       dadurch keine Höhe. */
+    .sprunglink { position: absolute; left: -9999px; top: 0; z-index: 40; display: inline-flex; align-items: center; min-height: 2.75rem; padding: 0 1rem; background: var(--blau); color: #fff; text-decoration: none; font-weight: 600; }
     .sprunglink:focus { left: 0; }
     .kopfnav { background: #fff; border-bottom: 1px solid var(--rand); }
     /* Dieselbe Breite wie main: Ein 60rem breiter Kopf über einer 44rem breiten
        Textspalte setzt zwei verschiedene linke Kanten auf eine Seite, die sonst
        durchgehend linksbündig steht. */
-    .kopfnav-inner { max-width: 44rem; margin: 0 auto; padding: 0.7rem 1rem; display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 1.2rem; }
-    .kopfnav-logo { font-weight: 700; color: var(--blau); text-decoration: none; font-size: 0.95rem; margin-right: auto; }
-    .kopfnav-links { display: flex; flex-wrap: wrap; align-items: center; gap: 0.3rem 0.9rem; }
-    /* Senkrechtes Polster statt reiner Zeilenhöhe: Ohne es sind die Nav-Links
-       19,7 px hoch und verfehlen die 24 px aus WCAG 2.5.8. Die Ausnahme für
-       Links im Fließtext greift hier nicht — das ist eine Linkreihe, kein Satz.
-       (Die punktgetrennte Fußnav ist ein Textblock und fällt unter die Ausnahme.) */
-    .kopfnav-links a { display: inline-block; padding: 0.28rem 0; color: #5c6478; text-decoration: none; font-size: 0.82rem; white-space: nowrap; }
+    /* Ohne senkrechtes Polster: Die Höhe der Leiste kommt jetzt aus den
+       Trefferflächen ihrer Bedienelemente (2.75rem je Zeile) statt aus Polster
+       plus Zeilenhöhe. Sonst käme das Maß oben drauf und die Leiste wüchse. */
+    .kopfnav-inner { max-width: 44rem; margin: 0 auto; padding: 0 1rem; display: flex; flex-wrap: wrap; align-items: center; gap: 0 1.2rem; }
+    /* Grad aus der Leiter (--t-s), nicht 0.95rem: content-stil.mts zieht jeden
+       Zwischenwert ohnehin auf die nächste tragende Stufe. Stünde hier der
+       Zwischenwert, machte ein Lauf dieses Skripts die Angleichung wieder
+       rückgängig — die Generatoren müssen in beliebiger Reihenfolge laufen.
+       Höhe aus dem Maß statt aus der Zeilenhöhe: siehe .kopfnav-links a. */
+    .kopfnav-logo { display: inline-flex; align-items: center; min-height: 2.75rem; font-weight: 700; color: var(--blau); text-decoration: none; font-size: 0.875rem; margin-right: auto; }
+    .kopfnav-links { display: flex; flex-wrap: wrap; align-items: center; gap: 0 0.9rem; }
+    /* Trefferfläche aus dem Maß statt aus Polster plus Zeilenhöhe: --ziel-basis
+       ist 2.75rem = 44 px (DESIGN.md). Mit 0.28rem Polster kam der Eintrag auf
+       29 px — über den 24 px aus WCAG 2.5.8, aber unter dem produkteigenen Maß,
+       und der Wert entstand zufällig aus Schriftgrad und Polster. min-height
+       plus inline-flex hält ihn unabhängig davon.
+       (Die punktgetrennte Fußnav bleibt ein Textblock und fällt unter die
+       WCAG-Ausnahme für Links im Fließtext — sie wird nicht angefasst.)
+       Grad aus der Leiter (--t-xs = 0.8125rem), siehe .kopfnav-logo. */
+    .kopfnav-links a { display: inline-flex; align-items: center; min-height: 2.75rem; padding: 0; color: #5c6478; text-decoration: none; font-size: 0.8125rem; white-space: nowrap; }
+    /* Der Konflikt zwischen Trefferfläche und Kopfhöhe, offen ausgetragen:
+       Auf 375 px bricht die Linkreihe auf zwei Zeilen um. Drei Zeilen à 44 px
+       (Logo plus zwei Linkzeilen) ergäben 132 px Kopf — 16 % des Sichtfelds,
+       statt der gemessenen 116 px. Deshalb behalten die Einträge dort 2rem
+       (32 px): über den 24 px der WCAG-Vorgabe, unter dem Produktmaß. Gemessen
+       auf 375 px steht die Leiste damit bei 109 px statt der bisherigen 116 —
+       das gestrichene senkrechte Polster von .kopfnav-inner zahlt die höheren
+       Ziele mehr als aus. Das eigentliche Problem sind nicht die Zeilenhöhen,
+       sondern die Zahl der Zeilen; die gehört in einen eigenen Schritt. */
+    @media (max-width: 30rem) {
+      .kopfnav-links a { min-height: 2rem; }
+    }
     .kopfnav-links a:hover { color: var(--blau-hell); text-decoration: underline; }
     .kopfnav-links a.aktiv { color: var(--blau); font-weight: 600; }
     .kopfnav-eintrag { position: relative; display: inline-flex; }
@@ -60,7 +96,9 @@
        Flach-im-Stand-Regel ihn zu — im Wert des dokumentierten Dropdown-Schattens. */
     .kopfnav-unter { position: absolute; top: 100%; left: -0.6rem; z-index: 30; display: none; grid-template-columns: 1fr; gap: 0.05rem; margin-top: 0.55rem; padding: 0.4rem; background: #fff; border: 1px solid var(--rand); border-radius: 0; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); }
     .kopfnav-unter-breit { grid-template-columns: 1fr 1fr; }
-    .kopfnav-unter a { display: block; padding: 0.35rem 0.6rem; border-radius: 0; }
+    /* Auch die Menüeinträge sind Bedienelemente und bekommen das Maß. Das Menü
+       liegt absolut über dem Inhalt — die Höhe kostet die Leiste nichts. */
+    .kopfnav-unter a { display: flex; align-items: center; min-height: 2.75rem; padding: 0 0.6rem; border-radius: 0; }
     .kopfnav-unter a:hover { background: var(--grau); text-decoration: none; }
     /* Der unsichtbare Streifen überbrückt den Abstand zwischen Eintrag und
        Menü — ohne ihn klappt das Menü beim Hinüberfahren wieder zu. */
@@ -72,12 +110,105 @@
     @media (hover: hover) and (pointer: fine) {
       .kopfnav-eintrag:hover .kopfnav-unter { display: grid; }
     }
-    .fussnav { display: inline; }
-    .fussnav a { white-space: nowrap; }
+    /* Fußzeile in vier Gruppen statt einer punktgetrennten Zwanzigerkette. Die
+       Gruppentitel stehen in der Versalzeile aus DESIGN.md (Mono, 700,
+       0.8125rem, ls 0.1em, uppercase, --text-2) — dieselbe
+       Meldevordruck-Anmutung wie die Spaltenköpfe in der App.
+       Die Links bleiben innerhalb der Gruppe ein Textblock und damit Links im
+       Fließtext: Die WCAG-2.5.8-Ausnahme greift weiter. Als Listenpunkte
+       bräuchte jeder der zwanzig 44 px, und die Fußzeile wüchse auf dem Handy
+       von 264 px auf über 880 px.
+       auto-fit ab 9rem: am Breitbild vier Spalten nebeneinander, auf 375 px
+       zwei. Gemessen auf 375 px: einspaltig wäre die Fußnavigation 350 px hoch,
+       zweispaltig 291 px. Enger als 9rem bringt nichts mehr — die Spalten sind
+       dann schmaler als die längsten Beschriftungen, und was an Spaltenzahl
+       gewonnen wird, geht an Zeilenumbrüchen wieder verloren. */
+    .fussnav { display: grid; grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr)); gap: 1.2rem 1.5rem; }
+    .fussnav-titel { margin: 0 0 0.2rem; font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace; font-weight: 700; font-size: 0.8125rem; letter-spacing: 0.1em; text-transform: uppercase; color: #5c6478; }
+    .fussnav-links { margin: 0; line-height: 1.8; }
+    /* Weniger Entscheidungen auf 375 px, ohne Skript und ohne verlorene Rubrik.
+       Sieben Einträge plus Logo passen dort nicht in eine Reihe; die Leiste
+       brach deshalb auf drei Zeilen um (Logo plus zwei Linkzeilen, 109 px).
+       Ein Hamburger-Menü schied aus — die Aufklappmenüs sind auf Touch bewusst
+       abgeschaltet (siehe unten), und ein Umschalter bräuchte JavaScript, das
+       diese Seiten nicht haben dürfen.
+       Also bleibt mobil sichtbar, was der Leser dort wirklich braucht: „Alle
+       Themen“ als Sammelweg auf das vollständige Verzeichnis und der Eintrag
+       der Rubrik, in der er gerade steht. Die übrigen tragen "nur-breit". Sie
+       bleiben im Markup (Suchmaschinen sehen sie, die Fußzeile führt sie in
+       ihren vier Gruppen), sind aber nicht mehr Teil der Entscheidung, die
+       oben auf dem Bildschirm getroffen werden muss.
+       Der Selektor nennt beide Klassen, weil ".kopfnav-eintrag" weiter oben
+       "display: inline-flex" setzt: Mit ".nur-breit" allein stünde Gleichstand
+       bei der Spezifität und die spätere Regel entschiede — eine Abhängigkeit
+       von der Reihenfolge, die kein Leser dieses Blocks erwartet. */
+    @media (max-width: 30rem) {
+      .kopfnav-links .nur-breit { display: none; }
+    }
     /* NAV:CSS:END */
 /* HINWEIS:CSS:START */
-    .marken-hinweis { margin: 1rem 0 0; font-size: 0.78rem; line-height: 1.45; color: #5c6478; }
+    /* Grad aus der Leiter (--t-xs = 0.8125rem), nicht 0.78rem: content-stil.mts
+       zieht jeden Zwischenwert ohnehin auf die nächste tragende Stufe. Stünde
+       hier der Zwischenwert, machte ein Lauf dieses Skripts die Angleichung
+       wieder rückgängig — die Generatoren müssen in beliebiger Reihenfolge
+       laufen können. */
+    /* max-width in ch, nicht in px: Der Hinweis lief über die volle
+       Inhaltsspalte und kam bei diesem Grad auf rund 108 Zeichen je Zeile.
+       Die Breite gehört hierher und nicht nach content-stil.mts — dieser
+       Block wird bei jedem Lauf ersetzt, eine dort eingefügte Deklaration
+       wäre nach dem nächsten Hinweis-Lauf wieder weg. */
+    .marken-hinweis { margin: 1rem 0 0; max-width: 60ch; font-size: 0.8125rem; line-height: 1.45; color: #5c6478; }
     /* HINWEIS:CSS:END */
+/* HANDLUNG:CSS:START */
+    .start { display: inline-flex; align-items: center; min-height: 2.75rem; }
+    .abschluss { margin-top: 2.5rem; }
+    .abschluss .zusicherung { margin: 0.4rem 0 0; font-size: 0.875rem; color: #5c6478; }
+    /* HANDLUNG:CSS:END */
+/* OFFENLEGUNG:CSS:START */
+    /* Aufklappblöcke. Der Griff ist als Bedienelement erkennbar: volle
+       Trefferfläche, eigenes Vorzeichen, Fokusring im App-Muster
+       (outline in der Kennfarbe, wie index.html und die Rollbereiche). Der
+       eigene Marker statt des Systemdreiecks, weil das Dreieck in Safari links
+       außerhalb der Textkante sitzt und die Zeile gegen die Überschriften
+       darüber verschiebt. */
+    .frage, .aufklapp { border-top: 1px solid var(--rand); }
+    .frage > summary, .aufklapp > summary { display: flex; align-items: center; gap: 0.6rem; min-height: 2.75rem; cursor: pointer; list-style: none; font-weight: 600; }
+    .frage > summary::-webkit-details-marker, .aufklapp > summary::-webkit-details-marker { display: none; }
+    .frage > summary::before, .aufklapp > summary::before { content: "+"; flex: none; width: 1rem; text-align: center; font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace; font-weight: 700; color: var(--blau); }
+    .frage[open] > summary::before, .aufklapp[open] > summary::before { content: "−"; }
+    .frage > summary:focus-visible, .aufklapp > summary:focus-visible { outline: 3px solid var(--blau); outline-offset: 2px; }
+    /* Die Frage bleibt eine h3 (im summary erlaubt) — Gliederung und JSON-LD
+       bleiben damit unberührt. Nur der Blocksatz muss weichen, sonst rutscht
+       sie unter das Vorzeichen. */
+    .frage > summary h3 { display: inline; margin: 0; padding: 0; border: 0; }
+    .frage > p, .aufklapp > .tabellenrahmen, .aufklapp > .tabelle { margin-top: 0; margin-bottom: 1rem; }
+    /* Ausdruck: Ein ausgedruckter Bogen darf nichts verschlucken. Zwei
+       Schreibweisen, weil die Browser das Element unterschiedlich bauen — die
+       ältere über den Kindselektor, die neuere über ::details-content. */
+    @media print {
+      details { display: block; }
+      details > summary { display: block; }
+      details > *:not(summary) { display: block; }
+      details::details-content { content-visibility: visible; display: block; }
+      .frage > summary::before, .aufklapp > summary::before { content: ""; width: 0; }
+    }
+    /* Sprungmenü: Listenpunkte sind keine Links im Fließtext, die
+       WCAG-2.5.8-Ausnahme greift hier nicht — volle Trefferfläche. Mehrspaltig
+       ab der Breite, ab der zwei Spalten nicht umbrechen; auf dem Handy
+       einspaltig. */
+    .sprungmenue { margin: 1.2rem 0 2rem; padding-top: 0.8rem; border-top: 1px solid var(--rand); }
+    .sprungmenue-titel { margin: 0 0 0.4rem; font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace; font-weight: 700; font-size: 0.8125rem; letter-spacing: 0.1em; text-transform: uppercase; color: #5c6478; }
+    .sprungmenue ul { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr)); gap: 0 1.5rem; }
+    .sprungmenue li { margin: 0; }
+    .sprungmenue a { display: flex; align-items: center; min-height: 2.75rem; }
+    /* Textfassung der Karte: dieselben zwölf Ziele als Zeile, nach Anzahl
+       geordnet. Sie steht außerhalb des Aufklappblocks, weil die Karte
+       aria-hidden ist und dies der einzige Zugang für Tastatur und
+       Screenreader bleibt. Als punktgetrennter Textblock fällt sie unter die
+       WCAG-2.5.8-Ausnahme für Links im Fließtext. */
+    .laenderliste { margin: 0.8rem 0 1.2rem; line-height: 2; }
+    .laenderliste .anzahl { font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace; font-size: 0.875rem; color: #5c6478; }
+    /* OFFENLEGUNG:CSS:END */
   </style>
 </head>
 <body>
@@ -98,7 +229,7 @@
             <a href="./impressum.html">Impressum</a>
           </span>
         </span>
-        <span class="kopfnav-eintrag">
+        <span class="kopfnav-eintrag nur-breit">
           <a href="./katastrophenschutz.html">Katastrophenschutz</a>
           <span class="kopfnav-unter kopfnav-unter-breit">
             <a href="./katastrophenschutz-baden-wuerttemberg.html">Baden-Württemberg</a>
@@ -115,7 +246,7 @@
             <a href="./katastrophenschutz-thueringen.html">Thüringen</a>
           </span>
         </span>
-        <span class="kopfnav-eintrag">
+        <span class="kopfnav-eintrag nur-breit">
           <a href="./thw.html">THW</a>
           <span class="kopfnav-unter">
             <a href="./thw-fachgruppe-raeumen-erfassungsbogen.html">Fachgruppe Räumen</a>
@@ -123,13 +254,13 @@
             <a href="./thw-fachgruppe-wasserschaden-pumpen-erfassungsbogen.html">Fachgruppe Wasserschaden/Pumpen</a>
           </span>
         </span>
-        <span class="kopfnav-eintrag">
+        <span class="kopfnav-eintrag nur-breit">
           <a href="./feuerwehr.html">Feuerwehr</a>
           <span class="kopfnav-unter">
             <a href="./staerkemeldung-feuerwehr.html">Stärkemeldung mit Beispiel</a>
           </span>
         </span>
-        <span class="kopfnav-eintrag">
+        <span class="kopfnav-eintrag nur-breit">
           <a href="./uebersicht.html#hilfsorganisationen">Hilfsorganisationen</a>
           <span class="kopfnav-unter">
             <a href="./drk.html">DRK</a>
@@ -139,8 +270,8 @@
             <a href="./dlrg.html">DLRG</a>
           </span>
         </span>
-        <a href="./meldekopf.html">Meldekopf</a>
-        <a href="./anleitung.html">Anleitung</a>
+        <a href="./meldekopf.html" class="nur-breit">Meldekopf</a>
+        <a href="./anleitung.html" class="nur-breit">Anleitung</a>
       </nav>
     </div>
   </header>
@@ -212,81 +343,128 @@
       </figcaption>
     </figure>
 
+    <!-- HANDLUNG:MITTE:START -->
+    <h2>Wo Namen und Erreichbarkeiten bleiben</h2>
+    <p>
+      Die Personendaten deiner Einsatzkräfte stehen im lokalen Speicher deines
+      Geräts: kein Server, kein Konto, keine Cloud. Ein Bogen verlässt das Gerät
+      nur, wenn du ihn selbst weitergibst — als PDF, als Datei, als QR-Code oder
+      als Link. Welche Einträge gespeichert werden und welche Verbindungen die
+      Anwendung von sich aus aufbaut, ist unter
+      <a href="./open-source-datenschutz.html">Open Source und Datenschutz</a>
+      vollständig aufgeführt.
+    </p>
+
+    <p><a class="start" href="./">BBK-Bogen jetzt ausfüllen</a></p>
+    <!-- HANDLUNG:MITTE:END -->
+
     <h2>Häufige Fragen zu den Bundeseinheiten</h2>
 
-    <h3>Welche Organisation wähle ich für die MTF?</h3>
-    <p>
+    <details class="frage" open>
+      <summary><h3>Welche Organisation wähle ich für die MTF?</h3></summary>
+      <p>
       Die MTF-Fahrzeuge sind Bundeseigentum, werden aber von einem örtlichen
       Träger besetzt — je nach Standort eine Feuerwehr oder eine
       Hilfsorganisation. Wähle im Bogen die Organisation deines Trägers; die
       Teileinheit trägst du als Einheitstyp frei ein (z. B. „Behandlungsbereitschaft
       (MTF)").
-    </p>
+      </p>
+    </details>
 
-    <h3>Wo bleiben die Daten der Einsatzkräfte?</h3>
-    <p>
+    <details class="frage">
+      <summary><h3>Wo bleiben die Daten der Einsatzkräfte?</h3></summary>
+      <p>
       Auf deinem Gerät. Es gibt keinen Server, keine Cloud und keine Konten;
       weitergegeben wird nur, was du selbst als PDF, Datei oder QR-Code
       übergibst — nachzulesen in der
       <a href="./datenschutz.html">Datenschutzerklärung</a>. Namen sind
       ohnehin optional: Für die Stärkemeldung genügen die Zahlen.
-    </p>
+      </p>
+    </details>
 
-    <h3>Funktioniert das mit Einheiten anderer Träger zusammen?</h3>
-    <p>
+    <details class="frage">
+      <summary><h3>Funktioniert das mit Einheiten anderer Träger zusammen?</h3></summary>
+      <p>
       Ja. Ein Meldekopf sammelt Feuerwehr-, DRK-, THW- und weitere
       Hilfsorganisations-Einheiten in derselben Übersicht — der Bogen ist für
       alle BOS und Hilfsorganisationen derselbe, nur Begriffe und taktische
       Zeichen passen sich an.
-    </p>
+      </p>
+    </details>
 
-    <h3>Was kostet die App?</h3>
-    <p>
+    <details class="frage">
+      <summary><h3>Was kostet die App?</h3></summary>
+      <p>
       Nichts. Sie ist freie Software unter der EUPL-1.2, ohne Werbung und
       Bezahlschranke; der Quellcode liegt offen auf
       <a href="https://github.com/wattnpapa/erfassungsbogen">GitHub</a>.
-    </p>
+      </p>
+    </details>
+
+    <!-- HANDLUNG:ABSCHLUSS:START -->
+    <div class="abschluss">
+      <a class="start" href="./">BBK-Bogen jetzt ausfüllen</a>
+      <p class="zusicherung">Kostenlos, ohne Anmeldung, alle Daten bleiben auf deinem Gerät.</p>
+    </div>
+    <!-- HANDLUNG:ABSCHLUSS:END -->
 
     <footer>
       <!-- FUSSNAV:START -->
       <nav class="fussnav" aria-label="Weitere Seiten">
-        <a href="./">Zurück zur App</a>
-        ·
-        <a href="./uebersicht.html">Alle Themen</a>
-        ·
-        <a href="./anleitung.html">Anleitung</a>
-        ·
-        <a href="./vorlage.html">Vorlage und Blanko-PDF</a>
-        ·
-        <a href="./meldekopf.html">Meldekopf digital</a>
-        ·
-        <a href="./katastrophenschutz.html">Katastrophenschutz</a>
-        ·
-        <a href="./thw.html">THW</a>
-        ·
-        <a href="./feuerwehr.html">Feuerwehr</a>
-        ·
-        <a href="./staerkemeldung-feuerwehr.html">Stärkemeldung</a>
-        ·
-        <a href="./drk.html">DRK</a>
-        ·
-        <a href="./johanniter.html">Johanniter</a>
-        ·
-        <a href="./malteser.html">Malteser</a>
-        ·
-        <a href="./asb.html">ASB</a>
-        ·
-        <a href="./dlrg.html">DLRG</a>
-        ·
-        <a href="./bundeswehr.html">Bundeswehr</a>
-        ·
-        <a href="./papier-oder-digital.html">Papier oder digital?</a>
-        ·
-        <a href="./open-source-datenschutz.html">Open Source und Datenschutz</a>
-        ·
-        <a href="./datenschutz.html">Datenschutz</a>
-        ·
-        <a href="./impressum.html">Impressum</a>
+        <div class="fussnav-gruppe">
+          <p class="fussnav-titel">Loslegen</p>
+          <p class="fussnav-links">
+            <a href="./">Zurück zur App</a>
+            ·
+            <a href="./uebersicht.html">Alle Themen</a>
+            ·
+            <a href="./anleitung.html">Anleitung</a>
+            ·
+            <a href="./vorlage.html">Vorlage und Blanko-PDF</a>
+            ·
+            <a href="./meldekopf.html">Meldekopf digital</a>
+            ·
+            <a href="./papier-oder-digital.html">Papier oder digital?</a>
+          </p>
+        </div>
+        <div class="fussnav-gruppe">
+          <p class="fussnav-titel">Organisationen</p>
+          <p class="fussnav-links">
+            <a href="./thw.html">THW</a>
+            ·
+            <a href="./feuerwehr.html">Feuerwehr</a>
+            ·
+            <a href="./staerkemeldung-feuerwehr.html">Stärkemeldung</a>
+            ·
+            <a href="./drk.html">DRK</a>
+            ·
+            <a href="./johanniter.html">Johanniter</a>
+            ·
+            <a href="./malteser.html">Malteser</a>
+            ·
+            <a href="./asb.html">ASB</a>
+            ·
+            <a href="./dlrg.html">DLRG</a>
+          </p>
+        </div>
+        <div class="fussnav-gruppe">
+          <p class="fussnav-titel">Behörden und Länder</p>
+          <p class="fussnav-links">
+            <a href="./katastrophenschutz.html">Katastrophenschutz</a>
+            ·
+            <a href="./bundeswehr.html">Bundeswehr</a>
+          </p>
+        </div>
+        <div class="fussnav-gruppe">
+          <p class="fussnav-titel">Rechtliches</p>
+          <p class="fussnav-links">
+            <a href="./open-source-datenschutz.html">Open Source und Datenschutz</a>
+            ·
+            <a href="./datenschutz.html">Datenschutz</a>
+            ·
+            <a href="./impressum.html">Impressum</a>
+          </p>
+        </div>
       </nav>
       <!-- FUSSNAV:END -->
       <!-- HINWEIS:START -->

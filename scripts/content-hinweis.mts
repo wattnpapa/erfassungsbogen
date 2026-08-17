@@ -57,7 +57,17 @@ const HINWEIS_HTML = `<!-- HINWEIS:START -->
  * `--grund`, nicht auf einer Karte.
  */
 const HINWEIS_CSS = `/* HINWEIS:CSS:START */
-    .marken-hinweis { margin: 1rem 0 0; font-size: 0.78rem; line-height: 1.45; color: #5c6478; }
+    /* Grad aus der Leiter (--t-xs = 0.8125rem), nicht 0.78rem: content-stil.mts
+       zieht jeden Zwischenwert ohnehin auf die nächste tragende Stufe. Stünde
+       hier der Zwischenwert, machte ein Lauf dieses Skripts die Angleichung
+       wieder rückgängig — die Generatoren müssen in beliebiger Reihenfolge
+       laufen können. */
+    /* max-width in ch, nicht in px: Der Hinweis lief über die volle
+       Inhaltsspalte und kam bei diesem Grad auf rund 108 Zeichen je Zeile.
+       Die Breite gehört hierher und nicht nach content-stil.mts — dieser
+       Block wird bei jedem Lauf ersetzt, eine dort eingefügte Deklaration
+       wäre nach dem nächsten Hinweis-Lauf wieder weg. */
+    .marken-hinweis { margin: 1rem 0 0; max-width: 60ch; font-size: 0.8125rem; line-height: 1.45; color: #5c6478; }
     /* HINWEIS:CSS:END */`;
 
 function inject(inhalt: string): string {

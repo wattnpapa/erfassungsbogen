@@ -46,6 +46,7 @@ import {
   meldungStatusSetzen,
   neuesteJeEinheit,
   revisionen,
+  tageBisAufraeumen,
   stammSchluessel,
   type AufteilungOptionen,
   type Einsatzsammlung,
@@ -145,6 +146,7 @@ export function EinsatzListe(props: {
     <>
       {einsaetze.map((s) => {
         const sum = aggregiere(s.eintraege);
+        const restTage = tageBisAufraeumen(s);
         return (
           <section className="karte" key={s.id}>
             <div className="kopfzeile">
@@ -158,6 +160,19 @@ export function EinsatzListe(props: {
             <p className="hinweis">
               {sum.einheiten} Einheit(en) anwesend · Stärke {sum.staerke.fuehrer} / {sum.staerke.unterfuehrer} / {sum.staerke.mannschaft} / {sum.staerke.gesamt}
             </p>
+            {/* Ankündigung der automatischen Löschung (siehe AUFRAEUM_FRIST_MS).
+                Sie steht über den Aktionen, damit der Ausweg — exportieren oder
+                durch eine Änderung die Uhr zurücksetzen — direkt daneben liegt. */}
+            {restTage != null && (
+              <p className="warnung">
+                {restTage > 0
+                  ? `Wird in ${restTage} Tag(en) automatisch gelöscht.`
+                  : "Wird beim nächsten Start automatisch gelöscht."}{" "}
+                Die Sammlung liegt seit 60 Tagen unverändert und enthält Personendaten
+                gemeldeter Kräfte. Wenn du sie noch brauchst, exportiere sie jetzt — jede
+                Änderung an der Sammlung setzt die Frist zurück.
+              </p>
+            )}
             <div className="vorlage-aktionen">
               <button type="button" className="entfernen" onClick={() => loeschen(s)}>Löschen</button>
             </div>

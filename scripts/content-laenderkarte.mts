@@ -208,14 +208,36 @@ const cssBlock = `
 /* KARTE:CSS:START */
     /* Dieselben Ziele wie der Text daneben, nur räumlich — darum ist das SVG
        für Tastatur und Screenreader ausgeblendet. Weiß und anklickbar sind die
-       Länder mit eigener Seite, grau die ohne, blau das Land dieser Seite. */
+       Länder mit eigener Seite, schraffiert die ohne, blau das Land dieser Seite.
+
+       Warum Schraffur statt Grau: #e6e8ee gegen #fff auf dem Grund #f2f3f7 sind
+       drei fast gleiche Helligkeiten — der Unterschied zwischen „führt irgendwo
+       hin" und „führt nirgendwo hin" hing an rund 4 % Helligkeit, und die
+       Semantik war verkehrt herum: Das *nicht* Eingefärbte war das Klickbare.
+       Die Schraffur trennt die beiden Zustände nach Struktur statt nach
+       Helligkeit; sie funktioniert damit auch bei Farbenblindheit, im
+       Schwarzweißdruck und auf einem Bildschirm im Sonnenlicht. Eine neue Farbe
+       kommt nicht in Frage: Die Kennfarbe gehört Kopf und Aktion, und die
+       Hervorhebung des aktuellen Landes ist der eine dokumentierte Sonderfall,
+       der nicht ausgeweitet wird. */
     .laenderkarte { margin: 1rem 0 0; }
     .laenderkarte svg { display: block; width: 100%; max-width: 22rem; height: auto; margin: 0 auto; }
-    .laenderkarte path { fill: #e6e8ee; stroke: var(--rand); stroke-width: 1.4; stroke-linejoin: round; }
-    .laenderkarte a path { fill: #fff; cursor: pointer; }
+    /* Der Zeiger bleibt der Standardpfeil: Eine Fläche, die wie ein Ziel
+       aussieht und auf den Klick nicht reagiert, ist schlimmer als eine, die
+       gar nicht erst danach aussieht. */
+    .laenderkarte path { fill: #e6e8ee; stroke: var(--rand); stroke-width: 1.4; stroke-linejoin: round; cursor: default; }
+    /* Stärkere Kante zusätzlich zur weißen Fläche: Die anklickbaren Länder
+       stehen damit nicht nur heller, sondern auch fester im Bild. */
+    .laenderkarte a path { fill: #fff; stroke: #9aa1b4; stroke-width: 1.6; cursor: pointer; }
     .laenderkarte a:hover path { fill: var(--blau-hell); stroke: var(--blau); }
     .laenderkarte .hier { fill: var(--blau); stroke: var(--blau); }
-    .laenderkarte figcaption { font-size: 0.8rem; color: #5c6478; margin-top: 0.6rem; }
+    .laenderkarte .ohne-seite { fill: url(#karte-ohne-seite); stroke: #b3b9c8; stroke-width: 1.2; }
+    /* Grad aus der Leiter (--t-s = 0.875rem), nicht 0.8rem: content-stil.mts
+       zieht jeden Zwischenwert ohnehin auf die nächste tragende Stufe. Stünde
+       hier der Zwischenwert, machte ein Lauf dieses Skripts die Angleichung
+       wieder rückgängig — die Generatoren müssen in beliebiger Reihenfolge
+       laufen können. */
+    .laenderkarte figcaption { font-size: 0.875rem; color: #5c6478; margin-top: 0.6rem; }
 /* KARTE:CSS:END */`;
 
 function karteHtml(datei: string, formen: Map<string, string>): string {
@@ -243,13 +265,21 @@ function karteHtml(datei: string, formen: Map<string, string>): string {
   });
   const einleitung = hier
     ? `Karte zum Anklicken: Hervorgehoben ist ${hier.name}, die weißen Länder
-        führen auf ihre Seite, grau eingefärbte haben noch keine.`
-    : `Karte zum Anklicken: Ein weißes Land führt auf seine Seite, grau
-        eingefärbte Länder haben noch keine.`;
+        führen auf ihre Seite, schraffierte haben noch keine.`
+    : `Karte zum Anklicken: Ein weißes Land führt auf seine Seite, schraffierte
+        Länder haben noch keine.`;
   return `
     <!-- KARTE:START -->
     <figure class="laenderkarte">
       <svg viewBox="0 0 592 801" width="592" height="801" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+        <defs>
+          <!-- Schraffur für Länder ohne eigene Seite: ein Strukturunterschied
+               statt eines vierten Grautons, siehe .ohne-seite im CSS-Block. -->
+          <pattern id="karte-ohne-seite" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+            <rect width="7" height="7" fill="#e6e8ee"/>
+            <line x1="0" y1="0" x2="0" y2="7" stroke="#a8afc0" stroke-width="2.4"/>
+          </pattern>
+        </defs>
 ${flaechen.join("\n")}
       </svg>
       <figcaption>
@@ -276,7 +306,9 @@ function einsetzen(inhalt: string, datei: string, block: string): string {
     return inhalt.replace(/\n(\s*)<ul class="laenderliste">/, `${block}\n\n$1<ul class="laenderliste">`);
   }
   if (datei === "katastrophenschutz.html") {
-    return inhalt.replace(/\n(\s*)<div class="tabellenrahmen">/, `${block}\n\n$1<div class="tabellenrahmen">`);
+    // Ohne `>` am Ende: content-rollbereich.mts hängt an denselben Rahmen noch
+    // tabindex, role und aria-label — das Muster darf daran nicht scheitern.
+    return inhalt.replace(/\n(\s*)(<div class="tabellenrahmen")/, `${block}\n\n$1$2`);
   }
   if (/<!-- LAENDER:END -->/.test(inhalt)) {
     return inhalt.replace(/<!-- LAENDER:END -->/, `<!-- LAENDER:END -->\n${block}`);

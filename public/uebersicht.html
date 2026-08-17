@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Übersicht: alle Seiten zum Einheiten-Erfassungsbogen</title>
+  <title>Alle Themenseiten im Überblick — Erfassungsbogen</title>
   <meta name="description" content="Alle Themenseiten zum Einheiten-Erfassungsbogen auf einen Blick: Feuerwehr, THW, Hilfsorganisationen, Katastrophenschutz der Länder, Meldekopf und Vorlagen.">
   <link rel="canonical" href="https://erfassungsbogen.app/uebersicht.html">
   <link rel="icon" href="./icon.svg" type="image/svg+xml">
@@ -17,18 +17,27 @@
   <meta property="og:locale" content="de_DE">
   <meta name="twitter:card" content="summary_large_image">
   <style>
-    :root { --blau: #12275e; --blau-hell: #1d3d8f; --rand: #c9cede; --grau: #f2f3f7; }
+    @font-face {
+      font-family: "Archivo Variable";
+      font-style: normal;
+      font-weight: 100 900;
+      font-display: swap;
+      src: url("./schrift/archivo-latin-wght-normal.woff2") format("woff2-variations"),
+           url("./schrift/archivo-latin-wght-normal.woff2") format("woff2");
+      unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+    }
+    :root { --blau: #12275e; --blau-hell: #1d3d8f; --rand: #c9cede; --grau: #f2f3f7; --text: #11141b; }
     * { box-sizing: border-box; }
-    body { margin: 0; font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; color: #1a1c22; background: var(--grau); line-height: 1.5; }
+    body { margin: 0; font-family: "Archivo Variable", -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; color: var(--text); background: var(--grau); line-height: 1.5; }
     main { max-width: 44rem; margin: 0 auto; padding: 1.5rem 1rem 4rem; }
-    h1 { color: var(--blau); font-size: 1.4rem; margin: 0.5rem 0 1rem; }
-    h2 { color: var(--blau); font-size: 1.1rem; border-bottom: 2px solid var(--blau); padding-bottom: 0.2rem; margin-top: 2rem; }
-    h3 { font-size: 1rem; margin: 1.4rem 0 0.3rem; }
+    h1 { text-wrap: balance; color: var(--text); font-size: 1.75rem; margin: 0.5rem 0 1rem; }
+    h2 { color: var(--text); font-size: 1.375rem; border-bottom: 1px solid var(--rand); padding-bottom: 0.2rem; margin-top: 2rem; }
+    h3 { font-size: 1.125rem; margin: 1.4rem 0 0.3rem; }
     a { color: var(--blau-hell); }
     ol, ul { padding-left: 1.2rem; }
     li { margin-bottom: 0.4rem; }
     .start { display: inline-block; margin: 0.5rem 0 0.5rem; padding: 0.6rem 1.1rem; background: var(--blau); color: #fff; border-radius: 0; text-decoration: none; font-weight: 600; }
-    footer { margin-top: 2.5rem; padding-top: 1rem; border-top: 1px solid var(--rand); font-size: 0.85rem; color: #5c6478; }
+    footer { margin-top: 2.5rem; padding-top: 1rem; border-top: 1px solid var(--rand); font-size: 0.875rem; color: #5c6478; }
     /* Kachelliste: je Eintrag ein Link mit erklärender Zeile darunter. Bewusst
        eine <ul> und kein Raster aus <div>, damit die Seite ohne CSS immer noch
        eine lesbare, verschachtelte Liste bleibt. */
@@ -36,44 +45,93 @@
     .themenliste li { margin: 0; background: #fff; border: 1px solid var(--rand); border-radius: 0; padding: 0.6rem 0.8rem; }
     .themenliste a { font-weight: 600; text-decoration: none; }
     .themenliste a:hover { text-decoration: underline; }
-    .themenliste span { display: block; font-size: 0.85rem; color: #5c6478; margin-top: 0.15rem; }
+    .themenliste span { display: block; font-size: 0.875rem; color: #5c6478; margin-top: 0.15rem; }
     /* Die Länderliste ist eine reine Namensliste — dort wäre je Eintrag eine
        Erklärzeile nur Rauschen, darum enger gesetzt. */
     .laenderliste { list-style: none; padding: 0; margin: 0.8rem 0 0; display: flex; flex-wrap: wrap; gap: 0.4rem 0.5rem; }
     .laenderliste li { margin: 0; }
-    .laenderliste a { display: inline-block; background: #fff; border: 1px solid var(--rand); border-radius: 0; padding: 0.3rem 0.7rem; font-size: 0.9rem; text-decoration: none; }
+    .laenderliste a { display: inline-block; background: #fff; border: 1px solid var(--rand); border-radius: 0; padding: 0.3rem 0.7rem; font-size: 0.875rem; text-decoration: none; }
     .laenderliste a:hover { text-decoration: underline; }
 /* KARTE:CSS:START */
     /* Dieselben Ziele wie der Text daneben, nur räumlich — darum ist das SVG
        für Tastatur und Screenreader ausgeblendet. Weiß und anklickbar sind die
-       Länder mit eigener Seite, grau die ohne, blau das Land dieser Seite. */
+       Länder mit eigener Seite, schraffiert die ohne, blau das Land dieser Seite.
+
+       Warum Schraffur statt Grau: #e6e8ee gegen #fff auf dem Grund #f2f3f7 sind
+       drei fast gleiche Helligkeiten — der Unterschied zwischen „führt irgendwo
+       hin" und „führt nirgendwo hin" hing an rund 4 % Helligkeit, und die
+       Semantik war verkehrt herum: Das *nicht* Eingefärbte war das Klickbare.
+       Die Schraffur trennt die beiden Zustände nach Struktur statt nach
+       Helligkeit; sie funktioniert damit auch bei Farbenblindheit, im
+       Schwarzweißdruck und auf einem Bildschirm im Sonnenlicht. Eine neue Farbe
+       kommt nicht in Frage: Die Kennfarbe gehört Kopf und Aktion, und die
+       Hervorhebung des aktuellen Landes ist der eine dokumentierte Sonderfall,
+       der nicht ausgeweitet wird. */
     .laenderkarte { margin: 1rem 0 0; }
     .laenderkarte svg { display: block; width: 100%; max-width: 22rem; height: auto; margin: 0 auto; }
-    .laenderkarte path { fill: #e6e8ee; stroke: var(--rand); stroke-width: 1.4; stroke-linejoin: round; }
-    .laenderkarte a path { fill: #fff; cursor: pointer; }
+    /* Der Zeiger bleibt der Standardpfeil: Eine Fläche, die wie ein Ziel
+       aussieht und auf den Klick nicht reagiert, ist schlimmer als eine, die
+       gar nicht erst danach aussieht. */
+    .laenderkarte path { fill: #e6e8ee; stroke: var(--rand); stroke-width: 1.4; stroke-linejoin: round; cursor: default; }
+    /* Stärkere Kante zusätzlich zur weißen Fläche: Die anklickbaren Länder
+       stehen damit nicht nur heller, sondern auch fester im Bild. */
+    .laenderkarte a path { fill: #fff; stroke: #9aa1b4; stroke-width: 1.6; cursor: pointer; }
     .laenderkarte a:hover path { fill: var(--blau-hell); stroke: var(--blau); }
     .laenderkarte .hier { fill: var(--blau); stroke: var(--blau); }
-    .laenderkarte figcaption { font-size: 0.8rem; color: #5c6478; margin-top: 0.6rem; }
+    .laenderkarte .ohne-seite { fill: url(#karte-ohne-seite); stroke: #b3b9c8; stroke-width: 1.2; }
+    /* Grad aus der Leiter (--t-s = 0.875rem), nicht 0.8rem: content-stil.mts
+       zieht jeden Zwischenwert ohnehin auf die nächste tragende Stufe. Stünde
+       hier der Zwischenwert, machte ein Lauf dieses Skripts die Angleichung
+       wieder rückgängig — die Generatoren müssen in beliebiger Reihenfolge
+       laufen können. */
+    .laenderkarte figcaption { font-size: 0.875rem; color: #5c6478; margin-top: 0.6rem; }
 /* KARTE:CSS:END */
 /* NAV:CSS:START */
     /* Sprunglink: sitzt außerhalb des Sichtfelds und kommt beim ersten Tabstopp
        hervor. Ohne ihn tabbt man auf jeder Seite durch Logo und acht Nav-Einträge,
        bevor der Text beginnt (WCAG 2.4.1). Nicht mit display:none oder
-       visibility:hidden verstecken — dann wäre er auch für die Tastatur weg. */
-    .sprunglink { position: absolute; left: -9999px; top: 0; z-index: 40; padding: 0.6rem 1rem; background: var(--blau); color: #fff; text-decoration: none; font-weight: 600; }
+       visibility:hidden verstecken — dann wäre er auch für die Tastatur weg.
+       Höhe aus --ziel-basis (2.75rem): mit 0.6rem Polster kam er auf 43 px und
+       verfehlte das Maß um einen Pixel. Er liegt absolut und kostet die Seite
+       dadurch keine Höhe. */
+    .sprunglink { position: absolute; left: -9999px; top: 0; z-index: 40; display: inline-flex; align-items: center; min-height: 2.75rem; padding: 0 1rem; background: var(--blau); color: #fff; text-decoration: none; font-weight: 600; }
     .sprunglink:focus { left: 0; }
     .kopfnav { background: #fff; border-bottom: 1px solid var(--rand); }
     /* Dieselbe Breite wie main: Ein 60rem breiter Kopf über einer 44rem breiten
        Textspalte setzt zwei verschiedene linke Kanten auf eine Seite, die sonst
        durchgehend linksbündig steht. */
-    .kopfnav-inner { max-width: 44rem; margin: 0 auto; padding: 0.7rem 1rem; display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 1.2rem; }
-    .kopfnav-logo { font-weight: 700; color: var(--blau); text-decoration: none; font-size: 0.95rem; margin-right: auto; }
-    .kopfnav-links { display: flex; flex-wrap: wrap; align-items: center; gap: 0.3rem 0.9rem; }
-    /* Senkrechtes Polster statt reiner Zeilenhöhe: Ohne es sind die Nav-Links
-       19,7 px hoch und verfehlen die 24 px aus WCAG 2.5.8. Die Ausnahme für
-       Links im Fließtext greift hier nicht — das ist eine Linkreihe, kein Satz.
-       (Die punktgetrennte Fußnav ist ein Textblock und fällt unter die Ausnahme.) */
-    .kopfnav-links a { display: inline-block; padding: 0.28rem 0; color: #5c6478; text-decoration: none; font-size: 0.82rem; white-space: nowrap; }
+    /* Ohne senkrechtes Polster: Die Höhe der Leiste kommt jetzt aus den
+       Trefferflächen ihrer Bedienelemente (2.75rem je Zeile) statt aus Polster
+       plus Zeilenhöhe. Sonst käme das Maß oben drauf und die Leiste wüchse. */
+    .kopfnav-inner { max-width: 44rem; margin: 0 auto; padding: 0 1rem; display: flex; flex-wrap: wrap; align-items: center; gap: 0 1.2rem; }
+    /* Grad aus der Leiter (--t-s), nicht 0.95rem: content-stil.mts zieht jeden
+       Zwischenwert ohnehin auf die nächste tragende Stufe. Stünde hier der
+       Zwischenwert, machte ein Lauf dieses Skripts die Angleichung wieder
+       rückgängig — die Generatoren müssen in beliebiger Reihenfolge laufen.
+       Höhe aus dem Maß statt aus der Zeilenhöhe: siehe .kopfnav-links a. */
+    .kopfnav-logo { display: inline-flex; align-items: center; min-height: 2.75rem; font-weight: 700; color: var(--blau); text-decoration: none; font-size: 0.875rem; margin-right: auto; }
+    .kopfnav-links { display: flex; flex-wrap: wrap; align-items: center; gap: 0 0.9rem; }
+    /* Trefferfläche aus dem Maß statt aus Polster plus Zeilenhöhe: --ziel-basis
+       ist 2.75rem = 44 px (DESIGN.md). Mit 0.28rem Polster kam der Eintrag auf
+       29 px — über den 24 px aus WCAG 2.5.8, aber unter dem produkteigenen Maß,
+       und der Wert entstand zufällig aus Schriftgrad und Polster. min-height
+       plus inline-flex hält ihn unabhängig davon.
+       (Die punktgetrennte Fußnav bleibt ein Textblock und fällt unter die
+       WCAG-Ausnahme für Links im Fließtext — sie wird nicht angefasst.)
+       Grad aus der Leiter (--t-xs = 0.8125rem), siehe .kopfnav-logo. */
+    .kopfnav-links a { display: inline-flex; align-items: center; min-height: 2.75rem; padding: 0; color: #5c6478; text-decoration: none; font-size: 0.8125rem; white-space: nowrap; }
+    /* Der Konflikt zwischen Trefferfläche und Kopfhöhe, offen ausgetragen:
+       Auf 375 px bricht die Linkreihe auf zwei Zeilen um. Drei Zeilen à 44 px
+       (Logo plus zwei Linkzeilen) ergäben 132 px Kopf — 16 % des Sichtfelds,
+       statt der gemessenen 116 px. Deshalb behalten die Einträge dort 2rem
+       (32 px): über den 24 px der WCAG-Vorgabe, unter dem Produktmaß. Gemessen
+       auf 375 px steht die Leiste damit bei 109 px statt der bisherigen 116 —
+       das gestrichene senkrechte Polster von .kopfnav-inner zahlt die höheren
+       Ziele mehr als aus. Das eigentliche Problem sind nicht die Zeilenhöhen,
+       sondern die Zahl der Zeilen; die gehört in einen eigenen Schritt. */
+    @media (max-width: 30rem) {
+      .kopfnav-links a { min-height: 2rem; }
+    }
     .kopfnav-links a:hover { color: var(--blau-hell); text-decoration: underline; }
     .kopfnav-links a.aktiv { color: var(--blau); font-weight: 600; }
     .kopfnav-eintrag { position: relative; display: inline-flex; }
@@ -82,7 +140,9 @@
        Flach-im-Stand-Regel ihn zu — im Wert des dokumentierten Dropdown-Schattens. */
     .kopfnav-unter { position: absolute; top: 100%; left: -0.6rem; z-index: 30; display: none; grid-template-columns: 1fr; gap: 0.05rem; margin-top: 0.55rem; padding: 0.4rem; background: #fff; border: 1px solid var(--rand); border-radius: 0; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); }
     .kopfnav-unter-breit { grid-template-columns: 1fr 1fr; }
-    .kopfnav-unter a { display: block; padding: 0.35rem 0.6rem; border-radius: 0; }
+    /* Auch die Menüeinträge sind Bedienelemente und bekommen das Maß. Das Menü
+       liegt absolut über dem Inhalt — die Höhe kostet die Leiste nichts. */
+    .kopfnav-unter a { display: flex; align-items: center; min-height: 2.75rem; padding: 0 0.6rem; border-radius: 0; }
     .kopfnav-unter a:hover { background: var(--grau); text-decoration: none; }
     /* Der unsichtbare Streifen überbrückt den Abstand zwischen Eintrag und
        Menü — ohne ihn klappt das Menü beim Hinüberfahren wieder zu. */
@@ -94,11 +154,54 @@
     @media (hover: hover) and (pointer: fine) {
       .kopfnav-eintrag:hover .kopfnav-unter { display: grid; }
     }
-    .fussnav { display: inline; }
-    .fussnav a { white-space: nowrap; }
+    /* Fußzeile in vier Gruppen statt einer punktgetrennten Zwanzigerkette. Die
+       Gruppentitel stehen in der Versalzeile aus DESIGN.md (Mono, 700,
+       0.8125rem, ls 0.1em, uppercase, --text-2) — dieselbe
+       Meldevordruck-Anmutung wie die Spaltenköpfe in der App.
+       Die Links bleiben innerhalb der Gruppe ein Textblock und damit Links im
+       Fließtext: Die WCAG-2.5.8-Ausnahme greift weiter. Als Listenpunkte
+       bräuchte jeder der zwanzig 44 px, und die Fußzeile wüchse auf dem Handy
+       von 264 px auf über 880 px.
+       auto-fit ab 9rem: am Breitbild vier Spalten nebeneinander, auf 375 px
+       zwei. Gemessen auf 375 px: einspaltig wäre die Fußnavigation 350 px hoch,
+       zweispaltig 291 px. Enger als 9rem bringt nichts mehr — die Spalten sind
+       dann schmaler als die längsten Beschriftungen, und was an Spaltenzahl
+       gewonnen wird, geht an Zeilenumbrüchen wieder verloren. */
+    .fussnav { display: grid; grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr)); gap: 1.2rem 1.5rem; }
+    .fussnav-titel { margin: 0 0 0.2rem; font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace; font-weight: 700; font-size: 0.8125rem; letter-spacing: 0.1em; text-transform: uppercase; color: #5c6478; }
+    .fussnav-links { margin: 0; line-height: 1.8; }
+    /* Weniger Entscheidungen auf 375 px, ohne Skript und ohne verlorene Rubrik.
+       Sieben Einträge plus Logo passen dort nicht in eine Reihe; die Leiste
+       brach deshalb auf drei Zeilen um (Logo plus zwei Linkzeilen, 109 px).
+       Ein Hamburger-Menü schied aus — die Aufklappmenüs sind auf Touch bewusst
+       abgeschaltet (siehe unten), und ein Umschalter bräuchte JavaScript, das
+       diese Seiten nicht haben dürfen.
+       Also bleibt mobil sichtbar, was der Leser dort wirklich braucht: „Alle
+       Themen“ als Sammelweg auf das vollständige Verzeichnis und der Eintrag
+       der Rubrik, in der er gerade steht. Die übrigen tragen "nur-breit". Sie
+       bleiben im Markup (Suchmaschinen sehen sie, die Fußzeile führt sie in
+       ihren vier Gruppen), sind aber nicht mehr Teil der Entscheidung, die
+       oben auf dem Bildschirm getroffen werden muss.
+       Der Selektor nennt beide Klassen, weil ".kopfnav-eintrag" weiter oben
+       "display: inline-flex" setzt: Mit ".nur-breit" allein stünde Gleichstand
+       bei der Spezifität und die spätere Regel entschiede — eine Abhängigkeit
+       von der Reihenfolge, die kein Leser dieses Blocks erwartet. */
+    @media (max-width: 30rem) {
+      .kopfnav-links .nur-breit { display: none; }
+    }
     /* NAV:CSS:END */
 /* HINWEIS:CSS:START */
-    .marken-hinweis { margin: 1rem 0 0; font-size: 0.78rem; line-height: 1.45; color: #5c6478; }
+    /* Grad aus der Leiter (--t-xs = 0.8125rem), nicht 0.78rem: content-stil.mts
+       zieht jeden Zwischenwert ohnehin auf die nächste tragende Stufe. Stünde
+       hier der Zwischenwert, machte ein Lauf dieses Skripts die Angleichung
+       wieder rückgängig — die Generatoren müssen in beliebiger Reihenfolge
+       laufen können. */
+    /* max-width in ch, nicht in px: Der Hinweis lief über die volle
+       Inhaltsspalte und kam bei diesem Grad auf rund 108 Zeichen je Zeile.
+       Die Breite gehört hierher und nicht nach content-stil.mts — dieser
+       Block wird bei jedem Lauf ersetzt, eine dort eingefügte Deklaration
+       wäre nach dem nächsten Hinweis-Lauf wieder weg. */
+    .marken-hinweis { margin: 1rem 0 0; max-width: 60ch; font-size: 0.8125rem; line-height: 1.45; color: #5c6478; }
     /* HINWEIS:CSS:END */
   </style>
 </head>
@@ -120,7 +223,7 @@
             <a href="./impressum.html">Impressum</a>
           </span>
         </span>
-        <span class="kopfnav-eintrag">
+        <span class="kopfnav-eintrag nur-breit">
           <a href="./katastrophenschutz.html">Katastrophenschutz</a>
           <span class="kopfnav-unter kopfnav-unter-breit">
             <a href="./katastrophenschutz-baden-wuerttemberg.html">Baden-Württemberg</a>
@@ -137,7 +240,7 @@
             <a href="./katastrophenschutz-thueringen.html">Thüringen</a>
           </span>
         </span>
-        <span class="kopfnav-eintrag">
+        <span class="kopfnav-eintrag nur-breit">
           <a href="./thw.html">THW</a>
           <span class="kopfnav-unter">
             <a href="./thw-fachgruppe-raeumen-erfassungsbogen.html">Fachgruppe Räumen</a>
@@ -145,13 +248,13 @@
             <a href="./thw-fachgruppe-wasserschaden-pumpen-erfassungsbogen.html">Fachgruppe Wasserschaden/Pumpen</a>
           </span>
         </span>
-        <span class="kopfnav-eintrag">
+        <span class="kopfnav-eintrag nur-breit">
           <a href="./feuerwehr.html">Feuerwehr</a>
           <span class="kopfnav-unter">
             <a href="./staerkemeldung-feuerwehr.html">Stärkemeldung mit Beispiel</a>
           </span>
         </span>
-        <span class="kopfnav-eintrag">
+        <span class="kopfnav-eintrag nur-breit">
           <a href="./uebersicht.html#hilfsorganisationen">Hilfsorganisationen</a>
           <span class="kopfnav-unter">
             <a href="./drk.html">DRK</a>
@@ -161,8 +264,8 @@
             <a href="./dlrg.html">DLRG</a>
           </span>
         </span>
-        <a href="./meldekopf.html">Meldekopf</a>
-        <a href="./anleitung.html">Anleitung</a>
+        <a href="./meldekopf.html" class="nur-breit">Meldekopf</a>
+        <a href="./anleitung.html" class="nur-breit">Anleitung</a>
       </nav>
     </div>
   </header>
@@ -280,6 +383,14 @@
     <!-- KARTE:START -->
     <figure class="laenderkarte">
       <svg viewBox="0 0 592 801" width="592" height="801" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+        <defs>
+          <!-- Schraffur für Länder ohne eigene Seite: ein Strukturunterschied
+               statt eines vierten Grautons, siehe .ohne-seite im CSS-Block. -->
+          <pattern id="karte-ohne-seite" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+            <rect width="7" height="7" fill="#e6e8ee"/>
+            <line x1="0" y1="0" x2="0" y2="7" stroke="#a8afc0" stroke-width="2.4"/>
+          </pattern>
+        </defs>
         <a href="./katastrophenschutz-thueringen.html" xlink:href="./katastrophenschutz-thueringen.html" tabindex="-1"><title>Thüringen</title><path d="M312 351.7l13.7 2.3l-2.1 3.8l5.9 10l-0.3 5.1l1.6 1.4l25.8 3.1l0.6 3.9l4.9 5l-6.9 7.9l6.8 2.8l1.1 2.7l-2.1 2l2.3 4.5l3.9-0.1l1.6-1.9l6.3 1l2.2 4.1l6.6 2l5.7-0.8l5.9 4l2.6 4.7l4.8-1l4.7 1.7l1.1-1.9l2.3 3.8l4.8-8.6l-2.4-4.5l4.7-4l10.6 3.5l0.9 5.1l7.3 3.4l1.7 7.1l-10.1 2.3l-2.6 5.2l-4-0.6l-1.9 2.8l-6.3 0.7l-1.3 8.2l3.3 5.2l3 0.8l-3.4 5l-9.7 3.8l3 1.6l-2.8 1.4l-6.4-0.1l-0.7-6.7l-5.5 5.2l-3.3 4.8l6.1 5.3l-4.8 4.6l2.2 1.8l-19.3 4.4l-2.2-1.6l-4.1 2.6l-3.5-5.5l-3.8-1.1l0.4-7.1l-5.3-0.7l-6.4 4.5l2.6 12l-2 6.9l-5 2.6l-2.9-3.1l1.7-3.1l-3-3.7l-4.7 2.4l-4-0.7l-3-4.1l-7 0l-7.5 3.1l0 4l8.6 5.5l0.2 2.5l-7.6-0.6l-1 4.8l-7.1-2.4l-0.7-10.9l-7-2.2l-2.8-4.7l-3.8 0.6l-3.4-8.9l-5.7-2.9l-3.3-4.4l-7.2 0.7l-3.5 3.3l-0.2-9.7l2.6-2.7l-1.8-3.7l-6.3 0.8l0.5 3.7l-5.3-0.6l0-3.6l4.1-7l-1.1-2.9l1.7-0.7l0-4.9l4.6-1l2.3-5.3l-2.5-11.5l2-1.9l6.1 1.9l3.9-1.4l0.6-1.8l-3.9-2.9l-2.3-8.7l3.1-1.2l2.6 3.6l-0.4-3.6l2.1-3.1l-10.5-6l-0.9-2.9l-5.3-2l-3.2-9.1l24-12.6l5.7-9l3.4-0.4l4.9 3.7l7-1.5l3-7.3z"/></a>
         <path class="ohne-seite" d="M322 114l0 5.1l-2.6-0.2l-5.2 3.7l-1.4 4.1l1 8.9l5.3 4.6l4.3 0.2l2 5.2l-11.5 16.7l-4.1 3.2l-3.5 0l-2.9 9.7l-17.2-7.3l-4.4-6.5l-4.6-2.7l-0.6-5.7l4.2-5.7l-2.3-3.1l0.6-6.9l-1.5-0.8l-6 3l-0.3 2.6l-4.9 3.8l-4.8-0.4l-5 7l-3.7-4.4l-2.1 7.1l-8.7-4.2l-16.2-26l-5.4-2.8l-12.6-0.3l-0.3-2.6l-2.8 0.7l-3.9-3.7l-5.1-9.5l3.6-2.1l4.9 1.3l1.5-2.9l-3.6-7.3l-3.5 1l-2.3-2.2l-1.1-3.3l2.1-4.8l-0.5-6.9l-7.5 0l-1.5 2.2l-5.9-3.8l1.1-4.9l2.2 1.3l3.5-1.8l0.5-4.3l11.7-1.2l7.5-7.5l-10.9-17.3l-4.5-3.2l-3.9-11.3l-4.5-5.2l1.8-7.2l18.3 1.2l5.9 3.2l5.6-0.1l5.8 2.4l0.5 4.1l4.7 0.5l10.1-3.6l5.6-4.7l2.2 0.8l-1.4 2.5l7.6 3.1l6.9 7.2l4.7-3.7l2.8 3.1l3.4 10.6l-0.3 11l-3.5 4.7l-8.1 3.1l2.1 2.6l15.9-3.8l3.6 2.9l-2.5 9.5l1.3 1.8l3.1-6.8l5.6-2.5l17.2 7.5l5.9 5.7l5-0.7l8.5-7.4l9.3-0.7l0.7 19.5l-12.6 11.3l-4-0.3l-3.8 4.6l2.1 5.2l5.1 0.7zM168.3 10.3l-2.6 8.9l0 13.9l1.1-12.5l2.1-1.4l4.2 2.7l4.5-2.9l-3.9-0.3l-3.5-3.4l-0.4-6l6.7-8l-4-0.6zM176.7 31.7l-4 1.5l-0.7 3.5l9.9 2.4l1.1-6.5zM165.7 40.8l2.9 5.1l3-0.6l-3.3-6.6l1.2-2.9zM182.9 44.4l4.1-1.2l0.7-2.1l-8.1 3.1l1 1.4zM184.2 58.3l3.7-0.1l2.1-5.7l-6.9 1.9zM199.4 55.6l-3.6 2.5l0 2.9l5.1 1.2l3.2-5.6zM331.8 54.9l-3 2.2l-1.2 7l2.2 1.2l-1.4-1.4l2.5-1l1.9 0.7l0.2 3.3l12.9 1l-5.5-10.4z"><title>Schleswig-Holstein — noch keine Seite</title></path>
         <path class="ohne-seite" d="M366 207.8l2.8-0.2l-0.8 2.7l4 3.2l3.3-1l6.2 3.4l-0.3 4.5l9.1 3.2l9-1.7l0.4 3.5l4.1-1.7l2.1 1.1l1.1 7l-2.1 2l-0.8 5.6l2.7 4.8l-0.4 4.3l-3.4 2.7l-1.8 7.9l2.7 3.2l2.8-2.1l5.5 1.9l-1.4 7.4l1.2 7.9l-5.3 18.2l7.7 10.4l13.5 7.5l4.7 0.5l3.3-3.2l11.9 7.5l8.9 2.8l3.3 3.3l4.8-1.5l2.2 1.6l-1.7 1.4l4.6 13.9l-8.4 7.4l-18.3 0.8l-4.6-1.5l-5 5.4l-2-1.4l-2.3 2.1l-13 2.5l-8.7 5.9l-2.6 7.7l3 12.7l-2.9 1.4l3.3 8.2l0.4 9.9l5.9 5.1l-1.6 2.5l2.4 3.5l-4.8 9.7l-2.3-3.8l-1.1 1.9l-4.7-1.7l-4.8 1l-2.6-4.7l-5.9-4l-5.7 0.8l-6.6-2l-2.2-4.1l-13.3-0.1l0.2-8.2l-6.8-2.8l6.9-7.9l-4.9-5l-0.6-3.9l-25.8-3.1l-1.6-1.4l0.3-5.1l-5.9-10l2.1-3.8l-14.1-2.4l-7.5-14.3l-0.1-6.8l4.6-5.2l-2.4-2.2l2-3.3l-5.4-5.2l4.2-0.4l3.7-4.1l17.5-1.1l0.7-5l5.3-5l-0.1-1.9l-2.7-0.8l0.3-2.5l4-2.5l-4.7-6.1l-0.4-4.1l3.9-2.8l0-2l-8.6-9.8l4.6-2.7l-3.9-5.1l-3.3-9.8l-6.3-7.2l-2.6-7.2l0.5-5.8l10.8-1.3l3.8-6l19.4 3.1l11.7-6.7l0.3-6.8l2.7 0.8z"><title>Sachsen-Anhalt — noch keine Seite</title></path>
@@ -298,8 +409,8 @@
         <a href="./katastrophenschutz-baden-wuerttemberg.html" xlink:href="./katastrophenschutz-baden-wuerttemberg.html" tabindex="-1"><title>Baden-Württemberg</title><path d="M207.4 563.1l9.2-0.3l4.3-7.4l7.5 0.1l0-6l-1.9-2l-0.3 2.7l-1.7 0.1l-2.5-6.7l9.5-0.1l2.5-1.9l4.2 4.6l5.6-4.8l-1.1 9.7l2 0.7l8.8-3.8l7.9 14.7l0 9.3l6.6 1l3.3-6.3l2.1 1.2l4.6 14.1l-3.6 1.7l2.3 9.3l-1.1 9.1l6.1 3.6l3 12.3l10.3 6.2l2.7 4.4l-1.8 20l2.7 0.8l1.9 4.7l-5 2.8l0.9-3.7l-6.4 1.1l-4.7-1.5l-1 4l3.1 4.3l0.9 10.3l-5.5 1.3l-4.3 5.2l-2.3 0.5l-2.1-2.1l-4.9 2l-2.7 8.9l5 8.9l2 12.6l2.9 5.3l0 8.8l-3.5 6.7l1.7 2.1l-0.4 7.5l2.2 5.3l-2.3 1.2l1.9 12.8l-3.7 3.7l-1.2-4.2l-2.6-0.5l-3.1 2.4l-10.2 0.4l-5.6 5.7l-6.3-1l-6.8 2.8l-4.7-6.8l-13.1-2.8l-6-7l-10.7-7.3l-2 1.2l9.7 7.2l3 7l-3 1.2l-10.7-3.5l-8.6 3.8l-6.1-4.7l-1.3 1.9l-4.4-1.9l-1.3-7.3l-3.9-2.2l-1.5 2.5l-0.9-4.3l-2.8-0.6l-1.2 2.3l-5.8 1.9l-4.9 9.1l4.6 3.8l9.3-3.3l1.5 2.3l-3.3 5.5l-4.1-3.9l-3.7 3l1.2 2.7l-10.5 0.5l-2.8-3.9l-6.2-1.5l-8.2 6.3l-4.8 0.6l-9.1-4.2l-3.8 0.1l-3.2 3.2l-8.4 1.7l-2.1-2.5l3.2-1l-0.5-2.2l-5.8-1.5l-5.2-9.6l2.6-3.1l-1-5.7l2.2-9.7l4.8-9.4l-3.4-6.5l0.9-8.7l6.4-10.1l2.2-8.3l3.6-2.5l-0.5-7.4l5.2-11.7l-0.1-7.3l2.8-5.7l8.3-7.7l1-4.1l7.6-4l7.9-15.7l6.1-3.9l5.4-10.9l2.2-13.4l6.9-6l-2.5-3.3l3.3-4.2l0.9-7.1l-4.4-1.8l-1-13.6l2.8-0.6l7.7 7.3l2.5-3l-1.5-6.3l6.6-1.2l-1.4 1.4l1.9 7.6l13.1 3.5l-6.7 9.4l3.2 1.7l6.9-6.1l-1.1-2.2l3-3.3l5.9-1.9l3.5 1.7l-2.2-3.4z"/></a>
       </svg>
       <figcaption>
-        Karte zum Anklicken: Ein weißes Land führt auf seine Seite, grau
-        eingefärbte Länder haben noch keine.
+        Karte zum Anklicken: Ein weißes Land führt auf seine Seite, schraffierte
+        Länder haben noch keine.
         Kartengrundlage: „Karte Bundesrepublik Deutschland“ von David Liuzzo nach
         Daten der statistischen Ämter des Bundes und der Länder,
         <a href="https://commons.wikimedia.org/wiki/File:Karte_Bundesrepublik_Deutschland.svg">Wikimedia Commons</a>
@@ -341,43 +452,60 @@
     <footer>
       <!-- FUSSNAV:START -->
       <nav class="fussnav" aria-label="Weitere Seiten">
-        <a href="./">Zurück zur App</a>
-        ·
-        <a href="./anleitung.html">Anleitung</a>
-        ·
-        <a href="./vorlage.html">Vorlage und Blanko-PDF</a>
-        ·
-        <a href="./meldekopf.html">Meldekopf digital</a>
-        ·
-        <a href="./katastrophenschutz.html">Katastrophenschutz</a>
-        ·
-        <a href="./thw.html">THW</a>
-        ·
-        <a href="./feuerwehr.html">Feuerwehr</a>
-        ·
-        <a href="./staerkemeldung-feuerwehr.html">Stärkemeldung</a>
-        ·
-        <a href="./drk.html">DRK</a>
-        ·
-        <a href="./johanniter.html">Johanniter</a>
-        ·
-        <a href="./malteser.html">Malteser</a>
-        ·
-        <a href="./asb.html">ASB</a>
-        ·
-        <a href="./dlrg.html">DLRG</a>
-        ·
-        <a href="./bbk.html">BBK</a>
-        ·
-        <a href="./bundeswehr.html">Bundeswehr</a>
-        ·
-        <a href="./papier-oder-digital.html">Papier oder digital?</a>
-        ·
-        <a href="./open-source-datenschutz.html">Open Source und Datenschutz</a>
-        ·
-        <a href="./datenschutz.html">Datenschutz</a>
-        ·
-        <a href="./impressum.html">Impressum</a>
+        <div class="fussnav-gruppe">
+          <p class="fussnav-titel">Loslegen</p>
+          <p class="fussnav-links">
+            <a href="./">Zurück zur App</a>
+            ·
+            <a href="./anleitung.html">Anleitung</a>
+            ·
+            <a href="./vorlage.html">Vorlage und Blanko-PDF</a>
+            ·
+            <a href="./meldekopf.html">Meldekopf digital</a>
+            ·
+            <a href="./papier-oder-digital.html">Papier oder digital?</a>
+          </p>
+        </div>
+        <div class="fussnav-gruppe">
+          <p class="fussnav-titel">Organisationen</p>
+          <p class="fussnav-links">
+            <a href="./thw.html">THW</a>
+            ·
+            <a href="./feuerwehr.html">Feuerwehr</a>
+            ·
+            <a href="./staerkemeldung-feuerwehr.html">Stärkemeldung</a>
+            ·
+            <a href="./drk.html">DRK</a>
+            ·
+            <a href="./johanniter.html">Johanniter</a>
+            ·
+            <a href="./malteser.html">Malteser</a>
+            ·
+            <a href="./asb.html">ASB</a>
+            ·
+            <a href="./dlrg.html">DLRG</a>
+          </p>
+        </div>
+        <div class="fussnav-gruppe">
+          <p class="fussnav-titel">Behörden und Länder</p>
+          <p class="fussnav-links">
+            <a href="./katastrophenschutz.html">Katastrophenschutz</a>
+            ·
+            <a href="./bbk.html">BBK</a>
+            ·
+            <a href="./bundeswehr.html">Bundeswehr</a>
+          </p>
+        </div>
+        <div class="fussnav-gruppe">
+          <p class="fussnav-titel">Rechtliches</p>
+          <p class="fussnav-links">
+            <a href="./open-source-datenschutz.html">Open Source und Datenschutz</a>
+            ·
+            <a href="./datenschutz.html">Datenschutz</a>
+            ·
+            <a href="./impressum.html">Impressum</a>
+          </p>
+        </div>
       </nav>
       <!-- FUSSNAV:END -->
       <!-- HINWEIS:START -->

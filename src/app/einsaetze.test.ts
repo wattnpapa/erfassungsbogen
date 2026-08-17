@@ -26,6 +26,7 @@ import {
   einsatzEndgueltigLoeschen,
   einsatzImportieren,
   einsaetzeLaden,
+  einsaetzeSpeichern,
   einsaetzePapierkorb,
   meldungHinzufuegen,
   meldungStatusSetzen,
@@ -34,6 +35,10 @@ import {
   meldungAufteilen,
   meldungenZusammenfuehren,
   stammSchluessel,
+  tageBisAufraeumen,
+  ruhendeBereinigt,
+  AUFRAEUM_HINWEIS_MS,
+  AUFRAEUM_FRIST_MS,
   type Einsatzsammlung,
 } from "./einsaetze";
 
@@ -554,5 +559,79 @@ describe("meldungenZusammenfuehren()", () => {
     expect(meldungenZusammenfuehren("gibts-nicht", rest.id, [teil.id])).toBeNull();
     expect(meldungenZusammenfuehren(einsatzId, "gibts-nicht", [teil.id])).toBeNull();
     expect(meldungenZusammenfuehren(einsatzId, rest.id, ["gibts-nicht"])).toBeNull();
+  });
+});
+
+describe("Automatisches Aufräumen ruhender Sammlungen", () => {
+  const TAG = 24 * 60 * 60 * 1000;
+  const jetzt = Date.now();
+  const sammlung = (alterTage: number, over: Partial<Einsatzsammlung> = {}) =>
+    ({
+      id: `s${alterTage}`,
+      name: "Übung",
+      art: EinsatzArt.UEBUNG,
+      angelegt: jetzt - alterTage * TAG,
+      geaendert: jetzt - alterTage * TAG,
+      eintraege: [],
+      ...over,
+    }) as Einsatzsammlung;
+
+  it("schweigt vor Tag 60", () => {
+    expect(tageBisAufraeumen(sammlung(0), jetzt)).toBeNull();
+    expect(tageBisAufraeumen(sammlung(59), jetzt)).toBeNull();
+  });
+
+  it("zählt ab Tag 60 die Tage bis zur Löschung herunter", () => {
+    expect(tageBisAufraeumen(sammlung(60), jetzt)).toBe(30);
+    expect(tageBisAufraeumen(sammlung(89), jetzt)).toBe(1);
+    expect(tageBisAufraeumen(sammlung(90), jetzt)).toBe(0);
+    expect(tageBisAufraeumen(sammlung(200), jetzt)).toBe(0);
+  });
+
+  it("die Ankündigung beginnt genau eine Frist-Differenz vor der Löschung", () => {
+    const angekuendigt = (AUFRAEUM_FRIST_MS - AUFRAEUM_HINWEIS_MS) / TAG;
+    expect(tageBisAufraeumen(sammlung(60), jetzt)).toBe(angekuendigt);
+  });
+
+  it("entfernt erst ab Tag 90 — und nur dann", () => {
+    const { liste, entfernt } = ruhendeBereinigt([sammlung(89), sammlung(90), sammlung(400)], jetzt);
+    expect(entfernt).toBe(2);
+    expect(liste.map((s) => s.id)).toEqual(["s89"]);
+  });
+
+  it("lässt Papierkorb-Einträge in Ruhe — die haben ihre eigene Uhr", () => {
+    const imKorb = sammlung(400, { id: "korb", geloeschtAm: jetzt - TAG });
+    const { liste, entfernt } = ruhendeBereinigt([imKorb], jetzt);
+    expect(entfernt).toBe(0);
+    expect(liste).toHaveLength(1);
+  });
+
+  it("räumt beim Laden automatisch auf und schreibt den Stand zurück", () => {
+    const frisch = einsatzAnlegen("Läuft noch", EinsatzArt.EINSATZ);
+    const alt = einsatzAnlegen("Vergessen", EinsatzArt.EINSATZ);
+    // Die alte Sammlung künstlich altern lassen (direkt im Speicher).
+    const roh = einsaetzeAusJson(localStorage.getItem("eeb.einsaetze.v1"));
+    einsaetzeSpeichern(
+      roh.map((s) => (s.id === alt.id ? { ...s, geaendert: jetzt - 91 * TAG } : s)),
+    );
+
+    const nachLaden = einsaetzeLaden();
+    expect(nachLaden.map((s) => s.id)).toEqual([frisch.id]);
+    // Persistiert: auch der Rohspeicher kennt die alte Sammlung nicht mehr.
+    expect(einsaetzeAusJson(localStorage.getItem("eeb.einsaetze.v1"))).toHaveLength(1);
+  });
+
+  it("eine Änderung setzt die Frist zurück", () => {
+    const s = einsatzAnlegen("Aktiv", EinsatzArt.EINSATZ);
+    einsaetzeSpeichern(
+      einsaetzeAusJson(localStorage.getItem("eeb.einsaetze.v1")).map((x) => ({
+        ...x,
+        geaendert: jetzt - 80 * TAG,
+      })),
+    );
+    expect(tageBisAufraeumen(einsaetzeLaden()[0]!, jetzt)).toBe(10);
+    // Eine neue Meldung berührt die Sammlung → geaendert wird neu gesetzt.
+    meldungHinzufuegen(s.id, bogen());
+    expect(tageBisAufraeumen(einsaetzeLaden()[0]!)).toBeNull();
   });
 });

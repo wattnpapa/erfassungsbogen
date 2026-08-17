@@ -73,9 +73,31 @@ function blockHtml(datei: string): string {
     <!-- LAENDER:END -->`;
 }
 
+/**
+ * Die Aufzählung selbst, ohne Hülle. Wird gebraucht, wenn der Block bereits
+ * steht: dann wird nur der Absatz nachgezogen, nicht die Umgebung.
+ */
+const ABSATZ_MUSTER = /<p>\s*Weitere Landesvorlagen[\s\S]*?<\/p>/;
+
 function inject(inhalt: string, datei: string): string {
   const block = blockHtml(datei);
-  if (BLOCK_MUSTER.test(inhalt)) return inhalt.replace(BLOCK_MUSTER, block);
+  if (BLOCK_MUSTER.test(inhalt)) {
+    // Nur der Absatz wird ausgetauscht, nicht der ganze markierte Bereich.
+    //
+    // Grund: content-offenlegung.mts wickelt die Frage nachträglich in
+    // `<details class="frage"><summary>…` ein, und diese Hülle steht innerhalb
+    // der LAENDER-Marker. Ein Ersetzen des gesamten Bereichs schrieb sie
+    // wieder heraus — die Generatoren müssen aber in beliebiger Reihenfolge
+    // laufen können, und lief `content-laender` zuletzt, stand die Frage auf
+    // zwölf Seiten wieder als starrer Absatz statt als Aufklapper. Wer die
+    // Frage einwickelt, entscheidet damit hier niemand mehr mit.
+    const vorhanden = inhalt.match(BLOCK_MUSTER)![0];
+    if (ABSATZ_MUSTER.test(vorhanden)) {
+      const neuerAbsatz = block.match(ABSATZ_MUSTER)![0];
+      return inhalt.replace(BLOCK_MUSTER, vorhanden.replace(ABSATZ_MUSTER, neuerAbsatz));
+    }
+    return inhalt.replace(BLOCK_MUSTER, block);
+  }
   if (ALT_MUSTER.test(inhalt)) return inhalt.replace(ALT_MUSTER, block);
   // Seiten ohne Vorgänger (Baden-Württemberg) bekommen den Absatz als letzten
   // Punkt vor der Fußzeile — dort, wo er auf allen anderen Seiten auch steht.

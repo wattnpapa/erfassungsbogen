@@ -10,24 +10,33 @@
   <meta name="robots" content="noindex, follow">
   <link rel="icon" href="/icon.svg" type="image/svg+xml">
   <style>
-    :root { --blau: #12275e; --blau-hell: #1d3d8f; --rand: #c9cede; --grau: #f2f3f7; }
+    @font-face {
+      font-family: "Archivo Variable";
+      font-style: normal;
+      font-weight: 100 900;
+      font-display: swap;
+      src: url("./schrift/archivo-latin-wght-normal.woff2") format("woff2-variations"),
+           url("./schrift/archivo-latin-wght-normal.woff2") format("woff2");
+      unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+    }
+    :root { --blau: #12275e; --blau-hell: #1d3d8f; --rand: #c9cede; --grau: #f2f3f7; --text: #11141b; }
     * { box-sizing: border-box; }
     body {
       margin: 0;
-      font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      color: #1a1c22;
+      font-family: "Archivo Variable", -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      color: var(--text);
       background: var(--grau);
       line-height: 1.5;
     }
     main { max-width: 34rem; margin: 0 auto; padding: 3rem 1rem 4rem; }
-    h1 { color: var(--blau); font-size: 1.4rem; margin: 0.5rem 0 1rem; }
+    h1 { text-wrap: balance; color: var(--text); font-size: 1.75rem; margin: 0.5rem 0 1rem; }
     a { color: var(--blau-hell); }
     .start {
       display: inline-block; margin: 1rem 0;
       padding: 0.6rem 1.1rem; background: var(--blau); color: #fff;
       border-radius: 0; text-decoration: none; font-weight: 600;
     }
-    footer { margin-top: 2.5rem; padding-top: 1rem; border-top: 1px solid var(--rand); font-size: 0.85rem; color: #5c6478; }
+    footer { margin-top: 2.5rem; padding-top: 1rem; border-top: 1px solid var(--rand); font-size: 0.875rem; color: #5c6478; }
   </style>
 </head>
 <body>

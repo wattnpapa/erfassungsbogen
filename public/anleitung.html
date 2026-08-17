@@ -17,17 +17,26 @@
   <meta property="og:locale" content="de_DE">
   <meta name="twitter:card" content="summary_large_image">
   <style>
+    @font-face {
+      font-family: "Archivo Variable";
+      font-style: normal;
+      font-weight: 100 900;
+      font-display: swap;
+      src: url("./schrift/archivo-latin-wght-normal.woff2") format("woff2-variations"),
+           url("./schrift/archivo-latin-wght-normal.woff2") format("woff2");
+      unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+    }
     :root {
       --blau: #12275e;
       --blau-hell: #1d3d8f;
       --rand: #c9cede;
-      --grau: #f2f3f7;
+      --grau: #f2f3f7; --text: #11141b;
     }
     * { box-sizing: border-box; }
     body {
       margin: 0;
-      font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      color: #1a1c22;
+      font-family: "Archivo Variable", -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      color: var(--text);
       background: var(--grau);
       line-height: 1.5;
     }
@@ -36,9 +45,9 @@
       margin: 0 auto;
       padding: 1.5rem 1rem 4rem;
     }
-    h1 { color: var(--blau); font-size: 1.4rem; margin: 0.5rem 0 1rem; }
-    h2 { color: var(--blau); font-size: 1.1rem; border-bottom: 2px solid var(--blau); padding-bottom: 0.2rem; margin-top: 2rem; }
-    h3 { font-size: 1rem; margin: 1.4rem 0 0.3rem; }
+    h1 { text-wrap: balance; color: var(--text); font-size: 1.75rem; margin: 0.5rem 0 1rem; }
+    h2 { color: var(--text); font-size: 1.375rem; border-bottom: 1px solid var(--rand); padding-bottom: 0.2rem; margin-top: 2rem; }
+    h3 { font-size: 1.125rem; margin: 1.4rem 0 0.3rem; }
     a { color: var(--blau-hell); }
     ol, ul { padding-left: 1.2rem; }
     li { margin-bottom: 0.4rem; }
@@ -55,7 +64,7 @@
     table { border-collapse: collapse; width: 100%; margin-top: 0.6rem; }
     th, td { border: 1px solid var(--rand); padding: 0.4rem 0.6rem; text-align: left; vertical-align: top; }
     th { background: #e7eaf3; }
-    footer { margin-top: 2.5rem; padding-top: 1rem; border-top: 1px solid var(--rand); font-size: 0.85rem; color: #5c6478; }
+    footer { margin-top: 2.5rem; padding-top: 1rem; border-top: 1px solid var(--rand); font-size: 0.875rem; color: #5c6478; }
     /* Bildschirmfotos aus public/screenshots/ (npm run screenshots). Sie zeigen
        den beschriebenen Ablauf und machen die Seite auch für die Bildersuche
        auffindbar; width/height stehen im Markup, damit beim Laden nichts
@@ -66,26 +75,53 @@
       border: 1px solid var(--rand); background: #fff;
     }
     figure img.schmal { max-width: 17rem; }
-    figcaption { font-size: 0.85rem; color: #5c6478; margin-top: 0.4rem; }
+    figcaption { max-width: 60ch; font-size: 0.875rem; color: #5c6478; margin-top: 0.4rem; }
 /* NAV:CSS:START */
     /* Sprunglink: sitzt außerhalb des Sichtfelds und kommt beim ersten Tabstopp
        hervor. Ohne ihn tabbt man auf jeder Seite durch Logo und acht Nav-Einträge,
        bevor der Text beginnt (WCAG 2.4.1). Nicht mit display:none oder
-       visibility:hidden verstecken — dann wäre er auch für die Tastatur weg. */
-    .sprunglink { position: absolute; left: -9999px; top: 0; z-index: 40; padding: 0.6rem 1rem; background: var(--blau); color: #fff; text-decoration: none; font-weight: 600; }
+       visibility:hidden verstecken — dann wäre er auch für die Tastatur weg.
+       Höhe aus --ziel-basis (2.75rem): mit 0.6rem Polster kam er auf 43 px und
+       verfehlte das Maß um einen Pixel. Er liegt absolut und kostet die Seite
+       dadurch keine Höhe. */
+    .sprunglink { position: absolute; left: -9999px; top: 0; z-index: 40; display: inline-flex; align-items: center; min-height: 2.75rem; padding: 0 1rem; background: var(--blau); color: #fff; text-decoration: none; font-weight: 600; }
     .sprunglink:focus { left: 0; }
     .kopfnav { background: #fff; border-bottom: 1px solid var(--rand); }
     /* Dieselbe Breite wie main: Ein 60rem breiter Kopf über einer 44rem breiten
        Textspalte setzt zwei verschiedene linke Kanten auf eine Seite, die sonst
        durchgehend linksbündig steht. */
-    .kopfnav-inner { max-width: 44rem; margin: 0 auto; padding: 0.7rem 1rem; display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 1.2rem; }
-    .kopfnav-logo { font-weight: 700; color: var(--blau); text-decoration: none; font-size: 0.95rem; margin-right: auto; }
-    .kopfnav-links { display: flex; flex-wrap: wrap; align-items: center; gap: 0.3rem 0.9rem; }
-    /* Senkrechtes Polster statt reiner Zeilenhöhe: Ohne es sind die Nav-Links
-       19,7 px hoch und verfehlen die 24 px aus WCAG 2.5.8. Die Ausnahme für
-       Links im Fließtext greift hier nicht — das ist eine Linkreihe, kein Satz.
-       (Die punktgetrennte Fußnav ist ein Textblock und fällt unter die Ausnahme.) */
-    .kopfnav-links a { display: inline-block; padding: 0.28rem 0; color: #5c6478; text-decoration: none; font-size: 0.82rem; white-space: nowrap; }
+    /* Ohne senkrechtes Polster: Die Höhe der Leiste kommt jetzt aus den
+       Trefferflächen ihrer Bedienelemente (2.75rem je Zeile) statt aus Polster
+       plus Zeilenhöhe. Sonst käme das Maß oben drauf und die Leiste wüchse. */
+    .kopfnav-inner { max-width: 44rem; margin: 0 auto; padding: 0 1rem; display: flex; flex-wrap: wrap; align-items: center; gap: 0 1.2rem; }
+    /* Grad aus der Leiter (--t-s), nicht 0.95rem: content-stil.mts zieht jeden
+       Zwischenwert ohnehin auf die nächste tragende Stufe. Stünde hier der
+       Zwischenwert, machte ein Lauf dieses Skripts die Angleichung wieder
+       rückgängig — die Generatoren müssen in beliebiger Reihenfolge laufen.
+       Höhe aus dem Maß statt aus der Zeilenhöhe: siehe .kopfnav-links a. */
+    .kopfnav-logo { display: inline-flex; align-items: center; min-height: 2.75rem; font-weight: 700; color: var(--blau); text-decoration: none; font-size: 0.875rem; margin-right: auto; }
+    .kopfnav-links { display: flex; flex-wrap: wrap; align-items: center; gap: 0 0.9rem; }
+    /* Trefferfläche aus dem Maß statt aus Polster plus Zeilenhöhe: --ziel-basis
+       ist 2.75rem = 44 px (DESIGN.md). Mit 0.28rem Polster kam der Eintrag auf
+       29 px — über den 24 px aus WCAG 2.5.8, aber unter dem produkteigenen Maß,
+       und der Wert entstand zufällig aus Schriftgrad und Polster. min-height
+       plus inline-flex hält ihn unabhängig davon.
+       (Die punktgetrennte Fußnav bleibt ein Textblock und fällt unter die
+       WCAG-Ausnahme für Links im Fließtext — sie wird nicht angefasst.)
+       Grad aus der Leiter (--t-xs = 0.8125rem), siehe .kopfnav-logo. */
+    .kopfnav-links a { display: inline-flex; align-items: center; min-height: 2.75rem; padding: 0; color: #5c6478; text-decoration: none; font-size: 0.8125rem; white-space: nowrap; }
+    /* Der Konflikt zwischen Trefferfläche und Kopfhöhe, offen ausgetragen:
+       Auf 375 px bricht die Linkreihe auf zwei Zeilen um. Drei Zeilen à 44 px
+       (Logo plus zwei Linkzeilen) ergäben 132 px Kopf — 16 % des Sichtfelds,
+       statt der gemessenen 116 px. Deshalb behalten die Einträge dort 2rem
+       (32 px): über den 24 px der WCAG-Vorgabe, unter dem Produktmaß. Gemessen
+       auf 375 px steht die Leiste damit bei 109 px statt der bisherigen 116 —
+       das gestrichene senkrechte Polster von .kopfnav-inner zahlt die höheren
+       Ziele mehr als aus. Das eigentliche Problem sind nicht die Zeilenhöhen,
+       sondern die Zahl der Zeilen; die gehört in einen eigenen Schritt. */
+    @media (max-width: 30rem) {
+      .kopfnav-links a { min-height: 2rem; }
+    }
     .kopfnav-links a:hover { color: var(--blau-hell); text-decoration: underline; }
     .kopfnav-links a.aktiv { color: var(--blau); font-weight: 600; }
     .kopfnav-eintrag { position: relative; display: inline-flex; }
@@ -94,7 +130,9 @@
        Flach-im-Stand-Regel ihn zu — im Wert des dokumentierten Dropdown-Schattens. */
     .kopfnav-unter { position: absolute; top: 100%; left: -0.6rem; z-index: 30; display: none; grid-template-columns: 1fr; gap: 0.05rem; margin-top: 0.55rem; padding: 0.4rem; background: #fff; border: 1px solid var(--rand); border-radius: 0; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); }
     .kopfnav-unter-breit { grid-template-columns: 1fr 1fr; }
-    .kopfnav-unter a { display: block; padding: 0.35rem 0.6rem; border-radius: 0; }
+    /* Auch die Menüeinträge sind Bedienelemente und bekommen das Maß. Das Menü
+       liegt absolut über dem Inhalt — die Höhe kostet die Leiste nichts. */
+    .kopfnav-unter a { display: flex; align-items: center; min-height: 2.75rem; padding: 0 0.6rem; border-radius: 0; }
     .kopfnav-unter a:hover { background: var(--grau); text-decoration: none; }
     /* Der unsichtbare Streifen überbrückt den Abstand zwischen Eintrag und
        Menü — ohne ihn klappt das Menü beim Hinüberfahren wieder zu. */
@@ -106,12 +144,109 @@
     @media (hover: hover) and (pointer: fine) {
       .kopfnav-eintrag:hover .kopfnav-unter { display: grid; }
     }
-    .fussnav { display: inline; }
-    .fussnav a { white-space: nowrap; }
+    /* Fußzeile in vier Gruppen statt einer punktgetrennten Zwanzigerkette. Die
+       Gruppentitel stehen in der Versalzeile aus DESIGN.md (Mono, 700,
+       0.8125rem, ls 0.1em, uppercase, --text-2) — dieselbe
+       Meldevordruck-Anmutung wie die Spaltenköpfe in der App.
+       Die Links bleiben innerhalb der Gruppe ein Textblock und damit Links im
+       Fließtext: Die WCAG-2.5.8-Ausnahme greift weiter. Als Listenpunkte
+       bräuchte jeder der zwanzig 44 px, und die Fußzeile wüchse auf dem Handy
+       von 264 px auf über 880 px.
+       auto-fit ab 9rem: am Breitbild vier Spalten nebeneinander, auf 375 px
+       zwei. Gemessen auf 375 px: einspaltig wäre die Fußnavigation 350 px hoch,
+       zweispaltig 291 px. Enger als 9rem bringt nichts mehr — die Spalten sind
+       dann schmaler als die längsten Beschriftungen, und was an Spaltenzahl
+       gewonnen wird, geht an Zeilenumbrüchen wieder verloren. */
+    .fussnav { display: grid; grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr)); gap: 1.2rem 1.5rem; }
+    .fussnav-titel { margin: 0 0 0.2rem; font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace; font-weight: 700; font-size: 0.8125rem; letter-spacing: 0.1em; text-transform: uppercase; color: #5c6478; }
+    .fussnav-links { margin: 0; line-height: 1.8; }
+    /* Weniger Entscheidungen auf 375 px, ohne Skript und ohne verlorene Rubrik.
+       Sieben Einträge plus Logo passen dort nicht in eine Reihe; die Leiste
+       brach deshalb auf drei Zeilen um (Logo plus zwei Linkzeilen, 109 px).
+       Ein Hamburger-Menü schied aus — die Aufklappmenüs sind auf Touch bewusst
+       abgeschaltet (siehe unten), und ein Umschalter bräuchte JavaScript, das
+       diese Seiten nicht haben dürfen.
+       Also bleibt mobil sichtbar, was der Leser dort wirklich braucht: „Alle
+       Themen“ als Sammelweg auf das vollständige Verzeichnis und der Eintrag
+       der Rubrik, in der er gerade steht. Die übrigen tragen "nur-breit". Sie
+       bleiben im Markup (Suchmaschinen sehen sie, die Fußzeile führt sie in
+       ihren vier Gruppen), sind aber nicht mehr Teil der Entscheidung, die
+       oben auf dem Bildschirm getroffen werden muss.
+       Der Selektor nennt beide Klassen, weil ".kopfnav-eintrag" weiter oben
+       "display: inline-flex" setzt: Mit ".nur-breit" allein stünde Gleichstand
+       bei der Spezifität und die spätere Regel entschiede — eine Abhängigkeit
+       von der Reihenfolge, die kein Leser dieses Blocks erwartet. */
+    @media (max-width: 30rem) {
+      .kopfnav-links .nur-breit { display: none; }
+    }
     /* NAV:CSS:END */
 /* HINWEIS:CSS:START */
-    .marken-hinweis { margin: 1rem 0 0; font-size: 0.78rem; line-height: 1.45; color: #5c6478; }
+    /* Grad aus der Leiter (--t-xs = 0.8125rem), nicht 0.78rem: content-stil.mts
+       zieht jeden Zwischenwert ohnehin auf die nächste tragende Stufe. Stünde
+       hier der Zwischenwert, machte ein Lauf dieses Skripts die Angleichung
+       wieder rückgängig — die Generatoren müssen in beliebiger Reihenfolge
+       laufen können. */
+    /* max-width in ch, nicht in px: Der Hinweis lief über die volle
+       Inhaltsspalte und kam bei diesem Grad auf rund 108 Zeichen je Zeile.
+       Die Breite gehört hierher und nicht nach content-stil.mts — dieser
+       Block wird bei jedem Lauf ersetzt, eine dort eingefügte Deklaration
+       wäre nach dem nächsten Hinweis-Lauf wieder weg. */
+    .marken-hinweis { margin: 1rem 0 0; max-width: 60ch; font-size: 0.8125rem; line-height: 1.45; color: #5c6478; }
     /* HINWEIS:CSS:END */
+/* HANDLUNG:CSS:START */
+    .start { display: inline-flex; align-items: center; min-height: 2.75rem; }
+    .abschluss { margin-top: 2.5rem; }
+    .abschluss .zusicherung { margin: 0.4rem 0 0; font-size: 0.875rem; color: #5c6478; }
+    /* HANDLUNG:CSS:END */
+/* ROLLBEREICH:CSS:START */
+    .tabellenrahmen, .tabelle { overflow-x: auto; }
+    .tabellenrahmen:focus-visible, .tabelle:focus-visible { outline: 3px solid var(--blau); outline-offset: 2px; }
+    /* ROLLBEREICH:CSS:END */
+/* OFFENLEGUNG:CSS:START */
+    /* Aufklappblöcke. Der Griff ist als Bedienelement erkennbar: volle
+       Trefferfläche, eigenes Vorzeichen, Fokusring im App-Muster
+       (outline in der Kennfarbe, wie index.html und die Rollbereiche). Der
+       eigene Marker statt des Systemdreiecks, weil das Dreieck in Safari links
+       außerhalb der Textkante sitzt und die Zeile gegen die Überschriften
+       darüber verschiebt. */
+    .frage, .aufklapp { border-top: 1px solid var(--rand); }
+    .frage > summary, .aufklapp > summary { display: flex; align-items: center; gap: 0.6rem; min-height: 2.75rem; cursor: pointer; list-style: none; font-weight: 600; }
+    .frage > summary::-webkit-details-marker, .aufklapp > summary::-webkit-details-marker { display: none; }
+    .frage > summary::before, .aufklapp > summary::before { content: "+"; flex: none; width: 1rem; text-align: center; font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace; font-weight: 700; color: var(--blau); }
+    .frage[open] > summary::before, .aufklapp[open] > summary::before { content: "−"; }
+    .frage > summary:focus-visible, .aufklapp > summary:focus-visible { outline: 3px solid var(--blau); outline-offset: 2px; }
+    /* Die Frage bleibt eine h3 (im summary erlaubt) — Gliederung und JSON-LD
+       bleiben damit unberührt. Nur der Blocksatz muss weichen, sonst rutscht
+       sie unter das Vorzeichen. */
+    .frage > summary h3 { display: inline; margin: 0; padding: 0; border: 0; }
+    .frage > p, .aufklapp > .tabellenrahmen, .aufklapp > .tabelle { margin-top: 0; margin-bottom: 1rem; }
+    /* Ausdruck: Ein ausgedruckter Bogen darf nichts verschlucken. Zwei
+       Schreibweisen, weil die Browser das Element unterschiedlich bauen — die
+       ältere über den Kindselektor, die neuere über ::details-content. */
+    @media print {
+      details { display: block; }
+      details > summary { display: block; }
+      details > *:not(summary) { display: block; }
+      details::details-content { content-visibility: visible; display: block; }
+      .frage > summary::before, .aufklapp > summary::before { content: ""; width: 0; }
+    }
+    /* Sprungmenü: Listenpunkte sind keine Links im Fließtext, die
+       WCAG-2.5.8-Ausnahme greift hier nicht — volle Trefferfläche. Mehrspaltig
+       ab der Breite, ab der zwei Spalten nicht umbrechen; auf dem Handy
+       einspaltig. */
+    .sprungmenue { margin: 1.2rem 0 2rem; padding-top: 0.8rem; border-top: 1px solid var(--rand); }
+    .sprungmenue-titel { margin: 0 0 0.4rem; font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace; font-weight: 700; font-size: 0.8125rem; letter-spacing: 0.1em; text-transform: uppercase; color: #5c6478; }
+    .sprungmenue ul { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr)); gap: 0 1.5rem; }
+    .sprungmenue li { margin: 0; }
+    .sprungmenue a { display: flex; align-items: center; min-height: 2.75rem; }
+    /* Textfassung der Karte: dieselben zwölf Ziele als Zeile, nach Anzahl
+       geordnet. Sie steht außerhalb des Aufklappblocks, weil die Karte
+       aria-hidden ist und dies der einzige Zugang für Tastatur und
+       Screenreader bleibt. Als punktgetrennter Textblock fällt sie unter die
+       WCAG-2.5.8-Ausnahme für Links im Fließtext. */
+    .laenderliste { margin: 0.8rem 0 1.2rem; line-height: 2; }
+    .laenderliste .anzahl { font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace; font-size: 0.875rem; color: #5c6478; }
+    /* OFFENLEGUNG:CSS:END */
   </style>
 </head>
 <body>
@@ -132,7 +267,7 @@
             <a href="./impressum.html">Impressum</a>
           </span>
         </span>
-        <span class="kopfnav-eintrag">
+        <span class="kopfnav-eintrag nur-breit">
           <a href="./katastrophenschutz.html">Katastrophenschutz</a>
           <span class="kopfnav-unter kopfnav-unter-breit">
             <a href="./katastrophenschutz-baden-wuerttemberg.html">Baden-Württemberg</a>
@@ -149,7 +284,7 @@
             <a href="./katastrophenschutz-thueringen.html">Thüringen</a>
           </span>
         </span>
-        <span class="kopfnav-eintrag">
+        <span class="kopfnav-eintrag nur-breit">
           <a href="./thw.html">THW</a>
           <span class="kopfnav-unter">
             <a href="./thw-fachgruppe-raeumen-erfassungsbogen.html">Fachgruppe Räumen</a>
@@ -157,13 +292,13 @@
             <a href="./thw-fachgruppe-wasserschaden-pumpen-erfassungsbogen.html">Fachgruppe Wasserschaden/Pumpen</a>
           </span>
         </span>
-        <span class="kopfnav-eintrag">
+        <span class="kopfnav-eintrag nur-breit">
           <a href="./feuerwehr.html">Feuerwehr</a>
           <span class="kopfnav-unter">
             <a href="./staerkemeldung-feuerwehr.html">Stärkemeldung mit Beispiel</a>
           </span>
         </span>
-        <span class="kopfnav-eintrag">
+        <span class="kopfnav-eintrag nur-breit">
           <a href="./uebersicht.html#hilfsorganisationen">Hilfsorganisationen</a>
           <span class="kopfnav-unter">
             <a href="./drk.html">DRK</a>
@@ -173,7 +308,7 @@
             <a href="./dlrg.html">DLRG</a>
           </span>
         </span>
-        <a href="./meldekopf.html">Meldekopf</a>
+        <a href="./meldekopf.html" class="nur-breit">Meldekopf</a>
         <a href="./anleitung.html" class="aktiv">Anleitung</a>
       </nav>
     </div>
@@ -182,6 +317,22 @@
 
   <main id="inhalt">
     <h1>Einheiten-Erfassungsbogen: Anleitung und häufige Fragen</h1>
+
+    <!-- SPRUNGMENUE:START -->
+    <nav class="sprungmenue" aria-label="Inhalt dieser Seite">
+      <p class="sprungmenue-titel">Auf dieser Seite</p>
+      <ul>
+        <li><a href="#in-fuenf-schritten-zum-fertigen-bogen">In fünf Schritten zum fertigen Bogen</a></li>
+        <li><a href="#uebergabe-per-qr-code-ohne-internet">Übergabe per QR-Code — ohne Internet</a></li>
+        <li><a href="#meldekopf-und-bereitstellungsraum-einsaetze-sammeln">Meldekopf und Bereitstellungsraum: Einsätze sammeln</a></li>
+        <li><a href="#eigene-vorlagen-und-beispielboegen">Eigene Vorlagen und Beispielbögen</a></li>
+        <li><a href="#auf-welchen-geraeten-laeuft-die-app">Auf welchen Geräten läuft die App?</a></li>
+        <li><a href="#technische-daten">Technische Daten</a></li>
+        <li><a href="#haeufige-fragen">Häufige Fragen</a></li>
+        <li><a href="#aus-demselben-projektumfeld">Aus demselben Projektumfeld</a></li>
+      </ul>
+    </nav>
+    <!-- SPRUNGMENUE:END -->
 
     <p>
       Der Einheiten-Erfassungsbogen hält fest, wer mit welcher Stärke, welchen
@@ -220,7 +371,7 @@
       </figcaption>
     </figure>
 
-    <h2>In fünf Schritten zum fertigen Bogen</h2>
+    <h2 id="in-fuenf-schritten-zum-fertigen-bogen">In fünf Schritten zum fertigen Bogen</h2>
     <ol>
       <li>
         <strong>Einheit angeben.</strong> Trag Organisation, Einheit und
@@ -255,7 +406,7 @@
       geschlossener Browser-Tab kostet dich also keine Arbeit.
     </p>
 
-    <h2>Übergabe per QR-Code — ohne Internet</h2>
+    <h2 id="uebergabe-per-qr-code-ohne-internet">Übergabe per QR-Code — ohne Internet</h2>
     <p>
       Der QR-Code auf dem PDF enthält nicht bloß einen Link auf eine
       Serverkopie, sondern den vollständigen Bogen in komprimierter Form.
@@ -280,7 +431,7 @@
       </figcaption>
     </figure>
 
-    <h2>Meldekopf und Bereitstellungsraum: Einsätze sammeln</h2>
+    <h2 id="meldekopf-und-bereitstellungsraum-einsaetze-sammeln">Meldekopf und Bereitstellungsraum: Einsätze sammeln</h2>
     <p>
       Trifft eine Einheit ohne Bogen ein, erfasst du sie am Tablet in wenigen
       Minuten — Stärke, Führungskraft, Fahrzeuge, fertig. Bringt sie einen
@@ -300,7 +451,7 @@
       weiterhin alle anwesenden Einheiten.
     </p>
 
-    <h2>Eigene Vorlagen und Beispielbögen</h2>
+    <h2 id="eigene-vorlagen-und-beispielboegen">Eigene Vorlagen und Beispielbögen</h2>
     <p>
       Einen einmal ausgefüllten Bogen sicherst du als Vorlage und rufst ihn beim
       nächsten Einsatz in Sekunden wieder auf — anpassen musst du dann nur noch,
@@ -310,96 +461,116 @@
       Niedersachsen, Sachsen, Brandenburg und Thüringen.
     </p>
 
-    <h2>Auf welchen Geräten läuft die App?</h2>
-    <table>
-      <thead><tr><th scope="col">Gerät</th><th scope="col">Nutzung</th></tr></thead><tbody>
-      <tr><td>Browser (alle Plattformen)</td><td><a href="./">erfassungsbogen.app</a> — ohne Installation; nach dem ersten Aufruf auch offline</td></tr>
-      <tr><td>Windows, macOS, Linux</td><td>Installierbare Desktop-App über die <a href="https://github.com/wattnpapa/erfassungsbogen/releases/latest">Releases</a></td></tr>
-      <tr><td>Android</td><td>APK über die Releases oder als installierbare Web-App (PWA)</td></tr>
-      <tr><td>iPhone, iPad</td><td>Über Safari zum Home-Bildschirm hinzufügen</td></tr>
-    </tbody></table>
+    <h2 id="auf-welchen-geraeten-laeuft-die-app">Auf welchen Geräten läuft die App?</h2>
+    <div class="tabellenrahmen" tabindex="0" role="region" aria-label="Auf welchen Geräten läuft die App?">
+      <table>
+        <thead><tr><th scope="col">Gerät</th><th scope="col">Nutzung</th></tr></thead><tbody>
+        <tr><td>Browser (alle Plattformen)</td><td><a href="./">erfassungsbogen.app</a> — ohne Installation; nach dem ersten Aufruf auch offline</td></tr>
+        <tr><td>Windows, macOS, Linux</td><td>Installierbare Desktop-App über die <a href="https://github.com/wattnpapa/erfassungsbogen/releases/latest">Releases</a></td></tr>
+        <tr><td>Android</td><td>APK über die Releases oder als installierbare Web-App (PWA)</td></tr>
+        <tr><td>iPhone, iPad</td><td>Über Safari zum Home-Bildschirm hinzufügen</td></tr>
+      </tbody></table>
+    </div>
 
-    <h2>Technische Daten</h2>
-    <table>
-      <thead><tr><th scope="col">Merkmal</th><th scope="col">Details</th></tr></thead><tbody>
-      <tr><td>Kosten</td><td>Kostenlos — keine Konten, keine Bezahlschranke, keine Werbung</td></tr>
-      <tr><td>Lizenz</td><td>Open Source unter EUPL-1.2 (Europäische Union Public Licence)</td></tr>
-      <tr><td>Offline</td><td>Offline-first: nach dem ersten Aufruf ohne Internet nutzbar (PWA); Desktop- und Android-Apps von vornherein</td></tr>
-      <tr><td>Registrierung</td><td>Keine — die App startet direkt</td></tr>
-      <tr><td>Datenhaltung</td><td>Ausschließlich lokal auf dem Gerät; kein Server, keine Cloud</td></tr>
-      <tr><td>Übergabe</td><td>QR-Code (kompletter Bogen im Code), Datei, PDF</td></tr>
-      <tr><td>Export</td><td>PDF im Papier-Layout, Bogen-Datei, CSV der Einsatz-Sammlung</td></tr>
-      <tr><td>Backup</td><td>Alle lokalen Daten als eine Datei sichern und wieder einspielen</td></tr>
-      <tr><td>Signatur</td><td>Optionale Ed25519-Signatur zur Herkunftsprüfung übergebener Bögen</td></tr>
-      <tr><td>Plattformen</td><td>Browser (alle Systeme), Windows, macOS, Linux, Android; iPhone/iPad über Safari („Zum Home-Bildschirm")</td></tr>
-    </tbody></table>
+    <h2 id="technische-daten">Technische Daten</h2>
+    <div class="tabellenrahmen" tabindex="0" role="region" aria-label="Technische Daten">
+      <table>
+        <thead><tr><th scope="col">Merkmal</th><th scope="col">Details</th></tr></thead><tbody>
+        <tr><td>Kosten</td><td>Kostenlos — keine Konten, keine Bezahlschranke, keine Werbung</td></tr>
+        <tr><td>Lizenz</td><td>Open Source unter EUPL-1.2 (Europäische Union Public Licence)</td></tr>
+        <tr><td>Offline</td><td>Offline-first: nach dem ersten Aufruf ohne Internet nutzbar (PWA); Desktop- und Android-Apps von vornherein</td></tr>
+        <tr><td>Registrierung</td><td>Keine — die App startet direkt</td></tr>
+        <tr><td>Datenhaltung</td><td>Ausschließlich lokal auf dem Gerät; kein Server, keine Cloud</td></tr>
+        <tr><td>Übergabe</td><td>QR-Code (kompletter Bogen im Code), Datei, PDF</td></tr>
+        <tr><td>Export</td><td>PDF im Papier-Layout, Bogen-Datei, CSV der Einsatz-Sammlung</td></tr>
+        <tr><td>Backup</td><td>Alle lokalen Daten als eine Datei sichern und wieder einspielen</td></tr>
+        <tr><td>Signatur</td><td>Optionale Ed25519-Signatur zur Herkunftsprüfung übergebener Bögen</td></tr>
+        <tr><td>Plattformen</td><td>Browser (alle Systeme), Windows, macOS, Linux, Android; iPhone/iPad über Safari („Zum Home-Bildschirm")</td></tr>
+      </tbody></table>
+    </div>
 
-    <h2>Häufige Fragen</h2>
+    <h2 id="haeufige-fragen">Häufige Fragen</h2>
 
-    <h3>Was kostet die App?</h3>
-    <p>
+    <details class="frage" open>
+      <summary><h3>Was kostet die App?</h3></summary>
+      <p>
       Nichts. Sie ist freie Software unter der
       <a href="https://github.com/wattnpapa/erfassungsbogen/blob/main/LICENSE">EUPL-1.2</a>
       (Europäische Union Public Licence), der Quellcode liegt offen auf
       <a href="https://github.com/wattnpapa/erfassungsbogen">GitHub</a>. Es gibt
       keine Konten, keine Bezahlschranke und keine Werbung.
-    </p>
+      </p>
+    </details>
 
-    <h3>Brauche ich eine Anmeldung oder eine Internetverbindung?</h3>
-    <p>
+    <details class="frage">
+      <summary><h3>Brauche ich eine Anmeldung oder eine Internetverbindung?</h3></summary>
+      <p>
       Nein. Es gibt keine Registrierung. Du musst die Seite einmal laden;
       danach arbeitet sie offline weiter, weil sie sich als Web-App in deinem
       Gerät ablegt. Die installierten Apps brauchen von vornherein kein Netz.
-    </p>
+      </p>
+    </details>
 
-    <h3>Wo bleiben die eingegebenen Daten?</h3>
-    <p>
+    <details class="frage">
+      <summary><h3>Wo bleiben die eingegebenen Daten?</h3></summary>
+      <p>
       Auf deinem Gerät. Es gibt keinen Server, an den ein Bogen geschickt würde,
       und keine Cloud. Weitergegeben wird nur, was du selbst weitergibst: ein
       PDF, eine Datei oder ein QR-Code. Einzelheiten stehen in der
       <a href="./datenschutz.html">Datenschutzerklärung</a>.
-    </p>
+      </p>
+    </details>
 
-    <h3>Wie kommt ein Bogen ohne Netz auf ein anderes Gerät?</h3>
-    <p>
+    <details class="frage">
+      <summary><h3>Wie kommt ein Bogen ohne Netz auf ein anderes Gerät?</h3></summary>
+      <p>
       Über den QR-Code auf der letzten PDF-Seite oder auf dem Bildschirm: Er
       trägt den kompletten Bogen in sich. Das empfangende Gerät scannt ihn und
       hat den Bogen — ganz ohne Verbindung zwischen den Geräten. Alternativ
       sicherst du den Bogen als Datei und überträgst ihn so.
-    </p>
+      </p>
+    </details>
 
-    <h3>Passt der Ausdruck zum gewohnten Papierformular?</h3>
-    <p>
+    <details class="frage">
+      <summary><h3>Passt der Ausdruck zum gewohnten Papierformular?</h3></summary>
+      <p>
       Ja, das PDF folgt dem bekannten Papier-Layout des Einheiten-Erfassungsbogens,
       du kannst es unverändert in den Papierlauf geben. Fahrzeuge erscheinen
       mit ihrem taktischen Zeichen nach DV 102.
-    </p>
+      </p>
+    </details>
 
-    <h3>Kann ich einen Bogen später ändern oder wiederverwenden?</h3>
-    <p>
+    <details class="frage">
+      <summary><h3>Kann ich einen Bogen später ändern oder wiederverwenden?</h3></summary>
+      <p>
       Ja. Du kannst Bögen als eigene Vorlage speichern und beim nächsten
       Einsatz erneut aufrufen; bei Bedarf streichst du Teile heraus,
       etwa wenn eine Teileinheit nicht ausrückt.
-    </p>
+      </p>
+    </details>
 
-    <h3>Für welche Organisationen ist der Bogen gedacht?</h3>
-    <p>
+    <details class="frage">
+      <summary><h3>Für welche Organisationen ist der Bogen gedacht?</h3></summary>
+      <p>
       Für alle: Feuerwehr, THW, Polizei und Bundespolizei, DRK, Johanniter,
       Malteser, ASB, DLRG, Rettungsdienst, Bundeswehr sowie die
       Katastrophenschutz-Einheiten der Länder. Die Begriffe im Bogen
       (Dienstgrade, Einheitsbezeichnungen, Funkrufnamen) passen sich der
       Organisation an, die du gewählt hast.
-    </p>
+      </p>
+    </details>
 
-    <h3>Ist der Quellcode einsehbar?</h3>
-    <p>
+    <details class="frage">
+      <summary><h3>Ist der Quellcode einsehbar?</h3></summary>
+      <p>
       Ja, vollständig:
       <a href="https://github.com/wattnpapa/erfassungsbogen">github.com/wattnpapa/erfassungsbogen</a>.
       Dort finden sich auch die technische Dokumentation, das Datenformat und
       der QR-Codec.
-    </p>
+      </p>
+    </details>
 
-    <h2>Aus demselben Projektumfeld</h2>
+    <h2 id="aus-demselben-projektumfeld">Aus demselben Projektumfeld</h2>
     <p>
       Vom selben Autor stammt
       <a href="https://sprechfunk-uebung.de">sprechfunk-uebung.de</a>, der
@@ -415,46 +586,70 @@
       erfasst dieser Bogen — als Übung gekennzeichnet wird er in Schritt 2.
     </p>
 
+    <!-- HANDLUNG:ABSCHLUSS:START -->
+    <div class="abschluss">
+      <a class="start" href="./">Bogen jetzt ausfüllen</a>
+      <p class="zusicherung">Kostenlos, ohne Anmeldung, alle Daten bleiben auf deinem Gerät.</p>
+    </div>
+    <!-- HANDLUNG:ABSCHLUSS:END -->
+
     <footer>
       <!-- FUSSNAV:START -->
       <nav class="fussnav" aria-label="Weitere Seiten">
-        <a href="./">Zurück zur App</a>
-        ·
-        <a href="./uebersicht.html">Alle Themen</a>
-        ·
-        <a href="./vorlage.html">Vorlage und Blanko-PDF</a>
-        ·
-        <a href="./meldekopf.html">Meldekopf digital</a>
-        ·
-        <a href="./katastrophenschutz.html">Katastrophenschutz</a>
-        ·
-        <a href="./thw.html">THW</a>
-        ·
-        <a href="./feuerwehr.html">Feuerwehr</a>
-        ·
-        <a href="./staerkemeldung-feuerwehr.html">Stärkemeldung</a>
-        ·
-        <a href="./drk.html">DRK</a>
-        ·
-        <a href="./johanniter.html">Johanniter</a>
-        ·
-        <a href="./malteser.html">Malteser</a>
-        ·
-        <a href="./asb.html">ASB</a>
-        ·
-        <a href="./dlrg.html">DLRG</a>
-        ·
-        <a href="./bbk.html">BBK</a>
-        ·
-        <a href="./bundeswehr.html">Bundeswehr</a>
-        ·
-        <a href="./papier-oder-digital.html">Papier oder digital?</a>
-        ·
-        <a href="./open-source-datenschutz.html">Open Source und Datenschutz</a>
-        ·
-        <a href="./datenschutz.html">Datenschutz</a>
-        ·
-        <a href="./impressum.html">Impressum</a>
+        <div class="fussnav-gruppe">
+          <p class="fussnav-titel">Loslegen</p>
+          <p class="fussnav-links">
+            <a href="./">Zurück zur App</a>
+            ·
+            <a href="./uebersicht.html">Alle Themen</a>
+            ·
+            <a href="./vorlage.html">Vorlage und Blanko-PDF</a>
+            ·
+            <a href="./meldekopf.html">Meldekopf digital</a>
+            ·
+            <a href="./papier-oder-digital.html">Papier oder digital?</a>
+          </p>
+        </div>
+        <div class="fussnav-gruppe">
+          <p class="fussnav-titel">Organisationen</p>
+          <p class="fussnav-links">
+            <a href="./thw.html">THW</a>
+            ·
+            <a href="./feuerwehr.html">Feuerwehr</a>
+            ·
+            <a href="./staerkemeldung-feuerwehr.html">Stärkemeldung</a>
+            ·
+            <a href="./drk.html">DRK</a>
+            ·
+            <a href="./johanniter.html">Johanniter</a>
+            ·
+            <a href="./malteser.html">Malteser</a>
+            ·
+            <a href="./asb.html">ASB</a>
+            ·
+            <a href="./dlrg.html">DLRG</a>
+          </p>
+        </div>
+        <div class="fussnav-gruppe">
+          <p class="fussnav-titel">Behörden und Länder</p>
+          <p class="fussnav-links">
+            <a href="./katastrophenschutz.html">Katastrophenschutz</a>
+            ·
+            <a href="./bbk.html">BBK</a>
+            ·
+            <a href="./bundeswehr.html">Bundeswehr</a>
+          </p>
+        </div>
+        <div class="fussnav-gruppe">
+          <p class="fussnav-titel">Rechtliches</p>
+          <p class="fussnav-links">
+            <a href="./open-source-datenschutz.html">Open Source und Datenschutz</a>
+            ·
+            <a href="./datenschutz.html">Datenschutz</a>
+            ·
+            <a href="./impressum.html">Impressum</a>
+          </p>
+        </div>
       </nav>
       <!-- FUSSNAV:END -->
       <!-- HINWEIS:START -->

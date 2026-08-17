@@ -168,37 +168,91 @@ const NAV: NavEintrag[] = [
 
 /**
  * Fußzeilen-Links: die Hauptseiten aller Bereiche, damit von jeder Seite aus
- * jede andere in höchstens zwei Klicks erreichbar ist. „Zurück zur App“ steht
- * vorn, das Rechtliche hinten.
+ * jede andere in höchstens zwei Klicks erreichbar ist. Vier Gruppen statt einer
+ * punktgetrennten Zwanzigerkette — dieselbe Gliederung, die DESIGN.md mit den
+ * „Fußzeilen-Gruppentiteln“ in der Versalzeile ohnehin vorsieht.
+ *
+ * Jeder vorhandene Link steht in genau einer Gruppe; nichts fällt weg. Die
+ * beiden Grenzfälle offen begründet: „Stärkemeldung“ ist eine Feuerwehr-Seite
+ * und steht deshalb bei den Organisationen, nicht bei den Einstiegen. „Papier
+ * oder digital?“ ist eine Entscheidungshilfe vor der ersten Nutzung und steht
+ * bei „Loslegen“, nicht beim Rechtlichen — dort stünde sie nur, weil sie sonst
+ * nirgends passt.
+ *
+ * **Trefferflächen:** Die Links bleiben innerhalb ihrer Gruppe ein
+ * punktgetrennter Textblock und damit Links im Fließtext — die
+ * WCAG-2.5.8-Ausnahme greift unverändert. Sie zu Listeneinträgen zu machen,
+ * hieße jedem der zwanzig Links 44 px zu geben; die Fußzeile wüchse auf dem
+ * Handy von 264 px auf über 880 px und wäre damit das größte Element der Seite.
+ * Die Gliederung ist der Gewinn, nicht die Listenform.
  */
-const FUSSNAV: { href: string; label: string }[] = [
-  { href: "./", label: "Zurück zur App" },
-  { href: "./uebersicht.html", label: "Alle Themen" },
-  { href: "./anleitung.html", label: "Anleitung" },
-  { href: "./vorlage.html", label: "Vorlage und Blanko-PDF" },
-  { href: "./meldekopf.html", label: "Meldekopf digital" },
-  { href: "./katastrophenschutz.html", label: "Katastrophenschutz" },
-  { href: "./thw.html", label: "THW" },
-  { href: "./feuerwehr.html", label: "Feuerwehr" },
-  { href: "./staerkemeldung-feuerwehr.html", label: "Stärkemeldung" },
-  { href: "./drk.html", label: "DRK" },
-  { href: "./johanniter.html", label: "Johanniter" },
-  { href: "./malteser.html", label: "Malteser" },
-  { href: "./asb.html", label: "ASB" },
-  { href: "./dlrg.html", label: "DLRG" },
-  { href: "./bbk.html", label: "BBK" },
-  { href: "./bundeswehr.html", label: "Bundeswehr" },
-  { href: "./papier-oder-digital.html", label: "Papier oder digital?" },
-  { href: "./open-source-datenschutz.html", label: "Open Source und Datenschutz" },
-  { href: "./datenschutz.html", label: "Datenschutz" },
-  { href: "./impressum.html", label: "Impressum" },
+interface FussGruppe {
+  titel: string;
+  links: { href: string; label: string }[];
+}
+
+const FUSSNAV: FussGruppe[] = [
+  {
+    titel: "Loslegen",
+    links: [
+      { href: "./", label: "Zurück zur App" },
+      { href: "./uebersicht.html", label: "Alle Themen" },
+      { href: "./anleitung.html", label: "Anleitung" },
+      { href: "./vorlage.html", label: "Vorlage und Blanko-PDF" },
+      { href: "./meldekopf.html", label: "Meldekopf digital" },
+      { href: "./papier-oder-digital.html", label: "Papier oder digital?" },
+    ],
+  },
+  {
+    titel: "Organisationen",
+    links: [
+      { href: "./thw.html", label: "THW" },
+      { href: "./feuerwehr.html", label: "Feuerwehr" },
+      { href: "./staerkemeldung-feuerwehr.html", label: "Stärkemeldung" },
+      { href: "./drk.html", label: "DRK" },
+      { href: "./johanniter.html", label: "Johanniter" },
+      { href: "./malteser.html", label: "Malteser" },
+      { href: "./asb.html", label: "ASB" },
+      { href: "./dlrg.html", label: "DLRG" },
+    ],
+  },
+  {
+    titel: "Behörden und Länder",
+    links: [
+      { href: "./katastrophenschutz.html", label: "Katastrophenschutz" },
+      { href: "./bbk.html", label: "BBK" },
+      { href: "./bundeswehr.html", label: "Bundeswehr" },
+    ],
+  },
+  {
+    titel: "Rechtliches",
+    links: [
+      { href: "./open-source-datenschutz.html", label: "Open Source und Datenschutz" },
+      { href: "./datenschutz.html", label: "Datenschutz" },
+      { href: "./impressum.html", label: "Impressum" },
+    ],
+  },
 ];
+
+/**
+ * Der Sammelweg auf schmalen Geräten: Was mobil nicht sichtbar bleibt, ist über
+ * diesen einen Eintrag erreichbar — er führt auf das vollständige Verzeichnis.
+ */
+const SAMMELWEG = "./uebersicht.html";
 
 function navHtml(datei: string): string {
   const links = NAV.map((e) => {
-    const klasse = e.aktivWenn(datei) ? ' class="aktiv"' : "";
-    const hauptlink = `<a href="${e.href}"${klasse}>${e.label}</a>`;
-    if (!e.unter) return hauptlink;
+    const aktiv = e.aktivWenn(datei);
+    const klasse = aktiv ? ' class="aktiv"' : "";
+    // Mobil sichtbar bleiben nur „Alle Themen“ und der Eintrag der aktuellen
+    // Rubrik; alles Übrige trägt `nur-breit` und wird unter 30rem ausgeblendet.
+    // Begründung siehe NAV_CSS.
+    const breit = aktiv || e.href === SAMMELWEG ? "" : " nur-breit";
+    if (!e.unter) {
+      // Ohne Aufklappmenü trägt der Link selbst die Klassen.
+      const klassen = `${aktiv ? "aktiv" : ""}${breit}`.trim();
+      return `<a href="${e.href}"${klassen ? ` class="${klassen}"` : ""}>${e.label}</a>`;
+    }
     const unterlinks = e.unter
       .map((u) => {
         const uKlasse = u.href === `./${datei}` ? ' class="aktiv"' : "";
@@ -206,8 +260,8 @@ function navHtml(datei: string): string {
       })
       .join("\n            ");
     const menuKlasse = e.zweispaltig ? "kopfnav-unter kopfnav-unter-breit" : "kopfnav-unter";
-    return `<span class="kopfnav-eintrag">
-          ${hauptlink}
+    return `<span class="kopfnav-eintrag${breit}">
+          <a href="${e.href}"${klasse}>${e.label}</a>
           <span class="${menuKlasse}">
             ${unterlinks}
           </span>
@@ -227,17 +281,34 @@ function navHtml(datei: string): string {
 }
 
 /**
- * Fußzeilen-Links als eine `·`-getrennte Zeile. Der Link auf die Seite selbst
- * fällt weg: Ein Verweis auf die gerade offene Seite ist für den Leser nutzlos
- * und für die interne Verlinkung wertlos.
+ * Fußzeilen-Links in vier betitelten Gruppen, innerhalb der Gruppe weiterhin
+ * `·`-getrennt. Der Link auf die Seite selbst fällt weg: Ein Verweis auf die
+ * gerade offene Seite ist für den Leser nutzlos und für die interne
+ * Verlinkung wertlos. Eine Gruppe, die dadurch leer würde, entfällt mit — ein
+ * Gruppentitel über nichts liest sich wie abgeschnittener Inhalt (dieselbe
+ * Überlegung wie die Leere-Tabelle-Regel in DESIGN.md).
  */
 function fussNavHtml(datei: string): string {
-  const links = FUSSNAV.filter((e) => e.href !== `./${datei}`)
-    .map((e) => `<a href="${e.href}">${e.label}</a>`)
-    .join("\n        ·\n        ");
+  const gruppen = FUSSNAV.map((g) => ({
+    titel: g.titel,
+    links: g.links.filter((e) => e.href !== `./${datei}`),
+  }))
+    .filter((g) => g.links.length > 0)
+    .map((g) => {
+      const links = g.links
+        .map((e) => `<a href="${e.href}">${e.label}</a>`)
+        .join("\n            ·\n            ");
+      return `<div class="fussnav-gruppe">
+          <p class="fussnav-titel">${g.titel}</p>
+          <p class="fussnav-links">
+            ${links}
+          </p>
+        </div>`;
+    })
+    .join("\n        ");
   return `<!-- FUSSNAV:START -->
       <nav class="fussnav" aria-label="Weitere Seiten">
-        ${links}
+        ${gruppen}
       </nav>
       <!-- FUSSNAV:END -->`;
 }
@@ -246,21 +317,48 @@ const NAV_CSS = `/* NAV:CSS:START */
     /* Sprunglink: sitzt außerhalb des Sichtfelds und kommt beim ersten Tabstopp
        hervor. Ohne ihn tabbt man auf jeder Seite durch Logo und acht Nav-Einträge,
        bevor der Text beginnt (WCAG 2.4.1). Nicht mit display:none oder
-       visibility:hidden verstecken — dann wäre er auch für die Tastatur weg. */
-    .sprunglink { position: absolute; left: -9999px; top: 0; z-index: 40; padding: 0.6rem 1rem; background: var(--blau); color: #fff; text-decoration: none; font-weight: 600; }
+       visibility:hidden verstecken — dann wäre er auch für die Tastatur weg.
+       Höhe aus --ziel-basis (2.75rem): mit 0.6rem Polster kam er auf 43 px und
+       verfehlte das Maß um einen Pixel. Er liegt absolut und kostet die Seite
+       dadurch keine Höhe. */
+    .sprunglink { position: absolute; left: -9999px; top: 0; z-index: 40; display: inline-flex; align-items: center; min-height: 2.75rem; padding: 0 1rem; background: var(--blau); color: #fff; text-decoration: none; font-weight: 600; }
     .sprunglink:focus { left: 0; }
     .kopfnav { background: #fff; border-bottom: 1px solid var(--rand); }
     /* Dieselbe Breite wie main: Ein 60rem breiter Kopf über einer 44rem breiten
        Textspalte setzt zwei verschiedene linke Kanten auf eine Seite, die sonst
        durchgehend linksbündig steht. */
-    .kopfnav-inner { max-width: 44rem; margin: 0 auto; padding: 0.7rem 1rem; display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 1.2rem; }
-    .kopfnav-logo { font-weight: 700; color: var(--blau); text-decoration: none; font-size: 0.95rem; margin-right: auto; }
-    .kopfnav-links { display: flex; flex-wrap: wrap; align-items: center; gap: 0.3rem 0.9rem; }
-    /* Senkrechtes Polster statt reiner Zeilenhöhe: Ohne es sind die Nav-Links
-       19,7 px hoch und verfehlen die 24 px aus WCAG 2.5.8. Die Ausnahme für
-       Links im Fließtext greift hier nicht — das ist eine Linkreihe, kein Satz.
-       (Die punktgetrennte Fußnav ist ein Textblock und fällt unter die Ausnahme.) */
-    .kopfnav-links a { display: inline-block; padding: 0.28rem 0; color: #5c6478; text-decoration: none; font-size: 0.82rem; white-space: nowrap; }
+    /* Ohne senkrechtes Polster: Die Höhe der Leiste kommt jetzt aus den
+       Trefferflächen ihrer Bedienelemente (2.75rem je Zeile) statt aus Polster
+       plus Zeilenhöhe. Sonst käme das Maß oben drauf und die Leiste wüchse. */
+    .kopfnav-inner { max-width: 44rem; margin: 0 auto; padding: 0 1rem; display: flex; flex-wrap: wrap; align-items: center; gap: 0 1.2rem; }
+    /* Grad aus der Leiter (--t-s), nicht 0.95rem: content-stil.mts zieht jeden
+       Zwischenwert ohnehin auf die nächste tragende Stufe. Stünde hier der
+       Zwischenwert, machte ein Lauf dieses Skripts die Angleichung wieder
+       rückgängig — die Generatoren müssen in beliebiger Reihenfolge laufen.
+       Höhe aus dem Maß statt aus der Zeilenhöhe: siehe .kopfnav-links a. */
+    .kopfnav-logo { display: inline-flex; align-items: center; min-height: 2.75rem; font-weight: 700; color: var(--blau); text-decoration: none; font-size: 0.875rem; margin-right: auto; }
+    .kopfnav-links { display: flex; flex-wrap: wrap; align-items: center; gap: 0 0.9rem; }
+    /* Trefferfläche aus dem Maß statt aus Polster plus Zeilenhöhe: --ziel-basis
+       ist 2.75rem = 44 px (DESIGN.md). Mit 0.28rem Polster kam der Eintrag auf
+       29 px — über den 24 px aus WCAG 2.5.8, aber unter dem produkteigenen Maß,
+       und der Wert entstand zufällig aus Schriftgrad und Polster. min-height
+       plus inline-flex hält ihn unabhängig davon.
+       (Die punktgetrennte Fußnav bleibt ein Textblock und fällt unter die
+       WCAG-Ausnahme für Links im Fließtext — sie wird nicht angefasst.)
+       Grad aus der Leiter (--t-xs = 0.8125rem), siehe .kopfnav-logo. */
+    .kopfnav-links a { display: inline-flex; align-items: center; min-height: 2.75rem; padding: 0; color: #5c6478; text-decoration: none; font-size: 0.8125rem; white-space: nowrap; }
+    /* Der Konflikt zwischen Trefferfläche und Kopfhöhe, offen ausgetragen:
+       Auf 375 px bricht die Linkreihe auf zwei Zeilen um. Drei Zeilen à 44 px
+       (Logo plus zwei Linkzeilen) ergäben 132 px Kopf — 16 % des Sichtfelds,
+       statt der gemessenen 116 px. Deshalb behalten die Einträge dort 2rem
+       (32 px): über den 24 px der WCAG-Vorgabe, unter dem Produktmaß. Gemessen
+       auf 375 px steht die Leiste damit bei 109 px statt der bisherigen 116 —
+       das gestrichene senkrechte Polster von .kopfnav-inner zahlt die höheren
+       Ziele mehr als aus. Das eigentliche Problem sind nicht die Zeilenhöhen,
+       sondern die Zahl der Zeilen; die gehört in einen eigenen Schritt. */
+    @media (max-width: 30rem) {
+      .kopfnav-links a { min-height: 2rem; }
+    }
     .kopfnav-links a:hover { color: var(--blau-hell); text-decoration: underline; }
     .kopfnav-links a.aktiv { color: var(--blau); font-weight: 600; }
     .kopfnav-eintrag { position: relative; display: inline-flex; }
@@ -269,7 +367,9 @@ const NAV_CSS = `/* NAV:CSS:START */
        Flach-im-Stand-Regel ihn zu — im Wert des dokumentierten Dropdown-Schattens. */
     .kopfnav-unter { position: absolute; top: 100%; left: -0.6rem; z-index: 30; display: none; grid-template-columns: 1fr; gap: 0.05rem; margin-top: 0.55rem; padding: 0.4rem; background: #fff; border: 1px solid var(--rand); border-radius: 0; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); }
     .kopfnav-unter-breit { grid-template-columns: 1fr 1fr; }
-    .kopfnav-unter a { display: block; padding: 0.35rem 0.6rem; border-radius: 0; }
+    /* Auch die Menüeinträge sind Bedienelemente und bekommen das Maß. Das Menü
+       liegt absolut über dem Inhalt — die Höhe kostet die Leiste nichts. */
+    .kopfnav-unter a { display: flex; align-items: center; min-height: 2.75rem; padding: 0 0.6rem; border-radius: 0; }
     .kopfnav-unter a:hover { background: var(--grau); text-decoration: none; }
     /* Der unsichtbare Streifen überbrückt den Abstand zwischen Eintrag und
        Menü — ohne ihn klappt das Menü beim Hinüberfahren wieder zu. */
@@ -281,8 +381,41 @@ const NAV_CSS = `/* NAV:CSS:START */
     @media (hover: hover) and (pointer: fine) {
       .kopfnav-eintrag:hover .kopfnav-unter { display: grid; }
     }
-    .fussnav { display: inline; }
-    .fussnav a { white-space: nowrap; }
+    /* Fußzeile in vier Gruppen statt einer punktgetrennten Zwanzigerkette. Die
+       Gruppentitel stehen in der Versalzeile aus DESIGN.md (Mono, 700,
+       0.8125rem, ls 0.1em, uppercase, --text-2) — dieselbe
+       Meldevordruck-Anmutung wie die Spaltenköpfe in der App.
+       Die Links bleiben innerhalb der Gruppe ein Textblock und damit Links im
+       Fließtext: Die WCAG-2.5.8-Ausnahme greift weiter. Als Listenpunkte
+       bräuchte jeder der zwanzig 44 px, und die Fußzeile wüchse auf dem Handy
+       von 264 px auf über 880 px.
+       auto-fit ab 9rem: am Breitbild vier Spalten nebeneinander, auf 375 px
+       zwei. Gemessen auf 375 px: einspaltig wäre die Fußnavigation 350 px hoch,
+       zweispaltig 291 px. Enger als 9rem bringt nichts mehr — die Spalten sind
+       dann schmaler als die längsten Beschriftungen, und was an Spaltenzahl
+       gewonnen wird, geht an Zeilenumbrüchen wieder verloren. */
+    .fussnav { display: grid; grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr)); gap: 1.2rem 1.5rem; }
+    .fussnav-titel { margin: 0 0 0.2rem; font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace; font-weight: 700; font-size: 0.8125rem; letter-spacing: 0.1em; text-transform: uppercase; color: #5c6478; }
+    .fussnav-links { margin: 0; line-height: 1.8; }
+    /* Weniger Entscheidungen auf 375 px, ohne Skript und ohne verlorene Rubrik.
+       Sieben Einträge plus Logo passen dort nicht in eine Reihe; die Leiste
+       brach deshalb auf drei Zeilen um (Logo plus zwei Linkzeilen, 109 px).
+       Ein Hamburger-Menü schied aus — die Aufklappmenüs sind auf Touch bewusst
+       abgeschaltet (siehe unten), und ein Umschalter bräuchte JavaScript, das
+       diese Seiten nicht haben dürfen.
+       Also bleibt mobil sichtbar, was der Leser dort wirklich braucht: „Alle
+       Themen“ als Sammelweg auf das vollständige Verzeichnis und der Eintrag
+       der Rubrik, in der er gerade steht. Die übrigen tragen "nur-breit". Sie
+       bleiben im Markup (Suchmaschinen sehen sie, die Fußzeile führt sie in
+       ihren vier Gruppen), sind aber nicht mehr Teil der Entscheidung, die
+       oben auf dem Bildschirm getroffen werden muss.
+       Der Selektor nennt beide Klassen, weil ".kopfnav-eintrag" weiter oben
+       "display: inline-flex" setzt: Mit ".nur-breit" allein stünde Gleichstand
+       bei der Spezifität und die spätere Regel entschiede — eine Abhängigkeit
+       von der Reihenfolge, die kein Leser dieses Blocks erwartet. */
+    @media (max-width: 30rem) {
+      .kopfnav-links .nur-breit { display: none; }
+    }
     /* NAV:CSS:END */`;
 
 /**
