@@ -31,6 +31,16 @@
     figure { margin: 1.2rem 0; }
     figure img { display: block; width: 100%; height: auto; border: 1px solid var(--rand); background: #fff; }
     figure.foto img { height: 260px; object-fit: cover; }
+    figure.foto { clear: both; }
+    h2 { clear: both; }
+    figure.flagge { float: right; width: 8rem; margin: 0.6rem 0 0.8rem 1.5rem; text-align: center; }
+    figure.flagge img { width: 7rem; height: auto; margin: 0 auto; }
+    figure.flagge figcaption { font-size: 0.72rem; line-height: 1.35; }
+    @media (max-width: 34rem) {
+      figure.flagge { float: none; width: auto; margin: 0.8rem 0 1.2rem; text-align: left; }
+      figure.flagge img { margin: 0; }
+      figure.flagge figcaption { font-size: 0.8rem; }
+    }
     figcaption { font-size: 0.85rem; color: #5c6478; margin-top: 0.4rem; }
     footer { margin-top: 2.5rem; padding-top: 1rem; border-top: 1px solid var(--rand); font-size: 0.85rem; color: #5c6478; }
 /* KARTE:CSS:START */
@@ -160,6 +170,15 @@
 
   <main id="inhalt">
     <h1>Einheiten-Erfassungsbogen für den Katastrophenschutz Brandenburg</h1>
+
+    <figure class="flagge">
+      <img src="./bilder/flagge-brandenburg.svg" width="112" height="67" fetchpriority="high" decoding="async"
+        alt="Landesflagge Brandenburgs: rot-weiß gestreift mit rotem Adler.">
+      <figcaption>
+        Landesflagge Brandenburgs. Quelle:
+        <a href="https://commons.wikimedia.org/wiki/File:Flag_of_Brandenburg.svg">Wikimedia Commons</a> (gemeinfrei).
+      </figcaption>
+    </figure>
 
     <p>
       Die <a href="https://bravors.brandenburg.de/verordnungen/katsv">Brandenburgische Katastrophenschutzverordnung (KatSV)</a> regelt die
