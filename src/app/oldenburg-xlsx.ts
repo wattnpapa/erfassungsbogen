@@ -134,6 +134,15 @@ const STIL_DATUM = 29;
 /** Stilnummer für Zellen mit Zeilenumbruch (Fahrzeugliste). */
 const STIL_UMBRUCH = 30;
 
+/**
+ * Breite der Datumsspalten. „14.05.2026 08:30" braucht rund 16 Zeichen; in der
+ * schmalen Standardbreite zeigt Excel stattdessen „########", und genau das
+ * landet dann auch in der Zwischenablage.
+ */
+const BREITE_DATUM = 16.5;
+/** „Aufträge" etwas breiter — die einzige Breite, die die Vorlage selbst setzt. */
+const BREITE_AUFTRAEGE = 11.6640625;
+
 // -------------------------------------------------------------------- Spalten
 
 interface SpaltenSpec {
@@ -149,10 +158,12 @@ interface SpaltenSpec {
   datenStil?: number;
   /** Zeile 1 trägt die SUBTOTAL-Summe dieser Spalte. */
   summe?: boolean;
+  /** Spaltenbreite in Zeichen; fehlt = Standardbreite der Vorlage. */
+  breite?: number;
 }
 
 /**
- * Die 38 Spalten A…AL der Vorlage in genau ihrer Reihenfolge. Die Stilnummern
+ * Die 37 Spalten A…AK der Vorlage in genau ihrer Reihenfolge. Die Stilnummern
  * stammen aus der Vorlagendatei (Zelle für Zelle abgelesen) — sie tragen die
  * Farbblöcke, mit denen die Führungsstelle die Bereiche der Liste unterscheidet.
  */
@@ -166,18 +177,18 @@ const SPALTEN: SpaltenSpec[] = [
   { id: "gruppe", kopf: "Gruppe", kopfStil: 5, leisteStil: 4 },
   { id: "person", kopf: "Person", kopfStil: 5, leisteStil: 4 },
   { id: "geraete", kopf: "Geräte / Fahrzeuge", kopfStil: 19, leisteStil: 6, datenStil: STIL_UMBRUCH },
-  { id: "auftraege", kopf: "Aufträge", kopfStil: 20, leisteStil: 7 },
+  { id: "auftraege", kopf: "Aufträge", kopfStil: 20, leisteStil: 7, breite: BREITE_AUFTRAEGE },
   { id: "erreichbarkeit", kopf: "Erreichbar_\nkeit", kopfStil: 21, leisteStil: 8, leiste: "(Funk / Tel. / eMail)" },
-  { id: "verfuegbarBis", kopf: "Verfügbar\n bis", kopfStil: 22, leisteStil: 8, leiste: "(Dat. / Zeit)", datenStil: STIL_DATUM },
-  { id: "abloesung", kopf: "Ablösung angefordert", kopfStil: 22, leisteStil: 8, leiste: "(Dat. / Zeit)", datenStil: STIL_DATUM },
+  { id: "verfuegbarBis", kopf: "Verfügbar\n bis", kopfStil: 22, leisteStil: 8, leiste: "(Dat. / Zeit)", datenStil: STIL_DATUM, breite: BREITE_DATUM },
+  { id: "abloesung", kopf: "Ablösung angefordert", kopfStil: 22, leisteStil: 8, leiste: "(Dat. / Zeit)", datenStil: STIL_DATUM, breite: BREITE_DATUM },
   { id: "anforderungsId", kopf: "Anforderungs \n- ID", kopfStil: 21, leisteStil: 8 },
-  { id: "zugesagtFuer", kopf: "Zugesagt \nfür", kopfStil: 22, leisteStil: 8, leiste: "(Dat. / Zeit)", datenStil: STIL_DATUM },
+  { id: "zugesagtFuer", kopf: "Zugesagt \nfür", kopfStil: 22, leisteStil: 8, leiste: "(Dat. / Zeit)", datenStil: STIL_DATUM, breite: BREITE_DATUM },
   { id: "zugesagtVon", kopf: "Zugesagt \nvon", kopfStil: 21, leisteStil: 8, leiste: "(Org.)" },
   { id: "vorgeseheneEinheit", kopf: "Vorgesehene Einheit", kopfStil: 21, leisteStil: 8 },
   { id: "vorgesehenerAuftrag", kopf: "Vorgesehener Auftrag", kopfStil: 21, leisteStil: 8 },
-  { id: "eingetroffen", kopf: "eingetr. / zugew.", kopfStil: 22, leisteStil: 8, leiste: "(Dat. / Zeit)", datenStil: STIL_DATUM },
-  { id: "einsatzende", kopf: "Einsatz-\nende", kopfStil: 22, leisteStil: 8, leiste: "(Dat. / Zeit)", datenStil: STIL_DATUM },
-  { id: "rueckfuehrung", kopf: "Rück-\nführung", kopfStil: 22, leisteStil: 8, leiste: "(Dat. / Zeit)", datenStil: STIL_DATUM },
+  { id: "eingetroffen", kopf: "eingetr. / zugew.", kopfStil: 22, leisteStil: 8, leiste: "(Dat. / Zeit)", datenStil: STIL_DATUM, breite: BREITE_DATUM },
+  { id: "einsatzende", kopf: "Einsatz-\nende", kopfStil: 22, leisteStil: 8, leiste: "(Dat. / Zeit)", datenStil: STIL_DATUM, breite: BREITE_DATUM },
+  { id: "rueckfuehrung", kopf: "Rück-\nführung", kopfStil: 22, leisteStil: 8, leiste: "(Dat. / Zeit)", datenStil: STIL_DATUM, breite: BREITE_DATUM },
   { id: "bemerkung", kopf: "Bemerkung", kopfStil: 21, leisteStil: 8 },
   { id: "reserve1", kopf: "Reserve", kopfStil: 21, leisteStil: 9 },
   { id: "reserve2", kopf: "Reserve", kopfStil: 21, leisteStil: 9 },
@@ -194,7 +205,6 @@ const SPALTEN: SpaltenSpec[] = [
   { id: "fuehrer", kopf: "Fü", kopfStil: 5, leisteStil: 14, summe: true },
   { id: "unterfuehrer", kopf: "Ufü", kopfStil: 5, leisteStil: 14, summe: true },
   { id: "helfer", kopf: "He", kopfStil: 5, leisteStil: 15, summe: true },
-  { id: "gesamt", kopf: "Gesamt", kopfStil: 23, leisteStil: 15, summe: true },
 ];
 
 /** Eine Datenzeile: Werte je Spalten-`id`; fehlende Schlüssel bleiben leer. */
@@ -325,7 +335,6 @@ function zeileFuer(b: Erfassungsbogen, k: Kontext): Zeile {
     fuehrer: st.fuehrer,
     unterfuehrer: st.unterfuehrer,
     helfer: st.mannschaft,
-    gesamt: st.gesamt,
   };
 }
 
@@ -368,6 +377,14 @@ function datenZeile(z: Zeile, nr: number): string {
   return zeileXml(nr, zellen);
 }
 
+/** `<cols>` für alle Spalten, die eine eigene Breite mitbringen. */
+function spaltenBreitenXml(): string {
+  const cols = SPALTEN.map((sp, i) =>
+    sp.breite == null ? "" : `<col min="${i + 1}" max="${i + 1}" width="${sp.breite}" customWidth="1"/>`,
+  ).join("");
+  return `<cols>${cols}</cols>`;
+}
+
 function blattBauen(zeilen: Zeile[]): Uint8Array<ArrayBuffer> {
   const letzteZeile = Math.max(ERSTE_DATENZEILE, ERSTE_DATENZEILE + zeilen.length - 1);
   return mappeBauen(
@@ -375,8 +392,7 @@ function blattBauen(zeilen: Zeile[]): Uint8Array<ArrayBuffer> {
       name: "Tabelle1",
       zeilen: [leisteZeile(letzteZeile), kopfZeile(), ...zeilen.map((z, i) => datenZeile(z, ERSTE_DATENZEILE + i))],
       bereich: `A1:${spaltenName(SPALTEN.length - 1)}${letzteZeile}`,
-      // Einzige Spaltenbreite der Vorlage: „Aufträge" etwas breiter.
-      spalten: '<cols><col min="10" max="10" width="11.6640625" customWidth="1"/></cols>',
+      spalten: spaltenBreitenXml(),
       verbund: ["A1:C1"],
     },
     STILE,

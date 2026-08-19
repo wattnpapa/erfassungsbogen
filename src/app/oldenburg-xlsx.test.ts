@@ -181,16 +181,17 @@ function wert(blattXml: string, zeilenNr: number, kopf: string): string | undefi
 // ------------------------------------------------------------------- Tests
 
 describe("Oldenburg-XLSX: Aufbau", () => {
-  it("hat die 38 Spalten der Vorlage in ihrer Reihenfolge", () => {
+  it("hat die 37 Spalten der Vorlage in ihrer Reihenfolge", () => {
     const b = blatt(bogenOldenburgXlsx(bogen()));
     expect(zelle(b, "A2")).toBe("FüSt.");
     expect(zelle(b, "B2")).toBe("Bezeichnung");
     expect(zelle(b, "C2")).toBe("Organisation");
     expect(zelle(b, "D2")).toBe("Herkunft");
     expect(zelle(b, "AA2")).toBe("ID Einheiten-Erfassungsbogen");
-    expect(zelle(b, "AL2")).toBe("Gesamt");
-    // Dahinter ist Schluss — eine 39. Spalte würde die fremde Liste verschieben.
-    expect(zelle(b, "AM2")).toBeUndefined();
+    expect(zelle(b, "AK2")).toBe("He");
+    // Dahinter ist Schluss: die Gesamtspalte der Vorlage entfällt, weil sie nur
+    // Fü + Ufü + He wiederholt.
+    expect(zelle(b, "AL2")).toBeUndefined();
   });
 
   it("trägt die Hinweisleiste und die SUBTOTAL-Summen in Zeile 1", () => {
@@ -199,7 +200,7 @@ describe("Oldenburg-XLSX: Aufbau", () => {
     expect(zelle(b, "L1")).toBe("(Dat. / Zeit)");
     expect(zelle(b, "P1")).toBe("(Org.)");
     // Eine Datenzeile → Bereich endet auf Zeile 3.
-    expect(zelle(b, "AL1")).toBe("=SUBTOTAL(9,AL3:AL3)");
+    expect(zelle(b, "AK1")).toBe("=SUBTOTAL(9,AK3:AK3)");
   });
 
   it("weitet den Summenbereich auf alle Datenzeilen aus", () => {
@@ -217,6 +218,14 @@ describe("Oldenburg-XLSX: Aufbau", () => {
     // Leerer Bereich: die Summe darf nicht auf „AB3:AB2" zeigen.
     expect(zelle(b, "AB1")).toBe("=SUBTOTAL(9,AB3:AB3)");
     expect(zelle(b, "A3")).toBeUndefined();
+  });
+
+  it("gibt den Datumsspalten Breite, damit dort kein „########\" steht", () => {
+    const b = blatt(bogenOldenburgXlsx(bogen()));
+    // L, M, O, S, T, U sind die Spalten mit „(Dat. / Zeit)".
+    for (const spalte of [12, 13, 15, 19, 20, 21]) {
+      expect(b).toContain(`<col min="${spalte}" max="${spalte}" width="16.5" customWidth="1"/>`);
+    }
   });
 
   it("verbindet A1:C1 wie die Vorlage", () => {
@@ -270,7 +279,7 @@ describe("Oldenburg-XLSX: Werte", () => {
     const b = blatt(bogenOldenburgXlsx(bogen()));
     expect(wert(b, 1, "Fü")).toBe("1");
     expect(wert(b, 1, "He")).toBe("2");
-    expect(wert(b, 1, "Gesamt")).toBe("3");
+    expect(wert(b, 1, "Ufü")).toBe("0");
     expect(wert(b, 1, "Weibl.")).toBe("1");
     expect(wert(b, 1, "Div.")).toBe("1");
     expect(wert(b, 1, "Vegan.")).toBe("1");
