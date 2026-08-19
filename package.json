@@ -54,7 +54,8 @@
     "bilder-webp": "node --import tsx scripts/bilder-webp.mts",
     "content-stil": "node --import tsx scripts/content-stil.mts",
     "content-handlung": "node --import tsx scripts/content-handlung.mts",
-    "content-offenlegung": "node --import tsx scripts/content-offenlegung.mts"
+    "content-offenlegung": "node --import tsx scripts/content-offenlegung.mts",
+    "content-faq": "node --import tsx scripts/content-faq.mts"
   },
   "keywords": [],
   "author": {

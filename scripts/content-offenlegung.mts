@@ -17,6 +17,12 @@
  *    Bogen darf nichts verschlucken. Sie deckt beide Bauweisen der Browser ab:
  *    die alte über `details > *` und die neue über `::details-content`.
  *
+ *    **Sprungziele:** Jeder Aufklapper trägt eine `id` — die von
+ *    `content-faq.mts` gesetzte, wo eine steht, sonst eine aus der Frage
+ *    abgeleitete. Damit ein geteilter Link auf eine einzelne Frage etwas nützt,
+ *    öffnen dieselben zwei Schreibweisen den Block auch bei `:target`; ohne
+ *    CSS-Unterstützung bleibt er zugeklappt und ein Klick öffnet ihn.
+ *
  * 2. **Sprungmenü auf anleitung.html** — Die Seite ist der Nachschlage-Ort und
  *    soll sich wie einer verhalten. Direkt unter der `h1` steht jetzt ein
  *    Inhaltsverzeichnis aus den vorhandenen `h2`; die Sprungziele entstehen als
@@ -73,10 +79,17 @@ const FAQ_MUSTER =
  * Muster, damit der zweite Lauf denselben Stoff liest wie der erste und
  * dasselbe Ergebnis schreibt.
  *
- * Group 1 ist der Einzug der Zeile, Group 2 die Frage, Group 3 die Antwort.
+ * Group 1 ist der Einzug der Zeile, Group 2 sind die Attribute eines bereits
+ * vorhandenen `<details>`, Group 3 die Frage, Group 4 die Antwort.
+ *
+ * Group 2 ist nicht kosmetisch: `content-faq.mts` schreibt dort das Sprungziel
+ * der Frage (`id="frage-…"`). Stünde im Muster weiter nur `(?: open)?`,
+ * verfehlte es jedes `<details>` mit Kennung — und das Paar würde ein zweites
+ * Mal eingewickelt, mit verschachtelten Aufklappern und verlorenem Sprungziel
+ * als Ergebnis.
  */
 const PAAR_MUSTER =
-  /([ \t]*)(?:<details class="frage"(?: open)?>\s*<summary>\s*)?<h3[^>]*>([\s\S]*?)<\/h3>(?:\s*<\/summary>)?\s*(<p[\s\S]*?<\/p>)(?:\s*<\/details>)?/g;
+  /([ \t]*)(?:<details class="frage"([^>]*)>\s*<summary>\s*)?<h3[^>]*>([\s\S]*?)<\/h3>(?:\s*<\/summary>)?\s*(<p[\s\S]*?<\/p>)(?:\s*<\/details>)?/g;
 
 /**
  * Fortsetzungszeilen der Antwort auf den Einzug im Aufklappblock legen. Die
@@ -100,11 +113,16 @@ function faqUmbauen(html: string): { html: string; anzahl: number } {
     let nummer = 0;
     const umgebaut = rumpf.replace(
       PAAR_MUSTER,
-      (_treffer, zeileneinzug: string, frage: string, antwort: string) => {
+      (_treffer, zeileneinzug: string, attribute: string | undefined, frage: string, antwort: string) => {
         const ein = zeileneinzug || einzug;
         const offen = nummer++ === 0 ? " open" : "";
+        // Ein vorhandenes Sprungziel bleibt, was es ist — es steht in geteilten
+        // Links. Nur wo noch keines ist (ein Aufklapper, den ein anderer
+        // Generator als nacktes h3/p-Paar hinterlässt), wird eines aus der
+        // Frage abgeleitet.
+        const id = attribute?.match(/\bid="([^"]+)"/)?.[1] ?? `frage-${kennung(reintext(frage))}`;
         return (
-          `${ein}<details class="frage"${offen}>\n` +
+          `${ein}<details class="frage" id="${id}"${offen}>\n` +
           `${ein}  <summary><h3>${frage.trim()}</h3></summary>\n` +
           `${ein}  ${einruecken(antwort, `${ein}  `)}\n` +
           `${ein}</details>`
@@ -170,7 +188,12 @@ function sprungmenueSetzen(html: string): { html: string; anzahl: number } {
   let neu = html.replace(/<h2\b([^>]*)>([\s\S]*?)<\/h2>/g, (ganz, attr: string, inhalt: string, index: number) => {
     if (index < hauptteil.index! || imBlock(index)) return ganz;
     const text = reintext(inhalt);
-    const id = kennung(text);
+    // Eine vorhandene Kennung gilt. `content-faq.mts` setzt an der
+    // FAQ-Überschrift `id="haeufige-fragen"` — ein Sprungziel, das geteilt wird
+    // und deshalb den Wortlaut überleben muss. Aus dem Text neu abgeleitet
+    // wanderte es mit jeder Umformulierung mit, und die beiden Generatoren
+    // schrieben sich abwechselnd um, statt zu konvergieren.
+    const id = attr.match(/\bid="([^"]+)"/)?.[1] ?? kennung(text);
     if (!id) return ganz;
     eintraege.push({ id, text });
     const ohneId = attr.replace(/\s*\bid="[^"]*"/, "");
@@ -288,9 +311,30 @@ const CSS = `/* OFFENLEGUNG:CSS:START */
        außerhalb der Textkante sitzt und die Zeile gegen die Überschriften
        darüber verschiebt. */
     .frage, .aufklapp { border-top: 1px solid var(--rand); }
+    /* Abschlusskante. Der Stapel trug nur Oberkanten und franste unten in die
+       Handlungsaufforderung aus — in einer Optik, die von geschlossenen Kästen
+       lebt, ein sichtbarer Bruch. Die Unterkante hängt am **Stapel**, nicht am
+       letzten Element der Seite: :has(~ .frage) fragt, ob unter demselben
+       Elternteil noch ein Aufklapper folgt. .frage:last-of-type hätte
+       dasselbe geleistet, solange die letzte Frage auch das letzte <details>
+       der Seite ist — steht dort eines Tages hinter dem Abschlussknopf noch
+       eines (der Länderblock stand schon einmal dort), rutschte die Kante
+       wortlos dorthin. Ohne :has()-Unterstützung fehlt sie; mehr passiert
+       nicht. */
+    .frage:not(:has(~ .frage)), .aufklapp:not(:has(~ .aufklapp)) { border-bottom: 1px solid var(--rand); }
     .frage > summary, .aufklapp > summary { display: flex; align-items: center; gap: 0.6rem; min-height: 2.75rem; cursor: pointer; list-style: none; font-weight: 600; }
     .frage > summary::-webkit-details-marker, .aufklapp > summary::-webkit-details-marker { display: none; }
-    .frage > summary::before, .aufklapp > summary::before { content: "+"; flex: none; width: 1rem; text-align: center; font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace; font-weight: 700; color: var(--blau); }
+    /* Das Vorzeichen steht im Zweittext-Ton (#5c6478 — DESIGN.md führt ihn als
+       --text-2; die Content-Seiten tragen den Wert wörtlich, ein Token dafür
+       haben sie nicht), nicht in der Kennfarbe. Die Kennfarben-Regel gibt das
+       Blau dem Kopfbalken und der primären Aktion; drei bis sechs blaue
+       Pluszeichen je Seite nahmen dem einen Knopf, auf den es ankommt (.start
+       im Abschlussblock), genau die Signalwirkung, für die er die Farbe trägt.
+       Sichtbar bleibt es: gemessen auf dem Seitengrund (#f2f3f7) 5,34:1 — über
+       den 4,5:1 aus WCAG 1.4.3 und weit über den 3:1 für Bedienteile. Der
+       Fokusring darunter bleibt blau: Er zeigt einen Zustand an und ist keine
+       Dekoration. */
+    .frage > summary::before, .aufklapp > summary::before { content: "+"; flex: none; width: 1rem; text-align: center; font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace; font-weight: 700; color: #5c6478; }
     .frage[open] > summary::before, .aufklapp[open] > summary::before { content: "−"; }
     .frage > summary:focus-visible, .aufklapp > summary:focus-visible { outline: 3px solid var(--blau); outline-offset: 2px; }
     /* Die Frage bleibt eine h3 (im summary erlaubt) — Gliederung und JSON-LD
@@ -298,6 +342,21 @@ const CSS = `/* OFFENLEGUNG:CSS:START */
        sie unter das Vorzeichen. */
     .frage > summary h3 { display: inline; margin: 0; padding: 0; border: 0; }
     .frage > p, .aufklapp > .tabellenrahmen, .aufklapp > .tabelle { margin-top: 0; margin-bottom: 1rem; }
+    /* Sprungziel. Ein Link auf eine einzelne Frage ist das, was im Ehrenamt
+       tatsächlich weitergereicht wird („guck mal, wo die Daten bleiben") — und
+       er taugt nur, wenn die Frage aufgeklappt ankommt. Von selbst öffnet sich
+       ein <details> beim Anker-Treffer nicht, und ein Skript gibt es auf diesen
+       Seiten nicht (dieselbe Prämisse wie bei der Landkarte: offline, ohne
+       Skript, im Ausdruck). Also derselbe Kniff wie beim Drucken, in beiden
+       Schreibweisen: die ältere über den Kindselektor, die neuere über
+       ::details-content. Wo beides nicht greift, bleibt die Frage zugeklappt —
+       sichtbar ist sie trotzdem, und ein Klick öffnet sie. Kaputt ist nichts.
+       Das Vorzeichen zeigt „−", damit der Zustand nicht lügt; scroll-margin
+       hält die Zeile vom oberen Fensterrand frei. */
+    .frage:target, [id]:target { scroll-margin-top: 1rem; }
+    .frage:target > *:not(summary) { display: block; }
+    .frage:target::details-content { content-visibility: visible; display: block; }
+    .frage:target:not([open]) > summary::before { content: "−"; }
     /* Ausdruck: Ein ausgedruckter Bogen darf nichts verschlucken. Zwei
        Schreibweisen, weil die Browser das Element unterschiedlich bauen — die
        ältere über den Kindselektor, die neuere über ::details-content. */

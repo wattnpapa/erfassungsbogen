@@ -14,6 +14,11 @@
  *   App als `--text-2` (Zweittext) führt. Beide bestehen den Kontrast auf dem
  *   Seitengrund; der Gewinn ist, dass es künftig einen Wert gibt statt drei.
  *   Ebenso #1a1c22 als Fließtextfarbe: das ist `--text` (#11141b) der App.
+ * - **Deckzeilen-Regel:** Ein Kasten, der sich abheben soll, bekommt die schwere
+ *   4-px-Oberkante des gedruckten Formularabschnitts — nie einen farbigen
+ *   Streifen an der linken Flanke. Der Seitenstreifen ist die Handschrift der
+ *   Consumer-Oberflächen, die Deckzeile die des Vordrucks; sie steht in
+ *   `--text`, weil die Kennfarbe dem Kopfbalken und der primären Aktion gehört.
  * - **Gewichts-Regel:** Überschriften tragen Gewicht und Größe, nie Farbe. h1
  *   und h2 standen in der Kennfarbe und h2 zusätzlich auf einer 2-px-Linie in
  *   der Kennfarbe — damit war das Blau auf jeder Seite dutzendfach vergeben und
@@ -89,6 +94,21 @@ const REGELN: Regel[] = [
     // Nur im <style>-Block relevant; im Markup kommt border-radius nicht vor.
     suchen: /border-radius:\s*(?!0\b)[0-9.]+(?:px|rem|em)/g,
     ersetzen: "border-radius: 0",
+  },
+  {
+    // Deckzeilen-Regel (DESIGN.md). Betroffen waren fünf Hinweiskästen: die
+    // Beispielmeldung auf staerkemeldung-feuerwehr.html und die `.hinweis`-
+    // Kästen der drei Fachgruppen-Seiten und von open-source-datenschutz.html.
+    // Alle trugen den Streifen an der linken Flanke — und dazu die Kennfarbe,
+    // die damit ein zweites Mal neben dem Knopf stand.
+    //
+    // Die Schwelle liegt bei 2 px: Ein 1-px-Rand links ist ein Kastenrand, ab
+    // 2 px ist es ein Streifen. Die Zielbreite ist immer 4 px, das ist das Maß
+    // der Oberkante im Vordruck (`--kopf-kante`), nicht der halbierte
+    // Ausgangswert.
+    name: "Deckzeile statt Seitenstreifen",
+    suchen: /border-left:\s*(?:[2-9]|[1-9]\d)px solid var\(--(?:blau|blau-hell|akzent)\)/g,
+    ersetzen: "border-top: 4px solid var(--text)",
   },
   {
     name: "Zweittext statt #555",

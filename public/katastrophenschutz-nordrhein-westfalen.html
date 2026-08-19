@@ -215,9 +215,30 @@
        außerhalb der Textkante sitzt und die Zeile gegen die Überschriften
        darüber verschiebt. */
     .frage, .aufklapp { border-top: 1px solid var(--rand); }
+    /* Abschlusskante. Der Stapel trug nur Oberkanten und franste unten in die
+       Handlungsaufforderung aus — in einer Optik, die von geschlossenen Kästen
+       lebt, ein sichtbarer Bruch. Die Unterkante hängt am **Stapel**, nicht am
+       letzten Element der Seite: :has(~ .frage) fragt, ob unter demselben
+       Elternteil noch ein Aufklapper folgt. .frage:last-of-type hätte
+       dasselbe geleistet, solange die letzte Frage auch das letzte <details>
+       der Seite ist — steht dort eines Tages hinter dem Abschlussknopf noch
+       eines (der Länderblock stand schon einmal dort), rutschte die Kante
+       wortlos dorthin. Ohne :has()-Unterstützung fehlt sie; mehr passiert
+       nicht. */
+    .frage:not(:has(~ .frage)), .aufklapp:not(:has(~ .aufklapp)) { border-bottom: 1px solid var(--rand); }
     .frage > summary, .aufklapp > summary { display: flex; align-items: center; gap: 0.6rem; min-height: 2.75rem; cursor: pointer; list-style: none; font-weight: 600; }
     .frage > summary::-webkit-details-marker, .aufklapp > summary::-webkit-details-marker { display: none; }
-    .frage > summary::before, .aufklapp > summary::before { content: "+"; flex: none; width: 1rem; text-align: center; font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace; font-weight: 700; color: var(--blau); }
+    /* Das Vorzeichen steht im Zweittext-Ton (#5c6478 — DESIGN.md führt ihn als
+       --text-2; die Content-Seiten tragen den Wert wörtlich, ein Token dafür
+       haben sie nicht), nicht in der Kennfarbe. Die Kennfarben-Regel gibt das
+       Blau dem Kopfbalken und der primären Aktion; drei bis sechs blaue
+       Pluszeichen je Seite nahmen dem einen Knopf, auf den es ankommt (.start
+       im Abschlussblock), genau die Signalwirkung, für die er die Farbe trägt.
+       Sichtbar bleibt es: gemessen auf dem Seitengrund (#f2f3f7) 5,34:1 — über
+       den 4,5:1 aus WCAG 1.4.3 und weit über den 3:1 für Bedienteile. Der
+       Fokusring darunter bleibt blau: Er zeigt einen Zustand an und ist keine
+       Dekoration. */
+    .frage > summary::before, .aufklapp > summary::before { content: "+"; flex: none; width: 1rem; text-align: center; font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace; font-weight: 700; color: #5c6478; }
     .frage[open] > summary::before, .aufklapp[open] > summary::before { content: "−"; }
     .frage > summary:focus-visible, .aufklapp > summary:focus-visible { outline: 3px solid var(--blau); outline-offset: 2px; }
     /* Die Frage bleibt eine h3 (im summary erlaubt) — Gliederung und JSON-LD
@@ -225,6 +246,21 @@
        sie unter das Vorzeichen. */
     .frage > summary h3 { display: inline; margin: 0; padding: 0; border: 0; }
     .frage > p, .aufklapp > .tabellenrahmen, .aufklapp > .tabelle { margin-top: 0; margin-bottom: 1rem; }
+    /* Sprungziel. Ein Link auf eine einzelne Frage ist das, was im Ehrenamt
+       tatsächlich weitergereicht wird („guck mal, wo die Daten bleiben") — und
+       er taugt nur, wenn die Frage aufgeklappt ankommt. Von selbst öffnet sich
+       ein <details> beim Anker-Treffer nicht, und ein Skript gibt es auf diesen
+       Seiten nicht (dieselbe Prämisse wie bei der Landkarte: offline, ohne
+       Skript, im Ausdruck). Also derselbe Kniff wie beim Drucken, in beiden
+       Schreibweisen: die ältere über den Kindselektor, die neuere über
+       ::details-content. Wo beides nicht greift, bleibt die Frage zugeklappt —
+       sichtbar ist sie trotzdem, und ein Klick öffnet sie. Kaputt ist nichts.
+       Das Vorzeichen zeigt „−", damit der Zustand nicht lügt; scroll-margin
+       hält die Zeile vom oberen Fensterrand frei. */
+    .frage:target, [id]:target { scroll-margin-top: 1rem; }
+    .frage:target > *:not(summary) { display: block; }
+    .frage:target::details-content { content-visibility: visible; display: block; }
+    .frage:target:not([open]) > summary::before { content: "−"; }
     /* Ausdruck: Ein ausgedruckter Bogen darf nichts verschlucken. Zwei
        Schreibweisen, weil die Browser das Element unterschiedlich bauen — die
        ältere über den Kindselektor, die neuere über ::details-content. */
@@ -252,6 +288,10 @@
     .laenderliste { margin: 0.8rem 0 1.2rem; line-height: 2; }
     .laenderliste .anzahl { font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace; font-size: 0.875rem; color: #5c6478; }
     /* OFFENLEGUNG:CSS:END */
+/* LAENDER:CSS:START */
+    h2#andere-bundeslaender { clear: both; margin-top: 2.5rem; padding: 0.9rem 0 0; border-top: 1px solid var(--rand); border-bottom: 0; font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace; font-weight: 700; font-size: 0.8125rem; letter-spacing: 0.1em; text-transform: uppercase; color: #5c6478; }
+    h2#andere-bundeslaender + p { max-width: 60ch; margin-top: 0.4rem; font-size: 0.875rem; color: #5c6478; }
+    /* LAENDER:CSS:END */
   </style>
 </head>
 <body>
@@ -419,25 +459,33 @@
     <p><a class="start" href="./">Bogen für Nordrhein-Westfalen starten</a></p>
     <!-- HANDLUNG:MITTE:END -->
 
-    <h2>Häufige Fragen zum Katastrophenschutz Nordrhein-Westfalen</h2>
+    <!-- FAQ:START -->
+    <h2 id="haeufige-fragen">Häufige Fragen zum Katastrophenschutz Nordrhein-Westfalen</h2>
 
-    <details class="frage" open>
-      <summary><h3>Warum unterscheiden sich die NRW-Bögen von anderen Ländern?</h3></summary>
+    <details class="frage" id="frage-amtlich" open>
+      <summary><h3>Sind die Katastrophenschutz-Vorlagen für NRW amtlich?</h3></summary>
       <p>
-      NRW kennt keine Katastrophenschutz-Verordnung mit Anlage wie z. B.
-      Thüringen oder Sachsen. Stattdessen führt das Land seit 2013 eigene
-      Katastrophenschutz-Konzepte des Innenministeriums ein, die dieselbe
-      Verbindlichkeit haben und ebenso Personal- und Fahrzeugzahlen je
-      Teileinheit festlegen — nur eben in einem anderen Dokumenttyp.
-      Abgebildet sind hier zwei dieser Konzepte (Einsatzeinheit NRW und
-      Behandlungsplatz 50 NRW); weitere Konzepte des Landes (Betreuungsplatz
-      500 NRW, Patiententransport-Zug 10 NRW, ABC-Schutz-Konzept,
-      Wasserrettungszug NRW) sind noch nicht mit derselben Detailtiefe
-      abgebildet.
+      Nein — sie sind aus dem öffentlich zugänglichen Konzept VüH-SanBt NRW
+      abgeleitet und sorgfältig geprüft, aber kein amtliches Dokument.
+      Maßgeblich bleibt die jeweilige Landesregelung; deshalb kannst du jede
+      Vorbelegung frei anpassen.
       </p>
     </details>
 
-    <details class="frage">
+    <details class="frage" id="frage-besonderheit">
+      <summary><h3>Warum unterscheiden sich die NRW-Bögen von anderen Ländern?</h3></summary>
+      <p>
+      NRW kennt keine Katastrophenschutz-Verordnung mit Anlage wie Thüringen
+      oder Sachsen. Stattdessen gelten seit 2013 eigene Konzepte des
+      Innenministeriums, die ebenso verbindlich sind und ebenso Personal- und
+      Fahrzeugzahlen je Teileinheit festlegen. Abgebildet sind zwei davon:
+      Einsatzeinheit NRW und Behandlungsplatz 50 NRW. Weitere Konzepte des
+      Landes — Betreuungsplatz 500, Patiententransport-Zug 10, ABC-Schutz,
+      Wasserrettungszug — fehlen bislang.
+      </p>
+    </details>
+
+    <details class="frage" id="frage-funkrufnamen">
       <summary><h3>Warum tragen die Fahrzeuge keine amtliche NRW-Kennzahl?</h3></summary>
       <p>
       Für NRW ist kein landeseigener, öffentlich zugänglicher
@@ -448,19 +496,36 @@
       </p>
     </details>
 
-    <details class="frage">
-      <summary><h3>Sind die Vorlagen amtlich?</h3></summary>
+    <details class="frage" id="frage-personendaten">
+      <summary><h3>Wo bleiben die Personendaten der Einsatzkräfte?</h3></summary>
       <p>
-      Nein — sie sind aus dem öffentlich zugänglichen Konzept VüH-SanBt NRW
-      abgeleitet und sorgfältig geprüft, aber kein amtliches Dokument.
-      Maßgeblich bleibt die jeweilige Landesregelung; deshalb kannst du jede
-      Vorbelegung frei anpassen.
+      Auf deinem Gerät. Es gibt keinen Server, keine Cloud und keine Konten;
+      weitergegeben wird nur, was du selbst als PDF, Datei, QR-Code oder Link
+      übergibst — nachzulesen in der <a href="./datenschutz.html">Datenschutzerklärung</a>. Namen sind ohnehin optional:
+      Für die Stärkemeldung genügen die Zahlen.
       </p>
     </details>
-    <!-- LAENDER:START -->
-    <details class="frage">
-      <summary><h3>Was ist mit anderen Bundesländern?</h3></summary>
+
+    <details class="frage" id="frage-kosten">
+      <summary><h3>Was kostet die App?</h3></summary>
       <p>
+      Nichts. Die App ist freie Software unter der EUPL-1.2 — kostenlos, ohne
+      Konto, ohne Bezahlschranke und ohne Werbung; der Quellcode liegt offen auf
+      <a href="https://github.com/wattnpapa/erfassungsbogen">GitHub</a>.
+      </p>
+    </details>
+    <!-- FAQ:END -->
+
+    <!-- HANDLUNG:ABSCHLUSS:START -->
+    <div class="abschluss">
+      <a class="start" href="./">Bogen für Nordrhein-Westfalen starten</a>
+      <p class="zusicherung">Kostenlos, ohne Anmeldung, alle Daten bleiben auf deinem Gerät.</p>
+    </div>
+    <!-- HANDLUNG:ABSCHLUSS:END -->
+
+    <!-- LAENDER:START -->
+    <h2 id="andere-bundeslaender">Andere Bundesländer</h2>
+    <p>
       Weitere Landesvorlagen liegen für
       <a href="./katastrophenschutz-baden-wuerttemberg.html">Baden-Württemberg</a>,
       <a href="./katastrophenschutz-bayern.html">Bayern</a>,
@@ -477,8 +542,7 @@
       <a href="./katastrophenschutz.html">Katastrophenschutz der Länder</a>.
       Fehlt deins, kannst du jeden Bogen frei ausfüllen und selbst als Vorlage
       speichern.
-      </p>
-    </details>
+    </p>
     <!-- LAENDER:END -->
 
     <!-- KARTE:START -->
@@ -519,13 +583,6 @@
       </figcaption>
     </figure>
     <!-- KARTE:END -->
-
-    <!-- HANDLUNG:ABSCHLUSS:START -->
-    <div class="abschluss">
-      <a class="start" href="./">Bogen für Nordrhein-Westfalen starten</a>
-      <p class="zusicherung">Kostenlos, ohne Anmeldung, alle Daten bleiben auf deinem Gerät.</p>
-    </div>
-    <!-- HANDLUNG:ABSCHLUSS:END -->
 
     <footer>
       <!-- FUSSNAV:START -->
@@ -618,18 +675,28 @@
         "mainEntity": [
           {
             "@type": "Question",
-            "name": "Warum unterscheiden sich die NRW-Bögen von anderen Ländern?",
-            "acceptedAnswer": { "@type": "Answer", "text": "NRW kennt keine Katastrophenschutz-Verordnung mit Anlage wie z. B. Thüringen oder Sachsen. Stattdessen führt das Land seit 2013 eigene Katastrophenschutz-Konzepte des Innenministeriums ein, die dieselbe Verbindlichkeit haben. Abgebildet sind hier zwei dieser Konzepte: Einsatzeinheit NRW und Behandlungsplatz 50 NRW." }
-          },
-          {
-            "@type": "Question",
-            "name": "Warum tragen die NRW-Fahrzeuge keine amtliche Kennzahl?",
-            "acceptedAnswer": { "@type": "Answer", "text": "Für NRW ist kein landeseigener, öffentlich zugänglicher Fahrzeugkennzahlen-Katalog auffindbar. Angenähert wird das im Bogen mit der bundesweiten OPTA-Systematik — keine amtliche NRW-Vorgabe." }
-          },
-          {
-            "@type": "Question",
             "name": "Sind die Katastrophenschutz-Vorlagen für NRW amtlich?",
-            "acceptedAnswer": { "@type": "Answer", "text": "Nein — sie sind aus dem öffentlich zugänglichen Konzept VüH-SanBt NRW abgeleitet, aber kein amtliches Dokument. Maßgeblich bleibt die Landesregelung; deshalb kannst du jede Vorbelegung frei anpassen." }
+            "acceptedAnswer": { "@type": "Answer", "text": "Nein — sie sind aus dem öffentlich zugänglichen Konzept VüH-SanBt NRW abgeleitet und sorgfältig geprüft, aber kein amtliches Dokument. Maßgeblich bleibt die jeweilige Landesregelung; deshalb kannst du jede Vorbelegung frei anpassen." }
+          },
+          {
+            "@type": "Question",
+            "name": "Warum unterscheiden sich die NRW-Bögen von anderen Ländern?",
+            "acceptedAnswer": { "@type": "Answer", "text": "NRW kennt keine Katastrophenschutz-Verordnung mit Anlage wie Thüringen oder Sachsen. Stattdessen gelten seit 2013 eigene Konzepte des Innenministeriums, die ebenso verbindlich sind und ebenso Personal- und Fahrzeugzahlen je Teileinheit festlegen. Abgebildet sind zwei davon: Einsatzeinheit NRW und Behandlungsplatz 50 NRW. Weitere Konzepte des Landes — Betreuungsplatz 500, Patiententransport-Zug 10, ABC-Schutz, Wasserrettungszug — fehlen bislang." }
+          },
+          {
+            "@type": "Question",
+            "name": "Warum tragen die Fahrzeuge keine amtliche NRW-Kennzahl?",
+            "acceptedAnswer": { "@type": "Answer", "text": "Für NRW ist kein landeseigener, öffentlich zugänglicher Fahrzeugkennzahlen-Katalog auffindbar. Angenähert wird das im Bogen mit der bundesweiten OPTA-Systematik: Kennwort der Trägerorganisation, Kreis bzw. kreisfreie Stadt, Wachennummer und eine plausible Fahrzeugkennzahl — keine amtliche NRW-Vorgabe." }
+          },
+          {
+            "@type": "Question",
+            "name": "Wo bleiben die Personendaten der Einsatzkräfte?",
+            "acceptedAnswer": { "@type": "Answer", "text": "Auf deinem Gerät. Es gibt keinen Server, keine Cloud und keine Konten; weitergegeben wird nur, was du selbst als PDF, Datei, QR-Code oder Link übergibst — nachzulesen in der Datenschutzerklärung. Namen sind ohnehin optional: Für die Stärkemeldung genügen die Zahlen." }
+          },
+          {
+            "@type": "Question",
+            "name": "Was kostet die App?",
+            "acceptedAnswer": { "@type": "Answer", "text": "Nichts. Die App ist freie Software unter der EUPL-1.2 — kostenlos, ohne Konto, ohne Bezahlschranke und ohne Werbung; der Quellcode liegt offen auf GitHub." }
           }
         ]
       }

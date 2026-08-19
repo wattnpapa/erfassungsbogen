@@ -180,9 +180,30 @@
        außerhalb der Textkante sitzt und die Zeile gegen die Überschriften
        darüber verschiebt. */
     .frage, .aufklapp { border-top: 1px solid var(--rand); }
+    /* Abschlusskante. Der Stapel trug nur Oberkanten und franste unten in die
+       Handlungsaufforderung aus — in einer Optik, die von geschlossenen Kästen
+       lebt, ein sichtbarer Bruch. Die Unterkante hängt am **Stapel**, nicht am
+       letzten Element der Seite: :has(~ .frage) fragt, ob unter demselben
+       Elternteil noch ein Aufklapper folgt. .frage:last-of-type hätte
+       dasselbe geleistet, solange die letzte Frage auch das letzte <details>
+       der Seite ist — steht dort eines Tages hinter dem Abschlussknopf noch
+       eines (der Länderblock stand schon einmal dort), rutschte die Kante
+       wortlos dorthin. Ohne :has()-Unterstützung fehlt sie; mehr passiert
+       nicht. */
+    .frage:not(:has(~ .frage)), .aufklapp:not(:has(~ .aufklapp)) { border-bottom: 1px solid var(--rand); }
     .frage > summary, .aufklapp > summary { display: flex; align-items: center; gap: 0.6rem; min-height: 2.75rem; cursor: pointer; list-style: none; font-weight: 600; }
     .frage > summary::-webkit-details-marker, .aufklapp > summary::-webkit-details-marker { display: none; }
-    .frage > summary::before, .aufklapp > summary::before { content: "+"; flex: none; width: 1rem; text-align: center; font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace; font-weight: 700; color: var(--blau); }
+    /* Das Vorzeichen steht im Zweittext-Ton (#5c6478 — DESIGN.md führt ihn als
+       --text-2; die Content-Seiten tragen den Wert wörtlich, ein Token dafür
+       haben sie nicht), nicht in der Kennfarbe. Die Kennfarben-Regel gibt das
+       Blau dem Kopfbalken und der primären Aktion; drei bis sechs blaue
+       Pluszeichen je Seite nahmen dem einen Knopf, auf den es ankommt (.start
+       im Abschlussblock), genau die Signalwirkung, für die er die Farbe trägt.
+       Sichtbar bleibt es: gemessen auf dem Seitengrund (#f2f3f7) 5,34:1 — über
+       den 4,5:1 aus WCAG 1.4.3 und weit über den 3:1 für Bedienteile. Der
+       Fokusring darunter bleibt blau: Er zeigt einen Zustand an und ist keine
+       Dekoration. */
+    .frage > summary::before, .aufklapp > summary::before { content: "+"; flex: none; width: 1rem; text-align: center; font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace; font-weight: 700; color: #5c6478; }
     .frage[open] > summary::before, .aufklapp[open] > summary::before { content: "−"; }
     .frage > summary:focus-visible, .aufklapp > summary:focus-visible { outline: 3px solid var(--blau); outline-offset: 2px; }
     /* Die Frage bleibt eine h3 (im summary erlaubt) — Gliederung und JSON-LD
@@ -190,6 +211,21 @@
        sie unter das Vorzeichen. */
     .frage > summary h3 { display: inline; margin: 0; padding: 0; border: 0; }
     .frage > p, .aufklapp > .tabellenrahmen, .aufklapp > .tabelle { margin-top: 0; margin-bottom: 1rem; }
+    /* Sprungziel. Ein Link auf eine einzelne Frage ist das, was im Ehrenamt
+       tatsächlich weitergereicht wird („guck mal, wo die Daten bleiben") — und
+       er taugt nur, wenn die Frage aufgeklappt ankommt. Von selbst öffnet sich
+       ein <details> beim Anker-Treffer nicht, und ein Skript gibt es auf diesen
+       Seiten nicht (dieselbe Prämisse wie bei der Landkarte: offline, ohne
+       Skript, im Ausdruck). Also derselbe Kniff wie beim Drucken, in beiden
+       Schreibweisen: die ältere über den Kindselektor, die neuere über
+       ::details-content. Wo beides nicht greift, bleibt die Frage zugeklappt —
+       sichtbar ist sie trotzdem, und ein Klick öffnet sie. Kaputt ist nichts.
+       Das Vorzeichen zeigt „−", damit der Zustand nicht lügt; scroll-margin
+       hält die Zeile vom oberen Fensterrand frei. */
+    .frage:target, [id]:target { scroll-margin-top: 1rem; }
+    .frage:target > *:not(summary) { display: block; }
+    .frage:target::details-content { content-visibility: visible; display: block; }
+    .frage:target:not([open]) > summary::before { content: "−"; }
     /* Ausdruck: Ein ausgedruckter Bogen darf nichts verschlucken. Zwei
        Schreibweisen, weil die Browser das Element unterschiedlich bauen — die
        ältere über den Kindselektor, die neuere über ::details-content. */
@@ -394,9 +430,20 @@
     <p><a class="start" href="./">Johanniter-Bogen jetzt ausfüllen</a></p>
     <!-- HANDLUNG:MITTE:END -->
 
-    <h2>Häufige Fragen aus der JUH</h2>
+    <!-- FAQ:START -->
+    <h2 id="haeufige-fragen">Häufige Fragen zur JUH</h2>
 
-    <details class="frage" open>
+    <details class="frage" id="frage-personendaten" open>
+      <summary><h3>Wo bleiben die Personendaten der Einsatzkräfte?</h3></summary>
+      <p>
+      Auf deinem Gerät. Es gibt keinen Server, keine Cloud und keine Konten;
+      weitergegeben wird nur, was du selbst als PDF, Datei, QR-Code oder Link
+      übergibst — nachzulesen in der <a href="./datenschutz.html">Datenschutzerklärung</a>. Namen sind ohnehin optional:
+      Für die Stärkemeldung genügen die Zahlen.
+      </p>
+    </details>
+
+    <details class="frage" id="frage-mehrere-segs">
       <summary><h3>Können mehrere SEGs unter einem Einsatz geführt werden?</h3></summary>
       <p>
       Ja. Die Einsatz-Sammlung bündelt beliebig viele Einheiten unter einem
@@ -405,7 +452,7 @@
       </p>
     </details>
 
-    <details class="frage">
+    <details class="frage" id="frage-geraete">
       <summary><h3>Auf welchen Geräten läuft die App?</h3></summary>
       <p>
       Im Browser auf allen Systemen — nach dem ersten Aufruf auch offline.
@@ -415,15 +462,15 @@
       </p>
     </details>
 
-    <details class="frage">
+    <details class="frage" id="frage-kosten">
       <summary><h3>Braucht es eine Anmeldung oder eine Freigabe der IT?</h3></summary>
       <p>
-      Nein. Es gibt keine Konten und keinen Server; alle Daten bleiben lokal
-      auf deinem Gerät (<a href="./datenschutz.html">Datenschutzerklärung</a>).
-      Die App ist freie Software unter der EUPL-1.2 — der Quellcode liegt
-      offen auf <a href="https://github.com/wattnpapa/erfassungsbogen">GitHub</a>.
+      Nein, weder noch: Es gibt keine Konten und keinen Server, den jemand freischalten müsste. Die App ist freie Software unter der EUPL-1.2 — kostenlos, ohne
+      Konto, ohne Bezahlschranke und ohne Werbung; der Quellcode liegt offen auf
+      <a href="https://github.com/wattnpapa/erfassungsbogen">GitHub</a>.
       </p>
     </details>
+    <!-- FAQ:END -->
 
     <!-- HANDLUNG:ABSCHLUSS:START -->
     <div class="abschluss">
@@ -520,18 +567,23 @@
         "mainEntity": [
           {
             "@type": "Question",
+            "name": "Wo bleiben die Personendaten der Einsatzkräfte?",
+            "acceptedAnswer": { "@type": "Answer", "text": "Auf deinem Gerät. Es gibt keinen Server, keine Cloud und keine Konten; weitergegeben wird nur, was du selbst als PDF, Datei, QR-Code oder Link übergibst — nachzulesen in der Datenschutzerklärung. Namen sind ohnehin optional: Für die Stärkemeldung genügen die Zahlen." }
+          },
+          {
+            "@type": "Question",
             "name": "Können mehrere SEGs unter einem Einsatz geführt werden?",
             "acceptedAnswer": { "@type": "Answer", "text": "Ja. Die Einsatz-Sammlung bündelt beliebig viele Einheiten unter einem Einsatz oder einer Übung, summiert Stärke und Bedarf laufend und gibt alles als Sammel-PDF oder Datei an die nächste Führungsstelle weiter." }
           },
           {
             "@type": "Question",
-            "name": "Auf welchen Geräten läuft der digitale Erfassungsbogen?",
+            "name": "Auf welchen Geräten läuft die App?",
             "acceptedAnswer": { "@type": "Answer", "text": "Im Browser auf allen Systemen — nach dem ersten Aufruf auch offline. Für Windows, macOS, Linux und Android gibt es installierbare Apps; auf iPhone und iPad fügst du die Web-App über Safari zum Home-Bildschirm hinzu." }
           },
           {
             "@type": "Question",
             "name": "Braucht es eine Anmeldung oder eine Freigabe der IT?",
-            "acceptedAnswer": { "@type": "Answer", "text": "Nein. Es gibt keine Konten und keinen Server; alle Daten bleiben lokal auf deinem Gerät. Die App ist freie Software unter der EUPL-1.2 — der Quellcode liegt offen auf GitHub." }
+            "acceptedAnswer": { "@type": "Answer", "text": "Nein, weder noch: Es gibt keine Konten und keinen Server, den jemand freischalten müsste. Die App ist freie Software unter der EUPL-1.2 — kostenlos, ohne Konto, ohne Bezahlschranke und ohne Werbung; der Quellcode liegt offen auf GitHub." }
           }
         ]
       }

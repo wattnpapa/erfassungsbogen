@@ -210,9 +210,30 @@
        außerhalb der Textkante sitzt und die Zeile gegen die Überschriften
        darüber verschiebt. */
     .frage, .aufklapp { border-top: 1px solid var(--rand); }
+    /* Abschlusskante. Der Stapel trug nur Oberkanten und franste unten in die
+       Handlungsaufforderung aus — in einer Optik, die von geschlossenen Kästen
+       lebt, ein sichtbarer Bruch. Die Unterkante hängt am **Stapel**, nicht am
+       letzten Element der Seite: :has(~ .frage) fragt, ob unter demselben
+       Elternteil noch ein Aufklapper folgt. .frage:last-of-type hätte
+       dasselbe geleistet, solange die letzte Frage auch das letzte <details>
+       der Seite ist — steht dort eines Tages hinter dem Abschlussknopf noch
+       eines (der Länderblock stand schon einmal dort), rutschte die Kante
+       wortlos dorthin. Ohne :has()-Unterstützung fehlt sie; mehr passiert
+       nicht. */
+    .frage:not(:has(~ .frage)), .aufklapp:not(:has(~ .aufklapp)) { border-bottom: 1px solid var(--rand); }
     .frage > summary, .aufklapp > summary { display: flex; align-items: center; gap: 0.6rem; min-height: 2.75rem; cursor: pointer; list-style: none; font-weight: 600; }
     .frage > summary::-webkit-details-marker, .aufklapp > summary::-webkit-details-marker { display: none; }
-    .frage > summary::before, .aufklapp > summary::before { content: "+"; flex: none; width: 1rem; text-align: center; font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace; font-weight: 700; color: var(--blau); }
+    /* Das Vorzeichen steht im Zweittext-Ton (#5c6478 — DESIGN.md führt ihn als
+       --text-2; die Content-Seiten tragen den Wert wörtlich, ein Token dafür
+       haben sie nicht), nicht in der Kennfarbe. Die Kennfarben-Regel gibt das
+       Blau dem Kopfbalken und der primären Aktion; drei bis sechs blaue
+       Pluszeichen je Seite nahmen dem einen Knopf, auf den es ankommt (.start
+       im Abschlussblock), genau die Signalwirkung, für die er die Farbe trägt.
+       Sichtbar bleibt es: gemessen auf dem Seitengrund (#f2f3f7) 5,34:1 — über
+       den 4,5:1 aus WCAG 1.4.3 und weit über den 3:1 für Bedienteile. Der
+       Fokusring darunter bleibt blau: Er zeigt einen Zustand an und ist keine
+       Dekoration. */
+    .frage > summary::before, .aufklapp > summary::before { content: "+"; flex: none; width: 1rem; text-align: center; font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace; font-weight: 700; color: #5c6478; }
     .frage[open] > summary::before, .aufklapp[open] > summary::before { content: "−"; }
     .frage > summary:focus-visible, .aufklapp > summary:focus-visible { outline: 3px solid var(--blau); outline-offset: 2px; }
     /* Die Frage bleibt eine h3 (im summary erlaubt) — Gliederung und JSON-LD
@@ -220,6 +241,21 @@
        sie unter das Vorzeichen. */
     .frage > summary h3 { display: inline; margin: 0; padding: 0; border: 0; }
     .frage > p, .aufklapp > .tabellenrahmen, .aufklapp > .tabelle { margin-top: 0; margin-bottom: 1rem; }
+    /* Sprungziel. Ein Link auf eine einzelne Frage ist das, was im Ehrenamt
+       tatsächlich weitergereicht wird („guck mal, wo die Daten bleiben") — und
+       er taugt nur, wenn die Frage aufgeklappt ankommt. Von selbst öffnet sich
+       ein <details> beim Anker-Treffer nicht, und ein Skript gibt es auf diesen
+       Seiten nicht (dieselbe Prämisse wie bei der Landkarte: offline, ohne
+       Skript, im Ausdruck). Also derselbe Kniff wie beim Drucken, in beiden
+       Schreibweisen: die ältere über den Kindselektor, die neuere über
+       ::details-content. Wo beides nicht greift, bleibt die Frage zugeklappt —
+       sichtbar ist sie trotzdem, und ein Klick öffnet sie. Kaputt ist nichts.
+       Das Vorzeichen zeigt „−", damit der Zustand nicht lügt; scroll-margin
+       hält die Zeile vom oberen Fensterrand frei. */
+    .frage:target, [id]:target { scroll-margin-top: 1rem; }
+    .frage:target > *:not(summary) { display: block; }
+    .frage:target::details-content { content-visibility: visible; display: block; }
+    .frage:target:not([open]) > summary::before { content: "−"; }
     /* Ausdruck: Ein ausgedruckter Bogen darf nichts verschlucken. Zwei
        Schreibweisen, weil die Browser das Element unterschiedlich bauen — die
        ältere über den Kindselektor, die neuere über ::details-content. */
@@ -328,7 +364,7 @@
         <li><a href="#eigene-vorlagen-und-beispielboegen">Eigene Vorlagen und Beispielbögen</a></li>
         <li><a href="#auf-welchen-geraeten-laeuft-die-app">Auf welchen Geräten läuft die App?</a></li>
         <li><a href="#technische-daten">Technische Daten</a></li>
-        <li><a href="#haeufige-fragen">Häufige Fragen</a></li>
+        <li><a href="#haeufige-fragen">Häufige Fragen zur App</a></li>
         <li><a href="#aus-demselben-projektumfeld">Aus demselben Projektumfeld</a></li>
       </ul>
     </nav>
@@ -489,20 +525,29 @@
       </tbody></table>
     </div>
 
-    <h2 id="haeufige-fragen">Häufige Fragen</h2>
+    <!-- FAQ:START -->
+    <h2 id="haeufige-fragen">Häufige Fragen zur App</h2>
 
-    <details class="frage" open>
-      <summary><h3>Was kostet die App?</h3></summary>
+    <details class="frage" id="frage-personendaten" open>
+      <summary><h3>Wo bleiben die eingegebenen Daten?</h3></summary>
       <p>
-      Nichts. Sie ist freie Software unter der
-      <a href="https://github.com/wattnpapa/erfassungsbogen/blob/main/LICENSE">EUPL-1.2</a>
-      (Europäische Union Public Licence), der Quellcode liegt offen auf
-      <a href="https://github.com/wattnpapa/erfassungsbogen">GitHub</a>. Es gibt
-      keine Konten, keine Bezahlschranke und keine Werbung.
+      Auf deinem Gerät. Es gibt keinen Server, keine Cloud und keine Konten;
+      weitergegeben wird nur, was du selbst als PDF, Datei, QR-Code oder Link
+      übergibst — nachzulesen in der <a href="./datenschutz.html">Datenschutzerklärung</a>. Namen sind ohnehin optional:
+      Für die Stärkemeldung genügen die Zahlen.
       </p>
     </details>
 
-    <details class="frage">
+    <details class="frage" id="frage-kosten">
+      <summary><h3>Was kostet die App?</h3></summary>
+      <p>
+      Nichts. Die App ist freie Software unter der EUPL-1.2 — kostenlos, ohne
+      Konto, ohne Bezahlschranke und ohne Werbung; der Quellcode liegt offen auf
+      <a href="https://github.com/wattnpapa/erfassungsbogen">GitHub</a>.
+      </p>
+    </details>
+
+    <details class="frage" id="frage-anmeldung">
       <summary><h3>Brauche ich eine Anmeldung oder eine Internetverbindung?</h3></summary>
       <p>
       Nein. Es gibt keine Registrierung. Du musst die Seite einmal laden;
@@ -511,17 +556,7 @@
       </p>
     </details>
 
-    <details class="frage">
-      <summary><h3>Wo bleiben die eingegebenen Daten?</h3></summary>
-      <p>
-      Auf deinem Gerät. Es gibt keinen Server, an den ein Bogen geschickt würde,
-      und keine Cloud. Weitergegeben wird nur, was du selbst weitergibst: ein
-      PDF, eine Datei oder ein QR-Code. Einzelheiten stehen in der
-      <a href="./datenschutz.html">Datenschutzerklärung</a>.
-      </p>
-    </details>
-
-    <details class="frage">
+    <details class="frage" id="frage-qr-uebergabe">
       <summary><h3>Wie kommt ein Bogen ohne Netz auf ein anderes Gerät?</h3></summary>
       <p>
       Über den QR-Code auf der letzten PDF-Seite oder auf dem Bildschirm: Er
@@ -531,7 +566,19 @@
       </p>
     </details>
 
-    <details class="frage">
+    <details class="frage" id="frage-meldekopf">
+      <summary><h3>Wie sammelt ein Meldekopf mehrere Einheiten?</h3></summary>
+      <p>
+      Eintreffende Einheiten erfasst du per QR-Scan, aus Datei oder am Tablet
+      von Hand und sammelst sie unter einem Einsatz. Die App zählt Stärke und
+      Bedarf über alle anwesenden Einheiten laufend zusammen, bildet
+      Zwischensummen je Zug und gibt alles als Sammel-PDF oder Datei an die
+      nächste Führungsstelle weiter — mehr dazu auf der Seite
+      <a href="./meldekopf.html">Meldekopf digital</a>.
+      </p>
+    </details>
+
+    <details class="frage" id="frage-papierformular">
       <summary><h3>Passt der Ausdruck zum gewohnten Papierformular?</h3></summary>
       <p>
       Ja, das PDF folgt dem bekannten Papier-Layout des Einheiten-Erfassungsbogens,
@@ -539,36 +586,7 @@
       mit ihrem taktischen Zeichen nach DV 102.
       </p>
     </details>
-
-    <details class="frage">
-      <summary><h3>Kann ich einen Bogen später ändern oder wiederverwenden?</h3></summary>
-      <p>
-      Ja. Du kannst Bögen als eigene Vorlage speichern und beim nächsten
-      Einsatz erneut aufrufen; bei Bedarf streichst du Teile heraus,
-      etwa wenn eine Teileinheit nicht ausrückt.
-      </p>
-    </details>
-
-    <details class="frage">
-      <summary><h3>Für welche Organisationen ist der Bogen gedacht?</h3></summary>
-      <p>
-      Für alle: Feuerwehr, THW, Polizei und Bundespolizei, DRK, Johanniter,
-      Malteser, ASB, DLRG, Rettungsdienst, Bundeswehr sowie die
-      Katastrophenschutz-Einheiten der Länder. Die Begriffe im Bogen
-      (Dienstgrade, Einheitsbezeichnungen, Funkrufnamen) passen sich der
-      Organisation an, die du gewählt hast.
-      </p>
-    </details>
-
-    <details class="frage">
-      <summary><h3>Ist der Quellcode einsehbar?</h3></summary>
-      <p>
-      Ja, vollständig:
-      <a href="https://github.com/wattnpapa/erfassungsbogen">github.com/wattnpapa/erfassungsbogen</a>.
-      Dort finden sich auch die technische Dokumentation, das Datenformat und
-      der QR-Codec.
-      </p>
-    </details>
+    <!-- FAQ:END -->
 
     <h2 id="aus-demselben-projektumfeld">Aus demselben Projektumfeld</h2>
     <p>
@@ -696,43 +714,33 @@
         "mainEntity": [
           {
             "@type": "Question",
-            "name": "Was kostet der Einheiten-Erfassungsbogen?",
-            "acceptedAnswer": { "@type": "Answer", "text": "Nichts. Die App ist freie Software unter der EUPL-1.2, der Quellcode liegt offen auf GitHub. Es gibt keine Konten, keine Bezahlschranke und keine Werbung." }
+            "name": "Wo bleiben die eingegebenen Daten?",
+            "acceptedAnswer": { "@type": "Answer", "text": "Auf deinem Gerät. Es gibt keinen Server, keine Cloud und keine Konten; weitergegeben wird nur, was du selbst als PDF, Datei, QR-Code oder Link übergibst — nachzulesen in der Datenschutzerklärung. Namen sind ohnehin optional: Für die Stärkemeldung genügen die Zahlen." }
+          },
+          {
+            "@type": "Question",
+            "name": "Was kostet die App?",
+            "acceptedAnswer": { "@type": "Answer", "text": "Nichts. Die App ist freie Software unter der EUPL-1.2 — kostenlos, ohne Konto, ohne Bezahlschranke und ohne Werbung; der Quellcode liegt offen auf GitHub." }
           },
           {
             "@type": "Question",
             "name": "Brauche ich eine Anmeldung oder eine Internetverbindung?",
-            "acceptedAnswer": { "@type": "Answer", "text": "Nein. Es gibt keine Registrierung. Du musst die Seite einmal laden, danach arbeitet sie offline weiter, weil sie sich als Web-App in deinem Gerät ablegt. Die installierten Apps für Windows, macOS, Linux und Android brauchen von vornherein kein Netz." }
-          },
-          {
-            "@type": "Question",
-            "name": "Wo bleiben die eingegebenen Daten?",
-            "acceptedAnswer": { "@type": "Answer", "text": "Auf deinem Gerät. Es gibt keinen Server, an den ein Bogen geschickt würde, und keine Cloud. Weitergegeben wird nur, was du selbst weitergibst: ein PDF, eine Datei oder ein QR-Code." }
+            "acceptedAnswer": { "@type": "Answer", "text": "Nein. Es gibt keine Registrierung. Du musst die Seite einmal laden; danach arbeitet sie offline weiter, weil sie sich als Web-App in deinem Gerät ablegt. Die installierten Apps brauchen von vornherein kein Netz." }
           },
           {
             "@type": "Question",
             "name": "Wie kommt ein Bogen ohne Netz auf ein anderes Gerät?",
-            "acceptedAnswer": { "@type": "Answer", "text": "Über den QR-Code auf der letzten PDF-Seite oder auf dem Bildschirm: Er trägt den kompletten Bogen in komprimierter Form in sich. Das empfangende Gerät scannt ihn und hat den Bogen — ohne Verbindung zwischen den Geräten und ohne Server. Alternativ sicherst du den Bogen als Datei und überträgst ihn so." }
-          },
-          {
-            "@type": "Question",
-            "name": "Passt der Ausdruck zum gewohnten Papierformular?",
-            "acceptedAnswer": { "@type": "Answer", "text": "Ja. Das PDF folgt dem bekannten Papier-Layout des Einheiten-Erfassungsbogens, du kannst es unverändert in den Papierlauf geben. Fahrzeuge erscheinen mit ihrem taktischen Zeichen nach DV 102." }
-          },
-          {
-            "@type": "Question",
-            "name": "Für welche Organisationen ist der Bogen gedacht?",
-            "acceptedAnswer": { "@type": "Answer", "text": "Für alle BOS und Hilfsorganisationen: Feuerwehr, THW, Polizei und Bundespolizei, DRK, Johanniter, Malteser, ASB, DLRG, Rettungsdienst, Bundeswehr sowie die Katastrophenschutz-Einheiten der Länder. Dienstgrade, Einheitsbezeichnungen und Funkrufnamen passen sich der Organisation an, die du gewählt hast." }
+            "acceptedAnswer": { "@type": "Answer", "text": "Über den QR-Code auf der letzten PDF-Seite oder auf dem Bildschirm: Er trägt den kompletten Bogen in sich. Das empfangende Gerät scannt ihn und hat den Bogen — ganz ohne Verbindung zwischen den Geräten. Alternativ sicherst du den Bogen als Datei und überträgst ihn so." }
           },
           {
             "@type": "Question",
             "name": "Wie sammelt ein Meldekopf mehrere Einheiten?",
-            "acceptedAnswer": { "@type": "Answer", "text": "Eintreffende Einheiten werden per QR-Scan, aus Datei oder PDF oder am Tablet manuell erfasst und unter einem Einsatz gesammelt. Die App zählt Stärke und Bedarf über alle anwesenden Einheiten laufend zusammen, bildet Zwischensummen je Zug und gibt alles als Sammel-PDF oder Datei an die nächste Führungsstelle weiter." }
+            "acceptedAnswer": { "@type": "Answer", "text": "Eintreffende Einheiten erfasst du per QR-Scan, aus Datei oder am Tablet von Hand und sammelst sie unter einem Einsatz. Die App zählt Stärke und Bedarf über alle anwesenden Einheiten laufend zusammen, bildet Zwischensummen je Zug und gibt alles als Sammel-PDF oder Datei an die nächste Führungsstelle weiter — mehr dazu auf der Seite Meldekopf digital." }
           },
           {
             "@type": "Question",
-            "name": "Ist der Quellcode einsehbar?",
-            "acceptedAnswer": { "@type": "Answer", "text": "Ja, vollständig unter github.com/wattnpapa/erfassungsbogen — samt technischer Dokumentation, Datenformat und QR-Codec." }
+            "name": "Passt der Ausdruck zum gewohnten Papierformular?",
+            "acceptedAnswer": { "@type": "Answer", "text": "Ja, das PDF folgt dem bekannten Papier-Layout des Einheiten-Erfassungsbogens, du kannst es unverändert in den Papierlauf geben. Fahrzeuge erscheinen mit ihrem taktischen Zeichen nach DV 102." }
           }
         ]
       }

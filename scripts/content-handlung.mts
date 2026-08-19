@@ -196,7 +196,11 @@ function einbauen(inhalt: string, datei: string, plan: SeitenPlan): string {
       neu = neu.replace(MITTE_MUSTER, `    ${block}`);
     } else {
       const ankerRoh = anker.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-      const ankerMuster = new RegExp(`([ \\t]*)(<h2[^>]*>\\s*${ankerRoh})`);
+      // Der Marker von content-faq.mts steht unmittelbar vor der
+      // FAQ-Überschrift. Er gehört mit in den Anker, sonst landete der
+      // Mitte-Block *innerhalb* des FAQ-Bereichs — und der nächste Lauf von
+      // content-faq schriebe ihn wortlos wieder heraus.
+      const ankerMuster = new RegExp(`([ \\t]*)((?:<!-- FAQ:START -->\\s*)?<h2[^>]*>\\s*${ankerRoh})`);
       if (!ankerMuster.test(neu)) {
         console.warn(`Mitte-Block übersprungen (Anker „${anker}" nicht gefunden): ${datei}`);
       } else {

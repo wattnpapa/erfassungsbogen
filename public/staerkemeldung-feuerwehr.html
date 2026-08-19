@@ -43,7 +43,7 @@
     figcaption { max-width: 60ch; font-size: 0.875rem; color: #5c6478; margin-top: 0.4rem; }
     /* Beispielmeldung: als Block abgesetzt, damit der Wortlaut vom Fließtext
        unterscheidbar bleibt — auch ohne Farbwahrnehmung. */
-    blockquote.meldung { margin: 1rem 0; padding: 0.8rem 1rem; background: #fff; border-left: 4px solid var(--blau); }
+    blockquote.meldung { margin: 1rem 0; padding: 0.8rem 1rem; background: #fff; border-top: 4px solid var(--text); }
     blockquote.meldung p { margin: 0.3rem 0; }
     /* Breite Tabellen dürfen scrollen, die Seite selbst nicht. */
     .tabelle { overflow-x: auto; }
@@ -185,9 +185,30 @@
        außerhalb der Textkante sitzt und die Zeile gegen die Überschriften
        darüber verschiebt. */
     .frage, .aufklapp { border-top: 1px solid var(--rand); }
+    /* Abschlusskante. Der Stapel trug nur Oberkanten und franste unten in die
+       Handlungsaufforderung aus — in einer Optik, die von geschlossenen Kästen
+       lebt, ein sichtbarer Bruch. Die Unterkante hängt am **Stapel**, nicht am
+       letzten Element der Seite: :has(~ .frage) fragt, ob unter demselben
+       Elternteil noch ein Aufklapper folgt. .frage:last-of-type hätte
+       dasselbe geleistet, solange die letzte Frage auch das letzte <details>
+       der Seite ist — steht dort eines Tages hinter dem Abschlussknopf noch
+       eines (der Länderblock stand schon einmal dort), rutschte die Kante
+       wortlos dorthin. Ohne :has()-Unterstützung fehlt sie; mehr passiert
+       nicht. */
+    .frage:not(:has(~ .frage)), .aufklapp:not(:has(~ .aufklapp)) { border-bottom: 1px solid var(--rand); }
     .frage > summary, .aufklapp > summary { display: flex; align-items: center; gap: 0.6rem; min-height: 2.75rem; cursor: pointer; list-style: none; font-weight: 600; }
     .frage > summary::-webkit-details-marker, .aufklapp > summary::-webkit-details-marker { display: none; }
-    .frage > summary::before, .aufklapp > summary::before { content: "+"; flex: none; width: 1rem; text-align: center; font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace; font-weight: 700; color: var(--blau); }
+    /* Das Vorzeichen steht im Zweittext-Ton (#5c6478 — DESIGN.md führt ihn als
+       --text-2; die Content-Seiten tragen den Wert wörtlich, ein Token dafür
+       haben sie nicht), nicht in der Kennfarbe. Die Kennfarben-Regel gibt das
+       Blau dem Kopfbalken und der primären Aktion; drei bis sechs blaue
+       Pluszeichen je Seite nahmen dem einen Knopf, auf den es ankommt (.start
+       im Abschlussblock), genau die Signalwirkung, für die er die Farbe trägt.
+       Sichtbar bleibt es: gemessen auf dem Seitengrund (#f2f3f7) 5,34:1 — über
+       den 4,5:1 aus WCAG 1.4.3 und weit über den 3:1 für Bedienteile. Der
+       Fokusring darunter bleibt blau: Er zeigt einen Zustand an und ist keine
+       Dekoration. */
+    .frage > summary::before, .aufklapp > summary::before { content: "+"; flex: none; width: 1rem; text-align: center; font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace; font-weight: 700; color: #5c6478; }
     .frage[open] > summary::before, .aufklapp[open] > summary::before { content: "−"; }
     .frage > summary:focus-visible, .aufklapp > summary:focus-visible { outline: 3px solid var(--blau); outline-offset: 2px; }
     /* Die Frage bleibt eine h3 (im summary erlaubt) — Gliederung und JSON-LD
@@ -195,6 +216,21 @@
        sie unter das Vorzeichen. */
     .frage > summary h3 { display: inline; margin: 0; padding: 0; border: 0; }
     .frage > p, .aufklapp > .tabellenrahmen, .aufklapp > .tabelle { margin-top: 0; margin-bottom: 1rem; }
+    /* Sprungziel. Ein Link auf eine einzelne Frage ist das, was im Ehrenamt
+       tatsächlich weitergereicht wird („guck mal, wo die Daten bleiben") — und
+       er taugt nur, wenn die Frage aufgeklappt ankommt. Von selbst öffnet sich
+       ein <details> beim Anker-Treffer nicht, und ein Skript gibt es auf diesen
+       Seiten nicht (dieselbe Prämisse wie bei der Landkarte: offline, ohne
+       Skript, im Ausdruck). Also derselbe Kniff wie beim Drucken, in beiden
+       Schreibweisen: die ältere über den Kindselektor, die neuere über
+       ::details-content. Wo beides nicht greift, bleibt die Frage zugeklappt —
+       sichtbar ist sie trotzdem, und ein Klick öffnet sie. Kaputt ist nichts.
+       Das Vorzeichen zeigt „−", damit der Zustand nicht lügt; scroll-margin
+       hält die Zeile vom oberen Fensterrand frei. */
+    .frage:target, [id]:target { scroll-margin-top: 1rem; }
+    .frage:target > *:not(summary) { display: block; }
+    .frage:target::details-content { content-visibility: visible; display: block; }
+    .frage:target:not([open]) > summary::before { content: "−"; }
     /* Ausdruck: Ein ausgedruckter Bogen darf nichts verschlucken. Zwei
        Schreibweisen, weil die Browser das Element unterschiedlich bauen — die
        ältere über den Kindselektor, die neuere über ::details-content. */
@@ -515,10 +551,11 @@
     <p><a class="start" href="./">Stärkemeldung direkt erfassen</a></p>
     <!-- HANDLUNG:MITTE:END -->
 
-    <h2>Häufige Fragen zur Stärkemeldung</h2>
+    <!-- FAQ:START -->
+    <h2 id="haeufige-fragen">Häufige Fragen zur Stärkemeldung</h2>
 
-    <details class="frage" open>
-      <summary><h3>Was bedeuten die Zahlen 1/8/9?</h3></summary>
+    <details class="frage" id="frage-zahlen-1-8-9" open>
+      <summary><h3>Was bedeuten die Zahlen 1/8/9 bei einer Stärkemeldung?</h3></summary>
       <p>
       Die erste Zahl nennt die Führungskräfte, die zweite die übrigen
       Einsatzkräfte, die dritte die Gesamtstärke. 1/8/9 ist damit eine
@@ -528,7 +565,7 @@
       </p>
     </details>
 
-    <details class="frage">
+    <details class="frage" id="frage-fahrzeugfuehrer">
       <summary><h3>Zählt der Fahrzeugführer als Führer oder als Unterführer?</h3></summary>
       <p>
       Das hängt davon ab, was gemeldet wird. Meldet sich eine Gruppe allein,
@@ -539,7 +576,7 @@
       </p>
     </details>
 
-    <details class="frage">
+    <details class="frage" id="frage-namen">
       <summary><h3>Muss ich für die Stärkemeldung alle Namen erfassen?</h3></summary>
       <p>
       Für die Meldung selbst nicht — dafür genügen die Zahlen und eine
@@ -549,8 +586,8 @@
       </p>
     </details>
 
-    <details class="frage">
-      <summary><h3>Gilt die Stärkemeldung bundesweit gleich?</h3></summary>
+    <details class="frage" id="frage-bundesweit">
+      <summary><h3>Gilt die Stärkemeldung der Feuerwehr bundesweit gleich?</h3></summary>
       <p>
       Das Feuerwehrrecht ist Landesrecht: Sollstärken, Bezeichnungen der
       Einheiten und die vorgeschriebene Form der Meldung können sich von Land
@@ -559,6 +596,26 @@
       bildet der Erfassungsbogen ab.
       </p>
     </details>
+
+    <details class="frage" id="frage-personendaten">
+      <summary><h3>Wo bleiben die Personendaten der Einsatzkräfte?</h3></summary>
+      <p>
+      Auf deinem Gerät. Es gibt keinen Server, keine Cloud und keine Konten;
+      weitergegeben wird nur, was du selbst als PDF, Datei, QR-Code oder Link
+      übergibst — nachzulesen in der <a href="./datenschutz.html">Datenschutzerklärung</a>. Namen sind ohnehin optional:
+      Für die Stärkemeldung genügen die Zahlen.
+      </p>
+    </details>
+
+    <details class="frage" id="frage-kosten">
+      <summary><h3>Was kostet die App?</h3></summary>
+      <p>
+      Nichts. Die App ist freie Software unter der EUPL-1.2 — kostenlos, ohne
+      Konto, ohne Bezahlschranke und ohne Werbung; der Quellcode liegt offen auf
+      <a href="https://github.com/wattnpapa/erfassungsbogen">GitHub</a>.
+      </p>
+    </details>
+    <!-- FAQ:END -->
 
     <!-- HANDLUNG:ABSCHLUSS:START -->
     <div class="abschluss">
@@ -662,7 +719,7 @@
           {
             "@type": "Question",
             "name": "Zählt der Fahrzeugführer als Führer oder als Unterführer?",
-            "acceptedAnswer": { "@type": "Answer", "text": "Maßgeblich ist die Stellung in der gemeldeten Einheit, nicht die Ausbildung. Meldet sich eine Gruppe allein, ist ihre Gruppenführerin die Führerin der Einheit. Rückt dieselbe Gruppe als Teil eines Zuges ein, führt der Zugführer die Einheit — die Gruppenführerin zählt dann als Unterführerin." }
+            "acceptedAnswer": { "@type": "Answer", "text": "Das hängt davon ab, was gemeldet wird. Meldet sich eine Gruppe allein, ist ihre Gruppenführerin die Führerin der gemeldeten Einheit. Rückt dieselbe Gruppe als Teil eines Zuges ein, führt der Zugführer die Einheit — die Gruppenführerin zählt dann als Unterführerin. Maßgeblich ist die Stellung in der gemeldeten Einheit, nicht die Ausbildung." }
           },
           {
             "@type": "Question",
@@ -672,7 +729,17 @@
           {
             "@type": "Question",
             "name": "Gilt die Stärkemeldung der Feuerwehr bundesweit gleich?",
-            "acceptedAnswer": { "@type": "Answer", "text": "Das Feuerwehrrecht ist Landesrecht: Sollstärken, Bezeichnungen der Einheiten und die vorgeschriebene Form der Meldung können sich von Land zu Land unterscheiden. Der Aufbau — Führung, Unterführung, Mannschaft, Gesamtstärke — ist dagegen überall derselbe." }
+            "acceptedAnswer": { "@type": "Answer", "text": "Das Feuerwehrrecht ist Landesrecht: Sollstärken, Bezeichnungen der Einheiten und die vorgeschriebene Form der Meldung können sich von Land zu Land unterscheiden. Der Aufbau — Führung, Unterführung, Mannschaft, Gesamtstärke — ist dagegen überall derselbe, und genau diese Struktur bildet der Erfassungsbogen ab." }
+          },
+          {
+            "@type": "Question",
+            "name": "Wo bleiben die Personendaten der Einsatzkräfte?",
+            "acceptedAnswer": { "@type": "Answer", "text": "Auf deinem Gerät. Es gibt keinen Server, keine Cloud und keine Konten; weitergegeben wird nur, was du selbst als PDF, Datei, QR-Code oder Link übergibst — nachzulesen in der Datenschutzerklärung. Namen sind ohnehin optional: Für die Stärkemeldung genügen die Zahlen." }
+          },
+          {
+            "@type": "Question",
+            "name": "Was kostet die App?",
+            "acceptedAnswer": { "@type": "Answer", "text": "Nichts. Die App ist freie Software unter der EUPL-1.2 — kostenlos, ohne Konto, ohne Bezahlschranke und ohne Werbung; der Quellcode liegt offen auf GitHub." }
           }
         ]
       }

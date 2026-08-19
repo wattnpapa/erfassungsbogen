@@ -171,6 +171,87 @@
     .tabellenrahmen, .tabelle { overflow-x: auto; }
     .tabellenrahmen:focus-visible, .tabelle:focus-visible { outline: 3px solid var(--blau); outline-offset: 2px; }
     /* ROLLBEREICH:CSS:END */
+/* OFFENLEGUNG:CSS:START */
+    /* Aufklappblöcke. Der Griff ist als Bedienelement erkennbar: volle
+       Trefferfläche, eigenes Vorzeichen, Fokusring im App-Muster
+       (outline in der Kennfarbe, wie index.html und die Rollbereiche). Der
+       eigene Marker statt des Systemdreiecks, weil das Dreieck in Safari links
+       außerhalb der Textkante sitzt und die Zeile gegen die Überschriften
+       darüber verschiebt. */
+    .frage, .aufklapp { border-top: 1px solid var(--rand); }
+    /* Abschlusskante. Der Stapel trug nur Oberkanten und franste unten in die
+       Handlungsaufforderung aus — in einer Optik, die von geschlossenen Kästen
+       lebt, ein sichtbarer Bruch. Die Unterkante hängt am **Stapel**, nicht am
+       letzten Element der Seite: :has(~ .frage) fragt, ob unter demselben
+       Elternteil noch ein Aufklapper folgt. .frage:last-of-type hätte
+       dasselbe geleistet, solange die letzte Frage auch das letzte <details>
+       der Seite ist — steht dort eines Tages hinter dem Abschlussknopf noch
+       eines (der Länderblock stand schon einmal dort), rutschte die Kante
+       wortlos dorthin. Ohne :has()-Unterstützung fehlt sie; mehr passiert
+       nicht. */
+    .frage:not(:has(~ .frage)), .aufklapp:not(:has(~ .aufklapp)) { border-bottom: 1px solid var(--rand); }
+    .frage > summary, .aufklapp > summary { display: flex; align-items: center; gap: 0.6rem; min-height: 2.75rem; cursor: pointer; list-style: none; font-weight: 600; }
+    .frage > summary::-webkit-details-marker, .aufklapp > summary::-webkit-details-marker { display: none; }
+    /* Das Vorzeichen steht im Zweittext-Ton (#5c6478 — DESIGN.md führt ihn als
+       --text-2; die Content-Seiten tragen den Wert wörtlich, ein Token dafür
+       haben sie nicht), nicht in der Kennfarbe. Die Kennfarben-Regel gibt das
+       Blau dem Kopfbalken und der primären Aktion; drei bis sechs blaue
+       Pluszeichen je Seite nahmen dem einen Knopf, auf den es ankommt (.start
+       im Abschlussblock), genau die Signalwirkung, für die er die Farbe trägt.
+       Sichtbar bleibt es: gemessen auf dem Seitengrund (#f2f3f7) 5,34:1 — über
+       den 4,5:1 aus WCAG 1.4.3 und weit über den 3:1 für Bedienteile. Der
+       Fokusring darunter bleibt blau: Er zeigt einen Zustand an und ist keine
+       Dekoration. */
+    .frage > summary::before, .aufklapp > summary::before { content: "+"; flex: none; width: 1rem; text-align: center; font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace; font-weight: 700; color: #5c6478; }
+    .frage[open] > summary::before, .aufklapp[open] > summary::before { content: "−"; }
+    .frage > summary:focus-visible, .aufklapp > summary:focus-visible { outline: 3px solid var(--blau); outline-offset: 2px; }
+    /* Die Frage bleibt eine h3 (im summary erlaubt) — Gliederung und JSON-LD
+       bleiben damit unberührt. Nur der Blocksatz muss weichen, sonst rutscht
+       sie unter das Vorzeichen. */
+    .frage > summary h3 { display: inline; margin: 0; padding: 0; border: 0; }
+    .frage > p, .aufklapp > .tabellenrahmen, .aufklapp > .tabelle { margin-top: 0; margin-bottom: 1rem; }
+    /* Sprungziel. Ein Link auf eine einzelne Frage ist das, was im Ehrenamt
+       tatsächlich weitergereicht wird („guck mal, wo die Daten bleiben") — und
+       er taugt nur, wenn die Frage aufgeklappt ankommt. Von selbst öffnet sich
+       ein <details> beim Anker-Treffer nicht, und ein Skript gibt es auf diesen
+       Seiten nicht (dieselbe Prämisse wie bei der Landkarte: offline, ohne
+       Skript, im Ausdruck). Also derselbe Kniff wie beim Drucken, in beiden
+       Schreibweisen: die ältere über den Kindselektor, die neuere über
+       ::details-content. Wo beides nicht greift, bleibt die Frage zugeklappt —
+       sichtbar ist sie trotzdem, und ein Klick öffnet sie. Kaputt ist nichts.
+       Das Vorzeichen zeigt „−", damit der Zustand nicht lügt; scroll-margin
+       hält die Zeile vom oberen Fensterrand frei. */
+    .frage:target, [id]:target { scroll-margin-top: 1rem; }
+    .frage:target > *:not(summary) { display: block; }
+    .frage:target::details-content { content-visibility: visible; display: block; }
+    .frage:target:not([open]) > summary::before { content: "−"; }
+    /* Ausdruck: Ein ausgedruckter Bogen darf nichts verschlucken. Zwei
+       Schreibweisen, weil die Browser das Element unterschiedlich bauen — die
+       ältere über den Kindselektor, die neuere über ::details-content. */
+    @media print {
+      details { display: block; }
+      details > summary { display: block; }
+      details > *:not(summary) { display: block; }
+      details::details-content { content-visibility: visible; display: block; }
+      .frage > summary::before, .aufklapp > summary::before { content: ""; width: 0; }
+    }
+    /* Sprungmenü: Listenpunkte sind keine Links im Fließtext, die
+       WCAG-2.5.8-Ausnahme greift hier nicht — volle Trefferfläche. Mehrspaltig
+       ab der Breite, ab der zwei Spalten nicht umbrechen; auf dem Handy
+       einspaltig. */
+    .sprungmenue { margin: 1.2rem 0 2rem; padding-top: 0.8rem; border-top: 1px solid var(--rand); }
+    .sprungmenue-titel { margin: 0 0 0.4rem; font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace; font-weight: 700; font-size: 0.8125rem; letter-spacing: 0.1em; text-transform: uppercase; color: #5c6478; }
+    .sprungmenue ul { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr)); gap: 0 1.5rem; }
+    .sprungmenue li { margin: 0; }
+    .sprungmenue a { display: flex; align-items: center; min-height: 2.75rem; }
+    /* Textfassung der Karte: dieselben zwölf Ziele als Zeile, nach Anzahl
+       geordnet. Sie steht außerhalb des Aufklappblocks, weil die Karte
+       aria-hidden ist und dies der einzige Zugang für Tastatur und
+       Screenreader bleibt. Als punktgetrennter Textblock fällt sie unter die
+       WCAG-2.5.8-Ausnahme für Links im Fließtext. */
+    .laenderliste { margin: 0.8rem 0 1.2rem; line-height: 2; }
+    .laenderliste .anzahl { font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace; font-size: 0.875rem; color: #5c6478; }
+    /* OFFENLEGUNG:CSS:END */
   </style>
 </head>
 <body>
@@ -360,6 +441,38 @@
 
     <p><a class="start" href="./">Bogen jetzt ausfüllen</a></p>
 
+    <!-- FAQ:START -->
+    <h2 id="haeufige-fragen">Häufige Fragen zum Vergleich</h2>
+
+    <details class="frage" id="frage-papier-ersetzt" open>
+      <summary><h3>Ersetzt der digitale Erfassungsbogen das Papier?</h3></summary>
+      <p>
+      Nein — er erzeugt es. Die App druckt das gewohnte Papierformular als PDF;
+      der QR-Code auf der letzten Seite macht dasselbe Blatt zusätzlich
+      maschinenlesbar. Fällt die Technik aus, funktioniert das Blatt wie eh und je.
+      </p>
+    </details>
+
+    <details class="frage" id="frage-excel">
+      <summary><h3>Ist eine Excel-Tabelle nicht genauso gut?</h3></summary>
+      <p>
+      Im Einsatz selten: Die Datei lebt auf einem Rechner, die Übergabe braucht
+      USB-Stick oder Netz, das Layout entspricht keinem Vordruck und taktische
+      Zeichen fehlen. Der digitale Erfassungsbogen bietet festes Formular-Layout
+      und QR-Übergabe von Gerät zu Gerät — und exportiert bei Bedarf CSV.
+      </p>
+    </details>
+
+    <details class="frage" id="frage-kosten">
+      <summary><h3>Was kostet die digitale Fassung?</h3></summary>
+      <p>
+      Nichts. Die App ist freie Software unter der EUPL-1.2 — kostenlos, ohne
+      Konto, ohne Bezahlschranke und ohne Werbung; der Quellcode liegt offen auf
+      <a href="https://github.com/wattnpapa/erfassungsbogen">GitHub</a>.
+      </p>
+    </details>
+    <!-- FAQ:END -->
+
     <!-- HANDLUNG:ABSCHLUSS:START -->
     <div class="abschluss">
       <a class="start" href="./">Bogen digital ausfüllen</a>
@@ -462,6 +575,11 @@
             "@type": "Question",
             "name": "Ist eine Excel-Tabelle nicht genauso gut?",
             "acceptedAnswer": { "@type": "Answer", "text": "Im Einsatz selten: Die Datei lebt auf einem Rechner, die Übergabe braucht USB-Stick oder Netz, das Layout entspricht keinem Vordruck und taktische Zeichen fehlen. Der digitale Erfassungsbogen bietet festes Formular-Layout und QR-Übergabe von Gerät zu Gerät — und exportiert bei Bedarf CSV." }
+          },
+          {
+            "@type": "Question",
+            "name": "Was kostet die digitale Fassung?",
+            "acceptedAnswer": { "@type": "Answer", "text": "Nichts. Die App ist freie Software unter der EUPL-1.2 — kostenlos, ohne Konto, ohne Bezahlschranke und ohne Werbung; der Quellcode liegt offen auf GitHub." }
           }
         ]
       }

@@ -55,7 +55,7 @@
     table { border-collapse: collapse; font-size: 0.875rem; background: #fff; min-width: 100%; }
     th, td { border: 1px solid var(--rand); padding: 0.4rem 0.6rem; text-align: left; vertical-align: top; white-space: nowrap; }
     th { background: #e8eaf2; color: var(--blau); }
-    .hinweis { background: #fff; border-left: 4px solid var(--blau); padding: 0.7rem 0.9rem; margin: 1.2rem 0; font-size: 0.875rem; }
+    .hinweis { background: #fff; border-top: 4px solid var(--text); padding: 0.7rem 0.9rem; margin: 1.2rem 0; font-size: 0.875rem; }
     footer { margin-top: 2.5rem; padding-top: 1rem; border-top: 1px solid var(--rand); font-size: 0.875rem; color: #5c6478; }
 /* NAV:CSS:START */
     /* Sprunglink: sitzt außerhalb des Sichtfelds und kommt beim ersten Tabstopp
@@ -191,9 +191,30 @@
        außerhalb der Textkante sitzt und die Zeile gegen die Überschriften
        darüber verschiebt. */
     .frage, .aufklapp { border-top: 1px solid var(--rand); }
+    /* Abschlusskante. Der Stapel trug nur Oberkanten und franste unten in die
+       Handlungsaufforderung aus — in einer Optik, die von geschlossenen Kästen
+       lebt, ein sichtbarer Bruch. Die Unterkante hängt am **Stapel**, nicht am
+       letzten Element der Seite: :has(~ .frage) fragt, ob unter demselben
+       Elternteil noch ein Aufklapper folgt. .frage:last-of-type hätte
+       dasselbe geleistet, solange die letzte Frage auch das letzte <details>
+       der Seite ist — steht dort eines Tages hinter dem Abschlussknopf noch
+       eines (der Länderblock stand schon einmal dort), rutschte die Kante
+       wortlos dorthin. Ohne :has()-Unterstützung fehlt sie; mehr passiert
+       nicht. */
+    .frage:not(:has(~ .frage)), .aufklapp:not(:has(~ .aufklapp)) { border-bottom: 1px solid var(--rand); }
     .frage > summary, .aufklapp > summary { display: flex; align-items: center; gap: 0.6rem; min-height: 2.75rem; cursor: pointer; list-style: none; font-weight: 600; }
     .frage > summary::-webkit-details-marker, .aufklapp > summary::-webkit-details-marker { display: none; }
-    .frage > summary::before, .aufklapp > summary::before { content: "+"; flex: none; width: 1rem; text-align: center; font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace; font-weight: 700; color: var(--blau); }
+    /* Das Vorzeichen steht im Zweittext-Ton (#5c6478 — DESIGN.md führt ihn als
+       --text-2; die Content-Seiten tragen den Wert wörtlich, ein Token dafür
+       haben sie nicht), nicht in der Kennfarbe. Die Kennfarben-Regel gibt das
+       Blau dem Kopfbalken und der primären Aktion; drei bis sechs blaue
+       Pluszeichen je Seite nahmen dem einen Knopf, auf den es ankommt (.start
+       im Abschlussblock), genau die Signalwirkung, für die er die Farbe trägt.
+       Sichtbar bleibt es: gemessen auf dem Seitengrund (#f2f3f7) 5,34:1 — über
+       den 4,5:1 aus WCAG 1.4.3 und weit über den 3:1 für Bedienteile. Der
+       Fokusring darunter bleibt blau: Er zeigt einen Zustand an und ist keine
+       Dekoration. */
+    .frage > summary::before, .aufklapp > summary::before { content: "+"; flex: none; width: 1rem; text-align: center; font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace; font-weight: 700; color: #5c6478; }
     .frage[open] > summary::before, .aufklapp[open] > summary::before { content: "−"; }
     .frage > summary:focus-visible, .aufklapp > summary:focus-visible { outline: 3px solid var(--blau); outline-offset: 2px; }
     /* Die Frage bleibt eine h3 (im summary erlaubt) — Gliederung und JSON-LD
@@ -201,6 +222,21 @@
        sie unter das Vorzeichen. */
     .frage > summary h3 { display: inline; margin: 0; padding: 0; border: 0; }
     .frage > p, .aufklapp > .tabellenrahmen, .aufklapp > .tabelle { margin-top: 0; margin-bottom: 1rem; }
+    /* Sprungziel. Ein Link auf eine einzelne Frage ist das, was im Ehrenamt
+       tatsächlich weitergereicht wird („guck mal, wo die Daten bleiben") — und
+       er taugt nur, wenn die Frage aufgeklappt ankommt. Von selbst öffnet sich
+       ein <details> beim Anker-Treffer nicht, und ein Skript gibt es auf diesen
+       Seiten nicht (dieselbe Prämisse wie bei der Landkarte: offline, ohne
+       Skript, im Ausdruck). Also derselbe Kniff wie beim Drucken, in beiden
+       Schreibweisen: die ältere über den Kindselektor, die neuere über
+       ::details-content. Wo beides nicht greift, bleibt die Frage zugeklappt —
+       sichtbar ist sie trotzdem, und ein Klick öffnet sie. Kaputt ist nichts.
+       Das Vorzeichen zeigt „−", damit der Zustand nicht lügt; scroll-margin
+       hält die Zeile vom oberen Fensterrand frei. */
+    .frage:target, [id]:target { scroll-margin-top: 1rem; }
+    .frage:target > *:not(summary) { display: block; }
+    .frage:target::details-content { content-visibility: visible; display: block; }
+    .frage:target:not([open]) > summary::before { content: "−"; }
     /* Ausdruck: Ein ausgedruckter Bogen darf nichts verschlucken. Zwei
        Schreibweisen, weil die Browser das Element unterschiedlich bauen — die
        ältere über den Kindselektor, die neuere über ::details-content. */
@@ -462,30 +498,63 @@
     <p><a class="start" href="./">Bogen für die FGr N ausfüllen</a></p>
     <!-- HANDLUNG:MITTE:END -->
 
-    <h2>Häufige Fragen zur FGr N</h2>
+    <!-- FAQ:START -->
+    <h2 id="haeufige-fragen">Häufige Fragen zur FGr N</h2>
 
-    <details class="frage" open>
-      <summary><h3>Warum legt die App nur neun Personalplätze an, obwohl es eine Reserve gibt?</h3></summary>
+    <details class="frage" id="frage-staerke" open>
+      <summary><h3>Welche Stärke hat die Fachgruppe Notversorgung und Notinstandsetzung?</h3></summary>
       <p>
-      Weil die Reserve nicht mit ausrückt und damit nicht zur Einsatzstärke
-      zählt. Der Bogen meldet, wer am Bereitstellungsraum steht. Wer die
-      Reserve im eigenen Bogen dokumentieren möchte, kann Personalkarten
-      ergänzen — die Vorbelegung tut es nicht von sich aus.
+      Neun Einsatzkräfte: eine Gruppenführung, eine Truppführung und sieben
+      Fachhelferinnen und Fachhelfer, in der Stärkenotation
+      <strong>-/2/7/9</strong>. Die Reserve zählt nicht dazu — sie rückt nicht
+      mit aus, und dem Meldekopf Kräfte zu melden, die nicht am
+      Bereitstellungsraum stehen, wäre falsch. Die App legt deshalb neun
+      Personalplätze an; wer die Reserve im eigenen Bogen führen will, ergänzt
+      sie von Hand.
       </p>
     </details>
 
-    <details class="frage">
-      <summary><h3>Wie viele Fachgruppen N gibt es überhaupt?</h3></summary>
+    <details class="frage" id="frage-kennzahl">
+      <summary><h3>Welche Kennzahl trägt die FGr N im Funkrufnamen?</h3></summary>
       <p>
-      Nach der Aufstellungsübersicht im THWiki sind es rund 662 Fachgruppen in
-      etwa 641 Ortsverbänden; in wenigen Ortsverbänden stehen zwei, in einigen
-      keine. Diese Zahlen sind eine Momentaufnahme aus einer nicht amtlichen
-      Quelle (abgerufen im August 2026) und ändern sich mit jeder Umgliederung.
-      Für den eigenen Bogen ist ohnehin nur die eigene Aufstellung maßgeblich.
+      Im ersten Technischen Zug die 24, im zweiten die 28. Die Vorbelegung
+      setzt die 24, weil die App beim Wählen des Einheitstyps den Zug nicht
+      kennt. Steht deine Fachgruppe im zweiten Zug, änderst du im Funkrufnamen
+      die erste Zahl von 24 auf 28 — ein Feld, ein Handgriff.
       </p>
     </details>
 
-    <details class="frage">
+    <details class="frage" id="frage-typen">
+      <summary><h3>Hat die Fachgruppe N die Typen A, B und C?</h3></summary>
+      <p>
+      Nein. Anders als die Fachgruppen
+      <a href="./thw-fachgruppe-raeumen-erfassungsbogen.html">Räumen</a> oder
+      <a href="./thw-fachgruppe-wasserschaden-pumpen-erfassungsbogen.html">Wasserschaden/Pumpen</a>
+      gibt es die FGr N nur in einer Ausführung — ein Einheitstyp, die
+      StAN-Nummer 02-09, ein taktisches Zeichen.
+      </p>
+    </details>
+
+    <details class="frage" id="frage-personendaten">
+      <summary><h3>Wo bleiben die Personendaten der Einsatzkräfte?</h3></summary>
+      <p>
+      Auf deinem Gerät. Es gibt keinen Server, keine Cloud und keine Konten;
+      weitergegeben wird nur, was du selbst als PDF, Datei, QR-Code oder Link
+      übergibst — nachzulesen in der <a href="./datenschutz.html">Datenschutzerklärung</a>. Namen sind ohnehin optional:
+      Für die Stärkemeldung genügen die Zahlen.
+      </p>
+    </details>
+
+    <details class="frage" id="frage-kosten">
+      <summary><h3>Was kostet die App?</h3></summary>
+      <p>
+      Nichts. Die App ist freie Software unter der EUPL-1.2 — kostenlos, ohne
+      Konto, ohne Bezahlschranke und ohne Werbung; der Quellcode liegt offen auf
+      <a href="https://github.com/wattnpapa/erfassungsbogen">GitHub</a>.
+      </p>
+    </details>
+
+    <details class="frage" id="frage-wiederverwenden">
       <summary><h3>Kann ich den ausgefüllten Bogen wiederverwenden?</h3></summary>
       <p>
       Ja. Ein einmal ausgefüllter Bogen lässt sich als eigene Vorlage
@@ -494,6 +563,7 @@
       <a href="./vorlage.html">Vorlage und Aufbau</a>.
       </p>
     </details>
+    <!-- FAQ:END -->
 
     <h2>Stand der Angaben</h2>
     <p>
@@ -605,17 +675,32 @@
           {
             "@type": "Question",
             "name": "Welche Stärke hat die Fachgruppe Notversorgung und Notinstandsetzung?",
-            "acceptedAnswer": { "@type": "Answer", "text": "Neun Einsatzkräfte: eine Gruppenführung, eine Truppführung und sieben Fachhelferinnen und Fachhelfer, in der Stärkenotation -/2/7/9. Hinzu kommt eine Reserve, die nicht zur Einsatzstärke zählt und deshalb in der Vorbelegung nicht angelegt wird." }
+            "acceptedAnswer": { "@type": "Answer", "text": "Neun Einsatzkräfte: eine Gruppenführung, eine Truppführung und sieben Fachhelferinnen und Fachhelfer, in der Stärkenotation -/2/7/9. Die Reserve zählt nicht dazu — sie rückt nicht mit aus, und dem Meldekopf Kräfte zu melden, die nicht am Bereitstellungsraum stehen, wäre falsch. Die App legt deshalb neun Personalplätze an; wer die Reserve im eigenen Bogen führen will, ergänzt sie von Hand." }
           },
           {
             "@type": "Question",
             "name": "Welche Kennzahl trägt die FGr N im Funkrufnamen?",
-            "acceptedAnswer": { "@type": "Answer", "text": "Im ersten Technischen Zug die 24, im zweiten die 28. Die Vorbelegung setzt die 24; steht die Fachgruppe im zweiten Zug, wird die erste Zahl im Funkrufnamen von Hand auf 28 geändert." }
+            "acceptedAnswer": { "@type": "Answer", "text": "Im ersten Technischen Zug die 24, im zweiten die 28. Die Vorbelegung setzt die 24, weil die App beim Wählen des Einheitstyps den Zug nicht kennt. Steht deine Fachgruppe im zweiten Zug, änderst du im Funkrufnamen die erste Zahl von 24 auf 28 — ein Feld, ein Handgriff." }
           },
           {
             "@type": "Question",
-            "name": "Hat die Fachgruppe N Typen A, B und C?",
-            "acceptedAnswer": { "@type": "Answer", "text": "Nein. Anders als die Fachgruppen Räumen oder Wasserschaden/Pumpen gibt es die FGr N nur in einer Ausführung, mit der StAN-Nummer 02-09 und einem einzigen taktischen Zeichen." }
+            "name": "Hat die Fachgruppe N die Typen A, B und C?",
+            "acceptedAnswer": { "@type": "Answer", "text": "Nein. Anders als die Fachgruppen Räumen oder Wasserschaden/Pumpen gibt es die FGr N nur in einer Ausführung — ein Einheitstyp, die StAN-Nummer 02-09, ein taktisches Zeichen." }
+          },
+          {
+            "@type": "Question",
+            "name": "Wo bleiben die Personendaten der Einsatzkräfte?",
+            "acceptedAnswer": { "@type": "Answer", "text": "Auf deinem Gerät. Es gibt keinen Server, keine Cloud und keine Konten; weitergegeben wird nur, was du selbst als PDF, Datei, QR-Code oder Link übergibst — nachzulesen in der Datenschutzerklärung. Namen sind ohnehin optional: Für die Stärkemeldung genügen die Zahlen." }
+          },
+          {
+            "@type": "Question",
+            "name": "Was kostet die App?",
+            "acceptedAnswer": { "@type": "Answer", "text": "Nichts. Die App ist freie Software unter der EUPL-1.2 — kostenlos, ohne Konto, ohne Bezahlschranke und ohne Werbung; der Quellcode liegt offen auf GitHub." }
+          },
+          {
+            "@type": "Question",
+            "name": "Kann ich den ausgefüllten Bogen wiederverwenden?",
+            "acceptedAnswer": { "@type": "Answer", "text": "Ja. Ein einmal ausgefüllter Bogen lässt sich als eigene Vorlage speichern; beim nächsten Einsatz musterst du nur noch, wer nicht dabei ist. Wie der Bogen aufgebaut ist, zeigt die Seite Vorlage und Aufbau." }
           }
         ]
       }
