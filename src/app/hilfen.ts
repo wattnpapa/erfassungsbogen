@@ -473,6 +473,25 @@ export function vorbelegungGeladen<T>(liste: T[], vorlage: T[]): boolean {
   return vorlage.length > 0 && JSON.stringify(liste) === JSON.stringify(vorlage);
 }
 
+/**
+ * Zeitstempel im NATO-Format (DTG ohne Zonenbuchstaben): Tag, Stunde, Minute,
+ * Monatskürzel, Jahr — „102035aug26" für den 10. August 2026, 20:35 Ortszeit.
+ * Steht in Dateinamen vor dem Einheitsnamen, damit mehrere Ausgaben derselben
+ * Einheit sich nicht überschreiben und die Meldezeit am Namen ablesbar ist.
+ */
+const NATO_MONATE = ["jan", "feb", "mar", "apr", "mai", "jun", "jul", "aug", "sep", "okt", "nov", "dez"];
+
+export function natoZeitstempel(d: Date = new Date()): string {
+  const zwei = (n: number) => String(n).padStart(2, "0");
+  return (
+    zwei(d.getDate()) +
+    zwei(d.getHours()) +
+    zwei(d.getMinutes()) +
+    NATO_MONATE[d.getMonth()] +
+    zwei(d.getFullYear() % 100)
+  );
+}
+
 /** Dateinamens-Rumpf aus dem Anzeigenamen der Einheit („THW_Oldenburg_NI_FGr_K_A"). */
 export function bogenDateiname(b: Erfassungsbogen): string {
   return einheitAnzeigename(b.einheit).replace(/[^\wäöüÄÖÜß-]+/g, "_");

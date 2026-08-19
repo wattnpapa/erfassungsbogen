@@ -40,6 +40,7 @@ import {
   migriereBogen,
   neuePerson,
   neuerBogen,
+  natoZeitstempel,
   neuesFahrzeug,
   orgLabel,
   plausibilitaet,
@@ -700,5 +701,15 @@ describe("qrErzeugen(): Textlink (vollUrl)", () => {
   it("trägt denselben Payload wie das QR-Bild (dort Base41)", async () => {
     const qr = await qrErzeugen(neuerBogen());
     expect(payloadAusText(qr.vollUrl)).toEqual(payloadAusText(qr.teile[0]!.url));
+  });
+});
+
+describe("natoZeitstempel()", () => {
+  it("setzt Tag, Uhrzeit, Monatskürzel und Jahr zusammen", () => {
+    expect(natoZeitstempel(new Date(2026, 7, 10, 20, 35))).toBe("102035aug26");
+  });
+
+  it("füllt einstellige Werte mit Null auf", () => {
+    expect(natoZeitstempel(new Date(2026, 0, 3, 7, 5))).toBe("030705jan26");
   });
 });

@@ -14,7 +14,7 @@ import * as pdfFonts from "pdfmake/build/vfs_fonts";
 import helvetica from "pdfmake/build/standard-fonts/Helvetica";
 import type { Erfassungsbogen } from "../model";
 import { base64UrlDekodieren } from "../codec";
-import { einheitAnzeigename, qrErzeugen } from "./hilfen";
+import { einheitAnzeigename, natoZeitstempel, qrErzeugen } from "./hilfen";
 import { istNativ, binaerTeilen } from "./nativ";
 import { einsatzPdfDokument, pdfDokument, type SammelBogen } from "./pdf-dokument";
 import { einsatzDateiInhalt } from "./einsatz-transport";
@@ -63,7 +63,8 @@ export async function pdfErzeugen(
 ): Promise<void> {
   const qr = await qrErzeugen(b, herkunft);
   const dd = pdfDokument(b, qr);
-  const dateiname = name ?? `eeb-${einheitAnzeigename(b.einheit).replace(/[^\wäöüÄÖÜß-]+/g, "_")}.pdf`;
+  const rumpf = einheitAnzeigename(b.einheit).replace(/[^\wäöüÄÖÜß-]+/g, "_");
+  const dateiname = name ?? `eeb-${natoZeitstempel()}_${rumpf}.pdf`;
   if (istNativ()) {
     // In der App gibt es keinen Browser-Download: PDF übers Share-Sheet anbieten
     const base64 = await pdfMake.createPdf(dd).getBase64();
@@ -124,7 +125,8 @@ export async function einsatzPdfErzeugen(einsatz: Einsatzsammlung, meldungen: Me
     });
   }
   const dd = einsatzPdfDokument(einsatz.name, boegenMitQr, einsatzDateiInhalt(einsatz));
-  const dateiname = `eeb-einsatz-${(einsatz.name || "sammlung").replace(/[^\wäöüÄÖÜß-]+/g, "_")}.pdf`;
+  const rumpf = (einsatz.name || "sammlung").replace(/[^\wäöüÄÖÜß-]+/g, "_");
+  const dateiname = `eeb-einsatz-${natoZeitstempel()}_${rumpf}.pdf`;
   if (istNativ()) {
     const base64 = await pdfMake.createPdf(dd).getBase64();
     await binaerTeilen(dateiname, base64);
