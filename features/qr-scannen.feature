@@ -7,16 +7,18 @@ Funktionalität: Bogen per QR-Code einlesen
 
   # Der genaue Fehlertext hängt am Grund (gesperrt, belegt, gar keine Kamera)
   # und damit an der Umgebung — geprüft wird deshalb, was der Nutzer in JEDEM
-  # dieser Fälle vorfindet: den Weg über ein Bild und einen zweiten Versuch.
-  Szenario: Ohne Kamera bleibt der Weg über ein Bild offen
+  # dieser Fälle vorfindet: den USB-Handscanner samt Lebenszeichen, den Weg
+  # über ein Bild und einen zweiten Versuch.
+  Szenario: Ohne Kamera stehen Handscanner und Bild-Weg bereit
     Angenommen ich öffne die App
     Wenn ich auf "QR-Code scannen…" klicke
     Dann sehe ich den Dialog "QR-Code scannen"
-    Und sehe ich den Hinweis "Ohne Kamera geht es weiter über ein Foto oder einen Screenshot des QR-Codes."
+    Und sehe ich den Hinweis "Ohne Kamera: mit dem USB-Handscanner scannen"
+    Und sehe ich den Hinweis "Bereit — warte auf den Handscanner"
     Und sehe ich den Datei-Knopf "QR aus Bild einlesen…"
     Und sehe ich die Schaltfläche "Kamera erneut versuchen"
     Wenn ich im Dialog "QR-Code scannen" auf "Abbrechen" klicke
-    Dann sehe ich den Hinweis "Ohne Kamera geht es weiter über ein Foto oder einen Screenshot des QR-Codes." nicht
+    Dann sehe ich den Hinweis "Ohne Kamera: mit dem USB-Handscanner scannen" nicht
     Und sehe ich die Schaltfläche "Neuen Bogen erstellen"
 
   Szenario: Der angezeigte QR-Code wird als Bild wieder eingelesen
