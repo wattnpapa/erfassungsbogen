@@ -122,6 +122,10 @@ export function QrScannerWeb(props: {
   // daraus geworden ist — sonst würde die Rückmeldung den Stream erneut starten.
   const [wunschKamera, setWunschKamera] = useState(gemerkteKamera);
   const [benutzteKamera, setBenutzteKamera] = useState("");
+  // Zeichen, die der Handscanner gerade tippt. Nur als Lebenszeichen gedacht:
+  // Ohne Kamerabild sieht man sonst nicht, ob der Scanner überhaupt am Rechner
+  // ankommt — ein stummer Bildschirm wirkt wie ein kaputter Scanner.
+  const [scannerZeichen, setScannerZeichen] = useState(0);
 
   useEffect(() => {
     let aktiv = true;
@@ -220,10 +224,12 @@ export function QrScannerWeb(props: {
       const jetzt = performance.now();
       if (jetzt - zuletzt > HANDSCANNER_PAUSE_MS) puffer = "";
       zuletzt = jetzt;
+      setScannerZeichen(puffer.length);
       // Leertaste ausgenommen: Sie bedient fokussierte Knöpfe, und kein
       // Payload-Zeichensatz (URL, Base41, Base64url) enthält Leerzeichen.
       if (e.key.length === 1 && e.key !== " ") {
         puffer += e.key;
+        setScannerZeichen(puffer.length);
         // Sonst springt z. B. die Kamera-Auswahl bei Buchstaben mit.
         e.preventDefault();
         return;
@@ -232,6 +238,7 @@ export function QrScannerWeb(props: {
         e.preventDefault();
         const text = puffer;
         puffer = "";
+        setScannerZeichen(0);
         propsRef.current.onErgebnis(text);
       }
     }
@@ -257,8 +264,6 @@ export function QrScannerWeb(props: {
                 {fehler.schritte.map((schritt) => <li key={schritt}>{schritt}</li>)}
               </ul>
             )}
-            <p>Ein angeschlossener USB-Handscanner liest den Code auch ohne Kamera — einfach auslösen.</p>
-            {props.onBild && <p>Ohne Kamera geht es weiter über ein Foto oder einen Screenshot des QR-Codes.</p>}
           </div>
         )
         : (
@@ -269,7 +274,31 @@ export function QrScannerWeb(props: {
             <TeilQuittung teile={props.teile ?? []} />
           </div>
         )}
-      {!fehler && <div className="scanner-rahmen" aria-hidden="true" />}
+      {!fehler
+        ? <div className="scanner-rahmen" aria-hidden="true" />
+        : (
+          /* Der zweite Weg ist ohne Kamera der einzige — er bekommt deshalb
+             die Mitte des Bildschirms, dort wo sonst der Suchrahmen steht,
+             statt als Nachsatz unter der Fehlermeldung zu stehen. */
+          <div className="scanner-handscanner">
+            <p className="handscanner-titel">Ohne Kamera: mit dem USB-Handscanner scannen</p>
+            <ol className="scanner-schritte">
+              <li>QR-Code des Erfassungsbogens auf Papier oder Bildschirm anvisieren.</li>
+              <li>Am Handscanner auslösen — dieses Fenster nimmt den Code sofort an, ohne Klick in ein Feld.</li>
+            </ol>
+            {/* role="status": Ohne Kamerabild ist diese Zeile die einzige
+                Rückmeldung, dass der Scanner am Rechner ankommt. */}
+            <p role="status" className={`handscanner-lampe${scannerZeichen ? " aktiv" : ""}`}>
+              {scannerZeichen
+                ? `Handscanner erkannt — ${scannerZeichen} Zeichen …`
+                : "Bereit — warte auf den Handscanner"}
+            </p>
+            <p className="handscanner-fussnote">
+              Der Scanner muss den Code mit Enter abschließen (Werkseinstellung der meisten Geräte).
+              {props.onBild && " Sonst hilft „QR aus Bild einlesen…“ mit einem Foto oder Screenshot."}
+            </p>
+          </div>
+        )}
       <div className="scanner-aktionen">
         {kameras.length > 1 && !fehler && (
           <label className="scanner-kamera">

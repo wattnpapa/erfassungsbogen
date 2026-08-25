@@ -141,6 +141,20 @@ describe("QR-Scanner im Browser", () => {
     expect(onErgebnis).toHaveBeenCalledExactlyOnceWith(url);
   });
 
+  it("zeigt ohne Kamera den Handscanner-Weg samt Lebenszeichen", async () => {
+    // Ohne Kamerabild ist die Zeichen-Rückmeldung der einzige Beleg, dass der
+    // Scanner am Rechner ankommt — sonst wirkt der schwarze Bildschirm tot.
+    mediaDevicesSetzen(undefined);
+
+    render(<QrScannerWeb onErgebnis={() => {}} onAbbruch={() => {}} />);
+    await screen.findByText(/USB-Handscanner/);
+    expect(screen.getByRole("status").textContent).toMatch(/warte auf den Handscanner/i);
+
+    for (const zeichen of "https:") fireEvent.keyDown(window, { key: zeichen });
+
+    expect(screen.getByRole("status").textContent).toMatch(/Handscanner erkannt — 6 Zeichen/);
+  });
+
   it("wertet langsames menschliches Tippen nicht als Scan", async () => {
     mediaDevicesSetzen(undefined);
     const onErgebnis = vi.fn();

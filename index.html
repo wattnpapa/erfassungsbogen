@@ -1512,6 +1512,31 @@
       --quittung-text: #fff;
       justify-content: center; margin-top: var(--r-2);
     }
+    /* Der Handscanner-Weg tritt an die Stelle des Suchrahmens, wenn die
+       Kamera ausfällt: gleiche Fläche, gleicher Platz — damit ohne Kamera
+       nicht ein leerer schwarzer Bildschirm mit roter Zeile übrig bleibt,
+       sondern sichtbar ein zweiter, gangbarer Weg. */
+    .scanner-handscanner {
+      width: min(90vw, 34rem); color: #fff; text-align: center;
+      display: grid; gap: 0.6rem;
+      border: 3px dashed rgba(255, 255, 255, 0.7); border-radius: var(--radius);
+      padding: 1rem 1.1rem;
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+    }
+    .scanner-handscanner p { margin: 0; }
+    .handscanner-titel { font-weight: 700; font-size: var(--t-l); }
+    .scanner-handscanner .scanner-schritte { color: #fff; }
+    /* Lebenszeichen: gedämpft, solange nichts kommt — aufleuchtend, sobald
+       der Scanner tippt. Das ist die Rückmeldung, die sonst das Kamerabild
+       gäbe. */
+    .handscanner-lampe {
+      border: var(--strich) solid rgba(255, 255, 255, 0.5); border-radius: var(--radius);
+      padding: 0.35rem 0.6rem; color: rgba(255, 255, 255, 0.75);
+    }
+    .handscanner-lampe.aktiv {
+      background: #fff; color: #000; border-color: #fff; text-shadow: none; font-weight: 700;
+    }
+    .handscanner-fussnote { font-size: var(--t-s); color: rgba(255, 255, 255, 0.8); }
     .scanner-rahmen {
       width: min(65vw, 55vh); aspect-ratio: 1;
       border: 3px solid rgba(255, 255, 255, 0.9); border-radius: var(--radius);
