@@ -287,12 +287,15 @@ export function QrScannerWeb(props: {
               <li>Am Handscanner auslösen — dieses Fenster nimmt den Code sofort an, ohne Klick in ein Feld.</li>
             </ol>
             {/* role="status": Ohne Kamerabild ist diese Zeile die einzige
-                Rückmeldung, dass der Scanner am Rechner ankommt. */}
+                Rückmeldung — erst dass der Scanner ankommt, dann bei einem
+                mehrteiligen Bogen, welcher Teil noch fehlt. Ohne sie wirkt ein
+                angenommener Teil 1 von 4 wie ein verschluckter Scan. */}
             <p role="status" className={`handscanner-lampe${scannerZeichen ? " aktiv" : ""}`}>
               {scannerZeichen
                 ? `Handscanner erkannt — ${scannerZeichen} Zeichen …`
-                : "Bereit — warte auf den Handscanner"}
+                : props.fortschritt || "Bereit — warte auf den Handscanner"}
             </p>
+            <TeilQuittung teile={props.teile ?? []} />
             <p className="handscanner-fussnote">
               Der Scanner muss den Code mit Enter abschließen (Werkseinstellung der meisten Geräte).
               {props.onBild && " Sonst hilft „QR aus Bild einlesen…“ mit einem Foto oder Screenshot."}

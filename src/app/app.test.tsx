@@ -48,7 +48,7 @@ vi.mock("./nativ", async () => {
   };
 });
 
-const { App } = await import("./app");
+const { App, scanFehlertext } = await import("./app");
 
 /** Vom Startbildschirm bis zum angegebenen Schritt klicken (0 = Einheit). */
 async function neuerBogenBis(nutzer: ReturnType<typeof userEvent.setup>, bisSchritt: number) {
@@ -761,5 +761,28 @@ describe("Meldekopf-Scan: Beschriftung des Schließen-Knopfes", () => {
     fragmentSetzen(teile[1]!);
     expect(await within(scanner).findByRole("button", { name: "Fertig" })).toBeDefined();
     expect(within(scanner).queryByRole("button", { name: "Abbrechen" })).toBeNull();
+  });
+});
+
+/**
+ * Was ein Scan meldet, der nicht lesbar war. Beim USB-Handscanner ist die
+ * häufigste Ursache nicht der Bogen, sondern eine falsch eingestellte
+ * Tastaturbelegung — dann muss die Meldung dorthin zeigen, nicht auf den Code.
+ */
+describe("Fehlertext eines nicht lesbaren Scans", () => {
+  it("nennt die Tastaturbelegung, wenn unser Link ohne Raute ankommt", () => {
+    const verstuemmelt = "https:--erfassungsbogen.app§EEBS.1.4.37766926.B.LMAD3A";
+
+    const text = scanFehlertext(verstuemmelt);
+
+    expect(text).toMatch(/Tastaturbelegung/);
+    expect(text).toMatch(/Empfangen: „https:--erfassungsbogen/);
+  });
+
+  it("bleibt bei fremdem Inhalt bei der schlichten Meldung, zeigt aber das Empfangene", () => {
+    const text = scanFehlertext("WIFI:S=Gastnetz;T=WPA;P=geheim;;");
+
+    expect(text).toMatch(/keinen gültigen Erfassungsbogen/);
+    expect(text).toMatch(/WIFI:S=Gastnetz/);
   });
 });

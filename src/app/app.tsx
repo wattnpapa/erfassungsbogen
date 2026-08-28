@@ -127,6 +127,28 @@ function startAusUrlFragment(): {
   }
 }
 
+/**
+ * Fehlertext für einen Scan, aus dem sich kein Bogen lesen ließ — mit dem
+ * Anfang dessen, was tatsächlich ankam.
+ *
+ * Nötig wegen der USB-Handscanner: Sie tippen den Code als Tastenfolge, und
+ * steht der Scanner auf einer anderen Tastaturbelegung als der Rechner, kommt
+ * er verstümmelt an („https:--erfassungsbogen.app§…" statt „…app/#…"). Der
+ * Bogen ist dann in Ordnung und der Scan technisch erfolgreich — nur die
+ * Zeichen stimmen nicht. Ohne den empfangenen Anfang ist das im Feld nicht zu
+ * erkennen, und die Meldung „kein gültiger Erfassungsbogen" zeigt auf den
+ * falschen Schuldigen.
+ */
+export function scanFehlertext(text: string): string {
+  const anfang = text.trim().slice(0, 40);
+  const gezeigt = `Empfangen: „${anfang}${text.trim().length > 40 ? "…" : ""}"`;
+  // Unser Link, aber ohne die Raute: Genau so sieht eine falsche Belegung aus.
+  if (/erfassungsbogen/i.test(text) && !text.includes("#")) {
+    return `Der Code kam verstümmelt an — der Handscanner ist vermutlich auf eine andere Tastaturbelegung eingestellt als der Rechner (Deutsch/DE). ${gezeigt}`;
+  }
+  return `Der gescannte QR-Code enthält keinen gültigen Erfassungsbogen. ${gezeigt}`;
+}
+
 /** SignaturStatus → gespeicherter Eintragsstatus (nur signierte Empfänge). */
 function alsEintragSignatur(status: SignaturStatus): EintragSignatur | undefined {
   if (status.zustand === "unsigniert") return undefined;
@@ -674,7 +696,7 @@ function AppInhalt() {
   }
 
   function uebernehmeQrText(text: string): Promise<boolean> {
-    return uebernehmeText(text, "Der gescannte QR-Code enthält keinen gültigen Erfassungsbogen.");
+    return uebernehmeText(text, scanFehlertext(text));
   }
 
   /** Web-Scanner-Ergebnis: bei Fertigstellung das Overlay schließen. */

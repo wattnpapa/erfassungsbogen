@@ -155,6 +155,23 @@ describe("QR-Scanner im Browser", () => {
     expect(screen.getByRole("status").textContent).toMatch(/Handscanner erkannt — 6 Zeichen/);
   });
 
+  it("zeigt ohne Kamera auch den Sammelstand eines mehrteiligen Bogens", async () => {
+    // Ohne Kamerabild gab es für einen angenommenen Teil bisher keine Anzeige:
+    // Teil 1 von 4 sah aus wie ein verschluckter Scan.
+    mediaDevicesSetzen(undefined);
+
+    render(
+      <QrScannerWeb
+        onErgebnis={() => {}}
+        onAbbruch={() => {}}
+        fortschritt="Teil 1 von 4 gescannt — es fehlen noch die Teile 2, 3 und 4."
+        teile={[{ teilNr: 1, anzahl: 4, id: 7, chunk: new Uint8Array([1]) }]}
+      />,
+    );
+
+    expect(await screen.findByText(/Teil 1 von 4 gescannt/)).toBeTruthy();
+  });
+
   it("wertet langsames menschliches Tippen nicht als Scan", async () => {
     mediaDevicesSetzen(undefined);
     const onErgebnis = vi.fn();
