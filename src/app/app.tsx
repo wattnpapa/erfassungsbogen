@@ -35,6 +35,7 @@ import {
 } from "./hilfen";
 import { PersonalErfassung, jetztZeitpunkt, staerke } from "../model";
 import { bogenLinksEmpfangen, imWebBrowser, istNativ, qrScannen, textTeilen } from "./nativ";
+import { entwirreScanText } from "./tastaturbelegung";
 import { vorlageAnlegen, vorlagenLaden, vorlagenPapierkorb, type Vorlage } from "./vorlagen";
 import { Musterung, VorlagenListe } from "./vorlagen-ui";
 import { absenderkarteGefuellt, absenderkarteLaden, type Absenderkarte } from "./absenderkarte";
@@ -139,6 +140,29 @@ function startAusUrlFragment(): {
  * erkennen, und die Meldung „kein gültiger Erfassungsbogen" zeigt auf den
  * falschen Schuldigen.
  */
+/** Trägt der Text einen Bogen, eine Vorlage oder einen Segment-Teil? */
+function istLesbarerScan(text: string): boolean {
+  try {
+    if (istSegmentNutzlast(text)) {
+      parseSegmentUrl(text);
+      return true;
+    }
+    if (istVorlageNutzlast(text)) {
+      decodeVorlagePayloadUrl(text, browserKompressor);
+      return true;
+    }
+    decodePayloadUrl(text, browserKompressor);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/** Hinweis nach einem zurückgerechneten Scan — die Einstellung selbst bleibt falsch. */
+const BELEGUNG_HINWEIS =
+  "Der Handscanner tippt in einer anderen Tastaturbelegung (US) als der Rechner; die App hat den Code zurückgerechnet. "
+  + "Dauerhaft behoben ist es, wenn der Scanner auf Deutschland/DE gestellt wird — bei vielen Geräten mit einem Strichcode aus der Kurzanleitung.";
+
 export function scanFehlertext(text: string): string {
   const anfang = text.trim().slice(0, 40);
   const gezeigt = `Empfangen: „${anfang}${text.trim().length > 40 ? "…" : ""}"`;
@@ -695,8 +719,20 @@ function AppInhalt() {
     return true;
   }
 
-  function uebernehmeQrText(text: string): Promise<boolean> {
-    return uebernehmeText(text, scanFehlertext(text));
+  /**
+   * Gescannten Text übernehmen. Vorgeschaltet die Belegungs-Rückrechnung: Ein
+   * Handscanner in US-Belegung liefert auf deutschen Rechnern einen verdrehten
+   * (aber vollständigen) Code — den kann die App lesen, statt den Nutzer mit
+   * einer Fehlermeldung an die Scanner-Konfiguration zu schicken. Der
+   * Fehlertext zeigt weiterhin, was TATSÄCHLICH ankam.
+   */
+  async function uebernehmeQrText(rohText: string): Promise<boolean> {
+    const text = entwirreScanText(rohText, istLesbarerScan);
+    const fertig = await uebernehmeText(text, scanFehlertext(rohText));
+    // Nach der Übernahme melden: Sie setzt ihrerseits Meldungen, die den
+    // Hinweis sonst gleich wieder überschrieben.
+    if (text !== rohText) setMeldung(BELEGUNG_HINWEIS);
+    return fertig;
   }
 
   /** Web-Scanner-Ergebnis: bei Fertigstellung das Overlay schließen. */

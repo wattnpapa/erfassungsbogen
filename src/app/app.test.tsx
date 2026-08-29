@@ -5,7 +5,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { render, screen, waitFor, within } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { OrganisationsTyp, type Erfassungsbogen } from "../model";
 import { encodePayload, encodePayloadUrl, encodeVorlagePayloadUrl, fragmentInhalt, segmentPayloadUrls } from "../codec";
@@ -784,5 +784,34 @@ describe("Fehlertext eines nicht lesbaren Scans", () => {
 
     expect(text).toMatch(/keinen gültigen Erfassungsbogen/);
     expect(text).toMatch(/WIFI:S=Gastnetz/);
+  });
+});
+
+/**
+ * Der Handscanner am PC: Er tippt den Code als Tastenfolge. Steht er auf
+ * US-Belegung (Werkseinstellung vieler Geräte), kommt der Code verdreht an —
+ * die App muss ihn trotzdem lesen und sagen, woran es lag.
+ */
+describe("Handscanner in falscher Tastaturbelegung", () => {
+  afterEach(() => localStorage.clear());
+
+  it("liest einen verdreht getippten Bogen und nennt die Ursache", async () => {
+    const nutzer = userEvent.setup();
+    const bogen = neuerBogen();
+    bogen.einheit.hierarchie[0]!.name = "Belegungshausen";
+    const verdreht = [...encodePayloadUrl(bogen, browserKompressor)]
+      .map((z) => (({ ":": "Ö", "/": "-", "#": "§", "-": "ß", "*": "(", y: "z", z: "y", Y: "Z", Z: "Y" }) as Record<string, string>)[z] ?? z)
+      .join("");
+    render(<App />);
+    await nutzer.click(screen.getByRole("button", { name: "QR-Code scannen…" }));
+    await screen.findByRole("dialog", { name: "QR-Code scannen" });
+
+    for (const zeichen of verdreht) fireEvent.keyDown(window, { key: zeichen });
+    fireEvent.keyDown(window, { key: "Enter" });
+
+    // Der Bogen ist da (Übersicht offen) — und die Meldung nennt die Ursache,
+    // damit die Einstellung am Scanner nicht dauerhaft falsch bleibt.
+    expect(await screen.findByText(/Tastaturbelegung \(US\)/)).toBeDefined();
+    expect(screen.getByText("Gesamtübersicht")).toBeDefined();
   });
 });
