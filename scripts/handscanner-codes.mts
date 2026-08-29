@@ -41,6 +41,11 @@ interface Code {
 const CODES: Code[] = [
   { datei: "datalogic-programmiermodus", inhalt: "$P", titel: "Datalogic: Programmiermodus aufrufen/verlassen" },
   { datei: "datalogic-belegung-deutschland", inhalt: "$CKBCO05", titel: "Datalogic: Tastaturbelegung Deutschland" },
+  // Rückweg, wenn am Gerät etwas verstellt wurde: Der Code bringt seinen
+  // Programmiermodus selbst mit ($P … ,P) und wird deshalb einzeln gescannt.
+  // Danach steht auch die Belegung wieder auf USA — der Deutschland-Code
+  // gehört also hinterher.
+  { datei: "datalogic-werkseinstellung", inhalt: "$P,HA00,P", titel: "Datalogic: auf Werkseinstellung zurücksetzen" },
 ];
 
 mkdirSync(ZIEL, { recursive: true });
