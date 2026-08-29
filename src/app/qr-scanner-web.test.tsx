@@ -132,7 +132,7 @@ describe("QR-Scanner im Browser", () => {
     const onErgebnis = vi.fn();
 
     render(<QrScannerWeb onErgebnis={onErgebnis} onAbbruch={() => {}} />);
-    await screen.findByText(/USB-Handscanner/);
+    await screen.findByText(/mit dem USB-Handscanner scannen/);
 
     const url = "https://erfassungsbogen.app/#0ABC$*-/:XYZ";
     for (const zeichen of url) fireEvent.keyDown(window, { key: zeichen });
@@ -147,7 +147,7 @@ describe("QR-Scanner im Browser", () => {
     mediaDevicesSetzen(undefined);
 
     render(<QrScannerWeb onErgebnis={() => {}} onAbbruch={() => {}} />);
-    await screen.findByText(/USB-Handscanner/);
+    await screen.findByText(/mit dem USB-Handscanner scannen/);
     expect(screen.getByRole("status").textContent).toMatch(/warte auf den Handscanner/i);
 
     for (const zeichen of "https:") fireEvent.keyDown(window, { key: zeichen });
@@ -181,7 +181,7 @@ describe("QR-Scanner im Browser", () => {
 
     try {
       render(<QrScannerWeb onErgebnis={onErgebnis} onAbbruch={() => {}} />);
-      await screen.findByText(/USB-Handscanner/);
+      await screen.findByText(/mit dem USB-Handscanner scannen/);
 
       for (const zeichen of "https://erfassungsbogen.app/#0ABC") fireEvent.keyDown(window, { key: zeichen });
       fireEvent.keyDown(window, { key: "Enter" });
@@ -197,7 +197,7 @@ describe("QR-Scanner im Browser", () => {
     const onErgebnis = vi.fn();
 
     render(<QrScannerWeb onErgebnis={onErgebnis} onAbbruch={() => {}} />);
-    await screen.findByText(/USB-Handscanner/);
+    await screen.findByText(/mit dem USB-Handscanner scannen/);
 
     // fireEvent liefert false, wenn preventDefault() gerufen wurde.
     expect(fireEvent.keyDown(window, { key: "Enter" })).toBe(true);

@@ -161,7 +161,7 @@ function istLesbarerScan(text: string): boolean {
 /** Hinweis nach einem zurückgerechneten Scan — die Einstellung selbst bleibt falsch. */
 const BELEGUNG_HINWEIS =
   "Der Handscanner tippt in einer anderen Tastaturbelegung (US) als der Rechner; die App hat den Code zurückgerechnet. "
-  + "Dauerhaft behoben ist es, wenn der Scanner auf Deutschland/DE gestellt wird — bei vielen Geräten mit einem Strichcode aus der Kurzanleitung.";
+  + "Dauerhaft behoben ist es, wenn der Scanner auf Deutschland/DE gestellt wird — die Anleitung zeigt unter „USB-Handscanner einrichten\" die Codes zum Abscannen.";
 
 export function scanFehlertext(text: string): string {
   const anfang = text.trim().slice(0, 40);

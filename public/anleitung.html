@@ -64,6 +64,14 @@
     table { border-collapse: collapse; width: 100%; margin-top: 0.6rem; }
     th, td { border: 1px solid var(--rand); padding: 0.4rem 0.6rem; text-align: left; vertical-align: top; }
     th { background: #e7eaf3; }
+    /* Konfigurations-Strichcodes: Sie werden vom Bildschirm abgescannt und
+       brauchen dafür weiße Fläche, Ruhezone und eine Mindestgröße — deshalb
+       feste Breite statt einer flexiblen Bildspalte. */
+    .scancodes { display: flex; flex-wrap: wrap; gap: 1.2rem; margin: 1rem 0; }
+    .scancodes figure { margin: 0; }
+    .scancodes img { display: block; width: 11rem; height: auto; background: #fff; border: 1px solid var(--rand); padding: 0.5rem; }
+    .scancodes figcaption { font-size: 0.875rem; color: #5c6478; margin-top: 0.4rem; max-width: 11rem; }
+    .scancode-hinweis { font-size: 0.875rem; color: #5c6478; }
     footer { margin-top: 2.5rem; padding-top: 1rem; border-top: 1px solid var(--rand); font-size: 0.875rem; color: #5c6478; }
     /* Bildschirmfotos aus public/screenshots/ (npm run screenshots). Sie zeigen
        den beschriebenen Ablauf und machen die Seite auch für die Bildersuche
@@ -360,6 +368,7 @@
       <ul>
         <li><a href="#in-fuenf-schritten-zum-fertigen-bogen">In fünf Schritten zum fertigen Bogen</a></li>
         <li><a href="#uebergabe-per-qr-code-ohne-internet">Übergabe per QR-Code — ohne Internet</a></li>
+        <li><a href="#handscanner">USB-Handscanner am PC einrichten</a></li>
         <li><a href="#meldekopf-und-bereitstellungsraum-einsaetze-sammeln">Meldekopf und Bereitstellungsraum: Einsätze sammeln</a></li>
         <li><a href="#eigene-vorlagen-und-beispielboegen">Eigene Vorlagen und Beispielbögen</a></li>
         <li><a href="#auf-welchen-geraeten-laeuft-die-app">Auf welchen Geräten läuft die App?</a></li>
@@ -466,6 +475,50 @@
         hinzu, danach arbeitet sie ohne Netz weiter.
       </figcaption>
     </figure>
+
+    <h2 id="handscanner">USB-Handscanner am PC einrichten</h2>
+    <p>
+      An einem Rechner ohne Kamera liest ein USB-Handscanner die Bögen ein. Er
+      braucht keine Installation: Öffne in der App „QR-Code scannen…“ und löse
+      am Scanner aus — das Fenster nimmt den Code direkt an, ein Klick in ein
+      Eingabefeld ist nicht nötig. Der Scanner muss den Code mit Enter
+      abschließen; das ist bei fast allen Geräten die Werkseinstellung.
+    </p>
+    <p>
+      Handscanner melden sich als Tastatur an und senden Tastenpositionen, keine
+      Zeichen. Steht der Scanner auf US-Belegung — Werkseinstellung vieler
+      Geräte — und der Rechner auf Deutsch, kommt der Bogen deshalb verdreht an:
+      <code>httpsÖ--erfassungsbogen.app-§B.…</code> statt
+      <code>https://erfassungsbogen.app/#B.…</code>. Die App rechnet das
+      selbständig zurück und liest den Bogen trotzdem. Dauerhaft behoben ist es
+      erst am Gerät — und dann tippt der Scanner auch in jedem anderen Programm
+      wieder richtig.
+    </p>
+
+    <h3>Datalogic (Gryphon, QuickScan, Heron)</h3>
+    <p>
+      Nacheinander scannen: erst den Programmiermodus, dann die Belegung, dann
+      wieder den Programmiermodus zum Verlassen.
+    </p>
+    <div class="scancodes">
+      <figure>
+        <img src="./bilder/handscanner/datalogic-programmiermodus.svg" width="180" height="180" loading="lazy"
+          alt="Data-Matrix-Code mit dem Datalogic-Befehl Dollarzeichen P: Programmiermodus aufrufen und verlassen.">
+        <figcaption>1. und 3.: Programmiermodus aufrufen bzw. verlassen</figcaption>
+      </figure>
+      <figure>
+        <img src="./bilder/handscanner/datalogic-belegung-deutschland.svg" width="180" height="180" loading="lazy"
+          alt="Data-Matrix-Code mit dem Datalogic-Befehl für den Ländermodus Deutschland.">
+        <figcaption>2.: Tastaturbelegung Deutschland</figcaption>
+      </figure>
+    </div>
+    <p class="scancode-hinweis">
+      Die Codes sind selbst erzeugt und tragen genau die zwei Befehle, die für
+      die Belegung nötig sind — sonst wird am Scanner nichts verstellt. Für
+      andere Hersteller heißt dieselbe Einstellung „Keyboard Country“,
+      „Country Code“ oder „Keyboard Language“; ihre Codes nehmen wir hier auf,
+      sobald sie an einem Gerät geprüft sind.
+    </p>
 
     <h2 id="meldekopf-und-bereitstellungsraum-einsaetze-sammeln">Meldekopf und Bereitstellungsraum: Einsätze sammeln</h2>
     <p>

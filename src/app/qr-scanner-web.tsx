@@ -298,6 +298,8 @@ export function QrScannerWeb(props: {
             <TeilQuittung teile={props.teile ?? []} />
             <p className="handscanner-fussnote">
               Der Scanner muss den Code mit Enter abschließen (Werkseinstellung der meisten Geräte).
+              {" "}Kommen die Zeichen verdreht an, steht er auf einer anderen Tastaturbelegung — die Anleitung
+              zeigt unter „USB-Handscanner einrichten“ die Codes zum Umstellen.
               {props.onBild && " Sonst hilft „QR aus Bild einlesen…“ mit einem Foto oder Screenshot."}
             </p>
           </div>
