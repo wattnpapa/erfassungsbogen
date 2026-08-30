@@ -350,6 +350,59 @@ mit ihrem taktischen Zeichen nach DV 102.
       },
     ],
   },
+  "autor.html": {
+    ueberschrift: "Häufige Fragen zum Autor",
+    fragen: [
+      {
+        frage: "Welche Qualifikation steht hinter den Inhalten?",
+        anker: "qualifikation",
+        antwort: `<p>
+Johannes Rudolph ist seit 2007 beim Technischen Hilfswerk, seit 2011 im
+Fachzug Führung und Kommunikation: Gruppenführer der Fachgruppe Kommunikation,
+ausgebildeter Zugführer und Sachgebietsleiter, Bereichsausbilder für
+Sprechfunk. Beruflich arbeitet er an der Digitalisierung von Abläufen und
+Prozessen.
+</p>`,
+        offen: true,
+      },
+      {
+        frage: "Ist der Einheiten-Erfassungsbogen ein offizielles Angebot des THW?",
+        anker: "kein-amtliches-angebot",
+        antwort: `<p>
+Nein. Es ist ein privates, ehrenamtliches Projekt ohne amtlichen Charakter —
+weder vom THW noch von einer Feuerwehr, einer Hilfsorganisation oder einer
+Behörde. Maßgeblich sind die geltenden Dienstvorschriften und die
+Festlegungen der eigenen Organisation.
+</p>`,
+      },
+      {
+        frage: "Woher stammen die Beispielbögen?",
+        anker: "beispielboegen",
+        antwort: `<p>
+Aus der Auswertung veröffentlichter Vorschriften: Katastrophenschutz- und
+Feuerwehrverordnungen der Länder, Stärke- und Ausstattungsnachweisungen und
+veröffentlichte Gliederungen der Hilfsorganisationen. Sie geben wieder, was in
+der Vorschrift steht — nicht den Bestand vor Ort. Welche Vorschrift hinter
+einem Satz Bögen steht, nennt die jeweilige Seite.
+</p>`,
+      },
+      {
+        frage: "Ersetzt die App das Papier?",
+        anker: "papier",
+        antwort: `<p>
+Nein — sie erzeugt es. Die App druckt den gewohnten Vordruck als PDF; der
+QR-Code auf dem Blatt macht dasselbe Blatt zusätzlich maschinenlesbar. Fällt
+Strom, Netz oder Gerät aus, wird auf Papier weitergearbeitet. Der Vergleich
+der Wege steht unter <a href="./papier-oder-digital.html">Papier oder digital?</a>
+</p>`,
+      },
+      {
+        frage: "Was kostet die App und wer pflegt sie?",
+        anker: "kosten",
+        antwort: kosten("Nichts.", " Entwickelt wird sie ehrenamtlich, neben dem eigenen Dienst."),
+      },
+    ],
+  },
   "asb.html": {
     ueberschrift: "Häufige Fragen zum ASB",
     fragen: [

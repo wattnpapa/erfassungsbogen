@@ -78,6 +78,7 @@ const SEITEN: Record<string, string> = {
   "staerkemeldung-feuerwehr.html": "0.7",
   "papier-oder-digital.html": "0.6",
   "open-source-datenschutz.html": "0.5",
+  "autor.html": "0.5",
   "impressum.html": "0.3",
   "datenschutz.html": "0.3",
 };

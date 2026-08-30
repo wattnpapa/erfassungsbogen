@@ -3,14 +3,14 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Feuerwehr Erfassungsbogen &amp; Stärkemeldung digital</title>
-  <meta name="description" content="Stärkemeldung und Einheiten-Erfassung für Feuerwehren. Kräfte und Fahrzeuge digital erfassen, PDF erzeugen und ohne Internet am Meldekopf übergeben.">
-  <link rel="canonical" href="https://erfassungsbogen.app/feuerwehr.html">
+  <title>Über den Autor – Einheiten-Erfassungsbogen</title>
+  <meta name="description" content="Wer hinter erfassungsbogen.app steht: seit 2007 im THW, Fachzug Führung und Kommunikation, Zugführer und Sachgebietsleiter — und warum der Bogen Papier bleibt.">
+  <link rel="canonical" href="https://erfassungsbogen.app/autor.html">
   <link rel="icon" href="./icon.svg" type="image/svg+xml">
-  <meta property="og:type" content="article">
-  <meta property="og:title" content="Digitaler Einheiten-Erfassungsbogen für die Feuerwehr">
-  <meta property="og:description" content="Kräfteerfassung statt Zettelwirtschaft: Einsatzkräfte, Stärke und Fahrzeuge digital erfassen, PDF erzeugen und im Bereitstellungsraum per QR-Code ohne Internet übergeben.">
-  <meta property="og:url" content="https://erfassungsbogen.app/feuerwehr.html">
+  <meta property="og:type" content="profile">
+  <meta property="og:title" content="Über den Autor: Zugführer im THW, Digitalisierung im Beruf">
+  <meta property="og:description" content="Warum es den Einheiten-Erfassungsbogen gibt: punktuell digitalisieren, wo es Zeit spart — und die Rückfallebene Papier behalten.">
+  <meta property="og:url" content="https://erfassungsbogen.app/autor.html">
   <meta property="og:image" content="https://erfassungsbogen.app/og-bild.jpg">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
@@ -39,16 +39,11 @@
     .start { display: inline-block; margin: 0.5rem 0 0.5rem; padding: 0.6rem 1.1rem; background: var(--blau); color: #fff; border-radius: 0; text-decoration: none; font-weight: 600; }
     figure { margin: 1.2rem 0; }
     figure img { display: block; width: 100%; height: auto; border: 1px solid var(--rand); background: #fff; }
-    figure.foto img { width: 100%; height: auto; }
-    figure.zeichen { float: right; width: 8rem; margin: 0.6rem 0 0.8rem 1.5rem; text-align: center; }
-    figure.zeichen img { width: 5.5rem; height: 5.5rem; border: none; background: none; margin: 0 auto; }
-    figure.zeichen figcaption { font-size: 0.8125rem; line-height: 1.35; }
-    @media (max-width: 34rem) {
-      figure.zeichen { float: none; width: auto; margin: 0.8rem 0 1.2rem; text-align: left; }
-      figure.zeichen img { margin: 0; }
-      figure.zeichen figcaption { font-size: 0.875rem; }
-    }
     figcaption { max-width: 60ch; font-size: 0.875rem; color: #5c6478; margin-top: 0.4rem; }
+    table { border-collapse: collapse; width: 100%; margin-top: 0.6rem; font-size: 0.875rem; }
+    .tabellenrahmen { overflow-x: auto; }
+    th, td { border: 1px solid var(--rand); padding: 0.4rem 0.6rem; text-align: left; vertical-align: top; }
+    th { background: #e7eaf3; }
     footer { margin-top: 2.5rem; padding-top: 1rem; border-top: 1px solid var(--rand); font-size: 0.875rem; color: #5c6478; }
 /* NAV:CSS:START */
     /* Sprunglink: sitzt außerhalb des Sichtfelds und kommt beim ersten Tabstopp
@@ -172,6 +167,10 @@
     .abschluss { margin-top: 2.5rem; }
     .abschluss .zusicherung { margin: 0.4rem 0 0; font-size: 0.875rem; color: #5c6478; }
     /* HANDLUNG:CSS:END */
+/* ROLLBEREICH:CSS:START */
+    .tabellenrahmen, .tabelle { overflow-x: auto; }
+    .tabellenrahmen:focus-visible, .tabelle:focus-visible { outline: 3px solid var(--blau); outline-offset: 2px; }
+    /* ROLLBEREICH:CSS:END */
 /* OFFENLEGUNG:CSS:START */
     /* Aufklappblöcke. Der Griff ist als Bedienelement erkennbar: volle
        Trefferfläche, eigenes Vorzeichen, Fokusring im App-Muster
@@ -263,14 +262,14 @@
       <a href="./" class="kopfnav-logo">Erfassungsbogen</a>
       <nav class="kopfnav-links" aria-label="Hauptnavigation">
         <span class="kopfnav-eintrag">
-          <a href="./uebersicht.html">Alle Themen</a>
+          <a href="./uebersicht.html" class="aktiv">Alle Themen</a>
           <span class="kopfnav-unter">
             <a href="./vorlage.html">Vorlage und Blanko-PDF</a>
             <a href="./papier-oder-digital.html">Papier oder digital?</a>
             <a href="./bbk.html">BBK</a>
             <a href="./bundeswehr.html">Bundeswehr</a>
             <a href="./open-source-datenschutz.html">Open Source und Datenschutz</a>
-            <a href="./autor.html">Über den Autor</a>
+            <a href="./autor.html" class="aktiv">Über den Autor</a>
             <a href="./impressum.html">Impressum</a>
           </span>
         </span>
@@ -299,8 +298,8 @@
             <a href="./thw-fachgruppe-wasserschaden-pumpen-erfassungsbogen.html">Fachgruppe Wasserschaden/Pumpen</a>
           </span>
         </span>
-        <span class="kopfnav-eintrag">
-          <a href="./feuerwehr.html" class="aktiv">Feuerwehr</a>
+        <span class="kopfnav-eintrag nur-breit">
+          <a href="./feuerwehr.html">Feuerwehr</a>
           <span class="kopfnav-unter">
             <a href="./staerkemeldung-feuerwehr.html">Stärkemeldung mit Beispiel</a>
           </span>
@@ -323,224 +322,219 @@
   <!-- NAV:END -->
 
   <main id="inhalt">
-    <h1>Digitaler Einheiten-Erfassungsbogen für die Feuerwehr</h1>
+    <h1>Über den Autor</h1>
+    <p>
+      Diese Seite sagt, wer hinter dem Einheiten-Erfassungsbogen steht und woraus
+      die fachliche Grundlage kommt. Sie ist bewusst knapp und nennt nur, was
+      überprüfbar ist — auch dort, wo die Antwort unbequem ist.
+    </p>
 
-    <figure class="zeichen">
-      <img src="./bilder/taktisches-zeichen-loeschzug.svg" width="256" height="256" fetchpriority="high" decoding="async"
-        alt="Taktisches Zeichen eines Löschzuges der Feuerwehr.">
+    <figure class="foto">
+      <picture>
+            <source srcset="./bilder/autor-johannes-rudolph.webp" type="image/webp">
+            <img src="./bilder/autor-johannes-rudolph.jpg" width="1080" height="810" loading="lazy"
+        alt="Johannes Rudolph in blauer THW-Einsatzkleidung auf dem Gelände eines THW-Ortsverbands, dahinter Fahrzeuge und Anhänger.">
+          </picture>
       <figcaption>
-        Taktisches Zeichen „Löschzug“. Quelle: Zeichensammlung
-        jonas-koeritz/Taktische-Zeichen (CC0 1.0), im Programm eingebacken.
+        Johannes Rudolph, Fachzug Führung und Kommunikation. Foto: privat.
       </figcaption>
     </figure>
 
+    <h2>Kurz gesagt</h2>
     <p>
-      Ob eine Bereitschaft des Landkreises auf dem Marsch ist, ein Zug in der überörtlichen
-      Hilfe oder Ortswehr im Hochwassereinsatz: Am Bereitstellungsraum zählt,
-      dass die Stärkemeldung schnell, leserlich und vollständig ankommt. Dieser
-      Bogen erfasst dafür die Kräfte einer Einheit — Einsatzkräfte mit Stärke
-      und Funktion, Fahrzeuge mit Funkrufnamen, Auftrag und Bedarf. Du füllst
-      ihn am Bildschirm aus statt auf der Motorhaube, druckst das gewohnte
-      Papierformular und gibst den kompletten Bogen am Meldekopf per QR-Code
-      weiter — ganz ohne Internet.
+      Der Erfassungsbogen ist neben dem Dienst entstanden, nicht am Reißbrett.
+      Johannes Rudolph ist seit 2007 beim Technischen Hilfswerk, seit 2011 im
+      Fachzug Führung und Kommunikation: Gruppenführer der Fachgruppe
+      Kommunikation, ausgebildeter Zugführer und Sachgebietsleiter,
+      Bereichsausbilder für Sprechfunk. Beruflich arbeitet er an der
+      Digitalisierung von Abläufen und Prozessen. Aus beidem kommt die
+      Grundentscheidung dieses Projekts: einzelne Schritte im Einsatz
+      digitalisieren, wo es Zeit spart — und die Rückfallebene Papier dabei
+      nicht aufgeben. Das Projekt ist ehrenamtlich, quelloffen und ohne
+      kommerzielles Interesse.
     </p>
 
+    <h2>Seit 2007 im Technischen Hilfswerk</h2>
     <p>
-      Zur Klarstellung, weil „Erfassungsbogen Feuerwehr" vieles heißen kann:
-      Hier geht es um die Kräfteerfassung von Einsatzkräften und Einheiten —
-      nicht um Objekt- oder Gefahrenerfassungsbögen für Gebäude, nicht um
-      Brandverhütungsschau, nicht um Verwaltungs- oder Mitgliederformulare. Der
-      Einheiten-Erfassungsbogen — häufig auch zusammengeschrieben als
-      Einheitenerfassungsbogen bezeichnet — dient der strukturierten Erfassung
-      von Einheiten, Stärke und Einsatzmitteln; wie das im Einzelnen abläuft,
-      beschreibt die
-      <a href="./staerkemeldung-feuerwehr.html">Stärkemeldung der Feuerwehr</a>.
+      Mein Name ist Johannes Rudolph. Seit 2007 bin ich beim Technischen
+      Hilfswerk, seit 2011 im Fachzug Führung und Kommunikation. Dort führe ich
+      die Fachgruppe Kommunikation als Gruppenführer; ausgebildet bin ich
+      außerdem als Zugführer und als Sachgebietsleiter.
+    </p>
+    <p>
+      Als Bereichsausbilder für Sprechfunk gebe ich die Ausbildung im Bereich
+      weiter: Lehrgänge vorbereiten, Ausbildungsabende halten, Prüfungen
+      abnehmen. Der Unterschied zum eigenen Lehrgang ist die Wiederholung — man
+      sieht dieselben Fehler bei vielen verschiedenen Gruppen und erkennt, welche
+      davon an der Person liegen und welche am Verfahren. Aus dieser
+      Ausbildungspraxis stammt auch mein zweites Projekt, der
+      <a href="https://sprechfunk-uebung.de/">Sprechfunk-Übungsgenerator</a>.
+    </p>
+    <p>
+      Der Fachzug FK stellt im Einsatz die Führungsunterstützung: Verbindungen
+      aufbauen und betreiben, die Führungsstelle einrichten, Lage und Kräfte für
+      die Führung zusammenführen. Wer dort ein Sachgebiet oder einen Zug führt,
+      hat mit Stärkemeldungen nicht gelegentlich zu tun, sondern ständig — sie
+      sind das Material, aus dem die Lage überhaupt erst entsteht.
+    </p>
+    <p>
+      Daher die Perspektive dieses Projekts. Ein Erfassungsbogen ist kein
+      Formular für den Aktenschrank, sondern eine Zulieferung: Einer meldet, ein
+      Zweiter zählt zusammen, ein Dritter entscheidet. Was dabei schiefgeht,
+      geht selten am Vordruck schief. Es geht an der Übergabe zwischen diesen
+      dreien schief — an unleserlichen Zahlen, an doppelt gemeldeten Einheiten,
+      an Summen, die niemand nachrechnen kann. Genau dort setzt die App an, und
+      deshalb hat sie mit dem
+      <a href="./meldekopf.html">Meldekopf</a> eine eigene Seite für die
+      Gegenseite der Meldung.
+    </p>
+
+    <h2>Beruflich: Digitalisierung von Abläufen</h2>
+    <p>
+      Beruflich beschäftige ich mich mit der Digitalisierung von Abläufen und
+      Prozessen. Das ist der zweite Teil der Antwort auf die Frage, warum es
+      diese App in dieser Form gibt.
+    </p>
+    <p>
+      Digitalisierung im Einsatz scheitert selten an der Technik. Sie scheitert
+      daran, dass ein Werkzeug den ganzen Ablauf beansprucht: Wer einsteigt, muss
+      alles darüber machen — und wenn es ausfällt, steht der Ablauf. Das kann
+      man sich im Einsatz nicht leisten.
+    </p>
+    <p>
+      Deshalb dieser Zuschnitt: <strong>punktuell digitalisieren</strong>, dort
+      wo es messbar Zeit spart — die Stammdaten, die man bei jeder Meldung neu
+      schreibt; das Zusammenzählen; die Übergabe an die nächste Stelle. Und
+      daneben <strong>die Rückfallebene behalten</strong>: Der Bogen ist und
+      bleibt ein Blatt Papier. Die App druckt den gewohnten Vordruck als PDF,
+      und der QR-Code auf dem Blatt macht dasselbe Blatt zusätzlich
+      maschinenlesbar. Fällt Strom, Netz oder Gerät aus, wird auf Papier
+      weitergearbeitet; was auf Papier steht, kommt später ohne Abtippen zurück
+      ins Digitale. Der Vergleich der drei Wege steht auf
+      <a href="./papier-oder-digital.html">Papier oder digital?</a>
+    </p>
+    <p>
+      Effizient heißt hier auch: kein Server, kein Konto, keine Beschaffung, kein
+      Projekt, das erst genehmigt werden muss. Wer die Seite aufruft, kann
+      anfangen. Was das technisch bedeutet und welche Daten wo liegen, steht
+      unter <a href="./open-source-datenschutz.html">Open Source und Technik</a>.
+    </p>
+
+    <h2>Woher die Beispielbögen stammen</h2>
+    <p>
+      Hier die unbequeme Antwort: nicht aus meinem eigenen Dienstalltag. Die
+      über 400 mitgelieferten Beispielbögen sind
+      <strong>Auswertungen veröffentlichter Vorschriften</strong> —
+      Katastrophenschutzverordnungen der Länder, Feuerwehrverordnungen,
+      Stärke- und Ausstattungsnachweisungen und veröffentlichte Gliederungen der
+      Hilfsorganisationen. Wo eine Vorschrift eine Einheit mit Stärke,
+      Funktionen und Fahrzeugen beschreibt, ist daraus ein vorbelegter Bogen
+      geworden.
+    </p>
+    <p>
+      Das hat eine Folge, die man kennen sollte: Die Bögen geben wieder, was in
+      der Vorschrift steht — nicht, was in deinem Landkreis tatsächlich auf dem
+      Hof steht. Sie sind als Startpunkt gedacht: laden, an die eigene Einheit
+      anpassen, als eigene Vorlage speichern. Welche Verordnung hinter einem
+      Satz Bögen steht, nennt die jeweilige Seite; für die Länder sind das die
+      zwölf Seiten unter
+      <a href="./katastrophenschutz.html">Katastrophenschutz der Länder</a>.
+    </p>
+    <p>
+      Wo eine Verordnung sich selbst widerspricht — das kommt vor, etwa bei
+      Stärkeangaben, die nicht zur aufgeführten Besatzung passen —, steht das
+      auf der betreffenden Seite und wird nicht stillschweigend geglättet.
+    </p>
+
+    <h2>Was dieses Angebot ist und was nicht</h2>
+    <p>
+      Der Einheiten-Erfassungsbogen ist ein privates, ehrenamtliches Projekt. Er
+      ist kein Angebot des THW, keiner Feuerwehr, keiner Hilfsorganisation und
+      keiner Behörde, und er gibt keine amtliche Auskunft. Maßgeblich sind im
+      Zweifel immer die geltenden Dienstvorschriften und die Festlegungen deiner
+      eigenen Organisation.
+    </p>
+    <p>
+      Wenn dir ein Fehler auffällt — in einem Beispielbogen, in einer
+      Verordnungsauswertung oder in der App selbst —, schreib mir:
+      <a href="mailto:johannes.rudolph@thw-oldenburg.de">johannes.rudolph@thw-oldenburg.de</a>.
+      Korrekturen sind willkommen; der Quellcode liegt vollständig offen auf
+      <a href="https://github.com/wattnpapa/erfassungsbogen">GitHub</a>, die
+      Anbieterkennzeichnung steht im <a href="./impressum.html">Impressum</a>.
+    </p>
+
+    <h2>Selbst ausprobieren</h2>
+    <p>
+      Die App läuft im Browser, ohne Anmeldung und ohne Installation; alle Daten
+      bleiben auf deinem Gerät. Einstiege für deine Organisation:
+      <a href="./thw.html">THW</a>, <a href="./feuerwehr.html">Feuerwehr</a>,
+      <a href="./drk.html">DRK</a>, <a href="./dlrg.html">DLRG</a>,
+      <a href="./katastrophenschutz.html">Katastrophenschutz der Länder</a> —
+      und für die Gegenseite der Meldung:
+      <a href="./meldekopf.html">Meldekopf digital</a>.
     </p>
 
     <p><a class="start" href="./">Bogen jetzt ausfüllen</a></p>
 
-    <figure class="foto">
-      <picture>
-            <source srcset="./bilder/feuerwehr-loeschfahrzeug-lichtental.webp" type="image/webp">
-            <img src="./bilder/feuerwehr-loeschfahrzeug-lichtental.jpg" width="960" height="675" fetchpriority="high" decoding="async"
-        alt="Löschfahrzeug Mercedes-Benz 1224 AF der Feuerwehr Lichtental.">
-          </picture>
-      <figcaption>
-        Löschfahrzeug der Freiwilligen Feuerwehr Lichtental. Foto: H. Zell, Lizenz CC BY-SA 3.0,
-        <a href="https://commons.wikimedia.org/wiki/File:Mercedes-Benz_1224_AF_Automatic_-_Feuerwehr_Lichtental_01.jpg">Wikimedia Commons</a>.
-      </figcaption>
-    </figure>
-
-    <h2>Stärkemeldung, wie die Feuerwehr sie meldet</h2>
-    <p>
-      Gezählt wird in der gewohnten Gliederung Führer / Unterführer /
-      Mannschaft / Gesamtstärke. Namen und Funktionen (Zugführer,
-      Gruppenführer, Atemschutzgeräteträger …) kannst du erfassen, Pflicht sind
-      sie für die Meldung nicht. Als Feuerwehr wählst du deine Organisation zu
-      Beginn aus; die Gliederungsebenen darüber heißen dann Gemeinde/Stadt,
-      Landkreis oder kreisfreie Stadt, Bezirk und Land — statt THW-Ebenen wie
-      Ortsverband und Landesverband. Einheitsbezeichnung, Funktionen und
-      Fahrzeugtypen trägst du frei ein, so wie sie bei euch heißen; ein
-      geschlossenes Feuerwehr-Vokabular gibt die App bewusst nicht vor, weil
-      Bezeichnungen und Gliederung Landesrecht sind und sich von Land zu Land
-      unterscheiden.
-    </p>
-
-    <h2>Fahrzeuge mit taktischen Zeichen nach DV 102</h2>
-    <p>
-      LF, TLF, DLK, ELW, GW-L: Du erfasst Fahrzeuge mit Kennzeichen und
-      Funkrufname — Kennwort „Florian", Standort und Kennzahlen so, wie ihr sie
-      funkt. Im PDF erscheinen sie mit ihrem taktischen Zeichen nach DV 102 —
-      der Bogen sieht aus wie vom Zeichenbrett, nicht wie ein Ausdruck aus der
-      Tabellenkalkulation. Welche Felder der Bogen insgesamt enthält, zeigt die
-      <a href="./vorlage.html">Übersicht über Vorlage und Aufbau</a>.
-    </p>
-
-    <h2>Fertige Bögen für Feuerwehr- und Katastrophenschutz-Einheiten</h2>
-    <p>
-      Für die taktischen Einheiten der niedersächsischen Feuerwehrverordnung —
-      Trupp, Staffel, Gruppe, Zug und die Ortsfeuerwehr-Arten — liegen fertige
-      Beispielbögen bei, die du als Vorlage über deinen Bogen legen kannst.
-      Ebenso für die Katastrophenschutz-Einheiten mehrerer Bundesländer,
-      darunter viele Brandschutz- und Löschzüge, abgeleitet aus den jeweiligen
-      Landesregelungen samt Teileinheiten und Funkrufnamen. Einmal geladen, passt du nur noch an, was vor Ort abweicht;
-      Details auf der Seite
-      <a href="./katastrophenschutz.html">Katastrophenschutz der Länder</a>.
-      Deinen eigenen Bogen kannst du zudem als Vorlage speichern — bei der
-      nächsten Alarmübung musterst du nur, statt neu zu tippen.
-    </p>
-
-    <h2>Vom Alarm bis zur Kräfteübersicht</h2>
-    <p>
-      Bei der überörtlichen Hilfe — etwa wenn ein Landkreis seine Bereitschaft
-      zusammenzieht, je nach Land Kreisbereitschaft oder
-      Kreisfeuerwehrbereitschaft genannt — läuft es meist so ab:
-    </p>
-    <ol>
-      <li>
-        <strong>Alarmierung.</strong> Die Einheit wird alarmiert und sammelt am
-        Gerätehaus; der Einheitsführer öffnet den Bogen auf dem Diensthandy und
-        lädt seine Vorlage.
-      </li>
-      <li>
-        <strong>Stärke erfassen.</strong> Wer ausrückt, bleibt stehen, wer fehlt,
-        wird gestrichen; Führer, Unterführer und Mannschaft summieren sich
-        laufend zur Gesamtstärke. Dazu die Fahrzeuge, die tatsächlich besetzt
-        sind, mit ihren Funkrufnamen.
-      </li>
-      <li>
-        <strong>Marsch und Bereitstellungsraum.</strong> Beim Eintreffen im
-        Bereitstellungsraum wird der Bogen gemeldet: PDF ausgedruckt übergeben
-        oder den QR-Code direkt vom Bildschirm scannen lassen.
-      </li>
-      <li>
-        <strong>Kräfteübersicht am Meldekopf.</strong> Der Meldekopf sammelt die
-        eingetroffenen Einheiten unter einem Einsatz und hat Stärke, Fahrzeuge
-        und Bedarf summiert vorliegen — die Grundlage für Einteilung und
-        Weitermeldung an die nächste Führungsstelle.
-      </li>
-    </ol>
-
-    <h2>Übergabe am Bereitstellungsraum: scannen statt stapeln</h2>
-    <p>
-      Der QR-Code auf der letzten PDF-Seite enthält den vollständigen Bogen.
-      Die Führungsstelle scannt ihn und hat Stärke, Fahrzeuge und Bedarf sofort
-      im eigenen Gerät — ohne Funknetz, ohne Server. Wie daraus eine laufend
-      summierte Übersicht über alle eingetroffenen Einheiten wird, zeigt die
-      <a href="./meldekopf.html">Kräfteerfassung im Bereitstellungsraum</a>.
-    </p>
-
-    <figure>
-      <picture>
-            <source srcset="./screenshots/feuerwehr-erfassungsbogen.webp" type="image/webp">
-            <img src="./screenshots/feuerwehr-erfassungsbogen.png" class="schmal" width="390" height="844" loading="lazy"
-        alt="Feuerwehr-Erfassungsbogen digital auf dem Smartphone: ausgefüllter Bogen einer Löschgruppe mit Stärke 0/1/8/9 und Übergabe-Aktionen in der Gesamtübersicht."
-        style="max-width: 17rem;">
-          </picture>
-      <figcaption>
-        Ein ausgefüllter Löschgruppen-Bogen auf dem Diensthandy: zum
-        Home-Bildschirm hinzufügen, danach arbeitet die App ohne Netz.
-      </figcaption>
-    </figure>
-
-    <figure class="foto">
-      <picture>
-            <source srcset="./bilder/feuerwehr-loeschgruppenfahrzeug-reinsfeld.webp" type="image/webp">
-            <img src="./bilder/feuerwehr-loeschgruppenfahrzeug-reinsfeld.jpg" width="960" height="720" loading="lazy"
-        alt="Löschgruppenfahrzeug der Freiwilligen Feuerwehr Reinsfeld, Verbandsgemeinde Hermeskeil.">
-          </picture>
-      <figcaption>
-        Löschgruppenfahrzeug der Freiwilligen Feuerwehr Reinsfeld. Foto: Alf van Beem, Lizenz CC0,
-        <a href="https://commons.wikimedia.org/wiki/File:Mercedes,_Schlingmann,_Verbandsgemeinde_Hermeskeil,_Freiwillige_Feuerwehr_Reinsfeld,_bild_2.JPG">Wikimedia Commons</a>.
-      </figcaption>
-    </figure>
-
-    <!-- HANDLUNG:MITTE:START -->
-    <h2>Wo Namen und Erreichbarkeiten bleiben</h2>
-    <p>
-      Die Personendaten deiner Einsatzkräfte stehen im lokalen Speicher deines
-      Geräts: kein Server, kein Konto, keine Cloud. Ein Bogen verlässt das Gerät
-      nur, wenn du ihn selbst weitergibst — als PDF, als Datei, als QR-Code oder
-      als Link. Welche Einträge gespeichert werden und welche Verbindungen die
-      Anwendung von sich aus aufbaut, ist unter
-      <a href="./open-source-datenschutz.html">Open Source und Datenschutz</a>
-      vollständig aufgeführt.
-    </p>
-
-    <p><a class="start" href="./">Feuerwehr-Bogen jetzt ausfüllen</a></p>
-    <!-- HANDLUNG:MITTE:END -->
-
     <!-- FAQ:START -->
-    <h2 id="haeufige-fragen">Häufige Fragen zur Feuerwehr</h2>
+    <h2 id="haeufige-fragen">Häufige Fragen zum Autor</h2>
 
-    <details class="frage" id="frage-personendaten" open>
-      <summary><h3>Wo landen die Daten der Einsatzkräfte?</h3></summary>
+    <details class="frage" id="frage-qualifikation" open>
+      <summary><h3>Welche Qualifikation steht hinter den Inhalten?</h3></summary>
       <p>
-      Auf deinem Gerät. Es gibt keinen Server, keine Cloud und keine Konten;
-      weitergegeben wird nur, was du selbst als PDF, Datei, QR-Code oder Link
-      übergibst — nachzulesen in der <a href="./datenschutz.html">Datenschutzerklärung</a>. Namen sind ohnehin optional:
-      Für die Stärkemeldung genügen die Zahlen.
+      Johannes Rudolph ist seit 2007 beim Technischen Hilfswerk, seit 2011 im
+      Fachzug Führung und Kommunikation: Gruppenführer der Fachgruppe Kommunikation,
+      ausgebildeter Zugführer und Sachgebietsleiter, Bereichsausbilder für
+      Sprechfunk. Beruflich arbeitet er an der Digitalisierung von Abläufen und
+      Prozessen.
       </p>
     </details>
 
-    <details class="frage" id="frage-datenschutzbeauftragter">
-      <summary><h3>Was sage ich unserem Datenschutzbeauftragten?</h3></summary>
+    <details class="frage" id="frage-kein-amtliches-angebot">
+      <summary><h3>Ist der Einheiten-Erfassungsbogen ein offizielles Angebot des THW?</h3></summary>
       <p>
-      Am besten die beiden Seiten, die er ohnehin sehen will: Die <a href="./datenschutz.html">Datenschutzerklärung</a>
-      nennt Verantwortlichen, Rechtsgrundlagen und Betroffenenrechte,
-      <a href="./open-source-datenschutz.html">Open Source und Technik</a> führt jeden Speicherort und jede Verbindung der Anwendung einzeln
-      auf. Kurzfassung: Bogendaten bleiben im lokalen Speicher des Geräts; für die
-      Geräte selbst und die dort gespeicherten Daten ist die einsetzende Stelle
-      verantwortlich.
+      Nein. Es ist ein privates, ehrenamtliches Projekt ohne amtlichen Charakter —
+      weder vom THW noch von einer Feuerwehr, einer Hilfsorganisation oder einer
+      Behörde. Maßgeblich sind die geltenden Dienstvorschriften und die
+      Festlegungen der eigenen Organisation.
+      </p>
+    </details>
+
+    <details class="frage" id="frage-beispielboegen">
+      <summary><h3>Woher stammen die Beispielbögen?</h3></summary>
+      <p>
+      Aus der Auswertung veröffentlichter Vorschriften: Katastrophenschutz- und
+      Feuerwehrverordnungen der Länder, Stärke- und Ausstattungsnachweisungen und
+      veröffentlichte Gliederungen der Hilfsorganisationen. Sie geben wieder, was in
+      der Vorschrift steht — nicht den Bestand vor Ort. Welche Vorschrift hinter
+      einem Satz Bögen steht, nennt die jeweilige Seite.
+      </p>
+    </details>
+
+    <details class="frage" id="frage-papier">
+      <summary><h3>Ersetzt die App das Papier?</h3></summary>
+      <p>
+      Nein — sie erzeugt es. Die App druckt den gewohnten Vordruck als PDF; der
+      QR-Code auf dem Blatt macht dasselbe Blatt zusätzlich maschinenlesbar. Fällt
+      Strom, Netz oder Gerät aus, wird auf Papier weitergearbeitet. Der Vergleich
+      der Wege steht unter <a href="./papier-oder-digital.html">Papier oder digital?</a>
       </p>
     </details>
 
     <details class="frage" id="frage-kosten">
-      <summary><h3>Was kostet die App — und wer steckt dahinter?</h3></summary>
+      <summary><h3>Was kostet die App und wer pflegt sie?</h3></summary>
       <p>
       Nichts. Die App ist freie Software unter der EUPL-1.2 — kostenlos, ohne
       Konto, ohne Bezahlschranke und ohne Werbung; der Quellcode liegt offen auf
-      <a href="https://github.com/wattnpapa/erfassungsbogen">GitHub</a>. Geschrieben hat sie ein ehrenamtlicher Helfer für die eigene Einheit.
-      </p>
-    </details>
-
-    <details class="frage" id="frage-papierformular">
-      <summary><h3>Ersetzt das unser Papierformular?</h3></summary>
-      <p>
-      Es erzeugt das Papierformular: Das PDF folgt dem gewohnten Layout des
-      Einheiten-Erfassungsbogens, du kannst es unverändert in den Papierlauf
-      geben. Der QR-Code macht dasselbe Blatt zusätzlich maschinenlesbar —
-      mehr dazu im Vergleich <a href="./papier-oder-digital.html">Papier oder digital?</a>
+      <a href="https://github.com/wattnpapa/erfassungsbogen">GitHub</a>. Entwickelt wird sie ehrenamtlich, neben dem eigenen Dienst.
       </p>
     </details>
     <!-- FAQ:END -->
 
-    <!-- HANDLUNG:ABSCHLUSS:START -->
     <div class="abschluss">
-      <a class="start" href="./">Feuerwehr-Bogen jetzt ausfüllen</a>
+      <a class="start" href="./">Bogen jetzt ausfüllen</a>
       <p class="zusicherung">Kostenlos, ohne Anmeldung, alle Daten bleiben auf deinem Gerät.</p>
     </div>
-    <!-- HANDLUNG:ABSCHLUSS:END -->
 
     <footer>
       <!-- FUSSNAV:START -->
@@ -565,6 +559,8 @@
           <p class="fussnav-titel">Organisationen</p>
           <p class="fussnav-links">
             <a href="./thw.html">THW</a>
+            ·
+            <a href="./feuerwehr.html">Feuerwehr</a>
             ·
             <a href="./staerkemeldung-feuerwehr.html">Stärkemeldung</a>
             ·
@@ -596,8 +592,6 @@
             ·
             <a href="./datenschutz.html">Datenschutz</a>
             ·
-            <a href="./autor.html">Über den Autor</a>
-            ·
             <a href="./impressum.html">Impressum</a>
           </p>
         </div>
@@ -614,7 +608,6 @@
       <!-- HINWEIS:END -->
     </footer>
   </main>
-
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -623,8 +616,32 @@
         "@type": "BreadcrumbList",
         "itemListElement": [
           { "@type": "ListItem", "position": 1, "name": "Erfassungsbogen.app", "item": "https://erfassungsbogen.app/" },
-          { "@type": "ListItem", "position": 2, "name": "Digitaler Einheiten-Erfassungsbogen für die Feuerwehr", "item": "https://erfassungsbogen.app/feuerwehr.html" }
+          { "@type": "ListItem", "position": 2, "name": "Über den Autor", "item": "https://erfassungsbogen.app/autor.html" }
         ]
+      },
+      {
+        "@type": "ProfilePage",
+        "inLanguage": "de",
+        "url": "https://erfassungsbogen.app/autor.html",
+        "mainEntity": {
+          "@type": "Person",
+          "name": "Johannes Rudolph",
+          "url": "https://erfassungsbogen.app/autor.html",
+          "email": "johannes.rudolph@thw-oldenburg.de",
+          "jobTitle": "Gruppenführer Fachgruppe Kommunikation, Zugführer, Sachgebietsleiter und Bereichsausbilder Sprechfunk (ehrenamtlich, THW)",
+          "image": "https://erfassungsbogen.app/bilder/autor-johannes-rudolph.jpg",
+          "knowsAbout": [
+            "Stärkemeldung",
+            "Führung und Kommunikation im THW",
+            "Sprechfunkausbildung",
+            "Katastrophenschutz",
+            "Digitalisierung von Einsatzabläufen"
+          ],
+          "sameAs": [
+            "https://github.com/wattnpapa",
+            "https://sprechfunk-uebung.de/autor/"
+          ]
+        }
       },
       {
         "@type": "FAQPage",
@@ -632,23 +649,28 @@
         "mainEntity": [
           {
             "@type": "Question",
-            "name": "Wo landen die Daten der Einsatzkräfte?",
-            "acceptedAnswer": { "@type": "Answer", "text": "Auf deinem Gerät. Es gibt keinen Server, keine Cloud und keine Konten; weitergegeben wird nur, was du selbst als PDF, Datei, QR-Code oder Link übergibst — nachzulesen in der Datenschutzerklärung. Namen sind ohnehin optional: Für die Stärkemeldung genügen die Zahlen." }
+            "name": "Welche Qualifikation steht hinter den Inhalten?",
+            "acceptedAnswer": { "@type": "Answer", "text": "Johannes Rudolph ist seit 2007 beim Technischen Hilfswerk, seit 2011 im Fachzug Führung und Kommunikation: Gruppenführer der Fachgruppe Kommunikation, ausgebildeter Zugführer und Sachgebietsleiter, Bereichsausbilder für Sprechfunk. Beruflich arbeitet er an der Digitalisierung von Abläufen und Prozessen." }
           },
           {
             "@type": "Question",
-            "name": "Was sage ich unserem Datenschutzbeauftragten?",
-            "acceptedAnswer": { "@type": "Answer", "text": "Am besten die beiden Seiten, die er ohnehin sehen will: Die Datenschutzerklärung nennt Verantwortlichen, Rechtsgrundlagen und Betroffenenrechte, Open Source und Technik führt jeden Speicherort und jede Verbindung der Anwendung einzeln auf. Kurzfassung: Bogendaten bleiben im lokalen Speicher des Geräts; für die Geräte selbst und die dort gespeicherten Daten ist die einsetzende Stelle verantwortlich." }
+            "name": "Ist der Einheiten-Erfassungsbogen ein offizielles Angebot des THW?",
+            "acceptedAnswer": { "@type": "Answer", "text": "Nein. Es ist ein privates, ehrenamtliches Projekt ohne amtlichen Charakter — weder vom THW noch von einer Feuerwehr, einer Hilfsorganisation oder einer Behörde. Maßgeblich sind die geltenden Dienstvorschriften und die Festlegungen der eigenen Organisation." }
           },
           {
             "@type": "Question",
-            "name": "Was kostet die App — und wer steckt dahinter?",
-            "acceptedAnswer": { "@type": "Answer", "text": "Nichts. Die App ist freie Software unter der EUPL-1.2 — kostenlos, ohne Konto, ohne Bezahlschranke und ohne Werbung; der Quellcode liegt offen auf GitHub. Geschrieben hat sie ein ehrenamtlicher Helfer für die eigene Einheit." }
+            "name": "Woher stammen die Beispielbögen?",
+            "acceptedAnswer": { "@type": "Answer", "text": "Aus der Auswertung veröffentlichter Vorschriften: Katastrophenschutz- und Feuerwehrverordnungen der Länder, Stärke- und Ausstattungsnachweisungen und veröffentlichte Gliederungen der Hilfsorganisationen. Sie geben wieder, was in der Vorschrift steht — nicht den Bestand vor Ort. Welche Vorschrift hinter einem Satz Bögen steht, nennt die jeweilige Seite." }
           },
           {
             "@type": "Question",
-            "name": "Ersetzt das unser Papierformular?",
-            "acceptedAnswer": { "@type": "Answer", "text": "Es erzeugt das Papierformular: Das PDF folgt dem gewohnten Layout des Einheiten-Erfassungsbogens, du kannst es unverändert in den Papierlauf geben. Der QR-Code macht dasselbe Blatt zusätzlich maschinenlesbar — mehr dazu im Vergleich Papier oder digital?" }
+            "name": "Ersetzt die App das Papier?",
+            "acceptedAnswer": { "@type": "Answer", "text": "Nein — sie erzeugt es. Die App druckt den gewohnten Vordruck als PDF; der QR-Code auf dem Blatt macht dasselbe Blatt zusätzlich maschinenlesbar. Fällt Strom, Netz oder Gerät aus, wird auf Papier weitergearbeitet. Der Vergleich der Wege steht unter Papier oder digital?" }
+          },
+          {
+            "@type": "Question",
+            "name": "Was kostet die App und wer pflegt sie?",
+            "acceptedAnswer": { "@type": "Answer", "text": "Nichts. Die App ist freie Software unter der EUPL-1.2 — kostenlos, ohne Konto, ohne Bezahlschranke und ohne Werbung; der Quellcode liegt offen auf GitHub. Entwickelt wird sie ehrenamtlich, neben dem eigenen Dienst." }
           }
         ]
       }

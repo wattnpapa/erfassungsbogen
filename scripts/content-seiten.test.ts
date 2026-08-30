@@ -384,6 +384,7 @@ describe("Content-Seiten unter public/", () => {
     "./bundeswehr.html",
     "./open-source-datenschutz.html",
     "./datenschutz.html",
+    "./autor.html",
     "./impressum.html",
   ];
 

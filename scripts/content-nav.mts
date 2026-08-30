@@ -86,6 +86,7 @@ const UNTER_UEBERSICHT = new Set([
   "open-source-datenschutz.html",
   "bbk.html",
   "bundeswehr.html",
+  "autor.html",
   "impressum.html",
   "datenschutz.html",
 ]);
@@ -121,6 +122,7 @@ const NAV: NavEintrag[] = [
       { href: "./bbk.html", label: "BBK" },
       { href: "./bundeswehr.html", label: "Bundeswehr" },
       { href: "./open-source-datenschutz.html", label: "Open Source und Datenschutz" },
+      { href: "./autor.html", label: "Über den Autor" },
       { href: "./impressum.html", label: "Impressum" },
     ],
   },
@@ -229,6 +231,7 @@ const FUSSNAV: FussGruppe[] = [
     links: [
       { href: "./open-source-datenschutz.html", label: "Open Source und Datenschutz" },
       { href: "./datenschutz.html", label: "Datenschutz" },
+      { href: "./autor.html", label: "Über den Autor" },
       { href: "./impressum.html", label: "Impressum" },
     ],
   },
