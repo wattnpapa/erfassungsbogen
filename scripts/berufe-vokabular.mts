@@ -1,15 +1,28 @@
 /**
- * Generiert src/vokabulare/berufe.ts aus der Klassifikation der Berufe (KldB 2010).
+ * Generiert src/vokabulare/berufe.ts aus zwei Quellen der Bundesagentur für
+ * Arbeit: der Klassifikation der Berufe (KldB 2010) und dem Berufsverzeichnis
+ * BERUFENET.
  *
- * Verwendet wird die Ebene der Berufsuntergruppen (4-stellige Kennziffer, 701
- * gültige Einträge). Die 5-stellige Ebene wäre feiner, unterscheidet aber je
- * Beruf nur noch das Anforderungsniveau ("-Helf./Anlerntät.", "-kompl.Spez.tät.")
- * — für die Zusatzqualifikation einer Person ist das Rauschen.
+ * Die KldB liefert die Sachgebiete ("Altenpflege", "Kraftfahrzeugtechnik"),
+ * BERUFENET die Bezeichnungen, mit denen Menschen ihre Qualifikation selbst
+ * benennen ("Altenpfleger/in", "Kfz-Mechatroniker/in - Nutzfahrzeugtechnik").
+ * Beides zusammen deckt beide Eingabegewohnheiten ab; die Vorschlagsliste ist
+ * eine Suche über Teilzeichenketten, doppelte Blickwinkel stören dort nicht.
  *
- * Die amtlichen Bezeichnungen sind auf 44 Zeichen gekürzt und darum stark
+ * Aus der KldB wird die Ebene der Berufsuntergruppen verwendet (4-stellige
+ * Kennziffer, 701 gültige Einträge). Die 5-stellige Ebene wäre feiner,
+ * unterscheidet aber je Beruf nur noch das Anforderungsniveau
+ * ("-Helf./Anlerntät.", "-kompl.Spez.tät.") — für die Zusatzqualifikation einer
+ * Person ist das Rauschen.
+ *
+ * Die amtlichen KldB-Bezeichnungen sind auf 44 Zeichen gekürzt und darum stark
  * abgekürzt ("Berufe Maschinenb.&Betriebst.(son.spez.Tät.)"). Hier werden sie
  * auf lesbare Vorschlagstexte gebracht; ABKUERZUNGEN muss dafür vollständig
  * bleiben — bleibt ein Punkt stehen, bricht der Generator ab.
+ *
+ * Aus BERUFENET werden die Berufsgruppen in BERUFENET_AUFGENOMMEN übernommen —
+ * alles, was jemand gelernt, als Weiterbildung erworben oder als Tätigkeit
+ * ausgeübt haben kann. Die Studienfächer bleiben draußen, siehe dort.
  *
  * Aufruf:  npx tsx scripts/berufe-vokabular.mts
  */
@@ -19,7 +32,8 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const HIER = dirname(fileURLToPath(import.meta.url));
-const QUELLE = join(HIER, "quellen", "kldb-2010-berufe.csv");
+const QUELLE_KLDB = join(HIER, "quellen", "kldb-2010-berufe.csv");
+const QUELLE_BERUFENET = join(HIER, "quellen", "berufenet-berufe.csv");
 const ZIEL = join(HIER, "..", "src", "vokabulare", "berufe.ts");
 
 /**
@@ -331,7 +345,7 @@ function lesbar(roh: string): string {
   return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
-const zeilen = readFileSync(QUELLE, "utf8").split("\n").slice(1);
+const zeilen = readFileSync(QUELLE_KLDB, "utf8").split("\n").slice(1);
 const eintraege: { kennziffer: string; name: string }[] = [];
 for (const zeile of zeilen) {
   if (!zeile.trim()) continue;
@@ -367,15 +381,82 @@ if (eintraege.length < 650) {
   throw new Error(`Nur ${eintraege.length} Berufsuntergruppen gefunden — Quelldatei geändert?`);
 }
 
-const namen = eintraege.map((e) => e.name).sort((a, b) => a.localeCompare(b, "de"));
+/**
+ * Berufsgruppen von BERUFENET (Schlüssel wie in der Quelldatei) und ob sie in
+ * die Vorschlagsliste wandern. Draußen bleiben die beiden Studienfach-Gruppen:
+ * ein Studienfach ist kein Beruf, der Zusatz "(grundständig)"/"(weiterführend)"
+ * gehört in die Studienberatung, und die zugehörigen Berufe stehen ohnehin
+ * unter "Tätigkeiten nach Studium".
+ */
+const BERUFENET_GRUPPEN: Record<string, { name: string; aufnehmen: boolean }> = {
+  "101": { name: "Duale Ausbildung", aufnehmen: true },
+  "102": { name: "Schulische Ausbildung", aufnehmen: true },
+  "103": { name: "Doppelt qualifizierende Ausbildung", aufnehmen: true },
+  "104": { name: "Ausbildung für Menschen mit Behinderungen", aufnehmen: true },
+  "105": { name: "Sonstige Ausbildung", aufnehmen: true },
+  "201": { name: "Berufsspezialisten", aufnehmen: true },
+  "202": { name: "Meister", aufnehmen: true },
+  "203": { name: "Techniker", aufnehmen: true },
+  "204": { name: "Kaufmännische Weiterbildung", aufnehmen: true },
+  "205": { name: "Andere Weiterbildung", aufnehmen: true },
+  "301": { name: "Studienfach grundständig", aufnehmen: false },
+  "302": { name: "Studienfach weiterführend", aufnehmen: false },
+  "401": { name: "Bachelor Professionals", aufnehmen: true },
+  "402": { name: "Master Professionals", aufnehmen: true },
+  "403": { name: "Tätigkeiten nach Studium", aufnehmen: true },
+  "404": { name: "Weiterbildung nach Studium", aufnehmen: true },
+  "501": { name: "Einfacher Dienst", aufnehmen: true },
+  "502": { name: "Mittlerer Dienst", aufnehmen: true },
+  "503": { name: "Gehobener Dienst", aufnehmen: true },
+  "504": { name: "Höherer Dienst", aufnehmen: true },
+  "600": { name: "Militärlaufbahnen", aufnehmen: true },
+  "700": { name: "Berufliche Einsatzmöglichkeiten", aufnehmen: true },
+  "800": { name: "Helfertätigkeiten", aufnehmen: true },
+  "900": { name: "Fachkräfte", aufnehmen: true },
+};
+
+/**
+ * Die Ausbildungen nach § 66 BBiG tragen die Rechtsgrundlage im Namen
+ * ("Fachpraktiker/in für Tierpflege (§66 BBiG/§42r HwO)"). Für die Tipphilfe
+ * ist das Ballast — der gelernte Beruf steht davor.
+ */
+const bnetLesbar = (roh: string): string => roh.replace(/\s*\(§\s?66 BBiG\/§\s?42r HwO\)/, "").trim();
+
+const bnetZeilen = readFileSync(QUELLE_BERUFENET, "utf8").split("\n").slice(1);
+const bnetNamen: string[] = [];
+let bnetGefunden = 0;
+for (const zeile of bnetZeilen) {
+  if (!zeile.trim()) continue;
+  const [gruppe, bezeichnung] = zeile.split(";").map((f) => f.replace(/^"|"$/g, ""));
+  if (!gruppe || !bezeichnung) continue;
+  bnetGefunden++;
+  const eintrag = BERUFENET_GRUPPEN[gruppe];
+  if (!eintrag) {
+    console.error(`Unbekannte BERUFENET-Berufsgruppe ${gruppe} (${bezeichnung}) — BERUFENET_GRUPPEN ergänzen.`);
+    process.exit(1);
+  }
+  if (eintrag.aufnehmen) bnetNamen.push(bnetLesbar(bezeichnung));
+}
+
+if (bnetGefunden < 3000) {
+  throw new Error(`Nur ${bnetGefunden} BERUFENET-Einträge gelesen — Quelldatei geändert?`);
+}
+
+// Beide Quellen benennen dasselbe teils gleich; als Vorschlag zählt jeder Text
+// nur einmal. Sortiert wird über den Gesamtbestand, damit keine Quelle vorne
+// klebt — die Trefferliste ordnet ohnehin nach Wortanfang.
+const namen = [...new Set([...eintraege.map((e) => e.name), ...bnetNamen])].sort((a, b) => a.localeCompare(b, "de"));
 
 const datei = `/**
  * Berufsbezeichnungen als Vorschlagsliste für die Zusatzqualifikationen einer
- * Person (Ebene der Berufsuntergruppen der KldB 2010, ${namen.length} Einträge).
+ * Person (${namen.length} Einträge).
  *
  * GENERIERT — nicht von Hand bearbeiten.
- * Quelle: Klassifikation der Berufe 2010 der Bundesagentur für Arbeit,
- * scripts/quellen/kldb-2010-berufe.csv.
+ * Quellen (beide Bundesagentur für Arbeit):
+ *   Klassifikation der Berufe 2010, Ebene der Berufsuntergruppen
+ *     — scripts/quellen/kldb-2010-berufe.csv (Sachgebiete)
+ *   BERUFENET, Berufe A bis Z ohne die Studienfächer
+ *     — scripts/quellen/berufenet-berufe.csv (Berufsbezeichnungen)
  * Neu erzeugen mit:  npx tsx scripts/berufe-vokabular.mts
  *
  * Bewusst nur Strings, keine Codes: ein Beruf wandert als Freitext in den Bogen.

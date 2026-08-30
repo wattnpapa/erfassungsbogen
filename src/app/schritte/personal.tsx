@@ -38,7 +38,7 @@ import {
   type SchrittProps,
 } from "./bausteine";
 
-// Die Berufsliste (700 Bezeichnungen, ~28 KB Quelldaten) hängt nicht im
+// Die Berufsliste (3512 Bezeichnungen, ~145 KB Quelldaten) hängt nicht im
 // Start-Bundle: sie wird erst gebraucht, wenn jemand Personal im Detail erfasst.
 // Einmal geladen bleibt das Modul im Cache, der useState-Startwert greift dann
 // sofort — ohne Nachlade-Flackern.
@@ -228,7 +228,7 @@ function PersonKarte(props: {
           </Feld>
           {/* Zusatzqualifikationen kennen kein Code-Vokabular: Beruf, Lehrgang oder
               externe Berechtigung wandern als Freitext in den Bogen. Die
-              Berufsbezeichnungen der KldB dienen nur als Tipphilfe. */}
+              Berufsbezeichnungen aus KldB und BERUFENET dienen nur als Tipphilfe. */}
           <Feld titel="Weitere Qualifikationen">
             <VokabListe
               werte={p.zusatzqualifikationen}

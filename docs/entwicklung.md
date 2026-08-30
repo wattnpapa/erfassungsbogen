@@ -498,16 +498,31 @@ der Personenkarte eigene `<option>`-Elemente mit derselben Rolle mitbringen.
 
 | Ziel | Generator | Quelle |
 | --- | --- | --- |
-| [src/vokabulare/berufe.ts](../src/vokabulare/berufe.ts) — 700 Berufsbezeichnungen | `npm run vokabular:berufe` | `scripts/quellen/kldb-2010-berufe.csv` |
+| [src/vokabulare/berufe.ts](../src/vokabulare/berufe.ts) — 3512 Berufsbezeichnungen | `npm run vokabular:berufe` | `scripts/quellen/kldb-2010-berufe.csv`, `scripts/quellen/berufenet-berufe.csv` |
 | [src/vokabulare/thw-funktionen-ergaenzung.ts](../src/vokabulare/thw-funktionen-ergaenzung.ts) — 145 THW-Funktionen | `npm run vokabular:thw-funktionen` | `scripts/quellen/thw-funktionen.csv` |
 
-**Berufe** kommen aus der Klassifikation der Berufe 2010 (Ebene der
-Berufsuntergruppen). Deren amtliche Bezeichnungen sind auf 44 Zeichen gekürzt
+**Berufe** kommen aus zwei Verzeichnissen der Bundesagentur für Arbeit. Die
+Klassifikation der Berufe 2010 (Ebene der Berufsuntergruppen) liefert die
+Sachgebiete („Altenpflege", „Kraftfahrzeugtechnik"). Deren amtliche
+Bezeichnungen sind auf 44 Zeichen gekürzt
 („Berufe Maschinenb.&Betriebst.(son.spez.Tät.)"); der Generator löst die
 Abkürzungen auf und bricht ab, wenn eine unbekannte übrig bleibt — das
-Abkürzungsverzeichnis muss also vollständig bleiben. Sie tragen **keine Codes**:
-ein Beruf wandert als Freitext in den Bogen, damit das QR-Format unberührt
-bleibt.
+Abkürzungsverzeichnis muss also vollständig bleiben.
+
+BERUFENET („Berufe von A bis Z") liefert die Bezeichnungen, mit denen Menschen
+ihre Qualifikation selbst benennen („Notfallsanitäter/in",
+„Kraftfahrzeugmechatroniker/in - Nutzfahrzeugtechnik"). Übernommen werden alle
+Berufsgruppen bis auf die beiden Studienfach-Gruppen: ein Studienfach ist kein
+Beruf, und die zugehörigen Berufe stehen ohnehin unter „Tätigkeiten nach
+Studium". `BERUFENET_GRUPPEN` im Generator entscheidet darüber; eine dort
+unbekannte Gruppe bricht den Lauf ab. Die Quelldatei entsteht aus
+`https://rest.arbeitsagentur.de/infosysbub/bnet/pc/v1/berufe?page=…&bg=…`
+(Header `X-API-Key: infosysbub-berufenet`, 20 Treffer je Seite) und ist
+eingecheckt — der Generator geht nicht ins Netz.
+
+Berufe tragen **keine Codes**: ein Beruf wandert als Freitext in den Bogen,
+damit das QR-Format unberührt bleibt. Die Liste hängt als eigener Chunk
+(~137 KB, gzip ~30 KB) am Personal-Schritt, nicht am Start-Bundle.
 
 **THW-Funktionen** ergänzen die Handredaktion in `thw.ts` (Codes 1–102, geläufige
 Funktionen mit eigenen Kurzformen) um die Inlandsbereiche der THW-Funktionsliste
