@@ -1,7 +1,7 @@
 {
-  "schemaVersion": 6,
+  "schemaVersion": 8,
   "uebung": true,
-  "stand": 1369,
+  "stand": 1971930,
   "einheit": {
     "organisation": 9,
     "einheitsTyp": {
@@ -59,10 +59,10 @@
       ],
       "zusatzqualifikationen": [
         {
-          "freitext": "Strömungsretter"
+          "freitext": "1011 Strömungsretter 1 (SR1)"
         },
         {
-          "freitext": "Zugführer Wasserrettung"
+          "freitext": "832 Zugführer- und Einsatzführerausbildung (Führungsstufe B)"
         }
       ]
     },
@@ -81,7 +81,7 @@
       "kontakte": [],
       "zusatzqualifikationen": [
         {
-          "freitext": "Strömungsretter"
+          "freitext": "1011 Strömungsretter 1 (SR1)"
         }
       ]
     },
@@ -100,10 +100,10 @@
       "kontakte": [],
       "zusatzqualifikationen": [
         {
-          "freitext": "Strömungsretter"
+          "freitext": "1011 Strömungsretter 1 (SR1)"
         },
         {
-          "freitext": "Sprechfunker (BOS-Digitalfunk)"
+          "freitext": "Rettungsschwimmabzeichen Gold"
         }
       ]
     },
@@ -122,10 +122,10 @@
       "kontakte": [],
       "zusatzqualifikationen": [
         {
-          "freitext": "Strömungsretter"
+          "freitext": "1011 Strömungsretter 1 (SR1)"
         },
         {
-          "freitext": "Sanitäter (San A/B)"
+          "freitext": "715 BOS-Sprechfunker digital"
         }
       ]
     },
@@ -144,7 +144,7 @@
       "kontakte": [],
       "zusatzqualifikationen": [
         {
-          "freitext": "Strömungsretter"
+          "freitext": "1011 Strömungsretter 1 (SR1)"
         }
       ]
     },
@@ -163,10 +163,10 @@
       "kontakte": [],
       "zusatzqualifikationen": [
         {
-          "freitext": "Strömungsretter"
+          "freitext": "1011 Strömungsretter 1 (SR1)"
         },
         {
-          "freitext": "Rettungsschwimmer Silber"
+          "freitext": "401 Basisausbildung Einsatzdienste"
         }
       ]
     },
@@ -185,7 +185,7 @@
       "kontakte": [],
       "zusatzqualifikationen": [
         {
-          "freitext": "Strömungsretter"
+          "freitext": "1011 Strömungsretter 1 (SR1)"
         }
       ]
     },
@@ -204,10 +204,10 @@
       "kontakte": [],
       "zusatzqualifikationen": [
         {
-          "freitext": "Strömungsretter"
+          "freitext": "1011 Strömungsretter 1 (SR1)"
         },
         {
-          "freitext": "Rettungsschwimmer Silber"
+          "freitext": "401 Basisausbildung Einsatzdienste"
         }
       ]
     }

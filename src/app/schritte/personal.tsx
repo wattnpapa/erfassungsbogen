@@ -3,7 +3,7 @@
  * und die Meldekopf-Schnellerfassung (nur Stärke).
  */
 
-import { useEffect, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from "react";
+import { useEffect, useMemo, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from "react";
 import {
   Ernaehrung,
   Fahrerlaubnis,
@@ -33,6 +33,7 @@ import {
   STAERKE_LEGENDE,
   Stepper,
   VokabListe,
+  type FreitextVorschlag,
   staerkeVorlesen,
   zahl,
   type SchrittProps,
@@ -40,13 +41,22 @@ import {
 
 // Die Berufsliste (3512 Bezeichnungen, ~145 KB Quelldaten) hängt nicht im
 // Start-Bundle: sie wird erst gebraucht, wenn jemand Personal im Detail erfasst.
-// Einmal geladen bleibt das Modul im Cache, der useState-Startwert greift dann
-// sofort — ohne Nachlade-Flackern.
-let berufeCache: readonly string[] | null = null;
+// Dasselbe gilt für die DLRG-Ausbildungskennzahlen, die nur eine von zwölf
+// Organisationen betreffen. Einmal geladen bleibt das Modul im Cache, der
+// useState-Startwert greift dann sofort — ohne Nachlade-Flackern.
+let berufeCache: readonly FreitextVorschlag[] | null = null;
+let dlrgQualiCache: readonly FreitextVorschlag[] | null = null;
 
-/** Berufsbezeichnungen als Tipphilfe für die Zusatzqualifikationen. */
-function useBerufe(aktiv: boolean): readonly string[] {
+/**
+ * Tipphilfe für die Zusatzqualifikationen: für alle die Berufsbezeichnungen,
+ * bei der DLRG davor deren Ausbildungskennzahlen (401, 715, 1011 …) — die
+ * Fachliste steht vorn, weil sie bei gleichwertigem Treffer die gemeinte ist
+ * und mit 56 Einträgen gegen 700 Berufe sonst untergeht.
+ */
+function useQualiVorschlaege(aktiv: boolean, org: OrganisationsTyp): readonly FreitextVorschlag[] {
+  const dlrg = org === OrganisationsTyp.DLRG;
   const [berufe, setBerufe] = useState(berufeCache);
+  const [dlrgQuali, setDlrgQuali] = useState(dlrgQualiCache);
   useEffect(() => {
     if (!aktiv || berufe) return;
     void import("../../vokabulare/berufe").then((m) => {
@@ -54,7 +64,17 @@ function useBerufe(aktiv: boolean): readonly string[] {
       setBerufe(berufeCache);
     });
   }, [aktiv, berufe]);
-  return berufe ?? [];
+  useEffect(() => {
+    if (!aktiv || !dlrg || dlrgQuali) return;
+    void import("../../vokabulare/dlrg-qualifikationen").then((m) => {
+      dlrgQualiCache = m.DLRG_QUALIFIKATIONEN;
+      setDlrgQuali(dlrgQualiCache);
+    });
+  }, [aktiv, dlrg, dlrgQuali]);
+  return useMemo(
+    () => [...(dlrg ? (dlrgQuali ?? []) : []), ...(berufe ?? [])],
+    [dlrg, dlrgQuali, berufe],
+  );
 }
 
 function KontakteEditor(props: { kontakte: Kontakt[]; aendern: (k: Kontakt[]) => void }) {
@@ -171,11 +191,11 @@ function FahrerlaubnisFeld(props: { person: Person; set: (patch: Partial<Person>
 function PersonKarte(props: {
   person: Person;
   org: OrganisationsTyp;
-  berufe: readonly string[];
+  vorschlaege: readonly FreitextVorschlag[];
   aendern: (p: Person) => void;
   entfernen: () => void;
 }) {
-  const { person: p, org, berufe, aendern, entfernen } = props;
+  const { person: p, org, vorschlaege, aendern, entfernen } = props;
   const set = (patch: Partial<Person>) => aendern({ ...p, ...patch });
   const funktionen = vokabularFuer(org, "funktion");
   return (
@@ -228,13 +248,14 @@ function PersonKarte(props: {
           </Feld>
           {/* Zusatzqualifikationen kennen kein Code-Vokabular: Beruf, Lehrgang oder
               externe Berechtigung wandern als Freitext in den Bogen. Die
-              Berufsbezeichnungen aus KldB und BERUFENET dienen nur als Tipphilfe. */}
+              Berufsbezeichnungen aus KldB und BERUFENET und die
+              DLRG-Ausbildungskennzahlen dienen nur als Tipphilfe. */}
           <Feld titel="Weitere Qualifikationen">
             <VokabListe
               werte={p.zusatzqualifikationen}
               aendern={(w) => set({ zusatzqualifikationen: w })}
               tabelle={[]}
-              freitextVorschlaege={berufe}
+              freitextVorschlaege={vorschlaege}
               hinzufuegenText="Qualifikation"
             />
           </Feld>
@@ -366,7 +387,7 @@ export function SchrittPersonal({ bogen, aendern, geheZu }: SchrittProps) {
   const [schnell, setSchnell] = useState(false);
   const [fokusNeue, setFokusNeue] = useState(false);
   // Nur die Detail-Karten zeigen Qualifikationen; die Schnelltabelle nicht.
-  const berufe = useBerufe(!nurStaerke && !schnell);
+  const vorschlaege = useQualiVorschlaege(!nurStaerke && !schnell, bogen.einheit.organisation);
   const namenDialog = useRef<HTMLDialogElement>(null);
   const [namenText, setNamenText] = useState("");
   const namenVorschau = parseNamen(namenText);
@@ -557,7 +578,7 @@ export function SchrittPersonal({ bogen, aendern, geheZu }: SchrittProps) {
             key={i}
             person={p}
             org={bogen.einheit.organisation}
-            berufe={berufe}
+            vorschlaege={vorschlaege}
             aendern={(np) => aendern({ personal: bogen.personal.map((x, j) => (j === i ? np : x)) })}
             entfernen={() => aendern({ personal: bogen.personal.filter((_, j) => j !== i) })}
           />

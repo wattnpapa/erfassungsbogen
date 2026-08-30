@@ -1,7 +1,7 @@
 {
-  "schemaVersion": 6,
+  "schemaVersion": 8,
   "uebung": true,
-  "stand": 1369,
+  "stand": 1971930,
   "einheit": {
     "organisation": 9,
     "einheitsTyp": {
@@ -62,10 +62,10 @@
       ],
       "zusatzqualifikationen": [
         {
-          "freitext": "Tauchereinsatzführer"
+          "freitext": "631 Taucheinsatzführer"
         },
         {
-          "freitext": "Einsatztaucher Stufe 2"
+          "freitext": "613 Einsatztaucher Stufe 2"
         }
       ]
     },
@@ -84,7 +84,7 @@
       "kontakte": [],
       "zusatzqualifikationen": [
         {
-          "freitext": "Einsatztaucher Stufe 2"
+          "freitext": "613 Einsatztaucher Stufe 2"
         }
       ]
     },
@@ -103,7 +103,7 @@
       "kontakte": [],
       "zusatzqualifikationen": [
         {
-          "freitext": "Einsatztaucher Stufe 1"
+          "freitext": "612 Einsatztaucher Stufe 1"
         }
       ]
     },
@@ -122,7 +122,7 @@
       "kontakte": [],
       "zusatzqualifikationen": [
         {
-          "freitext": "Einsatztaucher Stufe 1"
+          "freitext": "612 Einsatztaucher Stufe 1"
         }
       ]
     },
@@ -141,10 +141,10 @@
       "kontakte": [],
       "zusatzqualifikationen": [
         {
-          "freitext": "Signalmann (Tauchen)"
+          "freitext": "641 Signalmann"
         },
         {
-          "freitext": "Wasserretter"
+          "freitext": "Sanitäter (San A/B)"
         }
       ]
     },
@@ -163,7 +163,7 @@
       "kontakte": [],
       "zusatzqualifikationen": [
         {
-          "freitext": "Wasserretter"
+          "freitext": "Rettungsschwimmabzeichen Gold"
         }
       ]
     }

@@ -493,8 +493,8 @@ vom Aufrufer, weil jede Liste nach eigenen Feldern sucht. Genutzt von:
 - **Ortsverband** (Schritt 1): Auswahl füllt Kürzel, Telefon, eMail sowie
   Regionalstelle und Landesverband mit.
 - **Funktionen** (Schritt 3): trägt einen **Code** ein — kompakt im QR.
-- **Weitere Qualifikationen** (Schritt 3): trägt **Freitext** ein; die
-  Berufsliste ist reine Tipphilfe.
+- **Weitere Qualifikationen** (Schritt 3): trägt **Freitext** ein; Berufsliste
+  und DLRG-Ausbildungskennzahlen sind reine Tipphilfe.
 
 Eigene Eingaben bleiben überall möglich: Enter ohne markierten Vorschlag
 übernimmt sie, der Knopf „+ eigener Text" auch dann, wenn die Liste Treffer
@@ -549,6 +549,26 @@ Funktionen mit eigenen Kurzformen) um die Inlandsbereiche der THW-Funktionsliste
 (Codes ab 200, amtliche Kurzbezeichnungen). Abgelaufene Funktionen und die
 Auslandsbereiche (SEEBA, SEEWA, HCP …) bleiben draußen. `THW_FUNKTIONEN_ALLE`
 fügt beides zusammen — das nutzt die App.
+
+### Handredigierte Vokabulare dieser Felder
+
+**DLRG-Ausbildungskennzahlen**
+([src/vokabulare/dlrg-qualifikationen.ts](../src/vokabulare/dlrg-qualifikationen.ts))
+stehen bei „Weitere Qualifikationen" vor den Berufen, sobald die Einheit als
+DLRG geführt wird — 56 Einträge aus sechs Fachbereichen, aus der Legende einer
+DLRG-Übersicht abgeschrieben (es gibt keinen maschinenlesbaren Datensatz). Wie
+die Berufe tragen sie **keine Codes**: die Qualifikation wandert als Freitext in
+den Bogen, das QR-Format bleibt unberührt.
+
+Ein Eintrag führt Kennzahl und Bezeichnung („411 Wasserretter (Fachausbildung
+Wasserrettungsdienst)"), weil DLRG-Listen über die Zahl geführt werden, ein
+fremder Meldekopf sie aber nicht kennt. Der Fachbereich („Tauchen", „IuK", …)
+ist der `zusatz` des Vorschlags: er erscheint nur in der Liste, wird aber
+mitgesucht — „Tauchen" holt so alle Tauchausbildungen, obwohl das Wort in keiner
+Bezeichnung steht. Diesen zweiteiligen Weg gibt es nur für Freitext-Tipphilfen
+mit Objektform (`FreitextVorschlag` in
+[src/app/schritte/bausteine.tsx](../src/app/schritte/bausteine.tsx)); Listen aus
+bloßen Strings wie die Berufe bleiben unverändert.
 
 **Codes sind append-only.** Der Funktionsgenerator liest die bereits erzeugte
 Datei und behält jede vorhandene Bezeichnung→Code-Zuordnung; nur neue

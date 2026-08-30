@@ -1,7 +1,7 @@
 {
-  "schemaVersion": 6,
+  "schemaVersion": 8,
   "uebung": true,
-  "stand": 1369,
+  "stand": 1971930,
   "einheit": {
     "organisation": 9,
     "einheitsTyp": {
@@ -53,10 +53,10 @@
       ],
       "zusatzqualifikationen": [
         {
-          "freitext": "Zugführer Wasserrettung"
+          "freitext": "832 Zugführer- und Einsatzführerausbildung (Führungsstufe B)"
         },
         {
-          "freitext": "Sanitäter (San A/B)"
+          "freitext": "811 Helfergrundausbildung"
         }
       ]
     },
@@ -81,7 +81,7 @@
       ],
       "zusatzqualifikationen": [
         {
-          "freitext": "Sprechfunker (BOS-Digitalfunk)"
+          "freitext": "Rettungsschwimmabzeichen Gold"
         }
       ]
     },
@@ -100,7 +100,7 @@
       "kontakte": [],
       "zusatzqualifikationen": [
         {
-          "freitext": "Sanitäter (San A/B)"
+          "freitext": "811 Helfergrundausbildung"
         }
       ]
     },
@@ -119,7 +119,7 @@
       "kontakte": [],
       "zusatzqualifikationen": [
         {
-          "freitext": "Sprechfunker (BOS-Digitalfunk)"
+          "freitext": "811 Helfergrundausbildung"
         }
       ]
     }

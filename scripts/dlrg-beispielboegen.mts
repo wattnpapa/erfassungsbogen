@@ -28,9 +28,13 @@
  * Ortsgruppen gestellt werden, plus die beiden Trupps der Verbandsführung des
  * Wasserrettungsverbandes Baden-Württemberg. DLRG-Vokabular (Einheitstyp,
  * Funktion, Fahrzeug) steht als Freitext im Bogen — organisationsspezifische
- * Vokabulare sind bislang nur für das THW befüllt. Funkrufnamen mit dem
- * Kennwort „Pelikan"; die Kennzahlen sind beispielhaft (die DLRG hat kein
- * bundesweit einheitliches Kennzahlenschema wie die THW-Taschenkarte).
+ * Code-Vokabulare sind bislang nur für das THW befüllt. Die Zusatz-
+ * qualifikationen kommen dagegen über `ausbildung()` aus
+ * src/vokabulare/dlrg-qualifikationen.ts und stehen deshalb genau so im Bogen,
+ * wie die App sie aus der Vorschlagsliste einträgt („613 Einsatztaucher
+ * Stufe 2"). Funkrufnamen mit dem Kennwort „Pelikan"; die Kennzahlen sind
+ * beispielhaft (die DLRG hat kein bundesweit einheitliches Kennzahlenschema
+ * wie die THW-Taschenkarte).
  *
  * Am Ende läuft ein QR-Roundtrip; examples/dlrg/README.md bekommt eine
  * Übersichtstabelle.
@@ -69,6 +73,7 @@ import {
   parseSegmentUrl,
   segmentPayloadUrls,
 } from "../src/codec";
+import { DLRG_QUALIFIKATIONEN } from "../src/vokabulare/dlrg-qualifikationen";
 import { nodeKompressor } from "../src/qr-node";
 import type { QrSatz, QrTeil } from "../src/app/hilfen";
 import { fakeTelefon } from "./fake-telefon";
@@ -131,12 +136,31 @@ const NACHNAMEN = [
   "Weber", "Weis", "Wolf", "Ziegler",
 ] as const;
 
+/**
+ * Ausbildung aus dem DLRG-Vokabular in genau der Schreibweise, die die App bei
+ * „Weitere Qualifikationen" einträgt (src/vokabulare/dlrg-qualifikationen.ts).
+ * Über die Kennzahl nachgeschlagen statt abgetippt: so können Beispielbögen und
+ * Vorschlagsliste nicht auseinanderlaufen, und ein Tippfehler bricht den Lauf,
+ * statt still eine erfundene Ausbildung in die Beispiele zu schreiben.
+ */
+function ausbildung(kennzahl: string): string {
+  const e = DLRG_QUALIFIKATIONEN.find((q) => q.text.startsWith(`${kennzahl} `));
+  if (!e) throw new Error(`Unbekannte DLRG-Ausbildungskennzahl: ${kennzahl}`);
+  return e.text;
+}
+
+// Was quer durch alle Teileinheiten vorkommt und zufällig dazugewürfelt wird.
+// Die letzten beiden tragen bewusst keine Kennzahl: Rettungsschwimmabzeichen
+// und Sanitätsausbildung stehen nicht in der Ausbildungskennzahlen-Legende,
+// landen auf echten Bögen aber trotzdem im Feld — die Beispiele zeigen damit
+// beide Wege, Vorschlagsliste und eigener Text.
 const QUALI_ALLGEMEIN = [
-  "Rettungsschwimmer Silber",
-  "Rettungsschwimmer Gold",
+  ausbildung("401"), // Basisausbildung Einsatzdienste
+  ausbildung("411"), // Wasserretter
+  ausbildung("715"), // BOS-Sprechfunker digital
+  ausbildung("811"), // Helfergrundausbildung
+  "Rettungsschwimmabzeichen Gold",
   "Sanitäter (San A/B)",
-  "Sprechfunker (BOS-Digitalfunk)",
-  "Wasserretter",
 ] as const;
 
 // ------------------------------------------------------------ Personal-Fabrik
@@ -293,7 +317,7 @@ const baeuplane: Bauplan[] = [
     einheitsTyp: "Wasserrettungszug — Führungstrupp (KdoW)",
     hierarchie: hierarchie("Rastatt", BEZIRK, LV_BADEN, "072229876543", "rastatt"),
     personal: [
-      person({ rolle: R.FUEHRER, funktionen: ["ZFü"], fe: FE.B, kontakt: true, quali: ["Zugführer Wasserrettung"] }),
+      person({ rolle: R.FUEHRER, funktionen: ["ZFü"], fe: FE.B, kontakt: true, quali: [ausbildung("832")] }),
       person({ rolle: R.UNTERFUEHRER, funktionen: ["GrFü"], fe: FE.C, kontakt: true }),
       person({ rolle: R.MANNSCHAFT, funktionen: ["Hf"], fe: FE.B }),
       person({ rolle: R.MANNSCHAFT, funktionen: ["Kf"], fe: FE.C }),
@@ -308,11 +332,11 @@ const baeuplane: Bauplan[] = [
     einheitsTyp: "Wasserrettungszug — Strömungsrettergruppe",
     hierarchie: hierarchie("Gaggenau", BEZIRK, LV_BADEN, "072259988776", "gaggenau"),
     personal: [
-      person({ rolle: R.UNTERFUEHRER, funktionen: ["GrFü"], fe: FE.C, kontakt: true, quali: ["Strömungsretter", "Zugführer Wasserrettung"] }),
+      person({ rolle: R.UNTERFUEHRER, funktionen: ["GrFü"], fe: FE.C, kontakt: true, quali: [ausbildung("1011"), ausbildung("832")] }),
       ...Array.from({ length: 6 }, () =>
-        person({ rolle: R.MANNSCHAFT, funktionen: ["Sr"], fe: gewichtet<FE>([[FE.NONE, 3], [FE.B, 5], [FE.BE, 2]]), quali: ["Strömungsretter"] }),
+        person({ rolle: R.MANNSCHAFT, funktionen: ["Sr"], fe: gewichtet<FE>([[FE.NONE, 3], [FE.B, 5], [FE.BE, 2]]), quali: [ausbildung("1011")] }),
       ),
-      person({ rolle: R.MANNSCHAFT, funktionen: ["Kf"], fe: FE.BE, quali: ["Strömungsretter"] }),
+      person({ rolle: R.MANNSCHAFT, funktionen: ["Kf"], fe: FE.BE, quali: [ausbildung("1011")] }),
     ],
     fahrzeuge: [
       fahrzeug({ typ: "SrGrFzg (GA Strömungsrettung)", kennzeichen: "RA-DL 461", funkOrt: "Gaggenau", teile: [46, 1], aenderungen: "Zugfahrzeug mit Beladung Strömungsrettung" }),
@@ -325,9 +349,9 @@ const baeuplane: Bauplan[] = [
     einheitsTyp: "Wasserrettungszug — Bootsgruppe",
     hierarchie: hierarchie("Bühl", BEZIRK, LV_BADEN, "072238877665", "buehl"),
     personal: [
-      person({ rolle: R.UNTERFUEHRER, funktionen: ["GrFü", "Bf"], fe: FE.BE, kontakt: true, quali: ["Bootsführer DLRG"] }),
-      person({ rolle: R.MANNSCHAFT, funktionen: ["Bf"], fe: FE.B, quali: ["Bootsführer DLRG"] }),
-      person({ rolle: R.MANNSCHAFT, funktionen: ["Bf"], fe: FE.B, quali: ["Bootsführer DLRG"] }),
+      person({ rolle: R.UNTERFUEHRER, funktionen: ["GrFü", "Bf"], fe: FE.BE, kontakt: true, quali: [ausbildung("511")] }),
+      person({ rolle: R.MANNSCHAFT, funktionen: ["Bf"], fe: FE.B, quali: [ausbildung("511")] }),
+      person({ rolle: R.MANNSCHAFT, funktionen: ["Bf"], fe: FE.B, quali: [ausbildung("511")] }),
       person({ rolle: R.MANNSCHAFT, funktionen: ["Hf"], fe: FE.NONE }),
       person({ rolle: R.MANNSCHAFT, funktionen: ["Kf"], fe: FE.CE }),
     ],
@@ -342,11 +366,11 @@ const baeuplane: Bauplan[] = [
     einheitsTyp: "Wasserrettungszug — Tauchgruppe",
     hierarchie: hierarchie("Baden-Baden", BEZIRK, LV_BADEN, "072217766554", "baden-baden"),
     personal: [
-      person({ rolle: R.UNTERFUEHRER, funktionen: ["GrFü", "TEF"], fe: FE.C, kontakt: true, quali: ["Tauchereinsatzführer", "Einsatztaucher Stufe 2"] }),
-      person({ rolle: R.MANNSCHAFT, funktionen: ["Et"], fe: FE.B, quali: ["Einsatztaucher Stufe 2"] }),
-      person({ rolle: R.MANNSCHAFT, funktionen: ["Et"], fe: FE.NONE, quali: ["Einsatztaucher Stufe 1"] }),
-      person({ rolle: R.MANNSCHAFT, funktionen: ["Et"], fe: FE.B, quali: ["Einsatztaucher Stufe 1"] }),
-      person({ rolle: R.MANNSCHAFT, funktionen: ["Sm"], fe: FE.NONE, quali: ["Signalmann (Tauchen)"] }),
+      person({ rolle: R.UNTERFUEHRER, funktionen: ["GrFü", "TEF"], fe: FE.C, kontakt: true, quali: [ausbildung("631"), ausbildung("613")] }),
+      person({ rolle: R.MANNSCHAFT, funktionen: ["Et"], fe: FE.B, quali: [ausbildung("613")] }),
+      person({ rolle: R.MANNSCHAFT, funktionen: ["Et"], fe: FE.NONE, quali: [ausbildung("612")] }),
+      person({ rolle: R.MANNSCHAFT, funktionen: ["Et"], fe: FE.B, quali: [ausbildung("612")] }),
+      person({ rolle: R.MANNSCHAFT, funktionen: ["Sm"], fe: FE.NONE, quali: [ausbildung("641")] }),
       person({ rolle: R.MANNSCHAFT, funktionen: ["Kf"], fe: FE.C }),
     ],
     fahrzeuge: [
@@ -380,8 +404,8 @@ const baeuplane: Bauplan[] = [
       { bezeichnung: { freitext: "Koordinierungsstelle" }, name: "Wasserrettung Baden-Württemberg" },
     ],
     personal: [
-      person({ rolle: R.FUEHRER, funktionen: ["VFü"], fe: FE.B, kontakt: true, quali: ["Verbandsführer"] }),
-      person({ rolle: R.FUEHRER, funktionen: ["ZFü"], fe: FE.B, kontakt: true, quali: ["Zugführer Wasserrettung"] }),
+      person({ rolle: R.FUEHRER, funktionen: ["VFü"], fe: FE.B, kontakt: true, quali: [ausbildung("833")] }),
+      person({ rolle: R.FUEHRER, funktionen: ["ZFü"], fe: FE.B, kontakt: true, quali: [ausbildung("832")] }),
       person({ rolle: R.UNTERFUEHRER, funktionen: ["GrFü"], fe: FE.C }),
       person({ rolle: R.MANNSCHAFT, funktionen: ["Kf"], fe: FE.C }),
     ],
@@ -399,7 +423,7 @@ const baeuplane: Bauplan[] = [
       { bezeichnung: { freitext: "Koordinierungsstelle" }, name: "Wasserrettung Baden-Württemberg" },
     ],
     personal: [
-      person({ rolle: R.FUEHRER, funktionen: ["ZFü"], fe: FE.B, kontakt: true, quali: ["Zugführer Wasserrettung"] }),
+      person({ rolle: R.FUEHRER, funktionen: ["ZFü"], fe: FE.B, kontakt: true, quali: [ausbildung("832")] }),
       person({ rolle: R.UNTERFUEHRER, funktionen: ["GrFü"], fe: FE.C, kontakt: true }),
       person({ rolle: R.MANNSCHAFT, funktionen: ["HF"], fe: FE.NONE }),
       person({ rolle: R.MANNSCHAFT, funktionen: ["Kf"], fe: FE.C }),

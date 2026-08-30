@@ -1,7 +1,7 @@
 {
-  "schemaVersion": 6,
+  "schemaVersion": 8,
   "uebung": true,
-  "stand": 1369,
+  "stand": 1971930,
   "einheit": {
     "organisation": 9,
     "einheitsTyp": {
@@ -59,7 +59,7 @@
       ],
       "zusatzqualifikationen": [
         {
-          "freitext": "Rettungsschwimmer Silber"
+          "freitext": "401 Basisausbildung Einsatzdienste"
         }
       ]
     },
@@ -93,7 +93,7 @@
       "kontakte": [],
       "zusatzqualifikationen": [
         {
-          "freitext": "Wasserretter"
+          "freitext": "Sanitäter (San A/B)"
         }
       ]
     },
@@ -112,7 +112,7 @@
       "kontakte": [],
       "zusatzqualifikationen": [
         {
-          "freitext": "Sanitäter (San A/B)"
+          "freitext": "715 BOS-Sprechfunker digital"
         }
       ]
     }

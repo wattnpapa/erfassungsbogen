@@ -1,7 +1,7 @@
 {
-  "schemaVersion": 6,
+  "schemaVersion": 8,
   "uebung": true,
-  "stand": 1369,
+  "stand": 1971930,
   "einheit": {
     "organisation": 9,
     "einheitsTyp": {
@@ -53,7 +53,7 @@
       ],
       "zusatzqualifikationen": [
         {
-          "freitext": "Verbandsführer"
+          "freitext": "833 Verbandsführerausbildung (Führungsstufe C)"
         }
       ]
     },
@@ -78,7 +78,7 @@
       ],
       "zusatzqualifikationen": [
         {
-          "freitext": "Zugführer Wasserrettung"
+          "freitext": "832 Zugführer- und Einsatzführerausbildung (Führungsstufe B)"
         }
       ]
     },
@@ -97,7 +97,7 @@
       "kontakte": [],
       "zusatzqualifikationen": [
         {
-          "freitext": "Sanitäter (San A/B)"
+          "freitext": "811 Helfergrundausbildung"
         }
       ]
     },

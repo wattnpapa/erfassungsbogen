@@ -8,11 +8,18 @@ import { describe, it, expect } from "vitest";
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { SchrittBuehne } from "../../test/schritt-buehne";
+import { OrganisationsTyp } from "../../model";
 import { neuePerson, neuerBogen } from "../hilfen";
 import { SchrittPersonal } from "./personal";
 import { stanPersonalVorbelegung } from "../../vokabulare/thw-stan-personal";
 
 const buehne = () => render(<SchrittBuehne komponente={SchrittPersonal} />);
+
+/** Startbogen einer DLRG-Einheit — sonst ist der frische Bogen immer THW. */
+const dlrgBogen = () => {
+  const b = neuerBogen();
+  return { ...b, einheit: { ...b.einheit, organisation: OrganisationsTyp.DLRG } };
+};
 
 describe("Schritt Personal", () => {
   it("legt über „+ Person hinzufügen“ eine Detail-Karte an und zählt sie zur Stärke", async () => {
@@ -295,6 +302,53 @@ describe("Vorschlagsfelder für Funktion und Qualifikation", () => {
     await nutzer.click(await screen.findByText("Elektrotechnik"));
 
     expect(screen.getByRole("button", { name: "Elektrotechnik entfernen" })).toBeDefined();
+  });
+
+  /**
+   * Bei der DLRG wird Personal über Ausbildungskennzahlen geführt („411, 715,
+   * 831"). Die Zahl allein sagt einem fremden Meldekopf nichts, deshalb landet
+   * Kennzahl UND Bezeichnung im Bogen; der Fachbereich bleibt Anzeige.
+   */
+  it("schlägt bei der DLRG die Ausbildungskennzahlen vor — Kennzahl und Bezeichnung landen im Bogen", async () => {
+    const nutzer = userEvent.setup();
+    render(<SchrittBuehne komponente={SchrittPersonal} bogen={dlrgBogen()} />);
+    await nutzer.click(screen.getByRole("button", { name: "+ Person hinzufügen" }));
+
+    await nutzer.type(screen.getByLabelText("Qualifikation hinzufügen"), "411");
+    // Die DLRG-Liste wird nachgeladen — daher findBy statt getBy.
+    await nutzer.click(await screen.findByText("411 Wasserretter (Fachausbildung Wasserrettungsdienst)"));
+
+    expect(
+      screen.getByRole("button", { name: "411 Wasserretter (Fachausbildung Wasserrettungsdienst) entfernen" }),
+    ).toBeDefined();
+  });
+
+  it("findet DLRG-Qualifikationen auch über den Fachbereich, der nur in der Liste steht", async () => {
+    const nutzer = userEvent.setup();
+    render(<SchrittBuehne komponente={SchrittPersonal} bogen={dlrgBogen()} />);
+    await nutzer.click(screen.getByRole("button", { name: "+ Person hinzufügen" }));
+
+    // „Tauchen" kommt in keiner der Bezeichnungen vor, nur im Fachbereich.
+    await nutzer.type(screen.getByLabelText("Qualifikation hinzufügen"), "Tauchen");
+    await nutzer.click(await screen.findByText("612 Einsatztaucher Stufe 1"));
+
+    expect(screen.getByRole("button", { name: "612 Einsatztaucher Stufe 1 entfernen" })).toBeDefined();
+  });
+
+  it("hält die DLRG-Kennzahlen aus den Vorschlägen anderer Organisationen heraus", async () => {
+    const nutzer = userEvent.setup();
+    await mitPerson(nutzer); // frischer Bogen = THW
+
+    const feld = screen.getByLabelText("Qualifikation hinzufügen");
+    // Erst einen Beruf treffen: das beweist, dass die Vorschläge geladen sind —
+    // sonst prüft der Test nur, dass noch gar nichts da ist.
+    await nutzer.type(feld, "Elektrotechnik");
+    await screen.findByText("Elektrotechnik");
+
+    await nutzer.clear(feld);
+    await nutzer.type(feld, "Wasserretter");
+
+    expect(screen.queryByText(/^411 /)).toBeNull();
   });
 
   it("zeigt ohne Eingabe keine Vorschläge", async () => {

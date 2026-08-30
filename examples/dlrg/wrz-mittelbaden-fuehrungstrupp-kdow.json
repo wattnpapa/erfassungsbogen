@@ -1,7 +1,7 @@
 {
-  "schemaVersion": 6,
+  "schemaVersion": 8,
   "uebung": true,
-  "stand": 1369,
+  "stand": 1971930,
   "einheit": {
     "organisation": 9,
     "einheitsTyp": {
@@ -59,7 +59,7 @@
       ],
       "zusatzqualifikationen": [
         {
-          "freitext": "Zugführer Wasserrettung"
+          "freitext": "832 Zugführer- und Einsatzführerausbildung (Führungsstufe B)"
         }
       ]
     },
@@ -114,7 +114,7 @@
       "kontakte": [],
       "zusatzqualifikationen": [
         {
-          "freitext": "Rettungsschwimmer Silber"
+          "freitext": "401 Basisausbildung Einsatzdienste"
         }
       ]
     }

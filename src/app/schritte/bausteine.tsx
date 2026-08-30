@@ -334,6 +334,15 @@ export function VorschlagFeld<T>(props: {
 /** Ein Vorschlag der VokabListe — aus der Code-Tabelle oder als Freitext-Tipphilfe. */
 type Kandidat = { text: string; zusatz?: string; wert: VokabularWert };
 
+/**
+ * Eintrag einer Freitext-Tipphilfe. Der Kurzweg (String) reicht, wo der
+ * Vorschlag für sich spricht (Berufsbezeichnungen); die Objektform trägt einen
+ * `zusatz`, der NUR in der Liste erscheint und mitgesucht wird — im Bogen
+ * landet immer allein `text` (z. B. DLRG-Ausbildungskennzahl + Bezeichnung,
+ * daneben der Fachbereich als Zusatz).
+ */
+export type FreitextVorschlag = string | { text: string; zusatz?: string };
+
 export function VokabListe(props: {
   werte: VokabularWert[];
   aendern: (w: VokabularWert[]) => void;
@@ -343,7 +352,7 @@ export function VokabListe(props: {
    * Tipphilfe für den Freitext-Weg (z. B. Berufsbezeichnungen). Ausgewähltes
    * landet als Freitext im Bogen — anders als `tabelle`, die Codes vergibt.
    */
-  freitextVorschlaege?: readonly string[];
+  freitextVorschlaege?: readonly FreitextVorschlag[];
 }) {
   const { werte, aendern, tabelle, hinzufuegenText, freitextVorschlaege } = props;
   const [eingabe, setEingabe] = useState("");
@@ -358,8 +367,12 @@ export function VokabListe(props: {
         treffer.push({ text: t.kurz, zusatz: t.name, wert: { code: t.code } });
       }
     }
-    for (const s of freitextVorschlaege ?? []) {
-      if (s.toLowerCase().includes(suche)) treffer.push({ text: s, wert: { freitext: s } });
+    for (const v of freitextVorschlaege ?? []) {
+      const { text, zusatz } = typeof v === "string" ? { text: v, zusatz: undefined } : v;
+      // Der Zusatz zählt bei der Suche mit: „Tauchen" soll alle Tauchscheine
+      // holen, obwohl das Wort in keiner der Bezeichnungen steht.
+      if (text.toLowerCase().includes(suche) || (zusatz?.toLowerCase().includes(suche) ?? false))
+        treffer.push({ text, zusatz, wert: { freitext: text } });
     }
     // Was mit der Eingabe beginnt, ist meist das Gemeinte — nach vorn. Zählt für
     // beide Schreibweisen: die eine tippt „GrFü B", die andere „Gruppenführer".
