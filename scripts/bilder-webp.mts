@@ -66,12 +66,16 @@ function umwandeln(ordner: string, datei: string): "neu" | "aktuell" {
 /**
  * Verpackt ein `<img src="./bilder/x.jpg" …>` in ein `<picture>` mit
  * vorangestellter WebP-Quelle. Bereits verpackte Bilder erkennt die Funktion am
- * öffnenden `<picture>` unmittelbar davor.
+ * öffnenden `<picture>` davor — **einschließlich der `<source>`-Zeile**, die
+ * dieses Skript selbst dazwischensetzt. Ohne sie im Muster griff die Erkennung
+ * nie: Jeder Lauf legte eine weitere `<picture>`-Schicht um dasselbe Bild, und
+ * nach fünf Läufen stand jedes Foto in fünf verschachtelten `<picture>`. Der
+ * Zähler blieb dabei unauffällig, weil er verpackte Bilder zählt, nicht neue.
  */
 function verpacken(html: string): { html: string; anzahl: number } {
   let anzahl = 0;
   const neu = html.replace(
-    /(<picture>\s*)?<img\b([^>]*?)src="\.\/((?:bilder|screenshots)\/[^"]+\.(?:jpe?g|png))"([^>]*?)>/gi,
+    /(<picture>\s*(?:<source\b[^>]*>\s*)?)?<img\b([^>]*?)src="\.\/((?:bilder|screenshots)\/[^"]+\.(?:jpe?g|png))"([^>]*?)>/gi,
     (treffer, schonVerpackt: string | undefined, vor: string, pfad: string, nach: string) => {
       if (schonVerpackt) return treffer;
       anzahl++;
