@@ -121,9 +121,29 @@ describe("QR-Scanner im Browser", () => {
     // Gezielt nach Gerät fragen — die Rückkamera-Vorgabe würde die Wahl sonst
     // gleich wieder überstimmen. Und sie überlebt das Schließen des Scanners.
     await vi.waitFor(() => {
-      expect(getUserMedia).toHaveBeenLastCalledWith({ video: { deviceId: { exact: "vorn" } }, audio: false });
+      const video = getUserMedia.mock.lastCall![0].video as MediaTrackConstraints;
+      expect(video.deviceId).toEqual({ exact: "vorn" });
+      expect(video.facingMode).toBeUndefined();
     });
     expect(localStorage.getItem("eeb-kamera")).toBe("vorn");
+  });
+
+  it("fragt die Kamera hochauflösend an, damit dichte Codes lesbar bleiben", async () => {
+    // Der Fall aus dem Feld: ein Bogen-QR auf dem Notebook-Bildschirm, den die
+    // Kamera-App des Telefons sofort liest. Mit den voreingestellten 640×480
+    // entfallen auf ein Modul zu wenige Pixel — der Wunsch muss mit raus.
+    const getUserMedia = vi.fn(async (_c: MediaStreamConstraints) => streamAttrappe("hinten"));
+    mediaDevicesSetzen({ getUserMedia });
+
+    render(<QrScannerWeb onErgebnis={() => {}} onAbbruch={() => {}} />);
+
+    await vi.waitFor(() => expect(getUserMedia).toHaveBeenCalled());
+    const video = getUserMedia.mock.calls[0]![0].video as MediaTrackConstraints;
+    expect(video.width).toEqual({ ideal: 1920 });
+    expect(video.facingMode).toBe("environment");
+    // Der Fokuswunsch gehört in `advanced`: dort übergeht ihn ein Gerät, das
+    // ihn nicht kennt, statt die ganze Anfrage abzulehnen.
+    expect(video.advanced).toEqual([{ focusMode: "continuous" }]);
   });
 
   it("nimmt einen USB-Handscanner (Tastatur-Wedge) auch ohne Kamera an", async () => {
@@ -202,6 +222,34 @@ describe("QR-Scanner im Browser", () => {
     // fireEvent liefert false, wenn preventDefault() gerufen wurde.
     expect(fireEvent.keyDown(window, { key: "Enter" })).toBe(true);
     expect(onErgebnis).not.toHaveBeenCalled();
+  });
+
+  it("rät nach einer Weile ohne Treffer zu Abstand und Ultraweitwinkel", async () => {
+    // Der Feldfall: Das Bild bleibt unscharf, weil zu nah gehalten wird — die
+    // Hauptkamera stellt darunter nicht scharf, die Kamera-App weicht dafür
+    // von selbst aufs Ultraweitwinkel aus, eine Webseite darf das nicht. Ohne
+    // diesen Rat sucht man den Fehler bei der App statt am Abstand.
+    vi.useFakeTimers();
+    try {
+      mediaDevicesSetzen({
+        getUserMedia: vi.fn(async () => streamAttrappe("haupt")),
+        enumerateDevices: async () => [
+          kameraGeraet("haupt", "Back Camera"),
+          kameraGeraet("uww", "Back Ultra Wide Camera"),
+        ],
+      });
+
+      render(<QrScannerWeb onErgebnis={() => {}} onAbbruch={() => {}} />);
+      await vi.advanceTimersByTimeAsync(1000);
+      expect(screen.queryByText(/Abstand halten/)).toBeNull();
+
+      await vi.advanceTimersByTimeAsync(6000);
+
+      const rat = screen.getByText(/Abstand halten/);
+      expect(rat.textContent).toMatch(/Ultraweitwinkel/);
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   it("zeigt ohne zweite Kamera keine Auswahl", async () => {

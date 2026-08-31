@@ -24,6 +24,14 @@ describe("kameraName", () => {
     expect(kameraName("User Facing Camera", 1)).toBe("Frontkamera");
   });
 
+  it("benennt die Objektive der Rückseite einzeln", () => {
+    // „Hauptkamera 1/2/3" half niemandem: Gesucht wird auf dem iPhone gezielt
+    // das Ultraweitwinkel, weil nur es aus wenigen Zentimetern scharf stellt.
+    expect(kameraName("Back Ultra Wide Camera", 0)).toBe("Ultraweitwinkel (Nahaufnahme)");
+    expect(kameraName("Back Telephoto Camera", 0)).toBe("Teleobjektiv");
+    expect(kameraName("Back Dual Wide Camera", 0)).toBe("Hauptkamera");
+  });
+
   it("behält herstellereigene Namen, wenn keine Blickrichtung drinsteht", () => {
     expect(kameraName("Logitech BRIO", 0)).toBe("Logitech BRIO");
   });

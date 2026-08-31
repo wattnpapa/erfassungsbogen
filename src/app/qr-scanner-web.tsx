@@ -62,6 +62,29 @@ const HANDSCANNER_PAUSE_MS = 500;
 const HANDSCANNER_MINDESTLAENGE = 8;
 
 /**
+ * Bildwunsch für den Scan. Ohne Angabe liefern Browser 640×480 — und damit
+ * muss ein dichter Bogen-Code rund 60 % der Bildhöhe füllen, um gelesen zu
+ * werden. So nah stellt keine Handy-Hauptkamera mehr scharf: Genau daran
+ * scheiterte das Abfilmen eines Codes vom Notebook-Bildschirm, den die
+ * Kamera-App desselben Telefons sofort liest.
+ *
+ * Der Überschuss gegenüber {@link DECODE_BREITE} ist nicht verschenkt: Beim
+ * Verkleinern mittelt drawImage darüber und glättet so die Modulkanten, die
+ * eine direkte Aufnahme in 1280 px hart abtasten würde.
+ *
+ * Alles hier ist Wunsch (`ideal`) und keine Bedingung: Ein Gerät, das die
+ * Auflösung nicht kann, liefert weiter sein Bestes, statt die Anfrage
+ * abzulehnen. Der Fokuswunsch steht in `advanced`, weil ein dort unbekannter
+ * Eintrag stillschweigend übergangen wird — auf oberster Ebene würde er die
+ * Anfrage auf Geräten ohne steuerbaren Fokus sprengen.
+ */
+const BILD_WUNSCH: MediaTrackConstraints = {
+  width: { ideal: 1920 },
+  height: { ideal: 1080 },
+  advanced: [{ focusMode: "continuous" } as MediaTrackConstraintSet],
+};
+
+/**
  * Kamera anfordern. Eine gewählte Kamera geht vor, die Rückkamera ist Wunsch,
  * nicht Bedingung — jede Stufe darf scheitern, ohne den Scan zu beenden: Die
  * gemerkte Kamera kann abgemeldet sein, Geräte ohne Rückkamera kennen
@@ -70,18 +93,41 @@ const HANDSCANNER_MINDESTLAENGE = 8;
 async function kameraOeffnen(wunschId: string): Promise<MediaStream> {
   if (wunschId) {
     try {
-      return await navigator.mediaDevices.getUserMedia({ video: { deviceId: { exact: wunschId } }, audio: false });
+      return await navigator.mediaDevices.getUserMedia({
+        video: { ...BILD_WUNSCH, deviceId: { exact: wunschId } },
+        audio: false,
+      });
     } catch (err) {
       if (istVerweigert(err)) throw err;
     }
   }
   try {
-    return await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" }, audio: false });
+    return await navigator.mediaDevices.getUserMedia({
+      video: { ...BILD_WUNSCH, facingMode: "environment" },
+      audio: false,
+    });
   } catch (err) {
     if (istVerweigert(err)) throw err;
     return await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
   }
 }
+
+/**
+ * Breite, auf die die Suchschleife das Kamerabild zum Dekodieren verkleinert.
+ * Sie entscheidet über die Reichweite: Am dichtesten Bogen-Code (Version 25,
+ * 117 Module) gemessen, wie klein er im Bild stehen darf, damit jsQR ihn noch
+ * liest — bei 640 px muss er rund 60 % der Bildhöhe füllen, bei 1280 px reichen
+ * 30 %. Halb so groß im Bild heißt doppelt so weit weg, und genau daran hing
+ * der Fehlschlag: So nah, wie 640 px es verlangten, stellt keine
+ * Handy-Hauptkamera mehr scharf.
+ *
+ * Nach oben ist 1280 die Grenze des Nützlichen — 1920 kostete in derselben
+ * Messung ein Fünftel mehr Rechenzeit je Bild, ohne mehr Codes zu lesen.
+ */
+const DECODE_BREITE = 1280;
+// Nach dieser Zeit ohne Treffer bekommt der Nutzer den Rat, den sonst nur
+// kennt, wer die Naheinstellgrenze von Handykameras kennt.
+const TIPP_NACH_MS = 6000;
 
 export function QrScannerWeb(props: {
   onErgebnis: (text: string) => void;
@@ -126,11 +172,14 @@ export function QrScannerWeb(props: {
   // Ohne Kamerabild sieht man sonst nicht, ob der Scanner überhaupt am Rechner
   // ankommt — ein stummer Bildschirm wirkt wie ein kaputter Scanner.
   const [scannerZeichen, setScannerZeichen] = useState(0);
+  // Rat zum Abstand, sobald die Kamera eine Weile läuft, ohne etwas zu finden.
+  const [tipp, setTipp] = useState(false);
 
   useEffect(() => {
     let aktiv = true;
     let stream: MediaStream | null = null;
     let rahmen = 0;
+    let tippUhr: ReturnType<typeof setTimeout> | undefined;
     // jsQR (~130 KB) lädt erst mit dem Overlay, nicht mit dem Start-Bundle.
     // Bis dahin läuft die Scanschleife leer — das Kamerabild steht ohnehin
     // erst nach der getUserMedia-Freigabe.
@@ -142,6 +191,7 @@ export function QrScannerWeb(props: {
     function stoppen() {
       aktiv = false;
       cancelAnimationFrame(rahmen);
+      clearTimeout(tippUhr);
       stream?.getTracks().forEach((t) => t.stop());
     }
 
@@ -149,18 +199,22 @@ export function QrScannerWeb(props: {
       if (!aktiv) return;
       const video = videoRef.current;
       if (video && ctx && jsQR && video.readyState >= video.HAVE_ENOUGH_DATA && video.videoWidth) {
-        // Verkleinert dekodieren: deutlich schneller und für QR ausreichend.
-        const faktor = Math.min(1, 640 / video.videoWidth);
+        // Verkleinert dekodieren, aber nicht weiter als nötig — siehe
+        // DECODE_BREITE: unter 1280 px verliert der Scanner Reichweite.
+        const faktor = Math.min(1, DECODE_BREITE / video.videoWidth);
         leinwand.width = Math.round(video.videoWidth * faktor);
         leinwand.height = Math.round(video.videoHeight * faktor);
         ctx.drawImage(video, 0, 0, leinwand.width, leinwand.height);
         const bild = ctx.getImageData(0, 0, leinwand.width, leinwand.height);
-        const code = jsQR(bild.data, bild.width, bild.height, { inversionAttempts: "dontInvert" });
+        const text = jsQR(bild.data, bild.width, bild.height, { inversionAttempts: "dontInvert" })?.data ?? "";
         // Nur einen NEUEN Code melden. Der Scanner läuft weiter (Segmentierung:
         // mehrere Teile); den Overlay schließt der Aufrufer, wenn er fertig ist.
-        if (code?.data && code.data !== letzterText.current) {
-          letzterText.current = code.data;
-          propsRef.current.onErgebnis(code.data);
+        if (text && text !== letzterText.current) {
+          letzterText.current = text;
+          // Was einmal gelesen wurde, braucht keinen Rat mehr zum Abstand.
+          clearTimeout(tippUhr);
+          setTipp(false);
+          propsRef.current.onErgebnis(text);
         }
       }
       rahmen = requestAnimationFrame(suchen);
@@ -191,6 +245,7 @@ export function QrScannerWeb(props: {
         return;
       }
       setFehler(null);
+      setTipp(false);
       setBenutzteKamera(stream.getVideoTracks()[0]?.getSettings().deviceId ?? "");
       // Geräteliste erst NACH der Freigabe holen: vorher liefert der Browser
       // aus Datenschutzgründen keine Namen (und teils gar keine Geräte). Sie
@@ -205,6 +260,7 @@ export function QrScannerWeb(props: {
       if (!video) return;
       video.srcObject = stream;
       await video.play().catch(() => {});
+      tippUhr = setTimeout(() => { if (aktiv) setTipp(true); }, TIPP_NACH_MS);
       suchen();
     })();
 
@@ -271,6 +327,18 @@ export function QrScannerWeb(props: {
             {/* role="status": der Fortschritt wechselt mit jedem gelesenen Teil
                 — ohne Ansage wüsste ein Screenreader im Overlay nichts davon. */}
             <p role="status">{props.fortschritt || "QR-Code des Erfassungsbogens vor die Kamera halten"}</p>
+            {/* Der Rat, den sonst nur kennt, wer die Naheinstellgrenze von
+                Handykameras kennt: Zu nah ist der häufigste Grund, warum ein
+                Code unlesbar bleibt, den dieselbe Kamera in der Kamera-App
+                sofort liest — die schaltet dafür von selbst aufs Ultraweit-
+                winkel um, eine Webseite darf das nicht. */}
+            {tipp && (
+              <p role="status" className="scanner-tipp">
+                Noch nichts erkannt? Etwa 20–30 cm Abstand halten — näher stellt die Hauptkamera nicht scharf.
+                {kameras.length > 1 && " Für nahe Codes unten auf „Ultraweitwinkel“ umschalten."}
+                {" "}Steht der Code auf einem Bildschirm, hilft es, ihn dort größer zu ziehen.
+              </p>
+            )}
             <TeilQuittung teile={props.teile ?? []} />
           </div>
         )}

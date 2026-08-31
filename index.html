@@ -1485,12 +1485,22 @@
     }
     .scanner video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
     .scanner > * { position: relative; }
+    /* Dunkle Unterlage unter dem Text: Der Schlagschatten allein trägt nur über
+       dunklem Bild. Abgefilmt wird aber oft ein Bildschirm — hell und flächig,
+       und darauf verschwand weiße Schrift fast ganz. */
     .scanner-text {
       margin: 0; color: #fff; text-align: center;
       max-width: 34rem;
       text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+      background: rgba(0, 0, 0, 0.5);
+      padding: 0.6rem 0.9rem; border-radius: var(--radius);
     }
     .scanner-text > p { margin: 0; }
+    /* Der Abstandsrat kommt erst nach Sekunden ohne Treffer dazu: kleiner als
+       die Aufforderung darüber, damit er sie nicht überstimmt — aber in vollem
+       Weiß. Blasses Weiß verschwindet auf einem hellen Kamerabild, und
+       ausgerechnet ein Bildschirm im Bild macht es hell. */
+    .scanner-text > .scanner-tipp { margin-top: 0.6rem; font-size: var(--t-s); }
     /* Derselbe Ton wie im Aktualisierungsband: Alarmschrift auf dunkler
        Fläche, einmal benannt statt zweimal getippt. */
     .scanner-text.fehler { color: var(--alarm-auf-akzent); display: grid; gap: 0.6rem; }

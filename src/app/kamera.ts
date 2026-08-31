@@ -21,9 +21,17 @@ const SPEICHER_KAMERA = "eeb-kamera";
  * verschieden („camera2 0, facing back", „Surface Camera Front", „Integrated
  * Webcam"): Wo die Blickrichtung drinsteht, gewinnt sie — danach sucht, wer
  * zwischen Front- und Hauptkamera wechseln will.
+ *
+ * Das Objektiv geht der Blickrichtung vor, weil moderne Handys mehrere
+ * Rückkameras melden („Back Ultra Wide Camera", „Back Telephoto Camera"). Sie
+ * alle „Hauptkamera 1/2/3" zu nennen, hilft niemandem — und ausgerechnet das
+ * Ultraweitwinkel ist die Kamera, die aus wenigen Zentimetern noch scharf
+ * stellt, während die Hauptkamera erst ab etwa 20 cm scharf wird.
  */
 export function kameraName(label: string, index: number): string {
   const text = label.trim();
+  if (/\b(ultra.?wide|ultra.?weit|weitwinkel)/i.test(text)) return "Ultraweitwinkel (Nahaufnahme)";
+  if (/\b(telephoto|tele)\b/i.test(text)) return "Teleobjektiv";
   // Rückseite zuerst prüfen: Android-Labels nennen beides („facing back").
   if (/\b(back|rear|environment|rück|haupt)/i.test(text)) return "Hauptkamera";
   if (/\b(front|user|vorder|selfie)/i.test(text)) return "Frontkamera";
