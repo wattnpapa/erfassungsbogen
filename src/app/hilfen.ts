@@ -313,8 +313,9 @@ async function teilBild(url: string, teilNr: number, anzahl: number): Promise<Qr
 /**
  * Bogen → QR-Satz. QR-Inhalt ist eine App-URL: Die Kamera erkennt sie und öffnet
  * die App bzw. die Web-App; die Daten stehen im Fragment (bleiben also lokal).
- * Passt der Bogen in einen QR-Code (Budget ≤ v25), bleibt es bei genau einem —
- * unverändert zu früher. Erst darüber wird der Payload segmentiert.
+ * Passt der Bogen in einen QR-Code (Budget ≤ v18), bleibt es bei genau einem.
+ * Erst darüber wird der Payload segmentiert — lieber mehrere grobe Codes als
+ * einer, dessen Module zu fein zum Scannen sind.
  *
  * Der Payload wird immer Ed25519-signiert (Container „EEB2C", eine Stufe, netto
  * +99 Bytes) — der Geräteschlüssel bleibt lokal und wird bei Bedarf einmalig

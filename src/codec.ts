@@ -881,14 +881,31 @@ export function decodeVorlagePayloadUrl(text: string, k: Kompressor): Erfassungs
  * Scannen unterschiedliche Optima haben:
  *
  * - {@link QR_EINZEL_MAX_VERSION}: Bis zu dieser Version bleibt ein Bogen EIN
- *   einzelner QR-Code (unverändertes Verhalten für normale Bögen).
+ *   einzelner QR-Code.
  * - {@link QR_SEGMENT_ZIEL_VERSION}: Sobald segmentiert wird, zielt JEDER Teil
  *   auf höchstens diese — deutlich gröbere — Version. Weniger Module je Code =
  *   größere Punkte auf Papier/Display = zuverlässig mit dem Handy scannbar. Der
  *   Preis sind mehr Teile; das ist beim Sammel-Scan gewollt.
+ *
+ * Beide Schwellen wurden am 2026-09-05 in zwei Schritten um je ein Viertel
+ * abgesenkt (v25→v21→v18 einzeln, v18→v15→v13 je Segment-Teil): Feldmeldung
+ * „die QR-Codes sind zu klein". Maßgeblich ist die Nutzlast je Code, gemessen
+ * an den 443 Beispielbögen (Base41, EC M, signiert):
+ *
+ *     einzeln   936 B (v25) → 658 B (v21) → 512 B (v18)   = 0,75² des Ausgangs
+ *     Segment   498 B (v18) → 354 B (v15) → 276 B (v13)   = 0,75² des Ausgangs
+ *
+ * Weniger Information heißt bei quadratisch wachsender Modulfläche gröbere
+ * Module: 117 → 89 Module einzeln, 89 → 69 je Teil. Auf dem Papier wächst
+ * damit das einzelne Modul von 0,45 auf 0,59 mm (Einzelcode) bzw. von 0,91 auf
+ * 1,18 mm (Segment-Teil) — der eigentliche Zweck der Übung.
+ *
+ * Der Preis ist bewusst in Kauf genommen: nur noch 73 statt 377 der 443
+ * Beispielbögen passen in EINEN Code, im Schnitt 2,91 statt 1,29 Teile,
+ * höchstens 7. Das sind im Mittel 1,67 zusätzliche QR-Seiten je Bogen.
  */
-export const QR_EINZEL_MAX_VERSION = 25;
-export const QR_SEGMENT_ZIEL_VERSION = 18;
+export const QR_EINZEL_MAX_VERSION = 18;
+export const QR_SEGMENT_ZIEL_VERSION = 13;
 
 /** Marker im URL-Fragment, der einen Segment-Teil kennzeichnet. */
 export const EEB_SEGMENT_MARKER = "EEBS.";

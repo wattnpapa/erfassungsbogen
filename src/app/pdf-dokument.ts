@@ -126,14 +126,26 @@ const SCHRIFT = "Helvetica";
 const SEITENRAENDER: [number, number, number, number] = [71, 28, 57, 32];
 
 /**
- * Kantenlänge des QR-Bilds in pt (1 pt = 1/72 Zoll). 150 pt ≈ 53 mm: klein
- * genug, dass kleine Einheiten (wenig Daten → niedrige QR-Version → große
- * Module) komplett auf eine Seite passen, und noch groß genug für einfache
- * A4-Drucker (Version 16 ≈ 0,65 mm, Version 20 ≈ 0,55 mm je Modul). Bewusst als
- * Konstante, damit sich die Größe nach einem Druck-/Scan-Praxistest leicht
- * nachziehen lässt.
+ * Kantenlänge des QR-Bilds in pt (1 pt = 1/72 Zoll). 190 pt ≈ 67 mm.
+ *
+ * Vorher standen hier 150 pt — gewählt, damit der QR-Block möglichst oft noch
+ * auf die letzte Formularseite passt. Nachdem das Einzel-Budget auf v18
+ * gesenkt wurde (siehe QR_EINZEL_MAX_VERSION), blieb dieser Einzelcode
+ * trotzdem der dichteste gedruckte Code überhaupt: 0,59 mm je Modul gegen
+ * 1,18 mm bei einem Segment-Teil (v13 auf QR_SEGMENT_BREITE). Das Budget
+ * konnte das nicht heilen — die Modulgröße hängt an Version UND Druckbreite,
+ * und an der Breite war noch Luft. Mit 190 pt kommt der Einzelcode auf
+ * 0,75 mm je Modul (Version 16 ≈ 0,82 mm) und liegt damit in derselben
+ * Größenordnung wie ein Segment-Teil.
+ *
+ * Der Platzpreis wurde über alle 73 einteiligen Beispielbögen gemessen: 10
+ * davon wachsen von einer auf zwei Seiten (101 → 111 Seiten gesamt), weil der
+ * QR-Block als `unbreakable` nicht mehr unter das Formular passt. Bei 175 pt
+ * wären es 7 — die Kurve ist flach, ein kleinerer Wert kauft wenig zurück.
+ * Bewusst als Konstante, damit sich die Größe nach einem Druck-/Scan-
+ * Praxistest leicht nachziehen lässt.
  */
-const QR_BREITE = 150;
+const QR_BREITE = 190;
 
 /**
  * Kantenlänge je QR-Bild bei Segmentierung. Bewusst groß (≈ 8 cm) und pro Seite

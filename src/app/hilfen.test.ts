@@ -52,7 +52,17 @@ import {
   vokabularFuer,
   zeitgruppe,
 } from "./hilfen";
-import { EEB_URL_PREFIX, decodePayload, encodePayload, payloadAusText } from "../codec";
+import QRCode from "qrcode";
+import {
+  EEB_URL_PREFIX,
+  QR_EINZEL_MAX_VERSION,
+  QR_SEGMENT_ZIEL_VERSION,
+  decodePayload,
+  encodePayload,
+  parseSegmentUrl,
+  payloadAusText,
+  segmentePayload,
+} from "../codec";
 import {
   oeffentlicherSchluessel,
   schluesselKurzform,
@@ -701,6 +711,50 @@ describe("qrErzeugen(): Textlink (vollUrl)", () => {
   it("trägt denselben Payload wie das QR-Bild (dort Base41)", async () => {
     const qr = await qrErzeugen(neuerBogen());
     expect(payloadAusText(qr.vollUrl)).toEqual(payloadAusText(qr.teile[0]!.url));
+  });
+});
+
+describe("qrErzeugen(): QR-Budget (Modulgröße statt Datenmenge)", () => {
+  /** Modulzahl je Kante — das ist es, was auf Papier über die Punktgröße entscheidet. */
+  const module = (url: string) => 17 + 4 * QRCode.create(url, { errorCorrectionLevel: "M" }).version;
+
+  /** Bogen mit `n` ausführlich erfassten Personen — treibt den Payload gezielt hoch. */
+  function grosserBogen(n: number): Erfassungsbogen {
+    const b = neuerBogen();
+    b.personalErfassung = PersonalErfassung.VOLLSTAENDIG;
+    b.personal = Array.from({ length: n }, (_, i) =>
+      person({
+        vorname: `Vorname${i}`,
+        nachname: `Nachname${i}`,
+        funktionen: [{ freitext: `Sonderfunktion ${i}` }],
+        kontakte: [{ art: KontaktArt.MOBIL, dienstlich: false, wert: "01701234501" }],
+        zusatzqualifikationen: [{ freitext: `Qualifikation ${i}` }],
+      }),
+    );
+    return b;
+  }
+
+  it("hält einen normalen Bogen in einem Code — und den unter 89 Modulen", async () => {
+    const qr = await qrErzeugen(grosserBogen(6));
+    expect(qr.segmentiert).toBe(false);
+    expect(qr.teile).toHaveLength(1);
+    expect(module(qr.teile[0]!.url)).toBeLessThanOrEqual(17 + 4 * QR_EINZEL_MAX_VERSION); // ≤ 89
+  });
+
+  it("teilt einen großen Bogen lieber auf, als die Module fein werden zu lassen", async () => {
+    const qr = await qrErzeugen(grosserBogen(60));
+    expect(qr.segmentiert).toBe(true);
+    expect(qr.teile.length).toBeGreaterThan(1);
+    // Jeder Teil bleibt grob genug fürs Handy — das ist der Zweck der Aufteilung.
+    for (const t of qr.teile) {
+      expect(module(t.url)).toBeLessThanOrEqual(17 + 4 * QR_SEGMENT_ZIEL_VERSION); // ≤ 69
+    }
+  });
+
+  it("setzt die Teile wieder zu genau dem Payload des Textlinks zusammen", async () => {
+    const qr = await qrErzeugen(grosserBogen(60));
+    const zusammengesetzt = segmentePayload(qr.teile.map((t) => parseSegmentUrl(t.url)));
+    expect(zusammengesetzt).toEqual(payloadAusText(qr.vollUrl));
   });
 });
 

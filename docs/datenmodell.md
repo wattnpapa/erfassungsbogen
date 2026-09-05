@@ -59,8 +59,9 @@ Beide Fälle nutzen dasselbe Schema; der Modus steckt in `personalErfassung`
 
 1. Alle Informationen eines Erfassungsbogens strukturiert abbilden (Eingabe → PDF-Druck).
 2. Denselben Datensatz **offline** über einen einzelnen QR-Code transportieren.
-3. Kompression so weit treiben, dass ein gut scannbarer QR-Code (Ziel: ≤ Version 25,
-   Fehlerkorrektur M) entsteht.
+3. Kompression so weit treiben, dass ein gut scannbarer QR-Code (Ziel: ≤ Version 18,
+   Fehlerkorrektur M) entsteht; darüber lieber mehrere grobe Codes (Segmentierung)
+   als einen feinen.
 
 ## Kernidee der Kompression: namensraumbasierte Vokabulare
 
@@ -286,7 +287,7 @@ stufe_k            = pubkey[32]                   (Ed25519, roher Schlüssel)
   Kartenlänge), dazu 5 Magic + 1 Stufenzahl. Netto **+99 Bytes** gegenüber
   unsigniert bei `n=1` (das 4-Byte-`EEB2`-Magic wird durch das 5-Byte-`EEB2C`
   ersetzt), nach Base41 ~+149 Zeichen. Gemessen am vollen THW-Bogen:
-  unsigniert QR v13 → signiert QR v17 — deutlich unter dem Ziel ≤ v25.
+  unsigniert QR v13 → signiert QR v17 — noch unter dem Ziel ≤ v18.
 - **Vorlagen/Segmentierung orthogonal.** Der Vorlagen-Marker `V.` und die
   Base41/URL-Hülle liegen um den ganzen Payload; ein signierter Vorlagen-QR ist
   `#V.B.` ‖ Base41(`EEB2C…`).
@@ -332,7 +333,7 @@ karte:               flags[1]          (Bit 0 Name, Bit 1 E-Mail, Bit 2 Telefon)
 - **Größenbudget.** Flagbyte + Längen-Varint + Feldinhalte, unkomprimiert.
   Realistisch ~40–70 Bytes, gedeckelt auf 40 / 48 / 24 Zeichen (Name / E-Mail /
   Telefon); nach Base41 ~+60–105 Zeichen. Am vollen THW-Bogen bleibt der QR
-  damit weiterhin klar unter dem Ziel ≤ v25.
+  damit weiterhin unter dem Ziel ≤ v18.
 - **Datenschutz.** Personenbezogene Daten, freiwillig und jederzeit löschbar
   (`eeb.absenderkarte.v1` im `localStorage`, wandert über die Datensicherung mit).
   Referenz: [`src/app/absenderkarte.ts`](../src/app/absenderkarte.ts).
@@ -381,14 +382,16 @@ Ed25519-Signatur (Container `EEB2C`, netto +99 Bytes bei einer Stufe) — siehe
 
 **Gemessene Größen** (siehe README): voller THW-Bogen 511 Bytes → QR v18
 (mit OV-Verzeichnis-Referenz 411 Bytes → QR v15); Meldekopf-Schnellerfassung
-191 Bytes → QR v10. Budget ≤ v25 (997 Bytes bei ECC M) wird stets deutlich
-unterschritten.
+191 Bytes → QR v10. Budget ≤ v18 = **512 Payload-Bytes** (Base41 in der App-URL,
+ECC M) — der Regelfall ist damit die Aufteilung auf mehrere Codes.
 
 ### Segmentierung auf mehrere QR-Codes (Fallback)
 
 Der Normalfall bleibt **ein** QR-Code (unverändert, s. o.). Nur wenn ein Bogen so
-groß wird, dass der Single-QR das Budget (Ziel ≤ Version 25, ECC M) überschreitet,
-wird der **Payload** auf mehrere QR-Codes aufgeteilt. Jeder Teil ist eine eigene
+groß wird, dass der Single-QR das Budget (Ziel ≤ Version 18, ECC M) überschreitet,
+wird der **Payload** auf mehrere QR-Codes aufgeteilt — jeder Teil auf höchstens
+Version 13 (276 Payload-Bytes), damit die Module grob und aus Distanz scannbar
+bleiben. Jeder Teil ist eine eigene
 App-URL mit einem Text-Kopf im Fragment — analog zum Vorlagen-Marker `V.` und wie
 dieser außerhalb des Base41- und Base64url-Alphabets, also nie mit einem Payload
 verwechselbar:
@@ -410,9 +413,11 @@ Duplikate, meldet den Fortschritt („Teil 1 von 2"), und dekodiert erst, wenn a
 Prüfsumme nach dem Zusammensetzen falsch, wird abgelehnt. Ein zwischendurch
 gescannter fremder oder unsegmentierter Code wird sofort separat behandelt.
 
-**Abwärtskompatibel:** Passt der Bogen in einen QR (aktuell immer der Fall —
-voller THW-Bogen ≈ v18), wird **kein** Kopf erzeugt; der Single-QR-Roundtrip ist
-Byte-für-Byte identisch zu vorher. Referenz: [`src/codec.ts`](../src/codec.ts)
+**Abwärtskompatibel:** Passt der Bogen in einen QR (über die 443 Beispielbögen
+gemessen 73 — der Regelfall ist die Aufteilung), wird **kein** Kopf erzeugt; der
+Single-QR-Roundtrip ist Byte-für-Byte identisch zu vorher. Ein bereits gedruckter
+QR-Code bleibt unabhängig vom Budget lesbar — die Schwellen betreffen nur das
+Erzeugen. Referenz: [`src/codec.ts`](../src/codec.ts)
 (`segmentPayloadUrls`, `parseSegmentUrl`, `segmentSammeln`, `segmenteZuBogen`).
 
 ## Meldekopf-Workflow (Anforderungen an die App, Stufe 2+)
