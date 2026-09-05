@@ -139,6 +139,15 @@ describe("stanFahrzeugVorbelegung — Funkrufname", () => {
     }
   });
 
+  it("belegt den MTW OV des OV-Stabs mit Heros 86/25", () => {
+    // Der OV-Stab hängt an keinem Zug: seine Fahrzeuge laufen auf der
+    // OE-Zahl 86 des Ortsverbands, das Fahrzeug selbst als 1. MTW auf 25.
+    const fahrzeuge = stanFahrzeugVorbelegung(OrganisationsTyp.THW, einheitsTyp("OV-Stab"));
+    expect(fahrzeuge[0]!.typ).toEqual({ code: 27 }); // MTW OV
+    expect(fahrzeuge[0]!.funkrufname?.teile).toEqual([86, 25]);
+    expect(fahrzeuge[1]!.funkrufname).toBeUndefined(); // Anh OV (Freitext)
+  });
+
   it("gibt der FGr BT keinen Funkrufnamen (nicht in der Taschenkarte)", () => {
     const fahrzeuge = stanFahrzeugVorbelegung(OrganisationsTyp.THW, einheitsTyp("FGr BT"));
     expect(fahrzeuge.every((f) => f.funkrufname == null)).toBe(true);

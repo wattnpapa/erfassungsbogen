@@ -17,7 +17,10 @@
  *    27 im 2. TZ; FGr N = 24 bzw. 28). Vorbelegt wird immer der 1. Zug/TZ;
  *    beim 2. TZ korrigiert der Nutzer die Zahl im Feld.
  *  - FüSt-/Verwaltungs-Kennzahlen (10-15, 65-69, 71-73, 79-99) werden nur als
- *    Referenz geführt, nicht automatisch vorbelegt.
+ *    Referenz geführt, nicht automatisch vorbelegt. Ausnahme seit dem OV-Stab
+ *    (Einheitstyp 46): dessen Fahrzeuge laufen auf der OE-Zahl 86, denn der
+ *    MTW OV hängt an keinem Zug — "Heros <Ort> 86/25" ist genau das, was auf
+ *    dem Fahrzeug steht.
  *  - Uneindeutige Fahrzeug-Kennzahlen (LKW Kipper 41/42, LKW Ladekran 44/45,
  *    2. LKW WLF) sind bewusst mit einer plausiblen Zahl vorbelegt — editierbar.
  */
@@ -214,6 +217,7 @@ export const TEILEINHEIT_KENNZAHL_JE_EINHEITSTYP: Record<number, number> = {
   42: 17, // FGr F
   43: 18, // FGr K (A)
   44: 19, // FGr K (B)
+  46: 86, // OV-Stab → OV (Organisationseinheit, kein Zug; s. Kopf)
 };
 
 /** Teileinheit-Kennzahl (1. Zahl des Funkrufnamens) für einen Einheitstyp-Code. */

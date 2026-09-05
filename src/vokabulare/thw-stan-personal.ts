@@ -17,6 +17,15 @@
  *  - "Fachhelfer/in (Reserve)" wird nicht vorbelegt: die Reserve zählt nicht
  *    zur Einsatzstärke (StAN notiert sie als "+n") und rückt nicht mit aus.
  *  - SEEBA, SEEWA, SEElift, Sys BR500: keine Vorbelegung.
+ *
+ * Sonderfall OV-Stab (Code 46, Johannes/Claude 2026-09-05): Die StAN OV (00-01)
+ * liegt diesem Projekt nicht vor. Die Sollplätze sind stattdessen aus
+ * scripts/quellen/thw-funktionen.csv abgeleitet — alle dort als
+ * "STAN-Position" geführten Ämter, die an keinem Zug und keiner Fachgruppe
+ * hängen, also nur im Ortsverband selbst vorkommen können. Die ANZAHL ist
+ * gesetzt, nicht belegt: diese Ämter gibt es je Ortsverband einmal (der
+ * Fachberater kann mehrfach besetzt sein). Kommt die StAN 00-01 ins Projekt,
+ * ist das hier gegen ihre Funktionsübersicht zu prüfen.
  */
 
 import type { Person, VokabularWert } from "../model";
@@ -31,6 +40,9 @@ export interface StanSollplatz {
 
 // Funktions-Codes (siehe THW_FUNKTIONEN): 1 ZFü, 2 ZTrFü, 3 GrFü, 4 TrFü,
 // 7 SGL, 8 Ltr VOST, 9 stv. Ltr VOST, 10 GrLtr VOST, 11 TrLtr VOST, 12 PSF.
+// Aus THW_FUNKTIONEN_ERGAENZUNG (Codes ab 200) für den OV-Stab: 201 AB,
+// 202 BÖ, 204 FaBe 1/2, 237 OV-Koch, 238 OB, 239 OJB, 242 SM, 278 VwB,
+// 283 stv. OB, 284 stv. OJB.
 
 const fu = (funktion: number, staerkeRolle: StaerkeRolle, anzahl = 1): StanSollplatz =>
   ({ funktion, staerkeRolle, anzahl });
@@ -82,6 +94,21 @@ export const THW_STAN_PERSONAL: Record<number, StanSollplatz[]> = {
   43: [grfue(), trfue(2), he(6)], // K (A) — -/3/6/9
   44: [grfue(), trfue(3), he(9)], // K (B) — -/4/9/13
   45: [fu(7, StaerkeRolle.FUEHRER, 6)], // Stab — 6/-/-/6 (SGL S1–S6)
+  // OV-Stab (s. Kopf): OB und Vertretung führen, der Fachberater berät als
+  // Führungskraft die Einsatzleitung — die übrigen Ämter sind Verwaltung,
+  // Ausbildung und Betreuung und zählen in der Stärkemeldung als Mannschaft.
+  46: [
+    fu(238, StaerkeRolle.FUEHRER), // OB
+    fu(283, StaerkeRolle.FUEHRER), // stv. OB
+    fu(204, StaerkeRolle.UNTERFUEHRER), // FaBe 1/2
+    fu(242, StaerkeRolle.MANNSCHAFT), // SM
+    fu(278, StaerkeRolle.MANNSCHAFT), // VwB
+    fu(201, StaerkeRolle.MANNSCHAFT), // AB
+    fu(202, StaerkeRolle.MANNSCHAFT), // BÖ
+    fu(239, StaerkeRolle.MANNSCHAFT), // OJB
+    fu(284, StaerkeRolle.MANNSCHAFT), // stv. OJB
+    fu(237, StaerkeRolle.MANNSCHAFT), // OV-Koch/Köchin
+  ], // OV-Stab — 2/1/7/10
 };
 
 /**

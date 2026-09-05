@@ -1,4 +1,5 @@
 import { describe, it, expect } from "vitest";
+import { OrganisationsTyp, StaerkeRolle } from "../model";
 import {
   FUNKRUF_KENNWOERTER,
   THW_EINHEITSTYPEN,
@@ -8,6 +9,7 @@ import {
   THW_HIERARCHIE_EBENEN,
   type VokabularEintrag,
 } from "./thw";
+import { stanPersonalVorbelegung } from "./thw-stan-personal";
 
 // Alle im Codec adressierbaren THW-Vokabulare. Jede Tabelle wird über
 // VokabularWert.code referenziert; Datenpflege-Fehler (doppelte oder
@@ -65,5 +67,32 @@ describe("THW_FUNKTIONEN_ALLE", () => {
     const namen = THW_FUNKTIONEN_ALLE.map((f) => f.name.toLowerCase().replace(/[\s\-.]/g, ""));
     const doppelte = namen.filter((n, i) => namen.indexOf(n) !== i);
     expect(doppelte).toEqual([]);
+  });
+});
+
+describe("OV-Stab (StAN 00-01)", () => {
+  const ovStab = THW_EINHEITSTYPEN.find((e) => e.kurz === "OV-Stab")!;
+
+  it("steht als Einheitstyp mit seiner StAN-Nummer im Vokabular", () => {
+    expect(ovStab.stanNr).toBe("00-01");
+  });
+
+  it("belegt die Ämter vor, die es nur im Ortsverband gibt — je einmal", () => {
+    // Abgeleitet aus scripts/quellen/thw-funktionen.csv (alle STAN-Positionen
+    // ohne Zug-/Fachgruppen-Bindung); Reihenfolge ist die der Vorbelegung.
+    const personal = stanPersonalVorbelegung(OrganisationsTyp.THW, { code: ovStab.code });
+    expect(personal.map((p) => p.funktionen[0]?.code)).toEqual([
+      238, 283, 204, 242, 278, 201, 202, 239, 284, 237,
+    ]);
+    // Stärke 2/1/7/10: OB und Vertretung führen, der Fachberater als Unterführer.
+    const je = (r: StaerkeRolle) => personal.filter((p) => p.staerkeRolle === r).length;
+    expect([je(StaerkeRolle.FUEHRER), je(StaerkeRolle.UNTERFUEHRER), je(StaerkeRolle.MANNSCHAFT)])
+      .toEqual([2, 1, 7]);
+  });
+
+  it("verweist nur auf Funktionen, die es wirklich gibt", () => {
+    const bekannt = new Set(THW_FUNKTIONEN_ALLE.map((f) => f.code));
+    const personal = stanPersonalVorbelegung(OrganisationsTyp.THW, { code: ovStab.code });
+    for (const p of personal) expect(bekannt.has(p.funktionen[0]!.code!)).toBe(true);
   });
 });

@@ -23,6 +23,14 @@ describe("sitzplaetzeFuer()", () => {
 
   it("greift bei Freitext-Fahrzeugen auf die Kurzzeichen-Tabelle zurück", () => {
     expect(sitzplaetzeFuer(text("LF 20"), THW_FAHRZEUGTYPEN)).toBe(9);
+    expect(sitzplaetzeFuer(text("Bus"), THW_FAHRZEUGTYPEN)).toBeUndefined();
+  });
+
+  it("zählt den MTW OV mit Gruppenbesatzung — als Code wie als Freitext", () => {
+    // Der MTW OV steht seit 2026-09-05 im Vokabular; Alt-Bögen tragen ihn als
+    // Freitext. Beide Wege müssen dieselbe Zahl liefern, sonst springt der
+    // Sanitycheck je nach Herkunft des Bogens unterschiedlich an.
+    expect(sitzplaetzeFuer(code(27), THW_FAHRZEUGTYPEN)).toBe(9);
     expect(sitzplaetzeFuer(text("MTW OV"), THW_FAHRZEUGTYPEN)).toBe(9);
   });
 
@@ -97,6 +105,10 @@ describe("THW_FAHRZEUGTYPEN", () => {
   it("kürzt den Ladekran mit Lkr ab", () => {
     expect(THW_FAHRZEUGTYPEN.find((e) => e.code === 9)?.kurz).toBe("LKW Lkr");
     expect(THW_FAHRZEUGTYPEN.find((e) => e.code === 10)?.kurz).toBe("LKW Lkr gl");
+  });
+
+  it("führt den MTW OV mit eigener Kurzform", () => {
+    expect(THW_FAHRZEUGTYPEN.find((e) => e.code === 27)?.kurz).toBe("MTW OV");
   });
 
   it("hinterlegt für jeden Anhänger null Sitzplätze", () => {

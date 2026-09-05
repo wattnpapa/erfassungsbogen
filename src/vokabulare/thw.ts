@@ -8,11 +8,12 @@
  *  - `kurz` ist die Kurzform für Bogen-Druck und kompakte Anzeige.
  *
  * Redaktionsentscheidungen (Johannes, 2026-07-10):
- *  - StAN OV (00-01) wird nicht aufgenommen; OV-spezifische Einheiten und
- *    Fahrzeuge (z. B. MTW OV, Anh OV) laufen über den Freitext-Ausweg.
- *    Ausnahme: MzKW und MzGW stehen im Vokabular — sie tragen den Technischen
- *    Zug (FGr N, FGr SB, FGr BrB) und wurden ohne Eintrag ständig vermisst
- *    (Issue #6).
+ *  - Aus der StAN OV (00-01) ist der OV-Stab aufgenommen (Einheitstyp 46) samt
+ *    MTW OV; er ist die Stelle, an der OB, Schirrmeister und das OV-eigene
+ *    Fahrzeug hängen. Was darüber hinaus OV-spezifisch ist (Anh OV, Alters-
+ *    und Ehrengruppe, Jugendgruppe, Grundausbildungsgruppe), läuft weiter über
+ *    den Freitext-Ausweg. Weitere Fahrzeug-Ausnahmen: MzKW und MzGW — sie
+ *    tragen den Technischen Zug (FGr N, FGr SB, FGr BrB, Issue #6).
  *  - Ältere Bezeichnungen aus 02-00 STAN TZ (B1, B2, Bel, …) werden ignoriert;
  *    maßgeblich sind die Einzel-StAN dieser Lieferung.
  *  - Fb-Kürzel (z. B. "Fb Fü K_A") werden nicht abgebildet.
@@ -45,7 +46,8 @@ export const THW_HIERARCHIE_EBENEN: VokabularEintrag[] = [
 
 // ------------------------------------------------------------- Einheitstypen
 // Aus den StAN-Einzeldokumenten 2026 (eine StAN = ein Einheitstyp).
-// OV-Teileinheiten und Alt-Bezeichnungen bewusst nicht enthalten (s. Kopf).
+// Alt-Bezeichnungen und die übrigen OV-Teileinheiten (Alters- und Ehren-,
+// Jugend-, Grundausbildungsgruppe) bewusst nicht enthalten (s. Kopf).
 
 export const THW_EINHEITSTYPEN: VokabularEintrag[] = [
   { code: 1, kurz: "MT", name: "Media Team", stanNr: "00-06" },
@@ -93,6 +95,7 @@ export const THW_EINHEITSTYPEN: VokabularEintrag[] = [
   { code: 43, kurz: "FGr K (A)", name: "Fachgruppe Kommunikation (A)", stanNr: "10-05a" },
   { code: 44, kurz: "FGr K (B)", name: "Fachgruppe Kommunikation (B)", stanNr: "10-05b" },
   { code: 45, kurz: "Stab", name: "Stabspersonal", stanNr: "10-06" },
+  { code: 46, kurz: "OV-Stab", name: "Ortsverband (Stab)", stanNr: "00-01" },
 ];
 
 // ---------------------------------------------------------------- Funktionen
@@ -213,12 +216,13 @@ export const THW_FUNKTIONEN_ALLE: FunktionsEintrag[] = [
 
 // -------------------------------------------------------------- Fahrzeugtypen
 // Aus den Ausstattungs-Kapiteln der StAN-Einzeldokumente 2026 (Kurzzeichen wo
-// vorhanden), ergänzt um MzKW und MzGW (Issue #6). Reine OV-Fahrzeuge (MTW OV,
-// Anh OV, …) bleiben draußen — dafür den Freitext-Ausweg nutzen (s. Kopf).
+// vorhanden), ergänzt um MzKW, MzGW (Issue #6) und den MTW OV. Die übrigen
+// reinen OV-Fahrzeuge (Anh OV, …) bleiben draußen — dafür den Freitext-Ausweg
+// nutzen (s. Kopf).
 //
 // `sitzplaetze` = Sitzplätze inkl. Fahrer/in nach den Fahrzeugbeschreibungen
 // des THW (thw.de/Ausstattung) bzw. der jeweiligen Serienbeschaffung:
-// GKW 1+8, MTW 1+8, MLW IV 1/6, MzKW 1+6, MzGW 1+6, FmKW 1+6, FüKW 1+5, FüKomKW 1+2,
+// GKW 1+8, MTW 1+8 (TZ wie OV), MLW IV 1/6, MzKW 1+6, MzGW 1+6, FmKW 1+6, FüKW 1+5, FüKomKW 1+2,
 // MTW FGr 5 (Kleinbus, 3,2 t), LKW 7 t (Kipper/Lbw/Lkr/WLF) 1+2.
 // Baumaschinen und Kran zählen nur ihre Bedienplätze, Anhänger 0. Das MzAB
 // steht mit 0, weil es niemanden auf der Straße befördert (es reist auf dem
@@ -252,6 +256,7 @@ export const THW_FAHRZEUGTYPEN: VokabularEintrag[] = [
   { code: 24, kurz: "MTW gl", name: "Mannschaftstransportwagen geländegängig" },
   { code: 25, kurz: "MzKW", name: "Mehrzweckkraftwagen", sitzplaetze: 7 },
   { code: 26, kurz: "MzGW", name: "Mehrzweckgerätewagen", sitzplaetze: 7 },
+  { code: 27, kurz: "MTW OV", name: "Mannschaftstransportwagen Ortsverband", sitzplaetze: 9 },
   { code: 40, kurz: "Anh 2t", name: "Anhänger (2 t Nutzlast)", sitzplaetze: 0 },
   { code: 41, kurz: "Anh K", name: "Anhänger mit Spezialaufbau für FGr K (1 t Nutzlast)", sitzplaetze: 0 },
   { code: 42, kurz: "Anh FüLa", name: "Anhänger Führung und Lage", sitzplaetze: 0 },

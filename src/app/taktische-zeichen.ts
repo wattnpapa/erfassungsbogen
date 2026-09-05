@@ -275,6 +275,7 @@ export const THW_FAHRZEUG_ZEICHEN: Record<number, string> = {
   24: "MTW",
   25: "MzKW",
   26: "MzGW",
+  27: "MTW", // MTW OV: die Sammlung führt nur das allgemeine MTW-Zeichen
   40: "Anhänger_2t",
   41: "Anhänger_K_1t",
   42: "Anhänger_FüLa",
@@ -344,6 +345,7 @@ export const THW_EINHEIT_ZEICHEN: Record<number, string> = {
   43: "FGr_Kommunikation_A",
   44: "FGr_Kommunikation_B",
   45: "Stab",
+  46: "OV_Stab",
 };
 
 // -------------------------------------------------------------- Fahrzeuge

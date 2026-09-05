@@ -22,6 +22,9 @@
  *  - ZTr FZ Log (Code 36): StAN listet zusätzlich "3x FüKW FGr-spezifisch";
  *    vorbelegt wird nur der eigene FüKW. TODO(frage) bei Gelegenheit klären.
  *  - Alt-Format-StAN (SEEBA, SEEWA, SEElift, BR500, MT, VOST, Stab): keine Vorbelegung.
+ *  - OV-Stab (Code 46): die StAN OV (00-01) liegt diesem Projekt nicht vor.
+ *    Vorbelegt ist deshalb nur, was in jedem Ortsverband steht — der MTW OV
+ *    (Kennzahl 25, "1. MTW der OE") und der Anhänger als Freitext.
  */
 
 import type { Fahrzeug, Funkrufname, VokabularWert } from "../model";
@@ -84,6 +87,7 @@ export const THW_STAN_FAHRZEUGE: Record<number, StanFahrzeug[]> = {
   42: [fk(3, 12), f(42)], // F: FüKomKW, Anh FüLa
   43: [fk(1, 13), fk(5, 25), f(40), f(41)], // K (A): FmKW, MTW FGr, Anh 2t, Anh K
   44: [fk(1, 13), fk(5, 25, 26), f(40), f(41), ft("Fahrzeuge/Anhänger Richtfunk")], // K (B): 2x MTW FGr
+  46: [fk(27, 25), ft("Anh OV")], // OV-Stab: MTW OV, Anhänger des OV
 };
 
 /**
