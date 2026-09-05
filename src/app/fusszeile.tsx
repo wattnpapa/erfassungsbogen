@@ -6,6 +6,7 @@
 import { useEffect, useRef, useState, type ChangeEvent, type ReactNode, type RefObject } from "react";
 import { staerke, type Erfassungsbogen } from "../model";
 import { istNativ, textTeilen } from "./nativ";
+import { fehlerText } from "./nachladen";
 import { blobAlsDownload, einheitOrt, migriereBogen, orgLabel, vokabText, vokabularFuer } from "./hilfen";
 import { einheitSymbolSvg, svgDataUrl } from "./taktische-zeichen";
 import { nutzungsKanal, statistikAbgewaehlt, statistikAbwaehlen } from "./statistik";
@@ -414,7 +415,7 @@ export function Fusszeile({ onBogenOeffnen, kompakt = false }: {
     try {
       await beispielPdf(datei, url);
     } catch (err) {
-      setBeispielFehler(`PDF konnte nicht erzeugt werden: ${err instanceof Error ? err.message : String(err)}`);
+      setBeispielFehler(`PDF konnte nicht erzeugt werden: ${fehlerText(err)}`);
     } finally {
       setBeispielLaeuft("");
     }

@@ -48,6 +48,7 @@ import { absenderkarteLaden, type Absenderkarte } from "../absenderkarte";
 import { AbsenderkarteFeld } from "../absenderkarte-ui";
 import { geraeteKurzform, geraeteOeffentlichHex } from "../geraete-schluessel";
 import { istNativ, linkTeilen, nahbereichDienst, shareSheetVerfuegbar, textTeilen } from "../nativ";
+import { fehlerText } from "../nachladen";
 import { frageJaNein, frageText, zeigeHinweis } from "../dialoge";
 import {
   MWD_LEGENDE,
@@ -199,7 +200,7 @@ export function Uebersicht(props: {
       const { pdfDatenUrl } = await import("../pdf");
       setVorschauUrl(await pdfDatenUrl(bogen, props.herkunft));
     } catch (e) {
-      setFehler(`PDF-Vorschau: ${e instanceof Error ? e.message : e}`);
+      setFehler(`PDF-Vorschau: ${fehlerText(e)}`);
     } finally {
       setVorschauLaeuft(false);
     }
@@ -295,7 +296,7 @@ export function Uebersicht(props: {
       await bytesAlsDatei(`eeb-${bogenDateiname(bogen)}-oldenburg.xlsx`, bogenOldenburgXlsx(bogen), XLSX_MIME);
     } catch (e) {
       if (e instanceof Error && e.name === "AbortError") return; // Abbruch im Share-Dialog
-      setFehler(`Excel: ${e instanceof Error ? e.message : e}`);
+      setFehler(`Excel: ${fehlerText(e)}`);
     }
   }
 
@@ -306,7 +307,7 @@ export function Uebersicht(props: {
       const { pdfErzeugen } = await import("../pdf");
       await pdfErzeugen(bogen, undefined, props.herkunft);
     } catch (e) {
-      setFehler(`PDF: ${e instanceof Error ? e.message : e}`);
+      setFehler(`PDF: ${fehlerText(e)}`);
     } finally {
       setPdfLaeuft(false);
     }

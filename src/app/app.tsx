@@ -35,6 +35,7 @@ import {
 } from "./hilfen";
 import { PersonalErfassung, jetztZeitpunkt, staerke } from "../model";
 import { bogenLinksEmpfangen, imWebBrowser, istNativ, qrScannen, textTeilen } from "./nativ";
+import { fehlerText } from "./nachladen";
 import { entwirreScanText } from "./tastaturbelegung";
 import { vorlageAnlegen, vorlagenLaden, vorlagenPapierkorb, type Vorlage } from "./vorlagen";
 import { Musterung, VorlagenListe } from "./vorlagen-ui";
@@ -980,7 +981,7 @@ function AppInhalt() {
       const { XLSX_MIME, einsatzOldenburgXlsx } = await import("./oldenburg-xlsx");
       await bytesAlsDatei(`eeb-einsatz-${einsatzDateiname(s)}-oldenburg.xlsx`, einsatzOldenburgXlsx(s), XLSX_MIME);
     } catch (e) {
-      setFehler(`Excel-Liste: ${e instanceof Error ? e.message : e}`);
+      setFehler(`Excel-Liste: ${fehlerText(e)}`);
     }
   }
 
@@ -996,7 +997,7 @@ function AppInhalt() {
       const { einsatzPdfErzeugen } = await import("./pdf");
       await einsatzPdfErzeugen(s, meldungen);
     } catch (e) {
-      setFehler(`Sammel-PDF: ${e instanceof Error ? e.message : e}`);
+      setFehler(`Sammel-PDF: ${fehlerText(e)}`);
     }
   }
 

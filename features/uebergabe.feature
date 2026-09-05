@@ -47,6 +47,19 @@ Funktionalität: Bogen übergeben — QR, PDF, Link, CSV
     Und ich auf "PDF erzeugen" klicke und eine Datei erhalte
     Dann heißt die heruntergeladene Datei wie "eeb-*.pdf"
 
+  # Aus dem Einsatz gemeldet (Firefox, Übungswochenende): „PDF: error loading
+  # dynamically imported module … /assets/pdf-….js". Der PDF-Satz liegt als
+  # eigener Baustein neben der App-Shell und wird erst beim Klick geholt — er
+  # steckt zwar im Precache, aber beim allerersten Besuch lief die Seite am
+  # Service Worker vorbei ans Netz. War das inzwischen weg, kam statt des
+  # Bogens diese englische Zeile. Ohne Neuladen zwischendurch: genau so
+  # passiert es vor Ort.
+  Szenario: Die PDF entsteht auch ohne Netz und ohne Neuladen
+    Wenn ich die App vom Netz trenne
+    Und ich auf "Bogen übergeben…" klicke
+    Und ich auf "PDF erzeugen" klicke und eine Datei erhalte
+    Dann heißt die heruntergeladene Datei wie "eeb-*.pdf"
+
   Szenario: CSV liefert den Bogen als Tabelle für die Auswertung
     Wenn ich auf "Bogen übergeben…" klicke
     Und ich "Weitere Formate" aufklappe

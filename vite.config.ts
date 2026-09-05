@@ -211,6 +211,17 @@ export default defineConfig({
         navigateFallbackDenylist: [/^\/\.well-known\//, /\/[^/]+\.(?:html|json|txt|xml|pdf)$/],
         // Alte Precaches beim Versionswechsel entsorgen (kein Aggressiv-Cache).
         cleanupOutdatedCaches: true,
+        // Der frisch installierte SW übernimmt sofort die Seite, aus der heraus
+        // er installiert wurde. Ohne das bleibt der erste Besuch unkontrolliert:
+        // Die App-Shell liegt zwar schon im Precache, aber die nachgeladenen
+        // Bausteine (PDF, QR-Decoder, Landesvorlagen) holt die laufende Seite
+        // weiter aus dem Netz — bricht die Verbindung vorher weg, scheitert der
+        // erste PDF-Klick mit „error loading dynamically imported module",
+        // obwohl die Datei im Cache liegt. Genau der Fall im Einsatz: einmal
+        // aufrufen, dann ins Funkloch. Kein Widerspruch zu registerType
+        // "prompt" — claim greift beim Aktivieren, und eine NEUE Version
+        // aktiviert weiterhin erst auf Klick im Update-Banner.
+        clientsClaim: true,
       },
     }),
   ],

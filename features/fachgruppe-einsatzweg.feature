@@ -99,9 +99,11 @@ Funktionalität: Einsatzweg einer Fachgruppe — Vorbereitung, Fahrt, Meldekopf
   # Am Bereitstellungsraum gibt es kein WLAN und oft kein Netz: die volle
   # QR-Runde — erzeugen, als Bild abnehmen, einlesen — muss offline laufen.
   # Die bestehenden Offline-Tests decken Start und QR-Erzeugung ab, nicht die
-  # Empfängerseite. Der Neustart nach dem Trennen gehört zum Ablauf: erst ab
-  # dem zweiten Laden liefert der Service Worker auch die nachgeladenen
-  # Bausteine (jsQR) aus dem Cache — der Entwurf aus der Vorbereitung bleibt.
+  # Empfängerseite. Der Neustart nach dem Trennen prüft den Kaltstart ohne
+  # Netz: die App muss samt nachgeladener Bausteine (jsQR) aus dem Cache
+  # hochkommen — der Entwurf aus der Vorbereitung bleibt. Ohne Neuladen
+  # mitten in der Sitzung deckt das Szenario „Die PDF entsteht auch ohne Netz
+  # und ohne Neuladen" (uebergabe.feature) denselben Weg ab.
   Szenario: Die QR-Runde läuft komplett ohne Netz
     Wenn ich die App vom Netz trenne
     Und ich die Seite neu lade

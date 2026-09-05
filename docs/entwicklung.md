@@ -89,6 +89,15 @@ QR-Code erzeugen funktionieren rein clientseitig.
   Capacitor-App (`capacitor://`) und in Electron (`file://`) liegt `sw.js`
   ungenutzt im Bundle; dort bringen die eigenen Update-Mechanismen die App
   aktuell.
+- **Ab dem ersten Besuch kontrolliert.** `clientsClaim: true` — der frisch
+  installierte SW übernimmt sofort die Seite, aus der heraus er installiert
+  wurde. Ohne das lief der erste Besuch an ihm vorbei ans Netz: die App-Shell
+  lag im Precache, die erst beim Klick geholten Bausteine (PDF-Satz,
+  QR-Decoder, Landesvorlagen) aber holte die laufende Seite weiterhin vom
+  Server. Wer die App einmal aufrief und dann ins Funkloch fuhr, bekam beim
+  ersten PDF-Klick „error loading dynamically imported module" — aus dem
+  Einsatz genau so gemeldet. Gehütet vom Szenario „Die PDF entsteht auch ohne
+  Netz und ohne Neuladen" (features/uebergabe.feature).
 - **Updates ohne Aggressiv-Cache.** `registerType: "prompt"` — eine neue Version
   lädt im Hintergrund und wartet; das Banner „Neue Version verfügbar – Neu laden"
   aktiviert sie erst auf Klick (kein Auto-Reload, damit ein gerade ausgefüllter
