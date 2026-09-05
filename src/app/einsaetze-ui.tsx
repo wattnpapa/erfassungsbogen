@@ -67,8 +67,10 @@ import {
 import { debugAktiv } from "./debug-plattform";
 import { Auswahl } from "./schritte/bausteine";
 import { SeitenKopf } from "./seiten-kopf";
-import { frageJaNein } from "./dialoge";
+import { frageJaNein, zeigeHinweis } from "./dialoge";
 import { TabellenScroll } from "./tabellen-scroll";
+import { imWebBrowser } from "./nativ";
+import { fehlerText } from "./nachladen";
 
 export const ART_LABEL: Record<EinsatzArt, string> = {
   [EinsatzArt.EINSATZ]: "Einsatz",
@@ -724,6 +726,7 @@ function EinheitKarte(props: {
   const [aenderungen, setAenderungen] = useState(false);
   const [aufteilen, setAufteilen] = useState(false);
   const [zusammenfuehren, setZusammenfuehren] = useState(false);
+  const [pdfLaeuft, setPdfLaeuft] = useState(false);
   // null = nicht in Bearbeitung; String = Entwurf des Zug-Etiketts.
   const [zugEntwurf, setZugEntwurf] = useState<string | null>(null);
   const revs = revisionen(alle, kopf.einheitSchluessel);
@@ -774,6 +777,33 @@ function EinheitKarte(props: {
     meldungenZusammenfuehren(einsatzId, kopf.id, teilIds, opt);
     setZusammenfuehren(false);
     onGeaendert();
+  }
+
+  /**
+   * Einzelbogen dieser Meldung als PDF öffnen — der Blick auf genau eine
+   * Einheit (und der Ausdruck fürs Klemmbrett), ohne die Sammel-PDF aller
+   * Meldungen. Der Tab geht im Klick auf, noch vor dem Nachladen des
+   * PDF-Satzes: erst danach geöffnet, fiele er dem Popup-Blocker zum Opfer.
+   * In App und Desktop-Fenster gibt es keinen Tab — dort führt derselbe Knopf
+   * zu Share-Sheet bzw. Download.
+   */
+  async function bogenPdf() {
+    const tab = imWebBrowser() ? window.open("", "_blank") : null;
+    // Bis das PDF steht, vergehen Sekunden: ein weißes Fenster ohne Erklärung
+    // liest sich am Gerät wie ein Fehlklick.
+    if (tab) tab.document.body.textContent = "Bogen wird erzeugt…";
+    setPdfLaeuft(true);
+    try {
+      // Dynamisch: pdfmake samt Schriften bleibt aus dem Start-Bundle heraus.
+      const { meldungPdfAnzeigen } = await import("./pdf");
+      await meldungPdfAnzeigen(kopf, tab);
+    } catch (e) {
+      // Sonst bleibt der leere Tab als stiller Rest stehen.
+      tab?.close();
+      await zeigeHinweis({ titel: "Bogen als PDF", text: fehlerText(e) });
+    } finally {
+      setPdfLaeuft(false);
+    }
   }
 
   async function entfernen() {
@@ -855,6 +885,14 @@ function EinheitKarte(props: {
       <div className="vorlage-aktionen">
         <button type="button" onClick={() => setDetails(!details)}>
           {details ? "Details schließen" : "Details"}
+        </button>{" "}
+        <button
+          type="button"
+          onClick={bogenPdf}
+          disabled={pdfLaeuft}
+          title="Bogen dieser Einheit als PDF — im Browser in einem neuen Tab."
+        >
+          {pdfLaeuft ? "Bogen wird erzeugt…" : "Bogen als PDF"}
         </button>{" "}
         {vorige && (
           <>

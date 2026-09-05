@@ -108,6 +108,26 @@ function herkunftBytes(m: MeldeEintrag): Uint8Array | null {
   }
 }
 
+/**
+ * Einzelbogen einer Meldung anzeigen — der Blick auf genau eine Einheit, ohne
+ * den Umweg über die Sammel-PDF.
+ *
+ * Im Browser landet er in dem Tab, den der Aufrufer schon geöffnet hat: das
+ * muss im Klick selbst passieren, denn bis pdfmake nachgeladen und der Satz
+ * gerechnet ist, vergehen Sekunden — ein danach geöffnetes Fenster hält der
+ * Popup-Blocker für ungefragt. Ohne Fenster (Popup-Blocker, App, Electron)
+ * bleibt der gewohnte Weg: Download bzw. Share-Sheet.
+ */
+export async function meldungPdfAnzeigen(m: MeldeEintrag, fenster: Window | null): Promise<void> {
+  const herkunft = herkunftBytes(m);
+  if (!fenster) {
+    await pdfErzeugen(m.bogen, undefined, herkunft);
+    return;
+  }
+  const qr = await qrErzeugen(m.bogen, herkunft);
+  await pdfMake.createPdf(pdfDokument(m.bogen, qr)).open(fenster);
+}
+
 export async function einsatzPdfErzeugen(einsatz: Einsatzsammlung, meldungen: MeldeEintrag[]): Promise<void> {
   const boegenMitQr: SammelBogen[] = [];
   for (const m of meldungen) {
