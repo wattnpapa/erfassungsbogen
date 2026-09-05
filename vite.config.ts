@@ -190,7 +190,10 @@ export default defineConfig({
         // woff2 gehört zwingend dazu: die Oberflächenschrift liegt im Bundle
         // (kein CDN), fehlte sie im Precache, fiele die App offline auf die
         // Systemschrift zurück.
-        globPatterns: ["**/*.{js,css,html,svg,png,webmanifest,woff2}"],
+        // wasm ebenso: der QR-Decoder (ZXing) liegt als WebAssembly-Datei im
+        // Bundle — fehlte sie offline, fiele der Scanner auf jsQR mit
+        // kleinerer Reichweite zurück.
+        globPatterns: ["**/*.{js,css,html,svg,png,webmanifest,woff2,wasm}"],
         // Die Manifest-Screenshots braucht nur der Installationsdialog des
         // Browsers, nicht die laufende App — sie gehören nicht in den
         // Offline-Vorrat, den jedes Gerät beim ersten Aufruf mitlädt.

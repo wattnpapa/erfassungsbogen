@@ -11,6 +11,10 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { QrScannerWeb } from "./qr-scanner-web";
 
+// Der echte Decoder lädt WebAssembly — hier geht es um Kamera, Freigabe und
+// Handscanner, nicht ums Lesen; ein Leser, der nie etwas findet, reicht.
+vi.mock("./qr-decoder", () => ({ qrLeserLaden: async () => async () => null }));
+
 /** Kamerafehler wie im Browser: DOMException mit sprechendem `name`. */
 function kameraFehler(name: string): Error {
   const err = new Error(name);

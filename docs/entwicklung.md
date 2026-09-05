@@ -364,6 +364,17 @@ ein einzelner QR-Code heute schon mehr trägt.
 - [src/qr-node.ts](../src/qr-node.ts) — QR-Erzeugung als SVG/PNG für Node/Electron
 - [src/vokabulare/thw.ts](../src/vokabulare/thw.ts) — THW-Vokabular (StAN Stand 01.07.2026)
 - [scripts/qr-demo.ts](../scripts/qr-demo.ts) — End-to-End-Test: Bogen → QR-PNG → jsQR-Scan → Decoder → identisch (`npm run demo`; Ausgabe in `examples/`)
+- [src/app/qr-decoder.ts](../src/app/qr-decoder.ts) — QR-Lesen im Browser: ZXing
+  (WebAssembly, `zxing-wasm`, Datei im Bundle und PWA-Precache) mit jsQR als
+  Rückfallebene (Electron lädt über `file://`, dort scheitert der WASM-Abruf).
+  Der Live-Scanner ([src/app/qr-scanner-web.tsx](../src/app/qr-scanner-web.tsx))
+  fordert 1920×1080 an (Browser-Standard ohne Wunsch: 640×480) und dekodiert
+  nur den Suchrahmen in Kameraauflösung (`suchAusschnitt` in
+  [src/app/kamera.ts](../src/app/kamera.ts)). Gemessen an 144 synthetischen
+  Kameraposen liest ZXing so ab 2 px je QR-Modul in 100 % der Bilder; jsQR im
+  ganzen, auf 640 px verkleinerten Bild erst ab 3,6 px je Modul und dann in
+  8–50 %. Für einen Bogen-Code vom Handydisplay heißt das: Er muss nur noch
+  ein Fünftel statt vier Fünftel der Bildbreite füllen.
 
 Kern der Kompression: organisationsspezifische Vokabulare mit 1-Byte-Codes und
 Freitext-Ausweg, BCD-Telefonnummern, abgeleitete statt gespeicherter Werte

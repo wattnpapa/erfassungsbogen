@@ -5,8 +5,7 @@
  * Live-Scan (inklusive Segment-Sammlung über mehrere Bilder).
  */
 
-// jsQR (~130 KB) erst beim ersten Bild laden, nicht mit dem Start-Bundle.
-const jsQRLaden = () => import("jsqr").then((m) => m.default);
+import { qrLeserLaden } from "./qr-decoder";
 
 interface Bildquelle {
   quelle: CanvasImageSource;
@@ -39,11 +38,11 @@ async function bildLaden(datei: Blob): Promise<Bildquelle> {
 /**
  * QR-Code im Bild suchen; null, wenn keiner gefunden wird. Probiert mehrere
  * Auflösungen: Verkleinern glättet Foto-Rauschen und ist schnell, die volle
- * Größe rettet kleine Codes in großen Fotos. `attemptBoth` erkennt auch
- * invertierte Darstellungen (z. B. Dark-Mode-Screenshots).
+ * Größe rettet kleine Codes in großen Fotos. `invertiert` erkennt auch
+ * hell-auf-dunkel (z. B. Dark-Mode-Screenshots).
  */
 export async function qrAusBild(datei: Blob): Promise<string | null> {
-  const jsQR = await jsQRLaden();
+  const lesen = await qrLeserLaden();
   const bild = await bildLaden(datei);
   try {
     const leinwand = document.createElement("canvas");
@@ -56,8 +55,8 @@ export async function qrAusBild(datei: Blob): Promise<string | null> {
       leinwand.height = Math.max(1, Math.round(bild.hoehe * faktor));
       ctx.drawImage(bild.quelle, 0, 0, leinwand.width, leinwand.height);
       const daten = ctx.getImageData(0, 0, leinwand.width, leinwand.height);
-      const code = jsQR(daten.data, daten.width, daten.height, { inversionAttempts: "attemptBoth" });
-      if (code?.data) return code.data;
+      const text = await lesen(daten, { invertiert: true });
+      if (text) return text;
       if (faktor >= 1) break; // größer als das Original geht nicht
     }
     return null;

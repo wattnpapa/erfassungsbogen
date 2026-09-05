@@ -1,12 +1,13 @@
 /**
  * QR-Scanner für Browser und Desktop: Webcam per getUserMedia, Dekodierung
- * mit jsQR als Vollbild-Overlay. In der nativen App übernimmt stattdessen
- * der Capacitor-Scanner (siehe nativ.ts).
+ * mit ZXing (WebAssembly, jsQR als Rückfallebene — siehe qr-decoder.ts) als
+ * Vollbild-Overlay. In der nativen App übernimmt stattdessen der
+ * Capacitor-Scanner (siehe nativ.ts).
  */
 
 import { useEffect, useRef, useState, type ChangeEvent } from "react";
-import type jsQRTyp from "jsqr";
-import { gemerkteKamera, kameraListe, merkeKamera, type Kamera } from "./kamera";
+import { gemerkteKamera, kameraListe, merkeKamera, suchAusschnitt, type Kamera } from "./kamera";
+import { qrLeserLaden, type QrLeser } from "./qr-decoder";
 import { TeilQuittung } from "./teil-quittung";
 import type { SegmentTeil } from "../codec";
 
@@ -61,6 +62,13 @@ const HANDSCANNER_PAUSE_MS = 500;
 // länger) — versehentliche Tasten plus Enter lösen so keinen Scan aus.
 const HANDSCANNER_MINDESTLAENGE = 8;
 
+// Längste Kante des Dekodier-Ausschnitts. Der Ausschnitt ist der Suchrahmen
+// (plus Zugabe) in Kamerapixeln; größer als dieses Maß wird er verkleinert,
+// damit ein Bild auch mit der jsQR-Rückfallebene in ~20 ms dekodiert ist
+// (ZXing braucht dafür ~5 ms). Bei 1080 px Kamerabreite im Hochformat greift
+// die Grenze nicht — erst 4K-Streams werden hier gemittelt.
+const DEKODIER_KANTE = 1000;
+
 /**
  * Bildwunsch für den Scan. Ohne Angabe liefern Browser 640×480 — und damit
  * muss ein dichter Bogen-Code rund 60 % der Bildhöhe füllen, um gelesen zu
@@ -68,9 +76,9 @@ const HANDSCANNER_MINDESTLAENGE = 8;
  * scheiterte das Abfilmen eines Codes vom Notebook-Bildschirm, den die
  * Kamera-App desselben Telefons sofort liest.
  *
- * Der Überschuss gegenüber {@link DECODE_BREITE} ist nicht verschenkt: Beim
- * Verkleinern mittelt drawImage darüber und glättet so die Modulkanten, die
- * eine direkte Aufnahme in 1280 px hart abtasten würde.
+ * Dekodiert wird davon nur der Suchrahmen, in Kamerapixeln (siehe
+ * suchAusschnitt und DEKODIER_KANTE): Je mehr Pixel je QR-Modul dort
+ * ankommen, desto kleiner darf der Code im Bild stehen.
  *
  * Alles hier ist Wunsch (`ideal`) und keine Bedingung: Ein Gerät, das die
  * Auflösung nicht kann, liefert weiter sein Bestes, statt die Anfrage
@@ -88,7 +96,8 @@ const BILD_WUNSCH: MediaTrackConstraints = {
  * Kamera anfordern. Eine gewählte Kamera geht vor, die Rückkamera ist Wunsch,
  * nicht Bedingung — jede Stufe darf scheitern, ohne den Scan zu beenden: Die
  * gemerkte Kamera kann abgemeldet sein, Geräte ohne Rückkamera kennen
- * `facingMode` nicht, und manche Webviews weisen die Objekt-Form ganz zurück.
+ * `facingMode` nicht, und manche Webviews weisen die Objekt-Form ganz zurück
+ * (die letzte Stufe bleibt deshalb das nackte `video: true`).
  */
 async function kameraOeffnen(wunschId: string): Promise<MediaStream> {
   if (wunschId) {
@@ -112,19 +121,6 @@ async function kameraOeffnen(wunschId: string): Promise<MediaStream> {
   }
 }
 
-/**
- * Breite, auf die die Suchschleife das Kamerabild zum Dekodieren verkleinert.
- * Sie entscheidet über die Reichweite: Am dichtesten Bogen-Code (Version 25,
- * 117 Module) gemessen, wie klein er im Bild stehen darf, damit jsQR ihn noch
- * liest — bei 640 px muss er rund 60 % der Bildhöhe füllen, bei 1280 px reichen
- * 30 %. Halb so groß im Bild heißt doppelt so weit weg, und genau daran hing
- * der Fehlschlag: So nah, wie 640 px es verlangten, stellt keine
- * Handy-Hauptkamera mehr scharf.
- *
- * Nach oben ist 1280 die Grenze des Nützlichen — 1920 kostete in derselben
- * Messung ein Fünftel mehr Rechenzeit je Bild, ohne mehr Codes zu lesen.
- */
-const DECODE_BREITE = 1280;
 // Nach dieser Zeit ohne Treffer bekommt der Nutzer den Rat, den sonst nur
 // kennt, wer die Naheinstellgrenze von Handykameras kennt.
 const TIPP_NACH_MS = 6000;
@@ -149,6 +145,8 @@ export function QrScannerWeb(props: {
   onBild?: (e: ChangeEvent<HTMLInputElement>) => void;
 }) {
   const videoRef = useRef<HTMLVideoElement>(null);
+  // Der Suchrahmen bestimmt, welcher Bildausschnitt dekodiert wird.
+  const rahmenRef = useRef<HTMLDivElement>(null);
   // Callbacks über eine Ref ansprechen, damit der Kamera-Effekt nur einmal
   // läuft und neue Prop-Identitäten den Stream nicht neu starten.
   const propsRef = useRef(props);
@@ -180,11 +178,14 @@ export function QrScannerWeb(props: {
     let stream: MediaStream | null = null;
     let rahmen = 0;
     let tippUhr: ReturnType<typeof setTimeout> | undefined;
-    // jsQR (~130 KB) lädt erst mit dem Overlay, nicht mit dem Start-Bundle.
-    // Bis dahin läuft die Scanschleife leer — das Kamerabild steht ohnehin
-    // erst nach der getUserMedia-Freigabe.
-    let jsQR: typeof jsQRTyp | null = null;
-    void import("jsqr").then((m) => { jsQR = m.default; });
+    // Der Decoder (ZXing-WASM ~1,1 MB bzw. jsQR ~130 KB) lädt erst mit dem
+    // Overlay, nicht mit dem Start-Bundle. Bis dahin läuft die Scanschleife
+    // leer — das Kamerabild steht ohnehin erst nach der getUserMedia-Freigabe.
+    let leser: QrLeser | null = null;
+    void qrLeserLaden().then((l) => { leser = l; });
+    // Dekodieren ist asynchron (WASM): kein neues Bild anfangen, solange das
+    // letzte noch läuft — sonst stauen sich bei einem langsamen Gerät die Bilder.
+    let beschaeftigt = false;
     const leinwand = document.createElement("canvas");
     const ctx = leinwand.getContext("2d", { willReadFrequently: true });
 
@@ -198,24 +199,35 @@ export function QrScannerWeb(props: {
     function suchen() {
       if (!aktiv) return;
       const video = videoRef.current;
-      if (video && ctx && jsQR && video.readyState >= video.HAVE_ENOUGH_DATA && video.videoWidth) {
-        // Verkleinert dekodieren, aber nicht weiter als nötig — siehe
-        // DECODE_BREITE: unter 1280 px verliert der Scanner Reichweite.
-        const faktor = Math.min(1, DECODE_BREITE / video.videoWidth);
-        leinwand.width = Math.round(video.videoWidth * faktor);
-        leinwand.height = Math.round(video.videoHeight * faktor);
-        ctx.drawImage(video, 0, 0, leinwand.width, leinwand.height);
+      if (video && ctx && leser && !beschaeftigt && video.readyState >= video.HAVE_ENOUGH_DATA && video.videoWidth) {
+        // Nur den Suchrahmen dekodieren, in Kameraauflösung: Dort stehen je
+        // QR-Modul mehr Pixel als im ganzen, verkleinerten Bild (siehe
+        // suchAusschnitt) — das entscheidet bei Codes vom Handydisplay.
+        const a = suchAusschnitt(
+          { breite: video.videoWidth, hoehe: video.videoHeight },
+          video.getBoundingClientRect(),
+          rahmenRef.current?.getBoundingClientRect(),
+        );
+        const faktor = Math.min(1, DEKODIER_KANTE / Math.max(a.breite, a.hoehe));
+        leinwand.width = Math.max(1, Math.round(a.breite * faktor));
+        leinwand.height = Math.max(1, Math.round(a.hoehe * faktor));
+        ctx.drawImage(video, a.x, a.y, a.breite, a.hoehe, 0, 0, leinwand.width, leinwand.height);
         const bild = ctx.getImageData(0, 0, leinwand.width, leinwand.height);
-        const text = jsQR(bild.data, bild.width, bild.height, { inversionAttempts: "dontInvert" })?.data ?? "";
-        // Nur einen NEUEN Code melden. Der Scanner läuft weiter (Segmentierung:
-        // mehrere Teile); den Overlay schließt der Aufrufer, wenn er fertig ist.
-        if (text && text !== letzterText.current) {
-          letzterText.current = text;
-          // Was einmal gelesen wurde, braucht keinen Rat mehr zum Abstand.
-          clearTimeout(tippUhr);
-          setTipp(false);
-          propsRef.current.onErgebnis(text);
-        }
+        beschaeftigt = true;
+        leser(bild)
+          .then((text) => {
+            // Nur einen NEUEN Code melden. Der Scanner läuft weiter (Segmentierung:
+            // mehrere Teile); den Overlay schließt der Aufrufer, wenn er fertig ist.
+            if (aktiv && text && text !== letzterText.current) {
+              letzterText.current = text;
+              // Was einmal gelesen wurde, braucht keinen Rat mehr zum Abstand.
+              clearTimeout(tippUhr);
+              setTipp(false);
+              propsRef.current.onErgebnis(text);
+            }
+          })
+          .catch(() => { /* ein misslungenes Bild ist kein Fehler — das nächste kommt */ })
+          .finally(() => { beschaeftigt = false; });
       }
       rahmen = requestAnimationFrame(suchen);
     }
@@ -343,7 +355,7 @@ export function QrScannerWeb(props: {
           </div>
         )}
       {!fehler
-        ? <div className="scanner-rahmen" aria-hidden="true" />
+        ? <div className="scanner-rahmen" aria-hidden="true" ref={rahmenRef} />
         : (
           /* Der zweite Weg ist ohne Kamera der einzige — er bekommt deshalb
              die Mitte des Bildschirms, dort wo sonst der Suchrahmen steht,
