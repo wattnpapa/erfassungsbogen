@@ -1,5 +1,6 @@
-# App-Releases: macOS (dmg/zip), Windows (NSIS), Linux (deb/pacman) via Electron,
-# Android (signierte APK) via Capacitor/Gradle — plus GitHub-Pages-Deployment.
+# App-Releases: Windows (NSIS), Linux (deb/pacman) via Electron, Android
+# (signierte APK) via Capacitor/Gradle — plus GitHub-Pages-Deployment.
+# macOS (dmg/zip) ist vorerst stillgelegt, siehe Job build-mac.
 # Vorbild: S1-Control (build-main.yml) — Datums-Version, Git-Tag, GitHub Release.
 name: Build & Release
 
@@ -111,6 +112,12 @@ jobs:
         uses: actions/deploy-pages@v4
 
   build-mac:
+    # Vorerst stillgelegt (5.9.2026): Die Signatur bricht auf dem Runner ab
+    # („security set-key-partition-list … process failed 1"), damit fiel der
+    # ganze Lauf und mit ihm das Release für alle anderen Plattformen aus.
+    # Zum Wiedereinschalten: diese Zeile entfernen und build-mac wieder in die
+    # needs-Liste des release-Jobs aufnehmen.
+    if: false
     runs-on: macos-latest
     needs: [prepare, check]
     env:
@@ -276,7 +283,7 @@ jobs:
 
   release:
     runs-on: ubuntu-latest
-    needs: [prepare, build-mac, build-win, build-linux, build-android]
+    needs: [prepare, build-win, build-linux, build-android]
     steps:
       - name: Artefakte herunterladen
         uses: actions/download-artifact@v4

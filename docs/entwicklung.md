@@ -302,6 +302,11 @@ Auf macOS setzt das Installieren von Updates eine signierte App voraus
 (Signierung/Notarisierung aktiviert sich im Workflow automatisch, sobald die
 Apple-Secrets wie bei S1-Control hinterlegt sind).
 
+Der macOS-Job liegt derzeit still (`if: false` an `build-mac` in
+[release.yml](../.github/workflows/release.yml)): der Zertifikatsimport auf dem
+Runner bricht ab und riss bis dahin das ganze Release mit — auch für Windows,
+Linux und Android. Releases enthalten deshalb vorerst kein `.dmg`.
+
 Jeder Push auf `main` baut automatisch ein Release mit Datums-Version
 ([release.yml](../.github/workflows/release.yml), Aufbau wie bei
 [S1-Control](https://github.com/wattnpapa/S1-Control)). Lokal:

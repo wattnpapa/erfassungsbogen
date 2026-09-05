@@ -92,7 +92,7 @@ Alle Downloads unter
 | Gerät | Download |
 |---|---|
 | **Windows** | Installer (`.exe`) — für ARM-Geräte (Snapdragon) die `arm64`-Datei, sonst `x64` |
-| **macOS** | `.dmg` (signiert & notarisiert — per Doppelklick startbar) |
+| **macOS** | zurzeit kein Download — die Signatur wird überarbeitet; bis dahin: <https://erfassungsbogen.app> |
 | **Linux** | `.deb` (Debian/Ubuntu) oder `.pacman` (Arch) |
 | **Android** | APK (Android 8.0 oder neuer) |
 | **iPhone/iPad** | App Store / TestFlight in Vorbereitung — bis dahin: <https://erfassungsbogen.app> |
