@@ -858,7 +858,7 @@ const SPECS: BogenSpec[] = [
     ],
     fahrzeuge: [
       { kurz: "Zugfahrzeug", lang: "Zugfahrzeug (Anhängerzugleistung mind. 8,6 t)" },
-      { kurz: "SMF", lang: "Sandsackfüllmaschine, elektromechanisch", ohneFunk: true, ohneKennzeichen: "auf Anh Trsp" },
+      { kurz: "SFM", lang: "Sandsackfüllmaschine, elektromechanisch", ohneFunk: true, ohneKennzeichen: "auf Anh Trsp" },
       { kurz: "Anh Trsp", lang: "Anhänger zum Transport der Sandsackfüllmaschine, mit Materialcontainer", ohneFunk: true, ohneKennzeichen: "Anh Trsp" },
     ],
     szenario: "Hochwasser {ort} — Betrieb Sandsackfüllplatz (materielle Reserve)",
