@@ -181,17 +181,20 @@ function wert(blattXml: string, zeilenNr: number, kopf: string): string | undefi
 // ------------------------------------------------------------------- Tests
 
 describe("Oldenburg-XLSX: Aufbau", () => {
-  it("hat die 37 Spalten der Vorlage in ihrer Reihenfolge", () => {
+  it("hat die 36 Spalten der Vorlage in ihrer Reihenfolge", () => {
     const b = blatt(bogenOldenburgXlsx(bogen()));
     expect(zelle(b, "A2")).toBe("FüSt.");
     expect(zelle(b, "B2")).toBe("Bezeichnung");
     expect(zelle(b, "C2")).toBe("Organisation");
     expect(zelle(b, "D2")).toBe("Herkunft");
-    expect(zelle(b, "AA2")).toBe("ID Einheiten-Erfassungsbogen");
-    expect(zelle(b, "AK2")).toBe("He");
+    expect(zelle(b, "Z2")).toBe("ID Einheiten-Erfassungsbogen");
+    expect(zelle(b, "AJ2")).toBe("He");
     // Dahinter ist Schluss: die Gesamtspalte der Vorlage entfällt, weil sie nur
     // Fü + Ufü + He wiederholt.
-    expect(zelle(b, "AL2")).toBeUndefined();
+    expect(zelle(b, "AK2")).toBeUndefined();
+    // Die Status-Spalte der Vorlage ist ausgebaut — die Führungsstelle führt in
+    // ihrer Übersicht eigene Statuswerte.
+    expect(() => spalteVon(b, "Status")).toThrow();
   });
 
   it("trägt die Hinweisleiste und die SUBTOTAL-Summen in Zeile 1", () => {
@@ -200,7 +203,7 @@ describe("Oldenburg-XLSX: Aufbau", () => {
     expect(zelle(b, "L1")).toBe("(Dat. / Zeit)");
     expect(zelle(b, "P1")).toBe("(Org.)");
     // Eine Datenzeile → Bereich endet auf Zeile 3.
-    expect(zelle(b, "AK1")).toBe("=SUBTOTAL(9,AK3:AK3)");
+    expect(zelle(b, "AJ1")).toBe("=SUBTOTAL(9,AJ3:AJ3)");
   });
 
   it("weitet den Summenbereich auf alle Datenzeilen aus", () => {
@@ -209,7 +212,7 @@ describe("Oldenburg-XLSX: Aufbau", () => {
       meldung(bogen({ einheit: { ...bogen().einheit, einheitsTyp: { code: 4 } } })),
       meldung(bogen({ einheit: { ...bogen().einheit, einheitsTyp: { code: 16 } } })),
     ]);
-    expect(zelle(blatt(einsatzOldenburgXlsx(s)), "AI1")).toBe("=SUBTOTAL(9,AI3:AI5)");
+    expect(zelle(blatt(einsatzOldenburgXlsx(s)), "AH1")).toBe("=SUBTOTAL(9,AH3:AH5)");
   });
 
   it("bleibt bei einer leeren Sammlung eine gültige Datei", () => {
@@ -371,12 +374,11 @@ describe("Oldenburg-XLSX: Sammlung", () => {
     expect(wert(b, 3, "Bezeichnung")).toBeUndefined();
   });
 
-  it("übernimmt Status, Zug-Etikett und Teil-Bezeichnung aus der Meldung", () => {
+  it("übernimmt Zug-Etikett und Teil-Bezeichnung aus der Meldung", () => {
     const s = sammlung([
       meldung(bogen(), { status: MeldeStatus.ABGERUECKT, zugEtikett: "2. TZ", teilEtikett: "Fachberater" }),
     ]);
     const b = blatt(einsatzOldenburgXlsx(s));
-    expect(wert(b, 1, "Status")).toBe("Abgerückt");
     // Die Einheit ist eine Gruppe → die Zug-Spalte trägt die Zuordnung des Meldekopfs.
     expect(wert(b, 1, "Zug")).toBe("2. TZ");
     expect(wert(b, 1, "Bezeichnung")).toBe("FGr E (Fachberater)");

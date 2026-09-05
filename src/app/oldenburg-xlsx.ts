@@ -15,6 +15,12 @@
  * gehören der Führungsstelle, nicht der meldenden Einheit, und werden dort von
  * Hand geführt. Erfundene Werte wären dort schlimmer als leere Zellen.
  *
+ * Eine Spalte der Vorlage fehlt hier ganz: „Status". Die Einsatzkräfte-Übersicht
+ * der Führungsstelle führt eigene Statuswerte; das „Anwesend" aus der Sammlung
+ * gehört nicht dazu und stand dort als Fremdkörper. Das Blatt endet dadurch auf
+ * AJ statt AK. Wer den Meldestatus braucht, liest ihn in der App — im Blatt
+ * stehen abgerückte und aufgegangene Einheiten jetzt wie anwesende.
+ *
  * Enthält keine Personennamen, aber Kontaktdaten der Führungskraft
  * (Erreichbarkeit) — bleibt wie alle Exporte rein lokal.
  *
@@ -46,7 +52,7 @@ import {
   zeileXml,
   type Zelle,
 } from "./xlsx";
-import { bogenInhaltsId, neuesteJeEinheit, MeldeStatus, type Einsatzsammlung, type MeldeEintrag } from "./einsaetze";
+import { bogenInhaltsId, neuesteJeEinheit, type Einsatzsammlung, type MeldeEintrag } from "./einsaetze";
 
 export { XLSX_MIME };
 
@@ -163,9 +169,10 @@ interface SpaltenSpec {
 }
 
 /**
- * Die 37 Spalten A…AK der Vorlage in genau ihrer Reihenfolge. Die Stilnummern
- * stammen aus der Vorlagendatei (Zelle für Zelle abgelesen) — sie tragen die
- * Farbblöcke, mit denen die Führungsstelle die Bereiche der Liste unterscheidet.
+ * Die 36 Spalten A…AJ der Vorlage in genau ihrer Reihenfolge (ohne die
+ * ausgebaute Status-Spalte, siehe oben). Die Stilnummern stammen aus der
+ * Vorlagendatei (Zelle für Zelle abgelesen) — sie tragen die Farbblöcke, mit
+ * denen die Führungsstelle die Bereiche der Liste unterscheidet.
  */
 const SPALTEN: SpaltenSpec[] = [
   { id: "fuest", kopf: "FüSt.", kopfStil: 16, leisteStil: 1 },
@@ -192,7 +199,6 @@ const SPALTEN: SpaltenSpec[] = [
   { id: "bemerkung", kopf: "Bemerkung", kopfStil: 21, leisteStil: 8 },
   { id: "reserve1", kopf: "Reserve", kopfStil: 21, leisteStil: 9 },
   { id: "reserve2", kopf: "Reserve", kopfStil: 21, leisteStil: 9 },
-  { id: "status", kopf: "Status", kopfStil: 23, leisteStil: 7 },
   { id: "schicht", kopf: "Schicht", kopfStil: 24, leisteStil: 10 },
   { id: "bogenId", kopf: "ID Einheiten-Erfassungsbogen", kopfStil: 25, leisteStil: 11 },
   { id: "weiblich", kopf: "Weibl.", kopfStil: 26, leisteStil: 12, summe: true },
@@ -272,19 +278,12 @@ function erreichbarkeitText(b: Erfassungsbogen): string {
     .join(" / ");
 }
 
-const STATUS_TEXT: Record<MeldeStatus, string> = {
-  [MeldeStatus.ANWESEND]: "Anwesend",
-  [MeldeStatus.ABGERUECKT]: "Abgerückt",
-  [MeldeStatus.AUFGEGANGEN]: "Aufgegangen",
-};
-
 /** Kontext, den erst die Sammlung am Meldekopf beisteuert (beim Einzelbogen leer). */
 interface Kontext {
   /** Zug-Etikett aus dem Bündel — die Spalte „Zug", wenn die Einheit selbst keiner ist. */
   zug?: string;
   /** Bezeichnung eines abgeteilten Truppteils; hängt an der Bezeichnung. */
   teil?: string;
-  status?: string;
   /** Eintrags-ID der Sammlung; ohne Sammlung der Inhalts-Hash des Bogens. */
   id?: string;
 }
@@ -323,7 +322,6 @@ function zeileFuer(b: Erfassungsbogen, k: Kontext): Zeile {
     // Übung zuerst: eine Übungsmeldung darf in der Liste der Führungsstelle
     // nicht wie eine echte aussehen (siehe uebung im Datenmodell).
     bemerkung: [b.uebung === true ? "ÜBUNG" : "", b.sonstiges ?? ""].filter(Boolean).join(" — "),
-    status: k.status ?? "",
     bogenId: k.id ?? bogenInhaltsId(b),
     weiblich: u.w,
     divers: u.d,
@@ -409,8 +407,9 @@ export function bogenOldenburgXlsx(b: Erfassungsbogen): Uint8Array<ArrayBuffer> 
 /**
  * Einsatz-Sammlung → XLSX-Bytes: je gemeldeter Einheit eine Zeile in ihrer
  * neuesten Revision, nach Anzeigename sortiert. Auch abgerückte und aufgegangene
- * Einheiten sind dabei — die Spalte „Status" hält sie auseinander, und die
- * SUBTOTAL-Summen oben folgen dem Filter, den die Führungsstelle setzt.
+ * Einheiten sind dabei, seit dem Ausbau der Status-Spalte aber ohne Kennzeichen:
+ * das Blatt zeigt sie wie anwesende. Die SUBTOTAL-Summen oben folgen dem Filter,
+ * den die Führungsstelle setzt.
  */
 export function einsatzOldenburgXlsx(s: Einsatzsammlung): Uint8Array<ArrayBuffer> {
   const meldungen = neuesteJeEinheit(s.eintraege).sort(
@@ -422,5 +421,5 @@ export function einsatzOldenburgXlsx(s: Einsatzsammlung): Uint8Array<ArrayBuffer
 }
 
 function kontextAus(e: MeldeEintrag): Kontext {
-  return { zug: e.zugEtikett, teil: e.teilEtikett, status: STATUS_TEXT[e.status], id: e.id };
+  return { zug: e.zugEtikett, teil: e.teilEtikett, id: e.id };
 }
