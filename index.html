@@ -506,6 +506,86 @@
     }
     @media (hover: hover) { .sprungmarke:hover { background: var(--flaeche); color: var(--akzent); } }
     .sprungmarke:focus { top: var(--r-2); }
+
+    /* ---------------------------------------------------------------
+       Kopfnavigation — die Leiste der Themenwelt, hier über der App.
+
+       Sie ist bewusst dieselbe wie auf den statischen Seiten (Markup aus
+       src/app/kopfnav.ts), aber NICHT deren CSS: Dort stehen feste Farben
+       (#fff, var(--blau)) aus einer Welt, die nur hell existiert. In der App
+       muss dieselbe Leiste im Dunkel-, Feld- und Nacht-Modus mitgehen — sie
+       liegt deshalb auf den Design-Token, nicht auf Werten.
+
+       Über dem Kopfbalken, nicht darin: Der Balken trägt die Kennfarbe der
+       Organisation und wechselt mit ihr; eine Navigation, die je nach Bogen
+       die Farbe wechselt, liest sich als Teil des Bogens statt als Teil der
+       Seite. Die Leiste bleibt neutral auf --flaeche.
+       --------------------------------------------------------------- */
+    .kopfnav { background: var(--flaeche); border-bottom: var(--strich) solid var(--linie-fein); }
+    /* Satzspiegel wie main und .kopf-inhalt (60rem, nicht die 44rem der
+       Textseiten): Zwei verschiedene linke Kanten übereinander sähen aus wie
+       ein Fehler im Aufbau. */
+    .kopfnav-inner {
+      width: 100%; max-width: 60rem; margin: 0 auto;
+      padding: 0 var(--r-3);
+      display: flex; flex-wrap: wrap; align-items: center; gap: 0 var(--r-4);
+    }
+    /* Höhe aus den Trefferflächen der Bedienelemente statt aus Polster plus
+       Zeilenhöhe (--ziel-basis = 2.75rem, DESIGN.md) — sonst käme das Maß oben
+       drauf und die Leiste wüchse. */
+    .kopfnav-logo {
+      display: inline-flex; align-items: center; min-height: var(--ziel-basis);
+      margin-right: auto; font-weight: 700; font-size: var(--t-s);
+      color: var(--akzent); text-decoration: none;
+    }
+    .kopfnav-links { display: flex; flex-wrap: wrap; align-items: center; gap: 0 var(--r-3); }
+    .kopfnav-links a {
+      display: inline-flex; align-items: center; min-height: var(--ziel-basis);
+      font-size: var(--t-xs); color: var(--text-2); text-decoration: none; white-space: nowrap;
+    }
+    .kopfnav-links a:hover { color: var(--akzent-hell); text-decoration: underline; }
+    .kopfnav-eintrag { position: relative; display: inline-flex; }
+    /* Rechteckig wie alles andere (Null-Radius-Regel). Der Schatten bleibt: Das
+       Menü schwebt tatsächlich über dem Inhalt. */
+    .kopfnav-unter {
+      position: absolute; top: 100%; left: calc(-1 * var(--r-2)); z-index: 30;
+      display: none; grid-template-columns: 1fr; gap: 1px;
+      margin-top: var(--r-2); padding: var(--r-1);
+      background: var(--flaeche); border: var(--strich) solid var(--linie);
+      border-radius: var(--radius); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+    .kopfnav-unter-breit { grid-template-columns: 1fr 1fr; }
+    .kopfnav-unter a { display: flex; align-items: center; min-height: var(--ziel-basis); padding: 0 var(--r-2); }
+    .kopfnav-unter a:hover { background: var(--flaeche-2); text-decoration: none; }
+    /* Der unsichtbare Streifen überbrückt den Abstand zwischen Eintrag und
+       Menü — ohne ihn klappt das Menü beim Hinüberfahren wieder zu. */
+    .kopfnav-unter::before { content: ""; position: absolute; left: 0; right: 0; top: calc(-1 * var(--r-2)); height: var(--r-2); }
+    .kopfnav-eintrag:focus-within .kopfnav-unter { display: grid; }
+    /* Nur mit echtem Zeiger aufklappen: Auf Touchgeräten würde der erste Tipp
+       sonst das Menü öffnen, statt dem Link zu folgen. Dort führt der Eintrag
+       auf die Seite, die dieselben Unterpunkte ohnehin auflistet. */
+    @media (hover: hover) and (pointer: fine) {
+      .kopfnav-eintrag:hover .kopfnav-unter { display: grid; }
+    }
+    /* Auf 375 px passen sieben Einträge plus Logo nicht in eine Reihe. Statt
+       eines Hamburger-Menüs (bräuchte Skript und wäre auf Touch ohnehin der
+       zweite Tipp) bleibt sichtbar, was hier wirklich gebraucht wird: „Alle
+       Themen" als Sammelweg und „Anleitung" als der Weg, für den die Leiste in
+       der App überhaupt gebaut wurde. Der Rest bleibt im Markup und ist über
+       die Übersicht und die Fußzeile erreichbar.
+       Trefferfläche dort 2rem statt 2.75rem: über den 24 px aus WCAG 2.5.8,
+       aber drei Zeilen à 44 px wären 132 px Kopf auf einem 812-px-Schirm.
+       Beide Klassen im Selektor, weil .kopfnav-eintrag oben display setzt. */
+    @media (max-width: 30rem) {
+      .kopfnav-links a { min-height: 2rem; }
+      .kopfnav-links .nur-breit { display: none; }
+    }
+    /* In der installierten Fassung (Klasse aus der Frühweiche im Kopf) gibt es
+       die Themenwelt nicht — dieselbe Weiche wie beim erklärenden Text unten.
+       React lässt die Leiste dort ohnehin weg (imWebBrowser() in nativ.ts);
+       ohne diese Regel blitzte sie bis zum Mount im Gerüst auf. */
+    .als-app .kopfnav { display: none; }
+
     /* Der Sprung setzt den Fokus auf <main>; dort ist der Rahmen überflüssig. */
     main:focus { outline: none; }
     /* Umschalter Standard/Feld/Nacht als kompakte Segmente. In schmalen
@@ -2658,6 +2738,85 @@
        Funktion; sie erscheinen unterhalb und verschieben nichts (kein CLS). -->
   <div id="app">
     <button type="button" class="sprungmarke">Zum Inhalt springen</button>
+    <!-- Die Kopfleiste der Themenwelt, hier über der App: Ohne sie führte von
+         jeder Themenseite ein Klick in die App, aber aus der App nur die
+         Fußzeile zurück ins HowTo. Sie steht NACH der Sprungmarke, damit die
+         weiterhin der erste Tabstopp ist, und trägt bewusst nur Wissen — die
+         Aktionen stehen in der Weiche darunter (Begründung in kopfnav.ts).
+         Erzeugt aus derselben Quelle wie die React-Fassung, sonst spränge die
+         Seite beim Mount. -->
+    <!-- kopfnav:anfang (erzeugt aus src/app/kopfnav.ts — nicht von Hand ändern) -->
+    <div class="kopfnav">
+      <div class="kopfnav-inner">
+        <a href="./" class="kopfnav-logo">Erfassungsbogen</a>
+        <nav class="kopfnav-links" aria-label="Hauptnavigation">
+          <span class="kopfnav-eintrag">
+            <a href="./uebersicht.html">Alle Themen</a>
+            <span class="kopfnav-unter">
+              <a href="./vorlage.html">Vorlage und Blanko-PDF</a>
+              <a href="./papier-oder-digital.html">Papier oder digital?</a>
+              <a href="./bbk.html">BBK</a>
+              <a href="./bundeswehr.html">Bundeswehr</a>
+              <a href="./open-source-datenschutz.html">Open Source und Datenschutz</a>
+              <a href="./autor.html">Über den Autor</a>
+              <a href="./impressum.html">Impressum</a>
+            </span>
+          </span>
+          <span class="kopfnav-eintrag nur-breit">
+            <a href="./katastrophenschutz.html">Katastrophenschutz</a>
+            <span class="kopfnav-unter kopfnav-unter-breit">
+              <a href="./katastrophenschutz-baden-wuerttemberg.html">Baden-Württemberg</a>
+              <a href="./katastrophenschutz-bayern.html">Bayern</a>
+              <a href="./katastrophenschutz-berlin.html">Berlin</a>
+              <a href="./katastrophenschutz-brandenburg.html">Brandenburg</a>
+              <a href="./katastrophenschutz-hessen.html">Hessen</a>
+              <a href="./katastrophenschutz-mecklenburg-vorpommern.html">Mecklenburg-Vorpommern</a>
+              <a href="./katastrophenschutz-niedersachsen.html">Niedersachsen</a>
+              <a href="./katastrophenschutz-nordrhein-westfalen.html">Nordrhein-Westfalen</a>
+              <a href="./katastrophenschutz-rheinland-pfalz.html">Rheinland-Pfalz</a>
+              <a href="./katastrophenschutz-saarland.html">Saarland</a>
+              <a href="./katastrophenschutz-sachsen.html">Sachsen</a>
+              <a href="./katastrophenschutz-thueringen.html">Thüringen</a>
+            </span>
+          </span>
+          <span class="kopfnav-eintrag nur-breit">
+            <a href="./thw.html">THW</a>
+            <span class="kopfnav-unter">
+              <a href="./thw-fachgruppe-raeumen-erfassungsbogen.html">Fachgruppe Räumen</a>
+              <a href="./thw-fachgruppe-notversorgung-erfassungsbogen.html">Fachgruppe Notversorgung</a>
+              <a href="./thw-fachgruppe-wasserschaden-pumpen-erfassungsbogen.html">Fachgruppe Wasserschaden/Pumpen</a>
+            </span>
+          </span>
+          <span class="kopfnav-eintrag nur-breit">
+            <a href="./feuerwehr.html">Feuerwehr</a>
+            <span class="kopfnav-unter">
+              <a href="./staerkemeldung-feuerwehr.html">Stärkemeldung mit Beispiel</a>
+            </span>
+          </span>
+          <span class="kopfnav-eintrag nur-breit">
+            <a href="./uebersicht.html#hilfsorganisationen">Hilfsorganisationen</a>
+            <span class="kopfnav-unter">
+              <a href="./drk.html">DRK</a>
+              <a href="./johanniter.html">Johanniter</a>
+              <a href="./malteser.html">Malteser</a>
+              <a href="./asb.html">ASB</a>
+              <a href="./dlrg.html">DLRG</a>
+            </span>
+          </span>
+          <a href="./meldekopf.html" class="nur-breit">Meldekopf</a>
+          <span class="kopfnav-eintrag">
+            <a href="./anleitung.html">Anleitung</a>
+            <span class="kopfnav-unter">
+              <a href="./anleitung.html#bogen-erstellen">Bogen erstellen</a>
+              <a href="./anleitung.html#bogen-drucken">Bogen drucken</a>
+              <a href="./anleitung.html#bogen-scannen">Bogen scannen</a>
+              <a href="./anleitung.html#bogensammlung-anlegen">Bogensammlung anlegen</a>
+            </span>
+          </span>
+        </nav>
+      </div>
+    </div>
+    <!-- kopfnav:ende -->
     <header class="seiten-kopf start-kopf">
       <div class="kopf-inhalt">
         <div class="titelzeile">

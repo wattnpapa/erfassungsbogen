@@ -74,6 +74,40 @@ strukturierten Daten.
   sie über die Tabelle `SEITEN` im Skript.
 - **Ansehen:** `npm run sitemap -- /tmp/sitemap.xml`.
 
+### Kopfnavigation (generiert, drei Fassungen)
+
+Die Domain hat zwei Welten: die App unter `/` (index.html plus React-Bundle)
+und rund 35 statische Textseiten unter `public/`. Die Kopfleiste steht über
+beiden — und stammt aus **einer** Quelle,
+[src/app/kopfnav.ts](../src/app/kopfnav.ts). Daraus entstehen drei Fassungen:
+
+| Fassung | Erzeugt von | Marken |
+|---|---|---|
+| Statische Seiten unter `public/` | `npm run content-nav` | `<!-- NAV:START -->` … `<!-- NAV:END -->` |
+| Start-Gerüst in `index.html` | `node --import tsx scripts/kopfnav.mts` | `<!-- kopfnav:anfang -->` … `<!-- kopfnav:ende -->` |
+| React-Ansicht der Startseite | [kopfnav-ui.tsx](../src/app/kopfnav-ui.tsx) | — |
+
+[src/test/kopfnav.test.ts](../src/test/kopfnav.test.ts) vergleicht das Gerüst
+mit der Quelle und schlägt fehl, sobald es veraltet ist; außerdem prüft es,
+dass jeder Menüpunkt der Anleitung eine Sprungmarke hat, die dort auch
+existiert — ein Link auf eine fehlende `id` ist im Browser still kaputt.
+
+Drei Festlegungen, die beim Ändern leicht verlorengehen:
+
+- **Die Leiste trägt Wissen, keine Aktionen.** „Neuen Bogen erstellen",
+  „QR-Code scannen…" und „Neuer Einsatz…" stehen als Weiche mitten auf der
+  Startseite. Dieselben Ziele oben noch einmal wären zwei konkurrierende
+  Bedienelemente für eine Handlung — und in den Arbeitsansichten hieße „Bogen
+  erstellen" bei offenem Entwurf: Rückfrage oder Datenverlust. Aus demselben
+  Grund gibt es keinen Eintrag „Bogen drucken": Ohne Bogen führt er ins Leere.
+- **Nur auf der Startseite und nur im Browser.** Im Assistenten konkurriert
+  sie mit Schrittleiste und Rücksprung; in der installierten Fassung gibt es
+  die Themenwelt nicht (`imWebBrowser()`, im Gerüst die Klasse `.als-app`).
+- **Eigenes CSS in `index.html`, nicht das der Textseiten.** Deren Block
+  (`NAV:CSS`) steht auf festen Farben (`#fff`, `var(--blau)`) aus einer Welt,
+  die nur hell existiert. In der App muss dieselbe Leiste im Dunkel-, Feld- und
+  Nacht-Modus mitgehen und liegt deshalb auf den Design-Token.
+
 ### Offline (Service Worker)
 
 Die Web-App ist offline-fähig: ein Service Worker (Workbox über

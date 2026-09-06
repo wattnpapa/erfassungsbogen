@@ -44,6 +44,7 @@
     "electron:build": "vite build && electron-builder",
     "og": "node scripts/og-bild.mjs",
     "sitemap": "node --import tsx scripts/sitemap.ts",
+    "kopfnav": "node --import tsx scripts/kopfnav.mts",
     "content-nav": "node --import tsx scripts/content-nav.mts",
     "content-hinweis": "node --import tsx scripts/content-hinweis.mts",
     "content-laender": "node --import tsx scripts/content-laender.mts",

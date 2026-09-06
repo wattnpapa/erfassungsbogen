@@ -36,137 +36,13 @@
 import { readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { kopfnavHtml } from "../src/app/kopfnav.js";
 
 const wurzel = join(dirname(fileURLToPath(import.meta.url)), "..");
 const publicDir = join(wurzel, "public");
 
 /** Seiten, die absichtlich KEINE Kopfnavigation bekommen. */
 const AUSGENOMMEN = new Set(["404.html"]);
-
-/**
- * Nav-Einträge in Anzeige-Reihenfolge. `aktivWenn` bestimmt, für welche
- * Dateien der Link als aktuelle Seite hervorgehoben wird — bei
- * "Katastrophenschutz" zählen auch alle Länder-Unterseiten dazu, bei "THW" die
- * Fachgruppen-Seiten, damit die Zugehörigkeit beim Klicken in die Tiefe
- * erkennbar bleibt.
- */
-interface NavEintrag {
-  href: string;
-  label: string;
-  aktivWenn: (datei: string) => boolean;
-  /**
-   * Unterpunkte, die als Aufklapp-Menü unter dem Eintrag erscheinen. Rein per
-   * CSS (`:hover`/`:focus-within`) — kein Skript zur Laufzeit. Auf Geräten ohne
-   * echten Zeiger bleibt das Menü zu; dort führt der Eintrag selbst auf die
-   * Seite, die genau diese Unterpunkte auflistet.
-   */
-  unter?: { href: string; label: string }[];
-  /** Menü zweispaltig setzen (nur sinnvoll bei sehr vielen Unterpunkten). */
-  zweispaltig?: boolean;
-}
-
-/** Seiten, die auf der Übersicht unter „Hilfsorganisationen“ stehen. */
-const HILFSORGANISATIONEN = new Set([
-  "drk.html",
-  "johanniter.html",
-  "malteser.html",
-  "asb.html",
-  "dlrg.html",
-]);
-
-/**
- * Seiten ohne eigenen Kopf-Eintrag: Sie hängen an der Übersicht, und dort soll
- * die Markierung stehen, damit nie ein Eintrag als aktiv erscheint, der die
- * Seite gar nicht enthält.
- */
-const UNTER_UEBERSICHT = new Set([
-  "uebersicht.html",
-  "vorlage.html",
-  "papier-oder-digital.html",
-  "open-source-datenschutz.html",
-  "bbk.html",
-  "bundeswehr.html",
-  "autor.html",
-  "impressum.html",
-  "datenschutz.html",
-]);
-
-/** Die zwölf Länderseiten in der Reihenfolge der Übersicht. */
-const LAENDER: { href: string; label: string }[] = [
-  { href: "./katastrophenschutz-baden-wuerttemberg.html", label: "Baden-Württemberg" },
-  { href: "./katastrophenschutz-bayern.html", label: "Bayern" },
-  { href: "./katastrophenschutz-berlin.html", label: "Berlin" },
-  { href: "./katastrophenschutz-brandenburg.html", label: "Brandenburg" },
-  { href: "./katastrophenschutz-hessen.html", label: "Hessen" },
-  { href: "./katastrophenschutz-mecklenburg-vorpommern.html", label: "Mecklenburg-Vorpommern" },
-  { href: "./katastrophenschutz-niedersachsen.html", label: "Niedersachsen" },
-  { href: "./katastrophenschutz-nordrhein-westfalen.html", label: "Nordrhein-Westfalen" },
-  { href: "./katastrophenschutz-rheinland-pfalz.html", label: "Rheinland-Pfalz" },
-  { href: "./katastrophenschutz-saarland.html", label: "Saarland" },
-  { href: "./katastrophenschutz-sachsen.html", label: "Sachsen" },
-  { href: "./katastrophenschutz-thueringen.html", label: "Thüringen" },
-];
-
-/**
- * „Alle Themen“ steht vorn: Es ist der Einstieg in den gesamten Textbereich,
- * und sein Menü führt die Seiten, die keinen eigenen Kopf-Eintrag haben.
- */
-const NAV: NavEintrag[] = [
-  {
-    href: "./uebersicht.html",
-    label: "Alle Themen",
-    aktivWenn: (d) => UNTER_UEBERSICHT.has(d),
-    unter: [
-      { href: "./vorlage.html", label: "Vorlage und Blanko-PDF" },
-      { href: "./papier-oder-digital.html", label: "Papier oder digital?" },
-      { href: "./bbk.html", label: "BBK" },
-      { href: "./bundeswehr.html", label: "Bundeswehr" },
-      { href: "./open-source-datenschutz.html", label: "Open Source und Datenschutz" },
-      { href: "./autor.html", label: "Über den Autor" },
-      { href: "./impressum.html", label: "Impressum" },
-    ],
-  },
-  {
-    href: "./katastrophenschutz.html",
-    label: "Katastrophenschutz",
-    aktivWenn: (d) => d.startsWith("katastrophenschutz"),
-    unter: LAENDER,
-    zweispaltig: true,
-  },
-  {
-    href: "./thw.html",
-    label: "THW",
-    aktivWenn: (d) => d.startsWith("thw"),
-    unter: [
-      { href: "./thw-fachgruppe-raeumen-erfassungsbogen.html", label: "Fachgruppe Räumen" },
-      { href: "./thw-fachgruppe-notversorgung-erfassungsbogen.html", label: "Fachgruppe Notversorgung" },
-      { href: "./thw-fachgruppe-wasserschaden-pumpen-erfassungsbogen.html", label: "Fachgruppe Wasserschaden/Pumpen" },
-    ],
-  },
-  {
-    href: "./feuerwehr.html",
-    label: "Feuerwehr",
-    aktivWenn: (d) => d === "feuerwehr.html" || d === "staerkemeldung-feuerwehr.html",
-    unter: [{ href: "./staerkemeldung-feuerwehr.html", label: "Stärkemeldung mit Beispiel" }],
-  },
-  // Es gibt keine eigene Seite „Hilfsorganisationen“; der Abschnitt der
-  // Übersicht ist die ehrlichste Zieladresse — er listet genau die fünf Seiten,
-  // die der Eintrag verspricht.
-  {
-    href: "./uebersicht.html#hilfsorganisationen",
-    label: "Hilfsorganisationen",
-    aktivWenn: (d) => HILFSORGANISATIONEN.has(d),
-    unter: [
-      { href: "./drk.html", label: "DRK" },
-      { href: "./johanniter.html", label: "Johanniter" },
-      { href: "./malteser.html", label: "Malteser" },
-      { href: "./asb.html", label: "ASB" },
-      { href: "./dlrg.html", label: "DLRG" },
-    ],
-  },
-  { href: "./meldekopf.html", label: "Meldekopf", aktivWenn: (d) => d === "meldekopf.html" },
-  { href: "./anleitung.html", label: "Anleitung", aktivWenn: (d) => d === "anleitung.html" },
-];
 
 /**
  * Fußzeilen-Links: die Hauptseiten aller Bereiche, damit von jeder Seite aus
@@ -238,48 +114,19 @@ const FUSSNAV: FussGruppe[] = [
 ];
 
 /**
- * Der Sammelweg auf schmalen Geräten: Was mobil nicht sichtbar bleibt, ist über
- * diesen einen Eintrag erreichbar — er führt auf das vollständige Verzeichnis.
+ * Die Leiste einer Seite samt Sprunglink und Marken. Die Einträge selbst und
+ * ihr Markup stehen in src/app/kopfnav.ts — dieselbe Quelle, aus der auch das
+ * Start-Gerüst von index.html und die React-Fassung der App entstehen. Vorher
+ * standen sie hier, und die App hatte deshalb gar keine Leiste.
+ *
+ * Der Sprunglink bleibt hier: Er ist ein Fragment-Verweis („#inhalt") und damit
+ * genau das, was die App nicht haben darf — dort trägt das URL-Fragment die
+ * Nutzlast eines QR-Codes (siehe seiten-kopf.tsx).
  */
-const SAMMELWEG = "./uebersicht.html";
-
 function navHtml(datei: string): string {
-  const links = NAV.map((e) => {
-    const aktiv = e.aktivWenn(datei);
-    const klasse = aktiv ? ' class="aktiv"' : "";
-    // Mobil sichtbar bleiben nur „Alle Themen“ und der Eintrag der aktuellen
-    // Rubrik; alles Übrige trägt `nur-breit` und wird unter 30rem ausgeblendet.
-    // Begründung siehe NAV_CSS.
-    const breit = aktiv || e.href === SAMMELWEG ? "" : " nur-breit";
-    if (!e.unter) {
-      // Ohne Aufklappmenü trägt der Link selbst die Klassen.
-      const klassen = `${aktiv ? "aktiv" : ""}${breit}`.trim();
-      return `<a href="${e.href}"${klassen ? ` class="${klassen}"` : ""}>${e.label}</a>`;
-    }
-    const unterlinks = e.unter
-      .map((u) => {
-        const uKlasse = u.href === `./${datei}` ? ' class="aktiv"' : "";
-        return `<a href="${u.href}"${uKlasse}>${u.label}</a>`;
-      })
-      .join("\n            ");
-    const menuKlasse = e.zweispaltig ? "kopfnav-unter kopfnav-unter-breit" : "kopfnav-unter";
-    return `<span class="kopfnav-eintrag${breit}">
-          <a href="${e.href}"${klasse}>${e.label}</a>
-          <span class="${menuKlasse}">
-            ${unterlinks}
-          </span>
-        </span>`;
-  }).join("\n        ");
   return `<!-- NAV:START -->
   <a class="sprunglink" href="#inhalt">Zum Inhalt springen</a>
-  <header class="kopfnav">
-    <div class="kopfnav-inner">
-      <a href="./" class="kopfnav-logo">Erfassungsbogen</a>
-      <nav class="kopfnav-links" aria-label="Hauptnavigation">
-        ${links}
-      </nav>
-    </div>
-  </header>
+${kopfnavHtml(datei)}
   <!-- NAV:END -->`;
 }
 

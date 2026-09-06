@@ -26,12 +26,28 @@ function zumInhalt() {
   inhalt.scrollIntoView();
 }
 
-export function SeitenKopf({ variante, children }: { variante?: string; children: ReactNode }) {
+/**
+ * `vorspann` steht zwischen Sprungmarke und Kopfbalken — dort sitzt die
+ * Kopfnavigation auf der Startseite. Sie muss über dem Balken liegen, darf
+ * aber die Sprungmarke nicht von Platz eins der Tabfolge verdrängen: Sonst
+ * führte der Weg zum Formular jedes Mal durch acht Navigationslinks, also
+ * genau an dem Element vorbei, das ihn abkürzen soll.
+ */
+export function SeitenKopf({
+  variante,
+  vorspann,
+  children,
+}: {
+  variante?: string;
+  vorspann?: ReactNode;
+  children: ReactNode;
+}) {
   return (
     <>
       <button type="button" className="sprungmarke" onClick={zumInhalt}>
         Zum Inhalt springen
       </button>
+      {vorspann}
       <header className={variante ? `seiten-kopf ${variante}` : "seiten-kopf"}>
         <div className="kopf-inhalt">{children}</div>
       </header>

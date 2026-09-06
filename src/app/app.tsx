@@ -34,6 +34,7 @@ import {
   schrittStatus,
 } from "./hilfen";
 import { PersonalErfassung, jetztZeitpunkt, staerke } from "../model";
+import { Kopfnav } from "./kopfnav-ui";
 import { bogenLinksEmpfangen, imWebBrowser, istNativ, qrScannen, textTeilen } from "./nativ";
 import { fehlerText } from "./nachladen";
 import { entwirreScanText } from "./tastaturbelegung";
@@ -1135,7 +1136,11 @@ function AppInhalt() {
     return (
       <>
       <Aktualisierungshinweise />
-      <SeitenKopf variante="start-kopf">
+      {/* Die Kopfleiste der Themenwelt nur auf der Startseite: In Assistent
+          und Einsatzansicht konkurrierte sie mit Schrittleiste und
+          Rücksprung — und wer dort arbeitet, sucht keine Themenseite.
+          Nur im Browser, wie der erklärende Text unten (imWebBrowser()). */}
+      <SeitenKopf variante="start-kopf" vorspann={imWebBrowser() ? <Kopfnav /> : null}>
         <div className="titelzeile">
           <h1>Digitaler Einheiten-Erfassungsbogen</h1>
           {/* Feld/Nacht auch hier, nicht nur in der Fußzeile: Wer draußen
