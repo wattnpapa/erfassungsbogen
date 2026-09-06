@@ -1008,36 +1008,47 @@ function AppInhalt() {
     }
   }
 
-  /** Bögen aus einer JSON-/PDF-Datei in den offenen Einsatz aufnehmen (Bulk, mit Dedupe). */
-  async function importiereBoegen(zielId: string, datei: File) {
-    try {
-      let boegen: Erfassungsbogen[];
-      if (datei.name.toLowerCase().endsWith(".pdf") || datei.type === "application/pdf") {
-        boegen = boegenAusPdfBytes(new Uint8Array(await datei.arrayBuffer()));
-      } else {
-        const daten = JSON.parse(await datei.text());
-        boegen = Array.isArray(daten) ? daten : [daten];
-      }
-      let neu = 0;
-      let uebersprungen = 0;
-      for (const b of boegen) {
-        try {
-          const r = meldungHinzufuegen(zielId, b, { quelle: "pdf-import" });
-          if (r) r.neu ? neu++ : uebersprungen++;
-        } catch {
-          /* ungültiger Bogen — überspringen */
+  /**
+   * Bögen aus JSON-/PDF-Dateien in den offenen Einsatz aufnehmen (Bulk, mit
+   * Dedupe). Mehrere Dateien auf einmal, weil der Einlese-Knopf sie gemeinsam
+   * anbietet: eine Meldung über den ganzen Stapel liest sich besser als eine je
+   * Datei, und eine kaputte Datei darf die übrigen nicht abbrechen — sie wird
+   * mit Namen an die Meldung gehängt.
+   */
+  async function importiereBoegen(zielId: string, dateien: File[]) {
+    let neu = 0;
+    let uebersprungen = 0;
+    const kaputt: string[] = [];
+    for (const datei of dateien) {
+      try {
+        let boegen: Erfassungsbogen[];
+        if (datei.name.toLowerCase().endsWith(".pdf") || datei.type === "application/pdf") {
+          boegen = boegenAusPdfBytes(new Uint8Array(await datei.arrayBuffer()));
+        } else {
+          const daten = JSON.parse(await datei.text());
+          boegen = Array.isArray(daten) ? daten : [daten];
         }
+        for (const b of boegen) {
+          try {
+            const r = meldungHinzufuegen(zielId, b, { quelle: "pdf-import" });
+            if (r) r.neu ? neu++ : uebersprungen++;
+          } catch {
+            /* ungültiger Bogen — überspringen */
+          }
+        }
+      } catch (e) {
+        kaputt.push(`${datei.name} (${fehlerText(e)})`);
       }
-      einsaetzeNeuLaden();
-      setFehler("");
-      setMeldung(
-        neu + uebersprungen === 0
-          ? "Keine Bögen in der Datei gefunden."
-          : `${neu} Bogen/Bögen aufgenommen${uebersprungen ? `, ${uebersprungen} bereits vorhanden` : ""}.`,
-      );
-    } catch (e) {
-      setFehler(`Import: ${e instanceof Error ? e.message : e}`);
     }
+    einsaetzeNeuLaden();
+    setFehler(kaputt.length > 0 ? `Import: ${kaputt.join(", ")}` : "");
+    setMeldung(
+      neu + uebersprungen === 0
+        ? kaputt.length > 0
+          ? ""
+          : "Keine Bögen in der Datei gefunden."
+        : `${neu} Bogen/Bögen aufgenommen${uebersprungen ? `, ${uebersprungen} bereits vorhanden` : ""}.`,
+    );
   }
 
   /**
@@ -1108,7 +1119,7 @@ function AppInhalt() {
         if (!gefunden) {
           setFehler(
             "In dieser PDF steckt keine komplette Einsatz-Sammlung (ältere Sammel-PDF oder Einzelbogen). " +
-              "Einzelne Bögen lassen sich im geöffneten Einsatz über „Aus Datei/PDF…“ aufnehmen.",
+              "Einzelne Bögen lassen sich im geöffneten Einsatz über „Bögen einlesen…“ aufnehmen.",
           );
           return;
         }
@@ -1156,7 +1167,7 @@ function AppInhalt() {
           onGeaendert={einsaetzeNeuLaden}
           onScannen={() => scanneInEinsatz(offenerEinsatz.id)}
           onManuell={() => manuellInEinsatz(offenerEinsatz.id)}
-          onDateiImport={(datei) => importiereBoegen(offenerEinsatz.id, datei)}
+          onDateiImport={(dateien) => void importiereBoegen(offenerEinsatz.id, dateien)}
           onBilderImport={(dateien) => void importiereQrBilder(offenerEinsatz.id, dateien)}
           onExport={() => exportiereEinsatz(offenerEinsatz)}
           onCsvExport={() => exportiereEinsatzCsv(offenerEinsatz)}

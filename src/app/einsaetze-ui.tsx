@@ -82,6 +82,7 @@ import {
   type TabellenZeile,
 } from "./einheiten-tabelle";
 import { imWebBrowser } from "./nativ";
+import { istBilddatei } from "./qr-stapel";
 import { fehlerText } from "./nachladen";
 
 export const ART_LABEL: Record<EinsatzArt, string> = {
@@ -238,27 +239,139 @@ function ordnerAuswahlMoeglich(): boolean {
   return typeof matchMedia === "function" && matchMedia("(pointer: fine)").matches;
 }
 
+/** Was der Einlese-Knopf im Dateifenster vorschlägt: fertige Bögen in jeder Form. */
+const EINLESE_ARTEN = ".json,application/json,.pdf,application/pdf,image/*";
+
 /**
- * Dateifeld für die Ordnerauswahl. `webkitdirectory` ist kein React-Attribut und
- * wird deshalb nachträglich gesetzt.
+ * Ein Knopf für alles, was fertig ausgefüllt hereinkommt: JSON, PDF, Fotos und
+ * Screenshots von QR-Codes — einzeln, viele auf einmal oder als ganzer Ordner.
+ *
+ * Vorher standen dafür drei Knöpfe nebeneinander und verlangten vorab eine
+ * Entscheidung, die das Dateifenster ohnehin abnimmt: dort liegt die Datei, und
+ * was sie ist, sieht man an ihr — nicht am Knopf davor. Welcher Weg gegangen
+ * wird, entscheidet deshalb hier der Dateityp: Bilder gehen durch den
+ * QR-Stapel, JSON und PDF durch den Bogen-Import. Beides gemischt ist erlaubt.
+ *
+ * Nur die Ordnerauswahl bleibt ein eigener Weg, weil ein Dateifeld entweder
+ * Dateien ODER einen Ordner öffnen lässt. Sie hängt als zweiter Eintrag an
+ * einem kleinen Menü — und das Menü erscheint nur dort, wo es Ordner überhaupt
+ * gibt: sonst öffnet der Knopf ohne Zwischenschritt das Dateifenster.
  */
-function OrdnerFeld(props: { onDateien: (dateien: File[]) => void }) {
-  const feld = useRef<HTMLInputElement>(null);
+function BoegenEinlesenKnopf(props: {
+  /** JSON-/PDF-Dateien mit fertigen Bögen. */
+  onDaten: (dateien: File[]) => void;
+  /** Bilder, aus denen erst noch QR-Codes gelesen werden. */
+  onBilder: (dateien: File[]) => void;
+}) {
+  const mitOrdner = ordnerAuswahlMoeglich();
+  const dateiFeld = useRef<HTMLInputElement>(null);
+  const ordnerFeld = useRef<HTMLInputElement>(null);
+  const huelle = useRef<HTMLDivElement>(null);
+  const [offen, setOffen] = useState(false);
+
+  // `webkitdirectory` ist kein React-Attribut und wird deshalb nachgesetzt.
   useEffect(() => {
-    feld.current?.setAttribute("webkitdirectory", "");
-  }, []);
+    if (mitOrdner) ordnerFeld.current?.setAttribute("webkitdirectory", "");
+  }, [mitOrdner]);
+
+  // Ein offenes Menü muss auch wieder zugehen, ohne dass etwas gewählt wurde —
+  // sonst verdeckt es die Knopfreihe darunter.
+  useEffect(() => {
+    if (!offen) return;
+    function danebenGeklickt(e: MouseEvent) {
+      if (!huelle.current?.contains(e.target as Node)) setOffen(false);
+    }
+    function taste(e: KeyboardEvent) {
+      if (e.key === "Escape") setOffen(false);
+    }
+    document.addEventListener("mousedown", danebenGeklickt);
+    document.addEventListener("keydown", taste);
+    return () => {
+      document.removeEventListener("mousedown", danebenGeklickt);
+      document.removeEventListener("keydown", taste);
+    };
+  }, [offen]);
+
+  /** Auswahl auf die beiden Wege verteilen. */
+  function verteile(dateien: File[]) {
+    const bilder = dateien.filter((d) => istBilddatei(d.name, d.type));
+    const daten = dateien.filter((d) => !istBilddatei(d.name, d.type));
+    if (daten.length > 0) props.onDaten(daten);
+    // Auch die leere Auswahl geht weiter: der Aufrufer meldet dann „keine
+    // Bilddateien" — besser als ein Knopf, der wortlos nichts tut.
+    if (bilder.length > 0 || daten.length === 0) props.onBilder(bilder);
+  }
+
   return (
-    <input
-      ref={feld}
-      type="file"
-      multiple
-      className="nur-sr"
-      onChange={(e) => {
-        const dateien = [...(e.target.files ?? [])];
-        e.target.value = "";
-        if (dateien.length > 0) props.onDateien(dateien);
-      }}
-    />
+    <div className="einlese" ref={huelle}>
+      <button
+        type="button"
+        aria-haspopup={mitOrdner ? "menu" : undefined}
+        aria-expanded={mitOrdner ? offen : undefined}
+        title="Fertig ausgefüllte Bögen aufnehmen: JSON- oder PDF-Datei, Fotos oder Screenshots von QR-Codes — auch viele auf einmal und mehrteilige Bögen."
+        onClick={() => (mitOrdner ? setOffen((o) => !o) : dateiFeld.current?.click())}
+      >
+        Bögen einlesen…
+      </button>
+      {mitOrdner && offen && (
+        <div className="einlese-menue" role="menu">
+          <button
+            type="button"
+            role="menuitem"
+            onClick={() => {
+              setOffen(false);
+              dateiFeld.current?.click();
+            }}
+          >
+            Dateien wählen…
+          </button>
+          <button
+            type="button"
+            role="menuitem"
+            title="Einen ganzen Ordner mit QR-Bildern einlesen (Unterordner eingeschlossen). Nicht-Bilder werden übergangen."
+            onClick={() => {
+              setOffen(false);
+              ordnerFeld.current?.click();
+            }}
+          >
+            Ganzen Ordner wählen…
+          </button>
+        </div>
+      )}
+      {/* Die Felder werden vom Knopf ausgelöst und stehen deshalb nicht selbst
+          in der Tabfolge — sichtbar und bedienbar ist der Knopf. */}
+      <input
+        ref={dateiFeld}
+        type="file"
+        accept={EINLESE_ARTEN}
+        multiple
+        tabIndex={-1}
+        className="nur-sr"
+        aria-label="Dateien wählen…"
+        onChange={(e) => {
+          const dateien = [...(e.target.files ?? [])];
+          e.target.value = "";
+          if (dateien.length > 0) verteile(dateien);
+        }}
+      />
+      {mitOrdner && (
+        <input
+          ref={ordnerFeld}
+          type="file"
+          multiple
+          tabIndex={-1}
+          className="nur-sr"
+          aria-label="Ganzen Ordner wählen…"
+          onChange={(e) => {
+            // Ein Ordner enthält auch .DS_Store und Ähnliches: hier zählen nur
+            // die Bilder, alles andere wird stillschweigend übergangen.
+            const bilder = [...(e.target.files ?? [])].filter((d) => istBilddatei(d.name, d.type));
+            e.target.value = "";
+            props.onBilder(bilder);
+          }}
+        />
+      )}
+    </div>
   );
 }
 
@@ -268,7 +381,8 @@ export function EinsatzDetail(props: {
   onGeaendert: () => void;
   onScannen: () => void;
   onManuell: () => void;
-  onDateiImport: (datei: File) => void;
+  /** Fertige Bögen aus JSON-/PDF-Dateien. */
+  onDateiImport: (dateien: File[]) => void;
   /** Stapel abfotografierter/gescannter QR-Codes (Mehrfachauswahl oder Ordner). */
   onBilderImport: (dateien: File[]) => void;
   onExport: () => void;
@@ -383,42 +497,9 @@ export function EinsatzDetail(props: {
       <div className="aktionen">
         <button type="button" className="primaer" onClick={onScannen}>Bogen scannen…</button>
         <button type="button" onClick={onManuell}>Einheit manuell erfassen…</button>
-        <label className="datei-knopf">
-          Aus Datei/PDF…
-          <input
-            type="file"
-            accept=".json,application/json,.pdf,application/pdf"
-            className="nur-sr"
-            onChange={(e) => {
-              const f = e.target.files?.[0];
-              e.target.value = "";
-              if (f) onDateiImport(f);
-            }}
-          />
-        </label>
-        {/* Stapelweg: viele abfotografierte/gescannte QR-Codes auf einmal. Zwei
-            Knöpfe statt einem, weil ein Dateifeld entweder Dateien ODER einen
-            Ordner auswählen lässt — und Ordner kennt nur der Rechner. */}
-        <label className="datei-knopf" title="Mehrere Fotos oder Screenshots von QR-Codes auf einmal einlesen — auch mehrteilige Bögen, deren Teile auf mehrere Bilder verteilt sind.">
-          Viele QR-Bilder…
-          <input
-            type="file"
-            accept="image/*"
-            multiple
-            className="nur-sr"
-            onChange={(e) => {
-              const dateien = [...(e.target.files ?? [])];
-              e.target.value = "";
-              if (dateien.length > 0) onBilderImport(dateien);
-            }}
-          />
-        </label>
-        {ordnerAuswahlMoeglich() && (
-          <label className="datei-knopf" title="Einen ganzen Ordner mit QR-Bildern einlesen (Unterordner eingeschlossen). Nicht-Bilder werden übergangen.">
-            Ordner mit QR-Bildern…
-            <OrdnerFeld onDateien={onBilderImport} />
-          </label>
-        )}
+        {/* Datei, PDF, einzelne Bilder, viele Bilder, ganzer Ordner: ein Knopf,
+            der die Sorte am Dateityp erkennt (siehe BoegenEinlesenKnopf). */}
+        <BoegenEinlesenKnopf onDaten={onDateiImport} onBilder={onBilderImport} />
       </div>
 
       {/* Zweite Reihe: was aus der Sammlung herausgeht. Die erste nimmt Bögen

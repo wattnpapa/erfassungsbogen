@@ -410,9 +410,27 @@
     .start > p.meldung { color: var(--text); }
     .start > p.fehler { color: var(--alarm); }
     .aktionen { display: flex; gap: var(--r-2); justify-content: flex-start; flex-wrap: wrap; margin-top: var(--r-5); }
-    .aktionen > button, .aktionen > .datei-knopf {
+    .aktionen > button, .aktionen > .datei-knopf, .aktionen > .einlese > button {
       min-height: calc(2.75rem + var(--ziel)); padding: 0.6rem 1.1rem; font-size: var(--t-m);
     }
+    /* Ein Knopf, mehrere Wege herein (Datei, Bilder, ganzer Ordner): das Menue
+       haengt am Knopf und braucht deshalb dessen Kasten als Bezugspunkt. */
+    .einlese { position: relative; display: inline-flex; }
+    .einlese > button { width: 100%; }
+    .einlese-menue {
+      position: absolute; z-index: 30; top: calc(100% + var(--r-1)); left: 0;
+      display: flex; flex-direction: column; align-items: stretch; gap: 1px;
+      min-width: max(100%, 15rem); padding: var(--r-1);
+      background: var(--flaeche); border: var(--strich) solid var(--linie);
+      border-radius: var(--radius); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+    /* Menueeintraege sind Zeilen, keine Knoepfe in einer Reihe: linksbuendig,
+       ohne eigenen Rahmen — den zieht das Menue schon um alle. */
+    .einlese-menue > button {
+      justify-content: flex-start; text-align: left; border: none;
+      min-height: var(--ziel-basis); font-size: var(--t-s); padding: 0 var(--r-2);
+    }
+    @media (hover: hover) { .einlese-menue > button:hover { background: var(--flaeche-2); } }
     /* Auf dem Telefon füllen Knopfreihen die Spalte, statt in verschieden
        breiten Blöcken mit ausgefranster rechter Kante zu stehen: eine feste
        Kante liest sich als Liste, und jedes Ziel wird so breit wie möglich —
