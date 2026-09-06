@@ -2,6 +2,10 @@
  * Einsatzansicht des Meldekopfs — geprüft wird der eine Weg, an dem fremde
  * Meldedaten verschwinden: „Entfernen" an einer Meldung.
  *
+ * Dazu die Tabellensicht: sie ist die Sicht, aus der in der Lagebesprechung
+ * abgelesen wird, also muss der Umschalter beide Richtungen können und die
+ * Sortierung am Spaltenkopf tatsächlich umsortieren.
+ *
  * Wie überall bei Rückfragen zählen beide Richtungen. Ein Bestätigen, das nicht
  * entfernt, lässt eine abgerückte Einheit in der Stärkesumme stehen; ein
  * Abbruch, der trotzdem entfernt, wirft eine fremde Meldung samt Historie weg.
@@ -12,7 +16,7 @@
  */
 
 import { describe, it, expect, afterEach, beforeEach, vi } from "vitest";
-import { render, screen, within } from "@testing-library/react";
+import { cleanup, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import type { Erfassungsbogen } from "../model";
 import { Dialogschicht } from "./dialoge";
@@ -32,10 +36,10 @@ function bogenMitName(name: string): Erfassungsbogen {
   return b;
 }
 
-/** Einsatz mit einer gemeldeten Einheit, Detailansicht offen. */
-function buehne() {
+/** Einsatz mit den genannten Einheiten (Vorgabe: eine), Detailansicht offen. */
+function buehne(namen: string[] = ["Wardenburg"]) {
   const angelegt = einsatzAnlegen("Hochwasser Wardenburg", EinsatzArt.EINSATZ);
-  meldungHinzufuegen(angelegt.id, bogenMitName("Wardenburg"));
+  for (const n of namen) meldungHinzufuegen(angelegt.id, bogenMitName(n));
   const einsatz = einsaetzeLaden().find((s) => s.id === angelegt.id)!;
   const geaendert = vi.fn();
   render(
@@ -157,5 +161,66 @@ describe("Einzelbogen einer Meldung als PDF", () => {
     // entscheidet meldungPdfAnzeigen, es muss den Fall aber zu sehen bekommen.
     expect(meldungPdfAnzeigen).toHaveBeenCalledTimes(1);
     expect(meldungPdfAnzeigen.mock.calls[0]![1]).toBeNull();
+  });
+});
+
+describe("Einheiten als Tabelle", () => {
+  beforeEach(() => {
+    localStorage.clear();
+  });
+
+  /** Zeilenköpfe der Tabelle in Anzeigereihenfolge — die Einheitennamen. */
+  function einheitenSpalte() {
+    const tabelle = screen.getByRole("table", { name: /Gemeldete Einheiten/ });
+    return within(tabelle)
+      .getAllByRole("rowheader")
+      .map((z) => z.textContent ?? "");
+  }
+
+  it("schaltet zwischen Karten und Tabelle um und merkt sich die Wahl", async () => {
+    const nutzer = userEvent.setup();
+    buehne();
+
+    // Karten sind die Vorgabe: dort steht der Details-Knopf einer Meldung.
+    expect(screen.queryByRole("table", { name: /Gemeldete Einheiten/ })).toBeNull();
+
+    await nutzer.click(screen.getByRole("button", { name: "Tabelle" }));
+    expect(screen.getByRole("table", { name: /Gemeldete Einheiten/ })).not.toBeNull();
+    expect(screen.queryByRole("button", { name: "Details" })).toBeNull();
+
+    await nutzer.click(screen.getByRole("button", { name: "Karten" }));
+    expect(screen.queryByRole("table", { name: /Gemeldete Einheiten/ })).toBeNull();
+
+    // Die Wahl hängt am Arbeitsplatz, nicht am Einsatz: der nächste Aufbau
+    // startet in der zuletzt genutzten Sicht.
+    await nutzer.click(screen.getByRole("button", { name: "Tabelle" }));
+    cleanup();
+    buehne();
+    expect(screen.getByRole("table", { name: /Gemeldete Einheiten/ })).not.toBeNull();
+  });
+
+  it("sortiert am Spaltenkopf und dreht die Richtung beim zweiten Klick", async () => {
+    const nutzer = userEvent.setup();
+    buehne(["Wardenburg", "Ahlhorn"]);
+    await nutzer.click(screen.getByRole("button", { name: "Tabelle" }));
+
+    // Vorgabe ist die Sortierung der Leiste (Name A–Z).
+    expect(einheitenSpalte()[0]).toContain("Ahlhorn");
+
+    const spaltenkopf = screen.getAllByRole("columnheader")[0]!;
+    const kopf = within(spaltenkopf).getByRole("button");
+    await nutzer.click(kopf);
+    expect(einheitenSpalte()[0]).toContain("Ahlhorn");
+    await nutzer.click(kopf);
+    expect(einheitenSpalte()[0]).toContain("Wardenburg");
+  });
+
+  it("weist die Summe über die angezeigten Einheiten aus", async () => {
+    const nutzer = userEvent.setup();
+    buehne(["Wardenburg", "Ahlhorn"]);
+    await nutzer.click(screen.getByRole("button", { name: "Tabelle" }));
+
+    const tabelle = screen.getByRole("table", { name: /Gemeldete Einheiten/ });
+    expect(tabelle.querySelector("tfoot")!.textContent).toContain("Summe (2 anwesend)");
   });
 });

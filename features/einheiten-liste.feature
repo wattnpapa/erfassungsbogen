@@ -115,3 +115,23 @@ Funktionalität: Einheitenliste durchsuchen, filtern und sortieren
     Wenn ich das Feld "Sortierung" auf "Eintreffzeit (neueste zuerst)" stelle
     Dann führt die Einheitenliste "Feuerwehr Aschhausen" an Stelle 1
     Und führt die Einheitenliste "THW" an Stelle 3
+
+  # Rückmeldung eines Meldekopfs (September 2026): Karten untereinander
+  # beantworten „wer ist am stärksten?" nicht. Die Tabelle zeigt dieselbe
+  # gesuchte und gefilterte Auswahl in Zeilen — mit Summenzeile darunter.
+  Szenario: Die Tabellensicht zeigt dieselbe Auswahl in Zeilen
+    Wenn ich auf "Tabelle" klicke
+    Dann führt die Einheitentabelle genau 3 Zeilen
+    Und sehe ich den Text "Summe (3 anwesend)"
+    Wenn ich das Feld "Suche" mit "wardenburg" fülle
+    Dann sehe ich die Überschrift "Einheiten (1 von 3)"
+    Und führt die Einheitentabelle genau 1 Zeilen
+    Und sehe ich den Text "Summe (1 anwesend)"
+    Und meldet die Kopfleiste 3 Einheiten
+
+  Szenario: Der Spaltenkopf sortiert die Tabelle und dreht beim zweiten Klick
+    Wenn ich auf "Tabelle" klicke
+    Dann führt die Einheitentabelle "DLRG Wardenburg" an Stelle 1
+    Wenn ich die Tabelle nach "Einheit" sortiere
+    Und ich die Tabelle nach "Einheit" sortiere
+    Dann führt die Einheitentabelle "THW" an Stelle 1

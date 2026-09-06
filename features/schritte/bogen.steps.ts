@@ -268,6 +268,36 @@ Then("führt die Einheitenliste {string} nicht", async function (this: EebWelt, 
   }
 });
 
+/** Die Einheitennamen der Tabellensicht — Zeilenköpfe in Anzeigereihenfolge. */
+function tabellenNamen(welt: EebWelt): Promise<string[]> {
+  return welt.page.locator("table.einheiten-tabelle tbody th").allInnerTexts();
+}
+
+Then("führt die Einheitentabelle {string} an Stelle {int}", async function (this: EebWelt, name: string, platz: number) {
+  const namen = await tabellenNamen(this);
+  const ist = namen[platz - 1];
+  if (!ist?.includes(name)) {
+    throw new Error(`In der Tabelle steht an Stelle ${platz} „${ist ?? "(nichts)"}", erwartet war „${name}". Tabelle: ${namen.join(" | ")}`);
+  }
+});
+
+Then("führt die Einheitentabelle genau {int} Zeilen", async function (this: EebWelt, anzahl: number) {
+  const namen = await tabellenNamen(this);
+  if (namen.length !== anzahl) {
+    throw new Error(`Die Tabelle führt ${namen.length} Zeilen, erwartet waren ${anzahl}: ${namen.join(" | ")}`);
+  }
+});
+
+/** Sortierknopf im Spaltenkopf — angesprochen über die ausgeschriebene Spalte. */
+When("ich die Tabelle nach {string} sortiere", async function (this: EebWelt, spalte: string) {
+  await this.page
+    .locator("table.einheiten-tabelle thead th")
+    .filter({ hasText: spalte })
+    .first()
+    .getByRole("button")
+    .click();
+});
+
 Then("führt die Einheitenliste genau {int} Einheiten", async function (this: EebWelt, anzahl: number) {
   const namen = await einheitenNamen(this);
   if (namen.length !== anzahl) {

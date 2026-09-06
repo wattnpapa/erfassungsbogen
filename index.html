@@ -1256,6 +1256,49 @@
       vertical-align: 0.1em; white-space: nowrap;
     }
     .teil-badge { border-color: var(--akzent); color: var(--akzent); }
+    /* Umschalter Karten/Tabelle im Kartenkopf. Zwei aneinanderliegende
+       Knöpfe statt einer Auswahlliste: es sind genau zwei Zustände, und der
+       gewählte muss ohne Aufklappen sichtbar sein. */
+    .ansicht-umschalter { gap: 0 !important; }
+    .ansicht-umschalter button { border-radius: 0; margin-left: -1px; }
+    .ansicht-umschalter button:first-child { border-start-start-radius: var(--radius); border-end-start-radius: var(--radius); margin-left: 0; }
+    .ansicht-umschalter button:last-child { border-start-end-radius: var(--radius); border-end-end-radius: var(--radius); }
+    .ansicht-umschalter button[aria-pressed="true"] {
+      background: var(--akzent); border-color: var(--akzent); color: var(--auf-akzent); position: relative;
+    }
+    /* Einheitentabelle des Meldekopfs: 18 Spalten, davon 15 Zahlen. Zahlen
+       rechtsbündig und in Tabellenbreite (kommt schon von table.uebersicht),
+       die Einheitenspalte bleibt links stehen und trägt als Zeilenkopf den
+       Namen samt Etiketten. */
+    table.einheiten-tabelle th.zahl, table.einheiten-tabelle td.zahl { text-align: right; }
+    /* Der Zeilenkopf trägt den Einheitennamen — er darf nicht wie ein
+       Spaltenkopf aussehen: die Versal-Sperrschrift von table.uebersicht th
+       macht aus „THW Oldenburg FGr N" eine schwer lesbare Zeile und stellt sie
+       fälschlich auf eine Stufe mit den Spaltenüberschriften. */
+    table.einheiten-tabelle tbody th {
+      font-family: inherit; font-size: inherit; font-weight: 600; color: inherit;
+      letter-spacing: normal; text-transform: none; text-align: left; background: none;
+    }
+    table.einheiten-tabelle tbody th .muster-sub { display: block; }
+    table.einheiten-tabelle tr.gestrichen { opacity: 0.55; }
+    table.einheiten-tabelle tr.gestrichen th { text-decoration: line-through; }
+    /* Sortierknopf im Spaltenkopf: sieht aus wie der Kopf, nicht wie ein Knopf
+       — die Tabelle soll ein Vordruck bleiben. Der Griff zeigt sich beim
+       Überfahren und im Fokus. */
+    .spalten-sortierung {
+      display: inline-flex; align-items: baseline; gap: 0.25rem;
+      background: none; border: none; padding: 0; margin: 0;
+      font: inherit; letter-spacing: inherit; text-transform: inherit; color: inherit;
+      min-height: 0; cursor: pointer; text-align: inherit;
+    }
+    .spalten-sortierung:hover { color: var(--akzent); text-decoration: underline; }
+    .sortier-pfeil { color: var(--akzent); font-size: 0.8em; }
+    /* Die Summenzeile ist der Abschluss, nicht eine Zeile mehr: kräftige Linie
+       darüber, wie unter einer aufaddierten Spalte auf Papier. */
+    table.einheiten-tabelle tfoot td {
+      font-weight: 700; background: var(--flaeche-2);
+      border-top: var(--strich-stark) solid var(--linie);
+    }
     /* Aufteilen-Feld in der Einheitenkarte: gleiche Handschrift wie die
        ausklappbare Vollansicht, damit die Karte nicht in Kästen zerfällt. */
     .aufteilen-panel { margin-top: 0.6rem; border-top: 1px solid var(--rand); padding-top: 0.4rem; }

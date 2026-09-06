@@ -63,7 +63,11 @@ Wer noch abwägt: [Papier oder digital?](https://erfassungsbogen.app/papier-oder
   der Übersicht eines gerade geöffneten Bogens („In Einsatz aufnehmen"). Die App
   zählt Stärke und Bedarf über alle anwesenden Einheiten laufend zusammen (mit
   Zwischensummen je Zug), merkt sich tägliche Neumeldungen als Historie und gibt
-  alles als Sammel-PDF oder Datei an die nächste Führungsstelle weiter.
+  alles als Sammel-PDF oder Datei an die nächste Führungsstelle weiter. Die
+  gemeldeten Einheiten lassen sich als Karten oder als Tabelle lesen — die
+  Tabelle zeigt je Einheit eine Zeile mit Stärke, Verpflegung, Unterbringung und
+  Kraftstoff, sortiert nach jeder angeklickten Spalte, mit Summenzeile darunter;
+  Suche und Filter der Liste gelten für beide Sichten.
 - **Für die Schichtübergabe**: meldet eine Einheit neu, zeigt die App, was sich
   gegenüber ihrer letzten Meldung geändert hat — Stärke 12 → 9, Fahrzeug
   abgemeldet, Ruhezeit jetzt nötig. Die Sammel-PDF beginnt mit derselben

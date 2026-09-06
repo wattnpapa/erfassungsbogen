@@ -69,6 +69,18 @@ import { Auswahl } from "./schritte/bausteine";
 import { SeitenKopf } from "./seiten-kopf";
 import { frageJaNein, zeigeHinweis } from "./dialoge";
 import { TabellenScroll } from "./tabellen-scroll";
+import {
+  TABELLEN_SPALTEN,
+  gemerkteAnsicht,
+  merkeAnsicht,
+  tabellenSumme,
+  tabellenZeilen,
+  zeilenSortieren,
+  type EinheitenAnsicht,
+  type Sortierrichtung,
+  type TabellenSpalte,
+  type TabellenZeile,
+} from "./einheiten-tabelle";
 import { imWebBrowser } from "./nativ";
 import { fehlerText } from "./nachladen";
 
@@ -233,6 +245,8 @@ export function EinsatzDetail(props: {
   const [sortierung, setSortierung] = useState<EinheitenSortierung>("name");
   // "" = keine Einschränkung. Schlüssel siehe einheiten-liste.ts.
   const [quali, setQuali] = useState("");
+  // Karten oder Tabelle — geräteweit gemerkt (einheiten-tabelle.ts).
+  const [ansicht, setAnsicht] = useState<EinheitenAnsicht>(gemerkteAnsicht);
   const sum = aggregiere(einsatz.eintraege);
   const zugGruppen = aggregiereNachZug(einsatz.eintraege);
   // Alle gemeldeten Einheiten (neueste Revision je Einheit) — Grundlage für die
@@ -382,7 +396,33 @@ export function EinsatzDetail(props: {
       </div>
 
       <section className="karte">
-        <h2>Einheiten ({gefiltert ? `${kopf.length} von ${alleEinheiten.length}` : alleEinheiten.length})</h2>
+        <div className="kopfzeile">
+          <h2>Einheiten ({gefiltert ? `${kopf.length} von ${alleEinheiten.length}` : alleEinheiten.length})</h2>
+          {/* Zwei Sichten auf dieselbe (gesuchte, gefilterte, sortierte) Liste:
+              die Karten für die Arbeit an einer Einheit, die Tabelle für den
+              Vergleich über alle — „wer hat die meisten Kräfte?" ist an
+              Karten untereinander nicht zu beantworten. */}
+          {alleEinheiten.length > 0 && (
+            <span className="ansicht-umschalter" role="group" aria-label="Darstellung der Einheiten">
+              {([
+                { wert: "karten", label: "Karten" },
+                { wert: "tabelle", label: "Tabelle" },
+              ] as const).map((a) => (
+                <button
+                  key={a.wert}
+                  type="button"
+                  aria-pressed={ansicht === a.wert}
+                  onClick={() => {
+                    setAnsicht(a.wert);
+                    merkeAnsicht(a.wert);
+                  }}
+                >
+                  {a.label}
+                </button>
+              ))}
+            </span>
+          )}
+        </div>
         {/* Ab einer Handvoll Meldungen trägt die Liste allein nicht mehr — bei
             einer Großlage stehen hier 30–50 Einheiten. Bei einer einzigen
             Meldung wäre die Leiste nur Beiwerk, ab der zweiten steht sie
@@ -466,17 +506,19 @@ export function EinsatzDetail(props: {
             )}
           </p>
         )}
-        {kopf.map((e) => (
-          <EinheitKarte
-            key={e.einheitSchluessel}
-            einsatzId={einsatz.id}
-            kopf={e}
-            alle={einsatz.eintraege}
-            onGeaendert={onGeaendert}
-            qualifikation={quali}
-            qualifikationKurz={qualiKurz}
-          />
-        ))}
+        {ansicht === "tabelle" && kopf.length > 0 && <EinheitenTabelle meldungen={kopf} />}
+        {ansicht === "karten" &&
+          kopf.map((e) => (
+            <EinheitKarte
+              key={e.einheitSchluessel}
+              einsatzId={einsatz.id}
+              kopf={e}
+              alle={einsatz.eintraege}
+              onGeaendert={onGeaendert}
+              qualifikation={quali}
+              qualifikationKurz={qualiKurz}
+            />
+          ))}
       </section>
 
       <footer className="nav">
@@ -484,6 +526,162 @@ export function EinsatzDetail(props: {
       </footer>
     </main>
     </>
+  );
+}
+
+/**
+ * Einheitenliste als Tabelle: eine Zeile je Meldung, Spalten wie im
+ * CSV-Export der Übersicht, darunter eine Summenzeile über die anwesenden
+ * Zeilen der Auswahl.
+ *
+ * Gesucht und gefiltert wird oben in der Leiste — die Tabelle bekommt genau
+ * das Ergebnis. Zusätzlich sind die Spaltenköpfe Sortierknöpfe: das ist der
+ * Griff, den eine Tabelle mitbringt und eine Kartenliste nicht („welche
+ * Einheit meldet den größten Verpflegungsbedarf?"). Zahlen starten dabei
+ * absteigend — gefragt ist der größte Wert, nicht die Null.
+ */
+function EinheitenTabelle({ meldungen }: { meldungen: MeldeEintrag[] }) {
+  // null = Reihenfolge der Liste (Sortierauswahl der Leiste) unverändert
+  // übernehmen. Erst ein Klick auf einen Spaltenkopf ordnet hier um.
+  const [spalte, setSpalte] = useState<TabellenSpalte | null>(null);
+  const [richtung, setRichtung] = useState<Sortierrichtung>("auf");
+  const zeilen = tabellenZeilen(meldungen);
+  const sortiert = spalte ? zeilenSortieren(zeilen, spalte, richtung) : zeilen;
+  const summe = tabellenSumme(zeilen);
+  const anwesende = zeilen.filter((z) => z.anwesend).length;
+
+  function sortierenNach(s: TabellenSpalte, zahl: boolean) {
+    if (spalte === s) {
+      setRichtung(richtung === "auf" ? "ab" : "auf");
+      return;
+    }
+    setSpalte(s);
+    setRichtung(zahl ? "ab" : "auf");
+  }
+
+  /** Summenzeile spaltenweise — dieselbe Reihenfolge wie die Datenzeilen. */
+  const summenWert: Record<TabellenSpalte, string | number> = {
+    einheit: `Summe (${anwesende} anwesend)`,
+    organisation: "",
+    zugEtikett: "",
+    fuehrer: summe.staerke.fuehrer,
+    unterfuehrer: summe.staerke.unterfuehrer,
+    mannschaft: summe.staerke.mannschaft,
+    gesamt: summe.staerke.gesamt,
+    verpflegung: summe.verpflegung.gesamt,
+    vegetarisch: summe.verpflegung.vegetarisch,
+    vegan: summe.verpflegung.vegan,
+    unterbringungM: summe.unterbringung.m,
+    unterbringungW: summe.unterbringung.w,
+    unterbringungD: summe.unterbringung.d,
+    diesel: summe.kraftstoff.dieselLiter,
+    benzin: summe.kraftstoff.benzinLiter,
+    gemisch: summe.kraftstoff.gemischLiter,
+    fahrzeuge: summe.fahrzeuge,
+    stand: "",
+  };
+
+  return (
+    <>
+      <TabellenScroll titel="Einheitenübersicht">
+        <table className="uebersicht einheiten-tabelle">
+          <caption className="nur-sr">
+            Gemeldete Einheiten mit Stärke, Verpflegung, Unterbringung und Kraftstoff
+          </caption>
+          <thead>
+            <tr>
+              {TABELLEN_SPALTEN.map((s) => (
+                <th
+                  key={s.schluessel}
+                  scope="col"
+                  className={s.zahl ? "zahl" : undefined}
+                  aria-sort={
+                    spalte === s.schluessel
+                      ? richtung === "auf"
+                        ? "ascending"
+                        : "descending"
+                      : "none"
+                  }
+                >
+                  <button
+                    type="button"
+                    className="spalten-sortierung"
+                    title={`Nach ${s.titel} sortieren`}
+                    onClick={() => sortierenNach(s.schluessel, s.zahl)}
+                  >
+                    <span aria-hidden="true">{s.kopf}</span>
+                    <span className="nur-sr">{s.titel}</span>
+                    {spalte === s.schluessel && (
+                      <span className="sortier-pfeil" aria-hidden="true">
+                        {richtung === "auf" ? "▲" : "▼"}
+                      </span>
+                    )}
+                  </button>
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {sortiert.map((z) => (
+              <TabellenZeileZelle key={z.eintrag.einheitSchluessel} zeile={z} />
+            ))}
+          </tbody>
+          {/* Die Summe zählt nur die anwesenden Zeilen der Auswahl — abgerückte
+              stehen in der Tabelle, aber in keiner Summe, genau wie in der
+              Stärkeleiste oben. */}
+          <tfoot>
+            <tr>
+              {TABELLEN_SPALTEN.map((s) => (
+                <td key={s.schluessel} className={s.zahl ? "zahl" : undefined}>
+                  {summenWert[s.schluessel]}
+                </td>
+              ))}
+            </tr>
+          </tfoot>
+        </table>
+      </TabellenScroll>
+      <p className="hinweis">
+        Spaltenkopf anklicken sortiert die Tabelle. Details, Historie und Aktionen einer Einheit
+        stehen in der Kartenansicht.
+      </p>
+    </>
+  );
+}
+
+/** Eine Datenzeile — abgerückte Meldungen bleiben sichtbar, aber durchgestrichen. */
+function TabellenZeileZelle({ zeile: z }: { zeile: TabellenZeile }) {
+  return (
+    <tr className={z.anwesend ? undefined : "gestrichen"}>
+      <th scope="row">
+        {z.einheit}
+        {z.eintrag.bogen.uebung ? <span className="uebung-badge">ÜBUNG</span> : null}
+        {z.teilEtikett ? <span className="teil-badge">{z.teilEtikett}</span> : null}
+        {!z.anwesend && (
+          <span className="muster-sub">
+            {z.eintrag.status === MeldeStatus.ABGERUECKT ? "abgerückt" : "zusammengeführt"}
+          </span>
+        )}
+      </th>
+      <td>{z.organisation}</td>
+      <td>{z.zugEtikett}</td>
+      <td className="zahl">{z.fuehrer}</td>
+      <td className="zahl">{z.unterfuehrer}</td>
+      <td className="zahl">{z.mannschaft}</td>
+      <td className="zahl">{z.gesamt}</td>
+      <td className="zahl">{z.verpflegung}</td>
+      <td className="zahl">{z.vegetarisch}</td>
+      <td className="zahl">{z.vegan}</td>
+      <td className="zahl">{z.unterbringungM}</td>
+      <td className="zahl">{z.unterbringungW}</td>
+      <td className="zahl">{z.unterbringungD}</td>
+      <td className="zahl">{z.diesel}</td>
+      <td className="zahl">{z.benzin}</td>
+      <td className="zahl">{z.gemisch}</td>
+      {/* Zahl plus Typen: „3" beantwortet die Summenfrage, „GKW / MzKW" die
+          nach dem, was tatsächlich dasteht. */}
+      <td className="zahl" title={z.fahrzeugTypen}>{z.fahrzeuge}</td>
+      <td>{z.stand}</td>
+    </tr>
   );
 }
 

@@ -154,7 +154,7 @@ Zusammenspiel:
 | [vorlagen.feature](../features/vorlagen.feature) | Vorlage speichern, umbenennen, Papierkorb, Musterung (Abwesende streichen) |
 | [einsatz-sammlung.feature](../features/einsatz-sammlung.feature) | Einsatz anlegen (Dialog, Pflichtfeld, Enter, Esc, Abbruch), Bogen aufnehmen |
 | [einsatz-detail.feature](../features/einsatz-detail.feature) | Summen, Vollansicht, Abrücken, Zug-Etikett, Aufteilen/Zusammenführen, Folgemeldung/Historie/Diff, Sammel-PDF, CSV (Übersicht und alle Daten), Papierkorb |
-| [einheiten-liste.feature](../features/einheiten-liste.feature) | Einheitenliste einer Großlage: Suche, Sortierung, Qualifikationsfilter — und dass die Summen davon unberührt bleiben |
+| [einheiten-liste.feature](../features/einheiten-liste.feature) | Einheitenliste einer Großlage: Suche, Sortierung, Qualifikationsfilter, Tabellensicht mit Spaltensortierung und Summenzeile — und dass die Summen des Einsatzes davon unberührt bleiben |
 | [daten-und-anzeige.feature](../features/daten-und-anzeige.feature) | Anzeigemodus Dunkel/Feld/Nacht (auch bei dunklem Systemdesign und mit Android-Anmutung), Datensicherung, „Alle Daten löschen", Pflichtangaben, Beispielbögen, kaputter Link |
 
 Der Prüfstand steht in [features/support/haken.ts](../features/support/haken.ts):
