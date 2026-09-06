@@ -60,6 +60,7 @@ import { einsatzDetailCsvInhalt } from "./bogen-csv";
 import { QrScannerWeb } from "./qr-scanner-web";
 import { TeilQuittung, fehlendeTeile, fehltNochSatz } from "./teil-quittung";
 import { qrAusBild } from "./qr-bild";
+import { istBilddatei, qrStapelLesen, stapelBericht as stapelBerichtZeilen } from "./qr-stapel";
 import { entwurfLaden, entwurfSpeichern, entwurfVerwerfen } from "./entwurf";
 import { SeitenKopf } from "./seiten-kopf";
 import { AnzeigeSchalter } from "./anzeige-schalter";
@@ -398,6 +399,11 @@ function AppInhalt() {
   };
   // Auswahl „In Einsatz aufnehmen" aus der Übersicht heraus.
   const einsatzWahlDialog = useRef<HTMLDialogElement>(null);
+  // Stapel-Einlesen vieler QR-Bilder: laufender Stand und der Bericht danach.
+  // Der Abbruch als Ref, weil die laufende Schleife sonst den alten Stand sieht.
+  const [stapelStand, setStapelStand] = useState("");
+  const [stapelBericht, setStapelBericht] = useState<string[]>([]);
+  const stapelAbbruchRef = useRef(false);
   // Kiosk-Scan (Meldekopf): Zähler der in diesem Durchgang aufgenommenen Bögen.
   const kioskZaehlerRef = useRef(0);
   // Segmentierung: gesammelte Teile eines großen Bogens (Zustand als Ref, damit
@@ -1035,6 +1041,58 @@ function AppInhalt() {
   }
 
   /**
+   * Stapel QR-Bilder in den offenen Einsatz aufnehmen: eine Mehrfachauswahl
+   * oder ein ganzer Ordner voller abfotografierter/gescannter Bögen.
+   *
+   * Bewusst ohne Rückfrage je Bogen: die Einzelaufnahme fragt bei bekannter
+   * Einheit „neue Fassung oder eigene Einheit?" — bei dreißig Bildern wären das
+   * dreißig Dialoge. Der Stapel entscheidet wie der PDF-/JSON-Import: gleicher
+   * Inhalt wird übersprungen, neuer Inhalt derselben Einheit stapelt sich als
+   * Fassung in die Historie. Beides ist nachträglich korrigierbar, ein
+   * weggeklickter Dialog nicht.
+   */
+  async function importiereQrBilder(zielId: string, dateien: File[]) {
+    const bilder = dateien.filter((d) => istBilddatei(d.name, d.type));
+    if (bilder.length === 0) {
+      setFehler("In der Auswahl sind keine Bilddateien.");
+      return;
+    }
+    setFehler("");
+    setMeldung("");
+    setStapelBericht([]);
+    stapelAbbruchRef.current = false;
+    setStapelStand(`0 von ${bilder.length} Bildern gelesen…`);
+    try {
+      const erg = await qrStapelLesen(
+        bilder.map((d) => ({ name: d.name, blob: d })),
+        {
+          beiFortschritt: (fertig, gesamt) => setStapelStand(`${fertig} von ${gesamt} Bildern gelesen…`),
+          abbruch: () => stapelAbbruchRef.current,
+        },
+      );
+      let neu = 0;
+      let uebersprungen = 0;
+      for (const fund of erg.funde) {
+        // Signatur wie beim Einzelscan prüfen und den Rohpayload mitspeichern —
+        // sonst verlöre der Meldekopf beim Weiterreichen die fremde Signatur.
+        const status = fund.payload ? await signaturVonPayload(fund.payload) : null;
+        const r = meldungHinzufuegen(zielId, fund.bogen, {
+          quelle: "scan",
+          signatur: status ? alsEintragSignatur(status) : undefined,
+          herkunft: fund.payload ? base64UrlKodieren(fund.payload) : undefined,
+        });
+        if (r) r.neu ? neu++ : uebersprungen++;
+      }
+      einsaetzeNeuLaden();
+      setStapelBericht(stapelBerichtZeilen(erg, neu, uebersprungen));
+    } catch (e) {
+      setFehler(`Stapel einlesen: ${fehlerText(e)}`);
+    } finally {
+      setStapelStand("");
+    }
+  }
+
+  /**
    * Ganze Einsatz-Sammlung aus einer Datei importieren (Schichtübergabe/Backup).
    * Akzeptiert die Sammel-PDF (dort ist die komplette Sammlung inkl. Zügen,
    * Status und Historie eingebettet) ebenso wie eine JSON-Datei.
@@ -1099,6 +1157,7 @@ function AppInhalt() {
           onScannen={() => scanneInEinsatz(offenerEinsatz.id)}
           onManuell={() => manuellInEinsatz(offenerEinsatz.id)}
           onDateiImport={(datei) => importiereBoegen(offenerEinsatz.id, datei)}
+          onBilderImport={(dateien) => void importiereQrBilder(offenerEinsatz.id, dateien)}
           onExport={() => exportiereEinsatz(offenerEinsatz)}
           onCsvExport={() => exportiereEinsatzCsv(offenerEinsatz)}
           onCsvDetailExport={() => exportiereEinsatzCsvDetail(offenerEinsatz)}
@@ -1110,6 +1169,30 @@ function AppInhalt() {
           <p className={fehler ? "fehler" : "meldung"} role="status" style={{ textAlign: "center" }}>
             {fehler || meldung}
           </p>
+        )}
+        {/* Stapel läuft: Fortschritt und Abbruch. Dreißig Handyfotos dauern
+            spürbar — ohne Stand wirkt die App hängengeblieben, ohne Abbruch ist
+            ein versehentlich gewählter Bilderordner nicht mehr zu stoppen. */}
+        {stapelStand && (
+          <p className="meldung" role="status" style={{ textAlign: "center" }}>
+            {stapelStand}{" "}
+            <button type="button" onClick={() => (stapelAbbruchRef.current = true)}>Abbrechen</button>
+          </p>
+        )}
+        {/* Der Bericht bleibt stehen, bis er geschlossen wird: was NICHT
+            ankam (Bild ohne Code, fehlendes Teil eines mehrteiligen Bogens),
+            muss man abarbeiten können — eine verschwindende Meldung reicht
+            dafür nicht. */}
+        {stapelBericht.length > 0 && (
+          <section className="karte">
+            <h2>Stapel eingelesen</h2>
+            <ul>
+              {stapelBericht.map((zeile) => (
+                <li key={zeile}>{zeile}</li>
+              ))}
+            </ul>
+            <button type="button" onClick={() => setStapelBericht([])}>Schließen</button>
+          </section>
         )}
         {/* Kiosk-Scan: die aufgenommenen Bögen bleiben im Einsatz — der Knopf
             beendet nur den Durchgang, deshalb „Fertig". Liegen aber Teile eines

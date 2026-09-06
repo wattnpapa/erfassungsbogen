@@ -68,6 +68,12 @@ Wer noch abwägt: [Papier oder digital?](https://erfassungsbogen.app/papier-oder
   Tabelle zeigt je Einheit eine Zeile mit Stärke, Verpflegung, Unterbringung und
   Kraftstoff, sortiert nach jeder angeklickten Spalte, mit Summenzeile darunter;
   Suche und Filter der Liste gelten für beide Sichten.
+- **Viele QR-Bilder auf einmal**: kommen die Bögen als Fotos oder Screenshots
+  herein (Messenger, Mail, Ordner auf dem Rechner), liest der Meldekopf sie im
+  Stapel ein — Mehrfachauswahl auf jedem Gerät, am Rechner auch ein ganzer
+  Ordner. Mehrteilige Bögen findet die App über die Bilder hinweg zusammen, und
+  am Ende steht ein Bericht: was aufgenommen wurde, was doppelt war und welches
+  Teil noch fehlt.
 - **Für die Schichtübergabe**: meldet eine Einheit neu, zeigt die App, was sich
   gegenüber ihrer letzten Meldung geändert hat — Stärke 12 → 9, Fahrzeug
   abgemeldet, Ruhezeit jetzt nötig. Die Sammel-PDF beginnt mit derselben

@@ -226,6 +226,42 @@ export function EinsatzListe(props: {
 
 // ---------------------------------------------------------------- Einsatzdetail
 
+/**
+ * Kann dieses Gerät einen ganzen Ordner auswählen? Nur der Rechner: Handy- und
+ * Tablet-Browser kennen das Attribut zwar, öffnen aber trotzdem den normalen
+ * Dateipicker — ein Knopf, der etwas anderes tut als er verspricht, ist im Feld
+ * schlimmer als kein Knopf. Der Zeigergerät-Test trennt beide Welten
+ * zuverlässiger als eine Browser-Erkennung.
+ */
+function ordnerAuswahlMoeglich(): boolean {
+  if (typeof HTMLInputElement === "undefined" || !("webkitdirectory" in HTMLInputElement.prototype)) return false;
+  return typeof matchMedia === "function" && matchMedia("(pointer: fine)").matches;
+}
+
+/**
+ * Dateifeld für die Ordnerauswahl. `webkitdirectory` ist kein React-Attribut und
+ * wird deshalb nachträglich gesetzt.
+ */
+function OrdnerFeld(props: { onDateien: (dateien: File[]) => void }) {
+  const feld = useRef<HTMLInputElement>(null);
+  useEffect(() => {
+    feld.current?.setAttribute("webkitdirectory", "");
+  }, []);
+  return (
+    <input
+      ref={feld}
+      type="file"
+      multiple
+      className="nur-sr"
+      onChange={(e) => {
+        const dateien = [...(e.target.files ?? [])];
+        e.target.value = "";
+        if (dateien.length > 0) props.onDateien(dateien);
+      }}
+    />
+  );
+}
+
 export function EinsatzDetail(props: {
   einsatz: Einsatzsammlung;
   onZurueck: () => void;
@@ -233,6 +269,8 @@ export function EinsatzDetail(props: {
   onScannen: () => void;
   onManuell: () => void;
   onDateiImport: (datei: File) => void;
+  /** Stapel abfotografierter/gescannter QR-Codes (Mehrfachauswahl oder Ordner). */
+  onBilderImport: (dateien: File[]) => void;
   onExport: () => void;
   onCsvExport: () => void;
   onCsvDetailExport: () => void;
@@ -240,7 +278,7 @@ export function EinsatzDetail(props: {
   onSammelPdf: () => void;
   onGeloescht: () => void;
 }) {
-  const { einsatz, onZurueck, onGeaendert, onScannen, onManuell, onDateiImport, onExport, onCsvExport, onCsvDetailExport, onOldenburgExport, onSammelPdf, onGeloescht } = props;
+  const { einsatz, onZurueck, onGeaendert, onScannen, onManuell, onDateiImport, onBilderImport, onExport, onCsvExport, onCsvDetailExport, onOldenburgExport, onSammelPdf, onGeloescht } = props;
   const [suche, setSuche] = useState("");
   const [sortierung, setSortierung] = useState<EinheitenSortierung>("name");
   // "" = keine Einschränkung. Schlüssel siehe einheiten-liste.ts.
@@ -358,6 +396,29 @@ export function EinsatzDetail(props: {
             }}
           />
         </label>
+        {/* Stapelweg: viele abfotografierte/gescannte QR-Codes auf einmal. Zwei
+            Knöpfe statt einem, weil ein Dateifeld entweder Dateien ODER einen
+            Ordner auswählen lässt — und Ordner kennt nur der Rechner. */}
+        <label className="datei-knopf" title="Mehrere Fotos oder Screenshots von QR-Codes auf einmal einlesen — auch mehrteilige Bögen, deren Teile auf mehrere Bilder verteilt sind.">
+          Viele QR-Bilder…
+          <input
+            type="file"
+            accept="image/*"
+            multiple
+            className="nur-sr"
+            onChange={(e) => {
+              const dateien = [...(e.target.files ?? [])];
+              e.target.value = "";
+              if (dateien.length > 0) onBilderImport(dateien);
+            }}
+          />
+        </label>
+        {ordnerAuswahlMoeglich() && (
+          <label className="datei-knopf" title="Einen ganzen Ordner mit QR-Bildern einlesen (Unterordner eingeschlossen). Nicht-Bilder werden übergangen.">
+            Ordner mit QR-Bildern…
+            <OrdnerFeld onDateien={onBilderImport} />
+          </label>
+        )}
       </div>
 
       {/* Zweite Reihe: was aus der Sammlung herausgeht. Die erste nimmt Bögen

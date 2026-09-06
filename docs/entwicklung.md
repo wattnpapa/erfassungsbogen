@@ -259,6 +259,18 @@ localStorage-Hülle getrennt und unit-getestet.
   anwesenden Einheiten.
 - [src/app/einsatz-transport.ts](../src/app/einsatz-transport.ts) — Export/Import
   als JSON-Datei sowie Import aus dem in Sammel-PDFs eingebetteten JSON (pako).
+- [src/app/qr-stapel.ts](../src/app/qr-stapel.ts) — viele QR-Bilder auf einmal
+  (Mehrfachauswahl oder Ordner). Liest die Dateien nacheinander (parallel wären
+  n entpackte Bitmaps gleichzeitig im Speicher), sammelt Teile mehrteiliger
+  Bögen über den ganzen Stapel hinweg nach ihrer Bogen-Kennung — die Reihenfolge
+  im Ordner sagt nichts — und liefert einen Bericht statt einer Erfolgsmeldung:
+  Funde, Dateien ohne Bogen und unvollständige Sätze samt fehlender Teilnummern.
+  Nimmt im Gegensatz zum Einzelscan bewusst keine Rückfrage je Bogen entgegen
+  (dreißig Bilder wären dreißig Dialoge): gleicher Inhalt wird übersprungen,
+  neuer Inhalt derselben Einheit stapelt sich als Fassung in die Historie.
+  Ordnerauswahl gibt es nur am Rechner — Mobilbrowser kennen `webkitdirectory`,
+  öffnen aber trotzdem den Dateipicker, deshalb der Zeigergerät-Test in
+  [src/app/einsaetze-ui.tsx](../src/app/einsaetze-ui.tsx).
 - [src/app/einsatz-csv.ts](../src/app/einsatz-csv.ts) — CSV-Übersicht für die
   Lagekarte: eine Zeile je anwesender Einheit plus Summenzeile.
 - [src/app/bogen-csv.ts](../src/app/bogen-csv.ts) — CSV mit **allen** Feldern,

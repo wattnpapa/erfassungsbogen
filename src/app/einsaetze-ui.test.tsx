@@ -42,6 +42,7 @@ function buehne(namen: string[] = ["Wardenburg"]) {
   for (const n of namen) meldungHinzufuegen(angelegt.id, bogenMitName(n));
   const einsatz = einsaetzeLaden().find((s) => s.id === angelegt.id)!;
   const geaendert = vi.fn();
+  const bilderImport = vi.fn<(dateien: File[]) => void>();
   render(
     <>
       <EinsatzDetail
@@ -51,6 +52,7 @@ function buehne(namen: string[] = ["Wardenburg"]) {
         onScannen={() => {}}
         onManuell={() => {}}
         onDateiImport={() => {}}
+        onBilderImport={bilderImport}
         onExport={() => {}}
         onCsvExport={() => {}}
         onCsvDetailExport={() => {}}
@@ -61,7 +63,7 @@ function buehne(namen: string[] = ["Wardenburg"]) {
       <Dialogschicht />
     </>,
   );
-  return { einsatzId: angelegt.id, geaendert };
+  return { einsatzId: angelegt.id, geaendert, bilderImport };
 }
 
 describe("Meldung aus dem Einsatz entfernen", () => {
@@ -222,5 +224,35 @@ describe("Einheiten als Tabelle", () => {
 
     const tabelle = screen.getByRole("table", { name: /Gemeldete Einheiten/ });
     expect(tabelle.querySelector("tfoot")!.textContent).toContain("Summe (2 anwesend)");
+  });
+});
+
+describe("Stapel QR-Bilder aufnehmen", () => {
+  beforeEach(() => {
+    localStorage.clear();
+  });
+
+  it("reicht die ganze Mehrfachauswahl weiter", async () => {
+    const nutzer = userEvent.setup();
+    const { bilderImport } = buehne();
+
+    const feld = screen.getByLabelText("Viele QR-Bilder…") as HTMLInputElement;
+    expect(feld.multiple).toBe(true);
+    await nutzer.upload(feld, [
+      new File(["a"], "bogen-1.png", { type: "image/png" }),
+      new File(["b"], "bogen-2.png", { type: "image/png" }),
+    ]);
+
+    expect(bilderImport).toHaveBeenCalledTimes(1);
+    expect(bilderImport.mock.calls[0]![0].map((d) => d.name)).toEqual(["bogen-1.png", "bogen-2.png"]);
+    // Zurückgesetzt, sonst löst dieselbe Auswahl beim zweiten Mal nichts aus.
+    expect(feld.value).toBe("");
+  });
+
+  it("bietet die Ordnerauswahl nur an, wo es sie gibt", () => {
+    // jsdom meldet kein Zeigergerät — genau wie ein Telefon, wo der Knopf
+    // etwas anderes täte als er verspricht.
+    buehne();
+    expect(screen.queryByLabelText("Ordner mit QR-Bildern…")).toBeNull();
   });
 });
