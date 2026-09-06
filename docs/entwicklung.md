@@ -7,7 +7,9 @@ der [README](../README.md).
 
 Assistent (Einheit → Einsatz → Personal → Fahrzeuge → Sofortbedarf) mit
 Gesamtübersicht (alles nachbearbeitbar), PDF-Export im Papier-Layout mit
-QR-Code auf der letzten Seite, Bogen speichern/laden als JSON-Datei,
+QR-Code auf der letzten Seite, Bogen speichern als PDF und laden aus der PDF
+(eingebettetes JSON, ersatzweise der QR-Code darin; die blanke JSON-Datei bleibt
+als Altweg lesbar),
 QR-Scannen per Kamera (nativ über Capacitor-Plugin, im Browser/Electron per
 Webcam). Alles läuft clientseitig (Codec + pako + qrcode + pdfmake), kein
 Server nötig. Code: [index.html](../index.html), [src/app/](../src/app/).
@@ -271,6 +273,18 @@ localStorage-Hülle getrennt und unit-getestet.
   Ordnerauswahl gibt es nur am Rechner — Mobilbrowser kennen `webkitdirectory`,
   öffnen aber trotzdem den Dateipicker, deshalb der Zeigergerät-Test in
   [src/app/einsaetze-ui.tsx](../src/app/einsaetze-ui.tsx).
+- [src/app/pdf-stroeme.ts](../src/app/pdf-stroeme.ts) — Datenströme einer PDF
+  roh lesen (ohne PDF-Parser); Grundlage für den Import aus PDFs.
+- [src/app/qr-boegen.ts](../src/app/qr-boegen.ts) — QR-Texte → Bögen ohne
+  laufenden Scan: Teile werden über ihre Prüfsumme gruppiert (Reihenfolge egal),
+  unvollständige Sätze fallen raus. Signaturstatus und roher Payload reisen mit,
+  damit eine importierte Fremdmeldung weitergereicht werden kann.
+- [src/app/pdf-bilder.ts](../src/app/pdf-bilder.ts) /
+  [src/app/pdf-qr.ts](../src/app/pdf-qr.ts) — Rückfallebene beim Laden einer
+  PDF **ohne** eingebettetes JSON: die Bild-Objekte der PDF als Pixel lesen und
+  den QR-Code darin durch denselben Decoder schicken wie Kamera und Foto.
+  Bewusst ohne PDF-Renderer; abgedeckt sind die Bildformate, die pdfmake für
+  unsere QR-Codes erzeugt (8 Bit, DeviceRGB/DeviceGray, FlateDecode).
 - [src/app/einsatz-csv.ts](../src/app/einsatz-csv.ts) — CSV-Übersicht für die
   Lagekarte: eine Zeile je anwesender Einheit plus Summenzeile.
 - [src/app/bogen-csv.ts](../src/app/bogen-csv.ts) — CSV mit **allen** Feldern,

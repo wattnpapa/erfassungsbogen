@@ -48,7 +48,23 @@ vi.mock("./nativ", async () => {
   };
 });
 
+// QR-Auswertung einer PDF: im Test steuerbar, damit der Rückfallweg prüfbar
+// ist, ohne einen echten QR-Code zu rendern und zu dekodieren (eigene Tests:
+// pdf-bilder.test.ts).
+const qrTexteAusPdf = vi.fn<(bytes: Uint8Array) => Promise<string[]>>(async () => []);
+vi.mock("./pdf-qr", () => ({ qrTexteAusPdfBytes: (bytes: Uint8Array) => qrTexteAusPdf(bytes) }));
+
 const { App, scanFehlertext } = await import("./app");
+
+/**
+ * Datei, die sich wie eine PDF anfasst: Name, MIME-Typ und — wo Inhalt
+ * mitgegeben wird — ein unkomprimierter Datenstrom, wie ihn unsere PDFs für
+ * den eingebetteten Bogen tragen (pdf-dokument.ts).
+ */
+function pdfDatei(eingebettet?: unknown): File {
+  const strom = eingebettet === undefined ? "" : `1 0 obj\n<< /Type /EmbeddedFile >>\nstream\n${JSON.stringify(eingebettet)}\nendstream\nendobj\n`;
+  return new File([`%PDF-1.4\n${strom}%%EOF\n`], "bogen.pdf", { type: "application/pdf" });
+}
 
 /** Vom Startbildschirm bis zum angegebenen Schritt klicken (0 = Einheit). */
 async function neuerBogenBis(nutzer: ReturnType<typeof userEvent.setup>, bisSchritt: number) {
@@ -813,5 +829,103 @@ describe("Handscanner in falscher Tastaturbelegung", () => {
     // damit die Einstellung am Scanner nicht dauerhaft falsch bleibt.
     expect(await screen.findByText(/Tastaturbelegung \(US\)/)).toBeDefined();
     expect(screen.getByText("Gesamtübersicht")).toBeDefined();
+  });
+});
+
+describe("Bogen aus einer PDF laden (Startseite, „Aus Datei laden“)", () => {
+  beforeEach(() => {
+    localStorage.clear();
+    qrTexteAusPdf.mockReset();
+    qrTexteAusPdf.mockResolvedValue([]);
+  });
+
+  it("öffnet den Bogen aus den eingebetteten Daten der PDF", async () => {
+    const nutzer = userEvent.setup();
+    render(<App />);
+    await nutzer.upload(screen.getByLabelText("Aus Datei laden…"), pdfDatei(bogenMitName("OV Papier-PDF")));
+    expect((await screen.findAllByText(/OV Papier-PDF/)).length).toBeGreaterThan(0);
+    // Ohne eingebettete Daten wäre der QR-Weg dran gewesen — hier nicht nötig.
+    expect(qrTexteAusPdf).not.toHaveBeenCalled();
+  });
+
+  it("wertet den QR-Code aus, wenn die PDF keine eingebetteten Daten trägt", async () => {
+    qrTexteAusPdf.mockResolvedValue([encodePayloadUrl(bogenMitName("OV Nur-QR"), browserKompressor)]);
+    const nutzer = userEvent.setup();
+    render(<App />);
+    await nutzer.upload(screen.getByLabelText("Aus Datei laden…"), pdfDatei());
+    expect((await screen.findAllByText(/OV Nur-QR/)).length).toBeGreaterThan(0);
+  });
+
+  it("setzt einen mehrteiligen QR-Code aus derselben PDF wieder zusammen", async () => {
+    const b = bogenMitName("OV Dreiteilig");
+    qrTexteAusPdf.mockResolvedValue(segmentPayloadUrls(encodePayload(b, browserKompressor), 3));
+    const nutzer = userEvent.setup();
+    render(<App />);
+    await nutzer.upload(screen.getByLabelText("Aus Datei laden…"), pdfDatei());
+    expect((await screen.findAllByText(/OV Dreiteilig/)).length).toBeGreaterThan(0);
+  });
+
+  it("erklärt verständlich, wenn in der PDF weder Daten noch ein QR-Code stecken", async () => {
+    const nutzer = userEvent.setup();
+    render(<App />);
+    await nutzer.upload(screen.getByLabelText("Aus Datei laden…"), pdfDatei());
+    expect(await screen.findByText(/kein Erfassungsbogen/i)).toBeTruthy();
+  });
+});
+
+describe("Bögen aus einer PDF in einen Einsatz übernehmen", () => {
+  beforeEach(() => {
+    localStorage.clear();
+    qrTexteAusPdf.mockReset();
+    qrTexteAusPdf.mockResolvedValue([]);
+  });
+
+  /** Anlege-Dialog des Einsatzes ausfüllen (dieselben Felder wie „Neuer Einsatz…"). */
+  async function einsatzAnlegen(nutzer: ReturnType<typeof userEvent.setup>, name: string) {
+    const dialog = await screen.findByRole("dialog", { name: "Neuen Einsatz anlegen" });
+    await nutzer.type(within(dialog).getByLabelText("Name"), name);
+    await nutzer.click(within(dialog).getByRole("button", { name: "Einsatz anlegen" }));
+  }
+
+  it("legt aus den QR-Codes einer PDF ohne Sammlung einen neuen Einsatz an", async () => {
+    qrTexteAusPdf.mockResolvedValue([
+      encodePayloadUrl(bogenMitName("OV Erster"), browserKompressor),
+      encodePayloadUrl(bogenMitName("OV Zweiter"), browserKompressor),
+    ]);
+    const nutzer = userEvent.setup();
+    render(<App />);
+
+    await nutzer.upload(screen.getByLabelText("Einsatz importieren…"), pdfDatei());
+    // Erst die Rückfrage („keine Sammlung — neuen Einsatz anlegen?"), dann der
+    // gewohnte Anlege-Dialog.
+    const frage = await screen.findByRole("dialog", { name: "Keine Einsatz-Sammlung in der Datei" });
+    expect(within(frage).getByText(/2 Bogen\/Bögen/)).toBeTruthy();
+    await nutzer.click(within(frage).getByRole("button", { name: "Einsatz anlegen" }));
+    await einsatzAnlegen(nutzer, "Hochwasser Weser");
+
+    expect(await screen.findByRole("heading", { level: 1, name: "Hochwasser Weser" })).toBeTruthy();
+    expect((await screen.findAllByText(/OV Erster/)).length).toBeGreaterThan(0);
+    expect((await screen.findAllByText(/OV Zweiter/)).length).toBeGreaterThan(0);
+  });
+
+  it("nimmt eine PDF ohne eingebettete Daten über ihren QR-Code in den offenen Einsatz auf", async () => {
+    qrTexteAusPdf.mockResolvedValue([encodePayloadUrl(bogenMitName("OV Nachzügler"), browserKompressor)]);
+    const nutzer = userEvent.setup();
+    render(<App />);
+
+    await nutzer.click(screen.getByRole("button", { name: "Neuer Einsatz…" }));
+    await einsatzAnlegen(nutzer, "Sturmflut");
+    await screen.findByRole("heading", { level: 1, name: "Sturmflut" });
+
+    await nutzer.upload(screen.getByLabelText("Dateien wählen…"), pdfDatei());
+
+    expect((await screen.findAllByText(/OV Nachzügler/)).length).toBeGreaterThan(0);
+  });
+
+  it("meldet verständlich, wenn in der PDF gar nichts Lesbares steckt", async () => {
+    const nutzer = userEvent.setup();
+    render(<App />);
+    await nutzer.upload(screen.getByLabelText("Einsatz importieren…"), pdfDatei());
+    expect(await screen.findByText(/weder eine Einsatz-Sammlung noch ein einzelner Bogen/)).toBeTruthy();
   });
 });

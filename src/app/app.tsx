@@ -54,7 +54,8 @@ import {
 } from "./einsaetze";
 import { ART_LABEL, EinsatzDetail, EinsatzListe } from "./einsaetze-ui";
 import { aktuelleMeldungen } from "./auswertung";
-import { boegenAusPdfBytes, einsatzAusDatei, einsatzAusPdfBytes, einsatzDateiInhalt } from "./einsatz-transport";
+import { boegenAusPdfBytes, einsatzAusDatei, einsatzAusPdfBytes, einsatzDateiInhalt, istPdfDatei } from "./einsatz-transport";
+import type { QrBogen } from "./qr-boegen";
 import { einsatzCsvInhalt } from "./einsatz-csv";
 import { einsatzDetailCsvInhalt } from "./bogen-csv";
 import { QrScannerWeb } from "./qr-scanner-web";
@@ -455,11 +456,21 @@ function AppInhalt() {
     setMeldung("");
   }
 
+  /**
+   * Bogen aus einer Datei öffnen. Der Regelfall ist heute die PDF, die die App
+   * selbst erzeugt: Sie trägt den Bogen als eingebettete Daten (wie eine
+   * E-Rechnung) und zusätzlich als QR-Code. Die blanke JSON-Datei bleibt
+   * lesbar, ist aber nur noch der Altweg — weitergereicht wird die PDF.
+   */
   async function ladeDatei(e: ChangeEvent<HTMLInputElement>) {
     const datei = e.target.files?.[0];
     e.target.value = "";
     if (!datei) return;
     try {
+      if (istPdfDatei(datei)) {
+        await ladePdfBogen(datei);
+        return;
+      }
       setBogen(await bogenLaden(datei));
       setzeEmpfang(null); // Datei-Import: kein signierter Transport
       setSchritt(UEBERSICHT);
@@ -468,6 +479,52 @@ function AppInhalt() {
     } catch (err) {
       setFehler(err instanceof Error ? err.message : String(err));
     }
+  }
+
+  /**
+   * PDF → Bogen, zwei Wege in dieser Reihenfolge:
+   *  1. eingebettete Daten (verlustfrei, enthält alles),
+   *  2. Rückfall: die QR-Codes der PDF auswerten — für Ausdrucke, die durch ein
+   *     fremdes Werkzeug gelaufen sind und ihre Anhänge verloren haben. Das ist
+   *     derselbe Weg wie beim Scannen, inklusive Signaturprüfung und mehrteiliger
+   *     Codes (die Teile stehen alle in derselben PDF).
+   */
+  async function ladePdfBogen(datei: File) {
+    const bytes = new Uint8Array(await datei.arrayBuffer());
+    const boegen = boegenAusPdfBytes(bytes);
+    if (boegen.length > 0) {
+      const b = boegen[0]!;
+      setBogen(b);
+      setzeEmpfang(null); // Datei-Import: kein signierter Transport
+      setSchritt(UEBERSICHT);
+      setZeigeStart(false);
+      setFehler("");
+      // Sammel-PDF eines Meldekopfs: hier lässt sich nur EIN Bogen öffnen —
+      // wer alle will, ist beim Einsatz-Import richtig, statt die PDF als
+      // „ging nicht" abzulegen.
+      setMeldung(
+        boegen.length > 1
+          ? `Die PDF enthält ${boegen.length} Bögen — geöffnet ist „${einheitAnzeigename(b.einheit)}". Alle auf einmal: „Einsatz importieren…".`
+          : "",
+      );
+      return;
+    }
+    // Dynamisch: die QR-Auswertung zieht den Decoder (ZXing als WebAssembly)
+    // nach — der gehört nicht ins Start-Bundle, sondern erst in den Rückfall.
+    const { qrTexteAusPdfBytes } = await import("./pdf-qr");
+    const texte = await qrTexteAusPdfBytes(bytes);
+    if (texte.length === 0) {
+      throw new Error(
+        "In dieser PDF steckt kein Erfassungsbogen — weder eingebettete Daten noch ein lesbarer QR-Code. " +
+          "Stammt die PDF aus einem Scanner (abfotografiertes Papier), hilft „QR-Code scannen…“ bzw. ein Foto des Codes.",
+      );
+    }
+    for (const text of texte) {
+      // Mehrteilige Bögen: jeder Teil wandert in denselben Sammelstand wie beim
+      // Scannen; fertig ist es, sobald ein Teil den Bogen vervollständigt.
+      if (await uebernehmeText(text, "Der QR-Code in der PDF enthält keinen gültigen Erfassungsbogen.")) return;
+    }
+    // Unvollständig: der Fortschritt („es fehlt noch Teil x") steht bereits.
   }
 
   /**
@@ -1009,6 +1066,52 @@ function AppInhalt() {
   }
 
   /**
+   * Bögen aus einer Datei lesen — für die Aufnahme in einen Einsatz. Bei einer
+   * PDF zuerst die eingebetteten Daten, ersatzweise die QR-Codes darin (der
+   * Rückfallweg, siehe {@link ladePdfBogen}); sonst JSON. Der Signaturstatus
+   * reist beim QR-Weg mit, damit der Meldekopf die fremde Meldung später mit
+   * erhaltener Original-Signatur weiterreichen kann.
+   */
+  async function boegenAusDatei(datei: File): Promise<QrBogen[]> {
+    const ohneNachweis = (boegen: Erfassungsbogen[]): QrBogen[] =>
+      boegen.map((bogen) => ({ bogen, signatur: { zustand: "unsigniert" } as SignaturStatus, herkunft: null }));
+    if (!istPdfDatei(datei)) {
+      const daten = JSON.parse(await datei.text());
+      return ohneNachweis(Array.isArray(daten) ? daten : [daten]);
+    }
+    const bytes = new Uint8Array(await datei.arrayBuffer());
+    const eingebettet = boegenAusPdfBytes(bytes);
+    if (eingebettet.length > 0) return ohneNachweis(eingebettet);
+    // Dynamisch: die QR-Auswertung zieht den Decoder (ZXing als WebAssembly)
+    // nach — der gehört nicht ins Start-Bundle, sondern erst in den Rückfall.
+    const { qrTexteAusPdfBytes } = await import("./pdf-qr");
+    const { boegenAusQrTexten } = await import("./qr-boegen");
+    return boegenAusQrTexten(await qrTexteAusPdfBytes(bytes));
+  }
+
+  /**
+   * Gefundene Bögen in eine Sammlung schreiben (Dedupe über die Eintrags-ID).
+   * Der Aufrufer lädt die Einsätze neu — beim Stapel erst nach der letzten Datei.
+   */
+  function boegenAufnehmen(zielId: string, gefunden: QrBogen[]): { neu: number; uebersprungen: number } {
+    let neu = 0;
+    let uebersprungen = 0;
+    for (const { bogen: b, signatur, herkunft } of gefunden) {
+      try {
+        const r = meldungHinzufuegen(zielId, b, {
+          quelle: "pdf-import",
+          signatur: alsEintragSignatur(signatur),
+          herkunft: herkunft ? base64UrlKodieren(herkunft) : undefined,
+        });
+        if (r) r.neu ? neu++ : uebersprungen++;
+      } catch {
+        /* ungültiger Bogen — überspringen */
+      }
+    }
+    return { neu, uebersprungen };
+  }
+
+  /**
    * Bögen aus JSON-/PDF-Dateien in den offenen Einsatz aufnehmen (Bulk, mit
    * Dedupe). Mehrere Dateien auf einmal, weil der Einlese-Knopf sie gemeinsam
    * anbietet: eine Meldung über den ganzen Stapel liest sich besser als eine je
@@ -1021,21 +1124,9 @@ function AppInhalt() {
     const kaputt: string[] = [];
     for (const datei of dateien) {
       try {
-        let boegen: Erfassungsbogen[];
-        if (datei.name.toLowerCase().endsWith(".pdf") || datei.type === "application/pdf") {
-          boegen = boegenAusPdfBytes(new Uint8Array(await datei.arrayBuffer()));
-        } else {
-          const daten = JSON.parse(await datei.text());
-          boegen = Array.isArray(daten) ? daten : [daten];
-        }
-        for (const b of boegen) {
-          try {
-            const r = meldungHinzufuegen(zielId, b, { quelle: "pdf-import" });
-            if (r) r.neu ? neu++ : uebersprungen++;
-          } catch {
-            /* ungültiger Bogen — überspringen */
-          }
-        }
+        const r = boegenAufnehmen(zielId, await boegenAusDatei(datei));
+        neu += r.neu;
+        uebersprungen += r.uebersprungen;
       } catch (e) {
         kaputt.push(`${datei.name} (${fehlerText(e)})`);
       }
@@ -1046,9 +1137,38 @@ function AppInhalt() {
       neu + uebersprungen === 0
         ? kaputt.length > 0
           ? ""
-          : "Keine Bögen in der Datei gefunden."
+          : "Keine Bögen in der Datei gefunden — weder eingebettete Daten noch ein lesbarer QR-Code."
         : `${neu} Bogen/Bögen aufgenommen${uebersprungen ? `, ${uebersprungen} bereits vorhanden` : ""}.`,
     );
+  }
+
+  /**
+   * PDF ohne gespeicherte Sammlung (Einzelbogen, ältere oder fremd erzeugte
+   * Sammel-PDF): Die Bögen selbst stecken trotzdem drin — eingebettet oder als
+   * QR-Code. Statt den Import abzuweisen, wird daraus ein neuer Einsatz
+   * angelegt; das ist am Meldekopf der eigentliche Zweck („da kommt ein
+   * Ausdruck, mach was draus").
+   */
+  async function boegenAlsNeuerEinsatz(datei: File): Promise<boolean> {
+    const gefunden = await boegenAusDatei(datei);
+    if (gefunden.length === 0) return false;
+    const weiter = await frageJaNein({
+      titel: "Keine Einsatz-Sammlung in der Datei",
+      text:
+        `Die Datei enthält ${gefunden.length} Bogen/Bögen, aber keine gespeicherte Sammlung ` +
+        "(Einzelbogen oder ältere Sammel-PDF). Dafür einen neuen Einsatz anlegen?",
+      ok: "Einsatz anlegen",
+    });
+    if (!weiter) return true; // bewusst abgelehnt — kein Fehler
+    const s = await einsatzErfragen();
+    if (!s) return true;
+    const { neu, uebersprungen } = boegenAufnehmen(s.id, gefunden);
+    einsaetzeNeuLaden();
+    setFehler("");
+    setMeldung(`Einsatz „${s.name}" angelegt — ${neu} Bogen/Bögen aufgenommen${uebersprungen ? `, ${uebersprungen} bereits vorhanden` : ""}.`);
+    setZeigeStart(false);
+    setOffenerEinsatzId(s.id);
+    return true;
   }
 
   /**
@@ -1114,18 +1234,25 @@ function AppInhalt() {
     if (!datei) return;
     try {
       let s: Einsatzsammlung;
-      if (datei.name.toLowerCase().endsWith(".pdf") || datei.type === "application/pdf") {
+      if (istPdfDatei(datei)) {
         const gefunden = einsatzAusPdfBytes(new Uint8Array(await datei.arrayBuffer()));
         if (!gefunden) {
+          if (await boegenAlsNeuerEinsatz(datei)) return;
           setFehler(
-            "In dieser PDF steckt keine komplette Einsatz-Sammlung (ältere Sammel-PDF oder Einzelbogen). " +
-              "Einzelne Bögen lassen sich im geöffneten Einsatz über „Bögen einlesen…“ aufnehmen.",
+            "In dieser PDF steckt weder eine Einsatz-Sammlung noch ein einzelner Bogen — " +
+              "es sind keine eingebetteten Daten und kein lesbarer QR-Code darin.",
           );
           return;
         }
         s = gefunden;
       } else {
-        s = einsatzAusDatei(await datei.text());
+        try {
+          s = einsatzAusDatei(await datei.text());
+        } catch (err) {
+          // Keine Sammlung, aber vielleicht ein Bogen (oder mehrere) als JSON.
+          if (await boegenAlsNeuerEinsatz(datei)) return;
+          throw err;
+        }
       }
       const r = einsatzImportieren(s);
       einsaetzeNeuLaden();
@@ -1332,7 +1459,7 @@ function AppInhalt() {
                   mit der Maus bedienbar. */}
               <label className="datei-knopf">
                 Aus Datei laden…
-                <input type="file" accept=".json,application/json" onChange={ladeDatei} className="nur-sr" />
+                <input type="file" accept=".pdf,application/pdf,.json,application/json" onChange={ladeDatei} className="nur-sr" />
               </label>
             </div>
           </section>

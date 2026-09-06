@@ -4,16 +4,16 @@
  *
  * PDF-Import bewusst OHNE PDF-Parser-Abhängigkeit: unsere Bögen liegen in der
  * PDF als eingebettetes JSON (ZUGFeRD-artig, siehe pdf-dokument.ts). Wir
- * durchsuchen die PDF nach Datenströmen, entpacken sie mit pako (FlateDecode)
- * bzw. lesen sie roh und behalten, was sich als gültiger Erfassungsbogen (oder
- * ein Array davon) parsen lässt. Robust gegen Fremd-Streams (Schrift, Inhalt),
- * die schlicht nicht als Bogen-JSON durchgehen.
+ * durchsuchen die PDF nach Datenströmen (pdf-stroeme.ts), entpacken sie und
+ * behalten, was sich als gültiger Erfassungsbogen (oder ein Array davon)
+ * parsen lässt. Robust gegen Fremd-Streams (Schrift, Inhalt), die schlicht
+ * nicht als Bogen-JSON durchgehen.
  */
 
-import { inflate } from "pako";
 import { SCHEMA_VERSION, mitTransportVersion, type Erfassungsbogen } from "../model";
 import { migriereBogen } from "./hilfen";
 import type { Einsatzsammlung } from "./einsaetze";
+import { entpackt, pdfStroeme } from "./pdf-stroeme";
 
 // -------------------------------------------------------- JSON-Datei (Einsatz)
 
@@ -76,14 +76,9 @@ export function einsatzAusDatei(text: string): Einsatzsammlung {
 
 // -------------------------------------------------------------- PDF-Import
 
-/** Bytes → Latin1-String (chunkweise), um Stream-Marker per Offset zu finden. */
-function latin1String(bytes: Uint8Array): string {
-  let s = "";
-  const schritt = 0x8000;
-  for (let i = 0; i < bytes.length; i += schritt) {
-    s += String.fromCharCode(...bytes.subarray(i, i + schritt));
-  }
-  return s;
+/** Ist die gewählte Datei eine PDF? (Dateiendung ODER MIME-Typ — je nach Plattform fehlt eins davon.) */
+export function istPdfDatei(datei: File): boolean {
+  return datei.name.toLowerCase().endsWith(".pdf") || datei.type === "application/pdf";
 }
 
 /** Bogen oder Bogen-Array aus einem JSON-Text ziehen (gültige Bögen migriert). */
@@ -104,28 +99,20 @@ function boegenAusText(text: string): Erfassungsbogen[] {
  * die Aufrufer filtern ohnehin auf gültiges Bogen-/Einsatz-JSON.
  */
 function streamTexte(bytes: Uint8Array): string[] {
-  const latin1 = latin1String(bytes);
   const texte: string[] = [];
-  const re = /stream\r?\n/g;
-  let m: RegExpExecArray | null;
-  while ((m = re.exec(latin1))) {
-    const start = m.index + m[0].length;
-    const ende = latin1.indexOf("endstream", start);
-    if (ende < 0) continue;
-    // Vor „endstream" steht i. d. R. ein Zeilenumbruch, der nicht zum Strom gehört.
-    let bis = ende;
-    if (latin1[bis - 1] === "\n") bis--;
-    if (latin1[bis - 1] === "\r") bis--;
-    const roh = bytes.subarray(start, bis);
+  for (const strom of pdfStroeme(bytes)) {
     // 1) entpackt (FlateDecode)
-    try {
-      texte.push(new TextDecoder().decode(inflate(roh)));
-    } catch {
-      // kein Flate-Strom — ignorieren
+    const roh = entpackt(strom);
+    if (roh) {
+      try {
+        texte.push(new TextDecoder().decode(roh));
+      } catch {
+        // nicht dekodierbar — ignorieren
+      }
     }
     // 2) roh (unkomprimiert eingebettet)
     try {
-      texte.push(new TextDecoder().decode(roh));
+      texte.push(new TextDecoder().decode(strom.daten));
     } catch {
       // nicht dekodierbar — ignorieren
     }
