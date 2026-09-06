@@ -25,7 +25,7 @@ import {
 const pdfErzeugen = vi.fn<(bogen: Erfassungsbogen, name?: string) => Promise<void>>(async () => {});
 vi.mock("./pdf", () => ({
   pdfErzeugen: (bogen: Erfassungsbogen, name?: string) => pdfErzeugen(bogen, name),
-  pdfDatenUrl: async () => "data:application/pdf;base64,",
+  pdfBlobUrl: async () => "blob:pdf-vorschau",
   einsatzPdfErzeugen: async () => {},
 }));
 

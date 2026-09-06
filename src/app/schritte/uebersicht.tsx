@@ -129,6 +129,24 @@ export function Uebersicht(props: {
   // verworfen sobald der Bogen sich ändert (dann wäre sie veraltet).
   const [vorschauUrl, setVorschauUrl] = useState<string | null>(null);
   const [vorschauLaeuft, setVorschauLaeuft] = useState(false);
+  /**
+   * Blob-URLs der Vorschau leben bis zum Tab-Ende weiter, also beim Ersetzen
+   * (und beim Verlassen der Ansicht) die alte freigeben — sonst sammelt eine
+   * längere Sitzung jede erzeugte PDF im Speicher an.
+   */
+  const vorschauSetzen = (neu: string | null) =>
+    setVorschauUrl((alt) => {
+      if (alt) URL.revokeObjectURL(alt);
+      return neu;
+    });
+  const vorschauRef = useRef<string | null>(null);
+  vorschauRef.current = vorschauUrl;
+  useEffect(
+    () => () => {
+      if (vorschauRef.current) URL.revokeObjectURL(vorschauRef.current);
+    },
+    [],
+  );
   // Nahbereichs-Dienst des Systems (AirDrop/Quick Share) — nur Beschriftung.
   const nahDienst = nahbereichDienst();
   const org = bogen.einheit.organisation;
@@ -148,7 +166,7 @@ export function Uebersicht(props: {
 
   useEffect(() => {
     let aktiv = true;
-    setVorschauUrl(null); // Bogen geändert → alte PDF-Vorschau wäre veraltet
+    vorschauSetzen(null); // Bogen geändert → alte PDF-Vorschau wäre veraltet
     (async () => {
       try {
         // Eigener/bearbeiteter Bogen: mit dem Geräteschlüssel signiert.
@@ -197,8 +215,8 @@ export function Uebersicht(props: {
     try {
       // Dynamisch: pdfmake samt eingebetteter Schriften bleibt aus dem
       // Start-Bundle heraus und wird erst beim ersten PDF geladen.
-      const { pdfDatenUrl } = await import("../pdf");
-      setVorschauUrl(await pdfDatenUrl(bogen, props.herkunft));
+      const { pdfBlobUrl } = await import("../pdf");
+      vorschauSetzen(await pdfBlobUrl(bogen, props.herkunft));
     } catch (e) {
       setFehler(`PDF-Vorschau: ${fehlerText(e)}`);
     } finally {

@@ -80,6 +80,9 @@ function contentSecurityPolicy(): Plugin {
     "style-src 'self' file: 'unsafe-inline'",
     "img-src 'self' file: data: blob: https://erfassungsbogen.goatcounter.com",
     "font-src 'self' file: data:",
+    // Die PDF-Vorschau in der Übersicht rahmt eine im Browser erzeugte
+    // Blob-URL ein; ohne frame-src greift default-src und der Rahmen bliebe leer.
+    "frame-src 'self' file: blob:",
     "connect-src 'self' file: https://erfassungsbogen.goatcounter.com",
   ].join("; ");
   return {

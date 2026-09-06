@@ -75,13 +75,18 @@ export async function pdfErzeugen(
 }
 
 /**
- * Bogen als PDF-Daten-URL — für die eingebettete Vorschau in der Übersicht
+ * Bogen als PDF-Blob-URL — für die eingebettete Vorschau in der Übersicht
  * (Browser/Desktop; die native App zeigt PDFs übers Share-Sheet an).
+ *
+ * Bewusst Blob statt `data:`-URL: die Content-Security-Policy des Builds
+ * erlaubt als Rahmenquelle nur 'self'/file:/blob: — ein data:-Rahmen wird
+ * blockiert und die Vorschau bliebe leer. Die URL muss der Aufrufer wieder
+ * freigeben (URL.revokeObjectURL), sonst hält der Tab jede erzeugte PDF fest.
  */
-export async function pdfDatenUrl(b: Erfassungsbogen, herkunft?: Uint8Array | null): Promise<string> {
+export async function pdfBlobUrl(b: Erfassungsbogen, herkunft?: Uint8Array | null): Promise<string> {
   const qr = await qrErzeugen(b, herkunft);
   const dd = pdfDokument(b, qr);
-  return pdfMake.createPdf(dd).getDataUrl();
+  return URL.createObjectURL(await pdfMake.createPdf(dd).getBlob());
 }
 
 /**
