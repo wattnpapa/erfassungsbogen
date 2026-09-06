@@ -479,8 +479,10 @@ export function einsatzPdfDokument(
  * QR-Block der letzten Seite. Ein Teil = wie bisher (Bild + antippbarer Link).
  * Mehrere Teile (Segmentierung) = eigene QR-Seiten mit je zwei diagonal
  * versetzten Codes „Teil x / n" (Kamera sieht immer nur einen Code, siehe
- * QR_SEGMENT_BREITE); ein Öffnen-Link entfällt, da jeder Teil nur einen
- * Abschnitt trägt.
+ * QR_SEGMENT_BREITE). Der Öffnen-Link zeigt dort nicht auf einen einzelnen Teil
+ * (der trägt nur einen Abschnitt), sondern auf {@link QrSatz.vollUrl} — den
+ * kompletten Bogen in einer URL. Segmentierung ist eine Grenze des QR-Bildes,
+ * nicht des Links.
  */
 function qrBlock(qr: QrSatz, akzent: string): Content {
   const kopf = (text: string): Content => ({ text, bold: true, fontSize: 13, color: akzent, alignment: "center" });
@@ -522,13 +524,23 @@ function qrBlock(qr: QrSatz, akzent: string): Content {
       { image: t.datenUrl, width: QR_SEGMENT_BREITE, margin: [0, 4, 0, 0] },
     ],
   });
+  const oeffnenLink = (): Content => ({
+    text: "Bogen direkt in der App öffnen",
+    link: qr.vollUrl,
+    color: akzent,
+    decoration: "underline",
+    alignment: "center",
+    fontSize: 11,
+    margin: [0, 12, 0, 0],
+  });
   const hinweis = (): Content => ({
     text:
       `Alle ${anzahl} Teile nacheinander mit der Kamera scannen — die App setzt den Bogen zusammen.\n` +
-      `Beim Scannen jeweils nur einen Code ins Kamerabild nehmen.`,
+      `Beim Scannen jeweils nur einen Code ins Kamerabild nehmen. In der digitalen PDF geht es auch\n` +
+      `ohne Scannen: der Link oben öffnet den vollständigen Bogen.`,
     alignment: "center",
     fontSize: 8,
-    margin: [0, 12, 0, 0],
+    margin: [0, 6, 0, 0],
   });
   const seiten: Content[] = [];
   for (let i = 0; i < qr.teile.length; i += 2) {
@@ -547,7 +559,7 @@ function qrBlock(qr: QrSatz, akzent: string): Content {
         margin: [0, 150, 0, 0],
       });
     }
-    stack.push(hinweis());
+    stack.push(oeffnenLink(), hinweis());
     seiten.push({ stack, pageBreak: "before" });
   }
   return { stack: seiten };

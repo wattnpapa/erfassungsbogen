@@ -162,6 +162,10 @@ describe("pdfDokument()", () => {
     expect(t).toContain("Teil 1 / 2");
     expect(t).toContain("Teil 2 / 2");
     expect(t).toContain("Alle 2 Teile nacheinander mit der Kamera scannen");
+    // Auch bei Segmentierung gibt es einen anklickbaren Link — er trägt den
+    // vollständigen Bogen (vollUrl), nicht einen einzelnen Teil.
+    expect(t).toContain("Bogen direkt in der App öffnen");
+    expect(roh).toContain("https://erfassungsbogen.app/#EEBSVOLL");
   });
 
   it("druckt Kopf, Einsatz, Zugehörigkeit und Stärke", () => {
