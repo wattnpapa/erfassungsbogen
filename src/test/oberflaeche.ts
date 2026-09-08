@@ -15,6 +15,37 @@ import { dialogeZuruecksetzen } from "../app/dialoge";
 // Rückfragen (src/app/dialoge.tsx); ohne Ersatz bricht jeder Klick darauf ab.
 // Nachgebildet wird nur, was die App nutzt: das `open`-Attribut, der
 // Rückgabewert und das `close`-Ereignis.
+// Node ab Version 26 legt `localStorage` und `sessionStorage` selbst als Getter
+// auf `globalThis` — ohne `--localstorage-file` liefern sie `undefined`. Vitest
+// überschreibt vorhandene Getter beim Einhängen der jsdom-Globals nicht, also
+// bleibt der Speicher hier leer statt zu fehlen, und jedes `localStorage.clear()`
+// wirft. Unter Node 24 (siehe .nvmrc) existiert die Eigenschaft gar nicht und
+// jsdom setzt seine eigene ein; dann greift der Ersatz unten nicht.
+function speicherErsetzen(name: "localStorage" | "sessionStorage") {
+  if ((globalThis as Record<string, unknown>)[name] != null) return;
+  const inhalt = new Map<string, string>();
+  const ersatz: Storage = {
+    get length() {
+      return inhalt.size;
+    },
+    key: (stelle) => [...inhalt.keys()][stelle] ?? null,
+    getItem: (schluessel) => inhalt.get(String(schluessel)) ?? null,
+    setItem: (schluessel, wert) => {
+      inhalt.set(String(schluessel), String(wert));
+    },
+    removeItem: (schluessel) => {
+      inhalt.delete(String(schluessel));
+    },
+    clear: () => {
+      inhalt.clear();
+    },
+  };
+  Object.defineProperty(globalThis, name, { value: ersatz, configurable: true, writable: true });
+}
+
+speicherErsetzen("localStorage");
+speicherErsetzen("sessionStorage");
+
 const dialog = window.HTMLDialogElement?.prototype as HTMLDialogElement | undefined;
 if (dialog && typeof dialog.showModal !== "function") {
   dialog.show = function () {
