@@ -137,7 +137,7 @@ Eine kühle, leicht ins Blaue gekippte Neutralpalette unter einer einzigen, orga
 
 ### Primary
 - **Ultramarin-Dienstblau** (#12275e): Standard-Kennfarbe (THW-nah), Standardwert von `--akzent: var(--org-akzent, #12275e)`. Trägt Kopfbalken, primäre Knöpfe, Fokusringe und den aktiven Schritt. Je Organisation ersetzt `org-farben.ts` sie zur Laufzeit (Feuerrot #c8102e, DRK-Rot #e30613, Oliv #4b5320 …).
-- **Dienstblau, aufgehellt** (#1d3d8f): Hover und Links (`--akzent-hell`).
+- **Dienstblau, aufgehellt** (#1d3d8f): Hover und Links (`--akzent-hell`). Der Wert je Organisation ist gerechnet, nicht gesetzt — siehe die Kennfarben-Kontrast-Regel.
 - **Weiß auf Kennfarbe** (#ffffff): Schrift auf der Kennfarbe (`--auf-akzent`); alle Org-Töne sind bewusst dunkel gehalten, damit Weiß darauf trägt.
 
 ### Neutral
@@ -160,7 +160,8 @@ Signalfarben — bewusst getrennt von der Kennfarbe, damit „erledigt" und „A
 Töne, die auf einer gefüllten Fläche stehen und deshalb keinem Anzeigemodus folgen — als Token benannt, damit sie nicht je Bauteil neu erfunden werden:
 - **Zweitschrift auf der Kennfarbe** (#cdd6f4, `--auf-akzent-2`): Links im Aktualisierungsband; 10,4:1 auf THW-Blau.
 - **Alarmschrift auf dunkler Fläche** (#ffb4ab, `--alarm-auf-akzent`): Fehler im Aktualisierungsband und über dem Kamerabild; 8,9:1.
-- **Erledigt auf der Kennfarbe** (#8fe0ab, `--gut-auf-kopf`): der Haken in der Schrittleiste — `--gut` ist für weißes Papier gerechnet und verschwände im Balken.
+- **Erledigt auf der Kennfarbe** (#8fe0ab, `--gut-auf-kopf`): der Haken in der Schrittleiste — `--gut` ist für weißes Papier gerechnet und verschwände im Balken. Der Wert gilt für das Standard-Blau; je Organisation hellt `org-farben.ts` ihn auf, bis er auf DEREN Kennfarbe trägt (`--org-kopf-gut`).
+- **Zweitschrift im Kopfbalken** (`--kopf-auf-2`, Vorgabe #cbcfdc): inaktiver Schritt und Nebenzeilen im Balken. Bewusst ein fester Ton und kein halbdurchsichtiges Weiß — Deckkraft nimmt der Feld-Modus nicht zurück. Je Organisation gerechnet (`--org-kopf-auf-2`).
 - **Vollbild-QR** (`--qr-flaeche` #ffffff, `--qr-text` #000000, `--qr-text-2` #1a1c22): bewusst modusunabhängig hell. Ein Code auf dunklem Grund ist unscannbar, und genau dafür wird das Vollbild geöffnet.
 - **Kamerafläche** (#000 mit weißer Schrift): hinter der Fläche läuft ein Kamerabild, kein Formular — bewusst als Rohwert, es gibt keine Belegung, die ein Modus daran sinnvoll änderte.
 
@@ -168,6 +169,12 @@ Töne, die auf einer gefüllten Fläche stehen und deshalb keinem Anzeigemodus f
 **Die Kennfarben-Regel.** Die Kennfarbe gehört dem Kopfbalken und der primären Aktion. Überschriften tragen Gewicht statt Farbe — so verliert die Kennfarbe nie ihre Signalwirkung.
 
 **Die Signal-Regel.** `--gut(-*)`, `--warn-*` und `--alarm(-*)` sind organisationsunabhängig konstant. Eine DRK-rote Oberfläche darf „Fehler" nie mit der Hausfarbe verwechselbar machen.
+
+**Die Kennfarben-Kontrast-Regel.** Kein Ton, der aus der Kennfarbe abgeleitet ist, wird geschätzt — er wird gerechnet, gegen die Fläche, auf der er tatsächlich steht, auf mindestens 4,5:1. Das betrifft `--akzent-hell` (steht als Schrift auf `--flaeche`) sowie `--kopf-auf-2` und `--gut-auf-kopf` (stehen auf der Kennfarbe selbst); `orgAkzentPalette()` in `org-farben.ts` liefert sie, `org-farben.test.ts` prüft alle zwölf Organisationen.
+
+Der Anlass: die Töne waren einmal von Hand gegen das THW-Blau geprüft und galten dann für alle Kennfarben mit. Feuerrot und DRK-Rot sind aber deutlich heller — gemessen fielen acht der zwölf Organisationen unter AA, der DLRG-Link auf 2,3:1. Ein fester Helligkeitsschritt („etwas aufhellen") ist bei einer Farbe, die zur Laufzeit wechselt, keine Zusage, sondern eine Wette.
+
+Die Richtung bleibt dabei die Absicht: aufhellen heißt „anfassbar". Gesucht ist deshalb der **größte Aufhellungsschritt, der noch trägt**, nicht der erste beste Ton — nur wo gar keiner mehr bleibt (DLRG-Gelb), dunkelt der Ton ab. Und wo ein Signalton seinen Charakter verlöre, bevor er trägt (der Haken auf DRK-Rot und DLRG-Gelb: ab 90 % Helligkeit ist „Grün" weiß), wird er weiß statt fahlgrün — die Auskunft „erledigt" hängt dort am Zeichen ✓ gegenüber • und Leerstelle, nicht an der Farbe.
 
 **Die Modus-Regel.** Neue Farben werden nie als Rohwert in eine Komponente geschrieben, sondern als Rollen-Token angelegt und in allen vier Belegungen (Hell, Dunkel, Feld, Nacht) definiert — sonst entsteht das „halb angewandte Dunkel", das die Modi ausdrücklich verhindern.
 
@@ -223,6 +230,13 @@ Vier benannte Umbruchpunkte, jeder an einer Inhaltsgrenze statt an einer Geräte
 **Die Zeilentrenner-Regel.** Wiederholte Einträge einer Liste trennt eine Haarlinie plus Innenabstand, kein Kasten je Eintrag. Ohne sie liegt der Abstand innerhalb eines Eintrags so groß wie der zwischen zweien, und bei 30–50 Meldungen einer Großlage verschwimmt die Liste zu einer Fläche.
 
 **Die Eintragskopf-Regel.** Ein wiederholter Formulareintrag (Person, Fahrzeug) beginnt mit einer Kopfzeile (`.zeile.eintrag-kopf`): links steht die Kennung — der Name, das taktische Zeichen samt Typ —, rechts die Aktion, die den Eintrag entfernt, darunter eine Haarlinie. Der Löschknopf steht **in** dieser Zeile statt als `float: right` darüber; sonst rutscht er beim Umbruch auf dem Telefon über die Kennung und ist das Erste, was man je Eintrag liest. Zwischen zwei Einträgen steht `--r-5`, mehr als jeder Abstand innerhalb eines Eintrags (`.karte.eintrag`).
+
+**Die Zielmaß-Regel.** Ein Tippziel wird nie als feste Zahl gesetzt, sondern immer als `calc(… + var(--ziel))` — sonst gilt es nur für den Schreibtisch. Gemessen standen drei Bauteile daneben: der ✕ am Chip (`min-height: 0`), die Musterungszeile (`44px` fest) und Kästchen in Flex-Beschriftungen. Die kosteten ausgerechnet im Feld-Modus, der 48-px-Ziele zusagt, 18 bis 25 px.
+
+Zwei Nebensätze dazu, weil sie beim Nachbauen fehlen:
+
+- **Ein Kästchen in einer Flex-Zeile bekommt `flex: 0 0 auto`.** Ohne das schrumpft es mit der Länge seiner Beschriftung — derselbe Schalter stand auf einer Ansicht 30, 25 und 18 px breit da, und der Feld-Modus hob nur die Höhe mit. Ein Ziel, dessen Größe vom Text daneben abhängt, ist keines.
+- **Wo die Fläche nicht wachsen darf, wächst die Trefferfläche.** Am Chip zieht ein `::after` mit negativem `inset` das Ziel auf, ohne den Chip auseinanderzuziehen; ein Link mitten im Satz bekommt senkrechtes `padding` (an einem `inline`-Element vergrößert das die Trefferfläche, ohne die Zeilenhöhe anzufassen) statt `display: inline-flex`, das den Umbruch bräche.
 
 **Die Spaltenflucht-Regel.** Wiederholte Zeilen bleiben in der Flucht, auch wenn eine davon einen Knopf nicht braucht: der Platz des fehlenden ✕ bleibt reserviert (`.zeilen-knopf-leer`), solange die Zeile eine Zeile ist. Und ein Auswahlfeld bekommt die Spaltenbreite seines längsten Optionstexts (`.mittel`, 12rem) — „OV – Ortsverband" mitten im Wort abgeschnitten kostet genau die Auskunft, an der man die Zeile zuordnet.
 
@@ -292,11 +306,20 @@ Kästchenzeile für den segmentierten Transport (`teil-quittung.tsx`): je Teil e
 - **Nacht** (`.nacht-modus`): warm gedimmt (#0d0c08, Text #d9cdb6), Kennfarbe weicht Bernstein (#a8791a) — sattes Organisationsblau wäre genau das Licht, das die Dunkeladaption zerstört. Kopfbalken bleibt dunkel.
 - QR-Bilder behalten in jedem Modus ihre weiße Ruhezone (`background: #fff; padding: 8px`) — sonst unscannbar.
 
+### Bewegung
+
+Alles endet im Ruhezustand des Elements: fällt eine Animation aus, steht der Inhalt trotzdem vollständig da. `prefers-reduced-motion: reduce` setzt deshalb pauschal alle Dauern auf 0 ms.
+
+**Die Quittungs-Ausnahme.** Genau ein Bauteil ist davon ausgenommen: die Quittung der Stärke-Leiste (`.zahl-geaendert`). Sie darf laufen, weil sie gar keine Bewegung ist — das Keyframe wechselt nur die Fläche, nichts fährt, skaliert oder blinkt. Und sie muss laufen, weil sie die einzige Auskunft darüber ist, WELCHE Summe sich durch die neue Meldung geändert hat; auf 0 ms fiele die Auskunft ersatzlos weg statt statisch zu werden. Ganz abschalten ginge ebenfalls nicht: die Klasse bleibt am Element stehen, erst das Ausklingen räumt die Markierung ab — sonst leuchtete nach drei Meldungen die halbe Leiste.
+
+Die Lehre allgemein: eine Animation, die eine Auskunft trägt, braucht unter reduzierter Bewegung eine Entsprechung, keine Streichung.
+
 ## Do's and Don'ts
 
 ### Do:
 - **Do** neue Farben als Rollen-Token in `index.html` anlegen und in allen vier Belegungen (Hell, Dunkel, Feld, Nacht) definieren — plus, wo nötig, in den Plattform-Layern `--ios-*`/`--md-*`.
-- **Do** Trefferflächen über `calc(… + var(--ziel))` bauen, damit der Feld-Modus sie automatisch auf 48px zieht.
+- **Do** Trefferflächen über `calc(… + var(--ziel))` bauen, damit der Feld-Modus sie automatisch auf 48px zieht (Zielmaß-Regel).
+- **Do** aus der Kennfarbe abgeleitete Töne rechnen lassen (`orgAkzentPalette()`), nicht als Helligkeitsschritt schätzen (Kennfarben-Kontrast-Regel).
 - **Do** Fokus sichtbar und einheitlich halten: `outline: var(--fokus) solid var(--akzent)`.
 - **Do** Daten (Stärken, Kennzeichen) in `--schrift-daten` (Monospace) setzen.
 - **Do** die Kennfarbe der Organisation über `wendeOrgAkzentAn()` (org-farben.ts) beziehen — nie eine Org-Farbe hart in CSS schreiben.

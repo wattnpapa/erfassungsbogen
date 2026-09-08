@@ -226,8 +226,12 @@
       --rolle-m-fond: #eceef3; --rolle-m-text: #3a3f4a;
       /* Erledigt-Haken auf der Kennfarbe: --gut ist für weißes Papier
          gerechnet und verschwindet im Kopfbalken. Der Balken behält seine
-         Kennfarbe in allen Modi, also trägt dieser Ton sie ebenfalls. */
-      --gut-auf-kopf: #8fe0ab;
+         Kennfarbe in allen Modi, also trägt dieser Ton sie ebenfalls.
+         Der Wert hier gilt für das Standard-Blau; sobald ein Bogen offen
+         ist, setzt org-farben.ts den für DIESE Kennfarbe gerechneten Ton
+         (--org-kopf-gut) darüber — auf Feuerrot trüge das Blau-Grün nur
+         3,8:1. */
+      --gut-auf-kopf: var(--org-kopf-gut, #8fe0ab);
 
       /* Schrift AUF der Kennfarbe, zweite Stufe: Links und Fehler im
          Aktualisierungsband. Weiß trägt dort die Aussage, diese beiden
@@ -317,7 +321,12 @@
          können und der Nacht-Modus ihn abdunkeln kann. */
       --kopf-fond:  var(--akzent);
       --kopf-auf:   var(--auf-akzent);
-      --kopf-auf-2: rgba(255, 255, 255, 0.78);
+      /* Zweitschrift im Balken als fester Ton, nicht als halbdurchsichtiges
+         Weiß: Deckkraft nimmt der Feld-Modus nicht zurück, und dort tritt
+         ausdrücklich nichts zurück. Der Wert entspricht dem bisherigen
+         Weiß bei 78 % auf dem Standard-Blau; org-farben.ts rechnet ihn je
+         Kennfarbe neu (--org-kopf-auf-2). */
+      --kopf-auf-2: var(--org-kopf-auf-2, #cbcfdc);
       --kopf-linie: rgba(255, 255, 255, 0.3);
       --kopf-strich: 3px;
       --kopf-innen: var(--r-3) var(--r-4);
@@ -727,7 +736,7 @@
        Orientierungshelfer, blockiert nichts. */
     .schritte .schritt-status { margin-left: 0.35em; font-weight: 700; font-size: 0.95em; line-height: 1; }
     .schritte button.status-ok .schritt-status { color: var(--gut-auf-kopf); }
-    .schritte button.status-begonnen .schritt-status { color: rgba(255, 255, 255, 0.75); }
+    .schritte button.status-begonnen .schritt-status { color: var(--kopf-auf-2); }
     .schritte button.aktiv .schritt-status { color: var(--auf-akzent); }
     /* Karten: Kante statt Schatten. Die Trennung entsteht über Linie und
        Weißraum, nicht über abgerundete, schwebende Kacheln. */
@@ -796,6 +805,11 @@
       .zeile > .zeilen-knopf-leer { display: block; flex: 0 0 2.75rem; }
     }
     .inline { display: inline-flex; align-items: center; gap: 0.4rem; margin: 0.6rem 0.8rem 0 0; font-size: var(--t-m); }
+    /* Ohne dies schrumpft das Kästchen mit der Länge seiner Beschriftung:
+       derselbe Schalter stand auf einer Ansicht 30, 25 und 18 px breit da,
+       und der Feld-Modus hob nur die Höhe. Ein Tippziel, das vom Text
+       daneben abhängt, ist keines. */
+    .inline input[type="checkbox"], .inline input[type="radio"] { flex: 0 0 auto; }
     /* Nur für Vorlesesoftware: aus dem Bild genommen, aber im Baum und damit
        vorlesbar. Kein display:none und kein visibility:hidden – die nähme jede
        Vorlesesoftware mit heraus. */
@@ -833,7 +847,22 @@
       background: var(--flaeche-2); border: var(--strich) solid var(--linie); border-radius: var(--radius);
       padding: 0.15rem 0.5rem; font-size: var(--t-s); display: inline-flex; gap: 0.3rem; align-items: center;
     }
-    .chip button { border: none; padding: 0 0.2rem; min-height: 0; background: none; font-weight: bold; }
+    /* Das ✕ entfernt einen Eintrag — es braucht ein Tippziel, auch wenn der
+       Chip schmal bleiben soll. Sichtbar ist der Knopf so groß wie die
+       Schrift, angefasst wird die Fläche darum: `min-width/height` trägt die
+       24 px der WCAG-Zielgröße, das ::after dehnt sie im Feld-Modus auf die
+       48 px, die der Modus überall zusagt. `min-height: 0` stand hier, weil
+       das Grundmaß der Knöpfe den Chip auseinandergezogen hätte — das
+       erledigt jetzt die negative Einrückung des Pseudoelements. */
+    .chip button {
+      position: relative; border: none; background: none; font-weight: bold;
+      padding: 0; min-width: 1.5rem; min-height: 1.5rem;
+      display: inline-flex; align-items: center; justify-content: center;
+    }
+    .chip button::after {
+      content: ""; position: absolute;
+      inset: calc(-0.5 * var(--ziel)) calc(-0.25rem - 0.5 * var(--ziel));
+    }
     .karte .entfernen { float: right; color: var(--alarm); border-color: var(--alarm); font-size: var(--t-xs); }
     @media (hover: hover) { .karte .entfernen:hover { color: var(--alarm); border-color: var(--alarm); background: var(--flaeche-2); } }
     /* Wiederholte Einträge (Person, Fahrzeug) bekommen einen Kopf: links steht,
@@ -1096,7 +1125,10 @@
     /* Zweite Stufe des Übergeben-Dialogs: Link/CSV/Excel eingeklappt, damit am
        Entscheidungspunkt die Vor-Ort-Wege (QR, Nahbereich, PDF) tragen. */
     .teilen-dialog .teilen-weitere { margin: 0.9rem 0 0; border-top: var(--strich) solid var(--linie-fein); padding-top: 0.6rem; }
-    .teilen-dialog .teilen-weitere > summary { cursor: pointer; font-size: var(--t-s); font-weight: 600; color: var(--text-2); }
+    .teilen-dialog .teilen-weitere > summary {
+      cursor: pointer; font-size: var(--t-s); font-weight: 600; color: var(--text-2);
+      padding: calc(0.25rem + 0.5 * var(--ziel)) 0;
+    }
     @media (hover: hover) { .teilen-dialog .teilen-weitere > summary:hover { color: var(--akzent); } }
     .teilen-dialog .teilen-weg button { width: 100%; }
     .teilen-dialog .teilen-weg .hinweis { margin: 0.25rem 0 0; }
@@ -1217,7 +1249,10 @@
       font-family: var(--schrift-daten); font-size: var(--t-xs); letter-spacing: 0.1em;
       text-transform: uppercase; color: var(--text-2); opacity: 1;
     }
-    .muster-zeile { display: flex; align-items: center; gap: 0.7rem; padding: 0.55rem 0.2rem; border-top: 1px solid var(--rand); cursor: pointer; min-height: 44px; }
+    /* Zielmaß über --ziel-basis/--ziel statt fester 44 px: sonst bleibt
+       ausgerechnet die Zeile, mit der man Namen ausstreicht, im Feld-Modus
+       auf Schreibtischgröße stehen. */
+    .muster-zeile { display: flex; align-items: center; gap: 0.7rem; padding: 0.55rem 0.2rem; border-top: 1px solid var(--rand); cursor: pointer; min-height: calc(var(--ziel-basis) + var(--ziel)); }
     .muster-zeile input[type=checkbox] { width: 1.25rem; height: 1.25rem; flex: 0 0 auto; }
     .muster-zeile.gestrichen { opacity: 0.45; }
     .muster-zeile.gestrichen .muster-name { text-decoration: line-through; }
@@ -1306,7 +1341,14 @@
     .signatur-optionen label { display: inline-flex; align-items: center; gap: 0.35rem; }
     /* Technik-Erklärung zum Echtheits-Siegel eingeklappt — am Vorzeige-Punkt
        trägt der Kern, das Detail (Ed25519, Schlüssel teilen) auf Wunsch. */
-    .signatur-detail > summary { cursor: pointer; font-size: var(--t-xs); font-weight: 600; color: var(--text-2); }
+    /* Die Aufklappzeile ist ein eigenständiges Bedienelement, kein Link im
+       Satz — sie bekommt dasselbe Zielmaß wie die übrigen Knöpfe. */
+    .signatur-detail > summary {
+      cursor: pointer; font-size: var(--t-xs); font-weight: 600; color: var(--text-2);
+      /* Innenmaß statt Mindesthöhe und statt Flex: `display: flex` nähme der
+         Zeile das Aufklapp-Dreieck (der Marker hängt an `list-item`). */
+      padding: calc(0.3rem + 0.5 * var(--ziel)) 0;
+    }
     @media (hover: hover) { .signatur-detail > summary:hover { color: var(--akzent); } }
     .signatur-detail > .hinweis { margin-top: 0.3rem; }
     /* Freiwillige Absenderangaben zur Signatur (Name/E-Mail/Telefon). */
@@ -1476,6 +1518,17 @@
       grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
     }
     .fuss-gruppe { display: flex; flex-direction: column; align-items: flex-start; gap: 0.35rem; }
+    /* Diese Links stehen als eigene Zeilen in einer Liste, nicht eingebettet
+       in einen Satz — die Ausnahme der WCAG-Zielgröße für Links im Fließtext
+       greift hier also nicht. Höhe statt Rahmen: die Zeilen bleiben optisch
+       Text, bekommen aber eine anfassbare Fläche. */
+    .fuss-gruppe a,
+    .fuss-gruppe button.link,
+    .fuss-schmal nav a,
+    .fuss-schmal nav button.link {
+      display: inline-flex; align-items: center;
+      min-height: calc(1.5rem + var(--ziel));
+    }
     .fuss-titel {
       font-family: var(--schrift-daten); font-size: var(--t-xs); font-weight: 700; letter-spacing: 0.1em;
       /* --text-2 statt --text-3: die winzige Versalzeile braucht 4,5:1 Kontrast
@@ -1525,10 +1578,17 @@
       }
     }
     button.link {
-      border: none; background: none; padding: 0; font-size: inherit;
+      border: none; background: none; font-size: inherit;
       min-height: 0; display: inline; font-weight: inherit;
       color: var(--akzent-hell); text-decoration: underline; cursor: pointer;
       text-align: inherit;
+      /* Senkrechtes Innenmaß statt Mindesthöhe: an einem `inline`-Element
+         vergrößert es die Trefferfläche, ohne die Zeilenhöhe anzufassen —
+         der Link bleibt im Satz stehen, wo er im Satz steht, ist aber
+         angefasst 24 px hoch (WCAG 2.5.8) und im Feld-Modus mehr. `display`
+         auf inline-flex zu ziehen bräche dagegen den Umbruch mitten im
+         Absatz. */
+      padding: calc(0.28rem + 0.5 * var(--ziel)) 0;
     }
     @media (hover: hover) { button.link:hover { border: none; background: none; color: var(--akzent); } }
     /* Beispiel-Liste: eigener Aufzählungspunkt mit hängendem Einzug, damit
@@ -1738,6 +1798,14 @@
         transition-duration: 0ms !important;
         animation-duration: 0ms !important;
       }
+      /* Ausnahme von der Ausnahme: die Quittung ist die einzige Auskunft
+         darüber, WELCHE Summe sich durch die neue Meldung bewegt hat — auf
+         0 ms fiele sie ersatzlos weg. Sie darf laufen, weil sie gar keine
+         Bewegung ist: das Keyframe wechselt nur die Fläche, nichts fährt,
+         skaliert oder blinkt. Ganz abschalten ginge auch nicht — die Klasse
+         bleibt am Element stehen, das Ausklingen selbst räumt die Markierung
+         wieder ab, sonst leuchtete nach drei Meldungen die halbe Leiste. */
+      .zahl-geaendert { animation-duration: var(--dauer-3) !important; }
     }
     /* Der Wechsel des Anzeigemodus springt — hier erklärt Bewegung keinen
        Zustand, sie verdeckt ihn. Knöpfe überblenden ihre Schriftfarbe
@@ -2395,6 +2463,9 @@
       --kopf-auf-2: var(--ios-text-2);
       --kopf-linie: transparent;
       --kopf-strich: 0px;
+      /* Ohne Kennfarbenfläche steht der Haken auf der Systemfläche, nicht im
+         Balken — dort trägt der normale Erledigt-Ton. */
+      --gut-auf-kopf: var(--gut);
       /* Ohne Fläche trägt der Kopf keinen eigenen Rand — sein Inhalt steht
          auf demselben Satzspiegel wie main. */
       --kopf-innen: 0 var(--r-4);
@@ -2406,6 +2477,9 @@
       --kopf-auf-2: var(--md-on-surface-variant);
       --kopf-linie: transparent;
       --kopf-strich: 0px;
+      /* Ohne Kennfarbenfläche steht der Haken auf der Systemfläche, nicht im
+         Balken — dort trägt der normale Erledigt-Ton. */
+      --gut-auf-kopf: var(--gut);
       --kopf-innen: 0 var(--r-4);
       --kopf-kante: 0px;
     }
