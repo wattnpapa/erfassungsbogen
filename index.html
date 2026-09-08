@@ -738,6 +738,22 @@
     .schritte button.status-ok .schritt-status { color: var(--gut-auf-kopf); }
     .schritte button.status-begonnen .schritt-status { color: var(--kopf-auf-2); }
     .schritte button.aktiv .schritt-status { color: var(--auf-akzent); }
+    /* Schrittwechsel im Assistenten: der Inhalt kommt aus der Richtung, in die
+       gegangen wurde — vorwärts von rechts, zurück von links. Die Schrittleiste
+       zeigt, WO man ist; die Richtung zeigt, dass man gerade zurückgesprungen
+       ist, etwa weil ein Prüfpunkt in einen früheren Schritt verwies.
+
+       Kurz gehalten (--dauer-2) und nur Transform/Deckkraft: der Wechsel ist
+       der Weg zur Arbeit, keine Vorführung, und eine Bewegung, die man am
+       Meldekopf sechsmal abwartet, ist Latenz. Der Weg (0.75rem) bleibt unter
+       dem seitlichen Innenabstand von `main`, damit nichts über den Rand tritt.
+       Trägt keine eigene Auskunft, die nicht auch die Schrittleiste gäbe —
+       entfällt unter reduzierter Bewegung darum ersatzlos. */
+    .schritt-inhalt { animation: schritt-vor var(--dauer-2) var(--kurve); }
+    .schritt-inhalt.zurueck { animation-name: schritt-zurueck; }
+    @keyframes schritt-vor { from { opacity: 0; transform: translateX(0.75rem); } }
+    @keyframes schritt-zurueck { from { opacity: 0; transform: translateX(-0.75rem); } }
+
     /* Karten: Kante statt Schatten. Die Trennung entsteht über Linie und
        Weißraum, nicht über abgerundete, schwebende Kacheln. */
     section.karte, .karte {
@@ -878,6 +894,25 @@
        innerhalb eines Eintrags — sonst verschwimmt die Liste zur Fläche. */
     .karte.eintrag { margin-bottom: var(--r-5); }
     .karte.eintrag:last-of-type { margin-bottom: var(--r-4); }
+    /* Zu- und Abgang im Kartenstapel (siehe eintrag-bewegung.ts). Beide Listen
+       sind Stapel gleich aussehender Karten: die neue kommt unter dem Rand des
+       Bildschirms dazu, die gelöschte verschwindet aus der Mitte. Der Stempel
+       zeigt, welche kam; der Abgang zeigt, welche geht — und erst danach rückt
+       die Liste nach.
+
+       Nur Transform und Deckkraft: eine Höhen- oder Randanimation über eine
+       Karte mit ungewisser Höhe rechnet auf jedem Bild das Layout neu, und der
+       maßgebliche Fall ist ein Jahre altes Einsatz-Handy. Der Inhalt steht
+       danach unverändert da — unter reduzierter Bewegung entfällt beides also
+       ersatzlos, es trägt keine eigene Auskunft. */
+    .karte.eintrag.kommt { animation: eintrag-kommt var(--dauer-2) var(--kurve); }
+    @keyframes eintrag-kommt { from { opacity: 0; transform: scale(1.02); } }
+    /* Der Abgang läuft kürzer als der Zugang: was geht, soll nicht warten. */
+    .karte.eintrag.geht {
+      animation: eintrag-geht calc(var(--dauer-2) * 0.8) ease-in forwards;
+      transform-origin: 50% 0;
+    }
+    @keyframes eintrag-geht { to { opacity: 0; transform: scale(0.97); } }
     /* Rumpf einer Personen-Karte: gestapelt auf dem Telefon, zweispaltig,
        sobald die Karte breit genug ist. Links die feststehenden Merkmale,
        rechts Können und Erreichbarkeit — beides für sich kurz, untereinander
@@ -1663,13 +1698,20 @@
       border-radius: var(--radius); color: var(--quittung-text);
     }
     /* Abgestempelt. Der Unterschied liegt in der Füllung, nicht nur in der
-       Farbe — sonst wäre der Stand allein farbig kodiert. Es ist derselbe
-       Eingangsstempel wie bei den Rückmeldungen: der Teil kommt an. */
+       Farbe — sonst wäre der Stand allein farbig kodiert. Die Füllung ist der
+       Stand und steht deshalb sofort; bewegt wird sie nicht. */
     .teil-quittung > li.ein {
       background: var(--quittung-ein); border-color: var(--quittung-ein);
       color: var(--quittung-auf-ein);
-      animation: stempel var(--dauer-2) var(--kurve);
     }
+    /* Der Stempel kommt herunter — nur auf dem Kästchen, das GERADE eingegangen
+       ist (`.frisch` aus teil-quittung.tsx), nicht auf allen gefüllten. Vorher
+       hing die Bewegung an `.ein` und lief damit beim Öffnen des Scanners für
+       jeden längst gesammelten Teil erneut: eine Quittung für nichts, genau in
+       dem Moment, in dem der Blick nach dem fehlenden Teil sucht. Fällt die
+       Bewegung aus (reduzierte Bewegung), bleibt die Füllung als Auskunft. */
+    .teil-quittung > li.frisch { animation: stempel-teil var(--dauer-2) var(--kurve); }
+    @keyframes stempel-teil { from { transform: scale(1.5); opacity: 0.4; } }
     /* Schwarz, Weiß und der Textschatten sind hier bewusst modusunabhängige
        Rohwerte: hinter der Fläche läuft ein Kamerabild, kein Formular — es
        gibt keine Belegung, die ein Anzeigemodus daran sinnvoll änderte. */
@@ -1748,10 +1790,36 @@
       background: #fff; color: #000; border-color: #fff; text-shadow: none; font-weight: 700;
     }
     .handscanner-fussnote { font-size: var(--t-s); color: rgba(255, 255, 255, 0.8); }
+    /* Suchrahmen und seine Quittung. Der Rahmen ist der einzige Punkt, auf dem
+       der Blick beim Abfilmen wirklich liegt — die Hände halten den Stapel, die
+       Textzeile darüber wird nicht gelesen. Ein angenommener Teil quittiert
+       deshalb hier: der Rahmen wird kurz grün und die Fläche darin nimmt einen
+       Hauch derselben Farbe an.
+
+       Bewusst eine reine Farbquittung — der Rahmen legt fest, welcher
+       Bildausschnitt dekodiert wird (suchAusschnitt in qr-scanner-web.tsx);
+       etwas, das sich verschiebt oder skaliert, verzöge mitten im Scan das
+       Suchfenster. Und bewusst als Übergang statt als Keyframe: unter
+       reduzierter Bewegung bleibt so ein hartes Aufblitzen stehen, statt die
+       Auskunft ersatzlos zu streichen (dieselbe Lehre wie bei .zahl-geaendert).
+
+       Die Farben sind hier Rohwerte wie der übrige Scanner: hinter der Fläche
+       läuft ein Kamerabild, kein Formular. #8fe0ab ist der Grünton, der schon
+       im Kopfbalken „erledigt" sagt, wo --gut zu dunkel wäre — über einem
+       beliebigen Kamerabild gilt dasselbe. */
     .scanner-rahmen {
+      position: relative;
       width: min(65vw, 55vh); aspect-ratio: 1;
       border: 3px solid rgba(255, 255, 255, 0.9); border-radius: var(--radius);
+      transition: border-color var(--dauer-3) ease-out;
     }
+    .scanner-rahmen::after {
+      content: ""; position: absolute; inset: 0;
+      background: #8fe0ab; opacity: 0;
+      transition: opacity var(--dauer-3) ease-out;
+    }
+    .scanner-rahmen.angenommen { border-color: #8fe0ab; transition-duration: var(--dauer-1); }
+    .scanner-rahmen.angenommen::after { opacity: 0.22; transition-duration: var(--dauer-1); }
     .scanner-aktionen {
       display: flex; flex-direction: column; align-items: center; gap: 0.75rem;
     }
@@ -1784,10 +1852,16 @@
     @keyframes einblenden { from { opacity: 0; } }
     @keyframes dialog-auf { from { opacity: 0; transform: translateY(0.5rem); } }
     @keyframes stempel { from { opacity: 0; transform: scale(1.03); } }
-    /* Quittung der Stärke-Leiste: eine Zahl, die sich durch eine neue Meldung
-       geändert hat, blitzt kurz auf zweiter Fläche auf und klingt aus — das
-       Auge findet, WO sich die Summe bewegt hat. Gesetzt von der React-Seite
-       (einsaetze-ui.tsx), nur bei echter Wertänderung, nie beim ersten Malen. */
+    /* Quittung einer Zahl, die sich geändert hat: sie blitzt kurz auf zweiter
+       Fläche auf und klingt aus — das Auge findet, WO sich die Summe bewegt
+       hat. Gesetzt von der React-Seite (quittung.ts), nur bei echter
+       Wertänderung, nie beim ersten Malen. Zwei Orte, dieselbe Behandlung: die
+       Stärke-Leiste der Einsatz-Sammlung (neue Meldung) und die abgeleitete
+       Stärke im Personal-Schritt (Zeile weiter oben ergänzt). Bewusst ohne
+       eigenes Innenmaß: in der Leiste füllt die Zahl als Flex-Kind ohnehin ihre
+       Zelle, und ein negatives Außenmaß zum Ausgleich zöge sie dort über die
+       Trennlinie hinaus. Im Fließtext liegt das Aufblitzen damit eng an den
+       Ziffern — wie eine markierte Stelle im Vordruck. */
     .zahl-geaendert { animation: quittung var(--dauer-3) ease-out; }
     @keyframes quittung { from { background: var(--flaeche-2); } }
     /* Systemeinstellung „Bewegung reduzieren": alles aus, Zustände springen.

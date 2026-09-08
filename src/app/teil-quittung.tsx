@@ -15,6 +15,7 @@
  * Blick, nicht die einzige Quelle; sie ist deshalb `aria-hidden`.
  */
 
+import { useEffect, useRef } from "react";
 import type { SegmentTeil } from "@bos/eeb-format/codec";
 
 /** Noch fehlende Teilnummern, aufsteigend. Leer bei unsegmentiert/vollständig. */
@@ -53,15 +54,41 @@ export function fehltNochSatz(teile: SegmentTeil[]): string {
 /**
  * Die Kästchenzeile. Rendert nichts bei unsegmentiertem Transport (`anzahl < 2`)
  * oder leerem Sammelstand — dort gibt es keinen Fortschritt zu zeigen.
+ *
+ * Das eingehende Kästchen wird abgestempelt (`.frisch`, Keyframe `stempel-ein`
+ * in index.html): Wer einen Stapel abfilmt, hält das Gerät in Bewegung und
+ * sieht nur, DASS sich etwas geändert hat — der Stempel sagt, WELCHER Teil
+ * gerade angekommen ist, ohne dass die Zeile neu gelesen werden muss. Der
+ * erste Stand quittiert nie; er ist der Stand, nicht die Änderung.
  */
 export function TeilQuittung({ teile }: { teile: SegmentTeil[] }) {
+  const liste = useRef<HTMLOListElement>(null);
+  const gesehen = useRef<Set<number> | null>(null);
+  const haben = new Set(teile.map((t) => t.teilNr));
+  const schluessel = [...haben].sort((a, b) => a - b).join(",");
+  useEffect(() => {
+    const jetzt = new Set(schluessel ? schluessel.split(",").map(Number) : []);
+    const vorher = gesehen.current;
+    gesehen.current = jetzt;
+    if (vorher === null || !liste.current) return;
+    for (const n of jetzt) {
+      if (vorher.has(n)) continue;
+      const kaestchen = liste.current.querySelector<HTMLLIElement>(`[data-teil="${n}"]`);
+      if (!kaestchen) continue;
+      // Über das DOM statt über einen key: derselbe Teil kann in einer neuen
+      // Sammlung erneut eingehen, und der Reflow setzt den Stempel dann neu an.
+      kaestchen.classList.remove("frisch");
+      void kaestchen.offsetWidth;
+      kaestchen.classList.add("frisch");
+    }
+  }, [schluessel]);
+
   const anzahl = teile[0]?.anzahl ?? 0;
   if (anzahl < 2) return null;
-  const haben = new Set(teile.map((t) => t.teilNr));
   return (
-    <ol className="teil-quittung" aria-hidden="true">
+    <ol className="teil-quittung" aria-hidden="true" ref={liste}>
       {Array.from({ length: anzahl }, (_, i) => i + 1).map((n) => (
-        <li key={n} className={haben.has(n) ? "ein" : "offen"}>
+        <li key={n} data-teil={n} className={haben.has(n) ? "ein" : "offen"}>
           {n}
         </li>
       ))}

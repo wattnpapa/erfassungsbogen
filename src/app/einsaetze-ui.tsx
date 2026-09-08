@@ -82,6 +82,7 @@ import {
   type TabellenZeile,
 } from "./einheiten-tabelle";
 import { imWebBrowser } from "./nativ";
+import { useZahlQuittung } from "./quittung";
 import { istBilddatei } from "./qr-stapel";
 import { fehlerText } from "./nachladen";
 
@@ -829,22 +830,11 @@ function TabellenZeileZelle({ zeile: z }: { zeile: TabellenZeile }) {
 
 /**
  * Zahl der Stärke-Leiste. Ändert eine neue Meldung den Wert, quittiert die
- * Zahl das mit dem Aufblitzen aus index.html (.zahl-geaendert) — bewusst über
- * das DOM statt über einen key: beim ersten Malen der Ansicht bleibt alles
- * still, und bei schnellen Folgemeldungen (Kiosk-Scan) setzt die Animation
- * dank Reflow auch dann neu an, wenn die Klasse schon gesetzt war.
+ * Zahl das mit dem Aufblitzen aus index.html (.zahl-geaendert) — dieselbe
+ * Quittung wie die abgeleitete Stärke im Personal-Schritt (siehe quittung.ts).
  */
 function Zaehlwert({ wert }: { wert: number }) {
-  const element = useRef<HTMLElement>(null);
-  const vorher = useRef(wert);
-  useEffect(() => {
-    if (vorher.current === wert || !element.current) return;
-    vorher.current = wert;
-    element.current.classList.remove("zahl-geaendert");
-    void element.current.offsetWidth;
-    element.current.classList.add("zahl-geaendert");
-  }, [wert]);
-  return <strong ref={element}>{wert}</strong>;
+  return <strong ref={useZahlQuittung<HTMLElement>(wert)}>{wert}</strong>;
 }
 
 /**

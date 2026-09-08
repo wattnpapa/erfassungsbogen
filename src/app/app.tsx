@@ -354,9 +354,28 @@ export function App() {
   );
 }
 
+/**
+ * Richtung des letzten Schrittwechsels: `"vor"` oder `"zurueck"`.
+ *
+ * Reine Anzeigehilfe für die Bewegung in `.schritt-inhalt` — beim ersten Malen
+ * (und beim Sprung eines geöffneten Bogens direkt in die Übersicht) gilt
+ * „vor", weil es nichts gibt, wovon zurückgegangen worden wäre.
+ */
+function useSchrittRichtung(schritt: number) {
+  // Als Zustand, nicht als Ref: eine Ref, die beim Rendern beschrieben wird,
+  // ist im StrictMode nach dem zweiten Durchlauf schon nachgeführt — der
+  // Rücksprung meldete sich dann als Vorwärtsschritt.
+  const [stand, setStand] = useState({ schritt, richtung: "vor" });
+  if (stand.schritt !== schritt) {
+    setStand({ schritt, richtung: schritt < stand.schritt ? "zurueck" : "vor" });
+  }
+  return stand.richtung;
+}
+
 function AppInhalt() {
   const [bogen, setBogen] = useState<Erfassungsbogen | null>(START.bogen ?? ENTWURF?.bogen ?? null);
   const [schritt, setSchritt] = useState(START.bogen || ENTWURF ? UEBERSICHT : 0);
+  const richtung = useSchrittRichtung(schritt);
   const [fehler, setFehler] = useState(START.fehler);
   // Signaturstatus des zuletzt IMPORTIERTEN Bogens (Herkunft des Transports).
   // Wird beim Bearbeiten verworfen — dann beschreibt er den Bogen nicht mehr.
@@ -1643,6 +1662,14 @@ function AppInhalt() {
           im Assistenten unsichtbar und tauchten später unvermittelt auf der
           Startseite auf. */}
       {meldung && <p className="meldung" role="status" key={meldung}>{meldung}</p>}
+      {/* Der Schrittwechsel trägt seine Richtung: vorwärts kommt der Inhalt von
+          rechts, zurück von links. Die Schrittleiste oben sagt, WO man ist —
+          dass man gerade zurückgesprungen ist (etwa weil ein Prüfpunkt in einen
+          früheren Schritt verweist), sagte bisher nichts. Bewusst kurz: das
+          hier ist der Weg zur Arbeit, nicht die Arbeit.
+          `key` erzwingt den Neuaufbau, damit die Bewegung bei jedem Wechsel
+          neu ansetzt — die Schritte tauschen ohnehin die Komponente. */}
+      <div className={`schritt-inhalt ${richtung}`} key={schritt}>
       {schritt === 0 && <SchrittEinheit bogen={bogen} aendern={aendern} />}
       {schritt === 1 && <SchrittEinsatz bogen={bogen} aendern={aendern} />}
       {schritt === 2 && <SchrittPersonal bogen={bogen} aendern={aendern} geheZu={setSchritt} />}
@@ -1676,6 +1703,7 @@ function AppInhalt() {
           }
         />
       )}
+      </div>
 
       {/* Einsatz-Auswahl für „In Einsatz aufnehmen…": ein gescannter oder
           geöffneter Bogen wandert von der Übersicht direkt in eine Sammlung. */}

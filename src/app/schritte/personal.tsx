@@ -4,6 +4,8 @@
  */
 
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from "react";
+import { useZahlQuittung } from "../quittung";
+import { mitAbgang, useEinzugsstempel } from "../eintrag-bewegung";
 import {
   Ernaehrung,
   Fahrerlaubnis,
@@ -192,14 +194,18 @@ function PersonKarte(props: {
   person: Person;
   org: OrganisationsTyp;
   vorschlaege: readonly FreitextVorschlag[];
+  /** Gerade hinzugefügt: die Karte stempelt sich einmal ein. */
+  frisch?: boolean;
   aendern: (p: Person) => void;
   entfernen: () => void;
 }) {
-  const { person: p, org, vorschlaege, aendern, entfernen } = props;
+  const { person: p, org, vorschlaege, frisch, aendern, entfernen } = props;
+  const karte = useRef<HTMLDivElement>(null);
+  useEinzugsstempel(karte, frisch);
   const set = (patch: Partial<Person>) => aendern({ ...p, ...patch });
   const funktionen = vokabularFuer(org, "funktion");
   return (
-    <div className="karte eintrag">
+    <div className="karte eintrag" ref={karte}>
       {/* Kopf des Eintrags: wer die Person ist und welche Stärkerolle sie vor
           Ort ausfüllt — die einzige Auskunft, nach der man in einer Liste von
           zwölf Personen sucht. Sie steht darum allein in der breitesten Zeile,
@@ -214,7 +220,13 @@ function PersonKarte(props: {
             <option value={StaerkeRolle.MANNSCHAFT}>Mannschaft</option>
           </Auswahl>
         </Feld>
-        <button type="button" className="entfernen" onClick={entfernen}>Person entfernen</button>
+        <button
+          type="button"
+          className="entfernen"
+          onClick={() => mitAbgang(karte.current, entfernen)}
+        >
+          Person entfernen
+        </button>
       </div>
       {/* Rumpf des Eintrags in zwei Spalten, sobald die Karte breit genug ist:
           links die feststehenden Merkmale der Person, rechts, was sie kann und
@@ -386,6 +398,9 @@ export function SchrittPersonal({ bogen, aendern, geheZu }: SchrittProps) {
   // Fokus beim Anlegen per Enter in die neue Zeile springen.
   const [schnell, setSchnell] = useState(false);
   const [fokusNeue, setFokusNeue] = useState(false);
+  // Objektidentität statt Index — siehe fahrzeuge.tsx: ein Index rutscht beim
+  // Löschen einer anderen Karte auf eine bestehende.
+  const [frischeKarte, setFrischeKarte] = useState<Person | null>(null);
   // Nur die Detail-Karten zeigen Qualifikationen; die Schnelltabelle nicht.
   const vorschlaege = useQualiVorschlaege(!nurStaerke && !schnell, bogen.einheit.organisation);
   const namenDialog = useRef<HTMLDialogElement>(null);
@@ -411,8 +426,18 @@ export function SchrittPersonal({ bogen, aendern, geheZu }: SchrittProps) {
     namenDialog.current?.close();
   }
   const s = staerke(bogen);
+  /* Die abgeleitete Stärke rechnet sich weit oben in der Liste neu, während der
+     Blick unten in einer Personenkarte steht. Sie quittiert deshalb dieselbe
+     Änderung wie ihre Zwillingszahl in der Stärke-Leiste der Einsatz-Sammlung
+     — eine Auskunft, eine Behandlung. Der Schlüssel umfasst alle vier Werte:
+     ein Rollenwechsel verschiebt Führer und Mannschaft, ohne die Gesamtzahl
+     anzurühren. */
+  const staerkeQuittung = useZahlQuittung<HTMLElement>(
+    `${s.fuehrer}/${s.unterfuehrer}/${s.mannschaft}/${s.gesamt}`,
+  );
   const mwd = unterbringungMWD(bogen);
   const sm = bogen.staerkeManuell ?? { fuehrer: 0, unterfuehrer: 0, mannschaft: 0, gesamt: 0 };
+  const gesamtQuittung = useZahlQuittung<HTMLInputElement>(sm.gesamt);
   const setSm = (p: Partial<typeof sm>) => {
     const neu = { ...sm, ...p };
     neu.gesamt = neu.fuehrer + neu.unterfuehrer + neu.mannschaft;
@@ -459,7 +484,9 @@ export function SchrittPersonal({ bogen, aendern, geheZu }: SchrittProps) {
               <input type="number" min={0} value={sm.mannschaft} onChange={(e) => setSm({ mannschaft: zahl(e.target.value) })} />
             </Feld>
             <Feld titel="Gesamt" schmal>
-              <input value={sm.gesamt} readOnly />
+              {/* Errechnet, nicht getippt: die Summe zieht nach, während der
+                  Blick noch im Feld daneben steht — sie quittiert das. */}
+              <input ref={gesamtQuittung} value={sm.gesamt} readOnly />
             </Feld>
           </div>
           <div className="zeile">
@@ -500,7 +527,11 @@ export function SchrittPersonal({ bogen, aendern, geheZu }: SchrittProps) {
       {!nurStaerke && (
         <p className="hinweis">
           Stärke (abgeleitet):{" "}
-          <strong title={STAERKE_LEGENDE} aria-label={`Stärke: ${staerkeVorlesen(s)}`}>
+          <strong
+            ref={staerkeQuittung}
+            title={STAERKE_LEGENDE}
+            aria-label={`Stärke: ${staerkeVorlesen(s)}`}
+          >
             {s.fuehrer} / {s.unterfuehrer} / {s.mannschaft} / {s.gesamt}
           </strong>
           {" "}<span className="legende">({STAERKE_LEGENDE})</span>
@@ -579,6 +610,7 @@ export function SchrittPersonal({ bogen, aendern, geheZu }: SchrittProps) {
             person={p}
             org={bogen.einheit.organisation}
             vorschlaege={vorschlaege}
+            frisch={p === frischeKarte}
             aendern={(np) => aendern({ personal: bogen.personal.map((x, j) => (j === i ? np : x)) })}
             entfernen={() => aendern({ personal: bogen.personal.filter((_, j) => j !== i) })}
           />
@@ -589,7 +621,11 @@ export function SchrittPersonal({ bogen, aendern, geheZu }: SchrittProps) {
         className="primaer"
         onClick={() => {
           setFokusNeue(true);
-          aendern({ personal: [...bogen.personal, neuePerson()] });
+          // Die neue Karte erscheint ÜBER dem Knopf, den man gerade gedrückt
+          // hat — der Blick liegt unten. Der Stempel sagt, wohin er soll.
+          const neu = neuePerson();
+          setFrischeKarte(neu);
+          aendern({ personal: [...bogen.personal, neu] });
         }}
       >
         + Person hinzufügen

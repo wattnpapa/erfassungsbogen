@@ -164,6 +164,7 @@ Töne, die auf einer gefüllten Fläche stehen und deshalb keinem Anzeigemodus f
 - **Zweitschrift im Kopfbalken** (`--kopf-auf-2`, Vorgabe #cbcfdc): inaktiver Schritt und Nebenzeilen im Balken. Bewusst ein fester Ton und kein halbdurchsichtiges Weiß — Deckkraft nimmt der Feld-Modus nicht zurück. Je Organisation gerechnet (`--org-kopf-auf-2`).
 - **Vollbild-QR** (`--qr-flaeche` #ffffff, `--qr-text` #000000, `--qr-text-2` #1a1c22): bewusst modusunabhängig hell. Ein Code auf dunklem Grund ist unscannbar, und genau dafür wird das Vollbild geöffnet.
 - **Kamerafläche** (#000 mit weißer Schrift): hinter der Fläche läuft ein Kamerabild, kein Formular — bewusst als Rohwert, es gibt keine Belegung, die ein Modus daran sinnvoll änderte.
+- **Angenommen über dem Kamerabild** (#8fe0ab als Rahmenfarbe, 22 % als Fläche darin): die Quittung des Suchrahmens. Derselbe Grünton, der im Kopfbalken „erledigt" sagt, wo `--gut` zu dunkel wäre — über einem beliebigen Kamerabild gilt dasselbe. Rohwert aus demselben Grund wie die Kamerafläche, und fest statt aus der Kennfarbe abgeleitet: „angenommen" ist ein Signal (Signal-Regel), keine Hausfarbe.
 
 ### Named Rules
 **Die Kennfarben-Regel.** Die Kennfarbe gehört dem Kopfbalken und der primären Aktion. Überschriften tragen Gewicht statt Farbe — so verliert die Kennfarbe nie ihre Signalwirkung.
@@ -308,11 +309,25 @@ Kästchenzeile für den segmentierten Transport (`teil-quittung.tsx`): je Teil e
 
 ### Bewegung
 
-Alles endet im Ruhezustand des Elements: fällt eine Animation aus, steht der Inhalt trotzdem vollständig da. `prefers-reduced-motion: reduce` setzt deshalb pauschal alle Dauern auf 0 ms.
+**Bewegungsthese: „Der Stempel".** Es gibt genau eine Bewegungsidee, und sie kommt aus der Welt des Vordrucks: etwas kommt an und wird abgestempelt. Der Eingangsstempel (`stempel`, `stempel-teil`) quittiert Rückmeldungen, angenommene QR-Teile und neu angelegte Einträge; die Quittung (`quittung`) markiert eine Zahl, die sich bewegt hat. Alles Übrige ist Zustandswechsel, kein Auftritt. Es gibt keine zweite Sprache — keine Einblendungen beim Scrollen, keine gestaffelten Abschnittsauftritte, kein Schweben.
+
+**Der maßgebliche Moment ist der angenommene QR-Teil.** Wer am Meldekopf einen mehrteiligen Bogen abfilmt, hält den Stapel in der einen Hand und das Gerät in der anderen; der Blick liegt auf dem Suchrahmen, nicht auf der Textzeile darüber. Der Rahmen wird deshalb kurz grün und nimmt einen Hauch derselben Farbe an, und das Kästchen des eingegangenen Teils wird abgestempelt. Bewusst nur Farbe am Rahmen: er legt fest, welcher Bildausschnitt dekodiert wird — etwas, das sich verschiebt oder skaliert, verzöge mitten im Scan das Suchfenster.
+
+**Die Auskunfts-Regel.** Bewegung erklärt Rückmeldung, Zustand oder Zusammenhang — sonst gibt es sie nicht. Bewegt sich etwas, muss sich benennen lassen, welche Auskunft ohne sie fehlte: welche Summe sich geändert hat (`.zahl-geaendert`), welcher Teil eingegangen ist (`.frisch`, `.angenommen`), welche Karte gerade geht (`.geht`), in welche Richtung der Schritt ging (`.schritt-inhalt`). Eine Fläche wird nicht animiert, weil sie da ist.
+
+**Die Feldgeräte-Regel.** Nur Transform, Deckkraft und Farbe. Kein Blur, kein Filter, kein Schatten, nichts, was auf jedem Bild das Layout neu rechnet (Höhe, Ränder, Abstände) — der maßgebliche Fall ist ein Jahre altes Einsatz-Handy, das nebenher ein Kamerabild dekodiert. Nichts läuft in Schleife.
+
+**Die Dauern-Leiter.** `--dauer-1` (120 ms) unmittelbare Rückmeldung, `--dauer-2` (200 ms) Zustandswechsel und Auftritt, `--dauer-3` (450 ms) ausklingende Quittung. Was geht, geht schneller als es kam (Abgang 0,8 × `--dauer-2`). Die Kurve ist `--kurve` — entschieden abbremsend, ohne Nachfedern; ein federndes Behördenformular gibt es nicht.
+
+Alles endet im Ruhezustand des Elements: fällt eine Animation aus, steht der Inhalt trotzdem vollständig da. `prefers-reduced-motion: reduce` setzt deshalb pauschal alle Dauern auf 0 ms. Der Schrittwechsel, der Zugang und der Abgang tragen keine eigene Auskunft — die Schrittleiste und der Karteninhalt sagen dasselbe — und entfallen dort ersatzlos. Der Abgang nimmt dann den direkten Weg (`eintrag-bewegung.ts` prüft die gerechnete Animationsdauer), statt auf ein Ereignis zu warten, das nicht kommt: eine Löschung darf nie an einer Bewegung hängen.
 
 **Die Quittungs-Ausnahme.** Genau ein Bauteil ist davon ausgenommen: die Quittung der Stärke-Leiste (`.zahl-geaendert`). Sie darf laufen, weil sie gar keine Bewegung ist — das Keyframe wechselt nur die Fläche, nichts fährt, skaliert oder blinkt. Und sie muss laufen, weil sie die einzige Auskunft darüber ist, WELCHE Summe sich durch die neue Meldung geändert hat; auf 0 ms fiele die Auskunft ersatzlos weg statt statisch zu werden. Ganz abschalten ginge ebenfalls nicht: die Klasse bleibt am Element stehen, erst das Ausklingen räumt die Markierung ab — sonst leuchtete nach drei Meldungen die halbe Leiste.
 
+Dieselbe Ausnahme trägt die Rahmen-Quittung des Scanners: sie läuft als Übergang, nicht als Keyframe, und bleibt unter reduzierter Bewegung als hartes Aufblitzen stehen — ebenfalls reine Farbe, ohne Bewegung.
+
 Die Lehre allgemein: eine Animation, die eine Auskunft trägt, braucht unter reduzierter Bewegung eine Entsprechung, keine Streichung.
+
+**Die Stempel-Regel.** Ein Eingangsstempel gehört dem, was gerade eingegangen ist — nie allen, die den Zustand schon tragen. Die Quittungszeile hing die Bewegung einmal an der Füllung (`.ein`) und stempelte damit beim Öffnen des Scanners jeden längst gesammelten Teil erneut: eine Quittung für nichts, genau in dem Moment, in dem der Blick nach dem fehlenden Teil sucht. Der Zustand steht sofort und still da; die Bewegung markiert die Änderung.
 
 ## Do's and Don'ts
 
@@ -332,6 +347,8 @@ Die Lehre allgemein: eine Animation, die eine Auskunft trägt, braucht unter red
 - **Don't** `prefers-color-scheme` auswerten — die Modi schalten ausschließlich über den Schalter und die `<html>`-Klasse (bestätigt: ein halb angewandtes Dunkel ist im Einsatz schlimmer als eine helle Oberfläche).
 - **Don't** Text über Opacity oder helle Grauwerte zurücktreten lassen, wo der Feld-Modus greift — dort gilt: nichts tritt zurück.
 - **Don't** Verläufe, schwebende Kacheln, runde Ecken oder verspielte Illustrationen einführen (bestätigte Anti-Referenz: Consumer-App-Ästhetik).
+- **Don't** eine Fläche animieren, ohne benennen zu können, welche Auskunft ohne die Bewegung fehlte (Auskunfts-Regel) — und nichts animieren, was das Layout neu rechnet oder Blur/Filter/Schatten braucht (Feldgeräte-Regel).
+- **Don't** eine Löschung oder Zustandsänderung von einer Animation abhängig machen — läuft sie nicht, muss der direkte Weg greifen.
 - **Don't** Schrift vom CDN laden — Archivo liegt im Bundle und muss offline verfügbar bleiben (PWA-Precache).
 - **Don't** in Spaltenrichtung `flex-wrap: wrap` mit einem Kind auf `flex-basis: 100%` kombinieren — der Umbruch geht dann in eine ZWEITE SPALTE und die Knöpfe laufen aus der Karte heraus. Regeln mit voller Hauptachsen-Basis gehören in eine `min-width`-Abfrage.
 - **Don't** dieselbe Zahl in zwei Größen setzen: die Stärke trägt überall die dicktengleiche Zählwert-Figur (Übersicht wie Einsatz-Sammlung).

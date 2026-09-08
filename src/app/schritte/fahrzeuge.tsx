@@ -2,11 +2,13 @@
  * Schritt 4 — Fahrzeuge: Typ, Kennzeichen, Funkrufname und StAN-Vorbelegung.
  */
 
+import { useRef, useState } from "react";
 import { Fahrzeug, OrganisationsTyp } from "@bos/eeb-format/model";
 import { stanFahrzeugVorbelegung } from "@bos/vokabulare/thw-stan-fahrzeuge";
 import { fahrzeugHinweise, neuesFahrzeug, transportBilanz, vokabularFuer, vorbelegungGeladen } from "../hilfen";
 import { fahrzeugSymbolSvg, svgDataUrl } from "../taktische-zeichen-bogen";
 import { frageJaNein } from "../dialoge";
+import { mitAbgang, useEinzugsstempel } from "../eintrag-bewegung";
 import {
   Auswahl,
   Feld,
@@ -19,13 +21,17 @@ import {
 function FahrzeugKarte(props: {
   fahrzeug: Fahrzeug;
   org: OrganisationsTyp;
+  /** Gerade hinzugefügt: die Karte stempelt sich einmal ein. */
+  frisch?: boolean;
   aendern: (f: Fahrzeug) => void;
   entfernen: () => void;
 }) {
-  const { fahrzeug: f, org, aendern, entfernen } = props;
+  const { fahrzeug: f, org, frisch, aendern, entfernen } = props;
+  const karte = useRef<HTMLDivElement>(null);
+  useEinzugsstempel(karte, frisch);
   const set = (patch: Partial<Fahrzeug>) => aendern({ ...f, ...patch });
   return (
-    <div className="karte eintrag">
+    <div className="karte eintrag" ref={karte}>
       {/* Kopf des Eintrags: Zeichen, Typ und Kennzeichen sagen, welches Fahrzeug
           das ist; alles Weitere ist Beschreibung. Das taktische Zeichen (DV 102)
           steht als Glied der Kopfzeile darin statt als Float daneben — sonst
@@ -53,7 +59,13 @@ function FahrzeugKarte(props: {
             <option value="nein">nein</option>
           </Auswahl>
         </Feld>
-        <button type="button" className="entfernen" onClick={entfernen}>Fahrzeug entfernen</button>
+        <button
+          type="button"
+          className="entfernen"
+          onClick={() => mitAbgang(karte.current, entfernen)}
+        >
+          Fahrzeug entfernen
+        </button>
       </div>
       <div className="zeile">
         <label className="inline">
@@ -127,6 +139,11 @@ function Transportbilanz({ bogen }: Pick<SchrittProps, "bogen">) {
 }
 
 export function SchrittFahrzeuge({ bogen, aendern }: SchrittProps) {
+  // Als Objektidentität, nicht als Index: ein Index rutscht beim Löschen einer
+  // anderen Karte auf eine bestehende und stempelte sie grundlos ein zweites
+  // Mal. Das Bearbeiten der neuen Karte ersetzt das Objekt ohnehin — dann ist
+  // der Stempel gelaufen und die Markierung darf weg.
+  const [frisch, setFrisch] = useState<Fahrzeug | null>(null);
   const vorlage = stanFahrzeugVorbelegung(bogen.einheit.organisation, bogen.einheit.einheitsTyp);
   const stanGeladen = vorbelegungGeladen(bogen.fahrzeuge, vorlage);
   return (
@@ -168,11 +185,22 @@ export function SchrittFahrzeuge({ bogen, aendern }: SchrittProps) {
           key={i}
           fahrzeug={f}
           org={bogen.einheit.organisation}
+          frisch={f === frisch}
           aendern={(nf) => aendern({ fahrzeuge: bogen.fahrzeuge.map((x, j) => (j === i ? nf : x)) })}
           entfernen={() => aendern({ fahrzeuge: bogen.fahrzeuge.filter((_, j) => j !== i) })}
         />
       ))}
-      <button type="button" className="primaer" onClick={() => aendern({ fahrzeuge: [...bogen.fahrzeuge, neuesFahrzeug()] })}>
+      <button
+        type="button"
+        className="primaer"
+        onClick={() => {
+          // Die neue Karte erscheint ÜBER dem Knopf, den man gerade gedrückt
+          // hat — der Blick liegt unten. Der Stempel sagt, wohin er soll.
+          const neu = neuesFahrzeug();
+          setFrisch(neu);
+          aendern({ fahrzeuge: [...bogen.fahrzeuge, neu] });
+        }}
+      >
         + Fahrzeug hinzufügen
       </button>
       <Hinweise hinweise={fahrzeugHinweise(bogen)} />

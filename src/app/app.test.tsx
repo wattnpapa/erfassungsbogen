@@ -187,6 +187,25 @@ describe("Assistenten-Durchlauf", () => {
     expect(within(einheit).getByText(/Musterhausen/)).toBeDefined();
   });
 
+  it("merkt sich die Richtung des Schrittwechsels", async () => {
+    // Rein für die Bewegung: der Inhalt kommt aus der Richtung, in die gegangen
+    // wurde. Getestet, weil die Richtung an einem beim Rendern beschriebenen
+    // Ref hing und im StrictMode jeden Rücksprung als Vorwärtsschritt meldete.
+    const nutzer = userEvent.setup();
+    const { container } = render(<App />);
+    await nutzer.click(screen.getByRole("button", { name: "Neuen Bogen erstellen" }));
+    const richtung = () => container.querySelector(".schritt-inhalt")?.className;
+
+    await nutzer.click(screen.getByRole("button", { name: /^4\. Fahrzeuge/ }));
+    expect(richtung()).toBe("schritt-inhalt vor");
+
+    await nutzer.click(screen.getByRole("button", { name: /^2\. Einsatz/ }));
+    expect(richtung()).toBe("schritt-inhalt zurueck");
+
+    await nutzer.click(screen.getByRole("button", { name: /^6\. Übersicht/ }));
+    expect(richtung()).toBe("schritt-inhalt vor");
+  });
+
   it("erreicht die Übersicht auch über die Schrittleiste im Kopf", async () => {
     const nutzer = userEvent.setup();
     render(<App />);

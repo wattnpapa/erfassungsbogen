@@ -125,6 +125,43 @@ async function kameraOeffnen(wunschId: string): Promise<MediaStream> {
 // kennt, wer die Naheinstellgrenze von Handykameras kennt.
 const TIPP_NACH_MS = 6000;
 
+/**
+ * Quittung des Suchrahmens: kurz nach jedem angenommenen Teil `true`.
+ *
+ * Der maßgebliche Moment des ganzen Transports — und der einzige, in dem der
+ * Blick nicht auf der Oberfläche liegt, sondern über dem Papierstapel in der
+ * anderen Hand. Wer am Meldekopf einen mehrteiligen Bogen abfilmt, sieht den
+ * Rahmen, nicht die Textzeile darüber; ohne Quittung blättert er ratend weiter
+ * und filmt denselben Teil zweimal. Die Fortschrittszeile (`role="status"`)
+ * bleibt die maßgebliche Auskunft, hier wie in der Kästchenzeile.
+ *
+ * Bewusst nur eine Farbquittung, keine Bewegung: der Rahmen legt fest, welcher
+ * Bildausschnitt dekodiert wird (siehe `suchAusschnitt`) — ein Verschieben oder
+ * Skalieren würde mitten im Scan das Suchfenster verziehen.
+ */
+// 300 ms: lang genug, um im Vorbeigehen aufzufallen, kurz genug, dass die
+// grüne Fläche nicht im Weg steht, während schon die nächste Seite des Stapels
+// vor die Kamera kommt. Das Ausklingen läuft danach über --dauer-3 weiter.
+function useAngenommen(anzahlTeile: number, dauer = 300) {
+  const [an, setAn] = useState(false);
+  const vorher = useRef(anzahlTeile);
+  useEffect(() => {
+    if (anzahlTeile <= vorher.current) {
+      vorher.current = anzahlTeile;
+      return;
+    }
+    vorher.current = anzahlTeile;
+    setAn(false);
+    const anschalten = requestAnimationFrame(() => setAn(true));
+    const uhr = setTimeout(() => setAn(false), dauer);
+    return () => {
+      cancelAnimationFrame(anschalten);
+      clearTimeout(uhr);
+    };
+  }, [anzahlTeile, dauer]);
+  return an;
+}
+
 export function QrScannerWeb(props: {
   onErgebnis: (text: string) => void;
   onAbbruch: () => void;
@@ -147,6 +184,7 @@ export function QrScannerWeb(props: {
   const videoRef = useRef<HTMLVideoElement>(null);
   // Der Suchrahmen bestimmt, welcher Bildausschnitt dekodiert wird.
   const rahmenRef = useRef<HTMLDivElement>(null);
+  const rahmenQuittung = useAngenommen(props.teile?.length ?? 0);
   // Callbacks über eine Ref ansprechen, damit der Kamera-Effekt nur einmal
   // läuft und neue Prop-Identitäten den Stream nicht neu starten.
   const propsRef = useRef(props);
@@ -355,7 +393,7 @@ export function QrScannerWeb(props: {
           </div>
         )}
       {!fehler
-        ? <div className="scanner-rahmen" aria-hidden="true" ref={rahmenRef} />
+        ? <div className={`scanner-rahmen${rahmenQuittung ? " angenommen" : ""}`} aria-hidden="true" ref={rahmenRef} />
         : (
           /* Der zweite Weg ist ohne Kamera der einzige — er bekommt deshalb
              die Mitte des Bildschirms, dort wo sonst der Suchrahmen steht,
