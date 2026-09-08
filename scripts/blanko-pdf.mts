@@ -29,7 +29,7 @@ import {
   OrganisationsTyp,
   PersonalErfassung,
   SCHEMA_VERSION,
-} from "../src/model";
+} from "@bos/eeb-format/model";
 import { pdfDokument, type BlankoZeilen } from "../src/app/pdf-dokument";
 
 const wurzel = join(dirname(fileURLToPath(import.meta.url)), "..");

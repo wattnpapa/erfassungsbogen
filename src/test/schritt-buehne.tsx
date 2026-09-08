@@ -5,7 +5,7 @@
  */
 
 import { useState, type ComponentType } from "react";
-import type { Erfassungsbogen } from "../model";
+import type { Erfassungsbogen } from "@bos/eeb-format/model";
 import { neuerBogen } from "../app/hilfen";
 import { Dialogschicht } from "../app/dialoge";
 import type { SchrittProps } from "../app/schritte";

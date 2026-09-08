@@ -5,7 +5,7 @@
  * (siehe SchrittPersonal) — im Produktivbetrieb existiert der Weg nicht.
  */
 
-import { Ernaehrung, Fahrerlaubnis, Geschlecht, Person, StaerkeRolle } from "../model";
+import { Ernaehrung, Fahrerlaubnis, Geschlecht, Person, StaerkeRolle } from "@bos/eeb-format/model";
 import { neuePerson } from "./hilfen";
 
 // Gängige deutsche Namen — bewusst Allerweltsnamen, damit in einer Übung

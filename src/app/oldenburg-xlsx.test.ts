@@ -21,8 +21,8 @@ import {
   StaerkeRolle,
   type Erfassungsbogen,
   type Person,
-} from "../model";
-import { MeldeStatus, bogenInhaltsId, einheitSchluessel, type Einsatzsammlung, type MeldeEintrag } from "./einsaetze";
+} from "@bos/eeb-format/model";
+import { MeldeStatus, bogenInhaltsId, einheitSchluessel, type Einsatzsammlung, type MeldeEintrag } from "@bos/meldekopf/einsaetze";
 import { bogenOldenburgXlsx, einsatzOldenburgXlsx } from "./oldenburg-xlsx";
 import { spaltenName } from "./xlsx";
 

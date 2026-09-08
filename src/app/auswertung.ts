@@ -16,8 +16,8 @@ import {
   type Erfassungsbogen,
   type Staerke,
   type VerpflegungSplit,
-} from "../model";
-import { MeldeStatus, neuesteJeEinheit, type MeldeEintrag } from "./einsaetze";
+} from "@bos/eeb-format/model";
+import { MeldeStatus, neuesteJeEinheit, type MeldeEintrag } from "@bos/meldekopf/einsaetze";
 
 export interface EinsatzSummen {
   /** Anzahl anwesender Einheiten (nicht Personen). */

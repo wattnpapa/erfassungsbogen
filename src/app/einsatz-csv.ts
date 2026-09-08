@@ -13,11 +13,11 @@
  * wie alle Exporte rein lokal.
  */
 
-import { staerke, unterbringungMWD, verpflegung, type Erfassungsbogen } from "../model";
+import { staerke, unterbringungMWD, verpflegung, type Erfassungsbogen } from "@bos/eeb-format/model";
 import { einheitAnzeigename, orgLabel, vokabText, vokabularFuer, zeitgruppe } from "./hilfen";
 import { aktuelleMeldungen } from "./auswertung";
 import { csvDatei, csvZeile } from "./csv";
-import type { Einsatzsammlung, MeldeEintrag, MeldeQuelle } from "./einsaetze";
+import type { Einsatzsammlung, MeldeEintrag, MeldeQuelle } from "@bos/meldekopf/einsaetze";
 
 const QUELLE_LABEL: Record<MeldeQuelle, string> = {
   scan: "Scan",

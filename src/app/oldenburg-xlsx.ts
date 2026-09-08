@@ -34,7 +34,7 @@ import {
   unterbringungMWD,
   verpflegung,
   type Erfassungsbogen,
-} from "../model";
+} from "@bos/eeb-format/model";
 import {
   einheitAnzeigename,
   einheitOrt,
@@ -52,7 +52,7 @@ import {
   zeileXml,
   type Zelle,
 } from "./xlsx";
-import { bogenInhaltsId, neuesteJeEinheit, type Einsatzsammlung, type MeldeEintrag } from "./einsaetze";
+import { bogenInhaltsId, neuesteJeEinheit, type Einsatzsammlung, type MeldeEintrag } from "@bos/meldekopf/einsaetze";
 
 export { XLSX_MIME };
 

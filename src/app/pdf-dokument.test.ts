@@ -21,7 +21,7 @@ import {
   mitTransportVersion,
   zeitpunktAusIso,
   type Erfassungsbogen,
-} from "../model";
+} from "@bos/eeb-format/model";
 import type { QrSatz } from "./hilfen";
 import { EEB_JSON_DATEINAME, bogenAlsEingebetteteDatei, einsatzPdfDokument, pdfDokument } from "./pdf-dokument";
 

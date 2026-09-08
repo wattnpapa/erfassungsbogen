@@ -9,7 +9,7 @@ import { useEffect, useRef, useState, type ChangeEvent } from "react";
 import { gemerkteKamera, kameraListe, merkeKamera, suchAusschnitt, type Kamera } from "./kamera";
 import { qrLeserLaden, type QrLeser } from "./qr-decoder";
 import { TeilQuittung } from "./teil-quittung";
-import type { SegmentTeil } from "../codec";
+import type { SegmentTeil } from "@bos/eeb-format/codec";
 
 /** Was schiefging (ein Satz) und was dagegen hilft (kurze Schritte). */
 type KameraFehler = { text: string; schritte?: string[] };

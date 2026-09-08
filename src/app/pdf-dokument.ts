@@ -26,7 +26,7 @@ import {
   unterbringungMWD,
   verpflegung,
   zeitpunktZuIso,
-} from "../model";
+} from "@bos/eeb-format/model";
 import {
   datumDeutsch,
   einheitAnzeigename,
@@ -41,7 +41,7 @@ import {
   type QrSatz,
 } from "./hilfen";
 import { summiereBoegen, type EinsatzSummen } from "./auswertung";
-import { bogenDiff, diffZeilen } from "./meldung-diff";
+import { bogenDiff, diffZeilen } from "@bos/meldekopf/meldung-diff";
 import { fahrzeugSymbolSvg } from "./taktische-zeichen-bogen";
 import { orgFarbe } from "./org-farben";
 import { UEBUNG_BREITE, UEBUNG_HOEHE, UEBUNG_PFAD } from "./uebung-wasserzeichen";

@@ -4,8 +4,8 @@ import {
   encodePayloadUrl,
   encodeVorlagePayloadUrl,
   segmentPayloadUrls,
-} from "../codec";
-import { OrganisationsTyp, PersonalErfassung, SCHEMA_VERSION, type Erfassungsbogen } from "../model";
+} from "@bos/eeb-format/codec";
+import { OrganisationsTyp, PersonalErfassung, SCHEMA_VERSION, type Erfassungsbogen } from "@bos/eeb-format/model";
 import { browserKompressor } from "./hilfen";
 import { boegenAusQrTexten } from "./qr-boegen";
 

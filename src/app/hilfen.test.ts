@@ -27,7 +27,7 @@ import {
   KontaktArt,
   type Fahrzeug,
   type Person,
-} from "../model";
+} from "@bos/eeb-format/model";
 import {
   bogenLaden,
   browserKompressor,
@@ -52,14 +52,14 @@ import {
   parseSegmentUrl,
   payloadAusText,
   segmentePayload,
-} from "../codec";
+} from "@bos/eeb-format/codec";
 import {
   oeffentlicherSchluessel,
   schluesselKurzform,
   schluesselpaarErzeugen,
   signaturVonPayload,
   signiertePayloadBytes,
-} from "../signatur";
+} from "@bos/eeb-format/signatur";
 
 // Minimaler File-Ersatz: bogenLaden nutzt nur datei.text().
 function jsonDatei(inhalt: string): File {

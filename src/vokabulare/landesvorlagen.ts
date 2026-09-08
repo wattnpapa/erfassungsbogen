@@ -24,8 +24,8 @@
  *    Kennzeichen und ohne Funkrufname (der hängt am konkreten Standort).
  */
 
-import type { Erfassungsbogen, Fahrzeug, Person, VokabularWert } from "../model";
-import { Ernaehrung, Fahrerlaubnis, Geschlecht, OrganisationsTyp } from "../model";
+import type { Erfassungsbogen, Fahrzeug, Person, VokabularWert } from "@bos/eeb-format/model";
+import { Ernaehrung, Fahrerlaubnis, Geschlecht, OrganisationsTyp } from "@bos/eeb-format/model";
 
 export interface Landesvorlage {
   organisation: OrganisationsTyp;

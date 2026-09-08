@@ -3,6 +3,84 @@
 Technische Dokumentation für Mitentwickler. Was die App ist und kann, steht in
 der [README](../README.md).
 
+## Der geteilte Kern unter `vendor/`
+
+Der UI-freie Kern liegt nicht mehr in `src/`, sondern in vier eigenen,
+öffentlichen Repositories, die hier als git-Submodul unter `vendor/` hängen.
+Grund ist das Schwesterprodukt S1-Control, das denselben Codec und denselben
+Meldekopf-Apparat braucht; die Entscheidung samt Begründung, Aufnahmeregeln und
+Rückweg steht in ADR-003 des S1-Control-Projekts.
+
+| Submodul | npm | Inhalt |
+|---|---|---|
+| `vendor/eeb-format` | `@bos/eeb-format` | `model`, `codec`, `signatur`, `qr-node` |
+| `vendor/bos-meldekopf` | `@bos/meldekopf` | `einsaetze`, `aufteilen`, `zusammenfuehren`, `meldung-diff`, `papierkorb`, `darstellung` |
+| `vendor/bos-vokabulare` | `@bos/vokabulare` | THW-StAN, Ortsverbände, Funkrufnamen, Ebenen, Sitzplätze, Berufe |
+| `vendor/bos-taktische-zeichen` | `@bos/taktische-zeichen` | Zeichensammlung und Zuordnung |
+
+### Auschecken und bauen
+
+```bash
+git clone --recurse-submodules https://github.com/wattnpapa/erfassungsbogen.git
+# oder in einem vorhandenen Klon:
+git submodule update --init --recursive
+npm ci
+```
+
+Die Submodule sind auf feste Commits gepinnt und folgen NICHT automatisch ihrem
+`main`. Einen neuen Stand übernimmt man bewusst:
+
+```bash
+git -C vendor/eeb-format fetch && git -C vendor/eeb-format checkout <commit>
+git add vendor/eeb-format && git commit
+```
+
+### Warum die Quelle gebündelt wird, nicht `dist/`
+
+`vite.config.ts`, `tsconfig.json` und `vitest.config.ts` bilden `@bos/*` auf
+`vendor/*/src/*.ts` ab. Vite übersetzt TypeScript ohnehin; die Bausteine müssen
+dafür nicht vorgebaut werden, das Tree-Shaking arbeitet auf dem Original, und
+die Bundle-Messung sieht, was wirklich hineingeht. Das gebaute `dist/` der
+Bausteine bleibt bestehen — S1-Control konsumiert sie darüber.
+
+Importiert wird **modulgenau**, nicht über den Sammel-Einstieg:
+
+```ts
+import { SCHEMA_VERSION } from "@bos/eeb-format/model";      // so
+import { SCHEMA_VERSION } from "@bos/eeb-format";            // nicht so
+```
+
+Der Grund ist messbar: `@bos/vokabulare` insgesamt zieht die großen Tabellen
+(Berufe mit 3512 Einträgen, alle Ortsverbände) in jedes Bündel, das irgendein
+Vokabular anfasst — und damit ins Startbündel. Beim ersten Verdrahten wuchs es
+so von 843 kB auf 1.258 kB; mit modulgenauen Importen sind es 839 kB.
+
+### Zwei Wächter im CI
+
+- `npm run kern-kopien` prüft, dass jeder Baustein genau einmal im Baum liegt
+  und keiner einen anderen als `dependency` statt `peerDependency` führt. Lägen
+  zwei Kopien von `@bos/eeb-format` da, sähe TypeScript zwei verschiedene Typen
+  „Bogen"; die Fehlermeldung nennt zweimal denselben Namen und die Ursache
+  steht in keinem Stapelabzug.
+- `npm run bundle-budget` misst den gebauten Stand gegen
+  `scripts/bundle-budget.json`. Ist ein Zuwachs gewollt, hebt
+  `npm run bundle-budget -- --setze` das Budget — im selben Commit, mit
+  Begründung.
+
+### Was bewusst hier geblieben ist
+
+- `src/app/hilfen.ts` — hängt über `nativ.ts` an vier Capacitor-Paketen. Die
+  reine Darstellung ist als `darstellung` in den Meldekopf gewandert; `hilfen`
+  reicht sie weiter, damit die Aufrufstellen unberührt bleiben.
+- `src/app/speicher-browser.ts` — die einzige Stelle, die `localStorage` mit
+  der Einsatz-Sammlung verbindet. Der Kern bekommt die Ablage hineingereicht.
+- `src/app/taktische-zeichen-bogen.ts` — löst Organisation, Kurzzeichen und
+  Namen aus dem Bogen auf; die Zeichensammlung selbst kennt den Bogen nicht.
+- `src/vokabulare/landesvorlagen.ts` — liest die Beispielbögen über
+  `import.meta.glob`, eine Vite-Eigenschaft, und die Bögen sind Produktinhalt.
+- `pdf-dokument.ts`, `geraete-schluessel.ts` sowie Auswertung, Einheitenliste,
+  XLSX und CSV. Letztere sind Stufe 2 in ADR-003 und wandern erst bei Bedarf.
+
 ## Web-App
 
 Assistent (Einheit → Einsatz → Personal → Fahrzeuge → Sofortbedarf) mit
@@ -235,15 +313,15 @@ Fremde Bögen werden lokal unter einem Einsatz/einer Übung gesammelt (Gegenstü
 zu „Meine Vorlagen" für die eigene Einheit). Reine Logik ist von der
 localStorage-Hülle getrennt und unit-getestet.
 
-- [src/app/einsaetze.ts](../src/app/einsaetze.ts) — Speicher, Fingerabdruck
+- [vendor/bos-meldekopf/src/einsaetze.ts](../vendor/bos-meldekopf/src/einsaetze.ts) — Speicher, Fingerabdruck
   (`einheitSchluessel`), Dedupe über inhaltsbasierte Eintrags-ID, Revisions-Historie
   (neueste je Einheit zählt), Zug-Etikett je Einheit, Import/Merge.
-- [src/app/aufteilen.ts](../src/app/aufteilen.ts) — Bogen aufteilen: Personal,
+- [vendor/bos-meldekopf/src/aufteilen.ts](../vendor/bos-meldekopf/src/aufteilen.ts) — Bogen aufteilen: Personal,
   Fahrzeuge und (im Meldekopf-Modus) die Stärkezahlen auf Rest und abgeteilten
   Teil verteilen; Kraftstoff bleibt beim Rest, die Verpflegungszahl zieht mit
   der Stärke um. Oberfläche in
   [src/app/aufteilen-ui.tsx](../src/app/aufteilen-ui.tsx).
-- [src/app/zusammenfuehren.ts](../src/app/zusammenfuehren.ts) — Gegenstück: Teile
+- [vendor/bos-meldekopf/src/zusammenfuehren.ts](../vendor/bos-meldekopf/src/zusammenfuehren.ts) — Gegenstück: Teile
   wieder zu einer Meldung verschmelzen. Personal und Fahrzeuge werden
   zusammengelegt (nicht entdoppelt — Teile einer Aufteilung sind
   überschneidungsfrei), Sofortbedarf summiert, Ja/Nein-Angaben mit ODER
@@ -433,10 +511,10 @@ ein einzelner QR-Code heute schon mehr trägt.
 ## Datenmodell & QR-Codec (Schema v3)
 
 - [datenmodell.md](datenmodell.md) — Datenmodell und Binärformat „EEB2"
-- [src/model.ts](../src/model.ts) — plattformneutrale TypeScript-Typen
-- [src/codec.ts](../src/codec.ts) — Encoder und Decoder (plattformneutral, Kompression injizierbar)
-- [src/qr-node.ts](../src/qr-node.ts) — QR-Erzeugung als SVG/PNG für Node/Electron
-- [src/vokabulare/thw.ts](../src/vokabulare/thw.ts) — THW-Vokabular (StAN Stand 01.07.2026)
+- [vendor/eeb-format/src/model.ts](../vendor/eeb-format/src/model.ts) — plattformneutrale TypeScript-Typen
+- [vendor/eeb-format/src/codec.ts](../vendor/eeb-format/src/codec.ts) — Encoder und Decoder (plattformneutral, Kompression injizierbar)
+- [vendor/eeb-format/src/qr-node.ts](../vendor/eeb-format/src/qr-node.ts) — QR-Erzeugung als SVG/PNG für Node/Electron
+- [vendor/bos-vokabulare/src/thw.ts](../vendor/bos-vokabulare/src/thw.ts) — THW-Vokabular (StAN Stand 01.07.2026)
 - [scripts/qr-demo.ts](../scripts/qr-demo.ts) — End-to-End-Test: Bogen → QR-PNG → jsQR-Scan → Decoder → identisch (`npm run demo`; Ausgabe in `examples/`)
 - [src/app/qr-decoder.ts](../src/app/qr-decoder.ts) — QR-Lesen im Browser: ZXing
   (WebAssembly, `zxing-wasm`, Datei im Bundle und PWA-Precache) mit jsQR als
@@ -465,8 +543,8 @@ Beim Anlegen einer Einheit lassen sich Personal-Sollplätze und Fahrzeuge
 vorbelegen. Es gibt zwei Quellen:
 
 - **THW (code-basiert, StAN-konform):** an den Einheitstyp gekoppelt, gepflegt in
-  [src/vokabulare/thw-stan-personal.ts](../src/vokabulare/thw-stan-personal.ts)
-  und [thw-stan-fahrzeuge.ts](../src/vokabulare/thw-stan-fahrzeuge.ts).
+  [vendor/bos-vokabulare/src/thw-stan-personal.ts](../vendor/bos-vokabulare/src/thw-stan-personal.ts)
+  und [thw-stan-fahrzeuge.ts](../vendor/bos-vokabulare/src/thw-stan-fahrzeuge.ts).
 - **Landesvorlagen (freitext-basiert, aus den Beispielbögen abgeleitet):** für
   alle übrigen Organisationen außer Polizei, Bundespolizei und Bundeswehr.
   Logik in [src/vokabulare/landesvorlagen.ts](../src/vokabulare/landesvorlagen.ts),
@@ -512,7 +590,7 @@ Februar 2021 anders lizenziert; seither gilt CC BY 4.0. Daraus folgt für uns:
 Urheber, Lizenz und Fundstelle sind zu nennen, und weil das Holskript die
 SVG-Dateien verändert (Schrift entfernt, `viewbox` → `viewBox`), ist auch die
 Bearbeitung anzugeben. Beides steht im Kopf der erzeugten Datei
-`src/vokabulare/taktische-zeichen-symbole.ts` und in den Bildunterschriften der
+`vendor/bos-taktische-zeichen/src/symbole.ts` und in den Bildunterschriften der
 Inhaltsseiten.
 
 **Warum eingebacken und nicht als npm-Abhängigkeit:** Das Projekt liefert kein
@@ -526,10 +604,10 @@ PDF-Bau), und ein Download im Build würde offline-Builds brechen.
 
 Ablauf stattdessen:
 
-- [scripts/taktische-zeichen-holen.mts](../scripts/taktische-zeichen-holen.mts)
+- [vendor/bos-taktische-zeichen/scripts/holen.mts](../vendor/bos-taktische-zeichen/scripts/holen.mts)
   holt eine festgeschriebene Release-Version, wirft den je Datei eingebetteten
   Base64-Font raus (26 kB → ~800 B) und schreibt alles in eine generierte Datei
-  [src/vokabulare/taktische-zeichen-symbole.ts](../src/vokabulare/taktische-zeichen-symbole.ts)
+  [vendor/bos-taktische-zeichen/src/symbole.ts](../vendor/bos-taktische-zeichen/src/symbole.ts)
   (375 Zeichen, ~300 kB roh / ~15 kB gzip).
 - **Von Hand aktualisieren:** `npm run zeichen -- v2.1.0`, dann Diff ansehen und
   `npm test`. Ohne Argument gilt die im Skript festgeschriebene Version.
@@ -542,13 +620,13 @@ Ablauf stattdessen:
   ist nicht nötig). Die Zusammenfassung des Laufs listet neue und weggefallene
   Zeichen.
 
-Die Tests in [src/app/taktische-zeichen.test.ts](../src/app/taktische-zeichen.test.ts)
+Die Tests in [vendor/bos-taktische-zeichen/src/zeichen.test.ts](../vendor/bos-taktische-zeichen/src/zeichen.test.ts)
 sind das Sicherheitsnetz dieser Automatik: sie laufen über beide
 Zuordnungstabellen, prüfen für jede Organisation den Rückfallweg und schlagen
 an, wenn ein Zeichen wieder einen Font mitschleppt. Benennt die Sammlung etwas
 um, scheitert der Lauf — statt still aufs Grundzeichen zurückzufallen.
 
-Die Zuordnung liegt in [src/app/taktische-zeichen.ts](../src/app/taktische-zeichen.ts)
+Die Zuordnung liegt in [vendor/bos-taktische-zeichen/src/zeichen.ts](../vendor/bos-taktische-zeichen/src/zeichen.ts)
 und arbeitet in drei Stufen: fester THW-Vokabular-Code → benanntes Zeichen;
 sonst Namenssuche über Dateiname und Titel im Bereich der Organisation; sonst
 Grundzeichen (Kfz, Anhänger, Boot …) in der Organisationsfarbe, beschriftet mit
@@ -592,8 +670,8 @@ der Personenkarte eigene `<option>`-Elemente mit derselben Rolle mitbringen.
 
 | Ziel | Generator | Quelle |
 | --- | --- | --- |
-| [src/vokabulare/berufe.ts](../src/vokabulare/berufe.ts) — 3512 Berufsbezeichnungen | `npm run vokabular:berufe` | `scripts/quellen/kldb-2010-berufe.csv`, `scripts/quellen/berufenet-berufe.csv` |
-| [src/vokabulare/thw-funktionen-ergaenzung.ts](../src/vokabulare/thw-funktionen-ergaenzung.ts) — 145 THW-Funktionen | `npm run vokabular:thw-funktionen` | `scripts/quellen/thw-funktionen.csv` |
+| [vendor/bos-vokabulare/src/berufe.ts](../vendor/bos-vokabulare/src/berufe.ts) — 3512 Berufsbezeichnungen | `npm run vokabular:berufe` | `scripts/quellen/kldb-2010-berufe.csv`, `scripts/quellen/berufenet-berufe.csv` |
+| [vendor/bos-vokabulare/src/thw-funktionen-ergaenzung.ts](../vendor/bos-vokabulare/src/thw-funktionen-ergaenzung.ts) — 145 THW-Funktionen | `npm run vokabular:thw-funktionen` | `scripts/quellen/thw-funktionen.csv` |
 
 **Berufe** kommen aus zwei Verzeichnissen der Bundesagentur für Arbeit. Die
 Klassifikation der Berufe 2010 (Ebene der Berufsuntergruppen) liefert die
@@ -627,7 +705,7 @@ fügt beides zusammen — das nutzt die App.
 ### Handredigierte Vokabulare dieser Felder
 
 **DLRG-Ausbildungskennzahlen**
-([src/vokabulare/dlrg-qualifikationen.ts](../src/vokabulare/dlrg-qualifikationen.ts))
+([vendor/bos-vokabulare/src/dlrg-qualifikationen.ts](../vendor/bos-vokabulare/src/dlrg-qualifikationen.ts))
 stehen bei „Weitere Qualifikationen" vor den Berufen, sobald die Einheit als
 DLRG geführt wird — 56 Einträge aus sechs Fachbereichen, aus der Legende einer
 DLRG-Übersicht abgeschrieben (es gibt keinen maschinenlesbaren Datensatz). Wie
@@ -649,7 +727,7 @@ Datei und behält jede vorhandene Bezeichnung→Code-Zuordnung; nur neue
 Bezeichnungen bekommen Codes hinter dem bisherigen Maximum. Fällt eine Funktion
 aus der Quelle, bleibt ihr Code reserviert (der Generator meldet das) — sonst
 würden gespeicherte Bögen und alte QR-Codes still umgedeutet. Dass keine
-Funktion doppelt geführt wird, sichert `src/vokabulare/thw.test.ts` ab.
+Funktion doppelt geführt wird, sichert `vendor/bos-vokabulare/src/thw.test.ts` ab.
 
 ## Offene Punkte
 

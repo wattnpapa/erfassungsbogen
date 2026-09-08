@@ -9,8 +9,8 @@ import {
   StaerkeRolle,
   type Erfassungsbogen,
   type Fahrzeug,
-} from "../model";
-import { MeldeStatus, type MeldeEintrag } from "./einsaetze";
+} from "@bos/eeb-format/model";
+import { MeldeStatus, type MeldeEintrag } from "@bos/meldekopf/einsaetze";
 import {
   einheitenAnsicht,
   einheitenFiltern,
@@ -19,7 +19,7 @@ import {
   personenMitQualifikation,
   qualifikationenImEinsatz,
 } from "./einheiten-liste";
-import type { Person, VokabularWert } from "../model";
+import type { Person, VokabularWert } from "@bos/eeb-format/model";
 
 function fahrzeug(over: Partial<Fahrzeug> = {}): Fahrzeug {
   return { typ: { freitext: "MTW" }, stanKonform: true, ...over };

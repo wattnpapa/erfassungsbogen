@@ -18,7 +18,7 @@
  * die Stapellogik ohne Bilder und ohne Browser testbar bleibt.
  */
 
-import type { Erfassungsbogen } from "../model";
+import type { Erfassungsbogen } from "@bos/eeb-format/model";
 import {
   decodePayload,
   decodePayloadUrl,
@@ -29,7 +29,7 @@ import {
   segmentePayload,
   type Kompressor,
   type SegmentTeil,
-} from "../codec";
+} from "@bos/eeb-format/codec";
 import { browserKompressor } from "./hilfen";
 import { qrAusBild } from "./qr-bild";
 

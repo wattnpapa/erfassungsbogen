@@ -17,7 +17,7 @@ import {
   verpflegung,
   zeitpunktZuIso,
   type Erfassungsbogen,
-} from "../model";
+} from "@bos/eeb-format/model";
 import {
   datumDeutsch,
   zeitgruppe,
@@ -31,7 +31,7 @@ import {
   vokabText,
   vokabularFuer,
 } from "./hilfen";
-import { bogenDiff, diffKurzfassung, type WertAenderung } from "./meldung-diff";
+import { bogenDiff, diffKurzfassung, type WertAenderung } from "@bos/meldekopf/meldung-diff";
 import {
   EinsatzArt,
   MeldeStatus,
@@ -52,10 +52,10 @@ import {
   type Einsatzsammlung,
   type MeldeEintrag,
   type ZusammenfuehrungOptionen,
-} from "./einsaetze";
+} from "@bos/meldekopf/einsaetze";
 import { AufteilenPanel } from "./aufteilen-ui";
 import { ZusammenfuehrenPanel } from "./zusammenfuehren-ui";
-import type { AufteilungsWahl } from "./aufteilen";
+import type { AufteilungsWahl } from "@bos/meldekopf/aufteilen";
 import { aggregiere, aggregiereNachZug, type EinsatzSummen } from "./auswertung";
 import {
   SORTIERUNGEN,

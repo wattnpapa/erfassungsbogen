@@ -9,7 +9,7 @@ import {
   datumZuIso,
   zeitpunktAusIso,
   zeitpunktZuIso,
-} from "../../model";
+} from "@bos/eeb-format/model";
 import { Feld, type SchrittProps } from "./bausteine";
 
 export function SchrittEinsatz({ bogen, aendern }: SchrittProps) {

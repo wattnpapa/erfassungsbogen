@@ -10,7 +10,7 @@ import userEvent from "@testing-library/user-event";
 import { useState } from "react";
 import { Dialogschicht } from "../dialoge";
 import { neuePerson, neuerBogen } from "../hilfen";
-import type { Erfassungsbogen } from "../../model";
+import type { Erfassungsbogen } from "@bos/eeb-format/model";
 import { SchrittBuehne } from "../../test/schritt-buehne";
 import { SchrittEinheit } from "./einheit";
 

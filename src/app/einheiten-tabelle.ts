@@ -16,9 +16,9 @@
  * einer angeklickten Spalte um.
  */
 
-import { staerke, unterbringungMWD, verpflegung } from "../model";
+import { staerke, unterbringungMWD, verpflegung } from "@bos/eeb-format/model";
 import { einheitAnzeigename, orgLabel, vokabText, vokabularFuer, zeitgruppe } from "./hilfen";
-import { MeldeStatus, type MeldeEintrag } from "./einsaetze";
+import { MeldeStatus, type MeldeEintrag } from "@bos/meldekopf/einsaetze";
 import { summiereBoegen, type EinsatzSummen } from "./auswertung";
 
 /** Eine Tabellenzeile: eine gemeldete Einheit mit allen Zahlen der Übersicht. */

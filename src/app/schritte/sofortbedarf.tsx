@@ -3,7 +3,7 @@
  * Unterbringung/Ruhezeit und ein Freitextfeld.
  */
 
-import { PersonalErfassung, staerke, verpflegung } from "../../model";
+import { PersonalErfassung, staerke, verpflegung } from "@bos/eeb-format/model";
 import { Feld, zahl, type SchrittProps } from "./bausteine";
 
 export function SchrittSofortbedarf({ bogen, aendern }: SchrittProps) {

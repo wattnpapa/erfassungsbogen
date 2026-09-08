@@ -5,8 +5,8 @@
  */
 
 import { createContext, useContext, useEffect, useId, useState, type ComponentProps, type ReactNode } from "react";
-import { Erfassungsbogen, VokabularWert } from "../../model";
-import type { VokabularEintrag } from "../../vokabulare/thw";
+import { Erfassungsbogen, VokabularWert } from "@bos/eeb-format/model";
+import type { VokabularEintrag } from "@bos/vokabulare/thw";
 import { vokabSortiert, type Pruefpunkt } from "../hilfen";
 
 export type SchrittProps = {

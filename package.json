@@ -50,7 +50,6 @@
     "content-laender": "node --import tsx scripts/content-laender.mts",
     "content-laenderkarte": "node --import tsx scripts/content-laenderkarte.mts",
     "content-rollbereich": "node --import tsx scripts/content-rollbereich.mts",
-    "zeichen": "node --import tsx scripts/taktische-zeichen-holen.mts",
     "handscanner-codes": "node --import tsx scripts/handscanner-codes.mts",
     "wasserzeichen": "node --import tsx scripts/uebung-wasserzeichen.mts",
     "bilder-webp": "node --import tsx scripts/bilder-webp.mts",
@@ -117,6 +116,10 @@
     "generateUpdatesFilesForAllChannels": true
   },
   "dependencies": {
+    "@bos/eeb-format": "file:vendor/eeb-format",
+    "@bos/meldekopf": "file:vendor/bos-meldekopf",
+    "@bos/taktische-zeichen": "file:vendor/bos-taktische-zeichen",
+    "@bos/vokabulare": "file:vendor/bos-vokabulare",
     "@capacitor/android": "^8.4.1",
     "@capacitor/app": "^8.1.0",
     "@capacitor/barcode-scanner": "^3.1.0",

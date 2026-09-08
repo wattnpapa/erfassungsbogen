@@ -1,4 +1,5 @@
 import { readFileSync } from "node:fs";
+import { fileURLToPath } from "node:url";
 import { defineConfig, type Plugin } from "vite";
 import react from "@vitejs/plugin-react";
 import { VitePWA } from "vite-plugin-pwa";
@@ -166,8 +167,36 @@ function fontCssInline(): Plugin {
 
 // base "./": relative Pfade, damit der Build direkt auf GitHub Pages
 // (Unterpfad /<repo>/) funktioniert.
+/** Pfad relativ zur Projektwurzel, absolut aufgelöst. */
+function pfad(teil: string): string {
+  return fileURLToPath(new URL(teil, import.meta.url));
+}
+
 export default defineConfig({
   base: "./",
+  // Die vier Kern-Bausteine hängen als git-Submodul unter vendor/ und sind über
+  // `file:`-Abhängigkeiten in node_modules verlinkt (ADR-003). Gebündelt wird
+  // ihre QUELLE, nicht ihr dist/: Vite übersetzt TypeScript ohnehin, die
+  // Bausteine müssen dafür nicht vorgebaut werden, das Tree-Shaking arbeitet
+  // auf dem Original, und die Bundle-Messung sieht, was wirklich hineingeht.
+  // Das gebaute dist/ bleibt für das Schwesterprodukt bestehen, das es über
+  // `exports` konsumiert.
+  resolve: {
+    // Modulgenau, nicht über den Sammel-Einstieg: `@bos/vokabulare` insgesamt
+    // zöge die großen Tabellen (Berufe, Ortsverbände) in jedes Bündel, das
+    // irgendein Vokabular anfasst — und damit ins Startbündel. Der Sammel-
+    // Einstieg bleibt für Konsumenten ohne Bündler bestehen.
+    alias: [
+      { find: /^@bos\/eeb-format\/(.*)$/, replacement: pfad("vendor/eeb-format/src/$1.ts") },
+      { find: /^@bos\/eeb-format$/, replacement: pfad("vendor/eeb-format/src/index.ts") },
+      { find: /^@bos\/meldekopf\/(.*)$/, replacement: pfad("vendor/bos-meldekopf/src/$1.ts") },
+      { find: /^@bos\/meldekopf$/, replacement: pfad("vendor/bos-meldekopf/src/index.ts") },
+      { find: /^@bos\/vokabulare\/(.*)$/, replacement: pfad("vendor/bos-vokabulare/src/$1.ts") },
+      { find: /^@bos\/vokabulare$/, replacement: pfad("vendor/bos-vokabulare/src/index.ts") },
+      { find: /^@bos\/taktische-zeichen\/(.*)$/, replacement: pfad("vendor/bos-taktische-zeichen/src/$1.ts") },
+      { find: /^@bos\/taktische-zeichen$/, replacement: pfad("vendor/bos-taktische-zeichen/src/index.ts") },
+    ],
+  },
   plugins: [
     react(),
     bauStempel(),

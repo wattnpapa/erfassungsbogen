@@ -12,10 +12,10 @@
  * Migration) ist von der localStorage-Hülle getrennt und unit-getestet.
  */
 
-import type { Erfassungsbogen } from "../model";
-import { datumAusIso, jetztZeitpunkt } from "../model";
+import type { Erfassungsbogen } from "@bos/eeb-format/model";
+import { datumAusIso, jetztZeitpunkt } from "@bos/eeb-format/model";
 import { einheitAnzeigename, migriereBogen } from "./hilfen";
-import { aktive, imPapierkorb, papierkorbBereinigt } from "./papierkorb";
+import { aktive, imPapierkorb, papierkorbBereinigt } from "@bos/meldekopf/papierkorb";
 
 /** Versionierter Schlüssel — erlaubt spätere Formatwechsel der Sammlung selbst. */
 const SPEICHER_SCHLUESSEL = "eeb.vorlagen.v1";

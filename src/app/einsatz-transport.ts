@@ -10,9 +10,9 @@
  * nicht als Bogen-JSON durchgehen.
  */
 
-import { SCHEMA_VERSION, mitTransportVersion, type Erfassungsbogen } from "../model";
+import { SCHEMA_VERSION, mitTransportVersion, type Erfassungsbogen } from "@bos/eeb-format/model";
 import { migriereBogen } from "./hilfen";
-import type { Einsatzsammlung } from "./einsaetze";
+import type { Einsatzsammlung } from "@bos/meldekopf/einsaetze";
 import { entpackt, pdfStroeme } from "./pdf-stroeme";
 
 // -------------------------------------------------------- JSON-Datei (Einsatz)

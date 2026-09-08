@@ -7,7 +7,7 @@
  * THW-Blau — praktisch die bisherige Akzentfarbe.
  */
 
-import { OrganisationsTyp } from "../model";
+import { OrganisationsTyp } from "@bos/eeb-format/model";
 
 /**
  * Kennfarbe je Organisation: färbt im PDF Kopfbalken, Organisationsangabe und die

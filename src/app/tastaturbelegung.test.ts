@@ -7,7 +7,7 @@
 
 import { describe, it, expect } from "vitest";
 import { usBelegungZurueck, entwirreScanText } from "./tastaturbelegung";
-import { encodePayload, encodePayloadUrl, segmentPayloadUrls } from "../codec";
+import { encodePayload, encodePayloadUrl, segmentPayloadUrls } from "@bos/eeb-format/codec";
 import { browserKompressor, neuerBogen } from "./hilfen";
 
 /** Was ein auf US-Belegung stehender Scanner auf deutscher Tastatur hinterlässt. */

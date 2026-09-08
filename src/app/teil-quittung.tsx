@@ -15,7 +15,7 @@
  * Blick, nicht die einzige Quelle; sie ist deshalb `aria-hidden`.
  */
 
-import type { SegmentTeil } from "../codec";
+import type { SegmentTeil } from "@bos/eeb-format/codec";
 
 /** Noch fehlende Teilnummern, aufsteigend. Leer bei unsegmentiert/vollständig. */
 export function fehlendeTeile(teile: SegmentTeil[]): number[] {

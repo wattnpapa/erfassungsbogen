@@ -10,8 +10,8 @@ import {
   StaerkeRolle,
   type Erfassungsbogen,
   type Person,
-} from "../model";
-import { MeldeStatus, bogenInhaltsId, einheitSchluessel, type Einsatzsammlung, type MeldeEintrag } from "./einsaetze";
+} from "@bos/eeb-format/model";
+import { MeldeStatus, bogenInhaltsId, einheitSchluessel, type Einsatzsammlung, type MeldeEintrag } from "@bos/meldekopf/einsaetze";
 import { bogenCsvInhalt, einsatzDetailCsvInhalt } from "./bogen-csv";
 
 function person(over: Partial<Person> = {}): Person {

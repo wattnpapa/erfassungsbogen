@@ -8,9 +8,9 @@
  */
 
 import { useState } from "react";
-import { staerke, type Erfassungsbogen } from "../model";
-import { zusammenfuehrungFehler, fuegeZusammen } from "./zusammenfuehren";
-import type { MeldeEintrag, ZusammenfuehrungOptionen } from "./einsaetze";
+import { staerke, type Erfassungsbogen } from "@bos/eeb-format/model";
+import { zusammenfuehrungFehler, fuegeZusammen } from "@bos/meldekopf/zusammenfuehren";
+import type { MeldeEintrag, ZusammenfuehrungOptionen } from "@bos/meldekopf/einsaetze";
 import { einheitAnzeigename, zeitgruppe } from "./hilfen";
 
 /** Kurzfassung „0 / 1 / 8 / 9 · 2 Fzg" für die Vorschau. */

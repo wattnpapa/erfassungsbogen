@@ -12,13 +12,13 @@ import * as pdfFonts from "pdfmake/build/vfs_fonts";
 // virtuelle Dateisystem bekommen — sonst bricht das Rendern mit
 // „File 'data/Helvetica-Bold.afm' not found in virtual file system" ab.
 import helvetica from "pdfmake/build/standard-fonts/Helvetica";
-import type { Erfassungsbogen } from "../model";
-import { base64UrlDekodieren } from "../codec";
+import type { Erfassungsbogen } from "@bos/eeb-format/model";
+import { base64UrlDekodieren } from "@bos/eeb-format/codec";
 import { einheitAnzeigename, natoZeitstempel, qrErzeugen } from "./hilfen";
 import { istNativ, binaerTeilen } from "./nativ";
 import { einsatzPdfDokument, pdfDokument, type SammelBogen } from "./pdf-dokument";
 import { einsatzDateiInhalt } from "./einsatz-transport";
-import { revisionen, type Einsatzsammlung, type MeldeEintrag } from "./einsaetze";
+import { revisionen, type Einsatzsammlung, type MeldeEintrag } from "@bos/meldekopf/einsaetze";
 
 interface FontContainer {
   vfs: Record<string, string | { data: string; encoding?: string }>;

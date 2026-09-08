@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { fehlendeTeile, fehlendeTeileText, fehltNochSatz } from "./teil-quittung";
-import type { SegmentTeil } from "../codec";
+import type { SegmentTeil } from "@bos/eeb-format/codec";
 
 /** Sammelstand mit `anzahl` Teilen, von denen `haben` vorliegen. */
 function stand(anzahl: number, haben: number[]): SegmentTeil[] {

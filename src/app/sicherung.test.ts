@@ -7,11 +7,11 @@ import {
   sicherungInhalt,
   sicherungParsen,
 } from "./sicherung";
-import { OrganisationsTyp, PersonalErfassung, SCHEMA_VERSION, type Erfassungsbogen } from "../model";
+import { OrganisationsTyp, PersonalErfassung, SCHEMA_VERSION, type Erfassungsbogen } from "@bos/eeb-format/model";
 import { absenderkarteSpeichern } from "./absenderkarte";
 import { EinsatzArt, einsatzAnlegen, meldungHinzufuegen,
   speicherhuelleSetzen,
-} from "./einsaetze";
+} from "@bos/meldekopf/einsaetze";
 import { entwurfLaden, entwurfSpeichern } from "./entwurf";
 import { vorlageAnlegen, vorlageLoeschen, vorlagenLaden } from "./vorlagen";
 

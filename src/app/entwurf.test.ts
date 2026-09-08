@@ -7,7 +7,7 @@ vi.mock("./nativ", () => ({
   textTeilen: async () => {},
 }));
 
-import { SCHEMA_VERSION } from "../model";
+import { SCHEMA_VERSION } from "@bos/eeb-format/model";
 import { neuerBogen } from "./hilfen";
 import { entwurfAusJson, entwurfZuJson, entwurfLaden, entwurfSpeichern, entwurfVerwerfen } from "./entwurf";
 

@@ -9,9 +9,9 @@
  */
 
 import { useState } from "react";
-import { PersonalErfassung, staerke, type Erfassungsbogen } from "../model";
-import { aufteilungFehler, teileBogen, type AufteilungsWahl, type TeilStaerke } from "./aufteilen";
-import { MeldeStatus, type AufteilungOptionen, type MeldeEintrag } from "./einsaetze";
+import { PersonalErfassung, staerke, type Erfassungsbogen } from "@bos/eeb-format/model";
+import { aufteilungFehler, teileBogen, type AufteilungsWahl, type TeilStaerke } from "@bos/meldekopf/aufteilen";
+import { MeldeStatus, type AufteilungOptionen, type MeldeEintrag } from "@bos/meldekopf/einsaetze";
 import { funktionsText, kennzeichenText, vokabText, vokabularFuer } from "./hilfen";
 import { Auswahl } from "./schritte/bausteine";
 

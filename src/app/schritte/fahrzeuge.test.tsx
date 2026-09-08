@@ -6,10 +6,10 @@
 import { describe, it, expect } from "vitest";
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { OrganisationsTyp } from "../../model";
+import { OrganisationsTyp } from "@bos/eeb-format/model";
 import { SchrittBuehne } from "../../test/schritt-buehne";
 import { neuerBogen, neuesFahrzeug, vokabularFuer } from "../hilfen";
-import { stanFahrzeugVorbelegung } from "../../vokabulare/thw-stan-fahrzeuge";
+import { stanFahrzeugVorbelegung } from "@bos/vokabulare/thw-stan-fahrzeuge";
 import { SchrittFahrzeuge } from "./fahrzeuge";
 
 const buehne = () => render(<SchrittBuehne komponente={SchrittFahrzeuge} />);

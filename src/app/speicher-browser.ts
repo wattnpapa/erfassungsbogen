@@ -7,7 +7,7 @@
  * Stelle, die `localStorage` mit ihr verbindet.
  */
 
-import { speicherhuelleSetzen, type Speicherhuelle } from "./einsaetze";
+import { speicherhuelleSetzen, type Speicherhuelle } from "@bos/meldekopf/einsaetze";
 
 /** `localStorage`, sofern erreichbar — im Privatmodus oder bei blockiertem
  *  Speicher wirft schon der Zugriff auf die Eigenschaft. */

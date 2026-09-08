@@ -7,13 +7,13 @@
  * Produkt.
  */
 
-import { OrganisationsTyp, type Einheit, type Fahrzeug } from "../model";
-import { vokabText, vokabularFuer } from "./darstellung";
+import { OrganisationsTyp, type Einheit, type Fahrzeug } from "@bos/eeb-format/model";
+import { vokabText, vokabularFuer } from "@bos/meldekopf/darstellung";
 import {
   einheitZeichenSvg,
   fahrzeugZeichenSvg,
   type Zeichenorganisation,
-} from "./taktische-zeichen";
+} from "@bos/taktische-zeichen/zeichen";
 
 /**
  * Bogen-Organisation → Zeichenbereich der Sammlung. Mehrere Organisationen
@@ -64,4 +64,4 @@ export function einheitSymbolSvg(e: Einheit): string {
   });
 }
 
-export { svgDataUrl } from "./taktische-zeichen";
+export { svgDataUrl } from "@bos/taktische-zeichen/zeichen";

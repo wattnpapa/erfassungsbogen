@@ -29,9 +29,9 @@ import {
   zeitpunktAusIso,
   staerke,
   unterbringungMWD,
-} from "../src/model";
-import { EEB_URL_PREFIX } from "../src/codec";
-import { bogenZuQrPng, bogenZuQrSvg, qrTextZuBogen } from "../src/qr-node";
+} from "@bos/eeb-format/model";
+import { EEB_URL_PREFIX } from "@bos/eeb-format/codec";
+import { bogenZuQrPng, bogenZuQrSvg, qrTextZuBogen } from "@bos/eeb-format/qr-node";
 
 // Vokabular-Codes aus src/vokabulare/thw.ts:
 // Einheitstyp 43 = FGr K (A); Funktionen 3=GrFü 4=TrFü 5=He 7=SGL 35=FüGeh;

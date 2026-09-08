@@ -18,10 +18,10 @@ import {
   staerke,
   unterbringungMWD,
   verpflegung,
-} from "../../model";
+} from "@bos/eeb-format/model";
 import { parseNamen } from "../personal-schnell";
 import { beispielPersonen } from "../beispielnamen";
-import { stanPersonalVorbelegung } from "../../vokabulare/thw-stan-personal";
+import { stanPersonalVorbelegung } from "@bos/vokabulare/thw-stan-personal";
 import { FE_TEXT, neuePerson, pruefpunkte, vokabularFuer, vorbelegungGeladen } from "../hilfen";
 import { frageJaNein } from "../dialoge";
 import { TabellenScroll } from "../tabellen-scroll";
@@ -59,14 +59,14 @@ function useQualiVorschlaege(aktiv: boolean, org: OrganisationsTyp): readonly Fr
   const [dlrgQuali, setDlrgQuali] = useState(dlrgQualiCache);
   useEffect(() => {
     if (!aktiv || berufe) return;
-    void import("../../vokabulare/berufe").then((m) => {
+    void import("@bos/vokabulare/berufe").then((m) => {
       berufeCache = m.BERUFE;
       setBerufe(berufeCache);
     });
   }, [aktiv, berufe]);
   useEffect(() => {
     if (!aktiv || !dlrg || dlrgQuali) return;
-    void import("../../vokabulare/dlrg-qualifikationen").then((m) => {
+    void import("@bos/vokabulare/dlrg-qualifikationen").then((m) => {
       dlrgQualiCache = m.DLRG_QUALIFIKATIONEN;
       setDlrgQuali(dlrgQualiCache);
     });

@@ -14,7 +14,7 @@ import {
   schluesselKurzform,
   schluesselpaarErzeugen,
   zuHex,
-} from "../signatur";
+} from "@bos/eeb-format/signatur";
 
 const SCHLUESSEL_KEY = "eeb.geraeteschluessel.v1"; // privater Schlüssel (Hex)
 

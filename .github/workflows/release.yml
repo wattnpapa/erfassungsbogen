@@ -32,6 +32,9 @@ jobs:
       build_version: ${{ steps.version.outputs.build_version }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          # Der geteilte Kern hängt als Submodul unter vendor/ (ADR-003).
+          submodules: recursive
 
       - name: Build-Version erzeugen
         id: version
@@ -58,6 +61,9 @@ jobs:
     needs: prepare
     steps:
       - uses: actions/checkout@v4
+        with:
+          # Der geteilte Kern hängt als Submodul unter vendor/ (ADR-003).
+          submodules: recursive
       - uses: actions/setup-node@v4
         with:
           node-version: 24
@@ -78,6 +84,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
+          # Der geteilte Kern hängt als Submodul unter vendor/ (ADR-003).
+          submodules: recursive
           # Volle Historie: die sitemap.xml entsteht im Build und nimmt ihr
           # <lastmod> je Seite aus dem letzten Commit, der sie geändert hat
           # (scripts/sitemap.ts). Der flache Standard-Checkout kennt nur einen
@@ -133,6 +141,9 @@ jobs:
       APPLE_API_ISSUER: ${{ secrets.APPLE_API_ISSUER }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          # Der geteilte Kern hängt als Submodul unter vendor/ (ADR-003).
+          submodules: recursive
       - uses: actions/setup-node@v4
         with:
           node-version: 24
@@ -179,6 +190,9 @@ jobs:
       APP_BUILD_VERSION: ${{ needs.prepare.outputs.build_version }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          # Der geteilte Kern hängt als Submodul unter vendor/ (ADR-003).
+          submodules: recursive
       - uses: actions/setup-node@v4
         with:
           node-version: 24
@@ -214,6 +228,9 @@ jobs:
       APP_BUILD_VERSION: ${{ needs.prepare.outputs.build_version }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          # Der geteilte Kern hängt als Submodul unter vendor/ (ADR-003).
+          submodules: recursive
       - uses: actions/setup-node@v4
         with:
           node-version: 24
@@ -247,6 +264,9 @@ jobs:
       APP_BUILD_VERSION: ${{ needs.prepare.outputs.build_version }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          # Der geteilte Kern hängt als Submodul unter vendor/ (ADR-003).
+          submodules: recursive
       - uses: actions/setup-node@v4
         with:
           node-version: 24

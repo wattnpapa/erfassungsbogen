@@ -18,10 +18,10 @@
 import { describe, it, expect, afterEach, beforeEach, vi } from "vitest";
 import { cleanup, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import type { Erfassungsbogen } from "../model";
+import type { Erfassungsbogen } from "@bos/eeb-format/model";
 import { Dialogschicht } from "./dialoge";
 import { EinsatzDetail } from "./einsaetze-ui";
-import { EinsatzArt, einsaetzeLaden, einsatzAnlegen, meldungHinzufuegen, type MeldeEintrag } from "./einsaetze";
+import { EinsatzArt, einsaetzeLaden, einsatzAnlegen, meldungHinzufuegen, type MeldeEintrag } from "@bos/meldekopf/einsaetze";
 import { neuerBogen } from "./hilfen";
 
 // pdfmake selbst hat hier nichts zu suchen: geprüft wird der Weg dorthin.

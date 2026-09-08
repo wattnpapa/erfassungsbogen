@@ -10,10 +10,10 @@ import {
   Ernaehrung,
   type Erfassungsbogen,
   type Person,
-} from "../model";
+} from "@bos/eeb-format/model";
 import { einsatzAnlegen, einsaetzeLaden, einsatzImportieren, meldungHinzufuegen,
   speicherhuelleSetzen,
-} from "./einsaetze";
+} from "@bos/meldekopf/einsaetze";
 import { boegenAusPdfBytes, einsatzAusDatei, einsatzAusPdfBytes, einsatzDateiInhalt } from "./einsatz-transport";
 
 class MemStorage {

@@ -51,7 +51,7 @@ import {
   type Erfassungsbogen,
   type Fahrzeug,
   type Person,
-} from "../model";
+} from "@bos/eeb-format/model";
 import {
   FE_TEXT,
   datumDeutsch,
@@ -65,7 +65,7 @@ import {
   zeitgruppe,
 } from "./hilfen";
 import { csvDatei, csvZeile, jaNein } from "./csv";
-import { neuesteJeEinheit, MeldeStatus, type Einsatzsammlung, type MeldeEintrag, type MeldeQuelle } from "./einsaetze";
+import { neuesteJeEinheit, MeldeStatus, type Einsatzsammlung, type MeldeEintrag, type MeldeQuelle } from "@bos/meldekopf/einsaetze";
 
 // ------------------------------------------------------------------ Spalten
 

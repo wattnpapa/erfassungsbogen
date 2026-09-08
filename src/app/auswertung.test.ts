@@ -9,8 +9,8 @@ import {
   Ernaehrung,
   type Erfassungsbogen,
   type Person,
-} from "../model";
-import { MeldeStatus, einheitSchluessel, bogenInhaltsId, type MeldeEintrag } from "./einsaetze";
+} from "@bos/eeb-format/model";
+import { MeldeStatus, einheitSchluessel, bogenInhaltsId, type MeldeEintrag } from "@bos/meldekopf/einsaetze";
 import { aggregiere, aggregiereNachZug, aktuelleMeldungen } from "./auswertung";
 
 function person(rolle: StaerkeRolle, geschlecht = Geschlecht.M, ernaehrung = Ernaehrung.FLEISCH): Person {

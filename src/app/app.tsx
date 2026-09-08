@@ -8,7 +8,7 @@
 
 import { Fragment, useEffect, useRef, useState, type ChangeEvent } from "react";
 import { START_ABSCHNITTE, type Teil } from "./start-inhalt";
-import type { Erfassungsbogen } from "../model";
+import type { Erfassungsbogen } from "@bos/eeb-format/model";
 import {
   base64UrlKodieren,
   decodePayloadUrl,
@@ -21,8 +21,8 @@ import {
   segmentePayload,
   segmenteZuBogen,
   type SegmentTeil,
-} from "../codec";
-import { signaturLabel, signaturVonPayload, signaturVonText, type SignaturStatus } from "../signatur";
+} from "@bos/eeb-format/codec";
+import { signaturLabel, signaturVonPayload, signaturVonText, type SignaturStatus } from "@bos/eeb-format/signatur";
 import {
   SCHRITT_STATUS_TITEL,
   blobAlsDownload,
@@ -33,7 +33,7 @@ import {
   neuerBogen,
   schrittStatus,
 } from "./hilfen";
-import { PersonalErfassung, jetztZeitpunkt, staerke } from "../model";
+import { PersonalErfassung, jetztZeitpunkt, staerke } from "@bos/eeb-format/model";
 import { Kopfnav } from "./kopfnav-ui";
 import { bogenLinksEmpfangen, imWebBrowser, istNativ, qrScannen, textTeilen } from "./nativ";
 import { fehlerText } from "./nachladen";
@@ -51,7 +51,7 @@ import {
   meldungHinzufuegen,
   type EintragSignatur,
   type Einsatzsammlung,
-} from "./einsaetze";
+} from "@bos/meldekopf/einsaetze";
 import { ART_LABEL, EinsatzDetail, EinsatzListe } from "./einsaetze-ui";
 import { aktuelleMeldungen } from "./auswertung";
 import { boegenAusPdfBytes, einsatzAusDatei, einsatzAusPdfBytes, einsatzDateiInhalt, istPdfDatei } from "./einsatz-transport";

@@ -9,7 +9,7 @@
  */
 
 import { useState } from "react";
-import { StaerkeRolle, staerke, type Erfassungsbogen } from "../model";
+import { StaerkeRolle, staerke, type Erfassungsbogen } from "@bos/eeb-format/model";
 import {
   funktionsText,
   kennzeichenText,

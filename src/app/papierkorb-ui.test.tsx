@@ -20,7 +20,7 @@ import {
   einsaetzePapierkorb,
   einsatzAnlegen,
   einsatzLoeschen,
-} from "./einsaetze";
+} from "@bos/meldekopf/einsaetze";
 import { vorlageAnlegen, vorlageLoeschen, vorlagenLaden, vorlagenPapierkorb } from "./vorlagen";
 import { neuerBogen } from "./hilfen";
 

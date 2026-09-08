@@ -15,15 +15,15 @@ npm run test:coverage # mit Abdeckungsbericht
 
 Dateien liegen neben dem Code (`src/**/*.test.ts`). Schwerpunkt:
 
-- **`src/codec.test.ts`** — Binär-/QR-Roundtrip, BCD-Telefonnummern, Vokabular
+- **`vendor/eeb-format/src/codec.test.ts`** — Binär-/QR-Roundtrip, BCD-Telefonnummern, Vokabular
   (Code vs. Freitext), Unicode, Fehlerpfade (falsches Magic, Schema-Grenzen,
   über-/unvollständige Daten).
-- **`src/codec.migration.test.ts`** — Abwärtskompatibilität über eine
+- **`vendor/eeb-format/src/codec.migration.test.ts`** — Abwärtskompatibilität über eine
   **eingefrorene v2-QR-Payload** (Base64url-Konstante). Diese Bytes dürfen sich
   nie ändern; sie stehen für QR-Codes/Dateien, die vor einer Schema-Umstellung
   erzeugt wurden. Bei jeder neuen `SCHEMA_VERSION` eine analoge eingefrorene
   Fixture der Vorgängerversion ergänzen, statt die alte zu verändern.
-- **`src/model.test.ts`** — Datums-/Zeitkonvertierung, abgeleitete Werte
+- **`vendor/eeb-format/src/model.test.ts`** — Datums-/Zeitkonvertierung, abgeleitete Werte
   (Stärke, Unterbringung M/W/D, Verpflegung, Ansprechpartner).
 - **`src/app/hilfen.test.ts`** — Anzeige-Helfer (Funktions-/Kennzeichen-/
   Funkruftext), Plausibilitätsprüfung, JSON-Migration.

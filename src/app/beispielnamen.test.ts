@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { Geschlecht, Person, StaerkeRolle } from "../model";
+import { Geschlecht, Person, StaerkeRolle } from "@bos/eeb-format/model";
 import { beispielPersonen } from "./beispielnamen";
 import { neuePerson } from "./hilfen";
 

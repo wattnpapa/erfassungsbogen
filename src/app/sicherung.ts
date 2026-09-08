@@ -14,7 +14,7 @@
  */
 
 import { absenderkarteGefuellt, absenderkarteLaden } from "./absenderkarte";
-import { einsaetzeLaden, einsaetzePapierkorb } from "./einsaetze";
+import { einsaetzeLaden, einsaetzePapierkorb } from "@bos/meldekopf/einsaetze";
 import { entwurfLaden } from "./entwurf";
 import { geraeteSchluesselPrivat } from "./geraete-schluessel";
 import { vorlagenLaden, vorlagenPapierkorb } from "./vorlagen";

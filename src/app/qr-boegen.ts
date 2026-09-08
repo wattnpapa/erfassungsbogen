@@ -13,8 +13,8 @@
  * Weiterreichen einer fremden Meldung (Gegenzeichnen, siehe hilfen.ts).
  */
 
-import { signaturVonPayload, type SignaturStatus } from "../signatur";
-import type { Erfassungsbogen } from "../model";
+import { signaturVonPayload, type SignaturStatus } from "@bos/eeb-format/signatur";
+import type { Erfassungsbogen } from "@bos/eeb-format/model";
 import { qrStapelLesen } from "./qr-stapel";
 
 /** Ein aus QR-Codes gewonnener Bogen samt Herkunftsnachweis. */

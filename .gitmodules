@@ -1,0 +1,12 @@
+[submodule "vendor/eeb-format"]
+	path = vendor/eeb-format
+	url = https://github.com/wattnpapa/eeb-format.git
+[submodule "vendor/bos-meldekopf"]
+	path = vendor/bos-meldekopf
+	url = https://github.com/wattnpapa/bos-meldekopf.git
+[submodule "vendor/bos-vokabulare"]
+	path = vendor/bos-vokabulare
+	url = https://github.com/wattnpapa/bos-vokabulare.git
+[submodule "vendor/bos-taktische-zeichen"]
+	path = vendor/bos-taktische-zeichen
+	url = https://github.com/wattnpapa/bos-taktische-zeichen.git

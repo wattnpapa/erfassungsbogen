@@ -9,10 +9,10 @@ import {
   HierarchieEbene,
   OrganisationsTyp,
   PersonalErfassung,
-} from "../../model";
-import type { ThwOrtsverband } from "../../vokabulare/thw-ov";
-import { stanFahrzeugVorbelegung } from "../../vokabulare/thw-stan-fahrzeuge";
-import { stanPersonalVorbelegung } from "../../vokabulare/thw-stan-personal";
+} from "@bos/eeb-format/model";
+import type { ThwOrtsverband } from "@bos/vokabulare/thw-ov";
+import { stanFahrzeugVorbelegung } from "@bos/vokabulare/thw-stan-fahrzeuge";
+import { stanPersonalVorbelegung } from "@bos/vokabulare/thw-stan-personal";
 import { ORG_OPTIONEN, einheitAnzeigename, ersteEbene, vokabularFuer } from "../hilfen";
 import { frageJaNein } from "../dialoge";
 import { Auswahl, Feld, VokabAuswahl, VorschlagFeld, type SchrittProps } from "./bausteine";
@@ -22,8 +22,8 @@ import { Auswahl, Feld, VokabAuswahl, VorschlagFeld, type SchrittProps } from ".
 // Landesvorlagen, die über ihren eager-Glob sämtliche landesrechtlichen
 // Beispielbögen als Daten enthalten (~300 KB). Einmal geladen, bleiben die Module im Cache —
 // der useState-Startwert greift dann sofort, ohne Nachlade-Flackern.
-type OvDaten = typeof import("../../vokabulare/thw-ov") &
-  typeof import("../../vokabulare/thw-ov-regionalstruktur");
+type OvDaten = typeof import("@bos/vokabulare/thw-ov") &
+  typeof import("@bos/vokabulare/thw-ov-regionalstruktur");
 type LandesvorlagenModul = typeof import("../../vokabulare/landesvorlagen");
 
 let ovDatenCache: OvDaten | null = null;
@@ -35,8 +35,8 @@ function useOvDaten(aktiv: boolean): OvDaten | null {
   useEffect(() => {
     if (!aktiv || daten) return;
     void Promise.all([
-      import("../../vokabulare/thw-ov"),
-      import("../../vokabulare/thw-ov-regionalstruktur"),
+      import("@bos/vokabulare/thw-ov"),
+      import("@bos/vokabulare/thw-ov-regionalstruktur"),
     ]).then(([ov, struktur]) => {
       ovDatenCache = { ...ov, ...struktur };
       setDaten(ovDatenCache);

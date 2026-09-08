@@ -17,8 +17,8 @@ import {
   StaerkeRolle,
   type Erfassungsbogen,
   type Person,
-} from "../model";
-import { MeldeStatus, type MeldeEintrag } from "./einsaetze";
+} from "@bos/eeb-format/model";
+import { MeldeStatus, type MeldeEintrag } from "@bos/meldekopf/einsaetze";
 import { TABELLEN_SPALTEN, tabellenSumme, tabellenZeilen, zeilenSortieren } from "./einheiten-tabelle";
 
 function person(rolle: StaerkeRolle): Person {

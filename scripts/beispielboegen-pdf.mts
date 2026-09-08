@@ -53,7 +53,7 @@ import {
   datumAusIso,
   MINUTEN_JE_TAG,
   staerke,
-} from "../src/model";
+} from "@bos/eeb-format/model";
 import {
   EEB_URL_PREFIX,
   QR_EINZEL_MAX_VERSION,
@@ -64,24 +64,24 @@ import {
   encodePayload,
   parseSegmentUrl,
   segmentPayloadUrls,
-} from "../src/codec";
-import { nodeKompressor } from "../src/qr-node";
+} from "@bos/eeb-format/codec";
+import { nodeKompressor } from "@bos/eeb-format/qr-node";
 import { fakeTelefon } from "./fake-telefon";
 import type { QrSatz, QrTeil } from "../src/app/hilfen";
-import { THW_EINHEITSTYPEN, THW_FAHRZEUGTYPEN } from "../src/vokabulare/thw";
+import { THW_EINHEITSTYPEN, THW_FAHRZEUGTYPEN } from "@bos/vokabulare/thw";
 import {
   THW_FAHRZEUG_KENNZAHLEN,
   THW_TEILEINHEIT_KENNZAHLEN,
   teileinheitKennzahl,
-} from "../src/vokabulare/thw-funkrufnamen";
-import { THW_STAN_FAHRZEUGE } from "../src/vokabulare/thw-stan-fahrzeuge";
-import { THW_STAN_PERSONAL } from "../src/vokabulare/thw-stan-personal";
-import { THW_ORTSVERBAENDE, type ThwOrtsverband } from "../src/vokabulare/thw-ov";
+} from "@bos/vokabulare/thw-funkrufnamen";
+import { THW_STAN_FAHRZEUGE } from "@bos/vokabulare/thw-stan-fahrzeuge";
+import { THW_STAN_PERSONAL } from "@bos/vokabulare/thw-stan-personal";
+import { THW_ORTSVERBAENDE, type ThwOrtsverband } from "@bos/vokabulare/thw-ov";
 import {
   THW_LANDESVERBAENDE_KONTAKT,
   THW_OV_REGIONALSTRUKTUR,
   THW_REGIONALSTELLEN_KONTAKT,
-} from "../src/vokabulare/thw-ov-regionalstruktur";
+} from "@bos/vokabulare/thw-ov-regionalstruktur";
 
 const wurzel = join(dirname(fileURLToPath(import.meta.url)), "..");
 

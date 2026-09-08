@@ -2,8 +2,8 @@
  * Schritt 4 — Fahrzeuge: Typ, Kennzeichen, Funkrufname und StAN-Vorbelegung.
  */
 
-import { Fahrzeug, OrganisationsTyp } from "../../model";
-import { stanFahrzeugVorbelegung } from "../../vokabulare/thw-stan-fahrzeuge";
+import { Fahrzeug, OrganisationsTyp } from "@bos/eeb-format/model";
+import { stanFahrzeugVorbelegung } from "@bos/vokabulare/thw-stan-fahrzeuge";
 import { fahrzeugHinweise, neuesFahrzeug, transportBilanz, vokabularFuer, vorbelegungGeladen } from "../hilfen";
 import { fahrzeugSymbolSvg, svgDataUrl } from "../taktische-zeichen-bogen";
 import { frageJaNein } from "../dialoge";

@@ -12,7 +12,7 @@ import {
   unterbringungMWD,
   verpflegung,
   zeitpunktZuIso,
-} from "../../model";
+} from "@bos/eeb-format/model";
 import { vorlageAnlegen } from "../vorlagen";
 import { TabellenScroll } from "../tabellen-scroll";
 import {
@@ -43,7 +43,7 @@ import {
   ketteVollstaendig,
   signaturLabel,
   type SignaturStatus,
-} from "../../signatur";
+} from "@bos/eeb-format/signatur";
 import { absenderkarteLaden, type Absenderkarte } from "../absenderkarte";
 import { AbsenderkarteFeld } from "../absenderkarte-ui";
 import { geraeteKurzform, geraeteOeffentlichHex } from "../geraete-schluessel";

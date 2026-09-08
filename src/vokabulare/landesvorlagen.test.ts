@@ -7,7 +7,7 @@ import {
   landesvorlagenBundeslaender,
   landesvorlagenGruppen,
 } from "./landesvorlagen";
-import { Ernaehrung, Fahrerlaubnis, OrganisationsTyp, StaerkeRolle } from "../model";
+import { Ernaehrung, Fahrerlaubnis, OrganisationsTyp, StaerkeRolle } from "@bos/eeb-format/model";
 
 // Die Vorlagen entstehen zur Bauzeit aus den Beispielbögen unter
 // examples/<bereich>/<bundesland>/. Geprüft wird deshalb nicht der Inhalt

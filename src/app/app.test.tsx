@@ -7,8 +7,8 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { OrganisationsTyp, type Erfassungsbogen } from "../model";
-import { encodePayload, encodePayloadUrl, encodeVorlagePayloadUrl, fragmentInhalt, segmentPayloadUrls } from "../codec";
+import { OrganisationsTyp, type Erfassungsbogen } from "@bos/eeb-format/model";
+import { encodePayload, encodePayloadUrl, encodeVorlagePayloadUrl, fragmentInhalt, segmentPayloadUrls } from "@bos/eeb-format/codec";
 import { browserKompressor, neuerBogen } from "./hilfen";
 // `einsatzAnlegen` heißt in diesem Test schon ein Klick-Helfer (Dialog
 // ausfüllen); der Speicher-Weg kommt darum unter eigenem Namen herein.
@@ -18,7 +18,7 @@ import {
   einsatzAnlegen as einsatzImSpeicherAnlegen,
   meldungHinzufuegen,
   neuesteJeEinheit,
-} from "./einsaetze";
+} from "@bos/meldekopf/einsaetze";
 
 // Die PDF-Erzeugung (pdfmake) ist eigenständig getestet und im Test nur teuer;
 // hier zählt, dass der Weg dorthin funktioniert und der Bogen ankommt.

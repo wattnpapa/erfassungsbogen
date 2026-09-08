@@ -8,7 +8,7 @@
  */
 
 import { useState, type ReactNode } from "react";
-import { absenderLabel } from "../signatur";
+import { absenderLabel } from "@bos/eeb-format/signatur";
 import {
   ABSENDER_MAX,
   absenderHinweis,

@@ -13,7 +13,7 @@
  * freiwillig — ist sie leer, sind Payloads byte-identisch zu vorher.
  */
 
-import type { Absenderkarte } from "../signatur";
+import type { Absenderkarte } from "@bos/eeb-format/signatur";
 
 export type { Absenderkarte };
 

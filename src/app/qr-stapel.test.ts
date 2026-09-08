@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { deflateRawSync, inflateRawSync } from "node:zlib";
-import { encodePayload, encodePayloadUrl, encodeVorlagePayloadUrl, segmentPayloadUrls, type Kompressor } from "../codec";
+import { encodePayload, encodePayloadUrl, encodeVorlagePayloadUrl, segmentPayloadUrls, type Kompressor } from "@bos/eeb-format/codec";
 import {
   Ernaehrung,
   Fahrerlaubnis,
@@ -12,7 +12,7 @@ import {
   datumAusIso,
   type Erfassungsbogen,
   type Person,
-} from "../model";
+} from "@bos/eeb-format/model";
 import { istBilddatei, qrStapelLesen, stapelBericht, type StapelDatei } from "./qr-stapel";
 
 const zlib: Kompressor = {

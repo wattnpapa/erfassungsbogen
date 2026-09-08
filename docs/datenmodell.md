@@ -7,14 +7,14 @@ minutengenau als Zeitpunkt statt Kalendertag; v6 = Übungs-Kennzeichnung
 v3 = Ernährungsform je Person; v2 = organisationsübergreifend; v1 war THW-spezifisch).
 
 **Abwärtskompatibilität (Pflicht):** Schema-Änderungen dürfen ältere QR-Codes/Dateien nie
-unlesbar machen. `decodeBinaer` (`src/codec.ts`) und `bogenLaden`/`migriereBogen`
+unlesbar machen. `decodeBinaer` (`vendor/eeb-format/src/codec.ts`) und `bogenLaden`/`migriereBogen`
 (`src/app/hilfen.ts`) akzeptieren jede Version `2..SCHEMA_VERSION`, füllen fehlende Felder
 mit Defaults und überführen entfallene Felder (z. B. v2 `Sofortbedarf.davonVegetarisch`
 → `verpflegungManuell`); danach wird der Bogen auf `SCHEMA_VERSION` gehoben.
 
 **Vorwärtskompatibilität (kleinste tragende Version):** Encoder und JSON-Exporte
 schreiben nicht stur `SCHEMA_VERSION`, sondern `transportSchemaVersion(b)`
-(`src/model.ts`) — die kleinste Version, die den Inhalt trägt. Ein Bogen ohne
+(`vendor/eeb-format/src/model.ts`) — die kleinste Version, die den Inhalt trägt. Ein Bogen ohne
 Übungs-Flag bleibt Schema 5 und damit für ältere App-Stände lesbar; nur ein
 Übungsbogen fordert Schema 6. Dass ein alter Stand ihn dann mit „nicht
 unterstützte Schema-Version" ablehnt, ist gewollt: lieber gar nicht anzeigen
@@ -102,7 +102,7 @@ EU-Impfzertifikat, nutzt aber ein URL-sicheres Alphabet — siehe
 
 ## Entitäten
 
-Verbindliche Typdefinitionen: [`src/model.ts`](../src/model.ts).
+Verbindliche Typdefinitionen: [`vendor/eeb-format/src/model.ts`](../vendor/eeb-format/src/model.ts).
 
 ### Erfassungsbogen (Wurzel)
 
@@ -133,7 +133,7 @@ M/W/D, Verpflegung (vegetarisch/vegan), Ansprechpartner (erste Führungskraft mi
 | organisationName | string | Pflicht bei SONSTIGE („Freiwillige Feuerwehr Wardenburg") |
 | einheitsTyp | `VokabularWert` | FGr K (A), Löschzug, SEG Sanität, … |
 | standortRef | number | Referenz ins mitgelieferte Standort-Verzeichnis (THW: offizielle OV-Nummer). Wenn gesetzt, entfällt die hierarchie im QR komplett; im Modell bleibt sie für Anzeige/PDF gefüllt |
-| hierarchie | `HierarchieEbene[]` | 1..n Ebenen, unterste zuerst. Die **erste Ebene ist die eigene Einheit** und Pflicht — Bezeichnung als Vokabular (`src/vokabulare/ebenen.ts`: THW OV→RB→LV, FW Gemeinde→LK→Bezirk→Land, DRK OV→KV→LV, …; Codes steigen mit der Hierarchie), Name + optionale Kontakte |
+| hierarchie | `HierarchieEbene[]` | 1..n Ebenen, unterste zuerst. Die **erste Ebene ist die eigene Einheit** und Pflicht — Bezeichnung als Vokabular (`vendor/bos-vokabulare/src/ebenen.ts`: THW OV→RB→LV, FW Gemeinde→LK→Bezirk→Land, DRK OV→KV→LV, …; Codes steigen mit der Hierarchie), Name + optionale Kontakte |
 
 Der **Anzeigename** der Einheit wird abgeleitet statt erfasst: Organisation (bzw.
 `organisationName`) + Name der ersten Ebene + Einheitstyp, z. B. „THW Oldenburg (NI)
@@ -144,7 +144,7 @@ leerer String weitergeschrieben, ein gefüllter Altname ohne Hierarchie wird bei
 Dekodieren zur ersten Ebene.
 
 **Zeitfelder** werden im gesamten Modell einheitlich numerisch gespeichert und erst
-bei Anzeige/PDF formatiert (`datumZuIso`/`zeitpunktZuIso` in `src/model.ts`).
+bei Anzeige/PDF formatiert (`datumZuIso`/`zeitpunktZuIso` in `vendor/eeb-format/src/model.ts`).
 Bewusst **kein Unix-Timestamp**: Kalenderdaten als UTC-Zeitpunkt kippen je nach
 Zeitzone/Sommerzeit um einen Tag und kosten 4 statt 2 Bytes; für Zeitpunkte reicht
 Minutengenauigkeit in lokaler Wandzeit (= das, was auf dem Papierbogen steht).
@@ -178,7 +178,7 @@ ausgeschriebene Hierarchie der Normalfall.
 |---|---|---|
 | typ | `VokabularWert` | Org-Namensraum |
 | kennzeichen | string | Wie am Fahrzeug angeschrieben: „OL-FW 2041", „THW-84397" |
-| funkrufname | `Funkrufname` | Kennwort + Standort-Flag + Teile `[18,13]` bzw. `[11,48,1]`. THW: bei der StAN-Fahrzeug-Vorbelegung aus der Funkrufnamenregelung (Taschenkarte, `src/vokabulare/thw-funkrufnamen.ts`) vorbelegt — Teileinheit-Zahl aus dem Einheitstyp (1. Zug/TZ), Fahrzeug-Zahl je Fahrzeug; editierbar |
+| funkrufname | `Funkrufname` | Kennwort + Standort-Flag + Teile `[18,13]` bzw. `[11,48,1]`. THW: bei der StAN-Fahrzeug-Vorbelegung aus der Funkrufnamenregelung (Taschenkarte, `vendor/bos-vokabulare/src/thw-funkrufnamen.ts`) vorbelegt — Teileinheit-Zahl aus dem Einheitstyp (1. Zug/TZ), Fahrzeug-Zahl je Fahrzeug; editierbar |
 | stanKonform | bool? | „Ausstattung nach StAN/Norm" — `undefined` = Frage nicht anwendbar (z. B. Fremdorganisation) |
 | aenderungen | string | Freitext, meist leer |
 
@@ -369,7 +369,7 @@ eigene Gerät hängt nur eine Stufe an und bezeugt damit die Weitergabe.
   und je Meldung in der Einsatz-Sammlung (`herkunft`, Base64url) mitgeführt.
   Meldungen ohne dieses Feld (manuell erfasst, unsigniert empfangen, ältere
   Sammlungen) werden selbst signiert.
-  Referenz: [`src/signatur.ts`](../src/signatur.ts) (`gegengezeichnetePayloadBytes`).
+  Referenz: [`vendor/eeb-format/src/signatur.ts`](../vendor/eeb-format/src/signatur.ts) (`gegengezeichnetePayloadBytes`).
 
 Binärstrom: Felder in fester Reihenfolge, Varint-Längen, UTF-8-Strings, Optionals
 über Flag-Bits, Vokabular-Werte als Varint-Code (0 = Freitext folgt).
@@ -417,7 +417,7 @@ gescannter fremder oder unsegmentierter Code wird sofort separat behandelt.
 gemessen 73 — der Regelfall ist die Aufteilung), wird **kein** Kopf erzeugt; der
 Single-QR-Roundtrip ist Byte-für-Byte identisch zu vorher. Ein bereits gedruckter
 QR-Code bleibt unabhängig vom Budget lesbar — die Schwellen betreffen nur das
-Erzeugen. Referenz: [`src/codec.ts`](../src/codec.ts)
+Erzeugen. Referenz: [`vendor/eeb-format/src/codec.ts`](../vendor/eeb-format/src/codec.ts)
 (`segmentPayloadUrls`, `parseSegmentUrl`, `segmentSammeln`, `segmenteZuBogen`).
 
 ## Meldekopf-Workflow (Anforderungen an die App, Stufe 2+)
@@ -442,5 +442,5 @@ Erzeugen. Referenz: [`src/codec.ts`](../src/codec.ts)
   Aktualisierungsweg festlegen. (Format ist umgesetzt, siehe `standortRef`.)
 - Deflate-Preset-Dictionary aus typischen Bögen (~10–20 % zusätzliche Ersparnis).
 - ~~Signatur/Authentizität ja/nein.~~ Umgesetzt: Ed25519-Signatur (immer aktiv)
-  (`EEB2C`, `src/codec.ts` + `src/signatur.ts`), Verifikation bei Import,
+  (`EEB2C`, `vendor/eeb-format/src/codec.ts` + `vendor/eeb-format/src/signatur.ts`), Verifikation bei Import,
   Signaturkette beim Weiterreichen.

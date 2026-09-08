@@ -26,7 +26,7 @@ import {
   staerke,
   unterbringungMWD,
   verpflegung,
-} from "../model";
+} from "@bos/eeb-format/model";
 import {
   EEB_URL_PREFIX,
   QR_EINZEL_MAX_VERSION,
@@ -37,13 +37,13 @@ import {
   entpackePayload,
   segmentPayloadUrls,
   type Kompressor,
-} from "../codec";
-import { gegengezeichnetePayloadBytes, signiertePayloadBytes } from "../signatur";
+} from "@bos/eeb-format/codec";
+import { gegengezeichnetePayloadBytes, signiertePayloadBytes } from "@bos/eeb-format/signatur";
 import { absenderkarteLaden } from "./absenderkarte";
 import { geraeteSchluesselSicherstellen } from "./geraete-schluessel";
 import { binaerTeilen, istNativ, textTeilen } from "./nativ";
-import { sitzplatzBilanz, type SitzplatzBilanz } from "../vokabulare/sitzplaetze";
-import { einheitAnzeigename, einheitOrt, kennzeichenText, vokabularFuer } from "./darstellung";
+import { sitzplatzBilanz, type SitzplatzBilanz } from "@bos/vokabulare/sitzplaetze";
+import { einheitAnzeigename, einheitOrt, kennzeichenText, vokabularFuer } from "@bos/meldekopf/darstellung";
 
 // Nach ADR-003 wandert die reine Darstellung in einen eigenen Baustein. Die App
 // importiert sie weiterhin von hier, damit der Umzug an ihren Einstiegen nichts
@@ -64,7 +64,7 @@ export {
   einheitAnzeigename,
   datumDeutsch,
   zeitgruppe,
-} from "./darstellung";
+} from "@bos/meldekopf/darstellung";
 
 export const browserKompressor: Kompressor = {
   deflateRaw: (d) => deflateRaw(d, { level: 9 }),

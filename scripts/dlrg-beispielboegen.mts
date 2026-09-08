@@ -61,7 +61,7 @@ import {
   datumAusIso,
   zeitpunktAusIso,
   staerke,
-} from "../src/model";
+} from "@bos/eeb-format/model";
 import {
   EEB_URL_PREFIX,
   QR_EINZEL_MAX_VERSION,
@@ -72,9 +72,9 @@ import {
   encodePayload,
   parseSegmentUrl,
   segmentPayloadUrls,
-} from "../src/codec";
-import { DLRG_QUALIFIKATIONEN } from "../src/vokabulare/dlrg-qualifikationen";
-import { nodeKompressor } from "../src/qr-node";
+} from "@bos/eeb-format/codec";
+import { DLRG_QUALIFIKATIONEN } from "@bos/vokabulare/dlrg-qualifikationen";
+import { nodeKompressor } from "@bos/eeb-format/qr-node";
 import type { QrSatz, QrTeil } from "../src/app/hilfen";
 import { fakeTelefon } from "./fake-telefon";
 

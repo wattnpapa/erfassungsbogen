@@ -9,7 +9,7 @@ import {
   Ernaehrung,
   type Erfassungsbogen,
   type Person,
-} from "../model";
+} from "@bos/eeb-format/model";
 import {
   bogenAlsVorlage,
   vorlageInstanziieren,

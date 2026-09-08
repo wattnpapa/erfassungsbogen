@@ -8,10 +8,10 @@ import { describe, it, expect } from "vitest";
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { SchrittBuehne } from "../../test/schritt-buehne";
-import { OrganisationsTyp } from "../../model";
+import { OrganisationsTyp } from "@bos/eeb-format/model";
 import { neuePerson, neuerBogen } from "../hilfen";
 import { SchrittPersonal } from "./personal";
-import { stanPersonalVorbelegung } from "../../vokabulare/thw-stan-personal";
+import { stanPersonalVorbelegung } from "@bos/vokabulare/thw-stan-personal";
 
 const buehne = () => render(<SchrittBuehne komponente={SchrittPersonal} />);
 

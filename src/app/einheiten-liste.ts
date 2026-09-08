@@ -22,8 +22,8 @@
  * (auswertung.ts) rechnen unverändert über alle anwesenden Einheiten.
  */
 
-import { OrganisationsTyp, alleFahrerlaubnisse, type Person } from "../model";
-import type { MeldeEintrag } from "./einsaetze";
+import { OrganisationsTyp, alleFahrerlaubnisse, type Person } from "@bos/eeb-format/model";
+import type { MeldeEintrag } from "@bos/meldekopf/einsaetze";
 import { FE_EINGESCHLOSSEN, FE_TEXT, einheitAnzeigename, einheitOrt, funkrufText, kennzeichenText, orgLabel, vokabularFuer } from "./hilfen";
 
 export type EinheitenSortierung = "name" | "eintreffzeit" | "zug" | "organisation";

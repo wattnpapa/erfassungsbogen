@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { OrganisationsTyp } from "../model";
+import { OrganisationsTyp } from "@bos/eeb-format/model";
 import { orgAkzentPalette, orgFarbe } from "./org-farben";
 
 const HEX = /^#[0-9a-f]{6}$/;

@@ -4,7 +4,7 @@
  */
 
 import { useEffect, useRef, useState, type ChangeEvent, type ReactNode, type RefObject } from "react";
-import { staerke, type Erfassungsbogen } from "../model";
+import { staerke, type Erfassungsbogen } from "@bos/eeb-format/model";
 import { istNativ, textTeilen } from "./nativ";
 import { fehlerText } from "./nachladen";
 import { blobAlsDownload, einheitOrt, migriereBogen, orgLabel, vokabText, vokabularFuer } from "./hilfen";

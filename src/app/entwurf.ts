@@ -7,7 +7,7 @@
  * Einsatz).
  */
 
-import type { Erfassungsbogen } from "../model";
+import type { Erfassungsbogen } from "@bos/eeb-format/model";
 import { migriereBogen } from "./hilfen";
 
 const SPEICHER_SCHLUESSEL = "eeb.entwurf.v1";
