@@ -37,7 +37,7 @@ import {
   kontaktText,
   vokabText,
   vokabularFuer,
-} from "./hilfen";
+} from "./darstellung";
 
 /** Ein geändertes Feld mit Vorher/Nachher — beide Seiten bereits als Anzeigetext. */
 export interface WertAenderung {

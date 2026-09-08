@@ -25,7 +25,7 @@
 import type { Einheit, Fahrzeug } from "../model";
 import { OrganisationsTyp } from "../model";
 import { TZ_SYMBOLE, TZ_TITEL } from "../vokabulare/taktische-zeichen-symbole";
-import { vokabText, vokabularFuer } from "./hilfen";
+import { vokabText, vokabularFuer } from "./darstellung";
 
 // ------------------------------------------------------------- Organisation
 
