@@ -36,7 +36,7 @@ import {
 } from "../hilfen";
 import { debugAktiv } from "../debug-plattform";
 import { bogenCsvInhalt } from "../bogen-csv";
-import { einheitSymbolSvg, svgDataUrl } from "../taktische-zeichen";
+import { einheitSymbolSvg, svgDataUrl } from "../taktische-zeichen-bogen";
 import {
   absenderLabel,
   kettenLabel,

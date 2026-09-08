@@ -8,7 +8,7 @@ import { staerke, type Erfassungsbogen } from "../model";
 import { istNativ, textTeilen } from "./nativ";
 import { fehlerText } from "./nachladen";
 import { blobAlsDownload, einheitOrt, migriereBogen, orgLabel, vokabText, vokabularFuer } from "./hilfen";
-import { einheitSymbolSvg, svgDataUrl } from "./taktische-zeichen";
+import { einheitSymbolSvg, svgDataUrl } from "./taktische-zeichen-bogen";
 import { nutzungsKanal, statistikAbgewaehlt, statistikAbwaehlen } from "./statistik";
 import { AnzeigeSchalter } from "./anzeige-schalter";
 import { frageJaNein, zeigeHinweis } from "./dialoge";

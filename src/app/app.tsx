@@ -66,7 +66,7 @@ import { entwurfLaden, entwurfSpeichern, entwurfVerwerfen } from "./entwurf";
 import { SeitenKopf } from "./seiten-kopf";
 import { AnzeigeSchalter } from "./anzeige-schalter";
 import { orgFarbe, wendeOrgAkzentAn } from "./org-farben";
-import { einheitSymbolSvg, svgDataUrl } from "./taktische-zeichen";
+import { einheitSymbolSvg, svgDataUrl } from "./taktische-zeichen-bogen";
 import { Fusszeile } from "./fusszeile";
 import { Aktualisierungshinweise } from "./aktualisierung";
 import { Dialogschicht, frageFelder, frageJaNein, frageWahl } from "./dialoge";

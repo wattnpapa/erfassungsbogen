@@ -5,7 +5,7 @@
 import { Fahrzeug, OrganisationsTyp } from "../../model";
 import { stanFahrzeugVorbelegung } from "../../vokabulare/thw-stan-fahrzeuge";
 import { fahrzeugHinweise, neuesFahrzeug, transportBilanz, vokabularFuer, vorbelegungGeladen } from "../hilfen";
-import { fahrzeugSymbolSvg, svgDataUrl } from "../taktische-zeichen";
+import { fahrzeugSymbolSvg, svgDataUrl } from "../taktische-zeichen-bogen";
 import { frageJaNein } from "../dialoge";
 import {
   Auswahl,

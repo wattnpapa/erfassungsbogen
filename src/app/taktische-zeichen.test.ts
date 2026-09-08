@@ -4,11 +4,12 @@ import { OrganisationsTyp } from "../model";
 import {
   THW_EINHEIT_ZEICHEN,
   THW_FAHRZEUG_ZEICHEN,
-  einheitSymbolSvg,
-  fahrzeugSymbolSvg,
   grundzeichenFuer,
   svgDataUrl,
 } from "./taktische-zeichen";
+// Die beiden Symbolfunktionen nehmen einen Bogen entgegen und stehen deshalb
+// in der Brücke, nicht in der Zeichensammlung selbst (ADR-003).
+import { einheitSymbolSvg, fahrzeugSymbolSvg } from "./taktische-zeichen-bogen";
 import { TZ_SYMBOLE } from "../vokabulare/taktische-zeichen-symbole";
 import { THW_EINHEITSTYPEN, THW_FAHRZEUGTYPEN } from "../vokabulare/thw";
 

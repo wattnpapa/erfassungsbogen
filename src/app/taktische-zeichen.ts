@@ -22,12 +22,26 @@
  * unverändert im Browser, in den Unit-Tests und beim PDF-Bau.
  */
 
-import type { Einheit, Fahrzeug } from "../model";
-import { OrganisationsTyp } from "../model";
 import { TZ_SYMBOLE, TZ_TITEL } from "../vokabulare/taktische-zeichen-symbole";
-import { vokabText, vokabularFuer } from "./darstellung";
 
 // ------------------------------------------------------------- Organisation
+
+/**
+ * Organisation, für die gezeichnet wird — eigener Schlüssel statt des
+ * Bogen-Typs `OrganisationsTyp`.
+ *
+ * Nach ADR-003 steht diese Datei in einem eigenen Repo, das nichts vom
+ * EEB-Bogenmodell weiß; sie nimmt darum nur entgegen, was sie zum Zeichnen
+ * braucht. Die Zuordnung Bogen → Zeichen macht `taktische-zeichen-bogen.ts`.
+ */
+export type Zeichenorganisation =
+  | "thw"
+  | "feuerwehr"
+  | "polizei"
+  | "bundeswehr"
+  | "hilfsorganisation"
+  | "wasserrettung"
+  | "sonstige";
 
 /** Neutrale Grundfarbe der Sammlung (weißes Zeichen mit schwarzem Rand). */
 const NEUTRAL = "#FFFFFF";
@@ -46,45 +60,37 @@ interface OrgZeichen {
  * eingebauter Farbe). Am Ende jeder Liste stehen die neutralen Bereiche als
  * Auffangnetz; ein von dort geholtes Zeichen wird nachträglich eingefärbt.
  */
-const ORG_ZEICHEN: Record<OrganisationsTyp, OrgZeichen> = {
-  [OrganisationsTyp.THW]: {
+const ORG_ZEICHEN: Record<Zeichenorganisation, OrgZeichen> = {
+  thw: {
     fahrzeuge: ["THW_Fahrzeuge", "Fahrzeuge"],
     einheiten: ["THW_Einheiten", "Einheiten"],
     farbe: "#003399",
   },
-  [OrganisationsTyp.FEUERWEHR]: {
+  feuerwehr: {
     fahrzeuge: ["Feuerwehr_Fahrzeuge", "Fahrzeuge"],
     einheiten: ["Feuerwehr_Einheiten", "Einheiten"],
     farbe: "#FF0000",
   },
-  [OrganisationsTyp.POLIZEI]: {
+  // Bundespolizei zeichnet wie die Landespolizei.
+  polizei: {
     fahrzeuge: ["Polizei_Fahrzeuge", "Fahrzeuge"],
     einheiten: ["Polizei_Einheiten", "Einheiten"],
     farbe: "#13A538",
   },
-  [OrganisationsTyp.BUNDESPOLIZEI]: {
-    fahrzeuge: ["Polizei_Fahrzeuge", "Fahrzeuge"],
-    einheiten: ["Polizei_Einheiten", "Einheiten"],
-    farbe: "#13A538",
-  },
-  [OrganisationsTyp.BUNDESWEHR]: {
+  bundeswehr: {
     fahrzeuge: ["Bundeswehr_Fahrzeuge", "Fahrzeuge"],
     einheiten: ["Bundeswehr_Einheiten", "Einheiten"],
     farbe: "#996633",
   },
   // Hilfsorganisationen zeichnen im Rettungswesen — dort sind die Zeichen
   // neutral (weiß) gehalten, die Organisation steht nicht in der Farbe.
-  [OrganisationsTyp.DRK]: hilfsorganisation(),
-  [OrganisationsTyp.JUH]: hilfsorganisation(),
-  [OrganisationsTyp.MHD]: hilfsorganisation(),
-  [OrganisationsTyp.ASB]: hilfsorganisation(),
-  [OrganisationsTyp.RETTUNGSDIENST]: hilfsorganisation(),
-  [OrganisationsTyp.DLRG]: {
+  hilfsorganisation: hilfsorganisation(),
+  wasserrettung: {
     fahrzeuge: ["Rettungswesen_Fahrzeuge", "Fahrzeuge"],
     einheiten: ["Wasserrettung_Einheiten", "Rettungswesen_Einheiten", "Einheiten"],
     farbe: NEUTRAL,
   },
-  [OrganisationsTyp.SONSTIGE]: {
+  sonstige: {
     fahrzeuge: ["Fahrzeuge"],
     einheiten: ["Einheiten"],
     farbe: NEUTRAL,
@@ -362,18 +368,24 @@ function beschriftung(kurz: string): string | undefined {
 }
 
 /**
- * Taktisches Zeichen eines Fahrzeugs als (pdfmake-taugliches) SVG.
- * Kurzzeichen/Name stammen aus dem organisationsspezifischen Vokabular bzw.
- * dem Freitext des Fahrzeugtyps.
+ * Was gezeichnet werden soll — Organisation und die Bezeichnung des Typs.
+ *
+ * `kurz` und `name` sind bereits aufgelöst: stammt der Typ aus einem Vokabular,
+ * sind es Kurzform und ausgeschriebener Name des Eintrags; ist er Freitext,
+ * steht dieser in beiden. `thwCode` ist der Vokabular-Code der THW-Tabellen und
+ * trifft die fest zugeordneten Zeichen (Stufe 1); für alles andere entfällt er.
  */
-export function fahrzeugSymbolSvg(f: Fahrzeug, org: OrganisationsTyp): string {
-  const zeichen = ORG_ZEICHEN[org] ?? ORG_ZEICHEN[OrganisationsTyp.SONSTIGE];
-  const tabelle = vokabularFuer(org, "fahrzeug");
-  const kurz = vokabText(f.typ, tabelle, "kurz");
-  const name = vokabText(f.typ, tabelle, "name");
+export interface Zeichenwahl {
+  organisation: Zeichenorganisation;
+  kurz: string;
+  name: string;
+  thwCode?: number;
+}
 
-  const code = org === OrganisationsTyp.THW ? f.typ?.code : undefined;
-  const fest = code != null ? THW_FAHRZEUG_ZEICHEN[code] : undefined;
+/** Taktisches Zeichen eines Fahrzeugs als (pdfmake-taugliches) SVG. */
+export function fahrzeugZeichenSvg({ organisation, kurz, name, thwCode }: Zeichenwahl): string {
+  const zeichen = ORG_ZEICHEN[organisation] ?? ORG_ZEICHEN.sonstige;
+  const fest = organisation === "thw" && thwCode != null ? THW_FAHRZEUG_ZEICHEN[thwCode] : undefined;
   const treffer = holen(
     fest ? `THW_Fahrzeuge/${fest}` : undefined,
     suche(zeichen.fahrzeuge, [kurz, name].filter(Boolean)),
@@ -394,14 +406,9 @@ export function fahrzeugSymbolSvg(f: Fahrzeug, org: OrganisationsTyp): string {
  * das das echte Fachgruppen-Zeichen; sonst die Formation passender Größe,
  * beschriftet mit dem Kurzzeichen.
  */
-export function einheitSymbolSvg(e: Einheit): string {
-  const zeichen = ORG_ZEICHEN[e.organisation] ?? ORG_ZEICHEN[OrganisationsTyp.SONSTIGE];
-  const tabelle = vokabularFuer(e.organisation, "einheitstyp");
-  const kurz = vokabText(e.einheitsTyp, tabelle, "kurz").trim();
-  const name = vokabText(e.einheitsTyp, tabelle, "name").trim();
-
-  const code = e.organisation === OrganisationsTyp.THW ? e.einheitsTyp?.code : undefined;
-  const fest = code != null ? THW_EINHEIT_ZEICHEN[code] : undefined;
+export function einheitZeichenSvg({ organisation, kurz, name, thwCode }: Zeichenwahl): string {
+  const zeichen = ORG_ZEICHEN[organisation] ?? ORG_ZEICHEN.sonstige;
+  const fest = organisation === "thw" && thwCode != null ? THW_EINHEIT_ZEICHEN[thwCode] : undefined;
   const treffer = holen(
     fest ? `THW_Einheiten/${fest}` : undefined,
     suche(zeichen.einheiten, [kurz, name].filter(Boolean)),

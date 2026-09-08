@@ -42,7 +42,7 @@ import {
 } from "./hilfen";
 import { summiereBoegen, type EinsatzSummen } from "./auswertung";
 import { bogenDiff, diffZeilen } from "./meldung-diff";
-import { fahrzeugSymbolSvg } from "./taktische-zeichen";
+import { fahrzeugSymbolSvg } from "./taktische-zeichen-bogen";
 import { orgFarbe } from "./org-farben";
 import { UEBUNG_BREITE, UEBUNG_HOEHE, UEBUNG_PFAD } from "./uebung-wasserzeichen";
 
