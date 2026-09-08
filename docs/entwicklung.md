@@ -504,7 +504,16 @@ an einem Bundesland hängt.
 
 Die Zeichen neben jedem Fahrzeug und der „Avatar" der Einheit stammen aus der
 Sammlung **[jonas-koeritz/Taktische-Zeichen](https://github.com/jonas-koeritz/Taktische-Zeichen)**
-(Release-Archiv unter CC0 1.0, Quellen unter CC BY 4.0).
+von Jonas Köritz, **CC BY 4.0**.
+
+Das Release-Archiv trägt keine eigene Lizenzdatei — es ist ein Bauergebnis
+desselben Repositorys und steht damit unter dessen Lizenz. Die Sammlung war bis
+Februar 2021 anders lizenziert; seither gilt CC BY 4.0. Daraus folgt für uns:
+Urheber, Lizenz und Fundstelle sind zu nennen, und weil das Holskript die
+SVG-Dateien verändert (Schrift entfernt, `viewbox` → `viewBox`), ist auch die
+Bearbeitung anzugeben. Beides steht im Kopf der erzeugten Datei
+`src/vokabulare/taktische-zeichen-symbole.ts` und in den Bildunterschriften der
+Inhaltsseiten.
 
 **Warum eingebacken und nicht als npm-Abhängigkeit:** Das Projekt liefert kein
 npm-Paket. Sein Repository hat keine `package.json`, die Zeichen sind

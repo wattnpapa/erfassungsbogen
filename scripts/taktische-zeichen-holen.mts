@@ -135,7 +135,10 @@ try {
   const bytes = symbole.reduce((s, [, v]) => s + v.length, 0);
   const inhalt = `// GENERIERT von scripts/taktische-zeichen-holen.mts — nicht von Hand ändern.
 // Neu holen/aktualisieren: npm run zeichen [-- <version>]
-// Quelle: github.com/jonas-koeritz/Taktische-Zeichen, Release ${VERSION} (CC0 1.0).
+// Quelle: github.com/jonas-koeritz/Taktische-Zeichen, Release ${VERSION}.
+// © Jonas Köritz, Lizenz CC BY 4.0 (creativecommons.org/licenses/by/4.0/).
+// Bearbeitet: eingebettete Schrift entfernt, Schriftname und viewBox angepasst,
+// DOCTYPE/Titel/Einrückung entfernt (siehe Kopf des erzeugenden Skripts).
 // ${symbole.length} Zeichen, ${(bytes / 1024).toFixed(0)} kB.
 
 /** Taktisches Zeichen als SVG-Quelltext, Schlüssel „Ordner/Name". */

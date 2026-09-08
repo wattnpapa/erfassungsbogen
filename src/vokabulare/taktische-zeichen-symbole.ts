@@ -1,6 +1,9 @@
 // GENERIERT von scripts/taktische-zeichen-holen.mts — nicht von Hand ändern.
 // Neu holen/aktualisieren: npm run zeichen [-- <version>]
-// Quelle: github.com/jonas-koeritz/Taktische-Zeichen, Release v2.0.0 (CC0 1.0).
+// Quelle: github.com/jonas-koeritz/Taktische-Zeichen, Release v2.0.0.
+// © Jonas Köritz, Lizenz CC BY 4.0 (creativecommons.org/licenses/by/4.0/).
+// Bearbeitet: eingebettete Schrift entfernt, Schriftname und viewBox angepasst,
+// DOCTYPE/Titel/Einrückung entfernt (siehe Kopf des erzeugenden Skripts).
 // 375 Zeichen, 297 kB.
 
 /** Taktisches Zeichen als SVG-Quelltext, Schlüssel „Ordner/Name". */
