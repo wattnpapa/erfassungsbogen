@@ -1,0 +1,52 @@
+# Prüflauf für Zweige und Pull Requests. Die Release-CI (release.yml) prüft
+# dasselbe noch einmal vor der Veröffentlichung; hier geht es darum, dass ein
+# Verstoß auffällt, solange er noch billig zu beheben ist.
+#
+# Zwei Schritte kommen aus ADR-003 und sind der eigentliche Grund für diese
+# Datei: das Bundle-Budget (Aufnahmeregel 5 — der geteilte Kern darf die PWA
+# nicht schwerer machen) und die Diamant-Prüfung (genau eine Kopie jedes
+# Kern-Bausteins im Baum). Beide messen still vor sich hin; ohne festen
+# CI-Schritt merkt einen Verstoß später niemand.
+
+name: CI
+
+on:
+  push:
+    branches-ignore: [main]
+  pull_request:
+  workflow_dispatch:
+
+# Ein laufender Prüflauf desselben Zweigs wird abgebrochen, wenn nachgeschoben
+# wird — der ältere Stand interessiert dann niemanden mehr.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  pruefen:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # Der geteilte Kern hängt als Submodul unter vendor/ — ohne ihn
+          # scheitert schon die Typprüfung.
+          submodules: recursive
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+
+      - name: Genau eine Kopie je Kern-Baustein (ADR-003)
+        run: npm run kern-kopien
+
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
+
+      - name: Bundle-Budget (ADR-003, Aufnahmeregel 5)
+        run: npm run bundle-budget
+
+      - name: Playwright-Browser installieren (für die Cucumber-E2E-Tests)
+        run: npx playwright install --with-deps chromium
+      - run: npm run test:e2e

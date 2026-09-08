@@ -57,7 +57,9 @@
     "content-stil": "node --import tsx scripts/content-stil.mts",
     "content-handlung": "node --import tsx scripts/content-handlung.mts",
     "content-offenlegung": "node --import tsx scripts/content-offenlegung.mts",
-    "content-faq": "node --import tsx scripts/content-faq.mts"
+    "content-faq": "node --import tsx scripts/content-faq.mts",
+    "bundle-budget": "node --import tsx scripts/bundle-budget.ts",
+    "kern-kopien": "node --import tsx scripts/kern-kopien-pruefen.ts"
   },
   "keywords": [],
   "author": {
