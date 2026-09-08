@@ -40,6 +40,7 @@ import {
   AUFRAEUM_HINWEIS_MS,
   AUFRAEUM_FRIST_MS,
   type Einsatzsammlung,
+  speicherhuelleSetzen,
 } from "./einsaetze";
 
 class MemStorage {
@@ -65,7 +66,10 @@ class MemStorage {
 }
 
 beforeEach(() => {
-  (globalThis as { localStorage?: Storage }).localStorage = new MemStorage() as unknown as Storage;
+  const mem = new MemStorage() as unknown as Storage;
+  (globalThis as { localStorage?: Storage }).localStorage = mem;
+  // Die Einsatz-Sammlung bekommt ihre Ablage hineingereicht (ADR-003).
+  speicherhuelleSetzen(mem);
 });
 
 function person(nachname: string, rolle: StaerkeRolle): Person {

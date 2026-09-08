@@ -14,9 +14,10 @@
  *  - IDEMPOTENZ: derselbe Bogeninhalt (Doppelmeldeweg, PDF-Reimport) erzeugt
  *    KEINE zweite Revision. Die Eintrags-ID ist der Inhalts-Hash des Bogens.
  *
- * Ablage: localStorage (ein Code-Pfad für iOS/Android/Desktop/Browser). Reine
- * Logik (Fingerabdruck, Hash, Serialisierung, Migration, Auswahl) ist von der
- * localStorage-Hülle getrennt und unit-getestet.
+ * Ablage: eine hineingereichte Speicherhülle (im Erfassungsbogen localStorage,
+ * ein Code-Pfad für iOS/Android/Desktop/Browser). Reine Logik (Fingerabdruck,
+ * Hash, Serialisierung, Migration, Auswahl) ist von der Hülle getrennt und
+ * unit-getestet.
  */
 
 import { jetztZeitpunkt, type Einheit, type Erfassungsbogen } from "../model";
@@ -315,14 +316,35 @@ export function einsaetzeZuJson(liste: Einsatzsammlung[]): string {
   return JSON.stringify(liste);
 }
 
-// ------------------------------------------------- localStorage-Hülle (I/O)
+// ------------------------------------------------------ Speicherhülle (I/O)
 
-function speicher(): Storage | null {
-  try {
-    return globalThis.localStorage ?? null;
-  } catch {
-    return null; // z. B. Privatmodus/blockierter Speicher
-  }
+/**
+ * Der Speicher, in dem die Sammlung liegt — hineingereicht statt hier gewählt.
+ *
+ * Nach ADR-003 wandert dieses Modul in den geteilten Kern, und der darf keine
+ * Browser-Globals anfassen. Der Erfassungsbogen reicht `localStorage` herein
+ * (siehe `speicher-browser.ts`), das Schwesterprodukt später seine eigene
+ * Ablage. Verlangt wird nur, was dieses Modul tatsächlich braucht: ein Wert
+ * unter einem Schlüssel, lesbar und schreibbar.
+ */
+export interface Speicherhuelle {
+  getItem(schluessel: string): string | null;
+  setItem(schluessel: string, wert: string): void;
+}
+
+let huelle: Speicherhuelle | null = null;
+
+/**
+ * Hängt die Ablage ein. Ohne Aufruf arbeitet die Sammlung speicherlos: Listen
+ * bleiben leer, Schreibvorgänge verpuffen — genau das Verhalten, das der
+ * blockierte Speicher (Privatmodus) schon bisher hatte.
+ */
+export function speicherhuelleSetzen(neueHuelle: Speicherhuelle | null): void {
+  huelle = neueHuelle;
+}
+
+function speicher(): Speicherhuelle | null {
+  return huelle;
 }
 
 /**

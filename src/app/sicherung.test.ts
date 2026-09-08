@@ -9,7 +9,9 @@ import {
 } from "./sicherung";
 import { OrganisationsTyp, PersonalErfassung, SCHEMA_VERSION, type Erfassungsbogen } from "../model";
 import { absenderkarteSpeichern } from "./absenderkarte";
-import { EinsatzArt, einsatzAnlegen, meldungHinzufuegen } from "./einsaetze";
+import { EinsatzArt, einsatzAnlegen, meldungHinzufuegen,
+  speicherhuelleSetzen,
+} from "./einsaetze";
 import { entwurfLaden, entwurfSpeichern } from "./entwurf";
 import { vorlageAnlegen, vorlageLoeschen, vorlagenLaden } from "./vorlagen";
 
@@ -52,7 +54,10 @@ class MemStorage {
 }
 
 beforeEach(() => {
-  (globalThis as { localStorage?: Storage }).localStorage = new MemStorage() as unknown as Storage;
+  const mem = new MemStorage() as unknown as Storage;
+  (globalThis as { localStorage?: Storage }).localStorage = mem;
+  // Die Einsatz-Sammlung bekommt ihre Ablage hineingereicht (ADR-003).
+  speicherhuelleSetzen(mem);
 });
 
 describe("sicherungInhalt() / sicherungParsen()", () => {
@@ -80,7 +85,10 @@ describe("sicherungErstellen() / sicherungEinspielen()", () => {
     localStorage.setItem("fremd", "bleibt draußen");
     const datei = sicherungErstellen();
 
-    (globalThis as { localStorage?: Storage }).localStorage = new MemStorage() as unknown as Storage;
+    const mem = new MemStorage() as unknown as Storage;
+    (globalThis as { localStorage?: Storage }).localStorage = mem;
+    // Die Einsatz-Sammlung bekommt ihre Ablage hineingereicht (ADR-003).
+    speicherhuelleSetzen(mem);
     expect(sicherungEinspielen(datei)).toBe(2);
     expect(localStorage.getItem("eeb.vorlagen.v1")).toBe("[1]");
     expect(localStorage.getItem("eeb.einsaetze.v1")).toBe("[2]");

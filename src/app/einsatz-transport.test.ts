@@ -11,7 +11,9 @@ import {
   type Erfassungsbogen,
   type Person,
 } from "../model";
-import { einsatzAnlegen, einsaetzeLaden, einsatzImportieren, meldungHinzufuegen } from "./einsaetze";
+import { einsatzAnlegen, einsaetzeLaden, einsatzImportieren, meldungHinzufuegen,
+  speicherhuelleSetzen,
+} from "./einsaetze";
 import { boegenAusPdfBytes, einsatzAusDatei, einsatzAusPdfBytes, einsatzDateiInhalt } from "./einsatz-transport";
 
 class MemStorage {
@@ -25,7 +27,10 @@ class MemStorage {
 }
 
 beforeEach(() => {
-  (globalThis as { localStorage?: Storage }).localStorage = new MemStorage() as unknown as Storage;
+  const mem = new MemStorage() as unknown as Storage;
+  (globalThis as { localStorage?: Storage }).localStorage = mem;
+  // Die Einsatz-Sammlung bekommt ihre Ablage hineingereicht (ADR-003).
+  speicherhuelleSetzen(mem);
 });
 
 function person(nachname: string, rolle: StaerkeRolle): Person {
@@ -138,7 +143,10 @@ describe("einsatzImportieren()", () => {
     const s = einsatzAnlegen("Quelle", 0);
     meldungHinzufuegen(s.id, bogen());
     const kopie = einsatzAusDatei(einsatzDateiInhalt(einsaetzeLaden()[0]!));
-    (globalThis as { localStorage?: Storage }).localStorage = new MemStorage() as unknown as Storage; // frisches Zielgerät
+    const mem = new MemStorage() as unknown as Storage;
+    (globalThis as { localStorage?: Storage }).localStorage = mem;
+    // Die Einsatz-Sammlung bekommt ihre Ablage hineingereicht (ADR-003).
+    speicherhuelleSetzen(mem); // frisches Zielgerät
     const r = einsatzImportieren(kopie);
     expect(r.neuerEinsatz).toBe(true);
     expect(einsaetzeLaden()).toHaveLength(1);

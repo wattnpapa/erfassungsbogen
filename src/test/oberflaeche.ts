@@ -9,6 +9,7 @@
 import { afterEach } from "vitest";
 import { cleanup } from "@testing-library/react";
 import { dialogeZuruecksetzen } from "../app/dialoge";
+import { speicherVerdrahten } from "../app/speicher-browser";
 
 // Älteres jsdom kennt <dialog> nur als Element, nicht seine Methoden. Die App
 // öffnet damit den Übergabe-, Namens- und Einsatzwahl-Dialog sowie alle
@@ -45,6 +46,12 @@ function speicherErsetzen(name: "localStorage" | "sessionStorage") {
 
 speicherErsetzen("localStorage");
 speicherErsetzen("sessionStorage");
+
+// Die Einsatz-Sammlung bekommt ihre Ablage hineingereicht (ADR-003). Im Produkt
+// tut das `main.tsx`; die Oberflächentests starten die App nicht über ihren
+// Einstieg, brauchen die Ablage aber genauso. Muss nach `speicherErsetzen`
+// stehen, damit unter Node 26 der Ersatz und nicht `undefined` eingehängt wird.
+speicherVerdrahten();
 
 const dialog = window.HTMLDialogElement?.prototype as HTMLDialogElement | undefined;
 if (dialog && typeof dialog.showModal !== "function") {

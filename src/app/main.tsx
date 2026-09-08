@@ -14,6 +14,11 @@ import { App } from "./app";
 import { DebugLeiste, debugAktiv, wendePlattformKlasseAn, wendeRahmenAn } from "./debug-plattform";
 import { wendeAnzeigeModusAn } from "./anzeige-modus";
 import { statistikStarten } from "./statistik";
+import { speicherVerdrahten } from "./speicher-browser";
+
+// Die Einsatz-Sammlung bekommt ihre Ablage hineingereicht (ADR-003); ohne
+// diese Zeile bliebe sie speicherlos. Muss vor dem ersten Lesen stehen.
+speicherVerdrahten();
 
 // Plattform-Klasse (z. B. platform-ios) auf <html> für plattformspezifisches CSS.
 // Im Browser kann der Debug-Modus die visuelle Plattform überschreiben.
