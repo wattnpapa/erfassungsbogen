@@ -68,9 +68,10 @@ const OEFFNER = new RegExp(`<div class="(${KLASSEN.join("|")})"[^>]*>`, "g");
 function reintext(html: string): string {
   return html
     .replace(/<[^>]+>/g, "")
-    .replace(/&amp;/g, "&")
     .replace(/&nbsp;/g, " ")
     .replace(/&(?:quot|#34);/g, "")
+    // &amp; zuletzt, sonst würde „&amp;nbsp;" über „&nbsp;" zum Leerzeichen.
+    .replace(/&amp;/g, "&")
     .replace(/\s+/g, " ")
     .trim();
 }

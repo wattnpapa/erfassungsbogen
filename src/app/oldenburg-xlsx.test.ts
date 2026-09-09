@@ -159,7 +159,9 @@ function zelle(blattXml: string, ref: string): string | undefined {
   const formel = /<f>(.*?)<\/f>/s.exec(inhalt);
   if (formel) return `=${formel[1]}`;
   const text = /<t[^>]*>(.*?)<\/t>/s.exec(inhalt);
-  if (text) return text[1]!.replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">");
+  // &amp; zuletzt: sonst würde „&amp;lt;" über den Zwischenstand „&lt;" zu „<"
+  // und der Test läse einen Zellinhalt, der so nie in der Mappe stand.
+  if (text) return text[1]!.replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&");
   const zahl = /<v>(.*?)<\/v>/s.exec(inhalt);
   return zahl ? zahl[1] : "";
 }

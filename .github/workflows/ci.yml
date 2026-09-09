@@ -22,6 +22,11 @@ concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
 
+# Der Prüflauf liest nur den Baum; er schreibt weder Kommentare noch Pakete.
+# Ohne diesen Block bekäme das Token die weiten Voreinstellungen des Repos.
+permissions:
+  contents: read
+
 jobs:
   pruefen:
     runs-on: ubuntu-latest

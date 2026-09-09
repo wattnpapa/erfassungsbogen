@@ -123,8 +123,11 @@ Then("sehe ich das Bild {string}", async function (this: EebWelt, name: string) 
 When("ich zum Schritt {string} wechsle", async function (this: EebWelt, schritt: string) {
   // Die Schrittleiste hängt an den Knopf je nach Bearbeitungsstand noch einen
   // Status an („3. Personal — begonnen"), daher Präfix statt exaktem Namen.
+  // Der Schrittname kommt aus dem Merkmal und wird vollständig maskiert, damit
+  // auch Klammern oder ein Pluszeichen darin buchstäblich gesucht werden.
+  const roh = schritt.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   await this.page
-    .getByRole("button", { name: new RegExp(`^${schritt.replace(/\./g, "\\.")}`) })
+    .getByRole("button", { name: new RegExp(`^${roh}`) })
     .click();
 });
 
