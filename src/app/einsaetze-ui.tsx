@@ -83,6 +83,8 @@ import {
 } from "./einheiten-tabelle";
 import { imWebBrowser } from "./nativ";
 import { useZahlQuittung } from "./quittung";
+import { mitAbgang, useEingangsquittung } from "./eintrag-bewegung";
+import { AbgangKnopf, Kartenstapel } from "./kartenstapel";
 import { istBilddatei } from "./qr-stapel";
 import { fehlerText } from "./nachladen";
 
@@ -127,6 +129,20 @@ function standText(b: Erfassungsbogen): string {
   return zeitgruppe(b.stand);
 }
 
+/**
+ * Was gerade in dieser Sammlung eingegangen ist: der Schlüssel der Einheit
+ * plus ein Zähler. Der Zähler ist der Unterschied zwischen „schon da" und
+ * „gerade gekommen" — eine Folgemeldung derselben Einheit trägt denselben
+ * Schlüssel, ändert aber still eine bestehende Zeile, und genau die soll
+ * quittieren (siehe useEingangsquittung).
+ */
+export type Eingang = { schluessel: string; nonce: number };
+
+/** Marke für genau diese Zeile — null, wenn sie nicht gemeint ist. */
+function marke(eingang: Eingang | null | undefined, schluessel: string): string | null {
+  return eingang && eingang.schluessel === schluessel ? `${eingang.schluessel}#${eingang.nonce}` : null;
+}
+
 // ---------------------------------------------------------------- Einsatzliste
 
 export function EinsatzListe(props: {
@@ -137,6 +153,13 @@ export function EinsatzListe(props: {
   const { einsaetze, onOeffnen, onGeaendert } = props;
   const [zeigePapierkorb, setZeigePapierkorb] = useState(false);
   const papierkorb = einsaetzePapierkorb();
+  /**
+   * Der gerade zurückgeholte Einsatz. Aus dem Papierkorb wiederhergestellt,
+   * taucht er irgendwo in der Liste darüber wieder auf — bei mehreren
+   * Sammlungen ist ohne Stempel nicht zu sehen, welche zurückkam. Genau die
+   * Zusage „nichts geht verloren" bliebe damit unquittiert.
+   */
+  const [zurueckgeholt, setZurueckgeholt] = useState<string | null>(null);
 
   // Kein confirm: Löschen ist nur der Weg in den Papierkorb (30 Tage
   // wiederherstellbar) — ein Fehltipp lässt sich rückgängig machen.
@@ -145,17 +168,20 @@ export function EinsatzListe(props: {
     onGeaendert();
   }
 
-  async function endgueltigLoeschen(s: Einsatzsammlung) {
-    const sicher = await frageJaNein({
+  // Rückfrage und Mutation bleiben getrennt: der Abgang der Karte läuft
+  // zwischen beiden (siehe AbgangKnopf).
+  function fragEndgueltig(s: Einsatzsammlung) {
+    return frageJaNein({
       titel: "Einsatz endgültig löschen?",
       text: `„${s.name}" mit ${s.eintraege.length} Meldung(en) wird aus dem Papierkorb entfernt. Darin stecken fremde Personendaten; rückgängig geht das nicht.`,
       ok: "Endgültig löschen",
       gefahr: true,
     });
-    if (sicher) {
-      einsatzEndgueltigLoeschen(s.id);
-      onGeaendert();
-    }
+  }
+
+  function endgueltigLoeschen(s: Einsatzsammlung) {
+    einsatzEndgueltigLoeschen(s.id);
+    onGeaendert();
   }
 
   return (
@@ -164,7 +190,7 @@ export function EinsatzListe(props: {
         const sum = aggregiere(s.eintraege);
         const restTage = tageBisAufraeumen(s);
         return (
-          <section className="karte" key={s.id}>
+          <Kartenstapel className="karte" key={s.id} frisch={s.id === zurueckgeholt}>
             <div className="kopfzeile">
               <h2>{s.name}</h2>
               <button type="button" className="primaer" onClick={() => onOeffnen(s)}>Öffnen</button>
@@ -190,9 +216,13 @@ export function EinsatzListe(props: {
               </p>
             )}
             <div className="vorlage-aktionen">
-              <button type="button" className="entfernen" onClick={() => loeschen(s)}>Löschen</button>
+              {/* Der Abgang zeigt, welche Sammlung geht — die Liste rückt erst
+                  danach nach. Ohne ihn verschwindet aus einem Stapel gleich
+                  aussehender Karten schlagartig eine, und welche es war, steht
+                  nur noch im Papierkorb. */}
+              <AbgangKnopf className="entfernen" onAusfuehren={() => loeschen(s)}>Löschen</AbgangKnopf>
             </div>
-          </section>
+          </Kartenstapel>
         );
       })}
       {papierkorb.length > 0 && (
@@ -204,23 +234,29 @@ export function EinsatzListe(props: {
       )}
       {zeigePapierkorb &&
         papierkorb.map((s) => (
-          <section className="karte papierkorb" key={s.id}>
+          <Kartenstapel className="karte papierkorb" key={s.id}>
             <div className="kopfzeile">
               <h2>{s.name}</h2>
               <span>
-                <button type="button" onClick={() => { einsatzWiederherstellen(s.id); onGeaendert(); }}>
+                <AbgangKnopf
+                  onAusfuehren={() => { einsatzWiederherstellen(s.id); setZurueckgeholt(s.id); onGeaendert(); }}
+                >
                   Wiederherstellen
-                </button>{" "}
-                <button type="button" className="entfernen" onClick={() => endgueltigLoeschen(s)}>
+                </AbgangKnopf>{" "}
+                <AbgangKnopf
+                  className="entfernen"
+                  bestaetigen={() => fragEndgueltig(s)}
+                  onAusfuehren={() => endgueltigLoeschen(s)}
+                >
                   Endgültig löschen
-                </button>
+                </AbgangKnopf>
               </span>
             </div>
             <p className="hinweis">
               {s.eintraege.length} Meldung(en) · gelöscht am {new Date(s.geloeschtAm!).toLocaleDateString("de-DE")} —
               wird nach 30 Tagen automatisch endgültig entfernt.
             </p>
-          </section>
+          </Kartenstapel>
         ))}
     </>
   );
@@ -392,8 +428,10 @@ export function EinsatzDetail(props: {
   onOldenburgExport: () => void;
   onSammelPdf: () => void;
   onGeloescht: () => void;
+  /** Die gerade eingegangene Meldung — sie quittiert in der Liste. */
+  eingang?: Eingang | null;
 }) {
-  const { einsatz, onZurueck, onGeaendert, onScannen, onManuell, onDateiImport, onBilderImport, onExport, onCsvExport, onCsvDetailExport, onOldenburgExport, onSammelPdf, onGeloescht } = props;
+  const { einsatz, onZurueck, onGeaendert, onScannen, onManuell, onDateiImport, onBilderImport, onExport, onCsvExport, onCsvDetailExport, onOldenburgExport, onSammelPdf, onGeloescht, eingang } = props;
   const [suche, setSuche] = useState("");
   const [sortierung, setSortierung] = useState<EinheitenSortierung>("name");
   // "" = keine Einschränkung. Schlüssel siehe einheiten-liste.ts.
@@ -649,7 +687,7 @@ export function EinsatzDetail(props: {
             )}
           </p>
         )}
-        {ansicht === "tabelle" && kopf.length > 0 && <EinheitenTabelle meldungen={kopf} />}
+        {ansicht === "tabelle" && kopf.length > 0 && <EinheitenTabelle meldungen={kopf} eingang={eingang} />}
         {ansicht === "karten" &&
           kopf.map((e) => (
             <EinheitKarte
@@ -660,6 +698,7 @@ export function EinsatzDetail(props: {
               onGeaendert={onGeaendert}
               qualifikation={quali}
               qualifikationKurz={qualiKurz}
+              eingang={eingang}
             />
           ))}
       </section>
@@ -683,7 +722,7 @@ export function EinsatzDetail(props: {
  * Einheit meldet den größten Verpflegungsbedarf?"). Zahlen starten dabei
  * absteigend — gefragt ist der größte Wert, nicht die Null.
  */
-function EinheitenTabelle({ meldungen }: { meldungen: MeldeEintrag[] }) {
+function EinheitenTabelle({ meldungen, eingang }: { meldungen: MeldeEintrag[]; eingang?: Eingang | null }) {
   // null = Reihenfolge der Liste (Sortierauswahl der Leiste) unverändert
   // übernehmen. Erst ein Klick auf einen Spaltenkopf ordnet hier um.
   const [spalte, setSpalte] = useState<TabellenSpalte | null>(null);
@@ -766,7 +805,7 @@ function EinheitenTabelle({ meldungen }: { meldungen: MeldeEintrag[] }) {
           </thead>
           <tbody>
             {sortiert.map((z) => (
-              <TabellenZeileZelle key={z.eintrag.einheitSchluessel} zeile={z} />
+              <TabellenZeileZelle key={z.eintrag.einheitSchluessel} zeile={z} eingang={eingang} />
             ))}
           </tbody>
           {/* Die Summe zählt nur die anwesenden Zeilen der Auswahl — abgerückte
@@ -792,9 +831,10 @@ function EinheitenTabelle({ meldungen }: { meldungen: MeldeEintrag[] }) {
 }
 
 /** Eine Datenzeile — abgerückte Meldungen bleiben sichtbar, aber durchgestrichen. */
-function TabellenZeileZelle({ zeile: z }: { zeile: TabellenZeile }) {
+function TabellenZeileZelle({ zeile: z, eingang }: { zeile: TabellenZeile; eingang?: Eingang | null }) {
+  const zeile = useEingangsquittung<HTMLTableRowElement>(marke(eingang, z.eintrag.einheitSchluessel));
   return (
-    <tr className={z.anwesend ? undefined : "gestrichen"}>
+    <tr ref={zeile} className={z.anwesend ? undefined : "gestrichen"}>
       <th scope="row">
         {z.einheit}
         {z.eintrag.bogen.uebung ? <span className="uebung-badge">ÜBUNG</span> : null}
@@ -1046,8 +1086,11 @@ function EinheitKarte(props: {
   qualifikation?: string;
   /** Kurzform der gefilterten Qualifikation für die Trefferzeile („AGT"). */
   qualifikationKurz?: string;
+  /** Die gerade eingegangene Meldung — trifft sie diese Zeile, quittiert sie. */
+  eingang?: Eingang | null;
 }) {
-  const { einsatzId, kopf, alle, onGeaendert, qualifikation = "", qualifikationKurz = "" } = props;
+  const { einsatzId, kopf, alle, onGeaendert, qualifikation = "", qualifikationKurz = "", eingang } = props;
+  const zeile = useEingangsquittung<HTMLDivElement>(marke(eingang, kopf.einheitSchluessel));
   // Die Namen gehören in die Zeile, nicht hinter einen Klick: die Frage lautet
   // „wen habe ich?", und die Antwort ist der Name, nicht die Zahl.
   const qualiPersonen = personenMitQualifikation(kopf, qualifikation);
@@ -1143,14 +1186,20 @@ function EinheitKarte(props: {
       ok: "Meldung entfernen",
       gefahr: true,
     });
-    if (sicher) {
+    if (!sicher) return;
+    // Erst geht die Zeile sichtbar ab, dann erst wird sie weggenommen: bei
+    // dreißig gleich gebauten Zeilen ist sonst hinterher nicht zu sehen, ob
+    // die richtige ging — und anders als eine Karte im Assistenten ist eine
+    // entfernte Meldung nicht wiederherstellbar. Läuft keine Animation
+    // (reduzierte Bewegung, verdeckter Tab), nimmt mitAbgang den direkten Weg.
+    mitAbgang(zeile.current, () => {
       meldungEntfernen(einsatzId, kopf.id);
       onGeaendert();
-    }
+    });
   }
 
   return (
-    <div className={`einheit-zeile${zaehlt ? "" : " gestrichen"}`}>
+    <div ref={zeile} className={`einheit-zeile${zaehlt ? "" : " gestrichen"}`}>
       <div className="kopfzeile">
         <span className="muster-text">
           <span className="muster-name">

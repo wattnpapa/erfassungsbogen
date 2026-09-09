@@ -329,6 +329,22 @@ Die Lehre allgemein: eine Animation, die eine Auskunft trägt, braucht unter red
 
 **Die Stempel-Regel.** Ein Eingangsstempel gehört dem, was gerade eingegangen ist — nie allen, die den Zustand schon tragen. Die Quittungszeile hing die Bewegung einmal an der Füllung (`.ein`) und stempelte damit beim Öffnen des Scanners jeden längst gesammelten Teil erneut: eine Quittung für nichts, genau in dem Moment, in dem der Blick nach dem fehlenden Teil sucht. Der Zustand steht sofort und still da; die Bewegung markiert die Änderung.
 
+Die Regel schneidet in beide Richtungen: sie verlangt den Stempel auch dort, wo er fehlt. Wer am Meldekopf einen Bogen aufnimmt, sieht die Summe in der Stärke-Leiste springen und liest den Namen in der Rückmeldezeile — die Liste darunter, auf der der Blick liegt, sagte lange nichts. Bei dreißig bis fünfzig Meldungen einer Großlage wird der Name dort gesucht statt gefunden, und eine Folgemeldung ändert eine bestehende Zeile vollends still.
+
+**Die Eingangs-Quittung.** Die Zeile der gerade aufgenommenen Meldung blitzt kurz auf `--eingang-fond` auf (`.eingegangen`, `--dauer-3`) und wird, falls sie außerhalb liegt, ohne Rollbewegung in den Sichtbereich geholt. Sie gilt auch für den übersprungenen Bogen: die Frage nach dem Scan lautet „welche Zeile ist gemeint?", und darauf gibt es dort eine Antwort — welche es war, sagt die Rückmeldezeile.
+
+Bewusst die Bauart der Zahl-Quittung und nicht die des Stempels: eine Meldung ist keine Karte, sondern eine haarliniengetrennte Zeile bzw. eine Tabellenzeile. Was skaliert, schöbe seine Nachbarn an oder bräche die Spaltenflucht. Also reine Farbe — dieselbe Sprache, die der Scanner-Rahmen und die Teil-Quittung für „angenommen" sprechen, im Grün des Signals statt in der Kennfarbe (Signal-Regel). Und damit fällt sie unter die Quittungs-Ausnahme: unter reduzierter Bewegung bleibt sie als Farbwechsel stehen, statt ersatzlos zu entfallen.
+
+`--eingang-fond` steht eine Stufe entschiedener als `--gut-fond` — die Quittung hat nur `--dauer-3`, ein ruhender Zustandskasten hat beliebig lange Zeit. Alle vier Belegungen sind gegen `--text-2` auf mindestens 4,5:1 gerechnet, denn auf dem Fond steht die Nebenzeile der Meldung; im Feld-Modus wird sie deutlich satter, weil das blasse Hell auf weißem Grund in der Sonne verschwände.
+
+Ein Stapel von dreißig auf einmal eingelesenen Bögen bekommt keine Quittung: eine Marke, die dreißig Zeilen träfe, markierte nichts mehr. Wie viele es waren, sagt die Rückmeldezeile; welche es waren, ist die ganze Liste.
+
+**Zu- und Abgang gelten für jeden Kartenstapel.** Die Frage „welche kam, welche geht?" stellt sich in der Einsatz- und der Vorlagenliste genauso wie bei Personal und Fahrzeugen, und sie hat dort dieselbe Antwort (`.karte.kommt` / `.karte.geht`, `kartenstapel.tsx`). Gestempelt wird, was zurückkommt oder eingeht — die aus dem Papierkorb wiederhergestellte Sammlung, die eingescannte Vorlage auf dem Startbildschirm. Nicht gestempelt wird, was beim Anlegen gar nicht in seiner Liste steht: ein neu angelegter Einsatz wird sofort geöffnet, eine in der Übersicht gespeicherte Vorlage taucht erst beim nächsten Besuch der Startseite auf. Ein Stempel, der erst Minuten später liefe, quittierte nichts mehr.
+
+Steht vor dem Abgang eine Rückfrage, läuft sie zuerst (`AbgangKnopf`): andersherum bliebe die Karte bei „Abbrechen" unsichtbar stehen — die Abgangs-Animation hält ihren Endzustand, und weggenommen wurde nichts.
+
+Auch die entfernte Meldung geht sichtbar ab (`.einheit-zeile.geht`) — dort wiegt es schwerer als im Assistenten, weil sie samt Historie weg ist und sich hinterher nicht mehr prüfen lässt, ob die richtige ging. Die Form folgt derselben Trennung wie die Eingangs-Quittung: **Karten skalieren, Zeilen nicht.** Eine Karte hat eigene Kanten und darf zurückweichen; eine haarliniengetrennte Zeile zöge sich dabei sichtbar aus ihrer Linie heraus. Bleibt die Deckkraft — für 160 ms verblasst genau eine Zeile, während alle anderen stehen.
+
 ## Do's and Don'ts
 
 ### Do:

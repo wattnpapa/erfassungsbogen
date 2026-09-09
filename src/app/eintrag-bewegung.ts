@@ -1,5 +1,9 @@
 /**
- * Bewegung an den Eintragslisten (Personen, Fahrzeuge).
+ * Bewegung an den Listen: Zugang, Abgang und die Quittung des Eingangs.
+ *
+ * Drei Sorten Liste teilen sich das hier — die Eintragslisten des Assistenten
+ * (Personen, Fahrzeuge), die Kartenstapel von Einsätzen und Vorlagen
+ * (`kartenstapel.tsx`) und die Meldungen einer Einsatz-Sammlung.
  *
  * Beide Listen sind Stapel gleich aussehender Karten. Kommt eine dazu oder
  * geht eine weg, ändert sich der Stapel schlagartig — und wer gerade die
@@ -13,7 +17,7 @@
  * eine Animation zu warten, die nicht läuft.
  */
 
-import { useEffect, type RefObject } from "react";
+import { useEffect, useRef, type RefObject } from "react";
 
 /**
  * Setzt den Einzugsstempel — genau einmal, beim Einhängen der Karte.
@@ -86,4 +90,51 @@ export function mitAbgang(element: HTMLElement | null, wegnehmen: () => void) {
   };
   const uhr = setTimeout(abschliessen, ABGANG_NOTBREMSE_MS);
   element.addEventListener("animationend", abschliessen);
+}
+
+/**
+ * Die zuletzt quittierte Marke — modulweit, nicht je Komponente.
+ *
+ * Die Einheitenliste wird gesucht, gefiltert und sortiert; eine Zeile hängt
+ * sich dabei aus und wieder ein. Läge das Gedächtnis in der Zeile, quittierte
+ * sie beim Wiedereinhängen ein zweites Mal — eine Quittung für nichts, und
+ * genau das verbietet die Stempel-Regel. Kartenansicht und Tabelle stehen nie
+ * gleichzeitig, teilen sich das Gedächtnis also gefahrlos.
+ */
+let zuletztQuittiert: string | null = null;
+
+/**
+ * Quittiert die eine Zeile, die gerade eingegangen ist: sie blitzt kurz auf
+ * dem Eingangs-Fond auf (`.eingegangen` in index.html) und wird, falls sie
+ * außerhalb liegt, in den Sichtbereich geholt.
+ *
+ * `marke` ist der Schlüssel des Eingangs plus ein Zähler — nur so quittiert
+ * auch die Folgemeldung DERSELBEN Einheit, bei der sich eine bestehende Zeile
+ * still ändert. `null` heißt: diese Zeile ist nicht gemeint.
+ *
+ * Wie bei der Zahl-Quittung über das DOM statt über einen `key`: beim ersten
+ * Malen der Liste bleibt alles still, und ein Reflow lässt die Animation auch
+ * dann neu ansetzen, wenn die Klasse schon steht.
+ */
+export function useEingangsquittung<T extends HTMLElement>(marke: string | null) {
+  const element = useRef<T>(null);
+  useEffect(() => {
+    if (!marke || marke === zuletztQuittiert) return;
+    const el = element.current;
+    if (!el) return;
+    zuletztQuittiert = marke;
+    el.classList.remove("eingegangen");
+    void el.offsetWidth;
+    el.classList.add("eingegangen");
+    // Ohne Rollbewegung und nur, wenn die Zeile wirklich außerhalb liegt: eine
+    // Quittung, die niemand sieht, ist keine — und eine Liste, die unter dem
+    // Finger wegspringt, obwohl die Zeile schon dasteht, ist schlimmer als
+    // keine. „nearest" tut beides von sich aus.
+    //
+    // Geprüft, weil es die Funktion nicht überall gibt (Testumgebung, sehr
+    // alte WebViews): die Quittung selbst hängt nicht daran und steht auch
+    // ohne Rollen da.
+    if (typeof el.scrollIntoView === "function") el.scrollIntoView({ block: "nearest", inline: "nearest" });
+  }, [marke]);
+  return element;
 }

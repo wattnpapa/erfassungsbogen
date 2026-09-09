@@ -266,6 +266,14 @@
       --alarm:       #a4231c;
       --alarm-fond:  #fdecea;
       --alarm-linie: #eaa79d;
+      /* Fond der Eingangs-Quittung: die Fläche, auf der eine gerade
+         eingegangene Meldung kurz aufblitzt (.eingegangen). Eine Stufe
+         entschiedener als --gut-fond — die Quittung steht nur --dauer-3 lang
+         da und muss in dieser Zeit auffallen, während --gut-fond als ruhender
+         Zustandskasten leise bleiben darf. Alle vier Belegungen sind gegen
+         --text-2 auf mindestens 4,5:1 gerechnet: auf dem Fond steht die
+         Nebenzeile der Meldung (Organisation, Stärke, Stand). */
+      --eingang-fond: #d3e9dc;
 
       /* Form: rechteckig und kantenbetont — Behördenformular, nicht App-Kachel. */
       --radius:       0px;
@@ -904,11 +912,16 @@
        Karte mit ungewisser Höhe rechnet auf jedem Bild das Layout neu, und der
        maßgebliche Fall ist ein Jahre altes Einsatz-Handy. Der Inhalt steht
        danach unverändert da — unter reduzierter Bewegung entfällt beides also
-       ersatzlos, es trägt keine eigene Auskunft. */
-    .karte.eintrag.kommt { animation: eintrag-kommt var(--dauer-2) var(--kurve); }
+       ersatzlos, es trägt keine eigene Auskunft.
+
+       Die Regel gilt für jeden Kartenstapel, nicht nur für Personal und
+       Fahrzeuge: dieselbe Frage („welche kam, welche geht?") stellt sich in
+       der Einsatz- und in der Vorlagenliste, und sie hat dort dieselbe
+       Antwort. Der Auslöser bleibt eintrag-bewegung.ts. */
+    .karte.kommt { animation: eintrag-kommt var(--dauer-2) var(--kurve); }
     @keyframes eintrag-kommt { from { opacity: 0; transform: scale(1.02); } }
     /* Der Abgang läuft kürzer als der Zugang: was geht, soll nicht warten. */
-    .karte.eintrag.geht {
+    .karte.geht {
       animation: eintrag-geht calc(var(--dauer-2) * 0.8) ease-in forwards;
       transform-origin: 50% 0;
     }
@@ -1419,6 +1432,19 @@
     .einheit-zeile { border-top: var(--strich) solid var(--linie-fein); padding: var(--r-3) 0 var(--r-2); }
     .einheit-zeile:first-of-type { border-top: none; padding-top: var(--r-1); }
     .einheit-zeile.gestrichen { opacity: 0.55; }
+    /* Abgang einer entfernten Meldung. Dieselbe Auskunft wie der Abgang im
+       Kartenstapel — welche geht? —, aber in der Form, die eine Zeile trägt:
+       ohne Skalierung. Eine Karte hat eigene Kanten und darf zurückweichen;
+       eine haarliniengetrennte Zeile zöge sich dabei sichtbar aus ihrer Linie
+       heraus. Bleibt die Deckkraft, und die genügt: für 160 ms verblasst genau
+       eine Zeile, während alle anderen stehen.
+
+       Dass es überhaupt einen Abgang braucht, wiegt hier schwerer als im
+       Assistenten: eine entfernte Meldung ist samt Historie weg, und wer nach
+       dem Klick neunundzwanzig statt dreißig gleich gebaute Zeilen sieht,
+       kann nicht mehr prüfen, ob die richtige ging. */
+    .einheit-zeile.geht { animation: zeile-geht calc(var(--dauer-2) * 0.8) ease-in forwards; }
+    @keyframes zeile-geht { to { opacity: 0; } }
     .einheit-zeile.gestrichen .muster-name { text-decoration: line-through; }
     /* Zug- und Teil-Kennzeichnung an einer gemeldeten Einheit. Ruhiger als der
        Übungs-Störer daneben: sie ordnen ein, sie warnen nicht. Das Teil-Etikett
@@ -1864,6 +1890,35 @@
        Ziffern — wie eine markierte Stelle im Vordruck. */
     .zahl-geaendert { animation: quittung var(--dauer-3) ease-out; }
     @keyframes quittung { from { background: var(--flaeche-2); } }
+    /* Eingangs-Quittung: WELCHE Einheit ist gerade eingegangen? Die
+       Stärke-Leiste sagt, dass die Summe sich bewegt hat, die Rückmeldezeile
+       nennt den Namen — die Liste darunter sagt bisher nichts, und genau auf
+       ihr liegt nach dem Scan der Blick. Bei dreißig bis fünfzig Meldungen
+       einer Großlage wird der Name sonst gesucht statt gefunden. Gesetzt von
+       der React-Seite (eintrag-bewegung.ts) für die eine Zeile, die gerade
+       eingegangen ist — auch bei einer Folgemeldung, denn dort ändert sich
+       eine bestehende Zeile still.
+
+       Bewusst dieselbe Bauart wie die Zahl-Quittung und NICHT der Stempel:
+       eine Meldezeile ist keine Karte, sondern eine haarliniengetrennte Zeile
+       im Stapel (.einheit-zeile) bzw. eine Tabellenzeile. Was skaliert,
+       schöbe seine Nachbarn an oder bräche die Spaltenflucht. Also reine
+       Farbe — die Sprache, die der Scanner-Rahmen und die Teil-Quittung für
+       „angenommen" schon sprechen, im Grün des Signals statt in der
+       Kennfarbe (Signal-Regel: eingegangen ist eingegangen, in jeder
+       Organisation).
+
+       Ohne eigenes Innenmaß, wie die Zahl-Quittung: ein Ausgleichsmaß zöge
+       die Zeile über ihre Haarlinie hinaus. Die Fläche liegt damit eng an der
+       Zeile — wie eine angestrichene Stelle im Vordruck. */
+    .eingegangen { animation: eingang-quittung var(--dauer-3) ease-out; }
+    /* Erst halten, dann ausklingen — anders als bei der Zahl-Quittung, wo der
+       Blick schon auf dem Wert liegt. Hier wird die Zeile gesucht: eine Farbe,
+       die mit `ease-out` gleich im ersten Bild abfällt, blitzt zwar, klingt
+       aber nicht aus, und wer im Moment des Scans noch aufs Gerät sieht statt
+       auf die Liste, kommt zu spät. Die 45 % halten sie rund 200 ms — lang
+       genug, um gefunden zu werden, kurz genug, um kein Zustand zu werden. */
+    @keyframes eingang-quittung { 0%, 45% { background: var(--eingang-fond); } }
     /* Systemeinstellung „Bewegung reduzieren": alles aus, Zustände springen.
        Bewusst pauschal — auch die fest bezifferten Übergänge der
        Plattform-Layer (iOS-Gedrückt-Zustand) fallen darunter. */
@@ -1880,6 +1935,11 @@
          bleibt am Element stehen, das Ausklingen selbst räumt die Markierung
          wieder ab, sonst leuchtete nach drei Meldungen die halbe Leiste. */
       .zahl-geaendert { animation-duration: var(--dauer-3) !important; }
+      /* Aus demselben Grund: die Eingangs-Quittung ist die einzige Auskunft
+         darüber, WELCHE Zeile gerade eingegangen ist. Sie ist ebenfalls keine
+         Bewegung, sondern ein Farbwechsel — eine Animation, die eine Auskunft
+         trägt, braucht hier eine Entsprechung, keine Streichung. */
+      .eingegangen { animation-duration: var(--dauer-3) !important; }
     }
     /* Der Wechsel des Anzeigemodus springt — hier erklärt Bewegung keinen
        Zustand, sie verdeckt ihn. Knöpfe überblenden ihre Schriftfarbe
@@ -2686,6 +2746,9 @@
          gesperrte Versalzeilen und Nebentext stehen dann bei 16 bzw. 17 px. */
       --t-xs: 0.875rem;
       --t-s:  0.9375rem;
+      /* Draußen tritt nichts zurück — auch die Quittung nicht: das blasse
+         --gut-fond verschwände auf weißem Grund in der Sonne. */
+      --eingang-fond: #a9d3bc;
     }
     /* Draußen darf nichts „zurücktreten": Beschriftungen fett und schwarz,
        nichts läuft über Transparenz oder Grauwerte. Die Nebenzeilen brauchen
@@ -2754,6 +2817,7 @@
       --gut:         #6cd18a;
       --gut-fond:    #16261d;
       --gut-linie:   #2f5340;
+      --eingang-fond: #223f2d;
       --alarm:       #ff9d94;
       --alarm-fond:  #2a1715;
       --alarm-linie: #5c2a24;
@@ -2816,6 +2880,9 @@
       --gut:         #8fae63;
       --gut-fond:    #1d241a;
       --gut-linie:   #40523a;
+      /* Nachts bleibt auch die Quittung gedimmt: sie soll die Zeile finden
+         lassen, nicht die Dunkeladaption kosten. */
+      --eingang-fond: #28321e;
       --alarm:       #e08a7e;
       --alarm-fond:  #291410;
       --alarm-linie: #5e2f26;

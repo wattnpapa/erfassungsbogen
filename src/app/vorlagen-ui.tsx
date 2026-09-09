@@ -28,6 +28,7 @@ import {
 } from "./vorlagen";
 import { SeitenKopf } from "./seiten-kopf";
 import { frageJaNein, frageText } from "./dialoge";
+import { AbgangKnopf, Kartenstapel } from "./kartenstapel";
 
 function personName(vorname: string, nachname: string): string {
   return `${vorname} ${nachname}`.trim() || "(ohne Name)";
@@ -48,10 +49,19 @@ export function VorlagenListe(props: {
   vorlagen: Vorlage[];
   onMustern: (v: Vorlage) => void;
   onGeaendert: () => void;
+  /**
+   * Die gerade eingegangene Vorlage (Scan). Sie wird in der Liste
+   * abgestempelt — der Startbildschirm zeigt sie im selben Augenblick an, in
+   * dem sie ankommt, und ohne Stempel fiele sie zwischen den vorhandenen
+   * Vorlagen nicht auf.
+   */
+  frischeId?: string | null;
 }) {
-  const { vorlagen, onMustern, onGeaendert } = props;
+  const { vorlagen, onMustern, onGeaendert, frischeId } = props;
   const [zeigePapierkorb, setZeigePapierkorb] = useState(false);
   const papierkorb = vorlagenPapierkorb();
+  /** Die gerade aus dem Papierkorb zurückgeholte Vorlage — siehe EinsatzListe. */
+  const [zurueckgeholt, setZurueckgeholt] = useState<string | null>(null);
 
   async function umbenennen(v: Vorlage) {
     const name = await frageText({ titel: "Vorlage umbenennen", label: "Name", vorgabe: v.name, ok: "Umbenennen" });
@@ -68,23 +78,26 @@ export function VorlagenListe(props: {
     onGeaendert();
   }
 
-  async function endgueltigLoeschen(v: Vorlage) {
-    const sicher = await frageJaNein({
+  // Rückfrage und Mutation getrennt: dazwischen läuft der Abgang der Karte
+  // (siehe AbgangKnopf).
+  function fragEndgueltig(v: Vorlage) {
+    return frageJaNein({
       titel: "Vorlage endgültig löschen?",
       text: `„${v.name}" wird aus dem Papierkorb entfernt. Das lässt sich nicht rückgängig machen.`,
       ok: "Endgültig löschen",
       gefahr: true,
     });
-    if (sicher) {
-      vorlageEndgueltigLoeschen(v.id);
-      onGeaendert();
-    }
+  }
+
+  function endgueltigLoeschen(v: Vorlage) {
+    vorlageEndgueltigLoeschen(v.id);
+    onGeaendert();
   }
 
   return (
     <>
       {vorlagen.map((v) => (
-        <section className="karte" key={v.id}>
+        <Kartenstapel className="karte" key={v.id} frisch={v.id === frischeId || v.id === zurueckgeholt}>
           <div className="kopfzeile">
             <h2>{v.name}</h2>
             <button type="button" className="primaer" onClick={() => onMustern(v)}>
@@ -102,9 +115,11 @@ export function VorlagenListe(props: {
           </p>
           <div className="vorlage-aktionen">
             <button type="button" onClick={() => umbenennen(v)}>Umbenennen</button>{" "}
-            <button type="button" className="entfernen" onClick={() => loeschen(v)}>Löschen</button>
+            {/* Der Abgang zeigt, welche Vorlage geht — erst danach rückt die
+                Liste nach. */}
+            <AbgangKnopf className="entfernen" onAusfuehren={() => loeschen(v)}>Löschen</AbgangKnopf>
           </div>
-        </section>
+        </Kartenstapel>
       ))}
       {papierkorb.length > 0 && (
         <p>
@@ -115,23 +130,29 @@ export function VorlagenListe(props: {
       )}
       {zeigePapierkorb &&
         papierkorb.map((v) => (
-          <section className="karte papierkorb" key={v.id}>
+          <Kartenstapel className="karte papierkorb" key={v.id}>
             <div className="kopfzeile">
               <h2>{v.name}</h2>
               <span>
-                <button type="button" onClick={() => { vorlageWiederherstellen(v.id); onGeaendert(); }}>
+                <AbgangKnopf
+                  onAusfuehren={() => { vorlageWiederherstellen(v.id); setZurueckgeholt(v.id); onGeaendert(); }}
+                >
                   Wiederherstellen
-                </button>{" "}
-                <button type="button" className="entfernen" onClick={() => endgueltigLoeschen(v)}>
+                </AbgangKnopf>{" "}
+                <AbgangKnopf
+                  className="entfernen"
+                  bestaetigen={() => fragEndgueltig(v)}
+                  onAusfuehren={() => endgueltigLoeschen(v)}
+                >
                   Endgültig löschen
-                </button>
+                </AbgangKnopf>
               </span>
             </div>
             <p className="hinweis">
               Gelöscht am {new Date(v.geloeschtAm!).toLocaleDateString("de-DE")} — wird nach 30 Tagen
               automatisch endgültig entfernt.
             </p>
-          </section>
+          </Kartenstapel>
         ))}
     </>
   );

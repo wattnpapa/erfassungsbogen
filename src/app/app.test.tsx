@@ -693,6 +693,34 @@ describe("Neuen Einsatz anlegen", () => {
   });
 
   /**
+   * Am Meldekopf liegt nach dem Scan der Blick auf der Liste, nicht auf der
+   * Rückmeldezeile darüber: Zwischen dreißig gleich gebauten Zeilen ist ohne
+   * Quittung nicht zu sehen, welche zum gerade aufgenommenen Bogen gehört.
+   * Genau eine Zeile darf sie tragen — quittierten alle, quittierte keine.
+   */
+  it("quittiert die Zeile der gerade aufgenommenen Meldung — und nur sie", async () => {
+    const nutzer = userEvent.setup();
+    const einsatz = einsatzImSpeicherAnlegen("Sammelhausen", EinsatzArt.EINSATZ);
+    meldungHinzufuegen(einsatz.id, bogenMitName("Althausen"));
+    meldungHinzufuegen(einsatz.id, bogenMitName("Bestandshausen"));
+    render(<App />);
+
+    fragmentSetzen(encodePayloadUrl(bogenMitName("Neuhausen"), browserKompressor));
+    await screen.findByRole("heading", { name: "Gesamtübersicht" });
+    await nutzer.click(screen.getByRole("button", { name: "In Einsatz aufnehmen…" }));
+    await nutzer.click(await screen.findByRole("button", { name: /^Sammelhausen/ }));
+
+    await screen.findByRole("heading", { level: 1, name: "Sammelhausen" });
+    const quittiert = await waitFor(() => {
+      const treffer = document.querySelectorAll(".einheit-zeile.eingegangen");
+      expect(treffer).toHaveLength(1);
+      return treffer[0] as HTMLElement;
+    });
+    expect(quittiert.textContent).toContain("Neuhausen");
+    expect(quittiert.textContent).not.toContain("Althausen");
+  });
+
+  /**
    * Dieselbe Einheit ein zweites Mal: Die Frage hat zwei gleichwertige
    * Antworten, und beide müssen wirklich unterschiedlich wirken — sonst
    * verschwindet entweder eine Folgemeldung in der Historie einer fremden

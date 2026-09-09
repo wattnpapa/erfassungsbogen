@@ -52,7 +52,7 @@ import {
   type EintragSignatur,
   type Einsatzsammlung,
 } from "@bos/meldekopf/einsaetze";
-import { ART_LABEL, EinsatzDetail, EinsatzListe } from "./einsaetze-ui";
+import { ART_LABEL, EinsatzDetail, EinsatzListe, type Eingang } from "./einsaetze-ui";
 import { aktuelleMeldungen } from "./auswertung";
 import { boegenAusPdfBytes, einsatzAusDatei, einsatzAusPdfBytes, einsatzDateiInhalt, istPdfDatei } from "./einsatz-transport";
 import type { QrBogen } from "./qr-boegen";
@@ -409,6 +409,25 @@ function AppInhalt() {
   // Sammelziel für hereinkommende Bögen (Scan/manuell landen dort statt zu öffnen).
   const [einsaetze, setEinsaetze] = useState<Einsatzsammlung[]>(() => einsaetzeLaden());
   const [offenerEinsatzId, setOffenerEinsatzId] = useState<string | null>(null);
+  /**
+   * Welche Zeile der Einheitenliste gehört zum gerade aufgenommenen Bogen?
+   * Die Stärke-Leiste quittiert die geänderte Summe, die Rückmeldezeile nennt
+   * den Namen — aber die Liste, auf der nach dem Scan der Blick liegt, sagt
+   * ohne diese Marke nichts. Der Zähler unterscheidet zwei Aufnahmen derselben
+   * Einheit: bei einer Folgemeldung ändert sich eine bestehende Zeile still.
+   */
+  const [eingang, setEingang] = useState<Eingang | null>(null);
+  /**
+   * Die gerade eingescannte Vorlage. Der Startbildschirm listet sie im selben
+   * Augenblick; zwischen den vorhandenen Vorlagen fiele sie sonst nicht auf.
+   */
+  const [frischeVorlageId, setFrischeVorlageId] = useState<string | null>(null);
+  const eingangZaehler = useRef(0);
+  /** Merkt die Zeile zum gerade aufgenommenen Bogen vor (siehe `eingang`). */
+  function markiereEingang(schluessel: string) {
+    eingangZaehler.current += 1;
+    setEingang({ schluessel, nonce: eingangZaehler.current });
+  }
   const [sammelZielId, setSammelZielId] = useState<string | null>(null);
   // Sammelziel zusätzlich als Ref: der laufende (asynchrone) Scan-Loop und die
   // Scanner-Callbacks lesen sonst einen veralteten Closure-Stand.
@@ -694,6 +713,10 @@ function AppInhalt() {
         : `Bereits vorhanden — übersprungen (gleicher Inhalt).`,
     );
     setFehler("");
+    // Auch beim übersprungenen Bogen: die Frage nach dem Scan lautet „welche
+    // Zeile ist gemeint?", und darauf gibt es hier eine Antwort — die Zeile,
+    // die den Inhalt schon trägt. Die Rückmeldezeile sagt, ob er neu war.
+    markiereEingang(r.eintrag.einheitSchluessel);
     setOffenerEinsatzId(zielId); // zurück in die Einsatzansicht
   }
 
@@ -746,6 +769,7 @@ function AppInhalt() {
         const b = decodeVorlagePayloadUrl(text, browserKompressor);
         const v = vorlageAnlegen(einheitAnzeigename(b.einheit), b);
         setVorlagen(vorlagenLaden());
+        setFrischeVorlageId(v.id);
         setMusterVorlage(null);
         setZeigeStart(true); // Startbildschirm listet die (nun importierte) Vorlage
         const status = await signaturVonText(text);
@@ -1111,6 +1135,11 @@ function AppInhalt() {
   /**
    * Gefundene Bögen in eine Sammlung schreiben (Dedupe über die Eintrags-ID).
    * Der Aufrufer lädt die Einsätze neu — beim Stapel erst nach der letzten Datei.
+   *
+   * Bewusst ohne Eingangs-Quittung in der Liste: hier kommen dreißig Bögen auf
+   * einmal, und eine Marke, die dreißig Zeilen träfe, markierte nichts mehr.
+   * Wie viele es waren, sagt die Rückmeldezeile; welche es waren, ist die
+   * ganze Liste. Die Quittung gehört dem einzelnen Eingang.
    */
   function boegenAufnehmen(zielId: string, gefunden: QrBogen[]): { neu: number; uebersprungen: number } {
     let neu = 0;
@@ -1309,7 +1338,7 @@ function AppInhalt() {
         <Aktualisierungshinweise />
         <EinsatzDetail
           einsatz={offenerEinsatz}
-          onZurueck={() => { setOffenerEinsatzId(null); setMeldung(""); }}
+          onZurueck={() => { setOffenerEinsatzId(null); setMeldung(""); setEingang(null); }}
           onGeaendert={einsaetzeNeuLaden}
           onScannen={() => scanneInEinsatz(offenerEinsatz.id)}
           onManuell={() => manuellInEinsatz(offenerEinsatz.id)}
@@ -1320,6 +1349,7 @@ function AppInhalt() {
           onCsvDetailExport={() => exportiereEinsatzCsvDetail(offenerEinsatz)}
           onOldenburgExport={() => exportiereEinsatzOldenburg(offenerEinsatz)}
           onSammelPdf={() => sammelPdf(offenerEinsatz)}
+          eingang={eingang}
           onGeloescht={() => { setOffenerEinsatzId(null); einsaetzeNeuLaden(); setMeldung("Einsatz in den Papierkorb verschoben."); }}
         />
         {(meldung || fehler) && (
@@ -1532,6 +1562,7 @@ function AppInhalt() {
               vorlagen={vorlagen}
               onMustern={(v) => { setMeldung(""); setMusterVorlage(v); }}
               onGeaendert={vorlagenNeuLaden}
+              frischeId={frischeVorlageId}
             />
           </section>
         )}
