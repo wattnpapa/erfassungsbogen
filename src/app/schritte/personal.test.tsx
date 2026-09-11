@@ -10,7 +10,7 @@ import userEvent from "@testing-library/user-event";
 import { SchrittBuehne } from "../../test/schritt-buehne";
 import { OrganisationsTyp } from "@bos/eeb-format/model";
 import { neuePerson, neuerBogen } from "../hilfen";
-import { SchrittPersonal } from "./personal";
+import { SchrittPersonal, kraftfahrerHinweis } from "./personal";
 import { stanPersonalVorbelegung } from "@bos/vokabulare/thw-stan-personal";
 
 const buehne = () => render(<SchrittBuehne komponente={SchrittPersonal} />);
@@ -262,6 +262,39 @@ describe("Vorschlagsfelder für Funktion und Qualifikation", () => {
     await nutzer.click(screen.getByText("Schirrmeister/in"));
 
     expect(screen.getByRole("button", { name: "SM entfernen" })).toBeDefined();
+  });
+
+  /**
+   * Rückmeldung aus einem Ortsverband: „habe nur Kraftfahrer mit ADR gefunden".
+   * Der reine Kraftfahrer steht absichtlich nicht in der Funktionsliste — die
+   * Klasse gehört ins Feld Fahrerlaubnis. Das muss die Suche selbst sagen,
+   * sonst bleibt der Bogen an der Stelle falsch oder leer.
+   */
+  it("weist bei der Suche nach „Kraftfahrer“ auf das Feld Fahrerlaubnis hin", async () => {
+    const nutzer = userEvent.setup();
+    await mitPerson(nutzer);
+
+    const feld = screen.getByLabelText("Funktion hinzufügen");
+    await nutzer.type(feld, "Kraftfahrer");
+    // Die ADR-Zusätze bleiben als Treffer stehen — sie sind ja richtig hier.
+    expect(screen.getByText("Kraftfahrer/in CE ADR Stückgut")).toBeDefined();
+    expect(screen.getByRole("note").textContent).toMatch(/Feld „Fahrerlaubnis"/);
+
+    // Bei jeder anderen Suche stört kein Hinweis.
+    await nutzer.clear(feld);
+    await nutzer.type(feld, "Zugführer");
+    expect(screen.queryByRole("note")).toBeNull();
+  });
+
+  it("zeigt den Kraftfahrer-Hinweis auch für „Kf“, „Führerschein“ und „Lkw“, nicht aber für „Kfz“-fremde Kürzel", () => {
+    expect(kraftfahrerHinweis("Kf")).toBeDefined();
+    expect(kraftfahrerHinweis("kf b")).toBeDefined();
+    expect(kraftfahrerHinweis("Führerschein CE")).toBeDefined();
+    expect(kraftfahrerHinweis("LKW")).toBeDefined();
+    expect(kraftfahrerHinweis("Fahrerlaubnis")).toBeDefined();
+    expect(kraftfahrerHinweis("Zugführer")).toBeUndefined();
+    expect(kraftfahrerHinweis("AGT")).toBeUndefined();
+    expect(kraftfahrerHinweis("")).toBeUndefined();
   });
 
   it("übernimmt eine unbekannte Eingabe mit Enter als Freitext", async () => {

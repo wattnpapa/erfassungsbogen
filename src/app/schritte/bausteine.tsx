@@ -353,8 +353,14 @@ export function VokabListe(props: {
    * landet als Freitext im Bogen — anders als `tabelle`, die Codes vergibt.
    */
   freitextVorschlaege?: readonly FreitextVorschlag[];
+  /**
+   * Hinweis zur aktuellen Suche, der unter den Vorschlägen steht — für
+   * Eingaben, die hier nichts (Passendes) finden, weil das Gesuchte in einem
+   * anderen Feld liegt. Liefert nichts, bleibt die Liste allein.
+   */
+  suchhinweis?: (suche: string) => ReactNode | undefined;
 }) {
-  const { werte, aendern, tabelle, hinzufuegenText, freitextVorschlaege } = props;
+  const { werte, aendern, tabelle, hinzufuegenText, freitextVorschlaege, suchhinweis } = props;
   const [eingabe, setEingabe] = useState("");
 
   const suche = eingabe.trim().toLowerCase();
@@ -380,6 +386,8 @@ export function VokabListe(props: {
       Number(k.text.toLowerCase().startsWith(suche) || (k.zusatz?.toLowerCase().startsWith(suche) ?? false));
     treffer.sort((a, b) => beginnt(b) - beginnt(a));
   }
+
+  const hinweis = suche ? suchhinweis?.(suche) : undefined;
 
   const hinzu = (w: VokabularWert) => {
     aendern([...werte, w]);
@@ -426,6 +434,11 @@ export function VokabListe(props: {
       <button type="button" disabled={eingabe.trim() === ""} onClick={() => freitextHinzu(eingabe)}>
         + eigener Text
       </button>
+      {hinweis && (
+        <span className="hinweis suchhinweis" role="note">
+          {hinweis}
+        </span>
+      )}
     </span>
   );
 }

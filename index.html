@@ -867,6 +867,9 @@
     ul.vorschlaege li small { color: var(--text-2); margin-left: 0.3rem; }
     @media (hover: hover) { ul.vorschlaege li.aktiv, ul.vorschlaege li:hover { background: var(--flaeche-2); } }
     .chips { display: flex; flex-wrap: wrap; gap: 0.3rem; align-items: center; margin-top: 0.2rem; }
+    /* Der Suchhinweis („Kraftfahrer? → Fahrerlaubnis") bricht in eine eigene
+       Zeile unter Chips und Feld, statt sich zwischen die Knöpfe zu quetschen. */
+    .chips .suchhinweis { flex-basis: 100%; }
     .chip {
       background: var(--flaeche-2); border: var(--strich) solid var(--linie); border-radius: var(--radius);
       padding: 0.15rem 0.5rem; font-size: var(--t-s); display: inline-flex; gap: 0.3rem; align-items: center;

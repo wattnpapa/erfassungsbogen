@@ -122,6 +122,21 @@ function KontakteEditor(props: { kontakte: Kontakt[]; aendern: (k: Kontakt[]) =>
 }
 
 /**
+ * Wer „Kraftfahrer" als Funktion sucht, findet nur die ADR-Zusätze — die
+ * Funktionsliste führt den reinen Kraftfahrer absichtlich nicht, weil die
+ * Fahrerlaubnisklasse im eigenen Feld steht und dort schon „Kf" bedeutet (so
+ * zählt sie der Meldekopf-Filter, so steht sie im PDF). Aus der Rückmeldung
+ * eines Ortsverbands: „habe nur Kraftfahrer mit ADR gefunden, das hat bei uns
+ * nur einer". Der Hinweis erscheint genau bei dieser Suche und zeigt den Weg;
+ * er greift auch bei „Fahrer", „Führerschein", „Fahrerlaubnis" und „Lkw".
+ */
+export function kraftfahrerHinweis(suche: string): string | undefined {
+  const s = suche.trim().toLowerCase();
+  if (!/^kf\b|kraftfahr|fahrer|führerschein|fuehrerschein|\blkw\b/.test(s)) return undefined;
+  return `Kraftfahrer/in ohne Gefahrgut: die Klasse im Feld „Fahrerlaubnis" dieser Person eintragen — das gilt am Meldekopf als Kf. Hier stehen nur die ADR-Zusätze.`;
+}
+
+/**
  * Fahrerlaubnis mit Mehrfachauswahl: die erste Klasse wie bisher (inkl. „—"),
  * dahinter je weiterer Klasse eine eigene Auswahl mit ✕ und ein „+"-Knopf.
  * Nötig, weil sich nicht alle Klassen gegenseitig einschließen — CE deckt BE
@@ -256,7 +271,13 @@ function PersonKarte(props: {
         </div>
         <div className="person-faehigkeiten">
           <Feld titel="Funktionen / Zusatzfunktionen">
-            <VokabListe werte={p.funktionen} aendern={(w) => set({ funktionen: w })} tabelle={funktionen} hinzufuegenText="Funktion" />
+            <VokabListe
+              werte={p.funktionen}
+              aendern={(w) => set({ funktionen: w })}
+              tabelle={funktionen}
+              hinzufuegenText="Funktion"
+              suchhinweis={kraftfahrerHinweis}
+            />
           </Feld>
           {/* Zusatzqualifikationen kennen kein Code-Vokabular: Beruf, Lehrgang oder
               externe Berechtigung wandern als Freitext in den Bogen. Die
