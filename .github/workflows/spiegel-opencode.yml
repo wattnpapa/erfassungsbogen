@@ -62,7 +62,7 @@ jobs:
           ssh-keygen -lf ~/.ssh/id_ed25519
 
       # Ein blanker Spiegel-Klon statt actions/checkout: nur so sind alle
-      # Zweige und Tags vollständig da, ohne Refspecs von Hand zu basteln.
+      # Zweige und Tags vollständig da und nicht bloß der gebaute Stand.
       - name: Vollständigen Klon von GitHub holen
         run: git clone --mirror "https://github.com/${{ github.repository }}.git" spiegel.git
 
@@ -70,7 +70,11 @@ jobs:
         run: |
           set -euo pipefail
           cd spiegel.git
-          # refs/pull/* gehören GitHub und haben auf der Gegenseite nichts zu
-          # suchen; --mirror würde sie sonst mitschieben.
-          git for-each-ref --format='delete %(refname)' refs/pull | git update-ref --stdin
-          git push --mirror git@gitlab.opencode.de:oc000172112778/erfassungsbogen.git
+          # Kein `--mirror`: das würde auch refs/merge-requests/* auf der
+          # Gegenseite löschen wollen — die gehören GitLab, sind schreibgeschützt
+          # und brächten den gesamten Push zu Fall. Ebenso bleibt refs/pull/*
+          # von GitHub hier, wo es hingehört. Gespiegelt werden Zweige und Tags,
+          # `--prune` räumt drüben auf, was hier verschwunden ist.
+          git push --force --prune \
+            git@gitlab.opencode.de:oc000172112778/erfassungsbogen.git \
+            'refs/heads/*:refs/heads/*' 'refs/tags/*:refs/tags/*'
