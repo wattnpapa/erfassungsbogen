@@ -13,6 +13,7 @@ import { nutzungsKanal, statistikAbgewaehlt, statistikAbwaehlen } from "./statis
 import { AnzeigeSchalter } from "./anzeige-schalter";
 import { frageJaNein, zeigeHinweis } from "./dialoge";
 import { alleDatenLoeschen, datenUmfang, sicherungErstellen, sicherungEinspielen, type DatenUmfang } from "./sicherung";
+import { geraeteKurzform, geraeteSchluesselLoeschen, geraeteSchluesselSicherstellen } from "./geraete-schluessel";
 
 const KONTAKT = "johannes.rudolph@thw-oldenburg.de";
 const REPO = "https://github.com/wattnpapa/erfassungsbogen";
@@ -275,6 +276,15 @@ function Datenschutzdialog({ dialogRef }: { dialogRef: RefObject<HTMLDialogEleme
         Fußzeile oder durch Löschen der Websitedaten im Browser.
       </p>
       <p>
+        Der private Signatur-Geräteschlüssel liegt dabei unverschlüsselt im
+        lokalen Speicher; er belegt die Herkunft der Bögen, nicht die Identität
+        einer Person. Besteht der Verdacht, dass er in fremde Hände geraten ist
+        — etwa nach Verlust oder Weitergabe des Geräts —, ersetzt
+        „Geräteschlüssel neu erzeugen“ in der Fußzeile ihn durch ein neues
+        Schlüsselpaar. Bögen von diesem Gerät tragen danach eine andere
+        Kurzform, die den Empfängern bekannt gemacht werden muss.
+      </p>
+      <p>
         Zur Reichweitenmessung wird{" "}
         <a href="https://www.goatcounter.com/" target="_blank" rel="noopener noreferrer">
           GoatCounter
@@ -354,6 +364,10 @@ export function Fusszeile({ onBogenOeffnen, kompakt = false }: {
   // leer — ein zweiter Klick allein löscht also nie.
   const [loeschVerstanden, setLoeschVerstanden] = useState(false);
   const [loeschFehler, setLoeschFehler] = useState("");
+
+  // Fehlschlag beim Neuerzeugen des Geräteschlüssels — steht in der Fußzeile
+  // selbst, weil der Weg ohne eigenen Dialog auskommt (nur Rückfrage + Hinweis).
+  const [schluesselFehler, setSchluesselFehler] = useState("");
 
   // Bögen des offenen Ordners laden, sobald der Dialog offen ist bzw. der Pfad
   // wechselt. Fehlschläge (z. B. offline) sind kein Beinbruch: die Tabelle
@@ -497,6 +511,56 @@ export function Fusszeile({ onBogenOeffnen, kompakt = false }: {
     }
   }
 
+  /**
+   * Geräteschlüssel verwerfen und sofort einen neuen erzeugen — der Weg für den
+   * Verdacht, dass der private Schlüssel abgeflossen ist (M3 im
+   * Informationssicherheitskonzept). Der neue Schlüssel wird gleich hier erzeugt
+   * statt beim nächsten Signieren, damit die Kurzform in der Bestätigung steht:
+   * ohne sie wüssten die Empfänger nicht, worauf sie künftig prüfen sollen.
+   * Danach wird neu geladen, weil die Übersicht die alte Kurzform und den alten
+   * QR-Code sonst weiter anzeigt.
+   */
+  async function geraeteSchluesselNeuErzeugen() {
+    const sicher = await frageJaNein({
+      titel: "Geräteschlüssel neu erzeugen?",
+      text: (
+        <>
+          <p>
+            Der bisherige Signaturschlüssel dieses Geräts wird gelöscht und durch ein
+            neues Schlüsselpaar ersetzt. Sinnvoll ist das bei Verdacht, dass der private
+            Schlüssel in fremde Hände geraten ist — etwa nach Verlust oder Weitergabe des
+            Geräts.
+          </p>
+          <p>
+            <strong>Empfänger müssen die Kurzform danach neu abgleichen:</strong> Bögen von
+            diesem Gerät tragen ab sofort eine andere Kurzform. Bereits verschickte Bögen
+            bleiben gültig und prüfbar — aber nur gegen den alten öffentlichen Schlüssel,
+            und der lässt sich danach nicht wiederherstellen.
+          </p>
+        </>
+      ),
+      ok: "Neu erzeugen",
+      gefahr: true,
+    });
+    if (!sicher) return;
+    try {
+      geraeteSchluesselLoeschen();
+      await geraeteSchluesselSicherstellen();
+      const kurz = await geraeteKurzform();
+      await zeigeHinweis({
+        titel: "Geräteschlüssel neu erzeugt",
+        text: kurz
+          ? `Die neue Kurzform lautet ${kurz}. Sie muss den Empfängern bekannt gemacht werden. Die App lädt jetzt neu.`
+          : "Der neue Schlüssel steht. Die App lädt jetzt neu.",
+        kopiertext: kurz ?? undefined,
+        ok: "Neu laden",
+      });
+      window.location.reload();
+    } catch (err) {
+      setSchluesselFehler(err instanceof Error ? err.message : String(err));
+    }
+  }
+
   // Im Assistenten bleibt von der Fußzeile eine Zeile übrig: Pflichtangaben und
   // die Anleitung. Alles Übrige — samt der schweren Beispielbögen-Liste — wird
   // gar nicht erst gerendert, statt nur ausgeblendet zu werden.
@@ -537,7 +601,9 @@ export function Fusszeile({ onBogenOeffnen, kompakt = false }: {
           >
             Beispielbögen
           </button>
+          <button type="button" className="link" onClick={() => void geraeteSchluesselNeuErzeugen()}>Geräteschlüssel neu erzeugen</button>
           <button type="button" className="link gefahr" onClick={loeschenOeffnen}>Alle Daten löschen</button>
+          {schluesselFehler && <p className="fehler">{schluesselFehler}</p>}
         </nav>
         <nav className="fuss-gruppe" aria-label="Rechtliches">
           <span className="fuss-titel">Rechtliches</span>

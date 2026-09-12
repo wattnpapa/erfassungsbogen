@@ -78,6 +78,13 @@ und 8 mit konkreten Maßnahmen hinterlegt sind.
 > auf 4 MiB gedeckelt (`inflateRawBegrenzt`), und `script-src` kommt ohne
 > `'unsafe-inline'` aus (Hash-Freigabe der drei Inline-Blöcke). Offen bleibt der
 > unverschlüsselt abgelegte private Signaturschlüssel (6.3/R3/M3).
+>
+> *Nachtrag:* Der private Schlüssel liegt weiterhin unverschlüsselt, der
+> Wiederherstellungsweg dazu ist aber jetzt in der App selbst vorhanden:
+> „Geräteschlüssel neu erzeugen" in der Fußzeile tauscht das Schlüsselpaar nach
+> einer Rückfrage aus (M3). Ebenfalls neu: `SECURITY.md` beschreibt den
+> Meldeweg für Schwachstellen im Hauptrepository und den vier Submodulen
+> (6.4).
 
 **Gesamteinschätzung dieses Entwurfs:** Unter der Voraussetzung, dass die in
 Abschnitt 8 aufgeführten organisatorischen Maßnahmen (insbesondere
@@ -323,6 +330,7 @@ ORP.1 Organisation, INF.1 Gebäude) sind nicht Gegenstand dieses Dokuments.
 | Dokumentiertes Schlüsselkonzept | Erfüllt | Trust-Modell in `docs/datenmodell.md` explizit beschrieben |
 | Schutz privater Schlüssel gegen unbefugten Zugriff | Nicht erfüllt | Privater Ed25519-Schlüssel liegt als Klartext-Hex im `localStorage` — jede Anwendung/jeder Prozess mit Zugriff auf den Browser-/App-Speicher des Geräts kann ihn auslesen |
 | Sichere kryptografische Verfahren | Erfüllt | Ed25519 ist ein etabliertes, als sicher geltendes Verfahren |
+| Schlüsselwechsel bei Kompromittierungsverdacht möglich | Erfüllt | „Geräteschlüssel neu erzeugen" in der Fußzeile (`fusszeile.tsx` → `geraeteSchluesselLoeschen()`/`geraeteSchluesselSicherstellen()` in `src/app/geraete-schluessel.ts`): Rückfrage, dann neues Schlüsselpaar samt Anzeige der neuen Kurzform. Kein Widerruf des alten Schlüssels — Empfänger müssen die Kurzform neu abgleichen (TOFU-Modell, keine PKI) |
 
 ### 6.4 OPS.1.1.6 Software-Tests und Freigaben / Software-Lieferkette
 
@@ -333,6 +341,7 @@ ORP.1 Organisation, INF.1 Gebäude) sind nicht Gegenstand dieses Dokuments.
 | Versionierte, nachvollziehbare Abhängigkeiten | Erfüllt | `package-lock.json` je Teilprojekt/Submodul, Versionen gepinnt |
 | Regelmäßige Prüfung auf bekannte Schwachstellen in Abhängigkeiten (SCA) | Erfüllt | `.github/dependabot.yml` (wöchentlich, npm + GitHub-Actions), `npm audit --omit=dev --audit-level=high` als blockierender CI-Schritt, `npm audit` über das Bau-/Testwerkzeug als Hinweis |
 | Stückliste der ausgelieferten Software (SBOM) | Erfüllt | `npm run sbom` (`scripts/sbom.ts`) erzeugt CycloneDX 1.6 aus den fünf `package-lock.json`; im CI als Artefakt, im Release als Asset |
+| Dokumentierter Meldeweg für Schwachstellen | Erfüllt | `SECURITY.md` im Hauptrepository: Geltungsbereich (Hauptrepo + die vier `vendor/`-Submodule), Private Vulnerability Reporting auf GitHub bzw. E-Mail, angestrebte Fristen (7 Tage Eingangsbestätigung, 30 Tage Einschätzung, Veröffentlichung nach Fix bzw. spätestens nach 90 Tagen) |
 
 > *Prüfvermerk zu SCA (Stand `c7604e9`):* Die ursprüngliche Bewertung „Offen"
 > ist überholt. Dependabot läuft wöchentlich montags über npm und
@@ -346,7 +355,7 @@ ORP.1 Organisation, INF.1 Gebäude) sind nicht Gegenstand dieses Dokuments.
 | --- | --- | --- | --- | --- | --- |
 | R1 | Verlust/Diebstahl eines Geräts mit ungesperrtem Zugriff | D1–D4 (alle lokalen Daten) | Mittel (Einsatzgeräte werden im Feld mitgeführt) | Hoch (Zugriff auf alle lokal gespeicherten Bögen, Absenderkarte, Signaturschlüssel) | **Hoch** |
 | R2 | ~~Dekomprimierungs-Angriff über präparierte Importdatei (`inflateRaw` ohne Größenlimit)~~ **behoben mit `c7604e9`** (Deckel 4 MiB) | A1–A4 (Anwendungsverfügbarkeit) | Niedrig-Mittel | Mittel (Speicherüberlastung/Absturz; kein Datenabfluss) | ~~Mittel~~ → Sehr niedrig |
-| R3 | Diebstahl/Auslesen des unverschlüsselten privaten Signaturschlüssels | D4, K1 (Vertrauenskette) | Niedrig (setzt Gerätezugriff oder weitere Schwachstelle voraus) | Mittel (Signieren im Namen des Geräts möglich) | Niedrig-Mittel |
+| R3 | Diebstahl/Auslesen des unverschlüsselten privaten Signaturschlüssels | D4, K1 (Vertrauenskette) | Niedrig (setzt Gerätezugriff oder weitere Schwachstelle voraus) | Mittel (Signieren im Namen des Geräts möglich) — durch den Austausch des Schlüssels (M3) auf die Zeit bis zum Bemerken und den Abgleich der neuen Kurzform begrenzbar | Niedrig-Mittel |
 | R4 | Cross-Site-Scripting trotz CSP — ~~über `'unsafe-inline'` bei `script-src`~~ **mit `c7604e9` auf Hash-Freigabe umgestellt**; Restrisiko nur noch über `style-src 'unsafe-inline'` | A1 (Web-App) | Niedrig (CSP schränkt Auswirkungen stark ein) | Mittel (potenziell Zugriff auf `localStorage`-Inhalte des Tabs) | ~~Niedrig-Mittel~~ → Niedrig |
 | R5 | Kompromittierte oder manipulierte Build-/Update-Kette | B1–B5, A2 (Desktop) | Niedrig | Hoch (Verteilung manipulierter Software an alle Nutzer der Plattform) | Mittel-Hoch |
 | R6 | Fehlende Signaturprüfung durch den Empfänger (Signatur ist optional) | K1, D1/D2 (Integrität) | Mittel (Prüfung könnte im Alltag vernachlässigt werden) | Mittel (unbemerkt verfälschte Meldung erreicht die Führung) | Mittel |
@@ -364,7 +373,7 @@ Organisation.
 | --- | --- | --- | --- | --- | --- |
 | M1 | R1 | Verbindliche Geräte-Bildschirmsperre (PIN/Biometrie) als Dienstanweisung; wo verfügbar, Festplatten-/Profilverschlüsselung (BitLocker/FileVault/Android-Geräteverschlüsselung) aktivieren | Organisatorisch/technisch (Geräte-Ebene) | `[Organisation/IT-Verantwortliche/r]` | Hoch |
 | M2 | R2 | **Erledigt (`c7604e9`):** Ausgabegrößenbegrenzung bei der Dekomprimierung ist umgesetzt (`MAX_ENTPACKT = 4 MiB`). Für die Organisation bleibt nur: eine App-Version ab diesem Stand einsetzen | Technisch (umgesetzt) | `[Projektbetreiber/Maintainer]` | erledigt |
-| M3 | R3 | Bis zu einer verschlüsselten Ablage des privaten Schlüssels: Geräteabsicherung (M1) als kompensierende Maßnahme; Prozess für Neuerzeugung des Geräteschlüssels bei Kompromittierungsverdacht etablieren | Organisatorisch | `[Organisation]` | Mittel |
+| M3 | R3 | Bis zu einer verschlüsselten Ablage des privaten Schlüssels: Geräteabsicherung (M1) als kompensierende Maßnahme; Prozess für Neuerzeugung des Geräteschlüssels bei Kompromittierungsverdacht etablieren. **Technisch bereitgestellt:** der Knopf „Geräteschlüssel neu erzeugen" in der Fußzeile der App verwirft den bisherigen Schlüssel und erzeugt sofort ein neues Paar; die neue Kurzform steht in der Bestätigung. Für die Organisation bleibt: festlegen, wer den Verdacht meldet, wer den Knopf drückt und wie die neue Kurzform den Empfängern (Meldekopf, Führungsstelle) bekannt gemacht wird | Organisatorisch (technische Grundlage vorhanden) | `[Organisation]` | Mittel |
 | M4 | R4 | **Weitgehend erledigt (`c7604e9`):** `script-src` ist auf Hash-Freigabe umgestellt. Offen bleibt `style-src 'unsafe-inline'` (bewusster Trade-off wegen React-`style`-Attributen) | Technisch (Software-Weiterentwicklung) | `[Projektbetreiber/Maintainer]` | Niedrig |
 | M5 | R5 | Vor Rollout prüfen, dass ausschließlich signierte/notarisierte Pakete eingesetzt werden, sofern verfügbar; bei unsignierten Builds Bezugsquelle (offizielles GitHub-Release) verbindlich vorgeben und Prüfsummen dokumentieren | Organisatorisch | `[Organisation/IT-Verantwortliche/r]` | Hoch |
 | M6 | R6 | Dienstanweisung: Empfangene Bögen mit Signatur sind vor Übernahme in die Sammelübersicht auf gültige Signatur zu prüfen, insbesondere bei mehrstufiger Weitergabe | Organisatorisch | `[Organisation/Meldekopf-Verantwortliche/r]` | Mittel |

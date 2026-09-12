@@ -236,6 +236,12 @@ Kapitel 6 der [Arc42-Dokumentation](arc42-architektur.md).
   Zugriff mehr (vertiefend 6.3).
 - **Empfehlung:** eine eigene, dokumentierte Löschfrist für digital gespeicherte
   Bögen und für Papierausdrucke festlegen, da die Software selbst keine erzwingt.
+- **Geräteschlüssel:** Der private Signaturschlüssel lässt sich einzeln
+  verwerfen — „Geräteschlüssel neu erzeugen" in der Fußzeile löscht ihn nach
+  einer Rückfrage und setzt sofort ein neues Paar
+  (`src/app/geraete-schluessel.ts`). Gedacht ist der Weg für den Verdacht einer
+  Kompromittierung; die Bogendaten bleiben dabei unangetastet. Empfänger müssen
+  die Kurzform danach neu abgleichen.
 
 ### 5.8 Empfänger und Datenübermittlung an Dritte
 
@@ -323,7 +329,7 @@ Schutzziele in Anlehnung an das Standard-Datenschutzmodell (SDM): Vertraulichkei
 | R1 | Verlust/Diebstahl eines Geräts mit unverschlüsseltem `localStorage` → Zugriff auf alle lokal gespeicherten Bögen und die Absenderkarte | V | Mittel | Mittel (Namen, Kontaktdaten, ggf. Fahrzeugkennzeichen mehrerer Personen) | Mittel |
 | R2 | Verlust/Fehlleitung eines gedruckten PDF- oder exportierten CSV/Excel-Dokuments | V | Mittel | Mittel | Mittel |
 | R3 | Kein technisch erzwungener Löschzeitpunkt → Daten verbleiben ggf. länger als nötig auf Geräten | Vf/T | Hoch (Standardverhalten ohne organisatorische Vorgabe) | Niedrig-Mittel | Mittel |
-| R4 | Diebstahl/Auslesen des privaten Signaturschlüssels vom Gerät (unverschlüsselt im `localStorage`) → Signieren im Namen des Geräts | I | Niedrig | Niedrig (Trust-Modell ist ohnehin nur TOFU) | Niedrig |
+| R4 | Diebstahl/Auslesen des privaten Signaturschlüssels vom Gerät (unverschlüsselt im `localStorage`) → Signieren im Namen des Geräts | I | Niedrig | Niedrig (Trust-Modell ist ohnehin nur TOFU; der Schlüssel ist über die Fußzeile austauschbar, siehe 5.7) | Niedrig |
 | R5 | ~~Speicher-Überlastung durch präparierte Import-Datei (fehlende Obergrenze bei der Dekomprimierung)~~ **behoben mit `c7604e9`** (`inflateRawBegrenzt`, Deckel 4 MiB) | Vf | Niedrig | Niedrig (Verfügbarkeits-, kein Vertraulichkeitsrisiko) | ~~Niedrig~~ → Sehr niedrig |
 | R6 | Keine Verkettbarkeits-Kontrolle: Kennzeichen/Funkrufname in Sammel-Exporten könnten über mehrere Einsätze hinweg dieselbe Person/Fahrzeug wiedererkennbar machen | N | Niedrig-Mittel | Niedrig | Niedrig |
 | R7 | Fehlende eigene Zugriffssperre der App (verlässt sich auf Betriebssystem-/Gerätesperre) | V | Mittel | Niedrig-Mittel | Niedrig-Mittel |
@@ -339,6 +345,7 @@ Schutzziele in Anlehnung an das Standard-Datenschutzmodell (SDM): Vertraulichkei
 | --- | --- | --- | --- | --- | --- |
 | M1 | R1 | Verbindliche Geräte-Bildschirmsperre (PIN/Biometrie) als Dienstanweisung; wo verfügbar, Festplatten-/Profilverschlüsselung aktivieren | Organisatorisch/technisch | `[Organisation/IT-Verantwortliche/r]` | Niedrig |
 | M2 | R1, R4 | Perspektivisch: Ablage sensibler Daten über plattformeigene sichere Speicher (z. B. Electron `safeStorage`/Betriebssystem-Schlüsselbund) statt `localStorage` — als Hinweis an den Projektbetreiber | Technisch (Weiterentwicklung) | `[Projektbetreiber/Maintainer]` | Niedrig (nach Umsetzung) |
+| M2a | R4 | Bei Verdacht auf Kompromittierung eines Geräts den Signaturschlüssel über „Geräteschlüssel neu erzeugen" (Fußzeile) austauschen und die neue Kurzform an Meldekopf/Führungsstelle geben; Zuständigkeit und Weg dafür festlegen | Organisatorisch (technische Grundlage vorhanden) | `[Organisation]` | Niedrig |
 | M3 | R2, R8 | Dienstanweisung: gedruckte/exportierte Bögen wie das bisherige Papierformular behandeln (Aufbewahrung, Zugriffsschutz, dokumentierte Vernichtung) | Organisatorisch | `[Organisation]` | Niedrig-Mittel |
 | M4 | R3 | Eigene, dokumentierte Löschfrist für digital gespeicherte Bögen festlegen und die Papierkorb-Funktion in einer Kurzanleitung erklären | Organisatorisch | `[Organisation/Datenschutzbeauftragte/r]` | Niedrig |
 | M5 | R8 | Verfahrensanweisung für Auskunfts-/Löschanfragen, die auch bereits weitergereichte Bögen einschließt | Organisatorisch | `[Organisation/Datenschutzbeauftragte/r]` | Niedrig-Mittel |

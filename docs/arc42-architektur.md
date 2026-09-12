@@ -902,7 +902,11 @@ flowchart TB
   (`sicherung.ts`, `einsatz-transport.ts`).
 - **Absenderkarte** (`absenderkarte.ts`) und der geräteeigene Signaturschlüssel
   (`geraete-schluessel.ts`) sind ebenfalls nur lokal gespeichert,
-  personenbezogen und jederzeit löschbar; sie wandern mit der Datensicherung mit.
+  personenbezogen und jederzeit löschbar; sie wandern mit der Datensicherung mit. Der Signaturschlüssel hat dafür einen eigenen Weg neben
+  „Alle Daten löschen": „Geräteschlüssel neu erzeugen" in der Fußzeile verwirft
+  ihn und legt sofort ein neues Paar an, ohne die Bogendaten anzufassen — der
+  technische Teil von Maßnahme M3 des
+  [Informationssicherheitskonzepts](informationssicherheitskonzept.md).
 
 ### 8.3 Sicherheits- und Datenschutzkonzept
 
@@ -937,7 +941,12 @@ flowchart TB
   Fremd-Host in der CSP.
 - **Ed25519-Signatur** jedes von der App erzeugten QR-Codes (Container `EEB2C`),
   Geräteschlüssel wird lokal beim ersten Bedarf erzeugt; Verifikation ist rein
-  informativ und blockiert den Import nie.
+  informativ und blockiert den Import nie. Ein Schlüsselwechsel ist jederzeit
+  möglich (Fußzeile), wird aber nicht verkündet: Ohne PKI gibt es keinen
+  Widerruf, die Gegenstelle gleicht die neue Kurzform von Hand ab.
+- **Meldeweg für Schwachstellen:** `SECURITY.md` im Hauptrepository, gültig für
+  das Hauptrepo und die vier `vendor/`-Submodule (Private Vulnerability
+  Reporting auf GitHub oder E-Mail, keine öffentlichen Issues).
 - **TOFU-Vertrauensmodell**, keine zentrale PKI: „✓ signiert von …" belegt nur,
   dass der Datensatz unverändert vom Inhaber dieses Schlüssels stammt – nicht,
   wer diese Person ist.

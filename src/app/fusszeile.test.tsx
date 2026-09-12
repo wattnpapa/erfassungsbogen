@@ -1,11 +1,11 @@
 /**
- * Fußzeile — die beiden Wege, die den gesamten Gerätespeicher anfassen:
- * „Alle Daten löschen" und „Sicherung einspielen".
+ * Fußzeile — die Wege, die den Gerätespeicher unumkehrbar anfassen: „Alle Daten
+ * löschen", „Sicherung einspielen" und „Geräteschlüssel neu erzeugen".
  *
- * Beide sind unumkehrbar und beide hängen an einer Zustimmung: einmal an einem
- * Kontrollkästchen, einmal an einer Rückfrage. Geprüft wird darum nicht der
- * Klick, sondern der Speicher danach — und ausdrücklich auch, dass ohne
- * Zustimmung nichts passiert.
+ * Alle drei hängen an einer Zustimmung: einmal an einem Kontrollkästchen,
+ * zweimal an einer Rückfrage. Geprüft wird darum nicht der Klick, sondern der
+ * Speicher danach — und ausdrücklich auch, dass ohne Zustimmung nichts
+ * passiert.
  */
 
 import { describe, it, expect, beforeEach } from "vitest";
@@ -16,9 +16,11 @@ import { Fusszeile } from "./fusszeile";
 import { neuerBogen } from "./hilfen";
 import { vorlageAnlegen, vorlagenLaden } from "./vorlagen";
 import { sicherungErstellen } from "./sicherung";
+import { geraeteSchluesselSicherstellen } from "./geraete-schluessel";
+import { zuHex } from "@bos/eeb-format/signatur";
 
 /**
- * Beide Wege starten am Ende die App neu. Das ist hier bewusst nicht geprüft:
+ * Alle Wege starten am Ende die App neu. Das ist hier bewusst nicht geprüft:
  * `location.reload` lässt sich in jsdom nicht ersetzen, und der Neustart ist
  * nur die Aufräumhilfe für den laufenden React-Stand. Geprüft wird, was vor dem
  * Neustart passiert — der Speicher — und die Tests klicken den letzten Knopf
@@ -114,5 +116,47 @@ describe("Sicherung einspielen", () => {
     await nutzer.click(within(dialog).getByRole("button", { name: "Abbrechen" }));
 
     expect(vorlagenLaden().map((v) => v.name)).toEqual(["Vorher auf dem Gerät"]);
+  });
+});
+
+/**
+ * Geräteschlüssel neu erzeugen (Maßnahme M3 im Informationssicherheitskonzept):
+ * Der Weg hat keinen eigenen Dialog, sondern hängt an der Rückfrage. Geprüft
+ * wird darum auch hier der Speicher — und vor allem, dass der neue Schlüssel
+ * ein anderer ist als der alte. Ein Weg, der nur löscht und nichts Neues setzt,
+ * fiele beim Klick nicht auf.
+ */
+describe("Geräteschlüssel neu erzeugen", () => {
+  beforeEach(() => {
+    localStorage.clear();
+  });
+
+  const schluessel = () => localStorage.getItem("eeb.geraeteschluessel.v1");
+
+  it("ersetzt den Schlüssel, wenn die Rückfrage bejaht wird", async () => {
+    const nutzer = userEvent.setup();
+    const alt = zuHex(await geraeteSchluesselSicherstellen());
+    buehne();
+
+    await nutzer.click(screen.getByRole("button", { name: "Geräteschlüssel neu erzeugen" }));
+    const dialog = await screen.findByRole("dialog", { name: "Geräteschlüssel neu erzeugen?" });
+    await nutzer.click(within(dialog).getByRole("button", { name: "Neu erzeugen" }));
+
+    // Die Bestätigung steht da — erst ihr Knopf lädt die App neu.
+    expect(await screen.findByRole("dialog", { name: "Geräteschlüssel neu erzeugt" })).toBeDefined();
+    expect(schluessel()).not.toBeNull();
+    expect(schluessel()).not.toBe(alt);
+  });
+
+  it("lässt bei „Abbrechen“ den bisherigen Schlüssel stehen", async () => {
+    const nutzer = userEvent.setup();
+    const alt = zuHex(await geraeteSchluesselSicherstellen());
+    buehne();
+
+    await nutzer.click(screen.getByRole("button", { name: "Geräteschlüssel neu erzeugen" }));
+    const dialog = await screen.findByRole("dialog", { name: "Geräteschlüssel neu erzeugen?" });
+    await nutzer.click(within(dialog).getByRole("button", { name: "Abbrechen" }));
+
+    expect(schluessel()).toBe(alt);
   });
 });

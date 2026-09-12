@@ -119,3 +119,7 @@ Freie Software unter [EUPL-1.2](LICENSE) — Europäische Union Public Licence
 
 Technische Dokumentation (Build, Architektur, Datenformat, QR-Codec):
 [docs/entwicklung.md](docs/entwicklung.md)
+
+Sicherheitslücken bitte nicht über öffentliche Issues melden, sondern über den
+Weg in [SECURITY.md](SECURITY.md) — er gilt auch für die vier Submodule unter
+`vendor/`.
