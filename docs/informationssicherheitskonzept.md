@@ -121,7 +121,7 @@ Datenbank und keine Benutzerverwaltung.
 
 | # | Zielobjekt | Beschreibung | Plattform(en) |
 | --- | --- | --- | --- |
-| A1 | Web-App / PWA | Hauptauslieferungsform unter erfassungsbogen.app; als Progressive Web App vollständig offlinefähig (Service Worker precacht alle Bausteine) | Browser (Desktop/Mobil) |
+| A1 | Web-App / PWA | Hauptauslieferungsform unter erfassungsbogen.app; als Progressive Web App vollständig offlinefähig (Service Worker precacht alle Bausteine). Zusätzlich aus demselben Build als GitLab Pages auf dem Open-CoDE-Spiegel veröffentlicht (`.gitlab-ci.yml`, Job `pages`) — identischer Code, anderer Host; Installer und Auto-Update laufen unverändert über GitHub | Browser (Desktop/Mobil) |
 | A2 | Desktop-App | Electron-Wrapper um dieselbe Web-App, für Windows, macOS und Linux; Auslieferung über GitHub Releases mit Auto-Update | Windows, macOS, Linux |
 | A3 | Android-App | Capacitor-Wrapper um dieselbe Web-App | Android |
 | A4 | iOS-App | Capacitor-Wrapper, laut Quellcode/Dokumentation in Vorbereitung, zum Analysezeitpunkt noch nicht produktiv | iOS (geplant) |
@@ -162,6 +162,13 @@ Es existieren keine weiteren Netzwerkverbindungen der eigentlichen
 Bogen-Funktion — dies ist durch die Content-Security-Policy des Builds technisch
 erzwungen (siehe 5.3).
 
+> *Prüfvermerk zum zweiten Web-Host:* Wird die Anwendung über die GitLab-Pages-
+> Fassung auf Open CoDE aufgerufen (siehe 3.2/3.6), gelten K1 bis K3
+> unverändert — es ist derselbe Build. K2 zählt dabei in denselben
+> GoatCounter-Bestand; unterschieden wird nur über den Zählpfad, nicht über den
+> Host. Zusätzlich entstehen Abrufmetadaten (u. a. IP-Adresse) beim Betreiber
+> der Plattform anstelle von GitHub Pages.
+
 ### 3.5 Zielobjekte: IT-Systeme (Endgeräte)
 
 Die Endgeräte selbst (Smartphones, Tablets, Notebooks, Desktop-PCs) sind
@@ -175,7 +182,7 @@ Festplattenverschlüsselung, Betriebssystem-Updates).
 | # | Zielobjekt | Beschreibung |
 | --- | --- | --- |
 | B1 | Quellcode-Repository | `wattnpapa/erfassungsbogen` samt vier Submodulen (`@bos/*`), öffentlich auf GitHub |
-| B2 | CI/CD-Pipeline | GitHub Actions (`ci.yml`: Tests/Typecheck; `release.yml`: Build und Veröffentlichung der Auslieferungspakete; `spiegel-opencode.yml`: einseitiger Quellcode-Spiegel nach Open CoDE, authentifiziert über einen Deploy-Key im CI-Secret `OPENCODE_SSH_KEY` mit Schreibrecht ausschließlich auf dem Spiegel-Repository) |
+| B2 | CI/CD-Pipeline | GitHub Actions (`ci.yml`: Tests/Typecheck; `release.yml`: Build und Veröffentlichung der Auslieferungspakete; `spiegel-opencode.yml`: einseitiger Quellcode-Spiegel nach Open CoDE, authentifiziert über einen Deploy-Key im CI-Secret `OPENCODE_SSH_KEY` mit Schreibrecht ausschließlich auf dem Spiegel-Repository). Auf dem Spiegel selbst läuft GitLab CI (`.gitlab-ci.yml`, Job `pages`, nur Standardzweig): Build der Webfassung und Veröffentlichung als GitLab Pages; die Submodule werden dabei per HTTPS aus den öffentlichen GitHub-Repositories gezogen |
 | B3 | Abhängigkeiten (Software-Lieferkette) | npm-Pakete gemäß `package-lock.json` je Teilprojekt, versioniert und gepinnt |
 | B4 | Code-Signing-Material | Zertifikate/Schlüssel für macOS-Notarisierung und Windows-Signierung, als CI-Secrets hinterlegt (bedingt vorhanden, siehe 6.4) |
 | B5 | Auto-Update-Kanal | `electron-updater` gegen GitHub Releases (nur Desktop) |

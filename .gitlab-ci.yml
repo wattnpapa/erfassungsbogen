@@ -1,0 +1,66 @@
+# GitLab-CI für den Open-CoDE-Spiegel (gitlab.opencode.de).
+#
+# Auf GitHub entsteht die Webfassung über Actions (.github/workflows/release.yml,
+# Jobs build-pages/deploy-pages). Diese Datei ist das Gegenstück für den
+# Spiegel: sie baut dieselbe PWA und veröffentlicht sie als GitLab Pages, damit
+# die Anwendung auch innerhalb der Verwaltungs-Plattform direkt aufrufbar ist
+# und nicht nur als Quelltext daliegt.
+#
+# GitHub ignoriert diese Datei, GitLab ignoriert .github/ — beide Plattformen
+# bauen aus demselben Stand, ohne sich in die Quere zu kommen. Gespiegelt wird
+# nur in eine Richtung (GitHub -> Open CoDE), die Datei gehört also ins
+# GitHub-Repository und reist von dort mit.
+#
+# Einmalige Einrichtung auf Open CoDE:
+#   Deploy -> Pages: Veröffentlichung aktivieren. Je nach Instanzeinstellung ist
+#   dort auch zu entscheiden, ob die Seite öffentlich oder nur für angemeldete
+#   Nutzer erreichbar ist („Access Control"). Die fertige Adresse steht danach
+#   ebenda und ergibt sich aus Gruppen- und Projektpfad.
+
+stages: [seite]
+
+default:
+  # Volles node-Image (nicht -slim): der Klon braucht git, und die Submodule
+  # werden per https von GitHub nachgezogen.
+  image: node:24
+
+variables:
+  # Der geteilte Kern hängt als Submodul unter vendor/ (ADR-003) — ohne ihn
+  # scheitert schon die Typprüfung.
+  GIT_SUBMODULE_STRATEGY: recursive
+  GIT_SUBMODULE_FORCE_HTTPS: "true"
+  # Volle Historie: die sitemap.xml entsteht im Build und nimmt ihr <lastmod>
+  # je Seite aus dem letzten Commit, der sie geändert hat (scripts/sitemap.ts).
+  # Ein flacher Klon kennt nur einen Commit; das Skript merkt das und ließe
+  # <lastmod> dann ersatzlos weg.
+  GIT_DEPTH: "0"
+
+pages:
+  stage: seite
+  # Nur der Hauptzweig wird veröffentlicht. Die Spiegelung schiebt alle Zweige
+  # und Tags herüber; ein Feature-Zweig soll die Seite nicht überschreiben.
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  cache:
+    key:
+      files: [package-lock.json]
+    paths: [.npm]
+  script:
+    - npm ci --cache .npm --prefer-offline
+    # Footer-Version wie bei den App-Releases aus dem jüngsten Tag. Ohne Tag
+    # (frischer Spiegel, noch kein Release) bleibt der Fallback aus
+    # package.json — siehe vite.config.ts.
+    - export APP_BUILD_VERSION="$(git describe --tags --abbrev=0 2>/dev/null || true)"
+    - npm run build
+    # GitLab Pages veröffentlicht starr das Verzeichnis `public/`. Das ist hier
+    # schon belegt: `public/` sind die statischen Quelldateien, die Vite nach
+    # `dist/` kopiert. Statt über das neuere `pages.publish` zu gehen (das
+    # ältere GitLab-Fassungen nicht kennen), wird das Quellverzeichnis im
+    # Arbeitsbereich des Laufs durch das Bau-Ergebnis ersetzt. Das betrifft nur
+    # diesen Lauf, nicht das Repository.
+    - rm -rf public && mv dist public
+  artifacts:
+    paths: [public]
+  environment:
+    name: pages
+    url: $CI_PAGES_URL

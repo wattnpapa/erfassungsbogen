@@ -181,7 +181,11 @@ wieder.
   `release.yml` (Build & Release bei Push auf `main`, inkl.
   GitHub-Pages-Deployment und plattformspezifischen Build-Jobs) und
   `spiegel-opencode.yml` (Quellcode-Spiegel, siehe unten). Die ersten beiden
-  benötigen `submodules: recursive` beim Checkout.
+  benötigen `submodules: recursive` beim Checkout. Dazu kommt eine
+  GitLab-CI-Datei (`.gitlab-ci.yml`), die ausschließlich auf dem
+  Open-CoDE-Spiegel läuft und dort die Webfassung als GitLab Pages
+  veröffentlicht; GitHub ignoriert sie, GitLab ignoriert `.github/` — beide
+  Plattformen bauen aus demselben Stand.
 - **Versionsschema:** Datumsbasierte Build-Version `YYYY.MMDD.HHMM` (z. B.
   `2026.712.1035`), erzeugt im `prepare`-Job von `release.yml` – gültiges SemVer
   für npm/Electron und gültiger `CFBundleShortVersionString` für iOS,
@@ -196,9 +200,22 @@ wieder.
   jedem Push, jedem Tag, jedem gelöschten Zweig und einmal täglich; sie
   überträgt `refs/heads/*` und `refs/tags/*`, nicht die GitLab-eigenen
   Merge-Request-Refs. Open CoDE ist damit eine Lesefassung: dort direkt
-  eingebrachte Commits gehen beim nächsten Lauf verloren. Der Spiegel ist kein
-  Auslieferungsweg — Installer und PWA kommen weiterhin ausschließlich von
-  GitHub.
+  eingebrachte Commits gehen beim nächsten Lauf verloren.
+- **Webfassung auf dem Spiegel (GitLab Pages):** Auf Open CoDE läuft eine eigene
+  Pipeline (`.gitlab-ci.yml`, Job `pages`, nur auf dem Standardzweig): sie baut
+  aus demselben Stand `dist/` und veröffentlicht es als GitLab Pages, damit die
+  Anwendung innerhalb der Verwaltungsplattform unmittelbar aufrufbar ist und
+  nicht nur als Quelltext daliegt. Weil der Vite-Build relative Pfade erzeugt
+  (`base: "./"`), läuft dieselbe PWA auch unter einem Unterpfad, ohne
+  Sonderbehandlung. GitLab Pages veröffentlicht starr `public/` — dieser Name
+  ist hier durch die statischen Quelldateien belegt, deshalb ersetzt der Job im
+  Arbeitsbereich `public/` durch das Bau-Ergebnis, statt das neuere
+  `pages.publish` zu verwenden, das ältere GitLab-Fassungen nicht kennen. Die
+  kanonische Adresse bleibt `erfassungsbogen.app`: `sitemap.xml` und
+  `<link rel="canonical">` zeigen unverändert dorthin, die Spiegelfassung tritt
+  also nicht als zweite Quelle in Suchmaschinen auf. Installer, Auto-Update und
+  App-Store-Pakete kommen weiterhin ausschließlich von GitHub — der Spiegel ist
+  ein zweiter Web-Zugang, kein zweiter Release-Kanal.
 - **App-Store-Vertrieb** (Android Play Store, iOS App Store/TestFlight) ist laut
   `README.md`/`docs/TODO.md` in Vorbereitung, zum Analysezeitpunkt aber nicht
   produktiv.
@@ -804,7 +821,8 @@ dorthin.
 flowchart LR
   Dev["Entwicklung<br/>lokal / Pull Request"] -->|push| Repo["GitHub Repository<br/>wattnpapa/erfassungsbogen"]
   Repo -->|"push, Tag, täglich"| Spiegel["GitHub Actions: spiegel-opencode.yml"]
-  Spiegel --> OC["Open CoDE<br/>gitlab.opencode.de<br/>(Quellcode-Spiegel, nur lesend)"]
+  Spiegel --> OC["Open CoDE<br/>gitlab.opencode.de<br/>(Quellcode-Spiegel, keine Gegenrichtung)"]
+  OC -->|".gitlab-ci.yml: Job pages"| OCP["GitLab Pages auf Open CoDE<br/>(zweiter Web-Zugang,<br/>canonical bleibt erfassungsbogen.app)"]
   Repo -->|"push auf Branch ≠ main oder PR"| CI["GitHub Actions: ci.yml<br/>ubuntu-latest"]
   CI --> CIS["npm ci, kern-kopien,<br/>typecheck, test, build,<br/>bundle-budget, test:e2e"]
   Repo -->|"push auf main"| REL["GitHub Actions: release.yml"]
