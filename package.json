@@ -123,7 +123,7 @@
     "@bos/vokabulare": "file:vendor/bos-vokabulare",
     "@capacitor/android": "^8.4.1",
     "@capacitor/app": "^8.1.0",
-    "@capacitor/barcode-scanner": "^3.1.0",
+    "@capacitor/barcode-scanner": "^3.1.2",
     "@capacitor/core": "^8.4.1",
     "@capacitor/filesystem": "^8.1.2",
     "@capacitor/ios": "^8.4.1",
