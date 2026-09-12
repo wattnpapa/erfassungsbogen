@@ -3,6 +3,7 @@ dist/
 build/
 release/
 reports/
+sbom.cdx.json
 coverage/
 *.log
 .DS_Store

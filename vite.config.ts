@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { defineConfig, type Plugin } from "vite";
@@ -61,38 +62,73 @@ function sitemap(): Plugin {
  *
  * Die App lädt außer dem GoatCounter-Zählpixel (src/app/statistik.ts) keine
  * Fremd-Herkunft, daher sind connect-/img-src auf 'self' + genau diesen Host
- * begrenzt — Ausleitung woandershin ist damit unterbunden. Skript und Style
- * liegen teils inline (Boot-Skelett, Design-Tokens, eingebettete Woff2-Schrift),
- * deshalb dort 'unsafe-inline' und font-src data:. Das `file:`-Schema deckt den
- * Electron-Build ab (dist über file:// geladen); im Web ist es wirkungslos, weil
- * eine https-Seite keine file://-Ressourcen laden darf. Capacitor (iOS/Android)
- * läuft unter capacitor://localhost bzw. https://localhost und fällt unter 'self'.
+ * begrenzt — Ausleitung woandershin ist damit unterbunden. Das `file:`-Schema
+ * deckt den Electron-Build ab (dist über file:// geladen); im Web ist es
+ * wirkungslos, weil eine https-Seite keine file://-Ressourcen laden darf.
+ * Capacitor (iOS/Android) läuft unter capacitor://localhost bzw.
+ * https://localhost und fällt unter 'self'.
  *
- * Der eigentliche Härtungsgewinn: default-src 'self', object-src 'none',
+ * script-src kommt OHNE 'unsafe-inline' aus: die drei Inline-Blöcke der
+ * index.html (Boot-Skelett, zwei JSON-LD-Datenblöcke) werden hier beim Bauen
+ * gehasht und einzeln freigegeben. Mit 'unsafe-inline' wäre die Policy gegen
+ * XSS wirkungslos gewesen — ein eingeschleustes <script> hätte gleichberechtigt
+ * neben den eigenen gestanden. Ein Hash gilt nur für genau diesen einen Text;
+ * alles Fremde bleibt draußen, auch wenn irgendwann versehentlich Fremdeingabe
+ * in den DOM gerät. Kosten: die Blöcke dürfen nach diesem Plugin nicht mehr
+ * angefasst werden, sonst passt der Hash nicht — deshalb läuft es als letztes
+ * (`enforce: "post"`, hinter fontCssInline) auf dem fertigen HTML.
+ *
+ * style-src behält 'unsafe-inline': React setzt style-Attribute an Elementen,
+ * und die deckt ein Hash nicht ab (dafür bräuchte es 'unsafe-hashes' samt
+ * Hash je Attributwert). Der Design-Token-Block und die eingebettete Woff2-
+ * Schrift liegen ohnehin inline, daher zusätzlich font-src data:.
+ *
+ * Der weitere Härtungsgewinn: default-src 'self', object-src 'none',
  * base-uri 'none' und die auf einen Host begrenzte Netz-Ausleitung.
  */
 function contentSecurityPolicy(): Plugin {
-  const policy = [
-    "default-src 'self' file:",
-    "base-uri 'none'",
-    "object-src 'none'",
-    "form-action 'none'",
-    "script-src 'self' file: 'unsafe-inline'",
-    "style-src 'self' file: 'unsafe-inline'",
-    "img-src 'self' file: data: blob: https://erfassungsbogen.goatcounter.com",
-    "font-src 'self' file: data:",
-    // Die PDF-Vorschau in der Übersicht rahmt eine im Browser erzeugte
-    // Blob-URL ein; ohne frame-src greift default-src und der Rahmen bliebe leer.
-    "frame-src 'self' file: blob:",
-    "connect-src 'self' file: https://erfassungsbogen.goatcounter.com",
-  ].join("; ");
+  /** Inline-<script>-Blöcke (ohne src) — genau die brauchen einen Hash. */
+  const INLINE_SKRIPT = /<script(?![^>]*\ssrc[\s=])[^>]*>([\s\S]*?)<\/script>/g;
+
+  function policyMit(hashes: string[]): string {
+    return [
+      "default-src 'self' file:",
+      "base-uri 'none'",
+      "object-src 'none'",
+      "form-action 'none'",
+      `script-src 'self' file:${hashes.map((h) => ` '${h}'`).join("")}`,
+      "style-src 'self' file: 'unsafe-inline'",
+      "img-src 'self' file: data: blob: https://erfassungsbogen.goatcounter.com",
+      "font-src 'self' file: data:",
+      // Die PDF-Vorschau in der Übersicht rahmt eine im Browser erzeugte
+      // Blob-URL ein; ohne frame-src greift default-src und der Rahmen bliebe leer.
+      "frame-src 'self' file: blob:",
+      "connect-src 'self' file: https://erfassungsbogen.goatcounter.com",
+    ].join("; ");
+  }
+
   return {
     name: "eeb-csp",
     apply: "build",
-    transformIndexHtml(html: string) {
-      const meta = `<meta http-equiv="Content-Security-Policy" content="${policy}" />`;
+    enforce: "post",
+    generateBundle(_optionen, bundle) {
+      const html = bundle["index.html"];
+      if (!html || html.type !== "asset") return;
+      const quelle = String(html.source);
+
+      // Der Browser hasht den Textinhalt des Elements, unverändert und ohne
+      // die Tags — also genau die Gruppe aus dem Treffer.
+      const hashes = [...new Set([...quelle.matchAll(INLINE_SKRIPT)].map((t) => `sha256-${createHash("sha256").update(t[1]!, "utf8").digest("base64")}`))];
+      if (!hashes.length) {
+        // Kein Treffer heißt: das Muster passt nicht mehr zum HTML. Eine
+        // Policy ohne Hashes würde das Boot-Skript blockieren und die Seite
+        // im Dunkelmodus-Flackern hängen lassen — lieber hier abbrechen.
+        this.error("eeb-csp: keine Inline-Skripte in index.html gefunden — Muster prüfen, sonst geht der Build ohne funktionierende CSP raus.");
+      }
+
+      const meta = `<meta http-equiv="Content-Security-Policy" content="${policyMit(hashes)}" />`;
       // Möglichst früh im <head>, damit die Policy alle folgenden Ressourcen deckt.
-      return html.replace("<head>", `<head>\n${meta}`);
+      html.source = quelle.replace("<head>", `<head>\n${meta}`);
     },
   };
 }
@@ -201,9 +237,10 @@ export default defineConfig({
     react(),
     bauStempel(),
     sitemap(),
-    contentSecurityPolicy(),
     inlineCssMinify(),
     fontCssInline(),
+    // Zuletzt: hasht die Inline-Skripte des FERTIGEN HTML (siehe dort).
+    contentSecurityPolicy(),
     // Service Worker nur für die im Browser aufgerufene Web-App (erfassungsbogen.app):
     // cached die App-Shell (HTML/JS/CSS, Icons, manifest, das eingebaute THW-OV-
     // Verzeichnis steckt im JS-Bundle), damit die Seite auch offline startet.

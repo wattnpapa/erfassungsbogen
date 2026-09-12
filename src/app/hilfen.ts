@@ -3,7 +3,7 @@
  * Datei speichern/laden, Vokabular-Anzeige.
  */
 
-import { deflateRaw, inflateRaw } from "pako";
+import { deflateRaw, Inflate } from "pako";
 import QRCode from "qrcode";
 import {
   Einheit,
@@ -66,9 +66,48 @@ export {
   zeitgruppe,
 } from "@bos/meldekopf/darstellung";
 
+/**
+ * Obergrenze für die ENTPACKTE Größe eines Payloads. Ein echter Bogen liegt
+ * entpackt bei wenigen Kilobyte; selbst ein voll segmentierter QR-Satz (20
+ * Teile) bleibt weit darunter. Die Grenze zielt auf den anderen Weg hinein:
+ * Bögen kommen auch als Datei (Foto-Stapel, Sammel-Import), und Deflate packt
+ * eine Folge gleicher Bytes um Faktor 1000 zusammen. Eine präparierte Datei von
+ * wenigen Kilobyte könnte beim Entpacken Gigabyte belegen und den Tab bzw. die
+ * App wegräumen — kein Rechteproblem, aber im Einsatz ein toter Rechner.
+ * 4 MiB lässt jedem realen Bogen dreistellig Luft und deckelt trotzdem.
+ */
+export const MAX_ENTPACKT = 4 * 1024 * 1024;
+
+/**
+ * `inflateRaw` mit Deckel: bricht ab, sobald die Ausgabe {@link MAX_ENTPACKT}
+ * überschreitet, statt erst den ganzen Speicher zu füllen. pako meldet die
+ * entpackten Daten stückweise (Standard 16 KiB), die Prüfung greift also lange
+ * vor dem Ende — das ist der Grund für die Streaming-Fassung statt des
+ * bequemen Einzelaufrufs.
+ */
+export function inflateRawBegrenzt(daten: Uint8Array, grenze = MAX_ENTPACKT): Uint8Array {
+  const strom = new Inflate({ raw: true });
+  const stuecke: Uint8Array[] = [];
+  let summe = 0;
+  strom.onData = (stueck: Uint8Array) => {
+    summe += stueck.length;
+    if (summe > grenze) throw new RangeError(`Entpackte Daten überschreiten ${grenze} Bytes — Bogen wird nicht gelesen.`);
+    stuecke.push(stueck);
+  };
+  strom.push(daten, true);
+  if (strom.err) throw new Error(strom.msg || "Daten lassen sich nicht entpacken.");
+  const ergebnis = new Uint8Array(summe);
+  let stelle = 0;
+  for (const stueck of stuecke) {
+    ergebnis.set(stueck, stelle);
+    stelle += stueck.length;
+  }
+  return ergebnis;
+}
+
 export const browserKompressor: Kompressor = {
   deflateRaw: (d) => deflateRaw(d, { level: 9 }),
-  inflateRaw: (d) => inflateRaw(d),
+  inflateRaw: (d) => inflateRawBegrenzt(d),
 };
 
 // ---------------------------------------------------------------- QR-Code

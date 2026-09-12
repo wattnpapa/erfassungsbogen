@@ -52,6 +52,29 @@ jobs:
       - name: Bundle-Budget (ADR-003, Aufnahmeregel 5)
         run: npm run bundle-budget
 
+      # Stückliste aller fremden Bausteine (Hauptrepo + die vier Submodule).
+      # Hier nur als Prüfung, dass sie sich erzeugen lässt und am Artefakt
+      # hängt — veröffentlicht wird sie mit dem Release (release.yml).
+      - name: SBOM erzeugen
+        run: npm run sbom
+      - uses: actions/upload-artifact@v4
+        with:
+          name: sbom
+          path: sbom.cdx.json
+
+      # Bekannte Schwachstellen. Zwei Läufe mit verschiedenem Anspruch:
+      # Was in der ausgelieferten App landet, lässt den Lauf ab „hoch"
+      # scheitern — dort sitzt jeder Treffer auf einem Einsatzgerät.
+      - name: Schwachstellen in den Laufzeit-Abhängigkeiten
+        run: npm audit --omit=dev --audit-level=high
+
+      # Das Bau- und Testwerkzeug (rund 1000 Pakete) meldet ständig
+      # irgendetwas, ohne dass die App davon betroffen wäre. Das gehört ins
+      # Protokoll, soll aber keinen Pull Request blockieren.
+      - name: Schwachstellen im Bau-/Testwerkzeug (nur Hinweis)
+        continue-on-error: true
+        run: npm audit --audit-level=high
+
       - name: Playwright-Browser installieren (für die Cucumber-E2E-Tests)
         run: npx playwright install --with-deps chromium
       - run: npm run test:e2e

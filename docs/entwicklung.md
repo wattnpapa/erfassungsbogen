@@ -81,6 +81,57 @@ so von 843 kB auf 1.258 kB; mit modulgenauen Importen sind es 839 kB.
 - `pdf-dokument.ts`, `geraete-schluessel.ts` sowie Auswertung, Einheitenliste,
   XLSX und CSV. Letztere sind Stufe 2 in ADR-003 und wandern erst bei Bedarf.
 
+## Stückliste (SBOM) und Schwachstellen
+
+Wer die App im Behördenumfeld einsetzt, muss beantworten können, welche fremden
+Bausteine darin stecken. `npm run sbom` schreibt diese Liste als
+`sbom.cdx.json` im CycloneDX-Format — dem Format, das Grype, OWASP
+Dependency-Track und die übrigen Werkzeuge direkt einlesen:
+
+```bash
+npm run sbom
+grype sbom:sbom.cdx.json          # oder Upload in Dependency-Track
+```
+
+Gelesen werden die fünf `package-lock.json` (Hauptrepo und die vier Submodule),
+nicht `node_modules`: ein Lockfile trägt den aufgelösten Baum samt Version,
+Tarball-URL und Integritäts-Hash, es muss also nichts installiert sein. Rund
+1120 Komponenten kommen dabei zusammen; `scope` trennt die gut 90 mit
+Laufzeit-Rolle von den rund 1030 reinen Bau- und Testwerkzeugen. Diese
+Unterscheidung entscheidet, wie eilig ein Scanner-Treffer ist: `required` sitzt
+auf Einsatzgeräten, `optional` nur auf dem Build-Rechner. Die Eigenschaft
+`erfassungsbogen:usedIn` sagt zusätzlich, aus welchem der fünf Pakete eine
+Abhängigkeit stammt. Die vier Kern-Bausteine selbst stehen mit ihrem
+Submodul-Commit als Version drin — ein `pkg:npm/@bos/…` gibt es nicht, sie sind
+vendored und nicht veröffentlicht.
+
+Im CI läuft das dreifach: `ci.yml` erzeugt die SBOM bei jedem Pull Request und
+hängt sie ans Lauf-Artefakt, `release.yml` legt sie als
+`erfassungsbogen-<version>-sbom.cdx.json` ans GitHub-Release (zu jedem
+ausgelieferten Stand gehört die passende Stückliste), und `npm audit` prüft
+beides Mal gegen die npm-Advisory-Datenbank. Nur der Lauf über die
+Laufzeit-Abhängigkeiten (`--omit=dev`) lässt den Build scheitern; das
+Bau-/Testwerkzeug meldet ständig irgendetwas, was die App nicht betrifft, und
+steht deshalb als reiner Hinweis im Protokoll. Laufend nachgehalten wird der
+Baum von Dependabot (`.github/dependabot.yml`), einschließlich der
+GitHub-Actions — auch die sind fremder Code mit Schreibrechten aufs Repo.
+
+### Content-Security-Policy
+
+`vite.config.ts` setzt die Policy beim Bauen als `<meta>` in den Kopf der
+`index.html` (nur im Build — der Dev-Server braucht HMR-WebSocket und Eval).
+`script-src` kommt ohne `'unsafe-inline'` aus: die drei Inline-Blöcke der
+`index.html` werden gehasht und einzeln freigegeben. Das ist der Unterschied
+zwischen einer Policy, die XSS abfängt, und einer, die es nur dokumentiert.
+Preis dafür: **an den Inline-Blöcken darf nach dem `eeb-csp`-Plugin nichts mehr
+ändern**, sonst passt der Hash nicht mehr und der Browser blockiert das eigene
+Boot-Skript. Deshalb läuft das Plugin als letztes über das fertige HTML. Findet
+es gar keinen Inline-Block, bricht der Build ab, statt eine wirkungslose Policy
+auszuliefern.
+
+`style-src` behält `'unsafe-inline'`: React setzt `style`-Attribute an
+Elementen, und die deckt ein Hash nicht ab.
+
 ## Web-App
 
 Assistent (Einheit → Einsatz → Personal → Fahrzeuge → Sofortbedarf) mit

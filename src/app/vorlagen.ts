@@ -142,8 +142,27 @@ export function vorlagenSpeichern(liste: Vorlage[]): void {
   speicher()?.setItem(SPEICHER_SCHLUESSEL, vorlagenZuJson(liste));
 }
 
+let notfallZaehler = 0;
+
+/**
+ * Kennung einer Vorlage. `randomUUID` gibt es nur im sicheren Kontext (https
+ * bzw. localhost); über eine schlichte http-Adresse aufgerufen fehlt es. Der
+ * Rückfall nimmt dann `getRandomValues` — das steht auch dort zur Verfügung —
+ * statt `Math.random`, dessen Werte sich aus wenigen Ausgaben vorhersagen
+ * lassen. Sicherheitsrelevant ist das hier nicht (die Kennung ist eine lokale
+ * Datensatz-Nummer, kein Geheimnis), aber ein vorhersagbarer Zufallsgenerator
+ * hat in einem Projekt mit Signaturen auch an harmloser Stelle nichts zu suchen.
+ */
 function neueId(): string {
-  return globalThis.crypto?.randomUUID?.() ?? `v${Date.now()}-${Math.random().toString(36).slice(2)}`;
+  const c = globalThis.crypto;
+  if (c?.randomUUID) return c.randomUUID();
+  if (c?.getRandomValues) {
+    const bytes = c.getRandomValues(new Uint8Array(16));
+    return `v${Date.now()}-${[...bytes].map((b) => b.toString(16).padStart(2, "0")).join("")}`;
+  }
+  // Weder das eine noch das andere: dann bleibt nur der Zeitstempel, und ein
+  // Zähler hält zwei Vorlagen derselben Millisekunde auseinander.
+  return `v${Date.now()}-${(notfallZaehler++).toString(36)}`;
 }
 
 /**

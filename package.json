@@ -58,7 +58,8 @@
     "content-offenlegung": "node --import tsx scripts/content-offenlegung.mts",
     "content-faq": "node --import tsx scripts/content-faq.mts",
     "bundle-budget": "node --import tsx scripts/bundle-budget.ts",
-    "kern-kopien": "node --import tsx scripts/kern-kopien-pruefen.ts"
+    "kern-kopien": "node --import tsx scripts/kern-kopien-pruefen.ts",
+    "sbom": "node --import tsx scripts/sbom.ts"
   },
   "keywords": [],
   "author": {

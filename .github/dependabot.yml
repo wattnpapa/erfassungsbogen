@@ -1,0 +1,41 @@
+# Dependabot liest package-lock.json direkt und meldet, sobald für ein Paket
+# im Baum eine Schwachstelle bekannt wird — auch für die rund 1000 transitiven
+# Pakete, die kein Mensch von Hand nachhält. Das ist die laufende Ergänzung zur
+# SBOM (scripts/sbom.ts): die Stückliste sagt, was drin ist, Dependabot sagt,
+# wann sich an der Bewertung etwas ändert.
+#
+# Wöchentlich statt täglich, und die Bau-/Testwerkzeuge gebündelt in EINEM Pull
+# Request: bei täglicher Prüfung über fünf Ökosysteme hinweg entstünde mehr
+# Rauschen, als jemand liest — und ungelesene Meldungen sind so gut wie keine.
+# Sicherheitsmeldungen kommen davon unabhängig, die hält kein Zeitplan auf.
+version: 2
+
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    groups:
+      # Die Laufzeit-Abhängigkeiten landen auf Einsatzgeräten — jede einzeln,
+      # damit sich ein Fehler beim Update eindeutig zuordnen lässt.
+      werkzeug:
+        dependency-type: development
+        update-types: [minor, patch]
+    ignore:
+      # Die vier Kern-Bausteine hängen als git-Submodul unter vendor/ und sind
+      # über `file:` verlinkt (ADR-003); ein Registry-Update gibt es dafür nicht.
+      - dependency-name: "@bos/*"
+
+  # Die Actions in ci.yml und release.yml sind ebenfalls fremder Code, der mit
+  # Schreibrechten auf das Repo läuft — eine gekaperte Action wäre der teuerste
+  # Weg hinein. Deshalb mitprüfen.
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    groups:
+      actions:
+        patterns: ["*"]

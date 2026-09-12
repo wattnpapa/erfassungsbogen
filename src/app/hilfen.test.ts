@@ -32,6 +32,8 @@ import {
   bogenLaden,
   browserKompressor,
   fahrzeugHinweise,
+  inflateRawBegrenzt,
+  MAX_ENTPACKT,
   migriereBogen,
   neuePerson,
   neuerBogen,
@@ -42,6 +44,7 @@ import {
   schrittStatus,
   transportBilanz,
 } from "./hilfen";
+import { deflateRaw } from "pako";
 import QRCode from "qrcode";
 import {
   EEB_URL_PREFIX,
@@ -596,5 +599,32 @@ describe("natoZeitstempel()", () => {
 
   it("füllt einstellige Werte mit Null auf", () => {
     expect(natoZeitstempel(new Date(2026, 0, 3, 7, 5))).toBe("030705jan26");
+  });
+});
+
+describe("inflateRawBegrenzt()", () => {
+  it("entpackt normale Daten unverändert", () => {
+    const original = new TextEncoder().encode("Erfassungsbogen".repeat(100));
+    expect(inflateRawBegrenzt(deflateRaw(original))).toEqual(original);
+    // Und über den regulären Weg des Kompressors ebenso.
+    expect(browserKompressor.inflateRaw(browserKompressor.deflateRaw(original))).toEqual(original);
+  });
+
+  it("bricht ab, bevor eine Deflate-Bombe den Speicher füllt", () => {
+    // 8 MiB Nullbytes packen sich auf wenige Kilobyte zusammen — genau der
+    // Fall, den eine präparierte Importdatei ausnutzen würde.
+    const bombe = deflateRaw(new Uint8Array(8 * 1024 * 1024));
+    expect(bombe.length).toBeLessThan(64 * 1024);
+    expect(() => inflateRawBegrenzt(bombe)).toThrow(RangeError);
+    expect(() => browserKompressor.inflateRaw(bombe)).toThrow(RangeError);
+  });
+
+  it("lässt die Grenze selbst noch durch und alles darüber nicht mehr", () => {
+    expect(inflateRawBegrenzt(deflateRaw(new Uint8Array(1000)), 1000)).toHaveLength(1000);
+    expect(() => inflateRawBegrenzt(deflateRaw(new Uint8Array(1001)), 1000)).toThrow(RangeError);
+  });
+
+  it("hält für echte Bögen reichlich Luft (4 MiB)", () => {
+    expect(MAX_ENTPACKT).toBe(4 * 1024 * 1024);
   });
 });
