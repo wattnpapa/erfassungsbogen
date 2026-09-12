@@ -175,7 +175,7 @@ Festplattenverschlüsselung, Betriebssystem-Updates).
 | # | Zielobjekt | Beschreibung |
 | --- | --- | --- |
 | B1 | Quellcode-Repository | `wattnpapa/erfassungsbogen` samt vier Submodulen (`@bos/*`), öffentlich auf GitHub |
-| B2 | CI/CD-Pipeline | GitHub Actions (`ci.yml`: Tests/Typecheck; `release.yml`: Build und Veröffentlichung der Auslieferungspakete) |
+| B2 | CI/CD-Pipeline | GitHub Actions (`ci.yml`: Tests/Typecheck; `release.yml`: Build und Veröffentlichung der Auslieferungspakete; `spiegel-opencode.yml`: einseitiger Quellcode-Spiegel nach Open CoDE, authentifiziert über einen Deploy-Key im CI-Secret `OPENCODE_SSH_KEY` mit Schreibrecht ausschließlich auf dem Spiegel-Repository) |
 | B3 | Abhängigkeiten (Software-Lieferkette) | npm-Pakete gemäß `package-lock.json` je Teilprojekt, versioniert und gepinnt |
 | B4 | Code-Signing-Material | Zertifikate/Schlüssel für macOS-Notarisierung und Windows-Signierung, als CI-Secrets hinterlegt (bedingt vorhanden, siehe 6.4) |
 | B5 | Auto-Update-Kanal | `electron-updater` gegen GitHub Releases (nur Desktop) |

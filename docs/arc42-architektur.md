@@ -177,16 +177,28 @@ wieder.
   (Electron-Anwendung mit npm-Workspaces) über dessen gebautes `dist/`
   konsumiert. ADR-003 wurde ursprünglich dort verfasst, liegt aber wörtlich im
   `README.md` jedes Kern-Submoduls vor (Kapitel 9).
-- **CI/CD:** Zwei GitHub-Actions-Workflows – `ci.yml` (Prüflauf für Zweige/PRs)
-  und `release.yml` (Build & Release bei Push auf `main`, inkl.
-  GitHub-Pages-Deployment und plattformspezifischen Build-Jobs). Beide benötigen
-  `submodules: recursive` beim Checkout.
+- **CI/CD:** Drei GitHub-Actions-Workflows – `ci.yml` (Prüflauf für Zweige/PRs),
+  `release.yml` (Build & Release bei Push auf `main`, inkl.
+  GitHub-Pages-Deployment und plattformspezifischen Build-Jobs) und
+  `spiegel-opencode.yml` (Quellcode-Spiegel, siehe unten). Die ersten beiden
+  benötigen `submodules: recursive` beim Checkout.
 - **Versionsschema:** Datumsbasierte Build-Version `YYYY.MMDD.HHMM` (z. B.
   `2026.712.1035`), erzeugt im `prepare`-Job von `release.yml` – gültiges SemVer
   für npm/Electron und gültiger `CFBundleShortVersionString` für iOS,
   minutengenau und monoton steigend.
 - **Release-Kanal:** Auslieferung ausschließlich über GitHub Releases, keine
   eigene Update-Infrastruktur; `electron-updater` prüft direkt gegen GitHub.
+- **Quellcode-Spiegel:** Der Stand von GitHub wird nach Open CoDE
+  (`gitlab.opencode.de/oc000172112778/erfassungsbogen`) gespiegelt, der
+  Open-Source-Plattform der öffentlichen Verwaltung — dorthin gehört ein
+  Werkzeug, das von BOS und Verwaltung eingesetzt wird. Die Spiegelung läuft
+  einseitig (`spiegel-opencode.yml`, Push-Richtung GitHub → Open CoDE) bei
+  jedem Push, jedem Tag, jedem gelöschten Zweig und einmal täglich; sie
+  überträgt `refs/heads/*` und `refs/tags/*`, nicht die GitLab-eigenen
+  Merge-Request-Refs. Open CoDE ist damit eine Lesefassung: dort direkt
+  eingebrachte Commits gehen beim nächsten Lauf verloren. Der Spiegel ist kein
+  Auslieferungsweg — Installer und PWA kommen weiterhin ausschließlich von
+  GitHub.
 - **App-Store-Vertrieb** (Android Play Store, iOS App Store/TestFlight) ist laut
   `README.md`/`docs/TODO.md` in Vorbereitung, zum Analysezeitpunkt aber nicht
   produktiv.
@@ -791,6 +803,8 @@ dorthin.
 ```mermaid
 flowchart LR
   Dev["Entwicklung<br/>lokal / Pull Request"] -->|push| Repo["GitHub Repository<br/>wattnpapa/erfassungsbogen"]
+  Repo -->|"push, Tag, täglich"| Spiegel["GitHub Actions: spiegel-opencode.yml"]
+  Spiegel --> OC["Open CoDE<br/>gitlab.opencode.de<br/>(Quellcode-Spiegel, nur lesend)"]
   Repo -->|"push auf Branch ≠ main oder PR"| CI["GitHub Actions: ci.yml<br/>ubuntu-latest"]
   CI --> CIS["npm ci, kern-kopien,<br/>typecheck, test, build,<br/>bundle-budget, test:e2e"]
   Repo -->|"push auf main"| REL["GitHub Actions: release.yml"]
