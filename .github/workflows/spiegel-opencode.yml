@@ -1,0 +1,71 @@
+# Spiegelt dieses Repository nach Open CoDE (gitlab.opencode.de).
+#
+# Open CoDE ist die Open-Source-Plattform der öffentlichen Verwaltung. Die
+# Fassung dort soll dem GitHub-Stand entsprechen, ohne dass jemand daran
+# denken muss — deshalb läuft die Spiegelung bei jedem Push, bei jedem Tag,
+# beim Löschen eines Zweigs und zusätzlich einmal täglich als Netz für den
+# Fall, dass ein Lauf ausgefallen ist.
+#
+# Richtung: nur GitHub -> Open CoDE. Was dort direkt committet wird, geht beim
+# nächsten Lauf verloren (`git push --mirror` überschreibt und räumt auf).
+# Open CoDE ist eine Kopie zum Lesen, kein zweites Arbeits-Repository.
+#
+# Einmalige Einrichtung:
+#   1. Schlüsselpaar erzeugen (ohne Passphrase):
+#      ssh-keygen -t ed25519 -C "spiegel-github" -f opencode_deploy -N ""
+#   2. Öffentlichen Teil (opencode_deploy.pub) bei Open CoDE unter
+#      Settings -> Repository -> Deploy keys mit Schreibrecht hinterlegen.
+#   3. Privaten Teil (opencode_deploy) hier als Repository-Secret
+#      OPENCODE_SSH_KEY hinterlegen, danach beide Dateien lokal löschen.
+
+name: Spiegel nach Open CoDE
+
+on:
+  push:
+    branches: ['**']
+    tags: ['**']
+  delete:
+  schedule:
+    - cron: '17 4 * * *'
+  workflow_dispatch:
+
+# Zwei Spiegelläufe gleichzeitig würden sich gegenseitig überholen; der
+# jüngere Stand gewinnt, ältere Läufe werden nicht abgebrochen, sondern
+# nacheinander abgearbeitet.
+concurrency:
+  group: spiegel-opencode
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  spiegeln:
+    runs-on: ubuntu-latest
+    # Forks haben das Secret nicht und sollen fremde Stände auch nicht in den
+    # amtlichen Spiegel schieben.
+    if: github.repository == 'wattnpapa/erfassungsbogen'
+    steps:
+      - name: SSH-Schlüssel bereitlegen
+        env:
+          SSH_KEY: ${{ secrets.OPENCODE_SSH_KEY }}
+        run: |
+          set -euo pipefail
+          mkdir -p ~/.ssh && chmod 700 ~/.ssh
+          printf '%s\n' "$SSH_KEY" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -H gitlab.opencode.de >> ~/.ssh/known_hosts 2>/dev/null
+
+      # Ein blanker Spiegel-Klon statt actions/checkout: nur so sind alle
+      # Zweige und Tags vollständig da, ohne Refspecs von Hand zu basteln.
+      - name: Vollständigen Klon von GitHub holen
+        run: git clone --mirror "https://github.com/${{ github.repository }}.git" spiegel.git
+
+      - name: Nach Open CoDE schieben
+        run: |
+          set -euo pipefail
+          cd spiegel.git
+          # refs/pull/* gehören GitHub und haben auf der Gegenseite nichts zu
+          # suchen; --mirror würde sie sonst mitschieben.
+          git for-each-ref --format='delete %(refname)' refs/pull | git update-ref --stdin
+          git push --mirror git@gitlab.opencode.de:oc000172112778/erfassungsbogen.git
