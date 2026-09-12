@@ -63,14 +63,6 @@ jobs:
 
       # Ein blanker Spiegel-Klon statt actions/checkout: nur so sind alle
       # Zweige und Tags vollständig da und nicht bloß der gebaute Stand.
-      - name: SSH-Verbindung prüfen (Diagnose)
-        continue-on-error: true
-        run: |
-          wc -c ~/.ssh/id_ed25519
-          head -1 ~/.ssh/id_ed25519
-          tail -1 ~/.ssh/id_ed25519
-          ssh -vT -o IdentitiesOnly=yes -i ~/.ssh/id_ed25519 git@gitlab.opencode.de 2>&1 | tail -40
-
       - name: Vollständigen Klon von GitHub holen
         run: git clone --mirror "https://github.com/${{ github.repository }}.git" spiegel.git
 
