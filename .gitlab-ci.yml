@@ -172,11 +172,20 @@ build-linux:
     - apt-get update && apt-get install -y libarchive-tools fakeroot
     - npm pkg set version="$BUILD_VERSION"
     - npm run build
-    - npx electron-builder --linux --x64 --publish never --config.artifactName='Erfassungsbogen-${BUILD_VERSION}-${os}-${arch}.${ext}'
+    # ${version} statt ${BUILD_VERSION}: electron-builder ersetzt im
+    # artifactName nur seine eigenen Makros, und eine Shell-Variable ist keines
+    # („macro BUILD_VERSION is not defined"). ${version} ist die Version aus
+    # package.json — die Zeile darüber hat sie gerade auf BUILD_VERSION gesetzt.
+    - npx electron-builder --linux --x64 --publish never --config.artifactName='Erfassungsbogen-${version}-${os}-${arch}.${ext}'
     - node scripts/ensure-update-metadata.cjs linux
 
 build-android:
   extends: .paket
+  # node:24 steht auf Debian bookworm, und dort gibt es kein openjdk-21 (auch
+  # nicht in bookworm-backports, geprüft). Die trixie-Variante desselben
+  # node-Images bringt openjdk-21 mit — das ist dieselbe JDK-Hauptversion, die
+  # release.yml über setup-java/temurin 21 benutzt.
+  image: node:24-trixie
   variables:
     # SDK und Gradle-Zwischenstand liegen im Projektverzeichnis, damit der Cache
     # sie aufnehmen kann — sonst lädt jeder Lauf rund ein Gigabyte neu.
@@ -257,8 +266,8 @@ build-win:
     # zeigen — die ARM64-Metadaten legt das Skript danach an. ARM64 ist kein
     # Luxus: Auf Snapdragon-Geräten kommt die emulierte x64-App nicht an die
     # Kamera, der QR-Scan bliebe dort schwarz.
-    - npx electron-builder --win --arm64 --publish never --config.artifactName='Erfassungsbogen-${BUILD_VERSION}-${os}-${arch}.${ext}'
-    - npx electron-builder --win --x64 --publish never --config.artifactName='Erfassungsbogen-${BUILD_VERSION}-${os}-${arch}.${ext}'
+    - npx electron-builder --win --arm64 --publish never --config.artifactName='Erfassungsbogen-${version}-${os}-${arch}.${ext}'
+    - npx electron-builder --win --x64 --publish never --config.artifactName='Erfassungsbogen-${version}-${os}-${arch}.${ext}'
     - node scripts/ensure-update-metadata.cjs win
 
 build-mac:
@@ -291,7 +300,7 @@ build-mac:
         NOTARIZE=--config.mac.notarize=true
       fi
       npx electron-builder --mac --publish never ${NOTARIZE:-} \
-        --config.artifactName='Erfassungsbogen-${BUILD_VERSION}-${os}-${arch}.${ext}'
+        --config.artifactName='Erfassungsbogen-${version}-${os}-${arch}.${ext}'
     - node scripts/ensure-update-metadata.cjs mac
 
 # ---------------------------------------------------------------------------
