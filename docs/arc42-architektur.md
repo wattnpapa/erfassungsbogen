@@ -162,7 +162,7 @@ wieder.
 | Sprache der Oberfläche und des Codes | Durchgängig Deutsch – Bezeichner, Kommentare, Fachbegriffe, Gherkin-Szenarien | `PRODUCT.md`, gesamter Quellcode |
 
 > *Prüfvermerk:* Versionen in `package.json` bestätigt (react ^19.2.7,
-> vite ^8.1.4, electron ^43.4.0, typescript ^7.0.2, pako ^3.0.1,
+> vite ^8.2.2, electron ^43.4.0, typescript ^7.0.2, pako ^3.0.1,
 > pdfmake ^0.3.11, @noble/ed25519 ^2.3.0, jsqr ^1.4.0, zxing-wasm ^3.1.3,
 > qrcode ^1.5.4); CI-Jobs laufen auf `node-version: 24`.
 
