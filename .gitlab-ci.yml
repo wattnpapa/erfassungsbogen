@@ -1,28 +1,41 @@
 # GitLab-CI für den Open-CoDE-Spiegel (gitlab.opencode.de).
 #
-# Auf GitHub entsteht die Webfassung über Actions (.github/workflows/release.yml,
-# Jobs build-pages/deploy-pages). Diese Datei ist das Gegenstück für den
-# Spiegel: sie baut dieselbe PWA und veröffentlicht sie als GitLab Pages, damit
-# die Anwendung auch innerhalb der Verwaltungs-Plattform direkt aufrufbar ist
-# und nicht nur als Quelltext daliegt.
+# Gegenstück zu den GitHub-Actions-Workflows: Der Prüflauf hier bildet
+# .github/workflows/ci.yml Schritt für Schritt nach, der Pages-Job entspricht
+# build-pages/deploy-pages aus .github/workflows/release.yml. Beide Plattformen
+# bauen aus demselben Stand; GitHub ignoriert diese Datei, GitLab ignoriert
+# .github/. Gespiegelt wird nur in eine Richtung (GitHub -> Open CoDE), die
+# Datei gehört also ins GitHub-Repository und reist von dort mit.
 #
-# GitHub ignoriert diese Datei, GitLab ignoriert .github/ — beide Plattformen
-# bauen aus demselben Stand, ohne sich in die Quere zu kommen. Gespiegelt wird
-# nur in eine Richtung (GitHub -> Open CoDE), die Datei gehört also ins
-# GitHub-Repository und reist von dort mit.
+# Absichtlich NICHT nachgebildet sind die Release-Jobs aus release.yml
+# (prepare/build-win/build-linux/build-android/release):
+#   * Die Build-Version und ihr Git-Tag entstehen auf GitHub. Ein hier erzeugter
+#     Tag würde beim nächsten Spiegellauf überschrieben, und zurückschreiben
+#     kann der Spiegel nicht — er ist eine Lesefassung.
+#   * Die Signaturschlüssel (Apple, Android-Keystore, Windows) liegen als
+#     GitHub-Secrets und haben auf dem Spiegel nichts zu suchen. Unsignierte
+#     Installer wären ein zweiter, schlechterer Download-Weg; Auslieferung und
+#     Auto-Update laufen ausschließlich über GitHub Releases (Arc42 Kap. 2.2).
+# Geprüft wird hier also dasselbe, veröffentlicht nur die Webfassung.
 #
 # Einmalige Einrichtung auf Open CoDE:
-#   Deploy -> Pages: Veröffentlichung aktivieren. Je nach Instanzeinstellung ist
-#   dort auch zu entscheiden, ob die Seite öffentlich oder nur für angemeldete
-#   Nutzer erreichbar ist („Access Control"). Die fertige Adresse steht danach
-#   ebenda und ergibt sich aus Gruppen- und Projektpfad.
+#   Deploy -> Pages: Veröffentlichung aktivieren und entscheiden, ob die Seite
+#   öffentlich oder nur für angemeldete Nutzer erreichbar ist („Access
+#   Control"). Die fertige Adresse steht danach ebenda.
 
-stages: [seite]
+stages: [pruefen, seite]
 
 default:
-  # Volles node-Image (nicht -slim): der Klon braucht git, und die Submodule
-  # werden per https von GitHub nachgezogen.
+  # Volles node-Image (nicht -slim): der Klon braucht git, die Submodule werden
+  # per https von GitHub nachgezogen, und `playwright install --with-deps`
+  # braucht apt.
   image: node:24
+  cache:
+    key:
+      files: [package-lock.json]
+    paths: [.npm]
+  before_script:
+    - npm ci --cache .npm --prefer-offline
 
 variables:
   # Der geteilte Kern hängt als Submodul unter vendor/ (ADR-003) — ohne ihn
@@ -35,18 +48,61 @@ variables:
   # <lastmod> dann ersatzlos weg.
   GIT_DEPTH: "0"
 
+# Der Prüflauf, Schritt für Schritt wie in ci.yml. Er läuft auf jedem Zweig und
+# in jedem Merge Request — anders als dort auch auf dem Hauptzweig, denn der
+# Pages-Job hängt an ihm: veröffentlicht wird nur ein geprüfter Stand.
+pruefen:
+  stage: pruefen
+  script:
+    # Genau eine Kopie je Kern-Baustein (ADR-003).
+    - npm run kern-kopien
+    - npm run typecheck
+    - npm test
+    - npm run build
+    # Bundle-Budget (ADR-003, Aufnahmeregel 5) — der geteilte Kern darf die PWA
+    # nicht schwerer machen.
+    - npm run bundle-budget
+    # Stückliste aller fremden Bausteine (Hauptrepo + die vier Submodule). Hier
+    # nur als Prüfung, dass sie sich erzeugen lässt, und als Artefakt;
+    # veröffentlicht wird sie mit dem Release auf GitHub.
+    - npm run sbom
+    # Was in der ausgelieferten App landet, lässt den Lauf ab „hoch" scheitern —
+    # dort sitzt jeder Treffer auf einem Einsatzgerät.
+    - npm audit --omit=dev --audit-level=high
+  artifacts:
+    paths: [sbom.cdx.json]
+    expire_in: 30 days
+
+# Das Bau- und Testwerkzeug (rund 1000 Pakete) meldet ständig irgendetwas, ohne
+# dass die App davon betroffen wäre. Das gehört ins Protokoll, soll aber nichts
+# blockieren — in ci.yml ist das `continue-on-error`, hier ein eigener Job mit
+# `allow_failure`, weil ein einzelner Schritt in GitLab nicht scheitern darf,
+# ohne den ganzen Job mitzunehmen.
+audit-werkzeug:
+  stage: pruefen
+  allow_failure: true
+  script:
+    - npm audit --audit-level=high
+
+# Die Cucumber-E2E-Tests brauchen einen Browser. Eigener Job, weil der
+# Browser-Download die schnellen Prüfungen sonst ausbremst.
+e2e:
+  stage: pruefen
+  script:
+    - npx playwright install --with-deps chromium
+    - npm run test:e2e
+  artifacts:
+    when: on_failure
+    paths: [reports]
+    expire_in: 7 days
+
 pages:
   stage: seite
   # Nur der Hauptzweig wird veröffentlicht. Die Spiegelung schiebt alle Zweige
   # und Tags herüber; ein Feature-Zweig soll die Seite nicht überschreiben.
   rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
-  cache:
-    key:
-      files: [package-lock.json]
-    paths: [.npm]
   script:
-    - npm ci --cache .npm --prefer-offline
     # Footer-Version wie bei den App-Releases aus dem jüngsten Tag. Ohne Tag
     # (frischer Spiegel, noch kein Release) bleibt der Fallback aus
     # package.json — siehe vite.config.ts.

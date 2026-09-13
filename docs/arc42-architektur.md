@@ -183,9 +183,10 @@ wieder.
   `spiegel-opencode.yml` (Quellcode-Spiegel, siehe unten). Die ersten beiden
   benötigen `submodules: recursive` beim Checkout. Dazu kommt eine
   GitLab-CI-Datei (`.gitlab-ci.yml`), die ausschließlich auf dem
-  Open-CoDE-Spiegel läuft und dort die Webfassung als GitLab Pages
-  veröffentlicht; GitHub ignoriert sie, GitLab ignoriert `.github/` — beide
-  Plattformen bauen aus demselben Stand.
+  Open-CoDE-Spiegel läuft: sie bildet den Prüflauf aus `ci.yml` Schritt für
+  Schritt nach (`pruefen`, `audit-werkzeug`, `e2e`) und veröffentlicht danach
+  die Webfassung als GitLab Pages. GitHub ignoriert sie, GitLab ignoriert
+  `.github/` — beide Plattformen bauen aus demselben Stand.
 - **Versionsschema:** Datumsbasierte Build-Version `YYYY.MMDD.HHMM` (z. B.
   `2026.712.1035`), erzeugt im `prepare`-Job von `release.yml` – gültiges SemVer
   für npm/Electron und gültiger `CFBundleShortVersionString` für iOS,
@@ -201,6 +202,19 @@ wieder.
   überträgt `refs/heads/*` und `refs/tags/*`, nicht die GitLab-eigenen
   Merge-Request-Refs. Open CoDE ist damit eine Lesefassung: dort direkt
   eingebrachte Commits gehen beim nächsten Lauf verloren.
+- **Prüflauf auf dem Spiegel:** Die GitLab-Pipeline hat eine Prüfstufe vor der
+  Veröffentlichung: `pruefen` (kern-kopien, typecheck, test, build,
+  bundle-budget, SBOM, `npm audit --omit=dev`), `audit-werkzeug` (Werkzeugkette,
+  `allow_failure` — in `ci.yml` ist das `continue-on-error`; ein einzelner
+  Schritt kann in GitLab nicht scheitern, ohne den Job mitzunehmen, daher ein
+  eigener Job) und `e2e` (Cucumber über Playwright, eigener Job wegen des
+  Browser-Downloads). Anders als `ci.yml` läuft die Stufe auch auf dem
+  Hauptzweig, denn der Pages-Job hängt an ihr: veröffentlicht wird nur ein
+  geprüfter Stand. Die Release-Jobs aus `release.yml` sind bewusst **nicht**
+  nachgebildet — Build-Version und Tag entstehen auf GitHub und würden vom
+  nächsten Spiegellauf überschrieben, die Signaturschlüssel liegen als
+  GitHub-Secrets, und unsignierte Installer wären ein zweiter, schlechterer
+  Download-Weg.
 - **Webfassung auf dem Spiegel (GitLab Pages):** Auf Open CoDE läuft eine eigene
   Pipeline (`.gitlab-ci.yml`, Job `pages`, nur auf dem Standardzweig): sie baut
   aus demselben Stand `dist/` und veröffentlicht es als GitLab Pages, damit die
@@ -822,7 +836,8 @@ flowchart LR
   Dev["Entwicklung<br/>lokal / Pull Request"] -->|push| Repo["GitHub Repository<br/>wattnpapa/erfassungsbogen"]
   Repo -->|"push, Tag, täglich"| Spiegel["GitHub Actions: spiegel-opencode.yml"]
   Spiegel --> OC["Open CoDE<br/>gitlab.opencode.de<br/>(Quellcode-Spiegel, keine Gegenrichtung)"]
-  OC -->|".gitlab-ci.yml: Job pages"| OCP["GitLab Pages auf Open CoDE<br/>(zweiter Web-Zugang,<br/>canonical bleibt erfassungsbogen.app)"]
+  OC -->|".gitlab-ci.yml"| OCC["GitLab CI: Stufe pruefen<br/>pruefen, audit-werkzeug, e2e<br/>(Nachbildung von ci.yml)"]
+  OCC -->|"nur Standardzweig: Job pages"| OCP["GitLab Pages auf Open CoDE<br/>(zweiter Web-Zugang,<br/>canonical bleibt erfassungsbogen.app)"]
   Repo -->|"push auf Branch ≠ main oder PR"| CI["GitHub Actions: ci.yml<br/>ubuntu-latest"]
   CI --> CIS["npm ci, kern-kopien,<br/>typecheck, test, build,<br/>bundle-budget, test:e2e"]
   Repo -->|"push auf main"| REL["GitHub Actions: release.yml"]
