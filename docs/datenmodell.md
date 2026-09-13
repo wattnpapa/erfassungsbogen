@@ -125,6 +125,34 @@ Verbindliche Typdefinitionen: [`vendor/eeb-format/src/model.ts`](../vendor/eeb-f
 Abgeleitet (nie gespeichert, außer manuell überschrieben): Stärke, Unterbringung
 M/W/D, Verpflegung (vegetarisch/vegan), Ansprechpartner (erste Führungskraft mit Kontakt).
 
+### Datenschutzfrist (kein Schemafeld)
+
+Die personenbezogenen Angaben eines Bogens verfallen **90 Tage nach `stand`**;
+Bögen mit `uebung` sind ausgenommen. Die Frist ist aus den beiden Feldern
+abgeleitet und hat **kein eigenes Feld**: Sie gilt damit auch für alle schon
+verteilten QR-Codes, kostet kein Byte, und ältere App-Stände lesen die Bögen
+unverändert. Jede Bearbeitung setzt `stand` neu, und die Frist beginnt von vorn.
+Regeln und Anonymisierung: [`vendor/eeb-format/src/datenschutzfrist.ts`](../vendor/eeb-format/src/datenschutzfrist.ts).
+
+Nach Ablauf (`bogenAnonymisiert`):
+
+| Entfernt | Erhalten |
+|---|---|
+| Vor- und Nachname (→ „Einsatzkraft 1…n", nach Stärkerolle sortiert) | Stärkerolle, Geschlecht, Ernährung je Person (für Stärke, Unterbringung, Verpflegung) |
+| Funktionen, Zusatzqualifikationen, Fahrerlaubnisse | Einheit (ohne Telefon/E-Mail der Hierarchie-Ebenen), Einsatz |
+| Kontakte der Personen, Telefon/E-Mail der Hierarchie-Ebenen | Fahrzeuge, Sofortbedarf, `stand`, `uebung` |
+| `sonstiges` (Freitext, kann Namen enthalten) | |
+
+Die App wendet die Frist an jeder Stelle an, an der ein Bogen hereinkommt oder
+gelesen wird: Scan, Link, Datei/PDF, Einsatz-Import, Einsatz-Sammlung (je
+Meldung, samt Rohpayload `herkunft` und Signaturnachweis) und Entwurf. Vorlagen
+sind Stammdaten der eigenen Einheit und haben keine Frist.
+
+**Grenze:** Der QR-Code selbst bleibt unverändert und unverschlüsselt. Ein
+anderer Decoder oder ein älterer App-Stand liest ihn weiter vollständig. Die
+Frist begrenzt die Speicherung in der App; einen Schutz des Transportwegs bietet
+sie nicht.
+
 ### Einheit
 
 | Feld | Typ | Bemerkung |

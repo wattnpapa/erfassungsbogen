@@ -10,6 +10,7 @@ import {
   zeitpunktAusIso,
   zeitpunktZuIso,
 } from "@bos/eeb-format/model";
+import { DATENSCHUTZFRIST_TAGE } from "@bos/eeb-format/datenschutzfrist";
 import { Feld, type SchrittProps } from "./bausteine";
 
 export function SchrittEinsatz({ bogen, aendern }: SchrittProps) {
@@ -78,11 +79,27 @@ export function SchrittEinsatz({ bogen, aendern }: SchrittProps) {
           Dies ist eine Übung
         </label>
       </div>
-      {bogen.uebung && (
+      {bogen.uebung ? (
+        <>
+          <p className="hinweis">
+            Der Bogen wird überall als Übung gekennzeichnet: Störer in der App (auch nach dem
+            Scannen auf anderen Geräten), Wasserzeichen „ÜBUNG" im PDF und Markierung in der
+            Einsatz-Sammlung. Im Personal-Schritt lassen sich zusätzlich Beispielnamen erzeugen.
+          </p>
+          {/* Die Ausnahme von der Datenschutzfrist hängt allein an diesem Haken —
+              wer ihn setzt, soll wissen, dass Namen dann unbefristet lesbar bleiben. */}
+          <p className="warnung">
+            Übungsbögen unterliegen <strong>keiner Datenschutzfrist</strong>: Namen, Funktionen,
+            Qualifikationen und Erreichbarkeiten bleiben unbefristet lesbar — hier und auf jedem
+            Gerät, das den Bogen empfängt. Echte Personaldaten nur eintragen, wenn das vertretbar ist.
+          </p>
+        </>
+      ) : (
         <p className="hinweis">
-          Der Bogen wird überall als Übung gekennzeichnet: Störer in der App (auch nach dem
-          Scannen auf anderen Geräten), Wasserzeichen „ÜBUNG" im PDF und Markierung in der
-          Einsatz-Sammlung. Im Personal-Schritt lassen sich zusätzlich Beispielnamen erzeugen.
+          Datenschutzfrist: {DATENSCHUTZFRIST_TAGE} Tage nach der letzten Änderung zeigt die App
+          Namen, Funktionen, Qualifikationen und Erreichbarkeiten dieses Bogens nur noch
+          anonymisiert — auf diesem Gerät und auf empfangenden Geräten. Stärke und Summen bleiben
+          erhalten. Als Übung gekennzeichnete Bögen sind ausgenommen.
         </p>
       )}
     </section>

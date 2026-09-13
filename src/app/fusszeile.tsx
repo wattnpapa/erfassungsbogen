@@ -268,6 +268,17 @@ function Datenschutzdialog({ dialogRef }: { dialogRef: RefObject<HTMLDialogEleme
         Reichweitenmessung wird ebenfalls dort vermerkt.
       </p>
       <p>
+        Personaldaten in Bögen haben eine Datenschutzfrist: 90 Tage nach der
+        letzten Änderung eines Bogens entfernt die App Namen, Funktionen,
+        Qualifikationen und Erreichbarkeiten dauerhaft — im Entwurf, in
+        Einsatz-Sammlungen und beim Einlesen eines älteren QR-Codes oder einer
+        Datei. Stärke und Summen bleiben erhalten. Ausgenommen sind Übungsbögen
+        (Haken „Dies ist eine Übung“) und die eigenen Vorlagen. Damit eine falsch
+        gehende Geräteuhr keine Daten vorzeitig löscht, merkt sich die App
+        zusätzlich den zuletzt gesehenen Zeitpunkt. Ausgedruckte, exportierte
+        oder weitergegebene Kopien erreicht die Frist nicht.
+      </p>
+      <p>
         Diese Einträge sind für den ausdrücklich gewünschten Dienst technisch
         erforderlich (§ 25 Abs. 2 Nr. 2 TDDDG); eine Einwilligung ist dafür
         nicht nötig. Sie verlassen das Gerät nicht: es gibt keine Übertragung

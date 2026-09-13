@@ -11,6 +11,10 @@
 > **Nach dem Analysestand geändert:** Commit `c7604e9` („Sicherheitsbericht
 > umsetzen: SBOM, CSP ohne unsafe-inline, Entpack-Grenze") betrifft die Kapitel
 > 2.1, 8.3, 8.6, 8.7 und 11.2 — dort jeweils vermerkt.
+>
+> **Nachgezogen 2026-09-13:** Datenschutzfrist (neues Kern-Modul
+> `datenschutzfrist.ts`, Frist je Meldung in `einsaetze.ts`, Uhr in
+> `datenschutz-uhr.ts`) — Kapitel 5.3, 5.4 und 8.2.
 
 ---
 
@@ -556,6 +560,7 @@ import { bogenZuQrSvg, nodeKompressor } from "@bos/eeb-format/node";     // nur 
 | `model.ts` (446 Zeilen) | Typdefinitionen (`Erfassungsbogen`, `Einheit`, `Person`, `Fahrzeug`, `Sofortbedarf`, `HierarchieEbene`, …), Enums (`OrganisationsTyp`, `StaerkeRolle`, `Fahrerlaubnis`, `Geschlecht`, `Ernaehrung`, `PersonalErfassung`), abgeleitete Werte (`staerke()`, `unterbringungMWD()`, `verpflegung()`, `ansprechpartner()`), Datums-/Zeitkonvertierung (`EebDatum`, `EebZeitpunkt`, Referenzepoche 2020-01-01), `SCHEMA_VERSION = 8`, `transportSchemaVersion()`, `migriereBogen()`. Importiert laut Kopfkommentar bewusst nichts. |
 | `codec.ts` (1043 Zeilen) | Binärkodierung/-dekodierung, Base41-Transportkodierung, QR-Payload-Aufbau (`EEB2`/`EEB2C`), Segmentierung großer Bögen. Die Kompression wird als `Kompressor`-Funktion hineingereicht (Browser: pako, Node: `node:zlib`). |
 | `signatur.ts` (340 Zeilen) | Ed25519-Signatur/-Verifikation, Signaturkette („Gegenzeichnen", `gegengezeichnetePayloadBytes`), Container-Format `EEB2C`, Absenderkarten-Kodierung. |
+| `datenschutzfrist.ts` | Datenschutzfrist: Ende 90 Tage nach `stand`, Übungen ausgenommen (`datenschutzfristEnde`, `datenschutzfristAbgelaufen`, `tageBisAnonymisierung`), Anonymisierung eines Bogens (`bogenAnonymisiert`) und Plausibilitätsprüfung der Geräteuhr gegen Sprünge nach vorn (`uhrPruefen`). Baut nur auf `model` auf; kein Schemafeld. |
 | `qr-node.ts` (50 Zeilen) | QR-Erzeugung außerhalb des Browsers (SVG/PNG), z. B. für die Beispielbogen-Generatorskripte. Einziges Modul, das `node:zlib`, `qrcode` und `Buffer` benutzen darf. |
 | `index.ts` (89 Zeilen) | Öffentliche Fassade: reexportiert `model`/`codec`/`signatur` (nicht `qr-node`), definiert `kernVersion()` sowie eine handgeschriebene UTF-8-Kodierfunktion, die bewusst ohne `TextEncoder` auskommt. |
 
@@ -584,7 +589,7 @@ speicherunabhängige Logik:
 
 | Modul | Verantwortung |
 | --- | --- |
-| `einsaetze.ts` (752 Zeilen) | Die Sammlung selbst: Einsatz anlegen (`einsatzAnlegen`), Revisionen je Einheit stapeln, Zuordnung per inhaltsbasiertem Fingerabdruck/Dedupe, Idempotenz über Inhalts-Hash. |
+| `einsaetze.ts` | Die Sammlung selbst: Einsatz anlegen (`einsatzAnlegen`), Revisionen je Einheit stapeln, Zuordnung per inhaltsbasiertem Fingerabdruck/Dedupe, Idempotenz über Inhalts-Hash. Drei Fristen in `alleEinsaetzeLaden`: Papierkorb (30 Tage), ruhende Sammlung (90 Tage ohne Änderung) und Datenschutzfrist je Meldung (`fristBereinigt`/`eintragNachFrist`: nach 90 Tage altem Stand anonymisiert, ohne Rohpayload und Signaturnachweis; auch in `meldungHinzufuegen` und `einsatzImportieren`). |
 | `aufteilen.ts` / `zusammenfuehren.ts` | Eine Meldung in zwei zählende Einheiten trennen (ohne Stärke zu verlieren) bzw. die Gegenrichtung. |
 | `meldung-diff.ts` (346 Zeilen) | Was sich zwischen zwei Fassungen einer Meldung geändert hat (Grundlage der Schichtübergabe-Anzeige). |
 | `papierkorb.ts` | Wiederherstellbarkeit für 30 Tage, danach endgültiges Löschen. |
@@ -962,6 +967,17 @@ flowchart TB
   zwischen Browser-Speicher und der `@bos/meldekopf`-Kernlogik).
 - **Entwurfswiederherstellung** (`entwurf.ts`): ein gerade ausgefüllter, noch
   nicht übergebener Bogen geht bei Neuladen/Absturz nicht verloren.
+- **Datenschutzfrist:** 90 Tage nach dem Stand eines Bogens werden seine
+  Personaldaten dauerhaft anonymisiert. Das gilt für die Meldungen der
+  Einsatz-Sammlung, den Entwurf und jeden eingelesenen Bogen; Übungsbögen und
+  Vorlagen sind ausgenommen.
+  - **Regel:** liegt im Format (`@bos/eeb-format/datenschutzfrist`).
+  - **Uhr:** reicht das Produkt herein (`datenschutzUhrSetzen` in
+    `speicher-browser.ts`, Plausibilitätsprüfung in `datenschutz-uhr.ts`,
+    gemerkter Stand unter `eeb.uhr.v1`). Ohne hereingereichte Uhr anonymisiert
+    die Sammlung nichts — wie bei der Speicherhülle.
+  - **Kein Schemafeld:** Die Frist leitet sich aus `stand` und `uebung` ab und
+    gilt so auch für schon verteilte QR-Codes.
 - **Papierkorb statt endgültigem Löschen** – Prinzip „Nichts geht verloren"
   (`PRODUCT.md`); betrifft Vorlagen und Einträge der Einsatz-Sammlung.
 - **Datensicherung/-Export:** expliziter Export/Import als Datei (JSON), sodass

@@ -18,6 +18,8 @@ import {
   zeitpunktZuIso,
   type Erfassungsbogen,
 } from "@bos/eeb-format/model";
+import { datenschutzfristAbgelaufen } from "@bos/eeb-format/datenschutzfrist";
+import { datenschutzZeitpunkt } from "./datenschutz-uhr";
 import {
   datumDeutsch,
   zeitgruppe,
@@ -830,6 +832,20 @@ function EinheitenTabelle({ meldungen, eingang }: { meldungen: MeldeEintrag[]; e
   );
 }
 
+/**
+ * Kennzeichnung einer Meldung, deren Datenschutzfrist abgelaufen ist — ihre
+ * Personaldaten hat die Sammlung beim Laden schon entfernt. Ohne die Marke
+ * sähe „Einsatzkraft 1" wie ein Erfassungsfehler aus.
+ */
+function AnonymBadge({ bogen }: { bogen: Erfassungsbogen }) {
+  if (!datenschutzfristAbgelaufen(bogen, datenschutzZeitpunkt())) return null;
+  return (
+    <span className="uebung-badge" title="Datenschutzfrist abgelaufen: Namen, Funktionen, Qualifikationen und Erreichbarkeiten wurden entfernt.">
+      ANONYMISIERT
+    </span>
+  );
+}
+
 /** Eine Datenzeile — abgerückte Meldungen bleiben sichtbar, aber durchgestrichen. */
 function TabellenZeileZelle({ zeile: z, eingang }: { zeile: TabellenZeile; eingang?: Eingang | null }) {
   const zeile = useEingangsquittung<HTMLTableRowElement>(marke(eingang, z.eintrag.einheitSchluessel));
@@ -838,6 +854,7 @@ function TabellenZeileZelle({ zeile: z, eingang }: { zeile: TabellenZeile; einga
       <th scope="row">
         {z.einheit}
         {z.eintrag.bogen.uebung ? <span className="uebung-badge">ÜBUNG</span> : null}
+        <AnonymBadge bogen={z.eintrag.bogen} />
         {z.teilEtikett ? <span className="teil-badge">{z.teilEtikett}</span> : null}
         {!z.anwesend && (
           <span className="muster-sub">
@@ -1206,6 +1223,7 @@ function EinheitKarte(props: {
             {einheitAnzeigename(kopf.bogen.einheit)}
             {/* Übungsbögen bleiben auch neben echten Meldungen unübersehbar. */}
             {kopf.bogen.uebung ? <span className="uebung-badge">ÜBUNG</span> : null}
+            <AnonymBadge bogen={kopf.bogen} />
             {/* Ohne diese Kennzeichnung stünde dieselbe Einheit nach einer
                 Aufteilung zweimal gleichnamig untereinander. */}
             {kopf.teilEtikett ? <span className="teil-badge">{kopf.teilEtikett}</span> : null}

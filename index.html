@@ -713,6 +713,16 @@
     }
     .uebungs-band { padding: 0.4rem max(calc((100% - 60rem) / 2), var(--r-3)); }
     .uebungs-band strong { letter-spacing: 0.08em; }
+    /* Datenschutzfrist: gleiche Lage wie der Übungs-Störer, aber ohne Schraffur —
+       es ist ein Hinweis zum Bogen, kein Sitzungszustand. */
+    .frist-band {
+      background: var(--warn-fond);
+      color: var(--warn-text);
+      border-bottom: var(--strich) solid var(--warn-linie);
+      font-size: var(--t-s);
+      padding: 0.4rem max(calc((100% - 60rem) / 2), var(--r-3));
+    }
+    .frist-band strong { letter-spacing: 0.04em; }
     /* Startseite: der Titel ist hier die Hauptsache und darf größer stehen —
        der Kopf ist zugleich der Seitenaufmacher. */
     .seiten-kopf.start-kopf .kopf-inhalt { padding-bottom: var(--r-4); }

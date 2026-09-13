@@ -5,10 +5,18 @@
  * Bogen fortsetzen" mit dem letzten Stand an. Verworfen wird der Entwurf erst,
  * wenn der Bogen bewusst geschlossen wird („Neuer Bogen", Übernahme in einen
  * Einsatz).
+ *
+ * Auch der Entwurf unterliegt der Datenschutzfrist: 90 Tage nach der letzten
+ * Änderung (Übung ausgenommen) wird er beim Laden anonymisiert. Ein Bogen,
+ * der so lange nicht angefasst wurde, ist kein laufender Einsatz mehr — und er
+ * kann ebenso gut ein fremder, gescannter Bogen sein. Die Stammdaten der
+ * eigenen Einheit gehören in „Meine Vorlagen", die keine Frist haben.
  */
 
-import type { Erfassungsbogen } from "@bos/eeb-format/model";
+import type { EebZeitpunkt, Erfassungsbogen } from "@bos/eeb-format/model";
+import { bogenAnonymisiert, datenschutzfristAbgelaufen } from "@bos/eeb-format/datenschutzfrist";
 import { migriereBogen } from "./hilfen";
+import { datenschutzZeitpunkt } from "./datenschutz-uhr";
 
 const SPEICHER_SCHLUESSEL = "eeb.entwurf.v1";
 
@@ -42,6 +50,11 @@ export function entwurfZuJson(bogen: Erfassungsbogen, gespeichert = Date.now()):
   return JSON.stringify({ gespeichert, bogen });
 }
 
+/** Entwurf nach der Datenschutzfrist — anonymisiert, wenn sie abgelaufen ist. */
+export function entwurfNachFrist(e: Entwurf, jetzt: EebZeitpunkt): Entwurf {
+  return datenschutzfristAbgelaufen(e.bogen, jetzt) ? { ...e, bogen: bogenAnonymisiert(e.bogen) } : e;
+}
+
 // ------------------------------------------------- localStorage-Hülle (I/O)
 
 function speicher(): Storage | null {
@@ -52,9 +65,25 @@ function speicher(): Storage | null {
   }
 }
 
-export function entwurfLaden(): Entwurf | null {
+/** Entwurf laden; ist die Datenschutzfrist abgelaufen, wird er auch im Speicher überschrieben. */
+export function entwurfLaden(jetzt: EebZeitpunkt = datenschutzZeitpunkt()): Entwurf | null {
   const s = speicher();
-  return s ? entwurfAusJson(s.getItem(SPEICHER_SCHLUESSEL)) : null;
+  if (!s) return null;
+  const roh = s.getItem(SPEICHER_SCHLUESSEL);
+  const e = entwurfAusJson(roh);
+  if (!e) return null;
+  const nachFrist = entwurfNachFrist(e, jetzt);
+  if (nachFrist !== e) {
+    const text = entwurfZuJson(nachFrist.bogen, nachFrist.gespeichert);
+    if (text !== roh) {
+      try {
+        s.setItem(SPEICHER_SCHLUESSEL, text);
+      } catch {
+        /* Speicher voll o. ä. — angezeigt wird trotzdem nur die anonymisierte Fassung */
+      }
+    }
+  }
+  return nachFrist;
 }
 
 export function entwurfSpeichern(bogen: Erfassungsbogen): void {

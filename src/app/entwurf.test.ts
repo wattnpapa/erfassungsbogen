@@ -7,7 +7,15 @@ vi.mock("./nativ", () => ({
   textTeilen: async () => {},
 }));
 
-import { SCHEMA_VERSION } from "@bos/eeb-format/model";
+import {
+  Ernaehrung,
+  Fahrerlaubnis,
+  Geschlecht,
+  MINUTEN_JE_TAG,
+  SCHEMA_VERSION,
+  StaerkeRolle,
+} from "@bos/eeb-format/model";
+import { ANONYM_BEZEICHNUNG } from "@bos/eeb-format/datenschutzfrist";
 import { neuerBogen } from "./hilfen";
 import { entwurfAusJson, entwurfZuJson, entwurfLaden, entwurfSpeichern, entwurfVerwerfen } from "./entwurf";
 
@@ -70,5 +78,41 @@ describe("Speichern/Laden/Verwerfen über localStorage", () => {
 
     entwurfVerwerfen();
     expect(entwurfLaden()).toBeNull();
+  });
+});
+
+describe("Datenschutzfrist", () => {
+  function bogenMitPerson(uebung?: true) {
+    const b = neuerBogen();
+    b.stand = 2000 * MINUTEN_JE_TAG;
+    b.uebung = uebung;
+    b.personal = [
+      {
+        vorname: "Anna",
+        nachname: "Berger",
+        staerkeRolle: StaerkeRolle.FUEHRER,
+        funktionen: [{ code: 1 }],
+        fahrerlaubnis: Fahrerlaubnis.B,
+        geschlecht: Geschlecht.W,
+        ernaehrung: Ernaehrung.FLEISCH,
+        kontakte: [],
+        zusatzqualifikationen: [],
+      },
+    ];
+    return b;
+  }
+
+  it("anonymisiert einen abgelaufenen Entwurf beim Laden und überschreibt ihn im Speicher", () => {
+    entwurfSpeichern(bogenMitPerson());
+    const e = entwurfLaden((2000 + 90) * MINUTEN_JE_TAG);
+    expect(e?.bogen.personal[0]!.nachname).toBe(`${ANONYM_BEZEICHNUNG} 1`);
+    expect(localStorage.getItem("eeb.entwurf.v1")).not.toMatch(/Anna|Berger/);
+  });
+
+  it("lässt einen Entwurf in der Frist und einen Übungsentwurf unangetastet", () => {
+    entwurfSpeichern(bogenMitPerson());
+    expect(entwurfLaden((2000 + 89) * MINUTEN_JE_TAG)?.bogen.personal[0]!.nachname).toBe("Berger");
+    entwurfSpeichern(bogenMitPerson(true));
+    expect(entwurfLaden((2000 + 5000) * MINUTEN_JE_TAG)?.bogen.personal[0]!.nachname).toBe("Berger");
   });
 });

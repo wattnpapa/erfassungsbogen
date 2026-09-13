@@ -10,6 +10,14 @@ Grundlage: Repository `wattnpapa/erfassungsbogen`, Stand 2026-09-12 — Version 
 >
 > **Wichtig:** Der Commit „Sicherheitsbericht umsetzen" (`c7604e9`, 2026-09-12)
 > hat das in R5/M6 genannte Dekomprimierungs-Risiko bereits behoben.
+>
+> **Nachgezogen 2026-09-13 — Datenschutzfrist:** Die App anonymisiert
+> Personaldaten 90 Tage nach der letzten Änderung eines Bogens, Übungsbögen und
+> Vorlagen ausgenommen.
+> - **Geändert:** 5.7, 6.2, die Risiken R1/R3/R8, die neuen Risiken R10/R11,
+>   die Maßnahmen M4/M11/M12, Abschnitt 1 und Abschnitt 10.
+> - **Grenze:** QR-Codes, PDF und Exporte selbst bleiben unverschlüsselt
+>   lesbar.
 
 ## Hinweis zu diesem Dokument
 
@@ -61,6 +69,17 @@ Durchführung dennoch empfohlen.
 gering bis mittel. Die höchsten Einzelrisiken betreffen den Verlust/Diebstahl
 eines Endgeräts (unverschlüsselter lokaler Speicher, Abschnitt 7) und den Umgang
 mit gedruckten/exportierten Kopien (Abschnitt 6.3).
+
+**Datenschutzfrist (seit 2026-09-13):** Die App anonymisiert die Personaldaten
+eines Bogens 90 Tage nach seiner letzten Änderung, auch in fremden, empfangenen
+Bögen. Ausgenommen sind Übungsbögen und Vorlagen.
+- **Wirkung:** Der Speicherbegrenzung ist damit technisch statt nur
+  organisatorisch Rechnung getragen. R3 sinkt auf niedrig, R1 und R8 auf
+  niedrig-mittel.
+- **Nicht erfasst:** QR-Code, PDF und Exporte selbst. R2 bleibt deshalb
+  unverändert.
+- **Neue Risiken:** R10 (Datenverlust durch eine falsche Uhr) und R11
+  (fristfreie Übungsbögen mit echten Daten).
 
 ## 2. Rahmendaten
 
@@ -227,9 +246,29 @@ Kapitel 6 der [Arc42-Dokumentation](arc42-architektur.md).
 
 ### 5.7 Speicherdauer und Löschung
 
-- **Keine automatische Löschfrist.** Daten verbleiben im `localStorage` des
-  jeweiligen Geräts, bis sie manuell gelöscht werden oder der Browser-/App-
-  Speicher geleert wird.
+- **Datenschutzfrist (technisch erzwungen):** 90 Tage nach der letzten Änderung
+  eines Bogens (`stand`) entfernt die App die personenbezogenen Angaben
+  dauerhaft. Das sind Namen, Funktionen, Zusatzqualifikationen,
+  Fahrerlaubnisse, Kontakte der Personen, Telefon/E-Mail der
+  Hierarchie-Ebenen und der Freitext „Sonstiges". Stärke, Unterbringung und
+  Verpflegung bleiben als Summen erhalten.
+  - **Wirkt auf:** jeden eingelesenen Bogen (Scan, Link, Datei/PDF,
+    Einsatz-Import), jede Meldung einer Einsatz-Sammlung (samt empfangenem
+    Rohpayload und Signaturnachweis mit Absenderangaben) und den Entwurf. Die
+    Regel steht in `vendor/eeb-format/src/datenschutzfrist.ts` und leitet sich
+    ohne Schemafeld aus `stand` ab. Sie greift damit auch für alle vor ihrer
+    Einführung verteilten QR-Codes.
+  - **Ausgenommen:** Bögen mit dem Haken „Dies ist eine Übung" (UI-Hinweis
+    beim Haken und im Übungs-Störer) sowie „Meine Vorlagen" als Stammdaten der
+    eigenen Einheit. Beide bleiben unbefristet gespeichert, bis sie manuell
+    gelöscht werden.
+  - **Grenze:** Der QR-Code selbst, das eingebettete JSON im PDF und
+    CSV-/Excel-Exporte bleiben unverändert und unverschlüsselt. Ein fremder
+    Decoder oder eine ältere App-Version liest sie vollständig. Die Frist ist
+    eine Speicherbegrenzung in der App, kein Schutz des Transportwegs und keine
+    Anonymisierung im Rechtssinn für bereits weitergegebene Kopien.
+- **Aufräumfrist ruhender Einsatz-Sammlungen:** Eine Sammlung, die 90 Tage
+  nicht geändert wurde, löscht die App endgültig (Ankündigung ab Tag 60).
 - Eine **Papierkorb-Funktion** existiert (`sicherung.ts`, `vorlagen.ts`,
   `@bos/meldekopf/papierkorb`): gelöschte Einträge lassen sich vor endgültiger
   Löschung wiederherstellen.
@@ -287,6 +326,21 @@ veralteten Feldbedeutungen fehlinterpretiert werden. Eine inhaltliche
 Richtigkeitsprüfung der Nutzereingaben findet — erwartungsgemäß für ein
 Erfassungswerkzeug — nicht statt.
 
+Die **Speicherbegrenzung** (Art. 5 Abs. 1 lit. e DSGVO) setzt die App seit
+2026-09-13 technisch um: Nach der Datenschutzfrist von 90 Tagen (5.7) sind die
+Personaldaten eines Bogens in der App nicht mehr vorhanden. Dahinter steht
+Datenschutz durch Technikgestaltung nach Art. 25 DSGVO. Die Speicherbegrenzung
+hängt damit nicht mehr allein an einer Dienstanweisung. Sie wirkt auch auf
+Kopien in anderen App-Installationen, soweit diese einen Stand mit Frist
+nutzen.
+
+Zwei Einschränkungen bleiben:
+- **Übungsbögen** sind bewusst ausgenommen (R11/M11).
+- **Kein Schutz gegen Absicht:** Wer den unverschlüsselten QR-Code mit einem
+  eigenen Decoder liest oder die Geräteuhr zurückstellt, umgeht die Frist. Sie
+  ist deshalb als Zugriffshürde und Speicherbegrenzung zu werten, nicht als
+  Anonymisierung der übermittelten Daten.
+
 ### 6.3 Betroffenenrechte in einem dezentralen System — strukturelle Grenze
 
 Dies ist der wichtigste Verhältnismäßigkeitsaspekt der gesamten Architektur:
@@ -329,15 +383,17 @@ Schutzziele in Anlehnung an das Standard-Datenschutzmodell (SDM): Vertraulichkei
 
 | # | Risiko | Schutzziel | Eintrittswahrscheinlichkeit | Schwere für Betroffene | Gesamt |
 | --- | --- | --- | --- | --- | --- |
-| R1 | Verlust/Diebstahl eines Geräts mit unverschlüsseltem `localStorage` → Zugriff auf alle lokal gespeicherten Bögen und die Absenderkarte | V | Mittel | Mittel (Namen, Kontaktdaten, ggf. Fahrzeugkennzeichen mehrerer Personen) | Mittel |
-| R2 | Verlust/Fehlleitung eines gedruckten PDF- oder exportierten CSV/Excel-Dokuments | V | Mittel | Mittel | Mittel |
-| R3 | Kein technisch erzwungener Löschzeitpunkt → Daten verbleiben ggf. länger als nötig auf Geräten | Vf/T | Hoch (Standardverhalten ohne organisatorische Vorgabe) | Niedrig-Mittel | Mittel |
+| R1 | Verlust/Diebstahl eines Geräts mit unverschlüsseltem `localStorage` → Zugriff auf die lokal gespeicherten Bögen und die Absenderkarte | V | Mittel | ~~Mittel~~ → Niedrig-Mittel: seit der Datenschutzfrist (5.7) nur noch Personaldaten der letzten 90 Tage, dazu Übungsbögen und Vorlagen | ~~Mittel~~ → Niedrig-Mittel |
+| R2 | Verlust/Fehlleitung eines gedruckten PDF- oder exportierten CSV/Excel-Dokuments | V | Mittel | Mittel | Mittel (von der Datenschutzfrist nicht erfasst) |
+| R3 | ~~Kein technisch erzwungener Löschzeitpunkt~~ → **Datenschutzfrist umgesetzt** (5.7): nach 90 Tagen anonymisiert. Offen bleiben Übungsbögen und Vorlagen ohne Frist | Vf/T | ~~Hoch~~ → Niedrig (nur noch fristfreie Übungsbögen/Vorlagen) | Niedrig-Mittel | ~~Mittel~~ → Niedrig |
 | R4 | Diebstahl/Auslesen des privaten Signaturschlüssels vom Gerät (unverschlüsselt im `localStorage`) → Signieren im Namen des Geräts | I | Niedrig | Niedrig (Trust-Modell ist ohnehin nur TOFU; der Schlüssel ist über die Fußzeile austauschbar, siehe 5.7) | Niedrig |
 | R5 | ~~Speicher-Überlastung durch präparierte Import-Datei (fehlende Obergrenze bei der Dekomprimierung)~~ **behoben mit `c7604e9`** (`inflateRawBegrenzt`, Deckel 4 MiB) | Vf | Niedrig | Niedrig (Verfügbarkeits-, kein Vertraulichkeitsrisiko) | ~~Niedrig~~ → Sehr niedrig |
 | R6 | Keine Verkettbarkeits-Kontrolle: Kennzeichen/Funkrufname in Sammel-Exporten könnten über mehrere Einsätze hinweg dieselbe Person/Fahrzeug wiedererkennbar machen | N | Niedrig-Mittel | Niedrig | Niedrig |
 | R7 | Fehlende eigene Zugriffssperre der App (verlässt sich auf Betriebssystem-/Gerätesperre) | V | Mittel | Niedrig-Mittel | Niedrig-Mittel |
-| R8 | Strukturelle Grenze der Betroffenenrechte bei bereits weitergereichten Kopien (6.3) | Iv | Hoch (systembedingt) | Niedrig-Mittel | Mittel |
+| R8 | Strukturelle Grenze der Betroffenenrechte bei bereits weitergereichten Kopien (6.3) | Iv | Hoch (systembedingt) | Niedrig-Mittel | ~~Mittel~~ → Niedrig-Mittel: digitale Kopien in anderen App-Installationen (ab dem Stand mit Datenschutzfrist) verfallen nach 90 Tagen von selbst; Papier, Exporte und der QR-Inhalt selbst nicht |
 | R9 | GoatCounter/Update-Check als einzige Netzwerkkontaktpunkte — technische Metadaten (IP-Adresse) fallen bei einem Dritten an | T | Hoch (jeder Aufruf) | Sehr niedrig | Niedrig |
+| R10 | **Neu mit der Datenschutzfrist:** unumkehrbarer Verlust der Personaldaten im laufenden Einsatz — durch eine falsch vorgehende Geräteuhr oder eine Lage, die länger als 90 Tage ohne Bearbeitung des Bogens läuft | Vf | Niedrig (Uhrsprünge über 366 Tage werden erst nach Bestätigung einen Tag später übernommen; Ankündigung 14 Tage vor Ablauf; jede Bearbeitung startet die Frist neu) | Niedrig-Mittel (Stärke und Summen bleiben erhalten, Namen fehlen) | Niedrig |
+| R11 | **Neu mit der Datenschutzfrist:** Übungsbögen sind von der Frist ausgenommen — enthalten sie echte Personaldaten, liegen diese unbefristet auf den Geräten | V | Mittel (Übungen mit echtem Personal sind üblich) | Niedrig-Mittel | Niedrig-Mittel |
 
 **Höchste Einzelrisiken:** R1 (Geräteverlust), R2 (Papier-/Exportverlust) und R8
 (strukturelle Grenze der Betroffenenrechte) — alle drei primär organisatorisch.
@@ -350,13 +406,15 @@ Schutzziele in Anlehnung an das Standard-Datenschutzmodell (SDM): Vertraulichkei
 | M2 | R1, R4 | Perspektivisch: Ablage sensibler Daten über plattformeigene sichere Speicher (z. B. Electron `safeStorage`/Betriebssystem-Schlüsselbund) statt `localStorage` — als Hinweis an den Projektbetreiber | Technisch (Weiterentwicklung) | `[Projektbetreiber/Maintainer]` | Niedrig (nach Umsetzung) |
 | M2a | R4 | Bei Verdacht auf Kompromittierung eines Geräts den Signaturschlüssel über „Geräteschlüssel neu erzeugen" (Fußzeile) austauschen und die neue Kurzform an Meldekopf/Führungsstelle geben; Zuständigkeit und Weg dafür festlegen | Organisatorisch (technische Grundlage vorhanden) | `[Organisation]` | Niedrig |
 | M3 | R2, R8 | Dienstanweisung: gedruckte/exportierte Bögen wie das bisherige Papierformular behandeln (Aufbewahrung, Zugriffsschutz, dokumentierte Vernichtung) | Organisatorisch | `[Organisation]` | Niedrig-Mittel |
-| M4 | R3 | Eigene, dokumentierte Löschfrist für digital gespeicherte Bögen festlegen und die Papierkorb-Funktion in einer Kurzanleitung erklären | Organisatorisch | `[Organisation/Datenschutzbeauftragte/r]` | Niedrig |
+| M4 | R3 | ~~Eigene, dokumentierte Löschfrist für digital gespeicherte Bögen festlegen~~ **Technisch umgesetzt:** Datenschutzfrist von 90 Tagen (5.7). Für die Organisation bleibt: prüfen, ob 90 Tage zum eigenen Zweck passen, eine Frist für Papierausdrucke und Exporte festlegen und die Papierkorb-Funktion in einer Kurzanleitung erklären | Technisch (umgesetzt) / Organisatorisch | `[Organisation/Datenschutzbeauftragte/r]` | Niedrig |
 | M5 | R8 | Verfahrensanweisung für Auskunfts-/Löschanfragen, die auch bereits weitergereichte Bögen einschließt | Organisatorisch | `[Organisation/Datenschutzbeauftragte/r]` | Niedrig-Mittel |
 | M6 | R5 | **Erledigt (`c7604e9`):** Obergrenze für die Größe dekomprimierter Importe ist umgesetzt (`MAX_ENTPACKT = 4 MiB`, streamend geprüft). Für die Organisation bleibt: eine App-Version ab diesem Stand einsetzen | Technisch (umgesetzt) | `[Projektbetreiber/Maintainer]` | erledigt |
 | M7 | R6 | Bei organisationsübergreifenden Sammel-Exporten prüfen, ob Kennzeichen/Funkrufname wirklich benötigt werden, und optionale Felder leer lassen | Organisatorisch | `[erfassende/exportierende Person]` | Sehr niedrig |
 | M8 | R7 | App-eigene Zugriffssperre ist nicht vorgesehen — ersatzweise über Geräterichtlinie (M1) sicherstellen | Organisatorisch | `[Organisation]` | Niedrig |
 | M9 | R9, 5.8 | Vor Produktivbetrieb klären, wer für die GoatCounter-Messung verantwortlich ist und ob eine Vereinbarung nach Art. 26 oder 28 DSGVO nötig ist; alternativ Widerspruchsparameter (`skipgc`) organisationsweit hinterlegen | Organisatorisch/rechtlich | `[Organisation/Datenschutzbeauftragte/r]` | Sehr niedrig |
 | M10 | 6.4 | Eigene Datenschutzinformation für Nutzer/Personal erstellen (Zweck, Speicherort, Rechte, Kontakt) | Organisatorisch | `[Organisation]` | — (Transparenzpflicht) |
+| M11 | R11 | Dienstanweisung: In als Übung gekennzeichnete Bögen nur Personaldaten eintragen, deren unbefristete Speicherung vertretbar ist (sonst Beispielnamen oder Stärke-Erfassung nutzen); Übungsbögen nach der Übung manuell löschen. Die App weist beim Übungshaken und im Übungs-Störer darauf hin | Organisatorisch (technischer Hinweis vorhanden) | `[Organisation]` | Niedrig |
+| M12 | R10 | Bei Lagen, die länger als 90 Tage laufen, die Bögen aktiv fortschreiben oder rechtzeitig als PDF sichern; die App kündigt die Anonymisierung 14 Tage vorher an | Organisatorisch | `[erfassende Person/Meldekopf]` | Niedrig |
 
 ## 9. Konsultation
 
@@ -377,6 +435,16 @@ aufgeführten organisatorischen Maßnahmen (insbesondere M1, M3, M4, M5) umgeset
 werden, verbleibt ein geringes bis gering-mittleres Restrisiko für die Rechte und
 Freiheiten der betroffenen Personen. Ein hohes Risiko im Sinne des Art. 36 DSGVO
 wird nicht gesehen.
+
+Seit der technischen Datenschutzfrist (2026-09-13, 5.7) stützt sich diese
+Einschätzung weniger auf organisatorische Maßnahmen:
+- **M4:** Die Löschfrist für digital gespeicherte Bögen ist in der App
+  umgesetzt.
+- **R1, R3 und R8** sind gesunken.
+- **Neu hinzugekommen** sind die niedrigen Risiken R10 und R11 mit den
+  Maßnahmen M11 und M12.
+- **Unverändert** hängt das Ergebnis an M1, M3 und M5 für Geräte, Papier,
+  Exporte und bereits weitergegebene Kopien.
 
 Diese Einschätzung ersetzt keine rechtliche Prüfung.
 

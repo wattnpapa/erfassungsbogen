@@ -33,7 +33,15 @@ import {
   neuerBogen,
   schrittStatus,
 } from "./hilfen";
-import { PersonalErfassung, jetztZeitpunkt, staerke } from "@bos/eeb-format/model";
+import { EEB_EPOCHE_MS, PersonalErfassung, jetztZeitpunkt, staerke } from "@bos/eeb-format/model";
+import {
+  DATENSCHUTZFRIST_TAGE,
+  bogenAnonymisiert,
+  datenschutzfristAbgelaufen,
+  datenschutzfristEnde,
+  tageBisAnonymisierung,
+} from "@bos/eeb-format/datenschutzfrist";
+import { datenschutzZeitpunkt } from "./datenschutz-uhr";
 import { Kopfnav } from "./kopfnav-ui";
 import { bogenLinksEmpfangen, imWebBrowser, istNativ, qrScannen, textTeilen } from "./nativ";
 import { fehlerText } from "./nachladen";
@@ -84,6 +92,57 @@ const UEBERSICHT = SCHRITTE.length - 1;
 const SCHRITT_EINSATZ = 1; // Landepunkt nach der Musterung: Ort/Zeitraum sind das einzig Leere.
 
 /**
+ * Datenschutzfrist beim Öffnen eines Bogens von außen (Scan, Link, Datei): Ist
+ * sie abgelaufen, wird nur die anonymisierte Fassung übernommen. Wer das
+ * Ergebnis `anonymisiert` erhält, verwirft auch Signaturnachweis und
+ * Rohpayload — sie deckten den veränderten Inhalt nicht mehr und trügen die
+ * Namen beim Weiterreichen im Klartext weiter.
+ */
+function bogenNachFrist(b: Erfassungsbogen): { bogen: Erfassungsbogen; anonymisiert: boolean } {
+  if (!datenschutzfristAbgelaufen(b, datenschutzZeitpunkt())) return { bogen: b, anonymisiert: false };
+  return { bogen: bogenAnonymisiert(b), anonymisiert: true };
+}
+
+const FRIST_ABGELAUFEN_MELDUNG =
+  `Die Datenschutzfrist dieses Bogens ist abgelaufen (${DATENSCHUTZFRIST_TAGE} Tage nach der letzten Änderung) — ` +
+  "Namen, Funktionen, Qualifikationen und Erreichbarkeiten wurden entfernt.";
+
+/** Kalendertag eines Zeitpunkts, deutsch geschrieben („12.12.2026"). */
+function tagDeutsch(zeitpunkt: number): string {
+  return new Date(EEB_EPOCHE_MS + zeitpunkt * 60_000).toLocaleDateString("de-DE", { timeZone: "UTC" });
+}
+
+/**
+ * Hinweis zur Datenschutzfrist unter dem Kopf: nach Ablauf, dass die
+ * Personaldaten entfernt sind, und in den letzten 14 Tagen davor, wann es so
+ * weit ist. Die übrige Zeit schweigt das Band — der Hinweis steht dauerhaft im
+ * Einsatz-Schritt beim Übungshaken.
+ */
+function FristBand({ bogen }: { bogen: Erfassungsbogen }) {
+  const jetzt = datenschutzZeitpunkt();
+  const ende = datenschutzfristEnde(bogen);
+  if (ende == null) return null;
+  if (datenschutzfristAbgelaufen(bogen, jetzt)) {
+    return (
+      <div className="frist-band" role="status">
+        <strong>DATENSCHUTZFRIST ABGELAUFEN</strong> — Namen, Funktionen, Qualifikationen und
+        Erreichbarkeiten wurden {DATENSCHUTZFRIST_TAGE} Tage nach der letzten Änderung entfernt. Stärke
+        und Summen bleiben erhalten.
+      </div>
+    );
+  }
+  const tage = tageBisAnonymisierung(bogen, jetzt);
+  if (tage == null) return null;
+  return (
+    <div className="frist-band" role="status">
+      <strong>Datenschutzfrist</strong> — Die Personaldaten dieses Bogens werden am {tagDeutsch(ende)}{" "}
+      anonymisiert ({tage === 1 ? "noch 1 Tag" : `noch ${tage} Tage`}). Wird der Bogen weiter bearbeitet,
+      beginnt die Frist neu.
+    </div>
+  );
+}
+
+/**
  * Fragment aus der Adresszeile holen und dort entfernen, damit die Daten nicht
  * im Verlauf hängen bleiben. Gemeinsame Grundlage für den Kaltstart und für
  * `hashchange` (siehe den Listener in `App`).
@@ -126,7 +185,9 @@ function startAusUrlFragment(): {
       parseSegmentUrl(fragment);
       return { bogen: null, vorlage: null, fehler: "", text: "", segment: fragment };
     }
-    return { bogen: decodePayloadUrl(fragment, browserKompressor), vorlage: null, fehler: "", text: fragment, segment: "" };
+    const { bogen, anonymisiert } = bogenNachFrist(decodePayloadUrl(fragment, browserKompressor));
+    // Anonymisiert: kein Text für die Signaturprüfung — der Nachweis deckt den Inhalt nicht mehr.
+    return { bogen, vorlage: null, fehler: "", text: anonymisiert ? "" : fragment, segment: "" };
   } catch {
     return { bogen: null, vorlage: null, fehler: "Der geöffnete Link enthält keinen gültigen Erfassungsbogen.", text: "", segment: "" };
   }
@@ -509,11 +570,13 @@ function AppInhalt() {
         await ladePdfBogen(datei);
         return;
       }
-      setBogen(await bogenLaden(datei));
+      const { bogen: geladen, anonymisiert } = bogenNachFrist(await bogenLaden(datei));
+      setBogen(geladen);
       setzeEmpfang(null); // Datei-Import: kein signierter Transport
       setSchritt(UEBERSICHT);
       setZeigeStart(false);
       setFehler("");
+      setMeldung(anonymisiert ? FRIST_ABGELAUFEN_MELDUNG : "");
     } catch (err) {
       setFehler(err instanceof Error ? err.message : String(err));
     }
@@ -531,7 +594,7 @@ function AppInhalt() {
     const bytes = new Uint8Array(await datei.arrayBuffer());
     const boegen = boegenAusPdfBytes(bytes);
     if (boegen.length > 0) {
-      const b = boegen[0]!;
+      const { bogen: b, anonymisiert } = bogenNachFrist(boegen[0]!);
       setBogen(b);
       setzeEmpfang(null); // Datei-Import: kein signierter Transport
       setSchritt(UEBERSICHT);
@@ -541,9 +604,14 @@ function AppInhalt() {
       // wer alle will, ist beim Einsatz-Import richtig, statt die PDF als
       // „ging nicht" abzulegen.
       setMeldung(
-        boegen.length > 1
-          ? `Die PDF enthält ${boegen.length} Bögen — geöffnet ist „${einheitAnzeigename(b.einheit)}". Alle auf einmal: „Einsatz importieren…".`
-          : "",
+        [
+          anonymisiert ? FRIST_ABGELAUFEN_MELDUNG : "",
+          boegen.length > 1
+            ? `Die PDF enthält ${boegen.length} Bögen — geöffnet ist „${einheitAnzeigename(b.einheit)}". Alle auf einmal: „Einsatz importieren…".`
+            : "",
+        ]
+          .filter(Boolean)
+          .join(" "),
       );
       return;
     }
@@ -739,17 +807,21 @@ function AppInhalt() {
     if (ziel) {
       // Abwarten: steckt in der Aufnahme eine Rückfrage (Einheit schon
       // gemeldet), darf der Scan-Loop nicht schon den nächsten Code lesen.
+      // Die Datenschutzfrist wendet die Sammlung selbst an (meldungHinzufuegen).
       await bogenInSammlung(ziel, b, "scan", { signatur: alsEintragSignatur(signatur), herkunft: payload }, true);
       return false; // Kiosk: weiter scannen, bis abgebrochen wird
     }
-    setBogen(b);
-    setzeEmpfang(signatur, payload ?? null);
+    const { bogen: geoeffnet, anonymisiert } = bogenNachFrist(b);
+    setBogen(geoeffnet);
+    if (anonymisiert) setzeEmpfang(null);
+    else setzeEmpfang(signatur, payload ?? null);
     setSchritt(UEBERSICHT);
     setZeigeStart(false);
     // Einsatzansicht hat Vorrang vor der Übersicht (siehe Render weiter unten):
     // ohne dieses Schließen bliebe ein per Link geöffneter Bogen unsichtbar.
     setOffenerEinsatzId(null);
     setFehler("");
+    if (anonymisiert) setMeldung(FRIST_ABGELAUFEN_MELDUNG);
     return true;
   }
 
@@ -1683,8 +1755,10 @@ function AppInhalt() {
     {bogen.uebung && (
       <div className="uebungs-band" role="status">
         <strong>ÜBUNG</strong> — Dieser Bogen ist als Übung gekennzeichnet und beschreibt keinen echten Einsatz.
+        {" "}Übungsbögen unterliegen keiner Datenschutzfrist.
       </div>
     )}
+    <FristBand bogen={bogen} />
     {/* Die Übersicht ist der einzige Schritt ohne fixe Schritt-Navigation
         (siehe unten) — sie braucht deshalb auch nicht den Freiraum dafür. */}
     <main id="inhalt" tabIndex={-1} className={schritt === UEBERSICHT ? "ohne-nav" : undefined}>

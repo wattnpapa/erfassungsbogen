@@ -15,6 +15,10 @@ Grundlage: Repository `wattnpapa/erfassungsbogen`, Stand 2026-09-12 — Version 
 > `script-src` (5.3/6.2/R4/M4) und die fehlende Schwachstellenprüfung der
 > Abhängigkeiten (6.4/R8/M8). Die betroffenen Abschnitte sind entsprechend
 > gekennzeichnet.
+>
+> **Nachgezogen 2026-09-13:** Datenschutzfrist — nach 90 Tagen anonymisiert die
+> App die Personaldaten gespeicherter und eingelesener Bögen, Übungen
+> ausgenommen (3.3, 5.5; Branch `feat/datenschutzfrist`).
 
 ## Hinweis zu diesem Dokument
 
@@ -139,8 +143,9 @@ dem Vite-Build); es gibt keine serverseitige Variante.
 
 | # | Zielobjekt | Beschreibung | Speicherort |
 | --- | --- | --- | --- |
-| D1 | Erfassungsbogen-Entwurf | Aktuell bearbeiteter Bogen (Personal, Fahrzeuge, Einsatz, Sofortbedarf) | `localStorage` des Geräts |
-| D2 | Gesicherte/archivierte Bögen | Übergebene bzw. empfangene Bögen inkl. Papierkorb (vor endgültiger Löschung) | `localStorage` des Geräts |
+| D1 | Erfassungsbogen-Entwurf | Aktuell bearbeiteter Bogen (Personal, Fahrzeuge, Einsatz, Sofortbedarf); Personaldaten 90 Tage nach der letzten Änderung anonymisiert, außer bei Übungen (5.5) | `localStorage` des Geräts |
+| D2 | Gesicherte/archivierte Bögen | Übergebene bzw. empfangene Bögen inkl. Papierkorb (vor endgültiger Löschung); Meldungen der Einsatz-Sammlung unterliegen derselben Datenschutzfrist, Vorlagen nicht (5.5) | `localStorage` des Geräts |
+| D2a | Uhrstand der Datenschutzfrist | Zuletzt akzeptierter Zeitpunkt der Geräteuhr, ggf. unbestätigter Sprung; keine Personendaten | `localStorage` des Geräts (`eeb.uhr.v1`) |
 | D3 | Absenderkarte | Freiwillige Kontaktangabe (Name/E-Mail/Telefon) der meldenden Person | `localStorage` des Geräts |
 | D4 | Privater Geräteschlüssel | Ed25519-Schlüssel zur Signatur weitergereichter Bögen | `localStorage` des Geräts, **unverschlüsselt als Hex** |
 | D5 | QR-Payload / Exportdatei | Binär kodierter, komprimierter Bogen zur Übergabe an ein zweites Gerät | Transient (QR-Code-Anzeige) bzw. Datei auf dem Gerät |
@@ -282,6 +287,19 @@ Datenausleitung an eine andere Herkunft ist technisch unterbunden.
 
 ### 5.5 Datensparsamkeit und Löschung
 
+- **Datenschutzfrist** (`vendor/eeb-format/src/datenschutzfrist.ts`): 90 Tage
+  nach der letzten Änderung eines Bogens entfernt die App Namen, Funktionen,
+  Qualifikationen, Fahrerlaubnisse und Erreichbarkeiten dauerhaft. Das gilt
+  für eingelesene Bögen (Scan, Link, Datei, Einsatz-Import), für jede Meldung
+  der Einsatz-Sammlung und für den Entwurf. Bei den Meldungen fallen auch der
+  Rohpayload und der Signaturnachweis weg. Übungsbögen und Vorlagen sind
+  ausgenommen. Eine Uhr, die mehr als 366 Tage nach vorn springt, wird erst
+  übernommen, wenn sie sich einen Tag später bestätigt (`uhrPruefen`,
+  `src/app/datenschutz-uhr.ts`). Das schützt vor Datenverlust durch eine
+  falsch gehende Uhr. Gegen Absicht schützt die Frist nicht: Der QR-Code bleibt
+  unverschlüsselt, und eine zurückgestellte Uhr wird nicht abgefangen.
+- **Aufräumfrist ruhender Einsatz-Sammlungen** (`@bos/meldekopf/einsaetze`):
+  90 Tage ohne Änderung, dann endgültig gelöscht; Ankündigung ab Tag 60.
 - **Papierkorb-Funktion** (`src/app/sicherung.ts`, `src/app/vorlagen.ts`,
   `@bos/meldekopf/papierkorb`): gelöschte Einträge lassen sich vor endgültiger
   Löschung wiederherstellen.
