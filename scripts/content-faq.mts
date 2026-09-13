@@ -1730,8 +1730,15 @@ const AUFKLAPPER_MUSTER =
  * Quelltexts zu einfachen Leerzeichen.
  */
 function reintext(html: string): string {
-  return html
-    .replace(/<[^>]+>/g, "")
+  let ohneTags = html;
+  let vorher: string;
+  // Wiederholen, bis keine Tags mehr übrig sind: Ein einzelner Durchlauf ließe
+  // aus verschachtelten Resten wie „<scr<b>ipt>" wieder ein Tag entstehen.
+  do {
+    vorher = ohneTags;
+    ohneTags = ohneTags.replace(/<[^>]+>/g, "");
+  } while (ohneTags !== vorher);
+  return ohneTags
     .replace(/&nbsp;/g, " ")
     .replace(/&shy;/g, "")
     .replace(/&(?:quot|#34);/g, '"')
@@ -1743,11 +1750,20 @@ function reintext(html: string): string {
     .trim();
 }
 
+/**
+ * JSON für den Inhalt eines `<script>`-Elements. reintext löst `&lt;` auf; ein
+ * „</script>" im Antworttext beendete sonst das Element mitten im JSON.
+ * `<` ist gleichwertiges JSON und für den HTML-Parser kein Tag-Anfang.
+ */
+function jsonImSkript(wert: string): string {
+  return JSON.stringify(wert).replace(/</g, "\\u003c");
+}
+
 /** Die Einträge stehen im Quelltext auf zehn Leerzeichen Einzug, ihre Felder auf zwölf. */
 function mainEntityHtml(html: string): string {
   const eintraege = [...html.matchAll(AUFKLAPPER_MUSTER)].map(([, frage, antwort]) => {
-    const name = JSON.stringify(reintext(frage ?? ""));
-    const text = JSON.stringify(reintext(antwort ?? ""));
+    const name = jsonImSkript(reintext(frage ?? ""));
+    const text = jsonImSkript(reintext(antwort ?? ""));
     return (
       `          {\n` +
       `            "@type": "Question",\n` +

@@ -64,10 +64,22 @@ const NEUE_KLASSE = "tabellenrahmen";
 
 const OEFFNER = new RegExp(`<div class="(${KLASSEN.join("|")})"[^>]*>`, "g");
 
+/**
+ * Tags entfernen, bis keine mehr übrig sind: Ein einzelner Durchlauf ließe aus
+ * verschachtelten Resten wie „<scr<b>ipt>" wieder ein Tag entstehen.
+ */
+function ohneTags(html: string): string {
+  let vorher: string;
+  do {
+    vorher = html;
+    html = html.replace(/<[^>]+>/g, "");
+  } while (html !== vorher);
+  return html;
+}
+
 /** Text einer Überschrift, ohne Auszeichnung und ohne Entities. */
 function reintext(html: string): string {
-  return html
-    .replace(/<[^>]+>/g, "")
+  return ohneTags(html)
     .replace(/&nbsp;/g, " ")
     .replace(/&(?:quot|#34);/g, "")
     // &amp; zuletzt, sonst würde „&amp;nbsp;" über „&nbsp;" zum Leerzeichen.

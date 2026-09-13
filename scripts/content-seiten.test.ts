@@ -278,14 +278,20 @@ describe("Content-Seiten unter public/", () => {
   const MIT_FAQPAGE = SEITEN.filter((d) => /"@type":\s*"FAQPage"/.test(lies(d)));
 
   /** Klartext wie im Generator: Tags ersatzlos weg, Entities auf, Leerraum zusammen. */
-  const klartext = (html: string) =>
-    html
-      .replace(/<[^>]+>/g, "")
+  const klartext = (html: string) => {
+    let ohneTags = html;
+    let vorher: string;
+    do {
+      vorher = ohneTags;
+      ohneTags = ohneTags.replace(/<[^>]+>/g, "");
+    } while (ohneTags !== vorher);
+    return ohneTags
       .replace(/&nbsp;/g, " ")
       .replace(/&(?:quot|#34);/g, '"')
       .replace(/&amp;/g, "&")
       .replace(/\s+/g, " ")
       .trim();
+  };
 
   const sichtbareFragen = (html: string) =>
     [...html.matchAll(/<details class="frage"[^>]*>\s*<summary>\s*<h3[^>]*>([\s\S]*?)<\/h3>/g)].map((m) =>

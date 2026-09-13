@@ -51,7 +51,7 @@ describe("Startseiten-Text", () => {
     );
 
     // Gültiges JSON-LD mit den Pflichtfeldern je Typ …
-    const json = JSON.parse(block.replace(/^<script[^>]*>|<\/script>$/g, ""));
+    const json = JSON.parse(block.replace(/^<script[^>]*>|<\/script\s*>$/gi, ""));
     expect(json["@context"]).toBe("https://schema.org");
     expect(json["@type"]).toBe("FAQPage");
     expect(Array.isArray(json.mainEntity)).toBe(true);
