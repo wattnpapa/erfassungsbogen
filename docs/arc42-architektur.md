@@ -210,11 +210,19 @@ wieder.
   eigener Job) und `e2e` (Cucumber über Playwright, eigener Job wegen des
   Browser-Downloads). Anders als `ci.yml` läuft die Stufe auch auf dem
   Hauptzweig, denn der Pages-Job hängt an ihr: veröffentlicht wird nur ein
-  geprüfter Stand. Die Release-Jobs aus `release.yml` sind bewusst **nicht**
-  nachgebildet — Build-Version und Tag entstehen auf GitHub und würden vom
-  nächsten Spiegellauf überschrieben, die Signaturschlüssel liegen als
-  GitHub-Secrets, und unsignierte Installer wären ein zweiter, schlechterer
-  Download-Weg.
+  geprüfter Stand. Die Release-Jobs aus `release.yml` laufen dort **nicht**:
+  Build-Version und Tag entstehen auf GitHub und würden vom nächsten
+  Spiegellauf überschrieben, die Signaturschlüssel liegen als GitHub-Secrets,
+  und unsignierte Installer wären ein zweiter, schlechterer Download-Weg. Sie
+  sind aber im unteren Teil von `.gitlab-ci.yml` vollständig **auskommentiert
+  vorbereitet** (`vorbereiten`, `build-linux`, `build-android`, `build-win`,
+  `build-mac`, `freigabe`, `aufraeumen`) — für den Fall, dass GitHub als
+  führender Ort wegfällt. Die Datei nennt dort die Reihenfolge des Umschaltens,
+  die nötigen CI-Variablen und zwei Dinge, die sich nicht wegkonfigurieren
+  lassen: ein GitLab-Release trägt keine Dateien, sondern verweist auf URLs
+  (Installer und SBOM gehen daher zuerst in die Generic Package Registry), und
+  die Update-Adresse in `package.json` steckt in jeder bereits ausgelieferten
+  Desktop-App — der Bestand sucht sein Update weiter bei GitHub.
 - **Webfassung auf dem Spiegel (GitLab Pages):** Auf Open CoDE läuft eine eigene
   Pipeline (`.gitlab-ci.yml`, Job `pages`, nur auf dem Standardzweig): sie baut
   aus demselben Stand `dist/` und veröffentlicht es als GitLab Pages, damit die

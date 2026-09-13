@@ -120,3 +120,245 @@ pages:
   environment:
     name: pages
     url: $CI_PAGES_URL
+
+# ---------------------------------------------------------------------------
+# Vorbereitet, aber stillgelegt: der Release-Weg für den Tag, an dem GitHub
+# abgeschaltet wird.
+#
+# Alles unterhalb dieser Linie ist auskommentiert und bildet die Jobs aus
+# .github/workflows/release.yml nach (prepare, build-win, build-linux,
+# build-android, build-mac, release, cleanup). Solange GitHub der führende Ort
+# ist, darf davon nichts laufen — zwei Release-Kanäle mit je eigener
+# Build-Version und eigenen Installern wären schlimmer als einer.
+#
+# Reihenfolge beim Umschalten (jeder Punkt ist für sich ein eigener Schritt):
+#
+#   1. Führung umdrehen. Heute ist der Spiegel eine Lesefassung: GitHub
+#      überschreibt ihn per `git push --force --prune`. Erst wenn
+#      spiegel-opencode.yml abgeschaltet ist, darf hier etwas committet oder
+#      getaggt werden — vorher reißt der nächste Spiegellauf es weg.
+#   2. `stages:` oben um `freigabe` erweitern.
+#   3. package.json anpassen: `build.publish[0].url` zeigt heute auf
+#      `https://github.com/wattnpapa/erfassungsbogen/releases/latest/download`.
+#      Das ist die Adresse, die in jeder bereits ausgelieferten Desktop-App
+#      steckt — wer sie umstellt, erreicht damit nur künftige Installationen.
+#      Der Bestand sucht sein Update weiter bei GitHub. Die GitHub-Releases
+#      müssen also erreichbar bleiben, bis der Bestand durch ist, oder es
+#      braucht ein Übergangs-Release, dessen einziger Zweck die neue Adresse
+#      ist.
+#   4. CI/CD-Variablen auf Open CoDE hinterlegen (Settings -> CI/CD ->
+#      Variables), alle „Masked" und „Protected":
+#        GITLAB_PUSH_TOKEN   Projekt-Access-Token, Rolle Maintainer, Scope
+#                            `write_repository` — der CI_JOB_TOKEN darf nicht
+#                            pushen und kann deshalb keinen Tag anlegen.
+#        GITLAB_API_TOKEN    Scope `api`, nur für das Aufräumen alter Releases.
+#        ANDROID_KEYSTORE    Variable vom Typ „File" (GitLab kann Dateien
+#                            direkt; das base64-Hin-und-Her aus release.yml
+#                            entfällt damit).
+#        ANDROID_KEYSTORE_PASSWORD
+#        CSC_LINK, CSC_KEY_PASSWORD, APPLE_API_KEY_ID, APPLE_API_ISSUER,
+#        APPLE_API_KEY_BASE64   nur für macOS, siehe build-mac.
+#   5. Runner prüfen. Die Linux-Jobs laufen auf jedem Docker-Runner. Windows
+#      und macOS brauchen je einen Runner mit dem passenden Betriebssystem;
+#      stellt die Instanz keinen, bleiben diese beiden Jobs stillgelegt und es
+#      gibt von dort keine .exe und keine .dmg.
+#   6. Die Auslieferungswege in README.md, Arc42 Kap. 2.2/7, ISK 3.6 und DSFA
+#      Abschnitt 3/5.8 nachziehen — dort steht heute überall „ausschließlich
+#      über GitHub Releases".
+#
+# Ein Unterschied zu GitHub lässt sich nicht wegkonfigurieren: Ein
+# GitLab-Release trägt keine Dateien, es verweist nur auf URLs. Installer und
+# SBOM gehen deshalb zuerst in die Generic Package Registry des Projekts, und
+# das Release verlinkt sie von dort. Für electron-updater ist das gleichwertig
+# — der `generic`-Provider will ohnehin nur ein Verzeichnis voller Dateien —,
+# die Adressen sehen aber anders aus als bei GitHub.
+#
+# ---------------------------------------------------------------------------
+#
+# vorbereiten:
+#   stage: pruefen
+#   cache: {}
+#   before_script: []
+#   script:
+#     # Einheitliches Format YYYY.MMDD.HHMM (z. B. 2026.712.1035): zugleich
+#     # gültiges SemVer (electron/npm) und CFBundleShortVersionString (iOS),
+#     # minutengenau und über Tages-/Jahresgrenzen monoton steigend.
+#     - Y=$(date -u +%Y)
+#     - MMDD=$(( 10#$(date -u +%m) * 100 + 10#$(date -u +%d) ))
+#     - HHMM=$(( 10#$(date -u +%H) * 100 + 10#$(date -u +%M) ))
+#     - echo "BUILD_VERSION=$Y.$MMDD.$HHMM" > version.env
+#     - . ./version.env
+#     # Tag wie in release.yml, über HTTPS mit Projekt-Access-Token.
+#     - git config user.email "ci@$CI_SERVER_HOST"
+#     - git config user.name "GitLab CI"
+#     - git tag "$BUILD_VERSION" "$CI_COMMIT_SHA"
+#     - git push "https://oauth2:${GITLAB_PUSH_TOKEN}@${CI_SERVER_HOST}/${CI_PROJECT_PATH}.git" "$BUILD_VERSION"
+#   # dotenv statt „job outputs": so sehen alle folgenden Jobs dieselbe
+#   # BUILD_VERSION, ohne sie neu aus der Uhr zu lesen — zwei Jobs um 10:59:59
+#   # und 11:00:00 kämen sonst auf verschiedene Versionen.
+#   artifacts:
+#     reports:
+#       dotenv: version.env
+#   rules:
+#     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+#
+# build-linux:
+#   stage: pruefen
+#   needs: [vorbereiten, pruefen]
+#   variables:
+#     # Footer-Anzeige = Build-/Tag-Version (identisch zur npm-/electron-Version).
+#     APP_BUILD_VERSION: $BUILD_VERSION
+#   script:
+#     # libarchive-tools liefert bsdtar für das .pacman-Paket.
+#     - apt-get update && apt-get install -y libarchive-tools
+#     - npm pkg set version="$BUILD_VERSION"
+#     - npm run build
+#     - npx electron-builder --linux --x64 --publish never --config.artifactName='Erfassungsbogen-${BUILD_VERSION}-${os}-${arch}.${ext}'
+#     - node scripts/ensure-update-metadata.cjs linux
+#   artifacts:
+#     paths: [release/]
+#   rules:
+#     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+#
+# build-android:
+#   stage: pruefen
+#   needs: [vorbereiten, pruefen]
+#   # Braucht JDK 21 und das Android SDK; das node:24-Standardimage reicht
+#   # nicht. Welches Image genommen wird, ist eine Entscheidung der Instanz
+#   # (Open CoDE hat eine eigene Registry).
+#   image: <Image mit JDK 21 und Android SDK>
+#   variables:
+#     APP_BUILD_VERSION: $BUILD_VERSION
+#     # ANDROID_KEYSTORE ist eine File-Variable: GitLab legt sie als Datei ab
+#     # und setzt den Pfad in die Variable — genau das erwartet
+#     # android/build.gradle über ANDROID_KEYSTORE_PATH.
+#     ANDROID_KEYSTORE_PATH: $ANDROID_KEYSTORE
+#   script:
+#     - npm run build
+#     - npx cap sync android
+#     - mkdir -p release
+#     - cd android
+#     # versionCode muss pro Release monoton steigen (Minuten seit Epoche).
+#     - ./gradlew assembleRelease -PappVersionCode=$(( $(date -u +%s) / 60 )) -PappVersionName="$BUILD_VERSION"
+#     - cp app/build/outputs/apk/release/app-release.apk "$CI_PROJECT_DIR/release/Erfassungsbogen-$BUILD_VERSION-android.apk"
+#   artifacts:
+#     paths: [release/]
+#   rules:
+#     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+#
+# build-win:
+#   stage: pruefen
+#   needs: [vorbereiten, pruefen]
+#   # Kein Docker: electron-builder braucht für den NSIS-Installer echtes
+#   # Windows. Voraussetzung ist ein Runner mit Windows und dem Tag `windows`.
+#   tags: [windows]
+#   image: null
+#   variables:
+#     APP_BUILD_VERSION: $BUILD_VERSION
+#   script:
+#     - npm ci
+#     - npm pkg set version="$BUILD_VERSION"
+#     - npm run build
+#     # Zwei getrennte Läufe, damit je Architektur ein eigener Installer
+#     # entsteht. ARM64 zuerst: Beide Läufe schreiben dieselbe latest.yml, und
+#     # die soll am Ende (samt Blockmap für differenzielle Updates) auf das
+#     # x64-Paket zeigen — die ARM64-Metadaten legt das Skript danach an.
+#     # ARM64 ist kein Luxus: Auf Snapdragon-Geräten kommt die emulierte
+#     # x64-App nicht an die Kamera, der QR-Scan bliebe dort schwarz.
+#     - npx electron-builder --win --arm64 --publish never --config.artifactName='Erfassungsbogen-${BUILD_VERSION}-${os}-${arch}.${ext}'
+#     - npx electron-builder --win --x64 --publish never --config.artifactName='Erfassungsbogen-${BUILD_VERSION}-${os}-${arch}.${ext}'
+#     - node scripts/ensure-update-metadata.cjs win
+#   artifacts:
+#     paths: [release/]
+#   rules:
+#     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+#
+# build-mac:
+#   stage: pruefen
+#   needs: [vorbereiten, pruefen]
+#   # Braucht einen macOS-Runner. Auf GitHub ist dieser Job seit dem 2026-09-05
+#   # stillgelegt, weil die Signatur auf dem Runner abbricht („security
+#   # set-key-partition-list … process failed 1"); die Ursache sitzt im
+#   # Schlüsselbund des Runners und wandert mit. Vor dem Einschalten hier: erst
+#   # auf dem Runner von Hand signieren, dann automatisieren.
+#   #
+#   # Signiert und notarisiert, sobald CSC_LINK und die Apple-Variablen
+#   # hinterlegt sind: dann startet die .dmg per Doppelklick und die App
+#   # aktualisiert sich selbst. Ohne sie: unsigniert (Gatekeeper: Rechtsklick ->
+#   # Öffnen, kein Auto-Update). Mit CSC_LINK darf
+#   # CSC_IDENTITY_AUTO_DISCOVERY NICHT gesetzt sein, sonst überspringt
+#   # electron-builder die Identitätssuche trotz importiertem Zertifikat.
+#   tags: [macos]
+#   image: null
+#   variables:
+#     APP_BUILD_VERSION: $BUILD_VERSION
+#   script:
+#     - npm ci
+#     - npm pkg set version="$BUILD_VERSION"
+#     - npm run build
+#     - npx electron-builder --mac --publish never --config.artifactName='Erfassungsbogen-${BUILD_VERSION}-${os}-${arch}.${ext}'
+#     - node scripts/ensure-update-metadata.cjs mac
+#   artifacts:
+#     paths: [release/]
+#   rules:
+#     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+#
+# freigabe:
+#   stage: freigabe
+#   # `pruefen` steht mit in der Liste, weil dort die SBOM entsteht, die mit
+#   # veröffentlicht wird. build-win und build-mac fehlen absichtlich, solange
+#   # es für sie keine Runner gibt — sonst wartet das Release auf einen Job, der
+#   # nie startet.
+#   needs: [vorbereiten, pruefen, build-linux, build-android]
+#   before_script: []
+#   cache: {}
+#   script:
+#     # Schritt 1: Dateien in die Generic Package Registry. Ein GitLab-Release
+#     # kann nur auf URLs verweisen, nicht selbst Dateien tragen.
+#     - |
+#       BASIS="${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/erfassungsbogen/${BUILD_VERSION}"
+#       : > links.txt
+#       for datei in release/* sbom.cdx.json; do
+#         [ -f "$datei" ] || continue
+#         name=$(basename "$datei")
+#         curl --fail --silent --show-error --header "JOB-TOKEN: $CI_JOB_TOKEN" \
+#           --upload-file "$datei" "$BASIS/$name"
+#         printf '%s %s\n' "$name" "$BASIS/$name" >> links.txt
+#       done
+#     # Schritt 2: Release anlegen und jede Datei als Asset verlinken.
+#     - |
+#       ARGS=""
+#       while read -r name url; do
+#         ARGS="$ARGS --assets-link {\"name\":\"$name\",\"url\":\"$url\"}"
+#       done < links.txt
+#       release-cli create --name "$BUILD_VERSION" --tag-name "$BUILD_VERSION" $ARGS
+#   rules:
+#     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+#
+# aufraeumen:
+#   stage: freigabe
+#   needs: [freigabe]
+#   before_script: []
+#   cache: {}
+#   # Gegenstück zu cleanup in release.yml: nur die neuesten KEEP Releases
+#   # bleiben online, damit sich nicht endlos Builds ansammeln. Der Aufruf
+#   # entfernt Release und Tag über die GitLab-API; die zugehörigen Pakete in
+#   # der Registry bleiben und wären ein zweiter Schritt.
+#   variables:
+#     KEEP: 10
+#   script:
+#     - apt-get update && apt-get install -y jq
+#     - |
+#       API="${CI_API_V4_URL}/projects/${CI_PROJECT_ID}"
+#       curl --fail --silent --header "PRIVATE-TOKEN: $GITLAB_API_TOKEN" \
+#         "$API/releases?per_page=300" \
+#         | jq -r 'sort_by(.created_at) | reverse | .[].tag_name' \
+#         | tail -n +"$((KEEP + 1))" \
+#         | while read -r tag; do
+#             [ -z "$tag" ] && continue
+#             echo "Entferne Release und Tag $tag"
+#             curl --fail --silent --request DELETE --header "PRIVATE-TOKEN: $GITLAB_API_TOKEN" "$API/releases/$tag"
+#             curl --fail --silent --request DELETE --header "PRIVATE-TOKEN: $GITLAB_API_TOKEN" "$API/repository/tags/$tag"
+#           done
+#   rules:
+#     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
