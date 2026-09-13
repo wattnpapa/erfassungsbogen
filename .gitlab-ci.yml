@@ -1,29 +1,32 @@
 # GitLab-CI für den Open-CoDE-Spiegel (gitlab.opencode.de).
 #
-# Gegenstück zu den GitHub-Actions-Workflows: Der Prüflauf hier bildet
-# .github/workflows/ci.yml Schritt für Schritt nach, der Pages-Job entspricht
-# build-pages/deploy-pages aus .github/workflows/release.yml. Beide Plattformen
-# bauen aus demselben Stand; GitHub ignoriert diese Datei, GitLab ignoriert
-# .github/. Gespiegelt wird nur in eine Richtung (GitHub -> Open CoDE), die
-# Datei gehört also ins GitHub-Repository und reist von dort mit.
+# Gegenstück zu den GitHub-Actions-Workflows: Die Prüfstufe bildet
+# .github/workflows/ci.yml Schritt für Schritt nach, die Paketstufe die
+# Build-Jobs aus .github/workflows/release.yml, der Pages-Job dessen
+# build-pages/deploy-pages. Beide Plattformen bauen aus demselben Stand; GitHub
+# ignoriert diese Datei, GitLab ignoriert .github/. Gespiegelt wird nur in eine
+# Richtung (GitHub -> Open CoDE), die Datei gehört also ins GitHub-Repository
+# und reist von dort mit.
 #
-# Absichtlich NICHT nachgebildet sind die Release-Jobs aus release.yml
-# (prepare/build-win/build-linux/build-android/release):
-#   * Die Build-Version und ihr Git-Tag entstehen auf GitHub. Ein hier erzeugter
-#     Tag würde beim nächsten Spiegellauf überschrieben, und zurückschreiben
-#     kann der Spiegel nicht — er ist eine Lesefassung.
-#   * Die Signaturschlüssel (Apple, Android-Keystore, Windows) liegen als
-#     GitHub-Secrets und haben auf dem Spiegel nichts zu suchen. Unsignierte
-#     Installer wären ein zweiter, schlechterer Download-Weg; Auslieferung und
-#     Auto-Update laufen ausschließlich über GitHub Releases (Arc42 Kap. 2.2).
-# Geprüft wird hier also dasselbe, veröffentlicht nur die Webfassung.
+# Was hier NICHT passiert: veröffentlichen. Die Pakete hängen als
+# Job-Artefakte am Lauf, es entsteht kein GitLab-Release und kein Tag. Der
+# ausgelieferte Stand kommt weiterhin ausschließlich von GitHub Releases, und
+# dort zeigt auch der Auto-Update-Kanal hin (`build.publish` in package.json).
+# Zwei Release-Kanäle mit je eigener Build-Version wären schlimmer als einer.
+# Der Weg dorthin — für den Tag, an dem GitHub abgeschaltet wird — steht
+# auskommentiert am Ende dieser Datei.
 #
 # Einmalige Einrichtung auf Open CoDE:
-#   Deploy -> Pages: Veröffentlichung aktivieren und entscheiden, ob die Seite
-#   öffentlich oder nur für angemeldete Nutzer erreichbar ist („Access
-#   Control"). Die fertige Adresse steht danach ebenda.
+#   * Deploy -> Pages: Veröffentlichung aktivieren und entscheiden, ob die Seite
+#     öffentlich oder nur für angemeldete Nutzer erreichbar ist („Access
+#     Control").
+#   * Für signierte Pakete die Variablen aus dem Abschnitt am Dateiende
+#     hinterlegen. Ohne sie bauen die Jobs unsigniert durch — brauchbar zum
+#     Prüfen, nicht zum Verteilen.
+#   * Für Windows und macOS je einen Runner mit passendem Betriebssystem; ohne
+#     ihn bleiben die beiden Jobs unangetastet (siehe dort).
 
-stages: [pruefen, seite]
+stages: [pruefen, pakete, seite]
 
 default:
   # Volles node-Image (nicht -slim): der Klon braucht git, die Submodule werden
@@ -45,12 +48,18 @@ variables:
   # Volle Historie: die sitemap.xml entsteht im Build und nimmt ihr <lastmod>
   # je Seite aus dem letzten Commit, der sie geändert hat (scripts/sitemap.ts).
   # Ein flacher Klon kennt nur einen Commit; das Skript merkt das und ließe
-  # <lastmod> dann ersatzlos weg.
+  # <lastmod> dann ersatzlos weg. Die Build-Jobs brauchen die Tags außerdem für
+  # die Versionsnummer (Job `version`).
   GIT_DEPTH: "0"
 
+# ---------------------------------------------------------------------------
+# Stufe 1: prüfen
+# ---------------------------------------------------------------------------
+
 # Der Prüflauf, Schritt für Schritt wie in ci.yml. Er läuft auf jedem Zweig und
-# in jedem Merge Request — anders als dort auch auf dem Hauptzweig, denn der
-# Pages-Job hängt an ihm: veröffentlicht wird nur ein geprüfter Stand.
+# in jedem Merge Request — anders als dort auch auf dem Hauptzweig, denn Pakete
+# und Pages hängen an ihm: gebaut und veröffentlicht wird nur ein geprüfter
+# Stand.
 pruefen:
   stage: pruefen
   script:
@@ -96,8 +105,204 @@ e2e:
     paths: [reports]
     expire_in: 7 days
 
+# Eine Build-Version für alle Paket-Jobs, damit Installer, APK und Dateinamen
+# desselben Laufs zusammenpassen.
+#
+# Anders als `prepare` in release.yml legt dieser Job KEINEN Tag an: Der Spiegel
+# ist eine Lesefassung, ein hier erzeugter Tag wäre beim nächsten Spiegellauf
+# weg. Stattdessen wird der Tag benutzt, den GitHub für diesen Commit erzeugt
+# hat und der mitgespiegelt wurde. Ist er noch nicht da — Spiegelung und Release
+# laufen drüben gleichzeitig, der Tag kann Sekunden später eintreffen —, wird
+# dieselbe Form aus der Uhr gebildet und mit dem Kurz-SHA gekennzeichnet. So ist
+# an der Versionsnummer ablesbar, ob ein Paket zu einem GitHub-Release gehört
+# oder ein Zwischenstand vom Spiegel ist.
+version:
+  stage: pruefen
+  cache: {}
+  before_script: []
+  script:
+    - |
+      TAG="$(git tag --points-at "$CI_COMMIT_SHA" | sort -V | tail -n1)"
+      if [ -n "$TAG" ]; then
+        BUILD_VERSION="$TAG"
+      else
+        # Format YYYY.MMDD.HHMM wie in release.yml: zugleich gültiges SemVer
+        # (electron/npm) und CFBundleShortVersionString (iOS), minutengenau und
+        # über Tages-/Jahresgrenzen monoton steigend. Das Suffix macht den
+        # Zwischenstand erkennbar und bleibt SemVer-gültig.
+        Y=$(date -u +%Y)
+        MMDD=$(( 10#$(date -u +%m) * 100 + 10#$(date -u +%d) ))
+        HHMM=$(( 10#$(date -u +%H) * 100 + 10#$(date -u +%M) ))
+        BUILD_VERSION="$Y.$MMDD.$HHMM-spiegel.$CI_COMMIT_SHORT_SHA"
+      fi
+      echo "BUILD_VERSION=$BUILD_VERSION" > version.env
+      echo "APP_BUILD_VERSION=$BUILD_VERSION" >> version.env
+      cat version.env
+  # dotenv statt „job outputs": so sehen alle Paket-Jobs dieselbe Version, ohne
+  # sie neu aus der Uhr zu lesen — zwei Jobs um 10:59:59 und 11:00:00 kämen
+  # sonst auf verschiedene Versionen.
+  artifacts:
+    reports:
+      dotenv: version.env
+
+# ---------------------------------------------------------------------------
+# Stufe 2: Pakete
+#
+# Dieselben electron-builder- und Gradle-Aufrufe wie in release.yml. Die
+# Ergebnisse hängen als Artefakt am Lauf (30 Tage) und gehen nicht in ein
+# Release.
+# ---------------------------------------------------------------------------
+
+.paket:
+  stage: pakete
+  # Wie in release.yml, wo build-* an `check` hängt und dort auch die E2E-Tests
+  # laufen: gebaut wird nur, was den ganzen Prüflauf bestanden hat.
+  needs: [version, pruefen, e2e]
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  artifacts:
+    paths: [release/]
+    expire_in: 30 days
+
+build-linux:
+  extends: .paket
+  script:
+    # libarchive-tools liefert bsdtar für das .pacman-Paket, fakeroot braucht
+    # electron-builder für das .deb (auf dem GitHub-Runner ist beides schon da).
+    - apt-get update && apt-get install -y libarchive-tools fakeroot
+    - npm pkg set version="$BUILD_VERSION"
+    - npm run build
+    - npx electron-builder --linux --x64 --publish never --config.artifactName='Erfassungsbogen-${BUILD_VERSION}-${os}-${arch}.${ext}'
+    - node scripts/ensure-update-metadata.cjs linux
+
+build-android:
+  extends: .paket
+  variables:
+    # SDK und Gradle-Zwischenstand liegen im Projektverzeichnis, damit der Cache
+    # sie aufnehmen kann — sonst lädt jeder Lauf rund ein Gigabyte neu.
+    ANDROID_SDK_ROOT: $CI_PROJECT_DIR/.android-sdk
+    ANDROID_HOME: $CI_PROJECT_DIR/.android-sdk
+    GRADLE_USER_HOME: $CI_PROJECT_DIR/.gradle
+  cache:
+    - key:
+        files: [package-lock.json]
+      paths: [.npm]
+    - key: android-sdk-36
+      paths: [.android-sdk, .gradle/caches, .gradle/wrapper]
+  script:
+    # JDK 21 wie auf dem GitHub-Runner (setup-java, temurin 21).
+    - apt-get update && apt-get install -y openjdk-21-jdk-headless unzip
+    # Android-SDK einmalig einrichten; compileSdk/targetSdk 36 laut
+    # android/variables.gradle.
+    - |
+      if [ ! -d "$ANDROID_SDK_ROOT/platforms/android-36" ]; then
+        mkdir -p "$ANDROID_SDK_ROOT/cmdline-tools"
+        curl -fsSL -o /tmp/cmdline-tools.zip \
+          https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip
+        unzip -q /tmp/cmdline-tools.zip -d "$ANDROID_SDK_ROOT/cmdline-tools"
+        mv "$ANDROID_SDK_ROOT/cmdline-tools/cmdline-tools" "$ANDROID_SDK_ROOT/cmdline-tools/latest"
+        yes | "$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager" --licenses > /dev/null
+        "$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager" \
+          "platform-tools" "platforms;android-36" "build-tools;36.0.0" > /dev/null
+      fi
+    - npm run build
+    - npx cap sync android
+    - mkdir -p release
+    # Signiert nur, wenn ANDROID_KEYSTORE hinterlegt ist (File-Variable:
+    # GitLab legt sie als Datei ab und setzt den Pfad in die Variable — genau
+    # das erwartet android/app/build.gradle über ANDROID_KEYSTORE_PATH). Ohne
+    # sie entsteht app-release-unsigned.apk; der Dateiname sagt es dann auch.
+    - |
+      cd android
+      if [ -n "$ANDROID_KEYSTORE" ]; then
+        export ANDROID_KEYSTORE_PATH="$ANDROID_KEYSTORE"
+      fi
+      # versionCode muss pro Release monoton steigen (Minuten seit Epoche).
+      ./gradlew assembleRelease \
+        -PappVersionCode=$(( $(date -u +%s) / 60 )) \
+        -PappVersionName="$BUILD_VERSION"
+      AUSGABE=app/build/outputs/apk/release
+      if [ -f "$AUSGABE/app-release.apk" ]; then
+        cp "$AUSGABE/app-release.apk" "$CI_PROJECT_DIR/release/Erfassungsbogen-$BUILD_VERSION-android.apk"
+      else
+        cp "$AUSGABE/app-release-unsigned.apk" "$CI_PROJECT_DIR/release/Erfassungsbogen-$BUILD_VERSION-android-unsigniert.apk"
+      fi
+
+# Windows und macOS brauchen je einen Runner mit dem passenden Betriebssystem;
+# electron-builder kann den NSIS-Installer und das .dmg nicht unter Linux
+# erzeugen. Beide Jobs stehen deshalb auf `when: manual` mit `allow_failure`:
+# Gibt es keinen solchen Runner, bleibt der Job einfach unangetastet liegen,
+# statt den Lauf hängen zu lassen oder scheitern zu lassen. Sobald ein Runner
+# dauerhaft bereitsteht, hier `when: manual` und `allow_failure` entfernen —
+# dann laufen sie wie build-linux automatisch mit.
+#
+# Der Runner muss Node 24 und npm mitbringen (das `image` oben gilt nur für
+# Docker-Runner; ein Shell-Runner ignoriert es).
+.paket-fremdes-os:
+  extends: .paket
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      when: manual
+      allow_failure: true
+
+build-win:
+  extends: .paket-fremdes-os
+  tags: [windows]
+  script:
+    - npm pkg set version="$BUILD_VERSION"
+    - npm run build
+    # Zwei getrennte Läufe, damit je Architektur ein eigener Installer
+    # entsteht. ARM64 zuerst: Beide Läufe schreiben dieselbe latest.yml, und die
+    # soll am Ende (samt Blockmap für differenzielle Updates) auf das x64-Paket
+    # zeigen — die ARM64-Metadaten legt das Skript danach an. ARM64 ist kein
+    # Luxus: Auf Snapdragon-Geräten kommt die emulierte x64-App nicht an die
+    # Kamera, der QR-Scan bliebe dort schwarz.
+    - npx electron-builder --win --arm64 --publish never --config.artifactName='Erfassungsbogen-${BUILD_VERSION}-${os}-${arch}.${ext}'
+    - npx electron-builder --win --x64 --publish never --config.artifactName='Erfassungsbogen-${BUILD_VERSION}-${os}-${arch}.${ext}'
+    - node scripts/ensure-update-metadata.cjs win
+
+build-mac:
+  extends: .paket-fremdes-os
+  tags: [macos]
+  script:
+    - npm pkg set version="$BUILD_VERSION"
+    - npm run build
+    # Signiert und notarisiert, sobald CSC_LINK und die Apple-Variablen
+    # hinterlegt sind: dann startet die .dmg per Doppelklick und die App
+    # aktualisiert sich selbst. Ohne sie unsigniert (Gatekeeper: Rechtsklick ->
+    # Öffnen, kein Auto-Update) — dafür muss die Identitätssuche aus sein.
+    # Achtung: Mit CSC_LINK darf CSC_IDENTITY_AUTO_DISCOVERY NICHT gesetzt
+    # sein, sonst überspringt electron-builder die Suche trotz Zertifikat.
+    #
+    # Auf dem GitHub-Runner ist dieser Build seit dem 2026-09-05 stillgelegt,
+    # weil die Signatur dort abbricht („security set-key-partition-list …
+    # process failed 1"). Die Ursache sitzt im Schlüsselbund des Runners und
+    # wandert mit: auf einem eigenen Mac-Runner erst von Hand signieren, dann
+    # diesem Job die Variablen geben.
+    - |
+      if [ -z "$CSC_LINK" ]; then
+        export CSC_IDENTITY_AUTO_DISCOVERY=false
+      fi
+      if [ -n "$APPLE_API_KEY_ID" ] && [ -n "$APPLE_API_KEY_BASE64" ]; then
+        SCHLUESSEL="$CI_PROJECT_DIR/.apple/AuthKey_${APPLE_API_KEY_ID}.p8"
+        mkdir -p "$(dirname "$SCHLUESSEL")"
+        printf '%s' "$APPLE_API_KEY_BASE64" | base64 --decode > "$SCHLUESSEL"
+        export APPLE_API_KEY="$SCHLUESSEL"
+        NOTARIZE=--config.mac.notarize=true
+      fi
+      npx electron-builder --mac --publish never ${NOTARIZE:-} \
+        --config.artifactName='Erfassungsbogen-${BUILD_VERSION}-${os}-${arch}.${ext}'
+    - node scripts/ensure-update-metadata.cjs mac
+
+# ---------------------------------------------------------------------------
+# Stufe 3: Webfassung veröffentlichen
+# ---------------------------------------------------------------------------
+
 pages:
   stage: seite
+  # Hängt nur an der Prüfstufe, nicht an den Paket-Jobs: die Seite soll nicht
+  # darauf warten, dass ein Installer fertig ist.
+  needs: [pruefen]
   # Nur der Hauptzweig wird veröffentlicht. Die Spiegelung schiebt alle Zweige
   # und Tags herüber; ein Feature-Zweig soll die Seite nicht überschreiben.
   rules:
@@ -122,14 +327,34 @@ pages:
     url: $CI_PAGES_URL
 
 # ---------------------------------------------------------------------------
-# Vorbereitet, aber stillgelegt: der Release-Weg für den Tag, an dem GitHub
-# abgeschaltet wird.
+# Variablen für signierte Pakete
 #
-# Alles unterhalb dieser Linie ist auskommentiert und bildet die Jobs aus
-# .github/workflows/release.yml nach (prepare, build-win, build-linux,
-# build-android, build-mac, release, cleanup). Solange GitHub der führende Ort
-# ist, darf davon nichts laufen — zwei Release-Kanäle mit je eigener
-# Build-Version und eigenen Installern wären schlimmer als einer.
+# Ohne sie bauen die Jobs oben unsigniert durch. Alle unter Settings -> CI/CD ->
+# Variables, „Masked" und „Protected":
+#
+#   ANDROID_KEYSTORE           Typ „File" — GitLab legt die Datei ab und setzt
+#                              den Pfad in die Variable. Kein base64-Umweg wie
+#                              in release.yml nötig. Schlüsselalias:
+#                              `erfassungsbogen` (android/app/build.gradle).
+#   ANDROID_KEYSTORE_PASSWORD
+#   CSC_LINK                   macOS-Zertifikat (.p12, base64 oder URL).
+#   CSC_KEY_PASSWORD
+#   APPLE_API_KEY_ID           App-Store-Connect-Key für die Notarisierung.
+#   APPLE_API_ISSUER
+#   APPLE_API_KEY_BASE64
+#
+# Windows-Signierung ist auch auf GitHub nicht eingerichtet; der NSIS-Installer
+# ist dort ebenfalls unsigniert.
+# ---------------------------------------------------------------------------
+
+# ---------------------------------------------------------------------------
+# Vorbereitet, aber stillgelegt: Tag, Release und Aufräumen für den Tag, an dem
+# GitHub abgeschaltet wird.
+#
+# Die Build-Jobs oben laufen schon; was hier fehlt, ist nur das
+# Veröffentlichen. Solange GitHub der führende Ort ist, darf davon nichts
+# laufen — zwei Release-Kanäle mit je eigener Build-Version wären schlimmer als
+# einer.
 #
 # Reihenfolge beim Umschalten (jeder Punkt ist für sich ein eigener Schritt):
 #
@@ -138,7 +363,10 @@ pages:
 #      spiegel-opencode.yml abgeschaltet ist, darf hier etwas committet oder
 #      getaggt werden — vorher reißt der nächste Spiegellauf es weg.
 #   2. `stages:` oben um `freigabe` erweitern.
-#   3. package.json anpassen: `build.publish[0].url` zeigt heute auf
+#   3. Im Job `version` den Tag-Zweig gegen das Anlegen eines eigenen Tags
+#      tauschen (Block `tag-anlegen` unten) — ab dann entsteht die Build-Version
+#      hier und nicht mehr auf GitHub.
+#   4. package.json anpassen: `build.publish[0].url` zeigt heute auf
 #      `https://github.com/wattnpapa/erfassungsbogen/releases/latest/download`.
 #      Das ist die Adresse, die in jeder bereits ausgelieferten Desktop-App
 #      steckt — wer sie umstellt, erreicht damit nur künftige Installationen.
@@ -146,22 +374,11 @@ pages:
 #      müssen also erreichbar bleiben, bis der Bestand durch ist, oder es
 #      braucht ein Übergangs-Release, dessen einziger Zweck die neue Adresse
 #      ist.
-#   4. CI/CD-Variablen auf Open CoDE hinterlegen (Settings -> CI/CD ->
-#      Variables), alle „Masked" und „Protected":
+#   5. Zusätzliche Variablen hinterlegen:
 #        GITLAB_PUSH_TOKEN   Projekt-Access-Token, Rolle Maintainer, Scope
 #                            `write_repository` — der CI_JOB_TOKEN darf nicht
 #                            pushen und kann deshalb keinen Tag anlegen.
 #        GITLAB_API_TOKEN    Scope `api`, nur für das Aufräumen alter Releases.
-#        ANDROID_KEYSTORE    Variable vom Typ „File" (GitLab kann Dateien
-#                            direkt; das base64-Hin-und-Her aus release.yml
-#                            entfällt damit).
-#        ANDROID_KEYSTORE_PASSWORD
-#        CSC_LINK, CSC_KEY_PASSWORD, APPLE_API_KEY_ID, APPLE_API_ISSUER,
-#        APPLE_API_KEY_BASE64   nur für macOS, siehe build-mac.
-#   5. Runner prüfen. Die Linux-Jobs laufen auf jedem Docker-Runner. Windows
-#      und macOS brauchen je einen Runner mit dem passenden Betriebssystem;
-#      stellt die Instanz keinen, bleiben diese beiden Jobs stillgelegt und es
-#      gibt von dort keine .exe und keine .dmg.
 #   6. Die Auslieferungswege in README.md, Arc42 Kap. 2.2/7, ISK 3.6 und DSFA
 #      Abschnitt 3/5.8 nachziehen — dort steht heute überall „ausschließlich
 #      über GitHub Releases".
@@ -175,133 +392,14 @@ pages:
 #
 # ---------------------------------------------------------------------------
 #
-# vorbereiten:
-#   stage: pruefen
-#   cache: {}
-#   before_script: []
-#   script:
-#     # Einheitliches Format YYYY.MMDD.HHMM (z. B. 2026.712.1035): zugleich
-#     # gültiges SemVer (electron/npm) und CFBundleShortVersionString (iOS),
-#     # minutengenau und über Tages-/Jahresgrenzen monoton steigend.
-#     - Y=$(date -u +%Y)
-#     - MMDD=$(( 10#$(date -u +%m) * 100 + 10#$(date -u +%d) ))
-#     - HHMM=$(( 10#$(date -u +%H) * 100 + 10#$(date -u +%M) ))
-#     - echo "BUILD_VERSION=$Y.$MMDD.$HHMM" > version.env
-#     - . ./version.env
-#     # Tag wie in release.yml, über HTTPS mit Projekt-Access-Token.
-#     - git config user.email "ci@$CI_SERVER_HOST"
-#     - git config user.name "GitLab CI"
-#     - git tag "$BUILD_VERSION" "$CI_COMMIT_SHA"
-#     - git push "https://oauth2:${GITLAB_PUSH_TOKEN}@${CI_SERVER_HOST}/${CI_PROJECT_PATH}.git" "$BUILD_VERSION"
-#   # dotenv statt „job outputs": so sehen alle folgenden Jobs dieselbe
-#   # BUILD_VERSION, ohne sie neu aus der Uhr zu lesen — zwei Jobs um 10:59:59
-#   # und 11:00:00 kämen sonst auf verschiedene Versionen.
-#   artifacts:
-#     reports:
-#       dotenv: version.env
-#   rules:
-#     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
-#
-# build-linux:
-#   stage: pruefen
-#   needs: [vorbereiten, pruefen]
-#   variables:
-#     # Footer-Anzeige = Build-/Tag-Version (identisch zur npm-/electron-Version).
-#     APP_BUILD_VERSION: $BUILD_VERSION
-#   script:
-#     # libarchive-tools liefert bsdtar für das .pacman-Paket.
-#     - apt-get update && apt-get install -y libarchive-tools
-#     - npm pkg set version="$BUILD_VERSION"
-#     - npm run build
-#     - npx electron-builder --linux --x64 --publish never --config.artifactName='Erfassungsbogen-${BUILD_VERSION}-${os}-${arch}.${ext}'
-#     - node scripts/ensure-update-metadata.cjs linux
-#   artifacts:
-#     paths: [release/]
-#   rules:
-#     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
-#
-# build-android:
-#   stage: pruefen
-#   needs: [vorbereiten, pruefen]
-#   # Braucht JDK 21 und das Android SDK; das node:24-Standardimage reicht
-#   # nicht. Welches Image genommen wird, ist eine Entscheidung der Instanz
-#   # (Open CoDE hat eine eigene Registry).
-#   image: <Image mit JDK 21 und Android SDK>
-#   variables:
-#     APP_BUILD_VERSION: $BUILD_VERSION
-#     # ANDROID_KEYSTORE ist eine File-Variable: GitLab legt sie als Datei ab
-#     # und setzt den Pfad in die Variable — genau das erwartet
-#     # android/build.gradle über ANDROID_KEYSTORE_PATH.
-#     ANDROID_KEYSTORE_PATH: $ANDROID_KEYSTORE
-#   script:
-#     - npm run build
-#     - npx cap sync android
-#     - mkdir -p release
-#     - cd android
-#     # versionCode muss pro Release monoton steigen (Minuten seit Epoche).
-#     - ./gradlew assembleRelease -PappVersionCode=$(( $(date -u +%s) / 60 )) -PappVersionName="$BUILD_VERSION"
-#     - cp app/build/outputs/apk/release/app-release.apk "$CI_PROJECT_DIR/release/Erfassungsbogen-$BUILD_VERSION-android.apk"
-#   artifacts:
-#     paths: [release/]
-#   rules:
-#     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
-#
-# build-win:
-#   stage: pruefen
-#   needs: [vorbereiten, pruefen]
-#   # Kein Docker: electron-builder braucht für den NSIS-Installer echtes
-#   # Windows. Voraussetzung ist ein Runner mit Windows und dem Tag `windows`.
-#   tags: [windows]
-#   image: null
-#   variables:
-#     APP_BUILD_VERSION: $BUILD_VERSION
-#   script:
-#     - npm ci
-#     - npm pkg set version="$BUILD_VERSION"
-#     - npm run build
-#     # Zwei getrennte Läufe, damit je Architektur ein eigener Installer
-#     # entsteht. ARM64 zuerst: Beide Läufe schreiben dieselbe latest.yml, und
-#     # die soll am Ende (samt Blockmap für differenzielle Updates) auf das
-#     # x64-Paket zeigen — die ARM64-Metadaten legt das Skript danach an.
-#     # ARM64 ist kein Luxus: Auf Snapdragon-Geräten kommt die emulierte
-#     # x64-App nicht an die Kamera, der QR-Scan bliebe dort schwarz.
-#     - npx electron-builder --win --arm64 --publish never --config.artifactName='Erfassungsbogen-${BUILD_VERSION}-${os}-${arch}.${ext}'
-#     - npx electron-builder --win --x64 --publish never --config.artifactName='Erfassungsbogen-${BUILD_VERSION}-${os}-${arch}.${ext}'
-#     - node scripts/ensure-update-metadata.cjs win
-#   artifacts:
-#     paths: [release/]
-#   rules:
-#     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
-#
-# build-mac:
-#   stage: pruefen
-#   needs: [vorbereiten, pruefen]
-#   # Braucht einen macOS-Runner. Auf GitHub ist dieser Job seit dem 2026-09-05
-#   # stillgelegt, weil die Signatur auf dem Runner abbricht („security
-#   # set-key-partition-list … process failed 1"); die Ursache sitzt im
-#   # Schlüsselbund des Runners und wandert mit. Vor dem Einschalten hier: erst
-#   # auf dem Runner von Hand signieren, dann automatisieren.
-#   #
-#   # Signiert und notarisiert, sobald CSC_LINK und die Apple-Variablen
-#   # hinterlegt sind: dann startet die .dmg per Doppelklick und die App
-#   # aktualisiert sich selbst. Ohne sie: unsigniert (Gatekeeper: Rechtsklick ->
-#   # Öffnen, kein Auto-Update). Mit CSC_LINK darf
-#   # CSC_IDENTITY_AUTO_DISCOVERY NICHT gesetzt sein, sonst überspringt
-#   # electron-builder die Identitätssuche trotz importiertem Zertifikat.
-#   tags: [macos]
-#   image: null
-#   variables:
-#     APP_BUILD_VERSION: $BUILD_VERSION
-#   script:
-#     - npm ci
-#     - npm pkg set version="$BUILD_VERSION"
-#     - npm run build
-#     - npx electron-builder --mac --publish never --config.artifactName='Erfassungsbogen-${BUILD_VERSION}-${os}-${arch}.${ext}'
-#     - node scripts/ensure-update-metadata.cjs mac
-#   artifacts:
-#     paths: [release/]
-#   rules:
-#     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+# # Einschub für den Job `version`, Schritt 3 oben: statt den gespiegelten Tag
+# # zu lesen, selbst einen anlegen. Über HTTPS mit Projekt-Access-Token, weil
+# # der CI_JOB_TOKEN nur lesen darf.
+# tag-anlegen:
+#   - git config user.email "ci@$CI_SERVER_HOST"
+#   - git config user.name "GitLab CI"
+#   - git tag "$BUILD_VERSION" "$CI_COMMIT_SHA"
+#   - git push "https://oauth2:${GITLAB_PUSH_TOKEN}@${CI_SERVER_HOST}/${CI_PROJECT_PATH}.git" "$BUILD_VERSION"
 #
 # freigabe:
 #   stage: freigabe
@@ -309,7 +407,7 @@ pages:
 #   # veröffentlicht wird. build-win und build-mac fehlen absichtlich, solange
 #   # es für sie keine Runner gibt — sonst wartet das Release auf einen Job, der
 #   # nie startet.
-#   needs: [vorbereiten, pruefen, build-linux, build-android]
+#   needs: [version, pruefen, build-linux, build-android]
 #   before_script: []
 #   cache: {}
 #   script:

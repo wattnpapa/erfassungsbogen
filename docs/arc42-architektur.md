@@ -210,18 +210,30 @@ wieder.
   eigener Job) und `e2e` (Cucumber über Playwright, eigener Job wegen des
   Browser-Downloads). Anders als `ci.yml` läuft die Stufe auch auf dem
   Hauptzweig, denn der Pages-Job hängt an ihr: veröffentlicht wird nur ein
-  geprüfter Stand. Die Release-Jobs aus `release.yml` laufen dort **nicht**:
-  Build-Version und Tag entstehen auf GitHub und würden vom nächsten
-  Spiegellauf überschrieben, die Signaturschlüssel liegen als GitHub-Secrets,
-  und unsignierte Installer wären ein zweiter, schlechterer Download-Weg. Sie
-  sind aber im unteren Teil von `.gitlab-ci.yml` vollständig **auskommentiert
-  vorbereitet** (`vorbereiten`, `build-linux`, `build-android`, `build-win`,
-  `build-mac`, `freigabe`, `aufraeumen`) — für den Fall, dass GitHub als
-  führender Ort wegfällt. Die Datei nennt dort die Reihenfolge des Umschaltens,
-  die nötigen CI-Variablen und zwei Dinge, die sich nicht wegkonfigurieren
-  lassen: ein GitLab-Release trägt keine Dateien, sondern verweist auf URLs
-  (Installer und SBOM gehen daher zuerst in die Generic Package Registry), und
-  die Update-Adresse in `package.json` steckt in jeder bereits ausgelieferten
+  geprüfter Stand.
+- **Paketbauten auf dem Spiegel:** Die Stufe `pakete` baut dieselben Pakete wie
+  `release.yml` — `build-linux` (deb, pacman) und `build-android` (APK) laufen
+  automatisch, `build-win` (NSIS x64/arm64) und `build-mac` (dmg, zip) stehen auf
+  `when: manual` mit `allow_failure`, weil beide einen Runner mit dem passenden
+  Betriebssystem brauchen; fehlt er, bleibt der Job liegen, statt den Lauf zu
+  reißen. Die Versionsnummer nimmt der Job `version` aus dem mitgespiegelten
+  GitHub-Tag; ist der noch nicht angekommen, bildet er dieselbe Form aus der Uhr
+  und hängt `-spiegel.<SHA>` an — an der Nummer ist also ablesbar, ob ein Paket
+  zu einem GitHub-Release gehört. Signiert wird nur, wenn das Signaturmaterial
+  als CI-Variable auf Open CoDE hinterlegt ist; ohne laufen die Jobs unsigniert
+  durch (die APK heißt dann `…-android-unsigniert.apk`).
+- **Keine Veröffentlichung auf dem Spiegel:** Die Pakete hängen als
+  Job-Artefakte am Lauf (30 Tage). Es entsteht weder ein GitLab-Release noch ein
+  Tag — ein hier erzeugter Tag wäre beim nächsten Spiegellauf weg, und zwei
+  Release-Kanäle mit je eigener Build-Version wären schlimmer als einer.
+  Auslieferung und Auto-Update laufen ausschließlich über GitHub Releases. Der
+  fehlende Rest (`tag-anlegen`, `freigabe`, `aufraeumen`) steht **auskommentiert
+  vorbereitet** am Ende von `.gitlab-ci.yml`, für den Fall, dass GitHub als
+  führender Ort wegfällt; dort ist auch die Reihenfolge des Umschaltens notiert
+  samt der zwei Dinge, die sich nicht wegkonfigurieren lassen: ein
+  GitLab-Release trägt keine Dateien, sondern verweist auf URLs (Installer und
+  SBOM gehen daher zuerst in die Generic Package Registry), und die
+  Update-Adresse in `package.json` steckt in jeder bereits ausgelieferten
   Desktop-App — der Bestand sucht sein Update weiter bei GitHub.
 - **Webfassung auf dem Spiegel (GitLab Pages):** Auf Open CoDE läuft eine eigene
   Pipeline (`.gitlab-ci.yml`, Job `pages`, nur auf dem Standardzweig): sie baut
