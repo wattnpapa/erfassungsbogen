@@ -11,7 +11,7 @@ import {
   PersonalErfassung,
 } from "@bos/eeb-format/model";
 import type { ThwOrtsverband } from "@bos/vokabulare/thw-ov";
-import { stanFahrzeugVorbelegung } from "@bos/vokabulare/thw-stan-fahrzeuge";
+import { fahrzeugVorbelegung, fahrzeugeMitFunkrufOv } from "../../vokabulare/thw-funkrufname-ort";
 import { stanPersonalVorbelegung } from "@bos/vokabulare/thw-stan-personal";
 import { ORG_OPTIONEN, einheitAnzeigename, ersteEbene, vokabularFuer } from "../hilfen";
 import { frageJaNein } from "../dialoge";
@@ -165,6 +165,18 @@ export function SchrittEinheit({ bogen, aendern }: SchrittProps) {
   const ovDaten = useOvDaten(e.organisation === OrganisationsTyp.THW);
   const ovVerzeichnis = ovDaten?.THW_ORTSVERBAENDE ?? [];
 
+  /**
+   * OV aus der Vorschlagsliste übernehmen. Mit dem OV steht auch der
+   * Ortsteil des Funkrufnamens fest — in Berlin bekommen die schon erfassten
+   * Fahrzeuge dabei die OV-Kennzahl („22/51" → „06/22/51").
+   */
+  function ovUebernehmen(i: number, ov: ThwOrtsverband) {
+    if (!ovDaten) return;
+    const einheit = { ...e, hierarchie: ovInHierarchieUebernehmen(ovDaten, e.hierarchie, i, ov) };
+    const fahrzeuge = fahrzeugeMitFunkrufOv(bogen.fahrzeuge, einheit);
+    aendern({ einheit, ...(fahrzeuge === bogen.fahrzeuge ? {} : { fahrzeuge }) });
+  }
+
   // Landesvorlagen (KatS-Beispielbögen der Bundesländer) für Schritt 1.
   const lvModul = useLandesvorlagen();
   const [vorlageBundesland, setVorlageBundesland] = useState("");
@@ -234,7 +246,7 @@ export function SchrittEinheit({ bogen, aendern }: SchrittProps) {
             wert={e.einheitsTyp}
             aendern={(v) => {
               // StAN-Fahrzeuge und -Sollplätze vorbelegen, solange noch nichts erfasst ist
-              const fahrzeuge = bogen.fahrzeuge.length === 0 ? stanFahrzeugVorbelegung(e.organisation, v) : [];
+              const fahrzeuge = bogen.fahrzeuge.length === 0 ? fahrzeugVorbelegung({ ...e, einheitsTyp: v }) : [];
               const personal =
                 bogen.personal.length === 0 && bogen.personalErfassung === PersonalErfassung.VOLLSTAENDIG
                   ? stanPersonalVorbelegung(e.organisation, v)
@@ -322,7 +334,7 @@ export function SchrittEinheit({ bogen, aendern }: SchrittProps) {
                 platzhalter="tippen für Vorschläge…"
                 verzeichnis={ovVerzeichnis}
                 tippen={(name) => setE({ hierarchie: e.hierarchie.map((x, j) => (j === i ? { ...x, name } : x)) })}
-                uebernehmen={(ov) => ovDaten && setE({ hierarchie: ovInHierarchieUebernehmen(ovDaten, e.hierarchie, i, ov) })}
+                uebernehmen={(ov) => ovUebernehmen(i, ov)}
               />
             ) : (
               <input
@@ -343,7 +355,7 @@ export function SchrittEinheit({ bogen, aendern }: SchrittProps) {
                   tippen={(kurz) =>
                     setE({ hierarchie: e.hierarchie.map((x, j) => (j === i ? { ...x, kurz: kurz.toUpperCase() || undefined } : x)) })
                   }
-                  uebernehmen={(ov) => ovDaten && setE({ hierarchie: ovInHierarchieUebernehmen(ovDaten, e.hierarchie, i, ov) })}
+                  uebernehmen={(ov) => ovUebernehmen(i, ov)}
                 />
               ) : (
                 <input

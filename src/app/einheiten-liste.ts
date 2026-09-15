@@ -24,7 +24,7 @@
 
 import { OrganisationsTyp, alleFahrerlaubnisse, type Person } from "@bos/eeb-format/model";
 import type { MeldeEintrag } from "@bos/meldekopf/einsaetze";
-import { FE_EINGESCHLOSSEN, FE_TEXT, einheitAnzeigename, einheitOrt, funkrufText, kennzeichenText, orgLabel, vokabularFuer } from "./hilfen";
+import { FE_EINGESCHLOSSEN, FE_TEXT, einheitAnzeigename, funkrufText, kennzeichenText, orgLabel, vokabularFuer } from "./hilfen";
 
 export type EinheitenSortierung = "name" | "eintreffzeit" | "zug" | "organisation";
 
@@ -48,7 +48,6 @@ function normalisiere(text: string): string {
 /** Durchsuchbarer Text einer Meldung (siehe Modul-Kopf: was auf der Karte steht). */
 function suchtext(e: MeldeEintrag): string {
   const einheit = e.bogen.einheit;
-  const ort = einheitOrt(einheit);
   const teile = [
     einheitAnzeigename(einheit),
     orgLabel(einheit.organisation),
@@ -56,7 +55,7 @@ function suchtext(e: MeldeEintrag): string {
     e.zugEtikett ?? "",
     e.teilEtikett ?? "",
     ...einheit.hierarchie.flatMap((h) => [h.name, h.kurz ?? ""]),
-    ...e.bogen.fahrzeuge.flatMap((f) => [kennzeichenText(f), funkrufText(f, ort)]),
+    ...e.bogen.fahrzeuge.flatMap((f) => [kennzeichenText(f), funkrufText(f, einheit)]),
   ];
   return normalisiere(teile.filter(Boolean).join(" "));
 }

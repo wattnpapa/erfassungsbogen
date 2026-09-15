@@ -43,7 +43,16 @@ import { absenderkarteLaden } from "./absenderkarte";
 import { geraeteSchluesselSicherstellen } from "./geraete-schluessel";
 import { binaerTeilen, istNativ, textTeilen } from "./nativ";
 import { sitzplatzBilanz, type SitzplatzBilanz } from "@bos/vokabulare/sitzplaetze";
-import { einheitAnzeigename, einheitOrt, kennzeichenText, vokabularFuer } from "@bos/meldekopf/darstellung";
+import {
+  einheitAnzeigename,
+  einheitOrt,
+  funkrufText as funkrufTextEinfach,
+  kennzeichenText,
+  vokabText,
+  vokabularFuer,
+} from "@bos/meldekopf/darstellung";
+import { FUNKRUF_KENNWOERTER } from "@bos/vokabulare/thw";
+import { funkrufKennzahlen, funkrufOrtsverband } from "../vokabulare/thw-funkrufname-ort";
 
 // Nach ADR-003 wandert die reine Darstellung in einen eigenen Baustein. Die App
 // importiert sie weiterhin von hier, damit der Umzug an ihren Einstiegen nichts
@@ -59,12 +68,30 @@ export {
   funktionsText,
   kennzeichenText,
   kontaktText,
-  funkrufText,
   einheitOrt,
   einheitAnzeigename,
   datumDeutsch,
   zeitgruppe,
 } from "@bos/meldekopf/darstellung";
+
+/**
+ * Funkrufname eines Fahrzeugs, wie er gesprochen wird. Im Regelfall die
+ * Darstellung des Bausteins („Heros Oldenburg 18/13", Ortsteil = OV-Name).
+ * Unter der Großstadtregelung (vokabulare/thw-funkrufname-ort.ts) ist der
+ * Ortsteil die Stadt und der OV steht als führende Kennzahl davor — „Heros
+ * Berlin 06/22/51". Berlin schreibt diese Zahl zweistellig, Hamburg und Köln
+ * einstellig; die Kennzahlen dahinter (Teileinheit, Fahrzeug) sind ohnehin
+ * zweistellig.
+ */
+export function funkrufText(f: Fahrzeug, einheit: Einheit): string {
+  const fr = f.funkrufname;
+  const ov = funkrufOrtsverband(einheit);
+  if (!fr || !ov || !fr.eigenerStandort) return funkrufTextEinfach(f, einheitOrt(einheit));
+  const kennzahlen = funkrufKennzahlen(fr, ov)
+    .map((t, i) => String(t).padStart(i === 0 ? ov.stellen : 2, "0"))
+    .join("/");
+  return [vokabText(fr.kennwort, FUNKRUF_KENNWOERTER), ov.ort, kennzahlen].filter(Boolean).join(" ");
+}
 
 /**
  * Obergrenze für die ENTPACKTE Größe eines Payloads. Ein echter Bogen liegt

@@ -489,7 +489,7 @@ flowchart LR
 | Capacitor-Hüllen (`android/`, `ios/`) | Native Projekte (Gradle/Xcode), binden Capacitor-Plugins (Kamera-Barcode-Scanner, Filesystem, Share, App) ein. |
 | Build-/Content-Skripte (`scripts/`) | Vite-Plugin-Hilfsfunktionen, Beispielbogen-Generatoren je Bundesland/Organisation, Icon-/Screenshot-Rendering, Sitemap, Kopfnavigation, Bundle-Budget-Prüfung, Kern-Kopien-Prüfung. |
 | E2E-Spezifikation (`features/`) | Gherkin-Szenarien auf Deutsch als ausführbare Anforderungsdokumentation und Regressionsschutz. |
-| App-lokale Vokabulare (`src/vokabulare/`) | Inhalte, die laut `docs/entwicklung.md` bewusst nicht in den Kern gewandert sind, z. B. Landesvorlagen (`import.meta.glob`, eine Vite-Eigenschaft). |
+| App-lokale Vokabulare (`src/vokabulare/`) | Inhalte, die laut `docs/entwicklung.md` bewusst nicht in den Kern gewandert sind, z. B. Landesvorlagen (`import.meta.glob`, eine Vite-Eigenschaft) und die Großstadtregelung der Funkrufnamen (`thw-funkrufname-ort.ts`). |
 | `@bos/eeb-format` | Datenmodell (`model.ts`, 446 Zeilen), Binär-/QR-Codec (`codec.ts`, 1043 Zeilen — größtes Modul im Kern), Ed25519-Signatur (`signatur.ts`, 340 Zeilen), QR-Erzeugung außerhalb des Browsers (`qr-node.ts`). |
 | `@bos/meldekopf` | Reine Logik der Einsatz-Sammlung (`einsaetze.ts`, 752 Zeilen), Aufteilen/Zusammenführen, Melde-Diff (`meldung-diff.ts`, 346 Zeilen), Papierkorb, Text-Darstellung – bekommt die Speicher-Ablage von außen hineingereicht. |
 | `@bos/vokabulare` | Große, organisationsspezifische Nachschlagetabellen: `berufe.ts` (3531 Zeilen), `thw-ov-regionalstruktur.ts` (784) und `thw-ov.ts` (695), `thw.ts`, `thw-funkrufnamen.ts`, `ebenen.ts`, `sitzplaetze.ts`, `dlrg-qualifikationen.ts`. Bewusst modulgenau importierbar. |
@@ -635,7 +635,9 @@ Nachschlagetabellen plus Zugriffsfunktionen, keine Geschäftslogik:
 
 Bewusst **nicht** in diesem Baustein: `landesvorlagen.ts` (bleibt im
 Erfassungsbogen, weil es `import.meta.glob` nutzt und die Beispielbögen
-Produktinhalt statt Vokabular sind) sowie die Zeichen-Symboldaten.
+Produktinhalt statt Vokabular sind), `src/vokabulare/thw-funkrufname-ort.ts`
+(die OV-Kennzahlen der Großstadtregelung; Kandidat für den Kern, sobald der
+Meldekopf sie eigenständig braucht) sowie die Zeichen-Symboldaten.
 
 ### 5.6 Whitebox „@bos/taktische-zeichen" (Level 2)
 
@@ -1429,7 +1431,7 @@ Repository-Analyse, keine offiziellen Angaben des Projekts.
 | Stärke | Personalstärkeangabe einer Einheit in der Schreibweise `x/y/z//g` (Führer/Unterführer/Mannschaft//Gesamt). |
 | Sofortbedarf | Unmittelbarer Bedarf einer eintreffenden Einheit: Verpflegung, Betriebsstoff, Unterbringung, Ruhezeit. |
 | StAN | Stärke- und Ausstattungsnachweisung – die organisationsseitig festgelegte Soll-Ausstattung einer Einheit. |
-| Funkrufname | Standardisierte Sprechfunkbezeichnung eines Fahrzeugs/einer Einheit (z. B. „Heros Oldenburg 18/13"). |
+| Funkrufname | Standardisierte Sprechfunkbezeichnung eines Fahrzeugs/einer Einheit (z. B. „Heros Oldenburg 18/13"). Sitzen mehrere Ortsverbände in einer Stadt, greift die Großstadtregelung: alle sprechen auf den Stadtnamen, der OV steht als führende Kennzahl davor („Heros Berlin 06/22/51"). |
 | Taktisches Zeichen | Genormtes grafisches Symbol zur Kennzeichnung von Einheiten/Fahrzeugen/Einrichtungen im BOS-Umfeld. |
 | Fachgruppe | THW-spezifische Bezeichnung einer spezialisierten Teileinheit (z. B. „FGr K (A)" – Fachgruppe Küche). |
 | Ortsverband (OV) | Regionale Gliederungsebene, insbesondere beim THW; im Datenmodell über `standortRef` referenzierbar. |

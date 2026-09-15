@@ -30,7 +30,6 @@ import {
 import {
   datumDeutsch,
   einheitAnzeigename,
-  einheitOrt,
   funkrufText,
   funktionsText,
   kennzeichenText,
@@ -659,7 +658,7 @@ export function pdfDokument(b: Erfassungsbogen, qr: QrSatz | null, blanko?: Blan
           // beschriftungslose Leerzeile, in der niemand weiß, was hingehört.
           { text: blanko ? "Fahrzeug:" : vokabText(f.typ, vokabularFuer(org, "fahrzeug")) || "Fahrzeug", bold: true },
           { text: blanko ? "Kennzeichen:" : kennzeichenText(f), bold: true },
-          { text: blanko ? "Funkrufname:" : f.funkrufname ? `FuRn: ${funkrufText(f, einheitOrt(b.einheit))}` : "" },
+          { text: blanko ? "Funkrufname:" : f.funkrufname ? `FuRn: ${funkrufText(f, b.einheit)}` : "" },
         ],
         [
           {}, // von rowSpan des Zeichens belegt
