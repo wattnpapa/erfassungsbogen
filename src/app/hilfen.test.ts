@@ -166,6 +166,23 @@ describe("plausibilitaet()", () => {
     expect(transportBilanz(unklar).unbekannt).toBe(1);
   });
 
+  it("nimmt die am Fahrzeug erfasste Sitzplatzzahl vor dem Richtwert des Typs", () => {
+    // FüKomKw: im Vokabular mit 3 Plätzen hinterlegt, es gibt ihn aber auch mit
+    // Doppelkabine (7). Wer das einträgt, soll die Bilanz aufgehen sehen.
+    const personal = Array.from({ length: 7 }, () => person());
+    const richtwert = bogen({ personal, fahrzeuge: [{ typ: { code: 3 } }] });
+    expect(transportBilanz(richtwert)).toMatchObject({ plaetze: 3, fehlend: 4 });
+
+    const erfasst = bogen({ personal, fahrzeuge: [{ typ: { code: 3 }, sitzplaetze: 7 }] });
+    expect(transportBilanz(erfasst)).toMatchObject({ plaetze: 7, fehlend: 0, unbekannt: 0 });
+    expect(fahrzeugHinweise(erfasst).some((h) => /Sitzplätze/.test(h))).toBe(false);
+
+    // Auch für einen Typ ohne hinterlegten Richtwert (MTW gl) ist die Bilanz
+    // damit vollständig — und eine erfasste 0 zählt als Aussage, nicht als Lücke.
+    const ohneRichtwert = bogen({ personal, fahrzeuge: [{ typ: { code: 24 }, sitzplaetze: 0 }] });
+    expect(transportBilanz(ohneRichtwert)).toMatchObject({ plaetze: 0, unbekannt: 0, fehlend: 7 });
+  });
+
   it("warnt bei Fahrzeugen ohne erfassten Kraftfahrer", () => {
     // Die StAN-Vorbelegung setzt bewusst keine Fahrerlaubnisklassen — ohne den
     // Hinweis findet der Kraftfahrer-Filter am Meldekopf die Einheit nicht.

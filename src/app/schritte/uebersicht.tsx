@@ -25,6 +25,7 @@ import {
   textAlsDatei,
   einheitAnzeigename,
   einheitOrt,
+  fahrzeugSitzplaetze,
   funkrufText,
   funktionsText,
   kennzeichenText,
@@ -513,6 +514,7 @@ export function Uebersicht(props: {
               <th>Typ</th>
               <th>Kennzeichen</th>
               {zeigeFunkruf && <th>Funkrufname</th>}
+              <th>Sitzplätze</th>
               <th>StAN</th>
               {zeigeAenderungen && <th>Änderungen</th>}
             </tr>
@@ -523,6 +525,7 @@ export function Uebersicht(props: {
                 <td>{vokabText(f.typ, vokabularFuer(org, "fahrzeug")) || "—"}</td>
                 <td>{kennzeichenText(f)}</td>
                 {zeigeFunkruf && <td>{funkrufText(f, bogen.einheit)}</td>}
+                <td>{fahrzeugSitzplaetze(f, org) ?? "—"}</td>
                 <td>{f.stanKonform == null ? "—" : f.stanKonform ? "ja" : "nein"}</td>
                 {zeigeAenderungen && <td>{f.aenderungen ?? ""}</td>}
               </tr>

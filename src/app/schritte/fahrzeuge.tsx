@@ -4,6 +4,7 @@
 
 import { useRef, useState } from "react";
 import { Fahrzeug, OrganisationsTyp } from "@bos/eeb-format/model";
+import { sitzplaetzeRichtwert } from "@bos/vokabulare/sitzplaetze";
 import { fahrzeugVorbelegung, funkrufOrtsverband } from "../../vokabulare/thw-funkrufname-ort";
 import { fahrzeugHinweise, neuesFahrzeug, transportBilanz, vokabularFuer, vorbelegungGeladen } from "../hilfen";
 import { fahrzeugSymbolSvg, svgDataUrl } from "../taktische-zeichen-bogen";
@@ -18,6 +19,18 @@ import {
   type SchrittProps,
 } from "./bausteine";
 
+/**
+ * Eingabe der Sitzplatzzahl: leer heißt „Richtwert des Typs gilt", nicht null.
+ * Begrenzt auf 0..99 — mehr Plätze hat kein Fahrzeug, und eine verrutschte
+ * Ziffernfolge soll die Transportbilanz nicht stillschweigend aufgehen lassen.
+ */
+function sitzplatzEingabe(eingabe: string): number | undefined {
+  const t = eingabe.trim();
+  if (t === "") return undefined;
+  const n = parseInt(t, 10);
+  return Number.isFinite(n) ? Math.min(99, Math.max(0, n)) : undefined;
+}
+
 function FahrzeugKarte(props: {
   fahrzeug: Fahrzeug;
   org: OrganisationsTyp;
@@ -29,6 +42,7 @@ function FahrzeugKarte(props: {
   entfernen: () => void;
 }) {
   const { fahrzeug: f, org, ovKennzahl, frisch, aendern, entfernen } = props;
+  const richtwert = sitzplaetzeRichtwert(f, vokabularFuer(org, "fahrzeug"));
   const karte = useRef<HTMLDivElement>(null);
   useEinzugsstempel(karte, frisch);
   const set = (patch: Partial<Fahrzeug>) => aendern({ ...f, ...patch });
@@ -49,6 +63,24 @@ function FahrzeugKarte(props: {
             value={f.kennzeichen ?? ""}
             onChange={(e) => set({ kennzeichen: e.target.value })}
             placeholder="OL-FW 2041 / THW-84397"
+          />
+        </Feld>
+        <Feld titel="Sitzplätze" schmal>
+          {/* Leer = Richtwert des Typs. Der Richtwert steht als Platzhalter
+              drin, damit sichtbar ist, womit die Bilanz sonst rechnet — und
+              womit man nicht einverstanden ist, wenn man hier etwas einträgt.
+              Denselben Fahrzeugtyp gibt es in Baulosen mit unterschiedlicher
+              Kabine (FüKomKw 1+2 oder 1+6), deshalb ist der Richtwert nur ein
+              Vorschlag. */}
+          <input
+            type="number"
+            min={0}
+            max={99}
+            inputMode="numeric"
+            value={f.sitzplaetze ?? ""}
+            placeholder={richtwert != null ? `${richtwert} (Richtwert)` : "unbekannt"}
+            title="Sitzplätze inkl. Fahrer/in. Leer lassen = Richtwert des Fahrzeugtyps."
+            onChange={(e) => set({ sitzplaetze: sitzplatzEingabe(e.target.value) })}
           />
         </Feld>
         <Feld titel="Ausstattung nach StAN" schmal>

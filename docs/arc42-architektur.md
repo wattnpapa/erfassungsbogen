@@ -15,6 +15,10 @@
 > **Nachgezogen 2026-09-13:** Datenschutzfrist (neues Kern-Modul
 > `datenschutzfrist.ts`, Frist je Meldung in `einsaetze.ts`, Uhr in
 > `datenschutz-uhr.ts`) — Kapitel 5.3, 5.4 und 8.2.
+>
+> **Nachgezogen 2026-09-15:** Schema-Version 9 — Sitzplatzzahl je Fahrzeug
+> (`Fahrzeug.sitzplaetze`, Flag 32 im Fahrzeug-Byte, Vorrang vor dem Richtwert
+> in `sitzplaetze.ts`) — Kapitel 4.5, 5, 8.4 und 8.5.
 
 ---
 
@@ -415,8 +419,8 @@ Deflate-Kompression und eine alphanumerisch-optimierte Base41-Transportkodierung
 
 ### 4.5 Schema-Evolution statt Breaking Changes
 
-Das Datenformat hat Schema-Version 8 erreicht (v1 THW-spezifisch bis v8 mehrere
-Fahrerlaubnisklassen je Person). Jede App-Version kann Schema `2..SCHEMA_VERSION`
+Das Datenformat hat Schema-Version 9 erreicht (v1 THW-spezifisch bis v9
+abweichende Sitzplatzzahl je Fahrzeug). Jede App-Version kann Schema `2..SCHEMA_VERSION`
 lesen und migriert beim Laden automatisch; beim Schreiben wird stets die
 kleinste tragende Version gewählt (`transportSchemaVersion`).
 
@@ -490,8 +494,8 @@ flowchart LR
 | Build-/Content-Skripte (`scripts/`) | Vite-Plugin-Hilfsfunktionen, Beispielbogen-Generatoren je Bundesland/Organisation, Icon-/Screenshot-Rendering, Sitemap, Kopfnavigation, Bundle-Budget-Prüfung, Kern-Kopien-Prüfung. |
 | E2E-Spezifikation (`features/`) | Gherkin-Szenarien auf Deutsch als ausführbare Anforderungsdokumentation und Regressionsschutz. |
 | App-lokale Vokabulare (`src/vokabulare/`) | Inhalte, die laut `docs/entwicklung.md` bewusst nicht in den Kern gewandert sind, z. B. Landesvorlagen (`import.meta.glob`, eine Vite-Eigenschaft) und die Großstadtregelung der Funkrufnamen (`thw-funkrufname-ort.ts`). |
-| `@bos/eeb-format` | Datenmodell (`model.ts`, 446 Zeilen), Binär-/QR-Codec (`codec.ts`, 1043 Zeilen — größtes Modul im Kern), Ed25519-Signatur (`signatur.ts`, 340 Zeilen), QR-Erzeugung außerhalb des Browsers (`qr-node.ts`). |
-| `@bos/meldekopf` | Reine Logik der Einsatz-Sammlung (`einsaetze.ts`, 752 Zeilen), Aufteilen/Zusammenführen, Melde-Diff (`meldung-diff.ts`, 346 Zeilen), Papierkorb, Text-Darstellung – bekommt die Speicher-Ablage von außen hineingereicht. |
+| `@bos/eeb-format` | Datenmodell (`model.ts`, 456 Zeilen), Binär-/QR-Codec (`codec.ts`, 1053 Zeilen — größtes Modul im Kern), Ed25519-Signatur (`signatur.ts`, 340 Zeilen), QR-Erzeugung außerhalb des Browsers (`qr-node.ts`). |
+| `@bos/meldekopf` | Reine Logik der Einsatz-Sammlung (`einsaetze.ts`, 752 Zeilen), Aufteilen/Zusammenführen, Melde-Diff (`meldung-diff.ts`, 355 Zeilen), Papierkorb, Text-Darstellung – bekommt die Speicher-Ablage von außen hineingereicht. |
 | `@bos/vokabulare` | Große, organisationsspezifische Nachschlagetabellen: `berufe.ts` (3531 Zeilen), `thw-ov-regionalstruktur.ts` (784) und `thw-ov.ts` (695), `thw.ts`, `thw-funkrufnamen.ts`, `ebenen.ts`, `sitzplaetze.ts`, `dlrg-qualifikationen.ts`. Bewusst modulgenau importierbar. |
 | `@bos/taktische-zeichen` | Zuordnungslogik (`zeichen.ts`, 428 Zeilen, dreistufige Auflösung) auf einer wöchentlich automatisch aktualisierten, extern bezogenen Zeichensammlung (`symbole.ts`, 765 Zeilen); kennt den Erfassungsbogen selbst nicht. |
 
@@ -557,8 +561,8 @@ import { bogenZuQrSvg, nodeKompressor } from "@bos/eeb-format/node";     // nur 
 
 | Modul | Verantwortung |
 | --- | --- |
-| `model.ts` (446 Zeilen) | Typdefinitionen (`Erfassungsbogen`, `Einheit`, `Person`, `Fahrzeug`, `Sofortbedarf`, `HierarchieEbene`, …), Enums (`OrganisationsTyp`, `StaerkeRolle`, `Fahrerlaubnis`, `Geschlecht`, `Ernaehrung`, `PersonalErfassung`), abgeleitete Werte (`staerke()`, `unterbringungMWD()`, `verpflegung()`, `ansprechpartner()`), Datums-/Zeitkonvertierung (`EebDatum`, `EebZeitpunkt`, Referenzepoche 2020-01-01), `SCHEMA_VERSION = 8`, `transportSchemaVersion()`, `migriereBogen()`. Importiert laut Kopfkommentar bewusst nichts. |
-| `codec.ts` (1043 Zeilen) | Binärkodierung/-dekodierung, Base41-Transportkodierung, QR-Payload-Aufbau (`EEB2`/`EEB2C`), Segmentierung großer Bögen. Die Kompression wird als `Kompressor`-Funktion hineingereicht (Browser: pako, Node: `node:zlib`). |
+| `model.ts` (456 Zeilen) | Typdefinitionen (`Erfassungsbogen`, `Einheit`, `Person`, `Fahrzeug`, `Sofortbedarf`, `HierarchieEbene`, …), Enums (`OrganisationsTyp`, `StaerkeRolle`, `Fahrerlaubnis`, `Geschlecht`, `Ernaehrung`, `PersonalErfassung`), abgeleitete Werte (`staerke()`, `unterbringungMWD()`, `verpflegung()`, `ansprechpartner()`), Datums-/Zeitkonvertierung (`EebDatum`, `EebZeitpunkt`, Referenzepoche 2020-01-01), `SCHEMA_VERSION = 9`, `transportSchemaVersion()`, `migriereBogen()`. Importiert laut Kopfkommentar bewusst nichts. |
+| `codec.ts` (1053 Zeilen) | Binärkodierung/-dekodierung, Base41-Transportkodierung, QR-Payload-Aufbau (`EEB2`/`EEB2C`), Segmentierung großer Bögen. Die Kompression wird als `Kompressor`-Funktion hineingereicht (Browser: pako, Node: `node:zlib`). |
 | `signatur.ts` (340 Zeilen) | Ed25519-Signatur/-Verifikation, Signaturkette („Gegenzeichnen", `gegengezeichnetePayloadBytes`), Container-Format `EEB2C`, Absenderkarten-Kodierung. |
 | `datenschutzfrist.ts` | Datenschutzfrist: Ende 90 Tage nach `stand`, Übungen ausgenommen (`datenschutzfristEnde`, `datenschutzfristAbgelaufen`, `tageBisAnonymisierung`), Anonymisierung eines Bogens (`bogenAnonymisiert`) und Plausibilitätsprüfung der Geräteuhr gegen Sprünge nach vorn (`uhrPruefen`). Baut nur auf `model` auf; kein Schemafeld. |
 | `qr-node.ts` (50 Zeilen) | QR-Erzeugung außerhalb des Browsers (SVG/PNG), z. B. für die Beispielbogen-Generatorskripte. Einziges Modul, das `node:zlib`, `qrcode` und `Buffer` benutzen darf. |
@@ -629,7 +633,7 @@ Nachschlagetabellen plus Zugriffsfunktionen, keine Geschäftslogik:
 | `thw-funkrufnamen.ts` (227) | Kennwörter und Teile des Funkrufnamens. |
 | `thw-funktionen-ergaenzung.ts` (164) | Funktionen jenseits der StAN-Taschenkarte. |
 | `thw-stan-personal.ts` (138) / `thw-stan-fahrzeuge.ts` (122) | Sollausstattung je Teileinheit. |
-| `sitzplaetze.ts` (110) | Sitzplätze je Fahrzeugtyp, Bilanz gegen die Stärke. |
+| `sitzplaetze.ts` (125) | Sitzplätze je Fahrzeugtyp (Richtwert) und je Fahrzeug (`Fahrzeug.sitzplaetze` schlägt den Richtwert), Bilanz gegen die Stärke. |
 | `dlrg-qualifikationen.ts` (112) | Ausbildungskennzahlen der DLRG. |
 | `ebenen.ts` (73) | Hierarchie-Ebenen je Organisation (THW OV→RB→LV, FW Gemeinde→LK→Bezirk→Land, …). |
 
@@ -1049,11 +1053,11 @@ flowchart TB
 
 ### 8.4 Kompatibilitätskonzept (Schema-Evolution)
 
-- **Schema-Version aktuell 8** (`vendor/eeb-format/src/model.ts`); Historie: v1
+- **Schema-Version aktuell 9** (`vendor/eeb-format/src/model.ts`); Historie: v1
   (THW-spezifisch) → v2 (organisationsübergreifend) → v3 (Ernährungsform je
   Person) → v4 (ein Kennzeichen-Feld) → v5 (Einheitsname in der Hierarchie) → v6
   (Übungs-Kennzeichnung) → v7 (stand minutengenau) → v8 (mehrere
-  Fahrerlaubnisklassen je Person).
+  Fahrerlaubnisklassen je Person) → v9 (abweichende Sitzplatzzahl je Fahrzeug).
 - **Abwärtskompatibilität ist Pflicht:** `decodeBinaer` und
   `bogenLaden`/`migriereBogen` akzeptieren jede Version `2..SCHEMA_VERSION`,
   füllen fehlende Felder mit Defaults, überführen entfallene Felder (Beispiel: v2
@@ -1066,8 +1070,10 @@ flowchart TB
   Schema-Version" abgelehnt, statt eine Übung unmarkiert wie einen echten Einsatz
   anzuzeigen.
 - **Golden-Fixture-Tests** (`vendor/eeb-format/src/codec.migration.test.ts`,
-  `features/fixtures.ts`) frieren einen echten v2-QR-Payload als Konstante ein;
-  diese Bytes dürfen sich nie ändern.
+  `features/fixtures.ts`) frieren echte QR-Payloads als Konstanten ein — einen
+  v2-Bogen und einen v8-Bogen mit zwei Fahrzeugen; diese Bytes dürfen sich nie
+  ändern. Die v8-Fixture sichert speziell den Fahrzeug-Datenstrom ab, in dem v9
+  ein bis dahin unbenutztes Flag-Bit belegt hat.
 - **Bewusste Ausnahme (v4):** das historische THW-Kennzeichen-Sonderformat (Zahl
   statt String) wird beim Decodieren aus QR-Codes nur übersprungen (Feld bleibt
   leer), in JSON-Dateien/Vorlagen dagegen aktiv migriert (84397 → „THW-84397").
@@ -1078,6 +1084,9 @@ flowchart TB
   Namensraum, innerhalb dessen Einheitstyp, Funktionen, Fahrzeugtyp,
   Hierarchie-Ebenen und Qualifikationen als 1-Byte-Codes aufgelöst werden; jeder
   Vokabular-Wert hat einen Freitext-Ausweg (`code 0` + String).
+- **Optionale Felder kosten ein Flag-Bit, nicht ein Byte:** die Sitzplatzzahl je
+  Fahrzeug (ab v9) belegt Bit 32 des Fahrzeug-Flag-Bytes und schreibt nur dann
+  ein zusätzliches Byte, wenn die Einheit vom Richtwert des Typs abweicht.
 - **Bitweise Kodierung häufiger Enums** (Geschlecht, Ernährung, Stärkerolle je 2
   Bit; Fahrerlaubnisklasse 4 Bit), BCD-gepackte Telefonnummern, Datum/Zeit als
   kompakte Ganzzahl seit einem festen Referenzdatum.

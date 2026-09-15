@@ -658,7 +658,16 @@ export function pdfDokument(b: Erfassungsbogen, qr: QrSatz | null, blanko?: Blan
           // beschriftungslose Leerzeile, in der niemand weiß, was hingehört.
           { text: blanko ? "Fahrzeug:" : vokabText(f.typ, vokabularFuer(org, "fahrzeug")) || "Fahrzeug", bold: true },
           { text: blanko ? "Kennzeichen:" : kennzeichenText(f), bold: true },
-          { text: blanko ? "Funkrufname:" : f.funkrufname ? `FuRn: ${funkrufText(f, b.einheit)}` : "" },
+          // Sitzplätze nur, wenn sie am Fahrzeug erfasst sind: der Richtwert
+          // des Typs steht in keiner Akte und hätte auf dem Papier den Rang
+          // einer Zusage, die niemand gegeben hat.
+          {
+            text: blanko
+              ? "Funkrufname:"
+              : [f.funkrufname ? `FuRn: ${funkrufText(f, b.einheit)}` : "", f.sitzplaetze != null ? `Sitzplätze: ${f.sitzplaetze}` : ""]
+                  .filter(Boolean)
+                  .join("\n"),
+          },
         ],
         [
           {}, // von rowSpan des Zeichens belegt

@@ -6,7 +6,7 @@
 import { describe, it, expect } from "vitest";
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { OrganisationsTyp } from "@bos/eeb-format/model";
+import { OrganisationsTyp, PersonalErfassung } from "@bos/eeb-format/model";
 import { SchrittBuehne } from "../../test/schritt-buehne";
 import { neuerBogen, neuesFahrzeug, vokabularFuer } from "../hilfen";
 import { stanFahrzeugVorbelegung } from "@bos/vokabulare/thw-stan-fahrzeuge";
@@ -37,6 +37,29 @@ describe("Schritt Fahrzeuge", () => {
     await nutzer.type(screen.getByLabelText("Kennzeichen"), "OL-FW 2041");
 
     expect(screen.queryByText(/hat noch kein Kennzeichen/)).toBeNull();
+  });
+
+  it("übernimmt eine abweichende Sitzplatzzahl und rechnet die Bilanz damit", async () => {
+    const nutzer = userEvent.setup();
+    // Ein FüKomKw (Richtwert 3) und zwei Personen: Ohne eigene Angabe fehlt
+    // nichts, mit einer 1 fehlt eine Mitfahrgelegenheit.
+    const start = neuerBogen();
+    start.fahrzeuge = [{ typ: { code: 3 } }];
+    start.personal = [];
+    start.staerkeManuell = { fuehrer: 0, unterfuehrer: 0, mannschaft: 2, gesamt: 2 };
+    start.personalErfassung = PersonalErfassung.NUR_STAERKE;
+    render(<SchrittBuehne komponente={SchrittFahrzeuge} bogen={start} />);
+
+    const feld = screen.getByLabelText("Sitzplätze") as HTMLInputElement;
+    // Der Richtwert des Typs steht als Platzhalter drin, nicht als Wert — sonst
+    // wäre nicht mehr zu erkennen, was die Einheit selbst geprüft hat.
+    expect(feld.value).toBe("");
+    expect(feld.placeholder).toBe("3 (Richtwert)");
+    expect(screen.getByText(/Sitzplätze:/).textContent).toMatch(/3 für 2 Personen/);
+
+    await nutzer.type(feld, "1");
+
+    expect(screen.getByText(/1 brauchen eine andere Mitfahrgelegenheit/)).toBeDefined();
   });
 
   it("behält beim Tippen der Kennzahlen das Trennzeichen", async () => {

@@ -42,7 +42,7 @@ import { gegengezeichnetePayloadBytes, signiertePayloadBytes } from "@bos/eeb-fo
 import { absenderkarteLaden } from "./absenderkarte";
 import { geraeteSchluesselSicherstellen } from "./geraete-schluessel";
 import { binaerTeilen, istNativ, textTeilen } from "./nativ";
-import { sitzplatzBilanz, type SitzplatzBilanz } from "@bos/vokabulare/sitzplaetze";
+import { sitzplaetzeFuer, sitzplatzBilanz, type SitzplatzBilanz } from "@bos/vokabulare/sitzplaetze";
 import {
   einheitAnzeigename,
   einheitOrt,
@@ -488,10 +488,18 @@ export async function bogenLaden(datei: File): Promise<Erfassungsbogen> {
 // ------------------------------------------------------ Plausibilitätsprüfung
 
 /**
+ * Sitzplätze eines Fahrzeugs im Kontext des Bogens: die am Fahrzeug erfasste
+ * Zahl, sonst der Richtwert des Typs. `undefined` = unbekannt.
+ */
+export function fahrzeugSitzplaetze(f: Fahrzeug, org: OrganisationsTyp): number | undefined {
+  return sitzplaetzeFuer(f, vokabularFuer(org, "fahrzeug"));
+}
+
+/**
  * Transportbilanz des Bogens: Sitzplätze aller erfassten Fahrzeuge gegen die
- * Gesamtstärke. Sitzplatzzahlen sind Richtwerte je Fahrzeugtyp (s.
- * vokabulare/sitzplaetze.ts); Fahrzeuge ohne hinterlegte Zahl machen die
- * Bilanz unvollständig, dann wird bewusst nicht gewarnt.
+ * Gesamtstärke. Ohne eigene Angabe am Fahrzeug gilt der Richtwert des Typs
+ * (s. vokabulare/sitzplaetze.ts); Fahrzeuge ohne beides machen die Bilanz
+ * unvollständig, dann wird bewusst nicht gewarnt.
  */
 export function transportBilanz(b: Erfassungsbogen): SitzplatzBilanz {
   const tabelle = vokabularFuer(b.einheit.organisation, "fahrzeug");
@@ -520,7 +528,8 @@ export function fahrzeugHinweise(b: Erfassungsbogen): string[] {
     // das gehört dann in „Sonstiges" — der Meldekopf muss es wissen.
     hinweise.push(
       `Sitzplätze: ${bilanz.plaetze} in den erfassten Fahrzeugen für ${bilanz.benoetigt} Personen — ` +
-        `${bilanz.fehlend} brauchen eine andere Mitfahrgelegenheit (Richtwerte je Fahrzeugtyp).`,
+        `${bilanz.fehlend} brauchen eine andere Mitfahrgelegenheit (Richtwerte je Fahrzeugtyp, ` +
+        `soweit am Fahrzeug nichts anderes eingetragen ist).`,
     );
   }
   return hinweise;

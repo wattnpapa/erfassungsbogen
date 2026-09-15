@@ -57,6 +57,7 @@ import {
   datumDeutsch,
   einheitAnzeigename,
   einheitOrt,
+  fahrzeugSitzplaetze,
   funkrufText,
   kontaktText,
   orgLabel,
@@ -133,6 +134,7 @@ const SPALTEN = [
   "Fahrzeugtyp",
   "Kennzeichen",
   "Funkrufname",
+  "Sitzplätze",
   "StAN-konform",
   "Änderungen/Sondergerät",
 ] as const;
@@ -305,6 +307,9 @@ function fahrzeugSatz(b: Erfassungsbogen, k: Kontext, f: Fahrzeug, nr: number): 
     Fahrzeugtyp: vokabText(f.typ, vokabularFuer(b.einheit.organisation, "fahrzeug"), "name"),
     Kennzeichen: f.kennzeichen ?? "",
     Funkrufname: funkrufText(f, b.einheit),
+    // Erfasste Zahl, sonst Richtwert des Typs; ohne beides bleibt die Zelle
+    // leer — eine 0 hieße hier „fährt niemanden mit" und wäre eine Behauptung.
+    "Sitzplätze": fahrzeugSitzplaetze(f, b.einheit.organisation) ?? "",
     // undefined = Frage für diesen Fahrzeugtyp nicht anwendbar → leer lassen.
     "StAN-konform": f.stanKonform == null ? "" : jaNein(f.stanKonform),
     "Änderungen/Sondergerät": f.aenderungen ?? "",

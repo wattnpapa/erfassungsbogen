@@ -1,7 +1,8 @@
 # Datenmodell Einheiten-Erfassungsbogen (EEB)
 
-**Stufe 1** — Datenmodell und QR-Code-Kodierung. Stand: 2026-08-05, **Schema-Version 8**
-(v8 = mehrere Fahrerlaubnisklassen je Person `weitereFahrerlaubnisse`; v7 = `stand`
+**Stufe 1** — Datenmodell und QR-Code-Kodierung. Stand: 2026-09-15, **Schema-Version 9**
+(v9 = abweichende Sitzplatzzahl je Fahrzeug `Fahrzeug.sitzplaetze`;
+v8 = mehrere Fahrerlaubnisklassen je Person `weitereFahrerlaubnisse`; v7 = `stand`
 minutengenau als Zeitpunkt statt Kalendertag; v6 = Übungs-Kennzeichnung
 `uebung`; v5 = Einheitsname in der Hierarchie; v4 = ein einziges Kennzeichen-Feld;
 v3 = Ernährungsform je Person; v2 = organisationsübergreifend; v1 war THW-spezifisch).
@@ -32,6 +33,12 @@ nicht gegenseitig einschließen) fordert Schema 8: die weiteren Klassen stehen
 als Varint-Zähler + je 1 Byte hinter dem Ernährungs-Byte. Bögen, in denen jede
 Person höchstens eine Klasse hat, bleiben bei Schema ≤ 7 lesbar (der Zähler
 wird dann gar nicht geschrieben).
+
+Ein Fahrzeug mit eigener Sitzplatzzahl fordert Schema 9: die Zahl steht als
+1 Byte am Ende des Fahrzeug-Blocks, angekündigt durch Flag 32 im Fahrzeug-Byte
+(Flag 16 ist durch das alte THW-Kennzeichen belegt, siehe unten). Bögen, in
+denen jedes Fahrzeug beim Richtwert seines Typs bleibt, kosten kein Byte und
+bleiben für ältere App-Stände lesbar.
 
 **Bewusste Ausnahme (v4):** Bis v3 stand das THW-Kennzeichen als Zahl im QR-Code
 (Flag 16 im Fahrzeug-Byte). Dieses Sonderformat ist entfallen; es gibt nur noch ein
@@ -209,6 +216,7 @@ ausgeschriebene Hierarchie der Normalfall.
 | funkrufname | `Funkrufname` | Kennwort + Standort-Flag + Teile `[18,13]` bzw. `[11,48,1]`. THW: bei der StAN-Fahrzeug-Vorbelegung aus der Funkrufnamenregelung (Taschenkarte, `vendor/bos-vokabulare/src/thw-funkrufnamen.ts`) vorbelegt — Teileinheit-Zahl aus dem Einheitstyp (1. Zug/TZ), Fahrzeug-Zahl je Fahrzeug; editierbar |
 | stanKonform | bool? | „Ausstattung nach StAN/Norm" — `undefined` = Frage nicht anwendbar (z. B. Fremdorganisation) |
 | aenderungen | string | Freitext, meist leer |
+| sitzplaetze | number? | ab Schema 9: Sitzplätze inkl. Fahrer/in, wenn sie vom Richtwert des Typs abweichen (FüKomKw mit Doppelkabine: 7 statt 3). Fehlt = Richtwert aus `vendor/bos-vokabulare/src/sitzplaetze.ts`; die Transportbilanz rechnet mit der erfassten Zahl zuerst |
 
 ### Sofortbedarf
 
