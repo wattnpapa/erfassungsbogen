@@ -911,6 +911,25 @@
     .eintrag-kopf { padding-bottom: var(--r-3); border-bottom: var(--strich) solid var(--linie-fein); }
     .eintrag-kopf > .entfernen { float: none; margin-left: auto; }
     .eintrag-kopf + * { margin-top: var(--r-2); }
+    /* Umsortieren (siehe SortierKnoepfe in personal.tsx): Pfeile statt Ziehen,
+       weil der Bogen am Einsatzort auf dem Telefon ausgefüllt wird. Die Knöpfe
+       tragen nur ein Zeichen und dürfen trotzdem nicht kleiner als ein Finger
+       sein — daher feste Breite statt Text-Padding. Sie sitzen rechts neben den
+       Feldern, vor dem Löschknopf: erst die Ordnung, dann der Abgang. */
+    .sortieren { display: inline-flex; gap: 0.25rem; }
+    .sortieren > button { min-width: calc(2.25rem + var(--ziel)); padding: 0.25rem; line-height: 1; }
+    .sortieren > button:disabled { opacity: 0.4; }
+    .eintrag-kopf > .sortieren { margin-left: auto; }
+    .eintrag-kopf > .sortieren + .entfernen { margin-left: var(--r-2); }
+    .sortier-spalte { white-space: nowrap; }
+    /* Wer der Empfänger anruft, steht nicht im Bogen, sondern in der
+       Reihenfolge: die erste Person. Die Marke sagt das an der Karte, die es
+       betrifft — leise, weil sie neben jedem Namen einmal steht. */
+    .ansprech-marke {
+      align-self: center; padding: 0.15rem 0.5rem;
+      border: var(--strich) solid var(--linie); border-radius: var(--radius);
+      color: var(--text-2); font-size: var(--t-xs);
+    }
     /* Zwischen zwei Einträgen muss mehr Luft stehen als zwischen zwei Gruppen
        innerhalb eines Eintrags — sonst verschwimmt die Liste zur Fläche. */
     .karte.eintrag { margin-bottom: var(--r-5); }

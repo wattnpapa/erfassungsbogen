@@ -356,6 +356,23 @@ export function vorbelegungGeladen<T>(liste: T[], vorlage: T[]): boolean {
 }
 
 /**
+ * Eintrag einer Liste an eine andere Stelle setzen — die Reihenfolge ist in
+ * diesem Bogen keine Anzeigefrage, sondern Inhalt: die erste Person gilt als
+ * Ansprechpartner/in (PDF, Meldekopf), und wer die Vertretung heute fährt,
+ * steht bei jedem Einsatz woanders in der Liste.
+ *
+ * Indizes außerhalb der Liste geben sie unverändert zurück: die Knöpfe am
+ * Rand sind zwar gesperrt, ein Tastaturweg darf daran aber nicht scheitern.
+ */
+export function verschoben<T>(liste: readonly T[], von: number, nach: number): T[] {
+  const kopie = [...liste];
+  if (von === nach || von < 0 || nach < 0 || von >= kopie.length || nach >= kopie.length) return kopie;
+  const [eintrag] = kopie.splice(von, 1);
+  kopie.splice(nach, 0, eintrag!);
+  return kopie;
+}
+
+/**
  * Zeitstempel im NATO-Format (DTG ohne Zonenbuchstaben): Tag, Stunde, Minute,
  * Monatskürzel, Jahr — „102035aug26" für den 10. August 2026, 20:35 Ortszeit.
  * Steht in Dateinamen vor dem Einheitsnamen, damit mehrere Ausgaben derselben
