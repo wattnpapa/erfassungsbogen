@@ -5,9 +5,9 @@
 
 import { useEffect, useRef, useState, type ChangeEvent, type ReactNode, type RefObject } from "react";
 import { staerke, type Erfassungsbogen } from "@bos/eeb-format/model";
-import { istNativ, textTeilen } from "./nativ";
+import { istNativ, linkTeilen, shareSheetVerfuegbar, textTeilen } from "./nativ";
 import { fehlerText } from "./nachladen";
-import { blobAlsDownload, einheitOrt, migriereBogen, orgLabel, vokabText, vokabularFuer } from "./hilfen";
+import { blobAlsDownload, bogenVollUrl, einheitAnzeigename, einheitOrt, migriereBogen, orgLabel, vokabText, vokabularFuer } from "./hilfen";
 import { einheitSymbolSvg, svgDataUrl } from "./taktische-zeichen-bogen";
 import { nutzungsKanal, statistikAbgewaehlt, statistikAbwaehlen } from "./statistik";
 import { AnzeigeSchalter } from "./anzeige-schalter";
@@ -130,6 +130,16 @@ async function beispielPdf(datei: string, url: string): Promise<void> {
   await pdfErzeugen(await beispielKopie(url), `${datei}.pdf`);
 }
 
+/**
+ * Beispielbogen laden und daraus den Bogen-Link erzeugen — dieselbe Voll-URL,
+ * die auch im Bogen selbst unter „Link teilen" steht: Sie trägt den kompletten
+ * signierten Bogen im Fragment und öffnet ihn beim Antippen in der App.
+ */
+async function beispielLinkUrl(url: string): Promise<{ link: string; titel: string }> {
+  const bogen = await beispielKopie(url);
+  return { link: await bogenVollUrl(bogen), titel: `Erfassungsbogen ${einheitAnzeigename(bogen.einheit)}` };
+}
+
 /** Einheitstyp im Vokabular der Organisation („Betreuungsgruppe (BTGr)"). */
 function einheitsTypText(b: Erfassungsbogen): string {
   return vokabText(b.einheit.einheitsTyp, vokabularFuer(b.einheit.organisation, "einheitstyp"), "name");
@@ -173,6 +183,15 @@ function IconPdf() {
       <path d="M14 3v4.5h4.5" />
       <path d="M12 11v5" />
       <path d="m9.75 13.75 2.25 2.25 2.25-2.25" />
+    </svg>
+  );
+}
+
+function IconLink() {
+  return (
+    <svg className="knopf-icon" viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M10.5 13.5a4 4 0 0 0 5.66 0l3-3a4 4 0 0 0-5.66-5.66l-1.5 1.5" />
+      <path d="M13.5 10.5a4 4 0 0 0-5.66 0l-3 3a4 4 0 0 0 5.66 5.66l1.5-1.5" />
     </svg>
   );
 }
@@ -356,6 +375,9 @@ export function Fusszeile({ onBogenOeffnen, kompakt = false }: {
   // Dateiname des Bogens, dessen PDF gerade entsteht (leer = keiner läuft).
   const [beispielLaeuft, setBeispielLaeuft] = useState("");
   const [beispielFehler, setBeispielFehler] = useState("");
+  // Datei, deren Link gerade in der Zwischenablage liegt — die Zeile quittiert
+  // das kurz selbst, statt dafür einen Dialog aufzumachen.
+  const [beispielKopiert, setBeispielKopiert] = useState("");
   // Der Dialog lädt die Bögen des offenen Ordners nach, um Einheit, Herkunft
   // und Stärke in der Tabelle zu zeigen. Die Tabelle rendert ausschließlich aus
   // `beispielDaten` (URL → Bogen) — der Modul-Cache ist nur die Abkürzung beim
@@ -441,6 +463,36 @@ export function Fusszeile({ onBogenOeffnen, kompakt = false }: {
       await beispielPdf(datei, url);
     } catch (err) {
       setBeispielFehler(`PDF konnte nicht erzeugt werden: ${fehlerText(err)}`);
+    } finally {
+      setBeispielLaeuft("");
+    }
+  }
+
+  /**
+   * Link zum Beispielbogen weitergeben: Share-Sheet, wo es eins gibt (App,
+   * mobiler Browser), sonst in die Zwischenablage. Fehlt beides, steht der Link
+   * zum Markieren im Hinweis. Derselbe Weg wie „Link teilen" im Bogen selbst.
+   */
+  async function beispielLinkHolen(datei: string, url: string) {
+    setBeispielFehler("");
+    setBeispielKopiert("");
+    setBeispielLaeuft(datei);
+    try {
+      const { link, titel } = await beispielLinkUrl(url);
+      if (shareSheetVerfuegbar()) {
+        if (istNativ()) await linkTeilen(titel, link);
+        else await navigator.share({ title: titel, text: titel, url: link });
+      } else if (navigator.clipboard) {
+        await navigator.clipboard.writeText(link);
+        setBeispielKopiert(datei);
+        window.setTimeout(() => setBeispielKopiert((stand) => (stand === datei ? "" : stand)), 3000);
+      } else {
+        await zeigeHinweis({ titel: "Bogen-Link", text: "Zum Weitergeben markieren und kopieren:", kopiertext: link });
+      }
+    } catch (err) {
+      // Abbruch im Share-Dialog ist kein Fehler.
+      if (err instanceof Error && err.name === "AbortError") return;
+      setBeispielFehler(`Link konnte nicht erzeugt werden: ${fehlerText(err)}`);
     } finally {
       setBeispielLaeuft("");
     }
@@ -754,7 +806,9 @@ export function Fusszeile({ onBogenOeffnen, kompakt = false }: {
           Wasserzeichen „ÜBUNG". <strong>Anzeigen</strong>{" "}
           öffnet den Bogen in der App, als wäre er gerade gescannt worden;{" "}
           <strong>PDF</strong> erzeugt ihn im aktuellen Layout – die eingebetteten
-          QR-Codes lassen sich direkt mit der App scannen.
+          QR-Codes lassen sich direkt mit der App scannen. <strong>Link</strong>{" "}
+          gibt den Bogen-Link weiter (Share-Sheet, sonst Zwischenablage): Er trägt
+          den kompletten Bogen und öffnet ihn beim Antippen in der App.
         </p>
         {beispielPfad.length > 0 && (
           <p>
@@ -856,6 +910,13 @@ export function Fusszeile({ onBogenOeffnen, kompakt = false }: {
                           >
                             <IconPdf />
                             PDF
+                          </button>
+                          <button type="button"
+                            disabled={beispielLaeuft !== ""}
+                            onClick={() => void beispielLinkHolen(datei, url)}
+                          >
+                            <IconLink />
+                            {beispielKopiert === datei ? "Kopiert" : "Link"}
                           </button>
                         </span>
                       </td>

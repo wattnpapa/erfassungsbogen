@@ -1682,7 +1682,7 @@
     .beispiel-einheit { display: flex; align-items: center; gap: 0.5rem; }
     .beispiel-einheit > img { height: 1.9rem; width: auto; flex: 0 0 auto; }
     .beispiel-einheit > span { min-width: 0; }
-    .beispiel-aktionen { display: flex; gap: 0.4rem; white-space: nowrap; }
+    .beispiel-aktionen { display: flex; flex-wrap: wrap; gap: 0.4rem; white-space: nowrap; }
     /* Zeilen-Aktionen: echte Knöpfe, aber schmaler als die Seitenaktionen —
        zwei davon müssen in eine Tabellenzelle passen. Die Höhe bleibt beim
        Touch-Ziel (var(--ziel)), die Breite spart nur das Innenmaß. */
@@ -1872,8 +1872,11 @@
       background: var(--flaeche); color: var(--text); font-size: var(--t-m);
     }
     /* Dialoge mit Tabelle (Beispielbögen) brauchen mehr Breite als die
-       Textdialoge — auf schmalen Geräten greift wie gehabt die Viewport-Grenze. */
-    dialog.breit { width: min(50rem, calc(100vw - 2rem)); }
+       Textdialoge: 80 % der Seitenbreite, damit die vier Spalten samt
+       Zeilen-Aktionen nebeneinander passen. Der max()-Anteil hält den Dialog
+       auf kleinen Fenstern so breit wie bisher (80 % wären dort unnötig
+       schmal), die Viewport-Grenze deckelt ihn wie gehabt. */
+    dialog.breit { width: min(calc(100vw - 2rem), max(80vw, 34rem)); }
     dialog::backdrop { background: rgba(0, 0, 0, 0.45); }
     /* Dialoge steigen kurz ein (Fond blendet mit), damit die Überlagerung als
        Ebene ÜBER dem Formular lesbar ist. Das Schließen bleibt schlagartig:

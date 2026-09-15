@@ -242,6 +242,21 @@ export async function qrErzeugen(b: Erfassungsbogen, herkunft?: Uint8Array | nul
 }
 
 /**
+ * Nur der Textlink zum Bogen — dieselbe Voll-URL wie {@link QrSatz.vollUrl},
+ * aber ohne die QR-Bilder. Für Wege, die allein den Link brauchen (kopieren,
+ * ins Share-Sheet geben), spart das je Bogen das Rendern der Codes.
+ */
+export async function bogenVollUrl(b: Erfassungsbogen): Promise<string> {
+  const payload = await signiertePayloadBytes(
+    b,
+    browserKompressor,
+    await geraeteSchluesselSicherstellen(),
+    absenderkarteLaden(),
+  );
+  return EEB_URL_PREFIX + base64UrlKodieren(payload);
+}
+
+/**
  * Steckt in `herkunft` genau der Bogen, der hier offen liegt? Nur dann darf die
  * fremde Signatur mitreisen — sie deckt jene Bytes, nicht die bearbeiteten.
  *

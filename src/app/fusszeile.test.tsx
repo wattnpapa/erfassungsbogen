@@ -160,3 +160,34 @@ describe("Geräteschlüssel neu erzeugen", () => {
     expect(schluessel()).toBe(alt);
   });
 });
+
+/**
+ * „Link" in der Beispielbogen-Zeile: Ohne Share-Sheet (jsdom hat keins) geht der
+ * Link in die Zwischenablage. Geprüft wird, dass dort wirklich ein App-Link mit
+ * Nutzlast landet — nicht die Beispiel-JSON-URL, aus der er entsteht. Die
+ * Zwischenablage stellt userEvent selbst, gelesen wird sie darum über ihre
+ * eigene API.
+ */
+describe("Beispielbogen-Link kopieren", () => {
+  it("legt den Bogen-Link in die Zwischenablage", async () => {
+    const bogenJson = JSON.stringify({ ...neuerBogen(), uebung: true });
+    const echtesFetch = globalThis.fetch;
+    globalThis.fetch = async () => new Response(bogenJson, { headers: { "content-type": "application/json" } });
+    const nutzer = userEvent.setup();
+    try {
+      buehne();
+      await nutzer.click(screen.getByRole("button", { name: "Beispielbögen" }));
+      const dialog = await screen.findByRole("dialog", { name: "Beispielbögen" });
+      await nutzer.click(within(dialog).getByRole("button", { name: /^THW/ }));
+      const knoepfe = await within(dialog).findAllByRole("button", { name: "Link" }, { timeout: 15000 });
+      await nutzer.click(knoepfe[0]!);
+
+      await screen.findByRole("button", { name: "Kopiert" }, { timeout: 15000 });
+      const kopiert = await navigator.clipboard.readText();
+      expect(kopiert.startsWith("https://erfassungsbogen.app/#")).toBe(true);
+      expect(kopiert.length).toBeGreaterThan("https://erfassungsbogen.app/#".length + 20);
+    } finally {
+      globalThis.fetch = echtesFetch;
+    }
+  }, 20000);
+});
