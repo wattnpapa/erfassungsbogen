@@ -304,7 +304,7 @@ function fahrzeugSatz(b: Erfassungsbogen, k: Kontext, f: Fahrzeug, nr: number): 
     ...kontextFelder(b, k, SATZART_FAHRZEUG, nr),
     Fahrzeugtyp: vokabText(f.typ, vokabularFuer(b.einheit.organisation, "fahrzeug"), "name"),
     Kennzeichen: f.kennzeichen ?? "",
-    Funkrufname: funkrufText(f, einheitOrt(b.einheit)),
+    Funkrufname: funkrufText(f, b.einheit),
     // undefined = Frage für diesen Fahrzeugtyp nicht anwendbar → leer lassen.
     "StAN-konform": f.stanKonform == null ? "" : jaNein(f.stanKonform),
     "Änderungen/Sondergerät": f.aenderungen ?? "",

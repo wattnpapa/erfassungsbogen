@@ -24,7 +24,6 @@ import {
   datumDeutsch,
   zeitgruppe,
   einheitAnzeigename,
-  einheitOrt,
   funkrufText,
   funktionsText,
   kennzeichenText,
@@ -901,7 +900,6 @@ function Zaehlwert({ wert }: { wert: number }) {
  */
 function BogenDetails({ bogen }: { bogen: Erfassungsbogen }) {
   const org = bogen.einheit.organisation;
-  const standort = einheitOrt(bogen.einheit);
   const s = staerke(bogen);
   const mwd = unterbringungMWD(bogen);
   const vp = verpflegung(bogen);
@@ -980,7 +978,7 @@ function BogenDetails({ bogen }: { bogen: Erfassungsbogen }) {
                 <tr key={i}>
                   <td>{vokabText(f.typ, vokabularFuer(org, "fahrzeug")) || "—"}</td>
                   <td>{kennzeichenText(f) || "—"}</td>
-                  <td>{funkrufText(f, standort) || "—"}</td>
+                  <td>{funkrufText(f, bogen.einheit) || "—"}</td>
                   <td>{f.stanKonform == null ? "—" : f.stanKonform ? "ja" : "nein"}</td>
                   <td>{f.aenderungen ?? ""}</td>
                 </tr>

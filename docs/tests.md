@@ -27,6 +27,9 @@ Dateien liegen neben dem Code (`src/**/*.test.ts`). Schwerpunkt:
   (Stärke, Unterbringung M/W/D, Verpflegung, Ansprechpartner).
 - **`src/app/hilfen.test.ts`** — Anzeige-Helfer (Funktions-/Kennzeichen-/
   Funkruftext), Plausibilitätsprüfung, JSON-Migration.
+- **`src/vokabulare/thw-funkrufname-ort.test.ts`** — Berliner Funkrufnamen:
+  OV-Erkennung über Kürzel und Name, führende OV-Kennzahl in Vorbelegung und
+  Anzeige („Heros Berlin 06/22/51").
 
 Nicht durch Unit-Tests abgedeckt (planmäßig E2E/manuell): QR-Rendering
 (`qr-node.ts`), native Brücke (`nativ.ts`), PDF-Erzeugung (`pdf.ts`) sowie die

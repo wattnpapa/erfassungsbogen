@@ -4,7 +4,7 @@
 
 import { useRef, useState } from "react";
 import { Fahrzeug, OrganisationsTyp } from "@bos/eeb-format/model";
-import { stanFahrzeugVorbelegung } from "@bos/vokabulare/thw-stan-fahrzeuge";
+import { fahrzeugVorbelegung, funkrufOrtsverband } from "../../vokabulare/thw-funkrufname-ort";
 import { fahrzeugHinweise, neuesFahrzeug, transportBilanz, vokabularFuer, vorbelegungGeladen } from "../hilfen";
 import { fahrzeugSymbolSvg, svgDataUrl } from "../taktische-zeichen-bogen";
 import { frageJaNein } from "../dialoge";
@@ -21,12 +21,14 @@ import {
 function FahrzeugKarte(props: {
   fahrzeug: Fahrzeug;
   org: OrganisationsTyp;
+  /** Berlin: Kennzahl des eigenen OV, die im Funkrufnamen vorn steht. */
+  ovKennzahl?: number;
   /** Gerade hinzugefügt: die Karte stempelt sich einmal ein. */
   frisch?: boolean;
   aendern: (f: Fahrzeug) => void;
   entfernen: () => void;
 }) {
-  const { fahrzeug: f, org, frisch, aendern, entfernen } = props;
+  const { fahrzeug: f, org, ovKennzahl, frisch, aendern, entfernen } = props;
   const karte = useRef<HTMLDivElement>(null);
   useEinzugsstempel(karte, frisch);
   const set = (patch: Partial<Fahrzeug>) => aendern({ ...f, ...patch });
@@ -73,7 +75,15 @@ function FahrzeugKarte(props: {
             type="checkbox"
             checked={f.funkrufname != null}
             onChange={(e) =>
-              set({ funkrufname: e.target.checked ? { kennwort: org === OrganisationsTyp.THW ? { code: 1 } : {}, eigenerStandort: true, teile: [] } : undefined })
+              set({
+                funkrufname: e.target.checked
+                  ? {
+                      kennwort: org === OrganisationsTyp.THW ? { code: 1 } : {},
+                      eigenerStandort: true,
+                      teile: ovKennzahl != null ? [ovKennzahl] : [],
+                    }
+                  : undefined,
+              })
             }
           />
           Funkrufname
@@ -144,7 +154,8 @@ export function SchrittFahrzeuge({ bogen, aendern }: SchrittProps) {
   // Mal. Das Bearbeiten der neuen Karte ersetzt das Objekt ohnehin — dann ist
   // der Stempel gelaufen und die Markierung darf weg.
   const [frisch, setFrisch] = useState<Fahrzeug | null>(null);
-  const vorlage = stanFahrzeugVorbelegung(bogen.einheit.organisation, bogen.einheit.einheitsTyp);
+  const vorlage = fahrzeugVorbelegung(bogen.einheit);
+  const ovKennzahl = funkrufOrtsverband(bogen.einheit)?.kennzahl;
   const stanGeladen = vorbelegungGeladen(bogen.fahrzeuge, vorlage);
   return (
     <section className="karte">
@@ -185,6 +196,7 @@ export function SchrittFahrzeuge({ bogen, aendern }: SchrittProps) {
           key={i}
           fahrzeug={f}
           org={bogen.einheit.organisation}
+          ovKennzahl={ovKennzahl}
           frisch={f === frisch}
           aendern={(nf) => aendern({ fahrzeuge: bogen.fahrzeuge.map((x, j) => (j === i ? nf : x)) })}
           entfernen={() => aendern({ fahrzeuge: bogen.fahrzeuge.filter((_, j) => j !== i) })}

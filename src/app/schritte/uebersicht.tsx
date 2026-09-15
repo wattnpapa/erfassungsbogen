@@ -161,7 +161,7 @@ export function Uebersicht(props: {
    * Platz bekommt. Optionale Angaben ohne Inhalt sind keine Information.
    */
   const zeigeErreichbarkeit = bogen.personal.some((p) => p.kontakte.some((k) => kontaktText(k) !== ""));
-  const zeigeFunkruf = bogen.fahrzeuge.some((f) => funkrufText(f, einheitOrt(bogen.einheit)) !== "");
+  const zeigeFunkruf = bogen.fahrzeuge.some((f) => funkrufText(f, bogen.einheit) !== "");
   const zeigeAenderungen = bogen.fahrzeuge.some((f) => (f.aenderungen ?? "") !== "");
 
   useEffect(() => {
@@ -516,7 +516,7 @@ export function Uebersicht(props: {
               <tr key={i}>
                 <td>{vokabText(f.typ, vokabularFuer(org, "fahrzeug")) || "—"}</td>
                 <td>{kennzeichenText(f)}</td>
-                {zeigeFunkruf && <td>{funkrufText(f, einheitOrt(bogen.einheit))}</td>}
+                {zeigeFunkruf && <td>{funkrufText(f, bogen.einheit)}</td>}
                 <td>{f.stanKonform == null ? "—" : f.stanKonform ? "ja" : "nein"}</td>
                 {zeigeAenderungen && <td>{f.aenderungen ?? ""}</td>}
               </tr>
