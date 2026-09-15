@@ -144,7 +144,7 @@ wieder.
 | Randbedingung | Ausprägung | Quelle |
 | --- | --- | --- |
 | Programmiersprache | TypeScript (`"type": "module"`, ESM durchgängig) | `package.json`, `tsconfig.json` |
-| UI-Framework | React 19 (`react`, `react-dom` ^19.2.7), Function Components + Hooks, kein Router, kein globaler State-Manager (Redux/Zustand/Jotai o. ä. sind nicht eingebunden) | `package.json`, `src/app/app.tsx` |
+| UI-Framework | React 19 (`react`, `react-dom` ^19.3.0), Function Components + Hooks, kein Router, kein globaler State-Manager (Redux/Zustand/Jotai o. ä. sind nicht eingebunden) | `package.json`, `src/app/app.tsx` |
 | Build-Werkzeug | Vite 8 (`vite.config.ts`), Basis-Pfad `"./"` (relative Assets, GitHub-Pages-tauglich) | `vite.config.ts` |
 | PWA/Offline | `vite-plugin-pwa` (Workbox), Service Worker cached App-Shell, `registerType: "prompt"` (kein Auto-Reload) | `vite.config.ts` |
 | Zielplattformen | Web (PWA), Desktop via Electron (Windows x64/arm64, macOS, Linux), Mobil via Capacitor (Android; iOS in Vorbereitung) | `package.json` (`build`), `electron/main.js`, `capacitor.config.json`, `android/`, `ios/` |
@@ -162,7 +162,7 @@ wieder.
 | Sprache der Oberfläche und des Codes | Durchgängig Deutsch – Bezeichner, Kommentare, Fachbegriffe, Gherkin-Szenarien | `PRODUCT.md`, gesamter Quellcode |
 
 > *Prüfvermerk:* Versionen in `package.json` bestätigt (react ^19.2.7,
-> vite ^8.2.2, electron ^43.4.0, typescript ^7.0.2, pako ^3.0.1,
+> vite ^8.2.2, electron ^44.3.0, typescript ^7.0.2, pako ^3.0.1,
 > pdfmake ^0.3.11, @noble/ed25519 ^2.3.0, jsqr ^1.4.0, zxing-wasm ^3.1.3,
 > qrcode ^1.5.4); CI-Jobs laufen auf `node-version: 24`.
 
