@@ -55,6 +55,7 @@ import {
   type MeldeEintrag,
   type ZusammenfuehrungOptionen,
 } from "@bos/meldekopf/einsaetze";
+import { RolleMarke } from "./rolle-marke";
 import { AufteilenPanel } from "./aufteilen-ui";
 import { ZusammenfuehrenPanel } from "./zusammenfuehren-ui";
 import type { AufteilungsWahl } from "@bos/meldekopf/aufteilen";
@@ -67,7 +68,7 @@ import {
   type EinheitenSortierung,
 } from "./einheiten-liste";
 import { debugAktiv } from "./debug-plattform";
-import { Auswahl } from "./schritte/bausteine";
+import { Auswahl, STAERKE_LEGENDE } from "./schritte/bausteine";
 import { SeitenKopf } from "./seiten-kopf";
 import { frageJaNein, zeigeHinweis } from "./dialoge";
 import { TabellenScroll } from "./tabellen-scroll";
@@ -950,11 +951,14 @@ function BogenDetails({ bogen }: { bogen: Erfassungsbogen }) {
         <TabellenScroll titel="Personal">
           <table className="uebersicht">
             <thead>
-              <tr><th>Funktion / Zusatzfunktion</th><th>Name, Vorname</th><th>Erreichbarkeit</th></tr>
+              {/* Spalten wie in der Bogen-Übersicht: erst die Rolle, dann die
+                  Funktion — der Meldekopf liest beide Listen nebeneinander. */}
+              <tr><th title={STAERKE_LEGENDE}>Rolle</th><th>Funktion / Zusatzfunktion</th><th>Name, Vorname</th><th>Erreichbarkeit</th></tr>
             </thead>
             <tbody>
               {bogen.personal.map((p, i) => (
                 <tr key={i}>
+                  <td><RolleMarke rolle={p.staerkeRolle} /></td>
                   <td>{funktionsText(p, org) || "—"}</td>
                   <td>{p.nachname}{p.nachname && p.vorname ? ", " : ""}{p.vorname}</td>
                   <td>{p.kontakte.map(kontaktText).join(" · ") || "—"}</td>
