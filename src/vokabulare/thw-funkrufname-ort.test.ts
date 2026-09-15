@@ -20,9 +20,10 @@ const gkw = {
   funkrufname: { kennwort: { code: 1 }, eigenerStandort: true, teile: [22, 51] },
 };
 
-describe("Funkrufname der Berliner Ortsverbände", () => {
+describe("Großstadtregelung der Funkrufnamen", () => {
   it("erkennt den OV am Kürzel und am Namen, auch ohne Bindestrich", () => {
     expect(funkrufOrtsverband(einheit("Berlin Steglitz-Zehlendorf", "OSTZ"))?.kennzahl).toBe(6);
+    expect(funkrufOrtsverband(einheit("Hamburg Wandsbek", "OHHW"))?.kennzahl).toBe(5);
     expect(funkrufOrtsverband(einheit("Berlin Steglitz-Zehlendorf"))?.kennzahl).toBe(6);
     expect(funkrufOrtsverband(einheit("berlin mitte"))?.kennzahl).toBe(1);
     expect(funkrufOrtsverband(einheit("Oldenburg - Ni", "OODE"))).toBeUndefined();
@@ -30,9 +31,23 @@ describe("Funkrufname der Berliner Ortsverbände", () => {
     expect(funkrufOrtsverband(einheit("Berlin Mitte", "OBEM", OrganisationsTyp.FEUERWEHR))).toBeUndefined();
   });
 
-  it("spricht auf Berlin, mit dem OV als führender Kennzahl", () => {
+  it("spricht auf die Stadt, mit dem OV als führender Kennzahl", () => {
     expect(funkrufText(gkw, einheit("Berlin Steglitz-Zehlendorf", "OSTZ"))).toBe("Heros Berlin 06/22/51");
     expect(funkrufText(gkw, einheit("Berlin Lichtenberg", "OLIC"))).toBe("Heros Berlin 11/22/51");
+  });
+
+  it("schreibt die OV-Zahl in Hamburg und Köln einstellig, in Berlin zweistellig", () => {
+    // In der Großstadtregelung steht Berlin als 01…12, Hamburg als 1…7,
+    // Köln als 4/7/10 — die Schreibweise gehört zur Zahl.
+    expect(funkrufText(gkw, einheit("Hamburg-Harburg", "OHHH"))).toBe("Heros Hamburg 7/22/51");
+    expect(funkrufText(gkw, einheit("Hamburg Mitte", "OHHM"))).toBe("Heros Hamburg 1/22/51");
+    expect(funkrufText(gkw, einheit("Köln Nord-West", "OKNW"))).toBe("Heros Köln 4/22/51");
+    expect(funkrufText(gkw, einheit("Köln-Ost", "OKOT"))).toBe("Heros Köln 10/22/51");
+  });
+
+  it("lässt München und Bremen beim OV-Namen — die Regelung nennt dort keine Zahl", () => {
+    expect(funkrufOrtsverband(einheit("München-Ost", "OMUO"))).toBeUndefined();
+    expect(funkrufText(gkw, einheit("Bremen Nord", "OHBN"))).toBe("Heros Bremen Nord 22/51");
   });
 
   it("lässt Funkrufnamen außerhalb Berlins unverändert", () => {
@@ -47,7 +62,7 @@ describe("Funkrufname der Berliner Ortsverbände", () => {
     expect(funkrufText(ausAnderemOv, berlin)).toBe("Heros Berlin 11/22/51");
   });
 
-  it("belegt die StAN-Fahrzeuge in Berlin mit der OV-Kennzahl vor", () => {
+  it("belegt die StAN-Fahrzeuge in der Großstadt mit der OV-Kennzahl vor", () => {
     const b = fahrzeugVorbelegung(einheit("Berlin Neukölln", "ONKO"));
     expect(b.find((f) => f.funkrufname)?.funkrufname?.teile[0]).toBe(8);
     const ol = fahrzeugVorbelegung(einheit("Oldenburg - Ni", "OODE"));

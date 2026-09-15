@@ -189,11 +189,11 @@ Funktionalität: Bogen im Assistenten erfassen
     Und ich das Feld "Kennzahlen (z. B. 18/13)" mit "18/13" fülle
     Dann steht im Feld "Kennzahlen (z. B. 18/13)" der Wert "18/13"
 
-  # Berlin: alle zwölf Ortsverbände sprechen auf „Berlin", welcher OV gemeint
-  # ist, sagt die führende Kennzahl (06 = Steglitz-Zehlendorf). Ohne sie stünde
-  # dort „Heros Berlin Steglitz-Zehlendorf 22/51" — ein Funkrufname, den es in
-  # Berlin nicht gibt.
-  Szenario: In Berlin steht der Ortsverband als Kennzahl im Funkrufnamen
+  # Großstadtregelung: alle zwölf Berliner Ortsverbände sprechen auf „Berlin",
+  # welcher OV gemeint ist, sagt die führende Kennzahl (06 = Steglitz-
+  # Zehlendorf). Ohne sie stünde dort „Heros Berlin Steglitz-Zehlendorf 22/51"
+  # — ein Funkrufname, den es in Berlin nicht gibt.
+  Szenario: In der Großstadt steht der Ortsverband als Kennzahl im Funkrufnamen
     Wenn ich das Feld "Organisation" auf "THW" stelle
     Und ich das Feld "Name (Pflicht)" mit "Steglitz" fülle
     Und ich in der Vorschlagsliste "Berlin Steglitz-Zehlendorf" wähle

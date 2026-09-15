@@ -78,11 +78,13 @@ so von 843 kB auf 1.258 kB; mit modulgenauen Importen sind es 839 kB.
   Namen aus dem Bogen auf; die Zeichensammlung selbst kennt den Bogen nicht.
 - `src/vokabulare/landesvorlagen.ts` — liest die Beispielbögen über
   `import.meta.glob`, eine Vite-Eigenschaft, und die Bögen sind Produktinhalt.
-- `src/vokabulare/thw-funkrufname-ort.ts` — die zwölf Berliner Ortsverbände
-  sprechen auf „Berlin" und tragen den OV als führende Kennzahl im
-  Funkrufnamen („Heros Berlin 06/22/51"). Die Tabelle ist klein und bislang
-  nur für Berlin belegt; sie wandert in `@bos/vokabulare`, sobald die
-  Zuordnung für weitere Stadtstaaten (Hamburg, Bremen) feststeht.
+- `src/vokabulare/thw-funkrufname-ort.ts` — Großstadtregelung der
+  Funkrufnamen: Berlin, Hamburg und Köln sprechen auf den Stadtnamen und
+  tragen den Ortsverband als führende Kennzahl („Heros Berlin 06/22/51",
+  „Heros Köln 10/22/51"). München und Bremen stehen zwar in der Regelung,
+  aber ohne Kennzahl — dort unterscheidet der OV-Name selbst, also bleibt es
+  beim Regelfall. Die Tabelle wandert in `@bos/vokabulare`, sobald der
+  Meldekopf sie eigenständig braucht.
 - `pdf-dokument.ts`, `geraete-schluessel.ts` sowie Auswertung, Einheitenliste,
   XLSX und CSV. Letztere sind Stufe 2 in ADR-003 und wandern erst bei Bedarf.
 
