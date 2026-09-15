@@ -488,3 +488,90 @@ describe("Vorschlagsfeld für Vorlesesoftware", () => {
     expect(screen.getByRole("listbox")).toBeDefined();
   });
 });
+
+/**
+ * Die Reihenfolge der Personalliste ist im Bogen Inhalt: die erste Person
+ * steht im PDF als Ansprechpartner/in. Wer eine Vertretung erfasst, legt sie
+ * am Ende an — sie muss nach oben zu bekommen sein, ohne die ganze Liste neu
+ * zu tippen (Issue #23).
+ */
+describe("Personal umsortieren", () => {
+  const drei = () => {
+    const b = neuerBogen();
+    return {
+      ...b,
+      personal: [
+        { ...neuePerson(), vorname: "Anna", nachname: "Albers" },
+        { ...neuePerson(), vorname: "Bernd", nachname: "Bruns" },
+        { ...neuePerson(), vorname: "Carla", nachname: "Claus" },
+      ],
+    };
+  };
+
+  /** Vornamen in Listenreihenfolge — in beiden Ansichten die ersten Textfelder. */
+  const vornamen = () =>
+    (screen.getAllByLabelText("Vorname") as HTMLInputElement[]).map((f) => f.value);
+
+  it("hebt eine Person in den Detail-Karten um einen Platz", async () => {
+    const nutzer = userEvent.setup();
+    render(<SchrittBuehne komponente={SchrittPersonal} bogen={drei()} />);
+
+    await nutzer.click(screen.getByRole("button", { name: "Person 3 nach oben" }));
+
+    expect(vornamen()).toEqual(["Anna", "Carla", "Bernd"]);
+  });
+
+  it("setzt die zuletzt angelegte Person mit einem Griff an die erste Stelle", async () => {
+    const nutzer = userEvent.setup();
+    render(<SchrittBuehne komponente={SchrittPersonal} bogen={drei()} />);
+
+    await nutzer.click(screen.getByRole("button", { name: "Person 3 an die erste Stelle" }));
+
+    expect(vornamen()).toEqual(["Carla", "Anna", "Bernd"]);
+    // Die Marke sitzt an der Karte, die jetzt oben steht.
+    const oberste = screen.getAllByLabelText("Vorname")[0]!.closest(".karte")!;
+    expect(within(oberste as HTMLElement).getByText("Ansprechpartner/in")).toBeDefined();
+    expect(screen.getAllByText("Ansprechpartner/in")).toHaveLength(1);
+  });
+
+  it("sortiert auch in der Schnelleingabe-Tabelle", async () => {
+    const nutzer = userEvent.setup();
+    render(<SchrittBuehne komponente={SchrittPersonal} bogen={drei()} />);
+    await nutzer.click(screen.getByLabelText("Schnelleingabe (Tabelle)"));
+
+    await nutzer.click(screen.getByRole("button", { name: "Person 1 nach unten" }));
+
+    const werte = (within(screen.getByRole("table")).getAllByRole("textbox") as HTMLInputElement[]).map((f) => f.value);
+    expect(werte).toEqual(["Bernd", "Bruns", "Anna", "Albers", "Carla", "Claus"]);
+  });
+
+  /**
+   * Zweimal „nach oben" muss dieselbe Person zweimal heben. Bliebe der Fokus
+   * auf der Stelle, hätte der zweite Klick die nachgerückte Nachbarperson
+   * erwischt — der Fokus wandert deshalb mit.
+   */
+  it("lässt den Fokus mit der verschobenen Person wandern", async () => {
+    const nutzer = userEvent.setup();
+    render(<SchrittBuehne komponente={SchrittPersonal} bogen={drei()} />);
+
+    await nutzer.click(screen.getByRole("button", { name: "Person 3 nach oben" }));
+    expect(document.activeElement).toBe(screen.getByRole("button", { name: "Person 2 nach oben" }));
+
+    await nutzer.keyboard("{Enter}");
+
+    expect(vornamen()).toEqual(["Carla", "Anna", "Bernd"]);
+    // Oben angekommen ist der Hoch-Knopf gesperrt: der Fokus fällt auf den
+    // Nachbarn derselben Person statt auf den Seitenanfang.
+    expect(document.activeElement).toBe(screen.getByRole("button", { name: "Person 1 nach unten" }));
+  });
+
+  it("zeigt bei einer einzigen Person keine Sortierknöpfe", async () => {
+    const nutzer = userEvent.setup();
+    buehne();
+
+    await nutzer.click(screen.getByRole("button", { name: "+ Person hinzufügen" }));
+
+    expect(screen.queryByRole("button", { name: /nach oben$/ })).toBeNull();
+    expect(screen.queryByRole("button", { name: /nach unten$/ })).toBeNull();
+  });
+});

@@ -338,6 +338,13 @@ Der Prüfstand steht in [features/support/haken.ts](../features/support/haken.ts
   `EEB_SERVER=dev` schaltet auf den Dev-Server um, `EEB_BASE_URL=…` hängt sich an
   einen bereits laufenden Server, `EEB_BROWSER=webkit` fährt die Suite als
   iOS-WKWebView-Näherung.
+- **Feste Startzeit (20.05.2025).** Jeder Kontext bekommt die Uhr auf diesen Tag
+  gestellt und läuft von dort normal weiter. Der eingefrorene v2-Bogen aus
+  `features/fixtures.ts` hat den Stand 14.05.2025, und die Datenschutzfrist
+  anonymisiert Personaldaten 90 Tage nach dem Stand — mit der echten Uhr sähen
+  die Szenarien statt „Rudolph" nur noch „Einsatzkraft 1", und zwar seit dem
+  12.08.2025. Eine Fixture aus Bytes kann nicht mitaltern, also altert der
+  Prüfstand nicht mit.
 - **Wachhund gegen Systemdialoge.** Jedes `window.prompt/confirm/alert` lässt das
   Szenario scheitern — in der iOS-App bleiben sie unbeantwortet (siehe oben,
   „Rückfragen").

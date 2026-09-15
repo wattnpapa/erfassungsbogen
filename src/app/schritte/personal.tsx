@@ -24,7 +24,7 @@ import {
 import { parseNamen } from "../personal-schnell";
 import { beispielPersonen } from "../beispielnamen";
 import { stanPersonalVorbelegung } from "@bos/vokabulare/thw-stan-personal";
-import { FE_TEXT, neuePerson, pruefpunkte, vokabularFuer, vorbelegungGeladen } from "../hilfen";
+import { FE_TEXT, neuePerson, pruefpunkte, verschoben, vokabularFuer, vorbelegungGeladen } from "../hilfen";
 import { frageJaNein } from "../dialoge";
 import { TabellenScroll } from "../tabellen-scroll";
 import {
@@ -205,16 +205,81 @@ function FahrerlaubnisFeld(props: { person: Person; set: (patch: Partial<Person>
   );
 }
 
+/**
+ * Die Reihenfolge der Personalliste ist Inhalt, nicht Anzeige: die erste Person
+ * steht im PDF als Ansprechpartner/in. Wer eine Vertretung erfasst, legt sie
+ * unten an und braucht sie oben — daher an jedem Eintrag ein Griff nach oben
+ * und einer nach unten, in beiden Ansichten derselbe.
+ *
+ * Kein Ziehen mit der Maus: der Bogen wird am Einsatzort auf dem Telefon
+ * ausgefüllt, oft mit Handschuh, und Drag-and-drop gibt es weder für die
+ * Tastatur noch für den Screenreader ohne eigenen Ersatzweg.
+ *
+ * `gruppe` trennt die Knopfsätze beider Ansichten im DOM — nach dem Verschieben
+ * sucht der Fokus seinen Knopf über `data-sortier` an der neuen Stelle.
+ */
+function SortierKnoepfe(props: {
+  index: number;
+  anzahl: number;
+  gruppe: "karte" | "zeile";
+  verschieben: (von: number, nach: number, gruppe: "karte" | "zeile", art: "hoch" | "runter") => void;
+}) {
+  const { index, anzahl, gruppe, verschieben } = props;
+  if (anzahl < 2) return null;
+  return (
+    <span className="sortieren">
+      <button
+        type="button"
+        data-sortier={`${gruppe}-${index}-hoch`}
+        disabled={index === 0}
+        aria-label={`Person ${index + 1} nach oben`}
+        title={index === 1 ? "Nach oben — die erste Person gilt als Ansprechpartner/in" : "Nach oben"}
+        onClick={() => verschieben(index, index - 1, gruppe, "hoch")}
+      >
+        ▲
+      </button>
+      <button
+        type="button"
+        data-sortier={`${gruppe}-${index}-runter`}
+        disabled={index === anzahl - 1}
+        aria-label={`Person ${index + 1} nach unten`}
+        title="Nach unten"
+        onClick={() => verschieben(index, index + 1, gruppe, "runter")}
+      >
+        ▼
+      </button>
+      {index > 0 && (
+        /* Ohne diesen Weg braucht die zwölfte Person elf Klicks nach oben —
+           und genau die zuletzt angelegte Vertretung gehört dorthin. */
+        <button
+          type="button"
+          aria-label={`Person ${index + 1} an die erste Stelle`}
+          title="An die erste Stelle — gilt im PDF als Ansprechpartner/in"
+          onClick={() => verschieben(index, 0, gruppe, "hoch")}
+        >
+          ⇑
+        </button>
+      )}
+    </span>
+  );
+}
+
 function PersonKarte(props: {
   person: Person;
   org: OrganisationsTyp;
   vorschlaege: readonly FreitextVorschlag[];
   /** Gerade hinzugefügt: die Karte stempelt sich einmal ein. */
   frisch?: boolean;
+  /** Stelle in der Liste und Listenlänge — für die Umsortier-Knöpfe. */
+  index: number;
+  anzahl: number;
+  /** Erste Person eines vollständig erfassten Bogens: sie meldet der Empfänger an. */
+  ansprech?: boolean;
   aendern: (p: Person) => void;
   entfernen: () => void;
+  verschieben: (von: number, nach: number, gruppe: "karte" | "zeile", art: "hoch" | "runter") => void;
 }) {
-  const { person: p, org, vorschlaege, frisch, aendern, entfernen } = props;
+  const { person: p, org, vorschlaege, frisch, index, anzahl, ansprech, aendern, entfernen, verschieben } = props;
   const karte = useRef<HTMLDivElement>(null);
   useEinzugsstempel(karte, frisch);
   const set = (patch: Partial<Person>) => aendern({ ...p, ...patch });
@@ -235,6 +300,15 @@ function PersonKarte(props: {
             <option value={StaerkeRolle.MANNSCHAFT}>Mannschaft</option>
           </Auswahl>
         </Feld>
+        {/* Ohne die Marke ist die Reihenfolge eine stumme Regel: im PDF steht
+            die erste Person als Ansprechpartner/in, in der Liste sieht man ihr
+            das nicht an. Erst damit wird das Umsortieren daneben verständlich. */}
+        {ansprech && (
+          <span className="ansprech-marke" title="Steht im PDF und in der Meldung als Ansprechpartner/in dieser Einheit">
+            Ansprechpartner/in
+          </span>
+        )}
+        <SortierKnoepfe index={index} anzahl={anzahl} gruppe="karte" verschieben={verschieben} />
         <button
           type="button"
           className="entfernen"
@@ -314,8 +388,9 @@ function PersonalSchnellTabelle(props: {
   aendern: (p: Person[]) => void;
   fokusNeue: boolean;
   aufNeueFokus: () => void;
+  verschieben: (von: number, nach: number, gruppe: "karte" | "zeile", art: "hoch" | "runter") => void;
 }) {
-  const { personal, aendern, fokusNeue, aufNeueFokus } = props;
+  const { personal, aendern, fokusNeue, aufNeueFokus, verschieben } = props;
   const set = (i: number, patch: Partial<Person>) =>
     aendern(personal.map((p, j) => (j === i ? { ...p, ...patch } : p)));
 
@@ -340,7 +415,7 @@ function PersonalSchnellTabelle(props: {
     <TabellenScroll titel="Personal-Schnelleingabe">
       <table className="uebersicht schnell-tabelle">
         <thead>
-          <tr><th>Vorname</th><th>Nachname</th><th>Stärkerolle</th><th>Geschlecht</th><th aria-label="Entfernen" /></tr>
+          <tr><th>Vorname</th><th>Nachname</th><th>Stärkerolle</th><th>Geschlecht</th><th aria-label="Reihenfolge" /><th aria-label="Entfernen" /></tr>
         </thead>
         <tbody>
           {personal.map((p, i) => (
@@ -384,6 +459,11 @@ function PersonalSchnellTabelle(props: {
                   <option value={Geschlecht.D}>D</option>
                 </Auswahl>
               </td>
+              {/* Die Reihenfolge entscheidet, wer als Ansprechpartner/in gilt —
+                  in der Tabelle sieht man die Liste ganz, hier wird sie sortiert. */}
+              <td className="sortier-spalte">
+                <SortierKnoepfe index={i} anzahl={personal.length} gruppe="zeile" verschieben={verschieben} />
+              </td>
               <td>
                 <button
                   type="button"
@@ -424,6 +504,11 @@ export function SchrittPersonal({ bogen, aendern, geheZu }: SchrittProps) {
   const [frischeKarte, setFrischeKarte] = useState<Person | null>(null);
   // Nur die Detail-Karten zeigen Qualifikationen; die Schnelltabelle nicht.
   const vorschlaege = useQualiVorschlaege(!nurStaerke && !schnell, bogen.einheit.organisation);
+  // Nach dem Verschieben wandert der Fokus mit der Person. Ohne das zeigt der
+  // gerade gedrückte Knopf auf die Nachbarperson, die nachgerückt ist: der
+  // zweite Klick hebt dann die falsche. Gemerkt wird die Zielstelle, der
+  // Effekt sucht den Knopf, wenn die Liste neu steht.
+  const [fokusSortierung, setFokusSortierung] = useState<string | null>(null);
   const namenDialog = useRef<HTMLDialogElement>(null);
   const [namenText, setNamenText] = useState("");
   const namenVorschau = parseNamen(namenText);
@@ -446,6 +531,28 @@ export function SchrittPersonal({ bogen, aendern, geheZu }: SchrittProps) {
     setSchnell(true);
     namenDialog.current?.close();
   }
+  useEffect(() => {
+    if (fokusSortierung == null) return;
+    setFokusSortierung(null);
+    const ersatz = fokusSortierung.endsWith("hoch") ? "runter" : "hoch";
+    const knopf = (wahl: string) => document.querySelector<HTMLButtonElement>(`[data-sortier="${wahl}"]`);
+    // Am Listenrand ist der gedrückte Knopf gesperrt — dann den anderen nehmen,
+    // damit der Fokus nicht auf den Seitenanfang zurückfällt.
+    const ziel = knopf(fokusSortierung);
+    (ziel && !ziel.disabled ? ziel : knopf(fokusSortierung.replace(/(hoch|runter)$/, ersatz)))?.focus();
+  }, [fokusSortierung]);
+
+  /**
+   * Eine Person an eine andere Stelle setzen. `gruppe` und `art` sagen nur, wo
+   * der Fokus danach hingehört (Karte oder Tabellenzeile, oberer oder unterer
+   * Knopf) — die Liste selbst kennt keine Ansichten.
+   */
+  function personVerschieben(von: number, nach: number, gruppe: "karte" | "zeile", art: "hoch" | "runter") {
+    if (nach < 0 || nach >= bogen.personal.length) return;
+    aendern({ personal: verschoben(bogen.personal, von, nach) });
+    setFokusSortierung(`${gruppe}-${nach}-${art}`);
+  }
+
   const s = staerke(bogen);
   /* Die abgeleitete Stärke rechnet sich weit oben in der Liste neu, während der
      Blick unten in einer Personenkarte steht. Sie quittiert deshalb dieselbe
@@ -622,6 +729,7 @@ export function SchrittPersonal({ bogen, aendern, geheZu }: SchrittProps) {
             aendern={(p) => aendern({ personal: p })}
             fokusNeue={fokusNeue}
             aufNeueFokus={() => setFokusNeue(true)}
+            verschieben={personVerschieben}
           />
         )
       ) : (
@@ -632,6 +740,10 @@ export function SchrittPersonal({ bogen, aendern, geheZu }: SchrittProps) {
             org={bogen.einheit.organisation}
             vorschlaege={vorschlaege}
             frisch={p === frischeKarte}
+            index={i}
+            anzahl={bogen.personal.length}
+            ansprech={!nurStaerke && i === 0}
+            verschieben={personVerschieben}
             aendern={(np) => aendern({ personal: bogen.personal.map((x, j) => (j === i ? np : x)) })}
             entfernen={() => aendern({ personal: bogen.personal.filter((_, j) => j !== i) })}
           />

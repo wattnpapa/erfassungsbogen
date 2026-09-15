@@ -128,8 +128,21 @@ ${meckern.trim()}` : ""),
   browser = process.env.EEB_BROWSER === "webkit" ? await webkit.launch() : await chromium.launch();
 });
 
+/**
+ * Startzeit des Prüfstands: kurz nach dem Stand des eingefrorenen v2-Bogens aus
+ * features/fixtures.ts (14.05.2025). Seit der Datenschutzfrist verfallen die
+ * Personaldaten eines Bogens 90 Tage nach seinem Stand — die Fixture ist als
+ * Bytefolge eingefroren und kann nicht mitaltern, also würde die halbe Suite ab
+ * dem 12.08.2025 nur noch „Einsatzkraft 1" statt „Rudolph" sehen. Die Uhr der
+ * Seite läuft ab hier normal weiter (install + resume), sie startet nur an
+ * einem festen Tag statt am Tag des Laufs.
+ */
+const PRUEFSTAND_ZEIT = new Date("2025-05-20T09:00:00Z");
+
 Before(async function (this: EebWelt) {
   const kontext = await browser.newContext();
+  await kontext.clock.install({ time: PRUEFSTAND_ZEIT });
+  await kontext.clock.resume();
   // „Link teilen" schreibt ohne Web-Share-API in die Zwischenablage; ohne
   // Erlaubnis scheitert das still. WebKit kennt diese Berechtigungsnamen nicht.
   await kontext.grantPermissions(["clipboard-read", "clipboard-write"]).catch(() => {});

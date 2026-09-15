@@ -43,6 +43,7 @@ import {
   qrErzeugen,
   schrittStatus,
   transportBilanz,
+  verschoben,
 } from "./hilfen";
 import { deflateRaw } from "pako";
 import QRCode from "qrcode";
@@ -626,5 +627,27 @@ describe("inflateRawBegrenzt()", () => {
 
   it("hält für echte Bögen reichlich Luft (4 MiB)", () => {
     expect(MAX_ENTPACKT).toBe(4 * 1024 * 1024);
+  });
+});
+
+describe("verschoben", () => {
+  it("setzt einen Eintrag an die gewünschte Stelle", () => {
+    expect(verschoben(["a", "b", "c"], 2, 0)).toEqual(["c", "a", "b"]);
+    expect(verschoben(["a", "b", "c"], 0, 2)).toEqual(["b", "c", "a"]);
+    expect(verschoben(["a", "b", "c"], 1, 2)).toEqual(["a", "c", "b"]);
+  });
+
+  it("lässt die Quelle unangetastet und gibt eine neue Liste zurück", () => {
+    const quelle = ["a", "b"];
+    const ergebnis = verschoben(quelle, 0, 1);
+    expect(quelle).toEqual(["a", "b"]);
+    expect(ergebnis).not.toBe(quelle);
+  });
+
+  it("gibt die Liste bei Indizes außerhalb unverändert zurück", () => {
+    expect(verschoben(["a", "b"], 0, 0)).toEqual(["a", "b"]);
+    expect(verschoben(["a", "b"], 0, -1)).toEqual(["a", "b"]);
+    expect(verschoben(["a", "b"], 1, 2)).toEqual(["a", "b"]);
+    expect(verschoben([], 0, 0)).toEqual([]);
   });
 });
