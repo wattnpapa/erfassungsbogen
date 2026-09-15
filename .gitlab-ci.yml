@@ -239,20 +239,19 @@ build-android:
 
 # Windows und macOS brauchen je einen Runner mit dem passenden Betriebssystem;
 # electron-builder kann den NSIS-Installer und das .dmg nicht unter Linux
-# erzeugen. Beide Jobs stehen deshalb auf `when: manual` mit `allow_failure`:
-# Gibt es keinen solchen Runner, bleibt der Job einfach unangetastet liegen,
-# statt den Lauf hängen zu lassen oder scheitern zu lassen. Sobald ein Runner
-# dauerhaft bereitsteht, hier `when: manual` und `allow_failure` entfernen —
-# dann laufen sie wie build-linux automatisch mit.
+# erzeugen. Beide Jobs sind stillgelegt (`when: never`, 15.9.2026): Einen
+# solchen Runner gibt es hier nicht, und auf GitHub sind dieselben beiden
+# Bauten ebenfalls abgeschaltet (`if: false` an build-win/build-mac in
+# release.yml). Die Job-Definitionen bleiben stehen, damit das Wiedereinschalten
+# eine Zeile ist: `when: never` gegen `when: manual` (oder ganz weg, sobald ein
+# Runner dauerhaft bereitsteht) tauschen.
 #
 # Der Runner muss Node 24 und npm mitbringen (das `image` oben gilt nur für
 # Docker-Runner; ein Shell-Runner ignoriert es).
 .paket-fremdes-os:
   extends: .paket
   rules:
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
-      when: manual
-      allow_failure: true
+    - when: never
 
 build-win:
   extends: .paket-fremdes-os

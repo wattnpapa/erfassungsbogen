@@ -1,6 +1,6 @@
-# App-Releases: Windows (NSIS), Linux (deb/pacman) via Electron, Android
-# (signierte APK) via Capacitor/Gradle — plus GitHub-Pages-Deployment.
-# macOS (dmg/zip) ist vorerst stillgelegt, siehe Job build-mac.
+# App-Releases: Linux (deb/pacman) via Electron, Android (signierte APK) via
+# Capacitor/Gradle — plus GitHub-Pages-Deployment.
+# Windows (NSIS) und macOS (dmg/zip) sind stillgelegt, siehe build-win/build-mac.
 # Vorbild: S1-Control (build-main.yml) — Datums-Version, Git-Tag, GitHub Release.
 name: Build & Release
 
@@ -202,6 +202,12 @@ jobs:
             release/latest*.yml
 
   build-win:
+    # Stillgelegt (15.9.2026) im Zuge des Umzugs nach Open CoDE: Auf dem
+    # Spiegel gibt es keinen Windows-Runner, und solange offen ist, wo die
+    # Desktop-Pakete künftig herkommen, soll kein zweiter Kanal Installer
+    # erzeugen. Zum Wiedereinschalten: diese Zeile entfernen und build-win
+    # wieder in die needs-Liste des release-Jobs aufnehmen.
+    if: false
     runs-on: windows-latest
     needs: [prepare, check]
     env:
@@ -325,7 +331,10 @@ jobs:
     runs-on: ubuntu-latest
     # `check` steht mit in der Liste, weil dort die SBOM entsteht, die unten
     # mit heruntergeladen und ans Release gehängt wird.
-    needs: [prepare, check, build-win, build-linux, build-android]
+    # build-win und build-mac fehlen absichtlich: beide sind stillgelegt
+    # (siehe dort). Stünden sie hier, würde das Release auf Jobs warten, die
+    # nie starten.
+    needs: [prepare, check, build-linux, build-android]
     steps:
       - name: Artefakte herunterladen
         uses: actions/download-artifact@v8

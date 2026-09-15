@@ -257,10 +257,16 @@ wieder.
 - **App-Store-Vertrieb** (Android Play Store, iOS App Store/TestFlight) ist laut
   `README.md`/`docs/TODO.md` in Vorbereitung, zum Analysezeitpunkt aber nicht
   produktiv.
-- **macOS-Build vorübergehend deaktiviert:** Der `build-mac`-Job in
-  `release.yml` ist per `if: false` stillgelegt, weil die Code-Signatur auf dem
-  GitHub-Runner scheitert (Kommentar vom 2026-09-05); bis zur Behebung gibt es
-  keinen macOS-Download (`README.md`).
+- **macOS- und Windows-Build deaktiviert:** Die Jobs `build-mac` und
+  `build-win` in `release.yml` sind per `if: false` stillgelegt und stehen
+  nicht mehr in der `needs`-Liste des `release`-Jobs. macOS seit dem
+  2026-09-05 (die Code-Signatur scheitert auf dem GitHub-Runner), Windows seit
+  dem 2026-09-15 im Zuge des Umzugs nach Open CoDE. Auf dem Spiegel sind
+  dieselben beiden Jobs (`build-win`, `build-mac` in `.gitlab-ci.yml`) auf
+  `when: never` gesetzt. Neue Releases enthalten damit nur noch Linux-Pakete,
+  die Android-APK und die SBOM; für Windows und macOS gibt es keinen aktuellen
+  Download und auf Windows auch kein Auto-Update mehr, weil die `latest.yml`
+  in neuen Releases fehlt (`README.md`).
 
 ### 2.3 Konventionen
 
@@ -872,12 +878,11 @@ flowchart LR
   Prep --> Check["Job: check<br/>typecheck, test, test:e2e"]
   Check --> Pages["Job: build-pages<br/>vite build → dist/"]
   Pages --> Deploy["Job: deploy-pages"] --> GHP["GitHub Pages<br/>erfassungsbogen.app"]
-  Check --> Win["Job: build-win<br/>windows-latest, electron-builder<br/>NSIS x64 + arm64"]
+  Check -.-> Win["Job: build-win<br/>(deaktiviert, if: false)<br/>NSIS x64 + arm64"]
   Check --> Linux["Job: build-linux<br/>ubuntu-latest, electron-builder<br/>deb + pacman"]
   Check --> Android["Job: build-android<br/>ubuntu-latest, Gradle, signierte APK"]
   Check -.-> Mac["Job: build-mac<br/>(deaktiviert, if: false)<br/>macOS dmg/zip"]
-  Win --> Release["Job: release<br/>GitHub Release erstellen"]
-  Linux --> Release
+  Linux --> Release["Job: release<br/>GitHub Release erstellen"]
   Android --> Release
   Release --> GHR["GitHub Releases<br/>Installer, APK, latest*.yml"]
   Release --> Cleanup["Job: cleanup<br/>nur die neuesten 10 Releases behalten"]
@@ -893,7 +898,7 @@ flowchart TB
   Apple["Apple App Store / TestFlight<br/>(in Vorbereitung)"]
 
   Browser -->|"Electron-Fenster"| Win["Windows-PC<br/>x64 / arm64 (Snapdragon)"]
-  Releases -->|".exe (NSIS) inkl. Update-Check"| Win
+  Releases -.->|".exe (NSIS), Build stillgelegt"| Win
   Browser -->|"Electron-Fenster"| Linux["Linux-PC<br/>Debian/Ubuntu, Arch"]
   Releases -->|".deb / .pacman inkl. Update-Check"| Linux
   Browser -->|"Capacitor-WebView"| Android["Android-Gerät<br/>ab Android 8.0"]
@@ -907,9 +912,9 @@ flowchart TB
 | Plattform | Technologie | Artefakt | Verteilweg | Auto-Update |
 | --- | --- | --- | --- | --- |
 | Web/PWA | Vite-Build, Service Worker (Workbox) | `dist/` (statische Dateien) | GitHub Pages (erfassungsbogen.app), Deployment bei jedem Push auf `main` | Service-Worker-Update-Banner, kein Auto-Reload |
-| Windows | Electron + electron-builder, NSIS | `.exe` (x64 und separat arm64, je eigener Installer) | GitHub Releases | electron-updater, Hintergrund-Download, Installation nach Bestätigung oder beim Beenden |
+| Windows | Electron + electron-builder, NSIS | `.exe` (x64 und separat arm64, je eigener Installer) | Stillgelegt seit 2026-09-15 (Umzug nach Open CoDE); ältere Installer hängen noch an den vorhandenen Releases | electron-updater, findet aber kein neueres Paket mehr, solange der Build stillsteht |
 | Linux | Electron + electron-builder | `.deb` (Debian/Ubuntu), `.pacman` (Arch) | GitHub Releases | electron-updater |
-| macOS | Electron + electron-builder | `.dmg`, `.zip` | Vorübergehend deaktiviert (Signatur scheitert auf dem CI-Runner, Stand 2026-09-05); bis dahin Verweis auf die Web-App | – |
+| macOS | Electron + electron-builder | `.dmg`, `.zip` | Deaktiviert (Signatur scheitert auf dem CI-Runner, Stand 2026-09-05); bis dahin Verweis auf die Web-App | – |
 | Android | Capacitor + Gradle | signierte `.apk` (Release-Keystore aus GitHub Secret) | GitHub Releases; Play Store vorbereitet, noch nicht produktiv | kein In-App-Updater dokumentiert; manueller Download neuer APK |
 | iOS | Capacitor + Xcode | – | App Store/TestFlight in Vorbereitung (`docs/TODO.md`); bis dahin Verweis auf die Web-App | – |
 
@@ -926,7 +931,9 @@ flowchart TB
   generierte `sitemap.xml` ihr `<lastmod>` je Seite aus dem letzten ändernden
   Commit liest; ein flacher Checkout ließe das Skript das Datum bewusst weglassen
   statt ein falsches zu erfinden.
-- **Windows-Build erzeugt zwei Architekturen in Folge** (zuerst arm64, dann x64),
+- **Windows-Build erzeugt zwei Architekturen in Folge** (zuerst arm64, dann x64) —
+  so lange er lief; der Job ist stillgelegt, die Beschreibung gilt für den Stand,
+  auf den beim Wiedereinschalten aufgesetzt wird:
   weil beide dieselbe `latest.yml` schreiben und die Metadaten am Ende auf das
   x64-Paket zeigen sollen; ARM64 ist kein Nebenschauplatz, da die emulierte
   x64-App auf Snapdragon-Geräten nicht an die Kamera kommt.
@@ -1369,6 +1376,7 @@ Repository-Analyse, keine offiziellen Angaben des Projekts.
 | Risiko | Beschreibung | Mögliche Auswirkung |
 | --- | --- | --- |
 | macOS-Distribution ausgesetzt | Der `build-mac`-Job ist per `if: false` deaktiviert, weil die Code-Signatur auf dem GitHub-Runner mit „security set-key-partition-list … process failed 1" scheitert (Stand 2026-09-05). | macOS-Nutzer haben aktuell keinen Desktop-Download, nur den Verweis auf die Web-App; ein wachsender Rückstand bei macOS-spezifischen Problemen ist möglich. |
+| Windows-Distribution ausgesetzt | Der `build-win`-Job ist seit dem 2026-09-15 per `if: false` deaktiviert (Umzug nach Open CoDE); auf dem Spiegel steht der entsprechende Job auf `when: never`. | Windows ist die verbreitetste Desktop-Plattform der Anwender. Vorhandene Installationen laufen weiter, bekommen aber keine Updates mehr, weil neue Releases keine `latest.yml` für Windows enthalten; Sicherheitskorrekturen erreichen diese Geräte nur über die Web-App. |
 | iOS-App noch nicht veröffentlicht | Kein App-Store-Eintrag, TestFlight „in Vorbereitung"; Geräte-/TestFlight-Tests sind offene To-dos. | iOS-Nutzer sind auf die Web-App angewiesen; native Fähigkeiten sind auf iOS ungetestet in Produktion. |
 | Live-Kameratest ausstehend (Web/Electron) | Der Decodier-Roundtrip ist verifiziert (`npm run demo`), ein Live-Scan mit echter Kamera laut `docs/TODO.md` noch nicht. | Restrisiko, dass reale Kamerabedingungen (Beleuchtung, Fokus, Treiber) im Feld anders funktionieren als im Test. |
 | Electron-Kamerazugriff (macOS, signiert) | `getUserMedia` benötigt im gehärteten, signierten Build `NSCameraUsageDescription` und das Hardened-Runtime-Entitlement für die Kamera; laut TODO noch zu verifizieren. | Ohne diese Einträge scheitert der QR-Scan in der signierten macOS-Desktop-App lautlos. |

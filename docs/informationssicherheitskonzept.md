@@ -130,11 +130,15 @@ Datenbank und keine Benutzerverwaltung.
 | A3 | Android-App | Capacitor-Wrapper um dieselbe Web-App | Android |
 | A4 | iOS-App | Capacitor-Wrapper, laut Quellcode/Dokumentation in Vorbereitung, zum Analysezeitpunkt noch nicht produktiv | iOS (geplant) |
 
-> *Prüfvermerk zu A2:* Der macOS-Build ist in `release.yml` per `if: false`
-> stillgelegt (Kommentar vom 2026-09-05, Code-Signatur scheitert auf dem
-> GitHub-Runner). Für macOS gibt es damit derzeit **kein** ausgeliefertes
-> Desktop-Paket; produktiv verteilt werden Windows (x64 und arm64) und Linux
-> (.deb/.pacman). Beim Rollout ist das zu berücksichtigen.
+> *Prüfvermerk zu A2:* Die Builds für macOS und Windows sind in `release.yml`
+> per `if: false` stillgelegt — macOS seit dem 2026-09-05 (Code-Signatur
+> scheitert auf dem GitHub-Runner), Windows seit dem 2026-09-15 im Zuge des
+> Umzugs nach Open CoDE; auf dem Spiegel stehen beide Jobs auf `when: never`.
+> Produktiv verteilt wird als Desktop-Paket damit nur noch Linux
+> (.deb/.pacman). Vorhandene Windows-Installationen laufen weiter, erhalten
+> aber keine Updates mehr, weil neue Releases keine `latest.yml` für Windows
+> enthalten: Sicherheitskorrekturen erreichen diese Geräte nur noch über die
+> Web-App. Beim Rollout und in der Patch-Planung ist das zu berücksichtigen.
 
 Alle vier Auslieferungsformen teilen sich denselben Anwendungscode (`dist/` aus
 dem Vite-Build); es gibt keine serverseitige Variante.
@@ -187,7 +191,7 @@ Festplattenverschlüsselung, Betriebssystem-Updates).
 | # | Zielobjekt | Beschreibung |
 | --- | --- | --- |
 | B1 | Quellcode-Repository | `wattnpapa/erfassungsbogen` samt vier Submodulen (`@bos/*`), öffentlich auf GitHub |
-| B2 | CI/CD-Pipeline | GitHub Actions (`ci.yml`: Tests/Typecheck; `release.yml`: Build und Veröffentlichung der Auslieferungspakete; `spiegel-opencode.yml`: einseitiger Quellcode-Spiegel nach Open CoDE, authentifiziert über einen Deploy-Key im CI-Secret `OPENCODE_SSH_KEY` mit Schreibrecht ausschließlich auf dem Spiegel-Repository). Auf dem Spiegel selbst läuft GitLab CI (`.gitlab-ci.yml`): Prüfstufe als Nachbildung von `ci.yml` (Typprüfung, Tests, Build, Bundle-Budget, SBOM, `npm audit`, E2E) und darauf aufbauend Job `pages` (nur Standardzweig) mit Build und Veröffentlichung der Webfassung; dazu die Stufe `pakete` mit denselben Paketbauten wie `release.yml` (Linux und Android automatisch, Windows und macOS nur mit eigenem Runner und manuell ausgelöst). Die Pakete bleiben Job-Artefakte; ein GitLab-Release oder Tag entsteht nicht, dieser Teil ist nur auskommentiert vorbereitet. Die Submodule werden per HTTPS aus den öffentlichen GitHub-Repositories gezogen |
+| B2 | CI/CD-Pipeline | GitHub Actions (`ci.yml`: Tests/Typecheck; `release.yml`: Build und Veröffentlichung der Auslieferungspakete; `spiegel-opencode.yml`: einseitiger Quellcode-Spiegel nach Open CoDE, authentifiziert über einen Deploy-Key im CI-Secret `OPENCODE_SSH_KEY` mit Schreibrecht ausschließlich auf dem Spiegel-Repository). Auf dem Spiegel selbst läuft GitLab CI (`.gitlab-ci.yml`): Prüfstufe als Nachbildung von `ci.yml` (Typprüfung, Tests, Build, Bundle-Budget, SBOM, `npm audit`, E2E) und darauf aufbauend Job `pages` (nur Standardzweig) mit Build und Veröffentlichung der Webfassung; dazu die Stufe `pakete` mit denselben Paketbauten wie `release.yml` (Linux und Android automatisch; die Jobs für Windows und macOS sind auf `when: never` stillgelegt, passend zu `if: false` in `release.yml`). Die Pakete bleiben Job-Artefakte; ein GitLab-Release oder Tag entsteht nicht, dieser Teil ist nur auskommentiert vorbereitet. Die Submodule werden per HTTPS aus den öffentlichen GitHub-Repositories gezogen |
 | B3 | Abhängigkeiten (Software-Lieferkette) | npm-Pakete gemäß `package-lock.json` je Teilprojekt, versioniert und gepinnt |
 | B4 | Code-Signing-Material | Zertifikate/Schlüssel für macOS-Notarisierung und Windows-Signierung, als CI-Secrets hinterlegt (bedingt vorhanden, siehe 6.4). Der Android-Keystore liegt als CI-Secret im GitHub-Repository. Die Paketbauten auf dem Open-CoDE-Spiegel bauen ohne hinterlegtes Material **unsigniert**; sollen sie signieren, ist dasselbe Schlüsselmaterial zusätzlich dort als CI-Variable zu hinterlegen — dann verdoppelt sich der Ort, an dem es liegt, und das ist eine eigene Entscheidung (`.gitlab-ci.yml` nennt die Variablen) |
 | B5 | Auto-Update-Kanal | `electron-updater` gegen GitHub Releases (nur Desktop) |
@@ -362,7 +366,7 @@ ORP.1 Organisation, INF.1 Gebäude) sind nicht Gegenstand dieses Dokuments.
 | Anforderung (sinngemäß) | Status | Fundstelle/Anmerkung |
 | --- | --- | --- |
 | Automatisierte Tests vor Veröffentlichung | Erfüllt | GitHub-Actions-Workflow `ci.yml` (Unit-Tests via Vitest, E2E via Cucumber, Typecheck) |
-| Signierte/verifizierbare Auslieferungspakete | Teilweise erfüllt | macOS-Notarisierung und Code-Signing sind in `release.yml` vorgesehen, greifen aber nur, wenn die entsprechenden CI-Secrets hinterlegt sind; ohne diese entsteht laut Workflow-Kommentar bewusst ein unsignierter Build. **Ergänzung:** der macOS-Job ist derzeit ganz stillgelegt (`if: false`) |
+| Signierte/verifizierbare Auslieferungspakete | Teilweise erfüllt | macOS-Notarisierung und Code-Signing sind in `release.yml` vorgesehen, greifen aber nur, wenn die entsprechenden CI-Secrets hinterlegt sind; ohne diese entsteht laut Workflow-Kommentar bewusst ein unsignierter Build. **Ergänzung:** die Jobs für macOS und Windows sind stillgelegt (`if: false`), gebaut wird nur noch Linux und Android |
 | Versionierte, nachvollziehbare Abhängigkeiten | Erfüllt | `package-lock.json` je Teilprojekt/Submodul, Versionen gepinnt |
 | Regelmäßige Prüfung auf bekannte Schwachstellen in Abhängigkeiten (SCA) | Erfüllt | `.github/dependabot.yml` (wöchentlich, npm + GitHub-Actions), `npm audit --omit=dev --audit-level=high` als blockierender CI-Schritt, `npm audit` über das Bau-/Testwerkzeug als Hinweis |
 | Stückliste der ausgelieferten Software (SBOM) | Erfüllt | `npm run sbom` (`scripts/sbom.ts`) erzeugt CycloneDX 1.6 aus den fünf `package-lock.json`; im CI als Artefakt, im Release als Asset |

@@ -101,14 +101,16 @@ Alle Downloads unter
 
 | Gerät | Download |
 |---|---|
-| **Windows** | Installer (`.exe`) — für ARM-Geräte (Snapdragon) die `arm64`-Datei, sonst `x64` |
+| **Windows** | zurzeit kein neuer Download — der Build ist während des Umzugs nach Open CoDE stillgelegt; ältere Installer hängen noch an den vorhandenen Releases, aktuell ist <https://erfassungsbogen.app> |
 | **macOS** | zurzeit kein Download — die Signatur wird überarbeitet; bis dahin: <https://erfassungsbogen.app> |
 | **Linux** | `.deb` (Debian/Ubuntu) oder `.pacman` (Arch) |
 | **Android** | APK (Android 8.0 oder neuer) |
 | **iPhone/iPad** | App Store / TestFlight in Vorbereitung — bis dahin: <https://erfassungsbogen.app> |
 
 Die Desktop-App funktioniert komplett offline und hält sich selbst aktuell:
-Updates werden im Hintergrund geladen und nach Bestätigung installiert.
+Updates werden im Hintergrund geladen und nach Bestätigung installiert. Für
+Windows gilt das, solange der Build stillgelegt ist, nicht — dort findet die
+installierte App kein neueres Paket.
 
 ## Lizenz
 

@@ -101,8 +101,8 @@ Bögen. Ausgenommen sind Übungsbögen und Vorlagen.
 Ausführlich beschrieben in der [Arc42-Architekturdokumentation](arc42-architektur.md);
 hier die für die DSFA relevante Kurzfassung:
 
-- **Plattformen:** Web/PWA (erfassungsbogen.app), Windows- und Linux-Desktop
-  (Electron), Android (Capacitor); iOS in Vorbereitung. Dieselbe Webfassung wird
+- **Plattformen:** Web/PWA (erfassungsbogen.app), Linux-Desktop (Electron),
+  Android (Capacitor); iOS in Vorbereitung. Dieselbe Webfassung wird
   aus demselben Build zusätzlich als GitLab Pages auf dem Open-CoDE-Spiegel
   veröffentlicht (gleicher Code, anderer Host — siehe 5.8).
 - **Keine Server-Infrastruktur.** Jede fachliche Verarbeitung läuft auf dem
@@ -119,9 +119,13 @@ hier die für die DSFA relevante Kurzfassung:
   (1) GoatCounter-Reichweitenmessung beim App-Start, (2) Prüfung auf neue
   Versionen bei GitHub Releases (nur Desktop-Variante) — siehe 5.8.
 
-> *Prüfvermerk zu den Plattformen:* Der macOS-Desktop-Build ist in `release.yml`
-> derzeit stillgelegt (`if: false`, Stand 2026-09-05); die Nennung von nur
-> Windows und Linux ist insoweit zutreffend.
+> *Prüfvermerk zu den Plattformen:* Die Desktop-Builds für macOS (Stand
+> 2026-09-05) und Windows (Stand 2026-09-15, Umzug nach Open CoDE) sind in
+> `release.yml` stillgelegt (`if: false`); als Desktop-Paket entsteht derzeit
+> nur Linux. Bereits installierte Windows-Fassungen verarbeiten weiterhin
+> Daten auf dem Endgerät, erhalten aber keine Updates mehr — für die
+> Bewertung der technischen Maßnahmen (5.9) ist der Stand der jeweils
+> installierten Fassung maßgeblich.
 
 ## 4. Erforderlichkeitsprüfung (Art. 35 Abs. 1, 3 DSGVO)
 

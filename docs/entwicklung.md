@@ -505,10 +505,19 @@ Auf macOS setzt das Installieren von Updates eine signierte App voraus
 (Signierung/Notarisierung aktiviert sich im Workflow automatisch, sobald die
 Apple-Secrets wie bei S1-Control hinterlegt sind).
 
-Der macOS-Job liegt derzeit still (`if: false` an `build-mac` in
+Der macOS-Job liegt still (`if: false` an `build-mac` in
 [release.yml](../.github/workflows/release.yml)): der Zertifikatsimport auf dem
 Runner bricht ab und riss bis dahin das ganze Release mit — auch für Windows,
-Linux und Android. Releases enthalten deshalb vorerst kein `.dmg`.
+Linux und Android. Releases enthalten deshalb kein `.dmg`.
+
+Seit dem 15.9.2026 liegt aus demselben Grund auch `build-win` still — hier
+nicht wegen eines Fehlers, sondern weil der Umzug nach Open CoDE läuft und
+offen ist, woher die Desktop-Pakete künftig kommen. Beide Jobs stehen nicht
+mehr in der `needs`-Liste des `release`-Jobs, auf dem Spiegel stehen die
+Gegenstücke in [.gitlab-ci.yml](../.gitlab-ci.yml) auf `when: never`. Neue
+Releases enthalten damit weder `.exe` noch `latest.yml`; installierte
+Windows-Fassungen finden beim Update-Check nichts Neues. Wiedereinschalten:
+die `if: false`-Zeile entfernen und den Job zurück in `needs` nehmen.
 
 Jeder Push auf `main` baut automatisch ein Release mit Datums-Version
 ([release.yml](../.github/workflows/release.yml), Aufbau wie bei
@@ -525,7 +534,8 @@ System-Browser. Die Kamera (QR-Scan) wird dort ausdrücklich freigegeben.
 
 ### Windows: x64 **und** ARM64
 
-Für Windows entstehen zwei Installer. Auf ARM-Geräten (Snapdragon X u. Ä.)
+Solange `build-win` läuft, entstehen für Windows zwei Installer (der Job ist
+derzeit stillgelegt, siehe oben). Auf ARM-Geräten (Snapdragon X u. Ä.)
 läuft ein x64-Paket nur emuliert, und emulierte Apps kommen dort nicht an die
 Kamera — der QR-Scan bliebe schwarz, eine Kameraauswahl gäbe es nicht, weil das
 System gar keine Kamera meldet. Deshalb baut der Workflow beide Architekturen.
