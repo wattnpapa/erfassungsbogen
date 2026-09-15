@@ -15,6 +15,7 @@ import {
 } from "@bos/eeb-format/model";
 import { vorlageAnlegen } from "../vorlagen";
 import { TabellenScroll } from "../tabellen-scroll";
+import { RolleMarke } from "../rolle-marke";
 import {
   QrSatz,
   bogenDateiname,
@@ -479,6 +480,10 @@ export function Uebersicht(props: {
         <table className="uebersicht">
           <thead>
             <tr>
+              {/* Die Rolle führt die Zeile an: sie ist die Auskunft, nach der
+                  in der Liste gesucht wird („wer ist hier Unterführer?"), und
+                  die Funktion daneben sagt dann, welcher — GrFü, TrFü, … */}
+              <th title={STAERKE_LEGENDE}>Rolle</th>
               <th>Funktion / Zusatzfunktion</th>
               <th>Name, Vorname</th>
               {zeigeErreichbarkeit && <th>Erreichbarkeit</th>}
@@ -487,6 +492,7 @@ export function Uebersicht(props: {
           <tbody>
             {bogen.personal.map((p, i) => (
               <tr key={i}>
+                <td><RolleMarke rolle={p.staerkeRolle} /></td>
                 <td>{funktionsText(p, org) || "—"}</td>
                 <td>{p.nachname}{p.nachname && p.vorname ? ", " : ""}{p.vorname}</td>
                 {zeigeErreichbarkeit && <td>{p.kontakte.map(kontaktText).join(" · ")}</td>}

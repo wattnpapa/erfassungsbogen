@@ -1327,6 +1327,19 @@
     .rolle-badge.rolle-f { background: var(--rolle-f-fond); color: var(--rolle-f-text); }
     .rolle-badge.rolle-u { background: var(--rolle-u-fond); color: var(--rolle-u-text); }
     .rolle-badge.rolle-m { background: var(--rolle-m-fond); color: var(--rolle-m-text); }
+    /* Dieselben drei Rollenfarben in der Personaltabelle, nur als Kürzel
+       statt als Einzelbuchstabe: „UFü" passt nicht in das 1,5-rem-Quadrat der
+       Plakette. Feste Mindestbreite, damit die Marken der Spalte untereinander
+       eine Kante bilden und das Auge die Unterführer in einer Liste von zwölf
+       Zeilen in einem Zug findet. */
+    .rolle-marke {
+      display: inline-block; min-width: 2.6rem; text-align: center;
+      padding: 0.1rem 0.35rem; border-radius: var(--radius);
+      font-size: var(--t-s); font-weight: 700; white-space: nowrap;
+    }
+    .rolle-marke.rolle-f { background: var(--rolle-f-fond); color: var(--rolle-f-text); }
+    .rolle-marke.rolle-u { background: var(--rolle-u-fond); color: var(--rolle-u-text); }
+    .rolle-marke.rolle-m { background: var(--rolle-m-fond); color: var(--rolle-m-text); }
     .muster-start { width: 100%; }
     .update-banner {
       display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 0.75rem;
