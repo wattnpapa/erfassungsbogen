@@ -111,7 +111,7 @@
     "publish": [
       {
         "provider": "generic",
-        "url": "https://github.com/wattnpapa/erfassungsbogen/releases/latest/download"
+        "url": "https://gitlab.opencode.de/oc000172112778/erfassungsbogen/-/releases/permalink/latest/downloads"
       }
     ],
     "generateUpdatesFilesForAllChannels": true

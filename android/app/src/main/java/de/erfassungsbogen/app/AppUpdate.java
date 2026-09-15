@@ -27,7 +27,7 @@ import java.net.URL;
  * lädt die vom JS-Teil ermittelte Release-APK herunter und übergibt sie
  * dem System-Paketinstaller. Gegenstück zu electron-updater auf dem Desktop.
  *
- * Der Versionsvergleich (GitHub-Release vs. installierte Version) passiert
+ * Der Versionsvergleich (Release auf Open CoDE vs. installierte Version) passiert
  * bewusst im JS-Teil (aktualisierung.tsx); nativ bleibt nur, was nur nativ
  * geht: eigene Version auslesen, Download, Installer-Intent.
  */
@@ -77,9 +77,10 @@ public class AppUpdate extends Plugin {
         conn.setConnectTimeout(30000);
         conn.setReadTimeout(30000);
         conn.connect();
-        // GitHub liefert Assets per Redirect auf objects.githubusercontent.com.
-        // setInstanceFollowRedirects folgt https→https automatisch; dieser Zweig
-        // ist Absicherung, falls ein Redirect-Status doch durchkommt.
+        // Open CoDE liefert Release-Dateien über einen Redirect aus (Permalink
+        // bzw. Package Registry). setInstanceFollowRedirects folgt https→https
+        // automatisch; dieser Zweig ist Absicherung, falls ein Redirect-Status
+        // doch durchkommt.
         int status = conn.getResponseCode();
         if (status == HttpURLConnection.HTTP_MOVED_PERM
                 || status == HttpURLConnection.HTTP_MOVED_TEMP

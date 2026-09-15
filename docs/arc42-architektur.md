@@ -111,7 +111,7 @@ Festlegungen im Code (CSP, Bundle-Budget, Schema-Migrationen):
 | Meldeköpfe, Bereitstellungsräume, Führungsstellen (auch Zug-/Verbandsführer) | Erfassen eintreffende fremde Einheiten in Minuten (Schnellerfassung oder QR-Scan), sammeln und summieren Stärke/Sofortbedarf, melden geschlossen weiter. |
 | Autor/Maintainer – Johannes Rudolph (`package.json`) | Pflegt Code, Vokabulare, Vorlagen und die vier ausgelagerten Kern-Repositories; trifft Architekturentscheidungen (ADRs im Schwesterprojekt). |
 | Schwesterprodukt „S1-Control" | Konsumiert denselben geteilten Kern über dessen gebautes `dist/`; Änderungsanforderungen an den Kern betreffen beide Produkte. |
-| Betreiber der Zielplattformen (GitHub Pages, GitHub Releases, Google Play/App Store – zukünftig) | Hosting- bzw. Vertriebsinfrastruktur, ohne eigenes Backend des Projekts. |
+| Betreiber der Zielplattformen (GitHub Pages, Open CoDE/ZenDiS für Quellcode und Releases, Google Play/App Store – zukünftig) | Hosting- bzw. Vertriebsinfrastruktur, ohne eigenes Backend des Projekts. |
 | THW-Ortsverbände / Führungsstellen mit Excel-Format „Oldenburg" | Definieren ein festes, nicht verhandelbares Spaltenformat für den Excel-Export der Einheitenliste. |
 
 ### 1.4 Hinweis zu dieser Dokumentation
@@ -195,8 +195,12 @@ wieder.
   `2026.712.1035`), erzeugt im `prepare`-Job von `release.yml` – gültiges SemVer
   für npm/Electron und gültiger `CFBundleShortVersionString` für iOS,
   minutengenau und monoton steigend.
-- **Release-Kanal:** Auslieferung ausschließlich über GitHub Releases, keine
-  eigene Update-Infrastruktur; `electron-updater` prüft direkt gegen GitHub.
+- **Release-Kanal:** Führender Auslieferungsort sind seit dem 2026-09-15 die
+  Releases auf Open CoDE (Stufe `freigabe` in `.gitlab-ci.yml`); `build.publish`
+  in `package.json` und die Android-Update-Prüfung zeigen dorthin. Eine eigene
+  Update-Infrastruktur gibt es weiterhin nicht. Auf GitHub entstehen
+  übergangsweise dieselben Releases weiter, weil vor dem Umzug installierte
+  Fassungen ihre Update-Adresse fest eingebaut haben.
 - **Quellcode-Spiegel:** Der Stand von GitHub wird nach Open CoDE
   (`gitlab.opencode.de/oc000172112778/erfassungsbogen`) gespiegelt, der
   Open-Source-Plattform der öffentlichen Verwaltung — dorthin gehört ein
@@ -217,28 +221,26 @@ wieder.
   geprüfter Stand.
 - **Paketbauten auf dem Spiegel:** Die Stufe `pakete` baut dieselben Pakete wie
   `release.yml` — `build-linux` (deb, pacman) und `build-android` (APK) laufen
-  automatisch, `build-win` (NSIS x64/arm64) und `build-mac` (dmg, zip) stehen auf
-  `when: manual` mit `allow_failure`, weil beide einen Runner mit dem passenden
-  Betriebssystem brauchen; fehlt er, bleibt der Job liegen, statt den Lauf zu
-  reißen. Die Versionsnummer nimmt der Job `version` aus dem mitgespiegelten
+  automatisch; `build-win` (NSIS x64/arm64) und `build-mac` (dmg, zip) sind auf
+  `when: never` stillgelegt, passend zum `if: false` in `release.yml`. Die Versionsnummer nimmt der Job `version` aus dem mitgespiegelten
   GitHub-Tag; ist der noch nicht angekommen, bildet er dieselbe Form aus der Uhr
   und hängt `-spiegel.<SHA>` an — an der Nummer ist also ablesbar, ob ein Paket
   zu einem GitHub-Release gehört. Signiert wird nur, wenn das Signaturmaterial
   als CI-Variable auf Open CoDE hinterlegt ist; ohne laufen die Jobs unsigniert
   durch (die APK heißt dann `…-android-unsigniert.apk`).
-- **Keine Veröffentlichung auf dem Spiegel:** Die Pakete hängen als
-  Job-Artefakte am Lauf (30 Tage). Es entsteht weder ein GitLab-Release noch ein
-  Tag — ein hier erzeugter Tag wäre beim nächsten Spiegellauf weg, und zwei
-  Release-Kanäle mit je eigener Build-Version wären schlimmer als einer.
-  Auslieferung und Auto-Update laufen ausschließlich über GitHub Releases. Der
-  fehlende Rest (`tag-anlegen`, `freigabe`, `aufraeumen`) steht **auskommentiert
-  vorbereitet** am Ende von `.gitlab-ci.yml`, für den Fall, dass GitHub als
-  führender Ort wegfällt; dort ist auch die Reihenfolge des Umschaltens notiert
-  samt der zwei Dinge, die sich nicht wegkonfigurieren lassen: ein
-  GitLab-Release trägt keine Dateien, sondern verweist auf URLs (Installer und
-  SBOM gehen daher zuerst in die Generic Package Registry), und die
-  Update-Adresse in `package.json` steckt in jeder bereits ausgelieferten
-  Desktop-App — der Bestand sucht sein Update weiter bei GitHub.
+- **Veröffentlichung auf dem Spiegel:** Die Stufe `freigabe` lädt Pakete und
+  SBOM in die Generic Package Registry des Projekts und legt ein GitLab-Release
+  an, das sie von dort verlinkt (`direct_asset_path`, damit jede Datei unter
+  `/-/releases/permalink/latest/downloads/<datei>` liegt — genau die Adresse aus
+  `build.publish`). Ein GitLab-Release trägt keine Dateien, es verweist nur auf
+  URLs; dieser Umweg ist deshalb nicht optional. Einen **Tag** legt die Pipeline
+  weiterhin nicht an: getaggt wird auf GitHub (`prepare` in `release.yml`), der
+  Tag kommt mit der Spiegelung, und `version` liest ihn — ein hier erzeugter Tag
+  wäre beim nächsten Spiegellauf weg. Releases und Pakete sind keine Git-Refs
+  und überleben die Spiegelung. Ohne Tag auf dem Commit (Zwischenstand,
+  `-spiegel.<SHA>`) wird gebaut, aber nicht veröffentlicht. Der Job
+  `aufraeumen` hält die Zahl der Releases bei zehn, sofern ein
+  `GITLAB_API_TOKEN` hinterlegt ist.
 - **Webfassung auf dem Spiegel (GitLab Pages):** Auf Open CoDE läuft eine eigene
   Pipeline (`.gitlab-ci.yml`, Job `pages`, nur auf dem Standardzweig): sie baut
   aus demselben Stand `dist/` und veröffentlicht es als GitLab Pages, damit die
@@ -252,8 +254,8 @@ wieder.
   kanonische Adresse bleibt `erfassungsbogen.app`: `sitemap.xml` und
   `<link rel="canonical">` zeigen unverändert dorthin, die Spiegelfassung tritt
   also nicht als zweite Quelle in Suchmaschinen auf. Installer, Auto-Update und
-  App-Store-Pakete kommen weiterhin ausschließlich von GitHub — der Spiegel ist
-  ein zweiter Web-Zugang, kein zweiter Release-Kanal.
+  App-Store-Pakete (Play Store, App Store) sind davon unberührt und weiterhin
+  in Vorbereitung.
 - **App-Store-Vertrieb** (Android Play Store, iOS App Store/TestFlight) ist laut
   `README.md`/`docs/TODO.md` in Vorbereitung, zum Analysezeitpunkt aber nicht
   produktiv.
@@ -349,7 +351,7 @@ flowchart TB
     Plugins["Capacitor-Plugins<br/>(Kamera, Filesystem, Share, App)"]
   end
   GC["GoatCounter<br/>(cookielose Reichweitenmessung)"]
-  Releases["GitHub Releases<br/>(Installer, APK, Update-Metadaten)"]
+  Releases["Releases auf Open CoDE<br/>(Installer, APK, Update-Metadaten;<br/>übergangsweise auch GitHub Releases)"]
   Play["Play Store<br/>(zukünftig)"]
   AppStore["App Store / TestFlight<br/>(in Vorbereitung)"]
 
@@ -368,7 +370,8 @@ flowchart TB
 | --- | --- | --- | --- |
 | GitHub Pages (erfassungsbogen.app) | eingehend (einmaliger Ladevorgang) | Statisches Hosting der PWA; nach dem ersten Laden läuft die App vollständig offline (Service Worker) | HTTPS, statische Dateien aus `dist/` |
 | GoatCounter | ausgehend | Cookielose, datensparsame Reichweitenmessung; einziger in der CSP erlaubter externer Host | HTTPS-Zählpixel (`img-src`/`connect-src` in der CSP) |
-| GitHub Releases | ein-/ausgehend | Verteilt Desktop-/Android-Installer; `electron-updater` prüft im Hintergrund auf neue Versionen | `latest*.yml`-Metadaten + Binärartefakte, generischer electron-updater-Provider |
+| Releases auf Open CoDE (`gitlab.opencode.de`) | ein-/ausgehend | Verteilt Desktop-/Android-Installer; `electron-updater` und die Android-Update-Prüfung fragen dort nach neuen Versionen | `latest*.yml`-Metadaten + Binärartefakte über `/-/releases/permalink/latest/downloads/`, generischer electron-updater-Provider; Android über die Release-API |
+| GitHub Releases | ein-/ausgehend | Übergangsweise derselbe Inhalt, für vor dem Umzug installierte Fassungen mit fest eingebauter Update-Adresse | wie oben |
 | Google Play Store / Apple App Store | ausgehend (geplant) | Zukünftiger Vertriebsweg für Android/iOS; laut `README.md` noch nicht produktiv | – |
 | Capacitor-Plugin-Schicht | intern (nativ) | Kapselt native Fähigkeiten (Kamera-Barcode-Scan, Dateisystem, Teilen, App-Lifecycle/Deep-Links) einheitlich für Android/iOS | Capacitor-Bridge (JS ↔ nativer Code) |
 
@@ -838,7 +841,7 @@ Neuladen" in `features/uebergabe.feature`).
 sequenceDiagram
   participant App as Electron-App
   participant Upd as electron-updater
-  participant GH as GitHub Releases
+  participant GH as Releases (Open CoDE)
   actor Nutzer
 
   App->>Upd: beim Start: Update-Check (nur in gepackter App)
@@ -884,7 +887,8 @@ flowchart LR
   Check -.-> Mac["Job: build-mac<br/>(deaktiviert, if: false)<br/>macOS dmg/zip"]
   Linux --> Release["Job: release<br/>GitHub Release erstellen"]
   Android --> Release
-  Release --> GHR["GitHub Releases<br/>Installer, APK, latest*.yml"]
+  Release --> GHR["GitHub Releases<br/>(Übergang: Bestandsinstallationen)"]
+  OCC -->|"nur mit Tag: Stufe freigabe"| OCR["Releases auf Open CoDE<br/>Package Registry + Release<br/>(führender Update-Kanal)"]
   Release --> Cleanup["Job: cleanup<br/>nur die neuesten 10 Releases behalten"]
 ```
 
@@ -893,7 +897,7 @@ flowchart LR
 ```mermaid
 flowchart TB
   Pages["GitHub Pages<br/>erfassungsbogen.app"] -->|"HTTPS, einmaliger Ladevorgang"| Browser["Browser (Desktop/Mobil)<br/>PWA, danach offline via Service Worker"]
-  Releases["GitHub Releases"]
+  Releases["Releases auf Open CoDE<br/>(übergangsweise auch GitHub)"]
   Play["Google Play Store<br/>(vorbereitet, noch nicht produktiv)"]
   Apple["Apple App Store / TestFlight<br/>(in Vorbereitung)"]
 
@@ -913,9 +917,9 @@ flowchart TB
 | --- | --- | --- | --- | --- |
 | Web/PWA | Vite-Build, Service Worker (Workbox) | `dist/` (statische Dateien) | GitHub Pages (erfassungsbogen.app), Deployment bei jedem Push auf `main` | Service-Worker-Update-Banner, kein Auto-Reload |
 | Windows | Electron + electron-builder, NSIS | `.exe` (x64 und separat arm64, je eigener Installer) | Stillgelegt seit 2026-09-15 (Umzug nach Open CoDE); ältere Installer hängen noch an den vorhandenen Releases | electron-updater, findet aber kein neueres Paket mehr, solange der Build stillsteht |
-| Linux | Electron + electron-builder | `.deb` (Debian/Ubuntu), `.pacman` (Arch) | GitHub Releases | electron-updater |
+| Linux | Electron + electron-builder | `.deb` (Debian/Ubuntu), `.pacman` (Arch) | Releases auf Open CoDE (übergangsweise zusätzlich GitHub Releases) | electron-updater |
 | macOS | Electron + electron-builder | `.dmg`, `.zip` | Deaktiviert (Signatur scheitert auf dem CI-Runner, Stand 2026-09-05); bis dahin Verweis auf die Web-App | – |
-| Android | Capacitor + Gradle | signierte `.apk` (Release-Keystore aus GitHub Secret) | GitHub Releases; Play Store vorbereitet, noch nicht produktiv | kein In-App-Updater dokumentiert; manueller Download neuer APK |
+| Android | Capacitor + Gradle | signierte `.apk` (Release-Keystore aus CI-Secret) | Releases auf Open CoDE (übergangsweise zusätzlich GitHub Releases); Play Store vorbereitet, noch nicht produktiv | kein In-App-Updater dokumentiert; manueller Download neuer APK |
 | iOS | Capacitor + Xcode | – | App Store/TestFlight in Vorbereitung (`docs/TODO.md`); bis dahin Verweis auf die Web-App | – |
 
 ### 7.4 Besonderheiten der Pipeline
@@ -1038,7 +1042,8 @@ flowchart TB
   Widerruf, die Gegenstelle gleicht die neue Kurzform von Hand ab.
 - **Meldeweg für Schwachstellen:** `SECURITY.md` im Hauptrepository, gültig für
   das Hauptrepo und die vier `vendor/`-Submodule (Private Vulnerability
-  Reporting auf GitHub oder E-Mail, keine öffentlichen Issues).
+  E-Mail oder vertrauliches Issue auf Open CoDE, keine öffentlichen Issues bzw.
+  Merge Requests).
 - **TOFU-Vertrauensmodell**, keine zentrale PKI: „✓ signiert von …" belegt nur,
   dass der Datensatz unverändert vom Inhaber dieses Schlüssels stammt – nicht,
   wer diese Person ist.
@@ -1404,8 +1409,9 @@ Repository-Analyse, keine offiziellen Angaben des Projekts.
 
 ### 11.3 Technische Schulden (explizit im Code/Docs vermerkt)
 
-- **Release-Aufräumung behält nur 10 Releases** (`KEEP: 10` in `release.yml`) –
-  ältere Installer sind über GitHub Releases nicht mehr greifbar.
+- **Release-Aufräumung behält nur 10 Releases** (`KEEP: 10` in `release.yml`
+  und im Job `aufraeumen` auf Open CoDE) – ältere Installer sind danach nicht
+  mehr greifbar.
 - **`docs/TODO.md`** führt mehrere unerledigte Punkte als Checkliste (Gerätetest
   iPhone, App-Store-Connect-Einrichtung, Live-Webcam-Test,
   Electron-Kamera-Entitlements, Play-Signing-Fingerabdruck-Nachtrag).

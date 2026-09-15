@@ -21,7 +21,7 @@ Rückweg steht in ADR-003 des S1-Control-Projekts.
 ### Auschecken und bauen
 
 ```bash
-git clone --recurse-submodules https://github.com/wattnpapa/erfassungsbogen.git
+git clone --recurse-submodules https://gitlab.opencode.de/oc000172112778/erfassungsbogen.git
 # oder in einem vorhandenen Klon:
 git submodule update --init --recursive
 npm ci
@@ -114,7 +114,7 @@ vendored und nicht veröffentlicht.
 
 Im CI läuft das dreifach: `ci.yml` erzeugt die SBOM bei jedem Pull Request und
 hängt sie ans Lauf-Artefakt, `release.yml` legt sie als
-`erfassungsbogen-<version>-sbom.cdx.json` ans GitHub-Release (zu jedem
+`erfassungsbogen-<version>-sbom.cdx.json` ans Release (zu jedem
 ausgelieferten Stand gehört die passende Stückliste), und `npm audit` prüft
 beides Mal gegen die npm-Advisory-Datenbank. Nur der Lauf über die
 Laufzeit-Abhängigkeiten (`--omit=dev`) lässt den Build scheitern; das
@@ -499,7 +499,8 @@ bisherigen Fassungen derselben Einheit.
 ## Desktop-App (Electron)
 
 Die App prüft beim Start automatisch auf neue Versionen (electron-updater gegen
-das neueste GitHub-Release), lädt Updates im Hintergrund und installiert sie
+das neueste Release auf Open CoDE — die Adresse steht in `build.publish` in
+package.json), lädt Updates im Hintergrund und installiert sie
 nach Bestätigung bzw. beim nächsten Beenden. Offline-Starts bleiben ungestört.
 Auf macOS setzt das Installieren von Updates eine signierte App voraus
 (Signierung/Notarisierung aktiviert sich im Workflow automatisch, sobald die

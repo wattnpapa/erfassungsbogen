@@ -1,8 +1,8 @@
 /// <reference types="vite-plugin-pwa/client" />
 /**
  * Android-Selbst-Update (Sideload-APK, kein Play Store): beim Start prüfen,
- * ob ein neueres GitHub-Release vorliegt, und – auf Wunsch des Nutzers – die
- * APK laden und installieren. Gegenstück zu electron-updater auf dem Desktop.
+ * ob auf Open CoDE ein neueres Release vorliegt, und – auf Wunsch des Nutzers –
+ * die APK laden und installieren. Gegenstück zu electron-updater auf dem Desktop.
  *
  * Der native Teil (Download + Installer-Intent, Version auslesen) steckt im
  * Capacitor-Plugin AppUpdate (android/.../AppUpdate.java). Hier liegt die
@@ -24,8 +24,11 @@ interface AppUpdatePlugin {
 
 const AppUpdate = registerPlugin<AppUpdatePlugin>("AppUpdate");
 
-// owner/repo wie im Release-Workflow (.github/workflows/release.yml).
-const REPO = "wattnpapa/erfassungsbogen";
+// Projektpfad auf Open CoDE, URL-kodiert (`/` → `%2F`), wie die GitLab-API ihn
+// erwartet. Die Releases entstehen dort in der Stufe `freigabe` (.gitlab-ci.yml).
+const PROJEKT = "oc000172112778%2Ferfassungsbogen";
+const RELEASE_API =
+  `https://gitlab.opencode.de/api/v4/projects/${PROJEKT}/releases/permalink/latest`;
 
 interface UpdateInfo {
   version: string;
@@ -55,7 +58,7 @@ function versionNeuerAls(a: string, b: string): boolean {
 }
 
 /**
- * Neuestes Release von GitHub holen und mit der installierten Version
+ * Neuestes Release von Open CoDE holen und mit der installierten Version
  * vergleichen. Der Versionsstring hat das Format YYYY.MMDD.HHMM (z. B.
  * 2026.712.1035); verglichen wird numerisch je Komponente (siehe
  * versionNeuerAls). Fehler (kein Netz, Rate-Limit, kein Release) werden still
@@ -65,19 +68,23 @@ async function aufUpdatePruefen(): Promise<UpdateInfo | null> {
   if (!updatesUnterstuetzt()) return null;
   try {
     const { versionName } = await AppUpdate.getCurrentVersion();
-    const antwort = await fetch(
-      `https://api.github.com/repos/${REPO}/releases/latest`,
-      { headers: { Accept: "application/vnd.github+json" } },
-    );
+    const antwort = await fetch(RELEASE_API, { headers: { Accept: "application/json" } });
     if (!antwort.ok) return null;
     const release = await antwort.json();
     const neuste: unknown = release?.tag_name;
     if (typeof neuste !== "string" || !versionNeuerAls(neuste, versionName)) return null;
-    const apk = (release.assets ?? []).find(
-      (a: { name?: string }) => typeof a.name === "string" && a.name.endsWith("-android.apk"),
+    // Ein GitLab-Release trägt keine Dateien, sondern verlinkt sie (die Pakete
+    // liegen in der Generic Package Registry des Projekts). `direct_asset_url`
+    // ist der Weg über das Release selbst und bleibt gültig, wenn sich die
+    // Registry-Adresse ändert; `url` ist der Rückfallweg.
+    const links: { name?: string; url?: string; direct_asset_url?: string }[] =
+      release?.assets?.links ?? [];
+    const apk = links.find(
+      (a) => typeof a.name === "string" && a.name.endsWith("-android.apk"),
     );
-    if (!apk?.browser_download_url) return null;
-    return { version: neuste, apkUrl: apk.browser_download_url };
+    const apkUrl = apk?.direct_asset_url ?? apk?.url;
+    if (!apkUrl) return null;
+    return { version: neuste, apkUrl };
   } catch {
     return null;
   }

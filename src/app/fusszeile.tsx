@@ -16,7 +16,7 @@ import { alleDatenLoeschen, datenUmfang, sicherungErstellen, sicherungEinspielen
 import { geraeteKurzform, geraeteSchluesselLoeschen, geraeteSchluesselSicherstellen } from "./geraete-schluessel";
 
 const KONTAKT = "johannes.rudolph@thw-oldenburg.de";
-const REPO = "https://github.com/wattnpapa/erfassungsbogen";
+const REPO = "https://gitlab.opencode.de/oc000172112778/erfassungsbogen";
 // Absolut, nicht relativ: dieselbe Fußzeile läuft in der Electron-/Capacitor-App,
 // wo ein relativer Pfad auf das mitgelieferte Bundle statt auf die Seite zeigt.
 const ANLEITUNG = "https://erfassungsbogen.app/anleitung.html";
@@ -678,7 +678,7 @@ export function Fusszeile({ onBogenOeffnen, kompakt = false }: {
           <a href={ANLEITUNG} target="_blank" rel="noopener noreferrer">Anleitung</a>
           <a href={VORLAGE} target="_blank" rel="noopener noreferrer">Aufbau des Bogens</a>
           <a href={`mailto:${KONTAKT}`}>Kontakt</a>
-          <a href={REPO} target="_blank" rel="noopener noreferrer">Open Source auf GitHub</a>
+          <a href={REPO} target="_blank" rel="noopener noreferrer">Open Source auf Open CoDE</a>
           <a href="https://sprechfunk-uebung.de/" target="_blank" rel="noopener noreferrer">Sprechfunk-Übungsgenerator</a>
         </nav>
         {/* Registerentscheidung der Oberfläche: Du — wie an allen anderen
@@ -939,7 +939,7 @@ export function Fusszeile({ onBogenOeffnen, kompakt = false }: {
         </p>
         <p>
           Die Anwendung ist Open Source (Lizenz EUPL-1.2). Fehler, Ideen und Beiträge gern
-          über <a href={REPO} target="_blank" rel="noopener noreferrer">GitHub</a> oder per{" "}
+          über <a href={REPO} target="_blank" rel="noopener noreferrer">Open CoDE</a> oder per{" "}
           <a href={`mailto:${KONTAKT}`}>E-Mail</a>.
         </p>
         <p>

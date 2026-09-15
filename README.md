@@ -97,7 +97,7 @@ Wer noch abwägt: [Papier oder digital?](https://erfassungsbogen.app/papier-oder
 ## Herunterladen
 
 Alle Downloads unter
-[Releases](https://github.com/wattnpapa/erfassungsbogen/releases/latest):
+[Releases](https://gitlab.opencode.de/oc000172112778/erfassungsbogen/-/releases/permalink/latest):
 
 | Gerät | Download |
 |---|---|

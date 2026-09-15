@@ -343,6 +343,10 @@ jobs:
           merge-multiple: true
           path: artifacts
 
+      # Bleibt vorerst bestehen, obwohl der führende Release-Kanal seit dem
+      # Umzug auf Open CoDE liegt (`freigabe` in .gitlab-ci.yml): Vor dem Umzug
+      # installierte Desktop- und Android-Fassungen suchen ihr Update fest an
+      # dieser Adresse. Abschalten, wenn dieser Bestand durch ist.
       - name: GitHub Release erstellen
         uses: softprops/action-gh-release@v3
         with:

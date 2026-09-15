@@ -8,13 +8,24 @@
 # Richtung (GitHub -> Open CoDE), die Datei gehört also ins GitHub-Repository
 # und reist von dort mit.
 #
-# Was hier NICHT passiert: veröffentlichen. Die Pakete hängen als
-# Job-Artefakte am Lauf, es entsteht kein GitLab-Release und kein Tag. Der
-# ausgelieferte Stand kommt weiterhin ausschließlich von GitHub Releases, und
-# dort zeigt auch der Auto-Update-Kanal hin (`build.publish` in package.json).
-# Zwei Release-Kanäle mit je eigener Build-Version wären schlimmer als einer.
-# Der Weg dorthin — für den Tag, an dem GitHub abgeschaltet wird — steht
-# auskommentiert am Ende dieser Datei.
+# Seit dem 15.9.2026 entsteht hier auch das Release: Die Stufe `freigabe` lädt
+# die Pakete in die Generic Package Registry des Projekts und legt ein
+# GitLab-Release an, das sie von dort verlinkt. Darauf zeigt der Auto-Update-
+# Kanal der App (`build.publish` in package.json) über den Permalink
+# `/-/releases/permalink/latest/downloads/<datei>`.
+#
+# Einen Tag legt diese Datei weiterhin NICHT an, und das ist der Kern des
+# Aufbaus: Getaggt wird nach wie vor auf GitHub (`prepare` in release.yml), der
+# Tag kommt mit der Spiegelung herüber, und der Job `version` liest ihn. Ein
+# hier erzeugter Tag wäre beim nächsten Spiegellauf weg (`git push --force
+# --prune`). Releases und Pakete sind keine Git-Refs — die überlebt die
+# Spiegelung unangetastet.
+#
+# Solange auf GitHub ebenfalls noch Releases entstehen, gibt es die Pakete an
+# beiden Orten. Das ist Absicht und begrenzt: Vor dem Umzug installierte Apps
+# fragen ihr Update weiterhin bei GitHub an — die Adresse steckt fest in der
+# installierten Fassung. Erst wenn dieser Bestand durch ist, kann der
+# `release`-Job in release.yml abgeschaltet werden.
 #
 # Einmalige Einrichtung auf Open CoDE:
 #   * Deploy -> Pages: Veröffentlichung aktivieren und entscheiden, ob die Seite
@@ -23,10 +34,14 @@
 #   * Für signierte Pakete die Variablen aus dem Abschnitt am Dateiende
 #     hinterlegen. Ohne sie bauen die Jobs unsigniert durch — brauchbar zum
 #     Prüfen, nicht zum Verteilen.
-#   * Für Windows und macOS je einen Runner mit passendem Betriebssystem; ohne
-#     ihn bleiben die beiden Jobs unangetastet (siehe dort).
+#   * Settings -> Packages and registries: Package Registry aktiviert lassen —
+#     dort landen Installer, APK und SBOM, das Release verlinkt sie von da.
+#   * Optional GITLAB_API_TOKEN (Projekt-Access-Token, Scope `api`) für den
+#     Job `aufraeumen`; ohne es bleiben alte Releases einfach stehen.
+#   * Die Jobs für Windows und macOS sind stillgelegt (`when: never`). Wer sie
+#     wiederbeleben will, braucht je einen Runner mit passendem Betriebssystem.
 
-stages: [pruefen, pakete, seite]
+stages: [pruefen, pakete, freigabe, seite]
 
 default:
   # Volles node-Image (nicht -slim): der Klon braucht git, die Submodule werden
@@ -137,6 +152,9 @@ version:
       fi
       echo "BUILD_VERSION=$BUILD_VERSION" > version.env
       echo "APP_BUILD_VERSION=$BUILD_VERSION" >> version.env
+      # Veröffentlicht wird nur, was zu einem Tag gehört. Ein Zwischenstand vom
+      # Spiegel (Suffix -spiegel.<sha>) wird gebaut und bleibt Artefakt.
+      if [ -n "$TAG" ]; then echo "IST_RELEASE=ja" >> version.env; else echo "IST_RELEASE=nein" >> version.env; fi
       cat version.env
   # dotenv statt „job outputs": so sehen alle Paket-Jobs dieselbe Version, ohne
   # sie neu aus der Uhr zu lesen — zwei Jobs um 10:59:59 und 11:00:00 kämen
@@ -351,120 +369,135 @@ pages:
 #   APPLE_API_ISSUER
 #   APPLE_API_KEY_BASE64
 #
+# Dazu, nicht fürs Signieren, sondern fürs Aufräumen:
+#
+#   GITLAB_API_TOKEN           Projekt-Access-Token, Scope `api`. Nur der Job
+#                              `aufraeumen` benutzt es; fehlt es, bleiben alte
+#                              Releases stehen.
+#
 # Windows-Signierung ist auch auf GitHub nicht eingerichtet; der NSIS-Installer
 # ist dort ebenfalls unsigniert.
 # ---------------------------------------------------------------------------
 
 # ---------------------------------------------------------------------------
-# Vorbereitet, aber stillgelegt: Tag, Release und Aufräumen für den Tag, an dem
-# GitHub abgeschaltet wird.
+# Stufe 3: Freigabe — Pakete in die Registry, Release anlegen
 #
-# Die Build-Jobs oben laufen schon; was hier fehlt, ist nur das
-# Veröffentlichen. Solange GitHub der führende Ort ist, darf davon nichts
-# laufen — zwei Release-Kanäle mit je eigener Build-Version wären schlimmer als
-# einer.
-#
-# Reihenfolge beim Umschalten (jeder Punkt ist für sich ein eigener Schritt):
-#
-#   1. Führung umdrehen. Heute ist der Spiegel eine Lesefassung: GitHub
-#      überschreibt ihn per `git push --force --prune`. Erst wenn
-#      spiegel-opencode.yml abgeschaltet ist, darf hier etwas committet oder
-#      getaggt werden — vorher reißt der nächste Spiegellauf es weg.
-#   2. `stages:` oben um `freigabe` erweitern.
-#   3. Im Job `version` den Tag-Zweig gegen das Anlegen eines eigenen Tags
-#      tauschen (Block `tag-anlegen` unten) — ab dann entsteht die Build-Version
-#      hier und nicht mehr auf GitHub.
-#   4. package.json anpassen: `build.publish[0].url` zeigt heute auf
-#      `https://github.com/wattnpapa/erfassungsbogen/releases/latest/download`.
-#      Das ist die Adresse, die in jeder bereits ausgelieferten Desktop-App
-#      steckt — wer sie umstellt, erreicht damit nur künftige Installationen.
-#      Der Bestand sucht sein Update weiter bei GitHub. Die GitHub-Releases
-#      müssen also erreichbar bleiben, bis der Bestand durch ist, oder es
-#      braucht ein Übergangs-Release, dessen einziger Zweck die neue Adresse
-#      ist.
-#   5. Zusätzliche Variablen hinterlegen:
-#        GITLAB_PUSH_TOKEN   Projekt-Access-Token, Rolle Maintainer, Scope
-#                            `write_repository` — der CI_JOB_TOKEN darf nicht
-#                            pushen und kann deshalb keinen Tag anlegen.
-#        GITLAB_API_TOKEN    Scope `api`, nur für das Aufräumen alter Releases.
-#   6. Die Auslieferungswege in README.md, Arc42 Kap. 2.2/7, ISK 3.6 und DSFA
-#      Abschnitt 3/5.8 nachziehen — dort steht heute überall „ausschließlich
-#      über GitHub Releases".
-#
-# Ein Unterschied zu GitHub lässt sich nicht wegkonfigurieren: Ein
-# GitLab-Release trägt keine Dateien, es verweist nur auf URLs. Installer und
-# SBOM gehen deshalb zuerst in die Generic Package Registry des Projekts, und
-# das Release verlinkt sie von dort. Für electron-updater ist das gleichwertig
-# — der `generic`-Provider will ohnehin nur ein Verzeichnis voller Dateien —,
-# die Adressen sehen aber anders aus als bei GitHub.
-#
+# Ein GitLab-Release trägt keine Dateien, es verweist nur auf URLs. Installer,
+# APK und SBOM gehen deshalb zuerst in die Generic Package Registry des
+# Projekts; das Release verlinkt sie von dort. `direct_asset_path` ist dabei
+# nicht bloß Kosmetik: Nur damit ist jede Datei unter
+# `/-/releases/permalink/latest/downloads/<datei>` erreichbar, und genau diese
+# Adresse steht in `build.publish` (package.json). electron-updater holt sich
+# dort `latest.yml` und daneben das Paket.
 # ---------------------------------------------------------------------------
+
+freigabe:
+  stage: freigabe
+  # `pruefen` steht mit in der Liste, weil dort die SBOM entsteht, die mit
+  # veröffentlicht wird. build-win und build-mac fehlen, weil sie stillgelegt
+  # sind — sonst wartet das Release auf einen Job, der nie startet.
+  needs: [version, pruefen, build-linux, build-android]
+  before_script: []
+  cache: {}
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  script:
+    - |
+      set -euo pipefail
+      if [ "${IST_RELEASE:-nein}" != "ja" ]; then
+        echo "Kein Tag auf diesem Commit — Zwischenstand, kein Release."
+        exit 0
+      fi
+      BASIS="${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/erfassungsbogen/${BUILD_VERSION}"
+      : > dateien.txt
+      for datei in release/* sbom.cdx.json; do
+        [ -f "$datei" ] || continue
+        name=$(basename "$datei")
+        curl --fail --silent --show-error --header "JOB-TOKEN: $CI_JOB_TOKEN" \
+          --upload-file "$datei" "$BASIS/$name"
+        printf '%s\t%s\n' "$name" "$BASIS/$name" >> dateien.txt
+      done
+      # Payload mit node bauen statt mit jq: node ist im Image, jq nicht, und
+      # Dateinamen mit Sonderzeichen sind so ohne Zitier-Akrobatik richtig
+      # kodiert. `direct_asset_path` macht die Datei unter dem Permalink
+      # erreichbar (siehe Kopf dieses Abschnitts).
+      node -e '
+        const fs = require("node:fs");
+        const zeilen = fs.readFileSync("dateien.txt", "utf8").trim().split("\n").filter(Boolean);
+        const links = zeilen.map((z) => {
+          const [name, url] = z.split("\t");
+          return { name, url, direct_asset_path: `/${name}`, link_type: "package" };
+        });
+        const tag = process.env.BUILD_VERSION;
+        fs.writeFileSync("release.json", JSON.stringify({
+          name: tag, tag_name: tag, assets: { links },
+        }));
+      '
+      curl --fail --silent --show-error --request POST \
+        --header "JOB-TOKEN: $CI_JOB_TOKEN" \
+        --header "Content-Type: application/json" \
+        --data @release.json \
+        "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/releases"
+      echo "Release $BUILD_VERSION angelegt."
+
+# Gegenstück zum cleanup-Job in release.yml: nur die neuesten KEEP Releases
+# bleiben stehen. Entfernt wird das Release, nicht der Tag — der gehört GitHub
+# und kommt mit der Spiegelung. Meist räumt schon GitHub mit auf: dort löscht
+# `cleanup` Release und Tag, der nächste Spiegellauf nimmt den Tag per `--prune`
+# auch hier weg, und mit dem Tag verschwindet das zugehörige GitLab-Release.
+# Dieser Job ist das Netz für die Fälle, in denen das nicht greift. Die Pakete in der Registry bleiben ebenfalls
+# liegen; sie aufzuräumen wäre ein zweiter Schritt (API
+# `/packages`), der ein Token mit `api`-Rechten braucht.
 #
-# # Einschub für den Job `version`, Schritt 3 oben: statt den gespiegelten Tag
-# # zu lesen, selbst einen anlegen. Über HTTPS mit Projekt-Access-Token, weil
-# # der CI_JOB_TOKEN nur lesen darf.
-# tag-anlegen:
-#   - git config user.email "ci@$CI_SERVER_HOST"
-#   - git config user.name "GitLab CI"
-#   - git tag "$BUILD_VERSION" "$CI_COMMIT_SHA"
-#   - git push "https://oauth2:${GITLAB_PUSH_TOKEN}@${CI_SERVER_HOST}/${CI_PROJECT_PATH}.git" "$BUILD_VERSION"
+# Ohne hinterlegtes GITLAB_API_TOKEN (Projekt-Access-Token, Scope `api`) läuft
+# der Job nicht — das ist kein Fehlerfall, der ein Release verhindern soll,
+# deshalb `allow_failure`.
+aufraeumen:
+  stage: freigabe
+  needs: [version, freigabe]
+  before_script: []
+  cache: {}
+  allow_failure: true
+  variables:
+    KEEP: "10"
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  script:
+    - |
+      set -euo pipefail
+      if [ -z "${GITLAB_API_TOKEN:-}" ]; then
+        echo "GITLAB_API_TOKEN nicht hinterlegt — nichts aufgeräumt."
+        exit 0
+      fi
+      API="${CI_API_V4_URL}/projects/${CI_PROJECT_ID}"
+      curl --fail --silent --header "PRIVATE-TOKEN: $GITLAB_API_TOKEN" \
+        "$API/releases?per_page=100" > releases.json
+      node -e '
+        const rel = require("./releases.json");
+        const keep = Number(process.env.KEEP);
+        rel.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+        console.log(rel.slice(keep).map((r) => r.tag_name).join("\n"));
+      ' > alte.txt
+      while read -r tag; do
+        [ -z "$tag" ] && continue
+        echo "Entferne Release $tag"
+        curl --fail --silent --request DELETE \
+          --header "PRIVATE-TOKEN: $GITLAB_API_TOKEN" "$API/releases/$tag" > /dev/null
+      done < alte.txt
+
+# ---------------------------------------------------------------------------
+# Noch offen für den Tag, an dem GitHub abgeschaltet wird
 #
-# freigabe:
-#   stage: freigabe
-#   # `pruefen` steht mit in der Liste, weil dort die SBOM entsteht, die mit
-#   # veröffentlicht wird. build-win und build-mac fehlen absichtlich, solange
-#   # es für sie keine Runner gibt — sonst wartet das Release auf einen Job, der
-#   # nie startet.
-#   needs: [version, pruefen, build-linux, build-android]
-#   before_script: []
-#   cache: {}
-#   script:
-#     # Schritt 1: Dateien in die Generic Package Registry. Ein GitLab-Release
-#     # kann nur auf URLs verweisen, nicht selbst Dateien tragen.
-#     - |
-#       BASIS="${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/erfassungsbogen/${BUILD_VERSION}"
-#       : > links.txt
-#       for datei in release/* sbom.cdx.json; do
-#         [ -f "$datei" ] || continue
-#         name=$(basename "$datei")
-#         curl --fail --silent --show-error --header "JOB-TOKEN: $CI_JOB_TOKEN" \
-#           --upload-file "$datei" "$BASIS/$name"
-#         printf '%s %s\n' "$name" "$BASIS/$name" >> links.txt
-#       done
-#     # Schritt 2: Release anlegen und jede Datei als Asset verlinken.
-#     - |
-#       ARGS=""
-#       while read -r name url; do
-#         ARGS="$ARGS --assets-link {\"name\":\"$name\",\"url\":\"$url\"}"
-#       done < links.txt
-#       release-cli create --name "$BUILD_VERSION" --tag-name "$BUILD_VERSION" $ARGS
-#   rules:
-#     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
-#
-# aufraeumen:
-#   stage: freigabe
-#   needs: [freigabe]
-#   before_script: []
-#   cache: {}
-#   # Gegenstück zu cleanup in release.yml: nur die neuesten KEEP Releases
-#   # bleiben online, damit sich nicht endlos Builds ansammeln. Der Aufruf
-#   # entfernt Release und Tag über die GitLab-API; die zugehörigen Pakete in
-#   # der Registry bleiben und wären ein zweiter Schritt.
-#   variables:
-#     KEEP: 10
-#   script:
-#     - apt-get update && apt-get install -y jq
-#     - |
-#       API="${CI_API_V4_URL}/projects/${CI_PROJECT_ID}"
-#       curl --fail --silent --header "PRIVATE-TOKEN: $GITLAB_API_TOKEN" \
-#         "$API/releases?per_page=300" \
-#         | jq -r 'sort_by(.created_at) | reverse | .[].tag_name' \
-#         | tail -n +"$((KEEP + 1))" \
-#         | while read -r tag; do
-#             [ -z "$tag" ] && continue
-#             echo "Entferne Release und Tag $tag"
-#             curl --fail --silent --request DELETE --header "PRIVATE-TOKEN: $GITLAB_API_TOKEN" "$API/releases/$tag"
-#             curl --fail --silent --request DELETE --header "PRIVATE-TOKEN: $GITLAB_API_TOKEN" "$API/repository/tags/$tag"
-#           done
-#   rules:
-#     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+#   1. Führung umdrehen. Heute überschreibt GitHub den Spiegel per
+#      `git push --force --prune` (spiegel-opencode.yml). Erst wenn dieser
+#      Workflow abgeschaltet ist, darf hier committet oder getaggt werden.
+#   2. Den Tag hier anlegen statt ihn zu lesen — im Job `version`:
+#        git config user.email "ci@$CI_SERVER_HOST"
+#        git config user.name "GitLab CI"
+#        git tag "$BUILD_VERSION" "$CI_COMMIT_SHA"
+#        git push "https://oauth2:${GITLAB_PUSH_TOKEN}@${CI_SERVER_HOST}/${CI_PROJECT_PATH}.git" "$BUILD_VERSION"
+#      Dafür braucht es GITLAB_PUSH_TOKEN (Projekt-Access-Token, Rolle
+#      Maintainer, Scope `write_repository`); der CI_JOB_TOKEN darf nicht pushen.
+#   3. In release.yml den `release`-Job abschalten, sobald der Bestand an
+#      Installationen durch ist, die ihr Update noch bei GitHub suchen.
+# ---------------------------------------------------------------------------

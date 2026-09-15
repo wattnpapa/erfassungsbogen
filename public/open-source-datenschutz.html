@@ -271,7 +271,7 @@
         Verantwortlicher, Rechtsgrundlagen, Betroffenenrechte und der Widerspruch
         gegen die Reichweitenmessung. Diese Seite ist die technische Ergänzung
         dazu und ersetzt sie nicht. Jede Aussage hier lässt sich im
-        <a href="https://github.com/wattnpapa/erfassungsbogen">Quellcode</a>
+        <a href="https://gitlab.opencode.de/oc000172112778/erfassungsbogen">Quellcode</a>
         nachlesen; die Fundstelle steht jeweils dabei.
       </p>
     </div>
@@ -397,14 +397,16 @@
     <ul>
       <li>
         <strong>Android</strong> (per Datei verteilte APK): beim Start wird
-        <code>api.github.com</code> nach dem neuesten Release gefragt; erst nach
-        einem Tippen auf „Aktualisieren“ wird die APK von GitHub geladen
+        <code>gitlab.opencode.de</code> nach dem neuesten Release gefragt; erst nach
+        einem Tippen auf „Aktualisieren“ wird die APK von Open CoDE geladen
         (<code>src/app/aktualisierung.tsx</code>).
       </li>
       <li>
         <strong>Desktop</strong>: der Electron-Updater prüft im installierten Zustand
-        gegen die GitHub-Releases und lädt ein Update im Hintergrund; installiert wird
-        es nach Rückfrage beziehungsweise beim Beenden (<code>electron/main.js</code>).
+        gegen die Releases auf Open CoDE und lädt ein Update im Hintergrund; installiert
+        wird es nach Rückfrage beziehungsweise beim Beenden (<code>electron/main.js</code>).
+        Vor dem Umzug installierte Fassungen fragen weiterhin bei GitHub an, solange die
+        dortigen Releases erreichbar sind.
       </li>
       <li>
         <strong>Web und PWA</strong>: der Service Worker lädt eine neue Fassung im
@@ -485,11 +487,11 @@ connect-src 'self' file: https://erfassungsbogen.goatcounter.com</code></pre>
     <h2>Quellcode, Lizenz und Releases</h2>
     <ul>
       <li>Quellcode:
-        <a href="https://github.com/wattnpapa/erfassungsbogen">github.com/wattnpapa/erfassungsbogen</a></li>
+        <a href="https://gitlab.opencode.de/oc000172112778/erfassungsbogen">gitlab.opencode.de/oc000172112778/erfassungsbogen</a></li>
       <li>Lizenz:
-        <a href="https://github.com/wattnpapa/erfassungsbogen/blob/main/LICENSE">EUPL-1.2</a></li>
+        <a href="https://gitlab.opencode.de/oc000172112778/erfassungsbogen/-/blob/main/LICENSE">EUPL-1.2</a></li>
       <li>Fertige Fassungen für Windows, macOS, Linux und Android:
-        <a href="https://github.com/wattnpapa/erfassungsbogen/releases">Releases</a></li>
+        <a href="https://gitlab.opencode.de/oc000172112778/erfassungsbogen/-/releases">Releases</a></li>
       <li>Blanko-Bogen zum Ausdrucken:
         <a href="./downloads/einheiten-erfassungsbogen-blanko.pdf">PDF-Vorlage</a>
         (siehe <a href="./vorlage.html">Aufbau des Bogens</a>)</li>
@@ -497,7 +499,7 @@ connect-src 'self' file: https://erfassungsbogen.goatcounter.com</code></pre>
     <p>
       Der Quellcode ist vollständig einsehbar; wer die Aussagen dieser Seite prüfen
       will, findet die genannten Dateien dort unter denselben Pfaden. Fehler und
-      Verbesserungsvorschläge nimmt das GitHub-Projekt entgegen.
+      Verbesserungsvorschläge nimmt das Projekt auf Open CoDE entgegen.
     </p>
 
     <h2>Projekt und Autor</h2>

@@ -217,7 +217,7 @@ interface FaqSeite {
 // Kanonische Bausteine
 // ---------------------------------------------------------------------------
 
-const GITHUB = `<a href="https://github.com/wattnpapa/erfassungsbogen">GitHub</a>`;
+const OPENCODE = `<a href="https://gitlab.opencode.de/oc000172112778/erfassungsbogen">Open CoDE</a>`;
 const DATENSCHUTZ = `<a href="./datenschutz.html">Datenschutzerklärung</a>`;
 const TECHNIK = `<a href="./open-source-datenschutz.html">Open Source und Technik</a>`;
 
@@ -236,7 +236,7 @@ function kosten(einstieg: string, zusatz = ""): string {
   return `<p>
 ${einstieg} Die App ist freie Software unter der EUPL-1.2 — kostenlos, ohne
 Konto, ohne Bezahlschranke und ohne Werbung; der Quellcode liegt offen auf
-${GITHUB}.${zusatz}
+${OPENCODE}.${zusatz}
 </p>`;
 }
 

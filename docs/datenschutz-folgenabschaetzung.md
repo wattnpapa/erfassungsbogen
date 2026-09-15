@@ -117,7 +117,9 @@ hier die für die DSFA relevante Kurzfassung:
   (kein PKI-Modell, siehe 5.4).
 - **Zwei externe Netzverbindungen** außerhalb der eigentlichen Bogen-Funktion:
   (1) GoatCounter-Reichweitenmessung beim App-Start, (2) Prüfung auf neue
-  Versionen bei GitHub Releases (nur Desktop-Variante) — siehe 5.8.
+  Versionen bei den Releases auf Open CoDE (Desktop und Android-Sideload) —
+  siehe 5.8. Vor dem Umzug installierte Fassungen fragen weiterhin bei GitHub
+  an; die Adresse steckt fest im jeweils installierten Paket.
 
 > *Prüfvermerk zu den Plattformen:* Die Desktop-Builds für macOS (Stand
 > 2026-09-05) und Windows (Stand 2026-09-15, Umzug nach Open CoDE) sind in
@@ -294,7 +296,7 @@ Kapitel 6 der [Arc42-Dokumentation](arc42-architektur.md).
 | --- | --- | --- | --- |
 | QR-Code/Datei-Weitergabe im Meldeweg | Nächste Einheit/Führungsstelle | Ja, zweckgemäß | Kernfunktion der App, siehe 5.6 |
 | GoatCounter-Zählpixel | `erfassungsbogen.goatcounter.com` | Nein — laut Quellcode werden nur Pfad, Titel, Referrer und Geräteklasse (iOS/Android/Desktop) übertragen, keine Cookies, keine geräteübergreifende ID, keine Bogen-Inhalte | Art. 6 Abs. 1 lit. f DSGVO; ein Widerspruch (Art. 21 DSGVO) ist über einen dokumentierten URL-Parameter (`skipgc`) technisch vorgesehen |
-| Update-Prüfung (nur Desktop) | GitHub Releases | Nein, nur technische Metadaten der Anfrage (u. a. IP-Adresse als Transportdatum) | Berechtigtes Interesse an sicherem, aktuellem Software-Stand |
+| Update-Prüfung (Desktop und Android-Sideload) | Releases auf Open CoDE (`gitlab.opencode.de`); vor dem Umzug installierte Fassungen weiterhin GitHub Releases | Nein, nur technische Metadaten der Anfrage (u. a. IP-Adresse als Transportdatum) | Berechtigtes Interesse an sicherem, aktuellem Software-Stand |
 | Abruf der Webfassung | GitHub Pages (erfassungsbogen.app) **oder** GitLab Pages auf Open CoDE (`gitlab.opencode.de`) | Nein, nur technische Metadaten der Anfrage (u. a. IP-Adresse als Transportdatum) | Ausliefern der Anwendung selbst. Welcher der beiden Hoster diese Metadaten sieht, entscheidet allein die aufgerufene Adresse; der ausgelieferte Code ist identisch. Bei der Open-CoDE-Fassung liegt das Hosting bei der Betreiberin der Plattform — für Verwaltungen kann genau das der Grund für diesen Weg sein |
 
 **Offene Detailfrage für die einsetzende Organisation:** Wer im Sinne der DSGVO

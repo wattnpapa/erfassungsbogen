@@ -19,7 +19,7 @@ const hier = path.dirname(fileURLToPath(import.meta.url));
 // Im Dev-Modus (npm run electron:dev) läuft der Vite-Server; sonst dist/.
 const devServerUrl = process.env.VITE_DEV_SERVER_URL;
 
-/** Externe Links (GitHub, mailto …) im System öffnen statt im App-Fenster. */
+/** Externe Links (Open CoDE, mailto …) im System öffnen statt im App-Fenster. */
 function istExtern(url) {
   return !url.startsWith("file:") && !(devServerUrl && url.startsWith(devServerUrl));
 }
@@ -65,8 +65,9 @@ function fensterErstellen() {
 }
 
 /**
- * Auto-Update (wie S1-Control): beim Start gegen das neueste GitHub-Release
- * prüfen, Update im Hintergrund laden, dann Neustart anbieten. Wer "Später"
+ * Auto-Update (wie S1-Control): beim Start gegen das neueste Release auf Open
+ * CoDE prüfen (Adresse: `build.publish` in package.json), Update im Hintergrund
+ * laden, dann Neustart anbieten. Wer "Später"
  * wählt, bekommt das Update beim nächsten Beenden automatisch installiert.
  */
 function updatesEinrichten() {

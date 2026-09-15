@@ -103,7 +103,11 @@ function contentSecurityPolicy(): Plugin {
       // Die PDF-Vorschau in der Übersicht rahmt eine im Browser erzeugte
       // Blob-URL ein; ohne frame-src greift default-src und der Rahmen bliebe leer.
       "frame-src 'self' file: blob:",
-      "connect-src 'self' file: https://erfassungsbogen.goatcounter.com",
+      // gitlab.opencode.de: Die Android-Fassung fragt beim Start die
+      // Release-API von Open CoDE nach einer neueren APK (aktualisierung.tsx).
+      // In der Web-Fassung läuft diese Prüfung nicht — die Policy ist für alle
+      // Fassungen dieselbe, weil `cap sync` dieselbe index.html mitnimmt.
+      "connect-src 'self' file: https://erfassungsbogen.goatcounter.com https://gitlab.opencode.de",
     ].join("; ");
   }
 
@@ -201,8 +205,8 @@ function fontCssInline(): Plugin {
   };
 }
 
-// base "./": relative Pfade, damit der Build direkt auf GitHub Pages
-// (Unterpfad /<repo>/) funktioniert.
+// base "./": relative Pfade, damit der Build direkt unter einem Unterpfad
+// (/<repo>/) funktioniert, wie ihn GitHub Pages und GitLab Pages vergeben.
 /** Pfad relativ zur Projektwurzel, absolut aufgelöst. */
 function pfad(teil: string): string {
   return fileURLToPath(new URL(teil, import.meta.url));
