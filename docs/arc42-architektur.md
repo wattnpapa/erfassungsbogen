@@ -111,7 +111,7 @@ Festlegungen im Code (CSP, Bundle-Budget, Schema-Migrationen):
 | Meldeköpfe, Bereitstellungsräume, Führungsstellen (auch Zug-/Verbandsführer) | Erfassen eintreffende fremde Einheiten in Minuten (Schnellerfassung oder QR-Scan), sammeln und summieren Stärke/Sofortbedarf, melden geschlossen weiter. |
 | Autor/Maintainer – Johannes Rudolph (`package.json`) | Pflegt Code, Vokabulare, Vorlagen und die vier ausgelagerten Kern-Repositories; trifft Architekturentscheidungen (ADRs im Schwesterprojekt). |
 | Schwesterprodukt „S1-Control" | Konsumiert denselben geteilten Kern über dessen gebautes `dist/`; Änderungsanforderungen an den Kern betreffen beide Produkte. |
-| Betreiber der Zielplattformen (Open CoDE für Webfassung, Quellcode und Releases; GitHub als Rückfallweg; Google Play/App Store – zukünftig) | Hosting- bzw. Vertriebsinfrastruktur, ohne eigenes Backend des Projekts. |
+| Betreiber der Zielplattformen (Open CoDE/ZenDiS GmbH für Webfassung, Quellcode und Releases; GitHub als Rückfallweg; Google Play/App Store – zukünftig) | Hosting- bzw. Vertriebsinfrastruktur, ohne eigenes Backend des Projekts. |
 | THW-Ortsverbände / Führungsstellen mit Excel-Format „Oldenburg" | Definieren ein festes, nicht verhandelbares Spaltenformat für den Excel-Export der Einheitenliste. |
 
 ### 1.4 Hinweis zu dieser Dokumentation
@@ -1032,7 +1032,13 @@ flowchart TB
   CycloneDX-1.6-Stückliste aus den fünf `package-lock.json` ohne Installation
   und ohne Netz; `npm audit --omit=dev --audit-level=high` blockiert im CI,
   `npm audit` über das Bau-/Testwerkzeug läuft als Hinweis mit; Dependabot
-  (`.github/dependabot.yml`) prüft wöchentlich npm und GitHub-Actions.
+  (`.github/dependabot.yml`) prüft wöchentlich npm und GitHub-Actions. Für Open
+  CoDE liegt der Ersatz vorbereitet, aber inaktiv im Baum: `renovate.json` und
+  der geplante Job `renovate` treten an die Stelle von Dependabot, der Job
+  `sicherheits-audit` an die der Sicherheitswarnungen (beide nur in geplanten
+  Pipelines, siehe `docs/entwicklung.md`). Renovate kann dort allerdings erst
+  arbeiten, wenn die Spiegelung abgeschaltet ist — sie räumt fremde Zweige
+  weg.
 - **Keine Anmeldung, keine Cloud**, keine personenbezogenen Daten verlassen das
   Gerät außer über den vom Nutzer selbst gewählten Transportweg.
 - **Cookielose Reichweitenmessung** über GoatCounter – der einzige erlaubte

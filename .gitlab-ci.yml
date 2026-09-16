@@ -41,7 +41,7 @@
 #   * Die Jobs für Windows und macOS sind stillgelegt (`when: never`). Wer sie
 #     wiederbeleben will, braucht je einen Runner mit passendem Betriebssystem.
 
-stages: [pruefen, pakete, freigabe, seite]
+stages: [pruefen, pakete, freigabe, seite, wartung]
 
 default:
   # Volles node-Image (nicht -slim): der Klon braucht git, die Submodule werden
@@ -171,13 +171,20 @@ version:
 # Release.
 # ---------------------------------------------------------------------------
 
+# Geplante Läufe (Stufe `wartung`) sollen prüfen, nicht bauen und nicht
+# veröffentlichen — deshalb steht `when: never` für sie in jeder Regel unten.
+.nur-hauptzweig-ohne-zeitplan:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+      when: never
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+
 .paket:
   stage: pakete
   # Wie in release.yml, wo build-* an `check` hängt und dort auch die E2E-Tests
   # laufen: gebaut wird nur, was den ganzen Prüflauf bestanden hat.
   needs: [version, pruefen, e2e]
-  rules:
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  extends: .nur-hauptzweig-ohne-zeitplan
   artifacts:
     paths: [release/]
     expire_in: 30 days
@@ -335,8 +342,7 @@ pages:
   needs: [pruefen]
   # Nur der Hauptzweig wird veröffentlicht. Die Spiegelung schiebt alle Zweige
   # und Tags herüber; ein Feature-Zweig soll die Seite nicht überschreiben.
-  rules:
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  extends: .nur-hauptzweig-ohne-zeitplan
   script:
     # Footer-Version wie bei den App-Releases aus dem jüngsten Tag. Ohne Tag
     # (frischer Spiegel, noch kein Release) bleibt der Fallback aus
@@ -355,6 +361,68 @@ pages:
   environment:
     name: pages
     url: $CI_PAGES_URL
+
+# ---------------------------------------------------------------------------
+# Stufe 5: Wartung — was auf GitHub Dependabot und die Sicherheitswarnungen tun
+#
+# Beide Jobs laufen nur in geplanten Pipelines (Build -> Pipeline schedules).
+# Im normalen Push-Lauf haben sie nichts zu suchen: Der eine würde bei jedem
+# Commit Merge Requests anlegen, der andere prüft etwas, das sich ohne Commit
+# ändert — nämlich die Schwachstellendatenbank.
+# ---------------------------------------------------------------------------
+
+# Nachfolge von Dependabot. Renovate läuft hier selbst gehostet über npx, es
+# braucht kein eigenes Image. Gelesen wird renovate.json im Projekt (dieselben
+# Regeln wie .github/dependabot.yml).
+#
+# ACHTUNG, Reihenfolge: Solange die Spiegelung von GitHub läuft, ist dieser Job
+# zwecklos — `git push --force --prune` räumt jeden Zweig weg, den Renovate hier
+# anlegt, und mit ihm den Merge Request. Erst einschalten, wenn
+# spiegel-opencode.yml abgeschaltet ist und dieses Repository führt. Bis dahin
+# macht Dependabot die Arbeit auf GitHub.
+#
+# Einzurichten: RENOVATE_TOKEN (Projekt-Access-Token, Rolle Maintainer, Scopes
+# `api` und `write_repository`) und ein Pipeline-Schedule, z. B. montags früh.
+# Ohne das Token beendet sich der Job, ohne etwas zu tun.
+renovate:
+  stage: wartung
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+  cache: {}
+  before_script: []
+  variables:
+    RENOVATE_PLATFORM: gitlab
+    RENOVATE_ENDPOINT: $CI_API_V4_URL
+    RENOVATE_REPOSITORIES: $CI_PROJECT_PATH
+    # Ohne das Submodul-Verzeichnis: die vier Kern-Bausteine pflegen ihre
+    # Abhängigkeiten im eigenen Repository.
+    RENOVATE_IGNORE_PATHS: '["vendor/**", "**/node_modules/**"]'
+  script:
+    - |
+      set -euo pipefail
+      if [ -z "${RENOVATE_TOKEN:-}" ]; then
+        echo "RENOVATE_TOKEN nicht hinterlegt — nichts zu tun."
+        exit 0
+      fi
+      # Ohne Versionsangabe: die jeweils aktuelle Fassung. Sobald der Job
+      # wirklich läuft, ist ein fester Hauptstand (renovate@<major>) die
+      # bessere Wahl — dann ändert sich das Verhalten nicht über Nacht.
+      npx --yes renovate
+
+# Nachfolge der Dependabot-Sicherheitswarnungen: Die melden, wenn sich an der
+# Bewertung eines Pakets etwas ändert, ohne dass jemand etwas committet hat.
+# Genau das macht dieser Lauf — dieselbe Prüfung wie im Job `pruefen`, nur nach
+# Kalender statt nach Push. Scheitert er, gibt es für ein Paket im
+# ausgelieferten Baum eine neue Meldung ab „hoch".
+sicherheits-audit:
+  stage: wartung
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+  script:
+    - npm audit --omit=dev --audit-level=high
+    # Das Bau- und Testwerkzeug landet auf keinem Einsatzgerät; Treffer gehören
+    # ins Protokoll, sollen den Lauf aber nicht scheitern lassen.
+    - npm audit --audit-level=high || true
 
 # ---------------------------------------------------------------------------
 # Variablen für signierte Pakete
@@ -403,13 +471,19 @@ freigabe:
   needs: [version, pruefen, build-linux, build-android]
   before_script: []
   cache: {}
-  rules:
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  extends: .nur-hauptzweig-ohne-zeitplan
   script:
     - |
       set -euo pipefail
       if [ "${IST_RELEASE:-nein}" != "ja" ]; then
         echo "Kein Tag auf diesem Commit — Zwischenstand, kein Release."
+        exit 0
+      fi
+      # Ein zweiter Lauf derselben Pipeline soll nicht an einem „already
+      # exists" scheitern.
+      if curl --fail --silent --header "JOB-TOKEN: $CI_JOB_TOKEN" \
+           "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/releases/${BUILD_VERSION}" > /dev/null 2>&1; then
+        echo "Release $BUILD_VERSION gibt es schon — nichts zu tun."
         exit 0
       fi
       BASIS="${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/erfassungsbogen/${BUILD_VERSION}"
@@ -462,10 +536,9 @@ aufraeumen:
   before_script: []
   cache: {}
   allow_failure: true
+  extends: .nur-hauptzweig-ohne-zeitplan
   variables:
     KEEP: "10"
-  rules:
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
   script:
     - |
       set -euo pipefail

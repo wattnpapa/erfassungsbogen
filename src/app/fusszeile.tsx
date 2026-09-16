@@ -258,9 +258,12 @@ function Datenschutzdialog({ dialogRef }: { dialogRef: RefObject<HTMLDialogEleme
       <p>
         Die Website wird über die Pages-Funktion von Open CoDE
         (<code>gitlab.opencode.de</code>) ausgeliefert, der Open-Source-Plattform der
-        öffentlichen Verwaltung. Dabei verarbeitet die Plattform technisch notwendige
-        Verbindungsdaten (z.&nbsp;B. IP-Adresse) in Server-Logs zur Bereitstellung und
-        Absicherung des Dienstes.
+        öffentlichen Verwaltung. Betreiberin ist die ZenDiS GmbH (Zentrum für
+        Digitale Souveränität der Öffentlichen Verwaltung),{" "}
+        <a href="https://www.zendis.de" target="_blank" rel="noopener noreferrer">www.zendis.de</a>.
+        Dabei verarbeitet die Plattform technisch notwendige Verbindungsdaten
+        (z.&nbsp;B. IP-Adresse) in Server-Logs zur Bereitstellung und Absicherung
+        des Dienstes.
       </p>
       <h3>3. Erfasste Bogendaten</h3>
       <p>

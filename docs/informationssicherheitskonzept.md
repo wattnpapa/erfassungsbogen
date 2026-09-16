@@ -173,7 +173,8 @@ erzwungen (siehe 5.3).
 
 > *Prüfvermerk zum Web-Host (Stand 2026-09-16):* Die Domain erfassungsbogen.app
 > zieht auf die Pages von Open CoDE um; die Abrufmetadaten (u. a. IP-Adresse)
-> entstehen damit beim Betreiber dieser Plattform statt bei GitHub Pages. K1 bis
+> entstehen damit bei der Betreiberin dieser Plattform, der ZenDiS GmbH, statt
+> bei GitHub Pages. K1 bis
 > K3 gelten unverändert — es ist derselbe Build, und K2 zählt in denselben
 > GoatCounter-Bestand. Solange die GitHub-Pages-Fassung unter ihrer
 > `github.io`-Adresse zusätzlich erreichbar ist, gilt das dort entsprechend für
@@ -370,7 +371,8 @@ ORP.1 Organisation, INF.1 Gebäude) sind nicht Gegenstand dieses Dokuments.
 | Automatisierte Tests vor Veröffentlichung | Erfüllt | GitHub-Actions-Workflow `ci.yml` (Unit-Tests via Vitest, E2E via Cucumber, Typecheck) |
 | Signierte/verifizierbare Auslieferungspakete | Teilweise erfüllt | macOS-Notarisierung und Code-Signing sind in `release.yml` vorgesehen, greifen aber nur, wenn die entsprechenden CI-Secrets hinterlegt sind; ohne diese entsteht laut Workflow-Kommentar bewusst ein unsignierter Build. **Ergänzung:** die Jobs für macOS und Windows sind stillgelegt (`if: false`), gebaut wird nur noch Linux und Android |
 | Versionierte, nachvollziehbare Abhängigkeiten | Erfüllt | `package-lock.json` je Teilprojekt/Submodul, Versionen gepinnt |
-| Regelmäßige Prüfung auf bekannte Schwachstellen in Abhängigkeiten (SCA) | Erfüllt | `.github/dependabot.yml` (wöchentlich, npm + GitHub-Actions), `npm audit --omit=dev --audit-level=high` als blockierender CI-Schritt, `npm audit` über das Bau-/Testwerkzeug als Hinweis |
+| Regelmäßige Prüfung auf bekannte Schwachstellen in Abhängigkeiten (SCA) | Erfüllt | `.github/dependabot.yml` (wöchentlich, npm + GitHub-Actions), `npm audit --omit=dev --audit-level=high` als blockierender CI-Schritt, `npm audit` über das Bau-/Testwerkzeug als Hinweis. Auf Open CoDE vorbereitet, aber noch inaktiv: `renovate.json` mit dem geplanten Job `renovate` als Dependabot-Ersatz und der Job `sicherheits-audit` als Ersatz der Sicherheitswarnungen (beide nur in geplanten Pipelines und erst sinnvoll, wenn die Spiegelung abgeschaltet ist) |
+| Erkennung versehentlich eingecheckter Geheimnisse | Teilweise erfüllt | Auf GitHub greifen Secret-Scanning und Push-Protection (öffentliches Repository). Ein Gegenstück auf Open CoDE ist nicht eingerichtet; ein eigener CI-Job (etwa gitleaks) wäre der Weg, wenn die Führung dorthin wechselt |
 | Stückliste der ausgelieferten Software (SBOM) | Erfüllt | `npm run sbom` (`scripts/sbom.ts`) erzeugt CycloneDX 1.6 aus den fünf `package-lock.json`; im CI als Artefakt, im Release als Asset |
 | Dokumentierter Meldeweg für Schwachstellen | Erfüllt | `SECURITY.md` im Hauptrepository: Geltungsbereich (Hauptrepo + die vier `vendor/`-Submodule), E-Mail an den Betreuer bzw. vertrauliches Issue auf Open CoDE (für die vier Submodule weiterhin das private Vulnerability Reporting auf GitHub), angestrebte Fristen (7 Tage Eingangsbestätigung, 30 Tage Einschätzung, Veröffentlichung nach Fix bzw. spätestens nach 90 Tagen) |
 

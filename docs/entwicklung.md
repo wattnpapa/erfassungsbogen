@@ -123,6 +123,27 @@ steht deshalb als reiner Hinweis im Protokoll. Laufend nachgehalten wird der
 Baum von Dependabot (`.github/dependabot.yml`), einschließlich der
 GitHub-Actions — auch die sind fremder Code mit Schreibrechten aufs Repo.
 
+### Was davon Open CoDE kann, und was nicht
+
+Dependabot, die Sicherheitswarnungen zum Abhängigkeitsbaum und das
+Secret-Scanning sind Funktionen von GitHub; auf einer GitLab-Instanz gibt es
+sie so nicht. Solange GitHub das führende Repository ist, ändert das nichts —
+dort laufen sie weiter. Für den Tag, an dem die Führung umzieht, steht der
+Ersatz schon im Baum:
+
+| Was GitHub tut | Ersatz auf Open CoDE | Stand |
+| --- | --- | --- |
+| Dependabot legt wöchentlich PRs für neue Paketstände an | Renovate, selbst gehostet als geplanter Job `renovate` (`.gitlab-ci.yml`), Regeln in `renovate.json` | vorbereitet, inaktiv — braucht `RENOVATE_TOKEN` und einen Pipeline-Schedule |
+| Dependabot meldet neue Schwachstellen ohne neuen Commit | Job `sicherheits-audit`, derselbe `npm audit --omit=dev --audit-level=high`, nur nach Kalender statt nach Push | vorbereitet, inaktiv — braucht einen Pipeline-Schedule |
+| Secret-Scanning und Push-Protection | GitLab bringt das nur in höheren Stufen mit; ohne sie wäre ein eigener Job (etwa gitleaks) nötig | offen, bewusst noch nicht eingebaut |
+| Private Vulnerability Reporting | E-Mail und vertrauliches Issue, siehe `SECURITY.md` | erledigt |
+| `npm audit` im Prüflauf, SBOM | gehört dem Projekt, läuft auf beiden Seiten gleich | erledigt |
+
+Eine Reihenfolge ist dabei zwingend: Renovate kann auf Open CoDE erst arbeiten,
+wenn die Spiegelung abgeschaltet ist. Sie schiebt mit `git push --force
+--prune`, und das räumt jeden Zweig weg, den Renovate dort anlegt — samt Merge
+Request.
+
 ### Content-Security-Policy
 
 `vite.config.ts` setzt die Policy beim Bauen als `<meta>` in den Kopf der

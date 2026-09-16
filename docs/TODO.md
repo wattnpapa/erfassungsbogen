@@ -7,11 +7,12 @@
       eintragen, TXT-Eintrag zur Bestätigung setzen, Zertifikat abwarten).
       Danach die Domain in den GitHub-Pages-Einstellungen austragen, sonst
       streiten sich zwei Hoster um dieselbe Adresse.
-- [ ] **Datenschutzhinweise:** Der Betreiber der Plattform und der Link auf
-      dessen Datenschutzerklärung fehlen noch in `public/datenschutz.html`,
-      `public/open-source-datenschutz.html` und `src/app/fusszeile.tsx` — dort
-      steht bisher nur „Open CoDE (gitlab.opencode.de)". Der Verweis auf das
-      GitHub Privacy Statement ist entfallen und noch nicht ersetzt.
+- [ ] **Datenschutzhinweise:** Betreiberin (ZenDiS GmbH, www.zendis.de) steht
+      jetzt in `public/datenschutz.html`, `public/open-source-datenschutz.html`
+      und `src/app/fusszeile.tsx`. Offen: ein Verweis auf die
+      Datenschutzerklärung der Plattform selbst, sobald die konkrete Adresse
+      feststeht — an derselben Stelle, wo früher das GitHub Privacy Statement
+      verlinkt war.
 - [ ] **AASA nachmessen:** Nach dem DNS-Wechsel prüfen, mit welchem
       Content-Type die Pages auf Open CoDE
       `/.well-known/apple-app-site-association` ausliefern. Auf GitHub Pages
@@ -21,6 +22,11 @@
       `ANDROID_KEYSTORE` plus `ANDROID_KEYSTORE_PASSWORD`, derselbe Keystore wie
       auf GitHub. Ohne ihn baut `build-android` eine unsignierte APK, und die
       lässt sich über eine installierte signierte Fassung nicht installieren.
+- [ ] **Wartungs-Pipelines einrichten**, sobald Open CoDE führt: Pipeline
+      Schedule (montags früh) plus `RENOVATE_TOKEN` für den Job `renovate`, und
+      ein zweiter Schedule für `sicherheits-audit`. Vorher zwecklos — die
+      Spiegelung räumt Renovate-Zweige weg. Offen bleibt ein Ersatz für das
+      Secret-Scanning von GitHub (Tabelle in `docs/entwicklung.md`).
 - [ ] **Ersten Release-Lauf prüfen:** Ist
       `…/-/releases/permalink/latest/downloads/latest.yml` ohne Anmeldung
       erreichbar? Daran hängt der Desktop-Updater.

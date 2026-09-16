@@ -1,0 +1,40 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "_kommentar": [
+    "Gegenstück zu .github/dependabot.yml für Open CoDE: Dependabot gibt es nur",
+    "auf GitHub, Renovate läuft überall — als App oder, wie hier vorgesehen, als",
+    "geplanter CI-Job (Job `renovate` in .gitlab-ci.yml).",
+    "",
+    "Die Einstellungen bilden dependabot.yml nach: wöchentlich statt täglich,",
+    "das Bau- und Testwerkzeug gebündelt in EINEM Merge Request, die",
+    "Laufzeit-Abhängigkeiten einzeln (sie landen auf Einsatzgeräten, ein",
+    "Fehlschlag soll eindeutig zuzuordnen sein), und die vier Kern-Bausteine",
+    "ausgenommen — die hängen als Submodul unter vendor/ und sind über `file:`",
+    "verlinkt (ADR-003), ein Registry-Update gibt es dafür nicht.",
+    "",
+    "Sicherheitsmeldungen hält der Zeitplan nicht auf: `vulnerabilityAlerts`",
+    "läuft ohne Zeitfenster."
+  ],
+  "extends": ["config:recommended"],
+  "timezone": "Europe/Berlin",
+  "schedule": ["* 0-6 * * 1"],
+  "prConcurrentLimit": 5,
+  "labels": ["abhängigkeiten"],
+  "packageRules": [
+    {
+      "matchPackageNames": ["@bos/**"],
+      "enabled": false,
+      "description": "Kern-Bausteine kommen als Submodul, nicht aus der Registry."
+    },
+    {
+      "matchDepTypes": ["devDependencies"],
+      "matchUpdateTypes": ["minor", "patch"],
+      "groupName": "werkzeug",
+      "description": "Bau- und Testwerkzeug gesammelt in einem Merge Request."
+    }
+  ],
+  "vulnerabilityAlerts": {
+    "labels": ["sicherheit"],
+    "schedule": ["at any time"]
+  }
+}
