@@ -102,9 +102,11 @@ Ausführlich beschrieben in der [Arc42-Architekturdokumentation](arc42-architekt
 hier die für die DSFA relevante Kurzfassung:
 
 - **Plattformen:** Web/PWA (erfassungsbogen.app), Linux-Desktop (Electron),
-  Android (Capacitor); iOS in Vorbereitung. Dieselbe Webfassung wird
-  aus demselben Build zusätzlich als GitLab Pages auf dem Open-CoDE-Spiegel
-  veröffentlicht (gleicher Code, anderer Host — siehe 5.8).
+  Android (Capacitor); iOS in Vorbereitung. Die Webfassung unter
+  erfassungsbogen.app liegt seit dem 2026-09-16 auf den Pages von Open CoDE; die
+  aus demselben Build entstehende Fassung auf GitHub Pages bleibt unter ihrer
+  `github.io`-Adresse als Rückfallweg erreichbar (gleicher Code, anderer Host —
+  siehe 5.8).
 - **Keine Server-Infrastruktur.** Jede fachliche Verarbeitung läuft auf dem
   Endgerät. Keine zentrale Datenbank, keine Nutzerkonten, keine Anmeldung.
 - **Datenübergabe zwischen zwei Geräten** ausschließlich über einen
@@ -297,7 +299,7 @@ Kapitel 6 der [Arc42-Dokumentation](arc42-architektur.md).
 | QR-Code/Datei-Weitergabe im Meldeweg | Nächste Einheit/Führungsstelle | Ja, zweckgemäß | Kernfunktion der App, siehe 5.6 |
 | GoatCounter-Zählpixel | `erfassungsbogen.goatcounter.com` | Nein — laut Quellcode werden nur Pfad, Titel, Referrer und Geräteklasse (iOS/Android/Desktop) übertragen, keine Cookies, keine geräteübergreifende ID, keine Bogen-Inhalte | Art. 6 Abs. 1 lit. f DSGVO; ein Widerspruch (Art. 21 DSGVO) ist über einen dokumentierten URL-Parameter (`skipgc`) technisch vorgesehen |
 | Update-Prüfung (Desktop und Android-Sideload) | Releases auf Open CoDE (`gitlab.opencode.de`); vor dem Umzug installierte Fassungen weiterhin GitHub Releases | Nein, nur technische Metadaten der Anfrage (u. a. IP-Adresse als Transportdatum) | Berechtigtes Interesse an sicherem, aktuellem Software-Stand |
-| Abruf der Webfassung | GitHub Pages (erfassungsbogen.app) **oder** GitLab Pages auf Open CoDE (`gitlab.opencode.de`) | Nein, nur technische Metadaten der Anfrage (u. a. IP-Adresse als Transportdatum) | Ausliefern der Anwendung selbst. Welcher der beiden Hoster diese Metadaten sieht, entscheidet allein die aufgerufene Adresse; der ausgelieferte Code ist identisch. Bei der Open-CoDE-Fassung liegt das Hosting bei der Betreiberin der Plattform — für Verwaltungen kann genau das der Grund für diesen Weg sein |
+| Abruf der Webfassung | Pages auf Open CoDE (erfassungsbogen.app, `gitlab.opencode.de`); die Fassung auf GitHub Pages bleibt unter ihrer `github.io`-Adresse als Rückfallweg erreichbar | Nein, nur technische Metadaten der Anfrage (u. a. IP-Adresse als Transportdatum) | Ausliefern der Anwendung selbst. Seit dem Domain-Umzug sieht diese Metadaten die Betreiberin von Open CoDE — für Verwaltungen kann genau das der Grund für diesen Weg sein. Welcher Host sie sieht, entscheidet allein die aufgerufene Adresse; der ausgelieferte Code ist identisch |
 
 **Offene Detailfrage für die einsetzende Organisation:** Wer im Sinne der DSGVO
 für die GoatCounter-Messung verantwortlich ist (der Projektbetreiber bei Nutzung

@@ -111,7 +111,7 @@ Festlegungen im Code (CSP, Bundle-Budget, Schema-Migrationen):
 | Meldeköpfe, Bereitstellungsräume, Führungsstellen (auch Zug-/Verbandsführer) | Erfassen eintreffende fremde Einheiten in Minuten (Schnellerfassung oder QR-Scan), sammeln und summieren Stärke/Sofortbedarf, melden geschlossen weiter. |
 | Autor/Maintainer – Johannes Rudolph (`package.json`) | Pflegt Code, Vokabulare, Vorlagen und die vier ausgelagerten Kern-Repositories; trifft Architekturentscheidungen (ADRs im Schwesterprojekt). |
 | Schwesterprodukt „S1-Control" | Konsumiert denselben geteilten Kern über dessen gebautes `dist/`; Änderungsanforderungen an den Kern betreffen beide Produkte. |
-| Betreiber der Zielplattformen (GitHub Pages, Open CoDE/ZenDiS für Quellcode und Releases, Google Play/App Store – zukünftig) | Hosting- bzw. Vertriebsinfrastruktur, ohne eigenes Backend des Projekts. |
+| Betreiber der Zielplattformen (Open CoDE für Webfassung, Quellcode und Releases; GitHub als Rückfallweg; Google Play/App Store – zukünftig) | Hosting- bzw. Vertriebsinfrastruktur, ohne eigenes Backend des Projekts. |
 | THW-Ortsverbände / Führungsstellen mit Excel-Format „Oldenburg" | Definieren ein festes, nicht verhandelbares Spaltenformat für den Excel-Export der Einheitenliste. |
 
 ### 1.4 Hinweis zu dieser Dokumentation
@@ -241,19 +241,21 @@ wieder.
   `-spiegel.<SHA>`) wird gebaut, aber nicht veröffentlicht. Der Job
   `aufraeumen` hält die Zahl der Releases bei zehn, sofern ein
   `GITLAB_API_TOKEN` hinterlegt ist.
-- **Webfassung auf dem Spiegel (GitLab Pages):** Auf Open CoDE läuft eine eigene
+- **Webfassung auf Open CoDE (GitLab Pages):** Auf Open CoDE läuft eine eigene
   Pipeline (`.gitlab-ci.yml`, Job `pages`, nur auf dem Standardzweig): sie baut
-  aus demselben Stand `dist/` und veröffentlicht es als GitLab Pages, damit die
-  Anwendung innerhalb der Verwaltungsplattform unmittelbar aufrufbar ist und
-  nicht nur als Quelltext daliegt. Weil der Vite-Build relative Pfade erzeugt
+  aus demselben Stand `dist/` und veröffentlicht es als GitLab Pages. Seit dem
+  2026-09-16 ist das der Ort, an dem `erfassungsbogen.app` liegt — die Domain
+  zeigt per DNS dorthin, die Pages-Fassung auf GitHub bleibt als Rückfallweg
+  unter ihrer `github.io`-Adresse bestehen. Weil der Vite-Build relative Pfade erzeugt
   (`base: "./"`), läuft dieselbe PWA auch unter einem Unterpfad, ohne
   Sonderbehandlung. GitLab Pages veröffentlicht starr `public/` — dieser Name
   ist hier durch die statischen Quelldateien belegt, deshalb ersetzt der Job im
   Arbeitsbereich `public/` durch das Bau-Ergebnis, statt das neuere
   `pages.publish` zu verwenden, das ältere GitLab-Fassungen nicht kennen. Die
   kanonische Adresse bleibt `erfassungsbogen.app`: `sitemap.xml` und
-  `<link rel="canonical">` zeigen unverändert dorthin, die Spiegelfassung tritt
-  also nicht als zweite Quelle in Suchmaschinen auf. Installer, Auto-Update und
+  `<link rel="canonical">` zeigen unverändert dorthin — am Domainnamen ändert
+  der Umzug nichts, nur am Host dahinter. Die Fassung auf GitHub Pages tritt
+  damit nicht als zweite Quelle in Suchmaschinen auf. Installer, Auto-Update und
   App-Store-Pakete (Play Store, App Store) sind davon unberührt und weiterhin
   in Vorbereitung.
 - **App-Store-Vertrieb** (Android Play Store, iOS App Store/TestFlight) ist laut
@@ -342,7 +344,7 @@ flowchart LR
 
 ```mermaid
 flowchart TB
-  Pages["GitHub Pages<br/>(erfassungsbogen.app, statisches Hosting)"]
+  Pages["Pages auf Open CoDE<br/>(erfassungsbogen.app, statisches Hosting)"]
   subgraph Endgerät ["Endgerät (Browser / Electron / Capacitor)"]
     App["Erfassungsbogen<br/>(React-SPA, offline-fähig)"]
     SW["Service Worker<br/>(Workbox, App-Shell-Cache)"]
@@ -368,7 +370,7 @@ flowchart TB
 
 | System | Richtung | Zweck | Protokoll/Format |
 | --- | --- | --- | --- |
-| GitHub Pages (erfassungsbogen.app) | eingehend (einmaliger Ladevorgang) | Statisches Hosting der PWA; nach dem ersten Laden läuft die App vollständig offline (Service Worker) | HTTPS, statische Dateien aus `dist/` |
+| Pages auf Open CoDE (erfassungsbogen.app) | eingehend (einmaliger Ladevorgang) | Statisches Hosting der PWA; nach dem ersten Laden läuft die App vollständig offline (Service Worker) | HTTPS, statische Dateien aus `dist/` |
 | GoatCounter | ausgehend | Cookielose, datensparsame Reichweitenmessung; einziger in der CSP erlaubter externer Host | HTTPS-Zählpixel (`img-src`/`connect-src` in der CSP) |
 | Releases auf Open CoDE (`gitlab.opencode.de`) | ein-/ausgehend | Verteilt Desktop-/Android-Installer; `electron-updater` und die Android-Update-Prüfung fragen dort nach neuen Versionen | `latest*.yml`-Metadaten + Binärartefakte über `/-/releases/permalink/latest/downloads/`, generischer electron-updater-Provider; Android über die Release-API |
 | GitHub Releases | ein-/ausgehend | Übergangsweise derselbe Inhalt, für vor dem Umzug installierte Fassungen mit fest eingebauter Update-Adresse | wie oben |
@@ -388,8 +390,8 @@ Anmeldung, keine Cloud", `PRODUCT.md`).
 Alle fachlichen Prozesse (Bogen ausfüllen, PDF erzeugen, QR kodieren/dekodieren,
 Einsatz-Sammlung, Excel-/CSV-Export) laufen vollständig im Client. Es existiert
 kein Application- oder Datenbank-Server. Die einzige Infrastruktur ist
-statisches Hosting (GitHub Pages) für den initialen Ladevorgang und GitHub
-Releases als Downloadquelle für native Installer.
+statisches Hosting (Pages auf Open CoDE) für den initialen Ladevorgang und die
+dortigen Releases als Downloadquelle für native Installer.
 
 ### 4.2 Eine Web-Codebasis, drei native Hüllen
 
@@ -873,14 +875,14 @@ flowchart LR
   Repo -->|"push, Tag, täglich"| Spiegel["GitHub Actions: spiegel-opencode.yml"]
   Spiegel --> OC["Open CoDE<br/>gitlab.opencode.de<br/>(Quellcode-Spiegel, keine Gegenrichtung)"]
   OC -->|".gitlab-ci.yml"| OCC["GitLab CI: Stufe pruefen<br/>pruefen, audit-werkzeug, e2e<br/>(Nachbildung von ci.yml)"]
-  OCC -->|"nur Standardzweig: Job pages"| OCP["GitLab Pages auf Open CoDE<br/>(zweiter Web-Zugang,<br/>canonical bleibt erfassungsbogen.app)"]
+  OCC -->|"nur Standardzweig: Job pages"| OCP["Pages auf Open CoDE<br/>erfassungsbogen.app"]
   Repo -->|"push auf Branch ≠ main oder PR"| CI["GitHub Actions: ci.yml<br/>ubuntu-latest"]
   CI --> CIS["npm ci, kern-kopien,<br/>typecheck, test, build,<br/>bundle-budget, test:e2e"]
   Repo -->|"push auf main"| REL["GitHub Actions: release.yml"]
   REL --> Prep["Job: prepare<br/>Build-Version YYYY.MMDD.HHMM,<br/>Git-Tag erzeugen"]
   Prep --> Check["Job: check<br/>typecheck, test, test:e2e"]
   Check --> Pages["Job: build-pages<br/>vite build → dist/"]
-  Pages --> Deploy["Job: deploy-pages"] --> GHP["GitHub Pages<br/>erfassungsbogen.app"]
+  Pages --> Deploy["Job: deploy-pages"] --> GHP["GitHub Pages<br/>(Rückfallweg, github.io)"]
   Check -.-> Win["Job: build-win<br/>(deaktiviert, if: false)<br/>NSIS x64 + arm64"]
   Check --> Linux["Job: build-linux<br/>ubuntu-latest, electron-builder<br/>deb + pacman"]
   Check --> Android["Job: build-android<br/>ubuntu-latest, Gradle, signierte APK"]
@@ -896,7 +898,7 @@ flowchart LR
 
 ```mermaid
 flowchart TB
-  Pages["GitHub Pages<br/>erfassungsbogen.app"] -->|"HTTPS, einmaliger Ladevorgang"| Browser["Browser (Desktop/Mobil)<br/>PWA, danach offline via Service Worker"]
+  Pages["Pages auf Open CoDE<br/>erfassungsbogen.app"] -->|"HTTPS, einmaliger Ladevorgang"| Browser["Browser (Desktop/Mobil)<br/>PWA, danach offline via Service Worker"]
   Releases["Releases auf Open CoDE<br/>(übergangsweise auch GitHub)"]
   Play["Google Play Store<br/>(vorbereitet, noch nicht produktiv)"]
   Apple["Apple App Store / TestFlight<br/>(in Vorbereitung)"]
@@ -915,7 +917,7 @@ flowchart TB
 
 | Plattform | Technologie | Artefakt | Verteilweg | Auto-Update |
 | --- | --- | --- | --- | --- |
-| Web/PWA | Vite-Build, Service Worker (Workbox) | `dist/` (statische Dateien) | GitHub Pages (erfassungsbogen.app), Deployment bei jedem Push auf `main` | Service-Worker-Update-Banner, kein Auto-Reload |
+| Web/PWA | Vite-Build, Service Worker (Workbox) | `dist/` (statische Dateien) | Pages auf Open CoDE (erfassungsbogen.app), Lauf bei jedem Push auf `main` über die Spiegelung; GitHub Pages als Rückfallweg | Service-Worker-Update-Banner, kein Auto-Reload |
 | Windows | Electron + electron-builder, NSIS | `.exe` (x64 und separat arm64, je eigener Installer) | Stillgelegt seit 2026-09-15 (Umzug nach Open CoDE); ältere Installer hängen noch an den vorhandenen Releases | electron-updater, findet aber kein neueres Paket mehr, solange der Build stillsteht |
 | Linux | Electron + electron-builder | `.deb` (Debian/Ubuntu), `.pacman` (Arch) | Releases auf Open CoDE (übergangsweise zusätzlich GitHub Releases) | electron-updater |
 | macOS | Electron + electron-builder | `.dmg`, `.zip` | Deaktiviert (Signatur scheitert auf dem CI-Runner, Stand 2026-09-05); bis dahin Verweis auf die Web-App | – |
@@ -1386,7 +1388,7 @@ Repository-Analyse, keine offiziellen Angaben des Projekts.
 | Live-Kameratest ausstehend (Web/Electron) | Der Decodier-Roundtrip ist verifiziert (`npm run demo`), ein Live-Scan mit echter Kamera laut `docs/TODO.md` noch nicht. | Restrisiko, dass reale Kamerabedingungen (Beleuchtung, Fokus, Treiber) im Feld anders funktionieren als im Test. |
 | Electron-Kamerazugriff (macOS, signiert) | `getUserMedia` benötigt im gehärteten, signierten Build `NSCameraUsageDescription` und das Hardened-Runtime-Entitlement für die Kamera; laut TODO noch zu verifizieren. | Ohne diese Einträge scheitert der QR-Scan in der signierten macOS-Desktop-App lautlos. |
 | Android-Play-Signing-Wechsel | Wechselt das Projekt auf Google Play App Signing, signiert Google mit einem eigenen Schlüssel; der SHA-256-Fingerabdruck in `assetlinks.json` müsste ergänzt werden. | Ohne diesen Schritt bricht die Digital-Asset-Links-Verifikation und Deep Links gelten auf Android nicht mehr als „verified". |
-| AASA-Content-Type über GitHub Pages | GitHub Pages liefert `apple-app-site-association` als `application/octet-stream` statt `application/json`; funktioniert nur, weil Apples CDN das akzeptiert (verifiziert 2026-07-12). | Ändert Apple diese Toleranz, brechen Universal Links ohne Codeänderung im Projekt. |
+| AASA-Content-Type des Web-Hosts | GitHub Pages lieferte `apple-app-site-association` als `application/octet-stream` statt `application/json`; das funktionierte nur, weil Apples CDN das akzeptiert (verifiziert 2026-07-12). Für die Pages auf Open CoDE ist der ausgelieferte Content-Type nach dem Domain-Umzug erneut zu prüfen. | Ändert Apple diese Toleranz oder liefert der neue Host etwas anderes aus, brechen Universal Links ohne Codeänderung im Projekt. |
 | Verzögerte Verifikation von Deep Links | Apple cached die AASA über sein CDN; nach einem Deploy kann die Verifikation bis zu 24 Stunden dauern. | Erschwert schnelles Debugging von Universal-Link-Problemen nach einem Release. |
 
 ### 11.2 Architektur- und Prozessrisiken

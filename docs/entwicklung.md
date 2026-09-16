@@ -180,12 +180,16 @@ scheitern, in dem doch ein Systemdialog auftaucht.
 ```
 npm install
 npm run dev      # Entwicklung: http://localhost:5173
-npm run build    # Produktion: dist/ — direkt für GitHub Pages geeignet (base: "./")
+npm run build    # Produktion: dist/ — direkt für Pages geeignet (base: "./")
 ```
 
-Deployment: jeder Push auf `main` baut die Seite und deployt sie auf
-GitHub Pages unter <https://erfassungsbogen.app>
-([release.yml](../.github/workflows/release.yml)).
+Deployment: <https://erfassungsbogen.app> liegt auf den Pages von Open CoDE
+(Job `pages` in [.gitlab-ci.yml](../.gitlab-ci.yml), Standardzweig). Der Weg
+dorthin führt über die Spiegelung: Push auf `main` → Spiegel → GitLab-Pipeline.
+Parallel baut [release.yml](../.github/workflows/release.yml) dieselbe Seite
+weiter für GitHub Pages; das ist seit dem Domain-Umzug nur noch ein Rückfallweg
+unter der `github.io`-Adresse und kann abgeschaltet werden, sobald die Pages auf
+Open CoDE unter der eigenen Domain stabil laufen.
 
 ### Sitemap (generiert)
 

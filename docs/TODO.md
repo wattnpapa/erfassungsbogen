@@ -1,5 +1,30 @@
 # To-do
 
+## Umzug nach Open CoDE (Rest)
+
+- [ ] **DNS und eigene Domain:** `erfassungsbogen.app` auf die Pages des
+      Open-CoDE-Projekts zeigen lassen (Deploy → Pages → Domains: Domain
+      eintragen, TXT-Eintrag zur Bestätigung setzen, Zertifikat abwarten).
+      Danach die Domain in den GitHub-Pages-Einstellungen austragen, sonst
+      streiten sich zwei Hoster um dieselbe Adresse.
+- [ ] **Datenschutzhinweise:** Der Betreiber der Plattform und der Link auf
+      dessen Datenschutzerklärung fehlen noch in `public/datenschutz.html`,
+      `public/open-source-datenschutz.html` und `src/app/fusszeile.tsx` — dort
+      steht bisher nur „Open CoDE (gitlab.opencode.de)". Der Verweis auf das
+      GitHub Privacy Statement ist entfallen und noch nicht ersetzt.
+- [ ] **AASA nachmessen:** Nach dem DNS-Wechsel prüfen, mit welchem
+      Content-Type die Pages auf Open CoDE
+      `/.well-known/apple-app-site-association` ausliefern. Auf GitHub Pages
+      war es `application/octet-stream`, was Apple toleriert; ändert sich das,
+      brechen die Universal Links (Arc42 Kap. 11.2).
+- [ ] **Android-Keystore auf Open CoDE hinterlegen:** File-Variable
+      `ANDROID_KEYSTORE` plus `ANDROID_KEYSTORE_PASSWORD`, derselbe Keystore wie
+      auf GitHub. Ohne ihn baut `build-android` eine unsignierte APK, und die
+      lässt sich über eine installierte signierte Fassung nicht installieren.
+- [ ] **Ersten Release-Lauf prüfen:** Ist
+      `…/-/releases/permalink/latest/downloads/latest.yml` ohne Anmeldung
+      erreichbar? Daran hängt der Desktop-Updater.
+
 ## Gerätetest & TestFlight (iOS)
 
 - [ ] **Gerätetest iPhone:** `npm run ios:open`, iPhone anschließen, ▶︎ (Team

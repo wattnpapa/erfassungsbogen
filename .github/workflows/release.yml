@@ -124,6 +124,10 @@ jobs:
           path: dist
 
   deploy-pages:
+    # Seit dem Domain-Umzug am 2026-09-16 liegt erfassungsbogen.app auf den
+    # Pages von Open CoDE (Job `pages` in .gitlab-ci.yml). Dieses Deployment
+    # läuft als Rückfallweg unter der github.io-Adresse weiter und kann
+    # abgeschaltet werden, sobald die Seite dort stabil läuft.
     runs-on: ubuntu-latest
     needs: build-pages
     permissions:

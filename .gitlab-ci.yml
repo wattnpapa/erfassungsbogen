@@ -324,6 +324,10 @@ build-mac:
 # Stufe 3: Webfassung veröffentlichen
 # ---------------------------------------------------------------------------
 
+# Hier liegt seit dem 16.9.2026 erfassungsbogen.app: Die Domain zeigt per DNS
+# auf die Pages dieses Projekts, eingetragen unter Deploy -> Pages -> Domains
+# (samt TXT-Eintrag zur Bestätigung und Let's-Encrypt-Zertifikat). Die Fassung
+# auf GitHub Pages läuft als Rückfallweg unter ihrer github.io-Adresse weiter.
 pages:
   stage: seite
   # Hängt nur an der Prüfstufe, nicht an den Paket-Jobs: die Seite soll nicht

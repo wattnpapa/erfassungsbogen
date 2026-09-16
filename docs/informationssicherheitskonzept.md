@@ -125,7 +125,7 @@ Datenbank und keine Benutzerverwaltung.
 
 | # | Zielobjekt | Beschreibung | Plattform(en) |
 | --- | --- | --- | --- |
-| A1 | Web-App / PWA | Hauptauslieferungsform unter erfassungsbogen.app; als Progressive Web App vollständig offlinefähig (Service Worker precacht alle Bausteine). Zusätzlich aus demselben Build als GitLab Pages auf dem Open-CoDE-Spiegel veröffentlicht (`.gitlab-ci.yml`, Job `pages`) — identischer Code, anderer Host; Installer und Auto-Update laufen seit dem 2026-09-15 über die Releases auf Open CoDE | Browser (Desktop/Mobil) |
+| A1 | Web-App / PWA | Hauptauslieferungsform unter erfassungsbogen.app, ausgeliefert über die Pages von Open CoDE (`.gitlab-ci.yml`, Job `pages`); als Progressive Web App vollständig offlinefähig (Service Worker precacht alle Bausteine). Aus demselben Build entsteht weiterhin eine Fassung auf GitHub Pages (`release.yml`), seit dem Domain-Umzug als Rückfallweg unter der `github.io`-Adresse — identischer Code, anderer Host; Installer und Auto-Update laufen seit dem 2026-09-15 über die Releases auf Open CoDE | Browser (Desktop/Mobil) |
 | A2 | Desktop-App | Electron-Wrapper um dieselbe Web-App, für Windows, macOS und Linux; Auslieferung über die Releases auf Open CoDE mit Auto-Update (übergangsweise zusätzlich über GitHub Releases, für vor dem Umzug installierte Fassungen) | Windows, macOS, Linux |
 | A3 | Android-App | Capacitor-Wrapper um dieselbe Web-App | Android |
 | A4 | iOS-App | Capacitor-Wrapper, laut Quellcode/Dokumentation in Vorbereitung, zum Analysezeitpunkt noch nicht produktiv | iOS (geplant) |
@@ -171,12 +171,14 @@ Es existieren keine weiteren Netzwerkverbindungen der eigentlichen
 Bogen-Funktion — dies ist durch die Content-Security-Policy des Builds technisch
 erzwungen (siehe 5.3).
 
-> *Prüfvermerk zum zweiten Web-Host:* Wird die Anwendung über die GitLab-Pages-
-> Fassung auf Open CoDE aufgerufen (siehe 3.2/3.6), gelten K1 bis K3
-> unverändert — es ist derselbe Build. K2 zählt dabei in denselben
-> GoatCounter-Bestand; unterschieden wird nur über den Zählpfad, nicht über den
-> Host. Zusätzlich entstehen Abrufmetadaten (u. a. IP-Adresse) beim Betreiber
-> der Plattform anstelle von GitHub Pages.
+> *Prüfvermerk zum Web-Host (Stand 2026-09-16):* Die Domain erfassungsbogen.app
+> zieht auf die Pages von Open CoDE um; die Abrufmetadaten (u. a. IP-Adresse)
+> entstehen damit beim Betreiber dieser Plattform statt bei GitHub Pages. K1 bis
+> K3 gelten unverändert — es ist derselbe Build, und K2 zählt in denselben
+> GoatCounter-Bestand. Solange die GitHub-Pages-Fassung unter ihrer
+> `github.io`-Adresse zusätzlich erreichbar ist, gilt das dort entsprechend für
+> GitHub. Die Datenschutzhinweise der App nennen den Host; sie sind mit dem
+> DNS-Wechsel zusammen umzustellen.
 
 ### 3.5 Zielobjekte: IT-Systeme (Endgeräte)
 
