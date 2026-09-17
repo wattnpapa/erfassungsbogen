@@ -19,6 +19,7 @@ import {
   PersonalErfassung,
   SCHEMA_VERSION,
   Sofortbedarf,
+  StaerkeRolle,
   datumAusIso,
   jetztZeitpunkt,
   MINUTEN_JE_TAG,
@@ -756,4 +757,55 @@ export function neuePerson(): Person {
 
 export function neuesFahrzeug(): Fahrzeug {
   return { typ: {} };
+}
+
+/**
+ * Name einer Person, wie man sie in einer Rückfrage benennt: „Meyer, Jan",
+ * sonst die Stelle in der Liste. Dieselbe Folge wie im PDF (Nachname zuerst),
+ * damit die Rückfrage und der Bogen dieselbe Person gleich nennen.
+ */
+export function personBezeichnung(p: Person, index: number): string {
+  const name = [p.nachname, p.vorname].map((s) => s.trim()).filter(Boolean).join(", ");
+  return name || `Person ${index + 1}`;
+}
+
+/** Wie `personBezeichnung`, für ein Fahrzeug: Typ und Kennzeichen, sonst die Stelle. */
+export function fahrzeugBezeichnung(f: Fahrzeug, index: number, org: OrganisationsTyp): string {
+  const typ = vokabText(f.typ, vokabularFuer(org, "fahrzeug"), "kurz");
+  const teile = [typ, f.kennzeichen?.trim()].filter(Boolean);
+  return teile.length > 0 ? teile.join(" ") : `Fahrzeug ${index + 1}`;
+}
+
+/**
+ * Trägt der Eintrag schon etwas, das beim Entfernen verloren geht?
+ *
+ * Die Rückfrage vor dem Löschen (siehe PersonKarte/FahrzeugKarte) gilt nur für
+ * diesen Fall: Wer eben „+ Person hinzufügen" danebengetippt hat, soll die
+ * leere Karte ohne Dialog wieder loswerden — sonst erzieht die Rückfrage zum
+ * Wegklicken und schützt am Ende nichts mehr. Die Vorgaben aus `neuePerson()`
+ * (Geschlecht, Ernährung, Rolle) zählen deshalb nicht als Inhalt.
+ */
+export function personLeer(p: Person): boolean {
+  return (
+    !p.vorname.trim() &&
+    !p.nachname.trim() &&
+    p.funktionen.length === 0 &&
+    p.zusatzqualifikationen.length === 0 &&
+    p.kontakte.length === 0 &&
+    p.fahrerlaubnis === Fahrerlaubnis.NONE &&
+    p.staerkeRolle === StaerkeRolle.MANNSCHAFT
+  );
+}
+
+/** Wie `personLeer`, für ein Fahrzeug. */
+export function fahrzeugLeer(f: Fahrzeug): boolean {
+  return (
+    f.typ.code == null &&
+    !f.typ.freitext?.trim() &&
+    !f.kennzeichen?.trim() &&
+    f.funkrufname == null &&
+    f.stanKonform == null &&
+    !f.aenderungen?.trim() &&
+    f.sitzplaetze == null
+  );
 }

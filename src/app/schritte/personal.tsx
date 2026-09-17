@@ -24,7 +24,16 @@ import {
 import { parseNamen } from "../personal-schnell";
 import { beispielPersonen } from "../beispielnamen";
 import { stanPersonalVorbelegung } from "@bos/vokabulare/thw-stan-personal";
-import { FE_TEXT, neuePerson, pruefpunkte, verschoben, vokabularFuer, vorbelegungGeladen } from "../hilfen";
+import {
+  FE_TEXT,
+  neuePerson,
+  personBezeichnung,
+  personLeer,
+  pruefpunkte,
+  verschoben,
+  vokabularFuer,
+  vorbelegungGeladen,
+} from "../hilfen";
 import { frageJaNein } from "../dialoge";
 import { TabellenScroll } from "../tabellen-scroll";
 import {
@@ -97,7 +106,13 @@ function KontakteEditor(props: { kontakte: Kontakt[]; aendern: (k: Kontakt[]) =>
             </Auswahl>
           </Feld>
           <Feld titel={k.art === KontaktArt.EMAIL ? "Adresse" : "Nummer"}>
+            {/* Tastatur nach Kontaktart: Ziffernblock für Mobil/Festnetz,
+                E-Mail-Tastatur für die Adresse. Dieselbe Regel wie bei den
+                Kontaktstellen der Einheit — das hier ist die Nummer, über die
+                die Gegenstelle zurückfragt. */}
             <input
+              type={k.art === KontaktArt.EMAIL ? "email" : "tel"}
+              inputMode={k.art === KontaktArt.EMAIL ? "email" : "tel"}
               value={k.wert ?? ""}
               onChange={(e) =>
                 set(i, {
@@ -282,6 +297,7 @@ function PersonKarte(props: {
   const { person: p, org, vorschlaege, frisch, index, anzahl, ansprech, aendern, entfernen, verschieben } = props;
   const karte = useRef<HTMLDivElement>(null);
   useEinzugsstempel(karte, frisch);
+  const bezeichnung = personBezeichnung(p, index);
   const set = (patch: Partial<Person>) => aendern({ ...p, ...patch });
   const funktionen = vokabularFuer(org, "funktion");
   return (
@@ -290,6 +306,12 @@ function PersonKarte(props: {
           Ort ausfüllt — die einzige Auskunft, nach der man in einer Liste von
           zwölf Personen sucht. Sie steht darum allein in der breitesten Zeile,
           nicht als drittes von sechs gleich schmalen Feldern. */}
+      {/* Laufende Nummer sichtbar, nicht nur im aria-label: Solange noch keine
+          Namen stehen, sind zwölf Karten optisch identisch — beim Nachtragen
+          und beim Entfernen traf der Griff dann die falsche. Sie nennt die
+          Stelle in der Liste, also genau das, was die Sortierknöpfe daneben
+          verändern. */}
+      <p className="eintrag-nr" aria-hidden="true">Person {index + 1} von {anzahl}</p>
       <div className="zeile eintrag-kopf">
         <Feld titel="Vorname"><input value={p.vorname} onChange={(e) => set({ vorname: e.target.value })} /></Feld>
         <Feld titel="Nachname"><input value={p.nachname} onChange={(e) => set({ nachname: e.target.value })} /></Feld>
@@ -312,7 +334,25 @@ function PersonKarte(props: {
         <button
           type="button"
           className="entfernen"
-          onClick={() => mitAbgang(karte.current, entfernen)}
+          aria-label={`${bezeichnung} entfernen`}
+          onClick={async () => {
+            /* Rückfrage nur, wenn etwas verloren geht: eine eben danebengetippte
+               leere Karte verschwindet sofort, eine ausgefüllte erst nach
+               Bestätigung. Ohne diese Rückfrage war das Löschen die einzige
+               zerstörende Aktion der App, die still ausführte — „Neuer Bogen"
+               und „Entwurf verwerfen" fragen beide, und ein Dutzend Felder einer
+               Person wiegt nicht weniger. Der Name steht in der Frage, weil die
+               Liste zwölf gleich aussehende Karten führen kann. */
+            if (!personLeer(p) && !(await frageJaNein({
+              titel: `${bezeichnung} entfernen?`,
+              text: "Die erfassten Angaben dieser Person gehen verloren — Name, Funktionen, Qualifikationen und Erreichbarkeiten.",
+              ok: "Person entfernen",
+              gefahr: true,
+            }))) {
+              return;
+            }
+            mitAbgang(karte.current, entfernen);
+          }}
         >
           Person entfernen
         </button>
@@ -601,16 +641,16 @@ export function SchrittPersonal({ bogen, aendern, geheZu }: SchrittProps) {
 
       {nurStaerke && (
         <>
-          <div className="zeile">
-            <Feld titel="Führer" schmal>
-              <input type="number" min={0} value={sm.fuehrer} onChange={(e) => setSm({ fuehrer: zahl(e.target.value) })} />
-            </Feld>
-            <Feld titel="Unterführer" schmal>
-              <input type="number" min={0} value={sm.unterfuehrer} onChange={(e) => setSm({ unterfuehrer: zahl(e.target.value) })} />
-            </Feld>
-            <Feld titel="Mannschaft" schmal>
-              <input type="number" min={0} value={sm.mannschaft} onChange={(e) => setSm({ mannschaft: zahl(e.target.value) })} />
-            </Feld>
+          {/* Zähler statt nackter Zahlenfelder — dieselbe Bauart wie bei der
+              Verpflegung darunter. Es sind die Zahlen, um die es in dieser
+              Ansicht überhaupt geht: Der Meldekopf nimmt eine eintreffende
+              Einheit im Stehen auf, oft mit Handschuh, und zählt sie durch.
+              Tippen bleibt möglich (das Feld in der Mitte ist eins), nötig ist
+              es nicht mehr. */}
+          <div className="stepper-zeile">
+            <Stepper titel="Führer" wert={sm.fuehrer} setzen={(n) => setSm({ fuehrer: n })} />
+            <Stepper titel="Unterführer" wert={sm.unterfuehrer} setzen={(n) => setSm({ unterfuehrer: n })} />
+            <Stepper titel="Mannschaft" wert={sm.mannschaft} setzen={(n) => setSm({ mannschaft: n })} />
             <Feld titel="Gesamt" schmal>
               {/* Errechnet, nicht getippt: die Summe zieht nach, während der
                   Blick noch im Feld daneben steht — sie quittiert das. */}
@@ -628,15 +668,16 @@ export function SchrittPersonal({ bogen, aendern, geheZu }: SchrittProps) {
             </label>
             {bogen.unterbringungManuell && (
               <>
+                {/* Zähler wie bei der Stärke darüber: derselbe Vorgang, dieselbe
+                    Bedienung — drei Tippfelder unter drei Zählern wären genau
+                    die Ungleichbehandlung, die hier abgestellt wurde. */}
                 {(["m", "w", "d"] as const).map((g) => (
-                  <Feld key={g} titel={g.toUpperCase()} schmal>
-                    <input
-                      type="number"
-                      min={0}
-                      value={bogen.unterbringungManuell![g]}
-                      onChange={(e) => aendern({ unterbringungManuell: { ...bogen.unterbringungManuell!, [g]: zahl(e.target.value) } })}
-                    />
-                  </Feld>
+                  <Stepper
+                    key={g}
+                    titel={g.toUpperCase()}
+                    wert={bogen.unterbringungManuell![g]}
+                    setzen={(n) => aendern({ unterbringungManuell: { ...bogen.unterbringungManuell!, [g]: n } })}
+                  />
                 ))}
               </>
             )}

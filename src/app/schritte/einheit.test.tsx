@@ -10,7 +10,7 @@ import userEvent from "@testing-library/user-event";
 import { useState } from "react";
 import { Dialogschicht } from "../dialoge";
 import { neuePerson, neuerBogen } from "../hilfen";
-import type { Erfassungsbogen } from "@bos/eeb-format/model";
+import { PersonalErfassung, type Erfassungsbogen } from "@bos/eeb-format/model";
 import { SchrittBuehne } from "../../test/schritt-buehne";
 import { SchrittEinheit } from "./einheit";
 
@@ -205,5 +205,61 @@ describe("Schritt Einheit", () => {
     await nutzer.click(within(dialog).getByRole("button", { name: "Abbrechen" }));
 
     expect(screen.getByText(/Personal:/).textContent).toContain("Lange");
+  });
+});
+
+/**
+ * „Name (Pflicht)" war keine Pflicht: Mit leerem Feld führte „Weiter" ohne ein
+ * Wort auf Schritt 2, und die einzige Rückmeldung war ein „•" statt „✓" in der
+ * Schrittleiste — ein Zeichen, dessen Bedeutung nirgends erklärt wird. Der
+ * Fehler fiel erst fünf Schritte später in der Übersicht auf, als
+ * „(Standort offen)" auf dem Bogen. Gesperrt wird weiterhin nichts: wer den
+ * OV-Namen gerade nicht weiß, kommt weiter und trägt ihn nach.
+ */
+describe("Schritt Einheit — offene Pflichtangaben", () => {
+  it("nennt den fehlenden Namen der eigenen Einheit schon auf Schritt 1", () => {
+    render(<SchrittEinheit bogen={neuerBogen()} aendern={() => {}} />);
+
+    expect(screen.getByText(/Name der eigenen Einheit .* fehlt/)).toBeDefined();
+  });
+
+  it("nimmt den Hinweis zurück, sobald der Name steht", () => {
+    const bogen = neuerBogen();
+    render(
+      <SchrittEinheit
+        bogen={{ ...bogen, einheit: { ...bogen.einheit, hierarchie: [{ bezeichnung: { code: 1 }, name: "Oldenburg" }] } }}
+        aendern={() => {}}
+      />,
+    );
+
+    expect(screen.queryByText(/Name der eigenen Einheit .* fehlt/)).toBeNull();
+  });
+
+  /**
+   * Die Kontaktstellen tragen die Nummer, über die der Meldekopf zurückfragt.
+   * Ohne inputMode lag der Ziffernblock hinter einer Tastatur-Umschaltung.
+   */
+  it("öffnet für Telefon und E-Mail die passende Tastatur", () => {
+    render(<SchrittEinheit bogen={neuerBogen()} aendern={() => {}} />);
+
+    expect(screen.getByLabelText("Telefon")).toHaveProperty("inputMode", "tel");
+    expect(screen.getByLabelText("E-Mail")).toHaveProperty("inputMode", "email");
+  });
+
+  /**
+   * Der Schnell-Einstieg der Startseite landet in genau diesem Assistenten —
+   * sechs Schritte, dieselbe Überschrift. Dass nur Stärke gemeint ist, stand
+   * vorher erst auf Schritt 3.
+   */
+  it("benennt die Schnellerfassung auf Schritt 1", () => {
+    const bogen = neuerBogen();
+    render(
+      <SchrittEinheit
+        bogen={{ ...bogen, personalErfassung: PersonalErfassung.NUR_STAERKE }}
+        aendern={() => {}}
+      />,
+    );
+
+    expect(screen.getByText(/^Schnellerfassung:/)).toBeDefined();
   });
 });

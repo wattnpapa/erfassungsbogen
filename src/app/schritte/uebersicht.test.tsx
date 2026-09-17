@@ -6,6 +6,7 @@
 
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, within } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { StaerkeRolle, type Person } from "@bos/eeb-format/model";
 import { neuePerson, neuerBogen, vokabularFuer } from "../hilfen";
 import { Uebersicht } from "./uebersicht";
@@ -73,5 +74,74 @@ describe("Übersicht — Personalliste", () => {
     const zellen = within(zeile).getAllByRole("cell");
     expect(zellen[0]!.textContent).toBe("Ma");
     expect(zellen[1]!.textContent).toContain(grFue.kurz);
+  });
+});
+
+/**
+ * Der Übergabe-Dialog ist der letzte Moment, in dem eine Lücke im Bogen noch
+ * auffallen kann. Vorher zählte nur die Leitzeile der Ansicht die offenen
+ * Punkte auf — wer bis zum QR-Code durchgetippt hatte, hatte sie längst
+ * weggescrollt, und ein Bogen ohne Einheitsnamen und mit Stärke 0 ging
+ * kommentarlos als QR-Code und PDF an den Meldekopf. Am Meldekopf fällt das
+ * erst beim Zusammenzählen auf, und ohne hinterlegten Absender ist auch keine
+ * Rückfrage möglich.
+ */
+describe("Übersicht — Übergabe-Dialog", () => {
+  function uebergabeDialog(): HTMLDialogElement {
+    return document.querySelector<HTMLDialogElement>("dialog[aria-label='Bogen übergeben']")!;
+  }
+
+  it("zählt die offenen Punkte auch im Übergabe-Dialog auf", async () => {
+    const nutzer = userEvent.setup();
+    // Frischer Bogen: kein Einheitsname, Stärke 0, kein Ort/Auftrag.
+    render(<Uebersicht bogen={neuerBogen()} geheZu={() => {}} neu={() => {}} />);
+
+    await nutzer.click(screen.getByRole("button", { name: "Bogen übergeben…" }));
+
+    const dialog = uebergabeDialog();
+    expect(within(dialog).getByText(/offene Punkte für die Weitergabe/)).toBeDefined();
+    expect(
+      within(dialog).getByRole("button", { name: /Name der eigenen Einheit .* fehlt/ }),
+    ).toBeDefined();
+    // Gesperrt wird nichts — eine Teilmeldung ist manchmal richtig.
+    expect(within(dialog).getByText(/Übergeben ist trotzdem möglich/)).toBeDefined();
+    expect(within(dialog).getByRole("button", { name: "PDF erzeugen" })).toHaveProperty("disabled", false);
+  });
+
+  it("springt aus dem Dialog auf den Schritt, der die Lücke schließt", async () => {
+    const nutzer = userEvent.setup();
+    const gesprungen: number[] = [];
+    render(<Uebersicht bogen={neuerBogen()} geheZu={(s) => gesprungen.push(s)} neu={() => {}} />);
+
+    await nutzer.click(screen.getByRole("button", { name: "Bogen übergeben…" }));
+    await nutzer.click(
+      within(uebergabeDialog()).getByRole("button", { name: /Name der eigenen Einheit .* fehlt/ }),
+    );
+
+    expect(gesprungen).toEqual([0]); // Schritt 1 „Einheit"
+    expect(uebergabeDialog().open).toBe(false);
+  });
+
+  it("zeigt im vollständigen Bogen keine Punkte im Dialog", async () => {
+    const nutzer = userEvent.setup();
+    const bogen = neuerBogen();
+    render(
+      <Uebersicht
+        bogen={{
+          ...bogen,
+          einheit: { ...bogen.einheit, hierarchie: [{ bezeichnung: { code: 1 }, name: "Oldenburg", telefon: "4419876" }] },
+          einsatz: { ...bogen.einsatz, ortAuftrag: "Deichsicherung" },
+          personal: [
+            { ...person("Anna", "Ahrens", StaerkeRolle.FUEHRER), kontakte: [{ art: 0, dienstlich: true, wert: "441987654" }] },
+          ],
+        }}
+        geheZu={() => {}}
+        neu={() => {}}
+      />,
+    );
+
+    await nutzer.click(screen.getByRole("button", { name: "Bogen übergeben…" }));
+
+    expect(within(uebergabeDialog()).queryByText(/offene[nr]? Punkt/)).toBeNull();
   });
 });

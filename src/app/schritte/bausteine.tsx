@@ -541,8 +541,13 @@ export function Hinweise(props: {
  * einer Box; jeder Punkt springt direkt zum Schritt, auf dem er sich beheben
  * lässt. Ist alles vollständig, gibt es eine kurze grüne Bestätigung.
  */
-export function Vollstaendigkeit(props: { punkte: Pruefpunkt[]; geheZu: (schritt: number) => void }) {
-  const { punkte, geheZu } = props;
+export function Vollstaendigkeit(props: {
+  punkte: Pruefpunkt[];
+  geheZu: (schritt: number) => void;
+  /** Satz unter der Liste — im Übergabe-Dialog sagt er, dass nichts gesperrt ist. */
+  nachsatz?: string;
+}) {
+  const { punkte, geheZu, nachsatz } = props;
   if (punkte.length === 0) {
     return (
       <p className="vollstaendig-ok" role="status">✓ Alle Angaben vollständig und plausibel.</p>
@@ -562,6 +567,7 @@ export function Vollstaendigkeit(props: { punkte: Pruefpunkt[]; geheZu: (schritt
           </li>
         ))}
       </ul>
+      {nachsatz && <p className="hinweis">{nachsatz}</p>}
     </div>
   );
 }

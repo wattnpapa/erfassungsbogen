@@ -13,9 +13,9 @@ import {
 import type { ThwOrtsverband } from "@bos/vokabulare/thw-ov";
 import { fahrzeugVorbelegung, fahrzeugeMitFunkrufOv } from "../../vokabulare/thw-funkrufname-ort";
 import { stanPersonalVorbelegung } from "@bos/vokabulare/thw-stan-personal";
-import { ORG_OPTIONEN, einheitAnzeigename, ersteEbene, vokabularFuer } from "../hilfen";
+import { ORG_OPTIONEN, einheitAnzeigename, ersteEbene, pruefpunkte, vokabularFuer } from "../hilfen";
 import { frageJaNein } from "../dialoge";
-import { Auswahl, Feld, VokabAuswahl, VorschlagFeld, type SchrittProps } from "./bausteine";
+import { Auswahl, Feld, Hinweise, VokabAuswahl, VorschlagFeld, type SchrittProps } from "./bausteine";
 
 // Die beiden großen Datenpakete laden erst mit Schritt 1, nicht mit dem
 // Start-Bundle: das THW-OV-Verzeichnis (~190 KB Quelldaten) und die
@@ -158,7 +158,7 @@ const OHNE_LANDESVORLAGEN: OrganisationsTyp[] = [
   OrganisationsTyp.BUNDESWEHR,
 ];
 
-export function SchrittEinheit({ bogen, aendern }: SchrittProps) {
+export function SchrittEinheit({ bogen, aendern, geheZu }: SchrittProps) {
   const e = bogen.einheit;
   const setE = (p: Partial<Einheit>) => aendern({ einheit: { ...e, ...p } });
   const ebenen = vokabularFuer(e.organisation, "ebene");
@@ -218,6 +218,18 @@ export function SchrittEinheit({ bogen, aendern }: SchrittProps) {
   return (
     <section className="karte">
       <h2>1. Einheit</h2>
+      {/* Der Schnell-Einstieg von der Startseite landet in genau diesem
+          sechsschrittigen Assistenten — und sah damit aus wie der volle Bogen.
+          Wer eine eintreffende Einheit in zwanzig Sekunden aufnehmen will,
+          soll hier lesen, was ihn erwartet, statt es auf Schritt 3 zu
+          entdecken. Bewusst „können offen bleiben": Fahrzeuge zählt der
+          Meldekopf manchmal doch mit, gesperrt ist nichts. */}
+      {bogen.personalErfassung === PersonalErfassung.NUR_STAERKE && (
+        <p className="hinweis">
+          Schnellerfassung: Es reichen der Name der Einheit hier und die Stärke in Schritt 3 —
+          Einsatzdaten, Fahrzeuge und Sofortbedarf können offen bleiben.
+        </p>
+      )}
       <div className="zeile">
         <Feld titel="Organisation">
           <Auswahl
@@ -369,7 +381,16 @@ export function SchrittEinheit({ bogen, aendern }: SchrittProps) {
             </Feld>
           )}
           <Feld titel="Telefon" schmal>
+            {/* type="tel"/inputMode: auf dem Telefon kommt der Ziffernblock
+                zuerst. Ohne das lag die Nummer, die der Meldekopf für den
+                Rückruf braucht, hinter einer Tastatur-Umschaltung — und die
+                tippt niemand im Regen gern zweimal. Kein type="number":
+                Vorwahl-Trennzeichen und führende Null gehören nicht in ein
+                Rechenfeld. */}
             <input
+              type="tel"
+              inputMode="tel"
+              autoComplete="tel"
               value={h.telefon ?? ""}
               onChange={(ev) =>
                 setE({ hierarchie: e.hierarchie.map((x, j) => (j === i ? { ...x, telefon: ev.target.value.replace(/\D/g, "") || undefined } : x)) })
@@ -378,6 +399,9 @@ export function SchrittEinheit({ bogen, aendern }: SchrittProps) {
           </Feld>
           <Feld titel="E-Mail">
             <input
+              type="email"
+              inputMode="email"
+              autoComplete="email"
               value={h.email ?? ""}
               onChange={(ev) => setE({ hierarchie: e.hierarchie.map((x, j) => (j === i ? { ...x, email: ev.target.value || undefined } : x)) })}
             />
@@ -425,6 +449,14 @@ export function SchrittEinheit({ bogen, aendern }: SchrittProps) {
           </button>
         )}
       </p>
+      {/* Derselbe Hinweisblock wie im Personal-Schritt, und aus demselben
+          Grund: „Name (Pflicht)" konnte man kommentarlos leer lassen und
+          „Weiter" drücken — der Fehler fiel erst fünf Schritte später in der
+          Übersicht auf, als „(Standort offen)" auf dem Bogen. Gesperrt wird
+          weiterhin nichts: wer den OV-Namen gerade nicht weiß, soll
+          weiterkommen und ihn nachtragen. Er steht jetzt nur nicht mehr still
+          da. */}
+      <Hinweise punkte={pruefpunkte(bogen, false)} aktuellerSchritt={0} geheZu={geheZu} />
     </section>
   );
 }

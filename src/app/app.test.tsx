@@ -149,6 +149,36 @@ describe("Assistenten-Durchlauf", () => {
   });
 
   /**
+   * Der Schnell-Einstieg „Einheit schnell erfassen (nur Stärke)" landet im
+   * gleichen sechsschrittigen Assistenten wie der volle Bogen. Dass Personal
+   * hier nur als Zahl erfasst wird, stand vorher erst auf Schritt 3 — der
+   * Meldekopf-Bediener, der eine eintreffende Einheit in zwanzig Sekunden
+   * aufnehmen will, sah bis dahin sechs Schritte und dieselbe Überschrift.
+   */
+  it("benennt die Meldekopf-Schnellerfassung im Kopf jedes Schrittes", async () => {
+    const nutzer = userEvent.setup();
+    render(<App />);
+
+    await nutzer.click(screen.getByRole("button", { name: "Einheit schnell erfassen (nur Stärke)…" }));
+
+    const kopf = screen.getByRole("banner");
+    expect(within(kopf).getByText("Schnellerfassung")).toBeDefined();
+
+    // Auch zwei Schritte weiter, nicht nur auf Schritt 1.
+    await nutzer.click(screen.getByRole("button", { name: /^3\. Personal/ }));
+    expect(within(screen.getByRole("banner")).getByText("Schnellerfassung")).toBeDefined();
+  });
+
+  it("zeigt die Modus-Marke beim vollen Bogen nicht", async () => {
+    const nutzer = userEvent.setup();
+    render(<App />);
+
+    await nutzer.click(screen.getByRole("button", { name: "Neuen Bogen erstellen" }));
+
+    expect(within(screen.getByRole("banner")).queryByText("Schnellerfassung")).toBeNull();
+  });
+
+  /**
    * Der erklärende Text ist Prospekt, nicht Arbeitsfläche: Er beantwortet den
    * ersten Besuch im Browser. Wer schon Daten auf dem Gerät hat, hat die
    * Antwort — dann darf er die Startseite nicht mehr verlängern. (Die zweite

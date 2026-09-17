@@ -155,12 +155,37 @@ describe("Schritt Fahrzeuge", () => {
     expect(screen.getByText(/Schon geladen/)).toBeDefined();
   });
 
-  it("entfernt ein Fahrzeug wieder", async () => {
+  it("entfernt ein leeres Fahrzeug ohne Rückfrage", async () => {
     const nutzer = userEvent.setup();
     buehne();
 
     await nutzer.click(screen.getByRole("button", { name: "+ Fahrzeug hinzufügen" }));
-    await nutzer.click(screen.getByRole("button", { name: "Fahrzeug entfernen" }));
+    await nutzer.click(screen.getByRole("button", { name: "Fahrzeug 1 entfernen" }));
+
+    expect(screen.queryByLabelText("Kennzeichen")).toBeNull();
+  });
+
+  /** Wie bei der Personenkarte: erfasste Angaben gehen nicht still verloren. */
+  it("fragt vor dem Entfernen eines erfassten Fahrzeugs nach", async () => {
+    const nutzer = userEvent.setup();
+    const bogen = neuerBogen();
+    render(
+      <SchrittBuehne
+        komponente={SchrittFahrzeuge}
+        bogen={{ ...bogen, fahrzeuge: [{ ...neuesFahrzeug(), kennzeichen: "THW-84397" }] }}
+      />,
+    );
+
+    await nutzer.click(screen.getByRole("button", { name: "THW-84397 entfernen" }));
+    const dialog = document.querySelector<HTMLDialogElement>("dialog[aria-label='THW-84397 entfernen?']")!;
+    expect(dialog).not.toBeNull();
+    await nutzer.click(within(dialog).getByRole("button", { name: "Abbrechen" }));
+
+    expect((screen.getByLabelText("Kennzeichen") as HTMLInputElement).value).toBe("THW-84397");
+
+    await nutzer.click(screen.getByRole("button", { name: "THW-84397 entfernen" }));
+    const zweiter = document.querySelector<HTMLDialogElement>("dialog[aria-label='THW-84397 entfernen?']")!;
+    await nutzer.click(within(zweiter).getByRole("button", { name: "Fahrzeug entfernen" }));
 
     expect(screen.queryByLabelText("Kennzeichen")).toBeNull();
   });

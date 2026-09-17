@@ -685,17 +685,61 @@
     .seiten-kopf .kopf-inhalt > .zur-start { align-self: flex-start; }
     /* Im Assistenten steht die Schrittleiste im Markup vor dem Speicherstand,
        sitzt visuell aber als Reiterzeile ganz unten. */
-    .seiten-kopf.assistent-kopf .zur-start { order: 0; }
+    .seiten-kopf.assistent-kopf .kopf-oberzeile { order: 0; }
+    /* Rücksprung links, Anzeige-Umschalter rechts — eine Zeile für beides.
+       Umbruch bleibt erlaubt: in sehr großer Schrift (Feld-Modus plus
+       System-Zoom) darf der Umschalter unter den Rücksprung rutschen, statt
+       ihn zu zerquetschen. */
+    .seiten-kopf.assistent-kopf .kopf-oberzeile {
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 0.4rem;
+    }
+    .seiten-kopf.assistent-kopf .kopf-oberzeile .anzeige-schalter {
+      border-color: var(--kopf-linie);
+    }
+    .seiten-kopf.assistent-kopf .kopf-oberzeile .anzeige-schalter button + button {
+      border-left-color: var(--kopf-linie);
+    }
     .seiten-kopf.assistent-kopf .titelzeile { order: 1; }
     .seiten-kopf.assistent-kopf .autosave { order: 2; }
     .seiten-kopf.assistent-kopf .schritte { order: 3; }
     /* Die Schrittleiste sitzt bündig auf der Unterkante des Balkens. */
     .seiten-kopf.assistent-kopf .kopf-inhalt { padding-bottom: 0; }
     .seiten-kopf h1 { color: var(--kopf-auf); font-size: var(--t-xl); margin: 0; }
+    /* Modus-Marke neben dem Titel (Meldekopf-Schnellerfassung). Bauart wie die
+       Ansprechpartner-Marke im Eintrag, aber auf der Kennfarbe: eigene Linie
+       und Schriftfarbe, sonst verschwände sie im Balken. */
+    .seiten-kopf .modus-marke {
+      align-self: center; padding: 0.15rem 0.5rem;
+      border: var(--strich) solid var(--kopf-linie); border-radius: var(--radius);
+      color: var(--kopf-auf); font-size: var(--t-xs); font-weight: 600;
+      white-space: nowrap;
+    }
     .seiten-kopf .hinweis { color: var(--kopf-auf-2); margin: var(--r-1) 0 0; }
     .seiten-kopf .zur-start { color: var(--kopf-auf); opacity: 0.85; }
     @media (hover: hover) { .seiten-kopf .zur-start:hover { opacity: 1; } }
     .seiten-kopf .autosave { color: var(--kopf-auf-2); margin: 0; padding: 0 0 var(--r-3); animation: einblenden var(--dauer-2) ease-out; }
+    /* Platzhaushalt des Assistenten-Kopfes auf dem Telefon.
+       Gemessen im Viewport 360x640: Logo, Titel über zwei Zeilen, der
+       Anzeige-Umschalter auf eigener Zeile, der Speicherstand und die
+       dreizeilige Schrittleiste belegten 330 px im Standard- und 390 px im
+       Feld-Modus — von 640. Sichtbar blieb die Schrittüberschrift und eine
+       Optionszeile; jede Eingabe begann mit Scrollen, und das im Modus, der
+       „Feld" heißt.
+
+       Der Kopf wird deshalb schmal gesetzt statt gekürzt: kleineres Zeichen,
+       Titel in einer Zeile (so bleibt für den Umschalter Platz in derselben
+       Zeile), engere Reiter. Alle sechs Schrittnamen bleiben lesbar — eine
+       waagerecht scrollende Reiterzeile hätte Platz gespart und dafür Schritt
+       5 und 6 versteckt, und wer den Assistenten selten benutzt, findet dann
+       die Übersicht nicht mehr. Ab 30rem gilt wieder das großzügige Maß. */
+    @media (max-width: 29.999rem) {
+      .seiten-kopf.assistent-kopf .titelzeile { padding: var(--r-1) 0 var(--r-2); }
+      .seiten-kopf.assistent-kopf .titelzeile h1 { font-size: var(--t-l); flex: 1 1 auto; }
+      .seiten-kopf.assistent-kopf img.einheit-avatar { height: 1.8rem; }
+      .seiten-kopf.assistent-kopf .autosave { padding-bottom: var(--r-2); }
+      .seiten-kopf.assistent-kopf .schritte button { padding: 0.4rem 0.55rem; }
+    }
     /* Übungs-Störer: volle Fensterbreite direkt unter dem Kopf, Text auf dem
        Satzspiegel. Schraffur wie ein Absperrband — deutlich anders als jede
        Meldung oder Warnung, denn er beschreibt keinen Fehler, sondern einen
@@ -838,7 +882,22 @@
     @media (min-width: 48rem) {
       .zeile > .zeilen-knopf-leer { display: block; flex: 0 0 2.75rem; }
     }
+    /* min-height: dieselbe Zielhöhe wie jedes andere Tippziel der App
+       (--ziel-basis, DESIGN.md). Vorher war die Trefferfläche so hoch wie die
+       Textzeile daneben — 24 px gegen 44 px, gemessen im Telefon-Viewport.
+       Mit Handschuh oder nasser Hand wurde daneben getroffen, und einer der
+       Schalter ist „Dies ist eine Übung": sein falscher Zustand schiebt die
+       Meldung am Meldekopf in die falsche Spalte. Die iOS- und
+       Android-Schichten setzten das längst (44/48 px) — im Browser, wo die
+       App meistens läuft, fehlte es. */
     .inline { display: inline-flex; align-items: center; gap: 0.4rem; margin: 0.6rem 0.8rem 0 0; font-size: var(--t-m); }
+    label.inline { min-height: calc(var(--ziel-basis) + var(--ziel)); }
+    /* Nur label.inline: jede Kästchen- und Auswahlpunkt-Zeile der App ist ein
+       <label>, das Kästchen und Beschriftung umschließt — dort IST das Label
+       das Tippziel. Das eine <span class="inline"> (Fahrerlaubnis-Zusatz)
+       gruppiert dagegen zwei schon zielgroße Felder; ihm schöbe die
+       Mindesthöhe nur die Zeile auseinander. */
+    span.inline { min-height: 0; }
     /* Ohne dies schrumpft das Kästchen mit der Länge seiner Beschriftung:
        derselbe Schalter stand auf einer Ansicht 30, 25 und 18 px breit da,
        und der Feld-Modus hob nur die Höhe. Ein Tippziel, das vom Text
@@ -929,6 +988,15 @@
       align-self: center; padding: 0.15rem 0.5rem;
       border: var(--strich) solid var(--linie); border-radius: var(--radius);
       color: var(--text-2); font-size: var(--t-xs);
+    }
+    /* Laufende Nummer über dem Eintrag: „Person 3 von 12". Kein Titel, nur
+       eine Ordnungszahl — sie steht darum klein und zurückgenommen über der
+       Kopfzeile und nimmt ihr nicht das Gewicht. Nötig, weil frische Karten
+       ohne Namen (Person) oder ohne Typ (Fahrzeug) optisch identisch sind:
+       gesucht wird die Stelle, die die Sortierknöpfe daneben verschieben. */
+    .eintrag-nr {
+      margin: 0; color: var(--text-2);
+      font-size: var(--t-xs); font-weight: 600; letter-spacing: 0.04em;
     }
     /* Zwischen zwei Einträgen muss mehr Luft stehen als zwischen zwei Gruppen
        innerhalb eines Eintrags — sonst verschwimmt die Liste zur Fläche. */
@@ -1960,6 +2028,26 @@
        die Zeile über ihre Haarlinie hinaus. Die Fläche liegt damit eng an der
        Zeile — wie eine angestrichene Stelle im Vordruck. */
     .eingegangen { animation: eingang-quittung var(--dauer-3) ease-out; }
+    /* „Arbeitet" ist kein „gesperrt". Ein Knopf, der während der Arbeit auf
+       `disabled` läuft, erbt die 0.4 Deckkraft von oben — und damit genau das
+       Bild, das die App für „hier geht gerade nichts" benutzt. Das PDF samt
+       QR-Code braucht auf einem Telefon mehrere Sekunden; in dieser Zeit war
+       der Grauwert die einzige Auskunft, und unter Zeitdruck wurde mehrfach
+       getippt. Der Zustand steht deshalb still, aber in voller Schrift auf
+       zweiter Fläche mit starker Linie, und die Statuszeile daneben sagt in
+       Worten, was läuft (`aria-busy`, role="status").
+
+       Bewusst kein Laufbalken und kein kreisender Kringel: die
+       Feldgeräte-Regel in DESIGN.md lässt nichts in Schleife laufen — der
+       maßgebliche Fall ist ein altes Einsatz-Handy, das nebenher ein
+       Kamerabild dekodiert. Die Auskunft „es läuft noch" trägt hier der Satz,
+       nicht die Bewegung. */
+    button.arbeitet:disabled {
+      opacity: 1; cursor: progress;
+      background: var(--flaeche-2); color: var(--text);
+      border-color: var(--linie-stark); border-width: var(--strich-stark);
+    }
+    .arbeitet-zeile { margin-top: var(--r-2); }
     /* Erst halten, dann ausklingen — anders als bei der Zahl-Quittung, wo der
        Blick schon auf dem Wert liegt. Hier wird die Zeile gesucht: eine Farbe,
        die mit `ease-out` gleich im ersten Bild abfällt, blitzt zwar, klingt

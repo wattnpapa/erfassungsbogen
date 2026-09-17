@@ -6,7 +6,15 @@ import { useRef, useState } from "react";
 import { Fahrzeug, OrganisationsTyp } from "@bos/eeb-format/model";
 import { sitzplaetzeRichtwert } from "@bos/vokabulare/sitzplaetze";
 import { fahrzeugVorbelegung, funkrufOrtsverband } from "../../vokabulare/thw-funkrufname-ort";
-import { fahrzeugHinweise, neuesFahrzeug, transportBilanz, vokabularFuer, vorbelegungGeladen } from "../hilfen";
+import {
+  fahrzeugBezeichnung,
+  fahrzeugHinweise,
+  fahrzeugLeer,
+  neuesFahrzeug,
+  transportBilanz,
+  vokabularFuer,
+  vorbelegungGeladen,
+} from "../hilfen";
 import { fahrzeugSymbolSvg, svgDataUrl } from "../taktische-zeichen-bogen";
 import { frageJaNein } from "../dialoge";
 import { mitAbgang, useEinzugsstempel } from "../eintrag-bewegung";
@@ -38,16 +46,23 @@ function FahrzeugKarte(props: {
   ovKennzahl?: number;
   /** Gerade hinzugefügt: die Karte stempelt sich einmal ein. */
   frisch?: boolean;
+  /** Stelle in der Liste und Listenlänge — benennt die Karte, solange kein Typ steht. */
+  index: number;
+  anzahl: number;
   aendern: (f: Fahrzeug) => void;
   entfernen: () => void;
 }) {
-  const { fahrzeug: f, org, ovKennzahl, frisch, aendern, entfernen } = props;
+  const { fahrzeug: f, org, ovKennzahl, frisch, index, anzahl, aendern, entfernen } = props;
+  const bezeichnung = fahrzeugBezeichnung(f, index, org);
   const richtwert = sitzplaetzeRichtwert(f, vokabularFuer(org, "fahrzeug"));
   const karte = useRef<HTMLDivElement>(null);
   useEinzugsstempel(karte, frisch);
   const set = (patch: Partial<Fahrzeug>) => aendern({ ...f, ...patch });
   return (
     <div className="karte eintrag" ref={karte}>
+      {/* Laufende Nummer sichtbar, wie in der Personenkarte: ohne Typ und
+          Kennzeichen sind frische Karten nicht auseinanderzuhalten. */}
+      <p className="eintrag-nr" aria-hidden="true">Fahrzeug {index + 1} von {anzahl}</p>
       {/* Kopf des Eintrags: Zeichen, Typ und Kennzeichen sagen, welches Fahrzeug
           das ist; alles Weitere ist Beschreibung. Das taktische Zeichen (DV 102)
           steht als Glied der Kopfzeile darin statt als Float daneben — sonst
@@ -96,7 +111,21 @@ function FahrzeugKarte(props: {
         <button
           type="button"
           className="entfernen"
-          onClick={() => mitAbgang(karte.current, entfernen)}
+          aria-label={`${bezeichnung} entfernen`}
+          onClick={async () => {
+            /* Dieselbe Rückfrage wie bei der Personenkarte, aus demselben
+               Grund — und nur, wenn etwas verloren geht: eine leere Karte
+               verschwindet ohne Dialog. */
+            if (!fahrzeugLeer(f) && !(await frageJaNein({
+              titel: `${bezeichnung} entfernen?`,
+              text: "Die erfassten Angaben dieses Fahrzeugs gehen verloren — Typ, Kennzeichen, Funkrufname, Sitzplätze und Änderungen.",
+              ok: "Fahrzeug entfernen",
+              gefahr: true,
+            }))) {
+              return;
+            }
+            mitAbgang(karte.current, entfernen);
+          }}
         >
           Fahrzeug entfernen
         </button>
@@ -230,6 +259,8 @@ export function SchrittFahrzeuge({ bogen, aendern }: SchrittProps) {
           org={bogen.einheit.organisation}
           ovKennzahl={ovKennzahl}
           frisch={f === frisch}
+          index={i}
+          anzahl={bogen.fahrzeuge.length}
           aendern={(nf) => aendern({ fahrzeuge: bogen.fahrzeuge.map((x, j) => (j === i ? nf : x)) })}
           entfernen={() => aendern({ fahrzeuge: bogen.fahrzeuge.filter((_, j) => j !== i) })}
         />

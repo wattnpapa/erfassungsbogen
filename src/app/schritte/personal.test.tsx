@@ -35,15 +35,82 @@ describe("Schritt Personal", () => {
     expect(screen.getByLabelText("Stärke: 0 Führer, 0 Unterführer, 1 Mannschaft, 1 gesamt")).toBeDefined();
   });
 
-  it("entfernt eine Person wieder", async () => {
+  /**
+   * Eine eben danebengetippte leere Karte muss ohne Rückfrage wieder
+   * verschwinden — sonst erzieht die Rückfrage zum Wegklicken und schützt am
+   * Ende die ausgefüllte Karte auch nicht mehr.
+   */
+  it("entfernt eine leere Person ohne Rückfrage", async () => {
     const nutzer = userEvent.setup();
     buehne();
 
     await nutzer.click(screen.getByRole("button", { name: "+ Person hinzufügen" }));
-    await nutzer.click(screen.getByRole("button", { name: "Person entfernen" }));
+    await nutzer.click(screen.getByRole("button", { name: "Person 1 entfernen" }));
 
     expect(screen.queryByLabelText("Vorname")).toBeNull();
     expect(screen.getByLabelText(/^Stärke: 0 Führer/)).toBeDefined();
+  });
+
+  /**
+   * Der Löschknopf sitzt in der Kopfzeile der Karte, zwischen Sortierpfeilen
+   * und Rollen-Auswahl. Ein Fehlgriff kostete ein Dutzend Felder — Name,
+   * Funktionen, Qualifikationen, Erreichbarkeiten — ohne Rückfrage und ohne
+   * Rückgängig. „Neuer Bogen" und „Entwurf verwerfen" fragen beide nach; hier
+   * wiegt es nicht weniger.
+   */
+  it("fragt vor dem Entfernen einer ausgefüllten Person nach und behält sie bei Abbruch", async () => {
+    const nutzer = userEvent.setup();
+    const bogen = neuerBogen();
+    render(
+      <SchrittBuehne
+        komponente={SchrittPersonal}
+        bogen={{ ...bogen, personal: [{ ...neuePerson(), vorname: "Jan", nachname: "Meyer" }] }}
+      />,
+    );
+
+    await nutzer.click(screen.getByRole("button", { name: "Meyer, Jan entfernen" }));
+
+    // Die Rückfrage nennt die Person — bei zwölf Karten ist das die einzige
+    // Auskunft darüber, welche der Griff getroffen hat.
+    const dialog = document.querySelector<HTMLDialogElement>("dialog[aria-label='Meyer, Jan entfernen?']")!;
+    expect(dialog).not.toBeNull();
+    await nutzer.click(within(dialog).getByRole("button", { name: "Abbrechen" }));
+
+    expect(screen.getByLabelText(/^Stärke: 0 Führer, 0 Unterführer, 1 Mannschaft/)).toBeDefined();
+  });
+
+  it("entfernt die ausgefüllte Person erst nach Bestätigung", async () => {
+    const nutzer = userEvent.setup();
+    const bogen = neuerBogen();
+    render(
+      <SchrittBuehne
+        komponente={SchrittPersonal}
+        bogen={{ ...bogen, personal: [{ ...neuePerson(), vorname: "Jan", nachname: "Meyer" }] }}
+      />,
+    );
+
+    await nutzer.click(screen.getByRole("button", { name: "Meyer, Jan entfernen" }));
+    const dialog = document.querySelector<HTMLDialogElement>("dialog[aria-label='Meyer, Jan entfernen?']")!;
+    await nutzer.click(within(dialog).getByRole("button", { name: "Person entfernen" }));
+
+    expect(screen.queryByLabelText("Vorname")).toBeNull();
+    expect(screen.getByLabelText(/^Stärke: 0 Führer, 0 Unterführer, 0 Mannschaft/)).toBeDefined();
+  });
+
+  /**
+   * Ohne Namen sind zwölf frische Karten optisch identisch. Die laufende
+   * Nummer ist die Auskunft darüber, welche Stelle die Sortierknöpfe daneben
+   * verschieben — und welche der Löschknopf trifft.
+   */
+  it("beziffert die Personenkarten sichtbar", async () => {
+    const nutzer = userEvent.setup();
+    buehne();
+
+    await nutzer.click(screen.getByRole("button", { name: "+ Person hinzufügen" }));
+    await nutzer.click(screen.getByRole("button", { name: "+ Person hinzufügen" }));
+
+    expect(screen.getByText("Person 1 von 2")).toBeDefined();
+    expect(screen.getByText("Person 2 von 2")).toBeDefined();
   });
 
   it("rechnet in der Meldekopf-Schnellerfassung die Gesamtstärke aus", async () => {
@@ -57,6 +124,45 @@ describe("Schritt Personal", () => {
     await nutzer.type(screen.getByLabelText("Mannschaft"), "9");
 
     expect((screen.getByLabelText("Gesamt") as HTMLInputElement).value).toBe("12");
+  });
+
+  /**
+   * Die Stärke ist die Zahl, um die es in dieser Ansicht geht: Der Meldekopf
+   * nimmt eine eintreffende Einheit im Stehen auf, oft mit Handschuh. Vorher
+   * waren Führer, Unterführer und Mannschaft nackte Zahlenfelder — die
+   * Tastatur musste auf —, während die Verpflegung darunter schon
+   * −/+-Zähler hatte. Ausgerechnet die Hauptzahlen waren die umständlichen.
+   */
+  it("lässt die Stärke der Schnellerfassung ohne Tastatur zählen", async () => {
+    const nutzer = userEvent.setup();
+    buehne();
+
+    await nutzer.click(screen.getByLabelText("Nur Stärke (Meldekopf-Schnellerfassung)"));
+
+    await nutzer.click(screen.getByRole("button", { name: "Mannschaft: erhöhen" }));
+    await nutzer.click(screen.getByRole("button", { name: "Mannschaft: erhöhen" }));
+    await nutzer.click(screen.getByRole("button", { name: "Unterführer: erhöhen" }));
+
+    expect((screen.getByLabelText("Mannschaft") as HTMLInputElement).value).toBe("2");
+    expect((screen.getByLabelText("Gesamt") as HTMLInputElement).value).toBe("3");
+
+    await nutzer.click(screen.getByRole("button", { name: "Mannschaft: verringern" }));
+    expect((screen.getByLabelText("Gesamt") as HTMLInputElement).value).toBe("2");
+    // Bei 0 ist Schluss — eine negative Stärke gibt es nicht.
+    expect(screen.getByRole("button", { name: "Führer: verringern" })).toHaveProperty("disabled", true);
+  });
+
+  /** Dieselbe Bedienung für die Unterbringungsplätze im selben Block. */
+  it("lässt auch die Unterbringung M/W/D zählen", async () => {
+    const nutzer = userEvent.setup();
+    buehne();
+
+    await nutzer.click(screen.getByLabelText("Nur Stärke (Meldekopf-Schnellerfassung)"));
+    await nutzer.click(screen.getByLabelText("Unterbringung M/W/D angeben"));
+
+    await nutzer.click(screen.getByRole("button", { name: "W: erhöhen" }));
+
+    expect((screen.getByLabelText("W") as HTMLInputElement).value).toBe("1");
   });
 
   /**

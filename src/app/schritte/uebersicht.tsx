@@ -122,6 +122,11 @@ export function Uebersicht(props: {
   const [vollbildTeil, setVollbildTeil] = useState(0);
   // „Bogen übergeben": ein Dialog bündelt alle Transportwege (QR/PDF/Link/Datei).
   const teilenDialog = useRef<HTMLDialogElement>(null);
+  /* Einmal geprüft, zweimal gezeigt: in der Leitzeile dieser Ansicht und im
+     Übergabe-Dialog. Dort ist es der letzte Moment, in dem die Lücke noch
+     auffallen kann — wer bis zum QR-Code durchgetippt hat, hat die Warnung
+     oben längst weggescrollt. */
+  const offenePunkte = pruefpunkte(bogen);
   const [schluesselKurz, setSchluesselKurz] = useState<string | null>(null);
   // Freiwillige Absenderangaben zur Signatur. Als Effekt-Abhängigkeit geführt:
   // eine geänderte Karte ändert den signierten Payload → QR neu erzeugen.
@@ -431,7 +436,7 @@ export function Uebersicht(props: {
             </p>
           </div>
         </div>
-        <Vollstaendigkeit punkte={pruefpunkte(bogen)} geheZu={geheZu} />
+        <Vollstaendigkeit punkte={offenePunkte} geheZu={geheZu} />
       </section>
 
       {/* Einheit und Einsatz beantworten zusammen „wer, wo, wann" und tragen je
@@ -563,10 +568,29 @@ export function Uebersicht(props: {
         <section className="karte">
           <div className="kopfzeile">
             <h2>PDF-Vorschau</h2>
-            <button type="button" onClick={vorschauLaden} disabled={vorschauLaeuft}>
+            {/* „arbeitet" muss sich von „gesperrt" unterscheiden: der graue
+                Knopf mit dem Text „Vorschau wird erzeugt…" sah wie ein
+                deaktivierter Knopf aus (dieselbe 0.4 Deckkraft), und das
+                Setzen des Bogens samt QR-Code dauert auf einem Telefon
+                mehrere Sekunden — unter Zeitdruck wurde mehrfach getippt.
+                Die Klasse hält Schrift und Linie stark, die Statuszeile
+                darunter sagt in Worten, was läuft. */}
+            <button
+              type="button"
+              className={vorschauLaeuft ? "arbeitet" : ""}
+              aria-busy={vorschauLaeuft || undefined}
+              onClick={vorschauLaden}
+              disabled={vorschauLaeuft}
+            >
               {vorschauLaeuft ? "Vorschau wird erzeugt…" : vorschauUrl ? "Vorschau aktualisieren" : "Vorschau anzeigen"}
             </button>
           </div>
+          {vorschauLaeuft && (
+            <p className="hinweis arbeitet-zeile" role="status">
+              Der Bogen wird gesetzt und der QR-Code gerechnet — das dauert auf dem Telefon
+              einige Sekunden. Die App arbeitet, sie hängt nicht.
+            </p>
+          )}
           {vorschauUrl ? (
             <iframe className="pdf-rahmen" src={vorschauUrl} title="PDF-Vorschau des Erfassungsbogens" />
           ) : (
@@ -654,6 +678,21 @@ export function Uebersicht(props: {
           <h2>Bogen übergeben</h2>
           <button type="button" onClick={() => teilenDialog.current?.close()}>Schließen</button>
         </div>
+        {/* Die Lücken stehen VOR den Wegen, nicht danach: hinter dem QR-Knopf
+            gelesen wären sie eine Nachricht an jemanden, der schon zeigt.
+            Gesperrt wird nichts — eine Teilmeldung ist manchmal richtig, und
+            eine gesperrte Übergabe hilft am Meldekopf niemandem. Antippen
+            schließt den Dialog und springt an die Stelle. */}
+        {offenePunkte.length > 0 && (
+          <Vollstaendigkeit
+            punkte={offenePunkte}
+            geheZu={(schritt) => {
+              teilenDialog.current?.close();
+              geheZu(schritt);
+            }}
+            nachsatz="Übergeben ist trotzdem möglich — der Bogen geht dann mit diesen Lücken an die Gegenstelle."
+          />
+        )}
         <div className="teilen-weg">
           <button
             type="button"
@@ -687,7 +726,7 @@ export function Uebersicht(props: {
           </div>
         )}
         <div className="teilen-weg">
-          <button type="button" onClick={pdf} disabled={pdfLaeuft}>
+          <button type="button" className={pdfLaeuft ? "arbeitet" : ""} aria-busy={pdfLaeuft || undefined} onClick={pdf} disabled={pdfLaeuft}>
             {pdfLaeuft ? "PDF wird erstellt…" : "PDF erzeugen"}
           </button>
           <p className="hinweis">Zum Drucken oder Versenden — Papier-Layout, QR-Code auf der letzten Seite.</p>

@@ -47,6 +47,23 @@ function feld(welt: EebWelt, name: string): Locator {
     .first();
 }
 
+/**
+ * Zählfeld eines Steppers (−/Zahl/+, siehe `Stepper` in
+ * schritte/bausteine.tsx). Es steht nicht in einem <label>, sondern trägt
+ * seinen Namen als `aria-label` — die Beschriftung sitzt über der Dreiergruppe
+ * und darf nicht gleichzeitig Tippziel der Knöpfe sein. Für die Schritte ist
+ * das derselbe Zugang wie bei den Auswahllisten: über den angesagten Namen.
+ */
+function zaehlfeld(welt: EebWelt, name: string): Locator {
+  return inhalt(welt).locator(`.stepper input[aria-label="${name}"]`).first();
+}
+
+/** Eingabefeld gleich welcher Bauart — normales Feld oder Stepper-Zählfeld. */
+async function eingabe(welt: EebWelt, name: string): Promise<Locator> {
+  const gewoehnlich = feld(welt, name);
+  return (await gewoehnlich.count()) > 0 ? gewoehnlich : zaehlfeld(welt, name);
+}
+
 /** Wartet, bis `pruefung` ohne Ausnahme durchläuft (Standard: 10 s). */
 async function bisWahr(pruefung: () => Promise<void>, dauerMs = 10_000): Promise<void> {
   const ende = Date.now() + dauerMs;
@@ -87,7 +104,7 @@ Given("die App sich als Android-App zeigt", async function (this: EebWelt) {
 // ------------------------------------------------------------------ Bedienen
 
 When("ich das Feld {string} mit {string} fülle", async function (this: EebWelt, name: string, wert: string) {
-  await feld(this, name).fill(wert);
+  await (await eingabe(this, name)).fill(wert);
 });
 
 When("ich das Feld {string} auf {string} stelle", async function (this: EebWelt, name: string, wert: string) {
@@ -267,7 +284,7 @@ Then("sehe ich den Hinweis {string} nicht", async function (this: EebWelt, text:
 
 Then("steht im Feld {string} der Wert {string}", async function (this: EebWelt, name: string, wert: string) {
   await bisWahr(async () => {
-    const ist = await feld(this, name).inputValue();
+    const ist = await (await eingabe(this, name)).inputValue();
     if (ist !== wert) throw new Error(`Feld „${name}" enthält „${ist}", erwartet war „${wert}"`);
   });
 });

@@ -1702,9 +1702,19 @@ function AppInhalt() {
     <>
     <Aktualisierungshinweise />
     <SeitenKopf variante="assistent-kopf">
-      <button type="button" className="zur-start" onClick={() => { setMeldung(""); setZeigeStart(true); }}>
-        ‹ Startseite
-      </button>
+      {/* Rücksprung und Anzeige-Umschalter teilen sich die erste Zeile. Der
+          Umschalter stand vorher in der Titelzeile und rutschte dort auf dem
+          Telefon unter den Titel — eine eigene Zeile für vier Knöpfe, die
+          einmal im Einsatz gesetzt werden. „‹ Startseite" braucht 80 der 360
+          px; daneben ist der Platz, und erreichbar bleibt der Umschalter
+          genauso: Wer beim Ausfüllen in die Sonne gerät, findet ihn im Kopf
+          des Formulars. */}
+      <div className="kopf-oberzeile">
+        <button type="button" className="zur-start" onClick={() => { setMeldung(""); setZeigeStart(true); }}>
+          ‹ Startseite
+        </button>
+        <AnzeigeSchalter />
+      </div>
       <div className="titelzeile">
         {/* Taktisches Zeichen der Einheit als „Avatar" — Wiedererkennung auf einen Blick. */}
         <img
@@ -1714,10 +1724,15 @@ function AppInhalt() {
           aria-hidden="true"
         />
         <h1>Einheiten-Erfassungsbogen</h1>
-        {/* Feld/Nacht direkt am Formular: Wer beim Ausfüllen in die Sonne oder
-            ins Dunkel gerät, darf dafür nicht zur Startseiten-Fußzeile
-            zurückmüssen — das ist exakt die maßgebliche Einsatzsituation. */}
-        <AnzeigeSchalter />
+        {/* Modus-Marke: In der Meldekopf-Schnellerfassung sah der Assistent
+            genauso aus wie beim vollen Bogen — sechs Schritte, dieselbe
+            Überschrift. Die Marke steht auf jedem Schritt und sagt, warum
+            Personal nur als Zahl erfasst wird. */}
+        {bogen.personalErfassung === PersonalErfassung.NUR_STAERKE && (
+          <span className="modus-marke" title="Personal wird nur als Stärke erfasst (Führer/Unterführer/Mannschaft), nicht namentlich">
+            Schnellerfassung
+          </span>
+        )}
       </div>
       {/* Der aktive Schritt steht nicht nur als CSS-Klasse da: ohne
           aria-current="step" liest eine Vorlesesoftware sechs gleichwertige
@@ -1775,7 +1790,7 @@ function AppInhalt() {
           `key` erzwingt den Neuaufbau, damit die Bewegung bei jedem Wechsel
           neu ansetzt — die Schritte tauschen ohnehin die Komponente. */}
       <div className={`schritt-inhalt ${richtung}`} key={schritt}>
-      {schritt === 0 && <SchrittEinheit bogen={bogen} aendern={aendern} />}
+      {schritt === 0 && <SchrittEinheit bogen={bogen} aendern={aendern} geheZu={setSchritt} />}
       {schritt === 1 && <SchrittEinsatz bogen={bogen} aendern={aendern} />}
       {schritt === 2 && <SchrittPersonal bogen={bogen} aendern={aendern} geheZu={setSchritt} />}
       {schritt === 3 && <SchrittFahrzeuge bogen={bogen} aendern={aendern} />}

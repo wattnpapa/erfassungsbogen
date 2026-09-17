@@ -113,11 +113,21 @@ Funktionalität: Bogen im Assistenten erfassen
     Dann sehe ich die Überschrift "Personal (1)"
     Und sehe ich den Text "Musterfrau, Erika"
 
-  Szenario: Person wieder entfernen
+  # Eine ausgefüllte Karte verschwindet nicht mehr still: ein Fehlgriff auf den
+  # Löschknopf kostete Name, Funktionen, Qualifikationen und Erreichbarkeiten
+  # ohne Rückfrage und ohne Rückgängig.
+  Szenario: Person wieder entfernen — erst nach Rückfrage
     Wenn ich zum Schritt "3. Personal" wechsle
     Und ich auf "+ Person hinzufügen" klicke
     Und ich das Feld "Nachname" mit "Irrtum" fülle
-    Und ich auf "Person entfernen" klicke
+    Und ich auf "Irrtum entfernen" klicke
+    Dann sehe ich den Dialog "Irrtum entfernen?"
+    Wenn ich im Dialog "Irrtum entfernen?" auf "Abbrechen" klicke
+    Und ich zum Schritt "6. Übersicht" wechsle
+    Dann sehe ich die Überschrift "Personal (1)"
+    Wenn ich zum Schritt "3. Personal" wechsle
+    Und ich auf "Irrtum entfernen" klicke
+    Und ich im Dialog "Irrtum entfernen?" auf "Person entfernen" klicke
     Und ich zum Schritt "6. Übersicht" wechsle
     Dann sehe ich die Überschrift "Personal (0)"
 
@@ -170,6 +180,19 @@ Funktionalität: Bogen im Assistenten erfassen
     Wenn ich zum Schritt "6. Übersicht" wechsle
     Dann sehe ich den Text "1 / 2 / 9 / 12"
 
+  # Dieselbe Erfassung ohne Tastatur: Der Meldekopf nimmt eine eintreffende
+  # Einheit im Stehen auf, oft mit Handschuh.
+  Szenario: Stärke der Schnellerfassung ohne Tastatur zählen
+    Wenn ich zum Schritt "3. Personal" wechsle
+    Und ich "Nur Stärke (Meldekopf-Schnellerfassung)" ankreuze
+    Und ich auf "Führer: erhöhen" klicke
+    Und ich auf "Mannschaft: erhöhen" klicke
+    Und ich auf "Mannschaft: erhöhen" klicke
+    Dann steht im Feld "Mannschaft" der Wert "2"
+    Und steht im Feld "Gesamt" der Wert "3"
+    Wenn ich auf "Mannschaft: verringern" klicke
+    Dann steht im Feld "Gesamt" der Wert "2"
+
   Szenario: Fahrzeug mit Kennzeichen erfassen
     Wenn ich zum Schritt "4. Fahrzeuge" wechsle
     Und ich auf "+ Fahrzeug hinzufügen" klicke
@@ -201,10 +224,22 @@ Funktionalität: Bogen im Assistenten erfassen
     Und ich zum Schritt "6. Übersicht" wechsle
     Dann sehe ich den Text "Heros Berlin 06/22/51"
 
-  Szenario: Fahrzeug wieder entfernen
+  # Die leere Karte geht ohne Rückfrage — wer eben danebengetippt hat, soll sie
+  # ohne Dialog loswerden; sonst erzieht die Rückfrage zum Wegklicken.
+  Szenario: Leeres Fahrzeug wieder entfernen
     Wenn ich zum Schritt "4. Fahrzeuge" wechsle
     Und ich auf "+ Fahrzeug hinzufügen" klicke
-    Und ich auf "Fahrzeug entfernen" klicke
+    Und ich auf "Fahrzeug 1 entfernen" klicke
+    Und ich zum Schritt "6. Übersicht" wechsle
+    Dann sehe ich die Überschrift "Fahrzeuge (0)"
+
+  Szenario: Erfasstes Fahrzeug erst nach Rückfrage entfernen
+    Wenn ich zum Schritt "4. Fahrzeuge" wechsle
+    Und ich auf "+ Fahrzeug hinzufügen" klicke
+    Und ich das Feld "Kennzeichen" mit "OL-FW 2041" fülle
+    Und ich auf "OL-FW 2041 entfernen" klicke
+    Dann sehe ich den Dialog "OL-FW 2041 entfernen?"
+    Wenn ich im Dialog "OL-FW 2041 entfernen?" auf "Fahrzeug entfernen" klicke
     Und ich zum Schritt "6. Übersicht" wechsle
     Dann sehe ich die Überschrift "Fahrzeuge (0)"
 
