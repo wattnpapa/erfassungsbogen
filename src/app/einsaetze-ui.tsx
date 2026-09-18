@@ -45,6 +45,7 @@ import {
   meldungenZusammenfuehren,
   meldungEntfernen,
   meldungStatusSetzen,
+  einsatzImportieren,
   neuesteJeEinheit,
   revisionen,
   tageBisAufraeumen,
@@ -163,8 +164,21 @@ export function EinsatzListe(props: {
    */
   const [zurueckgeholt, setZurueckgeholt] = useState<string | null>(null);
 
-  // Kein confirm: Löschen ist nur der Weg in den Papierkorb (30 Tage
-  // wiederherstellbar) — ein Fehltipp lässt sich rückgängig machen.
+  /**
+   * Rückfrage vor dem Weg in den Papierkorb. Dass ein Fehltipp umkehrbar ist,
+   * hilft nur, wenn der Rückweg auch bekannt ist — der Papierkorb liegt hinter
+   * einem Textlink, den nichts ankündigt. Die Frage nennt ihn deshalb.
+   */
+  function fragLoeschen(s: Einsatzsammlung) {
+    const einheiten = neuesteJeEinheit(s.eintraege).length;
+    return frageJaNein({
+      titel: "Einsatz löschen?",
+      text: `„${s.name}" mit ${einheiten} gemeldeten Einheit${einheiten === 1 ? "" : "en"} wandert in den Papierkorb und lässt sich dort 30 Tage lang zurückholen.`,
+      ok: "In den Papierkorb",
+      gefahr: true,
+    });
+  }
+
   function loeschen(s: Einsatzsammlung) {
     einsatzLoeschen(s.id);
     onGeaendert();
@@ -222,7 +236,9 @@ export function EinsatzListe(props: {
                   danach nach. Ohne ihn verschwindet aus einem Stapel gleich
                   aussehender Karten schlagartig eine, und welche es war, steht
                   nur noch im Papierkorb. */}
-              <AbgangKnopf className="entfernen" onAusfuehren={() => loeschen(s)}>Löschen</AbgangKnopf>
+              <AbgangKnopf className="entfernen" bestaetigen={() => fragLoeschen(s)} onAusfuehren={() => loeschen(s)}>
+                Löschen…
+              </AbgangKnopf>
             </div>
           </Kartenstapel>
         );
@@ -239,25 +255,29 @@ export function EinsatzListe(props: {
           <Kartenstapel className="karte papierkorb" key={s.id}>
             <div className="kopfzeile">
               <h2>{s.name}</h2>
-              <span>
-                <AbgangKnopf
-                  onAusfuehren={() => { einsatzWiederherstellen(s.id); setZurueckgeholt(s.id); onGeaendert(); }}
-                >
-                  Wiederherstellen
-                </AbgangKnopf>{" "}
-                <AbgangKnopf
-                  className="entfernen"
-                  bestaetigen={() => fragEndgueltig(s)}
-                  onAusfuehren={() => endgueltigLoeschen(s)}
-                >
-                  Endgültig löschen
-                </AbgangKnopf>
-              </span>
+              {/* Nur der harmlose Weg steht in der Kopfzeile. „Endgültig
+                  löschen" lag daneben, keine zwei Fingerbreit vom
+                  Wiederherstellen entfernt — mit Handschuh eine Verwechslung
+                  ohne Rückweg. */}
+              <AbgangKnopf
+                onAusfuehren={() => { einsatzWiederherstellen(s.id); setZurueckgeholt(s.id); onGeaendert(); }}
+              >
+                Wiederherstellen
+              </AbgangKnopf>
             </div>
             <p className="hinweis">
               {s.eintraege.length} Meldung(en) · gelöscht am {new Date(s.geloeschtAm!).toLocaleDateString("de-DE")} —
               wird nach 30 Tagen automatisch endgültig entfernt.
             </p>
+            <div className="papierkorb-endgueltig">
+              <AbgangKnopf
+                className="entfernen"
+                bestaetigen={() => fragEndgueltig(s)}
+                onAusfuehren={() => endgueltigLoeschen(s)}
+              >
+                Endgültig löschen…
+              </AbgangKnopf>
+            </div>
           </Kartenstapel>
         ))}
     </>
@@ -445,6 +465,16 @@ export function EinsatzDetail(props: {
   // Was die Lage NICHT enthält, gehört genauso sichtbar gemacht wie das, was
   // sie enthält (siehe zaehltInLage).
   const uebungenDaneben = uebungenAusserhalbDerLage(einsatz.eintraege, einsatz.art);
+  // Zuletzt entfernte Meldung — solange sie hier steht, gibt es einen Rückweg.
+  const [zuletztEntfernt, setZuletztEntfernt] = useState<MeldeEintrag | null>(null);
+
+  /** Entfernte Meldung unverändert zurücklegen (mit Signatur, Herkunft, Etiketten). */
+  function entferntesZurueckholen() {
+    if (!zuletztEntfernt) return;
+    einsatzImportieren({ ...einsatz, eintraege: [zuletztEntfernt] });
+    setZuletztEntfernt(null);
+    onGeaendert();
+  }
   // Alle gemeldeten Einheiten (neueste Revision je Einheit) — Grundlage für die
   // Gesamtzahl; `kopf` ist davon nur der gerade angezeigte Ausschnitt. Suche,
   // Filter und Sortierung ändern die Summen oben bewusst nicht.
@@ -462,9 +492,24 @@ export function EinsatzDetail(props: {
   // Beschriftung — die steht schon im Hinweis über der Liste.
   const qualiKurz = gewaehlteQuali?.label.split(" – ")[0] ?? "";
 
-  // Verschiebt nur in den Papierkorb (30 Tage wiederherstellbar über die
-  // Einsatzliste) — daher kein confirm.
-  function loeschen() {
+  /**
+   * Einsatz löschen — mit Rückfrage, obwohl es „nur" in den Papierkorb geht.
+   *
+   * Der Knopf stand als einzige dauerhaft eingeblendete Aktion in der festen
+   * Fußleiste, an genau der Stelle, an der im Assistenten „← Zurück" sitzt: ein
+   * Daumentipp löschte die ganze Sammlung, ohne Frage, ohne Rückmeldung, und
+   * der Rückweg über den Papierkorb ist von dort aus nicht zu sehen. Die
+   * Rückfrage nennt deshalb den Umfang und den Papierkorb beim Namen.
+   */
+  async function loeschen() {
+    const anzahl = neuesteJeEinheit(einsatz.eintraege).length;
+    const sicher = await frageJaNein({
+      titel: "Einsatz löschen?",
+      text: `„${einsatz.name}" mit ${anzahl} gemeldeten Einheit${anzahl === 1 ? "" : "en"} wandert in den Papierkorb und lässt sich dort 30 Tage lang zurückholen.`,
+      ok: "In den Papierkorb",
+      gefahr: true,
+    });
+    if (!sicher) return;
     einsatzLoeschen(einsatz.id);
     onGeloescht();
   }
@@ -481,6 +526,13 @@ export function EinsatzDetail(props: {
       </p>
     </SeitenKopf>
     <main id="inhalt" tabIndex={-1} className="einsatz-detail">
+      {zuletztEntfernt && (
+        <p className="meldung" role="status">
+          Meldung „{einheitAnzeigename(zuletztEntfernt.bogen.einheit)}" entfernt.{" "}
+          <button type="button" className="link" onClick={entferntesZurueckholen}>Rückgängig</button>
+        </p>
+      )}
+
       {/* Ausgenommene Übungsmeldungen: Die Zahlen darunter sind ohne sie
           gerechnet, und das muss dort stehen, wo die Zahlen stehen — nicht nur
           als Etikett an der einzelnen Karte weiter unten. */}
@@ -715,13 +767,21 @@ export function EinsatzDetail(props: {
               qualifikation={quali}
               qualifikationKurz={qualiKurz}
               eingang={eingang}
+              onEntfernt={setZuletztEntfernt}
             />
           ))}
       </section>
 
-      <footer className="nav">
-        <button type="button" className="entfernen" onClick={loeschen}>Einsatz löschen</button>
-      </footer>
+      {/* Das Löschen gehört ans Ende des Inhalts, nicht in die feste Leiste am
+          Daumen: Es ist die seltenste und folgenschwerste Handlung dieser
+          Ansicht. */}
+      <section className="karte einsatz-verwalten">
+        <h2>Einsatz verwalten</h2>
+        <p className="hinweis">
+          Gelöschte Einsätze liegen 30 Tage im Papierkorb auf der Startseite und lassen sich von dort zurückholen.
+        </p>
+        <button type="button" className="entfernen" onClick={loeschen}>Einsatz löschen…</button>
+      </section>
     </main>
     </>
   );
@@ -1115,6 +1175,8 @@ function EinheitKarte(props: {
   kopf: MeldeEintrag;
   alle: MeldeEintrag[];
   onGeaendert: () => void;
+  /** Die entfernte Meldung — die Ansicht bietet sie danach zum Zurückholen an. */
+  onEntfernt?: (eintrag: MeldeEintrag) => void;
   /** Aktiver Qualifikationsfilter ("" = keiner) — nennt die passenden Personen in der Zeile. */
   qualifikation?: string;
   /** Kurzform der gefilterten Qualifikation für die Trefferzeile („AGT"). */
@@ -1122,7 +1184,7 @@ function EinheitKarte(props: {
   /** Die gerade eingegangene Meldung — trifft sie diese Zeile, quittiert sie. */
   eingang?: Eingang | null;
 }) {
-  const { einsatzId, kopf, alle, onGeaendert, qualifikation = "", qualifikationKurz = "", eingang } = props;
+  const { einsatzId, kopf, alle, onGeaendert, onEntfernt, qualifikation = "", qualifikationKurz = "", eingang } = props;
   const zeile = useEingangsquittung<HTMLDivElement>(marke(eingang, kopf.einheitSchluessel));
   // Die Namen gehören in die Zeile, nicht hinter einen Klick: die Frage lautet
   // „wen habe ich?", und die Antwort ist der Name, nicht die Zahl.
@@ -1227,6 +1289,10 @@ function EinheitKarte(props: {
     // (reduzierte Bewegung, verdeckter Tab), nimmt mitAbgang den direkten Weg.
     mitAbgang(zeile.current, () => {
       meldungEntfernen(einsatzId, kopf.id);
+      // Der Eintrag reist vollständig zurück an die Ansicht: Sie bietet ihn zum
+      // Zurückholen an, solange niemand weitergeklickt hat. Für Einsätze gibt
+      // es einen Papierkorb, für die einzelne Meldung bisher nichts.
+      onEntfernt?.(kopf);
       onGeaendert();
     });
   }

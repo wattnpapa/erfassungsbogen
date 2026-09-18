@@ -16,6 +16,7 @@ import {
   absenderkarteSpeichern,
   type Absenderkarte,
 } from "./absenderkarte";
+import { frageJaNein } from "./dialoge";
 
 /** Beschriftetes Eingabefeld — gleiche Auszeichnung wie in schritte.tsx. */
 function Feld(props: { titel: string; children: ReactNode }) {
@@ -55,7 +56,19 @@ export function AbsenderkarteFeld(props: {
     setOffen(false);
   }
 
-  function entfernen() {
+  /**
+   * Der Knopf stand unmittelbar neben „Abbrechen" und löschte die Angaben ohne
+   * Rückfrage — zwei Nachbarn mit gegensätzlicher Wirkung. Jetzt steht er
+   * abgesetzt und fragt nach.
+   */
+  async function entfernen() {
+    const sicher = await frageJaNein({
+      titel: "Absenderangaben entfernen?",
+      text: "Name, Rückrufnummer und E-Mail werden von diesem Gerät gelöscht. Künftig übergebene Bögen tragen dann keine Absenderangaben mehr.",
+      ok: "Angaben entfernen",
+      gefahr: true,
+    });
+    if (!sicher) return;
     props.onGespeichert(absenderkarteSpeichern({}));
     setEntwurf({});
     setOffen(false);
@@ -119,11 +132,13 @@ export function AbsenderkarteFeld(props: {
       </p>
       <div className="aktionen">
         <button type="button" className="primaer" onClick={speichern}>Übernehmen</button>{" "}
-        <button type="button" onClick={() => setOffen(false)}>Abbrechen</button>{" "}
-        {absenderkarteGefuellt(karte) && (
-          <button type="button" onClick={entfernen}>Angaben entfernen</button>
-        )}
+        <button type="button" onClick={() => setOffen(false)}>Abbrechen</button>
       </div>
+      {absenderkarteGefuellt(karte) && (
+        <div className="aktionen abgesetzt">
+          <button type="button" className="entfernen" onClick={entfernen}>Angaben entfernen…</button>
+        </div>
+      )}
     </div>
   );
 }

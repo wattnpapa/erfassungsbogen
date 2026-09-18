@@ -133,25 +133,27 @@ export function VorlagenListe(props: {
           <Kartenstapel className="karte papierkorb" key={v.id}>
             <div className="kopfzeile">
               <h2>{v.name}</h2>
-              <span>
-                <AbgangKnopf
-                  onAusfuehren={() => { vorlageWiederherstellen(v.id); setZurueckgeholt(v.id); onGeaendert(); }}
-                >
-                  Wiederherstellen
-                </AbgangKnopf>{" "}
-                <AbgangKnopf
-                  className="entfernen"
-                  bestaetigen={() => fragEndgueltig(v)}
-                  onAusfuehren={() => endgueltigLoeschen(v)}
-                >
-                  Endgültig löschen
-                </AbgangKnopf>
-              </span>
+              {/* Wie im Einsatz-Papierkorb: der harmlose Weg in der Kopfzeile,
+                  der endgültige abgesetzt darunter. */}
+              <AbgangKnopf
+                onAusfuehren={() => { vorlageWiederherstellen(v.id); setZurueckgeholt(v.id); onGeaendert(); }}
+              >
+                Wiederherstellen
+              </AbgangKnopf>
             </div>
             <p className="hinweis">
               Gelöscht am {new Date(v.geloeschtAm!).toLocaleDateString("de-DE")} — wird nach 30 Tagen
               automatisch endgültig entfernt.
             </p>
+            <div className="papierkorb-endgueltig">
+              <AbgangKnopf
+                className="entfernen"
+                bestaetigen={() => fragEndgueltig(v)}
+                onAusfuehren={() => endgueltigLoeschen(v)}
+              >
+                Endgültig löschen…
+              </AbgangKnopf>
+            </div>
           </Kartenstapel>
         ))}
     </>

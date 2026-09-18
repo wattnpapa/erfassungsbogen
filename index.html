@@ -1250,6 +1250,11 @@
        Rahmen, kein Farbbalken — er soll neben der aktiven Entwurfskarte nicht um
        den ersten Tipp konkurrieren. */
     .entwurf-karte.verdraengt { border-top: var(--strich) solid var(--linie); background: var(--flaeche-2, var(--flaeche)); margin-top: var(--r-3); }
+    /* Papierkorb: „Endgültig löschen" steht bewusst abgesetzt unter der Karte,
+       mit deutlichem Abstand zum Wiederherstellen in der Kopfzeile. */
+    .papierkorb-endgueltig { margin-top: var(--r-4); padding-top: var(--r-3); border-top: var(--strich) solid var(--linie); }
+    /* Dasselbe für die Einsatzansicht: „Einsatz löschen" am Ende des Inhalts. */
+    .einsatz-verwalten { margin-top: var(--r-6); }
     /* Erststart-Onboarding: drei Schritte erklären den Offline-QR-Transport. */
     .onboarding { margin-top: var(--r-6); }
     .onboarding h2 { border: none; text-align: left; }
@@ -1292,6 +1297,8 @@
     dialog.abfrage .kopiertext { width: 100%; font-family: var(--schrift-daten); font-size: var(--t-xs); }
     .abfrage-aktionen { display: flex; flex-wrap: wrap; gap: var(--r-2); margin-top: var(--r-4); }
     /* Benannte Wege (mehr als OK/Abbrechen): voller Knopf mit Erklärung darunter. */
+    .aktionen.abgesetzt { margin-top: var(--r-4); padding-top: var(--r-3); border-top: var(--strich) solid var(--linie); }
+    .abfrage-aktionen.abgesetzt { margin-top: var(--r-5); padding-top: var(--r-4); border-top: var(--strich) solid var(--linie); }
     .abfrage-weg { margin: 0.9rem 0; }
     .abfrage-weg button { width: 100%; }
     .abfrage-weg .hinweis { margin: 0.25rem 0 0; }

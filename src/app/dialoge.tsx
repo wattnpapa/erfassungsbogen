@@ -353,7 +353,10 @@ function Dialogfenster({ abfrage }: { abfrage: Abfrage }) {
                 {w.hinweis && <p className="hinweis">{w.hinweis}</p>}
               </div>
             ))}
-            <div className="abfrage-aktionen">
+            {/* Steht eine zerstörende Antwort im Dialog, rückt „Abbrechen"
+                sichtbar ab: Beide Knöpfe lagen keine zwei Fingerbreit
+                auseinander, und der obere ist der, der nichts zurücknimmt. */}
+            <div className={`abfrage-aktionen${abfrage.wege.some((w) => w.gefahr) ? " abgesetzt" : ""}`}>
               <button type="button" onClick={() => dialog.current?.close("")}>
                 {abfrage.abbruch}
               </button>
