@@ -713,6 +713,18 @@ export function schrittStatus(b: Erfassungsbogen): SchrittStatus[] {
   return [einheit, einsatz, personal, fahrzeuge, sofortbedarf];
 }
 
+/**
+ * Steckt in dem Bogen Arbeit, die beim Ersetzen verloren ginge?
+ *
+ * Maßstab ist derselbe wie bei den Schrittmarken: Sobald ein Schritt über
+ * „leer" hinaus ist, hat jemand etwas eingetragen. Ein frisch angelegter
+ * Bogen (`neuerBogen()`) trägt nur Vorgaben und zählt nicht — sonst stünde vor
+ * jedem Wechsel eine Rückfrage, die nichts schützt und zum Wegklicken erzieht.
+ */
+export function bogenHatInhalt(b: Erfassungsbogen): boolean {
+  return schrittStatus(b).some((s) => s !== "leer");
+}
+
 // ------------------------------------------------------------- Neuer Bogen
 
 /**

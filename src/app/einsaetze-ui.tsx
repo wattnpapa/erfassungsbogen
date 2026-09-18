@@ -58,7 +58,7 @@ import { RolleMarke } from "./rolle-marke";
 import { AufteilenPanel } from "./aufteilen-ui";
 import { ZusammenfuehrenPanel } from "./zusammenfuehren-ui";
 import type { AufteilungsWahl } from "@bos/meldekopf/aufteilen";
-import { aggregiere, aggregiereNachZug, type EinsatzSummen } from "./auswertung";
+import { aggregiere, aggregiereNachZug, uebungenAusserhalbDerLage, type EinsatzSummen } from "./auswertung";
 import {
   SORTIERUNGEN,
   einheitenAnsicht,
@@ -189,7 +189,7 @@ export function EinsatzListe(props: {
   return (
     <>
       {einsaetze.map((s) => {
-        const sum = aggregiere(s.eintraege);
+        const sum = aggregiere(s.eintraege, s.art);
         const restTage = tageBisAufraeumen(s);
         return (
           <Kartenstapel className="karte" key={s.id} frisch={s.id === zurueckgeholt}>
@@ -440,8 +440,11 @@ export function EinsatzDetail(props: {
   const [quali, setQuali] = useState("");
   // Karten oder Tabelle — geräteweit gemerkt (einheiten-tabelle.ts).
   const [ansicht, setAnsicht] = useState<EinheitenAnsicht>(gemerkteAnsicht);
-  const sum = aggregiere(einsatz.eintraege);
-  const zugGruppen = aggregiereNachZug(einsatz.eintraege);
+  const sum = aggregiere(einsatz.eintraege, einsatz.art);
+  const zugGruppen = aggregiereNachZug(einsatz.eintraege, einsatz.art);
+  // Was die Lage NICHT enthält, gehört genauso sichtbar gemacht wie das, was
+  // sie enthält (siehe zaehltInLage).
+  const uebungenDaneben = uebungenAusserhalbDerLage(einsatz.eintraege, einsatz.art);
   // Alle gemeldeten Einheiten (neueste Revision je Einheit) — Grundlage für die
   // Gesamtzahl; `kopf` ist davon nur der gerade angezeigte Ausschnitt. Suche,
   // Filter und Sortierung ändern die Summen oben bewusst nicht.
@@ -478,6 +481,17 @@ export function EinsatzDetail(props: {
       </p>
     </SeitenKopf>
     <main id="inhalt" tabIndex={-1} className="einsatz-detail">
+      {/* Ausgenommene Übungsmeldungen: Die Zahlen darunter sind ohne sie
+          gerechnet, und das muss dort stehen, wo die Zahlen stehen — nicht nur
+          als Etikett an der einzelnen Karte weiter unten. */}
+      {uebungenDaneben.length > 0 && (
+        <p className="meldung uebung-ausgenommen" role="status">
+          {uebungenDaneben.length} Übungsmeldung{uebungenDaneben.length === 1 ? "" : "en"} zählt nicht in diese Lage
+          {" "}({uebungenDaneben.map((e) => einheitAnzeigename(e.bogen.einheit)).join(", ")}).
+          Die Summen unten sind ohne sie gerechnet.
+        </p>
+      )}
+
       <section className="karte staerke-leiste">
         <div><Zaehlwert wert={sum.einheiten} /><span>Einheiten</span></div>
         <div><Zaehlwert wert={sum.staerke.fuehrer} /><span>Führer</span></div>
@@ -689,7 +703,7 @@ export function EinsatzDetail(props: {
             )}
           </p>
         )}
-        {ansicht === "tabelle" && kopf.length > 0 && <EinheitenTabelle meldungen={kopf} eingang={eingang} />}
+        {ansicht === "tabelle" && kopf.length > 0 && <EinheitenTabelle meldungen={kopf} art={einsatz.art} eingang={eingang} />}
         {ansicht === "karten" &&
           kopf.map((e) => (
             <EinheitKarte
@@ -724,12 +738,12 @@ export function EinsatzDetail(props: {
  * Einheit meldet den größten Verpflegungsbedarf?"). Zahlen starten dabei
  * absteigend — gefragt ist der größte Wert, nicht die Null.
  */
-function EinheitenTabelle({ meldungen, eingang }: { meldungen: MeldeEintrag[]; eingang?: Eingang | null }) {
+function EinheitenTabelle({ meldungen, art, eingang }: { meldungen: MeldeEintrag[]; art: EinsatzArt; eingang?: Eingang | null }) {
   // null = Reihenfolge der Liste (Sortierauswahl der Leiste) unverändert
   // übernehmen. Erst ein Klick auf einen Spaltenkopf ordnet hier um.
   const [spalte, setSpalte] = useState<TabellenSpalte | null>(null);
   const [richtung, setRichtung] = useState<Sortierrichtung>("auf");
-  const zeilen = tabellenZeilen(meldungen);
+  const zeilen = tabellenZeilen(meldungen, art);
   const sortiert = spalte ? zeilenSortieren(zeilen, spalte, richtung) : zeilen;
   const summe = tabellenSumme(zeilen);
   const anwesende = zeilen.filter((z) => z.anwesend).length;

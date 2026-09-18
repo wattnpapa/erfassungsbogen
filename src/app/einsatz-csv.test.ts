@@ -77,7 +77,8 @@ describe("einsatzCsvInhalt()", () => {
       "Verpflegung gesamt", "Verpflegung veg.", "Verpflegung vegan",
       "Unterbringung M", "Unterbringung W", "Unterbringung D",
       "Diesel (l)", "Benzin (l)", "Gemisch (l)",
-      "Fahrzeuge", "Stand", "Quelle",
+      "Fahrzeuge", "Stand", "Empfangen", "Quelle",
+      "Status", "Zählt in Lage", "Übung", "Sofortbedarf", "Signatur", "Absender",
     ]);
   });
 
@@ -99,7 +100,12 @@ describe("einsatzCsvInhalt()", () => {
     // Diesel/Benzin/Gemisch
     expect(f.slice(14, 17)).toEqual(["40", "5", "0"]);
     expect(f[18]).toMatch(/^\d{6}[a-z]{3}\d{2}$/); // Stand als NATO-Zeitgruppe
-    expect(f[19]).toBe("Scan");
+    expect(f[20]).toBe("Scan");
+    expect(f[21]).toBe("anwesend");
+    expect(f[22]).toBe("ja");
+    expect(f[23]).toBe(""); // kein Übungsbogen
+    expect(f[24]).toBe("Unterbringung / Kraftstoff");
+    expect(f[25]).toBe("unsigniert");
   });
 
   it("unterscheidet abgeteilte Truppteile in der Teil-Spalte", () => {
@@ -118,7 +124,7 @@ describe("einsatzCsvInhalt()", () => {
     );
     const felder = zeilen(csv).slice(1, 3).map((z) => z.split(";"));
     expect(felder.map((f) => f[1])).toEqual(["", "Fachberater"]);
-    expect(felder[1]![19]).toBe("Aufteilung");
+    expect(felder[1]![20]).toBe("Aufteilung");
   });
 
   it("hängt eine Summenzeile über alle anwesenden Einheiten an", () => {
@@ -132,14 +138,29 @@ describe("einsatzCsvInhalt()", () => {
     expect(summe[17]).toBe("2"); // Fahrzeuge gesamt
   });
 
-  it("ignoriert abgerückte Einheiten (nur aktuelle Meldungen)", () => {
+  it("führt abgerückte Einheiten mit Status auf, zählt sie aber nicht in die Summe", () => {
+    // Weglassen war der Fehler: Die Führungsstelle sah eine Lücke, ohne sie als
+    // Lücke erkennen zu können. Die Zeile bleibt, die Summe nicht.
     const csv = einsatzCsvInhalt(
       sammlung([meldung(bogen("A")), meldung(bogen("B"), { status: MeldeStatus.ABGERUECKT })]),
     );
     const reihen = zeilen(csv);
-    expect(reihen).toHaveLength(3); // Kopf + 1 Einheit + Summe
-    expect(reihen[3]).toBeUndefined();
-    expect(reihen[2]!).toContain("Summe (1 Einheiten)");
+    expect(reihen).toHaveLength(4); // Kopf + 2 Einheiten + Summe
+    const abgerueckt = reihen[2]!.split(";");
+    expect(abgerueckt[21]).toBe("abgerückt");
+    expect(abgerueckt[22]).toBe("nein");
+    expect(reihen[3]!).toContain("Summe (1 Einheiten)");
+  });
+
+  it("nimmt einen Übungsbogen aus der Lage eines echten Einsatzes heraus", () => {
+    const csv = einsatzCsvInhalt(
+      sammlung([meldung(bogen("A")), meldung(bogen("B", { uebung: true }))]),
+    );
+    const reihen = zeilen(csv);
+    const uebung = reihen[2]!.split(";");
+    expect(uebung[22]).toBe("nein");
+    expect(uebung[23]).toBe("ÜBUNG");
+    expect(reihen[3]!).toContain("Summe (1 Einheiten)");
   });
 
   it("quotet Felder mit Semikolon und deutschem Dezimalkomma", () => {

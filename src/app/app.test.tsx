@@ -413,6 +413,45 @@ describe("Assistenten-Durchlauf", () => {
     expect(screen.queryByText(/Entwurfshausen/)).toBeNull();
   });
 
+  it("fragt vor dem Ersetzen des angefangenen Bogens und holt ihn danach zurück", async () => {
+    const nutzer = userEvent.setup();
+    render(<App />);
+    await neuerBogenBis(nutzer, 0);
+    await nutzer.type(screen.getByLabelText("Name (Pflicht)"), "Verdrängthausen");
+    await nutzer.click(screen.getByRole("button", { name: "‹ Startseite" }));
+
+    // Abbruch: der angefangene Bogen bleibt im Arbeitsplatz.
+    await nutzer.click(screen.getByRole("button", { name: "Neuen Bogen erstellen" }));
+    await nutzer.click(within(rueckfrage("Neuen Bogen anfangen?")).getByRole("button", { name: "Abbrechen" }));
+    expect(screen.getByText(/Verdrängthausen/)).toBeDefined();
+
+    await nutzer.click(screen.getByRole("button", { name: "Neuen Bogen erstellen" }));
+    await nutzer.click(within(rueckfrage("Neuen Bogen anfangen?")).getByRole("button", { name: "Neu anfangen" }));
+
+    // Der leere Bogen steht jetzt im Assistenten; der verdrängte liegt nicht
+    // im Nichts, sondern wartet auf der Startseite.
+    await nutzer.click(screen.getByRole("button", { name: "‹ Startseite" }));
+    const zurueck = screen.getByRole("button", { name: "Zuletzt verdrängten Bogen zurückholen" });
+    expect(screen.getByText(/Verdrängthausen/)).toBeDefined();
+
+    await nutzer.click(zurueck);
+    expect(await screen.findByRole("heading", { name: "Gesamtübersicht" })).toBeDefined();
+    expect(screen.getAllByText(/Verdrängthausen/).length).toBeGreaterThan(0);
+  }, 20000);
+
+  it("lässt einen unberührten Bogen ohne Rückfrage ersetzen", async () => {
+    const nutzer = userEvent.setup();
+    render(<App />);
+    await nutzer.click(screen.getByRole("button", { name: "Neuen Bogen erstellen" }));
+    await nutzer.click(screen.getByRole("button", { name: "‹ Startseite" }));
+
+    // Nichts eingetragen: eine Rückfrage schützte hier nichts und würde nur
+    // zum Wegtippen erziehen.
+    await nutzer.click(screen.getByRole("button", { name: "Neuen Bogen erstellen" }));
+    expect(screen.queryByRole("dialog", { name: "Neuen Bogen anfangen?" })).toBeNull();
+    expect(screen.getByLabelText("Name (Pflicht)")).toBeDefined();
+  }, 20000);
+
   it("zeigt den QR-Code im Vollbild — mit Bild, nicht nur mit Rahmen", async () => {
     const nutzer = userEvent.setup();
     const dialog = await uebergabeDialog(nutzer);

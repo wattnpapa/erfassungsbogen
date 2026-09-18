@@ -17,7 +17,7 @@ import {
   type Staerke,
   type VerpflegungSplit,
 } from "@bos/eeb-format/model";
-import { MeldeStatus, neuesteJeEinheit, type MeldeEintrag } from "@bos/meldekopf/einsaetze";
+import { EinsatzArt, MeldeStatus, neuesteJeEinheit, type MeldeEintrag } from "@bos/meldekopf/einsaetze";
 
 export interface EinsatzSummen {
   /** Anzahl anwesender Einheiten (nicht Personen). */
@@ -34,11 +34,38 @@ export interface EinsatzSummen {
 }
 
 /**
- * Aktuell zählende Meldungen: neueste Revision je Einheit, nur anwesende.
- * Reihenfolge folgt {@link neuesteJeEinheit}.
+ * Zählt diese Meldung in die Lage der Sammlung?
+ *
+ * Ein als Übung gekennzeichneter Bogen gehört nicht in die Zahlen eines echten
+ * Einsatzes: Er beschreibt Kräfte, die für die Lage nicht verfügbar sind. In
+ * einer Übungssammlung ist er dagegen genau richtig. Die Startseite sichert
+ * das ausdrücklich zu („wird am Meldekopf nicht versehentlich zur Lage
+ * gezählt"); bis hierher galt die Zusage nur für das Etikett auf der Karte,
+ * nicht für die Summen.
  */
-export function aktuelleMeldungen(eintraege: MeldeEintrag[]): MeldeEintrag[] {
-  return neuesteJeEinheit(eintraege).filter((e) => e.status === MeldeStatus.ANWESEND);
+export function zaehltInLage(art: EinsatzArt, bogen: Erfassungsbogen): boolean {
+  return art === EinsatzArt.UEBUNG || !bogen.uebung;
+}
+
+/**
+ * Aktuell zählende Meldungen: neueste Revision je Einheit, nur anwesende —
+ * und, sobald die Einsatzart mitgegeben wird, ohne die Übungsmeldungen, die
+ * nicht in diese Lage gehören. Reihenfolge folgt {@link neuesteJeEinheit}.
+ */
+export function aktuelleMeldungen(eintraege: MeldeEintrag[], art?: EinsatzArt): MeldeEintrag[] {
+  const anwesend = neuesteJeEinheit(eintraege).filter((e) => e.status === MeldeStatus.ANWESEND);
+  return art == null ? anwesend : anwesend.filter((e) => zaehltInLage(art, e.bogen));
+}
+
+/**
+ * Die Gegenprobe: anwesende Meldungen, die wegen ihrer Übungskennzeichnung
+ * NICHT in die Lage zählen. Die Oberfläche sagt damit, was sie weglässt —
+ * eine stillschweigend kleinere Summe wäre so falsch wie die zu große.
+ */
+export function uebungenAusserhalbDerLage(eintraege: MeldeEintrag[], art: EinsatzArt): MeldeEintrag[] {
+  return neuesteJeEinheit(eintraege).filter(
+    (e) => e.status === MeldeStatus.ANWESEND && !zaehltInLage(art, e.bogen),
+  );
 }
 
 function leereSummen(): EinsatzSummen {
@@ -99,8 +126,8 @@ function summiere(meldungen: MeldeEintrag[]): EinsatzSummen {
 }
 
 /** Gesamtsummen über alle aktuell anwesenden Einheiten des Einsatzes. */
-export function aggregiere(eintraege: MeldeEintrag[]): EinsatzSummen {
-  return summiere(aktuelleMeldungen(eintraege));
+export function aggregiere(eintraege: MeldeEintrag[], art?: EinsatzArt): EinsatzSummen {
+  return summiere(aktuelleMeldungen(eintraege, art));
 }
 
 export interface ZugGruppe {
@@ -114,9 +141,9 @@ export interface ZugGruppe {
  * Nur aktuell anwesende Einheiten. Gruppen sind alphabetisch sortiert,
  * Einheiten ohne Etikett kommen zuletzt.
  */
-export function aggregiereNachZug(eintraege: MeldeEintrag[]): ZugGruppe[] {
+export function aggregiereNachZug(eintraege: MeldeEintrag[], art?: EinsatzArt): ZugGruppe[] {
   const nach = new Map<string, MeldeEintrag[]>();
-  for (const m of aktuelleMeldungen(eintraege)) {
+  for (const m of aktuelleMeldungen(eintraege, art)) {
     const k = m.zugEtikett ?? "";
     (nach.get(k) ?? nach.set(k, []).get(k)!).push(m);
   }

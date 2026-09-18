@@ -1246,6 +1246,10 @@
       .entwurf-karte .entwurf-aktionen { width: 100%; }
       .entwurf-karte .entwurf-aktionen button { flex: 1 1 0; min-width: 0; }
     }
+    /* Der zuletzt verdrängte Bogen ist der Ausweg, nicht das Angebot: gedämpfter
+       Rahmen, kein Farbbalken — er soll neben der aktiven Entwurfskarte nicht um
+       den ersten Tipp konkurrieren. */
+    .entwurf-karte.verdraengt { border-top: var(--strich) solid var(--linie); background: var(--flaeche-2, var(--flaeche)); margin-top: var(--r-3); }
     /* Erststart-Onboarding: drei Schritte erklären den Offline-QR-Transport. */
     .onboarding { margin-top: var(--r-6); }
     .onboarding h2 { border: none; text-align: left; }

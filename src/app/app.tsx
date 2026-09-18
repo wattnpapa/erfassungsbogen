@@ -26,6 +26,7 @@ import { signaturLabel, signaturVonPayload, signaturVonText, type SignaturStatus
 import {
   SCHRITT_STATUS_TITEL,
   blobAlsDownload,
+  bogenHatInhalt,
   bogenLaden,
   browserKompressor,
   bytesAlsDatei,
@@ -70,7 +71,15 @@ import { QrScannerWeb } from "./qr-scanner-web";
 import { TeilQuittung, fehlendeTeile, fehltNochSatz } from "./teil-quittung";
 import { qrAusBild } from "./qr-bild";
 import { istBilddatei, qrStapelLesen, stapelBericht as stapelBerichtZeilen } from "./qr-stapel";
-import { entwurfLaden, entwurfSpeichern, entwurfVerwerfen } from "./entwurf";
+import {
+  entwurfLaden,
+  entwurfSpeichern,
+  entwurfVerwerfen,
+  ersetztenEntwurfLaden,
+  ersetztenEntwurfMerken,
+  ersetztenEntwurfVerwerfen,
+  type Entwurf,
+} from "./entwurf";
 import { SeitenKopf } from "./seiten-kopf";
 import { AnzeigeSchalter } from "./anzeige-schalter";
 import { orgFarbe, wendeOrgAkzentAn } from "./org-farben";
@@ -402,6 +411,21 @@ const ART_WAHL = Object.entries(ART_LABEL).map(([wert, label]) => ({ wert, label
 // beendete Apps (siehe entwurf.ts).
 const ENTWURF = START.bogen ? null : entwurfLaden();
 
+/**
+ * Kaltstart MIT Bogen aus der URL (geteilter Link, QR mit Kamera-App): der
+ * eigene, gesicherte Entwurf wird dadurch verdrängt — ohne dass jemand gefragt
+ * werden könnte, die Entscheidung ist mit dem Öffnen des Links schon gefallen.
+ * Er wandert deshalb hier in die Rückholung, bevor das Autosave des neuen
+ * Bogens ihn überschreibt, und die Startseite bietet ihn wieder an.
+ */
+const VERDRAENGT_BEIM_START = ((): boolean => {
+  if (!START.bogen) return false;
+  const alt = entwurfLaden();
+  if (!alt || !bogenHatInhalt(alt.bogen)) return false;
+  ersetztenEntwurfMerken(alt.bogen);
+  return true;
+})();
+
 export function App() {
   // Rückfragen, Eingaben und Hinweise zeichnet die App selbst (dialoge.tsx) —
   // die eingebauten window.prompt/confirm/alert bleiben in der iOS-App
@@ -451,13 +475,18 @@ function AppInhalt() {
     setBogenHerkunft(payload);
   };
   const [meldung, setMeldung] = useState(
-    START.vorlage
+    VERDRAENGT_BEIM_START
+      ? 'Der empfangene Bogen hat deinen angefangenen Bogen aus dem Arbeitsplatz genommen. Auf der Startseite steht er unter „Zuletzt verdrängten Bogen zurückholen".'
+      : START.vorlage
       ? `Vorlage „${START.vorlage.name}" importiert.`
       : ENTWURF
         ? `Entwurf vom ${new Date(ENTWURF.gespeichert).toLocaleString("de-DE", { dateStyle: "short", timeStyle: "short" })} Uhr wiederhergestellt.`
         : "",
   );
   const [scannerOffen, setScannerOffen] = useState(false);
+  // Zuletzt verdrängter Arbeitsbogen (entwurf.ts): Solange er hier steht,
+  // bietet die Startseite ihn zum Zurückholen an.
+  const [ersetzterEntwurf, setErsetzterEntwurf] = useState<Entwurf | null>(() => ersetztenEntwurfLaden());
   // Zeigt den Startbildschirm, ohne den aktuellen Bogen zu verwerfen –
   // er lässt sich von dort per „Aktuellen Bogen fortsetzen“ wieder öffnen.
   const [zeigeStart, setZeigeStart] = useState(!START.bogen && !!ENTWURF);
@@ -546,7 +575,8 @@ function AppInhalt() {
     wendeOrgAkzentAn(bogen?.einheit.organisation);
   }, [bogen?.einheit.organisation]);
 
-  function musterungFertig(neuerArbeitsbogen: Erfassungsbogen) {
+  async function musterungFertig(neuerArbeitsbogen: Erfassungsbogen) {
+    if (!(await darfBogenErsetzen({ titel: "Bogen aus Vorlage anlegen?", was: "den Bogen aus der Vorlage", ok: "Aus Vorlage anlegen" }))) return;
     setBogen(neuerArbeitsbogen);
     setzeEmpfang(null);
     setSchritt(SCHRITT_EINSATZ);
@@ -565,6 +595,7 @@ function AppInhalt() {
     const datei = e.target.files?.[0];
     e.target.value = "";
     if (!datei) return;
+    if (!(await darfBogenErsetzen({ titel: "Bogen aus Datei öffnen?", was: "den Bogen aus der Datei", ok: "Datei öffnen" }))) return;
     try {
       if (istPdfDatei(datei)) {
         await ladePdfBogen(datei);
@@ -639,6 +670,66 @@ function AppInhalt() {
    * öffnen, um ihn in der Übersicht zu verwerfen. Anders als bei Vorlagen und
    * Einsätzen gibt es für den Entwurf keinen Papierkorb, deshalb die Rückfrage.
    */
+  /**
+   * Den Bogen merken, der gerade seinen Platz räumt — und die Startseite
+   * darüber in Kenntnis setzen.
+   */
+  function merkeVerdraengt(b: Erfassungsbogen) {
+    ersetztenEntwurfMerken(b);
+    setErsetzterEntwurf({ gespeichert: Date.now(), bogen: b });
+  }
+
+  /**
+   * Wächter vor jedem Wechsel des Arbeitsbogens.
+   *
+   * Die App führt genau einen Bogen. Wege wie „Neuen Bogen erstellen", „Aus
+   * Datei laden", ein eintreffender Scan oder „Einheit erfassen" aus einer
+   * Sammlung setzten sich bisher wortlos an dessen Stelle — der halb erfasste
+   * eigene Bogen war weg, ohne Frage und ohne Rückweg, während „Verwerfen" im
+   * selben Produkt sauber nachfragt. Hier steht deshalb beides: die Frage und
+   * die Rückholung (siehe `ersetztenEntwurfMerken`).
+   *
+   * Ein unberührter Bogen (nur Vorgaben) löst keine Frage aus; sonst stünde
+   * sie ständig im Weg und würde weggetippt.
+   */
+  async function darfBogenErsetzen(a: { titel: string; was: string; ok: string }): Promise<boolean> {
+    if (!bogen || !bogenHatInhalt(bogen)) return true;
+    const ja = await frageJaNein({
+      titel: a.titel,
+      text: `Der angefangene Bogen „${einheitAnzeigename(bogen.einheit)}" wird durch ${a.was} ersetzt. Er bleibt auf der Startseite unter „Zuletzt verdrängten Bogen zurückholen" erreichbar.`,
+      ok: a.ok,
+    });
+    if (!ja) return false;
+    merkeVerdraengt(bogen);
+    return true;
+  }
+
+  /** Den zuletzt verdrängten Bogen zurück in den Arbeitsplatz holen. */
+  async function holeVerdraengtenZurueck() {
+    const zurueck = ersetzterEntwurf;
+    if (!zurueck) return;
+    if (!(await darfBogenErsetzen({
+      titel: "Verdrängten Bogen zurückholen?",
+      was: `den Bogen „${einheitAnzeigename(zurueck.bogen.einheit)}"`,
+      ok: "Zurückholen",
+    }))) {
+      return;
+    }
+    // Erst nach dem Wächter aufräumen: Er kann den gerade offenen Bogen selbst
+    // in die Rückholung gelegt haben — dann steht dort jetzt der richtige.
+    if (ersetztenEntwurfLaden()?.gespeichert === zurueck.gespeichert) {
+      ersetztenEntwurfVerwerfen();
+      setErsetzterEntwurf(null);
+    }
+    setBogen(zurueck.bogen);
+    setzeEmpfang(null);
+    setSchritt(UEBERSICHT);
+    setOffenerEinsatzId(null);
+    setZeigeStart(false);
+    setFehler("");
+    setMeldung(`Bogen „${einheitAnzeigename(zurueck.bogen.einheit)}" zurückgeholt.`);
+  }
+
   async function entwurfWegwerfen() {
     if (!bogen) return;
     const sicher = await frageJaNein({
@@ -661,14 +752,7 @@ function AppInhalt() {
    * abgelehnt, der Beispielbögen-Dialog bleibt dann offen.
    */
   async function oeffneBeispiel(b: Erfassungsbogen): Promise<boolean> {
-    if (
-      bogen &&
-      !(await frageJaNein({
-        titel: "Beispielbogen öffnen?",
-        text: "Der aktuell geöffnete Bogen wird durch den Beispielbogen ersetzt — auch der gespeicherte Entwurf.",
-        ok: "Beispielbogen öffnen",
-      }))
-    ) {
+    if (!(await darfBogenErsetzen({ titel: "Beispielbogen öffnen?", was: "den Beispielbogen", ok: "Beispielbogen öffnen" }))) {
       return false;
     }
     setBogen(b);
@@ -720,6 +804,11 @@ function AppInhalt() {
   ) {
     const einsatz = einsaetzeLaden().find((s) => s.id === zielId);
     const schl = einheitSchluessel(b.einheit);
+    // Ein Übungsbogen in einer echten Lage zählt nicht mit (siehe zaehltInLage).
+    // Das gehört in dieselbe Zeile, die die Aufnahme quittiert — sonst steht die
+    // Meldung scheinbar normal in der Liste und der Meldekopf rechnet mit ihr.
+    const uebungDaneben = einsatz != null && !!b.uebung && einsatz.art !== EinsatzArt.UEBUNG;
+    const uebungZusatz = uebungDaneben ? " Achtung: als ÜBUNG gekennzeichnet — zählt nicht in die Lage." : "";
     let override: string | undefined;
     if (einsatz?.eintraege.some((e) => e.einheitSchluessel === schl)) {
       // Die Frage hat zwei gleichwertige Antworten und deshalb zwei benannte
@@ -769,7 +858,7 @@ function AppInhalt() {
       const stand = `${kioskZaehlerRef.current} ${kioskZaehlerRef.current === 1 ? "Bogen" : "Bögen"} in diesem Durchgang`;
       setScanFortschritt(
         r.neu
-          ? `✓ „${einheitAnzeigename(b.einheit)}" aufgenommen — ${stand}. Nächsten Bogen zeigen…`
+          ? `✓ „${einheitAnzeigename(b.einheit)}" aufgenommen — ${stand}.${uebungZusatz} Nächsten Bogen zeigen…`
           : `Bereits vorhanden — übersprungen (gleicher Inhalt). ${stand}.`,
       );
       setFehler("");
@@ -777,8 +866,8 @@ function AppInhalt() {
     }
     setMeldung(
       r.neu
-        ? `Meldung von „${einheitAnzeigename(b.einheit)}" aufgenommen.`
-        : `Bereits vorhanden — übersprungen (gleicher Inhalt).`,
+        ? `Meldung von „${einheitAnzeigename(b.einheit)}" aufgenommen.${uebungZusatz}`
+        : `Bereits vorhanden — übersprungen (gleicher Inhalt). Die Zeile in der Liste ist quittiert.`,
     );
     setFehler("");
     // Auch beim übersprungenen Bogen: die Frage nach dem Scan lautet „welche
@@ -810,6 +899,9 @@ function AppInhalt() {
       // Die Datenschutzfrist wendet die Sammlung selbst an (meldungHinzufuegen).
       await bogenInSammlung(ziel, b, "scan", { signatur: alsEintragSignatur(signatur), herkunft: payload }, true);
       return false; // Kiosk: weiter scannen, bis abgebrochen wird
+    }
+    if (!(await darfBogenErsetzen({ titel: "Empfangenen Bogen öffnen?", was: "die empfangene Meldung", ok: "Meldung öffnen" }))) {
+      return true; // Scan beendet, der eigene Bogen bleibt stehen
     }
     const { bogen: geoeffnet, anonymisiert } = bogenNachFrist(b);
     setBogen(geoeffnet);
@@ -1112,7 +1204,8 @@ function AppInhalt() {
     scanneQr(); // web: Scanner-Overlay; nativ: Plugin-Modal → uebernehmeQrText
   }
 
-  function manuellInEinsatz(zielId: string) {
+  async function manuellInEinsatz(zielId: string) {
+    if (!(await darfBogenErsetzen({ titel: "Einheit für den Einsatz erfassen?", was: "die neu zu erfassende Einheit", ok: "Einheit erfassen" }))) return;
     setSammelZiel(zielId);
     setOffenerEinsatzId(null); // Assistent übernimmt die Ansicht
     setMeldung("");
@@ -1165,7 +1258,9 @@ function AppInhalt() {
   }
 
   async function sammelPdf(s: Einsatzsammlung) {
-    const meldungen = aktuelleMeldungen(s.eintraege);
+    // Dieselbe Auswahl wie die Summenleiste: Übungsmeldungen gehören nicht in
+    // die Zahlen eines echten Einsatzes (siehe zaehltInLage).
+    const meldungen = aktuelleMeldungen(s.eintraege, s.art);
     if (meldungen.length === 0) {
       setFehler("Keine anwesenden Einheiten für die Sammel-PDF.");
       return;
@@ -1536,6 +1631,23 @@ function AppInhalt() {
             </section>
           );
         })()}
+        {/* Rückholung: Was ein anderer Bogen verdrängt hat, ist nicht verloren.
+            Die Zeile steht unter der Entwurfskarte, damit der aktuelle Bogen
+            zuerst kommt — sie ist der Ausweg, nicht das Angebot. */}
+        {ersetzterEntwurf && (
+          <section className="entwurf-karte verdraengt">
+            <span className="entwurf-text">
+              <strong>{einheitAnzeigename(ersetzterEntwurf.bogen.einheit)}</strong>
+              <span className="hinweis">
+                Zuletzt verdrängter Bogen · Stand{" "}
+                {new Date(ersetzterEntwurf.gespeichert).toLocaleString("de-DE", { dateStyle: "short", timeStyle: "short" })} Uhr
+              </span>
+            </span>
+            <span className="entwurf-aktionen">
+              <button type="button" onClick={holeVerdraengtenZurueck}>Zuletzt verdrängten Bogen zurückholen</button>
+            </span>
+          </section>
+        )}
         {/* Rückmeldungen stehen ÜBER den Aktionen: „Entwurf … wiederhergestellt"
             erklärt die Karte darüber, und unter den Knöpfen klebte der Kasten
             optisch an der Knopfreihe, statt ein eigener Block zu sein. */}
@@ -1562,7 +1674,14 @@ function AppInhalt() {
               Für Einheiten, die ihre eigene Stärkemeldung erfassen, drucken und weitergeben.
             </p>
             <div className="aktionen">
-              <button type="button" className={bogen ? "" : "primaer"} onClick={() => { setMeldung(""); setBogen(neuerBogen()); setzeEmpfang(null); setSchritt(0); setZeigeStart(false); }}>
+              <button type="button" className={bogen ? "" : "primaer"} onClick={async () => {
+                if (!(await darfBogenErsetzen({ titel: "Neuen Bogen anfangen?", was: "einen leeren Bogen", ok: "Neu anfangen" }))) return;
+                setMeldung("");
+                setBogen(neuerBogen());
+                setzeEmpfang(null);
+                setSchritt(0);
+                setZeigeStart(false);
+              }}>
                 Neuen Bogen erstellen
               </button>
               <button type="button" onClick={scanneQr}>QR-Code scannen…</button>
@@ -1597,7 +1716,8 @@ function AppInhalt() {
                   dort niemand. */}
               <button
                 type="button"
-                onClick={() => {
+                onClick={async () => {
+                  if (!(await darfBogenErsetzen({ titel: "Einheit schnell erfassen?", was: "die schnell zu erfassende Einheit", ok: "Schnell erfassen" }))) return;
                   setMeldung("");
                   setBogen({
                     ...neuerBogen(),
@@ -1841,7 +1961,7 @@ function AppInhalt() {
             <div className="teilen-weg" key={s.id}>
               <button type="button" onClick={() => bogenInEinsatzLegen(s.id)}>{s.name}</button>
               <p className="hinweis">
-                {ART_LABEL[s.art]}{s.ort ? ` · ${s.ort}` : ""} · {aktuelleMeldungen(s.eintraege).length} Einheit(en) anwesend
+                {ART_LABEL[s.art]}{s.ort ? ` · ${s.ort}` : ""} · {aktuelleMeldungen(s.eintraege, s.art).length} Einheit(en) anwesend
               </p>
             </div>
           ))}

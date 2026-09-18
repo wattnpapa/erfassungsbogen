@@ -10,8 +10,8 @@ import {
   type Erfassungsbogen,
   type Person,
 } from "@bos/eeb-format/model";
-import { MeldeStatus, einheitSchluessel, bogenInhaltsId, type MeldeEintrag } from "@bos/meldekopf/einsaetze";
-import { aggregiere, aggregiereNachZug, aktuelleMeldungen } from "./auswertung";
+import { EinsatzArt, MeldeStatus, einheitSchluessel, bogenInhaltsId, type MeldeEintrag } from "@bos/meldekopf/einsaetze";
+import { aggregiere, aggregiereNachZug, aktuelleMeldungen, uebungenAusserhalbDerLage } from "./auswertung";
 
 function person(rolle: StaerkeRolle, geschlecht = Geschlecht.M, ernaehrung = Ernaehrung.FLEISCH): Person {
   return {
@@ -138,5 +138,40 @@ describe("aktuelleMeldungen()", () => {
     ]);
     expect(m).toHaveLength(1);
     expect(m[0]!.bogen.stand).toBe(101);
+  });
+});
+
+describe("Übungsmeldungen und die Lage", () => {
+  it("lässt einen Übungsbogen aus den Summen eines echten Einsatzes heraus", () => {
+    const eintraege = [meldung(bogen("Echt")), meldung(bogen("Übung", { uebung: true }))];
+
+    const lage = aggregiere(eintraege, EinsatzArt.EINSATZ);
+    expect(lage.einheiten).toBe(1);
+    expect(lage.staerke.gesamt).toBe(3);
+    expect(lage.verpflegung.gesamt).toBe(3);
+
+    // Die weggelassene Meldung ist benennbar — die Oberfläche sagt, was fehlt.
+    expect(uebungenAusserhalbDerLage(eintraege, EinsatzArt.EINSATZ)).toHaveLength(1);
+  });
+
+  it("zählt denselben Bogen in einer Übungssammlung normal mit", () => {
+    const eintraege = [meldung(bogen("Echt")), meldung(bogen("Übung", { uebung: true }))];
+    expect(aggregiere(eintraege, EinsatzArt.UEBUNG).einheiten).toBe(2);
+    expect(uebungenAusserhalbDerLage(eintraege, EinsatzArt.UEBUNG)).toHaveLength(0);
+  });
+
+  it("hält die Zwischensummen nach Zug an dieselbe Regel", () => {
+    const eintraege = [
+      meldung(bogen("Echt"), { zugEtikett: "1. Zug" }),
+      meldung(bogen("Übung", { uebung: true }), { zugEtikett: "1. Zug" }),
+    ];
+    const gruppen = aggregiereNachZug(eintraege, EinsatzArt.EINSATZ);
+    expect(gruppen).toHaveLength(1);
+    expect(gruppen[0]!.summen.einheiten).toBe(1);
+  });
+
+  it("zählt ohne Einsatzart wie bisher alles (Aufrufer ohne Sammlungsbezug)", () => {
+    const eintraege = [meldung(bogen("Echt")), meldung(bogen("Übung", { uebung: true }))];
+    expect(aktuelleMeldungen(eintraege)).toHaveLength(2);
   });
 });

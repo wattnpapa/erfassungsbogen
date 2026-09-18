@@ -14,10 +14,17 @@
  */
 
 import { staerke, unterbringungMWD, verpflegung, type Erfassungsbogen } from "@bos/eeb-format/model";
+import type { EinsatzArt } from "@bos/meldekopf/einsaetze";
 import { einheitAnzeigename, orgLabel, vokabText, vokabularFuer, zeitgruppe } from "./hilfen";
-import { aktuelleMeldungen } from "./auswertung";
+import { aktuelleMeldungen, zaehltInLage } from "./auswertung";
 import { csvDatei, csvZeile } from "./csv";
-import type { Einsatzsammlung, MeldeEintrag, MeldeQuelle } from "@bos/meldekopf/einsaetze";
+import { MeldeStatus, neuesteJeEinheit, type Einsatzsammlung, type MeldeEintrag, type MeldeQuelle } from "@bos/meldekopf/einsaetze";
+
+const STATUS_LABEL: Record<MeldeStatus, string> = {
+  [MeldeStatus.ANWESEND]: "anwesend",
+  [MeldeStatus.ABGERUECKT]: "abgerückt",
+  [MeldeStatus.AUFGEGANGEN]: "aufgegangen",
+};
 
 const QUELLE_LABEL: Record<MeldeQuelle, string> = {
   scan: "Scan",
@@ -47,7 +54,14 @@ const SPALTEN = [
   "Gemisch (l)",
   "Fahrzeuge",
   "Stand",
+  "Empfangen",
   "Quelle",
+  "Status",
+  "Zählt in Lage",
+  "Übung",
+  "Sofortbedarf",
+  "Signatur",
+  "Absender",
 ] as const;
 
 /** Anzeigename wie in der Meldekopf-Oberfläche: Organisation + Standort + Einheitstyp. */
@@ -61,7 +75,32 @@ function fahrzeugListe(b: Erfassungsbogen): string {
   return b.fahrzeuge.map((f) => vokabText(f.typ, tabelle)).filter(Boolean).join(" / ");
 }
 
-function datenZeile(e: MeldeEintrag): string {
+/** Kurzform der Sofortbedarfs-Merker, die sonst nur als Zahl 0 sichtbar wären. */
+function sofortbedarfText(b: Erfassungsbogen): string {
+  const sb = b.sofortbedarf;
+  if (!sb) return "";
+  const teile: string[] = [];
+  if (sb.unterbringung) teile.push("Unterbringung");
+  if (sb.ruhezeitErforderlich) teile.push("Ruhezeit");
+  if (sb.dieselLiter || sb.benzinLiter || sb.gemischLiter) teile.push("Kraftstoff");
+  return teile.join(" / ");
+}
+
+function signaturText(e: MeldeEintrag): string {
+  if (!e.signatur) return "unsigniert";
+  return e.signatur.zustand === "gueltig"
+    ? `gültig${e.signatur.kurzform ? ` (${e.signatur.kurzform})` : ""}`
+    : "UNGÜLTIG";
+}
+
+/** Freiwillige Absenderangaben der mitsignierten Karte — für die Rückfrage. */
+function absenderText(e: MeldeEintrag): string {
+  const a = e.signatur?.absender;
+  if (!a) return "";
+  return [a.name, a.telefon, a.email].map((x) => x?.trim()).filter(Boolean).join(" · ");
+}
+
+function datenZeile(art: EinsatzArt, e: MeldeEintrag): string {
   const b = e.bogen;
   const st = staerke(b);
   const vp = verpflegung(b);
@@ -89,8 +128,20 @@ function datenZeile(e: MeldeEintrag): string {
     sb?.gemischLiter ?? 0,
     fahrzeugListe(b),
     zeitgruppe(b.stand),
+    new Date(e.empfangenAm).toLocaleString("de-DE", { dateStyle: "short", timeStyle: "short" }),
     QUELLE_LABEL[e.quelle],
+    STATUS_LABEL[e.status],
+    zaehlt(art, e) ? "ja" : "nein",
+    b.uebung ? "ÜBUNG" : "",
+    sofortbedarfText(b),
+    signaturText(e),
+    absenderText(e),
   ]);
+}
+
+/** Zählt der Eintrag in die Lage? Status UND Übungskennzeichnung entscheiden. */
+function zaehlt(art: EinsatzArt, e: MeldeEintrag): boolean {
+  return e.status === MeldeStatus.ANWESEND && zaehltInLage(art, e.bogen);
 }
 
 /** Summenzeile über alle anwesenden Einheiten — spaltenweise passend zu den Datenzeilen. */
@@ -142,8 +193,17 @@ function summenZeile(meldungen: MeldeEintrag[]): string {
  * eine Zeile (nach Anzeigename sortiert), zuletzt die Summenzeile.
  */
 export function einsatzCsvInhalt(s: Einsatzsammlung): string {
-  const meldungen = aktuelleMeldungen(s.eintraege).sort((a, b) =>
+  // Alle gemeldeten Einheiten, nicht nur die zählenden: Eine abgerückte oder
+  // als Übung geführte Einheit fiel bisher wortlos aus der Datei — die
+  // Führungsstelle sah eine Lücke, die sie nicht als Lücke erkennen konnte.
+  // Die Spalten „Status" und „Zählt in Lage" sagen, was die Summe enthält.
+  const alle = neuesteJeEinheit(s.eintraege).sort((a, b) =>
     einheitName(a.bogen).localeCompare(einheitName(b.bogen), "de"),
   );
-  return csvDatei([csvZeile([...SPALTEN]), ...meldungen.map(datenZeile), summenZeile(meldungen)]);
+  const zaehlende = aktuelleMeldungen(s.eintraege, s.art);
+  return csvDatei([
+    csvZeile([...SPALTEN]),
+    ...alle.map((e) => datenZeile(s.art, e)),
+    summenZeile(zaehlende),
+  ]);
 }

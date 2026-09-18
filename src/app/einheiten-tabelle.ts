@@ -18,8 +18,8 @@
 
 import { staerke, unterbringungMWD, verpflegung } from "@bos/eeb-format/model";
 import { einheitAnzeigename, orgLabel, vokabText, vokabularFuer, zeitgruppe } from "./hilfen";
-import { MeldeStatus, type MeldeEintrag } from "@bos/meldekopf/einsaetze";
-import { summiereBoegen, type EinsatzSummen } from "./auswertung";
+import { MeldeStatus, type EinsatzArt, type MeldeEintrag } from "@bos/meldekopf/einsaetze";
+import { summiereBoegen, zaehltInLage, type EinsatzSummen } from "./auswertung";
 
 /** Eine Tabellenzeile: eine gemeldete Einheit mit allen Zahlen der Übersicht. */
 export interface TabellenZeile {
@@ -44,8 +44,10 @@ export interface TabellenZeile {
   fahrzeuge: number;
   fahrzeugTypen: string;
   stand: string;
-  /** Zählt in die Summen (neueste Revision, nicht abgerückt/aufgegangen). */
+  /** Vor Ort (neueste Revision, nicht abgerückt/aufgegangen). */
   anwesend: boolean;
+  /** Zählt in die Summen: anwesend UND gehört in diese Lage (keine fremde Übung). */
+  zaehlt: boolean;
 }
 
 /** Spaltenschlüssel — zugleich Sortierschlüssel der anklickbaren Köpfe. */
@@ -113,8 +115,12 @@ function fahrzeugTypen(e: MeldeEintrag): string {
     .join(" / ");
 }
 
-/** Meldungen → Tabellenzeilen, Reihenfolge unverändert. */
-export function tabellenZeilen(eintraege: MeldeEintrag[]): TabellenZeile[] {
+/**
+ * Meldungen → Tabellenzeilen, Reihenfolge unverändert. Mit der Einsatzart
+ * fallen Übungsmeldungen aus der Summe (nicht aus der Tabelle — sie bleiben
+ * sichtbar, sie zählen nur nicht; siehe zaehltInLage).
+ */
+export function tabellenZeilen(eintraege: MeldeEintrag[], art?: EinsatzArt): TabellenZeile[] {
   return eintraege.map((e) => {
     const b = e.bogen;
     const st = staerke(b);
@@ -144,6 +150,7 @@ export function tabellenZeilen(eintraege: MeldeEintrag[]): TabellenZeile[] {
       fahrzeugTypen: fahrzeugTypen(e),
       stand: zeitgruppe(b.stand),
       anwesend: e.status === MeldeStatus.ANWESEND,
+      zaehlt: e.status === MeldeStatus.ANWESEND && (art == null || zaehltInLage(art, b)),
     };
   });
 }
@@ -157,7 +164,7 @@ export function tabellenZeilen(eintraege: MeldeEintrag[]): TabellenZeile[] {
  * Gesamtsummen des Einsatzes stehen unverändert in der Stärkeleiste.
  */
 export function tabellenSumme(zeilen: TabellenZeile[]): EinsatzSummen {
-  return summiereBoegen(zeilen.filter((z) => z.anwesend).map((z) => z.eintrag.bogen));
+  return summiereBoegen(zeilen.filter((z) => z.zaehlt).map((z) => z.eintrag.bogen));
 }
 
 export type Sortierrichtung = "auf" | "ab";

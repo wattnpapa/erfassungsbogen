@@ -20,6 +20,17 @@ import { datenschutzZeitpunkt } from "./datenschutz-uhr";
 
 const SPEICHER_SCHLUESSEL = "eeb.entwurf.v1";
 
+/**
+ * Zweiter Platz: der zuletzt VERDRÄNGTE Entwurf. Die App führt genau einen
+ * Arbeitsbogen; ein eintreffender Bogen (Link, QR, Datei, Beispiel) und jeder
+ * „neu anfangen"-Weg setzen sich an dessen Stelle. Bis hierher war das
+ * endgültig — wer mitten im eigenen Bogen eine fremde Meldung öffnete, hatte
+ * seine Eingaben verloren. Der verdrängte Bogen wandert deshalb hierher und
+ * lässt sich von der Startseite zurückholen; erst der übernächste Wechsel
+ * überschreibt ihn.
+ */
+const ERSETZT_SCHLUESSEL = "eeb.entwurf.ersetzt.v1";
+
 export interface Entwurf {
   gespeichert: number; // Date.now()
   bogen: Erfassungsbogen;
@@ -67,9 +78,13 @@ function speicher(): Storage | null {
 
 /** Entwurf laden; ist die Datenschutzfrist abgelaufen, wird er auch im Speicher überschrieben. */
 export function entwurfLaden(jetzt: EebZeitpunkt = datenschutzZeitpunkt()): Entwurf | null {
+  return ausSpeicherLaden(SPEICHER_SCHLUESSEL, jetzt);
+}
+
+function ausSpeicherLaden(schluessel: string, jetzt: EebZeitpunkt): Entwurf | null {
   const s = speicher();
   if (!s) return null;
-  const roh = s.getItem(SPEICHER_SCHLUESSEL);
+  const roh = s.getItem(schluessel);
   const e = entwurfAusJson(roh);
   if (!e) return null;
   const nachFrist = entwurfNachFrist(e, jetzt);
@@ -77,7 +92,7 @@ export function entwurfLaden(jetzt: EebZeitpunkt = datenschutzZeitpunkt()): Entw
     const text = entwurfZuJson(nachFrist.bogen, nachFrist.gespeichert);
     if (text !== roh) {
       try {
-        s.setItem(SPEICHER_SCHLUESSEL, text);
+        s.setItem(schluessel, text);
       } catch {
         /* Speicher voll o. ä. — angezeigt wird trotzdem nur die anonymisierte Fassung */
       }
@@ -96,4 +111,27 @@ export function entwurfSpeichern(bogen: Erfassungsbogen): void {
 
 export function entwurfVerwerfen(): void {
   speicher()?.removeItem(SPEICHER_SCHLUESSEL);
+}
+
+// --------------------------------------------- Verdrängter Entwurf (Rückholung)
+
+/**
+ * Den Bogen merken, der gerade von einem anderen verdrängt wird. Ein leerer
+ * Bogen ist nichts wert und würde nur eine sinnlose Rückhol-Zeile erzeugen —
+ * das entscheidet die aufrufende Stelle (siehe `bogenHatInhalt`).
+ */
+export function ersetztenEntwurfMerken(bogen: Erfassungsbogen): void {
+  try {
+    speicher()?.setItem(ERSETZT_SCHLUESSEL, entwurfZuJson(bogen));
+  } catch {
+    /* Speicher voll o. ä. — der Wechsel selbst darf daran nicht scheitern */
+  }
+}
+
+export function ersetztenEntwurfLaden(jetzt: EebZeitpunkt = datenschutzZeitpunkt()): Entwurf | null {
+  return ausSpeicherLaden(ERSETZT_SCHLUESSEL, jetzt);
+}
+
+export function ersetztenEntwurfVerwerfen(): void {
+  speicher()?.removeItem(ERSETZT_SCHLUESSEL);
 }
