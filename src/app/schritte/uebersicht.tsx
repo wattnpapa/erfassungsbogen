@@ -7,6 +7,7 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 import {
   Erfassungsbogen,
   KontaktArt,
+  PersonalErfassung,
   datumZuIso,
   staerke,
   unterbringungMWD,
@@ -158,8 +159,21 @@ export function Uebersicht(props: {
   const nahDienst = nahbereichDienst();
   const org = bogen.einheit.organisation;
   const s = staerke(bogen);
+  // Schnellerfassung des Meldekopfs: Stärke als Summe, absichtlich ohne Namen.
+  const nurStaerke = bogen.personalErfassung === PersonalErfassung.NUR_STAERKE;
+  const staerkeText = `${s.fuehrer} / ${s.unterfuehrer} / ${s.mannschaft} / ${s.gesamt}`;
   const mwd = unterbringungMWD(bogen);
   const vp = verpflegung(bogen);
+  /**
+   * Bei der Schnellerfassung ohne manuelle Aufteilung steht schlicht nichts zur
+   * Unterbringung und zur Ernährung im Bogen. Die abgeleitete Null las sich
+   * dort aber wie eine Meldung („niemand braucht ein Bett"), obwohl neun
+   * Personen gemeldet waren — deshalb wird sie hier als fehlende Angabe
+   * gezeigt.
+   */
+  const mwdAngegeben = !nurStaerke || bogen.unterbringungManuell != null;
+  const vpAufteilungAngegeben = !nurStaerke || bogen.verpflegungManuell != null;
+  const mwdText = mwdAngegeben ? `M ${mwd.m} / W ${mwd.w} / D ${mwd.d}` : "keine Angabe";
   /**
    * Spalten, die für diesen Bogen nirgends etwas enthalten, werden nicht
    * gezeigt. Sonst nimmt „Erreichbarkeit" ein Drittel der Personaltabelle für
@@ -432,7 +446,7 @@ export function Uebersicht(props: {
                   {s.fuehrer} / {s.unterfuehrer} / {s.mannschaft} / {s.gesamt}
                 </strong>
               </span>
-              <span title={MWD_LEGENDE}>Unterbringung: M {mwd.m} / W {mwd.w} / D {mwd.d}</span>
+              <span title={MWD_LEGENDE}>Unterbringung: {mwdText}</span>
             </p>
           </div>
         </div>
@@ -479,8 +493,21 @@ export function Uebersicht(props: {
           über nichts, die aussieht, als sei die Tabelle abgeschnitten. Ein
           Satz sagt stattdessen, was fehlt; dieselbe Auskunft wie in der
           Einsatz-Sammlung, damit „nichts erfasst" überall gleich klingt. */}
-      {abschnitt(`Personal (${bogen.personal.length})`, 2, bogen.personal.length === 0 ? (
-        <p className="hinweis">Kein Personal erfasst.</p>
+      {/* Bei der Schnellerfassung („nur Stärke") gibt es absichtlich keine
+          Namensliste. „Personal (0) — kein Personal erfasst" stand dann direkt
+          unter einer gemeldeten Stärke von neun und las sich wie ein Fehler;
+          die Überschrift nennt deshalb die gemeldete Stärke. */}
+      {abschnitt(
+        nurStaerke
+          ? `Personal (Stärke ${staerkeText})`
+          : `Personal (${bogen.personal.length})`,
+        2,
+        bogen.personal.length === 0 ? (
+        <p className="hinweis">
+          {nurStaerke
+            ? `Stärke ${staerkeText} als Summe gemeldet — ohne Namensliste (Meldekopf-Schnellerfassung).`
+            : "Kein Personal erfasst."}
+        </p>
       ) : (
         <TabellenScroll titel="Personal">
         <table className="uebersicht">
@@ -543,7 +570,14 @@ export function Uebersicht(props: {
       {abschnitt("Sofortbedarf & Sonstiges", 4, (
         <dl className="paare">
           <dt>Verpflegung</dt>
-          <dd>{bogen.sofortbedarf ? `${bogen.sofortbedarf.verpflegungPersonen} Personen, davon ${vp.vegetarisch} vegetarisch, ${vp.vegan} vegan` : "—"}</dd>
+          <dd>
+            {bogen.sofortbedarf
+              ? `${bogen.sofortbedarf.verpflegungPersonen} Personen` +
+                (vpAufteilungAngegeben
+                  ? `, davon ${vp.vegetarisch} vegetarisch, ${vp.vegan} vegan`
+                  : " · Aufteilung vegetarisch/vegan: keine Angabe")
+              : "—"}
+          </dd>
           <dt>Betriebsstoff</dt>
           <dd>
             {bogen.sofortbedarf

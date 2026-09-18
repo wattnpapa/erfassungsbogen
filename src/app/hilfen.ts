@@ -13,6 +13,7 @@ import {
   Fahrerlaubnis,
   alleFahrerlaubnisse,
   Fahrzeug,
+  Geschlecht,
   KontaktArt,
   OrganisationsTyp,
   Person,
@@ -600,6 +601,33 @@ export function pruefpunkte(b: Erfassungsbogen, mitFahrzeugen = true): Pruefpunk
       schritt: S_PERSONAL,
     });
   }
+  // Leere Personenkarten zählen voll in die Stärke: „+ Person hinzufügen"
+  // danebengetippt, und die Meldung ist um eine Person zu groß — sichtbar wird
+  // das sonst nirgends, weil die Karte ja leer aussieht.
+  if (b.personalErfassung === PersonalErfassung.VOLLSTAENDIG) {
+    const leere = b.personal.filter(personLeer).length;
+    if (leere > 0) {
+      hinweise.push({
+        text: `${leere} Personenkarte${leere === 1 ? " ohne Angaben zählt" : "n ohne Angaben zählen"} in die Stärke — ausfüllen oder entfernen.`,
+        schritt: S_PERSONAL,
+      });
+    }
+  }
+  // Unterbringung wird je Person aus dem Geschlecht abgeleitet, und die
+  // Vorbelegung einer neuen Person ist „M". Sind ALLE Personen männlich
+  // eingetragen, ist das entweder so — oder niemand hat das Feld angefasst und
+  // die Unterbringungsplanung bekommt eine erfundene Zahl. Nachfragen kostet
+  // hier weniger als eine falsche Bettenzahl.
+  if (
+    b.personalErfassung === PersonalErfassung.VOLLSTAENDIG &&
+    b.personal.length > 1 &&
+    b.personal.every((p) => p.geschlecht === Geschlecht.M)
+  ) {
+    hinweise.push({
+      text: `Unterbringung M ${b.personal.length} / W 0 / D 0 — bei allen Personen steht die Vorbelegung „M". Bitte prüfen.`,
+      schritt: S_PERSONAL,
+    });
+  }
   if (b.einsatz.zeitraumBis < b.einsatz.zeitraumVon) {
     hinweise.push({ text: "Einsatzzeitraum: „bis“ liegt vor „von“.", schritt: S_EINSATZ });
   }
@@ -703,7 +731,16 @@ export function schrittStatus(b: Erfassungsbogen): SchrittStatus[] {
       ? "begonnen"
       : "leer";
 
-  const personal: SchrittStatus = staerke(b).gesamt > 0 ? "ok" : b.personal.length > 0 ? "begonnen" : "leer";
+  // Eine leere Personenkarte ist kein ausgefüllter Schritt, auch wenn sie
+  // schon in die Stärke zählt — das grüne Häkchen hätte die Meldung sonst als
+  // fertig ausgewiesen, obwohl eine namenlose Person darin steckt.
+  const staerkeGemeldet = staerke(b).gesamt > 0;
+  const nurLeereKarten =
+    b.personalErfassung === PersonalErfassung.VOLLSTAENDIG &&
+    b.personal.length > 0 &&
+    b.personal.every(personLeer);
+  const personal: SchrittStatus =
+    staerkeGemeldet && !nurLeereKarten ? "ok" : b.personal.length > 0 || staerkeGemeldet ? "begonnen" : "leer";
 
   const fahrzeuge: SchrittStatus = b.fahrzeuge.length > 0 ? "ok" : "leer";
 

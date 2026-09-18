@@ -50,6 +50,13 @@ import {
   type SchrittProps,
 } from "./bausteine";
 
+/** Rollen-Beschriftung für die Einfüge-Vorschau — dieselben Wörter wie im Auswahlfeld. */
+const ROLLE_LABEL: Record<StaerkeRolle, string> = {
+  [StaerkeRolle.FUEHRER]: "Führer/in",
+  [StaerkeRolle.UNTERFUEHRER]: "Unterführer/in",
+  [StaerkeRolle.MANNSCHAFT]: "Mannschaft",
+};
+
 // Die Berufsliste (3512 Bezeichnungen, ~145 KB Quelldaten) hängt nicht im
 // Start-Bundle: sie wird erst gebraucht, wenn jemand Personal im Detail erfasst.
 // Dasselbe gilt für die DLRG-Ausbildungskennzahlen, die nur eine von zwölf
@@ -556,9 +563,29 @@ export function SchrittPersonal({ bogen, aendern, geheZu }: SchrittProps) {
   // Trupp bis Gruppe, die häufigste Größenordnung in Übungslagen.
   const [beispielAnzahl, setBeispielAnzahl] = useState(9);
 
+  /**
+   * Eingefügte Zeile → Person. Das Funktionsfeld wandert in die Funktionsliste
+   * (als Vokabeleintrag, wenn das Kürzel im Vokabular der Organisation steht,
+   * sonst als Freitext) und bringt die Stärke-Rolle mit — ohne das zählte ein
+   * eingefügter Zugführer als Mannschaft.
+   */
+  function personAusZeile(n: (typeof namenVorschau)[number]) {
+    const person = { ...neuePerson(), vorname: n.vorname, nachname: n.nachname };
+    if (n.rolle != null) person.staerkeRolle = n.rolle;
+    if (n.funktion) {
+      const tabelle = vokabularFuer(bogen.einheit.organisation, "funktion");
+      const gesucht = n.funktion.toLowerCase();
+      const treffer = tabelle.find(
+        (v) => v.kurz?.toLowerCase() === gesucht || v.name.toLowerCase() === gesucht,
+      );
+      person.funktionen = [treffer ? { code: treffer.code } : { freitext: n.funktion }];
+    }
+    return person;
+  }
+
   function namenUebernehmen() {
     if (namenVorschau.length === 0) return;
-    aendern({ personal: [...benannte(bogen.personal), ...namenVorschau.map((n) => ({ ...neuePerson(), ...n }))] });
+    aendern({ personal: [...benannte(bogen.personal), ...namenVorschau.map(personAusZeile)] });
     setSchnell(true); // die frisch eingefügten Namen direkt als Tabelle zeigen
     setNamenText("");
     namenDialog.current?.close();
@@ -822,6 +849,20 @@ export function SchrittPersonal({ bogen, aendern, geheZu }: SchrittProps) {
           placeholder={"Muster, Max\nErika Musterfrau\n…"}
           style={{ width: "100%" }}
         />
+        {/* Vorschau: Wer welche Rolle bekommt, entscheidet über die gemeldete
+            Stärke — das darf nicht erst im fertigen Bogen auffallen. */}
+        {namenVorschau.length > 0 && (
+          <ul className="namen-vorschau">
+            {namenVorschau.map((n, i) => (
+              <li key={i}>
+                {[n.nachname, n.vorname].filter(Boolean).join(", ")}
+                {n.funktion ? ` · ${n.funktion}` : ""}
+                {" · "}
+                <strong>{ROLLE_LABEL[n.rolle ?? StaerkeRolle.MANNSCHAFT]}</strong>
+              </li>
+            ))}
+          </ul>
+        )}
         <p>
           <button type="button" className="primaer" disabled={namenVorschau.length === 0} onClick={namenUebernehmen}>
             {namenVorschau.length === 0

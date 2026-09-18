@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { parseNamen } from "./personal-schnell";
+import { StaerkeRolle } from "@bos/eeb-format/model";
+import { parseNamen, rolleAusFunktion } from "./personal-schnell";
 
 describe("parseNamen", () => {
   it("liest „Nachname, Vorname“ je Zeile", () => {
@@ -27,8 +28,29 @@ describe("parseNamen", () => {
     ]);
   });
 
-  it("weitere Kommas gehören zum Vornamen", () => {
-    expect(parseNamen("Muster, Max, Dr.")).toEqual([{ nachname: "Muster", vorname: "Max, Dr." }]);
+  it("liest das dritte Feld als Funktion, nicht als Teil des Vornamens", () => {
+    // Eingefügte Listen tragen die Funktion mit. Früher wanderte sie in den
+    // Vornamen und stand so auf dem Ausdruck in der Spalte „Name, Vorname".
+    expect(parseNamen("Muster, Max, Dr.")).toEqual([
+      { nachname: "Muster", vorname: "Max", funktion: "Dr.", rolle: undefined },
+    ]);
+  });
+
+  it("leitet die Stärke-Rolle aus bekannten Funktionskürzeln ab", () => {
+    expect(parseNamen("Meyer, Jens, ZFhr")).toEqual([
+      { nachname: "Meyer", vorname: "Jens", funktion: "ZFhr", rolle: StaerkeRolle.FUEHRER },
+    ]);
+    expect(parseNamen("Koch, Lea, GrFü")).toEqual([
+      { nachname: "Koch", vorname: "Lea", funktion: "GrFü", rolle: StaerkeRolle.UNTERFUEHRER },
+    ]);
+    // Unbekanntes Kürzel bleibt Mannschaft (Vorgabe) und wird nicht geraten.
+    expect(parseNamen("Wolf, Ida, Fachberater")[0]!.rolle).toBeUndefined();
+  });
+
+  it("erkennt Kürzel unabhängig von Schreibweise, Punkten und Umlauten", () => {
+    expect(rolleAusFunktion("z.fü.")).toBe(StaerkeRolle.FUEHRER);
+    expect(rolleAusFunktion("Gruppenführer")).toBe(StaerkeRolle.UNTERFUEHRER);
+    expect(rolleAusFunktion("")).toBeUndefined();
   });
 
   it("leerer Text ergibt eine leere Liste", () => {

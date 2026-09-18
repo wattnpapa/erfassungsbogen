@@ -375,6 +375,35 @@ describe("bogenLaden() (JSON-Datei)", () => {
   });
 });
 
+describe("plausibilitaet() — Stärke ohne Substanz", () => {
+  it("meldet leere Personenkarten, die trotzdem in die Stärke zählen", () => {
+    const b = { ...neuerBogen(), personal: [neuePerson(), neuePerson()] };
+    expect(plausibilitaet(b).some((t) => /2 Personenkarten ohne Angaben zählen/.test(t))).toBe(true);
+  });
+
+  it("fragt nach, wenn bei allen Personen die Geschlechts-Vorbelegung steht", () => {
+    const b = {
+      ...neuerBogen(),
+      personal: [
+        { ...neuePerson(), nachname: "Anna", geschlecht: Geschlecht.M },
+        { ...neuePerson(), nachname: "Eva", geschlecht: Geschlecht.M },
+      ],
+    };
+    expect(plausibilitaet(b).some((t) => /Vorbelegung „M"/.test(t))).toBe(true);
+  });
+
+  it("schweigt, sobald das Geschlecht irgendwo abweicht", () => {
+    const b = {
+      ...neuerBogen(),
+      personal: [
+        { ...neuePerson(), nachname: "Anna", geschlecht: Geschlecht.W },
+        { ...neuePerson(), nachname: "Ben", geschlecht: Geschlecht.M },
+      ],
+    };
+    expect(plausibilitaet(b).some((t) => /Vorbelegung/.test(t))).toBe(false);
+  });
+});
+
 describe("plausibilitaet() — weitere Zweige", () => {
   function bogen(over: Partial<Erfassungsbogen> = {}): Erfassungsbogen {
     return { ...neuerBogen(), ...over };
@@ -456,6 +485,12 @@ describe("Konstruktoren für neue Objekte", () => {
 });
 
 describe("schrittStatus", () => {
+  it("wertet einen Bogen mit ausschließlich leeren Personenkarten als begonnen", () => {
+    const b = neuerBogen();
+    b.personal = [neuePerson()];
+    expect(schrittStatus(b)[2]).toBe("begonnen");
+  });
+
   it("meldet für einen leeren Bogen alle Schritte als leer", () => {
     expect(schrittStatus(neuerBogen())).toEqual(["leer", "leer", "leer", "leer", "leer"]);
   });
@@ -465,7 +500,9 @@ describe("schrittStatus", () => {
     b.einheit.einheitsTyp = { code: 43 };
     b.einheit.hierarchie = [{ bezeichnung: { code: 1 }, name: "OV Oldenburg - Ni" }];
     b.einsatz.ortAuftrag = "Übung Kabelblitz";
-    b.personal = [neuePerson()];
+    // Mit Namen: eine leere Personenkarte zählt zwar in die Stärke, macht den
+    // Schritt aber nicht fertig (sie ist meist ein Fehlgriff).
+    b.personal = [{ ...neuePerson(), nachname: "Muster", vorname: "Max" }];
     b.fahrzeuge = [neuesFahrzeug()];
     b.sofortbedarf = { verpflegungPersonen: 1, dieselLiter: 0, benzinLiter: 0, gemischLiter: 0, unterbringung: false, ruhezeitErforderlich: false };
     expect(schrittStatus(b)).toEqual(["ok", "ok", "ok", "ok", "ok"]);
