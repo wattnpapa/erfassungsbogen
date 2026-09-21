@@ -156,7 +156,7 @@
     "@vitejs/plugin-react": "^6.1.1",
     "@vitest/coverage-v8": "^4.1.11",
     "bwip-js": "^4.11.4",
-    "concurrently": "^9.1.2",
+    "concurrently": "^10.0.5",
     "cross-env": "^7.0.3",
     "electron": "^44.3.0",
     "electron-builder": "^26.15.3",
