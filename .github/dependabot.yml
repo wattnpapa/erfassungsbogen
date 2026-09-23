@@ -27,6 +27,12 @@ updates:
       # Die vier Kern-Bausteine hängen als git-Submodul unter vendor/ und sind
       # über `file:` verlinkt (ADR-003); ein Registry-Update gibt es dafür nicht.
       - dependency-name: "@bos/*"
+      # Mit Vite 8.3.0 bricht `npm run build` in vite-plugin-pwa 1.3.0 ab
+      # (Workbox findet die Build-Ausgabe nicht). Nur diese eine Version
+      # ausblenden, damit ein 8.3.1 oder ein neues Plugin wieder vorgeschlagen
+      # wird.
+      - dependency-name: "vite"
+        versions: ["8.3.0"]
 
   # Die Actions in ci.yml und release.yml sind ebenfalls fremder Code, der mit
   # Schreibrechten auf das Repo läuft — eine gekaperte Action wäre der teuerste

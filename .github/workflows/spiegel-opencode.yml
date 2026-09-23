@@ -43,8 +43,11 @@ jobs:
   spiegeln:
     runs-on: ubuntu-latest
     # Forks haben das Secret nicht und sollen fremde Stände auch nicht in den
-    # amtlichen Spiegel schieben.
-    if: github.repository == 'wattnpapa/erfassungsbogen'
+    # amtlichen Spiegel schieben. Dasselbe gilt für Läufe, die Dependabot mit
+    # seinen Zweigen auslöst: sie bekommen nur Dependabot-Secrets, der Schlüssel
+    # ist dort leer und der Lauf wäre rot, ohne dass etwas kaputt ist. Die
+    # Zweige nimmt der tägliche Lauf ohnehin mit.
+    if: github.repository == 'wattnpapa/erfassungsbogen' && github.actor != 'dependabot[bot]'
     steps:
       - name: SSH-Schlüssel bereitlegen
         env:
