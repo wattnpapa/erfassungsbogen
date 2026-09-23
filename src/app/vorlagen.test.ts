@@ -22,6 +22,9 @@ import {
   vorlageEndgueltigLoeschen,
   vorlagenLaden,
   vorlagenPapierkorb,
+  vorlageAusDatei,
+  vorlageDateiInhalt,
+  vorlageDateiname,
   type Vorlage,
 } from "./vorlagen";
 
@@ -198,5 +201,54 @@ describe("Papierkorb", () => {
 
     expect(vorlagenPapierkorb()).toEqual([]);
     expect(JSON.parse(localStorage.getItem("eeb.vorlagen.v1")!)).toEqual([]); // persistiert
+  });
+});
+
+describe("Vorlagen-Datei (Vorlage teilen → Als Datei speichern)", () => {
+  function vorlage(name = "FGr K Oldenburg"): Vorlage {
+    return { id: "v1", name, erstellt: 1, geaendert: 1, bogen: bogenAlsVorlage(bogen()) };
+  }
+
+  it("liest die geschriebene Datei mit Name und Bogen wieder ein", () => {
+    const v = vorlage();
+    const gelesen = vorlageAusDatei(vorlageDateiInhalt(v));
+    expect(gelesen?.name).toBe("FGr K Oldenburg");
+    expect(gelesen?.bogen.personal).toEqual(v.bogen.personal);
+    expect(gelesen?.bogen.fahrzeuge).toEqual(v.bogen.fahrzeuge);
+    expect(gelesen?.bogen.schemaVersion).toBe(SCHEMA_VERSION);
+  });
+
+  it("trägt nur die Vorlage, keine App-Daten des Geräts", () => {
+    const roh = JSON.parse(vorlageDateiInhalt(vorlage())) as Record<string, unknown>;
+    expect(Object.keys(roh).sort()).toEqual(["bogen", "format", "name", "version"]);
+    expect(roh.format).toBe("eeb-vorlage");
+  });
+
+  it("gibt null zurück, wenn es keine Vorlagen-Datei ist — dann ist der Bogen-Weg dran", () => {
+    expect(vorlageAusDatei("kein JSON")).toBeNull();
+    expect(vorlageAusDatei(JSON.stringify(bogen()))).toBeNull();
+    expect(vorlageAusDatei(JSON.stringify({ format: "eeb-sicherung", version: 1, eintraege: {} }))).toBeNull();
+  });
+
+  it("meldet eine Datei aus einer neueren App-Version verständlich", () => {
+    const roh = JSON.parse(vorlageDateiInhalt(vorlage()));
+    roh.version = 99;
+    expect(() => vorlageAusDatei(JSON.stringify(roh))).toThrow(/neueren App-Version/);
+  });
+
+  it("meldet eine Vorlagen-Datei ohne gültigen Bogen", () => {
+    expect(() => vorlageAusDatei(JSON.stringify({ format: "eeb-vorlage", version: 1, name: "X", bogen: {} }))).toThrow(
+      /Keine gültige Erfassungsbogen-Datei/,
+    );
+  });
+
+  it("nimmt den Einheitsnamen, wenn die Datei keinen Namen trägt", () => {
+    const roh = JSON.parse(vorlageDateiInhalt(vorlage()));
+    roh.name = "  ";
+    expect(vorlageAusDatei(JSON.stringify(roh))?.name).toBeTruthy();
+  });
+
+  it("baut einen unbedenklichen Dateinamen aus dem Vorlagennamen", () => {
+    expect(vorlageDateiname(vorlage("FGr K / Oldenburg"))).toBe("eeb-vorlage-FGr_K_Oldenburg.json");
   });
 });

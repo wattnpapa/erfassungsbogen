@@ -18,6 +18,11 @@ Grundlage: Repository `wattnpapa/erfassungsbogen`, Stand 2026-09-12 — Version 
 >   die Maßnahmen M4/M11/M12, Abschnitt 1 und Abschnitt 10.
 > - **Grenze:** QR-Codes, PDF und Exporte selbst bleiben unverschlüsselt
 >   lesbar.
+>
+> **Nachgezogen 2026-09-23 — Vorlage teilen (Issue #26):** Eine gespeicherte
+> Vorlage (Mannschaftsliste einer Einheit) lässt sich als QR-Code, Link oder
+> JSON-Datei weitergeben, ausdrücklich auch zur Ablage in einer Cloud. Geändert:
+> 5.1, 5.5, 5.8.
 
 ## Hinweis zu diesem Dokument
 
@@ -175,6 +180,9 @@ definieren.
   (Stärke- und Bedarfssummen) beim Meldekopf.
 - Ausdruck als PDF im Layout des gewohnten Papierformulars, inklusive QR-Code.
 - Export als CSV bzw. organisationsspezifisches Excel-Format.
+- Weitergabe einer gespeicherten Vorlage (Stammdaten der eigenen Einheit) an ein
+  anderes Gerät oder in eine vom Nutzer gewählte Ablage, damit sie
+  geräteunabhängig verfügbar ist.
 - Optional: Bestätigung der Herkunft eines weitergereichten Bogens durch eine
   geräteseitige digitale Signatur.
 - Anonyme Reichweitenmessung der App-Nutzung (siehe 5.8).
@@ -227,6 +235,12 @@ biometrische Daten, strafrechtliche Daten.
   blockiert den Import nie), Aufnahme in die lokale Einsatz-Sammlung.
 - Aggregation mehrerer Meldungen zu Summen beim Meldekopf.
 - Optionaler Ausdruck (PDF) oder Tabellenexport (CSV/Excel).
+- „Vorlage teilen": die Vorlage als signierter QR-Code/Link oder als
+  unsignierte JSON-Datei (`eeb-vorlage-*.json`). Die Datei trägt nur diese
+  eine Vorlage, keinen Geräteschlüssel. Beim Empfänger entsteht daraus wieder
+  eine Vorlage in `localStorage`; der offene Arbeitsbogen bleibt unberührt.
+  Vorlagen sind von der Datenschutzfrist ausgenommen (5.7) — eine geteilte
+  Vorlage ebenso.
 
 Eine vollständige technische Darstellung inkl. Sequenzdiagrammen findet sich in
 Kapitel 6 der [Arc42-Dokumentation](arc42-architektur.md).
@@ -289,6 +303,7 @@ Kapitel 6 der [Arc42-Dokumentation](arc42-architektur.md).
 | Übermittlung | Ziel | Enthält Bogen-/Personaldaten? | Rechtsgrundlage/Anmerkung |
 | --- | --- | --- | --- |
 | QR-Code/Datei-Weitergabe im Meldeweg | Nächste Einheit/Führungsstelle | Ja, zweckgemäß | Kernfunktion der App, siehe 5.6 |
+| Vorlage teilen (Link/Datei) | Vom Nutzer gewählt: eigenes zweites Gerät, Messenger, Mail, Cloud-Ablage | Ja — Namen, Funktionen, Fahrerlaubnisse und Erreichbarkeiten der ganzen Mannschaft | Die App überträgt selbst nichts, sie erzeugt nur Link bzw. Datei; der Dialog weist vor dem Teilen auf den Inhalt hin. Legt ein Nutzer die Datei in einen Cloud-Dienst, ist dieser Dienst Empfänger im Sinne der DSGVO. `[einsetzende Organisation: zulässige Ablageorte für Vorlagen festlegen]` |
 | GoatCounter-Zählpixel | `erfassungsbogen.goatcounter.com` | Nein — laut Quellcode werden nur Pfad, Titel, Referrer und Geräteklasse (iOS/Android/Desktop) übertragen, keine Cookies, keine geräteübergreifende ID, keine Bogen-Inhalte | Art. 6 Abs. 1 lit. f DSGVO; ein Widerspruch (Art. 21 DSGVO) ist über einen dokumentierten URL-Parameter (`skipgc`) technisch vorgesehen |
 | Update-Prüfung (nur Desktop) | GitHub Releases | Nein, nur technische Metadaten der Anfrage (u. a. IP-Adresse als Transportdatum) | Berechtigtes Interesse an sicherem, aktuellem Software-Stand |
 | Abruf der Webfassung | GitHub Pages (erfassungsbogen.app) **oder** GitLab Pages auf Open CoDE (`gitlab.opencode.de`) | Nein, nur technische Metadaten der Anfrage (u. a. IP-Adresse als Transportdatum) | Ausliefern der Anwendung selbst. Welcher der beiden Hoster diese Metadaten sieht, entscheidet allein die aufgerufene Adresse; der ausgelieferte Code ist identisch. Bei der Open-CoDE-Fassung liegt das Hosting bei der Betreiberin der Plattform — für Verwaltungen kann genau das der Grund für diesen Weg sein |

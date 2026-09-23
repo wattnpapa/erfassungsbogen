@@ -13,8 +13,8 @@
  */
 
 import type { Erfassungsbogen } from "@bos/eeb-format/model";
-import { datumAusIso, jetztZeitpunkt } from "@bos/eeb-format/model";
-import { einheitAnzeigename, migriereBogen } from "./hilfen";
+import { datumAusIso, jetztZeitpunkt, mitTransportVersion } from "@bos/eeb-format/model";
+import { bogenPruefen, dateinameTeil, einheitAnzeigename, migriereBogen } from "./hilfen";
 import { aktive, imPapierkorb, papierkorbBereinigt } from "@bos/meldekopf/papierkorb";
 
 /** Versionierter Schlüssel — erlaubt spätere Formatwechsel der Sammlung selbst. */
@@ -103,6 +103,59 @@ export function vorlagenAusJson(text: string | null): Vorlage[] {
 
 export function vorlagenZuJson(liste: Vorlage[]): string {
   return JSON.stringify(liste);
+}
+
+// ------------------------------------------------- Vorlagen-Datei (rein)
+//
+// Eine einzelne Vorlage als JSON-Datei — für die Ablage in einer Cloud oder
+// den Versand per Mail, damit sie auf einem anderen Gerät wieder eingelesen
+// werden kann. Anders als die Komplett-Sicherung (sicherung.ts) trägt die
+// Datei nur diese eine Vorlage und keinen Geräteschlüssel.
+
+const DATEI_FORMAT = "eeb-vorlage";
+const DATEI_VERSION = 1;
+
+interface VorlagenDatei {
+  format: typeof DATEI_FORMAT;
+  version: number;
+  name: string;
+  bogen: Erfassungsbogen;
+}
+
+export function vorlageDateiname(v: Vorlage): string {
+  return `eeb-vorlage-${dateinameTeil(v.name)}.json`;
+}
+
+export function vorlageDateiInhalt(v: Vorlage): string {
+  const d: VorlagenDatei = {
+    format: DATEI_FORMAT,
+    version: DATEI_VERSION,
+    name: v.name,
+    bogen: mitTransportVersion(v.bogen),
+  };
+  return JSON.stringify(d, null, 2);
+}
+
+/**
+ * Dateitext → Name und Bogen der Vorlage. `null`, wenn es gar keine
+ * Vorlagen-Datei ist (dann versucht der Aufrufer den Bogen-Weg); wirft mit
+ * verständlicher Meldung, wenn sie es ist, aber nicht gelesen werden kann.
+ */
+export function vorlageAusDatei(text: string): { name: string; bogen: Erfassungsbogen } | null {
+  let roh: unknown;
+  try {
+    roh = JSON.parse(text);
+  } catch {
+    return null;
+  }
+  const d = roh as Partial<VorlagenDatei> | null;
+  if (d?.format !== DATEI_FORMAT) return null;
+  if (typeof d.version !== "number" || d.version > DATEI_VERSION) {
+    throw new Error(`Vorlage stammt aus einer neueren App-Version (Format ${d.version}) — bitte erst die App aktualisieren.`);
+  }
+  const bogen = bogenPruefen(d.bogen);
+  const name = typeof d.name === "string" && d.name.trim() ? d.name.trim() : einheitAnzeigename(bogen.einheit);
+  return { name, bogen };
 }
 
 // ------------------------------------------------- localStorage-Hülle (I/O)

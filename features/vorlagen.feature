@@ -25,6 +25,12 @@ Funktionalität: Vorlagen anlegen, verwalten und mustern
     Dann sehe ich die Überschrift "Fachgruppe Kabel"
     Und sehe ich "FGr K Oldenburg" nicht
 
+  Szenario: Vorlage teilen bietet QR-Code, Link und Datei an
+    Wenn ich auf "Teilen…" klicke
+    Dann sehe ich den Dialog "Vorlage teilen"
+    Und sehe ich die Schaltfläche "Link teilen"
+    Und sehe ich die Schaltfläche "Als Datei speichern"
+
   Szenario: Gelöschte Vorlage liegt im Papierkorb und lässt sich zurückholen
     Wenn ich auf "Löschen" klicke
     Dann sehe ich die Schaltfläche "Papierkorb (1)"

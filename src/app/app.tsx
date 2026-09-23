@@ -47,7 +47,7 @@ import { Kopfnav } from "./kopfnav-ui";
 import { bogenLinksEmpfangen, imWebBrowser, istNativ, qrScannen, textTeilen } from "./nativ";
 import { fehlerText } from "./nachladen";
 import { entwirreScanText } from "./tastaturbelegung";
-import { vorlageAnlegen, vorlagenLaden, vorlagenPapierkorb, type Vorlage } from "./vorlagen";
+import { vorlageAnlegen, vorlageAusDatei, vorlagenLaden, vorlagenPapierkorb, type Vorlage } from "./vorlagen";
 import { Musterung, VorlagenListe } from "./vorlagen-ui";
 import { absenderkarteGefuellt, absenderkarteLaden, type Absenderkarte } from "./absenderkarte";
 import { AbsenderkarteFeld } from "./absenderkarte-ui";
@@ -590,11 +590,29 @@ function AppInhalt() {
    * selbst erzeugt: Sie trägt den Bogen als eingebettete Daten (wie eine
    * E-Rechnung) und zusätzlich als QR-Code. Die blanke JSON-Datei bleibt
    * lesbar, ist aber nur noch der Altweg — weitergereicht wird die PDF.
+   *
+   * Eine Vorlagen-Datei („Vorlage teilen → Als Datei speichern") landet in den
+   * Vorlagen, nicht im Arbeitsbogen — sie wird deshalb vor der Rückfrage
+   * erkannt, die den offenen Bogen schützt: der bleibt dabei unberührt.
    */
   async function ladeDatei(e: ChangeEvent<HTMLInputElement>) {
     const datei = e.target.files?.[0];
     e.target.value = "";
     if (!datei) return;
+    if (!istPdfDatei(datei)) {
+      try {
+        const vorlage = vorlageAusDatei(await datei.text());
+        if (vorlage) {
+          const v = vorlageAnlegen(vorlage.name, vorlage.bogen);
+          vorlageEingegangen(v);
+          setMeldung(`Vorlage „${v.name}" importiert.`);
+          return;
+        }
+      } catch (err) {
+        setFehler(err instanceof Error ? err.message : String(err));
+        return;
+      }
+    }
     if (!(await darfBogenErsetzen({ titel: "Bogen aus Datei öffnen?", was: "den Bogen aus der Datei", ok: "Datei öffnen" }))) return;
     try {
       if (istPdfDatei(datei)) {
@@ -917,6 +935,15 @@ function AppInhalt() {
     return true;
   }
 
+  /** Eine eben importierte Vorlage (Scan, Link, Datei) auf der Startseite zeigen. */
+  function vorlageEingegangen(v: Vorlage) {
+    setVorlagen(vorlagenLaden());
+    setFrischeVorlageId(v.id);
+    setMusterVorlage(null);
+    setZeigeStart(true); // Startbildschirm listet die (nun importierte) Vorlage
+    setFehler("");
+  }
+
   /**
    * Einen gescannten/übergebenen QR-Text verarbeiten. Rückgabe: true = fertig
    * (Overlay schließen / Native-Schleife beenden), false = es wird noch ein
@@ -932,10 +959,7 @@ function AppInhalt() {
       try {
         const b = decodeVorlagePayloadUrl(text, browserKompressor);
         const v = vorlageAnlegen(einheitAnzeigename(b.einheit), b);
-        setVorlagen(vorlagenLaden());
-        setFrischeVorlageId(v.id);
-        setMusterVorlage(null);
-        setZeigeStart(true); // Startbildschirm listet die (nun importierte) Vorlage
+        vorlageEingegangen(v);
         const status = await signaturVonText(text);
         setMeldung(`Vorlage „${v.name}" importiert.${status.zustand !== "unsigniert" ? ` (${signaturLabel(status)})` : ""}`);
         setFehler("");

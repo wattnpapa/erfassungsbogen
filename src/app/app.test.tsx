@@ -10,6 +10,7 @@ import userEvent from "@testing-library/user-event";
 import { OrganisationsTyp, type Erfassungsbogen } from "@bos/eeb-format/model";
 import { encodePayload, encodePayloadUrl, encodeVorlagePayloadUrl, fragmentInhalt, segmentPayloadUrls } from "@bos/eeb-format/codec";
 import { browserKompressor, neuerBogen } from "./hilfen";
+import { vorlageAnlegen, vorlagenLaden } from "./vorlagen";
 // `einsatzAnlegen` heißt in diesem Test schon ein Klick-Helfer (Dialog
 // ausfüllen); der Speicher-Weg kommt darum unter eigenem Namen herein.
 import {
@@ -986,6 +987,61 @@ describe("Bogen aus einer PDF laden (Startseite, „Aus Datei laden“)", () => 
     render(<App />);
     await nutzer.upload(screen.getByLabelText("Aus Datei laden…"), pdfDatei());
     expect(await screen.findByText(/kein Erfassungsbogen/i)).toBeTruthy();
+  });
+});
+
+describe("Vorlage teilen (Karte in „Gespeicherte Vorlagen“)", () => {
+  beforeEach(() => {
+    localStorage.clear();
+  });
+
+  it("speichert die Vorlage als Datei, die sich auf der Startseite wieder einlesen lässt", async () => {
+    vorlageAnlegen("FGr K Dateihausen", bogenMitName("OV Dateihausen"));
+    const mitschnitt = downloadsMitschneiden();
+    try {
+      const nutzer = userEvent.setup();
+      render(<App />);
+      await nutzer.click(screen.getByRole("button", { name: "Teilen…" }));
+      const dialog = await screen.findByRole("dialog", { name: "Vorlage teilen" });
+      await nutzer.click(within(dialog).getByRole("button", { name: "Als Datei speichern" }));
+
+      expect(mitschnitt.dateien.map((d) => d.name)).toEqual(["eeb-vorlage-FGr_K_Dateihausen.json"]);
+      const datei = new File([await mitschnitt.dateien[0]!.blob.text()], "vorlage.json", { type: "application/json" });
+
+      // Anderes Gerät: dort gibt es die Vorlage noch nicht.
+      localStorage.clear();
+      await nutzer.click(within(dialog).getByRole("button", { name: "Schließen" }));
+      await nutzer.upload(screen.getByLabelText("Aus Datei laden…"), datei);
+
+      expect(await screen.findByText(/Vorlage „FGr K Dateihausen" importiert/)).toBeDefined();
+      expect(vorlagenLaden().map((v) => v.name)).toEqual(["FGr K Dateihausen"]);
+      // Eine Vorlage ersetzt keinen Arbeitsbogen — die Startseite bleibt stehen.
+      expect(screen.getByRole("button", { name: "Neuen Bogen erstellen" })).toBeDefined();
+    } finally {
+      mitschnitt.aufraeumen();
+    }
+  });
+
+  it("gibt einen Link weiter, der auf dem Empfängergerät eine Vorlage anlegt", async () => {
+    vorlageAnlegen("FGr K Linkhausen", bogenMitName("OV Linkhausen"));
+    const nutzer = userEvent.setup();
+    render(<App />);
+    await nutzer.click(screen.getByRole("button", { name: "Teilen…" }));
+    const dialog = await screen.findByRole("dialog", { name: "Vorlage teilen" });
+    // Der QR-Code steht direkt im Dialog — der Nachbar scannt ihn ohne Umweg.
+    expect(await within(dialog).findByRole("img", { name: /Vorlagen-QR-Code/ })).toBeDefined();
+
+    await nutzer.click(within(dialog).getByRole("button", { name: "Link teilen" }));
+    expect(await within(dialog).findByRole("button", { name: "Link kopiert ✓" })).toBeDefined();
+    const link = await navigator.clipboard.readText();
+    expect(fragmentInhalt(link).startsWith("V.")).toBe(true);
+
+    localStorage.clear();
+    await nutzer.click(within(dialog).getByRole("button", { name: "Schließen" }));
+    fragmentSetzen(link);
+
+    expect(await screen.findByText(/Vorlage .*OV Linkhausen.* importiert/)).toBeDefined();
+    expect(vorlagenLaden()).toHaveLength(1);
   });
 });
 

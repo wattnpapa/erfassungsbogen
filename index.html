@@ -1289,6 +1289,9 @@
     @media (hover: hover) { .teilen-dialog .teilen-weitere > summary:hover { color: var(--akzent); } }
     .teilen-dialog .teilen-weg button { width: 100%; }
     .teilen-dialog .teilen-weg .hinweis { margin: 0.25rem 0 0; }
+    /* „Vorlage teilen": der QR-Code steht direkt im Dialog — das Gerät daneben
+       scannt ihn ohne Vollbild. Das Bild bringt seinen weißen Rand selbst mit. */
+    .teilen-dialog .vorlage-qr { display: block; width: 100%; max-width: 18rem; margin: 0 auto; image-rendering: pixelated; }
     /* Eigene Abfragen (Eingabe/Rückfrage/Hinweis) statt window.prompt & Co. —
        siehe src/app/dialoge.tsx. Die Antwortknöpfe stehen als Zeile am Fuß, die
        bejahende zuerst; auf dem Telefon wird daraus ein Stapel voller Breite. */

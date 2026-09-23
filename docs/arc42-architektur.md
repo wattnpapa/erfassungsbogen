@@ -19,6 +19,10 @@
 > **Nachgezogen 2026-09-15:** Schema-Version 9 — Sitzplatzzahl je Fahrzeug
 > (`Fahrzeug.sitzplaetze`, Flag 32 im Fahrzeug-Byte, Vorrang vor dem Richtwert
 > in `sitzplaetze.ts`) — Kapitel 4.5, 5, 8.4 und 8.5.
+>
+> **Nachgezogen 2026-09-23:** „Vorlage teilen" (Issue #26) — QR/Link mit dem
+> schon vorhandenen Vorlagen-Marker `V.` und eine Vorlagen-Datei
+> (`eeb-vorlage`, JSON), eingelesen über „Aus Datei laden…" — Kapitel 5 und 8.2.
 
 ---
 
@@ -686,7 +690,7 @@ war und ältere Angaben (z. B. „CC0") geprüft werden sollten.
 | QR/Foto/USB-Scanner einlesen | `qr-scanner-web.tsx`, `qr-stapel.ts`, `qr-boegen.ts`, `tastaturbelegung.ts` |
 | Einsatz-Sammlung/Meldekopf | `einsaetze-ui.tsx`, `@bos/meldekopf/*`, `auswertung.ts` |
 | CSV-/Excel-Export | `bogen-csv.ts`, `einsatz-csv.ts`, `oldenburg-xlsx.ts` |
-| Vorlagen & Musterung | `vorlagen.ts`, `vorlagen-ui.tsx` |
+| Vorlagen & Musterung, Vorlage teilen | `vorlagen.ts`, `vorlagen-ui.tsx`, `vorlageTransportErzeugen` in `hilfen.ts` |
 | Signatur/Herkunft | `@bos/eeb-format/signatur`, `absenderkarte.ts`, `geraete-schluessel.ts` |
 | Offline-Betrieb (PWA) | `vite.config.ts` (VitePWA), `aktualisierung.tsx` |
 | Desktop-Auto-Update | `electron/main.js`, `electron-updater` |
@@ -988,7 +992,12 @@ flowchart TB
   (`PRODUCT.md`); betrifft Vorlagen und Einträge der Einsatz-Sammlung.
 - **Datensicherung/-Export:** expliziter Export/Import als Datei (JSON), sodass
   Nutzer ihre gesamte Einsatz-Sammlung sichern und übertragen können
-  (`sicherung.ts`, `einsatz-transport.ts`).
+  (`sicherung.ts`, `einsatz-transport.ts`). Einzelne Vorlagen lassen sich
+  zusätzlich ohne Komplett-Sicherung weitergeben: „Vorlage teilen" erzeugt
+  einen signierten Vorlagen-QR/-Link (Marker `V.`, nicht segmentiert — passt
+  die Vorlage nicht in einen Code, bleiben Link und Datei) oder eine JSON-Datei
+  (`format: "eeb-vorlage"`, ohne Geräteschlüssel), die „Aus Datei laden…" vor
+  der Bogen-Rückfrage als Vorlage erkennt (`vorlagen.ts`, `app.tsx`).
 - **Absenderkarte** (`absenderkarte.ts`) und der geräteeigene Signaturschlüssel
   (`geraete-schluessel.ts`) sind ebenfalls nur lokal gespeichert,
   personenbezogen und jederzeit löschbar; sie wandern mit der Datensicherung mit. Der Signaturschlüssel hat dafür einen eigenen Weg neben

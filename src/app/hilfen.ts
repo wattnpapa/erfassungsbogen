@@ -31,6 +31,7 @@ import {
 } from "@bos/eeb-format/model";
 import {
   EEB_URL_PREFIX,
+  EEB_VORLAGE_MARKER,
   QR_EINZEL_MAX_VERSION,
   QR_SEGMENT_ZIEL_VERSION,
   base64UrlKodieren,
@@ -285,6 +286,39 @@ export async function bogenVollUrl(b: Erfassungsbogen): Promise<string> {
   return EEB_URL_PREFIX + base64UrlKodieren(payload);
 }
 
+/** Transportwege einer geteilten Vorlage (siehe {@link vorlageTransportErzeugen}). */
+export interface VorlagenTransport {
+  /** QR-Bild als Data-URL; `null`, wenn die Vorlage für einen einzelnen Code zu groß ist. */
+  qrDatenUrl: string | null;
+  /** Der im QR-Code kodierte App-Link (Base41). */
+  qrUrl: string;
+  /** Textlink zum Teilen (Base64url, siehe {@link QrSatz.vollUrl}). */
+  link: string;
+}
+
+/**
+ * Vorlage → signierter Vorlagen-QR und -Link (Marker „V." vor dem Payload).
+ * Der Empfänger legt daraus eine Vorlage an, statt einen Arbeitsbogen zu öffnen.
+ *
+ * Anders als beim Bogen gibt es hier keine Segmentierung: Segment-Teile kennen
+ * den Vorlagen-Marker nicht und würden beim Empfänger als Einsatzbogen
+ * zusammengesetzt. Passt die Vorlage nicht in einen Code, bleiben Link und
+ * Datei — beide tragen sie vollständig.
+ */
+export async function vorlageTransportErzeugen(b: Erfassungsbogen): Promise<VorlagenTransport> {
+  const payload = await signiertePayloadBytes(
+    b,
+    browserKompressor,
+    await geraeteSchluesselSicherstellen(),
+    absenderkarteLaden(),
+  );
+  const qrUrl = EEB_URL_PREFIX + EEB_VORLAGE_MARKER + datenKodieren(payload);
+  const link = EEB_URL_PREFIX + EEB_VORLAGE_MARKER + base64UrlKodieren(payload);
+  const qrDatenUrl =
+    qrVersion(qrUrl) <= QR_EINZEL_MAX_VERSION ? (await teilBild(qrUrl, 1, 1)).datenUrl : null;
+  return { qrDatenUrl, qrUrl, link };
+}
+
 /**
  * Steckt in `herkunft` genau der Bogen, der hier offen liegt? Nur dann darf die
  * fremde Signatur mitreisen — sie deckt jene Bytes, nicht die bearbeiteten.
@@ -421,8 +455,13 @@ export function natoZeitstempel(d: Date = new Date()): string {
 }
 
 /** Dateinamens-Rumpf aus dem Anzeigenamen der Einheit („THW_Oldenburg_NI_FGr_K_A"). */
+/** Freitext (Einheits-, Vorlagenname) → unbedenklicher Teil eines Dateinamens. */
+export function dateinameTeil(text: string): string {
+  return text.replace(/[^\wäöüÄÖÜß-]+/g, "_");
+}
+
 export function bogenDateiname(b: Erfassungsbogen): string {
-  return einheitAnzeigename(b.einheit).replace(/[^\wäöüÄÖÜß-]+/g, "_");
+  return dateinameTeil(einheitAnzeigename(b.einheit));
 }
 
 export async function bogenSpeichern(b: Erfassungsbogen): Promise<void> {
@@ -480,6 +519,15 @@ export async function bogenLaden(datei: File): Promise<Erfassungsbogen> {
   } catch {
     throw new Error("Datei ist kein gültiges JSON.");
   }
+  return bogenPruefen(daten);
+}
+
+/**
+ * Geparstes JSON → Bogen (Schema geprüft und migriert). Wirft mit
+ * verständlicher Meldung, wenn es kein Erfassungsbogen ist. Geteilt von der
+ * Bogen-Datei und der Vorlagen-Datei (`vorlagen.ts`).
+ */
+export function bogenPruefen(daten: unknown): Erfassungsbogen {
   const b = daten as Erfassungsbogen;
   if (typeof b?.schemaVersion !== "number" || b.schemaVersion < 2 || b.schemaVersion > SCHEMA_VERSION || !b.einheit || !b.einsatz || !Array.isArray(b.personal)) {
     throw new Error(`Keine gültige Erfassungsbogen-Datei (Schema-Version 2–${SCHEMA_VERSION} erwartet).`);

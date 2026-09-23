@@ -1,21 +1,26 @@
 /**
  * Oberfläche für „Meine Vorlagen":
  *  - VorlagenListe: einbettbare Kartenliste der gespeicherten Vorlagen mit
- *    Verwalten (umbenennen, löschen) und Einstieg in die Musterung. Wird direkt
- *    unter den Start-Buttons angezeigt. Geteilt wird erst der fertige Bogen
- *    (nach der Musterung in der Übersicht), nicht die ungemusterte Vorlage.
+ *    Verwalten (umbenennen, teilen, löschen) und Einstieg in die Musterung.
+ *    Wird direkt unter den Start-Buttons angezeigt.
+ *  - VorlageTeilen: die Vorlage selbst weitergeben (QR, Link, Datei) — für ein
+ *    zweites Gerät oder die Ablage in einer Cloud. Der Empfänger legt daraus
+ *    wieder eine Vorlage an, keinen Arbeitsbogen.
  *  - Musterung: die anwesende Mannschaft und die ausrückenden Fahrzeuge
  *    zusammenstellen (Variante A) → frischer Arbeitsbogen.
  */
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { StaerkeRolle, staerke, type Erfassungsbogen } from "@bos/eeb-format/model";
 import {
   funktionsText,
   kennzeichenText,
   orgLabel,
+  textAlsDatei,
   vokabText,
   vokabularFuer,
+  vorlageTransportErzeugen,
+  type VorlagenTransport,
 } from "./hilfen";
 import {
   vorlageEndgueltigLoeschen,
@@ -24,10 +29,13 @@ import {
   vorlageUmbenennen,
   vorlageWiederherstellen,
   vorlagenPapierkorb,
+  vorlageDateiInhalt,
+  vorlageDateiname,
   type Vorlage,
 } from "./vorlagen";
 import { SeitenKopf } from "./seiten-kopf";
-import { frageJaNein, frageText } from "./dialoge";
+import { frageJaNein, frageText, zeigeHinweis } from "./dialoge";
+import { istNativ, linkTeilen, shareSheetVerfuegbar } from "./nativ";
 import { AbgangKnopf, Kartenstapel } from "./kartenstapel";
 
 function personName(vorname: string, nachname: string): string {
@@ -62,6 +70,8 @@ export function VorlagenListe(props: {
   const papierkorb = vorlagenPapierkorb();
   /** Die gerade aus dem Papierkorb zurückgeholte Vorlage — siehe EinsatzListe. */
   const [zurueckgeholt, setZurueckgeholt] = useState<string | null>(null);
+  /** Die Vorlage, deren Teilen-Dialog gerade offen ist. */
+  const [teilen, setTeilen] = useState<Vorlage | null>(null);
 
   async function umbenennen(v: Vorlage) {
     const name = await frageText({ titel: "Vorlage umbenennen", label: "Name", vorgabe: v.name, ok: "Umbenennen" });
@@ -115,6 +125,7 @@ export function VorlagenListe(props: {
           </p>
           <div className="vorlage-aktionen">
             <button type="button" onClick={() => umbenennen(v)}>Umbenennen</button>{" "}
+            <button type="button" onClick={() => setTeilen(v)}>Teilen…</button>{" "}
             {/* Der Abgang zeigt, welche Vorlage geht — erst danach rückt die
                 Liste nach. */}
             <AbgangKnopf className="entfernen" onAusfuehren={() => loeschen(v)}>Löschen</AbgangKnopf>
@@ -156,7 +167,115 @@ export function VorlagenListe(props: {
             </div>
           </Kartenstapel>
         ))}
+      {teilen && <VorlageTeilen vorlage={teilen} onSchliessen={() => setTeilen(null)} />}
     </>
+  );
+}
+
+// ---------------------------------------------------------- Vorlage teilen
+
+/**
+ * Eine Vorlage aufs nächste Gerät bringen oder außerhalb des Geräts ablegen.
+ * Drei Wege, derselbe Inhalt: QR-Code (Gerät daneben), Link (Chat, Mail,
+ * Notiz) und JSON-Datei (Cloud-Ordner, Mail-Anhang). Link und QR sind wie beim
+ * Bogen mit dem Geräteschlüssel signiert, die Datei ist es nicht.
+ */
+export function VorlageTeilen(props: { vorlage: Vorlage; onSchliessen: () => void }) {
+  const { vorlage, onSchliessen } = props;
+  const dialog = useRef<HTMLDialogElement>(null);
+  const [transport, setTransport] = useState<VorlagenTransport | null>(null);
+  const [fehler, setFehler] = useState("");
+  const [linkKopiert, setLinkKopiert] = useState(false);
+
+  useEffect(() => {
+    dialog.current?.showModal();
+  }, []);
+
+  useEffect(() => {
+    let aktiv = true;
+    vorlageTransportErzeugen(vorlage.bogen)
+      .then((t) => aktiv && setTransport(t))
+      .catch((e) => aktiv && setFehler(`QR-Code: ${e instanceof Error ? e.message : e}`));
+    return () => {
+      aktiv = false;
+    };
+  }, [vorlage]);
+
+  async function linkWeitergeben() {
+    if (!transport) return;
+    const url = transport.link;
+    const titel = `Vorlage ${vorlage.name}`;
+    setFehler("");
+    try {
+      if (shareSheetVerfuegbar()) {
+        if (istNativ()) await linkTeilen(titel, url);
+        else await navigator.share({ title: titel, text: titel, url });
+      } else if (navigator.clipboard) {
+        await navigator.clipboard.writeText(url);
+        setLinkKopiert(true);
+        window.setTimeout(() => setLinkKopiert(false), 3000);
+      } else {
+        await zeigeHinweis({ titel: "Vorlagen-Link", text: "Zum Weitergeben markieren und kopieren:", kopiertext: url });
+      }
+    } catch (e) {
+      if (e instanceof Error && e.name === "AbortError") return; // Abbruch im Share-Dialog
+      setFehler(`Link teilen: ${e instanceof Error ? e.message : e}`);
+    }
+  }
+
+  async function alsDatei() {
+    setFehler("");
+    try {
+      await textAlsDatei(vorlageDateiname(vorlage), vorlageDateiInhalt(vorlage), "application/json");
+    } catch (e) {
+      if (e instanceof Error && e.name === "AbortError") return; // Abbruch im Share-Dialog
+      setFehler(`Datei: ${e instanceof Error ? e.message : e}`);
+    }
+  }
+
+  return (
+    <dialog ref={dialog} aria-label="Vorlage teilen" className="teilen-dialog" onClose={onSchliessen}>
+      <div className="kopfzeile">
+        <h2>Vorlage teilen</h2>
+        <button type="button" onClick={() => dialog.current?.close()}>Schließen</button>
+      </div>
+      <p>
+        <strong>{vorlage.name}</strong> — {vorlage.bogen.personal.length} Personen, {vorlage.bogen.fahrzeuge.length} Fahrzeuge.
+        Auf dem anderen Gerät steht sie danach unter „Gespeicherte Vorlagen".
+      </p>
+      {/* Die Vorlage ist die ganze Mannschaftsliste. Wer sie in eine Cloud
+          legt, gibt Namen und Erreichbarkeiten dorthin — das soll vor dem
+          Knopf stehen, nicht danach. */}
+      <p className="hinweis">
+        Die Vorlage enthält Namen und Erreichbarkeiten aller erfassten Personen. Nur dort ablegen
+        oder hinschicken, wo diese Daten nach den Regeln eurer Organisation hindürfen.
+      </p>
+      <div className="teilen-weg">
+        {transport?.qrDatenUrl ? (
+          <img className="vorlage-qr" src={transport.qrDatenUrl} alt={`Vorlagen-QR-Code ${vorlage.name}`} />
+        ) : null}
+        <p className="hinweis">
+          {!transport
+            ? "QR-Code wird erzeugt…"
+            : transport.qrDatenUrl
+              ? "Gerät daneben: in der App „QR-Code scannen…“ wählen und diesen Code einlesen."
+              : "Für einen einzelnen QR-Code ist die Vorlage zu groß — Link oder Datei tragen sie vollständig."}
+        </p>
+      </div>
+      <div className="teilen-weg">
+        <button type="button" onClick={linkWeitergeben} disabled={!transport}>
+          {linkKopiert ? "Link kopiert ✓" : "Link teilen"}
+        </button>
+        <p className="hinweis">Für Chat, Mail oder Notiz — öffnet die App und legt die Vorlage an.</p>
+      </div>
+      <div className="teilen-weg">
+        <button type="button" onClick={alsDatei}>Als Datei speichern</button>
+        <p className="hinweis">
+          JSON-Datei, z. B. für einen Cloud-Ordner. Einlesen auf der Startseite über „Aus Datei laden…".
+        </p>
+      </div>
+      {fehler && <p className="fehler">{fehler}</p>}
+    </dialog>
   );
 }
 

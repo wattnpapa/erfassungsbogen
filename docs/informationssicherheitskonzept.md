@@ -19,6 +19,10 @@ Grundlage: Repository `wattnpapa/erfassungsbogen`, Stand 2026-09-12 — Version 
 > **Nachgezogen 2026-09-13:** Datenschutzfrist — nach 90 Tagen anonymisiert die
 > App die Personaldaten gespeicherter und eingelesener Bögen, Übungen
 > ausgenommen (3.3, 5.5; Branch `feat/datenschutzfrist`).
+>
+> **Nachgezogen 2026-09-23:** „Vorlage teilen" (Issue #26) — eine einzelne
+> Vorlage lässt sich als signierter QR-Code/Link oder als unsignierte
+> JSON-Datei weitergeben und wieder einlesen (3.3 D5, 5.4).
 
 ## Hinweis zu diesem Dokument
 
@@ -148,7 +152,7 @@ dem Vite-Build); es gibt keine serverseitige Variante.
 | D2a | Uhrstand der Datenschutzfrist | Zuletzt akzeptierter Zeitpunkt der Geräteuhr, ggf. unbestätigter Sprung; keine Personendaten | `localStorage` des Geräts (`eeb.uhr.v1`) |
 | D3 | Absenderkarte | Freiwillige Kontaktangabe (Name/E-Mail/Telefon) der meldenden Person | `localStorage` des Geräts |
 | D4 | Privater Geräteschlüssel | Ed25519-Schlüssel zur Signatur weitergereichter Bögen | `localStorage` des Geräts, **unverschlüsselt als Hex** |
-| D5 | QR-Payload / Exportdatei | Binär kodierter, komprimierter Bogen zur Übergabe an ein zweites Gerät | Transient (QR-Code-Anzeige) bzw. Datei auf dem Gerät |
+| D5 | QR-Payload / Exportdatei | Binär kodierter, komprimierter Bogen zur Übergabe an ein zweites Gerät; ebenso eine geteilte Vorlage (QR/Link mit Marker `V.`, oder JSON-Datei `eeb-vorlage-*.json`) | Transient (QR-Code-Anzeige) bzw. Datei auf dem Gerät oder in einer vom Nutzer gewählten Ablage (z. B. Cloud-Ordner) |
 | D6 | Ausgedruckte/exportierte Kopien | PDF-Ausdruck im Papier-Layout, CSV-/Excel-Export für Führungsstellen | Außerhalb der App (Papier, Dateisystem des Empfängers) |
 
 > *Prüfvermerk zu D4:* Bestätigt — `src/app/geraete-schluessel.ts` legt den
@@ -284,6 +288,18 @@ Datenausleitung an eine andere Herkunft ist technisch unterbunden.
 
 > *Prüfvermerk:* Beides im Code bestätigt (`FORMEL_START = /^[=+\-@\t\r]/`;
 > `&`/`<`-Escaping im XLSX-Writer).
+
+- **Vorlage teilen** (`src/app/vorlagen-ui.tsx`, `vorlagen.ts`,
+  `vorlageTransportErzeugen` in `hilfen.ts`, seit 2026-09-23): QR-Code und Link
+  tragen die Vorlage mit dem Geräteschlüssel signiert, wie beim Bogen. Die
+  JSON-Datei (`format: "eeb-vorlage"`) enthält nur Name und Bogen dieser einen
+  Vorlage, **keinen** Geräteschlüssel und keine übrigen App-Daten; sie ist
+  unsigniert. Beim Einlesen wird das Format und das Bogenschema geprüft
+  (`vorlageAusDatei`, `bogenPruefen`); eine Datei aus einer neueren App-Version
+  wird abgewiesen. Der Dialog weist vor den Knöpfen darauf hin, dass die
+  Vorlage Namen und Erreichbarkeiten enthält. Wohin die Datei gelangt (etwa in
+  eine Cloud), entscheidet der Nutzer; die einsetzende Organisation sollte das
+  regeln (siehe DSFA 5.8).
 
 ### 5.5 Datensparsamkeit und Löschung
 
