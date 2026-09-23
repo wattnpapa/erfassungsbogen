@@ -41,7 +41,7 @@ Funktionalität: Vorlagen anlegen, verwalten und mustern
   Szenario: Endgültiges Löschen fragt in der App zurück
     Wenn ich auf "Löschen" klicke
     Und ich auf "Papierkorb (1)" klicke
-    Und ich auf "Endgültig löschen" klicke
+    Und ich auf "Endgültig löschen…" klicke
     Dann sehe ich den Dialog "Vorlage endgültig löschen?"
     Wenn ich im Dialog auf "Endgültig löschen" klicke
     Dann sehe ich die Schaltfläche "Papierkorb (1)" nicht
@@ -53,6 +53,7 @@ Funktionalität: Vorlagen anlegen, verwalten und mustern
     Wenn ich in der Musterung "Weber" abwähle
     Dann sehe ich die Schaltfläche "Einsatz starten · 2 Pers · 1 Fz"
     Wenn ich auf "Einsatz starten · 2 Pers · 1 Fz" klicke
+    Und ich im Dialog auf "Aus Vorlage anlegen" klicke
     Dann sehe ich den Schritt "2. Einsatz"
     Wenn ich zum Schritt "6. Übersicht" wechsle
     Dann sehe ich die Überschrift "Personal (2)"
@@ -62,6 +63,7 @@ Funktionalität: Vorlagen anlegen, verwalten und mustern
     Wenn ich auf "Einsatz vorbereiten" klicke
     Und ich in der Musterung "Weber" abwähle
     Und ich auf "Einsatz starten · 2 Pers · 1 Fz" klicke
+    Und ich im Dialog auf "Aus Vorlage anlegen" klicke
     Und ich auf "‹ Startseite" klicke
     Dann sehe ich den Hinweis "3 Personen"
 

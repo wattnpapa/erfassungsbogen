@@ -95,6 +95,7 @@ Funktionalität: Einsatz-Sammlung führen (Meldekopf)
 
   Szenario: Folgemeldung derselben Einheit wandert in die Historie
     Wenn ich denselben Bogen-Link erneut öffne
+    Und ich im Dialog auf "Meldung öffnen" klicke
     Und ich zum Schritt "5. Sofortbedarf" wechsle
     Und ich das Feld "Sonstiges (Freitext)" mit "Ablösung angefordert" fülle
     Und ich zum Schritt "6. Übersicht" wechsle
@@ -110,6 +111,7 @@ Funktionalität: Einsatz-Sammlung führen (Meldekopf)
 
   Szenario: Dieselbe Einheit lässt sich getrennt weiterführen
     Wenn ich denselben Bogen-Link erneut öffne
+    Und ich im Dialog auf "Meldung öffnen" klicke
     Und ich zum Schritt "5. Sofortbedarf" wechsle
     Und ich das Feld "Sonstiges (Freitext)" mit "zweiter Trupp" fülle
     Und ich zum Schritt "6. Übersicht" wechsle
@@ -146,7 +148,8 @@ Funktionalität: Einsatz-Sammlung führen (Meldekopf)
     Dann heißt die heruntergeladene Datei wie "eeb-einsatz-*-oldenburg.xlsx"
 
   Szenario: Gelöschter Einsatz liegt im Papierkorb und kommt zurück
-    Wenn ich auf "Einsatz löschen" klicke
+    Wenn ich auf "Einsatz löschen…" klicke
+    Und ich im Dialog auf "In den Papierkorb" klicke
     Dann sehe ich die Schaltfläche "Neuen Bogen erstellen"
     Und sehe ich die Schaltfläche "Papierkorb (1)"
     Wenn ich auf "Papierkorb (1)" klicke
@@ -154,9 +157,10 @@ Funktionalität: Einsatz-Sammlung führen (Meldekopf)
     Dann sehe ich die Schaltfläche "Öffnen"
 
   Szenario: Einsatz endgültig löschen fragt in der App zurück
-    Wenn ich auf "Einsatz löschen" klicke
+    Wenn ich auf "Einsatz löschen…" klicke
+    Und ich im Dialog auf "In den Papierkorb" klicke
     Und ich auf "Papierkorb (1)" klicke
-    Und ich auf "Endgültig löschen" klicke
+    Und ich auf "Endgültig löschen…" klicke
     Dann sehe ich den Dialog "Einsatz endgültig löschen?"
     Und sehe ich den Hinweis "Darin stecken fremde Personendaten"
     Wenn ich im Dialog auf "Endgültig löschen" klicke
