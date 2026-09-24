@@ -50,6 +50,20 @@ export function shareSheetVerfuegbar(): boolean {
 }
 
 /**
+ * Kann die Seite eine PDF in einem <iframe> anzeigen? Chrome und Samsung
+ * Internet auf Android haben keinen eingebauten PDF-Betrachter; ein
+ * eingebetteter Blob zeigt dort nur die graue Fehlerseite „Inhalt blockiert"
+ * (so gemeldet aus einem THW-OV). Die Browser sagen das selbst über
+ * navigator.pdfViewerEnabled. Fehlt die Eigenschaft (ältere Browser), wird
+ * wie bisher eingebettet. Die native App bettet nie ein, sie teilt die Datei.
+ */
+export function pdfEinbettbar(): boolean {
+  if (istNativ()) return false;
+  if (typeof navigator === "undefined") return false;
+  return navigator.pdfViewerEnabled !== false;
+}
+
+/**
  * Name des Nahbereichs-Dienstes der Plattform — allein für die Beschriftung,
  * damit der Knopf das nennt, was der Nutzer im Share-Sheet dann auch sucht.
  * Im Browser bleibt nur die Gerätekennung; sie entscheidet hier über ein Wort,

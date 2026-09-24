@@ -50,7 +50,7 @@ import {
 import { absenderkarteLaden, type Absenderkarte } from "../absenderkarte";
 import { AbsenderkarteFeld } from "../absenderkarte-ui";
 import { geraeteKurzform, geraeteOeffentlichHex } from "../geraete-schluessel";
-import { istNativ, linkTeilen, nahbereichDienst, shareSheetVerfuegbar, textTeilen } from "../nativ";
+import { istNativ, linkTeilen, nahbereichDienst, pdfEinbettbar, shareSheetVerfuegbar, textTeilen } from "../nativ";
 import { fehlerText } from "../nachladen";
 import { frageJaNein, frageText, zeigeHinweis } from "../dialoge";
 import {
@@ -598,7 +598,24 @@ export function Uebersicht(props: {
       {/* Eingebettete PDF-Vorschau: man sieht, was der Meldekopf bekommt, bevor
           gedruckt wird. Nur im Browser — die native App zeigt PDFs im Share-Sheet,
           und mobile WebViews rendern eingebettete PDFs nicht zuverlässig. */}
-      {!istNativ() && (
+      {!istNativ() && !pdfEinbettbar() && (
+        // Browser ohne PDF-Betrachter (Chrome auf Android): der Rahmen bliebe
+        // eine Fehlerseite. Stattdessen die Datei selbst — die öffnet das
+        // Telefon mit der PDF-App, die es ohnehin hat.
+        <section className="karte">
+          <div className="kopfzeile">
+            <h2>PDF</h2>
+            <button type="button" className={pdfLaeuft ? "arbeitet" : ""} aria-busy={pdfLaeuft || undefined} onClick={pdf} disabled={pdfLaeuft}>
+              {pdfLaeuft ? "PDF wird erstellt…" : "PDF herunterladen"}
+            </button>
+          </div>
+          <p className="hinweis">
+            Dieser Browser kann PDFs nicht in der Seite anzeigen. Die heruntergeladene Datei öffnet
+            sich mit dem PDF-Betrachter des Telefons.
+          </p>
+        </section>
+      )}
+      {pdfEinbettbar() && (
         <section className="karte">
           <div className="kopfzeile">
             <h2>PDF-Vorschau</h2>

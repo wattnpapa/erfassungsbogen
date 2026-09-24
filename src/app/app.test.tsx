@@ -46,6 +46,7 @@ vi.mock("./nativ", async () => {
     textTeilen: async () => {},
     shareSheetVerfuegbar: () => typeof navigator.share === "function",
     nahbereichDienst: echt.nahbereichDienst,
+    pdfEinbettbar: () => true,
   };
 });
 

@@ -145,3 +145,40 @@ describe("Übersicht — Übergabe-Dialog", () => {
     expect(within(uebergabeDialog()).queryByText(/offene[nr]? Punkt/)).toBeNull();
   });
 });
+
+/**
+ * Gemeldet aus einem THW-OV: In Chrome auf Android zeigte „Vorschau anzeigen"
+ * nur eine graue Seite „Inhalt blockiert". Der Browser hat keinen eingebauten
+ * PDF-Betrachter und sagt das über navigator.pdfViewerEnabled.
+ */
+describe("Übersicht — PDF-Vorschau", () => {
+  function mitPdfBetrachter(wert: boolean | undefined, test: () => Promise<void> | void) {
+    const vorher = Object.getOwnPropertyDescriptor(navigator, "pdfViewerEnabled");
+    Object.defineProperty(navigator, "pdfViewerEnabled", { value: wert, configurable: true });
+    return Promise.resolve(test()).finally(() => {
+      if (vorher) Object.defineProperty(navigator, "pdfViewerEnabled", vorher);
+      else delete (navigator as { pdfViewerEnabled?: boolean }).pdfViewerEnabled;
+    });
+  }
+
+  it("bettet die Vorschau ein, wenn der Browser PDFs anzeigen kann", () =>
+    mitPdfBetrachter(true, async () => {
+      const nutzer = userEvent.setup();
+      const { container } = render(<Uebersicht bogen={neuerBogen()} geheZu={() => {}} neu={() => {}} />);
+
+      await nutzer.click(screen.getByRole("button", { name: "Vorschau anzeigen" }));
+
+      expect(await screen.findByTitle("PDF-Vorschau des Erfassungsbogens")).toBeDefined();
+      expect(container.querySelector("iframe.pdf-rahmen")).not.toBeNull();
+    }));
+
+  it("bietet ohne PDF-Betrachter den Download statt eines leeren Rahmens an", () =>
+    mitPdfBetrachter(false, () => {
+      const { container } = render(<Uebersicht bogen={neuerBogen()} geheZu={() => {}} neu={() => {}} />);
+
+      expect(screen.queryByRole("button", { name: "Vorschau anzeigen" })).toBeNull();
+      expect(screen.getByRole("button", { name: "PDF herunterladen" })).toBeDefined();
+      expect(screen.getByText(/kann PDFs nicht in der Seite anzeigen/)).toBeDefined();
+      expect(container.querySelector("iframe")).toBeNull();
+    }));
+});

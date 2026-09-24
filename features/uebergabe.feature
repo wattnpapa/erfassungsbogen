@@ -42,6 +42,14 @@ Funktionalität: Bogen übergeben — QR, PDF, Link, CSV
     Wenn ich auf "Vorschau anzeigen" klicke und die PDF-Vorschau erscheint
     Dann sehe ich die Schaltfläche "Vorschau aktualisieren"
 
+  # Aus einem THW-OV gemeldet: Chrome auf Android zeigte statt der Vorschau
+  # die graue Seite „Inhalt blockiert" — dort gibt es keinen PDF-Betrachter.
+  @ohne-pdf-betrachter
+  Szenario: Ohne PDF-Betrachter im Browser gibt es die Datei statt der Vorschau
+    Dann sehe ich die Schaltfläche "Vorschau anzeigen" nicht
+    Wenn ich auf "PDF herunterladen" klicke und eine Datei erhalte
+    Dann heißt die heruntergeladene Datei wie "eeb-*.pdf"
+
   Szenario: PDF erzeugen liefert eine Datei im Papier-Layout
     Wenn ich auf "Bogen übergeben…" klicke
     Und ich auf "PDF erzeugen" klicke und eine Datei erhalte
