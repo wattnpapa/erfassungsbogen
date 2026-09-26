@@ -168,6 +168,39 @@ describe("pdfDokument()", () => {
     expect(roh).toContain("https://erfassungsbogen.app/#EEBSVOLL");
   });
 
+  it("macht bei Segmentierung jedes Teilbild anklickbar — mit dem vollständigen Bogen", () => {
+    const segQr: QrSatz = {
+      teile: [
+        { datenUrl: "data:image/png;base64,TEIL1", url: "https://erfassungsbogen.app/#EEBS.1.3.99.AA", teilNr: 1, anzahl: 3, version: 20 },
+        { datenUrl: "data:image/png;base64,TEIL2", url: "https://erfassungsbogen.app/#EEBS.2.3.99.BB", teilNr: 2, anzahl: 3, version: 20 },
+        { datenUrl: "data:image/png;base64,TEIL3", url: "https://erfassungsbogen.app/#EEBS.3.3.99.CC", teilNr: 3, anzahl: 3, version: 20 },
+      ],
+      segmentiert: true,
+      zeichen: 2700,
+      version: 20,
+      vollUrl: "https://erfassungsbogen.app/#EEBSVOLL",
+      stufen: 1,
+      weitergeleitet: false,
+    };
+    const dd = pdfDokument(basisBogen(), segQr);
+    const bilder: { image: string; link?: unknown }[] = [];
+    const sammle = (node: unknown): void => {
+      if (Array.isArray(node)) node.forEach(sammle);
+      else if (node && typeof node === "object") {
+        if (typeof (node as { image?: unknown }).image === "string") bilder.push(node as { image: string });
+        Object.values(node).forEach(sammle);
+      }
+    };
+    sammle(dd.content);
+    const qrBilder = bilder.filter((b) => b.image.startsWith("data:image/png;base64,TEIL"));
+    expect(qrBilder).toHaveLength(3);
+    // Jedes Teilbild trägt den Link auf den KOMPLETTEN Bogen — nicht die
+    // Teil-URL, die nur einen Abschnitt enthält. Ein Klick aufs Bild in der
+    // digitalen PDF muss dasselbe tun wie der Textlink darunter.
+    for (const b of qrBilder) expect(b.link).toBe("https://erfassungsbogen.app/#EEBSVOLL");
+    expect(qrBilder.some((b) => typeof b.link === "string" && b.link.includes("EEBS."))).toBe(false);
+  });
+
   it("druckt Kopf, Einsatz, Zugehörigkeit und Stärke", () => {
     const t = texte(pdfDokument(basisBogen(), QR).content).join("\n");
     expect(t).toContain("Erfassungsbogen FGr K (A)");

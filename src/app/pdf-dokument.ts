@@ -478,10 +478,10 @@ export function einsatzPdfDokument(
  * QR-Block der letzten Seite. Ein Teil = wie bisher (Bild + antippbarer Link).
  * Mehrere Teile (Segmentierung) = eigene QR-Seiten mit je zwei diagonal
  * versetzten Codes „Teil x / n" (Kamera sieht immer nur einen Code, siehe
- * QR_SEGMENT_BREITE). Der Öffnen-Link zeigt dort nicht auf einen einzelnen Teil
- * (der trägt nur einen Abschnitt), sondern auf {@link QrSatz.vollUrl} — den
- * kompletten Bogen in einer URL. Segmentierung ist eine Grenze des QR-Bildes,
- * nicht des Links.
+ * QR_SEGMENT_BREITE). Der Öffnen-Link — auf dem Text UND auf jedem Teilbild —
+ * zeigt dort nicht auf einen einzelnen Teil (der trägt nur einen Abschnitt),
+ * sondern auf {@link QrSatz.vollUrl} — den kompletten Bogen in einer URL.
+ * Segmentierung ist eine Grenze des QR-Bildes, nicht des Links.
  */
 function qrBlock(qr: QrSatz, akzent: string): Content {
   const kopf = (text: string): Content => ({ text, bold: true, fontSize: 13, color: akzent, alignment: "center" });
@@ -517,10 +517,14 @@ function qrBlock(qr: QrSatz, akzent: string): Content {
   // Pro Seite zwei Teile, diagonal versetzt (siehe QR_SEGMENT_BREITE). Jede
   // QR-Seite beginnt auf einer frischen Seite, damit kein Formularrest die
   // Diagonale zusammenstaucht.
+  // Jedes Teilbild ist — wie der Einzelcode — antippbar und öffnet den
+  // vollständigen Bogen (vollUrl), nicht den einzelnen Abschnitt: Nutzer
+  // versuchen sonst, den Link „aus dem QR-Code zu kopieren", und landen beim
+  // Bild statt bei der URL (Rückmeldung aus dem OV Oldenburg, Firefox-Viewer).
   const teilZelle = (t: QrSatz["teile"][number]): Content => ({
     stack: [
       { text: `Teil ${t.teilNr} / ${anzahl}`, bold: true, alignment: "center", color: akzent },
-      { image: t.datenUrl, width: QR_SEGMENT_BREITE, margin: [0, 4, 0, 0] },
+      { image: t.datenUrl, width: QR_SEGMENT_BREITE, margin: [0, 4, 0, 0], link: qr.vollUrl },
     ],
   });
   const oeffnenLink = (): Content => ({
