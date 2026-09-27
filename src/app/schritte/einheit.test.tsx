@@ -9,7 +9,7 @@ import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { useState } from "react";
 import { Dialogschicht } from "../dialoge";
-import { neuePerson, neuerBogen } from "../hilfen";
+import { neuePerson, neuerBogen, vokabularFuer } from "../hilfen";
 import { PersonalErfassung, type Erfassungsbogen } from "@bos/eeb-format/model";
 import { SchrittBuehne } from "../../test/schritt-buehne";
 import { SchrittEinheit } from "./einheit";
@@ -95,6 +95,24 @@ describe("Schritt Einheit", () => {
     expect(namen.map((f) => f.value)).toEqual(["Oldenburg", "Bremen, Niedersachsen"]);
     const kuerzel = screen.getAllByLabelText("Kürzel") as HTMLInputElement[];
     expect(kuerzel.map((f) => f.value)).toEqual(["OODE", "GOLD", "LVNI"]);
+  });
+
+  it("zeigt beim Antippen des Einheitstyps die ganze Liste, nicht nur die ersten acht", async () => {
+    const nutzer = userEvent.setup();
+    buehne();
+
+    const feld = screen.getByRole("combobox", { name: "Einheitstyp" });
+    await nutzer.click(feld);
+
+    const alle = vokabularFuer(neuerBogen().einheit.organisation, "einheitstyp");
+    expect(alle.length).toBeGreaterThan(8);
+    const zeilen = within(screen.getByRole("listbox", { name: "Vorschläge zu Einheitstyp" })).getAllByRole("option");
+    expect(zeilen.length).toBe(alle.length);
+    // Die Liste bleibt beim Tippen vollständig: alle Fachgruppen, nicht acht.
+    await nutzer.type(feld, "FGr");
+    const fgr = alle.filter((t) => t.kurz.toLowerCase().includes("fgr") || t.name.toLowerCase().includes("fgr"));
+    expect(fgr.length).toBeGreaterThan(8);
+    expect(within(screen.getByRole("listbox", { name: "Vorschläge zu Einheitstyp" })).getAllByRole("option").length).toBe(fgr.length);
   });
 
   it("bildet den Anzeigenamen aus Organisation, Einheitstyp und Ebenenname", async () => {

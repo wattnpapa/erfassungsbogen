@@ -123,16 +123,19 @@ function VokabCombobox(props: {
   }, [wert.code, wert.freitext]);
 
   const suche = eingabe.trim().toLowerCase();
-  const treffer = (
-    suche
-      ? sortiert.filter(
-          (t) =>
-            t.kurz.toLowerCase().includes(suche) ||
-            t.name.toLowerCase().includes(suche) ||
-            label(t).toLowerCase().includes(suche),
-        )
-      : sortiert
-  ).slice(0, 8);
+  // Bewusst ohne Obergrenze: die Liste ist ein Ersatz für das Native-Select und
+  // muss ohne Tippen jeden Eintrag zeigen — sie scrollt (max-height in der
+  // CSS). Gekappt auf acht Zeilen las sich „B (ASH) … FGr I" am Handy als
+  // vollständige Auswahl, und wer seine Einheit nicht sah, hielt sie für
+  // nicht vorgesehen, statt zu tippen.
+  const treffer = suche
+    ? sortiert.filter(
+        (t) =>
+          t.kurz.toLowerCase().includes(suche) ||
+          t.name.toLowerCase().includes(suche) ||
+          label(t).toLowerCase().includes(suche),
+      )
+    : sortiert;
 
   return (
     <VorschlagFeld
