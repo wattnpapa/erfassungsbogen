@@ -171,7 +171,7 @@ wieder.
 | XLSX-Export | Eigener minimaler XLSX-Writer (`src/app/xlsx.ts`, ZIP + zwei XML-Teile über `pako`) statt SheetJS/exceljs – bewusste Entscheidung, keine neue Abhängigkeit | `docs/tests.md` |
 | Node-Version (CI) | Node 24 | `.github/workflows/ci.yml`, `release.yml` |
 | Testwerkzeuge | Vitest (Unit, zwei Projekte `logik`/`oberflaeche`), Cucumber.js + Playwright (E2E/Gherkin auf Deutsch) | `package.json`, `docs/tests.md` |
-| Browser-Sicherheit | Content-Security-Policy wird im Build injiziert (`default-src 'self'`, `object-src 'none'`, `base-uri 'none'`, `script-src` ohne `'unsafe-inline'` über `sha256`-Hashes, eng begrenztes `connect-src`/`img-src` nur für GoatCounter) | `vite.config.ts` (`contentSecurityPolicy()`) |
+| Browser-Sicherheit | Content-Security-Policy wird im Build injiziert (`default-src 'self'`, `object-src 'none'`, `base-uri 'none'`, `script-src` ohne `'unsafe-inline'` über `sha256`-Hashes plus `'wasm-unsafe-eval'` für den ZXing-Decoder, eng begrenztes `connect-src`/`img-src` nur für GoatCounter) | `vite.config.ts` (`contentSecurityPolicy()`) |
 | Software-Lieferkette | SBOM (CycloneDX 1.6) aus den fünf `package-lock.json`, `npm audit` als CI-Gate, Dependabot wöchentlich für npm und GitHub-Actions | `scripts/sbom.ts`, `.github/workflows/ci.yml`, `.github/dependabot.yml` |
 | Kamera-Zugriff | Erfordert Secure Context (HTTPS/localhost) für `getUserMedia`; in Electron zusätzliche macOS-Entitlements nötig (`NSCameraUsageDescription`, Hardened-Runtime-Camera-Entitlement) | `docs/TODO.md` |
 | Sprache der Oberfläche und des Codes | Durchgängig Deutsch – Bezeichner, Kommentare, Fachbegriffe, Gherkin-Szenarien | `PRODUCT.md`, gesamter Quellcode |
@@ -826,7 +826,7 @@ sequenceDiagram
   Nutzer->>Browser: erster Aufruf von erfassungsbogen.app
   Browser->>Netz: App-Shell laden (HTML/JS/CSS, Icons, manifest, woff2, wasm)
   Browser->>SW: Service Worker installieren
-  SW->>SW: precache App-Shell (globPatterns inkl. wasm/woff2)
+  SW->>SW: precache App-Shell (globPatterns inkl. wasm/woff2/json der Beispielbögen)
   SW-->>Browser: clientsClaim() – übernimmt sofort die laufende Seite
   Note over Nutzer,Netz: Gerät verliert Netzverbindung
   Nutzer->>Browser: erneuter Aufruf / weiter benutzen
@@ -1025,8 +1025,11 @@ flowchart TB
   (`erfassungsbogen.goatcounter.com`). `script-src` gibt die drei
   Inline-`<script>`-Blöcke der `index.html` einzeln über beim Bauen erzeugte
   `sha256`-Hashes frei und kommt damit **ohne `'unsafe-inline'`** aus;
-  `style-src` behält `'unsafe-inline'`, weil React `style`-Attribute an
-  Elementen setzt. `file:` deckt den Electron-Build ab.
+  `'wasm-unsafe-eval'` erlaubt zusätzlich das Kompilieren des
+  WebAssembly-Decoders ZXing aus dem eigenen Bundle (seit 2026-09-27; vorher
+  fiel der Scanner im Build still auf jsQR zurück). `style-src` behält
+  `'unsafe-inline'`, weil React `style`-Attribute an Elementen setzt. `file:`
+  deckt den Electron-Build ab.
 
   > *Prüfvermerk:* Die Hash-Freigabe kam mit `c7604e9` (2026-09-12); die
   > PDF-Fassung vom 2026-09-11 beschreibt noch `'unsafe-inline'` bei

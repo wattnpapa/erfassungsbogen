@@ -86,9 +86,22 @@ export function VorlagenListe(props: {
   }
 
   // Kein confirm: Löschen ist nur der Weg in den Papierkorb (30 Tage
-  // wiederherstellbar) — ein Fehltipp lässt sich rückgängig machen.
+  // wiederherstellbar) — ein Fehltipp lässt sich rückgängig machen. Dass es
+  // diesen Rückweg gibt, sagt danach die Statuszeile mit „Rückgängig"
+  // (Audit „Zerstörende Handlungen", D6): vorher verschwand die Karte stumm.
   function loeschen(v: Vorlage) {
     vorlageLoeschen(v.id);
+    setZuletztGeloescht(v);
+    onGeaendert();
+  }
+
+  /** Die eben gelöschte Vorlage — solange sie hier steht, gibt es den Rückweg in einem Tipp. */
+  const [zuletztGeloescht, setZuletztGeloescht] = useState<Vorlage | null>(null);
+  function loeschenRueckgaengig() {
+    if (!zuletztGeloescht) return;
+    vorlageWiederherstellen(zuletztGeloescht.id);
+    setZurueckgeholt(zuletztGeloescht.id);
+    setZuletztGeloescht(null);
     onGeaendert();
   }
 
@@ -110,6 +123,12 @@ export function VorlagenListe(props: {
 
   return (
     <>
+      {zuletztGeloescht && (
+        <p className="meldung" role="status">
+          Vorlage „{zuletztGeloescht.name}" in den Papierkorb gelegt (30 Tage rückholbar).{" "}
+          <button type="button" className="link" onClick={loeschenRueckgaengig}>Rückgängig</button>
+        </p>
+      )}
       {vorlagen.map((v) => (
         <Kartenstapel className="karte" key={v.id} frisch={v.id === frischeId || v.id === zurueckgeholt}>
           <div className="kopfzeile">

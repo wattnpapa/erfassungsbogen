@@ -139,6 +139,13 @@ auszuliefern.
 `style-src` behält `'unsafe-inline'`: React setzt `style`-Attribute an
 Elementen, und die deckt ein Hash nicht ab.
 
+`script-src` trägt außerdem `'wasm-unsafe-eval'`. Das ist keine Aufweichung
+von `'self'`, sondern die einzige Freigabe, mit der ein Browser ein
+WebAssembly-Modul überhaupt kompiliert — gebraucht vom QR-Decoder ZXing
+(`zxing_reader-*.wasm` aus dem eigenen Bundle). Ohne sie meldete die Konsole
+im Build „Refused to compile … WebAssembly", und der Scanner fiel still auf
+jsQR zurück, mit kleinerer Reichweite bei schlechten Fotos.
+
 ## Web-App
 
 Assistent (Einheit → Einsatz → Personal → Fahrzeuge → Sofortbedarf) mit
@@ -393,6 +400,16 @@ localStorage-Hülle getrennt und unit-getestet.
   verknüpft. Ist ein Teil nur als Stärke gemeldet, führt das Ergebnis die Summen
   als Zahlen und behält die bekannten Namen als Ansprechpartner. Oberfläche in
   [src/app/zusammenfuehren-ui.tsx](../src/app/zusammenfuehren-ui.tsx).
+- [src/app/eintrag-zeiten.ts](../src/app/eintrag-zeiten.ts) — App-seitige
+  Erweiterung des Eintrags um Eintreffzeit, Abrückzeit und eine Notiz der
+  Führungsstelle (Modul-Augmentation von `MeldeEintrag`, die Felder reisen als
+  JSON mit der Sammlung; der Kern reicht unbekannte Felder durch). Dazu die
+  Statusänderung mit Zeitstempel, das Erben von Eintreffzeit und Notiz durch
+  eine Folgemeldung und die Meldung eines vollen Speichers
+  (`SpeicherVollFehler`) — ein `setItem`, das still scheitert, darf nie als
+  „gespeichert" erscheinen. Bewusst hier und nicht im Submodul: die Felder
+  sind Führungsstellen-Sicht des Erfassungsbogens, kein Bestandteil des
+  Meldeformats.
 - [src/app/auswertung.ts](../src/app/auswertung.ts) — Summen über die aktuell
   anwesenden Einheiten (`aggregiere`) und Zwischensummen je Zug
   (`aggregiereNachZug`), aufgebaut auf denselben abgeleiteten Werten wie die

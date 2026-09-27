@@ -109,13 +109,25 @@ function ausSpeicherLaden(schluessel: string, jetzt: EebZeitpunkt): Entwurf | nu
   return nachFrist;
 }
 
-/** `vorlageId`: der Bogen ist die Bearbeitung dieser gespeicherten Vorlage (siehe `Entwurf`). */
-export function entwurfSpeichern(bogen: Erfassungsbogen, vorlageId?: string): void {
+/**
+ * `vorlageId`: der Bogen ist die Bearbeitung dieser gespeicherten Vorlage (siehe `Entwurf`).
+ *
+ * Rückgabe: true = gespeichert, false = nicht gespeichert (Speicher voll,
+ * blockiert). Das Autosave darf die Bearbeitung nie stören — aber die
+ * Anzeige „automatisch gespeichert" darf auch nicht lügen (Audit „Offline
+ * und Speicher", O1): der Aufrufer zeigt bei false den Fehlzustand.
+ */
+export function entwurfSpeichern(bogen: Erfassungsbogen, vorlageId?: string): boolean {
+  const s = speicher();
+  if (!s) return false;
+  const text = entwurfZuJson(bogen, Date.now(), vorlageId);
   try {
-    speicher()?.setItem(SPEICHER_SCHLUESSEL, entwurfZuJson(bogen, Date.now(), vorlageId));
+    s.setItem(SPEICHER_SCHLUESSEL, text);
   } catch {
-    /* Speicher voll o. ä. — Autosave darf die Bearbeitung nie stören */
+    return false;
   }
+  // Manche Browser scheitern still: dem Speicher glauben, nicht dem Aufruf.
+  return s.getItem(SPEICHER_SCHLUESSEL) === text;
 }
 
 export function entwurfVerwerfen(): void {

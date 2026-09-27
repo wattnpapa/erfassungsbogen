@@ -96,7 +96,10 @@ function contentSecurityPolicy(): Plugin {
       "base-uri 'none'",
       "object-src 'none'",
       "form-action 'none'",
-      `script-src 'self' file:${hashes.map((h) => ` '${h}'`).join("")}`,
+      // 'wasm-unsafe-eval' erlaubt NUR das Kompilieren von WebAssembly (kein
+      // eval, kein Inline-Skript): der QR-Decoder ZXing liegt als .wasm im
+      // Bundle und fiel ohne diese Freigabe im Build still auf jsQR zurück.
+      `script-src 'self' file: 'wasm-unsafe-eval'${hashes.map((h) => ` '${h}'`).join("")}`,
       "style-src 'self' file: 'unsafe-inline'",
       "img-src 'self' file: data: blob: https://erfassungsbogen.goatcounter.com",
       "font-src 'self' file: data:",
@@ -262,7 +265,10 @@ export default defineConfig({
         // wasm ebenso: der QR-Decoder (ZXing) liegt als WebAssembly-Datei im
         // Bundle — fehlte sie offline, fiele der Scanner auf jsQR mit
         // kleinerer Reichweite zurück.
-        globPatterns: ["**/*.{js,css,html,svg,png,webmanifest,woff2,wasm}"],
+        globPatterns: ["**/*.{js,css,html,svg,png,webmanifest,woff2,wasm,json}"],
+        // json: die Beispielbögen (examples/**/*.json, ~450 kleine Dateien)
+        // werden erst beim Anklicken geladen — ohne Precache reagierte der
+        // Beispiele-Dialog offline gar nicht (Audit „Offline und Speicher", O2).
         // Die Manifest-Screenshots braucht nur der Installationsdialog des
         // Browsers, nicht die laufende App — sie gehören nicht in den
         // Offline-Vorrat, den jedes Gerät beim ersten Aufruf mitlädt.

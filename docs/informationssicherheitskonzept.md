@@ -150,6 +150,8 @@ dem Vite-Build); es gibt keine serverseitige Variante.
 | D1 | Erfassungsbogen-Entwurf | Aktuell bearbeiteter Bogen (Personal, Fahrzeuge, Einsatz, Sofortbedarf); Personaldaten 90 Tage nach der letzten Änderung anonymisiert, außer bei Übungen (5.5). Wird eine Vorlage bearbeitet, trägt der Entwurf zusätzlich deren Kennung (`vorlageId`, keine Personendaten) | `localStorage` des Geräts |
 | D2 | Gesicherte/archivierte Bögen | Übergebene bzw. empfangene Bögen inkl. Papierkorb (vor endgültiger Löschung); Meldungen der Einsatz-Sammlung unterliegen derselben Datenschutzfrist, Vorlagen nicht (5.5) | `localStorage` des Geräts |
 | D2a | Uhrstand der Datenschutzfrist | Zuletzt akzeptierter Zeitpunkt der Geräteuhr, ggf. unbestätigter Sprung; keine Personendaten | `localStorage` des Geräts (`eeb.uhr.v1`) |
+| D2b | Zusatzfelder je Meldung der Einsatz-Sammlung | Eintreff- und Abrückzeit (`eingetroffenAm`, `abgerueckAm`, Geräteuhr) sowie eine Notiz/Auftrag der Führungsstelle (`notiz`, Freitext — kann Personenbezug enthalten, z. B. „Rückruf Hr. Meyer 15:00"). Reisen mit der Sammlung in Sammel-PDF und Einsatz-Transport mit; unterliegen mit der Meldung dem Papierkorb und der Löschung (`src/app/eintrag-zeiten.ts`) | `localStorage` des Geräts (`eeb.einsaetze.v1`, am Eintrag) |
+| D2c | Zuletzt offene Sammlung | Kennung und Zeitpunkt der zuletzt geöffneten Einsatz-Sammlung, 12 Stunden gültig; keine Personendaten | `localStorage` des Geräts (`eeb.letzterEinsatz.v1`) |
 | D3 | Absenderkarte | Freiwillige Kontaktangabe (Name/E-Mail/Telefon) der meldenden Person | `localStorage` des Geräts |
 | D4 | Privater Geräteschlüssel | Ed25519-Schlüssel zur Signatur weitergereichter Bögen | `localStorage` des Geräts, **unverschlüsselt als Hex** |
 | D5 | QR-Payload / Exportdatei | Binär kodierter, komprimierter Bogen zur Übergabe an ein zweites Gerät; ebenso eine geteilte Vorlage (QR/Link mit Marker `V.`, oder JSON-Datei `eeb-vorlage-*.json`) | Transient (QR-Code-Anzeige) bzw. Datei auf dem Gerät oder in einer vom Nutzer gewählten Ablage (z. B. Cloud-Ordner) |
@@ -259,7 +261,7 @@ Der Produktions-Build setzt eine restriktive CSP als `<meta>`-Header
 
 ```
 default-src 'self' file:; base-uri 'none'; object-src 'none'; form-action 'none';
-script-src 'self' file: 'sha256-…' 'sha256-…' 'sha256-…';
+script-src 'self' file: 'wasm-unsafe-eval' 'sha256-…' 'sha256-…' 'sha256-…';
 style-src 'self' file: 'unsafe-inline';
 img-src 'self' file: data: blob: https://erfassungsbogen.goatcounter.com;
 font-src 'self' file: data:; frame-src 'self' file: blob:;
@@ -278,6 +280,14 @@ Datenausleitung an eine andere Herkunft ist technisch unterbunden.
 > React `style`-Attribute an Elementen setzt. Die ursprüngliche
 > Entwurfsfassung dieses Dokuments beschrieb noch die alte Policy mit
 > `'unsafe-inline'` auch bei `script-src`.
+>
+> *Prüfvermerk (Stand 2026-09-27):* `script-src` trägt zusätzlich
+> `'wasm-unsafe-eval'`. Die Freigabe erlaubt ausschließlich das Kompilieren von
+> WebAssembly-Modulen (kein `eval`, kein Inline-Skript) und ist nötig für den
+> QR-Decoder ZXing (`assets/zxing_reader-*.wasm`, aus dem eigenen Bundle):
+> ohne sie verweigerte der Browser das Modul, und die App fiel still auf den
+> reineren JavaScript-Decoder jsQR zurück. Die Angriffsfläche wächst dadurch
+> nicht — geladen werden kann weiterhin nur, was `'self'` liefert.
 
 ### 5.4 Schutz bei Datenexport
 

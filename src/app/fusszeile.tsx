@@ -14,6 +14,7 @@ import { AnzeigeSchalter } from "./anzeige-schalter";
 import { frageJaNein, zeigeHinweis } from "./dialoge";
 import { alleDatenLoeschen, datenUmfang, sicherungErstellen, sicherungEinspielen, type DatenUmfang } from "./sicherung";
 import { geraeteKurzform, geraeteSchluesselLoeschen, geraeteSchluesselSicherstellen } from "./geraete-schluessel";
+import { speicherBelegung, speicherText } from "./eintrag-zeiten";
 
 const KONTAKT = "johannes.rudolph@thw-oldenburg.de";
 const REPO = "https://github.com/wattnpapa/erfassungsbogen";
@@ -730,6 +731,11 @@ export function Fusszeile({ onBogenOeffnen, kompakt = false }: {
         <p className="hinweis">
           Einspielen ersetzt die vorhandenen App-Daten auf diesem Gerät vollständig.
         </p>
+        {/* Der Speicherstand gehört dorthin, wo aufgeräumt wird: Ein voller
+            Speicher trifft sonst ohne Vorwarnung (Audit „Offline und
+            Speicher", O4). Die Grenze ist eine Schätzung — Browser nennen
+            ihr Limit nicht, üblich sind rund 5 MB. */}
+        <SpeicherStand />
       </Dialog>
 
       {/* Restlos löschen — z. B. bevor ein geteiltes Tablet weitergegeben wird
@@ -952,5 +958,20 @@ export function Fusszeile({ onBogenOeffnen, kompakt = false }: {
 
       <Datenschutzdialog dialogRef={datenschutz} />
     </footer>
+  );
+}
+
+/** Belegter Gerätespeicher als Zeile mit Aufräum-Hinweis ab 70 %. */
+function SpeicherStand() {
+  const b = speicherBelegung();
+  if (!b) return null;
+  const anteil = b.belegt / b.grenze;
+  return (
+    <p className={anteil >= 0.7 ? "warnung" : "hinweis"} role="status">
+      Belegter Speicher: etwa {speicherText(b)}.
+      {anteil >= 0.7
+        ? " Wird er voll, kann die App nichts mehr speichern — alte Einsätze in den Papierkorb legen und den Papierkorb leeren, vorher sichern."
+        : ""}
+    </p>
   );
 }

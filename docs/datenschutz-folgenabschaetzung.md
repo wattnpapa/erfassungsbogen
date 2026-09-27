@@ -218,6 +218,7 @@ definieren.
 | Freiwillige Absenderangabe | Name, E-Mail, Telefon | Vollständig freiwillig (Opt-in) | Absenderkarte, `docs/datenmodell.md` |
 | Geräteschlüssel | Öffentlicher Ed25519-Schlüssel (kein Personenbezug für sich allein) | Automatisch, lokal erzeugt | `signatur.ts` |
 | Einsatzkontext | Einsatzort/-auftrag, Zeitraum | Pflicht | `Einsatz` — kann in Verbindung mit Personaldaten mittelbar Rückschlüsse auf Aufenthaltsorte erlauben |
+| Führungsstellen-Zusatz je Meldung (Einsatz-Sammlung) | Eintreffzeit, Abrückzeit, Auftrag/Notiz der Führungsstelle (Freitext) | Optional, nur am Meldekopf-Gerät | `MeldeEintrag` (App-seitige Erweiterung `src/app/eintrag-zeiten.ts`, seit 2026-09-27) — die Zeiten sind Einsatzdokumentation ohne eigenen Personenbezug; der Freitext kann Namen enthalten (z. B. Rückruf-Vermerk) und unterliegt derselben Löschung wie die Meldung (Papierkorb, Aufräumfrist); die 90-Tage-Anonymisierung erfasst ihn nicht |
 
 **Nicht enthalten:** Gesundheitsdaten, besondere Kategorien nach Art. 9 DSGVO,
 biometrische Daten, strafrechtliche Daten.
@@ -283,6 +284,9 @@ Kapitel 6 der [Arc42-Dokumentation](arc42-architektur.md).
     Anonymisierung im Rechtssinn für bereits weitergegebene Kopien.
 - **Aufräumfrist ruhender Einsatz-Sammlungen:** Eine Sammlung, die 90 Tage
   nicht geändert wurde, löscht die App endgültig (Ankündigung ab Tag 60).
+  Mit ihr gehen auch die Zusatzfelder je Meldung (Eintreff-/Abrückzeit,
+  Notiz der Führungsstelle) und die Merkung der zuletzt offenen Sammlung
+  (`eeb.letzterEinsatz.v1`, ohne Personenbezug, 12 Stunden gültig).
 - Eine **Papierkorb-Funktion** existiert (`sicherung.ts`, `vorlagen.ts`,
   `@bos/meldekopf/papierkorb`): gelöschte Einträge lassen sich vor endgültiger
   Löschung wiederherstellen.
