@@ -393,12 +393,10 @@ function base64Aus(bytes: Uint8Array): string {
 }
 
 /** Binärdatei anbieten — in der App übers Share-Sheet, im Browser als Download. */
-export async function bytesAlsDatei(dateiname: string, bytes: Uint8Array<ArrayBuffer>, mime: string): Promise<void> {
-  if (istNativ()) {
-    await binaerTeilen(dateiname, base64Aus(bytes));
-    return;
-  }
+export async function bytesAlsDatei(dateiname: string, bytes: Uint8Array<ArrayBuffer>, mime: string): Promise<boolean> {
+  if (istNativ()) return binaerTeilen(dateiname, base64Aus(bytes));
   blobAlsDownload(dateiname, new Blob([bytes], { type: mime }));
+  return true;
 }
 
 /**

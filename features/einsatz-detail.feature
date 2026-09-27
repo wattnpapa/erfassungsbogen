@@ -147,6 +147,22 @@ Funktionalität: Einsatz-Sammlung führen (Meldekopf)
     Wenn ich auf "Excel-Liste (Format „Oldenburg“)" klicke und eine Datei erhalte
     Dann heißt die heruntergeladene Datei wie "eeb-einsatz-*-oldenburg.xlsx"
 
+  # Nachlieferung an den Stab: Abends geht alles hinaus, morgens nur, was
+  # seitdem dazukam. Ohne neue Bögen bleiben die Ausgabewege gesperrt, statt
+  # eine leere Datei zu erzeugen.
+  Szenario: Nach dem Export lassen sich nur die seitdem neuen Bögen weitergeben
+    Dann sehe ich den Hinweis "Noch kein Export aus diesem Einsatz"
+    Wenn ich auf "Übersicht als CSV" klicke und eine Datei erhalte
+    Dann sehe ich den Hinweis "seitdem keine neuen Bögen"
+    Wenn ich "Nur neue Bögen seit dem letzten Export" ankreuze
+    Dann ist die Schaltfläche "Sammel-PDF (nur neue Bögen)" gesperrt
+    Und ist die Schaltfläche "Übersicht als CSV" gesperrt
+    Wenn ich die Einheit "DLRG" "Wardenburg" manuell in den Einsatz aufnehme
+    Dann sehe ich den Hinweis "seitdem 1 neuer Bogen"
+    Und ist die Schaltfläche "Sammel-PDF (nur neue Bögen)" bedienbar
+    Wenn ich auf "Übersicht als CSV" klicke und eine Datei erhalte
+    Dann sehe ich den Hinweis "seitdem keine neuen Bögen"
+
   Szenario: Gelöschter Einsatz liegt im Papierkorb und kommt zurück
     Wenn ich auf "Einsatz löschen…" klicke
     Und ich im Dialog auf "In den Papierkorb" klicke

@@ -552,12 +552,12 @@ flowchart TB
 | --- | --- |
 | `schritte/` | Ein Schritt des Erfassungs-Assistenten je Datei (`einheit.tsx`, `einsatz.tsx`, `personal.tsx`, `fahrzeuge.tsx`, `sofortbedarf.tsx`, `uebersicht.tsx`); gemeinsame UI-Bausteine in `bausteine.tsx`. |
 | `dialoge.tsx` | Ersatz für Systemdialoge: `frageText`/`frageFelder` (statt `prompt`), `frageJaNein` (statt `confirm`), `frageWahl`, `zeigeHinweis` (statt `alert`); gezeichnet von einer einmal eingehängten `<Dialogschicht />`. |
-| `einsaetze-ui.tsx` (56 KB, größte UI-Datei) | Einsatz-Sammlung: Liste, Detailsicht mit Summen, Abrücken, Zug-Etikett, Aufteilen/Zusammenführen, Folgemeldung/Historie/Diff, Sammel-PDF, CSV-Export, Papierkorb. |
+| `einsaetze-ui.tsx` (56 KB, größte UI-Datei) | Einsatz-Sammlung: Liste, Detailsicht mit Summen, Abrücken, Zug-Etikett, Aufteilen/Zusammenführen, Folgemeldung/Historie/Diff, Sammel-PDF, CSV-Export (wahlweise nur die seit dem letzten Export neuen Bögen), Papierkorb. |
 | `qr-scanner-web.tsx` + `qr-bild.ts`/`qr-stapel.ts`/`qr-boegen.ts` | Web-QR-Scan per `getUserMedia`/jsQR, Einzelbild-Decodierung, Stapel-Import (mehrere Fotos/Screenshots, Mehrteil-Erkennung), Gruppierung von QR-Texten zu vollständigen Bögen. |
 | `pdf-dokument.ts` (833 Zeilen, größte Nicht-UI-Datei) | Baut die pdfmake-Dokumentdefinition im Papier-Layout inkl. eingebettetem QR-Code auf der letzten Seite. |
 | `pdf-bilder.ts` / `pdf-qr.ts` / `pdf-stroeme.ts` | Rückfallebene: PDF-Bild-Objekte roh als Pixel lesen und den enthaltenen QR-Code decodieren – bewusst ohne vollständigen PDF-Renderer. |
 | `bogen-csv.ts` / `einsatz-csv.ts` / `oldenburg-xlsx.ts` / `xlsx.ts` / `csv.ts` | Datenexporte: vollständiges CSV je Bogen/Einsatz (Langformat mit Satzart-Spalte), CSV-Übersicht für die Lagekarte, XLSX im „Oldenburg"-Format, gemeinsame CSV-Formatgrundlagen (Semikolon, UTF-8-BOM, Dezimalkomma). |
-| `entwurf.ts` / `speicher-browser.ts` / `sicherung.ts` / `absenderkarte.ts` | Lokale Persistenz: Entwurfswiederherstellung, `localStorage`-Anbindung der Einsatz-Sammlung, Datensicherung/-Export, freiwillige Absenderkarte. |
+| `entwurf.ts` / `speicher-browser.ts` / `sicherung.ts` / `absenderkarte.ts` / `export-stand.ts` | Lokale Persistenz: Entwurfswiederherstellung, `localStorage`-Anbindung der Einsatz-Sammlung, Datensicherung/-Export, freiwillige Absenderkarte, Export-Stand je Einsatz (welche Meldungen der Stab schon bekommen hat — Grundlage des Teilexports „nur neue Bögen"). |
 | `nativ.ts` / `hilfen.ts` / `geraete-schluessel.ts` | Abstraktion nativer Fähigkeiten über Capacitor; Anzeige-/Migrations-Helfer (`bogenLaden`, `migriereBogen`, `einheitAnzeigename`); Erzeugung/Verwaltung des geräteeigenen Ed25519-Schlüssels. |
 | `anzeige-modus.ts` / `org-farben.ts` | Dunkel-/Feld-/Nacht-Modus als Design-Token-Umschaltung; organisationsspezifische Akzentfarben. |
 | `aktualisierung.tsx` | Update-Hinweise: Service-Worker-Banner im Web, Electron-Auto-Update-Status im Desktop. |

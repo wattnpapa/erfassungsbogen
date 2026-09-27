@@ -123,24 +123,29 @@ export async function qrScannen(anweisung = "QR-Code des Erfassungsbogens in den
   }
 }
 
-/** Share-Sheet öffnen; Abbruch durch den Nutzer ist kein Fehler. */
-async function teilen(titel: string, uri: string): Promise<void> {
+/**
+ * Share-Sheet öffnen; Abbruch durch den Nutzer ist kein Fehler — aber auch
+ * keine Übergabe, deshalb liefert der Abbruch false: der Export-Stand des
+ * Meldekopfs (export-stand.ts) darf ihn nicht als „übergeben" verbuchen.
+ */
+async function teilen(titel: string, uri: string): Promise<boolean> {
   try {
     await Share.share({ title: titel, files: [uri] });
+    return true;
   } catch (err) {
-    if (/cancel|abbruch/i.test(err instanceof Error ? err.message : String(err))) return;
+    if (/cancel|abbruch/i.test(err instanceof Error ? err.message : String(err))) return false;
     throw err;
   }
 }
 
 /** Binärdatei (Base64) in den Cache schreiben und übers Share-Sheet anbieten — PDF, XLSX, … */
-export async function binaerTeilen(dateiname: string, base64: string): Promise<void> {
+export async function binaerTeilen(dateiname: string, base64: string): Promise<boolean> {
   const datei = await Filesystem.writeFile({
     path: dateiname,
     data: base64,
     directory: Directory.Cache,
   });
-  await teilen(dateiname, datei.uri);
+  return teilen(dateiname, datei.uri);
 }
 
 /** Einen Link (App-URL) als Text übers Share-Sheet anbieten — ohne Datei-Anhang. */
@@ -154,12 +159,12 @@ export async function linkTeilen(titel: string, url: string): Promise<void> {
 }
 
 /** Text (z. B. Bogen-JSON) als Datei übers Share-Sheet anbieten. */
-export async function textTeilen(dateiname: string, text: string): Promise<void> {
+export async function textTeilen(dateiname: string, text: string): Promise<boolean> {
   const datei = await Filesystem.writeFile({
     path: dateiname,
     data: text,
     directory: Directory.Cache,
     encoding: Encoding.UTF8,
   });
-  await teilen(dateiname, datei.uri);
+  return teilen(dateiname, datei.uri);
 }

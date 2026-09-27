@@ -23,6 +23,7 @@ import { Dialogschicht } from "./dialoge";
 import { EinsatzDetail } from "./einsaetze-ui";
 import { EinsatzArt, einsaetzeLaden, einsatzAnlegen, meldungHinzufuegen, type MeldeEintrag } from "@bos/meldekopf/einsaetze";
 import { neuerBogen } from "./hilfen";
+import type { ExportStand, ExportUmfang } from "./export-stand";
 
 // pdfmake selbst hat hier nichts zu suchen: geprüft wird der Weg dorthin.
 const meldungPdfAnzeigen = vi.fn<(m: MeldeEintrag, fenster: Window | null) => Promise<void>>(async () => {});
@@ -36,14 +37,28 @@ function bogenMitName(name: string): Erfassungsbogen {
   return b;
 }
 
-/** Einsatz mit den genannten Einheiten (Vorgabe: eine), Detailansicht offen. */
-function buehne(namen: string[] = ["Wardenburg"]) {
+/**
+ * Einsatz mit den genannten Einheiten (Vorgabe: eine), Detailansicht offen.
+ * `exportStand` stellt die Ansicht so, als wäre schon einmal exportiert worden;
+ * `standAus` nennt die Einheiten, die damals schon in der Sammlung standen.
+ */
+function buehne(namen: string[] = ["Wardenburg"], opt: { standAus?: string[]; zeitpunkt?: number } = {}) {
   const angelegt = einsatzAnlegen("Hochwasser Wardenburg", EinsatzArt.EINSATZ);
   for (const n of namen) meldungHinzufuegen(angelegt.id, bogenMitName(n));
   const einsatz = einsaetzeLaden().find((s) => s.id === angelegt.id)!;
+  const exportStand: ExportStand | null = opt.standAus
+    ? {
+        zeitpunkt: opt.zeitpunkt ?? Date.now(),
+        eintragIds: einsatz.eintraege
+          .filter((e) => opt.standAus!.includes(e.bogen.einheit.hierarchie[0]!.name))
+          .map((e) => e.id),
+      }
+    : null;
   const geaendert = vi.fn();
   const bilderImport = vi.fn<(dateien: File[]) => void>();
   const dateiImport = vi.fn<(dateien: File[]) => void>();
+  const sammelPdf = vi.fn<(umfang: ExportUmfang) => void>();
+  const csvExport = vi.fn<(umfang: ExportUmfang) => void>();
   render(
     <>
       <EinsatzDetail
@@ -55,16 +70,17 @@ function buehne(namen: string[] = ["Wardenburg"]) {
         onDateiImport={dateiImport}
         onBilderImport={bilderImport}
         onExport={() => {}}
-        onCsvExport={() => {}}
+        onCsvExport={csvExport}
         onCsvDetailExport={() => {}}
         onOldenburgExport={() => {}}
-        onSammelPdf={() => {}}
+        onSammelPdf={sammelPdf}
         onGeloescht={() => {}}
+        exportStand={exportStand}
       />
       <Dialogschicht />
     </>,
   );
-  return { einsatzId: angelegt.id, geaendert, bilderImport, dateiImport };
+  return { einsatzId: angelegt.id, geaendert, bilderImport, dateiImport, sammelPdf, csvExport };
 }
 
 describe("Meldung aus dem Einsatz entfernen", () => {
@@ -307,5 +323,60 @@ describe("Bögen einlesen (ein Knopf für Datei, Bilder und Ordner)", () => {
 
     expect(screen.queryByRole("menuitem")).toBeNull();
     expect(screen.queryByLabelText("Ganzen Ordner wählen…")).toBeNull();
+  });
+});
+
+/**
+ * Nachlieferung an den Stab: einmal alles, danach nur, was seitdem dazukam.
+ * Das Kästchen schaltet alle Ausgabewege um — der Umfang muss beim Aufrufer
+ * ankommen, und ohne neue Bögen darf kein leerer Export entstehen.
+ */
+describe("Nur neue Bögen seit dem letzten Export", () => {
+  beforeEach(() => {
+    localStorage.clear();
+  });
+
+  it("gibt vor dem ersten Export alles heraus und sagt, dass alle Bögen neu sind", async () => {
+    const nutzer = userEvent.setup();
+    const { sammelPdf } = buehne(["Wardenburg", "Hatten"]);
+
+    expect(screen.getByText(/Noch kein Export aus diesem Einsatz/)).toBeDefined();
+    await nutzer.click(screen.getByRole("button", { name: "Sammel-PDF (alle Bögen)" }));
+    expect(sammelPdf).toHaveBeenCalledWith("alle");
+  });
+
+  it("zählt ab, was seit dem letzten Export dazukam, und reicht den Umfang weiter", async () => {
+    const nutzer = userEvent.setup();
+    const { sammelPdf, csvExport } = buehne(["Wardenburg", "Hatten", "Ganderkesee"], { standAus: ["Wardenburg"] });
+
+    expect(screen.getByText(/seitdem 2 neue Bögen/)).toBeDefined();
+    await nutzer.click(screen.getByRole("checkbox", { name: /Nur neue Bögen seit dem letzten Export/ }));
+
+    await nutzer.click(screen.getByRole("button", { name: "Sammel-PDF (nur neue Bögen)" }));
+    expect(sammelPdf).toHaveBeenCalledWith("neue");
+    await nutzer.click(screen.getByRole("button", { name: "Übersicht als CSV" }));
+    expect(csvExport).toHaveBeenCalledWith("neue");
+
+    // Zurück auf alle: die Knöpfe heißen wieder wie vorher und liefern alles.
+    await nutzer.click(screen.getByRole("checkbox", { name: /Nur neue Bögen seit dem letzten Export/ }));
+    await nutzer.click(screen.getByRole("button", { name: "Sammel-PDF (alle Bögen)" }));
+    expect(sammelPdf).toHaveBeenLastCalledWith("alle");
+  });
+
+  it("sperrt die Ausgabewege, wenn seit dem letzten Export nichts Neues da ist", async () => {
+    const nutzer = userEvent.setup();
+    const { sammelPdf } = buehne(["Wardenburg"], { standAus: ["Wardenburg"] });
+
+    expect(screen.getByText(/seitdem keine neuen Bögen/)).toBeDefined();
+    const knopf = screen.getByRole("button", { name: "Sammel-PDF (alle Bögen)" });
+    expect((knopf as HTMLButtonElement).disabled).toBe(false);
+
+    await nutzer.click(screen.getByRole("checkbox", { name: /Nur neue Bögen seit dem letzten Export/ }));
+
+    for (const name of ["Sammel-PDF (nur neue Bögen)", "Übersicht als CSV", "Alle Daten als CSV", /^Excel-Liste/]) {
+      expect((screen.getByRole("button", { name }) as HTMLButtonElement).disabled).toBe(true);
+    }
+    await nutzer.click(screen.getByRole("button", { name: "Sammel-PDF (nur neue Bögen)" }));
+    expect(sammelPdf).not.toHaveBeenCalled();
   });
 });

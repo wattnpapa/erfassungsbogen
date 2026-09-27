@@ -90,6 +90,7 @@ import { mitAbgang, useEingangsquittung } from "./eintrag-bewegung";
 import { AbgangKnopf, Kartenstapel } from "./kartenstapel";
 import { istBilddatei } from "./qr-stapel";
 import { fehlerText } from "./nachladen";
+import { exportZeitKurz, neueEintraege, type ExportStand, type ExportUmfang } from "./export-stand";
 
 export const ART_LABEL: Record<EinsatzArt, string> = {
   [EinsatzArt.EINSATZ]: "Einsatz",
@@ -445,15 +446,34 @@ export function EinsatzDetail(props: {
   /** Stapel abfotografierter/gescannter QR-Codes (Mehrfachauswahl oder Ordner). */
   onBilderImport: (dateien: File[]) => void;
   onExport: () => void;
-  onCsvExport: () => void;
-  onCsvDetailExport: () => void;
-  onOldenburgExport: () => void;
-  onSammelPdf: () => void;
+  /** Die Ausgabewege bekommen den gewählten Umfang mit: alle Bögen oder nur die seit dem letzten Export neuen. */
+  onCsvExport: (umfang: ExportUmfang) => void;
+  onCsvDetailExport: (umfang: ExportUmfang) => void;
+  onOldenburgExport: (umfang: ExportUmfang) => void;
+  onSammelPdf: (umfang: ExportUmfang) => void;
   onGeloescht: () => void;
   /** Die gerade eingegangene Meldung — sie quittiert in der Liste. */
   eingang?: Eingang | null;
+  /** Stand des letzten Exports dieses Einsatzes (export-stand.ts); null oder weggelassen: noch keiner. */
+  exportStand?: ExportStand | null;
+  /**
+   * Alle Bögen oder nur die neuen. Hält der Aufrufer die Wahl (app.tsx, damit
+   * sie das Aus- und Einhängen der Ansicht übersteht), gibt er beides herein;
+   * sonst führt die Ansicht sie selbst.
+   */
+  exportUmfang?: ExportUmfang;
+  onExportUmfang?: (umfang: ExportUmfang) => void;
 }) {
   const { einsatz, onZurueck, onGeaendert, onScannen, onManuell, onDateiImport, onBilderImport, onExport, onCsvExport, onCsvDetailExport, onOldenburgExport, onSammelPdf, onGeloescht, eingang } = props;
+  const exportStand = props.exportStand ?? null;
+  const [eigenerUmfang, setEigenerUmfang] = useState<ExportUmfang>("alle");
+  const exportUmfang = props.exportUmfang ?? eigenerUmfang;
+  const setExportUmfang = props.onExportUmfang ?? setEigenerUmfang;
+  const neueBoegen = neueEintraege(einsatz.eintraege, exportStand).length;
+  const nurNeue = exportUmfang === "neue";
+  // Beim Teilexport ohne neue Bögen gäbe es eine leere Datei — die Knöpfe
+  // bleiben gesperrt, die Kästchenzeile sagt warum.
+  const exportGesperrt = nurNeue && neueBoegen === 0;
   const [suche, setSuche] = useState("");
   const [sortierung, setSortierung] = useState<EinheitenSortierung>("name");
   // "" = keine Einschränkung. Schlüssel siehe einheiten-liste.ts.
@@ -613,28 +633,52 @@ export function EinsatzDetail(props: {
           auf. Der Sprung zwischen den Reihen muss größer sein als der zwischen
           den Knöpfen, sonst liest sich die Aufteilung als zufälliger Umbruch
           einer einzigen Reihe aus sieben gleichrangigen Knöpfen. */}
+      {/* Der Meldekopf liefert dem Stab nach: einmal am Abend alles, am Morgen
+          nur, was seitdem dazukam. Das Kästchen schaltet alle vier Ausgabewege
+          um; die Zeile sagt, wann zuletzt exportiert wurde und wie viel
+          seitdem neu ist (Rückmeldung Anwender, September 2026). */}
+      <div className="export-umfang">
+        <label className="inline">
+          <input
+            type="checkbox"
+            checked={nurNeue}
+            onChange={(e) => setExportUmfang(e.target.checked ? "neue" : "alle")}
+          />
+          Nur neue Bögen seit dem letzten Export
+        </label>
+        <span className="hinweis">
+          {exportStand
+            ? `Zuletzt exportiert ${exportZeitKurz(exportStand.zeitpunkt)} · seitdem ${
+                neueBoegen === 0 ? "keine neuen Bögen" : neueBoegen === 1 ? "1 neuer Bogen" : `${neueBoegen} neue Bögen`
+              }`
+            : "Noch kein Export aus diesem Einsatz — alle Bögen sind neu."}
+        </span>
+      </div>
       <div className="vorlage-aktionen einsatz-ausgaben">
         <button
           type="button"
-          onClick={onSammelPdf}
-          title="Alle Bögen als eine PDF — mit eingebetteter kompletter Sammlung (Züge, Status, Historie). Auf dem Zielgerät über „Einsatz importieren…“ einlesbar."
+          onClick={() => onSammelPdf(exportUmfang)}
+          disabled={exportGesperrt}
+          title={nurNeue
+            ? "Nur die seit dem letzten Export neuen Bögen als eine PDF — mit eingebetteten Daten dieser Bögen. Auf dem Zielgerät über „Einsatz importieren…“ einlesbar."
+            : "Alle Bögen als eine PDF — mit eingebetteter kompletter Sammlung (Züge, Status, Historie). Auf dem Zielgerät über „Einsatz importieren…“ einlesbar."}
         >
-          Sammel-PDF (alle Bögen)
+          {nurNeue ? "Sammel-PDF (nur neue Bögen)" : "Sammel-PDF (alle Bögen)"}
         </button>{" "}
         {/* Zwei CSV-Wege, weil zwei verschiedene Fragen dahinterstehen: die
             Übersicht beantwortet „wie stark ist die Lage?" (eine Zeile je
             Einheit, mit Summenzeile), der Detail-Export „wer und was genau ist
             da?" (jede Person, jedes Fahrzeug einzeln). */}
-        <button type="button" onClick={onCsvExport} title="Eine Zeile je anwesender Einheit mit Stärke, Verpflegung, Unterbringung und Kraftstoff — plus Summenzeile. Für die Lagekarte.">
+        <button type="button" onClick={() => onCsvExport(exportUmfang)} disabled={exportGesperrt} title="Eine Zeile je anwesender Einheit mit Stärke, Verpflegung, Unterbringung und Kraftstoff — plus Summenzeile. Für die Lagekarte.">
           Übersicht als CSV
         </button>{" "}
-        <button type="button" onClick={onCsvDetailExport} title="Alle Daten aller gemeldeten Einheiten: je Einheit eine Zeile, dazu eine Zeile pro Person und pro Fahrzeug. Für Auswertung in Excel.">
+        <button type="button" onClick={() => onCsvDetailExport(exportUmfang)} disabled={exportGesperrt} title="Alle Daten aller gemeldeten Einheiten: je Einheit eine Zeile, dazu eine Zeile pro Person und pro Fahrzeug. Für Auswertung in Excel.">
           Alle Daten als CSV
         </button>{" "}
         {/* Drittes Format, weil es keinem der beiden CSVs entspricht: eine
             fremde Excel-Vorlage mit fester Spaltenfolge, in die die
             Führungsstelle die Zeilen direkt einfügt. */}
-        <button type="button" onClick={onOldenburgExport} title="Einheitenliste im Format der Führungsstelle Oldenburg: je gemeldeter Einheit eine Zeile, Spalten und Formatierung wie in deren Excel-Vorlage.">
+        <button type="button" onClick={() => onOldenburgExport(exportUmfang)} disabled={exportGesperrt} title="Einheitenliste im Format der Führungsstelle Oldenburg: je gemeldeter Einheit eine Zeile, Spalten und Formatierung wie in deren Excel-Vorlage.">
           Excel-Liste (Format „Oldenburg“)
         </button>{" "}
         {/* Roh-JSON nur im Debug-Modus: fürs Publikum trägt die Sammel-PDF die

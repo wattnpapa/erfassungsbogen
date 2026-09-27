@@ -133,12 +133,18 @@ export async function meldungPdfAnzeigen(m: MeldeEintrag, fenster: Window | null
   await pdfMake.createPdf(pdfDokument(m.bogen, qr)).open(fenster);
 }
 
-export async function einsatzPdfErzeugen(einsatz: Einsatzsammlung, meldungen: MeldeEintrag[]): Promise<void> {
+export async function einsatzPdfErzeugen(
+  einsatz: Einsatzsammlung,
+  meldungen: MeldeEintrag[],
+  // Beim Teilexport („nur neue Bögen") ist `einsatz` schon zugeschnitten; die
+  // Vorfassung einer Folgemeldung steckt dann nur noch in der ganzen Sammlung.
+  historie: MeldeEintrag[] = einsatz.eintraege,
+): Promise<boolean> {
   const boegenMitQr: SammelBogen[] = [];
   for (const m of meldungen) {
     // revisionen() liefert neueste zuerst — die Vorfassung steht direkt hinter
     // dieser Meldung. Fehlt sie, ist es eine Erstmeldung.
-    const revs = revisionen(einsatz.eintraege, m.einheitSchluessel);
+    const revs = revisionen(historie, m.einheitSchluessel);
     const idx = revs.findIndex((r) => r.id === m.id);
     const vorher = idx >= 0 ? revs[idx + 1]?.bogen : undefined;
     boegenMitQr.push({
@@ -154,8 +160,8 @@ export async function einsatzPdfErzeugen(einsatz: Einsatzsammlung, meldungen: Me
   const dateiname = `eeb-einsatz-${natoZeitstempel()}_${rumpf}.pdf`;
   if (istNativ()) {
     const base64 = await pdfMake.createPdf(dd).getBase64();
-    await binaerTeilen(dateiname, base64);
-  } else {
-    pdfMake.createPdf(dd).download(dateiname);
+    return binaerTeilen(dateiname, base64);
   }
+  pdfMake.createPdf(dd).download(dateiname);
+  return true;
 }
