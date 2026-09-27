@@ -1,8 +1,10 @@
 /**
  * Oberfläche für „Meine Vorlagen":
  *  - VorlagenListe: einbettbare Kartenliste der gespeicherten Vorlagen mit
- *    Verwalten (umbenennen, teilen, löschen) und Einstieg in die Musterung.
- *    Wird direkt unter den Start-Buttons angezeigt.
+ *    Verwalten (bearbeiten, umbenennen, teilen, löschen) und Einstieg in die
+ *    Musterung. Wird direkt unter den Start-Buttons angezeigt. „Bearbeiten"
+ *    ändert die Vorlage dauerhaft (über den Assistenten, app.tsx) — die
+ *    Musterung dagegen nie.
  *  - VorlageTeilen: die Vorlage selbst weitergeben (QR, Link, Datei) — für ein
  *    zweites Gerät oder die Ablage in einer Cloud. Der Empfänger legt daraus
  *    wieder eine Vorlage an, keinen Arbeitsbogen.
@@ -56,6 +58,8 @@ function staerkeText(b: Erfassungsbogen): string {
 export function VorlagenListe(props: {
   vorlagen: Vorlage[];
   onMustern: (v: Vorlage) => void;
+  /** Die Vorlage selbst ändern: öffnet ihren Bogen im Assistenten (dauerhaft, nicht nur für den nächsten Einsatz). */
+  onBearbeiten: (v: Vorlage) => void;
   onGeaendert: () => void;
   /**
    * Die gerade eingegangene Vorlage (Scan). Sie wird in der Liste
@@ -65,7 +69,7 @@ export function VorlagenListe(props: {
    */
   frischeId?: string | null;
 }) {
-  const { vorlagen, onMustern, onGeaendert, frischeId } = props;
+  const { vorlagen, onMustern, onBearbeiten, onGeaendert, frischeId } = props;
   const [zeigePapierkorb, setZeigePapierkorb] = useState(false);
   const papierkorb = vorlagenPapierkorb();
   /** Die gerade aus dem Papierkorb zurückgeholte Vorlage — siehe EinsatzListe. */
@@ -124,6 +128,7 @@ export function VorlagenListe(props: {
             Stärke {staerkeText(v.bogen)} · {v.bogen.personal.length} Personen · {v.bogen.fahrzeuge.length} Fahrzeuge
           </p>
           <div className="vorlage-aktionen">
+            <button type="button" onClick={() => onBearbeiten(v)}>Bearbeiten</button>{" "}
             <button type="button" onClick={() => umbenennen(v)}>Umbenennen</button>{" "}
             <button type="button" onClick={() => setTeilen(v)}>Teilen…</button>{" "}
             {/* Der Abgang zeigt, welche Vorlage geht — erst danach rückt die
@@ -310,7 +315,10 @@ export function Musterung(props: {
       <div className="titelzeile">
         <h1>{vorlage.name}</h1>
       </div>
-      <p className="hinweis">Anwesende abhaken lassen — die Vorlage bleibt unverändert.</p>
+      <p className="hinweis">
+        Anwesende abhaken lassen — die Vorlage bleibt unverändert. Dauerhaft ändern lässt sie sich über
+        „Bearbeiten" auf der Startseite.
+      </p>
     </SeitenKopf>
     <main id="inhalt" tabIndex={-1} className="musterung">
       <section className="karte staerke-leiste">

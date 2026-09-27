@@ -47,7 +47,7 @@ import { Kopfnav } from "./kopfnav-ui";
 import { bogenLinksEmpfangen, imWebBrowser, istNativ, qrScannen, textTeilen } from "./nativ";
 import { fehlerText } from "./nachladen";
 import { entwirreScanText } from "./tastaturbelegung";
-import { vorlageAnlegen, vorlageAusDatei, vorlagenLaden, vorlagenPapierkorb, type Vorlage } from "./vorlagen";
+import { vorlageAktualisieren, vorlageAnlegen, vorlageAusDatei, vorlagenLaden, vorlagenPapierkorb, type Vorlage } from "./vorlagen";
 import { Musterung, VorlagenListe } from "./vorlagen-ui";
 import { absenderkarteGefuellt, absenderkarteLaden, type Absenderkarte } from "./absenderkarte";
 import { AbsenderkarteFeld } from "./absenderkarte-ui";
@@ -459,6 +459,14 @@ function useSchrittRichtung(schritt: number) {
 
 function AppInhalt() {
   const [bogen, setBogen] = useState<Erfassungsbogen | null>(START.bogen ?? ENTWURF?.bogen ?? null);
+  /**
+   * Kennung der gespeicherten Vorlage, die der offene Bogen gerade bearbeitet
+   * („Bearbeiten" auf der Vorlagenkarte). Solange sie gesetzt ist, bietet die
+   * Übersicht „Vorlage aktualisieren" statt „Als Vorlage speichern" an, und
+   * jeder Weg, der den Bogen ersetzt oder schließt, löst die Verbindung. Sie
+   * wandert mit dem Entwurf in den Speicher, damit sie einen Neustart überlebt.
+   */
+  const [vorlageInBearbeitung, setVorlageInBearbeitung] = useState<string | null>(ENTWURF?.vorlageId ?? null);
   const [schritt, setSchritt] = useState(START.bogen || ENTWURF ? UEBERSICHT : 0);
   const richtung = useSchrittRichtung(schritt);
   const [fehler, setFehler] = useState(START.fehler);
@@ -560,13 +568,22 @@ function AppInhalt() {
   const [gespeichertUm, setGespeichertUm] = useState<Date | null>(null);
   useEffect(() => {
     if (bogen) {
-      entwurfSpeichern(bogen);
+      entwurfSpeichern(bogen, vorlageInBearbeitung ?? undefined);
       setGespeichertUm(new Date());
     } else {
       entwurfVerwerfen();
       setGespeichertUm(null);
     }
-  }, [bogen]);
+  }, [bogen, vorlageInBearbeitung]);
+
+  /**
+   * Die Vorlage zum offenen Bogen — nur solange sie noch in der Liste steht.
+   * Landet sie zwischendurch im Papierkorb, ist der Bogen bis zur
+   * Wiederherstellung ein gewöhnlicher Arbeitsbogen (die Kennung bleibt).
+   */
+  const bearbeiteteVorlage = vorlageInBearbeitung
+    ? vorlagen.find((v) => v.id === vorlageInBearbeitung) ?? null
+    : null;
 
   // Akzentfarbe der Oberfläche der Organisation des offenen Bogens anpassen —
   // ohne Bogen (Startseite/Einsatzansicht) das Standard-Blau. So sieht man
@@ -711,7 +728,12 @@ function AppInhalt() {
    * sie ständig im Weg und würde weggetippt.
    */
   async function darfBogenErsetzen(a: { titel: string; was: string; ok: string }): Promise<boolean> {
-    if (!bogen || !bogenHatInhalt(bogen)) return true;
+    // Was auch immer den Bogen ersetzt: die Bearbeitung einer Vorlage ist es
+    // danach nicht mehr — der verdrängte Bogen wird zum gewöhnlichen Entwurf.
+    if (!bogen || !bogenHatInhalt(bogen)) {
+      setVorlageInBearbeitung(null);
+      return true;
+    }
     const ja = await frageJaNein({
       titel: a.titel,
       text: `Der angefangene Bogen „${einheitAnzeigename(bogen.einheit)}" wird durch ${a.was} ersetzt. Er bleibt auf der Startseite unter „Zuletzt verdrängten Bogen zurückholen" erreichbar.`,
@@ -719,7 +741,52 @@ function AppInhalt() {
     });
     if (!ja) return false;
     merkeVerdraengt(bogen);
+    setVorlageInBearbeitung(null);
     return true;
+  }
+
+  /**
+   * Gespeicherte Vorlage dauerhaft ändern: ihr Bogen kommt in den Assistenten,
+   * die Übersicht schreibt ihn mit „Vorlage aktualisieren" zurück. Die
+   * Musterung („Einsatz vorbereiten") lässt die Vorlage bewusst unangetastet —
+   * bis hierher gab es keinen Weg, eine Vorlage inhaltlich zu ändern, außer
+   * sie als neue Vorlage zu speichern und die alte zu löschen.
+   */
+  async function vorlageBearbeiten(v: Vorlage) {
+    // Dieselbe Vorlage ist schon offen: weiterarbeiten statt die eigenen
+    // Änderungen durch den gespeicherten Stand zu ersetzen.
+    if (bogen && vorlageInBearbeitung === v.id) {
+      setZeigeStart(false);
+      setMeldung("");
+      return;
+    }
+    if (!(await darfBogenErsetzen({ titel: "Vorlage bearbeiten?", was: `die Vorlage „${v.name}"`, ok: "Vorlage bearbeiten" }))) return;
+    setBogen(structuredClone(v.bogen));
+    setVorlageInBearbeitung(v.id);
+    setzeEmpfang(null);
+    setSchritt(0);
+    setMusterVorlage(null);
+    setOffenerEinsatzId(null);
+    setZeigeStart(false);
+    setFehler("");
+    setMeldung(`Vorlage „${v.name}" wird bearbeitet — die Änderungen kommen in der Übersicht mit „Vorlage aktualisieren" in die Vorlage.`);
+  }
+
+  /** Den bearbeiteten Bogen in die Vorlage zurückschreiben und den Arbeitsplatz räumen. */
+  function vorlageAktualisierenUndSchliessen() {
+    if (!bogen || !vorlageInBearbeitung) return;
+    // Endgültig gelöscht, während der Bogen offen war: dann eben als neue
+    // Vorlage — die Arbeit soll nicht ins Leere laufen.
+    const v = vorlageAktualisieren(vorlageInBearbeitung, bogen)
+      ?? vorlageAnlegen(bearbeiteteVorlage?.name ?? einheitAnzeigename(bogen.einheit), bogen);
+    setBogen(null); // löscht auch die Entwurfssicherung
+    setVorlageInBearbeitung(null);
+    setzeEmpfang(null);
+    setSchritt(0);
+    vorlagenNeuLaden();
+    setFrischeVorlageId(v.id);
+    setZeigeStart(true);
+    setMeldung(`Vorlage „${v.name}" aktualisiert.`);
   }
 
   /** Den zuletzt verdrängten Bogen zurück in den Arbeitsplatz holen. */
@@ -758,6 +825,7 @@ function AppInhalt() {
     });
     if (!sicher) return;
     setBogen(null); // löscht auch die Entwurfssicherung (siehe oben)
+    setVorlageInBearbeitung(null);
     setzeEmpfang(null);
     setSchritt(0);
     setMeldung("Angefangener Bogen verworfen.");
@@ -1203,6 +1271,7 @@ function AppInhalt() {
     const herkunft = bogenHerkunft;
     einsatzWahlDialog.current?.close();
     setBogen(null);
+    setVorlageInBearbeitung(null);
     setzeEmpfang(null);
     setSchritt(0);
     setMeldung(""); // Rückmeldung des Assistenten gehört nicht in die Folgeansicht
@@ -1777,6 +1846,7 @@ function AppInhalt() {
             <VorlagenListe
               vorlagen={vorlagen}
               onMustern={(v) => { setMeldung(""); setMusterVorlage(v); }}
+              onBearbeiten={(v) => void vorlageBearbeiten(v)}
               onGeaendert={vorlagenNeuLaden}
               frischeId={frischeVorlageId}
             />
@@ -1877,6 +1947,14 @@ function AppInhalt() {
             Schnellerfassung
           </span>
         )}
+        {/* Vorlagen-Bearbeitung: der Assistent sieht aus wie bei jedem Bogen —
+            die Marke sagt auf jedem Schritt, dass hier die gespeicherte Vorlage
+            geändert wird und nicht ein Einsatzbogen entsteht. */}
+        {bearbeiteteVorlage && (
+          <span className="modus-marke" title={`Die gespeicherte Vorlage „${bearbeiteteVorlage.name}" wird bearbeitet — sichern in der Übersicht über „Vorlage aktualisieren"`}>
+            Vorlage
+          </span>
+        )}
       </div>
       {/* Der aktive Schritt steht nicht nur als CSS-Klasse da: ohne
           aria-current="step" liest eine Vorlesesoftware sechs gleichwertige
@@ -1945,8 +2023,11 @@ function AppInhalt() {
           signatur={bogenSignatur}
           herkunft={bogenHerkunft}
           geheZu={setSchritt}
-          neu={() => { setMeldung(""); setBogen(null); setzeEmpfang(null); setSchritt(0); }}
+          neu={() => { setMeldung(""); setBogen(null); setVorlageInBearbeitung(null); setzeEmpfang(null); setSchritt(0); }}
           onVorlageGespeichert={(name) => { vorlagenNeuLaden(); setMeldung(`Als Vorlage „${name}" gespeichert.`); }}
+          vorlageBearbeitung={
+            bearbeiteteVorlage ? { name: bearbeiteteVorlage.name, onAktualisieren: vorlageAktualisierenUndSchliessen } : undefined
+          }
           onInEinsatzAufnehmen={() => { einsaetzeNeuLaden(); einsatzWahlDialog.current?.showModal(); }}
           sammelAktion={
             sammelZielId
@@ -1956,6 +2037,7 @@ function AppInhalt() {
                     const ziel = sammelZielId;
                     setSammelZiel(null);
                     setBogen(null);
+                    setVorlageInBearbeitung(null);
                     setzeEmpfang(null);
                     setSchritt(0);
                     setMeldung("");

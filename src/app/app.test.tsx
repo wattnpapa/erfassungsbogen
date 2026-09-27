@@ -1046,6 +1046,70 @@ describe("Vorlage teilen (Karte in „Gespeicherte Vorlagen“)", () => {
   });
 });
 
+describe("Vorlage bearbeiten (Karte in „Gespeicherte Vorlagen“)", () => {
+  beforeEach(() => {
+    localStorage.clear();
+  });
+
+  function rueckfrage(titel: string): HTMLDialogElement {
+    return document.querySelector<HTMLDialogElement>(`dialog[aria-label='${titel}']`)!;
+  }
+
+  it("öffnet die Vorlage im Assistenten und schreibt „Vorlage aktualisieren“ in dieselbe Vorlage zurück", async () => {
+    const v = vorlageAnlegen("FGr K Bearbeithausen", bogenMitName("OV Alt"));
+    const nutzer = userEvent.setup();
+    render(<App />);
+    await nutzer.click(screen.getByRole("button", { name: "Bearbeiten" }));
+
+    // Schritt 1 mit dem Stand der Vorlage; die Marke sagt, was hier geändert wird.
+    const name = screen.getByLabelText("Name (Pflicht)") as HTMLInputElement;
+    expect(name.value).toBe("OV Alt");
+    expect(screen.getByText("Vorlage", { selector: ".modus-marke" })).toBeDefined();
+    // Der Entwurf kennt die Vorlage — nach einem Neustart findet die App zu ihr zurück.
+    await waitFor(() => expect(JSON.parse(localStorage.getItem("eeb.entwurf.v1")!).vorlageId).toBe(v.id));
+
+    await nutzer.clear(name);
+    await nutzer.type(name, "OV Neu");
+    await nutzer.click(screen.getByRole("button", { name: /^6\. Übersicht/ }));
+
+    // Hauptaktion ist das Zurückschreiben; eine Kopie bleibt als Nebenweg möglich.
+    expect(screen.getByRole("button", { name: "Als neue Vorlage speichern" })).toBeDefined();
+    expect(screen.queryByRole("button", { name: "Als Vorlage speichern" })).toBeNull();
+    await nutzer.click(screen.getByRole("button", { name: "Vorlage aktualisieren" }));
+
+    expect(await screen.findByText(/Vorlage „FGr K Bearbeithausen" aktualisiert/)).toBeDefined();
+    const vorlagen = vorlagenLaden();
+    expect(vorlagen).toHaveLength(1); // geändert, nicht verdoppelt
+    expect(vorlagen[0]!.id).toBe(v.id);
+    expect(vorlagen[0]!.bogen.einheit.hierarchie[0]!.name).toBe("OV Neu");
+    // Der Arbeitsplatz ist geräumt: kein liegengebliebener Entwurf der Vorlage.
+    expect(localStorage.getItem("eeb.entwurf.v1")).toBeNull();
+    expect(screen.getByRole("heading", { name: "Gespeicherte Vorlagen" })).toBeDefined();
+  });
+
+  it("fragt vor dem Bearbeiten, wenn ein angefangener Bogen offen ist, und löst danach die Verbindung zur Vorlage", async () => {
+    vorlageAnlegen("FGr K Wächterhausen", bogenMitName("OV Vorlage"));
+    const nutzer = userEvent.setup();
+    render(<App />);
+    await neuerBogenBis(nutzer, 0);
+    await nutzer.type(screen.getByLabelText("Name (Pflicht)"), "Angefangenhausen");
+    await nutzer.click(screen.getByRole("button", { name: "‹ Startseite" }));
+
+    await nutzer.click(screen.getByRole("button", { name: "Bearbeiten" }));
+    await nutzer.click(within(rueckfrage("Vorlage bearbeiten?")).getByRole("button", { name: "Vorlage bearbeiten" }));
+    expect((screen.getByLabelText("Name (Pflicht)") as HTMLInputElement).value).toBe("OV Vorlage");
+
+    // Ein neuer Bogen an dieser Stelle ist kein Vorlagen-Bogen mehr.
+    await nutzer.click(screen.getByRole("button", { name: "‹ Startseite" }));
+    await nutzer.click(screen.getByRole("button", { name: "Neuen Bogen erstellen" }));
+    await nutzer.click(within(rueckfrage("Neuen Bogen anfangen?")).getByRole("button", { name: "Neu anfangen" }));
+    expect(screen.queryByText("Vorlage", { selector: ".modus-marke" })).toBeNull();
+    await nutzer.click(screen.getByRole("button", { name: /^6\. Übersicht/ }));
+    expect(screen.getByRole("button", { name: "Als Vorlage speichern" })).toBeDefined();
+    expect(screen.queryByRole("button", { name: "Vorlage aktualisieren" })).toBeNull();
+  });
+});
+
 describe("Bögen aus einer PDF in einen Einsatz übernehmen", () => {
   beforeEach(() => {
     localStorage.clear();

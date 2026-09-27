@@ -323,7 +323,7 @@ Zusammenspiel:
 | [bogen-transport.feature](../features/bogen-transport.feature) | Startseite, Einstieg in den Assistenten, geteilter Link eines alten Bogens (Migration v2→v3) |
 | [assistent.feature](../features/assistent.feature) | Alle sechs Schritte, Schrittleiste, OV-Vorschläge, Landesvorlage, Namensimport, Schnelleingabe, Meldekopf-Stärke, Fahrzeuge, Sofortbedarf, Vollständigkeit, Entwurfswiederherstellung |
 | [uebergabe.feature](../features/uebergabe.feature) | QR-Code und Vollbild, PDF-Vorschau, PDF-Download, Link teilen — samt Runde „Link erzeugen → öffnen → Herkunft belegt → gegengezeichnet" |
-| [vorlagen.feature](../features/vorlagen.feature) | Vorlage speichern, umbenennen, Papierkorb, Musterung (Abwesende streichen) |
+| [vorlagen.feature](../features/vorlagen.feature) | Vorlage speichern, bearbeiten (dauerhaft ändern), umbenennen, Papierkorb, Musterung (Abwesende streichen) |
 | [einsatz-sammlung.feature](../features/einsatz-sammlung.feature) | Einsatz anlegen (Dialog, Pflichtfeld, Enter, Esc, Abbruch), Bogen aufnehmen |
 | [einsatz-detail.feature](../features/einsatz-detail.feature) | Summen, Vollansicht, Abrücken, Zug-Etikett, Aufteilen/Zusammenführen, Folgemeldung/Historie/Diff, Sammel-PDF, CSV (Übersicht und alle Daten), Papierkorb |
 | [einheiten-liste.feature](../features/einheiten-liste.feature) | Einheitenliste einer Großlage: Suche, Sortierung, Qualifikationsfilter, Tabellensicht mit Spaltensortierung und Summenzeile — und dass die Summen des Einsatzes davon unberührt bleiben |

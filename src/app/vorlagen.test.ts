@@ -16,6 +16,7 @@ import {
   vorlagenAusJson,
   vorlagenZuJson,
   vorlageAnlegen,
+  vorlageAktualisieren,
   vorlageUmbenennen,
   vorlageLoeschen,
   vorlageWiederherstellen,
@@ -159,6 +160,31 @@ describe("CRUD über localStorage", () => {
     vorlageAnlegen("   ", bogen());
     expect(vorlagenLaden()[0]!.name).toBe("THW OV Test Media Team");
   });
+
+  it("aktualisieren ersetzt den Bogen der Vorlage, behält Name und Kennung und normalisiert einsatzfrei", () => {
+    const v = vorlageAnlegen("Bergung", bogen());
+    const geaendert = bogen();
+    geaendert.personal = geaendert.personal.slice(0, 1);
+    geaendert.einheit.hierarchie[0]!.name = "OV Neu";
+    geaendert.einsatz.ortAuftrag = "Deich km 3"; // darf nicht in die Vorlage
+
+    const neu = vorlageAktualisieren(v.id, geaendert);
+    expect(neu?.id).toBe(v.id);
+    expect(neu?.name).toBe("Bergung");
+    expect(neu!.geaendert).toBeGreaterThanOrEqual(v.geaendert);
+
+    const [geladen] = vorlagenLaden();
+    expect(vorlagenLaden()).toHaveLength(1); // keine zweite Vorlage
+    expect(geladen!.bogen.personal).toHaveLength(1);
+    expect(geladen!.bogen.einheit.hierarchie[0]!.name).toBe("OV Neu");
+    expect(geladen!.bogen.einsatz.ortAuftrag).toBe("");
+  });
+
+  it("aktualisieren einer unbekannten Vorlage legt nichts an und meldet null", () => {
+    vorlageAnlegen("Bleibt", bogen());
+    expect(vorlageAktualisieren("gibt-es-nicht", bogen())).toBeNull();
+    expect(vorlagenLaden().map((x) => x.name)).toEqual(["Bleibt"]);
+  });
 });
 
 describe("Papierkorb", () => {
@@ -189,6 +215,17 @@ describe("Papierkorb", () => {
     vorlageUmbenennen(bleibt.id, "Bleibt 2");
     expect(vorlagenLaden().map((x) => x.name)).toEqual(["Bleibt 2"]);
     expect(vorlagenPapierkorb().map((x) => x.id)).toEqual([geloescht.id]);
+  });
+
+  it("aktualisieren holt eine Vorlage aus dem Papierkorb zurück", () => {
+    const v = vorlageAnlegen("Zurück", bogen());
+    vorlageLoeschen(v.id);
+    expect(vorlagenLaden()).toEqual([]);
+
+    const neu = vorlageAktualisieren(v.id, bogen());
+    expect(neu?.geloeschtAm).toBeUndefined();
+    expect(vorlagenLaden().map((x) => x.id)).toEqual([v.id]);
+    expect(vorlagenPapierkorb()).toEqual([]);
   });
 
   it("abgelaufene Einträge werden beim Laden endgültig bereinigt", () => {

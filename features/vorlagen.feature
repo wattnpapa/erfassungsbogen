@@ -25,6 +25,21 @@ Funktionalität: Vorlagen anlegen, verwalten und mustern
     Dann sehe ich die Überschrift "Fachgruppe Kabel"
     Und sehe ich "FGr K Oldenburg" nicht
 
+  Szenario: Bearbeiten ändert die Vorlage dauerhaft — nicht nur für den nächsten Einsatz
+    Wenn ich auf "Bearbeiten" klicke
+    Und ich im Dialog auf "Vorlage bearbeiten" klicke
+    Dann sehe ich den Schritt "1. Einheit"
+    Wenn ich das Feld "Name (Pflicht)" mit "Bearbeitungshausen" fülle
+    Und ich zum Schritt "6. Übersicht" wechsle
+    Dann sehe ich die Schaltfläche "Vorlage aktualisieren"
+    Und sehe ich die Schaltfläche "Als neue Vorlage speichern"
+    Wenn ich auf "Vorlage aktualisieren" klicke
+    Dann sehe ich die Überschrift "Gespeicherte Vorlagen"
+    Und sehe ich den Hinweis "Vorlage „FGr K Oldenburg\" aktualisiert."
+    Und sehe ich die Überschrift "FGr K Oldenburg"
+    Wenn ich auf "Bearbeiten" klicke
+    Dann steht im Feld "Name (Pflicht)" der Wert "Bearbeitungshausen"
+
   Szenario: Vorlage teilen bietet QR-Code, Link und Datei an
     Wenn ich auf "Teilen…" klicke
     Dann sehe ich den Dialog "Vorlage teilen"

@@ -70,6 +70,13 @@ export function Uebersicht(props: {
   geheZu: (schritt: number) => void;
   neu: () => void;
   onVorlageGespeichert?: (name: string) => void;
+  /**
+   * Gesetzt, wenn der Bogen die Bearbeitung einer gespeicherten Vorlage ist
+   * („Bearbeiten" auf der Vorlagenkarte). Dann ist „Vorlage aktualisieren" die
+   * Hauptaktion — ein Einsatzbogen soll hier gar nicht erst entstehen — und
+   * „Als Vorlage speichern" wird zu „Als neue Vorlage speichern".
+   */
+  vorlageBearbeitung?: { name: string; onAktualisieren: () => void };
   /** Signaturstatus des importierten Transports (Herkunft), falls der Bogen gescannt wurde. */
   signatur?: SignaturStatus | null;
   /**
@@ -92,10 +99,12 @@ export function Uebersicht(props: {
 
   async function alsVorlageSpeichern() {
     const name = await frageText({
-      titel: "Als Vorlage speichern",
+      titel: props.vorlageBearbeitung ? "Als neue Vorlage speichern" : "Als Vorlage speichern",
       label: "Name der Vorlage",
-      vorgabe: einheitAnzeigename(bogen.einheit),
-      hinweis: "Die Vorlage bleibt auf diesem Gerät und lässt sich für den nächsten Einsatz mustern.",
+      vorgabe: props.vorlageBearbeitung ? "" : einheitAnzeigename(bogen.einheit),
+      hinweis: props.vorlageBearbeitung
+        ? `Legt eine zweite Vorlage neben „${props.vorlageBearbeitung.name}" an; die bleibt, wie sie war.`
+        : "Die Vorlage bleibt auf diesem Gerät und lässt sich für den nächsten Einsatz mustern.",
       ok: "Vorlage speichern",
     });
     if (name == null) return;
@@ -371,7 +380,13 @@ export function Uebersicht(props: {
               stehen als Nebenaktionen abgesetzt daneben, statt als vier
               gleichrangige Knöpfe um den Blick zu konkurrieren. */}
           <span className="uebersicht-aktionen">
-            {props.sammelAktion ? (
+            {props.vorlageBearbeitung ? (
+              // Vorlagen-Bearbeitung: das Ziel ist die gespeicherte Vorlage,
+              // nicht ein Empfänger — Übergabe und Sammlung treten zurück.
+              <button type="button" className="primaer" onClick={props.vorlageBearbeitung.onAktualisieren}>
+                Vorlage aktualisieren
+              </button>
+            ) : props.sammelAktion ? (
               <button type="button" className="primaer" onClick={props.sammelAktion.onUebernehmen}>
                 {props.sammelAktion.label}
               </button>
@@ -383,13 +398,15 @@ export function Uebersicht(props: {
               </button>
             )}
             <span className="neben-aktionen">
-              {props.sammelAktion && (
+              {(props.sammelAktion || props.vorlageBearbeitung) && (
                 <button type="button" onClick={() => teilenDialog.current?.showModal()}>Bogen übergeben…</button>
               )}
-              {!props.sammelAktion && props.onInEinsatzAufnehmen && (
+              {!props.sammelAktion && !props.vorlageBearbeitung && props.onInEinsatzAufnehmen && (
                 <button type="button" onClick={props.onInEinsatzAufnehmen}>In Einsatz aufnehmen…</button>
               )}
-              <button type="button" onClick={alsVorlageSpeichern}>Als Vorlage speichern</button>
+              <button type="button" onClick={alsVorlageSpeichern}>
+                {props.vorlageBearbeitung ? "Als neue Vorlage speichern" : "Als Vorlage speichern"}
+              </button>
               <button type="button" onClick={() => void bogenVerwerfen()}>Neuer Bogen</button>
             </span>
           </span>

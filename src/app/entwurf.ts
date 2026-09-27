@@ -34,6 +34,13 @@ const ERSETZT_SCHLUESSEL = "eeb.entwurf.ersetzt.v1";
 export interface Entwurf {
   gespeichert: number; // Date.now()
   bogen: Erfassungsbogen;
+  /**
+   * Gesetzt, wenn der Bogen die Bearbeitung einer gespeicherten Vorlage ist
+   * („Bearbeiten" auf der Vorlagenkarte). Nur die Kennung — so findet die App
+   * nach einem Neustart wieder zu der Vorlage, in die „Vorlage aktualisieren"
+   * zurückschreibt. Fehlt = gewöhnlicher Arbeitsbogen.
+   */
+  vorlageId?: string;
 }
 
 // ------------------------------------------------- Serialisierung (rein)
@@ -54,11 +61,12 @@ export function entwurfAusJson(text: string | null): Entwurf | null {
   } catch {
     return null;
   }
+  if (typeof e.vorlageId !== "string" || !e.vorlageId) delete e.vorlageId;
   return e;
 }
 
-export function entwurfZuJson(bogen: Erfassungsbogen, gespeichert = Date.now()): string {
-  return JSON.stringify({ gespeichert, bogen });
+export function entwurfZuJson(bogen: Erfassungsbogen, gespeichert = Date.now(), vorlageId?: string): string {
+  return JSON.stringify(vorlageId ? { gespeichert, bogen, vorlageId } : { gespeichert, bogen });
 }
 
 /** Entwurf nach der Datenschutzfrist — anonymisiert, wenn sie abgelaufen ist. */
@@ -89,7 +97,7 @@ function ausSpeicherLaden(schluessel: string, jetzt: EebZeitpunkt): Entwurf | nu
   if (!e) return null;
   const nachFrist = entwurfNachFrist(e, jetzt);
   if (nachFrist !== e) {
-    const text = entwurfZuJson(nachFrist.bogen, nachFrist.gespeichert);
+    const text = entwurfZuJson(nachFrist.bogen, nachFrist.gespeichert, nachFrist.vorlageId);
     if (text !== roh) {
       try {
         s.setItem(schluessel, text);
@@ -101,9 +109,10 @@ function ausSpeicherLaden(schluessel: string, jetzt: EebZeitpunkt): Entwurf | nu
   return nachFrist;
 }
 
-export function entwurfSpeichern(bogen: Erfassungsbogen): void {
+/** `vorlageId`: der Bogen ist die Bearbeitung dieser gespeicherten Vorlage (siehe `Entwurf`). */
+export function entwurfSpeichern(bogen: Erfassungsbogen, vorlageId?: string): void {
   try {
-    speicher()?.setItem(SPEICHER_SCHLUESSEL, entwurfZuJson(bogen));
+    speicher()?.setItem(SPEICHER_SCHLUESSEL, entwurfZuJson(bogen, Date.now(), vorlageId));
   } catch {
     /* Speicher voll o. ä. — Autosave darf die Bearbeitung nie stören */
   }

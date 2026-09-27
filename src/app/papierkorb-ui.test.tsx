@@ -92,7 +92,7 @@ describe("Papierkorb der Vorlagen", () => {
     vorlageLoeschen(v.id);
     render(
       <>
-        <VorlagenListe vorlagen={vorlagenLaden()} onMustern={() => {}} onGeaendert={() => {}} />
+        <VorlagenListe vorlagen={vorlagenLaden()} onMustern={() => {}} onBearbeiten={() => {}} onGeaendert={() => {}} />
         <Dialogschicht />
       </>,
     );

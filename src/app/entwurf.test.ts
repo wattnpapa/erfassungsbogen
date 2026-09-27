@@ -79,6 +79,21 @@ describe("Speichern/Laden/Verwerfen über localStorage", () => {
     entwurfVerwerfen();
     expect(entwurfLaden()).toBeNull();
   });
+
+  it("merkt sich die bearbeitete Vorlage — und lässt sie weg, wenn es keine gibt", () => {
+    const b = neuerBogen();
+    entwurfSpeichern(b, "vorlage-7");
+    expect(entwurfLaden()?.vorlageId).toBe("vorlage-7");
+    entwurfSpeichern(b);
+    expect(entwurfLaden()?.vorlageId).toBeUndefined();
+    expect(localStorage.getItem("eeb.entwurf.v1")).not.toMatch(/vorlageId/);
+  });
+
+  it("verwirft eine unbrauchbare Vorlagen-Kennung statt des ganzen Entwurfs", () => {
+    const e = entwurfAusJson(JSON.stringify({ gespeichert: 1, bogen: neuerBogen(), vorlageId: 42 }));
+    expect(e).not.toBeNull();
+    expect(e?.vorlageId).toBeUndefined();
+  });
 });
 
 describe("Datenschutzfrist", () => {
@@ -103,10 +118,13 @@ describe("Datenschutzfrist", () => {
   }
 
   it("anonymisiert einen abgelaufenen Entwurf beim Laden und überschreibt ihn im Speicher", () => {
-    entwurfSpeichern(bogenMitPerson());
+    entwurfSpeichern(bogenMitPerson(), "vorlage-9");
     const e = entwurfLaden((2000 + 90) * MINUTEN_JE_TAG);
     expect(e?.bogen.personal[0]!.nachname).toBe(`${ANONYM_BEZEICHNUNG} 1`);
     expect(localStorage.getItem("eeb.entwurf.v1")).not.toMatch(/Anna|Berger/);
+    // Die Verbindung zur Vorlage überlebt das Überschreiben im Speicher.
+    expect(e?.vorlageId).toBe("vorlage-9");
+    expect(entwurfLaden((2000 + 90) * MINUTEN_JE_TAG)?.vorlageId).toBe("vorlage-9");
   });
 
   it("lässt einen Entwurf in der Frist und einen Übungsentwurf unangetastet", () => {

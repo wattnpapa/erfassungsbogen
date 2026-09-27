@@ -237,6 +237,24 @@ export function vorlageAnlegen(name: string, bogen: Erfassungsbogen): Vorlage {
   return v;
 }
 
+/**
+ * Bogen einer bestehenden Vorlage ersetzen („Bearbeiten" auf der Vorlagenkarte:
+ * Vorlage → Assistent → „Vorlage aktualisieren"). Der Bogen wird wie beim
+ * Anlegen einsatzfrei normalisiert. Liegt die Vorlage inzwischen im Papierkorb,
+ * holt die Aktualisierung sie zurück — wer sie gerade ändert, will sie
+ * behalten. Liefert die aktualisierte Vorlage, oder null, wenn es sie nicht
+ * mehr gibt (endgültig gelöscht).
+ */
+export function vorlageAktualisieren(id: string, bogen: Erfassungsbogen): Vorlage | null {
+  const liste = alleVorlagenLaden();
+  const alt = liste.find((v) => v.id === id);
+  if (!alt) return null;
+  const { geloeschtAm: _, ...rest } = alt;
+  const neu: Vorlage = { ...rest, bogen: bogenAlsVorlage(bogen), geaendert: Date.now() };
+  vorlagenSpeichern(liste.map((v) => (v.id === id ? neu : v)));
+  return neu;
+}
+
 export function vorlageUmbenennen(id: string, name: string): void {
   vorlagenSpeichern(
     alleVorlagenLaden().map((v) =>

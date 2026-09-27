@@ -23,6 +23,13 @@
 > **Nachgezogen 2026-09-23:** „Vorlage teilen" (Issue #26) — QR/Link mit dem
 > schon vorhandenen Vorlagen-Marker `V.` und eine Vorlagen-Datei
 > (`eeb-vorlage`, JSON), eingelesen über „Aus Datei laden…" — Kapitel 5 und 8.2.
+>
+> **Nachgezogen 2026-09-27:** „Vorlage bearbeiten" — der Bogen einer
+> gespeicherten Vorlage läuft durch den Assistenten und wird mit „Vorlage
+> aktualisieren" in dieselbe Vorlage zurückgeschrieben (`vorlageAktualisieren`
+> in `vorlagen.ts`); der Entwurf trägt dafür die Vorlagen-Kennung
+> (`Entwurf.vorlageId`, `entwurf.ts`). Bis dahin ließ sich eine Vorlage nur
+> durch „Als Vorlage speichern" plus Löschen der alten ersetzen — Kapitel 5.
 
 ---
 
@@ -692,7 +699,7 @@ war und ältere Angaben (z. B. „CC0") geprüft werden sollten.
 | QR/Foto/USB-Scanner einlesen | `qr-scanner-web.tsx`, `qr-stapel.ts`, `qr-boegen.ts`, `tastaturbelegung.ts` |
 | Einsatz-Sammlung/Meldekopf | `einsaetze-ui.tsx`, `@bos/meldekopf/*`, `auswertung.ts` |
 | CSV-/Excel-Export | `bogen-csv.ts`, `einsatz-csv.ts`, `oldenburg-xlsx.ts` |
-| Vorlagen & Musterung, Vorlage teilen | `vorlagen.ts`, `vorlagen-ui.tsx`, `vorlageTransportErzeugen` in `hilfen.ts` |
+| Vorlagen & Musterung, Vorlage bearbeiten/teilen | `vorlagen.ts` (`vorlageAktualisieren`), `vorlagen-ui.tsx`, `vorlageBearbeiten` in `app.tsx`, `vorlageTransportErzeugen` in `hilfen.ts` |
 | Signatur/Herkunft | `@bos/eeb-format/signatur`, `absenderkarte.ts`, `geraete-schluessel.ts` |
 | Offline-Betrieb (PWA) | `vite.config.ts` (VitePWA), `aktualisierung.tsx` |
 | Desktop-Auto-Update | `electron/main.js`, `electron-updater` |
