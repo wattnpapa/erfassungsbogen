@@ -155,6 +155,16 @@ describe("einheitenSortieren", () => {
     expect(ids(eingabe)).toEqual(["a", "b", "c"]);
   });
 
+  it("ordnet nach der korrigierten Eintreffzeit, nicht nach dem Empfangsmoment", () => {
+    // Nachgetragener Papierstapel: alle in derselben Minute erfasst, aber
+    // Zwickau kam laut Zettel zuerst.
+    const stapel = [
+      eintrag("x", bogen(OrganisationsTyp.THW, "Zwickau", "FGr N"), { empfangenAm: 9000, eingetroffenAm: 100 }),
+      eintrag("y", bogen(OrganisationsTyp.THW, "Aurich", "FGr N"), { empfangenAm: 9000, eingetroffenAm: 200 }),
+    ];
+    expect(ids(einheitenSortieren(stapel, "eintreffzeit"))).toEqual(["y", "x"]);
+  });
+
   it("ordnet bei gleicher Eintreffzeit stabil nach Name", () => {
     const gleichzeitig = [
       eintrag("x", bogen(OrganisationsTyp.THW, "Zwickau", "FGr N"), { empfangenAm: 500 }),

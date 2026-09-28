@@ -7,8 +7,17 @@
 import { describe, it, expect } from "vitest";
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { useState } from "react";
 import { SchrittBuehne } from "../../test/schritt-buehne";
-import { OrganisationsTyp } from "@bos/eeb-format/model";
+import { Dialogschicht } from "../dialoge";
+import {
+  Ernaehrung,
+  Geschlecht,
+  KontaktArt,
+  OrganisationsTyp,
+  StaerkeRolle,
+  type Erfassungsbogen,
+} from "@bos/eeb-format/model";
 import { neuePerson, neuerBogen } from "../hilfen";
 import { SchrittPersonal, kraftfahrerHinweis } from "./personal";
 import { stanPersonalVorbelegung } from "@bos/vokabulare/thw-stan-personal";
@@ -636,8 +645,8 @@ describe("Personal umsortieren", () => {
     expect(vornamen()).toEqual(["Carla", "Anna", "Bernd"]);
     // Die Marke sitzt an der Karte, die jetzt oben steht.
     const oberste = screen.getAllByLabelText("Vorname")[0]!.closest(".karte")!;
-    expect(within(oberste as HTMLElement).getByText("Ansprechpartner/in")).toBeDefined();
-    expect(screen.getAllByText("Ansprechpartner/in")).toHaveLength(1);
+    expect(within(oberste as HTMLElement).getByText("Erreichbar für Rückfragen")).toBeDefined();
+    expect(screen.getAllByText("Erreichbar für Rückfragen")).toHaveLength(1);
   });
 
   it("sortiert auch in der Schnelleingabe-Tabelle", async () => {
@@ -679,5 +688,278 @@ describe("Personal umsortieren", () => {
 
     expect(screen.queryByRole("button", { name: /nach oben$/ })).toBeNull();
     expect(screen.queryByRole("button", { name: /nach unten$/ })).toBeNull();
+  });
+});
+
+/**
+ * Die Schnelleingabe-Tabelle löschte ohne Rückfrage — in der Karte fragte
+ * derselbe Vorgang mit Namen nach. Hier wiegt es mehr: Qualifikationen und
+ * Erreichbarkeiten sieht man in der Tabelle gar nicht, und der Knopf liegt
+ * am rechten Rand neben den Sortierpfeilen.
+ */
+describe("Schnelleingabe-Tabelle — Person entfernen", () => {
+  const mitJan = () => ({ ...neuerBogen(), personal: [{ ...neuePerson(), vorname: "Jan", nachname: "Meyer" }, neuePerson()] });
+
+  it("fragt in der Tabelle vor dem Entfernen einer ausgefüllten Person nach", async () => {
+    const nutzer = userEvent.setup();
+    render(<SchrittBuehne komponente={SchrittPersonal} bogen={mitJan()} />);
+    await nutzer.click(screen.getByLabelText("Schnelleingabe (Tabelle)"));
+
+    await nutzer.click(screen.getByRole("button", { name: "Meyer, Jan entfernen" }));
+
+    const dialog = document.querySelector<HTMLDialogElement>("dialog[aria-label='Meyer, Jan entfernen?']")!;
+    expect(dialog).not.toBeNull();
+    await nutzer.click(within(dialog).getByRole("button", { name: "Abbrechen" }));
+    expect(within(screen.getByRole("table")).getAllByRole("row")).toHaveLength(3);
+
+    await nutzer.click(screen.getByRole("button", { name: "Meyer, Jan entfernen" }));
+    const zweiter = document.querySelector<HTMLDialogElement>("dialog[aria-label='Meyer, Jan entfernen?']")!;
+    await nutzer.click(within(zweiter).getByRole("button", { name: "Person entfernen" }));
+    expect(within(screen.getByRole("table")).getAllByRole("row")).toHaveLength(2);
+  });
+
+  it("entfernt eine leere Zeile ohne Rückfrage", async () => {
+    const nutzer = userEvent.setup();
+    render(<SchrittBuehne komponente={SchrittPersonal} bogen={mitJan()} />);
+    await nutzer.click(screen.getByLabelText("Schnelleingabe (Tabelle)"));
+
+    await nutzer.click(screen.getByRole("button", { name: "Person 2 entfernen" }));
+
+    expect(document.querySelector("dialog.abfrage")).toBeNull();
+    expect(within(screen.getByRole("table")).getAllByRole("row")).toHaveLength(2);
+  });
+});
+
+/**
+ * „Nur Stärke" setzte bei vier erfassten Personen die gemeldete Stärke auf
+ * 0/0/0/0, während die Karten darunter stehen blieben — der Bogen ging so an
+ * den Meldekopf. Jetzt startet die manuelle Stärke mit der abgeleiteten, und
+ * bei vorhandenem Personal wird vorher gefragt.
+ */
+describe("Umschalten auf „Nur Stärke“", () => {
+  const vier = () => ({
+    ...neuerBogen(),
+    personal: [
+      { ...neuePerson(), vorname: "Anna", nachname: "Albers", staerkeRolle: StaerkeRolle.FUEHRER, ernaehrung: Ernaehrung.VEGETARISCH },
+      { ...neuePerson(), vorname: "Bernd", nachname: "Bruns", staerkeRolle: StaerkeRolle.UNTERFUEHRER, geschlecht: Geschlecht.W },
+      { ...neuePerson(), vorname: "Carla", nachname: "Claus" },
+      { ...neuePerson(), vorname: "Dirk", nachname: "Dahl" },
+    ],
+  });
+
+  it("fragt bei erfasstem Personal nach und bleibt bei Abbruch in der Vollerfassung", async () => {
+    const nutzer = userEvent.setup();
+    render(<SchrittBuehne komponente={SchrittPersonal} bogen={vier()} />);
+
+    await nutzer.click(screen.getByLabelText("Nur Stärke (Meldekopf-Schnellerfassung)"));
+
+    const dialog = document.querySelector<HTMLDialogElement>("dialog[aria-label='Nur die Stärke melden?']")!;
+    expect(dialog).not.toBeNull();
+    expect(dialog.textContent).toContain("4 erfasste Personen zählen dann nicht mehr");
+    await nutzer.click(within(dialog).getByRole("button", { name: "Abbrechen" }));
+
+    expect((screen.getByLabelText("Personal vollständig erfassen") as HTMLInputElement).checked).toBe(true);
+    expect(screen.getByLabelText("Stärke: 1 Führer, 1 Unterführer, 2 Mannschaft, 4 gesamt")).toBeDefined();
+  });
+
+  it("belegt Stärke, Unterbringung und Verpflegung mit den abgeleiteten Zahlen vor und kennzeichnet die Karten als nicht gezählt", async () => {
+    const nutzer = userEvent.setup();
+    render(<SchrittBuehne komponente={SchrittPersonal} bogen={vier()} />);
+
+    await nutzer.click(screen.getByLabelText("Nur Stärke (Meldekopf-Schnellerfassung)"));
+    const dialog = document.querySelector<HTMLDialogElement>("dialog[aria-label='Nur die Stärke melden?']")!;
+    await nutzer.click(within(dialog).getByRole("button", { name: "Nur Stärke melden" }));
+
+    expect((screen.getByLabelText("Führer") as HTMLInputElement).value).toBe("1");
+    expect((screen.getByLabelText("Unterführer") as HTMLInputElement).value).toBe("1");
+    expect((screen.getByLabelText("Mannschaft") as HTMLInputElement).value).toBe("2");
+    expect((screen.getByLabelText("Gesamt") as HTMLInputElement).value).toBe("4");
+    expect((screen.getByLabelText("W") as HTMLInputElement).value).toBe("1");
+    expect((screen.getByLabelText("vegetarisch") as HTMLInputElement).value).toBe("1");
+    expect(screen.getByText(/1 von 4 vegetarisch\/vegan/)).toBeDefined();
+    // Die Namen bleiben — als nicht gezählte Erreichbarkeiten.
+    expect(screen.getAllByLabelText("Vorname")).toHaveLength(4);
+    expect(screen.getByText("Person 1 von 4 · nicht gezählt")).toBeDefined();
+    expect(screen.getByText(/Diese 4 Personen zählen nicht in die Stärke/)).toBeDefined();
+  });
+
+  it("schaltet ohne Personal ohne Rückfrage um", async () => {
+    const nutzer = userEvent.setup();
+    buehne();
+
+    await nutzer.click(screen.getByLabelText("Nur Stärke (Meldekopf-Schnellerfassung)"));
+
+    expect(document.querySelector("dialog.abfrage")).toBeNull();
+    expect((screen.getByLabelText("Gesamt") as HTMLInputElement).value).toBe("0");
+  });
+
+  /** „1 von 0 vegetarisch" war ein Bruch, keine Auskunft — der Widerspruch wird benannt. */
+  it("nennt einen Widerspruch zwischen Verpflegung und Gesamtstärke statt „1 von 0“", async () => {
+    const nutzer = userEvent.setup();
+    buehne();
+    await nutzer.click(screen.getByLabelText("Nur Stärke (Meldekopf-Schnellerfassung)"));
+
+    await nutzer.click(screen.getByRole("button", { name: "vegetarisch: erhöhen" }));
+
+    expect(screen.queryByText(/1 von 0/)).toBeNull();
+    expect(screen.getByText(/1 vegetarisch\/vegan — mehr als die Gesamtstärke 0/)).toBeDefined();
+  });
+});
+
+/** Rückfrage-Regel an der Erreichbarkeit: die Rufnummer ist, worüber der Meldekopf zurückruft. */
+describe("Erreichbarkeit entfernen", () => {
+  const mitNummer = () => ({
+    ...neuerBogen(),
+    personal: [
+      {
+        ...neuePerson(),
+        vorname: "Sabine",
+        nachname: "Lang",
+        kontakte: [
+          { art: KontaktArt.MOBIL, dienstlich: true, wert: "01701234567" },
+          { art: KontaktArt.MOBIL, dienstlich: false, wert: "" },
+        ],
+      },
+    ],
+  });
+
+  it("fragt vor dem Entfernen einer Nummer nach und nennt sie", async () => {
+    const nutzer = userEvent.setup();
+    render(<SchrittBuehne komponente={SchrittPersonal} bogen={mitNummer()} />);
+
+    await nutzer.click(screen.getByRole("button", { name: "Erreichbarkeit 01701234567 entfernen" }));
+
+    const dialog = document.querySelector<HTMLDialogElement>("dialog[aria-label='Erreichbarkeit 01701234567 entfernen?']")!;
+    expect(dialog).not.toBeNull();
+    await nutzer.click(within(dialog).getByRole("button", { name: "Abbrechen" }));
+    expect(screen.getByRole("button", { name: "Erreichbarkeit 01701234567 entfernen" })).toBeDefined();
+
+    await nutzer.click(screen.getByRole("button", { name: "Erreichbarkeit 01701234567 entfernen" }));
+    const zweiter = document.querySelector<HTMLDialogElement>("dialog[aria-label='Erreichbarkeit 01701234567 entfernen?']")!;
+    await nutzer.click(within(zweiter).getByRole("button", { name: "Erreichbarkeit entfernen" }));
+    expect(screen.queryByRole("button", { name: "Erreichbarkeit 01701234567 entfernen" })).toBeNull();
+  });
+
+  it("entfernt eine leere Erreichbarkeit ohne Rückfrage", async () => {
+    const nutzer = userEvent.setup();
+    render(<SchrittBuehne komponente={SchrittPersonal} bogen={mitNummer()} />);
+
+    await nutzer.click(screen.getByRole("button", { name: "Erreichbarkeit 2 (leer) entfernen" }));
+
+    expect(document.querySelector("dialog.abfrage")).toBeNull();
+    expect(screen.queryByRole("button", { name: "Erreichbarkeit 2 (leer) entfernen" })).toBeNull();
+  });
+});
+
+/**
+ * Die Vorbelegung aus Schritt 1 (StAN-Sollplätze) muss sich auf Schritt 3
+ * wieder loswerden lassen, ohne 13-mal „entfernen" — und ohne die Karten zu
+ * treffen, die schon jemand ausgefüllt hat.
+ */
+describe("Vorbelegung entfernen (Schritt 3)", () => {
+  it("entfernt nur die Karten ohne Namen und Erreichbarkeit", async () => {
+    const nutzer = userEvent.setup();
+    const einheitsTyp = { code: 4 };
+    const bogen = neuerBogen();
+    const vorlage = stanPersonalVorbelegung(bogen.einheit.organisation, einheitsTyp);
+    render(
+      <SchrittBuehne
+        komponente={SchrittPersonal}
+        bogen={{
+          ...bogen,
+          einheit: { ...bogen.einheit, einheitsTyp },
+          personal: [
+            { ...vorlage[0]!, vorname: "Jan", nachname: "Meyer" },
+            { ...vorlage[1]!, kontakte: [{ art: KontaktArt.MOBIL, dienstlich: true, wert: "0170" }] },
+            ...vorlage.slice(2),
+          ],
+        }}
+      />,
+    );
+
+    await nutzer.click(screen.getByRole("button", { name: `Vorbelegung entfernen (${vorlage.length - 2} Personen ohne Namen)` }));
+
+    expect(screen.getAllByLabelText("Vorname")).toHaveLength(2);
+    expect(screen.queryByRole("button", { name: /^Vorbelegung entfernen/ })).toBeNull();
+  });
+
+  it("zeigt den Knopf nicht, wenn alle Karten benannt sind", () => {
+    render(
+      <SchrittBuehne
+        komponente={SchrittPersonal}
+        bogen={{ ...neuerBogen(), personal: [{ ...neuePerson(), vorname: "Jan", nachname: "Meyer" }] }}
+      />,
+    );
+
+    expect(screen.queryByRole("button", { name: /^Vorbelegung entfernen/ })).toBeNull();
+  });
+});
+
+/** Auf Schritt 3 stehen nur die Hinweise zu Schritt 3 — Zugehörigkeit und Auftrag gehören woandershin. */
+describe("Schritt Personal — nur eigene Hinweise", () => {
+  it("zeigt weder den fehlenden Einheitsnamen noch den leeren Auftrag", () => {
+    buehne();
+
+    expect(screen.getByText(/Stärke ist 0/)).toBeDefined();
+    expect(screen.queryByText(/Name der eigenen Einheit/)).toBeNull();
+    expect(screen.queryByText(/Ort\/Auftrag/)).toBeNull();
+  });
+
+  it("stutzt bei einem Zahlendreher in der Stärke", async () => {
+    const nutzer = userEvent.setup();
+    buehne();
+    await nutzer.click(screen.getByLabelText("Nur Stärke (Meldekopf-Schnellerfassung)"));
+
+    await nutzer.type(screen.getByLabelText("Führer"), "99");
+    await nutzer.type(screen.getByLabelText("Mannschaft"), "1");
+
+    expect(screen.getByText(/99 Führer — stimmt das\?/)).toBeDefined();
+    expect(screen.getByText(/mehr Führer als Mannschaft — stimmt das\?/)).toBeDefined();
+  });
+});
+
+/**
+ * Verpflegung wurde doppelt geführt: Nach dem Entfernen einer Person blieb der
+ * Bedarf in Schritt 5 bei 4 und musste von Hand nachgezogen werden. Jetzt
+ * folgt er der Stärke, solange er ihr entsprach.
+ */
+describe("Verpflegung zieht mit der Stärke mit", () => {
+  function Ableseleiste({ start }: { start: Erfassungsbogen }) {
+    const [bogen, setBogen] = useState(start);
+    return (
+      <>
+        <SchrittPersonal bogen={bogen} aendern={(patch) => setBogen((b) => ({ ...b, ...patch }))} />
+        <output data-testid="verpflegung">{bogen.sofortbedarf?.verpflegungPersonen}</output>
+        <Dialogschicht />
+      </>
+    );
+  }
+  const sofortbedarf = (verpflegungPersonen: number) => ({
+    verpflegungPersonen,
+    dieselLiter: 0,
+    benzinLiter: 0,
+    gemischLiter: 0,
+    unterbringung: false,
+    ruhezeitErforderlich: false,
+  });
+
+  it("zieht den Bedarf nach, wenn er der Stärke entsprach", async () => {
+    const nutzer = userEvent.setup();
+    render(<Ableseleiste start={{ ...neuerBogen(), personal: [neuePerson(), neuePerson()], sofortbedarf: sofortbedarf(2) }} />);
+
+    await nutzer.click(screen.getByRole("button", { name: "+ Person hinzufügen" }));
+    expect(screen.getByTestId("verpflegung").textContent).toBe("3");
+
+    await nutzer.click(screen.getByRole("button", { name: "Person 3 entfernen" }));
+    expect(screen.getByTestId("verpflegung").textContent).toBe("2");
+  });
+
+  it("lässt einen bewusst abweichenden Bedarf stehen", async () => {
+    const nutzer = userEvent.setup();
+    render(<Ableseleiste start={{ ...neuerBogen(), personal: [neuePerson(), neuePerson()], sofortbedarf: sofortbedarf(5) }} />);
+
+    await nutzer.click(screen.getByRole("button", { name: "+ Person hinzufügen" }));
+
+    expect(screen.getByTestId("verpflegung").textContent).toBe("5");
   });
 });

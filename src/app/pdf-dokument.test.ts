@@ -23,7 +23,7 @@ import {
   type Erfassungsbogen,
 } from "@bos/eeb-format/model";
 import type { QrSatz } from "./hilfen";
-import { EEB_JSON_DATEINAME, bogenAlsEingebetteteDatei, einsatzPdfDokument, pdfDokument } from "./pdf-dokument";
+import { EEB_JSON_DATEINAME, bogenAlsEingebetteteDatei, einsatzLageblattDokument, einsatzPdfDokument, pdfDokument } from "./pdf-dokument";
 
 const QR_BILD = "data:image/png;base64,QRTESTBILD";
 const QR_URL = "https://erfassungsbogen.app/#TESTPAYLOAD";
@@ -385,8 +385,60 @@ describe("einsatzPdfDokument()", () => {
         { bogen: basisBogen(), qr: QR },
       ]).content,
     ).join("\n");
-    expect(t).toContain("Summe (2 Einheiten)");
+    expect(t).toContain("Summe (2 zählend)");
     expect(t).toContain("2 / 0 / 2 / 4");
+  });
+
+  it("führt abgerückte Einheiten in einem eigenen Block mit Zeiten auf und zählt sie nicht", () => {
+    // Papier und eingebettete Datei müssen dasselbe sagen: Crailsheim war da
+    // und ist wieder weg — auf dem Blatt stand davon bisher nichts (A1).
+    const eingetroffen = new Date("2026-09-26T09:40").getTime();
+    const abgerueckt = new Date("2026-09-27T15:10").getTime();
+    const t = texte(
+      einsatzPdfDokument("Lage", [
+        { bogen: basisBogen(), qr: QR, eingetroffenAm: eingetroffen, notiz: "Deichabschnitt Nord" },
+        { bogen: basisBogen(), qr: QR, eingetroffenAm: eingetroffen, abgerueckAm: abgerueckt, abgerueckt: true },
+      ]).content,
+    ).join("\n");
+    expect(t).toContain("Eingetroffen");
+    expect(t).toContain("Abgerückt (1)");
+    expect(t).toContain("26.09.2026, 09:40");
+    expect(t).toContain("27.09.2026, 15:10");
+    expect(t).toContain("Auftrag / Notiz");
+    expect(t).toContain("Deichabschnitt Nord");
+    expect(t).toContain("Summe (1 zählend · 1 abgerückt)");
+    // Stärke und Bedarf nur über die zählende Einheit.
+    expect(t).toContain("1 / 0 / 1 / 2");
+    expect(t).toContain("Bedarf gesamt (1 Einheiten, 2 Personen)");
+    // Beide Bögen hängen trotzdem an — „alle Bögen" heißt alle.
+    const umbrueche = (einsatzPdfDokument("Lage", [
+      { bogen: basisBogen(), qr: QR },
+      { bogen: basisBogen(), qr: QR, abgerueckt: true },
+    ]).content as { pageBreak?: string }[]).filter((c) => c && c.pageBreak === "before");
+    expect(umbrueche).toHaveLength(2);
+  });
+
+  it("kennzeichnet eine nicht zählende Übung und rechnet ohne sie", () => {
+    const u = basisBogen();
+    u.uebung = true;
+    const t = texte(
+      einsatzPdfDokument("Lage", [
+        { bogen: basisBogen(), qr: QR },
+        { bogen: u, qr: QR, zaehlt: false },
+      ]).content,
+    ).join("\n");
+    expect(t).toContain("zählt nicht in diese Lage");
+    expect(t).toContain("Summe (1 zählend · 1 Übung)");
+  });
+
+  it("erzeugt auch ohne eine einzige Meldung ein Dokument", () => {
+    // Am Einsatzende sind alle abgerückt — die Datei ist dann die Übergabe
+    // ans Archiv und darf sich nicht verweigern (W2).
+    const dd = einsatzPdfDokument("Lage", [], "{}");
+    const t = texte(dd.content).join("\n");
+    expect(t).toContain("Übergabe-Übersicht: Lage");
+    expect(t).toContain("Summe (0 zählend)");
+    expect(dd.files).toBeDefined();
   });
 
   it("legt die Übersicht quer und schaltet ab dem ersten Bogen zurück ins Hochformat", () => {
@@ -433,5 +485,32 @@ describe("einsatzPdfDokument()", () => {
     expect(t).toContain("Zwischensummen nach Zug");
     expect(t.indexOf("1. Zug")).toBeLessThan(t.indexOf("2. Zug"));
     expect(t.indexOf("2. Zug")).toBeLessThan(t.indexOf("Ohne Zug"));
+  });
+});
+
+describe("einsatzLageblattDokument()", () => {
+  it("liefert nur die Übersichtsseite quer — ohne Bögen, QR und Anhang", () => {
+    const dd = einsatzLageblattDokument("Hochwasser", [
+      { bogen: basisBogen(), eingetroffenAm: new Date("2026-09-27T09:40").getTime() },
+      { bogen: basisBogen(), zugEtikett: "1. Zug" },
+    ], new Date("2026-09-27T20:19").getTime());
+    const t = texte(dd.content).join("\n");
+    expect(dd.pageOrientation).toBe("landscape");
+    expect(t).toContain("Lageblatt: Hochwasser");
+    expect(t).toContain("Erstellt 27.09.2026, 20:19");
+    expect(t).toContain("27.09.2026, 09:40");
+    expect(t).toContain("Bedarf gesamt (2 Einheiten, 4 Personen)");
+    expect(t).toContain("Zwischensummen nach Zug");
+    // Kein Bogen, kein QR-Code, keine eingebettete Datei.
+    expect(t).not.toContain("Erfassungsbogen FGr K (A)");
+    expect(t).not.toContain(QR_BILD);
+    expect(dd.files).toBeUndefined();
+    expect((dd.content as { pageBreak?: string }[]).some((c) => c && c.pageBreak === "before")).toBe(false);
+  });
+
+  it("sagt auf einem leeren Blatt, dass noch nichts gemeldet ist", () => {
+    const t = texte(einsatzLageblattDokument("Lage", []).content).join("\n");
+    expect(t).toContain("Noch keine Einheit gemeldet.");
+    expect(t).toContain("Summe (0 zählend)");
   });
 });

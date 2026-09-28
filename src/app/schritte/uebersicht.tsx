@@ -12,7 +12,6 @@ import {
   staerke,
   unterbringungMWD,
   verpflegung,
-  zeitpunktZuIso,
 } from "@bos/eeb-format/model";
 import { vorlageAnlegen } from "../vorlagen";
 import { TabellenScroll } from "../tabellen-scroll";
@@ -31,11 +30,13 @@ import {
   funktionsText,
   kennzeichenText,
   kontaktText,
+  natoZeitstempel,
   orgLabel,
   pruefpunkte,
   qrErzeugen,
   vokabText,
   vokabularFuer,
+  zeitpunktDeutsch,
 } from "../hilfen";
 import { debugAktiv } from "../debug-plattform";
 import { bogenCsvInhalt } from "../bogen-csv";
@@ -126,6 +127,11 @@ export function Uebersicht(props: {
   const [qr, setQr] = useState<QrSatz | null>(null);
   const [fehler, setFehler] = useState("");
   const [pdfLaeuft, setPdfLaeuft] = useState(false);
+  // Quittung nach „PDF erzeugen": der Browser zeigt den Download oft nur kurz
+  // oder gar nicht (Telefon), die App sagte nichts — also wurde ein zweites
+  // Mal getippt und die Mail an den Meldekopf trug zwei Anhänge. Steht bis
+  // zum nächsten PDF oder bis der Dialog geschlossen wird.
+  const [pdfQuittung, setPdfQuittung] = useState("");
   // Vollbild-QR zum Vorzeigen (Handy-zu-Tablet-Scan ohne Papier); bei
   // Segmentierung blättert `vollbildTeil` durch die Teile.
   const [vollbild, setVollbild] = useState(false);
@@ -351,10 +357,24 @@ export function Uebersicht(props: {
   async function pdf() {
     setPdfLaeuft(true);
     setFehler("");
+    setPdfQuittung("");
+    // Der Dateiname wird HIER gebildet und an pdfErzeugen übergeben, nicht
+    // dort erraten: so nennt die Quittung genau die Datei, die entstanden ist
+    // — auch wenn der Minutenwechsel des Zeitstempels dazwischenfällt. Die
+    // Bauart (eeb-<NATO-Zeit>_<Einheit>.pdf) ist dieselbe wie in pdf.ts.
+    const dateiname = `eeb-${natoZeitstempel()}_${bogenDateiname(bogen)}.pdf`;
     try {
       const { pdfErzeugen } = await import("../pdf");
-      await pdfErzeugen(bogen, undefined, props.herkunft);
+      await pdfErzeugen(bogen, dateiname, props.herkunft);
+      // In der App gibt es keinen Download: die PDF ging ins Teilen-Fenster
+      // des Systems — dort heißt „fertig" etwas anderes als im Browser.
+      setPdfQuittung(
+        istNativ()
+          ? `PDF erstellt und im Teilen-Fenster übergeben: ${dateiname}`
+          : `PDF gespeichert: ${dateiname} — liegt im Download-Ordner des Browsers.`,
+      );
     } catch (e) {
+      if (e instanceof Error && e.name === "AbortError") return; // Abbruch im Teilen-Fenster
       setFehler(`PDF: ${fehlerText(e)}`);
     } finally {
       setPdfLaeuft(false);
@@ -498,9 +518,9 @@ export function Uebersicht(props: {
           <dt>Ort / Auftrag</dt><dd>{bogen.einsatz.ortAuftrag || "—"}</dd>
           <dt>Beginn / Ende</dt>
           <dd>
-            {bogen.einsatz.einsatzbeginn != null ? zeitpunktZuIso(bogen.einsatz.einsatzbeginn).replace("T", " ") : "—"}
+            {bogen.einsatz.einsatzbeginn != null ? zeitpunktDeutsch(bogen.einsatz.einsatzbeginn) : "—"}
             {" / "}
-            {bogen.einsatz.einsatzende != null ? zeitpunktZuIso(bogen.einsatz.einsatzende).replace("T", " ") : "—"}
+            {bogen.einsatz.einsatzende != null ? zeitpunktDeutsch(bogen.einsatz.einsatzende) : "—"}
           </dd>
         </dl>
       ))}
@@ -717,12 +737,20 @@ export function Uebersicht(props: {
               hat signiert", nicht Kurvenname und Byte-Zahl. „Echtheits-Siegel"
               bleibt der Leitbegriff (auch auf der Startseite); Ed25519 & Co.
               stehen nur noch unter „Was das Siegel belegt". */}
+          {/* Die Kurzform (Hex-Ziffern) steht im Aufklapper: in der Karte las
+              sie sich wie etwas, das man abschreiben oder vergleichen müsste,
+              an der Stelle, an der nur der QR-Code gezeigt werden soll (Audit
+              „Neuer Nutzer", F7). Gebraucht wird sie beim Abgleich mit der
+              Gegenstelle — dafür ist sie einen Tipp entfernt. */}
           <p className="hinweis">
-            {qr?.weitergeleitet ? "Gegengezeichnet" : "Signiert"} mit dem Echtheits-Siegel dieses
-            Geräts: <strong>{schluesselKurz ?? "Schlüssel wird erzeugt…"}</strong>
+            {qr?.weitergeleitet ? "Gegengezeichnet" : "Signiert"} mit dem Echtheits-Siegel dieses Geräts.
           </p>
           <details className="signatur-detail">
             <summary>Was das Siegel belegt</summary>
+            <p className="hinweis">
+              Kurzform des Siegels: <strong>{schluesselKurz ?? "Schlüssel wird erzeugt…"}</strong> — die
+              Gegenstelle sieht dieselben Zeichen beim Einlesen.
+            </p>
             <p className="hinweis">
               Es belegt Herkunft und Integrität, nicht die Identität — der private Schlüssel bleibt
               auf dem Gerät. Technisch eine Ed25519-Signatur (+97 Byte je Bogen){qr ? ` · Format EEB2C${stufenText(qr)}` : ""}.
@@ -741,7 +769,14 @@ export function Uebersicht(props: {
       </section>
       </div>
 
-      <dialog ref={teilenDialog} aria-label="Bogen übergeben" className="teilen-dialog">
+      <dialog
+        ref={teilenDialog}
+        aria-label="Bogen übergeben"
+        className="teilen-dialog"
+        // Beim nächsten Öffnen beginnt der Dialog ohne alte Quittung — sonst
+        // stünde „PDF gespeichert" von gestern unter einem frischen Bogen.
+        onClose={() => setPdfQuittung("")}
+      >
         <div className="kopfzeile">
           <h2>Bogen übergeben</h2>
           <button type="button" onClick={() => teilenDialog.current?.close()}>Schließen</button>
@@ -774,9 +809,12 @@ export function Uebersicht(props: {
           >
             QR-Code im Vollbild zeigen
           </button>
+          {/* Je Weg genau ein kurzer Satz: unter Stress wird der Text nicht
+              gelesen, aber er schiebt den nächsten Knopf nach unten — „PDF
+              erzeugen" lag nach zwei Erklärabsätzen außerhalb des Bildes. */}
           <p className="hinweis">
-            Vor Ort ohne Netz: Die Gegenstelle scannt den Code direkt vom Display
-            {qr?.segmentiert ? ` (${qr.teile.length} Teile nacheinander)` : ""}.
+            Die Gegenstelle scannt den Code vom Display
+            {qr?.segmentiert ? ` — ${qr.teile.length} Teile nacheinander` : ""}.
           </p>
         </div>
         {/* Handy zu Handy ohne Papier und ohne Kamera. Nur dort anbieten, wo es
@@ -787,9 +825,7 @@ export function Uebersicht(props: {
               {nahDienst ? `Per ${nahDienst} senden` : "An Gerät in der Nähe senden"}
             </button>
             <p className="hinweis">
-              Handy zu Handy: im Teilen-Fenster {nahDienst ?? "den Nahbereichs-Dienst"} wählen —
-              ohne Netz, ohne Kopplung. Der Link trägt den ganzen Bogen, auch einen für den
-              QR-Code zu großen.
+              Handy zu Handy über {nahDienst ?? "den Nahbereichs-Dienst"} — ohne Netz, ohne Kopplung.
             </p>
           </div>
         )}
@@ -797,7 +833,10 @@ export function Uebersicht(props: {
           <button type="button" className={pdfLaeuft ? "arbeitet" : ""} aria-busy={pdfLaeuft || undefined} onClick={pdf} disabled={pdfLaeuft}>
             {pdfLaeuft ? "PDF wird erstellt…" : "PDF erzeugen"}
           </button>
-          <p className="hinweis">Zum Drucken oder Versenden — Papier-Layout, QR-Code auf der letzten Seite.</p>
+          <p className="hinweis">Zum Drucken oder Versenden, mit QR-Code auf der letzten Seite.</p>
+          {/* role="status": die Quittung kommt asynchron, nach dem Klick — ohne
+              Ansage erführe ein Screenreader nichts davon. */}
+          {pdfQuittung && <p className="hinweis pdf-quittung" role="status">✓ {pdfQuittung}</p>}
         </div>
         {/* Zweite Stufe: Vor Ort zählen fast immer QR-Vollbild, Nahbereich
             oder PDF (oben). Link/CSV/Excel sind Chat- bzw. Führungsstellen-

@@ -9,6 +9,21 @@
        Tippfehler-Adressen als scheinbar eigenständige Seiten ein. -->
   <meta name="robots" content="noindex, follow">
   <link rel="icon" href="/icon.svg" type="image/svg+xml">
+  <!-- THEMA:JS:START -->
+  <script>
+    // Anzeigemodus der App (Dunkel/Feld/Nacht) VOR dem ersten Malen übernehmen:
+    // gleiche Herkunft, gleicher Speicher, gleiche Regel wie in der App
+    // (index.html, anzeige-modus.ts). Erzeugt von scripts/content-stil.mts.
+    try {
+      var eebModus = localStorage.getItem("eeb.anzeigemodus.v1")
+        || (localStorage.getItem("eeb.feldmodus.v1") === "1" ? "feld" : "");
+      if (!eebModus && window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches)
+        eebModus = "dunkel";
+      if (eebModus === "feld" || eebModus === "nacht" || eebModus === "dunkel")
+        document.documentElement.classList.add(eebModus + "-modus");
+    } catch (e) { /* Privatmodus/blockierter Speicher: helle Darstellung */ }
+  </script>
+  <!-- THEMA:JS:END -->
   <style>
     @font-face {
       font-family: "Archivo Variable";
@@ -19,7 +34,7 @@
            url("./schrift/archivo-latin-wght-normal.woff2") format("woff2");
       unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
     }
-    :root { --blau: #12275e; --blau-hell: #1d3d8f; --rand: #c9cede; --grau: #f2f3f7; --text: #11141b; }
+    :root { --blau: #12275e; --blau-hell: #1d3d8f; --rand: #c9cede; --grau: #f2f3f7; --text: #11141b; --text-2: #5c6478; --flaeche: #fff; --flaeche-2: #e8ebf2; --auf-blau: #fff; }
     * { box-sizing: border-box; }
     body {
       margin: 0;
@@ -33,10 +48,29 @@
     a { color: var(--blau-hell); }
     .start {
       display: inline-block; margin: 1rem 0;
-      padding: 0.6rem 1.1rem; background: var(--blau); color: #fff;
+      padding: 0.6rem 1.1rem; background: var(--blau); color: var(--auf-blau);
       border-radius: 0; text-decoration: none; font-weight: 600;
     }
-    footer { margin-top: 2.5rem; padding-top: 1rem; border-top: 1px solid var(--rand); font-size: 0.875rem; color: #5c6478; }
+    footer { margin-top: 2.5rem; padding-top: 1rem; border-top: 1px solid var(--rand); font-size: 0.875rem; color: var(--text-2); }
+    /* THEMA:CSS:START */
+    /* Anzeigemodus der App (Modus-Regel, scripts/content-stil.mts): Werte aus
+       index.html. Feld: 112 % Schrift, harte Linien, schwarze Schrift. Dunkel
+       und Nacht: dunkle Flächen, helle Schrift; nachts weicht die Kennfarbe
+       Bernstein, damit kein sattes Blau die Dunkeladaption zerstört. */
+    html.feld-modus { font-size: 112%; --grau: #e8eaef; --text: #11141b; --text-2: #262b36; --rand: #111318; --flaeche-2: #dfe3ea; }
+    html.dunkel-modus { color-scheme: dark; --grau: #0f1116; --flaeche: #171a21; --flaeche-2: #21252e; --text: #11141b; --text-2: #aab2c2; --rand: #3a414f; --blau: #a8bdf2; --blau-hell: #c6d4f8; --auf-blau: #101a33; }
+    html.nacht-modus { color-scheme: dark; --grau: #0d0c08; --flaeche: #17150f; --flaeche-2: #221f16; --text: #11141b; --text-2: #a2977e; --rand: #423c2d; --blau: #a8791a; --blau-hell: #c9932c; --auf-blau: #100d07; }
+    /* Sicherheitsnetz gegen die Rohwerte der anderen Generatoren (siehe oben). */
+    html.dunkel-modus :is(.kopfnav, .kopfnav-unter, .hinweis, table, th, .themenliste li, .laenderliste a),
+    html.nacht-modus :is(.kopfnav, .kopfnav-unter, .hinweis, table, th, .themenliste li, .laenderliste a) { background: var(--flaeche); }
+    html.dunkel-modus :is(.kopfnav-links a, footer, figcaption, .fussnav-titel, .marken-hinweis, .sprungmenue-titel, .abschluss .zusicherung, .laenderliste .anzahl, h2#andere-bundeslaender, h2#andere-bundeslaender + p, .frage > summary::before, .aufklapp > summary::before),
+    html.nacht-modus :is(.kopfnav-links a, footer, figcaption, .fussnav-titel, .marken-hinweis, .sprungmenue-titel, .abschluss .zusicherung, .laenderliste .anzahl, h2#andere-bundeslaender, h2#andere-bundeslaender + p, .frage > summary::before, .aufklapp > summary::before) { color: var(--text-2); }
+    html.dunkel-modus :is(.start, .sprunglink), html.nacht-modus :is(.start, .sprunglink) { color: var(--auf-blau); }
+    /* Fotos und Bildschirmfotos sind nachts helle Flächen — gedimmt, aber
+       erkennbar. Die Strichcodes (.scancodes) bleiben ungedimmt: sie werden
+       vom Bildschirm abgescannt. */
+    html.nacht-modus figure:not(.scancodes figure) img { filter: brightness(0.7); }
+    /* THEMA:CSS:END */
   </style>
 </head>
 <body>

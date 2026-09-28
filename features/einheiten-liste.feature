@@ -8,12 +8,12 @@ Funktionalität: Einheitenliste durchsuchen, filtern und sortieren
   Grundlage:
     Angenommen ich öffne einen geteilten Bogen-Link eines alten Bogens
     Wenn ich auf "In Einsatz aufnehmen…" klicke
-    Und ich auf "Neuen Einsatz anlegen…" klicke
+    Und ich auf "Neue Sammlung anlegen…" klicke
     Und ich im Dialog "Name" mit "Hochwasser Weser" fülle
     Und ich im Dialog auf "Einsatz anlegen" klicke
     Und ich die Einheit "DLRG" "Wardenburg" manuell in den Einsatz aufnehme
     Und ich die Einheit "Feuerwehr" "Aschhausen" manuell in den Einsatz aufnehme
-    Dann sehe ich die Überschrift "Einheiten (3)"
+    Dann sehe ich die Überschrift "Einheiten (3 gemeldet"
 
   Szenario: Ab der zweiten Meldung steht die Filterleiste bereit
     Dann sehe ich den Text "Suche"
@@ -24,7 +24,7 @@ Funktionalität: Einheitenliste durchsuchen, filtern und sortieren
 
   Szenario: Die Suche grenzt auf die gesuchte Einheit ein
     Wenn ich das Feld "Suche" mit "wardenburg" fülle
-    Dann sehe ich die Überschrift "Einheiten (1 von 3)"
+    Dann sehe ich die Überschrift "Einheiten (1 von 3 gemeldet"
     Und führt die Einheitenliste genau 1 Einheiten
     Und führt die Einheitenliste "DLRG Wardenburg" an Stelle 1
     Und führt die Einheitenliste "THW" nicht
@@ -52,7 +52,7 @@ Funktionalität: Einheitenliste durchsuchen, filtern und sortieren
   # führen kein Personal.
   Szenario: Der Qualifikationsfilter nennt die passenden Einsatzkräfte
     Wenn ich das Feld "Qualifikation" auf "SGL – Sachgebietsleiter/in (1)" stelle
-    Dann sehe ich die Überschrift "Einheiten (1 von 3)"
+    Dann sehe ich die Überschrift "Einheiten (1 von 3 gemeldet"
     Und führt die Einheitenliste genau 1 Einheiten
     Und sehe ich den Text "1× SGL: Johannes Rudolph"
     Und sehe ich den Hinweis "1 Einsatzkraft mit „SGL – Sachgebietsleiter/in“"
@@ -77,7 +77,7 @@ Funktionalität: Einheitenliste durchsuchen, filtern und sortieren
   # (Klasse B); die beiden manuell erfassten Einheiten führen kein Personal.
   Szenario: Der Kraftfahrer-Filter findet die Einheit mit Fahrern
     Wenn ich das Feld "Qualifikation" auf "Kf – Kraftfahrer/in (beliebige Klasse) (2)" stelle
-    Dann sehe ich die Überschrift "Einheiten (1 von 3)"
+    Dann sehe ich die Überschrift "Einheiten (1 von 3 gemeldet"
     Und führt die Einheitenliste genau 1 Einheiten
     Und sehe ich den Hinweis "Kf: Johannes Rudolph, Tom Fischer"
     Und sehe ich den Hinweis "2 Einsatzkräfte mit „Kf – Kraftfahrer/in (beliebige Klasse)“"
@@ -105,9 +105,9 @@ Funktionalität: Einheitenliste durchsuchen, filtern und sortieren
     Und ich das Feld "Fahrerlaubnis" auf "CE" stelle
     Und ich zum Schritt "6. Übersicht" wechsle
     Und ich auf "In Einsatz übernehmen" klicke
-    Dann sehe ich die Überschrift "Einheiten (4)"
+    Dann sehe ich die Überschrift "Einheiten (4 gemeldet"
     Wenn ich das Feld "Qualifikation" auf "Kf CE – Fahrerlaubnisklasse CE (1)" stelle
-    Dann sehe ich die Überschrift "Einheiten (1 von 4)"
+    Dann sehe ich die Überschrift "Einheiten (1 von 4 gemeldet"
     Und führt die Einheitenliste "Feuerwehr Hude" an Stelle 1
     Und führt die Einheitenliste "THW" nicht
 
@@ -124,7 +124,7 @@ Funktionalität: Einheitenliste durchsuchen, filtern und sortieren
     Dann führt die Einheitentabelle genau 3 Zeilen
     Und sehe ich den Text "Summe (3 anwesend)"
     Wenn ich das Feld "Suche" mit "wardenburg" fülle
-    Dann sehe ich die Überschrift "Einheiten (1 von 3)"
+    Dann sehe ich die Überschrift "Einheiten (1 von 3 gemeldet"
     Und führt die Einheitentabelle genau 1 Zeilen
     Und sehe ich den Text "Summe (1 anwesend)"
     Und meldet die Kopfleiste 3 Einheiten

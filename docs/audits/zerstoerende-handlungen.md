@@ -4,7 +4,11 @@ Stand: 27.09.2026 · Prüfer: Rollenaudit `thw-destructive-action-reviewer` ·
 Prüfgegenstand: Web-App, Produktionsbuild (`vite build` + `vite preview`),
 Zweig `claude/thw-reviewer-skills-dr76q1`, Commit `c425b12`.
 
-Reiner Prüfbericht, keine Codeänderung. Baut auf dem Stand nach
+Reiner Prüfbericht, keine Codeänderung.
+> *Nachtrag 28.09.2026:* Die Befunde dieses Berichts sind behoben oder mit
+> Begründung zurückgestellt; der Stand je Befund steht in
+> [README.md → Stand der Behebung](README.md#stand-der-behebung).
+ Baut auf dem Stand nach
 `541cf68` („Zerstörende Handlungen absichern") und `2023551` (Entwurf
 schützen) auf; was dort abgestellt wurde, ist unten unter „Was gut
 funktioniert" nachgemessen.

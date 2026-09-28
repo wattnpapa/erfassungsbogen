@@ -180,6 +180,10 @@ definieren.
   (Stärke- und Bedarfssummen) beim Meldekopf.
 - Ausdruck als PDF im Layout des gewohnten Papierformulars, inklusive QR-Code.
 - Export als CSV bzw. organisationsspezifisches Excel-Format.
+- Führung der Kräfteübersicht am Meldekopf mit Eintreff- und Abrückzeit je
+  Einheit und einer Notiz/einem Auftrag der Führungsstelle; Ausgabe als
+  Übergabeblatt (Sammel-PDF mit eingebetteter Sammlung) und einseitiges
+  Lageblatt für Wand, Ablösung und Einsatztagebuch (seit 2026-09-27).
 - Weitergabe einer gespeicherten Vorlage (Stammdaten der eigenen Einheit) an ein
   anderes Gerät oder in eine vom Nutzer gewählte Ablage, damit sie
   geräteunabhängig verfügbar ist.

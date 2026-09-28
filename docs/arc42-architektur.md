@@ -501,7 +501,7 @@ flowchart LR
 | Baustein | Verantwortung |
 | --- | --- |
 | Web-App (`src/app/`) | React-Oberfläche, Assistent, Meldekopf-UI, PDF-/CSV-/XLSX-Export-Aufrufe, Plattform-Anpassung, lokale Persistenz. |
-| Statische Seiten (`public/*.html`) | ~35 SEO-/Informationsseiten je Organisation (THW, Feuerwehr, DRK, …), Anleitung, Datenschutz, Impressum – teilen sich Kopfnavigation und Design-Token mit der App, laufen aber außerhalb des React-Bundles. |
+| Statische Seiten (`public/*.html`) | ~35 SEO-/Informationsseiten je Organisation (THW, Feuerwehr, DRK, …), Anleitung, Datenschutz, Impressum – teilen sich Kopfnavigation und Design-Token mit der App, laufen aber außerhalb des React-Bundles. Seit 2026-09-27 übernehmen sie den Anzeigemodus der App (Dunkel/Feld/Nacht, ohne gespeicherte Wahl die Systemeinstellung) über einen kleinen Inline-Block, den `scripts/content-stil.mts` schreibt; er liest nur `eeb.anzeigemodus.v1` und setzt eine Klasse auf `<html>`. |
 | Electron-Hülle (`electron/main.js`) | Desktop-Fenster, Auto-Update (`electron-updater`), eingeschränkte Berechtigungsvergabe, externe Links im Systembrowser öffnen. |
 | Capacitor-Hüllen (`android/`, `ios/`) | Native Projekte (Gradle/Xcode), binden Capacitor-Plugins (Kamera-Barcode-Scanner, Filesystem, Share, App) ein. |
 | Build-/Content-Skripte (`scripts/`) | Vite-Plugin-Hilfsfunktionen, Beispielbogen-Generatoren je Bundesland/Organisation, Icon-/Screenshot-Rendering, Sitemap, Kopfnavigation, Bundle-Budget-Prüfung, Kern-Kopien-Prüfung. |
@@ -611,6 +611,16 @@ speicherunabhängige Logik:
 | `meldung-diff.ts` (346 Zeilen) | Was sich zwischen zwei Fassungen einer Meldung geändert hat (Grundlage der Schichtübergabe-Anzeige). |
 | `papierkorb.ts` | Wiederherstellbarkeit für 30 Tage, danach endgültiges Löschen. |
 | `darstellung.ts` | Bogeninhalte als Text, wie sie auf dem Papierbogen stehen — plattformneutrale Vorstufe für PDF/CSV-Ausgabe. |
+
+Der Erfassungsbogen erweitert den Eintrag app-seitig um drei optionale
+Felder (`src/app/eintrag-zeiten.ts`, seit 2026-09-27): `eingetroffenAm`,
+`abgerueckAm` (Geräteuhr) und `notiz` (Auftrag/Notiz der Führungsstelle). Sie
+werden per TypeScript-Modul-Augmentation an `MeldeEintrag` gehängt, reisen als
+gewöhnliche JSON-Felder mit der Sammlung (der Kern kopiert unbekannte Felder
+in `einsaetzeAusJson` unverändert) und bleiben damit ohne Schemawechsel im
+Submodul lesbar; ältere Sammlungen ohne die Felder fallen auf `empfangenAm`
+zurück. Bewusst nicht im Kern: Die Felder sind Führungsstellen-Sicht dieses
+Produkts, nicht Bestandteil des Meldeformats.
 
 Die Ablage wird **hineingereicht, nicht selbst geholt** (Aufnahmeregel 2 aus
 ADR-003):

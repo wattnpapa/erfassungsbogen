@@ -25,7 +25,6 @@ import {
   staerke,
   unterbringungMWD,
   verpflegung,
-  zeitpunktZuIso,
 } from "@bos/eeb-format/model";
 import {
   datumDeutsch,
@@ -38,8 +37,10 @@ import {
   vokabularFuer,
   zeitgruppe,
   type QrSatz,
+  zeitpunktDeutsch,
 } from "./hilfen";
 import { summiereBoegen, type EinsatzSummen } from "./auswertung";
+import { zeitLang } from "./eintrag-zeiten";
 import { bogenDiff, diffZeilen } from "@bos/meldekopf/meldung-diff";
 import { fahrzeugSymbolSvg } from "./taktische-zeichen-bogen";
 import { orgFarbe } from "./org-farben";
@@ -243,47 +244,85 @@ export function boegenAlsEingebetteteDatei(boegen: Erfassungsbogen[]): Eingebett
   };
 }
 
-/** Ein Bogen der Sammel-PDF samt QR und (für die Änderungsspalte) seiner Vorfassung. */
-export interface SammelBogen {
+/**
+ * Was die Übergabe-Übersicht je Einheit braucht — bewusst ohne QR-Satz, damit
+ * das einseitige Lageblatt keinen Code rechnen muss (auf dem Telefon Sekunden
+ * je Bogen; für ein Blatt an der Wand ist das der Unterschied zwischen
+ * „drucke ich stündlich" und „drucke ich nie", Analog-Audit A3/A4).
+ */
+export interface UebersichtEintrag {
   bogen: Erfassungsbogen;
-  qr: QrSatz;
   /** Vorherige Meldung derselben Einheit; fehlt bei einer Erstmeldung. */
   vorher?: Erfassungsbogen;
   /** Zug-/Verbandsetikett aus der Sammlung — Grundlage der Zwischensummen. */
   zugEtikett?: string;
   /** Bezeichnung eines abgeteilten Truppteils (MeldeEintrag.teilEtikett). */
   teil?: string;
+  /** Eintreffzeit (ms); fehlt bei Aufrufern, die nur Bögen kennen. */
+  eingetroffenAm?: number;
+  /** Abrückzeit (ms), falls festgehalten. */
+  abgerueckAm?: number;
+  /**
+   * Nicht mehr vor Ort (abgerückt oder zusammengeführt): steht im eigenen
+   * Block unter den anwesenden Einheiten. Bisher fehlten diese Einheiten auf
+   * dem Papier vollständig, während die eingebettete Sammlung sie trug — zwei
+   * Wahrheiten für dieselbe Übergabe (Analog-Audit A1).
+   */
+  abgerueckt?: boolean;
+  /** Zählt in Summen und Bedarf (anwesend, keine fremde Übung). Fehlt = ja. */
+  zaehlt?: boolean;
+  /** Auftrag/Notiz der Führungsstelle zu dieser Einheit. */
+  notiz?: string;
+}
+
+/** Ein Bogen der Sammel-PDF samt QR — die Übersichtsangaben plus der Code für die Bogenseiten. */
+export interface SammelBogen extends UebersichtEintrag {
+  qr: QrSatz;
+}
+
+/** Zählt der Eintrag in die Summen? Abgerückte nie, Übungen nur in Übungssammlungen (zaehlt=false). */
+function zaehlend(e: UebersichtEintrag): boolean {
+  return !e.abgerueckt && e.zaehlt !== false;
+}
+
+/** Nur die Bögen, die in Summen und Bedarf gehören. */
+function zaehlendeBoegen(eintraege: UebersichtEintrag[]): Erfassungsbogen[] {
+  return eintraege.filter(zaehlend).map((e) => e.bogen);
 }
 
 /** Mehr Zeilen passen nicht sinnvoll in eine Tabellenzelle — der Rest wird gezählt. */
 const UEBERSICHT_MAX_ZEILEN = 8;
 
+/** Zeitpunkt auf dem Blatt — immer mit Datum: gelesen wird es auch morgen noch. */
+function blattZeit(ms: number | undefined): string {
+  return ms == null ? "" : zeitLang(ms);
+}
+
 /**
- * Übergabe-Übersicht: eine Zeile je Einheit mit Stärke, Fahrzeugen und der
- * Spalte „Veränderung seit der letzten Meldung" — der Teil, den die ablösende
- * Schicht zuerst liest. Die Detailbögen dahinter bleiben unverändert im Layout
- * des Papiervordrucks.
+ * Übergabe-Übersicht: eine Zeile je Einheit mit Eintreff-/Abrückzeit, Stärke,
+ * Fahrzeugen, Auftrag der Führungsstelle und der Spalte „Veränderung seit der
+ * letzten Meldung" — der Teil, den die ablösende Schicht zuerst liest.
+ * Abgerückte Einheiten stehen als eigener Block darunter; die Summe zählt
+ * nur die zählenden — genau wie die Stärkeleiste am Gerät.
  */
-function uebersichtsTabelle(boegen: SammelBogen[]): Content {
+function uebersichtsTabelle(eintraege: UebersichtEintrag[]): Content {
   const kopf = (text: string): TableCell => ({ text, bold: true, fillColor: GRAU });
+  const SPALTEN = 8;
   const body: TableCell[][] = [
     [
       kopf("Einheit"),
+      kopf("Eingetroffen"),
+      kopf("Abgerückt"),
       kopf("Stand"),
       kopf("Stärke\nF / U / M / G"),
       kopf("Fzg"),
+      kopf("Auftrag / Notiz"),
       kopf("Veränderung seit der letzten Meldung"),
     ],
   ];
-  const summe = { fuehrer: 0, unterfuehrer: 0, mannschaft: 0, gesamt: 0, fahrzeuge: 0 };
-  for (const { bogen: b, vorher, teil } of boegen) {
+  const zeile = (e: UebersichtEintrag): TableCell[] => {
+    const { bogen: b, vorher, teil } = e;
     const s = staerke(b);
-    summe.fuehrer += s.fuehrer;
-    summe.unterfuehrer += s.unterfuehrer;
-    summe.mannschaft += s.mannschaft;
-    summe.gesamt += s.gesamt;
-    summe.fahrzeuge += b.fahrzeuge.length;
-
     let aenderung: Content;
     if (!vorher) {
       aenderung = { text: "Erstmeldung", italics: true };
@@ -305,24 +344,50 @@ function uebersichtsTabelle(boegen: SammelBogen[]): Content {
     const namensZeilen: Content[] = [{ text: einheitAnzeigename(b.einheit) }];
     if (teil) namensZeilen.push({ text: teil, italics: true });
     if (b.uebung) namensZeilen.push({ text: "ÜBUNG", bold: true, color: UEBUNG_FARBE });
-    body.push([
+    if (!e.abgerueckt && e.zaehlt === false) namensZeilen.push({ text: "zählt nicht in diese Lage", italics: true });
+    return [
       namensZeilen.length === 1 ? namensZeilen[0]! : { stack: namensZeilen },
+      { text: blattZeit(e.eingetroffenAm) },
+      { text: blattZeit(e.abgerueckAm) },
       { text: zeitgruppe(b.stand) },
       { text: `${s.fuehrer} / ${s.unterfuehrer} / ${s.mannschaft} / ${s.gesamt}` },
       { text: `${b.fahrzeuge.length}` },
+      { text: weichUmbrechen(e.notiz ?? "") },
       aenderung,
-    ]);
+    ];
+  };
+  const anwesend = eintraege.filter((e) => !e.abgerueckt);
+  const abgerueckt = eintraege.filter((e) => e.abgerueckt);
+  for (const e of anwesend) body.push(zeile(e));
+  if (abgerueckt.length > 0) {
+    // Ein Zwischenkopf statt einer Fußnote: „war da und ist wieder weg" muss
+    // auf dem Papier so sichtbar sein wie in der Datei.
+    const trenner: TableCell[] = [{ text: `Abgerückt (${abgerueckt.length})`, bold: true, fillColor: GRAU, colSpan: SPALTEN }];
+    for (let i = 1; i < SPALTEN; i++) trenner.push({});
+    body.push(trenner);
+    for (const e of abgerueckt) body.push(zeile(e));
   }
+  const summe = summiereBoegen(zaehlendeBoegen(eintraege));
+  const uebungen = anwesend.filter((e) => e.zaehlt === false).length;
+  const beschriftung = [`${summe.einheiten} zählend`];
+  if (uebungen > 0) beschriftung.push(`${uebungen} Übung`);
+  if (abgerueckt.length > 0) beschriftung.push(`${abgerueckt.length} abgerückt`);
   body.push([
-    { text: `Summe (${boegen.length} Einheiten)`, bold: true },
+    { text: `Summe (${beschriftung.join(" · ")})`, bold: true },
     { text: "" },
-    { text: `${summe.fuehrer} / ${summe.unterfuehrer} / ${summe.mannschaft} / ${summe.gesamt}`, bold: true },
+    { text: "" },
+    { text: "" },
+    { text: `${summe.staerke.fuehrer} / ${summe.staerke.unterfuehrer} / ${summe.staerke.mannschaft} / ${summe.staerke.gesamt}`, bold: true },
     { text: `${summe.fahrzeuge}`, bold: true },
     { text: "" },
+    { text: "" },
   ]);
-  // Breiten für die quer liegende Übersichtsseite: Einheitsname und Zeitgruppe
-  // bekommen so viel Platz, dass sie einzeilig bleiben.
-  return { table: { headerRows: 1, widths: [170, 56, 60, 22, "*"], body }, margin: [0, 0, 0, 4] };
+  // Breiten für die quer liegende Übersichtsseite: Einheitsname, Zeiten und
+  // Zeitgruppe bekommen so viel Platz, dass sie einzeilig bleiben.
+  return {
+    table: { headerRows: 1, widths: [130, 62, 62, 52, 58, 20, 110, "*"], body },
+    margin: [0, 0, 0, 4],
+  };
 }
 
 /** „Diesel 120 l · Benzin 30 l" — Gemisch nur, wenn gemeldet (wie in der Oberfläche). */
@@ -334,12 +399,12 @@ function kraftstoffText(k: EinsatzSummen["kraftstoff"]): string {
 
 /**
  * Bedarfs-Übersicht des ganzen Einsatzes: Verpflegung, Unterbringung,
- * Kraftstoff und Ruhezeit über alle Bögen der Sammlung — dieselben Zahlen, die
- * der Meldekopf auf dem Bildschirm sieht (gemeinsame Summierung in
+ * Kraftstoff und Ruhezeit über die zählenden Bögen der Sammlung — dieselben
+ * Zahlen, die der Meldekopf auf dem Bildschirm sieht (gemeinsame Summierung in
  * auswertung.ts). Ohne sie zeigte die gedruckte Sammlung nur die Stärke.
  */
-function bedarfsTabelle(boegen: SammelBogen[]): Content {
-  const s = summiereBoegen(boegen.map((x) => x.bogen));
+function bedarfsTabelle(eintraege: UebersichtEintrag[]): Content {
+  const s = summiereBoegen(zaehlendeBoegen(eintraege));
   const body: TableCell[][] = [
     [
       { text: "Verpflegung:", bold: true },
@@ -375,12 +440,13 @@ function bedarfsTabelle(boegen: SammelBogen[]): Content {
 /**
  * Zwischensummen je Zug/Verband — nur sinnvoll, wenn die Sammlung überhaupt
  * mehr als eine Gruppe kennt (sonst wiederholt die Tabelle nur den Gesamtwert).
+ * Nur zählende Einheiten, wie am Gerät (aggregiereNachZug).
  */
-function zugSummenTabelle(boegen: SammelBogen[]): Content | undefined {
+function zugSummenTabelle(eintraege: UebersichtEintrag[]): Content | undefined {
   const nach = new Map<string, Erfassungsbogen[]>();
-  for (const { bogen, zugEtikett } of boegen) {
-    const k = zugEtikett ?? "";
-    (nach.get(k) ?? nach.set(k, []).get(k)!).push(bogen);
+  for (const e of eintraege.filter(zaehlend)) {
+    const k = e.zugEtikett ?? "";
+    (nach.get(k) ?? nach.set(k, []).get(k)!).push(e.bogen);
   }
   if (nach.size < 2) return undefined;
   const kopf = (text: string): TableCell => ({ text, bold: true, fillColor: GRAU });
@@ -412,31 +478,55 @@ function zugSummenTabelle(boegen: SammelBogen[]): Content | undefined {
   };
 }
 
+/** Die Übersichtsseite — gemeinsamer Kern von Sammel-PDF und Lageblatt. */
+function uebersichtsSeite(titel: string, eintraege: UebersichtEintrag[], erstellt: number, hinweis?: string): Content[] {
+  const zugSummen = zugSummenTabelle(eintraege);
+  return [
+    { text: titel, bold: true, fontSize: 12, margin: [0, 0, 0, 2] },
+    // Wann das Blatt gedruckt wurde, gehört aufs Blatt: an der Wand hängen
+    // nachher drei davon, und nur das jüngste gilt.
+    { text: `Erstellt ${zeitLang(erstellt)}`, italics: true, margin: [0, 0, 0, 8] },
+    uebersichtsTabelle(eintraege),
+    ...(hinweis ? [{ text: hinweis, italics: true, margin: [0, 4, 0, 0] } as Content] : []),
+    bedarfsTabelle(eintraege),
+    ...(zugSummen ? [zugSummen] : []),
+  ];
+}
+
+/** Fußzeile mit Seitenzahl — für Sammel-PDF und Lageblatt gleich. */
+function seitenFuss(text: string): TDocumentDefinitions["footer"] {
+  return (seite, gesamt) => ({
+    columns: [
+      { text, margin: [40, 0, 0, 0] },
+      { text: `${seite} / ${gesamt}`, alignment: "right", margin: [0, 0, 40, 0] },
+    ],
+    fontSize: 8,
+  });
+}
+
 /**
- * Sammel-PDF eines Einsatzes: vorneweg die Übergabe-Übersicht (Stärke,
- * Fahrzeuge, Änderungen je Einheit), dahinter alle Bögen (je Bogen die
- * vollständigen Seiten inkl. QR-Code), plus ALLE Bögen als eingebettetes
- * JSON-Array — so ist der ganze Einsatz maschinen- und menschenlesbar in einer
- * Datei übergebbar. Baut die Seiten aus {@link pdfDokument} zusammen.
+ * Sammel-PDF eines Einsatzes: vorneweg die Übergabe-Übersicht (Zeiten,
+ * Stärke, Fahrzeuge, Auftrag, Änderungen je Einheit — abgerückte in einem
+ * eigenen Block), dahinter alle Bögen (je Bogen die vollständigen Seiten inkl.
+ * QR-Code), plus ALLE Bögen als eingebettetes JSON-Array — so ist der ganze
+ * Einsatz maschinen- und menschenlesbar in einer Datei übergebbar. Auch mit
+ * null anwesenden Einheiten: am Einsatzende, wenn alle abgerückt sind, ist die
+ * Datei die Übergabe ans Archiv (Arbeitsablauf-Audit W2). Baut die Seiten aus
+ * {@link pdfDokument} zusammen.
  */
 export function einsatzPdfDokument(
   name: string,
   boegenMitQr: SammelBogen[],
   /** Optional: kompletter Einsatz-Umschlag (einsatzDateiInhalt) für die Schichtübergabe. */
   sammlungJson?: string,
+  erstellt = Date.now(),
 ): TDocumentDefinitions {
-  const zugSummen = zugSummenTabelle(boegenMitQr);
-  const content: Content[] = [
-    { text: `Übergabe-Übersicht: ${name}`, bold: true, fontSize: 12, margin: [0, 0, 0, 8] },
-    uebersichtsTabelle(boegenMitQr),
-    {
-      text: "Die Änderungsspalte vergleicht jede Meldung mit der vorherigen Meldung derselben Einheit. Die vollständigen Bögen folgen.",
-      italics: true,
-      margin: [0, 4, 0, 0],
-    },
-    bedarfsTabelle(boegenMitQr),
-    ...(zugSummen ? [zugSummen] : []),
-  ];
+  const content: Content[] = uebersichtsSeite(
+    `Übergabe-Übersicht: ${name}`,
+    boegenMitQr,
+    erstellt,
+    "Die Änderungsspalte vergleicht jede Meldung mit der vorherigen Meldung derselben Einheit. Die vollständigen Bögen folgen.",
+  );
   boegenMitQr.forEach(({ bogen, qr }) => {
     // Zurück ins Hochformat: der Bogen selbst bleibt exakt der Papiervordruck.
     // pdfmake übernimmt die Ausrichtung des Knotens, der den Umbruch auslöst.
@@ -463,14 +553,44 @@ export function einsatzPdfDokument(
       [EEB_EINSATZ_DATEINAME]: boegenAlsEingebetteteDatei(boegenMitQr.map((x) => x.bogen)),
       ...(sammlungJson ? { [EEB_EINSATZ_SAMMLUNG_DATEINAME]: sammlungAlsEingebetteteDatei(sammlungJson) } : {}),
     },
-    footer: (seite, gesamt) => ({
-      columns: [
-        { text: `Einsatz-Sammlung: ${name}`, margin: [40, 0, 0, 0] },
-        { text: `${seite} / ${gesamt}`, alignment: "right", margin: [0, 0, 40, 0] },
-      ],
-      fontSize: 8,
-    }),
+    footer: seitenFuss(`Einsatz-Sammlung: ${name}`),
     content,
+  };
+}
+
+/**
+ * Lageblatt: nur die Übersichtsseite der Sammel-PDF — Einheiten mit Zeiten,
+ * Bedarf, Zwischensummen — quer auf A4, ohne Bögen, ohne QR, ohne Anhang.
+ *
+ * Das Blatt für die Wand und für die Ablösung: „alle 60 Minuten ein Blatt,
+ * das ist der Stand, der bei Geräteausfall gilt" (Analog-Audit A3). Die
+ * Sammel-PDF mit 40 Bögen ist 41 Seiten und wird deshalb nicht gedruckt (A4).
+ * Bewusst kein eingebettetes JSON: das Blatt ist Papier, die Weitergabe der
+ * Sammlung ist die Sammel-PDF.
+ */
+export function einsatzLageblattDokument(
+  name: string,
+  eintraege: UebersichtEintrag[],
+  erstellt = Date.now(),
+): TDocumentDefinitions {
+  return {
+    pageSize: "A4",
+    pageOrientation: "landscape",
+    pageMargins: SEITENRAENDER,
+    defaultStyle: { fontSize: 8, font: SCHRIFT },
+    info: { title: `Lageblatt ${name}` },
+    ...(eintraege.length > 0 && eintraege.every(({ bogen }) => bogen.uebung)
+      ? { background: uebungsWasserzeichen() }
+      : {}),
+    footer: seitenFuss(`Lageblatt: ${name}`),
+    content: uebersichtsSeite(
+      `Lageblatt: ${name}`,
+      eintraege,
+      erstellt,
+      eintraege.length === 0
+        ? "Noch keine Einheit gemeldet."
+        : "Summen und Bedarf zählen nur die anwesenden Einheiten dieser Lage; abgerückte stehen im eigenen Block.",
+    ),
   };
 }
 
@@ -646,9 +766,9 @@ export function pdfDokument(b: Erfassungsbogen, qr: QrSatz | null, blanko?: Blan
   ]);
   infoZeilen.push([
     { text: "Einsatzbeginn:", bold: true },
-    { text: b.einsatz.einsatzbeginn != null ? zeitpunktZuIso(b.einsatz.einsatzbeginn).replace("T", " ") : "" },
+    { text: b.einsatz.einsatzbeginn != null ? zeitpunktDeutsch(b.einsatz.einsatzbeginn) : "" },
     { text: "Einsatzende:", bold: true },
-    { text: b.einsatz.einsatzende != null ? zeitpunktZuIso(b.einsatz.einsatzende).replace("T", " ") : "" },
+    { text: b.einsatz.einsatzende != null ? zeitpunktDeutsch(b.einsatz.einsatzende) : "" },
   ]);
 
   const fahrzeugBlock = (f: Fahrzeug): Content => ({

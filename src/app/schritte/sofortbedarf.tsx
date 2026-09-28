@@ -4,7 +4,8 @@
  */
 
 import { PersonalErfassung, staerke, verpflegung } from "@bos/eeb-format/model";
-import { Feld, zahl, type SchrittProps } from "./bausteine";
+import { pruefpunkte } from "../hilfen";
+import { Feld, Hinweise, zahl, type SchrittProps } from "./bausteine";
 
 export function SchrittSofortbedarf({ bogen, aendern }: SchrittProps) {
   const s = bogen.sofortbedarf;
@@ -60,6 +61,14 @@ export function SchrittSofortbedarf({ bogen, aendern }: SchrittProps) {
               <input type="number" min={0} value={s.gemischLiter} onChange={(e) => aendern({ sofortbedarf: { ...s, gemischLiter: zahl(e.target.value) } })} />
             </Feld>
           </div>
+          {/* Eine Angabe, ein Ort: der Bedarf folgt der Stärke (verpflegungMitziehen
+              in hilfen.ts), solange er ihr entspricht — wer bewusst abweicht,
+              behält seine Zahl. Das muss dranstehen, sonst wundert man sich,
+              warum die Zahl mal mitgeht und mal nicht. */}
+          <p className="hinweis">
+            Verpflegung ist aus der Stärke vorbelegt und zieht mit ihr mit; abweichend eintragen,
+            wenn mehr oder weniger bestellt wird.
+          </p>
           <p>
             <label className="inline">
               <input type="checkbox" checked={s.unterbringung} onChange={(e) => aendern({ sofortbedarf: { ...s, unterbringung: e.target.checked } })} />
@@ -75,6 +84,9 @@ export function SchrittSofortbedarf({ bogen, aendern }: SchrittProps) {
       <Feld titel="Sonstiges (Freitext)">
         <textarea rows={3} value={bogen.sonstiges ?? ""} onChange={(e) => aendern({ sonstiges: e.target.value || undefined })} />
       </Feld>
+      {/* Schritt-Index 4 = Sofortbedarf (siehe SCHRITTE in app.tsx): „Diesel
+          99 999 l" fiel vorher erst in der Übersicht auf — wenn überhaupt. */}
+      <Hinweise punkte={pruefpunkte(bogen, false)} aktuellerSchritt={4} />
     </section>
   );
 }

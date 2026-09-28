@@ -18,6 +18,7 @@ import type { EinsatzArt } from "@bos/meldekopf/einsaetze";
 import { einheitAnzeigename, orgLabel, vokabText, vokabularFuer, zeitgruppe } from "./hilfen";
 import { aktuelleMeldungen, zaehltInLage } from "./auswertung";
 import { csvDatei, csvZeile } from "./csv";
+import { eintreffzeit, zeitLang } from "./eintrag-zeiten";
 import { MeldeStatus, neuesteJeEinheit, type Einsatzsammlung, type MeldeEintrag, type MeldeQuelle } from "@bos/meldekopf/einsaetze";
 
 const STATUS_LABEL: Record<MeldeStatus, string> = {
@@ -54,6 +55,11 @@ const SPALTEN = [
   "Gemisch (l)",
   "Fahrzeuge",
   "Stand",
+  // Eintreff- und Abrückzeit der Führungsstelle — für Einsatztagebuch und
+  // Abrechnung (Führungssicht-Audit K2). „Empfangen" bleibt daneben der
+  // Moment, in dem das Gerät die Meldung angenommen hat.
+  "Eingetroffen",
+  "Abgerückt",
   "Empfangen",
   "Quelle",
   "Status",
@@ -62,6 +68,7 @@ const SPALTEN = [
   "Sofortbedarf",
   "Signatur",
   "Absender",
+  "Auftrag/Notiz",
 ] as const;
 
 /** Anzeigename wie in der Meldekopf-Oberfläche: Organisation + Standort + Einheitstyp. */
@@ -128,6 +135,8 @@ function datenZeile(art: EinsatzArt, e: MeldeEintrag): string {
     sb?.gemischLiter ?? 0,
     fahrzeugListe(b),
     zeitgruppe(b.stand),
+    zeitLang(eintreffzeit(e)),
+    e.abgerueckAm != null ? zeitLang(e.abgerueckAm) : "",
     new Date(e.empfangenAm).toLocaleString("de-DE", { dateStyle: "short", timeStyle: "short" }),
     QUELLE_LABEL[e.quelle],
     STATUS_LABEL[e.status],
@@ -136,6 +145,7 @@ function datenZeile(art: EinsatzArt, e: MeldeEintrag): string {
     sofortbedarfText(b),
     signaturText(e),
     absenderText(e),
+    e.notiz ?? "",
   ]);
 }
 
@@ -183,6 +193,8 @@ function summenZeile(meldungen: MeldeEintrag[]): string {
     acc.uM, acc.uW, acc.uD,
     acc.diesel, acc.benzin, acc.gemisch,
     acc.fahrzeuge,
+    "",
+    "",
     "",
     "",
   ]);

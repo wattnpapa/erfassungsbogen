@@ -39,6 +39,26 @@
  *   tauscht nach). Kein CDN — DESIGN.md verbietet das ausdrücklich, und es wäre
  *   ein Drittanbieter-Request auf Seiten, die genau damit werben, keinen zu
  *   haben.
+ * - **Modus-Regel (Anzeigemodus der App):** Wer in der App „Nacht" gewählt hat
+ *   und aus der Fußzeile die Anleitung öffnet, bekam eine weiße Seite — genau
+ *   in der Situation, in der Hilfe gesucht wird, war die Nachtsicht weg. Die
+ *   Seiten lesen deshalb dieselbe Wahl (localStorage `eeb.anzeigemodus.v1`,
+ *   gleiche Herkunft wie die App) in einem kleinen Inline-Skript VOR dem
+ *   ersten Malen und setzen die Klassen `dunkel-/feld-/nacht-modus` auf
+ *   `<html>`; ohne gespeicherte Wahl zählt `prefers-color-scheme` (dunkel →
+ *   Dunkel), wie in anzeige-modus.ts. Damit die Klassen etwas bewirken, werden
+ *   die Rohwerte der Seiten zu Rollen-Token: `background: #fff` →
+ *   `--flaeche`, `#5c6478` → `--text-2`, weiße Schrift auf der Kennfarbe →
+ *   `--auf-blau`, die Tabellenköpfe und die Länderkarte → `--flaeche-2`.
+ *   Ein Block am Ende des Stylesheets belegt die Token je Modus neu — mit den
+ *   Werten aus index.html, damit App und Seiten dieselbe Nacht zeigen.
+ *   Ausgenommen bleiben Bilder (`img`): Fotos, Screenshots und die
+ *   Strichcodes der Handscanner-Einrichtung brauchen ihre weiße Unterlage —
+ *   die Codes werden vom Bildschirm abgescannt.
+ *   Inline statt externer Datei: Die Seiten tragen keine Content-Security-
+ *   Policy (die der App setzt vite.config.ts nur in index.html), und ein
+ *   externes Skript käme erst nach dem ersten Malen — genau das Aufblitzen
+ *   der hellen Seite, das vermieden werden soll.
  *
  * Aufruf (Node ≥ 22): npm run content-stil
  *
@@ -63,6 +83,72 @@ const TEXT_2 = "#5c6478";
 const TEXT = "#11141b";
 
 /**
+ * Rollen-Token, die jede Seite in `:root` führt (Modus-Regel). Werte der hellen
+ * Belegung; die Modus-Blöcke unten belegen sie neu. `--flaeche-2` steht auf
+ * dem Wert der App (--n-100) statt der drei Grautöne, die die Seiten für
+ * Tabellenköpfe und Karte benutzten (#e6e8ee, #e7eaf3, #e8eaf2).
+ */
+const TOKEN: [name: string, wert: string][] = [
+  ["--text", TEXT],
+  ["--text-2", TEXT_2],
+  ["--flaeche", "#fff"],
+  ["--flaeche-2", "#e8ebf2"],
+  ["--auf-blau", "#fff"],
+];
+
+/**
+ * Anzeigemodus der App auf den Seiten. Das Skript läuft VOR dem ersten Malen
+ * und setzt nur eine Klasse auf <html> — dieselbe Regel wie das Boot-Skript in
+ * index.html und anzeigeModus() in anzeige-modus.ts: gespeicherte Wahl (auch
+ * „standard“) geht vor, sonst zählt die Systemeinstellung.
+ */
+const THEMA_SKRIPT = `<!-- THEMA:JS:START -->
+  <script>
+    // Anzeigemodus der App (Dunkel/Feld/Nacht) VOR dem ersten Malen übernehmen:
+    // gleiche Herkunft, gleicher Speicher, gleiche Regel wie in der App
+    // (index.html, anzeige-modus.ts). Erzeugt von scripts/content-stil.mts.
+    try {
+      var eebModus = localStorage.getItem("eeb.anzeigemodus.v1")
+        || (localStorage.getItem("eeb.feldmodus.v1") === "1" ? "feld" : "");
+      if (!eebModus && window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches)
+        eebModus = "dunkel";
+      if (eebModus === "feld" || eebModus === "nacht" || eebModus === "dunkel")
+        document.documentElement.classList.add(eebModus + "-modus");
+    } catch (e) { /* Privatmodus/blockierter Speicher: helle Darstellung */ }
+  </script>
+  <!-- THEMA:JS:END -->
+`;
+
+/**
+ * Belegung der Token je Modus — Werte aus index.html (.feld-modus,
+ * .dunkel-modus, .nacht-modus), damit die Anleitung dieselbe Nacht zeigt wie
+ * die App. Steht am Ende des Stylesheets, damit die Selektor-Regeln darin
+ * auch die Blöcke der anderen Generatoren (NAV:CSS, LAENDER:CSS, …) schlagen:
+ * die schreiben ihre Rohwerte beim nächsten Lauf zurück, und dann trüge die
+ * Kopfleiste im Dunkeln wieder Weiß — das Sicherheitsnetz fängt genau das.
+ */
+const THEMA_CSS = `    /* THEMA:CSS:START */
+    /* Anzeigemodus der App (Modus-Regel, scripts/content-stil.mts): Werte aus
+       index.html. Feld: 112 % Schrift, harte Linien, schwarze Schrift. Dunkel
+       und Nacht: dunkle Flächen, helle Schrift; nachts weicht die Kennfarbe
+       Bernstein, damit kein sattes Blau die Dunkeladaption zerstört. */
+    html.feld-modus { font-size: 112%; --grau: #e8eaef; --text: #000000; --text-2: #262b36; --rand: #111318; --flaeche-2: #dfe3ea; }
+    html.dunkel-modus { color-scheme: dark; --grau: #0f1116; --flaeche: #171a21; --flaeche-2: #21252e; --text: #e7eaf1; --text-2: #aab2c2; --rand: #3a414f; --blau: #a8bdf2; --blau-hell: #c6d4f8; --auf-blau: #101a33; }
+    html.nacht-modus { color-scheme: dark; --grau: #0d0c08; --flaeche: #17150f; --flaeche-2: #221f16; --text: #d9cdb6; --text-2: #a2977e; --rand: #423c2d; --blau: #a8791a; --blau-hell: #c9932c; --auf-blau: #100d07; }
+    /* Sicherheitsnetz gegen die Rohwerte der anderen Generatoren (siehe oben). */
+    html.dunkel-modus :is(.kopfnav, .kopfnav-unter, .hinweis, table, th, .themenliste li, .laenderliste a),
+    html.nacht-modus :is(.kopfnav, .kopfnav-unter, .hinweis, table, th, .themenliste li, .laenderliste a) { background: var(--flaeche); }
+    html.dunkel-modus :is(.kopfnav-links a, footer, figcaption, .fussnav-titel, .marken-hinweis, .sprungmenue-titel, .abschluss .zusicherung, .laenderliste .anzahl, h2#andere-bundeslaender, h2#andere-bundeslaender + p, .frage > summary::before, .aufklapp > summary::before),
+    html.nacht-modus :is(.kopfnav-links a, footer, figcaption, .fussnav-titel, .marken-hinweis, .sprungmenue-titel, .abschluss .zusicherung, .laenderliste .anzahl, h2#andere-bundeslaender, h2#andere-bundeslaender + p, .frage > summary::before, .aufklapp > summary::before) { color: var(--text-2); }
+    html.dunkel-modus :is(.start, .sprunglink), html.nacht-modus :is(.start, .sprunglink) { color: var(--auf-blau); }
+    /* Fotos und Bildschirmfotos sind nachts helle Flächen — gedimmt, aber
+       erkennbar. Die Strichcodes (.scancodes) bleiben ungedimmt: sie werden
+       vom Bildschirm abgescannt. */
+    html.nacht-modus figure:not(.scancodes figure) img { filter: brightness(0.7); }
+    /* THEMA:CSS:END */
+`;
+
+/**
  * Schriftgrad-Leiter der App. Jeder auf den Seiten vorgefundene Zwischenwert
  * wird auf die nächstgelegene tragende Stufe gelegt — Tabellen, Bildunterzeilen
  * und Fußzeile auf den Nebentext (0.875), Nav-Links und Markenhinweis auf das
@@ -84,6 +170,8 @@ interface Regel {
   name: string;
   /** Nur Blöcke, deren Selektorliste hierauf passt (ohne: das ganze Stylesheet). */
   selektor?: RegExp;
+  /** Blöcke, deren Selektorliste hierauf passt, bleiben unangetastet. */
+  ausser?: RegExp;
   suchen: RegExp;
   ersetzen: string;
 }
@@ -248,6 +336,51 @@ const REGELN: Regel[] = [
     suchen: /font-size:\s*(?!1\.125rem)[0-9.]+rem/g,
     ersetzen: "font-size: 1.125rem",
   },
+  // Modus-Regel: Rohwerte zu Rollen-Token, damit die Modus-Blöcke greifen.
+  {
+    // Nicht bei Bildern: Fotos, Screenshots und die Handscanner-Strichcodes
+    // behalten ihre weiße Unterlage in jedem Modus.
+    name: "Fläche statt #fff",
+    ausser: /\bimg\b/,
+    suchen: /background:\s*#fff\b/g,
+    ersetzen: "background: var(--flaeche)",
+  },
+  {
+    // Weiße Schrift steht auf den Seiten nur auf der Kennfarbe (.start,
+    // .sprunglink) — nachts ist die Kennfarbe Bernstein und die Schrift dunkel.
+    name: "Schrift auf der Kennfarbe als Token",
+    suchen: /color:\s*#fff\b/g,
+    ersetzen: "color: var(--auf-blau)",
+  },
+  {
+    // Das Aufklapp-Vorzeichen behält den Rohwert: scripts/content-seiten.test.ts
+    // prüft dort auf #5c6478 wörtlich; der Modus-Block oben belegt es per
+    // Selektor neu.
+    name: "Zweittext als Token",
+    ausser: /summary::before/,
+    suchen: /color:\s*#5c6478\b/g,
+    ersetzen: "color: var(--text-2)",
+  },
+  {
+    name: "Tabellenkopf auf --flaeche-2",
+    suchen: /background:\s*#e(?:7eaf3|8eaf2)\b/g,
+    ersetzen: "background: var(--flaeche-2)",
+  },
+  {
+    name: "Länderkarte: Fläche als Token",
+    suchen: /fill:\s*#fff\b/g,
+    ersetzen: "fill: var(--flaeche)",
+  },
+  {
+    name: "Länderkarte: Zweitfläche als Token",
+    suchen: /fill:\s*#e6e8ee\b/g,
+    ersetzen: "fill: var(--flaeche-2)",
+  },
+  {
+    name: "Länderkarte: Linie als Token",
+    suchen: /stroke:\s*#(?:9aa1b4|b3b9c8)\b/g,
+    ersetzen: "stroke: var(--rand)",
+  },
 ];
 
 /**
@@ -266,15 +399,42 @@ const SCHRIFT_REGEL = `    @font-face {
     }
 `;
 
-/** Das Farb-Token `--text` gehört neben die schon vorhandenen in `:root`. */
+/** Die Rollen-Token (TOKEN) gehören neben die schon vorhandenen in `:root`. */
 function tokenErgaenzen(css: string): { css: string; ergaenzt: number } {
-  if (/--text:/.test(css)) return { css, ergaenzt: 0 };
   let ergaenzt = 0;
-  const neu = css.replace(/(:root\s*\{[^}]*?)(\s*\})/, (_ganz, kopf: string, ende: string) => {
-    ergaenzt = 1;
-    return `${kopf} --text: ${TEXT};${ende}`;
-  });
+  let neu = css;
+  for (const [name, wert] of TOKEN) {
+    if (new RegExp(`${name}:`).test(neu)) continue;
+    neu = neu.replace(/(:root\s*\{[^}]*?)(\s*\})/, (_ganz, kopf: string, ende: string) => {
+      ergaenzt++;
+      return `${kopf} ${name}: ${wert};${ende}`;
+    });
+  }
   return { css: neu, ergaenzt };
+}
+
+/**
+ * Modus-Block am Ende des Stylesheets — ersetzt eine ältere Fassung zwischen
+ * den Marken, damit ein zweiter Lauf nichts verdoppelt.
+ */
+function themaCssEinbinden(css: string): { css: string; ergaenzt: number } {
+  const muster = /[ \t]*\/\* THEMA:CSS:START \*\/[\s\S]*?\/\* THEMA:CSS:END \*\/\n?/;
+  if (muster.test(css)) {
+    const neu = css.replace(muster, THEMA_CSS);
+    return { css: neu, ergaenzt: neu === css ? 0 : 1 };
+  }
+  return { css: `${css.replace(/\s*$/, "\n")}${THEMA_CSS}  `, ergaenzt: 1 };
+}
+
+/** Das Modus-Skript steht im <head> vor dem Stylesheet — vor dem ersten Malen. */
+function themaSkriptEinbinden(html: string): { html: string; ergaenzt: number } {
+  const muster = /<!-- THEMA:JS:START -->[\s\S]*?<!-- THEMA:JS:END -->\n?/;
+  if (muster.test(html)) {
+    const neu = html.replace(muster, THEMA_SKRIPT);
+    return { html: neu, ergaenzt: neu === html ? 0 : 1 };
+  }
+  const neu = html.replace(/([ \t]*)<style>/, (ganz, einzug: string) => `${einzug}${THEMA_SKRIPT}${ganz}`);
+  return { html: neu, ergaenzt: neu === html ? 0 : 1 };
 }
 
 /** Die @font-face-Regel steht vor allem anderen, direkt über dem `:root`-Block. */
@@ -312,7 +472,11 @@ function inSelektorErsetzen(css: string, regel: Regel): { css: string; anzahl: n
   let anzahl = 0;
   // Innerste Blöcke: @media-Vorspann enthält „{“ und passt deshalb nie auf `[^{}]+`.
   const neu = css.replace(/([^{}]+)\{([^{}]*)\}/g, (ganz, selektor: string, rumpf: string) => {
-    if (!regel.selektor!.test(selektor.trim())) return ganz;
+    // Ohne den Kommentar davor: der gehört zum vorigen Block und enthält
+    // Wörter wie „img“, die sonst die Ausnahme auslösten.
+    const liste = selektor.replace(/\/\*[\s\S]*?\*\//g, "").trim();
+    if (regel.selektor && !regel.selektor.test(liste)) return ganz;
+    if (regel.ausser?.test(liste)) return ganz;
     const treffer = (rumpf.match(regel.suchen) ?? []).length;
     if (!treffer) return ganz;
     anzahl += treffer;
@@ -337,10 +501,14 @@ function stilAngleichen(html: string): { html: string; treffer: Record<string, n
 
     const token = tokenErgaenzen(angepasst);
     angepasst = token.css;
-    if (token.ergaenzt) treffer["Token --text angelegt"] = (treffer["Token --text angelegt"] ?? 0) + 1;
+    if (token.ergaenzt) treffer["Rollen-Token angelegt"] = (treffer["Rollen-Token angelegt"] ?? 0) + token.ergaenzt;
+
+    const thema = themaCssEinbinden(angepasst);
+    angepasst = thema.css;
+    if (thema.ergaenzt) treffer["Modus-Block eingebunden"] = (treffer["Modus-Block eingebunden"] ?? 0) + 1;
 
     for (const regel of REGELN) {
-      if (regel.selektor) {
+      if (regel.selektor || regel.ausser) {
         const { css: nachher, anzahl } = inSelektorErsetzen(angepasst, regel);
         if (anzahl) {
           treffer[regel.name] = (treffer[regel.name] ?? 0) + anzahl;
@@ -356,7 +524,9 @@ function stilAngleichen(html: string): { html: string; treffer: Record<string, n
     }
     return `<style>${angepasst}</style>`;
   });
-  return { html: neu, treffer };
+  const skript = themaSkriptEinbinden(neu);
+  if (skript.ergaenzt) treffer["Modus-Skript eingebunden"] = (treffer["Modus-Skript eingebunden"] ?? 0) + 1;
+  return { html: skript.html, treffer };
 }
 
 function main(): void {

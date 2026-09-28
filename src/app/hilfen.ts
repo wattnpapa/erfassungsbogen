@@ -23,6 +23,8 @@ import {
   StaerkeRolle,
   datumAusIso,
   jetztZeitpunkt,
+  zeitpunktZuIso,
+  type EebZeitpunkt,
   MINUTEN_JE_TAG,
   mitTransportVersion,
   staerke,
@@ -45,8 +47,9 @@ import { gegengezeichnetePayloadBytes, signiertePayloadBytes } from "@bos/eeb-fo
 import { absenderkarteLaden } from "./absenderkarte";
 import { geraeteSchluesselSicherstellen } from "./geraete-schluessel";
 import { binaerTeilen, istNativ, textTeilen } from "./nativ";
-import { sitzplaetzeFuer, sitzplatzBilanz, type SitzplatzBilanz } from "@bos/vokabulare/sitzplaetze";
+import { sitzplaetzeFuer, sitzplaetzeRichtwert, sitzplatzBilanz, type SitzplatzBilanz } from "@bos/vokabulare/sitzplaetze";
 import {
+  datumDeutsch,
   einheitAnzeigename,
   einheitOrt,
   funkrufText as funkrufTextEinfach,
@@ -563,9 +566,23 @@ export function transportBilanz(b: Erfassungsbogen): SitzplatzBilanz {
  */
 export function fahrzeugHinweise(b: Erfassungsbogen): string[] {
   const hinweise: string[] = [];
+  const org = b.einheit.organisation;
   b.fahrzeuge.forEach((f, i) => {
     if (!kennzeichenText(f).trim()) {
       hinweise.push(`Fahrzeug ${i + 1} hat noch kein Kennzeichen.`);
+    }
+    // 0 Sitzplätze an einem Fahrzeug, das laut Typ Leute befördert (MzKW: 7),
+    // ist fast immer ein Tippfehler — ein Anhänger hat den Richtwert 0 und
+    // löst deshalb nichts aus. Negative Werte kommen nur per Datei herein,
+    // die Eingabe hält sie auf 0; gemeldet werden sie trotzdem.
+    if (f.sitzplaetze != null && f.sitzplaetze <= 0) {
+      const richtwert = sitzplaetzeRichtwert(f, vokabularFuer(org, "fahrzeug"));
+      if (f.sitzplaetze < 0 || (richtwert != null && richtwert > 0)) {
+        hinweise.push(
+          `${fahrzeugBezeichnung(f, i, org)}: ${f.sitzplaetze} Sitzplätze eingetragen` +
+            `${richtwert != null ? ` (Richtwert ${richtwert})` : ""} — stimmt das?`,
+        );
+      }
     }
   });
   // Ohne Fahrzeuge reist die Einheit erklärtermaßen anders an — das ist kein
@@ -679,6 +696,25 @@ export function pruefpunkte(b: Erfassungsbogen, mitFahrzeugen = true): Pruefpunk
   if (b.einsatz.zeitraumBis < b.einsatz.zeitraumVon) {
     hinweise.push({ text: "Einsatzzeitraum: „bis“ liegt vor „von“.", schritt: S_EINSATZ });
   }
+  // Einsatzende 06:00 vor Einsatzbeginn 18:00 am selben Tag ging unbemerkt in
+  // die Übergabe — im Sammel-PDF steht die Einheit dann mit einem Ende vor dem
+  // Anfang, und am Meldekopf ist das nicht mehr als Tippfehler erkennbar.
+  if (
+    b.einsatz.einsatzbeginn != null &&
+    b.einsatz.einsatzende != null &&
+    b.einsatz.einsatzende < b.einsatz.einsatzbeginn
+  ) {
+    hinweise.push({
+      text: `Einsatzende ${zeitpunktDeutsch(b.einsatz.einsatzende)} liegt vor dem Einsatzbeginn ${zeitpunktDeutsch(b.einsatz.einsatzbeginn)}.`,
+      schritt: S_EINSATZ,
+    });
+  }
+  // Zahlendreher in der Stärke: 99 statt 9 fällt beim Tippen nicht auf, am
+  // Meldekopf zählt die Einheit dann mit 100 in die Lage. Zwei Muster, die
+  // fast nie stimmen: ein Einzelwert über 50 und mehr Führer als Mannschaft
+  // (ab vier Personen — ein Trupp aus Führer und Unterführer ist normal).
+  // Bewusst als Frage formuliert: ein Führungsstab kann so aussehen.
+  hinweise.push(...staerkePlausibilitaet(s).map((text) => ({ text, schritt: S_PERSONAL })));
   if (b.sofortbedarf && s.gesamt > 0 && b.sofortbedarf.verpflegungPersonen > s.gesamt) {
     hinweise.push({
       text: `Verpflegung für ${b.sofortbedarf.verpflegungPersonen} Personen angefordert, die Gesamtstärke ist aber ${s.gesamt}.`,
@@ -693,6 +729,7 @@ export function pruefpunkte(b: Erfassungsbogen, mitFahrzeugen = true): Pruefpunk
         schritt: S_SOFORTBEDARF,
       });
     }
+    hinweise.push(...betriebsstoffPlausibilitaet(b).map((text) => ({ text, schritt: S_SOFORTBEDARF })));
   }
   // Manuell erfasste Verpflegungs-Aufteilung (Meldekopf): veg + vegan dürfen die
   // Gesamtstärke nicht übersteigen — Hinweis schon bei der Stärkeerfassung.
@@ -746,6 +783,105 @@ export function pruefpunkte(b: Erfassungsbogen, mitFahrzeugen = true): Pruefpunk
 /** Nur die Hinweistexte — für Stellen, die keinen Sprung zum Schritt brauchen. */
 export function plausibilitaet(b: Erfassungsbogen, mitFahrzeugen = true): string[] {
   return pruefpunkte(b, mitFahrzeugen).map((p) => p.text);
+}
+
+/** Ab diesem Einzelwert (Führer, Unterführer oder Mannschaft) fragt die Stärkeprüfung nach. */
+const STAERKE_EINZELWERT_GRENZE = 50;
+
+/**
+ * Zahlendreher-Prüfung der Stärke, siehe {@link pruefpunkte}. Eigene Funktion,
+ * damit der Personal-Schritt sie direkt an der Stärke-Zeile zeigen kann.
+ */
+export function staerkePlausibilitaet(s: {
+  fuehrer: number;
+  unterfuehrer: number;
+  mannschaft: number;
+  gesamt: number;
+}): string[] {
+  const hinweise: string[] = [];
+  const einzel: [number, string][] = [
+    [s.fuehrer, "Führer"],
+    [s.unterfuehrer, "Unterführer"],
+    [s.mannschaft, "Mannschaft"],
+  ];
+  for (const [wert, name] of einzel) {
+    if (wert > STAERKE_EINZELWERT_GRENZE) hinweise.push(`Stärke: ${wert} ${name} — stimmt das?`);
+  }
+  if (s.gesamt >= 4 && s.fuehrer > s.mannschaft) {
+    hinweise.push(
+      `Stärke ${s.fuehrer} / ${s.unterfuehrer} / ${s.mannschaft} / ${s.gesamt}: mehr Führer als Mannschaft — stimmt das?`,
+    );
+  }
+  return hinweise;
+}
+
+/** Liter je Fahrzeug, ab denen der Betriebsstoff-Bedarf hinterfragt wird (Tank eines Lkw: 200–400 l). */
+const BETRIEBSSTOFF_JE_FAHRZEUG_GRENZE = 1000;
+
+/**
+ * Betriebsstoff-Plausibilität: „Diesel 99 999 l" tippt man mit einer Ziffer zu
+ * viel. Grenze ist 1000 l je erfasstem Fahrzeug (ohne Fahrzeuge: 1000 l) —
+ * großzügig genug für Aggregate und Reservekanister, aber nicht für einen
+ * Zahlendreher. Nicht sperrend: wer wirklich einen Tankwagen füllt, lässt es stehen.
+ */
+export function betriebsstoffPlausibilitaet(b: Pick<Erfassungsbogen, "sofortbedarf" | "fahrzeuge">): string[] {
+  const s = b.sofortbedarf;
+  if (!s) return [];
+  const fahrzeuge = Math.max(1, b.fahrzeuge.length);
+  const grenze = BETRIEBSSTOFF_JE_FAHRZEUG_GRENZE * fahrzeuge;
+  const sorten: [number, string][] = [
+    [s.dieselLiter, "Diesel"],
+    [s.benzinLiter, "Benzin"],
+    [s.gemischLiter, "Gemisch"],
+  ];
+  return sorten
+    .filter(([liter]) => liter > grenze)
+    .map(
+      ([liter, name]) =>
+        `Sofortbedarf: ${literText(liter)} ${name}` +
+        (b.fahrzeuge.length > 0 ? ` für ${b.fahrzeuge.length} ${b.fahrzeuge.length === 1 ? "Fahrzeug" : "Fahrzeuge"}` : "") +
+        ` — mehr als ${literText(BETRIEBSSTOFF_JE_FAHRZEUG_GRENZE)} je Fahrzeug. Stimmt das?`,
+    );
+}
+
+/** „5.000 l" — Tausenderpunkt wie auf dem Papierbogen, damit die Größenordnung ins Auge fällt. */
+function literText(liter: number): string {
+  return `${liter.toLocaleString("de-DE")} l`;
+}
+
+/**
+ * Zeitpunkt lesbar: „27.09.2026, 18:00" — dieselbe Schreibweise wie das
+ * Datum des Zeitraums (datumDeutsch), nur mit Uhrzeit. Vorher standen
+ * Einsatzbeginn und -ende als „2026-09-27T18:00" neben „27.09.2026" — zwei
+ * Schreibweisen für dieselbe Auskunft auf einer Seite.
+ */
+export function zeitpunktDeutsch(z: EebZeitpunkt): string {
+  const [datum = "", zeit = ""] = zeitpunktZuIso(z).split("T");
+  return `${datumDeutsch(datum)}, ${zeit}`;
+}
+
+/**
+ * Verpflegungs-Bedarf mit der Stärke mitziehen.
+ *
+ * Der Bedarf in Schritt 5 ist mit der Gesamtstärke vorbelegt. Wer danach in
+ * Schritt 3 eine Person entfernt, bekam nur einen Hinweis („Verpflegung für
+ * 4 angefordert, Stärke ist 3") und musste die Zahl selbst nachziehen — eine
+ * Angabe, zwei Orte. Deshalb folgt der Bedarf der Stärke, solange er ihr
+ * entspricht (oder noch 0 ist): Wer bewusst mehr bestellt hat, weil ein
+ * Nachzügler kommt, behält seine Zahl.
+ *
+ * Nimmt den Bogen vor der Änderung und den Patch, gibt den Patch zurück —
+ * ergänzt um den nachgezogenen Sofortbedarf, wenn nötig.
+ */
+export function verpflegungMitziehen(vorher: Erfassungsbogen, patch: Partial<Erfassungsbogen>): Partial<Erfassungsbogen> {
+  const nachher = { ...vorher, ...patch };
+  const sb = nachher.sofortbedarf;
+  if (!sb) return patch;
+  const alt = staerke(vorher).gesamt;
+  const neu = staerke(nachher).gesamt;
+  if (alt === neu) return patch;
+  if (sb.verpflegungPersonen !== alt && sb.verpflegungPersonen !== 0) return patch;
+  return { ...patch, sofortbedarf: { ...sb, verpflegungPersonen: neu } };
 }
 
 // ------------------------------------------------- Fortschritt je Schritt
@@ -892,6 +1028,23 @@ export function personLeer(p: Person): boolean {
     p.fahrerlaubnis === Fahrerlaubnis.NONE &&
     p.staerkeRolle === StaerkeRolle.MANNSCHAFT
   );
+}
+
+/**
+ * Eine Vorbelegungs-Karte, die noch niemand ausgefüllt hat: kein Name, keine
+ * Erreichbarkeit. Die StAN-Sollplätze und die Landesvorlagen legen genau
+ * solche Karten an (Rolle und Funktion gesetzt, Namen offen). Beim Wechsel
+ * des Einheitstyps und über „Vorbelegung entfernen" werden nur sie
+ * weggeräumt — eine Karte, in der schon eine Rufnummer steht, ist Inhalt,
+ * auch wenn der Name noch fehlt.
+ */
+export function personUnbenannt(p: Person): boolean {
+  return !p.vorname.trim() && !p.nachname.trim() && p.kontakte.length === 0;
+}
+
+/** Wie `personUnbenannt`, für ein Fahrzeug: das Kennzeichen ist das, was die Vorbelegung offen lässt. */
+export function fahrzeugUnbenannt(f: Fahrzeug): boolean {
+  return !f.kennzeichen?.trim();
 }
 
 /** Wie `personLeer`, für ein Fahrzeug. */

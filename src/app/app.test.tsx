@@ -387,10 +387,13 @@ describe("Assistenten-Durchlauf", () => {
       within(rueckfrage("Aktuellen Bogen verwerfen?")).getByRole("button", { name: "Verwerfen und neu beginnen" }),
     );
 
-    // Verworfen heißt: kein Bogen mehr — die App steht wieder am Anfang, und
-    // der Entwurf ist auch nicht als „Fortsetzen" übrig.
+    // Verworfen heißt: kein offener Bogen mehr — die App steht wieder am
+    // Anfang, der Entwurf ist nicht als „Fortsetzen" übrig. Verloren ist er
+    // aber nicht: er liegt in der Rückholung (Audit „Zerstörende
+    // Handlungen", D7).
     expect(screen.getByRole("heading", { name: "Digitaler Einheiten-Erfassungsbogen" })).toBeDefined();
-    expect(screen.queryByText(/Wegwerfhausen/)).toBeNull();
+    expect(screen.queryByRole("button", { name: "Fortsetzen" })).toBeNull();
+    expect(screen.getByRole("button", { name: "Zuletzt verdrängten Bogen zurückholen" })).toBeDefined();
   });
 
   it("wirft den angefangenen Bogen von der Startseite aus weg — nach Rückfrage", async () => {
@@ -411,8 +414,13 @@ describe("Assistenten-Durchlauf", () => {
     await nutzer.click(screen.getByRole("button", { name: "Verwerfen" }));
     await nutzer.click(within(rueckfrage("Angefangenen Bogen verwerfen?")).getByRole("button", { name: "Verwerfen" }));
 
-    expect(screen.getByText("Angefangener Bogen verworfen.")).toBeDefined();
-    expect(screen.queryByText(/Entwurfshausen/)).toBeNull();
+    expect(screen.getByText("Angefangener Bogen verworfen — Rückholung unten auf der Startseite.")).toBeDefined();
+    expect(screen.queryByRole("button", { name: "Fortsetzen" })).toBeNull();
+
+    // Die Rückholung bringt ihn zurück (D7).
+    await nutzer.click(screen.getByRole("button", { name: "Zuletzt verdrängten Bogen zurückholen" }));
+    expect(await screen.findByRole("heading", { name: "Gesamtübersicht" })).toBeDefined();
+    expect(screen.getAllByText(/Entwurfshausen/).length).toBeGreaterThan(0);
   });
 
   it("fragt vor dem Ersetzen des angefangenen Bogens und holt ihn danach zurück", async () => {
@@ -682,7 +690,7 @@ describe("Neuen Einsatz anlegen", () => {
     art?: string,
     ort?: string,
   ) {
-    const dialog = await screen.findByRole("dialog", { name: "Neuen Einsatz anlegen" });
+    const dialog = await screen.findByRole("dialog", { name: "Neue Einsatz-Sammlung anlegen" });
     const anlegen = within(dialog).getByRole("button", { name: "Einsatz anlegen" });
     // Ohne Namen ist der Einsatz nicht anzulegen — die Pflichtangabe sperrt den Knopf.
     expect(anlegen.hasAttribute("disabled")).toBe(true);
@@ -697,7 +705,7 @@ describe("Neuen Einsatz anlegen", () => {
     const nutzer = userEvent.setup();
     render(<App />);
 
-    await nutzer.click(screen.getByRole("button", { name: "Neuer Einsatz…" }));
+    await nutzer.click(screen.getByRole("button", { name: "Neue Einsatz-Sammlung…" }));
     await einsatzAnlegen(nutzer, "Hochwasser Weser", "Übung", "Deichabschnitt Nord");
 
     // Die Einsatzansicht übernimmt — mit Name, gewählter Art und Ort im Kopf.
@@ -715,7 +723,7 @@ describe("Neuen Einsatz anlegen", () => {
     const mitschnitt = downloadsMitschneiden();
     try {
       render(<App />);
-      await nutzer.click(screen.getByRole("button", { name: "Neuer Einsatz…" }));
+      await nutzer.click(screen.getByRole("button", { name: "Neue Einsatz-Sammlung…" }));
       await einsatzAnlegen(nutzer, "Hochwasser Weser", "Einsatz");
       await screen.findByRole("heading", { level: 1, name: "Hochwasser Weser" });
 
@@ -735,8 +743,8 @@ describe("Neuen Einsatz anlegen", () => {
     const nutzer = userEvent.setup();
     render(<App />);
 
-    await nutzer.click(screen.getByRole("button", { name: "Neuer Einsatz…" }));
-    const dialog = await screen.findByRole("dialog", { name: "Neuen Einsatz anlegen" });
+    await nutzer.click(screen.getByRole("button", { name: "Neue Einsatz-Sammlung…" }));
+    const dialog = await screen.findByRole("dialog", { name: "Neue Einsatz-Sammlung anlegen" });
     await nutzer.type(within(dialog).getByLabelText("Name"), "Verworfen");
     await nutzer.click(within(dialog).getByRole("button", { name: "Abbrechen" }));
 
@@ -754,12 +762,12 @@ describe("Neuen Einsatz anlegen", () => {
 
     await nutzer.click(screen.getByRole("button", { name: "In Einsatz aufnehmen…" }));
     // Der Anlege-Dialog erscheint über der schon offenen Einsatz-Auswahl.
-    await nutzer.click(screen.getByRole("button", { name: "Neuen Einsatz anlegen…" }));
+    await nutzer.click(screen.getByRole("button", { name: "Neue Sammlung anlegen…" }));
     await einsatzAnlegen(nutzer, "Sammelhausen");
 
     // Der Bogen ist als Meldung abgelegt: Einsatzansicht mit einer Einheit.
     expect(await screen.findByRole("heading", { level: 1, name: "Sammelhausen" })).toBeDefined();
-    const liste = screen.getByRole("heading", { name: "Einheiten (1)" }).closest("section")!;
+    const liste = screen.getByRole("heading", { name: "Einheiten (1 gemeldet · 1 zählend)" }).closest("section")!;
     expect(within(liste).getByText("THW Scanhausen")).toBeDefined();
   });
 
@@ -776,10 +784,11 @@ describe("Neuen Einsatz anlegen", () => {
     meldungHinzufuegen(einsatz.id, bogenMitName("Bestandshausen"));
     render(<App />);
 
+    // Mit vorhandener Sammlung bietet der Empfang die Aufnahme direkt an —
+    // ohne Umweg über den eigenen Arbeitsbogen (Audit „Arbeitsablauf", W1).
     fragmentSetzen(encodePayloadUrl(bogenMitName("Neuhausen"), browserKompressor));
-    await screen.findByRole("heading", { name: "Gesamtübersicht" });
-    await nutzer.click(screen.getByRole("button", { name: "In Einsatz aufnehmen…" }));
-    await nutzer.click(await screen.findByRole("button", { name: /^Sammelhausen/ }));
+    const empfang = await screen.findByRole("dialog", { name: /Meldung von „THW Neuhausen" empfangen/ });
+    await nutzer.click(within(empfang).getByRole("button", { name: /In „Sammelhausen" aufnehmen/ }));
 
     await screen.findByRole("heading", { level: 1, name: "Sammelhausen" });
     const quittiert = await waitFor(() => {
@@ -803,10 +812,10 @@ describe("Neuen Einsatz anlegen", () => {
     render(<App />);
 
     fragmentSetzen(encodePayloadUrl(bogenMitName("Doppelhausen"), browserKompressor));
-    await screen.findByRole("heading", { name: "Gesamtübersicht" });
-    await nutzer.click(screen.getByRole("button", { name: "In Einsatz aufnehmen…" }));
-    // Die Einsatz-Auswahl erscheint als eigener Dialog — er braucht einen Tick.
-    await nutzer.click(await screen.findByRole("button", { name: /^Sammelhausen/ }));
+    const empfang = await screen.findByRole("dialog", { name: /Meldung von „THW Doppelhausen" empfangen/ });
+    await nutzer.click(within(empfang).getByRole("button", { name: /In „Sammelhausen" aufnehmen/ }));
+    // Die Rückfrage zur bekannten Einheit erscheint als eigener Dialog — er braucht einen Tick.
+    await screen.findByRole("dialog", { name: "Einheit ist bereits gemeldet" });
 
     return {
       einsatzId: einsatz.id,
@@ -835,6 +844,31 @@ describe("Neuen Einsatz anlegen", () => {
     expect(neuesteJeEinheit(eintraege)).toHaveLength(2); // beide zählen getrennt
   });
 
+  /**
+   * Nach einer Papierphase: dieselbe Einheit, einmal ohne Einheitstyp
+   * abgetippt, jetzt mit Typ gescannt — der Schlüssel unterscheidet sich,
+   * der Ort nicht. Die App fragt, statt doppelt zu zählen (Audit „Analog
+   * first", A5).
+   */
+  it("fragt bei gleichem Ort und anderem Einheitstyp, ob es dieselbe Einheit ist", async () => {
+    const nutzer = userEvent.setup();
+    const einsatz = einsatzImSpeicherAnlegen("Sammelhausen", EinsatzArt.EINSATZ);
+    meldungHinzufuegen(einsatz.id, bogenMitName("Papierhausen"));
+    render(<App />);
+
+    const mitTyp = bogenMitName("Papierhausen");
+    mitTyp.einheit.einheitsTyp = { code: 3 };
+    fragmentSetzen(encodePayloadUrl(mitTyp, browserKompressor));
+    const empfang = await screen.findByRole("dialog", { name: /empfangen/ });
+    await nutzer.click(within(empfang).getByRole("button", { name: /In „Sammelhausen" aufnehmen/ }));
+    const frage = await screen.findByRole("dialog", { name: "Ist das dieselbe Einheit?" });
+    await nutzer.click(within(frage).getByRole("button", { name: /^Ja — als neue Fassung/ }));
+
+    const eintraege = einsaetzeLaden().find((s) => s.id === einsatz.id)!.eintraege;
+    expect(eintraege).toHaveLength(2);
+    expect(neuesteJeEinheit(eintraege)).toHaveLength(1);
+  });
+
   it("nimmt bei Abbruch der Rückfrage gar nichts auf", async () => {
     const nutzer = userEvent.setup();
     const { einsatzId, dialog } = await zweiteMeldungDerselbenEinheit(nutzer);
@@ -860,8 +894,8 @@ describe("Meldekopf-Scan: Beschriftung des Schließen-Knopfes", () => {
 
   /** Einsatz anlegen und den Kiosk-Scanner darin öffnen. */
   async function scannerImEinsatz(nutzer: ReturnType<typeof userEvent.setup>): Promise<HTMLElement> {
-    await nutzer.click(screen.getByRole("button", { name: "Neuer Einsatz…" }));
-    const anlegen = await screen.findByRole("dialog", { name: "Neuen Einsatz anlegen" });
+    await nutzer.click(screen.getByRole("button", { name: "Neue Einsatz-Sammlung…" }));
+    const anlegen = await screen.findByRole("dialog", { name: "Neue Einsatz-Sammlung anlegen" });
     await nutzer.type(within(anlegen).getByLabelText("Name"), "Meldekopfhausen");
     await nutzer.click(within(anlegen).getByRole("button", { name: "Einsatz anlegen" }));
 
@@ -895,6 +929,66 @@ describe("Meldekopf-Scan: Beschriftung des Schließen-Knopfes", () => {
     fragmentSetzen(teile[1]!);
     expect(await within(scanner).findByRole("button", { name: "Fertig" })).toBeDefined();
     expect(within(scanner).queryByRole("button", { name: "Abbrechen" })).toBeNull();
+  });
+});
+
+/**
+ * Stapelscan am Meldekopf: Eine Folgemeldung derselben Einheit wird ohne
+ * Rückfrage als neue Fassung angehängt — die Frage „neue Fassung oder eigene
+ * Einheit?" hielt den Stapel an, während die nächste Einheit den Code hinhielt
+ * (Audit „Stress und Unterbrechung", S1).
+ */
+describe("Meldekopf-Scan: Folgemeldung ohne Rückfrage", () => {
+  afterEach(() => {
+    window.history.replaceState(null, "", window.location.pathname + window.location.search);
+    localStorage.clear();
+  });
+
+  it("hängt eine veränderte Fassung derselben Einheit ohne Dialog an und quittiert sie als Folgemeldung", async () => {
+    const nutzer = userEvent.setup();
+    const einsatz = einsatzImSpeicherAnlegen("Stapelhausen", EinsatzArt.EINSATZ);
+    const erste = bogenMitName("Folgehausen");
+    meldungHinzufuegen(einsatz.id, erste);
+    render(<App />);
+
+    await nutzer.click(await screen.findByRole("button", { name: "Öffnen" }));
+    await nutzer.click(await screen.findByRole("button", { name: "Bogen scannen…" }));
+    const scanner = await screen.findByRole("dialog", { name: "QR-Code scannen" });
+
+    const zweite = { ...erste, sonstiges: "Nachzügler eingetroffen" };
+    fragmentSetzen(encodePayloadUrl(zweite, browserKompressor));
+
+    expect(await within(scanner).findByText(/Folgemeldung/)).toBeDefined();
+    expect(document.querySelector("dialog[aria-label='Einheit ist bereits gemeldet']")).toBeNull();
+    const eintraege = einsaetzeLaden().find((s) => s.id === einsatz.id)!.eintraege;
+    expect(eintraege).toHaveLength(2);
+    expect(neuesteJeEinheit(eintraege)).toHaveLength(1);
+  });
+});
+
+/**
+ * Speicher voll: Die Anzeige „automatisch gespeichert" darf nicht lügen
+ * (Audit „Offline und Speicher", O1).
+ */
+describe("Speicher voll", () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+    localStorage.clear();
+  });
+
+  it("meldet im Assistenten, dass nicht gespeichert wurde", async () => {
+    const nutzer = userEvent.setup();
+    render(<App />);
+    await neuerBogenBis(nutzer, 0);
+    const echt = Storage.prototype.setItem;
+    vi.spyOn(Storage.prototype, "setItem").mockImplementation(function (this: Storage, k: string, v: string) {
+      if (k === "eeb.entwurf.v1") throw new DOMException("voll", "QuotaExceededError");
+      return echt.call(this, k, v);
+    });
+    await nutzer.type(screen.getByLabelText("Name (Pflicht)"), "V");
+
+    expect(await screen.findByText(/Nicht gespeichert — der Speicher dieses Geräts ist voll/)).toBeDefined();
+    expect(screen.queryByText(/✓ automatisch gespeichert/)).toBeNull();
   });
 });
 
@@ -1117,9 +1211,9 @@ describe("Bögen aus einer PDF in einen Einsatz übernehmen", () => {
     qrTexteAusPdf.mockResolvedValue([]);
   });
 
-  /** Anlege-Dialog des Einsatzes ausfüllen (dieselben Felder wie „Neuer Einsatz…"). */
+  /** Anlege-Dialog des Einsatzes ausfüllen (dieselben Felder wie „Neue Einsatz-Sammlung…"). */
   async function einsatzAnlegen(nutzer: ReturnType<typeof userEvent.setup>, name: string) {
-    const dialog = await screen.findByRole("dialog", { name: "Neuen Einsatz anlegen" });
+    const dialog = await screen.findByRole("dialog", { name: "Neue Einsatz-Sammlung anlegen" });
     await nutzer.type(within(dialog).getByLabelText("Name"), name);
     await nutzer.click(within(dialog).getByRole("button", { name: "Einsatz anlegen" }));
   }
@@ -1150,7 +1244,7 @@ describe("Bögen aus einer PDF in einen Einsatz übernehmen", () => {
     const nutzer = userEvent.setup();
     render(<App />);
 
-    await nutzer.click(screen.getByRole("button", { name: "Neuer Einsatz…" }));
+    await nutzer.click(screen.getByRole("button", { name: "Neue Einsatz-Sammlung…" }));
     await einsatzAnlegen(nutzer, "Sturmflut");
     await screen.findByRole("heading", { level: 1, name: "Sturmflut" });
 

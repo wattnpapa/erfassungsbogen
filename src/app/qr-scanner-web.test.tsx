@@ -268,3 +268,45 @@ describe("QR-Scanner im Browser", () => {
     expect(screen.queryByRole("combobox")).toBeNull();
   });
 });
+
+/**
+ * Der Ausgang aus dem Overlay (Audit „Neuer Nutzer", F1): Ohne Kamera war der
+ * Inhalt höher als ein Telefonbildschirm, „Abbrechen" lag außerhalb und Escape
+ * tat nichts — der einzige Weg zurück war das Neuladen. Das Layout regelt
+ * index.html (rollendes Overlay, klebende Knopfleiste); hier wird geprüft, was
+ * die Komponente dazu beiträgt: Escape schließt, und der lange Erklärtext
+ * steht eingeklappt, statt die Knöpfe zu verdrängen.
+ */
+describe("QR-Scanner — Ausgang ohne Kamera", () => {
+  it("schließt das Overlay mit Escape, ohne den Handscanner-Puffer zu stören", async () => {
+    mediaDevicesSetzen(undefined);
+    const onAbbruch = vi.fn();
+    const onErgebnis = vi.fn();
+
+    render(<QrScannerWeb onErgebnis={onErgebnis} onAbbruch={onAbbruch} />);
+    await screen.findByText(/mit dem USB-Handscanner scannen/);
+
+    // Ein angefangener Scan darf durch Escape nicht als Ergebnis durchrutschen …
+    for (const zeichen of "https://erfassungsbogen.app/#0ABC") fireEvent.keyDown(window, { key: zeichen });
+    fireEvent.keyDown(window, { key: "Escape" });
+
+    expect(onAbbruch).toHaveBeenCalledOnce();
+    expect(onErgebnis).not.toHaveBeenCalled();
+    // … und Escape mit Kurzbefehl-Taste bleibt dem Browser überlassen.
+    fireEvent.keyDown(window, { key: "Escape", ctrlKey: true });
+    expect(onAbbruch).toHaveBeenCalledOnce();
+  });
+
+  it("klappt die Einstellhinweise zum Handscanner ein", async () => {
+    mediaDevicesSetzen(undefined);
+
+    render(<QrScannerWeb onErgebnis={() => {}} onAbbruch={() => {}} onBild={() => {}} />);
+    await screen.findByText(/mit dem USB-Handscanner scannen/);
+
+    const hinweise = screen.getByText("Hinweise zum Handscanner").closest("details")!;
+    expect(hinweise.open).toBe(false);
+    expect(hinweise.textContent).toMatch(/mit Enter abschließen/);
+    // Der Ausgang steht weiter als Knopf da — unabhängig vom Erklärtext.
+    expect(screen.getByRole("button", { name: "Abbrechen" })).toBeTruthy();
+  });
+});

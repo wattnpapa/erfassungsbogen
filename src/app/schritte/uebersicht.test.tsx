@@ -182,3 +182,45 @@ describe("Übersicht — PDF-Vorschau", () => {
       expect(container.querySelector("iframe")).toBeNull();
     }));
 });
+
+/**
+ * Quittung nach „PDF erzeugen" (Audit „Arbeitsablauf", W6): Die Datei entstand,
+ * der Dialog blieb stumm — ob es geklappt hat, zeigte nur der Browser, auf dem
+ * Telefon oft nur kurz. Folge: doppelte Klicks, doppelte Anhänge.
+ */
+describe("Übersicht — PDF-Quittung", () => {
+  it("nennt nach dem Erzeugen den Dateinamen im Dialog", async () => {
+    const nutzer = userEvent.setup();
+    const bogen = neuerBogen();
+    render(
+      <Uebersicht
+        bogen={{ ...bogen, einheit: { ...bogen.einheit, hierarchie: [{ bezeichnung: { code: 1 }, name: "Albstadt", telefon: "" }] } }}
+        geheZu={() => {}}
+        neu={() => {}}
+      />,
+    );
+    await nutzer.click(screen.getByRole("button", { name: "Bogen übergeben…" }));
+    const dialog = document.querySelector<HTMLDialogElement>("dialog[aria-label='Bogen übergeben']")!;
+
+    await nutzer.click(within(dialog).getByRole("button", { name: "PDF erzeugen" }));
+
+    const quittung = await within(dialog).findByText(/PDF gespeichert:/);
+    expect(quittung.getAttribute("role")).toBe("status");
+    expect(quittung.textContent).toMatch(/PDF gespeichert: eeb-\d{6}[a-z]{3}\d{2}_.*Albstadt.*\.pdf/);
+    // Der Knopf steht wieder bereit — ein zweites PDF ist möglich, aber kein Muss.
+    expect(within(dialog).getByRole("button", { name: "PDF erzeugen" })).toHaveProperty("disabled", false);
+  });
+
+  it("vergisst die Quittung beim Schließen des Dialogs", async () => {
+    const nutzer = userEvent.setup();
+    render(<Uebersicht bogen={neuerBogen()} geheZu={() => {}} neu={() => {}} />);
+    await nutzer.click(screen.getByRole("button", { name: "Bogen übergeben…" }));
+    const dialog = document.querySelector<HTMLDialogElement>("dialog[aria-label='Bogen übergeben']")!;
+    await nutzer.click(within(dialog).getByRole("button", { name: "PDF erzeugen" }));
+    await within(dialog).findByText(/PDF gespeichert:/);
+
+    await nutzer.click(within(dialog).getByRole("button", { name: "Schließen" }));
+
+    expect(within(dialog).queryByText(/PDF gespeichert:/)).toBeNull();
+  });
+});

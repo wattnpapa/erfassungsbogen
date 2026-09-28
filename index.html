@@ -160,10 +160,14 @@
     // Das statische Start-Gerüst unten erscheint sofort mit dem HTML — ohne
     // diese Zeilen wäre es bis zum Laden des App-Bundles hell und würde im
     // Nachteinsatz genau die Blendung verursachen, die der Nacht-Modus
-    // verhindern soll. Gleiche Logik wie anzeigeModus() in anzeige-modus.ts.
+    // verhindern soll. Gleiche Logik wie anzeigeModus() in anzeige-modus.ts:
+    // ohne gespeicherte Wahl zählt die Systemeinstellung (dunkel → Dunkel),
+    // eine gespeicherte Wahl — auch „standard" — geht immer vor.
     try {
       var eebModus = localStorage.getItem("eeb.anzeigemodus.v1")
         || (localStorage.getItem("eeb.feldmodus.v1") === "1" ? "feld" : "");
+      if (!eebModus && window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches)
+        eebModus = "dunkel";
       if (eebModus === "feld" || eebModus === "nacht" || eebModus === "dunkel")
         document.documentElement.classList.add(eebModus + "-modus");
     } catch (e) { /* Privatmodus/blockierter Speicher: Standard-Darstellung */ }
@@ -239,13 +243,12 @@
          erfunden werden. */
       --auf-akzent-2:     #cdd6f4;
       --alarm-auf-akzent: #ffb4ab;
-      /* Der Vollbild-QR ist bewusst modusunabhängig hell: ein Code auf
-         dunklem Grund ist unscannbar, und genau dafür wird das Vollbild
-         geöffnet. Konstanten, die als Konstanten benannt sind — nicht
-         Rohwerte, die den Modus vergessen haben. */
-      --qr-flaeche: #ffffff;
-      --qr-text:    #000000;
-      --qr-text-2:  #1a1c22;
+      /* Ruhezone des QR-Codes: die weiße Fläche, die ein Code um sich braucht,
+         um lesbar zu bleiben — mindestens vier Module, hier als Rand um das
+         Bild. Bewusst ein Rohwert in jedem Modus: Weiß ist hier keine
+         Flächenfarbe, sondern Teil des Codes. Der Grund DRUMHERUM folgt dem
+         Modus (siehe .qr-vollbild). */
+      --qr-ruhezone: #ffffff;
 
       /* Kennfarbe der Organisation: org-farben.ts setzt --org-akzent* auf
          <html>; ohne offenen Bogen greift das THW-Blau. */
@@ -630,9 +633,13 @@
       display: inline-flex; flex-wrap: wrap; max-width: 100%;
       border: var(--strich) solid var(--linie); border-radius: var(--radius); overflow: hidden;
     }
+    /* Die Segmente tragen das volle Zielmaß (44/48 px), nicht 30: sie stehen
+       im Kopf neben dem Rücksprung und in der Fußzeile neben den Datenwegen —
+       ein Fehlgriff mit Handschuh schaltete dort auf „Nacht" statt zurück zur
+       Startseite, bei Sonne ein dunkler Bildschirm. */
     .anzeige-schalter button {
       border: none; border-radius: 0; background: var(--flaeche); color: var(--text-2);
-      padding: 0.25rem 0.7rem; font-size: var(--t-xs); min-height: calc(1.9rem + var(--ziel));
+      padding: 0.25rem 0.7rem; font-size: var(--t-xs); min-height: calc(var(--ziel-basis) + var(--ziel));
       /* Nach einem Umbruch füllen die Segmente die Zeile, statt rechts eine
          Lücke zu lassen. */
       flex: 1 1 auto;
@@ -648,10 +655,14 @@
     .seiten-kopf .titelzeile h1 { flex: 1 1 14rem; }
     .seiten-kopf .titelzeile .anzeige-schalter { margin-left: auto; border-color: var(--kopf-linie); }
     .seiten-kopf .titelzeile .anzeige-schalter button + button { border-left-color: var(--kopf-linie); }
-    /* Immer sichtbarer Rücksprung zur Startseite im Kopfbereich. */
+    /* Immer sichtbarer Rücksprung zur Startseite im Kopfbereich. Sieht aus
+       wie ein Wort, ist aber ein Knopf im Zielmaß (44/48 px, gemessen vorher
+       80 × 30): der Rückweg ist die meistgenutzte Bedienung des Kopfes und
+       darf mit Handschuh nicht neben den Umschalter daneben gehen. Die
+       Trefferfläche wächst über die Höhe, nicht über einen Rahmen. */
     .zur-start {
-      display: inline-flex; border: none; background: none;
-      padding: 0.2rem 0; margin-top: 0; min-height: 0;
+      display: inline-flex; align-items: center; border: none; background: none;
+      padding: 0.2rem 0; margin-top: 0; min-height: calc(var(--ziel-basis) + var(--ziel));
       color: var(--akzent); font-size: var(--t-m); font-weight: 600; cursor: pointer;
     }
     @media (hover: hover) { .zur-start:hover { border: none; background: none; text-decoration: underline; } }
@@ -690,15 +701,33 @@
        Umbruch bleibt erlaubt: in sehr großer Schrift (Feld-Modus plus
        System-Zoom) darf der Umschalter unter den Rücksprung rutschen, statt
        ihn zu zerquetschen. */
-    .seiten-kopf.assistent-kopf .kopf-oberzeile {
+    /* Die Einsatzansicht trägt dieselbe Oberzeile (Rücksprung + Anzeige-
+       Umschalter): vorher lag der Umschalter dort 2 000 px tief in der
+       Fußzeile — wer bei Einbruch der Dunkelheit am Meldekopf auf „Nacht"
+       wollte, scrollte fünf Bildschirmhöhen (Audit „Nacht und Sicht", N3). */
+    .seiten-kopf.assistent-kopf .kopf-oberzeile,
+    .seiten-kopf.einsatz-kopf .kopf-oberzeile {
       display: flex; align-items: center; justify-content: space-between;
-      flex-wrap: wrap; gap: 0.4rem;
+      /* Mindestens 12 px zwischen Rücksprung und Umschalter — auch nach dem
+         Umbruch untereinander: zwei 44-px-Ziele mit 6 px Luft sind mit
+         Handschuh ein einziges. */
+      flex-wrap: wrap; gap: var(--r-3);
     }
-    .seiten-kopf.assistent-kopf .kopf-oberzeile .anzeige-schalter {
+    .seiten-kopf.assistent-kopf .kopf-oberzeile .anzeige-schalter,
+    .seiten-kopf.einsatz-kopf .kopf-oberzeile .anzeige-schalter {
       border-color: var(--kopf-linie);
     }
-    .seiten-kopf.assistent-kopf .kopf-oberzeile .anzeige-schalter button + button {
+    .seiten-kopf.assistent-kopf .kopf-oberzeile .anzeige-schalter button + button,
+    .seiten-kopf.einsatz-kopf .kopf-oberzeile .anzeige-schalter button + button {
       border-left-color: var(--kopf-linie);
+    }
+    /* Speicher voll: die Zeile, die sonst „gespeichert" meldet, wird zur
+       Warnung — im Kopf auf Warnfond, damit sie nicht wie die ruhige
+       Bestätigung aussieht, die sie ersetzt (Audit „Offline", O1). */
+    .seiten-kopf .autosave.speicher-fehler {
+      color: var(--warn-text); background: var(--warn-fond);
+      border: var(--strich) solid var(--warn-linie); border-radius: var(--radius);
+      padding: var(--r-2) var(--r-3); margin-bottom: var(--r-3); font-weight: 600;
     }
     .seiten-kopf.assistent-kopf .titelzeile { order: 1; }
     .seiten-kopf.assistent-kopf .autosave { order: 2; }
@@ -844,8 +873,13 @@
     input:not([type="checkbox"]):not([type="radio"]):not([type="file"]), select, textarea {
       min-height: calc(var(--ziel-basis) + var(--ziel));
     }
+    /* 1.5rem (24 px) statt 1.1rem: Das Tippziel ist die Zeile (label.inline,
+       siehe Zielmaß-Regel), aber der Blick zielt auf das Kästchen — und mit
+       18 px landete der zweite Versuch regelmäßig daneben. 24 px ist die
+       WCAG-Schwelle für das sichtbare Ziel; der Feld-Modus hebt weiter auf
+       1.7rem. */
     input[type="checkbox"], input[type="radio"] {
-      accent-color: var(--akzent); width: 1.1rem; height: 1.1rem; min-height: 0; padding: 0;
+      accent-color: var(--akzent); width: 1.5rem; height: 1.5rem; min-height: 0; padding: 0;
     }
     /* Zahlenfelder und errechnete Werte stehen in den Formularen spaltenweise
        untereinander (Stärke je Rolle, Summen). Dicktengleiche Ziffern halten
@@ -935,30 +969,34 @@
     ul.vorschlaege li { padding: 0.45rem 0.6rem; cursor: pointer; font-size: var(--t-m); }
     ul.vorschlaege li small { color: var(--text-2); margin-left: 0.3rem; }
     @media (hover: hover) { ul.vorschlaege li.aktiv, ul.vorschlaege li:hover { background: var(--flaeche-2); } }
-    .chips { display: flex; flex-wrap: wrap; gap: 0.3rem; align-items: center; margin-top: 0.2rem; }
+    /* 8 px zwischen den Chips: das ✕ des einen darf nicht am ✕ des nächsten
+       kleben — „He ×" neben „Spr ×" war mit Handschuh ein Ziel. */
+    .chips { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; margin-top: 0.2rem; }
     /* Der Suchhinweis („Kraftfahrer? → Fahrerlaubnis") bricht in eine eigene
        Zeile unter Chips und Feld, statt sich zwischen die Knöpfe zu quetschen. */
     .chips .suchhinweis { flex-basis: 100%; }
+    /* Der Chip ist so hoch wie jedes andere Tippziel (44/48 px): Er ist die
+       Zeile, in der ein Eintrag steht, und das ✕ darin wird beim Durchwischen
+       einer Chip-Reihe getroffen — mit 31 px Höhe lag der Daumen halb daneben
+       und halb auf dem Kreuz. Der Text bleibt leise (--t-s); nur die Fläche
+       wächst. */
     .chip {
       background: var(--flaeche-2); border: var(--strich) solid var(--linie); border-radius: var(--radius);
-      padding: 0.15rem 0.5rem; font-size: var(--t-s); display: inline-flex; gap: 0.3rem; align-items: center;
+      padding: 0.15rem 0.25rem 0.15rem 0.6rem; font-size: var(--t-s); display: inline-flex; gap: 0.3rem; align-items: center;
+      min-height: calc(var(--ziel-basis) + var(--ziel));
     }
-    /* Das ✕ entfernt einen Eintrag — es braucht ein Tippziel, auch wenn der
-       Chip schmal bleiben soll. Sichtbar ist der Knopf so groß wie die
-       Schrift, angefasst wird die Fläche darum: `min-width/height` trägt die
-       24 px der WCAG-Zielgröße, das ::after dehnt sie im Feld-Modus auf die
-       48 px, die der Modus überall zusagt. `min-height: 0` stand hier, weil
-       das Grundmaß der Knöpfe den Chip auseinandergezogen hätte — das
-       erledigt jetzt die negative Einrückung des Pseudoelements. */
+    /* Das ✕ entfernt einen Eintrag ohne Rückfrage — es war mit 24 × 24 px das
+       kleinste Ziel der App. Jetzt 2rem (32 px) sichtbare Trefferfläche, im
+       Feld-Modus das volle Grundmaß (44 px): dort wird mit Handschuh
+       gearbeitet, und ein verschwundenes „ZFü" fällt erst am Meldekopf auf.
+       Ein Pseudoelement mit negativem Einzug (frühere Lösung) hätte das
+       Nachbar-✕ überdeckt, sobald die Chips 8 px auseinanderstehen. */
     .chip button {
-      position: relative; border: none; background: none; font-weight: bold;
-      padding: 0; min-width: 1.5rem; min-height: 1.5rem;
+      border: none; background: none; font-weight: bold;
+      padding: 0; min-width: 2rem; min-height: 2rem;
       display: inline-flex; align-items: center; justify-content: center;
     }
-    .chip button::after {
-      content: ""; position: absolute;
-      inset: calc(-0.5 * var(--ziel)) calc(-0.25rem - 0.5 * var(--ziel));
-    }
+    .feld-modus .chip button { min-width: var(--ziel-basis); min-height: var(--ziel-basis); }
     .karte .entfernen { float: right; color: var(--alarm); border-color: var(--alarm); font-size: var(--t-xs); }
     @media (hover: hover) { .karte .entfernen:hover { color: var(--alarm); border-color: var(--alarm); background: var(--flaeche-2); } }
     /* Wiederholte Einträge (Person, Fahrzeug) bekommen einen Kopf: links steht,
@@ -975,9 +1013,24 @@
        tragen nur ein Zeichen und dürfen trotzdem nicht kleiner als ein Finger
        sein — daher feste Breite statt Text-Padding. Sie sitzen rechts neben den
        Feldern, vor dem Löschknopf: erst die Ordnung, dann der Abgang. */
-    .sortieren { display: inline-flex; gap: 0.25rem; }
-    .sortieren > button { min-width: calc(2.25rem + var(--ziel)); padding: 0.25rem; line-height: 1; }
+    /* Volles Zielmaß je Pfeil (44/48 px, vorher 36) und 8 px Luft dazwischen
+       (Feld: 12 px): drei Pfeile mit 4 px Abstand waren ein Griff ins Blaue —
+       ein Fehlgriff sortiert nur um, aber in der Tabelle folgt direkt das
+       Löschen. Der Abstand hängt an --ziel, damit der Feld-Modus ihn wie die
+       Ziele mitzieht. */
+    .sortieren { display: inline-flex; gap: calc(0.5rem + var(--ziel)); }
+    /* Hinweis nach der StAN-Vorbelegung auf Schritt 1: sagt, was der
+       Einheitstyp gerade angelegt hat, und trägt den Weg zurück (Audit
+       „Fehler", E1). Knopf in eigener Zeile, damit er nicht am Satz klebt. */
+    .vorbelegung-hinweis { display: flex; flex-wrap: wrap; align-items: center; gap: var(--r-2) var(--r-3); }
+    .sortieren > button { min-width: calc(var(--ziel-basis) + var(--ziel)); padding: 0.25rem; line-height: 1; }
     .sortieren > button:disabled { opacity: 0.4; }
+    /* In der Schnelleingabe-Tabelle steht das ✕ (Person entfernen) in der
+       Zelle neben den Pfeilen — 17 px daneben. Der Löschknopf rückt um --r-3
+       ab und bekommt selbst das Grundmaß; sein Zellen-Polster allein trug
+       nur 41 px Breite. */
+    .schnell-tabelle td.sortier-spalte + td { padding-left: var(--r-3); }
+    .schnell-tabelle td.sortier-spalte + td > button { min-width: calc(var(--ziel-basis) + var(--ziel)); }
     .eintrag-kopf > .sortieren { margin-left: auto; }
     .eintrag-kopf > .sortieren + .entfernen { margin-left: var(--r-2); }
     .sortier-spalte { white-space: nowrap; }
@@ -1054,6 +1107,14 @@
        gehört in dieser App der einen primären Aktion einer Ansicht. */
     button.gefahr { color: var(--alarm); border-color: var(--alarm); }
     @media (hover: hover) { button.gefahr:hover:not(:disabled) { color: var(--alarm); border-color: var(--alarm); background: var(--flaeche-2); } }
+    /* Ein fokussiertes Feld rollt über die feste Fußleiste, nicht darunter:
+       Tippte man auf ein Feld, das gerade unter der Leiste verschwand, traf
+       man „Weiter" (Audit „Handschuh", G6). */
+    html { scroll-padding-bottom: calc(6rem + env(safe-area-inset-bottom)); }
+    /* Abschluss der Einsatz-Erfassung auf jedem Schritt, zwischen Zurück und
+       Weiter — am Meldekopf reichen oft Schritt 1 und 3 (Audit „Neuer
+       Nutzer", F2). Schmal gesetzt, damit drei Knöpfe auf 360 px passen. */
+    footer.nav .uebernehmen { flex: 0 1 auto; padding-inline: 0.6rem; font-size: var(--t-s); white-space: normal; line-height: 1.15; }
     footer.nav {
       position: fixed; bottom: 0; left: 0; right: 0; background: var(--flaeche);
       border-top: var(--strich-stark) solid var(--linie);
@@ -1076,13 +1137,45 @@
        rückt der Kopf deshalb zusammen. Was verschwindet, ist die
        Speicherzeile — eine Zusicherung, keine Auskunft; das Übungsband
        bleibt, es ist eine rechtlich erhebliche Kennzeichnung. */
-    @media (orientation: landscape) and (max-height: 30rem) {
+    /* Gemessen bei 640 × 360 (Telefon quer im Fahrzeughalter): der
+       Assistenten-Kopf endete danach immer noch bei 181 px (Feld: 215), die
+       Fußleiste begann bei 299 — dazwischen 118 px Formular, eine Überschrift
+       und eine Zeile. Der Kopf wird deshalb quer auf zwei Zeilen
+       zusammengezogen: Zeichen, Titel, Rücksprung und Umschalter teilen sich
+       EINE Zeile (kleine Schrift, kompakte Segmente), darunter die
+       Schrittleiste einzeilig. Die läuft hier ausdrücklich waagerecht — die
+       Abwägung, die im Hochformat gegen das Rollen sprach (Schritt 5 und 6
+       wären versteckt), kippt quer: dort ist die Höhe das knappe Gut, und die
+       Leiste zeigt am Rand den Anschnitt des nächsten Reiters. Die Grenze
+       liegt bei 500 px (31.25rem): darunter fällt jedes Telefon quer. */
+    @media (orientation: landscape) and (max-height: 31.25rem) {
       .seiten-kopf { --kopf-innen: var(--r-1) var(--r-4); --kopf-kante: 2px; }
       .seiten-kopf .autosave { display: none; }
       .uebungs-band { padding-block: 0.1rem; }
       main { padding-top: var(--r-3); }
-      footer.nav { padding-top: 0.35rem; padding-bottom: max(0.35rem, env(safe-area-inset-bottom)); }
-      footer.nav button { min-height: calc(2.25rem + var(--ziel)); }
+      /* Schmaler, nicht kleiner: 0.25rem Polster, die Knöpfe behalten das
+         Grundmaß (44/48 px) — quer wird genauso mit Handschuh getippt. */
+      footer.nav { padding-top: 0.25rem; padding-bottom: max(0.25rem, env(safe-area-inset-bottom)); }
+      footer.nav button { min-height: calc(var(--ziel-basis) + var(--ziel)); padding-block: 0.3rem; }
+      .seiten-kopf.assistent-kopf .kopf-inhalt { flex-direction: row; flex-wrap: wrap; align-items: center; column-gap: var(--r-3); }
+      .seiten-kopf.assistent-kopf .titelzeile { order: 0; flex: 1 1 auto; min-width: 0; padding: 0.15rem 0; gap: 0.4rem; flex-wrap: nowrap; }
+      /* Der Titel gibt nach, nicht die Zeile: im Feld-Modus (112 % Schrift)
+         passten Titel, Rücksprung und vier Segmente nicht nebeneinander, und
+         der Umbruch kostete genau die Zeile, die hier gewonnen werden soll.
+         Der Name der App ist auf jedem Schritt derselbe — abgeschnitten ist
+         er quer verschmerzbar, eine zweite Kopfzeile nicht. */
+      .seiten-kopf.assistent-kopf .titelzeile h1 { font-size: var(--t-s); flex: 0 1 auto; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+      /* Im Feld-Modus (größere Schrift, größere Segmente) reichte selbst der
+         gekürzte Titel, um die Oberzeile in eine zweite Zeile zu drücken —
+         gemessen 145 statt der angestrebten 200 px Formular. Der Titel ist
+         der Name der App und auf jedem Schritt derselbe; das Zeichen der
+         Einheit daneben bleibt und trägt die Wiedererkennung. */
+      .feld-modus .seiten-kopf.assistent-kopf .titelzeile h1 { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+      .seiten-kopf.assistent-kopf img.einheit-avatar { height: 1.6rem; }
+      .seiten-kopf.assistent-kopf .kopf-oberzeile { order: 1; flex: 0 0 auto; gap: var(--r-3); }
+      .seiten-kopf.assistent-kopf .kopf-oberzeile .anzeige-schalter button { padding-inline: 0.45rem; }
+      .seiten-kopf.assistent-kopf .schritte { order: 3; flex: 1 1 100%; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: thin; }
+      .seiten-kopf.assistent-kopf .schritte button { white-space: nowrap; padding: 0.3rem 0.6rem; min-height: calc(2.25rem + var(--ziel)); }
     }
     footer.nav button { min-height: calc(2.6rem + var(--ziel)); padding: 0.55rem 1.1rem; font-size: var(--t-m); }
     .fehler { color: var(--alarm); }
@@ -1277,8 +1370,12 @@
     .schnell-tabelle td:last-child button { border: none; background: none; font-weight: bold; }
     /* Eingebettete PDF-Vorschau (Übersicht, nur Browser/Desktop). */
     .pdf-rahmen { width: 100%; height: 32rem; border: 1px solid var(--rand); border-radius: var(--radius); margin-top: 0.6rem; }
-    /* „Bogen übergeben"-Dialog: je Transportweg ein voller Knopf + Situationshilfe. */
-    .teilen-dialog .teilen-weg { margin: 0.9rem 0; }
+    /* „Bogen übergeben"-Dialog: je Transportweg ein voller Knopf + ein Satz
+       Situationshilfe. Die drei Vor-Ort-Wege stehen als dichter Stapel
+       (--r-2 statt 0.9rem Absatz): unter Stress wird der Text nicht gelesen,
+       der zweite Knopf muss ohne Scrollen im Bild stehen. */
+    .teilen-dialog .teilen-weg { margin: var(--r-3) 0 0; }
+    .teilen-dialog .teilen-weg + .teilen-weg { margin-top: var(--r-2); }
     /* Zweite Stufe des Übergeben-Dialogs: Link/CSV/Excel eingeklappt, damit am
        Entscheidungspunkt die Vor-Ort-Wege (QR, Nahbereich, PDF) tragen. */
     .teilen-dialog .teilen-weitere { margin: 0.9rem 0 0; border-top: var(--strich) solid var(--linie-fein); padding-top: 0.6rem; }
@@ -1289,6 +1386,10 @@
     @media (hover: hover) { .teilen-dialog .teilen-weitere > summary:hover { color: var(--akzent); } }
     .teilen-dialog .teilen-weg button { width: 100%; }
     .teilen-dialog .teilen-weg .hinweis { margin: 0.25rem 0 0; }
+    /* Quittung „PDF gespeichert: …" — im Erledigt-Grün und mit dem Dateinamen
+       in Datenschrift, damit er sich gegen den Hinweis darüber absetzt und
+       vom Bildschirm ablesen lässt. */
+    .teilen-dialog .pdf-quittung { color: var(--gut); font-weight: 600; overflow-wrap: anywhere; }
     /* „Vorlage teilen": der QR-Code steht direkt im Dialog — das Gerät daneben
        scannt ihn ohne Vollbild. Das Bild bringt seinen weißen Rand selbst mit. */
     .teilen-dialog .vorlage-qr { display: block; width: 100%; max-width: 18rem; margin: 0 auto; image-rendering: pixelated; }
@@ -1310,8 +1411,11 @@
     }
     /* Übersichts-Aktionen: die eine primäre Aktion steht heraus, die
        Nebenaktionen bilden ein eigenes, leicht abgesetztes Cluster. */
-    .kopfzeile > span.uebersicht-aktionen { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; }
-    .uebersicht-aktionen .neben-aktionen { display: inline-flex; flex-wrap: wrap; gap: 0.4rem; }
+    /* 12 px zwischen den Knöpfen (--r-3), nicht 6: „Neuer Bogen" (mit
+       Rückfrage) steht neben „Als Vorlage speichern" — mit Handschuh braucht
+       das Gegensatzpaar Luft. */
+    .kopfzeile > span.uebersicht-aktionen { display: flex; flex-wrap: wrap; gap: var(--r-3); align-items: center; }
+    .uebersicht-aktionen .neben-aktionen { display: inline-flex; flex-wrap: wrap; gap: var(--r-3); }
     /* Nebenaktionen deutlich abgesetzt: spürbarer Spalt plus Trennlinie in der
        kräftigeren Linienfarbe — Fill-vs-Outline allein trug die Trennung im
        Live-Bild zu leise. */
@@ -1584,6 +1688,62 @@
       vertical-align: 0.1em; white-space: nowrap;
     }
     .teil-badge { border-color: var(--akzent); color: var(--akzent); }
+    /* Zeiten je Einheit (eingetroffen / abgerückt) — die Frage „seit wann ist
+       wer da?" stand bisher auf keiner Karte (Audit „Führungssicht", K2).
+       Datenschrift, damit Uhrzeiten untereinander vergleichbar stehen. */
+    .zeiten-zeile { display: block; font-variant-numeric: tabular-nums; }
+    .zeiten-zeile .zeit-aendern { margin-left: 0.25rem; font-size: var(--t-xs); }
+    /* „neu" = in den letzten 30 Minuten eingetroffen: das, was seit dem
+       letzten Blick dazukam. Akzent statt Warnfarbe — es ist Information,
+       kein Problem. „alt" = Absender-Stand deutlich älter als das Eintreffen:
+       ein Hinweis zum Nachfragen, deshalb in der Warnfarbe. */
+    .neu-badge, .alt-badge {
+      display: inline-block; margin-left: 0.4rem; padding: 0 0.35rem;
+      border-radius: var(--radius); font-size: var(--t-xs); font-weight: 700;
+      letter-spacing: 0.04em; vertical-align: 0.1em; white-space: nowrap;
+    }
+    .neu-badge { background: var(--akzent); color: var(--auf-akzent); }
+    .alt-badge { background: var(--warn-fond); color: var(--warn-text); border: 1px solid var(--warn-linie); }
+    /* Sofortbedarf je Einheit: nur gesetzte Marken, jede ein eigenes Kästchen
+       — wer Ruhezeit braucht, muss ohne „Details" erkennbar sein (K1). Warn-
+       Tokens, weil jede Marke eine offene Anforderung ist. */
+    .bedarf-zeile { display: flex; flex-wrap: wrap; gap: 0.3rem; margin-top: 0.25rem; }
+    .bedarf-marke {
+      display: inline-block; padding: 0.05rem 0.4rem;
+      background: var(--warn-fond); color: var(--warn-text);
+      border: 1px solid var(--warn-linie); border-radius: var(--radius);
+      font-size: var(--t-xs); font-weight: 600; white-space: nowrap;
+    }
+    .bedarf-filter { margin-top: var(--r-2); }
+    /* Auftrag/Notiz der Führungsstelle: steht als eigene Zeile unter dem
+       Namen, links mit dem Akzentstrich markiert — sie ist das, was die
+       Führungsstelle der Einheit gegeben hat, nicht deren Meldung (K5). */
+    .auftrag-notiz {
+      display: block; margin-top: 0.25rem; padding-left: var(--r-2);
+      border-left: var(--strich-stark) solid var(--akzent); color: var(--text);
+      font-size: var(--t-s); overflow-wrap: anywhere;
+    }
+    .einheiten-tabelle .auftrag-zelle { min-width: 10rem; overflow-wrap: anywhere; }
+    .einheiten-tabelle .bedarf-zelle { white-space: nowrap; }
+    /* Lücken einer Meldung (fehlende Rufnummer, leerer Auftrag …): ein
+       Link-Knopf mit Zahl und ausklappbarer Liste — nachfragen, solange die
+       Einheit noch vor einem steht (K3). */
+    .luecken-marke { font-size: var(--t-xs); color: var(--warn-text); font-weight: 600; margin-left: 0.4rem; }
+    .luecken-liste { margin: 0.25rem 0 0; padding-left: 1.2rem; font-size: var(--t-s); color: var(--warn-text); }
+    /* Inline-Bearbeitung von Zeiten und Notiz: gleiche Bauart wie der Zug. */
+    .zug-bearbeiten.zeit-bearbeiten, .zug-bearbeiten.notiz-bearbeiten { display: flex; flex-wrap: wrap; align-items: flex-end; gap: var(--r-2); margin-top: var(--r-2); }
+    .zug-bearbeiten.notiz-bearbeiten input { flex: 1 1 14rem; }
+    /* „Als anwesend" steht nicht dort, wo eben „Abrücken" stand: ein zweiter
+       Tipp an derselben Stelle schaltete sonst unbemerkt zurück (D4). */
+    .knopf-abgesetzt { margin-left: var(--r-4); }
+    /* Zwischensummen je Zug als aufklappbare Karte: ab drei Zügen zu, damit
+       die Einheitenliste auf dem Tablet ohne Wischen beginnt (K6). */
+    details.zug-summen > summary { cursor: pointer; list-style: none; display: flex; align-items: center; min-height: calc(var(--ziel-basis) + var(--ziel)); }
+    details.zug-summen > summary::-webkit-details-marker { display: none; }
+    details.zug-summen > summary::before { content: "▸"; margin-right: var(--r-2); color: var(--text-2); }
+    details.zug-summen[open] > summary::before { content: "▾"; }
+    details.zug-summen > summary h2 { margin: 0; }
+    .einsatz-ausgaben-hinweis { flex-basis: 100%; margin: var(--r-1) 0 var(--r-2); }
     /* Umschalter Karten/Tabelle im Kartenkopf. Zwei aneinanderliegende
        Knöpfe statt einer Auswahlliste: es sind genau zwei Zustände, und der
        gewählte muss ohne Aufklappen sichtbar sein. */
@@ -1620,6 +1780,16 @@
       min-height: 0; cursor: pointer; text-align: inherit;
     }
     .spalten-sortierung:hover { color: var(--akzent); text-decoration: underline; }
+    /* In der Einsatztabelle ist die ganze Kopfzelle der Griff: „F", „U", „M"
+       maßen als Knopf 9 × 20 px — am Rechner ein Mausziel, am Telefon keins.
+       Die Zelle gibt ihr Polster an den Knopf ab, der füllt sie und trägt das
+       Zielmaß in der Höhe; die Ausrichtung der Zahlenspalten bleibt. */
+    table.einheiten-tabelle thead th:has(> .spalten-sortierung) { padding: 0; }
+    table.einheiten-tabelle thead th > .spalten-sortierung {
+      display: flex; width: 100%; align-items: center;
+      min-height: calc(var(--ziel-basis) + var(--ziel)); padding: 0.35rem 0.5rem;
+    }
+    table.einheiten-tabelle thead th.zahl > .spalten-sortierung { justify-content: flex-end; }
     .sortier-pfeil { color: var(--akzent); font-size: 0.8em; }
     /* Die Summenzeile ist der Abschluss, nicht eine Zeile mehr: kräftige Linie
        darüber, wie unter einer aufaddierten Spalte auf Papier. */
@@ -1705,18 +1875,27 @@
       display: grid; gap: var(--r-4) var(--r-5);
       grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
     }
-    .fuss-gruppe { display: flex; flex-direction: column; align-items: flex-start; gap: 0.35rem; }
+    .fuss-gruppe { display: flex; flex-direction: column; align-items: flex-start; gap: 0; }
     /* Diese Links stehen als eigene Zeilen in einer Liste, nicht eingebettet
        in einen Satz — die Ausnahme der WCAG-Zielgröße für Links im Fließtext
        greift hier also nicht. Höhe statt Rahmen: die Zeilen bleiben optisch
-       Text, bekommen aber eine anfassbare Fläche. */
+       Text, bekommen aber eine anfassbare Fläche — das volle Zielmaß (44/48
+       px, gemessen vorher 24–30 px mit 6 px Luft). Die Zeilen stoßen
+       aneinander; die Höhe ist der Abstand. */
     .fuss-gruppe a,
     .fuss-gruppe button.link,
     .fuss-schmal nav a,
     .fuss-schmal nav button.link {
       display: inline-flex; align-items: center;
-      min-height: calc(1.5rem + var(--ziel));
+      min-height: calc(var(--ziel-basis) + var(--ziel));
     }
+    /* Die Datenwege (Datensicherung, Beispielbögen, Geräteschlüssel, Alle
+       Daten löschen) sind Knöpfe, die etwas tun — sie bekommen zusätzlich
+       12 px Luft zueinander, und der eine, der alles vernichtet, steht
+       nochmals abgesetzt: der erste Griff daneben ist mit Handschuh die Regel,
+       und der Dialog dahinter kostet einen Abbrechen-Tipp. */
+    .fuss-gruppe button.link + button.link { margin-top: var(--r-3); }
+    .fuss-gruppe button.link.gefahr { margin-top: var(--r-5); }
     .fuss-titel {
       font-family: var(--schrift-daten); font-size: var(--t-xs); font-weight: 700; letter-spacing: 0.1em;
       /* --text-2 statt --text-3: die winzige Versalzeile braucht 4,5:1 Kontrast
@@ -1750,8 +1929,8 @@
        liegt fix darüber und verdeckt die Zeile sonst. */
     footer.seite.fuss-schmal { padding: var(--r-3) var(--r-4) 5rem; gap: 0; }
     .fuss-schmal nav {
-      display: flex; flex-wrap: wrap; align-items: baseline;
-      gap: 0.4rem var(--r-3);
+      display: flex; flex-wrap: wrap; align-items: center;
+      gap: 0 var(--r-3);
     }
     .fuss-schmal .fuss-version { color: var(--text-2); margin-left: auto; }
     footer.seite.fuss-schmal a,
@@ -1871,15 +2050,23 @@
     .scanner {
       position: fixed; inset: 0; z-index: 100; background: #000;
       display: flex; flex-direction: column; align-items: center;
-      justify-content: space-between; padding: 1.5rem 1rem; gap: 1rem;
+      justify-content: space-between; padding: 1.5rem 1rem 0; gap: 1rem;
       /* Mobile Browser: `inset: 0` misst den Layout-Viewport — bei sichtbarer
          Browserleiste läge „Abbrechen" darunter und der Scan-Modus hätte
          scheinbar keinen Ausgang. `100dvh` folgt der Leiste; die Safe-Area
          hält die Knöpfe über dem Home-Indikator (PWA/Standalone). */
       height: 100dvh;
-      padding-bottom: calc(1.5rem + env(safe-area-inset-bottom));
+      /* Ohne Kamera (Fehlertext plus Handscanner-Anleitung) war der Inhalt
+         bei 360 × 640 rund 840 px hoch, im Feld-Modus 1030 — und das Overlay
+         schnitt ihn ab: „Abbrechen" stand bei 800 px, unerreichbar, der
+         einzige Ausweg war das Neuladen. Das Overlay rollt deshalb, und die
+         Knopfleiste (.scanner-aktionen) klebt an seiner Unterkante. */
+      overflow-y: auto;
     }
-    .scanner video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+    /* `fixed` statt `absolute`: als absolut gesetztes Kind rollte das
+       Kamerabild mit dem Inhalt mit. Beide Rechtecke (Video und Suchrahmen)
+       bleiben so viewport-bezogen — darauf rechnet suchAusschnitt. */
+    .scanner video { position: fixed; inset: 0; width: 100%; height: 100%; object-fit: cover; }
     .scanner > * { position: relative; }
     /* Dunkle Unterlage unter dem Text: Der Schlagschatten allein trägt nur über
        dunklem Bild. Abgefilmt wird aber oft ein Bildschirm — hell und flächig,
@@ -1943,6 +2130,17 @@
       background: #fff; color: #000; border-color: #fff; text-shadow: none; font-weight: 700;
     }
     .handscanner-fussnote { font-size: var(--t-s); color: rgba(255, 255, 255, 0.8); }
+    /* Die Einstellhinweise (Enter-Abschluss, Tastaturbelegung) sind
+       eingeklappt: rund 50 Wörter, die nur braucht, wessen Scanner verdreht
+       tippt — ausgeklappt verdrängten sie die Knopfleiste. Die Zeile ist
+       selbst ein Tippziel im Grundmaß. */
+    .handscanner-hinweise { text-align: left; }
+    .handscanner-hinweise > summary {
+      cursor: pointer; font-weight: 600; text-align: center;
+      display: flex; align-items: center; justify-content: center;
+      min-height: calc(var(--ziel-basis) + var(--ziel));
+    }
+    .handscanner-hinweise > p { margin: 0.2rem 0 0; }
     /* Suchrahmen und seine Quittung. Der Rahmen ist der einzige Punkt, auf dem
        der Blick beim Abfilmen wirklich liegt — die Hände halten den Stapel, die
        Textzeile darüber wird nicht gelesen. Ein angenommener Teil quittiert
@@ -1973,8 +2171,18 @@
     }
     .scanner-rahmen.angenommen { border-color: #8fe0ab; transition-duration: var(--dauer-1); }
     .scanner-rahmen.angenommen::after { opacity: 0.22; transition-duration: var(--dauer-1); }
-    .scanner-aktionen {
-      display: flex; flex-direction: column; align-items: center; gap: 0.75rem;
+    /* Der Ausgang steht auf jeder Displayhöhe im Bild: die Leiste klebt an
+       der Unterkante des rollenden Overlays (sticky schlägt das `relative`
+       aller Scanner-Kinder), mit eigener dunkler Unterlage, weil unter ihr
+       Text oder Kamerabild vorbeirollen. Die Knöpfe stehen in einer Zeile
+       und brechen um — gestapelt kosteten drei Knöpfe 160 px Höhe. Die
+       Safe-Area wandert vom Overlay hierher: `bottom: 0` misst am Rollfenster,
+       ein Polster am Overlay läge sonst UNTER der Leiste. */
+    .scanner > .scanner-aktionen {
+      position: sticky; bottom: 0; z-index: 1; width: 100%;
+      display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 0.5rem 0.75rem;
+      padding: 0.75rem 0 calc(0.75rem + env(safe-area-inset-bottom));
+      background: linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.75) 35%);
     }
     /* Kamera-Auswahl im Scanner (erst ab zwei Kameras sichtbar): erbt das
        Feld-Aussehen, bleibt aber schmal genug, dass lange Gerätenamen die
@@ -2847,24 +3055,34 @@
     .platform-android.debug-rahmen #app { background: var(--md-surface); }
 
     /* ---------------------------------------------------------------
-       Vollbild-QR zum Vorzeigen: weißer Grund, maximale Größe — für den
-       Handy-zu-Tablet-Scan ohne Papier. Bei Segmentierung blättert die
-       Navigation durch die Teile (der Scanner sammelt sie ohnehin
-       nacheinander ein).
+       Vollbild-QR zum Vorzeigen: maximale Größe — für den Handy-zu-Tablet-
+       Scan ohne Papier. Bei Segmentierung blättert die Navigation durch die
+       Teile (der Scanner sammelt sie ohnehin nacheinander ein).
+
+       Weiß ist nur der Code samt Ruhezone, nicht der Bildschirm: die Fläche
+       drumherum trägt den Seitengrund des Modus. Vorher war das ganze
+       Vollbild Weiß — nachts im Bereitstellungsraum eine Lampe in der Hand,
+       Nachtsicht weg für beide Beteiligten, und das Telefon wurde
+       abgeschirmt gehalten, was das Scannen erschwert. Ein Scanner braucht
+       um den Code vier Module Weiß (Ruhezone), keinen weißen Bildschirm;
+       die 1.5rem (24 px) Rand um das Bild leisten das auch bei kleinen
+       Codes. Im Standard- und Feld-Modus ist der Grund ohnehin hell.
        --------------------------------------------------------------- */
     .qr-vollbild {
-      position: fixed; inset: 0; z-index: 110; background: #fff;
+      position: fixed; inset: 0; z-index: 110; background: var(--grund);
       display: flex; flex-direction: column; align-items: center; justify-content: center;
       gap: 0.8rem; padding: 1rem;
     }
     .qr-vollbild img {
-      width: min(92vw, 68vh); max-width: none;
+      /* content-box: die Ruhezone kommt zum Bild dazu, statt es zu verkleinern;
+         das Maß nimmt sie deshalb von der Fensterkante vorweg. */
+      box-sizing: content-box;
+      width: min(calc(92vw - 3rem), calc(68vh - 3rem)); max-width: none;
+      padding: 1.5rem; background: var(--qr-ruhezone);
       image-rendering: pixelated; border: none;
     }
-    .qr-vollbild p { margin: 0; color: var(--qr-text); text-align: center; }
+    .qr-vollbild p { margin: 0; color: var(--text); text-align: center; }
     .qr-vollbild-nav { display: flex; gap: 0.8rem; flex-wrap: wrap; justify-content: center; }
-    .qr-vollbild-nav button { background: var(--qr-flaeche); color: var(--qr-text-2); border: 1px solid var(--rand); }
-    .qr-vollbild-nav button.primaer { background: var(--blau); color: #fff; }
 
     /* Papierkorb-Karten (gelöschte Vorlagen/Einsätze): sichtbar zurückgestuft. */
     section.karte.papierkorb { background: var(--flaeche-2); border-style: dashed; }
@@ -2941,11 +3159,13 @@
        ist die Wahl fürs abgedunkelte Büro oder den Dienstabend, nicht für
        die Dunkeladaption.
 
-       Ausdrücklich gewählt statt automatisch: die Systemeinstellung des
-       Geräts schaltet die App NICHT um. Ein halb angewandtes Dunkel — dunkle
-       Fläche, schwarze Schrift — ist im Einsatz schlimmer als eine hell
-       gebliebene Oberfläche, und wer draußen mit Handschuhen arbeitet, will
-       ohnehin selbst entscheiden.
+       Die Systemeinstellung „dunkel" ist nur die Vorgabe beim ersten Start
+       (Boot-Skript oben, anzeige-modus.ts): sie wählt diesen Modus, solange
+       nichts gespeichert ist. Eine einmal getroffene Wahl — auch „Standard"
+       — geht immer vor und wird nie automatisch umgestellt: Ein halb
+       angewandtes Dunkel wäre im Einsatz schlimmer als eine hell gebliebene
+       Oberfläche, und wer draußen mit Handschuhen arbeitet, entscheidet
+       selbst.
        --------------------------------------------------------------- */
     .dunkel-modus {
       color-scheme: dark;
@@ -2995,6 +3215,10 @@
     .dunkel-modus .offline-badge { color: var(--gut); border-color: var(--gut); }
     /* QR-Bilder behalten ihre weiße Ruhezone — sonst sind sie unscannbar. */
     .dunkel-modus .qr-box img { background: #fff; padding: 8px; }
+    /* Das taktische Zeichen ist für weißes Papier gezeichnet und steht im
+       Kopf auf weißer Unterlage — im dunklen Bild ein heller Fleck. Leicht
+       gedimmt bleibt es erkennbar, ohne die hellste Stelle zu sein. */
+    .dunkel-modus img.einheit-avatar { filter: brightness(0.85); }
 
     /* Helle Schrift auf dunklem Grund läuft optisch zu: die Punzen füllen sich,
        Zeilen rücken zusammen. Beides wird auf derselben Leiter ausgeglichen,
@@ -3060,9 +3284,16 @@
       --rolle-u-fond: #1d2a22; --rolle-u-text: #9fcbb2;
       --rolle-m-fond: var(--flaeche-2); --rolle-m-text: var(--text-2);
     }
-    /* QR-Bilder und Vollbild bleiben hell — Scannbarkeit geht vor Dunkeladaption;
-       fürs Vorzeigen wird ohnehin das Display der Gegenseite gebraucht. */
+    /* QR-Bilder behalten ihre weiße Ruhezone — Scannbarkeit geht vor
+       Dunkeladaption. Das Vollbild dagegen trägt nur noch um den Code Weiß
+       (.qr-vollbild), der Rest bleibt der dunkle Grund. */
     .nacht-modus .qr-box img { background: #fff; padding: 8px; }
+    /* Das taktische Zeichen (Blau auf Weiß) war nachts der hellste Fleck im
+       Bild — dauerhaft, im Kopf jedes Schritts. Gedimmt und ins Warme
+       gezogen bleibt es lesbar (das Zeichen liegt in den Linien, nicht in
+       der Leuchtkraft), aber es leuchtet nicht mehr. Ein statischer Filter;
+       die Feldgeräte-Regel betrifft Bewegung. */
+    .nacht-modus img.einheit-avatar { filter: brightness(0.6) sepia(0.4); }
     /* Dasselbe für die App-Plattformen: ohne diese Blöcke blieben in der iOS-
        und Android-App die hellen Systemflächen stehen (Fläche #faf9fd, Schrift
        #1a1b20) — der Nacht-Modus sah dort weiß aus, und die Kopfzeile trug

@@ -64,7 +64,7 @@ Funktionalität: Einsatzweg einer Fachgruppe — Vorbereitung, Fahrt, Meldekopf
   Szenario: Auftrag und Sofortbedarf ergänzen die Vorbereitung, ohne sie zu stören
     Wenn ich zum Schritt "2. Einsatz" wechsle
     Und ich das Feld "Einsatzort / Auftrag" mit "Hochwasser Hunte — Pumpeneinsatz Achterdiek" fülle
-    Und ich "Einsatzbeginn" ankreuze
+    Und ich "Einsatzbeginn eintragen" ankreuze
     Und ich zum Schritt "5. Sofortbedarf" wechsle
     Und ich "Sofortbedarf erfassen" ankreuze
     Und ich das Feld "Diesel (l)" mit "400" fülle
@@ -88,10 +88,10 @@ Funktionalität: Einsatzweg einer Fachgruppe — Vorbereitung, Fahrt, Meldekopf
     Und ich den gemerkten QR-Code über "QR aus Bild einlesen…" einlese
     Dann sehe ich die Übersicht mit dem Standort "Oldenburg (NI)"
     Wenn ich auf "In Einsatz aufnehmen…" klicke
-    Und ich auf "Neuen Einsatz anlegen…" klicke
+    Und ich auf "Neue Sammlung anlegen…" klicke
     Und ich im Dialog "Name" mit "Hochwasser Hunte" fülle
     Und ich im Dialog auf "Einsatz anlegen" klicke
-    Dann sehe ich die Überschrift "Einheiten (1)"
+    Dann sehe ich die Überschrift "Einheiten (1 gemeldet"
     Und sehe ich den Hinweis "Stärke 0 / 3 / 9 / 12"
     Und sehe ich zu "Kraftstoff" den Wert "Diesel 400 l"
     Und sehe ich zu "Fahrzeuge" den Wert "4"

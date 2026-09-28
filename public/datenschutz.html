@@ -13,6 +13,21 @@
   <meta property="og:url" content="https://erfassungsbogen.app/datenschutz.html">
   <meta property="og:image" content="https://erfassungsbogen.app/og-bild.jpg">
   <meta property="og:locale" content="de_DE">
+  <!-- THEMA:JS:START -->
+  <script>
+    // Anzeigemodus der App (Dunkel/Feld/Nacht) VOR dem ersten Malen übernehmen:
+    // gleiche Herkunft, gleicher Speicher, gleiche Regel wie in der App
+    // (index.html, anzeige-modus.ts). Erzeugt von scripts/content-stil.mts.
+    try {
+      var eebModus = localStorage.getItem("eeb.anzeigemodus.v1")
+        || (localStorage.getItem("eeb.feldmodus.v1") === "1" ? "feld" : "");
+      if (!eebModus && window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches)
+        eebModus = "dunkel";
+      if (eebModus === "feld" || eebModus === "nacht" || eebModus === "dunkel")
+        document.documentElement.classList.add(eebModus + "-modus");
+    } catch (e) { /* Privatmodus/blockierter Speicher: helle Darstellung */ }
+  </script>
+  <!-- THEMA:JS:END -->
   <style>
     @font-face {
       font-family: "Archivo Variable";
@@ -27,7 +42,7 @@
       --blau: #12275e;
       --blau-hell: #1d3d8f;
       --rand: #c9cede;
-      --grau: #f2f3f7; --text: #11141b;
+      --grau: #f2f3f7; --text: #11141b; --text-2: #5c6478; --flaeche: #fff; --flaeche-2: #e8ebf2; --auf-blau: #fff;
     }
     * { box-sizing: border-box; }
     body {
@@ -45,7 +60,7 @@
     h1 { text-wrap: balance; color: var(--text); font-size: 1.75rem; margin: 0.5rem 0 1rem; }
     h2 { color: var(--text); font-size: 1.375rem; border-bottom: 1px solid var(--rand); padding-bottom: 0.2rem; margin-top: 1.5rem; }
     a { color: var(--blau-hell); }
-    footer { margin-top: 2.5rem; padding-top: 1rem; border-top: 1px solid var(--rand); font-size: 0.875rem; color: #5c6478; }
+    footer { margin-top: 2.5rem; padding-top: 1rem; border-top: 1px solid var(--rand); font-size: 0.875rem; color: var(--text-2); }
 /* NAV:CSS:START */
     /* Sprunglink: sitzt außerhalb des Sichtfelds und kommt beim ersten Tabstopp
        hervor. Ohne ihn tabbt man auf jeder Seite durch Logo und acht Nav-Einträge,
@@ -54,9 +69,9 @@
        Höhe aus --ziel-basis (2.75rem): mit 0.6rem Polster kam er auf 43 px und
        verfehlte das Maß um einen Pixel. Er liegt absolut und kostet die Seite
        dadurch keine Höhe. */
-    .sprunglink { position: absolute; left: -9999px; top: 0; z-index: 40; display: inline-flex; align-items: center; min-height: 2.75rem; padding: 0 1rem; background: var(--blau); color: #fff; text-decoration: none; font-weight: 600; }
+    .sprunglink { position: absolute; left: -9999px; top: 0; z-index: 40; display: inline-flex; align-items: center; min-height: 2.75rem; padding: 0 1rem; background: var(--blau); color: var(--auf-blau); text-decoration: none; font-weight: 600; }
     .sprunglink:focus { left: 0; }
-    .kopfnav { background: #fff; border-bottom: 1px solid var(--rand); }
+    .kopfnav { background: var(--flaeche); border-bottom: 1px solid var(--rand); }
     /* Dieselbe Breite wie main: Ein 60rem breiter Kopf über einer 44rem breiten
        Textspalte setzt zwei verschiedene linke Kanten auf eine Seite, die sonst
        durchgehend linksbündig steht. */
@@ -79,7 +94,7 @@
        (Die punktgetrennte Fußnav bleibt ein Textblock und fällt unter die
        WCAG-Ausnahme für Links im Fließtext — sie wird nicht angefasst.)
        Grad aus der Leiter (--t-xs = 0.8125rem), siehe .kopfnav-logo. */
-    .kopfnav-links a { display: inline-flex; align-items: center; min-height: 2.75rem; padding: 0; color: #5c6478; text-decoration: none; font-size: 0.8125rem; white-space: nowrap; }
+    .kopfnav-links a { display: inline-flex; align-items: center; min-height: 2.75rem; padding: 0; color: var(--text-2); text-decoration: none; font-size: 0.8125rem; white-space: nowrap; }
     /* Der Konflikt zwischen Trefferfläche und Kopfhöhe, offen ausgetragen:
        Auf 375 px bricht die Linkreihe auf zwei Zeilen um. Drei Zeilen à 44 px
        (Logo plus zwei Linkzeilen) ergäben 132 px Kopf — 16 % des Sichtfelds,
@@ -98,7 +113,7 @@
     /* Rechteckig wie alles andere (Null-Radius-Regel). Der Schatten bleibt: Das
        Menü schwebt tatsächlich über dem Inhalt, und genau dafür lässt die
        Flach-im-Stand-Regel ihn zu — im Wert des dokumentierten Dropdown-Schattens. */
-    .kopfnav-unter { position: absolute; top: 100%; left: -0.6rem; z-index: 30; display: none; grid-template-columns: 1fr; gap: 0.05rem; margin-top: 0.55rem; padding: 0.4rem; background: #fff; border: 1px solid var(--rand); border-radius: 0; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); }
+    .kopfnav-unter { position: absolute; top: 100%; left: -0.6rem; z-index: 30; display: none; grid-template-columns: 1fr; gap: 0.05rem; margin-top: 0.55rem; padding: 0.4rem; background: var(--flaeche); border: 1px solid var(--rand); border-radius: 0; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); }
     .kopfnav-unter-breit { grid-template-columns: 1fr 1fr; }
     /* Auch die Menüeinträge sind Bedienelemente und bekommen das Maß. Das Menü
        liegt absolut über dem Inhalt — die Höhe kostet die Leiste nichts. */
@@ -128,7 +143,7 @@
        dann schmaler als die längsten Beschriftungen, und was an Spaltenzahl
        gewonnen wird, geht an Zeilenumbrüchen wieder verloren. */
     .fussnav { display: grid; grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr)); gap: 1.2rem 1.5rem; }
-    .fussnav-titel { margin: 0 0 0.2rem; font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace; font-weight: 700; font-size: 0.8125rem; letter-spacing: 0.1em; text-transform: uppercase; color: #5c6478; }
+    .fussnav-titel { margin: 0 0 0.2rem; font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace; font-weight: 700; font-size: 0.8125rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-2); }
     .fussnav-links { margin: 0; line-height: 1.8; }
     /* Weniger Entscheidungen auf 375 px, ohne Skript und ohne verlorene Rubrik.
        Sieben Einträge plus Logo passen dort nicht in eine Reihe; die Leiste
@@ -161,8 +176,27 @@
        Die Breite gehört hierher und nicht nach content-stil.mts — dieser
        Block wird bei jedem Lauf ersetzt, eine dort eingefügte Deklaration
        wäre nach dem nächsten Hinweis-Lauf wieder weg. */
-    .marken-hinweis { margin: 1rem 0 0; max-width: 60ch; font-size: 0.8125rem; line-height: 1.45; color: #5c6478; }
+    .marken-hinweis { margin: 1rem 0 0; max-width: 60ch; font-size: 0.8125rem; line-height: 1.45; color: var(--text-2); }
     /* HINWEIS:CSS:END */
+    /* THEMA:CSS:START */
+    /* Anzeigemodus der App (Modus-Regel, scripts/content-stil.mts): Werte aus
+       index.html. Feld: 112 % Schrift, harte Linien, schwarze Schrift. Dunkel
+       und Nacht: dunkle Flächen, helle Schrift; nachts weicht die Kennfarbe
+       Bernstein, damit kein sattes Blau die Dunkeladaption zerstört. */
+    html.feld-modus { font-size: 112%; --grau: #e8eaef; --text: #11141b; --text-2: #262b36; --rand: #111318; --flaeche-2: #dfe3ea; }
+    html.dunkel-modus { color-scheme: dark; --grau: #0f1116; --flaeche: #171a21; --flaeche-2: #21252e; --text: #11141b; --text-2: #aab2c2; --rand: #3a414f; --blau: #a8bdf2; --blau-hell: #c6d4f8; --auf-blau: #101a33; }
+    html.nacht-modus { color-scheme: dark; --grau: #0d0c08; --flaeche: #17150f; --flaeche-2: #221f16; --text: #11141b; --text-2: #a2977e; --rand: #423c2d; --blau: #a8791a; --blau-hell: #c9932c; --auf-blau: #100d07; }
+    /* Sicherheitsnetz gegen die Rohwerte der anderen Generatoren (siehe oben). */
+    html.dunkel-modus :is(.kopfnav, .kopfnav-unter, .hinweis, table, th, .themenliste li, .laenderliste a),
+    html.nacht-modus :is(.kopfnav, .kopfnav-unter, .hinweis, table, th, .themenliste li, .laenderliste a) { background: var(--flaeche); }
+    html.dunkel-modus :is(.kopfnav-links a, footer, figcaption, .fussnav-titel, .marken-hinweis, .sprungmenue-titel, .abschluss .zusicherung, .laenderliste .anzahl, h2#andere-bundeslaender, h2#andere-bundeslaender + p, .frage > summary::before, .aufklapp > summary::before),
+    html.nacht-modus :is(.kopfnav-links a, footer, figcaption, .fussnav-titel, .marken-hinweis, .sprungmenue-titel, .abschluss .zusicherung, .laenderliste .anzahl, h2#andere-bundeslaender, h2#andere-bundeslaender + p, .frage > summary::before, .aufklapp > summary::before) { color: var(--text-2); }
+    html.dunkel-modus :is(.start, .sprunglink), html.nacht-modus :is(.start, .sprunglink) { color: var(--auf-blau); }
+    /* Fotos und Bildschirmfotos sind nachts helle Flächen — gedimmt, aber
+       erkennbar. Die Strichcodes (.scancodes) bleiben ungedimmt: sie werden
+       vom Bildschirm abgescannt. */
+    html.nacht-modus figure:not(.scancodes figure) img { filter: brightness(0.7); }
+    /* THEMA:CSS:END */
   </style>
 </head>
 <body>

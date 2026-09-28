@@ -505,36 +505,39 @@ export function Stepper(props: { titel: string; wert: number; setzen: (n: number
 }
 
 /**
- * Plausibilitätshinweise (nicht blockierend). Ein Warnmuster wie in der
- * Übersicht: Punkte, die auf einen ANDEREN Schritt zeigen, sind antippbar und
- * springen dorthin — vorher waren sie hier Sackgassen, und man lernte erst in
- * der Übersicht, dass Warnungen klickbar sein können. `role="status"`, damit
- * Vorlesesoftware neu auftauchende Hinweise aktiv mitbekommt.
+ * Plausibilitätshinweise (nicht blockierend) zum AKTUELLEN Schritt.
+ *
+ * Von den Prüfpunkten (pruefpunkte()) erscheinen nur die, die sich auf diesem
+ * Schritt beheben lassen. Vorher standen auf Schritt 1 schon drei gelbe
+ * Kästen, bevor irgendetwas eingegeben war — zwei davon zu Schritt 2 und 3,
+ * antippbar, und wer ihnen folgte, sprang auf Schritt 3, bevor Schritt 1
+ * fertig war. Wer auf dem ersten Bildschirm lernt, dass gelbe Kästen ohnehin
+ * immer da sind, überliest später auch die, die zählen (kein Name, keine
+ * Rufnummer). Die Gesamtliste über alle Schritte gehört in die Übersicht und
+ * den Übergabe-Dialog, wo sie als Checkliste mit Sprung steht.
+ *
+ * `role="status"`, damit Vorlesesoftware neu auftauchende Hinweise aktiv
+ * mitbekommt.
  */
 export function Hinweise(props: {
   /** Nur-Text-Hinweise, die den aktuellen Schritt selbst betreffen. */
   hinweise?: string[];
-  /** Hinweise mit Schrittbezug (pruefpunkte()). */
+  /** Hinweise mit Schrittbezug (pruefpunkte()); gezeigt werden die zu `aktuellerSchritt`. */
   punkte?: Pruefpunkt[];
+  /** Schritt-Index (0-basiert, siehe SCHRITTE in app.tsx) — ohne Angabe erscheinen alle Punkte. */
   aktuellerSchritt?: number;
-  geheZu?: (schritt: number) => void;
 }) {
-  const { hinweise = [], punkte = [], aktuellerSchritt, geheZu } = props;
-  if (hinweise.length === 0 && punkte.length === 0) return null;
+  const { hinweise = [], punkte = [], aktuellerSchritt } = props;
+  const hier = aktuellerSchritt == null ? punkte : punkte.filter((p) => p.schritt === aktuellerSchritt);
+  if (hinweise.length === 0 && hier.length === 0) return null;
   return (
     <div role="status">
       {hinweise.map((h) => (
         <p key={h} className="warnung">⚠ {h}</p>
       ))}
-      {punkte.map((p) =>
-        geheZu && p.schritt !== aktuellerSchritt ? (
-          <p key={p.text} className="warnung">
-            ⚠ <button type="button" className="link" onClick={() => geheZu(p.schritt)}>{p.text}</button>
-          </p>
-        ) : (
-          <p key={p.text} className="warnung">⚠ {p.text}</p>
-        ),
-      )}
+      {hier.map((p) => (
+        <p key={p.text} className="warnung">⚠ {p.text}</p>
+      ))}
     </div>
   );
 }

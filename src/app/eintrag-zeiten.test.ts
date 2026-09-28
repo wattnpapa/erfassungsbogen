@@ -1,0 +1,249 @@
+/**
+ * Zeiten und Notizen am Meldeeintrag (App-Erweiterung des Kerns).
+ *
+ * Geprüft wird, worauf sich Einsatztagebuch und Ablösung verlassen: dass
+ * „Abrücken" den Zeitpunkt festhält und „wieder anwesend" ihn zurücknimmt,
+ * dass eine Folgemeldung die Eintreffzeit und den Auftrag ihrer Vorgängerin
+ * erbt (sonst stünde jede Folgemeldung als frisch eingetroffen da), und dass
+ * ein voller Speicher als benannter Fehler ankommt statt als stille Ausnahme.
+ */
+
+import { describe, it, expect, beforeEach } from "vitest";
+import {
+  OrganisationsTyp,
+  PersonalErfassung,
+  SCHEMA_VERSION,
+  type Erfassungsbogen,
+} from "@bos/eeb-format/model";
+import {
+  EinsatzArt,
+  MeldeStatus,
+  einsaetzeLaden,
+  einsatzAnlegen,
+  meldungHinzufuegen,
+  speicherhuelleSetzen,
+} from "@bos/meldekopf/einsaetze";
+import {
+  SpeicherVollFehler,
+  abrueckzeitSetzen,
+  eintragGespeichert,
+  eintreffzeit,
+  eintreffzeitSetzen,
+  einheitVerschieben,
+  folgemeldungErbt,
+  istSpeicherVoll,
+  notizSetzen,
+  sammlungenSchreiben,
+  statusMitZeitSetzen,
+  zeitKurz,
+  zeitLang,
+} from "./eintrag-zeiten";
+
+class MemStorage {
+  private m = new Map<string, string>();
+  /** Wirft beim Schreiben wie ein voller Browser-Speicher. */
+  voll = false;
+  get length() { return this.m.size; }
+  clear() { this.m.clear(); }
+  getItem(k: string) { return this.m.has(k) ? this.m.get(k)! : null; }
+  setItem(k: string, v: string) {
+    if (this.voll) {
+      const e = new Error("The quota has been exceeded.");
+      e.name = "QuotaExceededError";
+      throw e;
+    }
+    this.m.set(k, String(v));
+  }
+  removeItem(k: string) { this.m.delete(k); }
+  key(i: number) { return [...this.m.keys()][i] ?? null; }
+}
+
+let mem: MemStorage;
+
+beforeEach(() => {
+  mem = new MemStorage();
+  (globalThis as { localStorage?: Storage }).localStorage = mem as unknown as Storage;
+  // Die Einsatz-Sammlung bekommt ihre Ablage hineingereicht (ADR-003).
+  speicherhuelleSetzen(mem as unknown as Storage);
+});
+
+function bogen(name: string, stand = 100): Erfassungsbogen {
+  return {
+    schemaVersion: SCHEMA_VERSION,
+    stand,
+    einheit: { organisation: OrganisationsTyp.THW, einheitsTyp: { code: 1 }, hierarchie: [{ bezeichnung: { code: 1 }, name }] },
+    einsatz: { zeitraumVon: 100, zeitraumBis: 130, ortAuftrag: "Lage" },
+    personalErfassung: PersonalErfassung.NUR_STAERKE,
+    staerkeManuell: { fuehrer: 1, unterfuehrer: 0, mannschaft: 3, gesamt: 4 },
+    personal: [],
+    fahrzeuge: [],
+  };
+}
+
+/** Einsatz mit einer Meldung; liefert Einsatz-Id und Eintrag-Id. */
+function buehne() {
+  const s = einsatzAnlegen("Hochwasser", EinsatzArt.EINSATZ);
+  const r = meldungHinzufuegen(s.id, bogen("Crailsheim"))!;
+  return { einsatzId: s.id, eintragId: r.eintrag.id };
+}
+
+function eintrag(einsatzId: string, eintragId: string) {
+  return einsaetzeLaden().find((s) => s.id === einsatzId)!.eintraege.find((e) => e.id === eintragId)!;
+}
+
+describe("statusMitZeitSetzen", () => {
+  it("hält beim Abrücken den Zeitpunkt fest und nimmt ihn bei „wieder anwesend“ zurück", () => {
+    const { einsatzId, eintragId } = buehne();
+    statusMitZeitSetzen(einsatzId, eintragId, MeldeStatus.ABGERUECKT, 5000);
+    let e = eintrag(einsatzId, eintragId);
+    expect(e.status).toBe(MeldeStatus.ABGERUECKT);
+    expect(e.abgerueckAm).toBe(5000);
+
+    statusMitZeitSetzen(einsatzId, eintragId, MeldeStatus.ANWESEND);
+    e = eintrag(einsatzId, eintragId);
+    expect(e.status).toBe(MeldeStatus.ANWESEND);
+    expect(e.abgerueckAm).toBeUndefined();
+  });
+
+  it("setzt die Änderungszeit der Sammlung — die Aufräumfrist zählt neu", () => {
+    const { einsatzId, eintragId } = buehne();
+    const vorher = einsaetzeLaden().find((s) => s.id === einsatzId)!.geaendert;
+    statusMitZeitSetzen(einsatzId, eintragId, MeldeStatus.ABGERUECKT, vorher + 10_000);
+    expect(einsaetzeLaden().find((s) => s.id === einsatzId)!.geaendert).toBeGreaterThanOrEqual(vorher);
+  });
+
+  it("tut nichts bei unbekannter Meldung", () => {
+    const { einsatzId } = buehne();
+    expect(() => statusMitZeitSetzen(einsatzId, "gibt-es-nicht", MeldeStatus.ABGERUECKT)).not.toThrow();
+  });
+});
+
+describe("Eintreffzeit, Abrückzeit, Notiz", () => {
+  it("gilt ohne Korrektur als Empfangszeit und lässt sich nachtragen", () => {
+    const { einsatzId, eintragId } = buehne();
+    const e = eintrag(einsatzId, eintragId);
+    expect(eintreffzeit(e)).toBe(e.empfangenAm);
+
+    eintreffzeitSetzen(einsatzId, eintragId, 4242);
+    expect(eintreffzeit(eintrag(einsatzId, eintragId))).toBe(4242);
+    // Der Empfangsmoment bleibt als Spur erhalten.
+    expect(eintrag(einsatzId, eintragId).empfangenAm).toBe(e.empfangenAm);
+  });
+
+  it("korrigiert die Abrückzeit", () => {
+    const { einsatzId, eintragId } = buehne();
+    statusMitZeitSetzen(einsatzId, eintragId, MeldeStatus.ABGERUECKT, 5000);
+    abrueckzeitSetzen(einsatzId, eintragId, 4000);
+    expect(eintrag(einsatzId, eintragId).abgerueckAm).toBe(4000);
+  });
+
+  it("speichert die Notiz getrimmt und entfernt sie bei leerem Text", () => {
+    const { einsatzId, eintragId } = buehne();
+    notizSetzen(einsatzId, eintragId, "  Deichabschnitt Nord ab 14:00 ");
+    expect(eintrag(einsatzId, eintragId).notiz).toBe("Deichabschnitt Nord ab 14:00");
+    notizSetzen(einsatzId, eintragId, "   ");
+    expect(eintrag(einsatzId, eintragId).notiz).toBeUndefined();
+  });
+});
+
+describe("folgemeldungErbt", () => {
+  it("übernimmt Eintreffzeit und Notiz der Vorgängerin derselben Einheit", () => {
+    const { einsatzId, eintragId } = buehne();
+    eintreffzeitSetzen(einsatzId, eintragId, 4242);
+    notizSetzen(einsatzId, eintragId, "Deichabschnitt Nord");
+
+    // Folgemeldung: gleicher Einheitsschlüssel, neuerer Stand.
+    const r = meldungHinzufuegen(einsatzId, bogen("Crailsheim", 200))!;
+    expect(r.neu).toBe(true);
+    expect(r.eintrag.id).not.toBe(eintragId);
+    folgemeldungErbt(einsatzId, r.eintrag.id);
+
+    const folge = eintrag(einsatzId, r.eintrag.id);
+    expect(folge.eingetroffenAm).toBe(4242);
+    expect(folge.notiz).toBe("Deichabschnitt Nord");
+  });
+
+  it("überschreibt nichts, was die Folgemeldung schon trägt, und schweigt ohne Vorgängerin", () => {
+    const { einsatzId, eintragId } = buehne();
+    // Erstmeldung: keine Vorgängerin — nichts passiert, nichts wirft.
+    folgemeldungErbt(einsatzId, eintragId);
+    expect(eintrag(einsatzId, eintragId).eingetroffenAm).toBeUndefined();
+
+    notizSetzen(einsatzId, eintragId, "alt");
+    const r = meldungHinzufuegen(einsatzId, bogen("Crailsheim", 200))!;
+    notizSetzen(einsatzId, r.eintrag.id, "neu");
+    eintreffzeitSetzen(einsatzId, r.eintrag.id, 9);
+    folgemeldungErbt(einsatzId, r.eintrag.id);
+    expect(eintrag(einsatzId, r.eintrag.id).notiz).toBe("neu");
+    expect(eintrag(einsatzId, r.eintrag.id).eingetroffenAm).toBe(9);
+  });
+});
+
+describe("Speicher voll", () => {
+  it("meldet einen vollen Speicher als SpeicherVollFehler", () => {
+    const { einsatzId, eintragId } = buehne();
+    mem.voll = true;
+    expect(() => sammlungenSchreiben(einsaetzeLaden())).toThrow(SpeicherVollFehler);
+    expect(() => statusMitZeitSetzen(einsatzId, eintragId, MeldeStatus.ABGERUECKT)).toThrow(SpeicherVollFehler);
+    // Der Speicher ist die Wahrheit, nicht der Aufruf: die Meldung steht noch.
+    expect(eintragGespeichert(einsatzId, eintragId)).toBe(true);
+    expect(eintrag(einsatzId, eintragId).status).toBe(MeldeStatus.ANWESEND);
+  });
+
+  it("erkennt die verschiedenen Namen des vollen Speichers", () => {
+    expect(istSpeicherVoll(Object.assign(new Error("x"), { name: "QuotaExceededError" }))).toBe(true);
+    expect(istSpeicherVoll(Object.assign(new Error("x"), { name: "NS_ERROR_DOM_QUOTA_REACHED", code: 22 }))).toBe(true);
+    expect(istSpeicherVoll(new Error("Netz weg"))).toBe(false);
+    expect(istSpeicherVoll("kein Fehlerobjekt")).toBe(false);
+  });
+
+  it("reicht andere Fehler unverändert durch", () => {
+    speicherhuelleSetzen({
+      ...mem,
+      setItem: () => {
+        throw new Error("Platte kaputt");
+      },
+      getItem: (k: string) => mem.getItem(k),
+    } as unknown as Storage);
+    expect(() => sammlungenSchreiben([])).toThrow("Platte kaputt");
+  });
+});
+
+describe("zeitKurz / zeitLang", () => {
+  it("zeigt am selben Tag nur die Uhrzeit, sonst Tag und Monat dazu", () => {
+    const jetzt = new Date("2026-09-27T20:19").getTime();
+    expect(zeitKurz(new Date("2026-09-27T09:40").getTime(), jetzt)).toBe("09:40");
+    expect(zeitKurz(new Date("2026-09-26T23:05").getTime(), jetzt)).toBe("26.09., 23:05");
+  });
+
+  it("schreibt Datum und Uhrzeit aus", () => {
+    expect(zeitLang(new Date("2026-09-27T20:19").getTime())).toBe("27.09.2026, 20:19");
+  });
+});
+
+describe("einheitVerschieben", () => {
+  it("nimmt alle Fassungen einer Einheit samt Notiz mit und verdoppelt nichts", () => {
+    const a = einsatzAnlegen("A", EinsatzArt.EINSATZ);
+    const b = einsatzAnlegen("B", EinsatzArt.EINSATZ);
+    const b0 = bogen("Wanderhausen");
+    const r1 = meldungHinzufuegen(a.id, b0)!;
+    meldungHinzufuegen(a.id, { ...b0, stand: 101, sonstiges: "zweite Fassung" });
+    notizSetzen(a.id, r1.eintrag.id, "Deich Nord");
+
+    const n = einheitVerschieben(a.id, b.id, r1.eintrag.einheitSchluessel);
+
+    expect(n).toBe(2);
+    const nachA = einsaetzeLaden().find((s) => s.id === a.id)!;
+    const nachB = einsaetzeLaden().find((s) => s.id === b.id)!;
+    expect(nachA.eintraege).toHaveLength(0);
+    expect(nachB.eintraege).toHaveLength(2);
+    expect(nachB.eintraege.find((e) => e.id === r1.eintrag.id)!.notiz).toBe("Deich Nord");
+  });
+
+  it("tut nichts, wenn Ziel und Quelle gleich sind", () => {
+    const a = einsatzAnlegen("A", EinsatzArt.EINSATZ);
+    const r = meldungHinzufuegen(a.id, bogen("Bleibhausen"))!;
+    expect(einheitVerschieben(a.id, a.id, r.eintrag.einheitSchluessel)).toBe(0);
+    expect(einsaetzeLaden()[0]!.eintraege).toHaveLength(1);
+  });
+});

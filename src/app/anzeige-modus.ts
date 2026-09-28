@@ -7,13 +7,21 @@
  *  - „nacht":    gedimmte, warme Darstellung für Nachteinsätze (Zelt,
  *                Fahrzeugkabine) — blendet nicht und schont die Dunkeladaption.
  *
- * Die Systemeinstellung des Geräts schaltet NICHT mit: „Standard" ist überall
- * hell. Ein automatisches, nur halb angewandtes Dunkel (dunkle Fläche,
- * schwarze Schrift) hat auf Android-Geräten genau die Lesbarkeit gekostet, für
- * die dieser Schalter da ist — wer dunkel will, wählt es hier einmal.
+ * Die Systemeinstellung des Geräts ist nur die Vorgabe beim ersten Start:
+ * Ohne gespeicherte Wahl startet die App mit „dunkel", wenn das Gerät auf
+ * dunkel steht (prefers-color-scheme), sonst mit „standard" — der Kaltstart
+ * bei Nacht soll nicht mit einem weißen Bildschirm beginnen. Eine einmal
+ * getroffene Wahl — auch „standard" — geht immer vor und wird nie automatisch
+ * überschrieben; auch ein späterer Wechsel der Systemeinstellung schaltet eine
+ * laufende Sitzung nicht um. Ein automatisches, nur halb angewandtes Dunkel
+ * (dunkle Fläche, schwarze Schrift) hat auf Android-Geräten genau die
+ * Lesbarkeit gekostet, für die dieser Schalter da ist — deshalb setzt die
+ * Vorgabe denselben, vollständig belegten Dunkel-Modus, den auch der Schalter
+ * setzt, und nichts Automatisches daneben.
  *
  * Technisch nur eine Klasse auf <html> (dunkel-/feld-/nacht-modus), das Styling
- * liegt in index.html; die Wahl bleibt im Gerätespeicher.
+ * liegt in index.html; die Wahl bleibt im Gerätespeicher. Das Boot-Skript in
+ * index.html wendet dieselbe Regel vor dem ersten Malen an.
  */
 
 export type AnzeigeModus = "standard" | "dunkel" | "feld" | "nacht";
@@ -23,7 +31,7 @@ const SPEICHER_SCHLUESSEL = "eeb.anzeigemodus.v1";
 const ALT_FELDMODUS = "eeb.feldmodus.v1";
 
 export const ANZEIGE_MODI: { modus: AnzeigeModus; label: string; titel: string }[] = [
-  { modus: "standard", label: "Standard", titel: "Normale, helle Darstellung — unabhängig von der Systemeinstellung des Geräts" },
+  { modus: "standard", label: "Standard", titel: "Normale, helle Darstellung — bleibt hell, auch wenn das Gerät auf dunkel steht" },
   { modus: "dunkel", label: "Dunkel", titel: "Heller Text auf dunklem Grund für abgedunkelte Räume" },
   { modus: "feld", label: "Feld", titel: "Große Tippziele und hoher Kontrast für den Einsatz draußen" },
   { modus: "nacht", label: "Nacht", titel: "Gedimmte, warme Darstellung für Nachteinsätze — blendet nicht" },
@@ -37,11 +45,21 @@ function speicher(): Storage | null {
   }
 }
 
+/** Steht das Gerät auf dunkel? Ohne matchMedia (alte Webviews, Tests): nein. */
+function systemDunkel(): boolean {
+  try {
+    return globalThis.matchMedia?.("(prefers-color-scheme: dark)").matches ?? false;
+  } catch {
+    return false;
+  }
+}
+
 export function anzeigeModus(): AnzeigeModus {
   const s = speicher();
   const wert = s?.getItem(SPEICHER_SCHLUESSEL);
   if (wert === "standard" || wert === "dunkel" || wert === "feld" || wert === "nacht") return wert;
-  return s?.getItem(ALT_FELDMODUS) === "1" ? "feld" : "standard";
+  if (s?.getItem(ALT_FELDMODUS) === "1") return "feld";
+  return systemDunkel() ? "dunkel" : "standard";
 }
 
 function anwenden(m: AnzeigeModus): void {

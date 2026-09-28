@@ -16,9 +16,11 @@ import type { Erfassungsbogen } from "@bos/eeb-format/model";
 import { base64UrlDekodieren } from "@bos/eeb-format/codec";
 import { einheitAnzeigename, natoZeitstempel, qrErzeugen } from "./hilfen";
 import { istNativ, binaerTeilen } from "./nativ";
-import { einsatzPdfDokument, pdfDokument, type SammelBogen } from "./pdf-dokument";
+import { einsatzLageblattDokument, einsatzPdfDokument, pdfDokument, type SammelBogen, type UebersichtEintrag } from "./pdf-dokument";
 import { einsatzDateiInhalt } from "./einsatz-transport";
-import { revisionen, type Einsatzsammlung, type MeldeEintrag } from "@bos/meldekopf/einsaetze";
+import { MeldeStatus, neuesteJeEinheit, revisionen, type Einsatzsammlung, type MeldeEintrag } from "@bos/meldekopf/einsaetze";
+import { zaehltInLage } from "./auswertung";
+import { eintreffzeit } from "./eintrag-zeiten";
 
 interface FontContainer {
   vfs: Record<string, string | { data: string; encoding?: string }>;
@@ -133,29 +135,84 @@ export async function meldungPdfAnzeigen(m: MeldeEintrag, fenster: Window | null
   await pdfMake.createPdf(pdfDokument(m.bogen, qr)).open(fenster);
 }
 
-export async function einsatzPdfErzeugen(einsatz: Einsatzsammlung, meldungen: MeldeEintrag[]): Promise<void> {
-  const boegenMitQr: SammelBogen[] = [];
-  for (const m of meldungen) {
-    // revisionen() liefert neueste zuerst — die Vorfassung steht direkt hinter
-    // dieser Meldung. Fehlt sie, ist es eine Erstmeldung.
-    const revs = revisionen(einsatz.eintraege, m.einheitSchluessel);
-    const idx = revs.findIndex((r) => r.id === m.id);
-    const vorher = idx >= 0 ? revs[idx + 1]?.bogen : undefined;
-    boegenMitQr.push({
-      bogen: m.bogen,
-      qr: await qrErzeugen(m.bogen, herkunftBytes(m)),
-      vorher,
-      zugEtikett: m.zugEtikett,
-      teil: m.teilEtikett,
-    });
-  }
-  const dd = einsatzPdfDokument(einsatz.name, boegenMitQr, einsatzDateiInhalt(einsatz));
-  const rumpf = (einsatz.name || "sammlung").replace(/[^\wäöüÄÖÜß-]+/g, "_");
-  const dateiname = `eeb-einsatz-${natoZeitstempel()}_${rumpf}.pdf`;
+/**
+ * Was die Übersichtsseite über eine Meldung wissen muss — Zeiten, Status,
+ * Auftrag, Vorfassung. Gemeinsam für Sammel-PDF und Lageblatt.
+ */
+function uebersichtEintrag(einsatz: Einsatzsammlung, m: MeldeEintrag): UebersichtEintrag {
+  // revisionen() liefert neueste zuerst — die Vorfassung steht direkt hinter
+  // dieser Meldung. Fehlt sie, ist es eine Erstmeldung.
+  const revs = revisionen(einsatz.eintraege, m.einheitSchluessel);
+  const idx = revs.findIndex((r) => r.id === m.id);
+  const vorher = idx >= 0 ? revs[idx + 1]?.bogen : undefined;
+  return {
+    bogen: m.bogen,
+    vorher,
+    zugEtikett: m.zugEtikett,
+    teil: m.teilEtikett,
+    eingetroffenAm: eintreffzeit(m),
+    abgerueckAm: m.abgerueckAm,
+    abgerueckt: m.status !== MeldeStatus.ANWESEND,
+    zaehlt: m.status === MeldeStatus.ANWESEND && zaehltInLage(einsatz.art, m.bogen),
+    notiz: m.notiz,
+  };
+}
+
+/**
+ * Alle aktuellen Meldungen des Einsatzes — neueste Fassung je Einheit, auch
+ * abgerückte und Übungen — nach Anzeigename geordnet. Die Auswahl „nur
+ * anwesende" war der Fehler: Papier und eingebettete Datei sagten Verschiedenes
+ * (Analog-Audit A1), und bei null Anwesenden gab es gar keine Datei (W2).
+ */
+function alleAktuellen(einsatz: Einsatzsammlung): MeldeEintrag[] {
+  return neuesteJeEinheit(einsatz.eintraege).sort((a, b) =>
+    einheitAnzeigename(a.bogen.einheit).localeCompare(einheitAnzeigename(b.bogen.einheit), "de"),
+  );
+}
+
+/** Dateiname-tauglicher Rumpf aus dem Einsatznamen. */
+function dateiRumpf(einsatz: Einsatzsammlung): string {
+  return (einsatz.name || "sammlung").replace(/[^\wäöüÄÖÜß-]+/g, "_");
+}
+
+/** Fertiges Dokument ausgeben: Download im Browser, Share-Sheet in der App. */
+async function dokumentAusgeben(dd: Parameters<typeof pdfMake.createPdf>[0], dateiname: string): Promise<void> {
   if (istNativ()) {
     const base64 = await pdfMake.createPdf(dd).getBase64();
     await binaerTeilen(dateiname, base64);
   } else {
     pdfMake.createPdf(dd).download(dateiname);
   }
+}
+
+/**
+ * Sammel-PDF: Übergabe-Übersicht plus alle Bögen plus eingebettete Sammlung.
+ * `meldungen` ist nur noch eine Auswahl für Sonderfälle; ohne Angabe gehen
+ * ALLE aktuellen Meldungen je Einheit hinein (inkl. abgerückte und Übungen) —
+ * auch bei null anwesenden Einheiten entsteht ein Dokument.
+ */
+export async function einsatzPdfErzeugen(
+  einsatz: Einsatzsammlung,
+  meldungen: MeldeEintrag[] = alleAktuellen(einsatz),
+): Promise<void> {
+  const boegenMitQr: SammelBogen[] = [];
+  for (const m of meldungen) {
+    boegenMitQr.push({
+      ...uebersichtEintrag(einsatz, m),
+      qr: await qrErzeugen(m.bogen, herkunftBytes(m)),
+    });
+  }
+  const dd = einsatzPdfDokument(einsatz.name, boegenMitQr, einsatzDateiInhalt(einsatz));
+  await dokumentAusgeben(dd, `eeb-einsatz-${natoZeitstempel()}_${dateiRumpf(einsatz)}.pdf`);
+}
+
+/**
+ * Lageblatt: nur die Übersichtsseite (Einheiten mit Zeiten, Bedarf, Züge) als
+ * A4 quer — ohne Bögen und ohne QR-Codes, deshalb in Sekundenbruchteilen
+ * fertig. Das Blatt für die Wand (Analog-Audit A3/A4).
+ */
+export async function einsatzLageblattErzeugen(einsatz: Einsatzsammlung): Promise<void> {
+  const eintraege = alleAktuellen(einsatz).map((m) => uebersichtEintrag(einsatz, m));
+  const dd = einsatzLageblattDokument(einsatz.name, eintraege);
+  await dokumentAusgeben(dd, `eeb-lageblatt-${natoZeitstempel()}_${dateiRumpf(einsatz)}.pdf`);
 }

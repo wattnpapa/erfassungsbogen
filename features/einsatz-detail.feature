@@ -7,11 +7,11 @@ Funktionalität: Einsatz-Sammlung führen (Meldekopf)
   Grundlage:
     Angenommen ich öffne einen geteilten Bogen-Link eines alten Bogens
     Wenn ich auf "In Einsatz aufnehmen…" klicke
-    Und ich auf "Neuen Einsatz anlegen…" klicke
+    Und ich auf "Neue Sammlung anlegen…" klicke
     Und ich im Dialog "Name" mit "Hochwasser Weser" fülle
     Und ich im Dialog auf "Einsatz anlegen" klicke
     Dann sehe ich die Überschrift "Hochwasser Weser"
-    Und sehe ich die Überschrift "Einheiten (1)"
+    Und sehe ich die Überschrift "Einheiten (1 gemeldet"
 
   Szenario: Die Sammlung summiert Stärke und Bedarf über alle Einheiten
     Dann sehe ich die Überschrift "Bedarf (anwesende Einheiten)"
@@ -52,7 +52,7 @@ Funktionalität: Einsatz-Sammlung führen (Meldekopf)
     Wenn ich das Feld "Bezeichnung des abgeteilten Teils" mit "Fachberater" fülle
     Und ich "Rudolph, Johannes" ankreuze
     Und ich auf "Aufteilen" klicke
-    Dann sehe ich die Überschrift "Einheiten (2)"
+    Dann sehe ich die Überschrift "Einheiten (2 gemeldet"
     Und sehe ich den Hinweis "Fachberater"
     Und sehe ich den Hinweis "abgeteilt aus"
     # Die Stärke verteilt sich, sie verschwindet nicht: aus 1 / 0 / 2 / 3 werden
@@ -65,7 +65,7 @@ Funktionalität: Einsatz-Sammlung führen (Meldekopf)
     Und ich das Feld "Bezeichnung des abgeteilten Teils" mit "Fachberater" fülle
     Und ich "Rudolph, Johannes" ankreuze
     Und ich auf "Aufteilen" klicke
-    Dann sehe ich die Überschrift "Einheiten (2)"
+    Dann sehe ich die Überschrift "Einheiten (2 gemeldet"
     # Zusammenführen wird erst angeboten, wenn es einen zweiten Teil gibt — und
     # nur zeilenweise: nach der Aufteilung trägt jede Zeile den Knopf.
     Wenn ich bei der Einheit "Fachberater" auf "Zusammenführen…" klicke
@@ -84,13 +84,13 @@ Funktionalität: Einsatz-Sammlung führen (Meldekopf)
     Und ich das Feld "Bezeichnung des abgeteilten Teils" mit "Fachberater" fülle
     Und ich "Rudolph, Johannes" ankreuze
     Und ich auf "Abbrechen" klicke
-    Dann sehe ich die Überschrift "Einheiten (1)"
+    Dann sehe ich die Überschrift "Einheiten (1 gemeldet"
 
   Szenario: Meldung entfernen fragt in der App zurück
     Wenn ich auf "Entfernen" klicke
     Dann sehe ich den Dialog "Meldung entfernen?"
     Wenn ich im Dialog auf "Meldung entfernen" klicke
-    Dann sehe ich die Überschrift "Einheiten (0)"
+    Dann sehe ich die Überschrift "Einheiten (0 gemeldet"
     Und sehe ich den Hinweis "Noch keine Meldung."
 
   Szenario: Folgemeldung derselben Einheit wandert in die Historie
@@ -103,7 +103,7 @@ Funktionalität: Einsatz-Sammlung führen (Meldekopf)
     Und ich auf "Hochwasser Weser" klicke
     Dann sehe ich den Dialog "Einheit ist bereits gemeldet"
     Wenn ich im Dialog auf "Als neue Fassung anhängen" klicke
-    Dann sehe ich die Überschrift "Einheiten (1)"
+    Dann sehe ich die Überschrift "Einheiten (1 gemeldet"
     Und sehe ich die Schaltfläche "Historie (2)"
     Wenn ich auf "Änderungen" klicke
     Dann sehe ich den Hinweis "Auftrag / Sonstiges"
@@ -118,7 +118,7 @@ Funktionalität: Einsatz-Sammlung führen (Meldekopf)
     Und ich auf "In Einsatz aufnehmen…" klicke
     Und ich auf "Hochwasser Weser" klicke
     Und ich im Dialog auf "Als eigene Einheit führen" klicke
-    Dann sehe ich die Überschrift "Einheiten (2)"
+    Dann sehe ich die Überschrift "Einheiten (2 gemeldet"
 
   Szenario: Einheit manuell in den Einsatz erfassen
     Wenn ich auf "Einheit manuell erfassen…" klicke
@@ -129,7 +129,7 @@ Funktionalität: Einsatz-Sammlung führen (Meldekopf)
     Dann sehe ich die Schaltfläche "In Einsatz übernehmen"
     Wenn ich auf "In Einsatz übernehmen" klicke
     Dann sehe ich die Überschrift "Hochwasser Weser"
-    Und sehe ich die Überschrift "Einheiten (2)"
+    Und sehe ich die Überschrift "Einheiten (2 gemeldet"
 
   Szenario: Sammel-PDF bündelt alle Bögen in einer Datei
     Wenn ich auf "Sammel-PDF (alle Bögen)" klicke und eine Datei erhalte
@@ -173,7 +173,7 @@ Funktionalität: Einsatz-Sammlung führen (Meldekopf)
   # fehlende Funktion aussah — ab der zweiten Meldung steht sie da.
   Szenario: Mit der zweiten Meldung erscheint die Filterleiste
     Wenn ich die Einheit "DLRG" "Wardenburg" manuell in den Einsatz aufnehme
-    Dann sehe ich die Überschrift "Einheiten (2)"
+    Dann sehe ich die Überschrift "Einheiten (2 gemeldet"
     Und sehe ich den Text "Suche"
 
   Szenario: Die Sammel-PDF bringt die ganze Sammlung auf ein leeres Gerät
@@ -186,7 +186,7 @@ Funktionalität: Einsatz-Sammlung führen (Meldekopf)
     Dann sehe ich "Hochwasser Weser" nicht
     Wenn ich die zuletzt erhaltene Datei über "Einsatz importieren…" einlese
     Dann sehe ich die Überschrift "Hochwasser Weser"
-    Und sehe ich die Überschrift "Einheiten (1)"
+    Und sehe ich die Überschrift "Einheiten (1 gemeldet"
     Und führt die Einheitenliste "THW" an Stelle 1
 
   Szenario: Zurück zur Startseite listet den Einsatz mit seinen Summen

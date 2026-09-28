@@ -299,6 +299,16 @@ Datenausleitung an eine andere Herkunft ist technisch unterbunden.
 > *Prüfvermerk:* Beides im Code bestätigt (`FORMEL_START = /^[=+\-@\t\r]/`;
 > `&`/`<`-Escaping im XLSX-Writer).
 
+- **Lageblatt und Übergabeblatt der Einsatz-Sammlung** (`src/app/pdf.ts`,
+  `pdf-dokument.ts`, seit 2026-09-27): Das Übergabeblatt (Seite 1 der
+  Sammel-PDF „Einsatz weitergeben / sichern") und das einseitige „Lageblatt"
+  führen je Einheit Eintreff- und Abrückzeit sowie den Auftrag/die Notiz der
+  Führungsstelle (Freitext) — abgerückte Einheiten stehen als eigener Block,
+  damit Papier und eingebettete Sammlung denselben Stand zeigen. Dieselben
+  drei Spalten stehen in der Übersichts-CSV (`einsatz-csv.ts`), dort mit der
+  bestehenden Formel-Abwehr. Die Sammel-PDF entsteht auch ohne anwesende
+  Einheiten (Einsatzende). Wohin Ausdruck und Datei gelangen, entscheidet
+  weiterhin der Nutzer (DSFA 5.8).
 - **Vorlage teilen** (`src/app/vorlagen-ui.tsx`, `vorlagen.ts`,
   `vorlageTransportErzeugen` in `hilfen.ts`, seit 2026-09-23): QR-Code und Link
   tragen die Vorlage mit dem Geräteschlüssel signiert, wie beim Bogen. Die

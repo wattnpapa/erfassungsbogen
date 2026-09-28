@@ -29,7 +29,9 @@ import {
   neuePerson,
   personBezeichnung,
   personLeer,
+  personUnbenannt,
   pruefpunkte,
+  verpflegungMitziehen,
   verschoben,
   vokabularFuer,
   vorbelegungGeladen,
@@ -133,7 +135,30 @@ function KontakteEditor(props: { kontakte: Kontakt[]; aendern: (k: Kontakt[]) =>
             <input type="checkbox" checked={k.dienstlich} onChange={(e) => set(i, { dienstlich: e.target.checked })} />
             dienstlich
           </label>
-          <button type="button" onClick={() => aendern(kontakte.filter((_, j) => j !== i))}>✕</button>
+          {/* Rückfrage-Regel: die Rufnummer ist die Angabe, über die der
+              Meldekopf zurückruft — sie verschwindet nicht durch einen
+              Fehlgriff. Eine leere Zeile geht ohne Dialog. */}
+          <button
+            type="button"
+            aria-label={`Erreichbarkeit ${k.wert?.trim() || `${i + 1} (leer)`} entfernen`}
+            onClick={async () => {
+              const wert = k.wert?.trim() ?? "";
+              if (
+                wert &&
+                !(await frageJaNein({
+                  titel: `Erreichbarkeit ${wert} entfernen?`,
+                  text: `Die ${k.art === KontaktArt.EMAIL ? "Adresse" : "Nummer"} ${wert} wird aus dem Bogen entfernt.`,
+                  ok: "Erreichbarkeit entfernen",
+                  gefahr: true,
+                }))
+              ) {
+                return;
+              }
+              aendern(kontakte.filter((_, j) => j !== i));
+            }}
+          >
+            ✕
+          </button>
         </div>
       ))}
       <button type="button" onClick={() => aendern([...kontakte, { art: KontaktArt.MOBIL, dienstlich: false, wert: "" }])}>
@@ -255,7 +280,7 @@ function SortierKnoepfe(props: {
         data-sortier={`${gruppe}-${index}-hoch`}
         disabled={index === 0}
         aria-label={`Person ${index + 1} nach oben`}
-        title={index === 1 ? "Nach oben — die erste Person gilt als Ansprechpartner/in" : "Nach oben"}
+        title={index === 1 ? "Nach oben — die erste Person gilt als erreichbar für Rückfragen" : "Nach oben"}
         onClick={() => verschieben(index, index - 1, gruppe, "hoch")}
       >
         ▲
@@ -276,7 +301,7 @@ function SortierKnoepfe(props: {
         <button
           type="button"
           aria-label={`Person ${index + 1} an die erste Stelle`}
-          title="An die erste Stelle — gilt im PDF als Ansprechpartner/in"
+          title="An die erste Stelle — gilt im PDF und in der Meldung als erreichbar für Rückfragen"
           onClick={() => verschieben(index, 0, gruppe, "hoch")}
         >
           ⇑
@@ -297,11 +322,13 @@ function PersonKarte(props: {
   anzahl: number;
   /** Erste Person eines vollständig erfassten Bogens: sie meldet der Empfänger an. */
   ansprech?: boolean;
+  /** Meldekopf-Schnellerfassung: die Karte zählt nicht in die Stärke — das steht dran. */
+  nichtGezaehlt?: boolean;
   aendern: (p: Person) => void;
   entfernen: () => void;
   verschieben: (von: number, nach: number, gruppe: "karte" | "zeile", art: "hoch" | "runter") => void;
 }) {
-  const { person: p, org, vorschlaege, frisch, index, anzahl, ansprech, aendern, entfernen, verschieben } = props;
+  const { person: p, org, vorschlaege, frisch, index, anzahl, ansprech, nichtGezaehlt, aendern, entfernen, verschieben } = props;
   const karte = useRef<HTMLDivElement>(null);
   useEinzugsstempel(karte, frisch);
   const bezeichnung = personBezeichnung(p, index);
@@ -318,11 +345,17 @@ function PersonKarte(props: {
           und beim Entfernen traf der Griff dann die falsche. Sie nennt die
           Stelle in der Liste, also genau das, was die Sortierknöpfe daneben
           verändern. */}
-      <p className="eintrag-nr" aria-hidden="true">Person {index + 1} von {anzahl}</p>
+      <p className="eintrag-nr" aria-hidden="true">
+        Person {index + 1} von {anzahl}
+        {nichtGezaehlt && " · nicht gezählt"}
+      </p>
       <div className="zeile eintrag-kopf">
         <Feld titel="Vorname"><input value={p.vorname} onChange={(e) => set({ vorname: e.target.value })} /></Feld>
         <Feld titel="Nachname"><input value={p.nachname} onChange={(e) => set({ nachname: e.target.value })} /></Feld>
-        <Feld titel="Stärkerolle (vor Ort)" klasse="mittel">
+        {/* „Zählt als" statt „Stärkerolle (vor Ort)": das Feld entscheidet,
+            in welcher Spalte der Stärkemeldung die Person landet — genau das
+            sagt die Beschriftung. „(vor Ort)" las sich wie eine Ortsangabe. */}
+        <Feld titel="Zählt als" klasse="mittel">
           <Auswahl value={p.staerkeRolle} onChange={(e) => set({ staerkeRolle: Number(e.target.value) })}>
             <option value={StaerkeRolle.FUEHRER}>Führer/in</option>
             <option value={StaerkeRolle.UNTERFUEHRER}>Unterführer/in</option>
@@ -331,10 +364,12 @@ function PersonKarte(props: {
         </Feld>
         {/* Ohne die Marke ist die Reihenfolge eine stumme Regel: im PDF steht
             die erste Person als Ansprechpartner/in, in der Liste sieht man ihr
-            das nicht an. Erst damit wird das Umsortieren daneben verständlich. */}
+            das nicht an. Erst damit wird das Umsortieren daneben verständlich.
+            „Erreichbar für Rückfragen" sagt, wozu — „Ansprechpartner/in" war
+            ein Etikett ohne Aussage, ob es einen oder mehrere geben darf. */}
         {ansprech && (
-          <span className="ansprech-marke" title="Steht im PDF und in der Meldung als Ansprechpartner/in dieser Einheit">
-            Ansprechpartner/in
+          <span className="ansprech-marke" title="Die erste Person steht im PDF und in der Meldung als Ansprechpartner/in dieser Einheit — bei ihr fragt der Meldekopf nach">
+            Erreichbar für Rückfragen
           </span>
         )}
         <SortierKnoepfe index={index} anzahl={anzahl} gruppe="karte" verschieben={verschieben} />
@@ -441,6 +476,29 @@ function PersonalSchnellTabelle(props: {
   const set = (i: number, patch: Partial<Person>) =>
     aendern(personal.map((p, j) => (j === i ? { ...p, ...patch } : p)));
 
+  /**
+   * Dieselbe Rückfrage wie in der Karte, aus demselben Grund — und in der
+   * Tabelle wiegt sie mehr: Qualifikationen und Erreichbarkeiten sieht man
+   * hier gar nicht, und der Knopf liegt am rechten Rand neben den
+   * Sortierpfeilen. Eine leere Zeile geht weiterhin ohne Dialog.
+   */
+  async function zeileEntfernen(i: number) {
+    const p = personal[i]!;
+    const bezeichnung = personBezeichnung(p, i);
+    if (
+      !personLeer(p) &&
+      !(await frageJaNein({
+        titel: `${bezeichnung} entfernen?`,
+        text: "Die erfassten Angaben dieser Person gehen verloren — Name, Funktionen, Qualifikationen und Erreichbarkeiten.",
+        ok: "Person entfernen",
+        gefahr: true,
+      }))
+    ) {
+      return;
+    }
+    aendern(personal.filter((_, j) => j !== i));
+  }
+
   function enterWeiter(e: ReactKeyboardEvent, i: number) {
     if (e.key !== "Enter") return;
     e.preventDefault();
@@ -462,7 +520,7 @@ function PersonalSchnellTabelle(props: {
     <TabellenScroll titel="Personal-Schnelleingabe">
       <table className="uebersicht schnell-tabelle">
         <thead>
-          <tr><th>Vorname</th><th>Nachname</th><th>Stärkerolle</th><th>Geschlecht</th><th aria-label="Reihenfolge" /><th aria-label="Entfernen" /></tr>
+          <tr><th>Vorname</th><th>Nachname</th><th>Zählt als</th><th>Geschlecht</th><th aria-label="Reihenfolge" /><th aria-label="Entfernen" /></tr>
         </thead>
         <tbody>
           {personal.map((p, i) => (
@@ -486,7 +544,7 @@ function PersonalSchnellTabelle(props: {
                 {/* In der Tabelle gibt es kein <Feld> — Beschriftung wie beim
                     Entfernen-Knopf mit der Zeilennummer, sonst heißen alle gleich. */}
                 <Auswahl
-                  beschriftung={`Person ${i + 1}: Stärkerolle`}
+                  beschriftung={`Person ${i + 1}: Zählt als`}
                   value={p.staerkeRolle}
                   onChange={(e) => set(i, { staerkeRolle: Number(e.target.value) })}
                 >
@@ -511,11 +569,15 @@ function PersonalSchnellTabelle(props: {
               <td className="sortier-spalte">
                 <SortierKnoepfe index={i} anzahl={personal.length} gruppe="zeile" verschieben={verschieben} />
               </td>
+              {/* Klasse „entfernen" wie in der Karte: sie rückt den Knopf von
+                  den Sortierpfeilen ab (CSS in index.html) — ein Fehlgriff
+                  auf „nach unten" darf nicht auf dem Löschen landen. */}
               <td>
                 <button
                   type="button"
-                  aria-label={`Person ${i + 1} entfernen`}
-                  onClick={() => aendern(personal.filter((_, j) => j !== i))}
+                  className="entfernen"
+                  aria-label={`${personBezeichnung(p, i)} entfernen`}
+                  onClick={() => void zeileEntfernen(i)}
                 >
                   ✕
                 </button>
@@ -529,19 +591,23 @@ function PersonalSchnellTabelle(props: {
 }
 
 /**
- * Personen, die schon einen Namen tragen. Eingefügte Namen ersetzen die
- * namenlosen Zeilen — etwa die Sollplätze einer Vorlage —, statt sich
- * dahinter zu stellen; Ausgefülltes bleibt unangetastet.
+ * Personen, die schon etwas tragen (Name oder Erreichbarkeit). Eingefügte
+ * Namen ersetzen die unbenannten Zeilen — etwa die Sollplätze einer
+ * Vorlage —, statt sich dahinter zu stellen; Ausgefülltes bleibt unangetastet.
  */
 function benannte(personal: Person[]): Person[] {
-  return personal.filter((p) => p.vorname.trim() !== "" || p.nachname.trim() !== "");
+  return personal.filter((p) => !personUnbenannt(p));
 }
 
 
-export function SchrittPersonal({ bogen, aendern, geheZu }: SchrittProps) {
+export function SchrittPersonal({ bogen, aendern: aendernRoh }: SchrittProps) {
+  // Jede Änderung hier kann die Stärke verschieben — der Verpflegungs-Bedarf
+  // in Schritt 5 zieht mit, solange er der Stärke entsprach (verpflegungMitziehen).
+  const aendern = (patch: Partial<typeof bogen>) => aendernRoh(verpflegungMitziehen(bogen, patch));
   const nurStaerke = bogen.personalErfassung === PersonalErfassung.NUR_STAERKE;
   const vorlage = stanPersonalVorbelegung(bogen.einheit.organisation, bogen.einheit.einheitsTyp);
   const stanGeladen = vorbelegungGeladen(bogen.personal, vorlage);
+  const unbenannte = bogen.personal.filter(personUnbenannt).length;
   // Schnelleingabe: Tabellenansicht statt Detail-Karten; `fokusNeue` lässt den
   // Fokus beim Anlegen per Enter in die neue Zeile springen.
   const [schnell, setSchnell] = useState(false);
@@ -559,6 +625,16 @@ export function SchrittPersonal({ bogen, aendern, geheZu }: SchrittProps) {
   const namenDialog = useRef<HTMLDialogElement>(null);
   const [namenText, setNamenText] = useState("");
   const namenVorschau = parseNamen(namenText);
+  // Dubletten kennzeichnen — in der Liste selbst und gegenüber schon
+  // erfassten Personen. Übernommen werden sie trotzdem (zwei gleichnamige
+  // Helfer gibt es), aber nicht unbemerkt (Audit „Fehler", E6).
+  const namensSchluessel = (v: string, n: string) => `${n.trim().toLowerCase()}|${v.trim().toLowerCase()}`;
+  const schonErfasst = new Set(bogen.personal.map((p) => namensSchluessel(p.vorname, p.nachname)));
+  const vorschauDoppelt = namenVorschau.map((n, i) => {
+    const k = namensSchluessel(n.vorname, n.nachname);
+    return schonErfasst.has(k) || namenVorschau.findIndex((m) => namensSchluessel(m.vorname, m.nachname) === k) < i;
+  });
+  const anzahlDoppelt = vorschauDoppelt.filter(Boolean).length;
   // Anzahl für den Beispielnamen-Generator (nur Übungsbögen). Vorgabe 9:
   // Trupp bis Gruppe, die häufigste Größenordnung in Übungslagen.
   const [beispielAnzahl, setBeispielAnzahl] = useState(9);
@@ -641,6 +717,41 @@ export function SchrittPersonal({ bogen, aendern, geheZu }: SchrittProps) {
   const vp = verpflegung(bogen);
   const setVp = (patch: Partial<{ vegetarisch: number; vegan: number }>) =>
     aendern({ verpflegungManuell: { vegetarisch: vp.vegetarisch, vegan: vp.vegan, ...patch } });
+  const vegSumme = vp.vegetarisch + vp.vegan;
+
+  /**
+   * Auf „Nur Stärke" umschalten. Vorher setzte der Wechsel die gemeldete
+   * Stärke auf 0/0/0/0, während die erfassten Personen darunter stehen
+   * blieben — der Bogen ging so an den Meldekopf, und dort zählte die Einheit
+   * nicht. Jetzt starten Stärke, Unterbringung und Verpflegung mit den aus
+   * den Karten abgeleiteten Zahlen; steht schon Personal im Bogen, wird
+   * vorher gesagt, was der Wechsel bedeutet. Die Namen bleiben in jedem Fall.
+   */
+  async function aufNurStaerke() {
+    const erfasst = bogen.personal.filter((p) => !personLeer(p)).length;
+    const abgeleitet = staerke({ personal: bogen.personal });
+    if (
+      erfasst > 0 &&
+      !(await frageJaNein({
+        titel: "Nur die Stärke melden?",
+        text: `${erfasst === 1 ? "1 erfasste Person zählt" : `${erfasst} erfasste Personen zählen`} dann nicht mehr einzeln — die Stärke wird von Hand geführt und startet mit ${abgeleitet.fuehrer} / ${abgeleitet.unterfuehrer} / ${abgeleitet.mannschaft} / ${abgeleitet.gesamt}. Die Namen bleiben als Erreichbarkeiten erhalten.`,
+        ok: "Nur Stärke melden",
+      }))
+    ) {
+      return;
+    }
+    const vpAbgeleitet = verpflegung({ personal: bogen.personal });
+    aendern({
+      personalErfassung: PersonalErfassung.NUR_STAERKE,
+      staerkeManuell: abgeleitet,
+      ...(bogen.personal.length > 0
+        ? {
+            unterbringungManuell: unterbringungMWD({ personal: bogen.personal }),
+            verpflegungManuell: { vegetarisch: vpAbgeleitet.vegetarisch, vegan: vpAbgeleitet.vegan },
+          }
+        : {}),
+    });
+  }
 
   return (
     <section className="karte">
@@ -651,7 +762,18 @@ export function SchrittPersonal({ bogen, aendern, geheZu }: SchrittProps) {
             type="radio"
             name="perfassung"
             checked={!nurStaerke}
-            onChange={() => aendern({ personalErfassung: PersonalErfassung.VOLLSTAENDIG, staerkeManuell: undefined, unterbringungManuell: undefined })}
+            onChange={() =>
+              // Die manuellen Zahlen gehören zur Schnellerfassung — zurück in
+              // der Vollerfassung zählen wieder die Karten, auch bei der
+              // Verpflegung (sonst überdeckte die manuelle Aufteilung die
+              // Ernährungsangaben der Personen).
+              aendern({
+                personalErfassung: PersonalErfassung.VOLLSTAENDIG,
+                staerkeManuell: undefined,
+                unterbringungManuell: undefined,
+                verpflegungManuell: undefined,
+              })
+            }
           />
           Personal vollständig erfassen
         </label>
@@ -660,7 +782,7 @@ export function SchrittPersonal({ bogen, aendern, geheZu }: SchrittProps) {
             type="radio"
             name="perfassung"
             checked={nurStaerke}
-            onChange={() => aendern({ personalErfassung: PersonalErfassung.NUR_STAERKE, staerkeManuell: sm })}
+            onChange={() => void aufNurStaerke()}
           />
           Nur Stärke (Meldekopf-Schnellerfassung)
         </label>
@@ -713,11 +835,24 @@ export function SchrittPersonal({ bogen, aendern, geheZu }: SchrittProps) {
           <div className="stepper-zeile">
             <Stepper titel="vegetarisch" wert={vp.vegetarisch} setzen={(n) => setVp({ vegetarisch: n })} />
             <Stepper titel="vegan" wert={vp.vegan} setzen={(n) => setVp({ vegan: n })} />
+            {/* „1 von 0 vegetarisch" ist keine Auskunft, sondern ein Widerspruch —
+                der wird benannt, statt als Bruch dazustehen. */}
             <span className="hinweis stepper-rest">
-              {vp.vegetarisch + vp.vegan} von {sm.gesamt} vegetarisch/vegan · {Math.max(0, sm.gesamt - vp.vegetarisch - vp.vegan)} sonstige
+              {vegSumme > sm.gesamt
+                ? `${vegSumme} vegetarisch/vegan — mehr als die Gesamtstärke ${sm.gesamt}`
+                : `${vegSumme} von ${sm.gesamt} vegetarisch/vegan · ${sm.gesamt - vegSumme} sonstige`}
             </span>
           </div>
-          <h3>Führungskraft / Ansprechpartner</h3>
+          <h3>Führungskraft / erreichbar für Rückfragen</h3>
+          {/* Die Karten stehen unter den Zählern und sehen aus wie gezählt —
+              sind es aber nicht. Das muss dranstehen, sonst liest sich
+              „Stärke 4" über vier Karten als bestätigt. */}
+          {bogen.personal.length > 0 && (
+            <p className="hinweis">
+              {bogen.personal.length === 1 ? "Diese Person zählt" : `Diese ${bogen.personal.length} Personen zählen`} nicht in die
+              Stärke — die steht oben von Hand. Hier stehen nur die Erreichbarkeiten für Rückfragen.
+            </p>
+          )}
         </>
       )}
       {!nurStaerke && (
@@ -736,9 +871,24 @@ export function SchrittPersonal({ bogen, aendern, geheZu }: SchrittProps) {
         </p>
       )}
 
-      {/* Schritt-Index 2 = Personal (siehe SCHRITTE in app.tsx): Punkte
-          anderer Schritte (Zugehörigkeit, Ort/Auftrag) springen dorthin. */}
-      <Hinweise punkte={pruefpunkte(bogen, false)} aktuellerSchritt={2} geheZu={geheZu} />
+      {/* Schritt-Index 2 = Personal (siehe SCHRITTE in app.tsx): nur die
+          Punkte dieses Schritts; Zugehörigkeit und Ort/Auftrag stehen dort,
+          wo man sie behebt, und gesammelt in der Übersicht. */}
+      <Hinweise punkte={pruefpunkte(bogen, false)} aktuellerSchritt={2} />
+
+      {/* Der Rückweg zur Vorbelegung aus Schritt 1: entfernt nur Karten ohne
+          Namen und Erreichbarkeit — deshalb ohne Rückfrage (Rückfrage-Regel:
+          verloren geht nichts Erfasstes). Was jemand ausgefüllt hat, bleibt. */}
+      {unbenannte > 0 && (
+        <p>
+          <button
+            type="button"
+            onClick={() => aendern({ personal: benannte(bogen.personal) })}
+          >
+            Vorbelegung entfernen ({unbenannte === 1 ? "1 Person ohne Namen" : `${unbenannte} Personen ohne Namen`})
+          </button>
+        </p>
+      )}
 
       {!nurStaerke && vorlage.length > 0 && (
         <p>
@@ -811,6 +961,7 @@ export function SchrittPersonal({ bogen, aendern, geheZu }: SchrittProps) {
             index={i}
             anzahl={bogen.personal.length}
             ansprech={!nurStaerke && i === 0}
+            nichtGezaehlt={nurStaerke}
             verschieben={personVerschieben}
             aendern={(np) => aendern({ personal: bogen.personal.map((x, j) => (j === i ? np : x)) })}
             entfernen={() => aendern({ personal: bogen.personal.filter((_, j) => j !== i) })}
@@ -859,9 +1010,16 @@ export function SchrittPersonal({ bogen, aendern, geheZu }: SchrittProps) {
                 {n.funktion ? ` · ${n.funktion}` : ""}
                 {" · "}
                 <strong>{ROLLE_LABEL[n.rolle ?? StaerkeRolle.MANNSCHAFT]}</strong>
+                {vorschauDoppelt[i] && <span className="uebung-badge">doppelt</span>}
               </li>
             ))}
           </ul>
+        )}
+        {anzahlDoppelt > 0 && (
+          <p className="warnung" role="status">
+            {anzahlDoppelt === 1 ? "Ein Name steht" : `${anzahlDoppelt} Namen stehen`} doppelt — in der Liste oder
+            schon im Bogen. Übernommen werden sie trotzdem; wenn es dieselbe Person ist, die Zeile vorher löschen.
+          </p>
         )}
         <p>
           <button type="button" className="primaer" disabled={namenVorschau.length === 0} onClick={namenUebernehmen}>

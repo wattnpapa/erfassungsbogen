@@ -29,9 +29,11 @@ import {
   type Person,
 } from "@bos/eeb-format/model";
 import {
+  betriebsstoffPlausibilitaet,
   bogenLaden,
   browserKompressor,
   fahrzeugHinweise,
+  fahrzeugUnbenannt,
   inflateRawBegrenzt,
   MAX_ENTPACKT,
   migriereBogen,
@@ -39,11 +41,16 @@ import {
   neuerBogen,
   natoZeitstempel,
   neuesFahrzeug,
+  personUnbenannt,
   plausibilitaet,
+  pruefpunkte,
   qrErzeugen,
   schrittStatus,
+  staerkePlausibilitaet,
   transportBilanz,
+  verpflegungMitziehen,
   verschoben,
+  zeitpunktDeutsch,
 } from "./hilfen";
 import { deflateRaw } from "pako";
 import QRCode from "qrcode";
@@ -703,5 +710,135 @@ describe("verschoben", () => {
     expect(verschoben(["a", "b"], 0, -1)).toEqual(["a", "b"]);
     expect(verschoben(["a", "b"], 1, 2)).toEqual(["a", "b"]);
     expect(verschoben([], 0, 0)).toEqual([]);
+  });
+});
+
+describe("zeitpunktDeutsch()", () => {
+  it("schreibt Datum und Uhrzeit wie der Papierbogen: „27.09.2026, 18:00“", () => {
+    expect(zeitpunktDeutsch(zeitpunktAusIso("2026-09-27T18:00"))).toBe("27.09.2026, 18:00");
+    expect(zeitpunktDeutsch(zeitpunktAusIso("2026-01-05T06:05"))).toBe("05.01.2026, 06:05");
+  });
+});
+
+/**
+ * Der Bedarf in Schritt 5 folgt der Stärke, solange er ihr entsprach — wer
+ * bewusst mehr bestellt hat, behält seine Zahl (Audit Arbeitsablauf W4).
+ */
+describe("verpflegungMitziehen()", () => {
+  const sb = (verpflegungPersonen: number) => ({
+    verpflegungPersonen,
+    dieselLiter: 0,
+    benzinLiter: 0,
+    gemischLiter: 0,
+    unterbringung: false,
+    ruhezeitErforderlich: false,
+  });
+
+  it("zieht den Bedarf nach, wenn er der alten Stärke entsprach", () => {
+    const vorher = { ...neuerBogen(), personal: [person(), person()], sofortbedarf: sb(2) };
+    const patch = verpflegungMitziehen(vorher, { personal: [person()] });
+    expect(patch.sofortbedarf?.verpflegungPersonen).toBe(1);
+  });
+
+  it("zieht auch einen noch nicht gesetzten Bedarf (0) nach", () => {
+    const vorher = { ...neuerBogen(), personal: [], sofortbedarf: sb(0) };
+    const patch = verpflegungMitziehen(vorher, { personal: [person(), person(), person()] });
+    expect(patch.sofortbedarf?.verpflegungPersonen).toBe(3);
+  });
+
+  it("lässt einen abweichenden Bedarf stehen", () => {
+    const vorher = { ...neuerBogen(), personal: [person(), person()], sofortbedarf: sb(5) };
+    const patch = verpflegungMitziehen(vorher, { personal: [person()] });
+    expect(patch.sofortbedarf).toBeUndefined(); // Patch unverändert
+  });
+
+  it("rührt nichts an, wenn kein Sofortbedarf erfasst ist oder die Stärke gleich bleibt", () => {
+    const ohne = { ...neuerBogen(), personal: [person()] };
+    expect(verpflegungMitziehen(ohne, { personal: [] })).toEqual({ personal: [] });
+    const gleich = { ...neuerBogen(), personal: [person()], sofortbedarf: sb(1) };
+    const patch = verpflegungMitziehen(gleich, { personal: [person({ vorname: "Neu" })] });
+    expect(patch.sofortbedarf).toBeUndefined();
+  });
+
+  it("rechnet mit der manuellen Stärke, wenn auf „Nur Stärke“ umgeschaltet wird", () => {
+    const vorher = { ...neuerBogen(), personal: [person(), person()], sofortbedarf: sb(2) };
+    const patch = verpflegungMitziehen(vorher, {
+      personalErfassung: PersonalErfassung.NUR_STAERKE,
+      staerkeManuell: { fuehrer: 1, unterfuehrer: 0, mannschaft: 9, gesamt: 10 },
+    });
+    expect(patch.sofortbedarf?.verpflegungPersonen).toBe(10);
+  });
+});
+
+/** Zahlendreher und Zeitfehler, die vorher ungeprüft in die Übergabe gingen (Audit E4). */
+describe("plausibilitaet() — Zahlendreher und Zeitfehler", () => {
+  it("meldet ein Einsatzende vor dem Einsatzbeginn mit lesbaren Zeitpunkten", () => {
+    const b = neuerBogen();
+    b.einsatz.einsatzbeginn = zeitpunktAusIso("2026-09-27T18:00");
+    b.einsatz.einsatzende = zeitpunktAusIso("2026-09-27T06:00");
+    const punkt = pruefpunkte(b).find((p) => /Einsatzende/.test(p.text))!;
+    expect(punkt.text).toBe("Einsatzende 27.09.2026, 06:00 liegt vor dem Einsatzbeginn 27.09.2026, 18:00.");
+    expect(punkt.schritt).toBe(1);
+  });
+
+  it("schweigt bei Einsatzende nach dem Beginn oder ohne einen der Zeitpunkte", () => {
+    const b = neuerBogen();
+    b.einsatz.einsatzbeginn = zeitpunktAusIso("2026-09-27T18:00");
+    expect(plausibilitaet(b).some((h) => /Einsatzende/.test(h))).toBe(false);
+    b.einsatz.einsatzende = zeitpunktAusIso("2026-09-28T06:00");
+    expect(plausibilitaet(b).some((h) => /Einsatzende/.test(h))).toBe(false);
+  });
+
+  it("stutzt bei 99 Führern und bei mehr Führern als Mannschaft", () => {
+    const b = { ...neuerBogen(), personalErfassung: PersonalErfassung.NUR_STAERKE, staerkeManuell: { fuehrer: 99, unterfuehrer: 0, mannschaft: 1, gesamt: 100 } };
+    const h = plausibilitaet(b);
+    expect(h).toContain("Stärke: 99 Führer — stimmt das?");
+    expect(h).toContain("Stärke 99 / 0 / 1 / 100: mehr Führer als Mannschaft — stimmt das?");
+  });
+
+  it("lässt kleine Trupps und normale Gruppen in Ruhe", () => {
+    // Trupp: Führer + Unterführer, keine Mannschaft — normal, kein Hinweis.
+    expect(staerkePlausibilitaet({ fuehrer: 1, unterfuehrer: 1, mannschaft: 0, gesamt: 2 })).toEqual([]);
+    expect(staerkePlausibilitaet({ fuehrer: 0, unterfuehrer: 2, mannschaft: 7, gesamt: 9 })).toEqual([]);
+    expect(staerkePlausibilitaet({ fuehrer: 3, unterfuehrer: 0, mannschaft: 1, gesamt: 4 })).toHaveLength(1);
+  });
+
+  it("meldet 0 Sitzplätze an einem Fahrzeug, das laut Typ Leute befördert — nicht am Anhänger", () => {
+    const b = neuerBogen();
+    b.fahrzeuge = [
+      { typ: { code: 4 }, kennzeichen: "THW-1", sitzplaetze: 0 }, // GKW, Richtwert 9
+      { typ: { code: 43 }, kennzeichen: "THW-2", sitzplaetze: 0 }, // Anhänger, Richtwert 0
+    ];
+    const h = fahrzeugHinweise(b);
+    expect(h).toContain("GKW THW-1: 0 Sitzplätze eingetragen (Richtwert 9) — stimmt das?");
+    expect(h.some((t) => /Anh/.test(t))).toBe(false);
+  });
+
+  it("meldet Betriebsstoff über 1000 l je Fahrzeug, mit Tausenderpunkt", () => {
+    const b = neuerBogen();
+    b.fahrzeuge = [{ typ: { code: 4 }, kennzeichen: "THW-1" }];
+    b.sofortbedarf = { verpflegungPersonen: 0, dieselLiter: 99999, benzinLiter: 800, gemischLiter: 0, unterbringung: false, ruhezeitErforderlich: false };
+    const h = betriebsstoffPlausibilitaet(b);
+    expect(h).toEqual(["Sofortbedarf: 99.999 l Diesel für 1 Fahrzeug — mehr als 1.000 l je Fahrzeug. Stimmt das?"]);
+    // Ohne Fahrzeuge gilt die Grenze einmal.
+    expect(betriebsstoffPlausibilitaet({ ...b, fahrzeuge: [] })).toHaveLength(1);
+    expect(pruefpunkte(b).some((p) => /99\.999 l Diesel/.test(p.text) && p.schritt === 4)).toBe(true);
+  });
+});
+
+/** Was die Vorbelegung offen lässt — und was schon Inhalt ist. */
+describe("personUnbenannt() / fahrzeugUnbenannt()", () => {
+  it("zählt Sollplätze ohne Namen und Erreichbarkeit als unbenannt", () => {
+    const sollplatz = { ...neuePerson(), staerkeRolle: StaerkeRolle.UNTERFUEHRER, funktionen: [{ code: 3 }] };
+    expect(personUnbenannt(sollplatz)).toBe(true);
+    expect(personUnbenannt({ ...sollplatz, nachname: "Meyer" })).toBe(false);
+    // Eine Rufnummer ohne Namen ist Inhalt — sie geht beim Typwechsel nicht verloren.
+    expect(personUnbenannt({ ...sollplatz, kontakte: [{ art: KontaktArt.MOBIL, dienstlich: true, wert: "0170" }] })).toBe(false);
+  });
+
+  it("kennt ein Fahrzeug am Kennzeichen", () => {
+    expect(fahrzeugUnbenannt({ typ: { code: 4 }, funkrufname: { kennwort: { code: 1 }, eigenerStandort: true, teile: [18, 13] } })).toBe(true);
+    expect(fahrzeugUnbenannt({ typ: { code: 4 }, kennzeichen: "THW-84397" })).toBe(false);
+    expect(fahrzeugUnbenannt({ typ: {}, kennzeichen: "  " })).toBe(true);
   });
 });

@@ -10,6 +10,7 @@ import {
   fahrzeugBezeichnung,
   fahrzeugHinweise,
   fahrzeugLeer,
+  fahrzeugUnbenannt,
   neuesFahrzeug,
   transportBilanz,
   vokabularFuer,
@@ -194,10 +195,15 @@ function FahrzeugKarte(props: {
  * dann da, wenn sie aufgeht: beim Streichen eines Fahrzeugs sieht man sofort,
  * was das für die Anfahrt bedeutet. Reicht es nicht, übernimmt der Hinweis am
  * Ende der Seite (fahrzeugHinweise) — sonst stünde dasselbe zweimal.
+ *
+ * Erst, wenn es etwas zu rechnen gibt: mindestens ein Fahrzeug mit Typ oder
+ * Sitzplatzzahl. Vorher erschrak „Sitzplätze: 0 für 1 Person — 1 Fahrzeug
+ * ohne hinterlegte Sitzplatzzahl" schon bei einer leeren, eben angelegten Karte.
  */
 function Transportbilanz({ bogen }: Pick<SchrittProps, "bogen">) {
   const b = transportBilanz(bogen);
-  if (bogen.fahrzeuge.length === 0 || b.fehlend > 0) return null;
+  const rechenbar = bogen.fahrzeuge.some((f) => f.typ.code != null || !!f.typ.freitext?.trim() || f.sitzplaetze != null);
+  if (!rechenbar || b.fehlend > 0) return null;
   return (
     <p className="hinweis">
       Sitzplätze: <strong>{b.plaetze}</strong> für {b.benoetigt}{" "}
@@ -218,10 +224,20 @@ export function SchrittFahrzeuge({ bogen, aendern }: SchrittProps) {
   const vorlage = fahrzeugVorbelegung(bogen.einheit);
   const ovKennzahl = funkrufOrtsverband(bogen.einheit)?.kennzahl;
   const stanGeladen = vorbelegungGeladen(bogen.fahrzeuge, vorlage);
+  const unbenannte = bogen.fahrzeuge.filter(fahrzeugUnbenannt).length;
   return (
     <section className="karte">
       <h2>4. Fahrzeuge</h2>
       <Transportbilanz bogen={bogen} />
+      {/* Der Rückweg zur Vorbelegung aus Schritt 1, wie im Personal-Schritt:
+          entfernt nur Fahrzeuge ohne Kennzeichen — deshalb ohne Rückfrage. */}
+      {unbenannte > 0 && (
+        <p>
+          <button type="button" onClick={() => aendern({ fahrzeuge: bogen.fahrzeuge.filter((f) => !fahrzeugUnbenannt(f)) })}>
+            Vorbelegung entfernen ({unbenannte === 1 ? "1 Fahrzeug ohne Kennzeichen" : `${unbenannte} Fahrzeuge ohne Kennzeichen`})
+          </button>
+        </p>
+      )}
       {vorlage.length > 0 && (
         <p>
           <button

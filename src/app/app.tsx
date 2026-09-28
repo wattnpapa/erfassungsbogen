@@ -31,6 +31,7 @@ import {
   browserKompressor,
   bytesAlsDatei,
   einheitAnzeigename,
+  einheitOrt,
   neuerBogen,
   schrittStatus,
 } from "./hilfen";
@@ -53,14 +54,19 @@ import { absenderkarteGefuellt, absenderkarteLaden, type Absenderkarte } from ".
 import { AbsenderkarteFeld } from "./absenderkarte-ui";
 import {
   EinsatzArt,
+  bogenInhaltsId,
   einheitSchluessel,
   einsaetzeLaden,
   einsatzAnlegen,
   einsatzImportieren,
   meldungHinzufuegen,
+  neuesteJeEinheit,
+  revisionen,
   type EintragSignatur,
   type Einsatzsammlung,
 } from "@bos/meldekopf/einsaetze";
+import { bogenDiff, diffKurzfassung } from "@bos/meldekopf/meldung-diff";
+import { SpeicherVollFehler, folgemeldungErbt, istSpeicherVoll } from "./eintrag-zeiten";
 import { ART_LABEL, EinsatzDetail, EinsatzListe, type Eingang } from "./einsaetze-ui";
 import { aktuelleMeldungen } from "./auswertung";
 import { boegenAusPdfBytes, einsatzAusDatei, einsatzAusPdfBytes, einsatzDateiInhalt, istPdfDatei } from "./einsatz-transport";
@@ -395,9 +401,53 @@ function teile(stuecke: Teil[]) {
 
 const START = startAusUrlFragment();
 
+/**
+ * Zuletzt offene Einsatz-Sammlung — damit ein Meldekopf-Tablet nach Neuladen,
+ * Akku oder Browserneustart dort weitermacht, wo es war (Audit
+ * „Arbeitsablauf", W5), statt auf der Startseite mit einem fremden Bogen als
+ * oberster Karte (Audit „Stress", S2). Nur für einige Stunden: wer die
+ * Sammlung vor Tagen zuletzt offen hatte, will heute eher den eigenen Bogen.
+ */
+const LETZTER_EINSATZ_SCHLUESSEL = "eeb.letzterEinsatz.v1";
+const LETZTER_EINSATZ_FRIST_MS = 12 * 60 * 60 * 1000;
+
+function letztenEinsatzMerken(id: string | null): void {
+  try {
+    if (id) localStorage.setItem(LETZTER_EINSATZ_SCHLUESSEL, JSON.stringify({ id, um: Date.now() }));
+    else localStorage.removeItem(LETZTER_EINSATZ_SCHLUESSEL);
+  } catch {
+    /* Speicher voll oder gesperrt — dann eben nicht gemerkt */
+  }
+}
+
+function letztenEinsatzLaden(): string | null {
+  try {
+    const roh = localStorage.getItem(LETZTER_EINSATZ_SCHLUESSEL);
+    if (!roh) return null;
+    const { id, um } = JSON.parse(roh) as { id?: string; um?: number };
+    if (typeof id !== "string" || typeof um !== "number" || Date.now() - um > LETZTER_EINSATZ_FRIST_MS) return null;
+    return einsaetzeLaden().some((s) => s.id === id) ? id : null;
+  } catch {
+    return null;
+  }
+}
+
+/** „1 / 1 / 2 / 4" — die Stärke in der Kurzform des Bogens. */
+function staerkeKurz(b: Erfassungsbogen): string {
+  const s = staerke(b);
+  return `${s.fuehrer} / ${s.unterfuehrer} / ${s.mannschaft} / ${s.gesamt}`;
+}
+
+/** Was die App gerade zeigt — für den Browser-Verlauf (Zurück-Knopf, Audit „Fehler", E3). */
+type Ansicht = { schritt: number; zeigeStart: boolean; einsatz: string | null; scanner: boolean };
+function ansichtGleich(a: Ansicht, b: Ansicht): boolean {
+  return a.schritt === b.schritt && a.zeigeStart === b.zeigeStart && a.einsatz === b.einsatz && a.scanner === b.scanner;
+}
+
 // Ein Segment-Teil aus dem Kaltstart darf nur einmal in den Sammelstand —
 // StrictMode (Entwicklung) führt Mount-Effekte doppelt aus.
 let startSegmentVerbraucht = false;
+let startEmpfangVerbraucht = false;
 
 /**
  * Auswahl der Einsatzart für den Anlege-Dialog. Die alte Abfrage über
@@ -506,7 +556,14 @@ function AppInhalt() {
   // Einsatz-Sammlung (Meldekopf/Zugführer): Liste, offener Einsatz und das
   // Sammelziel für hereinkommende Bögen (Scan/manuell landen dort statt zu öffnen).
   const [einsaetze, setEinsaetze] = useState<Einsatzsammlung[]>(() => einsaetzeLaden());
-  const [offenerEinsatzId, setOffenerEinsatzId] = useState<string | null>(null);
+  // Beim Kaltstart ohne Link die zuletzt offene Sammlung wieder öffnen (W5).
+  const [offenerEinsatzId, setOffenerEinsatzIdRoh] = useState<string | null>(() =>
+    START.bogen || START.segment || START.vorlage ? null : letztenEinsatzLaden(),
+  );
+  const setOffenerEinsatzId = (id: string | null) => {
+    setOffenerEinsatzIdRoh(id);
+    letztenEinsatzMerken(id);
+  };
   /**
    * Welche Zeile der Einheitenliste gehört zum gerade aufgenommenen Bogen?
    * Die Stärke-Leiste quittiert die geänderte Summe, die Rückmeldezeile nennt
@@ -561,18 +618,67 @@ function AppInhalt() {
   const vorlagenNeuLaden = () => setVorlagen(vorlagenLaden());
   const einsaetzeNeuLaden = () => setEinsaetze(einsaetzeLaden());
 
+  // Browser-Verlauf: Jeder Ansichtswechsel (Schritt, Startseite, Einsatz,
+  // Scanner) bekommt einen Verlaufseintrag, damit „Zurück" — auf Android der
+  // Hardware-Knopf — innerhalb der App bleibt, statt sie zu verlassen (Audit
+  // „Fehler und Wiederanlauf", E3). Ein Rücksprung aus dem Verlauf stellt die
+  // gemerkte Ansicht wieder her und legt selbst keinen neuen Eintrag an.
+  const ansichtRef = useRef<Ansicht | null>(null);
+  const verlaufZielRef = useRef<Ansicht | null>(null);
+  useEffect(() => {
+    const jetzt: Ansicht = { schritt, zeigeStart, einsatz: offenerEinsatzId, scanner: scannerOffen };
+    const vorher = ansichtRef.current;
+    ansichtRef.current = jetzt;
+    if (typeof history === "undefined") return;
+    if (!vorher) {
+      history.replaceState({ ...(history.state ?? {}), eeb: jetzt }, "");
+      return;
+    }
+    if (ansichtGleich(vorher, jetzt)) return;
+    if (verlaufZielRef.current && ansichtGleich(verlaufZielRef.current, jetzt)) {
+      verlaufZielRef.current = null; // Rücksprung angekommen — kein neuer Eintrag
+      return;
+    }
+    verlaufZielRef.current = null;
+    history.pushState({ eeb: jetzt }, "");
+  }, [schritt, zeigeStart, offenerEinsatzId, scannerOffen]);
+  useEffect(() => {
+    function beiVerlauf(e: PopStateEvent) {
+      const ziel = (e.state as { eeb?: Ansicht } | null)?.eeb;
+      if (!ziel) return;
+      verlaufZielRef.current = ziel;
+      setSchritt(ziel.schritt);
+      setZeigeStart(ziel.zeigeStart);
+      setOffenerEinsatzIdRoh(ziel.einsatz);
+      letztenEinsatzMerken(ziel.einsatz);
+      if (!ziel.scanner && scannerOffenRef.current) scanAbbrechen(!!sammelZielRef.current);
+      else if (ziel.scanner && !scannerOffenRef.current && !istNativ()) setScannerOffen(true);
+    }
+    window.addEventListener("popstate", beiVerlauf);
+    return () => window.removeEventListener("popstate", beiVerlauf);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- nur einmal registrieren; Handler nutzt Refs und stabile Setter
+  }, []);
+  const scannerOffenRef = useRef(false);
+  scannerOffenRef.current = scannerOffen;
+
   // Entwurfssicherung: jede Änderung still sichern; wird der Bogen bewusst
   // geschlossen (Neuer Bogen, Übernahme in einen Einsatz), fällt der Entwurf weg.
   // Der Zeitstempel speist die sichtbare „automatisch gespeichert"-Anzeige —
   // sie nimmt die Angst, dass Eingaben bei Akku/Abbruch verloren gehen.
   const [gespeichertUm, setGespeichertUm] = useState<Date | null>(null);
+  // Wahrheit statt Beruhigung: Schlägt das Sichern fehl (Speicher voll), sagt
+  // die Zeile das — die alte Anzeige behauptete „gespeichert", während nichts
+  // gespeichert war (Audit „Offline und Speicher", O1).
+  const [speicherFehler, setSpeicherFehler] = useState(false);
   useEffect(() => {
     if (bogen) {
-      entwurfSpeichern(bogen, vorlageInBearbeitung ?? undefined);
-      setGespeichertUm(new Date());
+      const ok = entwurfSpeichern(bogen, vorlageInBearbeitung ?? undefined);
+      setSpeicherFehler(!ok);
+      if (ok) setGespeichertUm(new Date());
     } else {
       entwurfVerwerfen();
       setGespeichertUm(null);
+      setSpeicherFehler(false);
     }
   }, [bogen, vorlageInBearbeitung]);
 
@@ -616,6 +722,7 @@ function AppInhalt() {
     const datei = e.target.files?.[0];
     e.target.value = "";
     if (!datei) return;
+    setFehler(""); // eine Meldung gehört zur letzten Handlung, nicht zur vorletzten (E6)
     if (!istPdfDatei(datei)) {
       try {
         const vorlage = vorlageAusDatei(await datei.text());
@@ -817,18 +924,22 @@ function AppInhalt() {
 
   async function entwurfWegwerfen() {
     if (!bogen) return;
+    // Verworfen heißt nicht verloren: Der Bogen wandert in dieselbe Rückholung
+    // wie ein verdrängter (Audit „Zerstörende Handlungen", D7) — wer nach
+    // 14 Stunden „Verwerfen" statt „Fortsetzen" trifft, hat ihn morgen wieder.
     const sicher = await frageJaNein({
       titel: "Angefangenen Bogen verwerfen?",
-      text: `„${einheitAnzeigename(bogen.einheit)}" wird gelöscht. Das lässt sich nicht rückgängig machen.`,
+      text: `„${einheitAnzeigename(bogen.einheit)}" wird geschlossen. Er bleibt auf der Startseite unter „Zuletzt verdrängten Bogen zurückholen" erreichbar, bis ein anderer Bogen diesen Platz braucht.`,
       ok: "Verwerfen",
       gefahr: true,
     });
     if (!sicher) return;
+    if (bogenHatInhalt(bogen)) merkeVerdraengt(bogen);
     setBogen(null); // löscht auch die Entwurfssicherung (siehe oben)
     setVorlageInBearbeitung(null);
     setzeEmpfang(null);
     setSchritt(0);
-    setMeldung("Angefangener Bogen verworfen.");
+    setMeldung("Angefangener Bogen verworfen — Rückholung unten auf der Startseite.");
   }
 
   /**
@@ -887,16 +998,28 @@ function AppInhalt() {
     empfang?: { signatur?: EintragSignatur; herkunft?: Uint8Array | null },
     /** Kiosk-Scan: Rückmeldung ins Scanner-Overlay statt Ansichtswechsel. */
     kiosk = false,
-  ) {
+    /** Satz hinter der Quittung — etwa, dass der eigene Bogen offen bleibt. */
+    zusatz = "",
+  ): Promise<boolean> {
     const einsatz = einsaetzeLaden().find((s) => s.id === zielId);
     const schl = einheitSchluessel(b.einheit);
+    // Gleicher Inhalt schon da? Dann gibt es nichts zu fragen — der Kern
+    // überspringt ihn ohnehin, die Rückfrage davor war nur Stapel-Bremse
+    // (Audit „Stress", S1; „Offline", O3).
+    const schonDa = einsatz?.eintraege.some((e) => e.id === bogenInhaltsId(b)) ?? false;
     // Ein Übungsbogen in einer echten Lage zählt nicht mit (siehe zaehltInLage).
     // Das gehört in dieselbe Zeile, die die Aufnahme quittiert — sonst steht die
     // Meldung scheinbar normal in der Liste und der Meldekopf rechnet mit ihr.
     const uebungDaneben = einsatz != null && !!b.uebung && einsatz.art !== EinsatzArt.UEBUNG;
     const uebungZusatz = uebungDaneben ? " Achtung: als ÜBUNG gekennzeichnet — zählt nicht in die Lage." : "";
     let override: string | undefined;
-    if (einsatz?.eintraege.some((e) => e.einheitSchluessel === schl)) {
+    const bekannt = einsatz?.eintraege.some((e) => e.einheitSchluessel === schl) ?? false;
+    // Im Kiosk-Stapel keine Fachfrage: Eine veränderte Fassung derselben
+    // Einheit ist laut Dialog selbst „der Normalfall" — sie wird angehängt und
+    // in der Quittung als Folgemeldung genannt; die Ausnahme „zweite
+    // gleichnamige Einheit" bleibt über „Aufteilen"/„Als eigene Einheit" in
+    // der Einsatzansicht erreichbar.
+    if (bekannt && !schonDa && !kiosk) {
       // Die Frage hat zwei gleichwertige Antworten und deshalb zwei benannte
       // Knöpfe: „OK/Abbrechen" hätte den zweiten Weg als Abbruch getarnt.
       const wahl = await frageWahl({
@@ -921,21 +1044,84 @@ function AppInhalt() {
         const text = `„${einheitAnzeigename(b.einheit)}" nicht aufgenommen.`;
         if (kiosk) setScanFortschritt(text);
         else setMeldung(text);
-        return;
+        return false;
       }
       if (wahl === "eigene") override = `${schl}#${Date.now()}`;
     }
-    const r = meldungHinzufuegen(zielId, b, {
-      quelle,
-      einheitSchluesselOverride: override,
-      signatur: empfang?.signatur,
-      herkunft: empfang?.herkunft ? base64UrlKodieren(empfang.herkunft) : undefined,
-    });
+    // Ähnliche Einheit schon da (gleiche Organisation und gleicher Ort, aber
+    // anderer Schlüssel — etwa nach einer Papierphase ohne Einheitstyp
+    // abgetippt, jetzt gescannt)? Dann fragen, statt still eine zweite Einheit
+    // anzulegen, die doppelt zählt (Audit „Analog first", A5). Im Stapel
+    // keine Frage: dort gilt „anhalten kostet mehr als nachträglich
+    // zusammenführen".
+    if (!bekannt && !schonDa && !kiosk && einsatz) {
+      const ort = einheitOrt(b.einheit)?.trim().toLowerCase();
+      const aehnlich = ort
+        ? neuesteJeEinheit(einsatz.eintraege).find(
+            (e) =>
+              e.einheitSchluessel !== schl &&
+              e.bogen.einheit.organisation === b.einheit.organisation &&
+              einheitOrt(e.bogen.einheit)?.trim().toLowerCase() === ort,
+          )
+        : undefined;
+      if (aehnlich) {
+        const wahl = await frageWahl({
+          titel: "Ist das dieselbe Einheit?",
+          text: `In diesem Einsatz steht schon „${einheitAnzeigename(aehnlich.bogen.einheit)}" (Stärke ${staerkeKurz(aehnlich.bogen)}). Die neue Meldung heißt „${einheitAnzeigename(b.einheit)}".`,
+          wege: [
+            {
+              wert: "gleich",
+              label: `Ja — als neue Fassung von „${einheitAnzeigename(aehnlich.bogen.einheit)}"`,
+              hinweis: "Die bisherige Meldung wandert in die Historie; gezählt wird eine Einheit.",
+            },
+            {
+              wert: "eigene",
+              label: "Nein — als eigene Einheit führen",
+              hinweis: "Beide zählen getrennt in die Summe.",
+            },
+          ],
+        });
+        if (!wahl) {
+          setMeldung(`„${einheitAnzeigename(b.einheit)}" nicht aufgenommen.`);
+          return false;
+        }
+        if (wahl === "gleich") override = aehnlich.einheitSchluessel;
+      }
+    }
+    // Was sich gegenüber der vorigen Fassung ändert — für die Quittung im
+    // Kiosk, bevor der Kern die neue Fassung obenauf legt.
+    const vorige = bekannt && !schonDa && einsatz ? revisionen(einsatz.eintraege, schl)[0] : undefined;
+    let r;
+    try {
+      r = meldungHinzufuegen(zielId, b, {
+        quelle,
+        einheitSchluesselOverride: override,
+        signatur: empfang?.signatur,
+        herkunft: empfang?.herkunft ? base64UrlKodieren(empfang.herkunft) : undefined,
+      });
+    } catch (e) {
+      // Voller Speicher: nichts abgelegt, und das muss sichtbar sein — der
+      // Bogen bleibt beim Aufrufer offen (Audit „Offline und Speicher", O1).
+      const text = istSpeicherVoll(e) ? new SpeicherVollFehler(e).message : fehlerText(e);
+      if (kiosk) setScanFortschritt(`✗ Nicht aufgenommen: ${text}`);
+      else setFehler(text);
+      einsaetzeNeuLaden();
+      return false;
+    }
     einsaetzeNeuLaden();
     if (!r) {
       setFehler("Einsatz nicht gefunden.");
-      return;
+      return false;
     }
+    // Folgemeldung erbt Eintreffzeit und Auftrag der Vorgängerin (eintrag-zeiten.ts).
+    if (r.neu) {
+      try {
+        folgemeldungErbt(zielId, r.eintrag.id);
+      } catch {
+        /* Zusatzfelder sind Beiwerk — die Meldung selbst ist abgelegt */
+      }
+    }
+    const folge = r.neu && vorige ? ` (Folgemeldung: ${diffKurzfassung(bogenDiff(vorige.bogen, b)) || "inhaltlich unverändert"})` : "";
     if (kiosk) {
       // Dauerscannen: Piep + Zähler im Overlay, die Kamera bleibt an — beim
       // Massen-Check-in muss niemand zwischen den Bögen die Ansicht wechseln.
@@ -944,16 +1130,16 @@ function AppInhalt() {
       const stand = `${kioskZaehlerRef.current} ${kioskZaehlerRef.current === 1 ? "Bogen" : "Bögen"} in diesem Durchgang`;
       setScanFortschritt(
         r.neu
-          ? `✓ „${einheitAnzeigename(b.einheit)}" aufgenommen — ${stand}.${uebungZusatz} Nächsten Bogen zeigen…`
+          ? `✓ „${einheitAnzeigename(b.einheit)}" aufgenommen${folge} — ${stand}.${uebungZusatz} Nächsten Bogen zeigen…`
           : `Bereits vorhanden — übersprungen (gleicher Inhalt). ${stand}.`,
       );
       setFehler("");
-      return;
+      return true;
     }
     setMeldung(
       r.neu
-        ? `Meldung von „${einheitAnzeigename(b.einheit)}" aufgenommen.${uebungZusatz}`
-        : `Bereits vorhanden — übersprungen (gleicher Inhalt). Die Zeile in der Liste ist quittiert.`,
+        ? `Meldung von „${einheitAnzeigename(b.einheit)}" aufgenommen${folge}.${uebungZusatz}${zusatz ? ` ${zusatz}` : ""}`
+        : `Bereits vorhanden — übersprungen (gleicher Inhalt). Die Zeile in der Liste ist quittiert.${zusatz ? ` ${zusatz}` : ""}`,
     );
     setFehler("");
     // Auch beim übersprungenen Bogen: die Frage nach dem Scan lautet „welche
@@ -961,6 +1147,39 @@ function AppInhalt() {
     // die den Inhalt schon trägt. Die Rückmeldezeile sagt, ob er neu war.
     markiereEingang(r.eintrag.einheitSchluessel);
     setOffenerEinsatzId(zielId); // zurück in die Einsatzansicht
+    return true;
+  }
+
+  /**
+   * Wohin mit einer empfangenen Meldung (Link, Nahbereich, Datei, Kaltstart)?
+   * Gibt es Sammlungen, ist die Antwort am Meldekopf fast immer „in die
+   * Sammlung" — vorher lief jeder dieser Wege über den eigenen Arbeitsbogen,
+   * mit fünf Tipps und einer Rückfrage zum „angefangenen Bogen", den es aus
+   * Meldekopf-Sicht gar nicht gab (Audit „Arbeitsablauf", W1). Ohne Sammlung
+   * wird der Bogen wie bisher geöffnet.
+   *
+   * Rückgabe: Einsatz-ID, "oeffnen" oder null (abgebrochen).
+   */
+  async function empfangsZielWaehlen(b: Erfassungsbogen): Promise<string | null> {
+    const sammlungen = einsaetzeLaden();
+    if (sammlungen.length === 0) return "oeffnen";
+    const letzte = letztenEinsatzLaden() ?? offenerEinsatzId;
+    const sortiert = [...sammlungen].sort((x, y) => (x.id === letzte ? -1 : y.id === letzte ? 1 : y.geaendert - x.geaendert));
+    const wege = sortiert.slice(0, 4).map((s) => ({
+      wert: s.id,
+      label: `In „${s.name}" aufnehmen`,
+      hinweis: `${ART_LABEL[s.art]}${s.ort ? ` · ${s.ort}` : ""} · ${aktuelleMeldungen(s.eintraege, s.art).length} Einheit(en) anwesend`,
+    }));
+    wege.push({
+      wert: "oeffnen",
+      label: "Bogen öffnen (ansehen oder bearbeiten)",
+      hinweis: "Für die Einheit selbst — der eigene angefangene Bogen bleibt über die Startseite zurückholbar.",
+    });
+    return frageWahl({
+      titel: `Meldung von „${einheitAnzeigename(b.einheit)}" empfangen`,
+      text: `Stärke ${staerkeKurz(b)}${b.uebung ? " · ÜBUNG" : ""}. Wohin damit?`,
+      wege,
+    });
   }
 
   /**
@@ -985,6 +1204,13 @@ function AppInhalt() {
       // Die Datenschutzfrist wendet die Sammlung selbst an (meldungHinzufuegen).
       await bogenInSammlung(ziel, b, "scan", { signatur: alsEintragSignatur(signatur), herkunft: payload }, true);
       return false; // Kiosk: weiter scannen, bis abgebrochen wird
+    }
+    const wohin = await empfangsZielWaehlen(b);
+    if (wohin == null) return true; // abgebrochen — nichts verändert
+    if (wohin !== "oeffnen") {
+      await bogenInSammlung(wohin, b, "scan", { signatur: alsEintragSignatur(signatur), herkunft: payload });
+      setZeigeStart(false);
+      return true;
     }
     if (!(await darfBogenErsetzen({ titel: "Empfangenen Bogen öffnen?", was: "die empfangene Meldung", ok: "Meldung öffnen" }))) {
       return true; // Scan beendet, der eigene Bogen bleibt stehen
@@ -1032,6 +1258,7 @@ function AppInhalt() {
         setMeldung(`Vorlage „${v.name}" importiert.${status.zustand !== "unsigniert" ? ` (${signaturLabel(status)})` : ""}`);
         setFehler("");
       } catch {
+        scanFehlerRef.current = fehlertext;
         setFehler(fehlertext);
       }
       return true;
@@ -1066,6 +1293,7 @@ function AppInhalt() {
         );
         return false;
       } catch {
+        scanFehlerRef.current = fehlertext;
         setFehler(fehlertext);
         return true;
       }
@@ -1078,6 +1306,7 @@ function AppInhalt() {
       const status = await signaturVonText(text);
       return uebernimmBogen(dekodiert, status, payloadAusText(text));
     } catch {
+      scanFehlerRef.current = fehlertext;
       setFehler(fehlertext);
     }
     return true;
@@ -1099,13 +1328,26 @@ function AppInhalt() {
     return fertig;
   }
 
-  /** Web-Scanner-Ergebnis: bei Fertigstellung das Overlay schließen. */
+  /**
+   * Web-Scanner-Ergebnis: bei Fertigstellung das Overlay schließen. Ein
+   * unlesbarer Code schließt es NICHT — die Meldung steht im Scanner, der
+   * nächste Versuch braucht keinen Neustart (Audit „Fehler", E6).
+   */
   async function scanErgebnisWeb(text: string) {
-    if (await uebernehmeQrText(text)) {
+    scanFehlerRef.current = null;
+    const fertig = await uebernehmeQrText(text);
+    if (scanFehlerRef.current) {
+      setScanFortschritt(`✗ ${scanFehlerRef.current}`);
+      setFehler("");
+      return;
+    }
+    if (fertig) {
       setScannerOffen(false);
       setScanFortschritt("");
     }
   }
+  /** Fehlertext des letzten Scans — gesetzt von uebernehmeText, gelesen vom Web-Scanner. */
+  const scanFehlerRef = useRef<string | null>(null);
 
   function scanAbbrechen(auchSammelZiel: boolean) {
     setScannerOffen(false);
@@ -1128,6 +1370,39 @@ function AppInhalt() {
     return () => {
       aktiv = false;
     };
+  }, []);
+
+  // Kaltstart mit Bogen aus dem Link auf einem Gerät MIT Sammlungen: Das ist
+  // der Meldekopf, dem jemand per Nahbereich oder Chat einen Bogen schickt.
+  // Statt den Bogen als eigenen Entwurf stehen zu lassen, wird er in die
+  // Sammlung angeboten; der verdrängte eigene Bogen kommt dann zurück (W1).
+  useEffect(() => {
+    if (!START.bogen || startEmpfangVerbraucht || einsaetzeLaden().length === 0) return;
+    startEmpfangVerbraucht = true;
+    const b = START.bogen;
+    void (async () => {
+      const wohin = await empfangsZielWaehlen(b);
+      if (wohin == null || wohin === "oeffnen") return;
+      const status = START.text ? await signaturVonText(START.text) : ({ zustand: "unsigniert" } as SignaturStatus);
+      const ok = await bogenInSammlung(wohin, b, "scan", {
+        signatur: alsEintragSignatur(status),
+        herkunft: START.text ? payloadAusText(START.text) : null,
+      });
+      if (!ok) return;
+      // Den beim Start verdrängten eigenen Bogen zurück an den Arbeitsplatz.
+      const alt = ersetztenEntwurfLaden();
+      if (VERDRAENGT_BEIM_START && alt) {
+        ersetztenEntwurfVerwerfen();
+        setErsetzterEntwurf(null);
+        setBogen(alt.bogen);
+        setSchritt(UEBERSICHT);
+      } else {
+        setBogen(null);
+      }
+      setzeEmpfang(null);
+      setZeigeStart(false);
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- nur beim Mounten
   }, []);
 
   // Kaltstart mit einem Segment-Teil: Jemand hat einen Teil eines mehrteiligen
@@ -1233,9 +1508,9 @@ function AppInhalt() {
    */
   async function einsatzErfragen(): Promise<Einsatzsammlung | null> {
     const werte = await frageFelder({
-      titel: "Neuen Einsatz anlegen",
+      titel: "Neue Einsatz-Sammlung anlegen",
       hinweis:
-        "Eine Sammlung für fremde Bögen — mit Stärke-Summen über alle anwesenden Einheiten.",
+        "Die Sammelmappe des Meldekopfs für eintreffende Bögen — mit Stärke-Summen über alle anwesenden Einheiten. Der eigene Bogen entsteht unter „Meinen Bogen ausfüllen“.",
       ok: "Einsatz anlegen",
       felder: [
         { name: "name", label: "Name", platzhalter: "z. B. Hochwasser Weser" },
@@ -1270,17 +1545,43 @@ function AppInhalt() {
     const sig = bogenSignatur;
     const herkunft = bogenHerkunft;
     einsatzWahlDialog.current?.close();
-    setBogen(null);
-    setVorlageInBearbeitung(null);
-    setzeEmpfang(null);
-    setSchritt(0);
     setMeldung(""); // Rückmeldung des Assistenten gehört nicht in die Folgeansicht
-    await bogenInSammlung(
+    // Erst ablegen, dann schließen: Scheitert das Ablegen (Speicher voll),
+    // bleibt der Bogen offen — vorher war er in dem Fall nirgends mehr (O1).
+    // Ein EMPFANGENER Bogen (mit Signatur) wird nach dem Ablegen geschlossen,
+    // damit der Meldekopf keinen fremden Bogen als eigenen Entwurf behält;
+    // der selbst erfasste Bogen der eigenen Einheit bleibt offen — sie will
+    // ihn weiter pflegen (Audit „Zerstörende Handlungen", D5).
+    const eigener = !sig;
+    const ok = await bogenInSammlung(
       zielId,
       b,
       sig ? "scan" : "manuell",
       sig ? { signatur: alsEintragSignatur(sig), herkunft } : undefined,
+      false,
+      eigener ? "Dein Bogen bleibt geöffnet — Startseite → „Fortsetzen“." : "",
     );
+    if (!ok || eigener) return;
+    setBogen(null);
+    setVorlageInBearbeitung(null);
+    setzeEmpfang(null);
+    setSchritt(0);
+  }
+
+  /** Erfassung für einen Einsatz abschließen: ablegen, dann den Arbeitsplatz räumen. */
+  async function erfassungUebernehmen() {
+    const ziel = sammelZielId;
+    if (!ziel || !bogen) return;
+    const b = bogen;
+    setMeldung("");
+    // Manuell erfasster Bogen ist kein signierter Transport.
+    const ok = await bogenInSammlung(ziel, b, "manuell");
+    if (!ok) return;
+    setSammelZiel(null);
+    setBogen(null);
+    setVorlageInBearbeitung(null);
+    setzeEmpfang(null);
+    setSchritt(0);
   }
 
   /** Aus der Einsatz-Auswahl heraus einen neuen Einsatz anlegen und den Bogen hineinlegen. */
@@ -1351,20 +1652,31 @@ function AppInhalt() {
   }
 
   async function sammelPdf(s: Einsatzsammlung) {
-    // Dieselbe Auswahl wie die Summenleiste: Übungsmeldungen gehören nicht in
-    // die Zahlen eines echten Einsatzes (siehe zaehltInLage).
-    const meldungen = aktuelleMeldungen(s.eintraege, s.art);
-    if (meldungen.length === 0) {
-      setFehler("Keine anwesenden Einheiten für die Sammel-PDF.");
-      return;
-    }
+    // ALLE aktuellen Meldungen — auch abgerückte und Übungen: Die Datei ist die
+    // Übergabe der ganzen Sammlung und muss auch am Einsatzende funktionieren,
+    // wenn niemand mehr anwesend ist (Audit „Arbeitsablauf", W2; „Analog
+    // first", A1). Was zählt und was nicht, unterscheidet das Blatt selbst.
+    setFehler("");
     try {
       // Dynamisch: pdfmake samt eingebetteter Schriften bleibt aus dem
       // Start-Bundle heraus und wird erst beim ersten PDF geladen.
       const { einsatzPdfErzeugen } = await import("./pdf");
-      await einsatzPdfErzeugen(s, meldungen);
+      await einsatzPdfErzeugen(s);
+      setMeldung(`Einsatz „${s.name}" als PDF weitergegeben/gesichert — mit allen Meldungen, Zeiten und Historie.`);
     } catch (e) {
-      setFehler(`Sammel-PDF: ${fehlerText(e)}`);
+      setFehler(`Einsatz weitergeben: ${fehlerText(e)}`);
+    }
+  }
+
+  /** Einseitiges Lageblatt (nur Übersicht) — für Wand, Ablösung und Klemmbrett (A3/A4). */
+  async function lageblatt(s: Einsatzsammlung) {
+    setFehler("");
+    try {
+      const { einsatzLageblattErzeugen } = await import("./pdf");
+      await einsatzLageblattErzeugen(s);
+      setMeldung("Lageblatt erzeugt (eine Seite).");
+    } catch (e) {
+      setFehler(`Lageblatt: ${fehlerText(e)}`);
     }
   }
 
@@ -1540,6 +1852,7 @@ function AppInhalt() {
     const datei = e.target.files?.[0];
     e.target.value = "";
     if (!datei) return;
+    setFehler(""); // Meldung der vorigen Handlung nicht stehen lassen (E6)
     try {
       let s: Einsatzsammlung;
       if (istPdfDatei(datei)) {
@@ -1609,12 +1922,23 @@ function AppInhalt() {
           onCsvDetailExport={() => exportiereEinsatzCsvDetail(offenerEinsatz)}
           onOldenburgExport={() => exportiereEinsatzOldenburg(offenerEinsatz)}
           onSammelPdf={() => sammelPdf(offenerEinsatz)}
+          onWeitergeben={() => sammelPdf(offenerEinsatz)}
+          onLageblatt={() => lageblatt(offenerEinsatz)}
           eingang={eingang}
           onGeloescht={() => { setOffenerEinsatzId(null); einsaetzeNeuLaden(); setMeldung("Einsatz in den Papierkorb verschoben."); }}
         />
         {(meldung || fehler) && (
           <p className={fehler ? "fehler" : "meldung"} role="status" style={{ textAlign: "center" }}>
             {fehler || meldung}
+          </p>
+        )}
+        {/* Eine angefangene Erfassung für diesen Einsatz liegt im Assistenten:
+            Wer mit „‹ Einsatz" zurückkam, findet sie hier wieder — nicht als
+            fremden „eigenen Bogen" auf der Startseite (Audit „Neuer Nutzer", F2). */}
+        {bogen && sammelZielId === offenerEinsatz.id && (
+          <p className="meldung" role="status" style={{ textAlign: "center" }}>
+            Angefangene Erfassung für diesen Einsatz: „{einheitAnzeigename(bogen.einheit) || "(noch ohne Namen)"}".{" "}
+            <button type="button" className="link" onClick={() => { setMeldung(""); setOffenerEinsatzId(null); setZeigeStart(false); }}>Weiter erfassen</button>
           </p>
         )}
         {/* Stapel läuft: Fortschritt und Abbruch. Dreißig Handyfotos dauern
@@ -1803,7 +2127,10 @@ function AppInhalt() {
               — Stärke und Sofortbedarf laufend zusammengezählt.
             </p>
             <div className="aktionen">
-              <button type="button" className="primaer" onClick={neuerEinsatz}>Neuer Einsatz…</button>
+              {/* „Neuer Einsatz…" lasen Helfer als Beginn der eigenen Meldung
+                  (Audit „Neuer Nutzer", F3) — der Knopf nennt jetzt, was er
+                  anlegt: die Sammelmappe. */}
+              <button type="button" className="primaer" onClick={neuerEinsatz}>Neue Einsatz-Sammlung…</button>
               {/* Direkter Einstieg in die Meldekopf-Schnellerfassung: vorher nur
                   als Radio in Schritt 3 erreichbar — unter Zeitdruck fand ihn
                   dort niemand. */}
@@ -1911,6 +2238,9 @@ function AppInhalt() {
 
   // Leichter Füllstand je Schritt (Orientierung; die Übersicht hat keinen Status).
   const status = schrittStatus(bogen);
+  // Erfassung für eine Sammlung? Dann trägt der Kopf den Einsatz und die
+  // Fußleiste den Abschluss (F2).
+  const sammelEinsatz = sammelZielId ? einsaetze.find((s) => s.id === sammelZielId) ?? null : null;
 
   return (
     <>
@@ -1924,9 +2254,18 @@ function AppInhalt() {
           genauso: Wer beim Ausfüllen in die Sonne gerät, findet ihn im Kopf
           des Formulars. */}
       <div className="kopf-oberzeile">
-        <button type="button" className="zur-start" onClick={() => { setMeldung(""); setZeigeStart(true); }}>
-          ‹ Startseite
-        </button>
+        {/* In der Erfassung für einen Einsatz führt der Rückweg in den Einsatz,
+            nicht auf die Startseite: Dorthin gehört die halbe Erfassung nicht,
+            und dort sah sie aus wie der eigene Bogen (Audit „Neuer Nutzer", F2). */}
+        {sammelEinsatz ? (
+          <button type="button" className="zur-start" onClick={() => { setMeldung(""); setOffenerEinsatzId(sammelEinsatz.id); }}>
+            ‹ Einsatz „{sammelEinsatz.name}"
+          </button>
+        ) : (
+          <button type="button" className="zur-start" onClick={() => { setMeldung(""); setZeigeStart(true); }}>
+            ‹ Startseite
+          </button>
+        )}
         <AnzeigeSchalter />
       </div>
       <div className="titelzeile">
@@ -1945,6 +2284,11 @@ function AppInhalt() {
         {bogen.personalErfassung === PersonalErfassung.NUR_STAERKE && (
           <span className="modus-marke" title="Personal wird nur als Stärke erfasst (Führer/Unterführer/Mannschaft), nicht namentlich">
             Schnellerfassung
+          </span>
+        )}
+        {sammelEinsatz && (
+          <span className="modus-marke" title={`Diese Erfassung wird als Meldung in die Sammlung „${sammelEinsatz.name}" gelegt — mit „In Einsatz übernehmen" auf jedem Schritt.`}>
+            Aufnahme für: {sammelEinsatz.name}
           </span>
         )}
         {/* Vorlagen-Bearbeitung: der Assistent sieht aus wie bei jedem Bogen —
@@ -1980,11 +2324,16 @@ function AppInhalt() {
           );
         })}
       </nav>
-      {gespeichertUm && (
+      {speicherFehler ? (
+        <p className="autosave speicher-fehler" role="alert">
+          ⚠ Nicht gespeichert — der Speicher dieses Geräts ist voll. Der Bogen bleibt geöffnet; bitte jetzt „Bogen übergeben" (PDF) oder in der Fußzeile der Startseite Papierkorb leeren bzw. Sicherung erstellen.
+          {gespeichertUm ? ` Letzter gesicherter Stand: ${gespeichertUm.toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit" })} Uhr.` : ""}
+        </p>
+      ) : gespeichertUm ? (
         <p className="autosave" role="status">
           ✓ automatisch gespeichert · {gespeichertUm.toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit" })} Uhr — bleibt auf diesem Gerät
         </p>
-      )}
+      ) : null}
     </SeitenKopf>
     {/* Übungs-Störer: volle Breite direkt unter dem Kopf, auf jedem Schritt.
         Er hängt am Bogen (nicht an einem Geräte-Modus) und erscheint darum
@@ -2023,7 +2372,7 @@ function AppInhalt() {
           signatur={bogenSignatur}
           herkunft={bogenHerkunft}
           geheZu={setSchritt}
-          neu={() => { setMeldung(""); setBogen(null); setVorlageInBearbeitung(null); setzeEmpfang(null); setSchritt(0); }}
+          neu={() => { if (bogenHatInhalt(bogen)) merkeVerdraengt(bogen); setMeldung(""); setBogen(null); setVorlageInBearbeitung(null); setzeEmpfang(null); setSchritt(0); }}
           onVorlageGespeichert={(name) => { vorlagenNeuLaden(); setMeldung(`Als Vorlage „${name}" gespeichert.`); }}
           vorlageBearbeitung={
             bearbeiteteVorlage ? { name: bearbeiteteVorlage.name, onAktualisieren: vorlageAktualisierenUndSchliessen } : undefined
@@ -2031,20 +2380,7 @@ function AppInhalt() {
           onInEinsatzAufnehmen={() => { einsaetzeNeuLaden(); einsatzWahlDialog.current?.showModal(); }}
           sammelAktion={
             sammelZielId
-              ? {
-                  label: "In Einsatz übernehmen",
-                  onUebernehmen: () => {
-                    const ziel = sammelZielId;
-                    setSammelZiel(null);
-                    setBogen(null);
-                    setVorlageInBearbeitung(null);
-                    setzeEmpfang(null);
-                    setSchritt(0);
-                    setMeldung("");
-                    // Manuell erfasster Bogen ist kein signierter Transport.
-                    void bogenInSammlung(ziel, bogen, "manuell");
-                  },
-                }
+              ? { label: "In Einsatz übernehmen", onUebernehmen: () => void erfassungUebernehmen() }
               : undefined
           }
         />
@@ -2054,14 +2390,16 @@ function AppInhalt() {
       {/* Einsatz-Auswahl für „In Einsatz aufnehmen…": ein gescannter oder
           geöffneter Bogen wandert von der Übersicht direkt in eine Sammlung. */}
       {schritt === UEBERSICHT && (
-        <dialog ref={einsatzWahlDialog} aria-label="In Einsatz aufnehmen" className="teilen-dialog">
+        <dialog ref={einsatzWahlDialog} aria-label="In Einsatz-Sammlung ablegen" className="teilen-dialog">
           <div className="kopfzeile">
-            <h2>In Einsatz aufnehmen</h2>
+            <h2>In Einsatz-Sammlung ablegen</h2>
             <button type="button" onClick={() => einsatzWahlDialog.current?.close()}>Schließen</button>
           </div>
           <p className="hinweis">
-            Der Bogen wird als Meldung abgelegt und hier geschlossen; ist die Einheit im Einsatz schon
-            gemeldet, wird nachgefragt (neue Fassung oder eigene Einheit).
+            {bogenSignatur
+              ? "Die empfangene Meldung wird in der Sammlung abgelegt und hier geschlossen."
+              : "Dein Bogen wird als Meldung abgelegt und bleibt hier geöffnet."}
+            {" "}Ist die Einheit dort schon gemeldet, wird nachgefragt (neue Fassung oder eigene Einheit).
           </p>
           {einsaetze.map((s) => (
             <div className="teilen-weg" key={s.id}>
@@ -2073,7 +2411,7 @@ function AppInhalt() {
           ))}
           <div className="teilen-weg">
             <button type="button" className={einsaetze.length === 0 ? "primaer" : ""} onClick={neuerEinsatzFuerBogen}>
-              Neuen Einsatz anlegen…
+              Neue Sammlung anlegen…
             </button>
             <p className="hinweis">
               {einsaetze.length === 0
@@ -2087,7 +2425,13 @@ function AppInhalt() {
       {schritt !== UEBERSICHT && (
         <footer className="nav">
           <button type="button" disabled={schritt === 0} onClick={() => setSchritt(schritt - 1)}>← Zurück</button>
-          <span className="platzhalter" />
+          {/* Der Abschluss der Einsatz-Erfassung stand nur auf Schritt 6; am
+              Meldekopf reicht oft Schritt 1 und 3 (F2). */}
+          {sammelEinsatz ? (
+            <button type="button" className="uebernehmen" onClick={() => void erfassungUebernehmen()}>In Einsatz übernehmen</button>
+          ) : (
+            <span className="platzhalter" />
+          )}
           <button type="button" className="primaer" onClick={() => setSchritt(schritt + 1)}>
             {schritt === UEBERSICHT - 1 ? "Zur Übersicht →" : "Weiter →"}
           </button>

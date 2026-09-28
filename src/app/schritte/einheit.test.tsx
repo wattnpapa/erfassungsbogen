@@ -10,7 +10,9 @@ import userEvent from "@testing-library/user-event";
 import { useState } from "react";
 import { Dialogschicht } from "../dialoge";
 import { neuePerson, neuerBogen, vokabularFuer } from "../hilfen";
-import { PersonalErfassung, type Erfassungsbogen } from "@bos/eeb-format/model";
+import { OrganisationsTyp, PersonalErfassung, type Erfassungsbogen } from "@bos/eeb-format/model";
+import { stanPersonalVorbelegung } from "@bos/vokabulare/thw-stan-personal";
+import { stanFahrzeugVorbelegung } from "@bos/vokabulare/thw-stan-fahrzeuge";
 import { SchrittBuehne } from "../../test/schritt-buehne";
 import { SchrittEinheit } from "./einheit";
 
@@ -62,11 +64,11 @@ describe("Schritt Einheit", () => {
     const nutzer = userEvent.setup();
     buehne();
 
-    expect(screen.getByLabelText("Kürzel")).toBeDefined();
+    expect(screen.getByLabelText("Dienststellen-Kürzel (optional)")).toBeDefined();
 
     await nutzer.selectOptions(screen.getByLabelText("Organisation"), "Feuerwehr");
 
-    expect(screen.queryByLabelText("Kürzel")).toBeNull();
+    expect(screen.queryByLabelText("Dienststellen-Kürzel (optional)")).toBeNull();
   });
 
   it("übernimmt einen Ortsverband aus der Vorschlagsliste mit Kontakt und Struktur", async () => {
@@ -85,7 +87,7 @@ describe("Schritt Einheit", () => {
     await nutzer.click(treffer);
 
     expect((screen.getByLabelText("Name (Pflicht)") as HTMLInputElement).value).toBe("Oldenburg (NI)");
-    expect((screen.getAllByLabelText("Kürzel")[0] as HTMLInputElement).value).toBe("OODE");
+    expect((screen.getAllByLabelText("Dienststellen-Kürzel (optional)")[0] as HTMLInputElement).value).toBe("OODE");
     // Ziffern only — die Eingabe filtert Trenn- und Leerzeichen heraus.
     expect((screen.getAllByLabelText("Telefon")[0] as HTMLInputElement).value).toBe("04413401050");
 
@@ -93,7 +95,7 @@ describe("Schritt Einheit", () => {
     // ihrem offiziellen Kürzel aus der Organisationskennzeichnung.
     const namen = screen.getAllByLabelText("Name") as HTMLInputElement[];
     expect(namen.map((f) => f.value)).toEqual(["Oldenburg", "Bremen, Niedersachsen"]);
-    const kuerzel = screen.getAllByLabelText("Kürzel") as HTMLInputElement[];
+    const kuerzel = screen.getAllByLabelText("Dienststellen-Kürzel (optional)") as HTMLInputElement[];
     expect(kuerzel.map((f) => f.value)).toEqual(["OODE", "GOLD", "LVNI"]);
   });
 
@@ -151,7 +153,8 @@ describe("Schritt Einheit", () => {
     await nutzer.click(screen.getByRole("button", { name: "+ übergeordnete Ebene" }));
     expect(screen.getAllByLabelText(/^Name/)).toHaveLength(2);
 
-    await nutzer.click(screen.getByRole("button", { name: "✕" }));
+    // Eine leere Ebene geht ohne Rückfrage (Rückfrage-Regel).
+    await nutzer.click(screen.getByRole("button", { name: /^Ebene .* entfernen$/ }));
     expect(screen.getAllByLabelText(/^Name/)).toHaveLength(1);
   });
 
@@ -279,5 +282,199 @@ describe("Schritt Einheit — offene Pflichtangaben", () => {
     );
 
     expect(screen.getByText(/^Schnellerfassung:/)).toBeDefined();
+  });
+});
+
+/**
+ * Die Wahl des Einheitstyps legt die StAN-Sollplätze und -Fahrzeuge still an
+ * — und ein Wechsel auf den richtigen Typ ließ sie vorher stehen: Der Bogen
+ * meldete die Summe beider Vorbelegungen, in der Größenordnung einer ganzen
+ * Gruppe. Jetzt folgt die unbenannte Vorbelegung dem Typ, wird auf Schritt 1
+ * angesagt und lässt sich dort wieder entfernen; Benanntes bleibt.
+ */
+describe("Schritt Einheit — Vorbelegung nach Einheitstyp", () => {
+  /** Bühne mit Ableseleiste für Personal und Fahrzeuge (Schritt 1 zeigt beides sonst nicht). */
+  function VorbelegungBuehne({ start }: { start: Erfassungsbogen }) {
+    const [bogen, setBogen] = useState(start);
+    return (
+      <>
+        <SchrittEinheit bogen={bogen} aendern={(patch) => setBogen((b) => ({ ...b, ...patch }))} />
+        <p>
+          Personal: <output data-testid="personal">{bogen.personal.length}</output>
+          {" · "}Namen: <output data-testid="namen">{bogen.personal.map((p) => p.nachname).filter(Boolean).join(", ") || "keine"}</output>
+          {" · "}Fahrzeuge: <output data-testid="fahrzeuge">{bogen.fahrzeuge.length}</output>
+          {" · "}Kennzeichen: <output data-testid="kennzeichen">{bogen.fahrzeuge.map((f) => f.kennzeichen).filter(Boolean).join(", ") || "keine"}</output>
+        </p>
+        <Dialogschicht />
+      </>
+    );
+  }
+
+  const gross = { code: 7, name: "Fachgruppe Räumen (B)" }; // StAN 9 Personen, 4 Fahrzeuge
+  const klein = { code: 3, name: "Zugtrupp Technischer Zug" }; // StAN 4 Personen, 1 Fahrzeug
+  const org = OrganisationsTyp.THW;
+  const personen = (code: number) => stanPersonalVorbelegung(org, { code }).length;
+  const fahrzeuge = (code: number) => stanFahrzeugVorbelegung(org, { code }).length;
+  const zahl = (id: string) => Number(screen.getByTestId(id).textContent);
+
+  async function typWaehlen(nutzer: ReturnType<typeof userEvent.setup>, name: string) {
+    const feld = screen.getByRole("combobox", { name: "Einheitstyp" });
+    await nutzer.clear(feld);
+    await nutzer.type(feld, name);
+    const liste = screen.getByRole("listbox", { name: "Vorschläge zu Einheitstyp" });
+    await nutzer.click(within(liste).getByText(name));
+  }
+
+  it("sagt die Vorbelegung auf Schritt 1 an und ersetzt sie beim Typwechsel durch die des neuen Typs", async () => {
+    const nutzer = userEvent.setup();
+    render(<VorbelegungBuehne start={neuerBogen()} />);
+
+    await typWaehlen(nutzer, gross.name);
+    expect(zahl("personal")).toBe(personen(gross.code));
+    expect(zahl("fahrzeuge")).toBe(fahrzeuge(gross.code));
+    expect(screen.getByText(/^Vorbelegt nach StAN:/).textContent).toContain(`${personen(gross.code)} Personen (Namen offen)`);
+
+    await typWaehlen(nutzer, klein.name);
+
+    // Nur die Sollplätze des neuen Typs — nicht die Summe beider.
+    expect(zahl("personal")).toBe(personen(klein.code));
+    expect(zahl("fahrzeuge")).toBe(fahrzeuge(klein.code));
+  });
+
+  it("nimmt beim Leeren des Typs die unbenannten Karten mit, benannte bleiben", async () => {
+    const nutzer = userEvent.setup();
+    const start = neuerBogen();
+    start.einheit.einheitsTyp = { code: gross.code };
+    start.personal = [...stanPersonalVorbelegung(org, { code: gross.code }), { ...neuePerson(), vorname: "Thomas", nachname: "Lange" }];
+    start.fahrzeuge = [...stanFahrzeugVorbelegung(org, { code: gross.code }), { typ: {}, kennzeichen: "THW-84397" }];
+    render(<VorbelegungBuehne start={start} />);
+
+    await nutzer.clear(screen.getByRole("combobox", { name: "Einheitstyp" }));
+
+    expect(zahl("personal")).toBe(1);
+    expect(screen.getByTestId("namen").textContent).toBe("Lange");
+    expect(zahl("fahrzeuge")).toBe(1);
+    expect(screen.getByTestId("kennzeichen").textContent).toBe("THW-84397");
+  });
+
+  it("entfernt die Vorbelegung auf Knopfdruck — und nur die", async () => {
+    const nutzer = userEvent.setup();
+    const start = neuerBogen();
+    start.einheit.einheitsTyp = { code: gross.code };
+    start.personal = [{ ...neuePerson(), vorname: "Thomas", nachname: "Lange" }, ...stanPersonalVorbelegung(org, { code: gross.code })];
+    start.fahrzeuge = stanFahrzeugVorbelegung(org, { code: gross.code });
+    render(<VorbelegungBuehne start={start} />);
+
+    await nutzer.click(screen.getByRole("button", { name: "Vorbelegung entfernen" }));
+
+    expect(zahl("personal")).toBe(1);
+    expect(screen.getByTestId("namen").textContent).toBe("Lange");
+    expect(zahl("fahrzeuge")).toBe(0);
+    expect(screen.queryByText(/^Vorbelegt nach StAN:/)).toBeNull();
+  });
+
+  it("zeigt keinen Vorbelegungs-Hinweis, solange kein Typ mit Vorgabe gewählt ist", () => {
+    render(<VorbelegungBuehne start={neuerBogen()} />);
+
+    expect(screen.queryByText(/^Vorbelegt nach StAN:/)).toBeNull();
+  });
+});
+
+/**
+ * Ein Vertipper im ersten Auswahlfeld löschte vorher Einheitstyp und die ganze
+ * Zugehörigkeit — Rufnummern und Postfächer dreier Ebenen — ohne ein Wort.
+ * Steht davon etwas im Bogen, wird gefragt und benannt, was verloren geht.
+ */
+describe("Schritt Einheit — Organisation wechseln", () => {
+  function ausgefuellt(): Erfassungsbogen {
+    const b = neuerBogen();
+    b.einheit.einheitsTyp = { code: 7 };
+    b.einheit.hierarchie = [
+      { bezeichnung: { code: 1 }, name: "Wardenburg", kurz: "OWAR", telefon: "04407123" },
+      { bezeichnung: { code: 2 }, name: "Bremen" },
+    ];
+    return b;
+  }
+
+  it("fragt nach und behält bei Abbruch Organisation, Typ und Zugehörigkeit", async () => {
+    const nutzer = userEvent.setup();
+    render(<SchrittBuehne komponente={SchrittEinheit} bogen={ausgefuellt()} />);
+
+    await nutzer.selectOptions(screen.getByLabelText("Organisation"), "Feuerwehr");
+
+    const dialog = document.querySelector<HTMLDialogElement>("dialog[aria-label='Organisation auf „Feuerwehr\" wechseln?']")!;
+    expect(dialog).not.toBeNull();
+    // Die Frage nennt, was verloren geht.
+    expect(dialog.textContent).toContain("FGr R (B)");
+    expect(dialog.textContent).toContain("OV Wardenburg");
+    await nutzer.click(within(dialog).getByRole("button", { name: "Abbrechen" }));
+
+    expect((screen.getByLabelText("Organisation") as HTMLSelectElement).selectedOptions[0]?.textContent).toBe("THW");
+    expect((screen.getByLabelText("Name (Pflicht)") as HTMLInputElement).value).toBe("Wardenburg");
+    expect(screen.getAllByLabelText(/^Name/)).toHaveLength(2);
+  });
+
+  it("wechselt nach Bestätigung und setzt die Zugehörigkeit neu auf", async () => {
+    const nutzer = userEvent.setup();
+    render(<SchrittBuehne komponente={SchrittEinheit} bogen={ausgefuellt()} />);
+
+    await nutzer.selectOptions(screen.getByLabelText("Organisation"), "Feuerwehr");
+    const dialog = document.querySelector<HTMLDialogElement>("dialog[aria-label='Organisation auf „Feuerwehr\" wechseln?']")!;
+    await nutzer.click(within(dialog).getByRole("button", { name: "Organisation wechseln" }));
+
+    expect((screen.getByLabelText("Organisation") as HTMLSelectElement).selectedOptions[0]?.textContent).toBe("Feuerwehr");
+    expect((screen.getByLabelText("Name (Pflicht)") as HTMLInputElement).value).toBe("");
+    expect(screen.getAllByLabelText(/^Name/)).toHaveLength(1);
+  });
+
+  it("wechselt ohne Rückfrage, solange nichts ausgefüllt ist", async () => {
+    const nutzer = userEvent.setup();
+    buehne();
+
+    await nutzer.selectOptions(screen.getByLabelText("Organisation"), "Feuerwehr");
+
+    expect(document.querySelector("dialog.abfrage")).toBeNull();
+    expect((screen.getByLabelText("Organisation") as HTMLSelectElement).selectedOptions[0]?.textContent).toBe("Feuerwehr");
+  });
+});
+
+/** Rückfrage-Regel für die Ebenen: „RB Tübingen" samt Rufnummer verschwand mit einem Fehlgriff. */
+describe("Schritt Einheit — Ebene entfernen", () => {
+  it("fragt vor dem Entfernen einer Ebene mit Inhalt nach und nennt sie", async () => {
+    const nutzer = userEvent.setup();
+    const b = neuerBogen();
+    b.einheit.hierarchie = [
+      { bezeichnung: { code: 1 }, name: "Wardenburg" },
+      { bezeichnung: { code: 2 }, name: "Tübingen", telefon: "07071123" },
+    ];
+    render(<SchrittBuehne komponente={SchrittEinheit} bogen={b} />);
+
+    await nutzer.click(screen.getByRole("button", { name: "Ebene RB Tübingen entfernen" }));
+
+    const dialog = document.querySelector<HTMLDialogElement>("dialog[aria-label='RB Tübingen entfernen?']")!;
+    expect(dialog).not.toBeNull();
+    expect(dialog.textContent).toContain("Telefon 07071123");
+    await nutzer.click(within(dialog).getByRole("button", { name: "Abbrechen" }));
+    expect(screen.getAllByLabelText(/^Name/)).toHaveLength(2);
+
+    await nutzer.click(screen.getByRole("button", { name: "Ebene RB Tübingen entfernen" }));
+    const zweiter = document.querySelector<HTMLDialogElement>("dialog[aria-label='RB Tübingen entfernen?']")!;
+    await nutzer.click(within(zweiter).getByRole("button", { name: "Ebene entfernen" }));
+    expect(screen.getAllByLabelText(/^Name/)).toHaveLength(1);
+  });
+});
+
+/**
+ * Auf Schritt 1 standen vorher drei gelbe Kästen, bevor irgendetwas eingegeben
+ * war — zwei davon zu Schritt 2 und 3. Wer auf dem ersten Bildschirm lernt,
+ * dass gelbe Kästen ohnehin immer da sind, überliest später auch die, die zählen.
+ */
+describe("Schritt Einheit — nur eigene Hinweise", () => {
+  it("weist auf einem frischen Bogen höchstens auf den fehlenden Namen hin", () => {
+    render(<SchrittEinheit bogen={neuerBogen()} aendern={() => {}} />);
+
+    expect(screen.getByText(/Name der eigenen Einheit .* fehlt/)).toBeDefined();
+    expect(screen.queryByText(/Stärke ist 0/)).toBeNull();
+    expect(screen.queryByText(/Ort\/Auftrag/)).toBeNull();
   });
 });

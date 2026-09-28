@@ -15,18 +15,20 @@ Funktionalität: Darstellung, Datensicherung und Auskunft
     Dann ist der Anzeigemodus "Nacht" aktiv
 
   # Rückmeldung aus Cuxhaven (August 2026): auf einem Android-Gerät mit dunklem
-  # Systemdesign war der Hintergrund dunkel, die Schrift aber schwarz. Die App
-  # folgt dem Systemdesign nun nicht mehr — dunkel wird hier gewählt, nicht geerbt.
+  # Systemdesign war der Hintergrund dunkel, die Schrift aber schwarz. Seit dem
+  # Audit „Nacht und Sicht" (docs/audits/nacht-und-sicht.md) startet die App bei dunklem
+  # Systemdesign im eigenen, vollständig abgestimmten Modus „Dunkel" — geerbt
+  # wird die Wahl, nicht einzelne Farben. Eine ausdrückliche Wahl hat Vorrang.
   Szenario: Dunkles Systemdesign lässt die App lesbar
     Angenommen mein Gerät auf dunkles Design eingestellt ist
     Und die App sich als Android-App zeigt
     Und ich öffne die App
-    Dann ist der Anzeigemodus "Standard" aktiv
+    Dann ist der Anzeigemodus "Dunkel" aktiv
     Und hebt sich jeder Text von seiner Fläche ab
-    Wenn ich den Anzeigemodus "Dunkel" wähle
+    Wenn ich den Anzeigemodus "Standard" wähle
     Dann hebt sich jeder Text von seiner Fläche ab
     Wenn ich die Seite neu lade
-    Dann ist der Anzeigemodus "Dunkel" aktiv
+    Dann ist der Anzeigemodus "Standard" aktiv
     Und hebt sich jeder Text von seiner Fläche ab
 
   # Rückmeldung Anwender (August 2026): „Nacht ist aus irgendeinem Grund weiß."
@@ -128,7 +130,7 @@ Funktionalität: Darstellung, Datensicherung und Auskunft
     Und ich auf "Verwerfen" klicke
     Dann sehe ich den Dialog "Angefangenen Bogen verwerfen?"
     Wenn ich im Dialog auf "Verwerfen" klicke
-    Dann sehe ich den Hinweis "Angefangener Bogen verworfen."
+    Dann sehe ich den Hinweis "Angefangener Bogen verworfen — Rückholung unten auf der Startseite."
     Und sehe ich die Schaltfläche "Fortsetzen" nicht
 
   Szenario: Das Verwerfen abbrechen lässt den angefangenen Bogen stehen

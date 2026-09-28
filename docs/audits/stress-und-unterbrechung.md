@@ -4,7 +4,11 @@ Stand: 27.09.2026 · Prüfer: Rollenaudit `thw-stress-test-user` ·
 Prüfgegenstand: Web-App, Produktionsbuild (`vite build` + `vite preview`),
 Zweig `claude/thw-reviewer-skills-dr76q1`, Commit `17f72ce`.
 
-Reiner Prüfbericht, keine Codeänderung. Baut auf den vorigen Audits auf;
+Reiner Prüfbericht, keine Codeänderung.
+> *Nachtrag 28.09.2026:* Die Befunde dieses Berichts sind behoben oder mit
+> Begründung zurückgestellt; der Stand je Befund steht in
+> [README.md → Stand der Behebung](README.md#stand-der-behebung).
+ Baut auf den vorigen Audits auf;
 Befunde, die dort schon stehen, werden hier nur als Stressfalle
 eingeordnet und verwiesen, nicht wiederholt.
 

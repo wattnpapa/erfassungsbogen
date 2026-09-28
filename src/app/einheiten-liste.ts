@@ -25,6 +25,7 @@
 import { OrganisationsTyp, alleFahrerlaubnisse, type Person } from "@bos/eeb-format/model";
 import type { MeldeEintrag } from "@bos/meldekopf/einsaetze";
 import { FE_EINGESCHLOSSEN, FE_TEXT, einheitAnzeigename, funkrufText, kennzeichenText, orgLabel, vokabularFuer } from "./hilfen";
+import { eintreffzeit } from "./eintrag-zeiten";
 
 export type EinheitenSortierung = "name" | "eintreffzeit" | "zug" | "organisation";
 
@@ -203,7 +204,10 @@ export function einheitenSortieren(
   const liste = [...eintraege];
   switch (sortierung) {
     case "eintreffzeit":
-      return liste.sort((a, b) => b.empfangenAm - a.empfangenAm || nameVergleich(a, b));
+      // Die korrigierte Eintreffzeit, nicht der Empfangsmoment: wer einen
+      // Papierstapel nachträgt, hat alle Bögen in derselben Minute erfasst —
+      // geordnet werden soll nach dem Eintreffen der Einheit.
+      return liste.sort((a, b) => eintreffzeit(b) - eintreffzeit(a) || nameVergleich(a, b));
     case "zug":
       return liste.sort((a, b) => {
         const za = a.zugEtikett ?? "";

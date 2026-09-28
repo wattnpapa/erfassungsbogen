@@ -16,10 +16,78 @@
  * einer angeklickten Spalte um.
  */
 
-import { staerke, unterbringungMWD, verpflegung } from "@bos/eeb-format/model";
+import { staerke, unterbringungMWD, verpflegung, type Erfassungsbogen } from "@bos/eeb-format/model";
 import { einheitAnzeigename, orgLabel, vokabText, vokabularFuer, zeitgruppe } from "./hilfen";
 import { MeldeStatus, type EinsatzArt, type MeldeEintrag } from "@bos/meldekopf/einsaetze";
 import { summiereBoegen, zaehltInLage, type EinsatzSummen } from "./auswertung";
+import { eintreffzeit, zeitKurz } from "./eintrag-zeiten";
+
+// ------------------------------------------------------------ Bedarfsmarken
+
+/** Eine Bedarfsmarke: ausgeschrieben für die Karte, kurz für die Tabellenzelle. */
+export interface BedarfMarke {
+  lang: string;
+  kurz: string;
+}
+
+/**
+ * Was eine Einheit sofort braucht — nur das, was gesetzt ist. Der Bedarf
+ * stand bisher allein als Summe im Kopf („Ruhezeit: 3×"); WER Ruhezeit
+ * braucht, war nur über die Details jeder einzelnen Karte zu finden
+ * (Führungssicht-Audit K1). Leer = kein Sofortbedarf, und dann steht auch
+ * nichts da: eine Marke „Ruhezeit: nein" alarmierte, wo nichts ist.
+ *
+ * Verpflegung erscheint nur, wenn die gemeldete Zahl von der Stärke abweicht —
+ * „Verpflegung 12" bei Stärke 12 ist der Normalfall und keine Auffälligkeit.
+ */
+export function bedarfMarken(b: Erfassungsbogen): BedarfMarke[] {
+  const sb = b.sofortbedarf;
+  if (!sb) return [];
+  const marken: BedarfMarke[] = [];
+  if (sb.ruhezeitErforderlich) marken.push({ lang: "Ruhezeit", kurz: "Ruhezeit" });
+  if (sb.unterbringung) marken.push({ lang: "Unterbringung angefordert", kurz: "Unterbr." });
+  if (sb.dieselLiter > 0) marken.push({ lang: `Diesel ${sb.dieselLiter} l`, kurz: `Diesel ${sb.dieselLiter} l` });
+  if (sb.benzinLiter > 0) marken.push({ lang: `Benzin ${sb.benzinLiter} l`, kurz: `Benzin ${sb.benzinLiter} l` });
+  if (sb.gemischLiter > 0) marken.push({ lang: `Gemisch ${sb.gemischLiter} l`, kurz: `Gemisch ${sb.gemischLiter} l` });
+  const gesamt = staerke(b).gesamt;
+  if (sb.verpflegungPersonen > 0 && sb.verpflegungPersonen !== gesamt) {
+    marken.push({
+      lang: `Verpflegung ${sb.verpflegungPersonen} (Stärke ${gesamt})`,
+      kurz: `Verpfl. ${sb.verpflegungPersonen} (St. ${gesamt})`,
+    });
+  }
+  return marken;
+}
+
+/** Kurztext für die Tabellenspalte „Bedarf": „Ruhezeit · Unterbr. · Diesel 400 l". */
+export function bedarfKurztext(b: Erfassungsbogen): string {
+  return bedarfMarken(b)
+    .map((m) => m.kurz)
+    .join(" · ");
+}
+
+/** Hat die Meldung irgendeinen Sofortbedarf? (Filter „nur mit Sofortbedarf".) */
+export function hatSofortbedarf(e: MeldeEintrag): boolean {
+  return bedarfMarken(e.bogen).length > 0;
+}
+
+/**
+ * Ist der Absender-Stand alt — älter als 24 Stunden vor dem Eintreffen? Ein
+ * Bogen vom Juli in einer September-Lage sah bisher aus wie jeder andere
+ * (K2); die Marke „alt" sagt, dass die Zahlen aus einer anderen Zeit stammen.
+ */
+export const STAND_ALT_MS = 24 * 60 * 60 * 1000;
+
+export function standIstAlt(e: MeldeEintrag): boolean {
+  return eintreffzeit(e) - e.bogen.stand > STAND_ALT_MS;
+}
+
+/** „Neu": vor weniger als 30 Minuten eingetroffen — was seit der Übernahme dazukam. */
+export const NEU_MS = 30 * 60 * 1000;
+
+export function istNeu(e: MeldeEintrag, jetzt = Date.now()): boolean {
+  return jetzt - eintreffzeit(e) < NEU_MS;
+}
 
 /** Eine Tabellenzeile: eine gemeldete Einheit mit allen Zahlen der Übersicht. */
 export interface TabellenZeile {
@@ -43,7 +111,21 @@ export interface TabellenZeile {
   gemisch: number;
   fahrzeuge: number;
   fahrzeugTypen: string;
+  /** Sofortbedarf als Kurztext (siehe {@link bedarfKurztext}); leer = keiner. */
+  bedarf: string;
+  /** Eintreffzeit als Uhrzeit (bei anderem Tag mit Datum). */
+  eingetroffen: string;
+  /** Eintreffzeit in ms — Sortierschlüssel der Spalte „Eingetroffen". */
+  eingetroffenAm: number;
+  /** Abrückzeit als Uhrzeit; leer, solange die Einheit da ist. */
+  abgerueckt: string;
+  /** Abrückzeit in ms, 0 = nicht abgerückt — Sortierschlüssel. */
+  abgerueckAm: number;
   stand: string;
+  /** Absender-Stand älter als 24 h vor dem Eintreffen (Marke „alt"). */
+  standAlt: boolean;
+  /** Auftrag/Notiz der Führungsstelle (MeldeEintrag.notiz). */
+  auftrag: string;
   /** Vor Ort (neueste Revision, nicht abgerückt/aufgegangen). */
   anwesend: boolean;
   /** Zählt in die Summen: anwesend UND gehört in diese Lage (keine fremde Übung). */
@@ -69,16 +151,26 @@ export type TabellenSpalte =
   | "benzin"
   | "gemisch"
   | "fahrzeuge"
-  | "stand";
+  | "bedarf"
+  | "eingetroffen"
+  | "abgerueckt"
+  | "stand"
+  | "auftrag";
 
 export interface SpaltenDefinition {
   schluessel: TabellenSpalte;
-  /** Spaltenkopf; kurz, weil 18 Spalten nebeneinander stehen. */
+  /** Spaltenkopf; kurz, weil über 20 Spalten nebeneinander stehen. */
   kopf: string;
   /** Langfassung als title/aria — „F" allein sagt am Bildschirm nichts. */
   titel: string;
   /** Zahlenspalte: rechtsbündig und absteigend vorsortiert. */
   zahl: boolean;
+  /**
+   * Sortiert nach diesem Feld statt nach dem angezeigten Text — die Uhrzeit
+   * „09:40" steht als Text da, geordnet wird aber nach dem Zeitpunkt (sonst
+   * käme „26.09., 23:00" vor „08:00" von heute).
+   */
+  sortiertNach?: keyof TabellenZeile;
 }
 
 /**
@@ -103,7 +195,13 @@ export const TABELLEN_SPALTEN: SpaltenDefinition[] = [
   { schluessel: "benzin", kopf: "Benzin", titel: "Benzin (Liter)", zahl: true },
   { schluessel: "gemisch", kopf: "Gemisch", titel: "Gemisch (Liter)", zahl: true },
   { schluessel: "fahrzeuge", kopf: "Kfz", titel: "Fahrzeuge", zahl: true },
-  { schluessel: "stand", kopf: "Stand", titel: "Stand der Meldung", zahl: false },
+  // Der Bedarf steht VOR dem Stand: nach ihm wird gesucht („wer schläft
+  // zuerst?"), der Stand ist Beiwerk (K1, K2).
+  { schluessel: "bedarf", kopf: "Bedarf", titel: "Sofortbedarf", zahl: false },
+  { schluessel: "eingetroffen", kopf: "Eingetr.", titel: "Eingetroffen", zahl: false, sortiertNach: "eingetroffenAm" },
+  { schluessel: "abgerueckt", kopf: "Abger.", titel: "Abgerückt", zahl: false, sortiertNach: "abgerueckAm" },
+  { schluessel: "stand", kopf: "Stand", titel: "Stand der Meldung (Absender)", zahl: false },
+  { schluessel: "auftrag", kopf: "Auftrag", titel: "Auftrag / Notiz der Führungsstelle", zahl: false },
 ];
 
 /** Fahrzeug-Kurzbezeichnungen einer Einheit, z. B. „GKW / MzKW" (wie im CSV). */
@@ -120,7 +218,7 @@ function fahrzeugTypen(e: MeldeEintrag): string {
  * fallen Übungsmeldungen aus der Summe (nicht aus der Tabelle — sie bleiben
  * sichtbar, sie zählen nur nicht; siehe zaehltInLage).
  */
-export function tabellenZeilen(eintraege: MeldeEintrag[], art?: EinsatzArt): TabellenZeile[] {
+export function tabellenZeilen(eintraege: MeldeEintrag[], art?: EinsatzArt, jetzt = Date.now()): TabellenZeile[] {
   return eintraege.map((e) => {
     const b = e.bogen;
     const st = staerke(b);
@@ -148,7 +246,14 @@ export function tabellenZeilen(eintraege: MeldeEintrag[], art?: EinsatzArt): Tab
       gemisch: sb?.gemischLiter ?? 0,
       fahrzeuge: b.fahrzeuge.length,
       fahrzeugTypen: fahrzeugTypen(e),
+      bedarf: bedarfKurztext(b),
+      eingetroffen: zeitKurz(eintreffzeit(e), jetzt),
+      eingetroffenAm: eintreffzeit(e),
+      abgerueckt: e.abgerueckAm != null ? zeitKurz(e.abgerueckAm, jetzt) : "",
+      abgerueckAm: e.abgerueckAm ?? 0,
       stand: zeitgruppe(b.stand),
+      standAlt: standIstAlt(e),
+      auftrag: e.notiz ?? "",
       anwesend: e.status === MeldeStatus.ANWESEND,
       zaehlt: e.status === MeldeStatus.ANWESEND && (art == null || zaehltInLage(art, b)),
     };
@@ -167,6 +272,44 @@ export function tabellenSumme(zeilen: TabellenZeile[]): EinsatzSummen {
   return summiereBoegen(zeilen.filter((z) => z.zaehlt).map((z) => z.eintrag.bogen));
 }
 
+/** Wie sich die Zeilen auf die Zählweisen verteilen (siehe {@link summenBeschriftung}). */
+export interface TabellenZaehlung {
+  /** Anwesend und in dieser Lage zählend — die Zahl der Stärkeleiste. */
+  zaehlend: number;
+  /** Anwesend, aber als Übung nicht in dieser Lage. */
+  uebung: number;
+  abgerueckt: number;
+  zusammengefuehrt: number;
+}
+
+export function tabellenZaehlung(zeilen: TabellenZeile[]): TabellenZaehlung {
+  const z: TabellenZaehlung = { zaehlend: 0, uebung: 0, abgerueckt: 0, zusammengefuehrt: 0 };
+  for (const zeile of zeilen) {
+    if (zeile.zaehlt) z.zaehlend++;
+    else if (zeile.anwesend) z.uebung++;
+    else if (zeile.eintrag.status === MeldeStatus.AUFGEGANGEN) z.zusammengefuehrt++;
+    else z.abgerueckt++;
+  }
+  return z;
+}
+
+/**
+ * Beschriftung der Summenzeile: „Summe (6 zählend · 1 Übung · 1 abgerückt)".
+ *
+ * Vorher hieß es „Summe (7 anwesend)" und die Stärke daneben war die von
+ * sechs — die Übung zählte als anwesend, aber nicht in die Zahl. Kopfzahl,
+ * Listenüberschrift und Summenzeile nannten damit drei verschiedene Zahlen
+ * für „wie viele Einheiten" (K4). Jetzt sagt jede Zahl, was sie zählt; was
+ * null ist, bleibt weg.
+ */
+export function summenBeschriftung(z: TabellenZaehlung): string {
+  const teile = [`${z.zaehlend} zählend`];
+  if (z.uebung > 0) teile.push(`${z.uebung} Übung`);
+  if (z.abgerueckt > 0) teile.push(`${z.abgerueckt} abgerückt`);
+  if (z.zusammengefuehrt > 0) teile.push(`${z.zusammengefuehrt} zusammengeführt`);
+  return `Summe (${teile.join(" · ")})`;
+}
+
 export type Sortierrichtung = "auf" | "ab";
 
 /**
@@ -180,13 +323,15 @@ export function zeilenSortieren(
   richtung: Sortierrichtung,
 ): TabellenZeile[] {
   const vorzeichen = richtung === "auf" ? 1 : -1;
-  const zahl = TABELLEN_SPALTEN.find((s) => s.schluessel === spalte)?.zahl ?? false;
+  const definition = TABELLEN_SPALTEN.find((s) => s.schluessel === spalte);
+  const feld: keyof TabellenZeile = definition?.sortiertNach ?? spalte;
   return [...zeilen].sort((a, b) => {
-    const wa = a[spalte];
-    const wb = b[spalte];
-    const vergleich = zahl
-      ? (wa as number) - (wb as number)
-      : String(wa).localeCompare(String(wb), "de");
+    const wa = a[feld];
+    const wb = b[feld];
+    const vergleich =
+      typeof wa === "number" && typeof wb === "number"
+        ? wa - wb
+        : String(wa).localeCompare(String(wb), "de");
     return vergleich * vorzeichen || a.einheit.localeCompare(b.einheit, "de");
   });
 }

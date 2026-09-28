@@ -221,3 +221,32 @@ export function speicherText(b: { belegt: number; grenze: number }): string {
   const mb = (n: number) => (n / (1024 * 1024)).toLocaleString("de-DE", { maximumFractionDigits: 1 });
   return `${mb(b.belegt)} von ${mb(b.grenze)} MB`;
 }
+
+/**
+ * Eine Einheit samt aller ihrer Fassungen in eine andere Sammlung verschieben
+ * (falsche Mappe erwischt — Audit „Fehler und Wiederanlauf", E5). Signatur,
+ * Herkunft, Zeiten und Notiz reisen unverändert mit; Fassungen, die im Ziel
+ * schon liegen (gleiche Inhalts-ID), werden nicht verdoppelt. Rückgabe: Zahl
+ * der verschobenen Fassungen.
+ */
+export function einheitVerschieben(vonEinsatzId: string, nachEinsatzId: string, einheitSchl: string): number {
+  if (vonEinsatzId === nachEinsatzId) return 0;
+  const liste = alleSammlungen();
+  const von = liste.find((s) => s.id === vonEinsatzId);
+  const nach = liste.find((s) => s.id === nachEinsatzId);
+  if (!von || !nach) return 0;
+  const wandern = von.eintraege.filter((e) => e.einheitSchluessel === einheitSchl);
+  if (wandern.length === 0) return 0;
+  von.eintraege = von.eintraege.filter((e) => e.einheitSchluessel !== einheitSchl);
+  let verschoben = 0;
+  for (const e of wandern) {
+    if (nach.eintraege.some((x) => x.id === e.id)) continue;
+    nach.eintraege.push(e);
+    verschoben++;
+  }
+  const jetzt = Date.now();
+  von.geaendert = jetzt;
+  nach.geaendert = jetzt;
+  sammlungenSchreiben(liste);
+  return verschoben;
+}

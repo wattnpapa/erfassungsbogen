@@ -77,8 +77,8 @@ describe("einsatzCsvInhalt()", () => {
       "Verpflegung gesamt", "Verpflegung veg.", "Verpflegung vegan",
       "Unterbringung M", "Unterbringung W", "Unterbringung D",
       "Diesel (l)", "Benzin (l)", "Gemisch (l)",
-      "Fahrzeuge", "Stand", "Empfangen", "Quelle",
-      "Status", "Zählt in Lage", "Übung", "Sofortbedarf", "Signatur", "Absender",
+      "Fahrzeuge", "Stand", "Eingetroffen", "Abgerückt", "Empfangen", "Quelle",
+      "Status", "Zählt in Lage", "Übung", "Sofortbedarf", "Signatur", "Absender", "Auftrag/Notiz",
     ]);
   });
 
@@ -100,12 +100,15 @@ describe("einsatzCsvInhalt()", () => {
     // Diesel/Benzin/Gemisch
     expect(f.slice(14, 17)).toEqual(["40", "5", "0"]);
     expect(f[18]).toMatch(/^\d{6}[a-z]{3}\d{2}$/); // Stand als NATO-Zeitgruppe
-    expect(f[20]).toBe("Scan");
-    expect(f[21]).toBe("anwesend");
-    expect(f[22]).toBe("ja");
-    expect(f[23]).toBe(""); // kein Übungsbogen
-    expect(f[24]).toBe("Unterbringung / Kraftstoff");
-    expect(f[25]).toBe("unsigniert");
+    expect(f[19]).toMatch(/^\d{2}\.\d{2}\.\d{4}, \d{2}:\d{2}$/); // Eingetroffen = Empfangszeit, wenn nicht korrigiert
+    expect(f[20]).toBe(""); // nicht abgerückt
+    expect(f[22]).toBe("Scan");
+    expect(f[23]).toBe("anwesend");
+    expect(f[24]).toBe("ja");
+    expect(f[25]).toBe(""); // kein Übungsbogen
+    expect(f[26]).toBe("Unterbringung / Kraftstoff");
+    expect(f[27]).toBe("unsigniert");
+    expect(f[29]).toBe(""); // kein Auftrag
   });
 
   it("unterscheidet abgeteilte Truppteile in der Teil-Spalte", () => {
@@ -124,7 +127,7 @@ describe("einsatzCsvInhalt()", () => {
     );
     const felder = zeilen(csv).slice(1, 3).map((z) => z.split(";"));
     expect(felder.map((f) => f[1])).toEqual(["", "Fachberater"]);
-    expect(felder[1]![20]).toBe("Aufteilung");
+    expect(felder[1]![22]).toBe("Aufteilung");
   });
 
   it("hängt eine Summenzeile über alle anwesenden Einheiten an", () => {
@@ -147,8 +150,8 @@ describe("einsatzCsvInhalt()", () => {
     const reihen = zeilen(csv);
     expect(reihen).toHaveLength(4); // Kopf + 2 Einheiten + Summe
     const abgerueckt = reihen[2]!.split(";");
-    expect(abgerueckt[21]).toBe("abgerückt");
-    expect(abgerueckt[22]).toBe("nein");
+    expect(abgerueckt[23]).toBe("abgerückt");
+    expect(abgerueckt[24]).toBe("nein");
     expect(reihen[3]!).toContain("Summe (1 Einheiten)");
   });
 
@@ -158,9 +161,30 @@ describe("einsatzCsvInhalt()", () => {
     );
     const reihen = zeilen(csv);
     const uebung = reihen[2]!.split(";");
-    expect(uebung[22]).toBe("nein");
-    expect(uebung[23]).toBe("ÜBUNG");
+    expect(uebung[24]).toBe("nein");
+    expect(uebung[25]).toBe("ÜBUNG");
     expect(reihen[3]!).toContain("Summe (1 Einheiten)");
+  });
+
+  it("schreibt korrigierte Eintreffzeit, Abrückzeit und Auftrag der Führungsstelle", () => {
+    // Die Zeiten der Führungsstelle, nicht der Empfangsmoment: fürs
+    // Einsatztagebuch zählt, wann die Einheit da war.
+    const eingetroffen = new Date("2026-09-26T09:40").getTime();
+    const abgerueckt = new Date("2026-09-27T15:10").getTime();
+    const csv = einsatzCsvInhalt(
+      sammlung([
+        meldung(bogen("A"), {
+          status: MeldeStatus.ABGERUECKT,
+          eingetroffenAm: eingetroffen,
+          abgerueckAm: abgerueckt,
+          notiz: "Deichabschnitt Nord",
+        }),
+      ]),
+    );
+    const f = zeilen(csv)[1]!.split(";");
+    expect(f[19]).toBe("26.09.2026, 09:40");
+    expect(f[20]).toBe("27.09.2026, 15:10");
+    expect(f[29]).toBe("Deichabschnitt Nord");
   });
 
   it("quotet Felder mit Semikolon und deutschem Dezimalkomma", () => {

@@ -18,8 +18,19 @@ import {
   type Erfassungsbogen,
   type Person,
 } from "@bos/eeb-format/model";
-import { MeldeStatus, type MeldeEintrag } from "@bos/meldekopf/einsaetze";
-import { TABELLEN_SPALTEN, tabellenSumme, tabellenZeilen, zeilenSortieren } from "./einheiten-tabelle";
+import { EinsatzArt, MeldeStatus, type MeldeEintrag } from "@bos/meldekopf/einsaetze";
+import {
+  TABELLEN_SPALTEN,
+  bedarfKurztext,
+  bedarfMarken,
+  istNeu,
+  standIstAlt,
+  summenBeschriftung,
+  tabellenSumme,
+  tabellenZaehlung,
+  tabellenZeilen,
+  zeilenSortieren,
+} from "./einheiten-tabelle";
 
 function person(rolle: StaerkeRolle): Person {
   return {
@@ -89,6 +100,85 @@ describe("tabellenZeilen", () => {
   it("kennzeichnet abgerückte Meldungen als nicht anwesend", () => {
     expect(tabellenZeilen([cloppenburg])[0]!.anwesend).toBe(false);
   });
+
+  it("trägt Eintreff- und Abrückzeit, Bedarf und Auftrag der Führungsstelle", () => {
+    const jetzt = new Date("2026-09-27T20:00").getTime();
+    const b = bogen("Crailsheim", 3);
+    b.sofortbedarf = { verpflegungPersonen: 0, dieselLiter: 400, benzinLiter: 0, gemischLiter: 0, unterbringung: true, ruhezeitErforderlich: true };
+    const [z] = tabellenZeilen(
+      [
+        eintrag("x", b, {
+          status: MeldeStatus.ABGERUECKT,
+          eingetroffenAm: new Date("2026-09-27T09:40").getTime(),
+          abgerueckAm: new Date("2026-09-27T15:10").getTime(),
+          notiz: "Deichabschnitt Nord",
+        }),
+      ],
+      undefined,
+      jetzt,
+    );
+    expect(z!.eingetroffen).toBe("09:40");
+    expect(z!.abgerueckt).toBe("15:10");
+    expect(z!.bedarf).toBe("Ruhezeit · Unterbr. · Diesel 400 l");
+    expect(z!.auftrag).toBe("Deichabschnitt Nord");
+    // Stand 100 (1970) liegt Jahrzehnte vor dem Eintreffen.
+    expect(z!.standAlt).toBe(true);
+  });
+
+  it("lässt Abrückzeit und Bedarf leer, wo nichts ist", () => {
+    const [z] = tabellenZeilen([oldenburg]);
+    expect(z!.abgerueckt).toBe("");
+    expect(z!.abgerueckAm).toBe(0);
+    expect(z!.bedarf).toBe("");
+    expect(z!.auftrag).toBe("");
+  });
+});
+
+describe("bedarfMarken", () => {
+  it("nennt nur, was gesetzt ist — nichts alarmiert, was leer ist", () => {
+    const b = bogen("Bremen", 1);
+    expect(bedarfMarken(b)).toEqual([]);
+    b.sofortbedarf = { verpflegungPersonen: 2, dieselLiter: 0, benzinLiter: 0, gemischLiter: 0, unterbringung: false, ruhezeitErforderlich: false };
+    // Verpflegung 2 bei Stärke 2: der Normalfall, keine Marke.
+    expect(bedarfMarken(b)).toEqual([]);
+    b.sofortbedarf = { verpflegungPersonen: 5, dieselLiter: 0, benzinLiter: 20, gemischLiter: 0, unterbringung: false, ruhezeitErforderlich: true };
+    expect(bedarfMarken(b).map((m) => m.lang)).toEqual(["Ruhezeit", "Benzin 20 l", "Verpflegung 5 (Stärke 2)"]);
+    expect(bedarfKurztext(b)).toBe("Ruhezeit · Benzin 20 l · Verpfl. 5 (St. 2)");
+  });
+});
+
+describe("standIstAlt / istNeu", () => {
+  it("nennt einen Stand alt, der mehr als 24 h vor dem Eintreffen liegt", () => {
+    const b = bogen("Aurich", 1);
+    b.stand = new Date("2026-07-16T19:23").getTime();
+    const frisch = eintrag("f", b, { eingetroffenAm: b.stand + 60 * 60 * 1000 });
+    const alt = eintrag("a", b, { eingetroffenAm: new Date("2026-09-27T09:40").getTime() });
+    expect(standIstAlt(frisch)).toBe(false);
+    expect(standIstAlt(alt)).toBe(true);
+  });
+
+  it("nennt eine Meldung neu, die vor weniger als 30 Minuten eintraf", () => {
+    const jetzt = new Date("2026-09-27T10:00").getTime();
+    expect(istNeu(eintrag("n", bogen("A", 1), { eingetroffenAm: jetzt - 10 * 60 * 1000 }), jetzt)).toBe(true);
+    expect(istNeu(eintrag("o", bogen("B", 1), { eingetroffenAm: jetzt - 45 * 60 * 1000 }), jetzt)).toBe(false);
+  });
+});
+
+describe("tabellenZaehlung / summenBeschriftung", () => {
+  it("nennt jede Zählweise beim Namen und lässt Nullen weg", () => {
+    const uebung = bogen("Übung", 1);
+    uebung.uebung = true;
+    const zeilen = tabellenZeilen(
+      [oldenburg, bremen, cloppenburg, eintrag("u", uebung), eintrag("z", bogen("Zusammen", 1), { status: MeldeStatus.AUFGEGANGEN })],
+      EinsatzArt.EINSATZ,
+    );
+    const z = tabellenZaehlung(zeilen);
+    expect(z).toEqual({ zaehlend: 2, uebung: 1, abgerueckt: 1, zusammengefuehrt: 1 });
+    expect(summenBeschriftung(z)).toBe("Summe (2 zählend · 1 Übung · 1 abgerückt · 1 zusammengeführt)");
+    expect(summenBeschriftung(tabellenZaehlung(tabellenZeilen([oldenburg])))).toBe("Summe (1 zählend)");
+    // Dieselbe Zahl wie die Stärkeleiste: die Summe zählt genau die zählenden.
+    expect(tabellenSumme(zeilen).einheiten).toBe(2);
+  });
 });
 
 describe("tabellenSumme", () => {
@@ -117,6 +207,15 @@ describe("zeilenSortieren", () => {
     const vorher = zeilen.map((z) => z.einheit);
     zeilenSortieren(zeilen, "gesamt", "ab");
     expect(zeilen.map((z) => z.einheit)).toEqual(vorher);
+  });
+
+  it("sortiert die Zeitspalten nach dem Zeitpunkt, nicht nach dem Uhrzeit-Text", () => {
+    const jetzt = new Date("2026-09-27T20:00").getTime();
+    const spaet = eintrag("s", bogen("Spät", 1), { eingetroffenAm: new Date("2026-09-27T08:00").getTime() });
+    const frueh = eintrag("f", bogen("Früh", 1), { eingetroffenAm: new Date("2026-09-26T23:00").getTime() });
+    const sortiert = zeilenSortieren(tabellenZeilen([spaet, frueh], undefined, jetzt), "eingetroffen", "auf");
+    // Als Text käme „08:00" vor „26.09., 23:00" — als Zeitpunkt ist es umgekehrt.
+    expect(sortiert.map((z) => z.eingetroffen)).toEqual(["26.09., 23:00", "08:00"]);
   });
 
   it("hält jede Spalte sortierbar (kein Schlüssel ohne Wert)", () => {
