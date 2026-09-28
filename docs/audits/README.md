@@ -1,5 +1,7 @@
 # Rollenaudits (Stand 27.09.2026)
 
+> Runde 2 (28.09.2026, nach der Behebung): [runde-2/README.md](runde-2/README.md).
+
 Zehn Prüfberichte aus je einer Nutzerrolle, alle gegen den Produktionsbuild
 (`vite build` + `vite preview`) im Telefon-Viewport 360 × 640 (Führungssicht
 zusätzlich Tablet 820 × 1180), Zweig `claude/thw-reviewer-skills-dr76q1`.
