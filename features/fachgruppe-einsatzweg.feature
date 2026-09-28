@@ -39,13 +39,18 @@ Funktionalität: Einsatzweg einer Fachgruppe — Vorbereitung, Fahrt, Meldekopf
 
   # Die Vorbelegung ist ein Startpunkt, kein Diktat: Wer nach dem Ausfüllen den
   # Typ korrigiert, darf dabei nicht die schon angepassten Fahrzeuge und das
-  # eingetragene Personal verlieren.
-  Szenario: Ein späterer Typwechsel wirft die vorbelegten Daten nicht weg
-    Wenn ich das Feld "Einheitstyp" auf "FGr WP (C) – Fachgruppe Wasserschaden/Pumpen (C)" stelle
+  # eingetragene Personal verlieren. Unberührte Vorbelegung (Fahrzeug ohne
+  # Kennzeichen, Person ohne Namen) weicht dagegen der des neuen Typs, statt
+  # sich zu stapeln (Audit „Fehler und Wiederanlauf", E1).
+  Szenario: Ein späterer Typwechsel behält Angepasstes und ersetzt nur die unberührte Vorbelegung
+    Wenn ich zum Schritt "4. Fahrzeuge" wechsle
+    Und ich das Feld "Kennzeichen" mit "THW-84711" fülle
+    Und ich zum Schritt "1. Einheit" wechsle
+    Und ich das Feld "Einheitstyp" auf "FGr WP (C) – Fachgruppe Wasserschaden/Pumpen (C)" stelle
     Und ich zum Schritt "6. Übersicht" wechsle
-    Dann sehe ich die Überschrift "Fahrzeuge (4)"
+    Dann sehe ich den Text "THW-84711"
     Und sehe ich den Text "Heros Oldenburg (NI) 48/43"
-    Und sehe ich die Überschrift "Personal (12)"
+    Und sehe ich die Überschrift "Fahrzeuge (5)"
 
   # Die StAN setzt bewusst keine Fahrerlaubnisklassen — vergisst der Bogen
   # sie ganz, findet der Kraftfahrer-Filter am Meldekopf die Einheit nicht.

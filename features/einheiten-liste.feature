@@ -122,11 +122,11 @@ Funktionalität: Einheitenliste durchsuchen, filtern und sortieren
   Szenario: Die Tabellensicht zeigt dieselbe Auswahl in Zeilen
     Wenn ich auf "Tabelle" klicke
     Dann führt die Einheitentabelle genau 3 Zeilen
-    Und sehe ich den Text "Summe (3 anwesend)"
+    Und sehe ich den Text "Summe (3 zählend)"
     Wenn ich das Feld "Suche" mit "wardenburg" fülle
     Dann sehe ich die Überschrift "Einheiten (1 von 3 gemeldet"
     Und führt die Einheitentabelle genau 1 Zeilen
-    Und sehe ich den Text "Summe (1 anwesend)"
+    Und sehe ich den Text "Summe (1 zählend)"
     Und meldet die Kopfleiste 3 Einheiten
 
   Szenario: Der Spaltenkopf sortiert die Tabelle und dreht beim zweiten Klick

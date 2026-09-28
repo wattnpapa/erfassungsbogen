@@ -95,6 +95,7 @@ Funktionalität: Einsatz-Sammlung führen (Meldekopf)
 
   Szenario: Folgemeldung derselben Einheit wandert in die Historie
     Wenn ich denselben Bogen-Link erneut öffne
+    Und ich im Dialog auf "Bogen öffnen (ansehen oder bearbeiten)" klicke
     Und ich im Dialog auf "Meldung öffnen" klicke
     Und ich zum Schritt "5. Sofortbedarf" wechsle
     Und ich das Feld "Sonstiges (Freitext)" mit "Ablösung angefordert" fülle
@@ -111,6 +112,7 @@ Funktionalität: Einsatz-Sammlung führen (Meldekopf)
 
   Szenario: Dieselbe Einheit lässt sich getrennt weiterführen
     Wenn ich denselben Bogen-Link erneut öffne
+    Und ich im Dialog auf "Bogen öffnen (ansehen oder bearbeiten)" klicke
     Und ich im Dialog auf "Meldung öffnen" klicke
     Und ich zum Schritt "5. Sofortbedarf" wechsle
     Und ich das Feld "Sonstiges (Freitext)" mit "zweiter Trupp" fülle
