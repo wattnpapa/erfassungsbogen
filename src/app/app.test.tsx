@@ -449,6 +449,107 @@ describe("Assistenten-Durchlauf", () => {
     expect(screen.getAllByText(/Verdrängthausen/).length).toBeGreaterThan(0);
   }, 20000);
 
+  /**
+   * Audit Runde 2, R2-N1: Zwei Schnellerfassungen nacheinander — oder eine
+   * abgebrochene und eine neue — schoben die erste fremde Einheit auf den
+   * einzigen Rückholplatz, und der eigene Bogen dort war endgültig weg,
+   * während die Rückfrage „bleibt erreichbar" versprach.
+   */
+  it("lässt fremde Schnellerfassungen den eigenen Bogen nicht aus der Rückholung verdrängen", async () => {
+    const nutzer = userEvent.setup();
+    render(<App />);
+    await neuerBogenBis(nutzer, 0);
+    await nutzer.type(screen.getByLabelText("Name (Pflicht)"), "Eigenhausen");
+    await nutzer.click(screen.getByRole("button", { name: "‹ Startseite" }));
+
+    await nutzer.click(screen.getByRole("button", { name: "Einheit schnell erfassen (nur Stärke)…" }));
+    await nutzer.click(within(rueckfrage("Einheit schnell erfassen?")).getByRole("button", { name: "Schnell erfassen" }));
+    await nutzer.type(screen.getByLabelText("Name (Pflicht)"), "Fremdstadt");
+    await nutzer.click(screen.getByRole("button", { name: "‹ Startseite" }));
+    // Die Karte sagt, dass das nicht der eigene Bogen ist.
+    expect(screen.getByText(/Angefangene Erfassung einer fremden Einheit/)).toBeDefined();
+
+    // Zweite Schnellerfassung: die Rückfrage sagt jetzt ehrlich, dass die
+    // angefangene Erfassung verworfen wird — und der eigene Bogen bleibt.
+    await nutzer.click(screen.getByRole("button", { name: "Einheit schnell erfassen (nur Stärke)…" }));
+    const frage = rueckfrage("Einheit schnell erfassen?");
+    expect(frage.textContent).toMatch(/wird verworfen/);
+    expect(frage.textContent).toMatch(/Dein eigener Bogen „THW Eigenhausen"/);
+    await nutzer.click(within(frage).getByRole("button", { name: "Schnell erfassen" }));
+    await nutzer.click(screen.getByRole("button", { name: "‹ Startseite" }));
+
+    expect(screen.getByText("THW Eigenhausen")).toBeDefined();
+    await nutzer.click(screen.getByRole("button", { name: "Zuletzt verdrängten Bogen zurückholen" }));
+    expect(await screen.findByRole("heading", { name: "Gesamtübersicht" })).toBeDefined();
+    expect(screen.getAllByText(/Eigenhausen/).length).toBeGreaterThan(0);
+  }, 20000);
+
+  it("schließt eine abgelegte Schnellerfassung, statt sie als eigenen Bogen offen zu lassen", async () => {
+    const einsatz = einsatzImSpeicherAnlegen("Sammelhausen", EinsatzArt.EINSATZ);
+    const nutzer = userEvent.setup();
+    render(<App />);
+    await neuerBogenBis(nutzer, 0);
+    await nutzer.type(screen.getByLabelText("Name (Pflicht)"), "Eigenhausen");
+    await nutzer.click(screen.getByRole("button", { name: "‹ Startseite" }));
+
+    for (const name of ["Aalen", "Biberach"]) {
+      await nutzer.click(screen.getByRole("button", { name: "Einheit schnell erfassen (nur Stärke)…" }));
+      const frage = document.querySelector<HTMLDialogElement>("dialog[aria-label='Einheit schnell erfassen?']");
+      if (frage) await nutzer.click(within(frage).getByRole("button", { name: "Schnell erfassen" }));
+      await nutzer.type(screen.getByLabelText("Name (Pflicht)"), name);
+      await nutzer.click(screen.getByRole("button", { name: /^6\. Übersicht/ }));
+      await nutzer.click(screen.getByRole("button", { name: "In Einsatz aufnehmen…" }));
+      expect(screen.getByText(/Die Erfassung wird in der Sammlung abgelegt und hier geschlossen/)).toBeDefined();
+      await nutzer.click(screen.getByRole("button", { name: "Sammelhausen" }));
+      await screen.findByRole("heading", { level: 1, name: "Sammelhausen" });
+      expect(screen.getByText(/Dein eigener Bogen „THW Eigenhausen" liegt auf der Startseite/)).toBeDefined();
+      await nutzer.click(screen.getByRole("button", { name: /‹ Einsätze|‹ Startseite/ }));
+    }
+
+    const s = einsaetzeLaden().find((x) => x.id === einsatz.id)!;
+    expect(s.eintraege).toHaveLength(2);
+    expect(localStorage.getItem("eeb.entwurf.v1")).toBeNull();
+    expect(localStorage.getItem("eeb.entwurf.ersetzt.v1")).toContain("Eigenhausen");
+  }, 30000);
+
+  /**
+   * Audit Runde 2, R2-E1: Eine über „‹ Einsatz" abgebrochene Erfassung lag
+   * beim nächsten „Einheit manuell erfassen…" auf dem Rückholplatz — und der
+   * eigene Bogen war weg. Jetzt fragt die App: fortsetzen oder verwerfen.
+   */
+  it("bietet eine abgebrochene Einsatz-Erfassung zum Fortsetzen an und schützt den eigenen Bogen", async () => {
+    einsatzImSpeicherAnlegen("Sammelhausen", EinsatzArt.EINSATZ);
+    const nutzer = userEvent.setup();
+    render(<App />);
+    await neuerBogenBis(nutzer, 0);
+    await nutzer.type(screen.getByLabelText("Name (Pflicht)"), "Eigenhausen");
+    await nutzer.click(screen.getByRole("button", { name: "‹ Startseite" }));
+    await nutzer.click(screen.getByRole("button", { name: "Öffnen" }));
+    await screen.findByRole("heading", { level: 1, name: "Sammelhausen" });
+
+    await nutzer.click(screen.getByRole("button", { name: "Einheit manuell erfassen…" }));
+    await nutzer.click(within(rueckfrage("Einheit für den Einsatz erfassen?")).getByRole("button", { name: "Einheit erfassen" }));
+    await nutzer.type(screen.getByLabelText("Name (Pflicht)"), "Falschstadt");
+    await nutzer.click(screen.getByRole("button", { name: /‹ Einsatz „Sammelhausen"/ }));
+
+    // Fortsetzen führt zurück in dieselbe Erfassung.
+    await nutzer.click(screen.getByRole("button", { name: "Einheit manuell erfassen…" }));
+    await nutzer.click(within(rueckfrage("Angefangene Erfassung")).getByRole("button", { name: "Diese Erfassung fortsetzen" }));
+    expect((screen.getByLabelText("Name (Pflicht)") as HTMLInputElement).value).toBe("Falschstadt");
+    await nutzer.click(screen.getByRole("button", { name: /‹ Einsatz „Sammelhausen"/ }));
+
+    // Verwerfen: Die falsche Erfassung geht, der eigene Bogen bleibt.
+    await nutzer.click(screen.getByRole("button", { name: "Einheit manuell erfassen…" }));
+    const frage = rueckfrage("Angefangene Erfassung");
+    expect(frage.textContent).toMatch(/Dein eigener Bogen „THW Eigenhausen" bleibt/);
+    await nutzer.click(within(frage).getByRole("button", { name: "Verwerfen und neue Einheit erfassen" }));
+    expect((screen.getByLabelText("Name (Pflicht)") as HTMLInputElement).value).toBe("");
+
+    const rueck = localStorage.getItem("eeb.entwurf.ersetzt.v1") ?? "";
+    expect(rueck).toContain("Eigenhausen");
+    expect(rueck).not.toContain("Falschstadt");
+  }, 30000);
+
   it("lässt einen unberührten Bogen ohne Rückfrage ersetzen", async () => {
     const nutzer = userEvent.setup();
     render(<App />);

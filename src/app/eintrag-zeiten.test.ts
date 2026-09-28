@@ -19,6 +19,7 @@ import {
   EinsatzArt,
   MeldeStatus,
   einsaetzeLaden,
+  einheitZugEtikettSetzen,
   einsatzAnlegen,
   meldungHinzufuegen,
   speicherhuelleSetzen,
@@ -32,6 +33,7 @@ import {
   einheitVerschieben,
   folgemeldungErbt,
   istSpeicherVoll,
+  meldungAufnehmen,
   notizSetzen,
   sammlungenSchreiben,
   statusMitZeitSetzen,
@@ -176,6 +178,44 @@ describe("folgemeldungErbt", () => {
     folgemeldungErbt(einsatzId, r.eintrag.id);
     expect(eintrag(einsatzId, r.eintrag.id).notiz).toBe("neu");
     expect(eintrag(einsatzId, r.eintrag.id).eingetroffenAm).toBe(9);
+  });
+});
+
+describe("meldungAufnehmen (R2-K1)", () => {
+  it("lässt die Folgemeldung Zug, Auftrag und Eintreffzeit der Führungsstelle behalten", () => {
+    const { einsatzId, eintragId } = buehne();
+    const schl = eintrag(einsatzId, eintragId).einheitSchluessel;
+    eintreffzeitSetzen(einsatzId, eintragId, 4242);
+    notizSetzen(einsatzId, eintragId, "Ortung Trümmerkegel B");
+    einheitZugEtikettSetzen(einsatzId, schl, "1. TZ");
+
+    const r = meldungAufnehmen(einsatzId, bogen("Crailsheim", 200), { quelle: "pdf-import" })!;
+    expect(r.neu).toBe(true);
+    const folge = eintrag(einsatzId, r.eintrag.id);
+    expect(folge.zugEtikett).toBe("1. TZ");
+    expect(folge.notiz).toBe("Ortung Trümmerkegel B");
+    expect(folge.eingetroffenAm).toBe(4242);
+
+    // Auch die dritte Fassung erbt — über die zweite hinweg.
+    const r3 = meldungAufnehmen(einsatzId, bogen("Crailsheim", 300), { quelle: "manuell" })!;
+    const dritte = eintrag(einsatzId, r3.eintrag.id);
+    expect(dritte.zugEtikett).toBe("1. TZ");
+    expect(dritte.notiz).toBe("Ortung Trümmerkegel B");
+    expect(dritte.eingetroffenAm).toBe(4242);
+  });
+
+  it("fasst eine Dublette nicht an und lässt Erstmeldungen ohne Erbe", () => {
+    const { einsatzId, eintragId } = buehne();
+    notizSetzen(einsatzId, eintragId, "Auftrag");
+    const gleich = meldungAufnehmen(einsatzId, bogen("Crailsheim"))!;
+    expect(gleich.neu).toBe(false);
+    expect(gleich.eintrag.id).toBe(eintragId);
+
+    const fremd = meldungAufnehmen(einsatzId, bogen("Aalen"))!;
+    expect(fremd.neu).toBe(true);
+    const e = eintrag(einsatzId, fremd.eintrag.id);
+    expect(e.notiz).toBeUndefined();
+    expect(e.zugEtikett).toBeUndefined();
   });
 });
 

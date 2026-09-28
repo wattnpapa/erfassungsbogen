@@ -28,6 +28,11 @@ Grundlage: Repository `wattnpapa/erfassungsbogen`, Stand 2026-09-12 — Version 
 > Export":** Der Meldekopf kann dem Stab nur die seit der letzten Weitergabe
 > neuen Meldungen nachliefern; dafür merkt sich die App je Einsatz-Sammlung die
 > Kennungen der bereits exportierten Meldungen. Geändert: 5.7.
+>
+> **Nachgezogen 2026-09-28 — Rückholplatz des Entwurfs:** Eine am Meldekopf
+> angefangene Erfassung einer fremden Einheit verdrängt den eigenen Bogen nicht
+> mehr vom Rückholplatz; sie wird stattdessen nach Rückfrage verworfen.
+> Geändert: 5.7.
 
 ## Hinweis zu diesem Dokument
 
@@ -310,6 +315,14 @@ Kapitel 6 der [Arc42-Dokumentation](arc42-architektur.md).
   nächsten Export um Stände endgültig gelöschter Sammlungen bereinigt. Er
   verkleinert die Zahl der weitergegebenen Kopien (Datenminimierung beim
   Empfänger), ersetzt aber keine Löschregel dort.
+- **Rückholplatz des Entwurfs (seit 2026-09-28 mit Vorrang für den eigenen
+  Bogen):** Ein verdrängter oder verworfener Bogen liegt auf genau einem
+  Rückholplatz (`eeb.entwurf.ersetzt.v1`, dieselbe Datenschutzfrist wie der
+  Entwurf) und wird vom nächsten verdrängten Bogen überschrieben; die
+  Rückfrage nennt das. Die Erfassung einer fremden Einheit am Meldekopf
+  (Marke `fremd` am Entwurf, nur die Kennung der Ziel-Sammlung) verdrängt dort
+  keinen eigenen Bogen, sondern wird nach Rückfrage verworfen — sie ist noch
+  in keiner Sammlung und muss neu erfasst werden (`src/app/entwurf.ts`).
 - **Empfehlung:** eine eigene, dokumentierte Löschfrist für digital gespeicherte
   Bögen und für Papierausdrucke festlegen, da die Software selbst keine erzwingt.
 - **Geräteschlüssel:** Der private Signaturschlüssel lässt sich einzeln

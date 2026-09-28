@@ -19,8 +19,11 @@ import {
   einsaetzeLaden,
   einsaetzePapierkorb,
   einsaetzeSpeichern,
+  meldungHinzufuegen,
   type Einsatzsammlung,
   type MeldeEintrag,
+  type MeldungAufnahme,
+  type MeldungOptionen,
 } from "@bos/meldekopf/einsaetze";
 
 declare module "@bos/meldekopf/einsaetze" {
@@ -168,10 +171,13 @@ export function notizSetzen(einsatzId: string, eintragId: string, notiz: string)
 }
 
 /**
- * Eine Folgemeldung erbt Eintreffzeit und Notiz der Vorgängerin derselben
- * Einheit — sonst stünde jede Folgemeldung als frisch eingetroffen da, und der
- * Auftrag wäre mit jeder Fassung weg. Aufzurufen direkt nach
- * `meldungHinzufuegen`, wenn `neu` war.
+ * Eine Folgemeldung erbt, was die Führungsstelle der Einheit gegeben hat:
+ * Eintreffzeit, Auftrag/Notiz, Zug und Teil-Etikett der Vorgängerin derselben
+ * Einheit. Sonst stünde jede Folgemeldung als frisch eingetroffen da, und Zug
+ * und Auftrag wären mit jeder Fassung weg — still, weil die Karte nur die
+ * Stärkeänderung meldet (Audit Runde 2, „Führungssicht", R2-K1). Aufzurufen
+ * direkt nach `meldungHinzufuegen`, wenn `neu` war; {@link meldungAufnehmen}
+ * erledigt beides.
  */
 export function folgemeldungErbt(einsatzId: string, eintragId: string): void {
   const liste = alleSammlungen();
@@ -191,7 +197,43 @@ export function folgemeldungErbt(einsatzId: string, eintragId: string): void {
     e.notiz = vorgaenger.notiz;
     geaendert = true;
   }
+  if (!e.zugEtikett && vorgaenger.zugEtikett) {
+    e.zugEtikett = vorgaenger.zugEtikett;
+    geaendert = true;
+  }
+  if (!e.teilEtikett && vorgaenger.teilEtikett) {
+    e.teilEtikett = vorgaenger.teilEtikett;
+    geaendert = true;
+  }
   if (geaendert) sammlungenSchreiben(liste);
+}
+
+/**
+ * Ergebnis von {@link meldungAufnehmen}. `erbeFehlt`: die Meldung ist
+ * abgelegt, aber Zug, Auftrag und Eintreffzeit der Vorgängerin konnten nicht
+ * übernommen werden (Speicher voll) — das muss der Aufrufer sagen.
+ */
+export type MeldungAufnahmeMitErbe = MeldungAufnahme & { erbeFehlt?: boolean };
+
+/**
+ * Bogen als Meldung in eine Sammlung legen — der einzige Weg, den die App
+ * dafür nimmt. Scan, Link, Datei, Ordner, Bilderstapel und „In Einsatz
+ * aufnehmen" liefen bisher teils am Erbe der Folgemeldung vorbei; dann waren
+ * Zug und Auftrag je nach Eingangsweg weg (R2-K1).
+ */
+export function meldungAufnehmen(
+  einsatzId: string,
+  bogen: Parameters<typeof meldungHinzufuegen>[1],
+  opt: MeldungOptionen = {},
+): MeldungAufnahmeMitErbe | null {
+  const r = meldungHinzufuegen(einsatzId, bogen, opt);
+  if (!r?.neu) return r;
+  try {
+    folgemeldungErbt(einsatzId, r.eintrag.id);
+  } catch {
+    return { ...r, erbeFehlt: true };
+  }
+  return r;
 }
 
 /**

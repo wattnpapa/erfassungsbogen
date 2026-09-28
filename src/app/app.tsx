@@ -60,14 +60,13 @@ import {
   einsaetzePapierkorb,
   einsatzAnlegen,
   einsatzImportieren,
-  meldungHinzufuegen,
   neuesteJeEinheit,
   revisionen,
   type EintragSignatur,
   type Einsatzsammlung,
 } from "@bos/meldekopf/einsaetze";
 import { bogenDiff, diffKurzfassung } from "@bos/meldekopf/meldung-diff";
-import { SpeicherVollFehler, folgemeldungErbt, istSpeicherVoll } from "./eintrag-zeiten";
+import { SpeicherVollFehler, istSpeicherVoll, meldungAufnehmen } from "./eintrag-zeiten";
 import { ART_LABEL, EinsatzDetail, EinsatzListe, type Eingang } from "./einsaetze-ui";
 import { exportSammlung, exportStandLaden, exportVermerken, type ExportStand, type ExportUmfang } from "./export-stand";
 import { aktuelleMeldungen } from "./auswertung";
@@ -85,6 +84,7 @@ import {
   entwurfVerwerfen,
   ersetztenEntwurfLaden,
   ersetztenEntwurfMerken,
+  rueckholungNimmt,
   ersetztenEntwurfVerwerfen,
   type Entwurf,
 } from "./entwurf";
@@ -470,12 +470,17 @@ const ENTWURF = START.bogen ? null : entwurfLaden();
  * Er wandert deshalb hier in die Rückholung, bevor das Autosave des neuen
  * Bogens ihn überschreibt, und die Startseite bietet ihn wieder an.
  */
+/** Sammlung, für die der wiederhergestellte Entwurf erfasst wurde — falls es sie noch gibt. */
+function erfassungsZielBeimStart(): string | null {
+  const id = ENTWURF?.fremd?.einsatzId;
+  return id && einsaetzeLaden().some((s) => s.id === id) ? id : null;
+}
+
 const VERDRAENGT_BEIM_START = ((): boolean => {
   if (!START.bogen) return false;
   const alt = entwurfLaden();
   if (!alt || !bogenHatInhalt(alt.bogen)) return false;
-  ersetztenEntwurfMerken(alt.bogen);
-  return true;
+  return ersetztenEntwurfMerken(alt.bogen, alt.fremd);
 })();
 
 export function App() {
@@ -519,6 +524,14 @@ function AppInhalt() {
    * wandert mit dem Entwurf in den Speicher, damit sie einen Neustart überlebt.
    */
   const [vorlageInBearbeitung, setVorlageInBearbeitung] = useState<string | null>(ENTWURF?.vorlageId ?? null);
+  /**
+   * Der offene Bogen ist keine eigene Meldung, sondern die Erfassung einer
+   * fremden Einheit am Meldekopf („Einheit schnell erfassen", „Einheit manuell
+   * erfassen…"). Sie darf den eigenen Bogen nie aus der Rückholung verdrängen
+   * (entwurf.ts, `rueckholungNimmt`) und wird nach dem Ablegen geschlossen.
+   * Wandert mit dem Entwurf in den Speicher.
+   */
+  const [fremdeErfassung, setFremdeErfassung] = useState<boolean>(!!ENTWURF?.fremd);
   const [schritt, setSchritt] = useState(START.bogen || ENTWURF ? UEBERSICHT : 0);
   const richtung = useSchrittRichtung(schritt);
   const [fehler, setFehler] = useState(START.fehler);
@@ -601,10 +614,12 @@ function AppInhalt() {
     eingangZaehler.current += 1;
     setEingang({ schluessel, nonce: eingangZaehler.current });
   }
-  const [sammelZielId, setSammelZielId] = useState<string | null>(null);
+  // Nach einem Neustart mitten in einer Erfassung für eine Sammlung geht es
+  // dort weiter, statt die fremde Einheit als eigenen Bogen zu zeigen (R2-E3).
+  const [sammelZielId, setSammelZielId] = useState<string | null>(() => erfassungsZielBeimStart());
   // Sammelziel zusätzlich als Ref: der laufende (asynchrone) Scan-Loop und die
   // Scanner-Callbacks lesen sonst einen veralteten Closure-Stand.
-  const sammelZielRef = useRef<string | null>(null);
+  const sammelZielRef = useRef<string | null>(sammelZielId);
   const setSammelZiel = (id: string | null) => {
     sammelZielRef.current = id;
     setSammelZielId(id);
@@ -690,7 +705,10 @@ function AppInhalt() {
   const [speicherFehler, setSpeicherFehler] = useState(false);
   useEffect(() => {
     if (bogen) {
-      const ok = entwurfSpeichern(bogen, vorlageInBearbeitung ?? undefined);
+      const ok = entwurfSpeichern(bogen, {
+        vorlageId: vorlageInBearbeitung ?? undefined,
+        fremd: fremdeErfassung ? { einsatzId: sammelZielId ?? undefined } : undefined,
+      });
       setSpeicherFehler(!ok);
       if (ok) setGespeichertUm(new Date());
     } else {
@@ -698,7 +716,7 @@ function AppInhalt() {
       setGespeichertUm(null);
       setSpeicherFehler(false);
     }
-  }, [bogen, vorlageInBearbeitung]);
+  }, [bogen, vorlageInBearbeitung, fremdeErfassung, sammelZielId]);
 
   /**
    * Die Vorlage zum offenen Bogen — nur solange sie noch in der Liste steht.
@@ -831,12 +849,50 @@ function AppInhalt() {
    * Einsätzen gibt es für den Entwurf keinen Papierkorb, deshalb die Rückfrage.
    */
   /**
-   * Den Bogen merken, der gerade seinen Platz räumt — und die Startseite
-   * darüber in Kenntnis setzen.
+   * Den offenen Bogen merken, der gerade seinen Platz räumt — und die
+   * Startseite darüber in Kenntnis setzen. Rückgabe false: nicht gemerkt,
+   * weil eine fremde Erfassung den eigenen Bogen aus der Rückholung verdrängt
+   * hätte (dann ist die Erfassung verworfen, siehe `folgenFuerOffenenBogen`).
    */
-  function merkeVerdraengt(b: Erfassungsbogen) {
-    ersetztenEntwurfMerken(b);
-    setErsetzterEntwurf({ gespeichert: Date.now(), bogen: b });
+  function merkeVerdraengt(b: Erfassungsbogen, opt: { tausch?: boolean } = {}): boolean {
+    const ok = ersetztenEntwurfMerken(b, fremdeErfassung ? { einsatzId: sammelZielId ?? undefined } : undefined, opt);
+    if (ok) setErsetzterEntwurf(ersetztenEntwurfLaden());
+    return ok;
+  }
+
+  /**
+   * Was mit dem offenen Bogen passiert, wenn er seinen Platz räumt — in einem
+   * Satz für die Rückfrage, und ob dabei etwas endgültig verloren geht. Die
+   * alte Rückfrage versprach immer „bleibt erreichbar", auch wenn der Bogen
+   * auf dem Rückholplatz dabei überschrieben wurde (R2-N1/R2-E1).
+   */
+  function folgenFuerOffenenBogen(opt: { tausch?: boolean } = {}): { satz: string; verlust: boolean } {
+    if (!bogen) return { satz: "", verlust: false };
+    const name = einheitAnzeigename(bogen.einheit);
+    const alt = opt.tausch ? null : ersetztenEntwurfLaden();
+    const altName = alt ? einheitAnzeigename(alt.bogen.einheit) : "";
+    const altZaehlt = !!alt && bogenHatInhalt(alt.bogen);
+    if (fremdeErfassung && !rueckholungNimmt(true, alt)) {
+      return {
+        satz: `Sie ist noch in keiner Sammlung und wird verworfen. Dein eigener Bogen „${altName}" bleibt auf der Startseite zurückholbar.`,
+        verlust: true,
+      };
+    }
+    const bleibt = `„${name}" bleibt auf der Startseite unter „Zuletzt verdrängten Bogen zurückholen" erreichbar.`;
+    if (!altZaehlt) return { satz: bleibt, verlust: false };
+    const stand = new Date(alt.gespeichert).toLocaleString("de-DE", { dateStyle: "short", timeStyle: "short" });
+    return {
+      satz: `${bleibt} ${alt.fremd ? "Die" : "Der"} dort bisher liegende ${alt.fremd ? "Erfassung" : "Bogen"} „${altName}" (Stand ${stand} Uhr) wird dabei endgültig gelöscht.`,
+      verlust: true,
+    };
+  }
+
+  /** Satz für Quittungen: wo der eigene Bogen liegt, wenn er in der Rückholung wartet. */
+  function eigenerBogenWartetHinweis(): string {
+    const r = ersetztenEntwurfLaden();
+    return r && !r.fremd && bogenHatInhalt(r.bogen)
+      ? `Dein eigener Bogen „${einheitAnzeigename(r.bogen.einheit)}" liegt auf der Startseite unter „Zuletzt verdrängten Bogen zurückholen".`
+      : "";
   }
 
   /**
@@ -850,23 +906,36 @@ function AppInhalt() {
    * die Rückholung (siehe `ersetztenEntwurfMerken`).
    *
    * Ein unberührter Bogen (nur Vorgaben) löst keine Frage aus; sonst stünde
-   * sie ständig im Weg und würde weggetippt.
+   * sie ständig im Weg und würde weggetippt. `ohneFrage`: der Aufrufer hat
+   * schon gefragt. `tausch`: die Rückholung wird gerade geleert (Zurückholen).
    */
-  async function darfBogenErsetzen(a: { titel: string; was: string; ok: string }): Promise<boolean> {
+  async function darfBogenErsetzen(a: {
+    titel: string;
+    was: string;
+    ok: string;
+    ohneFrage?: boolean;
+    tausch?: boolean;
+  }): Promise<boolean> {
     // Was auch immer den Bogen ersetzt: die Bearbeitung einer Vorlage ist es
     // danach nicht mehr — der verdrängte Bogen wird zum gewöhnlichen Entwurf.
     if (!bogen || !bogenHatInhalt(bogen)) {
       setVorlageInBearbeitung(null);
+      setFremdeErfassung(false);
       return true;
     }
-    const ja = await frageJaNein({
-      titel: a.titel,
-      text: `Der angefangene Bogen „${einheitAnzeigename(bogen.einheit)}" wird durch ${a.was} ersetzt. Er bleibt auf der Startseite unter „Zuletzt verdrängten Bogen zurückholen" erreichbar.`,
-      ok: a.ok,
-    });
-    if (!ja) return false;
-    merkeVerdraengt(bogen);
+    if (!a.ohneFrage) {
+      const folgen = folgenFuerOffenenBogen({ tausch: a.tausch });
+      const ja = await frageJaNein({
+        titel: a.titel,
+        text: `${fremdeErfassung ? "Die angefangene Erfassung" : "Der angefangene Bogen"} „${einheitAnzeigename(bogen.einheit)}" wird durch ${a.was} ersetzt. ${folgen.satz}`,
+        ok: a.ok,
+        gefahr: folgen.verlust,
+      });
+      if (!ja) return false;
+    }
+    merkeVerdraengt(bogen, { tausch: a.tausch });
     setVorlageInBearbeitung(null);
+    setFremdeErfassung(false);
     return true;
   }
 
@@ -922,6 +991,7 @@ function AppInhalt() {
       titel: "Verdrängten Bogen zurückholen?",
       was: `den Bogen „${einheitAnzeigename(zurueck.bogen.einheit)}"`,
       ok: "Zurückholen",
+      tausch: true,
     }))) {
       return;
     }
@@ -932,6 +1002,10 @@ function AppInhalt() {
       setErsetzterEntwurf(null);
     }
     setBogen(zurueck.bogen);
+    // Eine zurückgeholte Erfassung bleibt eine Erfassung — samt Sammlung, falls es sie noch gibt.
+    const ziel = zurueck.fremd?.einsatzId;
+    setFremdeErfassung(!!zurueck.fremd);
+    setSammelZiel(ziel && einsaetzeLaden().some((x) => x.id === ziel) ? ziel : null);
     setzeEmpfang(null);
     setSchritt(UEBERSICHT);
     setOffenerEinsatzId(null);
@@ -945,19 +1019,23 @@ function AppInhalt() {
     // Verworfen heißt nicht verloren: Der Bogen wandert in dieselbe Rückholung
     // wie ein verdrängter (Audit „Zerstörende Handlungen", D7) — wer nach
     // 14 Stunden „Verwerfen" statt „Fortsetzen" trifft, hat ihn morgen wieder.
+    // Ausnahme: eine fremde Erfassung, die dort den eigenen Bogen verdrängen würde.
+    const folgen = bogenHatInhalt(bogen) ? folgenFuerOffenenBogen() : { satz: "", verlust: false };
     const sicher = await frageJaNein({
-      titel: "Angefangenen Bogen verwerfen?",
-      text: `„${einheitAnzeigename(bogen.einheit)}" wird geschlossen. Er bleibt auf der Startseite unter „Zuletzt verdrängten Bogen zurückholen" erreichbar, bis ein anderer Bogen diesen Platz braucht.`,
+      titel: fremdeErfassung ? "Angefangene Erfassung verwerfen?" : "Angefangenen Bogen verwerfen?",
+      text: `„${einheitAnzeigename(bogen.einheit)}" wird geschlossen. ${folgen.satz}`,
       ok: "Verwerfen",
       gefahr: true,
     });
     if (!sicher) return;
-    if (bogenHatInhalt(bogen)) merkeVerdraengt(bogen);
+    const gemerkt = bogenHatInhalt(bogen) && merkeVerdraengt(bogen);
     setBogen(null); // löscht auch die Entwurfssicherung (siehe oben)
     setVorlageInBearbeitung(null);
+    setFremdeErfassung(false);
+    setSammelZiel(null);
     setzeEmpfang(null);
     setSchritt(0);
-    setMeldung("Angefangener Bogen verworfen — Rückholung unten auf der Startseite.");
+    setMeldung(gemerkt ? "Angefangener Bogen verworfen — Rückholung unten auf der Startseite." : "Angefangene Erfassung verworfen.");
   }
 
   /**
@@ -1111,7 +1189,9 @@ function AppInhalt() {
     const vorige = bekannt && !schonDa && einsatz ? revisionen(einsatz.eintraege, schl)[0] : undefined;
     let r;
     try {
-      r = meldungHinzufuegen(zielId, b, {
+      // meldungAufnehmen: legt ab und lässt die Folgemeldung Zug, Auftrag und
+      // Eintreffzeit der Vorgängerin erben (eintrag-zeiten.ts, R2-K1).
+      r = meldungAufnehmen(zielId, b, {
         quelle,
         einheitSchluesselOverride: override,
         signatur: empfang?.signatur,
@@ -1131,15 +1211,9 @@ function AppInhalt() {
       setFehler("Einsatz nicht gefunden.");
       return false;
     }
-    // Folgemeldung erbt Eintreffzeit und Auftrag der Vorgängerin (eintrag-zeiten.ts).
-    if (r.neu) {
-      try {
-        folgemeldungErbt(zielId, r.eintrag.id);
-      } catch {
-        /* Zusatzfelder sind Beiwerk — die Meldung selbst ist abgelegt */
-      }
-    }
-    const folge = r.neu && vorige ? ` (Folgemeldung: ${diffKurzfassung(bogenDiff(vorige.bogen, b)) || "inhaltlich unverändert"})` : "";
+    const folge =
+      (r.neu && vorige ? ` (Folgemeldung: ${diffKurzfassung(bogenDiff(vorige.bogen, b)) || "inhaltlich unverändert"})` : "") +
+      (r.erbeFehlt ? " Zug, Auftrag und Eintreffzeit der vorigen Fassung konnten nicht übernommen werden (Speicher voll) — bitte an der Karte nachtragen." : "");
     if (kiosk) {
       // Dauerscannen: Piep + Zähler im Overlay, die Kamera bleibt an — beim
       // Massen-Check-in muss niemand zwischen den Bögen die Ansicht wechseln.
@@ -1412,6 +1486,7 @@ function AppInhalt() {
       if (VERDRAENGT_BEIM_START && alt) {
         ersetztenEntwurfVerwerfen();
         setErsetzterEntwurf(null);
+        setFremdeErfassung(!!alt.fremd);
         setBogen(alt.bogen);
         setSchritt(UEBERSICHT);
       } else {
@@ -1570,17 +1645,21 @@ function AppInhalt() {
     // damit der Meldekopf keinen fremden Bogen als eigenen Entwurf behält;
     // der selbst erfasste Bogen der eigenen Einheit bleibt offen — sie will
     // ihn weiter pflegen (Audit „Zerstörende Handlungen", D5).
-    const eigener = !sig;
+    // Eine fremde Erfassung (Schnellerfassung von der Startseite) ist
+    // ebenfalls nicht „dein Bogen": offen gelassen, verdrängte sie beim
+    // nächsten Wechsel den eigenen aus der Rückholung (R2-N1).
+    const eigener = !sig && !fremdeErfassung;
     const ok = await bogenInSammlung(
       zielId,
       b,
       sig ? "scan" : "manuell",
       sig ? { signatur: alsEintragSignatur(sig), herkunft } : undefined,
       false,
-      eigener ? "Dein Bogen bleibt geöffnet — Startseite → „Fortsetzen“." : "",
+      eigener ? "Dein Bogen bleibt geöffnet — Startseite → „Fortsetzen“." : eigenerBogenWartetHinweis(),
     );
     if (!ok || eigener) return;
     setBogen(null);
+    setFremdeErfassung(false);
     setVorlageInBearbeitung(null);
     setzeEmpfang(null);
     setSchritt(0);
@@ -1593,10 +1672,11 @@ function AppInhalt() {
     const b = bogen;
     setMeldung("");
     // Manuell erfasster Bogen ist kein signierter Transport.
-    const ok = await bogenInSammlung(ziel, b, "manuell");
+    const ok = await bogenInSammlung(ziel, b, "manuell", undefined, false, eigenerBogenWartetHinweis());
     if (!ok) return;
     setSammelZiel(null);
     setBogen(null);
+    setFremdeErfassung(false);
     setVorlageInBearbeitung(null);
     setzeEmpfang(null);
     setSchritt(0);
@@ -1617,7 +1697,33 @@ function AppInhalt() {
   }
 
   async function manuellInEinsatz(zielId: string) {
-    if (!(await darfBogenErsetzen({ titel: "Einheit für den Einsatz erfassen?", was: "die neu zu erfassende Einheit", ok: "Einheit erfassen" }))) return;
+    // Eine angefangene Erfassung liegt noch im Assistenten (abgebrochen über
+    // „‹ Einsatz", oder nach einem Neustart): fortsetzen oder bewusst
+    // verwerfen — nicht still in die Rückholung schieben, wo sie den eigenen
+    // Bogen verdrängte (R2-E1).
+    if (bogen && fremdeErfassung && bogenHatInhalt(bogen)) {
+      const folgen = folgenFuerOffenenBogen();
+      const wahl = await frageWahl({
+        titel: "Angefangene Erfassung",
+        text: `„${einheitAnzeigename(bogen.einheit) || "(noch ohne Namen)"}" ist angefangen, aber noch in keiner Sammlung.`,
+        wege: [
+          { wert: "weiter", label: "Diese Erfassung fortsetzen" },
+          { wert: "neu", label: "Verwerfen und neue Einheit erfassen", hinweis: folgen.satz, gefahr: folgen.verlust },
+        ],
+      });
+      if (!wahl) return;
+      if (wahl === "weiter") {
+        setSammelZiel(zielId);
+        setOffenerEinsatzId(null);
+        setMeldung("");
+        setZeigeStart(false);
+        return;
+      }
+      await darfBogenErsetzen({ titel: "", was: "", ok: "", ohneFrage: true });
+    } else if (!(await darfBogenErsetzen({ titel: "Einheit für den Einsatz erfassen?", was: "die neu zu erfassende Einheit", ok: "Einheit erfassen" }))) {
+      return;
+    }
+    setFremdeErfassung(true);
     setSammelZiel(zielId);
     setOffenerEinsatzId(null); // Assistent übernimmt die Ansicht
     setMeldung("");
@@ -1768,7 +1874,7 @@ function AppInhalt() {
     let uebersprungen = 0;
     for (const { bogen: b, signatur, herkunft } of gefunden) {
       try {
-        const r = meldungHinzufuegen(zielId, b, {
+        const r = meldungAufnehmen(zielId, b, {
           quelle: "pdf-import",
           signatur: alsEintragSignatur(signatur),
           herkunft: herkunft ? base64UrlKodieren(herkunft) : undefined,
@@ -1877,7 +1983,7 @@ function AppInhalt() {
         // Signatur wie beim Einzelscan prüfen und den Rohpayload mitspeichern —
         // sonst verlöre der Meldekopf beim Weiterreichen die fremde Signatur.
         const status = fund.payload ? await signaturVonPayload(fund.payload) : null;
-        const r = meldungHinzufuegen(zielId, fund.bogen, {
+        const r = meldungAufnehmen(zielId, fund.bogen, {
           quelle: "scan",
           signatur: status ? alsEintragSignatur(status) : undefined,
           herkunft: fund.payload ? base64UrlKodieren(fund.payload) : undefined,
@@ -2087,6 +2193,16 @@ function AppInhalt() {
               />
               <span className="entwurf-text">
                 <strong>{einheitAnzeigename(bogen.einheit)}</strong>
+                {/* Eine fremde Einheit ist nicht „mein Bogen" — die Karte sagt es (R2-E3). */}
+                {fremdeErfassung && (
+                  <span className="hinweis">
+                    Angefangene Erfassung
+                    {(() => {
+                      const ziel = sammelZielId ? einsaetze.find((x) => x.id === sammelZielId) : undefined;
+                      return ziel ? ` für „${ziel.name}"` : " einer fremden Einheit";
+                    })()}
+                  </span>
+                )}
                 <span className="hinweis">
                   Stärke {s.fuehrer} / {s.unterfuehrer} / {s.mannschaft} / {s.gesamt}
                   {gespeichertUm
@@ -2191,6 +2307,7 @@ function AppInhalt() {
                 type="button"
                 onClick={async () => {
                   if (!(await darfBogenErsetzen({ titel: "Einheit schnell erfassen?", was: "die schnell zu erfassende Einheit", ok: "Schnell erfassen" }))) return;
+                  setFremdeErfassung(true);
                   setMeldung("");
                   setBogen({
                     ...neuerBogen(),
@@ -2425,7 +2542,7 @@ function AppInhalt() {
           signatur={bogenSignatur}
           herkunft={bogenHerkunft}
           geheZu={setSchritt}
-          neu={() => { if (bogenHatInhalt(bogen)) merkeVerdraengt(bogen); setMeldung(""); setBogen(null); setVorlageInBearbeitung(null); setzeEmpfang(null); setSchritt(0); }}
+          neu={() => { if (bogenHatInhalt(bogen)) merkeVerdraengt(bogen); setMeldung(""); setBogen(null); setVorlageInBearbeitung(null); setFremdeErfassung(false); setSammelZiel(null); setzeEmpfang(null); setSchritt(0); }}
           onVorlageGespeichert={(name) => { vorlagenNeuLaden(); setMeldung(`Als Vorlage „${name}" gespeichert.`); }}
           vorlageBearbeitung={
             bearbeiteteVorlage ? { name: bearbeiteteVorlage.name, onAktualisieren: vorlageAktualisierenUndSchliessen } : undefined
@@ -2451,7 +2568,9 @@ function AppInhalt() {
           <p className="hinweis">
             {bogenSignatur
               ? "Die empfangene Meldung wird in der Sammlung abgelegt und hier geschlossen."
-              : "Dein Bogen wird als Meldung abgelegt und bleibt hier geöffnet."}
+              : fremdeErfassung
+                ? "Die Erfassung wird in der Sammlung abgelegt und hier geschlossen."
+                : "Dein Bogen wird als Meldung abgelegt und bleibt hier geöffnet."}
             {" "}Ist die Einheit dort schon gemeldet, wird nachgefragt (neue Fassung oder eigene Einheit).
           </p>
           {einsaetze.map((s) => (

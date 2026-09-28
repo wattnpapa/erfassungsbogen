@@ -30,6 +30,13 @@
 > in `vorlagen.ts`); der Entwurf trägt dafür die Vorlagen-Kennung
 > (`Entwurf.vorlageId`, `entwurf.ts`). Bis dahin ließ sich eine Vorlage nur
 > durch „Als Vorlage speichern" plus Löschen der alten ersetzen — Kapitel 5.
+>
+> **Nachgezogen 2026-09-28:** Audit Runde 2, P0-Befunde — der Entwurf trägt die
+> Marke `fremd` (Erfassung einer fremden Einheit samt Ziel-Sammlung), und
+> `rueckholungNimmt` in `entwurf.ts` hält den eigenen Bogen auf dem
+> Rückholplatz; alle Eingänge in eine Sammlung laufen über `meldungAufnehmen`
+> (`eintrag-zeiten.ts`), das Zug, Auftrag und Eintreffzeit an die Folgemeldung
+> vererbt — Kapitel 8.2.
 
 ---
 
@@ -995,7 +1002,17 @@ flowchart TB
   `localStorage` des Geräts (`speicher-browser.ts` als einzige Anbindungsstelle
   zwischen Browser-Speicher und der `@bos/meldekopf`-Kernlogik).
 - **Entwurfswiederherstellung** (`entwurf.ts`): ein gerade ausgefüllter, noch
-  nicht übergebener Bogen geht bei Neuladen/Absturz nicht verloren.
+  nicht übergebener Bogen geht bei Neuladen/Absturz nicht verloren. Ein
+  verdrängter Bogen wartet auf genau einem Rückholplatz
+  (`eeb.entwurf.ersetzt.v1`). Die Erfassung einer fremden Einheit am
+  Meldekopf ist am Entwurf markiert (`Entwurf.fremd` mit Ziel-Sammlung, nach
+  einem Neustart geht es in derselben Erfassung weiter) und verdrängt dort nie
+  einen eigenen Bogen (`rueckholungNimmt`).
+- **Folgemeldungen** (`eintrag-zeiten.ts`): Jeder Eingang in eine Sammlung —
+  Scan, Link, Datei, Bilderstapel, „In Einsatz aufnehmen" — läuft über
+  `meldungAufnehmen`. Eine neue Fassung derselben Einheit erbt dort
+  Eintreffzeit, Auftrag/Notiz, Zug- und Teil-Etikett der Vorgängerin; der
+  Kern (`@bos/meldekopf`) bleibt unverändert.
 - **Datenschutzfrist:** 90 Tage nach dem Stand eines Bogens werden seine
   Personaldaten dauerhaft anonymisiert. Das gilt für die Meldungen der
   Einsatz-Sammlung, den Entwurf und jeden eingelesenen Bogen; Übungsbögen und

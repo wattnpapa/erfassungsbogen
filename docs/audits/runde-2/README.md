@@ -92,3 +92,18 @@ Je nach Rolle kamen dazu: 640 × 360 quer, 320 × 568, 390 × 844, Tablet
 Lageblatt, Sammel-PDF, CSV und Excel wurden heruntergeladen und gegengelesen.
 Nicht prüfbar: Kamera-Scan, Handscanner, Nahbereichs-Weitergabe, echte
 Handschuhe, echtes Licht, Bildschirmtastatur, echtes Drucken, native Builds.
+
+## Stand der Behebung
+
+Stand 28.09.2026. Behoben sind die drei P0-Befunde. Geprüft wurde mit
+Unit-Tests, Oberflächentests (`app.test.tsx`), den Cucumber-Szenarien, der
+Typprüfung und einem Nachlauf der Audit-Abläufe im Produktionsbuild
+(360 × 640 bzw. 820 × 1180).
+
+| Befund | Stand | Umsetzung |
+| --- | --- | --- |
+| R2-N1 Schnellerfassung verdrängt eigenen Bogen | behoben | Erfassungen fremder Einheiten sind am Entwurf markiert (`Entwurf.fremd`) und dürfen einen eigenen Bogen nicht vom Rückholplatz verdrängen (`rueckholungNimmt`). Eine abgelegte Schnellerfassung wird geschlossen, die Quittung nennt, wo der eigene Bogen liegt. Die Rückfrage sagt, was verworfen wird oder endgültig verloren geht, und färbt den Knopf dann rot. Nachlauf: drei Schnellerfassungen, eine davon abgebrochen, „THW Ulm" blieb auf dem Rückholplatz. |
+| R2-E1 Abgebrochene Einsatz-Erfassung verdrängt eigenen Bogen | behoben | „Einheit manuell erfassen…" fragt bei einer angefangenen Erfassung „fortsetzen" oder „verwerfen und neu"; verworfen wird nur die Erfassung. Nebenbei R2-E3: Die Ziel-Sammlung wandert mit dem Entwurf, nach dem Neuladen zeigt die Startseite „Angefangene Erfassung für ‚…'", und „Fortsetzen" führt zurück in die Erfassung mit „In Einsatz übernehmen". |
+| R2-K1 Folgemeldung löscht Zug, Auftrag, Eintreffzeit | behoben | Alle Eingänge (Scan, Link, Dateien, Bilderstapel, „In Einsatz aufnehmen") laufen über `meldungAufnehmen`, das Eintreffzeit, Auftrag, Zug und Teil-Etikett der Vorgängerin vererbt. Vorher erbten nur Scan/Link und „In Einsatz aufnehmen", den Zug nie. Nachlauf: Folgemeldung per „Bögen einlesen…" hält „1. TZ", Auftrag und 22:07 auch nach Neuladen. |
+
+Alle übrigen Befunde (P1 bis P3) sind offen.
