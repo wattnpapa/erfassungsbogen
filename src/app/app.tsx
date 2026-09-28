@@ -57,6 +57,7 @@ import {
   bogenInhaltsId,
   einheitSchluessel,
   einsaetzeLaden,
+  einsaetzePapierkorb,
   einsatzAnlegen,
   einsatzImportieren,
   meldungHinzufuegen,
@@ -68,6 +69,7 @@ import {
 import { bogenDiff, diffKurzfassung } from "@bos/meldekopf/meldung-diff";
 import { SpeicherVollFehler, folgemeldungErbt, istSpeicherVoll } from "./eintrag-zeiten";
 import { ART_LABEL, EinsatzDetail, EinsatzListe, type Eingang } from "./einsaetze-ui";
+import { exportSammlung, exportStandLaden, exportVermerken, type ExportStand, type ExportUmfang } from "./export-stand";
 import { aktuelleMeldungen } from "./auswertung";
 import { boegenAusPdfBytes, einsatzAusDatei, einsatzAusPdfBytes, einsatzDateiInhalt, istPdfDatei } from "./einsatz-transport";
 import type { QrBogen } from "./qr-boegen";
@@ -564,6 +566,22 @@ function AppInhalt() {
     setOffenerEinsatzIdRoh(id);
     letztenEinsatzMerken(id);
   };
+  // Was beim letzten Export des offenen Einsatzes schon in der Sammlung stand
+  // (export-stand.ts) — die Detailansicht zählt daran ab, was seitdem neu ist.
+  const [exportStand, setExportStand] = useState<ExportStand | null>(null);
+  // Alle Bögen oder nur die neuen: liegt hier statt in der Detailansicht, weil
+  // die beim Erfassen einer Einheit (Assistent übernimmt) aus- und wieder
+  // eingehängt wird — ein angekreuztes Kästchen, das dabei zurückspränge,
+  // läse sich als Fehler. Vorgabe bleibt der Gesamtexport, und ein anderer
+  // Einsatz beginnt wieder damit: dem Stab darf nicht versehentlich etwas fehlen.
+  const [exportUmfang, setExportUmfang] = useState<ExportUmfang>("alle");
+  const letzterExportEinsatz = useRef<string | null>(null);
+  useEffect(() => {
+    if (!offenerEinsatzId) return; // Assistent zwischendurch — die Wahl wartet auf die Rückkehr
+    setExportStand(exportStandLaden(offenerEinsatzId));
+    if (letzterExportEinsatz.current !== offenerEinsatzId) setExportUmfang("alle");
+    letzterExportEinsatz.current = offenerEinsatzId;
+  }, [offenerEinsatzId]);
   /**
    * Welche Zeile der Einheitenliste gehört zum gerade aufgenommenen Bogen?
    * Die Stärke-Leiste quittiert die geänderte Summe, die Rückmeldezeile nennt
@@ -1609,60 +1627,93 @@ function AppInhalt() {
     setZeigeStart(false);
   }
 
-  /** Text als Datei anbieten — App: Share-Sheet, Browser: Download (wie bogenSpeichern). */
-  async function dateiAnbieten(dateiname: string, text: string, mime: string) {
-    if (istNativ()) {
-      await textTeilen(dateiname, text);
-      return;
-    }
+  /**
+   * Text als Datei anbieten — App: Share-Sheet, Browser: Download (wie
+   * bogenSpeichern). Liefert false, wenn das Share-Sheet abgebrochen wurde.
+   */
+  async function dateiAnbieten(dateiname: string, text: string, mime: string): Promise<boolean> {
+    if (istNativ()) return textTeilen(dateiname, text);
     blobAlsDownload(dateiname, new Blob([text], { type: mime }));
+    return true;
   }
 
   function einsatzDateiname(s: Einsatzsammlung): string {
     return (s.name || "einsatz").replace(/[^\wäöüÄÖÜß-]+/g, "_");
   }
 
+  /**
+   * Nach einem gelungenen Export: alles, was jetzt in der Sammlung steht, ist
+   * beim Stab angekommen — beim nächsten „nur neue Bögen" zählt es nicht mehr
+   * mit. Ein abgebrochenes Share-Sheet kommt hier nicht an (siehe Aufrufer).
+   */
+  function exportVerbuchen(s: Einsatzsammlung) {
+    const vorhanden = [...einsaetzeLaden(), ...einsaetzePapierkorb()].map((x) => x.id);
+    setExportStand(exportVermerken(s, vorhanden));
+  }
+
   async function exportiereEinsatz(s: Einsatzsammlung) {
     await dateiAnbieten(`eeb-einsatz-${einsatzDateiname(s)}.json`, einsatzDateiInhalt(s), "application/json");
   }
 
-  async function exportiereEinsatzCsv(s: Einsatzsammlung) {
-    await dateiAnbieten(`eeb-einsatz-${einsatzDateiname(s)}.csv`, einsatzCsvInhalt(s), "text/csv;charset=utf-8");
+  async function exportiereEinsatzCsv(s: Einsatzsammlung, umfang: ExportUmfang) {
+    const teil = exportSammlung(s, umfang, exportStand);
+    const ok = await dateiAnbieten(`eeb-einsatz-${einsatzDateiname(s)}.csv`, einsatzCsvInhalt(teil), "text/csv;charset=utf-8");
+    if (ok) exportVerbuchen(s);
   }
 
-  async function exportiereEinsatzCsvDetail(s: Einsatzsammlung) {
-    await dateiAnbieten(
+  async function exportiereEinsatzCsvDetail(s: Einsatzsammlung, umfang: ExportUmfang) {
+    const teil = exportSammlung(s, umfang, exportStand);
+    const ok = await dateiAnbieten(
       `eeb-einsatz-${einsatzDateiname(s)}-alle-daten.csv`,
-      einsatzDetailCsvInhalt(s),
+      einsatzDetailCsvInhalt(teil),
       "text/csv;charset=utf-8",
     );
+    if (ok) exportVerbuchen(s);
   }
 
   /**
    * Einheitenliste im Fremdformat der Führungsstelle. Dynamisch geladen: der
    * XLSX-Schreiber samt Stiltabelle wird nur beim Klick gebraucht (wie die PDF).
    */
-  async function exportiereEinsatzOldenburg(s: Einsatzsammlung) {
+  async function exportiereEinsatzOldenburg(s: Einsatzsammlung, umfang: ExportUmfang) {
+    const teil = exportSammlung(s, umfang, exportStand);
     try {
       const { XLSX_MIME, einsatzOldenburgXlsx } = await import("./oldenburg-xlsx");
-      await bytesAlsDatei(`eeb-einsatz-${einsatzDateiname(s)}-oldenburg.xlsx`, einsatzOldenburgXlsx(s), XLSX_MIME);
+      const ok = await bytesAlsDatei(`eeb-einsatz-${einsatzDateiname(s)}-oldenburg.xlsx`, einsatzOldenburgXlsx(teil), XLSX_MIME);
+      if (ok) exportVerbuchen(s);
     } catch (e) {
       setFehler(`Excel-Liste: ${fehlerText(e)}`);
     }
   }
 
-  async function sammelPdf(s: Einsatzsammlung) {
-    // ALLE aktuellen Meldungen — auch abgerückte und Übungen: Die Datei ist die
-    // Übergabe der ganzen Sammlung und muss auch am Einsatzende funktionieren,
-    // wenn niemand mehr anwesend ist (Audit „Arbeitsablauf", W2; „Analog
-    // first", A1). Was zählt und was nicht, unterscheidet das Blatt selbst.
+  /**
+   * Sammel-PDF. Im Gesamtumfang ALLE aktuellen Meldungen — auch abgerückte und
+   * Übungen: Die Datei ist die Übergabe der ganzen Sammlung und muss auch am
+   * Einsatzende funktionieren, wenn niemand mehr anwesend ist (Audit
+   * „Arbeitsablauf", W2; „Analog first", A1). Was zählt und was nicht,
+   * unterscheidet das Blatt selbst. Beim Teilexport enthält die PDF (Seiten
+   * wie eingebettete Sammlung) nur die neuen Bögen; die Vorfassung einer
+   * Folgemeldung für den Diff kommt aus der ganzen Sammlung.
+   */
+  async function sammelPdf(s: Einsatzsammlung, umfang: ExportUmfang) {
     setFehler("");
+    const teil = exportSammlung(s, umfang, exportStand);
+    if (teil.eintraege.length === 0) {
+      setFehler("Seit dem letzten Export ist kein Bogen neu dazugekommen.");
+      return;
+    }
     try {
       // Dynamisch: pdfmake samt eingebetteter Schriften bleibt aus dem
       // Start-Bundle heraus und wird erst beim ersten PDF geladen.
       const { einsatzPdfErzeugen } = await import("./pdf");
-      await einsatzPdfErzeugen(s);
-      setMeldung(`Einsatz „${s.name}" als PDF weitergegeben/gesichert — mit allen Meldungen, Zeiten und Historie.`);
+      const ok = await einsatzPdfErzeugen(teil, undefined, s.eintraege);
+      if (!ok) return; // Share-Sheet abgebrochen — nichts übergeben
+      exportVerbuchen(s);
+      setMeldung(
+        umfang === "neue"
+          ? `Neue Bögen aus „${s.name}" als PDF weitergegeben.`
+          : `Einsatz „${s.name}" als PDF weitergegeben/gesichert — mit allen Meldungen, Zeiten und Historie.`,
+      );
     } catch (e) {
       setFehler(`Einsatz weitergeben: ${fehlerText(e)}`);
     }
@@ -1673,8 +1724,7 @@ function AppInhalt() {
     setFehler("");
     try {
       const { einsatzLageblattErzeugen } = await import("./pdf");
-      await einsatzLageblattErzeugen(s);
-      setMeldung("Lageblatt erzeugt (eine Seite).");
+      if (await einsatzLageblattErzeugen(s)) setMeldung("Lageblatt erzeugt (eine Seite).");
     } catch (e) {
       setFehler(`Lageblatt: ${fehlerText(e)}`);
     }
@@ -1918,11 +1968,14 @@ function AppInhalt() {
           onDateiImport={(dateien) => void importiereBoegen(offenerEinsatz.id, dateien)}
           onBilderImport={(dateien) => void importiereQrBilder(offenerEinsatz.id, dateien)}
           onExport={() => exportiereEinsatz(offenerEinsatz)}
-          onCsvExport={() => exportiereEinsatzCsv(offenerEinsatz)}
-          onCsvDetailExport={() => exportiereEinsatzCsvDetail(offenerEinsatz)}
-          onOldenburgExport={() => exportiereEinsatzOldenburg(offenerEinsatz)}
-          onSammelPdf={() => sammelPdf(offenerEinsatz)}
-          onWeitergeben={() => sammelPdf(offenerEinsatz)}
+          onCsvExport={(umfang) => exportiereEinsatzCsv(offenerEinsatz, umfang)}
+          onCsvDetailExport={(umfang) => exportiereEinsatzCsvDetail(offenerEinsatz, umfang)}
+          onOldenburgExport={(umfang) => exportiereEinsatzOldenburg(offenerEinsatz, umfang)}
+          onSammelPdf={(umfang) => sammelPdf(offenerEinsatz, umfang)}
+          exportStand={exportStand}
+          exportUmfang={exportUmfang}
+          onExportUmfang={setExportUmfang}
+          onWeitergeben={() => sammelPdf(offenerEinsatz, "alle")}
           onLageblatt={() => lageblatt(offenerEinsatz)}
           eingang={eingang}
           onGeloescht={() => { setOffenerEinsatzId(null); einsaetzeNeuLaden(); setMeldung("Einsatz in den Papierkorb verschoben."); }}

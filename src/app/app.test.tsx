@@ -739,6 +739,46 @@ describe("Neuen Einsatz anlegen", () => {
     }
   });
 
+  /**
+   * Nachlieferung an den Stab: Nach dem ersten Export merkt sich die App den
+   * Stand; ein danach eingelesener Bogen zählt als neu, und der Teilexport
+   * enthält nur ihn. Der ganze Weg über die Oberfläche, weil der Stand in
+   * app.tsx verbucht und in der Einsatzansicht abgelesen wird.
+   */
+  it("gibt nach dem ersten Export auf Wunsch nur die seitdem neuen Bögen heraus", async () => {
+    const angelegt = einsatzImSpeicherAnlegen("Hochwasser Weser", EinsatzArt.EINSATZ);
+    meldungHinzufuegen(angelegt.id, bogenMitName("OV Erster"));
+    const nutzer = userEvent.setup();
+    const mitschnitt = downloadsMitschneiden();
+    try {
+      render(<App />);
+      await nutzer.click(screen.getByRole("button", { name: "Öffnen" }));
+      await screen.findByRole("heading", { level: 1, name: "Hochwasser Weser" });
+      expect(screen.getByText(/Noch kein Export aus diesem Einsatz/)).toBeDefined();
+
+      await nutzer.click(screen.getByRole("button", { name: "Übersicht als CSV" }));
+      await waitFor(() => expect(mitschnitt.dateien).toHaveLength(1));
+      expect(await mitschnitt.dateien[0]!.blob.text()).toContain("OV Erster");
+      expect(await screen.findByText(/seitdem keine neuen Bögen/)).toBeDefined();
+
+      // Ein Bogen kommt nach dem Export herein — der ist für den Stab neu.
+      const datei = new File([JSON.stringify(bogenMitName("OV Zweiter"))], "zweiter.json", { type: "application/json" });
+      await nutzer.upload(screen.getByLabelText("Dateien wählen…"), datei);
+      expect(await screen.findByText(/seitdem 1 neuer Bogen/)).toBeDefined();
+
+      await nutzer.click(screen.getByRole("checkbox", { name: /Nur neue Bögen seit dem letzten Export/ }));
+      await nutzer.click(screen.getByRole("button", { name: "Übersicht als CSV" }));
+      await waitFor(() => expect(mitschnitt.dateien).toHaveLength(2));
+      const nachlieferung = await mitschnitt.dateien[1]!.blob.text();
+      expect(nachlieferung).toContain("OV Zweiter");
+      expect(nachlieferung).not.toContain("OV Erster");
+      // Der Teilexport zählt als Übergabe: danach ist wieder nichts neu.
+      expect(await screen.findByText(/seitdem keine neuen Bögen/)).toBeDefined();
+    } finally {
+      mitschnitt.aufraeumen();
+    }
+  });
+
   it("legt nichts an, wenn der Dialog abgebrochen wird", async () => {
     const nutzer = userEvent.setup();
     render(<App />);

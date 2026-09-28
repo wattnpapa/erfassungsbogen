@@ -137,12 +137,18 @@ export async function meldungPdfAnzeigen(m: MeldeEintrag, fenster: Window | null
 
 /**
  * Was die Übersichtsseite über eine Meldung wissen muss — Zeiten, Status,
- * Auftrag, Vorfassung. Gemeinsam für Sammel-PDF und Lageblatt.
+ * Auftrag, Vorfassung. Gemeinsam für Sammel-PDF und Lageblatt. `historie`
+ * ist die ganze Sammlung: beim Teilexport („nur neue Bögen") steckt die
+ * Vorfassung einer Folgemeldung nur noch dort.
  */
-function uebersichtEintrag(einsatz: Einsatzsammlung, m: MeldeEintrag): UebersichtEintrag {
+function uebersichtEintrag(
+  einsatz: Einsatzsammlung,
+  m: MeldeEintrag,
+  historie: MeldeEintrag[] = einsatz.eintraege,
+): UebersichtEintrag {
   // revisionen() liefert neueste zuerst — die Vorfassung steht direkt hinter
   // dieser Meldung. Fehlt sie, ist es eine Erstmeldung.
-  const revs = revisionen(einsatz.eintraege, m.einheitSchluessel);
+  const revs = revisionen(historie, m.einheitSchluessel);
   const idx = revs.findIndex((r) => r.id === m.id);
   const vorher = idx >= 0 ? revs[idx + 1]?.bogen : undefined;
   return {
@@ -164,7 +170,7 @@ function uebersichtEintrag(einsatz: Einsatzsammlung, m: MeldeEintrag): Uebersich
  * anwesende" war der Fehler: Papier und eingebettete Datei sagten Verschiedenes
  * (Analog-Audit A1), und bei null Anwesenden gab es gar keine Datei (W2).
  */
-function alleAktuellen(einsatz: Einsatzsammlung): MeldeEintrag[] {
+export function alleAktuellen(einsatz: Einsatzsammlung): MeldeEintrag[] {
   return neuesteJeEinheit(einsatz.eintraege).sort((a, b) =>
     einheitAnzeigename(a.bogen.einheit).localeCompare(einheitAnzeigename(b.bogen.einheit), "de"),
   );
@@ -175,44 +181,51 @@ function dateiRumpf(einsatz: Einsatzsammlung): string {
   return (einsatz.name || "sammlung").replace(/[^\wäöüÄÖÜß-]+/g, "_");
 }
 
-/** Fertiges Dokument ausgeben: Download im Browser, Share-Sheet in der App. */
-async function dokumentAusgeben(dd: Parameters<typeof pdfMake.createPdf>[0], dateiname: string): Promise<void> {
+/**
+ * Fertiges Dokument ausgeben: Download im Browser, Share-Sheet in der App.
+ * false = Share-Sheet abgebrochen; der Export-Stand verbucht dann nichts.
+ */
+async function dokumentAusgeben(dd: Parameters<typeof pdfMake.createPdf>[0], dateiname: string): Promise<boolean> {
   if (istNativ()) {
     const base64 = await pdfMake.createPdf(dd).getBase64();
-    await binaerTeilen(dateiname, base64);
-  } else {
-    pdfMake.createPdf(dd).download(dateiname);
+    return binaerTeilen(dateiname, base64);
   }
+  pdfMake.createPdf(dd).download(dateiname);
+  return true;
 }
 
 /**
- * Sammel-PDF: Übergabe-Übersicht plus alle Bögen plus eingebettete Sammlung.
- * `meldungen` ist nur noch eine Auswahl für Sonderfälle; ohne Angabe gehen
- * ALLE aktuellen Meldungen je Einheit hinein (inkl. abgerückte und Übungen) —
- * auch bei null anwesenden Einheiten entsteht ein Dokument.
+ * Sammel-PDF: Übergabe-Übersicht plus Bögen plus eingebettete Sammlung.
+ * Ohne `meldungen` gehen ALLE aktuellen Meldungen je Einheit hinein (inkl.
+ * abgerückte und Übungen) — auch bei null anwesenden Einheiten entsteht ein
+ * Dokument. Beim Teilexport ist `einsatz` schon auf die neuen Bögen
+ * zugeschnitten (export-stand.ts); `historie` ist dann die ganze Sammlung,
+ * aus der die Vorfassung einer Folgemeldung für den Diff kommt.
  */
 export async function einsatzPdfErzeugen(
   einsatz: Einsatzsammlung,
   meldungen: MeldeEintrag[] = alleAktuellen(einsatz),
-): Promise<void> {
+  historie: MeldeEintrag[] = einsatz.eintraege,
+): Promise<boolean> {
   const boegenMitQr: SammelBogen[] = [];
   for (const m of meldungen) {
     boegenMitQr.push({
-      ...uebersichtEintrag(einsatz, m),
+      ...uebersichtEintrag(einsatz, m, historie),
       qr: await qrErzeugen(m.bogen, herkunftBytes(m)),
     });
   }
   const dd = einsatzPdfDokument(einsatz.name, boegenMitQr, einsatzDateiInhalt(einsatz));
-  await dokumentAusgeben(dd, `eeb-einsatz-${natoZeitstempel()}_${dateiRumpf(einsatz)}.pdf`);
+  return dokumentAusgeben(dd, `eeb-einsatz-${natoZeitstempel()}_${dateiRumpf(einsatz)}.pdf`);
 }
 
 /**
  * Lageblatt: nur die Übersichtsseite (Einheiten mit Zeiten, Bedarf, Züge) als
  * A4 quer — ohne Bögen und ohne QR-Codes, deshalb in Sekundenbruchteilen
- * fertig. Das Blatt für die Wand (Analog-Audit A3/A4).
+ * fertig. Das Blatt für die Wand (Analog-Audit A3/A4). Immer der ganze
+ * Einsatz: die Wand braucht die Lage, nicht die Lieferung.
  */
-export async function einsatzLageblattErzeugen(einsatz: Einsatzsammlung): Promise<void> {
+export async function einsatzLageblattErzeugen(einsatz: Einsatzsammlung): Promise<boolean> {
   const eintraege = alleAktuellen(einsatz).map((m) => uebersichtEintrag(einsatz, m));
   const dd = einsatzLageblattDokument(einsatz.name, eintraege);
-  await dokumentAusgeben(dd, `eeb-lageblatt-${natoZeitstempel()}_${dateiRumpf(einsatz)}.pdf`);
+  return dokumentAusgeben(dd, `eeb-lageblatt-${natoZeitstempel()}_${dateiRumpf(einsatz)}.pdf`);
 }

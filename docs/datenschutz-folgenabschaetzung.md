@@ -23,6 +23,11 @@ Grundlage: Repository `wattnpapa/erfassungsbogen`, Stand 2026-09-12 — Version 
 > Vorlage (Mannschaftsliste einer Einheit) lässt sich als QR-Code, Link oder
 > JSON-Datei weitergeben, ausdrücklich auch zur Ablage in einer Cloud. Geändert:
 > 5.1, 5.5, 5.8.
+>
+> **Nachgezogen 2026-09-27 — Teilexport „Nur neue Bögen seit dem letzten
+> Export":** Der Meldekopf kann dem Stab nur die seit der letzten Weitergabe
+> neuen Meldungen nachliefern; dafür merkt sich die App je Einsatz-Sammlung die
+> Kennungen der bereits exportierten Meldungen. Geändert: 5.7.
 
 ## Hinweis zu diesem Dokument
 
@@ -297,6 +302,14 @@ Kapitel 6 der [Arc42-Dokumentation](arc42-architektur.md).
 - **Strukturelle Grenze:** Sobald ein Bogen als QR-Code gescannt, als PDF
   gedruckt oder als Datei exportiert wurde, hat die App auf diese Kopien keinen
   Zugriff mehr (vertiefend 6.3).
+- **Export-Stand (seit 2026-09-27):** Damit der Meldekopf dem Stab nur die seit
+  dem letzten Export neuen Bögen nachliefern kann, merkt sich die App je
+  Einsatz-Sammlung die Kennungen der bereits exportierten Meldungen und den
+  Zeitpunkt (`src/app/export-stand.ts`, `eeb.export-stand.v1`). Das sind keine
+  Personendaten; der Eintrag wird mit „Alle Daten löschen" entfernt und beim
+  nächsten Export um Stände endgültig gelöschter Sammlungen bereinigt. Er
+  verkleinert die Zahl der weitergegebenen Kopien (Datenminimierung beim
+  Empfänger), ersetzt aber keine Löschregel dort.
 - **Empfehlung:** eine eigene, dokumentierte Löschfrist für digital gespeicherte
   Bögen und für Papierausdrucke festlegen, da die Software selbst keine erzwingt.
 - **Geräteschlüssel:** Der private Signaturschlüssel lässt sich einzeln

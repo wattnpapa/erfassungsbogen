@@ -421,6 +421,12 @@ localStorage-Hülle getrennt und unit-getestet.
   anwesenden Einheiten.
 - [src/app/einsatz-transport.ts](../src/app/einsatz-transport.ts) — Export/Import
   als JSON-Datei sowie Import aus dem in Sammel-PDFs eingebetteten JSON (pako).
+- [src/app/export-stand.ts](../src/app/export-stand.ts) — merkt je Einsatz,
+  welche Meldungen beim letzten Export schon in der Sammlung standen
+  (Kennungen, nicht Empfangszeiten: importierte Bögen tragen fremde Zeiten).
+  Darauf beruht das Kästchen „Nur neue Bögen seit dem letzten Export", das alle
+  vier Ausgabewege der Einsatzansicht umschaltet. Verbucht wird erst nach
+  gelungenem Export; ein abgebrochenes Share-Sheet zählt nicht.
 - [src/app/qr-stapel.ts](../src/app/qr-stapel.ts) — viele QR-Bilder auf einmal
   (Mehrfachauswahl oder Ordner). Liest die Dateien nacheinander (parallel wären
   n entpackte Bitmaps gleichzeitig im Speicher), sammelt Teile mehrteiliger

@@ -23,6 +23,10 @@ Grundlage: Repository `wattnpapa/erfassungsbogen`, Stand 2026-09-12 — Version 
 > **Nachgezogen 2026-09-23:** „Vorlage teilen" (Issue #26) — eine einzelne
 > Vorlage lässt sich als signierter QR-Code/Link oder als unsignierte
 > JSON-Datei weitergeben und wieder einlesen (3.3 D5, 5.4).
+>
+> **Nachgezogen 2026-09-27:** Teilexport „Nur neue Bögen seit dem letzten
+> Export" — die App merkt sich je Einsatz-Sammlung, welche Meldungen schon
+> exportiert wurden (3.3 D2b, 5.4).
 
 ## Hinweis zu diesem Dokument
 
@@ -150,8 +154,9 @@ dem Vite-Build); es gibt keine serverseitige Variante.
 | D1 | Erfassungsbogen-Entwurf | Aktuell bearbeiteter Bogen (Personal, Fahrzeuge, Einsatz, Sofortbedarf); Personaldaten 90 Tage nach der letzten Änderung anonymisiert, außer bei Übungen (5.5). Wird eine Vorlage bearbeitet, trägt der Entwurf zusätzlich deren Kennung (`vorlageId`, keine Personendaten) | `localStorage` des Geräts |
 | D2 | Gesicherte/archivierte Bögen | Übergebene bzw. empfangene Bögen inkl. Papierkorb (vor endgültiger Löschung); Meldungen der Einsatz-Sammlung unterliegen derselben Datenschutzfrist, Vorlagen nicht (5.5) | `localStorage` des Geräts |
 | D2a | Uhrstand der Datenschutzfrist | Zuletzt akzeptierter Zeitpunkt der Geräteuhr, ggf. unbestätigter Sprung; keine Personendaten | `localStorage` des Geräts (`eeb.uhr.v1`) |
-| D2b | Zusatzfelder je Meldung der Einsatz-Sammlung | Eintreff- und Abrückzeit (`eingetroffenAm`, `abgerueckAm`, Geräteuhr) sowie eine Notiz/Auftrag der Führungsstelle (`notiz`, Freitext — kann Personenbezug enthalten, z. B. „Rückruf Hr. Meyer 15:00"). Reisen mit der Sammlung in Sammel-PDF und Einsatz-Transport mit; unterliegen mit der Meldung dem Papierkorb und der Löschung (`src/app/eintrag-zeiten.ts`) | `localStorage` des Geräts (`eeb.einsaetze.v1`, am Eintrag) |
-| D2c | Zuletzt offene Sammlung | Kennung und Zeitpunkt der zuletzt geöffneten Einsatz-Sammlung, 12 Stunden gültig; keine Personendaten | `localStorage` des Geräts (`eeb.letzterEinsatz.v1`) |
+| D2b | Export-Stand je Einsatz-Sammlung | Kennungen der Meldungen, die beim letzten Export (Sammel-PDF, CSV, Excel) schon in der Sammlung standen, samt Zeitpunkt — Grundlage für „Nur neue Bögen seit dem letzten Export" (5.4); keine Personendaten, nur zufällige Kennungen | `localStorage` des Geräts (`eeb.export-stand.v1`), wandert mit der Datensicherung mit, fällt mit „Alle Daten löschen" weg |
+| D2c | Zusatzfelder je Meldung der Einsatz-Sammlung | Eintreff- und Abrückzeit (`eingetroffenAm`, `abgerueckAm`, Geräteuhr) sowie eine Notiz/Auftrag der Führungsstelle (`notiz`, Freitext — kann Personenbezug enthalten, z. B. „Rückruf Hr. Meyer 15:00"). Reisen mit der Sammlung in Sammel-PDF und Einsatz-Transport mit; unterliegen mit der Meldung dem Papierkorb und der Löschung (`src/app/eintrag-zeiten.ts`) | `localStorage` des Geräts (`eeb.einsaetze.v1`, am Eintrag) |
+| D2d | Zuletzt offene Sammlung | Kennung und Zeitpunkt der zuletzt geöffneten Einsatz-Sammlung, 12 Stunden gültig; keine Personendaten | `localStorage` des Geräts (`eeb.letzterEinsatz.v1`) |
 | D3 | Absenderkarte | Freiwillige Kontaktangabe (Name/E-Mail/Telefon) der meldenden Person | `localStorage` des Geräts |
 | D4 | Privater Geräteschlüssel | Ed25519-Schlüssel zur Signatur weitergereichter Bögen | `localStorage` des Geräts, **unverschlüsselt als Hex** |
 | D5 | QR-Payload / Exportdatei | Binär kodierter, komprimierter Bogen zur Übergabe an ein zweites Gerät; ebenso eine geteilte Vorlage (QR/Link mit Marker `V.`, oder JSON-Datei `eeb-vorlage-*.json`) | Transient (QR-Code-Anzeige) bzw. Datei auf dem Gerät oder in einer vom Nutzer gewählten Ablage (z. B. Cloud-Ordner) |
@@ -309,6 +314,16 @@ Datenausleitung an eine andere Herkunft ist technisch unterbunden.
   bestehenden Formel-Abwehr. Die Sammel-PDF entsteht auch ohne anwesende
   Einheiten (Einsatzende). Wohin Ausdruck und Datei gelangen, entscheidet
   weiterhin der Nutzer (DSFA 5.8).
+
+- **Teilexport „Nur neue Bögen seit dem letzten Export"**
+  (`src/app/export-stand.ts`, seit 2026-09-27): Sammel-PDF, beide CSV-Wege und
+  die Excel-Liste lassen sich auf die Meldungen beschränken, die beim letzten
+  Export dieses Einsatzes noch nicht in der Sammlung standen. Die Sammel-PDF
+  bettet dann auch nur diese Meldungen als JSON ein; die Vorfassung einer
+  Folgemeldung dient nur dem Diff auf der Seite. Als „übergeben" gilt der
+  Stand erst nach gelungenem Export — ein abgebrochenes Share-Sheet der App
+  verbucht nichts (`nativ.ts`: `teilen()` meldet den Abbruch). Vorgabe bleibt
+  der Gesamtexport; die Wahl wird nicht gespeichert.
 - **Vorlage teilen** (`src/app/vorlagen-ui.tsx`, `vorlagen.ts`,
   `vorlageTransportErzeugen` in `hilfen.ts`, seit 2026-09-23): QR-Code und Link
   tragen die Vorlage mit dem Geräteschlüssel signiert, wie beim Bogen. Die

@@ -1464,8 +1464,15 @@
        „Löschen" bleibt rechts, klappt bei Platzmangel sauber in die nächste Zeile. */
     .vorlage-aktionen { margin-top: 0.6rem; display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; }
     .vorlage-aktionen .entfernen { float: none; margin-left: auto; }
-    /* Ausgabewege der Einsatz-Sammlung (siehe einsaetze-ui.tsx). */
-    .einsatz-ausgaben { margin-top: var(--r-4); margin-bottom: var(--r-5); }
+    /* Ausgabewege der Einsatz-Sammlung (siehe einsaetze-ui.tsx). Das Kästchen
+       „nur neue Bögen" steht als Kopf der Ausgabezeile direkt darüber: es
+       gehört zu den vier Knöpfen darunter, nicht zur Aufnahmezeile davor. */
+    /* Weitergabe und Lageblatt stehen über dem Kästchen: sie geben immer den
+       ganzen Einsatz aus, das Kästchen gilt nur den vier Stab-Ausgaben darunter. */
+    .einsatz-weitergabe { margin-top: var(--r-4); }
+    .export-umfang { margin-top: var(--r-3); }
+    .export-umfang .hinweis { display: block; margin-left: 0.2rem; }
+    .einsatz-ausgaben { margin-top: var(--r-2); margin-bottom: var(--r-5); }
     /* Stärke als Instrumentenleiste: die Zahl ist das Fachliche, also groß und
        dicktengleich; die Beschriftung tritt als gesperrte Versalzeile zurück.
        Die Gesamtsumme trägt als einzige die Kennfarbe. */
