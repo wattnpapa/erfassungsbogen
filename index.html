@@ -3873,6 +3873,15 @@
     @media (max-width: 30rem) {
       .zeile > label.feld.datum { flex: 1 1 100%; }
     }
+    /* R2-G5: Im Querformat (über 540 px, also Zeile statt Stapel) stand in
+       Rückfragen mit benannten Wegen die gefährliche Aktion in voller
+       Breite, „Abbrechen" dagegen 152 × 44 px unten links — das kleinste
+       Ziel war ausgerechnet der Rückweg. Die Knöpfe der Antwortzeile teilen
+       sich jetzt die Breite: ein einzelnes „Abbrechen" ist so breit wie die
+       Wege darüber, OK und Abbrechen sind gleich groß. */
+    @media (min-width: 540.02px) {
+      .abfrage-aktionen > button { flex: 1 1 0; }
+    }
   </style>
 </head>
 <body>

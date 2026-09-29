@@ -90,6 +90,12 @@ describe("Datumsfelder (R2-H8)", () => {
   });
 });
 
+describe("Antwortknöpfe der Rückfragen im Querformat (R2-G5)", () => {
+  it("teilen sich die Breite — „Abbrechen“ ist nicht das kleinste Ziel", () => {
+    expect(bloecke(".abfrage-aktionen > button").join("")).toMatch(/flex:\s*1 1 0/);
+  });
+});
+
 describe("Fokus in der Schrittleiste (R2-L4)", () => {
   it("zeichnet den Fokusrahmen in der Kopf-Schriftfarbe, nicht in der Kennfarbe des Balkens", () => {
     const regel = bloecke(":root:not(.platform-ios):not(.platform-android) .schritte button:focus-visible").join("\n");

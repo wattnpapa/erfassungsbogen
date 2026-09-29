@@ -601,13 +601,51 @@ describe("Vorschlagsfelder für Funktion und Qualifikation", () => {
     expect(screen.queryByText(/^411 /)).toBeNull();
   });
 
-  it("zeigt ohne Eingabe keine Vorschläge", async () => {
+  it("zeigt im leeren Qualifikationsfeld keine Vorschläge", async () => {
     const nutzer = userEvent.setup();
     await mitPerson(nutzer);
 
-    await nutzer.click(screen.getByLabelText("Funktion hinzufügen"));
+    await nutzer.click(screen.getByLabelText("Qualifikation hinzufügen"));
 
     expect(document.querySelector("ul.vorschlaege")).toBeNull();
+  });
+
+  /**
+   * Audit Runde 2, R2-G5: Das Funktionsfeld zeigte beim Antippen nichts —
+   * jede Funktion hieß Tastatur auf, Buchstabe tippen, Vorschlag wählen. Jetzt
+   * bietet das leere Feld die häufigsten Funktionen der Einheit an (StAN,
+   * schon Vergebenes, beim THW Sprechfunk & Co.); eine Funktion lässt sich
+   * mit zwei Tipps zuweisen.
+   */
+  it("bietet im leeren Funktionsfeld die häufigsten Funktionen der Einheit zum Antippen an", async () => {
+    const nutzer = userEvent.setup();
+    const einheitsTyp = { code: 4 }; // B – Bergungsgruppe: GrFü, TrFü, 7 Helfer
+    const bogen = neuerBogen();
+    render(
+      <SchrittBuehne
+        komponente={SchrittPersonal}
+        bogen={{ ...bogen, einheit: { ...bogen.einheit, einheitsTyp }, personal: [neuePerson()] }}
+      />,
+    );
+
+    await nutzer.click(screen.getByLabelText("Funktion hinzufügen"));
+    const liste = screen.getByRole("listbox");
+    const zeilen = within(liste).getAllByRole("option").map((z) => z.textContent);
+    expect(zeilen).toEqual([
+      "HeFachhelfer/in",
+      "GrFüGruppenführer/in",
+      "TrFüTruppführer/in",
+      "SprSprechfunker/in",
+      "SanHeSanitätshelfer/in",
+      "AGTAtemschutzgeräteträger/in",
+    ]);
+
+    await nutzer.click(within(liste).getByText("Spr"));
+    expect(screen.getByRole("button", { name: "Spr entfernen" })).toBeDefined();
+
+    // Schon Vergebenes fällt aus dem Angebot.
+    await nutzer.click(screen.getByLabelText("Funktion hinzufügen"));
+    expect(within(screen.getByRole("listbox")).queryByText("Spr")).toBeNull();
   });
 });
 

@@ -8,6 +8,7 @@ import { createContext, useContext, useEffect, useId, useState, type ComponentPr
 import { Erfassungsbogen, VokabularWert } from "@bos/eeb-format/model";
 import type { VokabularEintrag } from "@bos/vokabulare/thw";
 import { vokabSortiert, type Pruefpunkt } from "../hilfen";
+import { funktionVergeben } from "../haeufige-funktionen";
 
 export type SchrittProps = {
   bogen: Erfassungsbogen;
@@ -391,13 +392,27 @@ export function VokabListe(props: {
    * anderen Feld liegt. Liefert nichts, bleibt die Liste allein.
    */
   suchhinweis?: (suche: string) => ReactNode | undefined;
+  /**
+   * Was das LEERE Feld beim Antippen anbietet (häufigste Funktionen der
+   * Einheit, haeufige-funktionen.ts) — damit sich eine Funktion ohne
+   * Tastatur zuweisen lässt (Audit Runde 2, R2-G5). Schon gesetzte Werte
+   * fallen heraus.
+   */
+  haeufige?: readonly VokabularWert[];
 }) {
-  const { werte, aendern, tabelle, hinzufuegenText, freitextVorschlaege, suchhinweis } = props;
+  const { werte, aendern, tabelle, hinzufuegenText, freitextVorschlaege, suchhinweis, haeufige } = props;
   const [eingabe, setEingabe] = useState("");
 
   const suche = eingabe.trim().toLowerCase();
   const treffer: Kandidat[] = [];
-  if (suche) {
+  if (!suche) {
+    for (const w of haeufige ?? []) {
+      if (funktionVergeben(werte, w)) continue;
+      const t = w.code != null ? tabelle.find((x) => x.code === w.code) : undefined;
+      if (w.code != null && !t) continue; // Code aus fremder Tabelle: lieber nicht als „#12" anbieten
+      treffer.push(t ? { text: t.kurz, zusatz: t.name, wert: w } : { text: w.freitext ?? "", wert: w });
+    }
+  } else {
     // vokabSortiert: gleiche Reihenfolge wie in den Auswahllisten der App,
     // damit Gleichartiges beieinander steht („GrFü B", „GrFü BrB", „GrFü E").
     for (const t of vokabSortiert(tabelle)) {

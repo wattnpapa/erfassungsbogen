@@ -16,6 +16,7 @@ import {
   Person,
   PersonalErfassung,
   StaerkeRolle,
+  type VokabularWert,
   alleFahrerlaubnisse,
   staerke,
   unterbringungMWD,
@@ -24,6 +25,7 @@ import {
 import { namenEinsetzen, parseNamen } from "../personal-schnell";
 import { beispielPersonen } from "../beispielnamen";
 import { stanPersonalVorbelegung } from "@bos/vokabulare/thw-stan-personal";
+import { haeufigeFunktionen } from "../haeufige-funktionen";
 import {
   FE_TEXT,
   neuePerson,
@@ -318,6 +320,8 @@ function PersonKarte(props: {
   person: Person;
   org: OrganisationsTyp;
   vorschlaege: readonly FreitextVorschlag[];
+  /** Häufigste Funktionen der Einheit — das leere Funktionsfeld bietet sie zum Antippen an (R2-G5). */
+  haeufigeFunktionen: readonly VokabularWert[];
   /** Gerade hinzugefügt: die Karte stempelt sich einmal ein. */
   frisch?: boolean;
   /** Stelle in der Liste und Listenlänge — für die Umsortier-Knöpfe. */
@@ -331,7 +335,7 @@ function PersonKarte(props: {
   entfernen: () => void;
   verschieben: (von: number, nach: number, gruppe: "karte" | "zeile", art: "hoch" | "runter") => void;
 }) {
-  const { person: p, org, vorschlaege, frisch, index, anzahl, ansprech, nichtGezaehlt, aendern, entfernen, verschieben } = props;
+  const { person: p, org, vorschlaege, haeufigeFunktionen, frisch, index, anzahl, ansprech, nichtGezaehlt, aendern, entfernen, verschieben } = props;
   const karte = useRef<HTMLDivElement>(null);
   useEinzugsstempel(karte, frisch);
   const bezeichnung = personBezeichnung(p, index);
@@ -443,6 +447,7 @@ function PersonKarte(props: {
               tabelle={funktionen}
               hinzufuegenText="Funktion"
               suchhinweis={kraftfahrerHinweis}
+              haeufige={haeufigeFunktionen}
             />
           </Feld>
           {/* Zusatzqualifikationen kennen kein Code-Vokabular: Beruf, Lehrgang oder
@@ -670,6 +675,7 @@ export function SchrittPersonal({ bogen, aendern: aendernRoh }: SchrittProps) {
   const nurStaerke = bogen.personalErfassung === PersonalErfassung.NUR_STAERKE;
   const vorlage = stanPersonalVorbelegung(bogen.einheit.organisation, bogen.einheit.einheitsTyp);
   const stanGeladen = vorbelegungGeladen(bogen.personal, vorlage);
+  const funktionsauswahl = haeufigeFunktionen(bogen.einheit.organisation, vorlage, bogen.personal);
   const unbenannte = bogen.personal.filter(personUnbenannt).length;
   // Schnelleingabe: Tabellenansicht statt Detail-Karten; `fokusNeue` lässt den
   // Fokus beim Anlegen per Enter in die neue Zeile springen.
@@ -987,6 +993,7 @@ export function SchrittPersonal({ bogen, aendern: aendernRoh }: SchrittProps) {
             person={p}
             org={bogen.einheit.organisation}
             vorschlaege={vorschlaege}
+            haeufigeFunktionen={funktionsauswahl}
             frisch={p === frischeKarte}
             index={i}
             anzahl={bogen.personal.length}
