@@ -912,8 +912,14 @@ export function Uebersicht(props: {
             <button type="button" onClick={bogenLinkTeilen} disabled={!qr}>
               {linkKopiert ? "Link kopiert ✓" : "Link teilen"}
             </button>
+            {/* Der Link trägt den Bogen, aber nicht die App: Ein Gerät, das die
+                Seite nie mit Netz geöffnet hat, zeigt offline nur eine
+                Fehlerseite. Das muss der Absender vorher wissen, nicht der
+                Empfänger im Funkloch (Audit Runde 2, R2-O5). */}
             <p className="hinweis">
               Für Chat, Mail oder Notiz: derselbe Inhalt wie im QR-Code — öffnet den Bogen beim Antippen.
+              Ohne Netz öffnet er sich nur, wenn die Gegenstelle die App schon einmal mit Netz
+              geöffnet hat — sonst QR-Code oder PDF weitergeben (die PDF trägt den Bogen selbst).
             </p>
           </div>
           {/* Anders als die Wege darüber ist CSV eine Einbahnstraße: es trägt

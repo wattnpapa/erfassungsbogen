@@ -224,3 +224,21 @@ describe("Übersicht — PDF-Quittung", () => {
     expect(within(dialog).queryByText(/PDF gespeichert:/)).toBeNull();
   });
 });
+
+/**
+ * Link-Übergabe (Audit Runde 2, R2-O5): Der Link trägt den Bogen, nicht die
+ * App. Auf einem Gerät, das die App nie mit Netz geöffnet hat, zeigt er
+ * offline nur die Fehlerseite des Browsers — das muss am Link-Knopf stehen.
+ */
+describe("Übersicht — Hinweis zur Link-Übergabe", () => {
+  it("nennt die Voraussetzung der Gegenstelle und den Weg ohne Netz", async () => {
+    const nutzer = userEvent.setup();
+    render(<Uebersicht bogen={neuerBogen()} geheZu={() => {}} neu={() => {}} />);
+
+    await nutzer.click(screen.getByRole("button", { name: "Bogen übergeben…" }));
+
+    const dialog = document.querySelector<HTMLDialogElement>("dialog[aria-label='Bogen übergeben']")!;
+    expect(within(dialog).getByText(/schon einmal mit Netz geöffnet/)).toBeDefined();
+    expect(within(dialog).getByText(/sonst QR-Code oder PDF weitergeben/)).toBeDefined();
+  });
+});
