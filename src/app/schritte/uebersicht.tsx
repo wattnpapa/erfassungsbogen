@@ -510,7 +510,9 @@ export function Uebersicht(props: {
                 Stärke{" "}
                 <strong title={STAERKE_LEGENDE} aria-label={`Stärke: ${staerkeVorlesen(s)}`}>
                   {s.fuehrer} / {s.unterfuehrer} / {s.mannschaft} / {s.gesamt}
-                </strong>
+                </strong>{" "}
+                {/* Kurzlegende sichtbar statt nur im Tooltip (R2-N9). */}
+                <span className="hinweis" aria-hidden="true">(F / UF / M / Ges)</span>
               </span>
               <span title={MWD_LEGENDE}>Unterbringung: {mwdText}</span>
             </p>

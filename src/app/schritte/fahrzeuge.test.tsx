@@ -77,6 +77,18 @@ describe("Schritt Fahrzeuge", () => {
     expect(kennzahlen.value).toBe("18/13");
   });
 
+  /** R2-N9: Platzhalter als Beispiel der eigenen Organisation, „eigener Standort" erklärt. */
+  it("zeigt ein THW-Beispiel im Kennzeichen und erklärt „eigener Standort“", async () => {
+    const nutzer = userEvent.setup();
+    buehne();
+
+    await nutzer.click(screen.getByRole("button", { name: "+ Fahrzeug hinzufügen" }));
+    expect((screen.getByLabelText("Kennzeichen") as HTMLInputElement).placeholder).toBe("z. B. THW-84397");
+    await nutzer.click(screen.getByLabelText("Funkrufname"));
+
+    expect(screen.getByLabelText(/^eigener Standort/).closest("label")!.textContent).toMatch(/Ort im Funkrufnamen = Standort der Einheit/);
+  });
+
   it("lädt die StAN-Vorbelegung des Einheitstyps", async () => {
     const nutzer = userEvent.setup();
     // Ersten THW-Einheitstyp nehmen, für den es überhaupt eine Vorgabe gibt —

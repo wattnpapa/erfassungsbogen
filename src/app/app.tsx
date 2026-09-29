@@ -2479,7 +2479,8 @@ function AppInhalt() {
                   <span className="hinweis warnung-text">Einsatz {zeitraumDeutsch(bogen)}</span>
                 )}
                 <span className="hinweis">
-                  Stärke {s.fuehrer} / {s.unterfuehrer} / {s.mannschaft} / {s.gesamt}
+                  {/* Kurzlegende sichtbar: die Zahlen allein erklärte nur Schritt 3 (R2-N9). */}
+                  Stärke {s.fuehrer} / {s.unterfuehrer} / {s.mannschaft} / {s.gesamt} (F / UF / M / Ges)
                   {gespeichertUm
                     ? ` · gespeichert ${uhrzeitMitTag(gespeichertUm)} Uhr`
                     : ""}

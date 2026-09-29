@@ -18,6 +18,7 @@ import {
 } from "../hilfen";
 import { fahrzeugSymbolSvg, svgDataUrl } from "../taktische-zeichen-bogen";
 import { frageJaNein } from "../dialoge";
+import { einheitOrt } from "@bos/meldekopf/darstellung";
 import { mitAbgang, useEinzugsstempel } from "../eintrag-bewegung";
 import {
   Auswahl,
@@ -43,6 +44,8 @@ function sitzplatzEingabe(eingabe: string): number | undefined {
 function FahrzeugKarte(props: {
   fahrzeug: Fahrzeug;
   org: OrganisationsTyp;
+  /** Standort der Einheit aus Schritt 1 — erklärt „eigener Standort". */
+  standort: string;
   /** Berlin: Kennzahl des eigenen OV, die im Funkrufnamen vorn steht. */
   ovKennzahl?: number;
   /** Gerade hinzugefügt: die Karte stempelt sich einmal ein. */
@@ -53,7 +56,7 @@ function FahrzeugKarte(props: {
   aendern: (f: Fahrzeug) => void;
   entfernen: () => void;
 }) {
-  const { fahrzeug: f, org, ovKennzahl, frisch, index, anzahl, aendern, entfernen } = props;
+  const { fahrzeug: f, org, standort, ovKennzahl, frisch, index, anzahl, aendern, entfernen } = props;
   const bezeichnung = fahrzeugBezeichnung(f, index, org);
   const richtwert = sitzplaetzeRichtwert(f, vokabularFuer(org, "fahrzeug"));
   const karte = useRef<HTMLDivElement>(null);
@@ -79,7 +82,10 @@ function FahrzeugKarte(props: {
             id={`feld-kennzeichen-${index}`}
             value={f.kennzeichen ?? ""}
             onChange={(e) => set({ kennzeichen: e.target.value })}
-            placeholder="OL-FW 2041 / THW-84397"
+            // Beispiel der eigenen Organisation, mit „z. B." — das feste
+            // „OL-FW 2041 / THW-84397" sah wie ein eingetragener Wert aus und
+            // wurde ausgelassen (Audit Runde 2, R2-N9).
+            placeholder={org === OrganisationsTyp.THW ? "z. B. THW-84397" : "z. B. OL-FW 2041"}
           />
         </Feld>
         <Feld titel="Sitzplätze" schmal>
@@ -169,6 +175,10 @@ function FahrzeugKarte(props: {
                 onChange={(e) => set({ funkrufname: { ...f.funkrufname!, eigenerStandort: e.target.checked, ort: e.target.checked ? undefined : "" } })}
               />
               eigener Standort
+              {/* Ohne Erklärung blieb offen, was der Haken tut (R2-N9). */}
+              <span className="hinweis">
+                {" "}— Ort im Funkrufnamen = Standort der Einheit{standort ? ` (${standort})` : " aus Schritt 1"}
+              </span>
             </label>
             {!f.funkrufname.eigenerStandort && (
               <Feld titel="Ort" schmal>
@@ -274,6 +284,7 @@ export function SchrittFahrzeuge({ bogen, aendern }: SchrittProps) {
           key={i}
           fahrzeug={f}
           org={bogen.einheit.organisation}
+          standort={einheitOrt(bogen.einheit)}
           ovKennzahl={ovKennzahl}
           frisch={f === frisch}
           index={i}

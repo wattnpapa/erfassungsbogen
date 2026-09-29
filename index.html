@@ -1027,7 +1027,8 @@
        untereinander (Stärke je Rolle, Summen). Dicktengleiche Ziffern halten
        sie in der Flucht, statt die Zeile bei jeder Eingabe zucken zu lassen. */
     input[type="number"], output.abgeleitet { font-variant-numeric: tabular-nums; }
-    input::placeholder, textarea::placeholder { color: var(--text-3); }
+    /* Kursiv: ein Beispiel darf nicht wie ein eingetragener Wert aussehen (R2-N9). */
+    input::placeholder, textarea::placeholder { color: var(--text-3); font-style: italic; }
     input:focus, select:focus, textarea:focus {
       outline: var(--fokus) solid var(--akzent); outline-offset: 0; border-color: var(--akzent);
     }

@@ -179,6 +179,20 @@ function anzahlText(n: number, einzahl: string, mehrzahl: string): string {
   return `${n} ${n === 1 ? einzahl : mehrzahl}`;
 }
 
+/**
+ * Beispiel im Feld „Organisationsname" passend zur gewählten Organisation.
+ * Beim THW stand vorher „z. B. Freiwillige Feuerwehr Wardenburg" (R2-N9).
+ */
+const ORGANISATIONSNAME_BEISPIEL: Partial<Record<OrganisationsTyp, string>> = {
+  [OrganisationsTyp.THW]: "z. B. THW Ortsverband Ulm",
+  [OrganisationsTyp.FEUERWEHR]: "z. B. Freiwillige Feuerwehr Wardenburg",
+  [OrganisationsTyp.DRK]: "z. B. DRK-Kreisverband Oldenburg-Land",
+  [OrganisationsTyp.JUH]: "z. B. Johanniter-Unfall-Hilfe Regionalverband Weser-Ems",
+  [OrganisationsTyp.MHD]: "z. B. Malteser Hilfsdienst Oldenburg",
+  [OrganisationsTyp.ASB]: "z. B. ASB Regionalverband Oldenburg",
+  [OrganisationsTyp.DLRG]: "z. B. DLRG Ortsgruppe Wardenburg",
+};
+
 export function SchrittEinheit({ bogen, aendern: aendernRoh }: SchrittProps) {
   const e = bogen.einheit;
   // Vorbelegung und Typwechsel verändern die Personalliste — der Verpflegungs-
@@ -362,7 +376,7 @@ export function SchrittEinheit({ bogen, aendern: aendernRoh }: SchrittProps) {
           <input
             value={e.organisationName ?? ""}
             onChange={(ev) => setE({ organisationName: ev.target.value || undefined })}
-            placeholder="z. B. Freiwillige Feuerwehr Wardenburg"
+            placeholder={ORGANISATIONSNAME_BEISPIEL[e.organisation] ?? "z. B. Name der Organisation"}
           />
         </Feld>
       </div>
