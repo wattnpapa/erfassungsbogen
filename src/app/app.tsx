@@ -51,6 +51,7 @@ import { Kopfnav } from "./kopfnav-ui";
 import { bogenLinksEmpfangen, imWebBrowser, istNativ, qrScannen, textTeilen } from "./nativ";
 import { fehlerText } from "./nachladen";
 import { dateiFehlerMeldung } from "./datei-fehler";
+import { FehlerImBild } from "./fehler-im-bild";
 import { entwirreScanText } from "./tastaturbelegung";
 import { vorlageAktualisieren, vorlageAnlegen, vorlageAusDatei, vorlagenLaden, vorlagenPapierkorb, vorlageZuruecksetzen, type Vorlage } from "./vorlagen";
 import { Musterung, VorlagenListe } from "./vorlagen-ui";
@@ -2489,7 +2490,9 @@ function AppInhalt() {
             )}
           </p>
         )}
-        {fehler && <p className="fehler">{fehler}</p>}
+        {/* Holt sich ins Bild und wird angesagt: die Knöpfe sitzen weit
+            unter dieser Zeile (Audit Runde 2, R2-L2). */}
+        {fehler && <FehlerImBild text={fehler} />}
         {/* Ohne Kamera-Overlay (nativer Scan, „QR aus Bild einlesen") steht der
             Fortschritt hier — mit derselben Kästchenzeile, damit auch dieser
             Weg zeigt, welcher Teil noch aussteht. */}
