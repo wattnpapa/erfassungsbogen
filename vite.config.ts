@@ -265,7 +265,10 @@ export default defineConfig({
         // wasm ebenso: der QR-Decoder (ZXing) liegt als WebAssembly-Datei im
         // Bundle — fehlte sie offline, fiele der Scanner auf jsQR mit
         // kleinerer Reichweite zurück.
-        globPatterns: ["**/*.{js,css,html,svg,png,webmanifest,woff2,wasm,json}"],
+        globPatterns: ["**/*.{js,css,html,svg,png,webmanifest,woff2,wasm,json}", "downloads/*.pdf"],
+        // downloads/*.pdf: der Blanko-Vordruck ist die Papier-Rückfallebene —
+        // gebraucht genau dann, wenn Gerät oder Netz ausfallen. Offline gab
+        // der direkte Aufruf ERR_INTERNET_DISCONNECTED (Audit Runde 2, R2-O7).
         // json: die Beispielbögen (examples/**/*.json, ~450 kleine Dateien)
         // werden erst beim Anklicken geladen — ohne Precache reagierte der
         // Beispiele-Dialog offline gar nicht (Audit „Offline und Speicher", O2).

@@ -853,7 +853,7 @@ sequenceDiagram
   Nutzer->>Browser: erster Aufruf von erfassungsbogen.app
   Browser->>Netz: App-Shell laden (HTML/JS/CSS, Icons, manifest, woff2, wasm)
   Browser->>SW: Service Worker installieren
-  SW->>SW: precache App-Shell (globPatterns inkl. wasm/woff2/json der Beispielbögen)
+  SW->>SW: precache App-Shell (globPatterns inkl. wasm/woff2/json der Beispielbögen und Blanko-Vordruck downloads/*.pdf)
   SW-->>Browser: clientsClaim() – übernimmt sofort die laufende Seite
   Note over Nutzer,Netz: Gerät verliert Netzverbindung
   Nutzer->>Browser: erneuter Aufruf / weiter benutzen
@@ -869,6 +869,12 @@ Klick aus dem Netz, und ein Funkloch direkt nach dem ersten Aufruf hätte „err
 loading dynamically imported module" zur Folge (`docs/entwicklung.md`,
 abgesichert durch das Szenario „Die PDF entsteht auch ohne Netz und ohne
 Neuladen" in `features/uebergabe.feature`).
+
+*Nachgezogen 2026-09-29 (Audit Runde 2, R2-O7):* Der Blanko-Vordruck
+`downloads/einheiten-erfassungsbogen-blanko.pdf` (rund 11 KB) liegt jetzt im
+Precache. Er ist die Papier-Rückfallebene und wird gerade dann gebraucht, wenn
+kein Netz da ist; vorher lieferte der direkte Aufruf offline
+`ERR_INTERNET_DISCONNECTED`.
 
 ### 6.5 Desktop-Auto-Update (Electron)
 

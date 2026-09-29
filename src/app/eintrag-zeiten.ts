@@ -122,7 +122,8 @@ export class SpeicherVollFehler extends Error {
   constructor(ursache?: unknown) {
     super(
       "Speichern fehlgeschlagen — der Speicher dieses Geräts ist voll. " +
-        "Alte Einsätze in den Papierkorb legen und den Papierkorb leeren, oder vorher eine Sicherung erstellen.",
+        "Platz schafft nur Löschen: nicht mehr benötigte Einsätze in den Papierkorb legen und den Papierkorb leeren " +
+        "(bei Bedarf vorher sichern — die Sicherung selbst schafft keinen Platz).",
     );
     this.name = "SpeicherVollFehler";
     (this as { cause?: unknown }).cause = ursache;
@@ -338,11 +339,16 @@ export function meldungAufnehmen(
 }
 
 /**
- * Wie voll ist der Speicher? Grobe Schätzung über die Länge aller Einträge
- * (UTF-16, zwei Byte je Zeichen) — die Browser nennen ihr Limit nicht, üblich
- * sind rund 5 MB. Rückgabe in Byte; null ohne Speicher.
+ * Wie voll ist der Speicher? Die Browser nennen ihr Limit nicht; Chromium lässt
+ * je Herkunft rund 5 Mio. Zeichen zu (Schlüssel + Wert, UTF-16 intern 10 MB),
+ * Firefox und Safari ähnlich (jsdom: genau 5 000 000 Codeeinheiten). Vorher rechnete die Anzeige Zeichen × 2 gegen
+ * 5 MB und kam bei vollem Speicher auf „10 von 5 MB" (Audit Runde 2, R2-O7).
+ * Gerechnet wird jetzt in Zeichen gegen diese Grenze; `anteil` ist auf 1
+ * gedeckelt. Null ohne Speicher.
  */
-export function speicherBelegung(): { belegt: number; grenze: number } | null {
+export const SPEICHER_GRENZE_ZEICHEN = 5_000_000;
+
+export function speicherBelegung(): { belegt: number; grenze: number; anteil: number } | null {
   let s: Storage | null;
   try {
     s = globalThis.localStorage ?? null;
@@ -356,13 +362,33 @@ export function speicherBelegung(): { belegt: number; grenze: number } | null {
     if (k == null) continue;
     zeichen += k.length + (s.getItem(k)?.length ?? 0);
   }
-  return { belegt: zeichen * 2, grenze: 5 * 1024 * 1024 };
+  return { belegt: zeichen, grenze: SPEICHER_GRENZE_ZEICHEN, anteil: Math.min(1, zeichen / SPEICHER_GRENZE_ZEICHEN) };
 }
 
-/** „3,8 von 5 MB" */
-export function speicherText(b: { belegt: number; grenze: number }): string {
-  const mb = (n: number) => (n / (1024 * 1024)).toLocaleString("de-DE", { maximumFractionDigits: 1 });
-  return `${mb(b.belegt)} von ${mb(b.grenze)} MB`;
+/** „etwa 38 % (1,9 von 5 Mio. Zeichen)" — nie über 100 %. */
+export function speicherText(b: { belegt: number; grenze: number; anteil?: number }): string {
+  const anteil = b.anteil ?? Math.min(1, b.belegt / b.grenze);
+  const mio = (n: number) => (n / 1_000_000).toLocaleString("de-DE", { maximumFractionDigits: 1 });
+  return `${Math.round(anteil * 100)} % (${mio(Math.min(b.belegt, b.grenze))} von ${mio(b.grenze)} Mio. Zeichen)`;
+}
+
+/**
+ * Welche Sammlungen belegen am meisten? Für den Aufräum-Hinweis: vorher hieß
+ * es nur „Papierkorb leeren", ohne zu sagen, wo der Platz steckt (R2-O7).
+ */
+export function speicherGroessteSammlungen(anzahl = 3): { name: string; papierkorb: boolean; anteil: number }[] {
+  const groesse = (x: Einsatzsammlung, papierkorb: boolean) => ({
+    name: x.name,
+    papierkorb,
+    anteil: JSON.stringify(x).length / SPEICHER_GRENZE_ZEICHEN,
+  });
+  try {
+    return [...einsaetzeLaden().map((x) => groesse(x, false)), ...einsaetzePapierkorb().map((x) => groesse(x, true))]
+      .sort((x, y) => y.anteil - x.anteil)
+      .slice(0, anzahl);
+  } catch {
+    return [];
+  }
 }
 
 /**

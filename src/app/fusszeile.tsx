@@ -29,6 +29,7 @@ import {
 import { dateiFehlerMeldung } from "./datei-fehler";
 import { geraeteKurzform, geraeteSchluesselLoeschen, geraeteSchluesselSicherstellen } from "./geraete-schluessel";
 import { speicherBelegung, speicherText } from "./eintrag-zeiten";
+import { groessteText } from "./speicher-warnung";
 import { dauerhaftenSpeicherAnfragen, speicherDauerhaft } from "./speicher-browser";
 
 const KONTAKT = "johannes.rudolph@thw-oldenburg.de";
@@ -1145,12 +1146,12 @@ function BestandListe({ bestand }: { bestand: BestandUmfang }) {
 function SpeicherStand() {
   const b = speicherBelegung();
   if (!b) return null;
-  const anteil = b.belegt / b.grenze;
+  const groesste = b.anteil >= 0.7 ? groessteText() : "";
   return (
-    <p className={anteil >= 0.7 ? "warnung" : "hinweis"} role="status">
+    <p className={b.anteil >= 0.7 ? "warnung" : "hinweis"} role="status">
       Belegter Speicher: etwa {speicherText(b)}.
-      {anteil >= 0.7
-        ? " Wird er voll, kann die App nichts mehr speichern — alte Einsätze in den Papierkorb legen und den Papierkorb leeren, vorher sichern."
+      {b.anteil >= 0.7
+        ? ` Wird er voll, kann die App nichts mehr speichern.${groesste ? ` Am meisten belegen: ${groesste}.` : ""} Platz schafft nur Löschen — alte Einsätze sichern, in den Papierkorb legen und den Papierkorb leeren; die Sicherung selbst schafft keinen Platz.`
         : ""}
     </p>
   );

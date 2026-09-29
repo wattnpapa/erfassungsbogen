@@ -105,6 +105,7 @@ import { orgFarbe, wendeOrgAkzentAn } from "./org-farben";
 import { einheitSymbolSvg, svgDataUrl } from "./taktische-zeichen-bogen";
 import { Fusszeile } from "./fusszeile";
 import { Aktualisierungshinweise } from "./aktualisierung";
+import { SpeicherWarnung } from "./speicher-warnung";
 import { Dialogschicht, frageFelder, frageJaNein, frageWahl, zeigeHinweis } from "./dialoge";
 import {
   SchrittEinheit,
@@ -2346,6 +2347,7 @@ function AppInhalt() {
     return (
       <>
         <Aktualisierungshinweise />
+        <SpeicherWarnung stand={einsaetze} />
         <EinsatzDetail
           einsatz={offenerEinsatz}
           onZurueck={() => { setOffenerEinsatzId(null); setZeigeStart(true); setMeldung(""); setEingang(null); }}
@@ -2441,6 +2443,7 @@ function AppInhalt() {
         )}
         {/* Die Zusage erst, wenn sie stimmt (R2-O1, offline-bereit.ts). */}
         <p className={`offline-badge${offline.stand === "bereit" ? "" : " offline-laedt"}`} role="status">{offlineText(offline)}</p>
+        <SpeicherWarnung stand={einsaetze} />
         {/* „Weiter, wo du warst": der Entwurf als Karte mit taktischem Zeichen,
             Kennfarbe der Organisation und Stärke — der häufigste Weg zurück in
             die Arbeit ist damit ein einziger Tipp. */}
