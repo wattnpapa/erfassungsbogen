@@ -114,6 +114,12 @@ Grundlage: Repository `wattnpapa/erfassungsbogen`, Stand 2026-09-12 — Version 
 > und Kennungen der weitergegebenen Meldungen (`eeb.weitergabe-stand.v1`,
 > keine Personendaten) und zeigt in der Einsatzansicht „Weitergegeben … —
 > seitdem hier n neue Meldungen". Kein neuer Empfänger. Geändert: 5.7.
+>
+> **Nachgezogen 2026-09-29 — Nummern und Zeitform auf Lageblatt und
+> Sammel-PDF (Audit Runde 2, R2-A6):** Jede Meldung trägt eine laufende
+> Nummer aus der Eingangsreihenfolge; Zeitpunkte stehen einheitlich als
+> „TT.MM.JJJJ, hh:mm". Keine neuen personenbezogenen Daten, kein neuer
+> Empfänger. Geändert: 5.1.
 
 ## Hinweis zu diesem Dokument
 

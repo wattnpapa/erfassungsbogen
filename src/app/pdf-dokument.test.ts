@@ -595,6 +595,24 @@ describe("einsatzLageblattDokument()", () => {
     expect((dd.content as { pageBreak?: string }[]).some((c) => c && c.pageBreak === "before")).toBe(false);
   });
 
+  it("beschriftet die Stärke-Linien des Blanko-Vordrucks (R2-A6)", () => {
+    const blanko = texte(pdfDokument(basisBogen(), null, { fahrzeuge: 1, personal: 1, qualifikationen: 1 }).content).join("\n");
+    expect(blanko).toContain("Stärke (F / UF / M / Ges.):");
+    const voll = texte(pdfDokument(basisBogen(), QR).content).join("\n");
+    expect(voll).not.toContain("Stärke (F / UF / M / Ges.):");
+  });
+
+  it("stellt die laufende Nummer der Meldung vor den Namen, wie an der Karte (R2-A6)", () => {
+    const t = texte(
+      einsatzLageblattDokument("Lage", [
+        { bogen: basisBogen(), nummer: 3 },
+        { bogen: basisBogen() },
+      ]).content,
+    ).join("\n");
+    expect(t).toContain("Nr. 3  ");
+    expect(t.match(/Nr\. \d/g)).toHaveLength(1);
+  });
+
   it("zeigt Zug und Bedarf je Einheit und Änderungen ohne Pfeil (R2-K3)", () => {
     const ruhe = basisBogen();
     ruhe.sofortbedarf = { ...ruhe.sofortbedarf!, ruhezeitErforderlich: true, dieselLiter: 200 };

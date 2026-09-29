@@ -24,6 +24,7 @@
  */
 
 import type { Einsatzsammlung, MeldeEintrag } from "@bos/meldekopf/einsaetze";
+import { zeitLang } from "./eintrag-zeiten";
 
 const SPEICHER_SCHLUESSEL = "eeb.export-stand.v1";
 /**
@@ -191,7 +192,12 @@ export function exportSammlung(einsatz: Einsatzsammlung, umfang: ExportUmfang, s
   return { ...einsatz, eintraege: neueEintraege(einsatz.eintraege, stand) };
 }
 
-/** „Sa. 21:55" — kurz genug für die Kästchenzeile neben den Export-Knöpfen. */
+/**
+ * Zeitpunkt von Export, Lageblatt und Weitergabe — in derselben Form wie auf
+ * Karte und Lageblatt: „29.09.2026, 16:44". Vorher „Mo., 16:44", das über
+ * eine Woche hinaus mehrdeutig war und neben „28.09.2026, 14:05" stand
+ * (Audit Runde 2, R2-A6).
+ */
 export function exportZeitKurz(zeitpunkt: number): string {
-  return new Date(zeitpunkt).toLocaleString("de-DE", { weekday: "short", hour: "2-digit", minute: "2-digit" });
+  return zeitLang(zeitpunkt);
 }

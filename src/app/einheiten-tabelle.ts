@@ -18,10 +18,10 @@
  */
 
 import { staerke, type Erfassungsbogen } from "@bos/eeb-format/model";
-import { einheitAnzeigename, orgLabel, vokabText, vokabularFuer, zeitgruppe } from "./hilfen";
+import { einheitAnzeigename, orgLabel, vokabText, vokabularFuer, zeitpunktDeutsch } from "./hilfen";
 import { MeldeStatus, type EinsatzArt, type MeldeEintrag } from "@bos/meldekopf/einsaetze";
 import { summiereBoegen, unterbringungLage, verpflegungLage, zaehltInLage, type EinsatzSummen } from "./auswertung";
-import { eintreffzeit, zeitKurz, zeitpunktZuMs } from "./eintrag-zeiten";
+import { eintreffzeit, zeitLang, zeitpunktZuMs } from "./eintrag-zeiten";
 
 // ------------------------------------------------------------ Bedarfsmarken
 
@@ -109,6 +109,26 @@ export function standIstAlt(e: MeldeEintrag): boolean {
   // bogen.stand ist ein EebZeitpunkt (Minuten), die Eintreffzeit Millisekunden
   // — erst umrechnen (Audit Runde 2, R2-N4).
   return eintreffzeit(e) - zeitpunktZuMs(e.bogen.stand) > STAND_ALT_MS;
+}
+
+/**
+ * Laufende Nummer je Meldung: die Einheiten in der Reihenfolge, in der sie in
+ * dieser Sammlung zum ersten Mal eingingen (erste Fassung, Empfangszeit) —
+ * auf Karte, Tabelle und Lageblatt dieselbe. Über Funk hieß eine Zeile des
+ * Lageblatts sonst „THW Biberach/Riß Fachgruppe Ortung (B)" (Audit Runde 2,
+ * R2-A6). Die Empfangszeit ist unveränderlich (anders als die korrigierbare
+ * Eintreffzeit) und reist beim Weitergeben mit; ein anderes Gerät mit
+ * derselben Sammlung vergibt also dieselben Nummern. Wird eine Einheit
+ * entfernt, rücken die späteren nach.
+ */
+export function meldungsNummern(eintraege: MeldeEintrag[]): Map<string, number> {
+  const erste = new Map<string, number>();
+  for (const e of eintraege) {
+    const bisher = erste.get(e.einheitSchluessel);
+    if (bisher == null || e.empfangenAm < bisher) erste.set(e.einheitSchluessel, e.empfangenAm);
+  }
+  const reihe = [...erste].sort((a, b) => a[1] - b[1] || (a[0] < b[0] ? -1 : a[0] > b[0] ? 1 : 0));
+  return new Map(reihe.map(([schluessel], i) => [schluessel, i + 1]));
 }
 
 /** „Neu": vor weniger als 30 Minuten eingetroffen — was seit der Übernahme dazukam. */
@@ -284,11 +304,14 @@ export function tabellenZeilen(eintraege: MeldeEintrag[], art?: EinsatzArt, jetz
       fahrzeuge: b.fahrzeuge.length,
       fahrzeugTypen: fahrzeugTypen(e),
       bedarf: bedarfKurztext(b),
-      eingetroffen: zeitKurz(eintreffzeit(e), jetzt),
+      // Eine Zeitform für Karte, Tabelle und Lageblatt: „29.09.2026, 14:05".
+      // Vorher stand hier „14:05" neben „170805jul26", auf dem Blatt
+      // „28.09.2026, 14:05" (Audit Runde 2, R2-A6).
+      eingetroffen: zeitLang(eintreffzeit(e)),
       eingetroffenAm: eintreffzeit(e),
-      abgerueckt: e.abgerueckAm != null ? zeitKurz(e.abgerueckAm, jetzt) : "",
+      abgerueckt: e.abgerueckAm != null ? zeitLang(e.abgerueckAm) : "",
       abgerueckAm: e.abgerueckAm ?? 0,
-      stand: zeitgruppe(b.stand),
+      stand: zeitpunktDeutsch(b.stand),
       standAlt: standIstAlt(e),
       auftrag: e.notiz ?? "",
       anwesend: e.status === MeldeStatus.ANWESEND,

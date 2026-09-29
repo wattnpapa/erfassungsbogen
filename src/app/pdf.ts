@@ -22,6 +22,7 @@ import { MeldeStatus, neuesteJeEinheit, revisionen, type Einsatzsammlung, type M
 import { zaehltInLage } from "./auswertung";
 import { eintreffzeit } from "./eintrag-zeiten";
 import { lageblattVermerken, weitergabeVermerken } from "./export-stand";
+import { meldungsNummern } from "./einheiten-tabelle";
 
 interface FontContainer {
   vfs: Record<string, string | { data: string; encoding?: string }>;
@@ -162,6 +163,9 @@ function uebersichtEintrag(
     abgerueckt: m.status !== MeldeStatus.ANWESEND,
     zaehlt: m.status === MeldeStatus.ANWESEND && zaehltInLage(einsatz.art, m.bogen),
     notiz: m.notiz,
+    // Über die ganze Sammlung gezählt — auch im Nachtrag „nur neue Bögen"
+    // dieselbe Nummer wie am Gerät (R2-A6).
+    nummer: meldungsNummern(historie).get(m.einheitSchluessel),
   };
 }
 

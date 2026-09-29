@@ -115,6 +115,11 @@ Grundlage: Repository `wattnpapa/erfassungsbogen`, Stand 2026-09-12 — Version 
 > der weitergegebenen Meldungen (neuer Speicherort `eeb.weitergabe-stand.v1`,
 > ohne Personendaten) und zeigt ihn in der Einsatzansicht und auf der
 > Startseitenkarte (3.3 D2i).
+>
+> **Nachgezogen 2026-09-29:** Lageblatt und Sammel-PDF (Audit Runde 2, R2-A6)
+> — laufende Nummer je Meldung („Nr. 3", aus der Eingangsreihenfolge, wie an
+> der Karte), Zeitpunkte einheitlich „TT.MM.JJJJ, hh:mm", Blanko-Vordruck mit
+> Stärke-Legende. Keine neuen Daten (5.4).
 
 ## Hinweis zu diesem Dokument
 

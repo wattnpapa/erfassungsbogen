@@ -27,6 +27,7 @@ import {
   hatSofortbedarf,
   passtZuBedarfsfilter,
   istNeu,
+  meldungsNummern,
   standIstAlt,
   summenBeschriftung,
   tabellenSumme,
@@ -120,8 +121,9 @@ describe("tabellenZeilen", () => {
       undefined,
       jetzt,
     );
-    expect(z!.eingetroffen).toBe("09:40");
-    expect(z!.abgerueckt).toBe("15:10");
+    // Mit Datum, in derselben Form wie Karte und Lageblatt (R2-A6).
+    expect(z!.eingetroffen).toBe("27.09.2026, 09:40");
+    expect(z!.abgerueckt).toBe("27.09.2026, 15:10");
     expect(z!.bedarf).toBe("Ruhezeit · Unterbr. · Diesel 400 l");
     expect(z!.auftrag).toBe("Deichabschnitt Nord");
     // Stand 100 (1970) liegt Jahrzehnte vor dem Eintreffen.
@@ -134,6 +136,17 @@ describe("tabellenZeilen", () => {
     expect(z!.abgerueckAm).toBe(0);
     expect(z!.bedarf).toBe("");
     expect(z!.auftrag).toBe("");
+  });
+});
+
+describe("meldungsNummern (Audit Runde 2, R2-A6)", () => {
+  it("nummeriert Einheiten nach dem ersten Eingang; Folgemeldungen und korrigierte Eintreffzeit ändern nichts", () => {
+    const a1 = eintrag("a1", bogen("Aalen", 1), { einheitSchluessel: "A", empfangenAm: 300 });
+    const b1 = eintrag("b1", bogen("Biberach", 1), { einheitSchluessel: "B", empfangenAm: 100, eingetroffenAm: 900 });
+    const a2 = eintrag("a2", bogen("Aalen", 2), { einheitSchluessel: "A", empfangenAm: 800 });
+    const c1 = eintrag("c1", bogen("Crailsheim", 1), { einheitSchluessel: "C", empfangenAm: 500 });
+    const nr = meldungsNummern([a2, c1, a1, b1]);
+    expect([nr.get("B"), nr.get("A"), nr.get("C")]).toEqual([1, 2, 3]);
   });
 });
 
@@ -252,8 +265,9 @@ describe("zeilenSortieren", () => {
     const spaet = eintrag("s", bogen("Spät", 1), { eingetroffenAm: new Date("2026-09-27T08:00").getTime() });
     const frueh = eintrag("f", bogen("Früh", 1), { eingetroffenAm: new Date("2026-09-26T23:00").getTime() });
     const sortiert = zeilenSortieren(tabellenZeilen([spaet, frueh], undefined, jetzt), "eingetroffen", "auf");
-    // Als Text käme „08:00" vor „26.09., 23:00" — als Zeitpunkt ist es umgekehrt.
-    expect(sortiert.map((z) => z.eingetroffen)).toEqual(["26.09., 23:00", "08:00"]);
+    // Als Text käme „27.09.…" nach „26.09.…" nur zufällig richtig — sortiert
+    // wird nach dem Zeitpunkt, nicht nach dem Text.
+    expect(sortiert.map((z) => z.eingetroffen)).toEqual(["26.09.2026, 23:00", "27.09.2026, 08:00"]);
   });
 
   it("hält jede Spalte sortierbar (kein Schlüssel ohne Wert)", () => {

@@ -92,6 +92,7 @@ import {
   bedarfMarken,
   gemerkteAnsicht,
   istNeu,
+  meldungsNummern,
   passtZuBedarfsfilter,
   type BedarfsFilter,
   merkeAnsicht,
@@ -750,6 +751,8 @@ export function EinsatzDetail(props: {
   // Gesamtzahl; `kopf` ist davon nur der gerade angezeigte Ausschnitt. Suche,
   // Filter und Sortierung ändern die Summen oben bewusst nicht.
   const alleEinheiten = neuesteJeEinheit(einsatz.eintraege);
+  // Laufende Nummer je Meldung — dieselbe wie auf dem Lageblatt (R2-A6).
+  const nummern = meldungsNummern(einsatz.eintraege);
   // Die zuletzt eingelesene Einheit (siehe `eingang`) — für die Quittung oben.
   const eingegangen = eingang ? alleEinheiten.find((e) => e.einheitSchluessel === eingang.schluessel) : undefined;
   /**
@@ -1297,7 +1300,7 @@ export function EinsatzDetail(props: {
             )}
           </p>
         )}
-        {ansicht === "tabelle" && kopf.length > 0 && <EinheitenTabelle meldungen={kopf} art={einsatz.art} eingang={eingang} />}
+        {ansicht === "tabelle" && kopf.length > 0 && <EinheitenTabelle meldungen={kopf} art={einsatz.art} eingang={eingang} nummern={nummern} />}
         {/* Eine Liste: das Vorleseprogramm nennt die Zahl der Einheiten und
             erlaubt den Sprung von Eintrag zu Eintrag (R2-M4). */}
         {ansicht === "karten" && kopf.length > 0 && (
@@ -1316,6 +1319,7 @@ export function EinsatzDetail(props: {
                 onStatusWechsel={(w) => { setAufgeteilt(null); setStatusWechsel(w); }}
                 onAufgeteilt={(a) => { setZuletztEntfernt(null); setStatusWechsel(null); setAufgeteilt(a); }}
                 kompakt={kompakt}
+                nummer={nummern.get(e.einheitSchluessel)}
               />
             ))}
           </ul>
@@ -1393,7 +1397,7 @@ export function EinsatzDetail(props: {
  * Einheit meldet den größten Verpflegungsbedarf?"). Zahlen starten dabei
  * absteigend — gefragt ist der größte Wert, nicht die Null.
  */
-function EinheitenTabelle({ meldungen, art, eingang }: { meldungen: MeldeEintrag[]; art: EinsatzArt; eingang?: Eingang | null }) {
+function EinheitenTabelle({ meldungen, art, eingang, nummern }: { meldungen: MeldeEintrag[]; art: EinsatzArt; eingang?: Eingang | null; nummern?: Map<string, number> }) {
   // null = Reihenfolge der Liste (Sortierauswahl der Leiste) unverändert
   // übernehmen. Erst ein Klick auf einen Spaltenkopf ordnet hier um.
   const [spalte, setSpalte] = useState<TabellenSpalte | null>(null);
@@ -1480,7 +1484,7 @@ function EinheitenTabelle({ meldungen, art, eingang }: { meldungen: MeldeEintrag
           </thead>
           <tbody>
             {sortiert.map((z) => (
-              <TabellenZeileZelle key={z.eintrag.einheitSchluessel} zeile={z} eingang={eingang} />
+              <TabellenZeileZelle key={z.eintrag.einheitSchluessel} zeile={z} eingang={eingang} nummer={nummern?.get(z.eintrag.einheitSchluessel)} />
             ))}
           </tbody>
           {/* Die Summe zählt nur die anwesenden Zeilen der Auswahl — abgerückte
@@ -1529,11 +1533,12 @@ function AltBadge() {
 }
 
 /** Eine Datenzeile — abgerückte Meldungen bleiben sichtbar, aber durchgestrichen. */
-function TabellenZeileZelle({ zeile: z, eingang }: { zeile: TabellenZeile; eingang?: Eingang | null }) {
+function TabellenZeileZelle({ zeile: z, eingang, nummer }: { zeile: TabellenZeile; eingang?: Eingang | null; nummer?: number }) {
   const zeile = useEingangsquittung<HTMLTableRowElement>(marke(eingang, z.eintrag.einheitSchluessel), { rollen: false });
   return (
     <tr ref={zeile} data-einheit={z.eintrag.einheitSchluessel} className={z.anwesend ? undefined : "gestrichen"}>
       <th scope="row">
+        {nummer != null ? <><span className="meldung-nr">Nr. {nummer}</span>{" "}</> : null}
         {z.einheit}
         {z.eintrag.bogen.uebung ? <span className="uebung-badge">ÜBUNG</span> : null}
         <AnonymBadge bogen={z.eintrag.bogen} />
@@ -1894,6 +1899,8 @@ function EinheitKarte(props: {
   kompakt?: boolean;
   /** Eben aufgeteilt — die Ansicht quittiert mit Rückweg (R2-D6). */
   onAufgeteilt?: (a: Aufgeteilt) => void;
+  /** Laufende Nummer der Meldung, wie auf dem Lageblatt (R2-A6). */
+  nummer?: number;
 }) {
   const { einsatzId, kopf, alle, onGeaendert, onEntfernt, qualifikation = "", qualifikationKurz = "", eingang, onStatusWechsel, kompakt = false } = props;
   // Auf dem Telefon zugeklappt, bis die Einheit angetippt wird (R2-K7).
@@ -2206,6 +2213,9 @@ function EinheitKarte(props: {
               in der Knopfliste 21× „Abrücken" ohne Einheit (Audit Runde 2,
               R2-M4). Der sichtbare Knopfname bleibt, wie er ist. */}
           <h3 className="muster-name" id={nameId}>
+            {/* Laufende Nummer vorn — „Meldung 3" über Funk, auf Blatt und
+                Gerät gleich (Audit Runde 2, R2-A6). */}
+            {props.nummer != null ? <><span className="meldung-nr">Nr. {props.nummer}</span>{" "}</> : null}
             {einheitAnzeigename(kopf.bogen.einheit)}
             {/* Übungsbögen bleiben auch neben echten Meldungen unübersehbar. */}
             {kopf.bogen.uebung ? <span className="uebung-badge">ÜBUNG</span> : null}
@@ -2215,7 +2225,11 @@ function EinheitKarte(props: {
             {kopf.teilEtikett ? <span className="teil-badge">{kopf.teilEtikett}</span> : null}
             {kopf.zugEtikett ? <span className="zug-badge"> {kopf.zugEtikett}</span> : null}
             {/* Was seit der Übernahme dazukam: jünger als 30 Minuten (K2). */}
-            {zaehlt && istNeu(kopf) ? <span className="neu-badge" title="Vor weniger als 30 Minuten eingetroffen">neu</span> : null}
+            {/* Nicht „neu": dasselbe Wort hieß ein paar Zeilen darüber „seit
+                dem letzten Export" — nach einem Export trugen alle Karten
+                weiter „neu", während die Exportzeile „keine neuen Bögen"
+                sagte (Audit Runde 2, R2-A6). */}
+            {zaehlt && istNeu(kopf) ? <span className="neu-badge" title="Vor weniger als 30 Minuten eingetroffen — unabhängig vom Export">kürzlich eingetroffen</span> : null}
             {/* Der Zustand als Wort statt über Deckkraft: 55 % drückten Stärke
                 und Abrückzeit unter 3:1 (Audit Runde 2, R2-L5). */}
             {!zaehlt ? <span className="status-badge">{abgerueckt ? "abgerückt" : "zusammengeführt"}</span> : null}
@@ -2244,7 +2258,8 @@ function EinheitKarte(props: {
               Nachtragen vom Papier ist der Moment des Abtippens nicht der des
               Eintreffens (Analog-Audit A2). */}
           <span className="muster-sub zeiten-zeile">
-            eingetroffen {zeitKurz(eintreffzeit(kopf))}{" "}
+            {/* Mit Datum, wie Tabelle und Lageblatt (R2-A6). */}
+            eingetroffen {zeitLang(eintreffzeit(kopf))}{" "}
             <button
               aria-describedby={nameId}
               type="button"
@@ -2256,7 +2271,7 @@ function EinheitKarte(props: {
             {abgerueckt && (
               <>
                 {" · abgerückt"}
-                {kopf.abgerueckAm != null ? ` ${zeitKurz(kopf.abgerueckAm)}` : ""}{" "}
+                {kopf.abgerueckAm != null ? ` ${zeitLang(kopf.abgerueckAm)}` : ""}{" "}
                 <button
                   aria-describedby={nameId}
                   type="button"

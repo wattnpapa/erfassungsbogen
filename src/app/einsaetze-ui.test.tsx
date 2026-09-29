@@ -616,7 +616,8 @@ describe("Abrücken mit Zeit, Quittung und Rückweg", () => {
     expect(nachher.slice(0, platz)).toEqual(vorher.slice(0, platz));
     expect(nachher[platz + 1]).toBe(vorher[platz + 1]);
     // Die Karte nennt die Abrückzeit ohne weiteren Tipp.
-    expect(document.querySelector(".zeiten-zeile")!.textContent).toMatch(/abgerückt \d\d:\d\d/);
+    // Mit Datum, wie Tabelle und Lageblatt (R2-A6).
+    expect(document.querySelector(".zeiten-zeile")!.textContent).toMatch(/abgerückt \d\d\.\d\d\.\d{4}, \d\d:\d\d/);
   });
 
   it("rollt um den Versatz nach, wenn die Karte beim Abrücken wächst — der Rückweg bleibt unter dem Finger", async () => {
@@ -678,7 +679,7 @@ describe("Zeiten, Auftrag und Bedarf auf der Karte", () => {
   it("zeigt die Eintreffzeit und lässt sie über „ändern“ korrigieren", async () => {
     const nutzer = userEvent.setup();
     const { einsatzId, geaendert } = buehne(["Wardenburg"]);
-    expect(document.querySelector(".zeiten-zeile")!.textContent).toMatch(/eingetroffen \d\d:\d\d/);
+    expect(document.querySelector(".zeiten-zeile")!.textContent).toMatch(/eingetroffen \d\d\.\d\d\.\d{4}, \d\d:\d\d/);
 
     await nutzer.click(screen.getByRole("button", { name: "ändern" }));
     const feld = screen.getByLabelText("Eingetroffen am") as HTMLInputElement;
@@ -1209,5 +1210,39 @@ describe("Übergabevermerk nach „Einsatz weitergeben / sichern“ (R2-W5)", ()
     expect(vermerk().textContent).toContain("seitdem hier 1 neue Meldung");
     expect(vermerk().textContent).toContain("erneut weitergeben");
     expect(vermerk().className).toContain("seitdem-neu");
+  });
+});
+
+/**
+ * Funk und Abgleich: eine Nummer je Meldung auf Karte, Tabelle und Lageblatt,
+ * eine Zeitform, und „neu" nicht doppelt belegt (Audit Runde 2, R2-A6).
+ */
+describe("Laufende Nummer, Zeitform und Marke (R2-A6)", () => {
+  beforeEach(() => {
+    localStorage.clear();
+  });
+
+  it("nummeriert die Karten nach dem Eingang, auch in der Tabelle", async () => {
+    const nutzer = userEvent.setup();
+    const angelegt = einsatzAnlegen("Hochwasser Test", EinsatzArt.EINSATZ);
+    meldungHinzufuegen(angelegt.id, bogenMitName("Zeitz"));
+    const zweite = meldungHinzufuegen(angelegt.id, bogenMitName("Aalen"))!.eintrag;
+    // Aalen kam später — sie ist Nr. 2, obwohl sie alphabetisch oben steht.
+    const liste = einsaetzeLaden();
+    liste[0]!.eintraege.find((e) => e.id === zweite.id)!.empfangenAm += 60_000;
+    localStorage.setItem("eeb.einsaetze.v1", JSON.stringify(liste));
+    ansicht(angelegt.id);
+    const namen = screen.getAllByRole("heading", { level: 3 }).map((h) => h.textContent ?? "");
+    expect(namen[0]).toMatch(/^Nr\. 2 .*Aalen/);
+    expect(namen[1]).toMatch(/^Nr\. 1 .*Zeitz/);
+    await nutzer.click(screen.getByRole("button", { name: "Tabelle" }));
+    const zeilen = within(screen.getByRole("table", { name: /Gemeldete Einheiten/ })).getAllByRole("rowheader");
+    expect(zeilen.map((z) => z.textContent)).toEqual([expect.stringMatching(/^Nr\. 2 .*Aalen/), expect.stringMatching(/^Nr\. 1 .*Zeitz/)]);
+  });
+
+  it("nennt die Marke für frisch eingetroffene Einheiten nicht „neu“", () => {
+    buehne(["Wardenburg"]);
+    const marke = document.querySelector(".neu-badge")!;
+    expect(marke.textContent).toBe("kürzlich eingetroffen");
   });
 });

@@ -2097,6 +2097,10 @@
        Ziel. Nur das Dreieck rechts oben zeigt, dass es weitergeht. */
     .einheit-zeile.kompakt { position: relative; padding: var(--r-2) 2rem var(--r-2) 0; }
     .einheit-zeile.gestrichen.kompakt { padding-left: var(--r-2); }
+    /* Die Marke „kürzlich eingetroffen" kostete zugeklappt eine eigene Zeile
+       je Karte (Feld-Thema: 5 statt 6 Einheiten im Bild); sie steht nach
+       dem Aufklappen, und die Sammelquittung nennt die Neuen mit Namen. */
+    .einheit-zeile.kompakt .neu-badge { display: none; }
     .einheit-zeile.kompakt .kompakt-zeile {
       display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.1rem 0.4rem;
       font-variant-numeric: tabular-nums;
@@ -2108,6 +2112,13 @@
       box-shadow: none; color: var(--text-2); font-size: var(--t-m);
     }
     .einheit-zeile > button.karte-aufklappen:focus-visible { outline: 3px solid var(--akzent); outline-offset: -3px; }
+    /* R2-A6: Laufende Nummer der Meldung vor dem Namen — dieselbe wie auf dem
+       Lageblatt, damit „Meldung 3" über Funk ohne Rückfrage zu finden ist.
+       Datenschrift, damit die Nummern untereinander gleich breit stehen. */
+    .meldung-nr {
+      font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap;
+      color: var(--text-2);
+    }
     /* R2-W5: Übergabevermerk im Kopf der Einsatzansicht. Ist seit der
        Weitergabe hier etwas dazugekommen, steht er als Warnkasten da — die
        neue Schicht hat es womöglich nicht. */

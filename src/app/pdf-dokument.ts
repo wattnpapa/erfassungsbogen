@@ -276,6 +276,8 @@ export interface UebersichtEintrag {
   zaehlt?: boolean;
   /** Auftrag/Notiz der Führungsstelle zu dieser Einheit. */
   notiz?: string;
+  /** Laufende Nummer der Meldung, wie an der Karte am Gerät (R2-A6). */
+  nummer?: number;
 }
 
 /** Ein Bogen der Sammel-PDF samt QR — die Übersichtsangaben plus der Code für die Bogenseiten. */
@@ -405,7 +407,13 @@ function uebersichtsTabelle(
     // Name, darunter bei Bedarf die Kennzeichnung eines abgeteilten Truppteils
     // und der Übungs-Störer — beides muss in der Übersicht stehen, sonst sind
     // zwei Zeilen derselben Einheit nicht auseinanderzuhalten.
-    const namensZeilen: Content[] = [{ text: einheitAnzeigename(b.einheit) }];
+    // Laufende Nummer vorn, wie an der Karte: „Meldung 3" über Funk statt
+    // des vollen Einheitsnamens (Audit Runde 2, R2-A6).
+    const namensZeilen: Content[] = [
+      e.nummer != null
+        ? { text: [{ text: `Nr. ${e.nummer}  `, bold: true }, { text: einheitAnzeigename(b.einheit) }] }
+        : { text: einheitAnzeigename(b.einheit) },
+    ];
     if (teil) namensZeilen.push({ text: teil, italics: true });
     if (b.uebung) namensZeilen.push({ text: "ÜBUNG", bold: true, color: UEBUNG_FARBE });
     if (!e.abgerueckt && e.zaehlt === false) namensZeilen.push({ text: "zählt nicht in diese Lage", italics: true });
@@ -962,7 +970,9 @@ export function pdfDokument(
 
   const infoZeilen: TableCell[][] = [
     [
-      { text: "Stärke:", bold: true },
+      // Im Vordruck mit Legende: „____ / ____ / ____ / ____" allein sagte
+      // nicht, welche Linie welche Zahl ist (Audit Runde 2, R2-A6).
+      { text: blanko ? "Stärke (F / UF / M / Ges.):" : "Stärke:", bold: true },
       { text: `${zahl(s.fuehrer)} / ${zahl(s.unterfuehrer)} / ${zahl(s.mannschaft)} / ${zahl(s.gesamt)}` },
       { text: "Ansprechpartner/in:", bold: true },
       { text: ansprech ? `${ansprech.vorname} ${ansprech.nachname}` : "" },
