@@ -86,7 +86,7 @@ Grundlage: Repository `wattnpapa/erfassungsbogen`, Stand 2026-09-12 — Version 
 > Runde 2, R2-D5) — nach der Löschung nennt die Startseite die entfernte
 > Sammlung einmal beim Namen (neuer Speicherort `eeb.aufgeraeumt.v1`, ohne
 > Personendaten); die Ankündigung ab Tag 60 nennt die tatsächliche Ruhezeit
-> (3.3 D2e).
+> (3.3 D2g).
 >
 > **Nachgezogen 2026-09-29:** Lageblatt/Übergabeblatt (Audit Runde 2, R2-K3) —
 > Zug, Bedarf und Lückenzahl je Einheit, Änderungen als „von … auf …",
@@ -94,7 +94,7 @@ Grundlage: Repository `wattnpapa/erfassungsbogen`, Stand 2026-09-12 — Version 
 >
 > **Nachgezogen 2026-09-29:** Lageblatt zum Weiterführen (Audit Runde 2,
 > R2-A3) — Funkrufname und Rückrufnummer je Einheit, freie Zeilen; Zeitpunkt
-> des letzten Lageblatts wird gemerkt (3.3 D2f, 5.4).
+> des letzten Lageblatts wird gemerkt (3.3 D2h, 5.4).
 
 ## Hinweis zu diesem Dokument
 
