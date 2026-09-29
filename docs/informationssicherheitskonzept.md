@@ -96,6 +96,9 @@ Grundlage: Repository `wattnpapa/erfassungsbogen`, Stand 2026-09-12 — Version 
 > R2-A3) — Funkrufname und Rückrufnummer je Einheit, freie Zeilen; Zeitpunkt
 > des letzten Lageblatts wird gemerkt (3.3 D2h, 5.4).
 >
+> **Nachgezogen 2026-09-29:** Hinweis „von Hand geändert" neben dem QR-Code
+> (Audit Runde 2, R2-A4) — Stiftkorrekturen stecken nicht im Code (5.4).
+>
 > **Nachgezogen 2026-09-29:** Foto-Einlesen (Audit Runde 2, R2-A2) — liest
 > alle QR-Codes eines Bildes und merkt Teile unvollständiger mehrteiliger
 > Bögen bis zu einer Stunde im Arbeitsspeicher (nicht im Gerätespeicher) für
@@ -410,6 +413,12 @@ Datenausleitung an eine andere Herkunft ist technisch unterbunden.
   Aushang — Aushangort entsprechend wählen) und freie Zeilen für Nachträge.
   Die ganze Sammel-PDF gibt es nur noch über „Einsatz weitergeben / sichern";
   der Teilexport „nur neue Bögen" heißt `eeb-einsatz-nachtrag-….pdf`.
+  Seit 2026-09-29 (R2-A4) steht neben jedem QR-Code eines Bogen-PDF das
+  Kästchen „[  ] von Hand geändert" mit dem Stand (DTG), den der Code trägt:
+  Eine Stiftkorrektur auf dem Ausdruck steckt nicht im Code, und wer scannt,
+  soll das vorher sehen. Die Rückmeldung von „Bögen einlesen…" wiederholt den
+  Hinweis (`STIFT_HINWEIS`, `qr-stapel.ts`). Integrität: Papier und Gerät
+  können weiterhin auseinanderlaufen; der Hinweis macht es nur sichtbar.
 - **Excel-Liste „Oldenburg"** (`src/app/oldenburg-xlsx.ts`, seit 2026-09-29,
   Audit Runde 2, R2-K2): führt dieselben Führungsstellen-Angaben — Eintreffzeit
   in „eingetr. / zugew.", Abrückzeit in „Einsatz-ende", Auftrag/Notiz

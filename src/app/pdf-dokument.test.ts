@@ -22,8 +22,8 @@ import {
   zeitpunktAusIso,
   type Erfassungsbogen,
 } from "@bos/eeb-format/model";
-import type { QrSatz } from "./hilfen";
-import { EEB_JSON_DATEINAME, aenderungFuerPapier, bogenAlsEingebetteteDatei, einsatzLageblattDokument, einsatzPdfDokument, pdfDokument } from "./pdf-dokument";
+import { zeitgruppe, type QrSatz } from "./hilfen";
+import { EEB_JSON_DATEINAME, aenderungFuerPapier, bogenAlsEingebetteteDatei, einsatzLageblattDokument, einsatzPdfDokument, pdfDokument, stiftHinweis } from "./pdf-dokument";
 
 const QR_BILD = "data:image/png;base64,QRTESTBILD";
 const QR_URL = "https://erfassungsbogen.app/#TESTPAYLOAD";
@@ -119,6 +119,15 @@ describe("pdfDokument()", () => {
     expect(JSON.stringify(dd.content)).toContain(QR_BILD);
     expect(texte(dd.content)).toContain(
       "Mit der Kamera scannen oder den Link antippen, um den Bogen digital zu übernehmen.",
+    );
+  });
+
+  it("sagt neben dem Code, dass Stiftkorrekturen nicht im Code stecken — mit Stand und Kästchen (R2-A4)", () => {
+    const b = basisBogen();
+    const t = texte(pdfDokument(b, QR).content).join("\n");
+    expect(t).toContain(stiftHinweis(zeitgruppe(b.stand)));
+    expect(stiftHinweis("170805jul26")).toBe(
+      "[  ] von Hand geändert — dann gilt der Code (Stand 170805jul26) nicht mehr: abtippen oder neu erzeugen, nicht scannen.",
     );
   });
 

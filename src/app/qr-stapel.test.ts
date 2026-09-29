@@ -15,6 +15,7 @@ import {
 } from "@bos/eeb-format/model";
 import {
   LAGE_NACHTRAGEN_HINWEIS,
+  STIFT_HINWEIS,
   TEILE_ABLAUF_MS,
   TeileMerker,
   dateiImportMeldung,
@@ -262,6 +263,15 @@ describe("qrStapelLesen", () => {
     expect(dateiImportMeldung(4, 0, { sammlungInPdf: true })).not.toContain(LAGE_NACHTRAGEN_HINWEIS);
     expect(dateiImportMeldung(4, 0, { lage: true })).toContain(LAGE_NACHTRAGEN_HINWEIS);
     expect(dateiImportMeldung(0, 4, { lage: true })).not.toContain(LAGE_NACHTRAGEN_HINWEIS);
+  });
+
+  it("bericht warnt nach einer Aufnahme vor Stiftkorrekturen auf dem Ausdruck (R2-A4)", () => {
+    const leer = { gelesen: 2, funde: [], fehler: [], luecken: [], abgebrochen: false };
+    expect(stapelBericht(leer, 1, 0)).toContain(STIFT_HINWEIS);
+    expect(STIFT_HINWEIS).toContain("von Hand geändert");
+    expect(STIFT_HINWEIS).toContain("Stand");
+    // Nichts aufgenommen — nichts zu prüfen.
+    expect(stapelBericht(leer, 0, 2)).not.toContain(STIFT_HINWEIS);
   });
 
   it("bericht nennt Aufnahme und Dubletten", () => {

@@ -631,6 +631,17 @@ export const QR_NUR_BOGEN_HINWEIS =
   "stehen als Text im Kasten „Stand am Meldekopf“ und auf Seite 1 — nach dem Einlesen von Hand nachtragen. " +
   "Die ganze Lage liest „Einsatz importieren…“ aus der PDF-Datei.";
 
+/**
+ * Satz neben dem Code: Der Code trägt den gedruckten Stand, Handschrift sieht
+ * die App nicht. Ohne diesen Hinweis korrigierte eine Gruppenführerin „1 / 1 /
+ * 2 / 4" mit dem Stift auf „1 / 1 / 1 / 3", der Meldekopf scannte und zählte
+ * weiter 4 — Papier und Gerät widersprachen sich unbemerkt (Audit Runde 2,
+ * R2-A4). Das Kästchen macht die Korrektur für den Scannenden sichtbar.
+ */
+export function stiftHinweis(stand: string): string {
+  return `[  ] von Hand geändert — dann gilt der Code (Stand ${stand}) nicht mehr: abtippen oder neu erzeugen, nicht scannen.`;
+}
+
 export function meldekopfVermerk(e: UebersichtEintrag, name: string, erstellt: number): MeldekopfVermerk {
   const teile = [`Eingetroffen ${e.eingetroffenAm == null ? "(nicht festgehalten)" : zeitLang(e.eingetroffenAm)}`];
   if (e.abgerueckt) {
@@ -777,8 +788,13 @@ export function einsatzLageblattDokument(
  * sondern auf {@link QrSatz.vollUrl} — den kompletten Bogen in einer URL.
  * Segmentierung ist eine Grenze des QR-Bildes, nicht des Links.
  */
-function qrBlock(qr: QrSatz, akzent: string, vermerk?: MeldekopfVermerk): Content {
+function qrBlock(qr: QrSatz, akzent: string, stand: string, vermerk?: MeldekopfVermerk): Content {
   const kopf = (text: string): Content => ({ text, bold: true, fontSize: 13, color: akzent, alignment: "center" });
+  // Fett und direkt am Code: Wer den Ausdruck scannt, soll vorher aufs
+  // Kästchen schauen (R2-A4). Beim Einzelcode steht er in der freien Spalte
+  // links NEBEN dem Bild — unter dem Code kostete die Zeile 6 von 101
+  // THW-Beispielbögen eine zweite Seite (unbreakable-Block).
+  const stift = (): Content => ({ text: stiftHinweis(stand), bold: true, fontSize: 8 });
   // Nur in der Sammel-PDF: was der Code nicht enthält, direkt beim Code
   // (R2-A1). Beim Einzelcode steht der Kasten „Stand am Meldekopf“ schon über
   // dem Formular derselben Seite, der Hinweis rechts neben dem Code. Mehrteilige
@@ -802,14 +818,22 @@ function qrBlock(qr: QrSatz, akzent: string, vermerk?: MeldekopfVermerk): Conten
             // Bögen mittlerer Stärke eine zweite Seite (R2-A1).
             {
               columns: [
-                { width: "*", text: "" },
+                { width: "*", stack: [stift()], alignment: "right", margin: [0, 40, 12, 0] },
                 { image: t.datenUrl, width: QR_BREITE, link: t.url },
                 { width: "*", stack: [nurBogenHinweis()], margin: [12, 40, 0, 0] },
               ],
               columnGap: 0,
               margin: [0, 8, 0, 0],
             }
-          : { image: t.datenUrl, width: QR_BREITE, alignment: "center", margin: [0, 8, 0, 0], link: t.url },
+          : {
+              columns: [
+                { width: "*", stack: [stift()], alignment: "right", margin: [0, 40, 12, 0] },
+                { image: t.datenUrl, width: QR_BREITE, link: t.url },
+                { width: "*", text: "" },
+              ],
+              columnGap: 0,
+              margin: [0, 8, 0, 0],
+            },
         {
           text: "Bogen direkt in der App öffnen",
           link: t.url,
@@ -881,7 +905,7 @@ function qrBlock(qr: QrSatz, akzent: string, vermerk?: MeldekopfVermerk): Conten
         margin: [0, 150, 0, 0],
       });
     }
-    stack.push(oeffnenLink(), hinweis(), ...vermerkTeile());
+    stack.push(oeffnenLink(), hinweis(), { ...(stift() as object), alignment: "center", margin: [0, 6, 0, 0] } as Content, ...vermerkTeile());
     seiten.push({ stack, pageBreak: "before" });
   }
   return { stack: seiten };
@@ -1164,7 +1188,7 @@ export function pdfDokument(
       // Kein fester Seitenumbruch mehr; als unbreakable-Gruppe zusammengehalten,
       // damit der QR-Code nicht über eine Seitengrenze zerrissen wird. Passt der
       // Block nicht mehr, rückt er als Ganzes auf die nächste Seite.
-      ...(qr ? [qrBlock(qr, farbe.akzent, vermerk)] : []),
+      ...(qr ? [qrBlock(qr, farbe.akzent, zeitgruppe(b.stand), vermerk)] : []),
     ],
   };
 }
