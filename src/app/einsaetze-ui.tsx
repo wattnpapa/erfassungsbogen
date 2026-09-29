@@ -1066,7 +1066,7 @@ export function EinsatzDetail(props: {
               <input
                 type="search"
                 value={suche}
-                placeholder="Einheit, Organisation, Ort, Zug, Kennzeichen…"
+                placeholder="Einheit, Organisation, Ort, Zug, Kennzeichen, Auftrag…"
                 onChange={(e) => setSuche(e.target.value)}
               />
             </label>

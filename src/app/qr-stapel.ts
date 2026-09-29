@@ -373,7 +373,8 @@ export function dateiImportMeldung(
   uebersprungen: number,
   zusatz: { sammlungInPdf?: boolean; lage?: boolean } = {},
 ): string {
-  const teile = [`${neu} Bogen/Bögen aufgenommen${uebersprungen ? `, ${uebersprungen} bereits vorhanden` : ""}.`];
+  // Numerus statt „Bogen/Bögen" (Audit Runde 2, R2-K8).
+  const teile = [`${neu} ${neu === 1 ? "Bogen" : "Bögen"} aufgenommen${uebersprungen ? `, ${uebersprungen} bereits vorhanden` : ""}.`];
   if (zusatz.sammlungInPdf) teile.push(SAMMLUNG_IN_PDF_HINWEIS);
   else if (zusatz.lage && neu > 0) teile.push(LAGE_NACHTRAGEN_HINWEIS);
   return teile.join(" ");

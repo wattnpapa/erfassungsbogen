@@ -992,6 +992,23 @@ describe("Neuen Einsatz anlegen", () => {
     await nutzer.click(anlegen);
   }
 
+  it("zeigt die Einsatzansicht in neutraler Akzentfarbe, auch wenn ein Feuerwehr-Bogen offen ist (R2-K8)", async () => {
+    einsatzImSpeicherAnlegen("Übungslage", EinsatzArt.EINSATZ);
+    const nutzer = userEvent.setup();
+    render(<App />);
+    await neuerBogenBis(nutzer, 0);
+    await nutzer.selectOptions(screen.getByLabelText("Organisation"), String(OrganisationsTyp.FEUERWEHR));
+    const akzent = () => document.documentElement.style.getPropertyValue("--org-akzent");
+    await waitFor(() => expect(akzent()).not.toBe(""));
+    await nutzer.click(screen.getByRole("button", { name: "‹ Startseite" }));
+    await nutzer.click(screen.getByRole("button", { name: "Öffnen" }));
+    await screen.findByRole("heading", { level: 1, name: "Übungslage" });
+    expect(akzent()).toBe("");
+    // Zurück beim eigenen Bogen gilt wieder dessen Farbe.
+    await nutzer.click(screen.getByRole("button", { name: "‹ Einsätze" }));
+    await waitFor(() => expect(akzent()).not.toBe(""));
+  }, 20000);
+
   it("legt von der Startseite aus einen Einsatz an und öffnet ihn", async () => {
     const nutzer = userEvent.setup();
     render(<App />);

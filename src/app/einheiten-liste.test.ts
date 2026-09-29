@@ -124,6 +124,16 @@ describe("einheitenFiltern", () => {
   it("liefert leer, wenn nichts passt", () => {
     expect(einheitenFiltern(liste, "hamburg")).toEqual([]);
   });
+
+  it("findet über Auftrag/Notiz der Führungsstelle und Ort/Auftrag des Bogens (R2-K8)", () => {
+    const b = bogen(OrganisationsTyp.THW, "Leer", "B");
+    b.einsatz.ortAuftrag = "Sandsackfüllplatz Hafen";
+    const mitNotiz = eintrag("d", bogen(OrganisationsTyp.THW, "Aurich", "B"), { notiz: "Deichabschnitt Nord ab 14:00" });
+    const mitOrt = eintrag("e", b);
+    const l = [...liste, mitNotiz, mitOrt];
+    expect(ids(einheitenFiltern(l, "deich"))).toEqual(["d"]);
+    expect(ids(einheitenFiltern(l, "sandsack"))).toEqual(["e"]);
+  });
 });
 
 describe("einheitenSortieren", () => {

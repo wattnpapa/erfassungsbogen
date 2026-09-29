@@ -9,7 +9,9 @@
  *  - SUCHE: alle Wörter müssen treffen (UND), Groß/Klein und Akzente egal.
  *    Gesucht wird über das, was auf der Karte bzw. im Funkverkehr steht —
  *    Einheit, Organisation, Ort/Zugehörigkeit, Zug- und Teil-Etikett,
- *    Kennzeichen und Funkrufname. Nicht über Personennamen: die Liste ist eine
+ *    Kennzeichen und Funkrufname, Auftrag/Notiz der Führungsstelle und der
+ *    Ort/Auftrag des Bogens (Audit Runde 2, R2-K8: „Deich" fand 0 Einheiten,
+ *    obwohl „Deichabschnitt Nord" auf einer Karte stand). Nicht über Personennamen: die Liste ist eine
  *    Einheitenliste, und die Namen stehen ausgeklappt in den Details.
  *  - QUALIFIKATION: „welche Einheit hat mir Atemschutzgeräteträger gemeldet?"
  *    Filtert auf Einheiten mit mindestens einer passenden Person und nennt
@@ -57,6 +59,8 @@ function suchtext(e: MeldeEintrag): string {
     e.teilEtikett ?? "",
     ...einheit.hierarchie.flatMap((h) => [h.name, h.kurz ?? ""]),
     ...e.bogen.fahrzeuge.flatMap((f) => [kennzeichenText(f), funkrufText(f, einheit)]),
+    e.notiz ?? "",
+    e.bogen.einsatz.ortAuftrag,
   ];
   return normalisiere(teile.filter(Boolean).join(" "));
 }

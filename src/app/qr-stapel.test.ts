@@ -258,7 +258,9 @@ describe("qrStapelLesen", () => {
   });
 
   it("dateiImportMeldung verweist bei eingebetteter Sammlung auf „Einsatz importieren…“ (R2-A1)", () => {
-    expect(dateiImportMeldung(2, 1)).toBe("2 Bogen/Bögen aufgenommen, 1 bereits vorhanden.");
+    expect(dateiImportMeldung(2, 1)).toBe("2 Bögen aufgenommen, 1 bereits vorhanden.");
+    // Numerus statt „Bogen/Bögen" (R2-K8).
+    expect(dateiImportMeldung(1, 0)).toBe("1 Bogen aufgenommen.");
     expect(dateiImportMeldung(4, 0, { sammlungInPdf: true })).toContain("für die ganze Lage „Einsatz importieren…“ verwenden");
     expect(dateiImportMeldung(4, 0, { sammlungInPdf: true })).not.toContain(LAGE_NACHTRAGEN_HINWEIS);
     expect(dateiImportMeldung(4, 0, { lage: true })).toContain(LAGE_NACHTRAGEN_HINWEIS);

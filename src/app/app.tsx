@@ -836,9 +836,14 @@ function AppInhalt() {
   // Akzentfarbe der Oberfläche der Organisation des offenen Bogens anpassen —
   // ohne Bogen (Startseite/Einsatzansicht) das Standard-Blau. So sieht man
   // schon an der Farbe, in welcher Organisation man gerade unterwegs ist.
+  // Die Einsatzansicht bleibt neutral, auch wenn im Hintergrund ein eigener
+  // Bogen offen ist: nach einer Feuerwehr-Schnellerfassung standen Kopf und
+  // Gesamtzahl der Lage feuerrot da — in der Führungsstelle ein Warnsignal
+  // (Audit Runde 2, R2-K8).
+  const einsatzAnsicht = offenerEinsatzId != null && !musterVorlage;
   useEffect(() => {
-    wendeOrgAkzentAn(bogen?.einheit.organisation);
-  }, [bogen?.einheit.organisation]);
+    wendeOrgAkzentAn(einsatzAnsicht ? undefined : bogen?.einheit.organisation);
+  }, [bogen?.einheit.organisation, einsatzAnsicht]);
 
   async function musterungFertig(neuerArbeitsbogen: Erfassungsbogen) {
     if (!(await darfBogenErsetzen({ titel: "Bogen aus Vorlage anlegen?", was: "den Bogen aus der Vorlage", ok: "Aus Vorlage anlegen" }))) return;
