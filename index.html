@@ -3333,7 +3333,10 @@
        --------------------------------------------------------------- */
     dialog.scanner, dialog.qr-vollbild {
       margin: 0; border: none; border-radius: 0;
-      width: 100%; max-width: none; max-height: none;
+      /* 100vw als Obergrenze: Ist die Seite dahinter breiter als das Fenster
+         (große Schrift, R2-M1), wächst das Layout-Fenster mit — ein Overlay
+         mit 100 % stand dann rechts über den sichtbaren Rand hinaus. */
+      width: 100%; max-width: 100vw; max-height: none;
       animation: none;
       /* Rollen am Rand des Overlays nicht an die Seite weiterreichen. */
       overscroll-behavior: contain;
@@ -3341,6 +3344,54 @@
     dialog.scanner::backdrop, dialog.qr-vollbild::backdrop { background: transparent; animation: none; }
     dialog.scanner:not([open]), dialog.qr-vollbild:not([open]) { display: none; }
     dialog.scanner:focus, dialog.qr-vollbild:focus { outline: none; }
+
+    /* ---------------------------------------------------------------
+       QR-Vollbild: rollen statt abschneiden (Audit Runde 2, R2-M2).
+       Vorher `inset: 0`, kein Rollen und ein Bildmaß nach `vh`: Quer bei
+       640 × 360 lagen „Nächster Teil →" und „Schließen" 5 px unter dem Rand,
+       bei 200 % Schrift ganz außerhalb, und das Bild ragte oben hinaus —
+       mittig ausgerichteter Überlauf ist nach oben nicht erreichbar. Jetzt wie
+       der Scanner: Höhe nach `dvh` (folgt der Browserleiste), das Overlay
+       rollt, die Knopfleiste klebt unten. Zentriert wird über automatische
+       Außenabstände, die bei Überlauf auf 0 fallen statt nach oben
+       wegzuschieben.
+       --------------------------------------------------------------- */
+    dialog.qr-vollbild {
+      height: 100vh; height: 100dvh;
+      overflow-y: auto;
+      justify-content: flex-start;
+      padding-bottom: 0;
+    }
+    dialog.qr-vollbild > :first-child { margin-top: auto; }
+    dialog.qr-vollbild img {
+      width: min(calc(92vw - 3rem), calc(68vh - 3rem));
+      width: min(calc(92vw - 3rem), calc(68dvh - 3rem));
+      flex: none;
+    }
+    dialog.qr-vollbild > .qr-vollbild-nav {
+      position: sticky; bottom: 0; z-index: 1;
+      margin-top: auto; align-self: stretch;
+      padding: 0.6rem 0 calc(0.8rem + env(safe-area-inset-bottom));
+      background: var(--grund);
+    }
+    /* Quer auf dem Telefon: Code links, Text und Knöpfe rechts daneben —
+       untereinander passten beide nicht in 360 px Höhe. Der Code nimmt die
+       volle Höhe abzüglich Ruhezone und Rand. */
+    @media (orientation: landscape) and (max-height: 540px) {
+      dialog.qr-vollbild {
+        display: grid; grid-template-columns: auto minmax(0, 1fr);
+        align-content: center; align-items: center; column-gap: 1.2rem; row-gap: 0.6rem;
+        padding-bottom: 1rem;
+      }
+      dialog.qr-vollbild > img {
+        grid-column: 1; grid-row: 1 / span 3; margin: 0;
+        width: min(calc(55vw - 3rem), calc(100vh - 5rem));
+        width: min(calc(55vw - 3rem), calc(100dvh - 5rem));
+      }
+      dialog.qr-vollbild > :not(img) { grid-column: 2; margin: 0; }
+      dialog.qr-vollbild > .qr-vollbild-nav { position: static; margin: 0; padding: 0; background: none; justify-content: flex-start; }
+      dialog.qr-vollbild p { text-align: left; }
+    }
 
     /* Papierkorb-Karten (gelöschte Vorlagen/Einsätze): sichtbar zurückgestuft. */
     section.karte.papierkorb { background: var(--flaeche-2); border-style: dashed; }

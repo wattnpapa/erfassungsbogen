@@ -5,7 +5,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { OrganisationsTyp, type Erfassungsbogen } from "@bos/eeb-format/model";
 import { encodePayload, encodePayloadUrl, encodeVorlagePayloadUrl, fragmentInhalt, segmentPayloadUrls } from "@bos/eeb-format/codec";
@@ -698,6 +698,22 @@ describe("Assistenten-Durchlauf", () => {
     // Der Knopf gilt nur als heil, wenn wirklich ein Code dasteht.
     const bild = within(vollbild).getByRole("img") as HTMLImageElement;
     expect(bild.src.startsWith("data:image/")).toBe(true);
+  });
+
+  // Audit Runde 2, R2-M2: Escape schloss das QR-Vollbild nicht — am
+  // Meldekopf-Laptop blieb nur „Schließen", das bei großer Schrift außerhalb lag.
+  it("schließt das QR-Vollbild mit Escape (cancel des modalen Dialogs)", async () => {
+    const nutzer = userEvent.setup();
+    const dialog = await uebergabeDialog(nutzer);
+    const knopf = within(dialog).getByRole("button", { name: /QR-Code im Vollbild/ });
+    await waitFor(() => expect(knopf).toHaveProperty("disabled", false));
+    await nutzer.click(knopf);
+    const vollbild = (await screen.findByRole("dialog", { name: "QR-Code im Vollbild" })) as HTMLDialogElement;
+    expect(vollbild.tagName).toBe("DIALOG");
+    act(() => { vollbild.dispatchEvent(new Event("cancel", { cancelable: true })); });
+    expect(screen.queryByRole("dialog", { name: "QR-Code im Vollbild" })).toBeNull();
+    // Die Übersicht dahinter steht noch da.
+    expect(screen.getByRole("heading", { name: "Gesamtübersicht" })).toBeDefined();
   });
 
   /**
