@@ -171,4 +171,29 @@ Typprüfung und einem Nachlauf der Audit-Abläufe im Produktionsbuild
 | R2-A4 Stiftkorrektur | behoben | Kästchen „von Hand geändert" mit Stand neben jedem Code, Hinweis im Stapelbericht. |
 | R2-A5 Nacherfassung | teilweise | Ähnlichkeitsrückfrage erkennt Vorsätze (OV, THW …), Feld „Eingetroffen um". Reihenfolge Personal/Fahrzeuge wie bisher. |
 
-Die P3-Befunde sind offen.
+### P3 (Stand 29.09.2026)
+
+| Befund | Stand | Umsetzung |
+| --- | --- | --- |
+| R2-W4 Einsatzzeiten | behoben | Schritt 2 sagt, dass die Einheit Beginn und Ende für eigene Nachweise selbst einträgt; die Zeiten des Meldekopfs kommen nicht zurück. Die Übersicht erinnert bei leeren Zeiten. |
+| R2-W5 Zwei Geräte, eine Sammlung | teilweise | Übergabevermerk nach „Einsatz weitergeben / sichern" mit Zahl der seitdem neuen Meldungen (`eeb.weitergabe-stand.v1`). Ein Abschließen der Sammlung (nur lesen) ist nicht umgesetzt. |
+| R2-W6 Kleinere Brüche | behoben | QR-Vollbild mit Einheit, Stärke und Stand; PDF-Import übernimmt das Siegel aus dem QR der PDF, wenn er zur selben Fassung gehört; Rückfrage „Bogen schließen?" statt „gelöscht". Die springende Eintreffzeit ist nicht mehr nachzustellen (Test). |
+| R2-E6 Stille Überschreibungen | weitgehend | Wiederanhaken stellt die zuletzt eingetragene Zeit her; „Vorbelegung entfernen" lässt Karten mit Fahrerlaubnis oder Qualifikation stehen. Pfeil + Enter im Einheitstyp unverändert. |
+| R2-N9 Begriffe und Platzhalter | weitgehend | Beispiele je Organisation, mit „z. B." und kursiv; „eigener Standort" erklärt; Stärke mit „(F / UF / M / Ges)"; Einheitsname im QR-Vollbild. Themenschalter „Feld" unverändert. |
+| R2-O7 Speicher, Blanko, QR-Vollbild | behoben | Anzeige in Zeichen gegen die tatsächliche Grenze, höchstens 100 %; Warnung ab 80 % auch auf Startseite und in der Einsatzansicht mit den größten Sammlungen; Blanko-Vordruck im Precache (im Build geprüft, nicht auf einem Gerät im Flugmodus). |
+| R2-K7 Lagebild am Telefon | behoben | Bis 600 px Name, Stärke und Bedarf je Zeile, Aktionen nach Antippen. 360 × 640: 7 Einheiten im Bild (Feld 6). |
+| R2-K8 Kleinere Stellen | weitgehend | Einsatzansicht in neutraler Farbe, Suche in Auftrag und Notiz, Numerus der Import-Quittung. Fehlende Verpflegungsangabe nicht als Lücke: „0 vegetarisch" ist von „nicht angegeben" nicht zu unterscheiden. |
+| R2-S4 Wer kam zuletzt | behoben | Quittung „Zuletzt aufgenommen (n): Namen …" mit „Neueste oben zeigen". Voreinstellung der Sortierung bleibt A–Z. |
+| R2-D6 Aufteilen, Einsatz löschen, Musterung | behoben | Quittung mit „Rückgängig" nach Aufteilen und Löschen, Rückfrage beim Abbrechen der Musterung nach geänderten Haken. |
+| R2-A6 Zeitformen und Kennungen | behoben | Eine Zeitform „TT.MM.JJJJ, hh:mm" auf Karte, Lageblatt und Sammel-PDF; laufende Nummer je Meldung; Marke „kürzlich eingetroffen"; Blanko-Stärke beschriftet. |
+| R2-L5 Abgerückt gedimmt | behoben | Volle Deckkraft, Name durchgestrichen, Marke mit Grund. Kleinster Kontrast 5,92:1 (Standard) bis 9,92:1 (Feld). |
+| R2-H9 Rückfragen und seltene Aktionen | behoben | „Bogen schließen?" nennt den Rückholplatz; Schnellerfassung ohne Ort-Lücke; Aufteilen, Zusammenführen, Verschieben, Entfernen hinter „Mehr…". |
+| R2-L3 Feldrahmen dunkel | behoben | `--linie-stark` angehoben: Dunkel 3,45:1, Nacht 3,41:1. |
+| R2-L4 Fokus in der Schrittleiste | behoben | Rahmen in der Kopf-Schriftfarbe, nach innen versetzt; 15,09:1 bzw. 10,47:1 (Nacht). |
+| R2-L6 Helle Reste im Nacht-Thema | behoben | Scanner-Texte aus Themenfarben, PDF-Vorschau gedimmt, `theme-color` je Thema. QR-Platte bleibt weiß (Scannbarkeit). |
+| R2-M5 Namensfelder ohne Namen | behoben | „Person n: Vorname/Nachname", sichtbare Beschriftung in „Namen einfügen". |
+| R2-M6 autocomplete | behoben | Kein Autofill der eigenen Kontaktkarte in fremden Feldern; Kennungen ohne Autokorrektur, Großschreibung. Auf echten Telefonen nicht geprüft. |
+| R2-M7 Safe-Area der Fußleiste | behoben | Späte Additionsregel gestrichen; quer 52,6 px statt 60 px. |
+| R2-M8 Seite rollt hinter Dialogen | behoben | `html:has(dialog:modal)` sperrt die Seite; alte Webviews ohne `:has` wie bisher. |
+| R2-H8 Datumsfelder zu schmal | behoben | Bis 30rem volle Breite untereinander (360 px: 294 px je Feld). |
+| R2-G5 Funktion nur per Tastatur | weitgehend | Häufige Funktionen aus StAN und Bogen als Liste beim Antippen; Rückfrage-Knöpfe quer gleich breit. „Einheitstyp" zeigt beim Antippen weiter nur den aktuellen Wert. |
