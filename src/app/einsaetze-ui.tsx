@@ -114,7 +114,15 @@ import { AbgangKnopf, Kartenstapel } from "./kartenstapel";
 import { istBilddatei } from "./qr-stapel";
 import { fehlerText } from "./nachladen";
 import { entfernteMerken, entfernteVergessen } from "./entfernte-meldungen";
-import { exportZeitKurz, neueEintraege, type ExportStand, type ExportUmfang } from "./export-stand";
+import {
+  exportStandLaden,
+  exportZeitKurz,
+  lageblattStandLaden,
+  neueEintraege,
+  seitdemText,
+  type ExportStand,
+  type ExportUmfang,
+} from "./export-stand";
 
 export const ART_LABEL: Record<EinsatzArt, string> = {
   [EinsatzArt.EINSATZ]: "Einsatz",
@@ -179,6 +187,13 @@ function signaturBadge(e: MeldeEintrag) {
     );
   }
   return <span className="signatur-badge ungueltig" title="Signatur passt nicht zu den Daten">⚠ Signatur ungültig</span>;
+}
+
+/** „Lageblatt Mo., 16:30 (seitdem 1 neue Meldung) · Export: noch keiner" — für die Startseitenkarte (R2-A3). */
+function ausgabeStandText(s: Einsatzsammlung): string {
+  const teil = (was: string, stand: ExportStand | null, keiner: string) =>
+    stand ? `${was} ${exportZeitKurz(stand.zeitpunkt)} (${seitdemText(neueEintraege(s.eintraege, stand).length)})` : `${was}: ${keiner}`;
+  return `${teil("Lageblatt", lageblattStandLaden(s.id), "noch keins")} · ${teil("Export", exportStandLaden(s.id), "noch keiner")}`;
 }
 
 /** Kalendertag der Geräteuhr: „28.09.2026". */
@@ -324,6 +339,9 @@ export function EinsatzListe(props: {
             <p className="hinweis">
               {sum.einheiten} Einheit(en) anwesend · Stärke {sum.staerke.fuehrer} / {sum.staerke.unterfuehrer} / {sum.staerke.mannschaft} / {sum.staerke.gesamt}
             </p>
+            {/* Stand von Papier und Export schon auf der Startseite: ob der
+                Aushang und die letzte Lieferung noch stimmen (R2-A3). */}
+            <p className="hinweis ausgabe-stand">{ausgabeStandText(s)}</p>
             {/* Ankündigung der automatischen Löschung (siehe AUFRAEUM_FRIST_MS).
                 Sie steht über den Aktionen, damit der Ausweg — exportieren oder
                 durch eine Änderung die Uhr zurücksetzen — direkt daneben liegt. */}
@@ -591,6 +609,10 @@ export function EinsatzDetail(props: {
   // Beim Teilexport ohne neue Bögen gäbe es eine leere Datei — die Knöpfe
   // bleiben gesperrt, die Kästchenzeile sagt warum.
   const exportGesperrt = nurNeue && neueBoegen === 0;
+  // Wann zuletzt ein Lageblatt entstand und was seitdem kam — ob der Aushang
+  // an der Wand noch stimmt (Audit Runde 2, R2-A3). Bei jedem Rendern frisch
+  // gelesen: pdf.ts vermerkt den Druck, die Ansicht rendert danach neu.
+  const lageblattStand = lageblattStandLaden(einsatz.id);
   const [suche, setSuche] = useState("");
   const [sortierung, setSortierung] = useState<EinheitenSortierung>("name");
   // "" = keine Einschränkung. Schlüssel siehe einheiten-liste.ts.
@@ -899,10 +921,21 @@ export function EinsatzDetail(props: {
           )}{" "}
         </div>
       )}
+      {onLageblatt && (
+        <p className="hinweis lageblatt-stand" role="status">
+          {lageblattStand
+            ? `Lageblatt erstellt ${exportZeitKurz(lageblattStand.zeitpunkt)} · ${seitdemText(neueEintraege(einsatz.eintraege, lageblattStand).length)}`
+            : "Noch kein Lageblatt aus diesem Einsatz."}
+        </p>
+      )}
       {onWeitergeben && (
         <p className="hinweis einsatz-ausgaben-hinweis">
-          „Einsatz weitergeben / sichern" erzeugt eine Datei mit allen Meldungen, Zeiten, Historie und Zügen —
-          auf dem nächsten Gerät über „Einsatz importieren…" einlesbar, auch wenn alle abgerückt sind.
+          {/* Ein Knopf für die ganze Sammel-PDF: „Sammel-PDF (alle Bögen)"
+              darunter erzeugte dieselbe Datei — zwei gleichwertige Knöpfe, und
+              welcher „für Papier" ist, stand nur hier (Audit Runde 2, R2-A3). */}
+          „Einsatz weitergeben / sichern" erzeugt die Sammel-PDF mit allen Bögen (zum Drucken) und allen Meldungen,
+          Zeiten, Historie und Zügen — auf dem nächsten Gerät über „Einsatz importieren…" einlesbar, auch wenn alle
+          abgerückt sind. Nur die neuen Bögen für den Stab: Kästchen unten.
         </p>
       )}
       {/* Der Meldekopf liefert dem Stab nach: einmal am Abend alles, am Morgen
@@ -927,16 +960,23 @@ export function EinsatzDetail(props: {
         </span>
       </div>
       <div className="vorlage-aktionen einsatz-ausgaben">
-        <button
-          type="button"
-          onClick={() => onSammelPdf(exportUmfang)}
-          disabled={exportGesperrt}
-          title={nurNeue
-            ? "Nur die seit dem letzten Export neuen Bögen als eine PDF — mit eingebetteten Daten dieser Bögen. Auf dem Zielgerät über „Einsatz importieren…“ einlesbar."
-            : "Alle Bögen als eine PDF — mit eingebetteter kompletter Sammlung (Züge, Status, Historie). Auf dem Zielgerät über „Einsatz importieren…“ einlesbar."}
-        >
-          {nurNeue ? "Sammel-PDF (nur neue Bögen)" : "Sammel-PDF (alle Bögen)"}
-        </button>{" "}
+        {/* Die ganze Sammel-PDF liegt auf „Einsatz weitergeben / sichern";
+            hier nur noch der Nachtrag „nur neue Bögen" (R2-A3). Ohne
+            Weitergabe-Knopf bleibt der Gesamtweg hier. */}
+        {(nurNeue || !onWeitergeben) && (
+          <>
+            <button
+              type="button"
+              onClick={() => onSammelPdf(exportUmfang)}
+              disabled={exportGesperrt}
+              title={nurNeue
+                ? "Nur die seit dem letzten Export neuen Bögen als eine PDF — mit eingebetteten Daten dieser Bögen. Auf dem Zielgerät über „Einsatz importieren…“ einlesbar."
+                : "Alle Bögen als eine PDF — mit eingebetteter kompletter Sammlung (Züge, Status, Historie). Auf dem Zielgerät über „Einsatz importieren…“ einlesbar."}
+            >
+              {nurNeue ? "Sammel-PDF (nur neue Bögen)" : "Sammel-PDF (alle Bögen)"}
+            </button>{" "}
+          </>
+        )}
         {/* Zwei CSV-Wege, weil zwei verschiedene Fragen dahinterstehen: die
             Übersicht beantwortet „wie stark ist die Lage?" (eine Zeile je
             Einheit, mit Summenzeile), der Detail-Export „wer und was genau ist

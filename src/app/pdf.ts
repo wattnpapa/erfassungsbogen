@@ -21,6 +21,7 @@ import { einsatzDateiInhalt } from "./einsatz-transport";
 import { MeldeStatus, neuesteJeEinheit, revisionen, type Einsatzsammlung, type MeldeEintrag } from "@bos/meldekopf/einsaetze";
 import { zaehltInLage } from "./auswertung";
 import { eintreffzeit } from "./eintrag-zeiten";
+import { lageblattVermerken } from "./export-stand";
 
 interface FontContainer {
   vfs: Record<string, string | { data: string; encoding?: string }>;
@@ -215,7 +216,10 @@ export async function einsatzPdfErzeugen(
     });
   }
   const dd = einsatzPdfDokument(einsatz.name, boegenMitQr, einsatzDateiInhalt(einsatz));
-  return dokumentAusgeben(dd, `eeb-einsatz-${natoZeitstempel()}_${dateiRumpf(einsatz)}.pdf`);
+  // Teilexport („nur neue Bögen") mit eigenem Dateinamen — sonst hießen
+  // Nachtrag und ganze Sammlung gleich (Audit Runde 2, R2-A3).
+  const nachtrag = historie !== einsatz.eintraege;
+  return dokumentAusgeben(dd, `eeb-einsatz-${nachtrag ? "nachtrag-" : ""}${natoZeitstempel()}_${dateiRumpf(einsatz)}.pdf`);
 }
 
 /**
@@ -227,5 +231,9 @@ export async function einsatzPdfErzeugen(
 export async function einsatzLageblattErzeugen(einsatz: Einsatzsammlung): Promise<boolean> {
   const eintraege = alleAktuellen(einsatz).map((m) => uebersichtEintrag(einsatz, m));
   const dd = einsatzLageblattDokument(einsatz.name, eintraege);
-  return dokumentAusgeben(dd, `eeb-lageblatt-${natoZeitstempel()}_${dateiRumpf(einsatz)}.pdf`);
+  const ok = await dokumentAusgeben(dd, `eeb-lageblatt-${natoZeitstempel()}_${dateiRumpf(einsatz)}.pdf`);
+  // Merken, wann das Blatt entstand — die Einsatzansicht sagt dann „Lageblatt
+  // 16:30 · seitdem 1 neue Meldung" (Audit Runde 2, R2-A3).
+  if (ok) lageblattVermerken(einsatz);
+  return ok;
 }

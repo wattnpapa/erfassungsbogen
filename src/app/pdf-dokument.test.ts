@@ -600,6 +600,21 @@ describe("einsatzLageblattDokument()", () => {
     expect(t).not.toContain("→");
   });
 
+  it("ist ein Blatt zum Weiterführen: Funkrufname, Rückruf und freie Zeilen (R2-A3)", () => {
+    const dd = einsatzLageblattDokument("Lage", [{ bogen: basisBogen(), zugEtikett: "1. TZ" }]);
+    const t = texte(dd.content).join("\n").replace(/\u200B/g, "");
+    expect(t).toContain("Funkrufname /\nRückruf");
+    expect(t).toContain("Oldenburg - Ni 18/13");
+    expect(t).toContain("01701234501 (J. Rudolph)");
+    expect(t).toContain("Nachtrag von Hand");
+    // Bei einer Einheit bleibt Platz für sechs Nachträge.
+    const leer = JSON.stringify(dd.content).match(/\{"text":" ","margin":\[0,5,0,5\]\}/g) ?? [];
+    expect(leer.length).toBe(6 * 10);
+    // Die Übergabe-Übersicht der Sammel-PDF bleibt ohne diese Zusätze.
+    const u = texte((einsatzPdfDokument("Lage", [{ bogen: basisBogen(), qr: QR }]).content as unknown[]).slice(0, 3)).join("\n");
+    expect(u).not.toContain("Nachtrag von Hand");
+  });
+
   it("schreibt Änderungen fürs Papier als „von … auf …“", () => {
     expect(aenderungFuerPapier("Diesel: 50 l → 200 l")).toBe("Diesel: von 50 l auf 200 l");
     expect(aenderungFuerPapier("Unterbringung M/W/D: M 8 / W 3 / D 0 → M 7 / W 2 / D 0")).toBe(

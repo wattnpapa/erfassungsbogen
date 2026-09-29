@@ -9,7 +9,15 @@ import { describe, it, expect, beforeEach } from "vitest";
 import type { Erfassungsbogen } from "@bos/eeb-format/model";
 import { EinsatzArt, MeldeStatus, einheitSchluessel, type Einsatzsammlung, type MeldeEintrag } from "@bos/meldekopf/einsaetze";
 import { neuerBogen } from "./hilfen";
-import { exportSammlung, exportStandLaden, exportVermerken, neueEintraege } from "./export-stand";
+import {
+  exportSammlung,
+  exportStandLaden,
+  exportVermerken,
+  lageblattStandLaden,
+  lageblattVermerken,
+  neueEintraege,
+  seitdemText,
+} from "./export-stand";
 
 function bogen(name: string): Erfassungsbogen {
   const b = neuerBogen();
@@ -84,6 +92,19 @@ describe("exportStandLaden / exportVermerken", () => {
     localStorage.setItem("eeb.export-stand.v1", JSON.stringify({ e1: { zeitpunkt: "gestern", eintragIds: ["m1"] }, e2: { zeitpunkt: 3, eintragIds: ["m2", 7] } }));
     expect(exportStandLaden("e1")).toBeNull();
     expect(exportStandLaden("e2")).toEqual({ zeitpunkt: 3, eintragIds: ["m2"] });
+  });
+});
+
+describe("lageblattStandLaden / lageblattVermerken (Audit Runde 2, R2-A3)", () => {
+  it("merkt sich das Lageblatt getrennt vom Export — „nur neue Bögen“ verschiebt es nicht", () => {
+    const s = sammlung("e1", [eintrag("m1", "Wardenburg", 1000)]);
+    expect(lageblattStandLaden("e1")).toBeNull();
+    lageblattVermerken(s, undefined, 7000);
+    expect(lageblattStandLaden("e1")).toEqual({ zeitpunkt: 7000, eintragIds: ["m1"] });
+    expect(exportStandLaden("e1")).toBeNull();
+    const danach = sammlung("e1", [eintrag("m1", "Wardenburg", 1000), eintrag("m2", "Hatten", 8000)]);
+    expect(seitdemText(neueEintraege(danach.eintraege, lageblattStandLaden("e1")).length)).toBe("seitdem 1 neue Meldung");
+    expect(seitdemText(0)).toBe("seitdem keine neue Meldung");
   });
 });
 

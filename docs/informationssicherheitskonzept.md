@@ -91,6 +91,10 @@ Grundlage: Repository `wattnpapa/erfassungsbogen`, Stand 2026-09-12 — Version 
 > **Nachgezogen 2026-09-29:** Lageblatt/Übergabeblatt (Audit Runde 2, R2-K3) —
 > Zug, Bedarf und Lückenzahl je Einheit, Änderungen als „von … auf …",
 > Bedarf und Zwischensummen nebeneinander (5.4).
+>
+> **Nachgezogen 2026-09-29:** Lageblatt zum Weiterführen (Audit Runde 2,
+> R2-A3) — Funkrufname und Rückrufnummer je Einheit, freie Zeilen; Zeitpunkt
+> des letzten Lageblatts wird gemerkt (3.3 D2f, 5.4).
 
 ## Hinweis zu diesem Dokument
 
@@ -224,6 +228,7 @@ dem Vite-Build); es gibt keine serverseitige Variante.
 | D2e | Entfernte Meldungen je Einsatz-Sammlung | Kennungen der Einträge, die vor Ort über „Entfernen" oder „Fassung verwerfen…" herausgenommen wurden — damit „Einsatz importieren…" sie nicht still zurückholt, sondern nachfragt (`src/app/entfernte-meldungen.ts`, Audit Runde 2, R2-D4); keine Personendaten, nur zufällige Kennungen; „Rückgängig" nimmt sie wieder heraus, Einträge endgültig gelöschter Sammlungen fallen beim nächsten Schreiben weg | `localStorage` des Geräts (`eeb.entfernt.v1`), wandert mit der Datensicherung mit, fällt mit „Alle Daten löschen" weg |
 | D2f | Zeitpunkt der letzten Sicherung | Wann auf diesem Gerät zuletzt „Sicherung erstellen…" ausgelöst wurde — Grundlage für die Anzeige in der Datensicherung und die Erinnerung nach drei Tagen (`src/app/sicherung.ts`, Audit Runde 2, R2-O6); keine Personendaten | `localStorage` des Geräts (`eeb.sicherung.zuletzt.v1`), steht in der Sicherung selbst, fällt mit „Alle Daten löschen" weg |
 | D2g | Nachricht über automatisch gelöschte Sammlungen (seit 2026-09-29, R2-D5) | Name, Zeitraum (angelegt/zuletzt geändert), Zahl der Einheiten und Meldungen sowie Löschzeitpunkt einer Sammlung, die die Aufräumfrist (90 Tage ohne Änderung) überschritten hat; keine Personendaten, Name der Sammlung als Freitext. Vorgemerkt von einer Hülle um die Ablage (`src/app/aufraeum-hinweis.ts`), bevor der Kern die Sammlung verwirft; bleibt bis „Verstanden" auf der Startseite | `localStorage` des Geräts (`eeb.aufgeraeumt.v1`), fällt mit „Alle Daten löschen" weg |
+| D2h | Lageblatt-Stand je Einsatz-Sammlung (seit 2026-09-29, R2-A3) | Zeitpunkt des zuletzt erzeugten Lageblatts und Kennungen der Meldungen darauf — Grundlage für „Lageblatt erstellt … · seitdem n neue Meldungen"; keine Personendaten | `localStorage` des Geräts (`eeb.lageblatt-stand.v1`), fällt mit „Alle Daten löschen" weg |
 | D3 | Absenderkarte | Freiwillige Kontaktangabe (Name/E-Mail/Telefon) der meldenden Person | `localStorage` des Geräts |
 | D4 | Privater Geräteschlüssel | Ed25519-Schlüssel zur Signatur weitergereichter Bögen | `localStorage` des Geräts, **unverschlüsselt als Hex** |
 | D5 | QR-Payload / Exportdatei | Binär kodierter, komprimierter Bogen zur Übergabe an ein zweites Gerät; ebenso eine geteilte Vorlage (QR/Link mit Marker `V.`, oder JSON-Datei `eeb-vorlage-*.json`) | Transient (QR-Code-Anzeige) bzw. Datei auf dem Gerät oder in einer vom Nutzer gewählten Ablage (z. B. Cloud-Ordner) |
@@ -395,6 +400,11 @@ Datenausleitung an eine andere Herkunft ist technisch unterbunden.
   der Lücken der Meldung; Änderungen stehen als „von … auf …" (die
   PDF-Standardschrift kennt den Pfeil nicht). Das Lageblatt heißt jetzt
   „Lageblatt (A4 quer)" und passt bis etwa zwölf Einheiten auf eine Seite.
+  Seit 2026-09-29 (R2-A3) trägt das Lageblatt zusätzlich je Einheit
+  Funkrufname und Rückrufnummer der Führungskraft (Personenbezug auf dem
+  Aushang — Aushangort entsprechend wählen) und freie Zeilen für Nachträge.
+  Die ganze Sammel-PDF gibt es nur noch über „Einsatz weitergeben / sichern";
+  der Teilexport „nur neue Bögen" heißt `eeb-einsatz-nachtrag-….pdf`.
 - **Excel-Liste „Oldenburg"** (`src/app/oldenburg-xlsx.ts`, seit 2026-09-29,
   Audit Runde 2, R2-K2): führt dieselben Führungsstellen-Angaben — Eintreffzeit
   in „eingetr. / zugew.", Abrückzeit in „Einsatz-ende", Auftrag/Notiz

@@ -26,6 +26,14 @@
 import type { Einsatzsammlung, MeldeEintrag } from "@bos/meldekopf/einsaetze";
 
 const SPEICHER_SCHLUESSEL = "eeb.export-stand.v1";
+/**
+ * Wann zuletzt ein Lageblatt erzeugt wurde, und was da in der Sammlung stand.
+ * Getrennt vom Export-Stand: das Lageblatt ist Papier für die Wand, kein
+ * Export an den Stab — es darf „nur neue Bögen" nicht verschieben. Bisher
+ * merkte sich die App den Druck gar nicht; ob der Aushang aktuell ist, wusste
+ * niemand (Audit Runde 2, R2-A3).
+ */
+const LAGEBLATT_SCHLUESSEL = "eeb.lageblatt-stand.v1";
 
 /** Was der Export herausgeben soll. */
 export type ExportUmfang = "alle" | "neue";
@@ -47,9 +55,9 @@ function speicher(): Storage | null {
   }
 }
 
-function ablageLaden(): Ablage {
+function ablageLaden(schluessel = SPEICHER_SCHLUESSEL): Ablage {
   try {
-    const roh = speicher()?.getItem(SPEICHER_SCHLUESSEL);
+    const roh = speicher()?.getItem(schluessel);
     if (!roh) return {};
     const daten: unknown = JSON.parse(roh);
     if (!daten || typeof daten !== "object" || Array.isArray(daten)) return {};
@@ -69,9 +77,9 @@ function ablageLaden(): Ablage {
   }
 }
 
-function ablageSpeichern(ablage: Ablage): void {
+function ablageSpeichern(ablage: Ablage, schluessel = SPEICHER_SCHLUESSEL): void {
   try {
-    speicher()?.setItem(SPEICHER_SCHLUESSEL, JSON.stringify(ablage));
+    speicher()?.setItem(schluessel, JSON.stringify(ablage));
   } catch {
     /* voller oder gesperrter Speicher — der Stand ist Komfort, kein Fachdatum */
   }
@@ -105,6 +113,35 @@ export function exportVermerken(
   neu[einsatz.id] = stand;
   ablageSpeichern(neu);
   return stand;
+}
+
+/** Stand des zuletzt erzeugten Lageblatts dieses Einsatzes, oder null (R2-A3). */
+export function lageblattStandLaden(einsatzId: string): ExportStand | null {
+  return ablageLaden(LAGEBLATT_SCHLUESSEL)[einsatzId] ?? null;
+}
+
+/**
+ * Nach einem erzeugten Lageblatt: Zeitpunkt und die Meldungen, die darauf
+ * standen. Stände verschwundener Einsätze räumt der nächste Aufruf mit
+ * `behalten` weg — wie beim Export-Stand.
+ */
+export function lageblattVermerken(einsatz: Einsatzsammlung, behalten?: Iterable<string>, jetzt = Date.now()): ExportStand {
+  const stand: ExportStand = { zeitpunkt: jetzt, eintragIds: einsatz.eintraege.map((e) => e.id) };
+  const alt = ablageLaden(LAGEBLATT_SCHLUESSEL);
+  const neu: Ablage = {};
+  if (behalten) {
+    for (const id of behalten) if (alt[id]) neu[id] = alt[id];
+  } else {
+    Object.assign(neu, alt);
+  }
+  neu[einsatz.id] = stand;
+  ablageSpeichern(neu, LAGEBLATT_SCHLUESSEL);
+  return stand;
+}
+
+/** „seitdem 1 neue Meldung" / „seitdem keine neue Meldung" — für Export- und Lageblatt-Zeile. */
+export function seitdemText(neu: number): string {
+  return neu === 0 ? "seitdem keine neue Meldung" : neu === 1 ? "seitdem 1 neue Meldung" : `seitdem ${neu} neue Meldungen`;
 }
 
 /** Meldungen, die beim letzten Export noch nicht in der Sammlung standen — ohne Stand: alle. */

@@ -18,6 +18,7 @@ import {
   Erfassungsbogen,
   Fahrzeug,
   KontaktArt,
+  ansprechpartner,
   OrganisationsTyp,
   PersonalErfassung,
   datumZuIso,
@@ -298,7 +299,7 @@ const UEBERSICHT_MAX_ZEILEN = 8;
  * Auf dem Lageblatt weniger: es muss bei rund zehn Einheiten auf eine Seite
  * passen, die Einzelheiten stehen in der Sammel-PDF (Audit Runde 2, R2-K3).
  */
-const LAGEBLATT_MAX_ZEILEN = 3;
+const LAGEBLATT_MAX_ZEILEN = 2;
 
 /**
  * Änderungszeile fürs Papier: „Diesel: von 50 l auf 200 l" statt
@@ -324,15 +325,53 @@ function blattZeit(ms: number | undefined): string {
  * Abgerückte Einheiten stehen als eigener Block darunter; die Summe zählt
  * nur die zählenden — genau wie die Stärkeleiste am Gerät.
  */
-function uebersichtsTabelle(eintraege: UebersichtEintrag[], maxZeilen = UEBERSICHT_MAX_ZEILEN): Content {
+/**
+ * Wie erreiche ich die Einheit ohne Gerät? Funkrufname des ersten Fahrzeugs
+ * mit Funkrufnamen und die Rückrufnummer der Führungskraft (sonst die des
+ * Ortsverbands) — auf dem Einzelbogen stehen sie, auf dem Lageblatt fehlten
+ * sie (Audit Runde 2, R2-A3).
+ */
+export function erreichbarkeitZeilen(b: Erfassungsbogen): string[] {
+  const zeilen: string[] = [];
+  const fzg = b.fahrzeuge.find((f) => f.funkrufname);
+  const furn = fzg ? funkrufText(fzg, b.einheit) : "";
+  if (furn) zeilen.push(furn);
+  // Knapp, damit die Zeile in die Spalte passt: „5556968346 (S. Lang)".
+  const p = ansprechpartner(b.personal);
+  const tel = p?.kontakte.find((k) => k.art !== KontaktArt.EMAIL && k.wert);
+  if (p && tel) {
+    const name = [p.vorname ? `${p.vorname.charAt(0)}.` : "", p.nachname].filter(Boolean).join(" ");
+    zeilen.push(name ? `${tel.wert} (${name})` : `${tel.wert}`);
+  } else if (b.einheit.hierarchie[0]?.telefon) {
+    zeilen.push(`${b.einheit.hierarchie[0].telefon} (OV)`);
+  }
+  return zeilen;
+}
+
+/**
+ * Leere Zeilen unter den Einheiten des Lageblatts — zum Weiterschreiben bei
+ * Geräteausfall (R2-A3). Wenige Einheiten lassen Platz für mehr; bei rund
+ * zehn bleiben zwei, damit das Blatt eine Seite bleibt (R2-K3).
+ */
+function freieZeilen(anwesend: number): number {
+  return Math.min(6, Math.max(2, 10 - anwesend));
+}
+
+function uebersichtsTabelle(
+  eintraege: UebersichtEintrag[],
+  maxZeilen = UEBERSICHT_MAX_ZEILEN,
+  /** Lageblatt: Erreichbarkeit je Einheit und freie Zeilen zum Nachtragen (R2-A3). */
+  zumWeiterfuehren = false,
+): Content {
   const kopf = (text: string): TableCell => ({ text, bold: true, fillColor: GRAU });
   // Zug und Bedarf je Einheit, wie in der App-Tabelle — „Ruhezeit bei 5
   // Einheiten" ohne Namen musste die Ablösung per Funk klären (R2-K3).
-  const SPALTEN = 9;
+  const SPALTEN = zumWeiterfuehren ? 10 : 9;
   const body: TableCell[][] = [
     [
       kopf("Einheit"),
       kopf("Zug"),
+      ...(zumWeiterfuehren ? [kopf("Funkrufname /\nRückruf")] : []),
       // Eine Spalte für beide Zeiten: die Abrückzeit gibt es nur im Block
       // „Abgerückt", die leere Spalte daneben kostete die Änderungsspalte
       // ihre Breite und das Blatt seine Seite (R2-K3).
@@ -372,10 +411,11 @@ function uebersichtsTabelle(eintraege: UebersichtEintrag[], maxZeilen = UEBERSIC
     if (!e.abgerueckt && e.zaehlt === false) namensZeilen.push({ text: "zählt nicht in diese Lage", italics: true });
     // Lücken der Meldung als Zahl — am Gerät eine Marke an der Karte (R2-K3).
     const luecken = pruefpunkte(b).length;
-    if (luecken > 0) namensZeilen.push({ text: `${luecken} ${luecken === 1 ? "Lücke" : "Lücken"} in der Meldung`, italics: true });
+    if (luecken > 0) namensZeilen.push({ text: `${luecken} ${luecken === 1 ? "Lücke" : "Lücken"} (Meldung)`, italics: true });
     return [
       namensZeilen.length === 1 ? namensZeilen[0]! : { stack: namensZeilen },
       { text: weichUmbrechen(e.zugEtikett ?? "") },
+      ...(zumWeiterfuehren ? [{ stack: erreichbarkeitZeilen(b).map((text) => ({ text: weichUmbrechen(text) })) }] : []),
       {
         stack: [
           { text: blattZeit(e.eingetroffenAm) },
@@ -393,6 +433,18 @@ function uebersichtsTabelle(eintraege: UebersichtEintrag[], maxZeilen = UEBERSIC
   const anwesend = eintraege.filter((e) => !e.abgerueckt);
   const abgerueckt = eintraege.filter((e) => e.abgerueckt);
   for (const e of anwesend) body.push(zeile(e));
+  if (zumWeiterfuehren) {
+    // Fällt das Gerät aus, geht es auf diesem Blatt weiter statt auf einem
+    // neuen Zettel — sonst gibt es später drei Quellen (R2-A3).
+    const kopfzeile: TableCell[] = [
+      { text: "Nachtrag von Hand (Einheit, Zug, Uhrzeit, Stärke …)", italics: true, colSpan: SPALTEN },
+    ];
+    for (let i = 1; i < SPALTEN; i++) kopfzeile.push({});
+    body.push(kopfzeile);
+    for (let n = 0; n < freieZeilen(anwesend.length); n++) {
+      body.push(Array.from({ length: SPALTEN }, (): TableCell => ({ text: " ", margin: [0, 5, 0, 5] })));
+    }
+  }
   if (abgerueckt.length > 0) {
     // Ein Zwischenkopf statt einer Fußnote: „war da und ist wieder weg" muss
     // auf dem Papier so sichtbar sein wie in der Datei.
@@ -409,6 +461,7 @@ function uebersichtsTabelle(eintraege: UebersichtEintrag[], maxZeilen = UEBERSIC
   body.push([
     { text: `Summe (${beschriftung.join(" · ")})`, bold: true },
     { text: "" },
+    ...(zumWeiterfuehren ? [{ text: "" }] : []),
     { text: "" },
     { text: "" },
     { text: `${summe.staerke.fuehrer} / ${summe.staerke.unterfuehrer} / ${summe.staerke.mannschaft} / ${summe.staerke.gesamt}`, bold: true },
@@ -420,7 +473,13 @@ function uebersichtsTabelle(eintraege: UebersichtEintrag[], maxZeilen = UEBERSIC
   // Breiten für die quer liegende Übersichtsseite (714 pt Satzbreite): Zeiten
   // brechen nach dem Datum um, damit Zug und Bedarf daneben Platz haben.
   return {
-    table: { headerRows: 1, widths: [118, 38, 48, 48, 48, 16, 66, 88, "*"], body },
+    table: {
+      headerRows: 1,
+      widths: zumWeiterfuehren
+        ? [104, 34, 96, 46, 46, 52, 14, 62, 70, "*"]
+        : [118, 38, 48, 48, 48, 16, 66, 88, "*"],
+      body,
+    },
     fontSize: 7.5,
     // Knappe Innenabstände: bei zehn Einheiten entscheidet das über Seite 2.
     layout: { paddingTop: () => 1, paddingBottom: () => 1, paddingLeft: () => 3, paddingRight: () => 3 },
@@ -469,7 +528,7 @@ function bedarfsTabelle(eintraege: UebersichtEintrag[]): Content {
   return {
     stack: [
       { text: `Bedarf gesamt (${s.einheiten} Einheiten, ${s.staerke.gesamt} Personen)`, bold: true, margin: [0, 6, 0, 4] },
-      { table: { headerRows: 0, widths: [100, "*"], body }, margin: [0, 0, 0, 4] },
+      { table: { headerRows: 0, widths: [84, "*"], body }, margin: [0, 0, 0, 4] },
     ],
     unbreakable: true,
   };
@@ -524,6 +583,7 @@ function uebersichtsSeite(
   erstellt: number,
   hinweis?: string,
   maxZeilen = UEBERSICHT_MAX_ZEILEN,
+  zumWeiterfuehren = false,
 ): Content[] {
   const zugSummen = zugSummenTabelle(eintraege);
   const bedarf = bedarfsTabelle(eintraege);
@@ -539,12 +599,12 @@ function uebersichtsSeite(
       ],
       margin: [0, 0, 0, 6],
     },
-    uebersichtsTabelle(eintraege, maxZeilen),
+    uebersichtsTabelle(eintraege, maxZeilen, zumWeiterfuehren),
     ...(hinweis ? [{ text: hinweis, italics: true, margin: [0, 2, 0, 0] } as Content] : []),
     // Bedarf und Zwischensummen nebeneinander statt untereinander: vorher
     // rutschten die Zwischensummen allein auf Seite 2 (R2-K3).
     zugSummen
-      ? { columns: [{ width: 300, stack: [bedarf] }, { width: "*", stack: [zugSummen] }], columnGap: 12 }
+      ? { columns: [{ width: 330, stack: [bedarf] }, { width: "*", stack: [zugSummen] }], columnGap: 12, fontSize: 7.5 }
       : bedarf,
   ];
 }
@@ -703,6 +763,7 @@ export function einsatzLageblattDokument(
         ? "Noch keine Einheit gemeldet."
         : "Summen und Bedarf zählen nur die anwesenden Einheiten dieser Lage; abgerückte stehen im eigenen Block. Alle Änderungen im Einzelnen: Sammel-PDF.",
       LAGEBLATT_MAX_ZEILEN,
+      true,
     ),
   };
 }

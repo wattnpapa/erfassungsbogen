@@ -134,7 +134,7 @@ Funktionalität: Einsatz-Sammlung führen (Meldekopf)
     Und sehe ich die Überschrift "Einheiten (2 gemeldet"
 
   Szenario: Sammel-PDF bündelt alle Bögen in einer Datei
-    Wenn ich auf "Sammel-PDF (alle Bögen)" klicke und eine Datei erhalte
+    Wenn ich auf "Einsatz weitergeben / sichern" klicke und eine Datei erhalte
     Dann heißt die heruntergeladene Datei wie "eeb-einsatz-*.pdf"
 
   Szenario: CSV-Übersicht für die Lagekarte
@@ -195,7 +195,7 @@ Funktionalität: Einsatz-Sammlung führen (Meldekopf)
     Und sehe ich den Text "Suche"
 
   Szenario: Die Sammel-PDF bringt die ganze Sammlung auf ein leeres Gerät
-    Wenn ich auf "Sammel-PDF (alle Bögen)" klicke und eine Datei erhalte
+    Wenn ich auf "Einsatz weitergeben / sichern" klicke und eine Datei erhalte
     Und ich auf "‹ Einsätze" klicke
     Und ich auf "Alle Daten löschen" klicke
     Und ich im Dialog "Ja, alle lokalen Daten dieser App endgültig löschen" ankreuze

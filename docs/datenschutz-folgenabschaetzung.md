@@ -87,6 +87,13 @@ Grundlage: Repository `wattnpapa/erfassungsbogen`, Stand 2026-09-12 — Version 
 > Zeitraum und Zahl der Meldungen der gelöschten Sammlung (ohne
 > Personendaten), bis die Nachricht auf der Startseite quittiert ist. Die
 > Löschung selbst bleibt unverändert. Geändert: 5.7.
+>
+> **Nachgezogen 2026-09-29 — Lageblatt zum Weiterführen (Audit Runde 2,
+> R2-A3):** Das Lageblatt nennt je Einheit Funkrufname und Rückrufnummer der
+> Führungskraft (Initial, Nachname, Nummer) — neu auf diesem Ausdruck, auf dem
+> Einzelbogen und in der Excel-Liste stand sie schon. Die App merkt sich, wann
+> zuletzt ein Lageblatt erzeugt wurde (`eeb.lageblatt-stand.v1`, nur
+> Kennungen und Zeitpunkt). Geändert: 5.1, 5.7.
 
 ## Hinweis zu diesem Dokument
 
@@ -251,7 +258,11 @@ definieren.
   Angaben gehen seit 2026-09-29 auch in die Excel-Liste „Oldenburg" für die
   übergeordnete Führungsstelle. Seit 2026-09-29 steht dieser Stand in der Sammel-PDF zusätzlich über jedem Bogen
   und neben seinem QR-Code, damit ein Ausdruck ohne Seite 1 nicht eine
-  abgerückte Einheit als anwesend zeigt (R2-A1).
+  abgerückte Einheit als anwesend zeigt (R2-A1). Seit 2026-09-29 (R2-A3) trägt
+  das Lageblatt je Einheit auch Funkrufname und Rückrufnummer der
+  Führungskraft (Nummer mit Initial und Nachname) sowie freie Zeilen zum
+  handschriftlichen Nachtragen — damit die Einheit bei Geräteausfall ohne
+  Gerät erreichbar bleibt.
 - Weitergabe einer gespeicherten Vorlage (Stammdaten der eigenen Einheit) an ein
   anderes Gerät oder in eine vom Nutzer gewählte Ablage, damit sie
   geräteunabhängig verfügbar ist.
@@ -372,6 +383,10 @@ Kapitel 6 der [Arc42-Dokumentation](arc42-architektur.md).
   beim Namen (Zeitraum, Zahl der Meldungen), bis „Verstanden" gedrückt wird
   (`eeb.aufgeraeumt.v1`, `src/app/aufraeum-hinweis.ts`; nur Sammlungsname und
   Zahlen, keine Personendaten; Audit Runde 2, R2-D5).
+- **Lageblatt-Stand (seit 2026-09-29, R2-A3):** Zeitpunkt des zuletzt
+  erzeugten Lageblatts und die Kennungen der Meldungen darauf
+  (`eeb.lageblatt-stand.v1`, `src/app/export-stand.ts`) — wie der
+  Export-Stand ohne Personendaten, fällt mit „Alle Daten löschen" weg.
 - Eine **Papierkorb-Funktion** existiert (`sicherung.ts`, `vorlagen.ts`,
   `@bos/meldekopf/papierkorb`): gelöschte Einträge lassen sich vor endgültiger
   Löschung wiederherstellen.

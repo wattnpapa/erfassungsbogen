@@ -34,7 +34,7 @@ import {
 import { eintreffzeitSetzen, notizSetzen } from "./eintrag-zeiten";
 import { aggregiere } from "./auswertung";
 import { neuerBogen } from "./hilfen";
-import type { ExportStand, ExportUmfang } from "./export-stand";
+import { lageblattVermerken, type ExportStand, type ExportUmfang } from "./export-stand";
 
 // pdfmake selbst hat hier nichts zu suchen: geprüft wird der Weg dorthin.
 const meldungPdfAnzeigen = vi.fn<(m: MeldeEintrag, fenster: Window | null) => Promise<void>>(async () => {});
@@ -790,10 +790,26 @@ describe("Ausgabewege der Einsatzansicht", () => {
 
     await nutzer.click(screen.getByRole("button", { name: "Einsatz weitergeben / sichern" }));
     await nutzer.click(screen.getByRole("button", { name: "Lageblatt (A4 quer)" }));
-    await nutzer.click(screen.getByRole("button", { name: "Sammel-PDF (alle Bögen)" }));
     expect(weitergeben).toHaveBeenCalledTimes(1);
     expect(lageblatt).toHaveBeenCalledTimes(1);
-    expect(sammelPdf).toHaveBeenCalledWith("alle");
+    // Die ganze Sammel-PDF gibt es nur noch über „Einsatz weitergeben"; der
+    // zweite Knopf erzeugte dieselbe Datei (R2-A3). Der Nachtrag bleibt.
+    expect(screen.queryByRole("button", { name: "Sammel-PDF (alle Bögen)" })).toBeNull();
+    await nutzer.click(screen.getByRole("checkbox", { name: /Nur neue Bögen seit dem letzten Export/ }));
+    await nutzer.click(screen.getByRole("button", { name: "Sammel-PDF (nur neue Bögen)" }));
+    expect(sammelPdf).toHaveBeenCalledWith("neue");
+  });
+
+  it("sagt, wann zuletzt ein Lageblatt entstand und was seitdem neu ist (R2-A3)", () => {
+    buehne(["Wardenburg"], { onLageblatt: vi.fn() });
+    expect(document.querySelector(".lageblatt-stand")!.textContent).toBe("Noch kein Lageblatt aus diesem Einsatz.");
+    cleanup();
+    const angelegt = einsatzAnlegen("Lage", EinsatzArt.EINSATZ);
+    meldungHinzufuegen(angelegt.id, bogenMitName("Wardenburg"));
+    lageblattVermerken(einsaetzeLaden().find((s) => s.id === angelegt.id)!);
+    meldungHinzufuegen(angelegt.id, bogenMitName("Hatten"));
+    ansicht(angelegt.id, { onLageblatt: vi.fn() });
+    expect(document.querySelector(".lageblatt-stand")!.textContent).toMatch(/^Lageblatt erstellt .* · seitdem 1 neue Meldung$/);
   });
 
   it("zeigt die Herkunft als „Empfangen“ statt „Scan“", () => {
