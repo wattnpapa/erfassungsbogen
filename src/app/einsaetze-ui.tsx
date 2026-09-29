@@ -717,6 +717,36 @@ export function EinsatzDetail(props: {
     );
     ziel?.scrollIntoView({ block: "center" });
   }
+  /**
+   * Was seit dem Öffnen der Ansicht (bzw. seit dem Schließen der letzten
+   * Sammelquittung) neu in die Sammlung kam — Schlüssel der Einheiten in
+   * Eingangsreihenfolge. Kommen mehrere Einheiten kurz nacheinander oder als
+   * Stapel, nannte die Quittung nur „4 Bögen aufgenommen", und die Liste
+   * stand alphabetisch: Wer prüfen wollte, ob alle drin sind, suchte
+   * (Audit Runde 2, R2-S4). Eigene Umbauten (Aufteilen, Zusammenführen) und
+   * zurückgeholte Meldungen zählen nicht: deren Kennungen waren schon da
+   * oder entstehen hier.
+   */
+  const gesehen = useRef<{ einsatzId: string; ids: Set<string> } | null>(null);
+  const [zuletztAufgenommen, setZuletztAufgenommen] = useState<string[]>([]);
+  useEffect(() => {
+    const ids = einsatz.eintraege.map((e) => e.id);
+    if (gesehen.current?.einsatzId !== einsatz.id) {
+      gesehen.current = { einsatzId: einsatz.id, ids: new Set(ids) };
+      setZuletztAufgenommen([]);
+      return;
+    }
+    const bekannt = gesehen.current.ids;
+    const neu = einsatz.eintraege
+      .filter((e) => !bekannt.has(e.id) && e.quelle !== "aufteilung" && e.quelle !== "zusammenfuehrung")
+      .map((e) => e.einheitSchluessel);
+    for (const id of ids) bekannt.add(id);
+    if (neu.length > 0) setZuletztAufgenommen((alt) => [...alt.filter((x) => !neu.includes(x)), ...new Set(neu)]);
+  }, [einsatz]);
+  const aufgenommenListe = zuletztAufgenommen
+    .map((schl) => alleEinheiten.find((e) => e.einheitSchluessel === schl))
+    .filter((e): e is MeldeEintrag => e != null);
+  const aufgenommenUebung = aufgenommenListe.filter((e) => uebungenDaneben.some((u) => u.id === e.id)).length;
   const qualiListe = qualifikationenImEinsatz(alleEinheiten);
   const gewaehlteQuali = qualiListe.find((q) => q.schluessel === quali);
   // Zwei Gruppen in der Auswahlliste: „wer kann X?" und „wer darf was fahren?"
@@ -810,6 +840,31 @@ export function EinsatzDetail(props: {
           {eingegangen.teilEtikett ? ` (${eingegangen.teilEtikett})` : ""} · jetzt {sum.einheiten}{" "}
           {sum.einheiten === 1 ? "Einheit" : "Einheiten"}, Gesamt {sum.staerke.gesamt}.{" "}
           <button type="button" className="link" onClick={eingangZeigen}>In der Liste zeigen</button>
+        </p>
+      )}
+
+      {/* Mehrere Einheiten kurz nacheinander oder als Stapel: die Quittung
+          nennt sie mit Namen und sagt, welche davon als Übung nicht zählen;
+          ein Tipp stellt sie oben in die Liste (R2-S4). */}
+      {aufgenommenListe.length > 1 && (
+        <p className="meldung stapel-eingang" role="status">
+          Zuletzt aufgenommen ({aufgenommenListe.length}):{" "}
+          {aufgenommenListe
+            .map((e) => `${einheitAnzeigename(e.bogen.einheit)}${e.teilEtikett ? ` (${e.teilEtikett})` : ""}`)
+            .join(", ")}
+          {aufgenommenUebung > 0
+            ? aufgenommenUebung === aufgenommenListe.length
+              ? ` — ${aufgenommenUebung === 2 ? "beide" : `alle ${aufgenommenUebung}`} Übung, nicht gezählt`
+              : ` — davon ${aufgenommenUebung} Übung, nicht gezählt`
+            : ""}
+          .{" "}
+          {sortierung !== "eintreffzeit" && (
+            <>
+              <button type="button" className="link" onClick={() => setSortierung("eintreffzeit")}>Neueste oben zeigen</button>
+              {" · "}
+            </>
+          )}
+          <button type="button" className="link" onClick={() => setZuletztAufgenommen([])}>Ausblenden</button>
         </p>
       )}
 

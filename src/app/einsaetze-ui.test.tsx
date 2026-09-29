@@ -1089,3 +1089,57 @@ describe("Kompakte Einheiten auf dem Telefon (R2-K7)", () => {
     expect(karte.className).toContain("kompakt");
   });
 });
+
+/**
+ * Kommen mehrere Einheiten gleichzeitig, will der Meldekopf prüfen, ob alle
+ * drin sind — die Quittung nannte nur „4 Bogen/Bögen aufgenommen." (Audit
+ * Runde 2, R2-S4).
+ */
+describe("Quittung nennt die zuletzt aufgenommenen Einheiten (R2-S4)", () => {
+  beforeEach(() => {
+    localStorage.clear();
+  });
+
+  it("listet einen Stapel mit Namen, nennt die Übungen und stellt auf Wunsch die Neuesten nach oben", async () => {
+    const nutzer = userEvent.setup();
+    const { einsatzId, neuLaden } = buehne(["Zeitz"]);
+    // Vor dem Stapel: keine Sammelquittung.
+    expect(document.querySelector(".stapel-eingang")).toBeNull();
+    for (const n of ["Weinsberg", "Albstadt", "Ulm"]) {
+      const b = bogenMitName(n);
+      b.uebung = n !== "Ulm";
+      meldungHinzufuegen(einsatzId, b);
+    }
+    neuLaden();
+    const quittung = document.querySelector<HTMLElement>(".stapel-eingang")!;
+    expect(quittung.getAttribute("role")).toBe("status");
+    expect(quittung.textContent).toMatch(/Zuletzt aufgenommen \(3\): .*Weinsberg.*Albstadt.*Ulm — davon 2 Übung, nicht gezählt\./);
+    expect(quittung.textContent).not.toContain("Zeitz");
+
+    await nutzer.click(within(quittung).getByRole("button", { name: "Neueste oben zeigen" }));
+    expect((screen.getByLabelText("Sortierung") as HTMLSelectElement).value).toBe("eintreffzeit");
+
+    await nutzer.click(within(quittung).getByRole("button", { name: "Ausblenden" }));
+    expect(document.querySelector(".stapel-eingang")).toBeNull();
+  });
+
+  it("zählt Aufteilen nicht als Eingang", async () => {
+    const angelegt = einsatzAnlegen("Hochwasser Ulm", EinsatzArt.EINSATZ);
+    const b = bogenMitName("Ulm");
+    b.personalErfassung = PersonalErfassung.NUR_STAERKE;
+    b.staerkeManuell = { fuehrer: 0, unterfuehrer: 2, mannschaft: 6, gesamt: 8 };
+    const ulm = meldungHinzufuegen(angelegt.id, b)!.eintrag;
+    const { neuLaden } = ansicht(angelegt.id);
+    expect(
+      meldungAufteilen(angelegt.id, ulm.id, {
+        teilEtikett: "Fachberater",
+        personal: [],
+        staerke: { fuehrer: 0, unterfuehrer: 1, mannschaft: 1 },
+        fahrzeuge: [],
+      }),
+    ).not.toBeNull();
+    neuLaden();
+    expect(document.querySelectorAll(".einheit-zeile")).toHaveLength(2);
+    expect(document.querySelector(".stapel-eingang")).toBeNull();
+  });
+});
