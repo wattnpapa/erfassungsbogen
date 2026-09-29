@@ -1703,7 +1703,9 @@ function DaumenQuittung({ children, prellschutz = false, onRueckgaengig, onSchli
  * wer bewusst zurücknehmen will, tippt nicht schneller als nach einer
  * halben Sekunde erneut.
  */
-export const PRELLSCHUTZ_MS = 600;
+// Der Prüfstand (features/support/haken.ts) setzt ihn vor dem Laden auf 0 —
+// Playwright tippt schneller nach, als es ein Finger je täte.
+export const PRELLSCHUTZ_MS: number = (globalThis as { __EEB_PRELLSCHUTZ_MS?: number }).__EEB_PRELLSCHUTZ_MS ?? 600;
 
 function EinheitKarte(props: {
   einsatzId: string;
@@ -2001,7 +2003,8 @@ function EinheitKarte(props: {
       // die neu geordnete Karte (R2-G4). Abgefangen wird in der
       // Einfangphase, also bevor irgendein Knopf der Karte ihn sieht.
       onClickCapture={(e) => {
-        if (Date.now() < gesperrtBis.current) {
+        // Nur Zeiger-Tipps; ein Klick aus der Tastatur trägt `detail === 0`.
+        if (e.detail > 0 && Date.now() < gesperrtBis.current) {
           e.stopPropagation();
           e.preventDefault();
         }

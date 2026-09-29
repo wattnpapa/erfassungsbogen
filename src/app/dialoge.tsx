@@ -206,7 +206,8 @@ export function zeigeHinweis(a: {
  * (Enter, Esc) ist nicht betroffen: ein Klick aus der Tastatur trägt
  * `detail === 0`.
  */
-let prellschutzMs = 450;
+// Der Prüfstand (features/support/haken.ts) setzt ihn vor dem Laden auf 0.
+let prellschutzMs: number = (globalThis as { __EEB_PRELLSCHUTZ_MS?: number }).__EEB_PRELLSCHUTZ_MS ?? 450;
 
 /** Für Tests: Prellschutz setzen (0 = aus). Gibt den alten Wert zurück. */
 export function prellschutzSetzen(ms: number): number {

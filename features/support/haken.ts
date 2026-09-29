@@ -154,6 +154,10 @@ Before(async function (this: EebWelt, { pickle }) {
   await kontext.addInitScript(
     `Object.defineProperty(Navigator.prototype, "pdfViewerEnabled", { get: () => ${pdfBetrachter}, configurable: true });`,
   );
+  // Der Prellschutz der Rückfragen (src/app/dialoge.tsx, R2-G1) verschluckt
+  // Zeiger-Klicks in den ersten 450 ms — Playwright bestätigt schneller als
+  // jeder Finger. Sein Verhalten prüft ein eigener Oberflächentest.
+  await kontext.addInitScript(`globalThis.__EEB_PRELLSCHUTZ_MS = 0;`);
   // „Link teilen" schreibt ohne Web-Share-API in die Zwischenablage; ohne
   // Erlaubnis scheitert das still. WebKit kennt diese Berechtigungsnamen nicht.
   await kontext.grantPermissions(["clipboard-read", "clipboard-write"]).catch(() => {});
