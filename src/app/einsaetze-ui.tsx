@@ -8,7 +8,7 @@
  * Reine Anzeige + Aufruf der Store-/Auswertungslogik (einsaetze.ts, auswertung.ts).
  */
 
-import { useEffect, useRef, useState, type FocusEvent } from "react";
+import { useEffect, useId, useRef, useState, type FocusEvent } from "react";
 import {
   PersonalErfassung,
   datumZuIso,
@@ -1005,21 +1005,26 @@ export function EinsatzDetail(props: {
           </p>
         )}
         {ansicht === "tabelle" && kopf.length > 0 && <EinheitenTabelle meldungen={kopf} art={einsatz.art} eingang={eingang} />}
-        {ansicht === "karten" &&
-          kopf.map((e) => (
-            <EinheitKarte
-              key={e.einheitSchluessel}
-              einsatzId={einsatz.id}
-              kopf={e}
-              alle={einsatz.eintraege}
-              onGeaendert={onGeaendert}
-              qualifikation={quali}
-              qualifikationKurz={qualiKurz}
-              eingang={eingang}
-              onEntfernt={setZuletztEntfernt}
-              onStatusWechsel={setStatusWechsel}
-            />
-          ))}
+        {/* Eine Liste: das Vorleseprogramm nennt die Zahl der Einheiten und
+            erlaubt den Sprung von Eintrag zu Eintrag (R2-M4). */}
+        {ansicht === "karten" && kopf.length > 0 && (
+          <ul className="einheiten-liste">
+            {kopf.map((e) => (
+              <EinheitKarte
+                key={e.einheitSchluessel}
+                einsatzId={einsatz.id}
+                kopf={e}
+                alle={einsatz.eintraege}
+                onGeaendert={onGeaendert}
+                qualifikation={quali}
+                qualifikationKurz={qualiKurz}
+                eingang={eingang}
+                onEntfernt={setZuletztEntfernt}
+                onStatusWechsel={setStatusWechsel}
+              />
+            ))}
+          </ul>
+        )}
       </section>
 
       {/* Das Löschen gehört ans Ende des Inhalts, nicht in die feste Leiste am
@@ -1487,7 +1492,8 @@ function EinheitKarte(props: {
   onStatusWechsel?: (w: StatusWechsel) => void;
 }) {
   const { einsatzId, kopf, alle, onGeaendert, onEntfernt, qualifikation = "", qualifikationKurz = "", eingang, onStatusWechsel } = props;
-  const zeile = useEingangsquittung<HTMLDivElement>(marke(eingang, kopf.einheitSchluessel));
+  const zeile = useEingangsquittung<HTMLLIElement>(marke(eingang, kopf.einheitSchluessel));
+  const nameId = useId();
   // Die Namen gehören in die Zeile, nicht hinter einen Klick: die Frage lautet
   // „wen habe ich?", und die Antwort ist der Name, nicht die Zahl.
   const qualiPersonen = personenMitQualifikation(kopf, qualifikation);
@@ -1718,10 +1724,15 @@ function EinheitKarte(props: {
   }
 
   return (
-    <div ref={zeile} className={`einheit-zeile${zaehlt ? "" : " gestrichen"}`}>
+    <li ref={zeile} className={`einheit-zeile${zaehlt ? "" : " gestrichen"}`}>
       <div className="kopfzeile">
-        <span className="muster-text">
-          <span className="muster-name">
+        <div className="muster-text">
+          {/* Der Name als Überschrift: Mit Vorleseprogramm springt man so von
+              Einheit zu Einheit statt durch neun Knöpfe je Karte zu wischen;
+              die Knöpfe verweisen über aria-describedby auf ihn, sonst stand
+              in der Knopfliste 21× „Abrücken" ohne Einheit (Audit Runde 2,
+              R2-M4). Der sichtbare Knopfname bleibt, wie er ist. */}
+          <h3 className="muster-name" id={nameId}>
             {einheitAnzeigename(kopf.bogen.einheit)}
             {/* Übungsbögen bleiben auch neben echten Meldungen unübersehbar. */}
             {kopf.bogen.uebung ? <span className="uebung-badge">ÜBUNG</span> : null}
@@ -1732,7 +1743,7 @@ function EinheitKarte(props: {
             {kopf.zugEtikett ? <span className="zug-badge"> {kopf.zugEtikett}</span> : null}
             {/* Was seit der Übernahme dazukam: jünger als 30 Minuten (K2). */}
             {zaehlt && istNeu(kopf) ? <span className="neu-badge" title="Vor weniger als 30 Minuten eingetroffen">neu</span> : null}
-          </span>
+          </h3>
           <span className="muster-sub">
             {orgLabel(kopf.bogen.einheit.organisation)} · Stärke {staerkeText(kopf.bogen)}
             {aufgegangen ? " · zusammengeführt" : ""}
@@ -1747,6 +1758,7 @@ function EinheitKarte(props: {
           <span className="muster-sub zeiten-zeile">
             eingetroffen {zeitKurz(eintreffzeit(kopf))}{" "}
             <button
+              aria-describedby={nameId}
               type="button"
               className="link zeit-aendern"
               onClick={() => setZeitEntwurf({ feld: "eintreffen", wert: zuDatetimeLocal(eintreffzeit(kopf)) })}
@@ -1758,6 +1770,7 @@ function EinheitKarte(props: {
                 {" · abgerückt"}
                 {kopf.abgerueckAm != null ? ` ${zeitKurz(kopf.abgerueckAm)}` : ""}{" "}
                 <button
+                  aria-describedby={nameId}
                   type="button"
                   className="link zeit-aendern"
                   onClick={() => setZeitEntwurf({ feld: "abruecken", wert: zuDatetimeLocal(kopf.abgerueckAm ?? Date.now()) })}
@@ -1793,6 +1806,7 @@ function EinheitKarte(props: {
           {luecken.length > 0 && (
             <span className="muster-sub">
               <button
+                aria-describedby={nameId}
                 type="button"
                 className="link luecken-marke"
                 aria-expanded={lueckenOffen}
@@ -1845,13 +1859,14 @@ function EinheitKarte(props: {
               })}
             </span>
           )}
-        </span>
+        </div>
       </div>
       <div className="vorlage-aktionen">
-        <button type="button" onClick={() => setDetails(!details)}>
+        <button type="button" aria-describedby={nameId} onClick={() => setDetails(!details)}>
           {details ? "Details schließen" : "Details"}
         </button>{" "}
         <button
+          aria-describedby={nameId}
           type="button"
           onClick={bogenPdf}
           disabled={pdfLaeuft}
@@ -1861,7 +1876,7 @@ function EinheitKarte(props: {
         </button>{" "}
         {vorige && (
           <>
-            <button type="button" onClick={() => setAenderungen(!aenderungen)}>
+            <button type="button" aria-describedby={nameId} onClick={() => setAenderungen(!aenderungen)}>
               {aenderungen ? "Änderungen schließen" : "Änderungen"}
             </button>{" "}
           </>
@@ -1872,18 +1887,18 @@ function EinheitKarte(props: {
             gleich wieder zurück (D4). */}
         {zaehlt && (
           <>
-            <button type="button" onClick={() => void statusSetzen(MeldeStatus.ABGERUECKT)}>Abrücken</button>{" "}
+            <button type="button" aria-describedby={nameId} onClick={() => void statusSetzen(MeldeStatus.ABGERUECKT)}>Abrücken</button>{" "}
           </>
         )}
-        <button type="button" onClick={() => setZugEntwurf(kopf.zugEtikett ?? "")}>
+        <button type="button" aria-describedby={nameId} onClick={() => setZugEntwurf(kopf.zugEtikett ?? "")}>
           {kopf.zugEtikett ? "Zug ändern" : "Zug zuordnen"}
         </button>{" "}
-        <button type="button" onClick={() => setNotizEntwurf(kopf.notiz ?? "")}>
+        <button type="button" aria-describedby={nameId} onClick={() => setNotizEntwurf(kopf.notiz ?? "")}>
           {kopf.notiz ? "Auftrag ändern" : "Auftrag/Notiz"}
         </button>{" "}
         {zaehlt && (
           <>
-            <button type="button" onClick={() => setAufteilen(!aufteilen)}>
+            <button type="button" aria-describedby={nameId} onClick={() => setAufteilen(!aufteilen)}>
               {aufteilen ? "Aufteilen schließen" : "Aufteilen…"}
             </button>{" "}
           </>
@@ -1891,25 +1906,25 @@ function EinheitKarte(props: {
         {/* Nur anbieten, wenn es überhaupt einen anderen Teil zum Eingliedern gibt. */}
         {zaehlt && geschwister.length > 0 && (
           <>
-            <button type="button" onClick={() => setZusammenfuehren(!zusammenfuehren)}>
+            <button type="button" aria-describedby={nameId} onClick={() => setZusammenfuehren(!zusammenfuehren)}>
               {zusammenfuehren ? "Zusammenführen schließen" : "Zusammenführen…"}
             </button>{" "}
           </>
         )}
         {revs.length > 1 && (
-          <button type="button" onClick={() => setHistorie(!historie)}>
+          <button type="button" aria-describedby={nameId} onClick={() => setHistorie(!historie)}>
             {historie ? "Historie schließen" : `Historie (${revs.length})`}
           </button>
         )}{" "}
-        <button type="button" onClick={() => void verschieben()}>Verschieben…</button>{" "}
+        <button type="button" aria-describedby={nameId} onClick={() => void verschieben()}>Verschieben…</button>{" "}
         {!zaehlt && (
           <>
-            <button type="button" className="knopf-abgesetzt" onClick={() => void statusSetzen(MeldeStatus.ANWESEND)}>
+            <button type="button" aria-describedby={nameId} className="knopf-abgesetzt" onClick={() => void statusSetzen(MeldeStatus.ANWESEND)}>
               Als anwesend
             </button>{" "}
           </>
         )}
-        <button type="button" className="entfernen" onClick={entfernen}>Entfernen</button>
+        <button type="button" aria-describedby={nameId} className="entfernen" onClick={entfernen}>Entfernen</button>
       </div>
       {lueckenOffen && luecken.length > 0 && (
         <ul className="luecken-liste">
@@ -1950,8 +1965,8 @@ function EinheitKarte(props: {
             }}
             onBlur={(e) => inlineVerlassen(e, zugEntwurf, () => void zugSpeichern(), () => setZugEntwurf(null))}
           />{" "}
-          <button type="button" className="primaer" onClick={() => void zugSpeichern()}>Speichern</button>{" "}
-          <button type="button" onClick={() => setZugEntwurf(null)}>Abbrechen</button>
+          <button type="button" aria-describedby={nameId} className="primaer" onClick={() => void zugSpeichern()}>Speichern</button>{" "}
+          <button type="button" aria-describedby={nameId} onClick={() => setZugEntwurf(null)}>Abbrechen</button>
         </div>
       )}
       {notizEntwurf !== null && (
@@ -1969,8 +1984,8 @@ function EinheitKarte(props: {
             }}
             onBlur={(e) => inlineVerlassen(e, notizEntwurf, () => void notizSpeichern(), () => setNotizEntwurf(null))}
           />{" "}
-          <button type="button" className="primaer" onClick={() => void notizSpeichern()}>Speichern</button>{" "}
-          <button type="button" onClick={() => setNotizEntwurf(null)}>Abbrechen</button>
+          <button type="button" aria-describedby={nameId} className="primaer" onClick={() => void notizSpeichern()}>Speichern</button>{" "}
+          <button type="button" aria-describedby={nameId} onClick={() => setNotizEntwurf(null)}>Abbrechen</button>
         </div>
       )}
       {zeitEntwurf !== null && (
@@ -1988,8 +2003,8 @@ function EinheitKarte(props: {
               }}
             />
           </label>{" "}
-          <button type="button" className="primaer" onClick={() => void zeitSpeichern()}>Speichern</button>{" "}
-          <button type="button" onClick={() => setZeitEntwurf(null)}>Abbrechen</button>
+          <button type="button" aria-describedby={nameId} className="primaer" onClick={() => void zeitSpeichern()}>Speichern</button>{" "}
+          <button type="button" aria-describedby={nameId} onClick={() => setZeitEntwurf(null)}>Abbrechen</button>
         </div>
       )}
       {historie && revs.length > 1 && (
@@ -2005,6 +2020,6 @@ function EinheitKarte(props: {
           ))}
         </ul>
       )}
-    </div>
+    </li>
   );
 }

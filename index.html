@@ -1838,6 +1838,16 @@
     .einheit-zeile.geht { animation: zeile-geht calc(var(--dauer-2) * 0.8) ease-in forwards; }
     @keyframes zeile-geht { to { opacity: 0; } }
     .einheit-zeile.gestrichen .muster-name { text-decoration: line-through; }
+    /* Einheitenliste als Liste mit dem Namen als Überschrift (Audit Runde 2,
+       R2-M4): Semantik für Vorleseprogramme, am Bildschirm unverändert —
+       keine Aufzählungszeichen, und die Überschrift trägt die Schrift der
+       bisherigen Namenszeile statt der h3-Größe (Plattform-Themen setzen h3
+       eigens, deshalb die engere Auswahl). */
+    ul.einheiten-liste { list-style: none; margin: 0; padding: 0; }
+    .einheit-zeile h3.muster-name {
+      margin: 0; font: inherit; font-size: var(--t-m);
+      letter-spacing: normal; color: inherit; border: none; padding: 0;
+    }
     /* Zug- und Teil-Kennzeichnung an einer gemeldeten Einheit. Ruhiger als der
        Übungs-Störer daneben: sie ordnen ein, sie warnen nicht. Das Teil-Etikett
        trägt den Akzent, weil es nach einer Aufteilung das einzige ist, was zwei

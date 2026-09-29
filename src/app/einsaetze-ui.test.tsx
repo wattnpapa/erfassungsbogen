@@ -737,3 +737,43 @@ describe("Nur neue Bögen seit dem letzten Export", () => {
     expect(sammelPdf).not.toHaveBeenCalled();
   });
 });
+
+/**
+ * Die Kartenansicht für Vorleseprogramme: Die Einheiten waren weder Liste
+ * noch Überschrift, und 24 Knopfsätze hießen gleich — „Abrücken" ohne Bezug
+ * zur Einheit (Audit Runde 2, R2-M4).
+ */
+describe("Einheitenkarten als Liste mit Überschrift und Knopfbezug", () => {
+  beforeEach(() => {
+    localStorage.clear();
+  });
+
+  it("setzt jede Einheit als Listeneintrag mit dem Namen als Überschrift der Ebene 3", () => {
+    buehne(["Wardenburg", "Ahlhorn"]);
+    const liste = screen.getByRole("list");
+    const eintraege = within(liste).getAllByRole("listitem");
+    expect(eintraege).toHaveLength(2);
+    const ueberschriften = screen.getAllByRole("heading", { level: 3 }).map((h) => h.textContent ?? "");
+    expect(ueberschriften).toHaveLength(2);
+    expect(ueberschriften[0]).toContain("Ahlhorn");
+    expect(ueberschriften[1]).toContain("Wardenburg");
+  });
+
+  it("verbindet jeden Knopf einer Karte mit dem Einheitsnamen, ohne den sichtbaren Namen zu ändern", () => {
+    buehne(["Wardenburg", "Ahlhorn"]);
+    const abruecken = screen.getAllByRole("button", { name: "Abrücken" });
+    expect(abruecken).toHaveLength(2);
+    const beschreibungen = abruecken.map((k) => {
+      const id = k.getAttribute("aria-describedby");
+      return id ? document.getElementById(id)?.textContent ?? "" : "";
+    });
+    expect(beschreibungen[0]).toContain("Ahlhorn");
+    expect(beschreibungen[1]).toContain("Wardenburg");
+    // Kein Knopf einer Karte ohne Bezug.
+    for (const karte of document.querySelectorAll(".einheit-zeile")) {
+      for (const knopf of karte.querySelectorAll("button")) {
+        expect(knopf.getAttribute("aria-describedby"), knopf.textContent ?? "").toBeTruthy();
+      }
+    }
+  });
+});
