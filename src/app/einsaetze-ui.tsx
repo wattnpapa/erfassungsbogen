@@ -1021,14 +1021,13 @@ export function EinsatzDetail(props: {
             )}
             {/* „Wer braucht etwas?" — der Bedarf stand nur als Summe im Kopf,
                 die Zuordnung führte die Führungskraft nebenbei auf Papier (K1). */}
-            <label className="inline bedarf-filter">
+            <label className="inline bedarf-filter" title="Ruhezeit, Unterbringung, abweichende Verpflegung — Kraftstoff allein zählt nicht.">
               <input
                 type="checkbox"
                 checked={nurBedarf}
                 onChange={(e) => setBedarfsFilter(e.target.checked ? "dringend" : null)}
               />
-              {" "}nur dringender Bedarf
-              <span className="hinweis"> (Ruhezeit, Unterbringung, Verpflegung abweichend — nicht Kraftstoff)</span>
+              {" "}nur dringender Bedarf (ohne Kraftstoff)
             </label>
           </div>
         )}
