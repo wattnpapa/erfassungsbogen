@@ -160,7 +160,7 @@ Funktionalität: Darstellung, Datensicherung und Auskunft
     Angenommen ich öffne die App
     Dann sehe ich die Überschrift "So funktioniert’s"
     Und sehe ich den Hinweis "1. Bogen ausfüllen"
-    Und sehe ich den Hinweis "Funktioniert komplett offline"
+    Und sehe ich den Hinweis "Alle Daten bleiben auf diesem Gerät"
 
   Szenario: Ein kaputter Link meldet sich verständlich
     Angenommen ich öffne einen Bogen-Link mit beschädigtem Inhalt

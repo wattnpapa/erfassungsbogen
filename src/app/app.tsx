@@ -70,6 +70,7 @@ import {
 } from "@bos/meldekopf/einsaetze";
 import { bogenDiff, diffKurzfassung } from "@bos/meldekopf/meldung-diff";
 import { SpeicherVollFehler, istSpeicherVoll, meldungAufnehmen } from "./eintrag-zeiten";
+import { offlineText, useOfflineStand } from "./offline-bereit";
 import { ART_LABEL, EinsatzDetail, EinsatzListe, type Eingang } from "./einsaetze-ui";
 import { exportSammlung, exportStandLaden, exportVermerken, type ExportStand, type ExportUmfang } from "./export-stand";
 import { aktuelleMeldungen } from "./auswertung";
@@ -97,7 +98,7 @@ import { orgFarbe, wendeOrgAkzentAn } from "./org-farben";
 import { einheitSymbolSvg, svgDataUrl } from "./taktische-zeichen-bogen";
 import { Fusszeile } from "./fusszeile";
 import { Aktualisierungshinweise } from "./aktualisierung";
-import { Dialogschicht, frageFelder, frageJaNein, frageWahl } from "./dialoge";
+import { Dialogschicht, frageFelder, frageJaNein, frageWahl, zeigeHinweis } from "./dialoge";
 import {
   SchrittEinheit,
   SchrittEinsatz,
@@ -537,6 +538,7 @@ function AppInhalt() {
   const [fremdeErfassung, setFremdeErfassung] = useState<boolean>(!!ENTWURF?.fremd);
   const [schritt, setSchritt] = useState(START.bogen || ENTWURF ? UEBERSICHT : 0);
   const richtung = useSchrittRichtung(schritt);
+  const offline = useOfflineStand();
   // Schrittwechsel (Weiter, Zurück, Schrittleiste, Prüfpunkt): der neue
   // Schritt beginnt oben. Vorher blieb die Scrollposition des vorigen stehen,
   // und Schritt 2 bis 4 öffneten mitten im Formular — Ort/Auftrag, die
@@ -641,6 +643,8 @@ function AppInhalt() {
   }
   // Nach einem Neustart mitten in einer Erfassung für eine Sammlung geht es
   // dort weiter, statt die fremde Einheit als eigenen Bogen zu zeigen (R2-E3).
+  /** Grund, aus dem das letzte Ablegen in eine Sammlung scheiterte (voller Speicher o. ä.). */
+  const ablageFehler = useRef<string | null>(null);
   const [sammelZielId, setSammelZielId] = useState<string | null>(() => erfassungsZielBeimStart());
   // Sammelziel zusätzlich als Ref: der laufende (asynchrone) Scan-Loop und die
   // Scanner-Callbacks lesen sonst einen veralteten Closure-Stand.
@@ -1122,6 +1126,7 @@ function AppInhalt() {
     /** Satz hinter der Quittung — etwa, dass der eigene Bogen offen bleibt. */
     zusatz = "",
   ): Promise<boolean> {
+    ablageFehler.current = null;
     const einsatz = einsaetzeLaden().find((s) => s.id === zielId);
     const schl = einheitSchluessel(b.einheit);
     // Gleicher Inhalt schon da? Dann gibt es nichts zu fragen — der Kern
@@ -1226,6 +1231,7 @@ function AppInhalt() {
       // Voller Speicher: nichts abgelegt, und das muss sichtbar sein — der
       // Bogen bleibt beim Aufrufer offen (Audit „Offline und Speicher", O1).
       const text = istSpeicherVoll(e) ? new SpeicherVollFehler(e).message : fehlerText(e);
+      ablageFehler.current = text;
       if (kiosk) setScanFortschritt(`✗ Nicht aufgenommen: ${text}`);
       else setFehler(text);
       einsaetzeNeuLaden();
@@ -1324,10 +1330,16 @@ function AppInhalt() {
     }
     const wohin = await empfangsZielWaehlen(b);
     if (wohin == null) return true; // abgebrochen — nichts verändert
+    let nichtAbgelegt: string | null = null;
     if (wohin !== "oeffnen") {
-      await bogenInSammlung(wohin, b, "scan", { signatur: alsEintragSignatur(signatur), herkunft: payload });
+      const ok = await bogenInSammlung(wohin, b, "scan", { signatur: alsEintragSignatur(signatur), herkunft: payload });
       setZeigeStart(false);
-      return true;
+      // Nicht abgelegt, weil der Speicher voll war: Der eingelesene Bogen war
+      // sonst weg, und die Einheit fuhr weiter. Er wird geöffnet — mit dem
+      // Grund oben —, damit ihn niemand ein zweites Mal scannen muss (R2-O2).
+      // Ein bewusst abgebrochenes Ablegen bleibt, wie es war.
+      nichtAbgelegt = ok ? null : ablageFehler.current;
+      if (!nichtAbgelegt) return true;
     }
     if (!(await darfBogenErsetzen({ titel: "Empfangenen Bogen öffnen?", was: "die empfangene Meldung", ok: "Meldung öffnen" }))) {
       return true; // Scan beendet, der eigene Bogen bleibt stehen
@@ -1341,7 +1353,11 @@ function AppInhalt() {
     // Einsatzansicht hat Vorrang vor der Übersicht (siehe Render weiter unten):
     // ohne dieses Schließen bliebe ein per Link geöffneter Bogen unsichtbar.
     setOffenerEinsatzId(null);
-    setFehler("");
+    setFehler(
+      nichtAbgelegt
+        ? `Nicht in die Sammlung aufgenommen: ${nichtAbgelegt} Der Bogen bleibt hier geöffnet — danach „In Einsatz aufnehmen…".`
+        : "",
+    );
     if (anonymisiert) setMeldung(FRIST_ABGELAUFEN_MELDUNG);
     return true;
   }
@@ -1637,7 +1653,18 @@ function AppInhalt() {
       ],
     });
     if (!werte) return null;
-    const s = einsatzAnlegen(werte.name!, Number(werte.art) as EinsatzArt, werte.ort);
+    let s: Einsatzsammlung;
+    try {
+      s = einsatzAnlegen(werte.name!, Number(werte.art) as EinsatzArt, werte.ort);
+    } catch (e) {
+      // Voller Speicher: der Dialog schloss, und es gab weder Sammlung noch
+      // Meldung — nur einen Fehler in der Konsole (Audit Runde 2, R2-O2).
+      await zeigeHinweis({
+        titel: "Sammlung nicht angelegt",
+        text: istSpeicherVoll(e) ? new SpeicherVollFehler(e).message : fehlerText(e),
+      });
+      return null;
+    }
     einsaetzeNeuLaden();
     return s;
   }
@@ -1664,8 +1691,8 @@ function AppInhalt() {
     const herkunft = bogenHerkunft;
     // Ein empfangener Bogen ist die Meldung der Einheit — nur selbst Erfasstes prüfen (R2-E2).
     if (!sig && !(await sollstaerkeFreigeben(b))) return;
-    einsatzWahlDialog.current?.close();
     setMeldung(""); // Rückmeldung des Assistenten gehört nicht in die Folgeansicht
+    setFehler("");
     // Erst ablegen, dann schließen: Scheitert das Ablegen (Speicher voll),
     // bleibt der Bogen offen — vorher war er in dem Fall nirgends mehr (O1).
     // Ein EMPFANGENER Bogen (mit Signatur) wird nach dem Ablegen geschlossen,
@@ -1684,7 +1711,12 @@ function AppInhalt() {
       false,
       eigener ? "Dein Bogen bleibt geöffnet — Startseite → „Fortsetzen“." : eigenerBogenWartetHinweis(),
     );
-    if (!ok || eigener) return;
+    // Gescheitert (Speicher voll): Die Auswahl bleibt offen und zeigt den
+    // Fehler dort, wo getippt wurde — vorher schloss sie, und der Assistent
+    // meldete weiter „✓ gespeichert" (R2-O2).
+    if (!ok) return;
+    einsatzWahlDialog.current?.close();
+    if (eigener) return;
     setBogen(null);
     setFremdeErfassung(false);
     setVorlageInBearbeitung(null);
@@ -2230,7 +2262,8 @@ function AppInhalt() {
             QR-Code ohne Internetverbindung von Gerät zu Gerät übertragen.
           </p>
         )}
-        <p className="offline-badge">✓ Funktioniert komplett offline — alle Daten bleiben auf diesem Gerät.</p>
+        {/* Die Zusage erst, wenn sie stimmt (R2-O1, offline-bereit.ts). */}
+        <p className={`offline-badge${offline.stand === "bereit" ? "" : " offline-laedt"}`} role="status">{offlineText(offline)}</p>
         {/* „Weiter, wo du warst": der Entwurf als Karte mit taktischem Zeichen,
             Kennfarbe der Organisation und Stärke — der häufigste Weg zurück in
             die Arbeit ist damit ein einziger Tipp. */}
@@ -2583,6 +2616,7 @@ function AppInhalt() {
           im Assistenten unsichtbar und tauchten später unvermittelt auf der
           Startseite auf. */}
       {meldung && <p className="meldung" role="status" key={meldung}>{meldung}</p>}
+      {fehler && <p className="fehler" role="alert">{fehler}</p>}
       {/* Der Schrittwechsel trägt seine Richtung: vorwärts kommt der Inhalt von
           rechts, zurück von links. Die Schrittleiste oben sagt, WO man ist —
           dass man gerade zurückgesprungen ist (etwa weil ein Prüfpunkt in einen
@@ -2640,6 +2674,7 @@ function AppInhalt() {
                 : "Dein Bogen wird als Meldung abgelegt und bleibt hier geöffnet."}
             {" "}Ist die Einheit dort schon gemeldet, wird nachgefragt (neue Fassung oder eigene Einheit).
           </p>
+          {fehler && <p className="fehler" role="alert">{fehler}</p>}
           {einsaetze.map((s) => (
             <div className="teilen-weg" key={s.id}>
               <button type="button" onClick={() => bogenInEinsatzLegen(s.id)}>{s.name}</button>

@@ -56,6 +56,7 @@ import { geraeteKurzform, geraeteOeffentlichHex } from "../geraete-schluessel";
 import { istNativ, linkTeilen, nahbereichDienst, pdfEinbettbar, shareSheetVerfuegbar, textTeilen } from "../nativ";
 import { fehlerText } from "../nachladen";
 import { frageJaNein, frageText, zeigeHinweis } from "../dialoge";
+import { SpeicherVollFehler, istSpeicherVoll } from "../eintrag-zeiten";
 import {
   MWD_LEGENDE,
   STAERKE_LEGENDE,
@@ -116,7 +117,18 @@ export function Uebersicht(props: {
       ok: "Vorlage speichern",
     });
     if (name == null) return;
-    const v = vorlageAnlegen(name, bogen);
+    let v;
+    try {
+      v = vorlageAnlegen(name, bogen);
+    } catch (e) {
+      // Voller Speicher: der Dialog schloss ohne jede Meldung, nur die
+      // Konsole wusste Bescheid (Audit Runde 2, R2-O2).
+      await zeigeHinweis({
+        titel: "Vorlage nicht gespeichert",
+        text: istSpeicherVoll(e) ? new SpeicherVollFehler(e).message : String(e instanceof Error ? e.message : e),
+      });
+      return;
+    }
     props.onVorlageGespeichert?.(v.name);
   }
 

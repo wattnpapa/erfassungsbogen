@@ -1190,6 +1190,59 @@ describe("Speicher voll", () => {
     expect(await screen.findByText(/Nicht gespeichert — der Speicher dieses Geräts ist voll/)).toBeDefined();
     expect(screen.queryByText(/✓ automatisch gespeichert/)).toBeNull();
   });
+
+  /** Audit Runde 2, R2-O2: das Scheitern steht dort, wo getippt wurde. */
+  function sammlungenVoll() {
+    const echt = Storage.prototype.setItem;
+    vi.spyOn(Storage.prototype, "setItem").mockImplementation(function (this: Storage, k: string, v: string) {
+      // Wie ein echter voller Speicher: was wächst, scheitert; Gleiches oder Kürzeres geht.
+      if (k === "eeb.einsaetze.v1" && v.length > (this.getItem(k)?.length ?? 0)) {
+        throw new DOMException("voll", "QuotaExceededError");
+      }
+      return echt.call(this, k, v);
+    });
+  }
+
+  it("meldet eine nicht angelegte Sammlung im Dialog", async () => {
+    const nutzer = userEvent.setup();
+    render(<App />);
+    sammlungenVoll();
+    await nutzer.click(screen.getByRole("button", { name: "Neue Einsatz-Sammlung…" }));
+    const dialog = await screen.findByRole("dialog", { name: "Neue Einsatz-Sammlung anlegen" });
+    await nutzer.type(within(dialog).getByLabelText("Name"), "Vollhausen");
+    await nutzer.click(within(dialog).getByRole("button", { name: "Einsatz anlegen" }));
+    const hinweis = await screen.findByRole("dialog", { name: "Sammlung nicht angelegt" });
+    expect(hinweis.textContent).toMatch(/Speicher dieses Geräts ist voll/);
+  });
+
+  it("lässt die Auswahl beim Ablegen des eigenen Bogens offen und zeigt den Grund darin", async () => {
+    einsatzImSpeicherAnlegen("Sammelhausen", EinsatzArt.EINSATZ);
+    const nutzer = userEvent.setup();
+    render(<App />);
+    await neuerBogenBis(nutzer, 0);
+    await nutzer.type(screen.getByLabelText("Name (Pflicht)"), "Eigenhausen");
+    await nutzer.click(screen.getByRole("button", { name: /^6\. Übersicht/ }));
+    sammlungenVoll();
+    await nutzer.click(screen.getByRole("button", { name: "In Einsatz aufnehmen…" }));
+    const auswahl = document.querySelector<HTMLDialogElement>("dialog[aria-label='In Einsatz-Sammlung ablegen']")!;
+    await nutzer.click(within(auswahl).getByRole("button", { name: "Sammelhausen" }));
+    expect(auswahl.hasAttribute("open")).toBe(true);
+    expect(within(auswahl).getByRole("alert").textContent).toMatch(/Speicher dieses Geräts ist voll/);
+  }, 20000);
+
+  it("öffnet einen empfangenen Bogen, der nicht abgelegt werden konnte, statt ihn zu verwerfen", async () => {
+    einsatzImSpeicherAnlegen("Sammelhausen", EinsatzArt.EINSATZ);
+    const nutzer = userEvent.setup();
+    render(<App />);
+    sammlungenVoll();
+    fragmentSetzen(encodePayloadUrl(bogenMitName("Crailsheim"), browserKompressor));
+    const empfang = await screen.findByRole("dialog", { name: /Meldung von „THW Crailsheim" empfangen/ });
+    await nutzer.click(within(empfang).getByRole("button", { name: /In „Sammelhausen" aufnehmen/ }));
+
+    expect(await screen.findByRole("heading", { name: "Gesamtübersicht" })).toBeDefined();
+    expect(screen.getByRole("alert").textContent).toMatch(/Nicht in die Sammlung aufgenommen/);
+    expect(screen.getAllByText(/Crailsheim/).length).toBeGreaterThan(0);
+  }, 20000);
 });
 
 /**
