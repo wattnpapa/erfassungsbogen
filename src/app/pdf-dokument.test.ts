@@ -23,7 +23,7 @@ import {
   type Erfassungsbogen,
 } from "@bos/eeb-format/model";
 import type { QrSatz } from "./hilfen";
-import { EEB_JSON_DATEINAME, bogenAlsEingebetteteDatei, einsatzLageblattDokument, einsatzPdfDokument, pdfDokument } from "./pdf-dokument";
+import { EEB_JSON_DATEINAME, aenderungFuerPapier, bogenAlsEingebetteteDatei, einsatzLageblattDokument, einsatzPdfDokument, pdfDokument } from "./pdf-dokument";
 
 const QR_BILD = "data:image/png;base64,QRTESTBILD";
 const QR_URL = "https://erfassungsbogen.app/#TESTPAYLOAD";
@@ -359,10 +359,13 @@ describe("einsatzPdfDokument()", () => {
     const t = texte(dd.content).join("\n");
     expect(t).toContain("Übergabe-Übersicht: Hochwasser");
     expect(t).toContain("Veränderung seit der letzten Meldung");
-    expect(t).toContain("gegenüber 141039mai26:");
-    expect(t).toContain("Gesamtstärke: 2 → 1");
+    // Lesbare Zeit und „von … auf …" statt Pfeil — Helvetica kennt „→" nicht,
+    // im Ausdruck stand „!" (Audit Runde 2, R2-K3).
+    expect(t).toContain("gegenüber 14.05.2026, 10:39:");
+    expect(t).toContain("Gesamtstärke: von 2 auf 1");
     expect(t).toContain("Fahrzeug abgemeldet: MzKW (THW-84397)");
-    expect(t).toContain("Ruhezeit erforderlich: nein → ja");
+    expect(t).toContain("Ruhezeit erforderlich: von nein auf ja");
+    expect(t).not.toContain("→");
     // Die Übersicht steht vor dem ersten Bogen.
     expect(t.indexOf("Übergabe-Übersicht")).toBeLessThan(t.indexOf("Erfassungsbogen FGr K (A)"));
   });
@@ -375,7 +378,7 @@ describe("einsatzPdfDokument()", () => {
       ]).content,
     ).join("\n");
     expect(t).toContain("Erstmeldung");
-    expect(t).toContain("unverändert gegenüber 141039mai26");
+    expect(t).toContain("unverändert gegenüber 14.05.2026, 10:39");
   });
 
   it("summiert Stärke und Fahrzeuge über alle Bögen", () => {
@@ -483,8 +486,9 @@ describe("einsatzPdfDokument()", () => {
       ]).content,
     ).join("\n");
     expect(t).toContain("Zwischensummen nach Zug");
-    expect(t.indexOf("1. Zug")).toBeLessThan(t.indexOf("2. Zug"));
-    expect(t.indexOf("2. Zug")).toBeLessThan(t.indexOf("Ohne Zug"));
+    const zs = t.slice(t.indexOf("Zwischensummen nach Zug"));
+    expect(zs.indexOf("1. Zug")).toBeLessThan(zs.indexOf("2. Zug"));
+    expect(zs.indexOf("2. Zug")).toBeLessThan(zs.indexOf("Ohne Zug"));
   });
 });
 
@@ -580,6 +584,28 @@ describe("einsatzLageblattDokument()", () => {
     expect(t).not.toContain(QR_BILD);
     expect(dd.files).toBeUndefined();
     expect((dd.content as { pageBreak?: string }[]).some((c) => c && c.pageBreak === "before")).toBe(false);
+  });
+
+  it("zeigt Zug und Bedarf je Einheit und Änderungen ohne Pfeil (R2-K3)", () => {
+    const ruhe = basisBogen();
+    ruhe.sofortbedarf = { ...ruhe.sofortbedarf!, ruhezeitErforderlich: true, dieselLiter: 200 };
+    const vorher = basisBogen();
+    vorher.sofortbedarf = { ...vorher.sofortbedarf!, dieselLiter: 50 };
+    const t = texte(
+      einsatzLageblattDokument("Lage", [{ bogen: ruhe, vorher, zugEtikett: "1. TZ" }]).content,
+    ).join("\n");
+    expect(t).toContain("1. TZ");
+    expect(t).toMatch(/Ruhezeit · .*Diesel 200 l/);
+    expect(t).toMatch(/von 50 l auf 200 l/);
+    expect(t).not.toContain("→");
+  });
+
+  it("schreibt Änderungen fürs Papier als „von … auf …“", () => {
+    expect(aenderungFuerPapier("Diesel: 50 l → 200 l")).toBe("Diesel: von 50 l auf 200 l");
+    expect(aenderungFuerPapier("Unterbringung M/W/D: M 8 / W 3 / D 0 → M 7 / W 2 / D 0")).toBe(
+      "Unterbringung M/W/D: von M 8 / W 3 / D 0 auf M 7 / W 2 / D 0",
+    );
+    expect(aenderungFuerPapier("Personal neu: Anna Weber")).toBe("Personal neu: Anna Weber");
   });
 
   it("sagt auf einem leeren Blatt, dass noch nichts gemeldet ist", () => {

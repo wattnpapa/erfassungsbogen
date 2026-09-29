@@ -36,11 +36,13 @@ import {
   vokabText,
   vokabularFuer,
   zeitgruppe,
+  pruefpunkte,
   type QrSatz,
   zeitpunktDeutsch,
 } from "./hilfen";
 import { summiereBoegen, type EinsatzSummen } from "./auswertung";
 import { zeitLang } from "./eintrag-zeiten";
+import { bedarfKurztext } from "./einheiten-tabelle";
 import { bogenDiff, diffZeilen } from "@bos/meldekopf/meldung-diff";
 import { fahrzeugSymbolSvg } from "./taktische-zeichen-bogen";
 import { orgFarbe } from "./org-farben";
@@ -292,6 +294,23 @@ function zaehlendeBoegen(eintraege: UebersichtEintrag[]): Erfassungsbogen[] {
 
 /** Mehr Zeilen passen nicht sinnvoll in eine Tabellenzelle — der Rest wird gezählt. */
 const UEBERSICHT_MAX_ZEILEN = 8;
+/**
+ * Auf dem Lageblatt weniger: es muss bei rund zehn Einheiten auf eine Seite
+ * passen, die Einzelheiten stehen in der Sammel-PDF (Audit Runde 2, R2-K3).
+ */
+const LAGEBLATT_MAX_ZEILEN = 3;
+
+/**
+ * Änderungszeile fürs Papier: „Diesel: von 50 l auf 200 l" statt
+ * „Diesel: 50 l → 200 l". Die PDF-Standardschrift Helvetica (WinAnsi) kennt
+ * den Pfeil nicht; im Ausdruck stand „50 l !200 l" und las sich als Ausruf
+ * (Audit Runde 2, R2-K3).
+ */
+export function aenderungFuerPapier(zeile: string): string {
+  const m = /^([^:]+): (.*) → (.*)$/.exec(zeile);
+  if (m) return `${m[1]}: von ${m[2]} auf ${m[3]}`;
+  return zeile.replace(/→/g, "->");
+}
 
 /** Zeitpunkt auf dem Blatt — immer mit Datum: gelesen wird es auch morgen noch. */
 function blattZeit(ms: number | undefined): string {
@@ -305,17 +324,23 @@ function blattZeit(ms: number | undefined): string {
  * Abgerückte Einheiten stehen als eigener Block darunter; die Summe zählt
  * nur die zählenden — genau wie die Stärkeleiste am Gerät.
  */
-function uebersichtsTabelle(eintraege: UebersichtEintrag[]): Content {
+function uebersichtsTabelle(eintraege: UebersichtEintrag[], maxZeilen = UEBERSICHT_MAX_ZEILEN): Content {
   const kopf = (text: string): TableCell => ({ text, bold: true, fillColor: GRAU });
-  const SPALTEN = 8;
+  // Zug und Bedarf je Einheit, wie in der App-Tabelle — „Ruhezeit bei 5
+  // Einheiten" ohne Namen musste die Ablösung per Funk klären (R2-K3).
+  const SPALTEN = 9;
   const body: TableCell[][] = [
     [
       kopf("Einheit"),
-      kopf("Eingetroffen"),
-      kopf("Abgerückt"),
+      kopf("Zug"),
+      // Eine Spalte für beide Zeiten: die Abrückzeit gibt es nur im Block
+      // „Abgerückt", die leere Spalte daneben kostete die Änderungsspalte
+      // ihre Breite und das Blatt seine Seite (R2-K3).
+      kopf("Eingetroffen\n(abgerückt)"),
       kopf("Stand"),
       kopf("Stärke\nF / U / M / G"),
       kopf("Fzg"),
+      kopf("Bedarf"),
       kopf("Auftrag / Notiz"),
       kopf("Veränderung seit der letzten Meldung"),
     ],
@@ -330,11 +355,11 @@ function uebersichtsTabelle(eintraege: UebersichtEintrag[]): Content {
       const d = bogenDiff(vorher, b);
       aenderung =
         d.anzahl === 0
-          ? { text: `unverändert gegenüber ${zeitgruppe(vorher.stand)}`, italics: true }
+          ? { text: `unverändert gegenüber ${zeitpunktDeutsch(vorher.stand)}`, italics: true }
           : {
               stack: [
-                { text: `gegenüber ${zeitgruppe(vorher.stand)}:`, bold: true },
-                ...diffZeilen(d, UEBERSICHT_MAX_ZEILEN).map((z) => ({ text: z })),
+                { text: `gegenüber ${zeitpunktDeutsch(vorher.stand)}:`, bold: true },
+                ...diffZeilen(d, maxZeilen).map((z) => ({ text: aenderungFuerPapier(z) })),
               ],
             };
     }
@@ -345,13 +370,22 @@ function uebersichtsTabelle(eintraege: UebersichtEintrag[]): Content {
     if (teil) namensZeilen.push({ text: teil, italics: true });
     if (b.uebung) namensZeilen.push({ text: "ÜBUNG", bold: true, color: UEBUNG_FARBE });
     if (!e.abgerueckt && e.zaehlt === false) namensZeilen.push({ text: "zählt nicht in diese Lage", italics: true });
+    // Lücken der Meldung als Zahl — am Gerät eine Marke an der Karte (R2-K3).
+    const luecken = pruefpunkte(b).length;
+    if (luecken > 0) namensZeilen.push({ text: `${luecken} ${luecken === 1 ? "Lücke" : "Lücken"} in der Meldung`, italics: true });
     return [
       namensZeilen.length === 1 ? namensZeilen[0]! : { stack: namensZeilen },
-      { text: blattZeit(e.eingetroffenAm) },
-      { text: blattZeit(e.abgerueckAm) },
-      { text: zeitgruppe(b.stand) },
+      { text: weichUmbrechen(e.zugEtikett ?? "") },
+      {
+        stack: [
+          { text: blattZeit(e.eingetroffenAm) },
+          ...(e.abgerueckAm != null ? [{ text: `ab ${blattZeit(e.abgerueckAm)}`, bold: true }] : []),
+        ],
+      },
+      { text: zeitpunktDeutsch(b.stand) },
       { text: `${s.fuehrer} / ${s.unterfuehrer} / ${s.mannschaft} / ${s.gesamt}` },
       { text: `${b.fahrzeuge.length}` },
+      { text: bedarfKurztext(b), bold: true },
       { text: weichUmbrechen(e.notiz ?? "") },
       aenderung,
     ];
@@ -381,11 +415,15 @@ function uebersichtsTabelle(eintraege: UebersichtEintrag[]): Content {
     { text: `${summe.fahrzeuge}`, bold: true },
     { text: "" },
     { text: "" },
+    { text: "" },
   ]);
-  // Breiten für die quer liegende Übersichtsseite: Einheitsname, Zeiten und
-  // Zeitgruppe bekommen so viel Platz, dass sie einzeilig bleiben.
+  // Breiten für die quer liegende Übersichtsseite (714 pt Satzbreite): Zeiten
+  // brechen nach dem Datum um, damit Zug und Bedarf daneben Platz haben.
   return {
-    table: { headerRows: 1, widths: [130, 62, 62, 52, 58, 20, 110, "*"], body },
+    table: { headerRows: 1, widths: [118, 38, 48, 48, 48, 16, 66, 88, "*"], body },
+    fontSize: 7.5,
+    // Knappe Innenabstände: bei zehn Einheiten entscheidet das über Seite 2.
+    layout: { paddingTop: () => 1, paddingBottom: () => 1, paddingLeft: () => 3, paddingRight: () => 3 },
     margin: [0, 0, 0, 4],
   };
 }
@@ -430,8 +468,8 @@ function bedarfsTabelle(eintraege: UebersichtEintrag[]): Content {
   ];
   return {
     stack: [
-      { text: `Bedarf gesamt (${s.einheiten} Einheiten, ${s.staerke.gesamt} Personen)`, bold: true, margin: [0, 10, 0, 4] },
-      { table: { headerRows: 0, widths: [130, "*"], body }, margin: [0, 0, 0, 4] },
+      { text: `Bedarf gesamt (${s.einheiten} Einheiten, ${s.staerke.gesamt} Personen)`, bold: true, margin: [0, 6, 0, 4] },
+      { table: { headerRows: 0, widths: [100, "*"], body }, margin: [0, 0, 0, 4] },
     ],
     unbreakable: true,
   };
@@ -472,24 +510,42 @@ function zugSummenTabelle(eintraege: UebersichtEintrag[]): Content | undefined {
   }
   return {
     stack: [
-      { text: "Zwischensummen nach Zug", bold: true, margin: [0, 10, 0, 4] },
-      { table: { headerRows: 1, widths: [150, 32, 60, 36, 56, "*", 24], body }, margin: [0, 0, 0, 4] },
+      { text: "Zwischensummen nach Zug", bold: true, margin: [0, 6, 0, 4] },
+      { table: { headerRows: 1, widths: [90, 24, 56, 30, 50, "*", 20], body }, margin: [0, 0, 0, 4] },
     ],
+    unbreakable: true,
   };
 }
 
 /** Die Übersichtsseite — gemeinsamer Kern von Sammel-PDF und Lageblatt. */
-function uebersichtsSeite(titel: string, eintraege: UebersichtEintrag[], erstellt: number, hinweis?: string): Content[] {
+function uebersichtsSeite(
+  titel: string,
+  eintraege: UebersichtEintrag[],
+  erstellt: number,
+  hinweis?: string,
+  maxZeilen = UEBERSICHT_MAX_ZEILEN,
+): Content[] {
   const zugSummen = zugSummenTabelle(eintraege);
+  const bedarf = bedarfsTabelle(eintraege);
   return [
-    { text: titel, bold: true, fontSize: 12, margin: [0, 0, 0, 2] },
-    // Wann das Blatt gedruckt wurde, gehört aufs Blatt: an der Wand hängen
-    // nachher drei davon, und nur das jüngste gilt.
-    { text: `Erstellt ${zeitLang(erstellt)}`, italics: true, margin: [0, 0, 0, 8] },
-    uebersichtsTabelle(eintraege),
-    ...(hinweis ? [{ text: hinweis, italics: true, margin: [0, 4, 0, 0] } as Content] : []),
-    bedarfsTabelle(eintraege),
-    ...(zugSummen ? [zugSummen] : []),
+    // Titel und Erstellzeit in einer Zeile — jede Zeile zählt, damit das
+    // Lageblatt bei rund zehn Einheiten auf eine Seite passt (R2-K3).
+    {
+      text: [
+        { text: titel, bold: true, fontSize: 12 },
+        // Wann das Blatt gedruckt wurde, gehört aufs Blatt: an der Wand hängen
+        // nachher drei davon, und nur das jüngste gilt.
+        { text: `   Erstellt ${zeitLang(erstellt)}`, italics: true },
+      ],
+      margin: [0, 0, 0, 6],
+    },
+    uebersichtsTabelle(eintraege, maxZeilen),
+    ...(hinweis ? [{ text: hinweis, italics: true, margin: [0, 2, 0, 0] } as Content] : []),
+    // Bedarf und Zwischensummen nebeneinander statt untereinander: vorher
+    // rutschten die Zwischensummen allein auf Seite 2 (R2-K3).
+    zugSummen
+      ? { columns: [{ width: 300, stack: [bedarf] }, { width: "*", stack: [zugSummen] }], columnGap: 12 }
+      : bedarf,
   ];
 }
 
@@ -548,7 +604,7 @@ function seitenFuss(text: string): TDocumentDefinitions["footer"] {
     columns: [
       { text, margin: [40, 0, 0, 0] },
       // Seitenzahl nur so breit wie nötig — der Text links darf lang sein.
-      { text: `${seite} / ${gesamt}`, width: "auto", alignment: "right", margin: [8, 0, 40, 0] },
+      { text: `${seite} / ${gesamt}`, width: "auto", noWrap: true, alignment: "right", margin: [8, 0, 40, 0] },
     ],
     fontSize: 8,
   });
@@ -645,7 +701,8 @@ export function einsatzLageblattDokument(
       erstellt,
       eintraege.length === 0
         ? "Noch keine Einheit gemeldet."
-        : "Summen und Bedarf zählen nur die anwesenden Einheiten dieser Lage; abgerückte stehen im eigenen Block.",
+        : "Summen und Bedarf zählen nur die anwesenden Einheiten dieser Lage; abgerückte stehen im eigenen Block. Alle Änderungen im Einzelnen: Sammel-PDF.",
+      LAGEBLATT_MAX_ZEILEN,
     ),
   };
 }

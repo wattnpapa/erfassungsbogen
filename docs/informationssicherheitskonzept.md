@@ -87,6 +87,10 @@ Grundlage: Repository `wattnpapa/erfassungsbogen`, Stand 2026-09-12 — Version 
 > Sammlung einmal beim Namen (neuer Speicherort `eeb.aufgeraeumt.v1`, ohne
 > Personendaten); die Ankündigung ab Tag 60 nennt die tatsächliche Ruhezeit
 > (3.3 D2e).
+>
+> **Nachgezogen 2026-09-29:** Lageblatt/Übergabeblatt (Audit Runde 2, R2-K3) —
+> Zug, Bedarf und Lückenzahl je Einheit, Änderungen als „von … auf …",
+> Bedarf und Zwischensummen nebeneinander (5.4).
 
 ## Hinweis zu diesem Dokument
 
@@ -386,6 +390,11 @@ Datenausleitung an eine andere Herkunft ist technisch unterbunden.
   wieder einliest, bekommt die Angaben nicht zurück — die App sagt das in der
   Rückmeldung und verweist bei einer Sammel-PDF-Datei auf „Einsatz
   importieren…" (`qr-stapel.ts`, `einsatz-transport.ts: pdfInhaltArt`).
+  Seit 2026-09-29 (R2-K3) führen Übergabeblatt und Lageblatt je Einheit
+  zusätzlich Zug, Bedarf (Ruhezeit, Unterbringung, Kraftstoff) und die Zahl
+  der Lücken der Meldung; Änderungen stehen als „von … auf …" (die
+  PDF-Standardschrift kennt den Pfeil nicht). Das Lageblatt heißt jetzt
+  „Lageblatt (A4 quer)" und passt bis etwa zwölf Einheiten auf eine Seite.
 - **Excel-Liste „Oldenburg"** (`src/app/oldenburg-xlsx.ts`, seit 2026-09-29,
   Audit Runde 2, R2-K2): führt dieselben Führungsstellen-Angaben — Eintreffzeit
   in „eingetr. / zugew.", Abrückzeit in „Einsatz-ende", Auftrag/Notiz

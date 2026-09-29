@@ -2044,7 +2044,7 @@ function AppInhalt() {
     setFehler("");
     try {
       const { einsatzLageblattErzeugen } = await import("./pdf");
-      if (await einsatzLageblattErzeugen(s)) setMeldung("Lageblatt erzeugt (eine Seite).");
+      if (await einsatzLageblattErzeugen(s)) setMeldung("Lageblatt erzeugt (A4 quer).");
     } catch (e) {
       setFehler(`Lageblatt: ${fehlerText(e)}`);
     }

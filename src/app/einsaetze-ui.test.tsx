@@ -789,7 +789,7 @@ describe("Ausgabewege der Einsatzansicht", () => {
     buehne(["Wardenburg"], { onWeitergeben: weitergeben, onLageblatt: lageblatt, onSammelPdf: sammelPdf });
 
     await nutzer.click(screen.getByRole("button", { name: "Einsatz weitergeben / sichern" }));
-    await nutzer.click(screen.getByRole("button", { name: "Lageblatt (1 Seite)" }));
+    await nutzer.click(screen.getByRole("button", { name: "Lageblatt (A4 quer)" }));
     await nutzer.click(screen.getByRole("button", { name: "Sammel-PDF (alle Bögen)" }));
     expect(weitergeben).toHaveBeenCalledTimes(1);
     expect(lageblatt).toHaveBeenCalledTimes(1);
