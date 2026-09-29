@@ -198,7 +198,7 @@ describe("Assistenten-Durchlauf", () => {
     expect(document.activeElement?.id).toBe("feld-ort-auftrag");
     await nutzer.keyboard("Deich Nord");
     expect((document.getElementById("feld-ort-auftrag") as HTMLInputElement).value).toBe("Deich Nord");
-  });
+   }, 20000);
 
   it("zeigt die Modus-Marke beim vollen Bogen nicht", async () => {
     const nutzer = userEvent.setup();

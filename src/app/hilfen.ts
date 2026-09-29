@@ -951,14 +951,19 @@ export function schrittStatus(b: Erfassungsbogen): SchrittStatus[] {
   // schon in die Stärke zählt — das grüne Häkchen hätte die Meldung sonst als
   // fertig ausgewiesen, obwohl eine namenlose Person darin steckt.
   const staerkeGemeldet = staerke(b).gesamt > 0;
+  // Ebenso reine Sollplätze aus der StAN-Vorbelegung: Sie tragen Funktionen,
+  // aber keinen Namen — der Haken „ausgefüllt" stand schon, bevor Schritt 3
+  // je offen war (Audit Runde 2, R2-N3).
   const nurLeereKarten =
     b.personalErfassung === PersonalErfassung.VOLLSTAENDIG &&
     b.personal.length > 0 &&
-    b.personal.every(personLeer);
+    b.personal.every((p) => personLeer(p) || personUnbenannt(p));
   const personal: SchrittStatus =
     staerkeGemeldet && !nurLeereKarten ? "ok" : b.personal.length > 0 || staerkeGemeldet ? "begonnen" : "leer";
 
-  const fahrzeuge: SchrittStatus = b.fahrzeuge.length > 0 ? "ok" : "leer";
+  // Vorbelegte Fahrzeuge ohne ein einziges Kennzeichen sind begonnen, nicht fertig (R2-N3).
+  const fahrzeuge: SchrittStatus =
+    b.fahrzeuge.length === 0 ? "leer" : b.fahrzeuge.every(fahrzeugUnbenannt) ? "begonnen" : "ok";
 
   // Sofortbedarf/Sonstiges ist durchweg optional: „ok", sobald etwas erfasst ist, sonst neutral „leer".
   const sofortbedarf: SchrittStatus = b.sofortbedarf != null || !!b.sonstiges?.trim() ? "ok" : "leer";

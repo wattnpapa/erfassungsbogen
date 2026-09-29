@@ -510,9 +510,18 @@ describe("schrittStatus", () => {
     // Mit Namen: eine leere Personenkarte zählt zwar in die Stärke, macht den
     // Schritt aber nicht fertig (sie ist meist ein Fehlgriff).
     b.personal = [{ ...neuePerson(), nachname: "Muster", vorname: "Max" }];
-    b.fahrzeuge = [neuesFahrzeug()];
+    b.fahrzeuge = [{ ...neuesFahrzeug(), kennzeichen: "THW-84397" }];
     b.sofortbedarf = { verpflegungPersonen: 1, dieselLiter: 0, benzinLiter: 0, gemischLiter: 0, unterbringung: false, ruhezeitErforderlich: false };
     expect(schrittStatus(b)).toEqual(["ok", "ok", "ok", "ok", "ok"]);
+  });
+
+  it("gibt reinen Sollplätzen keinen Haken (R2-N3)", () => {
+    const b = neuerBogen();
+    b.personal = [{ ...neuePerson(), funktionen: [{ code: 1 }] }, { ...neuePerson(), funktionen: [{ code: 2 }] }];
+    b.fahrzeuge = [neuesFahrzeug(), neuesFahrzeug()];
+    const s = schrittStatus(b);
+    expect(s[2]).toBe("begonnen");
+    expect(s[3]).toBe("begonnen");
   });
 
   it("erkennt Zwischenzustände als begonnen", () => {

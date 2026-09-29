@@ -2629,7 +2629,8 @@ function AppInhalt() {
         {SCHRITTE.map((name, i) => {
           const st = status[i]; // undefined für die Übersicht (letzter Schritt)
           const klassen = [i === schritt ? "aktiv" : "", st ? `status-${st}` : ""].filter(Boolean).join(" ");
-          const glyph = st === "ok" ? "✓" : st === "begonnen" ? "•" : "";
+          // „begonnen" als Wort statt „•": das Symbol verstand niemand (R2-N3, F6).
+          const glyph = st === "ok" ? "✓" : st === "begonnen" ? "offen" : "";
           return (
             <button
               key={name}

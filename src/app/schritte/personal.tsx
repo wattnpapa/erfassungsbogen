@@ -346,8 +346,12 @@ function PersonKarte(props: {
           und beim Entfernen traf der Griff dann die falsche. Sie nennt die
           Stelle in der Liste, also genau das, was die Sortierknöpfe daneben
           verändern. */}
+      {/* Die Sollstelle (GrFü, TrFü …) steht im Kopf, vor dem Namensfeld: Sie
+          stand als Chip unter Geschlecht und Fahrerlaubnis, und Namen landeten
+          auf der falschen Stelle (Audit Runde 2, R2-N8). */}
       <p className="eintrag-nr" aria-hidden="true">
         Person {index + 1} von {anzahl}
+        {platzText(p, org) !== ROLLE_LABEL[p.staerkeRolle] && ` · ${platzText(p, org)}`}
         {nichtGezaehlt && " · nicht gezählt"}
       </p>
       <div className="zeile eintrag-kopf">
@@ -474,8 +478,9 @@ function PersonalSchnellTabelle(props: {
   verschieben: (von: number, nach: number, gruppe: "karte" | "zeile", art: "hoch" | "runter") => void;
   /** Nach dem Entfernen einer Zeile: Quittung mit „Rückgängig" (R2-G1). */
   entfernt: (vorher: Person[], bezeichnung: string) => void;
+  org: OrganisationsTyp;
 }) {
-  const { personal, aendern, fokusNeue, aufNeueFokus, verschieben, entfernt } = props;
+  const { personal, aendern, fokusNeue, aufNeueFokus, verschieben, entfernt, org } = props;
   const set = (i: number, patch: Partial<Person>) =>
     aendern(personal.map((p, j) => (j === i ? { ...p, ...patch } : p)));
 
@@ -524,11 +529,14 @@ function PersonalSchnellTabelle(props: {
     <TabellenScroll titel="Personal-Schnelleingabe">
       <table className="uebersicht schnell-tabelle">
         <thead>
-          <tr><th>Vorname</th><th>Nachname</th><th>Zählt als</th><th>Geschlecht</th><th aria-label="Reihenfolge" /><th aria-label="Entfernen" /></tr>
+          <tr><th>Stelle</th><th>Vorname</th><th>Nachname</th><th>Zählt als</th><th>Geschlecht</th><th aria-label="Reihenfolge" /><th aria-label="Entfernen" /></tr>
         </thead>
         <tbody>
           {personal.map((p, i) => (
             <tr key={i}>
+              {/* Die Sollstelle als erste Spalte: In der Tabelle fehlte die
+                  Funktion ganz, und Namen gerieten auf die falsche Stelle (R2-N8). */}
+              <td className="stelle">{platzText(p, org)}</td>
               <td>
                 <input
                   value={p.vorname}
@@ -927,6 +935,80 @@ export function SchrittPersonal({ bogen, aendern: aendernRoh }: SchrittProps) {
           wo man sie behebt, und gesammelt in der Übersicht. */}
       <Hinweise punkte={pruefpunkte(bogen, false)} aktuellerSchritt={2} />
 
+      {/* Ansichtswahl: Detail-Karten (alle Felder) oder Schnelleingabe-Tabelle
+          (viele Personen zügig erfassen); dazu Mehrzeilen-Import fertiger Listen. */}
+      {!nurStaerke && (
+        <p className="ansicht-wahl">
+          <label className="inline">
+            <input type="radio" name="pansicht" checked={!schnell} onChange={() => { setSchnell(false); setFokusNeue(false); }} />
+            Detail-Karten
+          </label>
+          <label className="inline">
+            <input type="radio" name="pansicht" checked={schnell} onChange={() => { setSchnell(true); setFokusNeue(false); }} />
+            Schnelleingabe (Tabelle)
+          </label>
+          <button type="button" onClick={() => { setNamenText(""); namenDialog.current?.showModal(); }}>
+            Namen einfügen…
+          </button>
+        </p>
+      )}
+      {quittung && rueckweg?.index == null && quittung}
+      {!nurStaerke && schnell ? (
+        bogen.personal.length > 0 && (
+          <PersonalSchnellTabelle
+            personal={bogen.personal}
+            aendern={(p) => aendern({ personal: p })}
+            fokusNeue={fokusNeue}
+            aufNeueFokus={() => setFokusNeue(true)}
+            verschieben={personVerschieben}
+            entfernt={(vorher, bezeichnung) => setRueckweg({ text: `${bezeichnung} entfernt.`, personal: vorher })}
+            org={bogen.einheit.organisation}
+          />
+        )
+      ) : (
+        bogen.personal.map((p, i) => (
+          <Fragment key={i}>
+          {rueckweg?.index === i && quittung}
+          <PersonKarte
+            key={i}
+            person={p}
+            org={bogen.einheit.organisation}
+            vorschlaege={vorschlaege}
+            frisch={p === frischeKarte}
+            index={i}
+            anzahl={bogen.personal.length}
+            ansprech={!nurStaerke && i === 0}
+            nichtGezaehlt={nurStaerke}
+            verschieben={personVerschieben}
+            aendern={(np) => aendern({ personal: bogen.personal.map((x, j) => (j === i ? np : x)) })}
+            entfernen={() => {
+              const rest = bogen.personal.filter((_, j) => j !== i);
+              if (personLeer(p)) aendern({ personal: rest });
+              else aendernMitRueckweg(rest, `${personBezeichnung(p, i)} entfernt.`, i);
+            }}
+          />
+          </Fragment>
+        ))
+      )}
+      {/* Die letzte Karte entfernt: die Quittung steht, wo sie war. */}
+      {!schnell && rueckweg?.index != null && rueckweg.index >= bogen.personal.length && quittung}
+      <button
+        type="button"
+        className="primaer"
+        onClick={() => {
+          setFokusNeue(true);
+          // Die neue Karte erscheint ÜBER dem Knopf, den man gerade gedrückt
+          // hat — der Blick liegt unten. Der Stempel sagt, wohin er soll.
+          const neu = neuePerson();
+          setFrischeKarte(neu);
+          aendern({ personal: [...bogen.personal, neu] });
+        }}
+      >
+        + Person hinzufügen
+      </button>
+
+      {/* Vorbelegungs-Knöpfe unter der Liste: oben schoben sie das erste
+          Namensfeld rund 900 px tief (R2-N8). */}
       {/* Der Rückweg zur Vorbelegung aus Schritt 1: entfernt nur Karten ohne
           Namen und Erreichbarkeit — deshalb ohne Rückfrage (Rückfrage-Regel:
           verloren geht nichts Erfasstes). Was jemand ausgefüllt hat, bleibt. */}
@@ -983,76 +1065,6 @@ export function SchrittPersonal({ bogen, aendern: aendernRoh }: SchrittProps) {
           )}
         </p>
       )}
-      {/* Ansichtswahl: Detail-Karten (alle Felder) oder Schnelleingabe-Tabelle
-          (viele Personen zügig erfassen); dazu Mehrzeilen-Import fertiger Listen. */}
-      {!nurStaerke && (
-        <p className="ansicht-wahl">
-          <label className="inline">
-            <input type="radio" name="pansicht" checked={!schnell} onChange={() => { setSchnell(false); setFokusNeue(false); }} />
-            Detail-Karten
-          </label>
-          <label className="inline">
-            <input type="radio" name="pansicht" checked={schnell} onChange={() => { setSchnell(true); setFokusNeue(false); }} />
-            Schnelleingabe (Tabelle)
-          </label>
-          <button type="button" onClick={() => { setNamenText(""); namenDialog.current?.showModal(); }}>
-            Namen einfügen…
-          </button>
-        </p>
-      )}
-      {quittung && rueckweg?.index == null && quittung}
-      {!nurStaerke && schnell ? (
-        bogen.personal.length > 0 && (
-          <PersonalSchnellTabelle
-            personal={bogen.personal}
-            aendern={(p) => aendern({ personal: p })}
-            fokusNeue={fokusNeue}
-            aufNeueFokus={() => setFokusNeue(true)}
-            verschieben={personVerschieben}
-            entfernt={(vorher, bezeichnung) => setRueckweg({ text: `${bezeichnung} entfernt.`, personal: vorher })}
-          />
-        )
-      ) : (
-        bogen.personal.map((p, i) => (
-          <Fragment key={i}>
-          {rueckweg?.index === i && quittung}
-          <PersonKarte
-            key={i}
-            person={p}
-            org={bogen.einheit.organisation}
-            vorschlaege={vorschlaege}
-            frisch={p === frischeKarte}
-            index={i}
-            anzahl={bogen.personal.length}
-            ansprech={!nurStaerke && i === 0}
-            nichtGezaehlt={nurStaerke}
-            verschieben={personVerschieben}
-            aendern={(np) => aendern({ personal: bogen.personal.map((x, j) => (j === i ? np : x)) })}
-            entfernen={() => {
-              const rest = bogen.personal.filter((_, j) => j !== i);
-              if (personLeer(p)) aendern({ personal: rest });
-              else aendernMitRueckweg(rest, `${personBezeichnung(p, i)} entfernt.`, i);
-            }}
-          />
-          </Fragment>
-        ))
-      )}
-      {/* Die letzte Karte entfernt: die Quittung steht, wo sie war. */}
-      {!schnell && rueckweg?.index != null && rueckweg.index >= bogen.personal.length && quittung}
-      <button
-        type="button"
-        className="primaer"
-        onClick={() => {
-          setFokusNeue(true);
-          // Die neue Karte erscheint ÜBER dem Knopf, den man gerade gedrückt
-          // hat — der Blick liegt unten. Der Stempel sagt, wohin er soll.
-          const neu = neuePerson();
-          setFrischeKarte(neu);
-          aendern({ personal: [...bogen.personal, neu] });
-        }}
-      >
-        + Person hinzufügen
-      </button>
 
       <dialog ref={namenDialog} aria-label="Namen einfügen">
         <div className="kopfzeile">
