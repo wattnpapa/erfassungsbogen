@@ -3802,6 +3802,23 @@
       --md-deaktiviert-flaeche:  rgba(217, 205, 182, 0.12);
       --md-deaktiviert-text:     rgba(217, 205, 182, 0.38);
     }
+
+    /* ---------------------------------------------------------------
+       Audit Runde 2, P3 (Themen, Formularfelder, Dialoge). Gesammelt an
+       einer Stelle am Ende, damit die Kaskade gegen Modus- und
+       Plattformblöcke eindeutig ist.
+       --------------------------------------------------------------- */
+    /* R2-L4: Der Fokusrahmen hat die Kennfarbe — im Standard- und
+       Feld-Thema ist das die Farbe des Kopfbalkens selbst (1,0:1): ein
+       fokussierter Reiter war von seinen Nachbarn nicht zu unterscheiden.
+       Im Balken trägt er deshalb die Kopf-Schriftfarbe (Standard: Weiß auf
+       Kennfarbe). Nach innen versetzt, weil die Leiste quer und auf schmalen
+       Köpfen waagerecht rollt und ein äußerer Rahmen dort abgeschnitten
+       würde. Die Plattformen haben keinen Balken und behalten ihren Fokus. */
+    :root:not(.platform-ios):not(.platform-android) .schritte button:focus-visible {
+      outline: var(--fokus) solid var(--kopf-auf);
+      outline-offset: calc(-1 * var(--fokus));
+    }
   </style>
 </head>
 <body>

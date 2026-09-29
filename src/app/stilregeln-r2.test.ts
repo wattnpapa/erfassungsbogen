@@ -59,3 +59,12 @@ describe("Feldrahmen in den dunklen Themen (R2-L3)", () => {
     expect(bloecke("input, select, textarea").join("\n")).toMatch(/border:[^;]*var\(--linie-stark\)/);
   });
 });
+
+describe("Fokus in der Schrittleiste (R2-L4)", () => {
+  it("zeichnet den Fokusrahmen in der Kopf-Schriftfarbe, nicht in der Kennfarbe des Balkens", () => {
+    const regel = bloecke(":root:not(.platform-ios):not(.platform-android) .schritte button:focus-visible").join("\n");
+    expect(regel).toMatch(/outline:[^;]*var\(--kopf-auf\)/);
+    // nach innen versetzt: die Leiste rollt waagerecht und schnitte einen äußeren Rahmen ab
+    expect(regel).toMatch(/outline-offset:\s*calc\(-1 \* var\(--fokus\)\)/);
+  });
+});
