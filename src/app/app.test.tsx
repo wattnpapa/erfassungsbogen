@@ -686,6 +686,20 @@ describe("Assistenten-Durchlauf", () => {
     expect(screen.getByLabelText("Name (Pflicht)")).toBeDefined();
   }, 20000);
 
+  // Audit Runde 2, R2-H5: „Neuen Bogen erstellen" legte keinen
+  // Verlaufseintrag an — Zurück aus Schritt 1 verließ die App.
+  it("führt mit Zurück aus Schritt 1 auf die Startseite", async () => {
+    const nutzer = userEvent.setup();
+    render(<App />);
+    const laenge = history.length;
+    await nutzer.click(screen.getByRole("button", { name: "Neuen Bogen erstellen" }));
+    expect(screen.getByLabelText("Name (Pflicht)")).toBeDefined();
+    expect(history.length).toBe(laenge + 1);
+    act(() => { history.back(); });
+    await waitFor(() => expect(screen.queryByLabelText("Name (Pflicht)")).toBeNull());
+    expect(screen.getByRole("button", { name: "Neuen Bogen erstellen" })).toBeDefined();
+  });
+
   it("zeigt den QR-Code im Vollbild — mit Bild, nicht nur mit Rahmen", async () => {
     const nutzer = userEvent.setup();
     const dialog = await uebergabeDialog(nutzer);
@@ -698,6 +712,34 @@ describe("Assistenten-Durchlauf", () => {
     // Der Knopf gilt nur als heil, wenn wirklich ein Code dasteht.
     const bild = within(vollbild).getByRole("img") as HTMLImageElement;
     expect(bild.src.startsWith("data:image/")).toBe(true);
+  });
+
+  // Audit Runde 2, R2-H5: Zurück im QR-Vollbild sprang von der Übersicht auf
+  // Schritt 5, statt nur das Vollbild zu schließen.
+  it("schließt das QR-Vollbild mit Zurück und bleibt auf der Übersicht", async () => {
+    const nutzer = userEvent.setup();
+    const dialog = await uebergabeDialog(nutzer);
+    const knopf = within(dialog).getByRole("button", { name: /QR-Code im Vollbild/ });
+    await waitFor(() => expect(knopf).toHaveProperty("disabled", false));
+    await nutzer.click(knopf);
+    await screen.findByRole("dialog", { name: "QR-Code im Vollbild" });
+    act(() => { history.back(); });
+    await waitFor(() => expect(screen.queryByRole("dialog", { name: "QR-Code im Vollbild" })).toBeNull());
+    expect(screen.getByRole("heading", { name: "Gesamtübersicht" })).toBeDefined();
+  });
+
+  it("verbraucht den Verlaufseintrag des QR-Vollbilds beim Schließen per Knopf", async () => {
+    const nutzer = userEvent.setup();
+    const dialog = await uebergabeDialog(nutzer);
+    const knopf = within(dialog).getByRole("button", { name: /QR-Code im Vollbild/ });
+    await waitFor(() => expect(knopf).toHaveProperty("disabled", false));
+    const laenge = history.length;
+    await nutzer.click(knopf);
+    const vollbild = await screen.findByRole("dialog", { name: "QR-Code im Vollbild" });
+    expect(history.length).toBe(laenge + 1);
+    await nutzer.click(within(vollbild).getByRole("button", { name: "Schließen" }));
+    await waitFor(() => expect((history.state as { eebEbene?: string } | null)?.eebEbene).toBeUndefined());
+    expect(screen.getByRole("heading", { name: "Gesamtübersicht" })).toBeDefined();
   });
 
   // Audit Runde 2, R2-M2: Escape schloss das QR-Vollbild nicht — am

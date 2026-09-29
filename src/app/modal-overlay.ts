@@ -15,7 +15,7 @@
  *    Auslöser zurückgeben — auch wenn React das Element einfach aushängt.
  */
 
-import { useLayoutEffect, useRef, type RefObject } from "react";
+import { useEffect, useLayoutEffect, useRef, type RefObject } from "react";
 
 // Mehrere Overlays können gestapelt sein (Scanner und darüber eine Rückfrage
 // sind native Dialoge; zwei Overlays zugleich kommen nicht vor, schaden aber
@@ -86,4 +86,52 @@ export function useModalesOverlay(ref: RefObject<HTMLDialogElement | null>, opti
       if (ziel?.isConnected) ziel.focus({ preventScroll: true });
     };
   }, [ref]);
+}
+
+/**
+ * Eigener Verlaufseintrag für ein Overlay, damit die Zurück-Geste nur das
+ * Overlay schließt. Im QR-Vollbild sprang Zurück sonst eine ganze Ansicht
+ * zurück — von der Übersicht auf Schritt 5 (Audit Runde 2, R2-H5).
+ *
+ * Bewusst an Handlungen gebunden statt an einen Effekt: Der Eintrag entsteht
+ * beim Öffnen ({@link ebeneBetreten}) und wird beim Schließen über Knopf oder
+ * Escape wieder verbraucht ({@link ebeneVerlassen}); Zurück schließt über
+ * {@link useEbeneZurueck}. Der Eintrag übernimmt den Verlaufszustand darunter
+ * (die Ansicht der App), der App-Lauscher stellt beim Rücksprung also nichts um.
+ */
+const EBENE = "eebEbene";
+
+function ebeneImVerlauf(): unknown {
+  try {
+    return (history.state as Record<string, unknown> | null)?.[EBENE];
+  } catch {
+    return undefined;
+  }
+}
+
+export function ebeneBetreten(kennung: string): void {
+  try {
+    history.pushState({ ...((history.state as object | null) ?? {}), [EBENE]: kennung }, "");
+  } catch {
+    /* ohne Verlauf (eingebettet, file://) schließt eben nur der Knopf */
+  }
+}
+
+/** Overlay schließen und, falls sein Eintrag obenauf liegt, ihn verbrauchen. */
+export function ebeneVerlassen(kennung: string, schliessen: () => void): void {
+  if (ebeneImVerlauf() === kennung) history.back();
+  schliessen();
+}
+
+/** Solange das Overlay offen ist: Zurück (Gerät, Browser) schließt es. */
+export function useEbeneZurueck(kennung: string, schliessen: () => void): void {
+  const zu = useRef(schliessen);
+  zu.current = schliessen;
+  useEffect(() => {
+    const beiZurueck = () => {
+      if (ebeneImVerlauf() !== kennung) zu.current();
+    };
+    window.addEventListener("popstate", beiZurueck);
+    return () => window.removeEventListener("popstate", beiZurueck);
+  }, [kennung]);
 }

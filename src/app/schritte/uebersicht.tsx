@@ -58,7 +58,7 @@ import { fehlerText } from "../nachladen";
 import { frageJaNein, frageText, zeigeHinweis } from "../dialoge";
 import { SpeicherVollFehler, istSpeicherVoll } from "../eintrag-zeiten";
 import { uebergabeText, type UebergabeStand } from "../uebergabe-stand";
-import { useModalesOverlay } from "../modal-overlay";
+import { ebeneBetreten, ebeneVerlassen, useEbeneZurueck, useModalesOverlay } from "../modal-overlay";
 import {
   MWD_LEGENDE,
   STAERKE_LEGENDE,
@@ -870,6 +870,7 @@ export function Uebersicht(props: {
               setVollbildTeil(0);
               setVollbild(true);
               props.onUebergeben?.();
+              ebeneBetreten(VOLLBILD_EBENE); // Zurück schließt nur das Vollbild (R2-H5)
             }}
           >
             QR-Code im Vollbild zeigen
@@ -954,7 +955,13 @@ export function Uebersicht(props: {
       </dialog>
 
       {vollbild && qr && (
-        <QrVollbild qr={qr} teilIndex={vollbildTeil} onTeil={setVollbildTeil} onSchliessen={() => setVollbild(false)} />
+        <QrVollbild
+          qr={qr}
+          teilIndex={vollbildTeil}
+          onTeil={setVollbildTeil}
+          onSchliessen={() => ebeneVerlassen(VOLLBILD_EBENE, () => setVollbild(false))}
+          onZurueck={() => setVollbild(false)}
+        />
       )}
     </>
   );
@@ -965,10 +972,21 @@ export function Uebersicht(props: {
  * und Vorlesen bleiben im Overlay, die Übersicht dahinter rollt nicht mit,
  * Escape schließt, und der Fokus kehrt auf „Bogen übergeben…" zurück.
  */
-function QrVollbild(props: { qr: QrSatz; teilIndex: number; onTeil: (i: number) => void; onSchliessen: () => void }) {
+const VOLLBILD_EBENE = "qr-vollbild";
+
+function QrVollbild(props: {
+  qr: QrSatz;
+  teilIndex: number;
+  onTeil: (i: number) => void;
+  /** Knopf oder Escape — verbraucht auch den Verlaufseintrag. */
+  onSchliessen: () => void;
+  /** Geräte-/Browser-Zurück — der Eintrag ist dann schon weg. */
+  onZurueck: () => void;
+}) {
   const { qr, teilIndex } = props;
   const dialog = useRef<HTMLDialogElement>(null);
   useModalesOverlay(dialog, { onSchliessen: props.onSchliessen });
+  useEbeneZurueck(VOLLBILD_EBENE, props.onZurueck);
   const teil = qr.teile[Math.min(teilIndex, qr.teile.length - 1)]!;
   return (
     <dialog ref={dialog} className="qr-vollbild" aria-label="QR-Code im Vollbild" tabIndex={-1}>

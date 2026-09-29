@@ -737,8 +737,13 @@ function AppInhalt() {
   // gemerkte Ansicht wieder her und legt selbst keinen neuen Eintrag an.
   const ansichtRef = useRef<Ansicht | null>(null);
   const verlaufZielRef = useRef<Ansicht | null>(null);
+  // Ohne Bogen IST die Startseite zu sehen, auch bei zeigeStart = false. Vorher
+  // galten Startseite und Schritt 1 deshalb als dieselbe Ansicht: „Neuen Bogen
+  // erstellen" legte keinen Verlaufseintrag an, und Zurück aus Schritt 1
+  // verließ die App (Audit Runde 2, R2-H5).
+  const startSichtbar = zeigeStart || !bogen;
   useEffect(() => {
-    const jetzt: Ansicht = { schritt, zeigeStart, einsatz: offenerEinsatzId, scanner: scannerOffen };
+    const jetzt: Ansicht = { schritt, zeigeStart: startSichtbar, einsatz: offenerEinsatzId, scanner: scannerOffen };
     const vorher = ansichtRef.current;
     ansichtRef.current = jetzt;
     if (typeof history === "undefined") return;
@@ -753,7 +758,7 @@ function AppInhalt() {
     }
     verlaufZielRef.current = null;
     history.pushState({ eeb: jetzt }, "");
-  }, [schritt, zeigeStart, offenerEinsatzId, scannerOffen]);
+  }, [schritt, startSichtbar, offenerEinsatzId, scannerOffen]);
   useEffect(() => {
     function beiVerlauf(e: PopStateEvent) {
       const ziel = (e.state as { eeb?: Ansicht } | null)?.eeb;
