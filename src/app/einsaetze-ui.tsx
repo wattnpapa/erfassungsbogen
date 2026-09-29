@@ -21,7 +21,6 @@ import { datenschutzfristAbgelaufen } from "@bos/eeb-format/datenschutzfrist";
 import { datenschutzZeitpunkt } from "./datenschutz-uhr";
 import {
   datumDeutsch,
-  zeitgruppe,
   einheitAnzeigename,
   funkrufText,
   funktionsText,
@@ -199,8 +198,12 @@ function summenStaerkeText(sum: EinsatzSummen): string {
   return `${s.fuehrer} / ${s.unterfuehrer} / ${s.mannschaft} / ${s.gesamt}`;
 }
 
+/**
+ * Stand lesbar: „28.09.2026, 14:42" statt der Zeitgruppe „281442sep26", die
+ * ein Neuling nicht auf Anhieb liest (Audit Runde 2, R2-N4).
+ */
 function standText(b: Erfassungsbogen): string {
-  return zeitgruppe(b.stand);
+  return zeitpunktDeutsch(b.stand);
 }
 
 /**

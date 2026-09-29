@@ -21,7 +21,7 @@ import { staerke, unterbringungMWD, verpflegung, type Erfassungsbogen } from "@b
 import { einheitAnzeigename, orgLabel, vokabText, vokabularFuer, zeitgruppe } from "./hilfen";
 import { MeldeStatus, type EinsatzArt, type MeldeEintrag } from "@bos/meldekopf/einsaetze";
 import { summiereBoegen, zaehltInLage, type EinsatzSummen } from "./auswertung";
-import { eintreffzeit, zeitKurz } from "./eintrag-zeiten";
+import { eintreffzeit, zeitKurz, zeitpunktZuMs } from "./eintrag-zeiten";
 
 // ------------------------------------------------------------ Bedarfsmarken
 
@@ -80,7 +80,9 @@ export function hatSofortbedarf(e: MeldeEintrag): boolean {
 export const STAND_ALT_MS = 24 * 60 * 60 * 1000;
 
 export function standIstAlt(e: MeldeEintrag): boolean {
-  return eintreffzeit(e) - e.bogen.stand > STAND_ALT_MS;
+  // bogen.stand ist ein EebZeitpunkt (Minuten), die Eintreffzeit Millisekunden
+  // — erst umrechnen (Audit Runde 2, R2-N4).
+  return eintreffzeit(e) - zeitpunktZuMs(e.bogen.stand) > STAND_ALT_MS;
 }
 
 /** „Neu": vor weniger als 30 Minuten eingetroffen — was seit der Übernahme dazukam. */

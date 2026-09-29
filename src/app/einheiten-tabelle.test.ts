@@ -17,6 +17,7 @@ import {
   StaerkeRolle,
   type Erfassungsbogen,
   type Person,
+  zeitpunktAusIso,
 } from "@bos/eeb-format/model";
 import { EinsatzArt, MeldeStatus, type MeldeEintrag } from "@bos/meldekopf/einsaetze";
 import {
@@ -150,11 +151,22 @@ describe("bedarfMarken", () => {
 describe("standIstAlt / istNeu", () => {
   it("nennt einen Stand alt, der mehr als 24 h vor dem Eintreffen liegt", () => {
     const b = bogen("Aurich", 1);
-    b.stand = new Date("2026-07-16T19:23").getTime();
-    const frisch = eintrag("f", b, { eingetroffenAm: b.stand + 60 * 60 * 1000 });
+    // bogen.stand ist ein EebZeitpunkt (Minuten seit 2020, Wandzeit), nicht ms.
+    b.stand = zeitpunktAusIso("2026-07-16T19:23");
+    const frisch = eintrag("f", b, { eingetroffenAm: new Date("2026-07-16T20:23").getTime() });
     const alt = eintrag("a", b, { eingetroffenAm: new Date("2026-09-27T09:40").getTime() });
     expect(standIstAlt(frisch)).toBe(false);
     expect(standIstAlt(alt)).toBe(true);
+  });
+
+  it("setzt die Marke alt nicht an einen Bogen, der Minuten vor dem Eintreffen erstellt wurde (R2-N4)", () => {
+    const b = bogen("Ulm", 1);
+    b.stand = zeitpunktAusIso("2026-09-28T10:42");
+    const e = eintrag("u", b, { eingetroffenAm: new Date("2026-09-28T10:51").getTime() });
+    expect(standIstAlt(e)).toBe(false);
+    // knapp 24 h: noch nicht alt; gut 24 h: alt
+    expect(standIstAlt(eintrag("v", b, { eingetroffenAm: new Date("2026-09-29T10:41").getTime() }))).toBe(false);
+    expect(standIstAlt(eintrag("w", b, { eingetroffenAm: new Date("2026-09-29T10:44").getTime() }))).toBe(true);
   });
 
   it("nennt eine Meldung neu, die vor weniger als 30 Minuten eintraf", () => {

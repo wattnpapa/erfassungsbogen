@@ -13,6 +13,7 @@ import {
   OrganisationsTyp,
   PersonalErfassung,
   SCHEMA_VERSION,
+  zeitpunktAusIso,
   type Erfassungsbogen,
 } from "@bos/eeb-format/model";
 import {
@@ -25,6 +26,7 @@ import {
   speicherhuelleSetzen,
 } from "@bos/meldekopf/einsaetze";
 import {
+  zeitpunktZuMs,
   SpeicherVollFehler,
   abrueckzeitSetzen,
   eintragGespeichert,
@@ -314,5 +316,12 @@ describe("einheitEntfernen (Audit Runde 2, R2-D1)", () => {
     expect(einheitEntfernen(a.id, "gibt-es-nicht")).toEqual([]);
     expect(einheitEntfernen("kein-einsatz", "x")).toEqual([]);
     expect(einsaetzeLaden()[0]!.eintraege).toHaveLength(1);
+  });
+});
+
+describe("zeitpunktZuMs (R2-N4)", () => {
+  it("liest den Bogen-Zeitpunkt als lokale Wandzeit dieses Geräts", () => {
+    expect(zeitpunktZuMs(zeitpunktAusIso("2026-09-28T14:42"))).toBe(new Date("2026-09-28T14:42").getTime());
+    expect(zeitpunktZuMs(zeitpunktAusIso("2026-01-02T00:05"))).toBe(new Date("2026-01-02T00:05").getTime());
   });
 });

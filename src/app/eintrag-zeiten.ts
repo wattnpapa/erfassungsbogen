@@ -26,6 +26,7 @@ import {
   type MeldungOptionen,
 } from "@bos/meldekopf/einsaetze";
 import { entfernteMerken } from "./entfernte-meldungen";
+import { EEB_EPOCHE_MS, type EebZeitpunkt } from "@bos/eeb-format/model";
 
 declare module "@bos/meldekopf/einsaetze" {
   interface MeldeEintrag {
@@ -44,6 +45,19 @@ declare module "@bos/meldekopf/einsaetze" {
      */
     notiz?: string;
   }
+}
+
+/**
+ * Bogen-Zeitpunkt (EebZeitpunkt: Minuten seit 2020-01-01, lokale Wandzeit) als
+ * Millisekunden der Geräteuhr, damit er sich mit `empfangenAm`/`eingetroffenAm`
+ * vergleichen lässt. Vorher wurden Minuten direkt von Millisekunden abgezogen —
+ * die Marke „alt" stand dadurch an jeder Karte (Audit Runde 2, R2-N4). Die
+ * Wandzeit wird als lokale Zeit dieses Geräts gelesen, wie sie auf dem Papier
+ * steht.
+ */
+export function zeitpunktZuMs(z: EebZeitpunkt): number {
+  const w = new Date(EEB_EPOCHE_MS + z * 60_000); // Wandzeit in UTC-Feldern
+  return new Date(w.getUTCFullYear(), w.getUTCMonth(), w.getUTCDate(), w.getUTCHours(), w.getUTCMinutes()).getTime();
 }
 
 /** Eintreffzeit einer Meldung — korrigierter Wert oder Empfangszeit. */
