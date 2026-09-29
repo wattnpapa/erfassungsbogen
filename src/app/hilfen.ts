@@ -585,6 +585,24 @@ export function fahrzeugHinweise(b: Erfassungsbogen): string[] {
       }
     }
   });
+  // Sitzplätze weit über dem Richtwert (90 statt 9) und dasselbe Kennzeichen
+  // zweimal gingen still durch (R2-E4).
+  b.fahrzeuge.forEach((f, i) => {
+    const richtwert = sitzplaetzeRichtwert(f, vokabularFuer(org, "fahrzeug"));
+    if (f.sitzplaetze != null && f.sitzplaetze > 9 && f.sitzplaetze > 2 * Math.max(richtwert ?? 0, 1)) {
+      hinweise.push(`${fahrzeugBezeichnung(f, i, org)}: ${f.sitzplaetze} Sitzplätze${richtwert != null ? ` (Richtwert ${richtwert})` : ""} — stimmt das?`);
+    }
+  });
+  const kennzeichenNorm = (f: Fahrzeug) => kennzeichenText(f).toUpperCase().replace(/[\s-]/g, "");
+  const doppelt = new Set(
+    b.fahrzeuge
+      .map(kennzeichenNorm)
+      .filter((k, i, alle) => k && alle.indexOf(k) !== i),
+  );
+  for (const k of doppelt) {
+    const f = b.fahrzeuge.find((x) => kennzeichenNorm(x) === k)!;
+    hinweise.push(`Kennzeichen ${kennzeichenText(f)} steht mehrfach in der Fahrzeugliste — stimmt das?`);
+  }
   // Ohne Fahrzeuge reist die Einheit erklärtermaßen anders an — das ist kein
   // offener Punkt, sondern eine Aussage. Erst wenn Fahrzeuge dastehen, muss
   // die Rechnung aufgehen.
@@ -723,6 +741,43 @@ export function pruefpunkte(b: Erfassungsbogen, mitFahrzeugen = true, heute?: Ee
       text: `Einsatzende ${zeitpunktDeutsch(b.einsatz.einsatzende)} liegt vor dem Einsatzbeginn ${zeitpunktDeutsch(b.einsatz.einsatzbeginn)}.`,
       schritt: S_EINSATZ,
     });
+  }
+  // Weitere Tippfehler, die bisher ohne Hinweis durchgingen (Audit Runde 2,
+  // R2-E4). Alle als Frage, nichts sperrt.
+  const ohneZiffer = (t?: string) => !!t?.trim() && !/\d/.test(t);
+  const ohneAt = (t?: string) => !!t?.trim() && !t.includes("@");
+  const nurZiffern = (t?: string) => !!t?.trim() && /^[\d\s./-]+$/.test(t.trim());
+  b.einheit.hierarchie.forEach((h) => {
+    const wo = h.name.trim() || "Zugehörigkeit";
+    if (ohneZiffer(h.telefon)) hinweise.push({ text: `${wo}: Rufnummer „${h.telefon}" enthält keine Ziffer — stimmt das?`, schritt: S_EINHEIT });
+    if (ohneAt(h.email)) hinweise.push({ text: `${wo}: E-Mail „${h.email}" ohne „@" — stimmt das?`, schritt: S_EINHEIT });
+    if (nurZiffern(h.name)) hinweise.push({ text: `Zugehörigkeit „${h.name}" besteht nur aus Ziffern — stimmt der Name?`, schritt: S_EINHEIT });
+  });
+  b.personal.forEach((p, i) => {
+    const wer = personBezeichnung(p, i);
+    if (nurZiffern(p.vorname) || nurZiffern(p.nachname)) {
+      hinweise.push({ text: `${wer}: Der Name besteht nur aus Ziffern — stimmt das?`, schritt: S_PERSONAL });
+    }
+    for (const k of p.kontakte) {
+      if (k.art === KontaktArt.EMAIL ? ohneAt(k.wert) : ohneZiffer(k.wert)) {
+        hinweise.push({
+          text: `${wer}: ${k.art === KontaktArt.EMAIL ? `E-Mail „${k.wert}" ohne „@"` : `Rufnummer „${k.wert}" ohne Ziffer`} — stimmt das?`,
+          schritt: S_PERSONAL,
+        });
+      }
+    }
+  });
+  if (b.einsatz.einsatzbeginn != null) {
+    const tag = Math.floor(b.einsatz.einsatzbeginn / MINUTEN_JE_TAG);
+    if (tag < b.einsatz.zeitraumVon || tag > b.einsatz.zeitraumBis) {
+      hinweise.push({
+        text: `Einsatzbeginn ${zeitpunktDeutsch(b.einsatz.einsatzbeginn)} liegt außerhalb des Einsatzzeitraums ${zeitraumDeutsch(b)}.`,
+        schritt: S_EINSATZ,
+      });
+    }
+  }
+  if (heute != null && (Math.abs(b.einsatz.zeitraumVon - heute) > 365 || b.einsatz.zeitraumBis - heute > 365)) {
+    hinweise.push({ text: `Einsatzzeitraum ${zeitraumDeutsch(b)} liegt mehr als ein Jahr entfernt — Tippfehler im Jahr?`, schritt: S_EINSATZ });
   }
   // Zahlendreher in der Stärke: 99 statt 9 fällt beim Tippen nicht auf, am
   // Meldekopf zählt die Einheit dann mit 100 in die Lage. Zwei Muster, die

@@ -21,6 +21,7 @@ import {
   PersonalErfassung,
   StaerkeRolle,
   SCHEMA_VERSION,
+  MINUTEN_JE_TAG,
   datumAusIso,
   zeitpunktAusIso,
   type Erfassungsbogen,
@@ -849,5 +850,29 @@ describe("personUnbenannt() / fahrzeugUnbenannt()", () => {
     expect(fahrzeugUnbenannt({ typ: { code: 4 }, funkrufname: { kennwort: { code: 1 }, eigenerStandort: true, teile: [18, 13] } })).toBe(true);
     expect(fahrzeugUnbenannt({ typ: { code: 4 }, kennzeichen: "THW-84397" })).toBe(false);
     expect(fahrzeugUnbenannt({ typ: {}, kennzeichen: "  " })).toBe(true);
+  });
+});
+
+describe("pruefpunkte: weitere Tippfehler (R2-E4)", () => {
+  it("fragt bei Rufnummer ohne Ziffer, E-Mail ohne @, Namen aus Ziffern, Sitzplätzen, doppeltem Kennzeichen und Datum", () => {
+    const b = neuerBogen();
+    b.einheit.hierarchie = [{ bezeichnung: { code: 1 }, name: "12345", telefon: "abc-xyz", email: "keinemail" }];
+    b.personal = [{ ...neuePerson(), vorname: "Max", nachname: "Muster", kontakte: [{ art: KontaktArt.MOBIL, dienstlich: true, wert: "abc" }] }];
+    b.fahrzeuge = [
+      { ...neuesFahrzeug(), kennzeichen: "THW-84397", sitzplaetze: 90 },
+      { ...neuesFahrzeug(), kennzeichen: "THW 84397" },
+    ];
+    const heute = b.einsatz.zeitraumVon;
+    b.einsatz.zeitraumBis = heute + 13000; // Jahr vertippt
+    b.einsatz.einsatzbeginn = (heute - 5) * MINUTEN_JE_TAG;
+    const texte = pruefpunkte(b, true, heute).map((p) => p.text).join("\n");
+    expect(texte).toMatch(/Rufnummer „abc-xyz" enthält keine Ziffer/);
+    expect(texte).toMatch(/E-Mail „keinemail" ohne „@"/);
+    expect(texte).toMatch(/„12345" besteht nur aus Ziffern/);
+    expect(texte).toMatch(/Muster, Max: Rufnummer „abc" ohne Ziffer/);
+    expect(texte).toMatch(/90 Sitzplätze/);
+    expect(texte).toMatch(/Kennzeichen THW-84397 steht mehrfach/);
+    expect(texte).toMatch(/mehr als ein Jahr entfernt/);
+    expect(texte).toMatch(/außerhalb des Einsatzzeitraums/);
   });
 });
