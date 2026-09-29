@@ -8,7 +8,7 @@
  * Reine Anzeige + Aufruf der Store-/Auswertungslogik (einsaetze.ts, auswertung.ts).
  */
 
-import { useEffect, useId, useRef, useState, type FocusEvent } from "react";
+import { useEffect, useId, useLayoutEffect, useRef, useState, type FocusEvent } from "react";
 import {
   PersonalErfassung,
   datumZuIso,
@@ -1475,6 +1475,14 @@ function HistorieZeile({ eintrag, vorheriger, aktuell, onVerwerfen }: {
   );
 }
 
+/**
+ * So lange nimmt eine Karte nach „Abrücken"/„Wieder anwesend" keinen Tipp an.
+ * Ein Doppeltipp mit Handschuh liegt bei 100–300 ms (Audit Runde 2, R2-G4);
+ * wer bewusst zurücknehmen will, tippt nicht schneller als nach einer
+ * halben Sekunde erneut.
+ */
+export const PRELLSCHUTZ_MS = 600;
+
 function EinheitKarte(props: {
   einsatzId: string;
   kopf: MeldeEintrag;
@@ -1494,6 +1502,37 @@ function EinheitKarte(props: {
   const { einsatzId, kopf, alle, onGeaendert, onEntfernt, qualifikation = "", qualifikationKurz = "", eingang, onStatusWechsel } = props;
   const zeile = useEingangsquittung<HTMLLIElement>(marke(eingang, kopf.einheitSchluessel));
   const nameId = useId();
+  // Bis wann die Karte nach einem Statuswechsel keine Tipps annimmt (R2-G4).
+  // Der Zeitstempel sperrt jeden Knopf der Karte; der Zustand graut den
+  // Wechselknopf für diese Zeit aus, damit sichtbar ist, dass er gerade nicht
+  // annimmt (und Testautomaten auf ihn warten, statt ins Leere zu tippen).
+  const gesperrtBis = useRef(0);
+  const [prellt, setPrellt] = useState(false);
+  // Der Wechselknopf und seine Lage im Bild beim Tipp: Nach dem Abrücken
+  // wächst die Zeitzeile („· abgerückt 11:07 ändern") meist um eine Zeile,
+  // und die Knopfreihe rutschte 28 px unter dem Finger weg. Die Ansicht rollt
+  // um genau diesen Betrag nach, damit der Rückweg dort liegt, wo eben
+  // „Abrücken" lag (R2-G4).
+  const wechselKnopf = useRef<HTMLButtonElement>(null);
+  const ankerOben = useRef<number | null>(null);
+  useLayoutEffect(() => {
+    const alt = ankerOben.current;
+    ankerOben.current = null;
+    const neu = wechselKnopf.current?.getBoundingClientRect().top;
+    if (alt == null || neu == null) return;
+    const versatz = neu - alt;
+    if (Math.abs(versatz) < 1) return;
+    try {
+      window.scrollBy(0, versatz);
+    } catch {
+      /* Testumgebung ohne Layout */
+    }
+  }, [kopf.status]);
+  useEffect(() => {
+    if (!prellt) return;
+    const uhr = setTimeout(() => setPrellt(false), Math.max(0, gesperrtBis.current - Date.now()));
+    return () => clearTimeout(uhr);
+  }, [prellt]);
   // Die Namen gehören in die Zeile, nicht hinter einen Klick: die Frage lautet
   // „wen habe ich?", und die Antwort ist der Name, nicht die Zahl.
   const qualiPersonen = personenMitQualifikation(kopf, qualifikation);
@@ -1543,12 +1582,18 @@ function EinheitKarte(props: {
   /** Statuswechsel mit Zeitstempel; die Ansicht bekommt den alten Stand für den Rückweg. */
   async function statusSetzen(status: MeldeStatus) {
     const zeit = Date.now();
+    gesperrtBis.current = zeit + PRELLSCHUTZ_MS;
+    setPrellt(true);
+    ankerOben.current = wechselKnopf.current?.getBoundingClientRect().top ?? null;
     const vorher = { ...kopf };
     const ok = await gesichert(
-      status === MeldeStatus.ABGERUECKT ? "Abrücken" : "Als anwesend",
+      status === MeldeStatus.ABGERUECKT ? "Abrücken" : "Wieder anwesend",
       () => statusMitZeitSetzen(einsatzId, kopf.id, status, zeit),
     );
-    if (!ok) return;
+    if (!ok) {
+      ankerOben.current = null;
+      return;
+    }
     onStatusWechsel?.({ vorher, status, zeit });
     onGeaendert();
   }
@@ -1724,7 +1769,19 @@ function EinheitKarte(props: {
   }
 
   return (
-    <li ref={zeile} className={`einheit-zeile${zaehlt ? "" : " gestrichen"}`}>
+    <li
+      ref={zeile}
+      className={`einheit-zeile${zaehlt ? "" : " gestrichen"}`}
+      // Prellschutz: Der zweite Tipp eines Doppeltipps auf „Abrücken" traf
+      // die neu geordnete Karte (R2-G4). Abgefangen wird in der
+      // Einfangphase, also bevor irgendein Knopf der Karte ihn sieht.
+      onClickCapture={(e) => {
+        if (Date.now() < gesperrtBis.current) {
+          e.stopPropagation();
+          e.preventDefault();
+        }
+      }}
+    >
       <div className="kopfzeile">
         <div className="muster-text">
           {/* Der Name als Überschrift: Mit Vorleseprogramm springt man so von
@@ -1881,13 +1938,24 @@ function EinheitKarte(props: {
             </button>{" "}
           </>
         )}
-        {/* „Abrücken" nur an anwesenden Karten; der Gegenknopf „Als anwesend"
-            steht bei abgerückten NICHT an derselben Stelle, sondern abgesetzt
-            vor „Entfernen" — ein Doppeltipp mit Handschuh schaltete sonst
-            gleich wieder zurück (D4). */}
-        {zaehlt && (
+        {/* „Abrücken" und sein Gegenknopf „Wieder anwesend" teilen sich einen
+            Platz. Stand der Gegenknopf abgesetzt vor „Entfernen" (D4), rückten
+            alle Knöpfe nach dem Abrücken um: unter dem Finger lag dann „Zug
+            ändern", und ein Doppeltipp öffnete den Zug-Editor mit Tastatur
+            (Audit Runde 2, R2-G4). Jetzt liegt unter dem Finger der Rückweg;
+            gegen das Zurückschalten durch denselben Doppeltipp hält der
+            Prellschutz der Karte (siehe PRELLSCHUTZ_MS). */}
+        {zaehlt ? (
           <>
-            <button type="button" aria-describedby={nameId} onClick={() => void statusSetzen(MeldeStatus.ABGERUECKT)}>Abrücken</button>{" "}
+            <button type="button" ref={wechselKnopf} aria-describedby={nameId} disabled={prellt} onClick={() => void statusSetzen(MeldeStatus.ABGERUECKT)}>
+              Abrücken
+            </button>{" "}
+          </>
+        ) : (
+          <>
+            <button type="button" ref={wechselKnopf} aria-describedby={nameId} disabled={prellt} onClick={() => void statusSetzen(MeldeStatus.ANWESEND)}>
+              Wieder anwesend
+            </button>{" "}
           </>
         )}
         <button type="button" aria-describedby={nameId} onClick={() => setZugEntwurf(kopf.zugEtikett ?? "")}>
@@ -1917,13 +1985,6 @@ function EinheitKarte(props: {
           </button>
         )}{" "}
         <button type="button" aria-describedby={nameId} onClick={() => void verschieben()}>Verschieben…</button>{" "}
-        {!zaehlt && (
-          <>
-            <button type="button" aria-describedby={nameId} className="knopf-abgesetzt" onClick={() => void statusSetzen(MeldeStatus.ANWESEND)}>
-              Als anwesend
-            </button>{" "}
-          </>
-        )}
         <button type="button" aria-describedby={nameId} className="entfernen" onClick={entfernen}>Entfernen</button>
       </div>
       {lueckenOffen && luecken.length > 0 && (

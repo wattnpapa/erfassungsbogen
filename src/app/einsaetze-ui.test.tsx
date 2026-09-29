@@ -16,11 +16,11 @@
  */
 
 import { describe, it, expect, afterEach, beforeEach, vi } from "vitest";
-import { cleanup, render, screen, within } from "@testing-library/react";
+import { cleanup, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { PersonalErfassung, type Erfassungsbogen } from "@bos/eeb-format/model";
 import { Dialogschicht } from "./dialoge";
-import { EinsatzDetail } from "./einsaetze-ui";
+import { EinsatzDetail, PRELLSCHUTZ_MS } from "./einsaetze-ui";
 import {
   EinsatzArt,
   MeldeStatus,
@@ -553,22 +553,79 @@ describe("Abrücken mit Zeit, Quittung und Rückweg", () => {
     expect(screen.queryByRole("status")).toBeNull();
   });
 
-  it("stellt den Gegenknopf nicht an dieselbe Stelle, sondern abgesetzt vor „Entfernen“", async () => {
+  /** Knopfbeschriftungen der Karte in Reihenfolge. */
+  function kartenKnoepfe() {
+    return [...document.querySelector(".einheit-zeile .vorlage-aktionen")!.querySelectorAll("button")].map(
+      (b) => b.textContent?.trim() ?? "",
+    );
+  }
+
+  it("setzt den Rückweg „Wieder anwesend“ an die Stelle von „Abrücken“, die übrigen Knöpfe bleiben stehen", async () => {
     const nutzer = userEvent.setup();
     const { neuLaden } = buehne(["Crailsheim"]);
+    const vorher = kartenKnoepfe();
+    const platz = vorher.indexOf("Abrücken");
     await nutzer.click(screen.getByRole("button", { name: "Abrücken" }));
     neuLaden();
 
     expect(screen.queryByRole("button", { name: "Abrücken" })).toBeNull();
-    const knoepfe = screen.getAllByRole("button").map((b) => b.textContent);
-    const anwesend = knoepfe.indexOf("Als anwesend");
-    // Direkt vor „Entfernen" — und damit nicht dort, wo eben „Abrücken" stand
-    // (das war vor „Zug zuordnen").
-    expect(knoepfe[anwesend + 1]).toBe("Entfernen");
-    expect(knoepfe.indexOf("Zug zuordnen")).toBeLessThan(anwesend);
-    expect(screen.getByRole("button", { name: "Als anwesend" }).className).toContain("knopf-abgesetzt");
+    const nachher = kartenKnoepfe();
+    // Unter dem Finger liegt der Rückweg, nicht „Zug zuordnen" (R2-G4).
+    expect(nachher[platz]).toBe("Wieder anwesend");
+    expect(nachher.slice(0, platz)).toEqual(vorher.slice(0, platz));
+    expect(nachher[platz + 1]).toBe(vorher[platz + 1]);
     // Die Karte nennt die Abrückzeit ohne weiteren Tipp.
     expect(document.querySelector(".zeiten-zeile")!.textContent).toMatch(/abgerückt \d\d:\d\d/);
+  });
+
+  it("rollt um den Versatz nach, wenn die Karte beim Abrücken wächst — der Rückweg bleibt unter dem Finger", async () => {
+    const nutzer = userEvent.setup();
+    const { neuLaden } = buehne(["Crailsheim"]);
+    // Nach dem Abrücken rutscht die Knopfreihe um eine Zeile (28 px) nach unten.
+    const proto = HTMLButtonElement.prototype;
+    const vorher = proto.getBoundingClientRect;
+    proto.getBoundingClientRect = function (this: HTMLButtonElement) {
+      const oben = this.textContent?.trim() === "Wieder anwesend" ? 278 : 250;
+      return { top: oben, bottom: oben + 44, left: 33, right: 126, width: 93, height: 44, x: 33, y: oben, toJSON() {} } as DOMRect;
+    };
+    const rollen = vi.spyOn(window, "scrollBy").mockImplementation(() => {});
+    try {
+      await nutzer.click(screen.getByRole("button", { name: "Abrücken" }));
+      neuLaden();
+      expect(rollen).toHaveBeenCalledWith(0, 28);
+    } finally {
+      rollen.mockRestore();
+      proto.getBoundingClientRect = vorher;
+    }
+  });
+
+  it("schluckt den zweiten Tipp eines Doppeltipps: weder Zurückschalten noch Zug-Editor", async () => {
+    const nutzer = userEvent.setup();
+    const { einsatzId, neuLaden } = buehne(["Crailsheim"]);
+    const platz = kartenKnoepfe().indexOf("Abrücken");
+    const knopfAmPlatz = () =>
+      document.querySelector(".einheit-zeile .vorlage-aktionen")!.querySelectorAll("button")[platz]!;
+
+    await nutzer.click(knopfAmPlatz());
+    neuLaden();
+    // Zweiter Tipp an derselben Stelle, 150 ms später: gesperrt.
+    await nutzer.click(knopfAmPlatz());
+    expect(gespeichert(einsatzId, "Crailsheim").status).toBe(MeldeStatus.ABGERUECKT);
+    expect(screen.queryByRole("textbox", { name: "Zug" })).toBeNull();
+    // Auch ein anderer Knopf der Karte nimmt im Prellfenster nichts an.
+    await nutzer.click(screen.getByRole("button", { name: "Zug zuordnen" }));
+    expect(screen.queryByRole("textbox", { name: "Zug" })).toBeNull();
+
+    // Nach dem Prellfenster wirkt der Rückweg wie gewohnt.
+    const echt = Date.now.bind(Date);
+    const uhr = vi.spyOn(Date, "now").mockImplementation(() => echt() + PRELLSCHUTZ_MS + 50);
+    try {
+      await waitFor(() => expect((knopfAmPlatz() as HTMLButtonElement).disabled).toBe(false), { timeout: PRELLSCHUTZ_MS + 500 });
+      await nutzer.click(knopfAmPlatz());
+    } finally {
+      uhr.mockRestore();
+    }
+    expect(gespeichert(einsatzId, "Crailsheim").status).toBe(MeldeStatus.ANWESEND);
   });
 });
 

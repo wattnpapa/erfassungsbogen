@@ -28,9 +28,9 @@ Funktionalität: Einsatz-Sammlung führen (Meldekopf)
 
   Szenario: Abgerückte Einheit zählt nicht mehr in die Summe
     Wenn ich auf "Abrücken" klicke
-    Dann sehe ich die Schaltfläche "Als anwesend"
+    Dann sehe ich die Schaltfläche "Wieder anwesend"
     Und sehe ich den Hinweis "abgerückt"
-    Wenn ich auf "Als anwesend" klicke
+    Wenn ich auf "Wieder anwesend" klicke
     Dann sehe ich die Schaltfläche "Abrücken"
 
   Szenario: Einheit einem Zug zuordnen
