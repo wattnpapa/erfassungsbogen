@@ -9,10 +9,11 @@ import { act, fireEvent, render, screen, waitFor, within } from "@testing-librar
 import userEvent from "@testing-library/user-event";
 import { OrganisationsTyp, type Erfassungsbogen } from "@bos/eeb-format/model";
 import { encodePayload, encodePayloadUrl, encodeVorlagePayloadUrl, fragmentInhalt, segmentPayloadUrls } from "@bos/eeb-format/codec";
+import { encodeSigniertPayloadUrl, schluesselpaarErzeugen } from "@bos/eeb-format/signatur";
 import { browserKompressor, neuerBogen } from "./hilfen";
 import { vorlageAnlegen, vorlagenLaden } from "./vorlagen";
 import { einsatzDateiInhalt } from "./einsatz-transport";
-import { einheitEntfernen } from "./eintrag-zeiten";
+import { einheitEntfernen, eintreffzeitSetzen, zeitKurz } from "./eintrag-zeiten";
 // `einsatzAnlegen` heißt in diesem Test schon ein Klick-Helfer (Dialog
 // ausfüllen); der Speicher-Weg kommt darum unter eigenem Namen herein.
 import {
@@ -712,6 +713,9 @@ describe("Assistenten-Durchlauf", () => {
     // Der Knopf gilt nur als heil, wenn wirklich ein Code dasteht.
     const bild = within(vollbild).getByRole("img") as HTMLImageElement;
     expect(bild.src.startsWith("data:image/")).toBe(true);
+    // R2-W6/N9/O7: vor dem Scan sichtbar, wer gezeigt wird.
+    expect(within(vollbild).getByText(/\(F \/ UF \/ M \/ Ges\) · Stand \d\d:\d\d Uhr/)).toBeDefined();
+    expect(vollbild.querySelector(".qr-vollbild-kopf strong")?.textContent).toMatch(/ · /);
   });
 
   // Audit Runde 2, R2-H5: Zurück im QR-Vollbild sprang von der Übersicht auf
@@ -1154,6 +1158,21 @@ describe("Neuen Einsatz anlegen", () => {
     const eintraege = einsaetzeLaden().find((s) => s.id === einsatzId)!.eintraege;
     expect(eintraege).toHaveLength(2); // die alte Meldung wandert in die Historie
     expect(neuesteJeEinheit(eintraege)).toHaveLength(1); // gezählt wird eine Einheit
+  });
+
+  /** R2-W6: Die Karte zeigte direkt danach die Zeit der Folgemeldung, erst nach dem Neuladen die richtige. */
+  it("zeigt nach dem Anhängen sofort die Eintreffzeit der ersten Meldung", async () => {
+    const nutzer = userEvent.setup();
+    const { einsatzId, dialog } = await zweiteMeldungDerselbenEinheit(nutzer);
+    const erste = einsaetzeLaden().find((s) => s.id === einsatzId)!.eintraege[0]!;
+    const frueher = Date.now() - 3 * 60 * 60 * 1000;
+    eintreffzeitSetzen(einsatzId, erste.id, frueher);
+
+    await nutzer.click(within(dialog).getByRole("button", { name: "Als neue Fassung anhängen" }));
+
+    const erwartet = `eingetroffen ${zeitKurz(frueher)}`;
+    await waitFor(() => expect(document.body.textContent).toContain(erwartet));
+    expect(document.body.textContent).not.toContain(`eingetroffen ${zeitKurz(Date.now())}`);
   });
 
   it("führt die zweite Meldung auf Wunsch als eigene Einheit", async () => {
@@ -1732,6 +1751,47 @@ describe("Bögen aus einer PDF in einen Einsatz übernehmen", () => {
     await nutzer.upload(screen.getByLabelText("Dateien wählen…"), pdfDatei());
 
     expect((await screen.findAllByText(/OV Nachzügler/)).length).toBeGreaterThan(0);
+  });
+
+  /**
+   * R2-W6: Derselbe Bogen kam per Link „✓ signiert" an, als PDF nur ohne
+   * Signatur. Das Siegel steht im QR-Code auf der letzten Seite der PDF.
+   */
+  it("liest beim PDF-Import das Siegel aus dem QR-Code der PDF mit", async () => {
+    const b = bogenMitName("OV Signiert");
+    const paar = await schluesselpaarErzeugen();
+    qrTexteAusPdf.mockResolvedValue([await encodeSigniertPayloadUrl(b, browserKompressor, paar.privat)]);
+    const nutzer = userEvent.setup();
+    render(<App />);
+    await nutzer.click(screen.getByRole("button", { name: "Neue Einsatz-Sammlung…" }));
+    await einsatzAnlegen(nutzer, "Siegelprobe");
+    await screen.findByRole("heading", { level: 1, name: "Siegelprobe" });
+
+    await nutzer.upload(screen.getByLabelText("Dateien wählen…"), pdfDatei(b));
+
+    expect((await screen.findAllByText(/OV Signiert/)).length).toBeGreaterThan(0);
+    const eintrag = einsaetzeLaden().find((e) => e.name === "Siegelprobe")!.eintraege[0]!;
+    expect(eintrag.signatur?.zustand).toBe("gueltig");
+    expect(eintrag.herkunft).toBeTruthy();
+  });
+
+  it("bleibt beim eingebetteten Bogen ohne Siegel, wenn der QR zu einer anderen Fassung gehört", async () => {
+    const b = bogenMitName("OV Fassung");
+    const anders = { ...b, stand: b.stand - 60 };
+    const paar = await schluesselpaarErzeugen();
+    qrTexteAusPdf.mockResolvedValue([await encodeSigniertPayloadUrl(anders, browserKompressor, paar.privat)]);
+    const nutzer = userEvent.setup();
+    render(<App />);
+    await nutzer.click(screen.getByRole("button", { name: "Neue Einsatz-Sammlung…" }));
+    await einsatzAnlegen(nutzer, "Fassungsprobe");
+    await screen.findByRole("heading", { level: 1, name: "Fassungsprobe" });
+
+    await nutzer.upload(screen.getByLabelText("Dateien wählen…"), pdfDatei(b));
+
+    expect((await screen.findAllByText(/OV Fassung/)).length).toBeGreaterThan(0);
+    const eintrag = einsaetzeLaden().find((e) => e.name === "Fassungsprobe")!.eintraege[0]!;
+    expect(eintrag.signatur?.zustand ?? "unsigniert").toBe("unsigniert");
+    expect(eintrag.bogen.stand).toBe(b.stand);
   });
 
   it("meldet verständlich, wenn in der PDF gar nichts Lesbares steckt", async () => {

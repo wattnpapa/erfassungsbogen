@@ -3459,6 +3459,9 @@
     }
     .qr-vollbild p { margin: 0; color: var(--text); text-align: center; }
     .qr-vollbild-nav { display: flex; gap: 0.8rem; flex-wrap: wrap; justify-content: center; }
+    /* Absender über dem Code (R2-W6): groß genug, um ihn vor dem Scan auf
+       Armlänge zu lesen, ohne dem Code Höhe zu nehmen (68vh bleiben). */
+    .qr-vollbild p.qr-vollbild-kopf { font-size: var(--t-xl); line-height: 1.3; }
 
     /* ---------------------------------------------------------------
        QR-Vollbild und Scanner als modale <dialog> (Audit Runde 2, R2-M3).

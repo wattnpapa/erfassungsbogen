@@ -964,6 +964,8 @@ export function Uebersicht(props: {
       {vollbild && qr && (
         <QrVollbild
           qr={qr}
+          einheit={`${orgLabel(org)} · ${vokabText(bogen.einheit.einheitsTyp, vokabularFuer(org, "einheitstyp"), "name") || "(Einheitstyp offen)"} · ${einheitOrt(bogen.einheit) || "(Standort offen)"}`}
+          staerke={staerkeText}
           teilIndex={vollbildTeil}
           onTeil={setVollbildTeil}
           onSchliessen={() => ebeneVerlassen(VOLLBILD_EBENE, () => setVollbild(false))}
@@ -983,6 +985,10 @@ const VOLLBILD_EBENE = "qr-vollbild";
 
 function QrVollbild(props: {
   qr: QrSatz;
+  /** Wer gezeigt wird — Organisation · Einheitstyp · Standort. */
+  einheit: string;
+  /** Stärke „F / UF / M / Ges" als Zahlen. */
+  staerke: string;
   teilIndex: number;
   onTeil: (i: number) => void;
   /** Knopf oder Escape — verbraucht auch den Verlaufseintrag. */
@@ -995,8 +1001,18 @@ function QrVollbild(props: {
   useModalesOverlay(dialog, { onSchliessen: props.onSchliessen });
   useEbeneZurueck(VOLLBILD_EBENE, props.onZurueck);
   const teil = qr.teile[Math.min(teilIndex, qr.teile.length - 1)]!;
+  // Stand = Moment des Öffnens; der Code zeigt den Bogen, wie er jetzt ist.
+  const [stand] = useState(() => new Date().toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit" }));
   return (
     <dialog ref={dialog} className="qr-vollbild" aria-label="QR-Code im Vollbild" tabIndex={-1}>
+      {/* Wer mehrere Telefone nacheinander scannt, prüft vor dem Scan, welcher
+          Bogen gerade gezeigt wird — vorher stand hier nur der Code
+          (Audit Runde 2, R2-W6, R2-N9, R2-O7). */}
+      <p className="qr-vollbild-kopf">
+        <strong>{props.einheit}</strong>
+        <br />
+        Stärke <strong>{props.staerke}</strong> <span className="hinweis">(F / UF / M / Ges) · Stand {stand} Uhr</span>
+      </p>
       <img
         src={teil.datenUrl}
         alt={qr.segmentiert ? `EEB2-QR-Code Teil ${teil.teilNr} von ${teil.anzahl}` : "EEB2-QR-Code"}

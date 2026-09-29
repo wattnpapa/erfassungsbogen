@@ -2093,12 +2093,40 @@ function AppInhalt() {
     }
     const bytes = new Uint8Array(await datei.arrayBuffer());
     const eingebettet = boegenAusPdfBytes(bytes);
+    if (eingebettet.length === 1) return [await siegelAusPdfQr(bytes, eingebettet[0]!)];
     if (eingebettet.length > 0) return ohneNachweis(eingebettet);
     // Dynamisch: die QR-Auswertung zieht den Decoder (ZXing als WebAssembly)
     // nach — der gehört nicht ins Start-Bundle, sondern erst in den Rückfall.
     const { qrTexteAusPdfBytes } = await import("./pdf-qr");
     const { boegenAusQrTexten } = await import("./qr-boegen");
     return boegenAusQrTexten(await qrTexteAusPdfBytes(bytes));
+  }
+
+  /**
+   * Siegel eines einzelnen PDF-Bogens aus seinem QR-Code mitlesen. Derselbe
+   * Bogen kam über den Link „✓ signiert" an, als PDF nur „Aus Datei" ohne
+   * Signatur — die Mail-Meldung galt dann als weniger vertrauenswürdig als
+   * dieselbe per QR (Audit Runde 2, R2-W6). Übernommen wird der Bogen aus dem
+   * QR, nicht der eingebettete: nur dessen Inhalt ist signiert. Passt der QR
+   * nicht zur selben Fassung (Einheit, Stand) oder ist er unlesbar, bleibt es
+   * beim eingebetteten Bogen ohne Nachweis.
+   */
+  async function siegelAusPdfQr(bytes: Uint8Array, bogen: Erfassungsbogen): Promise<QrBogen> {
+    const ohne: QrBogen = { bogen, signatur: { zustand: "unsigniert" } as SignaturStatus, herkunft: null };
+    try {
+      const { qrTexteAusPdfBytes } = await import("./pdf-qr");
+      const { boegenAusQrTexten } = await import("./qr-boegen");
+      const ausQr = await boegenAusQrTexten(await qrTexteAusPdfBytes(bytes));
+      const passend = ausQr.find(
+        (q) =>
+          q.signatur.zustand !== "unsigniert" &&
+          q.bogen.stand === bogen.stand &&
+          einheitSchluessel(q.bogen.einheit) === einheitSchluessel(bogen.einheit),
+      );
+      return passend ?? ohne;
+    } catch {
+      return ohne;
+    }
   }
 
   /**
