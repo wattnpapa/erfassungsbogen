@@ -59,6 +59,14 @@
  *   Policy (die der App setzt vite.config.ts nur in index.html), und ein
  *   externes Skript käme erst nach dem ersten Malen — genau das Aufblitzen
  *   der hellen Seite, das vermieden werden soll.
+ * - **Umbruch-Regel (große Systemschrift):** Bei 200 % Schrift waren alle
+ *   Seiten breiter als ein 360-px-Telefon (Anleitung 542, Datenschutz 625 px)
+ *   und ließen sich seitlich verschieben (Audit Runde 2, R2-M1). Ursachen:
+ *   lange Wörter und Links (E-Mail-Adresse, „Katastrophenschutz-…"), Raster
+ *   mit festen Mindestspalten (Sprungmenü 14rem, Themenliste 16rem) und
+ *   FAQ-Überschriften als Flex-Kinder ohne `min-width: 0`. Ein Block am Ende
+ *   des Stylesheets fängt das ab. Jede Regel darin greift nur im Überlauf —
+ *   bei normaler Schrift ändert sich am Bild nichts.
  *
  * Aufruf (Node ≥ 22): npm run content-stil
  *
@@ -148,6 +156,39 @@ export const THEMA_CSS = `    /* THEMA:CSS:START */
        vom Bildschirm abgescannt. */
     html.nacht-modus figure:not(.scancodes figure) img { filter: brightness(0.7); }
     /* THEMA:CSS:END */
+`;
+
+/**
+ * Umbruch-Regel: steht nach dem Modus-Block am Ende des Stylesheets, damit sie
+ * die Raster-Regeln der Generatoren (Sprungmenü, Themenliste, Fußnavigation)
+ * in der Kaskade schlägt, ohne deren Blöcke anzufassen. Nur Umbruch und
+ * Mindestbreiten, keine Farben.
+ */
+const UMBRUCH_CSS = `    /* UMBRUCH:CSS:START */
+    /* Große Systemschrift (Umbruch-Regel, scripts/content-stil.mts; Audit
+       Runde 2, R2-M1): nichts darf die Seite breiter machen als das Gerät.
+       break-word bricht nur ein Wort, das allein nicht in die Zeile passt;
+       min(…, 100%) lässt ein Raster auf eine Spalte zurückfallen, statt über
+       den Rand zu ragen. Bei normaler Schrift greift keine dieser Regeln. */
+    html { overflow-wrap: break-word; }
+    /* Tabellenzellen ausgenommen: dort ragte schon bei normaler Schrift
+       manches Wort ein Pixel ins Zellpolster („Taschenrechner"), gebrochen
+       stünde es als „Taschenrechne / r" da. Breite Tabellen rollen ohnehin
+       in ihrem .tabellenrahmen. */
+    th, td { overflow-wrap: normal; }
+    .sprungmenue ul { grid-template-columns: repeat(auto-fit, minmax(min(14rem, 100%), 1fr)); }
+    .themenliste { grid-template-columns: repeat(auto-fill, minmax(min(16rem, 100%), 1fr)); }
+    .fussnav { grid-template-columns: repeat(auto-fit, minmax(min(9rem, 100%), 1fr)); }
+    /* Aufklapp-Zeilen sind Flex-Zeilen: Überschrift und bloßer Text darin
+       brauchen eine Mindestbreite unter dem längsten Wort. */
+    summary { overflow-wrap: anywhere; }
+    summary > * { min-width: 0; }
+    .scancodes figure, .scancodes img { max-width: 100%; }
+    /* Der Knopf ist teils inline-flex: seine Beschriftung ist dann ein
+       anonymes Flex-Kind, dessen Mindestbreite das längste Wort ist
+       („Katastrophenschutz-Bogen"). anywhere senkt sie. */
+    .start { max-width: 100%; overflow-wrap: anywhere; }
+    /* UMBRUCH:CSS:END */
 `;
 
 /**
@@ -433,6 +474,21 @@ function themaCssEinbinden(css: string): { css: string; ergaenzt: number } {
   return { css: `${css.replace(/\s*$/, "\n")}${THEMA_CSS}  `, ergaenzt: 1 };
 }
 
+/**
+ * Umbruch-Block direkt hinter dem Modus-Block — ersetzt eine ältere Fassung
+ * zwischen den Marken, damit ein zweiter Lauf nichts verdoppelt.
+ */
+function umbruchCssEinbinden(css: string): { css: string; ergaenzt: number } {
+  const muster = /[ \t]*\/\* UMBRUCH:CSS:START \*\/[\s\S]*?\/\* UMBRUCH:CSS:END \*\/\n?/;
+  if (muster.test(css)) {
+    const neu = css.replace(muster, UMBRUCH_CSS);
+    return { css: neu, ergaenzt: neu === css ? 0 : 1 };
+  }
+  const nachThema = /(\/\* THEMA:CSS:END \*\/\n)/;
+  if (nachThema.test(css)) return { css: css.replace(nachThema, `$1${UMBRUCH_CSS}`), ergaenzt: 1 };
+  return { css: `${css.replace(/\s*$/, "\n")}${UMBRUCH_CSS}  `, ergaenzt: 1 };
+}
+
 /** Das Modus-Skript steht im <head> vor dem Stylesheet — vor dem ersten Malen. */
 function themaSkriptEinbinden(html: string): { html: string; ergaenzt: number } {
   const muster = /<!-- THEMA:JS:START -->[\s\S]*?<!-- THEMA:JS:END -->\n?/;
@@ -534,6 +590,12 @@ export function stilAngleichen(html: string): { html: string; treffer: Record<st
     const thema = themaCssEinbinden(angepasst);
     angepasst = thema.css;
     if (thema.ergaenzt) treffer["Modus-Block eingebunden"] = (treffer["Modus-Block eingebunden"] ?? 0) + 1;
+
+    // Umbruch-Block für große Schrift (Audit Runde 2, R2-M1): reines Layout,
+    // hinter dem Modus-Block, ebenfalls unberührt von den Angleich-Regeln.
+    const umbruch = umbruchCssEinbinden(angepasst);
+    angepasst = umbruch.css;
+    if (umbruch.ergaenzt) treffer["Umbruch-Block eingebunden"] = (treffer["Umbruch-Block eingebunden"] ?? 0) + 1;
 
     return `<style>${angepasst}</style>`;
   });

@@ -371,9 +371,17 @@
       color: var(--text);
       background: var(--grund);
       -webkit-font-smoothing: antialiased;
+      /* Letzte Absicherung für große Systemschrift: ein Wort, das breiter ist
+         als seine Zeile („Einheiten-Erfassungsbogen" bei 200 % auf 360 px),
+         bricht, statt die Seite seitlich verschiebbar zu machen. break-word
+         greift nur im Überlauf und ändert keine Mindestbreite — bei normaler
+         Schrift bleibt jeder Umbruch, wie er war (Audit Runde 2, R2-M1). */
+      overflow-wrap: break-word;
     }
     #app { min-height: 100dvh; display: flex; flex-direction: column; }
     main { width: 100%; max-width: 60rem; margin: 0 auto; padding: var(--r-5) var(--r-4) calc(6rem + env(safe-area-inset-bottom)); }
+    /* Seitenrand gedeckelt wie das Kartenpolster (.karte, R2-M1). */
+    main { padding-inline: min(var(--r-4), 18px); }
     /* Die 6rem unten halten die fixe Schritt-Navigation frei. Wo sie gar nicht
        erscheint (Startseite, Übersicht), ist das ein leeres Drittel Bildschirm
        zwischen letztem Inhalt und Fußzeile — dort reicht der normale Abstand.
@@ -670,6 +678,11 @@
       color: var(--akzent); font-size: var(--t-m); font-weight: 600; cursor: pointer;
     }
     @media (hover: hover) { .zur-start:hover { border: none; background: none; text-decoration: underline; } }
+    /* Der Rücksprung trägt in der Einsatz-Erfassung den Namen der Sammlung;
+       als inline-flex ist seine Beschriftung ein anonymes Flex-Kind mit dem
+       längsten Wort als Mindestbreite („Bereitstellungsraum" bei 200 %
+       Systemschrift: 10 px über den Rand, Audit Runde 2, R2-M1). */
+    .zur-start { max-width: 100%; overflow-wrap: anywhere; }
 
     /* ---------------------------------------------------------------
        Seitenkopf: jede Web-Ansicht beginnt mit derselben Kopfleiste über
@@ -746,7 +759,12 @@
       align-self: center; padding: 0.15rem 0.5rem;
       border: var(--strich) solid var(--kopf-linie); border-radius: var(--radius);
       color: var(--kopf-auf); font-size: var(--t-xs); font-weight: 600;
-      white-space: nowrap;
+      /* Kein nowrap (Audit Runde 2, R2-M1): „Aufnahme für: <Sammlung>" trägt
+         den frei vergebenen Namen der Sammlung. Ein langer Name („Übung
+         Hochwasser Donau 2026 — Bereitstellungsraum Ulm-Nord") machte die
+         Einsatz-Erfassung schon bei normaler Schrift 513 px breit, und mit ihr
+         wanderte „Weiter →" aus dem Bild. */
+      max-width: 100%;
     }
     .seiten-kopf .hinweis { color: var(--kopf-auf-2); margin: var(--r-1) 0 0; }
     .seiten-kopf .zur-start { color: var(--kopf-auf); opacity: 0.85; }
@@ -772,6 +790,25 @@
       .seiten-kopf.assistent-kopf img.einheit-avatar { height: 1.8rem; }
       .seiten-kopf.assistent-kopf .autosave { padding-bottom: var(--r-2); }
       .seiten-kopf.assistent-kopf .schritte button { padding: 0.4rem 0.55rem; }
+    }
+    /* Große Systemschrift (Audit Runde 2, R2-M1): bei 200 % auf 360 × 640
+       war der Kopf 1 155 px hoch, die Überschrift „1. Einheit" begann zweieinhalb
+       Bildhöhen tiefer. Eine Medienabfrage sieht die Systemschrift nicht (rem
+       in @media bezieht sich auf die Grundeinstellung des Browsers, nicht auf
+       die Schrift der Seite) — eine Container-Abfrage schon: dort zählt rem
+       die tatsächliche Schrift. „Schmaler als 17.5rem" trifft bei normaler
+       Schrift kein Telefon (320 px = 20rem, im Feld-Modus mit 112 % 17,9rem),
+       bei 150–200 % jedes (360 px bei 200 % = 11,25rem). Dann verdichtet sich
+       der Kopf wie
+       im Querformat: Speicherzeile weg, Titel einzeilig, Schrittleiste als
+       waagerecht rollende Reiterzeile. */
+    .seiten-kopf.assistent-kopf { container: kopf / inline-size; }
+    @container kopf (max-width: 17.5rem) {
+      .seiten-kopf.assistent-kopf .autosave:not(.speicher-fehler) { display: none; }
+      .seiten-kopf.assistent-kopf .titelzeile { padding: var(--r-1) 0; }
+      .seiten-kopf.assistent-kopf .titelzeile h1 { font-size: var(--t-m); min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+      .seiten-kopf.assistent-kopf .schritte { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: thin; }
+      .seiten-kopf.assistent-kopf .schritte button { white-space: nowrap; flex: 0 0 auto; }
     }
     /* Übungs-Störer: volle Fensterbreite direkt unter dem Kopf, Text auf dem
        Satzspiegel. Schraffur wie ein Absperrband — deutlich anders als jede
@@ -854,6 +891,12 @@
     section.karte, .karte {
       background: var(--flaeche); border: var(--strich) solid var(--linie); border-radius: var(--radius);
       padding: var(--r-4); margin-bottom: var(--r-4);
+      /* Seitliches Polster gedeckelt (Audit Runde 2, R2-M1): bei 200 %
+         Systemschrift fraßen Seitenrand, Karte und Personenkarte zusammen
+         192 der 320 px — für Felder blieben 124 px, keine vier Zeichen.
+         Der Deckel liegt beim Feld-Modus-Maß; bei normaler Schrift gilt
+         weiter --r-4. Gegenstück: .karte > .tabellen-scroll unten. */
+      padding-inline: min(var(--r-4), 18px);
     }
     /* Beschriftungen dunkel und halbfett statt hellgrau — im Feld muss ein
        Feldname genauso sicher lesbar sein wie sein Inhalt. */
@@ -941,6 +984,14 @@
        und der Feld-Modus hob nur die Höhe. Ein Tippziel, das vom Text
        daneben abhängt, ist keines. */
     .inline input[type="checkbox"], .inline input[type="radio"] { flex: 0 0 auto; }
+    /* Die Beschriftung ist ein anonymes Flex-Kind — ihre Mindestbreite ist
+       das längste Wort, und min-width lässt sich an ihr nicht setzen. Bei
+       200 % Systemschrift waren „Unterbringung" und „(Meldekopf-Schnell-
+       erfassung)" breiter als die Karte und schoben die Seite über den Rand
+       (Audit Runde 2, R2-M1). anywhere senkt diese Mindestbreite; getrennt
+       wird trotzdem zuerst an Leerzeichen, im Wort nur, wenn es allein nicht
+       mehr in die Zeile passt. Bei normaler Schrift passiert das nie. */
+    .inline { max-width: 100%; overflow-wrap: anywhere; }
     /* Nur für Vorlesesoftware: aus dem Bild genommen, aber im Baum und damit
        vorlesbar. Kein display:none und kein visibility:hidden – die nähme jede
        Vorlesesoftware mit heraus. */
@@ -959,7 +1010,11 @@
       color: var(--text-2); pointer-events: none; font-size: 0.9em;
     }
     /* Variante für Vorschlagsfelder, die in einer Zeile mit Chips stehen. */
-    .autocomplete.im-fluss { display: inline-block; }
+    /* min-width: 0 — als Flex-Kind der Chip-Zeile war die Mindestbreite sonst
+       die volle Feldbreite 12rem: bei 200 % Systemschrift 384 px in einer
+       164 px schmalen Personenkarte, die Seite wurde 482 px breit (Audit
+       Runde 2, R2-M1). So nimmt das Feld über max-width die Kartenbreite an. */
+    .autocomplete.im-fluss { display: inline-block; min-width: 0; max-width: 100%; }
     .autocomplete.im-fluss > input { width: 12rem; max-width: 100%; margin-top: 0; }
     ul.vorschlaege {
       position: absolute; z-index: 20; left: 0; right: 0; top: 100%; min-width: 15rem;
@@ -1023,11 +1078,18 @@
        Löschen. Der Abstand hängt an --ziel, damit der Feld-Modus ihn wie die
        Ziele mitzieht. */
     .sortieren { display: inline-flex; gap: calc(0.5rem + var(--ziel)); }
+    /* Große Systemschrift (Audit Runde 2, R2-M1): ein Finger wird mit der
+       Schrift nicht breiter. Bei 200 % waren die drei Pfeile je 88 px breit
+       und sprengten die 164 px schmale Personenkarte; gedeckelt bleiben sie
+       beim Handschuhmaß stehen (Deckel knapp über dem Feld-Modus-Maß, das
+       damit unverändert bleibt), und reicht auch das nicht, brechen sie um
+       statt über den Rand zu ragen. */
+    .sortieren { flex-wrap: wrap; max-width: 100%; gap: min(calc(0.5rem + var(--ziel)), calc(9px + var(--ziel))); }
     /* Hinweis nach der StAN-Vorbelegung auf Schritt 1: sagt, was der
        Einheitstyp gerade angelegt hat, und trägt den Weg zurück (Audit
        „Fehler", E1). Knopf in eigener Zeile, damit er nicht am Satz klebt. */
     .vorbelegung-hinweis { display: flex; flex-wrap: wrap; align-items: center; gap: var(--r-2) var(--r-3); }
-    .sortieren > button { min-width: calc(var(--ziel-basis) + var(--ziel)); padding: 0.25rem; line-height: 1; }
+    .sortieren > button { min-width: min(calc(var(--ziel-basis) + var(--ziel)), calc(50px + var(--ziel))); padding: 0.25rem; line-height: 1; }
     .sortieren > button:disabled { opacity: 0.4; }
     /* In der Schnelleingabe-Tabelle steht das ✕ (Person entfernen) in der
        Zelle neben den Pfeilen — 17 px daneben. Der Löschknopf rückt um --r-3
@@ -1118,20 +1180,28 @@
     /* Abschluss der Einsatz-Erfassung auf jedem Schritt, zwischen Zurück und
        Weiter — am Meldekopf reichen oft Schritt 1 und 3 (Audit „Neuer
        Nutzer", F2). Schmal gesetzt, damit drei Knöpfe auf 360 px passen. */
-    footer.nav .uebernehmen { flex: 0 1 auto; padding-inline: 0.6rem; font-size: var(--t-s); white-space: normal; line-height: 1.15; }
+    footer.nav .uebernehmen { flex: 0 1 auto; padding-inline: 0.6rem; font-size: min(var(--t-s), max(12px, 4vmin)); white-space: normal; line-height: 1.15; }
     footer.nav {
       position: fixed; bottom: 0; left: 0; right: 0; background: var(--flaeche);
       border-top: var(--strich-stark) solid var(--linie);
-      display: flex; justify-content: space-between; gap: 1rem;
+      display: flex; justify-content: space-between;
+      /* Die Leiste wächst nicht mit der Systemschrift (Audit Runde 2, R2-M1):
+         bei 200 % war sie 179 px hoch — 28 % des Bildes — und „Weiter →"
+         ragte 79 px über den rechten Rand. Abstände, Polster und Schrift der
+         Leiste sind deshalb nach oben gedeckelt; die Deckel liegen auf dem
+         Maß des Feld-Modus (112 %), bei normaler Schrift ändert sich nichts.
+         Nur der Abstand gibt auf 320 px zusätzlich nach, damit „Zur
+         Übersicht →" neben „← Zurück" in eine Zeile passt. */
+      gap: min(1rem, 18px, 3vw);
       /* Die Safe-Area gehört in die Web-Schicht, nicht nur in .platform-ios:
          diese Klasse setzt allein die Capacitor-App. Als Startbildschirm-App
          (PWA, standalone) läuft dieselbe Seite ohne sie — und dort lag „Weiter"
          auf einem Telefon mit Home-Indikator unter dem Balken. max() statt
          Addition, damit der Knopf am Rechner nicht grundlos abrückt. */
-      padding: 0.7rem 1rem;
-      padding-bottom: max(0.7rem, env(safe-area-inset-bottom));
-      padding-left: max(1rem, env(safe-area-inset-left));
-      padding-right: max(1rem, env(safe-area-inset-right));
+      padding: min(0.7rem, 12.5px) min(1rem, 18px);
+      padding-bottom: max(min(0.7rem, 12.5px), env(safe-area-inset-bottom));
+      padding-left: max(min(1rem, 18px), env(safe-area-inset-left));
+      padding-right: max(min(1rem, 18px), env(safe-area-inset-right));
     }
     footer.nav .platzhalter { flex: 1; }
     /* Quer am Telefon — das Gerät in der Fahrzeughalterung, eine der
@@ -1176,12 +1246,38 @@
          Einheit daneben bleibt und trägt die Wiedererkennung. */
       .feld-modus .seiten-kopf.assistent-kopf .titelzeile h1 { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
       .seiten-kopf.assistent-kopf img.einheit-avatar { height: 1.6rem; }
-      .seiten-kopf.assistent-kopf .kopf-oberzeile { order: 1; flex: 0 0 auto; gap: var(--r-3); }
+      /* flex-shrink und max-width: 100% (R2-M1) — bei 200 % Systemschrift
+         ragte der Umschalter quer um 11 px über den Rand („Nacht"); so bricht
+         er in sich um. Bei normaler Schrift passt die Zeile, es schrumpft
+         nichts. */
+      .seiten-kopf.assistent-kopf .kopf-oberzeile { order: 1; flex: 0 1 auto; max-width: 100%; gap: var(--r-3); }
       .seiten-kopf.assistent-kopf .kopf-oberzeile .anzeige-schalter button { padding-inline: 0.45rem; }
       .seiten-kopf.assistent-kopf .schritte { order: 3; flex: 1 1 100%; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: thin; }
       .seiten-kopf.assistent-kopf .schritte button { white-space: nowrap; padding: 0.3rem 0.6rem; min-height: calc(2.25rem + var(--ziel)); }
     }
-    footer.nav button { min-height: calc(2.6rem + var(--ziel)); padding: 0.55rem 1.1rem; font-size: var(--t-m); }
+    /* Deckel wie an der Leiste (R2-M1): Die Schrift folgt der Systemschrift
+       bis zur kürzeren Fensterkante — 5vmin sind 18 px auf 360 × 640 —,
+       das Tippziel bleibt beim Handschuhmaß stehen. nowrap hält jeden Knopf
+       einzeilig; reicht die Breite selbst dann nicht, kürzt die Ellipse den
+       Text, statt den Knopf aus dem Bild zu schieben. Einzige Wirkung bei
+       normaler Schrift: auf 320 px steht „Zur Übersicht →" jetzt in einer
+       Zeile statt in zwei, und im Feld-Modus sinkt die Leistenschrift dort
+       von 17,9 auf 16 px — sonst würde gekürzt. */
+    footer.nav button {
+      min-height: min(calc(2.6rem + var(--ziel)), calc(47px + var(--ziel)));
+      padding: min(0.55rem, 10px) min(1.1rem, 20px);
+      font-size: min(var(--t-m), max(16px, 5vmin));
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0;
+      /* Zurück und Weiter geben nicht nach — nachgeben soll der mittlere
+         Knopf „In Einsatz übernehmen": der bricht in sich um (siehe oben). */
+      flex-shrink: 0;
+    }
+    /* Mit drei Knöpfen wird es auf dem Telefon eng (R2-M1): Zurück und
+       Weiter rücken dann ihr Polster ein, der mittlere Knopf bricht in sich
+       um und — nur wenn „übernehmen" allein nicht mehr passt — im Wort,
+       statt abgeschnitten zu werden. Die Zweiknopf-Leiste bleibt, wie sie ist. */
+    footer.nav .uebernehmen { flex-shrink: 1; overflow: visible; overflow-wrap: anywhere; }
+    footer.nav:has(.uebernehmen) button:not(.uebernehmen) { padding-inline: min(1.1rem, 20px, 3.5vw); }
     .fehler { color: var(--alarm); }
     .warnung {
       color: var(--warn-text); background: var(--warn-fond); border: var(--strich) solid var(--warn-linie);
@@ -1245,10 +1341,16 @@
       font-family: var(--schrift-daten); font-size: var(--t-zahl); line-height: 1.05;
       font-weight: 700; letter-spacing: -0.01em; font-variant-numeric: tabular-nums;
       color: var(--text);
-      /* „0 / 2 / 6 / 8" ist eine Angabe, kein Satz: sie darf nie zwischen zwei
-         Zahlen umbrechen. Statt der Zahl gibt die Zeile nach — siehe die
-         Ausnahme für schmale Fenster weiter unten. */
-      white-space: nowrap;
+      /* „0 / 2 / 6 / 8" ist eine Angabe, kein Satz: sie soll nicht zwischen
+         zwei Zahlen umbrechen. Statt der Zahl gibt die Zeile nach — siehe die
+         Ausnahme für schmale Fenster weiter unten. Kein nowrap mehr: als
+         Flex-Kind rutscht die Angabe ohnehin erst in eine eigene Zeile, bevor
+         sie in sich umbricht; umbrechen muss sie nur noch, wenn sie auch allein
+         breiter wäre als die Karte. Das geschah bei 200 % Systemschrift —
+         mit nowrap wurde die Seite dann 466 px breit, das Gerät hat 360
+         (Audit Runde 2, R2-M1). balance teilt dann „0 / 2 / 6 / 8" in zwei
+         gleiche Hälften statt eine einzelne Zahl nach unten zu schieben. */
+      text-wrap: balance;
     }
     /* Auf dem Telefon teilt sich das taktische Zeichen die Zeile nicht mehr mit
        der Zahl: Name und Stärke bekommen die volle Kartenbreite, sonst passt die
@@ -1517,6 +1619,20 @@
         grid-column: 1 / -1; border-left: none; border-top-color: var(--linie);
       }
     }
+    /* Große Systemschrift oberhalb der Telefonbreite (Audit Runde 2, R2-M1):
+       Telefon quer, 640 × 360 bei 200 % — die Medienabfrage oben sieht die
+       Schrift nicht, es blieb bei fünf Spalten, und die Einsatz-Sammlung wurde
+       968 px breit. Als umbrechende Flex-Zeile mit Mindestbreite je Feld
+       rutschen die Felder in eine zweite Zeile, sobald sie nicht mehr
+       nebeneinander passen. Bei normaler Schrift passen sie immer: gleiche
+       Breiten wie das Raster (flex 1 1 0 ≙ 1fr, Mindestbreite = Inhalt).
+       Nur die Fünferleiste der Einsatz-Sammlung — die Viererleiste der
+       Musterung stand im Fünferraster mit leerer letzter Spalte und bliebe
+       sonst nicht, wie sie war. */
+    @media (width > 30rem) {
+      .staerke-leiste:has(> div:nth-child(5)) { display: flex; flex-wrap: wrap; }
+      .staerke-leiste:has(> div:nth-child(5)) > div { flex: 1 1 0; min-width: max-content; }
+    }
     .staerke-leiste strong {
       font-size: var(--t-zahl); line-height: 1.05; font-weight: 700;
       letter-spacing: -0.02em; font-variant-numeric: tabular-nums;
@@ -1529,6 +1645,18 @@
     .staerke-leiste span {
       font-family: var(--schrift-daten); font-size: var(--t-xs); letter-spacing: 0.1em;
       text-transform: uppercase; color: var(--text-2); opacity: 1;
+      /* Ausgenommen von overflow-wrap: break-word (body, R2-M1): im
+         Feld-Modus auf 320 px ragte „EINHEITEN" schon immer ein Stück ins
+         Zellpolster; gebrochen stünde dort „EINHEITE / N". Erst wenn der
+         Innenraum der Leiste schmaler ist als 12.5rem der tatsächlichen
+         Schrift — 150–200 % Systemschrift auf dem Telefon, bei normaler
+         Schrift nie (320 px im Feld-Modus: 13,7rem) —, bricht die Beschriftung
+         doch, statt die Seite zu verbreitern. */
+      overflow-wrap: normal;
+    }
+    .staerke-leiste { container-type: inline-size; }
+    @container (max-width: 12.5rem) {
+      .staerke-leiste span { overflow-wrap: break-word; }
     }
     /* Zielmaß über --ziel-basis/--ziel statt fester 44 px: sonst bleibt
        ausgerechnet die Zeile, mit der man Namen ausstreicht, im Feld-Modus
@@ -1584,7 +1712,13 @@
        Auf schmalen Fenstern läuft der Rollbereich bis an die Kartenkante: der
        Schnitt liegt dann sichtbar am Rand („da geht es weiter") statt mitten
        in der Karte, wo er wie abgeschnittener Inhalt aussieht. */
-    .tabellen-scroll { overflow-x: auto; }
+    /* position: relative macht den Rollbereich zum Bezugsrahmen der absolut
+       gesetzten Vorleser-Beschriftungen (.nur-sr) in den Spaltenköpfen. Ohne
+       ihn hingen sie am Dokument, lagen an ihrer Spaltenposition weit rechts
+       außerhalb des Rahmens, wurden vom Rollbereich nicht beschnitten und
+       machten die ganze Seite seitlich verschiebbar — 1 677 px breit bei
+       360 px Fenster (Audit Runde 2, R2-G2 und R2-M1). */
+    .tabellen-scroll { overflow-x: auto; position: relative; }
     /* Der Rollbereich nimmt den Fokus an, sobald wirklich etwas verdeckt ist
        (tabellen-scroll.tsx) — sonst wäre der abgeschnittene Teil für alle
        unerreichbar, die nicht wischen können. Die Fokusregeln oben greifen nur
@@ -1595,7 +1729,7 @@
       outline-offset: 2px;
     }
     @media (max-width: 40rem) {
-      .karte > .tabellen-scroll { margin-inline: calc(-1 * var(--r-4)); padding-inline: var(--r-4); }
+      .karte > .tabellen-scroll { margin-inline: calc(-1 * min(var(--r-4), 18px)); padding-inline: min(var(--r-4), 18px); }
     }
     /* Übersichtstabelle: Zahlen in Tabellenbreite, Spaltenköpfe als gesperrte
        Versalzeile — Meldevordruck-Anmutung statt Web-Tabelle. */
@@ -1617,6 +1751,12 @@
     /* Aktionsgruppen mit mehreren Knöpfen (als <span> im Kopf) umbrechen als
        Flex-Zeile, statt schmal auf dem Handy seitlich aus dem Bild zu laufen. */
     .kopfzeile > span { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: baseline; justify-content: flex-end; }
+    /* Kein Kind dieser Zeilen ist breiter als die Zeile: sonst setzt das
+       längste Wort die Mindestbreite — „Wasserschaden/Pumpen" im Namen einer
+       gemeldeten Einheit machte die Einsatz-Sammlung bei 200 % Systemschrift
+       423 px breit (Audit Runde 2, R2-M1). max-width deckelt auch die
+       automatische Mindestbreite; das Wort bricht dann über overflow-wrap. */
+    .kopfzeile > span > * { max-width: 100%; }
     /* Nur der Code selbst steht mittig — er ist ein Bild, das vorgehalten wird.
        Überschrift, Siegelangabe und Absenderfeld bleiben auf der linken Kante
        wie in jeder anderen Karte; zentriert wechselte der Satzspiegel mitten
@@ -1729,6 +1869,13 @@
       border: 1px solid var(--warn-linie); border-radius: var(--radius);
       font-size: var(--t-xs); font-weight: 600; white-space: nowrap;
     }
+    /* Marken sind inline-block: sie wandern als Ganzes in die nächste Zeile
+       und brechen in sich nur um, wenn sie allein breiter wären als die
+       Karte. Genau dann verhinderte nowrap das und schob die Seite über den
+       Rand — „Unterbringung angefordert" bei 200 % Systemschrift, Seite
+       442 statt 360 px (Audit Runde 2, R2-M1). Bei normaler Schrift passt
+       jede Marke in eine Zeile, dort ändert sich nichts. */
+    .zug-badge, .teil-badge, .neu-badge, .alt-badge, .bedarf-marke { white-space: normal; max-width: 100%; }
     .bedarf-filter { margin-top: var(--r-2); }
     /* Auftrag/Notiz der Führungsstelle: steht als eigene Zeile unter dem
        Namen, links mit dem Akzentstrich markiert — sie ist das, was die
@@ -2337,10 +2484,11 @@
       padding-left: env(safe-area-inset-left);
       padding-right: env(safe-area-inset-right);
     }
+    /* Deckel wie oben an footer.nav (R2-M1). */
     footer.nav {
-      padding-bottom: calc(0.7rem + env(safe-area-inset-bottom));
-      padding-left: calc(1rem + env(safe-area-inset-left));
-      padding-right: calc(1rem + env(safe-area-inset-right));
+      padding-bottom: calc(min(0.7rem, 12.5px) + env(safe-area-inset-bottom));
+      padding-left: calc(min(1rem, 18px) + env(safe-area-inset-left));
+      padding-right: calc(min(1rem, 18px) + env(safe-area-inset-right));
     }
 
     /* ---------------------------------------------------------------

@@ -289,6 +289,31 @@
        vom Bildschirm abgescannt. */
     html.nacht-modus figure:not(.scancodes figure) img { filter: brightness(0.7); }
     /* THEMA:CSS:END */
+    /* UMBRUCH:CSS:START */
+    /* Große Systemschrift (Umbruch-Regel, scripts/content-stil.mts; Audit
+       Runde 2, R2-M1): nichts darf die Seite breiter machen als das Gerät.
+       break-word bricht nur ein Wort, das allein nicht in die Zeile passt;
+       min(…, 100%) lässt ein Raster auf eine Spalte zurückfallen, statt über
+       den Rand zu ragen. Bei normaler Schrift greift keine dieser Regeln. */
+    html { overflow-wrap: break-word; }
+    /* Tabellenzellen ausgenommen: dort ragte schon bei normaler Schrift
+       manches Wort ein Pixel ins Zellpolster („Taschenrechner"), gebrochen
+       stünde es als „Taschenrechne / r" da. Breite Tabellen rollen ohnehin
+       in ihrem .tabellenrahmen. */
+    th, td { overflow-wrap: normal; }
+    .sprungmenue ul { grid-template-columns: repeat(auto-fit, minmax(min(14rem, 100%), 1fr)); }
+    .themenliste { grid-template-columns: repeat(auto-fill, minmax(min(16rem, 100%), 1fr)); }
+    .fussnav { grid-template-columns: repeat(auto-fit, minmax(min(9rem, 100%), 1fr)); }
+    /* Aufklapp-Zeilen sind Flex-Zeilen: Überschrift und bloßer Text darin
+       brauchen eine Mindestbreite unter dem längsten Wort. */
+    summary { overflow-wrap: anywhere; }
+    summary > * { min-width: 0; }
+    .scancodes figure, .scancodes img { max-width: 100%; }
+    /* Der Knopf ist teils inline-flex: seine Beschriftung ist dann ein
+       anonymes Flex-Kind, dessen Mindestbreite das längste Wort ist
+       („Katastrophenschutz-Bogen"). anywhere senkt sie. */
+    .start { max-width: 100%; overflow-wrap: anywhere; }
+    /* UMBRUCH:CSS:END */
   </style>
 </head>
 <body>
