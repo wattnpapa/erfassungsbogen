@@ -859,3 +859,75 @@ describe("Einheitenkarten als Liste mit Überschrift und Knopfbezug", () => {
     }
   });
 });
+
+/**
+ * Oben die Gesamtzahl, direkt darunter „nächste Einheit" — und nach einer
+ * Aufnahme bleibt die Ansicht dort (Audit Runde 2, R2-S3).
+ */
+describe("Summe und Aufnahme im ersten Bild", () => {
+  beforeEach(() => {
+    localStorage.clear();
+  });
+
+  it("setzt die Aufnahme-Knöpfe direkt unter die Stärkeleiste, vor Bedarf und Zwischensummen", () => {
+    buehne(["Wardenburg"]);
+    const leiste = document.querySelector(".staerke-leiste")!;
+    const scannen = screen.getByRole("button", { name: "Bogen scannen…" });
+    const bedarf = screen.getByRole("heading", { name: "Bedarf (anwesende Einheiten)" });
+    expect(leiste.nextElementSibling!.contains(scannen)).toBe(true);
+    expect(scannen.compareDocumentPosition(bedarf) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+
+  it("kürzt den Übungshinweis auf eine Zeile; die Namen stehen dahinter", async () => {
+    const nutzer = userEvent.setup();
+    const angelegt = einsatzAnlegen("Hochwasser Test", EinsatzArt.EINSATZ);
+    meldungHinzufuegen(angelegt.id, bogenMitName("Wardenburg"));
+    for (const n of ["Albstadt", "Karlsruhe"]) {
+      const b = bogenMitName(n);
+      b.uebung = true;
+      meldungHinzufuegen(angelegt.id, b);
+    }
+    ansicht(angelegt.id);
+    const hinweis = document.querySelector<HTMLDetailsElement>("details.uebung-ausgenommen")!;
+    const zeile = hinweis.querySelector("summary")!;
+    expect(zeile.textContent).toBe("2 Übungsmeldungen nicht gezählt — anzeigen");
+    expect(hinweis.open).toBe(false);
+    await nutzer.click(zeile);
+    expect(hinweis.open).toBe(true);
+    expect(hinweis.textContent).toContain("Albstadt");
+    expect(hinweis.textContent).toContain("Karlsruhe");
+  });
+
+  it("quittiert eine Aufnahme oben mit Namen und neuer Gesamtzahl und rollt nicht zur Karte", async () => {
+    const nutzer = userEvent.setup();
+    const proto = HTMLElement.prototype as unknown as { scrollIntoView?: unknown };
+    const vorher = proto.scrollIntoView;
+    const gerollt: string[] = [];
+    proto.scrollIntoView = function (this: HTMLElement) {
+      gerollt.push(this.dataset.einheit ?? this.className);
+    };
+    const nachOben = vi.spyOn(window, "scrollTo").mockImplementation(() => {});
+    try {
+      const angelegt = einsatzAnlegen("Hochwasser Test", EinsatzArt.EINSATZ);
+      meldungHinzufuegen(angelegt.id, bogenMitName("Albstadt"));
+      meldungHinzufuegen(angelegt.id, bogenMitName("Zeitz"));
+      const zeitz = gespeichert(angelegt.id, "Zeitz");
+      ansicht(angelegt.id, { eingang: { schluessel: zeitz.einheitSchluessel, nonce: 1 } });
+
+      const quittung = screen.getByRole("status");
+      expect(quittung.textContent).toMatch(/Zuletzt eingelesen: „.*Zeitz.*" · jetzt 2 Einheiten, Gesamt \d+\./);
+      // Die Karte blitzt, aber die Seite bleibt oben.
+      expect(document.querySelectorAll(".einheit-zeile.eingegangen")).toHaveLength(1);
+      expect(gerollt).toEqual([]);
+      expect(nachOben).toHaveBeenCalledWith(0, 0);
+
+      // Auf Wunsch holt die Quittung die Karte ins Bild.
+      await nutzer.click(within(quittung).getByRole("button", { name: "In der Liste zeigen" }));
+      expect(gerollt).toEqual([zeitz.einheitSchluessel]);
+    } finally {
+      nachOben.mockRestore();
+      if (vorher === undefined) delete proto.scrollIntoView;
+      else proto.scrollIntoView = vorher;
+    }
+  });
+});

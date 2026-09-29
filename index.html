@@ -1873,6 +1873,17 @@
     .quittung-daumen > button { flex: none; }
     .quittung-daumen > button:disabled { opacity: 1; }
     .quittung-daumen > .quittung-schliessen { min-width: calc(var(--ziel-basis) + var(--ziel)); padding-inline: 0; }
+    /* Übungshinweis der Einsatzansicht auf eine Zeile, die Namen auf Tipp
+       (Audit Runde 2, R2-S3); die Zeile ist ein volles Tippziel. */
+    details.uebung-ausgenommen > summary {
+      cursor: pointer; display: flex; align-items: center;
+      min-height: calc(var(--ziel-basis) + var(--ziel));
+    }
+    details.uebung-ausgenommen > p { margin: var(--r-1) 0 0; }
+    /* Die Aufnahme-Knöpfe sitzen in der Einsatzansicht direkt unter der
+       Stärkeleiste (R2-S3): oben genügt deren Abstand, unten brauchen sie
+       den Abstand einer Karte, sonst stößt die Bedarfskarte an die Reihe. */
+    .einsatz-detail > .aktionen { margin-top: 0; margin-bottom: var(--r-4); }
     /* Zug- und Teil-Kennzeichnung an einer gemeldeten Einheit. Ruhiger als der
        Übungs-Störer daneben: sie ordnen ein, sie warnen nicht. Das Teil-Etikett
        trägt den Akzent, weil es nach einer Aufteilung das einzige ist, was zwei

@@ -116,7 +116,10 @@ let zuletztQuittiert: string | null = null;
  * Malen der Liste bleibt alles still, und ein Reflow lässt die Animation auch
  * dann neu ansetzen, wenn die Klasse schon steht.
  */
-export function useEingangsquittung<T extends HTMLElement>(marke: string | null) {
+export function useEingangsquittung<T extends HTMLElement>(
+  marke: string | null,
+  { rollen = true }: { rollen?: boolean } = {},
+) {
   const element = useRef<T>(null);
   useEffect(() => {
     if (!marke || marke === zuletztQuittiert) return;
@@ -134,7 +137,11 @@ export function useEingangsquittung<T extends HTMLElement>(marke: string | null)
     // Geprüft, weil es die Funktion nicht überall gibt (Testumgebung, sehr
     // alte WebViews): die Quittung selbst hängt nicht daran und steht auch
     // ohne Rollen da.
-    if (typeof el.scrollIntoView === "function") el.scrollIntoView({ block: "nearest", inline: "nearest" });
+    //
+    // `rollen: false`: Die Einsatzansicht bleibt nach einer Aufnahme oben bei
+    // Summe und Aufnahme-Knopf und quittiert dort mit Namen (Audit Runde 2,
+    // R2-S3) — die Zeile blitzt dann nur auf.
+    if (rollen && typeof el.scrollIntoView === "function") el.scrollIntoView({ block: "nearest", inline: "nearest" });
   }, [marke]);
   return element;
 }

@@ -605,6 +605,30 @@ export function EinsatzDetail(props: {
   // Gesamtzahl; `kopf` ist davon nur der gerade angezeigte Ausschnitt. Suche,
   // Filter und Sortierung ändern die Summen oben bewusst nicht.
   const alleEinheiten = neuesteJeEinheit(einsatz.eintraege);
+  // Die zuletzt eingelesene Einheit (siehe `eingang`) — für die Quittung oben.
+  const eingegangen = eingang ? alleEinheiten.find((e) => e.einheitSchluessel === eingang.schluessel) : undefined;
+  /**
+   * Beim Öffnen und nach jeder Aufnahme beginnt die Ansicht oben, bei Summe
+   * und Aufnahme-Knopf. Vorher öffnete sie mitten auf der Seite (mit der
+   * Rollposition der vorigen Ansicht) bzw. an der neuen Karte, rund 700 px
+   * unter dem Knopf für die nächste Einheit (Audit Runde 2, R2-S3). Die
+   * Karte quittiert trotzdem; wer sie sehen will, tippt „In der Liste zeigen".
+   */
+  useEffect(() => {
+    try {
+      window.scrollTo(0, 0);
+    } catch {
+      /* Testumgebung ohne Layout */
+    }
+  }, [einsatz.id, eingang?.nonce]);
+  /** Die Karte (oder Tabellenzeile) der zuletzt eingelesenen Einheit ins Bild holen. */
+  function eingangZeigen() {
+    if (!eingegangen) return;
+    const ziel = [...document.querySelectorAll<HTMLElement>("[data-einheit]")].find(
+      (el) => el.dataset.einheit === eingegangen.einheitSchluessel,
+    );
+    ziel?.scrollIntoView({ block: "center" });
+  }
   const qualiListe = qualifikationenImEinsatz(alleEinheiten);
   const gewaehlteQuali = qualiListe.find((q) => q.schluessel === quali);
   // Zwei Gruppen in der Auswahlliste: „wer kann X?" und „wer darf was fahren?"
@@ -667,17 +691,6 @@ export function EinsatzDetail(props: {
       </p>
     </SeitenKopf>
     <main id="inhalt" tabIndex={-1} className="einsatz-detail">
-      {/* Ausgenommene Übungsmeldungen: Die Zahlen darunter sind ohne sie
-          gerechnet, und das muss dort stehen, wo die Zahlen stehen — nicht nur
-          als Etikett an der einzelnen Karte weiter unten. */}
-      {uebungenDaneben.length > 0 && (
-        <p className="meldung uebung-ausgenommen" role="status">
-          {uebungenDaneben.length} Übungsmeldung{uebungenDaneben.length === 1 ? "" : "en"} zählt nicht in diese Lage
-          {" "}({uebungenDaneben.map((e) => einheitAnzeigename(e.bogen.einheit)).join(", ")}).
-          Die Summen unten sind ohne sie gerechnet.
-        </p>
-      )}
-
       <section className="karte staerke-leiste">
         <div><Zaehlwert wert={sum.einheiten} /><span>Einheiten</span></div>
         <div><Zaehlwert wert={sum.staerke.fuehrer} /><span>Führer</span></div>
@@ -685,6 +698,53 @@ export function EinsatzDetail(props: {
         <div><Zaehlwert wert={sum.staerke.mannschaft} /><span>Mannsch.</span></div>
         <div className="gesamt"><Zaehlwert wert={sum.staerke.gesamt} /><span>Gesamt</span></div>
       </section>
+
+      {/* Aufnahme direkt unter der Summe: Beim Blick aufs Telefon steht oben
+          die Gesamtzahl und gleich darunter „nächste Einheit". Unter Bedarf
+          und Zwischensummen lag der Hauptknopf des Meldekopfs in keinem Fall
+          im ersten Bild (Audit Runde 2, R2-S3). */}
+      <div className="aktionen">
+        <button type="button" className="primaer" onClick={onScannen}>Bogen scannen…</button>
+        <button type="button" onClick={onManuell}>Einheit manuell erfassen…</button>
+        {/* Datei, PDF, einzelne Bilder, viele Bilder, ganzer Ordner: ein Knopf,
+            der die Sorte am Dateityp erkennt (siehe BoegenEinlesenKnopf). */}
+        <BoegenEinlesenKnopf onDaten={onDateiImport} onBilder={onBilderImport} />
+      </div>
+
+      {/* Quittung der Aufnahme dort, wo nach dem Übernehmen der Blick liegt:
+          Name und neue Gesamtzahl bei Summe und Aufnahme-Knopf, statt die
+          Seite zur neuen Karte zu rollen (R2-S3). Unter den Knöpfen, damit
+          sie den Knopf für die nächste Einheit nicht unter den Bildrand
+          schiebt. */}
+      {eingegangen && (
+        <p className="meldung eingang-quittung" role="status">
+          Zuletzt eingelesen: „{einheitAnzeigename(eingegangen.bogen.einheit)}"
+          {eingegangen.teilEtikett ? ` (${eingegangen.teilEtikett})` : ""} · jetzt {sum.einheiten}{" "}
+          {sum.einheiten === 1 ? "Einheit" : "Einheiten"}, Gesamt {sum.staerke.gesamt}.{" "}
+          <button type="button" className="link" onClick={eingangZeigen}>In der Liste zeigen</button>
+        </p>
+      )}
+
+      {/* Ausgenommene Übungsmeldungen: Die Zahlen darüber sind ohne sie
+          gerechnet, und das muss dort stehen, wo die Zahlen stehen — nicht nur
+          als Etikett an der einzelnen Karte weiter unten. Eine Zeile, die
+          Namen auf Tipp: Der Hinweis wuchs mit jedem Namen und schob Summe und
+          Aufnahme-Knöpfe unter den Bildrand (Audit Runde 2, R2-S3). Aus
+          demselben Grund steht er unter den Aufnahme-Knöpfen: im Feld-Thema
+          lag „Bogen scannen…" unter ihm bei 649 px, über ihm bei 545 px. */}
+      {uebungenDaneben.length > 0 && (
+        <details className="meldung uebung-ausgenommen">
+          <summary>
+            {uebungenDaneben.length} Übungsmeldung{uebungenDaneben.length === 1 ? "" : "en"} nicht gezählt — anzeigen
+          </summary>
+          <p>
+            {uebungenDaneben.map((e) => einheitAnzeigename(e.bogen.einheit)).join(", ")}.{" "}
+            {uebungenDaneben.length === 1 ? "Sie zählt" : "Sie zählen"} nicht in diese Lage; die Summen oben sind ohne{" "}
+            sie gerechnet.
+          </p>
+        </details>
+      )}
+
 
       <section className="karte">
         <h2>Bedarf (anwesende Einheiten)</h2>
@@ -738,13 +798,6 @@ export function EinsatzDetail(props: {
         </details>
       )}
 
-      <div className="aktionen">
-        <button type="button" className="primaer" onClick={onScannen}>Bogen scannen…</button>
-        <button type="button" onClick={onManuell}>Einheit manuell erfassen…</button>
-        {/* Datei, PDF, einzelne Bilder, viele Bilder, ganzer Ordner: ein Knopf,
-            der die Sorte am Dateityp erkennt (siehe BoegenEinlesenKnopf). */}
-        <BoegenEinlesenKnopf onDaten={onDateiImport} onBilder={onBilderImport} />
-      </div>
 
       {/* Zweite Reihe: was aus der Sammlung herausgeht. Die erste nimmt Bögen
           auf. Der Sprung zwischen den Reihen muss größer sein als der zwischen
@@ -1203,9 +1256,9 @@ function AltBadge() {
 
 /** Eine Datenzeile — abgerückte Meldungen bleiben sichtbar, aber durchgestrichen. */
 function TabellenZeileZelle({ zeile: z, eingang }: { zeile: TabellenZeile; eingang?: Eingang | null }) {
-  const zeile = useEingangsquittung<HTMLTableRowElement>(marke(eingang, z.eintrag.einheitSchluessel));
+  const zeile = useEingangsquittung<HTMLTableRowElement>(marke(eingang, z.eintrag.einheitSchluessel), { rollen: false });
   return (
-    <tr ref={zeile} className={z.anwesend ? undefined : "gestrichen"}>
+    <tr ref={zeile} data-einheit={z.eintrag.einheitSchluessel} className={z.anwesend ? undefined : "gestrichen"}>
       <th scope="row">
         {z.einheit}
         {z.eintrag.bogen.uebung ? <span className="uebung-badge">ÜBUNG</span> : null}
@@ -1548,7 +1601,8 @@ function EinheitKarte(props: {
   onStatusWechsel?: (w: StatusWechsel) => void;
 }) {
   const { einsatzId, kopf, alle, onGeaendert, onEntfernt, qualifikation = "", qualifikationKurz = "", eingang, onStatusWechsel } = props;
-  const zeile = useEingangsquittung<HTMLLIElement>(marke(eingang, kopf.einheitSchluessel));
+  // Ohne Rollen: Die Ansicht bleibt nach der Aufnahme oben (R2-S3).
+  const zeile = useEingangsquittung<HTMLLIElement>(marke(eingang, kopf.einheitSchluessel), { rollen: false });
   const nameId = useId();
   // Bis wann die Karte nach einem Statuswechsel keine Tipps annimmt (R2-G4).
   // Der Zeitstempel sperrt jeden Knopf der Karte; der Zustand graut den
@@ -1819,6 +1873,7 @@ function EinheitKarte(props: {
   return (
     <li
       ref={zeile}
+      data-einheit={kopf.einheitSchluessel}
       className={`einheit-zeile${zaehlt ? "" : " gestrichen"}`}
       // Prellschutz: Der zweite Tipp eines Doppeltipps auf „Abrücken" traf
       // die neu geordnete Karte (R2-G4). Abgefangen wird in der
