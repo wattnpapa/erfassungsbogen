@@ -1929,6 +1929,15 @@
        jede Marke in eine Zeile, dort ändert sich nichts. */
     .zug-badge, .teil-badge, .neu-badge, .alt-badge, .bedarf-marke { white-space: normal; max-width: 100%; }
     .bedarf-filter { margin-top: var(--r-2); }
+    /* Audit Runde 2, R2-K4: Dringendes (Ruhezeit, Unterbringung, abweichende
+       Verpflegung) hebt sich von Routine-Kraftstoff ab — nicht nur über die
+       Farbe: dicker Rand und ein Punkt davor; Kraftstoff ruhig in Grau. */
+    .bedarf-marke.dringend { border-width: 2px; }
+    .bedarf-marke.dringend::before { content: "● "; }
+    .bedarf-marke.routine {
+      background: transparent; color: var(--text-2);
+      border-color: var(--linie); font-weight: 400;
+    }
     /* Auftrag/Notiz der Führungsstelle: steht als eigene Zeile unter dem
        Namen, links mit dem Akzentstrich markiert — sie ist das, was die
        Führungsstelle der Einheit gegeben hat, nicht deren Meldung (K5). */

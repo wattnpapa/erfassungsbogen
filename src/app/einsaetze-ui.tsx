@@ -89,8 +89,9 @@ import {
   TABELLEN_SPALTEN,
   bedarfMarken,
   gemerkteAnsicht,
-  hatSofortbedarf,
   istNeu,
+  passtZuBedarfsfilter,
+  type BedarfsFilter,
   merkeAnsicht,
   standIstAlt,
   summenBeschriftung,
@@ -561,8 +562,17 @@ export function EinsatzDetail(props: {
   const [sortierung, setSortierung] = useState<EinheitenSortierung>("name");
   // "" = keine Einschränkung. Schlüssel siehe einheiten-liste.ts.
   const [quali, setQuali] = useState("");
-  // Nur Einheiten, die etwas brauchen (Ruhezeit, Unterbringung, Kraftstoff…).
-  const [nurBedarf, setNurBedarf] = useState(false);
+  // Nur Einheiten, bei denen jetzt etwas zu entscheiden ist — Kraftstoff
+  // allein zählt nicht, den meldet fast jede Einheit (Audit Runde 2, R2-K4).
+  // "ruhezeit"/"unterbringung" kommen aus den Kopfzahlen („Ruhezeit: 5×").
+  const [bedarfsFilter, setBedarfsFilter] = useState<BedarfsFilter | null>(null);
+  const nurBedarf = bedarfsFilter != null;
+  const bedarfsFilterText =
+    bedarfsFilter === "ruhezeit" ? "„nur mit Ruhezeit“" : bedarfsFilter === "unterbringung" ? "„nur mit Unterbringung“" : "„nur dringender Bedarf“";
+  const aufBedarfFiltern = (f: BedarfsFilter) => {
+    setBedarfsFilter(f);
+    document.querySelector(".einheiten-filter")?.scrollIntoView?.({ block: "start" });
+  };
   // Letzter Statuswechsel von Hand — solange er hier steht, gibt es den Rückweg.
   const [statusWechsel, setStatusWechsel] = useState<StatusWechsel | null>(null);
   // Karten oder Tabelle — geräteweit gemerkt (einheiten-tabelle.ts).
@@ -642,7 +652,7 @@ export function EinsatzDetail(props: {
   const qualiFunktionen = qualiListe.filter((q) => !istFahrerlaubnis(q.schluessel));
   const qualiFahrerlaubnis = qualiListe.filter((q) => istFahrerlaubnis(q.schluessel));
   const kopfOhneBedarfsfilter = einheitenAnsicht(alleEinheiten, suche, sortierung, quali);
-  const kopf = nurBedarf ? kopfOhneBedarfsfilter.filter(hatSofortbedarf) : kopfOhneBedarfsfilter;
+  const kopf = bedarfsFilter ? kopfOhneBedarfsfilter.filter((e) => passtZuBedarfsfilter(e, bedarfsFilter)) : kopfOhneBedarfsfilter;
   const gefiltert = kopf.length !== alleEinheiten.length;
   // Meldeköpfe melden oft nur die Stärke — dort steht keine Person und damit
   // keine Qualifikation. Ohne diesen Hinweis sähe der Filter wie ein Fehler aus.
@@ -767,7 +777,16 @@ export function EinsatzDetail(props: {
             {/* Schnellerfassungen ohne M/W/D-Aufteilung benennen statt als 0
                 zu verschweigen (Audit Runde 2, R2-N5). */}
             {sum.unterbringungOhneAngabe > 0 ? ` · ${sum.unterbringungOhneAngabe} ohne M/W/D-Angabe` : ""}
-            {sum.unterbringungBenoetigt > 0 ? ` · ${sum.unterbringungBenoetigt}× angefordert` : ""}
+            {/* Sprung in den passenden Filter: „wer braucht ein Quartier?" ist
+                genau die Frage hinter der Zahl (Audit Runde 2, R2-K4). */}
+            {sum.unterbringungBenoetigt > 0 && (
+              <>
+                {" · "}
+                <button type="button" className="link" onClick={() => aufBedarfFiltern("unterbringung")}>
+                  {sum.unterbringungBenoetigt}× angefordert
+                </button>
+              </>
+            )}
           </dd>
           <dt>Kraftstoff</dt>
           <dd>
@@ -777,7 +796,14 @@ export function EinsatzDetail(props: {
           <dt>Fahrzeuge</dt>
           <dd>
             {sum.fahrzeuge}
-            {sum.ruhezeitErforderlich > 0 ? ` · Ruhezeit: ${sum.ruhezeitErforderlich}×` : ""}
+            {sum.ruhezeitErforderlich > 0 && (
+              <>
+                {" · "}
+                <button type="button" className="link" onClick={() => aufBedarfFiltern("ruhezeit")}>
+                  Ruhezeit: {sum.ruhezeitErforderlich}×
+                </button>
+              </>
+            )}
           </dd>
         </dl>
       </section>
@@ -996,8 +1022,13 @@ export function EinsatzDetail(props: {
             {/* „Wer braucht etwas?" — der Bedarf stand nur als Summe im Kopf,
                 die Zuordnung führte die Führungskraft nebenbei auf Papier (K1). */}
             <label className="inline bedarf-filter">
-              <input type="checkbox" checked={nurBedarf} onChange={(e) => setNurBedarf(e.target.checked)} />
-              {" "}nur mit Sofortbedarf
+              <input
+                type="checkbox"
+                checked={nurBedarf}
+                onChange={(e) => setBedarfsFilter(e.target.checked ? "dringend" : null)}
+              />
+              {" "}nur dringender Bedarf
+              <span className="hinweis"> (Ruhezeit, Unterbringung, Verpflegung abweichend — nicht Kraftstoff)</span>
             </label>
           </div>
         )}
@@ -1018,11 +1049,17 @@ export function EinsatzDetail(props: {
             <button type="button" className="link" onClick={() => setQuali("")}>Filter aufheben</button>
           </p>
         )}
+        {(bedarfsFilter === "ruhezeit" || bedarfsFilter === "unterbringung") && kopf.length > 0 && (
+          <p className="hinweis" role="status">
+            {kopf.length} {kopf.length === 1 ? "Einheit" : "Einheiten"} {bedarfsFilter === "ruhezeit" ? "mit Ruhezeit" : "mit angeforderter Unterbringung"}.{" "}
+            <button type="button" className="link" onClick={() => setBedarfsFilter(null)}>Bedarfsfilter aufheben</button>
+          </p>
+        )}
         {alleEinheiten.length === 0 && <p className="hinweis">Noch keine Meldung. Bogen scannen oder manuell erfassen.</p>}
         {alleEinheiten.length > 0 && kopf.length === 0 && (
           <p className="hinweis">
             Keine Einheit passt zu{" "}
-            {[suche.trim() && `„${suche.trim()}“`, gewaehlteQuali && `„${gewaehlteQuali.label}“`, nurBedarf && "„nur mit Sofortbedarf“"]
+            {[suche.trim() && `„${suche.trim()}“`, gewaehlteQuali && `„${gewaehlteQuali.label}“`, nurBedarf && bedarfsFilterText]
               .filter(Boolean)
               .join(" und ")}
             .{" "}
@@ -1036,7 +1073,7 @@ export function EinsatzDetail(props: {
             {nurBedarf && (
               <>
                 {suche.trim() !== "" || gewaehlteQuali ? " · " : ""}
-                <button type="button" className="link" onClick={() => setNurBedarf(false)}>Bedarfsfilter aufheben</button>
+                <button type="button" className="link" onClick={() => setBedarfsFilter(null)}>Bedarfsfilter aufheben</button>
               </>
             )}
           </p>
@@ -1954,7 +1991,9 @@ function EinheitKarte(props: {
           {bedarf.length > 0 && (
             <span className="muster-sub bedarf-zeile">
               {bedarf.map((m) => (
-                <span className="bedarf-marke" key={m.lang}>{m.lang}</span>
+                // Dringendes kräftig, Kraftstoff als ruhige Routine-Marke
+                // (Audit Runde 2, R2-K4).
+                <span className={m.dringend ? "bedarf-marke dringend" : "bedarf-marke routine"} key={m.lang}>{m.lang}</span>
               ))}
             </span>
           )}

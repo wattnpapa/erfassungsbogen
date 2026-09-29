@@ -720,12 +720,37 @@ describe("Zeiten, Auftrag und Bedarf auf der Karte", () => {
 
     const marken = [...document.querySelectorAll(".bedarf-marke")].map((m) => m.textContent);
     expect(marken).toEqual(["Ruhezeit", "Unterbringung angefordert", "Diesel 400 l"]);
+    // Kraftstoff als Routine abgesetzt, Dringendes hervorgehoben (R2-K4).
+    expect(document.querySelectorAll(".bedarf-marke.dringend")).toHaveLength(2);
+    expect(document.querySelectorAll(".bedarf-marke.routine")).toHaveLength(1);
 
-    await nutzer.click(screen.getByLabelText("nur mit Sofortbedarf"));
+    await nutzer.click(screen.getByLabelText(/nur dringender Bedarf/));
     const namen = [...document.querySelectorAll(".muster-name")].map((n) => n.textContent ?? "");
     expect(namen).toHaveLength(1);
     expect(namen[0]).toContain("Crailsheim");
     expect(screen.getByRole("heading", { name: /Einheiten \(1 von 2 gemeldet · 2 zählend\)/ })).not.toBeNull();
+  });
+
+  it("filtert nicht auf Kraftstoff allein und springt aus „Ruhezeit: n×“ in den Filter (R2-K4)", async () => {
+    const nutzer = userEvent.setup();
+    const angelegt = einsatzAnlegen("Lage", EinsatzArt.EINSATZ);
+    for (const [name, ruhe] of [["Aalen", false], ["Biberach", true], ["Calw", false]] as const) {
+      const b = bogenMitName(name);
+      b.sofortbedarf = { verpflegungPersonen: 0, dieselLiter: 80, benzinLiter: 0, gemischLiter: 0, unterbringung: false, ruhezeitErforderlich: ruhe };
+      meldungHinzufuegen(angelegt.id, b);
+    }
+    ansicht(angelegt.id);
+    await nutzer.click(screen.getByLabelText(/nur dringender Bedarf/));
+    let namen = [...document.querySelectorAll(".muster-name")].map((n) => n.textContent ?? "");
+    expect(namen).toHaveLength(1);
+    expect(namen[0]).toContain("Biberach");
+
+    await nutzer.click(screen.getByLabelText(/nur dringender Bedarf/));
+    expect(document.querySelectorAll(".muster-name")).toHaveLength(3);
+    await nutzer.click(screen.getByRole("button", { name: "Ruhezeit: 1×" }));
+    namen = [...document.querySelectorAll(".muster-name")].map((n) => n.textContent ?? "");
+    expect(namen).toHaveLength(1);
+    expect(screen.getByText(/1 Einheit mit Ruhezeit/)).not.toBeNull();
   });
 
   it("zeigt die Lücken des Bogens als Marke mit aufklappbarer Liste", async () => {

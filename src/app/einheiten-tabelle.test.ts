@@ -24,6 +24,8 @@ import {
   TABELLEN_SPALTEN,
   bedarfKurztext,
   bedarfMarken,
+  hatSofortbedarf,
+  passtZuBedarfsfilter,
   istNeu,
   standIstAlt,
   summenBeschriftung,
@@ -143,8 +145,32 @@ describe("bedarfMarken", () => {
     // Verpflegung 2 bei Stärke 2: der Normalfall, keine Marke.
     expect(bedarfMarken(b)).toEqual([]);
     b.sofortbedarf = { verpflegungPersonen: 5, dieselLiter: 0, benzinLiter: 20, gemischLiter: 0, unterbringung: false, ruhezeitErforderlich: true };
-    expect(bedarfMarken(b).map((m) => m.lang)).toEqual(["Ruhezeit", "Benzin 20 l", "Verpflegung 5 (Stärke 2)"]);
-    expect(bedarfKurztext(b)).toBe("Ruhezeit · Benzin 20 l · Verpfl. 5 (St. 2)");
+    expect(bedarfMarken(b).map((m) => m.lang)).toEqual(["Ruhezeit", "Verpflegung 5 (Stärke 2)", "Benzin 20 l"]);
+    expect(bedarfKurztext(b)).toBe("Ruhezeit · Verpfl. 5 (St. 2) · Benzin 20 l");
+  });
+});
+
+describe("passtZuBedarfsfilter (Audit Runde 2, R2-K4)", () => {
+  const mitBedarf = (ort: string, ruhe: boolean, unterbr: boolean, status = MeldeStatus.ANWESEND) => {
+    const b = bogen(ort, 3);
+    b.sofortbedarf = { verpflegungPersonen: 0, dieselLiter: 80, benzinLiter: 0, gemischLiter: 0, unterbringung: unterbr, ruhezeitErforderlich: ruhe };
+    return eintrag(ort, b, { status });
+  };
+
+  it("zeigt bei elf Einheiten mit Diesel genau die zwei mit Ruhezeit", () => {
+    const lage = Array.from({ length: 9 }, (_, i) => mitBedarf(`D${i}`, false, false));
+    lage.push(mitBedarf("Ruhe1", true, false), mitBedarf("Ruhe2", true, false));
+    expect(lage.filter(hatSofortbedarf)).toHaveLength(11);
+    expect(lage.filter((e) => passtZuBedarfsfilter(e, "dringend")).map((e) => e.id)).toEqual(["Ruhe1", "Ruhe2"]);
+    expect(lage.filter((e) => passtZuBedarfsfilter(e, "ruhezeit"))).toHaveLength(2);
+    expect(lage.filter((e) => passtZuBedarfsfilter(e, "unterbringung"))).toHaveLength(0);
+  });
+
+  it("nimmt Abgerückte aus dem Filter und setzt Kraftstoff als Routine ab", () => {
+    const weg = mitBedarf("Weg", true, true, MeldeStatus.ABGERUECKT);
+    expect(passtZuBedarfsfilter(weg, "dringend")).toBe(false);
+    expect(passtZuBedarfsfilter(mitBedarf("U", false, true), "unterbringung")).toBe(true);
+    expect(bedarfMarken(mitBedarf("D", false, false).bogen).map((m) => m.dringend)).toEqual([false]);
   });
 });
 
