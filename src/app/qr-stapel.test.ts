@@ -13,7 +13,17 @@ import {
   type Erfassungsbogen,
   type Person,
 } from "@bos/eeb-format/model";
-import { LAGE_NACHTRAGEN_HINWEIS, dateiImportMeldung, istBilddatei, qrStapelLesen, stapelBericht, type StapelDatei } from "./qr-stapel";
+import {
+  LAGE_NACHTRAGEN_HINWEIS,
+  TEILE_ABLAUF_MS,
+  TeileMerker,
+  dateiImportMeldung,
+  istBilddatei,
+  qrStapelLesen,
+  stapelBericht,
+  teileMerker,
+  type StapelDatei,
+} from "./qr-stapel";
 
 const zlib: Kompressor = {
   deflateRaw: (d) => new Uint8Array(deflateRawSync(d, { level: 9 })),
@@ -129,6 +139,83 @@ describe("qrStapelLesen", () => {
     );
     expect(erg.funde).toHaveLength(1);
     expect(erg.funde[0]!.datei).toBe("a.jpg + c.jpg");
+  });
+
+  // Audit Runde 2, R2-A2: Foto einer Bogenseite mit zwei Codes, Teile aus
+  // getrennten Durchgängen.
+  describe("Fotos ganzer Seiten und Teile über Durchgänge (R2-A2)", () => {
+    // Ein Bild mit mehreren Codes: die Texte stehen zeilenweise im Blob.
+    const mehrere = {
+      kompressor: zlib,
+      lesen: async (blob: Blob) => (await blob.text()).split("\n").filter(Boolean),
+    };
+
+    it("liest beide Codes eines Seitenfotos und setzt den Bogen zusammen", async () => {
+      const urls = segmentPayloadUrls(encodePayload(bogen("Crailsheim"), zlib), 2);
+      const erg = await qrStapelLesen([datei("foto-s8.png", `${urls[0]}\n${urls[1]}`)], mehrere);
+      expect(erg.funde).toHaveLength(1);
+      expect(einheitName(erg.funde[0]!.bogen)).toBe("Crailsheim");
+      expect(erg.funde[0]!.datei).toBe("foto-s8.png");
+      expect(erg.luecken).toEqual([]);
+    });
+
+    it("merkt ein Teil bis zum nächsten Durchgang und vervollständigt den Bogen dort", async () => {
+      const urls = segmentPayloadUrls(encodePayload(bogen("Biberach"), zlib), 3);
+      let jetzt = 1_000_000;
+      const merker = new TeileMerker(TEILE_ABLAUF_MS, () => jetzt);
+      const erster = await qrStapelLesen([datei("s9.png", `${urls[0]}\n${urls[1]}`)], { ...mehrere, merker });
+      expect(erster.funde).toEqual([]);
+      expect(erster.luecken).toEqual([
+        { dateien: ["s9.png"], haben: 2, anzahl: 3, fehlen: [3], gemerktBis: jetzt + TEILE_ABLAUF_MS },
+      ]);
+      expect(stapelBericht(erster, 0, 0).join(" ")).toContain("bleiben bis");
+      expect(merker.anzahl()).toBe(1);
+      jetzt += 10 * 60_000;
+      const zweiter = await qrStapelLesen([datei("s10.png", urls[2]!)], { ...mehrere, merker });
+      expect(zweiter.funde).toHaveLength(1);
+      expect(einheitName(zweiter.funde[0]!.bogen)).toBe("Biberach");
+      expect(zweiter.funde[0]!.datei).toBe("s9.png + s10.png");
+      expect(zweiter.luecken).toEqual([]);
+      expect(merker.anzahl()).toBe(0);
+    });
+
+    it("lässt gemerkte Teile nach Ablauf verfallen", async () => {
+      const urls = segmentPayloadUrls(encodePayload(bogen("Albstadt"), zlib), 2);
+      let jetzt = 5_000_000;
+      const merker = new TeileMerker(TEILE_ABLAUF_MS, () => jetzt);
+      await qrStapelLesen([datei("t1.png", urls[0]!)], { ...mehrere, merker });
+      jetzt += TEILE_ABLAUF_MS + 1;
+      expect(merker.anzahl()).toBe(0);
+      const erg = await qrStapelLesen([datei("t2.png", urls[1]!)], { ...mehrere, merker });
+      expect(erg.funde).toEqual([]);
+      expect(erg.luecken[0]!.fehlen).toEqual([1]);
+    });
+
+    it("verlängert die Frist nur bei einem neuen Teil", async () => {
+      const urls = segmentPayloadUrls(encodePayload(bogen("Albstadt"), zlib), 3);
+      let jetzt = 9_000_000;
+      const merker = new TeileMerker(TEILE_ABLAUF_MS, () => jetzt);
+      await qrStapelLesen([datei("t1.png", urls[0]!)], { ...mehrere, merker });
+      const anfang = jetzt;
+      jetzt += 30 * 60_000;
+      // Ein Durchgang ohne Fortschritt für diesen Bogen (dasselbe Teil noch einmal).
+      const erg = await qrStapelLesen([datei("t1b.png", urls[0]!)], { ...mehrere, merker });
+      expect(erg.luecken[0]!.gemerktBis).toBe(anfang + TEILE_ABLAUF_MS);
+    });
+
+    it("verwirft gemerkte Teile auf Wunsch", async () => {
+      const urls = segmentPayloadUrls(encodePayload(bogen("Albstadt"), zlib), 2);
+      const merker = new TeileMerker();
+      await qrStapelLesen([datei("t1.png", urls[0]!)], { ...mehrere, merker });
+      merker.verwerfen();
+      const erg = await qrStapelLesen([datei("t2.png", urls[1]!)], { ...mehrere, merker });
+      expect(erg.funde).toEqual([]);
+    });
+
+    it("führt je Einsatz einen eigenen Merker", () => {
+      expect(teileMerker("einsatz-a")).toBe(teileMerker("einsatz-a"));
+      expect(teileMerker("einsatz-a")).not.toBe(teileMerker("einsatz-b"));
+    });
   });
 
   it("nimmt Vorlagen und fremde Codes nicht als Meldung auf", async () => {

@@ -86,7 +86,8 @@ import { einsatzDetailCsvInhalt } from "./bogen-csv";
 import { QrScannerWeb } from "./qr-scanner-web";
 import { TeilQuittung, fehlendeTeile, fehltNochSatz } from "./teil-quittung";
 import { qrAusBild } from "./qr-bild";
-import { dateiImportMeldung, istBilddatei, qrStapelLesen, stapelBericht as stapelBerichtZeilen } from "./qr-stapel";
+import { dateiImportMeldung, istBilddatei, qrStapelLesen, stapelBericht as stapelBerichtZeilen, teileMerker } from "./qr-stapel";
+import { StapelQuittung } from "./stapel-quittung";
 import {
   entwurfLaden,
   entwurfSpeichern,
@@ -2199,6 +2200,8 @@ function AppInhalt() {
         {
           beiFortschritt: (fertig, gesamt) => setStapelStand(`${fertig} von ${gesamt} Bildern gelesen…`),
           abbruch: () => stapelAbbruchRef.current,
+          // Teile mehrteiliger Bögen über Durchgänge merken (R2-A2).
+          merker: teileMerker(zielId),
         },
       );
       let neu = 0;
@@ -2328,30 +2331,14 @@ function AppInhalt() {
             <button type="button" className="link" onClick={() => { setMeldung(""); setOffenerEinsatzId(null); setZeigeStart(false); }}>Weiter erfassen</button>
           </p>
         )}
-        {/* Stapel läuft: Fortschritt und Abbruch. Dreißig Handyfotos dauern
-            spürbar — ohne Stand wirkt die App hängengeblieben, ohne Abbruch ist
-            ein versehentlich gewählter Bilderordner nicht mehr zu stoppen. */}
-        {stapelStand && (
-          <p className="meldung" role="status" style={{ textAlign: "center" }}>
-            {stapelStand}{" "}
-            <button type="button" onClick={() => (stapelAbbruchRef.current = true)}>Abbrechen</button>
-          </p>
-        )}
-        {/* Der Bericht bleibt stehen, bis er geschlossen wird: was NICHT
-            ankam (Bild ohne Code, fehlendes Teil eines mehrteiligen Bogens),
-            muss man abarbeiten können — eine verschwindende Meldung reicht
-            dafür nicht. */}
-        {stapelBericht.length > 0 && (
-          <section className="karte">
-            <h2>Stapel eingelesen</h2>
-            <ul>
-              {stapelBericht.map((zeile) => (
-                <li key={zeile}>{zeile}</li>
-              ))}
-            </ul>
-            <button type="button" onClick={() => setStapelBericht([])}>Schließen</button>
-          </section>
-        )}
+        {/* Stapel-Fortschritt und -Bericht holen sich selbst ins Bild (R2-A2). */}
+        <StapelQuittung
+          stand={stapelStand}
+          onAbbrechen={() => (stapelAbbruchRef.current = true)}
+          bericht={stapelBericht}
+          onSchliessen={() => setStapelBericht([])}
+          merker={teileMerker(offenerEinsatz.id)}
+        />
         {/* Kiosk-Scan: die aufgenommenen Bögen bleiben im Einsatz — der Knopf
             beendet nur den Durchgang, deshalb „Fertig". Liegen aber Teile eines
             noch unvollständigen Bogens im Sammelstand, gehen die beim Schließen

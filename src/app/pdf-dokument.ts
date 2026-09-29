@@ -853,9 +853,13 @@ function qrBlock(qr: QrSatz, akzent: string, vermerk?: MeldekopfVermerk): Conten
   });
   const hinweis = (): Content => ({
     text:
+      // Der Satz folgt dem tatsächlichen Verhalten (Audit Runde 2, R2-A2):
+      // Live-Scan sieht einen Code auf einmal, „Bögen einlesen…" liest alle
+      // Codes eines Fotos und merkt sich Teile bis zum nächsten Foto.
       `Alle ${anzahl} Teile nacheinander mit der Kamera scannen — die App setzt den Bogen zusammen.\n` +
-      `Beim Scannen jeweils nur einen Code ins Kamerabild nehmen. In der digitalen PDF geht es auch\n` +
-      `ohne Scannen: der Link oben öffnet den vollständigen Bogen.`,
+      `Beim Live-Scan jeweils nur einen Code ins Kamerabild nehmen. Fotos ganzer Seiten liest „Bögen einlesen…“\n` +
+      `mit allen Codes; fehlende Teile dürfen auch in einem späteren Foto kommen.\n` +
+      `In der digitalen PDF geht es auch ohne Scannen: der Link oben öffnet den vollständigen Bogen.`,
     alignment: "center",
     fontSize: 8,
     margin: [0, 6, 0, 0],

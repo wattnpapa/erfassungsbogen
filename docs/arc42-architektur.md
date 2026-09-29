@@ -833,6 +833,14 @@ gleicher Inhalt wird übersprungen, neuer Inhalt derselben Einheit landet als
 neue Fassung in der Historie; am Ende steht ein Bericht (Funde, Dateien ohne
 Bogen, unvollständige Mehrteil-Sätze).
 
+*Nachgezogen 2026-09-29 (Audit Runde 2, R2-A2):* Je Bild werden alle QR-Codes
+gelesen (`qrAlleAusBild`, ZXing mit bis zu acht Symbolen; die jsQR-Rückfallebene
+liest weiter nur einen) — das Foto einer Bogenseite mit zwei Teilen ergibt so
+einen Bogen. Unvollständige Mehrteil-Sätze bleiben je Einsatz im
+`TeileMerker` (nur Arbeitsspeicher, Ablauf eine Stunde nach dem letzten neuen
+Teil) und werden im nächsten Durchgang vervollständigt. Der Bericht holt sich
+beim Erscheinen selbst ins Bild (`stapel-quittung.tsx`).
+
 ### 6.4 Offline-Start der Web-App (Service Worker)
 
 ```mermaid

@@ -95,6 +95,11 @@ Grundlage: Repository `wattnpapa/erfassungsbogen`, Stand 2026-09-12 — Version 
 > **Nachgezogen 2026-09-29:** Lageblatt zum Weiterführen (Audit Runde 2,
 > R2-A3) — Funkrufname und Rückrufnummer je Einheit, freie Zeilen; Zeitpunkt
 > des letzten Lageblatts wird gemerkt (3.3 D2h, 5.4).
+>
+> **Nachgezogen 2026-09-29:** Foto-Einlesen (Audit Runde 2, R2-A2) — liest
+> alle QR-Codes eines Bildes und merkt Teile unvollständiger mehrteiliger
+> Bögen bis zu einer Stunde im Arbeitsspeicher (nicht im Gerätespeicher) für
+> den nächsten Durchgang (5.5).
 
 ## Hinweis zu diesem Dokument
 
@@ -484,6 +489,11 @@ Datenausleitung an eine andere Herkunft ist technisch unterbunden.
   Speicher der App. Dazu zeigt die Datensicherung die letzte Sicherung, und
   die Fußzeile erinnert, wenn wertvolle Daten seit drei Tagen ungesichert sind.
   Eine Sicherungspflicht erzwingt die App nicht; organisatorisch regeln.
+- **Gemerkte Teile beim Foto-Einlesen** (`TeileMerker`, `src/app/qr-stapel.ts`,
+  seit 2026-09-29, R2-A2): Teile eines unvollständigen mehrteiligen Bogens
+  warten je Einsatz höchstens eine Stunde nach dem letzten neuen Teil im
+  Arbeitsspeicher auf den Rest; Neuladen oder „Gemerkte Teile verwerfen"
+  löscht sie sofort. Kein `localStorage`.
 - **Schema-Migration** (`src/app/hilfen.ts`): verhindert, dass ältere Datensätze
   mit veralteten Feldbedeutungen fehlinterpretiert werden.
 - **Absenderkarte vollständig optional** (Opt-in), ohne Eingabe als „keine

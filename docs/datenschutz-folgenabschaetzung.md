@@ -94,6 +94,12 @@ Grundlage: Repository `wattnpapa/erfassungsbogen`, Stand 2026-09-12 — Version 
 > Einzelbogen und in der Excel-Liste stand sie schon. Die App merkt sich, wann
 > zuletzt ein Lageblatt erzeugt wurde (`eeb.lageblatt-stand.v1`, nur
 > Kennungen und Zeitpunkt). Geändert: 5.1, 5.7.
+>
+> **Nachgezogen 2026-09-29 — Teile mehrteiliger Bögen beim Foto-Einlesen
+> (Audit Runde 2, R2-A2):** „Bögen einlesen…" merkt sich Teile eines noch
+> unvollständigen mehrteiligen Bogens bis zum nächsten Durchgang — nur im
+> Arbeitsspeicher, je Einsatz, höchstens eine Stunde nach dem letzten neuen
+> Teil, und auf Wunsch sofort verwerfbar. Kein Gerätespeicher. Geändert: 5.7.
 
 ## Hinweis zu diesem Dokument
 
@@ -420,6 +426,13 @@ Kapitel 6 der [Arc42-Dokumentation](arc42-architektur.md).
   verhindert nur die Räumung durch den Browser. Die Sicherungsdatei selbst
   enthält Personendaten und den privaten Schlüssel — ihre Ablage ist
   organisatorisch zu regeln.
+- **Gemerkte Teile beim Foto-Einlesen (seit 2026-09-29):** Liest „Bögen
+  einlesen…" nur einen Teil eines mehrteiligen Bogens, bleiben die gelesenen
+  Teile (mit den darin enthaltenen Personendaten) für den nächsten Durchgang
+  im Arbeitsspeicher (`TeileMerker`, `src/app/qr-stapel.ts`) — je Einsatz,
+  höchstens eine Stunde nach dem letzten neuen Teil, weg mit dem Neuladen der
+  Seite oder über „Gemerkte Teile verwerfen" (Audit Runde 2, R2-A2). Nichts
+  davon landet im Gerätespeicher.
 - **Strukturelle Grenze:** Sobald ein Bogen als QR-Code gescannt, als PDF
   gedruckt oder als Datei exportiert wurde, hat die App auf diese Kopien keinen
   Zugriff mehr (vertiefend 6.3).
