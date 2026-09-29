@@ -51,7 +51,7 @@ import { Kopfnav } from "./kopfnav-ui";
 import { bogenLinksEmpfangen, imWebBrowser, istNativ, qrScannen, textTeilen } from "./nativ";
 import { fehlerText } from "./nachladen";
 import { entwirreScanText } from "./tastaturbelegung";
-import { vorlageAktualisieren, vorlageAnlegen, vorlageAusDatei, vorlagenLaden, vorlagenPapierkorb, type Vorlage } from "./vorlagen";
+import { vorlageAktualisieren, vorlageAnlegen, vorlageAusDatei, vorlagenLaden, vorlagenPapierkorb, vorlageZuruecksetzen, type Vorlage } from "./vorlagen";
 import { Musterung, VorlagenListe } from "./vorlagen-ui";
 import { absenderkarteGefuellt, absenderkarteLaden, type Absenderkarte } from "./absenderkarte";
 import { AbsenderkarteFeld } from "./absenderkarte-ui";
@@ -631,6 +631,8 @@ function AppInhalt() {
   // er lässt sich von dort per „Aktuellen Bogen fortsetzen“ wieder öffnen.
   const [zeigeStart, setZeigeStart] = useState(!START.bogen && !!ENTWURF);
   const [vorlagen, setVorlagen] = useState<Vorlage[]>(() => vorlagenLaden());
+  /** Vorige Fassung nach „Vorlage aktualisieren" — für „Rückgängig" (R2-D2). */
+  const [vorlageRueckweg, setVorlageRueckweg] = useState<Vorlage | null>(null);
   // Absenderkarte (Gerätestand) — auch auf der Startseite einstellbar; die
   // Übersicht liest sie beim Mounten erneut aus dem Speicher.
   const [absender, setAbsender] = useState<Absenderkarte>(() => absenderkarteLaden());
@@ -1054,13 +1056,36 @@ function AppInhalt() {
     setMeldung(`Vorlage „${v.name}" wird bearbeitet — die Änderungen kommen in der Übersicht mit „Vorlage aktualisieren" in die Vorlage.`);
   }
 
-  /** Den bearbeiteten Bogen in die Vorlage zurückschreiben und den Arbeitsplatz räumen. */
-  function vorlageAktualisierenUndSchliessen() {
+  /**
+   * Den bearbeiteten Bogen in die Vorlage zurückschreiben und den Arbeitsplatz
+   * räumen. Vorher nennt eine Rückfrage, was sich an der Vorlage ändert, und
+   * danach holt „Rückgängig" die vorige Fassung zurück: Mit „StAN-Sollplätze
+   * laden" und „Vorlage aktualisieren" waren elf Namen der Vorlage sonst
+   * dauerhaft weg (Audit Runde 2, R2-D2).
+   */
+  async function vorlageAktualisierenUndSchliessen() {
     if (!bogen || !vorlageInBearbeitung) return;
+    const vorher = vorlagen.find((x) => x.id === vorlageInBearbeitung) ?? null;
+    if (vorher) {
+      const namen = (b: Erfassungsbogen) => b.personal.filter((p) => p.vorname.trim() || p.nachname.trim()).length;
+      const zeile = (was: string, a: number, b: number) => (a === b ? `${was} ${a}` : `${was} ${a} → ${b}`);
+      const ja = await frageJaNein({
+        titel: `Vorlage „${vorher.name}" überschreiben?`,
+        text: [
+          zeile("Personen", vorher.bogen.personal.length, bogen.personal.length),
+          zeile("davon mit Namen", namen(vorher.bogen), namen(bogen)),
+          zeile("Fahrzeuge", vorher.bogen.fahrzeuge.length, bogen.fahrzeuge.length),
+        ].join(" · ") + ". Die vorige Fassung lässt sich danach mit „Rückgängig“ zurückholen.",
+        ok: "Vorlage aktualisieren",
+        gefahr: namen(bogen) < namen(vorher.bogen),
+      });
+      if (!ja) return;
+    }
     // Endgültig gelöscht, während der Bogen offen war: dann eben als neue
     // Vorlage — die Arbeit soll nicht ins Leere laufen.
     const v = vorlageAktualisieren(vorlageInBearbeitung, bogen)
       ?? vorlageAnlegen(bearbeiteteVorlage?.name ?? einheitAnzeigename(bogen.einheit), bogen);
+    setVorlageRueckweg(vorher);
     setBogen(null); // löscht auch die Entwurfssicherung
     setVorlageInBearbeitung(null);
     setzeEmpfang(null);
@@ -2434,7 +2459,27 @@ function AppInhalt() {
         {/* Rückmeldungen stehen ÜBER den Aktionen: „Entwurf … wiederhergestellt"
             erklärt die Karte darüber, und unter den Knöpfen klebte der Kasten
             optisch an der Knopfreihe, statt ein eigener Block zu sein. */}
-        {meldung && <p className="meldung" role="status" key={meldung}>{meldung}</p>}
+        {meldung && (
+          <p className="meldung" role="status" key={meldung}>
+            {meldung}
+            {vorlageRueckweg && meldung.startsWith(`Vorlage „`) && (
+              <>
+                {" "}
+                <button
+                  type="button"
+                  onClick={() => {
+                    vorlageZuruecksetzen(vorlageRueckweg);
+                    vorlagenNeuLaden();
+                    setMeldung(`Vorlage „${vorlageRueckweg.name}" auf die vorige Fassung zurückgesetzt.`);
+                    setVorlageRueckweg(null);
+                  }}
+                >
+                  Rückgängig
+                </button>
+              </>
+            )}
+          </p>
+        )}
         {fehler && <p className="fehler">{fehler}</p>}
         {/* Ohne Kamera-Overlay (nativer Scan, „QR aus Bild einlesen") steht der
             Fortschritt hier — mit derselben Kästchenzeile, damit auch dieser
@@ -2748,7 +2793,7 @@ function AppInhalt() {
           neu={() => { if (bogenHatInhalt(bogen)) merkeVerdraengt(bogen); setMeldung(""); setBogen(null); setVorlageInBearbeitung(null); setFremdeErfassung(false); setSammelZiel(null); setzeEmpfang(null); setSchritt(0); }}
           onVorlageGespeichert={(name) => { vorlagenNeuLaden(); setMeldung(`Als Vorlage „${name}" gespeichert.`); }}
           vorlageBearbeitung={
-            bearbeiteteVorlage ? { name: bearbeiteteVorlage.name, onAktualisieren: vorlageAktualisierenUndSchliessen } : undefined
+            bearbeiteteVorlage ? { name: bearbeiteteVorlage.name, onAktualisieren: () => void vorlageAktualisierenUndSchliessen() } : undefined
           }
           onInEinsatzAufnehmen={() => { einsaetzeNeuLaden(); einsatzWahlDialog.current?.showModal(); }}
           onNeuerEinsatz={() => {

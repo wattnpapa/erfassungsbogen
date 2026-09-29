@@ -268,6 +268,14 @@ export function vorlageAktualisieren(id: string, bogen: Erfassungsbogen): Vorlag
   return neu;
 }
 
+/**
+ * Eine Vorlage wieder auf eine frühere Fassung setzen — das „Rückgängig" nach
+ * „Vorlage aktualisieren" (Audit Runde 2, R2-D2).
+ */
+export function vorlageZuruecksetzen(fassung: Vorlage): void {
+  vorlagenSpeichern(alleVorlagenLaden().map((v) => (v.id === fassung.id ? fassung : v)));
+}
+
 export function vorlageUmbenennen(id: string, name: string): void {
   vorlagenSpeichern(
     alleVorlagenLaden().map((v) =>

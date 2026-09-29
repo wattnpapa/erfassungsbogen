@@ -1458,6 +1458,9 @@ describe("Vorlage bearbeiten (Karte in „Gespeicherte Vorlagen“)", () => {
     expect(screen.getByRole("button", { name: "Als neue Vorlage speichern" })).toBeDefined();
     expect(screen.queryByRole("button", { name: "Als Vorlage speichern" })).toBeNull();
     await nutzer.click(screen.getByRole("button", { name: "Vorlage aktualisieren" }));
+    // Rückfrage nennt die Änderung (R2-D2).
+    const frage = rueckfrage('Vorlage „FGr K Bearbeithausen" überschreiben?');
+    await nutzer.click(within(frage).getByRole("button", { name: "Vorlage aktualisieren" }));
 
     expect(await screen.findByText(/Vorlage „FGr K Bearbeithausen" aktualisiert/)).toBeDefined();
     const vorlagen = vorlagenLaden();
@@ -1467,6 +1470,10 @@ describe("Vorlage bearbeiten (Karte in „Gespeicherte Vorlagen“)", () => {
     // Der Arbeitsplatz ist geräumt: kein liegengebliebener Entwurf der Vorlage.
     expect(localStorage.getItem("eeb.entwurf.v1")).toBeNull();
     expect(screen.getByRole("heading", { name: "Gespeicherte Vorlagen" })).toBeDefined();
+
+    // „Rückgängig" holt die vorige Fassung zurück.
+    await nutzer.click(screen.getByRole("button", { name: "Rückgängig" }));
+    expect(vorlagenLaden()[0]!.bogen.einheit.hierarchie[0]!.name).toBe("OV Alt");
   });
 
   it("fragt vor dem Bearbeiten, wenn ein angefangener Bogen offen ist, und löst danach die Verbindung zur Vorlage", async () => {

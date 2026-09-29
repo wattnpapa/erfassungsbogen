@@ -34,6 +34,7 @@ Funktionalität: Vorlagen anlegen, verwalten und mustern
     Dann sehe ich die Schaltfläche "Vorlage aktualisieren"
     Und sehe ich die Schaltfläche "Als neue Vorlage speichern"
     Wenn ich auf "Vorlage aktualisieren" klicke
+    Und ich im Dialog auf "Vorlage aktualisieren" klicke
     Dann sehe ich die Überschrift "Gespeicherte Vorlagen"
     Und sehe ich den Hinweis "Vorlage „FGr K Oldenburg\" aktualisiert."
     Und sehe ich die Überschrift "FGr K Oldenburg"
