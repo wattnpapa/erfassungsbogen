@@ -88,3 +88,12 @@ Funktionalität: Vorlagen anlegen, verwalten und mustern
     Und ich auf "‹ Abbrechen" klicke
     Dann sehe ich die Überschrift "Gespeicherte Vorlagen"
     Und sehe ich die Schaltfläche "Einsatz vorbereiten"
+
+  # Audit Runde 2, R2-D6: abgewählte Personen gingen ohne Rückfrage verloren.
+  Szenario: Musterung nach geänderten Haken abbrechen fragt nach
+    Wenn ich auf "Einsatz vorbereiten" klicke
+    Und ich in der Musterung "Weber" abwähle
+    Und ich auf "‹ Abbrechen" klicke
+    Dann sehe ich den Dialog "Musterung verwerfen?"
+    Wenn ich im Dialog auf "Weiter mustern" klicke
+    Dann sehe ich die Schaltfläche "Einsatz starten · 2 Pers · 1 Fz"

@@ -235,6 +235,16 @@ function marke(eingang: Eingang | null | undefined, schluessel: string): string 
 
 // ---------------------------------------------------------------- Einsatzliste
 
+/**
+ * Der zuletzt in den Papierkorb gelegte Einsatz — die Startseite quittiert
+ * ihn mit „Rückgängig", wie bei den Vorlagen. Vorher ging die Karte auf der
+ * Startseite wortlos ab, und aus der Einsatzansicht hieß es nur „Einsatz in
+ * den Papierkorb verschoben." ohne Rückweg (Audit Runde 2, R2-D6). Auf
+ * Modulebene, weil der Weg aus der Einsatzansicht die Startseite erst danach
+ * aufbaut.
+ */
+let zuletztGeloeschterEinsatz: { id: string; name: string } | null = null;
+
 export function EinsatzListe(props: {
   einsaetze: Einsatzsammlung[];
   onOeffnen: (s: Einsatzsammlung) => void;
@@ -253,6 +263,20 @@ export function EinsatzListe(props: {
    * Zusage „nichts geht verloren" bliebe damit unquittiert.
    */
   const [zurueckgeholt, setZurueckgeholt] = useState<string | null>(null);
+  // Die Übergabe aus der Einsatzansicht gilt für genau einen Aufbau der
+  // Startseite; danach führt die Liste die Quittung selbst.
+  const [geloescht, setGeloescht] = useState(() => zuletztGeloeschterEinsatz);
+  useEffect(() => {
+    zuletztGeloeschterEinsatz = null;
+  }, []);
+
+  function loeschenRueckgaengig() {
+    if (!geloescht) return;
+    einsatzWiederherstellen(geloescht.id);
+    setZurueckgeholt(geloescht.id);
+    setGeloescht(null);
+    onGeaendert();
+  }
 
   /**
    * Rückfrage vor dem Weg in den Papierkorb. Dass ein Fehltipp umkehrbar ist,
@@ -271,6 +295,7 @@ export function EinsatzListe(props: {
 
   function loeschen(s: Einsatzsammlung) {
     einsatzLoeschen(s.id);
+    setGeloescht({ id: s.id, name: s.name });
     onGeaendert();
   }
 
@@ -321,6 +346,12 @@ export function EinsatzListe(props: {
             Verstanden
           </button>
         </div>
+      )}
+      {geloescht && (
+        <p className="meldung einsatz-geloescht" role="status">
+          Einsatz „{geloescht.name}" in den Papierkorb gelegt (30 Tage rückholbar).{" "}
+          <button type="button" className="link" onClick={loeschenRueckgaengig}>Rückgängig</button>
+        </p>
       )}
       {einsaetze.map((s) => {
         const sum = aggregiere(s.eintraege, s.art);
@@ -661,6 +692,20 @@ export function EinsatzDetail(props: {
   // Entfernen einer Einheit ALLE ihre Fassungen, beim Verwerfen einer Fassung
   // nur diese (Audit Runde 2, R2-D1).
   const [zuletztEntfernt, setZuletztEntfernt] = useState<Entfernt | null>(null);
+  // Zuletzt aufgeteilt — Quittung mit Rückweg (R2-D6).
+  const [aufgeteilt, setAufgeteilt] = useState<Aufgeteilt | null>(null);
+
+  /** Aufteilung zurücknehmen: die beiden neuen Einträge heraus, die Fassung davor gilt wieder. */
+  async function aufteilungZurueck() {
+    if (!aufgeteilt) return;
+    const ok = await gesichert("Rückgängig", () => {
+      for (const id of aufgeteilt.neueIds) meldungEntfernen(einsatz.id, id);
+      entfernteMerken(einsatz.id, aufgeteilt.neueIds); // kommen beim Import nicht still zurück (R2-D4)
+    });
+    if (!ok) return;
+    setAufgeteilt(null);
+    onGeaendert();
+  }
 
   /** Entferntes unverändert zurücklegen (mit Signatur, Herkunft, Zeiten, Notiz, Etiketten). */
   async function entferntesZurueckholen() {
@@ -787,6 +832,8 @@ export function EinsatzDetail(props: {
     });
     if (!sicher) return;
     einsatzLoeschen(einsatz.id);
+    // Die Startseite quittiert mit Rückweg (R2-D6).
+    zuletztGeloeschterEinsatz = { id: einsatz.id, name: einsatz.name };
     onGeloescht();
   }
 
@@ -1242,8 +1289,9 @@ export function EinsatzDetail(props: {
                 qualifikation={quali}
                 qualifikationKurz={qualiKurz}
                 eingang={eingang}
-                onEntfernt={setZuletztEntfernt}
-                onStatusWechsel={setStatusWechsel}
+                onEntfernt={(x) => { setAufgeteilt(null); setZuletztEntfernt(x); }}
+                onStatusWechsel={(w) => { setAufgeteilt(null); setStatusWechsel(w); }}
+                onAufgeteilt={(a) => { setZuletztEntfernt(null); setStatusWechsel(null); setAufgeteilt(a); }}
                 kompakt={kompakt}
               />
             ))}
@@ -1278,6 +1326,15 @@ export function EinsatzDetail(props: {
             : `Meldung „${einheitAnzeigename(zuletztEntfernt.eintraege[0]!.bogen.einheit)}" entfernt${
                 zuletztEntfernt.eintraege.length > 1 ? ` (${zuletztEntfernt.eintraege.length} Fassungen)` : ""
               }.`}
+        </DaumenQuittung>
+      )}
+      {aufgeteilt && (
+        <DaumenQuittung
+          key={`aufgeteilt:${aufgeteilt.neueIds.join(",")}`}
+          onRueckgaengig={() => void aufteilungZurueck()}
+          onSchliessen={() => setAufgeteilt(null)}
+        >
+          „{aufgeteilt.teil}" von „{aufgeteilt.name}" abgeteilt. Später zurück über „Mehr…" › „Zusammenführen…".
         </DaumenQuittung>
       )}
       {/* Statuswechsel mit Uhrzeit: Ein Tipp nahm die Einheit bisher wortlos
@@ -1694,6 +1751,18 @@ function Aenderungen({ vorher, nachher }: { vorher: Erfassungsbogen; nachher: Er
 }
 
 /**
+ * Eine eben vorgenommene Aufteilung — die Quittung nennt sie und bietet den
+ * Rückweg an (Audit Runde 2, R2-D6). `neueIds` sind genau die Einträge, die
+ * die Aufteilung angelegt hat (Rest-Fassung und abgeteilter Teil); sie wieder
+ * herauszunehmen stellt den Stand davor her.
+ */
+interface Aufgeteilt {
+  name: string;
+  teil: string;
+  neueIds: string[];
+}
+
+/**
  * Was „Entfernen" oder „Fassung verwerfen" zuletzt aus der Sammlung nahm —
  * neueste Fassung zuerst. Die Ansicht legt es bei „Rückgängig" unverändert
  * zurück (Audit Runde 2, R2-D1).
@@ -1800,6 +1869,8 @@ function EinheitKarte(props: {
   onStatusWechsel?: (w: StatusWechsel) => void;
   /** Schmaler Bildschirm: zugeklappt nur Name, Stärke und Bedarf (R2-K7). */
   kompakt?: boolean;
+  /** Eben aufgeteilt — die Ansicht quittiert mit Rückweg (R2-D6). */
+  onAufgeteilt?: (a: Aufgeteilt) => void;
 }) {
   const { einsatzId, kopf, alle, onGeaendert, onEntfernt, qualifikation = "", qualifikationKurz = "", eingang, onStatusWechsel, kompakt = false } = props;
   // Auf dem Telefon zugeklappt, bis die Einheit angetippt wird (R2-K7).
@@ -1953,8 +2024,18 @@ function EinheitKarte(props: {
   }
 
   function aufteilenAusfuehren(wahl: AufteilungsWahl, opt: AufteilungOptionen) {
-    meldungAufteilen(einsatzId, kopf.id, wahl, opt);
+    const vorher = new Set(alle.map((e) => e.id));
+    const r = meldungAufteilen(einsatzId, kopf.id, wahl, opt);
     setAufteilen(false);
+    // Nach dem Aufteilen stand die neue Karte wortlos in der Liste; dass es
+    // über „Zusammenführen…" zurückgeht, sagte die App nicht (R2-D6).
+    if (r) {
+      props.onAufgeteilt?.({
+        name: einheitAnzeigename(kopf.bogen.einheit),
+        teil: r.abgeteilt.teilEtikett ?? "",
+        neueIds: [r.rest.id, r.abgeteilt.id].filter((id) => !vorher.has(id)),
+      });
+    }
     onGeaendert();
   }
 

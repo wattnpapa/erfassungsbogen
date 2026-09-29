@@ -100,6 +100,14 @@ Grundlage: Repository `wattnpapa/erfassungsbogen`, Stand 2026-09-12 — Version 
 > unvollständigen mehrteiligen Bogens bis zum nächsten Durchgang — nur im
 > Arbeitsspeicher, je Einsatz, höchstens eine Stunde nach dem letzten neuen
 > Teil, und auf Wunsch sofort verwerfbar. Kein Gerätespeicher. Geändert: 5.7.
+>
+> **Nachgezogen 2026-09-29 — Rückweg bei Aufteilen und Einsatz löschen
+> (Audit Runde 2, R2-D6):** Nach „Aufteilen" nimmt „Rückgängig" die beiden
+> dabei angelegten Einträge (Rest-Fassung und abgeteilter Teil) wieder aus der
+> Sammlung und vermerkt ihre Kennungen wie bei „Entfernen" in
+> `eeb.entfernt.v1`; die Fassung davor gilt wieder. „Einsatz löschen" quittiert
+> auf der Startseite mit „Rückgängig" (Papierkorb, unverändert 30 Tage). Keine
+> neuen Daten, kein neuer Speicherort. Geändert: 5.7.
 
 ## Hinweis zu diesem Dokument
 

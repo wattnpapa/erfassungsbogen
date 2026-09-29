@@ -331,10 +331,37 @@ export function Musterung(props: {
     onStart(vorlageInstanziieren(b, { personal: pAn, fahrzeuge: vAn, sofortbedarf: bedarfAn }));
   }
 
+  /**
+   * „‹ Abbrechen" nach geänderten Haken: fünf abgewählte Personen waren ohne
+   * Rückfrage verworfen, beim erneuten Öffnen standen wieder alle angehakt
+   * (Audit Runde 2, R2-D6). Ohne Änderung geht es ohne Frage zurück.
+   */
+  async function abbrechen() {
+    const personenAb = pAn.filter((x) => !x).length;
+    const fahrzeugeAb = vAn.filter((x) => !x).length;
+    const geaendert = personenAb > 0 || fahrzeugeAb > 0 || bedarfAn;
+    if (geaendert) {
+      const was = [
+        personenAb > 0 ? `${personenAb} ${personenAb === 1 ? "Person" : "Personen"} abgewählt` : "",
+        fahrzeugeAb > 0 ? `${fahrzeugeAb} ${fahrzeugeAb === 1 ? "Fahrzeug" : "Fahrzeuge"} abgewählt` : "",
+        bedarfAn ? "Sofortbedarf angehakt" : "",
+      ].filter(Boolean);
+      const sicher = await frageJaNein({
+        titel: "Musterung verwerfen?",
+        text: `Die Haken dieser Musterung (${was.join(", ")}) gehen verloren; beim nächsten Öffnen sind wieder alle angehakt. Die Vorlage selbst bleibt unverändert.`,
+        ok: "Verwerfen",
+        abbruch: "Weiter mustern",
+        gefahr: true,
+      });
+      if (!sicher) return;
+    }
+    onAbbrechen();
+  }
+
   return (
     <>
     <SeitenKopf>
-      <button type="button" className="zur-start" onClick={onAbbrechen}>‹ Abbrechen</button>
+      <button type="button" className="zur-start" onClick={() => void abbrechen()}>‹ Abbrechen</button>
       <div className="titelzeile">
         <h1>{vorlage.name}</h1>
       </div>

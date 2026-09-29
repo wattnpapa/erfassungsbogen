@@ -33,7 +33,7 @@ import {
 } from "@bos/meldekopf/einsaetze";
 import { eintreffzeitSetzen, notizSetzen } from "./eintrag-zeiten";
 import { aggregiere } from "./auswertung";
-import { neuerBogen } from "./hilfen";
+import { neuerBogen, neuePerson } from "./hilfen";
 import { lageblattVermerken, type ExportStand, type ExportUmfang } from "./export-stand";
 
 // pdfmake selbst hat hier nichts zu suchen: geprüft wird der Weg dorthin.
@@ -1141,5 +1141,43 @@ describe("Quittung nennt die zuletzt aufgenommenen Einheiten (R2-S4)", () => {
     neuLaden();
     expect(document.querySelectorAll(".einheit-zeile")).toHaveLength(2);
     expect(document.querySelector(".stapel-eingang")).toBeNull();
+  });
+});
+
+/**
+ * Aufteilen quittierte nichts: die neue Karte stand wortlos in der Liste, der
+ * Rückweg „Zusammenführen…" war nirgends genannt (Audit Runde 2, R2-D6).
+ */
+describe("Aufteilen mit Quittung und Rückweg (R2-D6)", () => {
+  beforeEach(() => {
+    localStorage.clear();
+  });
+
+  it("quittiert die Aufteilung mit Namen und Rückweg; „Rückgängig“ stellt den Stand davor her", async () => {
+    const nutzer = userEvent.setup();
+    const angelegt = einsatzAnlegen("Hochwasser Test", EinsatzArt.EINSATZ);
+    const b = bogenMitName("Wardenburg");
+    b.personal = ["Rudolph", "Lang", "Weber"].map((nachname) => ({ ...neuePerson(), vorname: "T", nachname }));
+    meldungHinzufuegen(angelegt.id, b);
+    const vorher = einsaetzeLaden().find((s) => s.id === angelegt.id)!.eintraege.map((e) => e.id);
+    const { neuLaden } = ansicht(angelegt.id);
+
+    await nutzer.click(screen.getByRole("button", { name: "Mehr…" }));
+    await nutzer.click(screen.getByRole("button", { name: "Aufteilen…" }));
+    await nutzer.type(screen.getByLabelText("Bezeichnung des abgeteilten Teils"), "Fachberater");
+    await nutzer.click(screen.getByRole("checkbox", { name: /Rudolph/ }));
+    await nutzer.click(screen.getByRole("button", { name: "Aufteilen" }));
+    neuLaden();
+
+    expect(document.querySelectorAll(".einheit-zeile")).toHaveLength(2);
+    const quittung = screen.getByRole("status");
+    expect(quittung.className).toContain("quittung-daumen");
+    expect(quittung.textContent).toMatch(/„Fachberater" von „.*Wardenburg" abgeteilt\. Später zurück über „Mehr…" › „Zusammenführen…"\./);
+
+    await nutzer.click(within(quittung).getByRole("button", { name: "Rückgängig" }));
+    neuLaden();
+    expect(document.querySelectorAll(".einheit-zeile")).toHaveLength(1);
+    expect(einsaetzeLaden().find((s) => s.id === angelegt.id)!.eintraege.map((e) => e.id)).toEqual(vorher);
+    expect(document.querySelector(".quittung-daumen")).toBeNull();
   });
 });

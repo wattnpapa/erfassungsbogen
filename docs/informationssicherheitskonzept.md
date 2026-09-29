@@ -103,6 +103,12 @@ Grundlage: Repository `wattnpapa/erfassungsbogen`, Stand 2026-09-12 — Version 
 > alle QR-Codes eines Bildes und merkt Teile unvollständiger mehrteiliger
 > Bögen bis zu einer Stunde im Arbeitsspeicher (nicht im Gerätespeicher) für
 > den nächsten Durchgang (5.5).
+>
+> **Nachgezogen 2026-09-29:** Rückweg bei Aufteilen und Einsatz löschen (Audit
+> Runde 2, R2-D6) — „Rückgängig" nach dem Aufteilen entfernt die beiden dabei
+> angelegten Einträge und merkt ihre Kennungen in `eeb.entfernt.v1`; „Einsatz
+> löschen" quittiert auf der Startseite mit „Rückgängig" aus dem Papierkorb.
+> Kein neuer Speicherort (5.5).
 
 ## Hinweis zu diesem Dokument
 

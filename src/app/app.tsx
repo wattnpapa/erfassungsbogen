@@ -2372,7 +2372,7 @@ function AppInhalt() {
           onWeitergeben={() => sammelPdf(offenerEinsatz, "alle")}
           onLageblatt={() => lageblatt(offenerEinsatz)}
           eingang={eingang}
-          onGeloescht={() => { setOffenerEinsatzId(null); einsaetzeNeuLaden(); setMeldung("Einsatz in den Papierkorb verschoben."); }}
+          onGeloescht={() => { setOffenerEinsatzId(null); einsaetzeNeuLaden(); setMeldung(""); /* Quittung mit Rückweg: Startseite (R2-D6) */ }}
         />
         {(meldung || fehler) && (
           <p className={fehler ? "fehler" : "meldung"} role="status" style={{ textAlign: "center" }}>
