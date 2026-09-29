@@ -73,7 +73,7 @@ import {
   type Einsatzsammlung,
 } from "@bos/meldekopf/einsaetze";
 import { bogenDiff, diffKurzfassung } from "@bos/meldekopf/meldung-diff";
-import { SpeicherVollFehler, istSpeicherVoll, meldungAufnehmen } from "./eintrag-zeiten";
+import { SpeicherVollFehler, eintreffzeitSetzen, istSpeicherVoll, meldungAufnehmen } from "./eintrag-zeiten";
 import { offlineText, useOfflineStand } from "./offline-bereit";
 import { uebergabeFesthalten, uebergabeText, type UebergabeStand } from "./uebergabe-stand";
 import { ART_LABEL, EinsatzDetail, EinsatzListe, type Eingang } from "./einsaetze-ui";
@@ -88,6 +88,7 @@ import { TeilQuittung, fehlendeTeile, fehltNochSatz } from "./teil-quittung";
 import { qrAusBild } from "./qr-bild";
 import { dateiImportMeldung, istBilddatei, qrStapelLesen, stapelBericht as stapelBerichtZeilen, teileMerker } from "./qr-stapel";
 import { StapelQuittung } from "./stapel-quittung";
+import { EintreffzeitFeld, aehnlicherOrt, eintreffzeitAusUhrzeit } from "./nacherfassung";
 import {
   entwurfLaden,
   entwurfSpeichern,
@@ -723,6 +724,8 @@ function AppInhalt() {
     setSegmentStand(teile);
   };
   const [scanFortschritt, setScanFortschritt] = useState("");
+  // Nacherfassung vom Papier: Uhrzeit vom Meldeblock, leer = Zeit der Übernahme (R2-A5).
+  const [nachEintreffzeit, setNachEintreffzeit] = useState("");
 
   const vorlagenNeuLaden = () => setVorlagen(vorlagenLaden());
   const einsaetzeNeuLaden = () => setEinsaetze(einsaetzeLaden());
@@ -1272,15 +1275,15 @@ function AppInhalt() {
     // keine Frage: dort gilt „anhalten kostet mehr als nachträglich
     // zusammenführen".
     if (!bekannt && !schonDa && !kiosk && einsatz) {
-      const ort = einheitOrt(b.einheit)?.trim().toLowerCase();
-      const aehnlich = ort
-        ? neuesteJeEinheit(einsatz.eintraege).find(
-            (e) =>
-              e.einheitSchluessel !== schl &&
-              e.bogen.einheit.organisation === b.einheit.organisation &&
-              einheitOrt(e.bogen.einheit)?.trim().toLowerCase() === ort,
-          )
-        : undefined;
+      // Ort ohne Vorsätze wie „OV" und auch als Teil des anderen Namens — vorher
+      // buchstabengenau, „OV Albstadt" ≠ „Albstadt" zählte doppelt (R2-A5).
+      const ort = einheitOrt(b.einheit);
+      const aehnlich = neuesteJeEinheit(einsatz.eintraege).find(
+        (e) =>
+          e.einheitSchluessel !== schl &&
+          e.bogen.einheit.organisation === b.einheit.organisation &&
+          aehnlicherOrt(einheitOrt(e.bogen.einheit), ort),
+      );
       if (aehnlich) {
         const wahl = await frageWahl({
           titel: "Ist das dieselbe Einheit?",
@@ -1850,9 +1853,22 @@ function AppInhalt() {
     const b = bogen;
     if (!(await sollstaerkeFreigeben(b))) return;
     setMeldung("");
+    const zeit = eintreffzeitAusUhrzeit(nachEintreffzeit);
+    const vorherDa = new Set(einsaetzeLaden().find((s) => s.id === ziel)?.eintraege.map((e) => e.id));
     // Manuell erfasster Bogen ist kein signierter Transport.
     const ok = await bogenInSammlung(ziel, b, "manuell", undefined, false, eigenerBogenWartetHinweis());
     if (!ok) return;
+    // Uhrzeit vom Blatt an die NEUE Einheit (R2-A5). Eine Folgemeldung erbt
+    // die Eintreffzeit ihrer Vorgängerin, die bleibt maßgeblich.
+    if (zeit != null) {
+      const eintraege = einsaetzeLaden().find((s) => s.id === ziel)?.eintraege ?? [];
+      const neu = eintraege.find((e) => e.id === bogenInhaltsId(b) && !vorherDa.has(e.id));
+      if (neu && eintraege.filter((e) => e.einheitSchluessel === neu.einheitSchluessel).length === 1) {
+        eintreffzeitSetzen(ziel, neu.id, zeit);
+        einsaetzeNeuLaden();
+      }
+    }
+    setNachEintreffzeit("");
     setSammelZiel(null);
     setBogen(null);
     setFremdeErfassung(false);
@@ -1903,6 +1919,7 @@ function AppInhalt() {
       return;
     }
     setFremdeErfassung(true);
+    setNachEintreffzeit("");
     setSammelZiel(zielId);
     setOffenerEinsatzId(null); // Assistent übernimmt die Ansicht
     setMeldung("");
@@ -2784,6 +2801,11 @@ function AppInhalt() {
           `key` erzwingt den Neuaufbau, damit die Bewegung bei jedem Wechsel
           neu ansetzt — die Schritte tauschen ohnehin die Komponente. */}
       <div className={`schritt-inhalt ${richtung}`} key={schritt}>
+      {/* Nacherfassung für einen Einsatz: die Uhrzeit vom Meldeblock gleich
+          oben mitnehmen, statt sie danach je Karte über „ändern" (R2-A5). */}
+      {schritt === 0 && sammelEinsatz && fremdeErfassung && (
+        <EintreffzeitFeld wert={nachEintreffzeit} onAendern={setNachEintreffzeit} />
+      )}
       {schritt === 0 && <SchrittEinheit bogen={bogen} aendern={aendern} geheZu={setSchritt} />}
       {schritt === 1 && <SchrittEinsatz bogen={bogen} aendern={aendern} />}
       {schritt === 2 && <SchrittPersonal bogen={bogen} aendern={aendern} geheZu={setSchritt} />}

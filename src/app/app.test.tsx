@@ -629,6 +629,33 @@ describe("Assistenten-Durchlauf", () => {
     expect(einsaetzeLaden().find((x) => x.id === einsatz.id)!.eintraege).toHaveLength(1);
   }, 20000);
 
+  /**
+   * Audit Runde 2, R2-A5: Vom Papier abgetippt heißt die Einheit „OV
+   * Papierhausen", im Einsatz steht sie als „Papierhausen" — die Rückfrage
+   * schwieg, die Einheit zählte doppelt. Die Uhrzeit vom Meldeblock geht im
+   * selben Weg mit.
+   */
+  it("fragt bei „OV …“ ohne Einheitstyp nach und übernimmt die Eintreffzeit vom Blatt", async () => {
+    const einsatz = einsatzImSpeicherAnlegen("Sammelhausen", EinsatzArt.EINSATZ);
+    meldungHinzufuegen(einsatz.id, bogenMitName("Papierhausen"));
+    const nutzer = userEvent.setup();
+    render(<App />);
+    await nutzer.click(screen.getByRole("button", { name: "Öffnen" }));
+    await nutzer.click(await screen.findByRole("button", { name: "Einheit manuell erfassen…" }));
+    await nutzer.type(screen.getByLabelText("Eingetroffen um (vom Meldeblock)"), "09:40");
+    await nutzer.type(screen.getByLabelText("Name (Pflicht)"), "OV Papierhausen");
+    await nutzer.click(screen.getByRole("button", { name: "In Einsatz übernehmen" }));
+
+    const frage = await screen.findByRole("dialog", { name: "Ist das dieselbe Einheit?" });
+    await nutzer.click(within(frage).getByRole("button", { name: "Nein — als eigene Einheit führen" }));
+
+    const eintraege = einsaetzeLaden().find((s) => s.id === einsatz.id)!.eintraege;
+    const neu = eintraege.find((e) => e.bogen.einheit.hierarchie[0]!.name === "OV Papierhausen")!;
+    expect(new Date(neu.eingetroffenAm!).toTimeString().slice(0, 5)).toBe("09:40");
+    // Die vorhandene Einheit behält ihre Zeit.
+    expect(eintraege.find((e) => e.bogen.einheit.hierarchie[0]!.name === "Papierhausen")!.eingetroffenAm).toBeUndefined();
+  }, 20000);
+
   it("fragt bei einem alten Bogen vor der Übergabe nach und bereitet ihn für den neuen Einsatz vor (R2-S1)", async () => {
     const nutzer = userEvent.setup();
     const alt = bogenMitName("Althausen");
