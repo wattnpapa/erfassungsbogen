@@ -66,7 +66,7 @@
  * zweiter Lauf meldet 0 geänderte Seiten.
  */
 
-import { readFileSync, readdirSync, writeFileSync } from "node:fs";
+import { readFileSync, readdirSync, realpathSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -127,7 +127,7 @@ const THEMA_SKRIPT = `<!-- THEMA:JS:START -->
  * die schreiben ihre Rohwerte beim nächsten Lauf zurück, und dann trüge die
  * Kopfleiste im Dunkeln wieder Weiß — das Sicherheitsnetz fängt genau das.
  */
-const THEMA_CSS = `    /* THEMA:CSS:START */
+export const THEMA_CSS = `    /* THEMA:CSS:START */
     /* Anzeigemodus der App (Modus-Regel, scripts/content-stil.mts): Werte aus
        index.html. Feld: 112 % Schrift, harte Linien, schwarze Schrift. Dunkel
        und Nacht: dunkle Flächen, helle Schrift; nachts weicht die Kennfarbe
@@ -140,7 +140,9 @@ const THEMA_CSS = `    /* THEMA:CSS:START */
     html.nacht-modus :is(.kopfnav, .kopfnav-unter, .hinweis, table, th, .themenliste li, .laenderliste a) { background: var(--flaeche); }
     html.dunkel-modus :is(.kopfnav-links a, footer, figcaption, .fussnav-titel, .marken-hinweis, .sprungmenue-titel, .abschluss .zusicherung, .laenderliste .anzahl, h2#andere-bundeslaender, h2#andere-bundeslaender + p, .frage > summary::before, .aufklapp > summary::before),
     html.nacht-modus :is(.kopfnav-links a, footer, figcaption, .fussnav-titel, .marken-hinweis, .sprungmenue-titel, .abschluss .zusicherung, .laenderliste .anzahl, h2#andere-bundeslaender, h2#andere-bundeslaender + p, .frage > summary::before, .aufklapp > summary::before) { color: var(--text-2); }
-    html.dunkel-modus :is(.start, .sprunglink), html.nacht-modus :is(.start, .sprunglink) { color: var(--auf-blau); }
+    /* Der umrandete Knopf .start.papier steht auf der Fläche, nicht auf der
+       Kennfarbe — er behält seine Schrift in var(--blau) (R2-L1). */
+    html.dunkel-modus :is(.start:not(.papier), .sprunglink), html.nacht-modus :is(.start:not(.papier), .sprunglink) { color: var(--auf-blau); }
     /* Fotos und Bildschirmfotos sind nachts helle Flächen — gedimmt, aber
        erkennbar. Die Strichcodes (.scancodes) bleiben ungedimmt: sie werden
        vom Bildschirm abgescannt. */
@@ -209,7 +211,12 @@ const REGELN: Regel[] = [
     ersetzen: `color: ${TEXT_2}`,
   },
   {
+    // Nur in `:root`: Die Modus-Blöcke (THEMA:CSS) belegen `--text` bewusst
+    // anders — hell in Dunkel/Nacht, #000000 im Feld. Ungebunden schrieb diese
+    // Regel dort ebenfalls #11141b zurück; Überschriften und Fließtext standen
+    // dann im Dunkeln bei 1,01:1 auf dem Grund (Audit Runde 2, R2-L1).
     name: "Textfarbe als Token",
+    selektor: /^:root$/,
     suchen: /--text:\s*#(?!11141b\b)[0-9a-f]{3,8}\b/gi,
     ersetzen: `--text: ${TEXT}`,
   },
@@ -486,7 +493,7 @@ function inSelektorErsetzen(css: string, regel: Regel): { css: string; anzahl: n
 }
 
 /** Nur der <style>-Block wird angefasst — im Fließtext hat nichts davon etwas zu suchen. */
-function stilAngleichen(html: string): { html: string; treffer: Record<string, number> } {
+export function stilAngleichen(html: string): { html: string; treffer: Record<string, number> } {
   const treffer: Record<string, number> = {};
   const neu = html.replace(/<style>([\s\S]*?)<\/style>/, (_ganz, css: string) => {
     let angepasst = css;
@@ -503,10 +510,6 @@ function stilAngleichen(html: string): { html: string; treffer: Record<string, n
     angepasst = token.css;
     if (token.ergaenzt) treffer["Rollen-Token angelegt"] = (treffer["Rollen-Token angelegt"] ?? 0) + token.ergaenzt;
 
-    const thema = themaCssEinbinden(angepasst);
-    angepasst = thema.css;
-    if (thema.ergaenzt) treffer["Modus-Block eingebunden"] = (treffer["Modus-Block eingebunden"] ?? 0) + 1;
-
     for (const regel of REGELN) {
       if (regel.selektor || regel.ausser) {
         const { css: nachher, anzahl } = inSelektorErsetzen(angepasst, regel);
@@ -522,6 +525,16 @@ function stilAngleichen(html: string): { html: string; treffer: Record<string, n
         angepasst = angepasst.replace(regel.suchen, regel.ersetzen);
       }
     }
+
+    // Der Modus-Block kommt erst NACH den Regeln hinein und ersetzt eine ältere
+    // Fassung vollständig: Er trägt die Werte aus index.html wörtlich, und
+    // keine Angleich-Regel darf sie verändern. Vorher lief er durch die Regeln,
+    // und „Textfarbe als Token“ machte aus dem hellen Text der dunklen Modi
+    // Tintenschwarz (Audit Runde 2, R2-L1).
+    const thema = themaCssEinbinden(angepasst);
+    angepasst = thema.css;
+    if (thema.ergaenzt) treffer["Modus-Block eingebunden"] = (treffer["Modus-Block eingebunden"] ?? 0) + 1;
+
     return `<style>${angepasst}</style>`;
   });
   const skript = themaSkriptEinbinden(neu);
@@ -549,4 +562,6 @@ function main(): void {
   for (const [name, anzahl] of Object.entries(gesamt)) console.log(`  ${name}: ${anzahl} Werte`);
 }
 
-main();
+// Direkt aufgerufen (npm run content-stil): Seiten schreiben. Als Modul
+// importiert — von scripts/content-stil.test.ts — passiert hier nichts.
+if (process.argv[1] && import.meta.filename === realpathSync(process.argv[1])) main();

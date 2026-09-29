@@ -284,15 +284,17 @@
        index.html. Feld: 112 % Schrift, harte Linien, schwarze Schrift. Dunkel
        und Nacht: dunkle Flächen, helle Schrift; nachts weicht die Kennfarbe
        Bernstein, damit kein sattes Blau die Dunkeladaption zerstört. */
-    html.feld-modus { font-size: 112%; --grau: #e8eaef; --text: #11141b; --text-2: #262b36; --rand: #111318; --flaeche-2: #dfe3ea; }
-    html.dunkel-modus { color-scheme: dark; --grau: #0f1116; --flaeche: #171a21; --flaeche-2: #21252e; --text: #11141b; --text-2: #aab2c2; --rand: #3a414f; --blau: #a8bdf2; --blau-hell: #c6d4f8; --auf-blau: #101a33; }
-    html.nacht-modus { color-scheme: dark; --grau: #0d0c08; --flaeche: #17150f; --flaeche-2: #221f16; --text: #11141b; --text-2: #a2977e; --rand: #423c2d; --blau: #a8791a; --blau-hell: #c9932c; --auf-blau: #100d07; }
+    html.feld-modus { font-size: 112%; --grau: #e8eaef; --text: #000000; --text-2: #262b36; --rand: #111318; --flaeche-2: #dfe3ea; }
+    html.dunkel-modus { color-scheme: dark; --grau: #0f1116; --flaeche: #171a21; --flaeche-2: #21252e; --text: #e7eaf1; --text-2: #aab2c2; --rand: #3a414f; --blau: #a8bdf2; --blau-hell: #c6d4f8; --auf-blau: #101a33; }
+    html.nacht-modus { color-scheme: dark; --grau: #0d0c08; --flaeche: #17150f; --flaeche-2: #221f16; --text: #d9cdb6; --text-2: #a2977e; --rand: #423c2d; --blau: #a8791a; --blau-hell: #c9932c; --auf-blau: #100d07; }
     /* Sicherheitsnetz gegen die Rohwerte der anderen Generatoren (siehe oben). */
     html.dunkel-modus :is(.kopfnav, .kopfnav-unter, .hinweis, table, th, .themenliste li, .laenderliste a),
     html.nacht-modus :is(.kopfnav, .kopfnav-unter, .hinweis, table, th, .themenliste li, .laenderliste a) { background: var(--flaeche); }
     html.dunkel-modus :is(.kopfnav-links a, footer, figcaption, .fussnav-titel, .marken-hinweis, .sprungmenue-titel, .abschluss .zusicherung, .laenderliste .anzahl, h2#andere-bundeslaender, h2#andere-bundeslaender + p, .frage > summary::before, .aufklapp > summary::before),
     html.nacht-modus :is(.kopfnav-links a, footer, figcaption, .fussnav-titel, .marken-hinweis, .sprungmenue-titel, .abschluss .zusicherung, .laenderliste .anzahl, h2#andere-bundeslaender, h2#andere-bundeslaender + p, .frage > summary::before, .aufklapp > summary::before) { color: var(--text-2); }
-    html.dunkel-modus :is(.start, .sprunglink), html.nacht-modus :is(.start, .sprunglink) { color: var(--auf-blau); }
+    /* Der umrandete Knopf .start.papier steht auf der Fläche, nicht auf der
+       Kennfarbe — er behält seine Schrift in var(--blau) (R2-L1). */
+    html.dunkel-modus :is(.start:not(.papier), .sprunglink), html.nacht-modus :is(.start:not(.papier), .sprunglink) { color: var(--auf-blau); }
     /* Fotos und Bildschirmfotos sind nachts helle Flächen — gedimmt, aber
        erkennbar. Die Strichcodes (.scancodes) bleiben ungedimmt: sie werden
        vom Bildschirm abgescannt. */
