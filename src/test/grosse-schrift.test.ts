@@ -142,13 +142,44 @@ describe("Fußleiste des Assistenten wächst nicht mit der Schrift (R2-M1)", () 
 describe("Assistenten-Kopf verdichtet sich bei großer Schrift (R2-M1)", () => {
   it("der Kopf ist Container, die Schwelle liegt in rem der tatsächlichen Schrift", () => {
     expect(wert(".seiten-kopf.assistent-kopf", "container")).toBe("kopf / inline-size");
-    const kontext = APP.map((r) => r.kontext).find((k) => k.startsWith("@container kopf"));
+    // Die Abfrage, die die Schrittleiste rollen lässt (daneben gibt es eine
+    // weitere für den Anzeigemodus, R2-H7).
+    const kontext = APP.find(
+      (r) => r.kontext.startsWith("@container kopf") && r.selektoren.includes(".seiten-kopf.assistent-kopf .schritte"),
+    )?.kontext;
     const schwelle = Number(kontext?.match(/max-width: ([\d.]+)rem/)?.[1]);
     // Unter 320 px ÷ (16 px × 112 % Feld-Modus) = 17,86rem: bei normaler
     // Schrift greift sie auf keinem Telefon, auch nicht im Feld-Modus.
     expect(schwelle).toBeGreaterThan(0);
     expect(schwelle).toBeLessThan(320 / (16 * 1.12));
     expect(werte(APP, ".seiten-kopf.assistent-kopf .schritte", "flex-wrap", kontext)).toEqual(["nowrap"]);
+  });
+});
+
+describe("Assistenten-Kopf auf dem Telefon (R2-H7)", () => {
+  const TELEFON = "@media (max-width: 29.999rem)";
+
+  it("Titel und Schrittnamen sind nur aus dem Bild genommen, nicht aus dem Baum", () => {
+    for (const selektor of [
+      ".seiten-kopf.assistent-kopf .titelzeile h1",
+      ".seiten-kopf.assistent-kopf .schritte .schritt-name",
+    ]) {
+      expect(werte(APP, selektor, "clip-path", TELEFON)).toEqual(["inset(50%)"]);
+      expect(werte(APP, selektor, "display", TELEFON)).toEqual([]);
+      expect(werte(APP, selektor, "visibility", TELEFON)).toEqual([]);
+    }
+  });
+
+  it("der Anzeigemodus klappt nur auf dem Telefon ein", () => {
+    expect(wert(".anzeige-schalter .anzeige-klappe", "display")).toBe("none");
+    expect(werte(APP, ".anzeige-schalter.klappbar .anzeige-klappe", "display", TELEFON)).toEqual(["inline-flex"]);
+    expect(werte(APP, ".anzeige-schalter.klappbar:not(.offen) > button:not(.anzeige-klappe)", "display", TELEFON)).toEqual([
+      "none",
+    ]);
+  });
+
+  it("die ausgeblendeten Schrittnamen bleiben im Rahmen der Leiste (vgl. R2-G2)", () => {
+    expect(werte(APP, ".seiten-kopf.assistent-kopf .schritte", "position", TELEFON)).toEqual(["relative"]);
   });
 });
 

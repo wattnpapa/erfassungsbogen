@@ -797,6 +797,88 @@
       .seiten-kopf.assistent-kopf .autosave { padding-bottom: var(--r-2); }
       .seiten-kopf.assistent-kopf .schritte button { padding: 0.4rem 0.55rem; }
     }
+    /* Runde 2 (R2-H7): Trotz der Maßnahme oben endete der Kopf bei 360 × 640
+       wieder bei 327 px (Standard) und 394 px (Feld), dazu 77/117 px
+       Übungsband — in Schritt 2 und 4 stand im ersten Bild kein Feld, im
+       Feld-Thema in keinem Schritt. Der Kopf wird deshalb auf dem Telefon
+       auf drei schmale Zeilen gefaltet, ohne etwas zu entfernen:
+       1. Zeichen der Einheit, „‹ Startseite" und der Anzeigemodus als
+          Klappknopf („Standard ▾", anzeige-schalter.tsx) in EINER Zeile. Der
+          Titel „Einheiten-Erfassungsbogen" ist auf jedem Schritt derselbe; er
+          bleibt als Überschrift für Vorlesesoftware im Baum, nur nicht im Bild.
+       2. Die Speicherzeile einzeilig; wird sie gekürzt, fehlt nur „— bleibt
+          auf diesem Gerät". Die Warnung bei vollem Speicher bleibt ganz.
+       3. Die Schrittleiste in einer Zeile: Nummer und Stand je Schritt, der
+          aktive Reiter unterstrichen. Den Namen des aktiven Schritts trägt die
+          Überschrift direkt darunter („4. Fahrzeuge"); alle Namen stehen
+          weiter im Knopf, für Vorlesesoftware. Mit Namen am aktiven Reiter
+          („5. Sofortbedarf ✓") passte die Zeile auf 360 px nicht, „6" fiel
+          allein in eine zweite. Keiner der sechs Reiter verschwindet — anders
+          als bei der waagerecht rollenden Leiste, die oben verworfen ist.
+          Passt die Zeile nicht (viele „offen"), bricht sie um. */
+    @media (max-width: 29.999rem) {
+      .seiten-kopf.assistent-kopf .kopf-inhalt { flex-direction: row; flex-wrap: wrap; align-items: center; column-gap: var(--r-3); }
+      .seiten-kopf.assistent-kopf .kopf-oberzeile { order: 0; flex: 1 1 0; min-width: 0; }
+      .seiten-kopf.assistent-kopf .titelzeile { order: -1; flex: 0 0 auto; padding: 0; }
+      .seiten-kopf.assistent-kopf .titelzeile h1 {
+        position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap;
+      }
+      /* Mit Modus-Marke („Schnellerfassung", „Aufnahme für: …") bekommt die
+         Titelzeile eine eigene Zeile unter dem Rücksprung: die Marke sagt,
+         WAS hier erfasst wird, und darf nicht in die Rücksprungzeile drängen. */
+      .seiten-kopf.assistent-kopf .titelzeile:has(.modus-marke) { order: 1; flex: 1 1 100%; flex-wrap: nowrap; min-width: 0; padding-bottom: var(--r-2); }
+      /* In der Einsatz-Erfassung tragen Rücksprung und Marke den frei
+         vergebenen Namen der Sammlung — beide einzeilig, gekürzt wird der
+         Name; der volle Text bleibt Knopf- bzw. Markentext (Vorlesesoftware)
+         und steht in der Marke zusätzlich als title. Vorher: Rücksprung auf
+         360 px zweizeilig, Kopf 285 px. Gekürzt wird höchstens auf 7em —
+         bei großer Systemschrift rutscht der Anzeigemodus dann in die
+         nächste Zeile, statt „‹ Startseite" auf „‹" zu kürzen. */
+      .seiten-kopf.assistent-kopf .kopf-oberzeile .zur-start {
+        display: block; flex: 1 1 0; min-width: min(100%, 7em); text-align: left;
+        white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        line-height: calc(var(--ziel-basis) + var(--ziel) - 0.4rem);
+      }
+      .seiten-kopf.assistent-kopf .kopf-oberzeile .anzeige-schalter { flex: 0 0 auto; }
+      .seiten-kopf.assistent-kopf .titelzeile .modus-marke { flex: 0 1 auto; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+      .seiten-kopf.assistent-kopf .autosave { order: 2; flex: 1 1 100%; padding-bottom: var(--r-1); }
+      .seiten-kopf.assistent-kopf .autosave:not(.speicher-fehler) { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+      /* position: relative hält die ausgeblendeten Namen (absolut) im Rahmen
+         der Leiste — sonst lägen sie bei rollender Leiste (große Schrift)
+         außerhalb und verbreiterten die Seite, vgl. R2-G2. */
+      .seiten-kopf.assistent-kopf .schritte { order: 3; flex: 1 1 100%; position: relative; }
+      .seiten-kopf.assistent-kopf .schritte button { flex: 1 0 auto; justify-content: center; padding-inline: 0.3rem; gap: 0.25rem; }
+      .seiten-kopf.assistent-kopf .schritte .schritt-status { margin-left: 0; }
+      .seiten-kopf.assistent-kopf .schritte .schritt-name {
+        position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap;
+      }
+      /* Anzeigemodus: nur der gewählte als Klappknopf; aufgeklappt stehen die
+         vier Segmente in einer eigenen Zeile. */
+      .anzeige-schalter.klappbar .anzeige-klappe { display: inline-flex; align-items: center; gap: 0.3em; }
+      .anzeige-schalter.klappbar:not(.offen) > button:not(.anzeige-klappe) { display: none; }
+      .seiten-kopf.assistent-kopf .kopf-oberzeile:has(.anzeige-schalter.offen) .anzeige-schalter { flex: 1 1 100%; }
+      .anzeige-schalter.klappbar.offen .anzeige-klappe { flex: 1 1 100%; justify-content: center; }
+      .anzeige-schalter.klappbar.offen > button:not(.anzeige-klappe) { flex: 1 1 0; border-top: var(--strich) solid var(--kopf-linie); }
+      /* Übungsband einzeilig: „ÜBUNG" — die rechtlich erhebliche Kennzeichnung —
+         steht vorn und bleibt immer sichtbar; der erklärende Satz dahinter
+         wird notfalls gekürzt und bleibt im Baum für Vorlesesoftware. */
+      .uebungs-band { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-block: 0.25rem; }
+      /* Unter dem Kopf reicht der schmale Abstand wie im Querformat. */
+      .seiten-kopf.assistent-kopf ~ main { padding-top: var(--r-3); }
+    }
+    .anzeige-schalter .anzeige-klappe { display: none; }
+    /* Dasselbe Einklappen bei großer Systemschrift jenseits der Telefonbreite
+       (Telefon quer, 640 × 360 bei 200 %): dort standen Rücksprung und vier
+       Segmente auf drei Zeilen, und die Schrittleiste lag unter der
+       Fußleiste. Die Container-Abfrage zählt in der tatsächlichen Schrift;
+       bei normaler Schrift ist der Kopf hier immer breiter als 24rem. */
+    @container kopf (max-width: 24rem) {
+      .anzeige-schalter.klappbar .anzeige-klappe { display: inline-flex; align-items: center; gap: 0.3em; }
+      .anzeige-schalter.klappbar:not(.offen) > button:not(.anzeige-klappe) { display: none; }
+    }
+    /* Der (ausgeblendete) Klappknopf steht vor „Standard" — ohne dies bekäme
+       „Standard" die Trennlinie eines Folgesegments. */
+    .anzeige-schalter .anzeige-klappe + button { border-left: none; }
     /* Große Systemschrift (Audit Runde 2, R2-M1): bei 200 % auf 360 × 640
        war der Kopf 1 155 px hoch, die Überschrift „1. Einheit" begann zweieinhalb
        Bildhöhen tiefer. Eine Medienabfrage sieht die Systemschrift nicht (rem

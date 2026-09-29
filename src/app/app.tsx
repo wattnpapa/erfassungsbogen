@@ -2707,7 +2707,7 @@ function AppInhalt() {
             ‹ Startseite
           </button>
         )}
-        <AnzeigeSchalter />
+        <AnzeigeSchalter klappbar />
       </div>
       <div className="titelzeile">
         {/* Taktisches Zeichen der Einheit als „Avatar" — Wiedererkennung auf einen Blick. */}
@@ -2760,7 +2760,10 @@ function AppInhalt() {
               title={st ? SCHRITT_STATUS_TITEL[st] : undefined}
               onClick={() => setSchritt(i)}
             >
-              {i + 1}. {name}
+              {/* Name in eigenem Span: auf dem Telefon steht nur die Nummer im
+                  Bild, der Name bleibt für Vorlesesoftware im Knopf (R2-H7).
+                  Der äußere Span hält Nummer und Name als EIN Flex-Kind. */}
+              <span>{i + 1}<span className="schritt-name">. {name}</span></span>
               {glyph && <span className="schritt-status" aria-hidden="true">{glyph}</span>}
             </button>
           );

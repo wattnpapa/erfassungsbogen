@@ -12,8 +12,17 @@ import {
   type AnzeigeModus,
 } from "./anzeige-modus";
 
-export function AnzeigeSchalter() {
+/**
+ * `klappbar` (Assistenten-Kopf, R2-H7): Auf dem Telefon steht nur der gewählte
+ * Modus als Knopf da („Standard ▾"); ein Tipp klappt die vier Segmente auf.
+ * Die vier Segmente brauchten sonst eine eigene Kopfzeile — neben
+ * „‹ Startseite" passen sie im Feld-Modus nicht. Ab 30rem Breite blendet das
+ * Stylesheet den Klappknopf aus und zeigt die Segmente wie gewohnt; das
+ * Ausblenden ist reines CSS, im Baum stehen immer alle Knöpfe.
+ */
+export function AnzeigeSchalter({ klappbar = false }: { klappbar?: boolean }) {
   const [modus, setModus] = useState<AnzeigeModus>(() => anzeigeModus());
+  const [offen, setOffen] = useState(false);
 
   // Es gibt mehrere Instanzen (Kopfbereich + Fußzeile) — über das Event
   // bleiben alle auf demselben Stand, egal wo umgeschaltet wird.
@@ -26,10 +35,27 @@ export function AnzeigeSchalter() {
   function waehle(m: AnzeigeModus) {
     setModus(m);
     anzeigeModusSetzen(m);
+    setOffen(false);
   }
 
+  const klassen = ["anzeige-schalter", klappbar ? "klappbar" : "", klappbar && offen ? "offen" : ""]
+    .filter(Boolean)
+    .join(" ");
+  const aktuell = ANZEIGE_MODI.find((x) => x.modus === modus)?.label ?? "";
+
   return (
-    <span className="anzeige-schalter" role="group" aria-label="Anzeigemodus">
+    <span className={klassen} role="group" aria-label="Anzeigemodus">
+      {klappbar && (
+        <button
+          type="button"
+          className="anzeige-klappe"
+          aria-expanded={offen}
+          aria-label={`Anzeigemodus ${aktuell} – ${offen ? "zuklappen" : "ändern"}`}
+          onClick={() => setOffen((o) => !o)}
+        >
+          {aktuell} <span aria-hidden="true">{offen ? "▴" : "▾"}</span>
+        </button>
+      )}
       {ANZEIGE_MODI.map(({ modus: m, label, titel }) => (
         <button
           key={m}
