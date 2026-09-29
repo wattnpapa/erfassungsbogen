@@ -7,6 +7,7 @@
 
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
+import { kontrast } from "./org-farben";
 
 const html = readFileSync(new URL("../../index.html", import.meta.url), "utf8");
 // Kommentare raus, sonst zählen Begründungen als Regeln.
@@ -30,5 +31,31 @@ describe("Fußleiste und Safe-Area (R2-M7)", () => {
       expect(r).not.toMatch(/calc\([^;]*safe-area-inset/);
     }
     expect(regeln.join("\n")).toMatch(/padding-bottom:\s*max\(0\.25rem, env\(safe-area-inset-bottom\)\)/);
+  });
+});
+
+/** Wert eines Tokens im ersten Block mit genau diesem Selektor. */
+function token(selektor: string, name: string): string {
+  for (const b of bloecke(selektor)) {
+    const m = new RegExp(`${name}:\\s*(#[0-9a-fA-F]{6})\\s*;`).exec(b);
+    if (m) return m[1];
+  }
+  throw new Error(`${name} fehlt in ${selektor}`);
+}
+
+describe("Feldrahmen in den dunklen Themen (R2-L3)", () => {
+  it.each([".dunkel-modus", ".nacht-modus"])("%s: Rahmen ≥ 3:1 auf Karte und zweiter Fläche", (modus) => {
+    const rahmen = token(modus, "--linie-stark");
+    for (const grund of ["--flaeche", "--flaeche-2", "--grund"]) {
+      expect(kontrast(rahmen, token(modus, grund)), `${modus} ${grund}`).toBeGreaterThanOrEqual(3);
+    }
+    // … ohne heller zu werden als die blasseste Schrift.
+    expect(kontrast(rahmen, token(modus, "--flaeche"))).toBeLessThan(
+      kontrast(token(modus, "--text-3"), token(modus, "--flaeche")),
+    );
+  });
+
+  it("Eingabefelder ziehen ihren Rahmen aus --linie-stark", () => {
+    expect(bloecke("input, select, textarea").join("\n")).toMatch(/border:[^;]*var\(--linie-stark\)/);
   });
 });

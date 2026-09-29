@@ -3629,7 +3629,12 @@
       --text-3:      #848da0;
       --linie-fein:  #272c36;
       --linie:       #3a414f;
-      --linie-stark: #525b6b;
+      /* Rahmen von Eingabefeldern, Auswahllisten und Nebenknöpfen: mit
+         #525b6b standen sie bei 2,54:1 auf der Karte, ihre Füllung ist die
+         Karte selbst — leere Felder zeichneten sich nur über den Platzhalter
+         ab (Audit Runde 2, R2-L3). #676f80 hält 3,45:1 auf --flaeche und
+         3,04:1 auf --flaeche-2, bleibt aber deutlich unter --text-3. */
+      --linie-stark: #676f80;
       /* Auf dunklem Grund trägt nicht der Grundton der Organisation, sondern
          ihr aufgehellter Ton (org-farben.ts: `dunkel`); die Schrift darauf ist
          entsprechend der tiefe Ton. Ohne offenen Bogen greift das THW-Blau. */
@@ -3696,7 +3701,11 @@
       --text-3:      #877c66;
       --linie-fein:  #2b271d;
       --linie:       #423c2d;
-      --linie-stark: #5c5440;
+      /* Feldrahmen nachts ≥ 3:1 (R2-L3, vorher #5c5440 mit 2,43:1): #746a51
+         misst 3,41:1 auf --flaeche und 3,08:1 auf --flaeche-2 — gerade so
+         viel, dass das nächste leere Feld bei kleinster Displayhelligkeit
+         zu finden ist, und dunkler als jede Schrift (--text-3 #877c66). */
+      --linie-stark: #746a51;
       /* Auch die Kennfarbe weicht nachts einem warmen Ton: ein sattes
          Organisationsblau wäre genau das Licht, das die Dunkeladaption
          zerstört. Die Organisation bleibt am taktischen Zeichen erkennbar. */
