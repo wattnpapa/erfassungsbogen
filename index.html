@@ -2698,12 +2698,11 @@
       padding-left: env(safe-area-inset-left);
       padding-right: env(safe-area-inset-right);
     }
-    /* Deckel wie oben an footer.nav (R2-M1). */
-    footer.nav {
-      padding-bottom: calc(min(0.7rem, 12.5px) + env(safe-area-inset-bottom));
-      padding-left: calc(min(1rem, 18px) + env(safe-area-inset-left));
-      padding-right: calc(min(1rem, 18px) + env(safe-area-inset-right));
-    }
+    /* footer.nav trägt seine Safe-Area schon in der Grundregel (max() statt
+       Addition, mit Deckel R2-M1) und in der Querformat-Verdichtung. Hier
+       stand früher eine gleich spezifische calc()-Fassung; sie kam später und
+       gewann: quer 11,2 statt 4 px Polster unten, mit Home-Indikator 45 statt
+       34 px (Audit Runde 2, R2-M7). Deshalb hier bewusst keine Regel mehr. */
 
     /* ---------------------------------------------------------------
        Native iOS-Anmutung nach den Apple Human Interface Guidelines –
