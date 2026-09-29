@@ -63,6 +63,83 @@ export function sicherungParsen(text: string): Record<string, string> {
   return eintraege;
 }
 
+/** Zeitpunkt, zu dem die Sicherung erstellt wurde (ISO), oder null. */
+export function sicherungErstelltAm(text: string): string | null {
+  try {
+    const s = JSON.parse(text) as Partial<Sicherung>;
+    return typeof s?.erstellt === "string" ? s.erstellt : null;
+  } catch {
+    return null;
+  }
+}
+
+// ------------------------------------------ Was ersetzt wird (für die Rückfrage)
+
+/** Eine Einsatz-Sammlung, wie die Rückfrage vor dem Einspielen sie nennt. */
+export interface SammlungKurz {
+  name: string;
+  meldungen: number;
+  papierkorb: boolean;
+}
+
+/**
+ * Inhalt eines Bestands (Gerät oder Sicherungsdatei) — Sammlungen beim Namen,
+ * dazu Vorlagen und Entwurf. „Sicherung einspielen" ersetzt ALLES; die
+ * Rückfrage nannte bisher weder, was auf dem Gerät verschwindet, noch, was die
+ * Datei bringt (Audit Runde 2, R2-D3). Gelesen wird aus den rohen Einträgen,
+ * damit Gerät und Datei mit derselben Elle gemessen werden.
+ */
+export interface BestandUmfang {
+  sammlungen: SammlungKurz[];
+  vorlagen: number;
+  entwurf: boolean;
+}
+
+const EINSAETZE_SCHLUESSEL = "eeb.einsaetze.v1";
+const VORLAGEN_SCHLUESSEL = "eeb.vorlagen.v1";
+const ENTWURF_SCHLUESSEL = "eeb.entwurf.v1";
+
+function jsonListe(roh: string | undefined): unknown[] {
+  if (!roh) return [];
+  try {
+    const x: unknown = JSON.parse(roh);
+    return Array.isArray(x) ? x : [];
+  } catch {
+    return [];
+  }
+}
+
+export function bestandUmfang(eintraege: Record<string, string>): BestandUmfang {
+  const sammlungen: SammlungKurz[] = [];
+  for (const e of jsonListe(eintraege[EINSAETZE_SCHLUESSEL])) {
+    const s = e as { name?: unknown; eintraege?: unknown; geloeschtAm?: unknown };
+    if (!s || !Array.isArray(s.eintraege)) continue;
+    sammlungen.push({
+      name: typeof s.name === "string" && s.name ? s.name : "(ohne Namen)",
+      meldungen: s.eintraege.length,
+      papierkorb: typeof s.geloeschtAm === "number",
+    });
+  }
+  return {
+    sammlungen,
+    vorlagen: jsonListe(eintraege[VORLAGEN_SCHLUESSEL]).length,
+    entwurf: !!eintraege[ENTWURF_SCHLUESSEL],
+  };
+}
+
+/** Bestand dieses Geräts, gemessen wie eine Sicherungsdatei. */
+export function geraetBestand(): BestandUmfang {
+  const s = speicher();
+  const eintraege: Record<string, string> = {};
+  if (s) {
+    for (const k of [EINSAETZE_SCHLUESSEL, VORLAGEN_SCHLUESSEL, ENTWURF_SCHLUESSEL]) {
+      const v = s.getItem(k);
+      if (v != null) eintraege[k] = v;
+    }
+  }
+  return bestandUmfang(eintraege);
+}
+
 // ------------------------------------------------- localStorage-Hülle (I/O)
 
 function speicher(): Storage | null {

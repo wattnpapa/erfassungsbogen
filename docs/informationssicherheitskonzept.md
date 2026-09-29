@@ -48,6 +48,12 @@ Grundlage: Repository `wattnpapa/erfassungsbogen`, Stand 2026-09-12 — Version 
 > Sammel-PDF (Audit Runde 2, R2-A1) — Eintreff-/Abrückzeit, Zug und
 > Auftrag/Notiz stehen zusätzlich über jedem Bogen und neben jedem QR-Code;
 > der QR-Code selbst bleibt unverändert (kein Formatwechsel) (5.4).
+>
+> **Nachgezogen 2026-09-29:** „Sicherung einspielen" (Audit Runde 2, R2-D3)
+> prüft die Datei vor der Rückfrage und nennt dort die laufenden Sammlungen des
+> Geräts mit Namen und Meldungszahl sowie den Inhalt der Datei; es bietet
+> „Vorher Sicherung erstellen…" an und verlangt einen Haken, sobald laufende
+> Sammlungen ersetzt würden (5.5).
 
 ## Hinweis zu diesem Dokument
 
@@ -400,6 +406,13 @@ Datenausleitung an eine andere Herkunft ist technisch unterbunden.
   die Einträge nur im Arbeitsspeicher der geöffneten Ansicht, bis weitergeklickt
   wird — es gibt keinen Papierkorb für einzelne Meldungen. „Fassung
   verwerfen…" in der Historie nimmt gezielt eine einzelne Fassung heraus.
+- **Sicherung einspielen** (`src/app/sicherung.ts`, `src/app/fusszeile.tsx`):
+  ersetzt alle `eeb.*`-Einträge des Geräts ohne Papierkorb — dieselbe Folge
+  wie „Alle Daten löschen". Seit 2026-09-29 (R2-D3) wird die Datei vorher
+  geprüft (eine kaputte Datei ändert nichts), die Rückfrage nennt die
+  laufenden Sammlungen des Geräts und den Inhalt der Datei, bietet „Vorher
+  Sicherung erstellen…" an und verlangt einen Haken, sobald laufende
+  Sammlungen mit Meldungen betroffen sind.
 - **Schema-Migration** (`src/app/hilfen.ts`): verhindert, dass ältere Datensätze
   mit veralteten Feldbedeutungen fehlinterpretiert werden.
 - **Absenderkarte vollständig optional** (Opt-in), ohne Eingabe als „keine

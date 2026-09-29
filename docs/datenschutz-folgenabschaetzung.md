@@ -51,6 +51,12 @@ Grundlage: Repository `wattnpapa/erfassungsbogen`, Stand 2026-09-12 — Version 
 > Auftrag/Notiz je Einheit über deren Bogen und neben dem QR-Code. Keine neuen
 > Daten, kein neuer Empfänger; der QR-Code bleibt unverändert. Geändert: 5.1,
 > 5.5.
+>
+> **Nachgezogen 2026-09-29 — Sicherung einspielen (Audit Runde 2, R2-D3):**
+> Die Rückfrage vor dem Ersetzen nennt die laufenden Sammlungen des Geräts
+> und den Inhalt der Datei, bietet eine Sicherung vorher an und verlangt einen
+> Haken, wenn laufende Sammlungen betroffen sind. Keine neuen Daten.
+> Geändert: 5.7.
 
 ## Hinweis zu diesem Dokument
 
@@ -341,6 +347,12 @@ Kapitel 6 der [Arc42-Dokumentation](arc42-architektur.md).
   blieb bei Folgemeldungen die ältere Fassung mit ihren Personendaten stehen
   (Audit Runde 2, R2-D1). Der Rückweg „Rückgängig" lebt nur im Arbeitsspeicher
   der offenen Ansicht, nicht im Gerätespeicher.
+- **Sicherung einspielen:** ersetzt alle App-Daten des Geräts ohne
+  Papierkorb (`src/app/sicherung.ts`). Seit 2026-09-29 nennt die Rückfrage
+  die laufenden Sammlungen mit Namen und Meldungszahl sowie den Inhalt der
+  Datei, bietet „Vorher Sicherung erstellen…" an und verlangt einen Haken,
+  sobald laufende Sammlungen betroffen sind (Audit Runde 2, R2-D3) — damit
+  gehen fremde Meldungen nicht mehr unbemerkt verloren (Verfügbarkeit).
 - **Strukturelle Grenze:** Sobald ein Bogen als QR-Code gescannt, als PDF
   gedruckt oder als Datei exportiert wurde, hat die App auf diese Kopien keinen
   Zugriff mehr (vertiefend 6.3).

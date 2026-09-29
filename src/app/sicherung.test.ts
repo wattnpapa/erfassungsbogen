@@ -1,7 +1,10 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import {
   alleDatenLoeschen,
+  bestandUmfang,
   datenUmfang,
+  geraetBestand,
+  sicherungErstelltAm,
   sicherungEinspielen,
   sicherungErstellen,
   sicherungInhalt,
@@ -158,5 +161,36 @@ describe("alleDatenLoeschen()", () => {
 
   it("ist auf einem leeren Gerät ein Nullvorgang", () => {
     expect(alleDatenLoeschen()).toBe(0);
+  });
+});
+
+describe("bestandUmfang() / geraetBestand() — für die Einspiel-Rückfrage (R2-D3)", () => {
+  it("nennt Sammlungen beim Namen mit Meldungszahl, Papierkorb getrennt", () => {
+    const e = einsatzAnlegen("Heute Nacht Starkregen", EinsatzArt.EINSATZ);
+    meldungHinzufuegen(e.id, bogen(), { quelle: "manuell" });
+    vorlageAnlegen("Basis", bogen());
+
+    const geraet = geraetBestand();
+    expect(geraet.sammlungen).toEqual([{ name: "Heute Nacht Starkregen", meldungen: 1, papierkorb: false }]);
+    expect(geraet.vorlagen).toBe(1);
+    expect(geraet.entwurf).toBe(false);
+  });
+
+  it("misst eine Sicherungsdatei mit derselben Elle wie das Gerät", () => {
+    einsatzAnlegen("Alte Lage", EinsatzArt.EINSATZ);
+    entwurfSpeichern(bogen());
+    const text = sicherungErstellen();
+
+    const datei = bestandUmfang(sicherungParsen(text));
+    expect(datei).toEqual(geraetBestand());
+    expect(sicherungErstelltAm(text)).toMatch(/^\d{4}-\d{2}-\d{2}T/);
+  });
+
+  it("verträgt fremden Müll in den Einträgen", () => {
+    expect(bestandUmfang({ "eeb.einsaetze.v1": "kaputt", "eeb.vorlagen.v1": "{}" })).toEqual({
+      sammlungen: [],
+      vorlagen: 0,
+      entwurf: false,
+    });
   });
 });

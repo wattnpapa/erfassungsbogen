@@ -12,7 +12,18 @@ import { einheitSymbolSvg, svgDataUrl } from "./taktische-zeichen-bogen";
 import { nutzungsKanal, statistikAbgewaehlt, statistikAbwaehlen } from "./statistik";
 import { AnzeigeSchalter } from "./anzeige-schalter";
 import { frageJaNein, zeigeHinweis } from "./dialoge";
-import { alleDatenLoeschen, datenUmfang, sicherungErstellen, sicherungEinspielen, sicherungParsen, type DatenUmfang } from "./sicherung";
+import {
+  alleDatenLoeschen,
+  datenUmfang,
+  bestandUmfang,
+  geraetBestand,
+  sicherungErstellen,
+  sicherungErstelltAm,
+  sicherungEinspielen,
+  sicherungParsen,
+  type BestandUmfang,
+  type DatenUmfang,
+} from "./sicherung";
 import { dateiFehlerMeldung } from "./datei-fehler";
 import { geraeteKurzform, geraeteSchluesselLoeschen, geraeteSchluesselSicherstellen } from "./geraete-schluessel";
 import { speicherBelegung, speicherText } from "./eintrag-zeiten";
@@ -390,6 +401,18 @@ export function Fusszeile({ onBogenOeffnen, kompakt = false }: {
   const [beispielLaedt, setBeispielLaedt] = useState(false);
   const sicherung = useRef<HTMLDialogElement>(null);
   const [sicherungFehler, setSicherungFehler] = useState("");
+  // Rückfrage vor dem Einspielen — wie „Alle Daten löschen" mit Zahlen,
+  // Sicherungs-Ausweg und Haken, denn die Folge für den Bestand ist dieselbe
+  // (Audit Runde 2, R2-D3). Der Stand wird beim Öffnen erhoben.
+  const einspielen = useRef<HTMLDialogElement>(null);
+  const [einspielStand, setEinspielStand] = useState<{
+    text: string;
+    name: string;
+    erstellt: string | null;
+    datei: BestandUmfang;
+    geraet: BestandUmfang;
+  } | null>(null);
+  const [einspielVerstanden, setEinspielVerstanden] = useState(false);
   const loeschen = useRef<HTMLDialogElement>(null);
   // Stand beim Öffnen des Löschen-Dialogs — die Rückfrage nennt Zahlen, damit
   // niemand „alles löschen" blind bestätigt.
@@ -541,13 +564,22 @@ export function Fusszeile({ onBogenOeffnen, kompakt = false }: {
       setSicherungFehler(await dateiFehlerMeldung(datei, err, "sicherung"));
       return;
     }
-    const sicher = await frageJaNein({
-      titel: "Sicherung einspielen?",
-      text: "Alle App-Daten auf diesem Gerät — Vorlagen, Einsätze, Entwurf, Einstellungen und der Geräteschlüssel — werden durch den Inhalt der Datei ersetzt.",
-      ok: "Einspielen und ersetzen",
-      gefahr: true,
+    setEinspielStand({
+      text,
+      name: datei.name,
+      erstellt: sicherungErstelltAm(text),
+      datei: bestandUmfang(sicherungParsen(text)),
+      geraet: geraetBestand(),
     });
-    if (!sicher) return;
+    setEinspielVerstanden(false);
+    einspielen.current?.showModal();
+  }
+
+  /** Nach der Rückfrage: wirklich ersetzen und neu laden. */
+  async function einspielenJetzt() {
+    if (!einspielStand) return;
+    const { text } = einspielStand;
+    einspielen.current?.close(); // ein Fehler erscheint im Dialog „Datensicherung" dahinter
     try {
       const anzahl = sicherungEinspielen(text);
       await zeigeHinweis({
@@ -749,6 +781,67 @@ export function Fusszeile({ onBogenOeffnen, kompakt = false }: {
             Speicher", O4). Die Grenze ist eine Schätzung — Browser nennen
             ihr Limit nicht, üblich sind rund 5 MB. */}
         <SpeicherStand />
+      </Dialog>
+
+      {/* Rückfrage vor dem Einspielen: nennt, was auf dem Gerät verschwindet
+          und was die Datei bringt, bietet die Sicherung vorher an und
+          verlangt einen Haken, sobald laufende Sammlungen betroffen sind
+          (Audit Runde 2, R2-D3). */}
+      <Dialog titel="Sicherung einspielen?" dialogRef={einspielen} onSchliessen={() => setEinspielStand(null)}>
+        {einspielStand && (() => {
+          const laufendBetroffen = einspielStand.geraet.sammlungen.some((x) => !x.papierkorb && x.meldungen > 0);
+          return (
+            <>
+              <p>
+                Einspielen <strong>ersetzt</strong> alle App-Daten auf diesem Gerät — Vorlagen,
+                Einsätze, Entwurf, Einstellungen und den Geräteschlüssel — durch den Inhalt der
+                Datei. Anders als „Einsatz importieren…“ wird nichts ergänzt.
+              </p>
+              <p><strong>Auf diesem Gerät — geht dabei verloren:</strong></p>
+              <BestandListe bestand={einspielStand.geraet} />
+              <p>
+                <strong>
+                  In der Datei „{einspielStand.name}“
+                  {einspielStand.erstellt
+                    ? ` (erstellt ${new Date(einspielStand.erstellt).toLocaleString("de-DE", { dateStyle: "short", timeStyle: "short" })} Uhr)`
+                    : ""}
+                  :
+                </strong>
+              </p>
+              <BestandListe bestand={einspielStand.datei} />
+              {laufendBetroffen && (
+                <p className="warnung">
+                  Die laufenden Sammlungen dieses Geräts sind danach weg — ohne Papierkorb.
+                  Vorher sichern oder übergeben.
+                </p>
+              )}
+              <div className="aktionen">
+                <button type="button" onClick={() => void sicherungExportieren()}>Vorher Sicherung erstellen…</button>
+              </div>
+              {laufendBetroffen && (
+                <label className="inline">
+                  <input
+                    type="checkbox"
+                    checked={einspielVerstanden}
+                    onChange={(e) => setEinspielVerstanden(e.target.checked)}
+                  />
+                  Ja, die Daten dieses Geräts durch die Sicherung ersetzen
+                </label>
+              )}
+              <div className="aktionen">
+                <button
+                  type="button"
+                  className="gefahr"
+                  disabled={laufendBetroffen && !einspielVerstanden}
+                  onClick={() => void einspielenJetzt()}
+                >
+                  Einspielen und ersetzen
+                </button>
+                <button type="button" onClick={() => einspielen.current?.close()}>Abbrechen</button>
+              </div>
+            </>
+          );
+        })()}
       </Dialog>
 
       {/* Restlos löschen — z. B. bevor ein geteiltes Tablet weitergegeben wird
@@ -971,6 +1064,25 @@ export function Fusszeile({ onBogenOeffnen, kompakt = false }: {
 
       <Datenschutzdialog dialogRef={datenschutz} />
     </footer>
+  );
+}
+
+/** Inhalt eines Bestands für die Einspiel-Rückfrage: Sammlungen beim Namen. */
+function BestandListe({ bestand }: { bestand: BestandUmfang }) {
+  const aktiv = bestand.sammlungen.filter((x) => !x.papierkorb);
+  const papierkorb = bestand.sammlungen.length - aktiv.length;
+  return (
+    <ul>
+      {aktiv.length === 0 && <li>keine laufende Einsatz-Sammlung</li>}
+      {aktiv.map((x, i) => (
+        <li key={i}>
+          Sammlung „{x.name}“ mit {x.meldungen} {x.meldungen === 1 ? "Meldung" : "Meldungen"}
+        </li>
+      ))}
+      {papierkorb > 0 && <li>{papierkorb} {papierkorb === 1 ? "Sammlung" : "Sammlungen"} im Papierkorb</li>}
+      <li>{bestand.vorlagen} {bestand.vorlagen === 1 ? "Vorlage" : "Vorlagen"}</li>
+      <li>{bestand.entwurf ? "ein angefangener Bogen (Entwurf)" : "kein angefangener Bogen"}</li>
+    </ul>
   );
 }
 

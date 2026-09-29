@@ -18,6 +18,7 @@ import { vorlageAnlegen, vorlagenLaden } from "./vorlagen";
 import { sicherungErstellen } from "./sicherung";
 import { geraeteSchluesselSicherstellen } from "./geraete-schluessel";
 import { zuHex } from "@bos/eeb-format/signatur";
+import { EinsatzArt, einsatzAnlegen, einsaetzeLaden, meldungHinzufuegen } from "@bos/meldekopf/einsaetze";
 
 /**
  * Alle Wege starten am Ende die App neu. Das ist hier bewusst nicht geprüft:
@@ -116,6 +117,31 @@ describe("Sicherung einspielen", () => {
     await nutzer.click(within(dialog).getByRole("button", { name: "Abbrechen" }));
 
     expect(vorlagenLaden().map((v) => v.name)).toEqual(["Vorher auf dem Gerät"]);
+  });
+
+  it("nennt laufende Sammlungen und den Datei-Inhalt, bietet die Sicherung vorher an und verlangt den Haken (R2-D3)", async () => {
+    const nutzer = userEvent.setup();
+    const datei = sicherungsdatei();
+    const s = einsatzAnlegen("Heute Nacht Starkregen", EinsatzArt.EINSATZ);
+    meldungHinzufuegen(s.id, neuerBogen(), { quelle: "manuell" });
+    buehne();
+
+    await nutzer.upload(dateiFeld(), datei);
+    const dialog = await screen.findByRole("dialog", { name: "Sicherung einspielen?" });
+
+    expect(within(dialog).getByText(/Sammlung „Heute Nacht Starkregen“ mit 1 Meldung/)).toBeDefined();
+    expect(within(dialog).getByText(/In der Datei „eeb-sicherung.json“/)).toBeDefined();
+    expect(within(dialog).getByText("1 Vorlage")).toBeDefined(); // aus der Datei
+    expect(within(dialog).getByText(/Anders als „Einsatz importieren…“ wird nichts ergänzt/)).toBeDefined();
+    expect(within(dialog).getByRole("button", { name: "Vorher Sicherung erstellen…" })).toBeDefined();
+
+    const ersetzen = within(dialog).getByRole("button", { name: "Einspielen und ersetzen" });
+    expect(ersetzen).toHaveProperty("disabled", true);
+    await nutzer.click(within(dialog).getByLabelText(/Ja, die Daten dieses Geräts/));
+    await nutzer.click(ersetzen);
+
+    expect(await screen.findByRole("dialog", { name: "Sicherung eingespielt" })).toBeDefined();
+    expect(einsaetzeLaden()).toHaveLength(0);
   });
 
   it("erklärt eine abgeschnittene Sicherung ohne Programmtext und fragt gar nicht erst (R2-E5)", async () => {
