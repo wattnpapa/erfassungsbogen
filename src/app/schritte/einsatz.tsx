@@ -11,6 +11,7 @@ import {
   zeitpunktZuIso,
 } from "@bos/eeb-format/model";
 import { DATENSCHUTZFRIST_TAGE } from "@bos/eeb-format/datenschutzfrist";
+import { useRef } from "react";
 import { heuteDatum, pruefpunkte } from "../hilfen";
 import { Feld, Hinweise, type SchrittProps } from "./bausteine";
 
@@ -31,6 +32,21 @@ export function SchrittEinsatz({ bogen, aendern }: SchrittProps) {
    * er nie berührt hat.
    */
   const bisFolgtVon = ez.zeitraumBis === ez.zeitraumVon;
+  /**
+   * Zuletzt eingetragene Zeiten, solange der Schritt offen ist. Ein
+   * versehentliches Ab- und Wiederanhaken setzte vorher „jetzt" und die
+   * korrigierte Zeit war ohne Hinweis weg (Audit Runde 2, R2-E6). „Jetzt"
+   * gibt es nur beim ersten Anhaken.
+   */
+  const zuletzt = useRef<{ einsatzbeginn?: number; einsatzende?: number }>({});
+  const zeitUmschalten = (feld: "einsatzbeginn" | "einsatzende", an: boolean) => {
+    if (an) {
+      setEz({ [feld]: zuletzt.current[feld] ?? zeitpunktAusIso(jetztLokal()) });
+    } else {
+      zuletzt.current[feld] = ez[feld];
+      setEz({ [feld]: undefined });
+    }
+  };
   return (
     <section className="karte">
       <h2>2. Einsatz</h2>
@@ -71,7 +87,7 @@ export function SchrittEinsatz({ bogen, aendern }: SchrittProps) {
           <input
             type="checkbox"
             checked={ez.einsatzbeginn != null}
-            onChange={(e) => setEz({ einsatzbeginn: e.target.checked ? zeitpunktAusIso(jetztLokal()) : undefined })}
+            onChange={(e) => zeitUmschalten("einsatzbeginn", e.target.checked)}
           />
           Einsatzbeginn eintragen
         </label>
@@ -84,7 +100,7 @@ export function SchrittEinsatz({ bogen, aendern }: SchrittProps) {
           <input
             type="checkbox"
             checked={ez.einsatzende != null}
-            onChange={(e) => setEz({ einsatzende: e.target.checked ? zeitpunktAusIso(jetztLokal()) : undefined })}
+            onChange={(e) => zeitUmschalten("einsatzende", e.target.checked)}
           />
           Einsatzende eintragen
         </label>
@@ -94,9 +110,14 @@ export function SchrittEinsatz({ bogen, aendern }: SchrittProps) {
           </Feld>
         )}
       </div>
+      {/* Vorher: „meist trägt das der Meldekopf … ein". Die Zeiten des
+          Meldekopfs bleiben aber in seiner Sammlung und kommen nie in diesen
+          Bogen zurück — wer dem Hinweis folgte, hatte im eigenen PDF keine
+          Einsatzzeiten (Audit Runde 2, R2-W4). */}
       <p className="hinweis">
-        Setzt die aktuelle Uhrzeit, danach änderbar — meist trägt das der Meldekopf beim Eintreffen
-        bzw. Abrücken ein.
+        Setzt die aktuelle Uhrzeit, danach änderbar. Für den eigenen Bogen (Nachweis, Freistellung,
+        Abrechnung) hier eintragen — der Meldekopf führt seine Eintreff- und Abrückzeiten getrennt,
+        sie kommen nicht in diesen Bogen zurück.
       </p>
       {/* Schritt-Index 1 = Einsatz (siehe SCHRITTE in app.tsx): „bis vor von"
           und „Ende vor Beginn" erschienen vorher auf Schritt 1, 3 und in der

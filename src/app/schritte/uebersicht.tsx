@@ -555,6 +555,13 @@ export function Uebersicht(props: {
             {bogen.einsatz.einsatzbeginn != null ? zeitpunktDeutsch(bogen.einsatz.einsatzbeginn) : "—"}
             {" / "}
             {bogen.einsatz.einsatzende != null ? zeitpunktDeutsch(bogen.einsatz.einsatzende) : "—"}
+            {/* Die Zeiten des Meldekopfs kommen nicht in diesen Bogen zurück;
+                ohne eigenen Eintrag trägt das PDF keine Einsatzzeiten (R2-W4). */}
+            {(bogen.einsatz.einsatzbeginn == null || bogen.einsatz.einsatzende == null) && (
+              <span className="hinweis">
+                {" "}— für eigene Nachweise in Schritt 2 eintragen; die Zeiten des Meldekopfs kommen nicht hierher zurück.
+              </span>
+            )}
           </dd>
         </dl>
       ))}

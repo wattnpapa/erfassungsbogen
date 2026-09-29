@@ -60,6 +60,28 @@ describe("Schritt Einsatz", () => {
     expect(feld.value).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/);
   });
 
+  /** R2-E6: Ab- und Wiederanhaken setzte „jetzt" über die korrigierte Zeit. */
+  it("stellt beim Wiederanhaken die zuletzt eingetragene Zeit wieder her", async () => {
+    const nutzer = userEvent.setup();
+    buehne();
+
+    const kaestchen = screen.getByLabelText("Einsatzbeginn eintragen");
+    await nutzer.click(kaestchen);
+    fireEvent.change(screen.getByLabelText("Einsatzbeginn (Datum, Uhrzeit)"), { target: { value: "2026-07-16T09:30" } });
+    await nutzer.click(kaestchen);
+    expect(screen.queryByLabelText("Einsatzbeginn (Datum, Uhrzeit)")).toBeNull();
+    await nutzer.click(kaestchen);
+
+    expect((screen.getByLabelText("Einsatzbeginn (Datum, Uhrzeit)") as HTMLInputElement).value).toBe("2026-07-16T09:30");
+  });
+
+  /** R2-W4: Die Zeiten des Meldekopfs kommen nicht in den eigenen Bogen zurück. */
+  it("sagt, dass die Einheit ihre Zeiten selbst eintragen muss", () => {
+    buehne();
+    expect(screen.getByText(/der Meldekopf führt seine Eintreff- und Abrückzeiten getrennt/)).toBeDefined();
+    expect(screen.queryByText(/meist trägt das der Meldekopf/)).toBeNull();
+  });
+
   /**
    * „bis vor von" erschien vorher auf Schritt 1, 3 und in der Übersicht —
    * überall, nur nicht dort, wo der Fehler gemacht wird.
