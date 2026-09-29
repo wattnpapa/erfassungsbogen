@@ -183,6 +183,46 @@ describe("Assistenten-Kopf auf dem Telefon (R2-H7)", () => {
   });
 });
 
+describe("Tippziele im Standard-Thema (R2-G3)", () => {
+  const ZIEL = "calc(var(--ziel-basis) + var(--ziel))";
+
+  it("Chip-✕, Vorschläge und Spaltenköpfe tragen das Grundmaß auch ohne Feld-Modus", () => {
+    expect(wert(".chip button", "min-width")).toBe("var(--ziel-basis)");
+    expect(wert(".chip button", "min-height")).toBe("var(--ziel-basis)");
+    expect(wert("ul.vorschlaege li", "min-height")).toBe(ZIEL);
+    expect(wert("ul.vorschlaege li + li", "border-top")).toContain("solid");
+    expect(wert("table.einheiten-tabelle thead th > .spalten-sortierung", "min-width")).toBe(ZIEL);
+  });
+
+  it("Schrittleiste mindestens 44 px, ohne den Feld-Modus zu vergrößern", () => {
+    expect(wert(".schritte button", "min-height")).toBe("max(calc(2.5rem + var(--ziel)), 44px)");
+    expect(wert(".schritte button", "min-width")).toBe("44px");
+  });
+
+  it("Kopf-Links auf dem Telefon nicht mehr auf 2rem verkleinert (App und Begleitseiten)", () => {
+    expect(werte(APP, ".kopfnav-links a", "min-height", "@media (max-width: 30rem)")).toEqual([]);
+    for (const datei of readdirSync(join(WURZEL, "public")).filter((d) => d.endsWith(".html"))) {
+      expect(readFileSync(join(WURZEL, "public", datei), "utf8"), datei).not.toMatch(
+        /\.kopfnav-links a \{ min-height: 2rem; \}/,
+      );
+    }
+  });
+
+  it("„ändern“, „Lücken“ und Hinweis-Links: 44 px Trefferfläche, Zeilenhöhe per Gegenrand unverändert", () => {
+    for (const selektor of [
+      ".zeiten-zeile button.link.zeit-aendern",
+      "button.link.luecken-marke",
+      ".hinweis > button.link",
+      ".fuss-marke > button.link",
+    ]) {
+      const regel = APP.find((r) => r.kontext === "" && r.selektoren.includes(selektor))!;
+      const polster = regel.deklarationen.get("padding-block") ?? regel.deklarationen.get("padding")!;
+      expect(polster, selektor).toContain("var(--ziel-basis) + var(--ziel)");
+      expect(regel.deklarationen.get("margin-block"), selektor).toMatch(/^calc\(0\.28rem \+ 0\.5 \* var\(--ziel\) - /);
+    }
+  });
+});
+
 describe("Begleitseiten: Umbruch-Regel (R2-M1)", () => {
   const PUBLIC = join(WURZEL, "public");
   const SEITEN = readdirSync(PUBLIC).filter((d) => d.endsWith(".html"));

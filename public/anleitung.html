@@ -141,10 +141,10 @@
        auf 375 px steht die Leiste damit bei 109 px statt der bisherigen 116 —
        das gestrichene senkrechte Polster von .kopfnav-inner zahlt die höheren
        Ziele mehr als aus. Das eigentliche Problem sind nicht die Zeilenhöhen,
-       sondern die Zahl der Zeilen; die gehört in einen eigenen Schritt. */
-    @media (max-width: 30rem) {
-      .kopfnav-links a { min-height: 2rem; }
-    }
+       sondern die Zahl der Zeilen; die gehört in einen eigenen Schritt.
+       Dieser Schritt ist getan (mobil nur noch „Alle Themen" und die eigene
+       Rubrik, siehe unten): zwei Zeilen, und damit gilt auch hier das volle
+       Maß — Audit Runde 2, R2-G3 hatte 32 px gemessen. */
     .kopfnav-links a:hover { color: var(--blau-hell); text-decoration: underline; }
     .kopfnav-links a.aktiv { color: var(--blau); font-weight: 600; }
     .kopfnav-eintrag { position: relative; display: inline-flex; }

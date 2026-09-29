@@ -621,11 +621,11 @@
        Themen" als Sammelweg und „Anleitung" als der Weg, für den die Leiste in
        der App überhaupt gebaut wurde. Der Rest bleibt im Markup und ist über
        die Übersicht und die Fußzeile erreichbar.
-       Trefferfläche dort 2rem statt 2.75rem: über den 24 px aus WCAG 2.5.8,
-       aber drei Zeilen à 44 px wären 132 px Kopf auf einem 812-px-Schirm.
-       Beide Klassen im Selektor, weil .kopfnav-eintrag oben display setzt. */
+       Beide Klassen im Selektor, weil .kopfnav-eintrag oben display setzt.
+       Die Trefferfläche stand hier auf 2rem (32 px), um einen dreizeiligen
+       Kopf zu vermeiden. Seit mobil nur zwei Einträge stehen, bleibt es bei
+       zwei Zeilen — das volle Maß kostet 12 px Kopf (R2-G3). */
     @media (max-width: 30rem) {
-      .kopfnav-links a { min-height: 2rem; }
       .kopfnav-links .nur-breit { display: none; }
     }
     /* In der installierten Fassung (Klasse aus der Frühweiche im Kopf) gibt es
@@ -942,7 +942,14 @@
     .schritte { display: flex; gap: 0; flex-wrap: wrap; margin: 0; border-top: var(--strich) solid var(--kopf-linie); }
     .schritte button {
       padding: 0.55rem 0.75rem; font-size: var(--t-s); font-weight: 600;
-      min-height: calc(2.5rem + var(--ziel));
+      /* Volles Zielmaß auch im Standard-Thema (Audit Runde 2, R2-G3: 40 px
+         ohne Abstand, ein Fehlgriff springt in einen anderen Schritt). */
+      min-height: max(calc(2.5rem + var(--ziel)), 44px); /* Feld-Modus bleibt bei 49 px */
+      min-width: 44px; /* fest: sechs Reiter à 49 px passten im Feld-Modus nicht mehr in eine 320-px-Zeile (R2-H7) */
+      /* Die feste Mindestbreite ersetzt die inhaltliche — ohne flex-shrink: 0
+         schrumpften die Reiter in der waagerecht rollenden Leiste (quer)
+         unter ihren Text und überlappten sich. */
+      flex-shrink: 0;
       border: none; border-bottom: var(--kopf-strich) solid transparent; border-radius: 0;
       background: none; color: var(--kopf-auf-2);
       /* Der Unterstrich wandert nicht — er erscheint am neuen Reiter und
@@ -1025,6 +1032,9 @@
       outline: var(--fokus) solid var(--akzent); outline-offset: 0; border-color: var(--akzent);
     }
     .zeile { display: flex; gap: 0.8rem; flex-wrap: wrap; align-items: flex-end; }
+    /* Das ✕ einer Erreichbarkeit maß 43 px Breite (R2-G3) — ein Zeichen plus
+       Polster; die Mindestbreite macht es quadratisch. */
+    .zeile > button { min-width: calc(var(--ziel-basis) + var(--ziel)); }
     /* min-width: 0 – lange Select-Optionen dürfen die Spalte nicht aufdrücken. */
     .zeile > label.feld { flex: 1 1 10rem; margin-top: 0.4rem; min-width: 0; }
     select { min-width: 0; }
@@ -1113,7 +1123,16 @@
          Liste stehen, die Animation läuft nur beim Öffnen. */
       animation: einblenden calc(var(--dauer-1) * 0.8) ease-out;
     }
-    ul.vorschlaege li { padding: 0.45rem 0.6rem; cursor: pointer; font-size: var(--t-m); }
+    /* Je Vorschlag das volle Zielmaß und eine Trennlinie (R2-G3): bei 38 px
+       lückenlos traf ein Tipp 20 px unter der Mitte den nächsten Eintrag —
+       und untereinander stehen fachlich verschiedene Werte („SanHe", „SGL"). */
+    ul.vorschlaege li {
+      padding: 0.45rem 0.6rem; cursor: pointer; font-size: var(--t-m);
+      min-height: calc(var(--ziel-basis) + var(--ziel)); box-sizing: border-box;
+      display: flex; flex-wrap: wrap; align-items: center; column-gap: 0.3rem;
+    }
+    ul.vorschlaege li small { margin-left: 0; }
+    ul.vorschlaege li + li { border-top: var(--strich) solid var(--linie-fein); }
     ul.vorschlaege li small { color: var(--text-2); margin-left: 0.3rem; }
     @media (hover: hover) { ul.vorschlaege li.aktiv, ul.vorschlaege li:hover { background: var(--flaeche-2); } }
     /* 8 px zwischen den Chips: das ✕ des einen darf nicht am ✕ des nächsten
@@ -1144,6 +1163,14 @@
       display: inline-flex; align-items: center; justify-content: center;
     }
     .feld-modus .chip button { min-width: var(--ziel-basis); min-height: var(--ziel-basis); }
+    /* Runde 2 (R2-G3): das Grundmaß auch im Standard-Thema — ein Tipp 20 px
+       neben das 32-px-✕ traf die Chip-Beschriftung und öffnete die Tastatur.
+       Der Chip ist ohnehin 44 px hoch; er wird nur um 12 px breiter. */
+    .chip button { min-width: var(--ziel-basis); min-height: var(--ziel-basis); }
+    /* Mit dem breiteren ✕ ragte „Bed. Motorsäge ✕" bei 200 % Systemschrift
+       auf 320 px 2 px über den Rand (R2-M1): die Beschriftung ist ein
+       anonymes Flex-Kind, anywhere senkt ihre Mindestbreite. */
+    .chip { max-width: 100%; overflow-wrap: anywhere; }
     .karte .entfernen { float: right; color: var(--alarm); border-color: var(--alarm); font-size: var(--t-xs); }
     @media (hover: hover) { .karte .entfernen:hover { color: var(--alarm); border-color: var(--alarm); background: var(--flaeche-2); } }
     /* Wiederholte Einträge (Person, Fahrzeug) bekommen einen Kopf: links steht,
@@ -1870,6 +1897,9 @@
       /* Innenmaß statt Mindesthöhe und statt Flex: `display: flex` nähme der
          Zeile das Aufklapp-Dreieck (der Marker hängt an `list-item`). */
       padding: calc(0.3rem + 0.5 * var(--ziel)) 0;
+      /* R2-G3: 29 px hoch — die Zeile bekommt das Zielmaß. */
+      min-height: calc(var(--ziel-basis) + var(--ziel)); box-sizing: border-box;
+      padding-block: calc((var(--ziel-basis) + var(--ziel) - 1.5em) / 2);
     }
     @media (hover: hover) { .signatur-detail > summary:hover { color: var(--akzent); } }
     .signatur-detail > .hinweis { margin-top: 0.3rem; }
@@ -1982,6 +2012,18 @@
        Datenschrift, damit Uhrzeiten untereinander vergleichbar stehen. */
     .zeiten-zeile { display: block; font-variant-numeric: tabular-nums; }
     .zeiten-zeile .zeit-aendern { margin-left: 0.25rem; font-size: var(--t-xs); }
+    /* „ändern" und „2 Lücken" (R2-G3: 41 × 28 bzw. 47–56 × 30 px). Sie bleiben
+       Links im Satz, das Innenmaß wächst auf 44 px Höhe. Ein Knopf ist auch
+       mit display: inline intern ein inline-block und hebt die Zeile mit —
+       der negative Außenabstand gibt den Zuwachs zurück, die Zeile bleibt so
+       hoch wie vorher und die Karten werden nicht länger (ohne ihn: +638 px
+       Einsatz-Sammlung). Die Trefferfläche reicht dafür etwas in die Zeilen
+       darüber und darunter; dort steht nur Text. Waagerecht reicht ein
+       Hauch, damit „ändern" 44 px breit wird. */
+    .zeiten-zeile button.link.zeit-aendern, button.link.luecken-marke {
+      padding: calc((var(--ziel-basis) + var(--ziel) - 1.3em) / 2) 0.15rem;
+      margin-block: calc(0.28rem + 0.5 * var(--ziel) - (var(--ziel-basis) + var(--ziel) - 1.3em) / 2);
+    }
     /* „neu" = in den letzten 30 Minuten eingetroffen: das, was seit dem
        letzten Blick dazukam. Akzent statt Warnfarbe — es ist Information,
        kein Problem. „alt" = Absender-Stand deutlich älter als das Eintreffen:
@@ -2090,6 +2132,9 @@
     table.einheiten-tabelle thead th > .spalten-sortierung {
       display: flex; width: 100%; align-items: center;
       min-height: calc(var(--ziel-basis) + var(--ziel)); padding: 0.35rem 0.5rem;
+      /* Auch in der Breite (R2-G3: „F", „U", „M" 25–33 px, 1 px zur
+         Nachbarspalte). Die Tabelle rollt ohnehin im eigenen Rahmen. */
+      min-width: calc(var(--ziel-basis) + var(--ziel));
     }
     table.einheiten-tabelle thead th.zahl > .spalten-sortierung { justify-content: flex-end; }
     .sortier-pfeil { color: var(--akzent); font-size: 0.8em; }
@@ -2205,6 +2250,8 @@
     .fuss-schmal nav button.link {
       display: inline-flex; align-items: center;
       min-height: calc(var(--ziel-basis) + var(--ziel));
+      /* Kurze Einträge („THW", 29 px) auch in der Breite (R2-G3). */
+      min-width: calc(var(--ziel-basis) + var(--ziel));
     }
     /* Die Datenwege (Datensicherung, Beispielbögen, Geräteschlüssel, Alle
        Daten löschen) sind Knöpfe, die etwas tun — sie bekommen zusätzlich
@@ -2275,6 +2322,17 @@
       padding: calc(0.28rem + 0.5 * var(--ziel)) 0;
     }
     @media (hover: hover) { button.link:hover { border: none; background: none; color: var(--akzent); } }
+    /* Einzelne Link-Knöpfe in Hinweiszeilen, die auf dem Telefon oft
+       angetippt werden (R2-G3): „Name/Kontakt hinterlegen…" (162 × 28 px),
+       „öffentlichen Schlüssel anzeigen/teilen" (216 × 28 px) und der
+       Autorenname in der Fußzeile (118 × 30 px). Gleiches Mittel wie oben —
+       Innenmaß bis zum vollen Zielmaß, der Zuwachs per negativem
+       Außenabstand zurückgegeben, die Zeile bleibt, wo sie ist. Links in
+       anderen Absätzen behalten das kleinere Maß. */
+    .hinweis > button.link, .fuss-marke > button.link {
+      padding-block: calc((var(--ziel-basis) + var(--ziel) - 1.3em) / 2);
+      margin-block: calc(0.28rem + 0.5 * var(--ziel) - (var(--ziel-basis) + var(--ziel) - 1.3em) / 2);
+    }
     /* Beispiel-Liste: eigener Aufzählungspunkt mit hängendem Einzug, damit
        lange Namen (Button-Links) sauber links umbrechen und der Punkt an der
        ersten Zeile bleibt. Der Standard-Marker sitzt bei umbrechenden
