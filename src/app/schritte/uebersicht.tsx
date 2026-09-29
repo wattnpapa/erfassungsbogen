@@ -57,6 +57,7 @@ import { istNativ, linkTeilen, nahbereichDienst, pdfEinbettbar, shareSheetVerfue
 import { fehlerText } from "../nachladen";
 import { frageJaNein, frageText, zeigeHinweis } from "../dialoge";
 import { SpeicherVollFehler, istSpeicherVoll } from "../eintrag-zeiten";
+import { uebergabeText, type UebergabeStand } from "../uebergabe-stand";
 import {
   MWD_LEGENDE,
   STAERKE_LEGENDE,
@@ -103,6 +104,9 @@ export function Uebersicht(props: {
    * leer) — angeboten, wenn der Einsatzzeitraum vorbei ist (R2-S1).
    */
   onNeuerEinsatz?: () => void;
+  /** Letzte Übergabe und der Rückruf, wenn übergeben wurde (R2-W2). */
+  uebergabe?: UebergabeStand | null;
+  onUebergeben?: () => void;
 }) {
   const { bogen, geheZu, neu } = props;
 
@@ -322,6 +326,7 @@ export function Uebersicht(props: {
     setFehler("");
     try {
       await linkInsShareSheet(qr.vollUrl);
+      props.onUebergeben?.();
     } catch (e) {
       // Abbruch im Share-Dialog ist kein Fehler
       if (e instanceof Error && e.name === "AbortError") return;
@@ -335,8 +340,10 @@ export function Uebersicht(props: {
     try {
       if (shareSheetVerfuegbar()) {
         await linkInsShareSheet(url);
+        props.onUebergeben?.();
       } else if (navigator.clipboard) {
         await navigator.clipboard.writeText(url);
+        props.onUebergeben?.();
         setLinkKopiert(true);
         window.setTimeout(() => setLinkKopiert(false), 3000);
       } else {
@@ -386,6 +393,7 @@ export function Uebersicht(props: {
     try {
       const { pdfErzeugen } = await import("../pdf");
       await pdfErzeugen(bogen, dateiname, props.herkunft);
+      props.onUebergeben?.();
       // In der App gibt es keinen Download: die PDF ging ins Teilen-Fenster
       // des Systems — dort heißt „fertig" etwas anderes als im Browser.
       setPdfQuittung(
@@ -507,6 +515,11 @@ export function Uebersicht(props: {
             </p>
           </div>
         </div>
+        {/* Hat der Meldekopf den aktuellen Stand? (R2-W2) */}
+        {(() => {
+          const u = uebergabeText(bogen, props.uebergabe);
+          return u && <p className={u.geaendert ? "warnung" : "hinweis"} role="status">{u.text}</p>;
+        })()}
         <Vollstaendigkeit punkte={offenePunkte} geheZu={geheZu} />
       </section>
 
@@ -855,6 +868,7 @@ export function Uebersicht(props: {
               teilenDialog.current?.close();
               setVollbildTeil(0);
               setVollbild(true);
+              props.onUebergeben?.();
             }}
           >
             QR-Code im Vollbild zeigen

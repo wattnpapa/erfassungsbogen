@@ -17,6 +17,7 @@ import type { EebZeitpunkt, Erfassungsbogen } from "@bos/eeb-format/model";
 import { bogenAnonymisiert, datenschutzfristAbgelaufen } from "@bos/eeb-format/datenschutzfrist";
 import { migriereBogen } from "./hilfen";
 import { datenschutzZeitpunkt } from "./datenschutz-uhr";
+import type { UebergabeStand } from "./uebergabe-stand";
 
 const SPEICHER_SCHLUESSEL = "eeb.entwurf.v1";
 
@@ -57,10 +58,12 @@ export interface Entwurf {
   fremd?: { einsatzId?: string };
   /** Zuletzt offener Schritt des Assistenten — „Fortsetzen" öffnet ihn (R2-N7). */
   schritt?: number;
+  /** Letzte Übergabe dieses Bogens (QR, Link, PDF, Nahbereich) — siehe uebergabe-stand.ts (R2-W2). */
+  uebergabe?: UebergabeStand;
 }
 
 /** Zusätze eines Entwurfs neben dem Bogen (siehe `Entwurf`). */
-export type EntwurfZusatz = Pick<Entwurf, "vorlageId" | "fremd" | "schritt">;
+export type EntwurfZusatz = Pick<Entwurf, "vorlageId" | "fremd" | "schritt" | "uebergabe">;
 
 // ------------------------------------------------- Serialisierung (rein)
 
@@ -82,6 +85,10 @@ export function entwurfAusJson(text: string | null): Entwurf | null {
   }
   if (typeof e.vorlageId !== "string" || !e.vorlageId) delete e.vorlageId;
   if (typeof e.schritt !== "number" || !Number.isInteger(e.schritt) || e.schritt < 0 || e.schritt > 5) delete e.schritt;
+  const u = e.uebergabe as Partial<UebergabeStand> | undefined;
+  if (!u || typeof u.um !== "number" || typeof u.id !== "string" || typeof u.einheit !== "string" || typeof u.staerke !== "string") {
+    delete e.uebergabe;
+  }
   if (!e.fremd || typeof e.fremd !== "object") delete e.fremd;
   else e.fremd = typeof e.fremd.einsatzId === "string" && e.fremd.einsatzId ? { einsatzId: e.fremd.einsatzId } : {};
   return e;
@@ -94,6 +101,7 @@ export function entwurfZuJson(bogen: Erfassungsbogen, gespeichert = Date.now(), 
     ...(zusatz.vorlageId ? { vorlageId: zusatz.vorlageId } : {}),
     ...(zusatz.fremd ? { fremd: zusatz.fremd } : {}),
     ...(zusatz.schritt != null ? { schritt: zusatz.schritt } : {}),
+    ...(zusatz.uebergabe ? { uebergabe: zusatz.uebergabe } : {}),
   });
 }
 

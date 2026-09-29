@@ -71,6 +71,7 @@ import {
 import { bogenDiff, diffKurzfassung } from "@bos/meldekopf/meldung-diff";
 import { SpeicherVollFehler, istSpeicherVoll, meldungAufnehmen } from "./eintrag-zeiten";
 import { offlineText, useOfflineStand } from "./offline-bereit";
+import { uebergabeFesthalten, uebergabeText, type UebergabeStand } from "./uebergabe-stand";
 import { ART_LABEL, EinsatzDetail, EinsatzListe, type Eingang } from "./einsaetze-ui";
 import { exportSammlung, exportStandLaden, exportVermerken, type ExportStand, type ExportUmfang } from "./export-stand";
 import { aktuelleMeldungen } from "./auswertung";
@@ -557,6 +558,8 @@ function AppInhalt() {
    * Wandert mit dem Entwurf in den Speicher.
    */
   const [fremdeErfassung, setFremdeErfassung] = useState<boolean>(!!ENTWURF?.fremd);
+  /** Letzte Übergabe des offenen Bogens (R2-W2, uebergabe-stand.ts). */
+  const [uebergabe, setUebergabe] = useState<UebergabeStand | null>(ENTWURF?.uebergabe ?? null);
   // „Fortsetzen" öffnet den Schritt, auf dem gearbeitet wurde — nicht immer
   // die Übersicht mit acht gelben Punkten (Audit Runde 2, R2-N7).
   const [schritt, setSchritt] = useState(START.bogen ? UEBERSICHT : ENTWURF ? (ENTWURF.schritt ?? UEBERSICHT) : 0);
@@ -789,6 +792,7 @@ function AppInhalt() {
           vorlageId: vorlageInBearbeitung ?? undefined,
           fremd: fremdeErfassung ? { einsatzId: sammelZielId ?? undefined } : undefined,
           schritt,
+          uebergabe: uebergabe ?? undefined,
         },
         merk.um,
       );
@@ -800,7 +804,7 @@ function AppInhalt() {
       setGespeichertUm(null);
       setSpeicherFehler(false);
     }
-  }, [bogen, vorlageInBearbeitung, fremdeErfassung, sammelZielId, schritt]);
+  }, [bogen, vorlageInBearbeitung, fremdeErfassung, sammelZielId, schritt, uebergabe]);
 
   /**
    * Die Vorlage zum offenen Bogen — nur solange sie noch in der Liste steht.
@@ -2387,6 +2391,11 @@ function AppInhalt() {
                     })()}
                   </span>
                 )}
+                {/* Stand gegenüber der letzten Übergabe (R2-W2). */}
+                {(() => {
+                  const u = uebergabeText(bogen, uebergabe);
+                  return u && <span className={`hinweis${u.geaendert ? " warnung-text" : ""}`}>{u.text}</span>;
+                })()}
                 {/* Alter Bogen: der Zeitraum steht auf der Karte, bevor jemand „Fortsetzen" tippt (R2-S1). */}
                 {bogen.einsatz.zeitraumBis < heuteDatum() && (
                   <span className="hinweis warnung-text">Einsatz {zeitraumDeutsch(bogen)}</span>
@@ -2734,6 +2743,8 @@ function AppInhalt() {
           signatur={bogenSignatur}
           herkunft={bogenHerkunft}
           geheZu={geheZuFeld}
+          uebergabe={uebergabe}
+          onUebergeben={() => setUebergabe(uebergabeFesthalten(bogen))}
           neu={() => { if (bogenHatInhalt(bogen)) merkeVerdraengt(bogen); setMeldung(""); setBogen(null); setVorlageInBearbeitung(null); setFremdeErfassung(false); setSammelZiel(null); setzeEmpfang(null); setSchritt(0); }}
           onVorlageGespeichert={(name) => { vorlagenNeuLaden(); setMeldung(`Als Vorlage „${name}" gespeichert.`); }}
           vorlageBearbeitung={
