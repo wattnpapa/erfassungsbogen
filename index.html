@@ -2084,6 +2084,13 @@
       font-size: var(--t-xs); font-weight: 700; letter-spacing: 0.06em;
       text-transform: uppercase; vertical-align: 0.1em;
     }
+    /* R2-H9: Aufteilen, Zusammenführen, Verschieben und Entfernen in einer
+       zweiten Reihe hinter „Mehr…" — abgesetzt, damit „Entfernen" nicht wie
+       ein weiterer Alltagsknopf der ersten Reihe wirkt. */
+    .einheit-zeile .karte-mehr {
+      margin-top: var(--r-2); padding-top: var(--r-2);
+      border-top: 1px dashed var(--linie-fein);
+    }
     .bedarf-marke.routine {
       background: transparent; color: var(--text-2);
       border-color: var(--linie); font-weight: 400;

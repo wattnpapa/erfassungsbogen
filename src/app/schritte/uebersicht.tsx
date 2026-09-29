@@ -75,6 +75,12 @@ export function Uebersicht(props: {
   bogen: Erfassungsbogen;
   geheZu: (schritt: number, feld?: string) => void;
   neu: () => void;
+  /**
+   * Was mit dem offenen Bogen beim Schließen geschieht — ein Satz für die
+   * Rückfrage und ob dabei etwas endgültig verloren geht (app.tsx,
+   * folgenFuerOffenenBogen). Ohne ihn fällt die Rückfrage allgemein aus.
+   */
+  schliessenFolgen?: () => { satz: string; verlust: boolean };
   onVorlageGespeichert?: (name: string) => void;
   /**
    * Gesetzt, wenn der Bogen die Bearbeitung einer gespeicherten Vorlage ist
@@ -137,13 +143,23 @@ export function Uebersicht(props: {
     props.onVorlageGespeichert?.(v.name);
   }
 
-  /** Bogen schließen und mit einem leeren beginnen — der offene wäre danach weg. */
+  /**
+   * Bogen schließen, zurück zur Startseite. Die Rückfrage sagte „… der
+   * gespeicherte Entwurf gelöscht" — tatsächlich lag der Bogen danach unter
+   * „Zuletzt verdrängten Bogen zurückholen", und statt eines neuen Bogens kam
+   * die Startseite. Jetzt steht da, was wirklich geschieht; „gefahr" nur,
+   * wenn dabei wirklich etwas verloren geht (Audit Runde 2, R2-H9).
+   */
   async function bogenVerwerfen() {
+    const folgen = props.schliessenFolgen?.() ?? {
+      satz: `„${einheitAnzeigename(bogen.einheit)}" bleibt auf der Startseite unter „Zuletzt verdrängten Bogen zurückholen" erreichbar.`,
+      verlust: false,
+    };
     const sicher = await frageJaNein({
-      titel: "Aktuellen Bogen verwerfen?",
-      text: `„${einheitAnzeigename(bogen.einheit)}" wird geschlossen und der gespeicherte Entwurf gelöscht.`,
-      ok: "Verwerfen und neu beginnen",
-      gefahr: true,
+      titel: "Bogen schließen?",
+      text: `Der Bogen wird geschlossen, nicht gelöscht. ${folgen.satz} Einen neuen Bogen beginnst du auf der Startseite.`,
+      ok: "Schließen, zur Startseite",
+      gefahr: folgen.verlust,
     });
     if (sicher) neu();
   }

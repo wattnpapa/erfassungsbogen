@@ -876,3 +876,14 @@ describe("pruefpunkte: weitere Tippfehler (R2-E4)", () => {
     expect(texte).toMatch(/außerhalb des Einsatzzeitraums/);
   });
 });
+
+describe("pruefpunkte: Schnellerfassung (R2-H9)", () => {
+  it("zählt ein leeres Ort/Auftrag bei der Schnellerfassung nicht als offenen Punkt, beim vollen Bogen schon", () => {
+    const voll = neuerBogen();
+    expect(pruefpunkte(voll).some((p) => p.text === "Ort/Auftrag ist noch leer.")).toBe(true);
+    const schnell = neuerBogen();
+    schnell.personalErfassung = PersonalErfassung.NUR_STAERKE;
+    schnell.staerkeManuell = { fuehrer: 1, unterfuehrer: 1, mannschaft: 7, gesamt: 9 };
+    expect(pruefpunkte(schnell).some((p) => p.text === "Ort/Auftrag ist noch leer.")).toBe(false);
+  });
+});

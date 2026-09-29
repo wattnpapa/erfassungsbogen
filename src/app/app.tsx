@@ -2859,6 +2859,7 @@ function AppInhalt() {
           geheZu={geheZuFeld}
           uebergabe={uebergabe}
           onUebergeben={() => setUebergabe(uebergabeFesthalten(bogen))}
+          schliessenFolgen={() => (bogenHatInhalt(bogen) ? folgenFuerOffenenBogen() : { satz: "", verlust: false })}
           neu={() => { if (bogenHatInhalt(bogen)) merkeVerdraengt(bogen); setMeldung(""); setBogen(null); setVorlageInBearbeitung(null); setFremdeErfassung(false); setSammelZiel(null); setzeEmpfang(null); setSchritt(0); }}
           onVorlageGespeichert={(name) => { vorlagenNeuLaden(); setMeldung(`Als Vorlage „${name}" gespeichert.`); }}
           vorlageBearbeitung={

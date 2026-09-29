@@ -1767,6 +1767,9 @@ function EinheitKarte(props: {
   const [aenderungen, setAenderungen] = useState(false);
   const [aufteilen, setAufteilen] = useState(false);
   const [zusammenfuehren, setZusammenfuehren] = useState(false);
+  // Zweite Knopfreihe mit den seltenen Aktionen (R2-H9).
+  const [mehr, setMehr] = useState(false);
+  const mehrOffen = mehr || aufteilen || zusammenfuehren;
   const [pdfLaeuft, setPdfLaeuft] = useState(false);
   // null = nicht in Bearbeitung; String = Entwurf des Zug-Etiketts.
   const [zugEntwurf, setZugEntwurf] = useState<string | null>(null);
@@ -2197,29 +2200,52 @@ function EinheitKarte(props: {
         <button type="button" aria-describedby={nameId} onClick={() => setNotizEntwurf(kopf.notiz ?? "")}>
           {kopf.notiz ? "Auftrag ändern" : "Auftrag/Notiz"}
         </button>{" "}
-        {zaehlt && (
-          <>
-            <button type="button" aria-describedby={nameId} onClick={() => setAufteilen(!aufteilen)}>
-              {aufteilen ? "Aufteilen schließen" : "Aufteilen…"}
-            </button>{" "}
-          </>
-        )}
-        {/* Nur anbieten, wenn es überhaupt einen anderen Teil zum Eingliedern gibt. */}
-        {zaehlt && geschwister.length > 0 && (
-          <>
-            <button type="button" aria-describedby={nameId} onClick={() => setZusammenfuehren(!zusammenfuehren)}>
-              {zusammenfuehren ? "Zusammenführen schließen" : "Zusammenführen…"}
-            </button>{" "}
-          </>
-        )}
         {(revs.length > 1 || vermerke.length > 0) && (
           <button type="button" aria-describedby={nameId} onClick={() => setHistorie(!historie)}>
             {historie ? "Historie schließen" : revs.length > 1 ? `Historie (${revs.length})` : "Historie"}
           </button>
         )}{" "}
-        <button type="button" aria-describedby={nameId} onClick={() => void verschieben()}>Verschieben…</button>{" "}
-        <button type="button" aria-describedby={nameId} className="entfernen" onClick={entfernen}>Entfernen</button>
+        {/* Die seltenen, folgenschweren Aktionen hinter „Mehr…": neun Knöpfe
+            je Karte machten sie rund 450 px hoch, und beim Scrollen lag
+            „Entfernen" überall unter dem Daumen (Audit Runde 2, R2-H9). Ein
+            offenes Aufteilen/Zusammenführen hält die Reihe offen. */}
+        <button
+          type="button"
+          aria-describedby={nameId}
+          aria-expanded={mehrOffen}
+          className="karte-mehr-knopf"
+          onClick={() => {
+            setMehr(!mehrOffen);
+            if (mehrOffen) {
+              setAufteilen(false);
+              setZusammenfuehren(false);
+            }
+          }}
+        >
+          {mehrOffen ? "Weniger" : "Mehr…"}
+        </button>
       </div>
+      {mehrOffen && (
+        <div className="vorlage-aktionen karte-mehr">
+          {zaehlt && (
+            <>
+              <button type="button" aria-describedby={nameId} onClick={() => setAufteilen(!aufteilen)}>
+                {aufteilen ? "Aufteilen schließen" : "Aufteilen…"}
+              </button>{" "}
+            </>
+          )}
+          {/* Nur anbieten, wenn es überhaupt einen anderen Teil zum Eingliedern gibt. */}
+          {zaehlt && geschwister.length > 0 && (
+            <>
+              <button type="button" aria-describedby={nameId} onClick={() => setZusammenfuehren(!zusammenfuehren)}>
+                {zusammenfuehren ? "Zusammenführen schließen" : "Zusammenführen…"}
+              </button>{" "}
+            </>
+          )}
+          <button type="button" aria-describedby={nameId} onClick={() => void verschieben()}>Verschieben…</button>{" "}
+          <button type="button" aria-describedby={nameId} className="entfernen" onClick={entfernen}>Entfernen</button>
+        </div>
+      )}
       {lueckenOffen && luecken.length > 0 && (
         <ul className="luecken-liste">
           {luecken.map((p) => (

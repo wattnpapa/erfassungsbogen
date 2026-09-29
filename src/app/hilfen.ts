@@ -815,7 +815,10 @@ export function pruefpunkte(b: Erfassungsbogen, mitFahrzeugen = true, heute?: Ee
   // Vollständigkeit für die Weitergabe: genau die Angaben, wegen derer der
   // Meldekopf sonst zurückfragen muss (Auftrag, Erreichbarkeit). Die fehlenden
   // Kennzeichen prüft fahrzeugHinweise() auf dem Fahrzeug-Schritt.
-  if (!b.einsatz.ortAuftrag.trim()) {
+  // Nicht bei der Schnellerfassung: deren Schritt 1 sagt ausdrücklich
+  // „Einsatzdaten … können offen bleiben", die Übersicht zählte das leere
+  // Feld trotzdem als offenen Punkt für die Weitergabe (Audit Runde 2, R2-H9).
+  if (!b.einsatz.ortAuftrag.trim() && b.personalErfassung !== PersonalErfassung.NUR_STAERKE) {
     hinweise.push({ text: "Ort/Auftrag ist noch leer.", schritt: S_EINSATZ, feld: "feld-ort-auftrag" });
   }
   const telefonErfasst = b.personal.some((p) =>

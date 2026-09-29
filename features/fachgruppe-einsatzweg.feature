@@ -88,7 +88,7 @@ Funktionalität: Einsatzweg einer Fachgruppe — Vorbereitung, Fahrt, Meldekopf
     Und ich zum Schritt "6. Übersicht" wechsle
     Und ich mir den angezeigten QR-Code merke
     Und ich auf "Neuer Bogen" klicke
-    Und ich im Dialog auf "Verwerfen und neu beginnen" klicke
+    Und ich im Dialog auf "Schließen, zur Startseite" klicke
     Und ich auf "QR-Code scannen…" klicke
     Und ich den gemerkten QR-Code über "QR aus Bild einlesen…" einlese
     Dann sehe ich die Übersicht mit dem Standort "Oldenburg (NI)"
@@ -117,7 +117,7 @@ Funktionalität: Einsatzweg einer Fachgruppe — Vorbereitung, Fahrt, Meldekopf
     Dann sehe ich die Überschrift "Gesamtübersicht"
     Und ich mir den angezeigten QR-Code merke
     Und ich auf "Neuer Bogen" klicke
-    Und ich im Dialog auf "Verwerfen und neu beginnen" klicke
+    Und ich im Dialog auf "Schließen, zur Startseite" klicke
     Und ich auf "QR-Code scannen…" klicke
     Und ich den gemerkten QR-Code über "QR aus Bild einlesen…" einlese
     Dann sehe ich die Übersicht mit dem Standort "Oldenburg (NI)"

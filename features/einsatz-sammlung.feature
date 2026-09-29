@@ -59,9 +59,9 @@ Funktionalität: Einsatz-Sammlung anlegen und Bögen darin sammeln
     Und sehe ich den Text "Übung"
     Und sehe ich die Überschrift "Einheiten (1 gemeldet"
 
-  Szenario: Bogen verwerfen fragt in der App zurück
+  Szenario: Bogen schließen fragt in der App zurück
     Angenommen ich öffne einen geteilten Bogen-Link eines alten Bogens
     Wenn ich auf "Neuer Bogen" klicke
-    Dann sehe ich den Dialog "Aktuellen Bogen verwerfen?"
-    Wenn ich im Dialog auf "Verwerfen und neu beginnen" klicke
+    Dann sehe ich den Dialog "Bogen schließen?"
+    Wenn ich im Dialog auf "Schließen, zur Startseite" klicke
     Dann sehe ich die Schaltfläche "Neuen Bogen erstellen"

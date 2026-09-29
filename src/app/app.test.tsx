@@ -408,7 +408,12 @@ describe("Assistenten-Durchlauf", () => {
     await nutzer.click(screen.getByRole("button", { name: /^6\. Übersicht/ }));
 
     await nutzer.click(screen.getByRole("button", { name: "Neuer Bogen" }));
-    await nutzer.click(within(rueckfrage("Aktuellen Bogen verwerfen?")).getByRole("button", { name: "Abbrechen" }));
+    // Die Rückfrage sagt, was tatsächlich geschieht: geschlossen, nicht
+    // gelöscht, und wo der Bogen danach liegt (Audit Runde 2, R2-H9).
+    expect(rueckfrage("Bogen schließen?").textContent).toContain("geschlossen, nicht gelöscht");
+    expect(rueckfrage("Bogen schließen?").textContent).toContain("Zuletzt verdrängten Bogen zurückholen");
+    expect(rueckfrage("Bogen schließen?").textContent).not.toContain("Entwurf gelöscht");
+    await nutzer.click(within(rueckfrage("Bogen schließen?")).getByRole("button", { name: "Abbrechen" }));
 
     // Abgebrochen: derselbe Bogen steht noch da.
     expect(screen.getByRole("heading", { name: "Gesamtübersicht" })).toBeDefined();
@@ -416,7 +421,7 @@ describe("Assistenten-Durchlauf", () => {
 
     await nutzer.click(screen.getByRole("button", { name: "Neuer Bogen" }));
     await nutzer.click(
-      within(rueckfrage("Aktuellen Bogen verwerfen?")).getByRole("button", { name: "Verwerfen und neu beginnen" }),
+      within(rueckfrage("Bogen schließen?")).getByRole("button", { name: "Schließen, zur Startseite" }),
     );
 
     // Verworfen heißt: kein offener Bogen mehr — die App steht wieder am
@@ -935,11 +940,11 @@ describe("Assistenten-Durchlauf", () => {
 
     // Die Rückfrage ist ein eigener Dialog, kein window.confirm: in der iOS-App
     // (WKWebView) bliebe ein Systemdialog unbeantwortet.
-    const rueckfrage = await screen.findByRole("dialog", { name: "Aktuellen Bogen verwerfen?" });
+    const rueckfrage = await screen.findByRole("dialog", { name: "Bogen schließen?" });
     // Solange nicht bestätigt ist, bleibt der Bogen offen.
     expect(screen.getByRole("heading", { name: "Gesamtübersicht" })).toBeDefined();
 
-    await nutzer.click(within(rueckfrage).getByRole("button", { name: "Verwerfen und neu beginnen" }));
+    await nutzer.click(within(rueckfrage).getByRole("button", { name: "Schließen, zur Startseite" }));
 
     expect(await screen.findByRole("button", { name: "Neuen Bogen erstellen" })).toBeDefined();
   });
@@ -950,7 +955,7 @@ describe("Assistenten-Durchlauf", () => {
     await neuerBogenBis(nutzer, 5);
 
     await nutzer.click(screen.getByRole("button", { name: "Neuer Bogen" }));
-    const rueckfrage = await screen.findByRole("dialog", { name: "Aktuellen Bogen verwerfen?" });
+    const rueckfrage = await screen.findByRole("dialog", { name: "Bogen schließen?" });
     await nutzer.click(within(rueckfrage).getByRole("button", { name: "Abbrechen" }));
 
     expect(screen.getByRole("heading", { name: "Gesamtübersicht" })).toBeDefined();

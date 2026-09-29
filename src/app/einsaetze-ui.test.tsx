@@ -125,6 +125,8 @@ describe("Meldung aus dem Einsatz entfernen", () => {
   /** Meldung aufklappen und „Entfernen" drücken — die Rückfrage steht dann da. */
   async function entfernenDruecken(nutzer: ReturnType<typeof userEvent.setup>) {
     await nutzer.click(screen.getByRole("button", { name: "Details" }));
+    // Entfernen liegt hinter „Mehr…" (R2-H9).
+    await nutzer.click(screen.getByRole("button", { name: "Mehr…" }));
     await nutzer.click(screen.getByRole("button", { name: "Entfernen" }));
     return document.querySelector<HTMLDialogElement>("dialog[aria-label='Meldung entfernen?']")!;
   }
@@ -209,6 +211,7 @@ describe("Einheit mit Folgemeldung entfernen (R2-D1)", () => {
     const karte = karteVon("Ulm")!;
     expect(within(karte).getByRole("button", { name: "Historie (2)" })).toBeTruthy();
     await nutzer.click(within(karte).getByRole("button", { name: "Details" }));
+    await nutzer.click(within(karte).getByRole("button", { name: "Mehr…" }));
     await nutzer.click(within(karte).getByRole("button", { name: "Entfernen" }));
     const dialog = document.querySelector<HTMLDialogElement>("dialog[aria-label='Meldung entfernen?']")!;
     expect(dialog.textContent).toContain("samt Historie");
@@ -269,6 +272,7 @@ describe("Einheit mit Folgemeldung entfernen (R2-D1)", () => {
       (k) => !k.textContent!.includes("Fachberater"),
     )!;
     await nutzer.click(within(karte).getByRole("button", { name: "Details" }));
+    await nutzer.click(within(karte).getByRole("button", { name: "Mehr…" }));
     await nutzer.click(within(karte).getByRole("button", { name: "Entfernen" }));
     const dialog = document.querySelector<HTMLDialogElement>("dialog[aria-label='Meldung entfernen?']")!;
     await nutzer.click(within(dialog).getByRole("button", { name: "Meldung entfernen" }));
@@ -1005,5 +1009,34 @@ describe("Abgerückte Einheit ohne Dimmen (R2-L5)", () => {
     expect(within(karte).getByRole("heading", { level: 3 }).querySelector(".status-badge")!.textContent).toBe("abgerückt");
     const zurueck = within(karte).getByRole("button", { name: "Wieder anwesend" }) as HTMLButtonElement;
     await waitFor(() => expect(zurueck.disabled).toBe(false), { timeout: PRELLSCHUTZ_MS + 500 });
+  });
+});
+
+/**
+ * Neun Knöpfe je Karte machten eine Einheit rund 450 px hoch; die seltenen
+ * und folgenschweren Aktionen liegen jetzt hinter „Mehr…" (Audit Runde 2,
+ * R2-H9).
+ */
+describe("Seltene Kartenaktionen hinter „Mehr…“ (R2-H9)", () => {
+  beforeEach(() => {
+    localStorage.clear();
+  });
+
+  it("zeigt Aufteilen, Verschieben und Entfernen erst nach „Mehr…“ und klappt mit „Weniger“ wieder zu", async () => {
+    const nutzer = userEvent.setup();
+    buehne(["Wardenburg"]);
+    for (const name of ["Aufteilen…", "Verschieben…", "Entfernen"]) {
+      expect(screen.queryByRole("button", { name })).toBeNull();
+    }
+    const mehr = screen.getByRole("button", { name: "Mehr…" });
+    expect(mehr.getAttribute("aria-expanded")).toBe("false");
+    await nutzer.click(mehr);
+    for (const name of ["Aufteilen…", "Verschieben…", "Entfernen"]) {
+      expect(screen.getByRole("button", { name })).toBeTruthy();
+    }
+    const weniger = screen.getByRole("button", { name: "Weniger" });
+    expect(weniger.getAttribute("aria-expanded")).toBe("true");
+    await nutzer.click(weniger);
+    expect(screen.queryByRole("button", { name: "Entfernen" })).toBeNull();
   });
 });

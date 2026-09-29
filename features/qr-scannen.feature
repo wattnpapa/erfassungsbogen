@@ -26,7 +26,7 @@ Funktionalität: Bogen per QR-Code einlesen
     Dann sehe ich die Übersicht mit dem Standort "Oldenburg - Ni"
     Wenn ich mir den angezeigten QR-Code merke
     Und ich auf "Neuer Bogen" klicke
-    Und ich im Dialog auf "Verwerfen und neu beginnen" klicke
+    Und ich im Dialog auf "Schließen, zur Startseite" klicke
     Dann sehe ich die Schaltfläche "Neuen Bogen erstellen"
     Wenn ich auf "QR-Code scannen…" klicke
     Und ich den gemerkten QR-Code über "QR aus Bild einlesen…" einlese
