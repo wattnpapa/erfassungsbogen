@@ -60,8 +60,12 @@ export function SchrittEinsatz({ bogen, aendern }: SchrittProps) {
         Beginns vorbelegt; steht das Ende noch nicht fest, den Vorschlag einfach stehen lassen und
         später nachtragen.
       </p>
+      {/* Klasse „datum" statt „schmal": In 112 px stand vom Datum nur Tag und
+          Monat, das Jahr war abgeschnitten — ein Vorjahresbogen fiel nicht auf.
+          Auf dem Telefon stehen die Datumsfelder in voller Breite untereinander
+          (index.html, Audit Runde 2, R2-H8). */}
       <div className="zeile">
-        <Feld titel="Zeitraum von" schmal>
+        <Feld titel="Zeitraum von" klasse="datum">
           <input
             type="date"
             value={datumZuIso(ez.zeitraumVon)}
@@ -71,7 +75,7 @@ export function SchrittEinsatz({ bogen, aendern }: SchrittProps) {
             }}
           />
         </Feld>
-        <Feld titel={bisFolgtVon ? "Zeitraum bis (Vorschlag: wie Beginn)" : "Zeitraum bis"} schmal>
+        <Feld titel={bisFolgtVon ? "Zeitraum bis (Vorschlag: wie Beginn)" : "Zeitraum bis"} klasse="datum">
           <input type="date" value={datumZuIso(ez.zeitraumBis)} onChange={(e) => setEz({ zeitraumBis: datumAusIso(e.target.value) })} />
         </Feld>
         <Feld titel="Einsatzort / Auftrag">
@@ -92,7 +96,7 @@ export function SchrittEinsatz({ bogen, aendern }: SchrittProps) {
           Einsatzbeginn eintragen
         </label>
         {ez.einsatzbeginn != null && (
-          <Feld titel="Einsatzbeginn (Datum, Uhrzeit)" klasse="mittel">
+          <Feld titel="Einsatzbeginn (Datum, Uhrzeit)" klasse="mittel datum">
             <input type="datetime-local" value={zeitpunktZuIso(ez.einsatzbeginn)} onChange={(e) => setEz({ einsatzbeginn: zeitpunktAusIso(e.target.value) })} />
           </Feld>
         )}
@@ -105,7 +109,7 @@ export function SchrittEinsatz({ bogen, aendern }: SchrittProps) {
           Einsatzende eintragen
         </label>
         {ez.einsatzende != null && (
-          <Feld titel="Einsatzende (Datum, Uhrzeit)" klasse="mittel">
+          <Feld titel="Einsatzende (Datum, Uhrzeit)" klasse="mittel datum">
             <input type="datetime-local" value={zeitpunktZuIso(ez.einsatzende)} onChange={(e) => setEz({ einsatzende: zeitpunktAusIso(e.target.value) })} />
           </Feld>
         )}

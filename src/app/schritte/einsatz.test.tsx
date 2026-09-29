@@ -24,6 +24,29 @@ describe("Schritt Einsatz", () => {
   // für Zeichen — deshalb fireEvent.change statt userEvent.type.
   const datumSetzen = (feld: HTMLElement, wert: string) => fireEvent.change(feld, { target: { value: wert } });
 
+  /**
+   * Audit Runde 2, R2-H8: Als „schmal" (112 px) war vom Datum das Jahr
+   * abgeschnitten. Die Datumsfelder tragen die Klasse „datum" — das
+   * Stylesheet setzt sie breiter und auf dem Telefon in volle Breite
+   * (geprüft in stilregeln-r2.test.ts).
+   */
+  it("setzt die Datumsfelder nicht mehr in die schmale Spalte", async () => {
+    const nutzer = userEvent.setup();
+    buehne();
+    await nutzer.click(screen.getByLabelText("Einsatzbeginn eintragen"));
+
+    const felder = [
+      screen.getByLabelText("Zeitraum von"),
+      screen.getByLabelText(/^Zeitraum bis/),
+      screen.getByLabelText("Einsatzbeginn (Datum, Uhrzeit)"),
+    ];
+    for (const feld of felder) {
+      const label = feld.closest("label")!;
+      expect(label.classList.contains("datum")).toBe(true);
+      expect(label.classList.contains("schmal")).toBe(false);
+    }
+  });
+
   it("zieht „bis“ mit „von“ mit, solange es unberührt ist", () => {
     buehne();
 

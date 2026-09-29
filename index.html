@@ -3864,6 +3864,15 @@
        ist als der Bildschirm und an sein Ende kommt. */
     html:has(dialog:modal) { overflow: hidden; }
     dialog:modal { overscroll-behavior: contain; }
+    /* R2-H8: Datumsfelder (Schritt 2) standen als „schmal" auf 112 px — das
+       Jahr war abgeschnitten, „Zeitraum bis (Vorschlag: wie Beginn)" brach
+       auf drei Zeilen. Breit genug für TT.MM.JJJJ samt Kalenderknopf, und
+       auf dem Telefon in voller Breite untereinander; Datum mit Uhrzeit
+       („mittel datum") behält sein 12rem, stapelt dort aber ebenso. */
+    .zeile > label.feld.datum:not(.mittel) { flex: 0 1 11rem; }
+    @media (max-width: 30rem) {
+      .zeile > label.feld.datum { flex: 1 1 100%; }
+    }
   </style>
 </head>
 <body>
