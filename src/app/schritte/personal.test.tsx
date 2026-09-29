@@ -5,7 +5,7 @@
  */
 
 import { describe, it, expect } from "vitest";
-import { render, screen, within } from "@testing-library/react";
+import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { useState } from "react";
 import { SchrittBuehne } from "../../test/schritt-buehne";
@@ -267,7 +267,12 @@ describe("Schritt Personal", () => {
     expect(werte.some((v) => v === "")).toBe(false);
   });
 
-  it("räumt die namenlosen Zeilen auch beim Einfügen einer Namensliste weg", async () => {
+  /**
+   * Audit Runde 2, R2-N2: Eingefügte Namen räumten die Sollplätze weg — mit
+   * ihnen GrFü und TrFü, aus 0/2/7/9 wurde 0/0/2/2. Jetzt füllen sie die
+   * freien Plätze der Reihe nach auf; nichts Leeres verschwindet.
+   */
+  it("setzt eingefügte Namen in die freien Plätze, statt sie wegzuräumen", async () => {
     const nutzer = userEvent.setup();
     render(
       <SchrittBuehne komponente={SchrittPersonal} bogen={{ ...neuerBogen(), personal: [neuePerson(), neuePerson()] }} />,
@@ -276,11 +281,41 @@ describe("Schritt Personal", () => {
     await nutzer.click(screen.getByRole("button", { name: "Namen einfügen…" }));
     const dialog = document.querySelector<HTMLDialogElement>("dialog[aria-label='Namen einfügen']")!;
     await nutzer.type(within(dialog).getByRole("textbox"), "Muster, Max");
+    expect(within(dialog).getByText(/→ Platz 1/)).toBeDefined();
     await nutzer.click(within(dialog).getByRole("button", { name: "1 Person übernehmen" }));
 
     const werte = (within(screen.getByRole("table")).getAllByRole("textbox") as HTMLInputElement[]).map((f) => f.value);
-    expect(werte).toEqual(["Max", "Muster"]);
+    expect(werte).toEqual(["Max", "Muster", "", ""]);
   });
+
+  it("lässt die StAN-Stärke beim Einfügen von Namen stehen und bietet Rückgängig an", async () => {
+    const nutzer = userEvent.setup();
+    const einheitsTyp = { code: 4 }; // B – Bergungsgruppe, -/2/7/9
+    const bogen = neuerBogen();
+    render(
+      <SchrittBuehne
+        komponente={SchrittPersonal}
+        bogen={{
+          ...bogen,
+          einheit: { ...bogen.einheit, einheitsTyp },
+          personal: stanPersonalVorbelegung(bogen.einheit.organisation, einheitsTyp),
+        }}
+      />,
+    );
+
+    await nutzer.click(screen.getByRole("button", { name: "Namen einfügen…" }));
+    const dialog = document.querySelector<HTMLDialogElement>("dialog[aria-label='Namen einfügen']")!;
+    await nutzer.type(within(dialog).getByRole("textbox"), "Maier, Klaus\nAnna Schulz");
+    await nutzer.click(within(dialog).getByRole("button", { name: "2 Personen übernehmen" }));
+
+    expect(screen.getByLabelText("Stärke: 0 Führer, 2 Unterführer, 7 Mannschaft, 9 gesamt")).toBeDefined();
+    const werte = (within(screen.getByRole("table")).getAllByRole("textbox") as HTMLInputElement[]).map((f) => f.value);
+    expect(werte.slice(0, 4)).toEqual(["Klaus", "Maier", "Anna", "Schulz"]);
+
+    await nutzer.click(screen.getByRole("button", { name: "Rückgängig" }));
+    const danach = (within(screen.getByRole("table")).getAllByRole("textbox") as HTMLInputElement[]).map((f) => f.value);
+    expect(danach.every((v) => v === "")).toBe(true);
+   }, 20000);
 
   /**
    * Schritt 1 belegt das Personal beim Wählen des Einheitstyps schon mit der
@@ -327,11 +362,36 @@ describe("Schritt Personal", () => {
 
     await nutzer.click(knopf);
     const dialog = document.querySelector<HTMLDialogElement>("dialog[aria-label='StAN-Sollplätze laden?']")!;
-    await nutzer.click(within(dialog).getByRole("button", { name: "Ersetzen" }));
+    // Die Rückfrage nennt den Namen, der verloren geht (R2-N2).
+    expect(dialog.textContent).toMatch(/1 eingetragener Name verloren: Lange, Thomas/);
+    await nutzer.click(within(dialog).getByRole("button", { name: "Ersetzen, Namen löschen" }));
 
     expect(screen.getByLabelText("Stärke: 0 Führer, 2 Unterführer, 7 Mannschaft, 9 gesamt")).toBeDefined();
     // Und jetzt steht die StAN so da wie sie ist — der Knopf hätte nichts mehr zu tun.
     expect(screen.getByRole("button", { name: /^StAN-Sollplätze laden/ })).toHaveProperty("disabled", true);
+
+    // Rückgängig bringt Thomas zurück.
+    await nutzer.click(screen.getByRole("button", { name: "Rückgängig" }));
+    expect(screen.getByDisplayValue("Thomas")).toBeDefined();
+  });
+
+  it("quittiert „Person entfernen“ mit Rückgängig an der Stelle der Karte (R2-G1)", async () => {
+    const nutzer = userEvent.setup();
+    render(
+      <SchrittBuehne
+        komponente={SchrittPersonal}
+        bogen={{ ...neuerBogen(), personal: [{ ...neuePerson(), vorname: "Paul", nachname: "Stein" }, { ...neuePerson(), vorname: "Eva", nachname: "Berg" }] }}
+      />,
+    );
+    await nutzer.click(screen.getByRole("button", { name: "Stein, Paul entfernen" }));
+    const frage = document.querySelector<HTMLDialogElement>("dialog[aria-label='Stein, Paul entfernen?']")!;
+    await nutzer.click(within(frage).getByRole("button", { name: "Person entfernen" }));
+    await waitFor(() => expect(screen.queryByDisplayValue("Paul")).toBeNull());
+
+    expect(screen.getByText(/Stein, Paul entfernt/)).toBeDefined();
+    await nutzer.click(screen.getByRole("button", { name: "Rückgängig" }));
+    expect(screen.getByDisplayValue("Paul")).toBeDefined();
+    expect(screen.getByDisplayValue("Eva")).toBeDefined();
   });
 
   it("versteckt den Beispielnamen-Weg bei echten Bögen vollständig", async () => {

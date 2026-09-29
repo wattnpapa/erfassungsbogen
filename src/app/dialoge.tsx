@@ -17,7 +17,7 @@
  * überschreiben.
  */
 
-import { useEffect, useRef, useState, type FormEvent, type ReactNode } from "react";
+import { useEffect, useRef, useState, type FormEvent, type MouseEvent, type ReactNode } from "react";
 
 /** Ein Eingabefeld einer Abfrage. `name` ist der Schlüssel im Ergebnis. */
 export type Eingabefeld = {
@@ -199,6 +199,23 @@ export function zeigeHinweis(a: {
 // ------------------------------------------------------------------ Anzeige
 
 /**
+ * Prellschutz: So lange nach dem Öffnen nimmt das Fenster keinen Tipp an.
+ * Die Rückfrage erscheint in Bildmitte, oft genau unter dem Finger, der den
+ * Löschknopf gerade getroffen hat — ein prellender Handschuh oder ein
+ * Doppeltipp bestätigte sie dann gleich mit (Audit Runde 2, R2-G1). Tastatur
+ * (Enter, Esc) ist nicht betroffen: ein Klick aus der Tastatur trägt
+ * `detail === 0`.
+ */
+let prellschutzMs = 450;
+
+/** Für Tests: Prellschutz setzen (0 = aus). Gibt den alten Wert zurück. */
+export function prellschutzSetzen(ms: number): number {
+  const alt = prellschutzMs;
+  prellschutzMs = ms;
+  return alt;
+}
+
+/**
  * Die eine Stelle, an der Abfragen erscheinen. Die App hängt sie einmal ein
  * (siehe `App`); Tests, die eine einzelne Komponente rendern, brauchen sie
  * ebenfalls, sonst wartet ein `await frageJaNein(...)` ewig.
@@ -219,6 +236,15 @@ export function Dialogschicht() {
 function Dialogfenster({ abfrage }: { abfrage: Abfrage }) {
   const dialog = useRef<HTMLDialogElement>(null);
   const erstes = useRef<HTMLInputElement | HTMLTextAreaElement | null>(null);
+  const geoeffnetUm = useRef(Date.now());
+
+  /** Zeiger-Klicks kurz nach dem Öffnen verschlucken (siehe `prellschutzMs`). */
+  function prellschutz(e: MouseEvent<HTMLFormElement>) {
+    if (e.detail > 0 && Date.now() - geoeffnetUm.current < prellschutzMs) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+  }
   const [werte, setWerte] = useState<Record<string, string>>(() =>
     abfrage.art === "eingabe"
       ? Object.fromEntries(abfrage.felder.map((f) => [f.name, f.vorgabe ?? f.auswahl?.[0]?.wert ?? ""]))
@@ -232,6 +258,7 @@ function Dialogfenster({ abfrage }: { abfrage: Abfrage }) {
 
   useEffect(() => {
     dialog.current?.showModal();
+    geoeffnetUm.current = Date.now();
     // Wie beim alten `window.prompt` steht eine Vorgabe markiert da:
     // weitertippen ersetzt sie, ohne sie erst löschen zu müssen. Vor dem
     // `showModal()` geht das nicht — ein geschlossener Dialog ist unsichtbar
@@ -285,7 +312,7 @@ function Dialogfenster({ abfrage }: { abfrage: Abfrage }) {
 
   return (
     <dialog ref={dialog} className="abfrage" aria-label={abfrage.titel} onClose={beiSchluss}>
-      <form onSubmit={absenden}>
+      <form onSubmit={absenden} onClickCapture={prellschutz}>
         <h2>{abfrage.titel}</h2>
 
         {abfrage.art === "eingabe" && (

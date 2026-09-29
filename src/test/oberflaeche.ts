@@ -8,8 +8,11 @@
 
 import { afterEach } from "vitest";
 import { cleanup } from "@testing-library/react";
-import { dialogeZuruecksetzen } from "../app/dialoge";
+import { dialogeZuruecksetzen, prellschutzSetzen } from "../app/dialoge";
 import { speicherVerdrahten } from "../app/speicher-browser";
+// Testing Library klickt schneller als jeder Finger: der Prellschutz der
+// Rückfragen (dialoge.tsx, R2-G1) ist hier aus; sein eigener Test schaltet ihn ein.
+prellschutzSetzen(0);
 
 // Älteres jsdom kennt <dialog> nur als Element, nicht seine Methoden. Die App
 // öffnet damit den Übergabe-, Namens- und Einsatzwahl-Dialog sowie alle

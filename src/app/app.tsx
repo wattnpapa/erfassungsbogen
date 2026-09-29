@@ -534,6 +534,28 @@ function AppInhalt() {
   const [fremdeErfassung, setFremdeErfassung] = useState<boolean>(!!ENTWURF?.fremd);
   const [schritt, setSchritt] = useState(START.bogen || ENTWURF ? UEBERSICHT : 0);
   const richtung = useSchrittRichtung(schritt);
+  // Schrittwechsel (Weiter, Zurück, Schrittleiste, Prüfpunkt): der neue
+  // Schritt beginnt oben. Vorher blieb die Scrollposition des vorigen stehen,
+  // und Schritt 2 bis 4 öffneten mitten im Formular — Ort/Auftrag, die
+  // Personal-Betriebsart oder der Fahrzeugtyp lagen über dem Bildrand und
+  // wurden übersprungen (Audit Runde 2, R2-H1). Der Fokus geht auf die
+  // Überschrift, nicht ins erste Feld: keine aufspringende Tastatur, und
+  // Vorlesesoftware sagt, wo man jetzt ist.
+  const vorigerSchritt = useRef(schritt);
+  useEffect(() => {
+    if (vorigerSchritt.current === schritt) return;
+    vorigerSchritt.current = schritt;
+    try {
+      window.scrollTo(0, 0);
+    } catch {
+      /* Testumgebung ohne Layout */
+    }
+    const kopf = document.querySelector<HTMLElement>(".schritt-inhalt h2");
+    if (kopf) {
+      kopf.tabIndex = -1;
+      kopf.focus({ preventScroll: true });
+    }
+  }, [schritt]);
   const [fehler, setFehler] = useState(START.fehler);
   // Signaturstatus des zuletzt IMPORTIERTEN Bogens (Herkunft des Transports).
   // Wird beim Bearbeiten verworfen — dann beschreibt er den Bogen nicht mehr.

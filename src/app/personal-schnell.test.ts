@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { StaerkeRolle } from "@bos/eeb-format/model";
-import { parseNamen, rolleAusFunktion } from "./personal-schnell";
+import { namenEinsetzen, parseNamen, rolleAusFunktion } from "./personal-schnell";
+import { neuePerson, personUnbenannt } from "./hilfen";
 
 describe("parseNamen", () => {
   it("liest „Nachname, Vorname“ je Zeile", () => {
@@ -56,5 +57,33 @@ describe("parseNamen", () => {
   it("leerer Text ergibt eine leere Liste", () => {
     expect(parseNamen("")).toEqual([]);
     expect(parseNamen("\n  \n")).toEqual([]);
+  });
+});
+
+describe("Audit Runde 2, R2-N2", () => {
+  it("liest ein vorangestelltes Führungskürzel als Funktion, nicht als Nachnamen", () => {
+    expect(parseNamen("GrFü Maier, Klaus")).toEqual([
+      { nachname: "Maier", vorname: "Klaus", funktion: "GrFü", rolle: StaerkeRolle.UNTERFUEHRER },
+    ]);
+    expect(parseNamen("TrFü Anna Schulz")[0]).toMatchObject({ vorname: "Anna", nachname: "Schulz", funktion: "TrFü" });
+    // Ein gewöhnlicher Doppelname bleibt ein Name.
+    expect(parseNamen("Anna Maria Schulz")[0]).toEqual({ vorname: "Anna Maria", nachname: "Schulz" });
+  });
+
+  it("füllt freie Plätze auf, statt sie zu ersetzen — Führungsrolle zuerst auf passenden Platz", () => {
+    const platz = (rolle: StaerkeRolle, code: number) => ({ ...neuePerson(), staerkeRolle: rolle, funktionen: [{ code }] });
+    const liste = [platz(StaerkeRolle.UNTERFUEHRER, 1), platz(StaerkeRolle.UNTERFUEHRER, 2), platz(StaerkeRolle.MANNSCHAFT, 3)];
+    const helfer = { ...neuePerson(), vorname: "Anna", nachname: "Schulz" };
+    const fuehrer = { ...neuePerson(), vorname: "Klaus", nachname: "Maier", staerkeRolle: StaerkeRolle.UNTERFUEHRER, funktionen: [{ freitext: "TrFü" }] };
+    const extra = { ...neuePerson(), vorname: "Paul", nachname: "Stein" };
+    const vierter = { ...neuePerson(), vorname: "Eva", nachname: "Berg" };
+
+    const r = namenEinsetzen(liste, [helfer, fuehrer, extra, vierter], personUnbenannt);
+    expect(r.plaetze).toEqual([0, 1, 2, null]);
+    expect(r.personal).toHaveLength(4);
+    // Platz 0 behält seine Funktion, Platz 1 bekommt die mitgebrachte.
+    expect(r.personal[0]).toMatchObject({ nachname: "Schulz", funktionen: [{ code: 1 }], staerkeRolle: StaerkeRolle.UNTERFUEHRER });
+    expect(r.personal[1]).toMatchObject({ nachname: "Maier", funktionen: [{ freitext: "TrFü" }] });
+    expect(r.personal[3]).toBe(vierter);
   });
 });

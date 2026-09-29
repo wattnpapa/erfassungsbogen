@@ -3,7 +3,7 @@
  * und die Meldekopf-Schnellerfassung (nur Stärke).
  */
 
-import { useEffect, useMemo, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from "react";
+import { Fragment, useEffect, useMemo, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from "react";
 import { useZahlQuittung } from "../quittung";
 import { mitAbgang, useEinzugsstempel } from "../eintrag-bewegung";
 import {
@@ -21,7 +21,7 @@ import {
   unterbringungMWD,
   verpflegung,
 } from "@bos/eeb-format/model";
-import { parseNamen } from "../personal-schnell";
+import { namenEinsetzen, parseNamen } from "../personal-schnell";
 import { beispielPersonen } from "../beispielnamen";
 import { stanPersonalVorbelegung } from "@bos/vokabulare/thw-stan-personal";
 import {
@@ -33,6 +33,7 @@ import {
   pruefpunkte,
   verpflegungMitziehen,
   verschoben,
+  vokabText,
   vokabularFuer,
   vorbelegungGeladen,
 } from "../hilfen";
@@ -471,8 +472,10 @@ function PersonalSchnellTabelle(props: {
   fokusNeue: boolean;
   aufNeueFokus: () => void;
   verschieben: (von: number, nach: number, gruppe: "karte" | "zeile", art: "hoch" | "runter") => void;
+  /** Nach dem Entfernen einer Zeile: Quittung mit „Rückgängig" (R2-G1). */
+  entfernt: (vorher: Person[], bezeichnung: string) => void;
 }) {
-  const { personal, aendern, fokusNeue, aufNeueFokus, verschieben } = props;
+  const { personal, aendern, fokusNeue, aufNeueFokus, verschieben, entfernt } = props;
   const set = (i: number, patch: Partial<Person>) =>
     aendern(personal.map((p, j) => (j === i ? { ...p, ...patch } : p)));
 
@@ -497,6 +500,7 @@ function PersonalSchnellTabelle(props: {
       return;
     }
     aendern(personal.filter((_, j) => j !== i));
+    if (!personLeer(p)) entfernt(personal, bezeichnung);
   }
 
   function enterWeiter(e: ReactKeyboardEvent, i: number) {
@@ -599,11 +603,49 @@ function benannte(personal: Person[]): Person[] {
   return personal.filter((p) => !personUnbenannt(p));
 }
 
+/** Kurzbeschreibung eines Sollplatzes für die Namensvorschau: Funktion, sonst Rolle. */
+function platzText(p: Person, org: OrganisationsTyp): string {
+  const funktion = p.funktionen
+    .map((f) => vokabText(f, vokabularFuer(org, "funktion"), "kurz"))
+    .filter(Boolean)
+    .join(", ");
+  return funktion || ROLLE_LABEL[p.staerkeRolle];
+}
+
 
 export function SchrittPersonal({ bogen, aendern: aendernRoh }: SchrittProps) {
+  /**
+   * Rückweg nach einer Handlung, die Erfasstes wegnimmt: Person entfernen,
+   * Namen einfügen, Sollplätze laden. Eine gelöschte Person nahm Name,
+   * Funktionen und Erreichbarkeit ohne jeden Rückweg mit — und ein Doppeltipp
+   * genügte (Audit Runde 2, R2-G1, R2-N2). `index`: an dieser Stelle der
+   * Kartenliste steht die Quittung, also dort, wo der Finger gerade war.
+   * Jede weitere Änderung verwirft den Rückweg, damit „Rückgängig" nie
+   * spätere Eingaben mitnimmt.
+   */
+  const [rueckweg, setRueckweg] = useState<{ text: string; personal: Person[]; index?: number } | null>(null);
   // Jede Änderung hier kann die Stärke verschieben — der Verpflegungs-Bedarf
   // in Schritt 5 zieht mit, solange er der Stärke entsprach (verpflegungMitziehen).
-  const aendern = (patch: Partial<typeof bogen>) => aendernRoh(verpflegungMitziehen(bogen, patch));
+  const aendern = (patch: Partial<typeof bogen>) => {
+    setRueckweg(null);
+    aendernRoh(verpflegungMitziehen(bogen, patch));
+  };
+  /** Liste ändern und den vorigen Stand als Rückweg anbieten. */
+  const aendernMitRueckweg = (personal: Person[], text: string, index?: number) => {
+    const vorher = bogen.personal;
+    aendern({ personal });
+    setRueckweg({ text, personal: vorher, index });
+  };
+  const rueckgaengig = () => {
+    if (!rueckweg) return;
+    aendern({ personal: rueckweg.personal });
+  };
+  const quittung = rueckweg && (
+    <p className="meldung rueckweg" role="status">
+      {rueckweg.text}{" "}
+      <button type="button" onClick={rueckgaengig}>Rückgängig</button>
+    </p>
+  );
   const nurStaerke = bogen.personalErfassung === PersonalErfassung.NUR_STAERKE;
   const vorlage = stanPersonalVorbelegung(bogen.einheit.organisation, bogen.einheit.einheitsTyp);
   const stanGeladen = vorbelegungGeladen(bogen.personal, vorlage);
@@ -635,6 +677,9 @@ export function SchrittPersonal({ bogen, aendern: aendernRoh }: SchrittProps) {
     return schonErfasst.has(k) || namenVorschau.findIndex((m) => namensSchluessel(m.vorname, m.nachname) === k) < i;
   });
   const anzahlDoppelt = vorschauDoppelt.filter(Boolean).length;
+  // Wohin jeder Name kommt — freie Sollplätze zuerst (R2-N2). Die Vorschau
+  // zeigt es, bevor übernommen wird.
+  const vorschauPlaetze = namenEinsetzen(bogen.personal, namenVorschau.map(personAusZeile), personUnbenannt).plaetze;
   // Anzahl für den Beispielnamen-Generator (nur Übungsbögen). Vorgabe 9:
   // Trupp bis Gruppe, die häufigste Größenordnung in Übungslagen.
   const [beispielAnzahl, setBeispielAnzahl] = useState(9);
@@ -661,7 +706,13 @@ export function SchrittPersonal({ bogen, aendern: aendernRoh }: SchrittProps) {
 
   function namenUebernehmen() {
     if (namenVorschau.length === 0) return;
-    aendern({ personal: [...benannte(bogen.personal), ...namenVorschau.map(personAusZeile)] });
+    const { personal, plaetze } = namenEinsetzen(bogen.personal, namenVorschau.map(personAusZeile), personUnbenannt);
+    const eingesetzt = plaetze.filter((x) => x != null).length;
+    aendernMitRueckweg(
+      personal,
+      `${namenVorschau.length} ${namenVorschau.length === 1 ? "Name" : "Namen"} übernommen` +
+        (eingesetzt > 0 ? ` — ${eingesetzt} davon in freie Sollplätze.` : "."),
+    );
     setSchnell(true); // die frisch eingefügten Namen direkt als Tabelle zeigen
     setNamenText("");
     namenDialog.current?.close();
@@ -901,15 +952,24 @@ export function SchrittPersonal({ bogen, aendern: aendernRoh }: SchrittProps) {
                 : undefined
             }
             onClick={async () => {
+              // Die Rückfrage nennt, was verloren geht: „ersetzt" las niemand
+              // als „deine eingetragenen Namen werden gelöscht" — und weil die
+              // Stärke gleich blieb, fiel der Verlust nicht auf (R2-N2).
+              const namen = bogen.personal.filter((p) => !personUnbenannt(p)).map((p, i) => personBezeichnung(p, i));
               if (
                 bogen.personal.length === 0 ||
                 (await frageJaNein({
                   titel: "StAN-Sollplätze laden?",
-                  text: `Die aktuelle Personalliste (${bogen.personal.length} Personen) wird durch die ${vorlage.length} Sollplätze der StAN ersetzt.`,
-                  ok: "Ersetzen",
+                  text:
+                    `Die aktuelle Personalliste (${bogen.personal.length} Personen) wird durch die ${vorlage.length} Sollplätze der StAN ersetzt.` +
+                    (namen.length > 0
+                      ? ` Dabei ${namen.length === 1 ? "geht 1 eingetragener Name" : `gehen ${namen.length} eingetragene Namen`} verloren: ${namen.slice(0, 5).join(", ")}${namen.length > 5 ? " …" : ""}.`
+                      : ""),
+                  ok: namen.length > 0 ? "Ersetzen, Namen löschen" : "Ersetzen",
+                  gefahr: namen.length > 0,
                 }))
               ) {
-                aendern({ personal: vorlage });
+                aendernMitRueckweg(vorlage, `StAN-Sollplätze geladen${namen.length > 0 ? ` — ${namen.length} Namen entfernt` : ""}.`);
               }
             }}
           >
@@ -940,6 +1000,7 @@ export function SchrittPersonal({ bogen, aendern: aendernRoh }: SchrittProps) {
           </button>
         </p>
       )}
+      {quittung && rueckweg?.index == null && quittung}
       {!nurStaerke && schnell ? (
         bogen.personal.length > 0 && (
           <PersonalSchnellTabelle
@@ -948,10 +1009,13 @@ export function SchrittPersonal({ bogen, aendern: aendernRoh }: SchrittProps) {
             fokusNeue={fokusNeue}
             aufNeueFokus={() => setFokusNeue(true)}
             verschieben={personVerschieben}
+            entfernt={(vorher, bezeichnung) => setRueckweg({ text: `${bezeichnung} entfernt.`, personal: vorher })}
           />
         )
       ) : (
         bogen.personal.map((p, i) => (
+          <Fragment key={i}>
+          {rueckweg?.index === i && quittung}
           <PersonKarte
             key={i}
             person={p}
@@ -964,10 +1028,17 @@ export function SchrittPersonal({ bogen, aendern: aendernRoh }: SchrittProps) {
             nichtGezaehlt={nurStaerke}
             verschieben={personVerschieben}
             aendern={(np) => aendern({ personal: bogen.personal.map((x, j) => (j === i ? np : x)) })}
-            entfernen={() => aendern({ personal: bogen.personal.filter((_, j) => j !== i) })}
+            entfernen={() => {
+              const rest = bogen.personal.filter((_, j) => j !== i);
+              if (personLeer(p)) aendern({ personal: rest });
+              else aendernMitRueckweg(rest, `${personBezeichnung(p, i)} entfernt.`, i);
+            }}
           />
+          </Fragment>
         ))
       )}
+      {/* Die letzte Karte entfernt: die Quittung steht, wo sie war. */}
+      {!schnell && rueckweg?.index != null && rueckweg.index >= bogen.personal.length && quittung}
       <button
         type="button"
         className="primaer"
@@ -1009,7 +1080,11 @@ export function SchrittPersonal({ bogen, aendern: aendernRoh }: SchrittProps) {
                 {[n.nachname, n.vorname].filter(Boolean).join(", ")}
                 {n.funktion ? ` · ${n.funktion}` : ""}
                 {" · "}
-                <strong>{ROLLE_LABEL[n.rolle ?? StaerkeRolle.MANNSCHAFT]}</strong>
+                <strong>
+                  {vorschauPlaetze[i] != null
+                    ? `→ Platz ${vorschauPlaetze[i]! + 1}: ${platzText(bogen.personal[vorschauPlaetze[i]!]!, bogen.einheit.organisation)}`
+                    : ROLLE_LABEL[n.rolle ?? StaerkeRolle.MANNSCHAFT]}
+                </strong>
                 {vorschauDoppelt[i] && <span className="uebung-badge">doppelt</span>}
               </li>
             ))}

@@ -171,6 +171,23 @@ describe("Assistenten-Durchlauf", () => {
     expect(within(screen.getByRole("banner")).getByText("Schnellerfassung")).toBeDefined();
   });
 
+  it("beginnt jeden Schritt oben und setzt den Fokus auf die Schrittüberschrift (R2-H1)", async () => {
+    const nutzer = userEvent.setup();
+    const scroll = vi.spyOn(window, "scrollTo").mockImplementation(() => {});
+    try {
+      render(<App />);
+      await nutzer.click(screen.getByRole("button", { name: "Neuen Bogen erstellen" }));
+      scroll.mockClear();
+      await nutzer.click(screen.getByRole("button", { name: "Weiter →" }));
+      expect(scroll).toHaveBeenCalledWith(0, 0);
+      expect(document.activeElement).toBe(screen.getByRole("heading", { level: 2, name: "2. Einsatz" }));
+      await nutzer.click(screen.getByRole("button", { name: "← Zurück" }));
+      expect(document.activeElement).toBe(screen.getByRole("heading", { level: 2, name: "1. Einheit" }));
+    } finally {
+      scroll.mockRestore();
+    }
+  });
+
   it("zeigt die Modus-Marke beim vollen Bogen nicht", async () => {
     const nutzer = userEvent.setup();
     render(<App />);

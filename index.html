@@ -626,6 +626,8 @@
 
     /* Der Sprung setzt den Fokus auf <main>; dort ist der Rahmen überflüssig. */
     main:focus { outline: none; }
+    /* Schrittüberschrift bekommt beim Schrittwechsel den Fokus (R2-H1) — nur als Lesezeichen, ohne Rahmen. */
+    .schritt-inhalt h2:focus { outline: none; }
     /* Umschalter Standard/Feld/Nacht als kompakte Segmente. In schmalen
        Spalten (Fußzeile auf dem Telefon) darf die Segmentzeile umbrechen,
        statt über den Rand hinauszuragen. */
