@@ -41,6 +41,7 @@ import { frageJaNein } from "../dialoge";
 import { TabellenScroll } from "../tabellen-scroll";
 import {
   Feld,
+  FREMDE_DATEN,
   Auswahl,
   Hinweise,
   MWD_LEGENDE,
@@ -123,6 +124,7 @@ function KontakteEditor(props: { kontakte: Kontakt[]; aendern: (k: Kontakt[]) =>
             <input
               type={k.art === KontaktArt.EMAIL ? "email" : "tel"}
               inputMode={k.art === KontaktArt.EMAIL ? "email" : "tel"}
+              {...FREMDE_DATEN}
               value={k.wert ?? ""}
               onChange={(e) =>
                 set(i, {
@@ -355,8 +357,11 @@ function PersonKarte(props: {
         {nichtGezaehlt && " · nicht gezählt"}
       </p>
       <div className="zeile eintrag-kopf">
-        <Feld titel="Vorname"><input value={p.vorname} onChange={(e) => set({ vorname: e.target.value })} /></Feld>
-        <Feld titel="Nachname"><input value={p.nachname} onChange={(e) => set({ nachname: e.target.value })} /></Feld>
+        {/* Die Person auf dem Bogen, nicht der Gerätebesitzer: ohne
+            autocomplete schlug das Telefon für jede Person den eigenen Namen
+            vor (R2-M6). */}
+        <Feld titel="Vorname"><input {...FREMDE_DATEN} value={p.vorname} onChange={(e) => set({ vorname: e.target.value })} /></Feld>
+        <Feld titel="Nachname"><input {...FREMDE_DATEN} value={p.nachname} onChange={(e) => set({ nachname: e.target.value })} /></Feld>
         {/* „Zählt als" statt „Stärkerolle (vor Ort)": das Feld entscheidet,
             in welcher Spalte der Stärkemeldung die Person landet — genau das
             sagt die Beschriftung. „(vor Ort)" las sich wie eine Ortsangabe. */}
@@ -544,6 +549,7 @@ function PersonalSchnellTabelle(props: {
                     auf den Bogen (Audit Runde 2, R2-M5). */}
                 <input
                   aria-label={`Person ${i + 1}: Vorname`}
+                  {...FREMDE_DATEN}
                   value={p.vorname}
                   autoFocus={fokusNeue && i === personal.length - 1}
                   onChange={(e) => set(i, { vorname: e.target.value })}
@@ -553,6 +559,7 @@ function PersonalSchnellTabelle(props: {
               <td>
                 <input
                   aria-label={`Person ${i + 1}: Nachname`}
+                  {...FREMDE_DATEN}
                   value={p.nachname}
                   onChange={(e) => set(i, { nachname: e.target.value })}
                   onKeyDown={(e) => enterWeiter(e, i)}

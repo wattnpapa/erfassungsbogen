@@ -268,6 +268,23 @@ describe("Schritt Einheit — offene Pflichtangaben", () => {
   });
 
   /**
+   * Audit Runde 2, R2-M6: `autocomplete="tel"/"email"` meint die EIGENEN Daten
+   * des Gerätebesitzers — das Telefon bot für die OV-Rufnummer die private
+   * Handynummer an. Das Kürzel ist eine Kennung: Großbuchstaben, keine
+   * Autokorrektur, keine Rechtschreibprüfung.
+   */
+  it("bietet für Dienststellenkontakte kein Autofill der eigenen Kontaktkarte an, das Kürzel ohne Autokorrektur", () => {
+    render(<SchrittEinheit bogen={neuerBogen()} aendern={() => {}} />);
+
+    expect(screen.getByLabelText("Telefon").getAttribute("autocomplete")).toBe("off");
+    expect(screen.getByLabelText("E-Mail").getAttribute("autocomplete")).toBe("off");
+    const kuerzel = screen.getByLabelText("Dienststellen-Kürzel (optional)");
+    expect(kuerzel.getAttribute("autocapitalize")).toBe("characters");
+    expect(kuerzel.getAttribute("autocorrect")).toBe("off");
+    expect(kuerzel.getAttribute("spellcheck")).toBe("false");
+  });
+
+  /**
    * Der Schnell-Einstieg der Startseite landet in genau diesem Assistenten —
    * sechs Schritte, dieselbe Überschrift. Dass nur Stärke gemeint ist, stand
    * vorher erst auf Schritt 3.

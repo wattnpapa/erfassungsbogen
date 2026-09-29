@@ -206,6 +206,12 @@ Erreichbarkeiten der Personen, dort nach Kontaktart. Kein `type="number"` —
 Trennzeichen und führende Null gehören nicht in ein Rechenfeld. Nachgemessen im
 Browser und in einem Unit-Test.
 
+Nachtrag 2026-09-29 (Audit Runde 2, R2-M6): `autocomplete="tel"`/`"email"` ist
+wieder entfallen — die Werte meinen die eigenen Daten des Gerätebesitzers, und
+das Telefon bot für die OV-Rufnummer die private Handynummer an. Kontaktstellen,
+Erreichbarkeiten und Namen der Personen tragen jetzt `autocomplete="off"`;
+`type`/`inputmode` bleiben.
+
 ### F7 [P2] Kästchen und Auswahlpunkte sind 18 × 18 px groß
 
 Nachweis: beobachtet, gemessen.

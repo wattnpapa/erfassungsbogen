@@ -198,6 +198,32 @@ function VokabCombobox(props: {
  *  - Die Trefferzahl kommt zusätzlich über eine Statuszeile: dass sich die
  *    Anzahl beim Tippen ändert, verrät sonst nichts.
  */
+/**
+ * Eingabeattribute für Kennungen — Kennzeichen, Funkruf-Kennzahlen,
+ * Dienststellen-Kürzel. Das sind Buchstaben-Ziffern-Folgen, keine Wörter: die
+ * Autokorrektur „verbesserte" sie, die Großschreibung am Satzanfang machte
+ * aus „THW" ein „Thw", und die Rechtschreibprüfung unterstrich jedes
+ * Kennzeichen rot (Audit Runde 2, R2-M6). `autoComplete="off"` dazu, weil
+ * das Telefon für ein unbeschriftetes Textfeld sonst Einträge aus ganz
+ * anderen Formularen anbietet.
+ */
+export const KENNUNG_EINGABE = {
+  autoCapitalize: "characters",
+  autoCorrect: "off",
+  spellCheck: false,
+  autoComplete: "off",
+} as const;
+
+/**
+ * Für Felder, die NICHT die eigenen Daten des Gerätebesitzers meinen
+ * (Personen des Bogens, Dienststellenkontakte): kein Autofill aus der
+ * eigenen Kontaktkarte. `autocomplete="tel"`/`"email"` am OV-Telefon bot die
+ * private Handynummer an, und ein Tipp darauf setzte sie als
+ * Dienststellenkontakt auf den Bogen (R2-M6). Nur „Name/Kontakt hinterlegen"
+ * (Absenderkarte) meint wirklich den Gerätebesitzer und behält name/email/tel.
+ */
+export const FREMDE_DATEN = { autoComplete: "off" } as const;
+
 export function VorschlagFeld<T>(props: {
   wert: string;
   platzhalter?: string;
@@ -223,8 +249,10 @@ export function VorschlagFeld<T>(props: {
    * Suchfeldern wie dem OV-Namen), dass hier eine Liste wartet.
    */
   picker?: boolean;
+  /** true: Kennung (Kürzel) — Großbuchstaben, ohne Autokorrektur ({@link KENNUNG_EINGABE}). */
+  kennung?: boolean;
 }) {
-  const { wert, platzhalter, beschriftung, treffer, schluessel, zeile, tippen, waehlen, bestaetigen, verlassen, imFluss, picker } = props;
+  const { wert, platzhalter, beschriftung, treffer, schluessel, zeile, tippen, waehlen, bestaetigen, verlassen, imFluss, picker, kennung } = props;
   const ausFeld = useContext(FeldTitel);
   const [offen, setOffen] = useState(false);
   const [aktiv, setAktiv] = useState(0);
@@ -257,6 +285,7 @@ export function VorschlagFeld<T>(props: {
         aria-autocomplete="list"
         // Sonst legt sich die Autovervollständigung des Browsers über unsere.
         autoComplete="off"
+        {...(kennung ? KENNUNG_EINGABE : {})}
         value={wert}
         placeholder={platzhalter}
         onChange={(ev) => {
@@ -587,6 +616,7 @@ export function KennzahlenFeld(props: { teile: number[]; aendern: (t: number[]) 
   const [text, setText] = useState(props.teile.join("/"));
   return (
     <input
+      {...KENNUNG_EINGABE}
       value={text}
       placeholder="18/13"
       onChange={(e) => {

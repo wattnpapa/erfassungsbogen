@@ -39,6 +39,20 @@ describe("Schritt Fahrzeuge", () => {
     expect(screen.queryByText(/hat noch kein Kennzeichen/)).toBeNull();
   });
 
+  it("behandelt Kennzeichen und Kennzahlen als Kennung: Großbuchstaben, ohne Autokorrektur (R2-M6)", async () => {
+    const nutzer = userEvent.setup();
+    buehne();
+    await nutzer.click(screen.getByRole("button", { name: "+ Fahrzeug hinzufügen" }));
+    await nutzer.click(screen.getByLabelText("Funkrufname"));
+
+    for (const feld of [screen.getByLabelText("Kennzeichen"), screen.getByLabelText("Kennzahlen (z. B. 18/13)")]) {
+      expect(feld.getAttribute("autocapitalize")).toBe("characters");
+      expect(feld.getAttribute("autocorrect")).toBe("off");
+      expect(feld.getAttribute("spellcheck")).toBe("false");
+      expect(feld.getAttribute("autocomplete")).toBe("off");
+    }
+  });
+
   it("übernimmt eine abweichende Sitzplatzzahl und rechnet die Bilanz damit", async () => {
     const nutzer = userEvent.setup();
     // Ein FüKomKw (Richtwert 3) und zwei Personen: Ohne eigene Angabe fehlt

@@ -26,7 +26,7 @@ import {
   vokabularFuer,
 } from "../hilfen";
 import { frageJaNein } from "../dialoge";
-import { Auswahl, Feld, Hinweise, VokabAuswahl, VorschlagFeld, type SchrittProps } from "./bausteine";
+import { Auswahl, Feld, FREMDE_DATEN, Hinweise, KENNUNG_EINGABE, VokabAuswahl, VorschlagFeld, type SchrittProps } from "./bausteine";
 
 // Die beiden großen Datenpakete laden erst mit Schritt 1, nicht mit dem
 // Start-Bundle: das THW-OV-Verzeichnis (~190 KB Quelldaten) und die
@@ -121,8 +121,10 @@ function OvVorschlagFeld(props: {
   verzeichnis: readonly ThwOrtsverband[];
   tippen: (wert: string) => void;
   uebernehmen: (ov: ThwOrtsverband) => void;
+  /** true: das Feld nimmt das Kürzel auf, nicht den Namen (R2-M6). */
+  kennung?: boolean;
 }) {
-  const { wert, platzhalter, verzeichnis, tippen, uebernehmen } = props;
+  const { wert, platzhalter, verzeichnis, tippen, uebernehmen, kennung } = props;
 
   const suche = wert.trim().toLowerCase();
   const treffer = suche
@@ -150,6 +152,7 @@ function OvVorschlagFeld(props: {
       )}
       tippen={tippen}
       waehlen={uebernehmen}
+      kennung={kennung}
       verlassen={(eingabe) => {
         const e = eingabe.trim();
         const ov = verzeichnis.find((o) => o.kurz === e.toUpperCase() || o.name === e);
@@ -496,6 +499,7 @@ export function SchrittEinheit({ bogen, aendern: aendernRoh }: SchrittProps) {
               {h.bezeichnung.code === 1 ? (
                 // Viele kennen ihr OV-Kürzel und tippen es ein – dieselbe Vorschlagsliste wie beim OV-Namen.
                 <OvVorschlagFeld
+                  kennung
                   wert={h.kurz ?? ""}
                   platzhalter="z. B. OODE für OV Oldenburg"
                   verzeichnis={ovVerzeichnis}
@@ -506,6 +510,7 @@ export function SchrittEinheit({ bogen, aendern: aendernRoh }: SchrittProps) {
                 />
               ) : (
                 <input
+                  {...KENNUNG_EINGABE}
                   value={h.kurz ?? ""}
                   placeholder="z. B. GOLD für RSt Oldenburg"
                   onChange={(ev) =>
@@ -525,7 +530,9 @@ export function SchrittEinheit({ bogen, aendern: aendernRoh }: SchrittProps) {
             <input
               type="tel"
               inputMode="tel"
-              autoComplete="tel"
+              // Dienststellenkontakt, nicht der eigene: „tel" bot die private
+              // Handynummer des Helfers an (R2-M6).
+              {...FREMDE_DATEN}
               value={h.telefon ?? ""}
               onChange={(ev) =>
                 setE({ hierarchie: e.hierarchie.map((x, j) => (j === i ? { ...x, telefon: ev.target.value.replace(/\D/g, "") || undefined } : x)) })
@@ -536,7 +543,7 @@ export function SchrittEinheit({ bogen, aendern: aendernRoh }: SchrittProps) {
             <input
               type="email"
               inputMode="email"
-              autoComplete="email"
+              {...FREMDE_DATEN}
               value={h.email ?? ""}
               onChange={(ev) => setE({ hierarchie: e.hierarchie.map((x, j) => (j === i ? { ...x, email: ev.target.value || undefined } : x)) })}
             />

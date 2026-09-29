@@ -226,6 +226,19 @@ describe("Schritt Personal", () => {
     expect(within(tabelle).getByRole("textbox", { name: "Person 2: Nachname" })).toHaveProperty("value", "Musterfrau");
   });
 
+  it("schlägt für Personen des Bogens nicht den eigenen Namen vor (R2-M6)", async () => {
+    const nutzer = userEvent.setup();
+    buehne();
+    await nutzer.click(screen.getByRole("button", { name: "+ Person hinzufügen" }));
+
+    expect(screen.getByLabelText("Vorname").getAttribute("autocomplete")).toBe("off");
+    expect(screen.getByLabelText("Nachname").getAttribute("autocomplete")).toBe("off");
+    await nutzer.click(screen.getByLabelText("Schnelleingabe (Tabelle)"));
+    for (const feld of within(screen.getByRole("table")).getAllByRole("textbox")) {
+      expect(feld.getAttribute("autocomplete")).toBe("off");
+    }
+  });
+
   it("beschriftet das Feld in „Namen einfügen“ sichtbar, nicht nur per Platzhalter (R2-M5)", async () => {
     const nutzer = userEvent.setup();
     buehne();

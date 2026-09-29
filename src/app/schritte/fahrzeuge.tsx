@@ -25,6 +25,7 @@ import {
   Feld,
   Hinweise,
   KennzahlenFeld,
+  KENNUNG_EINGABE,
   VokabAuswahl,
   type SchrittProps,
 } from "./bausteine";
@@ -79,6 +80,7 @@ function FahrzeugKarte(props: {
         </Feld>
         <Feld titel="Kennzeichen">
           <input
+            {...KENNUNG_EINGABE}
             id={`feld-kennzeichen-${index}`}
             value={f.kennzeichen ?? ""}
             onChange={(e) => set({ kennzeichen: e.target.value })}
