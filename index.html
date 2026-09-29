@@ -1848,6 +1848,31 @@
       margin: 0; font: inherit; font-size: var(--t-m);
       letter-spacing: normal; color: inherit; border: none; padding: 0;
     }
+    /* Quittung mit Rückweg nach „Abrücken" und „Entfernen" in der
+       Einsatz-Sammlung: fest am unteren Bildrand, im Daumenbereich, statt
+       über den Summen am Seitenanfang — dort stand sie bei tief gerollter
+       Liste 2 100 px außerhalb des Bilds, „Rückgängig" war ein Textlink von
+       74 × 30 px (Audit Runde 2, R2-H4). Die Knöpfe tragen das volle Zielmaß.
+       Der Prellschutz sperrt sie kurz, ohne sie auszugrauen: sie sollen
+       beim Erscheinen nicht wie „geht nicht" aussehen. Das Polster unten in
+       main (6rem) hält das Seitenende frei. */
+    .quittung-daumen {
+      position: fixed; z-index: 20;
+      left: max(var(--r-3), env(safe-area-inset-left));
+      right: max(var(--r-3), env(safe-area-inset-right));
+      bottom: max(var(--r-3), env(safe-area-inset-bottom));
+      max-width: 40rem; margin-inline: auto;
+      display: flex; align-items: center; gap: var(--r-2);
+      padding: var(--r-2) var(--r-2) var(--r-2) var(--r-3);
+      background: var(--flaeche); color: var(--text);
+      border: var(--strich-stark) solid var(--linie-stark); border-top: 4px solid var(--text);
+      border-radius: var(--radius); box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+      font-size: var(--t-s);
+    }
+    .quittung-daumen > .quittung-text { flex: 1 1 auto; min-width: 0; overflow-wrap: anywhere; }
+    .quittung-daumen > button { flex: none; }
+    .quittung-daumen > button:disabled { opacity: 1; }
+    .quittung-daumen > .quittung-schliessen { min-width: calc(var(--ziel-basis) + var(--ziel)); padding-inline: 0; }
     /* Zug- und Teil-Kennzeichnung an einer gemeldeten Einheit. Ruhiger als der
        Übungs-Störer daneben: sie ordnen ein, sie warnen nicht. Das Teil-Etikett
        trägt den Akzent, weil es nach einer Aufteilung das einzige ist, was zwei

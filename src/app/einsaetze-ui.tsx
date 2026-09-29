@@ -8,7 +8,7 @@
  * Reine Anzeige + Aufruf der Store-/Auswertungslogik (einsaetze.ts, auswertung.ts).
  */
 
-import { useEffect, useId, useLayoutEffect, useRef, useState, type FocusEvent } from "react";
+import { useEffect, useId, useLayoutEffect, useRef, useState, type FocusEvent, type ReactNode } from "react";
 import {
   PersonalErfassung,
   datumZuIso,
@@ -667,29 +667,6 @@ export function EinsatzDetail(props: {
       </p>
     </SeitenKopf>
     <main id="inhalt" tabIndex={-1} className="einsatz-detail">
-      {zuletztEntfernt && (
-        <p className="meldung" role="status">
-          {zuletztEntfernt.art === "fassung"
-            ? `Fassung Stand ${standText(zuletztEntfernt.eintraege[0]!.bogen)} von „${einheitAnzeigename(zuletztEntfernt.eintraege[0]!.bogen.einheit)}" verworfen.`
-            : `Meldung „${einheitAnzeigename(zuletztEntfernt.eintraege[0]!.bogen.einheit)}" entfernt${
-                zuletztEntfernt.eintraege.length > 1 ? ` (${zuletztEntfernt.eintraege.length} Fassungen)` : ""
-              }.`}{" "}
-          <button type="button" className="link" onClick={() => void entferntesZurueckholen()}>Rückgängig</button>
-        </p>
-      )}
-      {/* Quittung des Statuswechsels mit Uhrzeit und Rückweg: Ein Tipp nahm die
-          Einheit bisher wortlos aus allen Summen — und niemand konnte hinterher
-          sagen, wann (D4, W3). */}
-      {statusWechsel && (
-        <p className="meldung" role="status">
-          „{einheitAnzeigename(statusWechsel.vorher.bogen.einheit)}"{" "}
-          {statusWechsel.status === MeldeStatus.ABGERUECKT ? "abgerückt" : "wieder anwesend"}{" "}
-          {zeitKurz(statusWechsel.zeit)}
-          {" — "}
-          <button type="button" className="link" onClick={statusZurueck}>Rückgängig</button>
-        </p>
-      )}
-
       {/* Ausgenommene Übungsmeldungen: Die Zahlen darunter sind ohne sie
           gerechnet, und das muss dort stehen, wo die Zahlen stehen — nicht nur
           als Etikett an der einzelnen Karte weiter unten. */}
@@ -1037,6 +1014,42 @@ export function EinsatzDetail(props: {
         </p>
         <button type="button" className="entfernen" onClick={loeschen}>Einsatz löschen…</button>
       </section>
+
+      {/* Quittung von Entfernen und Statuswechsel mit Rückweg — fest im
+          Daumenbereich statt über den Summen am Seitenanfang: Wer in einer
+          langen Liste bei 2 400 px „Abrücken" traf, sah die Quittung nicht,
+          „Rückgängig" war ein 74 × 30 px großer Textlink (Audit Runde 2,
+          R2-H4). Eine Quittung zur Zeit: die jüngere ersetzt die ältere. */}
+      {zuletztEntfernt && (
+        <DaumenQuittung
+          key={`entfernt:${zuletztEntfernt.eintraege.map((e) => e.id).join(",")}`}
+          onRueckgaengig={() => void entferntesZurueckholen()}
+          onSchliessen={() => setZuletztEntfernt(null)}
+        >
+          {zuletztEntfernt.art === "fassung"
+            ? `Fassung Stand ${standText(zuletztEntfernt.eintraege[0]!.bogen)} von „${einheitAnzeigename(zuletztEntfernt.eintraege[0]!.bogen.einheit)}" verworfen.`
+            : `Meldung „${einheitAnzeigename(zuletztEntfernt.eintraege[0]!.bogen.einheit)}" entfernt${
+                zuletztEntfernt.eintraege.length > 1 ? ` (${zuletztEntfernt.eintraege.length} Fassungen)` : ""
+              }.`}
+        </DaumenQuittung>
+      )}
+      {/* Statuswechsel mit Uhrzeit: Ein Tipp nahm die Einheit bisher wortlos
+          aus allen Summen — und niemand konnte hinterher sagen, wann (D4, W3).
+          Sie liegt womöglich genau unter dem Finger, der eben „Abrücken"
+          getippt hat; ihre Knöpfe tragen deshalb denselben Prellschutz wie
+          die Karte (R2-G4). */}
+      {statusWechsel && (
+        <DaumenQuittung
+          key={`status:${statusWechsel.vorher.id}:${statusWechsel.zeit}`}
+          prellschutz
+          onRueckgaengig={() => void statusZurueck()}
+          onSchliessen={() => setStatusWechsel(null)}
+        >
+          „{einheitAnzeigename(statusWechsel.vorher.bogen.einheit)}"{" "}
+          {statusWechsel.status === MeldeStatus.ABGERUECKT ? "abgerückt" : "wieder anwesend"}{" "}
+          {zeitKurz(statusWechsel.zeit)}
+        </DaumenQuittung>
+      )}
     </main>
     </>
   );
@@ -1472,6 +1485,41 @@ function HistorieZeile({ eintrag, vorheriger, aktuell, onVerwerfen }: {
       )}
       {offen && vorheriger && <Aenderungen vorher={vorheriger.bogen} nachher={eintrag.bogen} />}
     </li>
+  );
+}
+
+/**
+ * Quittung mit Rückweg, fest am unteren Bildrand (Daumenbereich), mit
+ * „Rückgängig" in voller Knopfgröße (Audit Runde 2, R2-H4). Sie bleibt, bis
+ * die nächste Quittung sie ersetzt, sie geschlossen wird oder die Ansicht
+ * wechselt — ein Zeitablauf nähme den einzigen Rückweg einer entfernten
+ * Meldung, während der Helfer gerade woanders hinsieht.
+ *
+ * `prellschutz`: Die Knöpfe nehmen erst nach PRELLSCHUTZ_MS an — die Leiste
+ * erscheint womöglich genau unter dem Finger eines Doppeltipps.
+ */
+function DaumenQuittung({ children, prellschutz = false, onRueckgaengig, onSchliessen }: {
+  children: ReactNode;
+  prellschutz?: boolean;
+  onRueckgaengig: () => void;
+  onSchliessen: () => void;
+}) {
+  const [bereit, setBereit] = useState(!prellschutz);
+  useEffect(() => {
+    if (bereit) return;
+    const uhr = setTimeout(() => setBereit(true), PRELLSCHUTZ_MS);
+    return () => clearTimeout(uhr);
+  }, [bereit]);
+  return (
+    <div className="quittung-daumen" role="status">
+      <span className="quittung-text">{children}</span>
+      <button type="button" className="quittung-rueckgaengig" disabled={!bereit} onClick={onRueckgaengig}>
+        Rückgängig
+      </button>
+      <button type="button" className="quittung-schliessen" disabled={!bereit} aria-label="Quittung schließen" onClick={onSchliessen}>
+        ✕
+      </button>
+    </div>
   );
 }
 

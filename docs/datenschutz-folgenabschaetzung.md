@@ -69,6 +69,11 @@ Grundlage: Repository `wattnpapa/erfassungsbogen`, Stand 2026-09-12 — Version 
 > Speicher, sobald Sammlungen mit Meldungen oder Vorlagen vorliegen, und merkt
 > sich den Zeitpunkt der letzten Sicherung (`eeb.sicherung.zuletzt.v1`, keine
 > Personendaten). Keine Netzverbindung, kein neuer Empfänger. Geändert: 5.7.
+>
+> **Nachgezogen 2026-09-29 — Quittung nach Entfernen (Audit Runde 2, R2-H4):**
+> „Rückgängig" steht jetzt in einer festen Leiste am unteren Bildrand; die
+> Lebensdauer des Rückwegs (nur Arbeitsspeicher) ist präzisiert. Keine neue
+> Speicherung. Geändert: 5.7.
 
 ## Hinweis zu diesem Dokument
 
@@ -358,7 +363,9 @@ Kapitel 6 der [Arc42-Dokumentation](arc42-architektur.md).
   Zusatzfeldern (`einheitEntfernen`, `src/app/eintrag-zeiten.ts`). Vorher
   blieb bei Folgemeldungen die ältere Fassung mit ihren Personendaten stehen
   (Audit Runde 2, R2-D1). Der Rückweg „Rückgängig" lebt nur im Arbeitsspeicher
-  der offenen Ansicht, nicht im Gerätespeicher. Seit 2026-09-29 merkt sich die
+  der offenen Ansicht, nicht im Gerätespeicher, und endet, sobald die
+  Quittung geschlossen, von einer neueren ersetzt oder die Ansicht verlassen
+  wird. Seit 2026-09-29 merkt sich die
   App die Kennungen der entfernten Einträge (`eeb.entfernt.v1`, nur zufällige
   Kennungen, `src/app/entfernte-meldungen.ts`): Bringt ein „Einsatz
   importieren…" eine davon zurück, wird gefragt, und ohne Zustimmung bleibt sie

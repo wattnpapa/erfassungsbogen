@@ -541,15 +541,40 @@ describe("Abrücken mit Zeit, Quittung und Rückweg", () => {
     expect(e.status).toBe(MeldeStatus.ABGERUECKT);
     expect(typeof e.abgerueckAm).toBe("number");
     expect(geaendert).toHaveBeenCalled();
-    // Die Quittung steht in der Ansicht — nicht nur der Zustand der Karte.
+    // Die Quittung steht in der Ansicht — nicht nur der Zustand der Karte —,
+    // und zwar in der festen Leiste im Daumenbereich (R2-H4).
     const quittung = screen.getByRole("status");
     expect(quittung.textContent).toMatch(/„.*Crailsheim.*" abgerückt \d\d:\d\d/);
+    expect(quittung.className).toContain("quittung-daumen");
 
-    await nutzer.click(within(quittung).getByRole("button", { name: "Rückgängig" }));
+    // Prellschutz: Die Leiste kann unter dem Finger des Doppeltipps liegen —
+    // „Rückgängig" nimmt erst nach einem Augenblick an.
+    const rueckgaengig = within(quittung).getByRole("button", { name: "Rückgängig" }) as HTMLButtonElement;
+    expect(rueckgaengig.disabled).toBe(true);
+    await waitFor(() => expect(rueckgaengig.disabled).toBe(false), { timeout: PRELLSCHUTZ_MS + 500 });
+    await nutzer.click(rueckgaengig);
     const zurueck = gespeichert(einsatzId, "Crailsheim");
     expect(zurueck.status).toBe(MeldeStatus.ANWESEND);
     expect(zurueck.abgerueckAm).toBeUndefined();
     neuLaden();
+    expect(screen.queryByRole("status")).toBeNull();
+  });
+
+  it("zeigt nur eine Quittung zur Zeit und lässt sie schließen", async () => {
+    const nutzer = userEvent.setup();
+    const { neuLaden } = buehne(["Crailsheim", "Aalen"]);
+    const karten = () => [...document.querySelectorAll<HTMLElement>(".einheit-zeile")];
+    await nutzer.click(within(karten()[1]!).getByRole("button", { name: "Abrücken" }));
+    neuLaden();
+    await nutzer.click(within(karten()[0]!).getByRole("button", { name: "Abrücken" }));
+    neuLaden();
+    const quittungen = screen.getAllByRole("status");
+    expect(quittungen).toHaveLength(1);
+    expect(quittungen[0]!.textContent).toContain("Aalen");
+
+    const schliessen = within(quittungen[0]!).getByRole("button", { name: "Quittung schließen" }) as HTMLButtonElement;
+    await waitFor(() => expect(schliessen.disabled).toBe(false), { timeout: PRELLSCHUTZ_MS + 500 });
+    await nutzer.click(schliessen);
     expect(screen.queryByRole("status")).toBeNull();
   });
 

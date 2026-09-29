@@ -71,6 +71,10 @@ Grundlage: Repository `wattnpapa/erfassungsbogen`, Stand 2026-09-12 — Version 
 > — ein Fenster überschreibt den Entwurf nicht mehr still, wenn ein anderes
 > Fenster ihn inzwischen geändert hat, sondern fragt; Einsatz-Sammlungen
 > werden bei Änderungen aus einem anderen Fenster neu eingelesen (3.3 D1).
+>
+> **Nachgezogen 2026-09-29:** Die Quittung mit „Rückgängig" nach Entfernen und
+> Abrücken steht fest im Daumenbereich statt am Seitenanfang (Audit Runde 2,
+> R2-H4); Lebensdauer des Rückwegs präzisiert, keine neue Speicherung (5.5).
 
 ## Hinweis zu diesem Dokument
 
@@ -421,9 +425,11 @@ Datenausleitung an eine andere Herkunft ist technisch unterbunden.
 - **Meldung aus einer Einsatz-Sammlung entfernen** (`einheitEntfernen`,
   `src/app/eintrag-zeiten.ts`, seit 2026-09-29): nimmt die Einheit mit
   **allen** Fassungen (Folgemeldungen) samt Zusatzfeldern aus dem Speicher;
-  abgeteilte Truppteile mit eigenem Fingerabdruck bleiben. „Rückgängig" hält
-  die Einträge nur im Arbeitsspeicher der geöffneten Ansicht, bis weitergeklickt
-  wird — es gibt keinen Papierkorb für einzelne Meldungen. „Fassung
+  abgeteilte Truppteile mit eigenem Fingerabdruck bleiben. „Rückgängig" (in
+  der Quittungsleiste am unteren Bildrand) hält die Einträge nur im
+  Arbeitsspeicher der geöffneten Ansicht, bis die Quittung geschlossen, von
+  einer neueren ersetzt oder die Ansicht verlassen wird — es gibt keinen
+  Papierkorb für einzelne Meldungen. „Fassung
   verwerfen…" in der Historie nimmt gezielt eine einzelne Fassung heraus.
   Die Kennungen der entfernten Einträge bleiben in `eeb.entfernt.v1` (D2e);
   „Einsatz importieren…" fragt, bevor es eine davon wieder aufnimmt, und lässt
