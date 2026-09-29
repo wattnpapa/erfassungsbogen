@@ -36,6 +36,7 @@ import {
   type Vorlage,
 } from "./vorlagen";
 import { SeitenKopf } from "./seiten-kopf";
+import { bedarfMarken } from "./einheiten-tabelle";
 import { frageJaNein, frageText, zeigeHinweis } from "./dialoge";
 import { istNativ, linkTeilen, shareSheetVerfuegbar } from "./nativ";
 import { AbgangKnopf, Kartenstapel } from "./kartenstapel";
@@ -315,6 +316,9 @@ export function Musterung(props: {
   const org = b.einheit.organisation;
   const [pAn, setPAn] = useState<boolean[]>(() => b.personal.map(() => true));
   const [vAn, setVAn] = useState<boolean[]>(() => b.fahrzeuge.map(() => true));
+  // Standard-Sofortbedarf der Vorlage: sichtbar, aber nicht vorausgewählt (R2-W1).
+  const bedarf = bedarfMarken({ ...b, sofortbedarf: b.sofortbedarf && { ...b.sofortbedarf, verpflegungPersonen: 0 } });
+  const [bedarfAn, setBedarfAn] = useState(false);
 
   const anwesendePersonen = b.personal.filter((_, i) => pAn[i]);
   const s = staerke({ personal: anwesendePersonen, staerkeManuell: b.staerkeManuell });
@@ -324,7 +328,7 @@ export function Musterung(props: {
   const toggleV = (i: number) => setVAn(vAn.map((x, j) => (j === i ? !x : x)));
 
   function starten() {
-    onStart(vorlageInstanziieren(b, { personal: pAn, fahrzeuge: vAn }));
+    onStart(vorlageInstanziieren(b, { personal: pAn, fahrzeuge: vAn, sofortbedarf: bedarfAn }));
   }
 
   return (
@@ -385,6 +389,19 @@ export function Musterung(props: {
           </label>
         ))}
       </section>
+
+      {bedarf.length > 0 && (
+        <section className="karte">
+          <h2>Sofortbedarf aus der Vorlage</h2>
+          <label className={`muster-zeile${bedarfAn ? "" : " gestrichen"}`}>
+            <input type="checkbox" checked={bedarfAn} onChange={() => setBedarfAn(!bedarfAn)} />
+            <span className="muster-text">
+              <span className="muster-name">{bedarf.map((m) => m.lang).join(" · ")}</span>
+              <span className="muster-sub">Stammt aus einem früheren Einsatz — nur anhaken, wenn er auch jetzt gilt.</span>
+            </span>
+          </label>
+        </section>
+      )}
 
       <footer className="nav">
         <button type="button" className="primaer muster-start" onClick={starten}>

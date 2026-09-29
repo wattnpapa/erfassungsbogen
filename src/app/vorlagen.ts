@@ -13,7 +13,7 @@
  */
 
 import type { Erfassungsbogen } from "@bos/eeb-format/model";
-import { datumAusIso, jetztZeitpunkt, mitTransportVersion } from "@bos/eeb-format/model";
+import { datumAusIso, jetztZeitpunkt, mitTransportVersion, staerke } from "@bos/eeb-format/model";
 import { bogenPruefen, dateinameTeil, einheitAnzeigename, migriereBogen } from "./hilfen";
 import { aktive, imPapierkorb, papierkorbBereinigt } from "@bos/meldekopf/papierkorb";
 
@@ -56,6 +56,13 @@ export function bogenAlsVorlage(b: Erfassungsbogen): Erfassungsbogen {
 export interface MusterungAuswahl {
   personal: boolean[];
   fahrzeuge: boolean[];
+  /**
+   * Den Standard-Sofortbedarf der Vorlage übernehmen? Fehlt/false = nein.
+   * Er gehört zum letzten Einsatz, nicht zur Einheit: still übernommen, stand
+   * „120 l Diesel" im nächsten Alarm und am Meldekopf in der Bedarfssumme
+   * (Audit Runde 2, R2-W1). Wer ihn will, hakt ihn in der Musterung bewusst an.
+   */
+  sofortbedarf?: boolean;
 }
 
 /**
@@ -69,6 +76,12 @@ export function vorlageInstanziieren(
   const b = bogenAlsVorlage(vorlageBogen); // gleiche Reset-Logik (Einsatz leer, stand heute)
   b.personal = b.personal.filter((_, i) => auswahl.personal[i] ?? true);
   b.fahrzeuge = b.fahrzeuge.filter((_, i) => auswahl.fahrzeuge[i] ?? true);
+  if (!auswahl.sofortbedarf) delete b.sofortbedarf;
+  // Übernommen: die Verpflegung folgt der gemusterten Stärke, nicht der
+  // Stärke, mit der die Vorlage gespeichert wurde.
+  else if (b.sofortbedarf && b.sofortbedarf.verpflegungPersonen > 0) {
+    b.sofortbedarf = { ...b.sofortbedarf, verpflegungPersonen: staerke(b).gesamt };
+  }
   return b;
 }
 

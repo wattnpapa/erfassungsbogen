@@ -28,6 +28,7 @@ import {
   kennzeichenText,
   kontaktText,
   orgLabel,
+  nurSollstaerke,
   pruefpunkte,
   vokabText,
   vokabularFuer,
@@ -1697,6 +1698,13 @@ function EinheitKarte(props: {
               {bedarf.map((m) => (
                 <span className="bedarf-marke" key={m.lang}>{m.lang}</span>
               ))}
+            </span>
+          )}
+          {/* Nur Sollplätze, niemand gezählt: als solche kennzeichnen, nicht als
+              gewöhnliche Lücke (Audit Runde 2, R2-E2). */}
+          {nurSollstaerke(kopf.bogen) && (
+            <span className="muster-sub">
+              <span className="bedarf-marke">Sollstärke, nicht gemeldet</span>
             </span>
           )}
           {kopf.notiz && (

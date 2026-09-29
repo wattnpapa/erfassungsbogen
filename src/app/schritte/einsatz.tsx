@@ -11,7 +11,7 @@ import {
   zeitpunktZuIso,
 } from "@bos/eeb-format/model";
 import { DATENSCHUTZFRIST_TAGE } from "@bos/eeb-format/datenschutzfrist";
-import { pruefpunkte } from "../hilfen";
+import { heuteDatum, pruefpunkte } from "../hilfen";
 import { Feld, Hinweise, type SchrittProps } from "./bausteine";
 
 export function SchrittEinsatz({ bogen, aendern }: SchrittProps) {
@@ -101,7 +101,7 @@ export function SchrittEinsatz({ bogen, aendern }: SchrittProps) {
       {/* Schritt-Index 1 = Einsatz (siehe SCHRITTE in app.tsx): „bis vor von"
           und „Ende vor Beginn" erschienen vorher auf Schritt 1, 3 und in der
           Übersicht — überall, nur nicht dort, wo der Fehler gemacht wird. */}
-      <Hinweise punkte={pruefpunkte(bogen, false)} aktuellerSchritt={1} />
+      <Hinweise punkte={pruefpunkte(bogen, false, heuteDatum())} aktuellerSchritt={1} />
       {/* Übung als Eigenschaft des BOGENS, nicht der App: die Kennzeichnung
           reist im QR mit und erscheint auch auf dem empfangenden Gerät —
           ein Geräte-Modus könnte das nicht leisten. Nicht gesetzt = Feld

@@ -113,6 +113,16 @@ describe("vorlageInstanziieren()", () => {
     expect(arbeit.einsatz.ortAuftrag).toBe(""); // frischer Einsatz
   });
 
+  it("lässt den Sofortbedarf der Vorlage weg, solange er nicht bewusst übernommen wird (R2-W1)", () => {
+    const ohne = vorlageInstanziieren(bogen(), { personal: [true, false, true], fahrzeuge: [true, true] });
+    expect(ohne.sofortbedarf).toBeUndefined();
+
+    const mit = vorlageInstanziieren(bogen(), { personal: [true, false, true], fahrzeuge: [true, true], sofortbedarf: true });
+    expect(mit.sofortbedarf?.dieselLiter).toBe(50);
+    // Die Verpflegung folgt der gemusterten Stärke (2), nicht der Vorlage (3).
+    expect(mit.sofortbedarf?.verpflegungPersonen).toBe(2);
+  });
+
   it("wertet fehlende Auswahl-Einträge als anwesend", () => {
     const arbeit = vorlageInstanziieren(bogen(), { personal: [true], fahrzeuge: [] });
     expect(arbeit.personal).toHaveLength(3);

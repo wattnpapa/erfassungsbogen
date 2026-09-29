@@ -22,8 +22,10 @@ import {
   Sofortbedarf,
   StaerkeRolle,
   datumAusIso,
+  datumZuIso,
   jetztZeitpunkt,
   zeitpunktZuIso,
+  type EebDatum,
   type EebZeitpunkt,
   MINUTEN_JE_TAG,
   mitTransportVersion,
@@ -624,8 +626,17 @@ const S_SOFORTBEDARF = 4;
  * standardmäßig mit an (für die Gesamtübersicht); auf der Personalseite
  * werden sie über `mitFahrzeugen = false` weggelassen.
  */
-export function pruefpunkte(b: Erfassungsbogen, mitFahrzeugen = true): Pruefpunkt[] {
+export function pruefpunkte(b: Erfassungsbogen, mitFahrzeugen = true, heute?: EebDatum): Pruefpunkt[] {
   const hinweise: Pruefpunkt[] = [];
+  // Nur wo `heute` hereinkommt (eigener Bogen vor der Übergabe): ein alter
+  // Entwurf ging sonst mit „✓ vollständig und plausibel" in den QR-Code —
+  // Zeitraum und Auftrag vom Juli als aktuelle Meldung (Audit Runde 2, R2-S1).
+  if (heute != null && b.einsatz.zeitraumBis < heute) {
+    hinweise.push({
+      text: `Einsatzzeitraum ${zeitraumDeutsch(b)} ist vorbei — gilt dieser Bogen noch für den aktuellen Einsatz? Sonst Zeitraum und Ort/Auftrag neu eintragen.`,
+      schritt: S_EINSATZ,
+    });
+  }
   const s = staerke(b);
   const mwd = unterbringungMWD(b);
 
@@ -853,6 +864,18 @@ function literText(liter: number): string {
  * Einsatzbeginn und -ende als „2026-09-27T18:00" neben „27.09.2026" — zwei
  * Schreibweisen für dieselbe Auskunft auf einer Seite.
  */
+/** Heutiger Kalendertag in lokaler Wandzeit (EebDatum). */
+export function heuteDatum(): EebDatum {
+  return Math.floor(jetztZeitpunkt() / MINUTEN_JE_TAG);
+}
+
+/** Einsatzzeitraum lesbar: „18.07.2026 – 22.07.2026" bzw. ein Tag. */
+export function zeitraumDeutsch(b: Erfassungsbogen): string {
+  const von = datumDeutsch(datumZuIso(b.einsatz.zeitraumVon));
+  const bis = datumDeutsch(datumZuIso(b.einsatz.zeitraumBis));
+  return von === bis ? von : `${von} – ${bis}`;
+}
+
 export function zeitpunktDeutsch(z: EebZeitpunkt): string {
   const [datum = "", zeit = ""] = zeitpunktZuIso(z).split("T");
   return `${datumDeutsch(datum)}, ${zeit}`;
@@ -942,6 +965,21 @@ export function schrittStatus(b: Erfassungsbogen): SchrittStatus[] {
  */
 export function bogenHatInhalt(b: Erfassungsbogen): boolean {
   return schrittStatus(b).some((s) => s !== "leer");
+}
+
+/**
+ * Steht die Stärke nur aus unbenannten Sollplätzen? Dann hat niemand die
+ * Einheit gezählt — die Zahl ist die Soll-, nicht die gemeldete Stärke. Am
+ * Meldekopf wirkte so eine Erfassung in der Summe wie eine Meldung von neun
+ * Helfern (Audit Runde 2, R2-E2). Die Schnellerfassung (nur Stärke) ist
+ * ausgenommen: dort ist die Zahl die Angabe.
+ */
+export function nurSollstaerke(b: Erfassungsbogen): boolean {
+  return (
+    b.personalErfassung !== PersonalErfassung.NUR_STAERKE &&
+    b.personal.length > 0 &&
+    b.personal.every(personUnbenannt)
+  );
 }
 
 // ------------------------------------------------------------- Neuer Bogen

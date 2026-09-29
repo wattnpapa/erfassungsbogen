@@ -567,6 +567,48 @@ describe("Assistenten-Durchlauf", () => {
     expect(rueck).not.toContain("Falschstadt");
   }, 30000);
 
+  /**
+   * Audit Runde 2, R2-E2: Eine Erfassung mit nur Name und Typ legte die
+   * StAN-Sollstärke ungefragt als gemeldete Stärke in die Lage.
+   */
+  it("fragt vor dem Ablegen reiner Sollstärke und kennzeichnet sie auf der Karte", async () => {
+    const einsatz = einsatzImSpeicherAnlegen("Sammelhausen", EinsatzArt.EINSATZ);
+    const nutzer = userEvent.setup();
+    render(<App />);
+    await nutzer.click(screen.getByRole("button", { name: "Öffnen" }));
+    await nutzer.click(await screen.findByRole("button", { name: "Einheit manuell erfassen…" }));
+    await nutzer.type(screen.getByLabelText("Name (Pflicht)"), "Sollhausen");
+    const feld = screen.getByRole("combobox", { name: "Einheitstyp" });
+    await nutzer.type(feld, "Bergungsgruppe");
+    const liste = screen.getByRole("listbox", { name: "Vorschläge zu Einheitstyp" });
+    await nutzer.click(within(liste).getAllByText(/Bergungsgruppe/)[0]!);
+
+    await nutzer.click(screen.getByRole("button", { name: "In Einsatz übernehmen" }));
+    const frage = rueckfrage("Stärke nicht gezählt");
+    expect(frage.textContent).toMatch(/nur die Sollplätze nach StAN/);
+    await nutzer.click(within(frage).getByRole("button", { name: "Als Sollstärke ablegen" }));
+
+    expect(await screen.findByText("Sollstärke, nicht gemeldet")).toBeDefined();
+    expect(einsaetzeLaden().find((x) => x.id === einsatz.id)!.eintraege).toHaveLength(1);
+  }, 20000);
+
+  it("fragt bei einem alten Bogen vor der Übergabe nach und bereitet ihn für den neuen Einsatz vor (R2-S1)", async () => {
+    const nutzer = userEvent.setup();
+    const alt = bogenMitName("Althausen");
+    alt.einsatz = { zeitraumVon: 2350, zeitraumBis: 2354, ortAuftrag: "Gebäudeschaden Ulm" };
+    render(<App />);
+    fragmentSetzen(encodePayloadUrl(alt, browserKompressor));
+    await screen.findByRole("heading", { name: "Gesamtübersicht" });
+    expect(screen.queryByText("✓ Alle Angaben vollständig und plausibel.")).toBeNull();
+    expect(screen.getAllByText(/ist vorbei — gilt dieser Bogen noch/).length).toBeGreaterThan(0);
+
+    await nutzer.click(screen.getByRole("button", { name: /^Bogen übergeben/ }));
+    await nutzer.click(screen.getByRole("button", { name: "Für neuen Einsatz vorbereiten" }));
+    expect(await screen.findByRole("heading", { level: 2, name: "2. Einsatz" })).toBeDefined();
+    expect(screen.getByText(/Einsatzdaten für den neuen Einsatz zurückgesetzt/)).toBeDefined();
+    expect(screen.queryByText(/ist vorbei — gilt dieser Bogen noch/)).toBeNull();
+  }, 20000);
+
   it("lässt einen unberührten Bogen ohne Rückfrage ersetzen", async () => {
     const nutzer = userEvent.setup();
     render(<App />);

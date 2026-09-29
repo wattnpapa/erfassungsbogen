@@ -27,6 +27,9 @@ import {
   SCHRITT_STATUS_TITEL,
   blobAlsDownload,
   bogenHatInhalt,
+  heuteDatum,
+  nurSollstaerke,
+  zeitraumDeutsch,
   bogenLaden,
   browserKompressor,
   bytesAlsDatei,
@@ -1659,6 +1662,8 @@ function AppInhalt() {
     const b = bogen;
     const sig = bogenSignatur;
     const herkunft = bogenHerkunft;
+    // Ein empfangener Bogen ist die Meldung der Einheit — nur selbst Erfasstes prüfen (R2-E2).
+    if (!sig && !(await sollstaerkeFreigeben(b))) return;
     einsatzWahlDialog.current?.close();
     setMeldung(""); // Rückmeldung des Assistenten gehört nicht in die Folgeansicht
     // Erst ablegen, dann schließen: Scheitert das Ablegen (Speicher voll),
@@ -1687,11 +1692,40 @@ function AppInhalt() {
     setSchritt(0);
   }
 
+  /**
+   * Vor dem Ablegen eines selbst erfassten Bogens: Besteht die Stärke nur aus
+   * unbenannten Sollplätzen, hat niemand die Einheit gezählt. „In Einsatz
+   * übernehmen" steht auf jedem Schritt — auf Schritt 1 übernommen, stand die
+   * StAN-Sollstärke ungefragt als Meldung in der Lage (Audit Runde 2, R2-E2).
+   * Rückgabe: true = ablegen, false = nicht (abgebrochen oder zum Eintragen
+   * in den Personal-Schritt gesprungen).
+   */
+  async function sollstaerkeFreigeben(b: Erfassungsbogen): Promise<boolean> {
+    if (!nurSollstaerke(b)) return true;
+    const s = staerke(b);
+    const wahl = await frageWahl({
+      titel: "Stärke nicht gezählt",
+      text: `Für „${einheitAnzeigename(b.einheit)}" stehen nur die Sollplätze nach StAN (Stärke ${s.fuehrer} / ${s.unterfuehrer} / ${s.mannschaft} / ${s.gesamt}${b.fahrzeuge.length ? `, ${b.fahrzeuge.length} Fahrzeug${b.fahrzeuge.length === 1 ? "" : "e"}` : ""}) — niemand hat Personen eingetragen.`,
+      wege: [
+        { wert: "eintragen", label: "Stärke jetzt eintragen", hinweis: "Springt zum Personal — Namen oder nur die Zahl (Schnellerfassung)." },
+        { wert: "soll", label: "Als Sollstärke ablegen", hinweis: "Die Karte in der Sammlung trägt die Marke „Sollstärke, nicht gemeldet“." },
+      ],
+    });
+    if (wahl === "eintragen") {
+      einsatzWahlDialog.current?.close();
+      setOffenerEinsatzId(null);
+      setZeigeStart(false);
+      setSchritt(2);
+    }
+    return wahl === "soll";
+  }
+
   /** Erfassung für einen Einsatz abschließen: ablegen, dann den Arbeitsplatz räumen. */
   async function erfassungUebernehmen() {
     const ziel = sammelZielId;
     if (!ziel || !bogen) return;
     const b = bogen;
+    if (!(await sollstaerkeFreigeben(b))) return;
     setMeldung("");
     // Manuell erfasster Bogen ist kein signierter Transport.
     const ok = await bogenInSammlung(ziel, b, "manuell", undefined, false, eigenerBogenWartetHinweis());
@@ -2225,6 +2259,10 @@ function AppInhalt() {
                     })()}
                   </span>
                 )}
+                {/* Alter Bogen: der Zeitraum steht auf der Karte, bevor jemand „Fortsetzen" tippt (R2-S1). */}
+                {bogen.einsatz.zeitraumBis < heuteDatum() && (
+                  <span className="hinweis warnung-text">Einsatz {zeitraumDeutsch(bogen)}</span>
+                )}
                 <span className="hinweis">
                   Stärke {s.fuehrer} / {s.unterfuehrer} / {s.mannschaft} / {s.gesamt}
                   {gespeichertUm
@@ -2570,6 +2608,13 @@ function AppInhalt() {
             bearbeiteteVorlage ? { name: bearbeiteteVorlage.name, onAktualisieren: vorlageAktualisierenUndSchliessen } : undefined
           }
           onInEinsatzAufnehmen={() => { einsaetzeNeuLaden(); einsatzWahlDialog.current?.showModal(); }}
+          onNeuerEinsatz={() => {
+            const heute = heuteDatum();
+            const { sofortbedarf: _alt, ...ohneBedarf } = bogen;
+            setBogen({ ...ohneBedarf, einsatz: { zeitraumVon: heute, zeitraumBis: heute, ortAuftrag: "" }, stand: jetztZeitpunkt() });
+            setSchritt(1);
+            setMeldung("Einsatzdaten für den neuen Einsatz zurückgesetzt — Ort/Auftrag eintragen. Personal und Fahrzeuge sind geblieben.");
+          }}
           sammelAktion={
             sammelZielId
               ? { label: "In Einsatz übernehmen", onUebernehmen: () => void erfassungUebernehmen() }

@@ -32,7 +32,9 @@ import {
   kontaktText,
   natoZeitstempel,
   orgLabel,
+  heuteDatum,
   pruefpunkte,
+  zeitraumDeutsch,
   qrErzeugen,
   vokabText,
   vokabularFuer,
@@ -95,6 +97,11 @@ export function Uebersicht(props: {
    * `sammelAktion` bereits in den vorgewählten Einsatz.
    */
   onInEinsatzAufnehmen?: () => void;
+  /**
+   * Einsatzdaten zurücksetzen (Zeitraum heute, Ort/Auftrag und Sofortbedarf
+   * leer) — angeboten, wenn der Einsatzzeitraum vorbei ist (R2-S1).
+   */
+  onNeuerEinsatz?: () => void;
 }) {
   const { bogen, geheZu, neu } = props;
 
@@ -142,7 +149,8 @@ export function Uebersicht(props: {
      Übergabe-Dialog. Dort ist es der letzte Moment, in dem die Lücke noch
      auffallen kann — wer bis zum QR-Code durchgetippt hat, hat die Warnung
      oben längst weggescrollt. */
-  const offenePunkte = pruefpunkte(bogen);
+  const offenePunkte = pruefpunkte(bogen, true, heuteDatum());
+  const zeitraumVorbei = bogen.einsatz.zeitraumBis < heuteDatum();
   const [schluesselKurz, setSchluesselKurz] = useState<string | null>(null);
   // Freiwillige Absenderangaben zur Signatur. Als Effekt-Abhängigkeit geführt:
   // eine geänderte Karte ändert den signierten Payload → QR neu erzeugen.
@@ -786,6 +794,27 @@ export function Uebersicht(props: {
             Gesperrt wird nichts — eine Teilmeldung ist manchmal richtig, und
             eine gesperrte Übergabe hilft am Meldekopf niemandem. Antippen
             schließt den Dialog und springt an die Stelle. */}
+        {/* Alter Bogen: zuerst fragen, ob er noch gilt — drei Tipps nach
+            „Fortsetzen" stand sonst der QR-Code eines Einsatzes vom Juli
+            (Audit Runde 2, R2-S1). */}
+        {zeitraumVorbei && props.onNeuerEinsatz && (
+          <div className="teilen-weg">
+            <p className="warnung" role="status">
+              Dieser Bogen gehört zum Einsatz {zeitraumDeutsch(bogen)}.
+            </p>
+            <button
+              type="button"
+              className="primaer"
+              onClick={() => {
+                teilenDialog.current?.close();
+                props.onNeuerEinsatz?.();
+              }}
+            >
+              Für neuen Einsatz vorbereiten
+            </button>
+            <p className="hinweis">Zeitraum heute, Ort/Auftrag und Sofortbedarf leer — Personal und Fahrzeuge bleiben.</p>
+          </div>
+        )}
         {offenePunkte.length > 0 && (
           <Vollstaendigkeit
             punkte={offenePunkte}
