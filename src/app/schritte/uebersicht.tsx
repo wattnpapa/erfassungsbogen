@@ -442,7 +442,7 @@ export function Uebersicht(props: {
                 <button type="button" onClick={() => teilenDialog.current?.showModal()}>Bogen übergeben…</button>
               )}
               {!props.sammelAktion && !props.vorlageBearbeitung && props.onInEinsatzAufnehmen && (
-                <button type="button" onClick={props.onInEinsatzAufnehmen}>In Einsatz aufnehmen…</button>
+                <button type="button" onClick={props.onInEinsatzAufnehmen}>In Einsatz-Sammlung ablegen…</button>
               )}
               <button type="button" onClick={alsVorlageSpeichern}>
                 {props.vorlageBearbeitung ? "Als neue Vorlage speichern" : "Als Vorlage speichern"}

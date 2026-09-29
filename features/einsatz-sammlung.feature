@@ -49,7 +49,7 @@ Funktionalität: Einsatz-Sammlung anlegen und Bögen darin sammeln
   Szenario: Gescannten Bogen in einen neu angelegten Einsatz aufnehmen
     Angenommen ich öffne einen geteilten Bogen-Link eines alten Bogens
     Dann sehe ich die Übersicht mit dem Standort "Oldenburg - Ni"
-    Wenn ich auf "In Einsatz aufnehmen…" klicke
+    Wenn ich auf "In Einsatz-Sammlung ablegen…" klicke
     Und ich auf "Neue Sammlung anlegen…" klicke
     Dann sehe ich den Dialog "Neue Einsatz-Sammlung anlegen"
     Wenn ich im Dialog "Name" mit "Sammelübung Nord" fülle

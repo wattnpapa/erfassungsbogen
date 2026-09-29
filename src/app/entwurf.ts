@@ -55,10 +55,12 @@ export interface Entwurf {
    * Fehlt = eigener Bogen.
    */
   fremd?: { einsatzId?: string };
+  /** Zuletzt offener Schritt des Assistenten — „Fortsetzen" öffnet ihn (R2-N7). */
+  schritt?: number;
 }
 
 /** Zusätze eines Entwurfs neben dem Bogen (siehe `Entwurf`). */
-export type EntwurfZusatz = Pick<Entwurf, "vorlageId" | "fremd">;
+export type EntwurfZusatz = Pick<Entwurf, "vorlageId" | "fremd" | "schritt">;
 
 // ------------------------------------------------- Serialisierung (rein)
 
@@ -79,6 +81,7 @@ export function entwurfAusJson(text: string | null): Entwurf | null {
     return null;
   }
   if (typeof e.vorlageId !== "string" || !e.vorlageId) delete e.vorlageId;
+  if (typeof e.schritt !== "number" || !Number.isInteger(e.schritt) || e.schritt < 0 || e.schritt > 5) delete e.schritt;
   if (!e.fremd || typeof e.fremd !== "object") delete e.fremd;
   else e.fremd = typeof e.fremd.einsatzId === "string" && e.fremd.einsatzId ? { einsatzId: e.fremd.einsatzId } : {};
   return e;
@@ -90,6 +93,7 @@ export function entwurfZuJson(bogen: Erfassungsbogen, gespeichert = Date.now(), 
     bogen,
     ...(zusatz.vorlageId ? { vorlageId: zusatz.vorlageId } : {}),
     ...(zusatz.fremd ? { fremd: zusatz.fremd } : {}),
+    ...(zusatz.schritt != null ? { schritt: zusatz.schritt } : {}),
   });
 }
 
@@ -151,10 +155,10 @@ function ausSpeicherLaden(schluessel: string, jetzt: EebZeitpunkt): Entwurf | nu
  * Anzeige „automatisch gespeichert" darf auch nicht lügen (Audit „Offline
  * und Speicher", O1): der Aufrufer zeigt bei false den Fehlzustand.
  */
-export function entwurfSpeichern(bogen: Erfassungsbogen, zusatz: EntwurfZusatz = {}): boolean {
+export function entwurfSpeichern(bogen: Erfassungsbogen, zusatz: EntwurfZusatz = {}, gespeichert = Date.now()): boolean {
   const s = speicher();
   if (!s) return false;
-  const text = entwurfZuJson(bogen, Date.now(), zusatz);
+  const text = entwurfZuJson(bogen, gespeichert, zusatz);
   try {
     s.setItem(SPEICHER_SCHLUESSEL, text);
   } catch {

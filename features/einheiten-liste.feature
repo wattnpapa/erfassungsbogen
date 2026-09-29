@@ -7,7 +7,7 @@ Funktionalität: Einheitenliste durchsuchen, filtern und sortieren
 
   Grundlage:
     Angenommen ich öffne einen geteilten Bogen-Link eines alten Bogens
-    Wenn ich auf "In Einsatz aufnehmen…" klicke
+    Wenn ich auf "In Einsatz-Sammlung ablegen…" klicke
     Und ich auf "Neue Sammlung anlegen…" klicke
     Und ich im Dialog "Name" mit "Hochwasser Weser" fülle
     Und ich im Dialog auf "Einsatz anlegen" klicke

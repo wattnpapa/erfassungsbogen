@@ -92,7 +92,7 @@ Funktionalität: Einsatzweg einer Fachgruppe — Vorbereitung, Fahrt, Meldekopf
     Und ich auf "QR-Code scannen…" klicke
     Und ich den gemerkten QR-Code über "QR aus Bild einlesen…" einlese
     Dann sehe ich die Übersicht mit dem Standort "Oldenburg (NI)"
-    Wenn ich auf "In Einsatz aufnehmen…" klicke
+    Wenn ich auf "In Einsatz-Sammlung ablegen…" klicke
     Und ich auf "Neue Sammlung anlegen…" klicke
     Und ich im Dialog "Name" mit "Hochwasser Hunte" fülle
     Und ich im Dialog auf "Einsatz anlegen" klicke

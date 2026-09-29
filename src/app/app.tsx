@@ -444,6 +444,17 @@ function staerkeKurz(b: Erfassungsbogen): string {
   return `${s.fuehrer} / ${s.unterfuehrer} / ${s.mannschaft} / ${s.gesamt}`;
 }
 
+/**
+ * „12:36" für heute, „25.09., 12:36" für einen anderen Tag — ein drei Tage
+ * alter Entwurf darf nicht wie von heute aussehen (Audit Runde 2, R2-O3).
+ */
+function uhrzeitMitTag(d: Date): string {
+  const uhr = d.toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit" });
+  return d.toDateString() === new Date().toDateString()
+    ? uhr
+    : `${d.toLocaleDateString("de-DE", { day: "2-digit", month: "2-digit" })}, ${uhr}`;
+}
+
 /** Was die App gerade zeigt — für den Browser-Verlauf (Zurück-Knopf, Audit „Fehler", E3). */
 type Ansicht = { schritt: number; zeigeStart: boolean; einsatz: string | null; scanner: boolean };
 function ansichtGleich(a: Ansicht, b: Ansicht): boolean {
@@ -466,6 +477,16 @@ const ART_WAHL = Object.entries(ART_LABEL).map(([wert, label]) => ({ wert, label
 // anbieten — Autosave überlebt geschlossene Tabs, leere Akkus und vom System
 // beendete Apps (siehe entwurf.ts).
 const ENTWURF = START.bogen ? null : entwurfLaden();
+
+// Nach einem Neuladen stellte der Browser die alte Scrollposition wieder her
+// — die Startseite stand dann 1 100 px unter der Entwurfskarte mit
+// „Fortsetzen", und der Bogen schien verloren (Audit Runde 2, R2-H3). Die App
+// führt ihre Ansichten selbst; jede beginnt oben.
+try {
+  if (typeof history !== "undefined" && "scrollRestoration" in history) history.scrollRestoration = "manual";
+} catch {
+  /* ohne Verlauf (Tests) */
+}
 
 /**
  * Kaltstart MIT Bogen aus der URL (geteilter Link, QR mit Kamera-App): der
@@ -536,7 +557,9 @@ function AppInhalt() {
    * Wandert mit dem Entwurf in den Speicher.
    */
   const [fremdeErfassung, setFremdeErfassung] = useState<boolean>(!!ENTWURF?.fremd);
-  const [schritt, setSchritt] = useState(START.bogen || ENTWURF ? UEBERSICHT : 0);
+  // „Fortsetzen" öffnet den Schritt, auf dem gearbeitet wurde — nicht immer
+  // die Übersicht mit acht gelben Punkten (Audit Runde 2, R2-N7).
+  const [schritt, setSchritt] = useState(START.bogen ? UEBERSICHT : ENTWURF ? (ENTWURF.schritt ?? UEBERSICHT) : 0);
   const richtung = useSchrittRichtung(schritt);
   const offline = useOfflineStand();
   // Schrittwechsel (Weiter, Zurück, Schrittleiste, Prüfpunkt): der neue
@@ -732,20 +755,38 @@ function AppInhalt() {
   // die Zeile das — die alte Anzeige behauptete „gespeichert", während nichts
   // gespeichert war (Audit „Offline und Speicher", O1).
   const [speicherFehler, setSpeicherFehler] = useState(false);
+  // „gespeichert" ist der Zeitpunkt der letzten ÄNDERUNG des Bogens: Bloßes
+  // Öffnen oder ein Schrittwechsel verschob ihn bisher auf „jetzt", und ein
+  // drei Tage alter Entwurf stand als „gespeichert 12:36 Uhr" da (R2-O3).
+  const bogenGespeichert = useRef<{ bogen: Erfassungsbogen | null; um: number }>({
+    bogen: ENTWURF?.bogen ?? null,
+    um: ENTWURF?.gespeichert ?? Date.now(),
+  });
   useEffect(() => {
     if (bogen) {
-      const ok = entwurfSpeichern(bogen, {
-        vorlageId: vorlageInBearbeitung ?? undefined,
-        fremd: fremdeErfassung ? { einsatzId: sammelZielId ?? undefined } : undefined,
-      });
+      const merk = bogenGespeichert.current;
+      if (merk.bogen !== bogen) {
+        merk.bogen = bogen;
+        merk.um = Date.now();
+      }
+      const ok = entwurfSpeichern(
+        bogen,
+        {
+          vorlageId: vorlageInBearbeitung ?? undefined,
+          fremd: fremdeErfassung ? { einsatzId: sammelZielId ?? undefined } : undefined,
+          schritt,
+        },
+        merk.um,
+      );
       setSpeicherFehler(!ok);
-      if (ok) setGespeichertUm(new Date());
+      if (ok) setGespeichertUm(new Date(merk.um));
     } else {
+      bogenGespeichert.current = { bogen: null, um: Date.now() };
       entwurfVerwerfen();
       setGespeichertUm(null);
       setSpeicherFehler(false);
     }
-  }, [bogen, vorlageInBearbeitung, fremdeErfassung, sammelZielId]);
+  }, [bogen, vorlageInBearbeitung, fremdeErfassung, sammelZielId, schritt]);
 
   /**
    * Die Vorlage zum offenen Bogen — nur solange sie noch in der Liste steht.
@@ -1355,7 +1396,7 @@ function AppInhalt() {
     setOffenerEinsatzId(null);
     setFehler(
       nichtAbgelegt
-        ? `Nicht in die Sammlung aufgenommen: ${nichtAbgelegt} Der Bogen bleibt hier geöffnet — danach „In Einsatz aufnehmen…".`
+        ? `Nicht in die Sammlung aufgenommen: ${nichtAbgelegt} Der Bogen bleibt hier geöffnet — danach „In Einsatz-Sammlung ablegen…".`
         : "",
     );
     if (anonymisiert) setMeldung(FRIST_ABGELAUFEN_MELDUNG);
@@ -2159,7 +2200,7 @@ function AppInhalt() {
         <Aktualisierungshinweise />
         <EinsatzDetail
           einsatz={offenerEinsatz}
-          onZurueck={() => { setOffenerEinsatzId(null); setMeldung(""); setEingang(null); }}
+          onZurueck={() => { setOffenerEinsatzId(null); setZeigeStart(true); setMeldung(""); setEingang(null); }}
           onGeaendert={einsaetzeNeuLaden}
           onScannen={() => scanneInEinsatz(offenerEinsatz.id)}
           onManuell={() => manuellInEinsatz(offenerEinsatz.id)}
@@ -2303,7 +2344,7 @@ function AppInhalt() {
                 <span className="hinweis">
                   Stärke {s.fuehrer} / {s.unterfuehrer} / {s.mannschaft} / {s.gesamt}
                   {gespeichertUm
-                    ? ` · gespeichert ${gespeichertUm.toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit" })} Uhr`
+                    ? ` · gespeichert ${uhrzeitMitTag(gespeichertUm)} Uhr`
                     : ""}
                 </span>
               </span>
@@ -2594,11 +2635,11 @@ function AppInhalt() {
       {speicherFehler ? (
         <p className="autosave speicher-fehler" role="alert">
           ⚠ Nicht gespeichert — der Speicher dieses Geräts ist voll. Der Bogen bleibt geöffnet; bitte jetzt „Bogen übergeben" (PDF) oder in der Fußzeile der Startseite Papierkorb leeren bzw. Sicherung erstellen.
-          {gespeichertUm ? ` Letzter gesicherter Stand: ${gespeichertUm.toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit" })} Uhr.` : ""}
+          {gespeichertUm ? ` Letzter gesicherter Stand: ${uhrzeitMitTag(gespeichertUm)} Uhr.` : ""}
         </p>
       ) : gespeichertUm ? (
         <p className="autosave" role="status">
-          ✓ automatisch gespeichert · {gespeichertUm.toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit" })} Uhr — bleibt auf diesem Gerät
+          ✓ automatisch gespeichert · {uhrzeitMitTag(gespeichertUm)} Uhr — bleibt auf diesem Gerät
         </p>
       ) : null}
     </SeitenKopf>
@@ -2662,7 +2703,7 @@ function AppInhalt() {
       )}
       </div>
 
-      {/* Einsatz-Auswahl für „In Einsatz aufnehmen…": ein gescannter oder
+      {/* Einsatz-Auswahl für „In Einsatz-Sammlung ablegen…": ein gescannter oder
           geöffneter Bogen wandert von der Übersicht direkt in eine Sammlung. */}
       {schritt === UEBERSICHT && (
         <dialog ref={einsatzWahlDialog} aria-label="In Einsatz-Sammlung ablegen" className="teilen-dialog">

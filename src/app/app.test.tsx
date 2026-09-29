@@ -515,7 +515,7 @@ describe("Assistenten-Durchlauf", () => {
       if (frage) await nutzer.click(within(frage).getByRole("button", { name: "Schnell erfassen" }));
       await nutzer.type(screen.getByLabelText("Name (Pflicht)"), name);
       await nutzer.click(screen.getByRole("button", { name: /^6\. Übersicht/ }));
-      await nutzer.click(screen.getByRole("button", { name: "In Einsatz aufnehmen…" }));
+      await nutzer.click(screen.getByRole("button", { name: "In Einsatz-Sammlung ablegen…" }));
       expect(screen.getByText(/Die Erfassung wird in der Sammlung abgelegt und hier geschlossen/)).toBeDefined();
       await nutzer.click(screen.getByRole("button", { name: "Sammelhausen" }));
       await screen.findByRole("heading", { level: 1, name: "Sammelhausen" });
@@ -960,7 +960,7 @@ describe("Neuen Einsatz anlegen", () => {
     fragmentSetzen(encodePayloadUrl(bogenMitName("Scanhausen"), browserKompressor));
     await screen.findByRole("heading", { name: "Gesamtübersicht" });
 
-    await nutzer.click(screen.getByRole("button", { name: "In Einsatz aufnehmen…" }));
+    await nutzer.click(screen.getByRole("button", { name: "In Einsatz-Sammlung ablegen…" }));
     // Der Anlege-Dialog erscheint über der schon offenen Einsatz-Auswahl.
     await nutzer.click(screen.getByRole("button", { name: "Neue Sammlung anlegen…" }));
     await einsatzAnlegen(nutzer, "Sammelhausen");
@@ -1223,7 +1223,7 @@ describe("Speicher voll", () => {
     await nutzer.type(screen.getByLabelText("Name (Pflicht)"), "Eigenhausen");
     await nutzer.click(screen.getByRole("button", { name: /^6\. Übersicht/ }));
     sammlungenVoll();
-    await nutzer.click(screen.getByRole("button", { name: "In Einsatz aufnehmen…" }));
+    await nutzer.click(screen.getByRole("button", { name: "In Einsatz-Sammlung ablegen…" }));
     const auswahl = document.querySelector<HTMLDialogElement>("dialog[aria-label='In Einsatz-Sammlung ablegen']")!;
     await nutzer.click(within(auswahl).getByRole("button", { name: "Sammelhausen" }));
     expect(auswahl.hasAttribute("open")).toBe(true);

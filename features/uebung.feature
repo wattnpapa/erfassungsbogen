@@ -55,7 +55,7 @@ Funktionalität: Übungs-Kennzeichnung des Bogens
 
   Szenario: In der Einsatz-Sammlung bleibt der Übungsbogen markiert
     Wenn ich zum Schritt "6. Übersicht" wechsle
-    Und ich auf "In Einsatz aufnehmen…" klicke
+    Und ich auf "In Einsatz-Sammlung ablegen…" klicke
     Und ich auf "Neue Sammlung anlegen…" klicke
     Und ich im Dialog "Name" mit "Stabsrahmenübung Küste" fülle
     Und ich im Dialog auf "Einsatz anlegen" klicke

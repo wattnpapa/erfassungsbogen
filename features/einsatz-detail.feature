@@ -6,7 +6,7 @@ Funktionalität: Einsatz-Sammlung führen (Meldekopf)
 
   Grundlage:
     Angenommen ich öffne einen geteilten Bogen-Link eines alten Bogens
-    Wenn ich auf "In Einsatz aufnehmen…" klicke
+    Wenn ich auf "In Einsatz-Sammlung ablegen…" klicke
     Und ich auf "Neue Sammlung anlegen…" klicke
     Und ich im Dialog "Name" mit "Hochwasser Weser" fülle
     Und ich im Dialog auf "Einsatz anlegen" klicke
@@ -100,7 +100,7 @@ Funktionalität: Einsatz-Sammlung führen (Meldekopf)
     Und ich zum Schritt "5. Sofortbedarf" wechsle
     Und ich das Feld "Sonstiges (Freitext)" mit "Ablösung angefordert" fülle
     Und ich zum Schritt "6. Übersicht" wechsle
-    Und ich auf "In Einsatz aufnehmen…" klicke
+    Und ich auf "In Einsatz-Sammlung ablegen…" klicke
     Und ich auf "Hochwasser Weser" klicke
     Dann sehe ich den Dialog "Einheit ist bereits gemeldet"
     Wenn ich im Dialog auf "Als neue Fassung anhängen" klicke
@@ -117,7 +117,7 @@ Funktionalität: Einsatz-Sammlung führen (Meldekopf)
     Und ich zum Schritt "5. Sofortbedarf" wechsle
     Und ich das Feld "Sonstiges (Freitext)" mit "zweiter Trupp" fülle
     Und ich zum Schritt "6. Übersicht" wechsle
-    Und ich auf "In Einsatz aufnehmen…" klicke
+    Und ich auf "In Einsatz-Sammlung ablegen…" klicke
     Und ich auf "Hochwasser Weser" klicke
     Und ich im Dialog auf "Als eigene Einheit führen" klicke
     Dann sehe ich die Überschrift "Einheiten (2 gemeldet"

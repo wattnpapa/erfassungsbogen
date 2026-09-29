@@ -177,3 +177,14 @@ describe("Rückholung und fremde Erfassungen (R2-N1/R2-E1)", () => {
     expect(ersetztenEntwurfLaden()?.fremd).toBeUndefined();
   });
 });
+
+describe("Wiedereinstieg (R2-N7, R2-O3)", () => {
+  it("merkt sich den zuletzt offenen Schritt und den Zeitpunkt der letzten Änderung", () => {
+    entwurfSpeichern(neuerBogen(), { schritt: 2 }, 1234);
+    const e = entwurfLaden()!;
+    expect(e.schritt).toBe(2);
+    expect(e.gespeichert).toBe(1234);
+    // Unsinniger Schritt fällt weg, statt die App in einen leeren Schritt zu führen.
+    expect(entwurfAusJson(JSON.stringify({ gespeichert: 1, bogen: neuerBogen(), schritt: 17 }))?.schritt).toBeUndefined();
+  });
+});
