@@ -25,6 +25,7 @@ import {
   type MeldungAufnahme,
   type MeldungOptionen,
 } from "@bos/meldekopf/einsaetze";
+import { entfernteMerken } from "./entfernte-meldungen";
 
 declare module "@bos/meldekopf/einsaetze" {
   interface MeldeEintrag {
@@ -315,5 +316,8 @@ export function einheitEntfernen(einsatzId: string, einheitSchl: string): MeldeE
   s.eintraege = s.eintraege.filter((e) => e.einheitSchluessel !== einheitSchl);
   s.geaendert = Date.now();
   sammlungenSchreiben(liste);
+  // Merken, damit ein späterer „Einsatz importieren…" die Einheit nicht still
+  // zurückholt (Audit Runde 2, R2-D4).
+  entfernteMerken(einsatzId, weg.map((e) => e.id));
   return weg;
 }

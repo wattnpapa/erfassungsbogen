@@ -11,6 +11,8 @@ import { OrganisationsTyp, type Erfassungsbogen } from "@bos/eeb-format/model";
 import { encodePayload, encodePayloadUrl, encodeVorlagePayloadUrl, fragmentInhalt, segmentPayloadUrls } from "@bos/eeb-format/codec";
 import { browserKompressor, neuerBogen } from "./hilfen";
 import { vorlageAnlegen, vorlagenLaden } from "./vorlagen";
+import { einsatzDateiInhalt } from "./einsatz-transport";
+import { einheitEntfernen } from "./eintrag-zeiten";
 // `einsatzAnlegen` heißt in diesem Test schon ein Klick-Helfer (Dialog
 // ausfüllen); der Speicher-Weg kommt darum unter eigenem Namen herein.
 import {
@@ -1422,6 +1424,53 @@ describe("Kaputte Datei auf allen Datei-Wegen", () => {
     const meldung = await screen.findByText(/beschädigt oder unvollständig/);
     expect(meldung.textContent).toMatch(/„liste.csv“ ist eine Tabelle oder Liste/);
     expect(meldung.textContent).not.toMatch(/JSON|Unexpected|token/);
+  });
+});
+
+/**
+ * Schichtübergabe in Gegenrichtung: Die Sammel-Datei von vor dem Entfernen
+ * kommt zurück. Die vor Ort entfernte Einheit darf nicht still wieder in der
+ * Lage stehen (Audit Runde 2, R2-D4).
+ */
+describe("Einsatz importieren: vor Ort entfernte Meldungen", () => {
+  beforeEach(() => {
+    localStorage.clear();
+  });
+
+  function vorbereiten() {
+    const s = einsatzImSpeicherAnlegen("Hochwasser Ulm", EinsatzArt.EINSATZ);
+    const alb = meldungHinzufuegen(s.id, bogenMitName("OV Albstadt"))!;
+    meldungHinzufuegen(s.id, bogenMitName("OV Crailsheim"));
+    const datei = new File([einsatzDateiInhalt(einsaetzeLaden()[0]!)], "hochwasser.json", { type: "application/json" });
+    einheitEntfernen(s.id, alb.eintrag.einheitSchluessel);
+    return { id: s.id, albId: alb.eintrag.id, datei };
+  }
+
+  it("fragt, lässt die Meldung ohne Zustimmung draußen und sagt das", async () => {
+    const { albId, datei } = vorbereiten();
+    const nutzer = userEvent.setup();
+    render(<App />);
+
+    await nutzer.upload(screen.getByLabelText("Einsatz importieren…"), datei);
+    const frage = await screen.findByRole("dialog", { name: "Hier entfernte Meldungen in der Datei" });
+    expect(within(frage).getByText(/„THW OV Albstadt“/)).toBeDefined();
+    await nutzer.click(within(frage).getByRole("button", { name: "Draußen lassen" }));
+
+    expect(await screen.findByText(/Hier entfernt und nicht wieder aufgenommen: „THW OV Albstadt“/)).toBeDefined();
+    expect(einsaetzeLaden()[0]!.eintraege.map((e) => e.id)).not.toContain(albId);
+  });
+
+  it("nimmt sie auf ausdrücklichen Wunsch wieder auf", async () => {
+    const { albId, datei } = vorbereiten();
+    const nutzer = userEvent.setup();
+    render(<App />);
+
+    await nutzer.upload(screen.getByLabelText("Einsatz importieren…"), datei);
+    const frage = await screen.findByRole("dialog", { name: "Hier entfernte Meldungen in der Datei" });
+    await nutzer.click(within(frage).getByRole("button", { name: "Wieder aufnehmen" }));
+
+    expect(await screen.findByText(/Zuvor entfernt, wieder aufgenommen: „THW OV Albstadt“/)).toBeDefined();
+    expect(einsaetzeLaden()[0]!.eintraege.map((e) => e.id)).toContain(albId);
   });
 });
 

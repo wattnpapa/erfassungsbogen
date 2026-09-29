@@ -54,6 +54,11 @@ Grundlage: Repository `wattnpapa/erfassungsbogen`, Stand 2026-09-12 — Version 
 > Geräts mit Namen und Meldungszahl sowie den Inhalt der Datei; es bietet
 > „Vorher Sicherung erstellen…" an und verlangt einen Haken, sobald laufende
 > Sammlungen ersetzt würden (5.5).
+>
+> **Nachgezogen 2026-09-29:** Gedächtnis entfernter Meldungen (Audit Runde 2,
+> R2-D4) — die App merkt sich je Sammlung die Kennungen vor Ort entfernter
+> Einträge (`eeb.entfernt.v1`) und fragt bei „Einsatz importieren…", bevor sie
+> eine davon wieder aufnimmt (3.3 D2e, 5.5).
 
 ## Hinweis zu diesem Dokument
 
@@ -184,6 +189,7 @@ dem Vite-Build); es gibt keine serverseitige Variante.
 | D2b | Export-Stand je Einsatz-Sammlung | Kennungen der Meldungen, die beim letzten Export (Sammel-PDF, CSV, Excel) schon in der Sammlung standen, samt Zeitpunkt — Grundlage für „Nur neue Bögen seit dem letzten Export" (5.4); keine Personendaten, nur zufällige Kennungen | `localStorage` des Geräts (`eeb.export-stand.v1`), wandert mit der Datensicherung mit, fällt mit „Alle Daten löschen" weg |
 | D2c | Zusatzfelder je Meldung der Einsatz-Sammlung | Eintreff- und Abrückzeit (`eingetroffenAm`, `abgerueckAm`, Geräteuhr) sowie eine Notiz/Auftrag der Führungsstelle (`notiz`, Freitext — kann Personenbezug enthalten, z. B. „Rückruf Hr. Meyer 15:00"). Eine Folgemeldung derselben Einheit erbt Eintreffzeit, Notiz und Zug der Vorgängerin auf jedem Eingangsweg (`meldungAufnehmen`). Reisen mit der Sammlung in Sammel-PDF und Einsatz-Transport mit; unterliegen mit der Meldung dem Papierkorb und der Löschung (`src/app/eintrag-zeiten.ts`) | `localStorage` des Geräts (`eeb.einsaetze.v1`, am Eintrag) |
 | D2d | Zuletzt offene Sammlung | Kennung und Zeitpunkt der zuletzt geöffneten Einsatz-Sammlung, 12 Stunden gültig; keine Personendaten | `localStorage` des Geräts (`eeb.letzterEinsatz.v1`) |
+| D2e | Entfernte Meldungen je Einsatz-Sammlung | Kennungen der Einträge, die vor Ort über „Entfernen" oder „Fassung verwerfen…" herausgenommen wurden — damit „Einsatz importieren…" sie nicht still zurückholt, sondern nachfragt (`src/app/entfernte-meldungen.ts`, Audit Runde 2, R2-D4); keine Personendaten, nur zufällige Kennungen; „Rückgängig" nimmt sie wieder heraus, Einträge endgültig gelöschter Sammlungen fallen beim nächsten Schreiben weg | `localStorage` des Geräts (`eeb.entfernt.v1`), wandert mit der Datensicherung mit, fällt mit „Alle Daten löschen" weg |
 | D3 | Absenderkarte | Freiwillige Kontaktangabe (Name/E-Mail/Telefon) der meldenden Person | `localStorage` des Geräts |
 | D4 | Privater Geräteschlüssel | Ed25519-Schlüssel zur Signatur weitergereichter Bögen | `localStorage` des Geräts, **unverschlüsselt als Hex** |
 | D5 | QR-Payload / Exportdatei | Binär kodierter, komprimierter Bogen zur Übergabe an ein zweites Gerät; ebenso eine geteilte Vorlage (QR/Link mit Marker `V.`, oder JSON-Datei `eeb-vorlage-*.json`) | Transient (QR-Code-Anzeige) bzw. Datei auf dem Gerät oder in einer vom Nutzer gewählten Ablage (z. B. Cloud-Ordner) |
@@ -406,6 +412,9 @@ Datenausleitung an eine andere Herkunft ist technisch unterbunden.
   die Einträge nur im Arbeitsspeicher der geöffneten Ansicht, bis weitergeklickt
   wird — es gibt keinen Papierkorb für einzelne Meldungen. „Fassung
   verwerfen…" in der Historie nimmt gezielt eine einzelne Fassung heraus.
+  Die Kennungen der entfernten Einträge bleiben in `eeb.entfernt.v1` (D2e);
+  „Einsatz importieren…" fragt, bevor es eine davon wieder aufnimmt, und lässt
+  sie ohne Zustimmung draußen (seit 2026-09-29, R2-D4).
 - **Sicherung einspielen** (`src/app/sicherung.ts`, `src/app/fusszeile.tsx`):
   ersetzt alle `eeb.*`-Einträge des Geräts ohne Papierkorb — dieselbe Folge
   wie „Alle Daten löschen". Seit 2026-09-29 (R2-D3) wird die Datei vorher

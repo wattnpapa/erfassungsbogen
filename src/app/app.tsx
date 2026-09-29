@@ -52,6 +52,7 @@ import { bogenLinksEmpfangen, imWebBrowser, istNativ, qrScannen, textTeilen } fr
 import { fehlerText } from "./nachladen";
 import { dateiFehlerMeldung } from "./datei-fehler";
 import { FehlerImBild } from "./fehler-im-bild";
+import { entfernteImImportKlaeren } from "./entfernte-meldungen";
 import { entwirreScanText } from "./tastaturbelegung";
 import { vorlageAktualisieren, vorlageAnlegen, vorlageAusDatei, vorlagenLaden, vorlagenPapierkorb, vorlageZuruecksetzen, type Vorlage } from "./vorlagen";
 import { Musterung, VorlagenListe } from "./vorlagen-ui";
@@ -2253,13 +2254,15 @@ function AppInhalt() {
           throw err;
         }
       }
-      const r = einsatzImportieren(s);
+      // Vor Ort entfernte Meldungen kommen nicht still zurück (R2-D4).
+      const geklaert = await entfernteImImportKlaeren(s);
+      const r = einsatzImportieren(geklaert.sammlung);
       einsaetzeNeuLaden();
       setFehler("");
       setMeldung(
-        r.neuerEinsatz
+        (r.neuerEinsatz
           ? `Einsatz „${s.name}" importiert (${r.hinzugefuegt} Meldung(en)).`
-          : `Einsatz „${s.name}": ${r.hinzugefuegt} neue Meldung(en) ergänzt.`,
+          : `Einsatz „${s.name}": ${r.hinzugefuegt} neue Meldung(en) ergänzt.`) + geklaert.hinweis,
       );
       setOffenerEinsatzId(s.id);
     } catch (err) {

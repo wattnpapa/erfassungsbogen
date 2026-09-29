@@ -110,6 +110,7 @@ import { mitAbgang, useEingangsquittung } from "./eintrag-bewegung";
 import { AbgangKnopf, Kartenstapel } from "./kartenstapel";
 import { istBilddatei } from "./qr-stapel";
 import { fehlerText } from "./nachladen";
+import { entfernteMerken, entfernteVergessen } from "./entfernte-meldungen";
 import { exportZeitKurz, neueEintraege, type ExportStand, type ExportUmfang } from "./export-stand";
 
 export const ART_LABEL: Record<EinsatzArt, string> = {
@@ -578,6 +579,8 @@ export function EinsatzDetail(props: {
     if (!zuletztEntfernt) return;
     const ok = await gesichert("Rückgängig", () => {
       einsatzImportieren({ ...einsatz, eintraege: zuletztEntfernt.eintraege });
+      // Zurückgeholt gilt nicht mehr als „hier entfernt" (R2-D4).
+      entfernteVergessen(einsatz.id, zuletztEntfernt.eintraege.map((e) => e.id));
     });
     if (!ok) return;
     setZuletztEntfernt(null);
@@ -1695,7 +1698,13 @@ function EinheitKarte(props: {
       gefahr: true,
     });
     if (!sicher) return;
-    if (!(await gesichert("Fassung verwerfen", () => meldungEntfernen(einsatzId, r.id)))) return;
+    if (
+      !(await gesichert("Fassung verwerfen", () => {
+        meldungEntfernen(einsatzId, r.id);
+        entfernteMerken(einsatzId, [r.id]); // kommt beim Import nicht still zurück (R2-D4)
+      }))
+    )
+      return;
     onEntfernt?.({ art: "fassung", eintraege: [r] });
     onGeaendert();
   }

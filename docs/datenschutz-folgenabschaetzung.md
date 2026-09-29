@@ -57,6 +57,12 @@ Grundlage: Repository `wattnpapa/erfassungsbogen`, Stand 2026-09-12 — Version 
 > und den Inhalt der Datei, bietet eine Sicherung vorher an und verlangt einen
 > Haken, wenn laufende Sammlungen betroffen sind. Keine neuen Daten.
 > Geändert: 5.7.
+>
+> **Nachgezogen 2026-09-29 — Entfernte Meldungen kommen nicht still zurück
+> (Audit Runde 2, R2-D4):** Die App merkt sich je Sammlung die Kennungen vor
+> Ort entfernter Einträge (`eeb.entfernt.v1`, keine Personendaten) und fragt
+> bei „Einsatz importieren…", bevor sie eine davon wieder aufnimmt.
+> Geändert: 5.7.
 
 ## Hinweis zu diesem Dokument
 
@@ -346,7 +352,12 @@ Kapitel 6 der [Arc42-Dokumentation](arc42-architektur.md).
   Zusatzfeldern (`einheitEntfernen`, `src/app/eintrag-zeiten.ts`). Vorher
   blieb bei Folgemeldungen die ältere Fassung mit ihren Personendaten stehen
   (Audit Runde 2, R2-D1). Der Rückweg „Rückgängig" lebt nur im Arbeitsspeicher
-  der offenen Ansicht, nicht im Gerätespeicher.
+  der offenen Ansicht, nicht im Gerätespeicher. Seit 2026-09-29 merkt sich die
+  App die Kennungen der entfernten Einträge (`eeb.entfernt.v1`, nur zufällige
+  Kennungen, `src/app/entfernte-meldungen.ts`): Bringt ein „Einsatz
+  importieren…" eine davon zurück, wird gefragt, und ohne Zustimmung bleibt sie
+  draußen (R2-D4) — eine entfernte Meldung samt Personendaten kehrt also nicht
+  still in den Speicher zurück.
 - **Sicherung einspielen:** ersetzt alle App-Daten des Geräts ohne
   Papierkorb (`src/app/sicherung.ts`). Seit 2026-09-29 nennt die Rückfrage
   die laufenden Sammlungen mit Namen und Meldungszahl sowie den Inhalt der
