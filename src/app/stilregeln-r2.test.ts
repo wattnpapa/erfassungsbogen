@@ -13,12 +13,13 @@ const html = readFileSync(new URL("../../index.html", import.meta.url), "utf8");
 // Kommentare raus, sonst zählen Begründungen als Regeln.
 const css = html.replace(/\/\*[\s\S]*?\*\//g, "");
 
-/** Alle Deklarationsblöcke, deren Selektorliste genau `selektor` ist. */
+/** Alle Deklarationsblöcke, deren Selektorliste genau `selektor` ist (Leerraum egal). */
 function bloecke(selektor: string): string[] {
   const treffer: string[] = [];
+  const glatt = (t: string) => t.replace(/\s+/g, " ").trim();
   const re = /([^{}]+)\{([^{}]*)\}/g;
   for (let m = re.exec(css); m; m = re.exec(css)) {
-    if (m[1].trim() === selektor) treffer.push(m[2]);
+    if (glatt(m[1]!) === glatt(selektor)) treffer.push(m[2]!);
   }
   return treffer;
 }
@@ -38,7 +39,7 @@ describe("Fußleiste und Safe-Area (R2-M7)", () => {
 function token(selektor: string, name: string): string {
   for (const b of bloecke(selektor)) {
     const m = new RegExp(`${name}:\\s*(#[0-9a-fA-F]{6})\\s*;`).exec(b);
-    if (m) return m[1];
+    if (m) return m[1]!;
   }
   throw new Error(`${name} fehlt in ${selektor}`);
 }
@@ -57,6 +58,21 @@ describe("Feldrahmen in den dunklen Themen (R2-L3)", () => {
 
   it("Eingabefelder ziehen ihren Rahmen aus --linie-stark", () => {
     expect(bloecke("input, select, textarea").join("\n")).toMatch(/border:[^;]*var\(--linie-stark\)/);
+  });
+});
+
+describe("Helle Reste im Nacht-Thema (R2-L6)", () => {
+  it("Scanner-Text und -Fehler kommen aus den Nacht-Farben", () => {
+    expect(bloecke(".nacht-modus .scanner-text, .nacht-modus .scanner-handscanner, .nacht-modus .scanner-handscanner .scanner-schritte").join("")).toMatch(
+      /color:\s*var\(--text\)/,
+    );
+    expect(bloecke(".nacht-modus .scanner-text.fehler").join("")).toMatch(/color:\s*var\(--alarm\)/);
+  });
+
+  it("die PDF-Vorschau ist nachts gedimmt, die QR-Platte bleibt weiß", () => {
+    expect(bloecke(".nacht-modus iframe.pdf-rahmen").join("")).toMatch(/filter:\s*brightness\(0\.\d+\)/);
+    expect(bloecke(".nacht-modus .qr-box img").join("")).toMatch(/background:\s*#fff/);
+    expect(css).not.toMatch(/\.nacht-modus[^{]*qr[^{]*\{[^}]*filter/);
   });
 });
 

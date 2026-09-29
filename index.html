@@ -170,6 +170,10 @@
         eebModus = "dunkel";
       if (eebModus === "feld" || eebModus === "nacht" || eebModus === "dunkel")
         document.documentElement.classList.add(eebModus + "-modus");
+      // Nachts auch die Browserleiste dunkel, nicht in der Kennfarbe (R2-L6;
+      // danach hält themeFarbeAbgleichen() in anzeige-modus.ts sie aktuell).
+      if (eebModus === "nacht")
+        document.querySelector('meta[name="theme-color"]').content = "#221f16";
     } catch (e) { /* Privatmodus/blockierter Speicher: Standard-Darstellung */ }
 
     // Installierte Fassung (Desktop-App, iOS, Android) VOR dem ersten Malen
@@ -3819,6 +3823,34 @@
       outline: var(--fokus) solid var(--kopf-auf);
       outline-offset: calc(-1 * var(--fokus));
     }
+    /* R2-L6: Helle Reste im Nacht-Thema. Der Scanner schrieb in reinem Weiß
+       (Luminanz 255 statt 206 des Nacht-Texts) und meldete Fehler in kühlem
+       Rosa — nachts der hellste Text der App. Hinter ihm läuft zwar ein
+       Kamerabild, aber die Schrift steht auf eigener dunkler Unterlage; der
+       warme Nacht-Text trägt dort genauso. */
+    .nacht-modus .scanner-text,
+    .nacht-modus .scanner-handscanner,
+    .nacht-modus .scanner-handscanner .scanner-schritte { color: var(--text); }
+    .nacht-modus .scanner-text.fehler { color: var(--alarm); }
+    .nacht-modus .handscanner-fussnote,
+    .nacht-modus .handscanner-lampe { color: var(--text-2); }
+    .nacht-modus .handscanner-lampe.aktiv { background: var(--text); border-color: var(--text); color: var(--grund); }
+    .nacht-modus .scanner-rahmen:not(.angenommen) { border-color: var(--text); }
+    .nacht-modus .scanner .teil-quittung {
+      --quittung-linie: var(--text-2); --quittung-ein: var(--text);
+      --quittung-auf-ein: var(--grund); --quittung-text: var(--text);
+    }
+    /* Die PDF-Vorschau ist ein weißes A4-Blatt über mehr als die halbe
+       Bildschirmhöhe — nachts gedimmt und ins Warme gezogen wie das
+       taktische Zeichen; lesbar bleibt sie (Schwarz auf Hellgrau). Die PDF
+       selbst, der Druck und der Download bleiben unverändert weiß.
+       Bewusst NICHT gedimmt: die weiße Platte des QR-Codes (.qr-box img,
+       .qr-vollbild). Ihre Ruhezone und ihr Kontrast sind das, was eine
+       fremde Kamera im Zelt oder ein Handscanner lesen muss; ein
+       gedämpftes Grau ist an drei Telefonen nicht geprüft, und ein
+       Übergabecode, der nachts nicht gelesen wird, kostet mehr als die
+       Helligkeit der Platte für die Sekunden der Übergabe. */
+    .nacht-modus iframe.pdf-rahmen { filter: brightness(0.55) sepia(0.35); }
   </style>
 </head>
 <body>

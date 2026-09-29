@@ -10,7 +10,9 @@ import { describe, it, expect, beforeEach } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { AnzeigeSchalter } from "./anzeige-schalter";
-import { anzeigeModus } from "./anzeige-modus";
+import { anzeigeModus, NACHT_KOPF_FOND } from "./anzeige-modus";
+import { wendeOrgAkzentAn, orgAkzentPalette } from "./org-farben";
+import { OrganisationsTyp } from "@bos/eeb-format/model";
 
 beforeEach(() => {
   localStorage.clear();
@@ -46,5 +48,44 @@ describe("AnzeigeSchalter", () => {
     expect(anzeigeModus()).toBe("nacht");
     expect(gruppe.classList.contains("offen")).toBe(false);
     expect(screen.getByRole("button", { name: /^Anzeigemodus Nacht/ }).getAttribute("aria-expanded")).toBe("false");
+  });
+});
+
+/**
+ * Browserleiste (Audit Runde 2, R2-L6): Sie trug auch nachts die Kennfarbe —
+ * Android färbt damit Status- und Adressleiste ein. Nachts nimmt sie den
+ * dunklen Kopf-Ton, sonst die Kennfarbe der Organisation, und das in beiden
+ * Reihenfolgen (erst Modus, dann Bogen — und umgekehrt).
+ */
+describe("theme-color folgt dem Anzeigemodus", () => {
+  function metaFarbe(): string {
+    return document.querySelector<HTMLMetaElement>('meta[name="theme-color"]')!.content;
+  }
+  beforeEach(() => {
+    document.head.querySelector('meta[name="theme-color"]')?.remove();
+    const meta = document.createElement("meta");
+    meta.name = "theme-color";
+    meta.content = "#12275e";
+    document.head.append(meta);
+    wendeOrgAkzentAn(undefined);
+  });
+
+  it("nachts dunkler Kopf-Ton, beim Zurückschalten wieder die Kennfarbe", async () => {
+    const u = userEvent.setup();
+    render(<AnzeigeSchalter />);
+    wendeOrgAkzentAn(OrganisationsTyp.FEUERWEHR);
+    const kennfarbe = orgAkzentPalette(OrganisationsTyp.FEUERWEHR).akzent;
+    expect(metaFarbe()).toBe(kennfarbe);
+
+    await u.click(screen.getByRole("button", { name: "Nacht" }));
+    expect(metaFarbe()).toBe(NACHT_KOPF_FOND);
+    // Ein Bogen, der nachts geöffnet wird, färbt die Leiste nicht zurück.
+    wendeOrgAkzentAn(OrganisationsTyp.THW);
+    expect(metaFarbe()).toBe(NACHT_KOPF_FOND);
+
+    await u.click(screen.getByRole("button", { name: "Dunkel" }));
+    expect(metaFarbe()).toBe(orgAkzentPalette(OrganisationsTyp.THW).akzent);
+    wendeOrgAkzentAn(undefined);
+    expect(metaFarbe()).toBe("#12275e");
   });
 });

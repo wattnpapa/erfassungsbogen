@@ -67,6 +67,30 @@ function anwenden(m: AnzeigeModus): void {
   klassen.toggle("dunkel-modus", m === "dunkel");
   klassen.toggle("feld-modus", m === "feld");
   klassen.toggle("nacht-modus", m === "nacht");
+  themeFarbeAbgleichen();
+}
+
+/** Kopfbalken des Nacht-Modus (index.html, `.nacht-modus { --kopf-fond }`). */
+export const NACHT_KOPF_FOND = "#221f16";
+/** Kennfarbe ohne offenen Bogen (index.html, Meta-Tag und `--akzent`). */
+const STANDARD_THEME_FARBE = "#12275e";
+
+/**
+ * Browserleiste (`<meta name="theme-color">`) an Modus und Organisation
+ * angleichen. Sie trug auch nachts die Kennfarbe — Android färbt damit
+ * Status- und Adressleiste ein, bei roter Kennfarbe rot, über dem warm
+ * gedimmten Bild (Audit Runde 2, R2-L6). Nachts nimmt sie deshalb den
+ * dunklen Kopf-Ton; Standard, Feld und Dunkel behalten die Kennfarbe, wie
+ * ihr Kopfbalken. Die Kennfarbe steht, sobald ein Bogen offen ist, als
+ * `--org-akzent` auf `<html>` (org-farben.ts ruft hierher zurück).
+ */
+export function themeFarbeAbgleichen(): void {
+  const meta = document.querySelector<HTMLMetaElement>('meta[name="theme-color"]');
+  if (!meta) return;
+  const wurzel = document.documentElement;
+  meta.content = wurzel.classList.contains("nacht-modus")
+    ? NACHT_KOPF_FOND
+    : wurzel.style.getPropertyValue("--org-akzent").trim() || STANDARD_THEME_FARBE;
 }
 
 /** Eigenes Event, damit mehrere Schalter-Instanzen (Kopf + Fußzeile) synchron bleiben. */

@@ -8,6 +8,7 @@
  */
 
 import { OrganisationsTyp } from "@bos/eeb-format/model";
+import { themeFarbeAbgleichen } from "./anzeige-modus";
 
 /**
  * Kennfarbe je Organisation: färbt im PDF Kopfbalken, Organisationsangabe und die
@@ -262,11 +263,10 @@ export function orgAkzentPalette(org: OrganisationsTyp): {
  */
 export function wendeOrgAkzentAn(org: OrganisationsTyp | undefined): void {
   const wurzel = document.documentElement;
-  const themeColor = document.querySelector<HTMLMetaElement>('meta[name="theme-color"]');
   if (org === undefined) {
     for (const suffix of ["", "-hell", "-dunkel", "-tief"]) wurzel.style.removeProperty(`--org-akzent${suffix}`);
     for (const name of ["--org-kopf-auf-2", "--org-kopf-gut"]) wurzel.style.removeProperty(name);
-    if (themeColor) themeColor.content = "#12275e";
+    themeFarbeAbgleichen();
     return;
   }
   const p = orgAkzentPalette(org);
@@ -279,5 +279,6 @@ export function wendeOrgAkzentAn(org: OrganisationsTyp | undefined): void {
   // für das THW-Blau. Ohne Bogen greifen die Vorgaben aus index.html.
   wurzel.style.setProperty("--org-kopf-auf-2", p.kopfAuf2);
   wurzel.style.setProperty("--org-kopf-gut", p.kopfGut);
-  if (themeColor) themeColor.content = p.akzent;
+  // Die Browserleiste folgt der Kennfarbe — außer nachts (R2-L6).
+  themeFarbeAbgleichen();
 }
