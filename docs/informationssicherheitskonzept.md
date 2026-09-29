@@ -339,6 +339,17 @@ bestimmten, lokal erzeugten Schlüssels stammt — nicht die reale Identität ei
 Person. Mehrstufige Weitergaben werden als Signaturkette (`EEB2C`-Container,
 begrenzt auf `MAX_STUFEN = 32`) abgebildet.
 
+*Nachgezogen 2026-09-29 (Audit Runde 2, R2-W6):* Das in eine PDF eingebettete
+Bogen-JSON ist unsigniert. Beim Einlesen einer Einzelbogen-PDF in eine
+Sammlung („Bögen einlesen…", `boegenAusDatei`/`siegelAusPdfQr` in
+`src/app/app.tsx`) wird deshalb zusätzlich der QR-Code der PDF gelesen. Trägt
+er eine Signatur und gehört er zur selben Fassung (Einheitsschlüssel und
+`stand` gleich), wird der Bogen **aus dem QR** übernommen, samt Signaturstatus
+und Original-Payload für das spätere Gegenzeichnen. Der eingebettete Bogen
+bekommt das Siegel nie: nur der Inhalt des QR ist signiert, eine nachträglich
+geänderte Einbettung würde sonst als geprüft erscheinen. Passt der QR nicht
+oder ist er unlesbar, bleibt es beim eingebetteten Bogen ohne Nachweis.
+
 ### 5.3 Content-Security-Policy
 
 Der Produktions-Build setzt eine restriktive CSP als `<meta>`-Header
