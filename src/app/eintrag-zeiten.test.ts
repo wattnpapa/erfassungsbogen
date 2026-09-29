@@ -30,6 +30,7 @@ import {
   eintragGespeichert,
   eintreffzeit,
   eintreffzeitSetzen,
+  einheitEntfernen,
   einheitVerschieben,
   folgemeldungErbt,
   istSpeicherVoll,
@@ -284,6 +285,34 @@ describe("einheitVerschieben", () => {
     const a = einsatzAnlegen("A", EinsatzArt.EINSATZ);
     const r = meldungHinzufuegen(a.id, bogen("Bleibhausen"))!;
     expect(einheitVerschieben(a.id, a.id, r.eintrag.einheitSchluessel)).toBe(0);
+    expect(einsaetzeLaden()[0]!.eintraege).toHaveLength(1);
+  });
+});
+
+describe("einheitEntfernen (Audit Runde 2, R2-D1)", () => {
+  it("nimmt alle Fassungen einer Einheit heraus, lässt Teile mit eigenem Schlüssel stehen und liefert die Einträge unverändert", () => {
+    const a = einsatzAnlegen("A", EinsatzArt.EINSATZ);
+    const b0 = bogen("Wanderhausen");
+    const r1 = meldungHinzufuegen(a.id, b0)!;
+    meldungHinzufuegen(a.id, { ...b0, stand: 101, sonstiges: "zweite Fassung" });
+    notizSetzen(a.id, r1.eintrag.id, "Deich Nord");
+    const schl = r1.eintrag.einheitSchluessel;
+    const teil = meldungHinzufuegen(a.id, { ...b0, sonstiges: "Fachberater" }, { einheitSchluesselOverride: `${schl}|teil:1` })!;
+    const andere = meldungHinzufuegen(a.id, bogen("Bleibhausen"))!;
+
+    const weg = einheitEntfernen(a.id, schl);
+
+    expect(weg).toHaveLength(2);
+    expect(weg.find((e) => e.id === r1.eintrag.id)!.notiz).toBe("Deich Nord");
+    const rest = einsaetzeLaden().find((s) => s.id === a.id)!.eintraege.map((e) => e.id).sort();
+    expect(rest).toEqual([teil.eintrag.id, andere.eintrag.id].sort());
+  });
+
+  it("liefert nichts und schreibt nichts bei unbekanntem Schlüssel", () => {
+    const a = einsatzAnlegen("A", EinsatzArt.EINSATZ);
+    meldungHinzufuegen(a.id, bogen("Bleibhausen"));
+    expect(einheitEntfernen(a.id, "gibt-es-nicht")).toEqual([]);
+    expect(einheitEntfernen("kein-einsatz", "x")).toEqual([]);
     expect(einsaetzeLaden()[0]!.eintraege).toHaveLength(1);
   });
 });

@@ -38,6 +38,11 @@ Grundlage: Repository `wattnpapa/erfassungsbogen`, Stand 2026-09-12 — Version 
 > trägt jetzt Eintreff-/Abrückzeit und den Auftrag/die Notiz der
 > Führungsstelle; nicht zählende Einheiten stehen in einem Block außerhalb der
 > SUBTOTAL-Summen (5.4).
+>
+> **Nachgezogen 2026-09-29:** „Entfernen" einer Meldung (Audit Runde 2, R2-D1)
+> nimmt die Einheit jetzt mit allen Fassungen aus der Einsatz-Sammlung; bisher
+> blieb die ältere Fassung samt Personendaten stehen und zählte wieder. Eine
+> einzelne Fassung lässt sich getrennt in der Historie verwerfen (5.5).
 
 ## Hinweis zu diesem Dokument
 
@@ -374,6 +379,13 @@ Datenausleitung an eine andere Herkunft ist technisch unterbunden.
 - **Papierkorb-Funktion** (`src/app/sicherung.ts`, `src/app/vorlagen.ts`,
   `@bos/meldekopf/papierkorb`): gelöschte Einträge lassen sich vor endgültiger
   Löschung wiederherstellen.
+- **Meldung aus einer Einsatz-Sammlung entfernen** (`einheitEntfernen`,
+  `src/app/eintrag-zeiten.ts`, seit 2026-09-29): nimmt die Einheit mit
+  **allen** Fassungen (Folgemeldungen) samt Zusatzfeldern aus dem Speicher;
+  abgeteilte Truppteile mit eigenem Fingerabdruck bleiben. „Rückgängig" hält
+  die Einträge nur im Arbeitsspeicher der geöffneten Ansicht, bis weitergeklickt
+  wird — es gibt keinen Papierkorb für einzelne Meldungen. „Fassung
+  verwerfen…" in der Historie nimmt gezielt eine einzelne Fassung heraus.
 - **Schema-Migration** (`src/app/hilfen.ts`): verhindert, dass ältere Datensätze
   mit veralteten Feldbedeutungen fehlinterpretiert werden.
 - **Absenderkarte vollständig optional** (Opt-in), ohne Eingabe als „keine

@@ -40,6 +40,11 @@ Grundlage: Repository `wattnpapa/erfassungsbogen`, Stand 2026-09-12 — Version 
 > (Freitext) je Einheit; abgerückte, aufgegangene und Übungsmeldungen stehen in
 > einem eigenen Block außerhalb der Summen. Damit verlässt der Notiz-Freitext
 > das Meldekopf-Gerät auch über diesen Exportweg. Geändert: 5.1, 5.5.
+>
+> **Nachgezogen 2026-09-29 — Meldung entfernen (Audit Runde 2, R2-D1):**
+> „Entfernen" löscht eine Einheit der Einsatz-Sammlung jetzt mit allen
+> Fassungen; bisher blieben die älteren Fassungen samt Personendaten
+> gespeichert. Geändert: 5.7.
 
 ## Hinweis zu diesem Dokument
 
@@ -318,6 +323,12 @@ Kapitel 6 der [Arc42-Dokumentation](arc42-architektur.md).
 - Eine **Papierkorb-Funktion** existiert (`sicherung.ts`, `vorlagen.ts`,
   `@bos/meldekopf/papierkorb`): gelöschte Einträge lassen sich vor endgültiger
   Löschung wiederherstellen.
+- **Einzelne Meldung entfernen (seit 2026-09-29 vollständig):** „Entfernen" an
+  einer Einheit der Einsatz-Sammlung löscht alle ihre Fassungen samt
+  Zusatzfeldern (`einheitEntfernen`, `src/app/eintrag-zeiten.ts`). Vorher
+  blieb bei Folgemeldungen die ältere Fassung mit ihren Personendaten stehen
+  (Audit Runde 2, R2-D1). Der Rückweg „Rückgängig" lebt nur im Arbeitsspeicher
+  der offenen Ansicht, nicht im Gerätespeicher.
 - **Strukturelle Grenze:** Sobald ein Bogen als QR-Code gescannt, als PDF
   gedruckt oder als Datei exportiert wurde, hat die App auf diese Kopien keinen
   Zugriff mehr (vertiefend 6.3).

@@ -78,6 +78,7 @@ import {
   abrueckzeitSetzen,
   eintreffzeit,
   eintreffzeitSetzen,
+  einheitEntfernen,
   einheitVerschieben,
   notizSetzen,
   statusMitZeitSetzen,
@@ -567,13 +568,18 @@ export function EinsatzDetail(props: {
   // Was die Lage NICHT enthält, gehört genauso sichtbar gemacht wie das, was
   // sie enthält (siehe zaehltInLage).
   const uebungenDaneben = uebungenAusserhalbDerLage(einsatz.eintraege, einsatz.art);
-  // Zuletzt entfernte Meldung — solange sie hier steht, gibt es einen Rückweg.
-  const [zuletztEntfernt, setZuletztEntfernt] = useState<MeldeEintrag | null>(null);
+  // Zuletzt Entferntes — solange es hier steht, gibt es einen Rückweg. Beim
+  // Entfernen einer Einheit ALLE ihre Fassungen, beim Verwerfen einer Fassung
+  // nur diese (Audit Runde 2, R2-D1).
+  const [zuletztEntfernt, setZuletztEntfernt] = useState<Entfernt | null>(null);
 
-  /** Entfernte Meldung unverändert zurücklegen (mit Signatur, Herkunft, Etiketten). */
-  function entferntesZurueckholen() {
+  /** Entferntes unverändert zurücklegen (mit Signatur, Herkunft, Zeiten, Notiz, Etiketten). */
+  async function entferntesZurueckholen() {
     if (!zuletztEntfernt) return;
-    einsatzImportieren({ ...einsatz, eintraege: [zuletztEntfernt] });
+    const ok = await gesichert("Rückgängig", () => {
+      einsatzImportieren({ ...einsatz, eintraege: zuletztEntfernt.eintraege });
+    });
+    if (!ok) return;
     setZuletztEntfernt(null);
     onGeaendert();
   }
@@ -660,8 +666,12 @@ export function EinsatzDetail(props: {
     <main id="inhalt" tabIndex={-1} className="einsatz-detail">
       {zuletztEntfernt && (
         <p className="meldung" role="status">
-          Meldung „{einheitAnzeigename(zuletztEntfernt.bogen.einheit)}" entfernt.{" "}
-          <button type="button" className="link" onClick={entferntesZurueckholen}>Rückgängig</button>
+          {zuletztEntfernt.art === "fassung"
+            ? `Fassung Stand ${standText(zuletztEntfernt.eintraege[0]!.bogen)} von „${einheitAnzeigename(zuletztEntfernt.eintraege[0]!.bogen.einheit)}" verworfen.`
+            : `Meldung „${einheitAnzeigename(zuletztEntfernt.eintraege[0]!.bogen.einheit)}" entfernt${
+                zuletztEntfernt.eintraege.length > 1 ? ` (${zuletztEntfernt.eintraege.length} Fassungen)` : ""
+              }.`}{" "}
+          <button type="button" className="link" onClick={() => void entferntesZurueckholen()}>Rückgängig</button>
         </p>
       )}
       {/* Quittung des Statuswechsels mit Uhrzeit und Rückweg: Ein Tipp nahm die
@@ -1407,8 +1417,24 @@ function Aenderungen({ vorher, nachher }: { vorher: Erfassungsbogen; nachher: Er
   );
 }
 
+/**
+ * Was „Entfernen" oder „Fassung verwerfen" zuletzt aus der Sammlung nahm —
+ * neueste Fassung zuerst. Die Ansicht legt es bei „Rückgängig" unverändert
+ * zurück (Audit Runde 2, R2-D1).
+ */
+interface Entfernt {
+  art: "einheit" | "fassung";
+  eintraege: MeldeEintrag[];
+}
+
 /** Eine Revisionszeile in der Historie, mit Diff zur direkt älteren Fassung. */
-function HistorieZeile({ eintrag, vorheriger, aktuell }: { eintrag: MeldeEintrag; vorheriger?: MeldeEintrag; aktuell: boolean }) {
+function HistorieZeile({ eintrag, vorheriger, aktuell, onVerwerfen }: {
+  eintrag: MeldeEintrag;
+  vorheriger?: MeldeEintrag;
+  aktuell: boolean;
+  /** Nur diese Fassung verwerfen (R2-D1) — die Historie steht erst ab zwei Fassungen da. */
+  onVerwerfen?: () => void;
+}) {
   const [offen, setOffen] = useState(false);
   return (
     <li>
@@ -1422,6 +1448,12 @@ function HistorieZeile({ eintrag, vorheriger, aktuell }: { eintrag: MeldeEintrag
           </button>
         </>
       )}
+      {onVerwerfen && (
+        <>
+          {" "}
+          <button type="button" className="link" onClick={onVerwerfen}>Fassung verwerfen…</button>
+        </>
+      )}
       {offen && vorheriger && <Aenderungen vorher={vorheriger.bogen} nachher={eintrag.bogen} />}
     </li>
   );
@@ -1432,8 +1464,8 @@ function EinheitKarte(props: {
   kopf: MeldeEintrag;
   alle: MeldeEintrag[];
   onGeaendert: () => void;
-  /** Die entfernte Meldung — die Ansicht bietet sie danach zum Zurückholen an. */
-  onEntfernt?: (eintrag: MeldeEintrag) => void;
+  /** Das Entfernte — die Ansicht bietet es danach zum Zurückholen an. */
+  onEntfernt?: (entfernt: Entfernt) => void;
   /** Aktiver Qualifikationsfilter ("" = keiner) — nennt die passenden Personen in der Zeile. */
   qualifikation?: string;
   /** Kurzform der gefilterten Qualifikation für die Trefferzeile („AGT"). */
@@ -1630,13 +1662,42 @@ function EinheitKarte(props: {
     // entfernte Meldung nicht wiederherstellbar. Läuft keine Animation
     // (reduzierte Bewegung, verdeckter Tab), nimmt mitAbgang den direkten Weg.
     mitAbgang(zeile.current, () => {
-      meldungEntfernen(einsatzId, kopf.id);
-      // Der Eintrag reist vollständig zurück an die Ansicht: Sie bietet ihn zum
-      // Zurückholen an, solange niemand weitergeklickt hat. Für Einsätze gibt
-      // es einen Papierkorb, für die einzelne Meldung bisher nichts.
-      onEntfernt?.(kopf);
+      // ALLE Fassungen der Einheit, nicht nur der Kopf: sonst rückt die ältere
+      // Fassung nach, die Einheit bleibt mit veralteter Stärke in der Lage und
+      // die Summen steigen sogar (Audit Runde 2, R2-D1). Abgeteilte Teile haben
+      // einen eigenen Schlüssel und bleiben.
+      const weg = einheitEntfernen(einsatzId, kopf.einheitSchluessel);
+      // Die Einträge reisen vollständig zurück an die Ansicht: Sie bietet sie
+      // zum Zurückholen an, solange niemand weitergeklickt hat. Für Einsätze
+      // gibt es einen Papierkorb, für die einzelne Meldung bisher nichts.
+      if (weg.length > 0) onEntfernt?.({ art: "einheit", eintraege: revisionen(weg, kopf.einheitSchluessel) });
       onGeaendert();
     });
+  }
+
+  /**
+   * Nur eine Fassung verwerfen — etwa eine falsch aufgenommene Folgemeldung.
+   * Eigener Weg mit eigener Rückfrage, die sagt, welcher Stand danach gilt;
+   * „Entfernen" nimmt dagegen die ganze Einheit (Audit Runde 2, R2-D1).
+   */
+  async function fassungVerwerfen(r: MeldeEintrag) {
+    const gueltig = revs.find((x) => x.id !== r.id);
+    if (!gueltig) return;
+    const istKopf = r.id === kopf.id;
+    const sicher = await frageJaNein({
+      titel: "Fassung verwerfen?",
+      text:
+        `Fassung Stand ${standText(r.bogen)} (Stärke ${staerkeText(r.bogen)}) von „${einheitAnzeigename(kopf.bogen.einheit)}" wird verworfen. ` +
+        (istKopf
+          ? `Gültig ist dann wieder Stand ${standText(gueltig.bogen)} mit Stärke ${staerkeText(gueltig.bogen)} — samt deren Zeiten und Auftrag.`
+          : `Die aktuelle Fassung (Stand ${standText(kopf.bogen)}, Stärke ${staerkeText(kopf.bogen)}) bleibt gültig.`),
+      ok: "Fassung verwerfen",
+      gefahr: true,
+    });
+    if (!sicher) return;
+    if (!(await gesichert("Fassung verwerfen", () => meldungEntfernen(einsatzId, r.id)))) return;
+    onEntfernt?.({ art: "fassung", eintraege: [r] });
+    onGeaendert();
   }
 
   return (
@@ -1917,7 +1978,13 @@ function EinheitKarte(props: {
       {historie && revs.length > 1 && (
         <ul className="historie">
           {revs.map((r, i) => (
-            <HistorieZeile key={r.id} eintrag={r} vorheriger={revs[i + 1]} aktuell={i === 0} />
+            <HistorieZeile
+              key={r.id}
+              eintrag={r}
+              vorheriger={revs[i + 1]}
+              aktuell={i === 0}
+              onVerwerfen={() => void fassungVerwerfen(r)}
+            />
           ))}
         </ul>
       )}

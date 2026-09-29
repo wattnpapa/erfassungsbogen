@@ -292,3 +292,28 @@ export function einheitVerschieben(vonEinsatzId: string, nachEinsatzId: string, 
   sammlungenSchreiben(liste);
   return verschoben;
 }
+
+/**
+ * Eine Einheit samt ALLER ihrer Fassungen aus einer Sammlung nehmen. Der Kern
+ * kennt nur `meldungEntfernen` für einen einzelnen Eintrag; damit fiel bei
+ * „Entfernen" nur die neueste Fassung weg, die ältere wurde wieder Kopf und
+ * zählte erneut in den Summen — obwohl die Rückfrage „samt Historie" sagt
+ * (Audit Runde 2, R2-D1). Gruppiert wird über den exakten Fingerabdruck:
+ * abgeteilte Truppteile tragen einen eigenen Schlüssel (`…|teil:n`) und sind
+ * eigene Einheiten, sie bleiben stehen. Ein Schreibvorgang für alle Fassungen,
+ * damit kein halb entfernter Zustand im Speicher landen kann.
+ *
+ * Rückgabe: die entfernten Einträge unverändert (Signatur, Herkunft, Zeiten,
+ * Notiz, Zug, Etiketten) — für „Rückgängig".
+ */
+export function einheitEntfernen(einsatzId: string, einheitSchl: string): MeldeEintrag[] {
+  const liste = alleSammlungen();
+  const s = liste.find((x) => x.id === einsatzId);
+  if (!s) return [];
+  const weg = s.eintraege.filter((e) => e.einheitSchluessel === einheitSchl);
+  if (weg.length === 0) return [];
+  s.eintraege = s.eintraege.filter((e) => e.einheitSchluessel !== einheitSchl);
+  s.geaendert = Date.now();
+  sammlungenSchreiben(liste);
+  return weg;
+}

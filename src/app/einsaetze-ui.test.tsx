@@ -18,10 +18,21 @@
 import { describe, it, expect, afterEach, beforeEach, vi } from "vitest";
 import { cleanup, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import type { Erfassungsbogen } from "@bos/eeb-format/model";
+import { PersonalErfassung, type Erfassungsbogen } from "@bos/eeb-format/model";
 import { Dialogschicht } from "./dialoge";
 import { EinsatzDetail } from "./einsaetze-ui";
-import { EinsatzArt, MeldeStatus, einsaetzeLaden, einsatzAnlegen, meldungHinzufuegen, type MeldeEintrag } from "@bos/meldekopf/einsaetze";
+import {
+  EinsatzArt,
+  MeldeStatus,
+  einheitZugEtikettSetzen,
+  einsaetzeLaden,
+  einsatzAnlegen,
+  meldungAufteilen,
+  meldungHinzufuegen,
+  type MeldeEintrag,
+} from "@bos/meldekopf/einsaetze";
+import { eintreffzeitSetzen, notizSetzen } from "./eintrag-zeiten";
+import { aggregiere } from "./auswertung";
 import { neuerBogen } from "./hilfen";
 import type { ExportStand, ExportUmfang } from "./export-stand";
 
@@ -138,6 +149,145 @@ describe("Meldung aus dem Einsatz entfernen", () => {
 
     expect(einsaetzeLaden().find((s) => s.id === einsatzId)!.eintraege).toHaveLength(1);
     expect(geaendert).not.toHaveBeenCalled();
+  });
+});
+
+/**
+ * Audit Runde 2, R2-D1: „Entfernen … samt Historie" nahm nur die neueste
+ * Fassung weg — die ältere rückte nach, die Einheit blieb in der Lage und die
+ * Summe stieg sogar. Geprüft wird die Einheit mit Folgemeldung, der Rückweg
+ * mit allen Fassungen und der eigene Weg „nur diese Fassung verwerfen".
+ */
+describe("Einheit mit Folgemeldung entfernen (R2-D1)", () => {
+  beforeEach(() => {
+    localStorage.clear();
+  });
+
+  function mitStaerke(name: string, stand: number, gesamt: number): Erfassungsbogen {
+    const b = bogenMitName(name);
+    b.stand = stand;
+    b.personalErfassung = PersonalErfassung.NUR_STAERKE;
+    b.staerkeManuell = { fuehrer: 0, unterfuehrer: 2, mannschaft: gesamt - 2, gesamt };
+    b.personal = [];
+    return b;
+  }
+
+  /** Ulm mit erster Meldung (8) und Folgemeldung (7), Blaubeuren daneben (5); Ulm hat Zug und Auftrag. */
+  function lage() {
+    const angelegt = einsatzAnlegen("Hochwasser Ulm", EinsatzArt.EINSATZ);
+    const erste = meldungHinzufuegen(angelegt.id, mitStaerke("Ulm", 1000, 8))!.eintrag;
+    const folge = meldungHinzufuegen(angelegt.id, mitStaerke("Ulm", 2000, 7))!.eintrag;
+    meldungHinzufuegen(angelegt.id, mitStaerke("Blaubeuren", 1000, 5));
+    einheitZugEtikettSetzen(angelegt.id, erste.einheitSchluessel, "1. Zug");
+    notizSetzen(angelegt.id, folge.id, "Deich Nord");
+    eintreffzeitSetzen(angelegt.id, erste.id, 4242);
+    return { ...ansicht(angelegt.id), erste, folge };
+  }
+
+  function summen(einsatzId: string) {
+    const s = einsaetzeLaden().find((x) => x.id === einsatzId)!;
+    return aggregiere(s.eintraege, s.art);
+  }
+
+  /** Die Zahlen der Stärkeleiste, wie sie auf dem Bildschirm stehen. */
+  function leiste() {
+    const felder = [...document.querySelectorAll(".staerke-leiste > div")];
+    const wert = (label: string) =>
+      Number(felder.find((d) => d.querySelector("span")!.textContent === label)!.querySelector("strong")!.textContent);
+    return { einheiten: wert("Einheiten"), gesamt: wert("Gesamt") };
+  }
+
+  function karteVon(name: string) {
+    return [...document.querySelectorAll<HTMLElement>(".einheit-zeile")].find((k) => k.textContent!.includes(name));
+  }
+
+  it("nimmt die Einheit mit allen Fassungen heraus; Rückgängig bringt beide samt Zug, Auftrag und Zeit zurück", async () => {
+    const nutzer = userEvent.setup();
+    const { einsatzId, neuLaden, erste, folge } = lage();
+    expect(leiste()).toEqual({ einheiten: 2, gesamt: 12 });
+
+    const karte = karteVon("Ulm")!;
+    expect(within(karte).getByRole("button", { name: "Historie (2)" })).toBeTruthy();
+    await nutzer.click(within(karte).getByRole("button", { name: "Details" }));
+    await nutzer.click(within(karte).getByRole("button", { name: "Entfernen" }));
+    const dialog = document.querySelector<HTMLDialogElement>("dialog[aria-label='Meldung entfernen?']")!;
+    expect(dialog.textContent).toContain("samt Historie");
+    await nutzer.click(within(dialog).getByRole("button", { name: "Meldung entfernen" }));
+    neuLaden();
+
+    // Beide Fassungen weg, die Summen fallen — keine ältere Fassung rückt nach.
+    const s = einsaetzeLaden().find((x) => x.id === einsatzId)!;
+    expect(s.eintraege.map((e) => e.bogen.einheit.hierarchie[0]!.name)).toEqual(["Blaubeuren"]);
+    expect(summen(einsatzId).einheiten).toBe(1);
+    expect(leiste()).toEqual({ einheiten: 1, gesamt: 5 });
+    expect(karteVon("Ulm")).toBeUndefined();
+    const quittung = screen.getByRole("status");
+    expect(quittung.textContent).toContain("entfernt (2 Fassungen)");
+
+    await nutzer.click(within(quittung).getByRole("button", { name: "Rückgängig" }));
+    neuLaden();
+
+    const zurueck = einsaetzeLaden().find((x) => x.id === einsatzId)!.eintraege;
+    expect(zurueck).toHaveLength(3);
+    const e1 = zurueck.find((e) => e.id === erste.id)!;
+    const e2 = zurueck.find((e) => e.id === folge.id)!;
+    expect(e1.zugEtikett).toBe("1. Zug");
+    expect(e1.eingetroffenAm).toBe(4242);
+    expect(e2.zugEtikett).toBe("1. Zug");
+    expect(e2.notiz).toBe("Deich Nord");
+    expect(leiste()).toEqual({ einheiten: 2, gesamt: 12 });
+    expect(within(karteVon("Ulm")!).getByRole("button", { name: "Historie (2)" })).toBeTruthy();
+    expect(screen.queryByRole("status")).toBeNull();
+  });
+
+  it("lässt einen abgeteilten Truppteil (eigener Schlüssel) stehen", async () => {
+    const nutzer = userEvent.setup();
+    const angelegt = einsatzAnlegen("Hochwasser Ulm", EinsatzArt.EINSATZ);
+    const ulm = meldungHinzufuegen(angelegt.id, mitStaerke("Ulm", 1000, 8))!.eintrag;
+    const ergebnis = meldungAufteilen(angelegt.id, ulm.id, {
+      teilEtikett: "Fachberater",
+      personal: [],
+      staerke: { fuehrer: 0, unterfuehrer: 1, mannschaft: 1 },
+      fahrzeuge: [],
+    })!;
+    expect(ergebnis.abgeteilt.einheitSchluessel).not.toBe(ulm.einheitSchluessel);
+    const { neuLaden } = ansicht(angelegt.id);
+
+    const karte = [...document.querySelectorAll<HTMLElement>(".einheit-zeile")].find(
+      (k) => !k.textContent!.includes("Fachberater"),
+    )!;
+    await nutzer.click(within(karte).getByRole("button", { name: "Details" }));
+    await nutzer.click(within(karte).getByRole("button", { name: "Entfernen" }));
+    const dialog = document.querySelector<HTMLDialogElement>("dialog[aria-label='Meldung entfernen?']")!;
+    await nutzer.click(within(dialog).getByRole("button", { name: "Meldung entfernen" }));
+    neuLaden();
+
+    const bleibt = einsaetzeLaden().find((x) => x.id === angelegt.id)!.eintraege;
+    expect(bleibt.map((e) => e.id)).toEqual([ergebnis.abgeteilt.id]);
+  });
+
+  it("verwirft über die Historie nur eine Fassung, nennt den dann gültigen Stand und bietet Rückgängig an", async () => {
+    const nutzer = userEvent.setup();
+    const { einsatzId, neuLaden, folge } = lage();
+
+    const karte = karteVon("Ulm")!;
+    await nutzer.click(within(karte).getByRole("button", { name: "Historie (2)" }));
+    // Oberste Zeile ist die aktuelle Fassung (die Folgemeldung).
+    await nutzer.click(within(karte).getAllByRole("button", { name: "Fassung verwerfen…" })[0]!);
+    const dialog = document.querySelector<HTMLDialogElement>("dialog[aria-label='Fassung verwerfen?']")!;
+    expect(dialog.textContent).toMatch(/Gültig ist dann wieder Stand .* mit Stärke 0 \/ 2 \/ 6 \/ 8/);
+    await nutzer.click(within(dialog).getByRole("button", { name: "Fassung verwerfen" }));
+    neuLaden();
+
+    expect(einsaetzeLaden().find((x) => x.id === einsatzId)!.eintraege.some((e) => e.id === folge.id)).toBe(false);
+    expect(leiste()).toEqual({ einheiten: 2, gesamt: 13 });
+    const quittung = screen.getByRole("status");
+    expect(quittung.textContent).toContain("verworfen");
+
+    await nutzer.click(within(quittung).getByRole("button", { name: "Rückgängig" }));
+    neuLaden();
+    expect(leiste()).toEqual({ einheiten: 2, gesamt: 12 });
+    expect(einsaetzeLaden().find((x) => x.id === einsatzId)!.eintraege.find((e) => e.id === folge.id)!.notiz).toBe("Deich Nord");
   });
 });
 
