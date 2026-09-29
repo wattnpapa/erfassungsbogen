@@ -268,6 +268,6 @@ Funktionalität: Bogen im Assistenten erfassen
     Dann sehe ich den Hinweis "Entwurf vom"
     Und sehe ich die Schaltfläche "Fortsetzen"
     Wenn ich auf "Fortsetzen" klicke
-    Dann sehe ich die Überschrift "Gesamtübersicht"
-    Wenn ich zum Schritt "1. Einheit" wechsle
-    Dann steht im Feld "Name (Pflicht)" der Wert "Wardenburg"
+    # „Fortsetzen" öffnet den Schritt, auf dem gearbeitet wurde (R2-N7).
+    Dann sehe ich die Überschrift "1. Einheit"
+    Und steht im Feld "Name (Pflicht)" der Wert "Wardenburg"

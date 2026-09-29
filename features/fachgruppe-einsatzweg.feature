@@ -113,6 +113,7 @@ Funktionalität: Einsatzweg einer Fachgruppe — Vorbereitung, Fahrt, Meldekopf
     Wenn ich die App vom Netz trenne
     Und ich die Seite neu lade
     Und ich auf "Fortsetzen" klicke
+    Und ich zum Schritt "6. Übersicht" wechsle
     Dann sehe ich die Überschrift "Gesamtübersicht"
     Und ich mir den angezeigten QR-Code merke
     Und ich auf "Neuer Bogen" klicke

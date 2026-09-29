@@ -232,13 +232,14 @@ When("ich in der Schnelltabelle Zeile {int} auf {string} setze", async function 
   zeile: number,
   wert: string,
 ) {
-  const zellen = this.page.locator("table.schnell-tabelle tbody tr").nth(zeile - 1).locator("td");
-  await zellen.nth(0).locator("input").fill(wert);
+  // Erstes Eingabefeld der Zeile (Vorname); davor steht seit R2-N8 die Sollstelle als Text.
+  const zeileLoc = this.page.locator("table.schnell-tabelle tbody tr").nth(zeile - 1);
+  await zeileLoc.locator("input").first().fill(wert);
 });
 
 When("ich in der Schnelltabelle in Zeile {int} die Eingabetaste drücke", async function (this: EebWelt, zeile: number) {
-  const zelle = this.page.locator("table.schnell-tabelle tbody tr").nth(zeile - 1).locator("td").first();
-  await zelle.locator("input").press("Enter");
+  const zeileLoc = this.page.locator("table.schnell-tabelle tbody tr").nth(zeile - 1);
+  await zeileLoc.locator("input").first().press("Enter");
 });
 
 // ------------------------------------------------------------------- Prüfen
