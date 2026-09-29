@@ -2063,6 +2063,27 @@
        Farbe: dicker Rand und ein Punkt davor; Kraftstoff ruhig in Grau. */
     .bedarf-marke.dringend { border-width: 2px; }
     .bedarf-marke.dringend::before { content: "● "; }
+    /* ===== Einsatz-Sammlung: Nachträge Audit Runde 2, P3 (Meldekopf) =====
+       Eigener Block, damit die Nachträge beisammen stehen; die Regeln davor
+       bleiben unberührt und werden hier, wo nötig, übersteuert. */
+    /* R2-L5: Abgerückte und zusammengeführte Einheiten traten über 55 %
+       Deckkraft zurück — Stärke und Abrückzeit fielen auf 2,3:1 (Standard)
+       bis 3,4:1 (Dunkel), „Wieder anwesend" war blass. Jetzt volle Deckkraft;
+       abgesetzt wird über Durchstreichung des Namens, das Wort in der Marke
+       (Grund: abgerückt / zusammengeführt) und eine gestrichelte Randlinie,
+       die auch in Graustufen und im Feld-Thema trägt. */
+    .einheit-zeile.gestrichen, table.einheiten-tabelle tr.gestrichen { opacity: 1; }
+    .einheit-zeile.gestrichen {
+      border-left: 3px dashed var(--linie-stark);
+      padding-left: var(--r-2);
+    }
+    .status-badge {
+      display: inline-block; margin-left: 0.4rem; padding: 0 0.35rem;
+      border: 1px solid var(--text); border-radius: var(--radius);
+      color: var(--text); background: transparent;
+      font-size: var(--t-xs); font-weight: 700; letter-spacing: 0.06em;
+      text-transform: uppercase; vertical-align: 0.1em;
+    }
     .bedarf-marke.routine {
       background: transparent; color: var(--text-2);
       border-color: var(--linie); font-weight: 400;

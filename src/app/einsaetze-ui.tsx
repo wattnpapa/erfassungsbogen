@@ -2028,6 +2028,9 @@ function EinheitKarte(props: {
             {kopf.zugEtikett ? <span className="zug-badge"> {kopf.zugEtikett}</span> : null}
             {/* Was seit der Übernahme dazukam: jünger als 30 Minuten (K2). */}
             {zaehlt && istNeu(kopf) ? <span className="neu-badge" title="Vor weniger als 30 Minuten eingetroffen">neu</span> : null}
+            {/* Der Zustand als Wort statt über Deckkraft: 55 % drückten Stärke
+                und Abrückzeit unter 3:1 (Audit Runde 2, R2-L5). */}
+            {!zaehlt ? <span className="status-badge">{abgerueckt ? "abgerückt" : "zusammengeführt"}</span> : null}
           </h3>
           <span className="muster-sub">
             {orgLabel(kopf.bogen.einheit.organisation)} · Stärke {staerkeText(kopf.bogen)}

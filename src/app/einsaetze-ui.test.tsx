@@ -984,3 +984,26 @@ describe("Summe und Aufnahme im ersten Bild", () => {
     }
   });
 });
+
+/**
+ * Abgerückte Einheiten traten über 55 % Deckkraft zurück und fielen dabei
+ * unter 3:1 (Audit Runde 2, R2-L5). Der Zustand steht jetzt als Wort an der
+ * Karte; die Deckkraft-Regel ist im Stylesheet aufgehoben.
+ */
+describe("Abgerückte Einheit ohne Dimmen (R2-L5)", () => {
+  beforeEach(() => {
+    localStorage.clear();
+  });
+
+  it("nennt den Zustand als Wort am Namen und lässt die Knöpfe bedienbar", async () => {
+    const nutzer = userEvent.setup();
+    const { neuLaden } = buehne(["Ansbach"]);
+    await nutzer.click(screen.getByRole("button", { name: "Abrücken" }));
+    neuLaden();
+    const karte = document.querySelector<HTMLElement>(".einheit-zeile")!;
+    expect(karte.className).toContain("gestrichen");
+    expect(within(karte).getByRole("heading", { level: 3 }).querySelector(".status-badge")!.textContent).toBe("abgerückt");
+    const zurueck = within(karte).getByRole("button", { name: "Wieder anwesend" }) as HTMLButtonElement;
+    await waitFor(() => expect(zurueck.disabled).toBe(false), { timeout: PRELLSCHUTZ_MS + 500 });
+  });
+});
