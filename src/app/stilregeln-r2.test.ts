@@ -76,6 +76,13 @@ describe("Helle Reste im Nacht-Thema (R2-L6)", () => {
   });
 });
 
+describe("Seite hinter modalen Dialogen (R2-M8)", () => {
+  it("hält das Dokument fest, solange irgendein nativer Dialog modal offen ist", () => {
+    expect(bloecke("html:has(dialog:modal)").join("")).toMatch(/overflow:\s*hidden/);
+    expect(bloecke("dialog:modal").join("")).toMatch(/overscroll-behavior:\s*contain/);
+  });
+});
+
 describe("Fokus in der Schrittleiste (R2-L4)", () => {
   it("zeichnet den Fokusrahmen in der Kopf-Schriftfarbe, nicht in der Kennfarbe des Balkens", () => {
     const regel = bloecke(":root:not(.platform-ios):not(.platform-android) .schritte button:focus-visible").join("\n");

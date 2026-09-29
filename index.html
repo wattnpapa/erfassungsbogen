@@ -3851,6 +3851,19 @@
        Übergabecode, der nachts nicht gelesen wird, kostet mehr als die
        Helligkeit der Platte für die Sekunden der Übergabe. */
     .nacht-modus iframe.pdf-rahmen { filter: brightness(0.55) sepia(0.35); }
+    /* R2-M8: Hinter einem offenen modalen Dialog rollte die Seite beim
+       Wischen auf der Abdeckung mit (Übergabe-Dialog: 417 → 852 → 1 295 px),
+       nach dem Schließen stand sie woanders. showModal() macht den Rest der
+       Seite inert, hält sie aber nicht fest. Eine Regel für ALLE nativen
+       Dialoge (Rückfragen aus dialoge.tsx, „Bogen übergeben", „Einheit für
+       den Einsatz erfassen?", Fußzeilen-Dialoge …) statt eines Aufrufs an
+       jeder showModal()-Stelle; die Vollbild-Overlays sperren zusätzlich
+       per useModalesOverlay (modal-overlay.ts), das schadet nicht. Ohne
+       :has()/:modal (sehr alte Webviews) bleibt es beim bisherigen Rollen.
+       overscroll-behavior hält das Rollen im Dialog selbst, wenn er länger
+       ist als der Bildschirm und an sein Ende kommt. */
+    html:has(dialog:modal) { overflow: hidden; }
+    dialog:modal { overscroll-behavior: contain; }
   </style>
 </head>
 <body>
