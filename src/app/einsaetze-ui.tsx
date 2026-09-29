@@ -120,6 +120,7 @@ import {
   lageblattStandLaden,
   neueEintraege,
   seitdemText,
+  weitergabeStandLaden,
   type ExportStand,
   type ExportUmfang,
 } from "./export-stand";
@@ -193,7 +194,14 @@ function signaturBadge(e: MeldeEintrag) {
 function ausgabeStandText(s: Einsatzsammlung): string {
   const teil = (was: string, stand: ExportStand | null, keiner: string) =>
     stand ? `${was} ${exportZeitKurz(stand.zeitpunkt)} (${seitdemText(neueEintraege(s.eintraege, stand).length)})` : `${was}: ${keiner}`;
-  return `${teil("Lageblatt", lageblattStandLaden(s.id), "noch keins")} · ${teil("Export", exportStandLaden(s.id), "noch keiner")}`;
+  // Weitergabe der ganzen Sammlung nur, wenn es eine gab: an ihr erkennt man
+  // auf der Startseite die an die nächste Schicht übergebene Lage (R2-W5).
+  const weitergabe = weitergabeStandLaden(s.id);
+  return [
+    teil("Lageblatt", lageblattStandLaden(s.id), "noch keins"),
+    teil("Export", exportStandLaden(s.id), "noch keiner"),
+    ...(weitergabe ? [teil("Weitergegeben", weitergabe, "")] : []),
+  ].join(" · ");
 }
 
 /** Kalendertag der Geräteuhr: „28.09.2026". */
@@ -663,6 +671,10 @@ export function EinsatzDetail(props: {
   // an der Wand noch stimmt (Audit Runde 2, R2-A3). Bei jedem Rendern frisch
   // gelesen: pdf.ts vermerkt den Druck, die Ansicht rendert danach neu.
   const lageblattStand = lageblattStandLaden(einsatz.id);
+  // Letzte Weitergabe der ganzen Sammlung — nach einer Schichtübergabe führt
+  // womöglich ein anderes Gerät die Lage (Audit Runde 2, R2-W5).
+  const weitergabeStand = weitergabeStandLaden(einsatz.id);
+  const seitWeitergabe = weitergabeStand ? neueEintraege(einsatz.eintraege, weitergabeStand).length : 0;
   const [suche, setSuche] = useState("");
   const [sortierung, setSortierung] = useState<EinheitenSortierung>("name");
   // "" = keine Einschränkung. Schlüssel siehe einheiten-liste.ts.
@@ -854,6 +866,17 @@ export function EinsatzDetail(props: {
       <p className="hinweis">
         {ART_LABEL[einsatz.art]}{einsatz.ort ? ` · ${einsatz.ort}` : ""}
       </p>
+      {/* Übergabevermerk im Kopf: Wer das alte Gerät nach der Schichtübergabe
+          wieder in die Hand nimmt, sieht zuerst, dass die Lage weitergegeben
+          wurde — und ob seitdem etwas nur hier dazukam (R2-W5). */}
+      {weitergabeStand && (
+        <p className={`hinweis weitergabe-vermerk${seitWeitergabe > 0 ? " seitdem-neu" : ""}`}>
+          <strong>Weitergegeben {exportZeitKurz(weitergabeStand.zeitpunkt)}</strong>
+          {seitWeitergabe === 0
+            ? " — seitdem hier nichts Neues."
+            : ` — seitdem hier ${seitWeitergabe === 1 ? "1 neue Meldung" : `${seitWeitergabe} neue Meldungen`}. Führt inzwischen ein anderes Gerät die Lage, fehlt das dort: erneut weitergeben.`}
+        </p>
+      )}
     </SeitenKopf>
     <main id="inhalt" tabIndex={-1} className="einsatz-detail">
       <section className="karte staerke-leiste">

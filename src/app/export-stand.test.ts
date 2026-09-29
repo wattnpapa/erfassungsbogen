@@ -17,6 +17,8 @@ import {
   lageblattVermerken,
   neueEintraege,
   seitdemText,
+  weitergabeStandLaden,
+  weitergabeVermerken,
 } from "./export-stand";
 
 function bogen(name: string): Erfassungsbogen {
@@ -105,6 +107,18 @@ describe("lageblattStandLaden / lageblattVermerken (Audit Runde 2, R2-A3)", () =
     const danach = sammlung("e1", [eintrag("m1", "Wardenburg", 1000), eintrag("m2", "Hatten", 8000)]);
     expect(seitdemText(neueEintraege(danach.eintraege, lageblattStandLaden("e1")).length)).toBe("seitdem 1 neue Meldung");
     expect(seitdemText(0)).toBe("seitdem keine neue Meldung");
+  });
+});
+
+describe("weitergabeStandLaden / weitergabeVermerken (Audit Runde 2, R2-W5)", () => {
+  it("merkt sich die Weitergabe der ganzen Sammlung getrennt von Export und Lageblatt", () => {
+    const s = sammlung("e1", [eintrag("m1", "Wardenburg", 1000)]);
+    expect(weitergabeStandLaden("e1")).toBeNull();
+    weitergabeVermerken(s, undefined, 9000);
+    expect(weitergabeStandLaden("e1")).toEqual({ zeitpunkt: 9000, eintragIds: ["m1"] });
+    expect(exportStandLaden("e1")).toBeNull();
+    expect(lageblattStandLaden("e1")).toBeNull();
+    expect(localStorage.getItem("eeb.weitergabe-stand.v1")).not.toBeNull();
   });
 });
 

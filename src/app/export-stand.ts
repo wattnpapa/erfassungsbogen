@@ -139,6 +139,36 @@ export function lageblattVermerken(einsatz: Einsatzsammlung, behalten?: Iterable
   return stand;
 }
 
+/**
+ * Wann die ganze Sammlung zuletzt über „Einsatz weitergeben / sichern"
+ * herausging, und was da in ihr stand. Nach einer Schichtübergabe arbeitete
+ * das alte Gerät weiter wie zuvor, ohne Hinweis, dass die Lage jetzt auf
+ * einem anderen Gerät geführt wird — ein Nachzügler landete dort und fehlte
+ * der neuen Schicht (Audit Runde 2, R2-W5). Getrennt vom Export-Stand: der
+ * Teilexport an den Stab ist keine Übergabe der Lage.
+ */
+const WEITERGABE_SCHLUESSEL = "eeb.weitergabe-stand.v1";
+
+/** Stand der letzten Weitergabe der ganzen Sammlung, oder null (R2-W5). */
+export function weitergabeStandLaden(einsatzId: string): ExportStand | null {
+  return ablageLaden(WEITERGABE_SCHLUESSEL)[einsatzId] ?? null;
+}
+
+/** Nach einer gelungenen Weitergabe der ganzen Sammlung (Sammel-PDF, alle Bögen). */
+export function weitergabeVermerken(einsatz: Einsatzsammlung, behalten?: Iterable<string>, jetzt = Date.now()): ExportStand {
+  const stand: ExportStand = { zeitpunkt: jetzt, eintragIds: einsatz.eintraege.map((e) => e.id) };
+  const alt = ablageLaden(WEITERGABE_SCHLUESSEL);
+  const neu: Ablage = {};
+  if (behalten) {
+    for (const id of behalten) if (alt[id]) neu[id] = alt[id];
+  } else {
+    Object.assign(neu, alt);
+  }
+  neu[einsatz.id] = stand;
+  ablageSpeichern(neu, WEITERGABE_SCHLUESSEL);
+  return stand;
+}
+
 /** „seitdem 1 neue Meldung" / „seitdem keine neue Meldung" — für Export- und Lageblatt-Zeile. */
 export function seitdemText(neu: number): string {
   return neu === 0 ? "seitdem keine neue Meldung" : neu === 1 ? "seitdem 1 neue Meldung" : `seitdem ${neu} neue Meldungen`;

@@ -2108,6 +2108,14 @@
       box-shadow: none; color: var(--text-2); font-size: var(--t-m);
     }
     .einheit-zeile > button.karte-aufklappen:focus-visible { outline: 3px solid var(--akzent); outline-offset: -3px; }
+    /* R2-W5: Übergabevermerk im Kopf der Einsatzansicht. Ist seit der
+       Weitergabe hier etwas dazugekommen, steht er als Warnkasten da — die
+       neue Schicht hat es womöglich nicht. */
+    .weitergabe-vermerk.seitdem-neu {
+      display: inline-block; margin-top: var(--r-1); padding: 0.15rem 0.5rem;
+      background: var(--warn-fond); color: var(--warn-text);
+      border: 1px solid var(--warn-linie); border-radius: var(--radius);
+    }
     .bedarf-marke.routine {
       background: transparent; color: var(--text-2);
       border-color: var(--linie); font-weight: 400;

@@ -34,7 +34,7 @@ import {
 import { eintreffzeitSetzen, notizSetzen } from "./eintrag-zeiten";
 import { aggregiere } from "./auswertung";
 import { neuerBogen, neuePerson } from "./hilfen";
-import { lageblattVermerken, type ExportStand, type ExportUmfang } from "./export-stand";
+import { lageblattVermerken, weitergabeVermerken, type ExportStand, type ExportUmfang } from "./export-stand";
 
 // pdfmake selbst hat hier nichts zu suchen: geprüft wird der Weg dorthin.
 const meldungPdfAnzeigen = vi.fn<(m: MeldeEintrag, fenster: Window | null) => Promise<void>>(async () => {});
@@ -1179,5 +1179,35 @@ describe("Aufteilen mit Quittung und Rückweg (R2-D6)", () => {
     expect(document.querySelectorAll(".einheit-zeile")).toHaveLength(1);
     expect(einsaetzeLaden().find((s) => s.id === angelegt.id)!.eintraege.map((e) => e.id)).toEqual(vorher);
     expect(document.querySelector(".quittung-daumen")).toBeNull();
+  });
+});
+
+/**
+ * Nach der Schichtübergabe arbeitete das alte Gerät weiter wie zuvor, ohne
+ * Hinweis, dass die Lage weitergegeben wurde (Audit Runde 2, R2-W5).
+ */
+describe("Übergabevermerk nach „Einsatz weitergeben / sichern“ (R2-W5)", () => {
+  beforeEach(() => {
+    localStorage.clear();
+  });
+
+  it("zeigt ohne Weitergabe keinen Vermerk", () => {
+    buehne(["Wardenburg"]);
+    expect(document.querySelector(".weitergabe-vermerk")).toBeNull();
+  });
+
+  it("nennt im Kopf den Zeitpunkt der Weitergabe und was seitdem nur hier dazukam", () => {
+    const angelegt = einsatzAnlegen("Hochwasser Test", EinsatzArt.EINSATZ);
+    meldungHinzufuegen(angelegt.id, bogenMitName("Ulm"));
+    weitergabeVermerken(einsaetzeLaden().find((s) => s.id === angelegt.id)!);
+    const { neuLaden } = ansicht(angelegt.id);
+    const vermerk = () => document.querySelector<HTMLElement>(".weitergabe-vermerk")!;
+    expect(vermerk().textContent).toMatch(/^Weitergegeben .+ — seitdem hier nichts Neues\.$/);
+
+    meldungHinzufuegen(angelegt.id, bogenMitName("Kulmbach"));
+    neuLaden();
+    expect(vermerk().textContent).toContain("seitdem hier 1 neue Meldung");
+    expect(vermerk().textContent).toContain("erneut weitergeben");
+    expect(vermerk().className).toContain("seitdem-neu");
   });
 });

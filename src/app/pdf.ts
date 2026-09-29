@@ -21,7 +21,7 @@ import { einsatzDateiInhalt } from "./einsatz-transport";
 import { MeldeStatus, neuesteJeEinheit, revisionen, type Einsatzsammlung, type MeldeEintrag } from "@bos/meldekopf/einsaetze";
 import { zaehltInLage } from "./auswertung";
 import { eintreffzeit } from "./eintrag-zeiten";
-import { lageblattVermerken } from "./export-stand";
+import { lageblattVermerken, weitergabeVermerken } from "./export-stand";
 
 interface FontContainer {
   vfs: Record<string, string | { data: string; encoding?: string }>;
@@ -219,7 +219,12 @@ export async function einsatzPdfErzeugen(
   // Teilexport („nur neue Bögen") mit eigenem Dateinamen — sonst hießen
   // Nachtrag und ganze Sammlung gleich (Audit Runde 2, R2-A3).
   const nachtrag = historie !== einsatz.eintraege;
-  return dokumentAusgeben(dd, `eeb-einsatz-${nachtrag ? "nachtrag-" : ""}${natoZeitstempel()}_${dateiRumpf(einsatz)}.pdf`);
+  const ok = await dokumentAusgeben(dd, `eeb-einsatz-${nachtrag ? "nachtrag-" : ""}${natoZeitstempel()}_${dateiRumpf(einsatz)}.pdf`);
+  // Die ganze Sammlung ging heraus — womöglich an die nächste Schicht. Die
+  // Einsatzansicht sagt danach, wann, und was seitdem nur hier dazukam
+  // (Audit Runde 2, R2-W5). Der Nachtrag „nur neue Bögen" ist keine Übergabe.
+  if (ok && !nachtrag) weitergabeVermerken(einsatz);
+  return ok;
 }
 
 /**

@@ -108,6 +108,12 @@ Grundlage: Repository `wattnpapa/erfassungsbogen`, Stand 2026-09-12 — Version 
 > `eeb.entfernt.v1`; die Fassung davor gilt wieder. „Einsatz löschen" quittiert
 > auf der Startseite mit „Rückgängig" (Papierkorb, unverändert 30 Tage). Keine
 > neuen Daten, kein neuer Speicherort. Geändert: 5.7.
+>
+> **Nachgezogen 2026-09-29 — Übergabevermerk der Sammlung (Audit Runde 2,
+> R2-W5):** Nach „Einsatz weitergeben / sichern" merkt sich die App Zeitpunkt
+> und Kennungen der weitergegebenen Meldungen (`eeb.weitergabe-stand.v1`,
+> keine Personendaten) und zeigt in der Einsatzansicht „Weitergegeben … —
+> seitdem hier n neue Meldungen". Kein neuer Empfänger. Geändert: 5.7.
 
 ## Hinweis zu diesem Dokument
 
@@ -401,6 +407,11 @@ Kapitel 6 der [Arc42-Dokumentation](arc42-architektur.md).
   erzeugten Lageblatts und die Kennungen der Meldungen darauf
   (`eeb.lageblatt-stand.v1`, `src/app/export-stand.ts`) — wie der
   Export-Stand ohne Personendaten, fällt mit „Alle Daten löschen" weg.
+- **Weitergabe-Stand (seit 2026-09-29, R2-W5):** Zeitpunkt der letzten
+  Weitergabe der ganzen Sammlung über „Einsatz weitergeben / sichern" und die
+  Kennungen der Meldungen darin (`eeb.weitergabe-stand.v1`,
+  `src/app/export-stand.ts`) — Grundlage des Übergabevermerks in der
+  Einsatzansicht; ohne Personendaten, fällt mit „Alle Daten löschen" weg.
 - Eine **Papierkorb-Funktion** existiert (`sicherung.ts`, `vorlagen.ts`,
   `@bos/meldekopf/papierkorb`): gelöschte Einträge lassen sich vor endgültiger
   Löschung wiederherstellen.
