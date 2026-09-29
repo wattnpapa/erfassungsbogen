@@ -9,7 +9,8 @@
  * damit die Oberfläche sie am Gerät zeigen kann.
  *
  * Bewusst dieselben Spalten wie {@link einsatzCsvInhalt}: wer die Tabelle am
- * Gerät gelesen hat, findet im Export exakt dieselben Zahlen wieder.
+ * Gerät gelesen hat, findet im Export exakt dieselben Zahlen wieder — nur in
+ * anderer Folge (siehe {@link TABELLEN_SPALTEN}).
  *
  * Gesucht, gefiltert und vorsortiert wird weiterhin in einheiten-liste.ts —
  * die Tabelle bekommt die fertige Anzeigeliste und ordnet sie höchstens nach
@@ -174,17 +175,30 @@ export interface SpaltenDefinition {
 }
 
 /**
- * Spaltenfolge der Tabelle. Reihenfolge wie im CSV der Übersicht: erst wer
- * (Einheit, Organisation, Zug), dann wie stark, dann was gebraucht wird.
+ * Spaltenfolge der Tabelle. Vorn steht, wonach die Führung entscheidet: wer
+ * (Einheit, Zug), wie stark, was gebraucht wird, seit wann da und mit welchem
+ * Auftrag. Vorher folgte die Tabelle dem CSV der Übersicht (Einheit, Org.,
+ * Zug, F, U, M, Ges., Verpflegung, Unterbringung, Kraftstoff, …) — auf dem
+ * Tablet endete das Bild bei „Unt. M", Bedarf, Eintreffzeit und Auftrag
+ * lagen rechts außerhalb (Audit Runde 2, R2-K5). Die Aufschlüsselung von
+ * Stärke, Verpflegung, Unterbringung und Kraftstoff folgt dahinter; das CSV
+ * behält seine Folge, die Zahlen sind dieselben.
  */
 export const TABELLEN_SPALTEN: SpaltenDefinition[] = [
   { schluessel: "einheit", kopf: "Einheit", titel: "Einheit", zahl: false },
-  { schluessel: "organisation", kopf: "Org.", titel: "Organisation", zahl: false },
   { schluessel: "zugEtikett", kopf: "Zug", titel: "Zug", zahl: false },
+  { schluessel: "gesamt", kopf: "Ges.", titel: "Stärke gesamt", zahl: true },
+  // Der Bedarf steht VOR den Zeiten: nach ihm wird gesucht („wer schläft
+  // zuerst?"), der Stand ist Beiwerk und steht ganz hinten (K1, K2).
+  { schluessel: "bedarf", kopf: "Bedarf", titel: "Sofortbedarf", zahl: false },
+  { schluessel: "eingetroffen", kopf: "Eingetr.", titel: "Eingetroffen", zahl: false, sortiertNach: "eingetroffenAm" },
+  { schluessel: "auftrag", kopf: "Auftrag", titel: "Auftrag / Notiz der Führungsstelle", zahl: false },
+  { schluessel: "abgerueckt", kopf: "Abger.", titel: "Abgerückt", zahl: false, sortiertNach: "abgerueckAm" },
   { schluessel: "fuehrer", kopf: "F", titel: "Führer", zahl: true },
   { schluessel: "unterfuehrer", kopf: "U", titel: "Unterführer", zahl: true },
   { schluessel: "mannschaft", kopf: "M", titel: "Mannschaft", zahl: true },
-  { schluessel: "gesamt", kopf: "Ges.", titel: "Stärke gesamt", zahl: true },
+  { schluessel: "fahrzeuge", kopf: "Kfz", titel: "Fahrzeuge", zahl: true },
+  { schluessel: "organisation", kopf: "Org.", titel: "Organisation", zahl: false },
   { schluessel: "verpflegung", kopf: "Verpfl.", titel: "Verpflegung gesamt", zahl: true },
   { schluessel: "vegetarisch", kopf: "veg.", titel: "Verpflegung vegetarisch", zahl: true },
   { schluessel: "vegan", kopf: "vegan", titel: "Verpflegung vegan", zahl: true },
@@ -194,14 +208,7 @@ export const TABELLEN_SPALTEN: SpaltenDefinition[] = [
   { schluessel: "diesel", kopf: "Diesel", titel: "Diesel (Liter)", zahl: true },
   { schluessel: "benzin", kopf: "Benzin", titel: "Benzin (Liter)", zahl: true },
   { schluessel: "gemisch", kopf: "Gemisch", titel: "Gemisch (Liter)", zahl: true },
-  { schluessel: "fahrzeuge", kopf: "Kfz", titel: "Fahrzeuge", zahl: true },
-  // Der Bedarf steht VOR dem Stand: nach ihm wird gesucht („wer schläft
-  // zuerst?"), der Stand ist Beiwerk (K1, K2).
-  { schluessel: "bedarf", kopf: "Bedarf", titel: "Sofortbedarf", zahl: false },
-  { schluessel: "eingetroffen", kopf: "Eingetr.", titel: "Eingetroffen", zahl: false, sortiertNach: "eingetroffenAm" },
-  { schluessel: "abgerueckt", kopf: "Abger.", titel: "Abgerückt", zahl: false, sortiertNach: "abgerueckAm" },
   { schluessel: "stand", kopf: "Stand", titel: "Stand der Meldung (Absender)", zahl: false },
-  { schluessel: "auftrag", kopf: "Auftrag", titel: "Auftrag / Notiz der Führungsstelle", zahl: false },
 ];
 
 /** Fahrzeug-Kurzbezeichnungen einer Einheit, z. B. „GKW / MzKW" (wie im CSV). */

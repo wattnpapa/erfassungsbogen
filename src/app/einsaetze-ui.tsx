@@ -1199,34 +1199,42 @@ function TabellenZeileZelle({ zeile: z, eingang }: { zeile: TabellenZeile; einga
           </span>
         )}
       </th>
-      <td>{z.organisation}</td>
-      <td>{z.zugEtikett}</td>
-      <td className="zahl">{z.fuehrer}</td>
-      <td className="zahl">{z.unterfuehrer}</td>
-      <td className="zahl">{z.mannschaft}</td>
-      <td className="zahl">{z.gesamt}</td>
-      <td className="zahl">{z.verpflegung}</td>
-      <td className="zahl">{z.vegetarisch}</td>
-      <td className="zahl">{z.vegan}</td>
-      <td className="zahl">{z.unterbringungM}</td>
-      <td className="zahl">{z.unterbringungW}</td>
-      <td className="zahl">{z.unterbringungD}</td>
-      <td className="zahl">{z.diesel}</td>
-      <td className="zahl">{z.benzin}</td>
-      <td className="zahl">{z.gemisch}</td>
-      {/* Zahl plus Typen: „3" beantwortet die Summenfrage, „GKW / MzKW" die
-          nach dem, was tatsächlich dasteht. */}
-      <td className="zahl" title={z.fahrzeugTypen}>{z.fahrzeuge}</td>
-      <td className="bedarf-zelle">{z.bedarf}</td>
-      <td>{z.eingetroffen}</td>
-      <td>{z.abgerueckt}</td>
-      <td>
-        {z.stand}
-        {z.standAlt && <AltBadge />}
-      </td>
-      <td className="auftrag-zelle">{z.auftrag}</td>
+      {/* Die Zellen folgen TABELLEN_SPALTEN, damit Kopf, Zeile und Summe nie
+          auseinanderlaufen, wenn die Spaltenfolge sich ändert (R2-K5). */}
+      {TABELLEN_SPALTEN.filter((s) => s.schluessel !== "einheit").map((s) => (
+        <TabellenZelle key={s.schluessel} spalte={s.schluessel} zeile={z} />
+      ))}
     </tr>
   );
+}
+
+/** Eine Datenzelle der Einheitentabelle (alles außer dem Zeilenkopf „Einheit"). */
+function TabellenZelle({ spalte, zeile: z }: { spalte: TabellenSpalte; zeile: TabellenZeile }) {
+  switch (spalte) {
+    // Zahl plus Typen: „3" beantwortet die Summenfrage, „GKW / MzKW" die
+    // nach dem, was tatsächlich dasteht.
+    case "fahrzeuge":
+      return <td className="zahl" title={z.fahrzeugTypen}>{z.fahrzeuge}</td>;
+    case "bedarf":
+      return <td className="bedarf-zelle">{z.bedarf}</td>;
+    case "auftrag":
+      return <td className="auftrag-zelle">{z.auftrag}</td>;
+    case "stand":
+      return (
+        <td>
+          {z.stand}
+          {z.standAlt && <AltBadge />}
+        </td>
+      );
+    case "einheit":
+    case "organisation":
+    case "zugEtikett":
+    case "eingetroffen":
+    case "abgerueckt":
+      return <td>{z[spalte]}</td>;
+    default:
+      return <td className="zahl">{z[spalte]}</td>;
+  }
 }
 
 /**

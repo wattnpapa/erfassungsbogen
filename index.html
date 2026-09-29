@@ -1965,6 +1965,21 @@
       font-weight: 700; background: var(--flaeche-2);
       border-top: var(--strich-stark) solid var(--linie);
     }
+    /* Die Einheitenspalte bleibt beim seitlichen Rollen stehen: rechts von
+       „Diesel" stand sonst ein Auftrag ohne Einheit daneben, und man zählte
+       Zeilen ab (Audit Runde 2, R2-K5). Eigene Fläche, weil die übrigen
+       Zellen darunter durchrollen; die Kante als Schatten, weil eine
+       zusammengefallene Rahmenlinie mit der Zelle nicht mitwandert. Die
+       Breite ist gedeckelt, damit ein langer Name am Telefon nicht das
+       halbe Bild festhält. */
+    table.einheiten-tabelle > * > tr > :first-child {
+      position: sticky; left: 0; z-index: 1;
+      background: var(--flaeche);
+      box-shadow: inset calc(-1 * var(--strich-stark)) 0 0 var(--linie);
+      min-width: 8rem; max-width: 14rem; overflow-wrap: anywhere;
+    }
+    table.einheiten-tabelle > thead > tr > :first-child,
+    table.einheiten-tabelle > tfoot > tr > :first-child { background: var(--flaeche-2); z-index: 2; }
     /* Aufteilen-Feld in der Einheitenkarte: gleiche Handschrift wie die
        ausklappbare Vollansicht, damit die Karte nicht in Kästen zerfällt. */
     .aufteilen-panel { margin-top: 0.6rem; border-top: 1px solid var(--rand); padding-top: 0.4rem; }

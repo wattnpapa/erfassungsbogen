@@ -415,6 +415,33 @@ describe("Einheiten als Tabelle", () => {
     const tabelle = screen.getByRole("table", { name: /Gemeldete Einheiten/ });
     expect(tabelle.querySelector("tfoot")!.textContent).toContain("Summe (2 zählend)");
   });
+
+  /**
+   * Die Entscheidungsspalten stehen vorn — Bedarf, Eintreffzeit und Auftrag
+   * lagen auf dem Tablet rechts außerhalb des Bilds (Audit Runde 2, R2-K5).
+   * Die Zellen jeder Zeile müssen dabei unter ihrem Kopf stehen.
+   */
+  it("stellt Zug, Stärke, Bedarf, Eintreffzeit und Auftrag vor die Aufschlüsselung und hält die Zellen unter ihrem Kopf", async () => {
+    const nutzer = userEvent.setup();
+    const { einsatzId } = buehne(["Wardenburg"]);
+    notizSetzen(einsatzId, gespeichert(einsatzId, "Wardenburg").id, "Deich Nord");
+    cleanup();
+    ansicht(einsatzId);
+    await nutzer.click(screen.getByRole("button", { name: "Tabelle" }));
+
+    const tabelle = screen.getByRole("table", { name: /Gemeldete Einheiten/ });
+    const koepfe = within(tabelle).getAllByRole("columnheader").map((k) => k.textContent ?? "");
+    expect(koepfe.slice(0, 6).map((k) => k.replace(/^(\S+?)[A-ZÄÖÜ].*$/, "$1"))).toEqual([
+      "Einheit", "Zug", "Ges.", "Bedarf", "Eingetr.", "Auftrag",
+    ]);
+    const zeile = within(tabelle).getAllByRole("row")[1]!;
+    const zellen = [...zeile.children].map((z) => z.textContent ?? "");
+    expect(zellen[0]).toContain("Wardenburg");
+    expect(zellen[koepfe.findIndex((k) => k.startsWith("Auftrag"))]).toBe("Deich Nord");
+    // Die Aufschlüsselung folgt dahinter, der Absender-Stand steht zuletzt.
+    expect(koepfe.findIndex((k) => k.startsWith("Unt. M"))).toBeGreaterThan(5);
+    expect(koepfe[koepfe.length - 1]).toMatch(/^Stand/);
+  });
 });
 
 describe("Bögen einlesen (ein Knopf für Datei, Bilder und Ordner)", () => {
