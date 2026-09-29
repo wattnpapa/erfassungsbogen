@@ -66,6 +66,7 @@ import {
   zeitgruppe,
 } from "./hilfen";
 import { csvDatei, csvZeile, jaNein } from "./csv";
+import { HERKUNFT_TEXT } from "./eintrag-zeiten";
 import { neuesteJeEinheit, MeldeStatus, type Einsatzsammlung, type MeldeEintrag, type MeldeQuelle } from "@bos/meldekopf/einsaetze";
 
 // ------------------------------------------------------------------ Spalten
@@ -177,13 +178,8 @@ const STATUS_TEXT: Record<MeldeStatus, string> = {
   [MeldeStatus.AUFGEGANGEN]: "Aufgegangen",
 };
 
-const QUELLE_TEXT: Record<MeldeQuelle, string> = {
-  scan: "Scan",
-  manuell: "Manuell",
-  "pdf-import": "PDF-Import",
-  aufteilung: "Aufteilung",
-  zusammenfuehrung: "Zusammenführung",
-};
+// Derselbe Wortlaut wie auf der Karte (Audit Runde 2, R2-K6).
+const QUELLE_TEXT: Record<MeldeQuelle, string> = HERKUNFT_TEXT;
 
 function datumText(d: EebDatum | undefined): string {
   return d != null ? datumDeutsch(datumZuIso(d)) : "";

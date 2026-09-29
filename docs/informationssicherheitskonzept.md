@@ -75,6 +75,12 @@ Grundlage: Repository `wattnpapa/erfassungsbogen`, Stand 2026-09-12 — Version 
 > **Nachgezogen 2026-09-29:** Die Quittung mit „Rückgängig" nach Entfernen und
 > Abrücken steht fest im Daumenbereich statt am Seitenanfang (Audit Runde 2,
 > R2-H4); Lebensdauer des Rückwegs präzisiert, keine neue Speicherung (5.5).
+>
+> **Nachgezogen 2026-09-29:** Vermerke der Führungsstelle (Audit Runde 2,
+> R2-K6) — Zug, Auftrag/Notiz, Zeitkorrektur und Abrücken werden mit Uhrzeit
+> als Zusatzfeld `vermerke` am Eintrag festgehalten (Vorwert eines Auftrags
+> steht im Vermerk, also auch dessen Freitext); Herkunft einer Meldung auf
+> Karte und in den CSV-Exporten einheitlich benannt (3.3 D2c).
 
 ## Hinweis zu diesem Dokument
 
@@ -203,7 +209,7 @@ dem Vite-Build); es gibt keine serverseitige Variante.
 | D2 | Gesicherte/archivierte Bögen | Übergebene bzw. empfangene Bögen inkl. Papierkorb (vor endgültiger Löschung); Meldungen der Einsatz-Sammlung unterliegen derselben Datenschutzfrist, Vorlagen nicht (5.5) | `localStorage` des Geräts |
 | D2a | Uhrstand der Datenschutzfrist | Zuletzt akzeptierter Zeitpunkt der Geräteuhr, ggf. unbestätigter Sprung; keine Personendaten | `localStorage` des Geräts (`eeb.uhr.v1`) |
 | D2b | Export-Stand je Einsatz-Sammlung | Kennungen der Meldungen, die beim letzten Export (Sammel-PDF, CSV, Excel) schon in der Sammlung standen, samt Zeitpunkt — Grundlage für „Nur neue Bögen seit dem letzten Export" (5.4); keine Personendaten, nur zufällige Kennungen | `localStorage` des Geräts (`eeb.export-stand.v1`), wandert mit der Datensicherung mit, fällt mit „Alle Daten löschen" weg |
-| D2c | Zusatzfelder je Meldung der Einsatz-Sammlung | Eintreff- und Abrückzeit (`eingetroffenAm`, `abgerueckAm`, Geräteuhr) sowie eine Notiz/Auftrag der Führungsstelle (`notiz`, Freitext — kann Personenbezug enthalten, z. B. „Rückruf Hr. Meyer 15:00"). Eine Folgemeldung derselben Einheit erbt Eintreffzeit, Notiz und Zug der Vorgängerin auf jedem Eingangsweg (`meldungAufnehmen`). Reisen mit der Sammlung in Sammel-PDF und Einsatz-Transport mit; unterliegen mit der Meldung dem Papierkorb und der Löschung (`src/app/eintrag-zeiten.ts`) | `localStorage` des Geräts (`eeb.einsaetze.v1`, am Eintrag) |
+| D2c | Zusatzfelder je Meldung der Einsatz-Sammlung | Eintreff- und Abrückzeit (`eingetroffenAm`, `abgerueckAm`, Geräteuhr) sowie eine Notiz/Auftrag der Führungsstelle (`notiz`, Freitext — kann Personenbezug enthalten, z. B. „Rückruf Hr. Meyer 15:00"); seit 2026-09-29 zusätzlich `vermerke` (Zeitstempel + Text je Handlung der Führungsstelle: Zug, Auftrag samt Vorwert, Zeitkorrektur, Abrücken; R2-K6). Eine Folgemeldung derselben Einheit erbt Eintreffzeit, Notiz und Zug der Vorgängerin auf jedem Eingangsweg (`meldungAufnehmen`). Reisen mit der Sammlung in Sammel-PDF und Einsatz-Transport mit; unterliegen mit der Meldung dem Papierkorb und der Löschung (`src/app/eintrag-zeiten.ts`) | `localStorage` des Geräts (`eeb.einsaetze.v1`, am Eintrag) |
 | D2d | Zuletzt offene Sammlung | Kennung und Zeitpunkt der zuletzt geöffneten Einsatz-Sammlung, 12 Stunden gültig; keine Personendaten | `localStorage` des Geräts (`eeb.letzterEinsatz.v1`) |
 | D2e | Entfernte Meldungen je Einsatz-Sammlung | Kennungen der Einträge, die vor Ort über „Entfernen" oder „Fassung verwerfen…" herausgenommen wurden — damit „Einsatz importieren…" sie nicht still zurückholt, sondern nachfragt (`src/app/entfernte-meldungen.ts`, Audit Runde 2, R2-D4); keine Personendaten, nur zufällige Kennungen; „Rückgängig" nimmt sie wieder heraus, Einträge endgültig gelöschter Sammlungen fallen beim nächsten Schreiben weg | `localStorage` des Geräts (`eeb.entfernt.v1`), wandert mit der Datensicherung mit, fällt mit „Alle Daten löschen" weg |
 | D2f | Zeitpunkt der letzten Sicherung | Wann auf diesem Gerät zuletzt „Sicherung erstellen…" ausgelöst wurde — Grundlage für die Anzeige in der Datensicherung und die Erinnerung nach drei Tagen (`src/app/sicherung.ts`, Audit Runde 2, R2-O6); keine Personendaten | `localStorage` des Geräts (`eeb.sicherung.zuletzt.v1`), steht in der Sicherung selbst, fällt mit „Alle Daten löschen" weg |

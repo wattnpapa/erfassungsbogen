@@ -240,6 +240,18 @@ describe("Einheit mit Folgemeldung entfernen (R2-D1)", () => {
     expect(screen.queryByRole("status")).toBeNull();
   });
 
+  it("zeigt in der Historie die Eingangszeit je Fassung und die Vermerke der Führungsstelle (R2-K6)", async () => {
+    const nutzer = userEvent.setup();
+    lage();
+    const karte = karteVon("Ulm")!;
+    await nutzer.click(within(karte).getByRole("button", { name: "Historie (2)" }));
+    const text = karteVon("Ulm")!.textContent!;
+    expect(text).toContain("eingegangen");
+    expect(text).toContain("Vermerke der Führungsstelle");
+    expect(text).toContain("Auftrag/Notiz: Deich Nord");
+    expect(text).toMatch(/Empfangen|Manuell erfasst|Aus Datei/);
+  });
+
   it("lässt einen abgeteilten Truppteil (eigener Schlüssel) stehen", async () => {
     const nutzer = userEvent.setup();
     const angelegt = einsatzAnlegen("Hochwasser Ulm", EinsatzArt.EINSATZ);

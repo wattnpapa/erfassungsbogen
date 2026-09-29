@@ -42,6 +42,8 @@ import {
   statusMitZeitSetzen,
   zeitKurz,
   zeitLang,
+  zugSetzen,
+  HERKUNFT_TEXT,
 } from "./eintrag-zeiten";
 
 class MemStorage {
@@ -323,5 +325,47 @@ describe("zeitpunktZuMs (R2-N4)", () => {
   it("liest den Bogen-Zeitpunkt als lokale Wandzeit dieses Geräts", () => {
     expect(zeitpunktZuMs(zeitpunktAusIso("2026-09-28T14:42"))).toBe(new Date("2026-09-28T14:42").getTime());
     expect(zeitpunktZuMs(zeitpunktAusIso("2026-01-02T00:05"))).toBe(new Date("2026-01-02T00:05").getTime());
+  });
+});
+
+describe("Vermerke der Führungsstelle (Audit Runde 2, R2-K6)", () => {
+  it("hält Zug, Auftrag, Zeitkorrektur und Abrücken mit Uhrzeit fest", () => {
+    const { einsatzId, eintragId } = buehne();
+    const schl = eintrag(einsatzId, eintragId).einheitSchluessel;
+    zugSetzen(einsatzId, schl, eintragId, "1. TZ");
+    notizSetzen(einsatzId, eintragId, "Einspeisung Pumpwerk Süd");
+    notizSetzen(einsatzId, eintragId, "Pumpwerk Nord");
+    eintreffzeitSetzen(einsatzId, eintragId, new Date("2026-09-28T15:40").getTime());
+    statusMitZeitSetzen(einsatzId, eintragId, MeldeStatus.ABGERUECKT, new Date("2026-09-28T18:00").getTime());
+    const v = eintrag(einsatzId, eintragId).vermerke!;
+    expect(v.map((x) => x.text)).toEqual([
+      "Zug: 1. TZ",
+      "Auftrag/Notiz: Einspeisung Pumpwerk Süd",
+      "Auftrag/Notiz geändert: Pumpwerk Nord (war: Einspeisung Pumpwerk Süd)",
+      expect.stringMatching(/^Eintreffzeit korrigiert: .* → 28\.09\.2026, 15:40$/),
+      "Abgerückt",
+    ]);
+    expect(v.every((x) => typeof x.zeit === "number" && x.zeit > 0)).toBe(true);
+    expect(eintrag(einsatzId, eintragId).zugEtikett).toBe("1. TZ");
+  });
+
+  it("vermerkt nichts, wenn sich nichts ändert", () => {
+    const { einsatzId, eintragId } = buehne();
+    notizSetzen(einsatzId, eintragId, "");
+    zugSetzen(einsatzId, eintrag(einsatzId, eintragId).einheitSchluessel, eintragId, "");
+    expect(eintrag(einsatzId, eintragId).vermerke).toBeUndefined();
+  });
+
+  it("gibt den Verlauf an die Folgemeldung weiter", () => {
+    const { einsatzId, eintragId } = buehne();
+    notizSetzen(einsatzId, eintragId, "Deich Nord");
+    const r = meldungAufnehmen(einsatzId, bogen("Crailsheim", 200))!;
+    expect(r.eintrag.id).not.toBe(eintragId);
+    expect(eintrag(einsatzId, r.eintrag.id).vermerke!.map((x) => x.text)).toEqual(["Auftrag/Notiz: Deich Nord"]);
+  });
+
+  it("nennt die Herkunft überall gleich", () => {
+    expect(HERKUNFT_TEXT["pdf-import"]).toBe("Aus Datei");
+    expect(HERKUNFT_TEXT.scan).toBe("Empfangen");
   });
 });

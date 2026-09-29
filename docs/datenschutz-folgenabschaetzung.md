@@ -74,6 +74,13 @@ Grundlage: Repository `wattnpapa/erfassungsbogen`, Stand 2026-09-12 — Version 
 > „Rückgängig" steht jetzt in einer festen Leiste am unteren Bildrand; die
 > Lebensdauer des Rückwegs (nur Arbeitsspeicher) ist präzisiert. Keine neue
 > Speicherung. Geändert: 5.7.
+>
+> **Nachgezogen 2026-09-29 — Vermerke der Führungsstelle (Audit Runde 2,
+> R2-K6):** Zug, Auftrag/Notiz, Zeitkorrekturen und Abrücken werden je Meldung
+> mit Uhrzeit protokolliert (Zusatzfeld `vermerke`). Ein geänderter Auftrag
+> bleibt damit als Vorwert im Vermerk stehen, bis die Sammlung gelöscht wird —
+> Freitext mit Personenbezug lebt also so lange wie die Sammlung, nicht nur bis
+> zur nächsten Änderung. Kein neuer Empfänger. Geändert: 5.7.
 
 ## Hinweis zu diesem Dokument
 
@@ -353,7 +360,7 @@ Kapitel 6 der [Arc42-Dokumentation](arc42-architektur.md).
 - **Aufräumfrist ruhender Einsatz-Sammlungen:** Eine Sammlung, die 90 Tage
   nicht geändert wurde, löscht die App endgültig (Ankündigung ab Tag 60).
   Mit ihr gehen auch die Zusatzfelder je Meldung (Eintreff-/Abrückzeit,
-  Notiz der Führungsstelle) und die Merkung der zuletzt offenen Sammlung
+  Notiz und Vermerke der Führungsstelle) und die Merkung der zuletzt offenen Sammlung
   (`eeb.letzterEinsatz.v1`, ohne Personenbezug, 12 Stunden gültig).
 - Eine **Papierkorb-Funktion** existiert (`sicherung.ts`, `vorlagen.ts`,
   `@bos/meldekopf/papierkorb`): gelöschte Einträge lassen sich vor endgültiger

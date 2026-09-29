@@ -619,9 +619,11 @@ speicherunabhängige Logik:
 | `papierkorb.ts` | Wiederherstellbarkeit für 30 Tage, danach endgültiges Löschen. |
 | `darstellung.ts` | Bogeninhalte als Text, wie sie auf dem Papierbogen stehen — plattformneutrale Vorstufe für PDF/CSV-Ausgabe. |
 
-Der Erfassungsbogen erweitert den Eintrag app-seitig um drei optionale
+Der Erfassungsbogen erweitert den Eintrag app-seitig um optionale
 Felder (`src/app/eintrag-zeiten.ts`, seit 2026-09-27): `eingetroffenAm`,
-`abgerueckAm` (Geräteuhr) und `notiz` (Auftrag/Notiz der Führungsstelle). Sie
+`abgerueckAm` (Geräteuhr), `notiz` (Auftrag/Notiz der Führungsstelle) und
+seit 2026-09-29 `vermerke` (Verlauf der Führungsstelle mit Uhrzeit: Zug,
+Auftrag, Zeitkorrektur, Abrücken; Audit Runde 2, R2-K6). Sie
 werden per TypeScript-Modul-Augmentation an `MeldeEintrag` gehängt, reisen als
 gewöhnliche JSON-Felder mit der Sammlung (der Kern kopiert unbekannte Felder
 in `einsaetzeAusJson` unverändert) und bleiben damit ohne Schemawechsel im

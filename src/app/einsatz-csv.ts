@@ -18,7 +18,7 @@ import type { EinsatzArt } from "@bos/meldekopf/einsaetze";
 import { einheitAnzeigename, orgLabel, vokabText, vokabularFuer, zeitgruppe } from "./hilfen";
 import { aktuelleMeldungen, unterbringungLage, verpflegungLage, zaehltInLage } from "./auswertung";
 import { csvDatei, csvZeile } from "./csv";
-import { eintreffzeit, zeitLang } from "./eintrag-zeiten";
+import { HERKUNFT_TEXT, eintreffzeit, zeitLang } from "./eintrag-zeiten";
 import { MeldeStatus, neuesteJeEinheit, type Einsatzsammlung, type MeldeEintrag, type MeldeQuelle } from "@bos/meldekopf/einsaetze";
 
 const STATUS_LABEL: Record<MeldeStatus, string> = {
@@ -27,13 +27,8 @@ const STATUS_LABEL: Record<MeldeStatus, string> = {
   [MeldeStatus.AUFGEGANGEN]: "aufgegangen",
 };
 
-const QUELLE_LABEL: Record<MeldeQuelle, string> = {
-  scan: "Scan",
-  manuell: "Manuell",
-  "pdf-import": "PDF-Import",
-  aufteilung: "Aufteilung",
-  zusammenfuehrung: "Zusammenführung",
-};
+// Derselbe Wortlaut wie auf der Karte (Audit Runde 2, R2-K6).
+const QUELLE_LABEL: Record<MeldeQuelle, string> = HERKUNFT_TEXT;
 
 const SPALTEN = [
   "Einheit",

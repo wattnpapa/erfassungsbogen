@@ -42,7 +42,6 @@ import {
   einsatzWiederherstellen,
   einsaetzeLaden,
   einsaetzePapierkorb,
-  einheitZugEtikettSetzen,
   meldungAufteilen,
   meldungenZusammenfuehren,
   meldungEntfernen,
@@ -80,6 +79,8 @@ import {
   einheitEntfernen,
   einheitVerschieben,
   notizSetzen,
+  zugSetzen,
+  HERKUNFT_TEXT,
   statusMitZeitSetzen,
   zeitKurz,
 } from "./eintrag-zeiten";
@@ -119,20 +120,9 @@ export const ART_LABEL: Record<EinsatzArt, string> = {
   [EinsatzArt.VERANSTALTUNG]: "Veranstaltung",
 };
 
-/**
- * Herkunft einer Meldung, wie die Führungsstelle sie liest: Hat die Einheit
- * selbst gemeldet (Scan, Link, Datei — alles „empfangen"), oder hat der
- * Meldekopf sie eingetippt? „Scan" für einen per Link geöffneten Bogen und
- * „Manuell" für eine aus einer Mail geladene PDF ließen nachgetippte Angaben
- * weniger vertrauenswürdig aussehen, als sie sind (Arbeitsablauf-Audit W7).
- */
-const QUELLE_LABEL: Record<MeldeEintrag["quelle"], string> = {
-  scan: "Empfangen",
-  manuell: "Manuell erfasst",
-  "pdf-import": "Aus Datei",
-  aufteilung: "Aufteilung",
-  zusammenfuehrung: "Zusammenführung",
-};
+// Herkunft einer Meldung: ein Wortlaut für Karte und Exporte, siehe
+// HERKUNFT_TEXT in eintrag-zeiten.ts (Audit Runde 2, R2-K6).
+const QUELLE_LABEL = HERKUNFT_TEXT;
 
 /**
  * Eine Schreibaktion auf die Sammlung ausführen und einen vollen Speicher dem
@@ -1564,6 +1554,9 @@ function HistorieZeile({ eintrag, vorheriger, aktuell, onVerwerfen }: {
   return (
     <li>
       Stand {standText(eintrag.bogen)} · Stärke {staerkeText(eintrag.bogen)} · {QUELLE_LABEL[eintrag.quelle]}
+      {/* Wann die Fassung HIER eingegangen ist — der Stand ist die Uhr des
+          Absenders (Audit Runde 2, R2-K6). */}
+      {" · eingegangen "}{zeitKurz(eintrag.empfangenAm)}
       {aktuell ? " (aktuell)" : ""}
       {vorheriger && (
         <>
@@ -1683,6 +1676,7 @@ function EinheitKarte(props: {
   const qualiPersonen = personenMitQualifikation(kopf, qualifikation);
   const [details, setDetails] = useState(false);
   const [historie, setHistorie] = useState(false);
+  const vermerke = kopf.vermerke ?? [];
   const [aenderungen, setAenderungen] = useState(false);
   const [aufteilen, setAufteilen] = useState(false);
   const [zusammenfuehren, setZusammenfuehren] = useState(false);
@@ -1745,7 +1739,7 @@ function EinheitKarte(props: {
 
   async function zugSpeichern() {
     const ok = await gesichert("Zug zuordnen", () =>
-      einheitZugEtikettSetzen(einsatzId, kopf.einheitSchluessel, zugEntwurf ?? ""),
+      zugSetzen(einsatzId, kopf.einheitSchluessel, kopf.id, zugEntwurf ?? ""),
     );
     setZugEntwurf(null);
     if (ok) onGeaendert();
@@ -2127,9 +2121,9 @@ function EinheitKarte(props: {
             </button>{" "}
           </>
         )}
-        {revs.length > 1 && (
+        {(revs.length > 1 || vermerke.length > 0) && (
           <button type="button" aria-describedby={nameId} onClick={() => setHistorie(!historie)}>
-            {historie ? "Historie schließen" : `Historie (${revs.length})`}
+            {historie ? "Historie schließen" : revs.length > 1 ? `Historie (${revs.length})` : "Historie"}
           </button>
         )}{" "}
         <button type="button" aria-describedby={nameId} onClick={() => void verschieben()}>Verschieben…</button>{" "}
@@ -2228,6 +2222,18 @@ function EinheitKarte(props: {
             />
           ))}
         </ul>
+      )}
+      {/* Verlauf der Führungsstelle: Zug, Auftrag, Zeitkorrektur, Abrücken
+          mit Uhrzeit — für Einsatztagebuch und Übergabe (Audit Runde 2, R2-K6). */}
+      {historie && vermerke.length > 0 && (
+        <>
+          <p className="hinweis"><strong>Vermerke der Führungsstelle</strong></p>
+          <ul className="historie fuehrungs-vermerke">
+            {vermerke.map((v, i) => (
+              <li key={i}>{zeitKurz(v.zeit)} {v.text}</li>
+            ))}
+          </ul>
+        </>
       )}
     </li>
   );

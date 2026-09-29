@@ -22,6 +22,7 @@ import {
   meldungHinzufuegen,
   type Einsatzsammlung,
   type MeldeEintrag,
+  type MeldeQuelle,
   type MeldungAufnahme,
   type MeldungOptionen,
 } from "@bos/meldekopf/einsaetze";
@@ -44,7 +45,40 @@ declare module "@bos/meldekopf/einsaetze" {
      * Meldung der Einheit, die Notiz gehört dem Meldekopf.
      */
     notiz?: string;
+    /**
+     * Was die Führungsstelle an dieser Einheit getan hat, mit Uhrzeit: Zug,
+     * Auftrag, Zeitkorrektur, Abrücken (Audit Runde 2, R2-K6). Bisher stand nur
+     * der aktuelle Wert da — „seit wann hat die FGr E diesen Auftrag?" war nicht
+     * zu beantworten. Wie die übrigen Zusatzfelder am Eintrag, vom Kern
+     * unverändert durchgereicht; eine Folgemeldung erbt die Liste.
+     */
+    vermerke?: FuehrungsVermerk[];
   }
+}
+
+/** Ein Eintrag im Verlauf der Führungsstelle: Zeitpunkt (Date.now()) und Text. */
+export interface FuehrungsVermerk {
+  zeit: number;
+  text: string;
+}
+
+/**
+ * Herkunft einer Meldung — EIN Wortlaut für Karte, Historie und alle CSV-
+ * Exporte. Bisher hieß derselbe JSON-Import auf der Karte „Aus Datei" und in
+ * der CSV „PDF-Import", ein Scan hier „Empfangen", dort „Scan" (Audit Runde 2,
+ * R2-K6). „Empfangen" statt „Scan" bleibt, weil Scan, Link und Übertragung
+ * dasselbe sind: die Einheit hat selbst gemeldet (Arbeitsablauf-Audit W7).
+ */
+export const HERKUNFT_TEXT: Record<MeldeQuelle, string> = {
+  scan: "Empfangen",
+  manuell: "Manuell erfasst",
+  "pdf-import": "Aus Datei",
+  aufteilung: "Aufteilung",
+  zusammenfuehrung: "Zusammenführung",
+};
+
+function vermerken(e: MeldeEintrag, text: string, zeit = Date.now()): void {
+  (e.vermerke ??= []).push({ zeit, text });
 }
 
 /**
@@ -146,14 +180,20 @@ function eintragAendern(einsatzId: string, eintragId: string, aendern: (e: Melde
 /** Eintreffzeit einer Meldung korrigieren (Nachtragen vom Papier). */
 export function eintreffzeitSetzen(einsatzId: string, eintragId: string, zeitpunkt: number): void {
   eintragAendern(einsatzId, eintragId, (e) => {
+    const vorher = eintreffzeit(e);
     e.eingetroffenAm = zeitpunkt;
+    if (vorher !== zeitpunkt) vermerken(e, `Eintreffzeit korrigiert: ${zeitLang(vorher)} → ${zeitLang(zeitpunkt)}`);
   });
 }
 
 /** Abrückzeit einer abgerückten Meldung korrigieren. */
 export function abrueckzeitSetzen(einsatzId: string, eintragId: string, zeitpunkt: number): void {
   eintragAendern(einsatzId, eintragId, (e) => {
+    const vorher = e.abgerueckAm;
     e.abgerueckAm = zeitpunkt;
+    if (vorher !== zeitpunkt) {
+      vermerken(e, `Abrückzeit korrigiert: ${vorher != null ? `${zeitLang(vorher)} → ` : ""}${zeitLang(zeitpunkt)}`);
+    }
   });
 }
 
@@ -169,6 +209,13 @@ export function statusMitZeitSetzen(
   zeitpunkt = Date.now(),
 ): void {
   eintragAendern(einsatzId, eintragId, (e) => {
+    if (e.status !== status) {
+      vermerken(
+        e,
+        status === MeldeStatus.ABGERUECKT ? "Abgerückt" : status === MeldeStatus.ANWESEND ? "Wieder als anwesend geführt" : "Status geändert",
+        zeitpunkt,
+      );
+    }
     e.status = status;
     if (status === MeldeStatus.ABGERUECKT) e.abgerueckAm = zeitpunkt;
     else delete e.abgerueckAm;
@@ -180,9 +227,43 @@ export function statusMitZeitSetzen(
 export function notizSetzen(einsatzId: string, eintragId: string, notiz: string): void {
   eintragAendern(einsatzId, eintragId, (e) => {
     const t = notiz.trim();
+    const vorher = e.notiz;
     if (t) e.notiz = t;
     else delete e.notiz;
+    if ((vorher ?? "") !== t) {
+      vermerken(
+        e,
+        !t ? `Auftrag/Notiz entfernt (war: ${vorher})` : vorher ? `Auftrag/Notiz geändert: ${t} (war: ${vorher})` : `Auftrag/Notiz: ${t}`,
+      );
+    }
   });
+}
+
+/**
+ * Zug einer Einheit setzen (alle Fassungen, wie `einheitZugEtikettSetzen` im
+ * Kern) und den Vorgang mit Uhrzeit an der aktuellen Fassung vermerken
+ * (R2-K6). Leer = Zuordnung entfernen.
+ */
+export function zugSetzen(einsatzId: string, einheitSchl: string, kopfId: string, etikett: string): void {
+  const liste = alleSammlungen();
+  const s = liste.find((x) => x.id === einsatzId);
+  if (!s) return;
+  const wert = etikett.trim() || undefined;
+  const kopf = s.eintraege.find((e) => e.id === kopfId);
+  const vorher = kopf?.zugEtikett;
+  let geaendert = false;
+  for (const e of s.eintraege) {
+    if (e.einheitSchluessel === einheitSchl && e.zugEtikett !== wert) {
+      e.zugEtikett = wert;
+      geaendert = true;
+    }
+  }
+  if (!geaendert) return;
+  if (kopf && vorher !== wert) {
+    vermerken(kopf, wert ? (vorher ? `Zug: ${wert} (war: ${vorher})` : `Zug: ${wert}`) : `Zug-Zuordnung entfernt (war: ${vorher})`);
+  }
+  s.geaendert = Date.now();
+  sammlungenSchreiben(liste);
 }
 
 /**
@@ -218,6 +299,11 @@ export function folgemeldungErbt(einsatzId: string, eintragId: string): void {
   }
   if (!e.teilEtikett && vorgaenger.teilEtikett) {
     e.teilEtikett = vorgaenger.teilEtikett;
+    geaendert = true;
+  }
+  // Der Verlauf der Führungsstelle gehört zur Einheit, nicht zur Fassung (R2-K6).
+  if (e.vermerke == null && vorgaenger.vermerke?.length) {
+    e.vermerke = vorgaenger.vermerke.map((v) => ({ ...v }));
     geaendert = true;
   }
   if (geaendert) sammlungenSchreiben(liste);

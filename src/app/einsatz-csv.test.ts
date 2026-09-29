@@ -102,7 +102,7 @@ describe("einsatzCsvInhalt()", () => {
     expect(f[18]).toMatch(/^\d{6}[a-z]{3}\d{2}$/); // Stand als NATO-Zeitgruppe
     expect(f[19]).toMatch(/^\d{2}\.\d{2}\.\d{4}, \d{2}:\d{2}$/); // Eingetroffen = Empfangszeit, wenn nicht korrigiert
     expect(f[20]).toBe(""); // nicht abgerückt
-    expect(f[22]).toBe("Scan");
+    expect(f[22]).toBe("Empfangen"); // gleicher Wortlaut wie auf der Karte (R2-K6)
     expect(f[23]).toBe("anwesend");
     expect(f[24]).toBe("ja");
     expect(f[25]).toBe(""); // kein Übungsbogen
