@@ -13,7 +13,7 @@ import {
   type Erfassungsbogen,
   type Person,
 } from "@bos/eeb-format/model";
-import { istBilddatei, qrStapelLesen, stapelBericht, type StapelDatei } from "./qr-stapel";
+import { LAGE_NACHTRAGEN_HINWEIS, dateiImportMeldung, istBilddatei, qrStapelLesen, stapelBericht, type StapelDatei } from "./qr-stapel";
 
 const zlib: Kompressor = {
   deflateRaw: (d) => new Uint8Array(deflateRawSync(d, { level: 9 })),
@@ -157,6 +157,24 @@ describe("qrStapelLesen", () => {
     expect(erg.abgebrochen).toBe(true);
     expect(erg.funde).toHaveLength(1);
     expect(stapelBericht(erg, 1, 0)).toContain("Abgebrochen — die restlichen Bilder wurden nicht gelesen.");
+  });
+
+  it("bericht sagt nach einer Aufnahme, dass Zeiten und Abrückvermerke nachzutragen sind (R2-A1)", () => {
+    const leer = { gelesen: 4, funde: [], fehler: [], luecken: [], abgebrochen: false };
+    const t = stapelBericht(leer, 4, 0).join(" ");
+    expect(t).toContain("Eintreffzeit der neu aufgenommenen Einheiten ist die Zeit des Einlesens");
+    expect(t).toContain("Abrückvermerk, Zug und Auftrag stecken nicht im Bogen");
+    expect(t).toContain("„ändern“ an der Eintreffzeit, „Abrücken“");
+    // Nichts aufgenommen — nichts nachzutragen.
+    expect(stapelBericht(leer, 0, 4)).not.toContain(LAGE_NACHTRAGEN_HINWEIS);
+  });
+
+  it("dateiImportMeldung verweist bei eingebetteter Sammlung auf „Einsatz importieren…“ (R2-A1)", () => {
+    expect(dateiImportMeldung(2, 1)).toBe("2 Bogen/Bögen aufgenommen, 1 bereits vorhanden.");
+    expect(dateiImportMeldung(4, 0, { sammlungInPdf: true })).toContain("für die ganze Lage „Einsatz importieren…“ verwenden");
+    expect(dateiImportMeldung(4, 0, { sammlungInPdf: true })).not.toContain(LAGE_NACHTRAGEN_HINWEIS);
+    expect(dateiImportMeldung(4, 0, { lage: true })).toContain(LAGE_NACHTRAGEN_HINWEIS);
+    expect(dateiImportMeldung(0, 4, { lage: true })).not.toContain(LAGE_NACHTRAGEN_HINWEIS);
   });
 
   it("bericht nennt Aufnahme und Dubletten", () => {

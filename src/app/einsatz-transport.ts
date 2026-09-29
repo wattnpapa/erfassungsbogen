@@ -163,3 +163,16 @@ export function einsatzAusPdfBytes(bytes: Uint8Array): Einsatzsammlung | null {
   }
   return null;
 }
+
+/**
+ * Was trägt diese PDF? „sammlung" = die ganze Einsatz-Sammlung eingebettet
+ * (Sammel-PDF: verlustfrei über „Einsatz importieren…"), „boegen" = nur
+ * eingebettete Bögen, „nur-qr" = keine Daten, allenfalls QR-Codes — ein
+ * eingescannter Ausdruck. Für die Rückmeldung von „Bögen einlesen…": bei
+ * „sammlung" auf den verlustfreien Weg verweisen, bei „nur-qr" sagen, dass
+ * Zeiten und Abrückvermerke vom Papier nachzutragen sind (Audit Runde 2, R2-A1).
+ */
+export function pdfInhaltArt(bytes: Uint8Array): "sammlung" | "boegen" | "nur-qr" {
+  if (einsatzAusPdfBytes(bytes)) return "sammlung";
+  return boegenAusPdfBytes(bytes).length > 0 ? "boegen" : "nur-qr";
+}

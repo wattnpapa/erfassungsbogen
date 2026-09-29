@@ -74,14 +74,14 @@ import { offlineText, useOfflineStand } from "./offline-bereit";
 import { ART_LABEL, EinsatzDetail, EinsatzListe, type Eingang } from "./einsaetze-ui";
 import { exportSammlung, exportStandLaden, exportVermerken, type ExportStand, type ExportUmfang } from "./export-stand";
 import { aktuelleMeldungen } from "./auswertung";
-import { boegenAusPdfBytes, einsatzAusDatei, einsatzAusPdfBytes, einsatzDateiInhalt, istPdfDatei } from "./einsatz-transport";
+import { boegenAusPdfBytes, einsatzAusDatei, einsatzAusPdfBytes, einsatzDateiInhalt, istPdfDatei, pdfInhaltArt } from "./einsatz-transport";
 import type { QrBogen } from "./qr-boegen";
 import { einsatzCsvInhalt } from "./einsatz-csv";
 import { einsatzDetailCsvInhalt } from "./bogen-csv";
 import { QrScannerWeb } from "./qr-scanner-web";
 import { TeilQuittung, fehlendeTeile, fehltNochSatz } from "./teil-quittung";
 import { qrAusBild } from "./qr-bild";
-import { istBilddatei, qrStapelLesen, stapelBericht as stapelBerichtZeilen } from "./qr-stapel";
+import { dateiImportMeldung, istBilddatei, qrStapelLesen, stapelBericht as stapelBerichtZeilen } from "./qr-stapel";
 import {
   entwurfLaden,
   entwurfSpeichern,
@@ -1986,8 +1986,12 @@ function AppInhalt() {
     let neu = 0;
     let uebersprungen = 0;
     const kaputt: string[] = [];
+    const zusatz = { sammlungInPdf: false, lage: false }; // R2-A1
     for (const datei of dateien) {
       try {
+        const art = istPdfDatei(datei) ? pdfInhaltArt(new Uint8Array(await datei.arrayBuffer())) : null;
+        if (art === "sammlung") zusatz.sammlungInPdf = true;
+        if (art === "nur-qr") zusatz.lage = true;
         const r = boegenAufnehmen(zielId, await boegenAusDatei(datei));
         neu += r.neu;
         uebersprungen += r.uebersprungen;
@@ -2002,7 +2006,7 @@ function AppInhalt() {
         ? kaputt.length > 0
           ? ""
           : "Keine Bögen in der Datei gefunden — weder eingebettete Daten noch ein lesbarer QR-Code."
-        : `${neu} Bogen/Bögen aufgenommen${uebersprungen ? `, ${uebersprungen} bereits vorhanden` : ""}.`,
+        : dateiImportMeldung(neu, uebersprungen, zusatz),
     );
   }
 
@@ -2029,7 +2033,7 @@ function AppInhalt() {
     const { neu, uebersprungen } = boegenAufnehmen(s.id, gefunden);
     einsaetzeNeuLaden();
     setFehler("");
-    setMeldung(`Einsatz „${s.name}" angelegt — ${neu} Bogen/Bögen aufgenommen${uebersprungen ? `, ${uebersprungen} bereits vorhanden` : ""}.`);
+    setMeldung(`Einsatz „${s.name}" angelegt — ${dateiImportMeldung(neu, uebersprungen, { lage: true })}`);
     setZeigeStart(false);
     setOffenerEinsatzId(s.id);
     return true;

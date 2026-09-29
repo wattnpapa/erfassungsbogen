@@ -45,6 +45,12 @@ Grundlage: Repository `wattnpapa/erfassungsbogen`, Stand 2026-09-12 — Version 
 > „Entfernen" löscht eine Einheit der Einsatz-Sammlung jetzt mit allen
 > Fassungen; bisher blieben die älteren Fassungen samt Personendaten
 > gespeichert. Geändert: 5.7.
+>
+> **Nachgezogen 2026-09-29 — Stand am Meldekopf auf den Bogenseiten (Audit
+> Runde 2, R2-A1):** Die Sammel-PDF wiederholt Eintreff-/Abrückzeit, Zug und
+> Auftrag/Notiz je Einheit über deren Bogen und neben dem QR-Code. Keine neuen
+> Daten, kein neuer Empfänger; der QR-Code bleibt unverändert. Geändert: 5.1,
+> 5.5.
 
 ## Hinweis zu diesem Dokument
 
@@ -207,7 +213,9 @@ definieren.
   Übergabeblatt (Sammel-PDF mit eingebetteter Sammlung) und einseitiges
   Lageblatt für Wand, Ablösung und Einsatztagebuch (seit 2026-09-27); dieselben
   Angaben gehen seit 2026-09-29 auch in die Excel-Liste „Oldenburg" für die
-  übergeordnete Führungsstelle.
+  übergeordnete Führungsstelle. Seit 2026-09-29 steht dieser Stand in der Sammel-PDF zusätzlich über jedem Bogen
+  und neben seinem QR-Code, damit ein Ausdruck ohne Seite 1 nicht eine
+  abgerückte Einheit als anwesend zeigt (R2-A1).
 - Weitergabe einer gespeicherten Vorlage (Stammdaten der eigenen Einheit) an ein
   anderes Gerät oder in eine vom Nutzer gewählte Ablage, damit sie
   geräteunabhängig verfügbar ist.
@@ -268,7 +276,11 @@ biometrische Daten, strafrechtliche Daten.
   Führungsstellen-Zusätze (Eintreff-/Abrückzeit, Auftrag/Notiz als Freitext,
   siehe 5.4); die Excel-Liste enthält außerdem die Erreichbarkeit der
   Führungskraft (Name und Kontakt). Abgerückte Einheiten bleiben in allen drei
-  Ausgaben sichtbar, zählen aber nicht in die Summen.
+  Ausgaben sichtbar, zählen aber nicht in die Summen. In der Sammel-PDF trägt jede Bogenseite den Kasten „Stand am Meldekopf"
+  (Eintreff-/Abrückzeit, Zug, Auftrag/Notiz — die Notiz ist Freitext und kann
+  Personenbezug haben); der QR-Code enthält davon nichts. Wird ein Ausdruck
+  über die QR-Codes wieder eingelesen, kommen nur die Bögen zurück; die App
+  weist auf das Nachtragen von Hand hin (seit 2026-09-29, R2-A1).
 - „Vorlage teilen": die Vorlage als signierter QR-Code/Link oder als
   unsignierte JSON-Datei (`eeb-vorlage-*.json`). Die Datei trägt nur diese
   eine Vorlage, keinen Geräteschlüssel. Beim Empfänger entsteht daraus wieder

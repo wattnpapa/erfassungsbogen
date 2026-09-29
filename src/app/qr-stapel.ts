@@ -205,5 +205,50 @@ export function stapelBericht(e: StapelErgebnis, neu: number, uebersprungen: num
     );
   }
   for (const f of e.fehler) zeilen.push(`${f.datei}: ${f.text}`);
+  if (neu > 0) zeilen.push(LAGE_NACHTRAGEN_HINWEIS);
   return zeilen;
+}
+
+/**
+ * Was ein Bogen aus Code oder Datei NICHT mitbringt: der QR-Code trägt nur den
+ * Bogen der Einheit. Eintreffzeit, Abrückvermerk, Zug und Auftrag gehören dem
+ * Meldekopf und stehen auf dem Papier nur als Text (Übergabe-Übersicht und
+ * Kasten „Stand am Meldekopf“ je Bogen). Ohne diesen Satz stand eine
+ * abgerückte Einheit nach dem Einlesen still wieder als anwesend und zählend
+ * da, mit der Scan-Uhrzeit als Eintreffzeit (Audit Runde 2, R2-A1).
+ * Folgemeldungen erben Zeit, Zug und Auftrag ihrer Vorgängerin — der Satz
+ * betrifft deshalb die neu aufgenommenen Einheiten.
+ */
+export const LAGE_NACHTRAGEN_HINWEIS =
+  "Eintreffzeit der neu aufgenommenen Einheiten ist die Zeit des Einlesens, und sie stehen als anwesend; " +
+  "Abrückvermerk, Zug und Auftrag stecken nicht im Bogen. Stammen die Bögen aus einer Sammel-PDF, die Angaben " +
+  "von Seite 1 (Übergabe-Übersicht) bzw. dem Kasten „Stand am Meldekopf“ an der Karte nachtragen: „ändern“ an " +
+  "der Eintreffzeit, „Abrücken“, „Zug zuordnen“, „Auftrag/Notiz“.";
+
+/**
+ * Hinweis für „Bögen einlesen…“ mit einer Sammel-PDF, die die ganze Sammlung
+ * eingebettet trägt: dieser Weg nimmt nur die Bögen, „Einsatz importieren…“
+ * brächte Zeiten, Abrückvermerke und Züge verlustfrei mit (R2-A1).
+ */
+export const SAMMLUNG_IN_PDF_HINWEIS =
+  "Die PDF enthält die vollständige Einsatz-Sammlung mit Zeiten, Abrückvermerken und Zügen — " +
+  "für die ganze Lage „Einsatz importieren…“ verwenden.";
+
+/**
+ * Rückmeldezeile für „Bögen einlesen…“ (JSON-/PDF-Dateien) und für eine PDF
+ * ohne Sammlung über „Einsatz importieren…“. Bei einer Sammel-PDF mit
+ * eingebetteter Sammlung verweist sie auf den verlustfreien Weg; `lage`
+ * hängt — wie beim Bilderstapel — an, was aus den Bögen allein nicht
+ * zurückkommt (R2-A1). Einzelne Bögen einer Einheit (JSON, eigener PDF-Bogen)
+ * brauchen den Satz nicht: dort IST der Eingang die Eintreffzeit.
+ */
+export function dateiImportMeldung(
+  neu: number,
+  uebersprungen: number,
+  zusatz: { sammlungInPdf?: boolean; lage?: boolean } = {},
+): string {
+  const teile = [`${neu} Bogen/Bögen aufgenommen${uebersprungen ? `, ${uebersprungen} bereits vorhanden` : ""}.`];
+  if (zusatz.sammlungInPdf) teile.push(SAMMLUNG_IN_PDF_HINWEIS);
+  else if (zusatz.lage && neu > 0) teile.push(LAGE_NACHTRAGEN_HINWEIS);
+  return teile.join(" ");
 }

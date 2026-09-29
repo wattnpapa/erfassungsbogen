@@ -488,6 +488,80 @@ describe("einsatzPdfDokument()", () => {
   });
 });
 
+describe("einsatzPdfDokument() — Stand am Meldekopf auf den Bogenseiten (R2-A1)", () => {
+  const eingetroffen = new Date("2026-09-28T14:05").getTime();
+  const abgerueckt = new Date("2026-09-28T16:30").getTime();
+  const erstellt = new Date("2026-09-28T17:00").getTime();
+  const QR3: QrSatz = {
+    ...QR,
+    teile: [1, 2, 3].map((n) => ({ datenUrl: `${QR_BILD}${n}`, url: `${QR_URL}${n}`, teilNr: n, anzahl: 3, version: 20 })),
+    segmentiert: true,
+  };
+
+  /** Text ab dem n-ten Bogen (nach dem n-ten Seitenumbruch) bis zum nächsten. */
+  function bogenTexte(dd: ReturnType<typeof einsatzPdfDokument>): string[] {
+    const bloecke: unknown[][] = [];
+    for (const c of dd.content as { pageBreak?: string; pageOrientation?: string }[]) {
+      if (c && c.pageBreak === "before" && c.pageOrientation === "portrait") bloecke.push([]);
+      else if (bloecke.length > 0) bloecke[bloecke.length - 1]!.push(c);
+    }
+    return bloecke.map((b) => texte(b).join("\n"));
+  }
+
+  it("vermerkt Eintreffzeit, Abrückvermerk, Zug und Auftrag über jedem Bogen", () => {
+    const dd = einsatzPdfDokument(
+      "Hochwasser Albtal",
+      [
+        { bogen: basisBogen(), qr: QR, eingetroffenAm: eingetroffen, zugEtikett: "1. Zug", notiz: "Deich Nord" },
+        { bogen: basisBogen(), qr: QR3, eingetroffenAm: eingetroffen, abgerueckAm: abgerueckt, abgerueckt: true },
+      ],
+      undefined,
+      erstellt,
+    );
+    const [albstadt, biberach] = bogenTexte(dd);
+    expect(albstadt).toContain(
+      "Stand am Meldekopf (Hochwasser Albtal, erstellt 28.09.2026, 17:00): Eingetroffen 28.09.2026, 14:05 · anwesend · Zug: 1. Zug · Auftrag / Notiz: Deich Nord",
+    );
+    expect(biberach).toContain("Eingetroffen 28.09.2026, 14:05 · ABGERÜCKT 28.09.2026, 16:30 · Zug: – · Auftrag / Notiz: –");
+    // Der Kasten steht vor dem Formular — also auf der ersten Seite des Bogens.
+    expect(albstadt!.indexOf("Stand am Meldekopf")).toBeLessThan(albstadt!.indexOf("Erfassungsbogen FGr K (A)"));
+  });
+
+  it("sagt neben jedem QR-Code, dass er nur den Bogen enthält — auch auf jeder Seite eines mehrteiligen Codes", () => {
+    const dd = einsatzPdfDokument(
+      "Lage",
+      [
+        { bogen: basisBogen(), qr: QR, eingetroffenAm: eingetroffen },
+        { bogen: basisBogen(), qr: QR3, eingetroffenAm: eingetroffen, abgerueckAm: abgerueckt, abgerueckt: true },
+      ],
+      undefined,
+      erstellt,
+    );
+    const [einteilig, dreiteilig] = bogenTexte(dd);
+    const hinweis = "Der Code enthält nur den Bogen der Einheit.";
+    expect(einteilig!.split(hinweis)).toHaveLength(2);
+    // Drei Teile → zwei QR-Seiten, jede mit Hinweis und Stand (ABGERÜCKT).
+    expect(dreiteilig!.split(hinweis)).toHaveLength(3);
+    expect(dreiteilig!.split("ABGERÜCKT 28.09.2026, 16:30")).toHaveLength(4); // Kasten oben + 2 QR-Seiten
+    expect(dreiteilig).toContain("nach dem Einlesen von Hand nachtragen");
+    expect(dreiteilig).toContain("„Einsatz importieren…“");
+  });
+
+  it("trägt den Stand des Ausdrucks in der Fußzeile jeder Seite", () => {
+    const dd = einsatzPdfDokument("Lage", [{ bogen: basisBogen(), qr: QR }], undefined, erstellt);
+    const fuss = (dd.footer as (s: number, g: number) => unknown)(3, 4);
+    const t = texte(fuss).join(" ");
+    expect(t).toContain("Einsatz-Sammlung: Lage · Stand 28.09.2026, 17:00");
+    expect(t).toContain("Seite 1 und Kasten über jedem Bogen");
+  });
+
+  it("lässt den Einzelbogen außerhalb der Sammlung ohne Meldekopf-Vermerk", () => {
+    const t = texte(pdfDokument(basisBogen(), QR).content).join("\n");
+    expect(t).not.toContain("Stand am Meldekopf");
+    expect(t).not.toContain("Der Code enthält nur den Bogen");
+  });
+});
+
 describe("einsatzLageblattDokument()", () => {
   it("liefert nur die Übersichtsseite quer — ohne Bögen, QR und Anhang", () => {
     const dd = einsatzLageblattDokument("Hochwasser", [

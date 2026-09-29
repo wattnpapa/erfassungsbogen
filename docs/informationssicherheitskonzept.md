@@ -43,6 +43,11 @@ Grundlage: Repository `wattnpapa/erfassungsbogen`, Stand 2026-09-12 — Version 
 > nimmt die Einheit jetzt mit allen Fassungen aus der Einsatz-Sammlung; bisher
 > blieb die ältere Fassung samt Personendaten stehen und zählte wieder. Eine
 > einzelne Fassung lässt sich getrennt in der Historie verwerfen (5.5).
+>
+> **Nachgezogen 2026-09-29:** Stand am Meldekopf auf den Bogenseiten der
+> Sammel-PDF (Audit Runde 2, R2-A1) — Eintreff-/Abrückzeit, Zug und
+> Auftrag/Notiz stehen zusätzlich über jedem Bogen und neben jedem QR-Code;
+> der QR-Code selbst bleibt unverändert (kein Formatwechsel) (5.4).
 
 ## Hinweis zu diesem Dokument
 
@@ -330,6 +335,15 @@ Datenausleitung an eine andere Herkunft ist technisch unterbunden.
   bestehenden Formel-Abwehr. Die Sammel-PDF entsteht auch ohne anwesende
   Einheiten (Einsatzende). Wohin Ausdruck und Datei gelangen, entscheidet
   weiterhin der Nutzer (DSFA 5.8).
+  Seit 2026-09-29 (R2-A1) trägt in der Sammel-PDF zusätzlich jede Bogenseite
+  den Kasten „Stand am Meldekopf" (Eintreff-/Abrückzeit, Zug, Auftrag/Notiz) —
+  über dem Formular und auf jeder QR-Seite, mit dem Hinweis, dass der QR-Code
+  nur den Bogen der Einheit enthält. Die Notiz der Führungsstelle steht damit
+  im Ausdruck nicht mehr nur auf Seite 1, sondern bei der Einheit; in den
+  QR-Code gelangt sie weiterhin nicht. Wer den Ausdruck nur über die QR-Codes
+  wieder einliest, bekommt die Angaben nicht zurück — die App sagt das in der
+  Rückmeldung und verweist bei einer Sammel-PDF-Datei auf „Einsatz
+  importieren…" (`qr-stapel.ts`, `einsatz-transport.ts: pdfInhaltArt`).
 - **Excel-Liste „Oldenburg"** (`src/app/oldenburg-xlsx.ts`, seit 2026-09-29,
   Audit Runde 2, R2-K2): führt dieselben Führungsstellen-Angaben — Eintreffzeit
   in „eingetr. / zugew.", Abrückzeit in „Einsatz-ende", Auftrag/Notiz

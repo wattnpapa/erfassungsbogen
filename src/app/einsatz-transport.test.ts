@@ -14,7 +14,7 @@ import {
 import { einsatzAnlegen, einsaetzeLaden, einsatzImportieren, meldungHinzufuegen,
   speicherhuelleSetzen,
 } from "@bos/meldekopf/einsaetze";
-import { boegenAusPdfBytes, einsatzAusDatei, einsatzAusPdfBytes, einsatzDateiInhalt } from "./einsatz-transport";
+import { boegenAusPdfBytes, einsatzAusDatei, einsatzAusPdfBytes, einsatzDateiInhalt, pdfInhaltArt } from "./einsatz-transport";
 
 class MemStorage {
   private m = new Map<string, string>();
@@ -135,6 +135,17 @@ describe("einsatzAusPdfBytes()", () => {
     expect(einsatzAusPdfBytes(pdfMitStream(json))).toBeNull();
     const noise = new TextEncoder().encode("BT /F1 12 Tf (Hallo) Tj ET");
     expect(einsatzAusPdfBytes(pdfMitStream(noise))).toBeNull();
+  });
+});
+
+describe("pdfInhaltArt() — Rückmeldung von „Bögen einlesen…“ (R2-A1)", () => {
+  it("unterscheidet Sammlung, eingebettete Bögen und eingescannten Ausdruck", () => {
+    const s = einsatzAnlegen("Übergabe", 0);
+    meldungHinzufuegen(s.id, bogen());
+    const umschlag = einsatzDateiInhalt(einsaetzeLaden()[0]!);
+    expect(pdfInhaltArt(pdfMitStream(deflate(new TextEncoder().encode(umschlag))))).toBe("sammlung");
+    expect(pdfInhaltArt(pdfMitStream(new TextEncoder().encode(JSON.stringify([bogen()]))))).toBe("boegen");
+    expect(pdfInhaltArt(pdfMitStream(new TextEncoder().encode("BT /F1 12 Tf (Hallo) Tj ET")))).toBe("nur-qr");
   });
 });
 

@@ -493,12 +493,62 @@ function uebersichtsSeite(titel: string, eintraege: UebersichtEintrag[], erstell
   ];
 }
 
+/**
+ * Stand einer Einheit am Meldekopf als Text für ihre Bogenseiten in der
+ * Sammel-PDF. Der QR-Code trägt nur den Bogen der Einheit — Eintreffzeit,
+ * Abrückvermerk, Zug und Auftrag gehören dem Meldekopf und stehen sonst nur
+ * auf Seite 1. Ein Ausdruck ohne Seite 1 zeigte eine abgerückte Einheit wie
+ * eine anwesende, und wer die Codes einlas, bekam die Scan-Uhrzeit als
+ * Eintreffzeit, ohne dass Blatt oder App sagten, was fehlt (Audit Runde 2,
+ * R2-A1). Kein Schemawechsel: der Vermerk ist reiner Text neben dem Code.
+ */
+export interface MeldekopfVermerk {
+  /** „Eingetroffen … · ABGERÜCKT … · Zug: … · Auftrag / Notiz: …" */
+  stand: string;
+  /** Nicht mehr vor Ort — hebt den Kasten hervor. */
+  abgerueckt: boolean;
+}
+
+/** Hinweis neben den QR-Codes der Sammel-PDF: was der Code NICHT enthält (R2-A1). */
+export const QR_NUR_BOGEN_HINWEIS =
+  "Der Code enthält nur den Bogen der Einheit. Eintreffzeit, Abrückvermerk, Zug und Auftrag des Meldekopfs " +
+  "stehen als Text im Kasten „Stand am Meldekopf“ und auf Seite 1 — nach dem Einlesen von Hand nachtragen. " +
+  "Die ganze Lage liest „Einsatz importieren…“ aus der PDF-Datei.";
+
+export function meldekopfVermerk(e: UebersichtEintrag, name: string, erstellt: number): MeldekopfVermerk {
+  const teile = [`Eingetroffen ${e.eingetroffenAm == null ? "(nicht festgehalten)" : zeitLang(e.eingetroffenAm)}`];
+  if (e.abgerueckt) {
+    teile.push(e.abgerueckAm == null ? "ABGERÜCKT (nicht mehr vor Ort)" : `ABGERÜCKT ${zeitLang(e.abgerueckAm)}`);
+  } else {
+    teile.push(e.zaehlt === false ? "anwesend, zählt nicht in diese Lage" : "anwesend");
+  }
+  teile.push(`Zug: ${e.zugEtikett || "–"}`);
+  if (e.teil) teile.push(`Teil: ${e.teil}`);
+  teile.push(`Auftrag / Notiz: ${e.notiz || "–"}`);
+  return {
+    stand: `Stand am Meldekopf (${name}, erstellt ${zeitLang(erstellt)}): ${teile.join(" · ")}`,
+    abgerueckt: !!e.abgerueckt,
+  };
+}
+
+/** Kasten „Stand am Meldekopf" — oben auf dem Bogen und auf jeder QR-Seite. */
+function vermerkKasten(v: MeldekopfVermerk, margin: [number, number, number, number]): Content {
+  return {
+    table: {
+      widths: ["*"],
+      body: [[{ text: weichUmbrechen(v.stand), bold: true, fontSize: 8, fillColor: v.abgerueckt ? GRAU : undefined }]],
+    },
+    margin,
+  };
+}
+
 /** Fußzeile mit Seitenzahl — für Sammel-PDF und Lageblatt gleich. */
 function seitenFuss(text: string): TDocumentDefinitions["footer"] {
   return (seite, gesamt) => ({
     columns: [
       { text, margin: [40, 0, 0, 0] },
-      { text: `${seite} / ${gesamt}`, alignment: "right", margin: [0, 0, 40, 0] },
+      // Seitenzahl nur so breit wie nötig — der Text links darf lang sein.
+      { text: `${seite} / ${gesamt}`, width: "auto", alignment: "right", margin: [8, 0, 40, 0] },
     ],
     fontSize: 8,
   });
@@ -527,11 +577,15 @@ export function einsatzPdfDokument(
     erstellt,
     "Die Änderungsspalte vergleicht jede Meldung mit der vorherigen Meldung derselben Einheit. Die vollständigen Bögen folgen.",
   );
-  boegenMitQr.forEach(({ bogen, qr }) => {
+  boegenMitQr.forEach((eintrag) => {
     // Zurück ins Hochformat: der Bogen selbst bleibt exakt der Papiervordruck.
     // pdfmake übernimmt die Ausrichtung des Knotens, der den Umbruch auslöst.
     content.push({ text: "", pageBreak: "before", pageOrientation: "portrait" });
-    content.push(...(pdfDokument(bogen, qr).content as Content[]));
+    // Der Stand am Meldekopf steht über dem Bogen und auf jeder QR-Seite —
+    // die Bogenseiten müssen auch ohne Seite 1 stimmen (R2-A1).
+    const vermerk = meldekopfVermerk(eintrag, name, erstellt);
+    content.push(vermerkKasten(vermerk, [0, 0, 0, 4]));
+    content.push(...(pdfDokument(eintrag.bogen, eintrag.qr, undefined, vermerk).content as Content[]));
   });
   return {
     pageSize: "A4",
@@ -553,7 +607,9 @@ export function einsatzPdfDokument(
       [EEB_EINSATZ_DATEINAME]: boegenAlsEingebetteteDatei(boegenMitQr.map((x) => x.bogen)),
       ...(sammlungJson ? { [EEB_EINSATZ_SAMMLUNG_DATEINAME]: sammlungAlsEingebetteteDatei(sammlungJson) } : {}),
     },
-    footer: seitenFuss(`Einsatz-Sammlung: ${name}`),
+    // Die Fußzeile trägt den Stand des Ausdrucks auf jeder Seite; Zeiten und
+    // Abrückvermerk je Einheit stehen im Kasten über dem Bogen (R2-A1).
+    footer: seitenFuss(`Einsatz-Sammlung: ${name} · Stand ${zeitLang(erstellt)} · Eintreff-/Abrückzeiten: Seite 1 und Kasten über jedem Bogen`),
     content,
   };
 }
@@ -603,8 +659,17 @@ export function einsatzLageblattDokument(
  * sondern auf {@link QrSatz.vollUrl} — den kompletten Bogen in einer URL.
  * Segmentierung ist eine Grenze des QR-Bildes, nicht des Links.
  */
-function qrBlock(qr: QrSatz, akzent: string): Content {
+function qrBlock(qr: QrSatz, akzent: string, vermerk?: MeldekopfVermerk): Content {
   const kopf = (text: string): Content => ({ text, bold: true, fontSize: 13, color: akzent, alignment: "center" });
+  // Nur in der Sammel-PDF: was der Code nicht enthält, direkt beim Code
+  // (R2-A1). Beim Einzelcode steht der Kasten „Stand am Meldekopf“ schon über
+  // dem Formular derselben Seite, der Hinweis rechts neben dem Code. Mehrteilige
+  // Codes stehen auf eigenen Seiten: dort Kasten und Hinweis unter den Codes.
+  const nurBogenHinweis = (): Content => ({ text: QR_NUR_BOGEN_HINWEIS, bold: true, fontSize: 8 });
+  const vermerkTeile = (): Content[] =>
+    vermerk
+      ? [vermerkKasten(vermerk, [0, 8, 0, 0]), { ...(nurBogenHinweis() as object), alignment: "center", margin: [0, 6, 0, 0] } as Content]
+      : [];
   if (qr.teile.length === 1) {
     const t = qr.teile[0]!;
     return {
@@ -614,7 +679,19 @@ function qrBlock(qr: QrSatz, akzent: string): Content {
         kopf("Digitaler Bogen als QR-Code"),
         // QR-Bild UND Textlink tragen dieselbe App-URL: mit der Kamera scannen ODER
         // in der digitalen PDF direkt anklicken, um den Bogen in der App zu öffnen.
-        { image: t.datenUrl, width: QR_BREITE, alignment: "center", margin: [0, 8, 0, 0], link: t.url },
+        vermerk
+          ? // Sammel-PDF: der Hinweis steht NEBEN dem Code — darunter kostete er
+            // Bögen mittlerer Stärke eine zweite Seite (R2-A1).
+            {
+              columns: [
+                { width: "*", text: "" },
+                { image: t.datenUrl, width: QR_BREITE, link: t.url },
+                { width: "*", stack: [nurBogenHinweis()], margin: [12, 40, 0, 0] },
+              ],
+              columnGap: 0,
+              margin: [0, 8, 0, 0],
+            }
+          : { image: t.datenUrl, width: QR_BREITE, alignment: "center", margin: [0, 8, 0, 0], link: t.url },
         {
           text: "Bogen direkt in der App öffnen",
           link: t.url,
@@ -682,7 +759,7 @@ function qrBlock(qr: QrSatz, akzent: string): Content {
         margin: [0, 150, 0, 0],
       });
     }
-    stack.push(oeffnenLink(), hinweis());
+    stack.push(oeffnenLink(), hinweis(), ...vermerkTeile());
     seiten.push({ stack, pageBreak: "before" });
   }
   return { stack: seiten };
@@ -712,7 +789,13 @@ const BLANKO_FAHRZEUG: Fahrzeug = { typ: { freitext: "" } };
  * leere Bogen „0 / 0 / 0 / 0" und „01.01.2020" drucken — auf einem Vordruck
  * sind das falsche Angaben, keine Leerstellen.
  */
-export function pdfDokument(b: Erfassungsbogen, qr: QrSatz | null, blanko?: BlankoZeilen): TDocumentDefinitions {
+export function pdfDokument(
+  b: Erfassungsbogen,
+  qr: QrSatz | null,
+  blanko?: BlankoZeilen,
+  /** Nur Sammel-PDF: Stand der Einheit am Meldekopf neben dem QR-Code (R2-A1). */
+  vermerk?: MeldekopfVermerk,
+): TDocumentDefinitions {
   const org = b.einheit.organisation;
   const farbe = orgFarbe(org);
   const typName = vokabText(b.einheit.einheitsTyp, vokabularFuer(org, "einheitstyp"), "name") || "Einheit";
@@ -959,7 +1042,7 @@ export function pdfDokument(b: Erfassungsbogen, qr: QrSatz | null, blanko?: Blan
       // Kein fester Seitenumbruch mehr; als unbreakable-Gruppe zusammengehalten,
       // damit der QR-Code nicht über eine Seitengrenze zerrissen wird. Passt der
       // Block nicht mehr, rückt er als Ganzes auf die nächste Seite.
-      ...(qr ? [qrBlock(qr, farbe.akzent)] : []),
+      ...(qr ? [qrBlock(qr, farbe.akzent, vermerk)] : []),
     ],
   };
 }
