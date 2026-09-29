@@ -86,7 +86,8 @@ describe("Seite hinter modalen Dialogen (R2-M8)", () => {
 describe("Datumsfelder (R2-H8)", () => {
   it("stehen breiter als „schmal“ und auf dem Telefon in voller Breite", () => {
     expect(bloecke(".zeile > label.feld.datum:not(.mittel)").join("")).toMatch(/flex:\s*0 1 11rem/);
-    expect(bloecke(".zeile > label.feld.datum").join("")).toMatch(/flex:\s*1 1 100%/);
+    // Die Telefonregel muss auch den spezifischeren :not(.mittel)-Selektor schlagen.
+    expect(bloecke(".zeile > label.feld.datum, .zeile > label.feld.datum:not(.mittel)").join("")).toMatch(/flex:\s*1 1 100%/);
   });
 });
 
