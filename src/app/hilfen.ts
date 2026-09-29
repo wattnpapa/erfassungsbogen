@@ -610,6 +610,12 @@ export function fahrzeugHinweise(b: Erfassungsbogen): string[] {
 export interface Pruefpunkt {
   text: string;
   schritt: number;
+  /**
+   * Kennung (id) des Eingabefelds, das den Punkt behebt. Antippen springt
+   * dorthin und setzt den Cursor — vorher endete der Sprung beim Schritt, und
+   * sofort eingetippter Text ging ins Leere (Audit Runde 2, R2-H2).
+   */
+  feld?: string;
 }
 
 // Schritt-Indizes des Assistenten (siehe SCHRITTE in main.tsx).
@@ -755,7 +761,7 @@ export function pruefpunkte(b: Erfassungsbogen, mitFahrzeugen = true, heute?: Ee
   // Meldekopf sonst zurückfragen muss (Auftrag, Erreichbarkeit). Die fehlenden
   // Kennzeichen prüft fahrzeugHinweise() auf dem Fahrzeug-Schritt.
   if (!b.einsatz.ortAuftrag.trim()) {
-    hinweise.push({ text: "Ort/Auftrag ist noch leer.", schritt: S_EINSATZ });
+    hinweise.push({ text: "Ort/Auftrag ist noch leer.", schritt: S_EINSATZ, feld: "feld-ort-auftrag" });
   }
   const telefonErfasst = b.personal.some((p) =>
     p.kontakte.some((k) => k.art !== KontaktArt.EMAIL && (k.wert ?? "").trim() !== ""),
@@ -767,7 +773,12 @@ export function pruefpunkte(b: Erfassungsbogen, mitFahrzeugen = true, heute?: Ee
     });
   }
   if (mitFahrzeugen) {
-    hinweise.push(...fahrzeugHinweise(b).map((text) => ({ text, schritt: S_FAHRZEUGE })));
+    hinweise.push(
+      ...fahrzeugHinweise(b).map((text) => {
+        const kz = /^Fahrzeug (\d+) hat noch kein Kennzeichen/.exec(text);
+        return { text, schritt: S_FAHRZEUGE, ...(kz ? { feld: `feld-kennzeichen-${Number(kz[1]) - 1}` } : {}) };
+      }),
+    );
     // Fahrzeuge ohne Fahrer kommen nicht in den Einsatz: die StAN-Vorbelegung
     // setzt bewusst keine Fahrerlaubnisklassen — vergisst der Bogen sie ganz,
     // findet der Kraftfahrer-Filter am Meldekopf die Einheit nicht. Nur bei

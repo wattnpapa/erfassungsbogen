@@ -188,6 +188,18 @@ describe("Assistenten-Durchlauf", () => {
     }
   });
 
+  it("springt vom offenen Punkt ins Feld und setzt den Cursor (R2-H2)", async () => {
+    const nutzer = userEvent.setup();
+    render(<App />);
+    await neuerBogenBis(nutzer, 0);
+    await nutzer.type(screen.getByLabelText("Name (Pflicht)"), "Punkthausen");
+    await nutzer.click(screen.getByRole("button", { name: /^6\. Übersicht/ }));
+    await nutzer.click(screen.getAllByRole("button", { name: "Ort/Auftrag ist noch leer." })[0]!);
+    expect(document.activeElement?.id).toBe("feld-ort-auftrag");
+    await nutzer.keyboard("Deich Nord");
+    expect((document.getElementById("feld-ort-auftrag") as HTMLInputElement).value).toBe("Deich Nord");
+  });
+
   it("zeigt die Modus-Marke beim vollen Bogen nicht", async () => {
     const nutzer = userEvent.setup();
     render(<App />);

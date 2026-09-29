@@ -71,7 +71,7 @@ function stufenText(qr: QrSatz): string {
 
 export function Uebersicht(props: {
   bogen: Erfassungsbogen;
-  geheZu: (schritt: number) => void;
+  geheZu: (schritt: number, feld?: string) => void;
   neu: () => void;
   onVorlageGespeichert?: (name: string) => void;
   /**
@@ -827,15 +827,24 @@ export function Uebersicht(props: {
             <p className="hinweis">Zeitraum heute, Ort/Auftrag und Sofortbedarf leer — Personal und Fahrzeuge bleiben.</p>
           </div>
         )}
+        {/* Die Lücken stehen eingeklappt über den Wegen: Aufgeklappt schoben
+            sechs Punkte „QR-Code" und „PDF" unter das erste Bild, und wer
+            übergeben wollte, sah keinen Knopf dafür (Audit Runde 2, R2-H6).
+            Die Zahl bleibt sichtbar, die Liste ist ein Tipp entfernt. */}
         {offenePunkte.length > 0 && (
-          <Vollstaendigkeit
-            punkte={offenePunkte}
-            geheZu={(schritt) => {
-              teilenDialog.current?.close();
-              geheZu(schritt);
-            }}
-            nachsatz="Übergeben ist trotzdem möglich — der Bogen geht dann mit diesen Lücken an die Gegenstelle."
-          />
+          <details className="offene-punkte">
+            <summary className="warnung">
+              ⚠ {offenePunkte.length === 1 ? "1 offener Punkt" : `${offenePunkte.length} offene Punkte`} — ansehen · Übergeben ist trotzdem möglich
+            </summary>
+            <Vollstaendigkeit
+              punkte={offenePunkte}
+              geheZu={(schritt, feld) => {
+                teilenDialog.current?.close();
+                geheZu(schritt, feld);
+              }}
+              nachsatz="Der Bogen geht dann mit diesen Lücken an die Gegenstelle."
+            />
+          </details>
         )}
         <div className="teilen-weg">
           <button

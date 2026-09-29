@@ -76,6 +76,7 @@ function FahrzeugKarte(props: {
         </Feld>
         <Feld titel="Kennzeichen">
           <input
+            id={`feld-kennzeichen-${index}`}
             value={f.kennzeichen ?? ""}
             onChange={(e) => set({ kennzeichen: e.target.value })}
             placeholder="OL-FW 2041 / THW-84397"

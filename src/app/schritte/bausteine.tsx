@@ -549,7 +549,7 @@ export function Hinweise(props: {
  */
 export function Vollstaendigkeit(props: {
   punkte: Pruefpunkt[];
-  geheZu: (schritt: number) => void;
+  geheZu: (schritt: number, feld?: string) => void;
   /** Satz unter der Liste — im Übergabe-Dialog sagt er, dass nichts gesperrt ist. */
   nachsatz?: string;
 }) {
@@ -567,7 +567,7 @@ export function Vollstaendigkeit(props: {
       <ul>
         {punkte.map((p) => (
           <li key={p.text}>
-            <button type="button" className="link" onClick={() => geheZu(p.schritt)}>
+            <button type="button" className="link" onClick={() => geheZu(p.schritt, p.feld)}>
               {p.text}
             </button>
           </li>

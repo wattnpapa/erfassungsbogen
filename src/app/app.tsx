@@ -570,9 +570,23 @@ function AppInhalt() {
   // Überschrift, nicht ins erste Feld: keine aufspringende Tastatur, und
   // Vorlesesoftware sagt, wo man jetzt ist.
   const vorigerSchritt = useRef(schritt);
+  // Ziel eines Prüfpunkts („antippen zum Beheben"): Feld statt Schrittanfang (R2-H2).
+  const zielFeld = useRef<string | null>(null);
+  const geheZuFeld = (s: number, feld?: string) => {
+    zielFeld.current = feld ?? null;
+    setSchritt(s);
+  };
   useEffect(() => {
     if (vorigerSchritt.current === schritt) return;
     vorigerSchritt.current = schritt;
+    const feld = zielFeld.current ? document.getElementById(zielFeld.current) : null;
+    zielFeld.current = null;
+    if (feld) {
+      // Mitte des Bildes: die Beschriftung darüber bleibt sichtbar, der Kopf verdeckt nichts.
+      feld.scrollIntoView?.({ block: "center" });
+      feld.focus({ preventScroll: true });
+      return;
+    }
     try {
       window.scrollTo(0, 0);
     } catch {
@@ -2680,7 +2694,7 @@ function AppInhalt() {
           bogen={bogen}
           signatur={bogenSignatur}
           herkunft={bogenHerkunft}
-          geheZu={setSchritt}
+          geheZu={geheZuFeld}
           neu={() => { if (bogenHatInhalt(bogen)) merkeVerdraengt(bogen); setMeldung(""); setBogen(null); setVorlageInBearbeitung(null); setFremdeErfassung(false); setSammelZiel(null); setzeEmpfang(null); setSchritt(0); }}
           onVorlageGespeichert={(name) => { vorlagenNeuLaden(); setMeldung(`Als Vorlage „${name}" gespeichert.`); }}
           vorlageBearbeitung={

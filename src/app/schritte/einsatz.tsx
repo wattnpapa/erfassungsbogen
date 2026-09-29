@@ -59,7 +59,7 @@ export function SchrittEinsatz({ bogen, aendern }: SchrittProps) {
           <input type="date" value={datumZuIso(ez.zeitraumBis)} onChange={(e) => setEz({ zeitraumBis: datumAusIso(e.target.value) })} />
         </Feld>
         <Feld titel="Einsatzort / Auftrag">
-          <input value={ez.ortAuftrag} onChange={(e) => setEz({ ortAuftrag: e.target.value })} placeholder="z. B. Fernmeldebauübung Kabelblitz" />
+          <input id="feld-ort-auftrag" value={ez.ortAuftrag} onChange={(e) => setEz({ ortAuftrag: e.target.value })} placeholder="z. B. Fernmeldebauübung Kabelblitz" />
         </Feld>
       </div>
       {/* Die Kästchen setzen einen Zeitstempel — das stand nirgends. Ein
