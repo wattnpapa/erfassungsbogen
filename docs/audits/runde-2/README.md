@@ -139,7 +139,7 @@ Typprüfung und einem Nachlauf der Audit-Abläufe im Produktionsbuild
 | R2-H4 Quittung außerhalb des Bilds | behoben | Feste Quittungsleiste unten mit „Rückgängig" 108 × 44 px, gesperrt 600 ms gegen Doppeltipp. |
 | R2-H5 Geräte-Zurück | behoben | Aus Schritt 1 zurück zur Startseite; im QR-Vollbild schließt Zurück nur das Vollbild. |
 | R2-H6 Übergabeknöpfe unter dem Bild | behoben | Offene Punkte eingeklappt mit Anzahl über den Wegen. |
-| R2-H7 Kopf zu hoch | in Arbeit | — |
+| R2-H7 Kopf zu hoch | weitgehend | Kopf unter 30rem auf drei schmale Zeilen gefaltet (Anzeigemodus als Klappknopf, Schrittname nur in der Überschrift, Übungsband einzeilig). 360 × 640: 327 → 131 px (Feld 394 → 154 px), Feld im Bild auf 5/5 Schritten. Offen: 320 × 568 im Feld-Thema, Schritt 2 und 4 — dort füllt der Schrittinhalt selbst das Bild. |
 | R2-E3 Neuladen in der Einsatz-Erfassung | behoben | mit den P0-Korrekturen: Ziel-Sammlung reist mit dem Entwurf. |
 | R2-E4 Zahlendreher | behoben | Hinweise zu Rufnummer, E-Mail, Namen aus Ziffern, Sitzplätzen, doppeltem Kennzeichen, Zeitraum und Einsatzbeginn. Eintreff-/Abrückzeit in der Zukunft ohne Hinweis. |
 | R2-E5 Programmtext bei Dateifehlern | behoben | Eigene Prüfung je Datei-Eingang mit Ursache und nächstem Schritt. |
@@ -156,7 +156,7 @@ Typprüfung und einem Nachlauf der Audit-Abläufe im Produktionsbuild
 | R2-S2 Schneller und richtiger Weg | behoben | Siehe R2-N6; die Erfassung im Einsatz übernimmt den Modus der letzten Handerfassung. |
 | R2-S3 Aufnahme-Knöpfe | behoben | Direkt unter der Stärkeleiste; nach der Aufnahme bleibt die Ansicht oben. |
 | R2-G2 Tabelle schiebt Seite | behoben | Rollrahmen `position: relative`, Seite gerätebreit. |
-| R2-G3 Kleine Ziele | in Arbeit | — |
+| R2-G3 Kleine Ziele | behoben | Schrittleiste, Vorschläge, „ändern", Lücken-Marke, Chip-✕, Spaltenköpfe F/U/M, Kopf-Links und Fußzeilenlinks auf 44 px, ohne die Seiten zu verlängern (Innenmaß per negativem Außenabstand ausgeglichen). Punktgetrennte Fußnavigation der Begleitseiten bleibt Fließtext. |
 | R2-G4 Abrücken-Doppeltipp | behoben | „Wieder anwesend" am selben Platz, Karte 600 ms gesperrt. |
 | R2-M2 QR-Vollbild rollt nicht | behoben | `100dvh`, rollt, Knopfleiste klebt unten; quer zweispaltig. |
 | R2-M3 Overlays nicht modal | behoben | QR-Vollbild und Scanner als modale Dialoge, Escape, Fokus zurück. |
