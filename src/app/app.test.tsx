@@ -13,7 +13,7 @@ import { encodeSigniertPayloadUrl, schluesselpaarErzeugen } from "@bos/eeb-forma
 import { browserKompressor, neuerBogen } from "./hilfen";
 import { vorlageAnlegen, vorlagenLaden } from "./vorlagen";
 import { einsatzDateiInhalt } from "./einsatz-transport";
-import { einheitEntfernen, eintreffzeitSetzen, zeitKurz } from "./eintrag-zeiten";
+import { einheitEntfernen, eintreffzeitSetzen, zeitLang } from "./eintrag-zeiten";
 // `einsatzAnlegen` heißt in diesem Test schon ein Klick-Helfer (Dialog
 // ausfüllen); der Speicher-Weg kommt darum unter eigenem Namen herein.
 import {
@@ -1192,9 +1192,10 @@ describe("Neuen Einsatz anlegen", () => {
 
     await nutzer.click(within(dialog).getByRole("button", { name: "Als neue Fassung anhängen" }));
 
-    const erwartet = `eingetroffen ${zeitKurz(frueher)}`;
+    // Karte in der Einsatzansicht: volle Zeitform seit R2-A6.
+    const erwartet = `eingetroffen ${zeitLang(frueher)}`;
     await waitFor(() => expect(document.body.textContent).toContain(erwartet));
-    expect(document.body.textContent).not.toContain(`eingetroffen ${zeitKurz(Date.now())}`);
+    expect(document.body.textContent).not.toContain(`eingetroffen ${zeitLang(Date.now())}`);
   });
 
   it("führt die zweite Meldung auf Wunsch als eigene Einheit", async () => {
