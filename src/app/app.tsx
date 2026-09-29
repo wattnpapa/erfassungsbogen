@@ -50,6 +50,7 @@ import { datenschutzZeitpunkt } from "./datenschutz-uhr";
 import { Kopfnav } from "./kopfnav-ui";
 import { bogenLinksEmpfangen, imWebBrowser, istNativ, qrScannen, textTeilen } from "./nativ";
 import { fehlerText } from "./nachladen";
+import { dateiFehlerMeldung } from "./datei-fehler";
 import { entwirreScanText } from "./tastaturbelegung";
 import { vorlageAktualisieren, vorlageAnlegen, vorlageAusDatei, vorlagenLaden, vorlagenPapierkorb, vorlageZuruecksetzen, type Vorlage } from "./vorlagen";
 import { Musterung, VorlagenListe } from "./vorlagen-ui";
@@ -75,7 +76,7 @@ import { uebergabeFesthalten, uebergabeText, type UebergabeStand } from "./ueber
 import { ART_LABEL, EinsatzDetail, EinsatzListe, type Eingang } from "./einsaetze-ui";
 import { exportSammlung, exportStandLaden, exportVermerken, type ExportStand, type ExportUmfang } from "./export-stand";
 import { aktuelleMeldungen } from "./auswertung";
-import { boegenAusPdfBytes, einsatzAusDatei, einsatzAusPdfBytes, einsatzDateiInhalt, istPdfDatei, pdfInhaltArt } from "./einsatz-transport";
+import { boegenAusJsonText, boegenAusPdfBytes, einsatzAusDatei, einsatzAusPdfBytes, einsatzDateiInhalt, istPdfDatei, pdfInhaltArt } from "./einsatz-transport";
 import type { QrBogen } from "./qr-boegen";
 import { einsatzCsvInhalt } from "./einsatz-csv";
 import { einsatzDetailCsvInhalt } from "./bogen-csv";
@@ -859,7 +860,7 @@ function AppInhalt() {
           return;
         }
       } catch (err) {
-        setFehler(err instanceof Error ? err.message : String(err));
+        setFehler(await dateiFehlerMeldung(datei, err, "bogen")); // nie Parser-Text (R2-E5)
         return;
       }
     }
@@ -877,7 +878,7 @@ function AppInhalt() {
       setFehler("");
       setMeldung(anonymisiert ? FRIST_ABGELAUFEN_MELDUNG : "");
     } catch (err) {
-      setFehler(err instanceof Error ? err.message : String(err));
+      setFehler(await dateiFehlerMeldung(datei, err, "bogen"));
     }
   }
 
@@ -2055,8 +2056,12 @@ function AppInhalt() {
     const ohneNachweis = (boegen: Erfassungsbogen[]): QrBogen[] =>
       boegen.map((bogen) => ({ bogen, signatur: { zustand: "unsigniert" } as SignaturStatus, herkunft: null }));
     if (!istPdfDatei(datei)) {
-      const daten = JSON.parse(await datei.text());
-      return ohneNachweis(Array.isArray(daten) ? daten : [daten]);
+      // Nur echte Bögen weiterreichen: Vorher wanderte jedes JSON-Objekt als
+      // „Bogen" weiter — eine Sicherung fragte dann „1 Bogen gefunden, Einsatz
+      // anlegen?". Was keiner ist, erklärt dateiFehlerMeldung (R2-E5).
+      const boegen = boegenAusJsonText(await datei.text());
+      if (boegen.length === 0) throw new Error("In der Datei steht kein lesbarer Erfassungsbogen.");
+      return ohneNachweis(boegen);
     }
     const bytes = new Uint8Array(await datei.arrayBuffer());
     const eingebettet = boegenAusPdfBytes(bytes);
@@ -2116,11 +2121,13 @@ function AppInhalt() {
         neu += r.neu;
         uebersprungen += r.uebersprungen;
       } catch (e) {
-        kaputt.push(`${datei.name} (${fehlerText(e)})`);
+        // Je Datei ein ganzer Satz mit Ursache und nächstem Schritt statt
+        // Parser-Text in Klammern (Audit Runde 2, R2-E5).
+        kaputt.push(await dateiFehlerMeldung(datei, e, "boegen"));
       }
     }
     einsaetzeNeuLaden();
-    setFehler(kaputt.length > 0 ? `Import: ${kaputt.join(", ")}` : "");
+    setFehler(kaputt.join(" "));
     setMeldung(
       neu + uebersprungen === 0
         ? kaputt.length > 0
@@ -2227,10 +2234,12 @@ function AppInhalt() {
         const gefunden = einsatzAusPdfBytes(new Uint8Array(await datei.arrayBuffer()));
         if (!gefunden) {
           if (await boegenAlsNeuerEinsatz(datei)) return;
-          setFehler(
+          // Eine abgeschnittene PDF ist „beschädigt", nicht „ohne Bogen" (R2-E5).
+          const leer = new Error(
             "In dieser PDF steckt weder eine Einsatz-Sammlung noch ein einzelner Bogen — " +
               "es sind keine eingebetteten Daten und kein lesbarer QR-Code darin.",
           );
+          setFehler(await dateiFehlerMeldung(datei, leer, "einsatz"));
           return;
         }
         s = gefunden;
@@ -2253,7 +2262,7 @@ function AppInhalt() {
       );
       setOffenerEinsatzId(s.id);
     } catch (err) {
-      setFehler(err instanceof Error ? err.message : String(err));
+      setFehler(await dateiFehlerMeldung(datei, err, "einsatz")); // nie Parser-Text (R2-E5)
     }
   }
 

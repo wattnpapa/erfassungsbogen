@@ -12,7 +12,8 @@ import { einheitSymbolSvg, svgDataUrl } from "./taktische-zeichen-bogen";
 import { nutzungsKanal, statistikAbgewaehlt, statistikAbwaehlen } from "./statistik";
 import { AnzeigeSchalter } from "./anzeige-schalter";
 import { frageJaNein, zeigeHinweis } from "./dialoge";
-import { alleDatenLoeschen, datenUmfang, sicherungErstellen, sicherungEinspielen, type DatenUmfang } from "./sicherung";
+import { alleDatenLoeschen, datenUmfang, sicherungErstellen, sicherungEinspielen, sicherungParsen, type DatenUmfang } from "./sicherung";
+import { dateiFehlerMeldung } from "./datei-fehler";
 import { geraeteKurzform, geraeteSchluesselLoeschen, geraeteSchluesselSicherstellen } from "./geraete-schluessel";
 import { speicherBelegung, speicherText } from "./eintrag-zeiten";
 
@@ -528,6 +529,18 @@ export function Fusszeile({ onBogenOeffnen, kompakt = false }: {
     const datei = e.target.files?.[0];
     e.target.value = "";
     if (!datei) return;
+    setSicherungFehler("");
+    // Erst prüfen, dann fragen: Eine kaputte oder falsche Datei soll nicht
+    // zuerst „alles ersetzen?" auslösen und danach Parser-Text zeigen
+    // (Audit Runde 2, R2-E5).
+    let text: string;
+    try {
+      text = await datei.text();
+      sicherungParsen(text);
+    } catch (err) {
+      setSicherungFehler(await dateiFehlerMeldung(datei, err, "sicherung"));
+      return;
+    }
     const sicher = await frageJaNein({
       titel: "Sicherung einspielen?",
       text: "Alle App-Daten auf diesem Gerät — Vorlagen, Einsätze, Entwurf, Einstellungen und der Geräteschlüssel — werden durch den Inhalt der Datei ersetzt.",
@@ -536,7 +549,7 @@ export function Fusszeile({ onBogenOeffnen, kompakt = false }: {
     });
     if (!sicher) return;
     try {
-      const anzahl = sicherungEinspielen(await datei.text());
+      const anzahl = sicherungEinspielen(text);
       await zeigeHinweis({
         titel: "Sicherung eingespielt",
         text: `${anzahl} Einträge übernommen. Die App lädt jetzt neu.`,
@@ -727,7 +740,7 @@ export function Fusszeile({ onBogenOeffnen, kompakt = false }: {
             <input type="file" accept=".json,application/json" className="nur-sr" onChange={(e) => void sicherungImportieren(e)} />
           </label>
         </div>
-        {sicherungFehler && <p className="fehler">{sicherungFehler}</p>}
+        {sicherungFehler && <p className="fehler" role="alert">{sicherungFehler}</p>}
         <p className="hinweis">
           Einspielen ersetzt die vorhandenen App-Daten auf diesem Gerät vollständig.
         </p>

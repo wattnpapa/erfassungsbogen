@@ -81,7 +81,15 @@ export function istPdfDatei(datei: File): boolean {
   return datei.name.toLowerCase().endsWith(".pdf") || datei.type === "application/pdf";
 }
 
-/** Bogen oder Bogen-Array aus einem JSON-Text ziehen (gültige Bögen migriert). */
+/**
+ * Bogen oder Bogen-Array aus einem JSON-Text ziehen (gültige Bögen migriert).
+ * Kaputtes JSON oder etwas anderes als Bögen ergibt eine leere Liste — auch
+ * für die JSON-Datei bei „Bögen einlesen…" (Audit Runde 2, R2-E5).
+ */
+export function boegenAusJsonText(text: string): Erfassungsbogen[] {
+  return boegenAusText(text);
+}
+
 function boegenAusText(text: string): Erfassungsbogen[] {
   let daten: unknown;
   try {

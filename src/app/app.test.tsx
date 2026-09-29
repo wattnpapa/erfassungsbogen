@@ -1373,6 +1373,58 @@ describe("Bogen aus einer PDF laden (Startseite, „Aus Datei laden“)", () => 
   });
 });
 
+/**
+ * Eine abgeschnittene Bogen-Datei auf allen drei Wegen: Jede Meldung kommt
+ * ohne Programmtext aus und nennt den nächsten Schritt (Audit Runde 2, R2-E5).
+ */
+describe("Kaputte Datei auf allen Datei-Wegen", () => {
+  beforeEach(() => {
+    localStorage.clear();
+    qrTexteAusPdf.mockReset();
+    qrTexteAusPdf.mockResolvedValue([]);
+  });
+
+  function halbeDatei(): File {
+    const text = JSON.stringify(bogenMitName("OV Abgeschnitten"));
+    return new File([text.slice(0, Math.floor(text.length / 2))], "kaputt.json", { type: "application/json" });
+  }
+
+  it("„Aus Datei laden…“", async () => {
+    const nutzer = userEvent.setup();
+    render(<App />);
+    await nutzer.upload(screen.getByLabelText("Aus Datei laden…"), halbeDatei());
+    const meldung = await screen.findByText(/beschädigt oder unvollständig/);
+    expect(meldung.textContent).toMatch(/neu anfordern oder den QR-Code/);
+    expect(meldung.textContent).not.toMatch(/JSON|Unexpected/);
+  });
+
+  it("„Einsatz importieren…“", async () => {
+    const nutzer = userEvent.setup();
+    render(<App />);
+    await nutzer.upload(screen.getByLabelText("Einsatz importieren…"), halbeDatei());
+    const meldung = await screen.findByText(/beschädigt oder unvollständig/);
+    expect(meldung.textContent).not.toMatch(/JSON|Unexpected/);
+  });
+
+  it("„Bögen einlesen…“ mit Liste und kaputter Datei zugleich", async () => {
+    // Die Liste kommt am Dateifilter vorbei („Alle Dateien" im Auswahldialog).
+    const nutzer = userEvent.setup({ applyAccept: false });
+    render(<App />);
+    await nutzer.click(screen.getByRole("button", { name: "Neue Einsatz-Sammlung…" }));
+    const dialog = await screen.findByRole("dialog", { name: "Neue Einsatz-Sammlung anlegen" });
+    await nutzer.type(within(dialog).getByLabelText("Name"), "Dateiprobe");
+    await nutzer.click(within(dialog).getByRole("button", { name: "Einsatz anlegen" }));
+    await screen.findByRole("heading", { level: 1, name: "Dateiprobe" });
+
+    const liste = new File(["Name;Vorname\nMüller;Anna\n"], "liste.csv", { type: "text/csv" });
+    await nutzer.upload(screen.getByLabelText("Dateien wählen…"), [halbeDatei(), liste]);
+
+    const meldung = await screen.findByText(/beschädigt oder unvollständig/);
+    expect(meldung.textContent).toMatch(/„liste.csv“ ist eine Tabelle oder Liste/);
+    expect(meldung.textContent).not.toMatch(/JSON|Unexpected|token/);
+  });
+});
+
 describe("Vorlage teilen (Karte in „Gespeicherte Vorlagen“)", () => {
   beforeEach(() => {
     localStorage.clear();

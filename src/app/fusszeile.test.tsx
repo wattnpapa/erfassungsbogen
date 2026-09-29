@@ -117,6 +117,22 @@ describe("Sicherung einspielen", () => {
 
     expect(vorlagenLaden().map((v) => v.name)).toEqual(["Vorher auf dem Gerät"]);
   });
+
+  it("erklärt eine abgeschnittene Sicherung ohne Programmtext und fragt gar nicht erst (R2-E5)", async () => {
+    const nutzer = userEvent.setup();
+    const inhalt = await sicherungsdatei().text();
+    vorlageAnlegen("Vorher auf dem Gerät", neuerBogen());
+    buehne();
+
+    await nutzer.upload(dateiFeld(), new File([inhalt.slice(0, 40)], "eeb-sicherung.json", { type: "application/json" }));
+
+    const meldung = await screen.findByText(/beschädigt oder unvollständig/);
+    expect(meldung.getAttribute("role")).toBe("alert");
+    expect(meldung.textContent).toMatch(/Daten auf diesem Gerät sind unverändert/);
+    expect(meldung.textContent).not.toMatch(/JSON|Unexpected/);
+    expect(screen.queryByRole("dialog", { name: "Sicherung einspielen?" })).toBeNull();
+    expect(vorlagenLaden().map((v) => v.name)).toEqual(["Vorher auf dem Gerät"]);
+  });
 });
 
 /**
