@@ -59,6 +59,13 @@ Grundlage: Repository `wattnpapa/erfassungsbogen`, Stand 2026-09-12 — Version 
 > R2-D4) — die App merkt sich je Sammlung die Kennungen vor Ort entfernter
 > Einträge (`eeb.entfernt.v1`) und fragt bei „Einsatz importieren…", bevor sie
 > eine davon wieder aufnimmt (3.3 D2e, 5.5).
+>
+> **Nachgezogen 2026-09-29:** Dauerhafter Speicher und Sicherungs-Erinnerung
+> (Audit Runde 2, R2-O6) — die Web-App bittet den Browser um dauerhaften
+> Speicher (`navigator.storage.persist`), sobald Sammlungen mit Meldungen oder
+> Vorlagen vorliegen, zeigt den Status und die letzte Sicherung in der
+> Datensicherung und erinnert in der Fußzeile nach drei Tagen ohne Sicherung
+> (3.3 D2f, 5.5).
 
 ## Hinweis zu diesem Dokument
 
@@ -190,6 +197,7 @@ dem Vite-Build); es gibt keine serverseitige Variante.
 | D2c | Zusatzfelder je Meldung der Einsatz-Sammlung | Eintreff- und Abrückzeit (`eingetroffenAm`, `abgerueckAm`, Geräteuhr) sowie eine Notiz/Auftrag der Führungsstelle (`notiz`, Freitext — kann Personenbezug enthalten, z. B. „Rückruf Hr. Meyer 15:00"). Eine Folgemeldung derselben Einheit erbt Eintreffzeit, Notiz und Zug der Vorgängerin auf jedem Eingangsweg (`meldungAufnehmen`). Reisen mit der Sammlung in Sammel-PDF und Einsatz-Transport mit; unterliegen mit der Meldung dem Papierkorb und der Löschung (`src/app/eintrag-zeiten.ts`) | `localStorage` des Geräts (`eeb.einsaetze.v1`, am Eintrag) |
 | D2d | Zuletzt offene Sammlung | Kennung und Zeitpunkt der zuletzt geöffneten Einsatz-Sammlung, 12 Stunden gültig; keine Personendaten | `localStorage` des Geräts (`eeb.letzterEinsatz.v1`) |
 | D2e | Entfernte Meldungen je Einsatz-Sammlung | Kennungen der Einträge, die vor Ort über „Entfernen" oder „Fassung verwerfen…" herausgenommen wurden — damit „Einsatz importieren…" sie nicht still zurückholt, sondern nachfragt (`src/app/entfernte-meldungen.ts`, Audit Runde 2, R2-D4); keine Personendaten, nur zufällige Kennungen; „Rückgängig" nimmt sie wieder heraus, Einträge endgültig gelöschter Sammlungen fallen beim nächsten Schreiben weg | `localStorage` des Geräts (`eeb.entfernt.v1`), wandert mit der Datensicherung mit, fällt mit „Alle Daten löschen" weg |
+| D2f | Zeitpunkt der letzten Sicherung | Wann auf diesem Gerät zuletzt „Sicherung erstellen…" ausgelöst wurde — Grundlage für die Anzeige in der Datensicherung und die Erinnerung nach drei Tagen (`src/app/sicherung.ts`, Audit Runde 2, R2-O6); keine Personendaten | `localStorage` des Geräts (`eeb.sicherung.zuletzt.v1`), steht in der Sicherung selbst, fällt mit „Alle Daten löschen" weg |
 | D3 | Absenderkarte | Freiwillige Kontaktangabe (Name/E-Mail/Telefon) der meldenden Person | `localStorage` des Geräts |
 | D4 | Privater Geräteschlüssel | Ed25519-Schlüssel zur Signatur weitergereichter Bögen | `localStorage` des Geräts, **unverschlüsselt als Hex** |
 | D5 | QR-Payload / Exportdatei | Binär kodierter, komprimierter Bogen zur Übergabe an ein zweites Gerät; ebenso eine geteilte Vorlage (QR/Link mit Marker `V.`, oder JSON-Datei `eeb-vorlage-*.json`) | Transient (QR-Code-Anzeige) bzw. Datei auf dem Gerät oder in einer vom Nutzer gewählten Ablage (z. B. Cloud-Ordner) |
@@ -422,6 +430,17 @@ Datenausleitung an eine andere Herkunft ist technisch unterbunden.
   laufenden Sammlungen des Geräts und den Inhalt der Datei, bietet „Vorher
   Sicherung erstellen…" an und verlangt einen Haken, sobald laufende
   Sammlungen mit Meldungen betroffen sind.
+- **Verfügbarkeit des Gerätespeichers** (`src/app/speicher-browser.ts`,
+  `src/app/sicherung.ts`, seit 2026-09-29, R2-O6): Browser dürfen
+  Website-Daten bei Platzmangel oder (Safari) nach längerer Nichtnutzung
+  räumen. Die Web-App bittet deshalb beim Start um dauerhaften Speicher
+  (`navigator.storage.persist`), sobald Sammlungen mit Meldungen oder Vorlagen
+  vorliegen, und zeigt in der Datensicherung, ob der Browser zugestimmt hat
+  (mit Knopf zum erneuten Anfragen und dem Rat, die App auf iOS auf den
+  Home-Bildschirm zu legen). Die native App fragt nicht — dort gehört der
+  Speicher der App. Dazu zeigt die Datensicherung die letzte Sicherung, und
+  die Fußzeile erinnert, wenn wertvolle Daten seit drei Tagen ungesichert sind.
+  Eine Sicherungspflicht erzwingt die App nicht; organisatorisch regeln.
 - **Schema-Migration** (`src/app/hilfen.ts`): verhindert, dass ältere Datensätze
   mit veralteten Feldbedeutungen fehlinterpretiert werden.
 - **Absenderkarte vollständig optional** (Opt-in), ohne Eingabe als „keine

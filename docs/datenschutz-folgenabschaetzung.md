@@ -63,6 +63,12 @@ Grundlage: Repository `wattnpapa/erfassungsbogen`, Stand 2026-09-12 — Version 
 > Ort entfernter Einträge (`eeb.entfernt.v1`, keine Personendaten) und fragt
 > bei „Einsatz importieren…", bevor sie eine davon wieder aufnimmt.
 > Geändert: 5.7.
+>
+> **Nachgezogen 2026-09-29 — Dauerhafter Speicher und Sicherungs-Erinnerung
+> (Audit Runde 2, R2-O6):** Die Web-App bittet den Browser um dauerhaften
+> Speicher, sobald Sammlungen mit Meldungen oder Vorlagen vorliegen, und merkt
+> sich den Zeitpunkt der letzten Sicherung (`eeb.sicherung.zuletzt.v1`, keine
+> Personendaten). Keine Netzverbindung, kein neuer Empfänger. Geändert: 5.7.
 
 ## Hinweis zu diesem Dokument
 
@@ -364,6 +370,17 @@ Kapitel 6 der [Arc42-Dokumentation](arc42-architektur.md).
   Datei, bietet „Vorher Sicherung erstellen…" an und verlangt einen Haken,
   sobald laufende Sammlungen betroffen sind (Audit Runde 2, R2-D3) — damit
   gehen fremde Meldungen nicht mehr unbemerkt verloren (Verfügbarkeit).
+- **Verfügbarkeit (seit 2026-09-29, R2-O6):** Der Browser darf den lokalen
+  Speicher einer Website räumen; dann wären auch fremde Meldungen verloren,
+  bevor sie weitergegeben sind. Die Web-App bittet deshalb um dauerhaften
+  Speicher (`navigator.storage.persist`), sobald Sammlungen mit Meldungen oder
+  Vorlagen vorliegen, zeigt den Status und die letzte Sicherung in der
+  Datensicherung (`eeb.sicherung.zuletzt.v1`, nur ein Zeitpunkt) und erinnert
+  in der Fußzeile nach drei Tagen ohne Sicherung. Dauerhafter Speicher
+  verlängert die Speicherdauer nicht über die Fristen oben hinaus; er
+  verhindert nur die Räumung durch den Browser. Die Sicherungsdatei selbst
+  enthält Personendaten und den privaten Schlüssel — ihre Ablage ist
+  organisatorisch zu regeln.
 - **Strukturelle Grenze:** Sobald ein Bogen als QR-Code gescannt, als PDF
   gedruckt oder als Datei exportiert wurde, hat die App auf diese Kopien keinen
   Zugriff mehr (vertiefend 6.3).

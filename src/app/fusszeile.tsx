@@ -17,7 +17,9 @@ import {
   datenUmfang,
   bestandUmfang,
   geraetBestand,
+  letzteSicherung,
   sicherungErstellen,
+  sicherungFaellig,
   sicherungErstelltAm,
   sicherungEinspielen,
   sicherungParsen,
@@ -27,6 +29,7 @@ import {
 import { dateiFehlerMeldung } from "./datei-fehler";
 import { geraeteKurzform, geraeteSchluesselLoeschen, geraeteSchluesselSicherstellen } from "./geraete-schluessel";
 import { speicherBelegung, speicherText } from "./eintrag-zeiten";
+import { dauerhaftenSpeicherAnfragen, speicherDauerhaft } from "./speicher-browser";
 
 const KONTAKT = "johannes.rudolph@thw-oldenburg.de";
 const REPO = "https://github.com/wattnpapa/erfassungsbogen";
@@ -413,6 +416,12 @@ export function Fusszeile({ onBogenOeffnen, kompakt = false }: {
     geraet: BestandUmfang;
   } | null>(null);
   const [einspielVerstanden, setEinspielVerstanden] = useState(false);
+  // Wann zuletzt gesichert, ob eine Erinnerung fällig ist und ob der Browser
+  // den Speicher dauerhaft vorhält (Audit Runde 2, R2-O6). Der Speicherstatus
+  // wird beim Öffnen der Datensicherung erhoben (asynchron).
+  const [zuletztGesichert, setZuletztGesichert] = useState(() => letzteSicherung());
+  const [erinnerung, setErinnerung] = useState(() => sicherungFaellig());
+  const [dauerhaft, setDauerhaft] = useState<boolean | null>(null);
   const loeschen = useRef<HTMLDialogElement>(null);
   // Stand beim Öffnen des Löschen-Dialogs — die Rückfrage nennt Zahlen, damit
   // niemand „alles löschen" blind bestätigt.
@@ -540,6 +549,8 @@ export function Fusszeile({ onBogenOeffnen, kompakt = false }: {
   /** Alle lokalen App-Daten als Datei anbieten — App: Share-Sheet, Browser: Download. */
   async function sicherungExportieren() {
     const inhalt = sicherungErstellen();
+    setZuletztGesichert(letzteSicherung());
+    setErinnerung(null);
     const name = `eeb-sicherung-${new Date().toISOString().slice(0, 10)}.json`;
     if (istNativ()) {
       await textTeilen(name, inhalt);
@@ -591,6 +602,17 @@ export function Fusszeile({ onBogenOeffnen, kompakt = false }: {
     } catch (err) {
       setSicherungFehler(err instanceof Error ? err.message : String(err));
     }
+  }
+
+  /** Datensicherung öffnen und den Speicherstatus des Browsers erheben. */
+  function sicherungOeffnen() {
+    setSicherungFehler("");
+    sicherung.current?.showModal();
+    void speicherDauerhaft().then(setDauerhaft);
+  }
+
+  async function dauerhaftAnfragen() {
+    setDauerhaft(await dauerhaftenSpeicherAnfragen());
   }
 
   /** Löschen-Dialog öffnen: Stand frisch erheben, Bestätigung zurücksetzen. */
@@ -698,7 +720,18 @@ export function Fusszeile({ onBogenOeffnen, kompakt = false }: {
       <div className="fuss-gruppen">
         <nav className="fuss-gruppe" aria-label="Daten">
           <span className="fuss-titel">Daten</span>
-          <button type="button" className="link" onClick={() => { setSicherungFehler(""); sicherung.current?.showModal(); }}>Datensicherung</button>
+          <button type="button" className="link" onClick={sicherungOeffnen}>Datensicherung</button>
+          {/* Dezente Erinnerung, solange wertvolle Daten ungesichert altern
+              (R2-O6) — kein Dialog, der die Arbeit unterbricht. */}
+          {erinnerung && (
+            <p className="hinweis sicherung-erinnerung">
+              {erinnerung.seit
+                ? `Letzte Sicherung vor ${Math.floor((Date.now() - erinnerung.seit) / 86_400_000)} Tagen.`
+                : "Noch keine Datensicherung erstellt."}{" "}
+              Alles liegt nur auf diesem Gerät.{" "}
+              <button type="button" className="link" onClick={sicherungOeffnen}>Jetzt sichern…</button>
+            </p>
+          )}
           <button type="button"
             className="link"
             onClick={() => {
@@ -776,6 +809,28 @@ export function Fusszeile({ onBogenOeffnen, kompakt = false }: {
         <p className="hinweis">
           Einspielen ersetzt die vorhandenen App-Daten auf diesem Gerät vollständig.
         </p>
+        {/* Wie sicher liegt es hier, und wann gab es zuletzt eine Kopie?
+            (Audit Runde 2, R2-O6) */}
+        <p className="hinweis" role="status">
+          {zuletztGesichert
+            ? `Letzte Sicherung auf diesem Gerät erstellt: ${new Date(zuletztGesichert).toLocaleString("de-DE", { dateStyle: "short", timeStyle: "short" })} Uhr.`
+            : "Auf diesem Gerät wurde noch keine Sicherung erstellt."}
+        </p>
+        {dauerhaft === true && (
+          <p className="hinweis">
+            Der Browser hält den Speicher dieser App dauerhaft vor und räumt ihn nicht von sich aus.
+          </p>
+        )}
+        {dauerhaft === false && (
+          <p className="warnung">
+            Der Speicher ist nicht dauerhaft: Der Browser darf ihn bei Platzmangel oder nach
+            längerer Nichtnutzung räumen. Regelmäßig sichern; auf iPhone und iPad die App über
+            „Zum Home-Bildschirm“ ablegen.{" "}
+            <button type="button" className="link" onClick={() => void dauerhaftAnfragen()}>
+              Dauerhaften Speicher anfragen
+            </button>
+          </p>
+        )}
         {/* Der Speicherstand gehört dorthin, wo aufgeräumt wird: Ein voller
             Speicher trifft sonst ohne Vorwarnung (Audit „Offline und
             Speicher", O4). Die Grenze ist eine Schätzung — Browser nennen

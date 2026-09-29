@@ -4,7 +4,11 @@ import {
   bestandUmfang,
   datenUmfang,
   geraetBestand,
+  letzteSicherung,
   sicherungErstelltAm,
+  sicherungFaellig,
+  wertvolleDaten,
+  ERINNERUNG_TAGE,
   sicherungEinspielen,
   sicherungErstellen,
   sicherungInhalt,
@@ -92,7 +96,9 @@ describe("sicherungErstellen() / sicherungEinspielen()", () => {
     (globalThis as { localStorage?: Storage }).localStorage = mem;
     // Die Einsatz-Sammlung bekommt ihre Ablage hineingereicht (ADR-003).
     speicherhuelleSetzen(mem);
-    expect(sicherungEinspielen(datei)).toBe(2);
+    // Zwei Nutzdaten-Einträge plus der Vermerk der Sicherung selbst (R2-O6).
+    expect(sicherungEinspielen(datei)).toBe(3);
+    expect(letzteSicherung()).not.toBeNull();
     expect(localStorage.getItem("eeb.vorlagen.v1")).toBe("[1]");
     expect(localStorage.getItem("eeb.einsaetze.v1")).toBe("[2]");
     expect(localStorage.getItem("fremd")).toBeNull();
@@ -192,5 +198,39 @@ describe("bestandUmfang() / geraetBestand() — für die Einspiel-Rückfrage (R2
       vorlagen: 0,
       entwurf: false,
     });
+  });
+});
+
+describe("Letzte Sicherung und Erinnerung (Audit Runde 2, R2-O6)", () => {
+  const TAG = 24 * 60 * 60 * 1000;
+
+  it("merkt sich beim Erstellen den Zeitpunkt — die Datei trägt ihn mit", () => {
+    expect(letzteSicherung()).toBeNull();
+    const jetzt = new Date("2026-09-29T10:00:00Z");
+    const text = sicherungErstellen(jetzt);
+    expect(letzteSicherung()).toBe(jetzt.getTime());
+    expect(sicherungParsen(text)["eeb.sicherung.zuletzt.v1"]).toBe(String(jetzt.getTime()));
+  });
+
+  it("erinnert nicht, solange nichts Wertvolles da ist", () => {
+    einsatzAnlegen("Leer", EinsatzArt.EINSATZ); // Sammlung ohne Meldung
+    expect(wertvolleDaten()).toBe(false);
+    expect(sicherungFaellig(Date.now() + 100 * TAG)).toBeNull();
+  });
+
+  it("erinnert, wenn eine Sammlung mit Meldungen seit Tagen ungesichert ist", () => {
+    const e = einsatzAnlegen("Sturmflut", EinsatzArt.EINSATZ);
+    meldungHinzufuegen(e.id, bogen(), { quelle: "manuell" });
+    expect(wertvolleDaten()).toBe(true);
+    expect(sicherungFaellig(Date.now())).toBeNull(); // gerade erst angelegt
+    expect(sicherungFaellig(Date.now() + ERINNERUNG_TAGE * TAG)).toEqual({ seit: null });
+  });
+
+  it("zählt ab der letzten Sicherung", () => {
+    vorlageAnlegen("Basis", bogen());
+    const gesichert = Date.now() + 10 * TAG;
+    sicherungErstellen(new Date(gesichert));
+    expect(sicherungFaellig(gesichert + TAG)).toBeNull();
+    expect(sicherungFaellig(gesichert + ERINNERUNG_TAGE * TAG)).toEqual({ seit: gesichert });
   });
 });

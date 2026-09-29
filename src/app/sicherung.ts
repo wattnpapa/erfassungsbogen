@@ -159,17 +159,76 @@ function alleEebSchluessel(s: Storage): string[] {
   return schluessel;
 }
 
+// ------------------------------------------------- Letzte Sicherung, Erinnerung
+
+/**
+ * Wann auf diesem Gerät zuletzt eine Sicherung erstellt wurde. Alles liegt nur
+ * hier, einen Server, der es noch hätte, gibt es nicht — und bisher sagte die
+ * App nirgends, wann zuletzt eine Kopie gezogen wurde, noch erinnerte sie
+ * daran (Audit Runde 2, R2-O6). Der Zeitpunkt steht unter `eeb.`: Er reist mit
+ * der Sicherung (nach dem Einspielen gilt deren Erstellzeit) und fällt mit
+ * „Alle Daten löschen" weg. Gemerkt wird beim Erstellen der Datei — ob sie
+ * danach wirklich abgelegt wurde, sieht die App nicht.
+ */
+const ZULETZT_SCHLUESSEL = "eeb.sicherung.zuletzt.v1";
+
+/** Nach so vielen Tagen ohne Sicherung erinnert die Fußzeile daran. */
+export const ERINNERUNG_TAGE = 3;
+const TAG_MS = 24 * 60 * 60 * 1000;
+
+export function letzteSicherung(): number | null {
+  const roh = speicher()?.getItem(ZULETZT_SCHLUESSEL);
+  const n = roh == null ? NaN : Number(roh);
+  return Number.isFinite(n) && n > 0 ? n : null;
+}
+
+/**
+ * Was eine Sicherung wert macht: laufende Sammlungen mit Meldungen und
+ * Vorlagen. Zeitpunkt, seit dem das so ist (älteste Anlage), oder null.
+ */
+function wertvollSeit(): number | null {
+  const zeiten = [
+    ...einsaetzeLaden().filter((e) => e.eintraege.length > 0).map((e) => e.angelegt),
+    ...vorlagenLaden().map((v) => v.erstellt),
+  ].filter((t) => typeof t === "number" && Number.isFinite(t));
+  return zeiten.length > 0 ? Math.min(...zeiten) : null;
+}
+
+/** Liegt hier etwas, dessen Verlust wehtäte? (Anlass, dauerhaften Speicher zu erbitten.) */
+export function wertvolleDaten(): boolean {
+  return wertvollSeit() != null;
+}
+
+/**
+ * Ist eine Erinnerung fällig? Ja, wenn wertvolle Daten da sind und die letzte
+ * Sicherung — oder, ohne jede Sicherung, das Entstehen dieser Daten — länger
+ * als {@link ERINNERUNG_TAGE} zurückliegt. `seit` = letzte Sicherung oder null.
+ */
+export function sicherungFaellig(jetzt = Date.now()): { seit: number | null } | null {
+  const wertvoll = wertvollSeit();
+  if (wertvoll == null) return null;
+  const seit = letzteSicherung();
+  const bezug = seit ?? wertvoll;
+  return jetzt - bezug >= ERINNERUNG_TAGE * TAG_MS ? { seit } : null;
+}
+
 /** Alle lokalen App-Daten als Sicherungsdatei-Inhalt. */
-export function sicherungErstellen(): string {
+export function sicherungErstellen(jetzt = new Date()): string {
   const s = speicher();
   const eintraege: Record<string, string> = {};
   if (s) {
+    // Vor dem Einsammeln merken, damit die Datei ihren eigenen Zeitpunkt trägt.
+    try {
+      s.setItem(ZULETZT_SCHLUESSEL, String(jetzt.getTime()));
+    } catch {
+      /* Speicher voll — die Sicherung selbst ist wichtiger als der Vermerk */
+    }
     for (const k of alleEebSchluessel(s)) {
       const v = s.getItem(k);
       if (v != null) eintraege[k] = v;
     }
   }
-  return sicherungInhalt(eintraege);
+  return sicherungInhalt(eintraege, jetzt);
 }
 
 /**

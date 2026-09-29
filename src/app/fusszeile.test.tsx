@@ -8,7 +8,7 @@
  * passiert.
  */
 
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { Dialogschicht } from "./dialoge";
@@ -73,6 +73,62 @@ describe("Alle Daten löschen", () => {
     await nutzer.click(within(loeschDialog()).getByRole("button", { name: "Abbrechen" }));
 
     expect(vorlagenLaden()).toHaveLength(1);
+  });
+});
+
+/**
+ * Wie sicher liegt es hier, und wann gab es zuletzt eine Kopie? (Audit Runde 2,
+ * R2-O6) — dauerhafter Speicher, letzte Sicherung, dezente Erinnerung.
+ */
+describe("Datensicherung: Speicherstatus und Erinnerung", () => {
+  beforeEach(() => {
+    localStorage.clear();
+  });
+  afterEach(() => {
+    Reflect.deleteProperty(navigator, "storage");
+  });
+
+  function speicherVorspielen(dauerhaft: boolean) {
+    const zustand = { dauerhaft };
+    const persist = vi.fn(async () => {
+      zustand.dauerhaft = true;
+      return true;
+    });
+    Object.defineProperty(navigator, "storage", {
+      configurable: true,
+      value: { persisted: async () => zustand.dauerhaft, persist },
+    });
+    return persist;
+  }
+
+  it("zeigt nicht dauerhaften Speicher an und bittet auf Knopfdruck darum", async () => {
+    const persist = speicherVorspielen(false);
+    const nutzer = userEvent.setup();
+    buehne();
+
+    await nutzer.click(screen.getByRole("button", { name: "Datensicherung" }));
+    const dialog = document.querySelector<HTMLDialogElement>("dialog[aria-label='Datensicherung']")!;
+    expect(await within(dialog).findByText(/Speicher ist nicht dauerhaft/)).toBeDefined();
+    expect(within(dialog).getByText("Auf diesem Gerät wurde noch keine Sicherung erstellt.")).toBeDefined();
+
+    await nutzer.click(within(dialog).getByRole("button", { name: "Dauerhaften Speicher anfragen" }));
+    expect(persist).toHaveBeenCalled();
+    expect(await within(dialog).findByText(/hält den Speicher dieser App dauerhaft vor/)).toBeDefined();
+  });
+
+  it("erinnert in der Fußzeile, wenn eine Sammlung mit Meldungen seit Tagen ungesichert ist", async () => {
+    const s = einsatzAnlegen("Sturmflut", EinsatzArt.EINSATZ);
+    meldungHinzufuegen(s.id, neuerBogen(), { quelle: "manuell" });
+    localStorage.setItem("eeb.sicherung.zuletzt.v1", String(Date.now() - 5 * 86_400_000));
+    buehne();
+
+    expect(screen.getByText(/Letzte Sicherung vor 5 Tagen/)).toBeDefined();
+    expect(screen.getByRole("button", { name: "Jetzt sichern…" })).toBeDefined();
+  });
+
+  it("schweigt ohne wertvolle Daten", () => {
+    buehne();
+    expect(screen.queryByRole("button", { name: "Jetzt sichern…" })).toBeNull();
   });
 });
 
