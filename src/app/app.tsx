@@ -1870,10 +1870,46 @@ function AppInhalt() {
     setSammelZiel(zielId);
     setOffenerEinsatzId(null); // Assistent übernimmt die Ansicht
     setMeldung("");
-    setBogen(neuerBogen());
+    // Wie die letzte hier von Hand erfasste Einheit: Wer eben nur die Stärke
+    // gezählt hat, will die nächste nicht mit „Personal vollständig erfassen"
+    // beginnen (R2-S2). Abgeleitet aus der Sammlung, kein eigener Speicher.
+    const zuletzt = einsaetzeLaden()
+      .find((x) => x.id === zielId)
+      ?.eintraege.filter((e) => e.quelle === "manuell")
+      .sort((a, b) => b.empfangenAm - a.empfangenAm)[0];
+    setBogen(zuletzt?.bogen.personalErfassung === PersonalErfassung.NUR_STAERKE ? schnellerfassungsBogen() : neuerBogen());
     setzeEmpfang(null);
     setSchritt(0);
     setZeigeStart(false);
+  }
+
+  /** Leerer Bogen für die Meldekopf-Schnellerfassung (nur Stärke). */
+  function schnellerfassungsBogen(): Erfassungsbogen {
+    return {
+      ...neuerBogen(),
+      personalErfassung: PersonalErfassung.NUR_STAERKE,
+      staerkeManuell: { fuehrer: 0, unterfuehrer: 0, mannschaft: 0, gesamt: 0 },
+    };
+  }
+
+  /**
+   * Zielsammlung der Schnellerfassung von der Startseite. Rückgabe: Einsatz-ID,
+   * "" = ohne Sammlung (nur ein Bogen), null = abgebrochen. Ohne Sammlungen
+   * gibt es nichts zu fragen.
+   */
+  async function schnellerfassungsZiel(): Promise<string | null> {
+    const sammlungen = einsaetzeLaden();
+    if (sammlungen.length === 0) return "";
+    const letzte = letztenEinsatzLaden();
+    const sortiert = [...sammlungen].sort((x, y) => (x.id === letzte ? -1 : y.id === letzte ? 1 : y.geaendert - x.geaendert));
+    const wege = sortiert.slice(0, 4).map((s) => ({
+      wert: s.id,
+      label: `Für „${s.name}" erfassen`,
+      hinweis: `${ART_LABEL[s.art]}${s.ort ? ` · ${s.ort}` : ""} · ${aktuelleMeldungen(s.eintraege, s.art).length} Einheit(en) anwesend`,
+    }));
+    wege.push({ wert: "ohne", label: "Ohne Sammlung erfassen", hinweis: "Nur ein Bogen — später über „In Einsatz-Sammlung ablegen…“ zuordnen." });
+    const wahl = await frageWahl({ titel: "Einheit schnell erfassen — für welche Sammlung?", text: "Die Einheit wird nach der Erfassung dort abgelegt.", wege });
+    return wahl === null ? null : wahl === "ohne" ? "" : wahl;
   }
 
   /**
@@ -2458,14 +2494,16 @@ function AppInhalt() {
               <button
                 type="button"
                 onClick={async () => {
+                  // Erst das Ziel: Die Schnellerfassung von hier kannte keine
+                  // Sammlung, sprach wie der eigene Bogen und endete mit einem
+                  // offenen Entwurf (Audit Runde 2, R2-N6, R2-S2).
+                  const ziel = await schnellerfassungsZiel();
+                  if (ziel === null) return;
                   if (!(await darfBogenErsetzen({ titel: "Einheit schnell erfassen?", was: "die schnell zu erfassende Einheit", ok: "Schnell erfassen" }))) return;
                   setFremdeErfassung(true);
+                  setSammelZiel(ziel || null);
                   setMeldung("");
-                  setBogen({
-                    ...neuerBogen(),
-                    personalErfassung: PersonalErfassung.NUR_STAERKE,
-                    staerkeManuell: { fuehrer: 0, unterfuehrer: 0, mannschaft: 0, gesamt: 0 },
-                  });
+                  setBogen(schnellerfassungsBogen());
                   setzeEmpfang(null);
                   setSchritt(0);
                   setZeigeStart(false);
@@ -2766,7 +2804,18 @@ function AppInhalt() {
           ) : (
             <span className="platzhalter" />
           )}
-          <button type="button" className="primaer" onClick={() => setSchritt(schritt + 1)}>
+          {/* Schnellerfassung einer fremden Einheit: nach Name und Typ direkt
+              zur Stärke — Schritt 2 („Wofür deine Einheit gemeldet wird") ist
+              dort nicht gefragt (R2-N6). */}
+          <button
+            type="button"
+            className="primaer"
+            onClick={() =>
+              setSchritt(
+                schritt === 0 && fremdeErfassung && bogen.personalErfassung === PersonalErfassung.NUR_STAERKE ? 2 : schritt + 1,
+              )
+            }
+          >
             {schritt === UEBERSICHT - 1 ? "Zur Übersicht →" : "Weiter →"}
           </button>
         </footer>

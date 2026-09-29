@@ -215,7 +215,13 @@ export function SchrittEinheit({ bogen, aendern: aendernRoh }: SchrittProps) {
       ...bogen.personal.filter((p) => !personUnbenannt(p)),
       ...(bogen.personalErfassung === PersonalErfassung.VOLLSTAENDIG ? stanPersonalVorbelegung(e.organisation, v) : []),
     ];
-    const fahrzeuge = [...bogen.fahrzeuge.filter((f) => !fahrzeugUnbenannt(f)), ...fahrzeugVorbelegung(einheit)];
+    // Nur Stärke (Meldekopf-Schnellerfassung): keine Soll-Fahrzeuge. Gefragt
+    // war die Stärke; vier ungeprüfte Fahrzeuge liefen sonst in die Summe der
+    // Lage und als „4 Lücken" auf die Karte (Audit Runde 2, R2-W3).
+    const fahrzeuge = [
+      ...bogen.fahrzeuge.filter((f) => !fahrzeugUnbenannt(f)),
+      ...(bogen.personalErfassung === PersonalErfassung.NUR_STAERKE ? [] : fahrzeugVorbelegung(einheit)),
+    ];
     aendern({
       einheit,
       ...(personal.length !== bogen.personal.length || personal.some((p, i) => p !== bogen.personal[i]) ? { personal } : {}),

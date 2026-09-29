@@ -523,6 +523,8 @@ describe("Assistenten-Durchlauf", () => {
 
     for (const name of ["Aalen", "Biberach"]) {
       await nutzer.click(screen.getByRole("button", { name: "Einheit schnell erfassen (nur Stärke)…" }));
+      // Ziel ohne Sammlung: geprüft wird hier der Weg über „In Einsatz-Sammlung ablegen…".
+      await nutzer.click(within(rueckfrage("Einheit schnell erfassen — für welche Sammlung?")).getByRole("button", { name: "Ohne Sammlung erfassen" }));
       const frage = document.querySelector<HTMLDialogElement>("dialog[aria-label='Einheit schnell erfassen?']");
       if (frage) await nutzer.click(within(frage).getByRole("button", { name: "Schnell erfassen" }));
       await nutzer.type(screen.getByLabelText("Name (Pflicht)"), name);
@@ -539,6 +541,27 @@ describe("Assistenten-Durchlauf", () => {
     expect(s.eintraege).toHaveLength(2);
     expect(localStorage.getItem("eeb.entwurf.v1")).toBeNull();
     expect(localStorage.getItem("eeb.entwurf.ersetzt.v1")).toContain("Eigenhausen");
+  }, 30000);
+
+  it("führt die Schnellerfassung von der Startseite in die gewählte Sammlung (R2-N6, R2-S2)", async () => {
+    const einsatz = einsatzImSpeicherAnlegen("Sammelhausen", EinsatzArt.EINSATZ);
+    const nutzer = userEvent.setup();
+    render(<App />);
+    await nutzer.click(screen.getByRole("button", { name: "Einheit schnell erfassen (nur Stärke)…" }));
+    await nutzer.click(within(rueckfrage("Einheit schnell erfassen — für welche Sammlung?")).getByRole("button", { name: /Für „Sammelhausen" erfassen/ }));
+    expect(within(screen.getByRole("banner")).getByText(/Aufnahme für: Sammelhausen/)).toBeDefined();
+    await nutzer.type(screen.getByLabelText("Name (Pflicht)"), "Schnellhausen");
+    await nutzer.click(screen.getByRole("button", { name: "Weiter →" }));
+    // Direkt zur Stärke, ohne Umweg über „2. Einsatz".
+    expect(screen.getByRole("heading", { level: 2, name: "3. Personal" })).toBeDefined();
+    await nutzer.click(screen.getByRole("button", { name: "In Einsatz übernehmen" }));
+    await screen.findByRole("heading", { level: 1, name: "Sammelhausen" });
+    expect(einsaetzeLaden().find((x) => x.id === einsatz.id)!.eintraege).toHaveLength(1);
+    expect(localStorage.getItem("eeb.entwurf.v1")).toBeNull();
+
+    // Die nächste Erfassung in dieser Sammlung beginnt wieder mit „nur Stärke".
+    await nutzer.click(screen.getByRole("button", { name: "Einheit manuell erfassen…" }));
+    expect(within(screen.getByRole("banner")).getByText("Schnellerfassung")).toBeDefined();
   }, 30000);
 
   /**
