@@ -58,6 +58,7 @@ import { fehlerText } from "../nachladen";
 import { frageJaNein, frageText, zeigeHinweis } from "../dialoge";
 import { SpeicherVollFehler, istSpeicherVoll } from "../eintrag-zeiten";
 import { uebergabeText, type UebergabeStand } from "../uebergabe-stand";
+import { useModalesOverlay } from "../modal-overlay";
 import {
   MWD_LEGENDE,
   STAERKE_LEGENDE,
@@ -952,40 +953,48 @@ export function Uebersicht(props: {
         {fehler && <p className="fehler">{fehler}</p>}
       </dialog>
 
-      {vollbild && qr && (() => {
-        const teil = qr.teile[Math.min(vollbildTeil, qr.teile.length - 1)]!;
-        return (
-          <div className="qr-vollbild" role="dialog" aria-label="QR-Code im Vollbild">
-            <img
-              src={teil.datenUrl}
-              alt={qr.segmentiert ? `EEB2-QR-Code Teil ${teil.teilNr} von ${teil.anzahl}` : "EEB2-QR-Code"}
-            />
-            {qr.segmentiert && (
-              <p>
-                <strong>Teil {teil.teilNr} von {teil.anzahl}</strong> — alle Teile nacheinander scannen lassen.
-              </p>
-            )}
-            <p className="hinweis">Der Bildschirm bleibt an — Display-Helligkeit hoch stellen hilft beim Scannen.</p>
-            <div className="qr-vollbild-nav">
-              {qr.segmentiert && (
-                <button type="button" disabled={vollbildTeil === 0} onClick={() => setVollbildTeil(vollbildTeil - 1)}>
-                  ← Voriger Teil
-                </button>
-              )}
-              {qr.segmentiert && (
-                <button
-                  type="button"
-                  disabled={vollbildTeil >= qr.teile.length - 1}
-                  onClick={() => setVollbildTeil(vollbildTeil + 1)}
-                >
-                  Nächster Teil →
-                </button>
-              )}
-              <button type="button" className="primaer" onClick={() => setVollbild(false)}>Schließen</button>
-            </div>
-          </div>
-        );
-      })()}
+      {vollbild && qr && (
+        <QrVollbild qr={qr} teilIndex={vollbildTeil} onTeil={setVollbildTeil} onSchliessen={() => setVollbild(false)} />
+      )}
     </>
+  );
+}
+
+/**
+ * QR-Code im Vollbild zum Vorzeigen. Ein modaler `<dialog>` (R2-M3): Fokus
+ * und Vorlesen bleiben im Overlay, die Übersicht dahinter rollt nicht mit,
+ * Escape schließt, und der Fokus kehrt auf „Bogen übergeben…" zurück.
+ */
+function QrVollbild(props: { qr: QrSatz; teilIndex: number; onTeil: (i: number) => void; onSchliessen: () => void }) {
+  const { qr, teilIndex } = props;
+  const dialog = useRef<HTMLDialogElement>(null);
+  useModalesOverlay(dialog, { onSchliessen: props.onSchliessen });
+  const teil = qr.teile[Math.min(teilIndex, qr.teile.length - 1)]!;
+  return (
+    <dialog ref={dialog} className="qr-vollbild" aria-label="QR-Code im Vollbild" tabIndex={-1}>
+      <img
+        src={teil.datenUrl}
+        alt={qr.segmentiert ? `EEB2-QR-Code Teil ${teil.teilNr} von ${teil.anzahl}` : "EEB2-QR-Code"}
+      />
+      {qr.segmentiert && (
+        <p>
+          <strong>Teil {teil.teilNr} von {teil.anzahl}</strong> — alle Teile nacheinander scannen lassen.
+        </p>
+      )}
+      <p className="hinweis">Der Bildschirm bleibt an — Display-Helligkeit hoch stellen hilft beim Scannen.</p>
+      <div className="qr-vollbild-nav">
+        {qr.segmentiert && (
+          <button type="button" disabled={teilIndex === 0} onClick={() => props.onTeil(teilIndex - 1)}>
+            ← Voriger Teil
+          </button>
+        )}
+        {qr.segmentiert && (
+          <button type="button" disabled={teilIndex >= qr.teile.length - 1} onClick={() => props.onTeil(teilIndex + 1)}>
+            Nächster Teil →
+          </button>
+        )}
+        <button type="button" className="primaer" onClick={props.onSchliessen}>Schließen</button>
+      </div>
+    </dialog>
   );
 }

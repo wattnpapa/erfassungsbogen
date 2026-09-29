@@ -3320,6 +3320,28 @@
     .qr-vollbild p { margin: 0; color: var(--text); text-align: center; }
     .qr-vollbild-nav { display: flex; gap: 0.8rem; flex-wrap: wrap; justify-content: center; }
 
+    /* ---------------------------------------------------------------
+       QR-Vollbild und Scanner als modale <dialog> (Audit Runde 2, R2-M3).
+       Die Regeln oben (.scanner, .qr-vollbild) beschreiben das Overlay; hier
+       nur, was der Browser-Standard eines modalen Dialogs und die Regel
+       `dialog { … }` weiter oben daran ändern würden: Rand, Außenabstand,
+       Höchstmaße und die schmale Dialogbreite. Die Einblend-Bewegung der
+       Dialoge (translateY) entfällt: Während sie läuft, wäre der Dialog der
+       Bezugsrahmen für das `position: fixed`-Kamerabild, und der Suchrahmen
+       (suchAusschnitt) läge daneben. `display` der Klassen oben gewönne sonst
+       gegen das `display: none` eines geschlossenen Dialogs.
+       --------------------------------------------------------------- */
+    dialog.scanner, dialog.qr-vollbild {
+      margin: 0; border: none; border-radius: 0;
+      width: 100%; max-width: none; max-height: none;
+      animation: none;
+      /* Rollen am Rand des Overlays nicht an die Seite weiterreichen. */
+      overscroll-behavior: contain;
+    }
+    dialog.scanner::backdrop, dialog.qr-vollbild::backdrop { background: transparent; animation: none; }
+    dialog.scanner:not([open]), dialog.qr-vollbild:not([open]) { display: none; }
+    dialog.scanner:focus, dialog.qr-vollbild:focus { outline: none; }
+
     /* Papierkorb-Karten (gelöschte Vorlagen/Einsätze): sichtbar zurückgestuft. */
     section.karte.papierkorb { background: var(--flaeche-2); border-style: dashed; }
 

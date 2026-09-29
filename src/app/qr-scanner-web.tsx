@@ -9,6 +9,7 @@ import { useEffect, useRef, useState, type ChangeEvent } from "react";
 import { gemerkteKamera, kameraListe, merkeKamera, suchAusschnitt, type Kamera } from "./kamera";
 import { qrLeserLaden, type QrLeser } from "./qr-decoder";
 import { TeilQuittung } from "./teil-quittung";
+import { useModalesOverlay } from "./modal-overlay";
 import type { SegmentTeil } from "@bos/eeb-format/codec";
 
 /** Was schiefging (ein Satz) und was dagegen hilft (kurze Schritte). */
@@ -182,6 +183,12 @@ export function QrScannerWeb(props: {
   onBild?: (e: ChangeEvent<HTMLInputElement>) => void;
 }) {
   const videoRef = useRef<HTMLVideoElement>(null);
+  // Modaler Dialog statt Overlay-<div>: Tab, Enter und Vorlesen erreichen die
+  // verdeckte Seite nicht mehr, sie rollt nicht mit, und der Fokus kehrt auf
+  // „QR-Code scannen…" zurück (Audit Runde 2, R2-M3). Escape fängt weiterhin
+  // der Tastatur-Lauscher unten ab; `cancel` ist der Weg ohne Tastatur.
+  const dialogRef = useRef<HTMLDialogElement>(null);
+  useModalesOverlay(dialogRef, { onSchliessen: props.onAbbruch });
   // Der Suchrahmen bestimmt, welcher Bildausschnitt dekodiert wird.
   const rahmenRef = useRef<HTMLDivElement>(null);
   const rahmenQuittung = useAngenommen(props.teile?.length ?? 0);
@@ -370,7 +377,7 @@ export function QrScannerWeb(props: {
     ?? "";
 
   return (
-    <div className="scanner" role="dialog" aria-label="QR-Code scannen">
+    <dialog ref={dialogRef} className="scanner" aria-label="QR-Code scannen" tabIndex={-1}>
       <video ref={videoRef} playsInline muted />
       {fehler
         ? (
@@ -465,6 +472,6 @@ export function QrScannerWeb(props: {
         )}
         <button type="button" onClick={props.onAbbruch}>{props.abbruchText ?? "Abbrechen"}</button>
       </div>
-    </div>
+    </dialog>
   );
 }
