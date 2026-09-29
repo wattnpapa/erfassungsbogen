@@ -12,6 +12,7 @@ import { SchrittBuehne } from "../../test/schritt-buehne";
 import { Dialogschicht } from "../dialoge";
 import {
   Ernaehrung,
+  Fahrerlaubnis,
   Geschlecht,
   KontaktArt,
   OrganisationsTyp,
@@ -931,15 +932,17 @@ describe("Vorbelegung entfernen (Schritt 3)", () => {
           personal: [
             { ...vorlage[0]!, vorname: "Jan", nachname: "Meyer" },
             { ...vorlage[1]!, kontakte: [{ art: KontaktArt.MOBIL, dienstlich: true, wert: "0170" }] },
-            ...vorlage.slice(2),
+            // R2-E6: Fahrerlaubnis vorbereitet, Helfer noch offen — bleibt.
+            { ...vorlage[2]!, fahrerlaubnis: Fahrerlaubnis.CE },
+            ...vorlage.slice(3),
           ],
         }}
       />,
     );
 
-    await nutzer.click(screen.getByRole("button", { name: `Vorbelegung entfernen (${vorlage.length - 2} Personen ohne Namen)` }));
+    await nutzer.click(screen.getByRole("button", { name: `Vorbelegung entfernen (${vorlage.length - 3} Personen ohne Namen)` }));
 
-    expect(screen.getAllByLabelText("Vorname")).toHaveLength(2);
+    expect(screen.getAllByLabelText("Vorname")).toHaveLength(3);
     expect(screen.queryByRole("button", { name: /^Vorbelegung entfernen/ })).toBeNull();
   });
 

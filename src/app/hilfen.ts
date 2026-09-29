@@ -1143,10 +1143,19 @@ export function personLeer(p: Person): boolean {
  * solche Karten an (Rolle und Funktion gesetzt, Namen offen). Beim Wechsel
  * des Einheitstyps und über „Vorbelegung entfernen" werden nur sie
  * weggeräumt — eine Karte, in der schon eine Rufnummer steht, ist Inhalt,
- * auch wenn der Name noch fehlt.
+ * auch wenn der Name noch fehlt. Dasselbe gilt für eine Fahrerlaubnis oder
+ * Zusatzqualifikation: Wer einem Sollplatz schon „CE" gegeben hat, weil der
+ * Helfer erst später feststeht, verlor die Angabe vorher ohne Rückfrage
+ * (Audit Runde 2, R2-E6). Die Vorbelegung setzt beides nie.
  */
 export function personUnbenannt(p: Person): boolean {
-  return !p.vorname.trim() && !p.nachname.trim() && p.kontakte.length === 0;
+  return (
+    !p.vorname.trim() &&
+    !p.nachname.trim() &&
+    p.kontakte.length === 0 &&
+    p.fahrerlaubnis === Fahrerlaubnis.NONE &&
+    p.zusatzqualifikationen.length === 0
+  );
 }
 
 /** Wie `personUnbenannt`, für ein Fahrzeug: das Kennzeichen ist das, was die Vorbelegung offen lässt. */
