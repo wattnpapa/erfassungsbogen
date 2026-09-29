@@ -560,6 +560,25 @@ function BoegenEinlesenKnopf(props: {
   );
 }
 
+/**
+ * Schmaler Bildschirm (Telefon hochkant)? Dort stehen die Einheiten als
+ * kompakte Zeilen — Name, Stärke, Bedarf —, Knöpfe erst nach Antippen: eine
+ * volle Karte war rund 450 px hoch, das Lagebild lief über 13 Bildschirmhöhen
+ * (Audit Runde 2, R2-K7). Ohne matchMedia (Tests, alte Webviews): nein.
+ */
+const SCHMAL_ABFRAGE = "(max-width: 600px)";
+function useSchmal(): boolean {
+  const [schmal, setSchmal] = useState(() => typeof matchMedia === "function" && matchMedia(SCHMAL_ABFRAGE).matches);
+  useEffect(() => {
+    if (typeof matchMedia !== "function") return;
+    const m = matchMedia(SCHMAL_ABFRAGE);
+    const wechsel = () => setSchmal(m.matches);
+    m.addEventListener?.("change", wechsel);
+    return () => m.removeEventListener?.("change", wechsel);
+  }, []);
+  return schmal;
+}
+
 export function EinsatzDetail(props: {
   einsatz: Einsatzsammlung;
   onZurueck: () => void;
@@ -632,6 +651,7 @@ export function EinsatzDetail(props: {
   const [statusWechsel, setStatusWechsel] = useState<StatusWechsel | null>(null);
   // Karten oder Tabelle — geräteweit gemerkt (einheiten-tabelle.ts).
   const [ansicht, setAnsicht] = useState<EinheitenAnsicht>(gemerkteAnsicht);
+  const kompakt = useSchmal();
   const sum = aggregiere(einsatz.eintraege, einsatz.art);
   const zugGruppen = aggregiereNachZug(einsatz.eintraege, einsatz.art);
   // Was die Lage NICHT enthält, gehört genauso sichtbar gemacht wie das, was
@@ -1169,6 +1189,7 @@ export function EinsatzDetail(props: {
                 eingang={eingang}
                 onEntfernt={setZuletztEntfernt}
                 onStatusWechsel={setStatusWechsel}
+                kompakt={kompakt}
               />
             ))}
           </ul>
@@ -1722,8 +1743,13 @@ function EinheitKarte(props: {
   eingang?: Eingang | null;
   /** Statuswechsel von Hand — die Ansicht quittiert ihn mit Uhrzeit und Rückweg. */
   onStatusWechsel?: (w: StatusWechsel) => void;
+  /** Schmaler Bildschirm: zugeklappt nur Name, Stärke und Bedarf (R2-K7). */
+  kompakt?: boolean;
 }) {
-  const { einsatzId, kopf, alle, onGeaendert, onEntfernt, qualifikation = "", qualifikationKurz = "", eingang, onStatusWechsel } = props;
+  const { einsatzId, kopf, alle, onGeaendert, onEntfernt, qualifikation = "", qualifikationKurz = "", eingang, onStatusWechsel, kompakt = false } = props;
+  // Auf dem Telefon zugeklappt, bis die Einheit angetippt wird (R2-K7).
+  const [aufgeklappt, setAufgeklappt] = useState(false);
+  const zu = kompakt && !aufgeklappt;
   // Ohne Rollen: Die Ansicht bleibt nach der Aufnahme oben (R2-S3).
   const zeile = useEingangsquittung<HTMLLIElement>(marke(eingang, kopf.einheitSchluessel), { rollen: false });
   const nameId = useId();
@@ -2001,7 +2027,7 @@ function EinheitKarte(props: {
     <li
       ref={zeile}
       data-einheit={kopf.einheitSchluessel}
-      className={`einheit-zeile${zaehlt ? "" : " gestrichen"}`}
+      className={`einheit-zeile${zaehlt ? "" : " gestrichen"}${zu ? " kompakt" : ""}`}
       // Prellschutz: Der zweite Tipp eines Doppeltipps auf „Abrücken" traf
       // die neu geordnete Karte (R2-G4). Abgefangen wird in der
       // Einfangphase, also bevor irgendein Knopf der Karte ihn sieht.
@@ -2035,6 +2061,18 @@ function EinheitKarte(props: {
                 und Abrückzeit unter 3:1 (Audit Runde 2, R2-L5). */}
             {!zaehlt ? <span className="status-badge">{abgerueckt ? "abgerückt" : "zusammengeführt"}</span> : null}
           </h3>
+          {zu ? (
+            // Zugeklappt: eine Zeile mit Stärke und Bedarf — die Fragen beim
+            // Gang durch den Bereitstellungsraum („wer ist da, wer braucht
+            // was?"). Alles Weitere nach Antippen (R2-K7).
+            <span className="muster-sub kompakt-zeile">
+              Stärke {staerkeText(kopf.bogen)}
+              {bedarf.map((m) => (
+                <span className={m.dringend ? "bedarf-marke dringend" : "bedarf-marke routine"} key={m.lang}>{m.lang}</span>
+              ))}
+            </span>
+          ) : (
+          <>
           <span className="muster-sub">
             {orgLabel(kopf.bogen.einheit.organisation)} · Stärke {staerkeText(kopf.bogen)}
             {aufgegangen ? " · zusammengeführt" : ""}
@@ -2152,9 +2190,34 @@ function EinheitKarte(props: {
               })}
             </span>
           )}
+          </>
+          )}
         </div>
       </div>
+      {zu && (
+        // Die ganze Zeile ist das Tippziel; der Knopf liegt über ihr (siehe
+        // .karte-aufklappen in index.html) und trägt den Namen als Bezug.
+        <button
+          type="button"
+          className="karte-aufklappen"
+          aria-expanded={false}
+          aria-describedby={nameId}
+          onClick={() => setAufgeklappt(true)}
+        >
+          <span className="nur-sr">Aufklappen: Zeiten, Details und Aktionen</span>
+          <span aria-hidden="true">▾</span>
+        </button>
+      )}
+      {!zu && (
+      <>
       <div className="vorlage-aktionen">
+        {kompakt && (
+          <>
+            <button type="button" aria-describedby={nameId} aria-expanded={true} onClick={() => setAufgeklappt(false)}>
+              Zuklappen
+            </button>{" "}
+          </>
+        )}
         <button type="button" aria-describedby={nameId} onClick={() => setDetails(!details)}>
           {details ? "Details schließen" : "Details"}
         </button>{" "}
@@ -2351,6 +2414,8 @@ function EinheitKarte(props: {
             ))}
           </ul>
         </>
+      )}
+      </>
       )}
     </li>
   );

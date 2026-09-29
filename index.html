@@ -2091,6 +2091,23 @@
       margin-top: var(--r-2); padding-top: var(--r-2);
       border-top: 1px dashed var(--linie-fein);
     }
+    /* R2-K7: Telefon — zugeklappte Einheit als kompakte Zeile (Name,
+       Stärke, Bedarf). Der Aufklapp-Knopf liegt unsichtbar über der ganzen
+       Zeile: getippt wird irgendwo auf die Einheit, nicht auf ein kleines
+       Ziel. Nur das Dreieck rechts oben zeigt, dass es weitergeht. */
+    .einheit-zeile.kompakt { position: relative; padding: var(--r-2) 2rem var(--r-2) 0; }
+    .einheit-zeile.gestrichen.kompakt { padding-left: var(--r-2); }
+    .einheit-zeile.kompakt .kompakt-zeile {
+      display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.1rem 0.4rem;
+      font-variant-numeric: tabular-nums;
+    }
+    .einheit-zeile > button.karte-aufklappen, .einheit-zeile > button.karte-aufklappen:hover {
+      position: absolute; inset: 0; width: 100%; min-height: 0; margin: 0;
+      display: flex; align-items: flex-start; justify-content: flex-end;
+      padding: var(--r-2) var(--r-1); background: transparent; border: none;
+      box-shadow: none; color: var(--text-2); font-size: var(--t-m);
+    }
+    .einheit-zeile > button.karte-aufklappen:focus-visible { outline: 3px solid var(--akzent); outline-offset: -3px; }
     .bedarf-marke.routine {
       background: transparent; color: var(--text-2);
       border-color: var(--linie); font-weight: 400;

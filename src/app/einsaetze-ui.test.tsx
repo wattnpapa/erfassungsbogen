@@ -1040,3 +1040,52 @@ describe("Seltene Kartenaktionen hinter „Mehr…“ (R2-H9)", () => {
     expect(screen.queryByRole("button", { name: "Entfernen" })).toBeNull();
   });
 });
+
+/**
+ * Telefon: Eine volle Karte war rund 450 px hoch, das Lagebild lief über
+ * dreizehn Bildschirmhöhen. Auf schmalem Bildschirm steht jede Einheit
+ * zugeklappt als Name, Stärke und Bedarf; Knöpfe erst nach Antippen
+ * (Audit Runde 2, R2-K7).
+ */
+describe("Kompakte Einheiten auf dem Telefon (R2-K7)", () => {
+  let vorher: typeof window.matchMedia | undefined;
+  beforeEach(() => {
+    localStorage.clear();
+    vorher = window.matchMedia;
+    window.matchMedia = ((abfrage: string) => ({
+      matches: abfrage === "(max-width: 600px)",
+      media: abfrage,
+      addEventListener: () => {},
+      removeEventListener: () => {},
+    })) as unknown as typeof window.matchMedia;
+  });
+  afterEach(() => {
+    if (vorher) window.matchMedia = vorher;
+    else delete (window as { matchMedia?: unknown }).matchMedia;
+  });
+
+  it("zeigt zugeklappt nur Name, Stärke und Bedarf und klappt auf Tipp auf", async () => {
+    const nutzer = userEvent.setup();
+    const angelegt = einsatzAnlegen("Hochwasser Test", EinsatzArt.EINSATZ);
+    const b = bogenMitName("Crailsheim");
+    b.sofortbedarf = { verpflegungPersonen: 0, dieselLiter: 0, benzinLiter: 0, gemischLiter: 0, unterbringung: false, ruhezeitErforderlich: true };
+    meldungHinzufuegen(angelegt.id, b);
+    ansicht(angelegt.id);
+    const karte = document.querySelector<HTMLElement>(".einheit-zeile")!;
+    expect(karte.className).toContain("kompakt");
+    expect(karte.textContent).toMatch(/Stärke \d+ \/ \d+ \/ \d+ \/ \d+/);
+    expect(karte.textContent).toContain("Ruhezeit");
+    // Keine Knöpfe außer dem Aufklapper, keine Zeitenzeile.
+    expect(within(karte).queryByRole("button", { name: "Abrücken" })).toBeNull();
+    expect(karte.querySelector(".zeiten-zeile")).toBeNull();
+    const auf = within(karte).getByRole("button", { name: /Aufklappen/ });
+    expect(auf.getAttribute("aria-expanded")).toBe("false");
+    expect(auf.getAttribute("aria-describedby")).toBeTruthy();
+
+    await nutzer.click(auf);
+    expect(karte.className).not.toContain("kompakt");
+    expect(within(karte).getByRole("button", { name: "Abrücken" })).toBeTruthy();
+    await nutzer.click(within(karte).getByRole("button", { name: "Zuklappen" }));
+    expect(karte.className).toContain("kompakt");
+  });
+});
