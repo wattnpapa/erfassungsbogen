@@ -12,6 +12,7 @@ import { datenschutzUhrSetzen, speicherhuelleSetzen, type Speicherhuelle } from 
 import { datenschutzZeitpunkt } from "./datenschutz-uhr";
 import { istNativ } from "./nativ";
 import { wertvolleDaten } from "./sicherung";
+import { aufraeumBeobachter } from "./aufraeum-hinweis";
 
 /** `localStorage`, sofern erreichbar — im Privatmodus oder bei blockiertem
  *  Speicher wirft schon der Zugriff auf die Eigenschaft. */
@@ -25,7 +26,10 @@ export function browserSpeicherhuelle(): Speicherhuelle | null {
 
 /** Einmal beim Start aufrufen, bevor die Sammlung gelesen wird. */
 export function speicherVerdrahten(): void {
-  speicherhuelleSetzen(browserSpeicherhuelle());
+  // Beobachter merkt sich ruhende Sammlungen, bevor der Kern sie nach 90
+  // Tagen still löscht — die Startseite nennt sie danach (Audit Runde 2, R2-D5).
+  const h = browserSpeicherhuelle();
+  speicherhuelleSetzen(h && aufraeumBeobachter(h));
   datenschutzUhrSetzen(() => datenschutzZeitpunkt());
 }
 

@@ -81,6 +81,12 @@ Grundlage: Repository `wattnpapa/erfassungsbogen`, Stand 2026-09-12 — Version 
 > bleibt damit als Vorwert im Vermerk stehen, bis die Sammlung gelöscht wird —
 > Freitext mit Personenbezug lebt also so lange wie die Sammlung, nicht nur bis
 > zur nächsten Änderung. Kein neuer Empfänger. Geändert: 5.7.
+>
+> **Nachgezogen 2026-09-29 — Nachricht nach automatischer Löschung (Audit
+> Runde 2, R2-D5):** Nach Ablauf der Aufräumfrist merkt sich die App Name,
+> Zeitraum und Zahl der Meldungen der gelöschten Sammlung (ohne
+> Personendaten), bis die Nachricht auf der Startseite quittiert ist. Die
+> Löschung selbst bleibt unverändert. Geändert: 5.7.
 
 ## Hinweis zu diesem Dokument
 
@@ -361,7 +367,11 @@ Kapitel 6 der [Arc42-Dokumentation](arc42-architektur.md).
   nicht geändert wurde, löscht die App endgültig (Ankündigung ab Tag 60).
   Mit ihr gehen auch die Zusatzfelder je Meldung (Eintreff-/Abrückzeit,
   Notiz und Vermerke der Führungsstelle) und die Merkung der zuletzt offenen Sammlung
-  (`eeb.letzterEinsatz.v1`, ohne Personenbezug, 12 Stunden gültig).
+  (`eeb.letzterEinsatz.v1`, ohne Personenbezug, 12 Stunden gültig). Seit
+  2026-09-29 nennt die Startseite eine so gelöschte Sammlung danach einmal
+  beim Namen (Zeitraum, Zahl der Meldungen), bis „Verstanden" gedrückt wird
+  (`eeb.aufgeraeumt.v1`, `src/app/aufraeum-hinweis.ts`; nur Sammlungsname und
+  Zahlen, keine Personendaten; Audit Runde 2, R2-D5).
 - Eine **Papierkorb-Funktion** existiert (`sicherung.ts`, `vorlagen.ts`,
   `@bos/meldekopf/papierkorb`): gelöschte Einträge lassen sich vor endgültiger
   Löschung wiederherstellen.

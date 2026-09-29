@@ -83,6 +83,7 @@ import {
   HERKUNFT_TEXT,
   statusMitZeitSetzen,
   zeitKurz,
+  zeitLang,
 } from "./eintrag-zeiten";
 import { frageJaNein, frageWahl, zeigeHinweis } from "./dialoge";
 import { TabellenScroll } from "./tabellen-scroll";
@@ -106,6 +107,7 @@ import {
   type TabellenZeile,
 } from "./einheiten-tabelle";
 import { imWebBrowser } from "./nativ";
+import { aufgeraeumteLaden, aufgeraeumteQuittieren } from "./aufraeum-hinweis";
 import { useZahlQuittung } from "./quittung";
 import { mitAbgang, useEingangsquittung } from "./eintrag-bewegung";
 import { AbgangKnopf, Kartenstapel } from "./kartenstapel";
@@ -179,6 +181,11 @@ function signaturBadge(e: MeldeEintrag) {
   return <span className="signatur-badge ungueltig" title="Signatur passt nicht zu den Daten">⚠ Signatur ungültig</span>;
 }
 
+/** Kalendertag der Geräteuhr: „28.09.2026". */
+function tagText(ms: number): string {
+  return new Date(ms).toLocaleDateString("de-DE", { day: "2-digit", month: "2-digit", year: "numeric" });
+}
+
 function staerkeText(b: Erfassungsbogen): string {
   const s = staerke(b);
   return `${s.fuehrer} / ${s.unterfuehrer} / ${s.mannschaft} / ${s.gesamt}`;
@@ -221,6 +228,9 @@ export function EinsatzListe(props: {
   const { einsaetze, onOeffnen, onGeaendert } = props;
   const [zeigePapierkorb, setZeigePapierkorb] = useState(false);
   const papierkorb = einsaetzePapierkorb();
+  // Nach dem Laden gelesen: einsaetzePapierkorb() hat die Frist gerade geprüft
+  // und fällige Löschungen vorgemerkt (aufraeum-hinweis.ts, R2-D5).
+  const [aufgeraeumt, setAufgeraeumt] = useState(() => aufgeraeumteLaden());
   /**
    * Der gerade zurückgeholte Einsatz. Aus dem Papierkorb wiederhergestellt,
    * taucht er irgendwo in der Liste darüber wieder auf — bei mehreren
@@ -267,9 +277,40 @@ export function EinsatzListe(props: {
 
   return (
     <>
+      {/* Nach einer automatischen Löschung einmal sagen, WAS weg ist — sonst
+          sucht man eine Sammlung, die nicht verlegt, sondern gelöscht ist
+          (Audit Runde 2, R2-D5). */}
+      {aufgeraeumt.length > 0 && (
+        <div className="warnung aufgeraeumt-hinweis" role="status">
+          <p>
+            <strong>Automatisch gelöscht:</strong>{" "}
+            {aufgeraeumt.length === 1 ? "Diese Sammlung lag" : "Diese Sammlungen lagen"} 90 Tage unverändert
+            und {aufgeraeumt.length === 1 ? "wurde" : "wurden"} wegen der enthaltenen Personendaten endgültig
+            entfernt — nicht im Papierkorb. Wer die Daten noch braucht, greift auf einen Export oder das Papier zurück.
+          </p>
+          <ul>
+            {aufgeraeumt.map((a) => (
+              <li key={a.id}>
+                „{a.name}" · {tagText(a.angelegt)} bis {tagText(a.geaendert)} · {a.einheiten} Einheit(en),{" "}
+                {a.meldungen} Meldung(en) · gelöscht am {zeitLang(a.entferntAm)}
+              </li>
+            ))}
+          </ul>
+          <button
+            type="button"
+            onClick={() => {
+              aufgeraeumteQuittieren();
+              setAufgeraeumt([]);
+            }}
+          >
+            Verstanden
+          </button>
+        </div>
+      )}
       {einsaetze.map((s) => {
         const sum = aggregiere(s.eintraege, s.art);
         const restTage = tageBisAufraeumen(s);
+        const ruhtTage = Math.floor((Date.now() - s.geaendert) / (24 * 60 * 60 * 1000));
         return (
           <Kartenstapel className="karte" key={s.id} frisch={s.id === zurueckgeholt}>
             <div className="kopfzeile">
@@ -291,7 +332,9 @@ export function EinsatzListe(props: {
                 {restTage > 0
                   ? `Wird in ${restTage} Tag(en) automatisch gelöscht.`
                   : "Wird beim nächsten Start automatisch gelöscht."}{" "}
-                Die Sammlung liegt seit 60 Tagen unverändert und enthält Personendaten
+                {/* Die tatsächliche Ruhezeit — „seit 60 Tagen" stand auch bei
+                    70 Tagen da (Audit Runde 2, R2-D5). */}
+                Die Sammlung liegt seit {ruhtTage} Tagen unverändert und enthält Personendaten
                 gemeldeter Kräfte. Wenn du sie noch brauchst, exportiere sie jetzt — jede
                 Änderung an der Sammlung setzt die Frist zurück.
               </p>
