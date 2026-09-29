@@ -53,6 +53,7 @@ import { fehlerText } from "./nachladen";
 import { dateiFehlerMeldung } from "./datei-fehler";
 import { FehlerImBild } from "./fehler-im-bild";
 import { entfernteImImportKlaeren } from "./entfernte-meldungen";
+import { FensterKonflikt, useFensterAbgleich } from "./fenster-abgleich";
 import { entwirreScanText } from "./tastaturbelegung";
 import { vorlageAktualisieren, vorlageAnlegen, vorlageAusDatei, vorlagenLaden, vorlagenPapierkorb, vorlageZuruecksetzen, type Vorlage } from "./vorlagen";
 import { Musterung, VorlagenListe } from "./vorlagen-ui";
@@ -784,6 +785,8 @@ function AppInhalt() {
     bogen: ENTWURF?.bogen ?? null,
     um: ENTWURF?.gespeichert ?? Date.now(),
   });
+  // Zweites Fenster mit demselben Bogen oder derselben Sammlung (R2-O4).
+  const fenster = useFensterAbgleich(!!bogen, einsaetzeNeuLaden);
   useEffect(() => {
     if (bogen) {
       const merk = bogenGespeichert.current;
@@ -809,7 +812,7 @@ function AppInhalt() {
       setGespeichertUm(null);
       setSpeicherFehler(false);
     }
-  }, [bogen, vorlageInBearbeitung, fremdeErfassung, sammelZielId, schritt, uebergabe]);
+  }, [bogen, vorlageInBearbeitung, fremdeErfassung, sammelZielId, schritt, uebergabe, fenster.runde]);
 
   /**
    * Die Vorlage zum offenen Bogen — nur solange sie noch in der Liste steht.
@@ -2754,7 +2757,9 @@ function AppInhalt() {
           );
         })}
       </nav>
-      {speicherFehler ? (
+      {fenster.konflikt ? (
+        <FensterKonflikt abgleich={fenster} />
+      ) : speicherFehler ? (
         <p className="autosave speicher-fehler" role="alert">
           ⚠ Nicht gespeichert — der Speicher dieses Geräts ist voll. Der Bogen bleibt geöffnet; bitte jetzt „Bogen übergeben" (PDF) oder in der Fußzeile der Startseite Papierkorb leeren bzw. Sicherung erstellen.
           {gespeichertUm ? ` Letzter gesicherter Stand: ${uhrzeitMitTag(gespeichertUm)} Uhr.` : ""}

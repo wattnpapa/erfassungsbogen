@@ -746,6 +746,12 @@
       border: var(--strich) solid var(--warn-linie); border-radius: var(--radius);
       padding: var(--r-2) var(--r-3); margin-bottom: var(--r-3); font-weight: 600;
     }
+    /* Zwei Fenster, ein Bogen (Audit Runde 2, R2-O4): Die Warnung trägt zwei
+       Knöpfe und darf auch quer nicht weggeblendet werden wie die ruhige
+       „gespeichert"-Zeile — hier wird gerade NICHT gespeichert. */
+    .seiten-kopf .autosave.fenster-konflikt { display: block; }
+    .autosave.fenster-konflikt p { margin: 0 0 var(--r-2); }
+    .autosave.fenster-konflikt .aktionen { margin: 0; font-weight: 400; }
     .seiten-kopf.assistent-kopf .titelzeile { order: 1; }
     .seiten-kopf.assistent-kopf .autosave { order: 2; }
     .seiten-kopf.assistent-kopf .schritte { order: 3; }
