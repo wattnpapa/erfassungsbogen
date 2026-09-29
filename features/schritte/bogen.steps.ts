@@ -358,8 +358,8 @@ When("ich im Dialog {string} auf {string} klicke", async function (this: EebWelt
 });
 
 When("ich im Dialog den Text {string} eingebe", async function (this: EebWelt, text: string) {
-  // Mehrzeilige Eingaben („Namen einfügen") haben keine eigene Beschriftung —
-  // der Dialogtitel benennt sie bereits.
+  // Der Dialog hat genau ein mehrzeiliges Feld („Namen einfügen": beschriftet
+  // mit „Namensliste …", R2-M5) — der Schritt braucht dessen Namen nicht.
   await offenerDialog(this).locator("textarea").fill(text.replaceAll("\\n", "\n"));
 });
 

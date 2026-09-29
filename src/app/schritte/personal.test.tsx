@@ -210,6 +210,34 @@ describe("Schritt Personal", () => {
     expect(within(screen.getByRole("table")).getAllByRole("row")).toHaveLength(3);
   });
 
+  it("benennt die Namensfelder der Schnelleingabe je Person (R2-M5)", async () => {
+    const nutzer = userEvent.setup();
+    buehne();
+
+    await nutzer.click(screen.getByRole("button", { name: "+ Person hinzufügen" }));
+    await nutzer.click(screen.getByRole("button", { name: "+ Person hinzufügen" }));
+    await nutzer.click(screen.getByLabelText("Schnelleingabe (Tabelle)"));
+
+    const tabelle = screen.getByRole("table");
+    const namen = within(tabelle).getAllByRole("textbox").map((f) => f.getAttribute("aria-label"));
+    expect(namen).toEqual(["Person 1: Vorname", "Person 1: Nachname", "Person 2: Vorname", "Person 2: Nachname"]);
+    // Der Name hängt nicht am Wert: auch mit Inhalt heißt das Feld so.
+    await nutzer.type(within(tabelle).getByRole("textbox", { name: "Person 2: Nachname" }), "Musterfrau");
+    expect(within(tabelle).getByRole("textbox", { name: "Person 2: Nachname" })).toHaveProperty("value", "Musterfrau");
+  });
+
+  it("beschriftet das Feld in „Namen einfügen“ sichtbar, nicht nur per Platzhalter (R2-M5)", async () => {
+    const nutzer = userEvent.setup();
+    buehne();
+
+    await nutzer.click(screen.getByRole("button", { name: "Namen einfügen…" }));
+    const dialog = document.querySelector<HTMLDialogElement>("dialog[aria-label='Namen einfügen']")!;
+    const feld = within(dialog).getByLabelText(/^Namensliste/);
+    expect(feld.tagName).toBe("TEXTAREA");
+    await nutzer.type(feld, "Muster, Max");
+    expect(within(dialog).getByRole("textbox", { name: /^Namensliste/ })).toBe(feld);
+  });
+
   it("übernimmt eine eingefügte Namensliste als Personen", async () => {
     const nutzer = userEvent.setup();
     buehne();

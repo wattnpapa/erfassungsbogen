@@ -538,7 +538,12 @@ function PersonalSchnellTabelle(props: {
                   Funktion ganz, und Namen gerieten auf die falsche Stelle (R2-N8). */}
               <td className="stelle">{platzText(p, org)}</td>
               <td>
+                {/* Name wie bei den Auswahlfeldern der Zeile: ohne ihn sagte
+                    der Vorleser nur den Wert an, ein leeres Feld hieß bloß
+                    „Bearbeitungsfeld" — Vor- und Nachname gerieten vertauscht
+                    auf den Bogen (Audit Runde 2, R2-M5). */}
                 <input
+                  aria-label={`Person ${i + 1}: Vorname`}
                   value={p.vorname}
                   autoFocus={fokusNeue && i === personal.length - 1}
                   onChange={(e) => set(i, { vorname: e.target.value })}
@@ -547,6 +552,7 @@ function PersonalSchnellTabelle(props: {
               </td>
               <td>
                 <input
+                  aria-label={`Person ${i + 1}: Nachname`}
                   value={p.nachname}
                   onChange={(e) => set(i, { nachname: e.target.value })}
                   onKeyDown={(e) => enterWeiter(e, i)}
@@ -1076,13 +1082,18 @@ export function SchrittPersonal({ bogen, aendern: aendernRoh }: SchrittProps) {
           Praktisch, wenn die Liste schon existiert (Nachricht, Tabelle, Zettel):
           einfach hier hineinkopieren.
         </p>
-        <textarea
-          rows={8}
-          value={namenText}
-          onChange={(e) => setNamenText(e.target.value)}
-          placeholder={"Muster, Max\nErika Musterfrau\n…"}
-          style={{ width: "100%" }}
-        />
+        {/* Sichtbare Beschriftung statt nur Platzhalter: der verschwand mit
+            der ersten Eingabe, und mit ihm der Name des Felds (R2-M5). */}
+        <label className="feld">
+          Namensliste (eine Person je Zeile)
+          <textarea
+            rows={8}
+            value={namenText}
+            onChange={(e) => setNamenText(e.target.value)}
+            placeholder={"Muster, Max\nErika Musterfrau\n…"}
+            style={{ width: "100%" }}
+          />
+        </label>
         {/* Vorschau: Wer welche Rolle bekommt, entscheidet über die gemeldete
             Stärke — das darf nicht erst im fertigen Bogen auffallen. */}
         {namenVorschau.length > 0 && (
