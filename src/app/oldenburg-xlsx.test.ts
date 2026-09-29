@@ -378,7 +378,7 @@ describe("Oldenburg-XLSX: Sammlung", () => {
 
   it("übernimmt Zug-Etikett und Teil-Bezeichnung aus der Meldung", () => {
     const s = sammlung([
-      meldung(bogen(), { status: MeldeStatus.ABGERUECKT, zugEtikett: "2. TZ", teilEtikett: "Fachberater" }),
+      meldung(bogen(), { zugEtikett: "2. TZ", teilEtikett: "Fachberater" }),
     ]);
     const b = blatt(einsatzOldenburgXlsx(s));
     // Die Einheit ist eine Gruppe → die Zug-Spalte trägt die Zuordnung des Meldekopfs.
@@ -397,6 +397,132 @@ describe("Oldenburg-XLSX: Sammlung", () => {
   it("nimmt die Eintrags-ID der Sammlung als Bogen-ID", () => {
     const e = meldung(bogen(), { id: "abc12345" });
     expect(wert(blatt(einsatzOldenburgXlsx(sammlung([e]))), 1, "ID Einheiten-Erfassungsbogen")).toBe("abc12345");
+  });
+});
+
+/**
+ * Audit Runde 2, R2-K2: Die Liste für die übergeordnete Führungsstelle muss
+ * dieselbe Lage zeigen wie die App — Summen nur über zählende Einheiten,
+ * Abgerückte erkennbar mit Abrückzeit, Auftrag und Eintreffzeit des Meldekopfs.
+ */
+describe("Oldenburg-XLSX: Lage wie in der App (R2-K2)", () => {
+  const einheit = bogen().einheit;
+  /** Ortszeit → Excel-Datumszahl, unabhängig von der Zeitzone des Testrechners. */
+  const excelOrtszeit = (j: number, mo: number, t: number, h: number, mi: number) =>
+    25569 + Date.UTC(j, mo - 1, t, h, mi) / 86400000;
+  const ms = (j: number, mo: number, t: number, h: number, mi: number) => new Date(j, mo - 1, t, h, mi).getTime();
+
+  // Fixture-Stärke je Einheit: 1 Führer, 0 Unterführer, 2 Helfer.
+  const fgrE = meldung(bogen(), {
+    id: "fgre",
+    notiz: "Deichabschnitt Nord, Sandsackverbau ab 14:00",
+    eingetroffenAm: ms(2026, 9, 29, 9, 40),
+  });
+  const bergung = meldung(bogen({ einheit: { ...einheit, einheitsTyp: { code: 4 } } }), {
+    id: "b",
+    empfangenAm: ms(2026, 9, 29, 10, 15),
+  });
+  const abgerueckt = meldung(bogen({ einheit: { ...einheit, einheitsTyp: { code: 20 } } }), {
+    id: "ess",
+    status: MeldeStatus.ABGERUECKT,
+    abgerueckAm: ms(2026, 9, 29, 16, 3),
+  });
+  const uebung = meldung(bogen({ uebung: true, einheit: { ...einheit, einheitsTyp: { code: 3 } } }), { id: "ztr" });
+
+  function lage(art: number) {
+    return blatt(einsatzOldenburgXlsx({ ...sammlung([fgrE, bergung, abgerueckt, uebung]), art }));
+  }
+
+  /** Summe, die Excel für die SUBTOTAL-Formel in Zeile 1 rechnen würde. */
+  function subtotal(b: string, kopf: string): number {
+    const formel = zelle(b, `${spalteVon(b, kopf)}1`)!;
+    const m = /^=SUBTOTAL\(9,([A-Z]+)(\d+):([A-Z]+)(\d+)\)$/.exec(formel);
+    expect(m, formel).not.toBeNull();
+    let summe = 0;
+    for (let z = Number(m![2]); z <= Number(m![4]); z++) summe += Number(zelle(b, `${m![1]}${z}`) ?? 0);
+    return summe;
+  }
+
+  /** Zeilennummer (Blatt) der Zeile mit dieser Bogen-ID. */
+  function zeileMitId(b: string, id: string): number {
+    const sp = spalteVon(b, "ID Einheiten-Erfassungsbogen");
+    for (let z = 3; z < 30; z++) if (zelle(b, `${sp}${z}`) === id) return z;
+    throw new Error(`keine Zeile mit ID ${id}`);
+  }
+
+  it("summiert in einer echten Lage nur die zählenden Einheiten — wie die App", () => {
+    const b = lage(0);
+    // App-Summe: zwei zählende Einheiten (FGr E, B) → Fü 2, Ufü 0, He 4.
+    expect(subtotal(b, "Fü")).toBe(2);
+    expect(subtotal(b, "Ufü")).toBe(0);
+    expect(subtotal(b, "He")).toBe(4);
+    expect(zelle(b, "AJ1")).toBe("=SUBTOTAL(9,AJ3:AJ4)");
+  });
+
+  it("stellt Abgerückte und Übungsmeldungen in einen überschriebenen Block unter den Summen", () => {
+    const b = lage(0);
+    expect(zelle(b, "A5"), "Leerzeile vor dem Block").toBeUndefined();
+    expect(zelle(b, "A6")).toBe("Nicht in der Lage gezählt (abgerückt, aufgegangen oder Übung) — 2 Einheit(en), in den Summen oben NICHT enthalten");
+    const zEss = zeileMitId(b, "ess");
+    const zZtr = zeileMitId(b, "ztr");
+    expect([zEss, zZtr].sort()).toEqual([7, 8]);
+    const bem = spalteVon(b, "Bemerkung");
+    expect(zelle(b, `${bem}${zEss}`)).toBe("ABGERÜCKT — zählt nicht in der Lage");
+    expect(zelle(b, `${bem}${zZtr}`)).toBe("ÜBUNG — zählt nicht in der Lage");
+  });
+
+  it("trägt die Abrückzeit in „Einsatz-ende“ und lässt „Rück-führung“ der Führungsstelle", () => {
+    const b = lage(0);
+    const z = zeileMitId(b, "ess");
+    expect(Number(zelle(b, `${spalteVon(b, "Einsatz-\nende")}${z}`))).toBeCloseTo(excelOrtszeit(2026, 9, 29, 16, 3), 6);
+    expect(zelle(b, `${spalteVon(b, "Rück-\nführung")}${z}`)).toBe("");
+  });
+
+  it("zählt in einer Übungssammlung auch den Übungsbogen — gleiche Regel wie die App", () => {
+    const b = lage(1);
+    // FGr E, B und ZTr TZ zählen; nur die abgerückte Einheit steht im Block.
+    expect(subtotal(b, "Fü")).toBe(3);
+    expect(subtotal(b, "He")).toBe(6);
+    expect(zelle(b, "A7")).toMatch(/— 1 Einheit\(en\)/);
+    expect(zeileMitId(b, "ztr")).toBeLessThanOrEqual(5);
+  });
+
+  it("schreibt den Auftrag der Führungsstelle in „Aufträge“ und den Bogen-Auftrag in „Vorgesehener Auftrag“", () => {
+    const b = lage(0);
+    const z = zeileMitId(b, "fgre");
+    expect(zelle(b, `${spalteVon(b, "Aufträge")}${z}`)).toBe("Deichabschnitt Nord, Sandsackverbau ab 14:00");
+    expect(zelle(b, `${spalteVon(b, "Vorgesehener Auftrag")}${z}`)).toBe("Deichverteidigung");
+    // Ohne Notiz bleibt „Aufträge" leer — kein Bogen-Text, der sich als Auftrag von hier liest.
+    expect(zelle(b, `${spalteVon(b, "Aufträge")}${zeileMitId(b, "b")}`)).toBeUndefined();
+  });
+
+  it("schreibt die Eintreffzeit des Meldekopfs in „eingetr. / zugew.“", () => {
+    const b = lage(0);
+    const sp = spalteVon(b, "eingetr. / zugew.");
+    // Korrigierte Eintreffzeit …
+    expect(Number(zelle(b, `${sp}${zeileMitId(b, "fgre")}`))).toBeCloseTo(excelOrtszeit(2026, 9, 29, 9, 40), 6);
+    // … sonst der Empfangszeitpunkt, wie die App ihn anzeigt.
+    expect(Number(zelle(b, `${sp}${zeileMitId(b, "b")}`))).toBeCloseTo(excelOrtszeit(2026, 9, 29, 10, 15), 6);
+  });
+
+  it("nennt bei aufgegangenen Teilen die Einheit, in der sie aufgegangen sind", () => {
+    const teil = meldung(bogen(), {
+      id: "teil",
+      einheitSchluessel: "teil-1",
+      status: MeldeStatus.AUFGEGANGEN,
+      aufgegangenIn: { einheitSchluessel: bergung.einheitSchluessel, zusammengefuehrtAm: 0 },
+    });
+    const b = blatt(einsatzOldenburgXlsx(sammlung([bergung, teil])));
+    expect(zelle(b, `${spalteVon(b, "Bemerkung")}${zeileMitId(b, "teil")}`)).toMatch(
+      /^AUFGEGANGEN in .+ — zählt nicht in der Lage$/,
+    );
+    expect(subtotal(b, "Fü")).toBe(1);
+  });
+
+  it("schreibt ohne nicht zählende Einheiten keinen Block", () => {
+    const b = blatt(einsatzOldenburgXlsx(sammlung([fgrE])));
+    expect(b).not.toContain("Nicht in der Lage gezählt");
+    expect(b).toContain('<dimension ref="A1:AJ3"/>');
   });
 });
 

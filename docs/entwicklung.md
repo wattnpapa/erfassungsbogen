@@ -463,10 +463,15 @@ localStorage-Hülle getrennt und unit-getestet.
   `Status`-Spalte hält sie auseinander. Formatgrundlagen (Semikolon, UTF-8-BOM,
   Dezimalkomma für Excel(DE)) stehen in [src/app/csv.ts](../src/app/csv.ts).
 - [src/app/oldenburg-xlsx.ts](../src/app/oldenburg-xlsx.ts) — XLSX im **fremden**
-  Format „Oldenburg": die Einheitenliste der Führungsstelle, 38 Spalten (A–AL) in
+  Format „Oldenburg": die Einheitenliste der Führungsstelle, 36 Spalten (A–AJ) in
   fester Reihenfolge, Zeile 1 farbige Leiste mit `SUBTOTAL`-Summen, Zeile 2
   Kopfzeile, ab Zeile 3 je Einheit eine Zeile. Für den Einzelbogen wie für die
-  ganze Sammlung. Spaltenfolge, Farben, Rahmen und das Datumsformat sind aus der
+  ganze Sammlung. Bei der Sammlung laufen die Summen nur über die Einheiten,
+  die in die Lage zählen (`zaehltInLage`, wie App und CSV); abgerückte,
+  aufgegangene und Übungsmeldungen folgen nach einer Leerzeile in einem
+  überschriebenen Block außerhalb der Formeln. Eintreffzeit, Abrückzeit und
+  Auftrag/Notiz des Meldekopfs landen in „eingetr. / zugew.", „Einsatz-ende"
+  und „Aufträge"; der Ort/Auftrag aus dem Bogen in „Vorgesehener Auftrag". Spaltenfolge, Farben, Rahmen und das Datumsformat sind aus der
   Vorlagendatei übernommen und **nicht verhandelbar** — der Empfänger fügt die
   Zeilen in seine laufende Liste ein. Spalten, die der Führungsstelle gehören
   (Ablösung, Anforderungs-ID, Zusagen, Rückführung, Schicht, FüSt.), bleiben

@@ -33,6 +33,11 @@ Grundlage: Repository `wattnpapa/erfassungsbogen`, Stand 2026-09-12 — Version 
 > am Meldekopf; sie darf den eigenen Bogen nicht mehr vom Rückholplatz
 > verdrängen und wird im Zweifel mit Ansage verworfen. Folgemeldungen erben auf
 > jedem Eingangsweg Zug, Auftrag und Eintreffzeit (3.3 D1, D2c).
+>
+> **Nachgezogen 2026-09-29:** Excel-Liste „Oldenburg" (Audit Runde 2, R2-K2) —
+> trägt jetzt Eintreff-/Abrückzeit und den Auftrag/die Notiz der
+> Führungsstelle; nicht zählende Einheiten stehen in einem Block außerhalb der
+> SUBTOTAL-Summen (5.4).
 
 ## Hinweis zu diesem Dokument
 
@@ -320,6 +325,15 @@ Datenausleitung an eine andere Herkunft ist technisch unterbunden.
   bestehenden Formel-Abwehr. Die Sammel-PDF entsteht auch ohne anwesende
   Einheiten (Einsatzende). Wohin Ausdruck und Datei gelangen, entscheidet
   weiterhin der Nutzer (DSFA 5.8).
+- **Excel-Liste „Oldenburg"** (`src/app/oldenburg-xlsx.ts`, seit 2026-09-29,
+  Audit Runde 2, R2-K2): führt dieselben Führungsstellen-Angaben — Eintreffzeit
+  in „eingetr. / zugew.", Abrückzeit in „Einsatz-ende", Auftrag/Notiz
+  (Freitext) in „Aufträge". Der Freitext steht als `inlineStr` in der Zelle
+  und wird von Excel nie als Formel ausgewertet; `&`/`<` escapt der
+  XLSX-Writer. Die SUBTOTAL-Summen laufen nur über die in die Lage zählenden
+  Einheiten (dieselbe Regel wie App und CSV); abgerückte, aufgegangene und
+  Übungsmeldungen stehen gekennzeichnet in einem Block darunter — eine zu
+  hohe Stärke in der Liste der nächsten Ebene wäre ein Integritätsfehler.
 
 - **Teilexport „Nur neue Bögen seit dem letzten Export"**
   (`src/app/export-stand.ts`, seit 2026-09-27): Sammel-PDF, beide CSV-Wege und

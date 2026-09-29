@@ -184,6 +184,21 @@ export function excelZeitpunkt(minuten: number): number {
   return EEB_EPOCHE_EXCEL + minuten / 1440;
 }
 
+/** Excel-Tageszahl des 1.1.1970 — Nullpunkt von `Date.now()`. */
+const UNIX_EPOCHE_EXCEL = 25569;
+
+/**
+ * Geräteuhr-Zeitpunkt (Millisekunden, `Date.now()`) → Excel-Datumszahl in
+ * ORTSZEIT, auf die Minute abgeschnitten. Excel kennt keine Zeitzonen: die Zahl
+ * muss die Wanduhrzeit tragen, die auch die App anzeigt (siehe zeitLang), sonst
+ * stünde in der Liste 14:03 statt 16:03.
+ */
+export function excelAusMs(ms: number): number {
+  const minute = Math.floor(ms / 60000) * 60000;
+  const ortsMs = minute - new Date(minute).getTimezoneOffset() * 60000;
+  return UNIX_EPOCHE_EXCEL + ortsMs / 86400000;
+}
+
 /** Eine Zelle: Wert (Text, Zahl oder Formel) plus optionale Stilnummer. */
 export interface Zelle {
   /** 0-basierter Spaltenindex. */

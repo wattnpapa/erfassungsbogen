@@ -33,6 +33,13 @@ Grundlage: Repository `wattnpapa/erfassungsbogen`, Stand 2026-09-12 — Version 
 > angefangene Erfassung einer fremden Einheit verdrängt den eigenen Bogen nicht
 > mehr vom Rückholplatz; sie wird stattdessen nach Rückfrage verworfen.
 > Geändert: 5.7.
+>
+> **Nachgezogen 2026-09-29 — Excel-Liste „Oldenburg" (Audit Runde 2, R2-K2):**
+> Die Excel-Liste für die übergeordnete Führungsstelle trägt jetzt auch
+> Eintreffzeit, Abrückzeit und den Auftrag/die Notiz der Führungsstelle
+> (Freitext) je Einheit; abgerückte, aufgegangene und Übungsmeldungen stehen in
+> einem eigenen Block außerhalb der Summen. Damit verlässt der Notiz-Freitext
+> das Meldekopf-Gerät auch über diesen Exportweg. Geändert: 5.1, 5.5.
 
 ## Hinweis zu diesem Dokument
 
@@ -193,7 +200,9 @@ definieren.
 - Führung der Kräfteübersicht am Meldekopf mit Eintreff- und Abrückzeit je
   Einheit und einer Notiz/einem Auftrag der Führungsstelle; Ausgabe als
   Übergabeblatt (Sammel-PDF mit eingebetteter Sammlung) und einseitiges
-  Lageblatt für Wand, Ablösung und Einsatztagebuch (seit 2026-09-27).
+  Lageblatt für Wand, Ablösung und Einsatztagebuch (seit 2026-09-27); dieselben
+  Angaben gehen seit 2026-09-29 auch in die Excel-Liste „Oldenburg" für die
+  übergeordnete Führungsstelle.
 - Weitergabe einer gespeicherten Vorlage (Stammdaten der eigenen Einheit) an ein
   anderes Gerät oder in eine vom Nutzer gewählte Ablage, damit sie
   geräteunabhängig verfügbar ist.
@@ -249,7 +258,12 @@ biometrische Daten, strafrechtliche Daten.
 - Beim Empfänger: Dekodierung, optionale Signaturprüfung (reiner Anzeigestatus,
   blockiert den Import nie), Aufnahme in die lokale Einsatz-Sammlung.
 - Aggregation mehrerer Meldungen zu Summen beim Meldekopf.
-- Optionaler Ausdruck (PDF) oder Tabellenexport (CSV/Excel).
+- Optionaler Ausdruck (PDF) oder Tabellenexport (CSV/Excel). Übersichts-CSV,
+  Lageblatt und Excel-Liste „Oldenburg" führen je Einheit auch die
+  Führungsstellen-Zusätze (Eintreff-/Abrückzeit, Auftrag/Notiz als Freitext,
+  siehe 5.4); die Excel-Liste enthält außerdem die Erreichbarkeit der
+  Führungskraft (Name und Kontakt). Abgerückte Einheiten bleiben in allen drei
+  Ausgaben sichtbar, zählen aber nicht in die Summen.
 - „Vorlage teilen": die Vorlage als signierter QR-Code/Link oder als
   unsignierte JSON-Datei (`eeb-vorlage-*.json`). Die Datei trägt nur diese
   eine Vorlage, keinen Geräteschlüssel. Beim Empfänger entsteht daraus wieder
