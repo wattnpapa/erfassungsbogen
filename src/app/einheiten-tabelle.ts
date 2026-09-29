@@ -17,10 +17,10 @@
  * einer angeklickten Spalte um.
  */
 
-import { staerke, unterbringungMWD, verpflegung, type Erfassungsbogen } from "@bos/eeb-format/model";
+import { staerke, type Erfassungsbogen } from "@bos/eeb-format/model";
 import { einheitAnzeigename, orgLabel, vokabText, vokabularFuer, zeitgruppe } from "./hilfen";
 import { MeldeStatus, type EinsatzArt, type MeldeEintrag } from "@bos/meldekopf/einsaetze";
-import { summiereBoegen, zaehltInLage, type EinsatzSummen } from "./auswertung";
+import { summiereBoegen, unterbringungLage, verpflegungLage, zaehltInLage, type EinsatzSummen } from "./auswertung";
 import { eintreffzeit, zeitKurz, zeitpunktZuMs } from "./eintrag-zeiten";
 
 // ------------------------------------------------------------ Bedarfsmarken
@@ -231,8 +231,10 @@ export function tabellenZeilen(eintraege: MeldeEintrag[], art?: EinsatzArt, jetz
   return eintraege.map((e) => {
     const b = e.bogen;
     const st = staerke(b);
-    const vp = verpflegung(b);
-    const u = unterbringungMWD(b);
+    // Dieselben Regeln wie die Summen: Schnellerfassung ohne Aufteilung zählt
+    // die Stärke, nicht die Ansprechpartner (R2-N5).
+    const vp = verpflegungLage(b);
+    const u = unterbringungLage(b);
     const sb = b.sofortbedarf;
     return {
       eintrag: e,

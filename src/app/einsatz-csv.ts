@@ -13,10 +13,10 @@
  * wie alle Exporte rein lokal.
  */
 
-import { staerke, unterbringungMWD, verpflegung, type Erfassungsbogen } from "@bos/eeb-format/model";
+import { staerke, type Erfassungsbogen } from "@bos/eeb-format/model";
 import type { EinsatzArt } from "@bos/meldekopf/einsaetze";
 import { einheitAnzeigename, orgLabel, vokabText, vokabularFuer, zeitgruppe } from "./hilfen";
-import { aktuelleMeldungen, zaehltInLage } from "./auswertung";
+import { aktuelleMeldungen, unterbringungLage, verpflegungLage, zaehltInLage } from "./auswertung";
 import { csvDatei, csvZeile } from "./csv";
 import { eintreffzeit, zeitLang } from "./eintrag-zeiten";
 import { MeldeStatus, neuesteJeEinheit, type Einsatzsammlung, type MeldeEintrag, type MeldeQuelle } from "@bos/meldekopf/einsaetze";
@@ -110,8 +110,9 @@ function absenderText(e: MeldeEintrag): string {
 function datenZeile(art: EinsatzArt, e: MeldeEintrag): string {
   const b = e.bogen;
   const st = staerke(b);
-  const vp = verpflegung(b);
-  const u = unterbringungMWD(b);
+  // Wie Tabelle und Summen: Schnellerfassung zählt die Stärke (R2-N5).
+  const vp = verpflegungLage(b);
+  const u = unterbringungLage(b);
   const sb = b.sofortbedarf;
   return csvZeile([
     einheitName(b),
@@ -166,8 +167,8 @@ function summenZeile(meldungen: MeldeEintrag[]): string {
   for (const e of meldungen) {
     const b = e.bogen;
     const st = staerke(b);
-    const vp = verpflegung(b);
-    const un = unterbringungMWD(b);
+    const vp = verpflegungLage(b);
+    const un = unterbringungLage(b);
     acc.f += st.fuehrer;
     acc.u += st.unterfuehrer;
     acc.m += st.mannschaft;

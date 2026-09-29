@@ -764,6 +764,9 @@ export function EinsatzDetail(props: {
           <dt>Unterbringung</dt>
           <dd>
             M {sum.unterbringung.m} / W {sum.unterbringung.w} / D {sum.unterbringung.d}
+            {/* Schnellerfassungen ohne M/W/D-Aufteilung benennen statt als 0
+                zu verschweigen (Audit Runde 2, R2-N5). */}
+            {sum.unterbringungOhneAngabe > 0 ? ` · ${sum.unterbringungOhneAngabe} ohne M/W/D-Angabe` : ""}
             {sum.unterbringungBenoetigt > 0 ? ` · ${sum.unterbringungBenoetigt}× angefordert` : ""}
           </dd>
           <dt>Kraftstoff</dt>
@@ -794,6 +797,7 @@ export function EinsatzDetail(props: {
               <p className="hinweis">
                 Verpflegung {g.summen.verpflegung.gesamt}
                 {" · "}Unterbringung M {g.summen.unterbringung.m} / W {g.summen.unterbringung.w} / D {g.summen.unterbringung.d}
+                {g.summen.unterbringungOhneAngabe > 0 ? ` (${g.summen.unterbringungOhneAngabe} ohne Angabe)` : ""}
                 {" · "}Fahrzeuge {g.summen.fahrzeuge}
               </p>
             </div>

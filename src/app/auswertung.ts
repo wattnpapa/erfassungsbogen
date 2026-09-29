@@ -25,6 +25,12 @@ export interface EinsatzSummen {
   staerke: Staerke;
   verpflegung: VerpflegungSplit;
   unterbringung: { m: number; w: number; d: number };
+  /**
+   * Personen, deren M/W/D-Aufteilung niemand angegeben hat (Schnellerfassung
+   * nur mit Stärke, ohne „Unterbringung M/W/D angeben"). Sie stehen nicht
+   * stillschweigend als 0 in M/W/D, sondern werden benannt (R2-N5).
+   */
+  unterbringungOhneAngabe: number;
   /** Einheiten, die Unterbringung angefordert haben (Sofortbedarf). */
   unterbringungBenoetigt: number;
   kraftstoff: { dieselLiter: number; benzinLiter: number; gemischLiter: number };
@@ -74,11 +80,43 @@ function leereSummen(): EinsatzSummen {
     staerke: { fuehrer: 0, unterfuehrer: 0, mannschaft: 0, gesamt: 0 },
     verpflegung: { gesamt: 0, fleisch: 0, vegetarisch: 0, vegan: 0 },
     unterbringung: { m: 0, w: 0, d: 0 },
+    unterbringungOhneAngabe: 0,
     unterbringungBenoetigt: 0,
     kraftstoff: { dieselLiter: 0, benzinLiter: 0, gemischLiter: 0 },
     ruhezeitErforderlich: 0,
     fahrzeuge: 0,
   };
+}
+
+/**
+ * Verpflegungs-Kopfzahl eines Bogens für die Lage.
+ *
+ * Das Model (`verpflegung`, Submodul) zählt ohne manuelle Aufteilung die
+ * Personalliste. Bei einer Schnellerfassung nur mit Stärke stehen dort aber nur
+ * die „nicht gezählten" Ansprechpartner — heraus kamen „Verpflegung 0" bei
+ * 12 anwesenden Helfern bzw. „Verpflegung 1" für die eine Kontaktperson
+ * (Audit Runde 2, R2-N5). Hier gilt dann die Stärke, alle als „sonstige" —
+ * genau so, wie die Erfassung selbst es anzeigt („0 von 12 vegetarisch/vegan ·
+ * 12 sonstige").
+ */
+export function verpflegungLage(b: Erfassungsbogen): VerpflegungSplit {
+  if (b.staerkeManuell && !b.verpflegungManuell) {
+    const gesamt = b.staerkeManuell.gesamt;
+    return { gesamt, fleisch: gesamt, vegetarisch: 0, vegan: 0 };
+  }
+  return verpflegung(b);
+}
+
+/**
+ * Unterbringung M/W/D eines Bogens für die Lage — bei Schnellerfassung ohne
+ * M/W/D-Angabe nicht aus den Ansprechpartnern abgeleitet (die zählen nicht,
+ * R2-N5), sondern als `ohneAngabe` mit der Gesamtstärke.
+ */
+export function unterbringungLage(b: Erfassungsbogen): { m: number; w: number; d: number; ohneAngabe: number } {
+  if (b.staerkeManuell && !b.unterbringungManuell) {
+    return { m: 0, w: 0, d: 0, ohneAngabe: b.staerkeManuell.gesamt };
+  }
+  return { ...unterbringungMWD(b), ohneAngabe: 0 };
 }
 
 /**
@@ -95,16 +133,17 @@ export function summiereBoegen(boegen: Erfassungsbogen[]): EinsatzSummen {
     s.staerke.mannschaft += st.mannschaft;
     s.staerke.gesamt += st.gesamt;
 
-    const vp = verpflegung(b);
+    const vp = verpflegungLage(b);
     s.verpflegung.gesamt += vp.gesamt;
     s.verpflegung.fleisch += vp.fleisch;
     s.verpflegung.vegetarisch += vp.vegetarisch;
     s.verpflegung.vegan += vp.vegan;
 
-    const u = unterbringungMWD(b);
+    const u = unterbringungLage(b);
     s.unterbringung.m += u.m;
     s.unterbringung.w += u.w;
     s.unterbringung.d += u.d;
+    s.unterbringungOhneAngabe += u.ohneAngabe;
 
     if (b.sofortbedarf) {
       s.kraftstoff.dieselLiter += b.sofortbedarf.dieselLiter;

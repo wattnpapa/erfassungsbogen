@@ -175,3 +175,42 @@ describe("Übungsmeldungen und die Lage", () => {
     expect(aktuelleMeldungen(eintraege)).toHaveLength(2);
   });
 });
+
+describe("Schnellerfassung nur mit Stärke (Audit Runde 2, R2-N5)", () => {
+  const schnell = (name: string, over: Partial<Erfassungsbogen> = {}) =>
+    bogen(name, {
+      personalErfassung: PersonalErfassung.NUR_STAERKE,
+      staerkeManuell: { fuehrer: 1, unterfuehrer: 2, mannschaft: 9, gesamt: 12 },
+      personal: [],
+      sofortbedarf: undefined,
+      ...over,
+    });
+
+  it("zählt die Stärke als Verpflegung, auch ohne Sofortbedarf und ohne Aufteilung", () => {
+    const s = aggregiere([meldung(schnell("Aalen"))]);
+    expect(s.verpflegung).toEqual({ gesamt: 12, fleisch: 12, vegetarisch: 0, vegan: 0 });
+    expect(s.unterbringung).toEqual({ m: 0, w: 0, d: 0 });
+    expect(s.unterbringungOhneAngabe).toBe(12);
+  });
+
+  it("zählt eine nicht gezählte Kontaktperson weder in Verpflegung noch in Unterbringung", () => {
+    const s = aggregiere([meldung(schnell("Aalen", { personal: [person(StaerkeRolle.FUEHRER)] }))]);
+    expect(s.verpflegung.gesamt).toBe(12);
+    expect(s.unterbringung.m).toBe(0);
+    expect(s.unterbringungOhneAngabe).toBe(12);
+  });
+
+  it("übernimmt angegebene Aufteilungen unverändert", () => {
+    const s = aggregiere([
+      meldung(
+        schnell("Aalen", {
+          unterbringungManuell: { m: 8, w: 4, d: 0 },
+          verpflegungManuell: { vegetarisch: 2, vegan: 1 },
+        }),
+      ),
+    ]);
+    expect(s.verpflegung).toEqual({ gesamt: 12, fleisch: 9, vegetarisch: 2, vegan: 1 });
+    expect(s.unterbringung).toEqual({ m: 8, w: 4, d: 0 });
+    expect(s.unterbringungOhneAngabe).toBe(0);
+  });
+});
