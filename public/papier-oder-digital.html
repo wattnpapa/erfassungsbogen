@@ -313,6 +313,11 @@
        („Katastrophenschutz-Bogen"). anywhere senkt sie. */
     .start { max-width: 100%; overflow-wrap: anywhere; }
     /* UMBRUCH:CSS:END */
+    /* WERKZEUGE:CSS:START */
+    footer .werkzeuge { display: flex; flex-wrap: wrap; align-items: center; gap: 0 0.5rem; margin-top: 1rem; padding-top: 0.5rem; border-top: 1px solid var(--rand); color: var(--text-2); }
+    footer .werkzeuge a { display: inline-flex; align-items: center; min-height: 2.75rem; color: var(--text-2); text-decoration: underline; text-decoration-color: var(--rand); text-underline-offset: 0.2em; }
+    footer .werkzeuge a:hover { color: var(--blau); text-decoration-color: currentColor; }
+    /* WERKZEUGE:CSS:END */
   </style>
 </head>
 <body>
@@ -620,6 +625,17 @@
         Bezeichnung der jeweiligen Organisation verwendet.
       </p>
       <!-- HINWEIS:END -->
+      <!-- WERKZEUGE:START -->
+      <nav class="werkzeuge" aria-label="Weitere Werkzeuge">
+        <a href="https://erfassungsbogen.app/">erfassungsbogen.app</a>
+        <span class="werkzeuge-trenner" aria-hidden="true">·</span>
+        <a href="https://fmbauplaner.app/">fmbauplaner.app</a>
+        <span class="werkzeuge-trenner" aria-hidden="true">·</span>
+        <a href="https://nachrichtenvordruck.app/">nachrichtenvordruck.app</a>
+        <span class="werkzeuge-trenner" aria-hidden="true">·</span>
+        <a href="https://sprechfunk-uebung.de/">sprechfunk-uebung.de</a>
+      </nav>
+      <!-- WERKZEUGE:END -->
     </footer>
   </main>
 

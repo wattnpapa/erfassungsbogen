@@ -3,7 +3,7 @@
  * Aufbau angelehnt an sprechfunk-uebung.de (gleicher Autor).
  */
 
-import { useEffect, useRef, useState, type ChangeEvent, type ReactNode, type RefObject } from "react";
+import { Fragment, useEffect, useRef, useState, type ChangeEvent, type ReactNode, type RefObject } from "react";
 import { staerke, type Erfassungsbogen } from "@bos/eeb-format/model";
 import { istNativ, linkTeilen, shareSheetVerfuegbar, textTeilen } from "./nativ";
 import { fehlerText } from "./nachladen";
@@ -31,6 +31,7 @@ import { geraeteKurzform, geraeteSchluesselLoeschen, geraeteSchluesselSicherstel
 import { speicherBelegung, speicherText } from "./eintrag-zeiten";
 import { groessteText } from "./speicher-warnung";
 import { dauerhaftenSpeicherAnfragen, speicherDauerhaft } from "./speicher-browser";
+import { WERKZEUGE, WERKZEUGE_TITEL } from "./werkzeuge";
 
 const KONTAKT = "johannes.rudolph@thw-oldenburg.de";
 const REPO = "https://github.com/wattnpapa/erfassungsbogen";
@@ -707,6 +708,7 @@ export function Fusszeile({ onBogenOeffnen, kompakt = false }: {
         </nav>
         <Impressumsdialog dialogRef={impressum} />
         <Datenschutzdialog dialogRef={datenschutz} />
+        <Werkzeugzeile />
       </footer>
     );
   }
@@ -759,7 +761,6 @@ export function Fusszeile({ onBogenOeffnen, kompakt = false }: {
           <a href={VORLAGE} target="_blank" rel="noopener noreferrer">Aufbau des Bogens</a>
           <a href={`mailto:${KONTAKT}`}>Kontakt</a>
           <a href={REPO} target="_blank" rel="noopener noreferrer">Open Source auf GitHub</a>
-          <a href="https://sprechfunk-uebung.de/" target="_blank" rel="noopener noreferrer">Sprechfunk-Übungsgenerator</a>
         </nav>
         {/* Registerentscheidung der Oberfläche: Du — wie an allen anderen
             Stellen (Absenderkarte, Hinweise); ein einzelnes „Sie" wirkte hier
@@ -1119,7 +1120,27 @@ export function Fusszeile({ onBogenOeffnen, kompakt = false }: {
       <Impressumsdialog dialogRef={impressum} />
 
       <Datenschutzdialog dialogRef={datenschutz} />
+
+      <Werkzeugzeile />
     </footer>
+  );
+}
+
+/**
+ * Letzte Zeile jeder Fußzeile: die Werkzeuge desselben Autors (werkzeuge.ts).
+ * Der Mittelpunkt steht als eigenes, verborgenes Element zwischen den Links —
+ * nicht unterstrichen, nicht angetippt, nicht vorgelesen.
+ */
+function Werkzeugzeile() {
+  return (
+    <nav className="fuss-werkzeuge" aria-label={WERKZEUGE_TITEL}>
+      {WERKZEUGE.map((w, i) => (
+        <Fragment key={w.href}>
+          {i > 0 && <span aria-hidden="true">·</span>}
+          <a href={w.href} target="_blank" rel="noopener noreferrer">{w.label}</a>
+        </Fragment>
+      ))}
+    </nav>
   );
 }
 

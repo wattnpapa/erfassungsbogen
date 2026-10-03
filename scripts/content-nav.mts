@@ -10,8 +10,9 @@
  * und ein Nav-Änderung (neuer Link, neue Reihenfolge) 33 Handbearbeitungen
  * nach sich ziehen. Das Skript injiziert stattdessen markierte Blöcke
  * (`<!-- NAV:START -->` … `<!-- NAV:END -->` nach `<body>`,
- * `<!-- FUSSNAV:START -->` … `<!-- FUSSNAV:END -->` im `<footer>`) sowie einen
- * zugehörigen `<!-- NAV:CSS:START -->`-Block am Ende des Style-Tags — beim
+ * `<!-- FUSSNAV:START -->` … `<!-- FUSSNAV:END -->` im `<footer>`,
+ * `<!-- WERKZEUGE:START -->` … `<!-- WERKZEUGE:END -->` als letzte Zeile des
+ * `<footer>`) sowie die zugehörigen CSS-Blöcke am Ende des Style-Tags — beim
  * erneuten Lauf werden bestehende Blöcke ersetzt, nicht verdoppelt.
  *
  * Aufruf (Node ≥ 22): npm run content-nav
@@ -37,11 +38,12 @@ import { readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { kopfnavHtml } from "../src/app/kopfnav.js";
+import { werkzeugeHtml } from "../src/app/werkzeuge.js";
 
 const wurzel = join(dirname(fileURLToPath(import.meta.url)), "..");
 const publicDir = join(wurzel, "public");
 
-/** Seiten, die absichtlich KEINE Kopfnavigation bekommen. */
+/** Seiten, die absichtlich KEINE Kopf- und Fußnavigation bekommen (die Werkzeugzeile schon). */
 const AUSGENOMMEN = new Set(["404.html"]);
 
 /**
@@ -272,7 +274,43 @@ const NAV_CSS = `/* NAV:CSS:START */
  * Inhalt der Fußzeile bis zum Markenhinweis bzw. `</footer>`. Group 1 ist das
  * öffnende `<footer>`-Tag, Group 2 der zu ersetzende Bereich, Group 3 das Ende.
  */
-const FUSS_MUSTER = /(<footer[^>]*>)([\s\S]*?)\s*(<!-- HINWEIS:START -->|<\/footer>)/;
+const FUSS_MUSTER = /(<footer[^>]*>)([\s\S]*?)\s*(<!-- HINWEIS:START -->|<!-- WERKZEUGE:START -->|<\/footer>)/;
+
+/**
+ * Werkzeugzeile (src/app/werkzeuge.ts): die letzte Zeile jeder Fußzeile, auch
+ * auf 404.html, das sonst keine Navigation bekommt. Werte aus den Rollen-Token
+ * der Seiten: --text-2 für die Schrift, --rand für Linie und Unterstreichung,
+ * --blau (die Kennfarbe, in jedem Anzeigemodus neu belegt) beim Überfahren.
+ * Der Schriftgrad erbt den Nebentext der Fußzeile (0.875rem). Die Höhe ist das
+ * Tippmaß aller Seiten (--ziel-basis, 2.75rem) — die Links stehen als Reihe,
+ * nicht im Fließtext, die WCAG-Ausnahme greift hier nicht.
+ */
+const WERKZEUGE_CSS = `/* WERKZEUGE:CSS:START */
+    footer .werkzeuge { display: flex; flex-wrap: wrap; align-items: center; gap: 0 0.5rem; margin-top: 1rem; padding-top: 0.5rem; border-top: 1px solid var(--rand); color: var(--text-2); }
+    footer .werkzeuge a { display: inline-flex; align-items: center; min-height: 2.75rem; color: var(--text-2); text-decoration: underline; text-decoration-color: var(--rand); text-underline-offset: 0.2em; }
+    footer .werkzeuge a:hover { color: var(--blau); text-decoration-color: currentColor; }
+    /* WERKZEUGE:CSS:END */`;
+
+/** Werkzeugzeile als letztes Element der Fußzeile einsetzen bzw. erneuern. */
+function injectWerkzeuge(inhalt: string, datei: string): string {
+  let neu = inhalt;
+  const blockMuster = /<!-- WERKZEUGE:START -->[\s\S]*?<!-- WERKZEUGE:END -->/;
+  if (blockMuster.test(neu)) {
+    neu = neu.replace(blockMuster, werkzeugeHtml());
+  } else if (neu.includes("</footer>")) {
+    neu = neu.replace(/\n?(\s*)<\/footer>/, `\n      ${werkzeugeHtml()}\n$1</footer>`);
+  } else {
+    console.warn(`Werkzeugzeile übersprungen (kein <footer>): ${datei}`);
+    return neu;
+  }
+  const cssMuster = /\/\* WERKZEUGE:CSS:START \*\/[\s\S]*?\/\* WERKZEUGE:CSS:END \*\//;
+  if (cssMuster.test(neu)) {
+    neu = neu.replace(cssMuster, WERKZEUGE_CSS);
+  } else {
+    neu = neu.replace("  </style>", `    ${WERKZEUGE_CSS}\n  </style>`);
+  }
+  return neu;
+}
 
 /**
  * Darf der bisherige Fußzeilen-Inhalt überschrieben werden?
@@ -330,15 +368,13 @@ function inject(inhalt: string, datei: string): string {
 }
 
 function main(): void {
-  const dateien = readdirSync(publicDir).filter(
-    (d) => d.endsWith(".html") && !AUSGENOMMEN.has(d),
-  );
+  const dateien = readdirSync(publicDir).filter((d) => d.endsWith(".html"));
 
   let geaendert = 0;
   for (const datei of dateien) {
     const pfad = join(publicDir, datei);
     const vorher = readFileSync(pfad, "utf8");
-    const nachher = inject(vorher, datei);
+    const nachher = injectWerkzeuge(AUSGENOMMEN.has(datei) ? vorher : inject(vorher, datei), datei);
     if (nachher !== vorher) {
       writeFileSync(pfad, nachher, "utf8");
       geaendert++;
