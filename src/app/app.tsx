@@ -73,10 +73,11 @@ import {
   type Einsatzsammlung,
 } from "@bos/meldekopf/einsaetze";
 import { bogenDiff, diffKurzfassung } from "@bos/meldekopf/meldung-diff";
-import { SpeicherVollFehler, eintreffzeitSetzen, istSpeicherVoll, meldungAufnehmen } from "./eintrag-zeiten";
+import { SpeicherVollFehler, eintreffzeitSetzen, istSpeicherVoll, meldungAufnehmen, zeitLang } from "./eintrag-zeiten";
 import { offlineText, useOfflineStand } from "./offline-bereit";
 import { uebergabeFesthalten, uebergabeText, type UebergabeStand } from "./uebergabe-stand";
-import { ART_LABEL, EinsatzDetail, EinsatzListe, type Eingang } from "./einsaetze-ui";
+import { ART_LABEL, EinsatzDetail, EinsatzListe, letzteMeldungText, type Eingang } from "./einsaetze-ui";
+import { letzteMeldung } from "./einheiten-tabelle";
 import { exportSammlung, exportStandLaden, exportVermerken, type ExportStand, type ExportUmfang } from "./export-stand";
 import { aktuelleMeldungen } from "./auswertung";
 import { boegenAusJsonText, boegenAusPdfBytes, einsatzAusDatei, einsatzAusPdfBytes, einsatzDateiInhalt, istPdfDatei, pdfInhaltArt } from "./einsatz-transport";
@@ -2319,12 +2320,17 @@ function AppInhalt() {
       // Vor Ort entfernte Meldungen kommen nicht still zurück (R2-D4).
       const geklaert = await entfernteImImportKlaeren(s);
       const r = einsatzImportieren(geklaert.sammlung);
+      const letzteImImport = letzteMeldung(geklaert.sammlung.eintraege);
       einsaetzeNeuLaden();
       setFehler("");
       setMeldung(
         (r.neuerEinsatz
           ? `Einsatz „${s.name}" importiert (${r.hinzugefuegt} Meldung(en)).`
-          : `Einsatz „${s.name}": ${r.hinzugefuegt} neue Meldung(en) ergänzt.`) + geklaert.hinweis,
+          : `Einsatz „${s.name}": ${r.hinzugefuegt} neue Meldung(en) ergänzt.`) +
+          // Wie aktuell die übernommene Lage ist: Kam auf dem alten Gerät
+          // danach noch etwas, fehlt es hier (Audit Runde 3, R3-K5).
+          (letzteImImport != null ? ` Letzte Meldung darin: ${zeitLang(letzteImImport)}.` : "") +
+          geklaert.hinweis,
       );
       setOffenerEinsatzId(s.id);
     } catch (err) {
@@ -2335,6 +2341,9 @@ function AppInhalt() {
   // Offener Einsatz (Meldekopf/Zugführer) — Vorrang vor Assistent/Start, aber
   // nicht über der Musterung/dem Assistenten während einer manuellen Erfassung.
   const offenerEinsatz = offenerEinsatzId ? einsaetze.find((s) => s.id === offenerEinsatzId) : null;
+  // Laufende Sammlungen für die Weiche der Startseite (R3-K5): die zuletzt
+  // geänderten, höchstens zwei — sonst wird aus der Weiche eine zweite Liste.
+  const laufende = [...einsaetze].sort((a, b) => b.geaendert - a.geaendert).slice(0, 2);
 
   // Musterung einer Vorlage (Vorrang vor allen anderen Ansichten).
   if (musterVorlage) {
@@ -2605,7 +2614,22 @@ function AppInhalt() {
               {/* „Neuer Einsatz…" lasen Helfer als Beginn der eigenen Meldung
                   (Audit „Neuer Nutzer", F3) — der Knopf nennt jetzt, was er
                   anlegt: die Sammelmappe. */}
-              <button type="button" className="primaer" onClick={neuerEinsatz}>Neue Einsatz-Sammlung…</button>
+              {/* Laufende Sammlungen direkt hier öffnen: auf dem Telefon stand
+                  ihre Karte erst unter Entwurf, Vorlagen und Weiche, bei rund
+                  1 850 px (Audit Runde 3, R3-K5). Die zuletzt geänderten zuerst,
+                  mit dem Zeitpunkt der letzten Meldung. */}
+              {laufende.map((s) => (
+                <button
+                  key={s.id}
+                  type="button"
+                  className="primaer sammlung-oeffnen"
+                  onClick={() => { setMeldung(""); setOffenerEinsatzId(s.id); }}
+                >
+                  „{s.name}" öffnen
+                  <span className="knopf-zusatz">{letzteMeldungText(s)}</span>
+                </button>
+              ))}
+              <button type="button" className={laufende.length > 0 ? "" : "primaer"} onClick={neuerEinsatz}>Neue Einsatz-Sammlung…</button>
               {/* Direkter Einstieg in die Meldekopf-Schnellerfassung: vorher nur
                   als Radio in Schritt 3 erreichbar — unter Zeitdruck fand ihn
                   dort niemand. */}

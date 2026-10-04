@@ -222,6 +222,22 @@ export function zuletztGemeldet(e: MeldeEintrag): number {
   return e.empfangenAm;
 }
 
+/**
+ * Eingang der jüngsten Meldung einer Sammlung (Geräteuhr, ms) — neue
+ * Einheiten wie Folgemeldungen; hier entstandene Fassungen (Aufteilen,
+ * Zusammenführen) zählen nicht. Nach „Einsatz importieren…" tragen die
+ * Meldungen die Empfangszeit des alten Geräts, die Zahl sagt also auch dort,
+ * wann zuletzt etwas einging (Audit Runde 3, R3-K5). null ohne Meldung.
+ */
+export function letzteMeldung(eintraege: MeldeEintrag[]): number | null {
+  let max: number | null = null;
+  for (const e of eintraege) {
+    if (e.quelle === "aufteilung" || e.quelle === "zusammenfuehrung") continue;
+    if (max == null || e.empfangenAm > max) max = e.empfangenAm;
+  }
+  return max;
+}
+
 /** Fassung vor weniger als 30 Minuten eingegangen (Marke „neue Fassung", R3-K1). */
 export function frischGemeldet(e: MeldeEintrag, jetzt = Date.now()): boolean {
   return jetzt - e.empfangenAm < NEU_MS;

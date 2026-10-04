@@ -573,6 +573,22 @@ describe("Assistenten-Durchlauf", () => {
   }, 30000);
 
   /**
+   * Audit Runde 3, R3-K5: Auf dem Telefon lag die Karte der laufenden
+   * Sammlung erst bei rund 1 850 px. Die Weiche bietet sie direkt an.
+   */
+  it("öffnet eine laufende Sammlung direkt aus der Weiche „Bögen sammeln“", async () => {
+    einsatzImSpeicherAnlegen("Sammelhausen", EinsatzArt.EINSATZ);
+    const nutzer = userEvent.setup();
+    render(<App />);
+    const weg = screen.getByRole("region", { name: "Bögen sammeln (Meldekopf)" });
+    const knopf = within(weg).getByRole("button", { name: /^„Sammelhausen" öffnen/ });
+    expect(knopf.className).toContain("primaer");
+    expect(within(weg).getByRole("button", { name: "Neue Einsatz-Sammlung…" }).className).not.toContain("primaer");
+    await nutzer.click(knopf);
+    await screen.findByRole("heading", { level: 1, name: "Sammelhausen" });
+  });
+
+  /**
    * Audit Runde 2, R2-E1: Eine über „‹ Einsatz" abgebrochene Erfassung lag
    * beim nächsten „Einheit manuell erfassen…" auf dem Rückholplatz — und der
    * eigene Bogen war weg. Jetzt fragt die App: fortsetzen oder verwerfen.

@@ -26,6 +26,7 @@ import {
   bedarfMarken,
   folgeAenderung,
   frischGemeldet,
+  letzteMeldung,
   hatSofortbedarf,
   passtZuBedarfsfilter,
   istNeu,
@@ -312,5 +313,15 @@ describe("folgeAenderung / frischGemeldet (Audit Runde 3, R3-K1)", () => {
   it("gilt 30 Minuten nach dem Eingang als frisch", () => {
     expect(frischGemeldet(eintrag("x", bogen("A", 1), { empfangenAm: 1_000_000 }), 1_000_000 + 29 * 60_000)).toBe(true);
     expect(frischGemeldet(eintrag("x", bogen("A", 1), { empfangenAm: 1_000_000 }), 1_000_000 + 31 * 60_000)).toBe(false);
+  });
+});
+
+describe("letzteMeldung (Audit Runde 3, R3-K5)", () => {
+  it("nimmt den jüngsten Eingang, ohne hier entstandene Fassungen", () => {
+    expect(letzteMeldung([])).toBeNull();
+    const a = eintrag("a", bogen("A", 1), { empfangenAm: 1000 });
+    const b = eintrag("b", bogen("B", 1), { empfangenAm: 3000, eingetroffenAm: 10 });
+    const rest = eintrag("c", bogen("B", 1), { empfangenAm: 9000, quelle: "aufteilung" });
+    expect(letzteMeldung([a, b, rest])).toBe(3000);
   });
 });

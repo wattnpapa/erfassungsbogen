@@ -20,7 +20,7 @@ import { cleanup, render, screen, waitFor, within } from "@testing-library/react
 import userEvent from "@testing-library/user-event";
 import { PersonalErfassung, type Erfassungsbogen } from "@bos/eeb-format/model";
 import { Dialogschicht } from "./dialoge";
-import { EinsatzDetail, PRELLSCHUTZ_MS } from "./einsaetze-ui";
+import { EinsatzDetail, PRELLSCHUTZ_MS, letzteMeldungText } from "./einsaetze-ui";
 import {
   EinsatzArt,
   MeldeStatus,
@@ -31,7 +31,7 @@ import {
   meldungHinzufuegen,
   type MeldeEintrag,
 } from "@bos/meldekopf/einsaetze";
-import { eintreffzeitSetzen, meldungAufnehmen, notizSetzen } from "./eintrag-zeiten";
+import { eintreffzeitSetzen, meldungAufnehmen, notizSetzen, zeitLang } from "./eintrag-zeiten";
 import { aggregiere } from "./auswertung";
 import { neuerBogen, neuePerson } from "./hilfen";
 import { lageblattVermerken, weitergabeVermerken, type ExportStand, type ExportUmfang } from "./export-stand";
@@ -1268,6 +1268,24 @@ describe("Unterbringung: angefordert und alle Anwesenden getrennt (R3-K4)", () =
     expect(screen.getByText("WC/Dusche (alle Anwesenden)").nextElementSibling!.textContent).toBe("M 0 / W 0 / D 0 · 27 ohne M/W/D-Angabe");
     await nutzer.click(within(dd).getByRole("button", { name: "1 Einheit" }));
     expect(document.querySelectorAll(".einheit-zeile")).toHaveLength(1);
+  });
+});
+
+describe("Zeitbezug der letzten Meldung (R3-K5)", () => {
+  beforeEach(() => {
+    localStorage.clear();
+  });
+
+  it("nennt im Kopf und auf der Startseitenkarte die letzte Meldung, dort auch das seit der Kenntnisnahme Neue", () => {
+    const angelegt = einsatzAnlegen("Hochwasser Kocher", EinsatzArt.EINSATZ);
+    const e = meldungHinzufuegen(angelegt.id, bogenMitName("Crailsheim"))!.eintrag;
+    const zeit = zeitLang(e.empfangenAm);
+    ansicht(angelegt.id);
+    expect(document.querySelector(".letzte-meldung")!.textContent).toBe(` · letzte Meldung ${zeit}`);
+    const s = () => einsaetzeLaden().find((x) => x.id === angelegt.id)!;
+    expect(letzteMeldungText(s())).toBe(`Letzte Meldung ${zeit}`);
+    meldungHinzufuegen(angelegt.id, bogenMitName("Ulm"));
+    expect(letzteMeldungText(s())).toMatch(/^Letzte Meldung .* · 1 neu seit der letzten Kenntnisnahme$/);
   });
 });
 

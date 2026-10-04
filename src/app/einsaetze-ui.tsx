@@ -92,6 +92,7 @@ import {
   bedarfMarken,
   gemerkteAnsicht,
   istNeu,
+  letzteMeldung,
   folgeAenderung,
   frischGemeldet,
   meldungsNummern,
@@ -207,6 +208,20 @@ function ausgabeStandText(s: Einsatzsammlung): string {
     teil("Export", exportStandLaden(s.id), "noch keiner"),
     ...(weitergabe ? [teil("Weitergegeben", weitergabe, "")] : []),
   ].join(" · ");
+}
+
+/**
+ * „Letzte Meldung 04.10.2026, 21:17 · 3 neu seit der letzten Kenntnisnahme"
+ * — für die Startseitenkarte (Audit Runde 3, R3-K5).
+ */
+export function letzteMeldungText(s: Einsatzsammlung): string {
+  const letzte = letzteMeldung(s.eintraege);
+  if (letzte == null) return "Noch keine Meldung.";
+  const stand = kenntnisStandLaden(s.id);
+  const neu = stand
+    ? neueEintraege(s.eintraege, stand).filter((e) => e.quelle !== "aufteilung" && e.quelle !== "zusammenfuehrung").length
+    : 0;
+  return `Letzte Meldung ${zeitLang(letzte)}${neu > 0 ? ` · ${neu} neu seit der letzten Kenntnisnahme` : ""}`;
 }
 
 /** Kalendertag der Geräteuhr: „28.09.2026". */
@@ -383,6 +398,9 @@ export function EinsatzListe(props: {
             <p className="hinweis">
               {sum.einheiten} Einheit(en) anwesend · Stärke {sum.staerke.fuehrer} / {sum.staerke.unterfuehrer} / {sum.staerke.mannschaft} / {sum.staerke.gesamt}
             </p>
+            {/* Zeitbezug der Zahlen und was seit der letzten Kenntnisnahme kam
+                (R3-K5, R3-K1). */}
+            <p className="hinweis letzte-meldung">{letzteMeldungText(s)}</p>
             {/* Stand von Papier und Export schon auf der Startseite: ob der
                 Aushang und die letzte Lieferung noch stimmen (R2-A3). */}
             <p className="hinweis ausgabe-stand">{ausgabeStandText(s)}</p>
@@ -766,6 +784,7 @@ export function EinsatzDetail(props: {
   // Gesamtzahl; `kopf` ist davon nur der gerade angezeigte Ausschnitt. Suche,
   // Filter und Sortierung ändern die Summen oben bewusst nicht.
   const alleEinheiten = neuesteJeEinheit(einsatz.eintraege);
+  const letzte = letzteMeldung(einsatz.eintraege);
   // Laufende Nummer je Meldung — dieselbe wie auf dem Lageblatt (R2-A6).
   const nummern = meldungsNummern(einsatz.eintraege);
   // Die zuletzt eingelesene Einheit (siehe `eingang`) — für die Quittung oben.
@@ -908,6 +927,10 @@ export function EinsatzDetail(props: {
       </div>
       <p className="hinweis">
         {ART_LABEL[einsatz.art]}{einsatz.ort ? ` · ${einsatz.ort}` : ""}
+        {/* Wie aktuell die Zahlen darunter sind: Wer das Gerät übernimmt, sah
+            nicht, ob die letzte Meldung von eben oder von gestern war (Audit
+            Runde 3, R3-K5). */}
+        {letzte != null && <span className="letzte-meldung"> · letzte Meldung {zeitLang(letzte)}</span>}
       </p>
       {/* Übergabevermerk im Kopf: Wer das alte Gerät nach der Schichtübergabe
           wieder in die Hand nimmt, sieht zuerst, dass die Lage weitergegeben

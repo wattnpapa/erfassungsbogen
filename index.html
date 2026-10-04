@@ -2284,6 +2284,12 @@
       background: var(--warn-fond); color: var(--warn-text); border: 2px solid var(--warn-linie);
     }
     span.kompakt-merkmal.luecken-merkmal { color: var(--warn-text); }
+    /* R3-K5: Laufende Sammlung direkt aus der Weiche öffnen — darunter
+       klein, wann zuletzt etwas einging. */
+    button.sammlung-oeffnen { flex-direction: column; align-items: flex-start; text-align: left; }
+    button.sammlung-oeffnen .knopf-zusatz {
+      display: block; font-size: var(--t-xs); font-weight: 400; opacity: 0.9;
+    }
     /* R3-K3: Bemerkung der Einheit („Sonstiges") auf der Karte, ruhig wie
        eine Unterzeile; neu mit einer Folgemeldung in der Warnfarbe. */
     .muster-sub.bemerkung { display: block; overflow-wrap: anywhere; }
