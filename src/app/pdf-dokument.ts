@@ -41,7 +41,7 @@ import {
   type QrSatz,
   zeitpunktDeutsch,
 } from "./hilfen";
-import { summiereBoegen, type EinsatzSummen } from "./auswertung";
+import { mwdText, summiereBoegen, unterbringungAngefordertText, type EinsatzSummen } from "./auswertung";
 import { zeitLang } from "./eintrag-zeiten";
 import { bedarfKurztext } from "./einheiten-tabelle";
 import { bogenDiff, diffZeilen } from "@bos/meldekopf/meldung-diff";
@@ -537,13 +537,15 @@ function bedarfsTabelle(eintraege: UebersichtEintrag[]): Content {
           `(${s.verpflegung.fleisch} Fleisch / ${s.verpflegung.vegetarisch} vegetarisch / ${s.verpflegung.vegan} vegan)`,
       },
     ],
+    // Quartier und WC/Dusche getrennt: die M/W/D-Zahl zählt alle Anwesenden,
+    // angefordert haben nur einige Einheiten (Audit Runde 3, R3-K4).
     [
-      { text: "Unterbringung/WC/Dusche:", bold: true },
-      {
-        text:
-          `M ${s.unterbringung.m} / W ${s.unterbringung.w} / D ${s.unterbringung.d}` +
-          (s.unterbringungBenoetigt > 0 ? ` · ${s.unterbringungBenoetigt}× Unterbringung angefordert` : ""),
-      },
+      { text: "Unterbringung angefordert:", bold: true },
+      { text: unterbringungAngefordertText(s) || "keine" },
+    ],
+    [
+      { text: "WC/Dusche (alle Anwesenden):", bold: true },
+      { text: mwdText({ ...s.unterbringung, ohneAngabe: s.unterbringungOhneAngabe }) },
     ],
     [{ text: "Betriebsstoff:", bold: true }, { text: kraftstoffText(s.kraftstoff) }],
     [
@@ -574,7 +576,9 @@ function zugSummenTabelle(eintraege: UebersichtEintrag[]): Content | undefined {
   if (nach.size < 2) return undefined;
   const kopf = (text: string): TableCell => ({ text, bold: true, fillColor: GRAU });
   const body: TableCell[][] = [
-    [kopf("Zug / Verband"), kopf("Einh."), kopf("Stärke\nF / U / M / G"), kopf("Verpfl."), kopf("M / W / D"), kopf("Betriebsstoff"), kopf("Fzg")],
+    // „Unterbr. angef." = Personen der Einheiten mit angeforderter
+    // Unterbringung; „M / W / D (alle)" zählt alle Anwesenden (R3-K4).
+    [kopf("Zug / Verband"), kopf("Einh."), kopf("Stärke\nF / U / M / G"), kopf("Verpfl."), kopf("Unterbr.\nangef."), kopf("M / W / D\n(alle)"), kopf("Betriebsstoff"), kopf("Fzg")],
   ];
   const gruppen = [...nach.entries()].sort(([a], [b]) => {
     if (a === "") return 1; // „ohne Etikett" ans Ende — wie in der Oberfläche
@@ -588,6 +592,7 @@ function zugSummenTabelle(eintraege: UebersichtEintrag[]): Content | undefined {
       { text: `${s.einheiten}` },
       { text: `${s.staerke.fuehrer} / ${s.staerke.unterfuehrer} / ${s.staerke.mannschaft} / ${s.staerke.gesamt}` },
       { text: `${s.verpflegung.gesamt}` },
+      { text: `${s.unterbringungAngefordert.personen}` },
       { text: `${s.unterbringung.m} / ${s.unterbringung.w} / ${s.unterbringung.d}` },
       { text: kraftstoffText(s.kraftstoff) },
       { text: `${s.fahrzeuge}` },
@@ -596,7 +601,7 @@ function zugSummenTabelle(eintraege: UebersichtEintrag[]): Content | undefined {
   return {
     stack: [
       { text: "Zwischensummen nach Zug", bold: true, margin: [0, 6, 0, 4] },
-      { table: { headerRows: 1, widths: [90, 24, 56, 30, 50, "*", 20], body }, margin: [0, 0, 0, 4] },
+      { table: { headerRows: 1, widths: [84, 22, 52, 28, 32, 44, "*", 18], body }, margin: [0, 0, 0, 4] },
     ],
     unbreakable: true,
   };

@@ -33,6 +33,13 @@ export interface EinsatzSummen {
   unterbringungOhneAngabe: number;
   /** Einheiten, die Unterbringung angefordert haben (Sofortbedarf). */
   unterbringungBenoetigt: number;
+  /**
+   * Personen genau dieser Einheiten, mit M/W/D-Aufteilung. `unterbringung`
+   * oben zählt ALLE Anwesenden (WC/Dusche); neben „6× angefordert" las man
+   * „M 71 / W 30" und bestellte Quartier für 101 statt 66 Personen (Audit
+   * Runde 3, R3-K4).
+   */
+  unterbringungAngefordert: { personen: number; m: number; w: number; d: number; ohneAngabe: number };
   kraftstoff: { dieselLiter: number; benzinLiter: number; gemischLiter: number };
   /** Einheiten, die Ruhezeit angemeldet haben. */
   ruhezeitErforderlich: number;
@@ -82,6 +89,7 @@ function leereSummen(): EinsatzSummen {
     unterbringung: { m: 0, w: 0, d: 0 },
     unterbringungOhneAngabe: 0,
     unterbringungBenoetigt: 0,
+    unterbringungAngefordert: { personen: 0, m: 0, w: 0, d: 0, ohneAngabe: 0 },
     kraftstoff: { dieselLiter: 0, benzinLiter: 0, gemischLiter: 0 },
     ruhezeitErforderlich: 0,
     fahrzeuge: 0,
@@ -149,7 +157,15 @@ export function summiereBoegen(boegen: Erfassungsbogen[]): EinsatzSummen {
       s.kraftstoff.dieselLiter += b.sofortbedarf.dieselLiter;
       s.kraftstoff.benzinLiter += b.sofortbedarf.benzinLiter;
       s.kraftstoff.gemischLiter += b.sofortbedarf.gemischLiter;
-      if (b.sofortbedarf.unterbringung) s.unterbringungBenoetigt++;
+      if (b.sofortbedarf.unterbringung) {
+        s.unterbringungBenoetigt++;
+        const a = s.unterbringungAngefordert;
+        a.m += u.m;
+        a.w += u.w;
+        a.d += u.d;
+        a.ohneAngabe += u.ohneAngabe;
+        a.personen += u.m + u.w + u.d + u.ohneAngabe;
+      }
       if (b.sofortbedarf.ruhezeitErforderlich) s.ruhezeitErforderlich++;
     }
 
@@ -157,6 +173,25 @@ export function summiereBoegen(boegen: Erfassungsbogen[]): EinsatzSummen {
     s.einheiten++;
   }
   return s;
+}
+
+/**
+ * „M 8 / W 1 / D 0" — bei Schnellerfassungen ohne Aufteilung mit dem Rest
+ * „· 12 ohne M/W/D-Angabe" (R2-N5). Für Bedarfsblock, Zwischensummen und
+ * Lageblatt, damit alle drei dieselbe Schreibweise haben.
+ */
+export function mwdText(x: { m: number; w: number; d: number; ohneAngabe?: number }): string {
+  return `M ${x.m} / W ${x.w} / D ${x.d}${x.ohneAngabe ? ` · ${x.ohneAngabe} ohne M/W/D-Angabe` : ""}`;
+}
+
+/**
+ * „6 Einheiten, 66 Personen (M 56 / W 10 / D 0)" — die Zahl fürs Quartier
+ * (R3-K4). Leer, wenn niemand Unterbringung angefordert hat.
+ */
+export function unterbringungAngefordertText(s: EinsatzSummen): string {
+  if (s.unterbringungBenoetigt === 0) return "";
+  const a = s.unterbringungAngefordert;
+  return `${s.unterbringungBenoetigt} ${s.unterbringungBenoetigt === 1 ? "Einheit" : "Einheiten"}, ${a.personen} ${a.personen === 1 ? "Person" : "Personen"} (${mwdText(a)})`;
 }
 
 /** Summiert eine bereits gefilterte Meldungsliste (neueste je Einheit, anwesend). */

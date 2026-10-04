@@ -59,7 +59,7 @@ import { RolleMarke } from "./rolle-marke";
 import { AufteilenPanel } from "./aufteilen-ui";
 import { ZusammenfuehrenPanel } from "./zusammenfuehren-ui";
 import type { AufteilungsWahl } from "@bos/meldekopf/aufteilen";
-import { aggregiere, aggregiereNachZug, uebungenAusserhalbDerLage, type EinsatzSummen } from "./auswertung";
+import { aggregiere, aggregiereNachZug, mwdText, uebungenAusserhalbDerLage, type EinsatzSummen } from "./auswertung";
 import {
   SORTIERUNGEN,
   einheitenAnsicht,
@@ -1038,22 +1038,33 @@ export function EinsatzDetail(props: {
             <strong>{sum.verpflegung.gesamt}</strong>
             {" "}({sum.verpflegung.vegetarisch} vegetarisch / {sum.verpflegung.vegan} vegan)
           </dd>
-          <dt>Unterbringung</dt>
+          {/* Zwei Zahlen, zwei Fragen (Audit Runde 3, R3-K4): Quartier
+              brauchen nur die Einheiten, die Unterbringung angefordert haben —
+              „M 71 / W 30" daneben zählte alle 101 Anwesenden, angefordert
+              hatten sechs Einheiten mit 66 Personen. Die Zahl aller
+              Anwesenden bleibt, beschriftet, für WC und Duschen. */}
+          <dt>Unterbringung angefordert</dt>
+          <dd className="unterbringung-angefordert">
+            {sum.unterbringungBenoetigt > 0 ? (
+              <>
+                {/* Sprung in den passenden Filter: „wer braucht ein Quartier?"
+                    ist genau die Frage hinter der Zahl (R2-K4). */}
+                <button type="button" className="link" onClick={() => aufBedarfFiltern("unterbringung")}>
+                  {sum.unterbringungBenoetigt} {sum.unterbringungBenoetigt === 1 ? "Einheit" : "Einheiten"}
+                </button>
+                {", "}
+                <strong>{sum.unterbringungAngefordert.personen} {sum.unterbringungAngefordert.personen === 1 ? "Person" : "Personen"}</strong>
+                {` (${mwdText(sum.unterbringungAngefordert)})`}
+              </>
+            ) : (
+              "keine"
+            )}
+          </dd>
+          <dt>WC/Dusche (alle Anwesenden)</dt>
           <dd>
-            M {sum.unterbringung.m} / W {sum.unterbringung.w} / D {sum.unterbringung.d}
             {/* Schnellerfassungen ohne M/W/D-Aufteilung benennen statt als 0
                 zu verschweigen (Audit Runde 2, R2-N5). */}
-            {sum.unterbringungOhneAngabe > 0 ? ` · ${sum.unterbringungOhneAngabe} ohne M/W/D-Angabe` : ""}
-            {/* Sprung in den passenden Filter: „wer braucht ein Quartier?" ist
-                genau die Frage hinter der Zahl (Audit Runde 2, R2-K4). */}
-            {sum.unterbringungBenoetigt > 0 && (
-              <>
-                {" · "}
-                <button type="button" className="link" onClick={() => aufBedarfFiltern("unterbringung")}>
-                  {sum.unterbringungBenoetigt}× angefordert
-                </button>
-              </>
-            )}
+            {mwdText({ ...sum.unterbringung, ohneAngabe: sum.unterbringungOhneAngabe })}
           </dd>
           <dt>Kraftstoff</dt>
           <dd>
@@ -1089,8 +1100,11 @@ export function EinsatzDetail(props: {
               </p>
               <p className="hinweis">
                 Verpflegung {g.summen.verpflegung.gesamt}
-                {" · "}Unterbringung M {g.summen.unterbringung.m} / W {g.summen.unterbringung.w} / D {g.summen.unterbringung.d}
-                {g.summen.unterbringungOhneAngabe > 0 ? ` (${g.summen.unterbringungOhneAngabe} ohne Angabe)` : ""}
+                {" · "}Unterbringung angefordert{" "}
+                {g.summen.unterbringungBenoetigt > 0
+                  ? `${g.summen.unterbringungAngefordert.personen} Pers. (${mwdText(g.summen.unterbringungAngefordert)})`
+                  : "keine"}
+                {" · "}WC/Dusche {mwdText({ ...g.summen.unterbringung, ohneAngabe: g.summen.unterbringungOhneAngabe })}
                 {" · "}Fahrzeuge {g.summen.fahrzeuge}
               </p>
             </div>

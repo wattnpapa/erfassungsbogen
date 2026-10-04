@@ -1244,6 +1244,33 @@ describe("Folgemeldungen als neue Fassung erkennbar (R3-K1)", () => {
   });
 });
 
+describe("Unterbringung: angefordert und alle Anwesenden getrennt (R3-K4)", () => {
+  beforeEach(() => {
+    localStorage.clear();
+  });
+
+  it("nennt Einheiten und Personen mit angeforderter Unterbringung und WC/Dusche für alle", async () => {
+    const nutzer = userEvent.setup();
+    const angelegt = einsatzAnlegen("Hochwasser Kocher", EinsatzArt.EINSATZ);
+    const mit = bogenMitName("Weinsberg");
+    mit.personalErfassung = PersonalErfassung.NUR_STAERKE;
+    mit.staerkeManuell = { fuehrer: 0, unterfuehrer: 4, mannschaft: 15, gesamt: 19 };
+    mit.sofortbedarf = { verpflegungPersonen: 0, dieselLiter: 0, benzinLiter: 0, gemischLiter: 0, unterbringung: true, ruhezeitErforderlich: false };
+    meldungHinzufuegen(angelegt.id, mit);
+    const ohne = structuredClone(mit);
+    ohne.einheit.hierarchie[0]!.name = "Ulm";
+    ohne.staerkeManuell = { fuehrer: 0, unterfuehrer: 2, mannschaft: 6, gesamt: 8 };
+    ohne.sofortbedarf!.unterbringung = false;
+    meldungHinzufuegen(angelegt.id, ohne);
+    ansicht(angelegt.id);
+    const dd = document.querySelector<HTMLElement>(".unterbringung-angefordert")!;
+    expect(dd.textContent).toBe("1 Einheit, 19 Personen (M 0 / W 0 / D 0 · 19 ohne M/W/D-Angabe)");
+    expect(screen.getByText("WC/Dusche (alle Anwesenden)").nextElementSibling!.textContent).toBe("M 0 / W 0 / D 0 · 27 ohne M/W/D-Angabe");
+    await nutzer.click(within(dd).getByRole("button", { name: "1 Einheit" }));
+    expect(document.querySelectorAll(".einheit-zeile")).toHaveLength(1);
+  });
+});
+
 describe("Bemerkung der Einheit auf der Karte (R3-K3)", () => {
   beforeEach(() => {
     localStorage.clear();

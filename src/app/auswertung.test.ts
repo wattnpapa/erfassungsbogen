@@ -11,7 +11,7 @@ import {
   type Person,
 } from "@bos/eeb-format/model";
 import { EinsatzArt, MeldeStatus, einheitSchluessel, bogenInhaltsId, type MeldeEintrag } from "@bos/meldekopf/einsaetze";
-import { aggregiere, aggregiereNachZug, aktuelleMeldungen, uebungenAusserhalbDerLage } from "./auswertung";
+import { aggregiere, aggregiereNachZug, aktuelleMeldungen, uebungenAusserhalbDerLage, unterbringungAngefordertText } from "./auswertung";
 
 function person(rolle: StaerkeRolle, geschlecht = Geschlecht.M, ernaehrung = Ernaehrung.FLEISCH): Person {
   return {
@@ -67,6 +67,26 @@ describe("aggregiere()", () => {
     expect(s.unterbringungBenoetigt).toBe(2);
     expect(s.kraftstoff).toEqual({ dieselLiter: 80, benzinLiter: 10, gemischLiter: 0 });
     expect(s.fahrzeuge).toBe(2);
+  });
+
+  it("zählt die Personen der Einheiten mit angeforderter Unterbringung getrennt von allen Anwesenden (R3-K4)", () => {
+    const ohne = bogen("B", {
+      sofortbedarf: { verpflegungPersonen: 3, dieselLiter: 0, benzinLiter: 0, gemischLiter: 0, unterbringung: false, ruhezeitErforderlich: false },
+    });
+    const schnell = bogen("C", {
+      personalErfassung: PersonalErfassung.NUR_STAERKE,
+      personal: [],
+      staerkeManuell: { fuehrer: 0, unterfuehrer: 2, mannschaft: 10, gesamt: 12 },
+    });
+    const s = aggregiere([meldung(bogen("A")), meldung(ohne), meldung(schnell)]);
+    // Alle Anwesenden (WC/Dusche): 3 + 3 + 12 ohne Aufteilung.
+    expect(s.unterbringung).toEqual({ m: 4, w: 2, d: 0 });
+    expect(s.unterbringungOhneAngabe).toBe(12);
+    // Angefordert: nur A (3) und C (12).
+    expect(s.unterbringungBenoetigt).toBe(2);
+    expect(s.unterbringungAngefordert).toEqual({ personen: 15, m: 2, w: 1, d: 0, ohneAngabe: 12 });
+    expect(unterbringungAngefordertText(s)).toBe("2 Einheiten, 15 Personen (M 2 / W 1 / D 0 · 12 ohne M/W/D-Angabe)");
+    expect(unterbringungAngefordertText(aggregiere([meldung(ohne)]))).toBe("");
   });
 
   it("ignoriert abgerückte Einheiten", () => {
