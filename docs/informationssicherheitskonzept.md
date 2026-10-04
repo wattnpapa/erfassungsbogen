@@ -127,6 +127,14 @@ Grundlage: Repository `wattnpapa/erfassungsbogen`, Stand 2026-09-12 — Version 
 > `eeb.kenntnis-stand.v1`, nur Kennungen und Zeitpunkt, keine
 > Personendaten), und nennt bis dahin neue Einheiten und Folgemeldungen auch
 > nach einem Neuladen (3.3 D2j).
+>
+> **Nachgezogen 2026-10-04:** Bemerkung der Einheit (Audit Runde 3, R3-K3) —
+> der Freitext „Sonstiges" des Bogens steht jetzt auch auf der Karte, auf
+> Lageblatt und Übergabeblatt (unter dem Auftrag, auf dem Lageblatt gekürzt)
+> und in der Übersichts-CSV (neue letzte Spalte „Bemerkung (Einheit)"); die
+> Suche der Einsatzansicht findet ihn. In „Alle Daten als CSV", der
+> Excel-Liste und dem Bogen-PDF stand er schon. Kein neuer Speicherort,
+> CSV mit der bestehenden Formel-Abwehr (5.4).
 
 ## Hinweis zu diesem Dokument
 
@@ -448,6 +456,10 @@ Datenausleitung an eine andere Herkunft ist technisch unterbunden.
   Seit 2026-09-29 (R2-A3) trägt das Lageblatt zusätzlich je Einheit
   Funkrufname und Rückrufnummer der Führungskraft (Personenbezug auf dem
   Aushang — Aushangort entsprechend wählen) und freie Zeilen für Nachträge.
+  Seit 2026-10-04 (R3-K3) steht in der Spalte „Auftrag / Notiz" darunter
+  kursiv die Bemerkung der Einheit („Sonstiges", Freitext — kann Personenbezug
+  enthalten; auf dem Lageblatt auf 110 Zeichen gekürzt), und die
+  Übersichts-CSV führt sie als letzte Spalte „Bemerkung (Einheit)".
   Die ganze Sammel-PDF gibt es nur noch über „Einsatz weitergeben / sichern";
   der Teilexport „nur neue Bögen" heißt `eeb-einsatz-nachtrag-….pdf`.
   Seit 2026-09-29 (R2-A4) steht neben jedem QR-Code eines Bogen-PDF das

@@ -359,6 +359,20 @@ function freieZeilen(anwesend: number): number {
   return Math.min(6, Math.max(2, 10 - anwesend));
 }
 
+/** So viele Zeichen der Bemerkung stehen auf dem Lageblatt, der Rest in der Sammel-PDF. */
+const BEMERKUNG_LAGEBLATT = 110;
+
+/** Zelle „Auftrag / Notiz (Bemerkung der Einheit)": Auftrag oben, Bemerkung kursiv darunter (R3-K3). */
+function bemerkungZelle(notiz: string | undefined, sonstiges: string | undefined, kuerzen?: number): TableCell {
+  const teile: Content[] = [];
+  if (notiz?.trim()) teile.push({ text: weichUmbrechen(notiz.trim()) });
+  let b = sonstiges?.trim() ?? "";
+  if (kuerzen != null && b.length > kuerzen) b = `${b.slice(0, kuerzen).trimEnd()} …`;
+  if (b) teile.push({ text: weichUmbrechen(`(${b})`), italics: true });
+  if (teile.length === 0) return { text: "" };
+  return teile.length === 1 ? (teile[0] as TableCell) : { stack: teile };
+}
+
 function uebersichtsTabelle(
   eintraege: UebersichtEintrag[],
   maxZeilen = UEBERSICHT_MAX_ZEILEN,
@@ -382,7 +396,11 @@ function uebersichtsTabelle(
       kopf("Stärke\nF / U / M / G"),
       kopf("Fzg"),
       kopf("Bedarf"),
-      kopf("Auftrag / Notiz"),
+      // Die Bemerkung der Einheit („Sonstiges") unter dem Auftrag — eine
+      // Nachschubanforderung im Freitext stand auf dem Blatt nur, solange sie
+      // als Änderung galt (Audit Runde 3, R3-K3). Gleiche Spalte, damit das
+      // Blatt nicht breiter wird.
+      kopf("Auftrag / Notiz\n(Bemerkung der Einheit)"),
       kopf("Veränderung seit der letzten Meldung"),
     ],
   ];
@@ -434,7 +452,7 @@ function uebersichtsTabelle(
       { text: `${s.fuehrer} / ${s.unterfuehrer} / ${s.mannschaft} / ${s.gesamt}` },
       { text: `${b.fahrzeuge.length}` },
       { text: bedarfKurztext(b), bold: true },
-      { text: weichUmbrechen(e.notiz ?? "") },
+      bemerkungZelle(e.notiz, b.sonstiges, maxZeilen === LAGEBLATT_MAX_ZEILEN ? BEMERKUNG_LAGEBLATT : undefined),
       aenderung,
     ];
   };

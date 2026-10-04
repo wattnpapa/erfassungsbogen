@@ -650,6 +650,20 @@ describe("einsatzLageblattDokument()", () => {
     expect(aenderungFuerPapier("Personal neu: Anna Weber")).toBe("Personal neu: Anna Weber");
   });
 
+  it("führt die Bemerkung der Einheit unter dem Auftrag, auf dem Lageblatt gekürzt (R3-K3)", () => {
+    const b = basisBogen();
+    b.sonstiges = "Ölsperre 200 m verbraucht, Nachschub nötig";
+    const lang = basisBogen();
+    lang.sonstiges = "x".repeat(300);
+    const t = texte(
+      einsatzLageblattDokument("Lage", [{ bogen: b, notiz: "Ölsperre Kocher km 12" }, { bogen: lang }]).content,
+    ).join("\n").replace(/\u200B/g, "");
+    expect(t).toContain("Auftrag / Notiz\n(Bemerkung der Einheit)");
+    expect(t).toContain("Ölsperre Kocher km 12");
+    expect(t).toContain("(Ölsperre 200 m verbraucht, Nachschub nötig)");
+    expect(t).toContain(`(${"x".repeat(110)} …)`);
+  });
+
   it("sagt auf einem leeren Blatt, dass noch nichts gemeldet ist", () => {
     const t = texte(einsatzLageblattDokument("Lage", []).content).join("\n");
     expect(t).toContain("Noch keine Einheit gemeldet.");

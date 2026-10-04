@@ -11,7 +11,8 @@
  *    Einheit, Organisation, Ort/Zugehörigkeit, Zug- und Teil-Etikett,
  *    Kennzeichen und Funkrufname, Auftrag/Notiz der Führungsstelle und der
  *    Ort/Auftrag des Bogens (Audit Runde 2, R2-K8: „Deich" fand 0 Einheiten,
- *    obwohl „Deichabschnitt Nord" auf einer Karte stand). Nicht über Personennamen: die Liste ist eine
+ *    obwohl „Deichabschnitt Nord" auf einer Karte stand) sowie die Bemerkung
+ *    der Einheit („Sonstiges", Audit Runde 3, R3-K3). Nicht über Personennamen: die Liste ist eine
  *    Einheitenliste, und die Namen stehen ausgeklappt in den Details.
  *  - QUALIFIKATION: „welche Einheit hat mir Atemschutzgeräteträger gemeldet?"
  *    Filtert auf Einheiten mit mindestens einer passenden Person und nennt
@@ -66,6 +67,9 @@ function suchtext(e: MeldeEintrag): string {
     ...e.bogen.fahrzeuge.flatMap((f) => [kennzeichenText(f), funkrufText(f, einheit)]),
     e.notiz ?? "",
     e.bogen.einsatz.ortAuftrag,
+    // Freitext der Einheit („Ölsperre verbraucht, Nachschub nötig"): die
+    // Suche „Nachschub" fand 0 von 14 (Audit Runde 3, R3-K3).
+    e.bogen.sonstiges ?? "",
   ];
   return normalisiere(teile.filter(Boolean).join(" "));
 }

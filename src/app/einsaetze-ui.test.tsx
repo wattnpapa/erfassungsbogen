@@ -1244,6 +1244,37 @@ describe("Folgemeldungen als neue Fassung erkennbar (R3-K1)", () => {
   });
 });
 
+describe("Bemerkung der Einheit auf der Karte (R3-K3)", () => {
+  beforeEach(() => {
+    localStorage.clear();
+  });
+
+  it("zeigt „Sonstiges“ ohne „Details“, lange Texte gekürzt mit „ganz zeigen“, eine neue Bemerkung hervorgehoben", async () => {
+    const nutzer = userEvent.setup();
+    const angelegt = einsatzAnlegen("Hochwasser Kocher", EinsatzArt.EINSATZ);
+    const lang = bogenMitName("Albstadt");
+    lang.sonstiges = "MzKW zusätzlich über StAN-Soll dabei. " + "Weitere Angaben zur Lage. ".repeat(8);
+    meldungHinzufuegen(angelegt.id, lang);
+    const w = bogenMitName("Weinsberg");
+    w.sonstiges = "1 Helfer über StAN-Soll";
+    meldungHinzufuegen(angelegt.id, w);
+    const w2 = structuredClone(w);
+    w2.sonstiges = "Ölsperre 200 m verbraucht, Nachschub nötig";
+    w2.stand += 5;
+    meldungAufnehmen(angelegt.id, w2);
+    ansicht(angelegt.id);
+    const [albstadt, weinsberg] = [...document.querySelectorAll<HTMLElement>(".einheit-zeile")];
+    const zeile = albstadt!.querySelector<HTMLElement>(".bemerkung")!;
+    expect(zeile.textContent).toMatch(/^Bemerkung der Einheit: MzKW zusätzlich über StAN-Soll dabei\..* … ganz zeigen$/);
+    await nutzer.click(within(zeile).getByRole("button", { name: "ganz zeigen" }));
+    expect(zeile.textContent).toContain("Weitere Angaben zur Lage. Weitere Angaben zur Lage.");
+    expect(within(zeile).getByRole("button", { name: "kürzer" })).toBeTruthy();
+    const neu = weinsberg!.querySelector<HTMLElement>(".bemerkung")!;
+    expect(neu.className).toContain("bemerkung-neu");
+    expect(neu.textContent).toBe("Bemerkung der Einheit (neu): Ölsperre 200 m verbraucht, Nachschub nötig");
+  });
+});
+
 /**
  * Aufteilen quittierte nichts: die neue Karte stand wortlos in der Liste, der
  * Rückweg „Zusammenführen…" war nirgends genannt (Audit Runde 2, R2-D6).

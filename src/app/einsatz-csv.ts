@@ -64,6 +64,9 @@ const SPALTEN = [
   "Signatur",
   "Absender",
   "Auftrag/Notiz",
+  // Was die Einheit selbst dazuschreibt („Nachschub nötig") — stand nur in
+  // „Alle Daten" und in der Excel-Liste (Audit Runde 3, R3-K3).
+  "Bemerkung (Einheit)",
 ] as const;
 
 /** Anzeigename wie in der Meldekopf-Oberfläche: Organisation + Standort + Einheitstyp. */
@@ -142,6 +145,7 @@ function datenZeile(art: EinsatzArt, e: MeldeEintrag): string {
     signaturText(e),
     absenderText(e),
     e.notiz ?? "",
+    b.sonstiges ?? "",
   ]);
 }
 

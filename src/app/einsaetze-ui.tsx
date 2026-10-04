@@ -615,6 +615,9 @@ function alleEinsatzIds(): string[] {
   return [...einsaetzeLaden(), ...einsaetzePapierkorb()].map((s) => s.id);
 }
 
+/** Bis zu so vielen Zeichen steht die Bemerkung der Einheit ungekürzt auf der Karte (R3-K3). */
+const BEMERKUNG_KURZ = 120;
+
 /** So viele Namen nennt die Sammelquittung, der Rest steht als Zahl da. */
 const QUITTUNG_MAX = 10;
 
@@ -2049,6 +2052,11 @@ function EinheitKarte(props: {
   // Telefon; an der geerbten Eintreffzeit war sie nicht zu erkennen (Audit
   // Runde 3, R3-K1).
   const folge = folgeAenderung(kopf, alle);
+  // Bemerkung der Einheit („Sonstiges"); neu, wenn die Folgemeldung sie
+  // geändert hat — dann auch zugeklappt ein Merkmal (R3-K3).
+  const bemerkung = kopf.bogen.sonstiges?.trim() ?? "";
+  const bemerkungNeu = folge != null && !!vorige && bemerkung !== "" && (vorige.bogen.sonstiges?.trim() ?? "") !== bemerkung;
+  const [bemerkungGanz, setBemerkungGanz] = useState(false);
   const neueFassung = folge != null && (props.ungesehen || frischGemeldet(kopf));
   const abgerueckt = kopf.status === MeldeStatus.ABGERUECKT;
   const aufgegangen = kopf.status === MeldeStatus.AUFGEGANGEN;
@@ -2339,6 +2347,9 @@ function EinheitKarte(props: {
               {bedarf.map((m) => (
                 <span className={m.dringend ? "bedarf-marke dringend" : "bedarf-marke routine"} key={m.lang} title={m.lang}>{m.kurz}</span>
               ))}
+              {bemerkungNeu && (
+                <span className="kompakt-merkmal bemerkung-merkmal" title={`Bemerkung der Einheit: ${bemerkung}`}>Bemerkung neu</span>
+              )}
               {kopf.notiz && (
                 <span className="kompakt-merkmal auftrag-merkmal" title={`Auftrag/Notiz: ${kopf.notiz}`}>Auftrag ✓</span>
               )}
@@ -2410,6 +2421,30 @@ function EinheitKarte(props: {
           {kopf.notiz && (
             <span className="muster-sub auftrag-notiz">
               Auftrag/Notiz: {kopf.notiz}
+            </span>
+          )}
+          {/* Was die Einheit selbst dazuschreibt, steht dort, wo die Lage
+              gelesen wird — „Ölsperre verbraucht, Nachschub nötig" stand nur
+              unter „Details" (Audit Runde 3, R3-K3). Lange Texte gekürzt, auf
+              Tipp ganz. */}
+          {bemerkung && (
+            <span className={`muster-sub bemerkung${bemerkungNeu ? " bemerkung-neu" : ""}`}>
+              {bemerkungNeu ? "Bemerkung der Einheit (neu): " : "Bemerkung der Einheit: "}
+              {bemerkungGanz || bemerkung.length <= BEMERKUNG_KURZ ? bemerkung : `${bemerkung.slice(0, BEMERKUNG_KURZ).trimEnd()} …`}
+              {bemerkung.length > BEMERKUNG_KURZ && (
+                <>
+                  {" "}
+                  <button
+                    type="button"
+                    className="link zeit-aendern"
+                    aria-describedby={nameId}
+                    aria-expanded={bemerkungGanz}
+                    onClick={() => setBemerkungGanz(!bemerkungGanz)}
+                  >
+                    {bemerkungGanz ? "kürzer" : "ganz zeigen"}
+                  </button>
+                </>
+              )}
             </span>
           )}
           {luecken.length > 0 && (

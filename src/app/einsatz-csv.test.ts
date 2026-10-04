@@ -79,7 +79,16 @@ describe("einsatzCsvInhalt()", () => {
       "Diesel (l)", "Benzin (l)", "Gemisch (l)",
       "Fahrzeuge", "Stand", "Eingetroffen", "Abgerückt", "Empfangen", "Quelle",
       "Status", "Zählt in Lage", "Übung", "Sofortbedarf", "Signatur", "Absender", "Auftrag/Notiz",
+      "Bemerkung (Einheit)",
     ]);
+  });
+
+  it("führt die Bemerkung der Einheit in einer eigenen Spalte (R3-K3)", () => {
+    const b = bogen("OV Alpha");
+    b.sonstiges = "Ölsperre 200 m verbraucht, Nachschub nötig";
+    const [kopf, daten] = zeilen(einsatzCsvInhalt(sammlung([meldung(b)])));
+    const i = kopf!.replace(/^\uFEFF/, "").split(";").indexOf("Bemerkung (Einheit)");
+    expect(daten!.split(";")[i]).toBe("Ölsperre 200 m verbraucht, Nachschub nötig");
   });
 
   it("schreibt je anwesende Einheit eine Datenzeile mit den erwarteten Werten", () => {

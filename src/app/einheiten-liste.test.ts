@@ -134,6 +134,12 @@ describe("einheitenFiltern", () => {
     expect(ids(einheitenFiltern(l, "deich"))).toEqual(["d"]);
     expect(ids(einheitenFiltern(l, "sandsack"))).toEqual(["e"]);
   });
+
+  it("findet über die Bemerkung der Einheit („Sonstiges“, R3-K3)", () => {
+    const b = bogen(OrganisationsTyp.THW, "Weinsberg", "FGr Öl");
+    b.sonstiges = "Ölsperre 200 m verbraucht, Nachschub nötig";
+    expect(ids(einheitenFiltern([...liste, eintrag("w", b)], "nachschub"))).toEqual(["w"]);
+  });
 });
 
 describe("einheitenSortieren", () => {

@@ -127,6 +127,13 @@ Grundlage: Repository `wattnpapa/erfassungsbogen`, Stand 2026-09-12 — Version 
 > (`eeb.kenntnis-stand.v1`, nur Kennungen und Zeitpunkt), und nennt bis
 > dahin neue Einheiten und Folgemeldungen mit ihrer Änderung. Keine neuen
 > personenbezogenen Daten, kein neuer Empfänger. Geändert: 5.7.
+>
+> **Nachgezogen 2026-10-04 — Bemerkung der Einheit (Audit Runde 3,
+> R3-K3):** Der Freitext „Sonstiges" eines Bogens steht jetzt auch auf
+> Lageblatt und Übergabeblatt sowie in der Übersichts-CSV (bisher nur in
+> „Alle Daten als CSV", Excel-Liste und Bogen-PDF). Kein neuer Empfänger;
+> der Freitext kann Personenbezug enthalten und hängt mit dem Lageblatt nun
+> auch an der Wand. Geändert: 5.5.
 
 ## Hinweis zu diesem Dokument
 
@@ -354,7 +361,8 @@ biometrische Daten, strafrechtliche Daten.
 - Optionaler Ausdruck (PDF) oder Tabellenexport (CSV/Excel). Übersichts-CSV,
   Lageblatt und Excel-Liste „Oldenburg" führen je Einheit auch die
   Führungsstellen-Zusätze (Eintreff-/Abrückzeit, Auftrag/Notiz als Freitext,
-  siehe 5.4); die Excel-Liste enthält außerdem die Erreichbarkeit der
+  siehe 5.4) und seit 2026-10-04 auch die Bemerkung der Einheit („Sonstiges",
+  Freitext; R3-K3); die Excel-Liste enthält außerdem die Erreichbarkeit der
   Führungskraft (Name und Kontakt). Abgerückte Einheiten bleiben in allen drei
   Ausgaben sichtbar, zählen aber nicht in die Summen. In der Sammel-PDF trägt jede Bogenseite den Kasten „Stand am Meldekopf"
   (Eintreff-/Abrückzeit, Zug, Auftrag/Notiz — die Notiz ist Freitext und kann
