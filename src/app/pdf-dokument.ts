@@ -43,8 +43,8 @@ import {
 } from "./hilfen";
 import { mwdText, summiereBoegen, unterbringungAngefordertText, type EinsatzSummen } from "./auswertung";
 import { zeitLang } from "./eintrag-zeiten";
-import { bedarfKurztext } from "./einheiten-tabelle";
-import { bogenDiff, diffZeilen } from "@bos/meldekopf/meldung-diff";
+import { bedarfMarken } from "./einheiten-tabelle";
+import { FELD_GESAMTSTAERKE, bogenDiff, diffZeilen, type BogenDiff } from "@bos/meldekopf/meldung-diff";
 import { fahrzeugSymbolSvg } from "./taktische-zeichen-bogen";
 import { orgFarbe } from "./org-farben";
 import { UEBUNG_BREITE, UEBUNG_HOEHE, UEBUNG_PFAD } from "./uebung-wasserzeichen";
@@ -359,8 +359,35 @@ function freieZeilen(anwesend: number): number {
   return Math.min(6, Math.max(2, 10 - anwesend));
 }
 
+/**
+ * Gesamtstärke an den Anfang der Änderungen: Auf dem Lageblatt (zwei Zeilen
+ * je Einheit) stand sonst „Mannschaft: von 9 auf 6 … und 5 weitere
+ * Änderungen", die Gesamtstärke 12 → 9 erst in der Sammel-PDF (Audit
+ * Runde 3, R3-K6).
+ */
+function gesamtZuerst(d: BogenDiff): BogenDiff {
+  const gesamt = d.staerke.filter((a) => a.feld === FELD_GESAMTSTAERKE);
+  return gesamt.length === 0 ? d : { ...d, staerke: [...gesamt, ...d.staerke.filter((a) => a.feld !== FELD_GESAMTSTAERKE)] };
+}
+
+/**
+ * Bedarf je Einheit: Dringendes (Ruhezeit, Unterbringung, abweichende
+ * Verpflegung) fett, Kraftstoff normal — am Gerät gelb gegen grau, auf dem
+ * Papier war alles gleich fett (Audit Runde 3, R3-K6).
+ */
+function bedarfZelle(b: Erfassungsbogen): TableCell {
+  const marken = bedarfMarken(b);
+  if (marken.length === 0) return { text: "" };
+  return {
+    text: marken.flatMap((m, i) => [
+      ...(i > 0 ? [{ text: " · " }] : []),
+      m.dringend ? { text: m.kurz, bold: true } : { text: m.kurz },
+    ]),
+  };
+}
+
 /** So viele Zeichen der Bemerkung stehen auf dem Lageblatt, der Rest in der Sammel-PDF. */
-const BEMERKUNG_LAGEBLATT = 110;
+const BEMERKUNG_LAGEBLATT = 70;
 
 /** Zelle „Auftrag / Notiz (Bemerkung der Einheit)": Auftrag oben, Bemerkung kursiv darunter (R3-K3). */
 function bemerkungZelle(notiz: string | undefined, sonstiges: string | undefined, kuerzen?: number): TableCell {
@@ -418,7 +445,7 @@ function uebersichtsTabelle(
           : {
               stack: [
                 { text: `gegenüber ${zeitpunktDeutsch(vorher.stand)}:`, bold: true },
-                ...diffZeilen(d, maxZeilen).map((z) => ({ text: aenderungFuerPapier(z) })),
+                ...diffZeilen(gesamtZuerst(d), maxZeilen).map((z) => ({ text: aenderungFuerPapier(z) })),
               ],
             };
     }
@@ -451,7 +478,7 @@ function uebersichtsTabelle(
       { text: zeitpunktDeutsch(b.stand) },
       { text: `${s.fuehrer} / ${s.unterfuehrer} / ${s.mannschaft} / ${s.gesamt}` },
       { text: `${b.fahrzeuge.length}` },
-      { text: bedarfKurztext(b), bold: true },
+      bedarfZelle(b),
       bemerkungZelle(e.notiz, b.sonstiges, maxZeilen === LAGEBLATT_MAX_ZEILEN ? BEMERKUNG_LAGEBLATT : undefined),
       aenderung,
     ];
@@ -502,10 +529,13 @@ function uebersichtsTabelle(
     table: {
       headerRows: 1,
       widths: zumWeiterfuehren
-        ? [104, 34, 96, 46, 46, 52, 14, 62, 70, "*"]
+        ? [100, 34, 86, 46, 46, 50, 14, 56, 104, "*"]
         : [118, 38, 48, 48, 48, 16, 66, 88, "*"],
       body,
     },
+    // Bei 7,5 pt bleibt es (Zeilenbox 6,9 pt): 8 pt schob zehn Einheiten auf
+    // zwei Seiten. Stärke und Bedarf stehen dafür in 9 pt in der Kopfleiste
+    // über der Tabelle (Audit Runde 3, R3-K6).
     fontSize: 7.5,
     // Knappe Innenabstände: bei zehn Einheiten entscheidet das über Seite 2.
     layout: { paddingTop: () => 1, paddingBottom: () => 1, paddingLeft: () => 3, paddingRight: () => 3 },
@@ -518,6 +548,15 @@ function kraftstoffText(k: EinsatzSummen["kraftstoff"]): string {
   const teile = [`Diesel ${k.dieselLiter} l`, `Benzin ${k.benzinLiter} l`];
   if (k.gemischLiter > 0) teile.push(`Gemisch ${k.gemischLiter} l`);
   return teile.join(" · ");
+}
+
+/** „Diesel 320 l · Gemisch 10 l" — nur gemeldete Sorten; „—" ohne Kraftstoff. */
+function kraftstoffKurz(k: EinsatzSummen["kraftstoff"]): string {
+  const teile: string[] = [];
+  if (k.dieselLiter > 0) teile.push(`Diesel ${k.dieselLiter} l`);
+  if (k.benzinLiter > 0) teile.push(`Benzin ${k.benzinLiter} l`);
+  if (k.gemischLiter > 0) teile.push(`Gemisch ${k.gemischLiter} l`);
+  return teile.join(" · ") || "—";
 }
 
 /**
@@ -556,7 +595,7 @@ function bedarfsTabelle(eintraege: UebersichtEintrag[]): Content {
   return {
     stack: [
       { text: `Bedarf gesamt (${s.einheiten} Einheiten, ${s.staerke.gesamt} Personen)`, bold: true, margin: [0, 6, 0, 4] },
-      { table: { headerRows: 0, widths: [84, "*"], body }, margin: [0, 0, 0, 4] },
+      { table: { headerRows: 0, widths: [104, "*"], body }, margin: [0, 0, 0, 4] },
     ],
     unbreakable: true,
   };
@@ -594,7 +633,9 @@ function zugSummenTabelle(eintraege: UebersichtEintrag[]): Content | undefined {
       { text: `${s.verpflegung.gesamt}` },
       { text: `${s.unterbringungAngefordert.personen}` },
       { text: `${s.unterbringung.m} / ${s.unterbringung.w} / ${s.unterbringung.d}` },
-      { text: kraftstoffText(s.kraftstoff) },
+      // Nur, was gemeldet ist: „Benzin 0 l" brach die Zeile in der schmalen
+      // Spalte auf drei Zeilen um und schob den Block auf Seite 2 (R3-K6).
+      { text: kraftstoffKurz(s.kraftstoff) },
       { text: `${s.fahrzeuge}` },
     ]);
   }
@@ -604,6 +645,37 @@ function zugSummenTabelle(eintraege: UebersichtEintrag[]): Content | undefined {
       { table: { headerRows: 1, widths: [84, 22, 52, 28, 32, 44, "*", 18], body }, margin: [0, 0, 0, 4] },
     ],
     unbreakable: true,
+  };
+}
+
+/**
+ * Kopfleiste der Übersichtsseite: Stärke und Bedarf der zählenden Einheiten
+ * in zwei Zeilen, Dringendes fett. Die Einzelheiten (Verpflegung nach
+ * Kostform, WC/Dusche, Zwischensummen) stehen weiter unter der Tabelle.
+ */
+function lageKopfleiste(eintraege: UebersichtEintrag[]): Content {
+  const s = summiereBoegen(zaehlendeBoegen(eintraege));
+  const staerkeZeile = [
+    { text: "Lage: ", bold: true },
+    { text: `${s.einheiten} ${s.einheiten === 1 ? "Einheit" : "Einheiten"} zählend · Stärke F / U / M / G ` },
+    { text: `${s.staerke.fuehrer} / ${s.staerke.unterfuehrer} / ${s.staerke.mannschaft} / ${s.staerke.gesamt}`, bold: true },
+    { text: ` · ${s.fahrzeuge} Fahrzeuge` },
+  ];
+  const angefordert = unterbringungAngefordertText(s);
+  const bedarfZeile = [
+    { text: "Bedarf: ", bold: true },
+    { text: `Verpflegung ${s.verpflegung.gesamt} · ` },
+    angefordert ? { text: `Unterbringung angefordert: ${angefordert}`, bold: true } : { text: "keine Unterbringung angefordert" },
+    { text: " · " },
+    s.ruhezeitErforderlich > 0
+      ? { text: `Ruhezeit: ${s.ruhezeitErforderlich} ${s.ruhezeitErforderlich === 1 ? "Einheit" : "Einheiten"}`, bold: true }
+      : { text: "keine Ruhezeit" },
+    { text: ` · ${kraftstoffText(s.kraftstoff)}` },
+  ];
+  return {
+    table: { widths: ["*"], body: [[{ stack: [{ text: staerkeZeile }, { text: bedarfZeile }] }]] },
+    fontSize: 9,
+    margin: [0, 0, 0, 5],
   };
 }
 
@@ -630,12 +702,16 @@ function uebersichtsSeite(
       ],
       margin: [0, 0, 0, 6],
     },
+    // Stärke und Bedarf vor der Tabelle: Ab rund 13 Einheiten stand „Bedarf
+    // gesamt" allein auf Seite 2 — wer nur Seite 1 aushängt oder faxt, gab
+    // Stärke ohne Bedarf weiter (Audit Runde 3, R3-K6).
+    lageKopfleiste(eintraege),
     uebersichtsTabelle(eintraege, maxZeilen, zumWeiterfuehren),
     ...(hinweis ? [{ text: hinweis, italics: true, margin: [0, 2, 0, 0] } as Content] : []),
     // Bedarf und Zwischensummen nebeneinander statt untereinander: vorher
     // rutschten die Zwischensummen allein auf Seite 2 (R2-K3).
     zugSummen
-      ? { columns: [{ width: 330, stack: [bedarf] }, { width: "*", stack: [zugSummen] }], columnGap: 12, fontSize: 7.5 }
+      ? { columns: [{ width: 300, stack: [bedarf] }, { width: "*", stack: [zugSummen] }], columnGap: 12, fontSize: 7.5 }
       : bedarf,
   ];
 }
@@ -708,7 +784,7 @@ function seitenFuss(text: string): TDocumentDefinitions["footer"] {
       // Seitenzahl nur so breit wie nötig — der Text links darf lang sein.
       { text: `${seite} / ${gesamt}`, width: "auto", noWrap: true, alignment: "right", margin: [8, 0, 40, 0] },
     ],
-    fontSize: 8,
+    fontSize: 7.5,
   });
 }
 
@@ -916,7 +992,7 @@ function qrBlock(qr: QrSatz, akzent: string, stand: string, vermerk?: MeldekopfV
       `mit allen Codes; fehlende Teile dürfen auch in einem späteren Foto kommen.\n` +
       `In der digitalen PDF geht es auch ohne Scannen: der Link oben öffnet den vollständigen Bogen.`,
     alignment: "center",
-    fontSize: 8,
+    fontSize: 7.5,
     margin: [0, 6, 0, 0],
   });
   const seiten: Content[] = [];

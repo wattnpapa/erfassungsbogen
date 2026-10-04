@@ -452,7 +452,9 @@ Datenausleitung an eine andere Herkunft ist technisch unterbunden.
   zusätzlich Zug, Bedarf (Ruhezeit, Unterbringung, Kraftstoff) und die Zahl
   der Lücken der Meldung; Änderungen stehen als „von … auf …" (die
   PDF-Standardschrift kennt den Pfeil nicht). Das Lageblatt heißt jetzt
-  „Lageblatt (A4 quer)" und passt bis etwa zwölf Einheiten auf eine Seite.
+  „Lageblatt (A4 quer)" und passt bis etwa zwölf Einheiten auf eine Seite
+  (seit 2026-10-04 mit der Bemerkung der Einheit bis etwa zehn; Stärke und
+  Bedarf stehen dafür als Kopfleiste oben auf Seite 1, R3-K6).
   Seit 2026-09-29 (R2-A3) trägt das Lageblatt zusätzlich je Einheit
   Funkrufname und Rückrufnummer der Führungskraft (Personenbezug auf dem
   Aushang — Aushangort entsprechend wählen) und freie Zeilen für Nachträge.

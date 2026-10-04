@@ -624,7 +624,7 @@ describe("einsatzLageblattDokument()", () => {
       einsatzLageblattDokument("Lage", [{ bogen: ruhe, vorher, zugEtikett: "1. TZ" }]).content,
     ).join("\n");
     expect(t).toContain("1. TZ");
-    expect(t).toMatch(/Ruhezeit · .*Diesel 200 l/);
+    expect(t).toMatch(/Ruhezeit\n · [\s\S]*Diesel 200 l/);
     expect(t).toMatch(/von 50 l auf 200 l/);
     expect(t).not.toContain("→");
   });
@@ -663,7 +663,31 @@ describe("einsatzLageblattDokument()", () => {
     expect(t).toContain("Auftrag / Notiz\n(Bemerkung der Einheit)");
     expect(t).toContain("Ölsperre Kocher km 12");
     expect(t).toContain("(Ölsperre 200 m verbraucht, Nachschub nötig)");
-    expect(t).toContain(`(${"x".repeat(110)} …)`);
+    expect(t).toContain(`(${"x".repeat(70)} …)`);
+  });
+
+  it("stellt Stärke und Bedarf als Kopfleiste vor die Tabelle, Dringendes fett, Gesamtstärke zuerst (R3-K6)", () => {
+    const ruhe = basisBogen();
+    ruhe.sofortbedarf = { ...ruhe.sofortbedarf!, ruhezeitErforderlich: true, unterbringung: false, dieselLiter: 80 };
+    const vorher = structuredClone(ruhe);
+    vorher.personal = [...vorher.personal, structuredClone(vorher.personal[1]!), structuredClone(vorher.personal[1]!)];
+    vorher.personal[vorher.personal.length - 1]!.nachname = "Zusatz";
+    vorher.personal[vorher.personal.length - 2]!.nachname = "Extra";
+    const dd = einsatzLageblattDokument("Lage", [{ bogen: ruhe, vorher }]);
+    const inhalt = dd.content as unknown[];
+    // Kopfleiste direkt nach dem Titel, vor der Einheitentabelle.
+    const kopf = texte(inhalt[1]).filter((x) => x !== "*").join("");
+    expect(kopf).toMatch(/^Lage: 1 Einheit zählend · Stärke F \/ U \/ M \/ G \d+ \/ \d+ \/ \d+ \/ \d+ · 1 Fahrzeuge/);
+    expect(kopf).toContain("Bedarf: Verpflegung");
+    expect(kopf).toContain("Ruhezeit: 1 Einheit");
+    expect(kopf).toContain("Diesel 80 l");
+    // Bedarf je Einheit: Ruhezeit fett, Diesel nicht.
+    const json = JSON.stringify(inhalt[2]);
+    expect(json).toContain('{"text":"Ruhezeit","bold":true}');
+    expect(json).toContain('{"text":"Diesel 80 l"}');
+    // Änderungen: die Gesamtstärke zuerst.
+    const t = texte(inhalt[2]).join("\n");
+    expect(t).toMatch(/gegenüber .*:\nGesamtstärke: von \d+ auf \d+\n… und \d+ weitere Änderungen/);
   });
 
   it("sagt auf einem leeren Blatt, dass noch nichts gemeldet ist", () => {

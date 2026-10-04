@@ -1161,7 +1161,7 @@ export function EinsatzDetail(props: {
             <button
               type="button"
               onClick={onLageblatt}
-              title="Nur die Übersicht: Einheiten mit Zug, Eintreff- und Abrückzeit, Bedarf und Zwischensummen — A4 quer, ohne Bögen; bis etwa zwölf Einheiten eine Seite."
+              title="Nur die Übersicht: Einheiten mit Zug, Eintreff- und Abrückzeit, Bedarf und Zwischensummen — A4 quer, ohne Bögen; Stärke und Bedarf stehen oben auf Seite 1; bis etwa zehn Einheiten eine Seite."
             >
               {/* Ehrlich beschriftet: bei großen Lagen wird es mehr als eine
                   Seite (Audit Runde 2, R2-K3). */}
