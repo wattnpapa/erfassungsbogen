@@ -201,3 +201,46 @@ export function exportSammlung(einsatz: Einsatzsammlung, umfang: ExportUmfang, s
 export function exportZeitKurz(zeitpunkt: number): string {
   return zeitLang(zeitpunkt);
 }
+
+/**
+ * Was die Führungsstelle an diesem Gerät zuletzt „zur Kenntnis genommen" hat:
+ * die Meldungen, die beim letzten Tipp auf „Zur Kenntnis genommen" in der
+ * Sammlung standen. Alles, was danach kam — neue Einheiten wie Folgemeldungen
+ * —, nennt die Einsatzansicht in einer Sammelquittung, auch nach einem
+ * Neuladen. Vorher merkte sich die Ansicht nur im Arbeitsspeicher, was seit
+ * dem Öffnen dazukam; nach dem Neuladen war die Quittung weg, und eine
+ * Folgemeldung mit drei Helfern weniger fiel nur auf, wer jede Karte prüfte
+ * (Audit Runde 3, R3-K1).
+ *
+ * Wie die anderen Stände: Kennungen statt Zeitpunkt (per Sammel-PDF
+ * übernommene Meldungen tragen die Empfangszeit des anderen Geräts), keine
+ * Personendaten, unter dem `eeb.`-Präfix. Bewusst je Gerät und nicht in der
+ * Sammlung: „gesehen" hat die Person an diesem Gerät, nicht die nächste
+ * Schicht, die die Lage per „Einsatz importieren…" übernimmt.
+ */
+const KENNTNIS_SCHLUESSEL = "eeb.kenntnis-stand.v1";
+
+/** Stand der letzten Kenntnisnahme dieses Einsatzes, oder null (noch nie geöffnet). */
+export function kenntnisStandLaden(einsatzId: string): ExportStand | null {
+  return ablageLaden(KENNTNIS_SCHLUESSEL)[einsatzId] ?? null;
+}
+
+/**
+ * Alles, was jetzt in der Sammlung steht, gilt als gesehen. Beim ersten
+ * Öffnen einer Sammlung gesetzt (sonst stünde beim ersten Mal jede Meldung
+ * als neu da) und bei „Zur Kenntnis genommen". `behalten` räumt Stände
+ * verschwundener Einsätze weg — wie beim Export-Stand.
+ */
+export function kenntnisVermerken(einsatz: Einsatzsammlung, behalten?: Iterable<string>, jetzt = Date.now()): ExportStand {
+  const stand: ExportStand = { zeitpunkt: jetzt, eintragIds: einsatz.eintraege.map((e) => e.id) };
+  const alt = ablageLaden(KENNTNIS_SCHLUESSEL);
+  const neu: Ablage = {};
+  if (behalten) {
+    for (const id of behalten) if (alt[id]) neu[id] = alt[id];
+  } else {
+    Object.assign(neu, alt);
+  }
+  neu[einsatz.id] = stand;
+  ablageSpeichern(neu, KENNTNIS_SCHLUESSEL);
+  return stand;
+}

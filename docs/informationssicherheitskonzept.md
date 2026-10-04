@@ -120,6 +120,13 @@ Grundlage: Repository `wattnpapa/erfassungsbogen`, Stand 2026-09-12 — Version 
 > — laufende Nummer je Meldung („Nr. 3", aus der Eingangsreihenfolge, wie an
 > der Karte), Zeitpunkte einheitlich „TT.MM.JJJJ, hh:mm", Blanko-Vordruck mit
 > Stärke-Legende. Keine neuen Daten (5.4).
+>
+> **Nachgezogen 2026-10-04:** Kenntnisnahme in der Einsatzansicht (Audit
+> Runde 3, R3-K1) — die App merkt sich je Sammlung, welche Meldungen beim
+> letzten „Zur Kenntnis genommen" schon da waren (neuer Speicherort
+> `eeb.kenntnis-stand.v1`, nur Kennungen und Zeitpunkt, keine
+> Personendaten), und nennt bis dahin neue Einheiten und Folgemeldungen auch
+> nach einem Neuladen (3.3 D2j).
 
 ## Hinweis zu diesem Dokument
 
@@ -255,6 +262,7 @@ dem Vite-Build); es gibt keine serverseitige Variante.
 | D2g | Nachricht über automatisch gelöschte Sammlungen (seit 2026-09-29, R2-D5) | Name, Zeitraum (angelegt/zuletzt geändert), Zahl der Einheiten und Meldungen sowie Löschzeitpunkt einer Sammlung, die die Aufräumfrist (90 Tage ohne Änderung) überschritten hat; keine Personendaten, Name der Sammlung als Freitext. Vorgemerkt von einer Hülle um die Ablage (`src/app/aufraeum-hinweis.ts`), bevor der Kern die Sammlung verwirft; bleibt bis „Verstanden" auf der Startseite | `localStorage` des Geräts (`eeb.aufgeraeumt.v1`), fällt mit „Alle Daten löschen" weg |
 | D2h | Lageblatt-Stand je Einsatz-Sammlung (seit 2026-09-29, R2-A3) | Zeitpunkt des zuletzt erzeugten Lageblatts und Kennungen der Meldungen darauf — Grundlage für „Lageblatt erstellt … · seitdem n neue Meldungen"; keine Personendaten | `localStorage` des Geräts (`eeb.lageblatt-stand.v1`), fällt mit „Alle Daten löschen" weg |
 | D2i | Weitergabe-Stand je Einsatz-Sammlung (seit 2026-09-29, R2-W5) | Zeitpunkt der letzten Weitergabe der ganzen Sammlung („Einsatz weitergeben / sichern") und Kennungen der Meldungen darin — Grundlage des Übergabevermerks „Weitergegeben … · seitdem n neue Meldungen"; keine Personendaten | `localStorage` des Geräts (`eeb.weitergabe-stand.v1`), fällt mit „Alle Daten löschen" weg |
+| D2j | Kenntnis-Stand je Einsatz-Sammlung (seit 2026-10-04, R3-K1) | Zeitpunkt der letzten Kenntnisnahme („Zur Kenntnis genommen" in der Einsatzansicht, beim ersten Öffnen einer Sammlung vorbelegt) und Kennungen der Meldungen, die da schon in der Sammlung standen — Grundlage der Sammelquittung „Neu seit der letzten Kenntnisnahme" und der Marke „neue Fassung"; je Gerät, reist nicht mit der Sammlung; keine Personendaten | `localStorage` des Geräts (`eeb.kenntnis-stand.v1`), fällt mit „Alle Daten löschen" weg |
 | D3 | Absenderkarte | Freiwillige Kontaktangabe (Name/E-Mail/Telefon) der meldenden Person | `localStorage` des Geräts |
 | D4 | Privater Geräteschlüssel | Ed25519-Schlüssel zur Signatur weitergereichter Bögen | `localStorage` des Geräts, **unverschlüsselt als Hex** |
 | D5 | QR-Payload / Exportdatei | Binär kodierter, komprimierter Bogen zur Übergabe an ein zweites Gerät; ebenso eine geteilte Vorlage (QR/Link mit Marker `V.`, oder JSON-Datei `eeb-vorlage-*.json`) | Transient (QR-Code-Anzeige) bzw. Datei auf dem Gerät oder in einer vom Nutzer gewählten Ablage (z. B. Cloud-Ordner) |

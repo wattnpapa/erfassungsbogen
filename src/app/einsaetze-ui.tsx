@@ -92,6 +92,8 @@ import {
   bedarfMarken,
   gemerkteAnsicht,
   istNeu,
+  folgeAenderung,
+  frischGemeldet,
   meldungsNummern,
   passtZuBedarfsfilter,
   type BedarfsFilter,
@@ -118,6 +120,8 @@ import { entfernteMerken, entfernteVergessen } from "./entfernte-meldungen";
 import {
   exportStandLaden,
   exportZeitKurz,
+  kenntnisStandLaden,
+  kenntnisVermerken,
   lageblattStandLaden,
   neueEintraege,
   seitdemText,
@@ -606,6 +610,14 @@ function BoegenEinlesenKnopf(props: {
  * volle Karte war rund 450 px hoch, das Lagebild lief über 13 Bildschirmhöhen
  * (Audit Runde 2, R2-K7). Ohne matchMedia (Tests, alte Webviews): nein.
  */
+/** Kennungen aller Sammlungen samt Papierkorb — Stände verschwundener fallen weg. */
+function alleEinsatzIds(): string[] {
+  return [...einsaetzeLaden(), ...einsaetzePapierkorb()].map((s) => s.id);
+}
+
+/** So viele Namen nennt die Sammelquittung, der Rest steht als Zahl da. */
+const QUITTUNG_MAX = 10;
+
 const SCHMAL_ABFRAGE = "(max-width: 600px)";
 function useSchmal(): boolean {
   const [schmal, setSchmal] = useState(() => typeof matchMedia === "function" && matchMedia(SCHMAL_ABFRAGE).matches);
@@ -755,6 +767,8 @@ export function EinsatzDetail(props: {
   const nummern = meldungsNummern(einsatz.eintraege);
   // Die zuletzt eingelesene Einheit (siehe `eingang`) — für die Quittung oben.
   const eingegangen = eingang ? alleEinheiten.find((e) => e.einheitSchluessel === eingang.schluessel) : undefined;
+  // War es eine Folgemeldung, sagt die Quittung, was sich geändert hat (R3-K1).
+  const eingangFolge = eingegangen ? folgeAenderung(eingegangen, einsatz.eintraege) : null;
   /**
    * Beim Öffnen und nach jeder Aufnahme beginnt die Ansicht oben, bei Summe
    * und Aufnahme-Knopf. Vorher öffnete sie mitten auf der Seite (mit der
@@ -778,34 +792,57 @@ export function EinsatzDetail(props: {
     ziel?.scrollIntoView({ block: "center" });
   }
   /**
-   * Was seit dem Öffnen der Ansicht (bzw. seit dem Schließen der letzten
-   * Sammelquittung) neu in die Sammlung kam — Schlüssel der Einheiten in
-   * Eingangsreihenfolge. Kommen mehrere Einheiten kurz nacheinander oder als
-   * Stapel, nannte die Quittung nur „4 Bögen aufgenommen", und die Liste
-   * stand alphabetisch: Wer prüfen wollte, ob alle drin sind, suchte
-   * (Audit Runde 2, R2-S4). Eigene Umbauten (Aufteilen, Zusammenführen) und
-   * zurückgeholte Meldungen zählen nicht: deren Kennungen waren schon da
-   * oder entstehen hier.
+   * Was seit der letzten Kenntnisnahme in die Sammlung kam — neue Einheiten
+   * und Folgemeldungen, in Eingangsreihenfolge. Kommen mehrere Einheiten kurz
+   * nacheinander oder als Stapel, nannte die Quittung nur „4 Bögen
+   * aufgenommen" (Audit Runde 2, R2-S4). Danach merkte sich die Ansicht den
+   * Eingang nur im Arbeitsspeicher: nach dem Neuladen war die Quittung weg,
+   * und ob eine Zeile eine neue Einheit oder eine Folgemeldung mit drei
+   * Helfern weniger war, sagte sie nicht (Audit Runde 3, R3-K1). Jetzt steht
+   * der Stand je Gerät im Speicher (export-stand.ts) und die Quittung bleibt,
+   * bis jemand „Zur Kenntnis genommen" tippt. Eigene Umbauten (Aufteilen,
+   * Zusammenführen) und zurückgeholte Meldungen zählen nicht: deren
+   * Kennungen waren schon da oder entstehen hier.
    */
-  const gesehen = useRef<{ einsatzId: string; ids: Set<string> } | null>(null);
-  const [zuletztAufgenommen, setZuletztAufgenommen] = useState<string[]>([]);
+  const [kenntnis, setKenntnis] = useState<{ einsatzId: string; stand: ExportStand } | null>(null);
+  const kenntnisStand =
+    kenntnis?.einsatzId === einsatz.id
+      ? kenntnis.stand
+      : (kenntnisStandLaden(einsatz.id) ?? kenntnisVermerken(einsatz, alleEinsatzIds()));
   useEffect(() => {
-    const ids = einsatz.eintraege.map((e) => e.id);
-    if (gesehen.current?.einsatzId !== einsatz.id) {
-      gesehen.current = { einsatzId: einsatz.id, ids: new Set(ids) };
-      setZuletztAufgenommen([]);
-      return;
-    }
-    const bekannt = gesehen.current.ids;
-    const neu = einsatz.eintraege
-      .filter((e) => !bekannt.has(e.id) && e.quelle !== "aufteilung" && e.quelle !== "zusammenfuehrung")
-      .map((e) => e.einheitSchluessel);
-    for (const id of ids) bekannt.add(id);
-    if (neu.length > 0) setZuletztAufgenommen((alt) => [...alt.filter((x) => !neu.includes(x)), ...new Set(neu)]);
-  }, [einsatz]);
+    if (kenntnis?.einsatzId !== einsatz.id) setKenntnis({ einsatzId: einsatz.id, stand: kenntnisStand });
+  }, [einsatz.id, kenntnis?.einsatzId, kenntnisStand]);
+  function kenntnisNehmen() {
+    setKenntnis({ einsatzId: einsatz.id, stand: kenntnisVermerken(einsatz, alleEinsatzIds()) });
+  }
+  const ungeseheneIds = new Set(
+    neueEintraege(einsatz.eintraege, kenntnisStand)
+      .filter((e) => e.quelle !== "aufteilung" && e.quelle !== "zusammenfuehrung")
+      .map((e) => e.id),
+  );
+  const zuletztAufgenommen = [
+    ...new Set(
+      einsatz.eintraege
+        .filter((e) => ungeseheneIds.has(e.id))
+        .sort((a, b) => a.empfangenAm - b.empfangenAm)
+        .map((e) => e.einheitSchluessel),
+    ),
+  ];
   const aufgenommenListe = zuletztAufgenommen
     .map((schl) => alleEinheiten.find((e) => e.einheitSchluessel === schl))
     .filter((e): e is MeldeEintrag => e != null);
+  // Eine einzelne, gerade eingelesene Meldung quittiert schon „Zuletzt
+  // eingelesen" — dieselbe Einheit zweimal untereinander wäre Lärm.
+  // Einheiten, deren aktuelle Fassung eine frische oder noch nicht zur
+  // Kenntnis genommene Folgemeldung ist — Marke auch in der Tabelle (R3-K1).
+  const neueFassungen = new Set(
+    alleEinheiten
+      .filter((e) => (ungeseheneIds.has(e.id) || frischGemeldet(e)) && folgeAenderung(e, einsatz.eintraege) != null)
+      .map((e) => e.einheitSchluessel),
+  );
+  const sammelquittungZeigen =
+    aufgenommenListe.length > 1 ||
+    (aufgenommenListe.length === 1 && aufgenommenListe[0]!.einheitSchluessel !== eingegangen?.einheitSchluessel);
   const aufgenommenUebung = aufgenommenListe.filter((e) => uebungenDaneben.some((u) => u.id === e.id)).length;
   const qualiListe = qualifikationenImEinsatz(alleEinheiten);
   const gewaehlteQuali = qualiListe.find((q) => q.schluessel === quali);
@@ -910,35 +947,59 @@ export function EinsatzDetail(props: {
       {eingegangen && (
         <p className="meldung eingang-quittung" role="status">
           Zuletzt eingelesen: „{einheitAnzeigename(eingegangen.bogen.einheit)}"
-          {eingegangen.teilEtikett ? ` (${eingegangen.teilEtikett})` : ""} · jetzt {sum.einheiten}{" "}
+          {eingegangen.teilEtikett ? ` (${eingegangen.teilEtikett})` : ""}
+          {eingangFolge ? <> — Folgemeldung: <span className={eingangFolge.verlust ? "staerke-verlust" : undefined}>{eingangFolge.kurz}</span></> : null}
+          {" · "}jetzt {sum.einheiten}{" "}
           {sum.einheiten === 1 ? "Einheit" : "Einheiten"}, Gesamt {sum.staerke.gesamt}.{" "}
           <button type="button" className="link" onClick={eingangZeigen}>In der Liste zeigen</button>
         </p>
       )}
 
-      {/* Mehrere Einheiten kurz nacheinander oder als Stapel: die Quittung
-          nennt sie mit Namen und sagt, welche davon als Übung nicht zählen;
-          ein Tipp stellt sie oben in die Liste (R2-S4). */}
-      {aufgenommenListe.length > 1 && (
-        <p className="meldung stapel-eingang" role="status">
-          Zuletzt aufgenommen ({aufgenommenListe.length}):{" "}
-          {aufgenommenListe
-            .map((e) => `${einheitAnzeigename(e.bogen.einheit)}${e.teilEtikett ? ` (${e.teilEtikett})` : ""}`)
-            .join(", ")}
-          {aufgenommenUebung > 0
-            ? aufgenommenUebung === aufgenommenListe.length
-              ? ` — ${aufgenommenUebung === 2 ? "beide" : `alle ${aufgenommenUebung}`} Übung, nicht gezählt`
-              : ` — davon ${aufgenommenUebung} Übung, nicht gezählt`
-            : ""}
-          .{" "}
-          {sortierung !== "eintreffzeit" && (
-            <>
-              <button type="button" className="link" onClick={() => setSortierung("eintreffzeit")}>Neueste oben zeigen</button>
-              {" · "}
-            </>
-          )}
-          <button type="button" className="link" onClick={() => setZuletztAufgenommen([])}>Ausblenden</button>
-        </p>
+      {/* Was seit der letzten Kenntnisnahme kam: mit Namen, mit der Änderung
+          einer Folgemeldung („Stärke 12 → 9 (−3)") und dem Hinweis, welche
+          Einheiten als Übung nicht zählen (R2-S4). Sie bleibt über ein
+          Neuladen hinweg stehen, bis jemand sie zur Kenntnis nimmt; ein Tipp
+          stellt die zuletzt gemeldeten nach oben (Audit Runde 3, R3-K1). */}
+      {sammelquittungZeigen && (
+        <div className="meldung stapel-eingang" role="status">
+          <p>
+            <strong>Neu seit der letzten Kenntnisnahme ({aufgenommenListe.length}):</strong>
+            {aufgenommenUebung > 0
+              ? aufgenommenUebung === aufgenommenListe.length
+                ? ` ${aufgenommenUebung === 1 ? "Übung" : aufgenommenUebung === 2 ? "beide Übung" : `alle ${aufgenommenUebung} Übung`}, nicht gezählt.`
+                : ` davon ${aufgenommenUebung} Übung, nicht gezählt.`
+              : ""}
+          </p>
+          <ul>
+            {aufgenommenListe.slice(0, QUITTUNG_MAX).map((e) => {
+              const folge = folgeAenderung(e, einsatz.eintraege);
+              return (
+                <li key={e.einheitSchluessel}>
+                  {einheitAnzeigename(e.bogen.einheit)}
+                  {e.teilEtikett ? ` (${e.teilEtikett})` : ""}
+                  {folge ? (
+                    <>
+                      {" — Folgemeldung "}{zeitKurz(folge.gemeldetAm)}:{" "}
+                      <span className={folge.verlust ? "staerke-verlust" : undefined}>{folge.kurz}</span>
+                    </>
+                  ) : (
+                    " — neu gemeldet"
+                  )}
+                </li>
+              );
+            })}
+            {aufgenommenListe.length > QUITTUNG_MAX && <li>und {aufgenommenListe.length - QUITTUNG_MAX} weitere</li>}
+          </ul>
+          <p>
+            {sortierung !== "zuletzt" && (
+              <>
+                <button type="button" className="link" onClick={() => setSortierung("zuletzt")}>Zuletzt gemeldete oben zeigen</button>
+                {" · "}
+              </>
+            )}
+            <button type="button" className="link" onClick={kenntnisNehmen}>Zur Kenntnis genommen</button>
+          </p>
+        </div>
       )}
 
       {/* Ausgenommene Übungsmeldungen: Die Zahlen darüber sind ohne sie
@@ -1300,7 +1361,9 @@ export function EinsatzDetail(props: {
             )}
           </p>
         )}
-        {ansicht === "tabelle" && kopf.length > 0 && <EinheitenTabelle meldungen={kopf} art={einsatz.art} eingang={eingang} nummern={nummern} />}
+        {ansicht === "tabelle" && kopf.length > 0 && (
+          <EinheitenTabelle meldungen={kopf} art={einsatz.art} eingang={eingang} nummern={nummern} neueFassungen={neueFassungen} />
+        )}
         {/* Eine Liste: das Vorleseprogramm nennt die Zahl der Einheiten und
             erlaubt den Sprung von Eintrag zu Eintrag (R2-M4). */}
         {ansicht === "karten" && kopf.length > 0 && (
@@ -1320,6 +1383,7 @@ export function EinsatzDetail(props: {
                 onAufgeteilt={(a) => { setZuletztEntfernt(null); setStatusWechsel(null); setAufgeteilt(a); }}
                 kompakt={kompakt}
                 nummer={nummern.get(e.einheitSchluessel)}
+                ungesehen={ungeseheneIds.has(e.id)}
               />
             ))}
           </ul>
@@ -1397,7 +1461,7 @@ export function EinsatzDetail(props: {
  * Einheit meldet den größten Verpflegungsbedarf?"). Zahlen starten dabei
  * absteigend — gefragt ist der größte Wert, nicht die Null.
  */
-function EinheitenTabelle({ meldungen, art, eingang, nummern }: { meldungen: MeldeEintrag[]; art: EinsatzArt; eingang?: Eingang | null; nummern?: Map<string, number> }) {
+function EinheitenTabelle({ meldungen, art, eingang, nummern, neueFassungen }: { meldungen: MeldeEintrag[]; art: EinsatzArt; eingang?: Eingang | null; nummern?: Map<string, number>; neueFassungen?: Set<string> }) {
   // null = Reihenfolge der Liste (Sortierauswahl der Leiste) unverändert
   // übernehmen. Erst ein Klick auf einen Spaltenkopf ordnet hier um.
   const [spalte, setSpalte] = useState<TabellenSpalte | null>(null);
@@ -1484,7 +1548,13 @@ function EinheitenTabelle({ meldungen, art, eingang, nummern }: { meldungen: Mel
           </thead>
           <tbody>
             {sortiert.map((z) => (
-              <TabellenZeileZelle key={z.eintrag.einheitSchluessel} zeile={z} eingang={eingang} nummer={nummern?.get(z.eintrag.einheitSchluessel)} />
+              <TabellenZeileZelle
+                key={z.eintrag.einheitSchluessel}
+                zeile={z}
+                eingang={eingang}
+                nummer={nummern?.get(z.eintrag.einheitSchluessel)}
+                neueFassung={neueFassungen?.has(z.eintrag.einheitSchluessel)}
+              />
             ))}
           </tbody>
           {/* Die Summe zählt nur die anwesenden Zeilen der Auswahl — abgerückte
@@ -1533,7 +1603,7 @@ function AltBadge() {
 }
 
 /** Eine Datenzeile — abgerückte Meldungen bleiben sichtbar, aber durchgestrichen. */
-function TabellenZeileZelle({ zeile: z, eingang, nummer }: { zeile: TabellenZeile; eingang?: Eingang | null; nummer?: number }) {
+function TabellenZeileZelle({ zeile: z, eingang, nummer, neueFassung }: { zeile: TabellenZeile; eingang?: Eingang | null; nummer?: number; neueFassung?: boolean }) {
   const zeile = useEingangsquittung<HTMLTableRowElement>(marke(eingang, z.eintrag.einheitSchluessel), { rollen: false });
   return (
     <tr ref={zeile} data-einheit={z.eintrag.einheitSchluessel} className={z.anwesend ? undefined : "gestrichen"}>
@@ -1543,6 +1613,7 @@ function TabellenZeileZelle({ zeile: z, eingang, nummer }: { zeile: TabellenZeil
         {z.eintrag.bogen.uebung ? <span className="uebung-badge">ÜBUNG</span> : null}
         <AnonymBadge bogen={z.eintrag.bogen} />
         {z.teilEtikett ? <span className="teil-badge">{z.teilEtikett}</span> : null}
+        {neueFassung ? <span className="fassung-badge">neue Fassung</span> : null}
         {!z.anwesend && (
           <span className="muster-sub">
             {z.eintrag.status === MeldeStatus.ABGERUECKT ? "abgerückt" : "zusammengeführt"}
@@ -1901,6 +1972,8 @@ function EinheitKarte(props: {
   onAufgeteilt?: (a: Aufgeteilt) => void;
   /** Laufende Nummer der Meldung, wie auf dem Lageblatt (R2-A6). */
   nummer?: number;
+  /** Aktuelle Fassung kam nach der letzten Kenntnisnahme (R3-K1). */
+  ungesehen?: boolean;
 }) {
   const { einsatzId, kopf, alle, onGeaendert, onEntfernt, qualifikation = "", qualifikationKurz = "", eingang, onStatusWechsel, kompakt = false } = props;
   // Auf dem Telefon zugeklappt, bis die Einheit angetippt wird (R2-K7).
@@ -1970,6 +2043,13 @@ function EinheitKarte(props: {
   // „was hat sich seit der letzten Meldung geändert?".
   const vorige = revs[1];
   const kurz = vorige ? diffKurzfassung(bogenDiff(vorige.bogen, kopf.bogen)) : "";
+  // Folgemeldung von außen (nicht die Rest-Fassung eines Aufteilens): wann
+  // sie einging und was sie änderte. Frisch oder noch nicht zur Kenntnis
+  // genommen trägt sie die Marke „neue Fassung" — auch zugeklappt auf dem
+  // Telefon; an der geerbten Eintreffzeit war sie nicht zu erkennen (Audit
+  // Runde 3, R3-K1).
+  const folge = folgeAenderung(kopf, alle);
+  const neueFassung = folge != null && (props.ungesehen || frischGemeldet(kopf));
   const abgerueckt = kopf.status === MeldeStatus.ABGERUECKT;
   const aufgegangen = kopf.status === MeldeStatus.AUFGEGANGEN;
   // Nur anwesende Meldungen zählen — und nur an ihnen sind Aufteilen und
@@ -2229,7 +2309,12 @@ function EinheitKarte(props: {
                 dem letzten Export" — nach einem Export trugen alle Karten
                 weiter „neu", während die Exportzeile „keine neuen Bögen"
                 sagte (Audit Runde 2, R2-A6). */}
-            {zaehlt && istNeu(kopf) ? <span className="neu-badge" title="Vor weniger als 30 Minuten eingetroffen — unabhängig vom Export">kürzlich eingetroffen</span> : null}
+            {zaehlt && istNeu(kopf) && !neueFassung ? <span className="neu-badge" title="Vor weniger als 30 Minuten eingetroffen — unabhängig vom Export">kürzlich eingetroffen</span> : null}
+            {neueFassung ? (
+              <span className="fassung-badge" title="Folgemeldung in den letzten 30 Minuten eingegangen oder noch nicht zur Kenntnis genommen">
+                neue Fassung
+              </span>
+            ) : null}
             {/* Der Zustand als Wort statt über Deckkraft: 55 % drückten Stärke
                 und Abrückzeit unter 3:1 (Audit Runde 2, R2-L5). */}
             {!zaehlt ? <span className="status-badge">{abgerueckt ? "abgerückt" : "zusammengeführt"}</span> : null}
@@ -2238,11 +2323,30 @@ function EinheitKarte(props: {
             // Zugeklappt: eine Zeile mit Stärke und Bedarf — die Fragen beim
             // Gang durch den Bereitstellungsraum („wer ist da, wer braucht
             // was?"). Alles Weitere nach Antippen (R2-K7).
+            // Dazu kurze Merkmale statt eigener Zeilen: Folgemeldung mit
+            // Stärkeänderung, Auftrag vorhanden, offene Lücken — sonst sah der
+            // Zugführer am Telefon erst nach Antippen, wer nachgemeldet hat
+            // und wer noch ohne Auftrag ist (Audit Runde 3, R3-K2). Der
+            // Bedarf steht dafür in der Kurzform der Tabelle.
             <span className="muster-sub kompakt-zeile">
-              Stärke {staerkeText(kopf.bogen)}
+              <span>Stärke {staerkeText(kopf.bogen)}</span>
+              {folge && (
+                <span className={`kompakt-merkmal folge-merkmal${folge.verlust ? " staerke-verlust" : ""}`} title={`Folgemeldung ${zeitLang(folge.gemeldetAm)}: ${folge.kurz}`}>
+                  Folgem. {zeitKurz(folge.gemeldetAm)}
+                  {folge.staerkeVorher != null ? ` · ${folge.staerkeVorher} → ${folge.staerkeNachher}` : ""}
+                </span>
+              )}
               {bedarf.map((m) => (
-                <span className={m.dringend ? "bedarf-marke dringend" : "bedarf-marke routine"} key={m.lang}>{m.lang}</span>
+                <span className={m.dringend ? "bedarf-marke dringend" : "bedarf-marke routine"} key={m.lang} title={m.lang}>{m.kurz}</span>
               ))}
+              {kopf.notiz && (
+                <span className="kompakt-merkmal auftrag-merkmal" title={`Auftrag/Notiz: ${kopf.notiz}`}>Auftrag ✓</span>
+              )}
+              {zaehlt && luecken.length > 0 && (
+                <span className="kompakt-merkmal luecken-merkmal" title={luecken.map((p) => p.text).join("\n")}>
+                  {luecken.length} {luecken.length === 1 ? "Lücke" : "Lücken"}
+                </span>
+              )}
             </span>
           ) : (
           <>
@@ -2332,11 +2436,19 @@ function EinheitKarte(props: {
           )}
           {/* Folgemeldung: die Veränderung gehört in die Zeile, nicht erst hinter
               einen Klick — sie ist die Information der Schichtübergabe. */}
-          {kurz && vorige && (
+          {folge && vorige ? (
+            // Wann die Folgemeldung kam, steht vorn: „seit Stand …" stand
+            // dauerhaft an jeder nachgemeldeten Einheit, ob die Änderung eine
+            // Minute oder sechs Stunden alt war (R3-K1).
+            <span className="muster-sub diff-kurz">
+              Folgemeldung {zeitLang(folge.gemeldetAm)} (vorher Stand {standText(vorige.bogen)}):{" "}
+              <span className={folge.verlust ? "staerke-verlust" : undefined}>{folge.kurz}</span>
+            </span>
+          ) : kurz && vorige ? (
             <span className="muster-sub diff-kurz">
               seit {standText(vorige.bogen)}: {kurz}
             </span>
-          )}
+          ) : null}
           {kopf.aufgegangenIn && (
             <span className="muster-sub">
               aufgegangen in{" "}

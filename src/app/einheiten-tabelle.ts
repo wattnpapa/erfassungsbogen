@@ -19,7 +19,8 @@
 
 import { staerke, type Erfassungsbogen } from "@bos/eeb-format/model";
 import { einheitAnzeigename, orgLabel, vokabText, vokabularFuer, zeitpunktDeutsch } from "./hilfen";
-import { MeldeStatus, type EinsatzArt, type MeldeEintrag } from "@bos/meldekopf/einsaetze";
+import { MeldeStatus, revisionen, type EinsatzArt, type MeldeEintrag } from "@bos/meldekopf/einsaetze";
+import { FELD_GESAMTSTAERKE, bogenDiff, diffKurzfassung } from "@bos/meldekopf/meldung-diff";
 import { summiereBoegen, unterbringungLage, verpflegungLage, zaehltInLage, type EinsatzSummen } from "./auswertung";
 import { eintreffzeit, zeitLang, zeitpunktZuMs } from "./eintrag-zeiten";
 
@@ -136,6 +137,94 @@ export const NEU_MS = 30 * 60 * 1000;
 
 export function istNeu(e: MeldeEintrag, jetzt = Date.now()): boolean {
   return jetzt - eintreffzeit(e) < NEU_MS;
+}
+
+// ------------------------------------------------------------ Folgemeldungen
+
+/**
+ * Was eine Folgemeldung an der Einheit geändert hat — für Karte, Kompaktzeile
+ * und Sammelquittung. Eine Folgemeldung erbt die Eintreffzeit (R2-K1); an ihr
+ * ist sie deshalb nicht als neu zu erkennen. Maßgeblich ist hier der Eingang
+ * der Fassung (`empfangenAm`), nicht das Eintreffen der Einheit (Audit
+ * Runde 3, R3-K1).
+ */
+export interface FolgeAenderung {
+  /** Eingang der aktuellen Fassung (Geräteuhr, ms). */
+  gemeldetAm: number;
+  /** „Stärke 12 → 9 (−3)", „Diesel … / 2 Änderungen", „inhaltlich unverändert". */
+  kurz: string;
+  /** Gesamtstärke vorher/nachher, nur wenn sie sich geändert hat. */
+  staerkeVorher?: number;
+  staerkeNachher?: number;
+  /** Die Gesamtstärke ist gesunken — das muss auffallen. */
+  verlust: boolean;
+}
+
+/**
+ * Ist diese Fassung eine Folgemeldung der Einheit? Ja, wenn es eine ältere
+ * Fassung gibt und die aktuelle von außen kam — eine hier entstandene
+ * Rest-Fassung nach Aufteilen oder Zusammenführen ist keine Meldung.
+ */
+export function folgeAenderung(kopf: MeldeEintrag, alle: MeldeEintrag[]): FolgeAenderung | null {
+  if (kopf.quelle === "aufteilung" || kopf.quelle === "zusammenfuehrung") return null;
+  const vorige = revisionen(alle, kopf.einheitSchluessel).find((r) => r.id !== kopf.id && r.empfangenAm <= kopf.empfangenAm);
+  if (!vorige) return null;
+  const d = bogenDiff(vorige.bogen, kopf.bogen);
+  const vorher = staerke(vorige.bogen).gesamt;
+  const nachher = staerke(kopf.bogen).gesamt;
+  return {
+    gemeldetAm: kopf.empfangenAm,
+    kurz: folgeKurztext(d, vorher, nachher),
+    ...(vorher !== nachher ? { staerkeVorher: vorher, staerkeNachher: nachher } : {}),
+    verlust: nachher < vorher,
+  };
+}
+
+/**
+ * Kurzfassung einer Folgemeldung: Stärke zuerst (mit Differenz), dann
+ * Fahrzeuge, dann bis zu zwei Bedarfsänderungen mit Wert („Diesel 200 l →
+ * 400 l") und geänderte Freitexte nur mit Namen. `diffKurzfassung` allein
+ * sagte bei Weinsberg „2 Änderungen" — welche, stand erst hinter einem Tipp.
+ */
+function folgeKurztext(d: ReturnType<typeof bogenDiff>, vorher: number, nachher: number): string {
+  if (d.anzahl === 0) return "inhaltlich unverändert";
+  const teile: string[] = [];
+  let erklaert = 0;
+  if (vorher !== nachher || d.staerke.some((a) => a.feld === FELD_GESAMTSTAERKE)) {
+    const diff = nachher - vorher;
+    teile.push(`Stärke ${vorher} → ${nachher}${diff !== 0 ? ` (${diff > 0 ? "+" : "−"}${Math.abs(diff)})` : ""}`);
+    // Ab- und Zugänge im Personal SIND die Stärkeänderung.
+    erklaert += d.staerke.length + d.personalZugang.length + d.personalAbgang.length;
+  }
+  const fz = diffKurzfassung({ ...d, staerke: [] });
+  if (d.fahrzeugeZugang.length > 0 || d.fahrzeugeAbgang.length > 0) {
+    teile.push(fz);
+    erklaert += d.fahrzeugeZugang.length + d.fahrzeugeAbgang.length;
+  }
+  // Die M/W/D-Aufteilung folgt der Stärke — neben ihr nur Lärm.
+  const bedarf = vorher !== nachher ? d.bedarf.filter((a) => a.feld !== "Unterbringung M/W/D") : d.bedarf;
+  erklaert += d.bedarf.length - bedarf.length;
+  for (const a of bedarf.slice(0, Math.max(0, 3 - teile.length))) {
+    teile.push(`${a.feld} ${a.vorher} → ${a.nachher}`);
+    erklaert++;
+  }
+  for (const a of d.sonstiges.slice(0, Math.max(0, 3 - teile.length))) {
+    teile.push(`${a.feld} geändert`);
+    erklaert++;
+  }
+  const rest = d.anzahl - erklaert;
+  if (rest > 0) teile.push(teile.length === 0 ? `${rest} ${rest === 1 ? "Änderung" : "Änderungen"}` : `${rest} weitere ${rest === 1 ? "Änderung" : "Änderungen"}`);
+  return teile.join(" · ");
+}
+
+/** Wann die aktuelle Fassung einging — Sortierschlüssel „zuletzt gemeldet". */
+export function zuletztGemeldet(e: MeldeEintrag): number {
+  return e.empfangenAm;
+}
+
+/** Fassung vor weniger als 30 Minuten eingegangen (Marke „neue Fassung", R3-K1). */
+export function frischGemeldet(e: MeldeEintrag, jetzt = Date.now()): boolean {
+  return jetzt - e.empfangenAm < NEU_MS;
 }
 
 /** Eine Tabellenzeile: eine gemeldete Einheit mit allen Zahlen der Übersicht. */

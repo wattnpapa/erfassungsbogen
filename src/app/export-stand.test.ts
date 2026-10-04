@@ -13,6 +13,8 @@ import {
   exportSammlung,
   exportStandLaden,
   exportVermerken,
+  kenntnisStandLaden,
+  kenntnisVermerken,
   lageblattStandLaden,
   lageblattVermerken,
   neueEintraege,
@@ -119,6 +121,23 @@ describe("weitergabeStandLaden / weitergabeVermerken (Audit Runde 2, R2-W5)", ()
     expect(exportStandLaden("e1")).toBeNull();
     expect(lageblattStandLaden("e1")).toBeNull();
     expect(localStorage.getItem("eeb.weitergabe-stand.v1")).not.toBeNull();
+  });
+});
+
+describe("kenntnisStandLaden / kenntnisVermerken (Audit Runde 3, R3-K1)", () => {
+  it("merkt sich die Kenntnisnahme je Sammlung, getrennt von den übrigen Ständen, und räumt verschwundene weg", () => {
+    const s = sammlung("e1", [eintrag("m1", "Wardenburg", 1000)]);
+    expect(kenntnisStandLaden("e1")).toBeNull();
+    kenntnisVermerken(s, undefined, 5000);
+    kenntnisVermerken(sammlung("e2", []), undefined, 6000);
+    expect(kenntnisStandLaden("e1")).toEqual({ zeitpunkt: 5000, eintragIds: ["m1"] });
+    expect(exportStandLaden("e1")).toBeNull();
+    expect(localStorage.getItem("eeb.kenntnis-stand.v1")).not.toBeNull();
+    const danach = sammlung("e1", [eintrag("m1", "Wardenburg", 1000), eintrag("m2", "Wardenburg", 800)]);
+    // Über die Kennung, nicht die Zeit: die ältere Empfangszeit ist trotzdem neu.
+    expect(neueEintraege(danach.eintraege, kenntnisStandLaden("e1")).map((e) => e.id)).toEqual(["m2"]);
+    kenntnisVermerken(danach, ["e1"], 7000);
+    expect(kenntnisStandLaden("e2")).toBeNull();
   });
 });
 

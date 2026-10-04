@@ -29,11 +29,16 @@ import type { MeldeEintrag } from "@bos/meldekopf/einsaetze";
 import { FE_EINGESCHLOSSEN, FE_TEXT, einheitAnzeigename, funkrufText, kennzeichenText, orgLabel, vokabularFuer } from "./hilfen";
 import { eintreffzeit } from "./eintrag-zeiten";
 
-export type EinheitenSortierung = "name" | "eintreffzeit" | "zug" | "organisation";
+export type EinheitenSortierung = "name" | "zuletzt" | "eintreffzeit" | "zug" | "organisation";
 
 export const SORTIERUNGEN: { wert: EinheitenSortierung; label: string }[] = [
   { wert: "name", label: "Name (A–Z)" },
-  { wert: "eintreffzeit", label: "Eintreffzeit (neueste zuerst)" },
+  // „Zuletzt gemeldet" ordnet nach dem Eingang der aktuellen Fassung, auch
+  // einer Folgemeldung. Die Eintreffzeit vererbt sich auf die Folgemeldung
+  // (R2-K1); eine frische Fassung mit drei Helfern weniger stand darin auf
+  // dem letzten Platz (Audit Runde 3, R3-K1).
+  { wert: "zuletzt", label: "Zuletzt gemeldet (neueste zuerst)" },
+  { wert: "eintreffzeit", label: "Eintreffzeit vor Ort (neueste zuerst)" },
   { wert: "zug", label: "Zug" },
   { wert: "organisation", label: "Organisation" },
 ];
@@ -198,8 +203,9 @@ function nameVergleich(a: MeldeEintrag, b: MeldeEintrag): number {
 
 /**
  * Sortierte Kopie der Liste. „zug" stellt Einheiten ohne Etikett ans Ende
- * (wie die Zwischensummen in auswertung.ts), „eintreffzeit" zeigt die zuletzt
- * eingetroffene Meldung oben — das ist beim Meldekopf das Neue.
+ * (wie die Zwischensummen in auswertung.ts), „zuletzt" die zuletzt
+ * eingegangene Fassung oben (auch eine Folgemeldung), „eintreffzeit" die
+ * zuletzt vor Ort eingetroffene Einheit.
  */
 export function einheitenSortieren(
   eintraege: MeldeEintrag[],
@@ -207,6 +213,9 @@ export function einheitenSortieren(
 ): MeldeEintrag[] {
   const liste = [...eintraege];
   switch (sortierung) {
+    case "zuletzt":
+      // Eingang der aktuellen Fassung (Geräteuhr), nicht das Eintreffen.
+      return liste.sort((a, b) => b.empfangenAm - a.empfangenAm || nameVergleich(a, b));
     case "eintreffzeit":
       // Die korrigierte Eintreffzeit, nicht der Empfangsmoment: wer einen
       // Papierstapel nachträgt, hat alle Bögen in derselben Minute erfasst —

@@ -2263,6 +2263,30 @@
     /* Kurzfassung in der Einheitenzeile: dieselbe Nebenzeile, aber lesbar statt
        abgeblendet — sie ist der eigentliche Übergabehinweis. */
     .muster-sub.diff-kurz { color: var(--akzent); font-weight: 600; }
+    /* R3-K1: Folgemeldung als „neue Fassung" — wie „kürzlich eingetroffen",
+       aber auch zugeklappt auf dem Telefon sichtbar: sie ist die Meldung,
+       nach der nach einer Unterbrechung gefragt wird. Ein Stärkeverlust
+       steht in der Warnfarbe und mit Dreieck davor, nicht nur farbig. */
+    .fassung-badge {
+      display: inline-block; margin-left: 0.4rem; padding: 0 0.35rem;
+      border-radius: var(--radius); font-size: var(--t-xs); font-weight: 700;
+      letter-spacing: 0.04em; vertical-align: 0.1em;
+      background: var(--akzent); color: var(--auf-akzent);
+    }
+    .staerke-verlust { color: var(--warn-text); font-weight: 700; }
+    .staerke-verlust::before { content: "▼ "; }
+    span.kompakt-merkmal {
+      display: inline-block; padding: 0.05rem 0.4rem;
+      border: 1px solid var(--linie); border-radius: var(--radius);
+      font-size: var(--t-xs); font-weight: 600; color: var(--text);
+    }
+    span.kompakt-merkmal.staerke-verlust {
+      background: var(--warn-fond); color: var(--warn-text); border: 2px solid var(--warn-linie);
+    }
+    span.kompakt-merkmal.luecken-merkmal { color: var(--warn-text); }
+    .stapel-eingang p { margin: 0; }
+    .stapel-eingang ul { margin: 0.25rem 0; padding-left: 1.1rem; }
+    .stapel-eingang li { overflow-wrap: anywhere; }
     /* Treffer des Qualifikationsfilters: die Namen sind hier die Antwort auf die
        Frage, also volle Deckkraft statt zurückgenommener Unterzeile. */
     .muster-sub.quali-treffer { color: var(--text); }

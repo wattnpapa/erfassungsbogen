@@ -31,7 +31,7 @@ import {
   meldungHinzufuegen,
   type MeldeEintrag,
 } from "@bos/meldekopf/einsaetze";
-import { eintreffzeitSetzen, notizSetzen } from "./eintrag-zeiten";
+import { eintreffzeitSetzen, meldungAufnehmen, notizSetzen } from "./eintrag-zeiten";
 import { aggregiere } from "./auswertung";
 import { neuerBogen, neuePerson } from "./hilfen";
 import { lageblattVermerken, weitergabeVermerken, type ExportStand, type ExportUmfang } from "./export-stand";
@@ -1089,6 +1089,32 @@ describe("Kompakte Einheiten auf dem Telefon (R2-K7)", () => {
     await nutzer.click(within(karte).getByRole("button", { name: "Zuklappen" }));
     expect(karte.className).toContain("kompakt");
   });
+
+  it("nennt zugeklappt Folgemeldung mit Stärkeänderung, Auftrag und Lücken als kurze Merkmale (R3-K2)", () => {
+    const angelegt = einsatzAnlegen("Hochwasser Test", EinsatzArt.EINSATZ);
+    const erst = bogenMitName("Crailsheim");
+    erst.personalErfassung = PersonalErfassung.NUR_STAERKE;
+    erst.staerkeManuell = { fuehrer: 0, unterfuehrer: 3, mannschaft: 9, gesamt: 12 };
+    const e1 = meldungHinzufuegen(angelegt.id, erst)!.eintrag;
+    notizSetzen(angelegt.id, e1.id, "Pumpenstandort Kocherbrücke");
+    const folge = structuredClone(erst);
+    folge.staerkeManuell = { fuehrer: 0, unterfuehrer: 3, mannschaft: 6, gesamt: 9 };
+    folge.stand += 5;
+    meldungAufnehmen(angelegt.id, folge);
+    meldungHinzufuegen(angelegt.id, bogenMitName("Ulm"));
+    ansicht(angelegt.id);
+    const [crailsheim, ulm] = [...document.querySelectorAll<HTMLElement>(".einheit-zeile")];
+    expect(crailsheim!.className).toContain("kompakt");
+    const zeile = crailsheim!.querySelector(".kompakt-zeile")!;
+    expect(zeile.querySelector(".folge-merkmal")!.textContent).toMatch(/^Folgem\. \d\d:\d\d · 12 → 9$/);
+    expect(zeile.querySelector(".folge-merkmal")!.className).toContain("staerke-verlust");
+    expect(zeile.querySelector(".auftrag-merkmal")!.textContent).toBe("Auftrag ✓");
+    // Die Marke „neue Fassung" bleibt zugeklappt sichtbar (anders als „kürzlich eingetroffen").
+    expect(crailsheim!.querySelector(".fassung-badge")).not.toBeNull();
+    expect(ulm!.querySelector(".folge-merkmal")).toBeNull();
+    expect(ulm!.querySelector(".auftrag-merkmal")).toBeNull();
+    expect(ulm!.querySelector(".luecken-merkmal")).not.toBeNull();
+  });
 });
 
 /**
@@ -1114,13 +1140,18 @@ describe("Quittung nennt die zuletzt aufgenommenen Einheiten (R2-S4)", () => {
     neuLaden();
     const quittung = document.querySelector<HTMLElement>(".stapel-eingang")!;
     expect(quittung.getAttribute("role")).toBe("status");
-    expect(quittung.textContent).toMatch(/Zuletzt aufgenommen \(3\): .*Weinsberg.*Albstadt.*Ulm — davon 2 Übung, nicht gezählt\./);
+    expect(quittung.textContent).toMatch(/Neu seit der letzten Kenntnisnahme \(3\): davon 2 Übung, nicht gezählt\./);
+    expect([...quittung.querySelectorAll("li")].map((li) => li.textContent)).toEqual([
+      "THW Weinsberg — neu gemeldet",
+      "THW Albstadt — neu gemeldet",
+      "THW Ulm — neu gemeldet",
+    ]);
     expect(quittung.textContent).not.toContain("Zeitz");
 
-    await nutzer.click(within(quittung).getByRole("button", { name: "Neueste oben zeigen" }));
-    expect((screen.getByLabelText("Sortierung") as HTMLSelectElement).value).toBe("eintreffzeit");
+    await nutzer.click(within(quittung).getByRole("button", { name: "Zuletzt gemeldete oben zeigen" }));
+    expect((screen.getByLabelText("Sortierung") as HTMLSelectElement).value).toBe("zuletzt");
 
-    await nutzer.click(within(quittung).getByRole("button", { name: "Ausblenden" }));
+    await nutzer.click(within(quittung).getByRole("button", { name: "Zur Kenntnis genommen" }));
     expect(document.querySelector(".stapel-eingang")).toBeNull();
   });
 
@@ -1142,6 +1173,74 @@ describe("Quittung nennt die zuletzt aufgenommenen Einheiten (R2-S4)", () => {
     neuLaden();
     expect(document.querySelectorAll(".einheit-zeile")).toHaveLength(2);
     expect(document.querySelector(".stapel-eingang")).toBeNull();
+  });
+});
+
+/**
+ * Folgemeldungen fielen nicht auf: Sie erben die Eintreffzeit, bekamen keine
+ * Marke, standen in „neueste zuerst" hinten, und nach dem Neuladen war die
+ * Quittung weg (Audit Runde 3, R3-K1).
+ */
+describe("Folgemeldungen als neue Fassung erkennbar (R3-K1)", () => {
+  beforeEach(() => {
+    localStorage.clear();
+  });
+
+  function staerkeBogen(name: string, gesamt: number): Erfassungsbogen {
+    const b = bogenMitName(name);
+    b.personalErfassung = PersonalErfassung.NUR_STAERKE;
+    b.staerkeManuell = { fuehrer: 0, unterfuehrer: 1, mannschaft: gesamt - 1, gesamt };
+    return b;
+  }
+
+  it("nennt die Folgemeldung mit Stärkeänderung, auch nach dem Neuaufbau, bis zur Kenntnisnahme", async () => {
+    const nutzer = userEvent.setup();
+    const angelegt = einsatzAnlegen("Hochwasser Kocher", EinsatzArt.EINSATZ);
+    meldungHinzufuegen(angelegt.id, staerkeBogen("Crailsheim", 12));
+    meldungHinzufuegen(angelegt.id, staerkeBogen("Ulm", 6));
+    // Erstes Öffnen: alles Vorhandene gilt als gesehen.
+    ansicht(angelegt.id);
+    expect(document.querySelector(".stapel-eingang")).toBeNull();
+    cleanup();
+
+    const folge = staerkeBogen("Crailsheim", 9);
+    folge.stand += 5;
+    meldungHinzufuegen(angelegt.id, folge);
+    // Neu aufgebaut wie nach einem Neuladen: die Quittung steht.
+    ansicht(angelegt.id);
+    const quittung = document.querySelector<HTMLElement>(".stapel-eingang")!;
+    expect(quittung.textContent).toMatch(/Neu seit der letzten Kenntnisnahme \(1\)/);
+    expect(quittung.textContent).toMatch(/THW Crailsheim — Folgemeldung \d\d:\d\d: Stärke 12 → 9 \(−3\)/);
+    expect(quittung.querySelector(".staerke-verlust")!.textContent).toBe("Stärke 12 → 9 (−3)");
+
+    const karte = [...document.querySelectorAll<HTMLElement>(".einheit-zeile")].find((k) => k.textContent!.includes("Crailsheim"))!;
+    expect(karte.querySelector(".fassung-badge")!.textContent).toContain("neue Fassung");
+    expect(karte.querySelector(".diff-kurz")!.textContent).toMatch(/^Folgemeldung \d\d\.\d\d\.\d{4}, \d\d:\d\d \(vorher Stand .*\): Stärke 12 → 9 \(−3\)$/);
+
+    await nutzer.click(within(quittung).getByRole("button", { name: "Zur Kenntnis genommen" }));
+    expect(document.querySelector(".stapel-eingang")).toBeNull();
+    cleanup();
+    ansicht(angelegt.id);
+    expect(document.querySelector(".stapel-eingang")).toBeNull();
+  });
+
+  it("stellt in „Zuletzt gemeldet“ die Folgemeldung nach oben, obwohl sie die alte Eintreffzeit erbt", async () => {
+    const nutzer = userEvent.setup();
+    const angelegt = einsatzAnlegen("Hochwasser Kocher", EinsatzArt.EINSATZ);
+    meldungHinzufuegen(angelegt.id, staerkeBogen("Crailsheim", 12));
+    const erst = gespeichert(angelegt.id, "Crailsheim");
+    eintreffzeitSetzen(angelegt.id, erst.id, Date.now() - 24 * 3600_000);
+    meldungHinzufuegen(angelegt.id, staerkeBogen("Ulm", 6));
+    eintreffzeitSetzen(angelegt.id, gespeichert(angelegt.id, "Ulm").id, Date.now() - 3600_000);
+    const folge = staerkeBogen("Crailsheim", 9);
+    folge.stand += 5;
+    meldungAufnehmen(angelegt.id, folge);
+    ansicht(angelegt.id);
+    const reihe = () => [...document.querySelectorAll(".einheit-zeile h3")].map((h) => h.textContent);
+    await nutzer.selectOptions(screen.getByLabelText("Sortierung"), "eintreffzeit");
+    expect(reihe()[0]).toContain("Ulm");
+    await nutzer.selectOptions(screen.getByLabelText("Sortierung"), "zuletzt");
+    expect(reihe()[0]).toContain("Crailsheim");
   });
 });
 

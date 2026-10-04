@@ -24,6 +24,8 @@ import {
   TABELLEN_SPALTEN,
   bedarfKurztext,
   bedarfMarken,
+  folgeAenderung,
+  frischGemeldet,
   hatSofortbedarf,
   passtZuBedarfsfilter,
   istNeu,
@@ -274,5 +276,41 @@ describe("zeilenSortieren", () => {
     for (const s of TABELLEN_SPALTEN) {
       expect(zeilenSortieren(zeilen, s.schluessel, "ab")).toHaveLength(zeilen.length);
     }
+  });
+});
+
+describe("folgeAenderung / frischGemeldet (Audit Runde 3, R3-K1)", () => {
+  const erst = eintrag("c1", bogen("Crailsheim", 11), { einheitSchluessel: "crailsheim", empfangenAm: 1000 });
+
+  it("nennt den Stärkeverlust mit Differenz und markiert ihn", () => {
+    const folge = eintrag("c2", bogen("Crailsheim", 8), { einheitSchluessel: "crailsheim", empfangenAm: 5000, eingetroffenAm: 1000 });
+    const f = folgeAenderung(folge, [erst, folge])!;
+    expect(f.gemeldetAm).toBe(5000);
+    expect(f.kurz).toBe("Stärke 12 → 9 (−3)");
+    expect(f).toMatchObject({ staerkeVorher: 12, staerkeNachher: 9, verlust: true });
+  });
+
+  it("nennt Bedarfsänderungen mit Wert und Freitexte mit Namen statt „2 Änderungen“", () => {
+    const b1 = bogen("Weinsberg", 3);
+    b1.sofortbedarf = { verpflegungPersonen: 0, dieselLiter: 200, benzinLiter: 0, gemischLiter: 0, unterbringung: false, ruhezeitErforderlich: false };
+    const b2 = structuredClone(b1);
+    b2.sofortbedarf!.dieselLiter = 400;
+    b2.sonstiges = "Nachschub nötig";
+    const a = eintrag("w1", b1, { einheitSchluessel: "w", empfangenAm: 1 });
+    const b = eintrag("w2", b2, { einheitSchluessel: "w", empfangenAm: 2 });
+    const f = folgeAenderung(b, [a, b])!;
+    expect(f.kurz).toBe("Diesel 200 l → 400 l · Sonstiges geändert");
+    expect(f.verlust).toBe(false);
+  });
+
+  it("ist keine Folgemeldung: Erstmeldung und Rest-Fassung nach Aufteilen", () => {
+    expect(folgeAenderung(erst, [erst])).toBeNull();
+    const rest = eintrag("c3", bogen("Crailsheim", 8), { einheitSchluessel: "crailsheim", empfangenAm: 5000, quelle: "aufteilung" });
+    expect(folgeAenderung(rest, [erst, rest])).toBeNull();
+  });
+
+  it("gilt 30 Minuten nach dem Eingang als frisch", () => {
+    expect(frischGemeldet(eintrag("x", bogen("A", 1), { empfangenAm: 1_000_000 }), 1_000_000 + 29 * 60_000)).toBe(true);
+    expect(frischGemeldet(eintrag("x", bogen("A", 1), { empfangenAm: 1_000_000 }), 1_000_000 + 31 * 60_000)).toBe(false);
   });
 });

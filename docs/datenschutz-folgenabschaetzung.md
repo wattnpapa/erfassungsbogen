@@ -120,6 +120,13 @@ Grundlage: Repository `wattnpapa/erfassungsbogen`, Stand 2026-09-12 — Version 
 > Nummer aus der Eingangsreihenfolge; Zeitpunkte stehen einheitlich als
 > „TT.MM.JJJJ, hh:mm". Keine neuen personenbezogenen Daten, kein neuer
 > Empfänger. Geändert: 5.1.
+>
+> **Nachgezogen 2026-10-04 — Kenntnisnahme in der Einsatzansicht (Audit
+> Runde 3, R3-K1):** Die App merkt sich je Sammlung und Gerät, welche
+> Meldungen beim letzten „Zur Kenntnis genommen" schon da waren
+> (`eeb.kenntnis-stand.v1`, nur Kennungen und Zeitpunkt), und nennt bis
+> dahin neue Einheiten und Folgemeldungen mit ihrer Änderung. Keine neuen
+> personenbezogenen Daten, kein neuer Empfänger. Geändert: 5.7.
 
 ## Hinweis zu diesem Dokument
 
@@ -418,6 +425,12 @@ Kapitel 6 der [Arc42-Dokumentation](arc42-architektur.md).
   Kennungen der Meldungen darin (`eeb.weitergabe-stand.v1`,
   `src/app/export-stand.ts`) — Grundlage des Übergabevermerks in der
   Einsatzansicht; ohne Personendaten, fällt mit „Alle Daten löschen" weg.
+- **Kenntnis-Stand (seit 2026-10-04, R3-K1):** Zeitpunkt der letzten
+  Kenntnisnahme in der Einsatzansicht und die Kennungen der Meldungen, die da
+  schon in der Sammlung standen (`eeb.kenntnis-stand.v1`,
+  `src/app/export-stand.ts`) — Grundlage der Sammelquittung „Neu seit der
+  letzten Kenntnisnahme"; je Gerät, ohne Personendaten, fällt mit „Alle Daten
+  löschen" weg.
 - Eine **Papierkorb-Funktion** existiert (`sicherung.ts`, `vorlagen.ts`,
   `@bos/meldekopf/papierkorb`): gelöschte Einträge lassen sich vor endgültiger
   Löschung wiederherstellen.

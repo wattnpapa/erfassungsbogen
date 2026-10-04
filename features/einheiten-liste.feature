@@ -112,7 +112,7 @@ Funktionalität: Einheitenliste durchsuchen, filtern und sortieren
     Und führt die Einheitenliste "THW" nicht
 
   Szenario: Nach Eintreffzeit steht die jüngste Meldung oben
-    Wenn ich das Feld "Sortierung" auf "Eintreffzeit (neueste zuerst)" stelle
+    Wenn ich das Feld "Sortierung" auf "Eintreffzeit vor Ort (neueste zuerst)" stelle
     Dann führt die Einheitenliste "Feuerwehr Aschhausen" an Stelle 1
     Und führt die Einheitenliste "THW" an Stelle 3
 

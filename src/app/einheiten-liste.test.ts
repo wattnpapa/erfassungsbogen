@@ -145,6 +145,16 @@ describe("einheitenSortieren", () => {
     expect(ids(einheitenSortieren(liste, "eintreffzeit"))).toEqual(["a", "c", "b"]);
   });
 
+  it("sortiert nach „zuletzt gemeldet“ über den Eingang der Fassung, nicht die geerbte Eintreffzeit (R3-K1)", () => {
+    const lage = [
+      eintrag("alt", bogen(OrganisationsTyp.THW, "Radolfzell", "Tr Log"), { empfangenAm: 8000, eingetroffenAm: 8000 }),
+      // Folgemeldung: erbt die Eintreffzeit von gestern, kam aber eben herein.
+      eintrag("folge", bogen(OrganisationsTyp.THW, "Crailsheim", "FGr W"), { empfangenAm: 9000, eingetroffenAm: 100 }),
+    ];
+    expect(ids(einheitenSortieren(lage, "eintreffzeit"))).toEqual(["alt", "folge"]);
+    expect(ids(einheitenSortieren(lage, "zuletzt"))).toEqual(["folge", "alt"]);
+  });
+
   it("sortiert nach Zug und stellt Einheiten ohne Zug ans Ende", () => {
     expect(ids(einheitenSortieren(liste, "zug"))).toEqual(["c", "a", "b"]);
   });
