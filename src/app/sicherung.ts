@@ -15,7 +15,8 @@
 
 import { absenderkarteGefuellt, absenderkarteLaden } from "./absenderkarte";
 import { einsaetzeLaden, einsaetzePapierkorb } from "./einsaetze-lesen";
-import { entwurfLaden } from "./entwurf";
+import { entwurfLaden, ersetztenEntwurfLaden } from "./entwurf";
+import { einheitAnzeigename } from "./hilfen";
 import { geraeteSchluesselPrivat } from "./geraete-schluessel";
 import { vorlagenLaden, vorlagenPapierkorb } from "./vorlagen";
 
@@ -260,8 +261,19 @@ export interface DatenUmfang {
   /** Gemeldete Bögen über alle Einsatz-Sammlungen. */
   meldungen: number;
   entwurf: boolean;
+  /**
+   * Name der Einheit auf dem Rückholplatz (verdrängter eigener Bogen), sonst
+   * null. Die Aufzählung nannte ihn nicht und sagte bei leerem Arbeitsplatz
+   * „kein offener Bogen-Entwurf" (Audit Runde 3, R3-D4).
+   */
+  rueckholplatz: string | null;
   absender: boolean;
   geraeteschluessel: boolean;
+}
+
+function rueckholplatzName(): string | null {
+  const e = ersetztenEntwurfLaden();
+  return e ? einheitAnzeigename(e.bogen.einheit) || "(Bogen ohne Namen)" : null;
 }
 
 export function datenUmfang(): DatenUmfang {
@@ -273,6 +285,7 @@ export function datenUmfang(): DatenUmfang {
     einsaetze: einsaetze.length,
     meldungen: einsaetze.reduce((summe, e) => summe + e.eintraege.length, 0),
     entwurf: entwurfLaden() != null,
+    rueckholplatz: rueckholplatzName(),
     absender: absenderkarteGefuellt(absenderkarteLaden()),
     geraeteschluessel: geraeteSchluesselPrivat() != null,
   };

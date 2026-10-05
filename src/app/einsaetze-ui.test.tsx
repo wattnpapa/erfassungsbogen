@@ -248,6 +248,31 @@ describe("Einheit mit Folgemeldung entfernen (R2-D1)", () => {
     expect(within(zurueckQuittung).queryByRole("button", { name: "Rückgängig" })).toBeNull();
   });
 
+  it("hält den Rückweg über das Verlassen der Ansicht hinweg (R3-D4)", async () => {
+    const nutzer = userEvent.setup();
+    const { einsatzId, neuLaden } = lage();
+    const karte = karteVon("Ulm")!;
+    await nutzer.click(within(karte).getByRole("button", { name: "Details" }));
+    await nutzer.click(within(karte).getByRole("button", { name: "Mehr…" }));
+    await nutzer.click(within(karte).getByRole("button", { name: "Entfernen" }));
+    const dialog = document.querySelector<HTMLDialogElement>("dialog[aria-label='Meldung entfernen?']")!;
+    await nutzer.click(within(dialog).getByRole("button", { name: "Meldung entfernen" }));
+    neuLaden();
+
+    // Ansicht verlassen und wieder öffnen.
+    cleanup();
+    ansicht(einsatzId);
+    const quittung = document.querySelector<HTMLElement>(".quittung-daumen")!;
+    expect(quittung.textContent).toMatch(/^Entfernt \(2 Fassungen\): .*Ulm/);
+    await nutzer.click(within(quittung).getByRole("button", { name: "Rückgängig" }));
+    expect(einsaetzeLaden().find((x) => x.id === einsatzId)!.eintraege).toHaveLength(3);
+
+    // Danach ist der Rückweg verbraucht, auch nach erneutem Öffnen.
+    cleanup();
+    ansicht(einsatzId);
+    expect(screen.queryByRole("button", { name: "Rückgängig" })).toBeNull();
+  });
+
   it("zeigt in der Historie die Eingangszeit je Fassung und die Vermerke der Führungsstelle (R2-K6)", async () => {
     const nutzer = userEvent.setup();
     lage();

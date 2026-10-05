@@ -127,7 +127,9 @@ export function VorlagenListe(props: {
       {zuletztGeloescht && (
         <p className="meldung" role="status">
           Vorlage „{zuletztGeloescht.name}" in den Papierkorb gelegt (30 Tage rückholbar).{" "}
-          <button type="button" className="link" onClick={loeschenRueckgaengig}>Rückgängig</button>
+          {/* Voller Knopf wie in der Daumenleiste, kein 74 × 30 px großer
+              Textlink (Audit Runde 3, R3-D4). */}
+          <button type="button" onClick={loeschenRueckgaengig}>Rückgängig</button>
         </p>
       )}
       {vorlagen.map((v) => (

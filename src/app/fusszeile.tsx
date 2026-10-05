@@ -936,6 +936,9 @@ export function Fusszeile({ onBogenOeffnen, kompakt = false }: {
                   {" mit "}{loeschUmfang.meldungen} {loeschUmfang.meldungen === 1 ? "gemeldeten Bogen" : "gemeldeten Bögen"}
                 </li>
                 <li>{loeschUmfang.entwurf ? "der aktuelle Bogen-Entwurf" : "kein offener Bogen-Entwurf"}</li>
+                {loeschUmfang.rueckholplatz != null && (
+                  <li>der zuletzt verdrängte Bogen „{loeschUmfang.rueckholplatz}" (Startseite, zum Zurückholen)</li>
+                )}
                 <li>{loeschUmfang.absender ? "die hinterlegte Absenderkarte" : "keine Absenderkarte"}</li>
                 <li>
                   {loeschUmfang.geraeteschluessel

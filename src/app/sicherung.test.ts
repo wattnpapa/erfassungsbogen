@@ -19,7 +19,7 @@ import { absenderkarteSpeichern } from "./absenderkarte";
 import { EinsatzArt, einsatzAnlegen, meldungHinzufuegen,
   speicherhuelleSetzen,
 } from "@bos/meldekopf/einsaetze";
-import { entwurfLaden, entwurfSpeichern } from "./entwurf";
+import { entwurfLaden, entwurfSpeichern, ersetztenEntwurfMerken } from "./entwurf";
 import { vorlageAnlegen, vorlageLoeschen, vorlagenLaden } from "./vorlagen";
 
 function bogen(): Erfassungsbogen {
@@ -122,6 +122,7 @@ describe("datenUmfang()", () => {
       einsaetze: 0,
       meldungen: 0,
       entwurf: false,
+      rueckholplatz: null,
       absender: false,
       geraeteschluessel: false,
     });
@@ -147,6 +148,13 @@ describe("datenUmfang()", () => {
     const u = datenUmfang();
     expect(u.entwurf).toBe(true);
     expect(u.absender).toBe(true);
+  });
+
+  it("nennt den Bogen auf dem Rückholplatz auch bei leerem Arbeitsplatz (R3-D4)", () => {
+    ersetztenEntwurfMerken(bogen());
+    const u = datenUmfang();
+    expect(u.entwurf).toBe(false);
+    expect(u.rueckholplatz).toMatch(/Oldenburg/);
   });
 });
 

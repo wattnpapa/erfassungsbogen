@@ -20,6 +20,7 @@ import { fahrzeugSymbolSvg, svgDataUrl } from "../taktische-zeichen-bogen";
 import { frageJaNein } from "../dialoge";
 import { einheitOrt } from "@bos/meldekopf/darstellung";
 import { mitAbgang, useEinzugsstempel } from "../eintrag-bewegung";
+import { DaumenQuittung } from "../daumen-quittung";
 import {
   Auswahl,
   Feld,
@@ -234,6 +235,23 @@ export function SchrittFahrzeuge({ bogen, aendern }: SchrittProps) {
   // Mal. Das Bearbeiten der neuen Karte ersetzt das Objekt ohnehin — dann ist
   // der Stempel gelaufen und die Markierung darf weg.
   const [frisch, setFrisch] = useState<Fahrzeug | null>(null);
+  // Rückweg nach „Fahrzeug entfernen", wie bei Personen (Audit Runde 3,
+  // R3-D4): Die Rückfrage nannte Typ und Kennzeichen, danach gab es keinen
+  // Weg zurück. „Rückgängig" setzt das Fahrzeug an seine alte Stelle und
+  // lässt später Eingetragenes stehen; die Leiste bleibt bis ✕, bis zum
+  // nächsten Entfernen oder bis der Schritt verlassen wird.
+  const [rueckweg, setRueckweg] = useState<{ fahrzeug: Fahrzeug; index: number; name: string; nonce: number } | null>(null);
+  const [zurueckgeholt, setZurueckgeholt] = useState<{ text: string; nonce: number } | null>(null);
+  const rueckgaengig = () => {
+    if (!rueckweg) return;
+    const liste = [...bogen.fahrzeuge];
+    const stelle = Math.min(rueckweg.index, liste.length);
+    liste.splice(stelle, 0, rueckweg.fahrzeug);
+    setRueckweg(null);
+    setFrisch(rueckweg.fahrzeug);
+    setZurueckgeholt({ text: `Zurückgeholt: ${rueckweg.name}`, nonce: Date.now() });
+    aendern({ fahrzeuge: liste });
+  };
   const vorlage = fahrzeugVorbelegung(bogen.einheit);
   const ovKennzahl = funkrufOrtsverband(bogen.einheit)?.kennzahl;
   const stanGeladen = vorbelegungGeladen(bogen.fahrzeuge, vorlage);
@@ -292,7 +310,12 @@ export function SchrittFahrzeuge({ bogen, aendern }: SchrittProps) {
           index={i}
           anzahl={bogen.fahrzeuge.length}
           aendern={(nf) => aendern({ fahrzeuge: bogen.fahrzeuge.map((x, j) => (j === i ? nf : x)) })}
-          entfernen={() => aendern({ fahrzeuge: bogen.fahrzeuge.filter((_, j) => j !== i) })}
+          entfernen={() => {
+            aendern({ fahrzeuge: bogen.fahrzeuge.filter((_, j) => j !== i) });
+            if (fahrzeugLeer(f)) return;
+            setZurueckgeholt(null);
+            setRueckweg({ fahrzeug: f, index: i, name: fahrzeugBezeichnung(f, i, bogen.einheit.organisation), nonce: Date.now() });
+          }}
         />
       ))}
       <button
@@ -309,6 +332,16 @@ export function SchrittFahrzeuge({ bogen, aendern }: SchrittProps) {
         + Fahrzeug hinzufügen
       </button>
       <Hinweise hinweise={fahrzeugHinweise(bogen)} />
+      {rueckweg && (
+        <DaumenQuittung key={`fahrzeug:${rueckweg.nonce}`} onRueckgaengig={rueckgaengig} onSchliessen={() => setRueckweg(null)}>
+          <strong>Entfernt:</strong> {rueckweg.name}
+        </DaumenQuittung>
+      )}
+      {zurueckgeholt && !rueckweg && (
+        <DaumenQuittung key={`zurueck:${zurueckgeholt.nonce}`} onSchliessen={() => setZurueckgeholt(null)}>
+          {zurueckgeholt.text}
+        </DaumenQuittung>
+      )}
     </section>
   );
 }

@@ -16,7 +16,7 @@ import {
   einsaetzeZuJson,
   einsatzAnlegen,
 } from "@bos/meldekopf/einsaetze";
-import { EinsatzListe } from "./einsaetze-ui";
+import { EinsatzDetail, EinsatzListe } from "./einsaetze-ui";
 import { Dialogschicht } from "./dialoge";
 import { aufgeraeumteLaden, aufraeumBeobachter, ruhendeVormerken } from "./aufraeum-hinweis";
 
@@ -62,6 +62,33 @@ describe("Nachricht nach automatischer Löschung (R2-D5)", () => {
     await nutzer.click(screen.getByRole("button", { name: "Verstanden" }));
     expect(screen.queryByText(/Automatisch gelöscht/)).toBeNull();
     expect(aufgeraeumteLaden()).toEqual([]);
+  });
+
+  it("kündigt die Löschung auch in der Einsatzansicht an (R3-D4)", () => {
+    einsatzAnlegen("Übung Aalen", EinsatzArt.UEBUNG);
+    zurueckdatieren({ "Übung Aalen": 70 });
+    const s = einsaetzeLaden()[0]!;
+    const nichts = () => {};
+    render(
+      <EinsatzDetail
+        einsatz={s}
+        onZurueck={nichts}
+        onGeaendert={nichts}
+        onScannen={nichts}
+        onManuell={nichts}
+        onDateiImport={nichts}
+        onBilderImport={nichts}
+        onExport={nichts}
+        onCsvExport={nichts}
+        onCsvDetailExport={nichts}
+        onOldenburgExport={nichts}
+        onSammelPdf={nichts}
+        onGeloescht={nichts}
+      />,
+    );
+    const warnung = document.querySelector("main .warnung")!;
+    expect(warnung.textContent).toContain("Wird in 20 Tag(en) automatisch gelöscht.");
+    expect(warnung.textContent).toContain("seit 70 Tagen unverändert");
   });
 
   it("merkt sich eine Sammlung nur einmal und lässt Papierkorb-Einträge in Ruhe", () => {

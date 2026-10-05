@@ -223,6 +223,14 @@ Grundlage: Repository `wattnpapa/erfassungsbogen`, Stand 2026-09-12 — Version 
 > auch auf einem frischen Gerät mit vollem Speicher; Speicherfehler erscheinen
 > nirgends mehr als englischer Programmtext (`fehlerText`). Signaturformat
 > unverändert (3.3 D4).
+>
+> **Nachgezogen 2026-10-05:** Rückwege (Audit Runde 3, R3-D4, R3-G1, R3-D3)
+> — „Rückgängig" nach dem Entfernen einer Meldung bleibt beim Verlassen und
+> Wiederöffnen der Einsatzansicht erhalten, bis die Seite neu lädt (weiter
+> nur Arbeitsspeicher). „Person entfernen" und neu „Fahrzeug entfernen"
+> halten die entfernte Person bzw. das Fahrzeug im Arbeitsspeicher, bis die
+> Quittung geschlossen, ersetzt oder der Schritt verlassen wird. „Alle Daten
+> löschen" nennt den Bogen auf dem Rückholplatz. Kein neuer Speicherort (5.5).
 
 ## Hinweis zu diesem Dokument
 
@@ -612,9 +620,10 @@ Datenausleitung an eine andere Herkunft ist technisch unterbunden.
   **allen** Fassungen (Folgemeldungen) samt Zusatzfeldern aus dem Speicher;
   abgeteilte Truppteile mit eigenem Fingerabdruck bleiben. „Rückgängig" (in
   der Quittungsleiste am unteren Bildrand) hält die Einträge nur im
-  Arbeitsspeicher der geöffneten Ansicht, bis die Quittung geschlossen, von
-  einer neueren ersetzt oder die Ansicht verlassen wird — es gibt keinen
-  Papierkorb für einzelne Meldungen. „Fassung
+  Arbeitsspeicher der geöffneten Seite, bis die Quittung geschlossen, von
+  einer neueren ersetzt oder die Seite neu geladen wird; das Verlassen der
+  Einsatzansicht beendet ihn seit 2026-10-05 nicht mehr (R3-D4) — es gibt
+  keinen Papierkorb für einzelne Meldungen. „Fassung
   verwerfen…" in der Historie nimmt gezielt eine einzelne Fassung heraus.
   Die Kennungen der entfernten Einträge bleiben in `eeb.entfernt.v1` (D2e);
   „Einsatz importieren…" fragt, bevor es eine davon wieder aufnimmt, und lässt

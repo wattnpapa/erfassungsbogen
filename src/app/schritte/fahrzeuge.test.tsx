@@ -4,7 +4,7 @@
  */
 
 import { describe, it, expect } from "vitest";
-import { render, screen, within } from "@testing-library/react";
+import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { OrganisationsTyp, PersonalErfassung } from "@bos/eeb-format/model";
 import { SchrittBuehne } from "../../test/schritt-buehne";
@@ -26,6 +26,31 @@ function stanTyp() {
 }
 
 describe("Schritt Fahrzeuge", () => {
+  it("bietet nach „Fahrzeug entfernen“ den Rückweg in der Daumenleiste (R3-D4)", async () => {
+    const nutzer = userEvent.setup();
+    const start = neuerBogen();
+    start.fahrzeuge = [
+      { ...neuesFahrzeug(), kennzeichen: "THW-80125" },
+      { ...neuesFahrzeug(), kennzeichen: "THW-80126" },
+    ];
+    render(<SchrittBuehne komponente={SchrittFahrzeuge} bogen={start} />);
+
+    const kennzeichen = () => (screen.getAllByLabelText("Kennzeichen") as HTMLInputElement[]).map((f) => f.value);
+    const knopf = screen.getAllByRole("button", { name: /entfernen$/ }).find((b) => b.className.includes("entfernen"))!;
+    await nutzer.click(knopf);
+    const frage = document.querySelector<HTMLDialogElement>("dialog[open]")!;
+    await nutzer.click(within(frage).getByRole("button", { name: "Fahrzeug entfernen" }));
+    await waitFor(() => expect(kennzeichen()).toEqual(["THW-80126"]));
+
+    const leiste = document.querySelector<HTMLElement>(".quittung-daumen")!;
+    expect(leiste.textContent).toMatch(/^Entfernt: .*THW-80125/);
+    // Eine Eingabe danach bleibt stehen, das Fahrzeug kommt an seine Stelle zurück.
+    await nutzer.type(screen.getByDisplayValue("THW-80126"), "7");
+    await nutzer.click(within(leiste).getByRole("button", { name: "Rückgängig" }));
+    expect(kennzeichen()).toEqual(["THW-80125", "THW-801267"]);
+    expect(document.querySelector(".quittung-daumen")!.textContent).toMatch(/^Zurückgeholt: .*THW-80125/);
+  });
+
   it("legt ein Fahrzeug an und mahnt das fehlende Kennzeichen an", async () => {
     const nutzer = userEvent.setup();
     buehne();

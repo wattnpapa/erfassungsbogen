@@ -393,13 +393,12 @@ export function EinsatzListe(props: {
       {geloescht && (
         <p className="meldung einsatz-geloescht" role="status">
           Einsatz „{geloescht.name}" in den Papierkorb gelegt (30 Tage rückholbar).{" "}
-          <button type="button" className="link" onClick={loeschenRueckgaengig}>Rückgängig</button>
+          {/* Voller Knopf wie bei Vorlagen und in der Daumenleiste (R3-D4). */}
+          <button type="button" onClick={loeschenRueckgaengig}>Rückgängig</button>
         </p>
       )}
       {einsaetze.map((s) => {
         const sum = aggregiere(s.eintraege, s.art);
-        const restTage = tageBisAufraeumen(s);
-        const ruhtTage = Math.floor((Date.now() - s.geaendert) / (24 * 60 * 60 * 1000));
         return (
           <Kartenstapel className="karte" key={s.id} frisch={s.id === zurueckgeholt}>
             <div className="kopfzeile">
@@ -422,18 +421,7 @@ export function EinsatzListe(props: {
             {/* Ankündigung der automatischen Löschung (siehe AUFRAEUM_FRIST_MS).
                 Sie steht über den Aktionen, damit der Ausweg — exportieren oder
                 durch eine Änderung die Uhr zurücksetzen — direkt daneben liegt. */}
-            {restTage != null && (
-              <p className="warnung">
-                {restTage > 0
-                  ? `Wird in ${restTage} Tag(en) automatisch gelöscht.`
-                  : "Wird beim nächsten Start automatisch gelöscht."}{" "}
-                {/* Die tatsächliche Ruhezeit — „seit 60 Tagen" stand auch bei
-                    70 Tagen da (Audit Runde 2, R2-D5). */}
-                Die Sammlung liegt seit {ruhtTage} Tagen unverändert und enthält Personendaten
-                gemeldeter Kräfte. Wenn du sie noch brauchst, exportiere sie jetzt — jede
-                Änderung an der Sammlung setzt die Frist zurück.
-              </p>
-            )}
+            <AufraeumWarnung sammlung={s} />
             <div className="vorlage-aktionen">
               {/* Der Abgang zeigt, welche Sammlung geht — die Liste rückt erst
                   danach nach. Ohne ihn verschwindet aus einem Stapel gleich
@@ -658,6 +646,29 @@ function alleEinsatzIds(): string[] {
 /** Bis zu so vielen Zeichen steht die Bemerkung der Einheit ungekürzt auf der Karte (R3-K3). */
 const BEMERKUNG_KURZ = 120;
 
+/**
+ * Ankündigung der automatischen Löschung einer ruhenden Sammlung — auf der
+ * Startseitenkarte und in der Einsatzansicht. Dort fehlte sie: Wer die
+ * Sammlung offen hatte, sah die Frist nicht (Audit Runde 3, R3-D4).
+ */
+function AufraeumWarnung({ sammlung: s }: { sammlung: Einsatzsammlung }) {
+  const restTage = tageBisAufraeumen(s);
+  if (restTage == null) return null;
+  const ruhtTage = Math.floor((Date.now() - s.geaendert) / (24 * 60 * 60 * 1000));
+  return (
+    <p className="warnung">
+      {restTage > 0 ? `Wird in ${restTage} Tag(en) automatisch gelöscht.` : "Wird beim nächsten Start automatisch gelöscht."}{" "}
+      {/* Die tatsächliche Ruhezeit — „seit 60 Tagen" stand auch bei
+          70 Tagen da (Audit Runde 2, R2-D5). */}
+      Die Sammlung liegt seit {ruhtTage} Tagen unverändert und enthält Personendaten gemeldeter Kräfte. Wenn du sie
+      noch brauchst, exportiere sie jetzt — jede Änderung an der Sammlung setzt die Frist zurück.
+    </p>
+  );
+}
+
+/** Letzte entfernte Meldung je Sammlung, für „Rückgängig" nach dem Zurückkehren (nur Arbeitsspeicher). */
+const entferntGemerkt = new Map<string, Entfernt>();
+
 /** Nonce der Aufnahme, zu der die Quittung zuletzt ins Bild gerollt wurde (je Seite, nicht je Ansicht). */
 let eingangGerollt = 0;
 
@@ -772,7 +783,16 @@ export function EinsatzDetail(props: {
   // Zuletzt Entferntes — solange es hier steht, gibt es einen Rückweg. Beim
   // Entfernen einer Einheit ALLE ihre Fassungen, beim Verwerfen einer Fassung
   // nur diese (Audit Runde 2, R2-D1).
-  const [zuletztEntfernt, setZuletztEntfernt] = useState<Entfernt | null>(null);
+  // Der Rückweg einer entfernten Meldung übersteht das Verlassen der
+  // Ansicht (nur Arbeitsspeicher, bis die Seite neu lädt): Bisher führte
+  // danach nur „Einsatz importieren…" mit einer älteren Datei zurück (Audit
+  // Runde 3, R3-D4).
+  const [zuletztEntfernt, setZuletztEntferntRoh] = useState<Entfernt | null>(() => entferntGemerkt.get(einsatz.id) ?? null);
+  const setZuletztEntfernt = (x: Entfernt | null) => {
+    if (x) entferntGemerkt.set(einsatz.id, x);
+    else entferntGemerkt.delete(einsatz.id);
+    setZuletztEntferntRoh(x);
+  };
   // Zuletzt aufgeteilt — Quittung mit Rückweg (R2-D6).
   const [aufgeteilt, setAufgeteilt] = useState<Aufgeteilt | null>(null);
   // Quittung eines Rückwegs: Das Zurücknehmen geschah bisher wortlos — wer
@@ -1026,6 +1046,7 @@ export function EinsatzDetail(props: {
       )}
     </SeitenKopf>
     <main id="inhalt" tabIndex={-1} className="einsatz-detail">
+      <AufraeumWarnung sammlung={einsatz} />
       <section className="karte staerke-leiste">
         <div><Zaehlwert wert={sum.einheiten} /><span>Einheiten</span></div>
         <div><Zaehlwert wert={sum.staerke.fuehrer} /><span>Führer</span></div>

@@ -186,6 +186,14 @@ Grundlage: Repository `wattnpapa/erfassungsbogen`, Stand 2026-09-12 — Version 
 > Schreibvorgang unbereinigt (wie bisher, nur ohne leeren Bildschirm). Das
 > Lese-Ergebnis wird höchstens eine Minute im Arbeitsspeicher der offenen
 > Seite gemerkt. Kein neuer Speicherort. Geändert: 5.7.
+>
+> **Nachgezogen 2026-10-05 — Rückwege (Audit Runde 3, R3-D4, R3-G1,
+> R3-D3):** Der Rückweg nach dem Entfernen einer Meldung lebt weiter nur im
+> Arbeitsspeicher, endet aber nicht mehr beim Verlassen der Einsatzansicht,
+> sondern erst mit Schließen, Ersetzen der Quittung oder Neuladen der Seite.
+> Entfernte Personen und Fahrzeuge im Assistenten bleiben bis zum Verlassen
+> des Schritts rückholbar (Arbeitsspeicher). „Alle Daten löschen" zählt den
+> Bogen auf dem Rückholplatz mit auf. Kein neuer Speicherort. Geändert: 5.7.
 
 ## Hinweis zu diesem Dokument
 
@@ -501,9 +509,10 @@ Kapitel 6 der [Arc42-Dokumentation](arc42-architektur.md).
   Zusatzfeldern (`einheitEntfernen`, `src/app/eintrag-zeiten.ts`). Vorher
   blieb bei Folgemeldungen die ältere Fassung mit ihren Personendaten stehen
   (Audit Runde 2, R2-D1). Der Rückweg „Rückgängig" lebt nur im Arbeitsspeicher
-  der offenen Ansicht, nicht im Gerätespeicher, und endet, sobald die
-  Quittung geschlossen, von einer neueren ersetzt oder die Ansicht verlassen
-  wird. Seit 2026-09-29 merkt sich die
+  der offenen Seite, nicht im Gerätespeicher, und endet, sobald die
+  Quittung geschlossen, von einer neueren ersetzt oder die Seite neu geladen
+  wird (seit 2026-10-05 nicht mehr schon beim Verlassen der Einsatzansicht,
+  R3-D4). Seit 2026-09-29 merkt sich die
   App die Kennungen der entfernten Einträge (`eeb.entfernt.v1`, nur zufällige
   Kennungen, `src/app/entfernte-meldungen.ts`): Bringt ein „Einsatz
   importieren…" eine davon zurück, wird gefragt, und ohne Zustimmung bleibt sie
