@@ -45,5 +45,19 @@ export function fehlerText(fehler: unknown): string {
       "mit Verbindung die Seite neu laden, danach steht er auch offline bereit."
     );
   }
+  // Voller oder gesperrter Speicher: nie den englischen Browser-Text
+  // („Failed to execute 'setItem' … exceeded the quota", Audit Runde 3, R3-E1).
+  if (istSpeicherFehler(fehler)) {
+    return (
+      "Der Speicher dieses Geräts nimmt nichts mehr an (voll oder vom Browser gesperrt). " +
+      "Platz schafft nur Löschen: nicht mehr benötigte Einsätze sichern, in den Papierkorb legen und den Papierkorb leeren."
+    );
+  }
   return fehler instanceof Error ? fehler.message : String(fehler);
+}
+
+function istSpeicherFehler(fehler: unknown): boolean {
+  if (fehler == null || typeof fehler !== "object") return false;
+  const { name = "", message = "", code } = fehler as { name?: string; message?: string; code?: number };
+  return /quota/i.test(name) || /quota|exceeded/i.test(message) || code === 22;
 }

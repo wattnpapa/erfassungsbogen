@@ -52,7 +52,7 @@ import {
 } from "@bos/eeb-format/signatur";
 import { absenderkarteLaden, type Absenderkarte } from "../absenderkarte";
 import { AbsenderkarteFeld } from "../absenderkarte-ui";
-import { geraeteKurzform, geraeteOeffentlichHex } from "../geraete-schluessel";
+import { geraeteKurzform, geraeteSchluesselNurSitzung, geraeteOeffentlichHex } from "../geraete-schluessel";
 import { istNativ, linkTeilen, nahbereichDienst, pdfEinbettbar, shareSheetVerfuegbar, textTeilen } from "../nativ";
 import { fehlerText } from "../nachladen";
 import { frageJaNein, frageText, zeigeHinweis } from "../dialoge";
@@ -185,6 +185,9 @@ export function Uebersicht(props: {
   const offenePunkte = pruefpunkte(bogen, true, heuteDatum());
   const zeitraumVorbei = bogen.einsatz.zeitraumBis < heuteDatum();
   const [schluesselKurz, setSchluesselKurz] = useState<string | null>(null);
+  // Geräteschlüssel ließ sich nicht speichern: das Siegel gilt nur für diese
+  // Sitzung (R3-E1). Code und PDF entstehen trotzdem.
+  const [nurSitzung, setNurSitzung] = useState(false);
   // Freiwillige Absenderangaben zur Signatur. Als Effekt-Abhängigkeit geführt:
   // eine geänderte Karte ändert den signierten Payload → QR neu erzeugen.
   const [absender, setAbsender] = useState<Absenderkarte>(() => absenderkarteLaden());
@@ -250,9 +253,11 @@ export function Uebersicht(props: {
         // Unverändert empfangener Bogen: Original-Payload gegengezeichnet.
         const q = await qrErzeugen(bogen, props.herkunft);
         if (aktiv) setQr(q);
+        if (aktiv) setNurSitzung(geraeteSchluesselNurSitzung());
         geraeteKurzform().then((k) => aktiv && setSchluesselKurz(k));
       } catch (e) {
-        if (aktiv) setFehler(`QR-Code: ${e instanceof Error ? e.message : e}`);
+        // Nie Programmtext (R3-E1): fehlerText übersetzt auch den vollen Speicher.
+        if (aktiv) setFehler(`QR-Code: ${fehlerText(e)}`);
       }
     })();
     return () => {
@@ -804,6 +809,13 @@ export function Uebersicht(props: {
           <p className="hinweis">
             {qr?.weitergeleitet ? "Gegengezeichnet" : "Signiert"} mit dem Echtheits-Siegel dieses Geräts.
           </p>
+          {nurSitzung && (
+            <p className="hinweis" role="status">
+              Das Siegel gilt nur, solange diese Seite offen ist: Der Speicher nimmt den Geräteschlüssel
+              gerade nicht an. Code und PDF sind vollständig; die Gegenstelle sieht bei einer späteren
+              Übergabe ein anderes Siegel dieses Geräts.
+            </p>
+          )}
           <details className="signatur-detail">
             <summary>Was das Siegel belegt</summary>
             <p className="hinweis">

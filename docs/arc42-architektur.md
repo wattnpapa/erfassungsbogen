@@ -1160,7 +1160,9 @@ flowchart TB
 - **Cookielose Reichweitenmessung** über GoatCounter – der einzige erlaubte
   Fremd-Host in der CSP.
 - **Ed25519-Signatur** jedes von der App erzeugten QR-Codes (Container `EEB2C`),
-  Geräteschlüssel wird lokal beim ersten Bedarf erzeugt; Verifikation ist rein
+  Geräteschlüssel wird lokal beim ersten Bedarf erzeugt (lässt er sich nicht
+  speichern, gilt er bis dahin nur für die offene Seite, seit 2026-10-05,
+  R3-E1 — die Übergabe scheitert nie am Schlüssel); Verifikation ist rein
   informativ und blockiert den Import nie. Ein Schlüsselwechsel ist jederzeit
   möglich (Fußzeile), wird aber nicht verkündet: Ohne PKI gibt es keinen
   Widerruf, die Gegenstelle gleicht die neue Kurzform von Hand ab.

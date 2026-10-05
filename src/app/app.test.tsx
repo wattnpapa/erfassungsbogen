@@ -11,6 +11,7 @@ import { OrganisationsTyp, type Erfassungsbogen } from "@bos/eeb-format/model";
 import { encodePayload, encodePayloadUrl, encodeVorlagePayloadUrl, fragmentInhalt, segmentPayloadUrls } from "@bos/eeb-format/codec";
 import { encodeSigniertPayloadUrl, schluesselpaarErzeugen } from "@bos/eeb-format/signatur";
 import { browserKompressor, neuerBogen } from "./hilfen";
+import { geraeteSchluesselLoeschen } from "./geraete-schluessel";
 import { vorlageAnlegen, vorlagenLaden } from "./vorlagen";
 import { einsatzDateiInhalt } from "./einsatz-transport";
 import { einheitEntfernen, eintreffzeitSetzen, zeitLang } from "./eintrag-zeiten";
@@ -1607,6 +1608,38 @@ describe("Speicher voll", () => {
     await nutzer.click(screen.getByRole("button", { name: /Öffnen/ }));
     expect(await screen.findByRole("heading", { level: 1, name: "Lesehausen" })).toBeDefined();
     expect(screen.getByText(/lässt die App gerade nichts speichern/)).toBeDefined();
+  }, 20000);
+
+  /**
+   * Audit Runde 3, R3-E1: Frisches Gerät ohne Geräteschlüssel, Speicher voll.
+   * QR-Code und PDF entstehen trotzdem (Siegel nur für diese Sitzung), und
+   * nirgends steht Programmtext.
+   */
+  it("übergibt bei vollem Speicher ohne gespeicherten Geräteschlüssel mit Sitzungs-Siegel", async () => {
+    const echt = Storage.prototype.setItem;
+    vi.spyOn(Storage.prototype, "setItem").mockImplementation(function (this: Storage, k: string, v: string) {
+      if (k.startsWith("eeb.") && v.length > (this.getItem(k)?.length ?? 0)) {
+        throw new DOMException(
+          `Failed to execute 'setItem' on 'Storage': Setting the value of '${k}' exceeded the quota.`,
+          "QuotaExceededError",
+        );
+      }
+      return echt.call(this, k, v);
+    });
+    const nutzer = userEvent.setup();
+    render(<App />);
+    await neuerBogenBis(nutzer, 5);
+    expect(await screen.findByText(/Das Siegel gilt nur, solange diese Seite offen ist/)).toBeDefined();
+    expect(localStorage.getItem("eeb.geraeteschluessel.v1")).toBeNull();
+
+    await nutzer.click(screen.getByRole("button", { name: "Bogen übergeben…" }));
+    const dialog = document.querySelector<HTMLDialogElement>("dialog[aria-label='Bogen übergeben']")!;
+    const knopf = within(dialog).getByRole("button", { name: /QR-Code im Vollbild/ });
+    await waitFor(() => expect(knopf).toHaveProperty("disabled", false));
+    await nutzer.click(within(dialog).getByRole("button", { name: "PDF erzeugen" }));
+    await waitFor(() => expect(pdfErzeugen).toHaveBeenCalled());
+    expect(document.body.textContent).not.toMatch(/Failed to execute|quota/i);
+    geraeteSchluesselLoeschen();
   }, 20000);
 
   /** Audit Runde 3, R3-O1: „Bögen einlesen…" nennt den vollen Speicher, nicht „nichts gefunden". */

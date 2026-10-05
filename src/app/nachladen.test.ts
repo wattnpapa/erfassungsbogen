@@ -42,3 +42,15 @@ describe("fehlerText", () => {
     expect(fehlerText("abgebrochen")).toBe("abgebrochen");
   });
 });
+
+describe("fehlerText bei vollem Speicher (R3-E1)", () => {
+  it("zeigt nie den englischen Browser-Text", () => {
+    const e = new DOMException(
+      "Failed to execute 'setItem' on 'Storage': Setting the value of 'eeb.geraeteschluessel.v1' exceeded the quota.",
+      "QuotaExceededError",
+    );
+    const t = fehlerText(e);
+    expect(t).toMatch(/Speicher dieses Geräts nimmt nichts mehr an/);
+    expect(t).not.toMatch(/Failed|quota/i);
+  });
+});

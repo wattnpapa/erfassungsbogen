@@ -195,6 +195,15 @@ Grundlage: Repository `wattnpapa/erfassungsbogen`, Stand 2026-09-12 — Version 
 > Einsatzansicht melden den Speicher — vorher blieb der Bildschirm leer
 > (Verfügbarkeit, 5.5). Kein neuer Speicherort; das gemerkte Lese-Ergebnis
 > liegt nur im Arbeitsspeicher der geöffneten Seite.
+>
+> **Nachgezogen 2026-10-05:** Geräteschlüssel bei vollem Speicher (Audit
+> Runde 3, R3-E1) — scheitert das erstmalige Speichern des privaten
+> Schlüssels, signiert die App mit einem Schlüssel nur für diese Sitzung
+> (`src/app/geraete-schluessel.ts`), sagt das in der Übersicht am Siegel und
+> speichert ihn, sobald wieder Platz ist. QR-Code und PDF entstehen damit
+> auch auf einem frischen Gerät mit vollem Speicher; Speicherfehler erscheinen
+> nirgends mehr als englischer Programmtext (`fehlerText`). Signaturformat
+> unverändert (3.3 D4).
 
 ## Hinweis zu diesem Dokument
 
@@ -332,7 +341,7 @@ dem Vite-Build); es gibt keine serverseitige Variante.
 | D2i | Weitergabe-Stand je Einsatz-Sammlung (seit 2026-09-29, R2-W5; erweitert 2026-10-05, R3-W2) | Zeitpunkt der letzten Weitergabe der ganzen Sammlung („Einsatz weitergeben / sichern"), Kennungen der Meldungen darin, Prüfsummen der Vermerke der Führungsstelle und Zeitpunkt der letzten Übernahme per Import — Grundlage des Übergabevermerks „Weitergegeben … · seitdem n neue Meldungen und m Änderungen"; keine Personendaten, kein Auftragstext | `localStorage` des Geräts (`eeb.weitergabe-stand.v1`), fällt mit „Alle Daten löschen" weg |
 | D2j | Kenntnis-Stand je Einsatz-Sammlung (seit 2026-10-04, R3-K1) | Zeitpunkt der letzten Kenntnisnahme („Zur Kenntnis genommen" in der Einsatzansicht, beim ersten Öffnen einer Sammlung vorbelegt) und Kennungen der Meldungen, die da schon in der Sammlung standen — Grundlage der Sammelquittung „Neu seit der letzten Kenntnisnahme" und der Marke „neue Fassung"; je Gerät, reist nicht mit der Sammlung; keine Personendaten | `localStorage` des Geräts (`eeb.kenntnis-stand.v1`), fällt mit „Alle Daten löschen" weg |
 | D3 | Absenderkarte | Freiwillige Kontaktangabe (Name/E-Mail/Telefon) der meldenden Person | `localStorage` des Geräts |
-| D4 | Privater Geräteschlüssel | Ed25519-Schlüssel zur Signatur weitergereichter Bögen | `localStorage` des Geräts, **unverschlüsselt als Hex** |
+| D4 | Privater Geräteschlüssel | Ed25519-Schlüssel zur Signatur weitergereichter Bögen | `localStorage` des Geräts, **unverschlüsselt als Hex**; lässt er sich beim ersten Erzeugen nicht speichern (Speicher voll/gesperrt), nur im Arbeitsspeicher der offenen Seite, bis Platz ist (seit 2026-10-05, R3-E1) |
 | D5 | QR-Payload / Exportdatei | Binär kodierter, komprimierter Bogen zur Übergabe an ein zweites Gerät; ebenso eine geteilte Vorlage (QR/Link mit Marker `V.`, oder JSON-Datei `eeb-vorlage-*.json`) | Transient (QR-Code-Anzeige) bzw. Datei auf dem Gerät oder in einer vom Nutzer gewählten Ablage (z. B. Cloud-Ordner) |
 | D6 | Ausgedruckte/exportierte Kopien | PDF-Ausdruck im Papier-Layout, CSV-/Excel-Export für Führungsstellen | Außerhalb der App (Papier, Dateisystem des Empfängers) |
 

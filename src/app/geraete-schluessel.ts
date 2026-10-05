@@ -26,9 +26,22 @@ function speicher(): Storage | null {
   }
 }
 
-/** Privater Geräteschlüssel (32 Byte) oder null, wenn noch keiner erzeugt wurde. */
-export function geraeteSchluesselPrivat(): Uint8Array | null {
-  const hex = speicher()?.getItem(SCHLUESSEL_KEY);
+/**
+ * Schlüssel nur für diese Sitzung: Ließ sich der neu erzeugte Schlüssel nicht
+ * speichern (Speicher voll oder gesperrt), signiert die App mit ihm weiter,
+ * solange die Seite offen ist. Vorher scheiterten QR-Code und PDF mit
+ * englischem Programmtext — gerade dann, wenn die App „jetzt PDF erzeugen"
+ * empfahl (Audit Runde 3, R3-E1). Sobald wieder Platz ist, wird er gespeichert.
+ */
+let sitzungsSchluessel: Uint8Array | null = null;
+
+function gespeicherterSchluessel(): Uint8Array | null {
+  let hex: string | null | undefined;
+  try {
+    hex = speicher()?.getItem(SCHLUESSEL_KEY);
+  } catch {
+    return null;
+  }
   if (!hex) return null;
   try {
     const bytes = ausHex(hex);
@@ -38,12 +51,46 @@ export function geraeteSchluesselPrivat(): Uint8Array | null {
   }
 }
 
-/** Privaten Geräteschlüssel zurückgeben; einmalig erzeugen und speichern, falls nötig. */
+/** Privater Geräteschlüssel (32 Byte) oder null, wenn noch keiner erzeugt wurde. */
+export function geraeteSchluesselPrivat(): Uint8Array | null {
+  return gespeicherterSchluessel() ?? sitzungsSchluessel;
+}
+
+/**
+ * Gilt der Geräteschlüssel nur für diese Sitzung? Dann trägt jede Übergabe
+ * ein Siegel, das die Gegenstelle später keinem gespeicherten Gerät
+ * zuordnen kann — die Übersicht sagt das am Code.
+ */
+export function geraeteSchluesselNurSitzung(): boolean {
+  return sitzungsSchluessel != null && gespeicherterSchluessel() == null;
+}
+
+function speichern(privat: Uint8Array): boolean {
+  try {
+    const s = speicher();
+    if (!s) return false;
+    s.setItem(SCHLUESSEL_KEY, zuHex(privat));
+    return true;
+  } catch {
+    return false; // Speicher voll oder gesperrt
+  }
+}
+
+/**
+ * Privaten Geräteschlüssel zurückgeben; einmalig erzeugen und speichern, falls
+ * nötig. Scheitert das Speichern, gilt der Schlüssel für diese Sitzung — die
+ * Übergabe darf nie am Schlüssel scheitern.
+ */
 export async function geraeteSchluesselSicherstellen(): Promise<Uint8Array> {
-  const vorhanden = geraeteSchluesselPrivat();
+  const vorhanden = gespeicherterSchluessel();
   if (vorhanden) return vorhanden;
+  if (sitzungsSchluessel) {
+    // Ist inzwischen Platz, wird der Sitzungsschlüssel zum Geräteschlüssel.
+    if (speichern(sitzungsSchluessel)) sitzungsSchluessel = null;
+    return gespeicherterSchluessel() ?? sitzungsSchluessel!;
+  }
   const kp = await schluesselpaarErzeugen();
-  speicher()?.setItem(SCHLUESSEL_KEY, zuHex(kp.privat));
+  if (!speichern(kp.privat)) sitzungsSchluessel = kp.privat;
   return kp.privat;
 }
 
@@ -62,5 +109,6 @@ export async function geraeteKurzform(): Promise<string | null> {
 
 /** Geräteschlüssel verwerfen (neuer Schlüssel wird bei Bedarf neu erzeugt). */
 export function geraeteSchluesselLoeschen(): void {
+  sitzungsSchluessel = null;
   speicher()?.removeItem(SCHLUESSEL_KEY);
 }
