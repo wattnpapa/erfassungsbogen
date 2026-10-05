@@ -72,7 +72,15 @@ import {
   type Einsatzsammlung,
 } from "@bos/meldekopf/einsaetze";
 import { bogenDiff, diffKurzfassung } from "@bos/meldekopf/meldung-diff";
-import { SpeicherVollFehler, eintreffzeitSetzen, istSpeicherVoll, meldungAufnehmen, vomPapierMarkieren, zeitLang } from "./eintrag-zeiten";
+import {
+  SpeicherVollFehler,
+  eintreffzeitSetzen,
+  istSpeicherVoll,
+  meldungAufnehmen,
+  speicherVollMeldung,
+  vomPapierMarkieren,
+  zeitLang,
+} from "./eintrag-zeiten";
 import { offlineText, useOfflineStand } from "./offline-bereit";
 import { uebergabeFesthalten, uebergabeText, type UebergabeStand } from "./uebergabe-stand";
 import { ART_LABEL, EinsatzDetail, EinsatzListe, letzteMeldungText, type Eingang } from "./einsaetze-ui";
@@ -2387,11 +2395,24 @@ function AppInhalt() {
    * Wie viele es waren, sagt die Rückmeldezeile; welche es waren, ist die
    * ganze Liste. Die Quittung gehört dem einzelnen Eingang.
    */
-  function boegenAufnehmen(zielId: string, gefunden: QrBogen[], vomPapier = false): { neu: number; uebersprungen: number } {
+  function boegenAufnehmen(
+    zielId: string,
+    gefunden: QrBogen[],
+    vomPapier = false,
+  ): { neu: number; uebersprungen: number; speicherVoll: number } {
     let neu = 0;
     let uebersprungen = 0;
+    // Bögen, die am vollen Speicher scheiterten — kein „kaputter Bogen" und
+    // kein „nichts gefunden" (Audit Runde 3, R3-O1).
+    let speicherVoll = 0;
     const neueIds: string[] = [];
     for (const { bogen: b, signatur, herkunft } of gefunden) {
+      if (speicherVoll > 0) {
+        // Ist der Speicher einmal voll, scheitert jeder weitere Bogen genauso;
+        // gezählt wird er trotzdem, damit die Meldung die Zahl nennt.
+        speicherVoll++;
+        continue;
+      }
       try {
         const r = meldungAufnehmen(zielId, b, {
           quelle: "pdf-import",
@@ -2400,8 +2421,9 @@ function AppInhalt() {
         });
         if (r) r.neu ? neu++ : uebersprungen++;
         if (r?.neu) neueIds.push(r.eintrag.id);
-      } catch {
-        /* ungültiger Bogen — überspringen */
+      } catch (e) {
+        if (istSpeicherVoll(e)) speicherVoll++;
+        /* sonst: ungültiger Bogen — überspringen */
       }
     }
     // Vom Papier: Karten tragen „vom Papier, Zeiten prüfen", bis der Abgleich
@@ -2413,7 +2435,7 @@ function AppInhalt() {
         /* Markierung ist Komfort */
       }
     }
-    return { neu, uebersprungen };
+    return { neu, uebersprungen, speicherVoll };
   }
 
   /**
@@ -2426,6 +2448,7 @@ function AppInhalt() {
   async function importiereBoegen(zielId: string, dateien: File[]) {
     let neu = 0;
     let uebersprungen = 0;
+    let speicherVoll = 0;
     const kaputt: string[] = [];
     const zusatz = { sammlungInPdf: false, lage: false }; // R2-A1
     const sammlungenUebernommen: string[] = []; // R3-W3
@@ -2449,6 +2472,7 @@ function AppInhalt() {
         const r = boegenAufnehmen(zielId, await boegenAusDatei(datei), art === "nur-qr");
         neu += r.neu;
         uebersprungen += r.uebersprungen;
+        speicherVoll += r.speicherVoll;
       } catch (e) {
         // Je Datei ein ganzer Satz mit Ursache und nächstem Schritt statt
         // Parser-Text in Klammern (Audit Runde 2, R2-E5).
@@ -2456,10 +2480,10 @@ function AppInhalt() {
       }
     }
     einsaetzeNeuLaden();
-    setFehler(kaputt.join(" "));
+    setFehler([speicherVollMeldung(speicherVoll), ...kaputt].filter(Boolean).join(" "));
     const bogenMeldung =
       neu + uebersprungen === 0
-        ? kaputt.length > 0 || sammlungenUebernommen.length > 0
+        ? kaputt.length > 0 || sammlungenUebernommen.length > 0 || speicherVoll > 0
           ? ""
           : "Keine Bögen in der Datei gefunden — weder eingebettete Daten noch ein lesbarer QR-Code."
         : dateiImportMeldung(neu, uebersprungen, zusatz);
@@ -2543,10 +2567,13 @@ function AppInhalt() {
     const s = await einsatzErfragen();
     if (!s) return true;
     const nurQr = istPdfDatei(datei) && pdfInhaltArt(new Uint8Array(await datei.arrayBuffer())) === "nur-qr";
-    const { neu, uebersprungen } = boegenAufnehmen(s.id, gefunden, nurQr);
+    const { neu, uebersprungen, speicherVoll } = boegenAufnehmen(s.id, gefunden, nurQr);
     einsaetzeNeuLaden();
-    setFehler("");
-    setMeldung(`Einsatz „${s.name}" angelegt — ${dateiImportMeldung(neu, uebersprungen, { lage: true })}`);
+    setFehler(speicherVollMeldung(speicherVoll));
+    setMeldung(
+      `Einsatz „${s.name}" angelegt — ` +
+        (neu + uebersprungen > 0 ? dateiImportMeldung(neu, uebersprungen, { lage: true }) : "noch ohne Bogen."),
+    );
     setZeigeStart(false);
     setOffenerEinsatzId(s.id);
     return true;
@@ -2586,18 +2613,30 @@ function AppInhalt() {
       );
       let neu = 0;
       let uebersprungen = 0;
+      let speicherVoll = 0;
       const neueIds: string[] = [];
       for (const fund of erg.funde) {
+        if (speicherVoll > 0) {
+          speicherVoll++; // jeder weitere scheitert genauso (R3-O1)
+          continue;
+        }
         // Signatur wie beim Einzelscan prüfen und den Rohpayload mitspeichern —
         // sonst verlöre der Meldekopf beim Weiterreichen die fremde Signatur.
         const status = fund.payload ? await signaturVonPayload(fund.payload) : null;
-        const r = meldungAufnehmen(zielId, fund.bogen, {
-          quelle: "scan",
-          signatur: status ? alsEintragSignatur(status) : undefined,
-          herkunft: fund.payload ? base64UrlKodieren(fund.payload) : undefined,
-        });
-        if (r) r.neu ? neu++ : uebersprungen++;
-        if (r?.neu) neueIds.push(r.eintrag.id);
+        try {
+          const r = meldungAufnehmen(zielId, fund.bogen, {
+            quelle: "scan",
+            signatur: status ? alsEintragSignatur(status) : undefined,
+            herkunft: fund.payload ? base64UrlKodieren(fund.payload) : undefined,
+          });
+          if (r) r.neu ? neu++ : uebersprungen++;
+          if (r?.neu) neueIds.push(r.eintrag.id);
+        } catch (e) {
+          // Bisher brach der erste volle Schreibversuch den Stapel ab, und
+          // die schon aufgenommenen Bögen wurden nicht mehr gemeldet.
+          if (!istSpeicherVoll(e)) throw e;
+          speicherVoll++;
+        }
       }
       try {
         vomPapierMarkieren(zielId, neueIds); // Abgleich vom Blatt anbieten (R3-A2)
@@ -2606,6 +2645,7 @@ function AppInhalt() {
       }
       einsaetzeNeuLaden();
       setStapelBericht(stapelBerichtZeilen(erg, neu, uebersprungen));
+      setFehler(speicherVollMeldung(speicherVoll));
     } catch (e) {
       setFehler(`Stapel einlesen: ${fehlerText(e)}`);
     } finally {

@@ -138,6 +138,20 @@ export class SpeicherVollFehler extends Error {
   }
 }
 
+/**
+ * Meldung, wenn beim Einlesen Bögen am vollen Speicher scheiterten. Die Datei
+ * ist dann in Ordnung — bisher stand „Keine Bögen in der Datei gefunden", und
+ * der Meldekopf forderte gültige PDFs neu an (Audit Runde 3, R3-O1). Leer bei 0.
+ */
+export function speicherVollMeldung(anzahl: number): string {
+  if (anzahl <= 0) return "";
+  return (
+    `Nicht aufgenommen: ${anzahl === 1 ? "1 Bogen" : `${anzahl} Bögen`} — der Speicher dieses Geräts ist voll, ` +
+    "die Datei selbst ist in Ordnung. Platz schafft nur Löschen: nicht mehr benötigte Einsätze sichern, " +
+    "in den Papierkorb legen und den Papierkorb leeren; danach dieselbe Datei noch einmal einlesen."
+  );
+}
+
 /** Ist dieser Fehler ein voller Speicher? (Browser nennen ihn unterschiedlich.) */
 export function istSpeicherVoll(e: unknown): boolean {
   if (!(e instanceof Error) && typeof e !== "object") return false;

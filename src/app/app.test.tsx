@@ -1583,6 +1583,34 @@ describe("Speicher voll", () => {
     expect(within(auswahl).getByRole("alert").textContent).toMatch(/Speicher dieses Geräts ist voll/);
   }, 20000);
 
+  /** Audit Runde 3, R3-O1: „Bögen einlesen…" nennt den vollen Speicher, nicht „nichts gefunden". */
+  it("„Bögen einlesen…“ meldet den vollen Speicher statt „Keine Bögen gefunden“", async () => {
+    const nutzer = userEvent.setup();
+    render(<App />);
+    await nutzer.click(screen.getByRole("button", { name: "Neue Einsatz-Sammlung…" }));
+    const dialog = await screen.findByRole("dialog", { name: "Neue Einsatz-Sammlung anlegen" });
+    await nutzer.type(within(dialog).getByLabelText("Name"), "Vollprobe");
+    await nutzer.click(within(dialog).getByRole("button", { name: "Einsatz anlegen" }));
+    await screen.findByRole("heading", { level: 1, name: "Vollprobe" });
+
+    sammlungenVoll();
+    await nutzer.upload(screen.getByLabelText("Dateien wählen…"), [
+      pdfDatei(bogenMitName("OV Voll A")),
+      pdfDatei(bogenMitName("OV Voll B")),
+    ]);
+    const meldung = await screen.findByText(/Nicht aufgenommen: 2 Bögen — der Speicher dieses Geräts ist voll/);
+    expect(meldung.textContent).toMatch(/die Datei selbst ist in Ordnung/);
+    expect(screen.queryByText(/Keine Bögen in der Datei gefunden/)).toBeNull();
+    expect(einsaetzeLaden()[0]!.eintraege).toHaveLength(0);
+
+    // Gegenprobe mit freiem Speicher: dieselbe Datei wird aufgenommen.
+    vi.restoreAllMocks();
+    await nutzer.upload(screen.getByLabelText("Dateien wählen…"), [pdfDatei(bogenMitName("OV Voll A"))]);
+    expect(await screen.findByText(/1 Bogen aufgenommen|1 Bögen aufgenommen|aufgenommen/)).toBeDefined();
+    expect(einsaetzeLaden()[0]!.eintraege).toHaveLength(1);
+    expect(screen.queryByText(/Nicht aufgenommen/)).toBeNull();
+  }, 20000);
+
   it("öffnet einen empfangenen Bogen, der nicht abgelegt werden konnte, statt ihn zu verwerfen", async () => {
     einsatzImSpeicherAnlegen("Sammelhausen", EinsatzArt.EINSATZ);
     const nutzer = userEvent.setup();

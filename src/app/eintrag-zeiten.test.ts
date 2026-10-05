@@ -44,6 +44,7 @@ import {
   zeitLang,
   zugSetzen,
   HERKUNFT_TEXT,
+  speicherVollMeldung,
 } from "./eintrag-zeiten";
 
 class MemStorage {
@@ -367,5 +368,14 @@ describe("Vermerke der Führungsstelle (Audit Runde 2, R2-K6)", () => {
   it("nennt die Herkunft überall gleich", () => {
     expect(HERKUNFT_TEXT["pdf-import"]).toBe("Aus Datei");
     expect(HERKUNFT_TEXT.scan).toBe("Empfangen");
+  });
+});
+
+describe("speicherVollMeldung (R3-O1)", () => {
+  it("nennt Zahl und Ursache und ist bei 0 leer", () => {
+    expect(speicherVollMeldung(0)).toBe("");
+    expect(speicherVollMeldung(1)).toMatch(/^Nicht aufgenommen: 1 Bogen — der Speicher dieses Geräts ist voll/);
+    expect(speicherVollMeldung(9)).toMatch(/9 Bögen/);
+    expect(speicherVollMeldung(9)).not.toMatch(/Keine Bögen/);
   });
 });
