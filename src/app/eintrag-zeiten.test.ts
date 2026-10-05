@@ -26,6 +26,7 @@ import {
   speicherhuelleSetzen,
 } from "@bos/meldekopf/einsaetze";
 import {
+  zeitUnstimmigkeit,
   zeitpunktZuMs,
   SpeicherVollFehler,
   abrueckzeitSetzen,
@@ -391,5 +392,17 @@ describe("speicherGroessteSammlungen (R3-O4)", () => {
     expect(groesste!.name).toBe("Großschadenslage Archiv");
     expect(groesste!.anteil).toBeLessThanOrEqual(1);
     expect(groesste!.anteil).toBeGreaterThan(0.95);
+  });
+});
+
+describe("zeitUnstimmigkeit (R3-E5)", () => {
+  const jetzt = new Date("2026-10-04T20:39").getTime();
+  it("meldet Zeiten mehr als 15 Minuten in der Zukunft", () => {
+    expect(zeitUnstimmigkeit({ eintreffen: new Date("2026-10-14T18:22").getTime() }, jetzt)).toMatch(/^Eingetroffen 14\.10\.2026, 18:22 liegt in der Zukunft/);
+    expect(zeitUnstimmigkeit({ eintreffen: jetzt + 10 * 60_000 }, jetzt)).toBeNull();
+  });
+  it("meldet Abrücken vor dem Eintreffen", () => {
+    expect(zeitUnstimmigkeit({ eintreffen: jetzt - 60_000, abgerueckt: jetzt - 3_600_000 }, jetzt)).toMatch(/liegt vor dem Eintreffen/);
+    expect(zeitUnstimmigkeit({ eintreffen: jetzt - 3_600_000, abgerueckt: jetzt }, jetzt)).toBeNull();
   });
 });

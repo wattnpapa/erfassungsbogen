@@ -110,6 +110,32 @@ export function eintreffzeit(e: MeldeEintrag): number {
   return e.eingetroffenAm ?? e.empfangenAm;
 }
 
+/** Spielraum für „in der Zukunft": Uhren zweier Geräte gehen nie gleich. */
+export const ZUKUNFT_TOLERANZ_MS = 15 * 60_000;
+
+/**
+ * Passt die Zeit zusammen? Eintreff- oder Abrückzeit mehr als eine
+ * Viertelstunde in der Zukunft oder Abrücken vor dem Eintreffen — typisch
+ * für einen Tag- oder Monatsdreher beim Nachtragen vom Meldeblock. Vorher
+ * gingen beide ohne Hinweis durch (Audit Runde 3, R3-E5). Nur ein Hinweis,
+ * gesperrt wird nichts. `null` heißt: plausibel.
+ */
+export function zeitUnstimmigkeit(
+  z: { eintreffen: number; abgerueckt?: number | null },
+  jetzt = Date.now(),
+): string | null {
+  if (z.eintreffen > jetzt + ZUKUNFT_TOLERANZ_MS) {
+    return `Eingetroffen ${zeitLang(z.eintreffen)} liegt in der Zukunft — Tag oder Monat vertauscht?`;
+  }
+  if (z.abgerueckt != null && z.abgerueckt > jetzt + ZUKUNFT_TOLERANZ_MS) {
+    return `Abgerückt ${zeitLang(z.abgerueckt)} liegt in der Zukunft — Tag oder Monat vertauscht?`;
+  }
+  if (z.abgerueckt != null && z.abgerueckt < z.eintreffen) {
+    return `Abgerückt ${zeitLang(z.abgerueckt)} liegt vor dem Eintreffen ${zeitLang(z.eintreffen)} — stimmt eine der Zeiten nicht?`;
+  }
+  return null;
+}
+
 /** Uhrzeit, bei anderem Tag mit Datum: „09:40" bzw. „26.09., 09:40". */
 export function zeitKurz(ms: number, jetzt = Date.now()): string {
   const d = new Date(ms);

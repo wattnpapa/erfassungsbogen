@@ -729,6 +729,33 @@ describe("Zeiten, Auftrag und Bedarf auf der Karte", () => {
     expect(geaendert).toHaveBeenCalled();
   });
 
+  it("fragt bei einer Eintreffzeit in der Zukunft nach und markiert Abrücken vor Eintreffen (R3-E5)", async () => {
+    const nutzer = userEvent.setup();
+    const { einsatzId, neuLaden } = buehne(["Crailsheim"]);
+    const zukunft = new Date(Date.now() + 10 * 86_400_000);
+    zukunft.setSeconds(0, 0);
+    const lokal = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}T${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
+
+    await nutzer.click(screen.getByRole("button", { name: "ändern" }));
+    const feld = screen.getByLabelText("Eingetroffen am") as HTMLInputElement;
+    await nutzer.clear(feld);
+    await nutzer.type(feld, lokal(zukunft));
+    await nutzer.click(screen.getByRole("button", { name: "Speichern" }));
+    const frage = () => document.querySelector<HTMLDialogElement>("dialog[aria-label='Stimmt die Zeit?']");
+    expect(frage()!.textContent).toMatch(/liegt in der Zukunft — Tag oder Monat vertauscht\?/);
+    // „Zeit korrigieren": nichts gespeichert, das Feld bleibt offen.
+    await nutzer.click(within(frage()!).getByRole("button", { name: "Zeit korrigieren" }));
+    expect(gespeichert(einsatzId, "Crailsheim").eingetroffenAm).toBeUndefined();
+    expect(screen.getByLabelText("Eingetroffen am")).not.toBeNull();
+
+    // „Ja, so speichern": gespeichert, die Karte nennt die Unstimmigkeit.
+    await nutzer.click(screen.getByRole("button", { name: "Speichern" }));
+    await nutzer.click(within(frage()!).getByRole("button", { name: "Ja, so speichern" }));
+    expect(gespeichert(einsatzId, "Crailsheim").eingetroffenAm).toBe(zukunft.getTime());
+    neuLaden();
+    expect(document.querySelector(".zeit-unstimmig")!.textContent).toMatch(/in der Zukunft/);
+  });
+
   it("nimmt einen Auftrag der Führungsstelle auf und speichert ihn beim Verlassen des Felds", async () => {
     const nutzer = userEvent.setup();
     const { einsatzId, neuLaden } = buehne(["Wardenburg"]);

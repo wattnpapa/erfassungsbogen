@@ -88,6 +88,7 @@ import {
   statusMitZeitSetzen,
   zeitKurz,
   zeitLang,
+  zeitUnstimmigkeit,
 } from "./eintrag-zeiten";
 import { frageFelder, frageJaNein, frageWahl, zeigeHinweis } from "./dialoge";
 import { nurStaerkeUebernehmen } from "./nur-staerke";
@@ -2246,6 +2247,7 @@ function EinheitKarte(props: {
   const [bemerkungGanz, setBemerkungGanz] = useState(false);
   const neueFassung = folge != null && (props.ungesehen || frischGemeldet(kopf));
   const abgerueckt = kopf.status === MeldeStatus.ABGERUECKT;
+  const zeitHinweis = zeitUnstimmigkeit({ eintreffen: eintreffzeit(kopf), abgerueckt: abgerueckt ? kopf.abgerueckAm : null });
   const aufgegangen = kopf.status === MeldeStatus.AUFGEGANGEN;
   // Nur anwesende Meldungen zählen — und nur an ihnen sind Aufteilen und
   // Zusammenführen sinnvoll.
@@ -2322,6 +2324,23 @@ function EinheitKarte(props: {
     if (ms == null) {
       setZeitEntwurf(null);
       return;
+    }
+    // Zukunft oder Abrücken vor Eintreffen: einmal fragen, nicht sperren (R3-E5).
+    const unstimmig = zeitUnstimmigkeit(
+      zeitEntwurf.feld === "eintreffen"
+        ? { eintreffen: ms, abgerueckt: abgerueckt ? kopf.abgerueckAm : null }
+        : { eintreffen: eintreffzeit(kopf), abgerueckt: ms },
+    );
+    if (
+      unstimmig &&
+      !(await frageJaNein({
+        titel: "Stimmt die Zeit?",
+        text: unstimmig,
+        ok: "Ja, so speichern",
+        abbruch: "Zeit korrigieren",
+      }))
+    ) {
+      return; // Das Feld bleibt offen, der Wert steht zum Korrigieren drin.
     }
     const ok = await gesichert("Zeit ändern", () =>
       zeitEntwurf.feld === "eintreffen"
@@ -2576,6 +2595,9 @@ function EinheitKarte(props: {
               {bemerkungNeu && (
                 <span className="kompakt-merkmal bemerkung-merkmal" title={`Bemerkung der Einheit: ${bemerkung}`}>Bemerkung neu</span>
               )}
+              {zeitHinweis && (
+                <span className="kompakt-merkmal luecken-merkmal" title={zeitHinweis}>⚠ Zeit prüfen</span>
+              )}
               {kopf.notiz && (
                 <span className="kompakt-merkmal auftrag-merkmal" title={`Auftrag/Notiz: ${kopf.notiz}`}>Auftrag ✓</span>
               )}
@@ -2628,6 +2650,10 @@ function EinheitKarte(props: {
             {standIstAlt(kopf) && <AltBadge />}
             {" · "}{QUELLE_LABEL[kopf.quelle]}
           </span>
+          {/* Bleibt stehen, bis die Zeiten zusammenpassen — auch nach einem
+              „Abrücken", das vor einer falsch nachgetragenen Eintreffzeit
+              liegt (R3-E5). */}
+          {zeitHinweis && <span className="muster-sub warnung-text zeit-unstimmig" role="note">⚠ {zeitHinweis}</span>}
           {/* Sofortbedarf nur, wenn gesetzt — nichts alarmiert, was leer ist (K1). */}
           {bedarf.length > 0 && (
             <span className="muster-sub bedarf-zeile">
