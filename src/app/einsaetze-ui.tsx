@@ -1020,7 +1020,9 @@ export function EinsatzDetail(props: {
           Umschalter nicht erst in der Fußzeile unter 30 Karten suchen müssen
           (Nacht-und-Sicht-Audit N3). */}
       <div className="kopf-oberzeile">
-        <button type="button" className="zur-start" onClick={onZurueck}>‹ Einsätze</button>
+        {/* „‹ Startseite" wie im Assistenten: Der Weg führt auf die
+            Startseite, die Einsätze stehen dort erst weiter unten (R3-N6). */}
+        <button type="button" className="zur-start" onClick={onZurueck}>‹ Startseite</button>
         <AnzeigeSchalter />
       </div>
       <div className="titelzeile">

@@ -159,7 +159,11 @@ describe("Schritt Fahrzeuge", () => {
     expect((screen.getByLabelText("Kennzeichen") as HTMLInputElement).placeholder).toBe("z. B. THW-84397");
     await nutzer.click(screen.getByLabelText("Funkrufname"));
 
-    expect(screen.getByLabelText(/^eigener Standort/).closest("label")!.textContent).toMatch(/Ort im Funkrufnamen = Standort der Einheit/);
+    // Die Erklärung steht unter dem Kästchen, nicht in der Beschriftung — dort
+    // brach „eigener Standort" in einer schmalen Spalte um (R3-N6).
+    const kaestchen = screen.getByLabelText("eigener Standort");
+    expect(kaestchen.closest("label")!.textContent).toBe("eigener Standort");
+    expect(kaestchen.closest("label")!.nextElementSibling!.textContent).toMatch(/Ort im Funkrufnamen = Standort der Einheit/);
   });
 
   it("lädt die StAN-Vorbelegung des Einheitstyps", async () => {

@@ -256,6 +256,24 @@ describe("Schritt Einheit", () => {
  * „(Standort offen)" auf dem Bogen. Gesperrt wird weiterhin nichts: wer den
  * OV-Namen gerade nicht weiß, kommt weiter und trägt ihn nach.
  */
+describe("Schritt Einheit — Beispiel im Einheitstyp (R3-H7)", () => {
+  it("nennt beim THW THW-Einheiten statt „Löschzug, SEG Sanität“", () => {
+    buehne();
+    const feld = screen.getByRole("combobox", { name: "Einheitstyp" }) as HTMLInputElement;
+    expect(feld.placeholder).toBe("z. B. Bergungsgruppe, FGr Wasserschaden/Pumpen");
+  });
+
+  it("nennt bei der Feuerwehr Feuerwehr-Einheiten", () => {
+    const start = neuerBogen();
+    start.einheit.organisation = OrganisationsTyp.FEUERWEHR;
+    render(<SchrittBuehne komponente={SchrittEinheit} bogen={start} />);
+    // Kurze Listen kommen als Auswahl, der Platzhalter ist dann die erste Zeile.
+    const feld = screen.getByLabelText("Einheitstyp") as HTMLInputElement | HTMLSelectElement;
+    const beispiel = feld instanceof HTMLSelectElement ? feld.options[0]!.text : feld.placeholder;
+    expect(beispiel).toContain("z. B. Löschzug, Löschgruppe");
+  });
+});
+
 describe("Schritt Einheit — offene Pflichtangaben", () => {
   it("nennt den fehlenden Namen der eigenen Einheit schon auf Schritt 1", () => {
     render(<SchrittEinheit bogen={neuerBogen()} aendern={() => {}} />);

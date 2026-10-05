@@ -87,7 +87,7 @@ Funktionalität: Einsatzweg einer Fachgruppe — Vorbereitung, Fahrt, Meldekopf
     Und ich das Feld "Diesel (l)" mit "400" fülle
     Und ich zum Schritt "6. Übersicht" wechsle
     Und ich mir den angezeigten QR-Code merke
-    Und ich auf "Neuer Bogen" klicke
+    Und ich auf "Bogen schließen" klicke
     Und ich im Dialog auf "Schließen, zur Startseite" klicke
     Und ich auf "QR-Code scannen…" klicke
     Und ich den gemerkten QR-Code über "QR aus Bild einlesen…" einlese
@@ -116,7 +116,7 @@ Funktionalität: Einsatzweg einer Fachgruppe — Vorbereitung, Fahrt, Meldekopf
     Und ich zum Schritt "6. Übersicht" wechsle
     Dann sehe ich die Überschrift "Gesamtübersicht"
     Und ich mir den angezeigten QR-Code merke
-    Und ich auf "Neuer Bogen" klicke
+    Und ich auf "Bogen schließen" klicke
     Und ich im Dialog auf "Schließen, zur Startseite" klicke
     Und ich auf "QR-Code scannen…" klicke
     Und ich den gemerkten QR-Code über "QR aus Bild einlesen…" einlese

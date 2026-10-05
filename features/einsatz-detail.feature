@@ -202,7 +202,7 @@ Funktionalität: Einsatz-Sammlung führen (Meldekopf)
 
   Szenario: Die Sammel-PDF bringt die ganze Sammlung auf ein leeres Gerät
     Wenn ich auf "Einsatz weitergeben / sichern" klicke und eine Datei erhalte
-    Und ich auf "‹ Einsätze" klicke
+    Und ich auf "‹ Startseite" klicke
     Und ich auf "Alle Daten löschen" klicke
     Und ich im Dialog "Ja, alle lokalen Daten dieser App endgültig löschen" ankreuze
     Und ich im Dialog auf "Endgültig löschen" klicke
@@ -214,7 +214,7 @@ Funktionalität: Einsatz-Sammlung führen (Meldekopf)
     Und führt die Einheitenliste "THW" an Stelle 1
 
   Szenario: Zurück zur Startseite listet den Einsatz mit seinen Summen
-    Wenn ich auf "‹ Einsätze" klicke
+    Wenn ich auf "‹ Startseite" klicke
     Dann sehe ich die Überschrift "Einsatz-Sammlung (Meldekopf)"
     Und sehe ich die Überschrift "Hochwasser Weser"
     Und sehe ich den Hinweis "1 Einheit(en) anwesend"

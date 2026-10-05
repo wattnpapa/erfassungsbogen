@@ -209,6 +209,21 @@ const ORGANISATIONSNAME_BEISPIEL: Partial<Record<OrganisationsTyp, string>> = {
   [OrganisationsTyp.DLRG]: "z. B. DLRG Ortsgruppe Wardenburg",
 };
 
+/**
+ * Beispiel im Feld „Einheitstyp" passend zur Organisation. Beim THW stand
+ * „z. B. Löschzug, SEG Sanität" — zwei Einheiten, die es dort nicht gibt
+ * (Audit Runde 3, R3-H7, R3-N6).
+ */
+const EINHEITSTYP_BEISPIEL: Partial<Record<OrganisationsTyp, string>> = {
+  [OrganisationsTyp.THW]: "z. B. Bergungsgruppe, FGr Wasserschaden/Pumpen",
+  [OrganisationsTyp.FEUERWEHR]: "z. B. Löschzug, Löschgruppe",
+  [OrganisationsTyp.DRK]: "z. B. SEG Sanität, Betreuungszug",
+  [OrganisationsTyp.JUH]: "z. B. SEG Sanität, Betreuungszug",
+  [OrganisationsTyp.MHD]: "z. B. SEG Sanität, Betreuungszug",
+  [OrganisationsTyp.ASB]: "z. B. SEG Sanität, Betreuungszug",
+  [OrganisationsTyp.DLRG]: "z. B. Wasserrettungszug, Bootstrupp",
+};
+
 export function SchrittEinheit({ bogen, aendern: aendernRoh }: SchrittProps) {
   const e = bogen.einheit;
   // Vorbelegung und Typwechsel verändern die Personalliste — der Verpflegungs-
@@ -402,7 +417,7 @@ export function SchrittEinheit({ bogen, aendern: aendernRoh }: SchrittProps) {
             wert={e.einheitsTyp}
             aendern={einheitstypSetzen}
             tabelle={einheitstypen}
-            platzhalter="z. B. Löschzug, SEG Sanität"
+            platzhalter={EINHEITSTYP_BEISPIEL[e.organisation] ?? "z. B. Löschzug, SEG Sanität"}
             suchbar
           />
         </Feld>

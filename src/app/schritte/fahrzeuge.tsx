@@ -178,11 +178,13 @@ function FahrzeugKarte(props: {
                 onChange={(e) => set({ funkrufname: { ...f.funkrufname!, eigenerStandort: e.target.checked, ort: e.target.checked ? undefined : "" } })}
               />
               eigener Standort
-              {/* Ohne Erklärung blieb offen, was der Haken tut (R2-N9). */}
-              <span className="hinweis">
-                {" "}— Ort im Funkrufnamen = Standort der Einheit{standort ? ` (${standort})` : " aus Schritt 1"}
-              </span>
             </label>
+            {/* Ohne Erklärung blieb offen, was der Haken tut (R2-N9). Als
+                eigene Zeile unter dem Kästchen: In der Beschriftung brach sie
+                „eigener / Standor / t" um (R3-N6). */}
+            <p className="hinweis funkruf-standort">
+              Ort im Funkrufnamen = Standort der Einheit{standort ? ` (${standort})` : " aus Schritt 1"}
+            </p>
             {!f.funkrufname.eigenerStandort && (
               <Feld titel="Ort" schmal>
                 <input value={f.funkrufname.ort ?? ""} onChange={(e) => set({ funkrufname: { ...f.funkrufname!, ort: e.target.value } })} />

@@ -25,7 +25,7 @@ Funktionalität: Bogen per QR-Code einlesen
     Angenommen ich öffne einen geteilten Bogen-Link eines alten Bogens
     Dann sehe ich die Übersicht mit dem Standort "Oldenburg - Ni"
     Wenn ich mir den angezeigten QR-Code merke
-    Und ich auf "Neuer Bogen" klicke
+    Und ich auf "Bogen schließen" klicke
     Und ich im Dialog auf "Schließen, zur Startseite" klicke
     Dann sehe ich die Schaltfläche "Neuen Bogen erstellen"
     Wenn ich auf "QR-Code scannen…" klicke

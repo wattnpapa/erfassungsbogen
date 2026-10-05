@@ -459,7 +459,7 @@ describe("Assistenten-Durchlauf", () => {
     await nutzer.type(screen.getByLabelText("Name (Pflicht)"), "Wegwerfhausen");
     await nutzer.click(screen.getByRole("button", { name: /^6\. Übersicht/ }));
 
-    await nutzer.click(screen.getByRole("button", { name: "Neuer Bogen" }));
+    await nutzer.click(screen.getByRole("button", { name: "Bogen schließen" }));
     // Die Rückfrage sagt, was tatsächlich geschieht: geschlossen, nicht
     // gelöscht, und wo der Bogen danach liegt (Audit Runde 2, R2-H9).
     expect(rueckfrage("Bogen schließen?").textContent).toContain("geschlossen, nicht gelöscht");
@@ -471,7 +471,7 @@ describe("Assistenten-Durchlauf", () => {
     expect(screen.getByRole("heading", { name: "Gesamtübersicht" })).toBeDefined();
     expect(screen.getAllByText(/Wegwerfhausen/).length).toBeGreaterThan(0);
 
-    await nutzer.click(screen.getByRole("button", { name: "Neuer Bogen" }));
+    await nutzer.click(screen.getByRole("button", { name: "Bogen schließen" }));
     await nutzer.click(
       within(rueckfrage("Bogen schließen?")).getByRole("button", { name: "Schließen, zur Startseite" }),
     );
@@ -594,7 +594,7 @@ describe("Assistenten-Durchlauf", () => {
       await nutzer.click(screen.getByRole("button", { name: "Sammelhausen" }));
       await screen.findByRole("heading", { level: 1, name: "Sammelhausen" });
       expect(screen.getByText(/Dein eigener Bogen „THW Eigenhausen" liegt auf der Startseite/)).toBeDefined();
-      await nutzer.click(screen.getByRole("button", { name: /‹ Einsätze|‹ Startseite/ }));
+      await nutzer.click(screen.getByRole("button", { name: "‹ Startseite" }));
     }
 
     const s = einsaetzeLaden().find((x) => x.id === einsatz.id)!;
@@ -695,7 +695,7 @@ describe("Assistenten-Durchlauf", () => {
     await nutzer.click(await screen.findByRole("button", { name: "Einheit manuell erfassen…" }));
     await nutzer.type(screen.getByLabelText("Name (Pflicht)"), "Aalen");
     await nutzer.click(screen.getByRole("button", { name: /‹ Einsatz „Hochwasser Deich"/ }));
-    await nutzer.click(screen.getByRole("button", { name: /‹ Einsätze|‹ Startseite/ }));
+    await nutzer.click(screen.getByRole("button", { name: "‹ Startseite" }));
 
     await nutzer.click(screen.getByRole("button", { name: "Neuen Bogen erstellen" }));
     await nutzer.click(within(rueckfrage("Neuen Bogen anfangen?")).getByRole("button", { name: "Neu anfangen" }));
@@ -1184,7 +1184,7 @@ describe("Assistenten-Durchlauf", () => {
     render(<App />);
     await neuerBogenBis(nutzer, 5);
 
-    await nutzer.click(screen.getByRole("button", { name: "Neuer Bogen" }));
+    await nutzer.click(screen.getByRole("button", { name: "Bogen schließen" }));
 
     // Die Rückfrage ist ein eigener Dialog, kein window.confirm: in der iOS-App
     // (WKWebView) bliebe ein Systemdialog unbeantwortet.
@@ -1202,7 +1202,7 @@ describe("Assistenten-Durchlauf", () => {
     render(<App />);
     await neuerBogenBis(nutzer, 5);
 
-    await nutzer.click(screen.getByRole("button", { name: "Neuer Bogen" }));
+    await nutzer.click(screen.getByRole("button", { name: "Bogen schließen" }));
     const rueckfrage = await screen.findByRole("dialog", { name: "Bogen schließen?" });
     await nutzer.click(within(rueckfrage).getByRole("button", { name: "Abbrechen" }));
 
@@ -1253,7 +1253,7 @@ describe("Neuen Einsatz anlegen", () => {
     await screen.findByRole("heading", { level: 1, name: "Übungslage" });
     expect(akzent()).toBe("");
     // Zurück beim eigenen Bogen gilt wieder dessen Farbe.
-    await nutzer.click(screen.getByRole("button", { name: "‹ Einsätze" }));
+    await nutzer.click(screen.getByRole("button", { name: "‹ Startseite" }));
     await waitFor(() => expect(akzent()).not.toBe(""));
   }, 20000);
 

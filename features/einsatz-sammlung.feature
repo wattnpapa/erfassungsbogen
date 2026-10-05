@@ -61,7 +61,7 @@ Funktionalität: Einsatz-Sammlung anlegen und Bögen darin sammeln
 
   Szenario: Bogen schließen fragt in der App zurück
     Angenommen ich öffne einen geteilten Bogen-Link eines alten Bogens
-    Wenn ich auf "Neuer Bogen" klicke
+    Wenn ich auf "Bogen schließen" klicke
     Dann sehe ich den Dialog "Bogen schließen?"
     Wenn ich im Dialog auf "Schließen, zur Startseite" klicke
     Dann sehe ich die Schaltfläche "Neuen Bogen erstellen"

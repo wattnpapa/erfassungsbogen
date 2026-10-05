@@ -505,7 +505,9 @@ export function Uebersicht(props: {
               <button type="button" onClick={alsVorlageSpeichern}>
                 {props.vorlageBearbeitung ? "Als neue Vorlage speichern" : "Als Vorlage speichern"}
               </button>
-              <button type="button" onClick={() => void bogenVerwerfen()}>Neuer Bogen</button>
+              {/* „Bogen schließen" statt „Neuer Bogen": Der Knopf schließt nur
+                  und führt zur Startseite (R3-H7, R3-N6). */}
+              <button type="button" onClick={() => void bogenVerwerfen()}>Bogen schließen</button>
             </span>
           </span>
         </div>
