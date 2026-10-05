@@ -509,3 +509,16 @@ R2-A1 erzeugt Leerseiten (R3-A3), und die Blanko-Beschriftung aus R2-A6
 steckt nur im Generator, nicht in der ausgelieferten Datei (R3-A4). Neu und am
 schwersten ist R3-A1: Ein Rückweg vom Papier, der bisher nicht geprüft war,
 verfälscht die Summen still.
+
+## Stand der Behebung
+
+Stand 05.10.2026, Paket „Einsatz-Import, Abgleich zwischen Geräten,
+Papier-Rückweg". Geprüft mit Typprüfung, Unit- und Oberflächentests
+(2 310 grün) und Nachmessung im Dev-Server (360 × 640, `isMobile`/`hasTouch`,
+de-DE) mit den Seeds und Fotos dieses Audits. Aufgeführt sind nur die
+Befunde dieses Pakets.
+
+| Befund | Stand | Umsetzung |
+| --- | --- | --- |
+| R3-A1 Stärkeänderung vom Papier als neue Fassung | behoben | Die Rückfragen „Ist das dieselbe Einheit?" und „Einheit ist bereits gemeldet" bieten bei einem reinen Stärke-Nachtrag zuerst „Nur die Stärke ändern (0 / 2 / 7 / 9 → 0 / 2 / 6 / 8)"; „als neue Fassung" nennt „Fällt dabei weg: 2 Fahrzeuge, Diesel 60 l, Gemisch 5 l, Ruhezeit, 9 Namen". Die neue Fassung entsteht aus der bisherigen: Schreibweise, Fahrzeuge, Bedarf, Namen bleiben, Verpflegungs- und M/W/D-Aufteilung werden festgeschrieben. An der Karte zusätzlich „Mehr…" › „Stärke ändern…". Nachlauf: Stärke 121 → 120, Fahrzeuge 32, Diesel 1330 l, Gemisch 35 l, Ruhezeit 5×, vegetarisch 23, kein „ohne M/W/D-Angabe". Die Bedienschritte bis zur Rückfrage bleiben 9. |
+| R3-A2 Übernahme nur vom Papier | teilweise | Vom Papier eingelesene neue Einheiten tragen „vom Papier, Zeiten prüfen". Die Einsatzansicht bietet „Lage vom Papier abgleichen…": alle markierten Einheiten in einer Liste mit Eintreffzeit, Status samt Abrückzeit und Zug, übernommen in einem Schritt. Nachlauf (Fotos der Seiten 4, 6, 15): 8 Bedienschritte für Ansbach und Kirchehrenbach, danach 0 / 2 / 7 / 9 und keine Marke. Offen: Die Werte müssen weiter vom Blatt abgetippt werden; ein Code für die Lage braucht ein neues Transportformat (bewusst kein Schemawechsel in diesem Paket). Der Kasten erscheint über der Liste, nach dem Einlesen liegt die Ansicht aber beim Stapelbericht weiter unten. |

@@ -368,3 +368,18 @@ bleibt teilweise. Unter dem Vermerk liegt ein Abgleich, der Änderungen nicht
 halten, soweit geprüft (R2-N1, R2-N4 bis R2-N7). Die Risiken liegen nicht
 mehr beim Weg der einzelnen Einheit. Sie liegen dort, wo dieselbe Lage auf
 mehr als einem Gerät geführt wird.
+
+## Stand der Behebung
+
+Stand 05.10.2026, Paket „Einsatz-Import, Abgleich zwischen Geräten,
+Papier-Rückweg". Geprüft mit Typprüfung, Unit- und Oberflächentests
+(2 310 grün) und Nachmessung im Dev-Server (360 × 640, `isMobile`/`hasTouch`,
+de-DE, je Gerät ein eigener Browser-Kontext), Prüfdateien dieses Audits.
+Aufgeführt sind nur die Befunde dieses Pakets. Der Kern-Import im Submodul
+ist unverändert; der Abgleich liegt in `src/app/einsatz-abgleich.ts`.
+
+| Befund | Stand | Umsetzung |
+| --- | --- | --- |
+| R3-W1 Rückimport übernimmt keine Änderungen | behoben | Der Import gleicht bekannte Einheiten ab: Status samt Abrückzeit, Zug, Auftrag/Notiz, Eintreffzeit. Es gilt die Seite, die das Feld seit dem gemeinsamen Stand geändert hat (Verlauf mit Uhrzeit). Haben beide geändert, gilt der jüngere Vermerk; der Widerspruch steht in der Quittung und im Verlauf der Einheit. Ohne Verlauf wird nur ein leerer Wert gefüllt. Die Werte landen auch auf einer Folgemeldung vom anderen Gerät (Szenario 2). Quittung: „0 neue Meldung(en) ergänzt. 2 Meldungen aktualisiert: Biberach/Riß Zug „2. TZ“, Auftrag „Ortung Trümmerkegel B27“; Ulm abgerückt 06:07." Nachlauf Szenario 3 (r2.cjs): A und B danach beide 0 / 2 / 9 / 11, Albstadt bleibt auf A abgerückt und kommt auf B an. Szenario 2: „Lagekarte führen" bleibt an Albstadt. |
+| R3-W2 Weitergabe-Vermerk zählt Importiertes | behoben | Was ein Import brachte, gilt als beim anderen Gerät bekannt (Kennungen und Prüfsummen der Vermerke im Weitergabe-Stand). Der Vermerk zählt auch Änderungen: „seitdem hier 1 neue Meldung und 1 Änderung (Auftrag)", dazu „Stand des anderen Geräts übernommen …". Nachlauf Szenario 2: Nach dem Rückimport nur „1 Änderung (Auftrag)" (die eigene Notiz), nach eigener Aufnahme „1 neue Meldung und 1 Änderung". Offen: Abschluss der Sammlung („nur noch lesen"). |
+| R3-W3 Sammlung des Zugführers an den Meldekopf | behoben | „Bögen einlesen…" mit einer Sammel-PDF einer anderen Sammlung fragt: „… ‚1. TZ Albstadt' mit 2 Einheiten. In ‚Hochwasser Albstadt' übernehmen — mit Eintreffzeiten, Abrückvermerken, Auftrag und Siegel?" mit „Übernehmen, Zug ‚1. TZ Albstadt'", „ohne Zug-Zuordnung" oder „Nur die Bögen". Bekannte Einheiten behalten ihren Zug. Nachlauf Szenario 4 (zfue-buendel.pdf): eine Sammlung mit 3 Einträgen, Albstadt und Ulm mit Zug und Siegel. |
