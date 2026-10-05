@@ -101,6 +101,16 @@ Given("die App sich als Android-App zeigt", async function (this: EebWelt) {
   });
 });
 
+/**
+ * Fenstergröße in CSS-Pixeln. Die Vorgabe von Playwright (1280 × 720) liegt
+ * genau auf der Grenze, ab der die App auf Telefonhöhe verdichtet
+ * (`max-height: 720px`, z. B. im QR-Vollbild seit R3-H2). Szenarien, die das
+ * eine oder das andere Bild prüfen, nennen die Größe darum ausdrücklich.
+ */
+Given("das Fenster {int} × {int} Pixel groß ist", async function (this: EebWelt, breite: number, hoehe: number) {
+  await this.page.setViewportSize({ width: breite, height: hoehe });
+});
+
 // ------------------------------------------------------------------ Bedienen
 
 When("ich das Feld {string} mit {string} fülle", async function (this: EebWelt, name: string, wert: string) {

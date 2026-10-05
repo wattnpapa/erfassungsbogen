@@ -31,16 +31,28 @@ Funktionalität: Bogen übergeben — QR, PDF, Link, CSV
     Dann ist kein Dialog offen
 
   Szenario: QR-Code im Vollbild zeigen und wieder schließen
+    Angenommen das Fenster 1280 × 900 Pixel groß ist
     Wenn ich auf "Bogen übergeben…" klicke
     Und ich im Dialog auf "QR-Code im Vollbild zeigen" klicke
     Dann sehe ich den Dialog "QR-Code im Vollbild"
     Und sehe ich den Hinweis "Der Bildschirm bleibt an"
     Wenn ich auf "Schließen" klicke
-    Dann sehe ich "Der Bildschirm bleibt an" nicht
+    Dann sehe ich den Hinweis "Der Bildschirm bleibt an" nicht
     # Die App weiß nicht, ob gescannt wurde — sie fragt (Audit Runde 3, R3-H3).
     Und sehe ich den Text "Hat die Gegenstelle den Code gescannt?"
     Wenn ich auf "Nicht sicher" klicke
     Dann sehe ich den Text "Empfang nicht bestätigt"
+
+  # Auf Telefonhöhe gehen Code, Teilnummer und Knöpfe vor; der
+  # Helligkeitstipp entfällt (Audit Runde 3, R3-H2).
+  Szenario: Auf Telefonhöhe hat der Code im Vollbild Vorrang vor dem Helligkeitstipp
+    Angenommen das Fenster 360 × 640 Pixel groß ist
+    Wenn ich auf "Bogen übergeben…" klicke
+    Und ich im Dialog auf "QR-Code im Vollbild zeigen" klicke
+    Dann sehe ich den Dialog "QR-Code im Vollbild"
+    Und sehe ich das Bild "EEB2-QR-Code"
+    Und sehe ich den Hinweis "Der Bildschirm bleibt an" nicht
+    Und sehe ich die Schaltfläche "Schließen"
 
   Szenario: PDF-Vorschau zeigt den fertigen Bogen im Papier-Layout
     Wenn ich auf "Vorschau anzeigen" klicke und die PDF-Vorschau erscheint
