@@ -25,6 +25,7 @@
 
 import type { Einsatzsammlung, MeldeEintrag } from "@bos/meldekopf/einsaetze";
 import { zeitLang } from "./eintrag-zeiten";
+import { vermerkFeld, vermerkKennung } from "./einsatz-abgleich";
 
 const SPEICHER_SCHLUESSEL = "eeb.export-stand.v1";
 /**
@@ -44,6 +45,16 @@ export interface ExportStand {
   zeitpunkt: number;
   /** IDs aller Meldungen, die zu diesem Zeitpunkt in der Sammlung standen. */
   eintragIds: string[];
+  /**
+   * Nur Weitergabe-Stand: Prüfsummen aller Vermerke der Führungsstelle
+   * (Abrücken, Zug, Auftrag, Eintreffzeit), die das andere Gerät kennt —
+   * gezählt wird, was danach HIER dazukam (Audit Runde 3, R3-W2). Prüfsummen
+   * statt Text, damit kein Auftragstext in diesem Komfort-Stand landet.
+   * Fehlt bei älteren Ständen; dann zählt der Zeitpunkt.
+   */
+  vermerke?: string[];
+  /** Nur Weitergabe-Stand: wann zuletzt eine Sammlung von dort übernommen wurde. */
+  uebernommenAm?: number;
 }
 
 type Ablage = Record<string, ExportStand>;
@@ -70,6 +81,8 @@ function ablageLaden(schluessel = SPEICHER_SCHLUESSEL): Ablage {
       ablage[einsatzId] = {
         zeitpunkt: s.zeitpunkt,
         eintragIds: s.eintragIds.filter((id): id is string => typeof id === "string"),
+        ...(Array.isArray(s.vermerke) ? { vermerke: s.vermerke.filter((v): v is string => typeof v === "string") } : {}),
+        ...(typeof s.uebernommenAm === "number" ? { uebernommenAm: s.uebernommenAm } : {}),
       };
     }
     return ablage;
@@ -157,7 +170,11 @@ export function weitergabeStandLaden(einsatzId: string): ExportStand | null {
 
 /** Nach einer gelungenen Weitergabe der ganzen Sammlung (Sammel-PDF, alle Bögen). */
 export function weitergabeVermerken(einsatz: Einsatzsammlung, behalten?: Iterable<string>, jetzt = Date.now()): ExportStand {
-  const stand: ExportStand = { zeitpunkt: jetzt, eintragIds: einsatz.eintraege.map((e) => e.id) };
+  const stand: ExportStand = {
+    zeitpunkt: jetzt,
+    eintragIds: einsatz.eintraege.map((e) => e.id),
+    vermerke: [...vermerkPruefsummen(einsatz.eintraege)],
+  };
   const alt = ablageLaden(WEITERGABE_SCHLUESSEL);
   const neu: Ablage = {};
   if (behalten) {
@@ -168,6 +185,74 @@ export function weitergabeVermerken(einsatz: Einsatzsammlung, behalten?: Iterabl
   neu[einsatz.id] = stand;
   ablageSpeichern(neu, WEITERGABE_SCHLUESSEL);
   return stand;
+}
+
+/** FNV-1a (32 Bit) — kurze Prüfsumme einer Vermerk-Kennung, kein Klartext im Stand. */
+function pruefsumme(text: string): string {
+  let h = 0x811c9dc5;
+  for (let i = 0; i < text.length; i++) {
+    h ^= text.charCodeAt(i);
+    h = Math.imul(h, 0x01000193);
+  }
+  return (h >>> 0).toString(16).padStart(8, "0");
+}
+
+function vermerkPruefsummen(eintraege: MeldeEintrag[]): Set<string> {
+  const p = new Set<string>();
+  for (const e of eintraege) for (const v of e.vermerke ?? []) p.add(pruefsumme(vermerkKennung(e.einheitSchluessel, v)));
+  return p;
+}
+
+/**
+ * Nach „Einsatz importieren…": Was von dort kam, hat das andere Gerät schon.
+ * Ohne das zählte der Vermerk zurückimportierte Meldungen als „hier neu" und
+ * schickte zum erneuten Weitergeben (Audit Runde 3, R3-W2). Nur wenn es schon
+ * eine Weitergabe gab; `vermerke` sind Vermerk-Kennungen aus dem Abgleich.
+ */
+export function weitergabeUmImportErgaenzen(
+  einsatzId: string,
+  eintragIds: string[],
+  vermerke: string[],
+  jetzt = Date.now(),
+): void {
+  const alt = ablageLaden(WEITERGABE_SCHLUESSEL);
+  const stand = alt[einsatzId];
+  if (!stand) return;
+  alt[einsatzId] = {
+    ...stand,
+    eintragIds: [...new Set([...stand.eintragIds, ...eintragIds])],
+    ...(stand.vermerke ? { vermerke: [...new Set([...stand.vermerke, ...vermerke.map(pruefsumme)])] } : {}),
+    uebernommenAm: jetzt,
+  };
+  ablageSpeichern(alt, WEITERGABE_SCHLUESSEL);
+}
+
+/** Was seit der Weitergabe HIER an bekannten Einheiten geändert wurde (R3-W2). */
+export interface AenderungenSeit {
+  anzahl: number;
+  /** „Abrücken", „Zug", „Auftrag", „Eintreffzeit" — in dieser Reihenfolge, ohne Doppel. */
+  arten: string[];
+}
+
+const ART_TEXT: Record<string, string> = { status: "Abrücken", zug: "Zug", notiz: "Auftrag", eintreffzeit: "Eintreffzeit" };
+
+export function aenderungenSeit(eintraege: MeldeEintrag[], stand: ExportStand): AenderungenSeit {
+  const bekannt = stand.vermerke ? new Set(stand.vermerke) : null;
+  const gezaehlt = new Set<string>();
+  const arten = new Set<string>();
+  for (const e of eintraege) {
+    for (const v of e.vermerke ?? []) {
+      const feld = vermerkFeld(v.text);
+      if (!feld) continue;
+      const p = pruefsumme(vermerkKennung(e.einheitSchluessel, v));
+      if (gezaehlt.has(p)) continue; // Folgemeldungen tragen den Verlauf mit
+      const neu = bekannt ? !bekannt.has(p) : v.zeit > stand.zeitpunkt;
+      if (!neu) continue;
+      gezaehlt.add(p);
+      arten.add(feld);
+    }
+  }
+  return { anzahl: gezaehlt.size, arten: ["status", "zug", "notiz", "eintreffzeit"].filter((a) => arten.has(a)).map((a) => ART_TEXT[a]!) };
 }
 
 /** „seitdem 1 neue Meldung" / „seitdem keine neue Meldung" — für Export- und Lageblatt-Zeile. */

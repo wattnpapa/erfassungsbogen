@@ -42,6 +42,13 @@
 > Rückholplatz, Übernahme" — eingehende Bogen-Links (laufende App und
 > Kaltstart) fragen vor dem Verdrängen gegen den aktuellen Arbeitsstand —
 > Kapitel 8.2.
+>
+> **Nachgezogen 2026-10-05:** Audit Runde 3, Paket „Einsatz-Import, Abgleich
+> zwischen Geräten, Papier-Rückweg" — „Einsatz importieren…" läuft über
+> `einsatzAbgleichen` (`src/app/einsatz-abgleich.ts`), das um den
+> unveränderten Kern-Import herum Status, Zug, Auftrag und Eintreffzeit
+> bekannter Einheiten abgleicht (R3-W1); der Weitergabe-Stand zählt
+> Importiertes nicht mehr als „hier neu" (R3-W2) — Kapitel 8.2, 11.3.
 
 ---
 
@@ -1047,6 +1054,18 @@ flowchart TB
   `meldungAufnehmen`. Eine neue Fassung derselben Einheit erbt dort
   Eintreffzeit, Auftrag/Notiz, Zug- und Teil-Etikett der Vorgängerin; der
   Kern (`@bos/meldekopf`) bleibt unverändert.
+- **Abgleich beim Einsatz-Import** (`einsatz-abgleich.ts`, R3-W1,
+  nachgezogen 2026-10-05): Der Kern-Import `einsatzImportieren` hängt nur
+  Meldungen mit unbekannter Eintrags-ID an. `einsatzAbgleichen` merkt sich den
+  Stand vor dem Import und gleicht danach je Einheit Status samt Abrückzeit,
+  Zug, Auftrag/Notiz und Eintreffzeit ab. Maßgeblich ist der Verlauf der
+  Führungsstelle (`vermerke` mit Uhrzeit): Es gilt die Seite, die das Feld
+  seit dem gemeinsamen Stand geändert hat; haben beide geändert, der jüngere
+  Vermerk, und der Widerspruch steht in Quittung und Verlauf („Abgleich mit
+  anderem Gerät: …"). Ohne Vermerk wird nur ein hier leerer Wert gefüllt.
+  Der Weitergabe-Stand (`eeb.weitergabe-stand.v1`) führt dazu Prüfsummen der
+  bekannten Vermerke und den Zeitpunkt der letzten Übernahme; was ein Import
+  brachte, zählt nicht als „hier neu" (R3-W2).
 - **Datenschutzfrist:** 90 Tage nach dem Stand eines Bogens werden seine
   Personaldaten dauerhaft anonymisiert. Das gilt für die Meldungen der
   Einsatz-Sammlung, den Entwurf und jeden eingelesenen Bogen; Übungsbögen und
@@ -1497,6 +1516,11 @@ Repository-Analyse, keine offiziellen Angaben des Projekts.
   Vollständigkeit je Organisation ist fortlaufender Pflegeaufwand.
 - **Zwei TypeScript-Versionen nebeneinander** in allen vier Kern-Submodulen –
   Übergangslösung mit definiertem Wegfallkriterium.
+- **Abgleich beim Einsatz-Import liegt im Produkt statt im Kern**
+  (`src/app/einsatz-abgleich.ts`, R3-W1, 2026-10-05): `einsatzImportieren` im
+  Submodul gleicht nur über die Eintrags-ID ab; die Feldregeln hängen an den
+  App-Zusatzfeldern (`eintrag-zeiten.ts`) und den Vermerktexten. Wandern diese
+  Felder in den Kern, gehört der Abgleich mit.
 - **`packages/kern-vendor/`-Rückweg ist vorbereitet, aber ungenutzt** – die
   Exit-Strategie ist eine Prozessvereinbarung, kein eingerichteter Mechanismus.
 

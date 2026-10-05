@@ -160,6 +160,15 @@ Grundlage: Repository `wattnpapa/erfassungsbogen`, Stand 2026-09-12 — Version 
 > eigenen Bogen legt den Entwurf eines anderen Fensters vor dem Anlegen
 > eines neuen Bogens nach Rückfrage auf den Rückholplatz, statt ihn still zu
 > überschreiben. Kein neuer Speicherort. Geändert: 5.7.
+>
+> **Nachgezogen 2026-10-05 — Abgleich beim Einsatz-Import (Audit Runde 3,
+> R3-W1, R3-W2):** „Einsatz importieren…" gleicht bei bekannten Einheiten
+> Status, Abrückzeit, Zug, Auftrag/Notiz und Eintreffzeit mit dem anderen
+> Gerät ab; vorher blieben dort geänderte Angaben still auf dem alten Stand
+> (Richtigkeit, Art. 5 Abs. 1 lit. d DSGVO). Keine neue Datenkategorie, kein
+> neuer Empfänger. Der Weitergabe-Stand führt zusätzlich Prüfsummen der
+> Vermerke und den Zeitpunkt der letzten Übernahme, ohne Personendaten.
+> Geändert: 5.7.
 
 ## Hinweis zu diesem Dokument
 
@@ -458,7 +467,9 @@ Kapitel 6 der [Arc42-Dokumentation](arc42-architektur.md).
   Weitergabe der ganzen Sammlung über „Einsatz weitergeben / sichern" und die
   Kennungen der Meldungen darin (`eeb.weitergabe-stand.v1`,
   `src/app/export-stand.ts`) — Grundlage des Übergabevermerks in der
-  Einsatzansicht; ohne Personendaten, fällt mit „Alle Daten löschen" weg.
+  Einsatzansicht; seit 2026-10-05 (R3-W2) zusätzlich Prüfsummen der Vermerke
+  der Führungsstelle und der Zeitpunkt der letzten Übernahme per Import;
+  ohne Personendaten, fällt mit „Alle Daten löschen" weg.
 - **Kenntnis-Stand (seit 2026-10-04, R3-K1):** Zeitpunkt der letzten
   Kenntnisnahme in der Einsatzansicht und die Kennungen der Meldungen, die da
   schon in der Sammlung standen (`eeb.kenntnis-stand.v1`,

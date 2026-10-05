@@ -66,7 +66,6 @@ import {
   einsaetzeLaden,
   einsaetzePapierkorb,
   einsatzAnlegen,
-  einsatzImportieren,
   neuesteJeEinheit,
   revisionen,
   type EintragSignatur,
@@ -78,7 +77,8 @@ import { offlineText, useOfflineStand } from "./offline-bereit";
 import { uebergabeFesthalten, uebergabeText, type UebergabeStand } from "./uebergabe-stand";
 import { ART_LABEL, EinsatzDetail, EinsatzListe, letzteMeldungText, type Eingang } from "./einsaetze-ui";
 import { letzteMeldung, meldungsNummern } from "./einheiten-tabelle";
-import { exportSammlung, exportStandLaden, exportVermerken, type ExportStand, type ExportUmfang } from "./export-stand";
+import { exportSammlung, exportStandLaden, exportVermerken, weitergabeUmImportErgaenzen, type ExportStand, type ExportUmfang } from "./export-stand";
+import { abgleichText, einsatzAbgleichen } from "./einsatz-abgleich";
 import { aktuelleMeldungen } from "./auswertung";
 import { boegenAusJsonText, boegenAusPdfBytes, einsatzAusDatei, einsatzAusPdfBytes, einsatzDateiInhalt, istPdfDatei, pdfInhaltArt } from "./einsatz-transport";
 import type { QrBogen } from "./qr-boegen";
@@ -2524,14 +2524,19 @@ function AppInhalt() {
       }
       // Vor Ort entfernte Meldungen kommen nicht still zurück (R2-D4).
       const geklaert = await entfernteImImportKlaeren(s);
-      const r = einsatzImportieren(geklaert.sammlung);
+      // Bekannte Meldungen abgleichen statt nur neue anzuhängen (R3-W1).
+      const r = einsatzAbgleichen(geklaert.sammlung);
+      // Was von dort kam, hat das andere Gerät schon (R3-W2).
+      weitergabeUmImportErgaenzen(s.id, r.neueIds, r.neueVermerke);
       const letzteImImport = letzteMeldung(geklaert.sammlung.eintraege);
       einsaetzeNeuLaden();
       setFehler("");
+      const abgleich = abgleichText(r);
       setMeldung(
         (r.neuerEinsatz
           ? `Einsatz „${s.name}" importiert (${r.hinzugefuegt} Meldung(en)).`
-          : `Einsatz „${s.name}": ${r.hinzugefuegt} neue Meldung(en) ergänzt.`) +
+          : `Einsatz „${s.name}": ${r.hinzugefuegt} neue Meldung(en) ergänzt` +
+            (abgleich ? `. ${abgleich}` : r.hinzugefuegt === 0 ? " — die Datei enthält nichts, was hier fehlte." : ".")) +
           // Wie aktuell die übernommene Lage ist: Kam auf dem alten Gerät
           // danach noch etwas, fehlt es hier (Audit Runde 3, R3-K5).
           (letzteImImport != null ? ` Letzte Meldung darin: ${zeitLang(letzteImImport)}.` : "") +

@@ -117,7 +117,7 @@ describe("weitergabeStandLaden / weitergabeVermerken (Audit Runde 2, R2-W5)", ()
     const s = sammlung("e1", [eintrag("m1", "Wardenburg", 1000)]);
     expect(weitergabeStandLaden("e1")).toBeNull();
     weitergabeVermerken(s, undefined, 9000);
-    expect(weitergabeStandLaden("e1")).toEqual({ zeitpunkt: 9000, eintragIds: ["m1"] });
+    expect(weitergabeStandLaden("e1")).toEqual({ zeitpunkt: 9000, eintragIds: ["m1"], vermerke: [] });
     expect(exportStandLaden("e1")).toBeNull();
     expect(lageblattStandLaden("e1")).toBeNull();
     expect(localStorage.getItem("eeb.weitergabe-stand.v1")).not.toBeNull();

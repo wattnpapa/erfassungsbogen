@@ -168,6 +168,15 @@ Grundlage: Repository `wattnpapa/erfassungsbogen`, Stand 2026-09-12 — Version 
 > Entwurf eines anderen Fensters nicht mehr still: Rückfrage mit Namen, dann
 > liegt der fremde Stand auf dem Rückholplatz. Die Konfliktwarnung steht fest
 > am oberen Bildrand (3.3 D1).
+>
+> **Nachgezogen 2026-10-05:** Abgleich beim Einsatz-Import (Audit Runde 3,
+> R3-W1, R3-W2) — „Einsatz importieren…" übernimmt jetzt auch Abrücken, Zug,
+> Auftrag und Eintreffzeit bekannter Einheiten vom anderen Gerät (jüngerer
+> Vermerk gilt, Widersprüche stehen in Quittung und Verlauf), statt sie still
+> zu verwerfen — Integrität der Lage. Der Weitergabe-Stand
+> `eeb.weitergabe-stand.v1` führt zusätzlich Prüfsummen (FNV-1a) der bekannten
+> Vermerke und den Zeitpunkt der letzten Übernahme, keinen Auftragstext
+> (3.3 D2i).
 
 ## Hinweis zu diesem Dokument
 
@@ -302,7 +311,7 @@ dem Vite-Build); es gibt keine serverseitige Variante.
 | D2f | Zeitpunkt der letzten Sicherung | Wann auf diesem Gerät zuletzt „Sicherung erstellen…" ausgelöst wurde — Grundlage für die Anzeige in der Datensicherung und die Erinnerung nach drei Tagen (`src/app/sicherung.ts`, Audit Runde 2, R2-O6); keine Personendaten | `localStorage` des Geräts (`eeb.sicherung.zuletzt.v1`), steht in der Sicherung selbst, fällt mit „Alle Daten löschen" weg |
 | D2g | Nachricht über automatisch gelöschte Sammlungen (seit 2026-09-29, R2-D5) | Name, Zeitraum (angelegt/zuletzt geändert), Zahl der Einheiten und Meldungen sowie Löschzeitpunkt einer Sammlung, die die Aufräumfrist (90 Tage ohne Änderung) überschritten hat; keine Personendaten, Name der Sammlung als Freitext. Vorgemerkt von einer Hülle um die Ablage (`src/app/aufraeum-hinweis.ts`), bevor der Kern die Sammlung verwirft; bleibt bis „Verstanden" auf der Startseite | `localStorage` des Geräts (`eeb.aufgeraeumt.v1`), fällt mit „Alle Daten löschen" weg |
 | D2h | Lageblatt-Stand je Einsatz-Sammlung (seit 2026-09-29, R2-A3) | Zeitpunkt des zuletzt erzeugten Lageblatts und Kennungen der Meldungen darauf — Grundlage für „Lageblatt erstellt … · seitdem n neue Meldungen"; keine Personendaten | `localStorage` des Geräts (`eeb.lageblatt-stand.v1`), fällt mit „Alle Daten löschen" weg |
-| D2i | Weitergabe-Stand je Einsatz-Sammlung (seit 2026-09-29, R2-W5) | Zeitpunkt der letzten Weitergabe der ganzen Sammlung („Einsatz weitergeben / sichern") und Kennungen der Meldungen darin — Grundlage des Übergabevermerks „Weitergegeben … · seitdem n neue Meldungen"; keine Personendaten | `localStorage` des Geräts (`eeb.weitergabe-stand.v1`), fällt mit „Alle Daten löschen" weg |
+| D2i | Weitergabe-Stand je Einsatz-Sammlung (seit 2026-09-29, R2-W5; erweitert 2026-10-05, R3-W2) | Zeitpunkt der letzten Weitergabe der ganzen Sammlung („Einsatz weitergeben / sichern"), Kennungen der Meldungen darin, Prüfsummen der Vermerke der Führungsstelle und Zeitpunkt der letzten Übernahme per Import — Grundlage des Übergabevermerks „Weitergegeben … · seitdem n neue Meldungen und m Änderungen"; keine Personendaten, kein Auftragstext | `localStorage` des Geräts (`eeb.weitergabe-stand.v1`), fällt mit „Alle Daten löschen" weg |
 | D2j | Kenntnis-Stand je Einsatz-Sammlung (seit 2026-10-04, R3-K1) | Zeitpunkt der letzten Kenntnisnahme („Zur Kenntnis genommen" in der Einsatzansicht, beim ersten Öffnen einer Sammlung vorbelegt) und Kennungen der Meldungen, die da schon in der Sammlung standen — Grundlage der Sammelquittung „Neu seit der letzten Kenntnisnahme" und der Marke „neue Fassung"; je Gerät, reist nicht mit der Sammlung; keine Personendaten | `localStorage` des Geräts (`eeb.kenntnis-stand.v1`), fällt mit „Alle Daten löschen" weg |
 | D3 | Absenderkarte | Freiwillige Kontaktangabe (Name/E-Mail/Telefon) der meldenden Person | `localStorage` des Geräts |
 | D4 | Privater Geräteschlüssel | Ed25519-Schlüssel zur Signatur weitergereichter Bögen | `localStorage` des Geräts, **unverschlüsselt als Hex** |

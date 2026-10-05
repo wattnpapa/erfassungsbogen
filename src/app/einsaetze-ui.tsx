@@ -128,6 +128,7 @@ import {
   neueEintraege,
   seitdemText,
   weitergabeStandLaden,
+  aenderungenSeit,
   type ExportStand,
   type ExportUmfang,
 } from "./export-stand";
@@ -207,8 +208,15 @@ function ausgabeStandText(s: Einsatzsammlung): string {
   return [
     teil("Lageblatt", lageblattStandLaden(s.id), "noch keins"),
     teil("Export", exportStandLaden(s.id), "noch keiner"),
-    ...(weitergabe ? [teil("Weitergegeben", weitergabe, "")] : []),
+    ...(weitergabe ? [weitergabeTeil(s, weitergabe)] : []),
   ].join(" · ");
+}
+
+/** „Weitergegeben … (seitdem 1 neue Meldung, 2 Änderungen)" — Änderungen an bekannten Einheiten zählen mit (R3-W2). */
+function weitergabeTeil(s: Einsatzsammlung, stand: ExportStand): string {
+  const aend = aenderungenSeit(s.eintraege, stand).anzahl;
+  const zusatz = aend === 0 ? "" : aend === 1 ? ", 1 Änderung" : `, ${aend} Änderungen`;
+  return `Weitergegeben ${exportZeitKurz(stand.zeitpunkt)} (${seitdemText(neueEintraege(s.eintraege, stand).length)}${zusatz})`;
 }
 
 /**
@@ -710,6 +718,9 @@ export function EinsatzDetail(props: {
   // womöglich ein anderes Gerät die Lage (Audit Runde 2, R2-W5).
   const weitergabeStand = weitergabeStandLaden(einsatz.id);
   const seitWeitergabe = weitergabeStand ? neueEintraege(einsatz.eintraege, weitergabeStand).length : 0;
+  // Auch Abrücken, Zug, Auftrag zählen — was ein Import mitbrachte, nicht (R3-W2).
+  const aenderungenSeitWeitergabe = weitergabeStand ? aenderungenSeit(einsatz.eintraege, weitergabeStand) : { anzahl: 0, arten: [] };
+  const weitergabeOffen = seitWeitergabe > 0 || aenderungenSeitWeitergabe.anzahl > 0;
   const [suche, setSuche] = useState("");
   const [sortierung, setSortierung] = useState<EinheitenSortierung>("name");
   // "" = keine Einschränkung. Schlüssel siehe einheiten-liste.ts.
@@ -937,11 +948,17 @@ export function EinsatzDetail(props: {
           wieder in die Hand nimmt, sieht zuerst, dass die Lage weitergegeben
           wurde — und ob seitdem etwas nur hier dazukam (R2-W5). */}
       {weitergabeStand && (
-        <p className={`hinweis weitergabe-vermerk${seitWeitergabe > 0 ? " seitdem-neu" : ""}`}>
+        <p className={`hinweis weitergabe-vermerk${weitergabeOffen ? " seitdem-neu" : ""}`}>
           <strong>Weitergegeben {exportZeitKurz(weitergabeStand.zeitpunkt)}</strong>
-          {seitWeitergabe === 0
+          {!weitergabeOffen
             ? " — seitdem hier nichts Neues."
-            : ` — seitdem hier ${seitWeitergabe === 1 ? "1 neue Meldung" : `${seitWeitergabe} neue Meldungen`}. Führt inzwischen ein anderes Gerät die Lage, fehlt das dort: erneut weitergeben.`}
+            : ` — seitdem hier ${[
+                ...(seitWeitergabe > 0 ? [seitWeitergabe === 1 ? "1 neue Meldung" : `${seitWeitergabe} neue Meldungen`] : []),
+                ...(aenderungenSeitWeitergabe.anzahl > 0
+                  ? [`${aenderungenSeitWeitergabe.anzahl === 1 ? "1 Änderung" : `${aenderungenSeitWeitergabe.anzahl} Änderungen`} (${aenderungenSeitWeitergabe.arten.join(", ")})`]
+                  : []),
+              ].join(" und ")}. Führt inzwischen ein anderes Gerät die Lage, fehlt das dort: erneut weitergeben.`}
+          {weitergabeStand.uebernommenAm != null && ` Stand des anderen Geräts übernommen ${exportZeitKurz(weitergabeStand.uebernommenAm)}.`}
         </p>
       )}
     </SeitenKopf>
