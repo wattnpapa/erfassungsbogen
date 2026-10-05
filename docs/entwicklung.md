@@ -219,6 +219,27 @@ strukturierten Daten.
   sie über die Tabelle `SEITEN` im Skript.
 - **Ansehen:** `npm run sitemap -- /tmp/sitemap.xml`.
 
+### Blanko-Vordruck (generiert, liegt im Repo)
+
+`public/downloads/einheiten-erfassungsbogen-blanko.pdf` ist der leere Bogen
+zum Ausdrucken — die Papier-Rückfallebene, direkt verlinkbar und auch ohne
+laufende App abrufbar. Deshalb liegt die Datei fertig im Repo und entsteht
+**nicht** im Build. Erzeugt wird sie aus derselben DocDefinition wie jede
+Bogen-PDF ([src/app/pdf-dokument.ts](../src/app/pdf-dokument.ts)):
+
+```bash
+npm run blanko-pdf   # schreibt public/downloads/einheiten-erfassungsbogen-blanko.pdf
+```
+
+- **Nach jeder Änderung am PDF-Layout** das Skript aufrufen und die neue Datei
+  mit committen. Vergessen fällt auf: [scripts/blanko-vordruck.test.ts](../scripts/blanko-vordruck.test.ts)
+  erzeugt den Vordruck mit dem Erstelldatum der ausgelieferten Datei neu und
+  vergleicht byte-genau. Vorher war die Stärke-Legende aus R2-A6 nur im
+  Generator, nicht in der ausgelieferten Datei (Audit Runde 3, R3-A4).
+- **Die Ausgabe ist deterministisch**, weil das Erstelldatum übergeben wird und
+  pdfkit die Datei-ID aus den Metadaten bildet. Wer Metadaten ergänzt, die bei
+  jedem Lauf anders sind, macht den Wächter wertlos.
+
 ### Kopfnavigation (generiert, drei Fassungen)
 
 Die Domain hat zwei Welten: die App unter `/` (index.html plus React-Bundle)

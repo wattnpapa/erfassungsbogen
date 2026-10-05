@@ -906,6 +906,13 @@ Precache. Er ist die Papier-Rückfallebene und wird gerade dann gebraucht, wenn
 kein Netz da ist; vorher lieferte der direkte Aufruf offline
 `ERR_INTERNET_DISCONNECTED`.
 
+*Nachgezogen 2026-10-05 (Audit Runde 3, R3-A4):* Die Datei liegt fertig im
+Repo und entsteht nicht im Build; `npm run blanko-pdf` schreibt sie aus
+derselben DocDefinition wie jede Bogen-PDF (`scripts/blanko-vordruck.ts`). Der
+Test `scripts/blanko-vordruck.test.ts` erzeugt sie mit dem Erstelldatum der
+ausgelieferten Datei neu und vergleicht byte-genau — eine Layoutänderung ohne
+neu erzeugten Vordruck fällt damit im Testlauf auf.
+
 *Nachgezogen 2026-10-05 (Audit Runde 3, R3-O3):* Der Vorrat ist zweistufig.
 Bisher war der Service Worker erst nach allen 552 Dateien (10,7 MB) aktiv, bei
 schwachem Mobilfunk über eine Minute ohne Fortschritt. Jetzt teilt
