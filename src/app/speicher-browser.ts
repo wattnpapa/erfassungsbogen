@@ -8,11 +8,12 @@
  * die Datenschutzfrist herein (siehe datenschutz-uhr.ts).
  */
 
-import { datenschutzUhrSetzen, speicherhuelleSetzen, type Speicherhuelle } from "@bos/meldekopf/einsaetze";
+import { datenschutzUhrSetzen, einsaetzeZuJson, speicherhuelleSetzen, type Speicherhuelle } from "@bos/meldekopf/einsaetze";
 import { datenschutzZeitpunkt } from "./datenschutz-uhr";
 import { istNativ } from "./nativ";
 import { wertvolleDaten } from "./sicherung";
 import { aufraeumBeobachter } from "./aufraeum-hinweis";
+import { schonendeHuelle } from "./speicher-schonend";
 
 /** `localStorage`, sofern erreichbar — im Privatmodus oder bei blockiertem
  *  Speicher wirft schon der Zugriff auf die Eigenschaft. */
@@ -28,8 +29,11 @@ export function browserSpeicherhuelle(): Speicherhuelle | null {
 export function speicherVerdrahten(): void {
   // Beobachter merkt sich ruhende Sammlungen, bevor der Kern sie nach 90
   // Tagen still löscht — die Startseite nennt sie danach (Audit Runde 2, R2-D5).
+  // Außen die schonende Hülle: Gleiches wird nicht neu geschrieben, und ein
+  // scheiterndes Zurückschreiben beim bloßen Lesen lässt die Anzeige stehen
+  // (Audit Runde 3, R3-O2).
   const h = browserSpeicherhuelle();
-  speicherhuelleSetzen(h && aufraeumBeobachter(h));
+  speicherhuelleSetzen(h && schonendeHuelle(aufraeumBeobachter(h), einsaetzeZuJson([])));
   datenschutzUhrSetzen(() => datenschutzZeitpunkt());
 }
 

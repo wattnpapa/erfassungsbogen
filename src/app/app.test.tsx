@@ -20,6 +20,7 @@ import {
   EinsatzArt,
   einsaetzeLaden,
   einsatzAnlegen as einsatzImSpeicherAnlegen,
+  einsatzLoeschen,
   meldungHinzufuegen,
   neuesteJeEinheit,
 } from "@bos/meldekopf/einsaetze";
@@ -1581,6 +1582,31 @@ describe("Speicher voll", () => {
     await nutzer.click(within(auswahl).getByRole("button", { name: "Sammelhausen" }));
     expect(auswahl.hasAttribute("open")).toBe(true);
     expect(within(auswahl).getByRole("alert").textContent).toMatch(/Speicher dieses Geräts ist voll/);
+  }, 20000);
+
+  /**
+   * Audit Runde 3, R3-O2: Lesen braucht keinen Schreibzugriff. Auch wenn der
+   * Kern beim Lesen bereinigen will (Papierkorb-Frist abgelaufen) und der
+   * Speicher nichts annimmt, erscheinen Startseite und Sammlung samt Meldung.
+   */
+  it("zeigt Startseite und Sammlung, wenn der Speicher beim Lesen nichts annimmt", async () => {
+    const alt = einsatzImSpeicherAnlegen("Altlast", EinsatzArt.EINSATZ);
+    einsatzImSpeicherAnlegen("Lesehausen", EinsatzArt.EINSATZ);
+    einsatzLoeschen(alt.id);
+    const roh = JSON.parse(localStorage.getItem("eeb.einsaetze.v1")!) as { id: string; geloeschtAm?: number }[];
+    roh.find((x) => x.id === alt.id)!.geloeschtAm = Date.now() - 40 * 86_400_000;
+    localStorage.setItem("eeb.einsaetze.v1", JSON.stringify(roh));
+    vi.spyOn(Storage.prototype, "setItem").mockImplementation(() => {
+      throw new DOMException("voll", "QuotaExceededError");
+    });
+
+    const nutzer = userEvent.setup();
+    render(<App />);
+    expect(screen.getByRole("button", { name: "Neuen Bogen erstellen" })).toBeDefined();
+    expect(screen.getByText(/lässt die App gerade nichts speichern/)).toBeDefined();
+    await nutzer.click(screen.getByRole("button", { name: /Öffnen/ }));
+    expect(await screen.findByRole("heading", { level: 1, name: "Lesehausen" })).toBeDefined();
+    expect(screen.getByText(/lässt die App gerade nichts speichern/)).toBeDefined();
   }, 20000);
 
   /** Audit Runde 3, R3-O1: „Bögen einlesen…" nennt den vollen Speicher, nicht „nichts gefunden". */

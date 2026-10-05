@@ -16,8 +16,6 @@
  */
 import {
   MeldeStatus,
-  einsaetzeLaden,
-  einsaetzePapierkorb,
   einsaetzeSpeichern,
   meldungHinzufuegen,
   type Einsatzsammlung,
@@ -25,6 +23,11 @@ import {
   type MeldeQuelle,
   type MeldungAufnahme,
   type MeldungOptionen,
+} from "@bos/meldekopf/einsaetze";
+import { einsaetzeLaden, einsaetzePapierkorb } from "./einsaetze-lesen";
+import {
+  einsaetzeLaden as kernEinsaetzeLaden,
+  einsaetzePapierkorb as kernEinsaetzePapierkorb,
 } from "@bos/meldekopf/einsaetze";
 import { entfernteMerken } from "./entfernte-meldungen";
 import { EEB_EPOCHE_MS, type EebZeitpunkt } from "@bos/eeb-format/model";
@@ -165,7 +168,10 @@ export function istSpeicherVoll(e: unknown): boolean {
  * Teillisten, schreibt aber immer die Gesamtliste.
  */
 function alleSammlungen(): Einsatzsammlung[] {
-  return [...einsaetzeLaden(), ...einsaetzePapierkorb()];
+  // Frisch aus dem Kern, nicht aus dem Lese-Zwischenspeicher: die Aufrufer
+  // ändern die Sammlungen an Ort und Stelle und schreiben sie dann zurück
+  // (einsaetze-lesen.ts, R3-O2).
+  return [...kernEinsaetzeLaden(), ...kernEinsaetzePapierkorb()];
 }
 
 /**
@@ -386,6 +392,23 @@ export function speicherBelegung(): { belegt: number; grenze: number; anteil: nu
     zeichen += k.length + (s.getItem(k)?.length ?? 0);
   }
   return { belegt: zeichen, grenze: SPEICHER_GRENZE_ZEICHEN, anteil: Math.min(1, zeichen / SPEICHER_GRENZE_ZEICHEN) };
+}
+
+/**
+ * Warum scheiterte ein Schreibvorgang? „gesperrt", wenn der Browser den
+ * Speicher gar nicht herausgibt (blockierte Website-Daten) oder er weit unter
+ * der Grenze belegt ist und trotzdem nichts annimmt (Privatmodus, Quote 0);
+ * sonst „voll". Vorher hieß beides „voll — Papierkorb leeren", was bei einer
+ * Sperre nicht hilft (Audit Runde 3, R3-O4).
+ */
+export function speicherFehlerArt(): "voll" | "gesperrt" {
+  try {
+    if (!globalThis.localStorage) return "gesperrt";
+  } catch {
+    return "gesperrt";
+  }
+  const b = speicherBelegung();
+  return b && b.anteil < 0.9 ? "gesperrt" : "voll";
 }
 
 /** „etwa 38 % (1,9 von 5 Mio. Zeichen)" — nie über 100 %. */

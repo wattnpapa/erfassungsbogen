@@ -176,6 +176,16 @@ Grundlage: Repository `wattnpapa/erfassungsbogen`, Stand 2026-09-12 — Version 
 > Eintreffzeit, Status und Zug in einem Schritt. Keine neuen
 > personenbezogenen Daten, kein neuer Empfänger; die Lage wird richtiger
 > (Art. 5 Abs. 1 lit. d DSGVO). Geändert: 5.7.
+>
+> **Nachgezogen 2026-10-05 — Lesen ohne Zurückschreiben (Audit Runde 3,
+> R3-O2):** Papierkorb-, Aufräum- und Datenschutzfrist greifen weiter bei
+> jedem Lesen; zurückgeschrieben wird nur, wenn dabei wirklich etwas
+> bereinigt wurde. Scheitert dieses Zurückschreiben (Speicher voll oder
+> gesperrt), zeigt die App die Daten bereits bereinigt an und meldet den
+> Speicher; im Gerätespeicher stehen sie bis zum nächsten gelungenen
+> Schreibvorgang unbereinigt (wie bisher, nur ohne leeren Bildschirm). Das
+> Lese-Ergebnis wird höchstens eine Minute im Arbeitsspeicher der offenen
+> Seite gemerkt. Kein neuer Speicherort. Geändert: 5.7.
 
 ## Hinweis zu diesem Dokument
 

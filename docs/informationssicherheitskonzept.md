@@ -184,6 +184,17 @@ Grundlage: Repository `wattnpapa/erfassungsbogen`, Stand 2026-09-12 — Version 
 > „vom Papier, Zeiten prüfen", bis Eintreffzeit, Status und Zug vom Blatt
 > abgeglichen sind. Das Feld reist mit Sammel-PDF und Einsatz-Transport wie
 > die übrigen Zusätze der Führungsstelle (3.3 D2).
+>
+> **Nachgezogen 2026-10-05:** Speicher und Offline (Audit Runde 3, R3-O2) —
+> Lesen der Einsatz-Sammlungen schreibt nicht mehr: Eine Hülle in
+> `src/app/speicher-schonend.ts` überspringt Schreibvorgänge mit
+> unverändertem Text (vorher schrieb jedes Lesen die ganze Liste zurück, bei
+> 5 Mio. Zeichen 64 Mio. Zeichen allein beim Start). Scheitert das
+> Zurückschreiben einer Frist-Bereinigung beim bloßen Lesen (Speicher voll
+> oder gesperrt), erscheint die Liste trotzdem, und Startseite bzw.
+> Einsatzansicht melden den Speicher — vorher blieb der Bildschirm leer
+> (Verfügbarkeit, 5.5). Kein neuer Speicherort; das gemerkte Lese-Ergebnis
+> liegt nur im Arbeitsspeicher der geöffneten Seite.
 
 ## Hinweis zu diesem Dokument
 
@@ -598,6 +609,10 @@ Datenausleitung an eine andere Herkunft ist technisch unterbunden.
   Speicher der App. Dazu zeigt die Datensicherung die letzte Sicherung, und
   die Fußzeile erinnert, wenn wertvolle Daten seit drei Tagen ungesichert sind.
   Eine Sicherungspflicht erzwingt die App nicht; organisatorisch regeln.
+  Seit 2026-10-05 (R3-O2) hängt das Anzeigen nicht mehr an einem
+  Schreibzugriff: Lesen schreibt nur, wenn eine Frist wirklich etwas
+  bereinigt hat (`src/app/speicher-schonend.ts`); scheitert das, zeigt die App
+  die Daten und meldet den vollen bzw. gesperrten Speicher.
 - **Gemerkte Teile beim Foto-Einlesen** (`TeileMerker`, `src/app/qr-stapel.ts`,
   seit 2026-09-29, R2-A2): Teile eines unvollständigen mehrteiligen Bogens
   warten je Einsatz höchstens eine Stunde nach dem letzten neuen Teil im

@@ -63,14 +63,13 @@ import {
   EinsatzArt,
   bogenInhaltsId,
   einheitSchluessel,
-  einsaetzeLaden,
-  einsaetzePapierkorb,
   einsatzAnlegen,
   neuesteJeEinheit,
   revisionen,
   type EintragSignatur,
   type Einsatzsammlung,
 } from "@bos/meldekopf/einsaetze";
+import { einsaetzeLaden, einsaetzePapierkorb } from "./einsaetze-lesen";
 import { bogenDiff, diffKurzfassung } from "@bos/meldekopf/meldung-diff";
 import {
   SpeicherVollFehler,

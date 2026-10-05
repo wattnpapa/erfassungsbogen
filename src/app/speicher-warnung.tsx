@@ -7,7 +7,8 @@
  * Platz steckt, und dass nur Löschen Platz schafft.
  */
 import { useMemo } from "react";
-import { speicherBelegung, speicherGroessteSammlungen, speicherText } from "./eintrag-zeiten";
+import { speicherBelegung, speicherFehlerArt, speicherGroessteSammlungen, speicherText } from "./eintrag-zeiten";
+import { leseSchreibFehler } from "./speicher-schonend";
 
 /** Ab diesem Anteil warnt die App (Fußzeile: ab 70 % gelb, hier ab 80 % sichtbar). */
 export const SPEICHER_WARNSCHWELLE = 0.8;
@@ -27,13 +28,40 @@ export function groessteText(): string {
  */
 export function SpeicherWarnung({ stand }: { stand: unknown }) {
   const b = useMemo(() => speicherBelegung(), [stand]);
+  // Je Sammlung einmal serialisieren kostet bei 5 Mio. Zeichen spürbar —
+  // nur neu rechnen, wenn sich die Sammlungen geändert haben (R3-O2).
+  const groesste = useMemo(() => (b && b.anteil >= SPEICHER_WARNSCHWELLE ? groessteText() : ""), [b]);
+  // Beim Lesen ließ sich die Frist-Bereinigung nicht zurückschreiben: die
+  // Liste steht trotzdem da, der Speicher nimmt aber nichts an (R3-O2).
+  if (leseSchreibFehler()) return <SpeicherNimmtNichtsAn />;
   if (!b || b.anteil < SPEICHER_WARNSCHWELLE) return null;
-  const groesste = groessteText();
   return (
     <p className="warnung" role="status">
       ⚠ Gerätespeicher zu {speicherText(b)} belegt. Wird er voll, kann die App nichts mehr speichern.
       {groesste ? ` Am meisten belegen: ${groesste}.` : ""} Platz schafft nur Löschen: nicht mehr
       benötigte Einsätze sichern, in den Papierkorb legen und den Papierkorb leeren.
+    </p>
+  );
+}
+
+/**
+ * Der Speicher nimmt gerade nichts an — gezeigt wird der gespeicherte Stand.
+ * Unterscheidet den vollen vom gesperrten Speicher, weil nur beim vollen
+ * Löschen hilft (R3-O4).
+ */
+export function SpeicherNimmtNichtsAn() {
+  return speicherFehlerArt() === "gesperrt" ? (
+    <p className="warnung" role="alert">
+      ⚠ Dieser Browser lässt die App gerade nichts speichern — etwa im privaten Modus oder durch eine
+      Datenschutz-Einstellung. Angezeigt wird der gespeicherte Stand; neue Eingaben gehen beim Schließen
+      verloren. Speichern für diese Seite erlauben oder ein normales Fenster nutzen; bis dahin Bögen als PDF
+      übergeben.
+    </p>
+  ) : (
+    <p className="warnung" role="alert">
+      ⚠ Der Speicher dieses Geräts ist voll — angezeigt wird der gespeicherte Stand, Änderungen lassen sich
+      nicht speichern. Platz schafft nur Löschen: nicht mehr benötigte Einsätze sichern, in den Papierkorb
+      legen und den Papierkorb leeren.
     </p>
   );
 }

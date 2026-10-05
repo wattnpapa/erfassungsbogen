@@ -10,6 +10,8 @@ import { afterEach } from "vitest";
 import { cleanup } from "@testing-library/react";
 import { dialogeZuruecksetzen, prellschutzSetzen } from "../app/dialoge";
 import { speicherVerdrahten } from "../app/speicher-browser";
+import { leseSchreibFehlerZuruecksetzen } from "../app/speicher-schonend";
+import { einsaetzeLesenZuruecksetzen } from "../app/einsaetze-lesen";
 // Testing Library klickt schneller als jeder Finger: der Prellschutz der
 // Rückfragen (dialoge.tsx, R2-G1) ist hier aus; sein eigener Test schaltet ihn ein.
 prellschutzSetzen(0);
@@ -79,4 +81,6 @@ afterEach(() => {
   dialogeZuruecksetzen();
   localStorage.clear();
   sessionStorage.clear();
+  leseSchreibFehlerZuruecksetzen();
+  einsaetzeLesenZuruecksetzen();
 });

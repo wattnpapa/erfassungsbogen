@@ -19,10 +19,11 @@
 
 import { staerke, type Erfassungsbogen } from "@bos/eeb-format/model";
 import { einheitAnzeigename, orgLabel, vokabText, vokabularFuer, zeitpunktDeutsch } from "./hilfen";
-import { MeldeStatus, revisionen, type EinsatzArt, type MeldeEintrag } from "@bos/meldekopf/einsaetze";
+import { MeldeStatus, type EinsatzArt, type MeldeEintrag } from "@bos/meldekopf/einsaetze";
 import { FELD_GESAMTSTAERKE, bogenDiff, diffKurzfassung } from "@bos/meldekopf/meldung-diff";
 import { summiereBoegen, unterbringungLage, verpflegungLage, zaehltInLage, type EinsatzSummen } from "./auswertung";
 import { eintreffzeit, zeitLang, zeitpunktZuMs } from "./eintrag-zeiten";
+import { revisionenJe } from "./einheiten-index";
 
 // ------------------------------------------------------------ Bedarfsmarken
 
@@ -196,7 +197,7 @@ export interface FolgeAenderung {
  */
 export function folgeAenderung(kopf: MeldeEintrag, alle: MeldeEintrag[]): FolgeAenderung | null {
   if (kopf.quelle === "aufteilung" || kopf.quelle === "zusammenfuehrung") return null;
-  const vorige = revisionen(alle, kopf.einheitSchluessel).find((r) => r.id !== kopf.id && r.empfangenAm <= kopf.empfangenAm);
+  const vorige = revisionenJe(alle, kopf.einheitSchluessel).find((r) => r.id !== kopf.id && r.empfangenAm <= kopf.empfangenAm);
   if (!vorige) return null;
   const d = bogenDiff(vorige.bogen, kopf.bogen);
   const vorher = staerke(vorige.bogen).gesamt;

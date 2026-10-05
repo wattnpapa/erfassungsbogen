@@ -41,8 +41,6 @@ import {
   einsatzEndgueltigLoeschen,
   einsatzLoeschen,
   einsatzWiederherstellen,
-  einsaetzeLaden,
-  einsaetzePapierkorb,
   meldungAufteilen,
   meldungenZusammenfuehren,
   meldungEntfernen,
@@ -56,6 +54,8 @@ import {
   type MeldeEintrag,
   type ZusammenfuehrungOptionen,
 } from "@bos/meldekopf/einsaetze";
+import { einsaetzeLaden, einsaetzePapierkorb } from "./einsaetze-lesen";
+import { koepfeJe, revisionenJe } from "./einheiten-index";
 import { RolleMarke } from "./rolle-marke";
 import { AufteilenPanel } from "./aufteilen-ui";
 import { ZusammenfuehrenPanel } from "./zusammenfuehren-ui";
@@ -2109,7 +2109,7 @@ function EinheitKarte(props: {
   // Rückfrage kommt, solange die Einheit noch vor dem Meldekopf steht (K3).
   const luecken = pruefpunkte(kopf.bogen);
   const bedarf = bedarfMarken(kopf.bogen);
-  const revs = revisionen(alle, kopf.einheitSchluessel);
+  const revs = revisionenJe(alle, kopf.einheitSchluessel);
   // Folgemeldung: die direkt ältere Fassung derselben Einheit ist der Bezug für
   // „was hat sich seit der letzten Meldung geändert?".
   const vorige = revs[1];
@@ -2132,7 +2132,7 @@ function EinheitKarte(props: {
   // Zusammenführen sinnvoll.
   const zaehlt = kopf.status === MeldeStatus.ANWESEND;
   // Andere anwesende Teile derselben Einheit — die Gegenstücke zum Zusammenführen.
-  const geschwister = neuesteJeEinheit(alle).filter(
+  const geschwister = koepfeJe(alle).filter(
     (e) =>
       e.einheitSchluessel !== kopf.einheitSchluessel &&
       stammSchluessel(e.einheitSchluessel) === stammSchluessel(kopf.einheitSchluessel) &&

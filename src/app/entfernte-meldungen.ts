@@ -15,7 +15,8 @@
  * „Alle Daten löschen" weg (Präfix `eeb.`).
  */
 
-import { einsaetzeLaden, einsaetzePapierkorb, type Einsatzsammlung, type MeldeEintrag } from "@bos/meldekopf/einsaetze";
+import { type Einsatzsammlung, type MeldeEintrag } from "@bos/meldekopf/einsaetze";
+import { einsaetzeLaden, einsaetzePapierkorb } from "./einsaetze-lesen";
 import { frageJaNein } from "./dialoge";
 import { einheitAnzeigename } from "./hilfen";
 

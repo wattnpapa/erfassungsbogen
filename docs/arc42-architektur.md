@@ -53,6 +53,17 @@
 > Stärkeänderung vom Papier ändert nur die Stärke (R3-A1); vom Papier
 > eingelesene Einheiten werden in einem Schritt abgeglichen (R3-A2, Feld
 > `vomPapier`) — Kapitel 8.2, 11.3.
+>
+> **Nachgezogen 2026-10-05:** Audit Runde 3, Paket „Speicher und Offline" —
+> zwischen Kern und `localStorage` sitzt außen eine schonende Hülle
+> (`src/app/speicher-schonend.ts`): Sie überspringt Schreibvorgänge mit
+> unverändertem Text (der Kern schrieb bei jedem Lesen die ganze Liste
+> zurück, weil `fristBereinigt()` immer ein neues Array liefert) und
+> verschluckt ein scheiterndes Zurückschreiben bei reinen Lesezugriffen. Die
+> Oberfläche liest über `src/app/einsaetze-lesen.ts` (gemerktes Ergebnis bei
+> gleichem Speichertext innerhalb einer Minute), Revisionen je Karte über
+> `src/app/einheiten-index.ts`. Der Kern bleibt unverändert (R3-O2) —
+> Kapitel 5, 8.2, 11.
 
 ---
 
@@ -580,7 +591,7 @@ flowchart TB
 | `pdf-dokument.ts` (833 Zeilen, größte Nicht-UI-Datei) | Baut die pdfmake-Dokumentdefinition im Papier-Layout inkl. eingebettetem QR-Code auf der letzten Seite. |
 | `pdf-bilder.ts` / `pdf-qr.ts` / `pdf-stroeme.ts` | Rückfallebene: PDF-Bild-Objekte roh als Pixel lesen und den enthaltenen QR-Code decodieren – bewusst ohne vollständigen PDF-Renderer. |
 | `bogen-csv.ts` / `einsatz-csv.ts` / `oldenburg-xlsx.ts` / `xlsx.ts` / `csv.ts` | Datenexporte: vollständiges CSV je Bogen/Einsatz (Langformat mit Satzart-Spalte), CSV-Übersicht für die Lagekarte, XLSX im „Oldenburg"-Format, gemeinsame CSV-Formatgrundlagen (Semikolon, UTF-8-BOM, Dezimalkomma). |
-| `entwurf.ts` / `speicher-browser.ts` / `sicherung.ts` / `absenderkarte.ts` / `export-stand.ts` | Lokale Persistenz: Entwurfswiederherstellung, `localStorage`-Anbindung der Einsatz-Sammlung, Datensicherung/-Export, freiwillige Absenderkarte, Export-Stand je Einsatz (welche Meldungen der Stab schon bekommen hat — Grundlage des Teilexports „nur neue Bögen"), dazu Lageblatt- und Weitergabe-Stand (wann zuletzt ein Lageblatt bzw. die ganze Sammlung herausging; Übergabevermerk, nachgezogen 2026-09-29, R2-W5) und Kenntnis-Stand (welche Meldungen an diesem Gerät zuletzt „zur Kenntnis genommen" wurden — Grundlage der Sammelquittung und der Marke „neue Fassung", `eeb.kenntnis-stand.v1`, nachgezogen 2026-10-04, R3-K1). |
+| `entwurf.ts` / `speicher-browser.ts` / `speicher-schonend.ts` / `einsaetze-lesen.ts` / `sicherung.ts` / `absenderkarte.ts` / `export-stand.ts` | Lokale Persistenz: Entwurfswiederherstellung, `localStorage`-Anbindung der Einsatz-Sammlung (seit 2026-10-05, R3-O2, mit schonender Hülle: kein Schreiben unveränderten Textes, Lesen scheitert nicht an einem gesperrten Speicher, Lese-Ergebnis gemerkt solange der Speichertext gleich ist), Datensicherung/-Export, freiwillige Absenderkarte, Export-Stand je Einsatz (welche Meldungen der Stab schon bekommen hat — Grundlage des Teilexports „nur neue Bögen"), dazu Lageblatt- und Weitergabe-Stand (wann zuletzt ein Lageblatt bzw. die ganze Sammlung herausging; Übergabevermerk, nachgezogen 2026-09-29, R2-W5) und Kenntnis-Stand (welche Meldungen an diesem Gerät zuletzt „zur Kenntnis genommen" wurden — Grundlage der Sammelquittung und der Marke „neue Fassung", `eeb.kenntnis-stand.v1`, nachgezogen 2026-10-04, R3-K1). |
 | `nativ.ts` / `hilfen.ts` / `geraete-schluessel.ts` | Abstraktion nativer Fähigkeiten über Capacitor; Anzeige-/Migrations-Helfer (`bogenLaden`, `migriereBogen`, `einheitAnzeigename`); Erzeugung/Verwaltung des geräteeigenen Ed25519-Schlüssels. |
 | `anzeige-modus.ts` / `org-farben.ts` | Dunkel-/Feld-/Nacht-Modus als Design-Token-Umschaltung; organisationsspezifische Akzentfarben. |
 | `aktualisierung.tsx` | Update-Hinweise: Service-Worker-Banner im Web, Electron-Auto-Update-Status im Desktop. |
