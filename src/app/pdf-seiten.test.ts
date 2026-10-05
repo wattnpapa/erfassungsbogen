@@ -26,7 +26,7 @@ import {
   type Erfassungsbogen,
 } from "@bos/eeb-format/model";
 import type { QrSatz } from "./hilfen";
-import { einsatzPdfDokument, pdfDokument } from "./pdf-dokument";
+import { einsatzLageblattDokument, einsatzLageblattSeiteFuellen, einsatzPdfDokument, pdfDokument, type UebersichtEintrag } from "./pdf-dokument";
 import { pdfBytes, seitenZahl } from "../../scripts/pdf-in-node";
 
 /** Echtes 1×1-PNG — pdfmake skaliert es auf die QR-Breite. */
@@ -141,5 +141,49 @@ describe("Sammel-PDF: QR-Seiten ohne Überlauf (R3-A3)", () => {
       ),
     );
     expect(sammel).toBe(1 + formular + 1);
+  }, 20_000);
+});
+
+describe("Lageblatt: Nachtragszeilen bis unten (R3-A5)", () => {
+  /** Nachtragszeilen = leere Zeilen mit dem Rand der Nachtragszeilen, je 10 Zellen. */
+  const nachtragZeilen = (dd: { content: unknown }) =>
+    (JSON.stringify(dd.content).match(/\{"text":" ","margin":\[0,5,0,5\]/g) ?? []).length / 10;
+
+  function einheiten(n: number): UebersichtEintrag[] {
+    return Array.from({ length: n }, (_, i) => {
+      const b = bogen(4 + (i % 5));
+      b.einheit.hierarchie[0]!.name = `Ortsverband ${i + 1}`;
+      return { bogen: b, zugEtikett: `${1 + (i % 2)}. Zug`, eingetroffenAm: eingetroffen, nummer: i + 1, notiz: i % 3 ? "Deich Nord sichern" : undefined };
+    });
+  }
+
+  it.each([
+    [0, 5],
+    [1, 5],
+    [3, 5],
+    // Sechs Einheiten mit Rückfrage, Erreichbarkeit und Auftrag: Die Seite
+    // trägt dann weniger als fünf, aber nie eine zweite Seite nur für Zeilen.
+    [6, 2],
+  ])("%i Einheiten: eine Seite, mindestens %i Zeilen, Seite gefüllt", async (n, mindestens) => {
+    const e = einheiten(n);
+    const dd = await einsatzLageblattSeiteFuellen("Lage", e, pdfBytes, erstellt);
+    const zeilen = nachtragZeilen(dd);
+    expect(zeilen).toBeGreaterThanOrEqual(mindestens);
+    // Gefüllt: Das Blatt bleibt eine Seite, aber zwei Zeilen mehr passen nicht.
+    expect(seitenZahl(await pdfBytes(dd))).toBe(1);
+    expect(seitenZahl(await pdfBytes(einsatzLageblattDokument("Lage", e, erstellt, zeilen + 2)))).toBe(2);
+  }, 30_000);
+
+  it("viele Einheiten: Füllen fügt keine Seite hinzu", async () => {
+    const e = einheiten(14);
+    const mindest = seitenZahl(await pdfBytes(einsatzLageblattDokument("Lage", e, erstellt)));
+    const dd = await einsatzLageblattSeiteFuellen("Lage", e, pdfBytes, erstellt);
+    expect(nachtragZeilen(dd)).toBeGreaterThanOrEqual(5);
+    expect(seitenZahl(await pdfBytes(dd))).toBe(mindest);
+  }, 30_000);
+
+  it("leeres Blatt: über 10 Zeilen statt einer halben leeren Seite", async () => {
+    const dd = await einsatzLageblattSeiteFuellen("Lage", [], pdfBytes, erstellt);
+    expect(nachtragZeilen(dd)).toBeGreaterThan(10);
   }, 20_000);
 });

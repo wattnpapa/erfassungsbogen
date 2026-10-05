@@ -16,7 +16,7 @@ import type { Erfassungsbogen } from "@bos/eeb-format/model";
 import { base64UrlDekodieren } from "@bos/eeb-format/codec";
 import { einheitAnzeigename, natoZeitstempel, qrErzeugen } from "./hilfen";
 import { istNativ, binaerTeilen } from "./nativ";
-import { einsatzLageblattDokument, einsatzPdfDokument, pdfDokument, type SammelBogen, type UebersichtEintrag } from "./pdf-dokument";
+import { einsatzLageblattSeiteFuellen, einsatzPdfDokument, pdfDokument, type SammelBogen, type UebersichtEintrag } from "./pdf-dokument";
 import { einsatzDateiInhalt } from "./einsatz-transport";
 import { MeldeStatus, neuesteJeEinheit, revisionen, type Einsatzsammlung, type MeldeEintrag } from "@bos/meldekopf/einsaetze";
 import { zaehltInLage } from "./auswertung";
@@ -239,7 +239,9 @@ export async function einsatzPdfErzeugen(
  */
 export async function einsatzLageblattErzeugen(einsatz: Einsatzsammlung): Promise<boolean> {
   const eintraege = alleAktuellen(einsatz).map((m) => uebersichtEintrag(einsatz, m));
-  const dd = einsatzLageblattDokument(einsatz.name, eintraege);
+  // Zwei Sätze: der erste misst, wie viel Platz unter dem Inhalt bleibt, der
+  // zweite füllt ihn mit Nachtragszeilen (Audit Runde 3, R3-A5).
+  const dd = await einsatzLageblattSeiteFuellen(einsatz.name, eintraege, (probe) => pdfMake.createPdf(probe).getBuffer());
   const ok = await dokumentAusgeben(dd, `eeb-lageblatt-${natoZeitstempel()}_${dateiRumpf(einsatz)}.pdf`);
   // Merken, wann das Blatt entstand — die Einsatzansicht sagt dann „Lageblatt
   // 16:30 · seitdem 1 neue Meldung" (Audit Runde 2, R2-A3).

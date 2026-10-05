@@ -636,9 +636,13 @@ describe("einsatzLageblattDokument()", () => {
     expect(t).toContain("Oldenburg - Ni 18/13");
     expect(t).toContain("01701234501 (J. Rudolph)");
     expect(t).toContain("Nachtrag von Hand");
-    // Bei einer Einheit bleibt Platz für sechs Nachträge.
-    const leer = JSON.stringify(dd.content).match(/\{"text":" ","margin":\[0,5,0,5\]\}/g) ?? [];
-    expect(leer.length).toBe(6 * 10);
+    // Mindestens fünf Nachtragszeilen (R3-A5); den Rest der Seite füllt
+    // einsatzLageblattSeiteFuellen (gemessen in pdf-seiten.test.ts).
+    const leer = JSON.stringify(dd.content).match(/\{"text":" ","margin":\[0,5,0,5\]/g) ?? [];
+    expect(leer.length).toBe(5 * 10);
+    // Unter der gedruckten Summe ein Feld für die fortgeschriebene (R3-A5).
+    expect(t).toContain("Summe laut Gerät (1 zählend)");
+    expect(t).toContain("Summe einschl. Nachträge (von Hand)");
     // Die Übergabe-Übersicht der Sammel-PDF bleibt ohne diese Zusätze.
     const u = texte((einsatzPdfDokument("Lage", [{ bogen: basisBogen(), qr: QR }]).content as unknown[]).slice(0, 3)).join("\n");
     expect(u).not.toContain("Nachtrag von Hand");
@@ -693,6 +697,11 @@ describe("einsatzLageblattDokument()", () => {
   it("sagt auf einem leeren Blatt, dass noch nichts gemeldet ist", () => {
     const t = texte(einsatzLageblattDokument("Lage", []).content).join("\n");
     expect(t).toContain("Noch keine Einheit gemeldet.");
-    expect(t).toContain("Summe (0 zählend)");
+    // Strichliste ohne vorgedruckte Nullen (R3-A5).
+    expect(t).toContain("Summe (von Hand)");
+    expect(t).not.toContain("zählend");
+    expect(t).not.toMatch(/\b0 \/ 0|0 Portionen|Diesel 0 l/);
+    expect(t).toContain("Stärke F / U / M / G ____ / ____ / ____ / ____");
+    expect(t).toContain("Bedarf gesamt (von Hand)");
   });
 });

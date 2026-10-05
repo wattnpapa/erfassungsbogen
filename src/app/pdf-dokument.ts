@@ -352,12 +352,26 @@ export function erreichbarkeitZeilen(b: Erfassungsbogen): string[] {
 
 /**
  * Leere Zeilen unter den Einheiten des Lageblatts — zum Weiterschreiben bei
- * Geräteausfall (R2-A3). Wenige Einheiten lassen Platz für mehr; bei rund
- * zehn bleiben zwei, damit das Blatt eine Seite bleibt (R2-K3).
+ * Geräteausfall (R2-A3). Bei zehn Einheiten waren es zwei, darunter ein
+ * Fünftel der Seite leer, und nach dem zweiten Nachtrag ging es auf einem
+ * Zettel weiter (Audit Runde 3, R3-A5). Ohne Messung fünf; gemessen füllt
+ * {@link einsatzLageblattSeiteFuellen} die letzte Seite bis unten.
  */
-function freieZeilen(anwesend: number): number {
-  return Math.min(6, Math.max(2, 10 - anwesend));
-}
+export const NACHTRAG_ZEILEN_MIN = 5;
+
+/**
+ * Untergrenze beim Messen: Passen auf die eine Seite keine fünf Zeilen mehr,
+ * bleiben es so viele wie passen, mindestens zwei — ein Lageblatt, das
+ * wegen leerer Zeilen eine zweite Seite anfängt, hängt niemand aus (R2-K3).
+ */
+const NACHTRAG_ZEILEN_UNTEN = 2;
+
+/** Kennungen der Messpunkte für {@link einsatzLageblattSeiteFuellen}. */
+const MESS_ENDE = "lageblatt-ende";
+const MESS_NACHTRAG = "lageblatt-nachtrag-";
+
+/** Ausfülllinie für Zahlen auf dem leeren Lageblatt — statt vorgedruckter Nullen (R3-A5). */
+const LEERFELD = "____";
 
 /**
  * Gesamtstärke an den Anfang der Änderungen: Auf dem Lageblatt (zwei Zeilen
@@ -405,6 +419,7 @@ function uebersichtsTabelle(
   maxZeilen = UEBERSICHT_MAX_ZEILEN,
   /** Lageblatt: Erreichbarkeit je Einheit und freie Zeilen zum Nachtragen (R2-A3). */
   zumWeiterfuehren = false,
+  nachtragZeilen = NACHTRAG_ZEILEN_MIN,
 ): Content {
   const kopf = (text: string): TableCell => ({ text, bold: true, fillColor: GRAU });
   // Zug und Bedarf je Einheit, wie in der App-Tabelle — „Ruhezeit bei 5
@@ -495,8 +510,15 @@ function uebersichtsTabelle(
     ];
     for (let i = 1; i < SPALTEN; i++) kopfzeile.push({});
     body.push(kopfzeile);
-    for (let n = 0; n < freieZeilen(anwesend.length); n++) {
-      body.push(Array.from({ length: SPALTEN }, (): TableCell => ({ text: " ", margin: [0, 5, 0, 5] })));
+    for (let n = 0; n < nachtragZeilen; n++) {
+      // Die ersten beiden Zeilen tragen Messpunkte: ihr Abstand ist die Zeilenhöhe.
+      body.push(
+        Array.from({ length: SPALTEN }, (_, i): TableCell => ({
+          text: " ",
+          margin: [0, 5, 0, 5],
+          ...(i === 0 && n < 2 ? { id: `${MESS_NACHTRAG}${n}` } : {}),
+        })),
+      );
     }
   }
   if (abgerueckt.length > 0) {
@@ -512,18 +534,45 @@ function uebersichtsTabelle(
   const beschriftung = [`${summe.einheiten} zählend`];
   if (uebungen > 0) beschriftung.push(`${uebungen} Übung`);
   if (abgerueckt.length > 0) beschriftung.push(`${abgerueckt.length} abgerückt`);
-  body.push([
-    { text: `Summe (${beschriftung.join(" · ")})`, bold: true },
+  /** Summenzeile: Beschriftung, Stärke, Fahrzeuge an ihren Spalten, Rest leer. */
+  const summenZeile = (titel: string, staerkeText: string, fzg: string, margin?: [number, number, number, number]): TableCell[] => [
+    { text: titel, bold: true, ...(margin ? { margin } : {}) },
     { text: "" },
     ...(zumWeiterfuehren ? [{ text: "" }] : []),
     { text: "" },
     { text: "" },
-    { text: `${summe.staerke.fuehrer} / ${summe.staerke.unterfuehrer} / ${summe.staerke.mannschaft} / ${summe.staerke.gesamt}`, bold: true },
-    { text: `${summe.fahrzeuge}`, bold: true },
+    { text: staerkeText, bold: true },
+    { text: fzg, bold: true },
     { text: "" },
     { text: "" },
     { text: "" },
-  ]);
+  ];
+  // Auf dem leeren Lageblatt keine vorgedruckten Nullen — es ist die
+  // Strichliste eines Meldekopfs, der gar nicht erst ins Gerät kommt (R3-A5).
+  const leer = zumWeiterfuehren && eintraege.length === 0;
+  if (!leer) {
+    body.push(
+      summenZeile(
+        `Summe${zumWeiterfuehren ? " laut Gerät" : ""} (${beschriftung.join(" · ")})`,
+        `${summe.staerke.fuehrer} / ${summe.staerke.unterfuehrer} / ${summe.staerke.mannschaft} / ${summe.staerke.gesamt}`,
+        `${summe.fahrzeuge}`,
+      ),
+    );
+  }
+  if (zumWeiterfuehren) {
+    // Nach dem ersten Nachtrag ist die gedruckte Summe falsch; die
+    // fortgeschriebene gehört darunter aufs Blatt, nicht auf einen Zettel (R3-A5).
+    body.push(
+      summenZeile(
+        leer ? "Summe (von Hand)" : "Summe einschl. Nachträge (von Hand)",
+        // Die Zelle ist das Feld: Linien darin brachen in der schmalen
+        // Stärkespalte um.
+        " ",
+        " ",
+        [0, 5, 0, 5],
+      ),
+    );
+  }
   // Breiten für die quer liegende Übersichtsseite (714 pt Satzbreite): Zeiten
   // brechen nach dem Datum um, damit Zug und Bedarf daneben Platz haben.
   return {
@@ -566,7 +615,25 @@ function kraftstoffKurz(k: EinsatzSummen["kraftstoff"]): string {
  * Zahlen, die der Meldekopf auf dem Bildschirm sieht (gemeinsame Summierung in
  * auswertung.ts). Ohne sie zeigte die gedruckte Sammlung nur die Stärke.
  */
-function bedarfsTabelle(eintraege: UebersichtEintrag[]): Content {
+function bedarfsTabelle(eintraege: UebersichtEintrag[], leer = false): Content {
+  if (leer) {
+    // Leeres Lageblatt: Zeilen zum Ausfüllen statt „0 Portionen" (R3-A5).
+    const zeile = (titel: string): TableCell[] => [{ text: titel, bold: true }, { text: " ", margin: [0, 3, 0, 3] }];
+    return {
+      stack: [
+        { text: "Bedarf gesamt (von Hand)", bold: true, margin: [0, 6, 0, 4] },
+        {
+          table: {
+            headerRows: 0,
+            widths: [104, "*"],
+            body: [zeile("Verpflegung:"), zeile("Unterbringung angefordert:"), zeile("Betriebsstoff:"), zeile("Ruhezeit erforderlich:")],
+          },
+          margin: [0, 0, 0, 4],
+        },
+      ],
+      unbreakable: true,
+    };
+  }
   const s = summiereBoegen(zaehlendeBoegen(eintraege));
   const body: TableCell[][] = [
     [
@@ -654,7 +721,25 @@ function zugSummenTabelle(eintraege: UebersichtEintrag[]): Content | undefined {
  * in zwei Zeilen, Dringendes fett. Die Einzelheiten (Verpflegung nach
  * Kostform, WC/Dusche, Zwischensummen) stehen weiter unter der Tabelle.
  */
-function lageKopfleiste(eintraege: UebersichtEintrag[]): Content {
+function lageKopfleiste(eintraege: UebersichtEintrag[], leer = false): Content {
+  if (leer) {
+    // Leeres Lageblatt: Ausfülllinien statt „0 / 0 / 0 / 0" (R3-A5).
+    const l = LEERFELD;
+    return {
+      table: {
+        widths: ["*"],
+        body: [[{
+          stack: [
+            { text: [{ text: "Lage: ", bold: true }, { text: `${l} Einheiten · Stärke F / U / M / G ${l} / ${l} / ${l} / ${l} · ${l} Fahrzeuge` }] },
+            { text: [{ text: "Bedarf: ", bold: true }, { text: `Verpflegung ${l} · Unterbringung ${l} · Ruhezeit ${l} · Diesel ${l} l · Benzin ${l} l` }] },
+          ],
+          margin: [0, 2, 0, 2],
+        }]],
+      },
+      fontSize: 9,
+      margin: [0, 0, 0, 5],
+    };
+  }
   const s = summiereBoegen(zaehlendeBoegen(eintraege));
   const staerkeZeile = [
     { text: "Lage: ", bold: true },
@@ -688,9 +773,11 @@ function uebersichtsSeite(
   hinweis?: string,
   maxZeilen = UEBERSICHT_MAX_ZEILEN,
   zumWeiterfuehren = false,
+  nachtragZeilen = NACHTRAG_ZEILEN_MIN,
 ): Content[] {
+  const leer = zumWeiterfuehren && eintraege.length === 0;
   const zugSummen = zugSummenTabelle(eintraege);
-  const bedarf = bedarfsTabelle(eintraege);
+  const bedarf = bedarfsTabelle(eintraege, leer);
   return [
     // Titel und Erstellzeit in einer Zeile — jede Zeile zählt, damit das
     // Lageblatt bei rund zehn Einheiten auf eine Seite passt (R2-K3).
@@ -706,14 +793,17 @@ function uebersichtsSeite(
     // Stärke und Bedarf vor der Tabelle: Ab rund 13 Einheiten stand „Bedarf
     // gesamt" allein auf Seite 2 — wer nur Seite 1 aushängt oder faxt, gab
     // Stärke ohne Bedarf weiter (Audit Runde 3, R3-K6).
-    lageKopfleiste(eintraege),
-    uebersichtsTabelle(eintraege, maxZeilen, zumWeiterfuehren),
+    lageKopfleiste(eintraege, leer),
+    uebersichtsTabelle(eintraege, maxZeilen, zumWeiterfuehren, nachtragZeilen),
     ...(hinweis ? [{ text: hinweis, italics: true, margin: [0, 2, 0, 0] } as Content] : []),
     // Bedarf und Zwischensummen nebeneinander statt untereinander: vorher
     // rutschten die Zwischensummen allein auf Seite 2 (R2-K3).
     zugSummen
       ? { columns: [{ width: 300, stack: [bedarf] }, { width: "*", stack: [zugSummen] }], columnGap: 12, fontSize: 7.5 }
       : bedarf,
+    // Messpunkt hinter dem letzten Inhalt: wie viel Platz bleibt auf der
+    // letzten Seite (einsatzLageblattSeiteFuellen)?
+    ...(zumWeiterfuehren ? [{ text: " ", fontSize: 1, id: MESS_ENDE } as Content] : []),
   ];
 }
 
@@ -863,6 +953,7 @@ export function einsatzLageblattDokument(
   name: string,
   eintraege: UebersichtEintrag[],
   erstellt = Date.now(),
+  nachtragZeilen = NACHTRAG_ZEILEN_MIN,
 ): TDocumentDefinitions {
   return {
     pageSize: "A4",
@@ -883,8 +974,61 @@ export function einsatzLageblattDokument(
         : "Summen und Bedarf zählen nur die anwesenden Einheiten dieser Lage; abgerückte stehen im eigenen Block. Alle Änderungen im Einzelnen: Sammel-PDF.",
       LAGEBLATT_MAX_ZEILEN,
       true,
+      nachtragZeilen,
     ),
   };
+}
+
+/** Was ein Messpunkt beim Setzen über seine Lage meldet (pdfmake `pageBreakBefore`). */
+interface MessPosition {
+  pageNumber: number;
+  top: number;
+  verticalRatio: number;
+  pageInnerHeight: number;
+}
+
+/**
+ * Lageblatt, dessen letzte Seite bis unten mit Nachtragszeilen gefüllt ist
+ * (Audit Runde 3, R3-A5). Wie viel Platz bleibt, weiß erst der Setzer: die
+ * Höhe einer Einheitenzeile hängt an Änderungen, Rückfragen und Bemerkung.
+ * Deshalb zwei Durchgänge: Der erste setzt das Blatt mit der Mindestzahl und
+ * liest über pdfmakes `pageBreakBefore` die Lage zweier Messpunkte ab (Ende
+ * des Inhalts, Abstand zweier Nachtragszeilen); der zweite trägt so viele
+ * Zeilen, wie in den Rest passen. Kostet einen zusätzlichen Satz einer
+ * Seite ohne Bilder — Sekundenbruchteile.
+ *
+ * `setzen` führt den Satz aus (Browser: pdfmake-Puffer, Tests: Node).
+ */
+export async function einsatzLageblattSeiteFuellen(
+  name: string,
+  eintraege: UebersichtEintrag[],
+  setzen: (dd: TDocumentDefinitions) => Promise<unknown>,
+  erstellt = Date.now(),
+): Promise<TDocumentDefinitions> {
+  const pos = new Map<string, MessPosition>();
+  const seiten = new Set<number>();
+  const probe = einsatzLageblattDokument(name, eintraege, erstellt, NACHTRAG_ZEILEN_UNTEN);
+  probe.pageBreakBefore = (knoten) => {
+    const k = knoten as { id?: string; startPosition?: MessPosition; pageNumbers?: number[] };
+    k.pageNumbers?.forEach((n) => seiten.add(n));
+    if (k.id && k.startPosition) pos.set(k.id, k.startPosition);
+    return false;
+  };
+  await setzen(probe);
+  const ende = pos.get(MESS_ENDE);
+  const z0 = pos.get(`${MESS_NACHTRAG}0`);
+  const z1 = pos.get(`${MESS_NACHTRAG}1`);
+  if (!ende) return einsatzLageblattDokument(name, eintraege, erstellt, NACHTRAG_ZEILEN_MIN);
+  const zeilenHoehe = z0 && z1 && z0.pageNumber === z1.pageNumber && z1.top > z0.top ? z1.top - z0.top : 20;
+  let rest = ende.pageInnerHeight * (1 - ende.verticalRatio);
+  const mehrseitig = Math.max(...seiten) > 1;
+  // Über mehrere Seiten wiederholt die Tabelle ihren Kopf; verschiebt sich
+  // dabei eine Zeile über den Seitenrand, kostet das eine Kopfzeile mehr.
+  if (mehrseitig) rest -= 2 * zeilenHoehe;
+  const passen = NACHTRAG_ZEILEN_UNTEN + Math.max(0, Math.floor((rest - 2) / zeilenHoehe));
+  // Mehrseitig ist das Blatt ohnehin: dann mindestens fünf Zeilen.
+  const zeilen = mehrseitig ? Math.max(NACHTRAG_ZEILEN_MIN, passen) : passen;
+  return einsatzLageblattDokument(name, eintraege, erstellt, Math.min(zeilen, 40));
 }
 
 /**
