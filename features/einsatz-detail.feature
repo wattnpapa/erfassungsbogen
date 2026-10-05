@@ -136,8 +136,24 @@ Funktionalität: Einsatz-Sammlung führen (Meldekopf)
     Und ich zum Schritt "6. Übersicht" wechsle
     Dann sehe ich die Schaltfläche "In Einsatz übernehmen"
     Wenn ich auf "In Einsatz übernehmen" klicke
+    Dann sehe ich den Dialog "Stärke fehlt"
+    Wenn ich im Dialog auf "Trotzdem mit Stärke 0 übernehmen" klicke
     Dann sehe ich die Überschrift "Hochwasser Weser"
     Und sehe ich die Überschrift "Einheiten (2 gemeldet"
+    Und sehe ich den Text "Stärke fehlt"
+
+  # R3-N1: Eine Einheit ohne Stärke lag früher ohne Rückfrage als „0 / 0 / 0"
+  # in der Lage. „Stärke eintragen" führt zu den Zählern statt abzulegen.
+  Szenario: Ohne Stärke führt die Rückfrage zu den Zählern
+    Wenn ich auf "Einheit manuell erfassen…" klicke
+    Und ich das Feld "Organisation" auf "Feuerwehr" stelle
+    Und ich das Feld "Name (Pflicht)" mit "Wardenburg" fülle
+    Und ich zum Schritt "6. Übersicht" wechsle
+    Und ich auf "In Einsatz übernehmen" klicke
+    Dann sehe ich den Dialog "Stärke fehlt"
+    Wenn ich im Dialog auf "Stärke eintragen" klicke
+    Dann sehe ich den Schritt "3. Personal"
+    Und sehe ich die Schaltfläche "In Einsatz übernehmen"
 
   Szenario: Sammel-PDF bündelt alle Bögen in einer Datei
     Wenn ich auf "Einsatz weitergeben / sichern" klicke und eine Datei erhalte

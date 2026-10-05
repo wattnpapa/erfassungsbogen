@@ -247,6 +247,13 @@ When(
       .fill(name);
     await this.page.getByRole("button", { name: /^6\. Übersicht/ }).click();
     await schaltflaeche(this, "In Einsatz übernehmen").click();
+    // Ohne Personal hat die Einheit Stärke 0 — die App fragt seit R3-N1 nach,
+    // bevor sie so in die Lage geht. Die Aufbau-Einheiten führen bewusst kein
+    // Personal (siehe einheiten-liste.feature): Rückfrage muss kommen und wird
+    // bewusst mit Stärke 0 bestätigt.
+    const rueckfrage = dialog(this, "Stärke fehlt");
+    await rueckfrage.waitFor({ state: "visible" });
+    await rueckfrage.getByRole("button", { name: "Trotzdem mit Stärke 0 übernehmen", exact: true }).click();
     await this.page.getByRole("heading", { name: /^Einheiten \(/ }).waitFor({ state: "visible" });
   },
 );
