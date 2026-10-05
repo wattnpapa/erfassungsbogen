@@ -1123,6 +1123,31 @@ describe("Assistenten-Durchlauf", () => {
     expect(localStorage.getItem("eeb.entwurf.ersetzt.v1")).toContain("Albstadt");
   }, 20000);
 
+  /** Audit Runde 3, R3-S7: Neuladen in der Einsatz-Erfassung führte zur Startseite. */
+  it("öffnet nach dem Neuladen eine angefangene Erfassung für eine Sammlung direkt wieder (R3-S7)", async () => {
+    const { entwurfZuJson } = await import("./entwurf");
+    const sammlung = einsatzImSpeicherAnlegen("Hochwasser Deich", EinsatzArt.EINSATZ);
+    localStorage.setItem("eeb.entwurf.v1", entwurfZuJson(bogenMitName("Rottweil"), Date.now(), { schritt: 0, fremd: { einsatzId: sammlung.id, beginn: Date.now() } }));
+    vi.resetModules();
+    // Die frischen Module brauchen ihren Speicher, wie main.tsx ihn beim Start verdrahtet.
+    (await import("./speicher-browser")).speicherVerdrahten();
+    const { App: AppKalt } = await import("./app");
+    render(<AppKalt />);
+
+    expect(await screen.findByRole("button", { name: "In Einsatz übernehmen" })).toBeDefined();
+    expect(screen.getByRole("button", { name: /‹ Einsatz „Hochwasser Deich"/ })).toBeDefined();
+    expect((screen.getByLabelText("Name (Pflicht)") as HTMLInputElement).value).toBe("Rottweil");
+  }, 20000);
+
+  it("beginnt nach dem Neuladen mit dem eigenen Bogen weiter auf der Startseite", async () => {
+    const { entwurfZuJson } = await import("./entwurf");
+    localStorage.setItem("eeb.entwurf.v1", entwurfZuJson(bogenMitName("Eigenstadt"), Date.now(), { schritt: 0 }));
+    vi.resetModules();
+    const { App: AppKalt } = await import("./app");
+    render(<AppKalt />);
+    expect(await screen.findByRole("button", { name: "Fortsetzen" })).toBeDefined();
+  }, 20000);
+
   it("importiert auch eine geteilte Vorlage über den Fragmentwechsel", async () => {
     render(<App />);
 

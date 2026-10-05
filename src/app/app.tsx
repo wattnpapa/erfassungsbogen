@@ -705,7 +705,11 @@ function AppInhalt() {
   const [ersetzterEntwurf, setErsetzterEntwurf] = useState<Entwurf | null>(() => ersetztenEntwurfLaden());
   // Zeigt den Startbildschirm, ohne den aktuellen Bogen zu verwerfen –
   // er lässt sich von dort per „Aktuellen Bogen fortsetzen“ wieder öffnen.
-  const [zeigeStart, setZeigeStart] = useState(!START_SOFORT && !!ENTWURF);
+  // Eine angefangene Erfassung für eine Sammlung (Meldekopf) öffnet nach dem
+  // Neuladen gleich wieder die Erfassung — vorher landete man auf der
+  // Startseite und brauchte „Fortsetzen" (Audit Runde 3, R3-S7). Der eigene
+  // Bogen beginnt weiter auf der Startseite.
+  const [zeigeStart, setZeigeStart] = useState(!START_SOFORT && !!ENTWURF && !erfassungsZielBeimStart());
   const [vorlagen, setVorlagen] = useState<Vorlage[]>(() => vorlagenLaden());
   /** Vorige Fassung nach „Vorlage aktualisieren" — für „Rückgängig" (R2-D2). */
   const [vorlageRueckweg, setVorlageRueckweg] = useState<Vorlage | null>(null);
@@ -718,7 +722,7 @@ function AppInhalt() {
   const [einsaetze, setEinsaetze] = useState<Einsatzsammlung[]>(() => einsaetzeLaden());
   // Beim Kaltstart ohne Link die zuletzt offene Sammlung wieder öffnen (W5).
   const [offenerEinsatzId, setOffenerEinsatzIdRoh] = useState<string | null>(() =>
-    START.bogen || START.segment || START.vorlage ? null : letztenEinsatzLaden(),
+    START.bogen || START.segment || START.vorlage || erfassungsZielBeimStart() ? null : letztenEinsatzLaden(),
   );
   const setOffenerEinsatzId = (id: string | null) => {
     setOffenerEinsatzIdRoh(id);
