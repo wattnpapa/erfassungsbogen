@@ -906,12 +906,8 @@ function qrBlock(qr: QrSatz, akzent: string, stand: string, vermerk?: MeldekopfV
   // Nur in der Sammel-PDF: was der Code nicht enthält, direkt beim Code
   // (R2-A1). Beim Einzelcode steht der Kasten „Stand am Meldekopf“ schon über
   // dem Formular derselben Seite, der Hinweis rechts neben dem Code. Mehrteilige
-  // Codes stehen auf eigenen Seiten: dort Kasten und Hinweis unter den Codes.
+  // Codes stehen auf eigenen Seiten: dort Kasten und Hinweis neben dem unteren Code (R3-A3).
   const nurBogenHinweis = (): Content => ({ text: QR_NUR_BOGEN_HINWEIS, bold: true, fontSize: 8 });
-  const vermerkTeile = (): Content[] =>
-    vermerk
-      ? [vermerkKasten(vermerk, [0, 8, 0, 0]), { ...(nurBogenHinweis() as object), alignment: "center", margin: [0, 6, 0, 0] } as Content]
-      : [];
   if (qr.teile.length === 1) {
     const t = qr.teile[0]!;
     return {
@@ -988,32 +984,52 @@ function qrBlock(qr: QrSatz, akzent: string, stand: string, vermerk?: MeldekopfV
       // Der Satz folgt dem tatsächlichen Verhalten (Audit Runde 2, R2-A2):
       // Live-Scan sieht einen Code auf einmal, „Bögen einlesen…" liest alle
       // Codes eines Fotos und merkt sich Teile bis zum nächsten Foto.
-      `Alle ${anzahl} Teile nacheinander mit der Kamera scannen — die App setzt den Bogen zusammen.\n` +
-      `Beim Live-Scan jeweils nur einen Code ins Kamerabild nehmen. Fotos ganzer Seiten liest „Bögen einlesen…“\n` +
-      `mit allen Codes; fehlende Teile dürfen auch in einem späteren Foto kommen.\n` +
-      `In der digitalen PDF geht es auch ohne Scannen: der Link oben öffnet den vollständigen Bogen.`,
-    alignment: "center",
+      `Alle ${anzahl} Teile nacheinander mit der Kamera scannen — die App setzt den Bogen zusammen. ` +
+      `Beim Live-Scan jeweils nur einen Code ins Kamerabild nehmen. Fotos ganzer Seiten liest „Bögen einlesen…“ ` +
+      `mit allen Codes; fehlende Teile dürfen auch in einem späteren Foto kommen. ` +
+      `In der digitalen PDF geht es auch ohne Scannen: der Link unten öffnet den vollständigen Bogen.`,
     fontSize: 7.5,
-    margin: [0, 6, 0, 0],
   });
+  // Der Erklärtext steht NEBEN den Codes, in der Fläche, die die Diagonale
+  // ohnehin frei lässt: rechts neben dem oberen Code Anleitung und Stift-
+  // Kästchen, links neben dem unteren Code Kasten „Stand am Meldekopf" und
+  // was der Code nicht enthält. Untereinander gestapelt sprengten sie in der
+  // Sammel-PDF die Seite; 7 von 38 Seiten trugen dann nur noch die letzte
+  // Zeile des Erklärtexts (Audit Runde 3, R3-A3).
+  const SEITENTEXT_ABSTAND = 12;
+  const anleitung = (): Content[] => [hinweis(), { ...(stift() as object), margin: [0, 8, 0, 0] } as Content];
+  const meldekopf = (): Content[] =>
+    vermerk ? [vermerkKasten(vermerk, [0, 0, 0, 0]), { ...(nurBogenHinweis() as object), margin: [0, 6, 0, 0] } as Content] : [];
   const seiten: Content[] = [];
   for (let i = 0; i < qr.teile.length; i += 2) {
     const links = qr.teile[i]!;
     const rechts = qr.teile[i + 1];
     const stack: Content[] = [
       kopf(`Digitaler Bogen als QR-Code (${anzahl} Teile)`),
-      // Erster Code oben links …
-      { columns: [{ width: "auto", stack: [teilZelle(links)] }], margin: [0, 10, 0, 0] },
+      // Erster Code oben links, daneben die Anleitung …
+      {
+        columns: [
+          { width: "auto", stack: [teilZelle(links)] },
+          { width: "*", stack: anleitung(), margin: [SEITENTEXT_ABSTAND, 24, 0, 0] },
+        ],
+        margin: [0, 10, 0, 0],
+      },
     ];
     if (rechts) {
-      // … zweiter Code unten rechts (Leerspalte schiebt ihn an den Rand,
-      // der obere Rand erzeugt den vertikalen Diagonalabstand).
+      // … zweiter Code unten rechts (der obere Rand erzeugt den vertikalen
+      // Diagonalabstand), links daneben der Stand am Meldekopf.
       stack.push({
-        columns: [{ width: "*", text: "" }, { width: "auto", stack: [teilZelle(rechts)] }],
+        columns: [
+          { width: "*", stack: meldekopf(), margin: [0, 24, SEITENTEXT_ABSTAND, 0] },
+          { width: "auto", stack: [teilZelle(rechts)] },
+        ],
         margin: [0, 150, 0, 0],
       });
+    } else if (vermerk) {
+      // Letzte Seite mit nur einem Code: der Platz unten ist frei.
+      stack.push({ stack: meldekopf(), margin: [0, 16, 0, 0] });
     }
-    stack.push(oeffnenLink(), hinweis(), { ...(stift() as object), alignment: "center", margin: [0, 6, 0, 0] } as Content, ...vermerkTeile());
+    stack.push(oeffnenLink());
     seiten.push({ stack, pageBreak: "before" });
   }
   return { stack: seiten };
