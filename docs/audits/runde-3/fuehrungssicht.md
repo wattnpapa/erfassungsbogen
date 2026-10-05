@@ -440,3 +440,19 @@ keine Behebung. Eine hat eine Nebenwirkung: Die Kompaktzeile aus R2-K7 macht
 auf dem Telefon unsichtbar, was R2-K1 und R2-K6 erhalten haben (R3-K2).
 Neu sind R3-K1 bis R3-K7. R3-K1 ist die nächste Stufe von R2-K1: Die Daten
 bleiben jetzt erhalten, aber die Veränderung fällt nicht auf.
+
+## Stand der Behebung
+
+Stand 05.10.2026. Geprüft mit Typprüfung, Unit-Tests (2 283 grün) und
+Nachmessung im Dev-Server mit dem Seed dieses Audits (360 × 640, Lageblatt
+per `pdftotext`).
+
+| Befund | Stand | Umsetzung |
+| --- | --- | --- |
+| R3-K1 Folgemeldung nicht als neu erkennbar | behoben | Sammelquittung „Neu seit der letzten Kenntnisnahme (n)" mit „Folgemeldung 22:45: Stärke 12 → 9 (−3)", bleibt bis „Zur Kenntnis genommen" auch über Neuladen (`eeb.kenntnis-stand.v1`); Marke „neue Fassung"; Sortierung „Zuletzt gemeldet (neueste zuerst)". Nachlauf: Ulm, Crailsheim, Weinsberg auf Platz 1–3. |
+| R3-K2 Kompaktzeile verschweigt Merkmale | behoben | Kurze Merkmale „Folgem. 22:46 · 12 → 9", „Auftrag ✓", Lücken mit Inhalt, „neue Fassung" zugeklappt sichtbar. 5 Einheiten weiter ganz im Bild. |
+| R3-K3 Sonstiges fehlt | behoben | „Bemerkung der Einheit" auf Karte (Änderung hervorgehoben), Lageblatt/Übergabeblatt, Übersichts-CSV; Suche findet „Nachschub" (1 von 14). |
+| R3-K4 Unterbringung zählt alle | behoben | „Unterbringung angefordert: 6 Einheiten, 66 Personen (M 44 / W 22 / D 0)", getrennt „WC/Dusche (alle Anwesenden)"; ebenso je Zug und auf dem Lageblatt. |
+| R3-K5 Ohne Zeitbezug | behoben | „letzte Meldung …" im Kopf, auf der Startseitenkarte und in der Import-Quittung; laufende Sammlungen direkt aus der Weiche öffnen (1 046 statt 1 914 px). |
+| R3-K6 Lageblatt | weitgehend | Kopfleiste „Lage" und „Bedarf" in 9 pt auf Seite 1, nur Dringendes fett, Gesamtstärke zuerst. Tabellenschrift bleibt 7,5 pt (8 pt schob zehn Einheiten auf zwei Seiten). |
+| R3-K7 Kleinere Stellen | behoben | „Nr."/„Meldung Nr." in beiden CSV, eine Zeitform je Datei, „Alle Daten" mit Eingetroffen/Abgerückt/Notiz, Excel-Summen mit gespeichertem Wert, „Rückfrage: Sitzplätze fehlen: 4" statt „1 Lücke", Bedarf an Abgerückten grau, F/U/M/Kfz neben „Ges.". |
