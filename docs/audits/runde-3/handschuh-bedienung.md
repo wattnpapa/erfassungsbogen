@@ -401,3 +401,14 @@ R3-S5/R3-G2). Kein P0 und kein P1 aus Handschuhsicht. Das Risiko liegt jetzt
 nicht mehr bei zu kleinen Zielen und kaum noch beim Doppeltipp in Rückfragen,
 sondern bei Rückwegen außerhalb des Bilds und bei einem endgültigen Knopf
 zwischen zwei Blätterknöpfen.
+
+## Stand der Behebung
+
+Stand 05.10.2026, Paket „Eigener Bogen, Rückholplatz, Übernahme". Geprüft mit
+Typprüfung, Unit-Tests (2 295 grün) und Nachmessung im Dev-Server (360 × 640,
+`isMobile`/`hasTouch`, de-DE). Aufgeführt sind nur die Befunde dieses
+Pakets.
+
+| Befund | Stand | Umsetzung |
+| --- | --- | --- |
+| R3-G3 „In Einsatz übernehmen“ schmal zwischen den Blätterknöpfen | behoben | Im Hochformat eigene Zeile in voller Breite über „← Zurück“/„Weiter →“, einzeilig, 14 px Abstand; quer unverändert. Nachlauf: 320 × 568 288 × 44 px, 360 × 640 328 × 44 px; Tipp 30 px links der Mitte von „Weiter →“ blättert nur. Dazu Rückfragen bei fehlendem Namen und Stärke 0 (R3-E3, R3-N1). |

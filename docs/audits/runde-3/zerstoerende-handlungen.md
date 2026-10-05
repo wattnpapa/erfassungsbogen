@@ -419,3 +419,15 @@ hält nur der kurze Doppeltipp (siehe R3-S5).
 Einordnung der eigenen Befunde: R3-D1, R3-D2 und R3-D4 sind neu. R3-D3 ist
 ein Rest von R2-G1/R2-H4. R3-D2 liegt im Umfeld von R3-S1 und R3-E2. Nur als
 Verweis geführt (nicht gezählt): R3-S1, R3-S5, R3-E2, R3-E6.
+
+## Stand der Behebung
+
+Stand 05.10.2026, Paket „Eigener Bogen, Rückholplatz, Übernahme". Geprüft mit
+Typprüfung, Unit-Tests (2 295 grün) und Nachmessung im Dev-Server (360 × 640,
+`isMobile`/`hasTouch`, de-DE), Skript t34 dieses Audits auf Port 5180. Aufgeführt sind nur die Befunde dieses
+Pakets.
+
+| Befund | Stand | Umsetzung |
+| --- | --- | --- |
+| R3-D1 Vorlage bearbeiten, „Verwerfen“ löscht den eigenen Bogen | behoben | Unveränderte Vorlagen-Bearbeitung kommt nicht auf den Rückholplatz, veränderte verdrängt dort keinen eigenen Bogen; Rückfrage „Bearbeitung der Vorlage beenden?“ nennt Vorlage und eigenen Bogen mit Personen und Einsatzort; Startseitenkarte „Bearbeitung der Vorlage ‚OV Ulm B' — kein Einsatzbogen“. Nachlauf: Rückholplatz danach 5 Personen / „ECHTER EINSATZ Deichsicherung“, Vorlage unverändert. |
+| R3-D2 Kaltstart über Link überschreibt den Rückholplatz | behoben | Start-Link öffnet sofort nur ohne angefangenen Bogen und ohne Sammlung; sonst erst „Wohin damit?“ bzw. Rückfrage (nennt den Bogen, der vom Rückholplatz fiele), dann verdrängen. Nachlauf: während des Dialogs Ulm / Albstadt unverändert; „Abbrechen“ mit und ohne Sammlung → Ulm / Albstadt. |

@@ -372,3 +372,14 @@ einfügen“, R2-N4, R2-N5, R2-N6). Zwei sind weitgehend umgesetzt (R2-N7,
 R2-N9), zwei teilweise (R2-N3, R2-N8). Der P0 aus Runde 2 ist behoben. Der
 schwerste neue Befund (R3-N1) liegt auf dem Meldekopf-Weg, den die
 R2-N6-Behebung erst bequem gemacht hat.
+
+## Stand der Behebung
+
+Stand 05.10.2026, Paket „Eigener Bogen, Rückholplatz, Übernahme". Geprüft mit
+Typprüfung, Unit-Tests (2 295 grün) und Nachmessung im Dev-Server (360 × 640,
+`isMobile`/`hasTouch`, de-DE). Aufgeführt sind nur die Befunde dieses
+Pakets.
+
+| Befund | Stand | Umsetzung |
+| --- | --- | --- |
+| R3-N1 Stärke 0 ohne Rückfrage, Quittung unter dem Bildrand | weitgehend | Rückfrage „Stärke fehlt“ mit „Stärke eintragen“ (Schritt 3, ohne Personen gleich „Nur Stärke“ mit Zählern) oder „Trotzdem mit Stärke 0 übernehmen“; Karte trägt „Stärke fehlt“. Nachlauf: „Rottweil“ → Rückfrage, „Stärke eintragen“ → „3. Personal“ mit Zählern. Offen: Lage der Quittung nach der Übernahme (gehört zu R3-S7/R3-L1). |

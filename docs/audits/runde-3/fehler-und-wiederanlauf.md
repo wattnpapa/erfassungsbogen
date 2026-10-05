@@ -457,3 +457,15 @@ R2-E6 habe ich nicht nachgeprüft. Verkehrt hat sich keine Behebung. Die
 Verlustwege aus Runde 2 laufen über den Meldekopf und sind zu. Der neue
 Verlustweg R3-E2 läuft über „Aus Datei laden…" und braucht einen belegten
 Rückholplatz.
+
+## Stand der Behebung
+
+Stand 05.10.2026, Paket „Eigener Bogen, Rückholplatz, Übernahme". Geprüft mit
+Typprüfung, Unit-Tests (2 295 grün) und Nachmessung im Dev-Server (360 × 640,
+`isMobile`/`hasTouch`, de-DE), Prüfdateien dieses Audits. Aufgeführt sind nur die Befunde dieses
+Pakets.
+
+| Befund | Stand | Umsetzung |
+| --- | --- | --- |
+| R3-E2 „Aus Datei laden…“ räumt den Rückholplatz vor dem Lesen | behoben | Erst lesen, dann fragen und verdrängen; unbrauchbare Datei meldet sich ohne Rückfrage; nie eine Kopie desselben Bogens auf den Rückholplatz. Nachlauf mit Entwurf Bamberg / Rückholplatz Ulm: abgeschnitten.json, foto.png, leer.json, liste.csv ohne Rückfrage, je richtige Fehlermeldung, danach Bamberg / Ulm. |
+| R3-E3 Leere Erfassung wird übernommen | behoben | Ohne Namen der Einheit kein Ablegen: Hinweis „Name der Einheit fehlt“, „Zum Namensfeld“ springt mit Cursor ins Feld. Nachlauf (320 × 568, 360 × 640, 640 × 360): 0 Einträge, Schritt 1, Fokus `feld-einheit-name`. Kein „Rückgängig“ nach der Übernahme. |

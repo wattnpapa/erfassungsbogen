@@ -463,3 +463,18 @@ ebenfalls. Was neu auftaucht, kommt von außen in die App: ein Link, ein
 zweiter Tab, ein Rollenwechsel auf demselben Telefon. R3-S1 bis R3-S7 sind
 neu. R3-L1 und R3-H1 stehen schon in anderen Runde-3-Berichten und sind hier
 nicht mitgezählt.
+
+## Stand der Behebung
+
+Stand 05.10.2026, Paket „Eigener Bogen, Rückholplatz, Übernahme". Geprüft mit
+Typprüfung, Unit-Tests (2 295 grün) und Nachmessung im Dev-Server (360 × 640,
+`isMobile`/`hasTouch`, de-DE), Skripte dieses Audits auf Port 5180. Aufgeführt sind nur die Befunde dieses
+Pakets.
+
+| Befund | Stand | Umsetzung |
+| --- | --- | --- |
+| R3-S1 Link bei offener App ersetzt den eigenen Bogen | behoben | Listener rufen über eine Ref den Handler des aktuellen Renders; Rückfrage und Rückholplatz prüfen gegen den aktuellen Stand, die Quittung nennt den Rückholplatz. Nachlauf s40: Rückfrage „Der angefangene Bogen ‚THW Eigenstadt Bergungsgruppe' wird … ersetzt“ nach 200/600/1 500 ms; nach „Meldung öffnen“ liegt der zuletzt getippte Stand zurückholbar. |
+| R3-S2 Eigener Bogen erbt den Aufnahme-Kontext | behoben | Jeder Bogenwechsel setzt das Sammelziel zurück; Kopf, Marke und „In Einsatz übernehmen“ nur bei einer als fremd markierten Erfassung. Nachlauf: neuer Bogen mit „‹ Startseite“, ohne Marke und Übernehmen-Knopf, Entwurf ohne `fremd`. |
+| R3-S3 Zweites Fenster überschreibt den Entwurf | behoben | Fenster ohne eigenen Bogen fragt vor dem Anlegen nach dem Entwurf des anderen Fensters und legt ihn auf den Rückholplatz; Konfliktwarnung fest am oberen Bildrand. Nachlauf: Rückfrage mit „THW TabA“, danach TabB / Rückholplatz TabA; Warnung in Tab A bei scrollY 520 im Bild (0–178 px). |
+| R3-S4 Vorschlagsliste über der Aktionsleiste | weitgehend | Leiste über der Liste (z-index); mehrdeutiger Name („Neustadt“) wird beim Verlassen nicht mehr aufgelöst. Nachlauf: unter der Knopfmitte liegt der Knopf, Kürzel/Telefon leer. Ein exakt getippter eindeutiger Name („Ulm“) füllt beim Verlassen weiter Kürzel und Kontakt, ohne Hinweis darauf. |
+| R3-S6 Unterbrechung wird zur Eintreffzeit | behoben | Beginn der Erfassung im Entwurf (`fremd.beginn`); bei leerem Feld und mehr als 5 Minuten Rückfrage „Um 05:47 (Beginn der Erfassung) / Jetzt, 06:12“. Nachlauf mit Neuladen und Uhr +25 min: Wahl „Beginn“ → eingetroffen 05:47. |
