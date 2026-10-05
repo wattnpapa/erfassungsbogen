@@ -7,6 +7,7 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen, within } from "@testing-library/react";
 import { Dialogschicht, frageJaNein, prellschutzSetzen } from "./dialoge";
+import { tippSchutzZuruecksetzen } from "./tipp-schutz";
 
 describe("Prellschutz der Rückfrage", () => {
   afterEach(() => {
@@ -41,6 +42,69 @@ describe("Prellschutz der Rückfrage", () => {
     const dialog = await screen.findByRole("dialog", { name: "Verwerfen?" });
     // Enter auf dem Knopf löst einen Klick mit detail 0 aus.
     fireEvent.click(within(dialog).getByRole("button", { name: "Verwerfen" }), { detail: 0 });
+    await expect(antwort).resolves.toBe(true);
+  });
+});
+
+/**
+ * Ortssperre an der Stelle des Auslösers (Audit Runde 4, R4-G1): Der
+ * Prellschutz deckte nur 450 ms. Ein zögernder zweiter Tipp nach 551 ms
+ * bestätigte „Person entfernen". Jetzt nimmt die Stelle des auslösenden
+ * Tipps 1,5 s lang nichts an; daneben wirkt ein Tipp sofort.
+ */
+describe("Ortssperre der Rückfrage", () => {
+  afterEach(() => {
+    prellschutzSetzen(0);
+    tippSchutzZuruecksetzen();
+    vi.useRealTimers();
+  });
+
+  function tippAuf(el: Element, x: number, y: number) {
+    el.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true, clientX: x, clientY: y, detail: 1 }));
+  }
+
+  it("verschluckt den zweiten Tipp an der Stelle des Auslösers bis 1,5 s, daneben nicht", async () => {
+    tippSchutzZuruecksetzen();
+    let antwort: Promise<boolean> | null = null;
+    render(
+      <>
+        <button type="button" onClick={() => (antwort = frageJaNein({ titel: "Einsatz löschen?", text: "?", ok: "In den Papierkorb", gefahr: true }))}>
+          Einsatz löschen…
+        </button>
+        <Dialogschicht />
+      </>,
+    );
+    tippAuf(screen.getByRole("button", { name: "Einsatz löschen…" }), 180, 400);
+    const dialog = await screen.findByRole("dialog", { name: "Einsatz löschen?" });
+    const knopf = within(dialog).getByRole("button", { name: "In den Papierkorb" });
+    vi.useFakeTimers({ toFake: ["Date"], now: Date.now() });
+    const start = Date.now();
+    for (const ms of [574, 746, 1156, 1400]) {
+      vi.setSystemTime(start + ms);
+      tippAuf(knopf, 182, 404);
+      expect(dialog.hasAttribute("open")).toBe(true);
+    }
+    // Bewusst getippt, eine Fingerbreite tiefer: wirkt.
+    tippAuf(knopf, 180, 470);
+    await expect(antwort).resolves.toBe(true);
+  });
+
+  it("gibt die Stelle nach der Sperre frei", async () => {
+    tippSchutzZuruecksetzen();
+    let antwort: Promise<boolean> | null = null;
+    render(
+      <>
+        <button type="button" onClick={() => (antwort = frageJaNein({ titel: "Verwerfen?", text: "?", ok: "Verwerfen" }))}>
+          Verwerfen
+        </button>
+        <Dialogschicht />
+      </>,
+    );
+    tippAuf(screen.getByRole("button", { name: "Verwerfen" }), 100, 410);
+    const dialog = await screen.findByRole("dialog", { name: "Verwerfen?" });
+    vi.useFakeTimers({ toFake: ["Date"], now: Date.now() });
+    vi.setSystemTime(Date.now() + 1600);
+    tippAuf(within(dialog).getByRole("button", { name: "Verwerfen" }), 100, 410);
     await expect(antwort).resolves.toBe(true);
   });
 });

@@ -18,6 +18,7 @@
  */
 
 import { useEffect, useRef, useState, type FormEvent, type MouseEvent, type ReactNode } from "react";
+import { ortSperren } from "./tipp-schutz";
 
 /** Ein Eingabefeld einer Abfrage. `name` ist der Schlüssel im Ergebnis. */
 export type Eingabefeld = {
@@ -205,6 +206,14 @@ export function zeigeHinweis(a: {
  * Doppeltipp bestätigte sie dann gleich mit (Audit Runde 2, R2-G1). Tastatur
  * (Enter, Esc) ist nicht betroffen: ein Klick aus der Tastatur trägt
  * `detail === 0`.
+ *
+ * Das allein reichte nicht: Ein zögernder zweiter Tipp kommt mit Handschuh
+ * bis zu einer Sekunde später, und nach 551 ms bestätigte er „Person
+ * entfernen", nach 574 ms „Einsatz löschen" (Audit Runde 4, R4-G1). Darum
+ * sperrt das Fenster beim Öffnen zusätzlich die Stelle des auslösenden Tipps
+ * für `ORTSSPERRE_MS` (1,5 s, tipp-schutz.ts) — derselbe Schutz wie nach
+ * „Abrücken". Ein Tipp daneben, etwa auf „Abbrechen", wirkt nach dem
+ * Prellschutz sofort.
  */
 // Der Prüfstand (features/support/haken.ts) setzt ihn vor dem Laden auf 0.
 let prellschutzMs: number = (globalThis as { __EEB_PRELLSCHUTZ_MS?: number }).__EEB_PRELLSCHUTZ_MS ?? 450;
@@ -260,6 +269,9 @@ function Dialogfenster({ abfrage }: { abfrage: Abfrage }) {
   useEffect(() => {
     dialog.current?.showModal();
     geoeffnetUm.current = Date.now();
+    // Die Fingerstelle des Auslösers: Dort liegt jetzt womöglich der
+    // bestätigende Knopf (R4-G1).
+    ortSperren();
     // Wie beim alten `window.prompt` steht eine Vorgabe markiert da:
     // weitertippen ersetzt sie, ohne sie erst löschen zu müssen. Vor dem
     // `showModal()` geht das nicht — ein geschlossener Dialog ist unsichtbar

@@ -326,6 +326,10 @@ export function EinsatzListe(props: {
   // Die Übergabe aus der Einsatzansicht gilt für genau einen Aufbau der
   // Startseite; danach führt die Liste die Quittung selbst.
   const [geloescht, setGeloescht] = useState(() => zuletztGeloeschterEinsatz);
+  // Aus der Einsatzansicht übergeben: Die Startseite beginnt oben, die Zeile
+  // über der Liste stand dreieinhalb Bildschirme tiefer, ohne Hinweis im
+  // ersten Bild (Audit Runde 4, R4-G1). Dann quittiert die Daumenleiste.
+  const [uebergeben] = useState(() => zuletztGeloeschterEinsatz !== null);
   useEffect(() => {
     zuletztGeloeschterEinsatz = null;
   }, []);
@@ -407,7 +411,12 @@ export function EinsatzListe(props: {
           </button>
         </div>
       )}
-      {geloescht && (
+      {geloescht && uebergeben && (
+        <DaumenQuittung onRueckgaengig={loeschenRueckgaengig} onSchliessen={() => setGeloescht(null)}>
+          Einsatz „{geloescht.name}" in den Papierkorb gelegt (30 Tage rückholbar).
+        </DaumenQuittung>
+      )}
+      {geloescht && !uebergeben && (
         <p className="meldung einsatz-geloescht" role="status">
           Einsatz „{geloescht.name}" in den Papierkorb gelegt (30 Tage rückholbar).{" "}
           {/* Voller Knopf wie bei Vorlagen und in der Daumenleiste (R3-D4). */}
