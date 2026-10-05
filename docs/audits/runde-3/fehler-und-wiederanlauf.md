@@ -477,3 +477,12 @@ Unit-Tests (2 337 grün) und Nachmessung im Produktionsbuild (`vite preview`,
 | Befund | Stand | Umsetzung |
 | --- | --- | --- |
 | R3-E1 Speicher voll, kein Geräteschlüssel: QR und PDF scheitern mit Programmtext | behoben | Lässt sich der neue Geräteschlüssel nicht speichern, signiert die App mit einem Schlüssel nur für diese Sitzung und speichert ihn, sobald Platz ist; die Übersicht sagt am Siegel „Das Siegel gilt nur, solange diese Seite offen ist …". Speicherfehler erscheinen überall deutsch (`fehlerText`). Nachlauf (016 Bamberg, kein Schlüssel, jede wachsende `eeb.*`-Schreibung scheitert): QR-Code in 3 Teilen, „QR-Code im Vollbild zeigen" bedienbar, „PDF erzeugen" lädt die PDF herunter, kein Programmtext. Signaturformat unverändert. |
+
+Stand 05.10.2026, Paket „Rückmeldungen im Bild, Scrollposition, Doppeltipp,
+Rückgängig". Geprüft mit Typprüfung, Unit-Tests (2 352 grün) und Nachmessung
+im Dev-Server (360 × 640, 320 × 568, 640 × 360, `isMobile`/`hasTouch`,
+de-DE). Aufgeführt sind nur die Befunde dieses Pakets.
+
+| Befund | Stand | Umsetzung |
+| --- | --- | --- |
+| R3-E4 Gemischter Stapel: Fehler verdrängt Erfolg, „0 Bögen aufgenommen“ | behoben | Dateien und Bilder einer Auswahl laufen als ein Stapel mit einer Rückmeldung. Nur Dateien: Erfolg und Fehler untereinander unter den Aufnahme-Knöpfen. Mit Bildern: ein Bericht, erste Zeile zählt beides („2 Dateien und 1 Bild gelesen — 1 Bogen aufgenommen.“), darunter kaputte Dateien und Bilder ohne Code. Nachlauf: Schwabach + abgeschnitten.json → „1 Bogen aufgenommen.“ und die Beschädigt-Zeile zusammen; Hilpoltstein + abgeschnitten.json + foto.png → keine Zeile mit „0 Bögen“. |

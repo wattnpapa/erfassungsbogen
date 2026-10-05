@@ -382,4 +382,13 @@ Pakets.
 
 | Befund | Stand | Umsetzung |
 | --- | --- | --- |
-| R3-N1 Stärke 0 ohne Rückfrage, Quittung unter dem Bildrand | weitgehend | Rückfrage „Stärke fehlt“ mit „Stärke eintragen“ (Schritt 3, ohne Personen gleich „Nur Stärke“ mit Zählern) oder „Trotzdem mit Stärke 0 übernehmen“; Karte trägt „Stärke fehlt“. Nachlauf: „Rottweil“ → Rückfrage, „Stärke eintragen“ → „3. Personal“ mit Zählern. Offen: Lage der Quittung nach der Übernahme (gehört zu R3-S7/R3-L1). |
+| R3-N1 Stärke 0 ohne Rückfrage, Quittung unter dem Bildrand | behoben | Rückfrage „Stärke fehlt“ mit „Stärke eintragen“ (Schritt 3, ohne Personen gleich „Nur Stärke“ mit Zählern) oder „Trotzdem mit Stärke 0 übernehmen“; Karte trägt „Stärke fehlt“. Nachlauf: „Rottweil“ → Rückfrage, „Stärke eintragen“ → „3. Personal“ mit Zählern. Lage der Quittung: siehe Paket „Rückmeldungen im Bild …“ unten. |
+
+Stand 05.10.2026, Paket „Rückmeldungen im Bild, Scrollposition, Doppeltipp,
+Rückgängig". Geprüft mit Typprüfung, Unit-Tests (2 352 grün) und Nachmessung
+im Dev-Server (360 × 640, 320 × 568, 640 × 360, `isMobile`/`hasTouch`,
+de-DE).
+
+| Befund | Stand | Umsetzung |
+| --- | --- | --- |
+| R3-N1 (Rest) Quittung nach „In Einsatz übernehmen“ unter dem Bildrand | behoben | Nach einer Aufnahme rollt die Einsatzansicht einmal so weit, dass „Zuletzt eingelesen: ‚THW Rottweil‘ · jetzt 5 Einheiten, Gesamt 34“ ganz im Bild steht; die Stärke-Leiste bleibt sichtbar. Nachlauf („Rottweil“, „Trotzdem mit Stärke 0 übernehmen“): Quittung 567–638 px bei 360 × 640 (vorher 636–707), 473–566 px bei 320 × 568 (vorher 655–748), 306–357 px bei 640 × 360; Stärke-Leiste 154–383 / 60–289 / 124–228 px. |

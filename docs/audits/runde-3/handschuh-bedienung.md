@@ -412,3 +412,13 @@ Pakets.
 | Befund | Stand | Umsetzung |
 | --- | --- | --- |
 | R3-G3 „In Einsatz übernehmen“ schmal zwischen den Blätterknöpfen | behoben | Im Hochformat eigene Zeile in voller Breite über „← Zurück“/„Weiter →“, einzeilig, 14 px Abstand; quer unverändert. Nachlauf: 320 × 568 288 × 44 px, 360 × 640 328 × 44 px; Tipp 30 px links der Mitte von „Weiter →“ blättert nur. Dazu Rückfragen bei fehlendem Namen und Stärke 0 (R3-E3, R3-N1). |
+
+Stand 05.10.2026, Paket „Rückmeldungen im Bild, Scrollposition, Doppeltipp,
+Rückgängig". Geprüft mit Typprüfung, Unit-Tests (2 352 grün) und Nachmessung
+im Dev-Server (360 × 640, 320 × 568, 640 × 360, `isMobile`/`hasTouch`,
+de-DE). Aufgeführt sind nur die Befunde dieses Pakets.
+
+| Befund | Stand | Umsetzung |
+| --- | --- | --- |
+| R3-G1 „Person entfernen“: „Rückgängig“ über dem Bildrand | behoben | Quittung „Entfernt: <Name>“ als Daumenleiste über „Weiter →“, bleibt bis ✕, zum nächsten Entfernen oder bis zum Verlassen des Schritts; „Rückgängig“ setzt die Person an ihre Stelle zurück. Die Ansicht beginnt danach mit dem Kopf der nachgerückten Karte, die alte Fingerstelle ist 1,5 s gesperrt. Nachlauf (Krüger, Florian, Knopf bei 150/320/500 px): „Rückgängig“ 108 × 44 px bei 512 px (360 × 640), 440 px (320 × 568), 246 px (640 × 360); nächstes „Person entfernen“ mindestens 50 px neben der alten Stelle. |
+| R3-G2 Quittungsleiste deckt bis 26 %, fängt den zweiten Tipp | weitgehend | Text höchstens zwei Zeilen, Handlung und Zeit vorn, Name gekürzt; Seite hält unten die Höhe der Leiste frei; geht sie unter dem Finger auf, sperrt sie die Stelle und rollt die Knopfreihe der getippten Karte über sich; Zurücknehmen quittiert sich („Wieder anwesend: Abrücken von Nr. 3 … zurückgenommen.“). Nachlauf: Leiste 65 px, 11 % bei 320 × 568 (vorher 26 %), 10 % bei 360 × 640, 18 % bei 640 × 360; Doppeltipp unten mit 700/1 000 ms → abgerückt. Offen: Der Kopf der nächsten Karte liegt kurz unter der Leiste, bis man rollt. |

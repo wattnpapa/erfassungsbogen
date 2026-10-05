@@ -431,3 +431,13 @@ Pakets.
 | --- | --- | --- |
 | R3-D1 Vorlage bearbeiten, „Verwerfen“ löscht den eigenen Bogen | behoben | Unveränderte Vorlagen-Bearbeitung kommt nicht auf den Rückholplatz, veränderte verdrängt dort keinen eigenen Bogen; Rückfrage „Bearbeitung der Vorlage beenden?“ nennt Vorlage und eigenen Bogen mit Personen und Einsatzort; Startseitenkarte „Bearbeitung der Vorlage ‚OV Ulm B' — kein Einsatzbogen“. Nachlauf: Rückholplatz danach 5 Personen / „ECHTER EINSATZ Deichsicherung“, Vorlage unverändert. |
 | R3-D2 Kaltstart über Link überschreibt den Rückholplatz | behoben | Start-Link öffnet sofort nur ohne angefangenen Bogen und ohne Sammlung; sonst erst „Wohin damit?“ bzw. Rückfrage (nennt den Bogen, der vom Rückholplatz fiele), dann verdrängen. Nachlauf: während des Dialogs Ulm / Albstadt unverändert; „Abbrechen“ mit und ohne Sammlung → Ulm / Albstadt. |
+
+Stand 05.10.2026, Paket „Rückmeldungen im Bild, Scrollposition, Doppeltipp,
+Rückgängig". Geprüft mit Typprüfung, Unit-Tests (2 352 grün) und Nachmessung
+im Dev-Server (360 × 640, 320 × 568, 640 × 360, `isMobile`/`hasTouch`,
+de-DE). Aufgeführt sind nur die Befunde dieses Pakets.
+
+| Befund | Stand | Umsetzung |
+| --- | --- | --- |
+| R3-D3 Person entfernen: Quittung oberhalb des Bilds | behoben | Wie R3-G1: Daumenleiste mit „Rückgängig“ im Bild, Rückweg übersteht weitere Eingaben bis zum Verlassen des Schritts; unter der alten Fingerstelle liegt der Kopf der nächsten Karte, nicht ihr „Person entfernen“, und ein zweiter Tipp dort bleibt 1,5 s wirkungslos. Nachlauf (360 × 640): „Rückgängig“ bei 512 px, nächstes „Person entfernen“ bei 361–370 px, zweiter Tipp nach 500 ms ohne Rückfrage. |
+| R3-D4 Kleinere Lücken bei Rückweg und Aufzählung | behoben | „Fahrzeug entfernen“ mit Daumenleiste und „Rückgängig“ (108 × 44 px); „Rückgängig“ nach Vorlage und Einsatz löschen als voller Knopf (108 × 44 statt 74 × 30 px); „Alle Daten löschen“ nennt den zuletzt verdrängten Bogen; Frist-Warnung auch oben in der Einsatzansicht; der Rückweg einer entfernten Meldung übersteht Verlassen und Wiederöffnen der Einsatzansicht (nur Arbeitsspeicher, bis Neuladen). Nachlauf je Punkt einzeln. |

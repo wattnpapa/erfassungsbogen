@@ -489,3 +489,16 @@ sich teilweise verkehrt (R2-M2).
 - Feldtauglichkeit: **eingeschränkt, nicht vollständig geprüft**. Offline,
   Autospeicher und Übergabe tragen. Handschuhe, Sonnenlicht, Kamera-Scan
   zweiteiliger Codes und native Builds gehören in einen Praxistest.
+
+## Stand der Behebung
+
+Stand 05.10.2026, Paket „Rückmeldungen im Bild, Scrollposition, Doppeltipp,
+Rückgängig". Geprüft mit Typprüfung, Unit-Tests (2 352 grün) und Nachmessung
+im Dev-Server (360 × 640, 320 × 568, 640 × 360, `isMobile`/`hasTouch`,
+de-DE). Aufgeführt sind nur die Befunde dieses Pakets.
+
+| Befund | Stand | Umsetzung |
+| --- | --- | --- |
+| R3-H1 Von der Startseite aus mitten im Formular | behoben | Jeder Wechsel der Ansicht (Assistent, Musterung, Schnellerfassung, „Fortsetzen“) beginnt oben, der Fokus liegt auf der Überschrift; ein Sprung auf ein Feld (R2-H2) hat Vorrang. Stärke-Leiste der Musterung klebt einzeilig oben (90 px). Nachlauf (360 × 640, 320 × 568, 640 × 360): „Einsatz vorbereiten“ von 840/963/711 px → 0 px, Überschrift bei 64/64/56 px, „Lisa Becker“ bei 381/381/338 px; Leiste nach 800 px Rollen bei 0 px; „Eingetroffen um“ bei 208 px (quer 161 px). |
+| R3-H5 Knöpfe des Helfers unter dem Bildrand, Vorlagen hinter dem Meldekopf | weitgehend | „Meinen Bogen ausfüllen“ bietet bis zu zwei Vorlagen als „Einsatz vorbereiten: <Name>“ an; Offline-Hinweis unter der Entwurfskarte; Zeichen neben dem Namen. Nachlauf: „Fortsetzen“ 360 × 640 Standard 367–411 px (vorher 540–584), Feld 473–527 px (649–703); „Einsatz vorbereiten“ bei 706 px statt 1 401 px. Offen: 320 × 568 im Feld-Modus steht „Fortsetzen“ bei 599–653 px, noch unter dem Rand. |
+| R3-H6 Nachzügler: 18 Bildschirme bis „+ Person hinzufügen“ | weitgehend | Ab zwei Personen steht „+ Person hinzufügen“ auch über der Liste; ein Tipp springt zur neuen Karte, Cursor im Vornamen. Ansichtswahl „Alle Angaben (Karten)“ / „Kurz-Liste (Tabelle)“. Nachlauf (FGr WP (A), 10 Personen): Knopf bei 524/528/402 px statt 11 531/12 615/6 311 px; nach dem Tipp „Person 11 von 11“, Vorname bei 75 px, „Zählt als“ bei 225–293 px, Weg höchstens ein Bildschirm. Offen: Karten standardmäßig zugeklappt. |

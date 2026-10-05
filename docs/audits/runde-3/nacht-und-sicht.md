@@ -469,3 +469,14 @@ vier (R2-L1, R2-L3, R2-L4, R2-L6). Zwei wirken teilweise: R2-L2 und R2-L5
 sind jeweils nur in einer von zwei Ansichten behoben. Neu in Runde 3:
 R3-L2 (P2), R3-L4, R3-L5, R3-L6 und R3-L7 (alle P3). R3-L1 und R3-L3 sind
 die Reste von R2-L2 und R2-L5. Zusammen: 0 × P0, 0 × P1, 2 × P2, 5 × P3.
+
+## Stand der Behebung
+
+Stand 05.10.2026, Paket „Rückmeldungen im Bild, Scrollposition, Doppeltipp,
+Rückgängig". Geprüft mit Typprüfung, Unit-Tests (2 352 grün) und Nachmessung
+im Dev-Server (360 × 640, 320 × 568, 640 × 360, `isMobile`/`hasTouch`,
+de-DE). Aufgeführt sind nur die Befunde dieses Pakets.
+
+| Befund | Stand | Umsetzung |
+| --- | --- | --- |
+| R3-L1 Rückmeldung nach „Bögen einlesen…“ außerhalb des Bilds | behoben | Rückmeldung (Erfolg und Fehler) direkt unter den Aufnahme-Knöpfen, holt sich ins Bild, `role="alert"` bei Fehlern, bleibt bis zum nächsten Einlesen; Bilderstapel-Bericht am selben Platz. Nachlauf mit dem Knopf in Bildmitte: falsche Datei 382–454 px (360 × 640), 345–441 px (320 × 568), 216–264 px (640 × 360), vorher 2 711 px; gültige Datei 382–424 / 345–387 / 222–264 px. Nach „In Einsatz übernehmen“ und Scan steht „Zuletzt eingelesen“ ganz im Bild (siehe R3-S7). |
