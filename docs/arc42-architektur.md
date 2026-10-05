@@ -1034,7 +1034,10 @@ flowchart TB
   Kaltstart nach dem Mounten über denselben Weg (`uebernimmBogen`): erst
   Rückfrage, dann verdrängen. Sofort geöffnet wird ein Start-Link nur ohne
   angefangenen Bogen und ohne Sammlung (`START_SOFORT`, R3-S1/R3-D2,
-  nachgezogen 2026-10-05).
+  nachgezogen 2026-10-05). `merkeVerdraengt` legt die Bearbeitung einer
+  gespeicherten Vorlage unverändert gar nicht und verändert nur ohne eigenen
+  Bogen auf den Rückholplatz (R3-D1); „Aus Datei laden…" fragt erst nach
+  dem Lesen (R3-E2).
 - **Folgemeldungen** (`eintrag-zeiten.ts`): Jeder Eingang in eine Sammlung —
   Scan, Link, Datei, Bilderstapel, „In Einsatz aufnehmen" — läuft über
   `meldungAufnehmen`. Eine neue Fassung derselben Einheit erbt dort

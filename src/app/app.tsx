@@ -888,57 +888,63 @@ function AppInhalt() {
         return;
       }
     }
-    if (!(await darfBogenErsetzen({ titel: "Bogen aus Datei öffnen?", was: "den Bogen aus der Datei", ok: "Datei öffnen" }))) return;
+    // Erst lesen und prüfen, dann fragen und verdrängen: Die Rückfrage kam
+    // vor dem Lesen, auch bei einer abgeschnittenen JSON oder einem Foto —
+    // und nach „Datei öffnen" lag eine Kopie des offenen Bogens auf dem
+    // Rückholplatz, der dort liegende Bogen war gelöscht, geöffnet wurde
+    // nichts (Audit Runde 3, R3-E2). Eine unbrauchbare Datei meldet sich
+    // jetzt ohne Rückfrage und lässt beide Plätze unberührt.
+    let geladen: { bogen: Erfassungsbogen; anonymisiert: boolean };
+    let anzahl = 1;
     try {
       if (istPdfDatei(datei)) {
-        await ladePdfBogen(datei);
-        return;
+        const bytes = new Uint8Array(await datei.arrayBuffer());
+        const boegen = boegenAusPdfBytes(bytes);
+        if (boegen.length === 0) {
+          // QR-Rückfall: Er läuft über `uebernimmBogen`, das selbst fragt.
+          await ladePdfQr(bytes);
+          return;
+        }
+        geladen = bogenNachFrist(boegen[0]!);
+        anzahl = boegen.length;
+      } else {
+        geladen = bogenNachFrist(await bogenLaden(datei));
       }
-      const { bogen: geladen, anonymisiert } = bogenNachFrist(await bogenLaden(datei));
-      setBogen(geladen);
-      setzeEmpfang(null); // Datei-Import: kein signierter Transport
-      setSchritt(UEBERSICHT);
-      setZeigeStart(false);
-      setFehler("");
-      setMeldung(anonymisiert ? FRIST_ABGELAUFEN_MELDUNG : "");
     } catch (err) {
-      setFehler(await dateiFehlerMeldung(datei, err, "bogen"));
+      setFehler(await dateiFehlerMeldung(datei, err, "bogen")); // nie Parser-Text (R2-E5)
+      return;
     }
+    if (!(await darfBogenErsetzen({ titel: "Bogen aus Datei öffnen?", was: "den Bogen aus der Datei", ok: "Datei öffnen" }))) return;
+    const b = geladen.bogen;
+    setBogen(b);
+    setzeEmpfang(null); // Datei-Import: kein signierter Transport
+    setSchritt(UEBERSICHT);
+    setZeigeStart(false);
+    setFehler("");
+    // Sammel-PDF eines Meldekopfs: hier lässt sich nur EIN Bogen öffnen —
+    // wer alle will, ist beim Einsatz-Import richtig, statt die PDF als
+    // „ging nicht" abzulegen.
+    setMeldung(
+      [
+        geladen.anonymisiert ? FRIST_ABGELAUFEN_MELDUNG : "",
+        anzahl > 1
+          ? `Die PDF enthält ${anzahl} Bögen — geöffnet ist „${einheitAnzeigename(b.einheit)}". Alle auf einmal: „Einsatz importieren…".`
+          : "",
+        eigenerBogenWartetHinweis(),
+      ]
+        .filter(Boolean)
+        .join(" "),
+    );
   }
 
   /**
-   * PDF → Bogen, zwei Wege in dieser Reihenfolge:
-   *  1. eingebettete Daten (verlustfrei, enthält alles),
-   *  2. Rückfall: die QR-Codes der PDF auswerten — für Ausdrucke, die durch ein
-   *     fremdes Werkzeug gelaufen sind und ihre Anhänge verloren haben. Das ist
-   *     derselbe Weg wie beim Scannen, inklusive Signaturprüfung und mehrteiliger
-   *     Codes (die Teile stehen alle in derselben PDF).
+   * PDF ohne eingebettete Daten: die QR-Codes der PDF auswerten — für
+   * Ausdrucke, die durch ein fremdes Werkzeug gelaufen sind und ihre Anhänge
+   * verloren haben. Das ist derselbe Weg wie beim Scannen, inklusive
+   * Signaturprüfung, mehrteiliger Codes (die Teile stehen alle in derselben
+   * PDF) und der Rückfrage zum offenen Bogen.
    */
-  async function ladePdfBogen(datei: File) {
-    const bytes = new Uint8Array(await datei.arrayBuffer());
-    const boegen = boegenAusPdfBytes(bytes);
-    if (boegen.length > 0) {
-      const { bogen: b, anonymisiert } = bogenNachFrist(boegen[0]!);
-      setBogen(b);
-      setzeEmpfang(null); // Datei-Import: kein signierter Transport
-      setSchritt(UEBERSICHT);
-      setZeigeStart(false);
-      setFehler("");
-      // Sammel-PDF eines Meldekopfs: hier lässt sich nur EIN Bogen öffnen —
-      // wer alle will, ist beim Einsatz-Import richtig, statt die PDF als
-      // „ging nicht" abzulegen.
-      setMeldung(
-        [
-          anonymisiert ? FRIST_ABGELAUFEN_MELDUNG : "",
-          boegen.length > 1
-            ? `Die PDF enthält ${boegen.length} Bögen — geöffnet ist „${einheitAnzeigename(b.einheit)}". Alle auf einmal: „Einsatz importieren…".`
-            : "",
-        ]
-          .filter(Boolean)
-          .join(" "),
-      );
-      return;
-    }
+  async function ladePdfQr(bytes: Uint8Array) {
     // Dynamisch: die QR-Auswertung zieht den Decoder (ZXing als WebAssembly)
     // nach — der gehört nicht ins Start-Bundle, sondern erst in den Rückfall.
     const { qrTexteAusPdfBytes } = await import("./pdf-qr");
@@ -952,7 +958,7 @@ function AppInhalt() {
     for (const text of texte) {
       // Mehrteilige Bögen: jeder Teil wandert in denselben Sammelstand wie beim
       // Scannen; fertig ist es, sobald ein Teil den Bogen vervollständigt.
-      if (await uebernehmeText(text, "Der QR-Code in der PDF enthält keinen gültigen Erfassungsbogen.")) return;
+      if (await uebernehmeText(text, "Der QR-Code in der PDF enthält keinen gültigen Erfassungsbogen.", { ohneKiosk: true })) return;
     }
     // Unvollständig: der Fortschritt („es fehlt noch Teil x") steht bereits.
   }
@@ -970,9 +976,38 @@ function AppInhalt() {
    * hätte (dann ist die Erfassung verworfen, siehe `folgenFuerOffenenBogen`).
    */
   function merkeVerdraengt(b: Erfassungsbogen, opt: { tausch?: boolean } = {}): boolean {
+    const alt = opt.tausch ? null : ersetztenEntwurfLaden();
+    // Bearbeitung einer gespeicherten Vorlage (R3-D1): Unverändert ist sie
+    // nichts wert — die Vorlage liegt ja gespeichert vor. Verändert darf sie
+    // wie eine fremde Erfassung keinen eigenen Bogen vom Rückholplatz
+    // schieben: Dort lag nach „Vorlage bearbeiten" → „Verwerfen" die
+    // unveränderte Vorlagen-Kopie, der echte Einsatzbogen war gelöscht.
+    if (bearbeiteteVorlage && (vorlageUnveraendert(b) || !rueckholungNimmt(true, alt))) return false;
+    // Derselbe Bogen liegt schon dort: keine Kopie über sich selbst (R3-E2).
+    if (alt && JSON.stringify(alt.bogen) === JSON.stringify(b)) return true;
     const ok = ersetztenEntwurfMerken(b, fremdeErfassung ? { einsatzId: sammelZielId ?? undefined } : undefined, opt);
     if (ok) setErsetzterEntwurf(ersetztenEntwurfLaden());
     return ok;
+  }
+
+  /** Steht im offenen Bogen noch genau der gespeicherte Stand der bearbeiteten Vorlage? */
+  function vorlageUnveraendert(b: Erfassungsbogen | null = bogen): boolean {
+    return !!b && !!bearbeiteteVorlage && JSON.stringify(b) === JSON.stringify(bearbeiteteVorlage.bogen);
+  }
+
+  /**
+   * Unterscheidungsmerkmal für Rückfragen, in denen zwei Bögen mit demselben
+   * Namen stehen können (eigener Bogen und Vorlage derselben Einheit, R3-D1):
+   * Personen und Einsatzort.
+   */
+  function bogenMerkmal(b: Erfassungsbogen): string {
+    const ort = b.einsatz.ortAuftrag.trim();
+    return [
+      b.personal.length > 0 ? `${b.personal.length} ${b.personal.length === 1 ? "Person" : "Personen"}` : "",
+      ort ? `„${ort.length > 40 ? `${ort.slice(0, 39)}…` : ort}"` : "",
+    ]
+      .filter(Boolean)
+      .join(" · ");
   }
 
   /**
@@ -987,6 +1022,25 @@ function AppInhalt() {
     const alt = opt.tausch ? null : ersetztenEntwurfLaden();
     const altName = alt ? einheitAnzeigename(alt.bogen.einheit) : "";
     const altZaehlt = !!alt && bogenHatInhalt(alt.bogen);
+    const altMerkmal = alt ? bogenMerkmal(alt.bogen) : "";
+    // Bearbeitung einer gespeicherten Vorlage (R3-D1): Die Vorlage selbst
+    // bleibt, wie sie gespeichert ist; es geht höchstens um nicht übernommene
+    // Änderungen. Ein eigener Bogen auf dem Rückholplatz bleibt dort.
+    if (bearbeiteteVorlage) {
+      const eigenerWartet =
+        alt && !alt.fremd && altZaehlt
+          ? ` Dein Bogen „${altName}"${altMerkmal ? ` (${altMerkmal})` : ""} bleibt auf der Startseite zurückholbar.`
+          : "";
+      if (vorlageUnveraendert()) {
+        return { satz: `Die Vorlage „${bearbeiteteVorlage.name}" bleibt unverändert gespeichert.${eigenerWartet}`, verlust: false };
+      }
+      if (!rueckholungNimmt(true, alt)) {
+        return {
+          satz: `Nicht mit „Vorlage aktualisieren" übernommene Änderungen gehen verloren, die Vorlage „${bearbeiteteVorlage.name}" bleibt in ihrer gespeicherten Fassung.${eigenerWartet}`,
+          verlust: true,
+        };
+      }
+    }
     if (fremdeErfassung && !rueckholungNimmt(true, alt)) {
       return {
         satz: `Sie ist noch in keiner Sammlung und wird verworfen. Dein eigener Bogen „${altName}" bleibt auf der Startseite zurückholbar.`,
@@ -997,7 +1051,7 @@ function AppInhalt() {
     if (!altZaehlt) return { satz: bleibt, verlust: false };
     const stand = new Date(alt.gespeichert).toLocaleString("de-DE", { dateStyle: "short", timeStyle: "short" });
     return {
-      satz: `${bleibt} ${alt.fremd ? "Die" : "Der"} dort bisher liegende ${alt.fremd ? "Erfassung" : "Bogen"} „${altName}" (Stand ${stand} Uhr) wird dabei endgültig gelöscht.`,
+      satz: `${bleibt} ${alt.fremd ? "Die" : "Der"} dort bisher liegende ${alt.fremd ? "Erfassung" : "Bogen"} „${altName}" (Stand ${stand} Uhr${altMerkmal ? ` · ${altMerkmal}` : ""}) wird dabei endgültig gelöscht.`,
       verlust: true,
     };
   }
@@ -1048,7 +1102,11 @@ function AppInhalt() {
       const folgen = folgenFuerOffenenBogen({ tausch: a.tausch });
       const ja = await frageJaNein({
         titel: a.titel,
-        text: `${fremdeErfassung ? "Die angefangene Erfassung" : "Der angefangene Bogen"} „${einheitAnzeigename(bogen.einheit)}" wird durch ${a.was} ersetzt. ${folgen.satz}`,
+        text: `${
+          bearbeiteteVorlage
+            ? `Die Bearbeitung der Vorlage „${bearbeiteteVorlage.name}"`
+            : `${fremdeErfassung ? "Die angefangene Erfassung" : "Der angefangene Bogen"} „${einheitAnzeigename(bogen.einheit)}"`
+        } wird durch ${a.was} ersetzt. ${folgen.satz}`,
         ok: a.ok,
         gefahr: folgen.verlust,
       });
@@ -1166,14 +1224,37 @@ function AppInhalt() {
     // 14 Stunden „Verwerfen" statt „Fortsetzen" trifft, hat ihn morgen wieder.
     // Ausnahme: eine fremde Erfassung, die dort den eigenen Bogen verdrängen würde.
     const folgen = bogenHatInhalt(bogen) ? folgenFuerOffenenBogen() : { satz: "", verlust: false };
+    // Vorlagen-Bearbeitung: „Verwerfen" heißt hier „Bearbeitung beenden" —
+    // die Vorlage bleibt gespeichert, der eigene Bogen auf dem Rückholplatz
+    // ebenso (R3-D1).
+    const vorlage = bearbeiteteVorlage;
+    const unveraendert = vorlageUnveraendert();
     const sicher = await frageJaNein({
-      titel: fremdeErfassung ? "Angefangene Erfassung verwerfen?" : "Angefangenen Bogen verwerfen?",
-      text: `„${einheitAnzeigename(bogen.einheit)}" wird geschlossen. ${folgen.satz}`,
-      ok: "Verwerfen",
-      gefahr: true,
+      titel: vorlage ? "Bearbeitung der Vorlage beenden?" : fremdeErfassung ? "Angefangene Erfassung verwerfen?" : "Angefangenen Bogen verwerfen?",
+      text: vorlage
+        ? `Die Bearbeitung der Vorlage „${vorlage.name}" wird beendet. ${folgen.satz}`
+        : `„${einheitAnzeigename(bogen.einheit)}" wird geschlossen. ${folgen.satz}`,
+      ok: vorlage ? "Bearbeitung beenden" : "Verwerfen",
+      gefahr: vorlage ? folgen.verlust : true,
     });
     if (!sicher) return;
     const gemerkt = bogenHatInhalt(bogen) && merkeVerdraengt(bogen);
+    if (vorlage) {
+      setBogen(null);
+      setVorlageInBearbeitung(null);
+      setzeEmpfang(null);
+      setSchritt(0);
+      setMeldung(
+        [
+          `Bearbeitung der Vorlage „${vorlage.name}" beendet — die Vorlage ist unverändert.`,
+          !unveraendert && gemerkt ? "Die nicht übernommenen Änderungen liegen unten auf der Startseite zum Zurückholen." : "",
+          eigenerBogenWartetHinweis(),
+        ]
+          .filter(Boolean)
+          .join(" "),
+      );
+      return;
+    }
     setBogen(null); // löscht auch die Entwurfssicherung (siehe oben)
     setVorlageInBearbeitung(null);
     setFremdeErfassung(false);
@@ -2085,7 +2166,7 @@ function AppInhalt() {
   /**
    * Bögen aus einer Datei lesen — für die Aufnahme in einen Einsatz. Bei einer
    * PDF zuerst die eingebetteten Daten, ersatzweise die QR-Codes darin (der
-   * Rückfallweg, siehe {@link ladePdfBogen}); sonst JSON. Der Signaturstatus
+   * Rückfallweg, siehe {@link ladePdfQr}); sonst JSON. Der Signaturstatus
    * reist beim QR-Weg mit, damit der Meldekopf die fremde Meldung später mit
    * erhaltener Original-Signatur weiterreichen kann.
    */
@@ -2478,6 +2559,11 @@ function AppInhalt() {
               />
               <span className="entwurf-text">
                 <strong>{einheitAnzeigename(bogen.einheit)}</strong>
+                {/* Vorlagen-Bearbeitung: Die Karte trug denselben Titel wie der
+                    eigene Bogen darunter und wurde als Doppelung verworfen (R3-D1). */}
+                {bearbeiteteVorlage && (
+                  <span className="hinweis warnung-text">Bearbeitung der Vorlage „{bearbeiteteVorlage.name}" — kein Einsatzbogen</span>
+                )}
                 {/* Eine fremde Einheit ist nicht „mein Bogen" — die Karte sagt es (R2-E3). */}
                 {fremdeErfassung && (
                   <span className="hinweis">

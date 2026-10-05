@@ -146,7 +146,9 @@ Grundlage: Repository `wattnpapa/erfassungsbogen`, Stand 2026-09-12 — Version 
 > nur noch nach Rückfrage, auch bei laufender App und beim Kaltstart. Vorher
 > konnte ein Link den eigenen Bogen still ersetzen bzw. einen Bogen vom
 > Rückholplatz löschen, bevor ein Dialog erschien. Weniger ungewollte
-> Löschung, kein neuer Speicherort. Geändert: 5.7.
+> Löschung, kein neuer Speicherort. Ebenso: Eine unbrauchbare Datei bei
+> „Aus Datei laden…" und das Beenden einer Vorlagen-Bearbeitung schieben den
+> eigenen Bogen nicht mehr vom Rückholplatz (R3-E2, R3-D1). Geändert: 5.7.
 
 ## Hinweis zu diesem Dokument
 
@@ -513,7 +515,9 @@ Kapitel 6 der [Arc42-Dokumentation](arc42-architektur.md).
   in keiner Sammlung und muss neu erfasst werden (`src/app/entwurf.ts`).
   Ein eingehender Bogen (Link, Scan, Datei) verdrängt den angefangenen
   Bogen erst nach Rückfrage — seit 2026-10-05 auch bei laufender App und
-  beim Kaltstart über einen Link (R3-S1, R3-D2).
+  beim Kaltstart über einen Link (R3-S1, R3-D2). Eine Datei wird vor der
+  Rückfrage gelesen (R3-E2); die Bearbeitung einer gespeicherten Vorlage
+  verdrängt dort keinen eigenen Bogen (R3-D1).
 - **Empfehlung:** eine eigene, dokumentierte Löschfrist für digital gespeicherte
   Bögen und für Papierausdrucke festlegen, da die Software selbst keine erzwingt.
 - **Geräteschlüssel:** Der private Signaturschlüssel lässt sich einzeln

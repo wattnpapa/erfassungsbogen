@@ -1590,6 +1590,33 @@ describe("Bogen aus einer PDF laden (Startseite, „Aus Datei laden“)", () => 
     expect((await screen.findAllByText(/OV Dreiteilig/)).length).toBeGreaterThan(0);
   });
 
+  /**
+   * Audit Runde 3, R3-E2: Die Rückfrage kam vor dem Lesen. Nach „Datei
+   * öffnen" scheiterte die Datei, auf dem Rückholplatz lag eine Kopie des
+   * offenen Bogens, der dort liegende war gelöscht.
+   */
+  it("liest die Datei vor der Rückfrage; eine unbrauchbare Datei lässt Arbeitsplatz und Rückholplatz unberührt (R3-E2)", async () => {
+    const { entwurfZuJson } = await import("./entwurf");
+    localStorage.setItem("eeb.entwurf.ersetzt.v1", entwurfZuJson(bogenMitName("Haßmersheim"), Date.now() - 60_000));
+    const nutzer = userEvent.setup();
+    render(<App />);
+    await nutzer.click(screen.getByRole("button", { name: "Neuen Bogen erstellen" }));
+    await nutzer.type(screen.getByLabelText("Name (Pflicht)"), "Bamberg");
+    await nutzer.click(screen.getByRole("button", { name: "‹ Startseite" }));
+
+    const kaputt = new File(['{"schemaVersion": 9, "einheit": {'], "abgeschnitten.json", { type: "application/json" });
+    await nutzer.upload(screen.getByLabelText("Aus Datei laden…"), kaputt);
+    expect(await screen.findByText(/abgeschnitten\.json/)).toBeDefined();
+    expect(document.querySelector("dialog[aria-label='Bogen aus Datei öffnen?']")).toBeNull();
+    expect(localStorage.getItem("eeb.entwurf.v1")).toContain("Bamberg");
+    expect(localStorage.getItem("eeb.entwurf.ersetzt.v1")).toContain("Haßmersheim");
+
+    // Eine lesbare Datei fragt danach wie gewohnt.
+    await nutzer.upload(screen.getByLabelText("Aus Datei laden…"), pdfDatei(bogenMitName("OV Papier-PDF")));
+    const frage = await screen.findByRole("dialog", { name: "Bogen aus Datei öffnen?" });
+    expect(frage.textContent).toContain("THW Haßmersheim");
+  });
+
   it("erklärt verständlich, wenn in der PDF weder Daten noch ein QR-Code stecken", async () => {
     const nutzer = userEvent.setup();
     render(<App />);
@@ -1820,7 +1847,44 @@ describe("Vorlage bearbeiten (Karte in „Gespeicherte Vorlagen“)", () => {
     await nutzer.click(screen.getByRole("button", { name: /^6\. Übersicht/ }));
     expect(screen.getByRole("button", { name: "Als Vorlage speichern" })).toBeDefined();
     expect(screen.queryByRole("button", { name: "Vorlage aktualisieren" })).toBeNull();
+    // Die unveränderte Vorlagen-Kopie hat den eigenen Bogen nicht vom Rückholplatz geschoben (R3-D1).
+    expect(localStorage.getItem("eeb.entwurf.ersetzt.v1")).toContain("Angefangenhausen");
   });
+
+  /**
+   * Audit Runde 3, R3-D1: Vorlage bearbeiten, zurück zur Startseite,
+   * „Verwerfen" — auf dem Rückholplatz lag danach die unveränderte
+   * Vorlagen-Kopie, der echte Einsatzbogen war gelöscht.
+   */
+  it("beendet mit „Verwerfen“ nur die Vorlagen-Bearbeitung; der eigene Bogen bleibt zurückholbar (R3-D1)", async () => {
+    const v = vorlageAnlegen("OV Ulm B", bogenMitName("Ulm"));
+    const vorlageVorher = JSON.stringify(vorlagenLaden().find((x) => x.id === v.id)!.bogen);
+    const nutzer = userEvent.setup();
+    render(<App />);
+    await nutzer.click(screen.getByRole("button", { name: "Neuen Bogen erstellen" }));
+    await nutzer.type(screen.getByLabelText("Name (Pflicht)"), "Ulm");
+    await nutzer.click(screen.getByRole("button", { name: "Weiter →" }));
+    await nutzer.type(document.getElementById("feld-ort-auftrag")!, "ECHTER EINSATZ Deichsicherung");
+    await nutzer.click(screen.getByRole("button", { name: "‹ Startseite" }));
+
+    await nutzer.click(screen.getByRole("button", { name: "Bearbeiten" }));
+    await nutzer.click(within(rueckfrage("Vorlage bearbeiten?")).getByRole("button", { name: "Vorlage bearbeiten" }));
+    await nutzer.click(screen.getByRole("button", { name: "‹ Startseite" }));
+    // Die Karte ist als Vorlagen-Bearbeitung erkennbar.
+    expect(screen.getByText(/Bearbeitung der Vorlage „OV Ulm B"/)).toBeDefined();
+
+    await nutzer.click(screen.getByRole("button", { name: "Verwerfen" }));
+    const frage = rueckfrage("Bearbeitung der Vorlage beenden?");
+    expect(frage.textContent).toContain("bleibt unverändert gespeichert");
+    expect(frage.textContent).toContain("ECHTER EINSATZ Deichsicherung");
+    await nutzer.click(within(frage).getByRole("button", { name: "Bearbeitung beenden" }));
+
+    const rueck = localStorage.getItem("eeb.entwurf.ersetzt.v1") ?? "";
+    expect(rueck).toContain("ECHTER EINSATZ Deichsicherung");
+    expect(JSON.stringify(vorlagenLaden().find((x) => x.id === v.id)!.bogen)).toBe(vorlageVorher);
+    await nutzer.click(screen.getByRole("button", { name: "Zuletzt verdrängten Bogen zurückholen" }));
+    expect((await screen.findAllByText(/ECHTER EINSATZ Deichsicherung/)).length).toBeGreaterThan(0);
+  }, 20000);
 });
 
 describe("Bögen aus einer PDF in einen Einsatz übernehmen", () => {
