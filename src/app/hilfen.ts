@@ -1161,9 +1161,16 @@ export function personUnbenannt(p: Person): boolean {
   );
 }
 
-/** Wie `personUnbenannt`, für ein Fahrzeug: das Kennzeichen ist das, was die Vorbelegung offen lässt. */
+/**
+ * Wie `personUnbenannt`, für ein Fahrzeug: Die Vorbelegung setzt Typ,
+ * „Ausstattung nach StAN" und den Funkrufnamen, lässt aber Kennzeichen,
+ * Sondergerät und Sitzplätze offen. Steht in einem davon etwas, ist das
+ * Fahrzeug Inhalt. Vorher zählte nur das Kennzeichen: „Vorbelegung entfernen"
+ * nahm einen GKW samt eingetragenem Sondergerät ohne Rückfrage mit (Audit
+ * Runde 3, R3-N2), ebenso der Wechsel des Einheitstyps.
+ */
 export function fahrzeugUnbenannt(f: Fahrzeug): boolean {
-  return !f.kennzeichen?.trim();
+  return !f.kennzeichen?.trim() && !f.aenderungen?.trim() && f.sitzplaetze == null;
 }
 
 /** Wie `personLeer`, für ein Fahrzeug. */

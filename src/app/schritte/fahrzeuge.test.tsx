@@ -51,6 +51,40 @@ describe("Schritt Fahrzeuge", () => {
     expect(document.querySelector(".quittung-daumen")!.textContent).toMatch(/^Zurückgeholt: .*THW-80125/);
   });
 
+  it("„Vorbelegung entfernen“ lässt Fahrzeuge mit Sondergerät stehen und bietet „Rückgängig“ (R3-N2)", async () => {
+    const nutzer = userEvent.setup();
+    const { typ, vorlage } = stanTyp();
+    const start = neuerBogen();
+    start.einheit.organisation = OrganisationsTyp.THW;
+    start.einheit.einheitsTyp = { code: typ.code };
+    start.fahrzeuge = [
+      { ...vorlage[0]!, aenderungen: "Lichtmast 2 kW, Tauchpumpe TP 4" },
+      { ...neuesFahrzeug(), kennzeichen: "THW-80125" },
+      { ...vorlage[0]! },
+    ];
+    render(<SchrittBuehne komponente={SchrittFahrzeuge} bogen={start} />);
+    const sondergeraet = () => (screen.getAllByLabelText("Änderungen bzw. Sondergerät") as HTMLInputElement[]).map((f) => f.value);
+    const kennzeichen = () => (screen.getAllByLabelText("Kennzeichen") as HTMLInputElement[]).map((f) => f.value);
+
+    // Der Knopf steht unter der Liste, nicht als erster Knopf des Schritts.
+    const knopf = screen.getByRole("button", { name: "Vorbelegung entfernen (1 Fahrzeug ohne eigene Angaben)" });
+    const hinzufuegen = screen.getByRole("button", { name: "+ Fahrzeug hinzufügen" });
+    expect(hinzufuegen.compareDocumentPosition(knopf) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(knopf.parentElement!.textContent).toMatch(/Ein Fahrzeug ohne Kennzeichen bleibt — dort ist schon Sondergerät/);
+
+    await nutzer.click(knopf);
+    expect(document.querySelector("dialog[open]")).toBeNull();
+    expect(sondergeraet()).toEqual(["Lichtmast 2 kW, Tauchpumpe TP 4", ""]);
+    expect(kennzeichen()).toEqual(["", "THW-80125"]);
+
+    const leiste = document.querySelector<HTMLElement>(".quittung-daumen")!;
+    expect(leiste.textContent).toMatch(/^Vorbelegung entfernt:/);
+    await nutzer.click(within(leiste).getByRole("button", { name: "Rückgängig" }));
+    expect(screen.getAllByLabelText("Kennzeichen")).toHaveLength(3);
+    expect(kennzeichen()).toEqual(["", "THW-80125", ""]);
+    expect(document.querySelector(".quittung-daumen")!.textContent).toMatch(/^Zurückgeholt:/);
+  });
+
   it("legt ein Fahrzeug an und mahnt das fehlende Kennzeichen an", async () => {
     const nutzer = userEvent.setup();
     buehne();

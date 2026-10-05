@@ -240,33 +240,103 @@ export function SchrittFahrzeuge({ bogen, aendern }: SchrittProps) {
   // Weg zurück. „Rückgängig" setzt das Fahrzeug an seine alte Stelle und
   // lässt später Eingetragenes stehen; die Leiste bleibt bis ✕, bis zum
   // nächsten Entfernen oder bis der Schritt verlassen wird.
-  const [rueckweg, setRueckweg] = useState<{ fahrzeug: Fahrzeug; index: number; name: string; nonce: number } | null>(null);
+  //
+  // Derselbe Rückweg trägt auch „Vorbelegung entfernen" (R3-N2): Dort gehen
+  // mehrere Fahrzeuge auf einmal, jedes kommt an seine alte Stelle zurück.
+  const [rueckweg, setRueckweg] = useState<{
+    eintraege: { fahrzeug: Fahrzeug; index: number }[];
+    text: string;
+    name: string;
+    nonce: number;
+  } | null>(null);
   const [zurueckgeholt, setZurueckgeholt] = useState<{ text: string; nonce: number } | null>(null);
   const rueckgaengig = () => {
     if (!rueckweg) return;
     const liste = [...bogen.fahrzeuge];
-    const stelle = Math.min(rueckweg.index, liste.length);
-    liste.splice(stelle, 0, rueckweg.fahrzeug);
+    // Aufsteigend einsetzen: Jede Stelle bezieht sich auf die Liste vor dem
+    // Entfernen, in der die früheren Einträge schon wieder stehen.
+    for (const { fahrzeug, index } of [...rueckweg.eintraege].sort((a, b) => a.index - b.index)) {
+      liste.splice(Math.min(index, liste.length), 0, fahrzeug);
+    }
     setRueckweg(null);
-    setFrisch(rueckweg.fahrzeug);
+    const [einziges] = rueckweg.eintraege;
+    setFrisch(rueckweg.eintraege.length === 1 && einziges ? einziges.fahrzeug : null);
     setZurueckgeholt({ text: `Zurückgeholt: ${rueckweg.name}`, nonce: Date.now() });
     aendern({ fahrzeuge: liste });
+  };
+  /**
+   * „Vorbelegung entfernen": nur Fahrzeuge, an denen außer der Vorbelegung
+   * nichts eingetragen ist (kein Kennzeichen, kein Sondergerät, keine
+   * Sitzplätze). Vorher nahm der Knopf alles ohne Kennzeichen mit, samt
+   * Sondergerät, ohne Rückfrage und ohne Rückweg (Audit Runde 3, R3-N2).
+   */
+  const vorbelegungEntfernen = () => {
+    const weg = bogen.fahrzeuge.flatMap((fahrzeug, index) => (fahrzeugUnbenannt(fahrzeug) ? [{ fahrzeug, index }] : []));
+    if (weg.length === 0) return;
+    aendern({ fahrzeuge: bogen.fahrzeuge.filter((f) => !fahrzeugUnbenannt(f)) });
+    const [erstes] = weg;
+    const name = weg.length === 1 && erstes ? fahrzeugBezeichnung(erstes.fahrzeug, erstes.index, bogen.einheit.organisation) : `${weg.length} Fahrzeuge der Vorbelegung`;
+    setZurueckgeholt(null);
+    setRueckweg({ eintraege: weg, text: "Vorbelegung entfernt:", name, nonce: Date.now() });
   };
   const vorlage = fahrzeugVorbelegung(bogen.einheit);
   const ovKennzahl = funkrufOrtsverband(bogen.einheit)?.kennzahl;
   const stanGeladen = vorbelegungGeladen(bogen.fahrzeuge, vorlage);
   const unbenannte = bogen.fahrzeuge.filter(fahrzeugUnbenannt).length;
+  const mitInhaltOhneKennzeichen = bogen.fahrzeuge.filter((f) => !f.kennzeichen?.trim() && !fahrzeugUnbenannt(f)).length;
   return (
     <section className="karte">
       <h2>4. Fahrzeuge</h2>
       <Transportbilanz bogen={bogen} />
-      {/* Der Rückweg zur Vorbelegung aus Schritt 1, wie im Personal-Schritt:
-          entfernt nur Fahrzeuge ohne Kennzeichen — deshalb ohne Rückfrage. */}
+      {bogen.fahrzeuge.map((f, i) => (
+        <FahrzeugKarte
+          key={i}
+          fahrzeug={f}
+          org={bogen.einheit.organisation}
+          standort={einheitOrt(bogen.einheit)}
+          ovKennzahl={ovKennzahl}
+          frisch={f === frisch}
+          index={i}
+          anzahl={bogen.fahrzeuge.length}
+          aendern={(nf) => aendern({ fahrzeuge: bogen.fahrzeuge.map((x, j) => (j === i ? nf : x)) })}
+          entfernen={() => {
+            aendern({ fahrzeuge: bogen.fahrzeuge.filter((_, j) => j !== i) });
+            if (fahrzeugLeer(f)) return;
+            setZurueckgeholt(null);
+            setRueckweg({ eintraege: [{ fahrzeug: f, index: i }], text: "Entfernt:", name: fahrzeugBezeichnung(f, i, bogen.einheit.organisation), nonce: Date.now() });
+          }}
+        />
+      ))}
+      <button
+        type="button"
+        className="primaer"
+        onClick={() => {
+          // Die neue Karte erscheint ÜBER dem Knopf, den man gerade gedrückt
+          // hat — der Blick liegt unten. Der Stempel sagt, wohin er soll.
+          const neu = neuesFahrzeug();
+          setFrisch(neu);
+          aendern({ fahrzeuge: [...bogen.fahrzeuge, neu] });
+        }}
+      >
+        + Fahrzeug hinzufügen
+      </button>
+      {/* Vorbelegungs-Knöpfe unter der Liste, wie in Schritt 3 (R2-N8): Oben
+          war „Vorbelegung entfernen" der erste und größte Knopf des Schritts
+          und wurde als „Vorschläge ausblenden" gelesen (R3-N2). Der Rückweg
+          zur Vorbelegung aus Schritt 1 entfernt nur Fahrzeuge ohne eigene
+          Angaben — deshalb ohne Rückfrage, aber mit „Rückgängig". */}
       {unbenannte > 0 && (
         <p>
-          <button type="button" onClick={() => aendern({ fahrzeuge: bogen.fahrzeuge.filter((f) => !fahrzeugUnbenannt(f)) })}>
-            Vorbelegung entfernen ({unbenannte === 1 ? "1 Fahrzeug ohne Kennzeichen" : `${unbenannte} Fahrzeuge ohne Kennzeichen`})
+          <button type="button" onClick={vorbelegungEntfernen}>
+            Vorbelegung entfernen ({unbenannte === 1 ? "1 Fahrzeug ohne eigene Angaben" : `${unbenannte} Fahrzeuge ohne eigene Angaben`})
           </button>
+          {mitInhaltOhneKennzeichen > 0 && (
+            <span className="hinweis">
+              {" "}
+              {mitInhaltOhneKennzeichen === 1 ? "Ein Fahrzeug ohne Kennzeichen bleibt" : `${mitInhaltOhneKennzeichen} Fahrzeuge ohne Kennzeichen bleiben`} —
+              dort ist schon Sondergerät oder eine Sitzplatzzahl eingetragen.
+            </span>
+          )}
         </p>
       )}
       {vorlage.length > 0 && (
@@ -299,42 +369,10 @@ export function SchrittFahrzeuge({ bogen, aendern }: SchrittProps) {
           )}
         </p>
       )}
-      {bogen.fahrzeuge.map((f, i) => (
-        <FahrzeugKarte
-          key={i}
-          fahrzeug={f}
-          org={bogen.einheit.organisation}
-          standort={einheitOrt(bogen.einheit)}
-          ovKennzahl={ovKennzahl}
-          frisch={f === frisch}
-          index={i}
-          anzahl={bogen.fahrzeuge.length}
-          aendern={(nf) => aendern({ fahrzeuge: bogen.fahrzeuge.map((x, j) => (j === i ? nf : x)) })}
-          entfernen={() => {
-            aendern({ fahrzeuge: bogen.fahrzeuge.filter((_, j) => j !== i) });
-            if (fahrzeugLeer(f)) return;
-            setZurueckgeholt(null);
-            setRueckweg({ fahrzeug: f, index: i, name: fahrzeugBezeichnung(f, i, bogen.einheit.organisation), nonce: Date.now() });
-          }}
-        />
-      ))}
-      <button
-        type="button"
-        className="primaer"
-        onClick={() => {
-          // Die neue Karte erscheint ÜBER dem Knopf, den man gerade gedrückt
-          // hat — der Blick liegt unten. Der Stempel sagt, wohin er soll.
-          const neu = neuesFahrzeug();
-          setFrisch(neu);
-          aendern({ fahrzeuge: [...bogen.fahrzeuge, neu] });
-        }}
-      >
-        + Fahrzeug hinzufügen
-      </button>
       <Hinweise hinweise={fahrzeugHinweise(bogen)} />
       {rueckweg && (
         <DaumenQuittung key={`fahrzeug:${rueckweg.nonce}`} onRueckgaengig={rueckgaengig} onSchliessen={() => setRueckweg(null)}>
-          <strong>Entfernt:</strong> {rueckweg.name}
+          <strong>{rueckweg.text}</strong> {rueckweg.name}
         </DaumenQuittung>
       )}
       {zurueckgeholt && !rueckweg && (

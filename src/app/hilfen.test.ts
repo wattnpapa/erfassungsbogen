@@ -851,6 +851,13 @@ describe("personUnbenannt() / fahrzeugUnbenannt()", () => {
     expect(fahrzeugUnbenannt({ typ: { code: 4 }, kennzeichen: "THW-84397" })).toBe(false);
     expect(fahrzeugUnbenannt({ typ: {}, kennzeichen: "  " })).toBe(true);
   });
+
+  it("zählt Sondergerät und Sitzplätze ohne Kennzeichen als Inhalt (R3-N2)", () => {
+    const vorbelegt = { typ: { code: 4 }, stanKonform: true, funkrufname: { kennwort: { code: 1 }, eigenerStandort: true, teile: [22, 51] } };
+    expect(fahrzeugUnbenannt({ ...vorbelegt, aenderungen: "Lichtmast 2 kW" })).toBe(false);
+    expect(fahrzeugUnbenannt({ ...vorbelegt, sitzplaetze: 6 })).toBe(false);
+    expect(fahrzeugUnbenannt({ ...vorbelegt, aenderungen: "  " })).toBe(true);
+  });
 });
 
 describe("pruefpunkte: weitere Tippfehler (R2-E4)", () => {
