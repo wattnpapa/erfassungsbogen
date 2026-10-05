@@ -240,6 +240,19 @@ export function entwurfUeberschreibenErlauben(): void {
   eigenerStand = undefined;
 }
 
+/**
+ * Der gespeicherte Entwurf, wenn ihn ein ANDERES Fenster geschrieben hat und
+ * dieses Fenster ihn nicht kennt — etwa ein früher geöffneter Tab, dessen
+ * Startseite ohne Entwurf geladen wurde. Ohne diese Prüfung überschrieb so
+ * ein Tab beim Anlegen eines neuen Bogens den Entwurf des anderen Fensters
+ * still (Audit Runde 3, R3-S3). null = nichts Fremdes gespeichert.
+ */
+export function entwurfAusAnderemFenster(jetzt: EebZeitpunkt = datenschutzZeitpunkt()): Entwurf | null {
+  const roh = speicher()?.getItem(SPEICHER_SCHLUESSEL) ?? null;
+  if (roh === null || roh === eigenerStand) return null;
+  return entwurfLaden(jetzt);
+}
+
 /** Speicherschlüssel des Entwurfs — für den Abgleich über das `storage`-Ereignis. */
 export const ENTWURF_SCHLUESSEL = SPEICHER_SCHLUESSEL;
 

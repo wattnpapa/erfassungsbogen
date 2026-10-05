@@ -1039,6 +1039,9 @@ flowchart TB
   gespeicherten Vorlage unverändert gar nicht und verändert nur ohne eigenen
   Bogen auf den Rückholplatz (R3-D1); „Aus Datei laden…" fragt erst nach
   dem Lesen (R3-E2).
+  Zwei Fenster: `entwurfAusAnderemFenster` erkennt einen Entwurf, den dieses
+  Fenster nicht selbst geschrieben hat; vor dem Anlegen eines neuen Bogens
+  fragt die App und legt ihn auf den Rückholplatz (R3-S3).
 - **Folgemeldungen** (`eintrag-zeiten.ts`): Jeder Eingang in eine Sammlung —
   Scan, Link, Datei, Bilderstapel, „In Einsatz aufnehmen" — läuft über
   `meldungAufnehmen`. Eine neue Fassung derselben Einheit erbt dort

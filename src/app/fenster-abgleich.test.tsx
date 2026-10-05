@@ -9,7 +9,7 @@ import { useEffect, useState } from "react";
 import { act, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { neuerBogen } from "./hilfen";
-import { ENTWURF_SCHLUESSEL, entwurfSpeichern, entwurfVerwerfen, entwurfZuJson } from "./entwurf";
+import { ENTWURF_SCHLUESSEL, entwurfAusAnderemFenster, entwurfSpeichern, entwurfVerwerfen, entwurfZuJson } from "./entwurf";
 import { FensterKonflikt, useFensterAbgleich } from "./fenster-abgleich";
 
 /** Nachbau des Autosave aus app.tsx: speichert bei jeder Änderung und bei jeder Entscheidung. */
@@ -94,5 +94,19 @@ describe("Fensterabgleich", () => {
     anderesFensterSchreibt("eeb.einsaetze.v1", "[]");
     expect(neuLaden).toHaveBeenCalledTimes(1);
     expect(screen.queryByRole("alert")).toBeNull();
+  });
+  // Audit Runde 3, R3-S3: Ein Tab ohne eigenen Bogen kannte den Entwurf des
+  // anderen Fensters nicht und überschrieb ihn beim Anlegen still.
+  it("erkennt einen Entwurf, den nur ein anderes Fenster geschrieben hat", () => {
+    expect(entwurfAusAnderemFenster()).toBeNull();
+    const b = neuerBogen();
+    b.einsatz.ortAuftrag = "Ort aus Fenster A";
+    localStorage.setItem(ENTWURF_SCHLUESSEL, entwurfZuJson(b));
+    expect(entwurfAusAnderemFenster()?.bogen.einsatz.ortAuftrag).toBe("Ort aus Fenster A");
+    // Den eigenen Stand erkennt das Fenster als eigenen.
+    entwurfVerwerfen();
+    localStorage.clear();
+    entwurfSpeichern(b);
+    expect(entwurfAusAnderemFenster()).toBeNull();
   });
 });

@@ -91,6 +91,7 @@ import { dateiImportMeldung, istBilddatei, qrStapelLesen, stapelBericht as stape
 import { StapelQuittung } from "./stapel-quittung";
 import { EintreffzeitFeld, aehnlicherOrt, eintreffzeitAusUhrzeit } from "./nacherfassung";
 import {
+  entwurfAusAnderemFenster,
   entwurfLaden,
   entwurfSpeichern,
   entwurfVerwerfen,
@@ -98,6 +99,7 @@ import {
   ersetztenEntwurfMerken,
   rueckholungNimmt,
   ersetztenEntwurfVerwerfen,
+  entwurfUeberschreibenErlauben,
   type Entwurf,
 } from "./entwurf";
 import { SeitenKopf } from "./seiten-kopf";
@@ -1106,6 +1108,7 @@ function AppInhalt() {
     // Tipp in der fremden Sammlung (Audit Runde 3, R3-S2). Wege, die wieder
     // für eine Sammlung erfassen, setzen das Ziel danach neu.
     if (!bogen || !bogenHatInhalt(bogen)) {
+      if (!a.tausch && !(await anderesFensterFreigeben(a))) return false;
       setVorlageInBearbeitung(null);
       setFremdeErfassung(false);
       setSammelZiel(null);
@@ -1131,6 +1134,41 @@ function AppInhalt() {
     setFremdeErfassung(false);
     setSammelZiel(null);
     setErfassungBeginn(null);
+    return true;
+  }
+
+  /**
+   * Dieses Fenster hat keinen Bogen offen, im Speicher steht aber der Entwurf
+   * eines anderen Fensters (zweiter Tab, früher geöffnet). Vorher legte dieser
+   * Tab ohne Frage einen neuen Bogen an und überschrieb den anderen Entwurf
+   * mit dem nächsten Speichern (Audit Runde 3, R3-S3). Jetzt: Rückfrage mit
+   * Namen, dann wandert der fremde Stand auf den Rückholplatz.
+   */
+  async function anderesFensterFreigeben(a: { titel: string; was: string; ok: string; ohneFrage?: boolean }): Promise<boolean> {
+    const anderes = entwurfAusAnderemFenster();
+    if (!anderes || !bogenHatInhalt(anderes.bogen)) return true;
+    const name = einheitAnzeigename(anderes.bogen.einheit);
+    const alt = ersetztenEntwurfLaden();
+    const nimmt = rueckholungNimmt(!!anderes.fremd, alt);
+    const altZaehlt = !!alt && bogenHatInhalt(alt.bogen);
+    const folge = !nimmt
+      ? ` Als Erfassung einer fremden Einheit wird sie dabei verworfen; dein Bogen „${einheitAnzeigename(alt!.bogen.einheit)}" bleibt zurückholbar.`
+      : ` „${name}" bleibt auf der Startseite unter „Zuletzt verdrängten Bogen zurückholen" erreichbar.${
+          altZaehlt ? ` Der dort bisher liegende Bogen „${einheitAnzeigename(alt!.bogen.einheit)}" wird dabei endgültig gelöscht.` : ""
+        }`;
+    if (!a.ohneFrage) {
+      const stand = new Date(anderes.gespeichert).toLocaleString("de-DE", { dateStyle: "short", timeStyle: "short" });
+      const ja = await frageJaNein({
+        titel: a.titel || "Bogen aus einem anderen Fenster",
+        text: `In einem anderen Fenster ist „${name}" angefangen (Stand ${stand} Uhr). Er wird durch ${a.was || "den neuen Bogen"} ersetzt.${folge}`,
+        ok: a.ok || "Ersetzen",
+        gefahr: !nimmt || altZaehlt,
+      });
+      if (!ja) return false;
+    }
+    if (nimmt && ersetztenEntwurfMerken(anderes.bogen, anderes.fremd)) setErsetzterEntwurf(ersetztenEntwurfLaden());
+    // Der nächste eigene Stand darf den fremden jetzt überschreiben — er liegt gesichert.
+    entwurfUeberschreibenErlauben();
     return true;
   }
 

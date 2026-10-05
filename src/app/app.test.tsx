@@ -793,6 +793,27 @@ describe("Assistenten-Durchlauf", () => {
     expect(screen.queryByText(/ist vorbei — gilt dieser Bogen noch/)).toBeNull();
   }, 20000);
 
+  /**
+   * Audit Runde 3, R3-S3: Ein früher geöffneter Tab ohne Bogen legte einen
+   * neuen an und überschrieb den Entwurf des anderen Tabs ohne Frage.
+   */
+  it("legt den Entwurf eines anderen Fensters vor dem Anlegen auf den Rückholplatz — nach Rückfrage (R3-S3)", async () => {
+    const nutzer = userEvent.setup();
+    render(<App />);
+    const { entwurfZuJson } = await import("./entwurf");
+    // Das andere Fenster schreibt seinen Bogen, dieses Fenster zeigt weiter die Startseite.
+    localStorage.setItem("eeb.entwurf.v1", entwurfZuJson(bogenMitName("TabA")));
+
+    await nutzer.click(screen.getByRole("button", { name: "Neuen Bogen erstellen" }));
+    const frage = await screen.findByRole("dialog", { name: "Neuen Bogen anfangen?" });
+    expect(frage.textContent).toContain("In einem anderen Fenster ist „THW TabA\" angefangen");
+    await nutzer.click(within(frage).getByRole("button", { name: "Neu anfangen" }));
+    await nutzer.type(screen.getByLabelText("Name (Pflicht)"), "TabB");
+
+    expect(localStorage.getItem("eeb.entwurf.v1")).toContain("TabB");
+    expect(localStorage.getItem("eeb.entwurf.ersetzt.v1")).toContain("TabA");
+  }, 20000);
+
   it("lässt einen unberührten Bogen ohne Rückfrage ersetzen", async () => {
     const nutzer = userEvent.setup();
     render(<App />);

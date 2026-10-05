@@ -155,6 +155,11 @@ Grundlage: Repository `wattnpapa/erfassungsbogen`, Stand 2026-09-12 — Version 
 > Zeitpunkt, zu dem die Erfassung begann; er dient als Vorschlag für die
 > Eintreffzeit. Keine Personendaten, gleiche Frist wie der Entwurf.
 > Geändert: 5.7.
+>
+> **Nachgezogen 2026-10-05 — Zweites Fenster (R3-S3):** Ein Fenster ohne
+> eigenen Bogen legt den Entwurf eines anderen Fensters vor dem Anlegen
+> eines neuen Bogens nach Rückfrage auf den Rückholplatz, statt ihn still zu
+> überschreiben. Kein neuer Speicherort. Geändert: 5.7.
 
 ## Hinweis zu diesem Dokument
 
@@ -525,6 +530,9 @@ Kapitel 6 der [Arc42-Dokumentation](arc42-architektur.md).
   beim Kaltstart über einen Link (R3-S1, R3-D2). Eine Datei wird vor der
   Rückfrage gelesen (R3-E2); die Bearbeitung einer gespeicherten Vorlage
   verdrängt dort keinen eigenen Bogen (R3-D1).
+  Ein zweites Fenster ohne eigenen Bogen überschreibt den Entwurf eines
+  anderen Fensters nicht still, sondern legt ihn nach Rückfrage auf den
+  Rückholplatz (R3-S3).
 - **Empfehlung:** eine eigene, dokumentierte Löschfrist für digital gespeicherte
   Bögen und für Papierausdrucke festlegen, da die Software selbst keine erzwingt.
 - **Geräteschlüssel:** Der private Signaturschlüssel lässt sich einzeln
