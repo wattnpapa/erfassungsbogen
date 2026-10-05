@@ -217,6 +217,13 @@ describe("Oldenburg-XLSX: Aufbau", () => {
     expect(zelle(blatt(einsatzOldenburgXlsx(s)), "AH1")).toBe("=SUBTOTAL(9,AH3:AH5)");
   });
 
+  it("speichert das Summenergebnis mit, für Vorschauen ohne Rechenwerk (R3-K7)", () => {
+    const s = sammlung([meldung(bogen()), meldung(bogen({ einheit: { ...bogen().einheit, einheitsTyp: { code: 4 } } }))]);
+    const b = blatt(einsatzOldenburgXlsx(s));
+    const ah = /<c r="AH1"[^>]*>(.*?)<\/c>/s.exec(b)?.[1] ?? "";
+    expect(ah).toMatch(/<f>SUBTOTAL\(9,AH3:AH4\)<\/f><v>-?\d+(\.\d+)?<\/v>/);
+  });
+
   it("bleibt bei einer leeren Sammlung eine gültige Datei", () => {
     const b = blatt(einsatzOldenburgXlsx(sammlung([])));
     expect(zelle(b, "A2")).toBe("FüSt.");

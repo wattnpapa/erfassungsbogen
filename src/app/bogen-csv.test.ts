@@ -109,7 +109,8 @@ describe("bogenCsvInhalt()", () => {
     const csv = bogenCsvInhalt(bogen());
     for (let z = 1; z <= 4; z++) {
       expect(spalte(csv, z, "Einheit")).toBe("THW Oldenburg Media Team");
-      expect(spalte(csv, z, "Stand")).toMatch(/^\d{6}[a-z]{3}\d{2}$/);
+      // Eine Zeitform in der ganzen Datei (R3-K7).
+      expect(spalte(csv, z, "Stand")).toMatch(/^\d{2}\.\d{2}\.\d{4}, \d{2}:\d{2}$/);
       expect(spalte(csv, z, "Übung")).toBe("nein");
     }
   });
@@ -127,7 +128,7 @@ describe("bogenCsvInhalt()", () => {
     expect(spalte(csv, 1, "Organisation")).toBe("THW");
     expect(spalte(csv, 1, "Standort")).toBe("Oldenburg");
     expect(spalte(csv, 1, "Telefon Einheit")).toBe("044112345");
-    expect(spalte(csv, 1, "Auftrag")).toBe("Deichverteidigung");
+    expect(spalte(csv, 1, "Ort/Auftrag (Bogen)")).toBe("Deichverteidigung");
     expect(spalte(csv, 1, "Zeitraum von")).toBe("10.04.2020");
     expect(spalte(csv, 1, "Personalerfassung")).toBe("Vollständig");
     expect(spalte(csv, 1, "Stärke F")).toBe("1");
@@ -258,8 +259,8 @@ describe("einsatzDetailCsvInhalt()", () => {
     );
     const einheiten = zeilen(csv)
       .slice(1)
-      .filter((z) => felder(z)[6] === "Einheit")
-      .map((z) => felder(z)[1]);
+      .filter((z) => felder(z)[7] === "Einheit")
+      .map((z) => felder(z)[2]);
     expect(einheiten).toEqual(["THW Alpha Media Team", "THW Zeta Media Team"]);
   });
 
@@ -275,6 +276,24 @@ describe("einsatzDetailCsvInhalt()", () => {
     expect(spalte(csv, 1, "Status")).toBe("Anwesend");
   });
 
+  it("führt Meldungsnummer, Eintreff-/Abrückzeit und Auftrag der Führungsstelle (R3-K7)", () => {
+    const csv = einsatzDetailCsvInhalt(
+      sammlung([
+        meldung(bogen("Alpha"), {
+          eingetroffenAm: new Date("2026-09-26T09:40").getTime(),
+          abgerueckAm: new Date("2026-09-27T15:10").getTime(),
+          status: MeldeStatus.ABGERUECKT,
+          notiz: "Deichabschnitt Nord",
+        }),
+      ]),
+    );
+    expect(spalte(csv, 1, "Meldung Nr.")).toBe("1");
+    expect(spalte(csv, 2, "Meldung Nr.")).toBe("1"); // auch auf der Personenzeile
+    expect(spalte(csv, 1, "Eingetroffen")).toBe("26.09.2026, 09:40");
+    expect(spalte(csv, 1, "Abgerückt")).toBe("27.09.2026, 15:10");
+    expect(spalte(csv, 1, "Auftrag/Notiz (Führungsstelle)")).toBe("Deichabschnitt Nord");
+  });
+
   it("nimmt abgerückte Einheiten mit auf und weist sie in der Status-Spalte aus", () => {
     const csv = einsatzDetailCsvInhalt(
       sammlung([
@@ -284,7 +303,7 @@ describe("einsatzDetailCsvInhalt()", () => {
     );
     const status = zeilen(csv)
       .slice(1)
-      .filter((z) => felder(z)[6] === "Einheit")
+      .filter((z) => felder(z)[7] === "Einheit")
       .map((z) => felder(z)[felder(zeilen(csv)[0]!).indexOf("Status")]);
     expect(status).toEqual(["Anwesend", "Abgerückt"]);
   });
@@ -295,7 +314,7 @@ describe("einsatzDetailCsvInhalt()", () => {
     const csv = einsatzDetailCsvInhalt(sammlung([meldung(alt), meldung(neu, { empfangenAm: 2000 })]));
     const personen = zeilen(csv)
       .slice(1)
-      .filter((z) => felder(z)[6] === "Person");
+      .filter((z) => felder(z)[7] === "Person");
     expect(personen).toHaveLength(1);
     expect(spalte(csv, 2, "Nachname")).toBe("Neu");
   });

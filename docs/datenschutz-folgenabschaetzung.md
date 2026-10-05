@@ -134,6 +134,12 @@ Grundlage: Repository `wattnpapa/erfassungsbogen`, Stand 2026-09-12 — Version 
 > „Alle Daten als CSV", Excel-Liste und Bogen-PDF). Kein neuer Empfänger;
 > der Freitext kann Personenbezug enthalten und hängt mit dem Lageblatt nun
 > auch an der Wand. Geändert: 5.5.
+>
+> **Nachgezogen 2026-10-05 — Exportspalten (Audit Runde 3, R3-K7):** „Alle
+> Daten als CSV" enthält jetzt auch Eintreff-/Abrückzeit und Auftrag/Notiz
+> der Führungsstelle (Freitext), die bisher nur Übersichts-CSV, Excel-Liste
+> und Sammel-PDF führten; beide CSV-Dateien tragen die laufende Nummer der
+> Meldung. Keine neue Datenkategorie, kein neuer Empfänger. Geändert: 5.5.
 
 ## Hinweis zu diesem Dokument
 

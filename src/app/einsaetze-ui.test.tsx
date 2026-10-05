@@ -447,15 +447,17 @@ describe("Einheiten als Tabelle", () => {
 
     const tabelle = screen.getByRole("table", { name: /Gemeldete Einheiten/ });
     const koepfe = within(tabelle).getAllByRole("columnheader").map((k) => k.textContent ?? "");
-    expect(koepfe.slice(0, 6).map((k) => k.replace(/^(\S+?)[A-ZÄÖÜ].*$/, "$1"))).toEqual([
-      "Einheit", "Zug", "Ges.", "Bedarf", "Eingetr.", "Auftrag",
+    // F/U/M und Kfz stehen bei der Gesamtstärke — am Laptop lagen sie sonst
+    // außerhalb des Rahmens (R3-K7).
+    expect(koepfe.slice(0, 10).map((k) => k.replace(/^(\S+?)[A-ZÄÖÜ].*$/, "$1"))).toEqual([
+      "Einheit", "Zug", "F", "U", "M", "Ges.", "Kfz", "Bedarf", "Eingetr.", "Auftrag",
     ]);
     const zeile = within(tabelle).getAllByRole("row")[1]!;
     const zellen = [...zeile.children].map((z) => z.textContent ?? "");
     expect(zellen[0]).toContain("Wardenburg");
     expect(zellen[koepfe.findIndex((k) => k.startsWith("Auftrag"))]).toBe("Deich Nord");
     // Die Aufschlüsselung folgt dahinter, der Absender-Stand steht zuletzt.
-    expect(koepfe.findIndex((k) => k.startsWith("Unt. M"))).toBeGreaterThan(5);
+    expect(koepfe.findIndex((k) => k.startsWith("Unt. M"))).toBeGreaterThan(9);
     expect(koepfe[koepfe.length - 1]).toMatch(/^Stand/);
   });
 });
@@ -774,7 +776,8 @@ describe("Zeiten, Auftrag und Bedarf auf der Karte", () => {
     const nutzer = userEvent.setup();
     // Ein leerer Bogen: Stärke 0, kein Auftrag — die Prüfliste hat etwas zu sagen.
     buehne(["Wardenburg"]);
-    const marke = screen.getByRole("button", { name: /\d+ Lücken?/ });
+    // Der Inhalt statt „n Lücken" (R3-K7).
+    const marke = screen.getByRole("button", { name: /^Rückfrage: .* \+ \d+ weitere$/ });
     expect(marke.getAttribute("aria-expanded")).toBe("false");
     await nutzer.click(marke);
     expect(document.querySelector(".luecken-liste")!.textContent).toContain("Stärke ist 0");

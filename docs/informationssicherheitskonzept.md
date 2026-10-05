@@ -135,6 +135,16 @@ Grundlage: Repository `wattnpapa/erfassungsbogen`, Stand 2026-09-12 — Version 
 > Suche der Einsatzansicht findet ihn. In „Alle Daten als CSV", der
 > Excel-Liste und dem Bogen-PDF stand er schon. Kein neuer Speicherort,
 > CSV mit der bestehenden Formel-Abwehr (5.4).
+>
+> **Nachgezogen 2026-10-05:** Exporte der Einsatz-Sammlung (Audit Runde 3,
+> R3-K7) — Übersichts-CSV und „Alle Daten als CSV" führen die laufende
+> Nummer der Meldung („Nr." bzw. „Meldung Nr.") wie Karte und Lageblatt und
+> schreiben alle Zeitpunkte einheitlich „TT.MM.JJJJ, hh:mm". „Alle Daten als
+> CSV" enthält zusätzlich Eingetroffen, Abgerückt und Auftrag/Notiz der
+> Führungsstelle (Freitext, bisher nur in Übersichts-CSV, Excel und PDF); die
+> Spalte „Auftrag" heißt dort „Ort/Auftrag (Bogen)". Die Excel-Liste speichert
+> die Summenwerte der Kopfzeile mit. Kein neuer Speicherort, keine neue
+> Datenkategorie, CSV mit der bestehenden Formel-Abwehr (5.4).
 
 ## Hinweis zu diesem Dokument
 

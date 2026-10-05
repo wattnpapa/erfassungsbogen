@@ -30,6 +30,8 @@ import {
   hatSofortbedarf,
   passtZuBedarfsfilter,
   istNeu,
+  lueckeKurz,
+  lueckenText,
   meldungsNummern,
   standIstAlt,
   summenBeschriftung,
@@ -323,5 +325,25 @@ describe("letzteMeldung (Audit Runde 3, R3-K5)", () => {
     const b = eintrag("b", bogen("B", 1), { empfangenAm: 3000, eingetroffenAm: 10 });
     const rest = eintrag("c", bogen("B", 1), { empfangenAm: 9000, quelle: "aufteilung" });
     expect(letzteMeldung([a, b, rest])).toBe(3000);
+  });
+});
+
+describe("Lücken mit Inhalt statt Zahl (Audit Runde 3, R3-K7)", () => {
+  it("nennt beim Sitzplatz-Hinweis die fehlenden Plätze", () => {
+    const t =
+      "Sitzplätze: 15 in den erfassten Fahrzeugen für 19 Personen — 4 brauchen eine andere Mitfahrgelegenheit (Richtwerte je Fahrzeugtyp, soweit am Fahrzeug nichts anderes eingetragen ist).";
+    expect(lueckeKurz(t)).toBe("Sitzplätze fehlen: 4");
+  });
+
+  it("fasst mehrere Punkte als ersten Punkt plus Anzahl zusammen", () => {
+    expect(lueckenText([])).toBe("");
+    expect(lueckenText(["Stärke ist 0."])).toBe("Stärke 0");
+    expect(lueckenText(["Stärke ist 0.", "Ort/Auftrag ist noch leer.", "x"])).toBe("Stärke 0 + 2 weitere");
+  });
+
+  it("kürzt unbekannte lange Texte", () => {
+    const k = lueckeKurz("Ein sehr langer Hinweis ohne Doppelpunkt und ohne Gedankenstrich am Anfang");
+    expect(k.length).toBeLessThanOrEqual(32);
+    expect(k.endsWith("…")).toBe(true);
   });
 });

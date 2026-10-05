@@ -77,7 +77,7 @@ import { SpeicherVollFehler, eintreffzeitSetzen, istSpeicherVoll, meldungAufnehm
 import { offlineText, useOfflineStand } from "./offline-bereit";
 import { uebergabeFesthalten, uebergabeText, type UebergabeStand } from "./uebergabe-stand";
 import { ART_LABEL, EinsatzDetail, EinsatzListe, letzteMeldungText, type Eingang } from "./einsaetze-ui";
-import { letzteMeldung } from "./einheiten-tabelle";
+import { letzteMeldung, meldungsNummern } from "./einheiten-tabelle";
 import { exportSammlung, exportStandLaden, exportVermerken, type ExportStand, type ExportUmfang } from "./export-stand";
 import { aktuelleMeldungen } from "./auswertung";
 import { boegenAusJsonText, boegenAusPdfBytes, einsatzAusDatei, einsatzAusPdfBytes, einsatzDateiInhalt, istPdfDatei, pdfInhaltArt } from "./einsatz-transport";
@@ -2007,7 +2007,7 @@ function AppInhalt() {
 
   async function exportiereEinsatzCsv(s: Einsatzsammlung, umfang: ExportUmfang) {
     const teil = exportSammlung(s, umfang, exportStand);
-    const ok = await dateiAnbieten(`eeb-einsatz-${einsatzDateiname(s)}.csv`, einsatzCsvInhalt(teil), "text/csv;charset=utf-8");
+    const ok = await dateiAnbieten(`eeb-einsatz-${einsatzDateiname(s)}.csv`, einsatzCsvInhalt(teil, meldungsNummern(s.eintraege)), "text/csv;charset=utf-8");
     if (ok) exportVerbuchen(s);
   }
 
@@ -2015,7 +2015,7 @@ function AppInhalt() {
     const teil = exportSammlung(s, umfang, exportStand);
     const ok = await dateiAnbieten(
       `eeb-einsatz-${einsatzDateiname(s)}-alle-daten.csv`,
-      einsatzDetailCsvInhalt(teil),
+      einsatzDetailCsvInhalt(teil, meldungsNummern(s.eintraege)),
       "text/csv;charset=utf-8",
     );
     if (ok) exportVerbuchen(s);

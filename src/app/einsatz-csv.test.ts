@@ -72,7 +72,7 @@ describe("einsatzCsvInhalt()", () => {
     const csv = einsatzCsvInhalt(sammlung([meldung(bogen("A"))]));
     const [kopf] = zeilen(csv);
     expect(kopf!.split(";")).toEqual([
-      "Einheit", "Teil", "Organisation", "Zug",
+      "Nr.", "Einheit", "Teil", "Organisation", "Zug",
       "Stärke F", "Stärke U", "Stärke M", "Stärke gesamt",
       "Verpflegung gesamt", "Verpflegung veg.", "Verpflegung vegan",
       "Unterbringung M", "Unterbringung W", "Unterbringung D",
@@ -96,28 +96,31 @@ describe("einsatzCsvInhalt()", () => {
     const csv = einsatzCsvInhalt(sammlung([meldung(bogen("OV Alpha"), { zugEtikett: "1. Zug" })]));
     const [, daten] = zeilen(csv);
     const f = daten!.split(";");
-    expect(f[0]).toBe("THW OV Alpha Media Team");
-    expect(f[1]).toBe(""); // ungeteilte Einheit: keine Teil-Bezeichnung
-    expect(f[2]).toBe("THW");
-    expect(f[3]).toBe("1. Zug");
+    expect(f[1]).toBe("THW OV Alpha Media Team");
+    expect(f[2]).toBe(""); // ungeteilte Einheit: keine Teil-Bezeichnung
+    expect(f[3]).toBe("THW");
+    expect(f[4]).toBe("1. Zug");
     // Stärke F/U/M/gesamt
-    expect(f.slice(4, 8)).toEqual(["1", "0", "2", "3"]);
+    expect(f.slice(5, 9)).toEqual(["1", "0", "2", "3"]);
     // Verpflegung gesamt/veg/vegan
-    expect(f.slice(8, 11)).toEqual(["3", "1", "1"]);
+    expect(f.slice(9, 12)).toEqual(["3", "1", "1"]);
     // Unterbringung M/W/D
-    expect(f.slice(11, 14)).toEqual(["2", "1", "0"]);
+    expect(f.slice(12, 15)).toEqual(["2", "1", "0"]);
     // Diesel/Benzin/Gemisch
-    expect(f.slice(14, 17)).toEqual(["40", "5", "0"]);
-    expect(f[18]).toMatch(/^\d{6}[a-z]{3}\d{2}$/); // Stand als NATO-Zeitgruppe
-    expect(f[19]).toMatch(/^\d{2}\.\d{2}\.\d{4}, \d{2}:\d{2}$/); // Eingetroffen = Empfangszeit, wenn nicht korrigiert
-    expect(f[20]).toBe(""); // nicht abgerückt
-    expect(f[22]).toBe("Empfangen"); // gleicher Wortlaut wie auf der Karte (R2-K6)
-    expect(f[23]).toBe("anwesend");
-    expect(f[24]).toBe("ja");
-    expect(f[25]).toBe(""); // kein Übungsbogen
-    expect(f[26]).toBe("Unterbringung / Kraftstoff");
-    expect(f[27]).toBe("unsigniert");
-    expect(f[29]).toBe(""); // kein Auftrag
+    expect(f.slice(15, 18)).toEqual(["40", "5", "0"]);
+    expect(f[0]).toBe("1"); // laufende Nummer wie auf Karte und Lageblatt (R3-K7)
+    // Eine Zeitform je Datei: Stand, Eingetroffen und Empfangen gleich (R3-K7).
+    expect(f[19]).toMatch(/^\d{2}\.\d{2}\.\d{4}, \d{2}:\d{2}$/);
+    expect(f[22]).toMatch(/^\d{2}\.\d{2}\.\d{4}, \d{2}:\d{2}$/);
+    expect(f[20]).toMatch(/^\d{2}\.\d{2}\.\d{4}, \d{2}:\d{2}$/); // Eingetroffen = Empfangszeit, wenn nicht korrigiert
+    expect(f[21]).toBe(""); // nicht abgerückt
+    expect(f[23]).toBe("Empfangen"); // gleicher Wortlaut wie auf der Karte (R2-K6)
+    expect(f[24]).toBe("anwesend");
+    expect(f[25]).toBe("ja");
+    expect(f[26]).toBe(""); // kein Übungsbogen
+    expect(f[27]).toBe("Unterbringung / Kraftstoff");
+    expect(f[28]).toBe("unsigniert");
+    expect(f[30]).toBe(""); // kein Auftrag
   });
 
   it("unterscheidet abgeteilte Truppteile in der Teil-Spalte", () => {
@@ -135,8 +138,8 @@ describe("einsatzCsvInhalt()", () => {
       ]),
     );
     const felder = zeilen(csv).slice(1, 3).map((z) => z.split(";"));
-    expect(felder.map((f) => f[1])).toEqual(["", "Fachberater"]);
-    expect(felder[1]![22]).toBe("Aufteilung");
+    expect(felder.map((f) => f[2])).toEqual(["", "Fachberater"]);
+    expect(felder[1]![23]).toBe("Aufteilung");
   });
 
   it("hängt eine Summenzeile über alle anwesenden Einheiten an", () => {
@@ -144,10 +147,10 @@ describe("einsatzCsvInhalt()", () => {
     const reihen = zeilen(csv);
     expect(reihen).toHaveLength(4); // Kopf + 2 Einheiten + Summe
     const summe = reihen[3]!.split(";");
-    expect(summe[0]).toBe("Summe (2 Einheiten)");
-    expect(summe.slice(4, 8)).toEqual(["2", "0", "4", "6"]); // Stärke gesamt 6
-    expect(summe.slice(14, 17)).toEqual(["80", "10", "0"]); // Kraftstoff summiert
-    expect(summe[17]).toBe("2"); // Fahrzeuge gesamt
+    expect(summe[1]).toBe("Summe (2 Einheiten)");
+    expect(summe.slice(5, 9)).toEqual(["2", "0", "4", "6"]); // Stärke gesamt 6
+    expect(summe.slice(15, 18)).toEqual(["80", "10", "0"]); // Kraftstoff summiert
+    expect(summe[18]).toBe("2"); // Fahrzeuge gesamt
   });
 
   it("führt abgerückte Einheiten mit Status auf, zählt sie aber nicht in die Summe", () => {
@@ -159,8 +162,8 @@ describe("einsatzCsvInhalt()", () => {
     const reihen = zeilen(csv);
     expect(reihen).toHaveLength(4); // Kopf + 2 Einheiten + Summe
     const abgerueckt = reihen[2]!.split(";");
-    expect(abgerueckt[23]).toBe("abgerückt");
-    expect(abgerueckt[24]).toBe("nein");
+    expect(abgerueckt[24]).toBe("abgerückt");
+    expect(abgerueckt[25]).toBe("nein");
     expect(reihen[3]!).toContain("Summe (1 Einheiten)");
   });
 
@@ -170,8 +173,8 @@ describe("einsatzCsvInhalt()", () => {
     );
     const reihen = zeilen(csv);
     const uebung = reihen[2]!.split(";");
-    expect(uebung[24]).toBe("nein");
-    expect(uebung[25]).toBe("ÜBUNG");
+    expect(uebung[25]).toBe("nein");
+    expect(uebung[26]).toBe("ÜBUNG");
     expect(reihen[3]!).toContain("Summe (1 Einheiten)");
   });
 
@@ -191,9 +194,9 @@ describe("einsatzCsvInhalt()", () => {
       ]),
     );
     const f = zeilen(csv)[1]!.split(";");
-    expect(f[19]).toBe("26.09.2026, 09:40");
-    expect(f[20]).toBe("27.09.2026, 15:10");
-    expect(f[29]).toBe("Deichabschnitt Nord");
+    expect(f[20]).toBe("26.09.2026, 09:40");
+    expect(f[21]).toBe("27.09.2026, 15:10");
+    expect(f[30]).toBe("Deichabschnitt Nord");
   });
 
   it("quotet Felder mit Semikolon und deutschem Dezimalkomma", () => {

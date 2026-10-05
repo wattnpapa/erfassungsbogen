@@ -139,6 +139,35 @@ export function istNeu(e: MeldeEintrag, jetzt = Date.now()): boolean {
   return jetzt - eintreffzeit(e) < NEU_MS;
 }
 
+// ------------------------------------------------------------ Lücken
+
+/**
+ * Kurzform eines offenen Punkts der Meldung für Karte und Lageblatt: „1
+ * Lücke" sagte nicht, worum es geht — dahinter stand etwa ein Sitzplatz-
+ * Hinweis „15 in den erfassten Fahrzeugen für 19 Personen" (Audit Runde 3,
+ * R3-K7). Bekannte Punkte bekommen ein Stichwort, alle anderen ihren Anfang.
+ */
+export function lueckeKurz(text: string): string {
+  const sitz = /^Sitzplätze: \d+ in den erfassten Fahrzeugen für \d+ Personen — (\d+)/.exec(text);
+  if (sitz) return `Sitzplätze fehlen: ${sitz[1]}`;
+  if (/^Keine telefonische Erreichbarkeit/.test(text)) return "keine Rufnummer";
+  if (/hat noch kein Kennzeichen/.test(text)) return "Kennzeichen fehlt";
+  if (/kein Kraftfahrer/.test(text)) return "kein Kraftfahrer";
+  if (/^Ort\/Auftrag ist noch leer/.test(text)) return "Ort/Auftrag leer";
+  if (/^Einsatzzeitraum .* ist vorbei/.test(text)) return "Zeitraum vorbei";
+  if (/^Stärke ist 0/.test(text)) return "Stärke 0";
+  const kopf = text.split(/[:—]/)[0]!.trim();
+  if (kopf.length > 0 && kopf.length <= 32 && kopf !== text) return `${kopf} prüfen`;
+  return text.length <= 32 ? text.replace(/\.$/, "") : `${text.slice(0, 30).trimEnd()} …`;
+}
+
+/** „Sitzplätze fehlen: 4" bzw. „Sitzplätze fehlen: 4 + 2 weitere" — leer ohne Lücken. */
+export function lueckenText(texte: string[]): string {
+  if (texte.length === 0) return "";
+  const erst = lueckeKurz(texte[0]!);
+  return texte.length === 1 ? erst : `${erst} + ${texte.length - 1} weitere`;
+}
+
 // ------------------------------------------------------------ Folgemeldungen
 
 /**
@@ -340,17 +369,20 @@ export interface SpaltenDefinition {
 export const TABELLEN_SPALTEN: SpaltenDefinition[] = [
   { schluessel: "einheit", kopf: "Einheit", titel: "Einheit", zahl: false },
   { schluessel: "zugEtikett", kopf: "Zug", titel: "Zug", zahl: false },
+  // F/U/M und Kfz direkt bei der Gesamtstärke: am Laptop lagen sie erst nach
+  // seitlichem Rollen im Bild (Rahmen 894 px, Tabelle 1 826 px; Audit
+  // Runde 3, R3-K7). Vier schmale Zahlenspalten kosten zusammen kaum Breite.
+  { schluessel: "fuehrer", kopf: "F", titel: "Führer", zahl: true },
+  { schluessel: "unterfuehrer", kopf: "U", titel: "Unterführer", zahl: true },
+  { schluessel: "mannschaft", kopf: "M", titel: "Mannschaft", zahl: true },
   { schluessel: "gesamt", kopf: "Ges.", titel: "Stärke gesamt", zahl: true },
+  { schluessel: "fahrzeuge", kopf: "Kfz", titel: "Fahrzeuge", zahl: true },
   // Der Bedarf steht VOR den Zeiten: nach ihm wird gesucht („wer schläft
   // zuerst?"), der Stand ist Beiwerk und steht ganz hinten (K1, K2).
   { schluessel: "bedarf", kopf: "Bedarf", titel: "Sofortbedarf", zahl: false },
   { schluessel: "eingetroffen", kopf: "Eingetr.", titel: "Eingetroffen", zahl: false, sortiertNach: "eingetroffenAm" },
   { schluessel: "auftrag", kopf: "Auftrag", titel: "Auftrag / Notiz der Führungsstelle", zahl: false },
   { schluessel: "abgerueckt", kopf: "Abger.", titel: "Abgerückt", zahl: false, sortiertNach: "abgerueckAm" },
-  { schluessel: "fuehrer", kopf: "F", titel: "Führer", zahl: true },
-  { schluessel: "unterfuehrer", kopf: "U", titel: "Unterführer", zahl: true },
-  { schluessel: "mannschaft", kopf: "M", titel: "Mannschaft", zahl: true },
-  { schluessel: "fahrzeuge", kopf: "Kfz", titel: "Fahrzeuge", zahl: true },
   { schluessel: "organisation", kopf: "Org.", titel: "Organisation", zahl: false },
   { schluessel: "verpflegung", kopf: "Verpfl.", titel: "Verpflegung gesamt", zahl: true },
   { schluessel: "vegetarisch", kopf: "veg.", titel: "Verpflegung vegetarisch", zahl: true },

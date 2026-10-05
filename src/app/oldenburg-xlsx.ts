@@ -415,11 +415,13 @@ function zeileFuer(b: Erfassungsbogen, k: Kontext): Zeile {
  * auslässt — filtert die Führungsstelle auf eine Organisation, stimmt die Summe
  * oben sofort für diese Auswahl.
  */
-function leisteZeile(letzteZeile: number): string {
+function leisteZeile(letzteZeile: number, zeilen: Zeile[]): string {
   const zellen: Zelle[] = SPALTEN.map((sp, i) => ({
     spalte: i,
     stil: sp.leisteStil,
-    wert: sp.leiste,
+    // Summenspalten: das Ergebnis gleich mit (ohne Filter = Summe aller
+    // zählenden Zeilen), damit nicht rechnende Vorschauen es zeigen (R3-K7).
+    wert: sp.summe ? zeilen.reduce((n, z) => n + (typeof z[sp.id] === "number" ? (z[sp.id] as number) : 0), 0) : sp.leiste,
     formel: sp.summe ? `SUBTOTAL(9,${spaltenName(i)}${ERSTE_DATENZEILE}:${spaltenName(i)}${letzteZeile})` : undefined,
   }));
   return zeileXml(1, zellen);
@@ -469,7 +471,7 @@ export function blockKopfText(anzahl: number): string {
  */
 function blattBauen(zeilen: Zeile[], ausserhalb: Zeile[] = []): Uint8Array<ArrayBuffer> {
   const summenEnde = Math.max(ERSTE_DATENZEILE, ERSTE_DATENZEILE + zeilen.length - 1);
-  const xml = [leisteZeile(summenEnde), kopfZeile(), ...zeilen.map((z, i) => datenZeile(z, ERSTE_DATENZEILE + i))];
+  const xml = [leisteZeile(summenEnde, zeilen), kopfZeile(), ...zeilen.map((z, i) => datenZeile(z, ERSTE_DATENZEILE + i))];
   let letzteZeile = summenEnde;
   if (ausserhalb.length > 0) {
     // Eine Leerzeile trennt den Block: Excel beendet dort die „aktuelle

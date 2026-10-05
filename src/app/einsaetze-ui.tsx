@@ -93,6 +93,7 @@ import {
   gemerkteAnsicht,
   istNeu,
   letzteMeldung,
+  lueckenText,
   folgeAenderung,
   frischGemeldet,
   meldungsNummern,
@@ -2382,7 +2383,7 @@ function EinheitKarte(props: {
                 </span>
               )}
               {bedarf.map((m) => (
-                <span className={m.dringend ? "bedarf-marke dringend" : "bedarf-marke routine"} key={m.lang} title={m.lang}>{m.kurz}</span>
+                <span className={m.dringend && zaehlt ? "bedarf-marke dringend" : "bedarf-marke routine"} key={m.lang} title={m.lang}>{m.kurz}</span>
               ))}
               {bemerkungNeu && (
                 <span className="kompakt-merkmal bemerkung-merkmal" title={`Bemerkung der Einheit: ${bemerkung}`}>Bemerkung neu</span>
@@ -2392,7 +2393,7 @@ function EinheitKarte(props: {
               )}
               {zaehlt && luecken.length > 0 && (
                 <span className="kompakt-merkmal luecken-merkmal" title={luecken.map((p) => p.text).join("\n")}>
-                  {luecken.length} {luecken.length === 1 ? "Lücke" : "Lücken"}
+                  {lueckenText(luecken.map((p) => p.text))}
                 </span>
               )}
             </span>
@@ -2444,7 +2445,10 @@ function EinheitKarte(props: {
               {bedarf.map((m) => (
                 // Dringendes kräftig, Kraftstoff als ruhige Routine-Marke
                 // (Audit Runde 2, R2-K4).
-                <span className={m.dringend ? "bedarf-marke dringend" : "bedarf-marke routine"} key={m.lang}>{m.lang}</span>
+                // An einer abgerückten oder zusammengeführten Einheit grau:
+                // gezählt wird ihr Bedarf nicht, gelb zog er trotzdem den
+                // Blick (Audit Runde 3, R3-K7).
+                <span className={m.dringend && zaehlt ? "bedarf-marke dringend" : "bedarf-marke routine"} key={m.lang}>{m.lang}</span>
               ))}
             </span>
           )}
@@ -2494,7 +2498,8 @@ function EinheitKarte(props: {
                 title={luecken.map((p) => p.text).join("\n")}
                 onClick={() => setLueckenOffen(!lueckenOffen)}
               >
-                {luecken.length} {luecken.length === 1 ? "Lücke" : "Lücken"}
+                {/* Der Inhalt statt „1 Lücke" (R3-K7). */}
+                Rückfrage: {lueckenText(luecken.map((p) => p.text))}
               </button>
             </span>
           )}

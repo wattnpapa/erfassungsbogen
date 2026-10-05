@@ -43,7 +43,7 @@ import {
 } from "./hilfen";
 import { mwdText, summiereBoegen, unterbringungAngefordertText, type EinsatzSummen } from "./auswertung";
 import { zeitLang } from "./eintrag-zeiten";
-import { bedarfMarken } from "./einheiten-tabelle";
+import { bedarfMarken, lueckenText } from "./einheiten-tabelle";
 import { FELD_GESAMTSTAERKE, bogenDiff, diffZeilen, type BogenDiff } from "@bos/meldekopf/meldung-diff";
 import { fahrzeugSymbolSvg } from "./taktische-zeichen-bogen";
 import { orgFarbe } from "./org-farben";
@@ -463,8 +463,9 @@ function uebersichtsTabelle(
     if (b.uebung) namensZeilen.push({ text: "ÜBUNG", bold: true, color: UEBUNG_FARBE });
     if (!e.abgerueckt && e.zaehlt === false) namensZeilen.push({ text: "zählt nicht in diese Lage", italics: true });
     // Lücken der Meldung als Zahl — am Gerät eine Marke an der Karte (R2-K3).
-    const luecken = pruefpunkte(b).length;
-    if (luecken > 0) namensZeilen.push({ text: `${luecken} ${luecken === 1 ? "Lücke" : "Lücken"} (Meldung)`, italics: true });
+    // Mit Inhalt statt „1 Lücke" (R3-K7).
+    const luecken = pruefpunkte(b);
+    if (luecken.length > 0) namensZeilen.push({ text: `Rückfrage: ${lueckenText(luecken.map((p) => p.text))}`, italics: true });
     return [
       namensZeilen.length === 1 ? namensZeilen[0]! : { stack: namensZeilen },
       { text: weichUmbrechen(e.zugEtikett ?? "") },

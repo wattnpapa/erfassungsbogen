@@ -204,7 +204,11 @@ export interface Zelle {
   /** 0-basierter Spaltenindex. */
   spalte: number;
   wert?: string | number;
-  /** Formel OHNE „=" („SUBTOTAL(9,AB3:AB40)"); schlägt `wert` aus. */
+  /**
+   * Formel OHNE „=" („SUBTOTAL(9,AB3:AB40)"). Mit einer Zahl in `wert` wird
+   * sie als zwischengespeichertes Ergebnis mitgeschrieben — Vorschau-Apps,
+   * die nicht rechnen, zeigen sonst ein leeres Feld (Audit Runde 3, R3-K7).
+   */
   formel?: string;
   /** Index in `<cellXfs>` der mitgelieferten Stiltabelle. */
   stil?: number;
@@ -213,7 +217,10 @@ export interface Zelle {
 function zelleXml(z: Zelle, zeilenNr: number): string {
   const ref = `${spaltenName(z.spalte)}${zeilenNr}`;
   const stil = z.stil != null ? ` s="${z.stil}"` : "";
-  if (z.formel != null) return `<c r="${ref}"${stil}><f>${xmlText(z.formel)}</f></c>`;
+  if (z.formel != null) {
+    const v = typeof z.wert === "number" ? `<v>${z.wert}</v>` : "";
+    return `<c r="${ref}"${stil}><f>${xmlText(z.formel)}</f>${v}</c>`;
+  }
   if (typeof z.wert === "number") return `<c r="${ref}"${stil}><v>${z.wert}</v></c>`;
   if (z.wert == null || z.wert === "") return `<c r="${ref}"${stil}/>`;
   return `<c r="${ref}"${stil} t="inlineStr"><is><t xml:space="preserve">${xmlText(z.wert)}</t></is></c>`;
@@ -260,8 +267,9 @@ function blattXml(b: Blatt): string {
 /**
  * Arbeitsmappe mit genau einem Blatt → XLSX-Bytes.
  *
- * `fullCalcOnLoad` lässt Excel alle Formeln beim Öffnen neu rechnen; deshalb
- * müssen Formelzellen keinen zwischengespeicherten Wert mitbringen.
+ * `fullCalcOnLoad` lässt Excel alle Formeln beim Öffnen neu rechnen. Ein
+ * zwischengespeicherter Wert (siehe {@link Zelle.formel}) ist trotzdem
+ * mitzugeben: Vorschau-Apps (Dateien, Mail, Numbers-Vorschau) rechnen nicht.
  */
 export function mappeBauen(blatt: Blatt, stile: string): Uint8Array<ArrayBuffer> {
   const teile: ZipEintrag[] = [

@@ -15,7 +15,8 @@
 
 import { staerke, type Erfassungsbogen } from "@bos/eeb-format/model";
 import type { EinsatzArt } from "@bos/meldekopf/einsaetze";
-import { einheitAnzeigename, orgLabel, vokabText, vokabularFuer, zeitgruppe } from "./hilfen";
+import { einheitAnzeigename, orgLabel, vokabText, vokabularFuer, zeitpunktDeutsch } from "./hilfen";
+import { meldungsNummern } from "./einheiten-tabelle";
 import { aktuelleMeldungen, unterbringungLage, verpflegungLage, zaehltInLage } from "./auswertung";
 import { csvDatei, csvZeile } from "./csv";
 import { HERKUNFT_TEXT, eintreffzeit, zeitLang } from "./eintrag-zeiten";
@@ -31,6 +32,9 @@ const STATUS_LABEL: Record<MeldeStatus, string> = {
 const QUELLE_LABEL: Record<MeldeQuelle, string> = HERKUNFT_TEXT;
 
 const SPALTEN = [
+  // Laufende Nummer wie an der Karte und auf dem Lageblatt — Abgleich
+  // zwischen Papier und Datei über „Nr. 7" (Audit Runde 3, R3-K7).
+  "Nr.",
   "Einheit",
   "Teil",
   "Organisation",
@@ -105,7 +109,7 @@ function absenderText(e: MeldeEintrag): string {
   return [a.name, a.telefon, a.email].map((x) => x?.trim()).filter(Boolean).join(" · ");
 }
 
-function datenZeile(art: EinsatzArt, e: MeldeEintrag): string {
+function datenZeile(art: EinsatzArt, e: MeldeEintrag, nr: number | undefined): string {
   const b = e.bogen;
   const st = staerke(b);
   // Wie Tabelle und Summen: Schnellerfassung zählt die Stärke (R2-N5).
@@ -113,6 +117,7 @@ function datenZeile(art: EinsatzArt, e: MeldeEintrag): string {
   const u = unterbringungLage(b);
   const sb = b.sofortbedarf;
   return csvZeile([
+    nr ?? "",
     einheitName(b),
     // Eigene Spalte statt Anhängsel am Namen: nach einer Aufteilung stehen
     // sonst zwei gleichnamige Zeilen da, und filtern lässt sich das auch nicht.
@@ -133,10 +138,13 @@ function datenZeile(art: EinsatzArt, e: MeldeEintrag): string {
     sb?.benzinLiter ?? 0,
     sb?.gemischLiter ?? 0,
     fahrzeugListe(b),
-    zeitgruppe(b.stand),
+    // Eine Zeitform je Datei: „04.10.2026, 14:36" für Stand, Eingetroffen,
+    // Abgerückt und Empfangen. Vorher standen „041436okt26",
+    // „04.10.2026, 14:41" und „04.10.26, 14:41" in derselben Zeile (R3-K7).
+    zeitpunktDeutsch(b.stand),
     zeitLang(eintreffzeit(e)),
     e.abgerueckAm != null ? zeitLang(e.abgerueckAm) : "",
-    new Date(e.empfangenAm).toLocaleString("de-DE", { dateStyle: "short", timeStyle: "short" }),
+    zeitLang(e.empfangenAm),
     QUELLE_LABEL[e.quelle],
     STATUS_LABEL[e.status],
     zaehlt(art, e) ? "ja" : "nein",
@@ -184,6 +192,7 @@ function summenZeile(meldungen: MeldeEintrag[]): string {
     acc.fahrzeuge += b.fahrzeuge.length;
   }
   return csvZeile([
+    "",
     `Summe (${meldungen.length} Einheiten)`,
     "",
     "",
@@ -204,7 +213,11 @@ function summenZeile(meldungen: MeldeEintrag[]): string {
  * Einsatz-Sammlung → CSV-Text (mit BOM). Zeilen: Kopf, je anwesende Einheit
  * eine Zeile (nach Anzeigename sortiert), zuletzt die Summenzeile.
  */
-export function einsatzCsvInhalt(s: Einsatzsammlung): string {
+export function einsatzCsvInhalt(
+  s: Einsatzsammlung,
+  /** Nummern aus der ganzen Sammlung — beim Teilexport „nur neue" sonst verschoben. */
+  nummern: Map<string, number> = meldungsNummern(s.eintraege),
+): string {
   // Alle gemeldeten Einheiten, nicht nur die zählenden: Eine abgerückte oder
   // als Übung geführte Einheit fiel bisher wortlos aus der Datei — die
   // Führungsstelle sah eine Lücke, die sie nicht als Lücke erkennen konnte.
@@ -215,7 +228,7 @@ export function einsatzCsvInhalt(s: Einsatzsammlung): string {
   const zaehlende = aktuelleMeldungen(s.eintraege, s.art);
   return csvDatei([
     csvZeile([...SPALTEN]),
-    ...alle.map((e) => datenZeile(s.art, e)),
+    ...alle.map((e) => datenZeile(s.art, e, nummern.get(e.einheitSchluessel))),
     summenZeile(zaehlende),
   ]);
 }
