@@ -183,6 +183,11 @@ export function Uebersicht(props: {
   // Segmentierung blättert `vollbildTeil` durch die Teile.
   const [vollbild, setVollbild] = useState(false);
   const [vollbildTeil, setVollbildTeil] = useState(0);
+  // Welche Teile dieses Codes schon im Vollbild standen — über das Schließen
+  // hinaus: Wieder geöffnet, beginnt das Vollbild beim ersten fehlenden Teil
+  // statt bei Teil 1 (Audit Runde 4, R4-M5). Ein neuer Code fängt neu an.
+  const [vollbildGezeigt, setVollbildGezeigt] = useState<ReadonlySet<number>>(() => new Set());
+  useEffect(() => setVollbildGezeigt(new Set()), [qr]);
   // „Bogen übergeben": ein Dialog bündelt alle Transportwege (QR/PDF/Link/Datei).
   const teilenDialog = useRef<HTMLDialogElement>(null);
   /* Einmal geprüft, zweimal gezeigt: in der Leitzeile dieser Ansicht und im
@@ -951,7 +956,8 @@ export function Uebersicht(props: {
             disabled={!qr}
             onClick={() => {
               teilenDialog.current?.close();
-              setVollbildTeil(0);
+              const fehlt = qr ? qr.teile.findIndex((_, i) => !vollbildGezeigt.has(i)) : -1;
+              setVollbildTeil(fehlt > 0 && vollbildGezeigt.size > 0 ? fehlt : 0);
               setVollbild(true);
               // Vermerkt wird erst beim Schließen — und nur, wenn alle Teile
               // gezeigt wurden (R3-H3).
@@ -1052,6 +1058,8 @@ export function Uebersicht(props: {
           staerke={staerkeText}
           teilIndex={vollbildTeil}
           onTeil={setVollbildTeil}
+          bereitsGezeigt={vollbildGezeigt}
+          onGezeigt={setVollbildGezeigt}
           onSchliessen={(ergebnis) =>
             ebeneVerlassen(VOLLBILD_EBENE, () => {
               setVollbild(false);
@@ -1090,6 +1098,10 @@ export function QrVollbild(props: {
   staerke: string;
   teilIndex: number;
   onTeil: (i: number) => void;
+  /** Teile, die bei einem früheren Öffnen schon gezeigt wurden. */
+  bereitsGezeigt?: ReadonlySet<number>;
+  /** Meldet jeden neu gezeigten Teil (für das nächste Öffnen). */
+  onGezeigt?: (gezeigt: ReadonlySet<number>) => void;
   /** Knopf oder Escape — verbraucht auch den Verlaufseintrag. */
   onSchliessen: (ergebnis: VollbildErgebnis) => void;
   /** Geräte-/Browser-Zurück — der Eintrag ist dann schon weg. */
@@ -1102,22 +1114,47 @@ export function QrVollbild(props: {
   const teil = qr.teile[index]!;
   // Welche Teile schon auf dem Bildschirm standen: „gezeigt" gilt erst, wenn
   // es alle waren — vorher hieß schon Teil 1 von 2 „Übergeben" (R3-H3).
-  const [gezeigt, setGezeigt] = useState<ReadonlySet<number>>(() => new Set([index]));
+  const [gezeigt, setGezeigt] = useState<ReadonlySet<number>>(() => new Set([...(props.bereitsGezeigt ?? []), index]));
   useEffect(() => {
     setGezeigt((g) => (g.has(index) ? g : new Set([...g, index])));
   }, [index]);
+  const onGezeigt = useRef(props.onGezeigt);
+  onGezeigt.current = props.onGezeigt;
+  useEffect(() => onGezeigt.current?.(gezeigt), [gezeigt]);
   const alleGezeigt = gezeigt.size >= anzahl;
   const fehlend = qr.teile.findIndex((_, i) => !gezeigt.has(i));
   // „zeigen" = Code; „frage" = Wurde gescannt?; „fehlt" = ein Teil fehlt noch.
   const [phase, setPhase] = useState<"zeigen" | "frage" | "fehlt">("zeigen");
   const ohneFrage = (): VollbildErgebnis => (alleGezeigt ? "gezeigt" : undefined);
-  useModalesOverlay(dialog, { onSchliessen: () => props.onSchliessen(ohneFrage()) });
-  useEbeneZurueck(VOLLBILD_EBENE, () => props.onZurueck(ohneFrage()));
+  /**
+   * Zurück-Geste und Escape wie „Schließen", solange Teile fehlen: Sie
+   * schlossen das Vollbild sonst mitten in der Übergabe ohne Hinweis, und
+   * „Schließen" fragte im selben Zustand nach (Audit Runde 4, R4-M5). Einmal
+   * abgefangen, steht „Teil n wurde noch nicht gezeigt" da; ein zweites
+   * Zurück schließt dann wirklich (wie „Trotzdem schließen").
+   */
+  const fehlteilAbfangen = (): boolean => {
+    if (phase !== "zeigen" || alleGezeigt) return false;
+    setPhase("fehlt");
+    return true;
+  };
+  useModalesOverlay(dialog, {
+    onSchliessen: () => {
+      if (!fehlteilAbfangen()) props.onSchliessen(ohneFrage());
+    },
+  });
+  useEbeneZurueck(VOLLBILD_EBENE, () => {
+    if (fehlteilAbfangen()) {
+      ebeneBetreten(VOLLBILD_EBENE); // die Geste ist verbraucht — der nächste Rücksprung landet wieder hier
+      return;
+    }
+    props.onZurueck(ohneFrage());
+  });
   // Stand = Moment des Öffnens; der Code zeigt den Bogen, wie er jetzt ist.
   const [stand] = useState(() => new Date().toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit" }));
   const teilText = (i: number) => `Teil ${i + 1} von ${anzahl}`;
   return (
-    <dialog ref={dialog} className="qr-vollbild" aria-label="QR-Code im Vollbild" tabIndex={-1}>
+    <dialog ref={dialog} className="qr-vollbild" aria-label="QR-Code im Vollbild" tabIndex={-1} data-zurueck="eigen">
       {/* Wer mehrere Telefone nacheinander scannt, prüft vor dem Scan, welcher
           Bogen gerade gezeigt wird — vorher stand hier nur der Code
           (Audit Runde 2, R2-W6, R2-N9, R2-O7). */}

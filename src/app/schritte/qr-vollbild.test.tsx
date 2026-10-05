@@ -5,7 +5,7 @@
  * R3-H3).
  */
 import { describe, expect, it, vi } from "vitest";
-import { render, screen, within } from "@testing-library/react";
+import { act, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { useState } from "react";
 import type { QrSatz } from "../hilfen";
@@ -89,10 +89,57 @@ describe("QR-Vollbild (R3-H2, R3-H3)", () => {
     expect(schliessen).toHaveBeenLastCalledWith("bestaetigt");
   });
 
-  it("Escape vor dem letzten Teil vermerkt nichts", () => {
+  // Audit Runde 4, R4-M5: Escape und Zurück schlossen ohne Hinweis auf die
+  // fehlenden Teile. Jetzt fragen sie wie „Schließen"; erst das zweite Mal
+  // schließt (wie „Trotzdem schließen") und vermerkt nichts.
+  it("Escape vor dem letzten Teil fragt erst nach dem fehlenden Teil, das zweite schließt ohne Vermerk", () => {
     const schliessen = vi.fn();
     render(<Rahmen n={2} onSchliessen={schliessen} />);
-    screen.getByRole("dialog").dispatchEvent(new Event("cancel", { cancelable: true }));
+    act(() => {
+      screen.getByRole("dialog").dispatchEvent(new Event("cancel", { cancelable: true }));
+    });
+    expect(schliessen).not.toHaveBeenCalled();
+    expect(screen.getByText(/Teil 2 von 2 wurde noch nicht gezeigt/)).toBeDefined();
+    act(() => {
+      screen.getByRole("dialog").dispatchEvent(new Event("cancel", { cancelable: true }));
+    });
     expect(schliessen).toHaveBeenLastCalledWith(undefined);
+  });
+
+  it("Zurück vor dem letzten Teil fängt die Geste einmal ab und legt den Verlaufseintrag neu an", () => {
+    const zurueck = vi.fn();
+    const vorher = history.length;
+    render(<Rahmen n={7} onSchliessen={() => {}} onZurueck={zurueck} />);
+    act(() => {
+      window.dispatchEvent(new PopStateEvent("popstate", { state: null }));
+    });
+    expect(zurueck).not.toHaveBeenCalled();
+    expect(screen.getByText(/Teil 2 von 7 wurde noch nicht gezeigt/)).toBeDefined();
+    expect((history.state as { eebEbene?: string } | null)?.eebEbene).toBe("qr-vollbild");
+    expect(history.length).toBe(vorher + 1);
+    history.replaceState(null, "");
+    act(() => {
+      window.dispatchEvent(new PopStateEvent("popstate", { state: null }));
+    });
+    expect(zurueck).toHaveBeenLastCalledWith(undefined);
+  });
+
+  it("beginnt beim Wiederöffnen mit dem ersten noch nicht gezeigten Teil", () => {
+    const gemeldet = vi.fn();
+    render(
+      <QrVollbild
+        qr={satz(7)}
+        einheit="THW"
+        staerke="0 / 1 / 2 / 3"
+        teilIndex={3}
+        onTeil={() => {}}
+        bereitsGezeigt={new Set([0, 1, 2])}
+        onGezeigt={gemeldet}
+        onSchliessen={() => {}}
+        onZurueck={() => {}}
+      />,
+    );
+    expect(screen.getByRole("dialog").querySelector(".qr-vollbild-teil")!.textContent).toContain("Teil 4 von 7");
+    expect([...(gemeldet.mock.lastCall![0] as Set<number>)].sort()).toEqual([0, 1, 2, 3]);
   });
 });

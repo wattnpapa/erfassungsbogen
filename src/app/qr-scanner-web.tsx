@@ -377,7 +377,7 @@ export function QrScannerWeb(props: {
     ?? "";
 
   return (
-    <dialog ref={dialogRef} className="scanner" aria-label="QR-Code scannen" tabIndex={-1}>
+    <dialog ref={dialogRef} className="scanner" aria-label="QR-Code scannen" tabIndex={-1} data-zurueck="eigen">
       <video ref={videoRef} playsInline muted />
       {fehler
         ? (

@@ -13,6 +13,7 @@ import { encodeSigniertPayloadUrl, schluesselpaarErzeugen } from "@bos/eeb-forma
 import { browserKompressor, neuerBogen } from "./hilfen";
 import { geraeteSchluesselLoeschen } from "./geraete-schluessel";
 import { tippSchutzZuruecksetzen } from "./tipp-schutz";
+import { frageJaNein } from "./dialoge";
 import { vorlageAnlegen, vorlagenLaden } from "./vorlagen";
 import { einsatzDateiInhalt } from "./einsatz-transport";
 import { einheitEntfernen, eintreffzeitSetzen, zeitLang } from "./eintrag-zeiten";
@@ -919,6 +920,30 @@ describe("Assistenten-Durchlauf", () => {
     await nutzer.click(screen.getByRole("button", { name: "Neuen Bogen erstellen" }));
     expect(screen.getByLabelText("Name (Pflicht)")).toBeDefined();
     expect(history.length).toBe(laenge + 1);
+    act(() => { history.back(); });
+    await waitFor(() => expect(screen.queryByLabelText("Name (Pflicht)")).toBeNull());
+    expect(screen.getByRole("button", { name: "Neuen Bogen erstellen" })).toBeDefined();
+  });
+
+  // Audit Runde 4, R4-S1: Zurück bei offener Rückfrage wechselte die Ansicht
+  // dahinter, die Rückfrage blieb über der Startseite stehen und wirkte von
+  // dort. Jetzt ist Zurück ihr „Abbrechen", die Ansicht bleibt.
+  it("schließt mit Zurück eine offene Rückfrage als „Abbrechen“ und bleibt in der Ansicht (R4-S1)", async () => {
+    const nutzer = userEvent.setup();
+    render(<App />);
+    await nutzer.click(screen.getByRole("button", { name: "Neuen Bogen erstellen" }));
+    const laenge = history.length;
+    let antwort: Promise<boolean> | null = null;
+    act(() => {
+      antwort = frageJaNein({ titel: "Person entfernen?", text: "?", ok: "Person entfernen", gefahr: true });
+    });
+    await screen.findByRole("dialog", { name: "Person entfernen?" });
+    act(() => { history.back(); });
+    await expect(antwort).resolves.toBe(false);
+    await waitFor(() => expect(screen.queryByRole("dialog", { name: "Person entfernen?" })).toBeNull());
+    expect(screen.getByRole("heading", { level: 2, name: "1. Einheit" })).toBeDefined();
+    // Der verbrauchte Eintrag ist neu angelegt: Das nächste Zurück führt zur Startseite.
+    expect(history.length).toBe(laenge);
     act(() => { history.back(); });
     await waitFor(() => expect(screen.queryByLabelText("Name (Pflicht)")).toBeNull());
     expect(screen.getByRole("button", { name: "Neuen Bogen erstellen" })).toBeDefined();

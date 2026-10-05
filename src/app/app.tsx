@@ -490,6 +490,26 @@ function uhrzeitMitTag(d: Date): string {
 
 /** Was die App gerade zeigt — für den Browser-Verlauf (Zurück-Knopf, Audit „Fehler", E3). */
 type Ansicht = { schritt: number; zeigeStart: boolean; einsatz: string | null; scanner: boolean };
+/**
+ * Das oberste offene Fenster schließen, als hätte man Escape gedrückt —
+ * für die Zurück-Geste (R4-S1). Rückfragen der Dialogschicht liegen immer
+ * oben. QR-Vollbild und Scanner führen ihren Rücksprung selbst
+ * (`data-zurueck="eigen"`: eigener Verlaufseintrag bzw. Teil der Ansicht).
+ * Rückgabe: ob ein Fenster offen war.
+ */
+function offenesFensterAbbrechen(): boolean {
+  if (typeof document === "undefined") return false;
+  const offen = [...document.querySelectorAll<HTMLDialogElement>("dialog[open]")].filter(
+    (d) => d.dataset.zurueck !== "eigen",
+  );
+  if (offen.length === 0) return false;
+  const oben = offen.find((d) => d.classList.contains("abfrage")) ?? offen[offen.length - 1]!;
+  const abbruch = new Event("cancel", { cancelable: true });
+  oben.dispatchEvent(abbruch);
+  if (!abbruch.defaultPrevented && oben.open) oben.close("");
+  return true;
+}
+
 function ansichtGleich(a: Ansicht, b: Ansicht): boolean {
   return a.schritt === b.schritt && a.zeigeStart === b.zeigeStart && a.einsatz === b.einsatz && a.scanner === b.scanner;
 }
@@ -845,6 +865,23 @@ function AppInhalt() {
   useEffect(() => {
     function beiVerlauf(e: PopStateEvent) {
       const ziel = (e.state as { eeb?: Ansicht } | null)?.eeb;
+      // Zurück bei offener Rückfrage oder offenem Fenster ist „Abbrechen":
+      // Es schließt, was oben liegt, und die Ansicht dahinter bleibt. Vorher
+      // sprang die Ansicht, und die Rückfrage blieb über der falschen Seite
+      // stehen und wirkte von dort, ohne „Rückgängig" (Audit Runde 4, R4-S1).
+      // Der verbrauchte Verlaufseintrag wird für die stehende Ansicht neu
+      // angelegt, damit das nächste Zurück wieder einen Schritt zurück führt.
+      if (offenesFensterAbbrechen()) {
+        const jetzt = ansichtRef.current;
+        if (jetzt && !(ziel && ansichtGleich(ziel, jetzt))) {
+          try {
+            history.pushState({ eeb: jetzt }, "");
+          } catch {
+            /* ohne Verlauf */
+          }
+        }
+        return;
+      }
       if (!ziel) return;
       verlaufZielRef.current = ziel;
       setSchritt(ziel.schritt);
