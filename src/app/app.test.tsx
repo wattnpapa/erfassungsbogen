@@ -1152,6 +1152,26 @@ describe("Assistenten-Durchlauf", () => {
     expect(screen.getByText(/Dein eigener Bogen „THW Eigenstadt-Nord" liegt auf der Startseite/)).toBeDefined();
   }, 20000);
 
+  /** Audit Runde 4, R4-E2: derselbe Link zweimal — der eigene Bogen bleibt auf dem Rückholplatz. */
+  it("öffnet denselben Link ein zweites Mal ohne Rückfrage und lässt den Rückholplatz, wie er ist (R4-E2)", async () => {
+    const nutzer = userEvent.setup();
+    render(<App />);
+    await neuerBogenBis(nutzer, 0);
+    await nutzer.type(screen.getByLabelText("Name (Pflicht)"), "Biberach");
+    const link = encodePayloadUrl(bogenMitName("Ulm"), browserKompressor);
+    fragmentSetzen(link);
+    const frage = await screen.findByRole("dialog", { name: "Empfangenen Bogen öffnen?" });
+    await nutzer.click(within(frage).getByRole("button", { name: "Meldung öffnen" }));
+    expect(await screen.findByRole("heading", { name: "Gesamtübersicht" })).toBeDefined();
+    expect(localStorage.getItem("eeb.entwurf.ersetzt.v1")).toContain("Biberach");
+
+    fragmentSetzen(link);
+    expect(await screen.findByText(/Dieser Bogen ist schon offen: „THW Ulm"/)).toBeDefined();
+    expect(screen.queryByRole("dialog", { name: "Empfangenen Bogen öffnen?" })).toBeNull();
+    expect(localStorage.getItem("eeb.entwurf.ersetzt.v1")).toContain("Biberach");
+    expect(screen.getByText(/Dein eigener Bogen „THW Biberach" liegt auf der Startseite/)).toBeDefined();
+  }, 20000);
+
   /**
    * Audit Runde 3, R3-D2: Beim Kaltstart über einen Link wanderte der eigene
    * Bogen schon beim Laden auf den Rückholplatz — der dort liegende Bogen war
@@ -1983,6 +2003,55 @@ describe("Bogen aus einer PDF laden (Startseite, „Aus Datei laden“)", () => 
     await nutzer.upload(screen.getByLabelText("Aus Datei laden…"), pdfDatei(bogenMitName("OV Papier-PDF")));
     const frage = await screen.findByRole("dialog", { name: "Bogen aus Datei öffnen?" });
     expect(frage.textContent).toContain("THW Haßmersheim");
+  });
+
+  /**
+   * Audit Runde 4, R4-E2: Dieselbe Datei ein zweites Mal geöffnet fragte,
+   * ob „Ulm" durch „Ulm" ersetzt werden darf — und löschte dabei den eigenen
+   * Bogen vom Rückholplatz. Jetzt: keine Rückfrage, der eigene Bogen bleibt.
+   */
+  it("öffnet dieselbe Datei ein zweites Mal ohne Rückfrage, der eigene Bogen bleibt auf dem Rückholplatz (R4-E2)", async () => {
+    const nutzer = userEvent.setup();
+    render(<App />);
+    await nutzer.click(screen.getByRole("button", { name: "Neuen Bogen erstellen" }));
+    await nutzer.type(screen.getByLabelText("Name (Pflicht)"), "Biberach");
+    await nutzer.click(screen.getByRole("button", { name: "‹ Startseite" }));
+    const ulm = bogenMitName("Ulm");
+    await nutzer.upload(screen.getByLabelText("Aus Datei laden…"), pdfDatei(ulm));
+    await nutzer.click(within(await screen.findByRole("dialog", { name: "Bogen aus Datei öffnen?" })).getByRole("button", { name: "Datei öffnen" }));
+    expect(await screen.findByRole("heading", { name: "Gesamtübersicht" })).toBeDefined();
+    expect(localStorage.getItem("eeb.entwurf.ersetzt.v1")).toContain("Biberach");
+
+    await nutzer.click(screen.getByRole("button", { name: "‹ Startseite" }));
+    await nutzer.upload(screen.getByLabelText("Aus Datei laden…"), pdfDatei(ulm));
+    expect(await screen.findByText(/Dieser Bogen ist schon offen: „THW Ulm"\. Nichts ersetzt\./)).toBeDefined();
+    expect(screen.queryByRole("dialog", { name: "Bogen aus Datei öffnen?" })).toBeNull();
+    expect(screen.getByRole("heading", { name: "Gesamtübersicht" })).toBeDefined();
+    expect(localStorage.getItem("eeb.entwurf.ersetzt.v1")).toContain("Biberach");
+    expect(localStorage.getItem("eeb.entwurf.v1")).toContain("Ulm");
+  });
+
+  /**
+   * Audit Runde 4, R4-N2: Am Meldekopf öffnete „Aus Datei laden…" die Meldung
+   * einer Einheit als eigenen Bogen; der Link fragte „Wohin damit?". Jetzt
+   * fragt die Datei dasselbe, und „In … aufnehmen" lässt den Entwurf stehen.
+   */
+  it("fragt bei vorhandener Sammlung „Wohin damit?“ und lässt beim Aufnehmen den eigenen Entwurf unberührt (R4-N2)", async () => {
+    const sammlung = einsatzImSpeicherAnlegen("Hochwasser Donau", EinsatzArt.EINSATZ);
+    const nutzer = userEvent.setup();
+    render(<App />);
+    await nutzer.click(screen.getByRole("button", { name: "Neuen Bogen erstellen" }));
+    await nutzer.type(screen.getByLabelText("Name (Pflicht)"), "Mühldorf");
+    await nutzer.click(screen.getByRole("button", { name: "‹ Startseite" }));
+
+    await nutzer.upload(screen.getByLabelText("Aus Datei laden…"), pdfDatei(bogenMitName("Bamberg")));
+    const frage = await screen.findByRole("dialog", { name: 'Bogen von „THW Bamberg" aus der Datei' });
+    expect(within(frage).getByRole("button", { name: "Bogen öffnen (ansehen oder bearbeiten)" })).toBeDefined();
+    await nutzer.click(within(frage).getByRole("button", { name: 'In „Hochwasser Donau" aufnehmen' }));
+    await waitFor(() => expect(neuesteJeEinheit(einsaetzeLaden().find((e) => e.id === sammlung.id)!.eintraege)).toHaveLength(1));
+    expect(screen.queryByRole("dialog", { name: "Bogen aus Datei öffnen?" })).toBeNull();
+    expect(localStorage.getItem("eeb.entwurf.v1")).toContain("Mühldorf");
+    expect(localStorage.getItem("eeb.entwurf.ersetzt.v1")).toBeNull();
   });
 
   it("erklärt verständlich, wenn in der PDF weder Daten noch ein QR-Code stecken", async () => {

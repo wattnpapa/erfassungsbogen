@@ -246,6 +246,7 @@ export function Dialogschicht() {
 function Dialogfenster({ abfrage }: { abfrage: Abfrage }) {
   const dialog = useRef<HTMLDialogElement>(null);
   const erstes = useRef<HTMLInputElement | HTMLTextAreaElement | null>(null);
+  const abbruchKnopf = useRef<HTMLButtonElement>(null);
   const geoeffnetUm = useRef(Date.now());
 
   /** Zeiger-Klicks kurz nach dem Öffnen verschlucken (siehe `prellschutzMs`). */
@@ -278,6 +279,12 @@ function Dialogfenster({ abfrage }: { abfrage: Abfrage }) {
     // und nichts darin fokussierbar.
     erstes.current?.focus();
     erstes.current?.select();
+    // Steht eine zerstörende Antwort im Dialog, liegt der Fokus auf dem Weg,
+    // der nichts verändert: Vorher hatte der rote Knopf ihn, und ein Enter
+    // oder ein Tipp auf den hervorgehobenen Knopf ersetzte (Audit Runde 4,
+    // R4-E2).
+    if (abfrage.art === "wahl" && abfrage.wege.some((w) => w.gefahr)) abbruchKnopf.current?.focus();
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- nur beim Öffnen; jede Abfrage hat ein eigenes Fenster
   }, []);
 
   /** Pflichtfeld noch leer → die bejahende Antwort bleibt gesperrt. */
@@ -397,7 +404,7 @@ function Dialogfenster({ abfrage }: { abfrage: Abfrage }) {
                 sichtbar ab: Beide Knöpfe lagen keine zwei Fingerbreit
                 auseinander, und der obere ist der, der nichts zurücknimmt. */}
             <div className={`abfrage-aktionen${abfrage.wege.some((w) => w.gefahr) ? " abgesetzt" : ""}`}>
-              <button type="button" onClick={() => dialog.current?.close("")}>
+              <button type="button" ref={abbruchKnopf} onClick={() => dialog.current?.close("")}>
                 {abfrage.abbruch}
               </button>
             </div>

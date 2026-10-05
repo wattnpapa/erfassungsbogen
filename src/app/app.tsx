@@ -1068,13 +1068,39 @@ function AppInhalt() {
       setFehler(await dateiFehlerMeldung(datei, err, "bogen")); // nie Parser-Text (R2-E5)
       return;
     }
+    // Am Meldekopf ist eine Bogendatei fast immer die Meldung einer Einheit:
+    // dieselbe Frage „Wohin damit?" wie bei Link und Scan. Vorher öffnete
+    // „Aus Datei laden…" sie als eigenen Bogen, die Einheit fehlte in der Lage
+    // und der eigene Entwurf lag auf dem Rückholplatz (Audit Runde 4, R4-N2).
+    const mehrere =
+      anzahl > 1 ? `Die PDF enthält ${anzahl} Bögen — aufgenommen ist „${einheitAnzeigename(geladen.bogen.einheit)}". Alle auf einmal: in der Sammlung „Bögen einlesen…".` : "";
+    const wohin = await empfangsZielWaehlen(geladen.bogen, "Datei");
+    if (wohin == null) return; // abgebrochen — nichts verändert
+    let nichtAbgelegt: string | null = null;
+    if (wohin !== "oeffnen") {
+      const ok = await bogenInSammlung(wohin, geladen.bogen, "pdf-import", undefined, false, mehrere);
+      setZeigeStart(false);
+      // Wie beim Link: nur bei vollem Speicher wird der Bogen stattdessen geöffnet (R2-O2).
+      nichtAbgelegt = ok ? null : ablageFehler.current;
+      if (!nichtAbgelegt) return;
+    }
+    // Derselbe Bogen ist schon offen: nichts ersetzen, nichts verdrängen (R4-E2).
+    if (bogenSchonOffen(geladen.bogen)) {
+      schonOffenenBogenZeigen(geladen.bogen);
+      return;
+    }
     if (!(await darfBogenErsetzen({ titel: "Bogen aus Datei öffnen?", was: "den Bogen aus der Datei", ok: "Datei öffnen" }))) return;
     const b = geladen.bogen;
     setBogen(b);
     setzeEmpfang(null); // Datei-Import: kein signierter Transport
     setSchritt(UEBERSICHT);
     setZeigeStart(false);
-    setFehler("");
+    setOffenerEinsatzId(null);
+    setFehler(
+      nichtAbgelegt
+        ? `Nicht in die Sammlung aufgenommen: ${nichtAbgelegt} Der Bogen bleibt hier geöffnet — danach „In Einsatz-Sammlung ablegen…".`
+        : "",
+    );
     // Sammel-PDF eines Meldekopfs: hier lässt sich nur EIN Bogen öffnen —
     // wer alle will, ist beim Einsatz-Import richtig, statt die PDF als
     // „ging nicht" abzulegen.
@@ -1212,6 +1238,29 @@ function AppInhalt() {
       satz: `${bleibt} ${alt.fremd ? "Die" : "Der"} dort bisher liegende ${alt.fremd ? "Erfassung" : "Bogen"} „${altName}" (Stand ${stand} Uhr${altMerkmal ? ` · ${altMerkmal}` : ""}) wird dabei endgültig gelöscht.`,
       verlust: true,
     };
+  }
+
+  /**
+   * Gleicht ein eintreffender Bogen dem offenen aufs Zeichen? Dann gibt es
+   * nichts zu ersetzen — und nichts vom Rückholplatz zu verdrängen (R4-E2).
+   * Ein inzwischen bearbeiteter Bogen gleicht nicht mehr; dann fragt die
+   * App wie bisher.
+   */
+  function bogenSchonOffen(neu: Erfassungsbogen): boolean {
+    return !!bogen && JSON.stringify(bogen) === JSON.stringify(neu);
+  }
+
+  /** Den schon offenen Bogen zeigen, statt ihn durch sich selbst zu ersetzen. */
+  function schonOffenenBogenZeigen(neu: Erfassungsbogen) {
+    setSchritt(UEBERSICHT);
+    setZeigeStart(false);
+    setOffenerEinsatzId(null);
+    setFehler("");
+    setMeldung(
+      [`Dieser Bogen ist schon offen: „${einheitAnzeigename(neu.einheit)}". Nichts ersetzt.`, eigenerBogenWartetHinweis()]
+        .filter(Boolean)
+        .join(" "),
+    );
   }
 
   /** Satz für Quittungen: wo der eigene Bogen liegt, wenn er in der Rückholung wartet. */
@@ -1508,7 +1557,7 @@ function AppInhalt() {
   async function bogenInSammlung(
     zielId: string,
     b: Erfassungsbogen,
-    quelle: "scan" | "manuell",
+    quelle: "scan" | "manuell" | "pdf-import",
     /**
      * Was beim Empfang mitkam: geprüfter Signaturstatus und der rohe Payload.
      * Letzterer wird mitgespeichert, damit der Meldekopf die Meldung später mit
@@ -1713,7 +1762,7 @@ function AppInhalt() {
    *
    * Rückgabe: Einsatz-ID, "oeffnen" oder null (abgebrochen).
    */
-  async function empfangsZielWaehlen(b: Erfassungsbogen): Promise<string | null> {
+  async function empfangsZielWaehlen(b: Erfassungsbogen, herkunft: "Meldung" | "Datei" = "Meldung"): Promise<string | null> {
     const sammlungen = einsaetzeLaden();
     if (sammlungen.length === 0) return "oeffnen";
     const letzte = letztenEinsatzLaden() ?? offenerEinsatzId;
@@ -1729,7 +1778,10 @@ function AppInhalt() {
       hinweis: "Für die Einheit selbst — der eigene angefangene Bogen bleibt über die Startseite zurückholbar.",
     });
     return frageWahl({
-      titel: `Meldung von „${einheitAnzeigename(b.einheit)}" empfangen`,
+      titel:
+        herkunft === "Datei"
+          ? `Bogen von „${einheitAnzeigename(b.einheit)}" aus der Datei`
+          : `Meldung von „${einheitAnzeigename(b.einheit)}" empfangen`,
       text: `Stärke ${staerkeKurz(b)}${b.uebung ? " · ÜBUNG" : ""}. Wohin damit?`,
       wege,
     });
@@ -1776,6 +1828,13 @@ function AppInhalt() {
       // Ein bewusst abgebrochenes Ablegen bleibt, wie es war.
       nichtAbgelegt = ok ? null : ablageFehler.current;
       if (!nichtAbgelegt) return true;
+    }
+    // Derselbe Bogen ist schon offen (Link zweimal angetippt): Die Rückfrage
+    // bot an, ihn „durch sich selbst" zu ersetzen, und löschte dabei den
+    // eigenen Bogen vom Rückholplatz (Audit Runde 4, R4-E2). Jetzt: zeigen.
+    if (!nichtAbgelegt && bogenSchonOffen(bogenNachFrist(b).bogen)) {
+      schonOffenenBogenZeigen(b);
+      return true;
     }
     if (!(await darfBogenErsetzen({ titel: "Empfangenen Bogen öffnen?", was: "die empfangene Meldung", ok: "Meldung öffnen" }))) {
       return true; // Scan beendet, der eigene Bogen bleibt stehen

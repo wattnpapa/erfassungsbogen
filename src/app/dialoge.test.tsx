@@ -108,3 +108,18 @@ describe("Ortssperre der Rückfrage", () => {
     await expect(antwort).resolves.toBe(true);
   });
 });
+
+/** Audit Runde 4, R4-E2: In einer Rückfrage mit Verlust hat „Abbrechen" den Fokus, nicht der rote Knopf. */
+describe("Fokus in Rückfragen", () => {
+  it("setzt den Fokus bei einer zerstörenden Antwort auf „Abbrechen“, sonst auf die erste Antwort", async () => {
+    render(<Dialogschicht />);
+    void frageJaNein({ titel: "Meldung öffnen?", text: "Der Bogen dort wird gelöscht.", ok: "Meldung öffnen", gefahr: true });
+    const gefahr = await screen.findByRole("dialog", { name: "Meldung öffnen?" });
+    expect(document.activeElement).toBe(within(gefahr).getByRole("button", { name: "Abbrechen" }));
+    fireEvent.click(within(gefahr).getByRole("button", { name: "Abbrechen" }), { detail: 0 });
+
+    void frageJaNein({ titel: "Weiter?", text: "Nichts geht verloren.", ok: "Weiter" });
+    const harmlos = await screen.findByRole("dialog", { name: "Weiter?" });
+    expect(document.activeElement).not.toBe(within(harmlos).getByRole("button", { name: "Abbrechen" }));
+  });
+});
