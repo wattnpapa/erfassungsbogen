@@ -199,7 +199,7 @@ describe("Schritt Personal", () => {
     buehne();
 
     await nutzer.click(screen.getByRole("button", { name: "+ Person hinzufügen" }));
-    await nutzer.click(screen.getByLabelText("Schnelleingabe (Tabelle)"));
+    await nutzer.click(screen.getByLabelText("Kurz-Liste (Tabelle)"));
 
     const tabelle = screen.getByRole("table");
     expect(within(tabelle).getAllByRole("row")).toHaveLength(2); // Kopf + 1 Person
@@ -216,7 +216,7 @@ describe("Schritt Personal", () => {
 
     await nutzer.click(screen.getByRole("button", { name: "+ Person hinzufügen" }));
     await nutzer.click(screen.getByRole("button", { name: "+ Person hinzufügen" }));
-    await nutzer.click(screen.getByLabelText("Schnelleingabe (Tabelle)"));
+    await nutzer.click(screen.getByLabelText("Kurz-Liste (Tabelle)"));
 
     const tabelle = screen.getByRole("table");
     const namen = within(tabelle).getAllByRole("textbox").map((f) => f.getAttribute("aria-label"));
@@ -233,7 +233,7 @@ describe("Schritt Personal", () => {
 
     expect(screen.getByLabelText("Vorname").getAttribute("autocomplete")).toBe("off");
     expect(screen.getByLabelText("Nachname").getAttribute("autocomplete")).toBe("off");
-    await nutzer.click(screen.getByLabelText("Schnelleingabe (Tabelle)"));
+    await nutzer.click(screen.getByLabelText("Kurz-Liste (Tabelle)"));
     for (const feld of within(screen.getByRole("table")).getAllByRole("textbox")) {
       expect(feld.getAttribute("autocomplete")).toBe("off");
     }
@@ -445,6 +445,25 @@ describe("Schritt Personal", () => {
     const zurueck = daumen();
     expect(zurueck.textContent).toMatch(/^Zurückgeholt: Stein, Paul \(wieder Person 1\)/);
     expect(within(zurueck).queryByRole("button", { name: "Rückgängig" })).toBeNull();
+  });
+
+  it("bietet „+ Person hinzufügen“ auch über der Liste an, die neue Person bekommt den Cursor (R3-H6)", async () => {
+    const nutzer = userEvent.setup();
+    render(
+      <SchrittBuehne
+        komponente={SchrittPersonal}
+        bogen={{ ...neuerBogen(), personal: [{ ...neuePerson(), vorname: "Paul", nachname: "Stein" }, { ...neuePerson(), vorname: "Eva", nachname: "Berg" }] }}
+      />,
+    );
+    const oben = screen.getByRole("button", { name: "+ Person hinzufügen (springt zur neuen Person)" });
+    // Oben, vor der ersten Karte.
+    expect(oben.compareDocumentPosition(document.querySelector('[data-person-index="0"]')!) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    await nutzer.click(oben);
+    const vornamen = screen.getAllByLabelText("Vorname") as HTMLInputElement[];
+    expect(vornamen).toHaveLength(3);
+    await waitFor(() => expect(document.activeElement).toBe(vornamen[2]));
+    await nutzer.keyboard("Jan");
+    expect(vornamen[2]!.value).toBe("Jan");
   });
 
   it("versteckt den Beispielnamen-Weg bei echten Bögen vollständig", async () => {
@@ -803,7 +822,7 @@ describe("Personal umsortieren", () => {
   it("sortiert auch in der Schnelleingabe-Tabelle", async () => {
     const nutzer = userEvent.setup();
     render(<SchrittBuehne komponente={SchrittPersonal} bogen={drei()} />);
-    await nutzer.click(screen.getByLabelText("Schnelleingabe (Tabelle)"));
+    await nutzer.click(screen.getByLabelText("Kurz-Liste (Tabelle)"));
 
     await nutzer.click(screen.getByRole("button", { name: "Person 1 nach unten" }));
 
@@ -854,7 +873,7 @@ describe("Schnelleingabe-Tabelle — Person entfernen", () => {
   it("fragt in der Tabelle vor dem Entfernen einer ausgefüllten Person nach", async () => {
     const nutzer = userEvent.setup();
     render(<SchrittBuehne komponente={SchrittPersonal} bogen={mitJan()} />);
-    await nutzer.click(screen.getByLabelText("Schnelleingabe (Tabelle)"));
+    await nutzer.click(screen.getByLabelText("Kurz-Liste (Tabelle)"));
 
     await nutzer.click(screen.getByRole("button", { name: "Meyer, Jan entfernen" }));
 
@@ -872,7 +891,7 @@ describe("Schnelleingabe-Tabelle — Person entfernen", () => {
   it("entfernt eine leere Zeile ohne Rückfrage", async () => {
     const nutzer = userEvent.setup();
     render(<SchrittBuehne komponente={SchrittPersonal} bogen={mitJan()} />);
-    await nutzer.click(screen.getByLabelText("Schnelleingabe (Tabelle)"));
+    await nutzer.click(screen.getByLabelText("Kurz-Liste (Tabelle)"));
 
     await nutzer.click(screen.getByRole("button", { name: "Person 2 entfernen" }));
 

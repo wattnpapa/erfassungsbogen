@@ -739,6 +739,14 @@ export function SchrittPersonal({ bogen, aendern: aendernRoh }: SchrittProps) {
     }
   }, [nachEntfernen]);
   const nurStaerke = bogen.personalErfassung === PersonalErfassung.NUR_STAERKE;
+  /** Neue Person ans Ende — in der Kartenansicht samt Sprung dorthin, in der Tabelle mit Fokus in der neuen Zeile. */
+  function personObenHinzufuegen() {
+    const neu = neuePerson();
+    setFokusNeue(true);
+    setFrischeKarte(neu);
+    if (!schnell) setZurNeuen(bogen.personal.length);
+    aendern({ personal: [...bogen.personal, neu] });
+  }
   const vorlage = stanPersonalVorbelegung(bogen.einheit.organisation, bogen.einheit.einheitsTyp);
   const stanGeladen = vorbelegungGeladen(bogen.personal, vorlage);
   const funktionsauswahl = haeufigeFunktionen(bogen.einheit.organisation, vorlage, bogen.personal);
@@ -750,6 +758,16 @@ export function SchrittPersonal({ bogen, aendern: aendernRoh }: SchrittProps) {
   // Objektidentität statt Index — siehe fahrzeuge.tsx: ein Index rutscht beim
   // Löschen einer anderen Karte auf eine bestehende.
   const [frischeKarte, setFrischeKarte] = useState<Person | null>(null);
+  // „+ Person hinzufügen" oben: nach dem Anlegen zur neuen Karte springen.
+  const [zurNeuen, setZurNeuen] = useState<number | null>(null);
+  useEffect(() => {
+    if (zurNeuen == null) return;
+    setZurNeuen(null);
+    const karte = document.querySelector<HTMLElement>(`[data-person-index="${zurNeuen}"]`);
+    if (!karte) return;
+    karte.scrollIntoView?.({ block: "start" });
+    karte.querySelector<HTMLInputElement>("input")?.focus({ preventScroll: true });
+  }, [zurNeuen]);
   // Nur die Detail-Karten zeigen Qualifikationen; die Schnelltabelle nicht.
   const vorschlaege = useQualiVorschlaege(!nurStaerke && !schnell, bogen.einheit.organisation);
   // Nach dem Verschieben wandert der Fokus mit der Person. Ohne das zeigt der
@@ -1026,12 +1044,21 @@ export function SchrittPersonal({ bogen, aendern: aendernRoh }: SchrittProps) {
         <p className="ansicht-wahl">
           <label className="inline">
             <input type="radio" name="pansicht" checked={!schnell} onChange={() => { setSchnell(false); setFokusNeue(false); }} />
-            Detail-Karten
+            Alle Angaben (Karten)
           </label>
           <label className="inline">
             <input type="radio" name="pansicht" checked={schnell} onChange={() => { setSchnell(true); setFokusNeue(false); }} />
-            Schnelleingabe (Tabelle)
+            Kurz-Liste (Tabelle)
           </label>
+          {/* Der häufige Fall im Einsatz: eine Person kommt nach. Unten am
+              Ende der Liste lag „+ Person hinzufügen" bei zehn Personen 18
+              Bildschirme tief (Audit Runde 3, R3-H6). Von hier springt die
+              Ansicht auf die neue Person, der Cursor steht im Vornamen. */}
+          {bogen.personal.length >= 2 && (
+            <button type="button" aria-label="+ Person hinzufügen (springt zur neuen Person)" onClick={personObenHinzufuegen}>
+              + Person hinzufügen
+            </button>
+          )}
           <button type="button" onClick={() => { setNamenText(""); namenDialog.current?.showModal(); }}>
             Namen einfügen…
           </button>

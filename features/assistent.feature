@@ -164,7 +164,7 @@ Funktionalität: Bogen im Assistenten erfassen
   Szenario: Enter in der Schnelleingabe legt die nächste Zeile an
     Wenn ich zum Schritt "3. Personal" wechsle
     Und ich auf "+ Person hinzufügen" klicke
-    Und ich "Schnelleingabe (Tabelle)" ankreuze
+    Und ich "Kurz-Liste (Tabelle)" ankreuze
     Und ich in der Schnelltabelle Zeile 1 auf "Anke" setze
     Und ich in der Schnelltabelle in Zeile 1 die Eingabetaste drücke
     Und ich in der Schnelltabelle Zeile 2 auf "Bernd" setze
