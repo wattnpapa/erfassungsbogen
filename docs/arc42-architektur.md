@@ -43,6 +43,16 @@
 > Kaltstart) fragen vor dem Verdrängen gegen den aktuellen Arbeitsstand —
 > Kapitel 8.2.
 >
+> **Nachgezogen 2026-10-05:** Audit Runde 4, Paket „Rückfragen, Links,
+> Rückholplatz, Zurück-Geste" — die Startentscheidung für einen Bogen-Link
+> (`startLage()` in `app.tsx`) fällt erst beim ersten Aufbau, nach
+> `speicherVerdrahten()` (R4-W3); „Aus Datei laden…" fragt wie Link und Scan
+> „Wohin damit?" (R4-N2); ein Bogen, der dem offenen gleicht, ersetzt nichts
+> (R4-E2); „Meine Fassung behalten" legt den Stand des anderen Fensters auf
+> den Rückholplatz (R4-S4); Zurück schließt bei offener Rückfrage nur sie
+> (R4-S1); Rückfragen und Ansichtswechsel sperren die Fingerstelle 1,5 s
+> (`tipp-schutz.ts`, R4-G1/S2/S3) — Kapitel 8.2.
+>
 > **Nachgezogen 2026-10-05:** Audit Runde 3, Paket „Einsatz-Import, Abgleich
 > zwischen Geräten, Papier-Rückweg" — „Einsatz importieren…" läuft über
 > `einsatzAbgleichen` (`src/app/einsatz-abgleich.ts`), das um den
@@ -1089,14 +1099,29 @@ flowchart TB
   Link) über eine Ref auf den Handler des aktuellen Renders und beim
   Kaltstart nach dem Mounten über denselben Weg (`uebernimmBogen`): erst
   Rückfrage, dann verdrängen. Sofort geöffnet wird ein Start-Link nur ohne
-  angefangenen Bogen und ohne Sammlung (`START_SOFORT`, R3-S1/R3-D2,
-  nachgezogen 2026-10-05). `merkeVerdraengt` legt die Bearbeitung einer
-  gespeicherten Vorlage unverändert gar nicht und verändert nur ohne eigenen
-  Bogen auf den Rückholplatz (R3-D1); „Aus Datei laden…" fragt erst nach
-  dem Lesen (R3-E2).
+  angefangenen Bogen und ohne Sammlung (R3-S1/R3-D2). Entschieden wird das
+  in `startLage()` beim ersten Aufbau der App, nicht beim Laden des Moduls:
+  `main.tsx` importiert `app.tsx`, bevor `speicherVerdrahten()` der
+  Sammlung ihren Speicher reicht, und die alte Modulkonstante `START_SOFORT`
+  sah nie eine Sammlung (R4-W3, nachgezogen 2026-10-05). `merkeVerdraengt`
+  legt die Bearbeitung einer gespeicherten Vorlage unverändert gar nicht und
+  verändert nur ohne eigenen Bogen auf den Rückholplatz (R3-D1); „Aus Datei
+  laden…" fragt erst nach dem Lesen (R3-E2) und bei vorhandener Sammlung
+  wie Link und Scan „Wohin damit?" (`empfangsZielWaehlen`, R4-N2). Gleicht
+  ein eintreffender Bogen dem offenen (`bogenSchonOffen`), wird nichts
+  ersetzt und nichts vom Rückholplatz verdrängt (R4-E2).
   Zwei Fenster: `entwurfAusAnderemFenster` erkennt einen Entwurf, den dieses
   Fenster nicht selbst geschrieben hat; vor dem Anlegen eines neuen Bogens
-  fragt die App und legt ihn auf den Rückholplatz (R3-S3).
+  fragt die App und legt ihn auf den Rückholplatz (R3-S3). „Meine Fassung
+  behalten" legt den Stand des anderen Fensters ebenso dort ab und fragt,
+  wenn dabei ein dritter Bogen fiele; „Stand aus dem anderen Fenster laden"
+  setzt einen inhaltsleeren Merker in `sessionStorage`
+  (`eeb.abgleich.fortsetzen`), damit die neu geladene Seite im Bogen statt
+  auf der Startseite beginnt (R4-S4).
+  Zurück-Geste: Der Verlaufs-Lauscher schließt zuerst das oberste offene
+  Fenster wie Escape und legt den verbrauchten Eintrag neu an; QR-Vollbild
+  und Scanner führen ihren Rücksprung selbst (`data-zurueck="eigen"`,
+  R4-S1, R4-M5).
 - **Folgemeldungen** (`eintrag-zeiten.ts`): Jeder Eingang in eine Sammlung —
   Scan, Link, Datei, Bilderstapel, „In Einsatz aufnehmen" — läuft über
   `meldungAufnehmen`. Eine neue Fassung derselben Einheit erbt dort

@@ -231,6 +231,22 @@ Grundlage: Repository `wattnpapa/erfassungsbogen`, Stand 2026-09-12 — Version 
 > halten die entfernte Person bzw. das Fahrzeug im Arbeitsspeicher, bis die
 > Quittung geschlossen, ersetzt oder der Schritt verlassen wird. „Alle Daten
 > löschen" nennt den Bogen auf dem Rückholplatz. Kein neuer Speicherort (5.5).
+>
+> **Nachgezogen 2026-10-05:** Rückfragen, Links, Rückholplatz (Audit Runde 4,
+> Paket 1) — ein Kaltstart-Link auf einem Gerät mit Sammlung, aber ohne
+> eigenen Bogen öffnete den fremden Bogen als eigenen Entwurf; jetzt fragt
+> er „Wohin damit?" (R4-W3). „Aus Datei laden…" fragt bei vorhandener
+> Sammlung ebenso (R4-N2). Derselbe Bogen ein zweites Mal geöffnet ersetzt
+> nichts und löscht den Rückholplatz nicht mehr (R4-E2). „Meine Fassung
+> behalten" legt den Stand des anderen Fensters auf den Rückholplatz statt
+> ihn zu verwerfen (R4-S4). Neu ist ein inhaltsleerer Merker im
+> **`sessionStorage`** (`eeb.abgleich.fortsetzen`, nur der Wert „1", lebt
+> bis zum Schließen des Tabs), damit die Seite nach „Stand aus dem anderen
+> Fenster laden" im Bogen beginnt (3.3 D1). „Sicherung einspielen" nennt
+> jetzt Rückholplatz, Absenderkarte und Geräteschlüssel (mit Kurzform vorher
+> und nachher) und verlangt den Haken, sobald auf dem Gerät überhaupt etwas
+> verloren geht (R4-D2, 5.5). Zurück schließt eine offene Rückfrage als
+> „Abbrechen", statt die Ansicht dahinter zu wechseln (R4-S1).
 
 ## Hinweis zu diesem Dokument
 
@@ -355,7 +371,7 @@ dem Vite-Build); es gibt keine serverseitige Variante.
 
 | # | Zielobjekt | Beschreibung | Speicherort |
 | --- | --- | --- | --- |
-| D1 | Erfassungsbogen-Entwurf | Aktuell bearbeiteter Bogen (Personal, Fahrzeuge, Einsatz, Sofortbedarf); Personaldaten 90 Tage nach der letzten Änderung anonymisiert, außer bei Übungen (5.5). Wird eine Vorlage bearbeitet, trägt der Entwurf zusätzlich deren Kennung (`vorlageId`, keine Personendaten); ist er die Erfassung einer fremden Einheit am Meldekopf, die Marke `fremd` mit der Kennung der Ziel-Sammlung und dem Beginn der Erfassung (`beginn`, Zeitpunkt; Vorschlag für die Eintreffzeit, R3-S6; keine Personendaten). Außerdem der zuletzt offene Schritt (`schritt`) und der Stand der letzten Übergabe (`uebergabe`: Zeitpunkt, Inhaltskennung, Stärke als Zahlen, seit R3-H3 auch der Weg — QR gezeigt, PDF erzeugt, Link, Nahbereich — und ob der Nutzer den Empfang bestätigt hat; keine Personendaten, R2-N7/R2-W2). Ein verdrängter oder verworfener Bogen liegt auf einem einzigen Rückholplatz (`eeb.entwurf.ersetzt.v1`), gleiche Frist; eine fremde Erfassung verdrängt dort nie einen eigenen Bogen, sondern wird dann nach Rückfrage verworfen (`src/app/entwurf.ts`). Ein eingehender Bogen (Link, Scan, Datei) verdrängt den angefangenen Bogen erst nach einer Rückfrage, die auch nennt, welcher Bogen dabei vom Rückholplatz fällt — das gilt seit R3-S1/R3-D2 auch für Links bei laufender App und beim Kaltstart. Eine Datei wird vorher gelesen; eine unbrauchbare Datei verdrängt nichts (R3-E2). Die Bearbeitung einer Vorlage kommt unverändert nicht auf den Rückholplatz und verdrängt dort verändert keinen eigenen Bogen (R3-D1). Sind zwei Fenster offen, schreibt ein Fenster nur über den Stand, den es selbst zuletzt geschrieben hat; hat ein anderes Fenster den Entwurf geändert, speichert es nicht und fragt („Stand aus dem anderen Fenster laden" / „Meine Fassung behalten", `src/app/fenster-abgleich.tsx`, `storage`-Ereignis, R2-O4); die Warnung steht fest am oberen Bildrand, und ein Fenster ohne eigenen Bogen legt den Entwurf eines anderen Fensters vor dem Anlegen nach Rückfrage auf den Rückholplatz (`entwurfAusAnderemFenster`, R3-S3) | `localStorage` des Geräts (`eeb.entwurf.v1`, `eeb.entwurf.ersetzt.v1`) |
+| D1 | Erfassungsbogen-Entwurf | Aktuell bearbeiteter Bogen (Personal, Fahrzeuge, Einsatz, Sofortbedarf); Personaldaten 90 Tage nach der letzten Änderung anonymisiert, außer bei Übungen (5.5). Wird eine Vorlage bearbeitet, trägt der Entwurf zusätzlich deren Kennung (`vorlageId`, keine Personendaten); ist er die Erfassung einer fremden Einheit am Meldekopf, die Marke `fremd` mit der Kennung der Ziel-Sammlung und dem Beginn der Erfassung (`beginn`, Zeitpunkt; Vorschlag für die Eintreffzeit, R3-S6; keine Personendaten). Außerdem der zuletzt offene Schritt (`schritt`) und der Stand der letzten Übergabe (`uebergabe`: Zeitpunkt, Inhaltskennung, Stärke als Zahlen, seit R3-H3 auch der Weg — QR gezeigt, PDF erzeugt, Link, Nahbereich — und ob der Nutzer den Empfang bestätigt hat; keine Personendaten, R2-N7/R2-W2). Ein verdrängter oder verworfener Bogen liegt auf einem einzigen Rückholplatz (`eeb.entwurf.ersetzt.v1`), gleiche Frist; eine fremde Erfassung verdrängt dort nie einen eigenen Bogen, sondern wird dann nach Rückfrage verworfen (`src/app/entwurf.ts`). Ein eingehender Bogen (Link, Scan, Datei) verdrängt den angefangenen Bogen erst nach einer Rückfrage, die auch nennt, welcher Bogen dabei vom Rückholplatz fällt — das gilt seit R3-S1/R3-D2 auch für Links bei laufender App und beim Kaltstart. Eine Datei wird vorher gelesen; eine unbrauchbare Datei verdrängt nichts (R3-E2). Die Bearbeitung einer Vorlage kommt unverändert nicht auf den Rückholplatz und verdrängt dort verändert keinen eigenen Bogen (R3-D1). Sind zwei Fenster offen, schreibt ein Fenster nur über den Stand, den es selbst zuletzt geschrieben hat; hat ein anderes Fenster den Entwurf geändert, speichert es nicht und fragt („Stand aus dem anderen Fenster laden" / „Meine Fassung behalten", `src/app/fenster-abgleich.tsx`, `storage`-Ereignis, R2-O4); die Warnung steht fest am oberen Bildrand, und ein Fenster ohne eigenen Bogen legt den Entwurf eines anderen Fensters vor dem Anlegen nach Rückfrage auf den Rückholplatz (`entwurfAusAnderemFenster`, R3-S3); „Meine Fassung behalten" legt den Stand des anderen Fensters ebenfalls auf den Rückholplatz und fragt, wenn dabei ein dritter Bogen fiele (R4-S4). Ein eingehender Bogen, der dem offenen gleicht, ersetzt nichts und verdrängt nichts (R4-E2); ein Kaltstart-Link oder „Aus Datei laden…" auf einem Gerät mit Sammlung fragt zuerst „Wohin damit?" und legt eine fremde Meldung nicht als eigenen Entwurf ab (R4-W3, R4-N2) | `localStorage` des Geräts (`eeb.entwurf.v1`, `eeb.entwurf.ersetzt.v1`); nach „Stand aus dem anderen Fenster laden" kurz ein inhaltsleerer Merker im `sessionStorage` des Tabs (`eeb.abgleich.fortsetzen`, wird beim nächsten Start gelesen und gelöscht, R4-S4) |
 | D2 | Gesicherte/archivierte Bögen | Übergebene bzw. empfangene Bögen inkl. Papierkorb (vor endgültiger Löschung); Meldungen der Einsatz-Sammlung unterliegen derselben Datenschutzfrist, Vorlagen nicht (5.5) | `localStorage` des Geräts |
 | D2a | Uhrstand der Datenschutzfrist | Zuletzt akzeptierter Zeitpunkt der Geräteuhr, ggf. unbestätigter Sprung; keine Personendaten | `localStorage` des Geräts (`eeb.uhr.v1`) |
 | D2b | Export-Stand je Einsatz-Sammlung | Kennungen der Meldungen, die beim letzten Export (Sammel-PDF, CSV, Excel) schon in der Sammlung standen, samt Zeitpunkt — Grundlage für „Nur neue Bögen seit dem letzten Export" (5.4); keine Personendaten, nur zufällige Kennungen | `localStorage` des Geräts (`eeb.export-stand.v1`), wandert mit der Datensicherung mit, fällt mit „Alle Daten löschen" weg |
@@ -651,6 +667,13 @@ Datenausleitung an eine andere Herkunft ist technisch unterbunden.
   laufenden Sammlungen des Geräts und den Inhalt der Datei, bietet „Vorher
   Sicherung erstellen…" an und verlangt einen Haken, sobald laufende
   Sammlungen mit Meldungen betroffen sind.
+  *Nachgezogen 2026-10-05 (Audit Runde 4, R4-D2):* Die Aufzählung nennt
+  dieselben Posten wie „Alle Daten löschen" — Vorlagen getrennt nach aktiv
+  und Papierkorb, den Bogen auf dem Rückholplatz, die Absenderkarte und den
+  Signatur-Geräteschlüssel mit Kurzform vorher (Gerät) und nachher (Datei).
+  Der Haken ist Pflicht, sobald auf dem Gerät überhaupt etwas verloren geht
+  (Sammlung, Vorlage, Entwurf, Rückholplatz, Absenderkarte oder
+  Geräteschlüssel). Gelöscht wird weiter alles unter `eeb.`.
 - **Verfügbarkeit des Gerätespeichers** (`src/app/speicher-browser.ts`,
   `src/app/sicherung.ts`, seit 2026-09-29, R2-O6): Browser dürfen
   Website-Daten bei Platzmangel oder (Safari) nach längerer Nichtnutzung

@@ -200,6 +200,19 @@ Grundlage: Repository `wattnpapa/erfassungsbogen`, Stand 2026-09-12 — Version 
 > Entfernte Personen und Fahrzeuge im Assistenten bleiben bis zum Verlassen
 > des Schritts rückholbar (Arbeitsspeicher). „Alle Daten löschen" zählt den
 > Bogen auf dem Rückholplatz mit auf. Kein neuer Speicherort. Geändert: 5.7.
+>
+> **Nachgezogen 2026-10-05 — Rückfragen, Links, Rückholplatz (Audit Runde 4,
+> Paket 1):** Ein Kaltstart-Link am Meldekopf ohne eigenen Bogen machte die
+> fremde Meldung zum eigenen Entwurf; jetzt fragt er „Wohin damit?", ebenso
+> „Aus Datei laden…" (R4-W3, R4-N2) — die Meldung landet in der Sammlung
+> statt als Kopie im Entwurf. Derselbe Bogen ein zweites Mal geöffnet
+> verdrängt nichts mehr vom Rückholplatz (R4-E2); „Meine Fassung behalten"
+> legt den Stand des anderen Fensters auf den Rückholplatz (R4-S4). Neu ein
+> inhaltsleerer Merker im `sessionStorage` des Tabs (`eeb.abgleich.fortsetzen`,
+> keine Personendaten). „Sicherung einspielen" nennt Rückholplatz,
+> Absenderkarte und Geräteschlüssel, bevor sie ersetzt werden, und verlangt
+> dann den Haken (R4-D2). Keine neue Datenkategorie, kein neuer Empfänger.
+> Geändert: 5.7.
 
 ## Hinweis zu diesem Dokument
 
@@ -532,6 +545,10 @@ Kapitel 6 der [Arc42-Dokumentation](arc42-architektur.md).
   Datei, bietet „Vorher Sicherung erstellen…" an und verlangt einen Haken,
   sobald laufende Sammlungen betroffen sind (Audit Runde 2, R2-D3) — damit
   gehen fremde Meldungen nicht mehr unbemerkt verloren (Verfügbarkeit).
+  Seit 2026-10-05 (R4-D2) nennt sie auch den Bogen auf dem Rückholplatz, die
+  Absenderkarte (Kontaktdaten der meldenden Person) und den Geräteschlüssel
+  mit Kurzform und verlangt den Haken, sobald auf dem Gerät überhaupt etwas
+  ersetzt wird.
 - **Verfügbarkeit (seit 2026-09-29, R2-O6):** Der Browser darf den lokalen
   Speicher einer Website räumen; dann wären auch fremde Meldungen verloren,
   bevor sie weitergegeben sind. Die Web-App bittet deshalb um dauerhaften
@@ -577,7 +594,14 @@ Kapitel 6 der [Arc42-Dokumentation](arc42-architektur.md).
   verdrängt dort keinen eigenen Bogen (R3-D1).
   Ein zweites Fenster ohne eigenen Bogen überschreibt den Entwurf eines
   anderen Fensters nicht still, sondern legt ihn nach Rückfrage auf den
-  Rückholplatz (R3-S3).
+  Rückholplatz (R3-S3); „Meine Fassung behalten" legt den Stand des anderen
+  Fensters ebenso dort ab (R4-S4). Seit 2026-10-05 (Audit Runde 4) ersetzt
+  ein Bogen, der dem offenen gleicht, nichts mehr (R4-E2), und ein
+  Kaltstart-Link oder „Aus Datei laden…" auf einem Gerät mit Sammlung fragt
+  zuerst „Wohin damit?" — eine fremde Meldung wird nicht mehr ungefragt zum
+  eigenen Entwurf (R4-W3, R4-N2). Nach „Stand aus dem anderen Fenster laden"
+  steht bis zum nächsten Start ein inhaltsleerer Merker im `sessionStorage`
+  des Tabs (`eeb.abgleich.fortsetzen`).
 - **Empfehlung:** eine eigene, dokumentierte Löschfrist für digital gespeicherte
   Bögen und für Papierausdrucke festlegen, da die Software selbst keine erzwingt.
 - **Geräteschlüssel:** Der private Signaturschlüssel lässt sich einzeln
