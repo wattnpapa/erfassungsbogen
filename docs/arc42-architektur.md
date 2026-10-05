@@ -1055,7 +1055,11 @@ flowchart TB
   Scan, Link, Datei, Bilderstapel, „In Einsatz aufnehmen" — läuft über
   `meldungAufnehmen`. Eine neue Fassung derselben Einheit erbt dort
   Eintreffzeit, Auftrag/Notiz, Zug- und Teil-Etikett der Vorgängerin; der
-  Kern (`@bos/meldekopf`) bleibt unverändert.
+  Kern (`@bos/meldekopf`) bleibt unverändert. Trägt ein Nachtrag nur eine
+  Stärke (Schnellerfassung vom Papier), bietet die Rückfrage „Nur die Stärke
+  ändern" an: `nurStaerkeUebernehmen` (`nur-staerke.ts`) baut die neue Fassung
+  aus der bisherigen und schreibt Verpflegungs- und M/W/D-Aufteilung fest;
+  dasselbe an der Karte über „Mehr…" › „Stärke ändern…" (R3-A1, 2026-10-05).
 - **Abgleich beim Einsatz-Import** (`einsatz-abgleich.ts`, R3-W1,
   nachgezogen 2026-10-05): Der Kern-Import `einsatzImportieren` hängt nur
   Meldungen mit unbekannter Eintrags-ID an. `einsatzAbgleichen` merkt sich den

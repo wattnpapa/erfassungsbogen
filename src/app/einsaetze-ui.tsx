@@ -12,6 +12,7 @@ import { useEffect, useId, useLayoutEffect, useRef, useState, type FocusEvent, t
 import {
   PersonalErfassung,
   datumZuIso,
+  jetztZeitpunkt,
   staerke,
   unterbringungMWD,
   verpflegung,
@@ -79,13 +80,15 @@ import {
   einheitEntfernen,
   einheitVerschieben,
   notizSetzen,
+  meldungAufnehmen,
   zugSetzen,
   HERKUNFT_TEXT,
   statusMitZeitSetzen,
   zeitKurz,
   zeitLang,
 } from "./eintrag-zeiten";
-import { frageJaNein, frageWahl, zeigeHinweis } from "./dialoge";
+import { frageFelder, frageJaNein, frageWahl, zeigeHinweis } from "./dialoge";
+import { nurStaerkeUebernehmen } from "./nur-staerke";
 import { TabellenScroll } from "./tabellen-scroll";
 import {
   TABELLEN_SPALTEN,
@@ -2251,6 +2254,39 @@ function EinheitKarte(props: {
    * „Entfernen" und neu scannen, beim eigenen Bogen sogar PDF → Datei laden.
    * Alle Fassungen, Signatur, Zeiten und Notiz ziehen unverändert mit.
    */
+  /**
+   * Stärke dieser Meldung korrigieren (Papiernachtrag „ein Helfer weniger"):
+   * neue Fassung mit allem Übrigen der bisherigen — Fahrzeuge, Bedarf, Namen,
+   * Zug, Auftrag und Eintreffzeit bleiben (Audit Runde 3, R3-A1).
+   */
+  async function staerkeAendern() {
+    const alt = staerke(kopf.bogen);
+    const feld = (name: string, label: string, wert: number) => ({ name, label, vorgabe: String(wert) });
+    const w = await frageFelder({
+      titel: "Stärke ändern",
+      hinweis:
+        `„${einheitAnzeigename(kopf.bogen.einheit)}", bisher ${alt.fuehrer} / ${alt.unterfuehrer} / ${alt.mannschaft} / ${alt.gesamt}. ` +
+        "Fahrzeuge, Bedarf, Namen, Zug und Auftrag bleiben; die bisherige Meldung wandert in die Historie.",
+      felder: [feld("fuehrer", "Führer", alt.fuehrer), feld("unterfuehrer", "Unterführer", alt.unterfuehrer), feld("mannschaft", "Mannschaft", alt.mannschaft)],
+      ok: "Stärke übernehmen",
+    });
+    if (!w) return;
+    const zahl = (t: string | undefined) => (/^\s*\d{1,3}\s*$/.test(t ?? "") ? Number(t) : null);
+    const f = zahl(w.fuehrer);
+    const u = zahl(w.unterfuehrer);
+    const m = zahl(w.mannschaft);
+    if (f == null || u == null || m == null) {
+      await zeigeHinweis({ titel: "Stärke ändern", text: "Bitte in jedes Feld eine ganze Zahl eintragen (0 bis 999). Nichts geändert." });
+      return;
+    }
+    if (f === alt.fuehrer && u === alt.unterfuehrer && m === alt.mannschaft) return;
+    const neu = nurStaerkeUebernehmen(kopf.bogen, { fuehrer: f, unterfuehrer: u, mannschaft: m, gesamt: f + u + m }, jetztZeitpunkt());
+    const ok = await gesichert("Stärke ändern", () => {
+      meldungAufnehmen(einsatzId, neu, { quelle: "manuell", einheitSchluesselOverride: kopf.einheitSchluessel });
+    });
+    if (ok) onGeaendert();
+  }
+
   async function verschieben() {
     const andere = einsaetzeLaden().filter((s) => s.id !== einsatzId);
     if (andere.length === 0) {
@@ -2690,6 +2726,11 @@ function EinheitKarte(props: {
               <button type="button" aria-describedby={nameId} onClick={() => setZusammenfuehren(!zusammenfuehren)}>
                 {zusammenfuehren ? "Zusammenführen schließen" : "Zusammenführen…"}
               </button>{" "}
+            </>
+          )}
+          {zaehlt && (
+            <>
+              <button type="button" aria-describedby={nameId} onClick={() => void staerkeAendern()}>Stärke ändern…</button>{" "}
             </>
           )}
           <button type="button" aria-describedby={nameId} onClick={() => void verschieben()}>Verschieben…</button>{" "}

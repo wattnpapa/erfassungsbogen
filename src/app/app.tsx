@@ -109,7 +109,8 @@ import { einheitSymbolSvg, svgDataUrl } from "./taktische-zeichen-bogen";
 import { Fusszeile } from "./fusszeile";
 import { Aktualisierungshinweise } from "./aktualisierung";
 import { SpeicherWarnung } from "./speicher-warnung";
-import { Dialogschicht, frageFelder, frageJaNein, frageWahl, zeigeHinweis } from "./dialoge";
+import { Dialogschicht, frageFelder, frageJaNein, frageWahl, zeigeHinweis, type Antwortweg } from "./dialoge";
+import { istNurStaerke, nurStaerkeUebernehmen, wasWegfiele } from "./nur-staerke";
 import {
   SchrittEinheit,
   SchrittEinsatz,
@@ -1396,17 +1397,41 @@ function AppInhalt() {
     // in der Quittung als Folgemeldung genannt; die Ausnahme „zweite
     // gleichnamige Einheit" bleibt über „Aufteilen"/„Als eigene Einheit" in
     // der Einsatzansicht erreichbar.
+    // Nur eine Stärke vom Papier für eine schon gemeldete Einheit: Als neue
+    // Fassung fielen Fahrzeuge, Bedarf und Namen still aus den Summen. Die
+    // Rückfrage sagt, was wegfiele, und bietet zuerst „Nur die Stärke
+    // ändern" an (Audit Runde 3, R3-A1).
+    let aufzunehmen = b;
+    const nurStaerkeWeg = (vorher: Erfassungsbogen): Antwortweg[] => {
+      if (!istNurStaerke(b) || wasWegfiele(vorher, b).length === 0) return [];
+      return [
+        {
+          wert: "staerke",
+          label: `Nur die Stärke ändern (${staerkeKurz(vorher)} → ${staerkeKurz(b)})`,
+          hinweis: `Neue Fassung mit allem Übrigen der bisherigen Meldung: ${wasWegfiele(vorher, b).join(", ")} bleiben.`,
+        },
+      ];
+    };
+    const wegfallHinweis = (vorher: Erfassungsbogen): string => {
+      if (!istNurStaerke(b)) return "";
+      const weg = wasWegfiele(vorher, b);
+      return weg.length > 0 ? ` Fällt dabei weg: ${weg.join(", ")}.` : "";
+    };
     if (bekannt && !schonDa && !kiosk) {
+      const bisher = einsatz ? revisionen(einsatz.eintraege, schl)[0]?.bogen : undefined;
       // Die Frage hat zwei gleichwertige Antworten und deshalb zwei benannte
       // Knöpfe: „OK/Abbrechen" hätte den zweiten Weg als Abbruch getarnt.
       const wahl = await frageWahl({
         titel: "Einheit ist bereits gemeldet",
         text: `„${einheitAnzeigename(b.einheit)}" steht in diesem Einsatz schon. Wie soll der neue Bogen dazu stehen?`,
         wege: [
+          ...(bisher ? nurStaerkeWeg(bisher) : []),
           {
             wert: "fassung",
             label: "Als neue Fassung anhängen",
-            hinweis: "Der Normalfall bei einer Folgemeldung: die bisherige Meldung wandert in die Historie.",
+            hinweis:
+              "Der Normalfall bei einer Folgemeldung: die bisherige Meldung wandert in die Historie." +
+              (bisher ? wegfallHinweis(bisher) : ""),
           },
           {
             wert: "eigene",
@@ -1424,6 +1449,7 @@ function AppInhalt() {
         return false;
       }
       if (wahl === "eigene") override = `${schl}#${Date.now()}`;
+      if (wahl === "staerke" && bisher) aufzunehmen = nurStaerkeUebernehmen(bisher, staerke(b), b.stand);
     }
     // Ähnliche Einheit schon da (gleiche Organisation und gleicher Ort, aber
     // anderer Schlüssel — etwa nach einer Papierphase ohne Einheitstyp
@@ -1446,10 +1472,14 @@ function AppInhalt() {
           titel: "Ist das dieselbe Einheit?",
           text: `In diesem Einsatz steht schon „${einheitAnzeigename(aehnlich.bogen.einheit)}" (Stärke ${staerkeKurz(aehnlich.bogen)}). Die neue Meldung heißt „${einheitAnzeigename(b.einheit)}".`,
           wege: [
+            ...nurStaerkeWeg(aehnlich.bogen).map((w) => ({
+              ...w,
+              label: `Ja — nur die Stärke von „${einheitAnzeigename(aehnlich.bogen.einheit)}" ändern (${staerkeKurz(aehnlich.bogen)} → ${staerkeKurz(b)})`,
+            })),
             {
               wert: "gleich",
               label: `Ja — als neue Fassung von „${einheitAnzeigename(aehnlich.bogen.einheit)}"`,
-              hinweis: "Die bisherige Meldung wandert in die Historie; gezählt wird eine Einheit.",
+              hinweis: "Die bisherige Meldung wandert in die Historie; gezählt wird eine Einheit." + wegfallHinweis(aehnlich.bogen),
             },
             {
               wert: "eigene",
@@ -1463,6 +1493,10 @@ function AppInhalt() {
           return false;
         }
         if (wahl === "gleich") override = aehnlich.einheitSchluessel;
+        if (wahl === "staerke") {
+          override = aehnlich.einheitSchluessel;
+          aufzunehmen = nurStaerkeUebernehmen(aehnlich.bogen, staerke(b), b.stand);
+        }
       }
     }
     // Was sich gegenüber der vorigen Fassung ändert — für die Quittung im
@@ -1472,7 +1506,7 @@ function AppInhalt() {
     try {
       // meldungAufnehmen: legt ab und lässt die Folgemeldung Zug, Auftrag und
       // Eintreffzeit der Vorgängerin erben (eintrag-zeiten.ts, R2-K1).
-      r = meldungAufnehmen(zielId, b, {
+      r = meldungAufnehmen(zielId, aufzunehmen, {
         quelle,
         einheitSchluesselOverride: override,
         signatur: empfang?.signatur,
@@ -1494,7 +1528,8 @@ function AppInhalt() {
       return false;
     }
     const folge =
-      (r.neu && vorige ? ` (Folgemeldung: ${diffKurzfassung(bogenDiff(vorige.bogen, b)) || "inhaltlich unverändert"})` : "") +
+      (r.neu && vorige ? ` (Folgemeldung: ${diffKurzfassung(bogenDiff(vorige.bogen, aufzunehmen)) || "inhaltlich unverändert"})` : "") +
+
       (r.erbeFehlt ? " Zug, Auftrag und Eintreffzeit der vorigen Fassung konnten nicht übernommen werden (Speicher voll) — bitte an der Karte nachtragen." : "");
     if (kiosk) {
       // Dauerscannen: Piep + Zähler im Overlay, die Kamera bleibt an — beim
@@ -1512,7 +1547,9 @@ function AppInhalt() {
     }
     setMeldung(
       r.neu
-        ? `Meldung von „${einheitAnzeigename(b.einheit)}" aufgenommen${folge}.${uebungZusatz}${zusatz ? ` ${zusatz}` : ""}`
+        ? `Meldung von „${einheitAnzeigename(b.einheit)}" aufgenommen${folge}.${
+            aufzunehmen !== b ? " Nur die Stärke geändert — Fahrzeuge, Bedarf und Namen der bisherigen Meldung gelten weiter." : ""
+          }${uebungZusatz}${zusatz ? ` ${zusatz}` : ""}`
         : `Bereits vorhanden — übersprungen (gleicher Inhalt). Die Zeile in der Liste ist quittiert.${zusatz ? ` ${zusatz}` : ""}`,
     );
     setFehler("");
