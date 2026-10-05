@@ -155,6 +155,9 @@ describe("Sicherung einspielen", () => {
 
     await nutzer.upload(dateiFeld(), datei);
     const dialog = await screen.findByRole("dialog", { name: "Sicherung einspielen?" });
+    // Auf dem Gerät liegt eine Vorlage: ohne Haken kein Ersetzen (R4-D2).
+    expect(within(dialog).getByRole("button", { name: "Einspielen und ersetzen" })).toHaveProperty("disabled", true);
+    await nutzer.click(within(dialog).getByLabelText(/Ja, die Daten dieses Geräts/));
     await nutzer.click(within(dialog).getByRole("button", { name: "Einspielen und ersetzen" }));
 
     // Der eigene Stand ist weg, der Stand aus der Datei steht da.
@@ -198,6 +201,29 @@ describe("Sicherung einspielen", () => {
 
     expect(await screen.findByRole("dialog", { name: "Sicherung eingespielt" })).toBeDefined();
     expect(einsaetzeLaden()).toHaveLength(0);
+  });
+
+  /**
+   * Audit Runde 4, R4-D2: Leerer Arbeitsplatz, belegter Rückholplatz und
+   * Absenderkarte — die Liste sagte „kein angefangener Bogen", verlangte
+   * keinen Haken und löschte beides.
+   */
+  it("nennt Rückholplatz, Absenderkarte und Geräteschlüssel mit Kurzform und verlangt dann den Haken (R4-D2)", async () => {
+    const nutzer = userEvent.setup();
+    const datei = sicherungsdatei();
+    const b = neuerBogen();
+    b.einheit.hierarchie[0]!.name = "Crailsheim";
+    localStorage.setItem("eeb.entwurf.ersetzt.v1", JSON.stringify({ gespeichert: Date.now(), bogen: b }));
+    localStorage.setItem("eeb.absenderkarte.v1", JSON.stringify({ name: "Zugtrupp Albstadt" }));
+    await geraeteSchluesselSicherstellen();
+    buehne();
+
+    await nutzer.upload(dateiFeld(), datei);
+    const dialog = await screen.findByRole("dialog", { name: "Sicherung einspielen?" });
+    expect(within(dialog).getByText(/der zuletzt verdrängte Bogen „THW Crailsheim“/)).toBeDefined();
+    expect(within(dialog).getByText("die hinterlegte Absenderkarte")).toBeDefined();
+    expect(within(dialog).getByText(/der Signatur-Geräteschlüssel \(Kurzform [0-9a-f]{4} [0-9a-f]{4} [0-9a-f]{4} [0-9a-f]{4}\)/)).toBeDefined();
+    expect(within(dialog).getByRole("button", { name: "Einspielen und ersetzen" })).toHaveProperty("disabled", true);
   });
 
   it("erklärt eine abgeschnittene Sicherung ohne Programmtext und fragt gar nicht erst (R2-E5)", async () => {

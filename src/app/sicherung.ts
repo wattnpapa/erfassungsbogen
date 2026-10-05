@@ -92,13 +92,38 @@ export interface SammlungKurz {
  */
 export interface BestandUmfang {
   sammlungen: SammlungKurz[];
+  /** Aktive Vorlagen. */
   vorlagen: number;
+  /** Vorlagen im Papierkorb (R4-D2: getrennt genannt). */
+  vorlagenPapierkorb: number;
   entwurf: boolean;
+  /**
+   * Name der Einheit auf dem Rückholplatz, sonst null. „Sicherung einspielen"
+   * nannte ihn nicht und löschte ihn trotzdem; bei leerem Arbeitsplatz stand
+   * dort „nichts geht verloren" (Audit Runde 4, R4-D2).
+   */
+  rueckholplatz: string | null;
+  /** Eine Absenderkarte mit Inhalt ist hinterlegt. */
+  absender: boolean;
+  /** Privater Geräteschlüssel (Hex) — für die Kurzform vorher/nachher; null = keiner. */
+  geraeteschluessel: string | null;
 }
 
 const EINSAETZE_SCHLUESSEL = "eeb.einsaetze.v1";
 const VORLAGEN_SCHLUESSEL = "eeb.vorlagen.v1";
 const ENTWURF_SCHLUESSEL = "eeb.entwurf.v1";
+const ERSETZT_SCHLUESSEL = "eeb.entwurf.ersetzt.v1";
+const ABSENDER_SCHLUESSEL = "eeb.absenderkarte.v1";
+const GERAETESCHLUESSEL_SCHLUESSEL = "eeb.geraeteschluessel.v1";
+/** Alles, was die Rückfrage vor dem Einspielen zählt — Gerät und Datei mit derselben Elle. */
+const BESTAND_SCHLUESSEL = [
+  EINSAETZE_SCHLUESSEL,
+  VORLAGEN_SCHLUESSEL,
+  ENTWURF_SCHLUESSEL,
+  ERSETZT_SCHLUESSEL,
+  ABSENDER_SCHLUESSEL,
+  GERAETESCHLUESSEL_SCHLUESSEL,
+];
 
 function jsonListe(roh: string | undefined): unknown[] {
   if (!roh) return [];
@@ -121,11 +146,57 @@ export function bestandUmfang(eintraege: Record<string, string>): BestandUmfang 
       papierkorb: typeof s.geloeschtAm === "number",
     });
   }
+  const vorlagen = jsonListe(eintraege[VORLAGEN_SCHLUESSEL]);
+  const imPapierkorb = vorlagen.filter((v) => typeof (v as { geloeschtAm?: unknown } | null)?.geloeschtAm === "number").length;
   return {
     sammlungen,
-    vorlagen: jsonListe(eintraege[VORLAGEN_SCHLUESSEL]).length,
+    vorlagen: vorlagen.length - imPapierkorb,
+    vorlagenPapierkorb: imPapierkorb,
     entwurf: !!eintraege[ENTWURF_SCHLUESSEL],
+    rueckholplatz: rueckholplatzAusRoh(eintraege[ERSETZT_SCHLUESSEL]),
+    absender: absenderAusRoh(eintraege[ABSENDER_SCHLUESSEL]),
+    geraeteschluessel: /^[0-9a-f]{64}$/i.test(eintraege[GERAETESCHLUESSEL_SCHLUESSEL] ?? "")
+      ? eintraege[GERAETESCHLUESSEL_SCHLUESSEL]!
+      : null,
   };
+}
+
+function rueckholplatzAusRoh(roh: string | undefined): string | null {
+  if (!roh) return null;
+  try {
+    const e = JSON.parse(roh) as { bogen?: { einheit?: unknown } };
+    if (!e?.bogen?.einheit) return "(Bogen ohne Namen)";
+    return einheitAnzeigename(e.bogen.einheit as Parameters<typeof einheitAnzeigename>[0]) || "(Bogen ohne Namen)";
+  } catch {
+    return "(Bogen ohne Namen)";
+  }
+}
+
+function absenderAusRoh(roh: string | undefined): boolean {
+  if (!roh) return false;
+  try {
+    const k = JSON.parse(roh) as unknown;
+    return !!k && typeof k === "object" && absenderkarteGefuellt(k as Parameters<typeof absenderkarteGefuellt>[0]);
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Steht auf dem Gerät überhaupt etwas, das beim Einspielen verloren geht?
+ * Dann verlangt die Rückfrage den Haken — nicht nur bei laufenden Sammlungen
+ * (R4-D2).
+ */
+export function bestandBetroffen(b: BestandUmfang): boolean {
+  return (
+    b.sammlungen.length > 0 ||
+    b.vorlagen > 0 ||
+    b.vorlagenPapierkorb > 0 ||
+    b.entwurf ||
+    b.rueckholplatz != null ||
+    b.absender ||
+    b.geraeteschluessel != null
+  );
 }
 
 /** Bestand dieses Geräts, gemessen wie eine Sicherungsdatei. */
@@ -133,7 +204,7 @@ export function geraetBestand(): BestandUmfang {
   const s = speicher();
   const eintraege: Record<string, string> = {};
   if (s) {
-    for (const k of [EINSAETZE_SCHLUESSEL, VORLAGEN_SCHLUESSEL, ENTWURF_SCHLUESSEL]) {
+    for (const k of BESTAND_SCHLUESSEL) {
       const v = s.getItem(k);
       if (v != null) eintraege[k] = v;
     }

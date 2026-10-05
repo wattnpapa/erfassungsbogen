@@ -15,6 +15,7 @@ import { frageJaNein, zeigeHinweis } from "./dialoge";
 import {
   alleDatenLoeschen,
   datenUmfang,
+  bestandBetroffen,
   bestandUmfang,
   geraetBestand,
   letzteSicherung,
@@ -27,7 +28,7 @@ import {
   type DatenUmfang,
 } from "./sicherung";
 import { dateiFehlerMeldung } from "./datei-fehler";
-import { geraeteKurzform, geraeteSchluesselLoeschen, geraeteSchluesselSicherstellen } from "./geraete-schluessel";
+import { geraeteKurzform, geraeteSchluesselLoeschen, geraeteSchluesselSicherstellen, kurzformAusPrivatHex } from "./geraete-schluessel";
 import { speicherBelegung, speicherText } from "./eintrag-zeiten";
 import { groessteText, istVoll } from "./speicher-warnung";
 import { dauerhaftenSpeicherAnfragen, speicherDauerhaft } from "./speicher-browser";
@@ -443,6 +444,9 @@ export function Fusszeile({ onBogenOeffnen, kompakt = false }: {
     erstellt: string | null;
     datei: BestandUmfang;
     geraet: BestandUmfang;
+    /** Kurzform des Geräteschlüssels vorher (Gerät) und nachher (Datei), R4-D2. */
+    kurzGeraet: string | null;
+    kurzDatei: string | null;
   } | null>(null);
   const [einspielVerstanden, setEinspielVerstanden] = useState(false);
   // Wann zuletzt gesichert, ob eine Erinnerung fällig ist und ob der Browser
@@ -604,12 +608,16 @@ export function Fusszeile({ onBogenOeffnen, kompakt = false }: {
       setSicherungFehler(await dateiFehlerMeldung(datei, err, "sicherung"));
       return;
     }
+    const dateiBestand = bestandUmfang(sicherungParsen(text));
+    const geraet = geraetBestand();
     setEinspielStand({
       text,
       name: datei.name,
       erstellt: sicherungErstelltAm(text),
-      datei: bestandUmfang(sicherungParsen(text)),
-      geraet: geraetBestand(),
+      datei: dateiBestand,
+      geraet,
+      kurzGeraet: geraet.geraeteschluessel ? await kurzformAusPrivatHex(geraet.geraeteschluessel) : null,
+      kurzDatei: dateiBestand.geraeteschluessel ? await kurzformAusPrivatHex(dateiBestand.geraeteschluessel) : null,
     });
     setEinspielVerstanden(false);
     einspielen.current?.showModal();
@@ -877,6 +885,9 @@ export function Fusszeile({ onBogenOeffnen, kompakt = false }: {
       <Dialog titel="Sicherung einspielen?" dialogRef={einspielen} onSchliessen={() => setEinspielStand(null)}>
         {einspielStand && (() => {
           const laufendBetroffen = einspielStand.geraet.sammlungen.some((x) => !x.papierkorb && x.meldungen > 0);
+          // Der Haken gilt, sobald hier überhaupt etwas verloren geht — nicht
+          // nur bei laufenden Sammlungen (R4-D2).
+          const betroffen = bestandBetroffen(einspielStand.geraet);
           return (
             <>
               <p>
@@ -885,7 +896,7 @@ export function Fusszeile({ onBogenOeffnen, kompakt = false }: {
                 Datei. Anders als „Einsatz importieren…“ wird nichts ergänzt.
               </p>
               <p><strong>Auf diesem Gerät — geht dabei verloren:</strong></p>
-              <BestandListe bestand={einspielStand.geraet} />
+              <BestandListe bestand={einspielStand.geraet} kurzform={einspielStand.kurzGeraet} geraet />
               <p>
                 <strong>
                   In der Datei „{einspielStand.name}“
@@ -895,7 +906,7 @@ export function Fusszeile({ onBogenOeffnen, kompakt = false }: {
                   :
                 </strong>
               </p>
-              <BestandListe bestand={einspielStand.datei} />
+              <BestandListe bestand={einspielStand.datei} kurzform={einspielStand.kurzDatei} />
               {laufendBetroffen && (
                 <p className="warnung">
                   Die laufenden Sammlungen dieses Geräts sind danach weg — ohne Papierkorb.
@@ -905,7 +916,7 @@ export function Fusszeile({ onBogenOeffnen, kompakt = false }: {
               <div className="aktionen">
                 <button type="button" onClick={() => void sicherungExportieren()}>Vorher Sicherung erstellen…</button>
               </div>
-              {laufendBetroffen && (
+              {betroffen && (
                 <label className="inline">
                   <input
                     type="checkbox"
@@ -919,7 +930,7 @@ export function Fusszeile({ onBogenOeffnen, kompakt = false }: {
                 <button
                   type="button"
                   className="gefahr"
-                  disabled={laufendBetroffen && !einspielVerstanden}
+                  disabled={betroffen && !einspielVerstanden}
                   onClick={() => void einspielenJetzt()}
                 >
                   Einspielen und ersetzen
@@ -1177,8 +1188,13 @@ function Werkzeugzeile() {
   );
 }
 
-/** Inhalt eines Bestands für die Einspiel-Rückfrage: Sammlungen beim Namen. */
-function BestandListe({ bestand }: { bestand: BestandUmfang }) {
+/**
+ * Inhalt eines Bestands für die Einspiel-Rückfrage: Sammlungen beim Namen,
+ * Vorlagen getrennt nach aktiv und Papierkorb, Rückholplatz, Absenderkarte
+ * und Geräteschlüssel mit Kurzform — dieselben Posten wie „Alle Daten
+ * löschen" (R4-D2).
+ */
+function BestandListe({ bestand, kurzform, geraet = false }: { bestand: BestandUmfang; kurzform: string | null; geraet?: boolean }) {
   const aktiv = bestand.sammlungen.filter((x) => !x.papierkorb);
   const papierkorb = bestand.sammlungen.length - aktiv.length;
   return (
@@ -1190,8 +1206,22 @@ function BestandListe({ bestand }: { bestand: BestandUmfang }) {
         </li>
       ))}
       {papierkorb > 0 && <li>{papierkorb} {papierkorb === 1 ? "Sammlung" : "Sammlungen"} im Papierkorb</li>}
-      <li>{bestand.vorlagen} {bestand.vorlagen === 1 ? "Vorlage" : "Vorlagen"}</li>
+      <li>
+        {bestand.vorlagen} {bestand.vorlagen === 1 ? "Vorlage" : "Vorlagen"}
+        {bestand.vorlagenPapierkorb > 0 ? `, dazu ${bestand.vorlagenPapierkorb} im Papierkorb` : ""}
+      </li>
       <li>{bestand.entwurf ? "ein angefangener Bogen (Entwurf)" : "kein angefangener Bogen"}</li>
+      {bestand.rueckholplatz != null && (
+        <li>der zuletzt verdrängte Bogen „{bestand.rueckholplatz}“ (Startseite, zum Zurückholen)</li>
+      )}
+      <li>{bestand.absender ? "die hinterlegte Absenderkarte" : "keine Absenderkarte"}</li>
+      <li>
+        {bestand.geraeteschluessel
+          ? `der Signatur-Geräteschlüssel${kurzform ? ` (Kurzform ${kurzform})` : ""}${
+              geraet ? " — Empfänger, die ihn kennen, sehen danach einen anderen" : ""
+            }`
+          : "kein Signatur-Geräteschlüssel"}
+      </li>
     </ul>
   );
 }

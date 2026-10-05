@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import {
   alleDatenLoeschen,
+  bestandBetroffen,
   bestandUmfang,
   datenUmfang,
   geraetBestand,
@@ -204,8 +205,36 @@ describe("bestandUmfang() / geraetBestand() — für die Einspiel-Rückfrage (R2
     expect(bestandUmfang({ "eeb.einsaetze.v1": "kaputt", "eeb.vorlagen.v1": "{}" })).toEqual({
       sammlungen: [],
       vorlagen: 0,
+      vorlagenPapierkorb: 0,
       entwurf: false,
+      rueckholplatz: null,
+      absender: false,
+      geraeteschluessel: null,
     });
+  });
+
+  // Audit Runde 4, R4-D2: Rückholplatz, Absenderkarte und Geräteschlüssel
+  // gingen beim Einspielen verloren, ohne in der Aufzählung zu stehen.
+  it("zählt Rückholplatz, Absenderkarte, Geräteschlüssel und den Vorlagen-Papierkorb mit (R4-D2)", () => {
+    const b = bogen();
+    b.einheit.hierarchie[0]!.name = "Crailsheim";
+    localStorage.setItem("eeb.entwurf.ersetzt.v1", JSON.stringify({ gespeichert: Date.now(), bogen: b }));
+    localStorage.setItem("eeb.absenderkarte.v1", JSON.stringify({ name: "Zugtrupp Albstadt" }));
+    localStorage.setItem("eeb.geraeteschluessel.v1", "ab".repeat(32));
+    localStorage.setItem("eeb.vorlagen.v1", JSON.stringify([{ id: "v1", name: "Alt", geloeschtAm: Date.now(), bogen: b }]));
+    const geraet = geraetBestand();
+    expect(geraet.rueckholplatz).toMatch(/Crailsheim/);
+    expect(geraet.absender).toBe(true);
+    expect(geraet.geraeteschluessel).toBe("ab".repeat(32));
+    expect(geraet.vorlagen).toBe(0);
+    expect(geraet.vorlagenPapierkorb).toBe(1);
+    expect(bestandBetroffen(geraet)).toBe(true);
+    expect(bestandUmfang(sicherungParsen(sicherungErstellen()))).toEqual(geraet);
+  });
+
+  it("ein leeres Gerät ist nicht betroffen", () => {
+    localStorage.clear();
+    expect(bestandBetroffen(geraetBestand())).toBe(false);
   });
 });
 

@@ -107,6 +107,21 @@ export async function geraeteKurzform(): Promise<string | null> {
   return hex ? schluesselKurzform(hex) : null;
 }
 
+/**
+ * Kurzform zu einem privaten Schlüssel als Hex — für die Rückfrage vor dem
+ * Einspielen einer Sicherung: welcher Schlüssel geht, welcher kommt (R4-D2).
+ * null bei unlesbarem Eintrag.
+ */
+export async function kurzformAusPrivatHex(hex: string): Promise<string | null> {
+  try {
+    const bytes = ausHex(hex);
+    if (bytes.length !== 32) return null;
+    return schluesselKurzform(await oeffentlicherSchluessel(bytes));
+  } catch {
+    return null;
+  }
+}
+
 /** Geräteschlüssel verwerfen (neuer Schlüssel wird bei Bedarf neu erzeugt). */
 export function geraeteSchluesselLoeschen(): void {
   sitzungsSchluessel = null;
