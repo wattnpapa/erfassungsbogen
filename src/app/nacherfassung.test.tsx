@@ -5,7 +5,7 @@
  */
 import { describe, expect, it } from "vitest";
 import { fireEvent, render, screen } from "@testing-library/react";
-import { EintreffzeitFeld, aehnlicherOrt, eintreffzeitAusUhrzeit, ortWoerter } from "./nacherfassung";
+import { EintreffzeitFeld, aehnlicherOrt, andererEinheitstyp, eintreffzeitAusUhrzeit, ortWoerter } from "./nacherfassung";
 
 describe("aehnlicherOrt", () => {
   it("erkennt den Runde-1-Prüffall „OV Albstadt“ ~ „Albstadt“", () => {
@@ -27,9 +27,29 @@ describe("aehnlicherOrt", () => {
     expect(aehnlicherOrt("OV", "Albstadt")).toBe(false);
   });
 
+  // Audit Runde 4, R4-E1: „Neu-Ulm" enthielt „Ulm" — zwei Ortsverbände.
+  it("vergleicht nur vom Anfang des Namens: „Neu-Ulm“ ist nicht „Ulm“", () => {
+    expect(aehnlicherOrt("Neu-Ulm", "Ulm")).toBe(false);
+    expect(aehnlicherOrt("OV Ulm", "THW Neu-Ulm")).toBe(false);
+    expect(aehnlicherOrt("Ulm", "Ulm")).toBe(true);
+  });
+
   it("streift Vorsätze nur ab, wenn danach noch ein Ort bleibt", () => {
     expect(ortWoerter("OV THW Albstadt")).toEqual(["albstadt"]);
     expect(ortWoerter("THW")).toEqual(["thw"]);
+  });
+});
+
+describe("andererEinheitstyp (R4-E1)", () => {
+  it("unterscheidet zwei eingetragene, verschiedene Typen", () => {
+    expect(andererEinheitstyp({ einheitsTyp: { code: 1 } }, { einheitsTyp: { code: 2 } })).toBe(true);
+    expect(andererEinheitstyp({ einheitsTyp: { freitext: "FGr R" } }, { einheitsTyp: { freitext: "B" } })).toBe(true);
+  });
+
+  it("fragt weiter, wenn der Typ gleich ist oder auf einer Seite fehlt", () => {
+    expect(andererEinheitstyp({ einheitsTyp: { code: 1 } }, { einheitsTyp: { code: 1 } })).toBe(false);
+    expect(andererEinheitstyp({ einheitsTyp: { freitext: "FGr R" } }, { einheitsTyp: { freitext: " fgr r" } })).toBe(false);
+    expect(andererEinheitstyp({ einheitsTyp: {} }, { einheitsTyp: { code: 2 } })).toBe(false);
   });
 });
 

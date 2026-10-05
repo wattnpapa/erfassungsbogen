@@ -39,19 +39,40 @@ export function ortWoerter(ort: string | undefined): string[] {
 
 /**
  * Könnte das derselbe Standort sein? Gleich nach dem Abstreifen der Vorsätze
- * („OV Albstadt" ~ „Albstadt") oder der eine Name steckt wortweise im
- * anderen („Albstadt" ~ „Albstadt-Ebingen"). Nur Anlass für eine Rückfrage —
- * zusammengelegt wird erst auf „Ja".
+ * („OV Albstadt" ~ „Albstadt") oder der kürzere Name steht wortweise VORN im
+ * längeren („Albstadt" ~ „Albstadt-Ebingen", „Biberach" ~ „Biberach/Riß").
+ * Nur Anlass für eine Rückfrage — zusammengelegt wird erst auf „Ja".
+ *
+ * Nicht mehr irgendwo im Namen: „Neu-Ulm" enthielt „Ulm", und die App schlug
+ * für zwei Ortsverbände „dieselbe Einheit" vor (Audit Runde 4, R4-E1).
  */
 export function aehnlicherOrt(a: string | undefined, b: string | undefined): boolean {
   const wa = ortWoerter(a);
   const wb = ortWoerter(b);
   if (wa.length === 0 || wb.length === 0) return false;
   const [kurz, lang] = wa.length <= wb.length ? [wa, wb] : [wb, wa];
-  for (let start = 0; start + kurz.length <= lang.length; start++) {
-    if (kurz.every((w, i) => lang[start + i] === w)) return true;
-  }
-  return false;
+  return kurz.every((w, i) => lang[i] === w);
+}
+
+/** Einheitstyp als Vergleichsschlüssel; leer, wenn keiner eingetragen ist. */
+function typSchluessel(t: { code?: number; freitext?: string } | undefined): string {
+  if (t?.code != null) return `c${t.code}`;
+  return (t?.freitext ?? "").trim().toLocaleLowerCase("de-DE");
+}
+
+/**
+ * Tragen beide Einheiten einen Einheitstyp, und sind es verschiedene? Dann
+ * sind es zwei Einheiten — Bergungsgruppe und Fachgruppe Räumen desselben
+ * Ortsverbands treffen am Meldekopf oft nacheinander ein (R4-E1). Fehlt der
+ * Typ auf einer Seite (Papierphase, R2-A5), bleibt die Rückfrage.
+ */
+export function andererEinheitstyp(
+  a: { einheitsTyp?: { code?: number; freitext?: string } },
+  b: { einheitsTyp?: { code?: number; freitext?: string } },
+): boolean {
+  const ta = typSchluessel(a.einheitsTyp);
+  const tb = typSchluessel(b.einheitsTyp);
+  return ta !== "" && tb !== "" && ta !== tb;
 }
 
 /**

@@ -10,7 +10,7 @@ import userEvent from "@testing-library/user-event";
 import { OrganisationsTyp, type Erfassungsbogen } from "@bos/eeb-format/model";
 import { encodePayload, encodePayloadUrl, encodeVorlagePayloadUrl, fragmentInhalt, segmentPayloadUrls } from "@bos/eeb-format/codec";
 import { encodeSigniertPayloadUrl, schluesselpaarErzeugen } from "@bos/eeb-format/signatur";
-import { browserKompressor, neuerBogen } from "./hilfen";
+import { browserKompressor, neuePerson, neuerBogen } from "./hilfen";
 import { geraeteSchluesselLoeschen } from "./geraete-schluessel";
 import { tippSchutzZuruecksetzen } from "./tipp-schutz";
 import { frageJaNein } from "./dialoge";
@@ -1603,6 +1603,79 @@ describe("Neuen Einsatz anlegen", () => {
     const eintraege = einsaetzeLaden().find((s) => s.id === einsatz.id)!.eintraege;
     expect(eintraege).toHaveLength(2);
     expect(neuesteJeEinheit(eintraege)).toHaveLength(1);
+  });
+
+  /**
+   * Audit Runde 4, R4-E1: Zweite Fachgruppe desselben Ortsverbands und der
+   * Nachbar-OV „Neu-Ulm" ergaben „Ist das dieselbe Einheit?", vorbelegt mit
+   * „Ja". Verschiedene eingetragene Typen und „Neu-Ulm" ≠ „Ulm" fragen nicht
+   * mehr; wo noch gefragt wird, steht „eigene Einheit" vorn, und ein „Ja"
+   * lässt sich in der Quittung zurücknehmen.
+   */
+  it("fragt bei anderem Einheitstyp desselben Orts und bei „Neu-Ulm“ nicht nach „dieselbe Einheit“ (R4-E1)", async () => {
+    const nutzer = userEvent.setup();
+    const einsatz = einsatzImSpeicherAnlegen("Hochwasser Donau", EinsatzArt.EINSATZ);
+    const bergung = bogenMitName("Ulm");
+    bergung.einheit.einheitsTyp = { freitext: "Bergungsgruppe" };
+    meldungHinzufuegen(einsatz.id, bergung);
+    render(<App />);
+    for (const [ort, typ] of [["Ulm", "Fachgruppe Räumen"], ["Neu-Ulm", "Bergungsgruppe"]] as const) {
+      const neu = bogenMitName(ort);
+      neu.einheit.einheitsTyp = { freitext: typ };
+      fragmentSetzen(encodePayloadUrl(neu, browserKompressor));
+      const empfang = await screen.findByRole("dialog", { name: /empfangen/ });
+      await nutzer.click(within(empfang).getByRole("button", { name: /In „Hochwasser Donau" aufnehmen/ }));
+      await screen.findByText(new RegExp(`Meldung von „THW ${ort}.*" aufgenommen`));
+      expect(screen.queryByRole("dialog", { name: "Ist das dieselbe Einheit?" })).toBeNull();
+    }
+    expect(neuesteJeEinheit(einsaetzeLaden().find((s) => s.id === einsatz.id)!.eintraege)).toHaveLength(3);
+  });
+
+  it("stellt bei „Ist das dieselbe Einheit?“ „eigene Einheit“ vorn und nimmt ein „Ja“ mit „Rückgängig“ zurück (R4-E1)", async () => {
+    const nutzer = userEvent.setup();
+    const einsatz = einsatzImSpeicherAnlegen("Sammelhausen", EinsatzArt.EINSATZ);
+    meldungHinzufuegen(einsatz.id, bogenMitName("Papierhausen"));
+    render(<App />);
+    const mitTyp = bogenMitName("Papierhausen");
+    mitTyp.einheit.einheitsTyp = { code: 3 };
+    fragmentSetzen(encodePayloadUrl(mitTyp, browserKompressor));
+    await nutzer.click(within(await screen.findByRole("dialog", { name: /empfangen/ })).getByRole("button", { name: /In „Sammelhausen" aufnehmen/ }));
+    const frage = await screen.findByRole("dialog", { name: "Ist das dieselbe Einheit?" });
+    const wege = within(frage).getAllByRole("button").map((k) => k.textContent);
+    expect(wege[0]).toBe("Nein — als eigene Einheit führen");
+    expect(frage.textContent).toMatch(/Bisher: Stärke .* · Stand/);
+    await nutzer.click(within(frage).getByRole("button", { name: /^Ja — als neue Fassung/ }));
+    expect(neuesteJeEinheit(einsaetzeLaden().find((s) => s.id === einsatz.id)!.eintraege)).toHaveLength(1);
+
+    const quittung = (await screen.findByText(/als Fassung von „THW Papierhausen" aufgenommen/)).closest(".quittung-daumen") as HTMLElement;
+    await nutzer.click(within(quittung).getByRole("button", { name: "Rückgängig" }));
+    const eintraege = einsaetzeLaden().find((s) => s.id === einsatz.id)!.eintraege;
+    expect(eintraege).toHaveLength(2);
+    expect(neuesteJeEinheit(eintraege)).toHaveLength(2); // zwei Einheiten, keine Historie
+    expect(screen.getByText(/steht jetzt als eigene Einheit in der Sammlung/)).toBeDefined();
+  });
+
+  /**
+   * Audit Runde 4, R4-N1: „Einheit ist bereits gemeldet" nannte weder Stärke
+   * noch Personen. Jetzt stehen beide Meldungen nebeneinander; ohne
+   * gemeinsame Person steht der Hinweis da und „eigene Einheit" vorn.
+   */
+  it("stellt bei „bereits gemeldet“ beide Meldungen gegenüber und warnt ohne gemeinsame Person (R4-N1)", async () => {
+    const nutzer = userEvent.setup();
+    const einsatz = einsatzImSpeicherAnlegen("Sammelhausen", EinsatzArt.EINSATZ);
+    const alt = bogenMitName("Doppelhausen");
+    alt.personal = [{ ...neuePerson(), nachname: "Lehmann", vorname: "Karsten" }];
+    meldungHinzufuegen(einsatz.id, alt);
+    render(<App />);
+    const neu = bogenMitName("Doppelhausen");
+    neu.personal = [{ ...alt.personal[0]!, nachname: "Müller", vorname: "Max" }];
+    fragmentSetzen(encodePayloadUrl(neu, browserKompressor));
+    await nutzer.click(within(await screen.findByRole("dialog", { name: /empfangen/ })).getByRole("button", { name: /In „Sammelhausen" aufnehmen/ }));
+    const frage = await screen.findByRole("dialog", { name: "Einheit ist bereits gemeldet" });
+    expect(frage.textContent).toContain("Lehmann, Karsten");
+    expect(frage.textContent).toContain("Müller, Max");
+    expect(frage.textContent).toContain("Keine gemeinsame Person, kein gemeinsames Fahrzeug");
+    expect(within(frage).getAllByRole("button")[0]!.textContent).toBe("Als eigene Einheit führen");
   });
 
   it("nimmt bei Abbruch der Rückfrage gar nichts auf", async () => {

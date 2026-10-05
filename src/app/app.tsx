@@ -65,6 +65,7 @@ import {
   bogenInhaltsId,
   einheitSchluessel,
   einsatzAnlegen,
+  meldungEntfernen,
   neuesteJeEinheit,
   revisionen,
   type EintragSignatur,
@@ -108,7 +109,9 @@ import {
 } from "./qr-stapel";
 import { EinleseQuittung } from "./einlese-quittung";
 import { StapelQuittung } from "./stapel-quittung";
-import { EintreffzeitFeld, aehnlicherOrt, eintreffzeitAusUhrzeit } from "./nacherfassung";
+import { EintreffzeitFeld, aehnlicherOrt, andererEinheitstyp, eintreffzeitAusUhrzeit } from "./nacherfassung";
+import { meldungenVergleichen, steckbriefZeile, type MeldungsVergleich } from "./meldungs-vergleich";
+import { DaumenQuittung } from "./daumen-quittung";
 import {
   entwurfAusAnderemFenster,
   entwurfLaden,
@@ -491,6 +494,33 @@ function uhrzeitMitTag(d: Date): string {
 /** Was die App gerade zeigt — für den Browser-Verlauf (Zurück-Knopf, Audit „Fehler", E3). */
 type Ansicht = { schritt: number; zeigeStart: boolean; einsatz: string | null; scanner: boolean };
 /**
+ * Bisherige und neue Meldung in der Rückfrage nebeneinander (R4-N1): Stärke,
+ * Ansprechperson, Kennzeichen, Stand — und ein Hinweis, wenn sie keine Person
+ * und kein Fahrzeug gemeinsam haben. Steht im `<p>` der Rückfrage, darum nur
+ * Inline-Elemente.
+ */
+function MeldungsGegenueberstellung({ vergleich }: { vergleich: MeldungsVergleich }) {
+  return (
+    <>
+      <br />
+      <span className="meldungs-vergleich">
+        <strong>Bisher:</strong> {steckbriefZeile(vergleich.bisher)}
+        <br />
+        <strong>Neu:</strong> {steckbriefZeile(vergleich.neu)}
+      </span>
+      {vergleich.keineUeberschneidung && (
+        <>
+          <br />
+          <span className="warnung-text">
+            ⚠ Keine gemeinsame Person, kein gemeinsames Fahrzeug — vielleicht eine andere Gruppe?
+          </span>
+        </>
+      )}
+    </>
+  );
+}
+
+/**
  * Das oberste offene Fenster schließen, als hätte man Escape gedrückt —
  * für die Zurück-Geste (R4-S1). Rückfragen der Dialogschicht liegen immer
  * oben. QR-Vollbild und Scanner führen ihren Rücksprung selbst
@@ -845,6 +875,18 @@ function AppInhalt() {
   const [scanFortschritt, setScanFortschritt] = useState("");
   // Nacherfassung vom Papier: Uhrzeit vom Meldeblock, leer = Zeit der Übernahme (R2-A5).
   const [nachEintreffzeit, setNachEintreffzeit] = useState("");
+  // Zuletzt auf „Ja — dieselbe Einheit" zusammengelegt: für die Quittung mit
+  // beiden Namen und „Rückgängig — als eigene Einheit" (Audit Runde 4, R4-E1).
+  const [zusammenlegung, setZusammenlegung] = useState<{
+    einsatzId: string;
+    eintragId: string;
+    bogen: Erfassungsbogen;
+    quelle: "scan" | "manuell" | "pdf-import";
+    signatur?: EintragSignatur;
+    herkunft?: string;
+    neu: string;
+    alt: string;
+  } | null>(null);
 
   const vorlagenNeuLaden = () => setVorlagen(vorlagenLaden());
   const einsaetzeNeuLaden = () => setEinsaetze(einsaetzeLaden());
@@ -1593,6 +1635,9 @@ function AppInhalt() {
     // Rückfrage sagt, was wegfiele, und bietet zuerst „Nur die Stärke
     // ändern" an (Audit Runde 3, R3-A1).
     let aufzunehmen = b;
+    // Auf „Ja" bei „Ist das dieselbe Einheit?": der Name der Einheit, in die
+    // die neue Meldung gelegt wurde — für Quittung und Rückweg (R4-E1).
+    let zusammengelegtMit: string | null = null;
     const nurStaerkeWeg = (vorher: Erfassungsbogen): Antwortweg[] => {
       if (!istNurStaerke(b) || wasWegfiele(vorher, b).length === 0) return [];
       return [
@@ -1610,26 +1655,36 @@ function AppInhalt() {
     };
     if (bekannt && !schonDa && !kiosk) {
       const bisher = einsatz ? revisionen(einsatz.eintraege, schl)[0]?.bogen : undefined;
+      // Beide Meldungen nebeneinander, bevor jemand „Fassung" oder „eigene
+      // Einheit" wählt: Stärke, Ansprechperson, Kennzeichen, Stand. Haben sie
+      // keine Person und kein Fahrzeug gemeinsam, ist es eher eine zweite
+      // Gruppe — dann steht „eigene Einheit" vorn (Audit Runde 4, R4-N1).
+      const vergleich = bisher ? meldungenVergleichen(bisher, b) : null;
+      const fassungWeg: Antwortweg = {
+        wert: "fassung",
+        label: "Als neue Fassung anhängen",
+        hinweis:
+          "Der Normalfall bei einer Folgemeldung: die bisherige Meldung wandert in die Historie." +
+          (bisher ? wegfallHinweis(bisher) : ""),
+      };
+      const eigeneWeg: Antwortweg = {
+        wert: "eigene",
+        label: "Als eigene Einheit führen",
+        hinweis: "Für eine zweite, gleich benannte Einheit — beide zählen getrennt in die Summe.",
+      };
       // Die Frage hat zwei gleichwertige Antworten und deshalb zwei benannte
       // Knöpfe: „OK/Abbrechen" hätte den zweiten Weg als Abbruch getarnt.
       const wahl = await frageWahl({
         titel: "Einheit ist bereits gemeldet",
-        text: `„${einheitAnzeigename(b.einheit)}" steht in diesem Einsatz schon. Wie soll der neue Bogen dazu stehen?`,
-        wege: [
-          ...(bisher ? nurStaerkeWeg(bisher) : []),
-          {
-            wert: "fassung",
-            label: "Als neue Fassung anhängen",
-            hinweis:
-              "Der Normalfall bei einer Folgemeldung: die bisherige Meldung wandert in die Historie." +
-              (bisher ? wegfallHinweis(bisher) : ""),
-          },
-          {
-            wert: "eigene",
-            label: "Als eigene Einheit führen",
-            hinweis: "Für eine zweite, gleich benannte Einheit — beide zählen getrennt in die Summe.",
-          },
-        ],
+        text: (
+          <>
+            „{einheitAnzeigename(b.einheit)}" steht in diesem Einsatz schon. Wie soll der neue Bogen dazu stehen?
+            {vergleich && <MeldungsGegenueberstellung vergleich={vergleich} />}
+          </>
+        ),
+        wege: vergleich?.keineUeberschneidung
+          ? [eigeneWeg, ...(bisher ? nurStaerkeWeg(bisher) : []), fassungWeg]
+          : [...(bisher ? nurStaerkeWeg(bisher) : []), fassungWeg, eigeneWeg],
       });
       if (!wahl) {
         // Abgebrochen: der Bogen bleibt draußen. Im Kiosk-Scan steht die
@@ -1656,13 +1711,32 @@ function AppInhalt() {
         (e) =>
           e.einheitSchluessel !== schl &&
           e.bogen.einheit.organisation === b.einheit.organisation &&
+          // Zwei eingetragene, verschiedene Einheitstypen sind zwei Einheiten
+          // (Bergungsgruppe und Fachgruppe Räumen desselben OV, R4-E1).
+          !andererEinheitstyp(e.bogen.einheit, b.einheit) &&
           aehnlicherOrt(einheitOrt(e.bogen.einheit), ort),
       );
       if (aehnlich) {
+        const vergleich = meldungenVergleichen(aehnlich.bogen, b);
         const wahl = await frageWahl({
           titel: "Ist das dieselbe Einheit?",
-          text: `In diesem Einsatz steht schon „${einheitAnzeigename(aehnlich.bogen.einheit)}" (Stärke ${staerkeKurz(aehnlich.bogen)}). Die neue Meldung heißt „${einheitAnzeigename(b.einheit)}".`,
+          text: (
+            <>
+              In diesem Einsatz steht schon „{einheitAnzeigename(aehnlich.bogen.einheit)}". Die neue Meldung heißt „
+              {einheitAnzeigename(b.einheit)}".
+              <MeldungsGegenueberstellung vergleich={vergleich} />
+            </>
+          ),
+          // Der sichere Weg vorn: Die Namen sind verschieden, und wer unter
+          // Zeitdruck den hervorgehobenen Knopf nahm, ließ eine Einheit aus
+          // der Lage fallen (R4-E1). Zusammenlegen bleibt ein Tipp weiter —
+          // und lässt sich in der Quittung zurücknehmen.
           wege: [
+            {
+              wert: "eigene",
+              label: "Nein — als eigene Einheit führen",
+              hinweis: "Beide zählen getrennt in die Summe.",
+            },
             ...nurStaerkeWeg(aehnlich.bogen).map((w) => ({
               ...w,
               label: `Ja — nur die Stärke von „${einheitAnzeigename(aehnlich.bogen.einheit)}" ändern (${staerkeKurz(aehnlich.bogen)} → ${staerkeKurz(b)})`,
@@ -1671,11 +1745,6 @@ function AppInhalt() {
               wert: "gleich",
               label: `Ja — als neue Fassung von „${einheitAnzeigename(aehnlich.bogen.einheit)}"`,
               hinweis: "Die bisherige Meldung wandert in die Historie; gezählt wird eine Einheit." + wegfallHinweis(aehnlich.bogen),
-            },
-            {
-              wert: "eigene",
-              label: "Nein — als eigene Einheit führen",
-              hinweis: "Beide zählen getrennt in die Summe.",
             },
           ],
         });
@@ -1688,6 +1757,7 @@ function AppInhalt() {
           override = aehnlich.einheitSchluessel;
           aufzunehmen = nurStaerkeUebernehmen(aehnlich.bogen, staerke(b), b.stand);
         }
+        if (wahl === "gleich" || wahl === "staerke") zusammengelegtMit = einheitAnzeigename(aehnlich.bogen.einheit);
       }
     }
     // Was sich gegenüber der vorigen Fassung ändert — für die Quittung im
@@ -1748,8 +1818,46 @@ function AppInhalt() {
     // Zeile ist gemeint?", und darauf gibt es hier eine Antwort — die Zeile,
     // die den Inhalt schon trägt. Die Rückmeldezeile sagt, ob er neu war.
     markiereEingang(r.eintrag.einheitSchluessel);
+    setZusammenlegung(
+      zusammengelegtMit && r.neu
+        ? {
+            einsatzId: zielId,
+            eintragId: r.eintrag.id,
+            bogen: b,
+            quelle,
+            signatur: empfang?.signatur,
+            herkunft: empfang?.herkunft ? base64UrlKodieren(empfang.herkunft) : undefined,
+            neu: einheitAnzeigename(b.einheit),
+            alt: zusammengelegtMit,
+          }
+        : null,
+    );
     setOffenerEinsatzId(zielId); // zurück in die Einsatzansicht
     return true;
+  }
+
+  /**
+   * „Rückgängig" nach dem Zusammenlegen (R4-E1): Die eben angehängte Fassung
+   * fällt wieder heraus, die bisherige Einheit gilt wie vorher, und die neue
+   * Meldung steht als eigene Einheit in der Sammlung — ohne neu zu erfassen.
+   * Vorher ging das nur über „Historie → Fassung verwerfen", und die
+   * Erfassung war danach weg.
+   */
+  function zusammenlegungZuruecknehmen() {
+    const z = zusammenlegung;
+    if (!z) return;
+    setZusammenlegung(null);
+    try {
+      meldungEntfernen(z.einsatzId, z.eintragId);
+      const r = meldungAufnehmen(z.einsatzId, z.bogen, { quelle: z.quelle, signatur: z.signatur, herkunft: z.herkunft });
+      einsaetzeNeuLaden();
+      if (r) markiereEingang(r.eintrag.einheitSchluessel);
+      setFehler("");
+      setMeldung(`„${z.neu}" steht jetzt als eigene Einheit in der Sammlung; „${z.alt}" gilt wie vorher.`);
+    } catch (e) {
+      einsaetzeNeuLaden();
+      setFehler(istSpeicherVoll(e) ? new SpeicherVollFehler(e).message : fehlerText(e));
+    }
   }
 
   /**
@@ -2982,7 +3090,7 @@ function AppInhalt() {
         <SpeicherWarnung stand={einsaetze} />
         <EinsatzDetail
           einsatz={offenerEinsatz}
-          onZurueck={() => { setOffenerEinsatzId(null); setZeigeStart(true); setMeldung(""); setEingang(null); setEinlese(null); setStapelBericht([]); }}
+          onZurueck={() => { setOffenerEinsatzId(null); setZeigeStart(true); setMeldung(""); setEingang(null); setZusammenlegung(null); setEinlese(null); setStapelBericht([]); }}
           onGeaendert={einsaetzeNeuLaden}
           onScannen={() => scanneInEinsatz(offenerEinsatz.id)}
           onManuell={() => manuellInEinsatz(offenerEinsatz.id)}
@@ -3031,6 +3139,11 @@ function AppInhalt() {
           <p className={fehler ? "fehler" : "meldung"} role="status" style={{ textAlign: "center" }}>
             {fehler || meldung}
           </p>
+        )}
+        {zusammenlegung && zusammenlegung.einsatzId === offenerEinsatz.id && (
+          <DaumenQuittung onRueckgaengig={zusammenlegungZuruecknehmen} onSchliessen={() => setZusammenlegung(null)}>
+            „{zusammenlegung.neu}" als Fassung von „{zusammenlegung.alt}" aufgenommen
+          </DaumenQuittung>
         )}
         {/* Kiosk-Scan: die aufgenommenen Bögen bleiben im Einsatz — der Knopf
             beendet nur den Durchgang, deshalb „Fertig". Liegen aber Teile eines
