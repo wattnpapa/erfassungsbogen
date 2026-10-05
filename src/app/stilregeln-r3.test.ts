@@ -81,3 +81,18 @@ describe("Kleinere Sichtreste (R3-L7)", () => {
     expect(css).not.toMatch(/anzeige-schalter button \+ button\s*\{[^}]*--kopf-linie/);
   });
 });
+
+describe("Restliche kleine Ziele (R3-G4)", () => {
+  it("Schrittleiste quer mit vollem Zielmaß", () => {
+    expect(css).toMatch(/\.schritte button \{[^}]*min-height: max\(calc\(2\.25rem \+ var\(--ziel\)\), 44px\)/);
+  });
+
+  it("Segmente des Umschalters und Kopf-Links mindestens 44 px breit", () => {
+    expect(bloecke(".anzeige-schalter button").join("\n")).toMatch(/min-width: calc\(var\(--ziel-basis\) \+ var\(--ziel\)\)/);
+    expect(bloecke(".kopfnav-links a").join("\n")).toMatch(/min-width: var\(--ziel-basis\)/);
+  });
+
+  it("Paar-Listen geben der Wertspalte Platz (keine max-content-Begriffsspalte)", () => {
+    expect(bloecke("dl.paare").join("\n")).toMatch(/grid-template-columns: fit-content\(45%\) minmax\(0, 1fr\)/);
+  });
+});

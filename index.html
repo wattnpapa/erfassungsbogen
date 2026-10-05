@@ -605,8 +605,9 @@
       color: var(--akzent); text-decoration: none;
     }
     .kopfnav-links { display: flex; flex-wrap: wrap; align-items: center; gap: 0 var(--r-3); }
+    /* min-width (R3-G4): „THW" war 29 px breit. */
     .kopfnav-links a {
-      display: inline-flex; align-items: center; min-height: var(--ziel-basis);
+      display: inline-flex; align-items: center; justify-content: center; min-height: var(--ziel-basis); min-width: var(--ziel-basis);
       font-size: var(--t-xs); color: var(--text-2); text-decoration: none; white-space: nowrap;
     }
     .kopfnav-links a:hover { color: var(--akzent-hell); text-decoration: underline; }
@@ -667,7 +668,9 @@
        im Kopf neben dem Rücksprung und in der Fußzeile neben den Datenwegen —
        ein Fehlgriff mit Handschuh schaltete dort auf „Nacht" statt zurück zur
        Startseite, bei Sonne ein dunkler Bildschirm. */
+    /* min-width (R3-G4): „Feld" war quer 41 px breit. */
     .anzeige-schalter button {
+      min-width: calc(var(--ziel-basis) + var(--ziel));
       border: none; border-radius: 0; background: var(--flaeche); color: var(--text-2);
       padding: 0.25rem 0.7rem; font-size: var(--t-xs); min-height: calc(var(--ziel-basis) + var(--ziel));
       /* Nach einem Umbruch füllen die Segmente die Zeile, statt rechts eine
@@ -1431,7 +1434,17 @@
       .seiten-kopf.assistent-kopf .kopf-oberzeile { order: 1; flex: 0 1 auto; max-width: 100%; gap: var(--r-3); }
       .seiten-kopf.assistent-kopf .kopf-oberzeile .anzeige-schalter button { padding-inline: 0.45rem; }
       .seiten-kopf.assistent-kopf .schritte { order: 3; flex: 1 1 100%; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: thin; }
-      .seiten-kopf.assistent-kopf .schritte button { white-space: nowrap; padding: 0.3rem 0.6rem; min-height: calc(2.25rem + var(--ziel)); }
+      /* R3-G4: quer 36 px hoch und rollend („6. Übersicht" abgeschnitten).
+         Jetzt volles Zielmaß; auf schmalen Querformaten trägt nur der aktive
+         Reiter seinen Namen, die übrigen Nummer und Status wie hochkant —
+         so passt die Leiste ganz ins Bild. */
+      .seiten-kopf.assistent-kopf .schritte button { white-space: nowrap; padding: 0.3rem 0.6rem; min-height: max(calc(2.25rem + var(--ziel)), 44px); }
+    }
+    @media (orientation: landscape) and (max-height: 31.25rem) and (max-width: 48rem) {
+      .seiten-kopf.assistent-kopf .schritte { position: relative; }
+      .seiten-kopf.assistent-kopf .schritte button:not(.aktiv) .schritt-name {
+        position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap;
+      }
     }
     /* Deckel wie an der Leiste (R2-M1): Die Schrift folgt der Systemschrift
        bis zur kürzeren Fensterkante — 5vmin sind 18 px auf 360 × 640 —,
@@ -1690,9 +1703,12 @@
     /* Zweite Stufe des Übergeben-Dialogs: Link/CSV/Excel eingeklappt, damit am
        Entscheidungspunkt die Vor-Ort-Wege (QR, Nahbereich, PDF) tragen. */
     .teilen-dialog .teilen-weitere { margin: 0.9rem 0 0; border-top: var(--strich) solid var(--linie-fein); padding-top: 0.6rem; }
+    /* R3-G4: volle Zeilenhöhe (44/48 px) statt 29 px. */
     .teilen-dialog .teilen-weitere > summary {
       cursor: pointer; font-size: var(--t-s); font-weight: 600; color: var(--text-2);
-      padding: calc(0.25rem + 0.5 * var(--ziel)) 0;
+      /* list-item bleibt (sonst fiele das Aufklappzeichen weg); die Höhe
+         kommt aus dem Innenmaß. */
+      padding: max(0.25rem, calc((var(--ziel-basis) + var(--ziel) - 1.5em) / 2)) 0;
     }
     @media (hover: hover) { .teilen-dialog .teilen-weitere > summary:hover { color: var(--akzent); } }
     .teilen-dialog .teilen-weg button { width: 100%; }
@@ -2274,6 +2290,8 @@
     .zug-bearbeiten.notiz-bearbeiten input { flex: 1 1 14rem; }
     /* Zwischensummen je Zug als aufklappbare Karte: ab drei Zügen zu, damit
        die Einheitenliste auf dem Tablet ohne Wischen beginnt (K6). */
+    /* R3-G4: „Datenschutzfrist: …" (Schritt 2) war quer 20 px hoch. */
+    details.frist-erklaerung > summary { cursor: pointer; padding-block: max(0.25rem, calc((var(--ziel-basis) + var(--ziel) - 1.5em) / 2)); }
     details.zug-summen > summary { cursor: pointer; list-style: none; display: flex; align-items: center; min-height: calc(var(--ziel-basis) + var(--ziel)); }
     details.zug-summen > summary::-webkit-details-marker { display: none; }
     details.zug-summen > summary::before { content: "▸"; margin-right: var(--r-2); color: var(--text-2); }
@@ -2448,7 +2466,11 @@
        trennbares Wort (E-Mail-Adresse, Funkrufname) die Spalte breiter als die
        Karte und die ganze Ansicht läuft auf dem Telefon nach rechts aus. */
     dl.paare {
-      display: grid; grid-template-columns: minmax(0, max-content) minmax(0, 1fr);
+      /* fit-content(45 %) statt max-content (R3-G4): Mit „WC/Dusche (alle
+         Anwesenden)" blieben im Feld-Modus bei 360 px für die Werte 34 px —
+         „4 Einheiten" brach in vier Zeilen, Ziffern zerfielen. Lange Begriffe
+         brechen jetzt in ihrer Spalte um. */
+      display: grid; grid-template-columns: fit-content(45%) minmax(0, 1fr);
       gap: 0.2rem 1rem; margin: 0.4rem 0; font-size: var(--t-s);
     }
     dl.paare dt { color: var(--text-2); }
@@ -2596,7 +2618,9 @@
        Innenmaß bis zum vollen Zielmaß, der Zuwachs per negativem
        Außenabstand zurückgegeben, die Zeile bleibt, wo sie ist. Links in
        anderen Absätzen behalten das kleinere Maß. */
-    .hinweis > button.link, .fuss-marke > button.link {
+    /* R3-G4: Sprung-Links im Bedarfskasten der Sammlung („1 Einheit",
+       „Ruhezeit: 2×") waren 30 px hoch — gleiches Mittel. */
+    .hinweis > button.link, .fuss-marke > button.link, dd > button.link {
       padding-block: calc((var(--ziel-basis) + var(--ziel) - 1.3em) / 2);
       margin-block: calc(0.28rem + 0.5 * var(--ziel) - (var(--ziel-basis) + var(--ziel) - 1.3em) / 2);
     }
