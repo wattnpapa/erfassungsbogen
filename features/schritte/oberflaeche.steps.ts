@@ -234,6 +234,27 @@ When("ich die App vom Netz trenne", async function (this: EebWelt) {
   await this.page.evaluate(async () => {
     await navigator.serviceWorker.ready;
   });
+  // Seit R3-O3 ist der Vorrat zweistufig: „ready" heißt nur, dass der Kern
+  // liegt; Beispielbögen und Themenseiten lädt die Seite danach nach. Die
+  // Startseite sagt „Funktioniert komplett offline" erst, wenn beides da ist —
+  // und so lange soll man sie mit Netz offen lassen. Genau das tut der Schritt.
+  //
+  // Nötig ist das Warten, weil `setOffline` in Chromium nur die Seite vom Netz
+  // nimmt, nicht den Service Worker: Ohne Warten lud der Service Worker den
+  // Rest „ohne Netz" weiter, und die Szenarien bestanden nur dank dieses Lecks.
+  await this.page.waitForFunction(
+    async () => {
+      const r = await fetch(new URL("offline-zusatz.json", document.baseURI), { cache: "no-cache" }).catch(() => null);
+      if (!r?.ok) return true; // Ohne Liste (Dev-Server) gibt es keine zweite Stufe.
+      const umfang = (await r.json()) as { zusatz: { url: string }[] };
+      for (const e of umfang.zusatz) {
+        if (!(await caches.match(new URL(e.url, document.baseURI).href))) return false;
+      }
+      return true;
+    },
+    undefined,
+    { polling: 250, timeout: 25_000 },
+  );
   await this.page.context().setOffline(true);
 });
 
