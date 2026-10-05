@@ -1596,7 +1596,12 @@
        Einheitsname würde mitten im Wort umbrechen. Dann rutschen die Knöpfe auf
        eine eigene Zeile und der Name bekommt die volle Breite. */
     @media (max-width: 30rem) {
-      .entwurf-karte { flex-wrap: wrap; }
+      .entwurf-karte { flex-wrap: wrap; align-items: flex-start; }
+      /* Zeichen und Name nebeneinander, nicht untereinander: Das Zeichen
+         stand allein in einer Zeile, und „Fortsetzen" rutschte im Feld-Modus
+         auf 651 px, unter den Bildrand (Audit Runde 3, R3-H5). */
+      .entwurf-karte .entwurf-text { flex: 1 1 0; }
+      .entwurf-karte img.einheit-avatar.gross { height: 2.6rem; }
       .entwurf-karte button { width: 100%; }
       .entwurf-karte .entwurf-aktionen { width: 100%; }
       .entwurf-karte .entwurf-aktionen button { flex: 1 1 0; min-width: 0; }

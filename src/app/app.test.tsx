@@ -203,7 +203,7 @@ describe("Assistenten-Durchlauf", () => {
     const scroll = vi.spyOn(window, "scrollTo").mockImplementation(() => {});
     try {
       render(<App />);
-      await nutzer.click(screen.getByRole("button", { name: /Einsatz vorbereiten/ }));
+      await nutzer.click(screen.getByRole("button", { name: "Einsatz vorbereiten" }));
       expect(scroll).toHaveBeenCalledWith(0, 0);
       expect(document.activeElement).toBe(screen.getByRole("heading", { level: 1, name: "FGr Obenhausen" }));
       await nutzer.click(screen.getByRole("button", { name: "‹ Abbrechen" }));
@@ -218,6 +218,29 @@ describe("Assistenten-Durchlauf", () => {
     } finally {
       scroll.mockRestore();
     }
+  });
+
+  /**
+   * Audit Runde 3, R3-H5: Die Vorlagen standen unter dem Meldekopf-Block,
+   * 1,7 Bildschirme tief. Jetzt bietet „Meinen Bogen ausfüllen" sie zuerst
+   * an — die Standard-Vorlage vorn.
+   */
+  it("bietet gespeicherte Vorlagen in „Meinen Bogen ausfüllen“ an, die Standard-Vorlage zuerst (R3-H5)", async () => {
+    vorlageAnlegen("B Nebenhausen", bogenMitName("OV Nebenhausen"));
+    const standard = vorlageAnlegen("FGr Haupthausen", bogenMitName("OV Haupthausen"));
+    const alle = JSON.parse(localStorage.getItem("eeb.vorlagen.v1")!) as { id: string; standard?: boolean }[];
+    localStorage.setItem("eeb.vorlagen.v1", JSON.stringify(alle.map((v) => ({ ...v, standard: v.id === standard.id }))));
+    const nutzer = userEvent.setup();
+    render(<App />);
+    const eigener = screen.getByRole("region", { name: "Meinen Bogen ausfüllen" });
+    const knoepfe = within(eigener).getAllByRole("button").map((b) => b.textContent);
+    expect(knoepfe.slice(0, 3)).toEqual([
+      "Einsatz vorbereiten: FGr Haupthausen",
+      "Einsatz vorbereiten: B Nebenhausen",
+      "Neuen Bogen erstellen",
+    ]);
+    await nutzer.click(within(eigener).getByRole("button", { name: "Einsatz vorbereiten: FGr Haupthausen" }));
+    expect(screen.getByRole("heading", { level: 1, name: "FGr Haupthausen" })).toBeDefined();
   });
 
   it("springt vom offenen Punkt ins Feld und setzt den Cursor (R2-H2)", async () => {

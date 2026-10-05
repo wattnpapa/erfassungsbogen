@@ -2860,6 +2860,12 @@ function AppInhalt() {
   if (!bogen || zeigeStart) {
     // Erststart = noch keinerlei Daten: Onboarding prominent statt am Seitenende.
     const erststart = !bogen && vorlagen.length === 0 && einsaetze.length === 0;
+    const schnellVorlagen = [...vorlagen]
+      .sort((a, b) => Number(!!b.standard) - Number(!!a.standard) || b.geaendert - a.geaendert)
+      .slice(0, 2);
+    const offlineHinweis = (
+      <p className={`offline-badge${offline.stand === "bereit" ? "" : " offline-laedt"}`} role="status">{offlineText(offline)}</p>
+    );
     return (
       <>
       <Aktualisierungshinweise />
@@ -2888,8 +2894,10 @@ function AppInhalt() {
             QR-Code ohne Internetverbindung von Gerät zu Gerät übertragen.
           </p>
         )}
-        {/* Die Zusage erst, wenn sie stimmt (R2-O1, offline-bereit.ts). */}
-        <p className={`offline-badge${offline.stand === "bereit" ? "" : " offline-laedt"}`} role="status">{offlineText(offline)}</p>
+        {/* Die Zusage erst, wenn sie stimmt (R2-O1, offline-bereit.ts). Mit
+            angefangenem Bogen steht sie unter dessen Karte: Sie schob
+            „Fortsetzen" im Feld-Modus unter den Bildrand (Audit Runde 3, R3-H5). */}
+        {!bogen && offlineHinweis}
         <SpeicherWarnung stand={einsaetze} />
         {/* „Weiter, wo du warst": der Entwurf als Karte mit taktischem Zeichen,
             Kennfarbe der Organisation und Stärke — der häufigste Weg zurück in
@@ -2965,6 +2973,7 @@ function AppInhalt() {
             </span>
           </section>
         )}
+        {bogen && offlineHinweis}
         {/* Rückmeldungen stehen ÜBER den Aktionen: „Entwurf … wiederhergestellt"
             erklärt die Karte darüber, und unter den Knöpfen klebte der Kasten
             optisch an der Knopfreihe, statt ein eigener Block zu sein. */}
@@ -3013,7 +3022,23 @@ function AppInhalt() {
               Für Einheiten, die ihre eigene Stärkemeldung erfassen, drucken und weitergeben.
             </p>
             <div className="aktionen">
-              <button type="button" className={bogen ? "" : "primaer"} onClick={async () => {
+              {/* Gespeicherte Vorlagen zuerst: Für den Helfer mit Vorlage ist
+                  „Einsatz vorbereiten" der Hauptweg, die Vorlagenkarten standen
+                  aber erst unter dem Meldekopf-Block, 1,7 bis 2,1 Bildschirme
+                  tief (Audit Runde 3, R3-H5). Die Standard-Vorlage vorn, sonst
+                  die zuletzt geänderten; die Karten unten bleiben für
+                  Bearbeiten, Teilen und Löschen. */}
+              {schnellVorlagen.map((v, i) => (
+                <button
+                  key={v.id}
+                  type="button"
+                  className={!bogen && i === 0 ? "primaer" : ""}
+                  onClick={() => { setMeldung(""); setMusterVorlage(v); }}
+                >
+                  Einsatz vorbereiten: {v.name}
+                </button>
+              ))}
+              <button type="button" className={bogen || schnellVorlagen.length > 0 ? "" : "primaer"} onClick={async () => {
                 if (!(await darfBogenErsetzen({ titel: "Neuen Bogen anfangen?", was: "einen leeren Bogen", ok: "Neu anfangen" }))) return;
                 setMeldung("");
                 setBogen(neuerBogen());
