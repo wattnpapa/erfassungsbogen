@@ -18,7 +18,7 @@ import {
   type Einsatzsammlung,
 } from "@bos/meldekopf/einsaetze";
 import { meldungAufnehmen, notizSetzen, statusMitZeitSetzen, zugSetzen, eintreffzeitSetzen } from "./eintrag-zeiten";
-import { abgleichText, einsatzAbgleichen } from "./einsatz-abgleich";
+import { abgleichText, einsatzAbgleichen, sammlungFuerZiel } from "./einsatz-abgleich";
 import { aenderungenSeit, neueEintraege, weitergabeStandLaden, weitergabeUmImportErgaenzen, weitergabeVermerken } from "./export-stand";
 
 class MemStorage {
@@ -241,5 +241,59 @@ describe("Weitergabe-Vermerk nach dem Rückimport (R3-W2)", () => {
     weitergabeVermerken(sammlung(id));
     expect(geraetA.getItem("eeb.weitergabe-stand.v1")).not.toContain("Geheimer");
     expect(aenderungenSeit(sammlung(id).eintraege, weitergabeStandLaden(id)!).anzahl).toBe(0);
+  });
+});
+
+describe("sammlungFuerZiel — Sammlung des Zugführers in die laufende Lage (R3-W3)", () => {
+  it("legt die Meldungen mit Zeiten, Status und Siegel in die Zielsammlung und schlägt den Zug vor", () => {
+    // ZFü-Telefon: eigene Sammlung „1. TZ Albstadt" mit Albstadt (signiert) und Ulm (abgerückt).
+    auf(geraetB);
+    const zfue = einsatzAnlegen("1. TZ Albstadt", EinsatzArt.EINSATZ);
+    meldungAufnehmen(zfue.id, bogen("Albstadt"), {
+      quelle: "scan",
+      signatur: { zustand: "gueltig", pubkey: "ab", kurzform: "4402 c713" },
+      herkunft: "QUJD",
+    });
+    meldungAufnehmen(zfue.id, bogen("Ulm"), { quelle: "scan" });
+    statusMitZeitSetzen(zfue.id, kopf(zfue.id, "Ulm").id, MeldeStatus.ABGERUECKT, 4000);
+    eintreffzeitSetzen(zfue.id, kopf(zfue.id, "Albstadt").id, 1234);
+    const datei = weitergeben(zfue.id);
+
+    // MK-Tablet: „Hochwasser Albstadt" mit Biberach.
+    auf(geraetA);
+    const mk = einsatzAnlegen("Hochwasser Albstadt", EinsatzArt.EINSATZ);
+    meldungAufnehmen(mk.id, bogen("Biberach"), { quelle: "scan" });
+    const r = einsatzAbgleichen(sammlungFuerZiel(datei, sammlung(mk.id), "1. TZ Albstadt"));
+    expect(r.neuerEinsatz).toBe(false);
+    expect(r.hinzugefuegt).toBe(2);
+    expect(einsaetzeLaden()).toHaveLength(1); // keine zweite Sammlung
+    const alb = kopf(mk.id, "Albstadt");
+    expect(alb.signatur?.kurzform).toBe("4402 c713");
+    expect(alb.herkunft).toBe("QUJD");
+    expect(alb.eingetroffenAm).toBe(1234);
+    expect(alb.zugEtikett).toBe("1. TZ Albstadt");
+    expect(alb.vermerke?.some((v) => v.text.startsWith("Zug: 1. TZ Albstadt"))).toBe(true);
+    expect(kopf(mk.id, "Ulm").status).toBe(MeldeStatus.ABGERUECKT);
+    expect(kopf(mk.id, "Biberach").zugEtikett).toBeUndefined();
+  });
+
+  it("überschreibt den Zug einer schon bekannten Einheit nicht und setzt ohne Vorschlag keinen", () => {
+    auf(geraetB);
+    const zfue = einsatzAnlegen("1. TZ", EinsatzArt.EINSATZ);
+    meldungAufnehmen(zfue.id, bogen("Biberach"), { quelle: "scan" });
+    meldungAufnehmen(zfue.id, bogen("Ulm"), { quelle: "scan" });
+    const datei = weitergeben(zfue.id);
+    auf(geraetA);
+    const mk = einsatzAnlegen("Lage", EinsatzArt.EINSATZ);
+    meldungAufnehmen(mk.id, bogen("Biberach"), { quelle: "scan" });
+    const bib = kopf(mk.id, "Biberach");
+    zugSetzen(mk.id, bib.einheitSchluessel, bib.id, "2. TZ");
+    const vorbereitet = sammlungFuerZiel(datei, sammlung(mk.id), "1. TZ");
+    expect(vorbereitet.eintraege.find((e) => e.bogen.einheit.hierarchie[0]!.name === "Biberach")!.zugEtikett).toBeUndefined();
+    einsatzAbgleichen(vorbereitet);
+    expect(kopf(mk.id, "Biberach").zugEtikett).toBe("2. TZ");
+    expect(kopf(mk.id, "Ulm").zugEtikett).toBe("1. TZ");
+    const ohne = sammlungFuerZiel(datei, sammlung(mk.id), "");
+    expect(ohne.eintraege.every((e) => !e.zugEtikett)).toBe(true);
   });
 });

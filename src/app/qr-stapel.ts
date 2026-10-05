@@ -353,12 +353,13 @@ export const LAGE_NACHTRAGEN_HINWEIS =
 
 /**
  * Hinweis für „Bögen einlesen…“ mit einer Sammel-PDF, die die ganze Sammlung
- * eingebettet trägt: dieser Weg nimmt nur die Bögen, „Einsatz importieren…“
- * brächte Zeiten, Abrückvermerke und Züge verlustfrei mit (R2-A1).
+ * eingebettet trägt, wenn bei der Rückfrage „Nur die Bögen“ gewählt wurde:
+ * Zeiten, Abrückvermerke, Züge und Siegel sind dann nicht mitgekommen (R2-A1).
+ * Seit R3-W3 bietet die Rückfrage die Übernahme in die offene Sammlung an.
  */
 export const SAMMLUNG_IN_PDF_HINWEIS =
-  "Die PDF enthält die vollständige Einsatz-Sammlung mit Zeiten, Abrückvermerken und Zügen — " +
-  "für die ganze Lage „Einsatz importieren…“ verwenden.";
+  "Die PDF enthält die vollständige Einsatz-Sammlung mit Zeiten, Abrückvermerken, Zügen und Siegeln — " +
+  "übernommen wurden nur die Bögen. Für alles die PDF erneut einlesen und „Übernehmen“ wählen.";
 
 /**
  * Rückmeldezeile für „Bögen einlesen…“ (JSON-/PDF-Dateien) und für eine PDF

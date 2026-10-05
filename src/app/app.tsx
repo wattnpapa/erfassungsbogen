@@ -78,7 +78,7 @@ import { uebergabeFesthalten, uebergabeText, type UebergabeStand } from "./ueber
 import { ART_LABEL, EinsatzDetail, EinsatzListe, letzteMeldungText, type Eingang } from "./einsaetze-ui";
 import { letzteMeldung, meldungsNummern } from "./einheiten-tabelle";
 import { exportSammlung, exportStandLaden, exportVermerken, weitergabeUmImportErgaenzen, type ExportStand, type ExportUmfang } from "./export-stand";
-import { abgleichText, einsatzAbgleichen } from "./einsatz-abgleich";
+import { abgleichText, einsatzAbgleichen, sammlungFuerZiel } from "./einsatz-abgleich";
 import { aktuelleMeldungen } from "./auswertung";
 import { boegenAusJsonText, boegenAusPdfBytes, einsatzAusDatei, einsatzAusPdfBytes, einsatzDateiInhalt, istPdfDatei, pdfInhaltArt } from "./einsatz-transport";
 import type { QrBogen } from "./qr-boegen";
@@ -2380,10 +2380,23 @@ function AppInhalt() {
     let uebersprungen = 0;
     const kaputt: string[] = [];
     const zusatz = { sammlungInPdf: false, lage: false }; // R2-A1
+    const sammlungenUebernommen: string[] = []; // R3-W3
     for (const datei of dateien) {
       try {
-        const art = istPdfDatei(datei) ? pdfInhaltArt(new Uint8Array(await datei.arrayBuffer())) : null;
-        if (art === "sammlung") zusatz.sammlungInPdf = true;
+        const bytes = istPdfDatei(datei) ? new Uint8Array(await datei.arrayBuffer()) : null;
+        const art = bytes ? pdfInhaltArt(bytes) : null;
+        if (art === "sammlung" && bytes) {
+          // Sammel-PDF (z. B. vom Zugführer): als Paket mit Zeiten, Zug und
+          // Siegel in diese Sammlung übernehmen, statt nur die Bögen zu
+          // nehmen oder eine zweite Sammlung anzulegen (R3-W3).
+          const uebernahme = await sammlungInZielUebernehmen(zielId, bytes);
+          if (uebernahme === "abbruch") continue;
+          if (uebernahme != null) {
+            sammlungenUebernommen.push(uebernahme);
+            continue;
+          }
+          zusatz.sammlungInPdf = true;
+        }
         if (art === "nur-qr") zusatz.lage = true;
         const r = boegenAufnehmen(zielId, await boegenAusDatei(datei));
         neu += r.neu;
@@ -2396,12 +2409,68 @@ function AppInhalt() {
     }
     einsaetzeNeuLaden();
     setFehler(kaputt.join(" "));
-    setMeldung(
+    const bogenMeldung =
       neu + uebersprungen === 0
-        ? kaputt.length > 0
+        ? kaputt.length > 0 || sammlungenUebernommen.length > 0
           ? ""
           : "Keine Bögen in der Datei gefunden — weder eingebettete Daten noch ein lesbarer QR-Code."
-        : dateiImportMeldung(neu, uebersprungen, zusatz),
+        : dateiImportMeldung(neu, uebersprungen, zusatz);
+    setMeldung([...sammlungenUebernommen, bogenMeldung].filter(Boolean).join(" "));
+  }
+
+  /**
+   * Sammel-PDF mit eingebetteter Sammlung beim „Bögen einlesen…" in die
+   * offene Sammlung übernehmen (Audit Runde 3, R3-W3). Bisher gab es zwei
+   * schlechte Wege: nur die Bögen (ohne Siegel, Zeiten und Zug) oder
+   * „Einsatz importieren…", das eine zweite Sammlung anlegte, aus der jede
+   * Einheit einzeln umgebucht werden musste.
+   *
+   * Rückgabe: Quittungstext nach der Übernahme, `null` für „nur die Bögen"
+   * (bisheriger Weg), `"abbruch"` für nichts.
+   */
+  async function sammlungInZielUebernehmen(zielId: string, bytes: Uint8Array): Promise<string | null | "abbruch"> {
+    const quelle = einsatzAusPdfBytes(bytes);
+    const ziel = einsaetzeLaden().find((x) => x.id === zielId);
+    if (!quelle || !ziel) return null;
+    let sammlung: Einsatzsammlung;
+    if (quelle.id === zielId) {
+      // Dieselbe Sammlung (Rückweg von einem anderen Gerät): verlustfrei abgleichen.
+      sammlung = quelle;
+    } else {
+      const einheiten = new Set(quelle.eintraege.map((e) => e.einheitSchluessel)).size;
+      const zug = quelle.name.trim();
+      const wahl = await frageWahl({
+        titel: "Sammel-PDF einer anderen Sammlung",
+        text:
+          `Die PDF enthält die Sammlung „${quelle.name}“ mit ${einheiten === 1 ? "1 Einheit" : `${einheiten} Einheiten`}. ` +
+          `In „${ziel.name}“ übernehmen — mit Eintreffzeiten, Abrückvermerken, Auftrag und Siegel?`,
+        wege: [
+          {
+            wert: "mit-zug",
+            label: `Übernehmen, Zug „${zug}“`,
+            hinweis: "Einheiten ohne Zug bekommen diesen Zug. Später an der Karte änderbar.",
+          },
+          { wert: "ohne-zug", label: "Übernehmen ohne Zug-Zuordnung" },
+          {
+            wert: "nur-boegen",
+            label: "Nur die Bögen",
+            hinweis: "Ohne Zeiten, Zug und Siegel — wie ein einzeln eingelesener Bogen.",
+          },
+        ],
+      });
+      if (!wahl) return "abbruch";
+      if (wahl === "nur-boegen") return null;
+      sammlung = sammlungFuerZiel(quelle, ziel, wahl === "mit-zug" ? zug : "");
+    }
+    const geklaert = await entfernteImImportKlaeren(sammlung);
+    const r = einsatzAbgleichen(geklaert.sammlung);
+    const abgleich = abgleichText(r);
+    return (
+      (quelle.id === zielId
+        ? `${r.hinzugefuegt} neue Meldung(en) ergänzt.`
+        : `Sammlung „${quelle.name}“ in „${ziel.name}“ übernommen: ${r.hinzugefuegt} neue Meldung(en) mit Zeiten, Zug und Siegel.`) +
+      (abgleich ? ` ${abgleich}` : "") +
+      geklaert.hinweis
     );
   }
 

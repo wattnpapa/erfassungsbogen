@@ -361,3 +361,37 @@ export function abgleichText(r: Pick<AbgleichErgebnis, "aktualisiert" | "widersp
   }
   return teile.join(" ");
 }
+
+/**
+ * Sammlung eines anderen Geräts (z. B. die Sammel-PDF des Zugführers) für die
+ * Übernahme in eine ANDERE, laufende Sammlung vorbereiten: dieselben
+ * Meldungen mit Eintreffzeit, Status, Auftrag, Siegel und Verlauf, aber unter
+ * der Kennung des Ziels — `einsatzAbgleichen` legt sie dann dort ab, statt
+ * eine zweite Sammlung anzulegen (Audit Runde 3, R3-W3). Einheiten, die im
+ * Ziel noch fehlen und keinen Zug tragen, bekommen `zug` (Vorschlag: der
+ * Name der Quell-Sammlung, „1. TZ Albstadt"), mit Vermerk. Bekannte Einheiten
+ * behalten ihren Zug — den gleicht der Abgleich nach seinen Regeln ab.
+ */
+export function sammlungFuerZiel(
+  quelle: Einsatzsammlung,
+  ziel: Einsatzsammlung,
+  zug = "",
+  jetzt = Date.now(),
+): Einsatzsammlung {
+  const bekannt = new Set(ziel.eintraege.map((e) => e.einheitSchluessel));
+  const eintraege: MeldeEintrag[] = JSON.parse(JSON.stringify(quelle.eintraege));
+  const wert = zug.trim();
+  if (wert) {
+    const neueEinheiten = new Set(
+      eintraege.filter((e) => !bekannt.has(e.einheitSchluessel) && !e.zugEtikett).map((e) => e.einheitSchluessel),
+    );
+    for (const schl of neueEinheiten) {
+      const fassungen = eintraege.filter((e) => e.einheitSchluessel === schl);
+      if (fassungen.some((e) => e.zugEtikett)) continue;
+      for (const e of fassungen) e.zugEtikett = wert;
+      const kopf = neuesteJeEinheit(fassungen)[0];
+      if (kopf) (kopf.vermerke ??= []).push({ zeit: jetzt, text: `Zug: ${wert} (aus Sammlung „${quelle.name}“ übernommen)` });
+    }
+  }
+  return { ...ziel, eintraege };
+}

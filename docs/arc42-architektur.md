@@ -48,7 +48,9 @@
 > `einsatzAbgleichen` (`src/app/einsatz-abgleich.ts`), das um den
 > unveränderten Kern-Import herum Status, Zug, Auftrag und Eintreffzeit
 > bekannter Einheiten abgleicht (R3-W1); der Weitergabe-Stand zählt
-> Importiertes nicht mehr als „hier neu" (R3-W2) — Kapitel 8.2, 11.3.
+> Importiertes nicht mehr als „hier neu" (R3-W2); eine Sammel-PDF des
+> Zugführers lässt sich in die laufende Sammlung übernehmen (R3-W3) —
+> Kapitel 8.2, 11.3.
 
 ---
 
@@ -1065,7 +1067,11 @@ flowchart TB
   anderem Gerät: …"). Ohne Vermerk wird nur ein hier leerer Wert gefüllt.
   Der Weitergabe-Stand (`eeb.weitergabe-stand.v1`) führt dazu Prüfsummen der
   bekannten Vermerke und den Zeitpunkt der letzten Übernahme; was ein Import
-  brachte, zählt nicht als „hier neu" (R3-W2).
+  brachte, zählt nicht als „hier neu" (R3-W2). Eine Sammel-PDF einer
+  anderen Sammlung über „Bögen einlesen…" bietet die Übernahme in die
+  offene Sammlung an (`sammlungFuerZiel`, Zug-Vorschlag = Name der
+  Quell-Sammlung, R3-W3); sie läuft über denselben Abgleich, mit Siegel,
+  Zeiten und Status, ohne zweite Sammlung.
 - **Datenschutzfrist:** 90 Tage nach dem Stand eines Bogens werden seine
   Personaldaten dauerhaft anonymisiert. Das gilt für die Meldungen der
   Einsatz-Sammlung, den Entwurf und jeden eingelesenen Bogen; Übungsbögen und
