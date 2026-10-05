@@ -958,6 +958,27 @@
     /* Startseite: der Titel ist hier die Hauptsache und darf größer stehen —
        der Kopf ist zugleich der Seitenaufmacher. */
     .seiten-kopf.start-kopf .kopf-inhalt { padding-bottom: var(--r-4); }
+    /* R3-H5 (Rest): Auf schmalen Telefonen verdichtet sich der Startkopf —
+       der Anzeigemodus als Klappknopf neben dem Titel, das Logo der
+       Kopfleiste entfällt (der Titel darunter nennt die App ohnehin). Die
+       Container-Abfrage zählt in der tatsächlichen Schrift: 320 px Standard
+       (20rem) und jedes Telefon im Feld-Modus (112 %), nicht 360 px Standard. */
+    .seiten-kopf.start-kopf { container: startkopf / inline-size; }
+    @container startkopf (max-width: 22rem) {
+      .seiten-kopf.start-kopf .anzeige-schalter.klappbar .anzeige-klappe { display: inline-flex; align-items: center; gap: 0.3em; }
+      .seiten-kopf.start-kopf .anzeige-schalter.klappbar:not(.offen) > button:not(.anzeige-klappe) { display: none; }
+      .seiten-kopf.start-kopf .anzeige-schalter.klappbar.offen { flex: 1 1 100%; }
+      .seiten-kopf.start-kopf .anzeige-schalter.klappbar.offen .anzeige-klappe { flex: 1 1 100%; justify-content: center; }
+      .seiten-kopf.start-kopf .titelzeile { flex-wrap: nowrap; align-items: flex-start; }
+      .seiten-kopf.start-kopf .titelzeile:has(.anzeige-schalter.offen) { flex-wrap: wrap; }
+      /* Kleinere Titelstufe: neben dem Klappknopf brach „Erfassungsbogen"
+         sonst mitten im Wort um. */
+      .seiten-kopf.start-kopf .titelzeile h1 { flex: 1 1 auto; font-size: var(--t-l); overflow-wrap: normal; }
+      .seiten-kopf.start-kopf .anzeige-schalter { flex: 0 0 auto; margin-left: auto; }
+    }
+    @media (max-width: 22.4rem) {
+      .kopfnav-logo { display: none; }
+    }
     .seiten-kopf.start-kopf h1 { font-size: clamp(var(--t-xl), 4vw, var(--t-2xl)); }
     /* Das taktische Zeichen liegt auf der Kennfarbe. Ohne helle Unterlage
        verschwindet ein gleichfarbiges Symbol (THW-Blau auf THW-Blau) im

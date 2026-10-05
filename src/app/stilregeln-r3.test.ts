@@ -96,3 +96,10 @@ describe("Restliche kleine Ziele (R3-G4)", () => {
     expect(bloecke("dl.paare").join("\n")).toMatch(/grid-template-columns: fit-content\(45%\) minmax\(0, 1fr\)/);
   });
 });
+
+describe("Startkopf auf schmalen Telefonen (R3-H5)", () => {
+  it("klappt den Anzeigemodus in einer Container-Abfrage ein und verkleinert den Titel", () => {
+    expect(css).toMatch(/\.seiten-kopf\.start-kopf \{ container: startkopf \/ inline-size; \}/);
+    expect(css).toMatch(/@container startkopf \(max-width: 22rem\) \{[\s\S]*?\.anzeige-schalter\.klappbar:not\(\.offen\) > button:not\(\.anzeige-klappe\) \{ display: none; \}/);
+  });
+});

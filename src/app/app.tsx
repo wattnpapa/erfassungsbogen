@@ -2946,8 +2946,11 @@ function AppInhalt() {
         <div className="titelzeile">
           <h1>Digitaler Einheiten-Erfassungsbogen</h1>
           {/* Feld/Nacht auch hier, nicht nur in der Fußzeile: Wer draußen
-              zuerst auf der Startseite landet, stellt die Anzeige sofort um. */}
-          <AnzeigeSchalter />
+              zuerst auf der Startseite landet, stellt die Anzeige sofort um.
+              Klappbar wie im Assistenten: Auf schmalen Telefonen (320 px,
+              Feld-Modus) standen die vier Segmente in zwei Zeilen und
+              „Fortsetzen" unter dem Bildrand (R3-H5). */}
+          <AnzeigeSchalter klappbar />
         </div>
       </SeitenKopf>
       <main id="inhalt" tabIndex={-1} className="start">
