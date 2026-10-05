@@ -721,6 +721,8 @@ export function EinsatzDetail(props: {
   onWeitergeben?: () => void;
   /** Einseitiges Lageblatt (Übersicht + Bedarf + Züge) als PDF. */
   onLageblatt?: () => void;
+  /** Leerer Bogen zum Ausfüllen mit der Hand — die Papier-Reserve (R3-A7). */
+  onBlanko?: () => void;
   onGeloescht: () => void;
   /** Die gerade eingegangene Meldung — sie quittiert in der Liste. */
   eingang?: Eingang | null;
@@ -734,7 +736,7 @@ export function EinsatzDetail(props: {
   exportUmfang?: ExportUmfang;
   onExportUmfang?: (umfang: ExportUmfang) => void;
 }) {
-  const { einsatz, onZurueck, onGeaendert, onScannen, onManuell, onDateiImport, onBilderImport, onExport, onCsvExport, onCsvDetailExport, onOldenburgExport, onSammelPdf, onWeitergeben, onLageblatt, onGeloescht, eingang } = props;
+  const { einsatz, onZurueck, onGeaendert, onScannen, onManuell, onDateiImport, onBilderImport, onExport, onCsvExport, onCsvDetailExport, onOldenburgExport, onSammelPdf, onWeitergeben, onLageblatt, onBlanko, onGeloescht, eingang } = props;
   const exportStand = props.exportStand ?? null;
   const [eigenerUmfang, setEigenerUmfang] = useState<ExportUmfang>("alle");
   const exportUmfang = props.exportUmfang ?? eigenerUmfang;
@@ -1282,6 +1284,17 @@ export function EinsatzDetail(props: {
               Lageblatt (A4 quer)
             </button>
           )}{" "}
+          {/* Der leere Vordruck dort, wo am Meldekopf gearbeitet wird — vorher
+              nur über die Website „Aufbau des Bogens" (Audit Runde 3, R3-A7). */}
+          {onBlanko && (
+            <button
+              type="button"
+              onClick={onBlanko}
+              title="Leerer Erfassungsbogen (2 Seiten A4) zum Ausfüllen mit der Hand — für Einheiten ohne Gerät oder bei Geräteausfall."
+            >
+              Blanko-Vordruck (Papier-Reserve)
+            </button>
+          )}
         </div>
       )}
       {onLageblatt && (

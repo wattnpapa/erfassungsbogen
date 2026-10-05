@@ -16,8 +16,9 @@ import type { Erfassungsbogen } from "@bos/eeb-format/model";
 import { base64UrlDekodieren } from "@bos/eeb-format/codec";
 import { einheitAnzeigename, natoZeitstempel, qrErzeugen } from "./hilfen";
 import { istNativ, binaerTeilen } from "./nativ";
-import { einsatzLageblattSeiteFuellen, einsatzPdfDokument, einzelPdfDokument, type SammelBogen, type UebersichtEintrag } from "./pdf-dokument";
+import { einsatzLageblattSeiteFuellen, einsatzPdfDokument, einzelPdfDokument, pdfDokument, type SammelBogen, type UebersichtEintrag } from "./pdf-dokument";
 import { einsatzDateiInhalt } from "./einsatz-transport";
+import { BLANKO_DATEINAME, BLANKO_INFO, BLANKO_ZEILEN, leererBogen } from "./blanko";
 import { MeldeStatus, neuesteJeEinheit, revisionen, type Einsatzsammlung, type MeldeEintrag } from "@bos/meldekopf/einsaetze";
 import { zaehltInLage } from "./auswertung";
 import { eintreffzeit } from "./eintrag-zeiten";
@@ -255,4 +256,16 @@ export async function einsatzLageblattErzeugen(einsatz: Einsatzsammlung): Promis
   // 16:30 · seitdem 1 neue Meldung" (Audit Runde 2, R2-A3).
   if (ok) lageblattVermerken(einsatz);
   return ok;
+}
+
+/**
+ * Blanko-Vordruck: der leere Bogen zum Ausfüllen mit der Hand, aus derselben
+ * Quelle wie die ausgelieferte Datei (blanko.ts). In der App erzeugt statt
+ * geladen — geht offline, in der Desktop-App und im Teilen-Fenster gleich.
+ * Bisher nur über „Aufbau des Bogens" auf der Website erreichbar (Audit
+ * Runde 3, R3-A7).
+ */
+export async function blankoPdfErzeugen(): Promise<boolean> {
+  const dd = pdfDokument(leererBogen(), null, BLANKO_ZEILEN);
+  return dokumentAusgeben({ ...dd, info: BLANKO_INFO }, BLANKO_DATEINAME);
 }

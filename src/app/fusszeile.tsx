@@ -376,6 +376,23 @@ function Datenschutzdialog({ dialogRef }: { dialogRef: RefObject<HTMLDialogEleme
   );
 }
 
+/**
+ * Leerer Vordruck aus der App erzeugen — derselbe wie der Download auf der
+ * Website, aber offline und in der Desktop-/Mobil-App ohne Umweg (R3-A7).
+ */
+async function blankoHerunterladen(): Promise<void> {
+  try {
+    const { blankoPdfErzeugen } = await import("./pdf");
+    await blankoPdfErzeugen();
+  } catch (e) {
+    if (e instanceof Error && e.name === "AbortError") return;
+    await zeigeHinweis({
+      titel: "Blanko-Vordruck",
+      text: `Der Vordruck ließ sich nicht erzeugen (${e instanceof Error ? e.message : String(e)}). Er liegt auch unter „Aufbau des Bogens" auf erfassungsbogen.app.`,
+    });
+  }
+}
+
 export function Fusszeile({ onBogenOeffnen, kompakt = false }: {
   /**
    * Beispielbogen in der App öffnen — wie ein frisch gescannter Bogen.
@@ -714,6 +731,8 @@ export function Fusszeile({ onBogenOeffnen, kompakt = false }: {
           <button type="button" className="link" onClick={() => impressum.current?.showModal()}>Impressum</button>
           <button type="button" className="link" onClick={() => datenschutz.current?.showModal()}>Datenschutz</button>
           <a href={ANLEITUNG} target="_blank" rel="noopener noreferrer">Anleitung</a>
+          {/* Auch beim Ausfüllen eines Bogens erreichbar (R3-A7). */}
+          <button type="button" className="link" onClick={() => void blankoHerunterladen()}>Blanko-Vordruck</button>
           <span className="fuss-version">v{__APP_VERSION__}</span>
         </nav>
         <Impressumsdialog dialogRef={impressum} />
@@ -769,6 +788,7 @@ export function Fusszeile({ onBogenOeffnen, kompakt = false }: {
           <span className="fuss-titel">Projekt</span>
           <a href={ANLEITUNG} target="_blank" rel="noopener noreferrer">Anleitung</a>
           <a href={VORLAGE} target="_blank" rel="noopener noreferrer">Aufbau des Bogens</a>
+          <button type="button" className="link" onClick={() => void blankoHerunterladen()}>Blanko-Vordruck (PDF)</button>
           <a href={`mailto:${KONTAKT}`}>Kontakt</a>
           <a href={REPO} target="_blank" rel="noopener noreferrer">Open Source auf GitHub</a>
         </nav>

@@ -578,6 +578,10 @@ Datenausleitung an eine andere Herkunft ist technisch unterbunden.
   freie Personalzeilen und einen leeren Fahrzeugblock. Kein neuer Inhalt aus
   der Sammlung, keine neue Datenkategorie: die Zählrolle ist Teil des Bogens
   und steht schon im QR-Code und in der CSV.
+  *Nachgezogen 2026-10-05 (R3-A7):* Den Blanko-Vordruck erzeugt die App jetzt
+  auch selbst (Einsatzansicht, Übergabe-Dialog unter „Weitere Formate",
+  Fußzeile; `blankoPdfErzeugen` aus `src/app/blanko.ts`, derselben Quelle wie
+  die ausgelieferte Datei). Er enthält keine Daten des Geräts.
 - **Excel-Liste „Oldenburg"** (`src/app/oldenburg-xlsx.ts`, seit 2026-09-29,
   Audit Runde 2, R2-K2): führt dieselben Führungsstellen-Angaben — Eintreffzeit
   in „eingetr. / zugew.", Abrückzeit in „Einsatz-ende", Auftrag/Notiz

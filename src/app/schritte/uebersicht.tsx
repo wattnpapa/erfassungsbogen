@@ -409,6 +409,17 @@ export function Uebersicht(props: {
     }
   }
 
+  async function blanko() {
+    setFehler("");
+    try {
+      const { blankoPdfErzeugen } = await import("../pdf");
+      await blankoPdfErzeugen();
+    } catch (e) {
+      if (e instanceof Error && e.name === "AbortError") return; // Abbruch im Teilen-Fenster
+      setFehler(`Blanko-Vordruck: ${fehlerText(e)}`);
+    }
+  }
+
   async function pdf() {
     setPdfLaeuft(true);
     setFehler("");
@@ -969,7 +980,7 @@ export function Uebersicht(props: {
             Aufgaben — eingeklappt bleiben es am Entscheidungspunkt ≤4 sichtbare
             Optionen, und alle Ausgabewege sind trotzdem an EINER Stelle. */}
         <details className="teilen-weitere">
-          <summary>Weitere Formate (Link, Tabelle, Excel)</summary>
+          <summary>Weitere Formate (Link, Tabelle, Excel, Blanko)</summary>
           <div className="teilen-weg">
             <button type="button" onClick={bogenLinkTeilen} disabled={!qr}>
               {linkKopiert ? "Link kopiert ✓" : "Link teilen"}
@@ -1000,6 +1011,12 @@ export function Uebersicht(props: {
               Eine Zeile in der Einheitenliste der Führungsstelle — Spalten und Formatierung wie in
               deren Vorlage. Zum Einfügen in die laufende Liste am Meldekopf.
             </p>
+          </div>
+          {/* Der leere Vordruck für die nächste Einheit ohne Gerät oder den
+              Ausfall dieses Geräts (Audit Runde 3, R3-A7). */}
+          <div className="teilen-weg">
+            <button type="button" onClick={blanko}>Blanko-Vordruck (Papier-Reserve)</button>
+            <p className="hinweis">Leerer Bogen, 2 Seiten A4, zum Ausfüllen mit der Hand.</p>
           </div>
           {/* Roh-JSON nur im Debug-Modus anbieten: fürs Publikum ist der Bogen
               ohnehin in jeder PDF eingebettet — ein separater JSON-Download

@@ -13,7 +13,9 @@ import { Uebersicht } from "./uebersicht";
 
 // pdfmake wird in der Übersicht nur nachgeladen, wenn jemand ein PDF anfordert;
 // im Test ist es teuer und hier ohne Belang.
+const blankoPdfErzeugen = vi.fn(async () => true);
 vi.mock("../pdf", () => ({
+  blankoPdfErzeugen: () => blankoPdfErzeugen(),
   pdfErzeugen: async () => {},
   pdfBlobUrl: async () => "blob:pdf-vorschau",
   einsatzPdfErzeugen: async () => {},
@@ -90,6 +92,16 @@ describe("Übersicht — Übergabe-Dialog", () => {
   function uebergabeDialog(): HTMLDialogElement {
     return document.querySelector<HTMLDialogElement>("dialog[aria-label='Bogen übergeben']")!;
   }
+
+  it("bietet den Blanko-Vordruck unter „Weitere Formate“ an (R3-A7)", async () => {
+    const nutzer = userEvent.setup();
+    render(<Uebersicht bogen={neuerBogen()} geheZu={() => {}} neu={() => {}} />);
+    await nutzer.click(screen.getByRole("button", { name: "Bogen übergeben…" }));
+    const dialog = uebergabeDialog();
+    await nutzer.click(within(dialog).getByText("Weitere Formate (Link, Tabelle, Excel, Blanko)"));
+    await nutzer.click(within(dialog).getByRole("button", { name: "Blanko-Vordruck (Papier-Reserve)" }));
+    expect(blankoPdfErzeugen).toHaveBeenCalledTimes(1);
+  });
 
   it("zählt die offenen Punkte auch im Übergabe-Dialog auf", async () => {
     const nutzer = userEvent.setup();

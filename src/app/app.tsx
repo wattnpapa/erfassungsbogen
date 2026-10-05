@@ -2384,6 +2384,17 @@ function AppInhalt() {
   }
 
   /** Einseitiges Lageblatt (nur Übersicht) — für Wand, Ablösung und Klemmbrett (A3/A4). */
+  /** Blanko-Vordruck aus der Einsatzansicht (R3-A7). */
+  async function blankoVordruck() {
+    setFehler("");
+    try {
+      const { blankoPdfErzeugen } = await import("./pdf");
+      if (await blankoPdfErzeugen()) setMeldung("Blanko-Vordruck erzeugt (2 Seiten A4, zum Ausfüllen mit der Hand).");
+    } catch (e) {
+      setFehler(`Blanko-Vordruck: ${fehlerText(e)}`);
+    }
+  }
+
   async function lageblatt(s: Einsatzsammlung) {
     setFehler("");
     try {
@@ -2883,6 +2894,7 @@ function AppInhalt() {
           onExportUmfang={setExportUmfang}
           onWeitergeben={() => sammelPdf(offenerEinsatz, "alle")}
           onLageblatt={() => lageblatt(offenerEinsatz)}
+          onBlanko={() => void blankoVordruck()}
           eingang={eingang}
           onGeloescht={() => { setOffenerEinsatzId(null); einsaetzeNeuLaden(); setMeldung(""); /* Quittung mit Rückweg: Startseite (R2-D6) */ }}
         />

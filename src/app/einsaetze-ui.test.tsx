@@ -843,6 +843,14 @@ describe("Ausgabewege der Einsatzansicht", () => {
     expect(sammelPdf).toHaveBeenCalledWith("neue");
   });
 
+  it("bietet den Blanko-Vordruck dort an, wo am Meldekopf gearbeitet wird (R3-A7)", async () => {
+    const nutzer = userEvent.setup();
+    const blanko = vi.fn();
+    buehne(["Wardenburg"], { onWeitergeben: vi.fn(), onLageblatt: vi.fn(), onBlanko: blanko });
+    await nutzer.click(screen.getByRole("button", { name: "Blanko-Vordruck (Papier-Reserve)" }));
+    expect(blanko).toHaveBeenCalledTimes(1);
+  });
+
   it("sagt, wann zuletzt ein Lageblatt entstand und was seitdem neu ist (R2-A3)", () => {
     buehne(["Wardenburg"], { onLageblatt: vi.fn() });
     expect(document.querySelector(".lageblatt-stand")!.textContent).toBe("Noch kein Lageblatt aus diesem Einsatz.");

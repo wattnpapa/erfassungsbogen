@@ -2,7 +2,8 @@
  * Der leere Erfassungsbogen als PDF-Bytes — gemeinsamer Kern von
  * `npm run blanko-pdf` (schreibt public/downloads/…) und dem Wächtertest
  * blanko-vordruck.test.ts, der die ausgelieferte Datei gegen diesen Generator
- * prüft.
+ * prüft. Bogen, Zeilenzahl und Metadaten stehen in src/app/blanko.ts — dieselbe
+ * Quelle nutzt der Knopf „Blanko-Vordruck" in der App.
  *
  * Der Wächter ist nötig, weil die Datei bewusst im Repo liegt (direkt
  * verlinkbarer Download, auch ohne laufende App) und nicht im Build entsteht:
@@ -17,70 +18,12 @@
  * und erzeugt mit genau diesem Datum neu.
  */
 
-import {
-  Erfassungsbogen,
-  OrganisationsTyp,
-  PersonalErfassung,
-  SCHEMA_VERSION,
-} from "@bos/eeb-format/model";
-import { pdfDokument, type BlankoZeilen } from "../src/app/pdf-dokument";
+import { pdfDokument } from "../src/app/pdf-dokument";
+import { BLANKO_DATEINAME, BLANKO_INFO, BLANKO_ZEILEN, leererBogen } from "../src/app/blanko";
 import { pdfBytes } from "./pdf-in-node";
 
 /** Pfad relativ zur Repo-Wurzel. */
-export const BLANKO_DATEI = "public/downloads/einheiten-erfassungsbogen-blanko.pdf";
-
-/**
- * Zeilenzahl des Vordrucks. Die Fahrzeug- und Personalzeilen füllen zusammen
- * genau zwei Seiten; mehr Personalzeilen würden eine dritte, fast leere Seite
- * anfangen — ein Vordruck, den man in zweifacher Ausfertigung kopiert, soll
- * kein Papier verschwenden.
- */
-export const BLANKO_ZEILEN: BlankoZeilen = { fahrzeuge: 4, personal: 36, qualifikationen: 6 };
-
-/**
- * Bogen ganz ohne Inhalt. `OrganisationsTyp.SONSTIGE` ist hier kein Notbehelf,
- * sondern die richtige Angabe: der Vordruck gehört keiner Organisation und
- * bekommt dadurch den neutralen grauen Kopfbalken statt einer fremden Kennfarbe.
- * Die Hierarchie-Ebenen tragen bewusst generische Bezeichnungen — welche Ebenen
- * eine Organisation kennt (OV/RB/LV, Gemeinde/Kreis, KV/LV …), entscheidet sich
- * erst beim Ausfüllen.
- */
-function leererBogen(): Erfassungsbogen {
-  const ebene = (bezeichnung: string) => ({
-    bezeichnung: { freitext: bezeichnung },
-    name: "",
-    // Leerstring statt undefined: das Layout setzt für fehlende Angaben ein
-    // „—" ein, und ein Gedankenstrich ist auf einem Vordruck keine Leerstelle.
-    telefon: "",
-    email: "",
-  });
-  return {
-    schemaVersion: SCHEMA_VERSION,
-    stand: 0, // im Vordruck nicht gedruckt (die Fußzeile bleibt zum Eintragen leer)
-    einheit: {
-      organisation: OrganisationsTyp.SONSTIGE,
-      einheitsTyp: { freitext: "" },
-      hierarchie: [ebene("Einheit / Standort"), ebene("übergeordnete Ebene")],
-    },
-    einsatz: { zeitraumVon: 0, zeitraumBis: 0, ortAuftrag: "" },
-    personalErfassung: PersonalErfassung.VOLLSTAENDIG,
-    personal: [],
-    fahrzeuge: [],
-    // Der Sofortbedarf gehört zum Papierbogen; im Vordruck werden aus allen
-    // Zahlen Ausfülllinien und aus allen Haken leere Kästchen.
-    sofortbedarf: {
-      verpflegungPersonen: 0,
-      dieselLiter: 0,
-      benzinLiter: 0,
-      gemischLiter: 0,
-      unterbringung: false,
-      ruhezeitErforderlich: false,
-    },
-    // Leerzeilen unter der Überschrift „Sonstiges" — ohne Inhalt entfiele die
-    // Zeile ganz, und damit das Feld für Besonderheiten.
-    sonstiges: "\n\n\n",
-  };
-}
+export const BLANKO_DATEI = `public/downloads/${BLANKO_DATEINAME}`;
 
 /** Der Vordruck mit dem angegebenen Erstelldatum (Millisekunden werden verworfen). */
 export async function blankoVordruck(erstellt: Date): Promise<Buffer> {
@@ -90,16 +33,7 @@ export async function blankoVordruck(erstellt: Date): Promise<Buffer> {
     ...dd,
     // Dokument-Metadaten: was Betriebssystem-Vorschau, PDF-Leser und
     // Suchmaschinen als Titel der Datei anzeigen.
-    info: {
-      title: "Einheiten-Erfassungsbogen — Blanko-Vordruck",
-      author: "Johannes Rudolph",
-      subject:
-        "Leerer Einheiten-Erfassungsbogen zum Ausdrucken: Stärkemeldung, Fahrzeuge, Personal und Sofortbedarf einer Einheit.",
-      keywords:
-        "Erfassungsbogen, Einheiten-Erfassungsbogen, Blanko, Vordruck, Stärkemeldung, Meldekopf, THW, Feuerwehr, Katastrophenschutz, BOS",
-      creator: "erfassungsbogen.app",
-      creationDate: sekunden,
-    },
+    info: { ...BLANKO_INFO, creationDate: sekunden },
   });
 }
 
