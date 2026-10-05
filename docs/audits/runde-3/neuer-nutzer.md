@@ -392,3 +392,17 @@ de-DE).
 | Befund | Stand | Umsetzung |
 | --- | --- | --- |
 | R3-N1 (Rest) Quittung nach „In Einsatz übernehmen“ unter dem Bildrand | behoben | Nach einer Aufnahme rollt die Einsatzansicht einmal so weit, dass „Zuletzt eingelesen: ‚THW Rottweil‘ · jetzt 5 Einheiten, Gesamt 34“ ganz im Bild steht; die Stärke-Leiste bleibt sichtbar. Nachlauf („Rottweil“, „Trotzdem mit Stärke 0 übernehmen“): Quittung 567–638 px bei 360 × 640 (vorher 636–707), 473–566 px bei 320 × 568 (vorher 655–748), 306–357 px bei 640 × 360; Stärke-Leiste 154–383 / 60–289 / 124–228 px. |
+
+Stand 05.10.2026, Paket „Begriffe, Sicht, Rückfragen, Kleinkram“. Geprüft mit Typprüfung, Unit- und
+Oberflächentests (2 418 grün) und Nachmessung im Dev-Server (360 × 640,
+320 × 568, 640 × 360, Standard / Feld / Dunkel / Nacht, `isMobile`/`hasTouch`,
+de-DE; Kontraste aus den berechneten Farben). Aufgeführt sind nur die Befunde
+dieses Pakets.
+
+| Befund | Stand | Umsetzung |
+| --- | --- | --- |
+| R3-N2 „Vorbelegung entfernen“ löscht Sondergerät und Funkrufnamen | behoben | Als Vorbelegung gilt nur ein Fahrzeug ohne Kennzeichen, Sondergerät und Sitzplätze (`fahrzeugUnbenannt`, gilt auch beim Wechsel des Einheitstyps). Der Knopf heißt „Vorbelegung entfernen (n Fahrzeuge ohne eigene Angaben)“, steht unter der Liste und nennt Fahrzeuge, die bleiben; danach Daumenleiste mit „Rückgängig“. Nachlauf (s43): GKW mit „Lichtmast 2 kW, Tauchpumpe TP 4“ bleibt, nur der Anhänger geht, „Rückgängig“ vorhanden. |
+| R3-N3 „M“ heißt Mannschaft und männlich | behoben | Aufteilung nach Geschlecht überall ausgeschrieben („9 männl. / 0 weibl. / 0 div.“, Rest „ohne Angabe zum Geschlecht“): Übersicht, Schritt 3, Bedarfskasten, Zwischensummen, Einheitsdetails, Lageblatt-PDF. In der Übersicht heißt die Zeile „Geschlecht“, „Unterbringung“ nur bei angeforderter Unterbringung. Zähler und Kästchen in Schritt 3 „männlich / weiblich / divers“, „Aufteilung nach Geschlecht angeben (für Unterbringung, WC/Dusche)“. Der Einzelbogen-PDF behält die Vordruck-Schreibweise. |
+| R3-N4 „offen“ und „✓“ passen nicht zum Schritt | behoben | „✓“ nur ohne eigene Prüfpunkte des Schritts; in der Schnellerfassung reicht für Schritt 1 der Name. Vorlesbar „offen, hier fehlt noch etwas“. Nachlauf: Schnellerfassung „Biberach“ → „1 ✓“ (vorher „offen“); 3 von 9 Namen → „3 offen“ (vorher „3 ✓“). |
+| R3-N5 Erklärungen nur im Tooltip | behoben | Aufnahme-Knöpfe mit sichtbarer Unterzeile („mit Kamera oder Handscanner“, „von Hand, ohne Bogen“, „Dateien oder Fotos von QR-Codes“). Marke „☎ Erreichbar für Rückfragen“ ohne Rahmen, darunter die Regel „Die erste Person der Liste steht im PDF und in der Meldung als Ansprechperson … mit ▲/▼ an die erste Stelle setzen“. Nachlauf: Unterzeilen einzeilig, Kontrast ≥ 5,0:1 in allen Modi; „Bogen scannen…“ im ersten Bild (468–571 px Standard/Nacht/Dunkel, 568 px Feld). |
+| R3-N6 Kleinere Stolpersteine | behoben | Erklärung zu „eigener Standort“ als eigene Zeile (Beschriftung 155 × 44 px einzeilig); Sammlung „‹ Startseite“ statt „‹ Einsätze“; „Bogen schließen“ statt „Neuer Bogen“ und Einheitstyp-Beispiel je Organisation (mit R3-H7); Einstieg mitten im Formular schon mit R3-H1 behoben. |

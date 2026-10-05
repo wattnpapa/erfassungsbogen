@@ -476,7 +476,7 @@ Pakets.
 | R3-S1 Link bei offener App ersetzt den eigenen Bogen | behoben | Listener rufen über eine Ref den Handler des aktuellen Renders; Rückfrage und Rückholplatz prüfen gegen den aktuellen Stand, die Quittung nennt den Rückholplatz. Nachlauf s40: Rückfrage „Der angefangene Bogen ‚THW Eigenstadt Bergungsgruppe' wird … ersetzt“ nach 200/600/1 500 ms; nach „Meldung öffnen“ liegt der zuletzt getippte Stand zurückholbar. |
 | R3-S2 Eigener Bogen erbt den Aufnahme-Kontext | behoben | Jeder Bogenwechsel setzt das Sammelziel zurück; Kopf, Marke und „In Einsatz übernehmen“ nur bei einer als fremd markierten Erfassung. Nachlauf: neuer Bogen mit „‹ Startseite“, ohne Marke und Übernehmen-Knopf, Entwurf ohne `fremd`. |
 | R3-S3 Zweites Fenster überschreibt den Entwurf | behoben | Fenster ohne eigenen Bogen fragt vor dem Anlegen nach dem Entwurf des anderen Fensters und legt ihn auf den Rückholplatz; Konfliktwarnung fest am oberen Bildrand. Nachlauf: Rückfrage mit „THW TabA“, danach TabB / Rückholplatz TabA; Warnung in Tab A bei scrollY 520 im Bild (0–178 px). |
-| R3-S4 Vorschlagsliste über der Aktionsleiste | weitgehend | Leiste über der Liste (z-index); mehrdeutiger Name („Neustadt“) wird beim Verlassen nicht mehr aufgelöst. Nachlauf: unter der Knopfmitte liegt der Knopf, Kürzel/Telefon leer. Ein exakt getippter eindeutiger Name („Ulm“) füllt beim Verlassen weiter Kürzel und Kontakt, ohne Hinweis darauf. |
+| R3-S4 Vorschlagsliste über der Aktionsleiste | behoben | Leiste über der Liste (z-index); mehrdeutiger Name („Neustadt“) wird beim Verlassen nicht mehr aufgelöst. Nachlauf: unter der Knopfmitte liegt der Knopf, Kürzel/Telefon leer. Damals offen: Ein exakt getippter eindeutiger Name („Ulm“) füllt beim Verlassen weiter Kürzel und Kontakt, ohne Hinweis darauf. Rest behoben im Paket „Begriffe, Sicht, Rückfragen, Kleinkram“ (siehe unten). |
 | R3-S6 Unterbrechung wird zur Eintreffzeit | behoben | Beginn der Erfassung im Entwurf (`fremd.beginn`); bei leerem Feld und mehr als 5 Minuten Rückfrage „Um 05:47 (Beginn der Erfassung) / Jetzt, 06:12“. Nachlauf mit Neuladen und Uhr +25 min: Wahl „Beginn“ → eingetroffen 05:47. |
 
 Stand 05.10.2026, Paket „Rückmeldungen im Bild, Scrollposition, Doppeltipp,
@@ -487,4 +487,15 @@ de-DE). Aufgeführt sind nur die Befunde dieses Pakets.
 | Befund | Stand | Umsetzung |
 | --- | --- | --- |
 | R3-S5 Doppeltipp auf „Abrücken“ trifft „Wieder anwesend“ | behoben | Ortssperre statt Knopfsperre: Nach „Abrücken“ nimmt die getippte Bildstelle 1,5 s keinen Tipp an (40 px Halbmesser), gleich welcher Knopf dort liegt; am Platz des Knopfs steht so lange „✓ Abgerückt“. Jedes Zurücknehmen quittiert sich selbst. Nachlauf (s30): 300/600/1 000 ms → abgerückt; Mitte des Bilds 700/1 000 ms → abgerückt, unter dem Finger „✓ Abgerückt“. Nach 1,7 s wirken „Wieder anwesend“ und „Rückgängig“ wie gewohnt. |
-| R3-S7 Kleinere Stellen beim Wiedereinstieg | weitgehend | Nach einer Aufnahme rollt die Ansicht einmal, bis „Zuletzt eingelesen: … · jetzt 5 Einheiten, Gesamt 34“ ganz im Bild steht (360 × 640: 567–638 px statt 636–707; 320 × 568: 473–566 statt 655–748). Der Hinweis „Angefangene Erfassung“ steht unter den Aufnahme-Knöpfen bei 636 px statt 2 672 px. Offen: Neuladen in der Einsatz-Erfassung führt weiter zur Startseite. |
+| R3-S7 Kleinere Stellen beim Wiedereinstieg | behoben | Nach einer Aufnahme rollt die Ansicht einmal, bis „Zuletzt eingelesen: … · jetzt 5 Einheiten, Gesamt 34“ ganz im Bild steht (360 × 640: 567–638 px statt 636–707; 320 × 568: 473–566 statt 655–748). Der Hinweis „Angefangene Erfassung“ steht unter den Aufnahme-Knöpfen bei 636 px statt 2 672 px. Damals offen: Neuladen in der Einsatz-Erfassung führt weiter zur Startseite. Rest behoben im Paket „Begriffe, Sicht, Rückfragen, Kleinkram“ (siehe unten). |
+
+Stand 05.10.2026, Paket „Begriffe, Sicht, Rückfragen, Kleinkram“. Geprüft mit Typprüfung, Unit- und
+Oberflächentests (2 418 grün) und Nachmessung im Dev-Server (360 × 640,
+320 × 568, 640 × 360, Standard / Feld / Dunkel / Nacht, `isMobile`/`hasTouch`,
+de-DE; Kontraste aus den berechneten Farben). Aufgeführt sind nur die Befunde
+dieses Pakets.
+
+| Befund | Stand | Umsetzung |
+| --- | --- | --- |
+| R3-S4 (Rest) Eindeutiger OV-Name füllt ohne Hinweis | behoben | Beim Verlassen aufgelöst (nicht gewählt) sagt Schritt 1 direkt unter dem Namensfeld „Aus dem OV-Verzeichnis ergänzt: Ulm (OULM) mit Telefon und E-Mail, dazu die übergeordneten Ebenen.“ mit „Rückgängig“ (Name bleibt). Nachlauf: Ansage 13 px unter dem Feld, „Rückgängig“ 69 × 47 px, danach Kürzel leer. |
+| R3-S7 (Rest) Neuladen in der Einsatz-Erfassung → Startseite | behoben | Gehört der Entwurf zu einer fremden Erfassung mit vorhandener Sammlung, beginnt die App nach dem Neuladen im Assistenten (gemerkter Schritt, „‹ Einsatz …“, „In Einsatz übernehmen“); der eigene Bogen weiter auf der Startseite. Nachlauf: „Rottweil“ → Neuladen → „1. Einheit“ mit Name und Übernehmen-Knopf. |

@@ -421,4 +421,15 @@ de-DE). Aufgeführt sind nur die Befunde dieses Pakets.
 | Befund | Stand | Umsetzung |
 | --- | --- | --- |
 | R3-G1 „Person entfernen“: „Rückgängig“ über dem Bildrand | behoben | Quittung „Entfernt: <Name>“ als Daumenleiste über „Weiter →“, bleibt bis ✕, zum nächsten Entfernen oder bis zum Verlassen des Schritts; „Rückgängig“ setzt die Person an ihre Stelle zurück. Die Ansicht beginnt danach mit dem Kopf der nachgerückten Karte, die alte Fingerstelle ist 1,5 s gesperrt. Nachlauf (Krüger, Florian, Knopf bei 150/320/500 px): „Rückgängig“ 108 × 44 px bei 512 px (360 × 640), 440 px (320 × 568), 246 px (640 × 360); nächstes „Person entfernen“ mindestens 50 px neben der alten Stelle. |
-| R3-G2 Quittungsleiste deckt bis 26 %, fängt den zweiten Tipp | weitgehend | Text höchstens zwei Zeilen, Handlung und Zeit vorn, Name gekürzt; Seite hält unten die Höhe der Leiste frei; geht sie unter dem Finger auf, sperrt sie die Stelle und rollt die Knopfreihe der getippten Karte über sich; Zurücknehmen quittiert sich („Wieder anwesend: Abrücken von Nr. 3 … zurückgenommen.“). Nachlauf: Leiste 65 px, 11 % bei 320 × 568 (vorher 26 %), 10 % bei 360 × 640, 18 % bei 640 × 360; Doppeltipp unten mit 700/1 000 ms → abgerückt. Offen: Der Kopf der nächsten Karte liegt kurz unter der Leiste, bis man rollt. |
+| R3-G2 Quittungsleiste deckt bis 26 %, fängt den zweiten Tipp | behoben | Text höchstens zwei Zeilen, Handlung und Zeit vorn, Name gekürzt; Seite hält unten die Höhe der Leiste frei; geht sie unter dem Finger auf, sperrt sie die Stelle und rollt die Knopfreihe der getippten Karte über sich; Zurücknehmen quittiert sich („Wieder anwesend: Abrücken von Nr. 3 … zurückgenommen.“). Nachlauf: Leiste 65 px, 11 % bei 320 × 568 (vorher 26 %), 10 % bei 360 × 640, 18 % bei 640 × 360; Doppeltipp unten mit 700/1 000 ms → abgerückt. Damals offen: Der Kopf der nächsten Karte liegt kurz unter der Leiste, bis man rollt. Rest behoben im Paket „Begriffe, Sicht, Rückfragen, Kleinkram“ (siehe unten). |
+
+Stand 05.10.2026, Paket „Begriffe, Sicht, Rückfragen, Kleinkram“. Geprüft mit Typprüfung, Unit- und
+Oberflächentests (2 418 grün) und Nachmessung im Dev-Server (360 × 640,
+320 × 568, 640 × 360, Standard / Feld / Dunkel / Nacht, `isMobile`/`hasTouch`,
+de-DE; Kontraste aus den berechneten Farben). Aufgeführt sind nur die Befunde
+dieses Pakets.
+
+| Befund | Stand | Umsetzung |
+| --- | --- | --- |
+| R3-G2 (Rest) Kopf der nächsten Karte unter der Leiste | behoben | Die Daumenleiste rollt einen Kartenkopf, den sie anschneidet, mit über sich — auch wenn sie nicht unter dem Finger aufging; die getippte Stelle bleibt im Bild. Nachlauf (zweite Karte, Knopf 90 px über dem Rand): „Abrücken“ und „Entfernen“ bei 320 × 568 und 360 × 640 ohne Kartenkopf unter der Leiste (vorher 546–594 bzw. 530–578 px); Doppeltipp 700/1 000 ms → abgerückt. |
+| R3-G4 Restliche kleine Ziele | behoben | Schrittleiste quer 44 px hoch, bis 48rem Breite nur der aktive Reiter mit Namen (608/608 px statt 679/608); Sprung-Links im Bedarfskasten 70 × 47 / 79 × 47 px (Feld 84 × 57 / 95 × 57; dabei `dl.paare` mit `fit-content(45%)`, vorher 34 px Wertspalte im Feld-Modus); „Weitere Formate“ 44 px, „Datenschutzfrist“ quer 574 × 44; Umschalter-Segmente ≥ 44 px breit („Feld“ 49 statt 41) mit sichtbarer Trennlinie; Kopf-Link „THW“ 44 × 44. |

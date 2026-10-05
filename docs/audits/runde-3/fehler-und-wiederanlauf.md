@@ -486,3 +486,15 @@ de-DE). Aufgeführt sind nur die Befunde dieses Pakets.
 | Befund | Stand | Umsetzung |
 | --- | --- | --- |
 | R3-E4 Gemischter Stapel: Fehler verdrängt Erfolg, „0 Bögen aufgenommen“ | behoben | Dateien und Bilder einer Auswahl laufen als ein Stapel mit einer Rückmeldung. Nur Dateien: Erfolg und Fehler untereinander unter den Aufnahme-Knöpfen. Mit Bildern: ein Bericht, erste Zeile zählt beides („2 Dateien und 1 Bild gelesen — 1 Bogen aufgenommen.“), darunter kaputte Dateien und Bilder ohne Code. Nachlauf: Schwabach + abgeschnitten.json → „1 Bogen aufgenommen.“ und die Beschädigt-Zeile zusammen; Hilpoltstein + abgeschnitten.json + foto.png → keine Zeile mit „0 Bögen“. |
+
+Stand 05.10.2026, Paket „Begriffe, Sicht, Rückfragen, Kleinkram“. Geprüft mit Typprüfung, Unit- und
+Oberflächentests (2 418 grün) und Nachmessung im Dev-Server (360 × 640,
+320 × 568, 640 × 360, Standard / Feld / Dunkel / Nacht, `isMobile`/`hasTouch`,
+de-DE; Kontraste aus den berechneten Farben). Aufgeführt sind nur die Befunde
+dieses Pakets.
+
+| Befund | Stand | Umsetzung |
+| --- | --- | --- |
+| R3-E5 Zukunft und Abrücken vor Eintreffen ohne Hinweis | behoben | `zeitUnstimmigkeit()`: mehr als 15 Minuten in der Zukunft oder Abrücken vor Eintreffen. „Speichern“ fragt „Stimmt die Zeit?“ („Ja, so speichern“ / „Zeit korrigieren“, Feld bleibt offen); bis die Zeiten passen, nennt die Karte die Unstimmigkeit, zugeklappt „⚠ Zeit prüfen“ — auch nach „Abrücken“, das keine eigene Rückfrage bekommt (doppeltippfest). Nachlauf: Eintreffzeit +10 Tage → Rückfrage, nach Speichern und Abrücken Hinweis an der Karte. |
+| R3-E6 „Verschieben…“ in eine Übung ohne Folge und Rückweg | behoben | Dialog nennt die Folge („… aus ‚Hochwasser Jagst‘ verschieben — die Lage ‚Hochwasser Jagst‘ verliert 4 Helfer“, an Übungszielen „zählt die Einheit in keiner Lage mehr“); Quittung mit „Rückgängig — zurück nach ‚Hochwasser Jagst‘“. Nachlauf: Gesamt 27 → 23, nach „Rückgängig“ 27. |
+| R3-E7 Jahresdreher erzeugt drei Hinweise | behoben | Liegt „bis“ vor „von“, entfallen „ist vorbei“ und „mehr als ein Jahr“; der eine Hinweis nennt das ferne Datum: „… — 16.07.2062 liegt mehr als ein Jahr entfernt, Tippfehler im Jahr 2062?“. Nachlauf: Übersicht „1 offener Punkt“ statt drei. |

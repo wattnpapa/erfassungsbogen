@@ -480,3 +480,18 @@ de-DE). Aufgeführt sind nur die Befunde dieses Pakets.
 | Befund | Stand | Umsetzung |
 | --- | --- | --- |
 | R3-L1 Rückmeldung nach „Bögen einlesen…“ außerhalb des Bilds | behoben | Rückmeldung (Erfolg und Fehler) direkt unter den Aufnahme-Knöpfen, holt sich ins Bild, `role="alert"` bei Fehlern, bleibt bis zum nächsten Einlesen; Bilderstapel-Bericht am selben Platz. Nachlauf mit dem Knopf in Bildmitte: falsche Datei 382–454 px (360 × 640), 345–441 px (320 × 568), 216–264 px (640 × 360), vorher 2 711 px; gültige Datei 382–424 / 345–387 / 222–264 px. Nach „In Einsatz übernehmen“ und Scan steht „Zuletzt eingelesen“ ganz im Bild (siehe R3-S7). |
+
+Stand 05.10.2026, Paket „Begriffe, Sicht, Rückfragen, Kleinkram“. Geprüft mit Typprüfung, Unit- und
+Oberflächentests (2 418 grün) und Nachmessung im Dev-Server (360 × 640,
+320 × 568, 640 × 360, Standard / Feld / Dunkel / Nacht, `isMobile`/`hasTouch`,
+de-DE; Kontraste aus den berechneten Farben). Aufgeführt sind nur die Befunde
+dieses Pakets.
+
+| Befund | Stand | Umsetzung |
+| --- | --- | --- |
+| R3-L2 „Signatur ungültig“ nur aufgeklappt | behoben | Marke „⚠ Signatur ungültig“ mit Rahmen im Kopf jeder Karte (zu- und aufgeklappt) und im Zeilenkopf der Tabelle; gültige Signaturen ohne Marke. Nachlauf (8 Einheiten, alle zugeklappt): Schrift und Rahmen 7,41 (Standard, Feld), 8,71 (Dunkel), 7,05:1 (Nacht). |
+| R3-L3 Tabelle: Abgerückte auf 55 % Deckkraft | behoben | Keine Deckkraft mehr; nur der Name durchgestrichen, Statuswort als Marke, Zahlen in der Nebentextfarbe. Nachlauf: Statuswort 18,43 / 21,0 / 14,46 / 11,61:1 (Standard / Feld / Dunkel / Nacht, vorher 2,33 / 3,44 / 3,38 / 2,77), „Nr.“ und Zahlen 5,92 / 14,18 / 8,17 / 6,31:1, „alt“ 7,51 / 7,51 / 10,27 / 8,15:1. |
+| R3-L4 Begleitseiten: Bilder im Dunkel-Modus ungedimmt | weitgehend | `scripts/content-stil.mts` dimmt Fotos und Bildschirmfotos auch im Dunkel-Modus (und bei System-dunkel) mit `brightness(0.7)`, Strichcodes ausgenommen; 36 Seiten neu erzeugt, Generator-Test prüft es. Alle 12 Aufnahmen neu (vier Modi im Umschalter, aktuelle Startseite und Einsatzansicht; Beispiele ohne Übungsband, Zeitraum ab heute). Nachlauf: Bildfläche in Dunkel/System-dunkel/Nacht 0 % helle Bildpunkte (Standard 72–81 %). Je Viewport höchstens 10,5 % (Anleitung), 11,5 % (asb), 12,3 % (johanniter) im Dunkel-Modus — derselbe Wert mit ausgeblendeten Bildern, er kommt von der hellen Schrift. Offen: eigene dunkle Fassung der Aufnahmen. |
+| R3-L5 Größenzeichen auf dunklem Grund unsichtbar | behoben | In Dunkel und Nacht trägt jedes taktische Zeichen die helle Unterlage (gedämpft durch den Modusfilter), auch im App-Kopf (`platform-ios`/`-android`). Nachlauf (Startseitenkarte, Kopf, Übersicht; Web und `platform-android`): Punkt 14,88:1 (Dunkel), 8,62:1 (Nacht), vorher 1,21 bzw. 1,15:1. Die nativen Apps selbst nicht geprüft. |
+| R3-L6 Moduswechsel nur ganz oben | behoben | Knopf „◐“ in der festen Fußleiste des Assistenten; ein Tipp klappt die vier Modi auf, der zweite wählt; das Element in der Bildmitte bleibt an seiner Stelle. Unter 360 px trägt „← Zurück“ nur den Pfeil. Nachlauf (Schritt 3, halbe Höhe): zwei Tipps bis Nacht, Element 279 → 279 px (360 × 640, 320 × 568 Feld), 178 → 178 px (640 × 360); Leiste in allen Größen gerätebreit. |
+| R3-L7 Kleinere Sichtreste | behoben | Nacht `--text-3` #8c816b (Platzhalter 4,75:1, vorher 4,44); Ladehinweis mit Rahmen in Schriftfarbe; im Übergabe-Dialog nur „QR-Code im Vollbild zeigen“ als Primärknopf; Segmentgrenzen in `--linie-stark` (3,37 / 18,58 / 3,45 / 3,41:1, vorher unsichtbar); `--n-400` #838ca1 (Knopfrahmen auf Seitengrund 3,09:1, vorher 2,79); Markenrahmen Feld #9c7a24 (4,02:1, vorher 1,79). |
