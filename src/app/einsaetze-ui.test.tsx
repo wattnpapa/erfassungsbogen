@@ -1471,6 +1471,43 @@ describe("Laufende Nummer, Zeitform und Marke (R2-A6)", () => {
   });
 });
 
+describe("Ungültige Signatur und Abgerückte ohne Aufklappen erkennbar (R3-L2, R3-L3)", () => {
+  beforeEach(() => {
+    localStorage.clear();
+  });
+
+  it("zeigt „⚠ Signatur ungültig“ im Kopf jeder Karte und im Zeilenkopf der Tabelle, abgerückt als Marke", async () => {
+    const nutzer = userEvent.setup();
+    const angelegt = einsatzAnlegen("Hochwasser Test", EinsatzArt.EINSATZ);
+    const kaputt = meldungHinzufuegen(angelegt.id, bogenMitName("Haßmersheim"))!.eintrag;
+    const gut = meldungHinzufuegen(angelegt.id, bogenMitName("Aalen"))!.eintrag;
+    const liste = einsaetzeLaden();
+    const eintraege = liste[0]!.eintraege;
+    eintraege.find((e) => e.id === kaputt.id)!.signatur = { zustand: "ungueltig" };
+    const aalen = eintraege.find((e) => e.id === gut.id)!;
+    aalen.signatur = { zustand: "gueltig", pubkey: "ab".repeat(32), kurzform: "AB12-CD34" };
+    aalen.status = MeldeStatus.ABGERUECKT;
+    aalen.abgerueckAm = Date.now();
+    localStorage.setItem("eeb.einsaetze.v1", JSON.stringify(liste));
+    ansicht(angelegt.id);
+
+    const koepfe = screen.getAllByRole("heading", { level: 3 });
+    const kopf = (name: string) => koepfe.find((h) => h.textContent!.includes(name))!;
+    expect(kopf("Haßmersheim").textContent).toContain("⚠ Signatur ungültig");
+    expect(kopf("Aalen").textContent).not.toContain("Signatur");
+
+    await nutzer.click(screen.getByRole("button", { name: "Tabelle" }));
+    const zeilen = within(screen.getByRole("table", { name: /Gemeldete Einheiten/ })).getAllByRole("rowheader");
+    const zeile = (name: string) => zeilen.find((z) => z.textContent!.includes(name))!;
+    expect(zeile("Haßmersheim").textContent).toContain("⚠ Signatur ungültig");
+    // Durchgestrichen ist nur der Name, das Statuswort steht als eigene Marke.
+    const aalenKopf = zeile("Aalen");
+    expect(aalenKopf.querySelector(".tabelle-name")!.textContent).toContain("Aalen");
+    expect(aalenKopf.querySelector(".status-badge")!.textContent).toBe("abgerückt");
+    expect(aalenKopf.querySelector(".tabelle-name .status-badge")).toBeNull();
+  });
+});
+
 describe("Lage vom Papier abgleichen (Audit Runde 3, R3-A2)", () => {
   it("zeigt eingelesene Einheiten mit Marke und übernimmt Status und Zug in einem Schritt", async () => {
     const user = userEvent.setup();

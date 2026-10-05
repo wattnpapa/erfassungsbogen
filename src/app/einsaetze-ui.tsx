@@ -204,6 +204,22 @@ function signaturBadge(e: MeldeEintrag) {
   return <span className="signatur-badge ungueltig" title="Signatur passt nicht zu den Daten">⚠ Signatur ungültig</span>;
 }
 
+/**
+ * Marke „⚠ Signatur ungültig" im Kopf der Karte und im Zeilenkopf der
+ * Tabelle. Sie stand nur in der aufgeklappten Karte; zugeklappt und in der
+ * Tabelle sah ein Bogen mit gebrochener Signatur aus wie jeder andere (Audit
+ * Runde 3, R3-L2). Zeichen, Wort und Rahmen tragen auch in Graustufen.
+ * Gültig signierte Bögen brauchen keine Marke.
+ */
+function SignaturWarnung({ eintrag }: { eintrag: MeldeEintrag }) {
+  if (eintrag.signatur?.zustand !== "ungueltig") return null;
+  return (
+    <span className="signatur-badge ungueltig signatur-marke" title="Signatur passt nicht zu den Daten — der Bogen kann unterwegs verändert worden sein">
+      ⚠ Signatur ungültig
+    </span>
+  );
+}
+
 /** „Lageblatt Mo., 16:30 (seitdem 1 neue Meldung) · Export: noch keiner" — für die Startseitenkarte (R2-A3). */
 function ausgabeStandText(s: Einsatzsammlung): string {
   const teil = (was: string, stand: ExportStand | null, keiner: string) =>
@@ -1808,13 +1824,16 @@ function TabellenZeileZelle({ zeile: z, eingang, nummer, neueFassung }: { zeile:
     <tr ref={zeile} data-einheit={z.eintrag.einheitSchluessel} className={z.anwesend ? undefined : "gestrichen"}>
       <th scope="row">
         {nummer != null ? <><span className="meldung-nr">Nr. {nummer}</span>{" "}</> : null}
-        {z.einheit}
+        {/* Durchgestrichen wird nur der Name, das Statuswort bleibt lesbar —
+            wie in den Karten (Audit Runde 3, R3-L3). */}
+        <span className="tabelle-name">{z.einheit}</span>
         {z.eintrag.bogen.uebung ? <span className="uebung-badge">ÜBUNG</span> : null}
         <AnonymBadge bogen={z.eintrag.bogen} />
+        <SignaturWarnung eintrag={z.eintrag} />
         {z.teilEtikett ? <span className="teil-badge">{z.teilEtikett}</span> : null}
         {neueFassung ? <span className="fassung-badge">neue Fassung</span> : null}
         {!z.anwesend && (
-          <span className="muster-sub">
+          <span className="status-badge">
             {z.eintrag.status === MeldeStatus.ABGERUECKT ? "abgerückt" : "zusammengeführt"}
           </span>
         )}
@@ -2513,6 +2532,7 @@ function EinheitKarte(props: {
             {/* Übungsbögen bleiben auch neben echten Meldungen unübersehbar. */}
             {kopf.bogen.uebung ? <span className="uebung-badge">ÜBUNG</span> : null}
             <AnonymBadge bogen={kopf.bogen} />
+            <SignaturWarnung eintrag={kopf} />
             {/* Ohne diese Kennzeichnung stünde dieselbe Einheit nach einer
                 Aufteilung zweimal gleichnamig untereinander. */}
             {kopf.teilEtikett ? <span className="teil-badge">{kopf.teilEtikett}</span> : null}
@@ -2570,7 +2590,8 @@ function EinheitKarte(props: {
           <span className="muster-sub">
             {orgLabel(kopf.bogen.einheit.organisation)} · Stärke {staerkeText(kopf.bogen)}
             {aufgegangen ? " · zusammengeführt" : ""}
-            {kopf.signatur ? <> · {signaturBadge(kopf)}</> : null}
+            {/* Ungültig steht schon als Marke im Kopf (R3-L2). */}
+            {kopf.signatur?.zustand === "gueltig" ? <> · {signaturBadge(kopf)}</> : null}
           </span>
           {/* Die Zeiten der Führungsstelle zuerst, der Absender-Stand nur als
               Zusatz: „eingetroffen 09:40" ist die Zeile fürs Einsatztagebuch,

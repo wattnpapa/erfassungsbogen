@@ -1987,6 +1987,13 @@
     .signatur-badge { white-space: nowrap; font-weight: 600; }
     .signatur-badge.gueltig { color: var(--gut); }
     .signatur-badge.ungueltig { color: var(--alarm); }
+    /* R3-L2: als Marke im Kartenkopf und in der Tabelle — Rahmen und Zeichen
+       tragen auch ohne Farbe. */
+    .signatur-marke {
+      display: inline-block; margin-left: 0.4rem; padding: 0 0.35rem;
+      border: 2px solid var(--alarm); border-radius: var(--radius);
+      font-size: var(--t-xs); font-weight: 700; letter-spacing: normal;
+    }
     /* Übungs-Kennzeichen an Meldungen in der Einsatz-Sammlung — gleiche
        Farbwelt wie der Störer im Assistenten (Warn-Tokens), damit „Übung"
        überall dieselbe Handschrift trägt. */
@@ -2267,8 +2274,13 @@
       letter-spacing: normal; text-transform: none; text-align: left; background: none;
     }
     table.einheiten-tabelle tbody th .muster-sub { display: block; }
-    table.einheiten-tabelle tr.gestrichen { opacity: 0.55; }
-    table.einheiten-tabelle tr.gestrichen th { text-decoration: line-through; }
+    /* R3-L3: Keine 55 % Deckkraft mehr — das Statuswort fiel nachts auf
+       2,77:1, im Standard auf 2,33:1. Wie in den Karten: der Name
+       durchgestrichen, das Statuswort als Marke in voller Deckkraft, die
+       Zahlen in der Nebentextfarbe. */
+    table.einheiten-tabelle tr.gestrichen td { color: var(--text-2); }
+    table.einheiten-tabelle tr.gestrichen th .tabelle-name { text-decoration: line-through; }
+    table.einheiten-tabelle tr.gestrichen th .status-badge { margin-left: 0; }
     /* Sortierknopf im Spaltenkopf: sieht aus wie der Kopf, nicht wie ein Knopf
        — die Tabelle soll ein Vordruck bleiben. Der Griff zeigt sich beim
        Überfahren und im Fokus. */
