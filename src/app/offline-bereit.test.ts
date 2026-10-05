@@ -48,4 +48,23 @@ describe("offlineText mit Fortschritt", () => {
       /^✓ Funktioniert komplett offline/,
     );
   });
+
+  // Gleich nach dem Aktivieren ist die zweite Stufe noch nicht gezählt. Die
+  // Zeile sagte dann rund 100 ms lang „komplett offline" — beim Neuladen ohne
+  // Netz auch dann, wenn noch kein einziger Beispielbogen im Gerät lag.
+  it("verspricht „komplett offline“ erst, wenn die zweite Stufe gezählt ist", () => {
+    const frisch = offlineText({ stand: "bereit", frischBereit: true, online: true, zweiStufen: true });
+    expect(frisch).toMatch(/^✓ Jetzt offline bereit für Bogen, PDF, QR-Code und Empfang — /);
+    expect(frisch).not.toMatch(/komplett offline/);
+    expect(offlineText({ stand: "bereit", frischBereit: false, online: false, zweiStufen: true, zusatz: null })).not.toMatch(
+      /komplett offline/,
+    );
+    expect(
+      offlineText({ stand: "bereit", frischBereit: false, online: true, zweiStufen: true, zusatz: { fertig: 474, gesamt: 474 } }),
+    ).toMatch(/^✓ Funktioniert komplett offline/);
+    // Native App: keine zweite Stufe, alles liegt im Paket.
+    expect(offlineText({ stand: "bereit", frischBereit: false, online: true, zweiStufen: false })).toMatch(
+      /^✓ Funktioniert komplett offline/,
+    );
+  });
 });

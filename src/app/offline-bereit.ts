@@ -46,6 +46,12 @@ export interface OfflineZustand {
   kern?: { geladen: number; gesamt: number } | null;
   /** Zweite Stufe (Beispielbögen, Themenseiten): Dateien da / gesamt. */
   zusatz?: { fertig: number; gesamt: number } | null;
+  /**
+   * Es gibt eine zweite Stufe (Web mit Service Worker, nicht nativ). Dann
+   * heißt „bereit" nur: der Kern liegt im Vorrat. Solange `zusatz` noch nicht
+   * gezählt ist, darf die Zeile nicht „komplett offline" sagen.
+   */
+  zweiStufen?: boolean;
 }
 
 export function useOfflineStand(): OfflineZustand {
@@ -131,7 +137,13 @@ export function useOfflineStand(): OfflineZustand {
     };
   }, [stand]);
 
-  return { stand, frischBereit, online, kern, zusatz };
+  const zweiStufen =
+    stand !== "ohne" &&
+    !istNativ() &&
+    sw() !== null &&
+    typeof window !== "undefined" &&
+    /^https?:$/.test(window.location.protocol);
+  return { stand, frischBereit, online, kern, zusatz, zweiStufen };
 }
 
 /** Text der Offline-Zeile auf der Startseite. */
@@ -145,6 +157,12 @@ export function offlineText(s: OfflineZustand): string {
       return s.online
         ? `${kopf} für Bogen, PDF, QR-Code und Empfang. Beispielbögen und Themenseiten werden nachgeladen (${s.zusatz.fertig} von ${s.zusatz.gesamt}) — ${daten}`
         : `${kopf} für Bogen, PDF, QR-Code und Empfang. Beispielbögen und Themenseiten fehlen noch (${s.zusatz.fertig} von ${s.zusatz.gesamt}), sie folgen beim nächsten Netz — ${daten}`;
+    }
+    // Zweite Stufe noch nicht gezählt (gleich nach dem Aktivieren, oder das
+    // Verzeichnis der Stufen fehlt): sicher ist nur der Kern. Vorher stand hier
+    // kurz „komplett offline", obwohl noch keine Beispielbögen im Gerät lagen.
+    if (s.zweiStufen && !s.zusatz) {
+      return `${s.frischBereit ? "✓ Jetzt offline bereit" : "✓ Offline bereit"} für Bogen, PDF, QR-Code und Empfang — ${daten}`;
     }
     return s.frischBereit
       ? `✓ Jetzt offline bereit. Funktioniert komplett offline — ${daten}`

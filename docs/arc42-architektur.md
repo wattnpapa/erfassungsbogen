@@ -931,7 +931,10 @@ der Service Worker legt sie über zwei Laufzeit-Routen in den Cache
 `eeb-zusatz` (Beispielbögen `CacheFirst`, Seiten und Liste `NetworkFirst`).
 Die Offline-Zeile zeigt beim Laden den Fortschritt des Kerns in MB und danach
 „offline bereit für Bogen, PDF, QR-Code und Empfang … (120 von 474)". Keine
-neuen Hosts, alle Abrufe gehen an die eigene Herkunft.
+neuen Hosts, alle Abrufe gehen an die eigene Herkunft. „Funktioniert komplett
+offline" steht erst, wenn die Zusatzstufe gezählt und vollständig ist; bis zur
+ersten Zählung nennt die Zeile nur den Kern (`zweiStufen` in
+`src/app/offline-bereit.ts`, nachgezogen 2026-10-05).
 
 ### 6.5 Desktop-Auto-Update (Electron)
 
