@@ -99,6 +99,25 @@ describe("Schritt Einheit", () => {
     expect(kuerzel.map((f) => f.value)).toEqual(["OODE", "GOLD", "LVNI"]);
   });
 
+  // Audit Runde 3, R3-S4: Beim Verlassen des Felds wurde „Neustadt" still zu
+  // Neustadt (Holstein) aufgelöst — samt Kürzel und Telefon, obwohl es drei
+  // Ortsverbände gibt, deren Name so beginnt.
+  it("löst beim Verlassen nur eindeutige Namen auf, keinen mehrdeutigen", async () => {
+    const nutzer = userEvent.setup();
+    buehne();
+
+    await nutzer.type(screen.getByLabelText("Name (Pflicht)"), "Neustadt");
+    await screen.findByText((_t, el) => el?.tagName === "LI" && el.textContent?.startsWith("Neustadt an der Aisch") === true, undefined, { timeout: 5000 });
+    await nutzer.tab();
+    expect((screen.getAllByLabelText("Dienststellen-Kürzel (optional)")[0] as HTMLInputElement).value).toBe("");
+
+    // Das Kürzel bleibt eindeutig und wird weiter aufgelöst.
+    await nutzer.clear(screen.getByLabelText("Name (Pflicht)"));
+    await nutzer.type(screen.getByLabelText("Name (Pflicht)"), "OODE");
+    await nutzer.tab();
+    expect((screen.getAllByLabelText("Dienststellen-Kürzel (optional)") as HTMLInputElement[]).map((f) => f.value)).toContain("OODE");
+  });
+
   it("zeigt beim Antippen des Einheitstyps die ganze Liste, nicht nur die ersten acht", async () => {
     const nutzer = userEvent.setup();
     buehne();

@@ -158,7 +158,17 @@ function OvVorschlagFeld(props: {
       kennung={kennung}
       verlassen={(eingabe) => {
         const e = eingabe.trim();
-        const ov = verzeichnis.find((o) => o.kurz === e.toUpperCase() || o.name === e);
+        if (!e) return;
+        // Beim Verlassen nur eindeutig auflösen: das Kürzel, oder ein Name,
+        // mit dem kein anderer Ortsverband beginnt. „Neustadt" füllte sonst
+        // Kürzel und Telefon von Neustadt (Holstein) ein, obwohl ebenso
+        // „Neustadt an der Aisch" oder „… an der Weinstraße" gemeint sein
+        // konnte — ohne dass jemand gewählt hatte (Audit Runde 3, R3-S4).
+        const klein = e.toLowerCase();
+        const gleichAnfang = verzeichnis.filter((o) => o.name.toLowerCase().startsWith(klein));
+        const ov =
+          verzeichnis.find((o) => o.kurz === e.toUpperCase()) ??
+          (gleichAnfang.length === 1 && gleichAnfang[0]!.name === e ? gleichAnfang[0] : undefined);
         if (ov) uebernehmen(ov);
       }}
     />

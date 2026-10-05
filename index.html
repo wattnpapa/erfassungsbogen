@@ -1301,8 +1301,13 @@
        Weiter — am Meldekopf reichen oft Schritt 1 und 3 (Audit „Neuer
        Nutzer", F2). Schmal gesetzt, damit drei Knöpfe auf 360 px passen. */
     footer.nav .uebernehmen { flex: 0 1 auto; padding-inline: 0.6rem; font-size: min(var(--t-s), max(12px, 4vmin)); white-space: normal; line-height: 1.15; }
+    /* z-index über der Vorschlagsliste (ul.vorschlaege, 20): Die offene
+       Liste unter dem Namensfeld lag über der Leiste, und der Tipp auf „In
+       Einsatz übernehmen" wählte den Ortsverband darunter (Audit Runde 3,
+       R3-S4). So trifft der Tipp den Knopf; das Feld verliert den Fokus und
+       schließt die Liste. */
     footer.nav {
-      position: fixed; bottom: 0; left: 0; right: 0; background: var(--flaeche);
+      position: fixed; bottom: 0; left: 0; right: 0; z-index: 25; background: var(--flaeche);
       border-top: var(--strich-stark) solid var(--linie);
       display: flex; justify-content: space-between;
       /* Die Leiste wächst nicht mit der Systemschrift (Audit Runde 2, R2-M1):
