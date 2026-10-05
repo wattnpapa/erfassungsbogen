@@ -72,7 +72,7 @@ import {
   type Einsatzsammlung,
 } from "@bos/meldekopf/einsaetze";
 import { bogenDiff, diffKurzfassung } from "@bos/meldekopf/meldung-diff";
-import { SpeicherVollFehler, eintreffzeitSetzen, istSpeicherVoll, meldungAufnehmen, zeitLang } from "./eintrag-zeiten";
+import { SpeicherVollFehler, eintreffzeitSetzen, istSpeicherVoll, meldungAufnehmen, vomPapierMarkieren, zeitLang } from "./eintrag-zeiten";
 import { offlineText, useOfflineStand } from "./offline-bereit";
 import { uebergabeFesthalten, uebergabeText, type UebergabeStand } from "./uebergabe-stand";
 import { ART_LABEL, EinsatzDetail, EinsatzListe, letzteMeldungText, type Eingang } from "./einsaetze-ui";
@@ -2387,9 +2387,10 @@ function AppInhalt() {
    * Wie viele es waren, sagt die Rückmeldezeile; welche es waren, ist die
    * ganze Liste. Die Quittung gehört dem einzelnen Eingang.
    */
-  function boegenAufnehmen(zielId: string, gefunden: QrBogen[]): { neu: number; uebersprungen: number } {
+  function boegenAufnehmen(zielId: string, gefunden: QrBogen[], vomPapier = false): { neu: number; uebersprungen: number } {
     let neu = 0;
     let uebersprungen = 0;
+    const neueIds: string[] = [];
     for (const { bogen: b, signatur, herkunft } of gefunden) {
       try {
         const r = meldungAufnehmen(zielId, b, {
@@ -2398,8 +2399,18 @@ function AppInhalt() {
           herkunft: herkunft ? base64UrlKodieren(herkunft) : undefined,
         });
         if (r) r.neu ? neu++ : uebersprungen++;
+        if (r?.neu) neueIds.push(r.eintrag.id);
       } catch {
         /* ungültiger Bogen — überspringen */
+      }
+    }
+    // Vom Papier: Karten tragen „vom Papier, Zeiten prüfen", bis der Abgleich
+    // bestätigt ist (R3-A2). Ein voller Speicher darf die Aufnahme nicht kippen.
+    if (vomPapier) {
+      try {
+        vomPapierMarkieren(zielId, neueIds);
+      } catch {
+        /* Markierung ist Komfort */
       }
     }
     return { neu, uebersprungen };
@@ -2435,7 +2446,7 @@ function AppInhalt() {
           zusatz.sammlungInPdf = true;
         }
         if (art === "nur-qr") zusatz.lage = true;
-        const r = boegenAufnehmen(zielId, await boegenAusDatei(datei));
+        const r = boegenAufnehmen(zielId, await boegenAusDatei(datei), art === "nur-qr");
         neu += r.neu;
         uebersprungen += r.uebersprungen;
       } catch (e) {
@@ -2531,7 +2542,8 @@ function AppInhalt() {
     if (!weiter) return true; // bewusst abgelehnt — kein Fehler
     const s = await einsatzErfragen();
     if (!s) return true;
-    const { neu, uebersprungen } = boegenAufnehmen(s.id, gefunden);
+    const nurQr = istPdfDatei(datei) && pdfInhaltArt(new Uint8Array(await datei.arrayBuffer())) === "nur-qr";
+    const { neu, uebersprungen } = boegenAufnehmen(s.id, gefunden, nurQr);
     einsaetzeNeuLaden();
     setFehler("");
     setMeldung(`Einsatz „${s.name}" angelegt — ${dateiImportMeldung(neu, uebersprungen, { lage: true })}`);
@@ -2574,6 +2586,7 @@ function AppInhalt() {
       );
       let neu = 0;
       let uebersprungen = 0;
+      const neueIds: string[] = [];
       for (const fund of erg.funde) {
         // Signatur wie beim Einzelscan prüfen und den Rohpayload mitspeichern —
         // sonst verlöre der Meldekopf beim Weiterreichen die fremde Signatur.
@@ -2584,6 +2597,12 @@ function AppInhalt() {
           herkunft: fund.payload ? base64UrlKodieren(fund.payload) : undefined,
         });
         if (r) r.neu ? neu++ : uebersprungen++;
+        if (r?.neu) neueIds.push(r.eintrag.id);
+      }
+      try {
+        vomPapierMarkieren(zielId, neueIds); // Abgleich vom Blatt anbieten (R3-A2)
+      } catch {
+        /* Markierung ist Komfort */
       }
       einsaetzeNeuLaden();
       setStapelBericht(stapelBerichtZeilen(erg, neu, uebersprungen));

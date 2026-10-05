@@ -89,6 +89,7 @@ import {
 } from "./eintrag-zeiten";
 import { frageFelder, frageJaNein, frageWahl, zeigeHinweis } from "./dialoge";
 import { nurStaerkeUebernehmen } from "./nur-staerke";
+import { PapierAbgleich, PapierMarke } from "./papier-abgleich-ui";
 import { TabellenScroll } from "./tabellen-scroll";
 import {
   TABELLEN_SPALTEN,
@@ -1001,6 +1002,15 @@ export function EinsatzDetail(props: {
           <button type="button" className="link" onClick={eingangZeigen}>In der Liste zeigen</button>
         </p>
       )}
+
+      {/* Vom Papier eingelesen: Eintreffzeit, Status und Zug in einem Schritt
+          vom Blatt übernehmen (Audit Runde 3, R3-A2). */}
+      <PapierAbgleich
+        einsatzId={einsatz.id}
+        eintraege={einsatz.eintraege}
+        zuege={[...new Set(einsatz.eintraege.map((e) => e.zugEtikett).filter((z): z is string => !!z))].sort()}
+        onGeaendert={onGeaendert}
+      />
 
       {/* Was seit der letzten Kenntnisnahme kam: mit Namen, mit der Änderung
           einer Folgemeldung („Stärke 12 → 9 (−3)") und dem Hinweis, welche
@@ -2403,6 +2413,7 @@ function EinheitKarte(props: {
                 Aufteilung zweimal gleichnamig untereinander. */}
             {kopf.teilEtikett ? <span className="teil-badge">{kopf.teilEtikett}</span> : null}
             {kopf.zugEtikett ? <span className="zug-badge"> {kopf.zugEtikett}</span> : null}
+            <PapierMarke eintrag={kopf} />
             {/* Was seit der Übernahme dazukam: jünger als 30 Minuten (K2). */}
             {/* Nicht „neu": dasselbe Wort hieß ein paar Zeilen darüber „seit
                 dem letzten Export" — nach einem Export trugen alle Karten

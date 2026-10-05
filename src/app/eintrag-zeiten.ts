@@ -53,6 +53,14 @@ declare module "@bos/meldekopf/einsaetze" {
      * unverändert durchgereicht; eine Folgemeldung erbt die Liste.
      */
     vermerke?: FuehrungsVermerk[];
+    /**
+     * Vom Papier eingelesen (Fotos/Scans der QR-Codes, PDF ohne eingebettete
+     * Daten), Lage noch nicht abgeglichen: Eintreffzeit ist die Zeit des
+     * Einlesens, Status „anwesend", kein Zug — bis jemand die Angaben vom
+     * Blatt bestätigt hat (Audit Runde 3, R3-A2). Zeitpunkt des Einlesens
+     * (Date.now()); fehlt = abgeglichen bzw. nicht vom Papier.
+     */
+    vomPapier?: number;
   }
 }
 
@@ -181,6 +189,7 @@ function eintragAendern(einsatzId: string, eintragId: string, aendern: (e: Melde
 /** Eintreffzeit einer Meldung korrigieren (Nachtragen vom Papier). */
 export function eintreffzeitSetzen(einsatzId: string, eintragId: string, zeitpunkt: number): void {
   eintragAendern(einsatzId, eintragId, (e) => {
+    delete e.vomPapier; // wer die Zeit vom Blatt einträgt, hat abgeglichen (R3-A2)
     const vorher = eintreffzeit(e);
     e.eingetroffenAm = zeitpunkt;
     if (vorher !== zeitpunkt) vermerken(e, `Eintreffzeit korrigiert: ${zeitLang(vorher)} → ${zeitLang(zeitpunkt)}`);
@@ -446,4 +455,80 @@ export function einheitEntfernen(einsatzId: string, einheitSchl: string): MeldeE
   // zurückholt (Audit Runde 2, R2-D4).
   entfernteMerken(einsatzId, weg.map((e) => e.id));
   return weg;
+}
+
+/**
+ * Frisch vom Papier eingelesene Meldungen markieren (R3-A2). Nur neue
+ * Einheiten: eine Folgemeldung erbt Zeit, Zug und Auftrag ihrer Vorgängerin
+ * und braucht keinen Abgleich.
+ */
+export function vomPapierMarkieren(einsatzId: string, eintragIds: string[], jetzt = Date.now()): void {
+  if (eintragIds.length === 0) return;
+  const ids = new Set(eintragIds);
+  const liste = alleSammlungen();
+  const s = liste.find((x) => x.id === einsatzId);
+  if (!s) return;
+  let geaendert = false;
+  for (const e of s.eintraege) {
+    if (!ids.has(e.id) || e.vomPapier != null) continue;
+    if (s.eintraege.some((x) => x.einheitSchluessel === e.einheitSchluessel && x.id !== e.id)) continue;
+    e.vomPapier = jetzt;
+    geaendert = true;
+  }
+  if (geaendert) sammlungenSchreiben(liste);
+}
+
+/** Eine Zeile des Abgleichs: was vom Blatt („Stand am Meldekopf") gilt. */
+export interface PapierAbgleichZeile {
+  eintragId: string;
+  eingetroffenAm: number;
+  status: MeldeStatus.ANWESEND | MeldeStatus.ABGERUECKT;
+  /** Nur bei ABGERUECKT. */
+  abgerueckAm?: number;
+  zug: string;
+}
+
+/**
+ * Lage vom Papier in einem Schritt übernehmen (R3-A2): je Einheit
+ * Eintreffzeit, Status samt Abrückzeit und Zug, mit Vermerken wie bei der
+ * Einzelkorrektur an der Karte; danach gilt die Meldung als abgeglichen.
+ * Ein Schreibvorgang für alle Zeilen. Rückgabe: Zahl der abgeglichenen.
+ */
+export function papierAbgleichUebernehmen(einsatzId: string, zeilen: PapierAbgleichZeile[]): number {
+  const liste = alleSammlungen();
+  const s = liste.find((x) => x.id === einsatzId);
+  if (!s) return 0;
+  let n = 0;
+  for (const z of zeilen) {
+    const e = s.eintraege.find((x) => x.id === z.eintragId);
+    if (!e) continue;
+    n++;
+    const vorher = eintreffzeit(e);
+    if (vorher !== z.eingetroffenAm) {
+      e.eingetroffenAm = z.eingetroffenAm;
+      vermerken(e, `Eintreffzeit korrigiert: ${zeitLang(vorher)} → ${zeitLang(z.eingetroffenAm)}`);
+    }
+    if (z.status === MeldeStatus.ABGERUECKT) {
+      const zeit = z.abgerueckAm ?? Date.now();
+      if (e.status !== MeldeStatus.ABGERUECKT) vermerken(e, "Abgerückt", zeit);
+      e.status = MeldeStatus.ABGERUECKT;
+      e.abgerueckAm = zeit;
+    } else if (e.status === MeldeStatus.ABGERUECKT) {
+      vermerken(e, "Wieder als anwesend geführt");
+      e.status = MeldeStatus.ANWESEND;
+      delete e.abgerueckAm;
+    }
+    const zug = z.zug.trim() || undefined;
+    if (zug !== e.zugEtikett) {
+      const war = e.zugEtikett;
+      for (const x of s.eintraege) if (x.einheitSchluessel === e.einheitSchluessel) x.zugEtikett = zug;
+      vermerken(e, zug ? (war ? `Zug: ${zug} (war: ${war})` : `Zug: ${zug}`) : `Zug-Zuordnung entfernt (war: ${war})`);
+    }
+    delete e.vomPapier;
+  }
+  if (n > 0) {
+    s.geaendert = Date.now();
+    sammlungenSchreiben(liste);
+  }
+  return n;
 }

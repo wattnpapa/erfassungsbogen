@@ -347,9 +347,10 @@ export const STIFT_HINWEIS =
  */
 export const LAGE_NACHTRAGEN_HINWEIS =
   "Eintreffzeit der neu aufgenommenen Einheiten ist die Zeit des Einlesens, und sie stehen als anwesend; " +
-  "Abrückvermerk, Zug und Auftrag stecken nicht im Bogen. Stammen die Bögen aus einer Sammel-PDF, die Angaben " +
-  "von Seite 1 (Übergabe-Übersicht) bzw. dem Kasten „Stand am Meldekopf“ an der Karte nachtragen: „ändern“ an " +
-  "der Eintreffzeit, „Abrücken“, „Zug zuordnen“, „Auftrag/Notiz“.";
+  "Abrückvermerk, Zug und Auftrag stecken nicht im Bogen. Stammen die Bögen aus einer Sammel-PDF: oben in der " +
+  "Einsatzansicht „Lage vom Papier abgleichen…“ — dort für alle eben eingelesenen Einheiten Eintreffzeit, Status " +
+  "und Zug von Seite 1 (Übergabe-Übersicht) bzw. dem Kasten „Stand am Meldekopf“ in einem Schritt eintragen. " +
+  "Bis dahin tragen die Karten „vom Papier, Zeiten prüfen“.";
 
 /**
  * Hinweis für „Bögen einlesen…“ mit einer Sammel-PDF, die die ganze Sammlung

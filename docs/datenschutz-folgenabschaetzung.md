@@ -169,6 +169,13 @@ Grundlage: Repository `wattnpapa/erfassungsbogen`, Stand 2026-09-12 — Version 
 > neuer Empfänger. Der Weitergabe-Stand führt zusätzlich Prüfsummen der
 > Vermerke und den Zeitpunkt der letzten Übernahme, ohne Personendaten.
 > Geändert: 5.7.
+>
+> **Nachgezogen 2026-10-05 — Rückweg vom Papier (Audit Runde 3, R3-A2):**
+> Vom Papier eingelesene Einheiten tragen bis zum Abgleich den Zeitpunkt des
+> Einlesens (`vomPapier`) am Eintrag der Sammlung; der Abgleich setzt
+> Eintreffzeit, Status und Zug in einem Schritt. Keine neuen
+> personenbezogenen Daten, kein neuer Empfänger; die Lage wird richtiger
+> (Art. 5 Abs. 1 lit. d DSGVO). Geändert: 5.7.
 
 ## Hinweis zu diesem Dokument
 

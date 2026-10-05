@@ -177,6 +177,13 @@ Grundlage: Repository `wattnpapa/erfassungsbogen`, Stand 2026-09-12 — Version 
 > `eeb.weitergabe-stand.v1` führt zusätzlich Prüfsummen (FNV-1a) der bekannten
 > Vermerke und den Zeitpunkt der letzten Übernahme, keinen Auftragstext
 > (3.3 D2i).
+>
+> **Nachgezogen 2026-10-05:** Rückweg vom Papier (Audit Runde 3, R3-A2) —
+> aus Bildern eingelesene neue Einheiten tragen am Eintrag der Sammlung den
+> Zeitpunkt des Einlesens (`vomPapier`, keine Personendaten) und die Marke
+> „vom Papier, Zeiten prüfen", bis Eintreffzeit, Status und Zug vom Blatt
+> abgeglichen sind. Das Feld reist mit Sammel-PDF und Einsatz-Transport wie
+> die übrigen Zusätze der Führungsstelle (3.3 D2).
 
 ## Hinweis zu diesem Dokument
 

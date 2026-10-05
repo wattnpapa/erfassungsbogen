@@ -49,8 +49,10 @@
 > unveränderten Kern-Import herum Status, Zug, Auftrag und Eintreffzeit
 > bekannter Einheiten abgleicht (R3-W1); der Weitergabe-Stand zählt
 > Importiertes nicht mehr als „hier neu" (R3-W2); eine Sammel-PDF des
-> Zugführers lässt sich in die laufende Sammlung übernehmen (R3-W3) —
-> Kapitel 8.2, 11.3.
+> Zugführers lässt sich in die laufende Sammlung übernehmen (R3-W3); eine
+> Stärkeänderung vom Papier ändert nur die Stärke (R3-A1); vom Papier
+> eingelesene Einheiten werden in einem Schritt abgeglichen (R3-A2, Feld
+> `vomPapier`) — Kapitel 8.2, 11.3.
 
 ---
 
@@ -1060,6 +1062,13 @@ flowchart TB
   ändern" an: `nurStaerkeUebernehmen` (`nur-staerke.ts`) baut die neue Fassung
   aus der bisherigen und schreibt Verpflegungs- und M/W/D-Aufteilung fest;
   dasselbe an der Karte über „Mehr…" › „Stärke ändern…" (R3-A1, 2026-10-05).
+- **Rückweg vom Papier** (R3-A2, 2026-10-05): Aus Bildern oder einer
+  PDF ohne eingebettete Daten eingelesene neue Einheiten tragen das
+  App-Zusatzfeld `vomPapier` (Zeitpunkt des Einlesens) am Eintrag. Die
+  Einsatzansicht bietet „Lage vom Papier abgleichen…" (`papier-abgleich-ui.tsx`):
+  Eintreffzeit, Status samt Abrückzeit und Zug je Einheit in einer Liste,
+  geschrieben in einem Vorgang (`papierAbgleichUebernehmen`), danach fällt
+  die Marke weg. Kein Schemawechsel: die Lage steckt weiter nicht im QR-Code.
 - **Abgleich beim Einsatz-Import** (`einsatz-abgleich.ts`, R3-W1,
   nachgezogen 2026-10-05): Der Kern-Import `einsatzImportieren` hängt nur
   Meldungen mit unbekannter Eintrags-ID an. `einsatzAbgleichen` merkt sich den

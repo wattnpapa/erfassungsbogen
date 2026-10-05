@@ -2308,6 +2308,21 @@
       background: var(--akzent); color: var(--auf-akzent);
     }
     .staerke-verlust { color: var(--warn-text); font-weight: 700; }
+    /* R3-A2: Vom Papier eingelesen, Lage noch nicht abgeglichen — Warnfarbe
+       und Text, auch zugeklappt sichtbar: die Zahlen stimmen erst nach dem
+       Abgleich. */
+    .papier-badge {
+      display: inline-block; margin-left: 0.4rem; padding: 0 0.35rem;
+      border-radius: var(--radius); font-size: var(--t-xs); font-weight: 700;
+      vertical-align: 0.1em; max-width: 100%;
+      background: var(--warn-fond); color: var(--warn-text); border: 1px solid var(--warn-linie);
+    }
+    .papier-abgleich { border: 2px solid var(--warn-linie); }
+    .papier-abgleich-liste { list-style: decimal; padding-left: 1.4rem; margin: var(--r-2) 0; }
+    .papier-abgleich-liste li { margin-bottom: var(--r-3); display: grid; gap: var(--r-1); }
+    .papier-abgleich-liste input[type=datetime-local], .papier-abgleich-liste input[type=text] { width: 100%; max-width: 20rem; }
+    .papier-status { border: 0; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: var(--r-3); }
+    .papier-status label { display: inline-flex; align-items: center; gap: 0.3rem; min-height: 2.75rem; }
     .staerke-verlust::before { content: "▼ "; }
     span.kompakt-merkmal {
       display: inline-block; padding: 0.05rem 0.4rem;

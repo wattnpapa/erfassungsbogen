@@ -31,7 +31,7 @@ import {
   meldungHinzufuegen,
   type MeldeEintrag,
 } from "@bos/meldekopf/einsaetze";
-import { eintreffzeitSetzen, meldungAufnehmen, notizSetzen, zeitLang } from "./eintrag-zeiten";
+import { eintreffzeitSetzen, meldungAufnehmen, notizSetzen, vomPapierMarkieren, zeitLang } from "./eintrag-zeiten";
 import { aggregiere } from "./auswertung";
 import { neuerBogen, neuePerson } from "./hilfen";
 import { lageblattVermerken, weitergabeVermerken, type ExportStand, type ExportUmfang } from "./export-stand";
@@ -1422,5 +1422,34 @@ describe("Laufende Nummer, Zeitform und Marke (R2-A6)", () => {
     buehne(["Wardenburg"]);
     const marke = document.querySelector(".neu-badge")!;
     expect(marke.textContent).toBe("kürzlich eingetroffen");
+  });
+});
+
+describe("Lage vom Papier abgleichen (Audit Runde 3, R3-A2)", () => {
+  it("zeigt eingelesene Einheiten mit Marke und übernimmt Status und Zug in einem Schritt", async () => {
+    const user = userEvent.setup();
+    const angelegt = einsatzAnlegen("Hochwasser Neckar", EinsatzArt.EINSATZ);
+    const ids = ["Ansbach", "Kirchehrenbach"].map((n) => meldungHinzufuegen(angelegt.id, bogenMitName(n))!.eintrag.id);
+    vomPapierMarkieren(angelegt.id, ids);
+    const a = ansicht(angelegt.id);
+    expect(screen.getAllByText("vom Papier, Zeiten prüfen")).toHaveLength(2);
+    expect(screen.getByText(/Lage noch nicht abgeglichen: 2 Einheiten/)).toBeTruthy();
+    await user.click(screen.getByRole("button", { name: "Lage vom Papier abgleichen…" }));
+    const radios = screen.getAllByRole("radio", { name: "abgerückt" });
+    await user.click(radios[0]!);
+    const zug = screen.getAllByLabelText("Zug (leer = ohne)");
+    await user.type(zug[0]!, "1. TZ");
+    await user.type(zug[1]!, "2. TZ");
+    await user.click(screen.getByRole("button", { name: "Abgleich übernehmen" }));
+    expect(a.geaendert).toHaveBeenCalled();
+    const e = einsaetzeLaden().find((s) => s.id === angelegt.id)!.eintraege;
+    const ansbach = e.find((x) => x.id === ids[0])!;
+    expect(ansbach.status).toBe(MeldeStatus.ABGERUECKT);
+    expect(ansbach.zugEtikett).toBe("1. TZ");
+    expect(ansbach.vomPapier).toBeUndefined();
+    expect(e.find((x) => x.id === ids[1])!.zugEtikett).toBe("2. TZ");
+    a.neuLaden();
+    expect(screen.queryByText("vom Papier, Zeiten prüfen")).toBeNull();
+    expect(screen.queryByRole("button", { name: "Lage vom Papier abgleichen…" })).toBeNull();
   });
 });
