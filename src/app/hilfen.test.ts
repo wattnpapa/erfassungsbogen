@@ -266,6 +266,17 @@ describe("plausibilitaet()", () => {
     expect(plausibilitaet(b).some((h) => /„bis“ liegt vor „von“/.test(h))).toBe(true);
   });
 
+  it("macht aus einem Jahresdreher im Zeitraum genau einen Hinweis, der das Jahr nennt (R3-E7)", () => {
+    const b = bogen({
+      personal: [person()],
+      einsatz: { zeitraumVon: datumAusIso("2062-07-16"), zeitraumBis: datumAusIso("2026-07-10"), ortAuftrag: "X" },
+    });
+    const zeitraum = pruefpunkte(b, true, datumAusIso("2026-10-04")).filter((p) => /Einsatzzeitraum/.test(p.text));
+    expect(zeitraum.map((p) => p.text)).toEqual([
+      "Einsatzzeitraum: „bis“ liegt vor „von“ — 16.07.2062 liegt mehr als ein Jahr entfernt, Tippfehler im Jahr 2062?",
+    ]);
+  });
+
   it("prüft die Unterbringungssumme nur bei belastbarer Grundlage (Meldekopf ohne manuelle Angabe: kein Hinweis)", () => {
     const b = bogen({
       personalErfassung: PersonalErfassung.NUR_STAERKE,

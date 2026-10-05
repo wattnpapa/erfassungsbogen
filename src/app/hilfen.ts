@@ -655,7 +655,11 @@ export function pruefpunkte(b: Erfassungsbogen, mitFahrzeugen = true, heute?: Ee
   // Nur wo `heute` hereinkommt (eigener Bogen vor der Übergabe): ein alter
   // Entwurf ging sonst mit „✓ vollständig und plausibel" in den QR-Code —
   // Zeitraum und Auftrag vom Juli als aktuelle Meldung (Audit Runde 2, R2-S1).
-  if (heute != null && b.einsatz.zeitraumBis < heute) {
+  // Ein Tippfehler, ein Hinweis (Audit Runde 3, R3-E7): Liegt „bis" vor
+  // „von", sagt der eine Hinweis dazu unten auch, welches Datum verdächtig ist
+  // — „ist vorbei" für ein Datum im Jahr 2062 lenkte auf die falsche Fährte.
+  const bisVorVon = b.einsatz.zeitraumBis < b.einsatz.zeitraumVon;
+  if (heute != null && !bisVorVon && b.einsatz.zeitraumBis < heute) {
     hinweise.push({
       text: `Einsatzzeitraum ${zeitraumDeutsch(b)} ist vorbei — gilt dieser Bogen noch für den aktuellen Einsatz? Sonst Zeitraum und Ort/Auftrag neu eintragen.`,
       schritt: S_EINSATZ,
@@ -726,8 +730,15 @@ export function pruefpunkte(b: Erfassungsbogen, mitFahrzeugen = true, heute?: Ee
       schritt: S_PERSONAL,
     });
   }
-  if (b.einsatz.zeitraumBis < b.einsatz.zeitraumVon) {
-    hinweise.push({ text: "Einsatzzeitraum: „bis“ liegt vor „von“.", schritt: S_EINSATZ });
+  if (bisVorVon) {
+    const fern = heute == null ? [] : [b.einsatz.zeitraumVon, b.einsatz.zeitraumBis].filter((d) => Math.abs(d - heute) > 365);
+    const verdaechtig = fern.length === 1 ? datumZuIso(fern[0]!) : null;
+    hinweise.push({
+      text: verdaechtig
+        ? `Einsatzzeitraum: „bis“ liegt vor „von“ — ${datumDeutsch(verdaechtig)} liegt mehr als ein Jahr entfernt, Tippfehler im Jahr ${verdaechtig.slice(0, 4)}?`
+        : "Einsatzzeitraum: „bis“ liegt vor „von“.",
+      schritt: S_EINSATZ,
+    });
   }
   // Einsatzende 06:00 vor Einsatzbeginn 18:00 am selben Tag ging unbemerkt in
   // die Übergabe — im Sammel-PDF steht die Einheit dann mit einem Ende vor dem
@@ -776,7 +787,7 @@ export function pruefpunkte(b: Erfassungsbogen, mitFahrzeugen = true, heute?: Ee
       });
     }
   }
-  if (heute != null && (Math.abs(b.einsatz.zeitraumVon - heute) > 365 || b.einsatz.zeitraumBis - heute > 365)) {
+  if (heute != null && !bisVorVon && (Math.abs(b.einsatz.zeitraumVon - heute) > 365 || b.einsatz.zeitraumBis - heute > 365)) {
     hinweise.push({ text: `Einsatzzeitraum ${zeitraumDeutsch(b)} liegt mehr als ein Jahr entfernt — Tippfehler im Jahr?`, schritt: S_EINSATZ });
   }
   // Zahlendreher in der Stärke: 99 statt 9 fällt beim Tippen nicht auf, am
