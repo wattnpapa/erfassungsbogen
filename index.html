@@ -4030,6 +4030,15 @@
        der Leuchtkraft), aber es leuchtet nicht mehr. Ein statischer Filter;
        die Feldgeräte-Regel betrifft Bewegung. */
     .nacht-modus img.einheit-avatar { filter: brightness(0.6) sepia(0.4); }
+    /* R3-L5: Das Größenzeichen über dem Rechteck ist schwarz gezeichnet und
+       stand auf Startseitenkarte und Übersicht direkt auf dem dunklen Grund
+       (1,15:1 nachts) — Trupp, Gruppe und Zug waren am Zeichen nicht zu
+       unterscheiden. Überall in Dunkel und Nacht dieselbe helle Unterlage wie
+       im Kopf; der Filter darüber dämpft sie mit (nachts warmes Grau). Auch
+       in den Apps, deren Kopf die Unterlage sonst wegnimmt (gleiche
+       Spezifität, später im Blatt). */
+    :is(.dunkel-modus, .nacht-modus) img.einheit-avatar,
+    :is(.dunkel-modus, .nacht-modus) .seiten-kopf img.einheit-avatar { background: #fff; padding: 2px; }
     /* Dasselbe für die App-Plattformen: ohne diese Blöcke blieben in der iOS-
        und Android-App die hellen Systemflächen stehen (Fläche #faf9fd, Schrift
        #1a1b20) — der Nacht-Modus sah dort weiß aus, und die Kopfzeile trug
