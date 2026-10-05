@@ -482,10 +482,29 @@ let startEmpfangVerbraucht = false;
  */
 const ART_WAHL = Object.entries(ART_LABEL).map(([wert, label]) => ({ wert, label }));
 
-// Kaltstart ohne Bogen aus der URL: den automatisch gesicherten Entwurf
-// anbieten — Autosave überlebt geschlossene Tabs, leere Akkus und vom System
-// beendete Apps (siehe entwurf.ts).
-const ENTWURF = START.bogen ? null : entwurfLaden();
+// Der automatisch gesicherte Entwurf — Autosave überlebt geschlossene Tabs,
+// leere Akkus und vom System beendete Apps (siehe entwurf.ts).
+const ENTWURF_GESPEICHERT = entwurfLaden();
+
+/**
+ * Kaltstart MIT Bogen aus der URL (geteilter Link, QR mit Kamera-App). Sofort
+ * geöffnet wird er nur, wenn nichts zu schützen und nichts zu wählen ist: kein
+ * angefangener Bogen, keine Sammlung. Sonst läuft er nach dem Mounten
+ * denselben Weg wie ein Link bei offener App (`uebernimmBogen`): erst „Wohin
+ * damit?" bzw. die Rückfrage zum angefangenen Bogen, dann verdrängen.
+ *
+ * Vorher wanderte der eigene Entwurf schon beim Laden des Moduls auf den
+ * Rückholplatz — ein dort liegender Bogen war gelöscht, bevor irgendein
+ * Dialog erschien, und „Abbrechen" stellte nichts wieder her (Audit Runde 3,
+ * R3-D2).
+ */
+const START_SOFORT: Erfassungsbogen | null =
+  START.bogen && !(ENTWURF_GESPEICHERT && bogenHatInhalt(ENTWURF_GESPEICHERT.bogen)) && einsaetzeLaden().length === 0
+    ? START.bogen
+    : null;
+/** Bogen aus dem Start-Link, der erst nach dem Mounten (mit Rückfrage) übernommen wird. */
+const START_EMPFANG: Erfassungsbogen | null = START.bogen && !START_SOFORT ? START.bogen : null;
+const ENTWURF = START_SOFORT ? null : ENTWURF_GESPEICHERT;
 
 // Nach einem Neuladen stellte der Browser die alte Scrollposition wieder her
 // — die Startseite stand dann 1 100 px unter der Entwurfskarte mit
@@ -497,25 +516,11 @@ try {
   /* ohne Verlauf (Tests) */
 }
 
-/**
- * Kaltstart MIT Bogen aus der URL (geteilter Link, QR mit Kamera-App): der
- * eigene, gesicherte Entwurf wird dadurch verdrängt — ohne dass jemand gefragt
- * werden könnte, die Entscheidung ist mit dem Öffnen des Links schon gefallen.
- * Er wandert deshalb hier in die Rückholung, bevor das Autosave des neuen
- * Bogens ihn überschreibt, und die Startseite bietet ihn wieder an.
- */
 /** Sammlung, für die der wiederhergestellte Entwurf erfasst wurde — falls es sie noch gibt. */
 function erfassungsZielBeimStart(): string | null {
   const id = ENTWURF?.fremd?.einsatzId;
   return id && einsaetzeLaden().some((s) => s.id === id) ? id : null;
 }
-
-const VERDRAENGT_BEIM_START = ((): boolean => {
-  if (!START.bogen) return false;
-  const alt = entwurfLaden();
-  if (!alt || !bogenHatInhalt(alt.bogen)) return false;
-  return ersetztenEntwurfMerken(alt.bogen, alt.fremd);
-})();
 
 export function App() {
   // Rückfragen, Eingaben und Hinweise zeichnet die App selbst (dialoge.tsx) —
@@ -549,7 +554,7 @@ function useSchrittRichtung(schritt: number) {
 }
 
 function AppInhalt() {
-  const [bogen, setBogen] = useState<Erfassungsbogen | null>(START.bogen ?? ENTWURF?.bogen ?? null);
+  const [bogen, setBogen] = useState<Erfassungsbogen | null>(START_SOFORT ?? ENTWURF?.bogen ?? null);
   /**
    * Kennung der gespeicherten Vorlage, die der offene Bogen gerade bearbeitet
    * („Bearbeiten" auf der Vorlagenkarte). Solange sie gesetzt ist, bietet die
@@ -570,7 +575,7 @@ function AppInhalt() {
   const [uebergabe, setUebergabe] = useState<UebergabeStand | null>(ENTWURF?.uebergabe ?? null);
   // „Fortsetzen" öffnet den Schritt, auf dem gearbeitet wurde — nicht immer
   // die Übersicht mit acht gelben Punkten (Audit Runde 2, R2-N7).
-  const [schritt, setSchritt] = useState(START.bogen ? UEBERSICHT : ENTWURF ? (ENTWURF.schritt ?? UEBERSICHT) : 0);
+  const [schritt, setSchritt] = useState(START_SOFORT ? UEBERSICHT : ENTWURF ? (ENTWURF.schritt ?? UEBERSICHT) : 0);
   const richtung = useSchrittRichtung(schritt);
   const offline = useOfflineStand();
   // Schrittwechsel (Weiter, Zurück, Schrittleiste, Prüfpunkt): der neue
@@ -623,9 +628,7 @@ function AppInhalt() {
     setBogenHerkunft(payload);
   };
   const [meldung, setMeldung] = useState(
-    VERDRAENGT_BEIM_START
-      ? 'Der empfangene Bogen hat deinen angefangenen Bogen aus dem Arbeitsplatz genommen. Auf der Startseite steht er unter „Zuletzt verdrängten Bogen zurückholen".'
-      : START.vorlage
+    START.vorlage
       ? `Vorlage „${START.vorlage.name}" importiert.`
       : ENTWURF
         ? `Entwurf vom ${new Date(ENTWURF.gespeichert).toLocaleString("de-DE", { dateStyle: "short", timeStyle: "short" })} Uhr wiederhergestellt.`
@@ -637,7 +640,7 @@ function AppInhalt() {
   const [ersetzterEntwurf, setErsetzterEntwurf] = useState<Entwurf | null>(() => ersetztenEntwurfLaden());
   // Zeigt den Startbildschirm, ohne den aktuellen Bogen zu verwerfen –
   // er lässt sich von dort per „Aktuellen Bogen fortsetzen“ wieder öffnen.
-  const [zeigeStart, setZeigeStart] = useState(!START.bogen && !!ENTWURF);
+  const [zeigeStart, setZeigeStart] = useState(!START_SOFORT && !!ENTWURF);
   const [vorlagen, setVorlagen] = useState<Vorlage[]>(() => vorlagenLaden());
   /** Vorige Fassung nach „Vorlage aktualisieren" — für „Rückgängig" (R2-D2). */
   const [vorlageRueckweg, setVorlageRueckweg] = useState<Vorlage | null>(null);
@@ -1425,9 +1428,15 @@ function AppInhalt() {
     b: Erfassungsbogen,
     signatur: SignaturStatus,
     payload?: Uint8Array | null,
+    /**
+     * Kein Kiosk-Scan: Link oder Datei. Ein gesetztes Sammelziel gehört dann
+     * zu einer offenen Erfassung (oder einem Scan-Durchgang ohne offenes
+     * Overlay) — der Bogen darf nicht still in dieser Sammlung landen.
+     */
+    opt: { ohneKiosk?: boolean } = {},
   ): Promise<boolean> {
     const ziel = sammelZielRef.current;
-    if (ziel) {
+    if (ziel && (!opt.ohneKiosk || scannerOffenRef.current)) {
       // Abwarten: steckt in der Aufnahme eine Rückfrage (Einheit schon
       // gemeldet), darf der Scan-Loop nicht schon den nächsten Code lesen.
       // Die Datenschutzfrist wendet die Sammlung selbst an (meldungHinzufuegen).
@@ -1450,6 +1459,9 @@ function AppInhalt() {
     if (!(await darfBogenErsetzen({ titel: "Empfangenen Bogen öffnen?", was: "die empfangene Meldung", ok: "Meldung öffnen" }))) {
       return true; // Scan beendet, der eigene Bogen bleibt stehen
     }
+    // Wo der eigene Bogen jetzt liegt — derselbe Hinweis wie früher beim
+    // Kaltstart, jetzt auf jedem Weg (R3-S1).
+    const wartet = eigenerBogenWartetHinweis();
     const { bogen: geoeffnet, anonymisiert } = bogenNachFrist(b);
     setBogen(geoeffnet);
     if (anonymisiert) setzeEmpfang(null);
@@ -1464,7 +1476,7 @@ function AppInhalt() {
         ? `Nicht in die Sammlung aufgenommen: ${nichtAbgelegt} Der Bogen bleibt hier geöffnet — danach „In Einsatz-Sammlung ablegen…".`
         : "",
     );
-    if (anonymisiert) setMeldung(FRIST_ABGELAUFEN_MELDUNG);
+    setMeldung([anonymisiert ? FRIST_ABGELAUFEN_MELDUNG : "", wartet].filter(Boolean).join(" "));
     return true;
   }
 
@@ -1485,7 +1497,7 @@ function AppInhalt() {
    * Vollständigkeit dekodiert. Vorlagen (Marker „V.") werden importiert. Die
    * Signatur des Transports wird geprüft (blockiert den Import nie).
    */
-  async function uebernehmeText(text: string, fehlertext: string): Promise<boolean> {
+  async function uebernehmeText(text: string, fehlertext: string, opt: { ohneKiosk?: boolean } = {}): Promise<boolean> {
     if (istVorlageNutzlast(text)) {
       setzeSegmentTeile([]);
       setScanFortschritt("");
@@ -1516,7 +1528,7 @@ function AppInhalt() {
           const status = await signaturVonPayload(payload);
           setzeSegmentTeile([]);
           setScanFortschritt("");
-          return uebernimmBogen(b, status, payload);
+          return uebernimmBogen(b, status, payload, opt);
         }
         setFehler("");
         // Die fehlenden Teile ausdrücklich benennen, statt sie ausrechnen zu
@@ -1543,7 +1555,7 @@ function AppInhalt() {
     try {
       const dekodiert = decodePayloadUrl(text, browserKompressor);
       const status = await signaturVonText(text);
-      return uebernimmBogen(dekodiert, status, payloadAusText(text));
+      return uebernimmBogen(dekodiert, status, payloadAusText(text), opt);
     } catch {
       scanFehlerRef.current = fehlertext;
       setFehler(fehlertext);
@@ -1603,7 +1615,7 @@ function AppInhalt() {
   // Kaltstart über QR/Universal Link: den beim Rendern schon dekodierten Bogen
   // nachträglich (asynchron) auf seine Signatur prüfen — blockiert nichts.
   useEffect(() => {
-    if (!START.bogen || !START.text) return;
+    if (!START_SOFORT || !START.text) return;
     let aktiv = true;
     signaturVonText(START.text).then((s) => aktiv && setzeEmpfang(s, payloadAusText(START.text)));
     return () => {
@@ -1611,36 +1623,18 @@ function AppInhalt() {
     };
   }, []);
 
-  // Kaltstart mit Bogen aus dem Link auf einem Gerät MIT Sammlungen: Das ist
-  // der Meldekopf, dem jemand per Nahbereich oder Chat einen Bogen schickt.
-  // Statt den Bogen als eigenen Entwurf stehen zu lassen, wird er in die
-  // Sammlung angeboten; der verdrängte eigene Bogen kommt dann zurück (W1).
+  // Kaltstart mit Bogen aus dem Link, während ein angefangener Bogen oder eine
+  // Sammlung auf dem Gerät liegt: derselbe Weg wie ein Link bei offener App —
+  // „Wohin damit?" (am Meldekopf fast immer die Sammlung, W1), sonst die
+  // Rückfrage zum angefangenen Bogen. Verdrängt wird erst nach der Antwort;
+  // „Abbrechen" lässt Arbeitsplatz und Rückholplatz, wie sie waren (R3-D2).
   useEffect(() => {
-    if (!START.bogen || startEmpfangVerbraucht || einsaetzeLaden().length === 0) return;
+    if (!START_EMPFANG || startEmpfangVerbraucht) return;
     startEmpfangVerbraucht = true;
-    const b = START.bogen;
+    const b = START_EMPFANG;
     void (async () => {
-      const wohin = await empfangsZielWaehlen(b);
-      if (wohin == null || wohin === "oeffnen") return;
       const status = START.text ? await signaturVonText(START.text) : ({ zustand: "unsigniert" } as SignaturStatus);
-      const ok = await bogenInSammlung(wohin, b, "scan", {
-        signatur: alsEintragSignatur(status),
-        herkunft: START.text ? payloadAusText(START.text) : null,
-      });
-      if (!ok) return;
-      // Den beim Start verdrängten eigenen Bogen zurück an den Arbeitsplatz.
-      const alt = ersetztenEntwurfLaden();
-      if (VERDRAENGT_BEIM_START && alt) {
-        ersetztenEntwurfVerwerfen();
-        setErsetzterEntwurf(null);
-        setFremdeErfassung(!!alt.fremd);
-        setBogen(alt.bogen);
-        setSchritt(UEBERSICHT);
-      } else {
-        setBogen(null);
-      }
-      setzeEmpfang(null);
-      setZeigeStart(false);
+      await uebernimmBogen(b, status, START.text ? payloadAusText(START.text) : null, { ohneKiosk: true });
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps -- nur beim Mounten
   }, []);
@@ -1662,6 +1656,28 @@ function AppInhalt() {
     // eslint-disable-next-line react-hooks/exhaustive-deps -- nur beim Mounten; der Handler nutzt ausschließlich stabile Setter
   }, []);
 
+  /**
+   * Ein Bogen-Link bei laufender App (Fragmentwechsel im Browser, Universal
+   * Link in der nativen App). Die Listener werden nur einmal registriert und
+   * rufen deshalb über diese Ref den Handler des AKTUELLEN Renders: Vorher
+   * lief der Handler aus dem ersten Render, und `darfBogenErsetzen` prüfte den
+   * Bogen vom Start — war die App ohne Entwurf geöffnet worden, ersetzte ein
+   * Link den inzwischen angelegten eigenen Bogen ohne Frage und ohne
+   * Rückholung (Audit Runde 3, R3-S1).
+   */
+  const linkEmpfangenRef = useRef<(text: string) => void>(() => {});
+  linkEmpfangenRef.current = (text: string) => {
+    void uebernehmeText(text, "Der geöffnete Link enthält keinen gültigen Erfassungsbogen.", { ohneKiosk: true }).then(
+      (fertig) => {
+        // Segment-Teil eines mehrteiligen Bogens: Scanner öffnen, damit die
+        // übrigen Teile direkt folgen können. Kam umgekehrt der LETZTE Teil
+        // per Link, während der Scanner offen war, schließt er sich.
+        if (!fertig) void scanneQr();
+        else setScannerOffen(false);
+      },
+    );
+  };
+
   // Web-Pendant zum Universal Link: Wird ein Bogen-Link angetippt, während die
   // Seite schon offen ist, lädt der Browser das Dokument NICHT neu — es ändert
   // sich nur das Fragment. Auf dem Telefon ist genau das der Normalfall (der
@@ -1671,36 +1687,15 @@ function AppInhalt() {
   useEffect(() => {
     function beiFragmentwechsel() {
       const fragment = fragmentNehmen();
-      if (!fragment) return;
-      void uebernehmeText(fragment, "Der geöffnete Link enthält keinen gültigen Erfassungsbogen.").then(
-        (fertig) => {
-          // Segment-Teil eines mehrteiligen Bogens: Scanner öffnen, damit die
-          // übrigen Teile direkt folgen können. Kam umgekehrt der LETZTE Teil
-          // per Link, während der Scanner offen war, schließt er sich.
-          if (!fertig) void scanneQr();
-          else setScannerOffen(false);
-        },
-      );
+      if (fragment) linkEmpfangenRef.current(fragment);
     }
     window.addEventListener("hashchange", beiFragmentwechsel);
     return () => window.removeEventListener("hashchange", beiFragmentwechsel);
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- nur einmal registrieren; der Handler nutzt ausschließlich stabile Setter
   }, []);
 
   // Universal Link (iOS) / App Link (Android) öffnet die native App:
   // Bogen oder Vorlage aus der übergebenen URL übernehmen (Kaltstart und laufende App).
-  useEffect(() => {
-    return bogenLinksEmpfangen((url) => {
-      void uebernehmeText(url, "Der geöffnete Link enthält keinen gültigen Erfassungsbogen.").then(
-        (fertig) => {
-          // Wie beim Web-Fragmentwechsel: Ein Segment-Teil per Link startet
-          // den Scanner für die übrigen Teile (hier die native Scan-Schleife).
-          if (!fertig) void scanneQr();
-        },
-      );
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- nur einmal registrieren; der Handler nutzt ausschließlich stabile Setter
-  }, []);
+  useEffect(() => bogenLinksEmpfangen((url) => linkEmpfangenRef.current(url)), []);
 
   async function scanneQr() {
     // Nativ (iOS/Android) scannt das Capacitor-Plugin, sonst die Webcam.

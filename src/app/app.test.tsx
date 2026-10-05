@@ -891,6 +891,60 @@ describe("Assistenten-Durchlauf", () => {
     expect(window.location.hash).toBe("");
   });
 
+  /**
+   * Audit Runde 3, R3-S1: Der Listener lief mit dem Zustand des ersten
+   * Renders. App ohne Entwurf geöffnet, eigenen Bogen angelegt, dann ein Link
+   * — der eigene Bogen war ohne Frage und ohne Rückholung weg.
+   */
+  it("fragt bei einem Link nach dem AKTUELLEN eigenen Bogen und legt ihn auf den Rückholplatz (R3-S1)", async () => {
+    const nutzer = userEvent.setup();
+    render(<App />);
+    await neuerBogenBis(nutzer, 0);
+    await nutzer.type(screen.getByLabelText("Name (Pflicht)"), "Eigenstadt");
+
+    fragmentSetzen(encodePayloadUrl(bogenMitName("Bamberg"), browserKompressor));
+    const frage = await screen.findByRole("dialog", { name: "Empfangenen Bogen öffnen?" });
+    expect(frage.textContent).toContain("THW Eigenstadt");
+    await nutzer.click(within(frage).getByRole("button", { name: "Abbrechen" }));
+    expect((screen.getByLabelText("Name (Pflicht)") as HTMLInputElement).value).toBe("Eigenstadt");
+    expect(localStorage.getItem("eeb.entwurf.ersetzt.v1")).toBeNull();
+
+    // Weitertippen, dann derselbe Weg mit „Meldung öffnen": zurückholbar ist der aktuelle Stand.
+    await nutzer.type(screen.getByLabelText("Name (Pflicht)"), "-Nord");
+    fragmentSetzen(encodePayloadUrl(bogenMitName("Bamberg"), browserKompressor));
+    await nutzer.click(within(await screen.findByRole("dialog", { name: "Empfangenen Bogen öffnen?" })).getByRole("button", { name: "Meldung öffnen" }));
+    expect(await screen.findByRole("heading", { name: "Gesamtübersicht" })).toBeDefined();
+    expect(localStorage.getItem("eeb.entwurf.ersetzt.v1")).toContain("Eigenstadt-Nord");
+    expect(screen.getByText(/Dein eigener Bogen „THW Eigenstadt-Nord" liegt auf der Startseite/)).toBeDefined();
+  }, 20000);
+
+  /**
+   * Audit Runde 3, R3-D2: Beim Kaltstart über einen Link wanderte der eigene
+   * Bogen schon beim Laden auf den Rückholplatz — der dort liegende Bogen war
+   * weg, bevor ein Dialog erschien, und „Abbrechen" stellte nichts wieder her.
+   */
+  it("fragt beim Kaltstart über einen Link erst und lässt bei „Abbrechen“ beide Plätze, wie sie waren (R3-D2)", async () => {
+    const { entwurfZuJson } = await import("./entwurf");
+    localStorage.setItem("eeb.entwurf.v1", entwurfZuJson(bogenMitName("Ulm"), Date.now(), { schritt: 5 }));
+    localStorage.setItem("eeb.entwurf.ersetzt.v1", entwurfZuJson(bogenMitName("Albstadt"), Date.now() - 60_000));
+    window.location.hash = fragmentInhalt(encodePayloadUrl(bogenMitName("Lüneburg"), browserKompressor));
+    vi.resetModules();
+    const { App: AppKalt } = await import("./app");
+    const nutzer = userEvent.setup();
+    render(<AppKalt />);
+
+    const frage = await screen.findByRole("dialog", { name: "Empfangenen Bogen öffnen?" });
+    // Solange gefragt wird, ist noch nichts verdrängt — und die Frage nennt, was vom Rückholplatz fiele.
+    expect(localStorage.getItem("eeb.entwurf.ersetzt.v1")).toContain("Albstadt");
+    expect(frage.textContent).toContain("THW Albstadt");
+    expect(frage.textContent).toContain("endgültig gelöscht");
+    await nutzer.click(within(frage).getByRole("button", { name: "Abbrechen" }));
+
+    expect(localStorage.getItem("eeb.entwurf.v1")).toContain("Ulm");
+    expect(localStorage.getItem("eeb.entwurf.v1")).not.toContain("Lüneburg");
+    expect(localStorage.getItem("eeb.entwurf.ersetzt.v1")).toContain("Albstadt");
+  }, 20000);
+
   it("importiert auch eine geteilte Vorlage über den Fragmentwechsel", async () => {
     render(<App />);
 

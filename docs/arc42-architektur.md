@@ -37,6 +37,11 @@
 > Rückholplatz; alle Eingänge in eine Sammlung laufen über `meldungAufnehmen`
 > (`eintrag-zeiten.ts`), das Zug, Auftrag und Eintreffzeit an die Folgemeldung
 > vererbt — Kapitel 8.2.
+>
+> **Nachgezogen 2026-10-05:** Audit Runde 3, Paket „Eigener Bogen,
+> Rückholplatz, Übernahme" — eingehende Bogen-Links (laufende App und
+> Kaltstart) fragen vor dem Verdrängen gegen den aktuellen Arbeitsstand —
+> Kapitel 8.2.
 
 ---
 
@@ -1024,6 +1029,12 @@ flowchart TB
   Meldekopf ist am Entwurf markiert (`Entwurf.fremd` mit Ziel-Sammlung, nach
   einem Neustart geht es in derselben Erfassung weiter) und verdrängt dort nie
   einen eigenen Bogen (`rueckholungNimmt`).
+  Eingehende Bogen-Links laufen bei laufender App (`hashchange`, Universal
+  Link) über eine Ref auf den Handler des aktuellen Renders und beim
+  Kaltstart nach dem Mounten über denselben Weg (`uebernimmBogen`): erst
+  Rückfrage, dann verdrängen. Sofort geöffnet wird ein Start-Link nur ohne
+  angefangenen Bogen und ohne Sammlung (`START_SOFORT`, R3-S1/R3-D2,
+  nachgezogen 2026-10-05).
 - **Folgemeldungen** (`eintrag-zeiten.ts`): Jeder Eingang in eine Sammlung —
   Scan, Link, Datei, Bilderstapel, „In Einsatz aufnehmen" — läuft über
   `meldungAufnehmen`. Eine neue Fassung derselben Einheit erbt dort

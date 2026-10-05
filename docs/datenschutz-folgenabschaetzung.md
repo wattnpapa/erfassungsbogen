@@ -140,6 +140,13 @@ Grundlage: Repository `wattnpapa/erfassungsbogen`, Stand 2026-09-12 — Version 
 > der Führungsstelle (Freitext), die bisher nur Übersichts-CSV, Excel-Liste
 > und Sammel-PDF führten; beide CSV-Dateien tragen die laufende Nummer der
 > Meldung. Keine neue Datenkategorie, kein neuer Empfänger. Geändert: 5.5.
+>
+> **Nachgezogen 2026-10-05 — Eingehender Link und Rückholplatz (Audit
+> Runde 3, R3-S1, R3-D2):** Ein Bogen-Link verdrängt den angefangenen Bogen
+> nur noch nach Rückfrage, auch bei laufender App und beim Kaltstart. Vorher
+> konnte ein Link den eigenen Bogen still ersetzen bzw. einen Bogen vom
+> Rückholplatz löschen, bevor ein Dialog erschien. Weniger ungewollte
+> Löschung, kein neuer Speicherort. Geändert: 5.7.
 
 ## Hinweis zu diesem Dokument
 
@@ -504,6 +511,9 @@ Kapitel 6 der [Arc42-Dokumentation](arc42-architektur.md).
   (Marke `fremd` am Entwurf, nur die Kennung der Ziel-Sammlung) verdrängt dort
   keinen eigenen Bogen, sondern wird nach Rückfrage verworfen — sie ist noch
   in keiner Sammlung und muss neu erfasst werden (`src/app/entwurf.ts`).
+  Ein eingehender Bogen (Link, Scan, Datei) verdrängt den angefangenen
+  Bogen erst nach Rückfrage — seit 2026-10-05 auch bei laufender App und
+  beim Kaltstart über einen Link (R3-S1, R3-D2).
 - **Empfehlung:** eine eigene, dokumentierte Löschfrist für digital gespeicherte
   Bögen und für Papierausdrucke festlegen, da die Software selbst keine erzwingt.
 - **Geräteschlüssel:** Der private Signaturschlüssel lässt sich einzeln
