@@ -1932,6 +1932,33 @@ describe("Kaputte Datei auf allen Datei-Wegen", () => {
     expect(meldung.textContent).toMatch(/„liste.csv“ ist eine Tabelle oder Liste/);
     expect(meldung.textContent).not.toMatch(/JSON|Unexpected|token/);
   });
+
+  it("„Bögen einlesen…“ mit gutem und kaputtem Bogen: beide Ergebnisse unter den Aufnahme-Knöpfen (R3-E4, R3-L1)", async () => {
+    const nutzer = userEvent.setup();
+    render(<App />);
+    await nutzer.click(screen.getByRole("button", { name: "Neue Einsatz-Sammlung…" }));
+    const dialog = await screen.findByRole("dialog", { name: "Neue Einsatz-Sammlung anlegen" });
+    await nutzer.type(within(dialog).getByLabelText("Name"), "Stapelprobe");
+    await nutzer.click(within(dialog).getByRole("button", { name: "Einsatz anlegen" }));
+    await screen.findByRole("heading", { level: 1, name: "Stapelprobe" });
+
+    const gut = new File([JSON.stringify(bogenMitName("OV Schwabach"))], "schwabach.json", { type: "application/json" });
+    await nutzer.upload(screen.getByLabelText("Dateien wählen…"), [gut, halbeDatei()]);
+
+    // Erfolg und Fehler stehen zusammen — die Fehlerzeile verdrängt nichts.
+    const quittung = await waitFor(() => {
+      const q = document.querySelector<HTMLElement>(".einlese-quittung");
+      expect(q).not.toBeNull();
+      return q!;
+    });
+    expect(quittung.getAttribute("role")).toBe("alert");
+    expect(quittung.textContent).toMatch(/1 Bogen aufgenommen\./);
+    expect(quittung.textContent).toMatch(/„kaputt.json“ ist beschädigt oder unvollständig/);
+    expect(einsaetzeLaden()[0]!.eintraege).toHaveLength(1);
+    // Direkt unter den Aufnahme-Knöpfen, nicht unter der ganzen Ansicht.
+    const aktionen = screen.getByRole("button", { name: "Bögen einlesen…" }).closest(".aktionen")!;
+    expect(aktionen.nextElementSibling).toBe(quittung);
+  });
 });
 
 /**

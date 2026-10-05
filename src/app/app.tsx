@@ -95,7 +95,17 @@ import { einsatzDetailCsvInhalt } from "./bogen-csv";
 import { QrScannerWeb } from "./qr-scanner-web";
 import { TeilQuittung, fehlendeTeile, fehltNochSatz } from "./teil-quittung";
 import { qrAusBild } from "./qr-bild";
-import { dateiImportMeldung, istBilddatei, qrStapelLesen, stapelBericht as stapelBerichtZeilen, teileMerker } from "./qr-stapel";
+import {
+  LAGE_NACHTRAGEN_HINWEIS,
+  SAMMLUNG_IN_PDF_HINWEIS,
+  dateiImportMeldung,
+  istBilddatei,
+  qrStapelLesen,
+  stapelBericht as stapelBerichtZeilen,
+  teileMerker,
+  type DateiAnteil,
+} from "./qr-stapel";
+import { EinleseQuittung } from "./einlese-quittung";
 import { StapelQuittung } from "./stapel-quittung";
 import { EintreffzeitFeld, aehnlicherOrt, eintreffzeitAusUhrzeit } from "./nacherfassung";
 import {
@@ -767,6 +777,8 @@ function AppInhalt() {
   // Der Abbruch als Ref, weil die laufende Schleife sonst den alten Stand sieht.
   const [stapelStand, setStapelStand] = useState("");
   const [stapelBericht, setStapelBericht] = useState<string[]>([]);
+  // Rückmeldung von „Bögen einlesen…" (Dateien) unter den Aufnahme-Knöpfen (R3-L1, R3-E4).
+  const [einlese, setEinlese] = useState<{ fehler: string; meldung: string } | null>(null);
   const stapelAbbruchRef = useRef(false);
   // Kiosk-Scan (Meldekopf): Zähler der in diesem Durchgang aufgenommenen Bögen.
   const kioskZaehlerRef = useRef(0);
@@ -2497,7 +2509,26 @@ function AppInhalt() {
    * Datei, und eine kaputte Datei darf die übrigen nicht abbrechen — sie wird
    * mit Namen an die Meldung gehängt.
    */
-  async function importiereBoegen(zielId: string, dateien: File[]) {
+  /**
+   * „Bögen einlesen…" mit Dateien und Bildern: eine gemeinsame Rückmeldung
+   * je Stapel (Audit Runde 3, R3-E4). Bisher liefen beide Wege nebeneinander;
+   * der Bilderweg leerte Fehler und Meldung des Dateiwegs, und dessen
+   * Fehlerzeile verdrängte die Erfolgsmeldung.
+   */
+  async function importiereStapel(zielId: string, daten: File[], bilder: File[]) {
+    setEinlese(null);
+    setStapelBericht([]);
+    setFehler("");
+    setMeldung("");
+    const d = daten.length > 0 ? await importiereBoegen(zielId, daten) : undefined;
+    if (bilder.length > 0) {
+      await importiereQrBilder(zielId, bilder, d);
+      return;
+    }
+    setEinlese(d ? { fehler: d.fehler, meldung: d.meldung } : { fehler: "In der Auswahl sind keine Bilddateien.", meldung: "" });
+  }
+
+  async function importiereBoegen(zielId: string, dateien: File[]): Promise<DateiAnteil & { fehler: string; meldung: string }> {
     let neu = 0;
     let uebersprungen = 0;
     let speicherVoll = 0;
@@ -2532,14 +2563,26 @@ function AppInhalt() {
       }
     }
     einsaetzeNeuLaden();
-    setFehler([speicherVollMeldung(speicherVoll), ...kaputt].filter(Boolean).join(" "));
+    const fehlerZeilen = [speicherVollMeldung(speicherVoll), ...kaputt].filter(Boolean);
     const bogenMeldung =
       neu + uebersprungen === 0
         ? kaputt.length > 0 || sammlungenUebernommen.length > 0 || speicherVoll > 0
           ? ""
           : "Keine Bögen in der Datei gefunden — weder eingebettete Daten noch ein lesbarer QR-Code."
         : dateiImportMeldung(neu, uebersprungen, zusatz);
-    setMeldung([...sammlungenUebernommen, bogenMeldung].filter(Boolean).join(" "));
+    // Für den gemeinsamen Bericht mit Bildern: nur, was die Zahl nicht sagt.
+    const hinweise = [
+      ...sammlungenUebernommen,
+      zusatz.sammlungInPdf ? SAMMLUNG_IN_PDF_HINWEIS : zusatz.lage && neu > 0 ? LAGE_NACHTRAGEN_HINWEIS : "",
+    ].filter(Boolean);
+    return {
+      anzahl: dateien.length,
+      neu,
+      uebersprungen,
+      zeilen: [...fehlerZeilen, ...hinweise],
+      fehler: fehlerZeilen.join(" "),
+      meldung: [...sammlungenUebernommen, bogenMeldung].filter(Boolean).join(" "),
+    };
   }
 
   /**
@@ -2642,14 +2685,15 @@ function AppInhalt() {
    * Fassung in die Historie. Beides ist nachträglich korrigierbar, ein
    * weggeklickter Dialog nicht.
    */
-  async function importiereQrBilder(zielId: string, dateien: File[]) {
+  async function importiereQrBilder(zielId: string, dateien: File[], daten?: DateiAnteil & { fehler: string; meldung: string }) {
     const bilder = dateien.filter((d) => istBilddatei(d.name, d.type));
     if (bilder.length === 0) {
-      setFehler("In der Auswahl sind keine Bilddateien.");
+      setEinlese(daten ? { fehler: daten.fehler, meldung: daten.meldung } : { fehler: "In der Auswahl sind keine Bilddateien.", meldung: "" });
       return;
     }
     setFehler("");
     setMeldung("");
+    setEinlese(null);
     setStapelBericht([]);
     stapelAbbruchRef.current = false;
     setStapelStand(`0 von ${bilder.length} Bildern gelesen…`);
@@ -2696,10 +2740,11 @@ function AppInhalt() {
         /* Markierung ist Komfort */
       }
       einsaetzeNeuLaden();
-      setStapelBericht(stapelBerichtZeilen(erg, neu, uebersprungen));
-      setFehler(speicherVollMeldung(speicherVoll));
+      setStapelBericht(stapelBerichtZeilen(erg, neu, uebersprungen, daten));
+      const voll = speicherVollMeldung(speicherVoll);
+      if (voll) setEinlese({ fehler: voll, meldung: "" });
     } catch (e) {
-      setFehler(`Stapel einlesen: ${fehlerText(e)}`);
+      setEinlese({ fehler: `Stapel einlesen: ${fehlerText(e)}`, meldung: daten?.meldung ?? "" });
     } finally {
       setStapelStand("");
     }
@@ -2797,12 +2842,37 @@ function AppInhalt() {
         <SpeicherWarnung stand={einsaetze} />
         <EinsatzDetail
           einsatz={offenerEinsatz}
-          onZurueck={() => { setOffenerEinsatzId(null); setZeigeStart(true); setMeldung(""); setEingang(null); }}
+          onZurueck={() => { setOffenerEinsatzId(null); setZeigeStart(true); setMeldung(""); setEingang(null); setEinlese(null); setStapelBericht([]); }}
           onGeaendert={einsaetzeNeuLaden}
           onScannen={() => scanneInEinsatz(offenerEinsatz.id)}
           onManuell={() => manuellInEinsatz(offenerEinsatz.id)}
-          onDateiImport={(dateien) => void importiereBoegen(offenerEinsatz.id, dateien)}
-          onBilderImport={(dateien) => void importiereQrBilder(offenerEinsatz.id, dateien)}
+          onDateiImport={(dateien) => void importiereStapel(offenerEinsatz.id, dateien, [])}
+          onBilderImport={(dateien) => void importiereStapel(offenerEinsatz.id, [], dateien)}
+          onEinlesen={(daten, bilder) => void importiereStapel(offenerEinsatz.id, daten, bilder)}
+          einleseQuittung={
+            <>
+              <EinleseQuittung fehler={einlese?.fehler ?? ""} meldung={einlese?.meldung ?? ""} />
+              {/* Eine angefangene Erfassung für diesen Einsatz liegt im Assistenten:
+                  Wer mit „‹ Einsatz" zurückkam, findet sie hier wieder — nicht als
+                  fremden „eigenen Bogen" auf der Startseite (Audit „Neuer Nutzer", F2).
+                  Neben „Einheit manuell erfassen…", nicht 2 600 px tiefer
+                  unter der Liste (Audit Runde 3, R3-S7). */}
+              {bogen && fremdeErfassung && sammelZielId === offenerEinsatz.id && (
+                <p className="meldung" role="status" style={{ textAlign: "center" }}>
+                  Angefangene Erfassung für diesen Einsatz: „{einheitAnzeigename(bogen.einheit) || "(noch ohne Namen)"}".{" "}
+                  <button type="button" className="link" onClick={() => { setMeldung(""); setOffenerEinsatzId(null); setZeigeStart(false); }}>Weiter erfassen</button>
+                </p>
+              )}
+              {/* Stapel-Fortschritt und -Bericht holen sich selbst ins Bild (R2-A2). */}
+              <StapelQuittung
+                stand={stapelStand}
+                onAbbrechen={() => (stapelAbbruchRef.current = true)}
+                bericht={stapelBericht}
+                onSchliessen={() => setStapelBericht([])}
+                merker={teileMerker(offenerEinsatz.id)}
+              />
+            </>
+          }
           onExport={() => exportiereEinsatz(offenerEinsatz)}
           onCsvExport={(umfang) => exportiereEinsatzCsv(offenerEinsatz, umfang)}
           onCsvDetailExport={(umfang) => exportiereEinsatzCsvDetail(offenerEinsatz, umfang)}
@@ -2821,23 +2891,6 @@ function AppInhalt() {
             {fehler || meldung}
           </p>
         )}
-        {/* Eine angefangene Erfassung für diesen Einsatz liegt im Assistenten:
-            Wer mit „‹ Einsatz" zurückkam, findet sie hier wieder — nicht als
-            fremden „eigenen Bogen" auf der Startseite (Audit „Neuer Nutzer", F2). */}
-        {bogen && fremdeErfassung && sammelZielId === offenerEinsatz.id && (
-          <p className="meldung" role="status" style={{ textAlign: "center" }}>
-            Angefangene Erfassung für diesen Einsatz: „{einheitAnzeigename(bogen.einheit) || "(noch ohne Namen)"}".{" "}
-            <button type="button" className="link" onClick={() => { setMeldung(""); setOffenerEinsatzId(null); setZeigeStart(false); }}>Weiter erfassen</button>
-          </p>
-        )}
-        {/* Stapel-Fortschritt und -Bericht holen sich selbst ins Bild (R2-A2). */}
-        <StapelQuittung
-          stand={stapelStand}
-          onAbbrechen={() => (stapelAbbruchRef.current = true)}
-          bericht={stapelBericht}
-          onSchliessen={() => setStapelBericht([])}
-          merker={teileMerker(offenerEinsatz.id)}
-        />
         {/* Kiosk-Scan: die aufgenommenen Bögen bleiben im Einsatz — der Knopf
             beendet nur den Durchgang, deshalb „Fertig". Liegen aber Teile eines
             noch unvollständigen Bogens im Sammelstand, gehen die beim Schließen

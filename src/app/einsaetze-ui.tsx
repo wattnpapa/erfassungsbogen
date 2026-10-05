@@ -8,7 +8,7 @@
  * Reine Anzeige + Aufruf der Store-/Auswertungslogik (einsaetze.ts, auswertung.ts).
  */
 
-import { useEffect, useId, useLayoutEffect, useRef, useState, type FocusEvent } from "react";
+import { useEffect, useId, useLayoutEffect, useRef, useState, type FocusEvent, type ReactNode } from "react";
 import { DaumenQuittung } from "./daumen-quittung";
 import { ORTSSPERRE_MS, PRELLSCHUTZ_MS, ortSperren } from "./tipp-schutz";
 import {
@@ -524,6 +524,8 @@ function BoegenEinlesenKnopf(props: {
   onDaten: (dateien: File[]) => void;
   /** Bilder, aus denen erst noch QR-Codes gelesen werden. */
   onBilder: (dateien: File[]) => void;
+  /** Beides zugleich, wenn der Aufrufer eine gemeinsame Rückmeldung gibt. */
+  onEinlesen?: (daten: File[], bilder: File[]) => void;
 }) {
   const mitOrdner = ordnerAuswahlMoeglich();
   const dateiFeld = useRef<HTMLInputElement>(null);
@@ -558,6 +560,10 @@ function BoegenEinlesenKnopf(props: {
   function verteile(dateien: File[]) {
     const bilder = dateien.filter((d) => istBilddatei(d.name, d.type));
     const daten = dateien.filter((d) => !istBilddatei(d.name, d.type));
+    if (props.onEinlesen) {
+      props.onEinlesen(daten, bilder);
+      return;
+    }
     if (daten.length > 0) props.onDaten(daten);
     // Auch die leere Auswahl geht weiter: der Aufrufer meldet dann „keine
     // Bilddateien" — besser als ein Knopf, der wortlos nichts tut.
@@ -629,7 +635,8 @@ function BoegenEinlesenKnopf(props: {
             // die Bilder, alles andere wird stillschweigend übergangen.
             const bilder = [...(e.target.files ?? [])].filter((d) => istBilddatei(d.name, d.type));
             e.target.value = "";
-            props.onBilder(bilder);
+            if (props.onEinlesen) props.onEinlesen([], bilder);
+            else props.onBilder(bilder);
           }}
         />
       )}
@@ -650,6 +657,9 @@ function alleEinsatzIds(): string[] {
 
 /** Bis zu so vielen Zeichen steht die Bemerkung der Einheit ungekürzt auf der Karte (R3-K3). */
 const BEMERKUNG_KURZ = 120;
+
+/** Nonce der Aufnahme, zu der die Quittung zuletzt ins Bild gerollt wurde (je Seite, nicht je Ansicht). */
+let eingangGerollt = 0;
 
 /** So viele Namen nennt die Sammelquittung, der Rest steht als Zahl da. */
 const QUITTUNG_MAX = 10;
@@ -677,6 +687,13 @@ export function EinsatzDetail(props: {
   onDateiImport: (dateien: File[]) => void;
   /** Stapel abfotografierter/gescannter QR-Codes (Mehrfachauswahl oder Ordner). */
   onBilderImport: (dateien: File[]) => void;
+  /**
+   * Dateien und Bilder einer Auswahl zusammen — eine Rückmeldung je Stapel
+   * (R3-E4). Ohne ihn gehen beide getrennt an onDateiImport/onBilderImport.
+   */
+  onEinlesen?: (daten: File[], bilder: File[]) => void;
+  /** Rückmeldung des Einlesens, unter den Aufnahme-Knöpfen gezeigt (R3-L1). */
+  einleseQuittung?: ReactNode;
   onExport: () => void;
   /** Die Ausgabewege bekommen den gewählten Umfang mit: alle Bögen oder nur die seit dem letzten Export neuen. */
   onCsvExport: (umfang: ExportUmfang) => void;
@@ -827,6 +844,26 @@ export function EinsatzDetail(props: {
   };
   // Die zuletzt eingelesene Einheit (siehe `eingang`) — für die Quittung oben.
   const eingegangen = eingang ? alleEinheiten.find((e) => e.einheitSchluessel === eingang.schluessel) : undefined;
+  // Die Quittung lag nach „In Einsatz übernehmen" und nach einem Scan bei
+  // 636 px, unter dem Bildrand: Die Ansicht beginnt oben (R3-H1), und Kopf
+  // und Stärke-Leiste füllen am Telefon das erste Bild (Audit Runde 3,
+  // R3-S7, R3-N1). Einmal je Aufnahme rollt die Ansicht darum so weit, dass
+  // die Quittung ganz im Bild steht; die Summen bleiben dabei sichtbar.
+  // Nach dem Zurückrollen an den Anfang (useAnsichtBeginntOben in app.tsx,
+  // ein Layout-Effekt) — darum useEffect und ein Bild später.
+  const eingangQuittung = useRef<HTMLParagraphElement>(null);
+  useEffect(() => {
+    if (!eingang || !eingegangen || eingang.nonce === eingangGerollt) return;
+    eingangGerollt = eingang.nonce;
+    // Von Hand statt scrollIntoView: scroll-padding-bottom hält Platz für die
+    // Fußleiste des Assistenten frei, die es hier nicht gibt.
+    requestAnimationFrame(() => {
+      const r = eingangQuittung.current?.getBoundingClientRect();
+      if (!r || r.height === 0) return;
+      const ueber = r.bottom - (window.innerHeight - 16);
+      if (ueber > 0) window.scrollBy(0, Math.min(ueber, r.top - 8));
+    });
+  }, [eingang, eingegangen]);
   // War es eine Folgemeldung, sagt die Quittung, was sich geändert hat (R3-K1).
   const eingangFolge = eingegangen ? folgeAenderung(eingegangen, einsatz.eintraege) : null;
   /**
@@ -1006,8 +1043,11 @@ export function EinsatzDetail(props: {
         <button type="button" onClick={onManuell}>Einheit manuell erfassen…</button>
         {/* Datei, PDF, einzelne Bilder, viele Bilder, ganzer Ordner: ein Knopf,
             der die Sorte am Dateityp erkennt (siehe BoegenEinlesenKnopf). */}
-        <BoegenEinlesenKnopf onDaten={onDateiImport} onBilder={onBilderImport} />
+        <BoegenEinlesenKnopf onDaten={onDateiImport} onBilder={onBilderImport} onEinlesen={props.onEinlesen} />
       </div>
+
+      {/* Was das Einlesen ergab, dort, wo der Finger eben war (R3-L1). */}
+      {props.einleseQuittung}
 
       {/* Quittung der Aufnahme dort, wo nach dem Übernehmen der Blick liegt:
           Name und neue Gesamtzahl bei Summe und Aufnahme-Knopf, statt die
@@ -1015,7 +1055,7 @@ export function EinsatzDetail(props: {
           sie den Knopf für die nächste Einheit nicht unter den Bildrand
           schiebt. */}
       {eingegangen && (
-        <p className="meldung eingang-quittung" role="status">
+        <p className="meldung eingang-quittung" role="status" ref={eingangQuittung}>
           Zuletzt eingelesen: „{einheitAnzeigename(eingegangen.bogen.einheit)}"
           {eingegangen.teilEtikett ? ` (${eingegangen.teilEtikett})` : ""}
           {eingangFolge ? <> — Folgemeldung: <span className={eingangFolge.verlust ? "staerke-verlust" : undefined}>{eingangFolge.kurz}</span></> : null}

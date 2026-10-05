@@ -450,6 +450,10 @@
     /* Ein Knopf, mehrere Wege herein (Datei, Bilder, ganzer Ordner): das Menue
        haengt am Knopf und braucht deshalb dessen Kasten als Bezugspunkt. */
     .einlese { position: relative; display: inline-flex; }
+    /* Rückmeldung von „Bögen einlesen…" direkt unter den Aufnahme-Knöpfen
+       (Audit Runde 3, R3-L1): Erfolg und Fehler untereinander (R3-E4). */
+    .einlese-quittung { display: grid; gap: var(--r-2); margin-block: var(--r-2); }
+    .einlese-quittung > p { margin: 0; }
     .einlese > button { width: 100%; }
     .einlese-menue {
       position: absolute; z-index: 30; top: calc(100% + var(--r-1)); left: 0;

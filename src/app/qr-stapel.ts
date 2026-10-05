@@ -302,13 +302,34 @@ function uhrzeit(ms: number): string {
  * bleibt, was NICHT angekommen ist. `neu`/`uebersprungen` liefert der Aufrufer,
  * denn erst die Sammlung weiß, was doppelt war.
  */
-export function stapelBericht(e: StapelErgebnis, neu: number, uebersprungen: number): string[] {
+/**
+ * Anteil der Dateien (JSON/PDF), die im selben Stapel mit den Bildern kamen.
+ * Beide Wege meldeten getrennt, und die Bild-Quittung sagte „0 Bögen
+ * aufgenommen", während die Datei daneben aufgenommen war; die Fehlerzeile
+ * der Datei verdrängte deren Erfolgsmeldung (Audit Runde 3, R3-E4). Jetzt
+ * zählt die erste Zeile beide, darunter stehen die Dateien, die nicht
+ * ankamen.
+ */
+export interface DateiAnteil {
+  anzahl: number;
+  neu: number;
+  uebersprungen: number;
+  /** Fehler und Hinweise zu den Dateien, je ein Satz. */
+  zeilen: string[];
+}
+
+export function stapelBericht(e: StapelErgebnis, neu: number, uebersprungen: number, dateien?: DateiAnteil): string[] {
   const zeilen: string[] = [];
+  const neuGesamt = neu + (dateien?.neu ?? 0);
+  const uebersprungenGesamt = uebersprungen + (dateien?.uebersprungen ?? 0);
+  const bilder = `${e.gelesen} ${e.gelesen === 1 ? "Bild" : "Bilder"}`;
   zeilen.push(
-    `${e.gelesen} ${e.gelesen === 1 ? "Bild" : "Bilder"} gelesen — ${neu} ${neu === 1 ? "Bogen" : "Bögen"} aufgenommen` +
-      (uebersprungen > 0 ? `, ${uebersprungen} bereits vorhanden` : "") +
+    (dateien ? `${dateien.anzahl} ${dateien.anzahl === 1 ? "Datei" : "Dateien"} und ${bilder}` : bilder) +
+      ` gelesen — ${neuGesamt} ${neuGesamt === 1 ? "Bogen" : "Bögen"} aufgenommen` +
+      (uebersprungenGesamt > 0 ? `, ${uebersprungenGesamt} bereits vorhanden` : "") +
       ".",
   );
+  if (dateien) zeilen.push(...dateien.zeilen);
   if (e.abgebrochen) zeilen.push("Abgebrochen — die restlichen Bilder wurden nicht gelesen.");
   for (const l of e.luecken) {
     zeilen.push(

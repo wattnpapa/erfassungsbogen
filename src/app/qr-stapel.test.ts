@@ -280,6 +280,16 @@ describe("qrStapelLesen", () => {
     const zeilen = stapelBericht({ gelesen: 5, funde: [], fehler: [], luecken: [], abgebrochen: false }, 3, 2);
     expect(zeilen[0]).toBe("5 Bilder gelesen — 3 Bögen aufgenommen, 2 bereits vorhanden.");
   });
+
+  it("bericht zählt Dateien desselben Stapels mit und nennt die kaputte Datei (R3-E4)", () => {
+    const bild = { gelesen: 1, funde: [], fehler: [{ datei: "foto.png", grund: "kein-code" as const, text: "Kein QR-Code im Bild gefunden." }], luecken: [], abgebrochen: false };
+    const zeilen = stapelBericht(bild, 0, 0, { anzahl: 2, neu: 1, uebersprungen: 0, zeilen: ["„abgeschnitten.json“ ist beschädigt."] });
+    expect(zeilen[0]).toBe("2 Dateien und 1 Bild gelesen — 1 Bogen aufgenommen.");
+    expect(zeilen).toContain("„abgeschnitten.json“ ist beschädigt.");
+    expect(zeilen).toContain("foto.png: Kein QR-Code im Bild gefunden.");
+    // Keine Zeile sagt „0 Bögen aufgenommen", wenn ein Bogen ankam.
+    expect(zeilen.join(" ")).not.toMatch(/0 Bögen aufgenommen/);
+  });
 });
 
 describe("istBilddatei", () => {
