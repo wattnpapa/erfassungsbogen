@@ -510,10 +510,37 @@ describe("schrittStatus", () => {
     b.einsatz.ortAuftrag = "Übung Kabelblitz";
     // Mit Namen: eine leere Personenkarte zählt zwar in die Stärke, macht den
     // Schritt aber nicht fertig (sie ist meist ein Fehlgriff).
-    b.personal = [{ ...neuePerson(), nachname: "Muster", vorname: "Max" }];
+    b.personal = [{
+      ...neuePerson(),
+      nachname: "Muster",
+      vorname: "Max",
+      fahrerlaubnis: Fahrerlaubnis.B,
+      kontakte: [{ art: KontaktArt.MOBIL, dienstlich: true, wert: "0170 1234567" }],
+    }];
     b.fahrzeuge = [{ ...neuesFahrzeug(), kennzeichen: "THW-84397" }];
     b.sofortbedarf = { verpflegungPersonen: 1, dieselLiter: 0, benzinLiter: 0, gemischLiter: 0, unterbringung: false, ruhezeitErforderlich: false };
     expect(schrittStatus(b)).toEqual(["ok", "ok", "ok", "ok", "ok"]);
+    // Ohne Rufnummer hat Schritt 3 einen Prüfpunkt — dann kein Haken (R3-N4).
+    b.personal = [{ ...b.personal[0]!, kontakte: [] }];
+    expect(schrittStatus(b)[2]).toBe("begonnen");
+  });
+
+  it("gibt 3 von 9 Namen keinen Haken (R3-N4)", () => {
+    const b = neuerBogen();
+    b.personal = [
+      ...["Huber", "Schmid", "Meier"].map((nachname) => ({ ...neuePerson(), nachname, vorname: "X" })),
+      ...Array.from({ length: 6 }, () => ({ ...neuePerson(), funktionen: [{ code: 1 }] })),
+    ];
+    expect(schrittStatus(b)[2]).toBe("begonnen");
+  });
+
+  it("wertet in der Schnellerfassung Schritt 1 schon mit dem Namen als fertig (R3-N4)", () => {
+    const b = neuerBogen();
+    b.personalErfassung = PersonalErfassung.NUR_STAERKE;
+    b.einheit.hierarchie = [{ bezeichnung: { code: 1 }, name: "Biberach" }];
+    expect(schrittStatus(b)[0]).toBe("ok");
+    b.personalErfassung = PersonalErfassung.VOLLSTAENDIG;
+    expect(schrittStatus(b)[0]).toBe("begonnen");
   });
 
   it("gibt reinen Sollplätzen keinen Haken (R2-N3)", () => {
@@ -529,11 +556,11 @@ describe("schrittStatus", () => {
     const b = neuerBogen();
     b.einheit.hierarchie = [{ bezeichnung: { code: 1 }, name: "OV X" }]; // Typ fehlt noch → begonnen
     b.einsatz.einsatzbeginn = 1000; // Ort fehlt noch → begonnen
+    expect(schrittStatus(b)[0]).toBe("begonnen");
     b.personalErfassung = PersonalErfassung.NUR_STAERKE;
     b.staerkeManuell = { fuehrer: 0, unterfuehrer: 0, mannschaft: 0, gesamt: 0 };
     b.personal = [neuePerson()]; // Ansprechpartner erfasst, Stärke aber 0 → begonnen
     const s = schrittStatus(b);
-    expect(s[0]).toBe("begonnen");
     expect(s[1]).toBe("begonnen");
     expect(s[2]).toBe("begonnen");
   });

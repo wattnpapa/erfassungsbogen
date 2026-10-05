@@ -981,7 +981,7 @@ export type SchrittStatus = "leer" | "begonnen" | "ok";
 
 export const SCHRITT_STATUS_TITEL: Record<SchrittStatus, string> = {
   leer: "noch leer",
-  begonnen: "begonnen",
+  begonnen: "offen, hier fehlt noch etwas",
   ok: "ausgefüllt",
 };
 
@@ -989,14 +989,22 @@ export const SCHRITT_STATUS_TITEL: Record<SchrittStatus, string> = {
  * Leichter Status je Schritt (Einheit, Einsatz, Personal, Fahrzeuge,
  * Sofortbedarf) aus dem Bogen abgeleitet — nur Orientierung, nichts wird
  * erzwungen. Die Übersicht (letzter Schritt) hat bewusst keinen Status.
+ *
+ * „✓" heißt fertig: Ein Schritt mit eigenen Prüfpunkten bleibt „offen", auch
+ * wenn er sonst als ausgefüllt gälte. Vorher stand „3 ✓" bei 3 von 9 Namen,
+ * während die Übersicht „6 Personenkarten ohne Angaben" meldete (Audit
+ * Runde 3, R3-N4). In der Schnellerfassung („Nur Stärke") reicht für
+ * Schritt 1 der Name, wie der Hinweis dort sagt — vorher stand „1 offen" bis
+ * zum Schluss, weil der Einheitstyp fehlte.
  */
 export function schrittStatus(b: Erfassungsbogen): SchrittStatus[] {
   const e = b.einheit;
+  const schnell = b.personalErfassung === PersonalErfassung.NUR_STAERKE;
   const typGesetzt = e.einheitsTyp.code != null || !!e.einheitsTyp.freitext?.trim();
   // Die erste Zugehörigkeits-Ebene ist die eigene Einheit und damit Pflicht.
   const nameGesetzt = !!einheitOrt(e) || e.standortRef != null;
   const einheitBegonnen = typGesetzt || nameGesetzt || e.hierarchie.length > 1 || !!e.organisationName;
-  const einheit: SchrittStatus = typGesetzt && nameGesetzt ? "ok" : einheitBegonnen ? "begonnen" : "leer";
+  const einheit: SchrittStatus = (typGesetzt || schnell) && nameGesetzt ? "ok" : einheitBegonnen ? "begonnen" : "leer";
 
   const ez = b.einsatz;
   const einsatz: SchrittStatus = ez.ortAuftrag.trim()
@@ -1026,7 +1034,10 @@ export function schrittStatus(b: Erfassungsbogen): SchrittStatus[] {
   // Sofortbedarf/Sonstiges ist durchweg optional: „ok", sobald etwas erfasst ist, sonst neutral „leer".
   const sofortbedarf: SchrittStatus = b.sofortbedarf != null || !!b.sonstiges?.trim() ? "ok" : "leer";
 
-  return [einheit, einsatz, personal, fahrzeuge, sofortbedarf];
+  // Eigene Prüfpunkte eines Schritts nehmen ihm den Haken (R3-N4). Die
+  // Fahrzeugpunkte nur, wo die App sie auch zeigt (nicht in der Schnellerfassung).
+  const mitPunkten = new Set(pruefpunkte(b, !schnell).map((p) => p.schritt));
+  return [einheit, einsatz, personal, fahrzeuge, sofortbedarf].map((st, i) => (st === "ok" && mitPunkten.has(i) ? "begonnen" : st));
 }
 
 /**
