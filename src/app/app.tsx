@@ -1033,9 +1033,15 @@ function AppInhalt() {
   }): Promise<boolean> {
     // Was auch immer den Bogen ersetzt: die Bearbeitung einer Vorlage ist es
     // danach nicht mehr — der verdrängte Bogen wird zum gewöhnlichen Entwurf.
+    // Ebenso endet eine Aufnahme für eine Sammlung: Wer danach „Neuen Bogen
+    // erstellen" tippte, erbte Kopf, Marke und „In Einsatz übernehmen" der
+    // eben abgebrochenen Erfassung, und der eigene Bogen landete mit einem
+    // Tipp in der fremden Sammlung (Audit Runde 3, R3-S2). Wege, die wieder
+    // für eine Sammlung erfassen, setzen das Ziel danach neu.
     if (!bogen || !bogenHatInhalt(bogen)) {
       setVorlageInBearbeitung(null);
       setFremdeErfassung(false);
+      setSammelZiel(null);
       return true;
     }
     if (!a.ohneFrage) {
@@ -1051,6 +1057,7 @@ function AppInhalt() {
     merkeVerdraengt(bogen, { tausch: a.tausch });
     setVorlageInBearbeitung(null);
     setFremdeErfassung(false);
+    setSammelZiel(null);
     return true;
   }
 
@@ -1856,7 +1863,7 @@ function AppInhalt() {
   /** Erfassung für einen Einsatz abschließen: ablegen, dann den Arbeitsplatz räumen. */
   async function erfassungUebernehmen() {
     const ziel = sammelZielId;
-    if (!ziel || !bogen) return;
+    if (!ziel || !bogen || !fremdeErfassung) return;
     const b = bogen;
     if (!(await sollstaerkeFreigeben(b))) return;
     setMeldung("");
@@ -2386,7 +2393,7 @@ function AppInhalt() {
         {/* Eine angefangene Erfassung für diesen Einsatz liegt im Assistenten:
             Wer mit „‹ Einsatz" zurückkam, findet sie hier wieder — nicht als
             fremden „eigenen Bogen" auf der Startseite (Audit „Neuer Nutzer", F2). */}
-        {bogen && sammelZielId === offenerEinsatz.id && (
+        {bogen && fremdeErfassung && sammelZielId === offenerEinsatz.id && (
           <p className="meldung" role="status" style={{ textAlign: "center" }}>
             Angefangene Erfassung für diesen Einsatz: „{einheitAnzeigename(bogen.einheit) || "(noch ohne Namen)"}".{" "}
             <button type="button" className="link" onClick={() => { setMeldung(""); setOffenerEinsatzId(null); setZeigeStart(false); }}>Weiter erfassen</button>
@@ -2736,8 +2743,9 @@ function AppInhalt() {
   // Leichter Füllstand je Schritt (Orientierung; die Übersicht hat keinen Status).
   const status = schrittStatus(bogen);
   // Erfassung für eine Sammlung? Dann trägt der Kopf den Einsatz und die
-  // Fußleiste den Abschluss (F2).
-  const sammelEinsatz = sammelZielId ? einsaetze.find((s) => s.id === sammelZielId) ?? null : null;
+  // Fußleiste den Abschluss (F2) — nur bei einer als fremd markierten
+  // Erfassung, nie beim eigenen Bogen (R3-S2).
+  const sammelEinsatz = fremdeErfassung && sammelZielId ? einsaetze.find((s) => s.id === sammelZielId) ?? null : null;
 
   return (
     <>
@@ -2898,7 +2906,7 @@ function AppInhalt() {
             setMeldung("Einsatzdaten für den neuen Einsatz zurückgesetzt — Ort/Auftrag eintragen. Personal und Fahrzeuge sind geblieben.");
           }}
           sammelAktion={
-            sammelZielId
+            sammelEinsatz
               ? { label: "In Einsatz übernehmen", onUebernehmen: () => void erfassungUebernehmen() }
               : undefined
           }

@@ -627,6 +627,32 @@ describe("Assistenten-Durchlauf", () => {
   }, 30000);
 
   /**
+   * Audit Runde 3, R3-S2: Nach einer abgebrochenen Einsatz-Erfassung erbte
+   * „Neuen Bogen erstellen" den Aufnahme-Kontext — Kopf „‹ Einsatz", Marke
+   * „Aufnahme für" und „In Einsatz übernehmen" legten den eigenen Bogen in
+   * die fremde Sammlung.
+   */
+  it("beendet mit „Neuen Bogen erstellen“ den Aufnahme-Kontext einer abgebrochenen Erfassung (R3-S2)", async () => {
+    einsatzImSpeicherAnlegen("Hochwasser Deich", EinsatzArt.EINSATZ);
+    const nutzer = userEvent.setup();
+    render(<App />);
+    await nutzer.click(screen.getByRole("button", { name: "Öffnen" }));
+    await nutzer.click(await screen.findByRole("button", { name: "Einheit manuell erfassen…" }));
+    await nutzer.type(screen.getByLabelText("Name (Pflicht)"), "Aalen");
+    await nutzer.click(screen.getByRole("button", { name: /‹ Einsatz „Hochwasser Deich"/ }));
+    await nutzer.click(screen.getByRole("button", { name: /‹ Einsätze|‹ Startseite/ }));
+
+    await nutzer.click(screen.getByRole("button", { name: "Neuen Bogen erstellen" }));
+    await nutzer.click(within(rueckfrage("Neuen Bogen anfangen?")).getByRole("button", { name: "Neu anfangen" }));
+    await nutzer.type(screen.getByLabelText("Name (Pflicht)"), "Eigenstadt");
+
+    expect(screen.getByRole("button", { name: "‹ Startseite" })).toBeDefined();
+    expect(within(screen.getByRole("banner")).queryByText(/Aufnahme für/)).toBeNull();
+    expect(screen.queryByRole("button", { name: "In Einsatz übernehmen" })).toBeNull();
+    expect(localStorage.getItem("eeb.entwurf.v1")).not.toContain('"fremd"');
+  }, 20000);
+
+  /**
    * Audit Runde 2, R2-E2: Eine Erfassung mit nur Name und Typ legte die
    * StAN-Sollstärke ungefragt als gemeldete Stärke in die Lage.
    */
