@@ -124,7 +124,17 @@ const BOGEN_CACHE = new Map<string, Erfassungsbogen>();
 async function beispielBogen(url: string): Promise<Erfassungsbogen> {
   const bekannt = BOGEN_CACHE.get(url);
   if (bekannt) return bekannt;
-  const bogen = migriereBogen((await (await fetch(url)).json()) as Erfassungsbogen);
+  let antwort: Response;
+  try {
+    antwort = await fetch(url);
+  } catch {
+    // Beispielbögen sind die zweite Stufe des Offline-Vorrats (R3-O3): ohne
+    // Netz fehlen sie, bis die Startseite sie nachgeladen hat.
+    throw new Error(
+      "Dieser Beispielbogen liegt noch nicht auf dem Gerät — Beispielbögen werden nach dem ersten Laden mit Netz nachgeladen (siehe Offline-Zeile der Startseite).",
+    );
+  }
+  const bogen = migriereBogen((await antwort.json()) as Erfassungsbogen);
   BOGEN_CACHE.set(url, bogen);
   return bogen;
 }
@@ -477,7 +487,7 @@ export function Fusszeile({ onBogenOeffnen, kompakt = false }: {
       setBeispielLaedt(false);
       if (geladen.some((ok) => !ok)) {
         setBeispielFehler(
-          "Einige Beispielbögen ließen sich nicht laden (offline?). Die Bögen selbst bleiben über die Aktionen erreichbar.",
+          "Einige Beispielbögen liegen noch nicht auf dem Gerät — sie werden mit Netz nachgeladen (siehe Offline-Zeile der Startseite).",
         );
       }
     });

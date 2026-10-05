@@ -880,8 +880,11 @@ sequenceDiagram
   Nutzer->>Browser: erster Aufruf von erfassungsbogen.app
   Browser->>Netz: App-Shell laden (HTML/JS/CSS, Icons, manifest, woff2, wasm)
   Browser->>SW: Service Worker installieren
-  SW->>SW: precache App-Shell (globPatterns inkl. wasm/woff2/json der Beispielbögen und Blanko-Vordruck downloads/*.pdf)
+  SW->>SW: precache Kern (App-Shell, alle JS-Bausteine, wasm/woff2, Bilder, Blanko-Vordruck, Anleitung/Vorlage/Datenschutz/Impressum)
+  Browser->>SW: Fortschritt aus der Cache API („2,1 von 6,7 MB")
   SW-->>Browser: clientsClaim() – übernimmt sofort die laufende Seite
+  Browser->>SW: zweite Stufe nachladen (Beispielbögen, Themenseiten laut offline-zusatz.json)
+  SW->>SW: Laufzeit-Cache eeb-zusatz
   Note over Nutzer,Netz: Gerät verliert Netzverbindung
   Nutzer->>Browser: erneuter Aufruf / weiter benutzen
   Browser->>SW: Anfragen aus Precache bedienen
@@ -902,6 +905,22 @@ Neuladen" in `features/uebergabe.feature`).
 Precache. Er ist die Papier-Rückfallebene und wird gerade dann gebraucht, wenn
 kein Netz da ist; vorher lieferte der direkte Aufruf offline
 `ERR_INTERNET_DISCONNECTED`.
+
+*Nachgezogen 2026-10-05 (Audit Runde 3, R3-O3):* Der Vorrat ist zweistufig.
+Bisher war der Service Worker erst nach allen 552 Dateien (10,7 MB) aktiv, bei
+schwachem Mobilfunk über eine Minute ohne Fortschritt. Jetzt teilt
+`manifestTransforms` (`scripts/precache-aufteilung.ts`) das Manifest: Der
+**Kern** (78 Dateien, 6,7 MB: App-Shell, alle JS-Bausteine einschließlich PDF,
+QR-Decoder und Landesvorlagen, Schrift, Bilder, Blanko-Vordruck und die von der
+App verlinkten Seiten) bleibt im Workbox-Precache und ist Bedingung für
+„offline bereit". Die **Zusatzstufe** (474 Dateien, 4,0 MB: Beispielbögen,
+Themen- und Länderseiten) schreibt der Build nach `offline-zusatz.json`; die
+Startseite lädt sie nach der Aktivierung nach (`src/app/offline-vorrat.ts`),
+der Service Worker legt sie über zwei Laufzeit-Routen in den Cache
+`eeb-zusatz` (Beispielbögen `CacheFirst`, Seiten und Liste `NetworkFirst`).
+Die Offline-Zeile zeigt beim Laden den Fortschritt des Kerns in MB und danach
+„offline bereit für Bogen, PDF, QR-Code und Empfang … (120 von 474)". Keine
+neuen Hosts, alle Abrufe gehen an die eigene Herkunft.
 
 ### 6.5 Desktop-Auto-Update (Electron)
 
@@ -1474,7 +1493,7 @@ flowchart LR
 
 | # | Qualitätsziel | Szenario | Bewertungsmaßstab / Nachweis im Repository |
 | --- | --- | --- | --- |
-| 1 | Offlinefähigkeit | Eine Einheit ruft die Web-App einmal online auf, verliert danach die Netzverbindung im Einsatzgebiet und füllt einen Bogen komplett aus, druckt PDF und erzeugt QR-Code. | Service Worker precacht App-Shell inkl. wasm/woff2 (`vite.config.ts`, VitePWA); Szenario „Die PDF entsteht auch ohne Netz und ohne Neuladen" in `features/uebergabe.feature`. |
+| 1 | Offlinefähigkeit | Eine Einheit ruft die Web-App einmal online auf, verliert danach die Netzverbindung im Einsatzgebiet und füllt einen Bogen komplett aus, druckt PDF und erzeugt QR-Code. | Service Worker precacht App-Shell inkl. wasm/woff2 (`vite.config.ts`, VitePWA), Beispielbögen und Themenseiten als zweite Stufe danach (seit 2026-10-05, 6.4); Szenario „Die PDF entsteht auch ohne Netz und ohne Neuladen" in `features/uebergabe.feature`. |
 | 2 | Benutzbarkeit im Feld | Ein Nutzer schaltet bei grellem Sonnenlicht in den Feld-Modus und kann alle Bedienelemente weiterhin klar erkennen. | `anzeige-modus.ts`, `features/daten-und-anzeige.feature` (Anzeigemodus Dunkel/Feld/Nacht, auch bei dunklem Systemdesign). |
 | 3 | Schnellerfassung am Meldekopf | Eine fremde Einheit trifft ohne eigenen Bogen ein; der Meldekopf erfasst sie in wenigen Minuten (nur Stärke, Führungskraft, Fahrzeuge) und druckt einen Bogen. | `personalErfassung = NUR_STAERKE`, Minimalfelder laut `docs/datenmodell.md` („Meldekopf-Workflow"), gemessene Payload-Größe 191 Bytes → QR-Version 10. |
 | 4 | Rückwärtskompatibilität | Ein vor Jahren gedruckter QR-Code (Schema-Version 2) wird mit der aktuellen App-Version gescannt und korrekt angezeigt. | Eingefrorene v2-Fixture in `codec.migration.test.ts` und `features/fixtures.ts`; `migriereBogen` deckt `2..SCHEMA_VERSION` ab. |

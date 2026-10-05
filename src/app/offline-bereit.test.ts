@@ -25,3 +25,27 @@ describe("offlineText", () => {
     expect(offlineText({ stand: "bereit", frischBereit: true, online: true })).toMatch(/^✓ Jetzt offline bereit/);
   });
 });
+
+/** Audit Runde 3, R3-O3: Fortschritt beim Laden, zweite Stufe benannt. */
+describe("offlineText mit Fortschritt", () => {
+  it("nennt beim Laden, wie viel schon da ist", () => {
+    const t = offlineText({ stand: "laedt", frischBereit: false, online: true, kern: { geladen: 2_202_009, gesamt: 7_025_459 } });
+    expect(t).toMatch(/: 2,1 von 6,7 MB — bitte mit Netz geöffnet lassen/);
+    expect(t).toMatch(/Danach gehen Bogen, PDF, QR-Code und Empfang ohne Netz/);
+    expect(offlineText({ stand: "laedt", frischBereit: false, online: false, kern: { geladen: 1_048_576, gesamt: 7_025_459 } })).toMatch(
+      /Noch nicht offline bereit \(1,0 von 6,7 MB geladen\)/,
+    );
+  });
+
+  it("meldet den Kern bereit, solange die zweite Stufe nachlädt", () => {
+    const t = offlineText({ stand: "bereit", frischBereit: true, online: true, zusatz: { fertig: 120, gesamt: 474 } });
+    expect(t).toMatch(/^✓ Jetzt offline bereit für Bogen, PDF, QR-Code und Empfang\. Beispielbögen und Themenseiten werden nachgeladen \(120 von 474\)/);
+    expect(t).not.toMatch(/komplett offline/);
+    expect(offlineText({ stand: "bereit", frischBereit: false, online: false, zusatz: { fertig: 120, gesamt: 474 } })).toMatch(
+      /folgen beim nächsten Netz/,
+    );
+    expect(offlineText({ stand: "bereit", frischBereit: false, online: true, zusatz: { fertig: 474, gesamt: 474 } })).toMatch(
+      /^✓ Funktioniert komplett offline/,
+    );
+  });
+});

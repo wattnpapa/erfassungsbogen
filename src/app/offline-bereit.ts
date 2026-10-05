@@ -16,6 +16,7 @@
  */
 import { useEffect, useState } from "react";
 import { istNativ } from "./nativ";
+import { kernFortschritt, mb, umfangLaden, zusatzNachladen, type OfflineUmfang } from "./offline-vorrat";
 
 export type OfflineStand = "bereit" | "laedt" | "ohne";
 
@@ -37,10 +38,69 @@ export function offlineStandJetzt(): OfflineStand {
  * Stand samt Netzlage. `frischBereit`: in dieser Sitzung gerade fertig
  * geworden — die Startseite quittiert das einmal.
  */
-export function useOfflineStand(): { stand: OfflineStand; frischBereit: boolean; online: boolean } {
+export interface OfflineZustand {
+  stand: OfflineStand;
+  frischBereit: boolean;
+  online: boolean;
+  /** Erste Stufe (Kern) beim Laden: Bytes im Vorrat / gesamt (R3-O3). */
+  kern?: { geladen: number; gesamt: number } | null;
+  /** Zweite Stufe (Beispielbögen, Themenseiten): Dateien da / gesamt. */
+  zusatz?: { fertig: number; gesamt: number } | null;
+}
+
+export function useOfflineStand(): OfflineZustand {
   const [stand, setStand] = useState<OfflineStand>(offlineStandJetzt);
   const [frischBereit, setFrischBereit] = useState(false);
   const [online, setOnline] = useState(() => (typeof navigator === "undefined" ? true : navigator.onLine !== false));
+  const [umfang, setUmfang] = useState<OfflineUmfang | null>(null);
+  const [kern, setKern] = useState<{ geladen: number; gesamt: number } | null>(null);
+  const [zusatz, setZusatz] = useState<{ fertig: number; gesamt: number } | null>(null);
+
+  // Umfang beider Stufen — nur im Web mit Service Worker, nicht nativ.
+  useEffect(() => {
+    if (stand === "ohne" || istNativ() || !sw() || umfang) return;
+    if (!/^https?:$/.test(window.location.protocol)) return;
+    let aus = false;
+    void umfangLaden().then((u) => {
+      if (!aus && u) setUmfang(u);
+    });
+    return () => {
+      aus = true;
+    };
+  }, [stand, online, umfang]);
+
+  // Erste Stufe: solange geladen wird, alle anderthalb Sekunden nachsehen.
+  useEffect(() => {
+    if (stand !== "laedt" || !umfang) return;
+    let aus = false;
+    const schauen = () =>
+      void kernFortschritt(umfang).then((k) => {
+        if (!aus && k) setKern(k);
+      });
+    schauen();
+    const uhr = setInterval(schauen, 1500);
+    return () => {
+      aus = true;
+      clearInterval(uhr);
+    };
+  }, [stand, umfang]);
+
+  // Zweite Stufe: erst wenn der Service Worker die Seite steuert (sonst landet
+  // nichts in seinem Cache), und erneut, wenn das Netz zurückkommt.
+  useEffect(() => {
+    if (stand !== "bereit" || !umfang || !sw()?.controller) return;
+    let aus = false;
+    void zusatzNachladen(
+      umfang,
+      (fertig, gesamt) => {
+        if (!aus) setZusatz({ fertig, gesamt });
+      },
+      () => aus,
+    );
+    return () => {
+      aus = true;
+    };
+  }, [stand, umfang, online]);
 
   useEffect(() => {
     const beiOnline = () => {
@@ -71,13 +131,21 @@ export function useOfflineStand(): { stand: OfflineStand; frischBereit: boolean;
     };
   }, [stand]);
 
-  return { stand, frischBereit, online };
+  return { stand, frischBereit, online, kern, zusatz };
 }
 
 /** Text der Offline-Zeile auf der Startseite. */
-export function offlineText(s: { stand: OfflineStand; frischBereit: boolean; online: boolean }): string {
+export function offlineText(s: OfflineZustand): string {
   const daten = "alle Daten bleiben auf diesem Gerät.";
   if (s.stand === "bereit") {
+    // Zweite Stufe noch unvollständig: Bogen, PDF, QR und Empfang gehen
+    // schon ohne Netz, Beispielbögen und Themenseiten folgen (R3-O3).
+    if (s.zusatz && s.zusatz.fertig < s.zusatz.gesamt) {
+      const kopf = s.frischBereit ? "✓ Jetzt offline bereit" : "✓ Offline bereit";
+      return s.online
+        ? `${kopf} für Bogen, PDF, QR-Code und Empfang. Beispielbögen und Themenseiten werden nachgeladen (${s.zusatz.fertig} von ${s.zusatz.gesamt}) — ${daten}`
+        : `${kopf} für Bogen, PDF, QR-Code und Empfang. Beispielbögen und Themenseiten fehlen noch (${s.zusatz.fertig} von ${s.zusatz.gesamt}), sie folgen beim nächsten Netz — ${daten}`;
+    }
     return s.frischBereit
       ? `✓ Jetzt offline bereit. Funktioniert komplett offline — ${daten}`
       : `✓ Funktioniert komplett offline — ${daten}`;
@@ -85,7 +153,9 @@ export function offlineText(s: { stand: OfflineStand; frischBereit: boolean; onl
   if (s.stand === "ohne") {
     return `Offline-Vorrat ist in diesem Browser nicht möglich (etwa im Privatmodus) — ohne Netz lässt sich die Seite nicht neu laden. Alle Daten bleiben auf diesem Gerät.`;
   }
+  // Fortschritt der ersten Stufe in Megabyte (R3-O3).
+  const stand = s.kern && s.kern.gesamt > 0 ? `${mb(s.kern.geladen)} von ${mb(s.kern.gesamt)} MB` : "";
   return s.online
-    ? `⏳ Wird für den Offline-Betrieb geladen — bitte mit Netz geöffnet lassen. Alle Daten bleiben auf diesem Gerät.`
-    : `⚠ Noch nicht offline bereit — ohne Netz diese Seite nicht neu laden; beim nächsten Netz wird der Rest geladen. Alle Daten bleiben auf diesem Gerät.`;
+    ? `⏳ Wird für den Offline-Betrieb geladen${stand ? `: ${stand}` : ""} — bitte mit Netz geöffnet lassen. Danach gehen Bogen, PDF, QR-Code und Empfang ohne Netz. Alle Daten bleiben auf diesem Gerät.`
+    : `⚠ Noch nicht offline bereit${stand ? ` (${stand} geladen)` : ""} — ohne Netz diese Seite nicht neu laden; beim nächsten Netz wird der Rest geladen. Alle Daten bleiben auf diesem Gerät.`;
 }

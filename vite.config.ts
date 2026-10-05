@@ -1,11 +1,12 @@
 import { createHash } from "node:crypto";
-import { readFileSync } from "node:fs";
+import { readFileSync, writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { defineConfig, type Plugin } from "vite";
 import react from "@vitejs/plugin-react";
 import { VitePWA } from "vite-plugin-pwa";
 import { transform } from "esbuild";
 import { sitemapErzeugen } from "./scripts/sitemap";
+import { ZUSATZ_DATEI, vorratAufteilen } from "./scripts/precache-aufteilung";
 
 const { version } = JSON.parse(readFileSync(new URL("./package.json", import.meta.url), "utf8"));
 
@@ -270,12 +271,41 @@ export default defineConfig({
         // gebraucht genau dann, wenn Gerät oder Netz ausfallen. Offline gab
         // der direkte Aufruf ERR_INTERNET_DISCONNECTED (Audit Runde 2, R2-O7).
         // json: die Beispielbögen (examples/**/*.json, ~450 kleine Dateien)
-        // werden erst beim Anklicken geladen — ohne Precache reagierte der
+        // werden erst beim Anklicken geladen — ohne Vorrat reagierte der
         // Beispiele-Dialog offline gar nicht (Audit „Offline und Speicher", O2).
+        // Sie gehören seit R3-O3 zur zweiten Stufe (manifestTransforms unten).
         // Die Manifest-Screenshots braucht nur der Installationsdialog des
         // Browsers, nicht die laufende App — sie gehören nicht in den
         // Offline-Vorrat, den jedes Gerät beim ersten Aufruf mitlädt.
         globIgnores: ["screenshots/**"],
+        // Zwei Stufen (Audit Runde 3, R3-O3): Beispielbögen und Themen-/
+        // Länderseiten bleiben aus dem Precache, damit der Service Worker nach
+        // dem Kern (Bogen, PDF, QR, Empfang) aktiv wird. Die Startseite lädt
+        // sie danach nach (src/app/offline-vorrat.ts) — Liste und Umfang des
+        // Kerns stehen in offline-zusatz.json (scripts/precache-aufteilung.ts).
+        manifestTransforms: [
+          async (eintraege) => {
+            const { kern, umfang } = vorratAufteilen(eintraege);
+            writeFileSync(fileURLToPath(new URL(`./dist/${ZUSATZ_DATEI}`, import.meta.url)), JSON.stringify(umfang));
+            return { manifest: kern, warnings: [] };
+          },
+        ],
+        // Die zweite Stufe: Beispielbögen tragen einen Hash im Namen (ändern
+        // sich nie) → aus dem Cache; Seiten und die Liste selbst → erst Netz,
+        // ohne Netz aus dem Cache.
+        runtimeCaching: [
+          {
+            urlPattern: ({ url, sameOrigin }) => sameOrigin && /\/assets\/[^/]+\.json$/.test(url.pathname),
+            handler: "CacheFirst",
+            options: { cacheName: "eeb-zusatz", expiration: { maxEntries: 1500 } },
+          },
+          {
+            urlPattern: ({ url, sameOrigin }) =>
+              sameOrigin && (/\.html$/.test(url.pathname) || url.pathname.endsWith("/offline-zusatz.json")),
+            handler: "NetworkFirst",
+            options: { cacheName: "eeb-zusatz", networkTimeoutSeconds: 5 },
+          },
+        ],
         // Das Haupt-Bundle (React, pdfmake, THW-OV-Verzeichnis …) ist ~3 MB und
         // damit größer als Workbox' 2-MiB-Standard. Es IST die App-Shell und muss
         // für den Offline-Start precacht werden – Limit entsprechend anheben.

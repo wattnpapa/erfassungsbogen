@@ -196,6 +196,15 @@ Grundlage: Repository `wattnpapa/erfassungsbogen`, Stand 2026-09-12 — Version 
 > (Verfügbarkeit, 5.5). Kein neuer Speicherort; das gemerkte Lese-Ergebnis
 > liegt nur im Arbeitsspeicher der geöffneten Seite.
 >
+> **Nachgezogen 2026-10-05:** Offline-Vorrat in zwei Stufen (Audit Runde 3,
+> R3-O3, `vite.config.ts`, `scripts/precache-aufteilung.ts`,
+> `src/app/offline-vorrat.ts`) — der Service Worker ist nach dem Kern
+> (6,7 MB) aktiv statt nach allen 10,7 MB; Beispielbögen und Themenseiten
+> lädt die Seite danach in den Laufzeit-Cache `eeb-zusatz`. Die Liste dafür
+> (`offline-zusatz.json`) entsteht beim Build. Keine neuen Hosts, CSP
+> unverändert (nur Abrufe an die eigene Herkunft, `connect-src 'self'`), keine
+> personenbezogenen Daten im Cache (3.4 unverändert).
+>
 > **Nachgezogen 2026-10-05:** Geräteschlüssel bei vollem Speicher (Audit
 > Runde 3, R3-E1) — scheitert das erstmalige Speichern des privaten
 > Schlüssels, signiert die App mit einem Schlüssel nur für diese Sitzung
@@ -310,7 +319,7 @@ Datenbank und keine Benutzerverwaltung.
 
 | # | Zielobjekt | Beschreibung | Plattform(en) |
 | --- | --- | --- | --- |
-| A1 | Web-App / PWA | Hauptauslieferungsform unter erfassungsbogen.app; als Progressive Web App vollständig offlinefähig (Service Worker precacht alle Bausteine). Zusätzlich aus demselben Build als GitLab Pages auf dem Open-CoDE-Spiegel veröffentlicht (`.gitlab-ci.yml`, Job `pages`) — identischer Code, anderer Host; Installer und Auto-Update laufen unverändert über GitHub | Browser (Desktop/Mobil) |
+| A1 | Web-App / PWA | Hauptauslieferungsform unter erfassungsbogen.app; als Progressive Web App vollständig offlinefähig (Service Worker precacht alle Bausteine; Beispielbögen und Themenseiten seit 2026-10-05 als zweite Stufe nach der Aktivierung, R3-O3). Zusätzlich aus demselben Build als GitLab Pages auf dem Open-CoDE-Spiegel veröffentlicht (`.gitlab-ci.yml`, Job `pages`) — identischer Code, anderer Host; Installer und Auto-Update laufen unverändert über GitHub | Browser (Desktop/Mobil) |
 | A2 | Desktop-App | Electron-Wrapper um dieselbe Web-App, für Windows, macOS und Linux; Auslieferung über GitHub Releases mit Auto-Update | Windows, macOS, Linux |
 | A3 | Android-App | Capacitor-Wrapper um dieselbe Web-App | Android |
 | A4 | iOS-App | Capacitor-Wrapper, laut Quellcode/Dokumentation in Vorbereitung, zum Analysezeitpunkt noch nicht produktiv | iOS (geplant) |
