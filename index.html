@@ -450,6 +450,12 @@
     /* Ein Knopf, mehrere Wege herein (Datei, Bilder, ganzer Ordner): das Menue
        haengt am Knopf und braucht deshalb dessen Kasten als Bezugspunkt. */
     .einlese { position: relative; display: inline-flex; }
+    /* Aufnahme-Knöpfe mit sichtbarer Unterzeile (R3-N5): was „scannen",
+       „manuell" und „einlesen" unterscheidet, steht im Knopf. */
+    .aktionen button.mit-zusatz { flex-direction: column; gap: 0; line-height: 1.25; }
+    .aktionen button.mit-zusatz > .knopf-zusatz {
+      display: block; font-size: var(--t-xs); font-weight: 400;
+    }
     /* Rückmeldung von „Bögen einlesen…" direkt unter den Aufnahme-Knöpfen
        (Audit Runde 3, R3-L1): Erfolg und Fehler untereinander (R3-E4). */
     .einlese-quittung { display: grid; gap: var(--r-2); margin-block: var(--r-2); }
@@ -1236,11 +1242,13 @@
     /* Wer der Empfänger anruft, steht nicht im Bogen, sondern in der
        Reihenfolge: die erste Person. Die Marke sagt das an der Karte, die es
        betrifft — leise, weil sie neben jedem Namen einmal steht. */
+    /* Ohne Rahmen (R3-N5): Das graue Kästchen sah wie ein Schalter aus. Die
+       Regel dahinter steht sichtbar unter dem Kopf (.ansprech-regel). */
     .ansprech-marke {
-      align-self: center; padding: 0.15rem 0.5rem;
-      border: var(--strich) solid var(--linie); border-radius: var(--radius);
-      color: var(--text-2); font-size: var(--t-xs);
+      align-self: center; padding: 0.15rem 0;
+      color: var(--text-2); font-size: var(--t-xs); font-weight: 600;
     }
+    .ansprech-regel { margin: 0 0 var(--r-2); }
     /* Laufende Nummer über dem Eintrag: „Person 3 von 12". Kein Titel, nur
        eine Ordnungszahl — sie steht darum klein und zurückgenommen über der
        Kopfzeile und nimmt ihr nicht das Gewicht. Nötig, weil frische Karten

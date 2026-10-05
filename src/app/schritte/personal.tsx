@@ -385,9 +385,13 @@ function PersonKarte(props: {
             das nicht an. Erst damit wird das Umsortieren daneben verständlich.
             „Erreichbar für Rückfragen" sagt, wozu — „Ansprechpartner/in" war
             ein Etikett ohne Aussage, ob es einen oder mehrere geben darf. */}
+        {/* Ohne Rahmen: Als graues Kästchen sah die Marke wie ein Schalter
+            aus, und die Regel dahinter stand nur im Tooltip, den es auf dem
+            Telefon nicht gibt (R3-N5). Die Regel steht darum sichtbar unter
+            dem Kopf. */}
         {ansprech && (
-          <span className="ansprech-marke" title="Die erste Person steht im PDF und in der Meldung als Ansprechpartner/in dieser Einheit — bei ihr fragt der Meldekopf nach">
-            Erreichbar für Rückfragen
+          <span className="ansprech-marke">
+            <span aria-hidden="true">☎ </span>Erreichbar für Rückfragen
           </span>
         )}
         <SortierKnoepfe index={index} anzahl={anzahl} gruppe="karte" verschieben={verschieben} />
@@ -420,6 +424,12 @@ function PersonKarte(props: {
           Person entfernen
         </button>
       </div>
+      {ansprech && (
+        <p className="hinweis ansprech-regel" id={`ansprech-regel-${index}`}>
+          Die erste Person der Liste steht im PDF und in der Meldung als Ansprechperson — bei ihr fragt der Meldekopf nach.
+          {anzahl > 1 && " Eine andere Person mit ▲/▼ an die erste Stelle setzen."}
+        </p>
+      )}
       {/* Rumpf des Eintrags in zwei Spalten, sobald die Karte breit genug ist:
           links die feststehenden Merkmale der Person, rechts, was sie kann und
           wie man sie erreicht. Untereinander gestapelt braucht eine Person auf

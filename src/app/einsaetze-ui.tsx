@@ -562,12 +562,16 @@ function BoegenEinlesenKnopf(props: {
     <div className="einlese" ref={huelle}>
       <button
         type="button"
+        className="mit-zusatz"
         aria-haspopup={mitOrdner ? "menu" : undefined}
         aria-expanded={mitOrdner ? offen : undefined}
+        aria-describedby="aufnahme-zusatz-einlesen"
         title="Fertig ausgefüllte Bögen aufnehmen: JSON- oder PDF-Datei, Fotos oder Screenshots von QR-Codes — auch viele auf einmal und mehrteilige Bögen."
         onClick={() => (mitOrdner ? setOffen((o) => !o) : dateiFeld.current?.click())}
       >
         Bögen einlesen…
+        {/* Sichtbar, nicht nur im Tooltip (R3-N5). */}
+        <span className="knopf-zusatz" id="aufnahme-zusatz-einlesen" aria-hidden="true">Dateien oder Fotos von QR-Codes</span>
       </button>
       {mitOrdner && offen && (
         <div className="einlese-menue" role="menu">
@@ -1062,8 +1066,18 @@ export function EinsatzDetail(props: {
           und Zwischensummen lag der Hauptknopf des Meldekopfs in keinem Fall
           im ersten Bild (Audit Runde 2, R2-S3). */}
       <div className="aktionen">
-        <button type="button" className="primaer" onClick={onScannen}>Bogen scannen…</button>
-        <button type="button" onClick={onManuell}>Einheit manuell erfassen…</button>
+        {/* Unterzeile sichtbar statt nur im Tooltip: „scannen" und „einlesen"
+            sind für einen Neuling dasselbe, und der Tipp auf „Bögen
+            einlesen…" öffnete ohne Erklärung die Dateiauswahl (R3-N5). Die
+            Unterzeile gehört nicht zum Knopfnamen, sie beschreibt ihn. */}
+        <button type="button" className="primaer mit-zusatz" onClick={onScannen} aria-describedby="aufnahme-zusatz-scan">
+          Bogen scannen…
+          <span className="knopf-zusatz" id="aufnahme-zusatz-scan" aria-hidden="true">mit Kamera oder Handscanner</span>
+        </button>
+        <button type="button" className="mit-zusatz" onClick={onManuell} aria-describedby="aufnahme-zusatz-manuell">
+          Einheit manuell erfassen…
+          <span className="knopf-zusatz" id="aufnahme-zusatz-manuell" aria-hidden="true">von Hand, ohne Bogen</span>
+        </button>
         {/* Datei, PDF, einzelne Bilder, viele Bilder, ganzer Ordner: ein Knopf,
             der die Sorte am Dateityp erkennt (siehe BoegenEinlesenKnopf). */}
         <BoegenEinlesenKnopf onDaten={onDateiImport} onBilder={onBilderImport} onEinlesen={props.onEinlesen} />
