@@ -1352,6 +1352,32 @@
       padding-right: max(min(1rem, 18px), env(safe-area-inset-right));
     }
     footer.nav .platzhalter { flex: 1; }
+    /* R3-L6: Moduswechsel aus der festen Leiste. Der Knopf ist schmal (nur
+       „◐"), die Wahl klappt über der Leiste auf, damit sie keine Zeile
+       kostet. */
+    .anzeige-leiste { display: inline-flex; flex: 0 0 auto; }
+    footer.nav .anzeige-leiste-knopf {
+      min-width: calc(var(--ziel-basis) + var(--ziel)); padding-inline: 0; font-size: var(--t-l);
+    }
+    /* Bezug ist die feste Leiste selbst: so breit wie sie, nie über den Rand. */
+    .anzeige-leiste-wahl {
+      position: absolute; bottom: calc(100% + var(--r-2)); left: var(--r-3); right: var(--r-3); z-index: 30;
+      display: flex; gap: 0; background: var(--flaeche);
+      border: var(--strich-stark) solid var(--linie-stark); border-radius: var(--radius);
+      box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.2);
+    }
+    footer.nav .anzeige-leiste-wahl button {
+      flex: 1 1 0; border: none; border-radius: 0; padding-inline: min(0.8rem, 14px);
+    }
+    footer.nav .anzeige-leiste-wahl button + button { border-left: var(--strich) solid var(--linie-stark); }
+    footer.nav .anzeige-leiste-wahl button.aktiv { background: var(--akzent); color: var(--auf-akzent); }
+    /* Unter 360 px passen „← Zurück", „◐" und „Zur Übersicht →" nicht in eine
+       Zeile (320 px, Feld: 372 px Inhalt). Dann trägt der Rückweg nur den
+       Pfeil — sein Name bleibt „← Zurück" (aria-label). */
+    @media (max-width: 22.4rem) {
+      footer.nav .nav-wort { display: none; }
+      footer.nav { gap: min(0.6rem, 2vw); }
+    }
     /* Quer am Telefon — das Gerät in der Fahrzeughalterung, eine der
        maßgeblichen Nutzungssituationen — blieben von 390 px Höhe nach
        Kopfbalken, Anzeigewahl, Speicherzeile, Schrittleiste und Übungsband

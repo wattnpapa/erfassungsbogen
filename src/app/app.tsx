@@ -121,7 +121,7 @@ import {
   type Entwurf,
 } from "./entwurf";
 import { SeitenKopf } from "./seiten-kopf";
-import { AnzeigeSchalter } from "./anzeige-schalter";
+import { AnzeigeLeistenKnopf, AnzeigeSchalter } from "./anzeige-schalter";
 import { orgFarbe, wendeOrgAkzentAn } from "./org-farben";
 import { einheitSymbolSvg, svgDataUrl } from "./taktische-zeichen-bogen";
 import { Fusszeile } from "./fusszeile";
@@ -3490,7 +3490,15 @@ function AppInhalt() {
 
       {schritt !== UEBERSICHT && (
         <footer className={sammelEinsatz ? "nav mit-uebernehmen" : "nav"}>
-          <button type="button" disabled={schritt === 0} onClick={() => setSchritt(schritt - 1)}>← Zurück</button>
+          {/* Unter 360 px steht nur „←" (das Wort fällt per CSS weg), damit der
+              Modusknopf daneben Platz hat; der Name bleibt „← Zurück". */}
+          <button type="button" aria-label="← Zurück" disabled={schritt === 0} onClick={() => setSchritt(schritt - 1)}>
+            ←<span className="nav-wort"> Zurück</span>
+          </button>
+          {/* Moduswechsel aus der festen Leiste, ohne die Stelle im Formular
+              zu verlieren (Audit Runde 3, R3-L6). Neben „← Zurück", nicht
+              neben „Weiter →": Ein Fehlgriff klappt nur die Wahl auf. */}
+          <AnzeigeLeistenKnopf />
           {/* Der Abschluss der Einsatz-Erfassung stand nur auf Schritt 6; am
               Meldekopf reicht oft Schritt 1 und 3 (F2). Im Hochformat steht er
               in eigener Zeile über dem Blättern: schmal zwischen „← Zurück" und

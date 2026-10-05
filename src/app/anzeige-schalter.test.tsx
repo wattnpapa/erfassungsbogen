@@ -9,7 +9,7 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { AnzeigeSchalter } from "./anzeige-schalter";
+import { AnzeigeLeistenKnopf, AnzeigeSchalter } from "./anzeige-schalter";
 import { anzeigeModus, NACHT_KOPF_FOND } from "./anzeige-modus";
 import { wendeOrgAkzentAn, orgAkzentPalette } from "./org-farben";
 import { OrganisationsTyp } from "@bos/eeb-format/model";
@@ -87,5 +87,30 @@ describe("theme-color folgt dem Anzeigemodus", () => {
     expect(metaFarbe()).toBe(orgAkzentPalette(OrganisationsTyp.THW).akzent);
     wendeOrgAkzentAn(undefined);
     expect(metaFarbe()).toBe("#12275e");
+  });
+});
+
+describe("AnzeigeLeistenKnopf (R3-L6)", () => {
+  it("klappt die vier Modi auf, wählt mit dem zweiten Tipp und klappt wieder zu", async () => {
+    const u = userEvent.setup();
+    render(<AnzeigeLeistenKnopf />);
+    const knopf = screen.getByRole("button", { name: /^Anzeigemodus Standard – ändern/ });
+    expect(screen.queryByRole("group", { name: "Anzeigemodus" })).toBeNull();
+    await u.click(knopf);
+    expect(knopf.getAttribute("aria-expanded")).toBe("true");
+    await u.click(screen.getByRole("button", { name: "Nacht" }));
+    expect(anzeigeModus()).toBe("nacht");
+    expect(document.documentElement.classList.contains("nacht-modus")).toBe(true);
+    expect(screen.queryByRole("group", { name: "Anzeigemodus" })).toBeNull();
+    expect(screen.getByRole("button", { name: /^Anzeigemodus Nacht/ })).toBeTruthy();
+  });
+
+  it("schließt mit Escape, ohne zu wählen", async () => {
+    const u = userEvent.setup();
+    render(<AnzeigeLeistenKnopf />);
+    await u.click(screen.getByRole("button", { name: /^Anzeigemodus/ }));
+    await u.keyboard("{Escape}");
+    expect(screen.queryByRole("group", { name: "Anzeigemodus" })).toBeNull();
+    expect(anzeigeModus()).toBe("standard");
   });
 });
