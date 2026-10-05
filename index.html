@@ -1398,6 +1398,24 @@
        statt abgeschnitten zu werden. Die Zweiknopf-Leiste bleibt, wie sie ist. */
     footer.nav .uebernehmen { flex-shrink: 1; overflow: visible; overflow-wrap: anywhere; }
     footer.nav:has(.uebernehmen) button:not(.uebernehmen) { padding-inline: min(1.1rem, 20px, 3.5vw); }
+    /* Hochformat: „In Einsatz übernehmen" in eigener Zeile über dem
+       Blättern. Zwischen „← Zurück" und „Weiter →" stand er 88–120 px breit
+       mit 9–11 px Abstand, bei 320 px dreizeilig mit Trennung im Wort — ein
+       Handschuh, der „Weiter" suchte, legte die halbe Einheit in die Lage
+       (Audit Runde 3, R3-G3). Quer bleibt die Zeile, dort liegen über 100 px
+       zwischen den Knöpfen. main und scroll-padding halten die höhere Leiste
+       frei. */
+    @media (max-width: 35.99rem) {
+      footer.nav.mit-uebernehmen { flex-wrap: wrap; row-gap: min(0.9rem, 14px); }
+      footer.nav.mit-uebernehmen .uebernehmen {
+        order: -1; flex: 1 1 100%; min-height: calc(var(--ziel-basis) + var(--ziel));
+        font-size: min(var(--t-m), max(16px, 5vmin)); white-space: nowrap; overflow-wrap: normal;
+        font-weight: 600; border-width: var(--strich-stark);
+      }
+      footer.nav.mit-uebernehmen button:not(.uebernehmen) { padding-inline: min(1.1rem, 20px); }
+      main.mit-uebernehmen { padding-bottom: calc(10rem + env(safe-area-inset-bottom)); }
+      html:has(main.mit-uebernehmen) { scroll-padding-bottom: calc(10rem + env(safe-area-inset-bottom)); }
+    }
     .fehler { color: var(--alarm); }
     .warnung {
       color: var(--warn-text); background: var(--warn-fond); border: var(--strich) solid var(--warn-linie);
@@ -2044,7 +2062,9 @@
        — wer Ruhezeit braucht, muss ohne „Details" erkennbar sein (K1). Warn-
        Tokens, weil jede Marke eine offene Anforderung ist. */
     .bedarf-zeile { display: flex; flex-wrap: wrap; gap: 0.3rem; margin-top: 0.25rem; }
-    .bedarf-marke {
+    /* .staerke-fehlt: Erfassung mit Stärke 0 (Audit Runde 3, R3-N1) — sieht
+       aus wie eine Bedarfsmarke, zählt aber nicht als Bedarf. */
+    .bedarf-marke, .staerke-fehlt {
       display: inline-block; padding: 0.05rem 0.4rem;
       background: var(--warn-fond); color: var(--warn-text);
       border: 1px solid var(--warn-linie); border-radius: var(--radius);
@@ -2056,7 +2076,7 @@
        Rand — „Unterbringung angefordert" bei 200 % Systemschrift, Seite
        442 statt 360 px (Audit Runde 2, R2-M1). Bei normaler Schrift passt
        jede Marke in eine Zeile, dort ändert sich nichts. */
-    .zug-badge, .teil-badge, .neu-badge, .alt-badge, .bedarf-marke { white-space: normal; max-width: 100%; }
+    .zug-badge, .teil-badge, .neu-badge, .alt-badge, .bedarf-marke, .staerke-fehlt { white-space: normal; max-width: 100%; }
     .bedarf-filter { margin-top: var(--r-2); }
     /* Audit Runde 2, R2-K4: Dringendes (Ruhezeit, Unterbringung, abweichende
        Verpflegung) hebt sich von Routine-Kraftstoff ab — nicht nur über die

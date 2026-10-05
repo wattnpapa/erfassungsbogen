@@ -115,6 +115,8 @@ function ovInHierarchieUebernehmen(daten: OvDaten, hierarchie: HierarchieEbene[]
  * Verlassen des Felds aufgelöst.
  */
 function OvVorschlagFeld(props: {
+  /** id des Eingabefelds — Sprungziel einer Rückfrage („Name der Einheit fehlt"). */
+  id?: string;
   wert: string;
   platzhalter: string;
   /** OV-Verzeichnis; leer, solange das Datenpaket noch lädt. */
@@ -124,7 +126,7 @@ function OvVorschlagFeld(props: {
   /** true: das Feld nimmt das Kürzel auf, nicht den Namen (R2-M6). */
   kennung?: boolean;
 }) {
-  const { wert, platzhalter, verzeichnis, tippen, uebernehmen, kennung } = props;
+  const { id, wert, platzhalter, verzeichnis, tippen, uebernehmen, kennung } = props;
 
   const suche = wert.trim().toLowerCase();
   const treffer = suche
@@ -138,6 +140,7 @@ function OvVorschlagFeld(props: {
 
   return (
     <VorschlagFeld
+      id={id}
       wert={wert}
       platzhalter={platzhalter}
       treffer={treffer}
@@ -478,6 +481,7 @@ export function SchrittEinheit({ bogen, aendern: aendernRoh }: SchrittProps) {
           <Feld titel={i === 0 ? "Name (Pflicht)" : "Name"}>
             {e.organisation === OrganisationsTyp.THW && h.bezeichnung.code === 1 ? (
               <OvVorschlagFeld
+                id={i === 0 ? "feld-einheit-name" : undefined}
                 wert={h.name}
                 platzhalter="tippen für Vorschläge…"
                 verzeichnis={ovVerzeichnis}
@@ -486,6 +490,7 @@ export function SchrittEinheit({ bogen, aendern: aendernRoh }: SchrittProps) {
               />
             ) : (
               <input
+                id={i === 0 ? "feld-einheit-name" : undefined}
                 value={h.name}
                 onChange={(ev) => setE({ hierarchie: e.hierarchie.map((x, j) => (j === i ? { ...x, name: ev.target.value } : x)) })}
               />

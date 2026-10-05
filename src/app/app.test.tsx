@@ -563,9 +563,12 @@ describe("Assistenten-Durchlauf", () => {
     // Direkt zur Stärke, ohne Umweg über „2. Einsatz".
     expect(screen.getByRole("heading", { level: 2, name: "3. Personal" })).toBeDefined();
     await nutzer.click(screen.getByRole("button", { name: "In Einsatz übernehmen" }));
+    // Stärke 0: die App fragt nach (R3-N1).
+    await nutzer.click(within(await screen.findByRole("dialog", { name: "Stärke fehlt" })).getByRole("button", { name: "Trotzdem mit Stärke 0 übernehmen" }));
     await screen.findByRole("heading", { level: 1, name: "Sammelhausen" });
     expect(einsaetzeLaden().find((x) => x.id === einsatz.id)!.eintraege).toHaveLength(1);
     expect(localStorage.getItem("eeb.entwurf.v1")).toBeNull();
+    expect(screen.getAllByText("Stärke fehlt").length).toBeGreaterThan(0);
 
     // Die nächste Erfassung in dieser Sammlung beginnt wieder mit „nur Stärke".
     await nutzer.click(screen.getByRole("button", { name: "Einheit manuell erfassen…" }));
@@ -678,6 +681,47 @@ describe("Assistenten-Durchlauf", () => {
   }, 20000);
 
   /**
+   * Audit Runde 3, R3-E3/R3-G3: Ein Tipp auf „In Einsatz übernehmen" direkt
+   * nach dem Öffnen legte eine namenlose Einheit „THW" mit Stärke 0 ab.
+   */
+  it("legt eine Erfassung ohne Namen nicht ab, sondern führt zum Namensfeld (R3-E3)", async () => {
+    const einsatz = einsatzImSpeicherAnlegen("Hochwasser Jagst", EinsatzArt.EINSATZ);
+    const nutzer = userEvent.setup();
+    render(<App />);
+    await nutzer.click(screen.getByRole("button", { name: "Öffnen" }));
+    await nutzer.click(await screen.findByRole("button", { name: "Einheit manuell erfassen…" }));
+    await nutzer.click(screen.getByRole("button", { name: /^3\. Personal/ }));
+    await nutzer.click(screen.getByRole("button", { name: "In Einsatz übernehmen" }));
+
+    const hinweis = await screen.findByRole("dialog", { name: "Name der Einheit fehlt" });
+    await nutzer.click(within(hinweis).getByRole("button", { name: "Zum Namensfeld" }));
+    expect(einsaetzeLaden().find((x) => x.id === einsatz.id)!.eintraege).toHaveLength(0);
+    expect(await screen.findByRole("heading", { level: 2, name: "1. Einheit" })).toBeDefined();
+    await waitFor(() => expect(document.activeElement?.id).toBe("feld-einheit-name"));
+  }, 20000);
+
+  /**
+   * Audit Runde 3, R3-N1: Name eingetragen, Stärke 0 — die Einheit lag ohne
+   * Rückfrage in der Lage. „Stärke eintragen" führt zu den Zählern.
+   */
+  it("fragt vor dem Ablegen mit Stärke 0 und führt mit „Stärke eintragen“ zu den Zählern (R3-N1)", async () => {
+    const einsatz = einsatzImSpeicherAnlegen("Hochwasser Neckar", EinsatzArt.EINSATZ);
+    const nutzer = userEvent.setup();
+    render(<App />);
+    await nutzer.click(screen.getByRole("button", { name: "Öffnen" }));
+    await nutzer.click(await screen.findByRole("button", { name: "Einheit manuell erfassen…" }));
+    await nutzer.type(screen.getByLabelText("Name (Pflicht)"), "Rottweil");
+    await nutzer.click(screen.getByRole("button", { name: "In Einsatz übernehmen" }));
+
+    const frage = await screen.findByRole("dialog", { name: "Stärke fehlt" });
+    expect(frage.textContent).toContain("THW Rottweil");
+    await nutzer.click(within(frage).getByRole("button", { name: "Stärke eintragen" }));
+    expect(await screen.findByRole("heading", { level: 2, name: "3. Personal" })).toBeDefined();
+    expect(within(screen.getByRole("banner")).getByText("Schnellerfassung")).toBeDefined();
+    expect(einsaetzeLaden().find((x) => x.id === einsatz.id)!.eintraege).toHaveLength(0);
+  }, 20000);
+
+  /**
    * Audit Runde 2, R2-A5: Vom Papier abgetippt heißt die Einheit „OV
    * Papierhausen", im Einsatz steht sie als „Papierhausen" — die Rückfrage
    * schwieg, die Einheit zählte doppelt. Die Uhrzeit vom Meldeblock geht im
@@ -693,6 +737,7 @@ describe("Assistenten-Durchlauf", () => {
     await nutzer.type(screen.getByLabelText("Eingetroffen um (vom Meldeblock)"), "09:40");
     await nutzer.type(screen.getByLabelText("Name (Pflicht)"), "OV Papierhausen");
     await nutzer.click(screen.getByRole("button", { name: "In Einsatz übernehmen" }));
+    await nutzer.click(within(await screen.findByRole("dialog", { name: "Stärke fehlt" })).getByRole("button", { name: "Trotzdem mit Stärke 0 übernehmen" }));
 
     const frage = await screen.findByRole("dialog", { name: "Ist das dieselbe Einheit?" });
     await nutzer.click(within(frage).getByRole("button", { name: "Nein — als eigene Einheit führen" }));

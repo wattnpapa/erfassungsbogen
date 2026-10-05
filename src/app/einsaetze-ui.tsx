@@ -2459,6 +2459,13 @@ function EinheitKarte(props: {
               <span className="bedarf-marke">Sollstärke, nicht gemeldet</span>
             </span>
           )}
+          {/* Stärke 0: zwischen lauter echten Zahlen fiel „0 / 0 / 0 / 0"
+              nicht auf (Audit Runde 3, R3-N1). */}
+          {!nurSollstaerke(kopf.bogen) && staerke(kopf.bogen).gesamt === 0 && (
+            <span className="muster-sub">
+              <span className="staerke-fehlt">Stärke fehlt</span>
+            </span>
+          )}
           {kopf.notiz && (
             <span className="muster-sub auftrag-notiz">
               Auftrag/Notiz: {kopf.notiz}

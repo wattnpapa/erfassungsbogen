@@ -1941,12 +1941,63 @@ function AppInhalt() {
     return wahl === "soll";
   }
 
+  /**
+   * Vor dem Ablegen einer Erfassung mit Stärke 0: Die Einheit galt sonst als
+   * angekommen, ihre Leute fehlten in Stärke, Verpflegung und Unterbringung,
+   * und auffallen konnte es nur in der Liste ganz unten (Audit Runde 3,
+   * R3-N1). „Stärke eintragen" springt zu Schritt 3 — ohne erfasste Personen
+   * gleich im Modus „Nur Stärke", dort stehen die Zähler.
+   * Rückgabe: true = ablegen.
+   */
+  async function staerkeFreigeben(b: Erfassungsbogen): Promise<boolean> {
+    if (nurSollstaerke(b) || staerke(b).gesamt > 0) return true;
+    const wahl = await frageWahl({
+      titel: "Stärke fehlt",
+      text: `„${einheitAnzeigename(b.einheit)}" hat noch keine Stärke (0 Personen). In der Lage zählte sie als Einheit ohne Leute.`,
+      wege: [
+        { wert: "eintragen", label: "Stärke eintragen", hinweis: "Springt zu „3. Personal“ — die Zahl genügt." },
+        { wert: "null", label: "Trotzdem mit Stärke 0 übernehmen", hinweis: "Die Karte trägt die Marke „Stärke fehlt“; nachtragen als Folgemeldung.", gefahr: true },
+      ],
+    });
+    if (wahl === "eintragen") {
+      if (b.personal.length === 0 && b.personalErfassung !== PersonalErfassung.NUR_STAERKE) {
+        setBogen({
+          ...b,
+          personalErfassung: PersonalErfassung.NUR_STAERKE,
+          staerkeManuell: { fuehrer: 0, unterfuehrer: 0, mannschaft: 0, gesamt: 0 },
+        });
+      }
+      setSchritt(2);
+    }
+    return wahl === "null";
+  }
+
   /** Erfassung für einen Einsatz abschließen: ablegen, dann den Arbeitsplatz räumen. */
   async function erfassungUebernehmen() {
     const ziel = sammelZielId;
     if (!ziel || !bogen || !fremdeErfassung) return;
     const b = bogen;
+    // Ohne Namen keine Meldung: Ein Tipp direkt nach dem Öffnen legte eine
+    // Einheit „THW" mit Stärke 0 in die Lage, die sich niemandem zuordnen
+    // ließ (Audit Runde 3, R3-E3, R3-G3). Gesperrt wird nur hier — im
+    // eigenen Bogen darf der Name weiter offen bleiben.
+    if (!einheitOrt(b.einheit) && b.einheit.standortRef == null) {
+      await zeigeHinweis({
+        titel: "Name der Einheit fehlt",
+        text: "Ohne Namen lässt sich die Meldung keiner Einheit zuordnen — in der Lage stünde nur die Organisation. Bitte zuerst den Namen eintragen.",
+        ok: "Zum Namensfeld",
+      });
+      einsatzWahlDialog.current?.close();
+      if (schritt !== 0) geheZuFeld(0, "feld-einheit-name");
+      else {
+        const feld = document.getElementById("feld-einheit-name");
+        feld?.scrollIntoView?.({ block: "center" });
+        feld?.focus({ preventScroll: true });
+      }
+      return;
+    }
     if (!(await sollstaerkeFreigeben(b))) return;
+    if (!(await staerkeFreigeben(b))) return;
     setMeldung("");
     const zeit = eintreffzeitAusUhrzeit(nachEintreffzeit);
     const vorherDa = new Set(einsaetzeLaden().find((s) => s.id === ziel)?.eintraege.map((e) => e.id));
@@ -2944,7 +2995,11 @@ function AppInhalt() {
     <FristBand bogen={bogen} />
     {/* Die Übersicht ist der einzige Schritt ohne fixe Schritt-Navigation
         (siehe unten) — sie braucht deshalb auch nicht den Freiraum dafür. */}
-    <main id="inhalt" tabIndex={-1} className={schritt === UEBERSICHT ? "ohne-nav" : undefined}>
+    <main
+      id="inhalt"
+      tabIndex={-1}
+      className={schritt === UEBERSICHT ? "ohne-nav" : sammelEinsatz ? "mit-uebernehmen" : undefined}
+    >
       {/* Rückmeldungen (Vorlage gespeichert, Beispielbogen geöffnet …) gehören
           dorthin, wo die Aktion ausgelöst wurde. Ohne diese Zeile blieben sie
           im Assistenten unsichtbar und tauchten später unvermittelt auf der
@@ -3039,10 +3094,13 @@ function AppInhalt() {
       )}
 
       {schritt !== UEBERSICHT && (
-        <footer className="nav">
+        <footer className={sammelEinsatz ? "nav mit-uebernehmen" : "nav"}>
           <button type="button" disabled={schritt === 0} onClick={() => setSchritt(schritt - 1)}>← Zurück</button>
           {/* Der Abschluss der Einsatz-Erfassung stand nur auf Schritt 6; am
-              Meldekopf reicht oft Schritt 1 und 3 (F2). */}
+              Meldekopf reicht oft Schritt 1 und 3 (F2). Im Hochformat steht er
+              in eigener Zeile über dem Blättern: schmal zwischen „← Zurück" und
+              „Weiter →" traf ein Handschuh, der „Weiter" suchte, das Ablegen
+              (Audit Runde 3, R3-G3). */}
           {sammelEinsatz ? (
             <button type="button" className="uebernehmen" onClick={() => void erfassungUebernehmen()}>In Einsatz übernehmen</button>
           ) : (

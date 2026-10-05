@@ -226,6 +226,8 @@ export const KENNUNG_EINGABE = {
 export const FREMDE_DATEN = { autoComplete: "off" } as const;
 
 export function VorschlagFeld<T>(props: {
+  /** id des Eingabefelds (Sprungziel); die Listen-IDs bleiben eigene. */
+  id?: string;
   wert: string;
   platzhalter?: string;
   beschriftung?: string;
@@ -253,7 +255,7 @@ export function VorschlagFeld<T>(props: {
   /** true: Kennung (Kürzel) — Großbuchstaben, ohne Autokorrektur ({@link KENNUNG_EINGABE}). */
   kennung?: boolean;
 }) {
-  const { wert, platzhalter, beschriftung, treffer, schluessel, zeile, tippen, waehlen, bestaetigen, verlassen, imFluss, picker, kennung } = props;
+  const { id: feldId, wert, platzhalter, beschriftung, treffer, schluessel, zeile, tippen, waehlen, bestaetigen, verlassen, imFluss, picker, kennung } = props;
   const ausFeld = useContext(FeldTitel);
   const [offen, setOffen] = useState(false);
   const [aktiv, setAktiv] = useState(0);
@@ -274,6 +276,7 @@ export function VorschlagFeld<T>(props: {
   return (
     <span className={["autocomplete", imFluss ? "im-fluss" : "", picker ? "picker" : ""].filter(Boolean).join(" ")}>
       <input
+        id={feldId}
         // Wie bei <Auswahl>: im umschließenden <label> zählt sonst der ganze
         // Textinhalt (hier die schon gesetzten Chips) als Feldname.
         aria-label={beschriftung ?? ausFeld}
