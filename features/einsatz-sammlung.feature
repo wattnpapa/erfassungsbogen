@@ -56,7 +56,8 @@ Funktionalität: Einsatz-Sammlung anlegen und Bögen darin sammeln
     Und ich im Dialog "Art" auf "Übung" stelle
     Und ich im Dialog auf "Einsatz anlegen" klicke
     Dann sehe ich die Überschrift "Sammelübung Nord"
-    Und sehe ich den Text "Übung"
+    # Hinter der Art steht seit R3-K5 die Zeit der letzten Meldung.
+    Und sehe ich den Hinweis "Übung · letzte Meldung"
     Und sehe ich die Überschrift "Einheiten (1 gemeldet"
 
   Szenario: Bogen schließen fragt in der App zurück
