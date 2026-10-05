@@ -1179,6 +1179,29 @@ describe("Assistenten-Durchlauf", () => {
     expect(localStorage.getItem("eeb.entwurf.ersetzt.v1")).toContain("Albstadt");
   }, 20000);
 
+  /**
+   * Audit Runde 4, R4-W3: Am Meldekopf (Sammlung, kein eigener Bogen) öffnete
+   * ein Kaltstart-Link den fremden Bogen als eigenen Arbeitsbogen. Die
+   * Entscheidung fiel beim Laden des Moduls — bevor main.tsx der Sammlung
+   * ihren Speicher reicht. Hier in derselben Reihenfolge wie main.tsx.
+   */
+  it("fragt beim Kaltstart-Link am Meldekopf ohne eigenen Bogen „Wohin damit?“ und legt in die Sammlung, ohne Entwurf (R4-W3)", async () => {
+    const sammlung = einsatzImSpeicherAnlegen("Hochwasser Eyach", EinsatzArt.EINSATZ);
+    window.location.hash = fragmentInhalt(encodePayloadUrl(bogenMitName("Albstadt"), browserKompressor));
+    vi.resetModules();
+    const { App: AppKalt } = await import("./app"); // Import vor dem Verdrahten, wie in main.tsx
+    (await import("./speicher-browser")).speicherVerdrahten();
+    (await import("./dialoge")).prellschutzSetzen(0); // frisches Modul: wie src/test/oberflaeche.ts
+    const nutzer = userEvent.setup();
+    render(<AppKalt />);
+
+    const frage = await screen.findByRole("dialog", { name: /Meldung von „THW Albstadt.*" empfangen/ });
+    await nutzer.click(within(frage).getByRole("button", { name: 'In „Hochwasser Eyach" aufnehmen' }));
+    await waitFor(() => expect(neuesteJeEinheit(einsaetzeLaden().find((e) => e.id === sammlung.id)!.eintraege)).toHaveLength(1));
+    expect(localStorage.getItem("eeb.entwurf.v1")).toBeNull();
+    expect(screen.queryByRole("button", { name: "Fortsetzen" })).toBeNull();
+  }, 20000);
+
   /** Audit Runde 3, R3-S7: Neuladen in der Einsatz-Erfassung führte zur Startseite. */
   it("öffnet nach dem Neuladen eine angefangene Erfassung für eine Sammlung direkt wieder (R3-S7)", async () => {
     const { entwurfZuJson } = await import("./entwurf");

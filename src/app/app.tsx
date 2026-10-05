@@ -541,14 +541,35 @@ const ENTWURF_GESPEICHERT = entwurfLaden();
  * Rückholplatz — ein dort liegender Bogen war gelöscht, bevor irgendein
  * Dialog erschien, und „Abbrechen" stellte nichts wieder her (Audit Runde 3,
  * R3-D2).
+ *
+ * Entschieden wird beim ersten Aufbau der App, nicht beim Laden dieses
+ * Moduls: Das Modul wird importiert, bevor main.tsx der Sammlung ihren
+ * Speicher reicht (`speicherVerdrahten`). Beim Laden sah `einsaetzeLaden()`
+ * darum nie eine Sammlung, und am Meldekopf ohne eigenen Bogen öffnete ein
+ * Kaltstart-Link den fremden Bogen als eigenen Arbeitsbogen, ohne „Wohin
+ * damit?" (Audit Runde 4, R4-W3).
  */
-const START_SOFORT: Erfassungsbogen | null =
-  START.bogen && !(ENTWURF_GESPEICHERT && bogenHatInhalt(ENTWURF_GESPEICHERT.bogen)) && einsaetzeLaden().length === 0
-    ? START.bogen
-    : null;
-/** Bogen aus dem Start-Link, der erst nach dem Mounten (mit Rückfrage) übernommen wird. */
-const START_EMPFANG: Erfassungsbogen | null = START.bogen && !START_SOFORT ? START.bogen : null;
-const ENTWURF = START_SOFORT ? null : ENTWURF_GESPEICHERT;
+interface StartLage {
+  sofort: Erfassungsbogen | null;
+  /** Bogen aus dem Start-Link, der erst nach dem Mounten (mit Rückfrage) übernommen wird. */
+  empfang: Erfassungsbogen | null;
+  entwurf: typeof ENTWURF_GESPEICHERT;
+}
+let startLageGemerkt: StartLage | null = null;
+function startLage(): StartLage {
+  if (!startLageGemerkt) {
+    const sofort =
+      START.bogen && !(ENTWURF_GESPEICHERT && bogenHatInhalt(ENTWURF_GESPEICHERT.bogen)) && einsaetzeLaden().length === 0
+        ? START.bogen
+        : null;
+    startLageGemerkt = {
+      sofort,
+      empfang: START.bogen && !sofort ? START.bogen : null,
+      entwurf: sofort ? null : ENTWURF_GESPEICHERT,
+    };
+  }
+  return startLageGemerkt;
+}
 
 // Nach einem Neuladen stellte der Browser die alte Scrollposition wieder her
 // — die Startseite stand dann 1 100 px unter der Entwurfskarte mit
@@ -562,7 +583,7 @@ try {
 
 /** Sammlung, für die der wiederhergestellte Entwurf erfasst wurde — falls es sie noch gibt. */
 function erfassungsZielBeimStart(): string | null {
-  const id = ENTWURF?.fremd?.einsatzId;
+  const id = startLage().entwurf?.fremd?.einsatzId;
   return id && einsaetzeLaden().some((s) => s.id === id) ? id : null;
 }
 
@@ -633,6 +654,7 @@ function useAnsichtBeginntOben(ansicht: string) {
 }
 
 function AppInhalt() {
+  const { sofort: START_SOFORT, empfang: START_EMPFANG, entwurf: ENTWURF } = startLage();
   const [bogen, setBogen] = useState<Erfassungsbogen | null>(START_SOFORT ?? ENTWURF?.bogen ?? null);
   /**
    * Kennung der gespeicherten Vorlage, die der offene Bogen gerade bearbeitet
