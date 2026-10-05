@@ -72,3 +72,35 @@ describe("Ortssperre nach einem Austausch unter dem Finger", () => {
     expect(getroffen).toHaveBeenCalledTimes(2);
   });
 });
+
+describe("Ortssperre beim Drücken und mit mitgegebener Stelle", () => {
+  afterEach(() => vi.restoreAllMocks());
+
+  it("verhindert an der gesperrten Stelle auch das Drücken (Fokus eines Felds), daneben nicht", () => {
+    tippSchutzZuruecksetzen();
+    ortSperren(undefined, { x: 100, y: 300 });
+    const feld = document.createElement("input");
+    document.body.appendChild(feld);
+    const druck = (x: number, y: number) => {
+      const e = new MouseEvent("mousedown", { bubbles: true, cancelable: true, clientX: x, clientY: y, detail: 1 });
+      feld.dispatchEvent(e);
+      return e.defaultPrevented;
+    };
+    expect(druck(105, 310)).toBe(true);
+    expect(druck(100, 300 + ORTSSPERRE_RADIUS_PX + 20)).toBe(false);
+    feld.remove();
+  });
+
+  it("sperrt eine mitgegebene Stelle auch ohne frischen Tipp (Rückfrage dazwischen)", () => {
+    tippSchutzZuruecksetzen();
+    const getroffen = vi.fn<(e: Event) => void>();
+    const knopf = document.createElement("button");
+    knopf.addEventListener("click", getroffen);
+    document.body.appendChild(knopf);
+    tipp(knopf, 180, 500); // „Person entfernen" im Dialog
+    ortSperren(undefined, { x: 100, y: 250 }); // Stelle des Knopfs an der Karte
+    tipp(knopf, 102, 252);
+    expect(getroffen).toHaveBeenCalledTimes(1);
+    knopf.remove();
+  });
+});

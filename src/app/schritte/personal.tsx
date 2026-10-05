@@ -3,7 +3,9 @@
  * und die Meldekopf-Schnellerfassung (nur Stärke).
  */
 
-import { Fragment, useEffect, useMemo, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from "react";
+import { Fragment, useEffect, useLayoutEffect, useMemo, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from "react";
+import { DaumenQuittung } from "../daumen-quittung";
+import { ortSperren } from "../tipp-schutz";
 import { useZahlQuittung } from "../quittung";
 import { mitAbgang, useEinzugsstempel } from "../eintrag-bewegung";
 import {
@@ -332,7 +334,8 @@ function PersonKarte(props: {
   /** Meldekopf-Schnellerfassung: die Karte zählt nicht in die Stärke — das steht dran. */
   nichtGezaehlt?: boolean;
   aendern: (p: Person) => void;
-  entfernen: () => void;
+  /** `ort`: Stelle des Tipps auf „Person entfernen" (Bildschirm), sofern getippt. */
+  entfernen: (ort?: { x: number; y: number }) => void;
   verschieben: (von: number, nach: number, gruppe: "karte" | "zeile", art: "hoch" | "runter") => void;
 }) {
   const { person: p, org, vorschlaege, haeufigeFunktionen, frisch, index, anzahl, ansprech, nichtGezaehlt, aendern, entfernen, verschieben } = props;
@@ -342,7 +345,7 @@ function PersonKarte(props: {
   const set = (patch: Partial<Person>) => aendern({ ...p, ...patch });
   const funktionen = vokabularFuer(org, "funktion");
   return (
-    <div className="karte eintrag" ref={karte}>
+    <div className="karte eintrag" ref={karte} data-person-index={index}>
       {/* Kopf des Eintrags: wer die Person ist und welche Stärkerolle sie vor
           Ort ausfüllt — die einzige Auskunft, nach der man in einer Liste von
           zwölf Personen sucht. Sie steht darum allein in der breitesten Zeile,
@@ -391,7 +394,10 @@ function PersonKarte(props: {
           type="button"
           className="entfernen"
           aria-label={`${bezeichnung} entfernen`}
-          onClick={async () => {
+          onClick={async (e) => {
+            // Die Stelle des Fingers — nach der Rückfrage zählt sonst nur der
+            // Tipp auf „Person entfernen" im Dialog (R3-D3).
+            const ort = e.detail > 0 ? { x: e.clientX, y: e.clientY } : undefined;
             /* Rückfrage nur, wenn etwas verloren geht: eine eben danebengetippte
                leere Karte verschwindet sofort, eine ausgefüllte erst nach
                Bestätigung. Ohne diese Rückfrage war das Löschen die einzige
@@ -407,7 +413,7 @@ function PersonKarte(props: {
             }))) {
               return;
             }
-            mitAbgang(karte.current, entfernen);
+            mitAbgang(karte.current, () => entfernen(ort));
           }}
         >
           Person entfernen
@@ -487,7 +493,7 @@ function PersonalSchnellTabelle(props: {
   aufNeueFokus: () => void;
   verschieben: (von: number, nach: number, gruppe: "karte" | "zeile", art: "hoch" | "runter") => void;
   /** Nach dem Entfernen einer Zeile: Quittung mit „Rückgängig" (R2-G1). */
-  entfernt: (vorher: Person[], bezeichnung: string) => void;
+  entfernt: (person: Person, index: number, bezeichnung: string) => void;
   org: OrganisationsTyp;
 }) {
   const { personal, aendern, fokusNeue, aufNeueFokus, verschieben, entfernt, org } = props;
@@ -515,7 +521,7 @@ function PersonalSchnellTabelle(props: {
       return;
     }
     aendern(personal.filter((_, j) => j !== i));
-    if (!personLeer(p)) entfernt(personal, bezeichnung);
+    if (!personLeer(p)) entfernt(p, i, bezeichnung);
   }
 
   function enterWeiter(e: ReactKeyboardEvent, i: number) {
@@ -644,34 +650,94 @@ export function SchrittPersonal({ bogen, aendern: aendernRoh }: SchrittProps) {
    * Rückweg nach einer Handlung, die Erfasstes wegnimmt: Person entfernen,
    * Namen einfügen, Sollplätze laden. Eine gelöschte Person nahm Name,
    * Funktionen und Erreichbarkeit ohne jeden Rückweg mit — und ein Doppeltipp
-   * genügte (Audit Runde 2, R2-G1, R2-N2). `index`: an dieser Stelle der
-   * Kartenliste steht die Quittung, also dort, wo der Finger gerade war.
-   * Jede weitere Änderung verwirft den Rückweg, damit „Rückgängig" nie
-   * spätere Eingaben mitnimmt.
+   * genügte (Audit Runde 2, R2-G1, R2-N2).
+   *
+   * Ganze Liste (`liste`): Jede weitere Änderung verwirft den Rückweg, damit
+   * „Rückgängig" nie spätere Eingaben mitnimmt; die Quittung steht oben bei
+   * den Knöpfen, die sie auslösen.
+   *
+   * Eine Person (`person`): R2-G1 setzte die Quittung an die Stelle der
+   * entfernten Karte — an deren Oberkante, „Person entfernen" sitzt aber
+   * unten an der rund 600 px hohen Karte; die Quittung lag oberhalb des
+   * Bilds und verfiel mit der nächsten Eingabe (Audit Runde 3, R3-G1,
+   * R3-D3). Jetzt steht sie als Leiste im Daumenbereich über „Weiter →" und
+   * bleibt bis ✕, bis zum nächsten Entfernen oder bis der Schritt verlassen
+   * wird. „Rückgängig" fügt die Person an ihrer alten Stelle wieder ein und
+   * lässt alles später Eingetragene stehen.
    */
-  const [rueckweg, setRueckweg] = useState<{ text: string; personal: Person[]; index?: number } | null>(null);
+  type Rueckweg =
+    | { art: "liste"; text: string; personal: Person[] }
+    | { art: "person"; name: string; person: Person; index: number; nonce: number };
+  const [rueckweg, setRueckweg] = useState<Rueckweg | null>(null);
+  // Quittung des Zurückholens (ohne weiteren Rückweg, wie in der Einsatzansicht).
+  const [zurueckgeholt, setZurueckgeholt] = useState<{ text: string; nonce: number } | null>(null);
   // Jede Änderung hier kann die Stärke verschieben — der Verpflegungs-Bedarf
   // in Schritt 5 zieht mit, solange er der Stärke entsprach (verpflegungMitziehen).
   const aendern = (patch: Partial<typeof bogen>) => {
-    setRueckweg(null);
+    setRueckweg((r) => (r?.art === "person" ? r : null));
     aendernRoh(verpflegungMitziehen(bogen, patch));
   };
   /** Liste ändern und den vorigen Stand als Rückweg anbieten. */
-  const aendernMitRueckweg = (personal: Person[], text: string, index?: number) => {
+  const aendernMitRueckweg = (personal: Person[], text: string) => {
     const vorher = bogen.personal;
     aendern({ personal });
-    setRueckweg({ text, personal: vorher, index });
+    setZurueckgeholt(null);
+    setRueckweg({ art: "liste", text, personal: vorher });
+  };
+  /** Eine Person ist weg: Rückweg in der Daumenleiste. */
+  const personEntfernt = (person: Person, index: number, bezeichnung: string) => {
+    setZurueckgeholt(null);
+    setRueckweg({ art: "person", name: bezeichnung, person, index, nonce: Date.now() });
   };
   const rueckgaengig = () => {
     if (!rueckweg) return;
-    aendern({ personal: rueckweg.personal });
+    if (rueckweg.art === "liste") {
+      aendern({ personal: rueckweg.personal });
+      return;
+    }
+    const liste = [...bogen.personal];
+    const stelle = Math.min(rueckweg.index, liste.length);
+    liste.splice(stelle, 0, rueckweg.person);
+    setRueckweg(null);
+    setFrischeKarte(rueckweg.person);
+    setZurueckgeholt({ text: `Zurückgeholt: ${rueckweg.name} (wieder Person ${stelle + 1})`, nonce: Date.now() });
+    aendernRoh(verpflegungMitziehen(bogen, { personal: liste }));
   };
-  const quittung = rueckweg && (
+  const quittung = rueckweg?.art === "liste" && (
     <p className="meldung rueckweg" role="status">
       {rueckweg.text}{" "}
       <button type="button" onClick={rueckgaengig}>Rückgängig</button>
     </p>
   );
+  // Nach dem Entfernen in der Kartenansicht rückt die nächste Karte an die
+  // Stelle der entfernten — ihr „Person entfernen" lag dann fast genau unter
+  // dem Finger (R3-G1, R3-D3). Die Ansicht beginnt darum mit dem Anfang der
+  // nachgerückten Karte (Name), und die alte Fingerstelle nimmt kurz keinen
+  // Tipp an.
+  const [nachEntfernen, setNachEntfernen] = useState<{ index: number; ort?: { x: number; y: number } } | null>(null);
+  useLayoutEffect(() => {
+    if (!nachEntfernen) return;
+    setNachEntfernen(null);
+    const { index, ort } = nachEntfernen;
+    if (ort) ortSperren(undefined, ort);
+    const ziel =
+      document.querySelector<HTMLElement>(`[data-person-index="${index}"]`) ??
+      document.querySelector<HTMLElement>(`[data-person-index="${index - 1}"]`);
+    if (!ziel) return;
+    const oben = ziel.getBoundingClientRect().top;
+    const frei = 8;
+    try {
+      window.scrollBy(0, Math.round(oben - frei));
+      // Liegt „Person entfernen" der nachgerückten Karte (breite Karte, quer)
+      // trotzdem unter der alten Fingerstelle, rückt die Karte tiefer.
+      const knopf = ort && ziel.querySelector<HTMLElement>("button.entfernen")?.getBoundingClientRect();
+      if (ort && knopf && knopf.height > 0 && knopf.top < ort.y + 50 && knopf.bottom > ort.y - 50) {
+        window.scrollBy(0, -Math.round(ort.y + 50 - knopf.top));
+      }
+    } catch {
+      /* Testumgebung ohne Layout */
+    }
+  }, [nachEntfernen]);
   const nurStaerke = bogen.personalErfassung === PersonalErfassung.NUR_STAERKE;
   const vorlage = stanPersonalVorbelegung(bogen.einheit.organisation, bogen.einheit.einheitsTyp);
   const stanGeladen = vorbelegungGeladen(bogen.personal, vorlage);
@@ -971,7 +1037,7 @@ export function SchrittPersonal({ bogen, aendern: aendernRoh }: SchrittProps) {
           </button>
         </p>
       )}
-      {quittung && rueckweg?.index == null && quittung}
+      {quittung}
       {!nurStaerke && schnell ? (
         bogen.personal.length > 0 && (
           <PersonalSchnellTabelle
@@ -980,14 +1046,13 @@ export function SchrittPersonal({ bogen, aendern: aendernRoh }: SchrittProps) {
             fokusNeue={fokusNeue}
             aufNeueFokus={() => setFokusNeue(true)}
             verschieben={personVerschieben}
-            entfernt={(vorher, bezeichnung) => setRueckweg({ text: `${bezeichnung} entfernt.`, personal: vorher })}
+            entfernt={personEntfernt}
             org={bogen.einheit.organisation}
           />
         )
       ) : (
         bogen.personal.map((p, i) => (
           <Fragment key={i}>
-          {rueckweg?.index === i && quittung}
           <PersonKarte
             key={i}
             person={p}
@@ -1001,17 +1066,29 @@ export function SchrittPersonal({ bogen, aendern: aendernRoh }: SchrittProps) {
             nichtGezaehlt={nurStaerke}
             verschieben={personVerschieben}
             aendern={(np) => aendern({ personal: bogen.personal.map((x, j) => (j === i ? np : x)) })}
-            entfernen={() => {
+            entfernen={(ort) => {
               const rest = bogen.personal.filter((_, j) => j !== i);
               if (personLeer(p)) aendern({ personal: rest });
-              else aendernMitRueckweg(rest, `${personBezeichnung(p, i)} entfernt.`, i);
+              else {
+                aendern({ personal: rest });
+                personEntfernt(p, i, personBezeichnung(p, i));
+                setNachEntfernen({ index: i, ort });
+              }
             }}
           />
           </Fragment>
         ))
       )}
-      {/* Die letzte Karte entfernt: die Quittung steht, wo sie war. */}
-      {!schnell && rueckweg?.index != null && rueckweg.index >= bogen.personal.length && quittung}
+      {rueckweg?.art === "person" && (
+        <DaumenQuittung key={`person:${rueckweg.nonce}`} onRueckgaengig={rueckgaengig} onSchliessen={() => setRueckweg(null)}>
+          <strong>Entfernt:</strong> {rueckweg.name}
+        </DaumenQuittung>
+      )}
+      {zurueckgeholt && !rueckweg && (
+        <DaumenQuittung key={`zurueck:${zurueckgeholt.nonce}`} onSchliessen={() => setZurueckgeholt(null)}>
+          {zurueckgeholt.text}
+        </DaumenQuittung>
+      )}
       <button
         type="button"
         className="primaer"

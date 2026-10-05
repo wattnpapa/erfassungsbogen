@@ -74,25 +74,41 @@ function klickPruefen(e: MouseEvent) {
   letzterTipp = { x: e.clientX, y: e.clientY, zeit: jetzt };
 }
 
+/** Ein Feld nimmt den Fokus schon beim Drücken — auch das an der gesperrten Stelle abfangen. */
+function druckPruefen(e: MouseEvent) {
+  if (!mitOrt(e) || !sperre || Date.now() > sperre.bis) return;
+  if (Math.hypot(e.clientX - sperre.x, e.clientY - sperre.y) <= ORTSSPERRE_RADIUS_PX) {
+    e.preventDefault();
+    e.stopImmediatePropagation();
+  }
+}
+
 let installiert = false;
 /** Einmal je Seite: der Prüfer sitzt vor React (Fenster, Einfangphase). */
 export function tippSchutzInstallieren(): void {
   if (installiert || typeof window === "undefined") return;
   installiert = true;
   window.addEventListener("click", klickPruefen, true);
+  window.addEventListener("mousedown", druckPruefen, true);
 }
 tippSchutzInstallieren();
 
 /**
  * Die Stelle des Tipps eben für `ms` sperren. Aufzurufen von einer Handlung,
  * nach der unter dem Finger etwas anderes liegt — auch nach einer Rückfrage:
- * dann gilt der Ort des bestätigenden Tipps.
+ * dann gilt der Ort des bestätigenden Tipps, oder `ort`, wenn die Handlung
+ * die Stelle des auslösenden Knopfs selbst mitgibt (Person entfernen).
  */
-export function ortSperren(ms: number = ORTSSPERRE_MS): void {
-  const t = letzterTipp;
-  if (!t || ms <= 0 || Date.now() - t.zeit > TIPP_FRISCH_MS) return;
+export function ortSperren(ms: number = ORTSSPERRE_MS, ort?: { x: number; y: number }): void {
+  if (ms <= 0) return;
+  let stelle = ort;
+  if (!stelle) {
+    const t = letzterTipp;
+    if (!t || Date.now() - t.zeit > TIPP_FRISCH_MS) return;
+    stelle = t;
+  }
   const bis = Date.now() + ms;
-  sperre = { x: t.x, y: t.y, bis: Math.max(bis, sperre?.bis ?? 0) };
+  sperre = { x: stelle.x, y: stelle.y, bis: Math.max(bis, sperre?.bis ?? 0) };
 }
 
 /** Ort des letzten Tipps (Bildschirmkoordinaten), solange er frisch ist. */

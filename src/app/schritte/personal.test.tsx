@@ -417,7 +417,7 @@ describe("Schritt Personal", () => {
     expect(screen.getByDisplayValue("Thomas")).toBeDefined();
   });
 
-  it("quittiert „Person entfernen“ mit Rückgängig an der Stelle der Karte (R2-G1)", async () => {
+  it("quittiert „Person entfernen“ in der Daumenleiste, der Rückweg übersteht weitere Eingaben (R2-G1, R3-G1, R3-D3)", async () => {
     const nutzer = userEvent.setup();
     render(
       <SchrittBuehne
@@ -430,10 +430,21 @@ describe("Schritt Personal", () => {
     await nutzer.click(within(frage).getByRole("button", { name: "Person entfernen" }));
     await waitFor(() => expect(screen.queryByDisplayValue("Paul")).toBeNull());
 
-    expect(screen.getByText(/Stein, Paul entfernt/)).toBeDefined();
-    await nutzer.click(screen.getByRole("button", { name: "Rückgängig" }));
-    expect(screen.getByDisplayValue("Paul")).toBeDefined();
-    expect(screen.getByDisplayValue("Eva")).toBeDefined();
+    // Feste Leiste im Daumenbereich statt an der Kartenoberkante (R3-G1).
+    const daumen = () => document.querySelector<HTMLElement>(".quittung-daumen")!;
+    const leiste = daumen();
+    expect(leiste.getAttribute("role")).toBe("status");
+    expect(leiste.textContent).toMatch(/^Entfernt: Stein, Paul/);
+
+    // Eine weitere Eingabe nimmt den Rückweg nicht mehr weg (R3-D3) …
+    await nutzer.type(screen.getByDisplayValue("Eva"), "-Maria");
+    // … und „Rückgängig" lässt sie stehen: Paul kommt an seine alte Stelle.
+    await nutzer.click(within(daumen()).getByRole("button", { name: "Rückgängig" }));
+    const vornamen = screen.getAllByLabelText("Vorname").map((f) => (f as HTMLInputElement).value);
+    expect(vornamen).toEqual(["Paul", "Eva-Maria"]);
+    const zurueck = daumen();
+    expect(zurueck.textContent).toMatch(/^Zurückgeholt: Stein, Paul \(wieder Person 1\)/);
+    expect(within(zurueck).queryByRole("button", { name: "Rückgängig" })).toBeNull();
   });
 
   it("versteckt den Beispielnamen-Weg bei echten Bögen vollständig", async () => {
