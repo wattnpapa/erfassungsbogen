@@ -55,6 +55,7 @@ import { FehlerImBild } from "./fehler-im-bild";
 import { entfernteImImportKlaeren } from "./entfernte-meldungen";
 import { FensterKonflikt, useFensterAbgleich } from "./fenster-abgleich";
 import { entwirreScanText } from "./tastaturbelegung";
+import { ortSperren } from "./tipp-schutz";
 import { vorlageAktualisieren, vorlageAnlegen, vorlageAusDatei, vorlagenLaden, vorlagenPapierkorb, vorlageZuruecksetzen, type Vorlage } from "./vorlagen";
 import { Musterung, VorlagenListe } from "./vorlagen-ui";
 import { absenderkarteGefuellt, absenderkarteLaden, type Absenderkarte } from "./absenderkarte";
@@ -828,6 +829,12 @@ function AppInhalt() {
       return;
     }
     if (ansichtGleich(vorher, jetzt)) return;
+    // Unter dem Finger liegt jetzt etwas anderes: Nach „Weiter →" wieder
+    // „Weiter →" (ein Doppeltipp übersprang Schritt 2), nach „Neuen Bogen
+    // erstellen" das „◐" des Assistenten (das Darstellungsmenü ging auf).
+    // Die Stelle des Tipps eben nimmt 1,5 s nichts an (Audit Runde 4, R4-S2,
+    // R4-S3) — wie nach „Abrücken".
+    ortSperren();
     if (verlaufZielRef.current && ansichtGleich(verlaufZielRef.current, jetzt)) {
       verlaufZielRef.current = null; // Rücksprung angekommen — kein neuer Eintrag
       return;

@@ -12,6 +12,7 @@ import { encodePayload, encodePayloadUrl, encodeVorlagePayloadUrl, fragmentInhal
 import { encodeSigniertPayloadUrl, schluesselpaarErzeugen } from "@bos/eeb-format/signatur";
 import { browserKompressor, neuerBogen } from "./hilfen";
 import { geraeteSchluesselLoeschen } from "./geraete-schluessel";
+import { tippSchutzZuruecksetzen } from "./tipp-schutz";
 import { vorlageAnlegen, vorlagenLaden } from "./vorlagen";
 import { einsatzDateiInhalt } from "./einsatz-transport";
 import { einheitEntfernen, eintreffzeitSetzen, zeitLang } from "./eintrag-zeiten";
@@ -174,6 +175,36 @@ describe("Assistenten-Durchlauf", () => {
     // Auch zwei Schritte weiter, nicht nur auf Schritt 1.
     await nutzer.click(screen.getByRole("button", { name: /^3\. Personal/ }));
     expect(within(screen.getByRole("banner")).getByText("Schnellerfassung")).toBeDefined();
+  });
+
+  /**
+   * Audit Runde 4, R4-S2/R4-S3: Nach „Weiter →" liegt dort wieder „Weiter →",
+   * nach „Neuen Bogen erstellen" das „◐". Ein zögernder zweiter Tipp an
+   * derselben Stelle übersprang Schritt 2 bzw. öffnete das Darstellungsmenü.
+   * Nach jedem Ansichtswechsel nimmt die Fingerstelle 1,5 s nichts an.
+   */
+  it("sperrt nach einem Ansichtswechsel die Fingerstelle — ein Doppeltipp auf „Weiter →“ überspringt keinen Schritt (R4-S2)", async () => {
+    tippSchutzZuruecksetzen();
+    render(<App />);
+    const tipp = (el: HTMLElement) =>
+      act(() => {
+        el.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true, clientX: 300, clientY: 600, detail: 1 }));
+      });
+    tipp(screen.getByRole("button", { name: "Neuen Bogen erstellen" }));
+    await screen.findByRole("heading", { level: 2, name: "1. Einheit" });
+    tipp(screen.getByRole("button", { name: "Weiter →" })); // der zweite Tipp des Doppeltipps
+    expect(screen.getByRole("heading", { level: 2, name: "1. Einheit" })).toBeDefined();
+    vi.useFakeTimers({ toFake: ["Date"], now: Date.now() + 1600 });
+    try {
+      tipp(screen.getByRole("button", { name: "Weiter →" })); // bewusst, nach der Sperre
+      expect(screen.getByRole("heading", { level: 2, name: "2. Einsatz" })).toBeDefined();
+      vi.setSystemTime(Date.now() + 700);
+      tipp(screen.getByRole("button", { name: "Weiter →" })); // Doppeltipp mit 700 ms
+      expect(screen.getByRole("heading", { level: 2, name: "2. Einsatz" })).toBeDefined();
+    } finally {
+      vi.useRealTimers();
+      tippSchutzZuruecksetzen();
+    }
   });
 
   it("beginnt jeden Schritt oben und setzt den Fokus auf die Schrittüberschrift (R2-H1)", async () => {
