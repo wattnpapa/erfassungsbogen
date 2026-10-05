@@ -402,3 +402,18 @@ Konfliktwarnung (R4-S4). Die Ortssperre aus R3-S5 wirkt, ist aber auf
 Ansichtswechsel (R4-S2, R4-S3) haben sie nicht. Neu sind R4-S1 bis R4-S5:
 zwei P2, drei P3. R4-G1 und R4-M5 stehen in anderen Runde-4-Berichten und
 sind hier nicht mitgezählt.
+
+## Stand der Behebung
+
+Stand 05.10.2026, Paket 1 „Rückfragen, Links, Rückholplatz, Zurück-Geste".
+Geprüft mit Typprüfung, Unit-Tests (2 446 grün), Verhaltenstests (137
+Szenarien grün) und Nachmessung im Dev-Server (360 × 640,
+`isMobile`/`hasTouch`, de-DE, Port 5180). Aufgeführt sind nur die Befunde
+dieses Pakets.
+
+| Befund | Stand | Umsetzung |
+| --- | --- | --- |
+| R4-S1 Zurück-Geste bei offener Rückfrage | behoben | Der Verlaufs-Lauscher schließt zuerst das oberste offene Fenster wie Escape und legt den verbrauchten Eintrag neu an; QR-Vollbild und Scanner führen ihren Rücksprung selbst. Nachlauf (`history.back()`): „Person entfernen", „Einsatz löschen…", „Einheit manuell erfassen…" mit eigenem Bogen, „Bogen übergeben", „In Einsatz-Sammlung ablegen", Datenschutz — Fenster zu, Ansicht wie vorher, Speicher unverändert; zweites Zurück → Startseite. |
+| R4-S2 Doppeltipp auf „Weiter →" überspringt einen Schritt | behoben | Jeder Ansichtswechsel sperrt die Fingerstelle 1,5 s. Nachlauf t07: 150/350/700 ms → „2. Einsatz". |
+| R4-S3 Zweiter Tipp nach „Neuen Bogen erstellen" trifft „◐" | behoben | Dieselbe Sperre. Nachlauf t07: 150/350/700 ms → „1. Einheit", kein Darstellungsmenü. |
+| R4-S4 „Meine Fassung behalten" verwirft das andere Fenster | weitgehend | Der Stand des anderen Fensters kommt auf den Rückholplatz; fiele dort ein dritter Bogen, fragt „Meine Fassung behalten?" und nennt ihn. Die Warnung nennt Name und Stand des anderen Fensters, aber nicht das geänderte Feld; „laden" kehrt in den Schritt zurück. Nachlauf zwei Tabs: A-Ort/B-Ort, B behält → Entwurf B-Ort, Rückholplatz A-Ort; Fall R3-S3 → Rückfrage, dann Entwurf TabA2, Rückholplatz TabB, kein Bogen doppelt; „laden" → „2. Einsatz". |

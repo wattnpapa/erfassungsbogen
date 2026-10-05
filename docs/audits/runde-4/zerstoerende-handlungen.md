@@ -406,3 +406,15 @@ Bilanz: Alle vier eigenen Runde-3-Befunde halten, R3-D4 mit einem Rest
 (R4-D3). Keine Behebung hat sich verkehrt. Neu sind R4-D1, R4-D2, R4-D4 und
 R4-D5; sie liegen in Wegen, die Runde 3 nicht geprüft hat (Uhrsprung,
 Einspielen ohne laufende Sammlung, Vorbelegung, Zusammenführen).
+
+## Stand der Behebung
+
+Stand 05.10.2026, Paket 1 „Rückfragen, Links, Rückholplatz, Zurück-Geste".
+Geprüft mit Typprüfung, Unit-Tests (2 446 grün), Verhaltenstests (137
+Szenarien grün) und Nachmessung im Dev-Server (360 × 640,
+`isMobile`/`hasTouch`, de-DE, Port 5180). Aufgeführt sind nur die Befunde
+dieses Pakets.
+
+| Befund | Stand | Umsetzung |
+| --- | --- | --- |
+| R4-D2 „Sicherung einspielen" verschweigt Rückholplatz und Absenderkarte | behoben | Beide Aufzählungen nennen Vorlagen (aktiv/Papierkorb), Rückholplatz, Absenderkarte und Geräteschlüssel mit Kurzform vorher/nachher; der Haken ist Pflicht, sobald auf dem Gerät etwas verloren geht. Nachlauf (leerer Arbeitsplatz, Rückholplatz Crailsheim, Absenderkarte, Schlüssel; Sicherung mit 1 Vorlage): alle drei genannt, „Einspielen und ersetzen" bis zum Haken gesperrt. |

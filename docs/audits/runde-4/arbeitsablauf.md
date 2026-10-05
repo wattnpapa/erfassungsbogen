@@ -537,3 +537,15 @@ gilt, und bei den Lieferungen an den Stab.
 - **Top-Priorität für die nächste Iteration:** Beim Eintreffen eines Bogens
   für eine schnell erfasste Einheit die Schnellerfassung ersetzen lassen
   statt nach dem Zeitstempel zu entscheiden (R4-W1).
+
+## Stand der Behebung
+
+Stand 05.10.2026, Paket 1 „Rückfragen, Links, Rückholplatz, Zurück-Geste".
+Geprüft mit Typprüfung, Unit-Tests (2 446 grün), Verhaltenstests (137
+Szenarien grün) und Nachmessung im Dev-Server (360 × 640,
+`isMobile`/`hasTouch`, de-DE, Port 5180). Aufgeführt sind nur die Befunde
+dieses Pakets.
+
+| Befund | Stand | Umsetzung |
+| --- | --- | --- |
+| R4-W3 Kaltstart-Link am Meldekopf wird eigener Entwurf | behoben | Die Startentscheidung (`startLage()`) fällt beim ersten Aufbau, nach `speicherVerdrahten()`; die alte Modulkonstante sah nie eine Sammlung. Nachlauf (Gerätestände B und C, Link A, App geschlossen): „Meldung von ‚THW Albstadt …' empfangen … Wohin damit?" mit der Sammlung zuerst; nach „Aufnehmen" kein Entwurf. Der ältere, schon vorhandene Link quittiert „Bereits vorhanden — übersprungen", der neuere fragt „Einheit ist bereits gemeldet". |

@@ -500,3 +500,15 @@ Schrift auf etwa 40 % der Rahmenbreite begrenzen.
   also nicht aus Runde 3. Die Nachmessung zu R2-M1 hat sie offenbar nicht
   erfasst, vermutlich ohne Sammlung mit Zügen. Mit drei Zügen sind sie
   jetzt die Ursache für den Überlauf in der Einsatzansicht (R4-M1).
+
+## Stand der Behebung
+
+Stand 05.10.2026, Paket 1 „Rückfragen, Links, Rückholplatz, Zurück-Geste".
+Geprüft mit Typprüfung, Unit-Tests (2 446 grün), Verhaltenstests (137
+Szenarien grün) und Nachmessung im Dev-Server (360 × 640,
+`isMobile`/`hasTouch`, de-DE, Port 5180). Aufgeführt sind nur die Befunde
+dieses Pakets.
+
+| Befund | Stand | Umsetzung |
+| --- | --- | --- |
+| R4-M5 Zurück/Escape schließen das mehrteilige QR-Vollbild ohne Teil-Hinweis | behoben | Fehlen Teile, fangen Zurück und Escape einmal ab und zeigen „Teil n von m wurde noch nicht gezeigt" (Zurück legt den Vollbild-Eintrag neu an); das zweite Mal schließt ohne Vermerk. Die Übersicht merkt sich die gezeigten Teile je Code. Nachlauf (7 Teile, auf Teil 3): Zurück bzw. Escape → Hinweis auf Teil 4, Vollbild offen; zweites Mal → Gesamtübersicht; wieder geöffnet → „Teil 4 von 7". |

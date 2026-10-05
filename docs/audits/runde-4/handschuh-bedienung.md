@@ -468,3 +468,15 @@ Vorschlagsliste (R3-S4) deckt bei offener Tastatur die Vorschläge. Die
 Behebung von R2-G1 deckt Doppeltipps nur bis etwa 450 ms ab, während
 Abrücken und Daumenleiste inzwischen 1,5 s sperren. Daraus wird R4-G1, der
 einzige P1 aus Handschuhsicht.
+
+## Stand der Behebung
+
+Stand 05.10.2026, Paket 1 „Rückfragen, Links, Rückholplatz, Zurück-Geste".
+Geprüft mit Typprüfung, Unit-Tests (2 446 grün), Verhaltenstests (137
+Szenarien grün) und Nachmessung im Dev-Server (360 × 640,
+`isMobile`/`hasTouch`, de-DE, Port 5180). Aufgeführt sind nur die Befunde
+dieses Pakets.
+
+| Befund | Stand | Umsetzung |
+| --- | --- | --- |
+| R4-G1 Rückfragen nehmen nach 450 ms einen zweiten Tipp an | behoben | Jede Rückfrage sperrt beim Öffnen die Fingerstelle des Auslösers 1,5 s (`ortSperren()`, wie nach „Abrücken"); daneben wirkt ein Tipp sofort. „Einsatz löschen" aus der Einsatzansicht quittiert in der Daumenleiste. Nachlauf (Feld, Auslöser auf Höhe des Bestätigungsknopfs, 500/750/1 000/1 250 ms): „Verwerfen", „Einsatz löschen…", „Person entfernen" — Rückfrage jedes Mal offen, nichts verändert (Gegenprobe ohne Sperre bei 750 ms: verworfen/gelöscht/entfernt). Nach „In den Papierkorb": „Rückgängig" 129 × 54 px bei y 562, ohne Rollen. |

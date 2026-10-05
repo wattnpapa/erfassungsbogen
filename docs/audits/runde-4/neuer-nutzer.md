@@ -403,3 +403,16 @@ verweise ich nur: R4-K5 (Einheitenliste weit unten).
 Bilanz: Von sechs Runde-3-Befunden halten fünf (R3-N1 bis R3-N4, R3-N6),
 einer wirkt teilweise (R3-N5). Der P1 aus Runde 3 ist behoben. Neu sind
 keine P0 oder P1, sondern zwei P2 an der Annahme fremder Bögen und vier P3.
+
+## Stand der Behebung
+
+Stand 05.10.2026, Paket 1 „Rückfragen, Links, Rückholplatz, Zurück-Geste".
+Geprüft mit Typprüfung, Unit-Tests (2 446 grün), Verhaltenstests (137
+Szenarien grün) und Nachmessung im Dev-Server (360 × 640,
+`isMobile`/`hasTouch`, de-DE, Port 5180). Aufgeführt sind nur die Befunde
+dieses Pakets.
+
+| Befund | Stand | Umsetzung |
+| --- | --- | --- |
+| R4-N1 „Bereits gemeldet" ohne Vergleich | behoben | Die Rückfrage zeigt „Bisher: …" / „Neu: …" (Stärke, Ansprechperson, Kennzeichen, Stand); ohne gemeinsame Person und gemeinsames Fahrzeug steht „⚠ Keine gemeinsame Person, kein gemeinsames Fahrzeug — vielleicht eine andere Gruppe?" und „Als eigene Einheit führen" vorn. Nachlauf: Ulm B mit anderem Personal → Hinweis, „eigene Einheit" vorn; Folgemeldung (+1) → 8 → 9, kein Hinweis. |
+| R4-N2 „Aus Datei laden…" ohne „Wohin damit?" | behoben | Bei vorhandener Sammlung fragt die Datei wie Link und Scan („Bogen von ‚…' aus der Datei … Wohin damit?"); erst „Bogen öffnen" verdrängt den Entwurf. Nachlauf (Sammlung, Entwurf Mühldorf, Datei Bamberg): „Aufnehmen" → Sammlung Ulm + Bamberg, Entwurf Mühldorf, Rückholplatz leer. |

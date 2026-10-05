@@ -501,3 +501,16 @@ Verkehrt hat sich keine Behebung. Die Ähnlichkeitsfrage aus R2-A5 ist nicht
 neu, ihr vorbelegter „nur die Stärke ändern"-Weg ist aber erst mit der
 Behebung von R3-A1 dazugekommen. Dadurch hat ein Fehlgriff dort jetzt eine
 stillere Folge als vorher (R4-E1).
+
+## Stand der Behebung
+
+Stand 05.10.2026, Paket 1 „Rückfragen, Links, Rückholplatz, Zurück-Geste".
+Geprüft mit Typprüfung, Unit-Tests (2 446 grün), Verhaltenstests (137
+Szenarien grün) und Nachmessung im Dev-Server (360 × 640,
+`isMobile`/`hasTouch`, de-DE, Port 5180). Aufgeführt sind nur die Befunde
+dieses Pakets.
+
+| Befund | Stand | Umsetzung |
+| --- | --- | --- |
+| R4-E1 „Ist das dieselbe Einheit?" bei verschiedenen Einheiten | behoben | Zwei eingetragene, verschiedene Einheitstypen fragen nicht mehr; Orte nur vom Namensanfang verglichen („Neu-Ulm" ≠ „Ulm"). Wo noch gefragt wird, steht „Nein — als eigene Einheit führen" vorn, mit Gegenüberstellung beider Meldungen; nach „Ja" Daumenleiste mit beiden Namen und „Rückgängig" (führt die Meldung als eigene Einheit). Nachlauf: Ulm FGr R und Neu-Ulm FGr F ohne Rückfrage; Ulm ohne Typ → „Ja" → „Rückgängig" → 2 Einheiten. |
+| R4-E2 Derselbe Bogen zweimal räumt den Rückholplatz | behoben | Gleicht der eintreffende Bogen dem offenen, gibt es keine Rückfrage: „Dieser Bogen ist schon offen … Nichts ersetzt." In Rückfragen mit Verlust hat „Abbrechen" den Fokus. Nachlauf (eigener Bogen Biberach, Ulm per Link offen und kalt sowie per Datei): nach dem 2. Öffnen keine Rückfrage, Speicher Ulm / Biberach. |
