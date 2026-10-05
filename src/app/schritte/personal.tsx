@@ -41,6 +41,7 @@ import {
   vokabularFuer,
   vorbelegungGeladen,
 } from "../hilfen";
+import { mwdText } from "../auswertung";
 import { frageJaNein } from "../dialoge";
 import { TabellenScroll } from "../tabellen-scroll";
 import {
@@ -975,17 +976,19 @@ export function SchrittPersonal({ bogen, aendern: aendernRoh }: SchrittProps) {
                 checked={bogen.unterbringungManuell != null}
                 onChange={(e) => aendern({ unterbringungManuell: e.target.checked ? { m: 0, w: 0, d: 0 } : undefined })}
               />
-              Unterbringung M/W/D angeben
+              Aufteilung nach Geschlecht angeben (für Unterbringung, WC/Dusche)
             </label>
             {bogen.unterbringungManuell && (
               <>
                 {/* Zähler wie bei der Stärke darüber: derselbe Vorgang, dieselbe
                     Bedienung — drei Tippfelder unter drei Zählern wären genau
                     die Ungleichbehandlung, die hier abgestellt wurde. */}
-                {(["m", "w", "d"] as const).map((g) => (
+                {/* Ausgeschrieben: „M" stand als Zähler direkt unter
+                    „Mannschaft" (R3-N3). */}
+                {([["m", "männlich"], ["w", "weiblich"], ["d", "divers"]] as const).map(([g, titel]) => (
                   <Stepper
                     key={g}
-                    titel={g.toUpperCase()}
+                    titel={titel}
                     wert={bogen.unterbringungManuell![g]}
                     setzen={(n) => aendern({ unterbringungManuell: { ...bogen.unterbringungManuell!, [g]: n } })}
                   />
@@ -1029,7 +1032,8 @@ export function SchrittPersonal({ bogen, aendern: aendernRoh }: SchrittProps) {
           </strong>
           {" "}<span className="legende">({STAERKE_LEGENDE})</span>
           {" · "}
-          <span title={MWD_LEGENDE}>Unterbringung: M {mwd.m} / W {mwd.w} / D {mwd.d}</span>
+          {/* Ausgeschrieben: „M" heißt in derselben Zeile schon Mannschaft (R3-N3). */}
+          <span title={MWD_LEGENDE}>Geschlecht: {mwdText(mwd)}</span>
         </p>
       )}
 

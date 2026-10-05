@@ -477,8 +477,8 @@ describe("einsatzPdfDokument()", () => {
     expect(t).toContain("Bedarf gesamt (2 Einheiten, 4 Personen)");
     expect(t).toContain("4 Portionen (2 Fleisch / 0 vegetarisch / 2 vegan)");
     // Quartier und WC/Dusche getrennt beschriftet (R3-K4).
-    expect(t).toContain("Unterbringung angefordert:\n2 Einheiten, 4 Personen (M 2 / W 2 / D 0)");
-    expect(t).toContain("WC/Dusche (alle Anwesenden):\nM 2 / W 2 / D 0");
+    expect(t).toContain("Unterbringung angefordert:\n2 Einheiten, 4 Personen (2 männl. / 2 weibl. / 0 div.)");
+    expect(t).toContain("WC/Dusche (alle Anwesenden):\n2 männl. / 2 weibl. / 0 div.");
     expect(t).toContain("Diesel 400 l · Benzin 0 l");
     expect(t).toContain("2 Fahrzeuge · Ruhezeit erforderlich bei 0 Einheit(en)");
   });

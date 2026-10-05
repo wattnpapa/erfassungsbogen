@@ -685,7 +685,7 @@ export function pruefpunkte(b: Erfassungsbogen, mitFahrzeugen = true, heute?: Ee
   const mwdSumme = mwd.m + mwd.w + mwd.d;
   if (mwdBelastbar && s.gesamt > 0 && mwdSumme !== s.gesamt) {
     hinweise.push({
-      text: `Unterbringung: M ${mwd.m} + W ${mwd.w} + D ${mwd.d} = ${mwdSumme} weicht von der Gesamtstärke ${s.gesamt} ab.`,
+      text: `Aufteilung nach Geschlecht: ${mwd.m} männl. + ${mwd.w} weibl. + ${mwd.d} div. = ${mwdSumme} weicht von der Gesamtstärke ${s.gesamt} ab.`,
       schritt: S_PERSONAL,
     });
   }
@@ -722,7 +722,7 @@ export function pruefpunkte(b: Erfassungsbogen, mitFahrzeugen = true, heute?: Ee
     b.personal.every((p) => p.geschlecht === Geschlecht.M)
   ) {
     hinweise.push({
-      text: `Unterbringung M ${b.personal.length} / W 0 / D 0 — bei allen Personen steht die Vorbelegung „M". Bitte prüfen.`,
+      text: `Alle ${b.personal.length} Personen stehen auf Geschlecht „männlich" — das ist die Vorbelegung. Bitte prüfen (zählt für Unterbringung und WC/Dusche).`,
       schritt: S_PERSONAL,
     });
   }

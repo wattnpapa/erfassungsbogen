@@ -1310,8 +1310,8 @@ describe("Unterbringung: angefordert und alle Anwesenden getrennt (R3-K4)", () =
     meldungHinzufuegen(angelegt.id, ohne);
     ansicht(angelegt.id);
     const dd = document.querySelector<HTMLElement>(".unterbringung-angefordert")!;
-    expect(dd.textContent).toBe("1 Einheit, 19 Personen (M 0 / W 0 / D 0 · 19 ohne M/W/D-Angabe)");
-    expect(screen.getByText("WC/Dusche (alle Anwesenden)").nextElementSibling!.textContent).toBe("M 0 / W 0 / D 0 · 27 ohne M/W/D-Angabe");
+    expect(dd.textContent).toBe("1 Einheit, 19 Personen (0 männl. / 0 weibl. / 0 div. · 19 ohne Angabe zum Geschlecht)");
+    expect(screen.getByText("WC/Dusche (alle Anwesenden)").nextElementSibling!.textContent).toBe("0 männl. / 0 weibl. / 0 div. · 27 ohne Angabe zum Geschlecht");
     await nutzer.click(within(dd).getByRole("button", { name: "1 Einheit" }));
     expect(document.querySelectorAll(".einheit-zeile")).toHaveLength(1);
   });

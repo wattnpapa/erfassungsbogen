@@ -135,13 +135,13 @@ export function AufteilenPanel(props: {
           </div>
           {zeigeUnterbringung && (
             <div className="zeile">
-              {staerkeFeld("Unterbringung M", unterbringung.m, bogen.unterbringungManuell!.m, (n) =>
+              {staerkeFeld("Unterbringung männlich", unterbringung.m, bogen.unterbringungManuell!.m, (n) =>
                 setUnterbringung({ ...unterbringung, m: n }),
               )}
-              {staerkeFeld("W", unterbringung.w, bogen.unterbringungManuell!.w, (n) =>
+              {staerkeFeld("weiblich", unterbringung.w, bogen.unterbringungManuell!.w, (n) =>
                 setUnterbringung({ ...unterbringung, w: n }),
               )}
-              {staerkeFeld("D", unterbringung.d, bogen.unterbringungManuell!.d, (n) =>
+              {staerkeFeld("divers", unterbringung.d, bogen.unterbringungManuell!.d, (n) =>
                 setUnterbringung({ ...unterbringung, d: n }),
               )}
             </div>

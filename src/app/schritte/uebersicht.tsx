@@ -41,6 +41,7 @@ import {
   zeitpunktDeutsch,
 } from "../hilfen";
 import { debugAktiv } from "../debug-plattform";
+import { mwdText } from "../auswertung";
 import { bogenCsvInhalt } from "../bogen-csv";
 import { einheitSymbolSvg, svgDataUrl } from "../taktische-zeichen-bogen";
 import {
@@ -238,7 +239,15 @@ export function Uebersicht(props: {
    */
   const mwdAngegeben = !nurStaerke || bogen.unterbringungManuell != null;
   const vpAufteilungAngegeben = !nurStaerke || bogen.verpflegungManuell != null;
-  const mwdText = mwdAngegeben ? `M ${mwd.m} / W ${mwd.w} / D ${mwd.d}` : "keine Angabe";
+  const mwdAnzeige = mwdAngegeben ? mwdText(mwd) : "keine Angabe";
+  /**
+   * „Unterbringung: M 9 / W 0 / D 0" stand auch ohne angeforderte
+   * Unterbringung da und las sich wie „9 Mann brauchen ein Quartier" — „M"
+   * hieß in derselben Zeile Mannschaft (Audit Runde 3, R3-N3). Die Zahl ist
+   * die Aufteilung nach Geschlecht; „Unterbringung" heißt sie nur, wenn der
+   * Bogen Unterbringung anfordert.
+   */
+  const mwdTitel = bogen.sofortbedarf?.unterbringung ? "Unterbringung" : "Geschlecht";
   /**
    * Spalten, die für diesen Bogen nirgends etwas enthalten, werden nicht
    * gezeigt. Sonst nimmt „Erreichbarkeit" ein Drittel der Personaltabelle für
@@ -554,7 +563,7 @@ export function Uebersicht(props: {
                 {/* Kurzlegende sichtbar statt nur im Tooltip (R2-N9). */}
                 <span className="hinweis" aria-hidden="true">(F / UF / M / Ges)</span>
               </span>
-              <span title={MWD_LEGENDE}>Unterbringung: {mwdText}</span>
+              <span title={MWD_LEGENDE}>{mwdTitel}: {mwdAnzeige}</span>
             </p>
           </div>
         </div>

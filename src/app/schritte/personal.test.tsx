@@ -163,16 +163,16 @@ describe("Schritt Personal", () => {
   });
 
   /** Dieselbe Bedienung für die Unterbringungsplätze im selben Block. */
-  it("lässt auch die Unterbringung M/W/D zählen", async () => {
+  it("lässt auch die Aufteilung nach Geschlecht zählen, ausgeschrieben statt M/W/D (R3-N3)", async () => {
     const nutzer = userEvent.setup();
     buehne();
 
     await nutzer.click(screen.getByLabelText("Nur Stärke (Meldekopf-Schnellerfassung)"));
-    await nutzer.click(screen.getByLabelText("Unterbringung M/W/D angeben"));
+    await nutzer.click(screen.getByLabelText("Aufteilung nach Geschlecht angeben (für Unterbringung, WC/Dusche)"));
 
-    await nutzer.click(screen.getByRole("button", { name: "W: erhöhen" }));
+    await nutzer.click(screen.getByRole("button", { name: "weiblich: erhöhen" }));
 
-    expect((screen.getByLabelText("W") as HTMLInputElement).value).toBe("1");
+    expect((screen.getByLabelText("weiblich") as HTMLInputElement).value).toBe("1");
   });
 
   /**
@@ -944,7 +944,7 @@ describe("Umschalten auf „Nur Stärke“", () => {
     expect((screen.getByLabelText("Unterführer") as HTMLInputElement).value).toBe("1");
     expect((screen.getByLabelText("Mannschaft") as HTMLInputElement).value).toBe("2");
     expect((screen.getByLabelText("Gesamt") as HTMLInputElement).value).toBe("4");
-    expect((screen.getByLabelText("W") as HTMLInputElement).value).toBe("1");
+    expect((screen.getByLabelText("weiblich") as HTMLInputElement).value).toBe("1");
     expect((screen.getByLabelText("vegetarisch") as HTMLInputElement).value).toBe("1");
     expect(screen.getByText(/1 von 4 vegetarisch\/vegan/)).toBeDefined();
     // Die Namen bleiben — als nicht gezählte Erreichbarkeiten.

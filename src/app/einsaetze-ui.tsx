@@ -1924,7 +1924,7 @@ function BogenDetails({ bogen }: { bogen: Erfassungsbogen }) {
       ) : (
         !nurStaerke && <p className="hinweis">Kein Personal erfasst.</p>
       )}
-      <p className="hinweis">Unterbringung: M {mwd.m} / W {mwd.w} / D {mwd.d}</p>
+      <p className="hinweis">Geschlecht: {mwdText(mwd)}</p>
 
       <h4>Fahrzeuge ({bogen.fahrzeuge.length})</h4>
       {bogen.fahrzeuge.length > 0 ? (

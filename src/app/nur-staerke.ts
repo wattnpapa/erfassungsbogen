@@ -53,7 +53,7 @@ export function wasWegfiele(vorher: Erfassungsbogen, neu: Erfassungsbogen): stri
   if (vorher.verpflegungManuell && (vorher.verpflegungManuell.vegetarisch > 0 || vorher.verpflegungManuell.vegan > 0)) {
     weg.push("Verpflegungsaufteilung");
   }
-  if (vorher.unterbringungManuell) weg.push("M/W/D-Angaben");
+  if (vorher.unterbringungManuell) weg.push("Aufteilung nach Geschlecht");
   if (vorher.sonstiges?.trim()) weg.push("Bemerkung");
   return weg;
 }

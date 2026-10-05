@@ -85,7 +85,7 @@ describe("aggregiere()", () => {
     // Angefordert: nur A (3) und C (12).
     expect(s.unterbringungBenoetigt).toBe(2);
     expect(s.unterbringungAngefordert).toEqual({ personen: 15, m: 2, w: 1, d: 0, ohneAngabe: 12 });
-    expect(unterbringungAngefordertText(s)).toBe("2 Einheiten, 15 Personen (M 2 / W 1 / D 0 · 12 ohne M/W/D-Angabe)");
+    expect(unterbringungAngefordertText(s)).toBe("2 Einheiten, 15 Personen (2 männl. / 1 weibl. / 0 div. · 12 ohne Angabe zum Geschlecht)");
     expect(unterbringungAngefordertText(aggregiere([meldung(ohne)]))).toBe("");
   });
 

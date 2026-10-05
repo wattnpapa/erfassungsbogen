@@ -510,7 +510,8 @@ export const zahl = (s: string): number => {
 // Die Stärke-Notation „x / x / x / x" ist BOS-Konvention, aber nicht jedem
 // geläufig — Tooltip/aria erklären sie, ohne die Anzeige aufzublähen.
 export const STAERKE_LEGENDE = "Führer / Unterführer / Mannschaft / Gesamt";
-export const MWD_LEGENDE = "Unterbringungsplätze: männlich / weiblich / divers";
+/** Wofür die Aufteilung nach Geschlecht gebraucht wird (Unterbringung, WC/Dusche). */
+export const MWD_LEGENDE = "Aufteilung nach Geschlecht — für Unterbringung und WC/Dusche";
 
 export function staerkeVorlesen(s: { fuehrer: number; unterfuehrer: number; mannschaft: number; gesamt: number }): string {
   return `${s.fuehrer} Führer, ${s.unterfuehrer} Unterführer, ${s.mannschaft} Mannschaft, ${s.gesamt} gesamt`;

@@ -176,12 +176,18 @@ export function summiereBoegen(boegen: Erfassungsbogen[]): EinsatzSummen {
 }
 
 /**
- * „M 8 / W 1 / D 0" — bei Schnellerfassungen ohne Aufteilung mit dem Rest
- * „· 12 ohne M/W/D-Angabe" (R2-N5). Für Bedarfsblock, Zwischensummen und
- * Lageblatt, damit alle drei dieselbe Schreibweise haben.
+ * „8 männl. / 1 weibl. / 0 div." — bei Schnellerfassungen ohne Aufteilung mit
+ * dem Rest „· 12 ohne Angabe zum Geschlecht" (R2-N5). Für Bedarfsblock,
+ * Zwischensummen, Bogen-Übersicht und Lageblatt, damit alle dieselbe
+ * Schreibweise haben.
+ *
+ * Ausgeschrieben statt „M 8 / W 1 / D 0": Direkt daneben steht die Stärke
+ * mit „M" für Mannschaft, und „Unterbringung: M 9" las sich als „9 Mann
+ * brauchen ein Quartier" (Audit Runde 3, R3-N3). Die Erklärung stand nur im
+ * Tooltip, den es auf dem Telefon nicht gibt.
  */
 export function mwdText(x: { m: number; w: number; d: number; ohneAngabe?: number }): string {
-  return `M ${x.m} / W ${x.w} / D ${x.d}${x.ohneAngabe ? ` · ${x.ohneAngabe} ohne M/W/D-Angabe` : ""}`;
+  return `${x.m} männl. / ${x.w} weibl. / ${x.d} div.${x.ohneAngabe ? ` · ${x.ohneAngabe} ohne Angabe zum Geschlecht` : ""}`;
 }
 
 /**

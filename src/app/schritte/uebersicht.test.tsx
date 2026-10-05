@@ -79,6 +79,23 @@ describe("Übersicht — Personalliste", () => {
   });
 });
 
+describe("Übersicht — Aufteilung nach Geschlecht (R3-N3)", () => {
+  const kopfzeile = () => document.querySelector<HTMLElement>(".einheit-staerke")!.textContent!;
+
+  it("heißt „Geschlecht“ und ist ausgeschrieben, solange keine Unterbringung angefordert ist", () => {
+    uebersichtMit([person("Anna", "Ahrens", StaerkeRolle.FUEHRER), person("Bernd", "Brandt", StaerkeRolle.MANNSCHAFT)]);
+    expect(kopfzeile()).toContain("Geschlecht: 2 männl. / 0 weibl. / 0 div.");
+    expect(kopfzeile()).not.toMatch(/Unterbringung|M 2/);
+  });
+
+  it("heißt „Unterbringung“, wenn der Bogen Unterbringung anfordert", () => {
+    const bogen = { ...neuerBogen(), personal: [person("Anna", "Ahrens", StaerkeRolle.FUEHRER)] };
+    bogen.sofortbedarf = { verpflegungPersonen: 1, dieselLiter: 0, benzinLiter: 0, gemischLiter: 0, unterbringung: true, ruhezeitErforderlich: false };
+    render(<Uebersicht bogen={bogen} geheZu={() => {}} neu={() => {}} />);
+    expect(kopfzeile()).toContain("Unterbringung: 1 männl. / 0 weibl. / 0 div.");
+  });
+});
+
 /**
  * Der Übergabe-Dialog ist der letzte Moment, in dem eine Lücke im Bogen noch
  * auffallen kann. Vorher zählte nur die Leitzeile der Ansicht die offenen

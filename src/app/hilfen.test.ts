@@ -397,7 +397,7 @@ describe("plausibilitaet() — Stärke ohne Substanz", () => {
         { ...neuePerson(), nachname: "Eva", geschlecht: Geschlecht.M },
       ],
     };
-    expect(plausibilitaet(b).some((t) => /Vorbelegung „M"/.test(t))).toBe(true);
+    expect(plausibilitaet(b).some((t) => /Geschlecht „männlich" — das ist die Vorbelegung/.test(t))).toBe(true);
   });
 
   it("schweigt, sobald das Geschlecht irgendwo abweicht", () => {
