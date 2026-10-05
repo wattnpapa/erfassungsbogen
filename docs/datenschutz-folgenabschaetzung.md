@@ -135,6 +135,12 @@ Grundlage: Repository `wattnpapa/erfassungsbogen`, Stand 2026-09-12 — Version 
 > der Freitext kann Personenbezug enthalten und hängt mit dem Lageblatt nun
 > auch an der Wand. Geändert: 5.5.
 >
+> **Nachgezogen 2026-10-05 — Papierfassungen (Audit Runde 3, R3-A3 bis
+> R3-A6):** Das Einzel-PDF druckt je Person zusätzlich die Zählrolle
+> (F/UF/M), die schon Teil des Bogens, des QR-Codes und der CSV ist; Lageblatt
+> und Einzel-PDF tragen mehr leere Zeilen zum Nachtragen von Hand. Keine neue
+> Datenkategorie, kein neuer Empfänger. Geändert: 5.5.
+>
 > **Nachgezogen 2026-10-05 — Exportspalten (Audit Runde 3, R3-K7):** „Alle
 > Daten als CSV" enthält jetzt auch Eintreff-/Abrückzeit und Auftrag/Notiz
 > der Führungsstelle (Freitext), die bisher nur Übersichts-CSV, Excel-Liste
@@ -429,6 +435,8 @@ biometrische Daten, strafrechtliche Daten.
   Personenbezug haben); der QR-Code enthält davon nichts. Wird ein Ausdruck
   über die QR-Codes wieder eingelesen, kommen nur die Bögen zurück; die App
   weist auf das Nachtragen von Hand hin (seit 2026-09-29, R2-A1).
+  Seit 2026-10-05 (R3-A6) steht im Bogen-PDF je Person auch die Zählrolle
+  (F/UF/M); Lageblatt und Bogen-PDF lassen Platz für Nachträge von Hand.
 - „Vorlage teilen": die Vorlage als signierter QR-Code/Link oder als
   unsignierte JSON-Datei (`eeb-vorlage-*.json`). Die Datei trägt nur diese
   eine Vorlage, keinen Geräteschlüssel. Beim Empfänger entsteht daraus wieder

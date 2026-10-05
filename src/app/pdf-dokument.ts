@@ -21,6 +21,7 @@ import {
   ansprechpartner,
   OrganisationsTyp,
   PersonalErfassung,
+  StaerkeRolle,
   datumZuIso,
   mitTransportVersion,
   staerke,
@@ -1190,6 +1191,34 @@ export interface BlankoZeilen {
   qualifikationen: number;
 }
 
+/** Zählrolle als Kürzel, wie in der Stärke „F / UF / M" (R3-A6). */
+const ROLLE_KURZ: Record<number, string> = {
+  [StaerkeRolle.FUEHRER]: "F",
+  [StaerkeRolle.UNTERFUEHRER]: "UF",
+  [StaerkeRolle.MANNSCHAFT]: "M",
+};
+
+/**
+ * Platz für Stiftnachträge im Einzel-PDF (R3-A6) — nur, wenn er keine Seite
+ * kostet; siehe {@link einzelPdfDokument}.
+ */
+export interface NachtragsPlatz {
+  /** Freie Zeilen unter dem Personal. */
+  freiePersonalZeilen?: number;
+  /** Ein leerer Fahrzeugblock unter den Fahrzeugen. */
+  freiesFahrzeug?: boolean;
+  /** Messpunkt hinter dem letzten Inhalt (nur für den Probesatz). */
+  messpunkt?: boolean;
+}
+
+/** Freie Personalzeilen, wenn Platz ist (R3-A6). */
+const PERSONAL_NACHTRAG_ZEILEN = 2;
+/** Höhe einer leeren Personalzeile in pt, gemessen 22,4 (8 pt Schrift, 5 pt Rand oben und unten, Innenabstand), aufgerundet. */
+const LEERZEILE_HOEHE = 23;
+/** Höhe eines leeren Fahrzeugblocks samt Abstand in pt, gemessen 74, aufgerundet. */
+const LEERFAHRZEUG_HOEHE = 76;
+const MESS_BOGEN_ENDE = "bogen-ende";
+
 /** Fahrzeug ohne Angaben — Platzhalter für die Fahrzeugblöcke des Blanko-Vordrucks. */
 const BLANKO_FAHRZEUG: Fahrzeug = { typ: { freitext: "" } };
 
@@ -1209,6 +1238,8 @@ export function pdfDokument(
   blanko?: BlankoZeilen,
   /** Nur Sammel-PDF: Stand der Einheit am Meldekopf neben dem QR-Code (R2-A1). */
   vermerk?: MeldekopfVermerk,
+  /** Nur Einzel-PDF: Platz für Stiftnachträge (R3-A6). */
+  zusatz?: NachtragsPlatz,
 ): TDocumentDefinitions {
   const org = b.einheit.organisation;
   const farbe = orgFarbe(org);
@@ -1230,9 +1261,11 @@ export function pdfDokument(
 
   const infoZeilen: TableCell[][] = [
     [
-      // Im Vordruck mit Legende: „____ / ____ / ____ / ____" allein sagte
-      // nicht, welche Linie welche Zahl ist (Audit Runde 2, R2-A6).
-      { text: blanko ? "Stärke (F / UF / M / Ges.):" : "Stärke:", bold: true },
+      // Mit Legende: „____ / ____ / ____ / ____" allein sagte nicht, welche
+      // Linie welche Zahl ist (Audit Runde 2, R2-A6) — und „1 / 1 / 2 / 4"
+      // ließ sich nach einer Stiftkorrektur nicht gegen die Namen prüfen
+      // (Audit Runde 3, R3-A6). Gleiche Beschriftung auf Vordruck und Bogen.
+      { text: "Stärke (F / UF / M / Ges.):", bold: true },
       { text: `${zahl(s.fuehrer)} / ${zahl(s.unterfuehrer)} / ${zahl(s.mannschaft)} / ${zahl(s.gesamt)}` },
       { text: "Ansprechpartner/in:", bold: true },
       { text: ansprech ? `${ansprech.vorname} ${ansprech.nachname}` : "" },
@@ -1270,7 +1303,7 @@ export function pdfDokument(
     { text: b.einsatz.einsatzende != null ? zeitpunktDeutsch(b.einsatz.einsatzende) : "" },
   ]);
 
-  const fahrzeugBlock = (f: Fahrzeug): Content => ({
+  const fahrzeugBlock = (f: Fahrzeug, leer = !!blanko): Content => ({
     table: {
       // Erste Spalte: taktisches Zeichen (DV 102), zeilenübergreifend links.
       widths: [56, "*", "*", "*"],
@@ -1279,13 +1312,13 @@ export function pdfDokument(
           { svg: fahrzeugSymbolSvg(f, org), width: 50, rowSpan: 2, alignment: "center", margin: [2, 6, 2, 6] as [number, number, number, number] },
           // Im Vordruck stehen hier die Feldnamen — sonst wäre die Zeile eine
           // beschriftungslose Leerzeile, in der niemand weiß, was hingehört.
-          { text: blanko ? "Fahrzeug:" : vokabText(f.typ, vokabularFuer(org, "fahrzeug")) || "Fahrzeug", bold: true },
-          { text: blanko ? "Kennzeichen:" : kennzeichenText(f), bold: true },
+          { text: leer ? "Fahrzeug:" : vokabText(f.typ, vokabularFuer(org, "fahrzeug")) || "Fahrzeug", bold: true },
+          { text: leer ? "Kennzeichen:" : kennzeichenText(f), bold: true },
           // Sitzplätze nur, wenn sie am Fahrzeug erfasst sind: der Richtwert
           // des Typs steht in keiner Akte und hätte auf dem Papier den Rang
           // einer Zusage, die niemand gegeben hat.
           {
-            text: blanko
+            text: leer
               ? "Funkrufname:"
               : [f.funkrufname ? `FuRn: ${funkrufText(f, b.einheit)}` : "", f.sitzplaetze != null ? `Sitzplätze: ${f.sitzplaetze}` : ""]
                   .filter(Boolean)
@@ -1296,7 +1329,7 @@ export function pdfDokument(
           {}, // von rowSpan des Zeichens belegt
           {
             colSpan: 3,
-            text: blanko
+            text: leer
               ? `Ausstattung nach StAN: ja ${kasten(false)} / nein ${kasten(false)}\nÄnderungen bzw. Sondergerät:`
               : f.stanKonform == null
                 ? `Änderungen bzw. Sondergerät: ${weichUmbrechen(f.aenderungen ?? "")}`
@@ -1311,17 +1344,24 @@ export function pdfDokument(
   });
   const fahrzeuge: Content[] = blanko
     ? Array.from({ length: blanko.fahrzeuge }, () => fahrzeugBlock(BLANKO_FAHRZEUG))
-    : b.fahrzeuge.map(fahrzeugBlock);
+    : [
+        ...b.fahrzeuge.map((f) => fahrzeugBlock(f)),
+        // Ein leerer Fahrzeugblock zum Nachtragen, wenn Platz ist (R3-A6).
+        ...(zusatz?.freiesFahrzeug ? [fahrzeugBlock(BLANKO_FAHRZEUG, true)] : []),
+      ];
 
+  // Spalte „Rolle" (F / UF / M): Ohne sie ließ sich eine von Hand geänderte
+  // Stärke auf dem Blatt nicht gegen die Namen prüfen (Audit Runde 3, R3-A6).
   const personalZeilen: TableCell[][] = [
     [
       { text: "Funktion /\nZusatzfunktion", bold: true, fillColor: GRAU },
+      { text: "Rolle\nF/UF/M", bold: true, fillColor: GRAU },
       { text: "Name, Vorname", bold: true, fillColor: GRAU },
       { text: "D = dienstlich / P = privat", bold: true, fillColor: GRAU },
     ],
   ];
   for (let i = 0; blanko && i < blanko.personal; i++) {
-    personalZeilen.push([leerZelle(), leerZelle(), leerZelle()]);
+    personalZeilen.push([leerZelle(), leerZelle(), leerZelle(), leerZelle()]);
   }
   for (const p of blanko ? [] : b.personal) {
     const kontakte = p.kontakte
@@ -1334,9 +1374,17 @@ export function pdfDokument(
       .join("\n");
     personalZeilen.push([
       { text: funktionsText(p, org) },
+      { text: ROLLE_KURZ[p.staerkeRolle] ?? "", alignment: "center" },
       { text: `${p.nachname}${p.nachname && p.vorname ? ", " : ""}${p.vorname}` },
       { text: kontakte },
     ]);
+  }
+  // Freie Zeilen für Nachrückende: Wer auf dem Ausdruck nachträgt und „von
+  // Hand geändert" ankreuzt, schrieb sonst an den Rand (R3-A6). Nur bei
+  // vollständig erfasstem Personal — „nur Stärke" hat keine Namensliste.
+  // Wie viele, entscheidet einzelPdfDokument nach einer Messung.
+  if (!blanko && b.personalErfassung !== PersonalErfassung.NUR_STAERKE) {
+    for (let i = 0; i < (zusatz?.freiePersonalZeilen ?? 0); i++) personalZeilen.push([leerZelle(), leerZelle(), leerZelle(), leerZelle()]);
   }
 
   const qualiZeilen: TableCell[][] = [
@@ -1445,7 +1493,7 @@ export function pdfDokument(
       // ---- Personal ----
       // Kein fester Seitenumbruch: kleine Einheiten passen so auf eine Seite,
       // größere lässt pdfmake bei Bedarf selbst umbrechen.
-      { table: { widths: [130, "*", 170], body: personalZeilen }, margin: [0, 12, 0, 10] },
+      { table: { widths: [118, 30, "*", 160], body: personalZeilen }, margin: [0, 12, 0, 10] },
       ...(b.personalErfassung === PersonalErfassung.NUR_STAERKE
         ? [{ text: "Personal am Meldekopf nur in Stärke erfasst.", italics: true, margin: [0, 0, 0, 6] } as Content]
         : []),
@@ -1453,12 +1501,54 @@ export function pdfDokument(
       { table: { widths: [180, "*"], body: qualiZeilen } },
       ...sofort,
       ...(b.sonstiges ? [{ text: `Sonstiges: ${weichUmbrechen(b.sonstiges)}`, margin: [0, 8, 0, 0] } as Content] : []),
+      ...(zusatz?.messpunkt ? [{ text: " ", fontSize: 1, id: `${MESS_BOGEN_ENDE}-formular` } as Content] : []),
 
       // ---- QR-Block ----
       // Kein fester Seitenumbruch mehr; als unbreakable-Gruppe zusammengehalten,
       // damit der QR-Code nicht über eine Seitengrenze zerrissen wird. Passt der
       // Block nicht mehr, rückt er als Ganzes auf die nächste Seite.
       ...(qr ? [qrBlock(qr, farbe.akzent, zeitgruppe(b.stand), vermerk)] : []),
+      ...(zusatz?.messpunkt ? [{ text: " ", fontSize: 1, id: `${MESS_BOGEN_ENDE}-qr` } as Content] : []),
     ],
   };
+}
+
+/**
+ * Einzel-PDF mit Platz für Stiftnachträge — aber nur, wo er keine Seite
+ * kostet (Audit Runde 3, R3-A6). Zwei freie Personalzeilen hätten 15 von 133
+ * Beispielbögen um eine Seite verlängert, darunter den einseitigen Bogen des
+ * Zugtrupps Albstadt. Deshalb ein Probesatz: Er liest über pdfmakes
+ * `pageBreakBefore` ab, wie viel Platz hinter dem Formular (mehrteiliger Code
+ * auf eigenen Seiten) bzw. hinter dem Code auf derselben Seite bleibt. Passen
+ * zwei Zeilen hinein, kommen sie dazu; passt danach noch ein Fahrzeugblock,
+ * auch der.
+ *
+ * `setzen` führt den Satz aus (Browser: pdfmake-Puffer, Tests: Node).
+ */
+export async function einzelPdfDokument(
+  b: Erfassungsbogen,
+  qr: QrSatz | null,
+  setzen: (dd: TDocumentDefinitions) => Promise<unknown>,
+): Promise<TDocumentDefinitions> {
+  if (b.personalErfassung === PersonalErfassung.NUR_STAERKE) return pdfDokument(b, qr);
+  const pos = new Map<string, MessPosition>();
+  const probe = pdfDokument(b, qr, undefined, undefined, { messpunkt: true });
+  probe.pageBreakBefore = (knoten) => {
+    const k = knoten as { id?: string; startPosition?: MessPosition };
+    if (k.id && k.startPosition) pos.set(k.id, k.startPosition);
+    return false;
+  };
+  await setzen(probe);
+  const formular = pos.get(`${MESS_BOGEN_ENDE}-formular`);
+  const ende = pos.get(`${MESS_BOGEN_ENDE}-qr`);
+  if (!formular || !ende) return pdfDokument(b, qr);
+  const rest = (p: MessPosition) => p.pageInnerHeight * (1 - p.verticalRatio);
+  // Einzelcode auf derselben Seite wie das Formularende: der Platz unter dem
+  // Code zählt. Sonst (Code auf eigener Seite, mehrteiliger Code) der Platz
+  // unter dem Formular — was dort nicht hineinpasst, schöbe den Code weiter.
+  const einzelcodeDahinter = qr != null && qr.teile.length === 1 && formular.pageNumber === ende.pageNumber;
+  const frei = (einzelcodeDahinter ? rest(ende) : rest(formular)) - 4;
+  const zeilen = frei >= PERSONAL_NACHTRAG_ZEILEN * LEERZEILE_HOEHE ? PERSONAL_NACHTRAG_ZEILEN : 0;
+  const fahrzeug = zeilen > 0 && frei >= zeilen * LEERZEILE_HOEHE + LEERFAHRZEUG_HOEHE;
+  return pdfDokument(b, qr, undefined, undefined, { freiePersonalZeilen: zeilen, freiesFahrzeug: fahrzeug });
 }

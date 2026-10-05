@@ -26,7 +26,8 @@ import {
   type Erfassungsbogen,
 } from "@bos/eeb-format/model";
 import type { QrSatz } from "./hilfen";
-import { einsatzLageblattDokument, einsatzLageblattSeiteFuellen, einsatzPdfDokument, pdfDokument, type UebersichtEintrag } from "./pdf-dokument";
+import { einsatzLageblattDokument, einsatzLageblattSeiteFuellen, einsatzPdfDokument, einzelPdfDokument, pdfDokument, type UebersichtEintrag } from "./pdf-dokument";
+import { readFileSync } from "node:fs";
 import { pdfBytes, seitenZahl } from "../../scripts/pdf-in-node";
 
 /** Echtes 1×1-PNG — pdfmake skaliert es auf die QR-Breite. */
@@ -185,5 +186,27 @@ describe("Lageblatt: Nachtragszeilen bis unten (R3-A5)", () => {
   it("leeres Blatt: über 10 Zeilen statt einer halben leeren Seite", async () => {
     const dd = await einsatzLageblattSeiteFuellen("Lage", [], pdfBytes, erstellt);
     expect(nachtragZeilen(dd)).toBeGreaterThan(10);
+  }, 20_000);
+});
+
+describe("Einzel-PDF: Platz für Stiftnachträge, wo er keine Seite kostet (R3-A6)", () => {
+  const freieZeilen = (dd: { content: unknown }) =>
+    (JSON.stringify(dd.content).match(/"text":" ","margin":\[0,5,0,5\]/g) ?? []).length / 4;
+  const beispiel = (datei: string): Erfassungsbogen =>
+    JSON.parse(readFileSync(new URL(`../../examples/thw/${datei}`, import.meta.url), "utf8")) as Erfassungsbogen;
+
+  it.each([1, 3])("kleiner Bogen (%i QR-Teile): zwei freie Personalzeilen und ein leerer Fahrzeugblock, Seitenzahl gleich", async (teile) => {
+    const b = bogen(4);
+    const dd = await einzelPdfDokument(b, qrSatz(teile), pdfBytes);
+    expect(freieZeilen(dd)).toBe(2);
+    expect(JSON.stringify(dd.content)).toContain('"Kennzeichen:"');
+    expect(seitenZahl(await pdfBytes(dd))).toBe(seitenZahl(await pdfBytes(pdfDokument(b, qrSatz(teile)))));
+  }, 20_000);
+
+  it("voller einseitiger Bogen (Zugtrupp Albstadt): keine freien Zeilen statt einer zweiten Seite", async () => {
+    const b = beispiel("001-albstadt-ztr-tz.json");
+    const dd = await einzelPdfDokument(b, qrSatz(1), pdfBytes);
+    expect(seitenZahl(await pdfBytes(dd))).toBe(1);
+    expect(freieZeilen(dd)).toBe(0);
   }, 20_000);
 });

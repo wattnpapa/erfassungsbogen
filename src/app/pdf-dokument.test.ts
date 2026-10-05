@@ -600,8 +600,9 @@ describe("einsatzLageblattDokument()", () => {
   it("beschriftet die Stärke-Linien des Blanko-Vordrucks (R2-A6)", () => {
     const blanko = texte(pdfDokument(basisBogen(), null, { fahrzeuge: 1, personal: 1, qualifikationen: 1 }).content).join("\n");
     expect(blanko).toContain("Stärke (F / UF / M / Ges.):");
+    // Seit R3-A6 auch auf dem ausgefüllten Bogen — gleiche Beschriftung wie der Vordruck.
     const voll = texte(pdfDokument(basisBogen(), QR).content).join("\n");
-    expect(voll).not.toContain("Stärke (F / UF / M / Ges.):");
+    expect(voll).toContain("Stärke (F / UF / M / Ges.):");
   });
 
   it("stellt die laufende Nummer der Meldung vor den Namen, wie an der Karte (R2-A6)", () => {
@@ -646,6 +647,20 @@ describe("einsatzLageblattDokument()", () => {
     // Die Übergabe-Übersicht der Sammel-PDF bleibt ohne diese Zusätze.
     const u = texte((einsatzPdfDokument("Lage", [{ bogen: basisBogen(), qr: QR }]).content as unknown[]).slice(0, 3)).join("\n");
     expect(u).not.toContain("Nachtrag von Hand");
+  });
+
+  it("führt die Zählrolle je Person im Einzel-PDF (R3-A6)", () => {
+    const dd = pdfDokument(basisBogen(), QR);
+    const t = texte(dd.content).join("\n");
+    expect(t).toContain("Rolle\nF/UF/M");
+    // Johannes Rudolph ist Führer, Anna Weber Mannschaft.
+    expect(t).toMatch(/\nF\ncenter\nRudolph, Johannes\n/);
+    expect(t).toMatch(/\nM\ncenter\nWeber, Anna\n/);
+    // Ohne Messung keine freien Zeilen — die gibt es nur über einzelPdfDokument.
+    expect(JSON.stringify(dd.content)).not.toContain('"text":" ","margin":[0,5,0,5]');
+    const frei = pdfDokument(basisBogen(), QR, undefined, undefined, { freiePersonalZeilen: 2, freiesFahrzeug: true });
+    expect(JSON.stringify(frei.content).match(/"text":" ","margin":\[0,5,0,5\]/g)).toHaveLength(8);
+    expect(texte(frei.content)).toContain("Kennzeichen:");
   });
 
   it("schreibt Änderungen fürs Papier als „von … auf …“", () => {

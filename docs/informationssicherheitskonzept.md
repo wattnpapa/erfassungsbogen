@@ -566,6 +566,18 @@ Datenausleitung an eine andere Herkunft ist technisch unterbunden.
   soll das vorher sehen. Die Rückmeldung von „Bögen einlesen…" wiederholt den
   Hinweis (`STIFT_HINWEIS`, `qr-stapel.ts`). Integrität: Papier und Gerät
   können weiterhin auseinanderlaufen; der Hinweis macht es nur sichtbar.
+  *Nachgezogen 2026-10-05 (Audit Runde 3, R3-A3, R3-A5, R3-A6):* Auf den
+  Seiten eines mehrteiligen Codes stehen Anleitung, Stift-Kästchen und Kasten
+  „Stand am Meldekopf" neben den Codes statt darunter (keine fast leeren
+  Folgeseiten mehr). Das Lageblatt füllt die letzte Seite mit
+  Nachtragszeilen (gemessen in einem Probesatz, `einsatzLageblattSeiteFuellen`)
+  und trägt unter „Summe laut Gerät" eine leere Zeile „Summe einschl.
+  Nachträge (von Hand)"; ein leeres Lageblatt druckt Ausfülllinien statt
+  Nullen. Das Einzel-PDF führt je Person die Zählrolle (F/UF/M), die Stärke
+  mit Legende und — nur wo es keine Seite kostet (`einzelPdfDokument`) — zwei
+  freie Personalzeilen und einen leeren Fahrzeugblock. Kein neuer Inhalt aus
+  der Sammlung, keine neue Datenkategorie: die Zählrolle ist Teil des Bogens
+  und steht schon im QR-Code und in der CSV.
 - **Excel-Liste „Oldenburg"** (`src/app/oldenburg-xlsx.ts`, seit 2026-09-29,
   Audit Runde 2, R2-K2): führt dieselben Führungsstellen-Angaben — Eintreffzeit
   in „eingetr. / zugew.", Abrückzeit in „Einsatz-ende", Auftrag/Notiz

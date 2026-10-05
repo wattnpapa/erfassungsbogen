@@ -16,7 +16,7 @@ import type { Erfassungsbogen } from "@bos/eeb-format/model";
 import { base64UrlDekodieren } from "@bos/eeb-format/codec";
 import { einheitAnzeigename, natoZeitstempel, qrErzeugen } from "./hilfen";
 import { istNativ, binaerTeilen } from "./nativ";
-import { einsatzLageblattSeiteFuellen, einsatzPdfDokument, pdfDokument, type SammelBogen, type UebersichtEintrag } from "./pdf-dokument";
+import { einsatzLageblattSeiteFuellen, einsatzPdfDokument, einzelPdfDokument, type SammelBogen, type UebersichtEintrag } from "./pdf-dokument";
 import { einsatzDateiInhalt } from "./einsatz-transport";
 import { MeldeStatus, neuesteJeEinheit, revisionen, type Einsatzsammlung, type MeldeEintrag } from "@bos/meldekopf/einsaetze";
 import { zaehltInLage } from "./auswertung";
@@ -55,6 +55,14 @@ pdf.addFonts({
 });
 
 /**
+ * Einzel-PDF mit Platz für Stiftnachträge, wo er keine Seite kostet: ein
+ * Probesatz misst den freien Platz (Audit Runde 3, R3-A6).
+ */
+function einzelDokument(b: Erfassungsbogen, qr: Awaited<ReturnType<typeof qrErzeugen>>) {
+  return einzelPdfDokument(b, qr, (probe) => pdfMake.createPdf(probe).getBuffer());
+}
+
+/**
  * Bogen als PDF ausgeben. `name` überschreibt den aus der Einheit abgeleiteten
  * Dateinamen (die Beispielbögen behalten so ihren Dateinamen aus examples/).
  * `herkunft` = empfangener Payload: unverändert weitergereicht behält der
@@ -66,7 +74,7 @@ export async function pdfErzeugen(
   herkunft?: Uint8Array | null,
 ): Promise<void> {
   const qr = await qrErzeugen(b, herkunft);
-  const dd = pdfDokument(b, qr);
+  const dd = await einzelDokument(b, qr);
   const rumpf = einheitAnzeigename(b.einheit).replace(/[^\wäöüÄÖÜß-]+/g, "_");
   const dateiname = name ?? `eeb-${natoZeitstempel()}_${rumpf}.pdf`;
   if (istNativ()) {
@@ -89,7 +97,7 @@ export async function pdfErzeugen(
  */
 export async function pdfBlobUrl(b: Erfassungsbogen, herkunft?: Uint8Array | null): Promise<string> {
   const qr = await qrErzeugen(b, herkunft);
-  const dd = pdfDokument(b, qr);
+  const dd = await einzelDokument(b, qr);
   return URL.createObjectURL(await pdfMake.createPdf(dd).getBlob());
 }
 
@@ -134,7 +142,7 @@ export async function meldungPdfAnzeigen(m: MeldeEintrag, fenster: Window | null
     return;
   }
   const qr = await qrErzeugen(m.bogen, herkunft);
-  await pdfMake.createPdf(pdfDokument(m.bogen, qr)).open(fenster);
+  await pdfMake.createPdf(await einzelDokument(m.bogen, qr)).open(fenster);
 }
 
 /**
