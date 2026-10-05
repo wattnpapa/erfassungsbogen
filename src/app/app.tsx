@@ -6,7 +6,7 @@
  * Tests rendern, ohne dass ein Wurzelknoten oder Plattform-Seiteneffekte nötig sind.
  */
 
-import { Fragment, useEffect, useRef, useState, type ChangeEvent } from "react";
+import { Fragment, useEffect, useLayoutEffect, useRef, useState, type ChangeEvent } from "react";
 import { START_ABSCHNITTE, type Teil } from "./start-inhalt";
 import type { Erfassungsbogen } from "@bos/eeb-format/model";
 import {
@@ -564,6 +564,41 @@ function useSchrittRichtung(schritt: number) {
     setStand({ schritt, richtung: schritt < stand.schritt ? "zurueck" : "vor" });
   }
   return stand.richtung;
+}
+
+/**
+ * Jeder Wechsel der Ansicht (Startseite, Assistent, Musterung,
+ * Einsatz-Sammlung) beginnt oben, mit Kopf und Überschrift im Bild.
+ *
+ * Der Schrittwechsel im Assistenten tat das schon (R2-H1), der Wechsel VON
+ * der Startseite aber nicht: „Neuen Bogen erstellen", „Fortsetzen", „Einsatz
+ * vorbereiten" und die Schnellerfassung liegen dort meist unter dem ersten
+ * Bild, und die neue Ansicht übernahm deren Scrollposition. Die Musterung
+ * öffnete bei 819 px — fünf angehakte Personen samt Stärke-Leiste über dem
+ * Bildrand —, die Schnellerfassung ohne „Eingetroffen um" und die Marke der
+ * Sammlung (Audit Runde 3, R3-H1). Darum hängt das an der Ansicht, nicht an
+ * jedem einzelnen Knopf. Vor dem Malen (Layout-Effekt), damit die Mitte der
+ * neuen Seite nicht kurz aufblitzt; der Fokus geht wie beim Schrittwechsel
+ * auf die Überschrift, ohne zu rollen.
+ */
+function useAnsichtBeginntOben(ansicht: string) {
+  const vorige = useRef(ansicht);
+  useLayoutEffect(() => {
+    if (vorige.current === ansicht) return;
+    vorige.current = ansicht;
+    try {
+      window.scrollTo(0, 0);
+    } catch {
+      /* Testumgebung ohne Layout */
+    }
+    const kopf =
+      document.querySelector<HTMLElement>(".schritt-inhalt h2") ??
+      document.querySelector<HTMLElement>(".seiten-kopf h1");
+    if (kopf && ansicht !== "start") {
+      if (!kopf.hasAttribute("tabindex")) kopf.tabIndex = -1;
+      kopf.focus({ preventScroll: true });
+    }
+  }, [ansicht]);
 }
 
 function AppInhalt() {
@@ -2736,6 +2771,12 @@ function AppInhalt() {
   // Laufende Sammlungen für die Weiche der Startseite (R3-K5): die zuletzt
   // geänderten, höchstens zwei — sonst wird aus der Weiche eine zweite Liste.
   const laufende = [...einsaetze].sort((a, b) => b.geaendert - a.geaendert).slice(0, 2);
+
+  // Welche Ansicht gleich gezeigt wird — dieselbe Rangfolge wie die
+  // Weichen darunter. Jeder Wechsel beginnt oben (R3-H1).
+  useAnsichtBeginntOben(
+    musterVorlage ? "musterung" : offenerEinsatz ? `einsatz:${offenerEinsatz.id}` : !bogen || zeigeStart ? "start" : "bogen",
+  );
 
   // Musterung einer Vorlage (Vorrang vor allen anderen Ansichten).
   if (musterVorlage) {

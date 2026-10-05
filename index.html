@@ -1785,6 +1785,24 @@
       .staerke-leiste:has(> div:nth-child(5)) { display: flex; flex-wrap: wrap; }
       .staerke-leiste:has(> div:nth-child(5)) > div { flex: 1 1 0; min-width: max-content; }
     }
+    /* Musterung: Die Leiste bleibt beim Abhaken im Bild — die Liste ist
+       länger als ein Bildschirm, und wer unten Haken entfernt, soll sehen,
+       was die Einheit damit meldet (Audit Runde 3, R3-H1). Dafür eine Zeile
+       mit vier Feldern statt des Zweierrasters, sonst klebten oben drei
+       Zeilen Zahlen. */
+    .musterung .staerke-leiste {
+      position: sticky; top: 0; z-index: 3;
+      display: grid; grid-template-columns: repeat(4, minmax(0, 1fr));
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+    }
+    .musterung .staerke-leiste > div {
+      grid-column: auto; padding: var(--r-1) var(--r-2);
+      border-top: none; border-left: var(--strich) solid var(--linie-fein);
+    }
+    .musterung .staerke-leiste > div:first-child { border-left: none; }
+    .musterung .staerke-leiste > div.gesamt { border-left-color: var(--linie); }
+    .musterung .staerke-leiste span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; letter-spacing: 0; }
+    .musterung .staerke-leiste strong { font-size: calc(var(--t-zahl) * 0.8); }
     .staerke-leiste strong {
       font-size: var(--t-zahl); line-height: 1.05; font-weight: 700;
       letter-spacing: -0.02em; font-variant-numeric: tabular-nums;

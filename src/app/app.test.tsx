@@ -193,6 +193,33 @@ describe("Assistenten-Durchlauf", () => {
     }
   });
 
+  /**
+   * Audit Runde 3, R3-H1: Von der Startseite aus übernahm die neue Ansicht
+   * deren Scrollposition — Musterung bei 819 px, Assistent ohne „1. Einheit".
+   */
+  it("beginnt beim Wechsel von der Startseite in Assistent und Musterung oben (R3-H1)", async () => {
+    vorlageAnlegen("FGr Obenhausen", bogenMitName("OV Obenhausen"));
+    const nutzer = userEvent.setup();
+    const scroll = vi.spyOn(window, "scrollTo").mockImplementation(() => {});
+    try {
+      render(<App />);
+      await nutzer.click(screen.getByRole("button", { name: /Einsatz vorbereiten/ }));
+      expect(scroll).toHaveBeenCalledWith(0, 0);
+      expect(document.activeElement).toBe(screen.getByRole("heading", { level: 1, name: "FGr Obenhausen" }));
+      await nutzer.click(screen.getByRole("button", { name: "‹ Abbrechen" }));
+      scroll.mockClear();
+      await nutzer.click(screen.getByRole("button", { name: "Neuen Bogen erstellen" }));
+      expect(scroll).toHaveBeenCalledWith(0, 0);
+      expect(document.activeElement).toBe(screen.getByRole("heading", { level: 2, name: "1. Einheit" }));
+      // Zurück zur Startseite: auch die beginnt oben.
+      scroll.mockClear();
+      await nutzer.click(screen.getByRole("button", { name: "‹ Startseite" }));
+      expect(scroll).toHaveBeenCalledWith(0, 0);
+    } finally {
+      scroll.mockRestore();
+    }
+  });
+
   it("springt vom offenen Punkt ins Feld und setzt den Cursor (R2-H2)", async () => {
     const nutzer = userEvent.setup();
     render(<App />);
