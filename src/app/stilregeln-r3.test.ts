@@ -6,6 +6,7 @@
 
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
+import { kontrast } from "./org-farben";
 
 const html = readFileSync(new URL("../../index.html", import.meta.url), "utf8");
 // Kommentare raus, sonst zählen Begründungen als Regeln.
@@ -43,5 +44,40 @@ describe("Taktisches Zeichen auf dunklem Grund (R3-L5)", () => {
     expect(css.lastIndexOf(":is(.dunkel-modus, .nacht-modus) .seiten-kopf img.einheit-avatar")).toBeGreaterThan(
       css.indexOf(".platform-android .seiten-kopf img.einheit-avatar"),
     );
+  });
+});
+
+/** Wert eines Tokens im ersten Block mit genau diesem Selektor. */
+function token(selektor: string, name: string): string {
+  for (const b of bloecke(selektor)) {
+    const m = new RegExp(`${name}:\\s*(#[0-9a-fA-F]{6})\\s*;`).exec(b);
+    if (m) return m[1]!;
+  }
+  throw new Error(`${name} fehlt in ${selektor}`);
+}
+
+describe("Kleinere Sichtreste (R3-L7)", () => {
+  it("Platzhalter (--text-3) nachts mindestens 4,5:1 auf dem Feldgrund", () => {
+    expect(kontrast(token(".nacht-modus", "--text-3"), token(".nacht-modus", "--flaeche"))).toBeGreaterThanOrEqual(4.5);
+  });
+
+  it("Knopfrahmen (--n-400) mindestens 3:1 auf dem Seitengrund (--n-50)", () => {
+    // :root ist die erste Regel des Blatts — ihr „Selektor" reicht bis in den
+    // HTML-Kopf, deshalb hier das erste Vorkommen im Stylesheet.
+    const roh = (name: string) => new RegExp(`${name}:\\s*(#[0-9a-fA-F]{6})\\s*;`).exec(css)![1]!;
+    expect(kontrast(roh("--n-400"), roh("--n-50"))).toBeGreaterThanOrEqual(3);
+  });
+
+  it("Markenrahmen im Feld-Modus mindestens 3:1 auf Weiß", () => {
+    expect(kontrast(token(".feld-modus", "--warn-linie"), "#ffffff")).toBeGreaterThanOrEqual(3);
+  });
+
+  it("der Ladehinweis trägt den Rahmen in der Schriftfarbe, nicht in Grün", () => {
+    expect(bloecke(".start > p.offline-badge.offline-laedt").join("\n")).toMatch(/border-color:\s*currentColor/);
+  });
+
+  it("die Segmentgrenze des Umschalters liegt auf --linie-stark, auch im Kopf", () => {
+    expect(bloecke(".anzeige-schalter button + button").join("\n")).toMatch(/var\(--linie-stark\)/);
+    expect(css).not.toMatch(/anzeige-schalter button \+ button\s*\{[^}]*--kopf-linie/);
   });
 });

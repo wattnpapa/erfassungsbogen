@@ -909,9 +909,12 @@ export function Uebersicht(props: {
             <p className="warnung" role="status">
               Dieser Bogen gehört zum Einsatz {zeitraumDeutsch(bogen)}.
             </p>
+            {/* Kein zweiter Primärknopf: Nachts standen zwei gleich
+                bernsteinfarbene Knöpfe untereinander, und der, der den Bogen
+                verändert, stand oben (Audit Runde 3, R3-L7). Er bleibt zuerst,
+                die Übergabe bleibt der eine Primärknopf. */}
             <button
               type="button"
-              className="primaer"
               onClick={() => {
                 teilenDialog.current?.close();
                 props.onNeuerEinsatz?.();

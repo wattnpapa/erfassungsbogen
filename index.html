@@ -205,7 +205,9 @@
       --n-100: #e8ebf2;
       --n-200: #d7dce7;
       --n-300: #bcc3d3;
-      --n-400: #8b94a9;
+      /* R3-L7: von #8b94a9 (2,79:1 auf dem Seitengrund) eine Stufe dunkler —
+         Knopfrahmen der Nebenknöpfe stehen auf --grund und brauchen 3:1. */
+      --n-400: #838ca1;
       /* Eigener Schritt für den Dritttext: --n-400 trägt als Linie genug,
          als Schrift auf Weiß nur 3,04:1 und verfehlt damit AA. Die Linie
          soll aber nicht mitdunkeln — deshalb ein Zwischenwert statt einer
@@ -425,7 +427,9 @@
        hinauslaufen: auf dem Telefon bricht es innerhalb der Fensterbreite um. */
     .start > p.offline-badge { max-width: 100%; width: max-content; font-size: var(--t-s); }
     /* Noch nicht offline bereit (R2-O1): in Warnfarbe, damit die Zeile nicht wie die Zusage aussieht. */
-    .start > p.offline-badge.offline-laedt { color: var(--warn-text); }
+    /* R3-L7: Rahmen in derselben Warnfarbe — der grüne Rahmen sagte „in
+       Ordnung", solange noch geladen wurde (nachts 1,32:1 zur Schrift). */
+    .start > p.offline-badge.offline-laedt { color: var(--warn-text); border-color: currentColor; }
     /* Rückmeldungen bleiben hier Text, keine zweite Deckzeile: die allgemeine
        `.meldung`-Kartenoptik (Rahmen, Deckkante, Stempel-Animation) ist für
        Stellen gedacht, an denen sie die einzige Karte weit und breit ist. Auf
@@ -670,7 +674,9 @@
          Lücke zu lassen. */
       flex: 1 1 auto;
     }
-    .anzeige-schalter button + button { border-left: var(--strich) solid var(--linie); }
+    /* R3-L7: --linie-stark statt --linie — die Segmentgrenze war zwischen
+       zwei weißen Feldern nicht zu sehen. */
+    .anzeige-schalter button + button { border-left: var(--strich) solid var(--linie-stark); }
     .anzeige-schalter button.aktiv { background: var(--akzent); color: var(--auf-akzent); }
     /* Im Assistenten-Kopf sitzt der Umschalter rechts in der Titelzeile — auf
        der Kennfarbe trennt die Kopf-Linie statt des Inhalts-Graus. */
@@ -680,7 +686,9 @@
        Kennfarben-Köpfen (Start + Assistent). */
     .seiten-kopf .titelzeile h1 { flex: 1 1 14rem; }
     .seiten-kopf .titelzeile .anzeige-schalter { margin-left: auto; border-color: var(--kopf-linie); }
-    .seiten-kopf .titelzeile .anzeige-schalter button + button { border-left-color: var(--kopf-linie); }
+    /* Die Trennlinie zwischen zwei Segmenten liegt auf den (weißen)
+       Segmenten, nicht auf der Kennfarbe: --kopf-linie war dort unsichtbar
+       (R3-L7). Sie kommt aus .anzeige-schalter button + button. */
     /* Immer sichtbarer Rücksprung zur Startseite im Kopfbereich. Sieht aus
        wie ein Wort, ist aber ein Knopf im Zielmaß (44/48 px, gemessen vorher
        80 × 30): der Rückweg ist die meistgenutzte Bedienung des Kopfes und
@@ -747,10 +755,6 @@
     .seiten-kopf.assistent-kopf .kopf-oberzeile .anzeige-schalter,
     .seiten-kopf.einsatz-kopf .kopf-oberzeile .anzeige-schalter {
       border-color: var(--kopf-linie);
-    }
-    .seiten-kopf.assistent-kopf .kopf-oberzeile .anzeige-schalter button + button,
-    .seiten-kopf.einsatz-kopf .kopf-oberzeile .anzeige-schalter button + button {
-      border-left-color: var(--kopf-linie);
     }
     /* Speicher voll: die Zeile, die sonst „gespeichert" meldet, wird zur
        Warnung — im Kopf auf Warnfond, damit sie nicht wie die ruhige
@@ -3855,6 +3859,9 @@
       --text:        #000000;
       --text-2:      #262b36;
       --text-3:      #262b36;
+      /* R3-L7: Markenrahmen („Ruhezeit", „Unterbringung angefordert") auf
+         Weiß 1,79:1 — in der Sonne verschwamm die Kante. 4,02:1. */
+      --warn-linie:  #9c7a24;
       --linie-fein:  #111318;
       --linie:       #111318;
       --linie-stark: #111318;
@@ -3999,7 +4006,8 @@
       --flaeche-2:   #221f16;
       --text:        #d9cdb6;
       --text-2:      #a2977e;
-      --text-3:      #877c66;
+      /* R3-L7: #877c66 maß auf dem Feldgrund 4,44:1 (Platzhalter). */
+      --text-3:      #8c816b;
       --linie-fein:  #2b271d;
       --linie:       #423c2d;
       /* Feldrahmen nachts ≥ 3:1 (R2-L3, vorher #5c5440 mit 2,43:1): #746a51
