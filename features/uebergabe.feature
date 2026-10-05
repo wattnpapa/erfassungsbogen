@@ -41,7 +41,8 @@ Funktionalität: Bogen übergeben — QR, PDF, Link, CSV
     # Die App weiß nicht, ob gescannt wurde — sie fragt (Audit Runde 3, R3-H3).
     Und sehe ich den Text "Hat die Gegenstelle den Code gescannt?"
     Wenn ich auf "Nicht sicher" klicke
-    Dann sehe ich den Text "Empfang nicht bestätigt"
+    Dann sehe ich den Hinweis "QR-Code gezeigt"
+    Und sehe ich den Hinweis "Empfang nicht bestätigt"
 
   # Auf Telefonhöhe gehen Code, Teilnummer und Knöpfe vor; der
   # Helligkeitstipp entfällt (Audit Runde 3, R3-H2).
