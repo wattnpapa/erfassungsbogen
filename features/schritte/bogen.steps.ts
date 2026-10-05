@@ -38,6 +38,9 @@ When("ich den Link aus der Zwischenablage öffne", async function (this: EebWelt
   // EEB_URL_PREFIX), geöffnet wird er aber auf dem Prüfstand. Sonst prüfte die
   // Runde den ausgelieferten Stand der echten Seite statt den eigenen Build —
   // und schlüge bei jeder Schemaänderung fehl, bis veröffentlicht ist.
+  // Der eigene Bogen liegt auf diesem Gerät noch als Entwurf: seit R3-S1/R3-D2
+  // fragt die App auch beim Kaltstart, bevor der Link ihn verdrängt. Die
+  // Szenarien bestätigen das ausdrücklich („Empfangenen Bogen öffnen?").
   // Dazwischen leer laden: ein reiner Fragmentwechsel startet die Seite nicht
   // neu — der Übergabe-Dialog stünde noch offen. Der Bogen soll aber ankommen
   // wie auf einem zweiten Gerät.

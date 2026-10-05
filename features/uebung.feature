@@ -50,6 +50,8 @@ Funktionalität: Übungs-Kennzeichnung des Bogens
     Und ich "Weitere Formate" aufklappe
     Und ich im Dialog auf "Link teilen" klicke
     Und ich den Link aus der Zwischenablage öffne
+    Dann sehe ich den Dialog "Empfangenen Bogen öffnen?"
+    Wenn ich im Dialog auf "Meldung öffnen" klicke
     Dann sehe ich die Übersicht mit dem Standort "Musterhausen"
     Und sehe ich den Hinweis "Dieser Bogen ist als Übung gekennzeichnet"
 

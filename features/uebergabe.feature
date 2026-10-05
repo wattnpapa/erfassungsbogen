@@ -103,6 +103,8 @@ Funktionalität: Bogen übergeben — QR, PDF, Link, CSV
     Und ich "Weitere Formate" aufklappe
     Und ich im Dialog auf "Link teilen" klicke
     Und ich den Link aus der Zwischenablage öffne
+    Dann sehe ich den Dialog "Empfangenen Bogen öffnen?"
+    Wenn ich im Dialog auf "Meldung öffnen" klicke
     Dann sehe ich die Übersicht mit dem Standort "Oldenburg - Ni"
     Und sehe ich den Text "eigener Stand"
     Und sehe ich den Hinweis "Empfangen als:"
@@ -118,6 +120,8 @@ Funktionalität: Bogen übergeben — QR, PDF, Link, CSV
     Und ich "Weitere Formate" aufklappe
     Und ich im Dialog auf "Link teilen" klicke
     Und ich den Link aus der Zwischenablage öffne
+    Dann sehe ich den Dialog "Empfangenen Bogen öffnen?"
+    Wenn ich im Dialog auf "Meldung öffnen" klicke
     Dann sehe ich den Hinweis "Unveränderter Bogen von fremder Stelle:"
     Wenn ich zum Schritt "5. Sofortbedarf" wechsle
     Und ich das Feld "Sonstiges (Freitext)" mit "nachträglich ergänzt" fülle
@@ -136,6 +140,8 @@ Funktionalität: Bogen übergeben — QR, PDF, Link, CSV
     Und ich "Weitere Formate" aufklappe
     Und ich im Dialog auf "Link teilen" klicke
     Und ich den Link aus der Zwischenablage öffne
+    Dann sehe ich den Dialog "Empfangenen Bogen öffnen?"
+    Wenn ich im Dialog auf "Meldung öffnen" klicke
     Dann sehe ich den Hinweis "Empfangen als:"
     Und sehe ich den Hinweis "Eigene Angabe des Absenders:"
     Und sehe ich den Hinweis "Max Mustermann"
