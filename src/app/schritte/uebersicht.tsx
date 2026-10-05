@@ -57,7 +57,7 @@ import { istNativ, linkTeilen, nahbereichDienst, pdfEinbettbar, shareSheetVerfue
 import { fehlerText } from "../nachladen";
 import { frageJaNein, frageText, zeigeHinweis } from "../dialoge";
 import { SpeicherVollFehler, istSpeicherVoll } from "../eintrag-zeiten";
-import { uebergabeText, type UebergabeStand } from "../uebergabe-stand";
+import { uebergabeText, type UebergabeStand, type UebergabeWeg } from "../uebergabe-stand";
 import { ebeneBetreten, ebeneVerlassen, useEbeneZurueck, useModalesOverlay } from "../modal-overlay";
 import {
   MWD_LEGENDE,
@@ -113,7 +113,13 @@ export function Uebersicht(props: {
   onNeuerEinsatz?: () => void;
   /** Letzte Übergabe und der Rückruf, wenn übergeben wurde (R2-W2). */
   uebergabe?: UebergabeStand | null;
-  onUebergeben?: () => void;
+  /**
+   * Was mit dem Bogen geschah (R3-H3): Weg und ob der Nutzer den Empfang
+   * bestätigt hat. Ohne Bestätigung heißt der Vermerk nicht „Übergeben".
+   */
+  onUebergeben?: (weg: UebergabeWeg, bestaetigt?: boolean) => void;
+  /** „Ist angekommen" zum letzten, unveränderten Vermerk (R3-H3). */
+  onUebergabeBestaetigen?: () => void;
 }) {
   const { bogen, geheZu, neu } = props;
 
@@ -348,7 +354,7 @@ export function Uebersicht(props: {
     setFehler("");
     try {
       await linkInsShareSheet(qr.vollUrl);
-      props.onUebergeben?.();
+      props.onUebergeben?.("nah");
     } catch (e) {
       // Abbruch im Share-Dialog ist kein Fehler
       if (e instanceof Error && e.name === "AbortError") return;
@@ -362,10 +368,10 @@ export function Uebersicht(props: {
     try {
       if (shareSheetVerfuegbar()) {
         await linkInsShareSheet(url);
-        props.onUebergeben?.();
+        props.onUebergeben?.("link");
       } else if (navigator.clipboard) {
         await navigator.clipboard.writeText(url);
-        props.onUebergeben?.();
+        props.onUebergeben?.("kopiert");
         setLinkKopiert(true);
         window.setTimeout(() => setLinkKopiert(false), 3000);
       } else {
@@ -415,7 +421,9 @@ export function Uebersicht(props: {
     try {
       const { pdfErzeugen } = await import("../pdf");
       await pdfErzeugen(bogen, dateiname, props.herkunft);
-      props.onUebergeben?.();
+      // „PDF erzeugt", nicht „Übergeben": die Datei liegt erst auf diesem
+      // Gerät (Audit Runde 3, R3-A7).
+      props.onUebergeben?.("pdf");
       // In der App gibt es keinen Download: die PDF ging ins Teilen-Fenster
       // des Systems — dort heißt „fertig" etwas anderes als im Browser.
       setPdfQuittung(
@@ -542,7 +550,21 @@ export function Uebersicht(props: {
         {/* Hat der Meldekopf den aktuellen Stand? (R2-W2) */}
         {(() => {
           const u = uebergabeText(bogen, props.uebergabe);
-          return u && <p className={u.geaendert ? "warnung" : "hinweis"} role="status">{u.text}</p>;
+          if (!u) return null;
+          return (
+            <>
+              <p className={u.geaendert ? "warnung" : "hinweis"} role="status">{u.text}</p>
+              {/* Die App weiß nicht, ob etwas ankam — der Nutzer kann es
+                  ausdrücklich bestätigen (R3-H3, R3-A7). */}
+              {u.offen && props.onUebergabeBestaetigen && (
+                <p>
+                  <button type="button" onClick={props.onUebergabeBestaetigen}>
+                    Gegenstelle hat ihn — als übergeben vermerken
+                  </button>
+                </p>
+              )}
+            </>
+          );
         })()}
         <Vollstaendigkeit punkte={offenePunkte} geheZu={geheZu} />
       </section>
@@ -906,7 +928,8 @@ export function Uebersicht(props: {
               teilenDialog.current?.close();
               setVollbildTeil(0);
               setVollbild(true);
-              props.onUebergeben?.();
+              // Vermerkt wird erst beim Schließen — und nur, wenn alle Teile
+              // gezeigt wurden (R3-H3).
               ebeneBetreten(VOLLBILD_EBENE); // Zurück schließt nur das Vollbild (R2-H5)
             }}
           >
@@ -998,8 +1021,16 @@ export function Uebersicht(props: {
           staerke={staerkeText}
           teilIndex={vollbildTeil}
           onTeil={setVollbildTeil}
-          onSchliessen={() => ebeneVerlassen(VOLLBILD_EBENE, () => setVollbild(false))}
-          onZurueck={() => setVollbild(false)}
+          onSchliessen={(ergebnis) =>
+            ebeneVerlassen(VOLLBILD_EBENE, () => {
+              setVollbild(false);
+              if (ergebnis) props.onUebergeben?.("qr", ergebnis === "bestaetigt");
+            })
+          }
+          onZurueck={(ergebnis) => {
+            setVollbild(false);
+            if (ergebnis) props.onUebergeben?.("qr", ergebnis === "bestaetigt");
+          }}
         />
       )}
     </>
@@ -1013,7 +1044,14 @@ export function Uebersicht(props: {
  */
 const VOLLBILD_EBENE = "qr-vollbild";
 
-function QrVollbild(props: {
+/**
+ * Was beim Schließen des Vollbilds vermerkt wird (R3-H3): `undefined` =
+ * nichts (nicht alle Teile gezeigt), „gezeigt" = alle Teile gezeigt, Empfang
+ * offen, „bestaetigt" = der Nutzer hat gesagt, dass gescannt wurde.
+ */
+export type VollbildErgebnis = "gezeigt" | "bestaetigt" | undefined;
+
+export function QrVollbild(props: {
   qr: QrSatz;
   /** Wer gezeigt wird — Organisation · Einheitstyp · Standort. */
   einheit: string;
@@ -1022,17 +1060,31 @@ function QrVollbild(props: {
   teilIndex: number;
   onTeil: (i: number) => void;
   /** Knopf oder Escape — verbraucht auch den Verlaufseintrag. */
-  onSchliessen: () => void;
+  onSchliessen: (ergebnis: VollbildErgebnis) => void;
   /** Geräte-/Browser-Zurück — der Eintrag ist dann schon weg. */
-  onZurueck: () => void;
+  onZurueck: (ergebnis: VollbildErgebnis) => void;
 }) {
   const { qr, teilIndex } = props;
   const dialog = useRef<HTMLDialogElement>(null);
-  useModalesOverlay(dialog, { onSchliessen: props.onSchliessen });
-  useEbeneZurueck(VOLLBILD_EBENE, props.onZurueck);
-  const teil = qr.teile[Math.min(teilIndex, qr.teile.length - 1)]!;
+  const anzahl = qr.teile.length;
+  const index = Math.min(teilIndex, anzahl - 1);
+  const teil = qr.teile[index]!;
+  // Welche Teile schon auf dem Bildschirm standen: „gezeigt" gilt erst, wenn
+  // es alle waren — vorher hieß schon Teil 1 von 2 „Übergeben" (R3-H3).
+  const [gezeigt, setGezeigt] = useState<ReadonlySet<number>>(() => new Set([index]));
+  useEffect(() => {
+    setGezeigt((g) => (g.has(index) ? g : new Set([...g, index])));
+  }, [index]);
+  const alleGezeigt = gezeigt.size >= anzahl;
+  const fehlend = qr.teile.findIndex((_, i) => !gezeigt.has(i));
+  // „zeigen" = Code; „frage" = Wurde gescannt?; „fehlt" = ein Teil fehlt noch.
+  const [phase, setPhase] = useState<"zeigen" | "frage" | "fehlt">("zeigen");
+  const ohneFrage = (): VollbildErgebnis => (alleGezeigt ? "gezeigt" : undefined);
+  useModalesOverlay(dialog, { onSchliessen: () => props.onSchliessen(ohneFrage()) });
+  useEbeneZurueck(VOLLBILD_EBENE, () => props.onZurueck(ohneFrage()));
   // Stand = Moment des Öffnens; der Code zeigt den Bogen, wie er jetzt ist.
   const [stand] = useState(() => new Date().toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit" }));
+  const teilText = (i: number) => `Teil ${i + 1} von ${anzahl}`;
   return (
     <dialog ref={dialog} className="qr-vollbild" aria-label="QR-Code im Vollbild" tabIndex={-1}>
       {/* Wer mehrere Telefone nacheinander scannt, prüft vor dem Scan, welcher
@@ -1043,29 +1095,92 @@ function QrVollbild(props: {
         <br />
         Stärke <strong>{props.staerke}</strong> <span className="hinweis">(F / UF / M / Ges) · Stand {stand} Uhr</span>
       </p>
-      <img
-        src={teil.datenUrl}
-        alt={qr.segmentiert ? `EEB2-QR-Code Teil ${teil.teilNr} von ${teil.anzahl}` : "EEB2-QR-Code"}
-      />
-      {qr.segmentiert && (
-        <p>
-          <strong>Teil {teil.teilNr} von {teil.anzahl}</strong> — alle Teile nacheinander scannen lassen.
+      {/* „Teil 1 von 2" ÜBER dem Code: darunter verdeckte ihn die klebende
+          Knopfleiste, und der zweite Teil wurde leicht vergessen (R3-H2). */}
+      {qr.segmentiert && phase === "zeigen" && (
+        <p className="qr-vollbild-teil">
+          <strong>{teilText(index)}</strong>
+          <span className="qr-vollbild-teil-zusatz"> — alle nacheinander scannen lassen.</span>
         </p>
       )}
-      <p className="hinweis">Der Bildschirm bleibt an — Display-Helligkeit hoch stellen hilft beim Scannen.</p>
-      <div className="qr-vollbild-nav">
-        {qr.segmentiert && (
-          <button type="button" disabled={teilIndex === 0} onClick={() => props.onTeil(teilIndex - 1)}>
-            ← Voriger Teil
+      {phase === "zeigen" && (
+        <div className="qr-vollbild-code">
+          <img
+            src={teil.datenUrl}
+            alt={qr.segmentiert ? `EEB2-QR-Code Teil ${teil.teilNr} von ${teil.anzahl}` : "EEB2-QR-Code"}
+          />
+        </div>
+      )}
+      {phase === "zeigen" && (
+        <p className="hinweis qr-vollbild-tipp">Der Bildschirm bleibt an — Display-Helligkeit hoch stellen hilft beim Scannen.</p>
+      )}
+      {phase === "frage" && (
+        <div className="qr-vollbild-frage" role="group" aria-label="Wurde gescannt?">
+          <p>
+            <strong>{anzahl > 1 ? `Hat die Gegenstelle alle ${anzahl} Teile gescannt?` : "Hat die Gegenstelle den Code gescannt?"}</strong>
+          </p>
+          <p className="hinweis">Die App kann das nicht selbst sehen.</p>
+          <div className="qr-vollbild-nav">
+            <button type="button" className="primaer" onClick={() => props.onSchliessen("bestaetigt")}>
+              Ja, gescannt — übergeben
+            </button>
+            <button type="button" onClick={() => props.onSchliessen("gezeigt")}>Nicht sicher</button>
+            <button type="button" onClick={() => setPhase("zeigen")}>← Code wieder zeigen</button>
+          </div>
+        </div>
+      )}
+      {phase === "fehlt" && fehlend >= 0 && (
+        <div className="qr-vollbild-frage" role="group" aria-label="Teil fehlt">
+          <p className="warnung">
+            <strong>{teilText(fehlend)} wurde noch nicht gezeigt.</strong> Ohne ihn hat die Gegenstelle den Bogen nicht.
+          </p>
+          <div className="qr-vollbild-nav">
+            <button
+              type="button"
+              className="primaer"
+              onClick={() => {
+                props.onTeil(fehlend);
+                setPhase("zeigen");
+              }}
+            >
+              {teilText(fehlend)} zeigen
+            </button>
+            <button type="button" onClick={() => props.onSchliessen(undefined)}>Trotzdem schließen</button>
+          </div>
+        </div>
+      )}
+      {phase === "zeigen" && (
+        <div className={`qr-vollbild-nav${qr.segmentiert ? " mit-teilen" : ""}`}>
+          {qr.segmentiert && (
+            <button
+              type="button"
+              disabled={index === 0}
+              aria-label={index === 0 ? "Voriger Teil" : `Voriger Teil (${index} von ${anzahl})`}
+              onClick={() => props.onTeil(index - 1)}
+            >
+              {index === 0 ? "←" : `← Teil ${index}`}
+            </button>
+          )}
+          {qr.segmentiert && (
+            <button
+              type="button"
+              disabled={index >= anzahl - 1}
+              aria-label={index >= anzahl - 1 ? "Nächster Teil" : `Nächster Teil (${index + 2} von ${anzahl})`}
+              onClick={() => props.onTeil(index + 1)}
+            >
+              {/* Die Teilzahl auch im Knopf — er bleibt im Bild, wenn der Text darüber es nicht ist (R3-H2). */}
+              {index >= anzahl - 1 ? `${teilText(index)} ist der letzte` : `Weiter zu Teil ${index + 2} →`}
+            </button>
+          )}
+          <button
+            type="button"
+            className="primaer"
+            onClick={() => setPhase(alleGezeigt ? "frage" : "fehlt")}
+          >
+            Schließen
           </button>
-        )}
-        {qr.segmentiert && (
-          <button type="button" disabled={teilIndex >= qr.teile.length - 1} onClick={() => props.onTeil(teilIndex + 1)}>
-            Nächster Teil →
-          </button>
-        )}
-        <button type="button" className="primaer" onClick={props.onSchliessen}>Schließen</button>
-      </div>
+        </div>
+      )}
     </dialog>
   );
 }

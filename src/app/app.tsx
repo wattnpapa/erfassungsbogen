@@ -82,7 +82,7 @@ import {
   zeitLang,
 } from "./eintrag-zeiten";
 import { offlineText, useOfflineStand } from "./offline-bereit";
-import { uebergabeFesthalten, uebergabeText, type UebergabeStand } from "./uebergabe-stand";
+import { uebergabeBestaetigen, uebergabeNachWeg, uebergabeText, type UebergabeStand } from "./uebergabe-stand";
 import { ART_LABEL, EinsatzDetail, EinsatzListe, letzteMeldungText, type Eingang } from "./einsaetze-ui";
 import { letzteMeldung, meldungsNummern } from "./einheiten-tabelle";
 import { exportSammlung, exportStandLaden, exportVermerken, weitergabeUmImportErgaenzen, type ExportStand, type ExportUmfang } from "./export-stand";
@@ -3413,7 +3413,8 @@ function AppInhalt() {
           herkunft={bogenHerkunft}
           geheZu={geheZuFeld}
           uebergabe={uebergabe}
-          onUebergeben={() => setUebergabe(uebergabeFesthalten(bogen))}
+          onUebergeben={(weg, bestaetigt) => setUebergabe((u) => uebergabeNachWeg(bogen, u, weg, bestaetigt))}
+          onUebergabeBestaetigen={() => setUebergabe((u) => uebergabeBestaetigen(bogen, u) ?? u)}
           schliessenFolgen={() => (bogenHatInhalt(bogen) ? folgenFuerOffenenBogen() : { satz: "", verlust: false })}
           neu={() => { if (bogenHatInhalt(bogen)) merkeVerdraengt(bogen); setMeldung(""); setBogen(null); setVorlageInBearbeitung(null); setFremdeErfassung(false); setSammelZiel(null); setzeEmpfang(null); setSchritt(0); }}
           onVorlageGespeichert={(name) => { vorlagenNeuLaden(); setMeldung(`Als Vorlage „${name}" gespeichert.`); }}

@@ -37,6 +37,10 @@ Funktionalität: Bogen übergeben — QR, PDF, Link, CSV
     Und sehe ich den Hinweis "Der Bildschirm bleibt an"
     Wenn ich auf "Schließen" klicke
     Dann sehe ich "Der Bildschirm bleibt an" nicht
+    # Die App weiß nicht, ob gescannt wurde — sie fragt (Audit Runde 3, R3-H3).
+    Und sehe ich den Text "Hat die Gegenstelle den Code gescannt?"
+    Wenn ich auf "Nicht sicher" klicke
+    Dann sehe ich den Text "Empfang nicht bestätigt"
 
   Szenario: PDF-Vorschau zeigt den fertigen Bogen im Papier-Layout
     Wenn ich auf "Vorschau anzeigen" klicke und die PDF-Vorschau erscheint

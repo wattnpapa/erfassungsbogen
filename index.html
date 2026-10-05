@@ -3719,11 +3719,45 @@
       justify-content: flex-start;
       padding-bottom: 0;
     }
-    dialog.qr-vollbild > :first-child { margin-top: auto; }
-    dialog.qr-vollbild img {
-      width: min(calc(92vw - 3rem), calc(68vh - 3rem));
-      width: min(calc(92vw - 3rem), calc(68dvh - 3rem));
+    /* Der Code füllt den Platz zwischen Kopf und Knopfleiste, statt nach
+       `vh` bemessen zu sein: Hochkant bei 360 × 640 lag die klebende
+       Knopfleiste über „Teil 1 von 2" und bei 320 × 568 über der Ruhezone
+       des Codes (Audit Runde 3, R3-H2). Jetzt bekommt der Code genau den
+       Rest; Kopf, „Teil x von n", Hinweis und Knöpfe stehen ganz im Bild.
+       Containermaße (cqw/cqh) machen ihn quadratisch so groß wie möglich;
+       ältere Browser nehmen das Maß davor. Erst unter 12rem Restplatz
+       (große Schrift) rollt das Overlay. */
+    dialog.qr-vollbild > .qr-vollbild-code {
+      flex: 1 1 0; min-height: 12rem; align-self: stretch;
+      display: flex; align-items: center; justify-content: center;
+      container-type: size;
+    }
+    dialog.qr-vollbild .qr-vollbild-code img {
+      box-sizing: border-box;
+      width: min(92vw, 60vh); width: min(92vw, 60dvh);
+      width: min(100cqw, 100cqh);
+      height: auto; aspect-ratio: 1 / 1;
       flex: none;
+    }
+    dialog.qr-vollbild p.qr-vollbild-teil { font-size: var(--t-l); }
+    /* Blättern und Schließen in zwei Zeilen statt drei: „← Teil 1" und
+       „Nächster Teil (2 von 2) →" nebeneinander, „Schließen" darunter über
+       die ganze Breite. Drei umbrechende Knöpfe nahmen bei 320 px Breite
+       180 px Höhe, die dem Code fehlten (R3-H2). */
+    dialog.qr-vollbild > .qr-vollbild-nav.mit-teilen {
+      display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 0.6rem;
+    }
+    dialog.qr-vollbild > .qr-vollbild-nav.mit-teilen > .primaer { grid-column: 1 / -1; }
+    /* Telefonhöhe: Absender eine Stufe kleiner, Helligkeitstipp und der
+       Nachsatz zu „Teil x von n" entfallen — Code, Teilnummer und Knöpfe
+       gehen vor, auch im Feld-Modus mit größerer Schrift. */
+    @media (max-height: 720px) {
+      dialog.qr-vollbild p.qr-vollbild-kopf { font-size: var(--t-l); }
+      dialog.qr-vollbild .qr-vollbild-tipp,
+      dialog.qr-vollbild .qr-vollbild-teil-zusatz { display: none; }
+    }
+    dialog.qr-vollbild > .qr-vollbild-frage {
+      margin: auto 0; display: flex; flex-direction: column; gap: 0.8rem; align-items: center;
     }
     dialog.qr-vollbild > .qr-vollbild-nav {
       position: sticky; bottom: 0; z-index: 1;
@@ -3734,18 +3768,23 @@
     /* Quer auf dem Telefon: Code links, Text und Knöpfe rechts daneben —
        untereinander passten beide nicht in 360 px Höhe. Der Code nimmt die
        volle Höhe abzüglich Ruhezone und Rand. */
+    /* Oben beginnen statt mittig: War die rechte Spalte höher als der
+       Bildschirm, begann der Code bei −39 px, die obere Ruhezone fehlte
+       (Audit Runde 3, R3-H2). Der Code ist so hoch wie das Fenster abzüglich
+       Innenabstand. */
     @media (orientation: landscape) and (max-height: 540px) {
       dialog.qr-vollbild {
         display: grid; grid-template-columns: auto minmax(0, 1fr);
-        align-content: center; align-items: center; column-gap: 1.2rem; row-gap: 0.6rem;
+        align-content: start; align-items: center; column-gap: 1.2rem; row-gap: 0.6rem;
         padding-bottom: 1rem;
       }
-      dialog.qr-vollbild > img {
-        grid-column: 1; grid-row: 1 / span 3; margin: 0;
-        width: min(calc(55vw - 3rem), calc(100vh - 5rem));
-        width: min(calc(55vw - 3rem), calc(100dvh - 5rem));
+      dialog.qr-vollbild > .qr-vollbild-code {
+        grid-column: 1; grid-row: 1 / span 5; margin: 0; align-self: start;
+        min-height: 0;
+        width: min(55vw, calc(100vh - 2rem)); height: min(55vw, calc(100vh - 2rem));
+        width: min(55vw, calc(100dvh - 2rem)); height: min(55vw, calc(100dvh - 2rem));
       }
-      dialog.qr-vollbild > :not(img) { grid-column: 2; margin: 0; }
+      dialog.qr-vollbild > :not(.qr-vollbild-code) { grid-column: 2; margin: 0; }
       dialog.qr-vollbild > .qr-vollbild-nav { position: static; margin: 0; padding: 0; background: none; justify-content: flex-start; }
       dialog.qr-vollbild p { text-align: left; }
     }

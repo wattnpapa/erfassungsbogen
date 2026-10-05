@@ -90,6 +90,10 @@ export function entwurfAusJson(text: string | null): Entwurf | null {
   const u = e.uebergabe as Partial<UebergabeStand> | undefined;
   if (!u || typeof u.um !== "number" || typeof u.id !== "string" || typeof u.einheit !== "string" || typeof u.staerke !== "string") {
     delete e.uebergabe;
+  } else {
+    // Weg und Bestätigung seit Runde 3 (R3-H3); Unbekanntes fällt weg.
+    if (u.weg !== undefined && !["qr", "pdf", "link", "kopiert", "nah"].includes(u.weg)) delete u.weg;
+    if (u.bestaetigt !== undefined && u.bestaetigt !== true) delete u.bestaetigt;
   }
   if (!e.fremd || typeof e.fremd !== "object") delete e.fremd;
   else {

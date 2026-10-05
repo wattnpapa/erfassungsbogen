@@ -934,8 +934,15 @@ describe("Assistenten-Durchlauf", () => {
     const vollbild = await screen.findByRole("dialog", { name: "QR-Code im Vollbild" });
     expect(history.length).toBe(laenge + 1);
     await nutzer.click(within(vollbild).getByRole("button", { name: "Schließen" }));
+    // Seit R3-H3 fragt Schließen, ob gescannt wurde.
+    await nutzer.click(within(vollbild).getByRole("button", { name: "Nicht sicher" }));
     await waitFor(() => expect((history.state as { eebEbene?: string } | null)?.eebEbene).toBeUndefined());
     expect(screen.getByRole("heading", { name: "Gesamtübersicht" })).toBeDefined();
+    // Vermerkt ist, was die App weiß — nicht „Übergeben" (R3-H3).
+    expect(screen.getByText(/^QR-Code gezeigt .* — Empfang nicht bestätigt\.$/)).toBeDefined();
+    expect(screen.queryByText(/^Übergeben/)).toBeNull();
+    await nutzer.click(screen.getByRole("button", { name: "Gegenstelle hat ihn — als übergeben vermerken" }));
+    expect(screen.getByText(/^✓ Übergeben .* \(bestätigt\) — seitdem unverändert\.$/)).toBeDefined();
   });
 
   // Audit Runde 2, R2-M2: Escape schloss das QR-Vollbild nicht — am
