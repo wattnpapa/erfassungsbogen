@@ -2041,7 +2041,22 @@
       border-radius: var(--radius); box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
       font-size: var(--t-s);
     }
-    .quittung-daumen > .quittung-text { flex: 1 1 auto; min-width: 0; overflow-wrap: anywhere; }
+    /* Höchstens zwei Zeilen: Handlung und Zeit stehen vorn, der Name wird
+       am Ende gekürzt. Ein langer Einheitsname brach bei 320 × 568 in fünf
+       Zeilen, die Leiste deckte 26 % des Bilds (Audit Runde 3, R3-G2). Den
+       ganzen Text liest das Vorleseprogramm trotzdem. */
+    .quittung-daumen > .quittung-text {
+      flex: 1 1 auto; min-width: 0; overflow-wrap: anywhere; line-height: 1.25;
+      display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; overflow: hidden;
+    }
+    /* Die Seite hält unten die Höhe der Leiste frei (daumen-quittung.tsx
+       setzt --quittung-hoehe), sonst lagen die letzten Knöpfe dauerhaft
+       darunter. */
+    html:has(.quittung-daumen) main { padding-bottom: calc(6rem + var(--quittung-hoehe, 5rem) + env(safe-area-inset-bottom)); }
+    html:has(.quittung-daumen) { scroll-padding-bottom: calc(6rem + var(--quittung-hoehe, 5rem) + env(safe-area-inset-bottom)); }
+    /* „✓ Abgerückt" am Platz des Wechselknopfs: Bestätigung, kein
+       ausgegrauter Knopf (R3-S5). */
+    .einheit-zeile button.wechsel-quittiert:disabled { opacity: 1; font-weight: 700; border-style: dashed; }
     .quittung-daumen > button { flex: none; }
     .quittung-daumen > button:disabled { opacity: 1; }
     .quittung-daumen > .quittung-schliessen { min-width: calc(var(--ziel-basis) + var(--ziel)); padding-inline: 0; }

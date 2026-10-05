@@ -21,6 +21,7 @@ import userEvent from "@testing-library/user-event";
 import { PersonalErfassung, type Erfassungsbogen } from "@bos/eeb-format/model";
 import { Dialogschicht } from "./dialoge";
 import { EinsatzDetail, PRELLSCHUTZ_MS, letzteMeldungText } from "./einsaetze-ui";
+import { ORTSSPERRE_MS } from "./tipp-schutz";
 import {
   EinsatzArt,
   MeldeStatus,
@@ -225,7 +226,8 @@ describe("Einheit mit Folgemeldung entfernen (R2-D1)", () => {
     expect(leiste()).toEqual({ einheiten: 1, gesamt: 5 });
     expect(karteVon("Ulm")).toBeUndefined();
     const quittung = screen.getByRole("status");
-    expect(quittung.textContent).toContain("entfernt (2 Fassungen)");
+    // Handlung vorn, Name danach — die Leiste kürzt am Ende (R3-G2).
+    expect(quittung.textContent).toMatch(/^Entfernt \(2 Fassungen\): Meldung Nr\. \d+ „.*Ulm"/);
 
     await nutzer.click(within(quittung).getByRole("button", { name: "Rückgängig" }));
     neuLaden();
@@ -240,7 +242,10 @@ describe("Einheit mit Folgemeldung entfernen (R2-D1)", () => {
     expect(e2.notiz).toBe("Deich Nord");
     expect(leiste()).toEqual({ einheiten: 2, gesamt: 12 });
     expect(within(karteVon("Ulm")!).getByRole("button", { name: "Historie (2)" })).toBeTruthy();
-    expect(screen.queryByRole("status")).toBeNull();
+    // Das Zurückholen quittiert selbst, ohne weiteren Rückweg (R3-G2).
+    const zurueckQuittung = screen.getByRole("status");
+    expect(zurueckQuittung.textContent).toMatch(/Meldung „.*Ulm" zurückgeholt\./);
+    expect(within(zurueckQuittung).queryByRole("button", { name: "Rückgängig" })).toBeNull();
   });
 
   it("zeigt in der Historie die Eingangszeit je Fassung und die Vermerke der Führungsstelle (R2-K6)", async () => {
@@ -562,7 +567,7 @@ describe("Abrücken mit Zeit, Quittung und Rückweg", () => {
     // Die Quittung steht in der Ansicht — nicht nur der Zustand der Karte —,
     // und zwar in der festen Leiste im Daumenbereich (R2-H4).
     const quittung = screen.getByRole("status");
-    expect(quittung.textContent).toMatch(/„.*Crailsheim.*" abgerückt \d\d:\d\d/);
+    expect(quittung.textContent).toMatch(/^Abgerückt \d\d:\d\d: Nr\. 1 „.*Crailsheim.*"/);
     expect(quittung.className).toContain("quittung-daumen");
 
     // Prellschutz: Die Leiste kann unter dem Finger des Doppeltipps liegen —
@@ -575,7 +580,8 @@ describe("Abrücken mit Zeit, Quittung und Rückweg", () => {
     expect(zurueck.status).toBe(MeldeStatus.ANWESEND);
     expect(zurueck.abgerueckAm).toBeUndefined();
     neuLaden();
-    expect(screen.queryByRole("status")).toBeNull();
+    // Das Zurücknehmen ist selbst quittiert (R3-G2).
+    expect(screen.getByRole("status").textContent).toMatch(/^Wieder anwesend: Abrücken von Nr\. 1 „.*Crailsheim.*" zurückgenommen\./);
   });
 
   it("zeigt nur eine Quittung zur Zeit und lässt sie schließen", async () => {
@@ -612,9 +618,13 @@ describe("Abrücken mit Zeit, Quittung und Rückweg", () => {
     neuLaden();
 
     expect(screen.queryByRole("button", { name: "Abrücken" })).toBeNull();
-    const nachher = kartenKnoepfe();
-    // Unter dem Finger liegt der Rückweg, nicht „Zug zuordnen" (R2-G4).
-    expect(nachher[platz]).toBe("Wieder anwesend");
+    let nachher = kartenKnoepfe();
+    // Unter dem Finger liegt zuerst die Bestätigung, gesperrt (R3-S5) …
+    expect(nachher[platz]).toBe("✓ Abgerückt");
+    expect((screen.getByRole("button", { name: "✓ Abgerückt" }) as HTMLButtonElement).disabled).toBe(true);
+    // … danach der Rückweg, nicht „Zug zuordnen" (R2-G4).
+    await waitFor(() => expect(kartenKnoepfe()[platz]).toBe("Wieder anwesend"), { timeout: ORTSSPERRE_MS + 500 });
+    nachher = kartenKnoepfe();
     expect(nachher.slice(0, platz)).toEqual(vorher.slice(0, platz));
     expect(nachher[platz + 1]).toBe(vorher[platz + 1]);
     // Die Karte nennt die Abrückzeit ohne weiteren Tipp.
@@ -629,7 +639,7 @@ describe("Abrücken mit Zeit, Quittung und Rückweg", () => {
     const proto = HTMLButtonElement.prototype;
     const vorher = proto.getBoundingClientRect;
     proto.getBoundingClientRect = function (this: HTMLButtonElement) {
-      const oben = this.textContent?.trim() === "Wieder anwesend" ? 278 : 250;
+      const oben = this.textContent?.trim() === "Abrücken" ? 250 : 278;
       return { top: oben, bottom: oben + 44, left: 33, right: 126, width: 93, height: 44, x: 33, y: oben, toJSON() {} } as DOMRect;
     };
     const rollen = vi.spyOn(window, "scrollBy").mockImplementation(() => {});
@@ -660,11 +670,11 @@ describe("Abrücken mit Zeit, Quittung und Rückweg", () => {
     await nutzer.click(screen.getByRole("button", { name: "Zug zuordnen" }));
     expect(screen.queryByRole("textbox", { name: "Zug" })).toBeNull();
 
-    // Nach dem Prellfenster wirkt der Rückweg wie gewohnt.
+    // Nach der Sperre wirkt der Rückweg wie gewohnt.
     const echt = Date.now.bind(Date);
-    const uhr = vi.spyOn(Date, "now").mockImplementation(() => echt() + PRELLSCHUTZ_MS + 50);
+    const uhr = vi.spyOn(Date, "now").mockImplementation(() => echt() + ORTSSPERRE_MS + 50);
     try {
-      await waitFor(() => expect((knopfAmPlatz() as HTMLButtonElement).disabled).toBe(false), { timeout: PRELLSCHUTZ_MS + 500 });
+      await waitFor(() => expect((knopfAmPlatz() as HTMLButtonElement).disabled).toBe(false), { timeout: ORTSSPERRE_MS + 500 });
       await nutzer.click(knopfAmPlatz());
     } finally {
       uhr.mockRestore();
@@ -1011,7 +1021,7 @@ describe("Abgerückte Einheit ohne Dimmen (R2-L5)", () => {
     const karte = document.querySelector<HTMLElement>(".einheit-zeile")!;
     expect(karte.className).toContain("gestrichen");
     expect(within(karte).getByRole("heading", { level: 3 }).querySelector(".status-badge")!.textContent).toBe("abgerückt");
-    const zurueck = within(karte).getByRole("button", { name: "Wieder anwesend" }) as HTMLButtonElement;
+    const zurueck = (await within(karte).findByRole("button", { name: "Wieder anwesend" }, { timeout: ORTSSPERRE_MS + 500 })) as HTMLButtonElement;
     await waitFor(() => expect(zurueck.disabled).toBe(false), { timeout: PRELLSCHUTZ_MS + 500 });
   });
 });
@@ -1357,7 +1367,10 @@ describe("Aufteilen mit Quittung und Rückweg (R2-D6)", () => {
     neuLaden();
     expect(document.querySelectorAll(".einheit-zeile")).toHaveLength(1);
     expect(einsaetzeLaden().find((s) => s.id === angelegt.id)!.eintraege.map((e) => e.id)).toEqual(vorher);
-    expect(document.querySelector(".quittung-daumen")).toBeNull();
+    // Zurückgenommen ist quittiert, ohne zweiten Rückweg (R3-G2).
+    const zurueck = screen.getByRole("status");
+    expect(zurueck.textContent).toMatch(/^Aufteilen zurückgenommen: „Fachberater" ist wieder Teil von „.*Wardenburg"\./);
+    expect(within(zurueck).queryByRole("button", { name: "Rückgängig" })).toBeNull();
   });
 });
 

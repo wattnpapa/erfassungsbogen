@@ -8,7 +8,9 @@
  * Reine Anzeige + Aufruf der Store-/Auswertungslogik (einsaetze.ts, auswertung.ts).
  */
 
-import { useEffect, useId, useLayoutEffect, useRef, useState, type FocusEvent, type ReactNode } from "react";
+import { useEffect, useId, useLayoutEffect, useRef, useState, type FocusEvent } from "react";
+import { DaumenQuittung } from "./daumen-quittung";
+import { ORTSSPERRE_MS, PRELLSCHUTZ_MS, ortSperren } from "./tipp-schutz";
 import {
   PersonalErfassung,
   datumZuIso,
@@ -756,6 +758,11 @@ export function EinsatzDetail(props: {
   const [zuletztEntfernt, setZuletztEntfernt] = useState<Entfernt | null>(null);
   // Zuletzt aufgeteilt — Quittung mit Rückweg (R2-D6).
   const [aufgeteilt, setAufgeteilt] = useState<Aufgeteilt | null>(null);
+  // Quittung eines Rückwegs: Das Zurücknehmen geschah bisher wortlos — wer
+  // nach 700 ms ein zweites Mal tippte und dabei „Rückgängig" traf, sah nur,
+  // dass die Leiste verschwand (Audit Runde 3, R3-G2).
+  const [zurueckQuittung, setZurueckQuittung] = useState<{ text: string; nonce: number } | null>(null);
+  const zurueckQuittieren = (text: string) => setZurueckQuittung({ text, nonce: Date.now() });
 
   /** Aufteilung zurücknehmen: die beiden neuen Einträge heraus, die Fassung davor gilt wieder. */
   async function aufteilungZurueck() {
@@ -765,6 +772,7 @@ export function EinsatzDetail(props: {
       entfernteMerken(einsatz.id, aufgeteilt.neueIds); // kommen beim Import nicht still zurück (R2-D4)
     });
     if (!ok) return;
+    zurueckQuittieren(`Aufteilen zurückgenommen: „${aufgeteilt.teil}" ist wieder Teil von „${aufgeteilt.name}".`);
     setAufgeteilt(null);
     onGeaendert();
   }
@@ -778,6 +786,8 @@ export function EinsatzDetail(props: {
       entfernteVergessen(einsatz.id, zuletztEntfernt.eintraege.map((e) => e.id));
     });
     if (!ok) return;
+    const name = einheitAnzeigename(zuletztEntfernt.eintraege[0]!.bogen.einheit);
+    zurueckQuittieren(zuletztEntfernt.art === "fassung" ? `Fassung von „${name}" zurückgeholt.` : `Meldung „${name}" zurückgeholt.`);
     setZuletztEntfernt(null);
     onGeaendert();
   }
@@ -793,6 +803,13 @@ export function EinsatzDetail(props: {
       statusMitZeitSetzen(einsatz.id, vorher.id, vorher.status, vorher.abgerueckAm),
     );
     if (!ok) return;
+    const nr = nummern.get(vorher.einheitSchluessel);
+    // Ergebnis zuerst — die Leiste kürzt den Namen am Ende.
+    zurueckQuittieren(
+      (vorher.status === MeldeStatus.ABGERUECKT ? "Wieder abgerückt: " : "Wieder anwesend: ") +
+        (statusWechsel.status === MeldeStatus.ABGERUECKT ? "Abrücken" : '„Wieder anwesend"') +
+        ` von ${nr != null ? `Nr. ${nr} ` : ""}„${einheitAnzeigename(vorher.bogen.einheit)}" zurückgenommen.`,
+    );
     setStatusWechsel(null);
     onGeaendert();
   }
@@ -803,6 +820,11 @@ export function EinsatzDetail(props: {
   const letzte = letzteMeldung(einsatz.eintraege);
   // Laufende Nummer je Meldung — dieselbe wie auf dem Lageblatt (R2-A6).
   const nummern = meldungsNummern(einsatz.eintraege);
+  /** „Nr. 3 " für die Quittungsleiste — kurz und eindeutig, wie auf dem Lageblatt. */
+  const nummerText = (schluessel: string) => {
+    const nr = nummern.get(schluessel);
+    return nr != null ? `Nr. ${nr} ` : "";
+  };
   // Die zuletzt eingelesene Einheit (siehe `eingang`) — für die Quittung oben.
   const eingegangen = eingang ? alleEinheiten.find((e) => e.einheitSchluessel === eingang.schluessel) : undefined;
   // War es eine Folgemeldung, sagt die Quittung, was sich geändert hat (R3-K1).
@@ -1449,9 +1471,9 @@ export function EinsatzDetail(props: {
                 qualifikation={quali}
                 qualifikationKurz={qualiKurz}
                 eingang={eingang}
-                onEntfernt={(x) => { setAufgeteilt(null); setZuletztEntfernt(x); }}
-                onStatusWechsel={(w) => { setAufgeteilt(null); setStatusWechsel(w); }}
-                onAufgeteilt={(a) => { setZuletztEntfernt(null); setStatusWechsel(null); setAufgeteilt(a); }}
+                onEntfernt={(x) => { setAufgeteilt(null); setZurueckQuittung(null); setZuletztEntfernt({ ...x, nummer: nummern.get(e.einheitSchluessel) }); }}
+                onStatusWechsel={(w) => { setAufgeteilt(null); setZurueckQuittung(null); setStatusWechsel(w); }}
+                onAufgeteilt={(a) => { setZuletztEntfernt(null); setStatusWechsel(null); setZurueckQuittung(null); setAufgeteilt(a); }}
                 kompakt={kompakt}
                 nummer={nummern.get(e.einheitSchluessel)}
                 ungesehen={ungeseheneIds.has(e.id)}
@@ -1477,17 +1499,27 @@ export function EinsatzDetail(props: {
           langen Liste bei 2 400 px „Abrücken" traf, sah die Quittung nicht,
           „Rückgängig" war ein 74 × 30 px großer Textlink (Audit Runde 2,
           R2-H4). Eine Quittung zur Zeit: die jüngere ersetzt die ältere. */}
+      {/* Handlung und Zeit vorn, der Name danach: Die Leiste hat höchstens
+          zwei Zeilen und kürzt am Ende (R3-G2). */}
       {zuletztEntfernt && (
         <DaumenQuittung
           key={`entfernt:${zuletztEntfernt.eintraege.map((e) => e.id).join(",")}`}
           onRueckgaengig={() => void entferntesZurueckholen()}
           onSchliessen={() => setZuletztEntfernt(null)}
         >
-          {zuletztEntfernt.art === "fassung"
-            ? `Fassung Stand ${standText(zuletztEntfernt.eintraege[0]!.bogen)} von „${einheitAnzeigename(zuletztEntfernt.eintraege[0]!.bogen.einheit)}" verworfen.`
-            : `Meldung „${einheitAnzeigename(zuletztEntfernt.eintraege[0]!.bogen.einheit)}" entfernt${
-                zuletztEntfernt.eintraege.length > 1 ? ` (${zuletztEntfernt.eintraege.length} Fassungen)` : ""
-              }.`}
+          {zuletztEntfernt.art === "fassung" ? (
+            <>
+              <strong>Fassung verworfen:</strong> Stand {standText(zuletztEntfernt.eintraege[0]!.bogen)} von „
+              {einheitAnzeigename(zuletztEntfernt.eintraege[0]!.bogen.einheit)}"
+            </>
+          ) : (
+            <>
+              <strong>
+                Entfernt{zuletztEntfernt.eintraege.length > 1 ? ` (${zuletztEntfernt.eintraege.length} Fassungen)` : ""}:
+              </strong>{" "}
+              Meldung {zuletztEntfernt.nummer != null ? `Nr. ${zuletztEntfernt.nummer} ` : ""}„{einheitAnzeigename(zuletztEntfernt.eintraege[0]!.bogen.einheit)}"
+            </>
+          )}
         </DaumenQuittung>
       )}
       {aufgeteilt && (
@@ -1511,9 +1543,15 @@ export function EinsatzDetail(props: {
           onRueckgaengig={() => void statusZurueck()}
           onSchliessen={() => setStatusWechsel(null)}
         >
-          „{einheitAnzeigename(statusWechsel.vorher.bogen.einheit)}"{" "}
-          {statusWechsel.status === MeldeStatus.ABGERUECKT ? "abgerückt" : "wieder anwesend"}{" "}
-          {zeitKurz(statusWechsel.zeit)}
+          <strong>
+            {statusWechsel.status === MeldeStatus.ABGERUECKT ? "Abgerückt" : "Wieder anwesend"} {zeitKurz(statusWechsel.zeit)}:
+          </strong>{" "}
+          {nummerText(statusWechsel.vorher.einheitSchluessel)}„{einheitAnzeigename(statusWechsel.vorher.bogen.einheit)}"
+        </DaumenQuittung>
+      )}
+      {zurueckQuittung && !statusWechsel && !zuletztEntfernt && !aufgeteilt && (
+        <DaumenQuittung key={`zurueck:${zurueckQuittung.nonce}`} onSchliessen={() => setZurueckQuittung(null)}>
+          {zurueckQuittung.text}
         </DaumenQuittung>
       )}
     </main>
@@ -1940,6 +1978,8 @@ interface Aufgeteilt {
 interface Entfernt {
   art: "einheit" | "fassung";
   eintraege: MeldeEintrag[];
+  /** Laufende Nummer vor dem Entfernen — danach hat die Einheit keine mehr. */
+  nummer?: number;
 }
 
 /** Eine Revisionszeile in der Historie, mit Diff zur direkt älteren Fassung. */
@@ -1977,50 +2017,8 @@ function HistorieZeile({ eintrag, vorheriger, aktuell, onVerwerfen }: {
   );
 }
 
-/**
- * Quittung mit Rückweg, fest am unteren Bildrand (Daumenbereich), mit
- * „Rückgängig" in voller Knopfgröße (Audit Runde 2, R2-H4). Sie bleibt, bis
- * die nächste Quittung sie ersetzt, sie geschlossen wird oder die Ansicht
- * wechselt — ein Zeitablauf nähme den einzigen Rückweg einer entfernten
- * Meldung, während der Helfer gerade woanders hinsieht.
- *
- * `prellschutz`: Die Knöpfe nehmen erst nach PRELLSCHUTZ_MS an — die Leiste
- * erscheint womöglich genau unter dem Finger eines Doppeltipps.
- */
-function DaumenQuittung({ children, prellschutz = false, onRueckgaengig, onSchliessen }: {
-  children: ReactNode;
-  prellschutz?: boolean;
-  onRueckgaengig: () => void;
-  onSchliessen: () => void;
-}) {
-  const [bereit, setBereit] = useState(!prellschutz);
-  useEffect(() => {
-    if (bereit) return;
-    const uhr = setTimeout(() => setBereit(true), PRELLSCHUTZ_MS);
-    return () => clearTimeout(uhr);
-  }, [bereit]);
-  return (
-    <div className="quittung-daumen" role="status">
-      <span className="quittung-text">{children}</span>
-      <button type="button" className="quittung-rueckgaengig" disabled={!bereit} onClick={onRueckgaengig}>
-        Rückgängig
-      </button>
-      <button type="button" className="quittung-schliessen" disabled={!bereit} aria-label="Quittung schließen" onClick={onSchliessen}>
-        ✕
-      </button>
-    </div>
-  );
-}
-
-/**
- * So lange nimmt eine Karte nach „Abrücken"/„Wieder anwesend" keinen Tipp an.
- * Ein Doppeltipp mit Handschuh liegt bei 100–300 ms (Audit Runde 2, R2-G4);
- * wer bewusst zurücknehmen will, tippt nicht schneller als nach einer
- * halben Sekunde erneut.
- */
-// Der Prüfstand (features/support/haken.ts) setzt ihn vor dem Laden auf 0 —
-// Playwright tippt schneller nach, als es ein Finger je täte.
-export const PRELLSCHUTZ_MS: number = (globalThis as { __EEB_PRELLSCHUTZ_MS?: number }).__EEB_PRELLSCHUTZ_MS ?? 600;
+// Quittungsleiste: daumen-quittung.tsx; Prellschutz und Ortssperre: tipp-schutz.ts.
+export { PRELLSCHUTZ_MS } from "./tipp-schutz";
 
 function EinheitKarte(props: {
   einsatzId: string;
@@ -2059,6 +2057,18 @@ function EinheitKarte(props: {
   // annimmt (und Testautomaten auf ihn warten, statt ins Leere zu tippen).
   const gesperrtBis = useRef(0);
   const [prellt, setPrellt] = useState(false);
+  // Der Wechselknopf selbst bleibt länger zu (ORTSSPERRE_MS) und zeigt so
+  // lange, was eben geschah („✓ Abgerückt"): Ein zögernder zweiter Tipp nach
+  // 600 oder 1 000 ms traf sonst „Wieder anwesend" am selben Platz und nahm
+  // das Abrücken zurück (Audit Runde 3, R3-S5). Wer unsicher war, ob der
+  // erste Tipp ankam, sieht die Antwort jetzt unter dem Finger.
+  const tauschBis = useRef(0);
+  const [getauscht, setGetauscht] = useState<MeldeStatus | null>(null);
+  useEffect(() => {
+    if (getauscht == null) return;
+    const uhr = setTimeout(() => setGetauscht(null), Math.max(0, tauschBis.current - Date.now()));
+    return () => clearTimeout(uhr);
+  }, [getauscht]);
   // Der Wechselknopf und seine Lage im Bild beim Tipp: Nach dem Abrücken
   // wächst die Zeitzeile („· abgerückt 11:07 ändern") meist um eine Zeile,
   // und die Knopfreihe rutschte 28 px unter dem Finger weg. Die Ansicht rollt
@@ -2151,6 +2161,9 @@ function EinheitKarte(props: {
     const zeit = Date.now();
     gesperrtBis.current = zeit + PRELLSCHUTZ_MS;
     setPrellt(true);
+    tauschBis.current = zeit + Math.max(PRELLSCHUTZ_MS, ORTSSPERRE_MS);
+    if (tauschBis.current > zeit) setGetauscht(status);
+    ortSperren();
     ankerOben.current = wechselKnopf.current?.getBoundingClientRect().top ?? null;
     const vorher = { ...kopf };
     const ok = await gesichert(
@@ -2159,6 +2172,7 @@ function EinheitKarte(props: {
     );
     if (!ok) {
       ankerOben.current = null;
+      setGetauscht(null);
       return;
     }
     onStatusWechsel?.({ vorher, status, zeit });
@@ -2675,10 +2689,17 @@ function EinheitKarte(props: {
             Platz. Stand der Gegenknopf abgesetzt vor „Entfernen" (D4), rückten
             alle Knöpfe nach dem Abrücken um: unter dem Finger lag dann „Zug
             ändern", und ein Doppeltipp öffnete den Zug-Editor mit Tastatur
-            (Audit Runde 2, R2-G4). Jetzt liegt unter dem Finger der Rückweg;
-            gegen das Zurückschalten durch denselben Doppeltipp hält der
-            Prellschutz der Karte (siehe PRELLSCHUTZ_MS). */}
-        {zaehlt ? (
+            (Audit Runde 2, R2-G4). Unter dem Finger liegt nach dem Tipp
+            zuerst die Bestätigung („✓ Abgerückt"), gesperrt für
+            ORTSSPERRE_MS, erst danach der Rückweg (R3-S5). */}
+        {getauscht != null ? (
+          <>
+            {/* Ein Knopf, kein Text: So bleibt die Knopfreihe stehen. */}
+            <button type="button" ref={wechselKnopf} aria-describedby={nameId} disabled className="wechsel-quittiert">
+              {getauscht === MeldeStatus.ABGERUECKT ? "✓ Abgerückt" : "✓ Anwesend"}
+            </button>{" "}
+          </>
+        ) : zaehlt ? (
           <>
             <button type="button" ref={wechselKnopf} aria-describedby={nameId} disabled={prellt} onClick={() => void statusSetzen(MeldeStatus.ABGERUECKT)}>
               Abrücken
