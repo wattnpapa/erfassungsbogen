@@ -123,10 +123,12 @@ function OvVorschlagFeld(props: {
   verzeichnis: readonly ThwOrtsverband[];
   tippen: (wert: string) => void;
   uebernehmen: (ov: ThwOrtsverband) => void;
+  /** Beim Verlassen eindeutig aufgelöst (nicht gewählt) — der Aufrufer sagt es an (R3-S4). */
+  aufgeloest?: (ov: ThwOrtsverband) => void;
   /** true: das Feld nimmt das Kürzel auf, nicht den Namen (R2-M6). */
   kennung?: boolean;
 }) {
-  const { id, wert, platzhalter, verzeichnis, tippen, uebernehmen, kennung } = props;
+  const { id, wert, platzhalter, verzeichnis, tippen, uebernehmen, aufgeloest, kennung } = props;
 
   const suche = wert.trim().toLowerCase();
   const treffer = suche
@@ -169,7 +171,7 @@ function OvVorschlagFeld(props: {
         const ov =
           verzeichnis.find((o) => o.kurz === e.toUpperCase()) ??
           (gleichAnfang.length === 1 && gleichAnfang[0]!.name === e ? gleichAnfang[0] : undefined);
-        if (ov) uebernehmen(ov);
+        if (ov) (aufgeloest ?? uebernehmen)(ov);
       }}
     />
   );
@@ -337,6 +339,30 @@ export function SchrittEinheit({ bogen, aendern: aendernRoh }: SchrittProps) {
     const einheit = { ...e, hierarchie: ovInHierarchieUebernehmen(ovDaten, e.hierarchie, i, ov) };
     const fahrzeuge = fahrzeugeMitFunkrufOv(bogen.fahrzeuge, einheit);
     aendern({ einheit, ...(fahrzeuge === bogen.fahrzeuge ? {} : { fahrzeuge }) });
+  }
+
+  /**
+   * Beim Verlassen eindeutig aufgelöst — nicht gewählt: „Ulm" getippt füllte
+   * Kürzel, Telefon, E-Mail, Regionalstelle und Landesverband, ohne dass es
+   * jemand sah (Audit Runde 3, R3-S4). Die App sagt es jetzt an und bietet
+   * „Rückgängig"; der getippte Name bleibt dabei stehen.
+   */
+  const [ergaenzt, setErgaenzt] = useState<{ i: number; ov: ThwOrtsverband; vorher: typeof e; fahrzeuge: typeof bogen.fahrzeuge } | null>(null);
+  function ovAufgeloest(i: number, ov: ThwOrtsverband) {
+    // Schon übernommen (Kürzel steht): nichts erneut füllen, nichts ansagen.
+    if (e.hierarchie[i]?.kurz === ov.kurz) return;
+    setErgaenzt({ i, ov, vorher: e, fahrzeuge: bogen.fahrzeuge });
+    ovUebernehmen(i, ov);
+  }
+  function ergaenzungZuruecknehmen() {
+    if (!ergaenzt) return;
+    const { i, vorher, fahrzeuge } = ergaenzt;
+    const jetzt = e.hierarchie[i];
+    aendern({
+      einheit: { ...vorher, hierarchie: vorher.hierarchie.map((x, j) => (j === i && jetzt ? { ...x, name: jetzt.name } : x)) },
+      fahrzeuge,
+    });
+    setErgaenzt(null);
   }
 
   // Landesvorlagen (KatS-Beispielbögen der Bundesländer) für Schritt 1.
@@ -511,7 +537,11 @@ export function SchrittEinheit({ bogen, aendern: aendernRoh }: SchrittProps) {
                 platzhalter="tippen für Vorschläge…"
                 verzeichnis={ovVerzeichnis}
                 tippen={(name) => setE({ hierarchie: e.hierarchie.map((x, j) => (j === i ? { ...x, name } : x)) })}
-                uebernehmen={(ov) => ovUebernehmen(i, ov)}
+                uebernehmen={(ov) => {
+                  setErgaenzt(null);
+                  ovUebernehmen(i, ov);
+                }}
+                aufgeloest={(ov) => ovAufgeloest(i, ov)}
               />
             ) : (
               <input
@@ -521,6 +551,14 @@ export function SchrittEinheit({ bogen, aendern: aendernRoh }: SchrittProps) {
               />
             )}
           </Feld>
+          {/* Direkt unter dem Namensfeld, das ergänzt hat — dort liegt der Blick. */}
+          {ergaenzt && ergaenzt.i === i && e.hierarchie[ergaenzt.i]?.kurz === ergaenzt.ov.kurz && (
+            <p className="hinweis ov-ergaenzt" role="status">
+              Aus dem OV-Verzeichnis ergänzt: {ergaenzt.ov.name} ({ergaenzt.ov.kurz}) mit Telefon und E-Mail
+              {e.hierarchie.length > 1 ? ", dazu die übergeordneten Ebenen" : ""}.{" "}
+              <button type="button" className="link" onClick={ergaenzungZuruecknehmen}>Rückgängig</button>
+            </p>
+          )}
           {/* Das Kürzel (z. B. THW-OV "OODE") ergibt nur beim THW Sinn; andere Organisationen führen keine solchen Kürzel.
               „Dienststellen-Kürzel (optional)": „Kürzel" allein las ein Neuling als
               irgendeine Abkürzung und tippte „OV OL" — das Beispiel sagt, was gemeint ist. */}
@@ -536,7 +574,11 @@ export function SchrittEinheit({ bogen, aendern: aendernRoh }: SchrittProps) {
                   tippen={(kurz) =>
                     setE({ hierarchie: e.hierarchie.map((x, j) => (j === i ? { ...x, kurz: kurz.toUpperCase() || undefined } : x)) })
                   }
-                  uebernehmen={(ov) => ovUebernehmen(i, ov)}
+                  uebernehmen={(ov) => {
+                    setErgaenzt(null);
+                    ovUebernehmen(i, ov);
+                  }}
+                  aufgeloest={(ov) => ovAufgeloest(i, ov)}
                 />
               ) : (
                 <input

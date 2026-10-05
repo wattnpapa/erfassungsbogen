@@ -118,6 +118,23 @@ describe("Schritt Einheit", () => {
     expect((screen.getAllByLabelText("Dienststellen-Kürzel (optional)") as HTMLInputElement[]).map((f) => f.value)).toContain("OODE");
   });
 
+  it("sagt an, was ein eindeutiger Name beim Verlassen ergänzt, und nimmt es auf Wunsch zurück (R3-S4)", async () => {
+    const nutzer = userEvent.setup();
+    buehne();
+    await nutzer.type(screen.getByLabelText("Name (Pflicht)"), "Ulm");
+    await screen.findByText((_t, el) => el?.tagName === "LI" && el.textContent?.startsWith("Ulm") === true, undefined, { timeout: 5000 });
+    await nutzer.tab();
+    const kuerzel = () => (screen.getAllByLabelText("Dienststellen-Kürzel (optional)") as HTMLInputElement[]).map((f) => f.value);
+    expect(kuerzel()).toContain("OULM");
+    const hinweis = document.querySelector<HTMLElement>(".ov-ergaenzt")!;
+    expect(hinweis.textContent).toMatch(/^Aus dem OV-Verzeichnis ergänzt: Ulm \(OULM\) mit Telefon und E-Mail/);
+
+    await nutzer.click(within(hinweis).getByRole("button", { name: "Rückgängig" }));
+    expect(kuerzel()).toEqual([""]);
+    expect((screen.getByLabelText("Name (Pflicht)") as HTMLInputElement).value).toBe("Ulm");
+    expect(document.querySelector(".ov-ergaenzt")).toBeNull();
+  });
+
   it("zeigt beim Antippen des Einheitstyps die ganze Liste, nicht nur die ersten acht", async () => {
     const nutzer = userEvent.setup();
     buehne();
