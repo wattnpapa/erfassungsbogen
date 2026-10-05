@@ -465,3 +465,18 @@ gezählt): R3-L1, R3-H3/R3-A7, R3-L7.
 Bilanz: Von sieben Runde-2-Befunden halten sechs (R2-O1, R2-O3 bis R2-O7,
 bei R2-O7 mit kleinem Rest) und einer teilweise (R2-O2). Keiner ist
 unverändert offen.
+
+## Stand der Behebung
+
+Stand 05.10.2026, Paket „Speicher und Offline". Geprüft mit Typprüfung,
+Unit-Tests (2 337 grün) und Nachmessung im Produktionsbuild (`vite preview`,
+360 × 640, `isMobile`/`hasTouch`, de-DE), Prüfskripte dieses Audits (s06b,
+s08, s10, s13) und eigene Skripte. Kern (`vendor/`) und Transportformat
+unverändert.
+
+| Befund | Stand | Umsetzung |
+| --- | --- | --- |
+| R3-O1 „Bögen einlesen…" bei vollem Speicher: „Keine Bögen gefunden" | behoben | Am vollen Speicher gescheiterte Bögen werden eigens gezählt: „Nicht aufgenommen: 2 Bögen — der Speicher dieses Geräts ist voll, die Datei selbst ist in Ordnung …" in der Fehlerzeile im Bild; vorher Aufgenommenes bleibt in der Erfolgsmeldung. Ebenso „Einsatz importieren…" mit Einzel-PDF und der Bilderstapel, der jetzt bis zum Ende läuft. Nachlauf s13 offline: frei → 9 Einheiten wie bisher, voll → Meldung mit Speicher, Kopf und Speicher bleiben 8. |
+| R3-O2 Lesen schreibt die ganze Einsatzliste zurück | behoben (ohne Kernänderung) | Hülle `speicher-schonend.ts` außen um die Ablage: kein Schreiben unveränderten Textes; ein scheiterndes Zurückschreiben beim bloßen Lesen wird gemerkt und auf Startseite/Einsatzansicht gemeldet (voll bzw. gesperrt), die Liste erscheint. Die Oberfläche liest über `einsaetze-lesen.ts` (Ergebnis gemerkt, solange der Speichertext gleich ist), Revisionen je Karte über `einheiten-index.ts` statt quadratisch. Nachlauf 4,93 Mio. Zeichen, CPU 4× gedrosselt, Klick im Seitenkontext: Start 13,3 → 1,7 s, Schreibvorgänge beim Start 18 (89 Mio. Zeichen) → 0, Öffnen 3,6 → 0,5 s, Abrücken 4,3 → 1,7–2,4 s mit einem Schreibvorgang. Mit s10 (Playwright-Rollensuche, die bei 1 700 Karten selbst ~15 s kostet): Start 12,8 → 1,6 s. Stub „jedes Schreiben scheitert": „Fortsetzen" und „Öffnen" zeigen Bogen bzw. Sammlung, leere gesperrte Startseite mit allen Knöpfen. Rest: Abrücken bleibt bei dieser Größe über 1 s, weil der Kern beim Ändern die ganze Liste parst und schreibt. |
+| R3-O3 Erstbesuch: lange bis „offline bereit", ohne Fortschritt | behoben | Vorrat zweistufig: Kern (78 Dateien, 6,7 MB: App, PDF, QR-Decoder, Landesvorlagen, Blanko, Anleitung) im Precache, Beispielbögen und Themenseiten (474 Dateien, 4,0 MB) danach nachgeladen. Zeile: „⏳ … geladen: 2,1 von 6,7 MB", dann „✓ Jetzt offline bereit für Bogen, PDF, QR-Code und Empfang. Beispielbögen und Themenseiten werden nachgeladen (120 von 474)". Die CDP-Drosselung der Seite greift nicht auf den Service Worker; nachgebildete gemeinsame Leitung (400 ms, 1,6 Mbit/s): vorher 294 s bis bereit ohne Fortschritt, nachher Fortschritt ab 9 s, Kern bereit nach 77 s, alles nach 135 s. Danach offline neu geladen: Bogen, QR, PDF, thw.html gehen. |
+| R3-O4 Speichermeldungen, 104 %, Schließen ohne Rückfrage | behoben | Gesperrter Speicher wird benannt („dieser Browser lässt die App nichts speichern …"), bei 100 % „Gerätespeicher ist voll", Sammlungsanteile gedeckelt, `beforeunload`-Rückfrage bei „Nicht gespeichert". Nachlauf: SecurityError → Sperr-Text; 5 240 563 Zeichen → „ist voll: 100 % … ‚Großschadenslage Archiv' (99 %)"; Schließen mit nicht Gespeichertem → Dialog `beforeunload`. |

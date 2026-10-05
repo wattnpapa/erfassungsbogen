@@ -469,3 +469,11 @@ Pakets.
 | --- | --- | --- |
 | R3-E2 „Aus Datei laden…“ räumt den Rückholplatz vor dem Lesen | behoben | Erst lesen, dann fragen und verdrängen; unbrauchbare Datei meldet sich ohne Rückfrage; nie eine Kopie desselben Bogens auf den Rückholplatz. Nachlauf mit Entwurf Bamberg / Rückholplatz Ulm: abgeschnitten.json, foto.png, leer.json, liste.csv ohne Rückfrage, je richtige Fehlermeldung, danach Bamberg / Ulm. |
 | R3-E3 Leere Erfassung wird übernommen | behoben | Ohne Namen der Einheit kein Ablegen: Hinweis „Name der Einheit fehlt“, „Zum Namensfeld“ springt mit Cursor ins Feld. Nachlauf (320 × 568, 360 × 640, 640 × 360): 0 Einträge, Schritt 1, Fokus `feld-einheit-name`. Kein „Rückgängig“ nach der Übernahme. |
+
+Stand 05.10.2026, Paket „Speicher und Offline". Geprüft mit Typprüfung,
+Unit-Tests (2 337 grün) und Nachmessung im Produktionsbuild (`vite preview`,
+360 × 640, `isMobile`/`hasTouch`, de-DE), Prüfskript s30c dieses Audits.
+
+| Befund | Stand | Umsetzung |
+| --- | --- | --- |
+| R3-E1 Speicher voll, kein Geräteschlüssel: QR und PDF scheitern mit Programmtext | behoben | Lässt sich der neue Geräteschlüssel nicht speichern, signiert die App mit einem Schlüssel nur für diese Sitzung und speichert ihn, sobald Platz ist; die Übersicht sagt am Siegel „Das Siegel gilt nur, solange diese Seite offen ist …". Speicherfehler erscheinen überall deutsch (`fehlerText`). Nachlauf (016 Bamberg, kein Schlüssel, jede wachsende `eeb.*`-Schreibung scheitert): QR-Code in 3 Teilen, „QR-Code im Vollbild zeigen" bedienbar, „PDF erzeugen" lädt die PDF herunter, kein Programmtext. Signaturformat unverändert. |
