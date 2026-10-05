@@ -1086,6 +1086,31 @@ describe("Abgerückte Einheit ohne Dimmen (R2-L5)", () => {
   });
 });
 
+describe("Verschieben in eine Übung (R3-E6)", () => {
+  beforeEach(() => {
+    localStorage.clear();
+  });
+
+  it("nennt die Folge für die Lage und bietet danach „Rückgängig“", async () => {
+    const nutzer = userEvent.setup();
+    const uebung = einsatzAnlegen("Übung Regnitz", EinsatzArt.UEBUNG);
+    const { einsatzId } = buehne(["Crailsheim"]);
+    await nutzer.click(screen.getByRole("button", { name: "Mehr…" }));
+    await nutzer.click(screen.getByRole("button", { name: "Verschieben…" }));
+    const wahl = document.querySelector<HTMLDialogElement>("dialog[aria-label='In anderen Einsatz verschieben']")!;
+    expect(wahl.textContent).toContain('aus „Hochwasser Wardenburg"');
+    expect(wahl.textContent).toContain("als Übung zählt die Einheit in keiner Lage mehr");
+    await nutzer.click(within(wahl).getByRole("button", { name: /Übung Regnitz/ }));
+
+    const quittung = await waitFor(() => document.querySelector<HTMLDialogElement>("dialog[aria-label='Verschoben']")!);
+    expect(quittung.textContent).toContain("zählt nicht mehr in „Hochwasser Wardenburg");
+    expect(einsaetzeLaden().find((x) => x.id === uebung.id)!.eintraege).toHaveLength(1);
+    await nutzer.click(within(quittung).getByRole("button", { name: /^Rückgängig — zurück nach/ }));
+    await waitFor(() => expect(einsaetzeLaden().find((x) => x.id === einsatzId)!.eintraege).toHaveLength(1));
+    expect(einsaetzeLaden().find((x) => x.id === uebung.id)!.eintraege).toHaveLength(0);
+  });
+});
+
 /**
  * Neun Knöpfe je Karte machten eine Einheit rund 450 px hoch; die seltenen
  * und folgenschweren Aktionen liegen jetzt hinter „Mehr…" (Audit Runde 2,

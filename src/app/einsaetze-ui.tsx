@@ -2445,20 +2445,39 @@ function EinheitKarte(props: {
       await zeigeHinweis({ titel: "In anderen Einsatz verschieben", text: "Es gibt keine andere Einsatz-Sammlung auf diesem Gerät." });
       return;
     }
+    // Die Folge steht im Dialog, nicht nur die Art klein darunter: Aus einem
+    // Einsatz in eine Übung verschoben, fiel die Einheit wortlos aus der Lage
+    // (Audit Runde 3, R3-E6).
+    const hier = einsaetzeLaden().find((s) => s.id === einsatzId);
+    const hierName = hier?.name ?? "";
+    const zaehltHier = zaehlt && hier?.art === EinsatzArt.EINSATZ;
+    const staerkeText = zaehltHier ? ` — die Lage „${hierName}" verliert ${staerke(kopf.bogen).gesamt} Helfer` : "";
     const ziel = await frageWahl({
       titel: "In anderen Einsatz verschieben",
-      text: `„${einheitAnzeigename(kopf.bogen.einheit)}" samt Historie, Zeiten und Auftrag verschieben nach:`,
+      text: `„${einheitAnzeigename(kopf.bogen.einheit)}" samt Historie, Zeiten und Auftrag aus „${hierName}" verschieben${staerkeText}. Ziel:`,
       wege: andere.map((s) => ({
         wert: s.id,
         label: s.name,
-        hinweis: `${ART_LABEL[s.art]}${s.ort ? ` · ${s.ort}` : ""} · angelegt ${new Date(s.angelegt).toLocaleDateString("de-DE")}`,
+        hinweis:
+          `${ART_LABEL[s.art]}${s.ort ? ` · ${s.ort}` : ""} · angelegt ${new Date(s.angelegt).toLocaleDateString("de-DE")}` +
+          (zaehltHier && s.art !== EinsatzArt.EINSATZ ? ` — als Übung zählt die Einheit in keiner Lage mehr` : ""),
       })),
     });
     if (!ziel) return;
     const name = andere.find((s) => s.id === ziel)?.name ?? "";
-    if (await gesichert("Verschieben", () => einheitVerschieben(einsatzId, ziel, kopf.einheitSchluessel))) {
+    const schl = kopf.einheitSchluessel;
+    if (await gesichert("Verschieben", () => einheitVerschieben(einsatzId, ziel, schl))) {
       onGeaendert();
-      await zeigeHinweis({ titel: "Verschoben", text: `„${einheitAnzeigename(kopf.bogen.einheit)}" liegt jetzt in „${name}".` });
+      // Rückweg mit einem Tipp, wie bei Abrücken und Entfernen (R3-E6).
+      const zurueck = await frageJaNein({
+        titel: "Verschoben",
+        text: `„${einheitAnzeigename(kopf.bogen.einheit)}" liegt jetzt in „${name}" und zählt nicht mehr in „${hierName}".`,
+        ok: `Rückgängig — zurück nach „${hierName}"`,
+        abbruch: "Alles klar",
+      });
+      if (zurueck && (await gesichert("Verschieben rückgängig", () => einheitVerschieben(ziel, einsatzId, schl)))) {
+        onGeaendert();
+      }
     }
   }
 
