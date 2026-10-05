@@ -63,6 +63,13 @@ export interface MusterungAuswahl {
    * (Audit Runde 2, R2-W1). Wer ihn will, hakt ihn in der Musterung bewusst an.
    */
   sofortbedarf?: boolean;
+  /**
+   * Die Bemerkung („Sonstiges") der Vorlage übernehmen? Fehlt/false = nein.
+   * Sie beschreibt oft den Stand beim Speichern („2 Sollplätze unbesetzt, Anh
+   * in Instandsetzung") und stimmte nach der Musterung nicht mehr — still
+   * übernommen stand sie falsch im übergebenen Bogen (Audit Runde 3, R3-H7).
+   */
+  sonstiges?: boolean;
 }
 
 /**
@@ -76,6 +83,7 @@ export function vorlageInstanziieren(
   const b = bogenAlsVorlage(vorlageBogen); // gleiche Reset-Logik (Einsatz leer, stand heute)
   b.personal = b.personal.filter((_, i) => auswahl.personal[i] ?? true);
   b.fahrzeuge = b.fahrzeuge.filter((_, i) => auswahl.fahrzeuge[i] ?? true);
+  if (!auswahl.sonstiges) delete b.sonstiges;
   if (!auswahl.sofortbedarf) delete b.sofortbedarf;
   // Übernommen: die Verpflegung folgt der gemusterten Stärke, nicht der
   // Stärke, mit der die Vorlage gespeichert wurde.

@@ -61,3 +61,67 @@ describe("Musterung abbrechen (R2-D6)", () => {
     expect(onAbbrechen).toHaveBeenCalledTimes(1);
   });
 });
+
+describe("Musterung starten (R3-H4, R3-H7)", () => {
+  beforeEach(() => localStorage.clear());
+  afterEach(() => cleanup());
+
+  function buehneMit(v: Vorlage) {
+    const onStart = vi.fn();
+    render(
+      <>
+        <Musterung vorlage={v} onStart={onStart} onAbbrechen={() => {}} />
+        <Dialogschicht />
+      </>,
+    );
+    return { onStart };
+  }
+  const frage = () => document.querySelector<HTMLDialogElement>("dialog[aria-label='Alle aus der Vorlage dabei?']");
+
+  it("sagt, dass alle vorab angehakt sind und Fehlende abgewählt werden", () => {
+    buehneMit(vorlage());
+    expect(document.body.textContent).toContain("Alle sind vorab angehakt — wer oder was fehlt, antippen und abwählen.");
+    expect(document.body.textContent).not.toContain("Anwesende abhaken");
+  });
+
+  it("fragt nach, wenn niemand abgewählt wurde; „Zurück zur Liste“ startet nicht", async () => {
+    const nutzer = userEvent.setup();
+    const { onStart } = buehneMit(vorlage());
+    await nutzer.click(screen.getByRole("button", { name: /^Einsatz starten/ }));
+    expect(frage()!.textContent).toContain("Gemeldet werden alle 3 Personen der Vorlage");
+    await nutzer.click(within(frage()!).getByRole("button", { name: "Zurück zur Liste" }));
+    expect(onStart).not.toHaveBeenCalled();
+
+    await nutzer.click(screen.getByRole("button", { name: /^Einsatz starten/ }));
+    await nutzer.click(within(frage()!).getByRole("button", { name: "Ja, alle sind da" }));
+    expect(onStart).toHaveBeenCalledTimes(1);
+  });
+
+  it("startet nach dem Abwählen ohne Rückfrage", async () => {
+    const nutzer = userEvent.setup();
+    const { onStart } = buehneMit(vorlage());
+    await nutzer.click(screen.getByRole("checkbox", { name: /Voss/ }));
+    await nutzer.click(screen.getByRole("button", { name: "Einsatz starten · 2 Pers · 0 Fz" }));
+    expect(frage()).toBeNull();
+    expect(onStart.mock.calls[0]![0].personal).toHaveLength(2);
+  });
+
+  it("übernimmt die Bemerkung der Vorlage nur angehakt", async () => {
+    const nutzer = userEvent.setup();
+    const v = vorlage();
+    v.bogen.sonstiges = "2 Sollplätze unbesetzt. Anh in Instandsetzung.";
+    const { onStart } = buehneMit(v);
+    const kaestchen = screen.getByRole("checkbox", { name: /2 Sollplätze unbesetzt/ }) as HTMLInputElement;
+    expect(kaestchen.checked).toBe(false);
+    await nutzer.click(screen.getByRole("checkbox", { name: /Voss/ }));
+    await nutzer.click(screen.getByRole("button", { name: /^Einsatz starten/ }));
+    expect(onStart.mock.calls[0]![0].sonstiges).toBeUndefined();
+
+    cleanup();
+    const zweite = buehneMit(v);
+    await nutzer.click(screen.getByRole("checkbox", { name: /2 Sollplätze unbesetzt/ }));
+    await nutzer.click(screen.getByRole("checkbox", { name: /Voss/ }));
+    await nutzer.click(screen.getByRole("button", { name: /^Einsatz starten/ }));
+    expect(zweite.onStart.mock.calls[0]![0].sonstiges).toBe("2 Sollplätze unbesetzt. Anh in Instandsetzung.");
+  });
+});

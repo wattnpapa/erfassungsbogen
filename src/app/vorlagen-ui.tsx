@@ -321,6 +321,9 @@ export function Musterung(props: {
   // Standard-Sofortbedarf der Vorlage: sichtbar, aber nicht vorausgewählt (R2-W1).
   const bedarf = bedarfMarken({ ...b, sofortbedarf: b.sofortbedarf && { ...b.sofortbedarf, verpflegungPersonen: 0 } });
   const [bedarfAn, setBedarfAn] = useState(false);
+  // Bemerkung der Vorlage wie der Sofortbedarf: sichtbar, nicht vorausgewählt (R3-H7).
+  const bemerkung = b.sonstiges?.trim() ?? "";
+  const [bemerkungAn, setBemerkungAn] = useState(false);
 
   const anwesendePersonen = b.personal.filter((_, i) => pAn[i]);
   const s = staerke({ personal: anwesendePersonen, staerkeManuell: b.staerkeManuell });
@@ -329,8 +332,28 @@ export function Musterung(props: {
   const toggleP = (i: number) => setPAn(pAn.map((x, j) => (j === i ? !x : x)));
   const toggleV = (i: number) => setVAn(vAn.map((x, j) => (j === i ? !x : x)));
 
-  function starten() {
-    onStart(vorlageInstanziieren(b, { personal: pAn, fahrzeuge: vAn, sofortbedarf: bedarfAn }));
+  /**
+   * Vorab ist jede Person und jedes Fahrzeug angehakt. Wer nichts anfasst,
+   * meldet die ganze Vorlage — die Musterung wurde leicht übersprungen, weil
+   * die Liste schon „abgehakt" aussah (Audit Runde 3, R3-H4). Bleibt alles
+   * angehakt, fragt der Start einmal nach; wer abgewählt hat, hat gemustert.
+   */
+  async function starten() {
+    const allesDa = pAn.every(Boolean) && vAn.every(Boolean);
+    if (allesDa && b.personal.length + b.fahrzeuge.length > 1) {
+      const teile = [
+        b.personal.length > 0 ? `alle ${b.personal.length} ${b.personal.length === 1 ? "Person" : "Personen"}` : "",
+        b.fahrzeuge.length > 0 ? `alle ${b.fahrzeuge.length} ${b.fahrzeuge.length === 1 ? "Fahrzeug" : "Fahrzeuge"}` : "",
+      ].filter(Boolean);
+      const sicher = await frageJaNein({
+        titel: "Alle aus der Vorlage dabei?",
+        text: `Gemeldet werden ${teile.join(" und ")} der Vorlage. Fehlt jemand, vorher in der Liste abwählen.`,
+        ok: "Ja, alle sind da",
+        abbruch: "Zurück zur Liste",
+      });
+      if (!sicher) return;
+    }
+    onStart(vorlageInstanziieren(b, { personal: pAn, fahrzeuge: vAn, sofortbedarf: bedarfAn, sonstiges: bemerkungAn }));
   }
 
   /**
@@ -341,12 +364,13 @@ export function Musterung(props: {
   async function abbrechen() {
     const personenAb = pAn.filter((x) => !x).length;
     const fahrzeugeAb = vAn.filter((x) => !x).length;
-    const geaendert = personenAb > 0 || fahrzeugeAb > 0 || bedarfAn;
+    const geaendert = personenAb > 0 || fahrzeugeAb > 0 || bedarfAn || bemerkungAn;
     if (geaendert) {
       const was = [
         personenAb > 0 ? `${personenAb} ${personenAb === 1 ? "Person" : "Personen"} abgewählt` : "",
         fahrzeugeAb > 0 ? `${fahrzeugeAb} ${fahrzeugeAb === 1 ? "Fahrzeug" : "Fahrzeuge"} abgewählt` : "",
         bedarfAn ? "Sofortbedarf angehakt" : "",
+        bemerkungAn ? "Bemerkung angehakt" : "",
       ].filter(Boolean);
       const sicher = await frageJaNein({
         titel: "Musterung verwerfen?",
@@ -367,9 +391,12 @@ export function Musterung(props: {
       <div className="titelzeile">
         <h1>{vorlage.name}</h1>
       </div>
+      {/* Der Text folgt der Vorgabe: Alle sind vorab angehakt, gemustert wird
+          durch Abwählen. „Anwesende abhaken" las sich wie „hier ist schon
+          abgehakt" (R3-H4). */}
       <p className="hinweis">
-        Anwesende abhaken lassen — die Vorlage bleibt unverändert. Dauerhaft ändern lässt sie sich über
-        „Bearbeiten" auf der Startseite.
+        <strong>Alle sind vorab angehakt — wer oder was fehlt, antippen und abwählen.</strong> Die Vorlage bleibt
+        unverändert; dauerhaft ändern lässt sie sich über „Bearbeiten" auf der Startseite.
       </p>
     </SeitenKopf>
     <main id="inhalt" tabIndex={-1} className="musterung">
@@ -383,7 +410,7 @@ export function Musterung(props: {
       <section className="karte">
         <div className="kopfzeile">
           <h2>Personal ({anwesendePersonen.length}/{b.personal.length})</h2>
-          <button type="button" onClick={() => setPAn(b.personal.map(() => true))}>Alle</button>
+          <button type="button" onClick={() => setPAn(b.personal.map(() => true))}>Alle anhaken</button>
         </div>
         {b.personal.length === 0 && <p className="hinweis">Kein Personal in der Vorlage.</p>}
         {b.personal.map((p, i) => (
@@ -403,7 +430,7 @@ export function Musterung(props: {
       <section className="karte">
         <div className="kopfzeile">
           <h2>Fahrzeuge ({anzahlFz}/{b.fahrzeuge.length})</h2>
-          <button type="button" onClick={() => setVAn(b.fahrzeuge.map(() => true))}>Alle</button>
+          <button type="button" onClick={() => setVAn(b.fahrzeuge.map(() => true))}>Alle anhaken</button>
         </div>
         {b.fahrzeuge.length === 0 && <p className="hinweis">Keine Fahrzeuge in der Vorlage.</p>}
         {b.fahrzeuge.map((f, i) => (
@@ -432,8 +459,21 @@ export function Musterung(props: {
         </section>
       )}
 
+      {bemerkung && (
+        <section className="karte">
+          <h2>Bemerkung aus der Vorlage</h2>
+          <label className={`muster-zeile${bemerkungAn ? "" : " gestrichen"}`}>
+            <input type="checkbox" checked={bemerkungAn} onChange={() => setBemerkungAn(!bemerkungAn)} />
+            <span className="muster-text">
+              <span className="muster-name bemerkung-text">{bemerkung}</span>
+              <span className="muster-sub">Stand beim Speichern der Vorlage — nur anhaken, wenn sie auch jetzt stimmt.</span>
+            </span>
+          </label>
+        </section>
+      )}
+
       <footer className="nav">
-        <button type="button" className="primaer muster-start" onClick={starten}>
+        <button type="button" className="primaer muster-start" onClick={() => void starten()}>
           Einsatz starten · {s.gesamt} Pers · {anzahlFz} Fz
         </button>
       </footer>
