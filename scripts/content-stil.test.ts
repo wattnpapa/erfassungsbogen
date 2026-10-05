@@ -89,6 +89,14 @@ describe("scripts/content-stil.mts: Modus-Blöcke (R2-L1)", () => {
     dunkleModiPruefen(css);
   });
 
+  it("dimmt Fotos und Bildschirmfotos in Dunkel und Nacht, die Strichcodes nicht (R3-L4)", () => {
+    expect(THEMA_CSS).toMatch(/html\.dunkel-modus figure:not\(\.scancodes figure\) img,\s*html\.nacht-modus figure:not\(\.scancodes figure\) img \{ filter: brightness\(0\.7\); \}/);
+    for (const datei of SEITEN) {
+      const css = lies(datei).match(/<style>([\s\S]*?)<\/style>/)?.[1] ?? "";
+      if (/<img/.test(lies(datei))) expect(css, datei).toContain("html.dunkel-modus figure:not(.scancodes figure) img");
+    }
+  });
+
   it("der umrandete Knopf .start.papier behält in den dunklen Modi seine Schrift", () => {
     // Das Sicherheitsnetz für .start setzt die Schrift auf --auf-blau (dunkel);
     // auf der Fläche stünde sie dann bei rund 1:1.

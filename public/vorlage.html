@@ -231,9 +231,13 @@
     /* Der umrandete Knopf .start.papier steht auf der Fläche, nicht auf der
        Kennfarbe — er behält seine Schrift in var(--blau) (R2-L1). */
     html.dunkel-modus :is(.start:not(.papier), .sprunglink), html.nacht-modus :is(.start:not(.papier), .sprunglink) { color: var(--auf-blau); }
-    /* Fotos und Bildschirmfotos sind nachts helle Flächen — gedimmt, aber
-       erkennbar. Die Strichcodes (.scancodes) bleiben ungedimmt: sie werden
-       vom Bildschirm abgescannt. */
+    /* Fotos und Bildschirmfotos sind in Dunkel und Nacht helle Flächen —
+       gedimmt, aber erkennbar. Im Dunkel-Modus (auch bei System-dunkel ohne
+       gespeicherte Wahl) waren sie ungedimmt; ein weißer App-Screenshot
+       blendete über eine halbe Bildschirmhöhe (Audit Runde 3, R3-L4). 0,7
+       drückt Weiß unter die Hell-Schwelle (Luminanz 0,46). Die Strichcodes
+       (.scancodes) bleiben ungedimmt: sie werden vom Bildschirm abgescannt. */
+    html.dunkel-modus figure:not(.scancodes figure) img,
     html.nacht-modus figure:not(.scancodes figure) img { filter: brightness(0.7); }
     /* THEMA:CSS:END */
     /* UMBRUCH:CSS:START */

@@ -38,9 +38,30 @@ const AUFNAHMEN = [
 const BREIT = { breite: 1280, hoehe: 800 };
 const SCHMAL = { breite: 390, hoehe: 844 };
 
-/** Beispielbogen aus examples/ lesen (dieselben Daten wie im Beispiele-Dialog). */
+/** Heutiges Datum als EebDatum (Tage seit 2020-01-01, siehe model.ts). */
+function heuteEebDatum() {
+  const d = new Date();
+  return Math.round((Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) - Date.UTC(2020, 0, 1)) / 86_400_000);
+}
+
+/**
+ * Beispielbogen aus examples/ lesen (dieselben Daten wie im Beispiele-Dialog).
+ * Der Einsatzzeitraum wird auf heute verschoben (gleiche Dauer): Die Beispiele
+ * stammen vom Juli 2026, und die App meldet einen abgelaufenen Zeitraum als
+ * offenen Punkt — auf jeder Aufnahme stünde sonst „Einsatzzeitraum … ist
+ * vorbei" (Audit Runde 3, R3-L4: Aufnahmen auf aktuellen Stand).
+ */
 async function beispielBogen(pfad) {
-  return JSON.parse(await readFile(new URL(`../examples/${pfad}`, import.meta.url), "utf8"));
+  const bogen = JSON.parse(await readFile(new URL(`../examples/${pfad}`, import.meta.url), "utf8"));
+  // Die Beispiele tragen „Übung"; als Übungsmeldungen zählte die Einsatz-
+  // Sammlung auf der Aufnahme 0 Einheiten, und jeder Bogen trug das Übungsband.
+  bogen.uebung = false;
+  if (bogen.einsatz && typeof bogen.einsatz.zeitraumVon === "number") {
+    const dauer = Math.max(0, (bogen.einsatz.zeitraumBis ?? bogen.einsatz.zeitraumVon) - bogen.einsatz.zeitraumVon);
+    bogen.einsatz.zeitraumVon = heuteEebDatum();
+    bogen.einsatz.zeitraumBis = bogen.einsatz.zeitraumVon + dauer;
+  }
+  return bogen;
 }
 
 /** localStorage-Seed: Bogen als automatisch gesicherter Entwurf (entwurf.ts). */
