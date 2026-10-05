@@ -99,10 +99,13 @@ Funktionalität: Einsatz-Sammlung führen (Meldekopf)
     Dann sehe ich die Überschrift "Einheiten (0 gemeldet"
     Und sehe ich den Hinweis "Noch keine Meldung."
 
+  # Seit R3-S1/R3-D2 fragt „Bogen öffnen" nur, wenn wirklich ein angefangener
+  # Bogen ersetzt würde. Nach dem Ablegen liegt keiner vor — früher fragte die
+  # App beim Kaltstart trotzdem, gegen den eben empfangenen Bogen selbst.
   Szenario: Folgemeldung derselben Einheit wandert in die Historie
     Wenn ich denselben Bogen-Link erneut öffne
     Und ich im Dialog auf "Bogen öffnen (ansehen oder bearbeiten)" klicke
-    Und ich im Dialog auf "Meldung öffnen" klicke
+    Dann ist kein Dialog offen
     Und ich zum Schritt "5. Sofortbedarf" wechsle
     Und ich das Feld "Sonstiges (Freitext)" mit "Ablösung angefordert" fülle
     Und ich zum Schritt "6. Übersicht" wechsle
@@ -119,7 +122,7 @@ Funktionalität: Einsatz-Sammlung führen (Meldekopf)
   Szenario: Dieselbe Einheit lässt sich getrennt weiterführen
     Wenn ich denselben Bogen-Link erneut öffne
     Und ich im Dialog auf "Bogen öffnen (ansehen oder bearbeiten)" klicke
-    Und ich im Dialog auf "Meldung öffnen" klicke
+    Dann ist kein Dialog offen
     Und ich zum Schritt "5. Sofortbedarf" wechsle
     Und ich das Feld "Sonstiges (Freitext)" mit "zweiter Trupp" fülle
     Und ich zum Schritt "6. Übersicht" wechsle
@@ -127,6 +130,17 @@ Funktionalität: Einsatz-Sammlung führen (Meldekopf)
     Und ich auf "Hochwasser Weser" klicke
     Und ich im Dialog auf "Als eigene Einheit führen" klicke
     Dann sehe ich die Überschrift "Einheiten (2 gemeldet"
+
+  Szenario: Ein Bogen-Link fragt vor dem Ersetzen des eigenen angefangenen Bogens
+    Wenn ich auf "‹ Startseite" klicke
+    Und ich auf "Neuen Bogen erstellen" klicke
+    Und ich das Feld "Name (Pflicht)" mit "Eigenstadt" fülle
+    Und ich denselben Bogen-Link erneut öffne
+    Und ich im Dialog auf "Bogen öffnen (ansehen oder bearbeiten)" klicke
+    Dann sehe ich den Dialog "Empfangenen Bogen öffnen?"
+    Und sehe ich den Hinweis "Eigenstadt"
+    Wenn ich im Dialog auf "Meldung öffnen" klicke
+    Dann sehe ich die Übersicht mit dem Standort "Oldenburg - Ni"
 
   Szenario: Einheit manuell in den Einsatz erfassen
     Wenn ich auf "Einheit manuell erfassen…" klicke
