@@ -53,7 +53,7 @@ import { fehlerText } from "./nachladen";
 import { dateiFehlerMeldung } from "./datei-fehler";
 import { FehlerImBild } from "./fehler-im-bild";
 import { entfernteImImportKlaeren } from "./entfernte-meldungen";
-import { FensterKonflikt, useFensterAbgleich } from "./fenster-abgleich";
+import { FensterKonflikt, nachAbgleichFortsetzen, useFensterAbgleich } from "./fenster-abgleich";
 import { entwirreScanText } from "./tastaturbelegung";
 import { ortSperren } from "./tipp-schutz";
 import { vorlageAktualisieren, vorlageAnlegen, vorlageAusDatei, vorlagenLaden, vorlagenPapierkorb, vorlageZuruecksetzen, type Vorlage } from "./vorlagen";
@@ -584,6 +584,8 @@ interface StartLage {
   /** Bogen aus dem Start-Link, der erst nach dem Mounten (mit Rückfrage) übernommen wird. */
   empfang: Erfassungsbogen | null;
   entwurf: typeof ENTWURF_GESPEICHERT;
+  /** Neu geladen über „Stand aus dem anderen Fenster laden": den Bogen direkt zeigen (R4-S4). */
+  fortsetzen: boolean;
 }
 let startLageGemerkt: StartLage | null = null;
 function startLage(): StartLage {
@@ -596,6 +598,7 @@ function startLage(): StartLage {
       sofort,
       empfang: START.bogen && !sofort ? START.bogen : null,
       entwurf: sofort ? null : ENTWURF_GESPEICHERT,
+      fortsetzen: nachAbgleichFortsetzen(),
     };
   }
   return startLageGemerkt;
@@ -684,7 +687,7 @@ function useAnsichtBeginntOben(ansicht: string) {
 }
 
 function AppInhalt() {
-  const { sofort: START_SOFORT, empfang: START_EMPFANG, entwurf: ENTWURF } = startLage();
+  const { sofort: START_SOFORT, empfang: START_EMPFANG, entwurf: ENTWURF, fortsetzen: NACH_ABGLEICH } = startLage();
   const [bogen, setBogen] = useState<Erfassungsbogen | null>(START_SOFORT ?? ENTWURF?.bogen ?? null);
   /**
    * Kennung der gespeicherten Vorlage, die der offene Bogen gerade bearbeitet
@@ -782,7 +785,7 @@ function AppInhalt() {
   // Neuladen gleich wieder die Erfassung — vorher landete man auf der
   // Startseite und brauchte „Fortsetzen" (Audit Runde 3, R3-S7). Der eigene
   // Bogen beginnt weiter auf der Startseite.
-  const [zeigeStart, setZeigeStart] = useState(!START_SOFORT && !!ENTWURF && !erfassungsZielBeimStart());
+  const [zeigeStart, setZeigeStart] = useState(!START_SOFORT && !!ENTWURF && !erfassungsZielBeimStart() && !NACH_ABGLEICH);
   const [vorlagen, setVorlagen] = useState<Vorlage[]>(() => vorlagenLaden());
   /** Vorige Fassung nach „Vorlage aktualisieren" — für „Rückgängig" (R2-D2). */
   const [vorlageRueckweg, setVorlageRueckweg] = useState<Vorlage | null>(null);
@@ -981,7 +984,10 @@ function AppInhalt() {
     um: ENTWURF?.gespeichert ?? Date.now(),
   });
   // Zweites Fenster mit demselben Bogen oder derselben Sammlung (R2-O4).
-  const fenster = useFensterAbgleich(!!bogen, einsaetzeNeuLaden);
+  const fenster = useFensterAbgleich(!!bogen, einsaetzeNeuLaden, {
+    eigenerBogen: () => bogen,
+    onRueckholung: () => setErsetzterEntwurf(ersetztenEntwurfLaden()),
+  });
   useEffect(() => {
     if (bogen) {
       const merk = bogenGespeichert.current;
