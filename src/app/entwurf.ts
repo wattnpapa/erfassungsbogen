@@ -53,9 +53,11 @@ export interface Entwurf {
    * einer fremden Einheit am Meldekopf („Einheit schnell erfassen",
    * „Einheit manuell erfassen…"). `einsatzId` = die Sammlung, für die erfasst
    * wird — so findet die App nach einem Neustart zurück in die Erfassung.
-   * Fehlt = eigener Bogen.
+   * Fehlt = eigener Bogen. `beginn` (Date.now()) = Beginn der Erfassung —
+   * Vorschlag für die Eintreffzeit, wenn bis zur Übernahme Zeit vergeht
+   * (Audit Runde 3, R3-S6).
    */
-  fremd?: { einsatzId?: string };
+  fremd?: { einsatzId?: string; beginn?: number };
   /** Zuletzt offener Schritt des Assistenten — „Fortsetzen" öffnet ihn (R2-N7). */
   schritt?: number;
   /** Letzte Übergabe dieses Bogens (QR, Link, PDF, Nahbereich) — siehe uebergabe-stand.ts (R2-W2). */
@@ -90,7 +92,13 @@ export function entwurfAusJson(text: string | null): Entwurf | null {
     delete e.uebergabe;
   }
   if (!e.fremd || typeof e.fremd !== "object") delete e.fremd;
-  else e.fremd = typeof e.fremd.einsatzId === "string" && e.fremd.einsatzId ? { einsatzId: e.fremd.einsatzId } : {};
+  else {
+    const { einsatzId, beginn } = e.fremd;
+    e.fremd = {
+      ...(typeof einsatzId === "string" && einsatzId ? { einsatzId } : {}),
+      ...(typeof beginn === "number" && Number.isFinite(beginn) ? { beginn } : {}),
+    };
+  }
   return e;
 }
 

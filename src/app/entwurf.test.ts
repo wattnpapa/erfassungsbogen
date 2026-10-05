@@ -160,6 +160,12 @@ describe("Rückholung und fremde Erfassungen (R2-N1/R2-E1)", () => {
     expect(entwurfAusJson(JSON.stringify({ gespeichert: 1, bogen: neuerBogen(), fremd: { einsatzId: 3 } }))?.fremd).toEqual({});
   });
 
+  it("merkt sich den Beginn einer fremden Erfassung (R3-S6) und verwirft Müll darin", () => {
+    entwurfSpeichern(neuerBogen(), { fremd: { einsatzId: "e-1", beginn: 1_700_000_000_000 } });
+    expect(entwurfLaden()?.fremd).toEqual({ einsatzId: "e-1", beginn: 1_700_000_000_000 });
+    expect(entwurfAusJson(JSON.stringify({ gespeichert: 1, bogen: neuerBogen(), fremd: { beginn: "12:00" } }))?.fremd).toEqual({});
+  });
+
   it("lässt eine fremde Erfassung einen eigenen Bogen nie verdrängen", () => {
     expect(rueckholungNimmt(false, null)).toBe(true);
     expect(rueckholungNimmt(true, null)).toBe(true);

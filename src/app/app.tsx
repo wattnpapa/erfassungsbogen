@@ -120,6 +120,8 @@ import {
 const SCHRITTE = ["Einheit", "Einsatz", "Personal", "Fahrzeuge", "Sofortbedarf", "Übersicht"];
 const UEBERSICHT = SCHRITTE.length - 1;
 const SCHRITT_EINSATZ = 1; // Landepunkt nach der Musterung: Ort/Zeitraum sind das einzig Leere.
+/** Ab dieser Dauer zwischen Beginn und Übernahme einer Erfassung fragt die App nach der Eintreffzeit (R3-S6). */
+const ERFASSUNG_PAUSE_MS = 5 * 60_000;
 
 /**
  * Datenschutzfrist beim Öffnen eines Bogens von außen (Scan, Link, Datei): Ist
@@ -571,6 +573,13 @@ function AppInhalt() {
    * Wandert mit dem Entwurf in den Speicher.
    */
   const [fremdeErfassung, setFremdeErfassung] = useState<boolean>(!!ENTWURF?.fremd);
+  /**
+   * Beginn der fremden Erfassung (Date.now()). Bleibt „Eingetroffen um" leer
+   * und liegen bis zur Übernahme mehr als fünf Minuten dazwischen, fragt die
+   * App, welche Zeit gilt — sonst wurde die Unterbrechung zur Eintreffzeit
+   * (Audit Runde 3, R3-S6). Wandert mit `fremd` in den Entwurf.
+   */
+  const [erfassungBeginn, setErfassungBeginn] = useState<number | null>(ENTWURF?.fremd?.beginn ?? null);
   /** Letzte Übergabe des offenen Bogens (R2-W2, uebergabe-stand.ts). */
   const [uebergabe, setUebergabe] = useState<UebergabeStand | null>(ENTWURF?.uebergabe ?? null);
   // „Fortsetzen" öffnet den Schritt, auf dem gearbeitet wurde — nicht immer
@@ -812,7 +821,7 @@ function AppInhalt() {
         bogen,
         {
           vorlageId: vorlageInBearbeitung ?? undefined,
-          fremd: fremdeErfassung ? { einsatzId: sammelZielId ?? undefined } : undefined,
+          fremd: fremdeErfassung ? { einsatzId: sammelZielId ?? undefined, beginn: erfassungBeginn ?? undefined } : undefined,
           schritt,
           uebergabe: uebergabe ?? undefined,
         },
@@ -826,7 +835,7 @@ function AppInhalt() {
       setGespeichertUm(null);
       setSpeicherFehler(false);
     }
-  }, [bogen, vorlageInBearbeitung, fremdeErfassung, sammelZielId, schritt, uebergabe, fenster.runde]);
+  }, [bogen, vorlageInBearbeitung, fremdeErfassung, sammelZielId, erfassungBeginn, schritt, uebergabe, fenster.runde]);
 
   /**
    * Die Vorlage zum offenen Bogen — nur solange sie noch in der Liste steht.
@@ -985,7 +994,11 @@ function AppInhalt() {
     if (bearbeiteteVorlage && (vorlageUnveraendert(b) || !rueckholungNimmt(true, alt))) return false;
     // Derselbe Bogen liegt schon dort: keine Kopie über sich selbst (R3-E2).
     if (alt && JSON.stringify(alt.bogen) === JSON.stringify(b)) return true;
-    const ok = ersetztenEntwurfMerken(b, fremdeErfassung ? { einsatzId: sammelZielId ?? undefined } : undefined, opt);
+    const ok = ersetztenEntwurfMerken(
+      b,
+      fremdeErfassung ? { einsatzId: sammelZielId ?? undefined, beginn: erfassungBeginn ?? undefined } : undefined,
+      opt,
+    );
     if (ok) setErsetzterEntwurf(ersetztenEntwurfLaden());
     return ok;
   }
@@ -1096,6 +1109,7 @@ function AppInhalt() {
       setVorlageInBearbeitung(null);
       setFremdeErfassung(false);
       setSammelZiel(null);
+      setErfassungBeginn(null);
       return true;
     }
     if (!a.ohneFrage) {
@@ -1116,6 +1130,7 @@ function AppInhalt() {
     setVorlageInBearbeitung(null);
     setFremdeErfassung(false);
     setSammelZiel(null);
+    setErfassungBeginn(null);
     return true;
   }
 
@@ -1208,6 +1223,7 @@ function AppInhalt() {
     // Eine zurückgeholte Erfassung bleibt eine Erfassung — samt Sammlung, falls es sie noch gibt.
     const ziel = zurueck.fremd?.einsatzId;
     setFremdeErfassung(!!zurueck.fremd);
+    setErfassungBeginn(zurueck.fremd?.beginn ?? null);
     setSammelZiel(ziel && einsaetzeLaden().some((x) => x.id === ziel) ? ziel : null);
     setzeEmpfang(null);
     setSchritt(UEBERSICHT);
@@ -1998,8 +2014,23 @@ function AppInhalt() {
     }
     if (!(await sollstaerkeFreigeben(b))) return;
     if (!(await staerkeFreigeben(b))) return;
+    let zeit = eintreffzeitAusUhrzeit(nachEintreffzeit);
+    // Kein Blatt-Wert und eine Unterbrechung dazwischen: fragen statt die
+    // Uhrzeit des Übernehmens still zur Eintreffzeit zu machen (R3-S6).
+    if (zeit == null && erfassungBeginn != null && Date.now() - erfassungBeginn > ERFASSUNG_PAUSE_MS) {
+      const uhr = (ms: number) => new Date(ms).toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit" });
+      const wahl = await frageWahl({
+        titel: "Wann ist die Einheit eingetroffen?",
+        text: `Die Erfassung von „${einheitAnzeigename(b.einheit)}" läuft seit ${uhr(erfassungBeginn)} Uhr, „Eingetroffen um" ist leer.`,
+        wege: [
+          { wert: "beginn", label: `Um ${uhr(erfassungBeginn)} (Beginn der Erfassung)` },
+          { wert: "jetzt", label: `Jetzt, ${uhr(Date.now())}` },
+        ],
+      });
+      if (!wahl) return;
+      if (wahl === "beginn") zeit = erfassungBeginn;
+    }
     setMeldung("");
-    const zeit = eintreffzeitAusUhrzeit(nachEintreffzeit);
     const vorherDa = new Set(einsaetzeLaden().find((s) => s.id === ziel)?.eintraege.map((e) => e.id));
     // Manuell erfasster Bogen ist kein signierter Transport.
     const ok = await bogenInSammlung(ziel, b, "manuell", undefined, false, eigenerBogenWartetHinweis());
@@ -2016,6 +2047,7 @@ function AppInhalt() {
     }
     setNachEintreffzeit("");
     setSammelZiel(null);
+    setErfassungBeginn(null);
     setBogen(null);
     setFremdeErfassung(false);
     setVorlageInBearbeitung(null);
@@ -2065,6 +2097,7 @@ function AppInhalt() {
       return;
     }
     setFremdeErfassung(true);
+    setErfassungBeginn(Date.now());
     setNachEintreffzeit("");
     setSammelZiel(zielId);
     setOffenerEinsatzId(null); // Assistent übernimmt die Ansicht
@@ -2782,6 +2815,7 @@ function AppInhalt() {
                   if (ziel === null) return;
                   if (!(await darfBogenErsetzen({ titel: "Einheit schnell erfassen?", was: "die schnell zu erfassende Einheit", ok: "Schnell erfassen" }))) return;
                   setFremdeErfassung(true);
+                  setErfassungBeginn(Date.now());
                   setSammelZiel(ziel || null);
                   setMeldung("");
                   setBogen(schnellerfassungsBogen());

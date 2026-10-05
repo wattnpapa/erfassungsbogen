@@ -85,6 +85,7 @@ export function EintreffzeitFeld(props: { wert: string; onAendern: (wert: string
       </Feld>
       <p className="hinweis">
         Leer lassen, wenn die Einheit gerade eintrifft — dann gilt die Uhrzeit von „In Einsatz übernehmen“.
+        Liegen bis dahin mehr als fünf Minuten, fragt die App, ob der Beginn der Erfassung gilt.
       </p>
     </section>
   );

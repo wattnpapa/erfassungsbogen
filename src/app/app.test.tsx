@@ -749,6 +749,33 @@ describe("Assistenten-Durchlauf", () => {
     expect(eintraege.find((e) => e.bogen.einheit.hierarchie[0]!.name === "Papierhausen")!.eingetroffenAm).toBeUndefined();
   }, 20000);
 
+  /**
+   * Audit Runde 3, R3-S6: „Eingetroffen um" leer, 25 Minuten Unterbrechung —
+   * gespeichert war die Uhrzeit des Übernehmens.
+   */
+  it("fragt nach einer Unterbrechung, ob der Beginn der Erfassung als Eintreffzeit gilt (R3-S6)", async () => {
+    const einsatz = einsatzImSpeicherAnlegen("Sammelhausen", EinsatzArt.EINSATZ);
+    const nutzer = userEvent.setup();
+    render(<App />);
+    await nutzer.click(screen.getByRole("button", { name: "Öffnen" }));
+    const beginn = Date.now();
+    await nutzer.click(await screen.findByRole("button", { name: "Einheit manuell erfassen…" }));
+    await nutzer.type(screen.getByLabelText("Name (Pflicht)"), "Pausenhausen");
+    const echt = Date.now.bind(Date);
+    const uhr = vi.spyOn(Date, "now").mockImplementation(() => echt() + 25 * 60_000);
+    try {
+      await nutzer.click(screen.getByRole("button", { name: "In Einsatz übernehmen" }));
+      await nutzer.click(within(await screen.findByRole("dialog", { name: "Stärke fehlt" })).getByRole("button", { name: "Trotzdem mit Stärke 0 übernehmen" }));
+      const frage = await screen.findByRole("dialog", { name: "Wann ist die Einheit eingetroffen?" });
+      await nutzer.click(within(frage).getByRole("button", { name: /Beginn der Erfassung/ }));
+      await screen.findByRole("heading", { level: 1, name: "Sammelhausen" });
+    } finally {
+      uhr.mockRestore();
+    }
+    const neu = einsaetzeLaden().find((x) => x.id === einsatz.id)!.eintraege[0]!;
+    expect(Math.abs(neu.eingetroffenAm! - beginn)).toBeLessThan(60_000);
+  }, 20000);
+
   it("fragt bei einem alten Bogen vor der Übergabe nach und bereitet ihn für den neuen Einsatz vor (R2-S1)", async () => {
     const nutzer = userEvent.setup();
     const alt = bogenMitName("Althausen");

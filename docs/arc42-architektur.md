@@ -1026,7 +1026,8 @@ flowchart TB
   nicht übergebener Bogen geht bei Neuladen/Absturz nicht verloren. Ein
   verdrängter Bogen wartet auf genau einem Rückholplatz
   (`eeb.entwurf.ersetzt.v1`). Die Erfassung einer fremden Einheit am
-  Meldekopf ist am Entwurf markiert (`Entwurf.fremd` mit Ziel-Sammlung, nach
+  Meldekopf ist am Entwurf markiert (`Entwurf.fremd` mit Ziel-Sammlung und
+  Beginn der Erfassung als Vorschlag für die Eintreffzeit (R3-S6), nach
   einem Neustart geht es in derselben Erfassung weiter) und verdrängt dort nie
   einen eigenen Bogen (`rueckholungNimmt`).
   Eingehende Bogen-Links laufen bei laufender App (`hashchange`, Universal

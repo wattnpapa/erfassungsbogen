@@ -149,6 +149,12 @@ Grundlage: Repository `wattnpapa/erfassungsbogen`, Stand 2026-09-12 — Version 
 > Löschung, kein neuer Speicherort. Ebenso: Eine unbrauchbare Datei bei
 > „Aus Datei laden…" und das Beenden einer Vorlagen-Bearbeitung schieben den
 > eigenen Bogen nicht mehr vom Rückholplatz (R3-E2, R3-D1). Geändert: 5.7.
+>
+> **Nachgezogen 2026-10-05 — Beginn der Meldekopf-Erfassung (R3-S6):** Der
+> Entwurf einer am Meldekopf erfassten fremden Einheit trägt zusätzlich den
+> Zeitpunkt, zu dem die Erfassung begann; er dient als Vorschlag für die
+> Eintreffzeit. Keine Personendaten, gleiche Frist wie der Entwurf.
+> Geändert: 5.7.
 
 ## Hinweis zu diesem Dokument
 
@@ -510,7 +516,8 @@ Kapitel 6 der [Arc42-Dokumentation](arc42-architektur.md).
   Rückholplatz (`eeb.entwurf.ersetzt.v1`, dieselbe Datenschutzfrist wie der
   Entwurf) und wird vom nächsten verdrängten Bogen überschrieben; die
   Rückfrage nennt das. Die Erfassung einer fremden Einheit am Meldekopf
-  (Marke `fremd` am Entwurf, nur die Kennung der Ziel-Sammlung) verdrängt dort
+  (Marke `fremd` am Entwurf, nur die Kennung der Ziel-Sammlung und seit
+  2026-10-05 der Beginn der Erfassung als Zeitpunkt, R3-S6) verdrängt dort
   keinen eigenen Bogen, sondern wird nach Rückfrage verworfen — sie ist noch
   in keiner Sammlung und muss neu erfasst werden (`src/app/entwurf.ts`).
   Ein eingehender Bogen (Link, Scan, Datei) verdrängt den angefangenen
