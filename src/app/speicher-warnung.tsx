@@ -10,6 +10,11 @@ import { useMemo } from "react";
 import { speicherBelegung, speicherFehlerArt, speicherGroessteSammlungen, speicherText } from "./eintrag-zeiten";
 import { leseSchreibFehler } from "./speicher-schonend";
 
+/** Gilt als voll: auf ganze Prozent gerundet 100 % (R3-O4). */
+export function istVoll(b: { anteil: number }): boolean {
+  return b.anteil >= 0.995;
+}
+
 /** Ab diesem Anteil warnt die App (Fußzeile: ab 70 % gelb, hier ab 80 % sichtbar). */
 export const SPEICHER_WARNSCHWELLE = 0.8;
 
@@ -37,7 +42,10 @@ export function SpeicherWarnung({ stand }: { stand: unknown }) {
   if (!b || b.anteil < SPEICHER_WARNSCHWELLE) return null;
   return (
     <p className="warnung" role="status">
-      ⚠ Gerätespeicher zu {speicherText(b)} belegt. Wird er voll, kann die App nichts mehr speichern.
+      {/* Bei 100 % ist „wird er voll" vorbei (R3-O4). */}
+      {istVoll(b)
+        ? `⚠ Gerätespeicher ist voll: ${speicherText(b)} — die App kann nichts mehr speichern.`
+        : `⚠ Gerätespeicher zu ${speicherText(b)} belegt. Wird er voll, kann die App nichts mehr speichern.`}
       {groesste ? ` Am meisten belegen: ${groesste}.` : ""} Platz schafft nur Löschen: nicht mehr
       benötigte Einsätze sichern, in den Papierkorb legen und den Papierkorb leeren.
     </p>
@@ -50,7 +58,8 @@ export function SpeicherWarnung({ stand }: { stand: unknown }) {
  * Löschen hilft (R3-O4).
  */
 export function SpeicherNimmtNichtsAn() {
-  return speicherFehlerArt() === "gesperrt" ? (
+  const art = useMemo(() => speicherFehlerArt(), []);
+  return art === "gesperrt" ? (
     <p className="warnung" role="alert">
       ⚠ Dieser Browser lässt die App gerade nichts speichern — etwa im privaten Modus oder durch eine
       Datenschutz-Einstellung. Angezeigt wird der gespeicherte Stand; neue Eingaben gehen beim Schließen

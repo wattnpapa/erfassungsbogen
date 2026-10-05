@@ -402,14 +402,26 @@ export function speicherBelegung(): { belegt: number; grenze: number; anteil: nu
  * Sperre nicht hilft (Audit Runde 3, R3-O4).
  */
 export function speicherFehlerArt(): "voll" | "gesperrt" {
+  let s: Storage | null;
   try {
-    if (!globalThis.localStorage) return "gesperrt";
+    s = globalThis.localStorage ?? null;
   } catch {
     return "gesperrt";
   }
-  const b = speicherBelegung();
-  return b && b.anteil < 0.9 ? "gesperrt" : "voll";
+  if (!s) return "gesperrt";
+  // Nimmt der Speicher ein einzelnes Zeichen? Dann ist er nicht gesperrt —
+  // nur der eine, größere Schreibvorgang passte nicht mehr hinein.
+  try {
+    s.setItem(PROBE_SCHLUESSEL, "1");
+    s.removeItem(PROBE_SCHLUESSEL);
+    return "voll";
+  } catch {
+    const b = speicherBelegung();
+    return b && b.anteil < 0.9 ? "gesperrt" : "voll";
+  }
 }
+
+const PROBE_SCHLUESSEL = "eeb.speicherprobe";
 
 /** „etwa 38 % (1,9 von 5 Mio. Zeichen)" — nie über 100 %. */
 export function speicherText(b: { belegt: number; grenze: number; anteil?: number }): string {
@@ -423,10 +435,14 @@ export function speicherText(b: { belegt: number; grenze: number; anteil?: numbe
  * es nur „Papierkorb leeren", ohne zu sagen, wo der Platz steckt (R2-O7).
  */
 export function speicherGroessteSammlungen(anzahl = 3): { name: string; papierkorb: boolean; anteil: number }[] {
+  // Bezug ist die Grenze — oder die tatsächliche Belegung, wenn der Browser
+  // mehr zulässt: eine Sammlung mit „104 %" neben einem Speicher „zu 100 %"
+  // ging nicht auf (Audit Runde 3, R3-O4).
+  const bezug = Math.max(SPEICHER_GRENZE_ZEICHEN, speicherBelegung()?.belegt ?? 0);
   const groesse = (x: Einsatzsammlung, papierkorb: boolean) => ({
     name: x.name,
     papierkorb,
-    anteil: JSON.stringify(x).length / SPEICHER_GRENZE_ZEICHEN,
+    anteil: Math.min(1, JSON.stringify(x).length / bezug),
   });
   try {
     return [...einsaetzeLaden().map((x) => groesse(x, false)), ...einsaetzePapierkorb().map((x) => groesse(x, true))]

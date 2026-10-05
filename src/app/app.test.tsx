@@ -1546,6 +1546,33 @@ describe("Speicher voll", () => {
     expect(screen.queryByText(/✓ automatisch gespeichert/)).toBeNull();
   });
 
+  /** Audit Runde 3, R3-O4: gesperrt ist nicht voll; Schließen fragt nach. */
+  it("nennt einen gesperrten Speicher beim Namen und fragt vor dem Schließen", async () => {
+    const nutzer = userEvent.setup();
+    render(<App />);
+    await neuerBogenBis(nutzer, 0);
+    vi.spyOn(Storage.prototype, "setItem").mockImplementation(() => {
+      throw new DOMException("gesperrt", "QuotaExceededError");
+    });
+    await nutzer.type(screen.getByLabelText("Name (Pflicht)"), "G");
+    expect(await screen.findByText(/dieser Browser lässt die App nichts speichern/)).toBeDefined();
+    expect(screen.queryByText(/Speicher dieses Geräts ist voll/)).toBeNull();
+
+    const schliessen = new Event("beforeunload", { cancelable: true });
+    window.dispatchEvent(schliessen);
+    expect(schliessen.defaultPrevented).toBe(true);
+  });
+
+  it("fragt vor dem Schließen nicht, wenn gespeichert ist", async () => {
+    const nutzer = userEvent.setup();
+    render(<App />);
+    await neuerBogenBis(nutzer, 0);
+    await nutzer.type(screen.getByLabelText("Name (Pflicht)"), "G");
+    const schliessen = new Event("beforeunload", { cancelable: true });
+    window.dispatchEvent(schliessen);
+    expect(schliessen.defaultPrevented).toBe(false);
+  });
+
   /** Audit Runde 2, R2-O2: das Scheitern steht dort, wo getippt wurde. */
   function sammlungenVoll() {
     const echt = Storage.prototype.setItem;

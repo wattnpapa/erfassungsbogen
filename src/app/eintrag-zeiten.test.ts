@@ -45,6 +45,8 @@ import {
   zugSetzen,
   HERKUNFT_TEXT,
   speicherVollMeldung,
+  speicherGroessteSammlungen,
+  SPEICHER_GRENZE_ZEICHEN,
 } from "./eintrag-zeiten";
 
 class MemStorage {
@@ -377,5 +379,17 @@ describe("speicherVollMeldung (R3-O1)", () => {
     expect(speicherVollMeldung(1)).toMatch(/^Nicht aufgenommen: 1 Bogen — der Speicher dieses Geräts ist voll/);
     expect(speicherVollMeldung(9)).toMatch(/9 Bögen/);
     expect(speicherVollMeldung(9)).not.toMatch(/Keine Bögen/);
+  });
+});
+
+describe("speicherGroessteSammlungen (R3-O4)", () => {
+  it("nennt keine Sammlung über 100 %, auch wenn der Browser mehr als die Grenze zulässt", () => {
+    const s = einsatzAnlegen("Großschadenslage Archiv", EinsatzArt.EINSATZ);
+    const b = bogen("x".repeat(Math.floor(SPEICHER_GRENZE_ZEICHEN * 1.05)));
+    meldungHinzufuegen(s.id, b);
+    const [groesste] = speicherGroessteSammlungen(1);
+    expect(groesste!.name).toBe("Großschadenslage Archiv");
+    expect(groesste!.anteil).toBeLessThanOrEqual(1);
+    expect(groesste!.anteil).toBeGreaterThan(0.95);
   });
 });

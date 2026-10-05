@@ -76,6 +76,7 @@ import {
   eintreffzeitSetzen,
   istSpeicherVoll,
   meldungAufnehmen,
+  speicherFehlerArt,
   speicherVollMeldung,
   vomPapierMarkieren,
   zeitLang,
@@ -811,6 +812,8 @@ function AppInhalt() {
   // die Zeile das — die alte Anzeige behauptete „gespeichert", während nichts
   // gespeichert war (Audit „Offline und Speicher", O1).
   const [speicherFehler, setSpeicherFehler] = useState(false);
+  // Voll oder vom Browser gesperrt? Einmal je Fehlschlag geprüft (R3-O4).
+  const [speicherArt, setSpeicherArt] = useState<"voll" | "gesperrt">("voll");
   // „gespeichert" ist der Zeitpunkt der letzten ÄNDERUNG des Bogens: Bloßes
   // Öffnen oder ein Schrittwechsel verschob ihn bisher auf „jetzt", und ein
   // drei Tage alter Entwurf stand als „gespeichert 12:36 Uhr" da (R2-O3).
@@ -838,6 +841,7 @@ function AppInhalt() {
         merk.um,
       );
       setSpeicherFehler(!ok);
+      if (!ok) setSpeicherArt(speicherFehlerArt());
       if (ok) setGespeichertUm(new Date(merk.um));
     } else {
       bogenGespeichert.current = { bogen: null, um: Date.now() };
@@ -846,6 +850,20 @@ function AppInhalt() {
       setSpeicherFehler(false);
     }
   }, [bogen, vorlageInBearbeitung, fremdeErfassung, sammelZielId, erfassungBeginn, schritt, uebergabe, fenster.runde]);
+
+  // Nicht Gespeichertes geht nicht ohne Rückfrage verloren: Schließen oder
+  // Neuladen fragt nach, solange die Zeile „Nicht gespeichert" steht. Viele
+  // mobile Browser zeigen den Dialog nicht; Tablet und Laptop am Meldekopf
+  // schon (Audit Runde 3, R3-O4).
+  useEffect(() => {
+    if (!speicherFehler || !bogen) return;
+    const warnen = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+      e.returnValue = "";
+    };
+    window.addEventListener("beforeunload", warnen);
+    return () => window.removeEventListener("beforeunload", warnen);
+  }, [speicherFehler, bogen]);
 
   /**
    * Die Vorlage zum offenen Bogen — nur solange sie noch in der Liste steht.
@@ -3215,7 +3233,11 @@ function AppInhalt() {
         <FensterKonflikt abgleich={fenster} />
       ) : speicherFehler ? (
         <p className="autosave speicher-fehler" role="alert">
-          ⚠ Nicht gespeichert — der Speicher dieses Geräts ist voll. Der Bogen bleibt geöffnet; bitte jetzt „Bogen übergeben" (PDF) oder in der Fußzeile der Startseite Papierkorb leeren bzw. Sicherung erstellen.
+          {/* Gesperrt ist nicht voll: dort hilft kein Papierkorb, sondern
+              Speichern erlauben bzw. den privaten Modus verlassen (R3-O4). */}
+          {speicherArt === "gesperrt"
+            ? `⚠ Nicht gespeichert — dieser Browser lässt die App nichts speichern (etwa im privaten Modus oder durch eine Datenschutz-Einstellung). Der Bogen bleibt geöffnet; bitte jetzt „Bogen übergeben" (PDF) und für die nächste Erfassung Speichern für diese Seite erlauben oder ein normales Fenster nutzen.`
+            : `⚠ Nicht gespeichert — der Speicher dieses Geräts ist voll. Der Bogen bleibt geöffnet; bitte jetzt „Bogen übergeben" (PDF) oder in der Fußzeile der Startseite Papierkorb leeren bzw. Sicherung erstellen.`}
           {gespeichertUm ? ` Letzter gesicherter Stand: ${uhrzeitMitTag(gespeichertUm)} Uhr.` : ""}
         </p>
       ) : gespeichertUm ? (

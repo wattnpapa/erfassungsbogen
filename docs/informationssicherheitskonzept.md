@@ -205,6 +205,16 @@ Grundlage: Repository `wattnpapa/erfassungsbogen`, Stand 2026-09-12 — Version 
 > unverändert (nur Abrufe an die eigene Herkunft, `connect-src 'self'`), keine
 > personenbezogenen Daten im Cache (3.4 unverändert).
 >
+> **Nachgezogen 2026-10-05:** Speichermeldungen (Audit Runde 3, R3-O4) —
+> „voll" und „gesperrt" werden unterschieden: Scheitert ein Schreibvorgang,
+> prüft die App mit einem Ein-Zeichen-Eintrag `eeb.speicherprobe`, der sofort
+> wieder entfernt wird (keine Daten), ob der Speicher überhaupt etwas annimmt.
+> Ein gesperrter Speicher (Privatmodus, blockierte Website-Daten) wird als
+> solcher benannt statt „Papierkorb leeren" zu empfehlen. Steht „Nicht
+> gespeichert", fragt der Browser vor dem Schließen oder Neuladen nach
+> (`beforeunload`, wo der Browser es zulässt). Anteile einzelner Sammlungen
+> sind auf 100 % gedeckelt.
+>
 > **Nachgezogen 2026-10-05:** Geräteschlüssel bei vollem Speicher (Audit
 > Runde 3, R3-E1) — scheitert das erstmalige Speichern des privaten
 > Schlüssels, signiert die App mit einem Schlüssel nur für diese Sitzung
