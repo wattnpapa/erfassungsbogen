@@ -1,6 +1,8 @@
 # Rollenaudits (Stand 27.09.2026)
 
 > Runde 2 (28.09.2026, nach der Behebung): [runde-2/README.md](runde-2/README.md).
+>
+> Runde 3 (04.10.2026, nach der Behebung von Runde 2, Befunde behoben am 05.10.2026): [runde-3/README.md](runde-3/README.md).
 
 Zehn Prüfberichte aus je einer Nutzerrolle, alle gegen den Produktionsbuild
 (`vite build` + `vite preview`) im Telefon-Viewport 360 × 640 (Führungssicht
