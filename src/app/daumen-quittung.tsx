@@ -66,6 +66,29 @@ export function DaumenQuittung({ children, prellschutz = false, onRueckgaengig, 
     // rollen — höchstens so weit, dass die getippte Stelle im Bild bleibt.
     const tipp = gerollt.current ? null : letzterTippOrt();
     gerollt.current = true;
+    /**
+     * Ein Kartenkopf unterhalb der getippten Stelle, den die Leiste anschneidet
+     * (R3-G2, Rest): Nach „Abrücken" weiter unten lag der Kopf der nächsten
+     * Karte halb unter der Leiste, bis man rollte. Er wird mit über die
+     * Leiste gerollt, solange die getippte Stelle im Bild bleibt.
+     */
+    const angeschnittenerKopf = (y: number): number => {
+      let noetig = 0;
+      for (const kopf of document.querySelectorAll<HTMLElement>("main h2, main h3")) {
+        const s = kopf.getBoundingClientRect();
+        if (s.height === 0 || s.top <= y || s.top >= r.bottom || s.bottom <= r.top) continue;
+        noetig = Math.max(noetig, s.bottom - r.top + 8);
+      }
+      return noetig;
+    };
+    if (tipp && !(tipp.y >= r.top - 8 && tipp.y <= r.bottom + 8)) {
+      const rollen = Math.min(angeschnittenerKopf(tipp.y), Math.max(0, tipp.y - 64));
+      try {
+        if (rollen > 0) window.scrollBy(0, Math.round(rollen));
+      } catch {
+        /* Testumgebung ohne Layout */
+      }
+    }
     if (tipp && tipp.y >= r.top - 8 && tipp.y <= r.bottom + 8) {
       ortSperren();
       let rollen = tipp.y - r.top + 40;
@@ -79,6 +102,7 @@ export function DaumenQuittung({ children, prellschutz = false, onRueckgaengig, 
           rollen = Math.max(rollen, s.bottom - r.top + 8);
         }
       }
+      rollen = Math.max(rollen, angeschnittenerKopf(tipp.y));
       rollen = Math.min(rollen, Math.max(0, tipp.y - 64));
       try {
         if (rollen > 0) window.scrollBy(0, Math.round(rollen));
