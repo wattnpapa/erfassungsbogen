@@ -30,11 +30,16 @@ const SPEICHER_SCHLUESSEL = "eeb.anzeigemodus.v1";
 /** Vorgänger-Schalter (nur Feld-Modus) — wird beim ersten Lesen übernommen. */
 const ALT_FELDMODUS = "eeb.feldmodus.v1";
 
-export const ANZEIGE_MODI: { modus: AnzeigeModus; label: string; titel: string }[] = [
-  { modus: "standard", label: "Standard", titel: "Normale, helle Darstellung — bleibt hell, auch wenn das Gerät auf dunkel steht" },
-  { modus: "dunkel", label: "Dunkel", titel: "Heller Text auf dunklem Grund für abgedunkelte Räume" },
-  { modus: "feld", label: "Feld", titel: "Große Tippziele und hoher Kontrast für den Einsatz draußen" },
-  { modus: "nacht", label: "Nacht", titel: "Gedimmte, warme Darstellung für Nachteinsätze — blendet nicht" },
+/**
+ * `kurz` ist die Zweckzeile unter dem Namen in der aufgeklappten Wahl (R4-G5):
+ * Wer ohne Einweisung mit Handschuh arbeitet, findet „Feld" an „große Tasten".
+ * Der Tooltip (`titel`) gibt es auf dem Telefon nicht.
+ */
+export const ANZEIGE_MODI: { modus: AnzeigeModus; label: string; kurz: string; titel: string }[] = [
+  { modus: "standard", label: "Standard", kurz: "normal", titel: "Normale, helle Darstellung — bleibt hell, auch wenn das Gerät auf dunkel steht" },
+  { modus: "dunkel", label: "Dunkel", kurz: "abends", titel: "Heller Text auf dunklem Grund für abgedunkelte Räume" },
+  { modus: "feld", label: "Feld", kurz: "große Tasten", titel: "Große Tippziele und hoher Kontrast für den Einsatz draußen (Handschuhe, Sonne)" },
+  { modus: "nacht", label: "Nacht", kurz: "gedimmt", titel: "Gedimmte, warme Darstellung für Nachteinsätze — blendet nicht" },
 ];
 
 function speicher(): Storage | null {

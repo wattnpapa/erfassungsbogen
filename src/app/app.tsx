@@ -3987,10 +3987,10 @@ function AppInhalt() {
       )}
 
       {schritt !== UEBERSICHT && (
-        <footer className={sammelEinsatz ? "nav mit-uebernehmen" : "nav"}>
+        <footer className={sammelEinsatz ? "nav assistent-nav mit-uebernehmen" : "nav assistent-nav"}>
           {/* Unter 360 px steht nur „←" (das Wort fällt per CSS weg), damit der
               Modusknopf daneben Platz hat; der Name bleibt „← Zurück". */}
-          <button type="button" aria-label="← Zurück" disabled={schritt === 0} onClick={() => setSchritt(schritt - 1)}>
+          <button type="button" className="nav-zurueck" aria-label="← Zurück" disabled={schritt === 0} onClick={() => setSchritt(schritt - 1)}>
             ←<span className="nav-wort"> Zurück</span>
           </button>
           {/* Moduswechsel aus der festen Leiste, ohne die Stelle im Formular
@@ -4002,10 +4002,8 @@ function AppInhalt() {
               in eigener Zeile über dem Blättern: schmal zwischen „← Zurück" und
               „Weiter →" traf ein Handschuh, der „Weiter" suchte, das Ablegen
               (Audit Runde 3, R3-G3). */}
-          {sammelEinsatz ? (
+          {sammelEinsatz && (
             <button type="button" className="uebernehmen" onClick={() => void erfassungUebernehmen()}>In Einsatz übernehmen</button>
-          ) : (
-            <span className="platzhalter" />
           )}
           {/* Schnellerfassung einer fremden Einheit: nach Name und Typ direkt
               zur Stärke — Schritt 2 („Wofür deine Einheit gemeldet wird") ist

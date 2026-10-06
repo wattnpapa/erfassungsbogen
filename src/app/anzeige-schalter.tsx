@@ -56,7 +56,7 @@ export function AnzeigeSchalter({ klappbar = false }: { klappbar?: boolean }) {
           {aktuell} <span aria-hidden="true">{offen ? "▴" : "▾"}</span>
         </button>
       )}
-      {ANZEIGE_MODI.map(({ modus: m, label, titel }) => (
+      {ANZEIGE_MODI.map(({ modus: m, label, kurz, titel }) => (
         <button
           key={m}
           type="button"
@@ -66,6 +66,7 @@ export function AnzeigeSchalter({ klappbar = false }: { klappbar?: boolean }) {
           onClick={() => waehle(m)}
         >
           {label}
+          <span className="modus-kurz" aria-hidden="true">{kurz}</span>
         </button>
       ))}
     </span>
@@ -139,7 +140,7 @@ export function AnzeigeLeistenKnopf() {
       </button>
       {offen && (
         <span className="anzeige-leiste-wahl" role="group" aria-label="Anzeigemodus">
-          {ANZEIGE_MODI.map(({ modus: m, label, titel }) => (
+          {ANZEIGE_MODI.map(({ modus: m, label, kurz, titel }) => (
             <button
               key={m}
               type="button"
@@ -149,6 +150,7 @@ export function AnzeigeLeistenKnopf() {
               onClick={() => waehle(m)}
             >
               {label}
+              <span className="modus-kurz" aria-hidden="true">{kurz}</span>
             </button>
           ))}
         </span>

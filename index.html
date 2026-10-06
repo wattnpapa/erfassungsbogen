@@ -385,7 +385,7 @@
       overflow-wrap: break-word;
     }
     #app { min-height: 100dvh; display: flex; flex-direction: column; }
-    main { width: 100%; max-width: 60rem; margin: 0 auto; padding: var(--r-5) var(--r-4) calc(6rem + env(safe-area-inset-bottom)); }
+    main { width: 100%; max-width: 60rem; margin: 0 auto; padding: var(--r-5) var(--r-4) calc(min(6rem, 108px) + env(safe-area-inset-bottom)); }
     /* Seitenrand gedeckelt wie das Kartenpolster (.karte, R2-M1). */
     main { padding-inline: min(var(--r-4), 18px); }
     /* Die 6rem unten halten die fixe Schritt-Navigation frei. Wo sie gar nicht
@@ -418,6 +418,18 @@
     h3 { font-size: var(--t-l); font-weight: 700; color: var(--text); margin: var(--r-4) 0 var(--r-1); }
     h4 { font-size: var(--t-m); font-weight: 700; color: var(--text); margin: var(--r-4) 0 var(--r-1); }
     h5 { font-size: var(--t-s); font-weight: 700; color: var(--text); margin: var(--r-3) 0 var(--r-1); }
+    /* R4-M1: Überschriften und Zusammenfassungen dürfen im Wort brechen.
+       overflow-wrap: break-word am body ändert die Mindestbreite eines Flex-
+       oder Block-Kinds nicht; „Zwischensummen nach Zug" (2,75 rem Zeilen bei
+       200 % Schrift) machte die Einsatzansicht 446 px breit. anywhere zählt
+       die Trennstellen schon in der Mindestbreite mit, hyphens trennt dort,
+       wo der Browser ein Trennmuster für lang="de" kennt, sauber nach Silben.
+       Als Regel für alle Überschriften, nicht Stelle für Stelle: jede neue
+       Überschrift kann sonst die Seite wieder verbreitern. */
+    h1, h2, h3, h4, h5, summary { overflow-wrap: anywhere; hyphens: auto; -webkit-hyphens: auto; }
+    /* Dasselbe für Links der Fußzeile („nachrichtenvordruck.app" bis 342 px bei
+       320 px Breite und 200 % Schrift). */
+    footer.seite a, footer.seite button.link { max-width: 100%; overflow-wrap: anywhere; }
     /* Startseite linksbündig: ein Satzspiegel mit fester linker Kante wirkt
        verbindlicher als die zentrierte Mittelachse. */
     .start { text-align: left; }
@@ -927,6 +939,20 @@
       .seiten-kopf.assistent-kopf .titelzeile h1 { font-size: var(--t-m); min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
       .seiten-kopf.assistent-kopf .schritte { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: thin; }
       .seiten-kopf.assistent-kopf .schritte button { white-space: nowrap; flex: 0 0 auto; }
+      /* R4-M2 (Rest): Die Bedienelemente des Kopfes wachsen nicht mit der
+         Schrift, wie es die Fußleiste schon tut: Rücksprung, Anzeige-Klappe und
+         Reiter bleiben beim Zielmaß (44 px + Feld-Zuschlag) und auf höchstens
+         18–20 px Schrift. Bei 200 % standen Rücksprung und Klappe auf zwei
+         Zeilen à 88 px, der Kopf war 393 px hoch, und über der Fußleiste blieb
+         in der Erfassung kein einziges Feld. Überschriften und Inhalt wachsen
+         weiter mit. */
+      .seiten-kopf.assistent-kopf .kopf-oberzeile { gap: var(--r-2); }
+      .seiten-kopf.assistent-kopf .kopf-oberzeile .zur-start { font-size: min(var(--t-m), 20px); line-height: calc(44px + var(--ziel) - 0.4rem); min-height: calc(44px + var(--ziel)); min-width: min(100%, 6em); }
+      .seiten-kopf.assistent-kopf .anzeige-schalter button { font-size: min(var(--t-xs), 16px); min-height: calc(44px + var(--ziel)); min-width: calc(44px + var(--ziel)); padding-block: 0.15rem; padding-inline: min(0.7rem, 12px); }
+      .seiten-kopf.assistent-kopf .anzeige-schalter .anzeige-klappe { font-size: min(var(--t-s), 18px); }
+      .seiten-kopf.assistent-kopf .schritte button { font-size: min(var(--t-s), 18px); padding-block: 0.15rem; min-height: calc(44px + var(--ziel)); }
+      .seiten-kopf.assistent-kopf .modus-marke { font-size: min(var(--t-xs), 15px); }
+      .seiten-kopf.assistent-kopf img.einheit-avatar { height: min(1.8rem, 36px); }
     }
     /* Übungs-Störer: volle Fensterbreite direkt unter dem Kopf, Text auf dem
        Satzspiegel. Schraffur wie ein Absperrband — deutlich anders als jede
@@ -969,11 +995,22 @@
       .seiten-kopf.start-kopf .anzeige-schalter.klappbar:not(.offen) > button:not(.anzeige-klappe) { display: none; }
       .seiten-kopf.start-kopf .anzeige-schalter.klappbar.offen { flex: 1 1 100%; }
       .seiten-kopf.start-kopf .anzeige-schalter.klappbar.offen .anzeige-klappe { flex: 1 1 100%; justify-content: center; }
-      .seiten-kopf.start-kopf .titelzeile { flex-wrap: nowrap; align-items: flex-start; }
-      .seiten-kopf.start-kopf .titelzeile:has(.anzeige-schalter.offen) { flex-wrap: wrap; }
+      /* R4-M6: Die Zeile darf umbrechen. Bei 200 % Schrift (und im Feld-Modus
+         auf 320 px) ist „Erfassungsbogen" breiter als der Platz neben dem
+         Klappknopf; der Titel lief unter den Knopf („Standard ▾" lag mitten auf
+         „Digitaler Einheiten-", bei 320 px stand der Titel rechts außerhalb).
+         Der Titel behält mindestens die Breite seines längsten Worts
+         (min-content, flex-basis 0) — passt der Knopf daneben nicht mehr, rutscht
+         er unter den Titel, statt ihn zu überdecken. Die Schrift folgt der
+         Systemschrift nur bis 6,4 vw (23 px bei 360 px), damit das Wort auch
+         bei 200 % auf eine 320-px-Zeile passt. */
+      .seiten-kopf.start-kopf .titelzeile { flex-wrap: wrap; align-items: flex-start; }
       /* Kleinere Titelstufe: neben dem Klappknopf brach „Erfassungsbogen"
          sonst mitten im Wort um. */
-      .seiten-kopf.start-kopf .titelzeile h1 { flex: 1 1 auto; font-size: var(--t-l); overflow-wrap: normal; }
+      .seiten-kopf.start-kopf .titelzeile h1 {
+        flex: 1 1 0; min-width: min-content; font-size: min(var(--t-l), 6.4vw);
+        overflow-wrap: normal; hyphens: manual; -webkit-hyphens: manual;
+      }
       .seiten-kopf.start-kopf .anzeige-schalter { flex: 0 0 auto; margin-left: auto; }
     }
     @media (max-width: 22.4rem) {
@@ -1347,7 +1384,7 @@
     /* Ein fokussiertes Feld rollt über die feste Fußleiste, nicht darunter:
        Tippte man auf ein Feld, das gerade unter der Leiste verschwand, traf
        man „Weiter" (Audit „Handschuh", G6). */
-    html { scroll-padding-bottom: calc(6rem + env(safe-area-inset-bottom)); }
+    html { scroll-padding-bottom: calc(min(6rem, 108px) + env(safe-area-inset-bottom)); }
     /* Abschluss der Einsatz-Erfassung auf jedem Schritt, zwischen Zurück und
        Weiter — am Meldekopf reichen oft Schritt 1 und 3 (Audit „Neuer
        Nutzer", F2). Schmal gesetzt, damit drei Knöpfe auf 360 px passen. */
@@ -1384,8 +1421,13 @@
        „◐"), die Wahl klappt über der Leiste auf, damit sie keine Zeile
        kostet. */
     .anzeige-leiste { display: inline-flex; flex: 0 0 auto; }
+    /* R4-M2: Maß und Schrift sind gedeckelt wie bei „Weiter". Der Knopf wuchs
+       mit der Systemschrift auf 88 × 76 px (200 %) und verdrängte „Weiter →"
+       über den Rand. Ein Tippziel bleibt er (44 px + Feld-Zuschlag), mehr
+       bekommt er nie. */
     footer.nav .anzeige-leiste-knopf {
-      min-width: calc(var(--ziel-basis) + var(--ziel)); padding-inline: 0; font-size: var(--t-l);
+      min-width: min(calc(var(--ziel-basis) + var(--ziel)), calc(44px + var(--ziel))); padding-inline: 0;
+      font-size: min(var(--t-l), 20px);
     }
     /* Bezug ist die feste Leiste selbst: so breit wie sie, nie über den Rand. */
     .anzeige-leiste-wahl {
@@ -1394,17 +1436,52 @@
       border: var(--strich-stark) solid var(--linie-stark); border-radius: var(--radius);
       box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.2);
     }
+    /* R4-M7: Die Segmente maßen 42 px (die Regel für Leistenknöpfe deckelt auf
+       41,6) — jetzt das Grundmaß wie überall. Mit Hinweiszeile (R4-G5) stehen
+       Name und Zweck übereinander; die Wahl ist selbst ein abgesetztes Feld
+       mit Schatten und deckendem Grund. */
     footer.nav .anzeige-leiste-wahl button {
-      flex: 1 1 0; border: none; border-radius: 0; padding-inline: min(0.8rem, 14px);
+      flex: 1 1 0; border: none; border-radius: 0; padding: 0.3rem min(0.4rem, 6px);
+      min-height: calc(44px + var(--ziel)); display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 0; line-height: 1.2; white-space: normal; background: var(--flaeche); color: var(--text);
     }
+    .modus-kurz { display: none; font-size: var(--t-xs); font-weight: 400; line-height: 1.2; }
+    .anzeige-leiste-wahl .modus-kurz { display: block; color: var(--text-2); }
+    footer.nav .anzeige-leiste-wahl button.aktiv .modus-kurz { color: inherit; }
+    /* Aufgeklappte Wahl im Kopf (Telefon): dieselbe Zweckzeile, in der
+       Kopf-Wahl auf der Farbe der Segmente. */
+    .anzeige-schalter.klappbar.offen > button:not(.anzeige-klappe) { display: flex; flex-direction: column; align-items: center; justify-content: center; }
+    .anzeige-schalter.klappbar.offen .modus-kurz { display: block; color: inherit; opacity: 1; }
     footer.nav .anzeige-leiste-wahl button + button { border-left: var(--strich) solid var(--linie-stark); }
     footer.nav .anzeige-leiste-wahl button.aktiv { background: var(--akzent); color: var(--auf-akzent); }
-    /* Unter 360 px passen „← Zurück", „◐" und „Zur Übersicht →" nicht in eine
-       Zeile (320 px, Feld: 372 px Inhalt). Dann trägt der Rückweg nur den
-       Pfeil — sein Name bleibt „← Zurück" (aria-label). */
-    @media (max-width: 22.4rem) {
-      footer.nav .nav-wort { display: none; }
-      footer.nav { gap: min(0.6rem, 2vw); }
+    /* R4-M2, R4-M3, R4-G2: Die Leiste des Assistenten ist ein Raster mit
+       festen Plätzen: „← Zurück" links, „◐" daneben, der Primärknopf rechts
+       außen — in jedem Schritt derselbe Platz, auch wenn „Zur Übersicht →"
+       breiter ist als „Weiter →". Das Raster bricht nie um (vorher: flex-wrap,
+       und „◐" rutschte an die Stelle von „Weiter →").
+       Wann „← Zurück" auf den Pfeil schrumpft, entscheidet eine Container-
+       Abfrage auf die Breite der Leiste selbst. Die Media Query davor rechnete
+       22,4rem mit der Browser-Grundschrift (16 px), nicht mit der Schrift der
+       Seite: im Feld-Modus (112 %) und bei 200 % griff sie nicht, und
+       „Zur Übersicht →" ragte 42 px über den Rand. rem in einer Container-
+       Abfrage folgt der Seitenschrift: 25rem sind 400 px bei 100 %, 448 px im
+       Feld-Modus, und ab 125 % reicht jede Telefonbreite. Der Name bleibt
+       „← Zurück" (aria-label). */
+    footer.nav.assistent-nav {
+      container: assistent-nav / inline-size;
+      display: grid; align-items: center; justify-content: stretch;
+      grid-template-columns: auto auto minmax(0, 1fr) minmax(0, auto);
+      grid-template-areas: "zurueck modus mitte weiter";
+      /* mindestens 12 px zwischen den Knöpfen (R4-G4), auch auf 320 px */
+      column-gap: max(12px, min(1rem, 18px, 3vw));
+    }
+    footer.nav.assistent-nav > .nav-zurueck { grid-area: zurueck; min-width: min(calc(var(--ziel-basis) + var(--ziel)), calc(44px + var(--ziel))); }
+    footer.nav.assistent-nav > .anzeige-leiste { grid-area: modus; }
+    footer.nav.assistent-nav > .uebernehmen { grid-area: mitte; justify-self: center; }
+    footer.nav.assistent-nav > .primaer { grid-area: weiter; justify-self: end; }
+    @container assistent-nav (max-width: 25rem) {
+      .nav-wort { display: none; }
+      .nav-zurueck, .primaer { padding-inline: min(1.1rem, 20px, 3.5vw); }
     }
     /* Quer am Telefon — das Gerät in der Fahrzeughalterung, eine der
        maßgeblichen Nutzungssituationen — blieben von 390 px Höhe nach
@@ -1489,7 +1566,7 @@
        um und — nur wenn „übernehmen" allein nicht mehr passt — im Wort,
        statt abgeschnitten zu werden. Die Zweiknopf-Leiste bleibt, wie sie ist. */
     footer.nav .uebernehmen { flex-shrink: 1; overflow: visible; overflow-wrap: anywhere; }
-    footer.nav:has(.uebernehmen) button:not(.uebernehmen) { padding-inline: min(1.1rem, 20px, 3.5vw); }
+    footer.nav:has(.uebernehmen) button:not(.uebernehmen):not(.anzeige-leiste-knopf) { padding-inline: min(1.1rem, 20px, 3.5vw); }
     /* Hochformat: „In Einsatz übernehmen" in eigener Zeile über dem
        Blättern. Zwischen „← Zurück" und „Weiter →" stand er 88–120 px breit
        mit 9–11 px Abstand, bei 320 px dreizeilig mit Trennung im Wort — ein
@@ -1497,16 +1574,23 @@
        (Audit Runde 3, R3-G3). Quer bleibt die Zeile, dort liegen über 100 px
        zwischen den Knöpfen. main und scroll-padding halten die höhere Leiste
        frei. */
+    /* R4-M2: Zwei Zeilen, nie drei — der Abschluss oben über die ganze Breite,
+       darunter dieselbe Ordnung wie in der einzeiligen Leiste. Die Höhe des
+       Abschlusses ist gedeckelt (44 px + Zuschlag, vorher 88 px bei 200 %); die
+       ganze Leiste belegt so höchstens ein Viertel des Bilds. */
     @media (max-width: 35.99rem) {
-      footer.nav.mit-uebernehmen { flex-wrap: wrap; row-gap: min(0.9rem, 14px); }
+      footer.nav.assistent-nav.mit-uebernehmen {
+        grid-template-areas: "mitte mitte mitte mitte" "zurueck modus leer weiter";
+        row-gap: min(0.9rem, 8px);
+      }
       footer.nav.mit-uebernehmen .uebernehmen {
-        order: -1; flex: 1 1 100%; min-height: calc(var(--ziel-basis) + var(--ziel));
+        justify-self: stretch; min-height: min(calc(var(--ziel-basis) + var(--ziel)), calc(44px + var(--ziel)));
         font-size: min(var(--t-m), max(16px, 5vmin)); white-space: nowrap; overflow-wrap: normal;
         font-weight: 600; border-width: var(--strich-stark);
       }
-      footer.nav.mit-uebernehmen button:not(.uebernehmen) { padding-inline: min(1.1rem, 20px); }
-      main.mit-uebernehmen { padding-bottom: calc(10rem + env(safe-area-inset-bottom)); }
-      html:has(main.mit-uebernehmen) { scroll-padding-bottom: calc(10rem + env(safe-area-inset-bottom)); }
+      footer.nav.mit-uebernehmen button:not(.uebernehmen):not(.anzeige-leiste-knopf) { padding-inline: min(1.1rem, 20px); }
+      main.mit-uebernehmen { padding-bottom: calc(min(10rem, 160px) + env(safe-area-inset-bottom)); }
+      html:has(main.mit-uebernehmen) { scroll-padding-bottom: calc(min(10rem, 160px) + env(safe-area-inset-bottom)); }
     }
     .fehler { color: var(--alarm); }
     .warnung {
