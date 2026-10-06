@@ -234,6 +234,11 @@ try {
     const seite = await kontext.newPage();
     await seite.goto(`${BASIS_URL}/`, { waitUntil: "networkidle" });
     await aktion?.(seite);
+    // Die Einblend-Bewegungen (Speicherzeile, Rückmeldungen) laufen rund
+    // 200 ms; ohne Warten hielt die Aufnahme sie halb durchsichtig fest — die
+    // Zeile „✓ gespeichert" war auf dem Kopfbalken kaum zu erkennen (Audit
+    // Runde 4, R4-L4: Aufnahmen auf aktuellem Stand).
+    await seite.waitForTimeout(600);
     await seite.screenshot({ path: ZIEL + datei });
     await seite.context().close();
     console.log(`${datei} (${breite}×${hoehe})`);
