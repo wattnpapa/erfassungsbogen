@@ -349,3 +349,24 @@ R4-L1 und R4-L2 sind keine Folge einer Behebung. Die Regeln stammen aus
 einem früheren Stand; sie fielen bisher nicht auf, weil alle Runden mit
 THW-Bögen geprüft haben. Neu in Runde 4: R4-L1 (P2), R4-L2 und R4-L4 (P3).
 R4-L3 ist der Rest von R3-L6. Zusammen: 0 × P0, 0 × P1, 1 × P2, 3 × P3.
+
+## Stand der Behebung
+
+Stand 06.10.2026, Paket 3 „Layout, 200 % Schrift, Touch, Sicht“.
+Geprüft mit Typprüfung, Unit-Tests (2 562 grün), Verhaltenstests (137 Szenarien, 1 749 Schritte grün)
+und Nachmessung im Dev-Server (`isMobile`/`hasTouch`, de-DE, Port 5180,
+360 × 640 und 320 × 568). Kontraste sind gerechnet: jeder sichtbare Textknoten
+von Schritt 1 und 3 gegen die tatsächlich darunterliegende Fläche (Deckkraft
+der Vorfahren eingerechnet), WCAG-Formel, Schwelle 4,5:1, für zwölf
+Organisationen (THW, Feuerwehr, Polizei, Bundespolizei, DRK, Johanniter,
+Malteser, ASB, DLRG, Bundeswehr, Rettungsdienst, Sonstige; Entwurf aus
+`examples/thw/024-muehldorf-b.json`, Organisation im Seed umgestellt) in
+Standard, Feld, Dunkel und Nacht. Aufgeführt sind nur die Befunde dieses
+Pakets.
+
+| Befund | Stand | Umsetzung |
+| --- | --- | --- |
+| R4-L1 „✓ automatisch gespeichert“ grün auf der Kennfarbe | behoben | Im Kopfbalken gilt im Dunkel-Modus dieselbe auf 4,5:1 gerechnete Zweitschrift der Kennfarbe wie in Standard und Feld (`.dunkel-modus .seiten-kopf .autosave`); das Grün gilt nur noch auf der Seite. Die Zeile heißt jetzt „✓ gespeichert · 22:24 Uhr · nur auf diesem Gerät“. Gemessen im Dunkel-Modus (vorher → nachher): DLRG 2,46 → 10,26:1, DRK 2,59 → 10,17:1, Feuerwehr 3,12 → 8,32:1, ASB 3,22 → 8,22:1, Polizei 3,46 → 7,73:1, Bundeswehr 4,35 → 7,54:1, Rettungsdienst 4,48 → 7,50:1, THW 7,99 → 9,66:1. Alle zwölf Organisationen, alle vier Modi, Schritt 1 und 3: kein sichtbarer Text unter 4,5:1; knappste Werte DLRG Feld 4,53:1, Polizei Standard 4,54:1, ASB Standard 4,55:1, DRK Standard 4,56:1. |
+| R4-L2 „‹ Startseite“ unter 4,5:1, Dunkel-Modus: gesättigt roter Balken | behoben | Der Rücksprung trägt statt der Deckkraft 0,85 die gerechnete Zweitschrift der Kennfarbe (DRK 3,75 → 4,56:1, DLRG 3,84 → 4,53:1 im Feld-Modus, Feuerwehr 4,62:1; THW 9,66:1, nachts 5,69:1). Im Dunkel-Modus nimmt der Kopfbalken die abgedunkelte Kennfarbe (`kopfDunkel()` in `org-farben.ts`: höchstens Leuchtdichte 0,05 und Sättigung 0,84, beides die Werte des Malteser-Bordeaux; THW, Malteser, Johanniter bleiben): DRK #e30613 → #7d0b12, Feuerwehr #c8102e → #800b1e, ASB #a34700 → #623009, DLRG #9c6b00 → #533b07; die Statusleiste (`theme-color`) folgt. Alle Texte im Kopfbalken des Dunkel-Modus: mindestens 6,83:1 (Rettungsdienst, Sonstige). |
+| R4-L3 „◐“ hält die Stelle nicht immer, Einsatzansicht ohne Umschalter unten | behoben | Der Anker ist das erste Element um die Bildmitte, das höchstens eine Zeile hoch ist (Feld, Beschriftung, Knopf), nicht die ganze Karte; feste Leisten zählen nicht. Nachlauf (360 × 640, Schritt 3, `scrollY` 1 500 bis 4 500, Nacht → Feld → Dunkel → Nacht → Standard → Feld): Verschiebung der Bildmitten-Sonde 0 px (höchstens 22 px bei 320 × 568; vorher rund 375 px). Die Einsatzansicht hat unten links einen festen „◐“ (44 px, mit Rahmen und Schatten); mitten in der Liste (`scrollY` 2 911 von 5 822 px) genügen zwei Tipps ohne Rollen, die Verschiebung beträgt 1 px. Er weicht der Daumen-Quittung und der Bildschirmtastatur. |
+| R4-L4 Kleinere Sichtreste | behoben | Nacht, Schritt 1–3: kein Bildpunkt über Luma 230, größter Wert 206 wie die Schrift (vorher 108 Punkte in Schritt 2 für das Kalendersymbol und 368 in Schritt 3 für die Optionsringe mit 255); Optionsknöpfe, Kästchen und Kalendersymbol sind per Filter warm und abgedunkelt. Handscanner-Rahmen in `--text-2` statt kaltgrau. Fehlerzeile nach „Bögen einlesen…“ mit „⚠“ und Rahmen. „⚠ Signatur ungültig“ ist auf dunklem Grund gefüllt (dunkle Schrift auf dem Alarmton: 7,55:1 nachts, 9,44:1 im Dunkel-Modus), die Warnmarken bleiben Umrisse. Umschalter in der Reihenfolge Standard, Feld, Dunkel, Nacht: „Nacht“ liegt nicht mehr neben „Feld“. Anleitungs-Aufnahmen (`public/screenshots/`, `npm run screenshots` + `npm run bilder-webp`) auf den aktuellen Stand gebracht, darunter `start-schmal.png` mit dem Klappknopf „Standard ▾“. Offen bleibt: Schritt 4 (Fahrzeuge) hat 4 Bildpunkte über Luma 230, die taktischen Zeichen tragen mit Absicht eine helle Unterlage. |

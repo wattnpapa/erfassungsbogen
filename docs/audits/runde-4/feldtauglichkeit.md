@@ -403,3 +403,16 @@ angetippt wurde. R4-H2 ist der Rest von R3-H6.
 - Feldtauglichkeit: **geeignet, nicht vollständig geprüft**. Handschuhe,
   Sonnenlicht, Kamera-Scan mehrteiliger Codes und native Builds gehören in
   einen Praxistest.
+
+## Stand der Behebung
+
+Stand 06.10.2026, Paket 3 „Layout, 200 % Schrift, Touch, Sicht“.
+Geprüft mit Typprüfung, Unit-Tests (2 562 grün), Verhaltenstests (137 Szenarien, 1 749 Schritte grün) und
+Nachmessung im Dev-Server (360 × 640, 320 × 568, 640 × 360,
+`isMobile`/`hasTouch`, de-DE, Port 5180, Schrift 100 % und 200 %). Aufgeführt
+sind nur die Befunde dieses Pakets.
+
+| Befund | Stand | Umsetzung |
+| --- | --- | --- |
+| R4-H2 Kurz-Liste ist am Telefon keine kurze Liste | teilweise | Unter 44rem Rahmenbreite (in der tatsächlichen Schrift) ist jede Person eine Karte aus sechs Spalten: Stelle und die drei Pfeile nebeneinander, Vorname und Nachname, „Zählt als“ und Geschlecht, ✕ am Zeilenende. Nichts liegt mehr außerhalb des Bilds (`scrollWidth` des Rahmens gleich `clientWidth`: 326 px bei 360, 280 px im Feld-Modus bei 320 px, auch bei 200 %); Name, „Zählt als“, Geschlecht, Reihenfolge und Entfernen stehen ohne seitliches Schieben im Bild, jedes Ziel 44 px (Feld 54 px). Die Spaltenköpfe bleiben für Vorlesesoftware im Baum (ausdrückliche Tabellenrollen). Nicht erreicht: „acht Zeilen in höchstens einem Bildschirm“ — eine Person misst 168 px (Feld 202 px, vorher rund 160 px), weil Vorname/Nachname, „Zählt als“/Geschlecht und die Pfeile je eine Zeile mit vollem Tippziel brauchen; acht Personen sind rund zwei Bildschirme lang. Ein Menü-Knopf für Sortieren und Entfernen würde das ändern, kostet aber einen Tipp mehr und den Umbau der Tabelle. |
+| R4-H3 Stärke-Leiste der Musterung kürzt ihre Beschriftung | behoben | Unter 24rem Leistenbreite (Container-Abfrage, `rem` der Seite) tragen die vier Felder die Kürzel des Bogens, „F“, „UF“, „M“, „Ges“; das ausgeschriebene Wort bleibt für Vorlesesoftware im Baum. Nachlauf (Vorlage „B Regen (Stamm)“ → Einsatz vorbereiten): 360 × 640 und 320 × 568 in Standard und Feld sowie 390 px: alle Beschriftungen ohne „…“; quer (640 px) stehen „FÜHRER / UNTERF. / MANNSCH. / GESAMT“ ausgeschrieben. |

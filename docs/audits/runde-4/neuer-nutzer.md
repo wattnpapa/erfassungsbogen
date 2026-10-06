@@ -416,3 +416,12 @@ dieses Pakets.
 | --- | --- | --- |
 | R4-N1 „Bereits gemeldet" ohne Vergleich | behoben | Die Rückfrage zeigt „Bisher: …" / „Neu: …" (Stärke, Ansprechperson, Kennzeichen, Stand); ohne gemeinsame Person und gemeinsames Fahrzeug steht „⚠ Keine gemeinsame Person, kein gemeinsames Fahrzeug — vielleicht eine andere Gruppe?" und „Als eigene Einheit führen" vorn. Nachlauf: Ulm B mit anderem Personal → Hinweis, „eigene Einheit" vorn; Folgemeldung (+1) → 8 → 9, kein Hinweis. |
 | R4-N2 „Aus Datei laden…" ohne „Wohin damit?" | behoben | Bei vorhandener Sammlung fragt die Datei wie Link und Scan („Bogen von ‚…' aus der Datei … Wohin damit?"); erst „Bogen öffnen" verdrängt den Entwurf. Nachlauf (Sammlung, Entwurf Mühldorf, Datei Bamberg): „Aufnehmen" → Sammlung Ulm + Bamberg, Entwurf Mühldorf, Rückholplatz leer. |
+
+Stand 06.10.2026, Paket 3 „Layout, 200 % Schrift, Touch, Sicht“.
+Geprüft mit Typprüfung, Unit-Tests (2 562 grün), Verhaltenstests (137 Szenarien, 1 749 Schritte grün) und
+Nachmessung im Dev-Server (360 × 640, `isMobile`/`hasTouch`, de-DE, Port
+5180). Aufgeführt sind nur die Befunde dieses Pakets.
+
+| Befund | Stand | Umsetzung |
+| --- | --- | --- |
+| R4-N3 Nach „Namen einfügen…“ liegt Geschlecht außerhalb des Bilds | behoben | Die Ansicht wechselt weiter in die Kurz-Liste, die auf dem Telefon aber keine 637 px breite Tabelle mehr ist (siehe R4-H2): Geschlecht steht in derselben Karte direkt unter dem Namen. Nachlauf (360 × 640, Entwurf Mühldorf): „Max Müller, Anna Schmidt, Jonas Weber, Lena Fischer, Tim Becker“ eingefügt — die Geschlecht-Auswahl jeder Person steht bei 184–327 px im Bild, `scrollWidth` gleich Fensterbreite, „Person 2: Geschlecht“ ließ sich ohne Seitwärtswischen umstellen (Rahmen `scrollLeft` 0). Die Warnung „Alle … Personen stehen auf Geschlecht ‚männlich‘“ bleibt bis zur Übersicht stehen; die Ansicht wechselt weiter von selbst in die Kurz-Liste (nicht geändert). |

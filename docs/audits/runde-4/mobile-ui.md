@@ -512,3 +512,30 @@ dieses Pakets.
 | Befund | Stand | Umsetzung |
 | --- | --- | --- |
 | R4-M5 Zurück/Escape schließen das mehrteilige QR-Vollbild ohne Teil-Hinweis | behoben | Fehlen Teile, fangen Zurück und Escape einmal ab und zeigen „Teil n von m wurde noch nicht gezeigt" (Zurück legt den Vollbild-Eintrag neu an); das zweite Mal schließt ohne Vermerk. Die Übersicht merkt sich die gezeigten Teile je Code. Nachlauf (7 Teile, auf Teil 3): Zurück bzw. Escape → Hinweis auf Teil 4, Vollbild offen; zweites Mal → Gesamtübersicht; wieder geöffnet → „Teil 4 von 7". |
+
+Stand 06.10.2026, Paket 3 „Layout, 200 % Schrift, Touch, Sicht“.
+Geprüft mit Typprüfung, Unit-Tests (2 562 grün), Verhaltenstests (137 Szenarien, 1 749 Schritte grün)
+und Nachmessung im Dev-Server (`isMobile`/`hasTouch`, de-DE, Port 5180):
+360 × 640, 320 × 568, 390 × 844 und 640 × 360, Schrift 100 % und 200 %
+(als `html { font-size: 200 % }` und als Browser-Zoom mit 180 und 160 px
+Layoutbreite), Standard, Feld, Dunkel und Nacht; Positionen per
+`getBoundingClientRect`, Kontraste gerechnet. Aufgeführt sind nur die
+Befunde dieses Pakets.
+
+Gemeinsame Ursache von R4-M1 bis R4-M3 (und R4-G2 im Handschuh-Bericht): Die
+Leisten rechneten mit Media Queries in `rem` (Browser-Grundschrift 16 px, nicht
+die Schrift der Seite) und mit einem „◐“, das mit der Schrift wuchs. Behoben
+wurde die Ursache, nicht die einzelne Stelle: Schrift, Zielhöhe, Polster und
+Rand fester Leisten und Overlays sind in px gedeckelt (DESIGN.md, „Die
+Deckel-Regel“), Umbrüche entscheidet eine Container-Abfrage (`rem` zählt dort in
+der tatsächlichen Schrift), und die Leiste des Assistenten ist ein Raster mit
+festem Platz für den Primärknopf.
+
+| Befund | Stand | Umsetzung |
+| --- | --- | --- |
+| R4-M1 200 % Schrift: Einsatzansicht und 320-px-Seiten breiter als das Gerät | behoben | `h1`–`h5`, `summary` und Links der Fußzeile brechen im Wort (`overflow-wrap: anywhere`, `hyphens: auto`, `lang="de"`) als allgemeine Regel. Daumen-Quittung: Schrift auf 18 px gedeckelt, „Rückgängig“ und „✕“ als Paar mit 12 px Abstand, das bei Platzmangel unter den Text rutscht. Dialoge: Rand und Polster in px gedeckelt, der Browser-Rand `2em` überschrieben, die Antwortknöpfe einer Rückfrage kleben am unteren Dialogrand. Nachlauf: `scrollWidth` gleich Fensterbreite auf Startseite, Assistent Schritt 1–6 und Einsatzansicht bei 360 und 320 px, 100 % und 200 %, Standard und Feld (64 Kombinationen) sowie bei Browser-Zoom (Layoutbreite 180 und 160 px). Nach „Abrücken“ bei 200 %: Quittung 135 px hoch (21 %), Text, „Rückgängig“ und „✕“ im Bild (vorher 643–768 px bei 640 px Fensterhöhe). Rückfrage „Einheit für den Einsatz erfassen?“: beide Knöpfe im Bild (y 383–471 und 503–591 bei 640 px). Tests: `stilregeln-r4.test.ts`, `src/test/grosse-schrift.test.ts` (Zwischensummen, Fußzeile, Container-Abfrage). |
+| R4-M2 Fußleiste läuft über, Erfassungsleiste belegt 42 % | behoben | Raster mit vier festen Plätzen („← Zurück“, „◐“, Mitte, Primärknopf rechts außen); „◐“ in Maß (44 px + Feld-Zuschlag) und Schrift (20 px) gedeckelt; „← Zurück“ kürzt auf den Pfeil per Container-Abfrage (25rem in Seitenschrift); „In Einsatz übernehmen“ in px gedeckelt; unter 260 px Leistenbreite (Browser-Zoom) bekommt der Primärknopf eine eigene Zeile. Der Kopf deckelt bei großer Schrift Rücksprung, Klappe, Reiter und Zeichen (Erfassung, 360 × 640, 200 %: Kopf 393 → 179 px). Nachlauf (Assistent und Erfassung, Schritt 1–5, 320/360/390 px und quer, 100 % und 200 %, Standard und Feld, Assistent zusätzlich Dunkel und Nacht): kein Knopf außerhalb des Bilds, keine Überlagerung, Leistenhöhe Assistent 8–14 % (quer 15–20 %), Erfassung hochkant 15–25 % (quer 15–20 %). Grenze: Bei 320 × 568, Feld, 200 % steht über der Leiste (ab 426 px) nur der obere Teil des ersten Feldes (372–468 px); bei 360 × 640, 200 % ist es ganz im Bild (368–456 px, Leiste ab 510). |
+| R4-M3 Erfassungsleiste springt in Schritt 5 auf drei Zeilen | behoben | Gleiche Ursache und Lösung wie R4-M2. 360 × 640, Erfassung, Schritt 1–5: „Weiter →“ und „Zur Übersicht →“ enden in jedem Schritt am selben rechten Rand (344 px Standard, 342 px Feld) in derselben Zeile (y 584 bzw. 575), die Leiste bleibt zweizeilig (122 px, 19 %). |
+| R4-M4 QR-Vollbild bei 200 %: kein Code im ersten Bild | behoben | Im Vollbild sind Schrift (18 px), Knopfmaß, Polster und Ruhezone (24 px) in px gedeckelt, der Code behält höchstens 192 px Mindesthöhe (vorher 12rem = 384 px), die Blätterknöpfe brechen nicht um, „Schließen“ liegt 16 px unter den Blätterknöpfen. Nachlauf (Großbogen, 7 Teile, 200 %, `scrollTop` 0): 360 × 640 Code 176–455 px, „Teil 1 von 7“ bei 133–163 px, Knöpfe bis 624 px, `scrollHeight` gleich Fensterhöhe; 320 × 568 Code 176–383 px, „Teil 1 von 7“ bei 133–163 px, Knöpfe bis 552 px, `scrollHeight` gleich Fensterhöhe; 640 × 360 Code 16–312 px, „Teil 1 von 7“ und alle Knöpfe bis 325 px im Bild (vorher `scrollTop` 467 und leere linke Spalte). Auch nach dem Blättern auf Teil 2 unverändert, „Weiter zu Teil 3 →“ bricht nicht mehr um. |
+| R4-M6 Startseite bei 200 %: „Standard ▾“ liegt über dem Titel | behoben | Die Titelzeile darf umbrechen, der Titel behält die Breite seines längsten Worts (`min-content`), die Schrift folgt der Systemschrift nur bis 6,4 vw. Nachlauf (320, 360, 390 px, 100 % und 200 %, Standard und Feld): Titel und Knopf überlappen nie, `scrollWidth` gleich Fensterbreite; bei 200 % rutscht der Knopf unter den Titel. |
+| R4-M7 Kleinere Stellen | teilweise | Moduswahl: Segmente 44 px (Feld 54 px) hoch, mit Zweckzeile und Schatten. Sammlungsmarke bricht um (bis zu drei Zeilen) statt „Aufnahme fü…“. Speicherzeile: „✓ gespeichert · 22:24 Uhr · nur auf diesem Gerät“. Klebende Tabellenspalte bei 200 %: 114 von 322 px (36 %, vorher 256 px), bei 100 % 118 von 326 px. Nicht erreicht: Erfassung quer (640 × 360) bleibt mit 128 px Kopf bei einer dritten Zeile für die Sammlungsmarke; zwei Versuche (Titel ausblenden, Marke und Rücksprung teilen sich die Zeile) brachen die Zeile trotzdem um oder machten den Kopf höher und sind zurückgenommen. |
