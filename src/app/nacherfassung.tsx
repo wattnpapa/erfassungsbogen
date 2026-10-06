@@ -75,22 +75,39 @@ export function andererEinheitstyp(
   return ta !== "" && tb !== "" && ta !== tb;
 }
 
+/** So weit darf „gestern" zurückliegen, damit es ohne Nachfrage gilt (Blatt von 23:50, abgetippt um 00:20). */
+export const GESTERN_STILL_MS = 6 * 60 * 60_000;
+
+/** Ergebnis von {@link eintreffzeitPruefen}. */
+export type EintreffzeitWahl =
+  /** Leer oder unlesbar — dann gilt wie bisher die Zeit der Aufnahme. */
+  | { art: "keine" }
+  /** Eindeutig: diese Zeit gilt. */
+  | { art: "zeit"; zeit: number }
+  /** Die Uhrzeit liegt heute in der Zukunft, gestern wäre lange her: fragen. */
+  | { art: "frage"; heute: number; gestern: number };
+
 /**
- * „09:40" → Zeitpunkt (ms). Das Datum ist heute; liegt die Uhrzeit mehr als
- * eine Viertelstunde in der Zukunft, ist gestern gemeint (Einsatz über
- * Mitternacht, Blatt von 23:50 wird um 00:20 abgetippt). Leer oder
- * unlesbar = null (dann gilt wie bisher die Zeit der Aufnahme).
+ * „09:40" → Eintreffzeit. Das Datum ist heute. Liegt die Uhrzeit mehr als
+ * eine Viertelstunde in der Zukunft, ist gestern nur dann still gemeint, wenn
+ * das kurz her ist (Blatt von 23:50, abgetippt um 00:20, siehe
+ * {@link GESTERN_STILL_MS}). Sonst ist es meist ein Dreher — „21:12" statt
+ * „20:12" um 20:42 landete bisher auf gestern und machte die Einheit fast
+ * einen Tag älter (Audit Runde 4, R4-E3). Dann fragt die App (heute oder gestern).
  */
-export function eintreffzeitAusUhrzeit(uhrzeit: string, jetzt = Date.now()): number | null {
+export function eintreffzeitPruefen(uhrzeit: string, jetzt = Date.now()): EintreffzeitWahl {
   const m = /^(\d{1,2}):(\d{2})$/.exec(uhrzeit.trim());
-  if (!m) return null;
+  if (!m) return { art: "keine" };
   const h = Number(m[1]);
   const min = Number(m[2]);
-  if (h > 23 || min > 59) return null;
+  if (h > 23 || min > 59) return { art: "keine" };
   const d = new Date(jetzt);
   d.setHours(h, min, 0, 0);
-  if (d.getTime() - jetzt > 15 * 60_000) d.setDate(d.getDate() - 1);
-  return d.getTime();
+  const heute = d.getTime();
+  if (heute - jetzt <= 15 * 60_000) return { art: "zeit", zeit: heute };
+  d.setDate(d.getDate() - 1);
+  const gestern = d.getTime();
+  return jetzt - gestern <= GESTERN_STILL_MS ? { art: "zeit", zeit: gestern } : { art: "frage", heute, gestern };
 }
 
 /**

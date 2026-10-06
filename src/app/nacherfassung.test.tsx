@@ -5,7 +5,7 @@
  */
 import { describe, expect, it } from "vitest";
 import { fireEvent, render, screen } from "@testing-library/react";
-import { EintreffzeitFeld, aehnlicherOrt, andererEinheitstyp, eintreffzeitAusUhrzeit, ortWoerter } from "./nacherfassung";
+import { EintreffzeitFeld, aehnlicherOrt, andererEinheitstyp, eintreffzeitPruefen, ortWoerter } from "./nacherfassung";
 
 describe("aehnlicherOrt", () => {
   it("erkennt den Runde-1-Prüffall „OV Albstadt“ ~ „Albstadt“", () => {
@@ -53,26 +53,39 @@ describe("andererEinheitstyp (R4-E1)", () => {
   });
 });
 
-describe("eintreffzeitAusUhrzeit", () => {
+describe("eintreffzeitPruefen", () => {
   const jetzt = new Date(2026, 8, 28, 14, 5).getTime();
 
   it("liest „09:40“ als heute 09:40", () => {
-    expect(eintreffzeitAusUhrzeit("09:40", jetzt)).toBe(new Date(2026, 8, 28, 9, 40).getTime());
+    expect(eintreffzeitPruefen("09:40", jetzt)).toEqual({ art: "zeit", zeit: new Date(2026, 8, 28, 9, 40).getTime() });
   });
 
-  it("nimmt eine Uhrzeit weit in der Zukunft als gestern (über Mitternacht)", () => {
+  it("nimmt kurz nach Mitternacht eine Uhrzeit vom Vorabend still als gestern", () => {
     const kurzNachMitternacht = new Date(2026, 8, 29, 0, 20).getTime();
-    expect(eintreffzeitAusUhrzeit("23:50", kurzNachMitternacht)).toBe(new Date(2026, 8, 28, 23, 50).getTime());
+    expect(eintreffzeitPruefen("23:50", kurzNachMitternacht)).toEqual({ art: "zeit", zeit: new Date(2026, 8, 28, 23, 50).getTime() });
+    // Auch zwei Stunden später noch, solange gestern höchstens sechs Stunden zurückliegt.
+    expect(eintreffzeitPruefen("23:30", new Date(2026, 8, 29, 2, 0).getTime())).toMatchObject({ art: "zeit" });
+  });
+
+  it("fragt bei einem Stundendreher in der Zukunft, statt fast einen Tag zurückzugehen (R4-E3)", () => {
+    const um2042 = new Date(2026, 8, 5, 20, 42).getTime();
+    expect(eintreffzeitPruefen("21:12", um2042)).toEqual({
+      art: "frage",
+      heute: new Date(2026, 8, 5, 21, 12).getTime(),
+      gestern: new Date(2026, 8, 4, 21, 12).getTime(),
+    });
+    // Drei Stunden voraus ebenso.
+    expect(eintreffzeitPruefen("23:41", um2042)).toMatchObject({ art: "frage" });
   });
 
   it("lässt eine Uhrzeit knapp nach jetzt am heutigen Tag", () => {
-    expect(eintreffzeitAusUhrzeit("14:10", jetzt)).toBe(new Date(2026, 8, 28, 14, 10).getTime());
+    expect(eintreffzeitPruefen("14:10", jetzt)).toEqual({ art: "zeit", zeit: new Date(2026, 8, 28, 14, 10).getTime() });
   });
 
-  it("gibt bei leer oder unlesbar null zurück", () => {
-    expect(eintreffzeitAusUhrzeit("", jetzt)).toBeNull();
-    expect(eintreffzeitAusUhrzeit("25:00", jetzt)).toBeNull();
-    expect(eintreffzeitAusUhrzeit("9.40", jetzt)).toBeNull();
+  it("gibt bei leer oder unlesbar „keine“ zurück", () => {
+    expect(eintreffzeitPruefen("", jetzt)).toEqual({ art: "keine" });
+    expect(eintreffzeitPruefen("25:00", jetzt)).toEqual({ art: "keine" });
+    expect(eintreffzeitPruefen("9.40", jetzt)).toEqual({ art: "keine" });
   });
 });
 

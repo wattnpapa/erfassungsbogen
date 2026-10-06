@@ -84,6 +84,7 @@ import {
   speicherFehlerArt,
   speicherVollMeldung,
   vomPapierMarkieren,
+  zeitKurz,
   zeitLang,
 } from "./eintrag-zeiten";
 import { offlineText, useOfflineStand } from "./offline-bereit";
@@ -112,7 +113,7 @@ import {
 } from "./qr-stapel";
 import { EinleseQuittung } from "./einlese-quittung";
 import { StapelQuittung } from "./stapel-quittung";
-import { EintreffzeitFeld, aehnlicherOrt, andererEinheitstyp, eintreffzeitAusUhrzeit } from "./nacherfassung";
+import { EintreffzeitFeld, aehnlicherOrt, andererEinheitstyp, eintreffzeitPruefen } from "./nacherfassung";
 import { meldungenVergleichen, steckbriefZeile, type MeldungsVergleich } from "./meldungs-vergleich";
 import { DaumenQuittung } from "./daumen-quittung";
 import {
@@ -2570,7 +2571,24 @@ function AppInhalt() {
     }
     if (!(await sollstaerkeFreigeben(b))) return;
     if (!(await staerkeFreigeben(b))) return;
-    let zeit = eintreffzeitAusUhrzeit(nachEintreffzeit);
+    let zeit: number | null = null;
+    const gelesen = eintreffzeitPruefen(nachEintreffzeit);
+    if (gelesen.art === "zeit") zeit = gelesen.zeit;
+    else if (gelesen.art === "frage") {
+      // Zukunft, und gestern läge fast einen Tag zurück: wie an der Karte
+      // fragen statt still auf gestern zu legen (Audit Runde 4, R4-E3).
+      const wahl = await frageWahl({
+        titel: "Stimmt die Zeit?",
+        text: `„Eingetroffen um" ${nachEintreffzeit} liegt in der Zukunft — Stunde oder Tag vertauscht? Jetzt ist es ${zeitKurz(Date.now())} Uhr.`,
+        wege: [
+          { wert: "heute", label: `Heute ${zeitLang(gelesen.heute)}` },
+          { wert: "gestern", label: `Gestern ${zeitLang(gelesen.gestern)}` },
+        ],
+        abbruch: "Zeit korrigieren",
+      });
+      if (!wahl) return; // Das Feld bleibt, der Wert steht zum Korrigieren drin.
+      zeit = wahl === "gestern" ? gelesen.gestern : gelesen.heute;
+    }
     // Kein Blatt-Wert und eine Unterbrechung dazwischen: fragen statt die
     // Uhrzeit des Übernehmens still zur Eintreffzeit zu machen (R3-S6).
     if (zeit == null && erfassungBeginn != null && Date.now() - erfassungBeginn > ERFASSUNG_PAUSE_MS) {
