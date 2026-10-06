@@ -266,7 +266,7 @@ describe("Assistenten-Durchlauf", () => {
     render(<App />);
     await nutzer.click(screen.getByRole("button", { name: "Einsatz vorbereiten" }));
     await nutzer.click(screen.getByRole("checkbox", { name: /Voss/ }));
-    await nutzer.click(screen.getByRole("button", { name: /^Einsatz starten/ }));
+    await nutzer.click(screen.getByRole("button", { name: /^Bogen anlegen/ }));
     // Vom Einsatz-Schritt weiter zum Personal.
     await nutzer.click(await screen.findByRole("button", { name: /Weiter →/ }));
     const knopf = await screen.findByRole("button", { name: /^Aus der Vorlage ergänzen… \(1\)$/ });
@@ -640,6 +640,18 @@ describe("Assistenten-Durchlauf", () => {
     await nutzer.click(screen.getByRole("button", { name: "Zuletzt geschlossenen Bogen zurückholen" }));
     expect(await screen.findByRole("heading", { name: "Gesamtübersicht" })).toBeDefined();
     expect(screen.getAllByText(/Eigenhausen/).length).toBeGreaterThan(0);
+  }, 20000);
+
+  it("sagt beim Ablegen des eigenen Bogens, dass nichts das Gerät verlässt (R4-N6)", async () => {
+    einsatzImSpeicherAnlegen("Sammelhausen", EinsatzArt.EINSATZ);
+    const nutzer = userEvent.setup();
+    render(<App />);
+    await neuerBogenBis(nutzer, 0);
+    await nutzer.type(screen.getByLabelText("Name (Pflicht)"), "Eigenhausen");
+    await nutzer.click(screen.getByRole("button", { name: /^6\. Übersicht/ }));
+    await nutzer.click(screen.getByRole("button", { name: "In Einsatz-Sammlung ablegen…" }));
+    const dialog = document.querySelector<HTMLDialogElement>("dialog[aria-label='In Einsatz-Sammlung ablegen']")!;
+    expect(dialog.textContent).toContain("Das bleibt auf diesem Gerät — an den Meldekopf geht er über „Bogen übergeben…“.");
   }, 20000);
 
   it("schließt eine abgelegte Schnellerfassung, statt sie als eigenen Bogen offen zu lassen", async () => {
@@ -2674,7 +2686,7 @@ describe("Musterung bei offenem Bogen: eine Rückfrage statt zwei (R4-S5)", () =
     await nutzer.click(screen.getByRole("button", { name: "‹ Startseite" }));
 
     await nutzer.click(screen.getByRole("button", { name: `Einsatz vorbereiten: ${v.name}` }));
-    await nutzer.click(screen.getByRole("button", { name: /^Einsatz starten/ }));
+    await nutzer.click(screen.getByRole("button", { name: /^Bogen anlegen/ }));
 
     expect(document.querySelector("dialog[aria-label='Alle aus der Vorlage dabei?']")).toBeNull();
     const frage = await screen.findByRole("dialog", { name: "Bogen aus Vorlage anlegen?" });
@@ -2685,7 +2697,7 @@ describe("Musterung bei offenem Bogen: eine Rückfrage statt zwei (R4-S5)", () =
   });
 });
 
-/** Audit Runde 4, R4-H5: Nach „Einsatz starten" geht es mit einem Tipp zur Übergabe. */
+/** Audit Runde 4, R4-H5: Nach „Bogen anlegen" geht es mit einem Tipp zur Übergabe. */
 describe("Nach der Musterung: „Zur Übergabe →“ in Schritt 2 (R4-H5)", () => {
   beforeEach(() => {
     localStorage.clear();
@@ -2698,7 +2710,7 @@ describe("Nach der Musterung: „Zur Übergabe →“ in Schritt 2 (R4-H5)", () 
 
     await nutzer.click(screen.getByRole("button", { name: `Einsatz vorbereiten: ${v.name}` }));
     await nutzer.click(screen.getByRole("checkbox", { name: /Ahlers/ }));
-    await nutzer.click(screen.getByRole("button", { name: /^Einsatz starten/ }));
+    await nutzer.click(screen.getByRole("button", { name: /^Bogen anlegen/ }));
 
     const sprung = await screen.findByRole("button", { name: "Zur Übergabe →" });
     await nutzer.click(sprung);

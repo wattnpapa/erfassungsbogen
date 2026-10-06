@@ -4063,7 +4063,8 @@ function AppInhalt() {
               ? "Die empfangene Meldung wird in der Sammlung abgelegt und hier geschlossen."
               : fremdeErfassung
                 ? "Die Erfassung wird in der Sammlung abgelegt und hier geschlossen."
-                : "Dein Bogen wird als Meldung abgelegt und bleibt hier geöffnet."}
+                : // Ein Gruppenführer hielt das für die Übergabe an den Meldekopf (R4-N6).
+                  "Dein Bogen wird als Meldung abgelegt und bleibt hier geöffnet. Das bleibt auf diesem Gerät — an den Meldekopf geht er über „Bogen übergeben…“."}
             {" "}Ist die Einheit dort schon gemeldet, wird nachgefragt (neue Fassung oder eigene Einheit).
           </p>
           {fehler && <p className="fehler" role="alert">{fehler}</p>}
@@ -4108,7 +4109,7 @@ function AppInhalt() {
             <button type="button" className="uebernehmen" onClick={() => void erfassungUebernehmen()}>In Einsatz übernehmen</button>
           )}
           {/* Nach der Musterung stehen Personal, Fahrzeuge und Bedarf schon da:
-              Von „Einsatz starten" bis zur Übergabe führte „Weiter →" durch
+              Von „Bogen anlegen" bis zur Übergabe führte „Weiter →" durch
               drei Schritte, die nichts Neues verlangten (Audit Runde 4, R4-H5).
               Einen Tipp weiter, ohne etwas zu überspringen: Die Übersicht
               nennt, was offen ist. */}

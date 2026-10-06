@@ -31,6 +31,10 @@ export function SchrittSofortbedarf({ bogen, aendern }: SchrittProps) {
         />
         Sofortbedarf erfassen
       </label>
+      {/* Was darunter fällt, vor dem Anhaken: Ein Neuling wusste es erst danach (R4-N6). */}
+      {!s && (
+        <p className="hinweis">Verpflegung, Betriebsstoff (Diesel, Benzin, Gemisch), Unterbringung, Ruhezeit — nur anhaken, wenn die Einheit etwas anfordert.</p>
+      )}
       {s && (
         <>
           <div className="zeile">

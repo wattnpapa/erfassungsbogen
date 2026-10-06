@@ -65,10 +65,10 @@ Funktionalität: Vorlagen anlegen, verwalten und mustern
   Szenario: Musterung streicht Abwesende und startet einen frischen Bogen
     Wenn ich auf "Einsatz vorbereiten" klicke
     Dann sehe ich die Überschrift "Personal (3/3)"
-    Und sehe ich die Schaltfläche "Einsatz starten · 3 Pers · 1 Fz"
+    Und sehe ich die Schaltfläche "Bogen anlegen · 3 Pers · 1 Fz"
     Wenn ich in der Musterung "Weber" abwähle
-    Dann sehe ich die Schaltfläche "Einsatz starten · 2 Pers · 1 Fz"
-    Wenn ich auf "Einsatz starten · 2 Pers · 1 Fz" klicke
+    Dann sehe ich die Schaltfläche "Bogen anlegen · 2 Pers · 1 Fz"
+    Wenn ich auf "Bogen anlegen · 2 Pers · 1 Fz" klicke
     Und ich im Dialog auf "Aus Vorlage anlegen" klicke
     Dann sehe ich den Schritt "2. Einsatz"
     Wenn ich zum Schritt "6. Übersicht" wechsle
@@ -78,7 +78,7 @@ Funktionalität: Vorlagen anlegen, verwalten und mustern
   Szenario: Die Musterung lässt die Vorlage unangetastet
     Wenn ich auf "Einsatz vorbereiten" klicke
     Und ich in der Musterung "Weber" abwähle
-    Und ich auf "Einsatz starten · 2 Pers · 1 Fz" klicke
+    Und ich auf "Bogen anlegen · 2 Pers · 1 Fz" klicke
     Und ich im Dialog auf "Aus Vorlage anlegen" klicke
     Und ich auf "‹ Startseite" klicke
     Dann sehe ich den Hinweis "3 Personen"
@@ -96,4 +96,4 @@ Funktionalität: Vorlagen anlegen, verwalten und mustern
     Und ich auf "‹ Abbrechen" klicke
     Dann sehe ich den Dialog "Musterung verwerfen?"
     Wenn ich im Dialog auf "Weiter mustern" klicke
-    Dann sehe ich die Schaltfläche "Einsatz starten · 2 Pers · 1 Fz"
+    Dann sehe ich die Schaltfläche "Bogen anlegen · 2 Pers · 1 Fz"

@@ -87,12 +87,12 @@ describe("Musterung starten (R3-H4, R3-H7)", () => {
   it("fragt nach, wenn niemand abgewählt wurde; „Zurück zur Liste“ startet nicht", async () => {
     const nutzer = userEvent.setup();
     const { onStart } = buehneMit(vorlage());
-    await nutzer.click(screen.getByRole("button", { name: /^Einsatz starten/ }));
+    await nutzer.click(screen.getByRole("button", { name: /^Bogen anlegen/ }));
     expect(frage()!.textContent).toContain("Gemeldet werden alle 3 Personen der Vorlage");
     await nutzer.click(within(frage()!).getByRole("button", { name: "Zurück zur Liste" }));
     expect(onStart).not.toHaveBeenCalled();
 
-    await nutzer.click(screen.getByRole("button", { name: /^Einsatz starten/ }));
+    await nutzer.click(screen.getByRole("button", { name: /^Bogen anlegen/ }));
     await nutzer.click(within(frage()!).getByRole("button", { name: "Ja, alle sind da" }));
     expect(onStart).toHaveBeenCalledTimes(1);
   });
@@ -107,7 +107,7 @@ describe("Musterung starten (R3-H4, R3-H7)", () => {
         <Dialogschicht />
       </>,
     );
-    await nutzer.click(screen.getByRole("button", { name: /^Einsatz starten/ }));
+    await nutzer.click(screen.getByRole("button", { name: /^Bogen anlegen/ }));
     expect(frage()).toBeNull();
     expect(onStart).toHaveBeenCalledTimes(1);
     expect(onStart.mock.calls[0]![2]).toMatch(/^Gemeldet werden alle 3 Personen der Vorlage\. Fehlt jemand/);
@@ -117,7 +117,7 @@ describe("Musterung starten (R3-H4, R3-H7)", () => {
     const nutzer = userEvent.setup();
     const { onStart } = buehneMit(vorlage());
     await nutzer.click(screen.getByRole("checkbox", { name: /Voss/ }));
-    await nutzer.click(screen.getByRole("button", { name: "Einsatz starten · 2 Pers · 0 Fz" }));
+    await nutzer.click(screen.getByRole("button", { name: "Bogen anlegen · 2 Pers · 0 Fz" }));
     expect(frage()).toBeNull();
     expect(onStart.mock.calls[0]![0].personal).toHaveLength(2);
     // Die abgewählte Person reist als Nachzügler mit (R4-W8).
@@ -132,14 +132,14 @@ describe("Musterung starten (R3-H4, R3-H7)", () => {
     const kaestchen = screen.getByRole("checkbox", { name: /2 Sollplätze unbesetzt/ }) as HTMLInputElement;
     expect(kaestchen.checked).toBe(false);
     await nutzer.click(screen.getByRole("checkbox", { name: /Voss/ }));
-    await nutzer.click(screen.getByRole("button", { name: /^Einsatz starten/ }));
+    await nutzer.click(screen.getByRole("button", { name: /^Bogen anlegen/ }));
     expect(onStart.mock.calls[0]![0].sonstiges).toBeUndefined();
 
     cleanup();
     const zweite = buehneMit(v);
     await nutzer.click(screen.getByRole("checkbox", { name: /2 Sollplätze unbesetzt/ }));
     await nutzer.click(screen.getByRole("checkbox", { name: /Voss/ }));
-    await nutzer.click(screen.getByRole("button", { name: /^Einsatz starten/ }));
+    await nutzer.click(screen.getByRole("button", { name: /^Bogen anlegen/ }));
     expect(zweite.onStart.mock.calls[0]![0].sonstiges).toBe("2 Sollplätze unbesetzt. Anh in Instandsetzung.");
   });
 });
@@ -171,7 +171,7 @@ describe("Musterung nach dem Neuladen (R4-E7)", () => {
     expect((screen.getByRole("checkbox", { name: /Voss/ }) as HTMLInputElement).checked).toBe(false);
     expect((screen.getByRole("checkbox", { name: /Ahlers/ }) as HTMLInputElement).checked).toBe(false);
     expect(screen.getByText(/Deine Haken von vorhin sind wieder da/)).toBeDefined();
-    expect(screen.getByRole("button", { name: /Einsatz starten · 1 Pers/ })).toBeDefined();
+    expect(screen.getByRole("button", { name: /Bogen anlegen · 1 Pers/ })).toBeDefined();
   });
 
   it("ignoriert den Stand einer anderen oder geänderten Vorlage", () => {

@@ -522,7 +522,7 @@ export function Musterung(props: {
 
       <footer className="nav">
         <button type="button" className="primaer muster-start" onClick={() => void starten()}>
-          Einsatz starten · {s.gesamt} Pers · {anzahlFz} Fz
+          Bogen anlegen · {s.gesamt} Pers · {anzahlFz} Fz
         </button>
       </footer>
     </main>

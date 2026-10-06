@@ -11,6 +11,15 @@ import { neuePerson, neuerBogen } from "../hilfen";
 import { SchrittSofortbedarf } from "./sofortbedarf";
 
 describe("Schritt Sofortbedarf", () => {
+  it("nennt vor dem Anhaken die vier Bereiche und blendet den Satz danach aus (R4-N6)", async () => {
+    const nutzer = userEvent.setup();
+    render(<SchrittBuehne komponente={SchrittSofortbedarf} />);
+    const satz = /Verpflegung, Betriebsstoff \(Diesel, Benzin, Gemisch\), Unterbringung, Ruhezeit/;
+    expect(screen.getByText(satz)).toBeDefined();
+    await nutzer.click(screen.getByLabelText("Sofortbedarf erfassen"));
+    expect(screen.queryByText(satz)).toBeNull();
+  });
+
   it("belegt die Verpflegung mit der Stärke vor und sagt das dazu", async () => {
     const nutzer = userEvent.setup();
     render(<SchrittBuehne komponente={SchrittSofortbedarf} bogen={{ ...neuerBogen(), personal: [neuePerson(), neuePerson(), neuePerson()] }} />);
