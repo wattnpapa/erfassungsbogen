@@ -42,7 +42,8 @@ import {
   vorbelegungGeladen,
 } from "../hilfen";
 import { mwdText } from "../auswertung";
-import { frageJaNein } from "../dialoge";
+import { frageJaNein, frageWahl } from "../dialoge";
+import { nachzueglerFuer } from "../vorlage-nachzuegler";
 import { TabellenScroll } from "../tabellen-scroll";
 import {
   Feld,
@@ -758,6 +759,28 @@ export function SchrittPersonal({ bogen, aendern: aendernRoh }: SchrittProps) {
     if (!schnell) setZurNeuen(bogen.personal.length);
     aendern({ personal: [...bogen.personal, neu] });
   }
+  // Bei „Einsatz vorbereiten" abgewählt, jetzt doch dabei: ein Tipp statt die
+  // Person mit Funktion, Fahrerlaubnis und Erreichbarkeit neu einzugeben (R4-W8).
+  const nachzuegler = nachzueglerFuer(bogen);
+  async function ausVorlageErgaenzen() {
+    const wahl = await frageWahl({
+      titel: "Aus der Vorlage ergänzen",
+      text: "Diese Personen wurden bei „Einsatz vorbereiten“ abgewählt. Wer kommt nach?",
+      wege: nachzuegler.map((p, i) => ({
+        wert: String(i),
+        label: personBezeichnung(p, i),
+        ...(p.funktionen.length > 0 || p.kontakte.length > 0 ? { hinweis: "mit Funktion und Erreichbarkeit aus der Vorlage" } : {}),
+      })),
+      abbruch: "Abbrechen",
+    });
+    if (wahl == null) return;
+    const person = nachzuegler[Number(wahl)];
+    if (!person) return;
+    const neu = structuredClone(person);
+    setFrischeKarte(neu);
+    if (!schnell) setZurNeuen(bogen.personal.length);
+    aendern({ personal: [...bogen.personal, neu] });
+  }
   const vorlage = stanPersonalVorbelegung(bogen.einheit.organisation, bogen.einheit.einheitsTyp);
   const stanGeladen = vorbelegungGeladen(bogen.personal, vorlage);
   const funktionsauswahl = haeufigeFunktionen(bogen.einheit.organisation, vorlage, bogen.personal);
@@ -1076,6 +1099,11 @@ export function SchrittPersonal({ bogen, aendern: aendernRoh }: SchrittProps) {
           <button type="button" onClick={() => { setNamenText(""); namenDialog.current?.showModal(); }}>
             Namen einfügen…
           </button>
+          {nachzuegler.length > 0 && (
+            <button type="button" onClick={() => void ausVorlageErgaenzen()}>
+              Aus der Vorlage ergänzen… ({nachzuegler.length})
+            </button>
+          )}
         </p>
       )}
       {quittung}

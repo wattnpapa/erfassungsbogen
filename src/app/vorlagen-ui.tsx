@@ -13,7 +13,7 @@
  */
 
 import { useEffect, useRef, useState } from "react";
-import { StaerkeRolle, staerke, type Erfassungsbogen } from "@bos/eeb-format/model";
+import { StaerkeRolle, staerke, type Erfassungsbogen, type Person } from "@bos/eeb-format/model";
 import {
   funktionsText,
   kennzeichenText,
@@ -310,7 +310,8 @@ export function VorlageTeilen(props: { vorlage: Vorlage; onSchliessen: () => voi
 
 export function Musterung(props: {
   vorlage: Vorlage;
-  onStart: (bogen: Erfassungsbogen) => void;
+  /** `abgewaehlt`: die Personen, die nicht mitgehen — als Nachzügler später ergänzbar (R4-W8). */
+  onStart: (bogen: Erfassungsbogen, abgewaehlt: Person[]) => void;
   onAbbrechen: () => void;
 }) {
   const { vorlage, onStart, onAbbrechen } = props;
@@ -353,7 +354,7 @@ export function Musterung(props: {
       });
       if (!sicher) return;
     }
-    onStart(vorlageInstanziieren(b, { personal: pAn, fahrzeuge: vAn, sofortbedarf: bedarfAn, sonstiges: bemerkungAn }));
+    onStart(vorlageInstanziieren(b, { personal: pAn, fahrzeuge: vAn, sofortbedarf: bedarfAn, sonstiges: bemerkungAn }), b.personal.filter((_, i) => !pAn[i]));
   }
 
   /**

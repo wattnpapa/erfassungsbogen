@@ -104,6 +104,8 @@ describe("Musterung starten (R3-H4, R3-H7)", () => {
     await nutzer.click(screen.getByRole("button", { name: "Einsatz starten · 2 Pers · 0 Fz" }));
     expect(frage()).toBeNull();
     expect(onStart.mock.calls[0]![0].personal).toHaveLength(2);
+    // Die abgewählte Person reist als Nachzügler mit (R4-W8).
+    expect(onStart.mock.calls[0]![1].map((p: { nachname: string }) => p.nachname)).toEqual(["Voss"]);
   });
 
   it("übernimmt die Bemerkung der Vorlage nur angehakt", async () => {

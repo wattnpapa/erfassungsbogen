@@ -8,7 +8,8 @@
 
 import { Fragment, useEffect, useLayoutEffect, useRef, useState, type ChangeEvent } from "react";
 import { START_ABSCHNITTE, type Teil } from "./start-inhalt";
-import type { Erfassungsbogen } from "@bos/eeb-format/model";
+import type { Erfassungsbogen, Person } from "@bos/eeb-format/model";
+import { nachzueglerMerken } from "./vorlage-nachzuegler";
 import {
   base64UrlKodieren,
   decodePayloadUrl,
@@ -1064,8 +1065,9 @@ function AppInhalt() {
     wendeOrgAkzentAn(einsatzAnsicht ? undefined : bogen?.einheit.organisation);
   }, [bogen?.einheit.organisation, einsatzAnsicht]);
 
-  async function musterungFertig(neuerArbeitsbogen: Erfassungsbogen) {
+  async function musterungFertig(neuerArbeitsbogen: Erfassungsbogen, abgewaehlt: Person[] = []) {
     if (!(await darfBogenErsetzen({ titel: "Bogen aus Vorlage anlegen?", was: "den Bogen aus der Vorlage", ok: "Aus Vorlage anlegen" }))) return;
+    nachzueglerMerken(neuerArbeitsbogen, abgewaehlt);
     setBogen(neuerArbeitsbogen);
     setzeEmpfang(null);
     setSchritt(SCHRITT_EINSATZ);
@@ -3055,18 +3057,29 @@ function AppInhalt() {
     } else {
       const einheiten = new Set(quelle.eintraege.map((e) => e.einheitSchluessel)).size;
       const zug = quelle.name.trim();
+      // Heißt die Sammlung wie die Lage hier (zwei Meldeköpfe derselben Lage), ist
+      // ihr Name kein Zug: Albstadt und Radolfzell bekämen sonst „Hochwasser Eyach
+      // 10/2026" als Schein-Zug, und die Zwischensummen nach Zug stimmten nicht
+      // mehr. Dann steht „ohne Zug-Zuordnung" vorn (R4-W8).
+      const norm = (s: string) => s.toLowerCase().replace(/\s+/g, " ").trim();
+      const gleicheLage = norm(zug) === norm(ziel.name) || norm(ziel.name).includes(norm(zug)) || norm(zug).includes(norm(ziel.name));
+      const mitZug = {
+        wert: "mit-zug",
+        label: `Übernehmen, Zug „${zug}“`,
+        hinweis: "Einheiten ohne Zug bekommen diesen Zug. Später an der Karte änderbar.",
+      };
+      const ohneZug = {
+        wert: "ohne-zug",
+        label: "Übernehmen ohne Zug-Zuordnung",
+        ...(gleicheLage ? { hinweis: "Die Sammlung heißt wie diese Lage — ihr Name ist vermutlich kein Zug." } : {}),
+      };
       const wahl = await frageWahl({
         titel: "Sammel-PDF einer anderen Sammlung",
         text:
           `Die PDF enthält die Sammlung „${quelle.name}“ mit ${einheiten === 1 ? "1 Einheit" : `${einheiten} Einheiten`}. ` +
           `In „${ziel.name}“ übernehmen — mit Eintreffzeiten, Abrückvermerken, Auftrag und Siegel?`,
         wege: [
-          {
-            wert: "mit-zug",
-            label: `Übernehmen, Zug „${zug}“`,
-            hinweis: "Einheiten ohne Zug bekommen diesen Zug. Später an der Karte änderbar.",
-          },
-          { wert: "ohne-zug", label: "Übernehmen ohne Zug-Zuordnung" },
+          ...(gleicheLage ? [ohneZug, mitZug] : [mitZug, ohneZug]),
           {
             wert: "nur-boegen",
             label: "Nur die Bögen",

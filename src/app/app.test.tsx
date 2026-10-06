@@ -253,6 +253,31 @@ describe("Assistenten-Durchlauf", () => {
   });
 
   /**
+   * R4-W8: Wer bei „Einsatz vorbereiten" abgewählt wurde und später doch kommt,
+   * wird im Personalschritt mit einem Tipp ergänzt statt neu eingegeben.
+   */
+  it("ergänzt eine abgewählte Person aus der Vorlage im Personalschritt (R4-W8)", async () => {
+    const b = bogenMitName("OV Nachzugshausen");
+    b.personal = ["Berger", "Ahlers", "Voss"].map((nachname) => ({ ...neuePerson(), vorname: "T", nachname }));
+    vorlageAnlegen("FGr Nachzugshausen", b);
+    const nutzer = userEvent.setup();
+    render(<App />);
+    await nutzer.click(screen.getByRole("button", { name: "Einsatz vorbereiten" }));
+    await nutzer.click(screen.getByRole("checkbox", { name: /Voss/ }));
+    await nutzer.click(screen.getByRole("button", { name: /^Einsatz starten/ }));
+    // Vom Einsatz-Schritt weiter zum Personal.
+    await nutzer.click(await screen.findByRole("button", { name: /Weiter →/ }));
+    const knopf = await screen.findByRole("button", { name: /^Aus der Vorlage ergänzen… \(1\)$/ });
+    expect(screen.queryByDisplayValue("Voss")).toBeNull();
+    await nutzer.click(knopf);
+    const wahl = await screen.findByRole("dialog", { name: "Aus der Vorlage ergänzen" });
+    await nutzer.click(within(wahl).getByRole("button", { name: /Voss/ }));
+    expect((await screen.findAllByDisplayValue("Voss")).length).toBeGreaterThan(0);
+    // Wer da ist, wird nicht noch einmal angeboten.
+    expect(screen.queryByRole("button", { name: /^Aus der Vorlage ergänzen…/ })).toBeNull();
+  });
+
+  /**
    * Audit Runde 3, R3-H5: Die Vorlagen standen unter dem Meldekopf-Block,
    * 1,7 Bildschirme tief. Jetzt bietet „Meinen Bogen ausfüllen" sie zuerst
    * an — die Standard-Vorlage vorn.
@@ -2339,6 +2364,39 @@ describe("Einsatz importieren: Nachtrag („nur neue Bögen“) auf einem Gerät
     await nutzer.click(within(frage).getByRole("button", { name: "Trotzdem anlegen" }));
     await waitFor(() => expect(einsaetzeLaden()).toHaveLength(1));
     expect(JSON.stringify(einsaetzeLaden()[0])).not.toContain("nachtragSeit");
+  });
+});
+
+describe("Sammel-PDF einer gleichnamigen Sammlung übernehmen (R4-W8)", () => {
+  beforeEach(() => {
+    localStorage.clear();
+  });
+
+  it("stellt „ohne Zug-Zuordnung“ vorn, wenn die Sammlung heißt wie die Lage hier", async () => {
+    // Die fremde Sammlung entsteht auf einem „anderen Gerät" (Speicher danach leer) …
+    const quelle = einsatzImSpeicherAnlegen("Quelle", EinsatzArt.EINSATZ);
+    meldungHinzufuegen(quelle.id, bogenMitName("OV Albstadt"));
+    const fremd = {
+      id: "fremd-1",
+      name: "Hochwasser Eyach 10/2026",
+      art: EinsatzArt.EINSATZ,
+      angelegt: 1,
+      geaendert: 1,
+      eintraege: einsaetzeLaden().find((x) => x.id === quelle.id)!.eintraege,
+    };
+    localStorage.clear();
+    // … und hier gibt es die Lage unter demselben Namen.
+    const hier = einsatzImSpeicherAnlegen("Hochwasser Eyach 10/2026", EinsatzArt.EINSATZ);
+    meldungHinzufuegen(hier.id, bogenMitName("OV Erster"));
+    const datei = pdfDatei({ typ: "eeb-einsatz", version: 1, einsatz: fremd });
+    const nutzer = userEvent.setup();
+    render(<App />);
+    await nutzer.click(screen.getByRole("button", { name: "Öffnen" }));
+    await nutzer.upload(await screen.findByLabelText("Dateien wählen…"), datei);
+    const frage = await screen.findByRole("dialog", { name: "Sammel-PDF einer anderen Sammlung" });
+    const wege = within(frage).getAllByRole("button").map((b) => b.textContent ?? "");
+    const erster = wege.findIndex((w) => /Übernehmen/.test(w));
+    expect(wege[erster]).toMatch(/Übernehmen ohne Zug-Zuordnung/);
   });
 });
 
