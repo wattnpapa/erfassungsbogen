@@ -2410,6 +2410,11 @@
       min-height: calc(var(--ziel-basis) + var(--ziel)); font-size: var(--t-s); font-weight: 600; color: var(--text-2);
     }
     details.einheiten-filter-wahl[open] > summary { margin-bottom: var(--r-2); }
+    /* Die Überschrift der Liste trägt Zahlen („Einheiten (6 gemeldet · 6 zählend)“)
+       und brach am Telefon auf drei Zeilen; in Zwischengröße sind es zwei. */
+    @media (max-width: 30rem) {
+      .einsatz-liste > .kopfzeile h2 { font-size: var(--t-l); }
+    }
     /* Zug- und Teil-Kennzeichnung an einer gemeldeten Einheit. Ruhiger als der
        Übungs-Störer daneben: sie ordnen ein, sie warnen nicht. Das Teil-Etikett
        trägt den Akzent, weil es nach einer Aufteilung das einzige ist, was zwei
