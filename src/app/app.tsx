@@ -2727,16 +2727,35 @@ function AppInhalt() {
     await dateiAnbieten(`eeb-einsatz-${einsatzDateiname(s)}.json`, einsatzDateiInhalt(s), "application/json");
   }
 
+  /**
+   * Ein Nachtrag („nur neue Bögen" mit Stand dieses Formats) heißt anders als
+   * die Gesamtdatei und trägt den Bezugszeitpunkt im Namen — zwei gleichnamige
+   * Dateien überschrieben sich im Download-Ordner (R4-W4). Ohne Stand ist
+   * „nur neue" die ganze Lage und heißt wie sie.
+   */
+  function nachtragMarke(umfang: ExportUmfang, ziel: ExportZiel): string {
+    const stand = umfang === "neue" ? exportStaende[ziel] : undefined;
+    if (!stand) return "";
+    const d = new Date(stand.zeitpunkt);
+    const z = (n: number) => String(n).padStart(2, "0");
+    return `nachtrag-seit-${d.getFullYear()}${z(d.getMonth() + 1)}${z(d.getDate())}-${z(d.getHours())}${z(d.getMinutes())}-`;
+  }
+
   async function exportiereEinsatzCsv(s: Einsatzsammlung, umfang: ExportUmfang) {
     const teil = exportSammlung(s, umfang, exportStaende.csv ?? null);
-    const ok = await dateiAnbieten(`eeb-einsatz-${einsatzDateiname(s)}.csv`, einsatzCsvInhalt(teil, meldungsNummern(s.eintraege)), "text/csv;charset=utf-8");
+    const marke = nachtragMarke(umfang, "csv");
+    const ok = await dateiAnbieten(
+      `eeb-einsatz-${marke}${einsatzDateiname(s)}.csv`,
+      einsatzCsvInhalt(teil, meldungsNummern(s.eintraege), marke !== ""),
+      "text/csv;charset=utf-8",
+    );
     if (ok) exportVerbuchen(s, "csv");
   }
 
   async function exportiereEinsatzCsvDetail(s: Einsatzsammlung, umfang: ExportUmfang) {
     const teil = exportSammlung(s, umfang, exportStaende["csv-detail"] ?? null);
     const ok = await dateiAnbieten(
-      `eeb-einsatz-${einsatzDateiname(s)}-alle-daten.csv`,
+      `eeb-einsatz-${nachtragMarke(umfang, "csv-detail")}${einsatzDateiname(s)}-alle-daten.csv`,
       einsatzDetailCsvInhalt(teil, meldungsNummern(s.eintraege)),
       "text/csv;charset=utf-8",
     );
@@ -2751,7 +2770,7 @@ function AppInhalt() {
     const teil = exportSammlung(s, umfang, exportStaende.xlsx ?? null);
     try {
       const { XLSX_MIME, einsatzOldenburgXlsx } = await import("./oldenburg-xlsx");
-      const ok = await bytesAlsDatei(`eeb-einsatz-${einsatzDateiname(s)}-oldenburg.xlsx`, einsatzOldenburgXlsx(teil), XLSX_MIME);
+      const ok = await bytesAlsDatei(`eeb-einsatz-${nachtragMarke(umfang, "xlsx")}${einsatzDateiname(s)}-oldenburg.xlsx`, einsatzOldenburgXlsx(teil), XLSX_MIME);
       if (ok) exportVerbuchen(s, "xlsx");
     } catch (e) {
       setFehler(`Excel-Liste: ${fehlerText(e)}`);
@@ -2778,7 +2797,8 @@ function AppInhalt() {
       // Dynamisch: pdfmake samt eingebetteter Schriften bleibt aus dem
       // Start-Bundle heraus und wird erst beim ersten PDF geladen.
       const { einsatzPdfErzeugen } = await import("./pdf");
-      const ok = await einsatzPdfErzeugen(teil, undefined, s.eintraege);
+      const stand = umfang === "neue" ? exportStaende.pdf : undefined;
+      const ok = await einsatzPdfErzeugen(teil, undefined, s.eintraege, stand?.zeitpunkt);
       if (!ok) return; // Share-Sheet abgebrochen — nichts übergeben
       // „Einsatz weitergeben / sichern" geht an die Ablösung oder ins Archiv,
       // nicht an den Stab: Es hat seinen eigenen Stand (pdf.ts) und verbraucht
@@ -3214,6 +3234,25 @@ function AppInhalt() {
           if (await boegenAlsNeuerEinsatz(datei)) return;
           throw err;
         }
+      }
+      // Ein Nachtrag („nur neue Bögen") ist nur ein Teil der Lage. Gibt es die
+      // Sammlung hier noch nicht, entstünde eine Lage mit den paar Einheiten
+      // des Nachtrags — das wird gesagt und gefragt (R4-W4). Der Zusatz wandert
+      // nie in den Speicher.
+      const nachtragSeit = s.nachtragSeit;
+      delete s.nachtragSeit;
+      if (nachtragSeit != null && ![...einsaetzeLaden(), ...einsaetzePapierkorb()].some((x) => x.id === s.id)) {
+        const n = geltendeJeEinheit(s.eintraege).length;
+        const anlegen = await frageJaNein({
+          titel: "Nur ein Nachtrag — nicht die ganze Lage",
+          text:
+            `Die Datei ist ein Nachtrag zu „${s.name}" seit ${zeitLang(nachtragSeit)} und enthält nur ${n} Einheit${n === 1 ? "" : "en"}. ` +
+            "Die Sammlung gibt es auf diesem Gerät noch nicht: Es entstünde eine Lage mit nur diesen Einheiten. " +
+            "Die ganze Lage kommt vom Gerät, das sie führt, über „Einsatz weitergeben / sichern“.",
+          ok: "Trotzdem anlegen",
+          abbruch: "Abbrechen",
+        });
+        if (!anlegen) return;
       }
       // Vor Ort entfernte Meldungen kommen nicht still zurück (R2-D4).
       const geklaert = await entfernteImImportKlaeren(s);

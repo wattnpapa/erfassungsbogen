@@ -361,6 +361,28 @@ describe("einsatzPdfDokument()", () => {
     return b;
   }
 
+  /**
+   * R4-W4: Seite 1 eines Nachtrags beginnt nicht wie die Gesamtfassung. Im Stab
+   * liegen am Morgen mehrere Ausdrucke; wer den jüngsten greift, darf nicht 8
+   * Kräfte für 50 halten.
+   */
+  it("kennzeichnet einen Nachtrag in Kopf, Summen und Fußzeile (R4-W4)", () => {
+    const seit = new Date("2026-10-05T20:49").getTime();
+    const dd = einsatzPdfDokument("Hochwasser", [{ bogen: folgeBogen(), qr: QR, vorher: basisBogen() }], undefined, undefined, seit);
+    const t = texte(dd.content).join("\n");
+    expect(t).toContain("Übergabe-Übersicht NACHTRAG seit 05.10.2026, 20:49: Hochwasser");
+    expect(t).toContain("NACHTRAG seit 05.10.2026, 20:49 — nicht die ganze Lage:");
+    expect(t).not.toMatch(/^Lage: $/m);
+    expect(t).toContain("Bedarf (nur Nachtrag):");
+    expect(t).toContain("Bedarf Nachtrag (1 Einheiten");
+    expect(t).toContain("Summe Nachtrag (");
+    expect(JSON.stringify(typeof dd.footer === "function" ? dd.footer(1, 1, { width: 0, height: 0, orientation: "landscape" }) : dd.footer)).toContain("NACHTRAG seit");
+    // Die Gesamtfassung bleibt, wie sie war.
+    const voll = texte(einsatzPdfDokument("Hochwasser", [{ bogen: folgeBogen(), qr: QR, vorher: basisBogen() }]).content).join("\n");
+    expect(voll).toMatch(/^Lage: $/m);
+    expect(voll).not.toContain("NACHTRAG");
+  });
+
   it("stellt der Sammlung eine Übersicht mit Änderungsspalte voran", () => {
     const dd = einsatzPdfDokument("Hochwasser", [
       { bogen: folgeBogen(), qr: QR, vorher: basisBogen() },

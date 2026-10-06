@@ -179,7 +179,7 @@ function zaehlt(art: EinsatzArt, e: MeldeEintrag): boolean {
 }
 
 /** Summenzeile über alle anwesenden Einheiten — spaltenweise passend zu den Datenzeilen. */
-function summenZeile(meldungen: MeldeEintrag[]): string {
+function summenZeile(meldungen: MeldeEintrag[], nachtrag = false): string {
   const acc = {
     f: 0, u: 0, m: 0, gesamt: 0,
     vGesamt: 0, veg: 0, vegan: 0,
@@ -215,7 +215,7 @@ function summenZeile(meldungen: MeldeEintrag[]): string {
   }
   return csvZeile([
     "",
-    `Summe (${meldungen.length} Einheiten)`,
+    `${nachtrag ? "Summe Nachtrag" : "Summe"} (${meldungen.length} Einheiten)`,
     "",
     "",
     "",
@@ -241,6 +241,8 @@ export function einsatzCsvInhalt(
   s: Einsatzsammlung,
   /** Nummern aus der ganzen Sammlung — beim Teilexport „nur neue" sonst verschoben. */
   nummern: Map<string, number> = meldungsNummern(s.eintraege),
+  /** Nachtrag („nur neue Bögen"): die Summe heißt „Summe Nachtrag" (R4-W4). */
+  nachtrag = false,
 ): string {
   // Alle gemeldeten Einheiten, nicht nur die zählenden: Eine abgerückte oder
   // als Übung geführte Einheit fiel bisher wortlos aus der Datei — die
@@ -253,6 +255,6 @@ export function einsatzCsvInhalt(
   return csvDatei([
     csvZeile([...SPALTEN]),
     ...alle.map((e) => datenZeile(s.art, e, nummern.get(e.einheitSchluessel))),
-    summenZeile(zaehlende),
+    summenZeile(zaehlende, nachtrag),
   ]);
 }

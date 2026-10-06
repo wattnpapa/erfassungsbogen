@@ -221,6 +221,8 @@ export async function einsatzPdfErzeugen(
   einsatz: Einsatzsammlung,
   meldungen: MeldeEintrag[] = alleAktuellen(einsatz),
   historie: MeldeEintrag[] = einsatz.eintraege,
+  /** Nachtrag seit dem Stand des letzten Sammel-PDF (Date.now()) — Kopf, Summen und Umschlag sagen es (R4-W4). */
+  nachtragSeit?: number,
 ): Promise<boolean> {
   const boegenMitQr: SammelBogen[] = [];
   for (const m of meldungen) {
@@ -229,10 +231,16 @@ export async function einsatzPdfErzeugen(
       qr: await qrErzeugen(m.bogen, herkunftBytes(m)),
     });
   }
-  const dd = einsatzPdfDokument(einsatz.name, boegenMitQr, einsatzDateiInhalt(einsatz));
+  const nachtrag = historie !== einsatz.eintraege;
+  const dd = einsatzPdfDokument(
+    einsatz.name,
+    boegenMitQr,
+    einsatzDateiInhalt(nachtrag && nachtragSeit != null ? { ...einsatz, nachtragSeit } : einsatz),
+    undefined,
+    nachtrag ? nachtragSeit : undefined,
+  );
   // Teilexport („nur neue Bögen") mit eigenem Dateinamen — sonst hießen
   // Nachtrag und ganze Sammlung gleich (Audit Runde 2, R2-A3).
-  const nachtrag = historie !== einsatz.eintraege;
   const ok = await dokumentAusgeben(dd, `eeb-einsatz-${nachtrag ? "nachtrag-" : ""}${natoZeitstempel()}_${dateiRumpf(einsatz)}.pdf`);
   // Die ganze Sammlung ging heraus — womöglich an die nächste Schicht. Die
   // Einsatzansicht sagt danach, wann, und was seitdem nur hier dazukam

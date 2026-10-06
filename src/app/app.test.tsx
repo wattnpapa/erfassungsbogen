@@ -2298,6 +2298,50 @@ describe("Einsatz importieren: vor Ort entfernte Meldungen", () => {
   });
 });
 
+describe("Einsatz importieren: Nachtrag („nur neue Bögen“) auf einem Gerät ohne die Lage (R4-W4)", () => {
+  beforeEach(() => {
+    localStorage.clear();
+  });
+
+  function nachtragDatei() {
+    const s = einsatzImSpeicherAnlegen("Hochwasser Eyach", EinsatzArt.EINSATZ);
+    meldungHinzufuegen(s.id, bogenMitName("OV Albstadt"));
+    const roh = einsaetzeLaden().find((x) => x.id === s.id)!;
+    const datei = new File([einsatzDateiInhalt({ ...roh, nachtragSeit: Date.now() - 3_600_000 })], "nachtrag.json", { type: "application/json" });
+    einsatzLoeschenEndgueltigFuerTest(s.id);
+    return datei;
+  }
+
+  /** Das „frische Gerät": Sammlung samt Papierkorb weg. */
+  function einsatzLoeschenEndgueltigFuerTest(id: string) {
+    localStorage.removeItem("eeb.einsaetze.v1");
+    localStorage.removeItem("eeb.einsaetze-papierkorb.v1");
+    void id;
+  }
+
+  it("warnt, dass es nur ein Teil der Lage ist, und legt ohne Zustimmung nichts an", async () => {
+    const datei = nachtragDatei();
+    const nutzer = userEvent.setup();
+    render(<App />);
+    await nutzer.upload(screen.getByLabelText("Einsatz importieren…"), datei);
+    const frage = await screen.findByRole("dialog", { name: "Nur ein Nachtrag — nicht die ganze Lage" });
+    expect(within(frage).getByText(/enthält nur 1 Einheit/)).toBeDefined();
+    await nutzer.click(within(frage).getByRole("button", { name: "Abbrechen" }));
+    expect(einsaetzeLaden()).toHaveLength(0);
+  });
+
+  it("legt auf „Trotzdem anlegen“ die Sammlung an, ohne den Zusatz zu speichern", async () => {
+    const datei = nachtragDatei();
+    const nutzer = userEvent.setup();
+    render(<App />);
+    await nutzer.upload(screen.getByLabelText("Einsatz importieren…"), datei);
+    const frage = await screen.findByRole("dialog", { name: "Nur ein Nachtrag — nicht die ganze Lage" });
+    await nutzer.click(within(frage).getByRole("button", { name: "Trotzdem anlegen" }));
+    await waitFor(() => expect(einsaetzeLaden()).toHaveLength(1));
+    expect(JSON.stringify(einsaetzeLaden()[0])).not.toContain("nachtragSeit");
+  });
+});
+
 describe("Vorlage teilen (Karte in „Gespeicherte Vorlagen“)", () => {
   beforeEach(() => {
     localStorage.clear();

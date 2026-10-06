@@ -15,6 +15,18 @@ import { migriereBogen } from "./hilfen";
 import type { Einsatzsammlung } from "@bos/meldekopf/einsaetze";
 import { entpackt, pdfStroeme } from "./pdf-stroeme";
 
+declare module "@bos/meldekopf/einsaetze" {
+  interface Einsatzsammlung {
+    /**
+     * Nur im Umschlag eines Nachtrags („nur neue Bögen", Audit Runde 4, R4-W4):
+     * ab wann (Date.now()). Die Datei enthält dann nur einen Teil der Lage; das
+     * Einlesen auf einem Gerät ohne diese Sammlung fragt nach. Wird nie in den
+     * Speicher übernommen.
+     */
+    nachtragSeit?: number;
+  }
+}
+
 // -------------------------------------------------------- JSON-Datei (Einsatz)
 
 interface EinsatzDatei {

@@ -421,6 +421,8 @@ function uebersichtsTabelle(
   /** Lageblatt: Erreichbarkeit je Einheit und freie Zeilen zum Nachtragen (R2-A3). */
   zumWeiterfuehren = false,
   nachtragZeilen = NACHTRAG_ZEILEN_MIN,
+  /** Nachtrag (R4-W4): „seit 05.10.2026, 20:49" — die Summen heißen dann „Summe Nachtrag". */
+  nachtrag?: string,
 ): Content {
   const kopf = (text: string): TableCell => ({ text, bold: true, fillColor: GRAU });
   // Zug und Bedarf je Einheit, wie in der App-Tabelle — „Ruhezeit bei 5
@@ -564,7 +566,7 @@ function uebersichtsTabelle(
   if (!leer) {
     body.push(
       summenZeile(
-        `Summe${zumWeiterfuehren ? " laut Gerät" : ""} (${beschriftung.join(" · ")})`,
+        `Summe${nachtrag ? " Nachtrag" : ""}${zumWeiterfuehren ? " laut Gerät" : ""} (${beschriftung.join(" · ")})`,
         `${summe.staerke.fuehrer} / ${summe.staerke.unterfuehrer} / ${summe.staerke.mannschaft} / ${summe.staerke.gesamt}`,
         `${summe.fahrzeuge}`,
       ),
@@ -626,7 +628,7 @@ function kraftstoffKurz(k: EinsatzSummen["kraftstoff"]): string {
  * Zahlen, die der Meldekopf auf dem Bildschirm sieht (gemeinsame Summierung in
  * auswertung.ts). Ohne sie zeigte die gedruckte Sammlung nur die Stärke.
  */
-function bedarfsTabelle(eintraege: UebersichtEintrag[], leer = false): Content {
+function bedarfsTabelle(eintraege: UebersichtEintrag[], leer = false, nachtrag?: string): Content {
   if (leer) {
     // Leeres Lageblatt: Zeilen zum Ausfüllen statt „0 Portionen" (R3-A5).
     const zeile = (titel: string): TableCell[] => [{ text: titel, bold: true }, { text: " ", margin: [0, 3, 0, 3] }];
@@ -673,7 +675,7 @@ function bedarfsTabelle(eintraege: UebersichtEintrag[], leer = false): Content {
   ];
   return {
     stack: [
-      { text: `Bedarf gesamt (${s.einheiten} Einheiten, ${s.staerke.gesamt} Personen)`, bold: true, margin: [0, 6, 0, 4] },
+      { text: `${nachtrag ? "Bedarf Nachtrag" : "Bedarf gesamt"} (${s.einheiten} Einheiten, ${s.staerke.gesamt} Personen)`, bold: true, margin: [0, 6, 0, 4] },
       { table: { headerRows: 0, widths: [104, "*"], body }, margin: [0, 0, 0, 4] },
     ],
     unbreakable: true,
@@ -685,7 +687,7 @@ function bedarfsTabelle(eintraege: UebersichtEintrag[], leer = false): Content {
  * mehr als eine Gruppe kennt (sonst wiederholt die Tabelle nur den Gesamtwert).
  * Nur zählende Einheiten, wie am Gerät (aggregiereNachZug).
  */
-function zugSummenTabelle(eintraege: UebersichtEintrag[]): Content | undefined {
+function zugSummenTabelle(eintraege: UebersichtEintrag[], nachtrag?: string): Content | undefined {
   const nach = new Map<string, Erfassungsbogen[]>();
   for (const e of eintraege.filter(zaehlend)) {
     const k = e.zugEtikett ?? "";
@@ -720,7 +722,7 @@ function zugSummenTabelle(eintraege: UebersichtEintrag[]): Content | undefined {
   }
   return {
     stack: [
-      { text: "Zwischensummen nach Zug", bold: true, margin: [0, 6, 0, 4] },
+      { text: nachtrag ? "Zwischensummen nach Zug (nur Nachtrag)" : "Zwischensummen nach Zug", bold: true, margin: [0, 6, 0, 4] },
       { table: { headerRows: 1, widths: [84, 22, 52, 28, 32, 44, "*", 18], body }, margin: [0, 0, 0, 4] },
     ],
     unbreakable: true,
@@ -732,7 +734,7 @@ function zugSummenTabelle(eintraege: UebersichtEintrag[]): Content | undefined {
  * in zwei Zeilen, Dringendes fett. Die Einzelheiten (Verpflegung nach
  * Kostform, WC/Dusche, Zwischensummen) stehen weiter unter der Tabelle.
  */
-function lageKopfleiste(eintraege: UebersichtEintrag[], leer = false): Content {
+function lageKopfleiste(eintraege: UebersichtEintrag[], leer = false, nachtrag?: string): Content {
   if (leer) {
     // Leeres Lageblatt: Ausfülllinien statt „0 / 0 / 0 / 0" (R3-A5).
     const l = LEERFELD;
@@ -752,15 +754,20 @@ function lageKopfleiste(eintraege: UebersichtEintrag[], leer = false): Content {
     };
   }
   const s = summiereBoegen(zaehlendeBoegen(eintraege));
+  // Ein Nachtrag beginnt nicht wie die Gesamtfassung: im Stab liegen am Morgen
+  // mehrere Ausdrucke mit „Lage: …", und wer den jüngsten greift, las 8 Kräfte
+  // statt 50 (R4-W4).
   const staerkeZeile = [
-    { text: "Lage: ", bold: true },
+    nachtrag
+      ? { text: `NACHTRAG ${nachtrag} — nicht die ganze Lage: `, bold: true }
+      : { text: "Lage: ", bold: true },
     { text: `${s.einheiten} ${s.einheiten === 1 ? "Einheit" : "Einheiten"} zählend · Stärke F / U / M / G ` },
     { text: `${s.staerke.fuehrer} / ${s.staerke.unterfuehrer} / ${s.staerke.mannschaft} / ${s.staerke.gesamt}`, bold: true },
     { text: ` · ${s.fahrzeuge} Fahrzeuge` },
   ];
   const angefordert = unterbringungAngefordertText(s);
   const bedarfZeile = [
-    { text: "Bedarf: ", bold: true },
+    { text: nachtrag ? "Bedarf (nur Nachtrag): " : "Bedarf: ", bold: true },
     { text: `Verpflegung ${s.verpflegung.gesamt} · ` },
     angefordert ? { text: `Unterbringung angefordert: ${angefordert}`, bold: true } : { text: "keine Unterbringung angefordert" },
     { text: " · " },
@@ -785,10 +792,11 @@ function uebersichtsSeite(
   maxZeilen = UEBERSICHT_MAX_ZEILEN,
   zumWeiterfuehren = false,
   nachtragZeilen = NACHTRAG_ZEILEN_MIN,
+  nachtrag?: string,
 ): Content[] {
   const leer = zumWeiterfuehren && eintraege.length === 0;
-  const zugSummen = zugSummenTabelle(eintraege);
-  const bedarf = bedarfsTabelle(eintraege, leer);
+  const zugSummen = zugSummenTabelle(eintraege, nachtrag);
+  const bedarf = bedarfsTabelle(eintraege, leer, nachtrag);
   return [
     // Titel und Erstellzeit in einer Zeile — jede Zeile zählt, damit das
     // Lageblatt bei rund zehn Einheiten auf eine Seite passt (R2-K3).
@@ -804,8 +812,8 @@ function uebersichtsSeite(
     // Stärke und Bedarf vor der Tabelle: Ab rund 13 Einheiten stand „Bedarf
     // gesamt" allein auf Seite 2 — wer nur Seite 1 aushängt oder faxt, gab
     // Stärke ohne Bedarf weiter (Audit Runde 3, R3-K6).
-    lageKopfleiste(eintraege, leer),
-    uebersichtsTabelle(eintraege, maxZeilen, zumWeiterfuehren, nachtragZeilen),
+    lageKopfleiste(eintraege, leer, nachtrag),
+    uebersichtsTabelle(eintraege, maxZeilen, zumWeiterfuehren, nachtragZeilen, nachtrag),
     ...(hinweis ? [{ text: hinweis, italics: true, margin: [0, 2, 0, 0] } as Content] : []),
     // Bedarf und Zwischensummen nebeneinander statt untereinander: vorher
     // rutschten die Zwischensummen allein auf Seite 2 (R2-K3).
@@ -906,12 +914,25 @@ export function einsatzPdfDokument(
   /** Optional: kompletter Einsatz-Umschlag (einsatzDateiInhalt) für die Schichtübergabe. */
   sammlungJson?: string,
   erstellt = Date.now(),
+  /**
+   * Ein Nachtrag („nur neue Bögen"): ab wann. Kopf, Summen und Fußzeile sagen,
+   * dass es nur ein Teil der Lage ist, und ein Import warnt (R4-W4).
+   */
+  nachtragSeit?: number,
 ): TDocumentDefinitions {
+  const nachtrag = nachtragSeit != null ? `seit ${zeitLang(nachtragSeit)}` : undefined;
   const content: Content[] = uebersichtsSeite(
-    `Übergabe-Übersicht: ${name}`,
+    nachtrag ? `Übergabe-Übersicht NACHTRAG ${nachtrag}: ${name}` : `Übergabe-Übersicht: ${name}`,
     boegenMitQr,
     erstellt,
-    "Die Änderungsspalte vergleicht jede Meldung mit der vorherigen Meldung derselben Einheit. Die vollständigen Bögen folgen.",
+    (nachtrag
+      ? `NACHTRAG ${nachtrag}: nur die neuen oder geänderten Einheiten — nicht die ganze Lage. Die ganze Lage steht in „Einsatz weitergeben / sichern“. `
+      : "") +
+      "Die Änderungsspalte vergleicht jede Meldung mit der vorherigen Meldung derselben Einheit. Die vollständigen Bögen folgen.",
+    undefined,
+    false,
+    undefined,
+    nachtrag,
   );
   boegenMitQr.forEach((eintrag) => {
     // Zurück ins Hochformat: der Bogen selbst bleibt exakt der Papiervordruck.
@@ -945,7 +966,9 @@ export function einsatzPdfDokument(
     },
     // Die Fußzeile trägt den Stand des Ausdrucks auf jeder Seite; Zeiten und
     // Abrückvermerk je Einheit stehen im Kasten über dem Bogen (R2-A1).
-    footer: seitenFuss(`Einsatz-Sammlung: ${name} · Stand ${zeitLang(erstellt)} · Eintreff-/Abrückzeiten: Seite 1 und Kasten über jedem Bogen`),
+    footer: seitenFuss(
+      `${nachtrag ? `NACHTRAG ${nachtrag} (nicht die ganze Lage) — Einsatz` : "Einsatz-Sammlung"}: ${name} · Stand ${zeitLang(erstellt)} · Eintreff-/Abrückzeiten: Seite 1 und Kasten über jedem Bogen`,
+    ),
     content,
   };
 }

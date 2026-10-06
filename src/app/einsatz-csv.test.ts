@@ -186,6 +186,12 @@ describe("einsatzCsvInhalt()", () => {
     expect(summe.slice(sp("WC/Dusche M"), sp("WC/Dusche D") + 1)).toEqual(["4", "2", "0"]);
   });
 
+  it("nennt die Summenzeile eines Nachtrags „Summe Nachtrag“ (R4-W4)", () => {
+    const csv = einsatzCsvInhalt(sammlung([meldung(bogen("A"))]), undefined, true);
+    expect(zeilen(csv)[2]).toContain("Summe Nachtrag (1 Einheiten)");
+    expect(zeilen(einsatzCsvInhalt(sammlung([meldung(bogen("A"))])))[2]).toContain("Summe (1 Einheiten)");
+  });
+
   it("schreibt die offenen Punkte der Meldung in eine Spalte „Rückfrage“ (R4-K8)", () => {
     const csv = einsatzCsvInhalt(sammlung([meldung(bogen("A", { fahrzeuge: [{ typ: { code: 2 }, kennzeichen: "" }] }))]));
     const sp = spaltenIndex(csv);
