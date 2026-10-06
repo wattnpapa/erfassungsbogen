@@ -239,3 +239,37 @@ describe("Begleitseiten: Umbruch-Regel (R2-M1)", () => {
     expect(werte(block, ".sprungmenue ul", "grid-template-columns")[0]).toContain("min(14rem, 100%)");
   });
 });
+
+describe("Überschriften, Zusammenfassungen und Fußzeilen-Links brechen im Wort (R4-M1)", () => {
+  // „Zwischensummen nach Zug (3 Züge)" (h2 in einer summary) machte die
+  // Einsatzansicht bei 200 % 446 px breit, „nachrichtenvordruck.app" jede Seite
+  // mit Fußzeile bei 320 px 342 px. overflow-wrap: break-word am body ändert die
+  // Mindestbreite nicht — anywhere schon.
+  it("h2 (wie h1–h5 und summary) trägt overflow-wrap: anywhere und hyphens: auto", () => {
+    expect(wert("h2", "overflow-wrap")).toBe("anywhere");
+    expect(wert("h2", "hyphens")).toBe("auto");
+  });
+
+  it("die Seite ist auf Deutsch ausgezeichnet, sonst trennt hyphens: auto nicht", () => {
+    expect(INDEX).toMatch(/<html lang="de">/);
+  });
+
+  it("Links und Link-Knöpfe der Fußzeile überschreiten die Breite nicht", () => {
+    expect(wert("footer.seite a", "max-width")).toBe("100%");
+    expect(wert("footer.seite a", "overflow-wrap")).toBe("anywhere");
+  });
+
+  it("die Überschrift der Zwischensummen steht in einer summary (die Regel greift dort)", () => {
+    const quelle = readFileSync(join(WURZEL, "src", "app", "einsaetze-ui.tsx"), "utf8");
+    expect(quelle).toMatch(/<summary><h2>Zwischensummen nach Zug/);
+  });
+});
+
+describe("Leiste des Assistenten: Raster statt Umbruch (R4-M2, R4-G2)", () => {
+  it("die Kürzung von „Zurück“ hängt an einer Container-Abfrage, nicht an einer Media Query in rem", () => {
+    const kontext = APP.find((r) => r.kontext.startsWith("@container assistent-nav (max-width: 25rem)"))?.kontext;
+    expect(kontext).toBeDefined();
+    expect(werte(APP, ".nav-wort", "display", kontext)).toEqual(["none"]);
+    expect(APP.some((r) => r.kontext.startsWith("@media") && r.selektoren.includes("footer.nav .nav-wort"))).toBe(false);
+  });
+});

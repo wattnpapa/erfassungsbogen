@@ -1483,6 +1483,17 @@
       .nav-wort { display: none; }
       .nav-zurueck, .primaer { padding-inline: min(1.1rem, 20px, 3.5vw); }
     }
+    /* Browser-Zoom statt Systemschrift (200 % auf 360 px = 180 px Layoutbreite):
+       Die Knöpfe haben px-Maße und passen dann nicht mehr nebeneinander (der
+       Primärknopf lag über „Zurück" und „◐"). Unter 300 px bekommt der
+       Primärknopf eine eigene, volle Zeile am unteren Rand. */
+    footer.nav.assistent-nav { row-gap: min(0.9rem, 8px); }
+    @container assistent-nav (max-width: 300px) {
+      footer.nav.assistent-nav > .nav-zurueck { grid-area: auto; grid-row: 2; grid-column: 1; }
+      footer.nav.assistent-nav > .anzeige-leiste { grid-area: auto; grid-row: 2; grid-column: 2; }
+      footer.nav.assistent-nav > .uebernehmen { grid-area: auto; grid-row: 1; grid-column: 1 / -1; justify-self: stretch; }
+      footer.nav.assistent-nav > .primaer { grid-area: auto; grid-row: 3; grid-column: 1 / -1; justify-self: stretch; }
+    }
     /* Quer am Telefon — das Gerät in der Fahrzeughalterung, eine der
        maßgeblichen Nutzungssituationen — blieben von 390 px Höhe nach
        Kopfbalken, Anzeigewahl, Speicherzeile, Schrittleiste und Übungsband
@@ -2215,27 +2226,38 @@
       background: var(--flaeche); color: var(--text);
       border: var(--strich-stark) solid var(--linie-stark); border-top: 4px solid var(--text);
       border-radius: var(--radius); box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
-      font-size: var(--t-s);
+      /* R4-M1: Die Schrift der Leiste ist nach oben gedeckelt wie die der
+         Fußleiste (18 px). Bei 200 % lagen „Rückgängig" (215 px) und „✕"
+         (88 px) neben einem Text von 21 px Breite; und die Leiste stand, weil
+         die Seite 446 px breit war, unter dem Bildrand. Reicht die Breite
+         nicht für Text und Knöpfe, rutschen die Knöpfe unter den Text. */
+      font-size: min(var(--t-s), 18px); flex-wrap: wrap;
     }
+    .quittung-daumen > .quittung-knoepfe { display: flex; flex: 0 0 auto; gap: max(var(--r-3), 12px); margin-left: auto; }
+    .quittung-daumen button {
+      font-size: min(var(--t-m), 18px); min-height: min(calc(var(--ziel-basis) + var(--ziel)), calc(44px + var(--ziel)));
+      padding: min(0.5rem, 8px) min(1.1rem, 16px); gap: 0; row-gap: 0;
+    }
+    .quittung-daumen { gap: min(var(--r-2), 8px) var(--r-2); }
     /* Höchstens zwei Zeilen: Handlung und Zeit stehen vorn, der Name wird
        am Ende gekürzt. Ein langer Einheitsname brach bei 320 × 568 in fünf
        Zeilen, die Leiste deckte 26 % des Bilds (Audit Runde 3, R3-G2). Den
        ganzen Text liest das Vorleseprogramm trotzdem. */
     .quittung-daumen > .quittung-text {
-      flex: 1 1 auto; min-width: 0; overflow-wrap: anywhere; line-height: 1.25;
+      flex: 1 1 5.5em; min-width: min(5.5em, 100%); overflow-wrap: anywhere; line-height: 1.25;
       display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; overflow: hidden;
     }
     /* Die Seite hält unten die Höhe der Leiste frei (daumen-quittung.tsx
        setzt --quittung-hoehe), sonst lagen die letzten Knöpfe dauerhaft
        darunter. */
-    html:has(.quittung-daumen) main { padding-bottom: calc(6rem + var(--quittung-hoehe, 5rem) + env(safe-area-inset-bottom)); }
-    html:has(.quittung-daumen) { scroll-padding-bottom: calc(6rem + var(--quittung-hoehe, 5rem) + env(safe-area-inset-bottom)); }
+    html:has(.quittung-daumen) main { padding-bottom: calc(min(6rem, 108px) + var(--quittung-hoehe, 5rem) + env(safe-area-inset-bottom)); }
+    html:has(.quittung-daumen) { scroll-padding-bottom: calc(min(6rem, 108px) + var(--quittung-hoehe, 5rem) + env(safe-area-inset-bottom)); }
     /* „✓ Abgerückt" am Platz des Wechselknopfs: Bestätigung, kein
        ausgegrauter Knopf (R3-S5). */
     .einheit-zeile button.wechsel-quittiert:disabled { opacity: 1; font-weight: 700; border-style: dashed; }
-    .quittung-daumen > button { flex: none; }
-    .quittung-daumen > button:disabled { opacity: 1; }
-    .quittung-daumen > .quittung-schliessen { min-width: calc(var(--ziel-basis) + var(--ziel)); padding-inline: 0; }
+    .quittung-daumen button { flex: none; }
+    .quittung-daumen button:disabled { opacity: 1; }
+    .quittung-daumen .quittung-schliessen { min-width: min(calc(var(--ziel-basis) + var(--ziel)), calc(44px + var(--ziel))); padding-inline: 0; }
     /* Übungshinweis der Einsatzansicht auf eine Zeile, die Namen auf Tipp
        (Audit Runde 2, R2-S3); die Zeile ist ein volles Tippziel. */
     details.uebung-ausgenommen > summary {
@@ -2969,17 +2991,33 @@
        Feld-Aussehen, bleibt aber schmal genug, dass lange Gerätenamen die
        Knopfleiste nicht über den Rand ziehen. */
     .scanner-kamera select { max-width: min(80vw, 22rem); }
+    /* R4-M1: Rand und Polster wachsen nicht mit der Schrift. Bei 200 % blieben
+       von 320 px Breite 154 px für den Inhalt (2 x 32 px Rand, 2 x 48 px
+       Polster); die Knöpfe waren breiter als der Dialog und liefen rechts aus
+       dem Rahmen („Abbrechen" angeschnitten). Bei normaler Schrift bleibt es
+       bei 2rem / 1rem / 1,5rem. */
     dialog {
       border: var(--strich-stark) solid var(--linie-stark); border-radius: var(--radius);
-      width: min(34rem, calc(100vw - 2rem)); padding: var(--r-4) var(--r-5);
+      width: min(34rem, calc(100vw - min(2rem, 32px))); padding: min(var(--r-4), 16px) min(var(--r-5), 24px);
       background: var(--flaeche); color: var(--text); font-size: var(--t-m);
+      /* Der Browser-Standard rechnet den Rand mit 2em (bei 200 % 64 px je Seite). */
+      max-width: calc(100vw - min(2rem, 32px)); max-height: calc(100dvh - min(2rem, 32px));
+    }
+    /* R4-M1: Die Antwortknöpfe einer Rückfrage kleben am unteren Rand des
+       rollenden Dialogs. Bei 200 % ist der Dialog höher als das Bild
+       (1 345 px Inhalt, 568 px Fenster), und „Abbrechen" lag unter dem
+       Bildrand. Die benannten Wege (.abgesetzt) tragen Erklärtexte und
+       rollen mit. */
+    dialog.abfrage .abfrage-aktionen:not(.abgesetzt) {
+      position: sticky; bottom: calc(-1 * min(var(--r-4), 16px)); z-index: 1;
+      background: var(--flaeche); padding-bottom: min(var(--r-4), 16px);
     }
     /* Dialoge mit Tabelle (Beispielbögen) brauchen mehr Breite als die
        Textdialoge: 80 % der Seitenbreite, damit die vier Spalten samt
        Zeilen-Aktionen nebeneinander passen. Der max()-Anteil hält den Dialog
        auf kleinen Fenstern so breit wie bisher (80 % wären dort unnötig
        schmal), die Viewport-Grenze deckelt ihn wie gehabt. */
-    dialog.breit { width: min(calc(100vw - 2rem), max(80vw, 34rem)); }
+    dialog.breit { width: min(calc(100vw - min(2rem, 32px)), max(80vw, 34rem)); }
     dialog::backdrop { background: rgba(0, 0, 0, 0.45); }
     /* Dialoge steigen kurz ein (Fond blendet mit), damit die Überlagerung als
        Ebene ÜBER dem Formular lesbar ist. Das Schließen bleibt schlagartig:

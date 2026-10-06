@@ -117,14 +117,19 @@ export function DaumenQuittung({ children, prellschutz = false, onRueckgaengig, 
   return (
     <div className="quittung-daumen" role="status" ref={leiste}>
       <span className="quittung-text">{children}</span>
-      {onRueckgaengig && (
-        <button type="button" className="quittung-rueckgaengig" disabled={!bereit} onClick={onRueckgaengig}>
-          Rückgängig
+      {/* Die beiden Knöpfe bleiben als Paar zusammen: reicht die Breite nicht
+          für Text und Knöpfe, rutscht das Paar unter den Text (R4-M1) — „✕"
+          steht nie allein in einer Zeile. */}
+      <span className="quittung-knoepfe">
+        {onRueckgaengig && (
+          <button type="button" className="quittung-rueckgaengig" disabled={!bereit} onClick={onRueckgaengig}>
+            Rückgängig
+          </button>
+        )}
+        <button type="button" className="quittung-schliessen" disabled={!bereit} aria-label="Quittung schließen" onClick={onSchliessen}>
+          ✕
         </button>
-      )}
-      <button type="button" className="quittung-schliessen" disabled={!bereit} aria-label="Quittung schließen" onClick={onSchliessen}>
-        ✕
-      </button>
+      </span>
     </div>
   );
 }

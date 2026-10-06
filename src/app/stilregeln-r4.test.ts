@@ -90,6 +90,32 @@ describe("Überschriften und Fußzeilen-Links brechen im Wort (R4-M1)", () => {
   });
 });
 
+describe("Daumen-Quittung und Rückfragen bei großer Schrift (R4-M1)", () => {
+  it("die Quittung deckelt ihre Schrift, darf umbrechen und hält „Rückgängig“ und „✕“ als Paar zusammen", () => {
+    const b = bloecke(".quittung-daumen").join("\n");
+    expect(b).toMatch(/flex-wrap:\s*wrap/);
+    expect(b).toMatch(/font-size:\s*min\(var\(--t-s\),\s*18px\)/);
+    expect(bloecke(".quittung-daumen > .quittung-knoepfe").join("\n")).toMatch(/gap:\s*max\(var\(--r-3\),\s*12px\)/);
+    expect(bloecke(".quittung-daumen > .quittung-text").join("\n")).toMatch(/min-width:\s*min\(5\.5em,\s*100%\)/);
+  });
+
+  it("Dialoge nehmen Rand und Polster nicht mit der Schrift mit und überschreiben den Rand 2em des Browsers", () => {
+    const b = bloecke("dialog").join("\n");
+    expect(b).toMatch(/width:\s*min\(34rem, calc\(100vw - min\(2rem, 32px\)\)\)/);
+    expect(b).toMatch(/max-width:\s*calc\(100vw - min\(2rem, 32px\)\)/);
+    expect(b).toMatch(/padding:\s*min\(var\(--r-4\), 16px\) min\(var\(--r-5\), 24px\)/);
+  });
+
+  it("die Antwortknöpfe einer Rückfrage kleben am unteren Rand des rollenden Dialogs", () => {
+    expect(bloecke("dialog.abfrage .abfrage-aktionen:not(.abgesetzt)").join("\n")).toMatch(/position:\s*sticky/);
+  });
+
+  it("unter 300 px Leistenbreite (Browser-Zoom 200 %) bekommt der Primärknopf eine eigene Zeile", () => {
+    expect(css).toMatch(/@container assistent-nav \(max-width: 300px\)/);
+    expect(bloecke("footer.nav.assistent-nav > .primaer").join("\n")).toMatch(/grid-area:\s*weiter/);
+  });
+});
+
 describe("Startseite bei großer Schrift (R4-M6)", () => {
   it("der Titel behält die Breite seines längsten Worts, die Zeile darf umbrechen", () => {
     const zeile = bloecke(".seiten-kopf.start-kopf .titelzeile").join("\n");
