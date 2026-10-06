@@ -448,6 +448,27 @@ export function exportSammlung(einsatz: Einsatzsammlung, umfang: ExportUmfang, s
 }
 
 /**
+ * Wann zuletzt ein Export, ein Lageblatt oder eine Weitergabe dieser Sammlung
+ * eine der Meldungen enthielt — `null`, wenn keine in irgendeinem Stand steht.
+ * Für die Rückfrage vor dem Entfernen: Sie sagt, ob es von der Meldung noch
+ * eine Kopie gibt (Audit Runde 4, R4-D3).
+ */
+export function letzterStandMit(einsatzId: string, eintragIds: readonly string[]): number | null {
+  const ids = new Set(eintragIds);
+  const staende: (ExportStand | null | undefined)[] = [
+    ...Object.values(exportStaendeLaden(einsatzId)),
+    lageblattStandLaden(einsatzId),
+    weitergabeStandLaden(einsatzId),
+  ];
+  let zuletzt: number | null = null;
+  for (const st of staende) {
+    if (!st || !st.eintragIds.some((id) => ids.has(id))) continue;
+    if (zuletzt == null || st.zeitpunkt > zuletzt) zuletzt = st.zeitpunkt;
+  }
+  return zuletzt;
+}
+
+/**
  * Zeitpunkt von Export, Lageblatt und Weitergabe — in derselben Form wie auf
  * Karte und Lageblatt: „29.09.2026, 16:44". Vorher „Mo., 16:44", das über
  * eine Woche hinaus mehrdeutig war und neben „28.09.2026, 14:05" stand

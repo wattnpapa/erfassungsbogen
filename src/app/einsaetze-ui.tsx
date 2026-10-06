@@ -131,6 +131,7 @@ import {
   EXPORT_ZIEL_NAME,
   exportStaendeLaden,
   exportZeitKurz,
+  letzterStandMit,
   kenntnisStandLaden,
   kenntnisVermerken,
   lageblattStandLaden,
@@ -2673,9 +2674,29 @@ function EinheitKarte(props: {
   }
 
   async function entfernen() {
+    // Der Rückweg („Rückgängig") hält nur im Arbeitsspeicher: Nach dem Neuladen
+    // oder Beenden der App (das Betriebssystem tut es im Hintergrund) ist die
+    // Meldung endgültig weg. Das sagt die Rückfrage, samt Stand der Kopien
+    // (Audit Runde 4, R4-D3).
+    const ids = alle.filter((e) => e.einheitSchluessel === kopf.einheitSchluessel).map((e) => e.id);
+    const kopie = letzterStandMit(einsatzId, ids);
     const sicher = await frageJaNein({
       titel: "Meldung entfernen?",
-      text: `„${einheitAnzeigename(kopf.bogen.einheit)}" (Stand ${standText(kopf.bogen)}) wird aus diesem Einsatz entfernt — samt Historie.`,
+      text: (
+        <>
+          <p>
+            „{einheitAnzeigename(kopf.bogen.einheit)}" (Stand {standText(kopf.bogen)}) wird aus diesem Einsatz entfernt — samt
+            Historie.
+          </p>
+          <p>
+            „Rückgängig" gibt es nur, solange die App geöffnet bleibt. Nach dem Neuladen oder Beenden der App ist die
+            Meldung endgültig weg.{" "}
+            {kopie != null
+              ? `Eine Kopie steht im Export oder der Weitergabe vom ${exportZeitKurz(kopie)}.`
+              : "Von dieser Meldung gibt es in dieser Sammlung noch keinen Export und keine Weitergabe."}
+          </p>
+        </>
+      ),
       ok: "Meldung entfernen",
       gefahr: true,
     });

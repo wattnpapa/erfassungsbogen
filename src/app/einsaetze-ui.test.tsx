@@ -251,6 +251,30 @@ describe("Einheit mit Folgemeldung entfernen (R2-D1)", () => {
     expect(within(zurueckQuittung).queryByRole("button", { name: "Rückgängig" })).toBeNull();
   });
 
+  // Audit Runde 4, R4-D3: Der Rückweg hält nur im Arbeitsspeicher. Die
+  // Rückfrage sagt das vorher und nennt, ob es von der Meldung eine Kopie gibt.
+  it("sagt in der Rückfrage, dass „Rückgängig“ nur bis zum Neuladen hält — und ob es einen Export gibt (R4-D3)", async () => {
+    const nutzer = userEvent.setup();
+    const { einsatzId } = lage();
+    const karte = karteVon("Ulm")!;
+    await nutzer.click(within(karte).getByRole("button", { name: "Details" }));
+    await nutzer.click(within(karte).getByRole("button", { name: "Mehr…" }));
+    await nutzer.click(within(karte).getByRole("button", { name: "Entfernen" }));
+    let dialog = document.querySelector<HTMLDialogElement>("dialog[aria-label='Meldung entfernen?']")!;
+    expect(dialog.textContent).toMatch(/„Rückgängig" gibt es nur, solange die App geöffnet bleibt/);
+    expect(dialog.textContent).toMatch(/Nach dem Neuladen oder Beenden der App ist die Meldung endgültig weg/);
+    expect(dialog.textContent).toMatch(/noch keinen Export und keine Weitergabe/);
+    await nutzer.click(within(dialog).getByRole("button", { name: "Abbrechen" }));
+
+    // Mit Export nennt sie die Kopie.
+    const s = einsaetzeLaden().find((x) => x.id === einsatzId)!;
+    lageblattVermerken(s);
+    await nutzer.click(within(karte).getByRole("button", { name: "Entfernen" }));
+    dialog = document.querySelector<HTMLDialogElement>("dialog[aria-label='Meldung entfernen?']")!;
+    expect(dialog.textContent).toMatch(/Eine Kopie steht im Export oder der Weitergabe vom \d\d\.\d\d\.\d{4}/);
+    expect(dialog.textContent).not.toMatch(/noch keinen Export/);
+  });
+
   it("hält den Rückweg über das Verlassen der Ansicht hinweg (R3-D4)", async () => {
     const nutzer = userEvent.setup();
     const { einsatzId, neuLaden } = lage();

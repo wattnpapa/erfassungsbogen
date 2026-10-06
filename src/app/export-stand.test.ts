@@ -20,6 +20,7 @@ import {
   kenntnisVermerken,
   lageblattStandLaden,
   lageblattVermerken,
+  letzterStandMit,
   neueEintraege,
   seitdemText,
   weitergabeStandLaden,
@@ -257,5 +258,25 @@ describe("Änderungen an bekannten Einheiten seit dem Stand (Audit Runde 4, R4-K
     a.vermerke = [{ zeit: 5000, text: "Abgerückt" }];
     const alt: ExportStand = { zeitpunkt: 4000, eintragIds: ["m1"] };
     expect(aenderungenSeit([a], alt)).toMatchObject({ anzahl: 1, arten: ["Abrücken"] });
+  });
+});
+
+/** Audit Runde 4, R4-D3: Gibt es von einer Meldung, die entfernt werden soll, noch eine Kopie? */
+describe("letzterStandMit()", () => {
+  beforeEach(() => {
+    (globalThis as { localStorage?: Storage }).localStorage = new MemStorage() as unknown as Storage;
+  });
+
+  it("nennt den jüngsten Stand, in dem eine der Meldungen stand — sonst null", () => {
+    const s = sammlung("e1", [eintrag("m1", "Wardenburg", 1), eintrag("m2", "Hatten", 2)]);
+    expect(letzterStandMit("e1", ["m1"])).toBeNull();
+
+    exportVermerken(s, "csv", undefined, 100);
+    lageblattVermerken(s, undefined, 300);
+    expect(letzterStandMit("e1", ["m1"])).toBe(300);
+    expect(letzterStandMit("e1", ["m9"])).toBeNull();
+    // Eine später dazugekommene Meldung stand in keinem Stand.
+    expect(letzterStandMit("e1", ["m3", "m9"])).toBeNull();
+    expect(letzterStandMit("andere", ["m1"])).toBeNull();
   });
 });
