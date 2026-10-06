@@ -126,17 +126,22 @@ import { istBilddatei } from "./qr-stapel";
 import { fehlerText } from "./nachladen";
 import { entfernteMerken, entfernteVergessen } from "./entfernte-meldungen";
 import {
-  exportStandLaden,
+  EXPORT_ZIELE,
+  EXPORT_ZIEL_NAME,
+  exportStaendeLaden,
   exportZeitKurz,
   kenntnisStandLaden,
   kenntnisVermerken,
   lageblattStandLaden,
+  nachtragEintraege,
   neueEintraege,
   seitdemText,
   weitergabeStandLaden,
   aenderungenSeit,
+  aenderungText,
   type ExportStand,
   type ExportUmfang,
+  type ExportZiel,
 } from "./export-stand";
 
 export const ART_LABEL: Record<EinsatzArt, string> = {
@@ -220,25 +225,37 @@ function SignaturWarnung({ eintrag }: { eintrag: MeldeEintrag }) {
   );
 }
 
+/** „seitdem keine neuen Bögen" / „seitdem 1 neuer Bogen und 1 Änderung (Abrücken)" — für die Zeile je Format (R4-W2, R4-K1). */
+function seitdemBoegenText(eintraege: MeldeEintrag[], stand: ExportStand): string {
+  const neu = neueEintraege(eintraege, stand).length;
+  const aend = aenderungText(aenderungenSeit(eintraege, stand));
+  const teile = [...(neu > 0 ? [neu === 1 ? "1 neuer Bogen" : `${neu} neue Bögen`] : []), ...(aend ? [aend] : [])];
+  return `seitdem ${teile.length > 0 ? teile.join(" und ") : "keine neuen Bögen"}`;
+}
+
 /** „Lageblatt Mo., 16:30 (seitdem 1 neue Meldung) · Export: noch keiner" — für die Startseitenkarte (R2-A3). */
 function ausgabeStandText(s: Einsatzsammlung): string {
+  // Neue Meldungen UND Änderungen an bekannten Einheiten (Abrücken, Zug,
+  // Auftrag, Eintreffzeit) — wie die Weitergabe (R4-K1).
+  const seit = (stand: ExportStand) => seitdemText(neueEintraege(s.eintraege, stand).length, aenderungenSeit(s.eintraege, stand));
   const teil = (was: string, stand: ExportStand | null, keiner: string) =>
-    stand ? `${was} ${exportZeitKurz(stand.zeitpunkt)} (${seitdemText(neueEintraege(s.eintraege, stand).length)})` : `${was}: ${keiner}`;
+    stand ? `${was} ${exportZeitKurz(stand.zeitpunkt)} (${seit(stand)})` : `${was}: ${keiner}`;
   // Weitergabe der ganzen Sammlung nur, wenn es eine gab: an ihr erkennt man
   // auf der Startseite die an die nächste Schicht übergebene Lage (R2-W5).
   const weitergabe = weitergabeStandLaden(s.id);
+  // Exporte je Format (R4-W2): nur die, die es gab, sonst „noch keiner".
+  const staende = exportStaendeLaden(s.id);
+  const exporte = EXPORT_ZIELE.filter((z) => staende[z]).map((z) => `${EXPORT_ZIEL_NAME[z]} ${exportZeitKurz(staende[z]!.zeitpunkt)} (${seit(staende[z]!)})`);
   return [
     teil("Lageblatt", lageblattStandLaden(s.id), "noch keins"),
-    teil("Export", exportStandLaden(s.id), "noch keiner"),
+    exporte.length > 0 ? `Export ${exporte.join(", ")}` : "Export: noch keiner",
     ...(weitergabe ? [weitergabeTeil(s, weitergabe)] : []),
   ].join(" · ");
 }
 
-/** „Weitergegeben … (seitdem 1 neue Meldung, 2 Änderungen)" — Änderungen an bekannten Einheiten zählen mit (R3-W2). */
+/** „Weitergegeben … (seitdem 1 neue Meldung und 1 Änderung (Abrücken))" — Änderungen an bekannten Einheiten zählen mit (R3-W2). */
 function weitergabeTeil(s: Einsatzsammlung, stand: ExportStand): string {
-  const aend = aenderungenSeit(s.eintraege, stand).anzahl;
-  const zusatz = aend === 0 ? "" : aend === 1 ? ", 1 Änderung" : `, ${aend} Änderungen`;
-  return `Weitergegeben ${exportZeitKurz(stand.zeitpunkt)} (${seitdemText(neueEintraege(s.eintraege, stand).length)}${zusatz})`;
+  return `Weitergegeben ${exportZeitKurz(stand.zeitpunkt)} (${seitdemText(neueEintraege(s.eintraege, stand).length, aenderungenSeit(s.eintraege, stand))})`;
 }
 
 /**
@@ -755,8 +772,11 @@ export function EinsatzDetail(props: {
   onGeloescht: () => void;
   /** Die gerade eingegangene Meldung — sie quittiert in der Liste. */
   eingang?: Eingang | null;
-  /** Stand des letzten Exports dieses Einsatzes (export-stand.ts); null oder weggelassen: noch keiner. */
-  exportStand?: ExportStand | null;
+  /**
+   * Stand des letzten Exports dieses Einsatzes je Format (export-stand.ts,
+   * R4-W2); fehlendes Format oder weggelassen: noch kein Export in diesem Format.
+   */
+  exportStaende?: Partial<Record<ExportZiel, ExportStand>>;
   /**
    * Alle Bögen oder nur die neuen. Hält der Aufrufer die Wahl (app.tsx, damit
    * sie das Aus- und Einhängen der Ansicht übersteht), gibt er beides herein;
@@ -766,19 +786,24 @@ export function EinsatzDetail(props: {
   onExportUmfang?: (umfang: ExportUmfang) => void;
 }) {
   const { einsatz, onZurueck, onGeaendert, onScannen, onManuell, onDateiImport, onBilderImport, onExport, onCsvExport, onCsvDetailExport, onOldenburgExport, onSammelPdf, onWeitergeben, onLageblatt, onBlanko, onGeloescht, eingang } = props;
-  const exportStand = props.exportStand ?? null;
+  const exportStaende = props.exportStaende ?? {};
   const [eigenerUmfang, setEigenerUmfang] = useState<ExportUmfang>("alle");
   const exportUmfang = props.exportUmfang ?? eigenerUmfang;
   const setExportUmfang = props.onExportUmfang ?? setEigenerUmfang;
-  const neueBoegen = neueEintraege(einsatz.eintraege, exportStand).length;
   const nurNeue = exportUmfang === "neue";
-  // Beim Teilexport ohne neue Bögen gäbe es eine leere Datei — die Knöpfe
-  // bleiben gesperrt, die Kästchenzeile sagt warum.
-  const exportGesperrt = nurNeue && neueBoegen === 0;
+  // Je Format, was seit DESSEN letztem Export neu ist: neue Bögen und die
+  // geltende Fassung jeder Einheit mit Änderung (R4-W2, R4-K1). Beim Teilexport
+  // ohne Neues gäbe es eine leere Datei — der Knopf dieses Formats bleibt
+  // gesperrt, seine Zeile sagt warum.
+  const nachtragJe = (z: ExportZiel) => nachtragEintraege(einsatz.eintraege, exportStaende[z] ?? null).length;
+  const gesperrt = (z: ExportZiel) => nurNeue && nachtragJe(z) === 0;
   // Wann zuletzt ein Lageblatt entstand und was seitdem kam — ob der Aushang
   // an der Wand noch stimmt (Audit Runde 2, R2-A3). Bei jedem Rendern frisch
   // gelesen: pdf.ts vermerkt den Druck, die Ansicht rendert danach neu.
   const lageblattStand = lageblattStandLaden(einsatz.id);
+  const lageblattVeraltet =
+    lageblattStand != null &&
+    (neueEintraege(einsatz.eintraege, lageblattStand).length > 0 || aenderungenSeit(einsatz.eintraege, lageblattStand).anzahl > 0);
   // Letzte Weitergabe der ganzen Sammlung — nach einer Schichtübergabe führt
   // womöglich ein anderes Gerät die Lage (Audit Runde 2, R2-W5).
   const weitergabeStand = weitergabeStandLaden(einsatz.id);
@@ -1355,7 +1380,7 @@ export function EinsatzDetail(props: {
       {onLageblatt && (
         <p className="hinweis lageblatt-stand" role="status">
           {lageblattStand
-            ? `Lageblatt erstellt ${exportZeitKurz(lageblattStand.zeitpunkt)} · ${seitdemText(neueEintraege(einsatz.eintraege, lageblattStand).length)}`
+            ? `Lageblatt erstellt ${exportZeitKurz(lageblattStand.zeitpunkt)} · ${seitdemText(neueEintraege(einsatz.eintraege, lageblattStand).length, aenderungenSeit(einsatz.eintraege, lageblattStand))}${lageblattVeraltet ? " — Aushang ist nicht mehr aktuell, neu drucken" : ""}`
             : "Noch kein Lageblatt aus diesem Einsatz."}
         </p>
       )}
@@ -1382,13 +1407,27 @@ export function EinsatzDetail(props: {
           />
           Nur neue Bögen seit dem letzten Export
         </label>
-        <span className="hinweis">
-          {exportStand
-            ? `Zuletzt exportiert ${exportZeitKurz(exportStand.zeitpunkt)} · seitdem ${
-                neueBoegen === 0 ? "keine neuen Bögen" : neueBoegen === 1 ? "1 neuer Bogen" : `${neueBoegen} neue Bögen`
-              }`
-            : "Noch kein Export aus diesem Einsatz — alle Bögen sind neu."}
-        </span>
+        {/* Je Format ein eigener Bezugspunkt (R4-W2): Excel für die eigene
+            Liste verbraucht den Nachtrag-PDF nicht, die Weitergabe an die
+            Ablösung keines von beiden. Ohne Haken nur, was es gab. */}
+        {EXPORT_ZIELE.every((z) => !exportStaende[z]) ? (
+          <span className="hinweis">Noch kein Export aus diesem Einsatz — alle Bögen sind neu.</span>
+        ) : null}
+        {EXPORT_ZIELE.filter((z) => nurNeue || exportStaende[z]).map((z) => {
+          const stand = exportStaende[z];
+          if (!stand) {
+            return nurNeue && EXPORT_ZIELE.some((x) => exportStaende[x]) ? (
+              <span className="hinweis export-stand-zeile" key={z}>
+                {EXPORT_ZIEL_NAME[z]}: noch nicht in diesem Format exportiert — alle Bögen sind neu.
+              </span>
+            ) : null;
+          }
+          return (
+            <span className="hinweis export-stand-zeile" key={z}>
+              {EXPORT_ZIEL_NAME[z]}: zuletzt {exportZeitKurz(stand.zeitpunkt)} · {seitdemBoegenText(einsatz.eintraege, stand)}
+            </span>
+          );
+        })}
       </div>
       <div className="vorlage-aktionen einsatz-ausgaben">
         {/* Die ganze Sammel-PDF liegt auf „Einsatz weitergeben / sichern";
@@ -1399,7 +1438,7 @@ export function EinsatzDetail(props: {
             <button
               type="button"
               onClick={() => onSammelPdf(exportUmfang)}
-              disabled={exportGesperrt}
+              disabled={gesperrt("pdf")}
               title={nurNeue
                 ? "Nur die seit dem letzten Export neuen Bögen als eine PDF — mit eingebetteten Daten dieser Bögen. Auf dem Zielgerät über „Einsatz importieren…“ einlesbar."
                 : "Alle Bögen als eine PDF — mit eingebetteter kompletter Sammlung (Züge, Status, Historie). Auf dem Zielgerät über „Einsatz importieren…“ einlesbar."}
@@ -1412,16 +1451,16 @@ export function EinsatzDetail(props: {
             Übersicht beantwortet „wie stark ist die Lage?" (eine Zeile je
             Einheit, mit Summenzeile), der Detail-Export „wer und was genau ist
             da?" (jede Person, jedes Fahrzeug einzeln). */}
-        <button type="button" onClick={() => onCsvExport(exportUmfang)} disabled={exportGesperrt} title="Eine Zeile je anwesender Einheit mit Stärke, Verpflegung, Unterbringung und Kraftstoff — plus Summenzeile. Für die Lagekarte.">
+        <button type="button" onClick={() => onCsvExport(exportUmfang)} disabled={gesperrt("csv")} title="Eine Zeile je anwesender Einheit mit Stärke, Verpflegung, Unterbringung und Kraftstoff — plus Summenzeile. Für die Lagekarte.">
           Übersicht als CSV
         </button>{" "}
-        <button type="button" onClick={() => onCsvDetailExport(exportUmfang)} disabled={exportGesperrt} title="Alle Daten aller gemeldeten Einheiten: je Einheit eine Zeile, dazu eine Zeile pro Person und pro Fahrzeug. Für Auswertung in Excel.">
+        <button type="button" onClick={() => onCsvDetailExport(exportUmfang)} disabled={gesperrt("csv-detail")} title="Alle Daten aller gemeldeten Einheiten: je Einheit eine Zeile, dazu eine Zeile pro Person und pro Fahrzeug. Für Auswertung in Excel.">
           Alle Daten als CSV
         </button>{" "}
         {/* Drittes Format, weil es keinem der beiden CSVs entspricht: eine
             fremde Excel-Vorlage mit fester Spaltenfolge, in die die
             Führungsstelle die Zeilen direkt einfügt. */}
-        <button type="button" onClick={() => onOldenburgExport(exportUmfang)} disabled={exportGesperrt} title="Einheitenliste im Format der Führungsstelle Oldenburg: je gemeldeter Einheit eine Zeile, Spalten und Formatierung wie in deren Excel-Vorlage.">
+        <button type="button" onClick={() => onOldenburgExport(exportUmfang)} disabled={gesperrt("xlsx")} title="Einheitenliste im Format der Führungsstelle Oldenburg: je gemeldeter Einheit eine Zeile, Spalten und Formatierung wie in deren Excel-Vorlage.">
           Excel-Liste (Format „Oldenburg“)
         </button>{" "}
         {/* Roh-JSON nur im Debug-Modus: fürs Publikum trägt die Sammel-PDF die

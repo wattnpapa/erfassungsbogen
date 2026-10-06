@@ -1459,6 +1459,43 @@ describe("Neuen Einsatz anlegen", () => {
     }
   });
 
+  /**
+   * R4-W2/R4-K1: CSV für die eigene Liste verbraucht den Nachtrag für Excel
+   * nicht, und ein Abrücken seit dem Export gehört in den Nachtrag.
+   */
+  it("hält den Bezugspunkt je Format und nimmt ein Abrücken in den Nachtrag mit", async () => {
+    const angelegt = einsatzImSpeicherAnlegen("Hochwasser Weser", EinsatzArt.EINSATZ);
+    meldungHinzufuegen(angelegt.id, bogenMitName("OV Erster"));
+    meldungHinzufuegen(angelegt.id, bogenMitName("OV Zweiter"));
+    const nutzer = userEvent.setup();
+    const mitschnitt = downloadsMitschneiden();
+    try {
+      render(<App />);
+      await nutzer.click(screen.getByRole("button", { name: "Öffnen" }));
+      await screen.findByRole("heading", { level: 1, name: "Hochwasser Weser" });
+
+      await nutzer.click(screen.getByRole("button", { name: "Übersicht als CSV" }));
+      await waitFor(() => expect(mitschnitt.dateien).toHaveLength(1));
+      await nutzer.click(screen.getByRole("checkbox", { name: /Nur neue Bögen seit dem letzten Export/ }));
+      // Die CSV hat nichts mehr zu liefern, Excel und PDF noch alles.
+      expect((screen.getByRole("button", { name: "Übersicht als CSV" }) as HTMLButtonElement).disabled).toBe(true);
+      expect((screen.getByRole("button", { name: /^Excel-Liste/ }) as HTMLButtonElement).disabled).toBe(false);
+      expect((screen.getByRole("button", { name: "Sammel-PDF (nur neue Bögen)" }) as HTMLButtonElement).disabled).toBe(false);
+      expect(screen.getByText(/Excel-Liste: noch nicht in diesem Format exportiert/)).toBeDefined();
+
+      // Abrücken nach dem CSV-Export: Änderung, und die CSV lässt sich wieder laden.
+      await nutzer.click(screen.getAllByRole("button", { name: "Abrücken" })[0]!);
+      expect(await screen.findByText(/seitdem 1 Änderung \(Abrücken\)/)).toBeDefined();
+      await nutzer.click(screen.getByRole("button", { name: "Übersicht als CSV" }));
+      await waitFor(() => expect(mitschnitt.dateien).toHaveLength(2));
+      const nachtrag = await mitschnitt.dateien[1]!.blob.text();
+      expect(nachtrag).toContain("abgerückt");
+      expect(await screen.findAllByText(/seitdem keine neuen Bögen/)).not.toHaveLength(0);
+    } finally {
+      mitschnitt.aufraeumen();
+    }
+  });
+
   it("legt nichts an, wenn der Dialog abgebrochen wird", async () => {
     const nutzer = userEvent.setup();
     render(<App />);

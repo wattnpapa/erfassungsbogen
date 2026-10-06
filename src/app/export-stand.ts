@@ -25,9 +25,34 @@
 
 import type { Einsatzsammlung, MeldeEintrag } from "@bos/meldekopf/einsaetze";
 import { zeitLang } from "./eintrag-zeiten";
-import { vermerkFeld, vermerkKennung } from "./einsatz-abgleich";
+import { FELDER, feldGleichheit, vermerkFeld, vermerkKennung, type Feld } from "./einsatz-abgleich";
+import { geltendeJeEinheit } from "./fassung-vorrang";
 
-const SPEICHER_SCHLUESSEL = "eeb.export-stand.v1";
+/**
+ * Stände des Exports je Einsatz UND Format (R4-W2). Bis Runde 4 gab es einen
+ * Merker für alle Ausgabewege: CSV und Excel für die eigene Liste, die Weitergabe
+ * an die Ablösung und der Nachtrag an den Stab verbrauchten ihn gegenseitig, dem
+ * Stab fehlten Einheiten. Jetzt hat jedes Format seinen eigenen Bezugspunkt, und
+ * die Weitergabe der ganzen Sammlung an die Ablösung zählt nicht mit (sie hat
+ * ihren eigenen Stand, `eeb.weitergabe-stand.v1`). Der alte gemeinsame Merker
+ * (`eeb.export-stand.v1`) wird nicht übernommen: lieber einmal zu viel
+ * liefern als einem Empfänger etwas vorzuenthalten.
+ */
+const SPEICHER_SCHLUESSEL = "eeb.export-stand.v2";
+const ALTER_SCHLUESSEL = "eeb.export-stand.v1";
+
+/** Ausgabewege mit eigenem Bezugspunkt für „nur neue Bögen". */
+export type ExportZiel = "pdf" | "csv" | "csv-detail" | "xlsx";
+
+export const EXPORT_ZIELE: readonly ExportZiel[] = ["pdf", "csv", "csv-detail", "xlsx"];
+
+/** Wie das Format in der Zeile unter dem Kästchen heißt. */
+export const EXPORT_ZIEL_NAME: Record<ExportZiel, string> = {
+  pdf: "Sammel-PDF",
+  csv: "Übersicht als CSV",
+  "csv-detail": "Alle Daten als CSV",
+  xlsx: "Excel-Liste",
+};
 /**
  * Wann zuletzt ein Lageblatt erzeugt wurde, und was da in der Sammlung stand.
  * Getrennt vom Export-Stand: das Lageblatt ist Papier für die Wand, kein
@@ -53,11 +78,21 @@ export interface ExportStand {
    * Fehlt bei älteren Ständen; dann zählt der Zeitpunkt.
    */
   vermerke?: string[];
+  /**
+   * Zustand je Einheit zum Zeitpunkt des Stands: Prüfsumme von Status samt
+   * Abrückzeit, Zug, Auftrag und Eintreffzeit (R4-K1). „Seitdem geändert" heißt
+   * damit: der Zustand weicht ab — ein Abrücken und sein „Rückgängig" ergeben
+   * nichts Neues, und was ein Import vom anderen Gerät brachte, lässt sich als
+   * bekannt buchen (R4-W7). Prüfsummen statt Text, damit kein Auftragstext in
+   * diesem Komfort-Stand landet.
+   */
+  zustand?: Record<string, Partial<Record<Feld, string>>>;
   /** Nur Weitergabe-Stand: wann zuletzt eine Sammlung von dort übernommen wurde. */
   uebernommenAm?: number;
 }
 
 type Ablage = Record<string, ExportStand>;
+type ZielAblage = Record<string, Partial<Record<ExportZiel, ExportStand>>>;
 
 function speicher(): Storage | null {
   try {
@@ -67,31 +102,55 @@ function speicher(): Storage | null {
   }
 }
 
-function ablageLaden(schluessel = SPEICHER_SCHLUESSEL): Ablage {
+/** Ein Stand aus dem Speicher, oder null, wenn er beschädigt ist. */
+function standLesen(stand: unknown): ExportStand | null {
+  if (!stand || typeof stand !== "object") return null;
+  const s = stand as Partial<ExportStand>;
+  if (typeof s.zeitpunkt !== "number" || !Array.isArray(s.eintragIds)) return null;
+  let zustand: ExportStand["zustand"];
+  if (s.zustand && typeof s.zustand === "object" && !Array.isArray(s.zustand)) {
+    zustand = {};
+    for (const [schl, felder] of Object.entries(s.zustand)) {
+      if (!felder || typeof felder !== "object") continue;
+      const f: Partial<Record<Feld, string>> = {};
+      for (const feld of FELDER) {
+        const w = (felder as Record<string, unknown>)[feld];
+        if (typeof w === "string") f[feld] = w;
+      }
+      zustand[schl] = f;
+    }
+  }
+  return {
+    zeitpunkt: s.zeitpunkt,
+    eintragIds: s.eintragIds.filter((id): id is string => typeof id === "string"),
+    ...(Array.isArray(s.vermerke) ? { vermerke: s.vermerke.filter((v): v is string => typeof v === "string") } : {}),
+    ...(zustand ? { zustand } : {}),
+    ...(typeof s.uebernommenAm === "number" ? { uebernommenAm: s.uebernommenAm } : {}),
+  };
+}
+
+function rohLesen(schluessel: string): Record<string, unknown> {
   try {
     const roh = speicher()?.getItem(schluessel);
     if (!roh) return {};
     const daten: unknown = JSON.parse(roh);
     if (!daten || typeof daten !== "object" || Array.isArray(daten)) return {};
-    const ablage: Ablage = {};
-    for (const [einsatzId, stand] of Object.entries(daten as Record<string, unknown>)) {
-      if (!stand || typeof stand !== "object") continue;
-      const s = stand as Partial<ExportStand>;
-      if (typeof s.zeitpunkt !== "number" || !Array.isArray(s.eintragIds)) continue;
-      ablage[einsatzId] = {
-        zeitpunkt: s.zeitpunkt,
-        eintragIds: s.eintragIds.filter((id): id is string => typeof id === "string"),
-        ...(Array.isArray(s.vermerke) ? { vermerke: s.vermerke.filter((v): v is string => typeof v === "string") } : {}),
-        ...(typeof s.uebernommenAm === "number" ? { uebernommenAm: s.uebernommenAm } : {}),
-      };
-    }
-    return ablage;
+    return daten as Record<string, unknown>;
   } catch {
     return {}; // beschädigter Eintrag: lieber „noch kein Export" als ein Absturz
   }
 }
 
-function ablageSpeichern(ablage: Ablage, schluessel = SPEICHER_SCHLUESSEL): void {
+function ablageLaden(schluessel: string): Ablage {
+  const ablage: Ablage = {};
+  for (const [einsatzId, stand] of Object.entries(rohLesen(schluessel))) {
+    const s = standLesen(stand);
+    if (s) ablage[einsatzId] = s;
+  }
+  return ablage;
+}
+
+function ablageSpeichern(ablage: Ablage | ZielAblage, schluessel: string): void {
   try {
     speicher()?.setItem(schluessel, JSON.stringify(ablage));
   } catch {
@@ -99,33 +158,74 @@ function ablageSpeichern(ablage: Ablage, schluessel = SPEICHER_SCHLUESSEL): void
   }
 }
 
-/** Stand des letzten Exports dieses Einsatzes, oder null, wenn es noch keinen gab. */
-export function exportStandLaden(einsatzId: string): ExportStand | null {
-  return ablageLaden()[einsatzId] ?? null;
+function zielAblageLaden(): ZielAblage {
+  const ablage: ZielAblage = {};
+  for (const [einsatzId, ziele] of Object.entries(rohLesen(SPEICHER_SCHLUESSEL))) {
+    if (!ziele || typeof ziele !== "object") continue;
+    const je: Partial<Record<ExportZiel, ExportStand>> = {};
+    for (const z of EXPORT_ZIELE) {
+      const s = standLesen((ziele as Record<string, unknown>)[z]);
+      if (s) je[z] = s;
+    }
+    if (Object.keys(je).length > 0) ablage[einsatzId] = je;
+  }
+  return ablage;
+}
+
+/** Stand des letzten Exports dieses Formats, oder null, wenn es noch keinen gab. */
+export function exportStandLaden(einsatzId: string, ziel: ExportZiel): ExportStand | null {
+  return zielAblageLaden()[einsatzId]?.[ziel] ?? null;
+}
+
+/** Die Stände aller Formate dieses Einsatzes (fehlend = noch nie in diesem Format exportiert). */
+export function exportStaendeLaden(einsatzId: string): Partial<Record<ExportZiel, ExportStand>> {
+  return zielAblageLaden()[einsatzId] ?? {};
+}
+
+/** Zustand je Einheit (Prüfsummen) für einen neuen Stand. */
+function zustandVon(eintraege: MeldeEintrag[]): NonNullable<ExportStand["zustand"]> {
+  const z: NonNullable<ExportStand["zustand"]> = {};
+  for (const k of geltendeJeEinheit(eintraege)) {
+    const f: Partial<Record<Feld, string>> = {};
+    for (const feld of FELDER) f[feld] = pruefsumme(feldGleichheit(feld, k));
+    z[k.einheitSchluessel] = f;
+  }
+  return z;
+}
+
+function neuerStand(einsatz: Einsatzsammlung, jetzt: number): ExportStand {
+  return { zeitpunkt: jetzt, eintragIds: einsatz.eintraege.map((e) => e.id), zustand: zustandVon(einsatz.eintraege) };
 }
 
 /**
- * Nach einem gelungenen Export: alles, was jetzt in der Sammlung steht, gilt
- * als übergeben — auch beim Teilexport, denn der enthielt genau das, was
- * vorher noch fehlte. Stände zu Einsätzen, die es nicht mehr gibt (endgültig
- * gelöscht), fallen bei der Gelegenheit weg; `behalten` nennt die IDs aller
- * noch vorhandenen Einsätze samt Papierkorb.
+ * Nach einem gelungenen Export in diesem Format: alles, was jetzt in der
+ * Sammlung steht, gilt in DIESEM Format als übergeben — auch beim Teilexport,
+ * denn der enthielt genau das, was vorher noch fehlte. Die anderen Formate
+ * bleiben, wie sie waren (R4-W2). Stände zu Einsätzen, die es nicht mehr gibt
+ * (endgültig gelöscht), fallen bei der Gelegenheit weg; `behalten` nennt die
+ * IDs aller noch vorhandenen Einsätze samt Papierkorb.
  */
 export function exportVermerken(
   einsatz: Einsatzsammlung,
+  ziel: ExportZiel,
   behalten?: Iterable<string>,
   jetzt = Date.now(),
 ): ExportStand {
-  const stand: ExportStand = { zeitpunkt: jetzt, eintragIds: einsatz.eintraege.map((e) => e.id) };
-  const alt = ablageLaden();
-  const neu: Ablage = {};
+  const stand = neuerStand(einsatz, jetzt);
+  const alt = zielAblageLaden();
+  const neu: ZielAblage = {};
   if (behalten) {
     for (const id of behalten) if (alt[id]) neu[id] = alt[id];
   } else {
     Object.assign(neu, alt);
   }
-  neu[einsatz.id] = stand;
-  ablageSpeichern(neu);
+  neu[einsatz.id] = { ...neu[einsatz.id], [ziel]: stand };
+  ablageSpeichern(neu, SPEICHER_SCHLUESSEL);
+  try {
+    speicher()?.removeItem(ALTER_SCHLUESSEL); // der gemeinsame Merker der Runden 1–3
+  } catch {
+    /* Komfort */
+  }
   return stand;
 }
 
@@ -140,7 +240,7 @@ export function lageblattStandLaden(einsatzId: string): ExportStand | null {
  * `behalten` weg — wie beim Export-Stand.
  */
 export function lageblattVermerken(einsatz: Einsatzsammlung, behalten?: Iterable<string>, jetzt = Date.now()): ExportStand {
-  const stand: ExportStand = { zeitpunkt: jetzt, eintragIds: einsatz.eintraege.map((e) => e.id) };
+  const stand = neuerStand(einsatz, jetzt);
   const alt = ablageLaden(LAGEBLATT_SCHLUESSEL);
   const neu: Ablage = {};
   if (behalten) {
@@ -170,11 +270,7 @@ export function weitergabeStandLaden(einsatzId: string): ExportStand | null {
 
 /** Nach einer gelungenen Weitergabe der ganzen Sammlung (Sammel-PDF, alle Bögen). */
 export function weitergabeVermerken(einsatz: Einsatzsammlung, behalten?: Iterable<string>, jetzt = Date.now()): ExportStand {
-  const stand: ExportStand = {
-    zeitpunkt: jetzt,
-    eintragIds: einsatz.eintraege.map((e) => e.id),
-    vermerke: [...vermerkPruefsummen(einsatz.eintraege)],
-  };
+  const stand = neuerStand(einsatz, jetzt);
   const alt = ablageLaden(WEITERGABE_SCHLUESSEL);
   const neu: Ablage = {};
   if (behalten) {
@@ -197,67 +293,118 @@ function pruefsumme(text: string): string {
   return (h >>> 0).toString(16).padStart(8, "0");
 }
 
-function vermerkPruefsummen(eintraege: MeldeEintrag[]): Set<string> {
-  const p = new Set<string>();
-  for (const e of eintraege) for (const v of e.vermerke ?? []) p.add(pruefsumme(vermerkKennung(e.einheitSchluessel, v)));
-  return p;
-}
-
 /**
  * Nach „Einsatz importieren…": Was von dort kam, hat das andere Gerät schon.
  * Ohne das zählte der Vermerk zurückimportierte Meldungen als „hier neu" und
  * schickte zum erneuten Weitergeben (Audit Runde 3, R3-W2). Nur wenn es schon
- * eine Weitergabe gab; `vermerke` sind Vermerk-Kennungen aus dem Abgleich.
+ * eine Weitergabe gab. `bekannt` nennt je Einheit die Felder, deren Wert jetzt
+ * dem der Datei entspricht (R4-W7) — auch, was der Abgleich dabei auf diesem
+ * Gerät geschrieben hat; `vermerke` (Vermerk-Kennungen) gelten nur noch für
+ * Stände ohne Zustand.
  */
 export function weitergabeUmImportErgaenzen(
   einsatzId: string,
   eintragIds: string[],
   vermerke: string[],
+  bekannt: Record<string, Partial<Record<Feld, string>>> = {},
   jetzt = Date.now(),
 ): void {
   const alt = ablageLaden(WEITERGABE_SCHLUESSEL);
   const stand = alt[einsatzId];
   if (!stand) return;
+  let zustand = stand.zustand;
+  if (zustand) {
+    zustand = { ...zustand };
+    for (const [schl, felder] of Object.entries(bekannt)) {
+      const f: Partial<Record<Feld, string>> = { ...zustand[schl] };
+      for (const feld of FELDER) {
+        const w = felder[feld];
+        if (w !== undefined) f[feld] = pruefsumme(w);
+      }
+      zustand[schl] = f;
+    }
+  }
   alt[einsatzId] = {
     ...stand,
     eintragIds: [...new Set([...stand.eintragIds, ...eintragIds])],
     ...(stand.vermerke ? { vermerke: [...new Set([...stand.vermerke, ...vermerke.map(pruefsumme)])] } : {}),
+    ...(zustand ? { zustand } : {}),
     uebernommenAm: jetzt,
   };
   ablageSpeichern(alt, WEITERGABE_SCHLUESSEL);
 }
 
-/** Was seit der Weitergabe HIER an bekannten Einheiten geändert wurde (R3-W2). */
+/** Was seit dem Stand HIER an bekannten Einheiten geändert wurde (R3-W2, R4-K1). */
 export interface AenderungenSeit {
   anzahl: number;
   /** „Abrücken", „Zug", „Auftrag", „Eintreffzeit" — in dieser Reihenfolge, ohne Doppel. */
   arten: string[];
+  /** Schlüssel der betroffenen Einheiten. */
+  einheiten: string[];
 }
 
-const ART_TEXT: Record<string, string> = { status: "Abrücken", zug: "Zug", notiz: "Auftrag", eintreffzeit: "Eintreffzeit" };
+const ART_TEXT: Record<Feld, string> = { status: "Abrücken", zug: "Zug", notiz: "Auftrag", eintreffzeit: "Eintreffzeit" };
 
+/**
+ * Änderungen an bekannten Einheiten seit einem Stand. Stände mit Zustand
+ * vergleichen den Zustand der geltenden Fassung je Einheit — ein „Rückgängig"
+ * nimmt die Änderung damit wirklich zurück. Ältere Stände (ohne Zustand)
+ * zählen die Vermerke der Führungsstelle.
+ */
 export function aenderungenSeit(eintraege: MeldeEintrag[], stand: ExportStand): AenderungenSeit {
-  const bekannt = stand.vermerke ? new Set(stand.vermerke) : null;
-  const gezaehlt = new Set<string>();
-  const arten = new Set<string>();
-  for (const e of eintraege) {
-    for (const v of e.vermerke ?? []) {
-      const feld = vermerkFeld(v.text);
-      if (!feld) continue;
-      const p = pruefsumme(vermerkKennung(e.einheitSchluessel, v));
-      if (gezaehlt.has(p)) continue; // Folgemeldungen tragen den Verlauf mit
-      const neu = bekannt ? !bekannt.has(p) : v.zeit > stand.zeitpunkt;
-      if (!neu) continue;
-      gezaehlt.add(p);
-      arten.add(feld);
+  const arten = new Set<Feld>();
+  const einheiten = new Set<string>();
+  let anzahl = 0;
+  if (stand.zustand) {
+    for (const k of geltendeJeEinheit(eintraege)) {
+      const z = stand.zustand[k.einheitSchluessel];
+      if (!z) continue; // neue Einheit: zählt als neue Meldung, nicht als Änderung
+      for (const feld of FELDER) {
+        const bekannt = z[feld];
+        if (bekannt === undefined || bekannt === pruefsumme(feldGleichheit(feld, k))) continue;
+        anzahl++;
+        arten.add(feld);
+        einheiten.add(k.einheitSchluessel);
+      }
     }
+  } else {
+    const bekannt = stand.vermerke ? new Set(stand.vermerke) : null;
+    const gezaehlt = new Set<string>();
+    for (const e of eintraege) {
+      for (const v of e.vermerke ?? []) {
+        const feld = vermerkFeld(v.text);
+        if (!feld) continue;
+        const p = pruefsumme(vermerkKennung(e.einheitSchluessel, v));
+        if (gezaehlt.has(p)) continue; // Folgemeldungen tragen den Verlauf mit
+        const neu = bekannt ? !bekannt.has(p) : v.zeit > stand.zeitpunkt;
+        if (!neu) continue;
+        gezaehlt.add(p);
+        arten.add(feld);
+        einheiten.add(e.einheitSchluessel);
+      }
+    }
+    anzahl = gezaehlt.size;
   }
-  return { anzahl: gezaehlt.size, arten: ["status", "zug", "notiz", "eintreffzeit"].filter((a) => arten.has(a)).map((a) => ART_TEXT[a]!) };
+  return { anzahl, arten: FELDER.filter((f) => arten.has(f)).map((f) => ART_TEXT[f]), einheiten: [...einheiten] };
 }
 
-/** „seitdem 1 neue Meldung" / „seitdem keine neue Meldung" — für Export- und Lageblatt-Zeile. */
-export function seitdemText(neu: number): string {
-  return neu === 0 ? "seitdem keine neue Meldung" : neu === 1 ? "seitdem 1 neue Meldung" : `seitdem ${neu} neue Meldungen`;
+/** „1 Änderung (Abrücken)" / „2 Änderungen (Zug, Auftrag)" — leer ohne Änderung. */
+export function aenderungText(a: AenderungenSeit): string {
+  if (a.anzahl === 0) return "";
+  return `${a.anzahl === 1 ? "1 Änderung" : `${a.anzahl} Änderungen`} (${a.arten.join(", ")})`;
+}
+
+/**
+ * „seitdem 1 neue Meldung" / „seitdem keine neue Meldung" — für Export- und
+ * Lageblatt-Zeile. Mit `aend` zählen auch Änderungen an bekannten Einheiten
+ * mit („seitdem 1 neue Meldung und 1 Änderung (Abrücken)", R4-K1): Ein Blatt,
+ * auf dem eine abgerückte Einheit noch steht, ist nicht „unverändert".
+ */
+export function seitdemText(neu: number, aend?: AenderungenSeit): string {
+  const a = aend ? aenderungText(aend) : "";
+  if (neu === 0) return a ? `seitdem ${a}` : "seitdem keine neue Meldung";
+  const m = neu === 1 ? "1 neue Meldung" : `${neu} neue Meldungen`;
+  return a ? `seitdem ${m} und ${a}` : `seitdem ${m}`;
 }
 
 /** Meldungen, die beim letzten Export noch nicht in der Sammlung standen — ohne Stand: alle. */
@@ -268,13 +415,29 @@ export function neueEintraege(eintraege: MeldeEintrag[], stand: ExportStand | nu
 }
 
 /**
+ * Was ein Nachtrag seit dem Stand enthält: die neuen Meldungen und die geltende
+ * Fassung jeder Einheit, an der sich seither etwas geändert hat (Abrücken, Zug,
+ * Auftrag, Eintreffzeit). Ohne das ginge ein Abrücken nie in einen Teilexport
+ * (R4-K1): Die Einheit stünde beim Stab weiter als anwesend in der Lage.
+ */
+export function nachtragEintraege(eintraege: MeldeEintrag[], stand: ExportStand | null): MeldeEintrag[] {
+  if (!stand) return eintraege;
+  const neu = neueEintraege(eintraege, stand);
+  const geaendert = new Set(aenderungenSeit(eintraege, stand).einheiten);
+  if (geaendert.size === 0) return neu;
+  const ids = new Set(neu.map((e) => e.id));
+  for (const k of geltendeJeEinheit(eintraege)) if (geaendert.has(k.einheitSchluessel)) ids.add(k.id);
+  return eintraege.filter((e) => ids.has(e.id));
+}
+
+/**
  * Die Sammlung auf den gewünschten Umfang zuschneiden. Die Exporte (CSV,
  * Excel, Sammel-PDF) rechnen alle auf einer `Einsatzsammlung`; sie bekommen
  * dieselbe Sammlung mit weniger Einträgen und müssen den Umfang nicht kennen.
  */
 export function exportSammlung(einsatz: Einsatzsammlung, umfang: ExportUmfang, stand: ExportStand | null): Einsatzsammlung {
   if (umfang === "alle") return einsatz;
-  return { ...einsatz, eintraege: neueEintraege(einsatz.eintraege, stand) };
+  return { ...einsatz, eintraege: nachtragEintraege(einsatz.eintraege, stand) };
 }
 
 /**

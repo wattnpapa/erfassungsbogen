@@ -219,7 +219,7 @@ describe("Weitergabe-Vermerk nach dem Rückimport (R3-W2)", () => {
     const vonB = weitergeben(id);
     auf(geraetA);
     const r = einsatzAbgleichen(vonB);
-    weitergabeUmImportErgaenzen(id, r.neueIds, r.neueVermerke);
+    weitergabeUmImportErgaenzen(id, r.neueIds, r.neueVermerke, r.bekannt);
     let stand = weitergabeStandLaden(id)!;
     expect(neueEintraege(sammlung(id).eintraege, stand)).toHaveLength(0);
     expect(aenderungenSeit(sammlung(id).eintraege, stand).anzahl).toBe(0);
@@ -231,7 +231,51 @@ describe("Weitergabe-Vermerk nach dem Rückimport (R3-W2)", () => {
     zugSetzen(id, bib.einheitSchluessel, bib.id, "1. TZ");
     stand = weitergabeStandLaden(id)!;
     expect(neueEintraege(sammlung(id).eintraege, stand)).toHaveLength(1);
-    expect(aenderungenSeit(sammlung(id).eintraege, stand)).toEqual({ anzahl: 1, arten: ["Zug"] });
+    expect(aenderungenSeit(sammlung(id).eintraege, stand)).toMatchObject({ anzahl: 1, arten: ["Zug"] });
+  });
+
+  it("zählt nach dem Rückimport auch Zug und Auftrag des anderen Geräts nicht als „hier“ (R4-W7)", () => {
+    const id = buehne();
+    // A gibt weiter (Stand), B ändert Zug und Auftrag und gibt zurück.
+    auf(geraetA);
+    weitergabeVermerken(sammlung(id));
+    auf(geraetB);
+    const ulm = kopf(id, "Ulm");
+    zugSetzen(id, ulm.einheitSchluessel, ulm.id, "2. TZ");
+    notizSetzen(id, kopf(id, "Biberach").id, "Ölsperre Brücke");
+    statusMitZeitSetzen(id, kopf(id, "Albstadt").id, MeldeStatus.ABGERUECKT);
+    const vonB = weitergeben(id);
+    auf(geraetA);
+    const r = einsatzAbgleichen(vonB);
+    expect(r.aktualisiert).toHaveLength(3);
+    weitergabeUmImportErgaenzen(id, r.neueIds, r.neueVermerke, r.bekannt);
+    const stand = weitergabeStandLaden(id)!;
+    expect(aenderungenSeit(sammlung(id).eintraege, stand)).toEqual({ anzahl: 0, arten: [], einheiten: [] });
+    // Ändert A danach selbst einen Zug, steht genau das da.
+    const bib = kopf(id, "Biberach");
+    zugSetzen(id, bib.einheitSchluessel, bib.id, "1. TZ");
+    expect(aenderungenSeit(sammlung(id).eintraege, stand)).toMatchObject({ anzahl: 1, arten: ["Zug"] });
+  });
+
+  it("bucht einen Wert, der hier gegen die Datei gewonnen hat, nicht als bekannt (R4-W7)", () => {
+    const id = buehne();
+    auf(geraetA);
+    weitergabeVermerken(sammlung(id));
+    auf(geraetB);
+    notizSetzen(id, kopf(id, "Ulm").id, "Deich Nord");
+    const vonB = weitergeben(id);
+    auf(geraetA);
+    notizSetzen(id, kopf(id, "Ulm").id, "Deich Süd");
+    // A's Vermerk ist sicher jünger.
+    const s = sammlung(id);
+    const ulm = neuesteJeEinheit(s.eintraege).find((e) => e.bogen.einheit.hierarchie[0]!.name === "Ulm")!;
+    ulm.vermerke![ulm.vermerke!.length - 1]!.zeit = Date.now() + 5000;
+    geraetA.setItem("eeb.einsaetze.v1", JSON.stringify(einsaetzeLaden().map((x) => (x.id === id ? s : x))));
+    const r = einsatzAbgleichen(vonB);
+    weitergabeUmImportErgaenzen(id, r.neueIds, r.neueVermerke, r.bekannt);
+    expect(kopf(id, "Ulm").notiz).toBe("Deich Süd");
+    // Das andere Gerät kennt „Deich Süd" nicht: das ist hier eine offene Änderung.
+    expect(aenderungenSeit(sammlung(id).eintraege, weitergabeStandLaden(id)!)).toMatchObject({ anzahl: 1, arten: ["Auftrag"] });
   });
 
   it("speichert keinen Auftragstext im Weitergabe-Stand", () => {

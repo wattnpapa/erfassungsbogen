@@ -42,7 +42,7 @@ import { geltendeJeEinheit } from "./fassung-vorrang";
 import { einheitAnzeigename } from "./hilfen";
 import { sammlungenSchreiben, zeitKurz, type FuehrungsVermerk } from "./eintrag-zeiten";
 
-type Feld = "status" | "zug" | "notiz" | "eintreffzeit";
+export type Feld = "status" | "zug" | "notiz" | "eintreffzeit";
 
 const FELD_NAME: Record<Feld, string> = {
   status: "Status",
@@ -109,6 +109,16 @@ interface Wert {
   gleichheit: string;
   text: string;
   leer: boolean;
+}
+
+/**
+ * Vergleichswert eines Felds der Einheit (Status samt Abrückzeit, Zug, Auftrag,
+ * Eintreffzeit) — Grundlage der Stände „was hat sich seit dem Export
+ * geändert?" (export-stand.ts, R4-K1): Es zählt der Zustand, nicht die Zahl der
+ * Vermerke, damit „Abrücken" und sein „Rückgängig" nichts Neues ergeben.
+ */
+export function feldGleichheit(feld: Feld, e: MeldeEintrag): string {
+  return wert(feld, e).gleichheit;
 }
 
 function wert(feld: Feld, e: MeldeEintrag): Wert {
@@ -235,6 +245,12 @@ export interface AbgleichErgebnis {
   neueIds: string[];
   /** Vermerk-Kennungen, die durch den Import hierher kamen oder dabei entstanden. */
   neueVermerke: string[];
+  /**
+   * Je Einheit die Felder, deren Wert jetzt dem der Datei entspricht — das
+   * andere Gerät kennt sie (R4-W7). Wo hier ein anderer Wert gilt (Widerspruch,
+   * hier behalten), fehlt das Feld: das hat das andere Gerät noch nicht.
+   */
+  bekannt: Record<string, Partial<Record<Feld, string>>>;
 }
 
 function kurzname(e: MeldeEintrag): string {
@@ -247,7 +263,7 @@ function alleSammlungen(): Einsatzsammlung[] {
   return [...einsaetzeLaden(), ...einsaetzePapierkorb()];
 }
 
-const FELDER: Feld[] = ["status", "zug", "notiz", "eintreffzeit"];
+export const FELDER: Feld[] = ["status", "zug", "notiz", "eintreffzeit"];
 
 /**
  * Sammlung importieren und mit dem Stand dieses Geräts abgleichen. Ersetzt
@@ -267,14 +283,30 @@ export function einsatzAbgleichen(importiert: Einsatzsammlung, jetzt = Date.now(
     widersprueche: [],
     neueIds: [],
     neueVermerke: [],
+    bekannt: {},
   };
   const liste = alleSammlungen();
   const s = liste.find((x) => x.id === importiert.id);
   if (!s) return ergebnis;
   const vorherIds = new Set(vorher?.eintraege.map((e) => e.id) ?? []);
   ergebnis.neueIds = s.eintraege.filter((e) => !vorherIds.has(e.id)).map((e) => e.id);
+  // Was die Datei an Zuständen trägt und hier jetzt genauso gilt (R4-W7).
+  const bekanntBuchen = () => {
+    for (const schl of new Set(importiert.eintraege.map((e) => e.einheitSchluessel))) {
+      const datei = seite(importiert.eintraege, schl);
+      const jetztKopf = seite(s.eintraege, schl);
+      if (!datei || !jetztKopf) continue;
+      const felder: Partial<Record<Feld, string>> = {};
+      for (const feld of FELDER) {
+        const g = feldGleichheit(feld, jetztKopf.kopf);
+        if (g === feldGleichheit(feld, datei.kopf)) felder[feld] = g;
+      }
+      ergebnis.bekannt[schl] = felder;
+    }
+  };
   if (!vorher) {
     ergebnis.neueVermerke = [...vermerkKennungen(s.eintraege)];
+    bekanntBuchen();
     return ergebnis;
   }
   const vorherVermerke = vermerkKennungen(vorher.eintraege);
@@ -337,6 +369,7 @@ export function einsatzAbgleichen(importiert: Einsatzsammlung, jetzt = Date.now(
     sammlungenSchreiben(liste);
   }
   ergebnis.neueVermerke = [...vermerkKennungen(s.eintraege)].filter((k) => !vorherVermerke.has(k));
+  bekanntBuchen();
   return ergebnis;
 }
 

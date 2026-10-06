@@ -35,7 +35,7 @@ import {
 import { eintreffzeitSetzen, meldungAufnehmen, notizSetzen, vomPapierMarkieren, zeitLang } from "./eintrag-zeiten";
 import { aggregiere } from "./auswertung";
 import { neuerBogen, neuePerson } from "./hilfen";
-import { lageblattVermerken, weitergabeVermerken, type ExportStand, type ExportUmfang } from "./export-stand";
+import { EXPORT_ZIELE, lageblattVermerken, weitergabeVermerken, type ExportStand, type ExportUmfang, type ExportZiel } from "./export-stand";
 
 // pdfmake selbst hat hier nichts zu suchen: geprüft wird der Weg dorthin.
 const meldungPdfAnzeigen = vi.fn<(m: MeldeEintrag, fenster: Window | null) => Promise<void>>(async () => {});
@@ -94,13 +94,13 @@ function ansicht(einsatzId: string, extra: Partial<Props> = {}) {
  */
 function buehne(
   namen: string[] = ["Wardenburg"],
-  opt: Partial<Props> & { standAus?: string[]; zeitpunkt?: number } = {},
+  opt: Partial<Props> & { standAus?: string[]; zeitpunkt?: number; standJe?: readonly ExportZiel[] } = {},
 ) {
-  const { standAus, zeitpunkt, ...extra } = opt;
+  const { standAus, zeitpunkt, standJe = EXPORT_ZIELE, ...extra } = opt;
   const angelegt = einsatzAnlegen("Hochwasser Wardenburg", EinsatzArt.EINSATZ);
   for (const n of namen) meldungHinzufuegen(angelegt.id, bogenMitName(n));
   const einsatz = einsaetzeLaden().find((s) => s.id === angelegt.id)!;
-  const exportStand: ExportStand | null = standAus
+  const stand: ExportStand | null = standAus
     ? {
         zeitpunkt: zeitpunkt ?? Date.now(),
         eintragIds: einsatz.eintraege
@@ -108,7 +108,10 @@ function buehne(
           .map((e) => e.id),
       }
     : null;
-  return ansicht(angelegt.id, { exportStand, ...extra });
+  // Stand je Format (R4-W2); ohne Angabe haben alle Formate denselben.
+  const exportStaende: Partial<Record<ExportZiel, ExportStand>> = {};
+  if (stand) for (const z of standJe) exportStaende[z] = stand;
+  return ansicht(angelegt.id, { exportStaende, ...extra });
 }
 
 /** Die gespeicherte Meldung der genannten Einheit. */
@@ -887,7 +890,7 @@ describe("Ausgabewege der Einsatzansicht", () => {
     lageblattVermerken(einsaetzeLaden().find((s) => s.id === angelegt.id)!);
     meldungHinzufuegen(angelegt.id, bogenMitName("Hatten"));
     ansicht(angelegt.id, { onLageblatt: vi.fn() });
-    expect(document.querySelector(".lageblatt-stand")!.textContent).toMatch(/^Lageblatt erstellt .* · seitdem 1 neue Meldung$/);
+    expect(document.querySelector(".lageblatt-stand")!.textContent).toMatch(/^Lageblatt erstellt .* · seitdem 1 neue Meldung — Aushang ist nicht mehr aktuell, neu drucken$/);
   });
 
   it("zeigt die Herkunft als „Empfangen“ statt „Scan“", () => {
@@ -919,7 +922,8 @@ describe("Nur neue Bögen seit dem letzten Export", () => {
     const nutzer = userEvent.setup();
     const { sammelPdf, csvExport } = buehne(["Wardenburg", "Hatten", "Ganderkesee"], { standAus: ["Wardenburg"] });
 
-    expect(screen.getByText(/seitdem 2 neue Bögen/)).toBeDefined();
+    // Je Format ein eigener Bezugspunkt (R4-W2): hier haben alle vier denselben.
+    expect(screen.getAllByText(/seitdem 2 neue Bögen/)).toHaveLength(4);
     await nutzer.click(screen.getByRole("checkbox", { name: /Nur neue Bögen seit dem letzten Export/ }));
 
     await nutzer.click(screen.getByRole("button", { name: "Sammel-PDF (nur neue Bögen)" }));
@@ -937,7 +941,7 @@ describe("Nur neue Bögen seit dem letzten Export", () => {
     const nutzer = userEvent.setup();
     const { sammelPdf } = buehne(["Wardenburg"], { standAus: ["Wardenburg"] });
 
-    expect(screen.getByText(/seitdem keine neuen Bögen/)).toBeDefined();
+    expect(screen.getAllByText(/seitdem keine neuen Bögen/).length).toBeGreaterThan(0);
     const knopf = screen.getByRole("button", { name: "Sammel-PDF (alle Bögen)" });
     expect((knopf as HTMLButtonElement).disabled).toBe(false);
 

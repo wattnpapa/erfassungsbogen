@@ -88,7 +88,7 @@ import { offlineText, useOfflineStand } from "./offline-bereit";
 import { uebergabeBestaetigen, uebergabeNachWeg, uebergabeText, type UebergabeStand } from "./uebergabe-stand";
 import { ART_LABEL, EinsatzDetail, EinsatzListe, letzteMeldungText, type Eingang } from "./einsaetze-ui";
 import { letzteMeldung, meldungsNummern } from "./einheiten-tabelle";
-import { exportSammlung, exportStandLaden, exportVermerken, weitergabeUmImportErgaenzen, type ExportStand, type ExportUmfang } from "./export-stand";
+import { exportSammlung, exportStaendeLaden, exportVermerken, weitergabeUmImportErgaenzen, type ExportStand, type ExportUmfang, type ExportZiel } from "./export-stand";
 import { abgleichText, einsatzAbgleichen, sammlungFuerZiel } from "./einsatz-abgleich";
 import { aktuelleMeldungen } from "./auswertung";
 import { boegenAusJsonText, boegenAusPdfBytes, einsatzAusDatei, einsatzAusPdfBytes, einsatzDateiInhalt, istPdfDatei, pdfInhaltArt } from "./einsatz-transport";
@@ -819,7 +819,7 @@ function AppInhalt() {
   };
   // Was beim letzten Export des offenen Einsatzes schon in der Sammlung stand
   // (export-stand.ts) — die Detailansicht zählt daran ab, was seitdem neu ist.
-  const [exportStand, setExportStand] = useState<ExportStand | null>(null);
+  const [exportStaende, setExportStaende] = useState<Partial<Record<ExportZiel, ExportStand>>>({});
   // Alle Bögen oder nur die neuen: liegt hier statt in der Detailansicht, weil
   // die beim Erfassen einer Einheit (Assistent übernimmt) aus- und wieder
   // eingehängt wird — ein angekreuztes Kästchen, das dabei zurückspränge,
@@ -829,7 +829,7 @@ function AppInhalt() {
   const letzterExportEinsatz = useRef<string | null>(null);
   useEffect(() => {
     if (!offenerEinsatzId) return; // Assistent zwischendurch — die Wahl wartet auf die Rückkehr
-    setExportStand(exportStandLaden(offenerEinsatzId));
+    setExportStaende(exportStaendeLaden(offenerEinsatzId));
     if (letzterExportEinsatz.current !== offenerEinsatzId) setExportUmfang("alle");
     letzterExportEinsatz.current = offenerEinsatzId;
   }, [offenerEinsatzId]);
@@ -2711,13 +2711,16 @@ function AppInhalt() {
   }
 
   /**
-   * Nach einem gelungenen Export: alles, was jetzt in der Sammlung steht, ist
-   * beim Stab angekommen — beim nächsten „nur neue Bögen" zählt es nicht mehr
-   * mit. Ein abgebrochenes Share-Sheet kommt hier nicht an (siehe Aufrufer).
+   * Nach einem gelungenen Export in diesem Format: alles, was jetzt in der
+   * Sammlung steht, ist in diesem Format hinausgegangen — beim nächsten „nur
+   * neue Bögen" DES FORMATS zählt es nicht mehr mit. Die anderen Formate und die
+   * Weitergabe an die Ablösung bleiben unberührt (R4-W2). Ein abgebrochenes
+   * Share-Sheet kommt hier nicht an (siehe Aufrufer).
    */
-  function exportVerbuchen(s: Einsatzsammlung) {
+  function exportVerbuchen(s: Einsatzsammlung, ziel: ExportZiel) {
     const vorhanden = [...einsaetzeLaden(), ...einsaetzePapierkorb()].map((x) => x.id);
-    setExportStand(exportVermerken(s, vorhanden));
+    const stand = exportVermerken(s, ziel, vorhanden);
+    setExportStaende((alt) => ({ ...alt, [ziel]: stand }));
   }
 
   async function exportiereEinsatz(s: Einsatzsammlung) {
@@ -2725,19 +2728,19 @@ function AppInhalt() {
   }
 
   async function exportiereEinsatzCsv(s: Einsatzsammlung, umfang: ExportUmfang) {
-    const teil = exportSammlung(s, umfang, exportStand);
+    const teil = exportSammlung(s, umfang, exportStaende.csv ?? null);
     const ok = await dateiAnbieten(`eeb-einsatz-${einsatzDateiname(s)}.csv`, einsatzCsvInhalt(teil, meldungsNummern(s.eintraege)), "text/csv;charset=utf-8");
-    if (ok) exportVerbuchen(s);
+    if (ok) exportVerbuchen(s, "csv");
   }
 
   async function exportiereEinsatzCsvDetail(s: Einsatzsammlung, umfang: ExportUmfang) {
-    const teil = exportSammlung(s, umfang, exportStand);
+    const teil = exportSammlung(s, umfang, exportStaende["csv-detail"] ?? null);
     const ok = await dateiAnbieten(
       `eeb-einsatz-${einsatzDateiname(s)}-alle-daten.csv`,
       einsatzDetailCsvInhalt(teil, meldungsNummern(s.eintraege)),
       "text/csv;charset=utf-8",
     );
-    if (ok) exportVerbuchen(s);
+    if (ok) exportVerbuchen(s, "csv-detail");
   }
 
   /**
@@ -2745,11 +2748,11 @@ function AppInhalt() {
    * XLSX-Schreiber samt Stiltabelle wird nur beim Klick gebraucht (wie die PDF).
    */
   async function exportiereEinsatzOldenburg(s: Einsatzsammlung, umfang: ExportUmfang) {
-    const teil = exportSammlung(s, umfang, exportStand);
+    const teil = exportSammlung(s, umfang, exportStaende.xlsx ?? null);
     try {
       const { XLSX_MIME, einsatzOldenburgXlsx } = await import("./oldenburg-xlsx");
       const ok = await bytesAlsDatei(`eeb-einsatz-${einsatzDateiname(s)}-oldenburg.xlsx`, einsatzOldenburgXlsx(teil), XLSX_MIME);
-      if (ok) exportVerbuchen(s);
+      if (ok) exportVerbuchen(s, "xlsx");
     } catch (e) {
       setFehler(`Excel-Liste: ${fehlerText(e)}`);
     }
@@ -2764,11 +2767,11 @@ function AppInhalt() {
    * wie eingebettete Sammlung) nur die neuen Bögen; die Vorfassung einer
    * Folgemeldung für den Diff kommt aus der ganzen Sammlung.
    */
-  async function sammelPdf(s: Einsatzsammlung, umfang: ExportUmfang) {
+  async function sammelPdf(s: Einsatzsammlung, umfang: ExportUmfang, weitergabe = false) {
     setFehler("");
-    const teil = exportSammlung(s, umfang, exportStand);
+    const teil = exportSammlung(s, umfang, exportStaende.pdf ?? null);
     if (teil.eintraege.length === 0) {
-      setFehler("Seit dem letzten Export ist kein Bogen neu dazugekommen.");
+      setFehler("Seit dem letzten Sammel-PDF ist kein Bogen neu dazugekommen und nichts geändert.");
       return;
     }
     try {
@@ -2777,7 +2780,10 @@ function AppInhalt() {
       const { einsatzPdfErzeugen } = await import("./pdf");
       const ok = await einsatzPdfErzeugen(teil, undefined, s.eintraege);
       if (!ok) return; // Share-Sheet abgebrochen — nichts übergeben
-      exportVerbuchen(s);
+      // „Einsatz weitergeben / sichern" geht an die Ablösung oder ins Archiv,
+      // nicht an den Stab: Es hat seinen eigenen Stand (pdf.ts) und verbraucht
+      // den Nachtrag-Bezugspunkt nicht (R4-W2).
+      if (!weitergabe) exportVerbuchen(s, "pdf");
       setMeldung(
         umfang === "neue"
           ? `Neue Bögen aus „${s.name}" als PDF weitergegeben.`
@@ -3214,7 +3220,7 @@ function AppInhalt() {
       // Bekannte Meldungen abgleichen statt nur neue anzuhängen (R3-W1).
       const r = einsatzAbgleichen(geklaert.sammlung);
       // Was von dort kam, hat das andere Gerät schon (R3-W2).
-      weitergabeUmImportErgaenzen(s.id, r.neueIds, r.neueVermerke);
+      weitergabeUmImportErgaenzen(s.id, r.neueIds, r.neueVermerke, r.bekannt);
       const letzteImImport = letzteMeldung(geklaert.sammlung.eintraege);
       einsaetzeNeuLaden();
       setFehler("");
@@ -3303,10 +3309,10 @@ function AppInhalt() {
           onCsvDetailExport={(umfang) => exportiereEinsatzCsvDetail(offenerEinsatz, umfang)}
           onOldenburgExport={(umfang) => exportiereEinsatzOldenburg(offenerEinsatz, umfang)}
           onSammelPdf={(umfang) => sammelPdf(offenerEinsatz, umfang)}
-          exportStand={exportStand}
+          exportStaende={exportStaende}
           exportUmfang={exportUmfang}
           onExportUmfang={setExportUmfang}
-          onWeitergeben={() => sammelPdf(offenerEinsatz, "alle")}
+          onWeitergeben={() => sammelPdf(offenerEinsatz, "alle", true)}
           onLageblatt={() => lageblatt(offenerEinsatz)}
           onBlanko={() => void blankoVordruck()}
           eingang={eingang}
