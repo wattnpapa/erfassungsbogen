@@ -840,6 +840,8 @@ export interface MeldekopfVermerk {
   stand: string;
   /** Nicht mehr vor Ort — hebt den Kasten hervor. */
   abgerueckt: boolean;
+  /** Laufende Nummer am Meldekopf — steht auch in der Kopfzeile der Codeseiten (R4-A5). */
+  nummer?: number;
 }
 
 /** Hinweis neben den QR-Codes der Sammel-PDF: was der Code NICHT enthält (R2-A1). */
@@ -856,7 +858,30 @@ export const QR_NUR_BOGEN_HINWEIS =
  * R2-A4). Das Kästchen macht die Korrektur für den Scannenden sichtbar.
  */
 export function stiftHinweis(stand: string): string {
-  return `[  ] von Hand geändert — dann gilt der Code (Stand ${stand}) nicht mehr: abtippen oder neu erzeugen, nicht scannen.`;
+  return `Ist oben auf dem Bogen „von Hand geändert“ angekreuzt, gilt dieser Code (Stand ${stand}) nicht mehr: abtippen oder neu erzeugen, nicht scannen.`;
+}
+
+/**
+ * Das Kästchen selbst steht auf dem Bogen, neben der Stärke: Mit dem Stift
+ * korrigiert wird dort, nicht auf der Codeseite. Wer auf Seite 1 änderte und
+ * das Kästchen auf der Codeseite vergaß, lieferte einen Code, der als gültig
+ * durchging (Audit Runde 4, R4-A5).
+ */
+export const STIFT_KAESTCHEN = "[  ] von Hand geändert";
+
+/**
+ * Kopfzeile der Codeseiten: Einheit, Funkrufname, Stand. Lose Codeseiten ohne
+ * Heftung ließen sich sonst nur durch Scannen einem Bogen zuordnen (R4-A5).
+ */
+export function codeKopfzeile(b: Erfassungsbogen, stand: string, nummer?: number): string {
+  const funk = erreichbarkeitZeilen(b)[0];
+  const fzg = b.fahrzeuge.find((f) => f.funkrufname);
+  return [
+    ...(nummer != null ? [`Nr. ${nummer}`] : []),
+    einheitAnzeigename(b.einheit),
+    ...(fzg && funk ? [`FuRn ${funk}`] : []),
+    `Stand ${stand}`,
+  ].join(" · ");
 }
 
 export function meldekopfVermerk(e: UebersichtEintrag, name: string, erstellt: number): MeldekopfVermerk {
@@ -878,6 +903,7 @@ export function meldekopfVermerk(e: UebersichtEintrag, name: string, erstellt: n
   return {
     stand: `Stand am Meldekopf (${name}, erstellt ${zeitLang(erstellt)}): ${teile.join(" · ")}`,
     abgerueckt: !!e.abgerueckt,
+    ...(e.nummer != null ? { nummer: e.nummer } : {}),
   };
 }
 
@@ -1080,8 +1106,14 @@ export async function einsatzLageblattSeiteFuellen(
  * sondern auf {@link QrSatz.vollUrl} — den kompletten Bogen in einer URL.
  * Segmentierung ist eine Grenze des QR-Bildes, nicht des Links.
  */
-function qrBlock(qr: QrSatz, akzent: string, stand: string, vermerk?: MeldekopfVermerk): Content {
+function qrBlock(qr: QrSatz, akzent: string, stand: string, vermerk?: MeldekopfVermerk, einheit = ""): Content {
   const kopf = (text: string): Content => ({ text, bold: true, fontSize: 13, color: akzent, alignment: "center" });
+  // Jede Codeseite nennt ihre Einheit (R4-A5). Beim Einzelcode steht die Zeile
+  // in der freien Spalte neben dem Bild — über dem Bild kostete sie 36 von 443
+  // Beispielbögen eine zweite Seite; auf den eigenen Seiten mehrteiliger Codes
+  // steht sie unter der Überschrift.
+  const einheitZeile = (): Content => ({ text: einheit, bold: true, fontSize: 9, alignment: "center", margin: [0, 2, 0, 0] });
+  const einheitSeitlich = (): Content => ({ text: einheit, bold: true, fontSize: 8, margin: [0, 0, 0, 8] });
   // Fett und direkt am Code: Wer den Ausdruck scannt, soll vorher aufs
   // Kästchen schauen (R2-A4). Beim Einzelcode steht er in der freien Spalte
   // links NEBEN dem Bild — unter dem Code kostete die Zeile 6 von 101
@@ -1106,7 +1138,7 @@ function qrBlock(qr: QrSatz, akzent: string, stand: string, vermerk?: MeldekopfV
             // Bögen mittlerer Stärke eine zweite Seite (R2-A1).
             {
               columns: [
-                { width: "*", stack: [stift()], alignment: "right", margin: [0, 40, 12, 0] },
+                { width: "*", stack: [einheitSeitlich(), stift()], alignment: "right", margin: [0, 8, 12, 0] },
                 { image: t.datenUrl, width: QR_BREITE, link: t.url },
                 { width: "*", stack: [nurBogenHinweis()], margin: [12, 40, 0, 0] },
               ],
@@ -1115,7 +1147,7 @@ function qrBlock(qr: QrSatz, akzent: string, stand: string, vermerk?: MeldekopfV
             }
           : {
               columns: [
-                { width: "*", stack: [stift()], alignment: "right", margin: [0, 40, 12, 0] },
+                { width: "*", stack: [einheitSeitlich(), stift()], alignment: "right", margin: [0, 8, 12, 0] },
                 { image: t.datenUrl, width: QR_BREITE, link: t.url },
                 { width: "*", text: "" },
               ],
@@ -1190,6 +1222,7 @@ function qrBlock(qr: QrSatz, akzent: string, stand: string, vermerk?: MeldekopfV
     const rechts = qr.teile[i + 1];
     const stack: Content[] = [
       kopf(`Digitaler Bogen als QR-Code (${anzahl} Teile)`),
+      einheitZeile(),
       // Erster Code oben links, daneben die Anleitung …
       {
         columns: [
@@ -1305,7 +1338,16 @@ export function pdfDokument(
       // ließ sich nach einer Stiftkorrektur nicht gegen die Namen prüfen
       // (Audit Runde 3, R3-A6). Gleiche Beschriftung auf Vordruck und Bogen.
       { text: "Stärke (F / UF / M / Ges.):", bold: true },
-      { text: `${zahl(s.fuehrer)} / ${zahl(s.unterfuehrer)} / ${zahl(s.mannschaft)} / ${zahl(s.gesamt)}` },
+      {
+        // Mit Code: das Kästchen „von Hand geändert“ gehört hierher, wo mit
+        // dem Stift korrigiert wird, nicht auf die Codeseite (R4-A5).
+        stack: [
+          { text: `${zahl(s.fuehrer)} / ${zahl(s.unterfuehrer)} / ${zahl(s.mannschaft)} / ${zahl(s.gesamt)}` },
+          // Zweite Zeile der Zelle: „Ansprechpartner/in:" daneben bricht ohnehin
+          // auf zwei Zeilen um, das Kästchen kostet keine Höhe.
+          ...(qr ? [{ text: STIFT_KAESTCHEN, bold: true } as Content] : []),
+        ],
+      },
       { text: "Ansprechpartner/in:", bold: true },
       { text: ansprech ? `${ansprech.vorname} ${ansprech.nachname}` : "" },
     ],
@@ -1546,7 +1588,7 @@ export function pdfDokument(
       // Kein fester Seitenumbruch mehr; als unbreakable-Gruppe zusammengehalten,
       // damit der QR-Code nicht über eine Seitengrenze zerrissen wird. Passt der
       // Block nicht mehr, rückt er als Ganzes auf die nächste Seite.
-      ...(qr ? [qrBlock(qr, farbe.akzent, zeitgruppe(b.stand), vermerk)] : []),
+      ...(qr ? [qrBlock(qr, farbe.akzent, zeitgruppe(b.stand), vermerk, codeKopfzeile(b, zeitgruppe(b.stand), vermerk?.nummer))] : []),
       ...(zusatz?.messpunkt ? [{ text: " ", fontSize: 1, id: `${MESS_BOGEN_ENDE}-qr` } as Content] : []),
     ],
   };

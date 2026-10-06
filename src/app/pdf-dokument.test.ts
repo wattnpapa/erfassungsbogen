@@ -22,8 +22,8 @@ import {
   zeitpunktAusIso,
   type Erfassungsbogen,
 } from "@bos/eeb-format/model";
-import { zeitgruppe, type QrSatz } from "./hilfen";
-import { EEB_JSON_DATEINAME, aenderungFuerPapier, bogenAlsEingebetteteDatei, einsatzLageblattDokument, einsatzPdfDokument, pdfDokument, stiftHinweis } from "./pdf-dokument";
+import { einheitAnzeigename, zeitgruppe, type QrSatz } from "./hilfen";
+import { EEB_JSON_DATEINAME, aenderungFuerPapier, bogenAlsEingebetteteDatei, einsatzLageblattDokument, einsatzPdfDokument, pdfDokument, stiftHinweis, STIFT_KAESTCHEN, codeKopfzeile } from "./pdf-dokument";
 
 const QR_BILD = "data:image/png;base64,QRTESTBILD";
 const QR_URL = "https://erfassungsbogen.app/#TESTPAYLOAD";
@@ -122,13 +122,43 @@ describe("pdfDokument()", () => {
     );
   });
 
-  it("sagt neben dem Code, dass Stiftkorrekturen nicht im Code stecken — mit Stand und Kästchen (R2-A4)", () => {
+  it("sagt neben dem Code, dass Stiftkorrekturen nicht im Code stecken — mit Stand (R2-A4); das Kästchen steht beim Bogen (R4-A5)", () => {
     const b = basisBogen();
     const t = texte(pdfDokument(b, QR).content).join("\n");
     expect(t).toContain(stiftHinweis(zeitgruppe(b.stand)));
     expect(stiftHinweis("170805jul26")).toBe(
-      "[  ] von Hand geändert — dann gilt der Code (Stand 170805jul26) nicht mehr: abtippen oder neu erzeugen, nicht scannen.",
+      "Ist oben auf dem Bogen „von Hand geändert“ angekreuzt, gilt dieser Code (Stand 170805jul26) nicht mehr: abtippen oder neu erzeugen, nicht scannen.",
     );
+    // Das Kästchen steht einmal, und zwar neben der Stärke auf dem Bogen — nicht auf der Codeseite.
+    expect(t.split(STIFT_KAESTCHEN)).toHaveLength(2);
+    const inhalt = pdfDokument(b, QR).content as unknown[];
+    const kopfTabelle = JSON.stringify(inhalt.slice(0, 3));
+    expect(kopfTabelle).toContain(STIFT_KAESTCHEN);
+    // Ohne Code (Vordruck, Bogen ohne QR) gibt es nichts, was durch Handschrift ungültig würde.
+    expect(texte(pdfDokument(b, null).content).join("\n")).not.toContain(STIFT_KAESTCHEN);
+  });
+
+  it("jede Codeseite nennt Einheit, Funkrufname und Stand — Einzelcode und mehrteilig (R4-A5)", () => {
+    const b = basisBogen();
+    const kopf = codeKopfzeile(b, zeitgruppe(b.stand), 7);
+    expect(kopf).toContain("Nr. 7");
+    expect(kopf).toContain(einheitAnzeigename(b.einheit));
+    expect(kopf).toContain(`Stand ${zeitgruppe(b.stand)}`);
+    expect(kopf).toMatch(/FuRn /);
+    const einzel = texte(pdfDokument(b, QR).content);
+    expect(einzel.filter((z) => z.startsWith(einheitAnzeigename(b.einheit)) && z.includes("Stand "))).toHaveLength(1);
+    const seg: QrSatz = {
+      teile: [1, 2, 3].map((n) => ({ datenUrl: QR_BILD, url: `https://erfassungsbogen.app/#EEBS.${n}.3`, teilNr: n, anzahl: 3, version: 20 })),
+      segmentiert: true,
+      zeichen: 2700,
+      version: 20,
+      vollUrl: "https://erfassungsbogen.app/#V",
+      stufen: 1,
+      weitergeleitet: false,
+    };
+    // 3 Teile = 2 Codeseiten, jede mit eigener Kopfzeile.
+    const mehr = texte(pdfDokument(b, seg).content);
+    expect(mehr.filter((z) => z.includes(einheitAnzeigename(b.einheit)) && z.includes("Stand "))).toHaveLength(2);
   });
 
   it("legt unter dem QR-Code einen anklickbaren App-Link auf QR-Bild und Text", () => {

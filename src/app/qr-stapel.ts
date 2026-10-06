@@ -350,10 +350,10 @@ export function stapelBericht(e: StapelErgebnis, neu: number, uebersprungen: num
  * Ein Foto zeigt Papier — und auf Papier wird mit dem Stift korrigiert. Der
  * Code trägt aber den gedruckten Stand; die Korrektur ging beim Einlesen still
  * verloren (Audit Runde 2, R2-A4). Der Ausdruck trägt dafür neben dem Code das
- * Kästchen „von Hand geändert" und den Stand, die Karte zeigt denselben Stand.
+ * Kästchen „von Hand geändert" (neben der Stärke) und den Stand, die Karte zeigt denselben Stand.
  */
 export const STIFT_HINWEIS =
-  "Von Hand korrigierte Angaben auf dem Ausdruck stecken nicht im Code: Ist dort „von Hand geändert“ " +
+  "Von Hand korrigierte Angaben auf dem Ausdruck stecken nicht im Code: Ist dort neben der Stärke „von Hand geändert“ " +
   "angekreuzt oder etwas durchgestrichen, die Karte gegen das Blatt prüfen (gleicher „Stand“) und in der App nachtragen.";
 
 /**
