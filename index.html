@@ -3863,7 +3863,7 @@
       background: var(--md-surface-container-high);
       color: var(--md-on-surface);
       box-shadow: var(--md-schatten-3);
-      padding: 1.5rem;
+      padding: min(1.5rem, 24px); /* R4-M1: nicht mit der Systemschrift wachsen */
     }
     .platform-android dialog h2,
     .platform-android dialog h3 { color: var(--md-on-surface); }
@@ -4093,7 +4093,7 @@
     /* R4-G4: Blättern und „Schließen“ mit mindestens 12 px dazwischen — ein
        grober Tipp unter „Weiter zu Teil 2 →“ traf „Schließen“ (11 px), das
        Vollbild ging zu. */
-    dialog.qr-vollbild > .qr-vollbild-nav { gap: max(0.8rem, 12px); }
+    dialog.qr-vollbild > .qr-vollbild-nav { gap: 12px; }
     /* Die Blätterknöpfe bleiben einzeilig: „← Teil 1“ und „Weiter zu Teil 3 →“
        brachen bei 320 px und quer um und machten die Leiste 76 statt 49 px hoch. */
     dialog.qr-vollbild > .qr-vollbild-nav.mit-teilen > button:not(.primaer) {
@@ -4104,7 +4104,7 @@
        die ganze Breite. Drei umbrechende Knöpfe nahmen bei 320 px Breite
        180 px Höhe, die dem Code fehlten (R3-H2). */
     dialog.qr-vollbild > .qr-vollbild-nav.mit-teilen {
-      display: grid; grid-template-columns: auto minmax(0, 1fr); gap: max(1rem, 14px) max(0.8rem, 12px);
+      display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 16px 12px;
     }
     dialog.qr-vollbild > .qr-vollbild-nav.mit-teilen > .primaer { grid-column: 1 / -1; }
     /* Telefonhöhe: Absender eine Stufe kleiner, Helligkeitstipp und der

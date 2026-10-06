@@ -157,7 +157,7 @@ describe("QR-Vollbild bei großer Schrift: der Code hat Vorrang (R4-M4)", () => 
 describe("Abstände zwischen gegensätzlichen Knöpfen (R4-G4)", () => {
   it("Blättern und „Schließen“ im QR-Vollbild: mindestens 12 px", () => {
     expect(bloecke("dialog.qr-vollbild > .qr-vollbild-nav.mit-teilen").join("\n")).toMatch(
-      /gap:\s*max\(1rem, 14px\) max\(0\.8rem, 12px\)/,
+      /gap:\s*16px 12px/,
     );
   });
 
