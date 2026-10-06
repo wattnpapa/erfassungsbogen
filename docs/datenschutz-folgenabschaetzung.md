@@ -243,6 +243,17 @@ Grundlage: Repository `wattnpapa/erfassungsbogen`, Stand 2026-09-12 — Version 
 > trägt die letzte Bearbeitung des Bogens als Stand (R4-S5). Keine neue
 > Datenkategorie, kein neuer Empfänger, keine neuen Netzverbindungen.
 > Geändert: 5.7.
+>
+> **Nachgezogen 2026-10-06 — Papier, Vordruck, Begriffe (Audit Runde 4,
+> Paket 5):** Lageblatt, Sammel-PDF und Blanko-Vordruck tragen mehr Raum und
+> Felder zum Ausfüllen von Hand (Nachtragszeilen mit Spalte „übertragen",
+> Kasten „Meldekopf" mit „ins Gerät übertragen" und „Übung" auf dem
+> Vordruck); das Lageblatt hat bei sechs bis zehn Einheiten eine zweite Seite
+> mit Nachtragszeilen (R4-A3, R4-A4, R4-A8). Jede QR-Codeseite nennt Einheit,
+> Funkrufname und Stand — Angaben, die schon auf dem Bogen stehen (R4-A5).
+> Der Papier-Abgleich verändert nichts an den Daten. Keine neue
+> Datenkategorie, kein neuer Empfänger, kein neuer Speicherort, keine neuen
+> Netzverbindungen. Geändert: 5.5.
 
 ## Hinweis zu diesem Dokument
 
@@ -483,6 +494,12 @@ biometrische Daten, strafrechtliche Daten.
   weist auf das Nachtragen von Hand hin (seit 2026-09-29, R2-A1).
   Seit 2026-10-05 (R3-A6) steht im Bogen-PDF je Person auch die Zählrolle
   (F/UF/M); Lageblatt und Bogen-PDF lassen Platz für Nachträge von Hand.
+  Seit 2026-10-06 (R4-A3 bis R4-A8) trägt das Lageblatt mindestens fünf
+  Nachtragszeilen mit der Spalte „übertragen" (bei vollem Blatt auf einer
+  eigenen Seite), der Blanko-Vordruck oben einen Kasten „Meldekopf" (Nr.,
+  Eingang, Zug, Übung, „ins Gerät übertragen von …"), und jede QR-Codeseite
+  nennt Einheit, Funkrufname und Stand. Handschriftliche Vermerke bleiben
+  Papier; die App liest sie nicht.
 - „Vorlage teilen": die Vorlage als signierter QR-Code/Link oder als
   unsignierte JSON-Datei (`eeb-vorlage-*.json`). Die Datei trägt nur diese
   eine Vorlage, keinen Geräteschlüssel. Beim Empfänger entsteht daraus wieder

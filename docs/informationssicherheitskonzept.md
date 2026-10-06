@@ -286,6 +286,21 @@ Grundlage: Repository `wattnpapa/erfassungsbogen`, Stand 2026-09-12 — Version 
 > Seite neu und meldet „Laden abgebrochen" (`src/app/offline-bereit.ts`,
 > R4-O1, 6.1); „PDF erzeugen" ohne geladenen Baustein nennt den QR-Code.
 > Keine neuen Hosts, CSP unverändert.
+>
+> **Nachgezogen 2026-10-06:** Papier, Vordruck, Begriffe (Audit Runde 4,
+> Paket 5) — Das Lageblatt trägt immer mindestens fünf Nachtragszeilen (passen
+> sie nicht mehr auf die letzte Seite, bekommen sie eine eigene Rückseite) mit
+> einer Spalte „übertragen" für den Haken „ins Gerät übertragen"; eine
+> Einheitszeile bricht nicht mehr über den Seitenwechsel (R4-A3, R4-A4,
+> R4-A7). Der Blanko-Vordruck trägt oben den Kasten „Meldekopf" mit Nr.,
+> Eingang, Zug, Übung und „ins Gerät übertragen"; die ausgelieferte Datei
+> unter `public/downloads/` ist neu erzeugt (R4-A4, R4-A8). Jede Codeseite
+> nennt Einheit, Funkrufname und Stand, das Kästchen „von Hand geändert"
+> steht auf dem Bogen neben der Stärke (R4-A5). Die Sammel-PDF setzt Bögen,
+> die mit der letzten Zeile allein auf einer Seite enden würden, per Probesatz
+> enger (R4-A7). Der Bericht von „Bögen einlesen…" fasst Bilder ohne Code
+> zusammen (R4-A6). Keine neuen Daten, keine neuen Speicherorte, keine neuen
+> Hosts, CSP unverändert. Exportwege 5.4.
 
 ## Hinweis zu diesem Dokument
 
@@ -638,6 +653,31 @@ Datenausleitung an eine andere Herkunft ist technisch unterbunden.
   auch selbst (Einsatzansicht, Übergabe-Dialog unter „Weitere Formate",
   Fußzeile; `blankoPdfErzeugen` aus `src/app/blanko.ts`, derselben Quelle wie
   die ausgelieferte Datei). Er enthält keine Daten des Geräts.
+  *Nachgezogen 2026-10-06 (Audit Runde 4, R4-A3 bis R4-A8):* Das Lageblatt
+  setzt die Nachtragszeilen in eine eigene Tabelle mit den Spalten der
+  Einheitenzeilen und einer schmalen Spalte „übertragen" (Kästchen und Kürzel
+  zum Ausfüllen mit dem Stift — kein App-Feld, nichts davon wird eingelesen).
+  `einsatzLageblattSeiteFuellen` misst in höchstens zwei Probesätzen ohne Bilder
+  und trägt immer mindestens fünf Zeilen: passen sie auf die letzte Seite,
+  füllen sie diese; sonst stehen sie auf einer eigenen letzten Seite mit
+  Spaltenköpfen („Nachträge von Hand: Seite 2"). Vorher blieben bei sechs bis
+  zehn Einheiten zwei Zeilen, der Bedarf stand bei 30 Einheiten allein auf
+  einer vierten Seite. Zeilen werden nicht mehr über den Seitenrand geteilt.
+  In der Sammel-PDF kostete der Kasten „Stand am Meldekopf" 36 von 443
+  Beispielbögen die letzte Zeile des Sofortbedarfs auf einer eigenen Seite;
+  `einsatzPdfDokumentGesetzt` misst das in einem Probesatz ohne Bilder und ohne
+  eingebettete Dateien und setzt nur diese Bögen enger (kleinerer
+  Innenabstand), der Sofortbedarf-Kasten bleibt ganz. Jede Codeseite trägt eine
+  Kopfzeile mit Einheit, Funkrufname und Stand (Angaben, die schon auf Bogen
+  und Lageblatt stehen); das Kästchen „von Hand geändert" steht nicht mehr auf
+  der Codeseite, sondern auf dem Bogen neben der Stärke. Der Blanko-Vordruck
+  trägt den Kasten „Meldekopf" (Nr., eingegangen am/um, Zug, „Übung",
+  „ins Gerät übertragen von (Kürzel)"), bleibt bei zwei Seiten und enthält
+  weiter keine Daten des Geräts. Der Bericht von „Bögen einlesen…" nennt
+  Bilder ohne Code in einer Zeile mit den ersten drei Dateinamen (Namen der
+  vom Nutzer gewählten Dateien, nur auf dem Bildschirm) und trägt „Lage vom
+  Papier abgleichen…" als Knopf. Das Lageblatt hat damit bei etwa sechs bis
+  zehn Einheiten zwei Seiten (Seite 2 sind die Nachtragszeilen).
 - **Excel-Liste „Oldenburg"** (`src/app/oldenburg-xlsx.ts`, seit 2026-09-29,
   Audit Runde 2, R2-K2): führt dieselben Führungsstellen-Angaben — Eintreffzeit
   in „eingetr. / zugew.", Abrückzeit in „Einsatz-ende", Auftrag/Notiz

@@ -425,3 +425,15 @@ Nachmessung im Dev-Server (360 × 640, `isMobile`/`hasTouch`, de-DE, Port
 | Befund | Stand | Umsetzung |
 | --- | --- | --- |
 | R4-N3 Nach „Namen einfügen…“ liegt Geschlecht außerhalb des Bilds | behoben | Die Ansicht wechselt weiter in die Kurz-Liste, die auf dem Telefon aber keine 637 px breite Tabelle mehr ist (siehe R4-H2): Geschlecht steht in derselben Karte direkt unter dem Namen. Nachlauf (360 × 640, Entwurf Mühldorf): „Max Müller, Anna Schmidt, Jonas Weber, Lena Fischer, Tim Becker“ eingefügt — die Geschlecht-Auswahl jeder Person steht bei 184–327 px im Bild, `scrollWidth` gleich Fensterbreite, „Person 2: Geschlecht“ ließ sich ohne Seitwärtswischen umstellen (Rahmen `scrollLeft` 0). Die Warnung „Alle … Personen stehen auf Geschlecht ‚männlich‘“ bleibt bis zur Übersicht stehen; die Ansicht wechselt weiter von selbst in die Kurz-Liste (nicht geändert). |
+
+Stand 06.10.2026, Paket 5 „Papier, Vordruck, Begriffe“.
+Geprüft mit Typprüfung, Unit-Tests (2 644 grün), Verhaltenstests (137
+Szenarien grün; `features/vorlagen.feature` an den neuen Knopfnamen
+angepasst) und Nachmessung im Dev-Server (360 × 640, `isMobile`/`hasTouch`,
+de-DE, Port 5180). Aufgeführt sind nur die Befunde dieses Pakets.
+
+| Befund | Stand | Umsetzung |
+| --- | --- | --- |
+| R4-N4 Marken und gekürzte Hinweise nur per Tooltip | behoben | „alt“ heißt „älter als 24 h“ (Karte und Tabelle). Die Herkunft an der Karte steht in Worten („von der Einheit empfangen, per Scan oder Link“, „am Meldekopf von Hand erfasst“, „aus Datei übernommen“); die CSV führt weiter „Empfangen“. Die Kurzform eines Hinweises bricht an einer Wortgrenze ab. Die Hinweise selbst waren seit R4-K3 meist Stichworte („Kennzeichen doppelt“, „alle als „männlich“ (Vorbelegung)“). Ein Tipp auf die Rückfrage-Marke der zugeklappten Karte klappt auf und zeigt die Sätze gleich (Tastatur und Vorlesesoftware klappen nur auf). |
+| R4-N5 Platzhalter „THW Ortsverband Ulm“ lenkt den OV ins Organisationsnamen-Feld | behoben | Der THW-Platzhalter heißt „meist leer – OV unten eintragen“. Steht ein Ortsverband des Verzeichnisses im Organisationsnamen und ist die Ebene „OV“ leer, erscheint „„Ulm“ ist ein Ortsverband und gehört unter „Zugehörigkeit“ …“ mit dem Knopf „Als Ortsverband „Ulm“ eintragen“: er füllt Name, Kürzel, Telefon, RB und LV; der Organisationsname geht, wenn er nur den OV nannte, sonst bleibt er. Test mit „THW Ortsverband Ulm“ und „Hochwasserstab Ulm“. |
+| R4-N6 Kleinere Stolpersteine | behoben | Abschlussknopf der Musterung „Bogen anlegen · 8 Pers · 2 Fz“. Der Dialog „In Einsatz-Sammlung ablegen“ sagt bei einem eigenen Bogen: „Das bleibt auf diesem Gerät — an den Meldekopf geht er über „Bogen übergeben…“.“ Schritt 5 nennt vor dem Anhaken „Verpflegung, Betriebsstoff (Diesel, Benzin, Gemisch), Unterbringung, Ruhezeit“. Kopfmarken der Schnellerfassung: seit R4-M7 umgebrochen; nachgemessen bei 360 und 320 px, nichts gekürzt („Schnellerfassung“ 121 px, „Aufnahme für: Hochwasser Donau“ zweizeilig); bei 200 % Schrift auf 320 px bleibt die Marke schmal (siehe R4-M7). |
