@@ -17,8 +17,8 @@
  * einer angeklickten Spalte um.
  */
 
-import { staerke, type Erfassungsbogen } from "@bos/eeb-format/model";
-import { einheitAnzeigename, orgLabel, vokabText, vokabularFuer, zeitpunktDeutsch } from "./hilfen";
+import { EEB_EPOCHE_MS, staerke, type EebDatum, type Erfassungsbogen } from "@bos/eeb-format/model";
+import { einheitAnzeigename, orgLabel, pruefpunkte, vokabText, vokabularFuer, zeitpunktDeutsch, type Pruefpunkt } from "./hilfen";
 import { MeldeStatus, type EinsatzArt, type MeldeEintrag } from "@bos/meldekopf/einsaetze";
 import { FELD_GESAMTSTAERKE, bogenDiff, diffKurzfassung } from "@bos/meldekopf/meldung-diff";
 import { summiereBoegen, unterbringungLage, verpflegungLage, zaehltInLage, type EinsatzSummen } from "./auswertung";
@@ -143,20 +143,63 @@ export function istNeu(e: MeldeEintrag, jetzt = Date.now()): boolean {
 // ------------------------------------------------------------ Lücken
 
 /**
+ * Kalendertag einer Geräteuhr-Zeit als Tageszähler des Bogenformats — der
+ * Bezug für „ist der Einsatzzeitraum vorbei?" am Meldekopf (R4-W6).
+ */
+export function datumVonMs(ms: number): EebDatum {
+  const d = new Date(ms);
+  return Math.round((Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) - EEB_EPOCHE_MS) / 86_400_000);
+}
+
+/**
+ * Offene Punkte einer Meldung, wie sie der Meldekopf sieht (Karte, Lageblatt,
+ * Sammel-PDF, CSV, Excel). Anders als im Assistenten der Einheit gilt hier die
+ * Zeitraum-Prüfung auch: Der Bezug ist der Tag, an dem die Einheit eintraf —
+ * ein Bogen mit Einsatzzeitraum der Julilage in einer Septemberlage fragt nach,
+ * gerade wenn die Einheit die Warnung übergangen hat (Audit Runde 4, R4-W6). Der
+ * Eintreffzeit-Bezug, nicht „heute", damit eine später geöffnete Sammlung nicht
+ * rückwirkend jede Meldung als abgelaufen zeigt.
+ */
+export function pruefpunkteEintrag(e: MeldeEintrag): Pruefpunkt[] {
+  return pruefpunkte(e.bogen, true, datumVonMs(eintreffzeit(e)));
+}
+
+/**
  * Kurzform eines offenen Punkts der Meldung für Karte und Lageblatt: „1
  * Lücke" sagte nicht, worum es geht — dahinter stand etwa ein Sitzplatz-
  * Hinweis „15 in den erfassten Fahrzeugen für 19 Personen" (Audit Runde 3,
- * R3-K7). Bekannte Punkte bekommen ein Stichwort, alle anderen ihren Anfang.
+ * R3-K7). Bekannte Punkte bekommen ein Stichwort, alle anderen ihren Anfang;
+ * die häufigen Prüfpunkte haben jetzt alle eines, damit auf dem Papier nichts
+ * mitten im Satz abbricht (R4-K3).
  */
 export function lueckeKurz(text: string): string {
   const sitz = /^Sitzplätze: \d+ in den erfassten Fahrzeugen für \d+ Personen — (\d+)/.exec(text);
   if (sitz) return `Sitzplätze fehlen: ${sitz[1]}`;
   if (/^Keine telefonische Erreichbarkeit/.test(text)) return "keine Rufnummer";
   if (/hat noch kein Kennzeichen/.test(text)) return "Kennzeichen fehlt";
+  if (/^Kennzeichen .* steht mehrfach/.test(text)) return "Kennzeichen doppelt";
   if (/kein Kraftfahrer/.test(text)) return "kein Kraftfahrer";
   if (/^Ort\/Auftrag ist noch leer/.test(text)) return "Ort/Auftrag leer";
   if (/^Einsatzzeitraum .* ist vorbei/.test(text)) return "Zeitraum vorbei";
+  if (/^Einsatzzeitraum .* mehr als ein Jahr entfernt/.test(text)) return "Zeitraum: Jahr prüfen";
+  if (/^Einsatzzeitraum: „bis“ liegt vor „von“/.test(text)) return "Zeitraum: bis vor von";
+  if (/^Einsatzende .* vor dem Einsatzbeginn/.test(text)) return "Ende vor Beginn";
+  if (/^Einsatzbeginn .* außerhalb des Einsatzzeitraums/.test(text)) return "Beginn außerhalb Zeitraum";
   if (/^Stärke ist 0/.test(text)) return "Stärke 0";
+  const verpflegung = /^Verpflegung für (\d+) Personen angefordert, die Gesamtstärke ist aber (\d+)/.exec(text);
+  if (verpflegung) return `Verpflegung ${verpflegung[1]} ≠ Stärke ${verpflegung[2]}`;
+  if (/^Sofortbedarf: mehr Vegetarier\/Veganer/.test(text)) return "mehr Vegetarier als Verpflegte";
+  if (/^Verpflegung: .* übersteigen die Gesamtstärke/.test(text)) return "vegetarisch/vegan > Stärke";
+  if (/^Alle \d+ Personen stehen auf Geschlecht/.test(text)) return "alle als „männlich“ (Vorbelegung)";
+  if (/^Aufteilung nach Geschlecht: .* weicht von der Gesamtstärke ab/.test(text)) return "M/W/D ≠ Stärke";
+  if (/^Stärke: \d+ \+ \d+ \+ \d+ ergibt nicht/.test(text)) return "F+U+M ≠ Gesamt";
+  if (/^Stärke \d+ \/ \d+ \/ \d+ \/ \d+: mehr Führer als Mannschaft/.test(text)) return "mehr Führer als Mannschaft";
+  if (/^Stärke: \d+ .* — stimmt das\?/.test(text)) return "Stärke auffällig hoch";
+  if (/^Es sind \d+ Ansprechpartner erfasst/.test(text)) return "mehr Personen als Stärke";
+  if (/Personenkarten? ohne Angaben/.test(text)) return "leere Personenkarte";
+  if (/^Zugehörigkeit: Der Name der eigenen Einheit/.test(text)) return "Einheitsname fehlt";
+  if (/Sitzplätze eingetragen|Sitzplätze \(Richtwert/.test(text) || /: \d+ Sitzplätze/.test(text)) return "Sitzplätze prüfen";
+  if (/^Sofortbedarf: .* — mehr als .* je Fahrzeug/.test(text)) return "Kraftstoff auffällig hoch";
   const kopf = text.split(/[:—]/)[0]!.trim();
   if (kopf.length > 0 && kopf.length <= 32 && kopf !== text) return `${kopf} prüfen`;
   return text.length <= 32 ? text.replace(/\.$/, "") : `${text.slice(0, 30).trimEnd()} …`;
@@ -167,6 +210,15 @@ export function lueckenText(texte: string[]): string {
   if (texte.length === 0) return "";
   const erst = lueckeKurz(texte[0]!);
   return texte.length === 1 ? erst : `${erst} + ${texte.length - 1} weitere`;
+}
+
+/**
+ * Alle offenen Punkte als Stichworte, durch „;" getrennt — für Lageblatt und
+ * Tabellen, wo kein Platz für die ganzen Sätze ist, aber auch kein Punkt
+ * hinter „+ 2 weitere" verschwinden soll (R4-K3).
+ */
+export function lueckenAlle(texte: string[]): string {
+  return texte.map(lueckeKurz).join("; ");
 }
 
 // ------------------------------------------------------------ Folgemeldungen
@@ -210,6 +262,13 @@ export function folgeAenderung(kopf: MeldeEintrag, alle: MeldeEintrag[]): FolgeA
   };
 }
 
+/** „…“ mit höchstens 60 Zeichen; „—" (geleert) bleibt ohne Anführungszeichen. */
+function zitat(text: string): string {
+  const t = text.trim();
+  if (t === "" || t === "—") return "entfernt";
+  return `„${t.length > 60 ? `${t.slice(0, 59).trimEnd()} …` : t}“`;
+}
+
 /**
  * Kurzfassung einer Folgemeldung: Stärke zuerst (mit Differenz), dann
  * Fahrzeuge, dann bis zu zwei Bedarfsänderungen mit Wert („Diesel 200 l →
@@ -239,7 +298,10 @@ function folgeKurztext(d: ReturnType<typeof bogenDiff>, vorher: number, nachher:
     erklaert++;
   }
   for (const a of d.sonstiges.slice(0, Math.max(0, 3 - teile.length))) {
-    teile.push(`${a.feld} geändert`);
+    // Die Bemerkung und der Auftrag der Einheit im Wortlaut (gekürzt): „Sonstiges
+    // geändert" klang nach Routine, dahinter stand „300 m Sperre nachfordern"
+    // (R4-K4).
+    teile.push(a.feld === "Sonstiges" ? `Bemerkung: ${zitat(a.nachher)}` : a.feld === "Ort / Auftrag" ? `Ort/Auftrag: ${zitat(a.nachher)}` : `${a.feld} geändert`);
     erklaert++;
   }
   const rest = d.anzahl - erklaert;

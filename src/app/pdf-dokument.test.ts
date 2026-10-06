@@ -685,6 +685,27 @@ describe("einsatzLageblattDokument()", () => {
     expect(t).toContain(`(${"x".repeat(70)} …)`);
   });
 
+  /**
+   * R4-K3: Auf dem Papier darf keine Rückfrage mitten im Satz abbrechen und
+   * keine hinter „+ 2 weitere" verschwinden: Das Lageblatt nennt jeden Punkt
+   * als Stichwort, die Sammel-PDF die ganzen Sätze.
+   */
+  it("nennt alle Rückfragen: Lageblatt als Stichworte, Sammel-PDF im Wortlaut (R4-K3)", () => {
+    const b = basisBogen();
+    b.sofortbedarf = { ...b.sofortbedarf!, verpflegungPersonen: b.personal.length + 8 };
+    b.fahrzeuge = [{ typ: { freitext: "MTW" }, kennzeichen: "" }, ...b.fahrzeuge];
+    const lage = texte(einsatzLageblattDokument("Lage", [{ bogen: b }]).content).join("\n").replace(/\u200B/g, "");
+    expect(lage).toMatch(/Rückfrage: .*Verpflegung \d+ ≠ Stärke \d+/);
+    expect(lage).not.toContain("weitere");
+    expect(/Rückfrage: [^\n]*/.exec(lage)![0]).not.toContain("…");
+    const sammel = texte(einsatzPdfDokument("Lage", [{ bogen: b, qr: QR }]).content)
+      .join("\n")
+      .replace(/\u200B/g, "");
+    expect(sammel).toMatch(/Rückfragen \(\d+\)/);
+    expect(sammel).toContain("Verpflegung für");
+    expect(sammel).toContain("hat noch kein Kennzeichen");
+  });
+
   it("stellt Stärke und Bedarf als Kopfleiste vor die Tabelle, Dringendes fett, Gesamtstärke zuerst (R3-K6)", () => {
     const ruhe = basisBogen();
     ruhe.sofortbedarf = { ...ruhe.sofortbedarf!, ruhezeitErforderlich: true, unterbringung: false, dieselLiter: 80 };

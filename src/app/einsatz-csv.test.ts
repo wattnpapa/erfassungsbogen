@@ -67,6 +67,16 @@ function zeilen(csv: string): string[] {
   return csv.slice(1).replace(/\r\n$/, "").split("\r\n");
 }
 
+/** Felder einer Datenzeile nach Spaltenüberschrift — Spalten kommen dazu, die Tests sollen nicht an Zahlen hängen. */
+function spaltenIndex(csv: string): (name: string) => number {
+  const kopf = zeilen(csv)[0]!.split(";");
+  return (name) => {
+    const i = kopf.indexOf(name);
+    expect(i, `Spalte „${name}“`).toBeGreaterThanOrEqual(0);
+    return i;
+  };
+}
+
 describe("einsatzCsvInhalt()", () => {
   it("beginnt mit UTF-8-BOM und semikolon-getrennter Kopfzeile", () => {
     const csv = einsatzCsvInhalt(sammlung([meldung(bogen("A"))]));
@@ -75,10 +85,11 @@ describe("einsatzCsvInhalt()", () => {
       "Nr.", "Einheit", "Teil", "Organisation", "Zug",
       "Stärke F", "Stärke U", "Stärke M", "Stärke gesamt",
       "Verpflegung gesamt", "Verpflegung veg.", "Verpflegung vegan",
-      "Unterbringung M", "Unterbringung W", "Unterbringung D",
+      "Unterbringung angefordert M", "Unterbringung angefordert W", "Unterbringung angefordert D",
+      "WC/Dusche M", "WC/Dusche W", "WC/Dusche D",
       "Diesel (l)", "Benzin (l)", "Gemisch (l)",
-      "Fahrzeuge", "Stand", "Eingetroffen", "Abgerückt", "Empfangen", "Quelle",
-      "Status", "Zählt in Lage", "Übung", "Sofortbedarf", "Signatur", "Absender", "Auftrag/Notiz",
+      "Fahrzeuge (Anzahl)", "Fahrzeuge (Liste)", "Stand", "Eingetroffen", "Abgerückt", "Empfangen", "Quelle",
+      "Status", "Zählt in Lage", "Übung", "Sofortbedarf", "Rückfrage", "Signatur", "Absender", "Auftrag/Notiz",
       "Bemerkung (Einheit)",
     ]);
   });
@@ -94,33 +105,34 @@ describe("einsatzCsvInhalt()", () => {
   it("schreibt je anwesende Einheit eine Datenzeile mit den erwarteten Werten", () => {
     // zugEtikett gehört an die Meldung, nicht an den Bogen.
     const csv = einsatzCsvInhalt(sammlung([meldung(bogen("OV Alpha"), { zugEtikett: "1. Zug" })]));
+    const sp = spaltenIndex(csv);
     const [, daten] = zeilen(csv);
     const f = daten!.split(";");
-    expect(f[1]).toBe("THW OV Alpha Media Team");
-    expect(f[2]).toBe(""); // ungeteilte Einheit: keine Teil-Bezeichnung
-    expect(f[3]).toBe("THW");
-    expect(f[4]).toBe("1. Zug");
-    // Stärke F/U/M/gesamt
-    expect(f.slice(5, 9)).toEqual(["1", "0", "2", "3"]);
-    // Verpflegung gesamt/veg/vegan
-    expect(f.slice(9, 12)).toEqual(["3", "1", "1"]);
-    // Unterbringung M/W/D
-    expect(f.slice(12, 15)).toEqual(["2", "1", "0"]);
-    // Diesel/Benzin/Gemisch
-    expect(f.slice(15, 18)).toEqual(["40", "5", "0"]);
-    expect(f[0]).toBe("1"); // laufende Nummer wie auf Karte und Lageblatt (R3-K7)
+    expect(f[sp("Einheit")]).toBe("THW OV Alpha Media Team");
+    expect(f[sp("Teil")]).toBe(""); // ungeteilte Einheit: keine Teil-Bezeichnung
+    expect(f[sp("Organisation")]).toBe("THW");
+    expect(f[sp("Zug")]).toBe("1. Zug");
+    expect(f.slice(sp("Stärke F"), sp("Stärke gesamt") + 1)).toEqual(["1", "0", "2", "3"]);
+    expect(f.slice(sp("Verpflegung gesamt"), sp("Verpflegung vegan") + 1)).toEqual(["3", "1", "1"]);
+    // Unterbringung angefordert (hier: ja) und WC/Dusche (alle Anwesenden) — beide M/W/D.
+    expect(f.slice(sp("Unterbringung angefordert M"), sp("Unterbringung angefordert D") + 1)).toEqual(["2", "1", "0"]);
+    expect(f.slice(sp("WC/Dusche M"), sp("WC/Dusche D") + 1)).toEqual(["2", "1", "0"]);
+    expect(f.slice(sp("Diesel (l)"), sp("Gemisch (l)") + 1)).toEqual(["40", "5", "0"]);
+    expect(f[sp("Nr.")]).toBe("1"); // laufende Nummer wie auf Karte und Lageblatt (R3-K7)
+    expect(f[sp("Fahrzeuge (Anzahl)")]).toBe("1");
+    expect(f[sp("Fahrzeuge (Liste)")]).not.toBe("");
     // Eine Zeitform je Datei: Stand, Eingetroffen und Empfangen gleich (R3-K7).
-    expect(f[19]).toMatch(/^\d{2}\.\d{2}\.\d{4}, \d{2}:\d{2}$/);
-    expect(f[22]).toMatch(/^\d{2}\.\d{2}\.\d{4}, \d{2}:\d{2}$/);
-    expect(f[20]).toMatch(/^\d{2}\.\d{2}\.\d{4}, \d{2}:\d{2}$/); // Eingetroffen = Empfangszeit, wenn nicht korrigiert
-    expect(f[21]).toBe(""); // nicht abgerückt
-    expect(f[23]).toBe("Empfangen"); // gleicher Wortlaut wie auf der Karte (R2-K6)
-    expect(f[24]).toBe("anwesend");
-    expect(f[25]).toBe("ja");
-    expect(f[26]).toBe(""); // kein Übungsbogen
-    expect(f[27]).toBe("Unterbringung / Kraftstoff");
-    expect(f[28]).toBe("unsigniert");
-    expect(f[30]).toBe(""); // kein Auftrag
+    expect(f[sp("Stand")]).toMatch(/^\d{2}\.\d{2}\.\d{4}, \d{2}:\d{2}$/);
+    expect(f[sp("Empfangen")]).toMatch(/^\d{2}\.\d{2}\.\d{4}, \d{2}:\d{2}$/);
+    expect(f[sp("Eingetroffen")]).toMatch(/^\d{2}\.\d{2}\.\d{4}, \d{2}:\d{2}$/); // = Empfangszeit, wenn nicht korrigiert
+    expect(f[sp("Abgerückt")]).toBe(""); // nicht abgerückt
+    expect(f[sp("Quelle")]).toBe("Empfangen"); // gleicher Wortlaut wie auf der Karte (R2-K6)
+    expect(f[sp("Status")]).toBe("anwesend");
+    expect(f[sp("Zählt in Lage")]).toBe("ja");
+    expect(f[sp("Übung")]).toBe(""); // kein Übungsbogen
+    expect(f[sp("Sofortbedarf")]).toBe("Unterbringung / Kraftstoff");
+    expect(f[sp("Signatur")]).toBe("unsigniert");
+    expect(f[sp("Auftrag/Notiz")]).toBe(""); // kein Auftrag
   });
 
   it("unterscheidet abgeteilte Truppteile in der Teil-Spalte", () => {
@@ -137,20 +149,47 @@ describe("einsatzCsvInhalt()", () => {
         }),
       ]),
     );
+    const sp = spaltenIndex(csv);
     const felder = zeilen(csv).slice(1, 3).map((z) => z.split(";"));
-    expect(felder.map((f) => f[2])).toEqual(["", "Fachberater"]);
-    expect(felder[1]![23]).toBe("Aufteilung");
+    expect(felder.map((f) => f[sp("Teil")])).toEqual(["", "Fachberater"]);
+    expect(felder[1]![sp("Quelle")]).toBe("Aufteilung");
   });
 
   it("hängt eine Summenzeile über alle anwesenden Einheiten an", () => {
     const csv = einsatzCsvInhalt(sammlung([meldung(bogen("A")), meldung(bogen("B"))]));
+    const sp = spaltenIndex(csv);
     const reihen = zeilen(csv);
     expect(reihen).toHaveLength(4); // Kopf + 2 Einheiten + Summe
     const summe = reihen[3]!.split(";");
     expect(summe[1]).toBe("Summe (2 Einheiten)");
-    expect(summe.slice(5, 9)).toEqual(["2", "0", "4", "6"]); // Stärke gesamt 6
-    expect(summe.slice(15, 18)).toEqual(["80", "10", "0"]); // Kraftstoff summiert
-    expect(summe[18]).toBe("2"); // Fahrzeuge gesamt
+    expect(summe.slice(sp("Stärke F"), sp("Stärke gesamt") + 1)).toEqual(["2", "0", "4", "6"]); // Stärke gesamt 6
+    expect(summe.slice(sp("Diesel (l)"), sp("Gemisch (l)") + 1)).toEqual(["80", "10", "0"]); // Kraftstoff summiert
+    expect(summe[sp("Fahrzeuge (Anzahl)")]).toBe("2"); // Fahrzeuge gesamt als Zahl, die Liste bleibt leer (R4-K8)
+    expect(summe[sp("Fahrzeuge (Liste)")]).toBe("");
+  });
+
+  /**
+   * R4-W5: Die Summe unter „Unterbringung angefordert“ ist die Zahl, mit der
+   * der Stab Schlafplätze plant — dieselbe wie auf Lageblatt und in der
+   * Excel-Liste. „WC/Dusche“ zählt alle Anwesenden.
+   */
+  it("führt Unterbringung angefordert nur für Einheiten mit Anforderung, WC/Dusche für alle (R4-W5)", () => {
+    const ohne = bogen("B", { sofortbedarf: { verpflegungPersonen: 3, dieselLiter: 0, benzinLiter: 0, gemischLiter: 0, unterbringung: false, ruhezeitErforderlich: false } });
+    const csv = einsatzCsvInhalt(sammlung([meldung(bogen("A")), meldung(ohne)]));
+    const sp = spaltenIndex(csv);
+    const reihen = zeilen(csv);
+    const b = reihen[2]!.split(";");
+    expect(b.slice(sp("Unterbringung angefordert M"), sp("Unterbringung angefordert D") + 1)).toEqual(["0", "0", "0"]);
+    expect(b.slice(sp("WC/Dusche M"), sp("WC/Dusche D") + 1)).toEqual(["2", "1", "0"]);
+    const summe = reihen[3]!.split(";");
+    expect(summe.slice(sp("Unterbringung angefordert M"), sp("Unterbringung angefordert D") + 1)).toEqual(["2", "1", "0"]);
+    expect(summe.slice(sp("WC/Dusche M"), sp("WC/Dusche D") + 1)).toEqual(["4", "2", "0"]);
+  });
+
+  it("schreibt die offenen Punkte der Meldung in eine Spalte „Rückfrage“ (R4-K8)", () => {
+    const csv = einsatzCsvInhalt(sammlung([meldung(bogen("A", { fahrzeuge: [{ typ: { code: 2 }, kennzeichen: "" }] }))]));
+    const sp = spaltenIndex(csv);
+    expect(zeilen(csv)[1]!.split(";")[sp("Rückfrage")]).toContain("hat noch kein Kennzeichen");
   });
 
   it("führt abgerückte Einheiten mit Status auf, zählt sie aber nicht in die Summe", () => {
@@ -159,11 +198,12 @@ describe("einsatzCsvInhalt()", () => {
     const csv = einsatzCsvInhalt(
       sammlung([meldung(bogen("A")), meldung(bogen("B"), { status: MeldeStatus.ABGERUECKT })]),
     );
+    const sp = spaltenIndex(csv);
     const reihen = zeilen(csv);
     expect(reihen).toHaveLength(4); // Kopf + 2 Einheiten + Summe
     const abgerueckt = reihen[2]!.split(";");
-    expect(abgerueckt[24]).toBe("abgerückt");
-    expect(abgerueckt[25]).toBe("nein");
+    expect(abgerueckt[sp("Status")]).toBe("abgerückt");
+    expect(abgerueckt[sp("Zählt in Lage")]).toBe("nein");
     expect(reihen[3]!).toContain("Summe (1 Einheiten)");
   });
 
@@ -171,10 +211,11 @@ describe("einsatzCsvInhalt()", () => {
     const csv = einsatzCsvInhalt(
       sammlung([meldung(bogen("A")), meldung(bogen("B", { uebung: true }))]),
     );
+    const sp = spaltenIndex(csv);
     const reihen = zeilen(csv);
     const uebung = reihen[2]!.split(";");
-    expect(uebung[25]).toBe("nein");
-    expect(uebung[26]).toBe("ÜBUNG");
+    expect(uebung[sp("Zählt in Lage")]).toBe("nein");
+    expect(uebung[sp("Übung")]).toBe("ÜBUNG");
     expect(reihen[3]!).toContain("Summe (1 Einheiten)");
   });
 
@@ -193,10 +234,11 @@ describe("einsatzCsvInhalt()", () => {
         }),
       ]),
     );
+    const sp = spaltenIndex(csv);
     const f = zeilen(csv)[1]!.split(";");
-    expect(f[20]).toBe("26.09.2026, 09:40");
-    expect(f[21]).toBe("27.09.2026, 15:10");
-    expect(f[30]).toBe("Deichabschnitt Nord");
+    expect(f[sp("Eingetroffen")]).toBe("26.09.2026, 09:40");
+    expect(f[sp("Abgerückt")]).toBe("27.09.2026, 15:10");
+    expect(f[sp("Auftrag/Notiz")]).toBe("Deichabschnitt Nord");
   });
 
   it("quotet Felder mit Semikolon und deutschem Dezimalkomma", () => {

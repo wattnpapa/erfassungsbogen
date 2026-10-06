@@ -397,8 +397,38 @@ describe("Oldenburg-XLSX: Sammlung", () => {
     const alt = bogen({ stand: 100 * 1440 });
     const neu = bogen({ stand: 101 * 1440, sonstiges: "Nachmeldung" });
     const b = blatt(einsatzOldenburgXlsx(sammlung([meldung(alt), meldung(neu, { empfangenAm: 2000 })])));
-    expect(wert(b, 1, "Bemerkung")).toBe("Nachmeldung");
+    expect(wert(b, 1, "Bemerkung")).toMatch(/Nachmeldung$/); // vorn ggf. die Rückfragen der Testdaten (R4-K8)
     expect(wert(b, 2, "Bezeichnung")).toBeUndefined();
+  });
+
+  /**
+   * R4-W6: Ein Bogen, dessen Einsatzzeitraum vor dem Eintreffen endete, stammt
+   * aus einer früheren Lage — die Liste trägt kein „Verfügbar bis" von vor
+   * Monaten weiter, die Bemerkung sagt es.
+   */
+  it("lässt „Verfügbar bis“ leer, wenn der Zeitraum vor dem Eintreffen endete (R4-W6)", () => {
+    const eingetroffen = new Date("2026-10-05T20:00").getTime();
+    const vorbei = bogen({ einsatz: { zeitraumVon: 2024, zeitraumBis: 2025, ortAuftrag: "Deichverteidigung" } }); // Juli 2025: Tage seit 2020
+    const aktuell = bogen({ einsatz: { zeitraumVon: 2470, zeitraumBis: 2480, ortAuftrag: "Deichverteidigung" } });
+    const b = blatt(
+      einsatzOldenburgXlsx(
+        sammlung([
+          meldung(vorbei, { eingetroffenAm: eingetroffen }),
+          meldung({ ...aktuell, einheit: { ...aktuell.einheit, hierarchie: [{ bezeichnung: { code: 1 }, name: "Ulm" }] } }, { eingetroffenAm: eingetroffen }),
+        ]),
+      ),
+    );
+    const zeilen = [1, 2].map((n) => ({ bis: wert(b, n, "Verfügbar\n bis"), bem: wert(b, n, "Bemerkung") ?? "" }));
+    const alt = zeilen.find((z) => z.bem.includes("endete"))!;
+    expect(alt.bis).toBe("");
+    expect(alt.bem).toMatch(/Einsatzzeitraum im Bogen endete \d\d\.\d\d\.2025 — Bogen aus früherer Lage\?/);
+    const neu = zeilen.find((z) => !z.bem.includes("endete"))!;
+    expect(neu.bis).not.toBe("");
+  });
+
+  it("nimmt die offenen Punkte der Meldung als Rückfrage in die Bemerkung (R4-K8)", () => {
+    const b = blatt(einsatzOldenburgXlsx(sammlung([meldung(bogen({ fahrzeuge: [{ typ: { code: 2 }, kennzeichen: "" }] }))])));
+    expect(wert(b, 1, "Bemerkung")).toMatch(/Rückfrage: .*Kennzeichen fehlt/);
   });
 
   it("nimmt die Eintrags-ID der Sammlung als Bogen-ID", () => {

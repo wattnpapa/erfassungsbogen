@@ -31,7 +31,6 @@ import {
   kontaktText,
   orgLabel,
   nurSollstaerke,
-  pruefpunkte,
   vokabText,
   vokabularFuer,
   zeitpunktDeutsch,
@@ -100,6 +99,7 @@ import {
   istNeu,
   letzteMeldung,
   lueckenText,
+  pruefpunkteEintrag,
   folgeAenderung,
   frischGemeldet,
   meldungsNummern,
@@ -1325,6 +1325,15 @@ export function EinsatzDetail(props: {
                   : "keine"}
                 {" · "}WC/Dusche {mwdText({ ...g.summen.unterbringung, ohneAngabe: g.summen.unterbringungOhneAngabe })}
                 {" · "}Fahrzeuge {g.summen.fahrzeuge}
+                {/* Betriebsstoff je Zug wie auf dem Lageblatt — nur gemeldete Sorten (R4-K8). */}
+                {[
+                  g.summen.kraftstoff.dieselLiter > 0 ? `Diesel ${g.summen.kraftstoff.dieselLiter} l` : "",
+                  g.summen.kraftstoff.benzinLiter > 0 ? `Benzin ${g.summen.kraftstoff.benzinLiter} l` : "",
+                  g.summen.kraftstoff.gemischLiter > 0 ? `Gemisch ${g.summen.kraftstoff.gemischLiter} l` : "",
+                ]
+                  .filter(Boolean)
+                  .map((k) => ` · ${k}`)
+                  .join("")}
               </p>
             </div>
           ))}
@@ -2298,7 +2307,7 @@ function EinheitKarte(props: {
   // Was der Bogen offenlässt (keine Rufnummer, Stärke ohne Namen…) — dieselbe
   // Prüfliste, die die Einheit beim Ausfüllen sieht. Auf der Karte, damit die
   // Rückfrage kommt, solange die Einheit noch vor dem Meldekopf steht (K3).
-  const luecken = pruefpunkte(kopf.bogen);
+  const luecken = pruefpunkteEintrag(kopf);
   const bedarf = bedarfMarken(kopf.bogen);
   const revs = revisionenJe(alle, kopf.einheitSchluessel);
   // Folgemeldung: die direkt ältere Fassung derselben Einheit ist der Bezug für

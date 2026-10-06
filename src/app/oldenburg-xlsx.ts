@@ -53,12 +53,14 @@
 
 import {
   ansprechpartner,
+  datumZuIso,
   staerke,
   unterbringungMWD,
   verpflegung,
   type Erfassungsbogen,
 } from "@bos/eeb-format/model";
 import {
+  datumDeutsch,
   einheitAnzeigename,
   einheitOrt,
   kontaktText,
@@ -84,6 +86,7 @@ import {
 } from "@bos/meldekopf/einsaetze";
 import { geltendeJeEinheit } from "./fassung-vorrang";
 import { zaehltInLage } from "./auswertung";
+import { datumVonMs, lueckenAlle, pruefpunkteEintrag } from "./einheiten-tabelle";
 import { eintreffzeit } from "./eintrag-zeiten";
 
 export { XLSX_MIME };
@@ -330,6 +333,8 @@ interface Kontext {
   abgerueckAm?: number;
   /** Auftrag/Notiz der Führungsstelle. */
   auftrag?: string;
+  /** Offene Punkte der Meldung (Rückfragen, R4-K8); reisen in die Bemerkung. */
+  rueckfragen?: string[];
   /** Statusvermerk für „Bemerkung", z. B. „ABGERÜCKT". */
   status?: string;
   /** Zählt nicht in die Lage — „Bemerkung" sagt es ausdrücklich. */
@@ -345,6 +350,13 @@ function zeileFuer(b: Erfassungsbogen, k: Kontext): Zeile {
   const u = unterbringungMWD(b);
   const sb = b.sofortbedarf;
   const ebene = ebeneVon(lang, st.gesamt);
+  // Ein Bogen, dessen Einsatzzeitraum vor dem Eintreffen endete, stammt aus einer
+  // früheren Lage: „Verfügbar bis" bleibt leer, die Bemerkung sagt warum — ein
+  // Datum von vor Monaten sah in der Liste wie eine Zusage aus (R4-W6).
+  const zeitraumVorbei =
+    k.eingetroffenAm != null &&
+    b.einsatz.zeitraumBis >= b.einsatz.zeitraumVon &&
+    b.einsatz.zeitraumBis < datumVonMs(k.eingetroffenAm);
   // ÜN nur, wenn Unterbringung überhaupt angefordert ist — sonst stünden dort
   // Betten für Einheiten, die abends nach Hause fahren.
   const uen = sb?.unterbringung ? u : { m: 0, w: 0, d: 0 };
@@ -367,7 +379,7 @@ function zeileFuer(b: Erfassungsbogen, k: Kontext): Zeile {
     // wurde (R2-K2, siehe Dateikopf).
     auftraege: k.auftrag ?? "",
     erreichbarkeit: erreichbarkeitText(b),
-    verfuegbarBis: excelDatum(b.einsatz.zeitraumBis),
+    verfuegbarBis: zeitraumVorbei ? "" : excelDatum(b.einsatz.zeitraumBis),
     vorgesehenerAuftrag: b.einsatz.ortAuftrag,
     // Die Zeiten des Meldekopfs sind die gelebten; der Bogen trägt nur, was
     // die Einheit selbst eingetragen hat (beim Einzelbogen das einzige).
@@ -389,6 +401,8 @@ function zeileFuer(b: Erfassungsbogen, k: Kontext): Zeile {
       k.status ?? "",
       b.uebung === true ? "ÜBUNG" : "",
       k.zaehltNicht ? "zählt nicht in der Lage" : "",
+      zeitraumVorbei ? `Einsatzzeitraum im Bogen endete ${datumDeutsch(datumZuIso(b.einsatz.zeitraumBis))} — Bogen aus früherer Lage?` : "",
+      k.rueckfragen?.length ? `Rückfrage: ${lueckenAlle(k.rueckfragen)}` : "",
       b.sonstiges ?? "",
     ]
       .filter(Boolean)
@@ -540,6 +554,13 @@ function kontextAus(s: Einsatzsammlung, e: MeldeEintrag, zaehlt: boolean): Konte
     eingetroffenAm: eintreffzeit(e),
     abgerueckAm: e.status === MeldeStatus.ABGERUECKT ? e.abgerueckAm : undefined,
     auftrag: e.notiz,
+    // Nur, wo die Meldung zählt — wie an der Karte; für Abgerückte und Übungen wäre die Rückfrage Lärm.
+    rueckfragen: zaehlt
+      ? pruefpunkteEintrag(e)
+          // Die Zeitraum-Rückfrage sagt „Bogen aus früherer Lage?" schon in ihrer eigenen Zeile.
+          .filter((p) => !/^Einsatzzeitraum .* ist vorbei/.test(p.text))
+          .map((p) => p.text)
+      : [],
     status: statusVermerk(s, e),
     zaehltNicht: !zaehlt,
   };

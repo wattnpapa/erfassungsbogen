@@ -44,7 +44,7 @@ import {
 } from "./hilfen";
 import { mwdText, summiereBoegen, unterbringungAngefordertText, type EinsatzSummen } from "./auswertung";
 import { zeitLang } from "./eintrag-zeiten";
-import { bedarfMarken, lueckenText } from "./einheiten-tabelle";
+import { bedarfMarken, datumVonMs, lueckenAlle } from "./einheiten-tabelle";
 import { FELD_GESAMTSTAERKE, bogenDiff, diffZeilen, type BogenDiff } from "@bos/meldekopf/meldung-diff";
 import { fahrzeugSymbolSvg } from "./taktische-zeichen-bogen";
 import { orgFarbe } from "./org-farben";
@@ -480,8 +480,18 @@ function uebersichtsTabelle(
     if (!e.abgerueckt && e.zaehlt === false) namensZeilen.push({ text: "zählt nicht in diese Lage", italics: true });
     // Lücken der Meldung als Zahl — am Gerät eine Marke an der Karte (R2-K3).
     // Mit Inhalt statt „1 Lücke" (R3-K7).
-    const luecken = pruefpunkte(b);
-    if (luecken.length > 0) namensZeilen.push({ text: `Rückfrage: ${lueckenText(luecken.map((p) => p.text))}`, italics: true });
+    // Auf dem Papier alle, nicht „… + 2 weitere" (R4-K3): Das Lageblatt nennt
+    // jeden Punkt als Stichwort, die Sammel-PDF die ganzen Sätze. Der Zeitraum
+    // zählt wie am Gerät mit (Bezug: Eintreffen, R4-W6).
+    const luecken = pruefpunkte(b, true, e.eingetroffenAm != null ? datumVonMs(e.eingetroffenAm) : undefined);
+    if (luecken.length > 0) {
+      if (maxZeilen === LAGEBLATT_MAX_ZEILEN) {
+        namensZeilen.push({ text: `Rückfrage: ${lueckenAlle(luecken.map((p) => p.text))}`, italics: true });
+      } else {
+        namensZeilen.push({ text: luecken.length === 1 ? "Rückfrage:" : `Rückfragen (${luecken.length}):`, italics: true });
+        for (const p of luecken) namensZeilen.push({ text: `– ${p.text}`, italics: true, fontSize: 7 });
+      }
+    }
     return [
       namensZeilen.length === 1 ? namensZeilen[0]! : { stack: namensZeilen },
       { text: weichUmbrechen(e.zugEtikett ?? "") },

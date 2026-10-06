@@ -2347,6 +2347,9 @@
       letter-spacing: normal; text-transform: none; text-align: left; background: none;
     }
     table.einheiten-tabelle tbody th .muster-sub { display: block; }
+    /* R4-K8: Lange Namen („Materialwirtschaft") trennen an Silbengrenzen mit
+       Trennstrich statt an der Zellkante ohne. Notbremse bleibt anywhere. */
+    table.einheiten-tabelle tbody th { hyphens: auto; -webkit-hyphens: auto; overflow-wrap: anywhere; }
     /* R3-L3: Keine 55 % Deckkraft mehr — das Statuswort fiel nachts auf
        2,77:1, im Standard auf 2,33:1. Wie in den Karten: der Name
        durchgestrichen, das Statuswort als Marke in voller Deckkraft, die

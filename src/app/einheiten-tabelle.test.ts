@@ -31,6 +31,7 @@ import {
   passtZuBedarfsfilter,
   istNeu,
   lueckeKurz,
+  lueckenAlle,
   lueckenText,
   meldungsNummern,
   standIstAlt,
@@ -293,7 +294,7 @@ describe("folgeAenderung / frischGemeldet (Audit Runde 3, R3-K1)", () => {
     expect(f).toMatchObject({ staerkeVorher: 12, staerkeNachher: 9, verlust: true });
   });
 
-  it("nennt Bedarfsänderungen mit Wert und Freitexte mit Namen statt „2 Änderungen“", () => {
+  it("nennt Bedarfsänderungen mit Wert und die Bemerkung im Wortlaut statt „2 Änderungen“ (R4-K4)", () => {
     const b1 = bogen("Weinsberg", 3);
     b1.sofortbedarf = { verpflegungPersonen: 0, dieselLiter: 200, benzinLiter: 0, gemischLiter: 0, unterbringung: false, ruhezeitErforderlich: false };
     const b2 = structuredClone(b1);
@@ -302,8 +303,21 @@ describe("folgeAenderung / frischGemeldet (Audit Runde 3, R3-K1)", () => {
     const a = eintrag("w1", b1, { einheitSchluessel: "w", empfangenAm: 1 });
     const b = eintrag("w2", b2, { einheitSchluessel: "w", empfangenAm: 2 });
     const f = folgeAenderung(b, [a, b])!;
-    expect(f.kurz).toBe("Diesel 200 l → 400 l · Sonstiges geändert");
+    expect(f.kurz).toBe("Diesel 200 l → 400 l · Bemerkung: „Nachschub nötig“");
     expect(f.verlust).toBe(false);
+  });
+
+  it("kürzt eine lange Bemerkung auf etwa 60 Zeichen und nennt eine geleerte (R4-K4)", () => {
+    const b1 = bogen("Weinsberg", 3);
+    const b2 = structuredClone(b1);
+    b2.sonstiges = "Ölsperre gerissen, 300 m Sperre nachfordern, außerdem Stiefel Größe 44 und Handschuhe";
+    const a = eintrag("w1", b1, { einheitSchluessel: "w", empfangenAm: 1 });
+    const b = eintrag("w2", b2, { einheitSchluessel: "w", empfangenAm: 2 });
+    const kurz = folgeAenderung(b, [a, b])!.kurz;
+    expect(kurz).toMatch(/^Bemerkung: „Ölsperre gerissen, 300 m Sperre nachfordern, außerdem Stief …“$/);
+    expect(kurz.length).toBeLessThan(90);
+    const c = eintrag("w3", b1, { einheitSchluessel: "w", empfangenAm: 3 });
+    expect(folgeAenderung(c, [a, b, c])!.kurz).toBe("Bemerkung: entfernt");
   });
 
   it("ist keine Folgemeldung: Erstmeldung und Rest-Fassung nach Aufteilen", () => {
@@ -339,6 +353,18 @@ describe("Lücken mit Inhalt statt Zahl (Audit Runde 3, R3-K7)", () => {
     expect(lueckenText([])).toBe("");
     expect(lueckenText(["Stärke ist 0."])).toBe("Stärke 0");
     expect(lueckenText(["Stärke ist 0.", "Ort/Auftrag ist noch leer.", "x"])).toBe("Stärke 0 + 2 weitere");
+  });
+
+  it("gibt den häufigen Prüfpunkten Stichworte statt eines abgeschnittenen Satzanfangs (R4-K3)", () => {
+    expect(lueckeKurz("Verpflegung für 12 Personen angefordert, die Gesamtstärke ist aber 8.")).toBe("Verpflegung 12 ≠ Stärke 8");
+    expect(lueckeKurz("Alle 4 Personen stehen auf Geschlecht „männlich“ — das ist die Vorbelegung. Bitte prüfen (zählt für Unterbringung und WC/Dusche).")).toBe(
+      "alle als „männlich“ (Vorbelegung)",
+    );
+    expect(lueckeKurz("Kennzeichen THW-1234 steht mehrfach in der Fahrzeugliste — stimmt das?")).toBe("Kennzeichen doppelt");
+    expect(lueckeKurz("Stärke: 5 + 1 + 2 ergibt nicht die Gesamtstärke 9.")).toBe("F+U+M ≠ Gesamt");
+    expect(lueckenAlle(["Stärke ist 0.", "Ort/Auftrag ist noch leer.", "Fahrzeug 2 hat noch kein Kennzeichen."])).toBe(
+      "Stärke 0; Ort/Auftrag leer; Kennzeichen fehlt",
+    );
   });
 
   it("kürzt unbekannte lange Texte", () => {

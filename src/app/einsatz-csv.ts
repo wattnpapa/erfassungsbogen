@@ -17,7 +17,7 @@ import { staerke, type Erfassungsbogen } from "@bos/eeb-format/model";
 import type { EinsatzArt } from "@bos/meldekopf/einsaetze";
 import { geltendeJeEinheit } from "./fassung-vorrang";
 import { einheitAnzeigename, orgLabel, vokabText, vokabularFuer, zeitpunktDeutsch } from "./hilfen";
-import { meldungsNummern } from "./einheiten-tabelle";
+import { meldungsNummern, pruefpunkteEintrag } from "./einheiten-tabelle";
 import { aktuelleMeldungen, unterbringungLage, verpflegungLage, zaehltInLage } from "./auswertung";
 import { csvDatei, csvZeile } from "./csv";
 import { HERKUNFT_TEXT, eintreffzeit, zeitLang } from "./eintrag-zeiten";
@@ -47,13 +47,23 @@ const SPALTEN = [
   "Verpflegung gesamt",
   "Verpflegung veg.",
   "Verpflegung vegan",
-  "Unterbringung M",
-  "Unterbringung W",
-  "Unterbringung D",
+  // Zwei Zahlen, zwei Fragen — wie auf Lageblatt und in der Excel-Liste (R4-W5):
+  // Schlafplätze brauchen nur die Einheiten mit angeforderter Unterbringung,
+  // WC und Duschen alle Anwesenden. Beide unter derselben Überschrift zu führen
+  // ließ den Stab 50 statt 35 Plätze planen.
+  "Unterbringung angefordert M",
+  "Unterbringung angefordert W",
+  "Unterbringung angefordert D",
+  "WC/Dusche M",
+  "WC/Dusche W",
+  "WC/Dusche D",
   "Diesel (l)",
   "Benzin (l)",
   "Gemisch (l)",
-  "Fahrzeuge",
+  // Anzahl und Liste getrennt: in der Summenzeile stand eine Zahl unter einer
+  // Liste (R4-K8).
+  "Fahrzeuge (Anzahl)",
+  "Fahrzeuge (Liste)",
   "Stand",
   // Eintreff- und Abrückzeit der Führungsstelle — für Einsatztagebuch und
   // Abrechnung (Führungssicht-Audit K2). „Empfangen" bleibt daneben der
@@ -66,6 +76,8 @@ const SPALTEN = [
   "Zählt in Lage",
   "Übung",
   "Sofortbedarf",
+  // Offene Punkte der Meldung — gingen in jede Tabelle verloren (R4-K8).
+  "Rückfrage",
   "Signatur",
   "Absender",
   "Auftrag/Notiz",
@@ -132,12 +144,14 @@ function datenZeile(art: EinsatzArt, e: MeldeEintrag, nr: number | undefined): s
     vp.gesamt,
     vp.vegetarisch,
     vp.vegan,
+    ...(sb?.unterbringung ? [u.m, u.w, u.d] : [0, 0, 0]),
     u.m,
     u.w,
     u.d,
     sb?.dieselLiter ?? 0,
     sb?.benzinLiter ?? 0,
     sb?.gemischLiter ?? 0,
+    b.fahrzeuge.length,
     fahrzeugListe(b),
     // Eine Zeitform je Datei: „04.10.2026, 14:36" für Stand, Eingetroffen,
     // Abgerückt und Empfangen. Vorher standen „041436okt26",
@@ -151,6 +165,7 @@ function datenZeile(art: EinsatzArt, e: MeldeEintrag, nr: number | undefined): s
     zaehlt(art, e) ? "ja" : "nein",
     b.uebung ? "ÜBUNG" : "",
     sofortbedarfText(b),
+    pruefpunkteEintrag(e).map((p) => p.text).join(" | "),
     signaturText(e),
     absenderText(e),
     e.notiz ?? "",
@@ -168,6 +183,7 @@ function summenZeile(meldungen: MeldeEintrag[]): string {
   const acc = {
     f: 0, u: 0, m: 0, gesamt: 0,
     vGesamt: 0, veg: 0, vegan: 0,
+    anM: 0, anW: 0, anD: 0,
     uM: 0, uW: 0, uD: 0,
     diesel: 0, benzin: 0, gemisch: 0,
     fahrzeuge: 0,
@@ -184,6 +200,11 @@ function summenZeile(meldungen: MeldeEintrag[]): string {
     acc.vGesamt += vp.gesamt;
     acc.veg += vp.vegetarisch;
     acc.vegan += vp.vegan;
+    if (b.sofortbedarf?.unterbringung) {
+      acc.anM += un.m;
+      acc.anW += un.w;
+      acc.anD += un.d;
+    }
     acc.uM += un.m;
     acc.uW += un.w;
     acc.uD += un.d;
@@ -200,9 +221,11 @@ function summenZeile(meldungen: MeldeEintrag[]): string {
     "",
     acc.f, acc.u, acc.m, acc.gesamt,
     acc.vGesamt, acc.veg, acc.vegan,
+    acc.anM, acc.anW, acc.anD,
     acc.uM, acc.uW, acc.uD,
     acc.diesel, acc.benzin, acc.gemisch,
     acc.fahrzeuge,
+    "",
     "",
     "",
     "",
