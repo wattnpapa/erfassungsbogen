@@ -1571,6 +1571,123 @@ describe("Aufteilen mit Quittung und Rückweg (R2-D6)", () => {
 });
 
 /**
+ * „Stärke ändern…" prüfte nichts, zeigte keine Summe, verlor bei Tippfehlern
+ * alle Felder und bot nach der Übernahme kein „Rückgängig“ (Audit Runde 4, R4-E4).
+ */
+describe("Stärke ändern mit Prüfung und Rückweg (R4-E4)", () => {
+  beforeEach(() => {
+    localStorage.clear();
+  });
+
+  function einsatzMitDreiPersonen() {
+    const angelegt = einsatzAnlegen("Hochwasser Test", EinsatzArt.EINSATZ);
+    const b = bogenMitName("Wardenburg");
+    b.personal = ["Rudolph", "Lang", "Weber"].map((nachname) => ({ ...neuePerson(), vorname: "T", nachname }));
+    meldungHinzufuegen(angelegt.id, b);
+    return ansicht(angelegt.id);
+  }
+
+  async function dialogOeffnen(nutzer: ReturnType<typeof userEvent.setup>) {
+    await nutzer.click(screen.getByRole("button", { name: "Mehr…" }));
+    await nutzer.click(screen.getByRole("button", { name: "Stärke ändern…" }));
+    return document.querySelector<HTMLDialogElement>("dialog[aria-label='Stärke ändern']")!;
+  }
+
+  async function eintragen(nutzer: ReturnType<typeof userEvent.setup>, dialog: HTMLElement, feld: string, wert: string) {
+    const f = within(dialog).getByLabelText(feld);
+    await nutzer.clear(f);
+    await nutzer.type(f, wert);
+  }
+
+  it("warnt bei „66“ statt „6“, nennt alt → neu und nimmt es mit „Rückgängig“ zurück", async () => {
+    const nutzer = userEvent.setup();
+    const { einsatzId, neuLaden } = einsatzMitDreiPersonen();
+    const dialog = await dialogOeffnen(nutzer);
+    await eintragen(nutzer, dialog, "Mannschaft", "66");
+    await nutzer.click(within(dialog).getByRole("button", { name: "Stärke übernehmen" }));
+
+    const frage = document.querySelector<HTMLDialogElement>("dialog[aria-label='Stimmt die Stärke?']")!;
+    expect(frage.textContent).toContain("0 / 0 / 3 / 3 → 0 / 0 / 66 / 66");
+    expect(frage.textContent).toMatch(/Stärke: 66 Mannschaft — stimmt das\?/);
+    expect(einsaetzeLaden().find((s) => s.id === einsatzId)!.eintraege).toHaveLength(1);
+    await nutzer.click(within(frage).getByRole("button", { name: "Ja, so übernehmen" }));
+    neuLaden();
+
+    expect(einsaetzeLaden().find((s) => s.id === einsatzId)!.eintraege).toHaveLength(2);
+    const quittung = document.querySelector<HTMLElement>(".quittung-daumen")!;
+    expect(quittung.textContent).toMatch(/^Stärke geändert: „.*Wardenburg" 3 → 66/);
+
+    await nutzer.click(within(quittung).getByRole("button", { name: "Rückgängig" }));
+    neuLaden();
+    expect(einsaetzeLaden().find((s) => s.id === einsatzId)!.eintraege).toHaveLength(1);
+    expect(document.querySelector(".quittung-daumen")!.textContent).toMatch(/^Stärke zurückgenommen: „.*Wardenburg" gilt wieder mit 3\./);
+  });
+
+  it("„Zahlen korrigieren“ geht zurück in den Dialog mit den eingegebenen Werten", async () => {
+    const nutzer = userEvent.setup();
+    const { einsatzId } = einsatzMitDreiPersonen();
+    const dialog = await dialogOeffnen(nutzer);
+    await eintragen(nutzer, dialog, "Mannschaft", "66");
+    await nutzer.click(within(dialog).getByRole("button", { name: "Stärke übernehmen" }));
+    await nutzer.click(within(document.querySelector<HTMLDialogElement>("dialog[aria-label='Stimmt die Stärke?']")!).getByRole("button", { name: "Zahlen korrigieren" }));
+
+    const wieder = document.querySelector<HTMLDialogElement>("dialog[aria-label='Stärke ändern']")!;
+    expect((within(wieder).getByLabelText("Mannschaft") as HTMLInputElement).value).toBe("66");
+    expect(einsaetzeLaden().find((s) => s.id === einsatzId)!.eintraege).toHaveLength(1);
+  });
+
+  it("nennt bei „6o“ das falsche Feld und behält die übrigen Eingaben", async () => {
+    const nutzer = userEvent.setup();
+    const { einsatzId } = einsatzMitDreiPersonen();
+    const dialog = await dialogOeffnen(nutzer);
+    await eintragen(nutzer, dialog, "Führer", "1");
+    await eintragen(nutzer, dialog, "Mannschaft", "6o");
+    await nutzer.click(within(dialog).getByRole("button", { name: "Stärke übernehmen" }));
+
+    const wieder = document.querySelector<HTMLDialogElement>("dialog[aria-label='Stärke ändern']")!;
+    expect(within(wieder).getByRole("alert").textContent).toMatch(/nicht lesbar: Mannschaft \(„6o"\)/);
+    expect((within(wieder).getByLabelText("Führer") as HTMLInputElement).value).toBe("1");
+    expect((within(wieder).getByLabelText("Mannschaft") as HTMLInputElement).value).toBe("6o");
+    expect(einsaetzeLaden().find((s) => s.id === einsatzId)!.eintraege).toHaveLength(1);
+  });
+
+  it("nimmt eine falsch aufgenommene Folgemeldung über „Rückgängig“ an der Quittung zurück", async () => {
+    const nutzer = userEvent.setup();
+    const angelegt = einsatzAnlegen("Hochwasser Test", EinsatzArt.EINSATZ);
+    const erste = bogenMitName("Wardenburg");
+    erste.personal = ["Rudolph", "Lang", "Weber"].map((nachname) => ({ ...neuePerson(), vorname: "T", nachname }));
+    meldungHinzufuegen(angelegt.id, erste);
+    const folge = { ...structuredClone(erste), stand: erste.stand + 5 };
+    folge.personal = [...folge.personal, ...Array.from({ length: 8 }, (_, i) => ({ ...neuePerson(), vorname: "N", nachname: `Neu${i}` }))];
+    meldungHinzufuegen(angelegt.id, folge);
+    const kopf = gespeichert(angelegt.id, "Wardenburg");
+    const { neuLaden } = ansicht(angelegt.id, { eingang: { schluessel: kopf.einheitSchluessel, nonce: 7 } });
+    const quittung = document.querySelector<HTMLElement>(".eingang-quittung")!;
+    expect(quittung.textContent).toMatch(/Folgemeldung/);
+
+    await nutzer.click(within(quittung).getByRole("button", { name: "Rückgängig" }));
+    neuLaden();
+
+    expect(einsaetzeLaden().find((s) => s.id === angelegt.id)!.eintraege).toHaveLength(1);
+    expect(document.querySelector(".eingang-quittung")).toBeNull();
+    expect(document.querySelector(".quittung-daumen")!.textContent).toMatch(/^Folgemeldung zurückgenommen: „.*Wardenburg" gilt wieder mit Stärke 3\./);
+  });
+
+  it("übernimmt eine plausible Änderung ohne Rückfrage — mit Rückweg", async () => {
+    const nutzer = userEvent.setup();
+    const { einsatzId, neuLaden } = einsatzMitDreiPersonen();
+    const dialog = await dialogOeffnen(nutzer);
+    await eintragen(nutzer, dialog, "Mannschaft", "2");
+    await nutzer.click(within(dialog).getByRole("button", { name: "Stärke übernehmen" }));
+    neuLaden();
+
+    expect(document.querySelector("dialog[aria-label='Stimmt die Stärke?']")).toBeNull();
+    expect(einsaetzeLaden().find((s) => s.id === einsatzId)!.eintraege).toHaveLength(2);
+    expect(document.querySelector(".quittung-daumen")!.textContent).toMatch(/3 → 2/);
+  });
+});
+
+/**
  * Zusammenführen nahm Teile still aus der Lage — ohne Quittung, ohne
  * „Rückgängig“ (Audit Runde 4, R4-D5).
  */

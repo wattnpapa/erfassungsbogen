@@ -34,6 +34,7 @@ import {
   vokabText,
   vokabularFuer,
   zeitpunktDeutsch,
+  staerkePlausibilitaet,
 } from "./hilfen";
 import { bogenDiff, diffKurzfassung, type WertAenderung } from "@bos/meldekopf/meldung-diff";
 import {
@@ -878,6 +879,8 @@ export function EinsatzDetail(props: {
   const [aufgeteilt, setAufgeteilt] = useState<Aufgeteilt | null>(null);
   // Zuletzt zusammengeführt — Quittung mit Rückweg (R4-D5).
   const [zusammengefuehrt, setZusammengefuehrt] = useState<Zusammengefuehrt | null>(null);
+  // Zuletzt „Stärke ändern…" — Quittung mit Rückweg (R4-E4).
+  const [staerkeGeaendert, setStaerkeGeaendert] = useState<StaerkeGeaendert | null>(null);
   // Quittung eines Rückwegs: Das Zurücknehmen geschah bisher wortlos — wer
   // nach 700 ms ein zweites Mal tippte und dabei „Rückgängig" traf, sah nur,
   // dass die Leiste verschwand (Audit Runde 3, R3-G2).
@@ -894,6 +897,35 @@ export function EinsatzDetail(props: {
     if (!ok) return;
     zurueckQuittieren(`Aufteilen zurückgenommen: „${aufgeteilt.teil}" ist wieder Teil von „${aufgeteilt.name}".`);
     setAufgeteilt(null);
+    onGeaendert();
+  }
+
+  /** Stärke zurücknehmen: die neue Fassung heraus, die davor gilt wieder. */
+  async function staerkeZurueckNehmen() {
+    if (!staerkeGeaendert) return;
+    const { eintragId, name, vorher } = staerkeGeaendert;
+    const ok = await gesichert("Rückgängig", () => {
+      meldungEntfernen(einsatz.id, eintragId);
+      entfernteMerken(einsatz.id, [eintragId]); // kommt beim Import nicht still zurück (R2-D4)
+    });
+    if (!ok) return;
+    zurueckQuittieren(`Stärke zurückgenommen: „${name}" gilt wieder mit ${vorher}.`);
+    setStaerkeGeaendert(null);
+    onGeaendert();
+  }
+
+  /** Eine Folgemeldung zurücknehmen (Quittung „Zuletzt eingelesen"): die Fassung heraus, die davor gilt wieder. */
+  async function folgemeldungZurueckNehmen() {
+    if (!eingegangen || !eingang) return;
+    const name = einheitAnzeigename(eingegangen.bogen.einheit);
+    const davor = fassungenJeEinheit(einsatz.eintraege, eingegangen.einheitSchluessel).find((x) => x.id !== eingegangen.id);
+    const ok = await gesichert("Rückgängig", () => {
+      meldungEntfernen(einsatz.id, eingegangen.id);
+      entfernteMerken(einsatz.id, [eingegangen.id]);
+    });
+    if (!ok) return;
+    setEingangWeg(eingang.nonce);
+    zurueckQuittieren(`Folgemeldung zurückgenommen: „${name}" gilt wieder mit Stärke ${davor ? staerke(davor.bogen).gesamt : "?"}.`);
     onGeaendert();
   }
 
@@ -990,6 +1022,8 @@ export function EinsatzDetail(props: {
   }, [eingang, eingegangen]);
   // War es eine Folgemeldung, sagt die Quittung, was sich geändert hat (R3-K1).
   const eingangFolge = eingegangen ? folgeAenderung(eingegangen, einsatz.eintraege) : null;
+  // „Rückgängig" an der Folgemeldung hat die Quittung verbraucht (R4-E4).
+  const [eingangWeg, setEingangWeg] = useState<number | null>(null);
   /**
    * Beim Öffnen und nach jeder Aufnahme beginnt die Ansicht oben, bei Summe
    * und Aufnahme-Knopf. Vorher öffnete sie mitten auf der Seite (mit der
@@ -1198,7 +1232,7 @@ export function EinsatzDetail(props: {
           Seite zur neuen Karte zu rollen (R2-S3). Unter den Knöpfen, damit
           sie den Knopf für die nächste Einheit nicht unter den Bildrand
           schiebt. */}
-      {eingegangen && (
+      {eingegangen && eingang?.nonce !== eingangWeg && (
         <p className="meldung eingang-quittung" role="status" ref={eingangQuittung}>
           Zuletzt eingelesen: „{einheitAnzeigename(eingegangen.bogen.einheit)}"
           {eingegangen.teilEtikett ? ` (${eingegangen.teilEtikett})` : ""}
@@ -1206,6 +1240,15 @@ export function EinsatzDetail(props: {
           {" · "}jetzt {sum.einheiten}{" "}
           {sum.einheiten === 1 ? "Einheit" : "Einheiten"}, Gesamt {sum.staerke.gesamt}.{" "}
           <button type="button" className="link" onClick={eingangZeigen}>In der Liste zeigen</button>
+          {/* Eine falsch aufgenommene Folgemeldung (Zahlendreher, falsche
+              Einheit) mit einem Tipp zurücknehmen statt über „Historie →
+              Fassung verwerfen…" (Audit Runde 4, R4-E4). */}
+          {eingangFolge && (
+            <>
+              {" "}
+              <button type="button" className="link" onClick={() => void folgemeldungZurueckNehmen()}>Rückgängig</button>
+            </>
+          )}
         </p>
       )}
 
@@ -1598,10 +1641,11 @@ export function EinsatzDetail(props: {
                 qualifikation={quali}
                 qualifikationKurz={qualiKurz}
                 eingang={eingang}
-                onEntfernt={(x) => { setAufgeteilt(null); setZusammengefuehrt(null); setZurueckQuittung(null); setZuletztEntfernt({ ...x, nummer: nummern.get(e.einheitSchluessel) }); }}
-                onStatusWechsel={(w) => { setAufgeteilt(null); setZusammengefuehrt(null); setZurueckQuittung(null); setStatusWechsel(w); }}
-                onAufgeteilt={(a) => { setZuletztEntfernt(null); setStatusWechsel(null); setZusammengefuehrt(null); setZurueckQuittung(null); setAufgeteilt(a); }}
-                onZusammengefuehrt={(z) => { setZuletztEntfernt(null); setStatusWechsel(null); setAufgeteilt(null); setZurueckQuittung(null); setZusammengefuehrt(z); }}
+                onEntfernt={(x) => { setAufgeteilt(null); setZusammengefuehrt(null); setStaerkeGeaendert(null); setZurueckQuittung(null); setZuletztEntfernt({ ...x, nummer: nummern.get(e.einheitSchluessel) }); }}
+                onStatusWechsel={(w) => { setAufgeteilt(null); setZusammengefuehrt(null); setStaerkeGeaendert(null); setZurueckQuittung(null); setStatusWechsel(w); }}
+                onAufgeteilt={(a) => { setZuletztEntfernt(null); setStatusWechsel(null); setZusammengefuehrt(null); setStaerkeGeaendert(null); setZurueckQuittung(null); setAufgeteilt(a); }}
+                onStaerkeGeaendert={(x) => { setZuletztEntfernt(null); setStatusWechsel(null); setAufgeteilt(null); setZusammengefuehrt(null); setZurueckQuittung(null); setStaerkeGeaendert(x); }}
+                onZusammengefuehrt={(z) => { setZuletztEntfernt(null); setStatusWechsel(null); setAufgeteilt(null); setStaerkeGeaendert(null); setZurueckQuittung(null); setZusammengefuehrt(z); }}
                 kompakt={kompakt}
                 nummer={nummern.get(e.einheitSchluessel)}
                 ungesehen={ungeseheneIds.has(e.id)}
@@ -1807,6 +1851,15 @@ export function EinsatzDetail(props: {
           „{aufgeteilt.teil}" von „{aufgeteilt.name}" abgeteilt. Später zurück über „Mehr…" › „Zusammenführen…".
         </DaumenQuittung>
       )}
+      {staerkeGeaendert && (
+        <DaumenQuittung
+          key={`staerke:${staerkeGeaendert.eintragId}`}
+          onRueckgaengig={() => void staerkeZurueckNehmen()}
+          onSchliessen={() => setStaerkeGeaendert(null)}
+        >
+          <strong>Stärke geändert:</strong> „{staerkeGeaendert.name}" {staerkeGeaendert.vorher} → {staerkeGeaendert.nachher}
+        </DaumenQuittung>
+      )}
       {zusammengefuehrt && (
         <DaumenQuittung
           key={`zusammengefuehrt:${zusammengefuehrt.vorher.zielId}`}
@@ -1834,7 +1887,7 @@ export function EinsatzDetail(props: {
           {nummerText(statusWechsel.vorher.einheitSchluessel)}„{einheitAnzeigename(statusWechsel.vorher.bogen.einheit)}"
         </DaumenQuittung>
       )}
-      {zurueckQuittung && !statusWechsel && !zuletztEntfernt && !aufgeteilt && !zusammengefuehrt && (
+      {zurueckQuittung && !statusWechsel && !zuletztEntfernt && !aufgeteilt && !zusammengefuehrt && !staerkeGeaendert && (
         <DaumenQuittung key={`zurueck:${zurueckQuittung.nonce}`} onSchliessen={() => setZurueckQuittung(null)}>
           {zurueckQuittung.text}
         </DaumenQuittung>
@@ -2267,6 +2320,15 @@ interface Aufgeteilt {
   neueIds: string[];
 }
 
+/** „Stärke ändern…" eben übernommen — Quittung mit Rückweg (R4-E4). */
+interface StaerkeGeaendert {
+  name: string;
+  vorher: number;
+  nachher: number;
+  /** Die neue Fassung — „Rückgängig" nimmt sie wieder heraus. */
+  eintragId: string;
+}
+
 /** Eben zusammengeführt — Quittung mit Rückweg und der Stärke vorher → nachher (R4-D5). */
 interface Zusammengefuehrt {
   name: string;
@@ -2352,6 +2414,8 @@ function EinheitKarte(props: {
   onStatusWechsel?: (w: StatusWechsel) => void;
   /** Schmaler Bildschirm: zugeklappt nur Name, Stärke und Bedarf (R2-K7). */
   kompakt?: boolean;
+  /** Stärke eben geändert — die Ansicht quittiert mit Rückweg (R4-E4). */
+  onStaerkeGeaendert?: (s: StaerkeGeaendert) => void;
   /** Eben zusammengeführt — die Ansicht quittiert mit Rückweg (R4-D5). */
   onZusammengefuehrt?: (z: Zusammengefuehrt) => void;
   /** Eben aufgeteilt — die Ansicht quittiert mit Rückweg (R2-D6). */
@@ -2645,30 +2709,87 @@ function EinheitKarte(props: {
    */
   async function staerkeAendern() {
     const alt = staerke(kopf.bogen);
-    const feld = (name: string, label: string, wert: number) => ({ name, label, vorgabe: String(wert) });
-    const w = await frageFelder({
-      titel: "Stärke ändern",
-      hinweis:
-        `„${einheitAnzeigename(kopf.bogen.einheit)}", bisher ${alt.fuehrer} / ${alt.unterfuehrer} / ${alt.mannschaft} / ${alt.gesamt}. ` +
-        "Fahrzeuge, Bedarf, Namen, Zug und Auftrag bleiben; die bisherige Meldung wandert in die Historie.",
-      felder: [feld("fuehrer", "Führer", alt.fuehrer), feld("unterfuehrer", "Unterführer", alt.unterfuehrer), feld("mannschaft", "Mannschaft", alt.mannschaft)],
-      ok: "Stärke übernehmen",
-    });
-    if (!w) return;
+    const feld = (name: string, label: string, wert: string) => ({ name, label, vorgabe: wert });
     const zahl = (t: string | undefined) => (/^\s*\d{1,3}\s*$/.test(t ?? "") ? Number(t) : null);
-    const f = zahl(w.fuehrer);
-    const u = zahl(w.unterfuehrer);
-    const m = zahl(w.mannschaft);
-    if (f == null || u == null || m == null) {
-      await zeigeHinweis({ titel: "Stärke ändern", text: "Bitte in jedes Feld eine ganze Zahl eintragen (0 bis 999). Nichts geändert." });
-      return;
+    let eingabe = { fuehrer: String(alt.fuehrer), unterfuehrer: String(alt.unterfuehrer), mannschaft: String(alt.mannschaft) };
+    let fehler: string | null = null;
+    let f = 0;
+    let u = 0;
+    let m = 0;
+    // Dialog, bis die Zahlen lesbar und plausibel sind: Ein Tippfehler nahm
+    // vorher alle Eingaben mit und nannte das Feld nicht, ein Zahlendreher
+    // ging ohne Warnung durch (Audit Runde 4, R4-E4).
+    for (;;) {
+      const w = await frageFelder({
+        titel: "Stärke ändern",
+        hinweis: (
+          <>
+            {fehler && <p className="fehler" role="alert">{fehler}</p>}
+            <p>
+              „{einheitAnzeigename(kopf.bogen.einheit)}", bisher {alt.fuehrer} / {alt.unterfuehrer} / {alt.mannschaft} / {alt.gesamt}.
+              Fahrzeuge, Bedarf, Namen, Zug und Auftrag bleiben; die bisherige Meldung wandert in die Historie.
+            </p>
+          </>
+        ),
+        felder: [
+          feld("fuehrer", "Führer", eingabe.fuehrer),
+          feld("unterfuehrer", "Unterführer", eingabe.unterfuehrer),
+          feld("mannschaft", "Mannschaft", eingabe.mannschaft),
+        ],
+        ok: "Stärke übernehmen",
+      });
+      if (!w) return;
+      eingabe = { fuehrer: w.fuehrer ?? "", unterfuehrer: w.unterfuehrer ?? "", mannschaft: w.mannschaft ?? "" };
+      const nichtLesbar = (
+        [["Führer", eingabe.fuehrer], ["Unterführer", eingabe.unterfuehrer], ["Mannschaft", eingabe.mannschaft]] as const
+      )
+        .filter(([, t]) => zahl(t) == null)
+        .map(([name, t]) => `${name} („${t.trim() || "leer"}")`);
+      if (nichtLesbar.length > 0) {
+        fehler = `Bitte in jedes Feld eine ganze Zahl von 0 bis 999 eintragen — nicht lesbar: ${nichtLesbar.join(", ")}.`;
+        continue;
+      }
+      f = zahl(eingabe.fuehrer)!;
+      u = zahl(eingabe.unterfuehrer)!;
+      m = zahl(eingabe.mannschaft)!;
+      if (f === alt.fuehrer && u === alt.unterfuehrer && m === alt.mannschaft) return;
+      // Dieselbe Warnung wie im Assistenten, dazu die neue Summe neben der alten.
+      const gesamt = f + u + m;
+      const warnungen = staerkePlausibilitaet({ fuehrer: f, unterfuehrer: u, mannschaft: m, gesamt });
+      if (gesamt >= 20 && gesamt >= 3 * Math.max(1, alt.gesamt)) {
+        warnungen.push(`Gesamt ${alt.gesamt} → ${gesamt}: mehr als das Dreifache der bisherigen Stärke — stimmt das?`);
+      }
+      if (warnungen.length === 0) break;
+      const ja = await frageJaNein({
+        titel: "Stimmt die Stärke?",
+        text: (
+          <>
+            <p>Stärke {alt.fuehrer} / {alt.unterfuehrer} / {alt.mannschaft} / {alt.gesamt} → {f} / {u} / {m} / {gesamt}</p>
+            <ul>{warnungen.map((x: string) => <li key={x}>{x}</li>)}</ul>
+          </>
+        ),
+        ok: "Ja, so übernehmen",
+        abbruch: "Zahlen korrigieren",
+      });
+      if (ja) break;
+      fehler = null;
     }
-    if (f === alt.fuehrer && u === alt.unterfuehrer && m === alt.mannschaft) return;
     const neu = nurStaerkeUebernehmen(kopf.bogen, { fuehrer: f, unterfuehrer: u, mannschaft: m, gesamt: f + u + m }, jetztZeitpunkt());
+    const neueFassung: { fassung: MeldeEintrag | null } = { fassung: null };
     const ok = await gesichert("Stärke ändern", () => {
-      meldungAufnehmen(einsatzId, neu, { quelle: "manuell", einheitSchluesselOverride: kopf.einheitSchluessel });
+      const r = meldungAufnehmen(einsatzId, neu, { quelle: "manuell", einheitSchluesselOverride: kopf.einheitSchluessel });
+      if (r?.neu) neueFassung.fassung = r.eintrag;
     });
-    if (ok) onGeaendert();
+    if (!ok) return;
+    if (neueFassung.fassung) {
+      props.onStaerkeGeaendert?.({
+        name: einheitAnzeigename(kopf.bogen.einheit),
+        vorher: alt.gesamt,
+        nachher: f + u + m,
+        eintragId: neueFassung.fassung.id,
+      });
+    }
+    onGeaendert();
   }
 
   async function verschieben() {
