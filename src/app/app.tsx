@@ -134,6 +134,7 @@ import { einheitSymbolSvg, svgDataUrl } from "./taktische-zeichen-bogen";
 import { Fusszeile } from "./fusszeile";
 import { Aktualisierungshinweise } from "./aktualisierung";
 import { SpeicherWarnung } from "./speicher-warnung";
+import { UhrWarnung } from "./uhr-warnung";
 import { Dialogschicht, frageFelder, frageJaNein, frageWahl, zeigeHinweis, type Antwortweg } from "./dialoge";
 import { istNurStaerke, nurStaerkeUebernehmen, wasWegfiele } from "./nur-staerke";
 import {
@@ -3341,6 +3342,7 @@ function AppInhalt() {
       <>
         <Aktualisierungshinweise />
         <SpeicherWarnung stand={einsaetze} />
+        <UhrWarnung />
         <EinsatzDetail
           einsatz={offenerEinsatz}
           onZurueck={() => { setOffenerEinsatzId(null); setZeigeStart(true); setMeldung(""); setEingang(null); setZusammenlegung(null); setEinlese(null); setStapelBericht([]); }}
@@ -3462,6 +3464,7 @@ function AppInhalt() {
             „Fortsetzen" im Feld-Modus unter den Bildrand (Audit Runde 3, R3-H5). */}
         {!bogen && offlineHinweis}
         <SpeicherWarnung stand={einsaetze} />
+        <UhrWarnung />
         {/* „Weiter, wo du warst": der Entwurf als Karte mit taktischem Zeichen,
             Kennfarbe der Organisation und Stärke — der häufigste Weg zurück in
             die Arbeit ist damit ein einziger Tipp. */}

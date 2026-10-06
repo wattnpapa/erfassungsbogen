@@ -16,6 +16,7 @@ import type { Erfassungsbogen } from "@bos/eeb-format/model";
 import { datumAusIso, jetztZeitpunkt, mitTransportVersion, staerke } from "@bos/eeb-format/model";
 import { bogenPruefen, dateinameTeil, einheitAnzeigename, migriereBogen } from "./hilfen";
 import { aktive, imPapierkorb, papierkorbBereinigt } from "@bos/meldekopf/papierkorb";
+import { geprueftesJetztMs } from "./datenschutz-uhr";
 
 /** Versionierter Schlüssel — erlaubt spätere Formatwechsel der Sammlung selbst. */
 const SPEICHER_SCHLUESSEL = "eeb.vorlagen.v1";
@@ -197,7 +198,8 @@ function speicher(): Storage | null {
 function alleVorlagenLaden(): Vorlage[] {
   const s = speicher();
   if (!s) return [];
-  const r = papierkorbBereinigt(vorlagenAusJson(s.getItem(SPEICHER_SCHLUESSEL)));
+  // Die geprüfte Uhr, nicht die Geräteuhr (R4-D1).
+  const r = papierkorbBereinigt(vorlagenAusJson(s.getItem(SPEICHER_SCHLUESSEL)), geprueftesJetztMs());
   if (r.entfernt > 0) vorlagenSpeichern(r.liste);
   return r.liste;
 }
@@ -295,7 +297,7 @@ export function vorlageUmbenennen(id: string, name: string): void {
 /** In den Papierkorb verschieben (30 Tage wiederherstellbar). */
 export function vorlageLoeschen(id: string): void {
   vorlagenSpeichern(
-    alleVorlagenLaden().map((v) => (v.id === id ? { ...v, geloeschtAm: Date.now() } : v)),
+    alleVorlagenLaden().map((v) => (v.id === id ? { ...v, geloeschtAm: geprueftesJetztMs() } : v)),
   );
 }
 

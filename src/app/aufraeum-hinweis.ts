@@ -20,6 +20,7 @@ import {
   einsaetzeAusJson,
   type Speicherhuelle,
 } from "@bos/meldekopf/einsaetze";
+import { geprueftesJetztMs } from "./datenschutz-uhr";
 import { geltendeJeEinheit } from "./fassung-vorrang";
 
 /** Speicherschlüssel der Sammlungen im Kern (einsaetze.ts, nicht exportiert). */
@@ -105,7 +106,11 @@ export function ruhendeVormerken(
  * vormerkt. Derselbe Text wird nur einmal geprüft — der Kern liest bei jedem
  * Zugriff, und eine große Sammlung jedes Mal zu parsen wäre unnötig.
  */
-export function aufraeumBeobachter(innen: Speicherhuelle & Partial<Pick<Storage, "removeItem">>): Speicherhuelle {
+export function aufraeumBeobachter(
+  innen: Speicherhuelle & Partial<Pick<Storage, "removeItem">>,
+  /** Die Uhr, nach der die Frist gilt — die geprüfte, nicht die Geräteuhr (R4-D1). */
+  jetzt: () => number = geprueftesJetztMs,
+): Speicherhuelle {
   let zuletzt: string | null = null;
   return {
     getItem(schluessel: string) {
@@ -113,7 +118,7 @@ export function aufraeumBeobachter(innen: Speicherhuelle & Partial<Pick<Storage,
       if (schluessel === SAMMLUNGEN_SCHLUESSEL && text !== zuletzt) {
         zuletzt = text;
         try {
-          ruhendeVormerken(text, innen);
+          ruhendeVormerken(text, innen, jetzt());
         } catch {
           // Nie das Laden der Sammlungen blockieren.
         }

@@ -14,6 +14,7 @@ import { istNativ } from "./nativ";
 import { wertvolleDaten } from "./sicherung";
 import { aufraeumBeobachter } from "./aufraeum-hinweis";
 import { schonendeHuelle } from "./speicher-schonend";
+import { uhrKorrigierteHuelle } from "./uhr-korrektur";
 
 /** `localStorage`, sofern erreichbar — im Privatmodus oder bei blockiertem
  *  Speicher wirft schon der Zugriff auf die Eigenschaft. */
@@ -31,9 +32,11 @@ export function speicherVerdrahten(): void {
   // Tagen still löscht — die Startseite nennt sie danach (Audit Runde 2, R2-D5).
   // Außen die schonende Hülle: Gleiches wird nicht neu geschrieben, und ein
   // scheiterndes Zurückschreiben beim bloßen Lesen lässt die Anzeige stehen
-  // (Audit Runde 3, R3-O2).
+  // (Audit Runde 3, R3-O2). Dazwischen die Uhrkorrektur: Geht die Geräteuhr
+  // unplausibel vor, sieht der Kern die geprüfte Uhr und löscht nichts
+  // (Audit Runde 4, R4-D1, uhr-korrektur.ts).
   const h = browserSpeicherhuelle();
-  speicherhuelleSetzen(h && schonendeHuelle(aufraeumBeobachter(h), einsaetzeZuJson([])));
+  speicherhuelleSetzen(h && schonendeHuelle(uhrKorrigierteHuelle(aufraeumBeobachter(h)), einsaetzeZuJson([])));
   datenschutzUhrSetzen(() => datenschutzZeitpunkt());
 }
 
