@@ -2374,7 +2374,42 @@
     /* Die Aufnahme-Knöpfe sitzen in der Einsatzansicht direkt unter der
        Stärkeleiste (R2-S3): oben genügt deren Abstand, unten brauchen sie
        den Abstand einer Karte, sonst stößt die Bedarfskarte an die Reihe. */
-    .einsatz-detail > .aktionen { margin-top: 0; margin-bottom: var(--r-4); }
+    .einsatz-detail .einsatz-seite > .aktionen { margin-top: 0; margin-bottom: var(--r-4); }
+    /* R4-K5: Am Laptop standen Summen und Liste untereinander in einer Spalte
+       von 930 px, die Liste unter drei Bildschirmen. Ab 72rem links Kopfzahlen,
+       Aufnahme, Bedarf und Zwischensummen, rechts die Liste — „wer ist da"
+       und „wie viel brauchen sie" nebeneinander im Bild. Weitergabe, Export
+       und Verwalten liegen unter beiden. Auf dem Telefon bleibt es eine
+       Spalte: Der Rahmen löst sich mit display: contents auf. */
+    .einsatz-detail .einsatz-seite { display: contents; }
+    @media (min-width: 72rem) {
+      /* Kopf, Navigation und Satzspiegel der Seite rücken mit, sonst läge die
+         linke Kante der Spalten neben der des Titels. */
+      html:has(main.einsatz-detail) .seiten-kopf .kopf-inhalt,
+      html:has(main.einsatz-detail) .kopfnav-inner { max-width: 84rem; }
+      main.einsatz-detail {
+        max-width: 84rem; display: grid;
+        grid-template-columns: minmax(20rem, 27rem) minmax(0, 1fr);
+        column-gap: var(--r-5); align-items: start;
+      }
+      main.einsatz-detail > * { grid-column: 1 / -1; }
+      main.einsatz-detail > .einsatz-seite { display: block; grid-column: 1; grid-row: 2; }
+      main.einsatz-detail > .einsatz-liste { grid-column: 2; grid-row: 2; margin-top: 0; }
+      main.einsatz-detail > .ausgabe-block { grid-row: 3; }
+      main.einsatz-detail > .einsatz-verwalten { grid-row: 4; }
+      main.einsatz-detail > .anzeige-schwebe { grid-column: auto; grid-row: auto; }
+      /* Die Aufnahme-Knöpfe füllen die schmale Spalte, statt ungleich lang darin zu stehen. */
+      main.einsatz-detail .einsatz-seite > .aktionen { display: flex; flex-direction: column; align-items: stretch; }
+      main.einsatz-detail .einsatz-seite > .aktionen > * { width: 100%; }
+    }
+    /* R4-K5: Suche, Sortierung und Filter am Telefon hinter einer Zeile, solange
+       die Liste kurz ist: Sie standen 320 px hoch vor der ersten Karte. Die
+       Zeile hat Tippgröße wie die übrigen Aufklapper. */
+    details.einheiten-filter-wahl > summary {
+      cursor: pointer; display: flex; align-items: center;
+      min-height: calc(var(--ziel-basis) + var(--ziel)); font-size: var(--t-s); font-weight: 600; color: var(--text-2);
+    }
+    details.einheiten-filter-wahl[open] > summary { margin-bottom: var(--r-2); }
     /* Zug- und Teil-Kennzeichnung an einer gemeldeten Einheit. Ruhiger als der
        Übungs-Störer daneben: sie ordnen ein, sie warnen nicht. Das Teil-Etikett
        trägt den Akzent, weil es nach einer Aufteilung das einzige ist, was zwei

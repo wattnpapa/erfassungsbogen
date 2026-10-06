@@ -32,7 +32,7 @@ import {
   meldungHinzufuegen,
   type MeldeEintrag,
 } from "@bos/meldekopf/einsaetze";
-import { eintreffzeitSetzen, meldungAufnehmen, notizSetzen, vomPapierMarkieren, zeitLang } from "./eintrag-zeiten";
+import { eintreffzeitSetzen, meldungAufnehmen, notizSetzen, vomPapierMarkieren, zeitLang, zugSetzen } from "./eintrag-zeiten";
 import { aggregiere } from "./auswertung";
 import { neuerBogen, neuePerson } from "./hilfen";
 import { EXPORT_ZIELE, lageblattVermerken, weitergabeVermerken, type ExportStand, type ExportUmfang, type ExportZiel } from "./export-stand";
@@ -1218,6 +1218,49 @@ describe("Kompakte Einheiten auf dem Telefon (R2-K7)", () => {
   afterEach(() => {
     if (vorher) window.matchMedia = vorher;
     else delete (window as { matchMedia?: unknown }).matchMedia;
+  });
+
+  // Audit Runde 4, R4-K5: Die erste Karte lag am Telefon vier Bildschirme tief.
+  it("Telefon, kurze Liste: Suche und Filter hinter einer Zeile, Zwischensummen zu, Karte bleibt Einzelspalte (R4-K5)", async () => {
+    const nutzer = userEvent.setup();
+    const angelegt = einsatzAnlegen("Hochwasser Test", EinsatzArt.EINSATZ);
+    for (const n of ["Aalen", "Biberach"]) meldungHinzufuegen(angelegt.id, bogenMitName(n));
+    ansicht(angelegt.id);
+    const wahl = document.querySelector<HTMLDetailsElement>("details.einheiten-filter-wahl")!;
+    expect(wahl).not.toBeNull();
+    expect(wahl.open).toBe(false);
+    expect(wahl.querySelector("summary")!.textContent).toBe("Suchen, sortieren, filtern");
+    // Der Rahmen für die zweispaltige Ansicht ist da; die Liste liegt daneben, nicht darin.
+    const seite = document.querySelector(".einsatz-seite")!;
+    expect(seite.querySelector(".staerke-leiste")).not.toBeNull();
+    expect(seite.querySelector(".einsatz-liste")).toBeNull();
+    expect(document.querySelector("main.einsatz-detail > .einsatz-liste")).not.toBeNull();
+    // Aufklappen zeigt die Felder und merkt sich das.
+    await nutzer.click(within(wahl).getByText("Suchen, sortieren, filtern"));
+    expect(wahl.open).toBe(true);
+    await nutzer.type(within(wahl).getByLabelText("Suche"), "Aalen");
+    expect(wahl.querySelector("summary")!.textContent).toBe("Suchen, sortieren, filtern · Filter aktiv");
+    expect(wahl.open).toBe(true);
+  });
+
+  it("Telefon: Zwischensummen bei zwei Zügen zugeklappt (R4-K5)", () => {
+    const angelegt = einsatzAnlegen("Hochwasser Test", EinsatzArt.EINSATZ);
+    const a = meldungHinzufuegen(angelegt.id, bogenMitName("Aalen"))!.eintrag;
+    const b = meldungHinzufuegen(angelegt.id, bogenMitName("Biberach"))!.eintrag;
+    zugSetzen(angelegt.id, a.einheitSchluessel, a.id, "1. Zug");
+    zugSetzen(angelegt.id, b.einheitSchluessel, b.id, "2. Zug");
+    ansicht(angelegt.id);
+    const summen = document.querySelector<HTMLDetailsElement>("details.zug-summen")!;
+    expect(summen).not.toBeNull();
+    expect(summen.open).toBe(false);
+  });
+
+  it("Telefon, lange Liste: die Suchleiste steht offen (R4-K5)", () => {
+    const angelegt = einsatzAnlegen("Grosslage", EinsatzArt.EINSATZ);
+    for (let i = 0; i < 10; i++) meldungHinzufuegen(angelegt.id, bogenMitName(`Ortsverband ${i + 1}`));
+    ansicht(angelegt.id);
+    expect(document.querySelector("details.einheiten-filter-wahl")).toBeNull();
+    expect(document.querySelector(".einheiten-filter")).not.toBeNull();
   });
 
   it("zeigt zugeklappt nur Name, Stärke und Bedarf und klappt auf Tipp auf", async () => {

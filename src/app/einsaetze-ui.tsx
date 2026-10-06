@@ -157,6 +157,9 @@ export const ART_LABEL: Record<EinsatzArt, string> = {
   [EinsatzArt.VERANSTALTUNG]: "Veranstaltung",
 };
 
+/** Ab so vielen Einheiten steht die Suchleiste am Telefon offen (R4-K5). */
+const FILTER_OFFEN_AB = 10;
+
 /**
  * Herkunft der Meldung an der Karte, in Worten, die ohne Einweisung tragen:
  * „Empfangen“ allein sagte nicht, von wem und wie (Audit Runde 4, R4-N4). Die
@@ -857,11 +860,15 @@ export function EinsatzDetail(props: {
   // "ruhezeit"/"unterbringung" kommen aus den Kopfzahlen („Ruhezeit: 5×").
   const [bedarfsFilter, setBedarfsFilter] = useState<BedarfsFilter | null>(null);
   const nurBedarf = bedarfsFilter != null;
+  // Suche, Sortierung und Filter am Telefon hinter einer Zeile, solange die Liste kurz ist (R4-K5).
+  const [filterOffen, setFilterOffen] = useState(false);
   const bedarfsFilterText =
     bedarfsFilter === "ruhezeit" ? "„nur mit Ruhezeit“" : bedarfsFilter === "unterbringung" ? "„nur mit Unterbringung“" : "„nur dringender Bedarf“";
   const aufBedarfFiltern = (f: BedarfsFilter) => {
     setBedarfsFilter(f);
-    document.querySelector(".einheiten-filter")?.scrollIntoView?.({ block: "start" });
+    setFilterOffen(true);
+    // Nach dem Rendern: Hinter der geschlossenen Zeile gibt es noch nichts zum Anspringen.
+    setTimeout(() => document.querySelector(".einheiten-filter")?.scrollIntoView?.({ block: "start" }), 0);
   };
   // Letzter Statuswechsel von Hand — solange er hier steht, gibt es den Rückweg.
   const [statusWechsel, setStatusWechsel] = useState<StatusWechsel | null>(null);
@@ -993,6 +1000,8 @@ export function EinsatzDetail(props: {
   // Gesamtzahl; `kopf` ist davon nur der gerade angezeigte Ausschnitt. Suche,
   // Filter und Sortierung ändern die Summen oben bewusst nicht.
   const alleEinheiten = geltendeJeEinheit(einsatz.eintraege);
+  /** Eine kurze Liste braucht am Telefon keine offene Suchleiste: sie stand 320 px hoch vor der ersten Karte (R4-K5). */
+  const filterEingeklappt = kompakt && alleEinheiten.length < FILTER_OFFEN_AB;
   const letzte = letzteMeldung(einsatz.eintraege);
   // Laufende Nummer je Meldung — dieselbe wie auf dem Lageblatt (R2-A6).
   const nummern = meldungsNummern(einsatz.eintraege);
@@ -1129,6 +1138,8 @@ export function EinsatzDetail(props: {
   const kopfOhneBedarfsfilter = einheitenAnsicht(alleEinheiten, suche, sortierung, quali);
   const kopf = bedarfsFilter ? kopfOhneBedarfsfilter.filter((e) => passtZuBedarfsfilter(e, bedarfsFilter)) : kopfOhneBedarfsfilter;
   const gefiltert = kopf.length !== alleEinheiten.length;
+  /** Irgendeine Einschränkung wirkt: dann bleibt die Suchleiste auch am Telefon offen (R4-K5). */
+  const filterAktiv = suche.trim() !== "" || quali !== "" || nurBedarf;
   // Meldeköpfe melden oft nur die Stärke — dort steht keine Person und damit
   // keine Qualifikation. Ohne diesen Hinweis sähe der Filter wie ein Fehler aus.
   const ohnePersonen = alleEinheiten.filter(
@@ -1161,6 +1172,74 @@ export function EinsatzDetail(props: {
     zuletztGeloeschterEinsatz = { id: einsatz.id, name: einsatz.name };
     onGeloescht();
   }
+
+  const filterZeile = (
+    <div className="zeile einheiten-filter">
+      <label className="feld">
+        Suche
+        <input
+          type="search"
+          value={suche}
+          placeholder="Einheit, Organisation, Ort, Zug, Kennzeichen, Auftrag…"
+          onChange={(e) => setSuche(e.target.value)}
+        />
+      </label>
+      <label className="feld sortierung">
+        Sortierung
+        <Auswahl
+          beschriftung="Sortierung"
+          value={sortierung}
+          onChange={(e) => setSortierung(e.target.value as EinheitenSortierung)}
+        >
+          {SORTIERUNGEN.map((s) => (
+            <option key={s.wert} value={s.wert}>{s.label}</option>
+          ))}
+        </Auswahl>
+      </label>
+      {/* Erst anbieten, wenn überhaupt Qualifikationen gemeldet sind —
+          bei reinen Stärkemeldungen wäre die Liste leer. */}
+      {qualiListe.length > 0 && (
+        <label className="feld sortierung">
+          Qualifikation
+          <Auswahl
+            beschriftung="Qualifikation"
+            value={quali}
+            onChange={(e) => setQuali(e.target.value)}
+          >
+            <option value="">alle</option>
+            {qualiFunktionen.length > 0 && (
+              <optgroup label="Funktionen">
+                {qualiFunktionen.map((q) => (
+                  <option key={q.schluessel} value={q.schluessel}>
+                    {q.label} ({q.personen})
+                  </option>
+                ))}
+              </optgroup>
+            )}
+            {qualiFahrerlaubnis.length > 0 && (
+              <optgroup label="Fahrerlaubnis">
+                {qualiFahrerlaubnis.map((q) => (
+                  <option key={q.schluessel} value={q.schluessel}>
+                    {q.label} ({q.personen})
+                  </option>
+                ))}
+              </optgroup>
+            )}
+          </Auswahl>
+        </label>
+      )}
+      {/* „Wer braucht etwas?" — der Bedarf stand nur als Summe im Kopf,
+          die Zuordnung führte die Führungskraft nebenbei auf Papier (K1). */}
+      <label className="inline bedarf-filter" title="Ruhezeit, Unterbringung, abweichende Verpflegung — Kraftstoff allein zählt nicht.">
+        <input
+          type="checkbox"
+          checked={nurBedarf}
+          onChange={(e) => setBedarfsFilter(e.target.checked ? "dringend" : null)}
+        />
+        {" "}nur dringender Bedarf (ohne Kraftstoff)
+      </label>
+    </div>
+  );
 
   return (
     <>
@@ -1205,6 +1284,10 @@ export function EinsatzDetail(props: {
     </SeitenKopf>
     <main id="inhalt" tabIndex={-1} className="einsatz-detail">
       <AufraeumWarnung sammlung={einsatz} />
+      {/* Kopfzahlen, Aufnahme, Bedarf und Summen bilden am Laptop die linke
+          Spalte neben der Liste (R4-K5); auf dem Telefon löst „display:
+          contents" den Rahmen auf, es bleibt eine Spalte. */}
+      <div className="einsatz-seite">
       <section className="karte staerke-leiste">
         <div><Zaehlwert wert={sum.einheiten} /><span>Einheiten</span></div>
         <div><Zaehlwert wert={sum.staerke.fuehrer} /><span>Führer</span></div>
@@ -1433,7 +1516,7 @@ export function EinsatzDetail(props: {
           in die Einheitenliste unter den Falz (K6). Die Zusammenfassung nennt
           die Zahl, damit klar ist, was sich dahinter verbirgt. */}
       {zugGruppen.length > 1 && (
-        <details className="karte zug-summen" open={zugGruppen.length < 3}>
+        <details className="karte zug-summen" open={zugGruppen.length < 3 && !kompakt}>
           <summary><h2>Zwischensummen nach Zug ({zugGruppen.length} Züge)</h2></summary>
           {zugGruppen.map((g) => (
             <div className="zug-summe" key={g.zugEtikett ? `zug:${g.zugEtikett}` : "zug:ohne"}>
@@ -1483,8 +1566,9 @@ export function EinsatzDetail(props: {
           — unter der Liste der Einheiten.
         </p>
       )}
+      </div>
 
-      <section className="karte">
+      <section className="karte einsatz-liste">
         <div className="kopfzeile">
           {/* Zwei beschriftete Zahlen statt drei unbeschrifteter: „gemeldet"
               ist die Länge der Liste, „zählend" die Zahl der Stärkeleiste —
@@ -1524,71 +1608,18 @@ export function EinsatzDetail(props: {
             bereit: eine erst später auftauchende Leiste liest sich am Gerät
             wie eine fehlende Funktion (Rückmeldung Anwender, August 2026). */}
         {alleEinheiten.length > 1 && (
-          <div className="zeile einheiten-filter">
-            <label className="feld">
-              Suche
-              <input
-                type="search"
-                value={suche}
-                placeholder="Einheit, Organisation, Ort, Zug, Kennzeichen, Auftrag…"
-                onChange={(e) => setSuche(e.target.value)}
-              />
-            </label>
-            <label className="feld sortierung">
-              Sortierung
-              <Auswahl
-                beschriftung="Sortierung"
-                value={sortierung}
-                onChange={(e) => setSortierung(e.target.value as EinheitenSortierung)}
-              >
-                {SORTIERUNGEN.map((s) => (
-                  <option key={s.wert} value={s.wert}>{s.label}</option>
-                ))}
-              </Auswahl>
-            </label>
-            {/* Erst anbieten, wenn überhaupt Qualifikationen gemeldet sind —
-                bei reinen Stärkemeldungen wäre die Liste leer. */}
-            {qualiListe.length > 0 && (
-              <label className="feld sortierung">
-                Qualifikation
-                <Auswahl
-                  beschriftung="Qualifikation"
-                  value={quali}
-                  onChange={(e) => setQuali(e.target.value)}
-                >
-                  <option value="">alle</option>
-                  {qualiFunktionen.length > 0 && (
-                    <optgroup label="Funktionen">
-                      {qualiFunktionen.map((q) => (
-                        <option key={q.schluessel} value={q.schluessel}>
-                          {q.label} ({q.personen})
-                        </option>
-                      ))}
-                    </optgroup>
-                  )}
-                  {qualiFahrerlaubnis.length > 0 && (
-                    <optgroup label="Fahrerlaubnis">
-                      {qualiFahrerlaubnis.map((q) => (
-                        <option key={q.schluessel} value={q.schluessel}>
-                          {q.label} ({q.personen})
-                        </option>
-                      ))}
-                    </optgroup>
-                  )}
-                </Auswahl>
-              </label>
-            )}
-            {/* „Wer braucht etwas?" — der Bedarf stand nur als Summe im Kopf,
-                die Zuordnung führte die Führungskraft nebenbei auf Papier (K1). */}
-            <label className="inline bedarf-filter" title="Ruhezeit, Unterbringung, abweichende Verpflegung — Kraftstoff allein zählt nicht.">
-              <input
-                type="checkbox"
-                checked={nurBedarf}
-                onChange={(e) => setBedarfsFilter(e.target.checked ? "dringend" : null)}
-              />
-              {" "}nur dringender Bedarf (ohne Kraftstoff)
-            </label>
-          </div>
+          filterEingeklappt ? (
+            <details
+              className="einheiten-filter-wahl"
+              open={filterOffen || filterAktiv}
+              onToggle={(e) => setFilterOffen(e.currentTarget.open)}
+            >
+              <summary>Suchen, sortieren, filtern{filterAktiv ? " · Filter aktiv" : ""}</summary>
+              {filterZeile}
+            </details>
+          ) : (
+            filterZeile
+          )
         )}
         {gewaehlteQuali && (
           <p className="hinweis" role="status">
