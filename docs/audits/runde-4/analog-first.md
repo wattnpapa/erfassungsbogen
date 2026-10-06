@@ -486,3 +486,16 @@ gemacht: Die Lage kommt jetzt in einem Abgleich zurück. Gerade dadurch
 fällt auf, dass die Nummern danach nicht mehr zum Papier passen (R4-A1).
 Keine Behebung hat sich ins Gegenteil verkehrt. Der Kasten „Stand am
 Meldekopf" erzeugt aber bei großen Lagen wieder Restseiten (R4-A7).
+
+## Stand der Behebung
+
+Stand 06.10.2026, Paket 2 „Meldungsfassungen, Exportstand, Führungssicht".
+Geprüft mit Typprüfung, Unit-Tests (2 494 grün), Verhaltenstests (137
+Szenarien grün) und Nachmessung im Dev-Server (360 × 640,
+`isMobile`/`hasTouch`, de-DE, Port 5180; Downloads gelesen, PDF mit
+`pdftotext`). Aufgeführt sind nur die Befunde dieses Pakets.
+
+| Befund | Stand | Umsetzung |
+| --- | --- | --- |
+| R4-A1 Nummern nach dem Wiederanlauf vom Papier | behoben, mit Grenze | Die Nummer steht im Kasten „Stand am Meldekopf“ über jedem Bogen (`Nr. 3 · Eingetroffen …`, gemessen). Der Papier-Abgleich fragt je Einheit „Nr. laut Blatt“ und speichert sie am Eintrag (`nummer`); eine gesetzte Nummer ist fest, die übrigen Einheiten rücken um sie herum, doppelte Nummern weist der Abgleich ab. Lässt jemand die Nr. leer, sagt die App nach dem Abgleich „Nummern neu vergeben … neues Lageblatt drucken und das alte abnehmen“. **Grenze:** Die QR-Codes tragen keine Nummer, die Nr. muss also von Hand aus dem Kasten übernommen werden; eine automatische Übernahme gibt es nicht. „Einsatz importieren…“ der Sammel-PDF behielt die Nummern schon vorher. |
+| R4-A2 Papier-Abgleich übernimmt die Notiz nicht | behoben | Je Einheit ein Feld „Auftrag / Notiz“ (vorbelegt mit einer vorhandenen Notiz); die Übernahme schreibt sie mit Vermerk wie an der Karte. Test: „Pumpe 2 defekt“ steht danach an der Einheit. |

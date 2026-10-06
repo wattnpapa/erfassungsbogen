@@ -499,3 +499,22 @@ Befunde). Keiner der dort notierten Punkte deckt sich mit R4-K1 bis R4-K8.
 Der Analog-first-Zwischenstand berührt mit „Meldungsnummern nach
 Papier-Wiederanlauf weichen ab" ebenfalls die Übereinstimmung von Papier und
 App, aber auf einem anderen Weg.
+
+## Stand der Behebung
+
+Stand 06.10.2026, Paket 2 „Meldungsfassungen, Exportstand, Führungssicht".
+Geprüft mit Typprüfung, Unit-Tests (2 494 grün), Verhaltenstests (137
+Szenarien grün) und Nachmessung im Dev-Server (360 × 640,
+`isMobile`/`hasTouch`, de-DE, Port 5180; Downloads gelesen, PDF mit
+`pdftotext`). Aufgeführt sind nur die Befunde dieses Pakets.
+
+| Befund | Stand | Umsetzung |
+| --- | --- | --- |
+| R4-K1 „Seitdem keine neue Meldung“ trotz Abrücken | behoben | Lageblatt-, Export- und Weitergabe-Zeile und die Startseitenkarte zählen neue Meldungen und Änderungen an bekannten Einheiten („seitdem 1 Änderung (Abrücken)“); ein „Rückgängig“ nimmt sie zurück, weil der Zustand je Einheit verglichen wird, nicht die Zahl der Vermerke. Das Lageblatt sagt „Aushang ist nicht mehr aktuell, neu drucken“. Der Nachtrag enthält die geltende Fassung jeder geänderten Einheit, ein Teilexport kann das Abrücken also weitergeben. Nachlauf: CSV und Excel, Lageblatt, Abrücken: alle drei Zeilen und die Startseitenkarte nennen „1 Änderung (Abrücken)“. |
+| R4-K2 Import-Quittung am Seitenende, zählt Fassungen | behoben | Die Quittung steht in der Einlese-Quittung bei den Aufnahmeknöpfen: „Einsatz „…“ übernommen: 6 Einheiten, davon 6 anwesend, 1 Folgemeldung. Stand der Datei: letzte Meldung …“. Beim Ergänzen einer vorhandenen Sammlung folgt „Jetzt n Einheiten…“. |
+| R4-K3 Rückfragen auf Papier abgeschnitten | behoben | Die häufigen Prüfpunkte haben Stichworte („Verpflegung 12 ≠ Stärke 8“, „alle als „männlich“ (Vorbelegung)“, „Kennzeichen doppelt“ …). Das Lageblatt nennt jede Rückfrage als Stichwort, die Sammel-PDF jede im Wortlaut. |
+| R4-K4 Kenntnisliste: „Sonstiges geändert“ | behoben | „Bemerkung: „Ölsperre gerissen, 300 m Sperre nachfordern“ (60 Zeichen), ebenso Ort/Auftrag; eine geleerte Bemerkung heißt „entfernt“. |
+| R4-K5 Einheitenliste weit unten | teilweise | Weitergabe, Lageblatt, Blanko, Kästchen und Exportknöpfe stehen unter der Liste, ein Sprung „Weitergeben, Lageblatt, Export ↓“ steht darüber. „Zuletzt gemeldete oben zeigen“ sortiert und springt zur Liste (Test). Gemessen am Telefon mit 6 Einheiten: erste Karte bei 1 640 px statt 2 217 px (rund 2,6 statt 3,5 Bildschirme). Das Ziel „höchstens zwei Bildschirmhöhen“ ist nicht erreicht (Kopfzahlen, Aufnahmeknöpfe und Bedarf mit zusammen rund 1 100 px und die große Such-/Filterzeile bleiben); eine zweispaltige Laptop-Ansicht ist nicht umgesetzt. |
+| R4-K6 Bogen eines anderen Einsatzes ohne Hinweis | behoben | Teilt Ort/Auftrag des Bogens kein bedeutungstragendes Wort mit Namen/Ort der Sammlung und den übrigen Meldungen (allgemeine Lagewörter wie „Hochwasser“ zählen nicht), steht an Karte und Quittung „⚠ Anderer Einsatz?“ bzw. „Bogen nennt: …“. Nicht gesperrt, weiter gezählt. Die Tabellenansicht trägt keine Marke. Eine Heuristik: Texte ohne Ortsnamen im Wortlaut der Lage können fälschlich auffallen. |
+| R4-K7 Neu-Marken uneinheitlich | behoben | „neu“ steht auch zugeklappt am Telefon; „neu“ und „neue Fassung“ verschwinden mit „Zur Kenntnis genommen“ (der Kenntnis-Stand merkt, ob getippt wurde) statt erst nach 30 Minuten. Vor dem ersten Tipp bleibt die 30-Minuten-Regel. |
+| R4-K8 Kleinere Stellen | behoben | Zwischensummen je Zug mit Betriebsstoff; Übersichts-CSV mit Spalte „Rückfrage“, Excel-Bemerkung mit den Rückfragen; „Fahrzeuge (Anzahl)“ und „Fahrzeuge (Liste)“ getrennt; Namensspalte der Tabelle mit Silbentrennung (`hyphens: auto`). |

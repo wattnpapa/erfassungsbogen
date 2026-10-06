@@ -514,3 +514,13 @@ dieses Pakets.
 | --- | --- | --- |
 | R4-E1 „Ist das dieselbe Einheit?" bei verschiedenen Einheiten | behoben | Zwei eingetragene, verschiedene Einheitstypen fragen nicht mehr; Orte nur vom Namensanfang verglichen („Neu-Ulm" ≠ „Ulm"). Wo noch gefragt wird, steht „Nein — als eigene Einheit führen" vorn, mit Gegenüberstellung beider Meldungen; nach „Ja" Daumenleiste mit beiden Namen und „Rückgängig" (führt die Meldung als eigene Einheit). Nachlauf: Ulm FGr R und Neu-Ulm FGr F ohne Rückfrage; Ulm ohne Typ → „Ja" → „Rückgängig" → 2 Einheiten. |
 | R4-E2 Derselbe Bogen zweimal räumt den Rückholplatz | behoben | Gleicht der eintreffende Bogen dem offenen, gibt es keine Rückfrage: „Dieser Bogen ist schon offen … Nichts ersetzt." In Rückfragen mit Verlust hat „Abbrechen" den Fokus. Nachlauf (eigener Bogen Biberach, Ulm per Link offen und kalt sowie per Datei): nach dem 2. Öffnen keine Rückfrage, Speicher Ulm / Biberach. |
+
+Stand 06.10.2026, Paket 2 „Meldungsfassungen, Exportstand, Führungssicht".
+Geprüft mit Typprüfung, Unit-Tests (2 494 grün), Verhaltenstests (137
+Szenarien grün) und Nachmessung im Dev-Server (360 × 640,
+`isMobile`/`hasTouch`, de-DE, Port 5180; Downloads gelesen, PDF mit
+`pdftotext`). Aufgeführt ist nur der Befund dieses Pakets.
+
+| Befund | Stand | Umsetzung |
+| --- | --- | --- |
+| R4-E6 „Verschieben…“ in eine Sammlung, die die Einheit schon führt | behoben | Der Dialog nennt am Ziel „dort schon gemeldet, wird zusammengeführt“, die Quittung „war sie schon gemeldet; beide Stände sind zusammengeführt“. „Rückgängig“ legt die eigenen Einträge des Ziels zurück und nimmt sie aus der Ausgangssammlung wieder heraus: Beide Sammlungen führen danach je einen Eintrag, die Übung mit ihrem eigenen Auftrag (Test). |

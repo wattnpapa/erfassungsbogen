@@ -1655,6 +1655,12 @@ Repository-Analyse, keine offiziellen Angaben des Projekts.
   Submodul gleicht nur über die Eintrags-ID ab; die Feldregeln hängen an den
   App-Zusatzfeldern (`eintrag-zeiten.ts`) und den Vermerktexten. Wandern diese
   Felder in den Kern, gehört der Abgleich mit.
+- **Fassungs-Vorrang liegt im Produkt statt im Kern**
+  (`src/app/fassung-vorrang.ts`, R4-W1, 2026-10-06): Der Kern wählt den Kopf
+  einer Einheit allein nach dem Stand im Bogen; die App verdrängt Fassungen
+  über das Zusatzfeld `ersetztDurch`. Alles, was den Kern direkt aufruft oder
+  eine ältere App-Version, ignoriert den Vorrang. Gehört langfristig in
+  `@bos/meldekopf` (`neuesteJeEinheit`, `revisionen`), dann entfällt die Schicht.
 - **`packages/kern-vendor/`-Rückweg ist vorbereitet, aber ungenutzt** – die
   Exit-Strategie ist eine Prozessvereinbarung, kein eingerichteter Mechanismus.
 
