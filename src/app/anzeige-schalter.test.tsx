@@ -90,6 +90,37 @@ describe("theme-color folgt dem Anzeigemodus", () => {
   });
 });
 
+describe("theme-color im Dunkel-Modus folgt dem abgedunkelten Kopfbalken (R4-L2)", () => {
+  function metaFarbe(): string {
+    return document.querySelector<HTMLMetaElement>('meta[name="theme-color"]')!.content;
+  }
+  beforeEach(() => {
+    document.head.querySelector('meta[name="theme-color"]')?.remove();
+    const meta = document.createElement("meta");
+    meta.name = "theme-color";
+    meta.content = "#12275e";
+    document.head.append(meta);
+    wendeOrgAkzentAn(undefined);
+  });
+
+  it("DRK: Standard die Kennfarbe, Dunkel der abgedunkelte Ton, wieder Standard die Kennfarbe", async () => {
+    const u = userEvent.setup();
+    render(<AnzeigeSchalter />);
+    wendeOrgAkzentAn(OrganisationsTyp.DRK);
+    const p = orgAkzentPalette(OrganisationsTyp.DRK);
+    await u.click(screen.getByRole("button", { name: "Standard" }));
+    expect(metaFarbe()).toBe(p.akzent);
+    await u.click(screen.getByRole("button", { name: "Dunkel" }));
+    expect(p.kopfDunkel).not.toBe(p.akzent);
+    expect(metaFarbe()).toBe(p.kopfDunkel);
+    // Ein später geöffneter Bogen folgt dem Modus, in dem das Gerät steht.
+    wendeOrgAkzentAn(OrganisationsTyp.FEUERWEHR);
+    expect(metaFarbe()).toBe(orgAkzentPalette(OrganisationsTyp.FEUERWEHR).kopfDunkel);
+    await u.click(screen.getByRole("button", { name: "Feld" }));
+    expect(metaFarbe()).toBe(orgAkzentPalette(OrganisationsTyp.FEUERWEHR).akzent);
+  });
+});
+
 describe("AnzeigeLeistenKnopf (R3-L6)", () => {
   it("klappt die vier Modi auf, wählt mit dem zweiten Tipp und klappt wieder zu", async () => {
     const u = userEvent.setup();
