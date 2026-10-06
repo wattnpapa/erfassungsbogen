@@ -361,15 +361,19 @@ export function erreichbarkeitZeilen(b: Erfassungsbogen): string[] {
 export const NACHTRAG_ZEILEN_MIN = 5;
 
 /**
- * Untergrenze beim Messen: Passen auf die eine Seite keine fünf Zeilen mehr,
- * bleiben es so viele wie passen, mindestens zwei — ein Lageblatt, das
- * wegen leerer Zeilen eine zweite Seite anfängt, hängt niemand aus (R2-K3).
+ * Zeilenzahl des Probesatzes. Früher die Untergrenze („mindestens zwei —
+ * ein Lageblatt, das wegen leerer Zeilen eine zweite Seite anfängt, hängt
+ * niemand aus", R2-K3); seit R4-A3 geht es bei zu vollem Blatt auf die
+ * Rückseite, und Seite 1 bleibt das Blatt für die Wand.
  */
-const NACHTRAG_ZEILEN_UNTEN = 2;
+const NACHTRAG_ZEILEN_PROBE = 3;
 
 /** Kennungen der Messpunkte für {@link einsatzLageblattSeiteFuellen}. */
 const MESS_ENDE = "lageblatt-ende";
 const MESS_NACHTRAG = "lageblatt-nachtrag-";
+
+/** Zelle „übertragen“ einer Nachtragszeile: Kästchen und Platz für das Kürzel. */
+const NACHTRAG_UEBERTRAGEN = "[  ] ______";
 
 /** Ausfülllinie für Zahlen auf dem leeren Lageblatt — statt vorgedruckter Nullen (R3-A5). */
 const LEERFELD = "____";
@@ -418,9 +422,8 @@ function bemerkungZelle(notiz: string | undefined, sonstiges: string | undefined
 function uebersichtsTabelle(
   eintraege: UebersichtEintrag[],
   maxZeilen = UEBERSICHT_MAX_ZEILEN,
-  /** Lageblatt: Erreichbarkeit je Einheit und freie Zeilen zum Nachtragen (R2-A3). */
+  /** Lageblatt: Erreichbarkeit je Einheit (R2-A3); die Nachtragszeilen stehen in {@link nachtragsTabelle}. */
   zumWeiterfuehren = false,
-  nachtragZeilen = NACHTRAG_ZEILEN_MIN,
   /** Nachtrag (R4-W4): „seit 05.10.2026, 20:49" — die Summen heißen dann „Summe Nachtrag". */
   nachtrag?: string,
 ): Content {
@@ -515,25 +518,6 @@ function uebersichtsTabelle(
   const anwesend = eintraege.filter((e) => !e.abgerueckt);
   const abgerueckt = eintraege.filter((e) => e.abgerueckt);
   for (const e of anwesend) body.push(zeile(e));
-  if (zumWeiterfuehren) {
-    // Fällt das Gerät aus, geht es auf diesem Blatt weiter statt auf einem
-    // neuen Zettel — sonst gibt es später drei Quellen (R2-A3).
-    const kopfzeile: TableCell[] = [
-      { text: "Nachtrag von Hand (Einheit, Zug, Uhrzeit, Stärke …)", italics: true, colSpan: SPALTEN },
-    ];
-    for (let i = 1; i < SPALTEN; i++) kopfzeile.push({});
-    body.push(kopfzeile);
-    for (let n = 0; n < nachtragZeilen; n++) {
-      // Die ersten beiden Zeilen tragen Messpunkte: ihr Abstand ist die Zeilenhöhe.
-      body.push(
-        Array.from({ length: SPALTEN }, (_, i): TableCell => ({
-          text: " ",
-          margin: [0, 5, 0, 5],
-          ...(i === 0 && n < 2 ? { id: `${MESS_NACHTRAG}${n}` } : {}),
-        })),
-      );
-    }
-  }
   if (abgerueckt.length > 0) {
     // Ein Zwischenkopf statt einer Fußnote: „war da und ist wieder weg" muss
     // auf dem Papier so sichtbar sein wie in der Datei.
@@ -572,28 +556,18 @@ function uebersichtsTabelle(
       ),
     );
   }
-  if (zumWeiterfuehren) {
-    // Nach dem ersten Nachtrag ist die gedruckte Summe falsch; die
-    // fortgeschriebene gehört darunter aufs Blatt, nicht auf einen Zettel (R3-A5).
-    body.push(
-      summenZeile(
-        leer ? "Summe (von Hand)" : "Summe einschl. Nachträge (von Hand)",
-        // Die Zelle ist das Feld: Linien darin brachen in der schmalen
-        // Stärkespalte um.
-        " ",
-        " ",
-        [0, 5, 0, 5],
-      ),
-    );
-  }
   // Breiten für die quer liegende Übersichtsseite (714 pt Satzbreite): Zeiten
   // brechen nach dem Datum um, damit Zug und Bedarf daneben Platz haben.
   return {
     table: {
       headerRows: 1,
-      widths: zumWeiterfuehren
-        ? [100, 34, 86, 46, 46, 50, 14, 56, 104, "*"]
-        : [118, 38, 48, 48, 48, 16, 66, 88, "*"],
+      // Eine Einheit steht auf einem Blatt: Auf dem Lageblatt brach die Zeile
+      // „Nr. 8 THW Müllheim …" am Seitenende, oben auf der nächsten Seite
+      // standen „Bergung (B)" und der Bedarf ohne Nummer und Namen (R4-A7).
+      // Kopf und erste Zeile bleiben beisammen.
+      dontBreakRows: true,
+      keepWithHeaderRows: 1,
+      widths: zumWeiterfuehren ? LAGEBLATT_SPALTEN : [118, 38, 48, 48, 48, 16, 66, 88, "*"],
       body,
     },
     // Bei 7,5 pt bleibt es (Zeilenbox 6,9 pt): 8 pt schob zehn Einheiten auf
@@ -783,6 +757,83 @@ function lageKopfleiste(eintraege: UebersichtEintrag[], leer = false, nachtrag?:
   };
 }
 
+/** Spaltenbreiten des Lageblatts (714 pt Satzbreite). */
+const LAGEBLATT_SPALTEN: (number | "*")[] = [100, 34, 86, 46, 46, 50, 14, 56, 104, "*"];
+/** Wie das Lageblatt, die letzte Spalte geteilt: hinten schmal „übertragen“ (R4-A4). */
+const NACHTRAG_SPALTEN: (number | "*")[] = [...LAGEBLATT_SPALTEN.slice(0, 9), "*", 64];
+
+/**
+ * Nachtragszeilen des Lageblatts: Fällt das Gerät aus, geht es auf diesem
+ * Blatt weiter statt auf einem neuen Zettel — sonst gibt es später drei
+ * Quellen (R2-A3). Gleiche Spalten wie die Einheitenzeilen darüber, hinten
+ * eine schmale Spalte „übertragen“: Nach der Papierphase hakt ab, wer die
+ * Zeile ins Gerät übernommen hat, statt dass zwei Helfer denselben Stapel
+ * abtippen (R4-A4). Darunter die fortgeschriebene Summe (R3-A5).
+ *
+ * Eigene Tabelle statt Zeilen der Einheitentabelle: Die Beschriftung
+ * „Nachtrag von Hand“ blieb am Seitenende stehen, ihre Zeilen standen auf
+ * der nächsten Seite (R4-A7). Als Kopfzeile bleibt sie bei den Zeilen und
+ * steht auf jeder Folgeseite wieder oben. Mit `rueckseite` wiederholt die
+ * Tabelle zusätzlich die Spaltenköpfe.
+ */
+function nachtragsTabelle(zeilen: number, leer: boolean, rueckseite: boolean): Content {
+  const SP = NACHTRAG_SPALTEN.length;
+  const kopf = (text: string): TableCell => ({ text, bold: true, fillColor: GRAU });
+  const body: TableCell[][] = [];
+  if (rueckseite) {
+    body.push([
+      kopf("Einheit"),
+      kopf("Zug"),
+      kopf("Funkrufname /\nRückruf"),
+      kopf("Eingetroffen\n(abgerückt)"),
+      kopf("Stand"),
+      kopf("Stärke\nF / U / M / G"),
+      kopf("Fzg"),
+      kopf("Bedarf"),
+      kopf("Auftrag / Notiz"),
+      kopf("Veränderung / Bemerkung"),
+      kopf("übertragen"),
+    ]);
+  }
+  const label: TableCell[] = [{ text: "Nachtrag von Hand (Einheit, Zug, Uhrzeit, Stärke …)", italics: true, colSpan: SP - 1 }];
+  for (let i = 1; i < SP - 1; i++) label.push({});
+  // Mit Spaltenköpfen steht „übertragen“ dort schon.
+  label.push({ text: rueckseite ? "" : "übertragen", italics: true });
+  body.push(label);
+  for (let n = 0; n < zeilen; n++) {
+    // Die zweite und dritte Zeile tragen Messpunkte: ihr Abstand ist die Zeilenhöhe
+    // (die erste steht hinter der Kopfzeile und misst anders).
+    body.push(
+      Array.from({ length: SP }, (_, i): TableCell => ({
+        // Hinten das Kästchen mit Platz für das Kürzel dahinter.
+        text: i === SP - 1 ? NACHTRAG_UEBERTRAGEN : " ",
+        margin: [0, 5, 0, 5],
+        ...(i === 0 && (n === 1 || n === 2) ? { id: `${MESS_NACHTRAG}${n}` } : {}),
+      })),
+    );
+  }
+  // Nach dem ersten Nachtrag ist die gedruckte Summe falsch; die
+  // fortgeschriebene gehört darunter aufs Blatt, nicht auf einen Zettel (R3-A5).
+  const summe: TableCell[] = [
+    { text: leer ? "Summe (von Hand)" : "Summe einschl. Nachträge (von Hand)", bold: true, margin: [0, 5, 0, 5] },
+    ...Array.from({ length: SP - 1 }, (): TableCell => ({ text: " " })),
+  ];
+  body.push(summe);
+  return {
+    table: {
+      // Zeilen bleiben ganz; Kopf (und bei der Rückseite die Spaltenköpfe) bleiben bei den Zeilen.
+      headerRows: rueckseite ? 2 : 1,
+      keepWithHeaderRows: 1,
+      dontBreakRows: true,
+      widths: NACHTRAG_SPALTEN,
+      body,
+    },
+    fontSize: 7.5,
+    layout: { paddingTop: () => 1, paddingBottom: () => 1, paddingLeft: () => 3, paddingRight: () => 3 },
+    margin: [0, 0, 0, 4],
+  };
+}
+
 /** Die Übersichtsseite — gemeinsamer Kern von Sammel-PDF und Lageblatt. */
 function uebersichtsSeite(
   titel: string,
@@ -793,8 +844,11 @@ function uebersichtsSeite(
   zumWeiterfuehren = false,
   nachtragZeilen = NACHTRAG_ZEILEN_MIN,
   nachtrag?: string,
+  /** Nachtragszeilen auf eine eigene Seite hinter dem Blatt (Lageblatt, das auf eine Seite zu voll ist). */
+  rueckseite = false,
 ): Content[] {
   const leer = zumWeiterfuehren && eintraege.length === 0;
+  const nachtragsTab = zumWeiterfuehren && nachtragZeilen > 0 ? nachtragsTabelle(nachtragZeilen, leer, rueckseite) : undefined;
   const zugSummen = zugSummenTabelle(eintraege, nachtrag);
   const bedarf = bedarfsTabelle(eintraege, leer, nachtrag);
   return [
@@ -813,13 +867,17 @@ function uebersichtsSeite(
     // gesamt" allein auf Seite 2 — wer nur Seite 1 aushängt oder faxt, gab
     // Stärke ohne Bedarf weiter (Audit Runde 3, R3-K6).
     lageKopfleiste(eintraege, leer, nachtrag),
-    uebersichtsTabelle(eintraege, maxZeilen, zumWeiterfuehren, nachtragZeilen, nachtrag),
+    uebersichtsTabelle(eintraege, maxZeilen, zumWeiterfuehren, nachtrag),
+    ...(nachtragsTab && !rueckseite ? [nachtragsTab] : []),
     ...(hinweis ? [{ text: hinweis, italics: true, margin: [0, 2, 0, 0] } as Content] : []),
     // Bedarf und Zwischensummen nebeneinander statt untereinander: vorher
     // rutschten die Zwischensummen allein auf Seite 2 (R2-K3).
     zugSummen
       ? { columns: [{ width: 300, stack: [bedarf] }, { width: "*", stack: [zugSummen] }], columnGap: 12, fontSize: 7.5 }
       : bedarf,
+    // Zu voll für eine Seite mit fünf Nachtragszeilen: die Zeilen bekommen die
+    // Rückseite, Seite 1 bleibt, wie sie ist (R4-A3).
+    ...(nachtragsTab && rueckseite ? [{ stack: [nachtragsTab], pageBreak: "before" } as Content] : []),
     // Messpunkt hinter dem letzten Inhalt: wie viel Platz bleibt auf der
     // letzten Seite (einsatzLageblattSeiteFuellen)?
     ...(zumWeiterfuehren ? [{ text: " ", fontSize: 1, id: MESS_ENDE } as Content] : []),
@@ -1020,6 +1078,8 @@ export function einsatzLageblattDokument(
   eintraege: UebersichtEintrag[],
   erstellt = Date.now(),
   nachtragZeilen = NACHTRAG_ZEILEN_MIN,
+  /** Die Nachtragszeilen auf eine eigene Seite hinter dem Blatt (R4-A3). */
+  rueckseite = false,
 ): TDocumentDefinitions {
   return {
     pageSize: "A4",
@@ -1037,10 +1097,13 @@ export function einsatzLageblattDokument(
       erstellt,
       eintraege.length === 0
         ? "Noch keine Einheit gemeldet."
-        : "Summen und Bedarf zählen nur die anwesenden Einheiten dieser Lage; abgerückte stehen im eigenen Block. Alle Änderungen im Einzelnen: Sammel-PDF.",
+        : "Summen und Bedarf zählen nur die anwesenden Einheiten dieser Lage; abgerückte stehen im eigenen Block. Alle Änderungen im Einzelnen: Sammel-PDF." +
+          (rueckseite ? " Nachträge von Hand: Seite 2." : ""),
       LAGEBLATT_MAX_ZEILEN,
       true,
       nachtragZeilen,
+      undefined,
+      rueckseite,
     ),
   };
 }
@@ -1055,13 +1118,25 @@ interface MessPosition {
 
 /**
  * Lageblatt, dessen letzte Seite bis unten mit Nachtragszeilen gefüllt ist
- * (Audit Runde 3, R3-A5). Wie viel Platz bleibt, weiß erst der Setzer: die
- * Höhe einer Einheitenzeile hängt an Änderungen, Rückfragen und Bemerkung.
- * Deshalb zwei Durchgänge: Der erste setzt das Blatt mit der Mindestzahl und
- * liest über pdfmakes `pageBreakBefore` die Lage zweier Messpunkte ab (Ende
- * des Inhalts, Abstand zweier Nachtragszeilen); der zweite trägt so viele
- * Zeilen, wie in den Rest passen. Kostet einen zusätzlichen Satz einer
- * Seite ohne Bilder — Sekundenbruchteile.
+ * (Audit Runde 3, R3-A5) und das immer mindestens fünf davon trägt (R4-A3).
+ * Wie viel Platz bleibt, weiß erst der Setzer: die Höhe einer Einheitenzeile
+ * hängt an Änderungen, Rückfragen und Bemerkung. Deshalb Probesätze: Der erste
+ * setzt das Blatt mit der Mindestzahl und liest über pdfmakes
+ * `pageBreakBefore` die Lage zweier Messpunkte ab (Ende des Inhalts, Abstand
+ * zweier Nachtragszeilen); der letzte trägt so viele Zeilen, wie in den Rest
+ * passen.
+ *
+ * Passen auf die letzte Seite keine fünf Zeilen mehr (bei sechs bis zehn
+ * Einheiten mit Bedarf und Zwischensummen der Normalfall), bekommen die Zeilen
+ * eine eigene letzte Seite, die Rückseite: mit Spaltenköpfen, bis unten
+ * gefüllt. Vorher blieben bei acht Einheiten zwei Zeilen, und ab dem dritten
+ * Nachtrag ging es auf einem Zettel weiter — drei Quellen statt einer. Bei 30
+ * Einheiten schob das Mindestmaß von fünf Zeilen den Bedarf allein auf eine
+ * vierte Seite. Die Rückseite wird immer mitgedruckt; Seite 1 bleibt das
+ * Blatt für die Wand.
+ *
+ * Kostet bis zu zwei zusätzliche Sätze einer Seite ohne Bilder —
+ * Sekundenbruchteile.
  *
  * `setzen` führt den Satz aus (Browser: pdfmake-Puffer, Tests: Node).
  */
@@ -1071,30 +1146,41 @@ export async function einsatzLageblattSeiteFuellen(
   setzen: (dd: TDocumentDefinitions) => Promise<unknown>,
   erstellt = Date.now(),
 ): Promise<TDocumentDefinitions> {
-  const pos = new Map<string, MessPosition>();
-  const seiten = new Set<number>();
-  const probe = einsatzLageblattDokument(name, eintraege, erstellt, NACHTRAG_ZEILEN_UNTEN);
-  probe.pageBreakBefore = (knoten) => {
-    const k = knoten as { id?: string; startPosition?: MessPosition; pageNumbers?: number[] };
-    k.pageNumbers?.forEach((n) => seiten.add(n));
-    if (k.id && k.startPosition) pos.set(k.id, k.startPosition);
-    return false;
+  const messen = async (dd: TDocumentDefinitions) => {
+    const pos = new Map<string, MessPosition>();
+    const seiten = new Set<number>();
+    dd.pageBreakBefore = (knoten) => {
+      const k = knoten as { id?: string; startPosition?: MessPosition; pageNumbers?: number[] };
+      k.pageNumbers?.forEach((n) => seiten.add(n));
+      if (k.id && k.startPosition) pos.set(k.id, k.startPosition);
+      return false;
+    };
+    await setzen(dd);
+    const ende = pos.get(MESS_ENDE);
+    const z1 = pos.get(`${MESS_NACHTRAG}1`);
+    const z2 = pos.get(`${MESS_NACHTRAG}2`);
+    return {
+      ende,
+      zeilenHoehe: z1 && z2 && z1.pageNumber === z2.pageNumber && z2.top > z1.top ? z2.top - z1.top : 20,
+      seiten: seiten.size === 0 ? 0 : Math.max(...seiten),
+      /** Platz unter dem letzten Inhalt der letzten Seite. */
+      rest: ende ? ende.pageInnerHeight * (1 - ende.verticalRatio) : 0,
+    };
   };
-  await setzen(probe);
-  const ende = pos.get(MESS_ENDE);
-  const z0 = pos.get(`${MESS_NACHTRAG}0`);
-  const z1 = pos.get(`${MESS_NACHTRAG}1`);
-  if (!ende) return einsatzLageblattDokument(name, eintraege, erstellt, NACHTRAG_ZEILEN_MIN);
-  const zeilenHoehe = z0 && z1 && z0.pageNumber === z1.pageNumber && z1.top > z0.top ? z1.top - z0.top : 20;
-  let rest = ende.pageInnerHeight * (1 - ende.verticalRatio);
-  const mehrseitig = Math.max(...seiten) > 1;
-  // Über mehrere Seiten wiederholt die Tabelle ihren Kopf; verschiebt sich
-  // dabei eine Zeile über den Seitenrand, kostet das eine Kopfzeile mehr.
-  if (mehrseitig) rest -= 2 * zeilenHoehe;
-  const passen = NACHTRAG_ZEILEN_UNTEN + Math.max(0, Math.floor((rest - 2) / zeilenHoehe));
-  // Mehrseitig ist das Blatt ohnehin: dann mindestens fünf Zeilen.
-  const zeilen = mehrseitig ? Math.max(NACHTRAG_ZEILEN_MIN, passen) : passen;
-  return einsatzLageblattDokument(name, eintraege, erstellt, Math.min(zeilen, 40));
+  const m = await messen(einsatzLageblattDokument(name, eintraege, erstellt, NACHTRAG_ZEILEN_PROBE));
+  if (!m.ende) return einsatzLageblattDokument(name, eintraege, erstellt, NACHTRAG_ZEILEN_MIN);
+  // Über mehrere Seiten wiederholt die Tabelle ihre Kopfzeile; verschiebt sich
+  // dabei eine Zeile über den Seitenrand, kostet das eine Zeile mehr.
+  const rest = m.seiten > 1 ? m.rest - 2 * m.zeilenHoehe : m.rest;
+  const passen = NACHTRAG_ZEILEN_PROBE + Math.max(0, Math.floor((rest - 2) / m.zeilenHoehe));
+  if (passen >= NACHTRAG_ZEILEN_MIN) return einsatzLageblattDokument(name, eintraege, erstellt, Math.min(passen, 40));
+  // Zu voll: Die Zeilen bekommen eine eigene Seite hinter dem Blatt, so viele,
+  // wie draufpassen.
+  const r = await messen(einsatzLageblattDokument(name, eintraege, erstellt, NACHTRAG_ZEILEN_PROBE, true));
+  const zeilen = r.ende
+    ? NACHTRAG_ZEILEN_PROBE + Math.max(0, Math.floor((r.rest - 2) / r.zeilenHoehe))
+    : NACHTRAG_ZEILEN_MIN;
+  return einsatzLageblattDokument(name, eintraege, erstellt, Math.max(NACHTRAG_ZEILEN_MIN, Math.min(zeilen, 40)), true);
 }
 
 /**
