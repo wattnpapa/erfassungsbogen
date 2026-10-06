@@ -7,7 +7,7 @@ import { describe, expect, it, vi } from "vitest";
 
 vi.mock("./nativ", () => ({ istNativ: () => false }));
 
-const { offlineText } = await import("./offline-bereit");
+const { offlineText, installationAnstossen } = await import("./offline-bereit");
 
 describe("offlineText", () => {
   it("verspricht den Offline-Betrieb nur im Stand „bereit“", () => {
@@ -66,5 +66,60 @@ describe("offlineText mit Fortschritt", () => {
     expect(offlineText({ stand: "bereit", frischBereit: false, online: true, zweiStufen: false })).toMatch(
       /^✓ Funktioniert komplett offline/,
     );
+  });
+});
+
+/**
+ * Audit Runde 4, R4-O1: Bricht das Erstladen ab, verwirft der Browser die
+ * Registrierung; die Zeile blieb bei „wird geladen" stehen. Jetzt wird neu
+ * registriert, und die Zeile sagt ehrlich, was los ist.
+ */
+describe("installationAnstossen", () => {
+  function container(registrierung: unknown) {
+    const register = vi.fn(async () => ({}));
+    const update = vi.fn(async () => {});
+    const c = {
+      getRegistration: vi.fn(async () => (registrierung ? { update } : undefined)),
+      register,
+    } as unknown as ServiceWorkerContainer;
+    return { c, register, update };
+  }
+
+  it("stößt eine lebende Registrierung nur an", async () => {
+    const { c, register, update } = container(true);
+    expect(await installationAnstossen(c, "https://x.test/app/sw.js")).toBe("vorhanden");
+    expect(update).toHaveBeenCalled();
+    expect(register).not.toHaveBeenCalled();
+  });
+
+  it("registriert neu, wenn der Browser die Registrierung verworfen hat", async () => {
+    const { c, register } = container(false);
+    expect(await installationAnstossen(c, "https://x.test/app/sw.js")).toBe("neu");
+    expect(register).toHaveBeenCalledWith("https://x.test/app/sw.js", { scope: "https://x.test/app/" });
+  });
+
+  it("meldet „fehler“, wenn das Registrieren scheitert oder es keinen Service Worker gibt", async () => {
+    const { c } = container(false);
+    (c.register as ReturnType<typeof vi.fn>).mockRejectedValueOnce(new Error("abgelehnt"));
+    expect(await installationAnstossen(c, "https://x.test/sw.js")).toBe("fehler");
+    expect(await installationAnstossen(null)).toBe("fehler");
+  });
+});
+
+describe("offlineText bei abgebrochenem Laden (R4-O1)", () => {
+  it("sagt „Laden abgebrochen“ mit Zahl und Ausweg, statt weiter zu laden", () => {
+    const t = offlineText({
+      stand: "laedt",
+      frischBereit: false,
+      online: true,
+      abgebrochen: true,
+      kern: { geladen: 1_677_721, gesamt: 7_025_459 },
+    });
+    expect(t).toMatch(/^⚠ Laden abgebrochen bei 1,6 von 6,7 MB — mit Netz einmal neu laden/);
+    expect(t).not.toMatch(/Wird für den Offline-Betrieb geladen/);
+  });
+
+  it("ohne Netz bleibt es bei der Zeile „noch nicht offline bereit“", () => {
+    expect(offlineText({ stand: "laedt", frischBereit: false, online: false, abgebrochen: true })).toMatch(/Noch nicht offline bereit/);
   });
 });

@@ -55,7 +55,7 @@ import { absenderkarteLaden, type Absenderkarte } from "../absenderkarte";
 import { AbsenderkarteFeld } from "../absenderkarte-ui";
 import { geraeteKurzform, geraeteSchluesselNurSitzung, geraeteOeffentlichHex } from "../geraete-schluessel";
 import { istNativ, linkTeilen, nahbereichDienst, pdfEinbettbar, shareSheetVerfuegbar, textTeilen } from "../nativ";
-import { fehlerText } from "../nachladen";
+import { fehlerText, istNachladeFehler } from "../nachladen";
 import { frageJaNein, frageText, zeigeHinweis } from "../dialoge";
 import { SpeicherVollFehler, istSpeicherVoll } from "../eintrag-zeiten";
 import { uebergabeText, type UebergabeStand, type UebergabeWeg } from "../uebergabe-stand";
@@ -179,6 +179,15 @@ export function Uebersicht(props: {
   // Mal getippt und die Mail an den Meldekopf trug zwei Anhänge. Steht bis
   // zum nächsten PDF oder bis der Dialog geschlossen wird.
   const [pdfQuittung, setPdfQuittung] = useState("");
+  // Fehler von „PDF erzeugen": steht direkt unter dem Knopf, nicht unten im
+  // Dialog, wo er hinter „Weitere Formate" außerhalb des Bildes lag (R4-O2).
+  const [pdfFehler, setPdfFehler] = useState("");
+  const pdfFehlerZeile = useRef<HTMLParagraphElement>(null);
+  // Der Dialog scrollt: Die Meldung rollt ins Bild, auch wenn sie unter dem
+  // Rand erscheint (R4-O2).
+  useEffect(() => {
+    if (pdfFehler) pdfFehlerZeile.current?.scrollIntoView?.({ block: "nearest" });
+  }, [pdfFehler]);
   // Vollbild-QR zum Vorzeigen (Handy-zu-Tablet-Scan ohne Papier); bei
   // Segmentierung blättert `vollbildTeil` durch die Teile.
   const [vollbild, setVollbild] = useState(false);
@@ -438,6 +447,7 @@ export function Uebersicht(props: {
     setPdfLaeuft(true);
     setFehler("");
     setPdfQuittung("");
+    setPdfFehler("");
     // Der Dateiname wird HIER gebildet und an pdfErzeugen übergeben, nicht
     // dort erraten: so nennt die Quittung genau die Datei, die entstanden ist
     // — auch wenn der Minutenwechsel des Zeitstempels dazwischenfällt. Die
@@ -458,7 +468,13 @@ export function Uebersicht(props: {
       );
     } catch (e) {
       if (e instanceof Error && e.name === "AbortError") return; // Abbruch im Teilen-Fenster
-      setFehler(`PDF: ${fehlerText(e)}`);
+      // Der Ausweg gehört zur Meldung: Fehlt der PDF-Baustein (Netz weg vor dem
+      // Vorrat), geht der QR-Code in derselben Lage (R4-O2).
+      setPdfFehler(
+        istNachladeFehler(e)
+          ? "PDF nicht möglich: Der PDF-Baustein ist noch nicht geladen. Ohne Netz geht jetzt nur der QR-Code — mit Netz die Seite einmal neu laden."
+          : `PDF: ${fehlerText(e)} Der QR-Code geht trotzdem.`,
+      );
     } finally {
       setPdfLaeuft(false);
     }
@@ -895,7 +911,10 @@ export function Uebersicht(props: {
         className="teilen-dialog"
         // Beim nächsten Öffnen beginnt der Dialog ohne alte Quittung — sonst
         // stünde „PDF gespeichert" von gestern unter einem frischen Bogen.
-        onClose={() => setPdfQuittung("")}
+        onClose={() => {
+          setPdfQuittung("");
+          setPdfFehler("");
+        }}
       >
         <div className="kopfzeile">
           <h2>Bogen übergeben</h2>
@@ -994,6 +1013,7 @@ export function Uebersicht(props: {
           {/* role="status": die Quittung kommt asynchron, nach dem Klick — ohne
               Ansage erführe ein Screenreader nichts davon. */}
           {pdfQuittung && <p className="hinweis pdf-quittung" role="status">✓ {pdfQuittung}</p>}
+          {pdfFehler && <p className="fehler pdf-fehler" role="alert" ref={pdfFehlerZeile}>{pdfFehler}</p>}
         </div>
         {/* Zweite Stufe: Vor Ort zählen fast immer QR-Vollbild, Nahbereich
             oder PDF (oben). Link/CSV/Excel sind Chat- bzw. Führungsstellen-

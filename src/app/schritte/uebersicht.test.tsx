@@ -14,9 +14,12 @@ import { Uebersicht } from "./uebersicht";
 // pdfmake wird in der Übersicht nur nachgeladen, wenn jemand ein PDF anfordert;
 // im Test ist es teuer und hier ohne Belang.
 const blankoPdfErzeugen = vi.fn(async () => true);
+const pdfFehlt = { an: false };
 vi.mock("../pdf", () => ({
   blankoPdfErzeugen: () => blankoPdfErzeugen(),
-  pdfErzeugen: async () => {},
+  pdfErzeugen: async () => {
+    if (pdfFehlt.an) throw new TypeError("Failed to fetch dynamically imported module: https://x/assets/pdf-1.js");
+  },
   pdfBlobUrl: async () => "blob:pdf-vorschau",
   einsatzPdfErzeugen: async () => {},
 }));
@@ -251,6 +254,37 @@ describe("Übersicht — PDF-Quittung", () => {
     await nutzer.click(within(dialog).getByRole("button", { name: "Schließen" }));
 
     expect(within(dialog).queryByText(/PDF gespeichert:/)).toBeNull();
+  });
+});
+
+/**
+ * Audit Runde 4, R4-O2: Fehlt der PDF-Baustein (Netz weg vor dem Vorrat),
+ * stand die Meldung unten im Dialog außerhalb des Bildes. Sie gehört direkt
+ * unter den Knopf und nennt den Ausweg.
+ */
+describe("Übersicht — PDF ohne geladenen Baustein (R4-O2)", () => {
+  it("zeigt die Meldung direkt unter „PDF erzeugen“ und nennt den QR-Code", async () => {
+    const nutzer = userEvent.setup();
+    pdfFehlt.an = true;
+    try {
+      render(<Uebersicht bogen={neuerBogen()} geheZu={() => {}} neu={() => {}} />);
+      await nutzer.click(screen.getByRole("button", { name: "Bogen übergeben…" }));
+      const dialog = document.querySelector<HTMLDialogElement>("dialog[aria-label='Bogen übergeben']")!;
+      const knopf = within(dialog).getByRole("button", { name: "PDF erzeugen" });
+      await nutzer.click(knopf);
+
+      const meldung = await within(dialog).findByRole("alert");
+      expect(meldung.textContent).toMatch(/^PDF nicht möglich: Der PDF-Baustein ist noch nicht geladen/);
+      expect(meldung.textContent).toMatch(/Ohne Netz geht jetzt nur der QR-Code/);
+      // Im selben Block wie der Knopf, nicht am Dialogende hinter „Weitere Formate“.
+      expect(meldung.closest(".teilen-weg")).toBe(knopf.closest(".teilen-weg"));
+      expect(within(dialog).getAllByText(/PDF-Baustein ist noch nicht geladen/)).toHaveLength(1);
+
+      await nutzer.click(within(dialog).getByRole("button", { name: "Schließen" }));
+      expect(within(dialog).queryByRole("alert")).toBeNull();
+    } finally {
+      pdfFehlt.an = false;
+    }
   });
 });
 

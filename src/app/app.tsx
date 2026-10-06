@@ -3426,7 +3426,16 @@ function AppInhalt() {
       .sort((a, b) => Number(!!b.standard) - Number(!!a.standard) || b.geaendert - a.geaendert)
       .slice(0, 2);
     const offlineHinweis = (
-      <p className={`offline-badge${offline.stand === "bereit" ? "" : " offline-laedt"}`} role="status">{offlineText(offline)}</p>
+      <p className={`offline-badge${offline.stand === "bereit" ? "" : " offline-laedt"}`} role="status">
+        {offlineText(offline)}
+        {/* Abgebrochenes Erstladen: Der Ausweg steht neben der Meldung (R4-O1). */}
+        {offline.abgebrochen && offline.online && (
+          <>
+            {" "}
+            <button type="button" onClick={() => window.location.reload()}>Jetzt neu laden</button>
+          </>
+        )}
+      </p>
     );
     return (
       <>

@@ -14,7 +14,7 @@
  *              Neuladen ohne Netz aber nicht.
  *  - "ohne":   Dieser Browser kann keinen Service Worker (etwa Privatmodus).
  */
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { istNativ } from "./nativ";
 import { kernFortschritt, mb, umfangLaden, zusatzNachladen, type OfflineUmfang } from "./offline-vorrat";
 
@@ -35,6 +35,42 @@ export function offlineStandJetzt(): OfflineStand {
 }
 
 /**
+ * So lange darf der Zähler beim Laden stehen, bevor die App nachsieht, ob die
+ * Installation noch lebt (Audit Runde 4, R4-O1).
+ */
+export const STILLSTAND_MS = 20_000;
+
+/**
+ * Die Installation anstoßen. Bricht das Erstladen im Funkloch ab, scheitert der
+ * Service Worker an der Installation, und der Browser verwirft die
+ * Registrierung — ein späteres `update()` ginge ins Leere, und die Zeile bliebe
+ * für immer bei „wird geladen" stehen (Audit Runde 4, R4-O1). Fehlt die
+ * Registrierung, wird deshalb neu registriert; der Vorrat im Gerät bleibt
+ * dabei erhalten, es wird nur der Rest geholt.
+ *
+ *  - "vorhanden": Registrierung lebt, `update()` ist angestoßen.
+ *  - "neu":       Registrierung fehlte, wurde neu angelegt.
+ *  - "fehler":    weder noch (Browser ohne Service Worker, Registrierung abgelehnt).
+ */
+export async function installationAnstossen(
+  container: ServiceWorkerContainer | null = sw(),
+  adresse = typeof document !== "undefined" ? new URL("sw.js", document.baseURI).href : "sw.js",
+): Promise<"vorhanden" | "neu" | "fehler"> {
+  if (!container) return "fehler";
+  try {
+    const r = await container.getRegistration();
+    if (r) {
+      void r.update().catch(() => {});
+      return "vorhanden";
+    }
+    await container.register(adresse, { scope: new URL(".", adresse).href });
+    return "neu";
+  } catch {
+    return "fehler";
+  }
+}
+
+/**
  * Stand samt Netzlage. `frischBereit`: in dieser Sitzung gerade fertig
  * geworden — die Startseite quittiert das einmal.
  */
@@ -52,6 +88,11 @@ export interface OfflineZustand {
    * gezählt ist, darf die Zeile nicht „komplett offline" sagen.
    */
   zweiStufen?: boolean;
+  /**
+   * Das Laden steht, und die Registrierung des Service Workers war weg: Es
+   * geht erst nach einem Neuladen mit Netz weiter (R4-O1).
+   */
+  abgebrochen?: boolean;
 }
 
 export function useOfflineStand(): OfflineZustand {
@@ -61,6 +102,9 @@ export function useOfflineStand(): OfflineZustand {
   const [umfang, setUmfang] = useState<OfflineUmfang | null>(null);
   const [kern, setKern] = useState<{ geladen: number; gesamt: number } | null>(null);
   const [zusatz, setZusatz] = useState<{ fertig: number; gesamt: number } | null>(null);
+  const [abgebrochen, setAbgebrochen] = useState(false);
+  // Letzte Bewegung des Zählers — steht er still, wird nachgesehen (R4-O1).
+  const bewegung = useRef({ geladen: -1, seit: Date.now() });
 
   // Umfang beider Stufen — nur im Web mit Service Worker, nicht nativ.
   useEffect(() => {
@@ -112,8 +156,13 @@ export function useOfflineStand(): OfflineZustand {
     const beiOnline = () => {
       setOnline(true);
       // Ist die Installation im Funkloch abgebrochen, beim nächsten Netz neu
-      // anstoßen, statt auf den nächsten Seitenaufruf zu warten.
-      if (stand === "laedt") void sw()?.getRegistration().then((r) => r?.update()).catch(() => {});
+      // anstoßen, statt auf den nächsten Seitenaufruf zu warten. Hat der
+      // Browser die Registrierung verworfen, geht das nur mit neu registrieren
+      // (R4-O1).
+      if (stand === "laedt") {
+        bewegung.current.seit = Date.now();
+        void installationAnstossen();
+      }
     };
     const beiOffline = () => setOnline(false);
     window.addEventListener("online", beiOnline);
@@ -123,6 +172,35 @@ export function useOfflineStand(): OfflineZustand {
       window.removeEventListener("offline", beiOffline);
     };
   }, [stand]);
+
+  // Bewegt sich der Zähler, läuft die Installation — der Abbruch ist behoben.
+  useEffect(() => {
+    if (!kern) return;
+    const b = bewegung.current;
+    if (kern.geladen !== b.geladen) {
+      b.geladen = kern.geladen;
+      b.seit = Date.now();
+      setAbgebrochen(false);
+    }
+  }, [kern]);
+
+  // Steht der Zähler bei Netz still, nachsehen: Ist die Registrierung weg, neu
+  // registrieren und es ehrlich sagen, statt weiter „wird geladen" zu zeigen
+  // (Audit Runde 4, R4-O1). Nur dort, wo es einen Vorrat zu zählen gibt.
+  useEffect(() => {
+    if (stand !== "laedt" || !online || !umfang) return;
+    const uhr = setInterval(() => {
+      const b = bewegung.current;
+      if (Date.now() - b.seit < STILLSTAND_MS) return;
+      b.seit = Date.now();
+      void installationAnstossen().then((r) => {
+        // Registrierung weg (neu angelegt oder auch das scheiterte): Der
+        // Browser hat die Installation verworfen, die Zeile sagt es.
+        if (r !== "vorhanden") setAbgebrochen(true);
+      });
+    }, 5000);
+    return () => clearInterval(uhr);
+  }, [stand, online, umfang]);
 
   useEffect(() => {
     if (stand !== "laedt") return;
@@ -143,7 +221,7 @@ export function useOfflineStand(): OfflineZustand {
     sw() !== null &&
     typeof window !== "undefined" &&
     /^https?:$/.test(window.location.protocol);
-  return { stand, frischBereit, online, kern, zusatz, zweiStufen };
+  return { stand, frischBereit, online, kern, zusatz, zweiStufen, abgebrochen: stand === "laedt" && abgebrochen };
 }
 
 /** Text der Offline-Zeile auf der Startseite. */
@@ -173,6 +251,11 @@ export function offlineText(s: OfflineZustand): string {
   }
   // Fortschritt der ersten Stufe in Megabyte (R3-O3).
   const stand = s.kern && s.kern.gesamt > 0 ? `${mb(s.kern.geladen)} von ${mb(s.kern.gesamt)} MB` : "";
+  // Die Registrierung war weg und ist neu angelegt: Der Rest kommt, sobald
+  // Netz da ist — wer nicht warten will, lädt neu (R4-O1).
+  if (s.abgebrochen && s.online) {
+    return `⚠ Laden abgebrochen${stand ? ` bei ${stand}` : ""} — mit Netz einmal neu laden, dann geht es weiter. Bis dahin diese Seite ohne Netz nicht neu laden. Alle Daten bleiben auf diesem Gerät.`;
+  }
   return s.online
     ? `⏳ Wird für den Offline-Betrieb geladen${stand ? `: ${stand}` : ""} — bitte mit Netz geöffnet lassen. Danach gehen Bogen, PDF, QR-Code und Empfang ohne Netz. Alle Daten bleiben auf diesem Gerät.`
     : `⚠ Noch nicht offline bereit${stand ? ` (${stand} geladen)` : ""} — ohne Netz diese Seite nicht neu laden; beim nächsten Netz wird der Rest geladen. Alle Daten bleiben auf diesem Gerät.`;
