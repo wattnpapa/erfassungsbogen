@@ -10,7 +10,7 @@ import userEvent from "@testing-library/user-event";
 import { useState } from "react";
 import { Dialogschicht } from "../dialoge";
 import { neuePerson, neuerBogen, vokabularFuer } from "../hilfen";
-import { OrganisationsTyp, PersonalErfassung, type Erfassungsbogen } from "@bos/eeb-format/model";
+import { Ernaehrung, Geschlecht, OrganisationsTyp, PersonalErfassung, type Erfassungsbogen } from "@bos/eeb-format/model";
 import { stanPersonalVorbelegung } from "@bos/vokabulare/thw-stan-personal";
 import { stanFahrzeugVorbelegung } from "@bos/vokabulare/thw-stan-fahrzeuge";
 import { SchrittBuehne } from "../../test/schritt-buehne";
@@ -442,6 +442,69 @@ describe("Schritt Einheit — Vorbelegung nach Einheitstyp", () => {
     expect(screen.getByTestId("namen").textContent).toBe("Lange");
     expect(zahl("fahrzeuge")).toBe(0);
     expect(screen.queryByText(/^Vorbelegt nach StAN:/)).toBeNull();
+  });
+
+  // Audit Runde 4, R4-D4: „Vorbelegung entfernen" nahm Sollplätze mit Geschlecht
+  // und Ernährung still mit, die Stärke fiel ohne Hinweis.
+  it("quittiert „Vorbelegung entfernen“ mit Stärke vorher → nachher, nennt Geschlecht/Ernährung und stellt mit „Rückgängig“ wieder her (R4-D4)", async () => {
+    const nutzer = userEvent.setup();
+    const start = neuerBogen();
+    start.einheit.einheitsTyp = { code: klein.code };
+    const plaetze = stanPersonalVorbelegung(org, { code: klein.code });
+    start.personal = [
+      { ...neuePerson(), vorname: "Thomas", nachname: "Lange" },
+      { ...plaetze[0]!, geschlecht: Geschlecht.W, ernaehrung: Ernaehrung.VEGAN },
+      ...plaetze.slice(1),
+    ];
+    start.fahrzeuge = stanFahrzeugVorbelegung(org, { code: klein.code });
+    render(<VorbelegungBuehne start={start} />);
+    const vor = 1 + plaetze.length;
+
+    await nutzer.click(screen.getByRole("button", { name: "Vorbelegung entfernen" }));
+
+    expect(zahl("personal")).toBe(1);
+    const quittung = document.querySelector<HTMLElement>(".quittung-daumen")!;
+    expect(quittung.textContent).toContain(`Vorbelegung entfernt: ${plaetze.length} Personen, ${fahrzeuge(klein.code)} Fahrzeug`);
+    expect(quittung.textContent).toContain("(1 mit Geschlecht oder Ernährung)");
+    expect(quittung.textContent).toContain(`Stärke ${vor} → 1`);
+
+    await nutzer.click(within(quittung).getByRole("button", { name: "Rückgängig" }));
+
+    expect(zahl("personal")).toBe(vor);
+    expect(zahl("fahrzeuge")).toBe(fahrzeuge(klein.code));
+    expect(document.querySelector(".quittung-daumen")).toBeNull();
+  });
+
+  it("quittiert den Typwechsel, der Sollplätze ersetzt, und „Rückgängig“ stellt auch den alten Typ wieder her (R4-D4)", async () => {
+    const nutzer = userEvent.setup();
+    render(<VorbelegungBuehne start={neuerBogen()} />);
+    await typWaehlen(nutzer, gross.name);
+    // Erste Wahl auf einem leeren Bogen: nichts ging verloren, keine Leiste.
+    expect(document.querySelector(".quittung-daumen")).toBeNull();
+
+    await typWaehlen(nutzer, klein.name);
+
+    const quittung = document.querySelector<HTMLElement>(".quittung-daumen")!;
+    expect(quittung.textContent).toContain("Vorbelegung des bisherigen Typs ersetzt");
+    expect(quittung.textContent).toContain(`Stärke ${personen(gross.code)} → ${personen(klein.code)}`);
+    await nutzer.click(within(quittung).getByRole("button", { name: "Rückgängig" }));
+    expect(zahl("personal")).toBe(personen(gross.code));
+    expect(zahl("fahrzeuge")).toBe(fahrzeuge(gross.code));
+    expect((screen.getByRole("combobox", { name: "Einheitstyp" }) as HTMLInputElement).value).toContain(gross.name);
+  });
+
+  it("die nächste Eingabe verwirft den Rückweg, damit „Rückgängig“ nie spätere Eingaben mitnimmt", async () => {
+    const nutzer = userEvent.setup();
+    const start = neuerBogen();
+    start.einheit.einheitsTyp = { code: klein.code };
+    start.personal = stanPersonalVorbelegung(org, { code: klein.code });
+    render(<VorbelegungBuehne start={start} />);
+    await nutzer.click(screen.getByRole("button", { name: "Vorbelegung entfernen" }));
+    expect(document.querySelector(".quittung-daumen")).not.toBeNull();
+
+    await nutzer.type(screen.getByLabelText(/Organisationsname/), "x");
+
+    expect(document.querySelector(".quittung-daumen")).toBeNull();
   });
 
   it("zeigt keinen Vorbelegungs-Hinweis, solange kein Typ mit Vorgabe gewählt ist", () => {

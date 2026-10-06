@@ -1184,7 +1184,15 @@ export function SchrittPersonal({ bogen, aendern: aendernRoh }: SchrittProps) {
         <p>
           <button
             type="button"
-            onClick={() => aendern({ personal: benannte(bogen.personal) })}
+            onClick={() => {
+              const nach = benannte(bogen.personal);
+              // Mit Rückweg und Stärke vorher → nachher: Die Plätze trugen
+              // Geschlecht und Ernährung (Audit Runde 4, R4-D4).
+              aendernMitRueckweg(
+                nach,
+                `Vorbelegung entfernt: ${unbenannte === 1 ? "1 Person" : `${unbenannte} Personen`} — Stärke ${staerke(bogen).gesamt} → ${staerke({ personal: nach, staerkeManuell: bogen.staerkeManuell }).gesamt}.`,
+              );
+            }}
           >
             Vorbelegung entfernen ({unbenannte === 1 ? "1 Person ohne Namen" : `${unbenannte} Personen ohne Namen`})
           </button>

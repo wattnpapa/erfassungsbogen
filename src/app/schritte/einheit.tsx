@@ -6,9 +6,14 @@
 import { useEffect, useState } from "react";
 import {
   Einheit,
+  Ernaehrung,
+  Geschlecht,
   HierarchieEbene,
   OrganisationsTyp,
   PersonalErfassung,
+  staerke,
+  type Fahrzeug,
+  type Person,
 } from "@bos/eeb-format/model";
 import type { ThwOrtsverband } from "@bos/vokabulare/thw-ov";
 import { fahrzeugVorbelegung, fahrzeugeMitFunkrufOv } from "../../vokabulare/thw-funkrufname-ort";
@@ -26,6 +31,7 @@ import {
   vokabularFuer,
 } from "../hilfen";
 import { frageJaNein } from "../dialoge";
+import { DaumenQuittung } from "../daumen-quittung";
 import { Auswahl, Feld, FREMDE_DATEN, Hinweise, KENNUNG_EINGABE, VokabAuswahl, VorschlagFeld, type SchrittProps } from "./bausteine";
 
 // Die beiden großen Datenpakete laden erst mit Schritt 1, nicht mit dem
@@ -230,7 +236,54 @@ export function SchrittEinheit({ bogen, aendern: aendernRoh }: SchrittProps) {
   const e = bogen.einheit;
   // Vorbelegung und Typwechsel verändern die Personalliste — der Verpflegungs-
   // Bedarf in Schritt 5 zieht mit (siehe verpflegungMitziehen).
-  const aendern = (patch: Partial<typeof bogen>) => aendernRoh(verpflegungMitziehen(bogen, patch));
+  // Jede weitere Änderung verwirft den Rückweg der Vorbelegung, damit
+  // „Rückgängig" nie spätere Eingaben mitnimmt (wie in Schritt 3).
+  const aendern = (patch: Partial<typeof bogen>) => {
+    setVorbelegungWeg(null);
+    aendernRoh(verpflegungMitziehen(bogen, patch));
+  };
+  /**
+   * Rückweg nach dem Wegnehmen unbenannter Sollplätze („Vorbelegung
+   * entfernen", Wechsel des Einheitstyps): Die Plätze trugen Geschlecht,
+   * Ernährung und „Zählt als", ohne dass es irgendwo stand, und mit ihnen
+   * fiel die Stärke — still (Audit Runde 4, R4-D4). Die Leiste im
+   * Daumenbereich nennt, was ging und wie sich die Stärke änderte.
+   *
+   * Der Stand zu Beginn bleibt erhalten, solange nichts anderes geändert wird:
+   * Wer den Typ erst leert und dann einen neuen tippt, geht über mehrere
+   * Schritte, und „Rückgängig" soll zum Anfang zurück, nicht zum Zwischenstand.
+   */
+  const [vorbelegungWeg, setVorbelegungWeg] = useState<
+    { kopf: string; vor: number; personal: Person[]; fahrzeuge: Fahrzeug[]; einheit: Einheit; nonce: number } | null
+  >(null);
+  /** `aendern` mit Rückweg, wenn dabei unbenannte Sollplätze weggehen (oder schon eine Leiste steht). */
+  function aendernMitVorbelegungWeg(patch: Partial<typeof bogen>, titel: string) {
+    if (vorbelegtePersonen > 0 || vorbelegteFahrzeuge > 0) {
+      const teile = [
+        vorbelegtePersonen > 0 ? anzahlText(vorbelegtePersonen, "Person", "Personen") : "",
+        vorbelegteFahrzeuge > 0 ? anzahlText(vorbelegteFahrzeuge, "Fahrzeug", "Fahrzeuge") : "",
+      ].filter(Boolean);
+      const mitAngaben = bogen.personal.filter(
+        (p) => personUnbenannt(p) && (p.geschlecht !== Geschlecht.M || p.ernaehrung !== Ernaehrung.FLEISCH),
+      ).length;
+      const neu = {
+        kopf: `${titel}: ${teile.join(", ")}${mitAngaben > 0 ? ` (${mitAngaben} mit Geschlecht oder Ernährung)` : ""}`,
+        vor: staerke(bogen).gesamt,
+        personal: bogen.personal,
+        fahrzeuge: bogen.fahrzeuge,
+        einheit: e,
+        nonce: Date.now(),
+      };
+      setVorbelegungWeg((alt) => alt ?? neu);
+    }
+    aendernRoh(verpflegungMitziehen(bogen, patch));
+  }
+  function vorbelegungZurueck() {
+    if (!vorbelegungWeg) return;
+    const { personal, fahrzeuge, einheit } = vorbelegungWeg;
+    aendernRoh(verpflegungMitziehen(bogen, { personal, fahrzeuge, einheit }));
+    setVorbelegungWeg(null);
+  }
   const setE = (p: Partial<Einheit>) => aendern({ einheit: { ...e, ...p } });
   const ebenen = vokabularFuer(e.organisation, "ebene");
   const einheitstypen = vokabularFuer(e.organisation, "einheitstyp");
@@ -254,8 +307,11 @@ export function SchrittEinheit({ bogen, aendern: aendernRoh }: SchrittProps) {
   function einheitstypSetzen(v: Einheit["einheitsTyp"]) {
     const einheit = { ...e, einheitsTyp: v };
     // Derselbe Code noch einmal (Combobox-Auflösung beim Verlassen): nichts anfassen.
+    // Der Rückweg der Vorbelegung bleibt dabei stehen: Wer „Rückgängig" tippt,
+    // nimmt den Fokus aus dem Feld, und das Verlassen löst denselben Typ noch
+    // einmal auf — das darf die Leiste nicht schon vor dem Tipp wegnehmen (R4-D4).
     if (v.code != null && v.code === e.einheitsTyp.code) {
-      aendern({ einheit });
+      aendernRoh(verpflegungMitziehen(bogen, { einheit }));
       return;
     }
     const personal = [
@@ -269,19 +325,25 @@ export function SchrittEinheit({ bogen, aendern: aendernRoh }: SchrittProps) {
       ...bogen.fahrzeuge.filter((f) => !fahrzeugUnbenannt(f)),
       ...(bogen.personalErfassung === PersonalErfassung.NUR_STAERKE ? [] : fahrzeugVorbelegung(einheit)),
     ];
-    aendern({
-      einheit,
-      ...(personal.length !== bogen.personal.length || personal.some((p, i) => p !== bogen.personal[i]) ? { personal } : {}),
-      ...(fahrzeuge.length !== bogen.fahrzeuge.length || fahrzeuge.some((f, i) => f !== bogen.fahrzeuge[i]) ? { fahrzeuge } : {}),
-    });
+    aendernMitVorbelegungWeg(
+      {
+        einheit,
+        ...(personal.length !== bogen.personal.length || personal.some((p, i) => p !== bogen.personal[i]) ? { personal } : {}),
+        ...(fahrzeuge.length !== bogen.fahrzeuge.length || fahrzeuge.some((f, i) => f !== bogen.fahrzeuge[i]) ? { fahrzeuge } : {}),
+      },
+      "Vorbelegung des bisherigen Typs ersetzt",
+    );
   }
 
   /** „Vorbelegung entfernen": nur die unbenannten Karten, benannte bleiben. */
   function vorbelegungEntfernen() {
-    aendern({
-      personal: bogen.personal.filter((p) => !personUnbenannt(p)),
-      fahrzeuge: bogen.fahrzeuge.filter((f) => !fahrzeugUnbenannt(f)),
-    });
+    aendernMitVorbelegungWeg(
+      {
+        personal: bogen.personal.filter((p) => !personUnbenannt(p)),
+        fahrzeuge: bogen.fahrzeuge.filter((f) => !fahrzeugUnbenannt(f)),
+      },
+      "Vorbelegung entfernt",
+    );
   }
 
   /**
@@ -704,6 +766,11 @@ export function SchrittEinheit({ bogen, aendern: aendernRoh }: SchrittProps) {
           weiterkommen und ihn nachtragen. Er steht jetzt nur nicht mehr still
           da. */}
       <Hinweise punkte={pruefpunkte(bogen, false)} aktuellerSchritt={0} />
+      {vorbelegungWeg && (
+        <DaumenQuittung key={`vorbelegung:${vorbelegungWeg.nonce}`} onRueckgaengig={vorbelegungZurueck} onSchliessen={() => setVorbelegungWeg(null)}>
+          {vorbelegungWeg.kopf} — Stärke {vorbelegungWeg.vor} → {staerke(bogen).gesamt}.
+        </DaumenQuittung>
+      )}
     </section>
   );
 }

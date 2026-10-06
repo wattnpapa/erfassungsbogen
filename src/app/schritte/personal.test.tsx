@@ -1053,6 +1053,11 @@ describe("Vorbelegung entfernen (Schritt 3)", () => {
 
     expect(screen.getAllByLabelText("Vorname")).toHaveLength(3);
     expect(screen.queryByRole("button", { name: /^Vorbelegung entfernen/ })).toBeNull();
+    // R4-D4: Quittung mit Stärke vorher → nachher und Rückweg.
+    const quittung = document.querySelector<HTMLElement>(".rueckweg")!;
+    expect(quittung.textContent).toContain(`Vorbelegung entfernt: ${vorlage.length - 3} Personen — Stärke ${vorlage.length} → 3.`);
+    await nutzer.click(within(quittung).getByRole("button", { name: "Rückgängig" }));
+    expect(screen.getAllByLabelText("Vorname")).toHaveLength(vorlage.length);
   });
 
   it("zeigt den Knopf nicht, wenn alle Karten benannt sind", () => {
