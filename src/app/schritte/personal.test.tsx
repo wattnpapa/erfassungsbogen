@@ -32,6 +32,11 @@ const dlrgBogen = () => {
 };
 
 describe("Schritt Personal", () => {
+  it("sagt, dass auf dem Papier die Fahrzeuge vor dem Personal stehen (R4-A8)", () => {
+    buehne();
+    expect(screen.getByText(/Vom Papier abtippen\? Auf dem Blatt stehen die Fahrzeuge oben, das Personal darunter: erst Schritt 4\./)).toBeDefined();
+  });
+
   it("legt über „+ Person hinzufügen“ eine Detail-Karte an und zählt sie zur Stärke", async () => {
     const nutzer = userEvent.setup();
     buehne();

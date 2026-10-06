@@ -3712,6 +3712,13 @@ function AppInhalt() {
                 Aus Datei laden…
                 <input type="file" accept=".pdf,application/pdf,.json,application/json" onChange={ladeDatei} className="nur-sr" />
               </label>
+              {/* Die Papier-Reserve für die eigene Einheit, bevor man sie
+                  braucht: stand nur als Fußzeilen-Link unter „Projekt“, bei
+                  leerem Gerät rund 6 300 px tief (Audit Runde 4, R4-A8). */}
+              <button type="button" className="mit-zusatz" onClick={() => void blankoVordruck()} aria-describedby="start-blanko-zusatz">
+                Leeren Vordruck drucken (PDF)
+                <span className="knopf-zusatz" id="start-blanko-zusatz" aria-hidden="true">Papier-Reserve zum Ausfüllen mit der Hand</span>
+              </button>
             </div>
           </section>
           <section className="weiche-weg" aria-labelledby="weg-meldekopf">

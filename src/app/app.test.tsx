@@ -31,10 +31,12 @@ import {
 // Die PDF-Erzeugung (pdfmake) ist eigenständig getestet und im Test nur teuer;
 // hier zählt, dass der Weg dorthin funktioniert und der Bogen ankommt.
 const pdfErzeugen = vi.fn<(bogen: Erfassungsbogen, name?: string) => Promise<void>>(async () => {});
+const blankoErzeugen = vi.fn<() => Promise<boolean>>(async () => true);
 vi.mock("./pdf", () => ({
   pdfErzeugen: (bogen: Erfassungsbogen, name?: string) => pdfErzeugen(bogen, name),
   pdfBlobUrl: async () => "blob:pdf-vorschau",
   einsatzPdfErzeugen: async () => {},
+  blankoPdfErzeugen: async () => blankoErzeugen(),
 }));
 
 // Ohne Capacitor: die Tests fahren die Browser-Variante der App. Das
@@ -298,6 +300,16 @@ describe("Assistenten-Durchlauf", () => {
     ]);
     await nutzer.click(within(eigener).getByRole("button", { name: "Einsatz vorbereiten: FGr Haupthausen" }));
     expect(screen.getByRole("heading", { level: 1, name: "FGr Haupthausen" })).toBeDefined();
+  });
+
+  it("bietet den Blanko-Vordruck schon auf der Startseite an, mit einem Tipp (R4-A8)", async () => {
+    blankoErzeugen.mockClear();
+    const nutzer = userEvent.setup();
+    render(<App />);
+    const eigener = screen.getByRole("region", { name: "Meinen Bogen ausfüllen" });
+    await nutzer.click(within(eigener).getByRole("button", { name: /^Leeren Vordruck drucken \(PDF\)/ }));
+    await waitFor(() => expect(blankoErzeugen).toHaveBeenCalledTimes(1));
+    expect(await screen.findByText(/Blanko-Vordruck erzeugt/)).toBeDefined();
   });
 
   it("springt vom offenen Punkt ins Feld und setzt den Cursor (R2-H2)", async () => {

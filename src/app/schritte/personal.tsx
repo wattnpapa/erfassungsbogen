@@ -991,6 +991,9 @@ export function SchrittPersonal({ bogen, aendern: aendernRoh }: SchrittProps) {
   return (
     <section className="karte">
       <h2>3. Personal</h2>
+      {/* Der Assistent fragt Personal vor Fahrzeugen, das Papier hat sie in
+          umgekehrter Reihenfolge — wer abtippt, blättert sonst (R4-A8). */}
+      <p className="hinweis">Vom Papier abtippen? Auf dem Blatt stehen die Fahrzeuge oben, das Personal darunter: erst Schritt 4.</p>
       <p>
         <label className="inline">
           <input
