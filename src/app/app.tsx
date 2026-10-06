@@ -60,6 +60,7 @@ import { entwirreScanText } from "./tastaturbelegung";
 import { ortSperren } from "./tipp-schutz";
 import { vorlageAktualisieren, vorlageAnlegen, vorlageAusDatei, vorlagenLaden, vorlagenPapierkorb, vorlageZuruecksetzen, type Vorlage } from "./vorlagen";
 import { Musterung, VorlagenListe } from "./vorlagen-ui";
+import { musterungVorlageAusStand } from "./musterung-stand";
 import { absenderkarteGefuellt, absenderkarteLaden, type Absenderkarte } from "./absenderkarte";
 import { AbsenderkarteFeld } from "./absenderkarte-ui";
 import {
@@ -218,6 +219,15 @@ function fragmentNehmen(): string {
 }
 
 /**
+ * Meldung bei einem Link ohne lesbaren Bogen — mit dem nächsten Schritt: Meist
+ * ist er auf dem Weg gekürzt worden (Chat, Mail), und der Absender hat QR-Code
+ * und PDF zur Hand (Audit Runde 4, R4-E7).
+ */
+const LINK_UNGUELTIG =
+  "Der geöffnete Link enthält keinen gültigen Erfassungsbogen. Er ist vermutlich unterwegs abgeschnitten worden — " +
+  "bitte den QR-Code oder die PDF des Absenders verwenden oder den Link neu anfordern.";
+
+/**
  * Startzustand aus dem URL-Fragment: Ein QR/Universal Link kann einen
  * Einsatzbogen (`#…`), eine geteilte Vorlage (`#V.…`) oder einen Segment-Teil
  * eines mehrteiligen Bogens (`#EEBS.…`) tragen. Eine Vorlage wird direkt
@@ -251,7 +261,7 @@ function startAusUrlFragment(): {
     // Anonymisiert: kein Text für die Signaturprüfung — der Nachweis deckt den Inhalt nicht mehr.
     return { bogen, vorlage: null, fehler: "", text: anonymisiert ? "" : fragment, segment: "" };
   } catch {
-    return { bogen: null, vorlage: null, fehler: "Der geöffnete Link enthält keinen gültigen Erfassungsbogen.", text: "", segment: "" };
+    return { bogen: null, vorlage: null, fehler: LINK_UNGUELTIG, text: "", segment: "" };
   }
 }
 
@@ -809,7 +819,11 @@ function AppInhalt() {
   // Absenderkarte (Gerätestand) — auch auf der Startseite einstellbar; die
   // Übersicht liest sie beim Mounten erneut aus dem Speicher.
   const [absender, setAbsender] = useState<Absenderkarte>(() => absenderkarteLaden());
-  const [musterVorlage, setMusterVorlage] = useState<Vorlage | null>(null);
+  // Eine vor dem Neuladen offene Musterung öffnet wieder, mit ihren Haken
+  // (Audit Runde 4, R4-E7); ein Link oder eine angefangene Erfassung geht vor.
+  const [musterVorlage, setMusterVorlage] = useState<Vorlage | null>(() =>
+    START.bogen || START.segment || START.vorlage || START_SOFORT || erfassungsZielBeimStart() ? null : musterungVorlageAusStand(vorlagen),
+  );
   // Einsatz-Sammlung (Meldekopf/Zugführer): Liste, offener Einsatz und das
   // Sammelziel für hereinkommende Bögen (Scan/manuell landen dort statt zu öffnen).
   const [einsaetze, setEinsaetze] = useState<Einsatzsammlung[]>(() => einsaetzeLaden());
@@ -1068,8 +1082,18 @@ function AppInhalt() {
     wendeOrgAkzentAn(einsatzAnsicht ? undefined : bogen?.einheit.organisation);
   }, [bogen?.einheit.organisation, einsatzAnsicht]);
 
-  async function musterungFertig(neuerArbeitsbogen: Erfassungsbogen, abgewaehlt: Person[] = []) {
-    if (!(await darfBogenErsetzen({ titel: "Bogen aus Vorlage anlegen?", was: "den Bogen aus der Vorlage", ok: "Aus Vorlage anlegen" }))) return;
+  async function musterungFertig(neuerArbeitsbogen: Erfassungsbogen, abgewaehlt: Person[] = [], alleDa?: string) {
+    if (
+      !(await darfBogenErsetzen({
+        titel: "Bogen aus Vorlage anlegen?",
+        was: "den Bogen aus der Vorlage",
+        ok: alleDa ? "Ja, alle sind da — anlegen" : "Aus Vorlage anlegen",
+        // „Alle dabei?" und „Bogen ersetzen?" in einer Rückfrage (R4-S5).
+        vorab: alleDa,
+        abbruch: alleDa ? "Zurück zur Liste" : undefined,
+      }))
+    )
+      return;
     nachzueglerMerken(neuerArbeitsbogen, abgewaehlt);
     setBogen(neuerArbeitsbogen);
     setzeEmpfang(null);
@@ -1231,10 +1255,12 @@ function AppInhalt() {
     if (bearbeiteteVorlage && (vorlageUnveraendert(b) || !rueckholungNimmt(true, alt))) return false;
     // Derselbe Bogen liegt schon dort: keine Kopie über sich selbst (R3-E2).
     if (alt && JSON.stringify(alt.bogen) === JSON.stringify(b)) return true;
+    // Die Rückholung nennt die letzte Bearbeitung, nicht den Moment des Schließens (R4-S5).
+    const geaendertUm = bogenGespeichert.current.bogen === b ? bogenGespeichert.current.um : undefined;
     const ok = ersetztenEntwurfMerken(
       b,
       fremdeErfassung ? { einsatzId: sammelZielId ?? undefined, beginn: erfassungBeginn ?? undefined } : undefined,
-      opt,
+      { ...opt, geaendertUm },
     );
     if (ok) setErsetzterEntwurf(ersetztenEntwurfLaden());
     return ok;
@@ -1297,7 +1323,7 @@ function AppInhalt() {
         verlust: true,
       };
     }
-    const bleibt = `„${name}" bleibt auf der Startseite unter „Zuletzt verdrängten Bogen zurückholen" erreichbar.`;
+    const bleibt = `„${name}" bleibt auf der Startseite unter „Zuletzt geschlossenen Bogen zurückholen" erreichbar.`;
     if (!altZaehlt) return { satz: bleibt, verlust: false };
     const stand = new Date(alt.gespeichert).toLocaleString("de-DE", { dateStyle: "short", timeStyle: "short" });
     return {
@@ -1333,7 +1359,7 @@ function AppInhalt() {
   function eigenerBogenWartetHinweis(): string {
     const r = ersetztenEntwurfLaden();
     return r && !r.fremd && bogenHatInhalt(r.bogen)
-      ? `Dein eigener Bogen „${einheitAnzeigename(r.bogen.einheit)}" liegt auf der Startseite unter „Zuletzt verdrängten Bogen zurückholen".`
+      ? `Dein eigener Bogen „${einheitAnzeigename(r.bogen.einheit)}" liegt auf der Startseite unter „Zuletzt geschlossenen Bogen zurückholen".`
       : "";
   }
 
@@ -1357,6 +1383,9 @@ function AppInhalt() {
     ok: string;
     ohneFrage?: boolean;
     tausch?: boolean;
+    /** Ein Satz vor der Frage (etwa „Alle dabei?" der Musterung, R4-S5) und die Beschriftung des Abbrechens. */
+    vorab?: string;
+    abbruch?: string;
   }): Promise<boolean> {
     // Was auch immer den Bogen ersetzt: die Bearbeitung einer Vorlage ist es
     // danach nicht mehr — der verdrängte Bogen wird zum gewöhnlichen Entwurf.
@@ -1377,12 +1406,13 @@ function AppInhalt() {
       const folgen = folgenFuerOffenenBogen({ tausch: a.tausch });
       const ja = await frageJaNein({
         titel: a.titel,
-        text: `${
+        text: `${a.vorab ? `${a.vorab} ` : ""}${
           bearbeiteteVorlage
             ? `Die Bearbeitung der Vorlage „${bearbeiteteVorlage.name}"`
             : `${fremdeErfassung ? "Die angefangene Erfassung" : "Der angefangene Bogen"} „${einheitAnzeigename(bogen.einheit)}"`
         } wird durch ${a.was} ersetzt. ${folgen.satz}`,
         ok: a.ok,
+        abbruch: a.abbruch,
         gefahr: folgen.verlust,
       });
       if (!ja) return false;
@@ -1411,7 +1441,7 @@ function AppInhalt() {
     const altZaehlt = !!alt && bogenHatInhalt(alt.bogen);
     const folge = !nimmt
       ? ` Als Erfassung einer fremden Einheit wird sie dabei verworfen; dein Bogen „${einheitAnzeigename(alt!.bogen.einheit)}" bleibt zurückholbar.`
-      : ` „${name}" bleibt auf der Startseite unter „Zuletzt verdrängten Bogen zurückholen" erreichbar.${
+      : ` „${name}" bleibt auf der Startseite unter „Zuletzt geschlossenen Bogen zurückholen" erreichbar.${
           altZaehlt ? ` Der dort bisher liegende Bogen „${einheitAnzeigename(alt!.bogen.einheit)}" wird dabei endgültig gelöscht.` : ""
         }`;
     if (!a.ohneFrage) {
@@ -1502,7 +1532,7 @@ function AppInhalt() {
     const zurueck = ersetzterEntwurf;
     if (!zurueck) return;
     if (!(await darfBogenErsetzen({
-      titel: "Verdrängten Bogen zurückholen?",
+      titel: "Geschlossenen Bogen zurückholen?",
       was: `den Bogen „${einheitAnzeigename(zurueck.bogen.einheit)}"`,
       ok: "Zurückholen",
       tausch: true,
@@ -1559,7 +1589,7 @@ function AppInhalt() {
       setMeldung(
         [
           `Bearbeitung der Vorlage „${vorlage.name}" beendet — die Vorlage ist unverändert.`,
-          !unveraendert && gemerkt ? "Die nicht übernommenen Änderungen liegen unten auf der Startseite zum Zurückholen." : "",
+          !unveraendert && gemerkt ? "Die nicht übernommenen Änderungen liegen oben auf der Startseite zum Zurückholen." : "",
           eigenerBogenWartetHinweis(),
         ]
           .filter(Boolean)
@@ -1573,7 +1603,7 @@ function AppInhalt() {
     setSammelZiel(null);
     setzeEmpfang(null);
     setSchritt(0);
-    setMeldung(gemerkt ? "Angefangener Bogen verworfen — Rückholung unten auf der Startseite." : "Angefangene Erfassung verworfen.");
+    setMeldung(gemerkt ? "Angefangener Bogen verworfen — Rückholung oben auf der Startseite." : "Angefangene Erfassung verworfen.");
   }
 
   /**
@@ -2309,7 +2339,7 @@ function AppInhalt() {
   useEffect(() => {
     if (!START.segment || startSegmentVerbraucht) return;
     startSegmentVerbraucht = true; // StrictMode mountet doppelt — der Teil zählt nur einmal
-    void uebernehmeText(START.segment, "Der geöffnete Link enthält keinen gültigen Erfassungsbogen.").then(
+    void uebernehmeText(START.segment, LINK_UNGUELTIG).then(
       (fertig) => {
         if (!fertig) void scanneQr();
       },
@@ -2328,7 +2358,7 @@ function AppInhalt() {
    */
   const linkEmpfangenRef = useRef<(text: string) => void>(() => {});
   linkEmpfangenRef.current = (text: string) => {
-    void uebernehmeText(text, "Der geöffnete Link enthält keinen gültigen Erfassungsbogen.", { ohneKiosk: true }).then(
+    void uebernehmeText(text, LINK_UNGUELTIG, { ohneKiosk: true }).then(
       (fertig) => {
         // Segment-Teil eines mehrteiligen Bogens: Scanner öffnen, damit die
         // übrigen Teile direkt folgen können. Kam umgekehrt der LETZTE Teil
@@ -3348,7 +3378,7 @@ function AppInhalt() {
     return (
       <>
         <Aktualisierungshinweise />
-        <Musterung vorlage={musterVorlage} onStart={musterungFertig} onAbbrechen={() => setMusterVorlage(null)} />
+        <Musterung vorlage={musterVorlage} onStart={musterungFertig} onAbbrechen={() => setMusterVorlage(null)} ersetztBogen={!!bogen && bogenHatInhalt(bogen)} />
         <Fusszeile onBogenOeffnen={oeffneBeispiel} />
       </>
     );
@@ -3537,10 +3567,20 @@ function AppInhalt() {
                 <span className="hinweis">
                   {/* Kurzlegende sichtbar: die Zahlen allein erklärte nur Schritt 3 (R2-N9). */}
                   Stärke {s.fuehrer} / {s.unterfuehrer} / {s.mannschaft} / {s.gesamt} (F / UF / M / Ges)
-                  {gespeichertUm
+                  {/* Mit ausgefallenem Speicher stand hier „gespeichert 21:01 Uhr"
+                      für einen Stand, der nicht im Speicher liegt (Audit Runde 4,
+                      R4-E5). */}
+                  {!speicherFehler && gespeichertUm
                     ? ` · gespeichert ${uhrzeitMitTag(gespeichertUm)} Uhr`
                     : ""}
                 </span>
+                {speicherFehler && (
+                  <span className="hinweis warnung-text speicher-fehler" role="alert">
+                    ⚠ Nicht gespeichert — {speicherArt === "gesperrt" ? "dieser Browser lässt die App nichts speichern" : "der Speicher dieses Geräts ist voll"}.
+                    {gespeichertUm ? ` Letzter gesicherter Stand: ${uhrzeitMitTag(gespeichertUm)} Uhr.` : ""} Beim Schließen
+                    gehen die Änderungen verloren — {fremdeErfassung ? "die Stärke jetzt auf dem Meldeblock notieren." : "jetzt „Fortsetzen“ und „Bogen übergeben“ (PDF oder QR-Code)."}
+                  </span>
+                )}
               </span>
               <span className="entwurf-aktionen">
                 <button type="button" className="primaer" onClick={() => { setMeldung(""); setZeigeStart(false); }}>Fortsetzen</button>
@@ -3562,12 +3602,12 @@ function AppInhalt() {
             <span className="entwurf-text">
               <strong>{einheitAnzeigename(ersetzterEntwurf.bogen.einheit)}</strong>
               <span className="hinweis">
-                Zuletzt verdrängter Bogen · Stand{" "}
+                Zuletzt geschlossener Bogen · zuletzt bearbeitet{" "}
                 {new Date(ersetzterEntwurf.gespeichert).toLocaleString("de-DE", { dateStyle: "short", timeStyle: "short" })} Uhr
               </span>
             </span>
             <span className="entwurf-aktionen">
-              <button type="button" onClick={holeVerdraengtenZurueck}>Zuletzt verdrängten Bogen zurückholen</button>
+              <button type="button" onClick={holeVerdraengtenZurueck}>Zuletzt geschlossenen Bogen zurückholen</button>
             </span>
           </section>
         )}
@@ -3899,9 +3939,16 @@ function AppInhalt() {
         <p className="autosave speicher-fehler" role="alert">
           {/* Gesperrt ist nicht voll: dort hilft kein Papierkorb, sondern
               Speichern erlauben bzw. den privaten Modus verlassen (R3-O4). */}
-          {speicherArt === "gesperrt"
-            ? `⚠ Nicht gespeichert — dieser Browser lässt die App nichts speichern (etwa im privaten Modus oder durch eine Datenschutz-Einstellung). Der Bogen bleibt geöffnet; bitte jetzt „Bogen übergeben" (PDF) und für die nächste Erfassung Speichern für diese Seite erlauben oder ein normales Fenster nutzen.`
-            : `⚠ Nicht gespeichert — der Speicher dieses Geräts ist voll. Der Bogen bleibt geöffnet; bitte jetzt „Bogen übergeben" (PDF) oder in der Fußzeile der Startseite Papierkorb leeren bzw. Sicherung erstellen.`}
+          {/* Eine fremde Erfassung am Meldekopf ist kein Bogen zum Übergeben: Dort
+              gehört die Stärke auf den Meldeblock, und der Speicher muss frei
+              werden (Audit Runde 4, R4-E7). */}
+          {fremdeErfassung
+            ? speicherArt === "gesperrt"
+              ? `⚠ Nicht gespeichert — dieser Browser lässt die App nichts speichern (etwa im privaten Modus oder durch eine Datenschutz-Einstellung). Die Erfassung bleibt geöffnet; bitte die Stärke jetzt auf dem Meldeblock notieren und Speichern für diese Seite erlauben oder ein normales Fenster nutzen.`
+              : `⚠ Nicht gespeichert — der Speicher dieses Geräts ist voll. Die Erfassung bleibt geöffnet; bitte die Stärke jetzt auf dem Meldeblock notieren und Platz schaffen: in der Fußzeile der Startseite Papierkorb leeren bzw. Sicherung erstellen.`
+            : speicherArt === "gesperrt"
+              ? `⚠ Nicht gespeichert — dieser Browser lässt die App nichts speichern (etwa im privaten Modus oder durch eine Datenschutz-Einstellung). Der Bogen bleibt geöffnet; bitte jetzt „Bogen übergeben" (PDF) und für die nächste Erfassung Speichern für diese Seite erlauben oder ein normales Fenster nutzen.`
+              : `⚠ Nicht gespeichert — der Speicher dieses Geräts ist voll. Der Bogen bleibt geöffnet; bitte jetzt „Bogen übergeben" (PDF) oder in der Fußzeile der Startseite Papierkorb leeren bzw. Sicherung erstellen.`}
           {gespeichertUm ? ` Letzter gesicherter Stand: ${uhrzeitMitTag(gespeichertUm)} Uhr.` : ""}
         </p>
       ) : gespeichertUm ? (

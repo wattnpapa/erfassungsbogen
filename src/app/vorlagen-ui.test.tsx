@@ -97,6 +97,22 @@ describe("Musterung starten (R3-H4, R3-H7)", () => {
     expect(onStart).toHaveBeenCalledTimes(1);
   });
 
+  // Audit Runde 4, R4-S5: Ersetzt der Start einen offenen Bogen, fragt die App; „Alle dabei?" steht dann in derselben Rückfrage.
+  it("fragt nicht selbst, wenn die App ohnehin zum Ersetzen fragt, und gibt den Satz mit (R4-S5)", async () => {
+    const nutzer = userEvent.setup();
+    const onStart = vi.fn();
+    render(
+      <>
+        <Musterung vorlage={vorlage()} onStart={onStart} onAbbrechen={() => {}} ersetztBogen />
+        <Dialogschicht />
+      </>,
+    );
+    await nutzer.click(screen.getByRole("button", { name: /^Einsatz starten/ }));
+    expect(frage()).toBeNull();
+    expect(onStart).toHaveBeenCalledTimes(1);
+    expect(onStart.mock.calls[0]![2]).toMatch(/^Gemeldet werden alle 3 Personen der Vorlage\. Fehlt jemand/);
+  });
+
   it("startet nach dem Abwählen ohne Rückfrage", async () => {
     const nutzer = userEvent.setup();
     const { onStart } = buehneMit(vorlage());
@@ -125,5 +141,57 @@ describe("Musterung starten (R3-H4, R3-H7)", () => {
     await nutzer.click(screen.getByRole("checkbox", { name: /Voss/ }));
     await nutzer.click(screen.getByRole("button", { name: /^Einsatz starten/ }));
     expect(zweite.onStart.mock.calls[0]![0].sonstiges).toBe("2 Sollplätze unbesetzt. Anh in Instandsetzung.");
+  });
+});
+
+/**
+ * Audit Runde 4, R4-E7: Die Haken einer Musterung überleben ein Neuladen, ein
+ * bewusstes Ende der Musterung räumt sie weg.
+ */
+describe("Musterung nach dem Neuladen (R4-E7)", () => {
+  beforeEach(() => localStorage.clear());
+  afterEach(() => cleanup());
+
+  it("stellt die Haken wieder her, wenn dieselbe Vorlage nach einem Neuladen gemustert wird", async () => {
+    const nutzer = userEvent.setup();
+    const v = vorlage();
+    const { unmount } = render(<Musterung vorlage={v} onStart={() => {}} onAbbrechen={() => {}} />);
+    await nutzer.click(screen.getByRole("checkbox", { name: /Voss/ }));
+    await nutzer.click(screen.getByRole("checkbox", { name: /Ahlers/ }));
+    const stand = localStorage.getItem("eeb.musterung.v1")!;
+    expect(JSON.parse(stand)).toMatchObject({ vorlageId: v.id, personal: [true, false, false] });
+    // Neuladen: die Seite verschwindet, ohne dass Reacts Aufräumen den Stand wegnimmt.
+    unmount();
+    expect(localStorage.getItem("eeb.musterung.v1")).toBeNull();
+    localStorage.setItem("eeb.musterung.v1", stand);
+
+    render(<Musterung vorlage={v} onStart={() => {}} onAbbrechen={() => {}} />);
+
+    expect((screen.getByRole("checkbox", { name: /Berger/ }) as HTMLInputElement).checked).toBe(true);
+    expect((screen.getByRole("checkbox", { name: /Voss/ }) as HTMLInputElement).checked).toBe(false);
+    expect((screen.getByRole("checkbox", { name: /Ahlers/ }) as HTMLInputElement).checked).toBe(false);
+    expect(screen.getByText(/Deine Haken von vorhin sind wieder da/)).toBeDefined();
+    expect(screen.getByRole("button", { name: /Einsatz starten · 1 Pers/ })).toBeDefined();
+  });
+
+  it("ignoriert den Stand einer anderen oder geänderten Vorlage", () => {
+    const v = vorlage();
+    localStorage.setItem(
+      "eeb.musterung.v1",
+      JSON.stringify({ vorlageId: v.id, vorlageGeaendert: v.geaendert + 1, personal: [true, false, false], fahrzeuge: [], bedarf: false, bemerkung: false, zeit: Date.now() }),
+    );
+    render(<Musterung vorlage={v} onStart={() => {}} onAbbrechen={() => {}} />);
+    expect((screen.getByRole("checkbox", { name: /Voss/ }) as HTMLInputElement).checked).toBe(true);
+    expect(screen.queryByText(/Deine Haken von vorhin/)).toBeNull();
+  });
+
+  it("räumt den Stand beim Ende der Musterung weg", async () => {
+    const nutzer = userEvent.setup();
+    const { onAbbrechen } = buehne();
+    expect(localStorage.getItem("eeb.musterung.v1")).not.toBeNull();
+    await nutzer.click(screen.getByRole("button", { name: "‹ Abbrechen" }));
+    expect(onAbbrechen).toHaveBeenCalled();
+    cleanup();
+    expect(localStorage.getItem("eeb.musterung.v1")).toBeNull();
   });
 });

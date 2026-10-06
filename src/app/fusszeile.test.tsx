@@ -220,7 +220,7 @@ describe("Sicherung einspielen", () => {
 
     await nutzer.upload(dateiFeld(), datei);
     const dialog = await screen.findByRole("dialog", { name: "Sicherung einspielen?" });
-    expect(within(dialog).getByText(/der zuletzt verdrängte Bogen „THW Crailsheim“/)).toBeDefined();
+    expect(within(dialog).getByText(/der zuletzt geschlossene Bogen „THW Crailsheim“/)).toBeDefined();
     expect(within(dialog).getByText("die hinterlegte Absenderkarte")).toBeDefined();
     expect(within(dialog).getByText(/der Signatur-Geräteschlüssel \(Kurzform [0-9a-f]{4} [0-9a-f]{4} [0-9a-f]{4} [0-9a-f]{4}\)/)).toBeDefined();
     expect(within(dialog).getByRole("button", { name: "Einspielen und ersetzen" })).toHaveProperty("disabled", true);

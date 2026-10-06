@@ -153,13 +153,13 @@ export function Uebersicht(props: {
   /**
    * Bogen schließen, zurück zur Startseite. Die Rückfrage sagte „… der
    * gespeicherte Entwurf gelöscht" — tatsächlich lag der Bogen danach unter
-   * „Zuletzt verdrängten Bogen zurückholen", und statt eines neuen Bogens kam
+   * „Zuletzt geschlossenen Bogen zurückholen", und statt eines neuen Bogens kam
    * die Startseite. Jetzt steht da, was wirklich geschieht; „gefahr" nur,
    * wenn dabei wirklich etwas verloren geht (Audit Runde 2, R2-H9).
    */
   async function bogenVerwerfen() {
     const folgen = props.schliessenFolgen?.() ?? {
-      satz: `„${einheitAnzeigename(bogen.einheit)}" bleibt auf der Startseite unter „Zuletzt verdrängten Bogen zurückholen" erreichbar.`,
+      satz: `„${einheitAnzeigename(bogen.einheit)}" bleibt auf der Startseite unter „Zuletzt geschlossenen Bogen zurückholen" erreichbar.`,
       verlust: false,
     };
     const sicher = await frageJaNein({

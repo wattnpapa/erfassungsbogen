@@ -41,6 +41,7 @@ import { frageJaNein, frageText, zeigeHinweis } from "./dialoge";
 import { istNativ, linkTeilen, shareSheetVerfuegbar } from "./nativ";
 import { AbgangKnopf, Kartenstapel } from "./kartenstapel";
 import { papierkorbRest } from "./papierkorb-frist";
+import { musterungStandLaden, musterungStandLoeschen, musterungStandSpeichern, standPasst } from "./musterung-stand";
 
 function personName(vorname: string, nachname: string): string {
   return `${vorname} ${nachname}`.trim() || "(ohne Name)";
@@ -311,20 +312,46 @@ export function VorlageTeilen(props: { vorlage: Vorlage; onSchliessen: () => voi
 export function Musterung(props: {
   vorlage: Vorlage;
   /** `abgewaehlt`: die Personen, die nicht mitgehen — als Nachzügler später ergänzbar (R4-W8). */
-  onStart: (bogen: Erfassungsbogen, abgewaehlt: Person[]) => void;
+  onStart: (bogen: Erfassungsbogen, abgewaehlt: Person[], alleDa?: string) => void;
   onAbbrechen: () => void;
+  /**
+   * Der Start ersetzt einen offenen Bogen, und die App fragt deshalb selbst.
+   * Dann steht „Alle dabei?" in DERSELBEN Rückfrage (`alleDa`, Satz zum
+   * Mitgeben), statt als zweite dahinter: Unter Zeitdruck waren zwei Fragen
+   * hintereinander eine zu viel (Audit Runde 4, R4-S5).
+   */
+  ersetztBogen?: boolean;
 }) {
-  const { vorlage, onStart, onAbbrechen } = props;
+  const { vorlage, onStart, onAbbrechen, ersetztBogen = false } = props;
   const b = vorlage.bogen;
   const org = b.einheit.organisation;
-  const [pAn, setPAn] = useState<boolean[]>(() => b.personal.map(() => true));
-  const [vAn, setVAn] = useState<boolean[]>(() => b.fahrzeuge.map(() => true));
+  // Die Haken einer vor dem Neuladen offenen Musterung (R4-E7, musterung-stand.ts).
+  const [gemerkt] = useState(() => {
+    const st = musterungStandLaden();
+    return standPasst(st, vorlage) ? st : null;
+  });
+  const [pAn, setPAn] = useState<boolean[]>(() => gemerkt?.personal ?? b.personal.map(() => true));
+  const [vAn, setVAn] = useState<boolean[]>(() => gemerkt?.fahrzeuge ?? b.fahrzeuge.map(() => true));
   // Standard-Sofortbedarf der Vorlage: sichtbar, aber nicht vorausgewählt (R2-W1).
   const bedarf = bedarfMarken({ ...b, sofortbedarf: b.sofortbedarf && { ...b.sofortbedarf, verpflegungPersonen: 0 } });
-  const [bedarfAn, setBedarfAn] = useState(false);
+  const [bedarfAn, setBedarfAn] = useState(gemerkt?.bedarf ?? false);
   // Bemerkung der Vorlage wie der Sofortbedarf: sichtbar, nicht vorausgewählt (R3-H7).
   const bemerkung = b.sonstiges?.trim() ?? "";
-  const [bemerkungAn, setBemerkungAn] = useState(false);
+  const [bemerkungAn, setBemerkungAn] = useState(gemerkt?.bemerkung ?? false);
+  // Jeder Haken wird gemerkt, das Ende der Musterung (Start, Abbrechen, andere
+  // Ansicht) räumt ihn weg; ein Neuladen räumt nichts.
+  useEffect(() => {
+    musterungStandSpeichern({
+      vorlageId: vorlage.id,
+      vorlageGeaendert: vorlage.geaendert,
+      personal: pAn,
+      fahrzeuge: vAn,
+      bedarf: bedarfAn,
+      bemerkung: bemerkungAn,
+      zeit: Date.now(),
+    });
+  }, [vorlage.id, vorlage.geaendert, pAn, vAn, bedarfAn, bemerkungAn]);
+  useEffect(() => () => musterungStandLoeschen(), []);
 
   const anwesendePersonen = b.personal.filter((_, i) => pAn[i]);
   const s = staerke({ personal: anwesendePersonen, staerkeManuell: b.staerkeManuell });
@@ -346,9 +373,19 @@ export function Musterung(props: {
         b.personal.length > 0 ? `alle ${b.personal.length} ${b.personal.length === 1 ? "Person" : "Personen"}` : "",
         b.fahrzeuge.length > 0 ? `alle ${b.fahrzeuge.length} ${b.fahrzeuge.length === 1 ? "Fahrzeug" : "Fahrzeuge"}` : "",
       ].filter(Boolean);
+      const satz = `Gemeldet werden ${teile.join(" und ")} der Vorlage. Fehlt jemand, vorher in der Liste abwählen.`;
+      if (ersetztBogen) {
+        // Die Rückfrage der App nimmt den Satz mit (R4-S5).
+        onStart(
+          vorlageInstanziieren(b, { personal: pAn, fahrzeuge: vAn, sofortbedarf: bedarfAn, sonstiges: bemerkungAn }),
+          b.personal.filter((_, i) => !pAn[i]),
+          satz,
+        );
+        return;
+      }
       const sicher = await frageJaNein({
         titel: "Alle aus der Vorlage dabei?",
-        text: `Gemeldet werden ${teile.join(" und ")} der Vorlage. Fehlt jemand, vorher in der Liste abwählen.`,
+        text: satz,
         ok: "Ja, alle sind da",
         abbruch: "Zurück zur Liste",
       });
@@ -395,6 +432,11 @@ export function Musterung(props: {
       {/* Der Text folgt der Vorgabe: Alle sind vorab angehakt, gemustert wird
           durch Abwählen. „Anwesende abhaken" las sich wie „hier ist schon
           abgehakt" (R3-H4). */}
+      {gemerkt && (
+        <p className="meldung" role="status">
+          Deine Haken von vorhin sind wieder da — die Musterung wurde unterbrochen.
+        </p>
+      )}
       <p className="hinweis">
         <strong>Alle sind vorab angehakt — wer oder was fehlt, antippen und abwählen.</strong> Die Vorlage bleibt
         unverändert; dauerhaft ändern lässt sie sich über „Bearbeiten" auf der Startseite.

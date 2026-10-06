@@ -520,7 +520,7 @@ describe("Assistenten-Durchlauf", () => {
     // Die Rückfrage sagt, was tatsächlich geschieht: geschlossen, nicht
     // gelöscht, und wo der Bogen danach liegt (Audit Runde 2, R2-H9).
     expect(rueckfrage("Bogen schließen?").textContent).toContain("geschlossen, nicht gelöscht");
-    expect(rueckfrage("Bogen schließen?").textContent).toContain("Zuletzt verdrängten Bogen zurückholen");
+    expect(rueckfrage("Bogen schließen?").textContent).toContain("Zuletzt geschlossenen Bogen zurückholen");
     expect(rueckfrage("Bogen schließen?").textContent).not.toContain("Entwurf gelöscht");
     await nutzer.click(within(rueckfrage("Bogen schließen?")).getByRole("button", { name: "Abbrechen" }));
 
@@ -539,7 +539,7 @@ describe("Assistenten-Durchlauf", () => {
     // Handlungen", D7).
     expect(screen.getByRole("heading", { name: "Digitaler Einheiten-Erfassungsbogen" })).toBeDefined();
     expect(screen.queryByRole("button", { name: "Fortsetzen" })).toBeNull();
-    expect(screen.getByRole("button", { name: "Zuletzt verdrängten Bogen zurückholen" })).toBeDefined();
+    expect(screen.getByRole("button", { name: "Zuletzt geschlossenen Bogen zurückholen" })).toBeDefined();
   });
 
   it("wirft den angefangenen Bogen von der Startseite aus weg — nach Rückfrage", async () => {
@@ -560,11 +560,11 @@ describe("Assistenten-Durchlauf", () => {
     await nutzer.click(screen.getByRole("button", { name: "Verwerfen" }));
     await nutzer.click(within(rueckfrage("Angefangenen Bogen verwerfen?")).getByRole("button", { name: "Verwerfen" }));
 
-    expect(screen.getByText("Angefangener Bogen verworfen — Rückholung unten auf der Startseite.")).toBeDefined();
+    expect(screen.getByText("Angefangener Bogen verworfen — Rückholung oben auf der Startseite.")).toBeDefined();
     expect(screen.queryByRole("button", { name: "Fortsetzen" })).toBeNull();
 
     // Die Rückholung bringt ihn zurück (D7).
-    await nutzer.click(screen.getByRole("button", { name: "Zuletzt verdrängten Bogen zurückholen" }));
+    await nutzer.click(screen.getByRole("button", { name: "Zuletzt geschlossenen Bogen zurückholen" }));
     expect(await screen.findByRole("heading", { name: "Gesamtübersicht" })).toBeDefined();
     expect(screen.getAllByText(/Entwurfshausen/).length).toBeGreaterThan(0);
   });
@@ -587,7 +587,7 @@ describe("Assistenten-Durchlauf", () => {
     // Der leere Bogen steht jetzt im Assistenten; der verdrängte liegt nicht
     // im Nichts, sondern wartet auf der Startseite.
     await nutzer.click(screen.getByRole("button", { name: "‹ Startseite" }));
-    const zurueck = screen.getByRole("button", { name: "Zuletzt verdrängten Bogen zurückholen" });
+    const zurueck = screen.getByRole("button", { name: "Zuletzt geschlossenen Bogen zurückholen" });
     expect(screen.getByText(/Verdrängthausen/)).toBeDefined();
 
     await nutzer.click(zurueck);
@@ -625,7 +625,7 @@ describe("Assistenten-Durchlauf", () => {
     await nutzer.click(screen.getByRole("button", { name: "‹ Startseite" }));
 
     expect(screen.getByText("THW Eigenhausen")).toBeDefined();
-    await nutzer.click(screen.getByRole("button", { name: "Zuletzt verdrängten Bogen zurückholen" }));
+    await nutzer.click(screen.getByRole("button", { name: "Zuletzt geschlossenen Bogen zurückholen" }));
     expect(await screen.findByRole("heading", { name: "Gesamtübersicht" })).toBeDefined();
     expect(screen.getAllByText(/Eigenhausen/).length).toBeGreaterThan(0);
   }, 20000);
@@ -1871,6 +1871,48 @@ describe("Speicher voll", () => {
     expect(screen.queryByText(/✓ gespeichert/)).toBeNull();
   });
 
+  /** Audit Runde 4, R4-E5: Die Startkarte darf den ungespeicherten Stand nicht als „gespeichert" beschriften. */
+  it("sagt auch auf der Startkarte, dass nicht gespeichert wurde, und nennt den letzten gesicherten Stand", async () => {
+    const nutzer = userEvent.setup();
+    render(<App />);
+    await neuerBogenBis(nutzer, 0);
+    await nutzer.type(screen.getByLabelText("Name (Pflicht)"), "V");
+    expect(await screen.findByText(/^✓ gespeichert · .* Uhr · nur auf diesem Gerät$/)).toBeDefined();
+    const echt = Storage.prototype.setItem;
+    vi.spyOn(Storage.prototype, "setItem").mockImplementation(function (this: Storage, k: string, v: string) {
+      if (k === "eeb.entwurf.v1") throw new DOMException("voll", "QuotaExceededError");
+      return echt.call(this, k, v);
+    });
+    await nutzer.type(screen.getByLabelText("Name (Pflicht)"), "W");
+    await screen.findByText(/Nicht gespeichert — der Speicher dieses Geräts ist voll/);
+
+    await nutzer.click(screen.getByRole("button", { name: "‹ Startseite" }));
+
+    const karte = document.querySelector<HTMLElement>(".entwurf-karte")!;
+    expect(karte.textContent).not.toMatch(/· gespeichert \d/);
+    const warnung = karte.querySelector<HTMLElement>(".speicher-fehler")!;
+    expect(warnung.getAttribute("role")).toBe("alert");
+    expect(warnung.textContent).toMatch(/Nicht gespeichert — der Speicher dieses Geräts ist voll\. Letzter gesicherter Stand: .* Uhr\./);
+    expect(warnung.textContent).toMatch(/Bogen übergeben/);
+  });
+
+  /** Audit Runde 4, R4-E7: In der Fremd-Erfassung ist die PDF nicht der Rettungsweg, sondern der Meldeblock. */
+  it("rät in der Fremd-Erfassung bei vollem Speicher zum Meldeblock statt zur PDF", async () => {
+    const nutzer = userEvent.setup();
+    render(<App />);
+    await nutzer.click(screen.getByRole("button", { name: /Einheit schnell erfassen/ }));
+    const echt = Storage.prototype.setItem;
+    vi.spyOn(Storage.prototype, "setItem").mockImplementation(function (this: Storage, k: string, v: string) {
+      if (k === "eeb.entwurf.v1") throw new DOMException("voll", "QuotaExceededError");
+      return echt.call(this, k, v);
+    });
+    await nutzer.type(screen.getByLabelText("Name (Pflicht)"), "V");
+
+    const zeile = await screen.findByText(/Nicht gespeichert — der Speicher dieses Geräts ist voll/);
+    expect(zeile.textContent).toMatch(/bitte die Stärke jetzt auf dem Meldeblock notieren/);
+    expect(zeile.textContent).not.toMatch(/Bogen übergeben/);
+  });
+
   /** Audit Runde 3, R3-O4: gesperrt ist nicht voll; Schließen fragt nach. */
   it("nennt einen gesperrten Speicher beim Namen und fragt vor dem Schließen", async () => {
     const nutzer = userEvent.setup();
@@ -2601,9 +2643,34 @@ describe("Vorlage bearbeiten (Karte in „Gespeicherte Vorlagen“)", () => {
     const rueck = localStorage.getItem("eeb.entwurf.ersetzt.v1") ?? "";
     expect(rueck).toContain("ECHTER EINSATZ Deichsicherung");
     expect(JSON.stringify(vorlagenLaden().find((x) => x.id === v.id)!.bogen)).toBe(vorlageVorher);
-    await nutzer.click(screen.getByRole("button", { name: "Zuletzt verdrängten Bogen zurückholen" }));
+    await nutzer.click(screen.getByRole("button", { name: "Zuletzt geschlossenen Bogen zurückholen" }));
     expect((await screen.findAllByText(/ECHTER EINSATZ Deichsicherung/)).length).toBeGreaterThan(0);
   }, 20000);
+});
+
+describe("Musterung bei offenem Bogen: eine Rückfrage statt zwei (R4-S5)", () => {
+  beforeEach(() => {
+    localStorage.clear();
+  });
+
+  it("fragt „Alle dabei?“ und „Bogen ersetzen?“ in einem Dialog", async () => {
+    const v = vorlageAnlegen("OV Ulm B", { ...bogenMitName("Ulm"), personal: ["Berger", "Ahlers"].map((nachname) => ({ ...neuePerson(), vorname: "T", nachname })) });
+    const nutzer = userEvent.setup();
+    render(<App />);
+    await nutzer.click(screen.getByRole("button", { name: "Neuen Bogen erstellen" }));
+    await nutzer.type(screen.getByLabelText("Name (Pflicht)"), "Eigenhausen");
+    await nutzer.click(screen.getByRole("button", { name: "‹ Startseite" }));
+
+    await nutzer.click(screen.getByRole("button", { name: `Einsatz vorbereiten: ${v.name}` }));
+    await nutzer.click(screen.getByRole("button", { name: /^Einsatz starten/ }));
+
+    expect(document.querySelector("dialog[aria-label='Alle aus der Vorlage dabei?']")).toBeNull();
+    const frage = await screen.findByRole("dialog", { name: "Bogen aus Vorlage anlegen?" });
+    expect(frage.textContent).toMatch(/Gemeldet werden alle 2 Personen der Vorlage\. Fehlt jemand, vorher in der Liste abwählen\./);
+    expect(frage.textContent).toMatch(/Eigenhausen.* wird durch den Bogen aus der Vorlage ersetzt/);
+    await nutzer.click(within(frage).getByRole("button", { name: "Ja, alle sind da — anlegen" }));
+    expect(document.querySelector("dialog[open]")).toBeNull();
+  });
 });
 
 describe("Bögen aus einer PDF in einen Einsatz übernehmen", () => {

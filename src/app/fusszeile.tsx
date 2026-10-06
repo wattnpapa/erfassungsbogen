@@ -975,7 +975,7 @@ export function Fusszeile({ onBogenOeffnen, kompakt = false }: {
                 </li>
                 <li>{loeschUmfang.entwurf ? "der aktuelle Bogen-Entwurf" : "kein offener Bogen-Entwurf"}</li>
                 {loeschUmfang.rueckholplatz != null && (
-                  <li>der zuletzt verdrängte Bogen „{loeschUmfang.rueckholplatz}" (Startseite, zum Zurückholen)</li>
+                  <li>der zuletzt geschlossene Bogen „{loeschUmfang.rueckholplatz}" (Startseite, zum Zurückholen)</li>
                 )}
                 <li>{loeschUmfang.absender ? "die hinterlegte Absenderkarte" : "keine Absenderkarte"}</li>
                 <li>
@@ -1219,7 +1219,7 @@ function BestandListe({ bestand, kurzform, geraet = false }: { bestand: BestandU
       </li>
       <li>{bestand.entwurf ? "ein angefangener Bogen (Entwurf)" : "kein angefangener Bogen"}</li>
       {bestand.rueckholplatz != null && (
-        <li>der zuletzt verdrängte Bogen „{bestand.rueckholplatz}“ (Startseite, zum Zurückholen)</li>
+        <li>der zuletzt geschlossene Bogen „{bestand.rueckholplatz}“ (Startseite, zum Zurückholen)</li>
       )}
       <li>{bestand.absender ? "die hinterlegte Absenderkarte" : "keine Absenderkarte"}</li>
       <li>

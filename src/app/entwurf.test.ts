@@ -182,6 +182,18 @@ describe("Rückholung und fremde Erfassungen (R2-N1/R2-E1)", () => {
     expect(ersetztenEntwurfMerken(mitName("Eigenhausen"))).toBe(true);
     expect(ersetztenEntwurfLaden()?.fremd).toBeUndefined();
   });
+
+  // Audit Runde 4, R4-S5: Der Stand am Rückholplatz ist die letzte Bearbeitung.
+  it("nennt am Rückholplatz die letzte Bearbeitung statt des Zeitpunkts des Verdrängens", () => {
+    const um2240 = new Date(2026, 9, 5, 22, 40).getTime();
+    expect(ersetztenEntwurfMerken(mitName("Eigenhausen"), undefined, { geaendertUm: um2240 })).toBe(true);
+    expect(ersetztenEntwurfLaden()?.gespeichert).toBe(um2240);
+
+    // Ohne Angabe gilt wie früher der Zeitpunkt des Merkens.
+    const vorher = Date.now();
+    expect(ersetztenEntwurfMerken(mitName("Zweitstadt"))).toBe(true);
+    expect(ersetztenEntwurfLaden()!.gespeichert).toBeGreaterThanOrEqual(vorher);
+  });
 });
 
 describe("Wiedereinstieg (R2-N7, R2-O3)", () => {

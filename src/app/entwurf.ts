@@ -270,16 +270,21 @@ export const ENTWURF_SCHLUESSEL = SPEICHER_SCHLUESSEL;
  * Rückgabe: true = gemerkt. false = nicht gemerkt — eine fremde Erfassung
  * hätte einen eigenen Bogen verdrängt ({@link rueckholungNimmt}) oder der
  * Speicher ist voll. `tausch`: die Rückholung wird ohnehin gerade geleert
- * (Zurückholen), dann ist der Platz frei.
+ * (Zurückholen), dann ist der Platz frei. `geaendertUm`: Zeitpunkt der letzten
+ * Bearbeitung des Bogens (siehe unten).
  */
 export function ersetztenEntwurfMerken(
   bogen: Erfassungsbogen,
   fremd?: Entwurf["fremd"],
-  opt: { tausch?: boolean } = {},
+  opt: { tausch?: boolean; geaendertUm?: number } = {},
 ): boolean {
   if (!opt.tausch && !rueckholungNimmt(!!fremd, ersetztenEntwurfLaden())) return false;
   try {
-    speicher()?.setItem(ERSETZT_SCHLUESSEL, entwurfZuJson(bogen, Date.now(), { fremd }));
+    // Der Stand ist die letzte BEARBEITUNG des Bogens, nicht der Augenblick des
+    // Schließens: Ein Bogen, der um 22:40 zuletzt bearbeitet war, wirkte sonst
+    // um 22:45 so neu wie der Wechsel selbst (Audit Runde 4, R4-S5). Fehlt die
+    // Angabe, gilt wie früher der Zeitpunkt des Merkens.
+    speicher()?.setItem(ERSETZT_SCHLUESSEL, entwurfZuJson(bogen, opt.geaendertUm ?? Date.now(), { fremd }));
     return true;
   } catch {
     return false; // Speicher voll o. ä. — der Wechsel selbst darf daran nicht scheitern
