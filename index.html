@@ -4111,6 +4111,10 @@
       display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 16px 12px;
     }
     dialog.qr-vollbild > .qr-vollbild-nav.mit-teilen > .primaer { grid-column: 1 / -1; }
+    /* R4-H5: Fehlen noch Teile, ist „Weiter zu Teil n →" der dunkle Hauptknopf und
+       „Schließen" tritt zurück. Das Maß bleibt (die Klasse „primaer" hält den Platz). */
+    dialog.qr-vollbild > .qr-vollbild-nav button.haupt { background: var(--akzent); color: var(--auf-akzent); border-color: var(--akzent); }
+    dialog.qr-vollbild > .qr-vollbild-nav button.primaer.zurueck { background: var(--flaeche); color: var(--text); border-color: var(--linie-stark); }
     /* Telefonhöhe: Absender eine Stufe kleiner, Helligkeitstipp und der
        Nachsatz zu „Teil x von n" entfallen — Code, Teilnummer und Knöpfe
        gehen vor, auch im Feld-Modus mit größerer Schrift. */

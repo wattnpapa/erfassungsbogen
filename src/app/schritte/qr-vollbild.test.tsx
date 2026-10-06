@@ -52,6 +52,24 @@ describe("QR-Vollbild (R3-H2, R3-H3)", () => {
     expect(within(d).getByRole("button", { name: "Nächster Teil (2 von 2)" }).textContent).toBe("Weiter zu Teil 2 →");
   });
 
+  // Audit Runde 4, R4-H5: Die Blickführung zeigte auf „Schließen", obwohl Teile fehlten.
+  it("macht „Weiter zu Teil n →“ zum Hauptknopf, solange Teile fehlen, und „Schließen“ nach dem letzten (R4-H5)", async () => {
+    const nutzer = userEvent.setup();
+    render(<Rahmen n={2} onSchliessen={() => {}} />);
+    const weiter = () => screen.getByRole("button", { name: /Nächster Teil/ });
+    const schliessen = () => screen.getByRole("button", { name: "Schließen" });
+    expect(weiter().className).toContain("haupt");
+    expect(schliessen().className).toContain("zurueck");
+    // Der Platz bleibt: „primaer" hält die Zeile unter dem Blättern.
+    expect(schliessen().className).toContain("primaer");
+
+    await nutzer.click(weiter());
+
+    // Teil 2 von 2: alle gezeigt, „Schließen" ist wieder der Hauptknopf.
+    expect(weiter().className).not.toContain("haupt");
+    expect(schliessen().className).not.toContain("zurueck");
+  });
+
   it("nur Teil 1 von 2 gezeigt: Schließen warnt, „Trotzdem schließen“ vermerkt nichts", async () => {
     const nutzer = userEvent.setup();
     const schliessen = vi.fn();

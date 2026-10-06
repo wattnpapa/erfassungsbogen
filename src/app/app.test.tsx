@@ -2673,6 +2673,34 @@ describe("Musterung bei offenem Bogen: eine Rückfrage statt zwei (R4-S5)", () =
   });
 });
 
+/** Audit Runde 4, R4-H5: Nach „Einsatz starten" geht es mit einem Tipp zur Übergabe. */
+describe("Nach der Musterung: „Zur Übergabe →“ in Schritt 2 (R4-H5)", () => {
+  beforeEach(() => {
+    localStorage.clear();
+  });
+
+  it("bietet den Sprung zur Übersicht nur nach einer Musterung an", async () => {
+    const v = vorlageAnlegen("OV Ulm B", { ...bogenMitName("Ulm"), personal: ["Berger", "Ahlers"].map((nachname) => ({ ...neuePerson(), vorname: "T", nachname })) });
+    const nutzer = userEvent.setup();
+    render(<App />);
+
+    await nutzer.click(screen.getByRole("button", { name: `Einsatz vorbereiten: ${v.name}` }));
+    await nutzer.click(screen.getByRole("checkbox", { name: /Ahlers/ }));
+    await nutzer.click(screen.getByRole("button", { name: /^Einsatz starten/ }));
+
+    const sprung = await screen.findByRole("button", { name: "Zur Übergabe →" });
+    await nutzer.click(sprung);
+    expect(await screen.findByRole("button", { name: "Bogen übergeben…" })).toBeDefined();
+
+    // Ein anderer neuer Bogen kommt nicht aus der Musterung.
+    await nutzer.click(screen.getByRole("button", { name: "‹ Startseite" }));
+    await nutzer.click(screen.getByRole("button", { name: "Neuen Bogen erstellen" }));
+    await nutzer.click(await screen.findByRole("button", { name: "Neu anfangen" }));
+    await nutzer.click(screen.getByRole("button", { name: "Weiter →" }));
+    expect(screen.queryByRole("button", { name: "Zur Übergabe →" })).toBeNull();
+  }, 20000);
+});
+
 describe("Bögen aus einer PDF in einen Einsatz übernehmen", () => {
   beforeEach(() => {
     localStorage.clear();

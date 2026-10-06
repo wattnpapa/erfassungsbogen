@@ -1905,7 +1905,7 @@ describe("Moduswechsel von unten in der Einsatzansicht (R4-L3)", () => {
     const nutzer = userEvent.setup();
     const fest = document.querySelector(".anzeige-schwebe");
     expect(fest).not.toBeNull();
-    const knopf = within(fest as HTMLElement).getByRole("button", { name: /Anzeigemodus .* ändern/ });
+    const knopf = within(fest as HTMLElement).getByRole("button", { name: /Ansicht: .* ändern/ });
     await nutzer.click(knopf);
     const wahl = within(fest as HTMLElement).getByRole("group", { name: "Anzeigemodus" });
     await nutzer.click(within(wahl).getByRole("button", { name: "Nacht" }));

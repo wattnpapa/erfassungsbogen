@@ -821,6 +821,9 @@ function AppInhalt() {
   const [absender, setAbsender] = useState<Absenderkarte>(() => absenderkarteLaden());
   // Eine vor dem Neuladen offene Musterung öffnet wieder, mit ihren Haken
   // (Audit Runde 4, R4-E7); ein Link oder eine angefangene Erfassung geht vor.
+  // Der Bogen kommt eben aus einer Musterung: Schritt 2 bietet „Zur Übergabe →"
+  // an, weil Personal, Fahrzeuge und Bedarf schon aus der Vorlage stehen (R4-H5).
+  const [nachMusterung, setNachMusterung] = useState(false);
   const [musterVorlage, setMusterVorlage] = useState<Vorlage | null>(() =>
     START.bogen || START.segment || START.vorlage || START_SOFORT || erfassungsZielBeimStart() ? null : musterungVorlageAusStand(vorlagen),
   );
@@ -1096,6 +1099,7 @@ function AppInhalt() {
       return;
     nachzueglerMerken(neuerArbeitsbogen, abgewaehlt);
     setBogen(neuerArbeitsbogen);
+    setNachMusterung(true);
     setzeEmpfang(null);
     setSchritt(SCHRITT_EINSATZ);
     setMusterVorlage(null);
@@ -1387,6 +1391,7 @@ function AppInhalt() {
     vorab?: string;
     abbruch?: string;
   }): Promise<boolean> {
+    setNachMusterung(false); // jeder andere Weg zu einem neuen Bogen kommt nicht aus der Musterung
     // Was auch immer den Bogen ersetzt: die Bearbeitung einer Vorlage ist es
     // danach nicht mehr — der verdrängte Bogen wird zum gewöhnlichen Entwurf.
     // Ebenso endet eine Aufnahme für eine Sammlung: Wer danach „Neuen Bogen
@@ -4090,6 +4095,14 @@ function AppInhalt() {
               (Audit Runde 3, R3-G3). */}
           {sammelEinsatz && (
             <button type="button" className="uebernehmen" onClick={() => void erfassungUebernehmen()}>In Einsatz übernehmen</button>
+          )}
+          {/* Nach der Musterung stehen Personal, Fahrzeuge und Bedarf schon da:
+              Von „Einsatz starten" bis zur Übergabe führte „Weiter →" durch
+              drei Schritte, die nichts Neues verlangten (Audit Runde 4, R4-H5).
+              Einen Tipp weiter, ohne etwas zu überspringen: Die Übersicht
+              nennt, was offen ist. */}
+          {!sammelEinsatz && nachMusterung && schritt === SCHRITT_EINSATZ && (
+            <button type="button" className="uebernehmen" onClick={() => setSchritt(UEBERSICHT)}>Zur Übergabe →</button>
           )}
           {/* Schnellerfassung einer fremden Einheit: nach Name und Typ direkt
               zur Stärke — Schritt 2 („Wofür deine Einheit gemeldet wird") ist

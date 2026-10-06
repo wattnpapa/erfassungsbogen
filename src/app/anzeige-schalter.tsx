@@ -14,7 +14,7 @@ import {
 
 /**
  * `klappbar` (Assistenten-Kopf, R2-H7): Auf dem Telefon steht nur der gewählte
- * Modus als Knopf da („Standard ▾"); ein Tipp klappt die vier Segmente auf.
+ * Modus als Knopf da („Ansicht: Standard ▾"); ein Tipp klappt die vier Segmente auf.
  * Die vier Segmente brauchten sonst eine eigene Kopfzeile — neben
  * „‹ Startseite" passen sie im Feld-Modus nicht. Ab 30rem Breite blendet das
  * Stylesheet den Klappknopf aus und zeigt die Segmente wie gewohnt; das
@@ -50,10 +50,12 @@ export function AnzeigeSchalter({ klappbar = false }: { klappbar?: boolean }) {
           type="button"
           className="anzeige-klappe"
           aria-expanded={offen}
-          aria-label={`Anzeigemodus ${aktuell} – ${offen ? "zuklappen" : "ändern"}`}
+          aria-label={`Ansicht: ${aktuell} – ${offen ? "zuklappen" : "ändern"}`}
           onClick={() => setOffen((o) => !o)}
         >
-          {aktuell} <span aria-hidden="true">{offen ? "▴" : "▾"}</span>
+          {/* „Standard ▾" klang nach einer Einstellung des Bogens; „Ansicht:" sagt,
+              dass es um die Darstellung der App geht (Audit Runde 4, R4-H5). */}
+          Ansicht: {aktuell} <span aria-hidden="true">{offen ? "▴" : "▾"}</span>
         </button>
       )}
       {ANZEIGE_MODI.map(({ modus: m, label, kurz, titel }) => (
@@ -172,8 +174,8 @@ export function AnzeigeLeistenKnopf() {
         type="button"
         className="anzeige-leiste-knopf"
         aria-expanded={offen}
-        aria-label={`Anzeigemodus ${aktuell} – ${offen ? "zuklappen" : "ändern"}`}
-        title="Anzeigemodus (Standard, Dunkel, Feld, Nacht)"
+        aria-label={`Ansicht: ${aktuell} – ${offen ? "zuklappen" : "ändern"}`}
+        title="Ansicht (Standard, Dunkel, Feld, Nacht)"
         onClick={() => setOffen((o) => !o)}
       >
         <span aria-hidden="true">◐</span>

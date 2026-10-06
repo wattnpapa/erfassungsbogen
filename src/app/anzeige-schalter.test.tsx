@@ -31,7 +31,7 @@ describe("AnzeigeSchalter", () => {
     const u = userEvent.setup();
     render(<AnzeigeSchalter klappbar />);
     const gruppe = screen.getByRole("group", { name: "Anzeigemodus" });
-    const klappe = screen.getByRole("button", { name: /^Anzeigemodus Standard/ });
+    const klappe = screen.getByRole("button", { name: /^Ansicht: Standard/ });
     expect(klappe.getAttribute("aria-expanded")).toBe("false");
     expect(gruppe.classList.contains("offen")).toBe(false);
     // Alle vier Segmente stehen trotzdem im Baum.
@@ -47,7 +47,7 @@ describe("AnzeigeSchalter", () => {
     await u.click(screen.getByRole("button", { name: "Nacht" }));
     expect(anzeigeModus()).toBe("nacht");
     expect(gruppe.classList.contains("offen")).toBe(false);
-    expect(screen.getByRole("button", { name: /^Anzeigemodus Nacht/ }).getAttribute("aria-expanded")).toBe("false");
+    expect(screen.getByRole("button", { name: /^Ansicht: Nacht/ }).getAttribute("aria-expanded")).toBe("false");
   });
 });
 
@@ -125,7 +125,7 @@ describe("AnzeigeLeistenKnopf (R3-L6)", () => {
   it("klappt die vier Modi auf, wählt mit dem zweiten Tipp und klappt wieder zu", async () => {
     const u = userEvent.setup();
     render(<AnzeigeLeistenKnopf />);
-    const knopf = screen.getByRole("button", { name: /^Anzeigemodus Standard – ändern/ });
+    const knopf = screen.getByRole("button", { name: /^Ansicht: Standard – ändern/ });
     expect(screen.queryByRole("group", { name: "Anzeigemodus" })).toBeNull();
     await u.click(knopf);
     expect(knopf.getAttribute("aria-expanded")).toBe("true");
@@ -133,13 +133,13 @@ describe("AnzeigeLeistenKnopf (R3-L6)", () => {
     expect(anzeigeModus()).toBe("nacht");
     expect(document.documentElement.classList.contains("nacht-modus")).toBe(true);
     expect(screen.queryByRole("group", { name: "Anzeigemodus" })).toBeNull();
-    expect(screen.getByRole("button", { name: /^Anzeigemodus Nacht/ })).toBeTruthy();
+    expect(screen.getByRole("button", { name: /^Ansicht: Nacht/ })).toBeTruthy();
   });
 
   it("schließt mit Escape, ohne zu wählen", async () => {
     const u = userEvent.setup();
     render(<AnzeigeLeistenKnopf />);
-    await u.click(screen.getByRole("button", { name: /^Anzeigemodus/ }));
+    await u.click(screen.getByRole("button", { name: /^Ansicht:/ }));
     await u.keyboard("{Escape}");
     expect(screen.queryByRole("group", { name: "Anzeigemodus" })).toBeNull();
     expect(anzeigeModus()).toBe("standard");

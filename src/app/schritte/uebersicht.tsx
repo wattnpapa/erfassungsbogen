@@ -1142,6 +1142,8 @@ export function QrVollbild(props: {
   onGezeigt.current = props.onGezeigt;
   useEffect(() => onGezeigt.current?.(gezeigt), [gezeigt]);
   const alleGezeigt = gezeigt.size >= anzahl;
+  /** Mehrteilig, und es steht noch ein Teil nach diesem aus: „Weiter zu Teil n" ist der Hauptknopf. */
+  const weiterIstHaupt = qr.segmentiert && !alleGezeigt && index < anzahl - 1;
   const fehlend = qr.teile.findIndex((_, i) => !gezeigt.has(i));
   // „zeigen" = Code; „frage" = Wurde gescannt?; „fehlt" = ein Teil fehlt noch.
   const [phase, setPhase] = useState<"zeigen" | "frage" | "fehlt">("zeigen");
@@ -1252,6 +1254,8 @@ export function QrVollbild(props: {
           {qr.segmentiert && (
             <button
               type="button"
+              // Solange Teile fehlen, ist „Weiter" der Hauptknopf (R4-H5).
+              className={weiterIstHaupt ? "haupt" : undefined}
               disabled={index >= anzahl - 1}
               aria-label={index >= anzahl - 1 ? "Nächster Teil" : `Nächster Teil (${index + 2} von ${anzahl})`}
               onClick={() => props.onTeil(index + 1)}
@@ -1262,7 +1266,10 @@ export function QrVollbild(props: {
           )}
           <button
             type="button"
-            className="primaer"
+            // „Schließen" tritt zurück, solange noch Teile fehlen: Der Daumen griff
+            // zum dunklen Knopf, und die Rückfrage musste den Fehlgriff abfangen
+            // (Audit Runde 4, R4-H5). Platz und Maß bleiben (Klasse „primaer").
+            className={weiterIstHaupt ? "primaer zurueck" : "primaer"}
             onClick={() => setPhase(alleGezeigt ? "frage" : "fehlt")}
           >
             Schließen
