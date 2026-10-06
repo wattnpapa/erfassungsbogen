@@ -116,6 +116,26 @@ function ovInHierarchieUebernehmen(daten: OvDaten, hierarchie: HierarchieEbene[]
 }
 
 /**
+ * Der Ortsverband, den ein Text nennt („THW Ortsverband Ulm“ → Ulm) — der
+ * längste Name des Verzeichnisses, der als ganzes Wort darin steht. Wer den
+ * Ortsverband in das Feld „Organisationsname“ tippt, bekam weder Kürzel noch
+ * Kontakte noch übergeordnete Stellen (Audit Runde 4, R4-N5).
+ */
+export function ovImText(verzeichnis: ThwOrtsverband[], text: string): ThwOrtsverband | undefined {
+  const t = text.trim().toLowerCase();
+  if (t.length < 4) return undefined;
+  let beste: ThwOrtsverband | undefined;
+  for (const o of verzeichnis) {
+    const n = o.name.trim().toLowerCase();
+    if (n.length < 3 || (beste && beste.name.length >= n.length)) continue;
+    const roh = n.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    // Als ganzes Wort: „Ulm“ steht auch in „Neu-Ulm“, aber „Neu-Ulm“ ist der längere Treffer.
+    if (new RegExp(`(^|[^a-zäöüß])${roh}($|[^a-zäöüß])`).test(t)) beste = o;
+  }
+  return beste;
+}
+
+/**
  * OV-Namensfeld mit Vorschlagsliste aus dem OV-Verzeichnis. Auswahl übernimmt
  * Kürzel + Kontaktdaten; ein direkt eingetipptes Kürzel ("OODE") wird beim
  * Verlassen des Felds aufgelöst.
@@ -210,7 +230,9 @@ function anzahlText(n: number, einzahl: string, mehrzahl: string): string {
  * Beim THW stand vorher „z. B. Freiwillige Feuerwehr Wardenburg" (R2-N9).
  */
 const ORGANISATIONSNAME_BEISPIEL: Partial<Record<OrganisationsTyp, string>> = {
-  [OrganisationsTyp.THW]: "z. B. THW Ortsverband Ulm",
+  // Kein Ortsverband als Beispiel: Wer ihn hier eintrug, ließ unten das Pflichtfeld
+  // der Ebene „OV“ leer, und Kürzel, Telefon, RB und LV fehlten (R4-N5).
+  [OrganisationsTyp.THW]: "meist leer – OV unten eintragen",
   [OrganisationsTyp.FEUERWEHR]: "z. B. Freiwillige Feuerwehr Wardenburg",
   [OrganisationsTyp.DRK]: "z. B. DRK-Kreisverband Oldenburg-Land",
   [OrganisationsTyp.JUH]: "z. B. Johanniter-Unfall-Hilfe Regionalverband Weser-Ems",
@@ -394,6 +416,29 @@ export function SchrittEinheit({ bogen, aendern: aendernRoh }: SchrittProps) {
   const [nameImFokus, setNameImFokus] = useState<number | null>(null);
   const ovDaten = useOvDaten(e.organisation === OrganisationsTyp.THW);
   const ovVerzeichnis = ovDaten?.THW_ORTSVERBAENDE ?? [];
+  // Der Ortsverband steht im „Organisationsnamen“, die Ebene „OV“ ist leer (R4-N5).
+  const eigeneEbene = e.hierarchie[0];
+  const ovImNamen =
+    e.organisation === OrganisationsTyp.THW && eigeneEbene?.bezeichnung.code === 1 && !eigeneEbene.name.trim()
+      ? ovImText(ovVerzeichnis, e.organisationName ?? "")
+      : undefined;
+  /** „Als Ortsverband eintragen“: die Ebene füllen; der Organisationsname geht, wenn er nur den OV nannte. */
+  function ovAusOrganisationsname(ov: ThwOrtsverband) {
+    if (!ovDaten) return;
+    const text = e.organisationName ?? "";
+    const rest = text
+      .replace(new RegExp(ov.name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "i"), "")
+      .replace(/\b(THW|Ortsverband|OV)\b/gi, "")
+      .replace(/[\s\-–,.]+/g, " ")
+      .trim();
+    const einheit = {
+      ...e,
+      organisationName: rest ? e.organisationName : undefined,
+      hierarchie: ovInHierarchieUebernehmen(ovDaten, e.hierarchie, 0, ov),
+    };
+    const fahrzeuge = fahrzeugeMitFunkrufOv(bogen.fahrzeuge, einheit);
+    aendern({ einheit, ...(fahrzeuge === bogen.fahrzeuge ? {} : { fahrzeuge }) });
+  }
 
   /**
    * OV aus der Vorschlagsliste übernehmen. Mit dem OV steht auch der
@@ -503,6 +548,15 @@ export function SchrittEinheit({ bogen, aendern: aendernRoh }: SchrittProps) {
           />
         </Feld>
       </div>
+      {ovImNamen && (
+        <p className="hinweis ov-im-namen" role="status">
+          „{ovImNamen.name}“ ist ein Ortsverband und gehört unter „Zugehörigkeit“: Dort ergänzen sich Kürzel, Telefon,
+          Regionalstelle und Landesverband.{" "}
+          <button type="button" onClick={() => ovAusOrganisationsname(ovImNamen)}>
+            Als Ortsverband „{ovImNamen.name}“ eintragen
+          </button>
+        </p>
+      )}
       <div className="zeile">
         <Feld titel="Einheitstyp">
           <VokabAuswahl

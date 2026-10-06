@@ -14,7 +14,7 @@ import { Ernaehrung, Geschlecht, OrganisationsTyp, PersonalErfassung, type Erfas
 import { stanPersonalVorbelegung } from "@bos/vokabulare/thw-stan-personal";
 import { stanFahrzeugVorbelegung } from "@bos/vokabulare/thw-stan-fahrzeuge";
 import { SchrittBuehne } from "../../test/schritt-buehne";
-import { SchrittEinheit } from "./einheit";
+import { SchrittEinheit, ovImText } from "./einheit";
 
 const buehne = () => render(<SchrittBuehne komponente={SchrittEinheit} />);
 
@@ -133,6 +133,67 @@ describe("Schritt Einheit", () => {
     expect(kuerzel()).toEqual([""]);
     expect((screen.getByLabelText("Name (Pflicht)") as HTMLInputElement).value).toBe("Ulm");
     expect(document.querySelector(".ov-ergaenzt")).toBeNull();
+  });
+
+  // Audit Runde 4, R4-N5: „z. B. THW Ortsverband Ulm“ lenkte den OV ins Feld
+  // Organisationsname; das Pflichtfeld der Ebene „OV“ blieb leer, Kürzel, Telefon,
+  // RB und LV fehlten.
+  it("THW: das Beispiel im Organisationsnamen ist kein Ortsverband (R4-N5)", () => {
+    buehne();
+    const feld = screen.getByLabelText(/^Organisationsname/) as HTMLInputElement;
+    expect(feld.placeholder).not.toMatch(/Ulm|Ortsverband Ulm/);
+    expect(feld.placeholder).toContain("OV unten eintragen");
+  });
+
+  it("erkennt einen Ortsverband im Organisationsnamen und bietet an, ihn als Ebene einzutragen (R4-N5)", async () => {
+    const nutzer = userEvent.setup();
+    const bogenStand: { b: Erfassungsbogen | null } = { b: null };
+    function Ablesen() {
+      const [bogen, setBogen] = useState(neuerBogen());
+      bogenStand.b = bogen;
+      return <SchrittEinheit bogen={bogen} aendern={(patch) => setBogen((b) => ({ ...b, ...patch }))} />;
+    }
+    render(<Ablesen />);
+    expect(document.querySelector(".ov-im-namen")).toBeNull();
+    await nutzer.type(screen.getByLabelText(/^Organisationsname/), "THW Ortsverband Ulm");
+    const knopf = await screen.findByRole("button", { name: "Als Ortsverband „Ulm“ eintragen" }, { timeout: 5000 });
+    await nutzer.click(knopf);
+    const ebene = bogenStand.b!.einheit.hierarchie[0]!;
+    expect(ebene.name).toBe("Ulm");
+    expect(ebene.kurz).toBe("OULM");
+    expect(ebene.telefon).toBeTruthy();
+    // Regionalstelle und Landesverband kommen mit.
+    expect(bogenStand.b!.einheit.hierarchie.length).toBeGreaterThanOrEqual(3);
+    // Der Organisationsname nannte nur den OV: er geht.
+    expect(bogenStand.b!.einheit.organisationName).toBeUndefined();
+    expect(document.querySelector(".ov-im-namen")).toBeNull();
+  });
+
+  it("ein Organisationsname mit mehr als dem OV bleibt stehen (R4-N5)", async () => {
+    const nutzer = userEvent.setup();
+    const bogenStand: { b: Erfassungsbogen | null } = { b: null };
+    function Ablesen() {
+      const [bogen, setBogen] = useState(neuerBogen());
+      bogenStand.b = bogen;
+      return <SchrittEinheit bogen={bogen} aendern={(patch) => setBogen((b) => ({ ...b, ...patch }))} />;
+    }
+    render(<Ablesen />);
+    await nutzer.type(screen.getByLabelText(/^Organisationsname/), "Hochwasserstab Ulm");
+    await nutzer.click(await screen.findByRole("button", { name: "Als Ortsverband „Ulm“ eintragen" }, { timeout: 5000 }));
+    expect(bogenStand.b!.einheit.hierarchie[0]!.name).toBe("Ulm");
+    expect(bogenStand.b!.einheit.organisationName).toBe("Hochwasserstab Ulm");
+  });
+
+  it("ovImText: ganzes Wort, längster Treffer, nichts bei Beliebigem", () => {
+    const o = (name: string) => ({ name, kurz: "X", plz: "", ort: "", telefon: "", email: "" }) as never;
+    const verzeichnis = [o("Ulm"), o("Neu-Ulm"), o("Ulmen"), o("Bad Ems")];
+    expect((ovImText(verzeichnis, "THW Ortsverband Ulm") as { name: string }).name).toBe("Ulm");
+    expect((ovImText(verzeichnis, "THW Neu-Ulm") as { name: string }).name).toBe("Neu-Ulm");
+    expect((ovImText(verzeichnis, "OV Ulmen Süd") as { name: string }).name).toBe("Ulmen");
+    expect(ovImText(verzeichnis, "Bundesschule")).toBeUndefined();
+    expect(ovImText(verzeichnis, "")).toBeUndefined();
+    // Kein Treffer mitten im Wort.
+    expect(ovImText([o("Ulm")], "Kulmbach")).toBeUndefined();
   });
 
   // Audit Runde 4, R4-H1: Wer „Bergungsgruppe" ausschreibt und „ulm" klein tippt,
