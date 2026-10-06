@@ -5,6 +5,8 @@
 > Runde 3 (04.10.2026, nach der Behebung von Runde 2, Befunde behoben am 05.10.2026): [runde-3/README.md](runde-3/README.md).
 >
 > Runde 4 (05.10.2026, nach der Behebung von Runde 3): [runde-4/README.md](runde-4/README.md).
+>
+> Runde 5 (06.10.2026, nach der Behebung von Runde 4): [runde-5/README.md](runde-5/README.md).
 
 ## Verlauf
 
@@ -12,7 +14,7 @@ Befunde je Runde und Priorität, wie in den Übersichten der Runden gezählt
 (Verweise auf Befunde anderer Berichte nicht doppelt). Runde 1: zehn Rollen
 ohne das ältere Feldtauglichkeits-Audit; Runde 2: zwölf Rollen mit
 Mobile-UI; Runde 3: elf THW-Rollen; Runde 4: zwölf Rollen, „Offline und
-Speicher" abgebrochen.
+Speicher" abgebrochen; Runde 5: zwölf Rollen, vollständig.
 
 | Runde | P0 | P1 | P2 | P3 |
 | --- | --- | --- | --- | --- |
@@ -20,6 +22,7 @@ Speicher" abgebrochen.
 | R2 | 3 | 13 | 42 | 22 |
 | R3 | 2 | 11 | 30 | 20 |
 | R4 | 0 | 12 | 30 | 29 |
+| R5 | 0 | 9 | 31 | 45 |
 
 Zehn Prüfberichte aus je einer Nutzerrolle, alle gegen den Produktionsbuild
 (`vite build` + `vite preview`) im Telefon-Viewport 360 × 640 (Führungssicht
