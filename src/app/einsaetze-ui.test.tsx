@@ -1571,6 +1571,55 @@ describe("Aufteilen mit Quittung und Rückweg (R2-D6)", () => {
 });
 
 /**
+ * Zusammenführen nahm Teile still aus der Lage — ohne Quittung, ohne
+ * „Rückgängig“ (Audit Runde 4, R4-D5).
+ */
+describe("Zusammenführen mit Quittung und Rückweg (R4-D5)", () => {
+  beforeEach(() => {
+    localStorage.clear();
+  });
+
+  it("quittiert mit Stärke vorher → nachher; „Rückgängig“ stellt beide Teile wieder her", async () => {
+    const nutzer = userEvent.setup();
+    const angelegt = einsatzAnlegen("Hochwasser Test", EinsatzArt.EINSATZ);
+    const b = bogenMitName("Wardenburg");
+    b.personal = ["Rudolph", "Lang", "Weber"].map((nachname) => ({ ...neuePerson(), vorname: "T", nachname }));
+    meldungHinzufuegen(angelegt.id, b);
+    const { neuLaden } = ansicht(angelegt.id);
+
+    await nutzer.click(screen.getByRole("button", { name: "Mehr…" }));
+    await nutzer.click(screen.getByRole("button", { name: "Aufteilen…" }));
+    await nutzer.type(screen.getByLabelText("Bezeichnung des abgeteilten Teils"), "Fachberater");
+    await nutzer.click(screen.getByRole("checkbox", { name: /Rudolph/ }));
+    await nutzer.click(screen.getByRole("button", { name: "Aufteilen" }));
+    neuLaden();
+    const nachAufteilen = einsaetzeLaden().find((s) => s.id === angelegt.id)!.eintraege.map((e) => `${e.id}:${e.status}`).sort();
+    expect(document.querySelectorAll(".einheit-zeile")).toHaveLength(2);
+
+    // Die Karte des Reststamms (3 → 2 Personen) nimmt den Teil wieder auf.
+    const rest = [...document.querySelectorAll<HTMLElement>(".einheit-zeile")].find((k) => !k.textContent!.includes("Fachberater"))!;
+    // „Mehr…" steht nach dem Aufteilen an dieser Karte noch offen.
+    await nutzer.click(within(rest).getByRole("button", { name: "Zusammenführen…" }));
+    await nutzer.click(within(rest).getByRole("button", { name: /^Zusammenführen$/ }));
+    neuLaden();
+
+    // Der Teil bleibt mit Historie stehen, zählt aber nicht mehr: ein Teil ist aufgegangen.
+    expect(einsaetzeLaden().find((s) => s.id === angelegt.id)!.eintraege.filter((e) => e.status === MeldeStatus.AUFGEGANGEN)).toHaveLength(1);
+    const quittung = document.querySelector<HTMLElement>(".quittung-daumen")!;
+    expect(quittung.textContent).toMatch(/^Zusammengeführt: „.*Wardenburg" · Stärke der Meldung 2 → 3/);
+    expect(within(quittung).getByRole("button", { name: "Rückgängig" })).toBeTruthy();
+
+    await nutzer.click(within(quittung).getByRole("button", { name: "Rückgängig" }));
+    neuLaden();
+
+    expect(einsaetzeLaden().find((s) => s.id === angelegt.id)!.eintraege.map((e) => `${e.id}:${e.status}`).sort()).toEqual(nachAufteilen);
+    const zurueck = document.querySelector<HTMLElement>(".quittung-daumen")!;
+    expect(zurueck.textContent).toMatch(/^Zusammenführen zurückgenommen: „.*Wardenburg" steht wieder in zwei Teilen\./);
+    expect(within(zurueck).queryByRole("button", { name: "Rückgängig" })).toBeNull();
+  });
+});
+
+/**
  * Nach der Schichtübergabe arbeitete das alte Gerät weiter wie zuvor, ohne
  * Hinweis, dass die Lage weitergegeben wurde (Audit Runde 2, R2-W5).
  */

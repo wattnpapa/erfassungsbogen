@@ -287,6 +287,42 @@ export function statusMitZeitSetzen(
   });
 }
 
+/**
+ * Stand vor einem Zusammenführen — alles, was für „Rückgängig" gebraucht wird
+ * (Audit Runde 4, R4-D5). Der Kern legt eine neue Revision des Ziels an (bei
+ * gleichem Inhalt schon vorhanden) und setzt die Teile auf AUFGEGANGEN.
+ */
+export interface ZusammenfuehrungVorher {
+  /** Die Revision, in der jetzt alles steckt. */
+  zielId: string;
+  /** Sie gab es vorher nicht — sie wird beim Zurücknehmen entfernt. */
+  zielWarNeu: boolean;
+  /** Die Teile samt Status und Abrückzeit vor dem Zusammenführen. */
+  teile: { id: string; status: MeldeStatus; abgerueckAm?: number }[];
+}
+
+/**
+ * Zusammenführen zurücknehmen: die Teile haben wieder ihren Status (und ihre
+ * Abrückzeit), die neue Revision des Ziels geht heraus, die Fassung davor gilt
+ * wieder. Ohne Vermerk in der Historie der Teile — sie waren nie weg.
+ */
+export function zusammenfuehrungZurueck(einsatzId: string, v: ZusammenfuehrungVorher): void {
+  const liste = alleSammlungen();
+  const s = liste.find((x) => x.id === einsatzId);
+  if (!s) return;
+  for (const t of v.teile) {
+    const e = s.eintraege.find((x) => x.id === t.id);
+    if (!e) continue;
+    e.status = t.status;
+    if (t.abgerueckAm != null) e.abgerueckAm = t.abgerueckAm;
+    else delete e.abgerueckAm;
+    delete e.aufgegangenIn;
+  }
+  if (v.zielWarNeu) s.eintraege = s.eintraege.filter((x) => x.id !== v.zielId);
+  s.geaendert = Date.now();
+  sammlungenSchreiben(liste);
+}
+
 /** Auftrag/Notiz der Führungsstelle setzen (leer = entfernen). */
 export function notizSetzen(einsatzId: string, eintragId: string, notiz: string): void {
   eintragAendern(einsatzId, eintragId, (e) => {

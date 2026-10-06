@@ -87,6 +87,8 @@ import {
   zeitKurz,
   zeitLang,
   zeitUnstimmigkeit,
+  zusammenfuehrungZurueck,
+  type ZusammenfuehrungVorher,
 } from "./eintrag-zeiten";
 import { frageFelder, frageJaNein, frageWahl, zeigeHinweis } from "./dialoge";
 import { nurStaerkeUebernehmen } from "./nur-staerke";
@@ -865,6 +867,8 @@ export function EinsatzDetail(props: {
   };
   // Zuletzt aufgeteilt — Quittung mit Rückweg (R2-D6).
   const [aufgeteilt, setAufgeteilt] = useState<Aufgeteilt | null>(null);
+  // Zuletzt zusammengeführt — Quittung mit Rückweg (R4-D5).
+  const [zusammengefuehrt, setZusammengefuehrt] = useState<Zusammengefuehrt | null>(null);
   // Quittung eines Rückwegs: Das Zurücknehmen geschah bisher wortlos — wer
   // nach 700 ms ein zweites Mal tippte und dabei „Rückgängig" traf, sah nur,
   // dass die Leiste verschwand (Audit Runde 3, R3-G2).
@@ -881,6 +885,19 @@ export function EinsatzDetail(props: {
     if (!ok) return;
     zurueckQuittieren(`Aufteilen zurückgenommen: „${aufgeteilt.teil}" ist wieder Teil von „${aufgeteilt.name}".`);
     setAufgeteilt(null);
+    onGeaendert();
+  }
+
+  /** Zusammenführen zurücknehmen: Teile wieder anwesend, die neue Fassung heraus. */
+  async function zusammenfuehrungZurueckNehmen() {
+    if (!zusammengefuehrt) return;
+    const ok = await gesichert("Rückgängig", () => {
+      zusammenfuehrungZurueck(einsatz.id, zusammengefuehrt.vorher);
+      if (zusammengefuehrt.vorher.zielWarNeu) entfernteMerken(einsatz.id, [zusammengefuehrt.vorher.zielId]);
+    });
+    if (!ok) return;
+    zurueckQuittieren(`Zusammenführen zurückgenommen: „${zusammengefuehrt.name}" steht wieder in ${zusammengefuehrt.vorher.teile.length === 1 ? "zwei Teilen" : `${zusammengefuehrt.vorher.teile.length + 1} Teilen`}.`);
+    setZusammengefuehrt(null);
     onGeaendert();
   }
 
@@ -1572,9 +1589,10 @@ export function EinsatzDetail(props: {
                 qualifikation={quali}
                 qualifikationKurz={qualiKurz}
                 eingang={eingang}
-                onEntfernt={(x) => { setAufgeteilt(null); setZurueckQuittung(null); setZuletztEntfernt({ ...x, nummer: nummern.get(e.einheitSchluessel) }); }}
-                onStatusWechsel={(w) => { setAufgeteilt(null); setZurueckQuittung(null); setStatusWechsel(w); }}
-                onAufgeteilt={(a) => { setZuletztEntfernt(null); setStatusWechsel(null); setZurueckQuittung(null); setAufgeteilt(a); }}
+                onEntfernt={(x) => { setAufgeteilt(null); setZusammengefuehrt(null); setZurueckQuittung(null); setZuletztEntfernt({ ...x, nummer: nummern.get(e.einheitSchluessel) }); }}
+                onStatusWechsel={(w) => { setAufgeteilt(null); setZusammengefuehrt(null); setZurueckQuittung(null); setStatusWechsel(w); }}
+                onAufgeteilt={(a) => { setZuletztEntfernt(null); setStatusWechsel(null); setZusammengefuehrt(null); setZurueckQuittung(null); setAufgeteilt(a); }}
+                onZusammengefuehrt={(z) => { setZuletztEntfernt(null); setStatusWechsel(null); setAufgeteilt(null); setZurueckQuittung(null); setZusammengefuehrt(z); }}
                 kompakt={kompakt}
                 nummer={nummern.get(e.einheitSchluessel)}
                 ungesehen={ungeseheneIds.has(e.id)}
@@ -1780,6 +1798,15 @@ export function EinsatzDetail(props: {
           „{aufgeteilt.teil}" von „{aufgeteilt.name}" abgeteilt. Später zurück über „Mehr…" › „Zusammenführen…".
         </DaumenQuittung>
       )}
+      {zusammengefuehrt && (
+        <DaumenQuittung
+          key={`zusammengefuehrt:${zusammengefuehrt.vorher.zielId}`}
+          onRueckgaengig={() => void zusammenfuehrungZurueckNehmen()}
+          onSchliessen={() => setZusammengefuehrt(null)}
+        >
+          <strong>Zusammengeführt:</strong> „{zusammengefuehrt.name}" · Stärke der Meldung {zusammengefuehrt.staerkeVorher} → {zusammengefuehrt.staerkeNachher}
+        </DaumenQuittung>
+      )}
       {/* Statuswechsel mit Uhrzeit: Ein Tipp nahm die Einheit bisher wortlos
           aus allen Summen — und niemand konnte hinterher sagen, wann (D4, W3).
           Sie liegt womöglich genau unter dem Finger, der eben „Abrücken"
@@ -1798,7 +1825,7 @@ export function EinsatzDetail(props: {
           {nummerText(statusWechsel.vorher.einheitSchluessel)}„{einheitAnzeigename(statusWechsel.vorher.bogen.einheit)}"
         </DaumenQuittung>
       )}
-      {zurueckQuittung && !statusWechsel && !zuletztEntfernt && !aufgeteilt && (
+      {zurueckQuittung && !statusWechsel && !zuletztEntfernt && !aufgeteilt && !zusammengefuehrt && (
         <DaumenQuittung key={`zurueck:${zurueckQuittung.nonce}`} onSchliessen={() => setZurueckQuittung(null)}>
           {zurueckQuittung.text}
         </DaumenQuittung>
@@ -2231,6 +2258,14 @@ interface Aufgeteilt {
   neueIds: string[];
 }
 
+/** Eben zusammengeführt — Quittung mit Rückweg und der Stärke vorher → nachher (R4-D5). */
+interface Zusammengefuehrt {
+  name: string;
+  staerkeVorher: number;
+  staerkeNachher: number;
+  vorher: ZusammenfuehrungVorher;
+}
+
 /**
  * Was „Entfernen" oder „Fassung verwerfen" zuletzt aus der Sammlung nahm —
  * neueste Fassung zuerst. Die Ansicht legt es bei „Rückgängig" unverändert
@@ -2308,6 +2343,8 @@ function EinheitKarte(props: {
   onStatusWechsel?: (w: StatusWechsel) => void;
   /** Schmaler Bildschirm: zugeklappt nur Name, Stärke und Bedarf (R2-K7). */
   kompakt?: boolean;
+  /** Eben zusammengeführt — die Ansicht quittiert mit Rückweg (R4-D5). */
+  onZusammengefuehrt?: (z: Zusammengefuehrt) => void;
   /** Eben aufgeteilt — die Ansicht quittiert mit Rückweg (R2-D6). */
   onAufgeteilt?: (a: Aufgeteilt) => void;
   /** Laufende Nummer der Meldung, wie auf dem Lageblatt (R2-A6). */
@@ -2536,8 +2573,26 @@ function EinheitKarte(props: {
   }
 
   function zusammenfuehrenAusfuehren(teilIds: string[], opt: ZusammenfuehrungOptionen) {
-    meldungenZusammenfuehren(einsatzId, kopf.id, teilIds, opt);
+    // Stand vorher festhalten: Das Zusammenführen nahm Teile still aus der
+    // Lage, ohne Quittung und ohne Rückweg (Audit Runde 4, R4-D5).
+    const teile = alle.filter((e) => teilIds.includes(e.id));
+    const vorher: ZusammenfuehrungVorher = {
+      zielId: "",
+      zielWarNeu: false,
+      teile: teile.map((e) => ({ id: e.id, status: e.status, abgerueckAm: e.abgerueckAm })),
+    };
+    const bisher = new Set(alle.map((e) => e.id));
+    const staerkeVorher = staerke(kopf.bogen).gesamt;
+    const r = meldungenZusammenfuehren(einsatzId, kopf.id, teilIds, opt);
     setZusammenfuehren(false);
+    if (r) {
+      props.onZusammengefuehrt?.({
+        name: einheitAnzeigename(kopf.bogen.einheit),
+        staerkeVorher,
+        staerkeNachher: staerke(r.ziel.bogen).gesamt,
+        vorher: { ...vorher, zielId: r.ziel.id, zielWarNeu: !bisher.has(r.ziel.id) },
+      });
+    }
     onGeaendert();
   }
 
