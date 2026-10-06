@@ -24,10 +24,9 @@ export function UhrWarnung() {
   if (!w) return null;
   return (
     <p className="warnung uhr-warnung" role="alert">
-      ⚠ Geräteuhr prüfen: Das Gerät zeigt den {tag(w.geraet)}, beim letzten Start war der {tag(w.zuletzt)}. Solange
-      das nicht geklärt ist, löscht und anonymisiert die App nichts — keine Sammlung, keinen Papierkorb-Eintrag,
-      keine Namen. Ist das Datum falsch, in den Geräteeinstellungen Datum und Uhrzeit korrigieren. Stimmt es (das
-      Gerät lag lange unbenutzt), gilt es ab dem nächsten Start, frühestens morgen.
+      ⚠ Geräteuhr prüfen: Das Gerät zeigt den {tag(w.geraet)}, beim letzten Start war der {tag(w.zuletzt)}. Bis das
+      geklärt ist, löscht und anonymisiert die App nichts. Datum falsch? In den Geräteeinstellungen korrigieren.
+      Stimmt es, gilt es ab dem nächsten Start (frühestens morgen).
     </p>
   );
 }
