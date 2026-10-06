@@ -74,3 +74,35 @@ Drosselung und `setOffline` erfassen den Service Worker nicht),
 Organisationen. Nicht prüfbar wie bisher: Kamera, Handscanner, echte
 Handschuhe und echtes Licht, Bildschirmtastatur (nur nachgestellt),
 WebKit/Safari, native Builds.
+
+## Stand der Behebung
+
+Stand 06.10.2026. Alle 71 Befunde wurden auf demselben Zweig in fünf Paketen
+bearbeitet, jedes mit Typprüfung, Unit-Tests, Verhaltensszenarien und
+Nachmessung im Browser. Einzelheiten stehen im Abschnitt „Stand der
+Behebung" jedes Berichts. Gesamtprüfung vor dem Zusammenführen: Typprüfung
+ohne Fehler, 2 644 Unit-Tests, 137 von 137 Verhaltensszenarien, Produktions-
+build ohne Fehler.
+
+| Paket | Inhalt | Befunde |
+| --- | --- | --- |
+| 1 | Rückfragen, Links, Rückholplatz, Zurück-Geste | R4-G1, S1–S4, M5, W3, E1, E2, N1, N2, D2 |
+| 2 | Meldungsfassungen, Exportstand, Führungssicht | R4-W1, W2, W4–W8, K1–K8, A1, A2, E6 |
+| 3 | Layout, 200 % Schrift, Touch, Sicht | R4-M1–M4, M6, M7, G2–G6, L1–L4, H2, H3, N3 |
+| 4 | Uhr, Speicher, Löschen, Offline, Zeiten | R4-D1, D3–D5, E3–E5, E7, O1, O2, S5, H1, H4, H5 |
+| 5 | Papier, Vordruck, Begriffe | R4-A3–A8, N4–N6 |
+
+Mit Grenze oder nur teilweise gelöst:
+
+- R4-W1: Der Vorrang einer Fassung gilt nur in der App (`src/app/fassung-vorrang.ts`);
+  der Kern in `vendor/bos-meldekopf` und der Kiosk-Stapel kennen ihn nicht
+  (Arc42 11.3).
+- R4-A1: Die QR-Codes tragen keine laufende Nummer, sie wird im
+  Papier-Abgleich von Hand übernommen.
+- R4-K5: Am Telefon liegt die erste Karte bei 1,96 Bildschirmen (6 Einheiten,
+  360 × 640), bei 320 × 568 und mehreren Zügen darüber.
+- R4-D1: Ein Sprung der Geräteuhr unter 60 Tagen wird nicht erkannt.
+- R4-S4, R4-S5, R4-H4, R4-H2, R4-M7: teilweise; die Begründungen stehen in
+  den Berichten.
+- R4-O: Die Prüfung „Offline und Speicher" blieb unvollständig; der Bericht
+  hat nur zwei Befunde.
