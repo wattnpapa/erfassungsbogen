@@ -1400,7 +1400,8 @@ export function EinsatzDetail(props: {
               welcher „für Papier" ist, stand nur hier (Audit Runde 2, R2-A3). */}
           „Einsatz weitergeben / sichern" erzeugt die Sammel-PDF mit allen Bögen (zum Drucken) und allen Meldungen,
           Zeiten, Historie und Zügen — auf dem nächsten Gerät über „Einsatz importieren…" einlesbar, auch wenn alle
-          abgerückt sind. Nur die neuen Bögen für den Stab: Kästchen unten.
+          abgerückt sind. Ein Nachtrag für den Stab (PDF, CSV, Excel): weiter unten „Nur neue Bögen seit dem letzten Export“
+          ankreuzen — erst dann erscheinen dort die Nachtrag-Knöpfe, je Format mit eigenem Bezugspunkt.
         </p>
       )}
       {/* Der Meldekopf liefert dem Stab nach: einmal am Abend alles, am Morgen
@@ -2535,6 +2536,11 @@ function EinheitKarte(props: {
     const hierName = hier?.name ?? "";
     const zaehltHier = zaehlt && hier?.art === EinsatzArt.EINSATZ;
     const staerkeText = zaehltHier ? ` — die Lage „${hierName}" verliert ${staerke(kopf.bogen).gesamt} Helfer` : "";
+    // Führt das Ziel diese Einheit schon (derselbe Bogen, etwa nach einer Übung
+    // am Vortag), wird zusammengeführt statt ersetzt — das steht im Dialog, und
+    // „Rückgängig" stellt dann auch die Einträge des Ziels wieder her (R4-E6).
+    const schlHier = kopf.einheitSchluessel;
+    const imZiel = (s: Einsatzsammlung) => s.eintraege.some((e) => e.einheitSchluessel === schlHier);
     const ziel = await frageWahl({
       titel: "In anderen Einsatz verschieben",
       text: `„${einheitAnzeigename(kopf.bogen.einheit)}" samt Historie, Zeiten und Auftrag aus „${hierName}" verschieben${staerkeText}. Ziel:`,
@@ -2543,22 +2549,41 @@ function EinheitKarte(props: {
         label: s.name,
         hinweis:
           `${ART_LABEL[s.art]}${s.ort ? ` · ${s.ort}` : ""} · angelegt ${new Date(s.angelegt).toLocaleDateString("de-DE")}` +
-          (zaehltHier && s.art !== EinsatzArt.EINSATZ ? ` — als Übung zählt die Einheit in keiner Lage mehr` : ""),
+          (zaehltHier && s.art !== EinsatzArt.EINSATZ ? ` — als Übung zählt die Einheit in keiner Lage mehr` : "") +
+          (imZiel(s) ? " — dort schon gemeldet, wird zusammengeführt" : ""),
       })),
     });
     if (!ziel) return;
     const name = andere.find((s) => s.id === ziel)?.name ?? "";
     const schl = kopf.einheitSchluessel;
+    // Stand vor dem Verschieben: die eigenen Einträge der Einheit hier und im Ziel.
+    const zielVorher = einsaetzeLaden().find((s) => s.id === ziel);
+    const zielEigene = structuredClone((zielVorher?.eintraege ?? []).filter((e) => e.einheitSchluessel === schl));
+    const hierIds = new Set((hier?.eintraege ?? []).filter((e) => e.einheitSchluessel === schl).map((e) => e.id));
     if (await gesichert("Verschieben", () => einheitVerschieben(einsatzId, ziel, schl))) {
       onGeaendert();
       // Rückweg mit einem Tipp, wie bei Abrücken und Entfernen (R3-E6).
       const zurueck = await frageJaNein({
         titel: "Verschoben",
-        text: `„${einheitAnzeigename(kopf.bogen.einheit)}" liegt jetzt in „${name}" und zählt nicht mehr in „${hierName}".`,
+        text:
+          `„${einheitAnzeigename(kopf.bogen.einheit)}" liegt jetzt in „${name}" und zählt nicht mehr in „${hierName}".` +
+          (zielEigene.length > 0 ? ` In „${name}" war sie schon gemeldet; beide Stände sind zusammengeführt.` : ""),
         ok: `Rückgängig — zurück nach „${hierName}"`,
         abbruch: "Alles klar",
       });
-      if (zurueck && (await gesichert("Verschieben rückgängig", () => einheitVerschieben(ziel, einsatzId, schl)))) {
+      if (
+        zurueck &&
+        (await gesichert("Verschieben rückgängig", () => {
+          einheitVerschieben(ziel, einsatzId, schl);
+          if (zielEigene.length > 0 && zielVorher) {
+            // Was das Ziel schon vorher hatte, geht zurück ins Ziel und aus dieser
+            // Sammlung wieder heraus — sonst nähme „Rückgängig" deren eigenen
+            // Eintrag mit (R4-E6).
+            for (const e of zielEigene) if (!hierIds.has(e.id)) meldungEntfernen(einsatzId, e.id);
+            einsatzImportieren({ ...zielVorher, eintraege: zielEigene });
+          }
+        }))
+      ) {
         onGeaendert();
       }
     }

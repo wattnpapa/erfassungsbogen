@@ -1115,6 +1115,34 @@ describe("Verschieben in eine Übung (R3-E6)", () => {
   });
 });
 
+describe("Verschieben in eine Sammlung, die die Einheit schon führt (R4-E6)", () => {
+  beforeEach(() => {
+    localStorage.clear();
+  });
+
+  it("sagt im Dialog, dass dort schon gemeldet ist, und „Rückgängig“ lässt deren Eintrag stehen", async () => {
+    const nutzer = userEvent.setup();
+    const uebung = einsatzAnlegen("Übung Iller", EinsatzArt.UEBUNG);
+    // Dieselbe Meldung (gleiche Eintrags-ID) steht schon in der Übung, mit eigenem Auftrag.
+    const dort = meldungHinzufuegen(uebung.id, bogenMitName("Crailsheim"))!.eintrag;
+    notizSetzen(uebung.id, dort.id, "Übungsauftrag Nord");
+    const { einsatzId } = buehne(["Crailsheim"]);
+    await nutzer.click(screen.getByRole("button", { name: "Mehr…" }));
+    await nutzer.click(screen.getByRole("button", { name: "Verschieben…" }));
+    const wahl = document.querySelector<HTMLDialogElement>("dialog[aria-label='In anderen Einsatz verschieben']")!;
+    expect(wahl.textContent).toContain("dort schon gemeldet, wird zusammengeführt");
+    await nutzer.click(within(wahl).getByRole("button", { name: /Übung Iller/ }));
+    const quittung = await waitFor(() => document.querySelector<HTMLDialogElement>("dialog[aria-label='Verschoben']")!);
+    expect(quittung.textContent).toContain("war sie schon gemeldet");
+    await nutzer.click(within(quittung).getByRole("button", { name: /^Rückgängig — zurück nach/ }));
+    await waitFor(() => expect(einsaetzeLaden().find((x) => x.id === einsatzId)!.eintraege).toHaveLength(1));
+    // Beide Sammlungen führen wieder je einen Eintrag, die Übung mit ihrem Auftrag.
+    const ziel = einsaetzeLaden().find((x) => x.id === uebung.id)!;
+    expect(ziel.eintraege).toHaveLength(1);
+    expect(ziel.eintraege[0]!.notiz).toBe("Übungsauftrag Nord");
+  });
+});
+
 /**
  * Neun Knöpfe je Karte machten eine Einheit rund 450 px hoch; die seltenen
  * und folgenschweren Aktionen liegen jetzt hinter „Mehr…" (Audit Runde 2,
@@ -1590,5 +1618,35 @@ describe("Lage vom Papier abgleichen (Audit Runde 3, R3-A2)", () => {
     a.neuLaden();
     expect(screen.queryByText("vom Papier, Zeiten prüfen")).toBeNull();
     expect(screen.queryByRole("button", { name: "Lage vom Papier abgleichen…" })).toBeNull();
+  });
+
+  /**
+   * R4-A1, R4-A2: Nr. und Auftrag/Notiz aus dem Kasten „Stand am Meldekopf“
+   * gehören in den Abgleich; fehlt die Nr., sagt die App, dass sie neu vergibt.
+   */
+  it("fragt „Nr. laut Blatt“ und „Auftrag / Notiz“ ab und sagt, wenn Nummern neu vergeben werden", async () => {
+    const user = userEvent.setup();
+    const angelegt = einsatzAnlegen("Hochwasser Neckar", EinsatzArt.EINSATZ);
+    const ids = ["Ansbach", "Kirchehrenbach"].map((n) => meldungHinzufuegen(angelegt.id, bogenMitName(n))!.eintrag.id);
+    vomPapierMarkieren(angelegt.id, ids);
+    ansicht(angelegt.id);
+    await user.click(screen.getByRole("button", { name: "Lage vom Papier abgleichen…" }));
+    const nr = screen.getAllByLabelText(/Nr\. laut Blatt/);
+    const notiz = screen.getAllByLabelText(/Auftrag \/ Notiz/);
+    await user.type(nr[0]!, "7");
+    await user.type(notiz[0]!, "Pumpe 2 defekt");
+    await user.type(nr[1]!, "7");
+    await user.click(screen.getByRole("button", { name: "Abgleich übernehmen" }));
+    // Zweimal Nr. 7: nichts übernommen.
+    expect(await screen.findByText(/„Nr\. 7“ steht bei .* und /)).toBeTruthy();
+    await user.click(within(screen.getByRole("dialog")).getByRole("button", { name: "Alles klar" }));
+    await user.clear(nr[1]!);
+    await user.click(screen.getByRole("button", { name: "Abgleich übernehmen" }));
+    const hinweis = await screen.findByRole("dialog", { name: "Nummern neu vergeben" });
+    expect(within(hinweis).getByText(/Für 1 Einheit stand keine „Nr\. laut Blatt“/)).toBeTruthy();
+    const e = einsaetzeLaden().find((s) => s.id === angelegt.id)!.eintraege;
+    expect(e.find((x) => x.id === ids[0])!.nummer).toBe(7);
+    expect(e.find((x) => x.id === ids[0])!.notiz).toBe("Pumpe 2 defekt");
+    expect(e.find((x) => x.id === ids[1])!.nummer).toBeUndefined();
   });
 });
