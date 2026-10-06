@@ -22,7 +22,16 @@ export function EinleseQuittung({ fehler, meldung }: { fehler: string; meldung: 
   return (
     <div ref={ref} className="einlese-quittung" role={fehler ? "alert" : "status"}>
       {meldung && <p className="meldung">{meldung}</p>}
-      {fehler && <p className="fehler">{fehler}</p>}
+      {/* Mit Zeichen und Rahmen wie die Erfolgsmeldung daneben (R4-L4): als
+          Fließtext im Alarmton war die Fehlerzeile unter Rot-Grün-Schwäche nur
+          noch ein beiger Satz. Das Zeichen ist für Vorleser versteckt, der
+          Wortlaut trägt die Aussage. */}
+      {fehler && (
+        <p className="fehler">
+          <span aria-hidden="true">⚠ </span>
+          {fehler}
+        </p>
+      )}
     </div>
   );
 }

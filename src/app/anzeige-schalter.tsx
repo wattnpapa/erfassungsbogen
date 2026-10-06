@@ -73,6 +73,48 @@ export function AnzeigeSchalter({ klappbar = false }: { klappbar?: boolean }) {
   );
 }
 
+/** Höchste Höhe, die ein Anker haben darf (px): eine Zeile, ein Feld, eine Überschrift. */
+const ANKER_MAX_HOEHE = 120;
+
+/**
+ * Das Element, das beim Moduswechsel an seiner Stelle im Bild bleiben soll
+ * (Audit Runde 4, R4-L3). Bisher: was genau in der Bildmitte lag. Traf der
+ * Punkt die Fläche einer ganzen Personenkarte (Rand, Zwischenraum), war das die
+ * Karte selbst — es blieb nur ihre Oberkante stehen, und der Inhalt darin
+ * wanderte im Feld-Modus, der die Schrift vergrößert, um rund 375 px (mehr
+ * als eine halbe Bildhöhe).
+ *
+ * Jetzt: das erste Element um die Bildmitte, das höchstens eine Zeile hoch
+ * ist (Feld, Beschriftung, Knopf, Überschrift). Gesucht wird in der Mitte,
+ * dann in Schritten nach oben und unten und an drei Spalten; fest
+ * positionierte Elemente (Leiste, Quittung) zählen nicht. Findet sich nichts,
+ * gilt wie bisher, was in der Mitte liegt.
+ */
+export function ankerInBildmitte(dok: Document = document, fenster: Window = window): Element | null {
+  if (typeof dok.elementFromPoint !== "function") return null;
+  const w = fenster.innerWidth;
+  const h = fenster.innerHeight;
+  const spalten = [w / 2, w * 0.25, w * 0.75];
+  const schritte = [0, -24, 24, -48, 48, -80, 80, -120, 120];
+  for (const d of schritte) {
+    for (const x of spalten) {
+      const el = dok.elementFromPoint(x, h / 2 + d);
+      if (!el || el === dok.documentElement || el === dok.body) continue;
+      if (festPositioniert(el, fenster)) continue;
+      const r = el.getBoundingClientRect();
+      if (r.width > 0 && r.height > 0 && r.height <= ANKER_MAX_HOEHE) return el;
+    }
+  }
+  return dok.elementFromPoint(w / 2, h / 2);
+}
+
+function festPositioniert(el: Element, fenster: Window): boolean {
+  for (let e: Element | null = el; e && e !== e.ownerDocument.documentElement; e = e.parentElement) {
+    if (fenster.getComputedStyle(e).position === "fixed") return true;
+  }
+  return false;
+}
+
 /**
  * Moduswechsel aus der festen Fußleiste des Assistenten (Audit Runde 3,
  * R3-L6): Der Umschalter stand nur im Kopf, und der Kopf rollt mit. Mitten in
@@ -111,10 +153,8 @@ export function AnzeigeLeistenKnopf() {
   }, [offen]);
 
   function waehle(m: AnzeigeModus) {
-    // Anker: das Element in der Bildmitte, damit die Stelle im Formular bleibt.
-    const anker = typeof document.elementFromPoint === "function"
-      ? document.elementFromPoint(window.innerWidth / 2, window.innerHeight / 2)
-      : null;
+    // Anker: ein kleines Element um die Bildmitte, damit die Stelle im Formular bleibt.
+    const anker = ankerInBildmitte();
     const vorher = anker?.getBoundingClientRect().top;
     setModus(m);
     anzeigeModusSetzen(m);

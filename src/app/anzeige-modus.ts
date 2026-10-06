@@ -31,14 +31,19 @@ const SPEICHER_SCHLUESSEL = "eeb.anzeigemodus.v1";
 const ALT_FELDMODUS = "eeb.feldmodus.v1";
 
 /**
+ * Reihenfolge der Wahl (R4-L4): Die beiden hellen Modi stehen zusammen, die
+ * beiden dunklen auch — „Feld" liegt nicht mehr neben „Nacht". Ein Fehltipp aus
+ * der Nacht heraus schaltete ohne Rückfrage auf die hellste Darstellung
+ * (Luma-Mittel 186 statt 33) und blendete für diesen Moment voll.
+ *
  * `kurz` ist die Zweckzeile unter dem Namen in der aufgeklappten Wahl (R4-G5):
  * Wer ohne Einweisung mit Handschuh arbeitet, findet „Feld" an „große Tasten".
  * Der Tooltip (`titel`) gibt es auf dem Telefon nicht.
  */
 export const ANZEIGE_MODI: { modus: AnzeigeModus; label: string; kurz: string; titel: string }[] = [
   { modus: "standard", label: "Standard", kurz: "normal", titel: "Normale, helle Darstellung — bleibt hell, auch wenn das Gerät auf dunkel steht" },
-  { modus: "dunkel", label: "Dunkel", kurz: "abends", titel: "Heller Text auf dunklem Grund für abgedunkelte Räume" },
   { modus: "feld", label: "Feld", kurz: "große Tasten", titel: "Große Tippziele und hoher Kontrast für den Einsatz draußen (Handschuhe, Sonne)" },
+  { modus: "dunkel", label: "Dunkel", kurz: "abends", titel: "Heller Text auf dunklem Grund für abgedunkelte Räume" },
   { modus: "nacht", label: "Nacht", kurz: "gedimmt", titel: "Gedimmte, warme Darstellung für Nachteinsätze — blendet nicht" },
 ];
 

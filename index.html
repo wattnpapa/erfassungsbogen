@@ -479,6 +479,10 @@
        (Audit Runde 3, R3-L1): Erfolg und Fehler untereinander (R3-E4). */
     .einlese-quittung { display: grid; gap: var(--r-2); margin-block: var(--r-2); }
     .einlese-quittung > p { margin: 0; }
+    .einlese-quittung > p.fehler {
+      background: var(--alarm-fond); border: var(--strich-stark) solid var(--alarm-linie); border-radius: var(--radius);
+      padding: 0.5rem 0.75rem; font-size: var(--t-s); font-weight: 600;
+    }
     .einlese > button { width: 100%; }
     .einlese-menue {
       position: absolute; z-index: 30; top: calc(100% + var(--r-1)); left: 0;
@@ -1471,20 +1475,37 @@
        41,6) — jetzt das Grundmaß wie überall. Mit Hinweiszeile (R4-G5) stehen
        Name und Zweck übereinander; die Wahl ist selbst ein abgesetztes Feld
        mit Schatten und deckendem Grund. */
-    footer.nav .anzeige-leiste-wahl button {
+    footer.nav .anzeige-leiste-wahl button, .anzeige-schwebe .anzeige-leiste-wahl button {
       flex: 1 1 0; border: none; border-radius: 0; padding: 0.3rem min(0.4rem, 6px);
       min-height: calc(44px + var(--ziel)); display: flex; flex-direction: column; align-items: center; justify-content: center;
       gap: 0; line-height: 1.2; white-space: normal; background: var(--flaeche); color: var(--text);
     }
     .modus-kurz { display: none; font-size: var(--t-xs); font-weight: 400; line-height: 1.2; }
     .anzeige-leiste-wahl .modus-kurz { display: block; color: var(--text-2); }
-    footer.nav .anzeige-leiste-wahl button.aktiv .modus-kurz { color: inherit; }
+    footer.nav .anzeige-leiste-wahl button.aktiv .modus-kurz, .anzeige-schwebe .anzeige-leiste-wahl button.aktiv .modus-kurz { color: inherit; }
     /* Aufgeklappte Wahl im Kopf (Telefon): dieselbe Zweckzeile, in der
        Kopf-Wahl auf der Farbe der Segmente. */
     .anzeige-schalter.klappbar.offen > button:not(.anzeige-klappe) { display: flex; flex-direction: column; align-items: center; justify-content: center; }
     .anzeige-schalter.klappbar.offen .modus-kurz { display: block; color: inherit; opacity: 1; }
-    footer.nav .anzeige-leiste-wahl button + button { border-left: var(--strich) solid var(--linie-stark); }
-    footer.nav .anzeige-leiste-wahl button.aktiv { background: var(--akzent); color: var(--auf-akzent); }
+    footer.nav .anzeige-leiste-wahl button + button, .anzeige-schwebe .anzeige-leiste-wahl button + button { border-left: var(--strich) solid var(--linie-stark); }
+    footer.nav .anzeige-leiste-wahl button.aktiv, .anzeige-schwebe .anzeige-leiste-wahl button.aktiv { background: var(--akzent); color: var(--auf-akzent); }
+    /* R4-L3: Moduswechsel in der Einsatzansicht (einsaetze-ui.tsx): ein kleiner
+       fester Knopf unten links im Daumenbereich, die Wahl klappt darüber auf.
+       Die Fläche trägt Rahmen und Schatten, damit er auf Karten nicht
+       verschwindet; die Quittung (z-index 20) deckt ihn ab, solange sie steht. */
+    .anzeige-schwebe {
+      position: fixed; z-index: 19;
+      left: max(var(--r-3), env(safe-area-inset-left)); bottom: max(var(--r-3), env(safe-area-inset-bottom));
+    }
+    .anzeige-schwebe .anzeige-leiste-knopf {
+      min-width: min(calc(var(--ziel-basis) + var(--ziel)), calc(44px + var(--ziel)));
+      min-height: min(calc(var(--ziel-basis) + var(--ziel)), calc(44px + var(--ziel)));
+      padding: 0; font-size: min(var(--t-l), 20px);
+      background: var(--flaeche); color: var(--text); border: var(--strich-stark) solid var(--linie-stark);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+    }
+    .anzeige-schwebe .anzeige-leiste-wahl { left: 0; right: auto; width: calc(100vw - 2 * var(--r-3)); max-width: 24rem; }
+    html:has(.quittung-daumen) .anzeige-schwebe, html.tastatur-offen .anzeige-schwebe { display: none; }
     /* R4-M2, R4-M3, R4-G2: Die Leiste des Assistenten ist ein Raster mit
        festen Plätzen: „← Zurück" links, „◐" daneben, der Primärknopf rechts
        außen — in jedem Schritt derselbe Platz, auch wenn „Zur Übersicht →"
@@ -2235,6 +2256,12 @@
       border: 2px solid var(--alarm); border-radius: var(--radius);
       font-size: var(--t-xs); font-weight: 700; letter-spacing: normal;
     }
+    /* R4-L4: Auf dunklem Grund ist die Alarmmarke gefüllt, die Warnmarken
+       („Ruhezeit", „Unterbringung") bleiben Umrisse: Unter Deuteranopie sind
+       Alarm- und Warnton beide beige, und „⚠" gegen „●" allein ist ein kleines
+       Merkmal. Gefüllt gegen leer unterscheidet sich auf einen Blick. Dunkle
+       Schrift auf dem Alarmton: 7,55:1 nachts, 9,44:1 im Dunkel-Modus. */
+    .dunkel-modus .signatur-marke, .nacht-modus .signatur-marke { background: var(--alarm); color: var(--grund); }
     /* Übungs-Kennzeichen an Meldungen in der Einsatz-Sammlung — gleiche
        Farbwelt wie der Störer im Assistenten (Warn-Tokens), damit „Übung"
        überall dieselbe Handschrift trägt. */
@@ -4340,6 +4367,21 @@
     .nacht-modus .schritte button.status-ok .schritt-status { color: var(--gut); }
     .nacht-modus .schritte button.status-begonnen .schritt-status { color: var(--akzent-hell); }
     .nacht-modus .vollstaendig-ok, .nacht-modus .autosave { color: var(--gut); }
+    /* R4-L4: Native Bedienelemente stehen nachts nicht mehr reinweiß im sonst
+       warmen Bild. Der Ring der Optionsknöpfe und der Kästchen und das
+       Kalendersymbol der Datumsfelder waren 255/255/255 — die hellsten Punkte
+       im Nacht-Modus (Schrift: Luma 206). Filter statt eigener Zeichnung:
+       warm getönt und abgedunkelt, höchstens so hell wie die Schrift. */
+    .nacht-modus input[type="radio"], .nacht-modus input[type="checkbox"],
+    .nacht-modus input::-webkit-calendar-picker-indicator, .nacht-modus input::-webkit-inner-spin-button {
+      filter: sepia(1) saturate(0.6) brightness(0.78);
+    }
+    /* Der Rahmen „Ohne Kamera: mit dem USB-Handscanner" war kaltgrau (179/179/179). */
+    .nacht-modus .scanner-handscanner { color: var(--text); border-color: var(--text-2); }
+    .nacht-modus .scanner-handscanner .scanner-schritte { color: var(--text); }
+    .nacht-modus .handscanner-fussnote { color: var(--text-2); }
+    .nacht-modus .handscanner-lampe { border-color: var(--text-2); color: var(--text-2); }
+    .nacht-modus .handscanner-lampe.aktiv { background: var(--text); border-color: var(--text); color: var(--grund); }
     .nacht-modus .offline-badge { color: var(--gut); border-color: var(--gut); }
     .nacht-modus {
       --rolle-f-fond: #2a2440; --rolle-f-text: #c3b6ea;

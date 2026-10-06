@@ -1707,3 +1707,22 @@ describe("Lage vom Papier abgleichen (Audit Runde 3, R3-A2)", () => {
     expect(e.find((x) => x.id === ids[1])!.nummer).toBeUndefined();
   });
 });
+
+/** Audit Runde 4, R4-L3: Der Moduswechsel steht in der Einsatzansicht auch von unten bereit. */
+describe("Moduswechsel von unten in der Einsatzansicht (R4-L3)", () => {
+  it("hat einen festen „◐“-Knopf, dessen Wahl mit zwei Tipps erreichbar ist", async () => {
+    buehne();
+    const nutzer = userEvent.setup();
+    const fest = document.querySelector(".anzeige-schwebe");
+    expect(fest).not.toBeNull();
+    const knopf = within(fest as HTMLElement).getByRole("button", { name: /Anzeigemodus .* ändern/ });
+    await nutzer.click(knopf);
+    const wahl = within(fest as HTMLElement).getByRole("group", { name: "Anzeigemodus" });
+    await nutzer.click(within(wahl).getByRole("button", { name: "Nacht" }));
+    expect(document.documentElement.classList.contains("nacht-modus")).toBe(true);
+    // Die Wahl klappt nach dem zweiten Tipp wieder zu.
+    expect(within(fest as HTMLElement).queryByRole("group", { name: "Anzeigemodus" })).toBeNull();
+    document.documentElement.classList.remove("nacht-modus");
+    localStorage.removeItem("eeb.anzeigemodus.v1");
+  });
+});

@@ -128,7 +128,7 @@ describe("Startseite bei großer Schrift (R4-M6)", () => {
 
 describe("Moduswahl (R4-M7, R4-G5)", () => {
   it("die Segmente der aufgeklappten Wahl haben das Grundmaß, nicht 42 px", () => {
-    expect(bloecke("footer.nav .anzeige-leiste-wahl button").join("\n")).toMatch(/min-height:\s*calc\(44px \+ var\(--ziel\)\)/);
+    expect(bloecke("footer.nav .anzeige-leiste-wahl button, .anzeige-schwebe .anzeige-leiste-wahl button").join("\n")).toMatch(/min-height:\s*calc\(44px \+ var\(--ziel\)\)/);
   });
 
   it("jeder Modus nennt seinen Zweck in einer Zeile, „Feld“ die großen Tasten", () => {
@@ -242,5 +242,43 @@ describe("Stärke-Leiste der Musterung (R4-H3)", () => {
     expect(bloecke(".staerke-leiste .etikett-kurz").join("\n")).toMatch(/display:\s*none/);
     const quelle = readFileSync(new URL("./vorlagen-ui.tsx", import.meta.url), "utf8");
     for (const k of ["F", "UF", "M", "Ges"]) expect(quelle).toContain(`aria-hidden="true">${k}</span>`);
+  });
+});
+
+describe("Kleinere Sichtreste (R4-L4)", () => {
+  it("nachts sind Optionsknöpfe, Kästchen und das Kalendersymbol gedimmt und warm, nicht reinweiß", () => {
+    const b = bloecke(
+      '.nacht-modus input[type="radio"], .nacht-modus input[type="checkbox"],\n    .nacht-modus input::-webkit-calendar-picker-indicator, .nacht-modus input::-webkit-inner-spin-button',
+    ).join("\n");
+    expect(b).toMatch(/filter:\s*sepia\(1\)[^;]*brightness\(0\.\d+\)/);
+  });
+
+  it("der Handscanner-Rahmen trägt nachts --text-2 statt Weiß mit Deckkraft", () => {
+    expect(bloecke(".nacht-modus .scanner-handscanner").join("\n")).toMatch(/border-color:\s*var\(--text-2\)/);
+  });
+
+  it("die Fehlerzeile nach „Bögen einlesen…“ trägt Rahmen und Zeichen wie die Erfolgsmeldung", () => {
+    expect(bloecke(".einlese-quittung > p.fehler").join("\n")).toMatch(/border:[^;]*var\(--alarm-linie\)/);
+    const quelle = readFileSync(new URL("./einlese-quittung.tsx", import.meta.url), "utf8");
+    expect(quelle).toContain('<span aria-hidden="true">⚠ </span>');
+  });
+
+  it("die Alarmmarke ist auf dunklem Grund gefüllt, die Warnmarken bleiben Umrisse", () => {
+    const b = bloecke(".dunkel-modus .signatur-marke, .nacht-modus .signatur-marke").join("\n");
+    expect(b).toMatch(/background:\s*var\(--alarm\)/);
+    expect(bloecke(".bedarf-marke").join("\n")).not.toMatch(/background:\s*var\(--alarm\)/);
+  });
+
+  it("„Nacht“ liegt im Umschalter nicht neben „Feld“", () => {
+    const reihenfolge = ANZEIGE_MODI.map((m) => m.modus);
+    expect(Math.abs(reihenfolge.indexOf("nacht") - reihenfolge.indexOf("feld"))).toBeGreaterThan(1);
+    expect(reihenfolge).toEqual(["standard", "feld", "dunkel", "nacht"]);
+  });
+});
+
+describe("Moduswechsel von unten (R4-L3)", () => {
+  it("die Einsatzansicht hat einen festen Knopf unten links, der der Quittung und der Tastatur weicht", () => {
+    expect(bloecke(".anzeige-schwebe").join("\n")).toMatch(/position:\s*fixed/);
+    expect(css).toMatch(/html:has\(\.quittung-daumen\) \.anzeige-schwebe, html\.tastatur-offen \.anzeige-schwebe\s*\{\s*display:\s*none/);
   });
 });

@@ -71,7 +71,7 @@ import {
 import { debugAktiv } from "./debug-plattform";
 import { Auswahl, STAERKE_LEGENDE } from "./schritte/bausteine";
 import { SeitenKopf } from "./seiten-kopf";
-import { AnzeigeSchalter } from "./anzeige-schalter";
+import { AnzeigeLeistenKnopf, AnzeigeSchalter } from "./anzeige-schalter";
 import {
   SpeicherVollFehler,
   abrueckzeitSetzen,
@@ -1802,6 +1802,15 @@ export function EinsatzDetail(props: {
           {zurueckQuittung.text}
         </DaumenQuittung>
       )}
+      {/* Moduswechsel von unten (Audit Runde 4, R4-L3): Die Einsatzansicht hat
+          keine feste Leiste, der Umschalter im Kopf lag mitten in der Liste
+          rund 2 000 px entfernt. Ein kleiner fester Knopf am unteren Rand —
+          dort, wo der Daumen ist; zwei Tipps (öffnen, wählen) genügen, ohne zu
+          rollen. Die Quittung mit „Rückgängig" geht vor (index.html blendet ihn
+          dann aus), ebenso die Bildschirmtastatur. */}
+      <div className="anzeige-schwebe">
+        <AnzeigeLeistenKnopf />
+      </div>
     </main>
     </>
   );
