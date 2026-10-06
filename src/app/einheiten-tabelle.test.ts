@@ -31,6 +31,7 @@ import {
   passtZuBedarfsfilter,
   istNeu,
   abweichenderOrt,
+  anWortgrenze,
   lueckeKurz,
   lueckenAlle,
   lueckenText,
@@ -376,6 +377,17 @@ describe("Lücken mit Inhalt statt Zahl (Audit Runde 3, R3-K7)", () => {
     const k = lueckeKurz("Ein sehr langer Hinweis ohne Doppelpunkt und ohne Gedankenstrich am Anfang");
     expect(k.length).toBeLessThanOrEqual(32);
     expect(k.endsWith("…")).toBe(true);
+  });
+
+  it("kürzt an einer Wortgrenze, nie mitten im Wort (R4-N4)", () => {
+    const k = lueckeKurz("Alle zwölf Mitglieder stehen auf Geschlechtsvorgabe männlich laut Vorbelegung des Bogens");
+    expect(k).toBe("Alle zwölf Mitglieder stehen …");
+    // Jedes Wort davor ist im Original ein ganzes Wort.
+    for (const wort of k.replace(/ …$/, "").split(" ")) expect("Alle zwölf Mitglieder stehen auf Geschlechtsvorgabe").toContain(wort);
+    expect(anWortgrenze("Kennzeichen auf Anhänger steht mehr als einmal", 30)).toBe("Kennzeichen auf Anhänger steht");
+    expect(anWortgrenze("kurz", 30)).toBe("kurz");
+    // Ein einziges langes Wort wird hart gekürzt.
+    expect(anWortgrenze("Donaudampfschifffahrtsgesellschaftskapitän", 10)).toBe("Donaudampf");
   });
 });
 

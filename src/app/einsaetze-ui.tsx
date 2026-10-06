@@ -157,9 +157,18 @@ export const ART_LABEL: Record<EinsatzArt, string> = {
   [EinsatzArt.VERANSTALTUNG]: "Veranstaltung",
 };
 
-// Herkunft einer Meldung: ein Wortlaut für Karte und Exporte, siehe
-// HERKUNFT_TEXT in eintrag-zeiten.ts (Audit Runde 2, R2-K6).
-const QUELLE_LABEL = HERKUNFT_TEXT;
+/**
+ * Herkunft der Meldung an der Karte, in Worten, die ohne Einweisung tragen:
+ * „Empfangen“ allein sagte nicht, von wem und wie (Audit Runde 4, R4-N4). Die
+ * CSV führt weiter HERKUNFT_TEXT.
+ */
+const QUELLE_LABEL: Record<keyof typeof HERKUNFT_TEXT, string> = {
+  scan: "von der Einheit empfangen, per Scan oder Link",
+  manuell: "am Meldekopf von Hand erfasst",
+  "pdf-import": "aus Datei übernommen",
+  aufteilung: "aus einer Aufteilung",
+  zusammenfuehrung: "aus einer Zusammenführung",
+};
 
 /**
  * Eine Schreibaktion auf die Sammlung ausführen und einen vollen Speicher dem
@@ -2052,11 +2061,11 @@ function AnonymBadge({ bogen }: { bogen: Erfassungsbogen }) {
   );
 }
 
-/** Marke „alt" am Absender-Stand, der weit vor dem Eintreffen liegt (siehe standIstAlt). */
+/** Marke „älter als 24 h" am Absender-Stand, der weit vor dem Eintreffen liegt (siehe standIstAlt). */
 function AltBadge() {
   return (
     <span className="alt-badge" title="Der Stand des Absenders liegt mehr als 24 Stunden vor dem Eintreffen — die Zahlen stammen aus einer anderen Zeit.">
-      alt
+      älter als 24 h
     </span>
   );
 }
@@ -3060,7 +3069,7 @@ function EinheitKarte(props: {
                 <span className="kompakt-merkmal auftrag-merkmal" title={`Auftrag/Notiz: ${kopf.notiz}`}>Auftrag ✓</span>
               )}
               {zaehlt && luecken.length > 0 && (
-                <span className="kompakt-merkmal luecken-merkmal" title={luecken.map((p) => p.text).join("\n")}>
+                <span className="kompakt-merkmal luecken-merkmal" data-oeffnet="luecken" title={luecken.map((p) => p.text).join("\n")}>
                   {lueckenText(luecken.map((p) => p.text))}
                 </span>
               )}
@@ -3261,7 +3270,16 @@ function EinheitKarte(props: {
           className="karte-aufklappen"
           aria-expanded={false}
           aria-describedby={nameId}
-          onClick={() => setAufgeklappt(true)}
+          onClick={(e) => {
+            // Der Knopf liegt über der ganzen Zeile. Traf der Tipp die Rückfrage-
+            // Marke, zeigt die aufgeklappte Karte die Hinweise gleich im Satz:
+            // vorher klappte der erste Tipp nur auf, und der Hinweis stand dort
+            // erneut gekürzt, erst ein zweiter Tipp zeigte ihn ganz (R4-N4).
+            // Tastatur und Vorlesesoftware (detail 0) klappen nur auf.
+            const unter = e.detail > 0 && typeof document.elementsFromPoint === "function" ? document.elementsFromPoint(e.clientX, e.clientY) : [];
+            if (unter.some((el) => el instanceof HTMLElement && el.dataset.oeffnet === "luecken")) setLueckenOffen(true);
+            setAufgeklappt(true);
+          }}
         >
           <span className="nur-sr">Aufklappen: Zeiten, Details und Aktionen</span>
           <span aria-hidden="true">▾</span>

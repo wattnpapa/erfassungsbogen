@@ -268,7 +268,20 @@ export function lueckeKurz(text: string): string {
   if (/^Sofortbedarf: .* — mehr als .* je Fahrzeug/.test(text)) return "Kraftstoff auffällig hoch";
   const kopf = text.split(/[:—]/)[0]!.trim();
   if (kopf.length > 0 && kopf.length <= 32 && kopf !== text) return `${kopf} prüfen`;
-  return text.length <= 32 ? text.replace(/\.$/, "") : `${text.slice(0, 30).trimEnd()} …`;
+  return text.length <= 32 ? text.replace(/\.$/, "") : `${anWortgrenze(text, 30)} …`;
+}
+
+/**
+ * Text auf höchstens `max` Zeichen, am letzten ganzen Wort abgeschnitten: Die
+ * Kurzform brach mitten im Wort ab („Alle 12 Personen stehen auf Ge …“,
+ * Audit Runde 4, R4-N4). Ein einziges langes Wort bleibt hart gekürzt.
+ */
+export function anWortgrenze(text: string, max: number): string {
+  if (text.length <= max) return text;
+  const kopf = text.slice(0, max + 1);
+  const leer = kopf.lastIndexOf(" ");
+  const schnitt = leer >= Math.floor(max / 2) ? kopf.slice(0, leer) : text.slice(0, max);
+  return schnitt.replace(/[\s,;:–—-]+$/, "");
 }
 
 /** „Sitzplätze fehlen: 4" bzw. „Sitzplätze fehlen: 4 + 2 weitere" — leer ohne Lücken. */

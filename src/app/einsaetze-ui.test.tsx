@@ -309,7 +309,7 @@ describe("Einheit mit Folgemeldung entfernen (R2-D1)", () => {
     expect(text).toContain("eingegangen");
     expect(text).toContain("Vermerke der Führungsstelle");
     expect(text).toContain("Auftrag/Notiz: Deich Nord");
-    expect(text).toMatch(/Empfangen|Manuell erfasst|Aus Datei/);
+    expect(text).toMatch(/von der Einheit empfangen|am Meldekopf von Hand erfasst|aus Datei übernommen/);
   });
 
   it("lässt einen abgeteilten Truppteil (eigener Schlüssel) stehen", async () => {
@@ -917,9 +917,10 @@ describe("Ausgabewege der Einsatzansicht", () => {
     expect(document.querySelector(".lageblatt-stand")!.textContent).toMatch(/^Lageblatt erstellt .* · seitdem 1 neue Meldung — Aushang ist nicht mehr aktuell, neu drucken$/);
   });
 
-  it("zeigt die Herkunft als „Empfangen“ statt „Scan“", () => {
+  it("sagt die Herkunft in Worten statt „Scan“ oder „Empfangen“ (R4-N4)", () => {
     buehne(["Wardenburg"]);
-    expect(document.querySelector(".zeiten-zeile")!.textContent).toContain("Empfangen");
+    expect(document.querySelector(".zeiten-zeile")!.textContent).toContain("von der Einheit empfangen, per Scan oder Link");
+    expect(document.querySelector(".zeiten-zeile")!.textContent).not.toMatch(/\bScan ·|· Empfangen/);
   });
 });
 
@@ -1242,6 +1243,44 @@ describe("Kompakte Einheiten auf dem Telefon (R2-K7)", () => {
     expect(within(karte).getByRole("button", { name: "Abrücken" })).toBeTruthy();
     await nutzer.click(within(karte).getByRole("button", { name: "Zuklappen" }));
     expect(karte.className).toContain("kompakt");
+  });
+
+  it("Tipp auf die Rückfrage-Marke klappt auf und zeigt die Hinweise gleich im Satz (R4-N4)", async () => {
+    const nutzer = userEvent.setup();
+    const angelegt = einsatzAnlegen("Hochwasser Test", EinsatzArt.EINSATZ);
+    meldungHinzufuegen(angelegt.id, bogenMitName("Ulm"));
+    ansicht(angelegt.id);
+    const karte = document.querySelector<HTMLElement>(".einheit-zeile")!;
+    const marke = karte.querySelector<HTMLElement>("[data-oeffnet='luecken']")!;
+    expect(marke).not.toBeNull();
+    // jsdom kennt elementsFromPoint nicht: die Marke liegt „unter dem Finger“.
+    const doc = document as unknown as { elementsFromPoint?: (x: number, y: number) => Element[] };
+    doc.elementsFromPoint = () => [karte.querySelector(".karte-aufklappen")!, marke];
+    try {
+      expect(karte.querySelector(".luecken-liste")).toBeNull();
+      await nutzer.click(within(karte).getByRole("button", { name: /Aufklappen/ }));
+      expect(karte.className).not.toContain("kompakt");
+      expect(karte.querySelector(".luecken-liste")!.textContent).toContain("Stärke ist 0");
+    } finally {
+      delete doc.elementsFromPoint;
+    }
+  });
+
+  it("ein Tipp neben der Rückfrage-Marke klappt nur auf (R4-N4)", async () => {
+    const nutzer = userEvent.setup();
+    const angelegt = einsatzAnlegen("Hochwasser Test", EinsatzArt.EINSATZ);
+    meldungHinzufuegen(angelegt.id, bogenMitName("Ulm"));
+    ansicht(angelegt.id);
+    const karte = document.querySelector<HTMLElement>(".einheit-zeile")!;
+    const doc = document as unknown as { elementsFromPoint?: (x: number, y: number) => Element[] };
+    doc.elementsFromPoint = () => [karte.querySelector(".karte-aufklappen")!];
+    try {
+      await nutzer.click(within(karte).getByRole("button", { name: /Aufklappen/ }));
+      expect(karte.className).not.toContain("kompakt");
+      expect(karte.querySelector(".luecken-liste")).toBeNull();
+    } finally {
+      delete doc.elementsFromPoint;
+    }
   });
 
   it("nennt zugeklappt Folgemeldung mit Stärkeänderung, Auftrag und Lücken als kurze Merkmale (R3-K2)", () => {
