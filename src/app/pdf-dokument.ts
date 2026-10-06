@@ -966,8 +966,9 @@ export function meldekopfVermerk(e: UebersichtEintrag, name: string, erstellt: n
 }
 
 /** Kasten „Stand am Meldekopf" — oben auf dem Bogen und auf jeder QR-Seite. */
-function vermerkKasten(v: MeldekopfVermerk, margin: [number, number, number, number]): Content {
+function vermerkKasten(v: MeldekopfVermerk, margin: [number, number, number, number], id?: string): Content {
   return {
+    ...(id ? { id } : {}),
     table: {
       widths: ["*"],
       body: [[{ text: weichUmbrechen(v.stand), bold: true, fontSize: 8, fillColor: v.abgerueckt ? GRAU : undefined }]],
@@ -986,6 +987,17 @@ function seitenFuss(text: string): TDocumentDefinitions["footer"] {
     ],
     fontSize: 7.5,
   });
+}
+
+/** Kennung des Kastens „Stand am Meldekopf“ im Probesatz (R4-A7). */
+const MESS_KASTEN = "sammel-kasten-";
+
+/** Nur für {@link einsatzPdfDokumentGesetzt} und den Probesatz. */
+export interface SammelOptionen {
+  /** Index der Bögen, die enger gesetzt werden (R4-A7). */
+  verdichtet?: ReadonlySet<number>;
+  /** Probesatz: Messpunkte je Bogen, ohne eingebettete Dateien. */
+  messen?: boolean;
 }
 
 /**
@@ -1009,6 +1021,7 @@ export function einsatzPdfDokument(
    * dass es nur ein Teil der Lage ist, und ein Import warnt (R4-W4).
    */
   nachtragSeit?: number,
+  optionen: SammelOptionen = {},
 ): TDocumentDefinitions {
   const nachtrag = nachtragSeit != null ? `seit ${zeitLang(nachtragSeit)}` : undefined;
   const content: Content[] = uebersichtsSeite(
@@ -1024,15 +1037,20 @@ export function einsatzPdfDokument(
     undefined,
     nachtrag,
   );
-  boegenMitQr.forEach((eintrag) => {
+  boegenMitQr.forEach((eintrag, i) => {
     // Zurück ins Hochformat: der Bogen selbst bleibt exakt der Papiervordruck.
     // pdfmake übernimmt die Ausrichtung des Knotens, der den Umbruch auslöst.
     content.push({ text: "", pageBreak: "before", pageOrientation: "portrait" });
     // Der Stand am Meldekopf steht über dem Bogen und auf jeder QR-Seite —
     // die Bogenseiten müssen auch ohne Seite 1 stimmen (R2-A1).
     const vermerk = meldekopfVermerk(eintrag, name, erstellt);
-    content.push(vermerkKasten(vermerk, [0, 0, 0, 4]));
-    content.push(...(pdfDokument(eintrag.bogen, eintrag.qr, undefined, vermerk).content as Content[]));
+    content.push(vermerkKasten(vermerk, [0, 0, 0, 4], optionen.messen ? `${MESS_KASTEN}${i}` : undefined));
+    content.push(
+      ...(pdfDokument(eintrag.bogen, eintrag.qr, undefined, vermerk, {
+        verdichtet: optionen.verdichtet?.has(i) === true,
+        ...(optionen.messen ? { messpunkt: true, messKennung: `-${i}` } : {}),
+      }).content as Content[]),
+    );
   });
   return {
     pageSize: "A4",
@@ -1050,10 +1068,14 @@ export function einsatzPdfDokument(
     ...(boegenMitQr.length > 0 && boegenMitQr.every(({ bogen }) => bogen.uebung)
       ? { background: uebungsWasserzeichen() }
       : {}),
-    files: {
-      [EEB_EINSATZ_DATEINAME]: boegenAlsEingebetteteDatei(boegenMitQr.map((x) => x.bogen)),
-      ...(sammlungJson ? { [EEB_EINSATZ_SAMMLUNG_DATEINAME]: sammlungAlsEingebetteteDatei(sammlungJson) } : {}),
-    },
+    ...(optionen.messen
+      ? {}
+      : {
+          files: {
+            [EEB_EINSATZ_DATEINAME]: boegenAlsEingebetteteDatei(boegenMitQr.map((x) => x.bogen)),
+            ...(sammlungJson ? { [EEB_EINSATZ_SAMMLUNG_DATEINAME]: sammlungAlsEingebetteteDatei(sammlungJson) } : {}),
+          },
+        }),
     // Die Fußzeile trägt den Stand des Ausdrucks auf jeder Seite; Zeiten und
     // Abrückvermerk je Einheit stehen im Kasten über dem Bogen (R2-A1).
     footer: seitenFuss(
@@ -1061,6 +1083,60 @@ export function einsatzPdfDokument(
     ),
     content,
   };
+}
+
+/**
+ * Bis zu so viel Höhe (pt) belegt die letzte Zeile(n) eines Bogens auf einer
+ * Folgeseite, damit sie als Restseite gilt: gut acht Textzeilen. Der Kasten
+ * „Stand am Meldekopf“ über dem Bogen kostete in der Sammel-PDF von 30
+ * Einheiten zwei Seiten, die nur noch die letzte Zeile des Sofortbedarfs
+ * trugen („M 11 / W 1 / D 0“), obwohl das Einzel-PDF derselben Einheit ohne
+ * Restseite auskam (Audit Runde 4, R4-A7).
+ */
+const RESTSEITE_MAX_PT = 110;
+
+/**
+ * Sammel-PDF ohne Restseiten. Ein Probesatz ohne Bilder und ohne Anhang misst
+ * je Bogen, wo sein Formular endet; steht der Rest auf einer Folgeseite und
+ * ist kürzer als {@link RESTSEITE_MAX_PT}, wird dieser Bogen enger gesetzt
+ * (`verdichtet`). Hilft das nicht, bleibt er wie er war — ein enger Bogen, der
+ * trotzdem eine Restseite braucht, hätte nichts gewonnen.
+ *
+ * `setzen` führt den Satz aus (Browser: pdfmake-Puffer, Tests: Node).
+ */
+export async function einsatzPdfDokumentGesetzt(
+  name: string,
+  boegenMitQr: SammelBogen[],
+  sammlungJson: string | undefined,
+  erstellt: number,
+  nachtragSeit: number | undefined,
+  setzen: (dd: TDocumentDefinitions) => Promise<unknown>,
+): Promise<TDocumentDefinitions> {
+  const ohneBilder = boegenMitQr.map((e) => ({ ...e, qr: null }) as unknown as SammelBogen);
+  /** Welche Bögen enden mit einer Restseite? */
+  const restseiten = async (verdichtet: ReadonlySet<number>): Promise<Set<number>> => {
+    const pos = new Map<string, MessPosition>();
+    const dd = einsatzPdfDokument(name, ohneBilder, undefined, erstellt, nachtragSeit, { verdichtet, messen: true });
+    dd.pageBreakBefore = (knoten) => {
+      const k = knoten as { id?: string; startPosition?: MessPosition };
+      if (k.id && k.startPosition) pos.set(k.id, k.startPosition);
+      return false;
+    };
+    await setzen(dd);
+    const rest = new Set<number>();
+    boegenMitQr.forEach((_, i) => {
+      const anfang = pos.get(`${MESS_KASTEN}${i}`);
+      const ende = pos.get(`${MESS_BOGEN_ENDE}-formular-${i}`);
+      if (!anfang || !ende || ende.pageNumber <= anfang.pageNumber) return;
+      if (ende.verticalRatio * ende.pageInnerHeight <= RESTSEITE_MAX_PT) rest.add(i);
+    });
+    return rest;
+  };
+  const betroffen = await restseiten(new Set());
+  if (betroffen.size === 0) return einsatzPdfDokument(name, boegenMitQr, sammlungJson, erstellt, nachtragSeit);
+  const nochBetroffen = await restseiten(betroffen);
+  const verdichtet = new Set([...betroffen].filter((i) => !nochBetroffen.has(i)));
+  return einsatzPdfDokument(name, boegenMitQr, sammlungJson, erstellt, nachtragSeit, { verdichtet });
 }
 
 /**
@@ -1392,6 +1468,14 @@ export interface NachtragsPlatz {
   freiesFahrzeug?: boolean;
   /** Messpunkt hinter dem letzten Inhalt (nur für den Probesatz). */
   messpunkt?: boolean;
+  /** Kennung des Messpunkts — in der Sammel-PDF je Bogen eine eigene (R4-A7). */
+  messKennung?: string;
+  /**
+   * Enger gesetzt: weniger Innenabstand und Zwischenraum, damit der Bogen samt
+   * Kasten „Stand am Meldekopf“ auf seine Seiten passt, statt mit der letzten
+   * Zeile allein auf einer weiteren zu stehen (R4-A7).
+   */
+  verdichtet?: boolean;
 }
 
 /** Freie Personalzeilen, wenn Platz ist (R3-A6). */
@@ -1432,6 +1516,11 @@ export function pdfDokument(
   const mwd = unterbringungMWD(b);
   const vp = verpflegung(b);
   const ansprech = b.personal[0];
+  // Verdichteter Satz (Sammel-PDF, R4-A7): knappere Innenabstände und Lücken.
+  const dicht = zusatz?.verdichtet === true;
+  const tabLayout = dicht ? { paddingTop: () => 0.5, paddingBottom: () => 0.5 } : undefined;
+  /** Abstand in pt, verdichtet halb so groß. */
+  const luecke = (pt: number): number => (dicht ? Math.ceil(pt / 2) : pt);
 
   // Ausfülllinie statt eines errechneten Werts (nur Vordruck). Bewusst kurz:
   // vier Stärkezahlen nebeneinander müssen in eine Tabellenzelle passen, ohne
@@ -1496,6 +1585,7 @@ export function pdfDokument(
   ]);
 
   const fahrzeugBlock = (f: Fahrzeug, leer = !!blanko): Content => ({
+    ...(tabLayout ? { layout: tabLayout } : {}),
     table: {
       // Erste Spalte: taktisches Zeichen (DV 102), zeilenübergreifend links.
       widths: [56, "*", "*", "*"],
@@ -1532,7 +1622,7 @@ export function pdfDokument(
         ],
       ],
     },
-    margin: [0, 0, 0, 6] as [number, number, number, number],
+    margin: [0, 0, 0, luecke(6)] as [number, number, number, number],
   });
   const fahrzeuge: Content[] = blanko
     ? Array.from({ length: blanko.fahrzeuge }, () => fahrzeugBlock(BLANKO_FAHRZEUG))
@@ -1602,8 +1692,12 @@ export function pdfDokument(
   if (b.sofortbedarf) {
     const sb = b.sofortbedarf;
     sofort.push({
+      ...(tabLayout ? { layout: tabLayout } : {}),
       table: {
         widths: ["*", "*"],
+        // Der Kasten bleibt ganz: In der Sammel-PDF stand die letzte Zeile
+        // („M 11 / W 1 / D 0“) allein auf einer Seite, die Beschriftung davor (R4-A7).
+        dontBreakRows: true,
         body: [
           [
             {
@@ -1623,7 +1717,7 @@ export function pdfDokument(
           ],
         ],
       },
-      margin: [0, 8, 0, 0] as [number, number, number, number],
+      margin: [0, luecke(8), 0, 0] as [number, number, number, number],
     });
   }
 
@@ -1651,6 +1745,7 @@ export function pdfDokument(
       ...(blanko ? [blankoMeldekopf()] : []),
       // ---- Kopf ----
       {
+        ...(tabLayout ? { layout: tabLayout } : {}),
         table: {
           // Kopf zweispaltig: Titel im Kasten in der Kennfarbe der Organisation,
           // rechts die Einheit von
@@ -1679,36 +1774,37 @@ export function pdfDokument(
             ],
           ],
         },
-        margin: [0, 0, 0, 8],
+        margin: [0, 0, 0, luecke(8)],
       },
-      { table: { widths: [110, "*", 70, "*"], body: infoZeilen }, margin: [0, 0, 0, 10] },
+      { ...(tabLayout ? { layout: tabLayout } : {}), table: { widths: [110, "*", 70, "*"], body: infoZeilen }, margin: [0, 0, 0, luecke(10)] },
       ...fahrzeuge,
 
       // ---- Personal ----
       // Kein fester Seitenumbruch: kleine Einheiten passen so auf eine Seite,
       // größere lässt pdfmake bei Bedarf selbst umbrechen.
       {
+        ...(tabLayout ? { layout: tabLayout } : {}),
         // Zeilen bleiben ganz: Auf Seite 1 des Vordrucks stand die letzte
         // Personalzeile nur als 3-mm-Streifen über der Fußzeile (R4-A8). Der
         // Vordruck wiederholt den Tabellenkopf auf Seite 2.
         table: { widths: [118, 30, "*", 160], body: personalZeilen, dontBreakRows: true, ...(blanko ? { headerRows: 1 } : {}) },
-        margin: [0, 12, 0, 10],
+        margin: [0, luecke(12), 0, luecke(10)],
       },
       ...(b.personalErfassung === PersonalErfassung.NUR_STAERKE
         ? [{ text: "Personal am Meldekopf nur in Stärke erfasst.", italics: true, margin: [0, 0, 0, 6] } as Content]
         : []),
       { text: "weitere interne / externe Qualifikationen obiger Helfer/-innen:", margin: [0, 0, 0, 4] },
-      { table: { widths: [180, "*"], body: qualiZeilen } },
+      { ...(tabLayout ? { layout: tabLayout } : {}), table: { widths: [180, "*"], body: qualiZeilen } },
       ...sofort,
       ...(b.sonstiges ? [{ text: `Sonstiges: ${weichUmbrechen(b.sonstiges)}`, margin: [0, 8, 0, 0] } as Content] : []),
-      ...(zusatz?.messpunkt ? [{ text: " ", fontSize: 1, id: `${MESS_BOGEN_ENDE}-formular` } as Content] : []),
+      ...(zusatz?.messpunkt ? [{ text: " ", fontSize: 1, id: `${MESS_BOGEN_ENDE}-formular${zusatz.messKennung ?? ""}` } as Content] : []),
 
       // ---- QR-Block ----
       // Kein fester Seitenumbruch mehr; als unbreakable-Gruppe zusammengehalten,
       // damit der QR-Code nicht über eine Seitengrenze zerrissen wird. Passt der
       // Block nicht mehr, rückt er als Ganzes auf die nächste Seite.
       ...(qr ? [qrBlock(qr, farbe.akzent, zeitgruppe(b.stand), vermerk, codeKopfzeile(b, zeitgruppe(b.stand), vermerk?.nummer))] : []),
-      ...(zusatz?.messpunkt ? [{ text: " ", fontSize: 1, id: `${MESS_BOGEN_ENDE}-qr` } as Content] : []),
+      ...(zusatz?.messpunkt ? [{ text: " ", fontSize: 1, id: `${MESS_BOGEN_ENDE}-qr${zusatz.messKennung ?? ""}` } as Content] : []),
     ],
   };
 }

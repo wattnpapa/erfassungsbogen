@@ -16,7 +16,7 @@ import type { Erfassungsbogen } from "@bos/eeb-format/model";
 import { base64UrlDekodieren } from "@bos/eeb-format/codec";
 import { einheitAnzeigename, natoZeitstempel, qrErzeugen } from "./hilfen";
 import { istNativ, binaerTeilen } from "./nativ";
-import { einsatzLageblattSeiteFuellen, einsatzPdfDokument, einzelPdfDokument, pdfDokument, type SammelBogen, type UebersichtEintrag } from "./pdf-dokument";
+import { einsatzLageblattSeiteFuellen, einsatzPdfDokumentGesetzt, einzelPdfDokument, pdfDokument, type SammelBogen, type UebersichtEintrag } from "./pdf-dokument";
 import { einsatzDateiInhalt } from "./einsatz-transport";
 import { BLANKO_DATEINAME, BLANKO_INFO, BLANKO_ZEILEN, leererBogen } from "./blanko";
 import { MeldeStatus, type Einsatzsammlung, type MeldeEintrag } from "@bos/meldekopf/einsaetze";
@@ -232,12 +232,15 @@ export async function einsatzPdfErzeugen(
     });
   }
   const nachtrag = historie !== einsatz.eintraege;
-  const dd = einsatzPdfDokument(
+  // Ein Probesatz ohne Bilder misst, welche Bögen mit ihrer letzten Zeile allein
+  // auf einer Seite stünden, und setzt diese enger (R4-A7).
+  const dd = await einsatzPdfDokumentGesetzt(
     einsatz.name,
     boegenMitQr,
     einsatzDateiInhalt(nachtrag && nachtragSeit != null ? { ...einsatz, nachtragSeit } : einsatz),
-    undefined,
+    Date.now(),
     nachtrag ? nachtragSeit : undefined,
+    (probe) => pdfMake.createPdf(probe).getBuffer(),
   );
   // Teilexport („nur neue Bögen") mit eigenem Dateinamen — sonst hießen
   // Nachtrag und ganze Sammlung gleich (Audit Runde 2, R2-A3).

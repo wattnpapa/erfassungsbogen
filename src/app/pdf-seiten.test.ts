@@ -26,9 +26,18 @@ import {
   type Erfassungsbogen,
 } from "@bos/eeb-format/model";
 import type { QrSatz } from "./hilfen";
-import { einsatzLageblattDokument, einsatzLageblattSeiteFuellen, einsatzPdfDokument, einzelPdfDokument, pdfDokument, type UebersichtEintrag } from "./pdf-dokument";
+import {
+  einsatzLageblattDokument,
+  einsatzLageblattSeiteFuellen,
+  einsatzPdfDokument,
+  einsatzPdfDokumentGesetzt,
+  einzelPdfDokument,
+  pdfDokument,
+  type SammelBogen,
+  type UebersichtEintrag,
+} from "./pdf-dokument";
 import { execFileSync } from "node:child_process";
-import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { pdfBytes, seitenZahl } from "../../scripts/pdf-in-node";
@@ -271,6 +280,43 @@ describe("Umbrüche zerreißen keine Angaben (R4-A7)", () => {
       expect(erste, "erste Zeile unter dem Tabellenkopf").toMatch(/^(Nr\. \d+|Nachtrag von Hand|Abgerückt|Summe)/);
     }
   }, 60_000);
+
+  /** Die ersten 30 THW-Beispielbögen als Sammlung — Bögen unterschiedlicher Länge, jeder mit Kasten „Stand am Meldekopf“. */
+  function grosslage(): SammelBogen[] {
+    const dir = new URL("../../examples/thw/", import.meta.url);
+    return readdirSync(dir)
+      .sort()
+      .slice(0, 30)
+      .map((datei, i) => ({
+        bogen: JSON.parse(readFileSync(new URL(datei, dir), "utf8")) as Erfassungsbogen,
+        qr: qrSatz(1 + (i % 3)),
+        eingetroffenAm: eingetroffen,
+        zugEtikett: `${1 + (i % 3)}. Zug`,
+        nummer: i + 1,
+      }));
+  }
+
+  it.skipIf(!hatPdftotext)("Sammel-PDF mit 30 Einheiten: keine Seite trägt nur die letzte Zeile eines Bogens (Kasten „Stand am Meldekopf“)", async () => {
+    const e = grosslage();
+    const roh = seitenZahl(await pdfBytes(einsatzPdfDokument("Grosslage", e, undefined, erstellt)));
+    const dd = await einsatzPdfDokumentGesetzt("Grosslage", e, undefined, erstellt, undefined, pdfBytes);
+    const seiten = await seitenTexte(dd);
+    // Die Beispielbögen 003 und 038 standen mit 4 bzw. 7 Textzeilen allein auf einer Seite.
+    expect(seiten.length).toBeLessThan(roh);
+    const zeilen = seiten.map((t) => t.split("\n").filter((z) => z.trim()).length);
+    expect(Math.min(...zeilen), `Zeilen je Seite: ${zeilen.join(" ")}`).toBeGreaterThanOrEqual(9);
+    // Der Sofortbedarf-Kasten steht ganz auf einer Seite: Beschriftung und letzte Zeile zusammen.
+    for (const t of seiten) {
+      if (t.includes("Anzahl Unterbringung/WC/Dusche:")) expect(t).toMatch(/M ?\d+ ?\/ ?W ?\d+ ?\/ ?D ?\d+/);
+    }
+  }, 120_000);
+
+  it("ein Bogen ohne Restseite bleibt unverändert: gleiche Seitenzahl, nichts verdichtet", async () => {
+    const e = [{ bogen: bogen(3), qr: qrSatz(1), eingetroffenAm: eingetroffen, zugEtikett: "1. Zug", nummer: 1 }];
+    const dd = await einsatzPdfDokumentGesetzt("Lage", e, undefined, erstellt, undefined, pdfBytes);
+    expect(seitenZahl(await pdfBytes(dd))).toBe(seitenZahl(await pdfBytes(einsatzPdfDokument("Lage", e, undefined, erstellt))));
+    expect(JSON.stringify(dd.content)).not.toContain('"paddingTop"');
+  }, 30_000);
 });
 
 describe("Einzel-PDF: Platz für Stiftnachträge, wo er keine Seite kostet (R3-A6)", () => {
