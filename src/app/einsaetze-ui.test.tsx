@@ -1278,11 +1278,66 @@ describe("Quittung nennt die zuletzt aufgenommenen Einheiten (R2-S4)", () => {
     ]);
     expect(quittung.textContent).not.toContain("Zeitz");
 
+    // Der Link sortiert UND bringt die Liste ins Bild (R4-K5).
+    const spring = vi.fn();
+    Element.prototype.scrollIntoView = spring;
     await nutzer.click(within(quittung).getByRole("button", { name: "Zuletzt gemeldete oben zeigen" }));
     expect((screen.getByLabelText("Sortierung") as HTMLSelectElement).value).toBe("zuletzt");
+    await waitFor(() => expect(spring).toHaveBeenCalled());
+    expect((spring.mock.contexts[0] as HTMLElement).id).toBe("einheiten-liste");
 
     await nutzer.click(within(quittung).getByRole("button", { name: "Zur Kenntnis genommen" }));
     expect(document.querySelector(".stapel-eingang")).toBeNull();
+  });
+
+  /**
+   * R4-K7: „neu" und „neue Fassung" hängen an der Kenntnisnahme, nicht an der
+   * Uhr — „Zur Kenntnis genommen" nimmt beide Marken weg, und eine eben
+   * eingetroffene Einheit trägt zugeklappt dieselbe Marke wie eine Folgemeldung.
+   */
+  it("setzt „neu“ und „neue Fassung“ bis zur Kenntnisnahme und nimmt beide dann weg (R4-K7)", async () => {
+    const nutzer = userEvent.setup();
+    const { einsatzId, neuLaden } = buehne(["Zeitz"]);
+    meldungHinzufuegen(einsatzId, bogenMitName("Biberach"));
+    const folge = bogenMitName("Zeitz");
+    folge.stand += 30;
+    folge.einsatz = { ...folge.einsatz, ortAuftrag: "Deich Süd" };
+    meldungHinzufuegen(einsatzId, folge);
+    neuLaden();
+    expect(document.querySelectorAll(".neu-badge")).toHaveLength(1);
+    expect(document.querySelector(".neu-badge .neu-kurz")!.textContent).toBe("neu");
+    expect(document.querySelectorAll(".fassung-badge")).toHaveLength(1);
+    await nutzer.click(screen.getByRole("button", { name: "Zur Kenntnis genommen" }));
+    expect(document.querySelectorAll(".neu-badge")).toHaveLength(0);
+    expect(document.querySelectorAll(".fassung-badge")).toHaveLength(0);
+  });
+
+  it("legt Weitergabe, Lageblatt und Export unter die Liste und verweist von oben darauf (R4-K5)", () => {
+    buehne(["Zeitz", "Hatten"], { onWeitergeben: vi.fn(), onLageblatt: vi.fn() });
+    const liste = document.getElementById("einheiten-liste")!;
+    const ausgabe = document.getElementById("ausgabe-block")!;
+    expect(liste.compareDocumentPosition(ausgabe) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(within(ausgabe).getByRole("button", { name: "Einsatz weitergeben / sichern" })).toBeTruthy();
+    expect(screen.getByRole("button", { name: /Weitergeben, Lageblatt, Export/ })).toBeTruthy();
+  });
+
+  it("zeigt an Karte und Quittung, dass ein Bogen für eine andere Lage ausgefüllt scheint, ohne ihn auszunehmen (R4-K6)", () => {
+    const angelegt = einsatzAnlegen("Hochwasser Jagst", EinsatzArt.EINSATZ);
+    const passend = bogenMitName("Albstadt");
+    passend.einsatz = { ...passend.einsatz, ortAuftrag: "Deichverteidigung Jagst" };
+    meldungHinzufuegen(angelegt.id, passend);
+    const { neuLaden } = ansicht(angelegt.id);
+    const fremd = bogenMitName("Schwabach");
+    fremd.einsatz = { ...fremd.einsatz, ortAuftrag: "Waldbrand Gräfenberg – Wasserversorgung" };
+    meldungHinzufuegen(angelegt.id, fremd);
+    neuLaden();
+    const karten = [...document.querySelectorAll<HTMLElement>(".einheit-zeile")];
+    const schwabach = karten.find((k) => k.textContent!.includes("Schwabach"))!;
+    expect(schwabach.textContent).toContain("Bogen nennt: „Waldbrand Gräfenberg – Wasserversorgung“");
+    expect(karten.find((k) => k.textContent!.includes("Albstadt"))!.textContent).not.toContain("Bogen nennt");
+    expect(document.querySelector(".stapel-eingang")!.textContent).toContain("Bogen nennt: „Waldbrand Gräfenberg");
+    // Gezählt wird er weiter.
+    expect(screen.getByText("Einheiten (2 gemeldet · 2 zählend)")).toBeTruthy();
   });
 
   it("zählt Aufteilen nicht als Eingang", async () => {
@@ -1551,7 +1606,9 @@ describe("Laufende Nummer, Zeitform und Marke (R2-A6)", () => {
   it("nennt die Marke für frisch eingetroffene Einheiten nicht „neu“", () => {
     buehne(["Wardenburg"]);
     const marke = document.querySelector(".neu-badge")!;
-    expect(marke.textContent).toBe("kürzlich eingetroffen");
+    // Ausgeschrieben „kürzlich eingetroffen“; das kurze „neu“ steht nur zugeklappt am
+    // Telefon (R4-K7) und meint „seit der Kenntnisnahme“, nicht „seit dem Export“.
+    expect(marke.querySelector(".neu-lang")!.textContent).toBe("kürzlich eingetroffen");
   });
 });
 

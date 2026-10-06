@@ -2264,7 +2264,10 @@
     /* Die Marke „kürzlich eingetroffen" kostete zugeklappt eine eigene Zeile
        je Karte (Feld-Thema: 5 statt 6 Einheiten im Bild); sie steht nach
        dem Aufklappen, und die Sammelquittung nennt die Neuen mit Namen. */
-    .einheit-zeile.kompakt .neu-badge { display: none; }
+    .einheit-zeile.kompakt .neu-badge .neu-lang { display: none; }
+    /* R4-K7: zugeklappt trotzdem sichtbar — kurz als „neu", wie „neue Fassung". */
+    .neu-badge .neu-kurz { display: none; }
+    .einheit-zeile.kompakt .neu-badge .neu-kurz { display: inline; }
     .einheit-zeile.kompakt .kompakt-zeile {
       display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.1rem 0.4rem;
       font-variant-numeric: tabular-nums;

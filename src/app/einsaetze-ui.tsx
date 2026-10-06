@@ -96,12 +96,13 @@ import {
   TABELLEN_SPALTEN,
   bedarfMarken,
   gemerkteAnsicht,
-  istNeu,
+  abweichenderOrt,
   letzteMeldung,
+  frischGemeldet,
+  istNeu,
   lueckenText,
   pruefpunkteEintrag,
   folgeAenderung,
-  frischGemeldet,
   meldungsNummern,
   passtZuBedarfsfilter,
   type BedarfsFilter,
@@ -813,6 +814,18 @@ export function EinsatzDetail(props: {
   const weitergabeOffen = seitWeitergabe > 0 || aenderungenSeitWeitergabe.anzahl > 0;
   const [suche, setSuche] = useState("");
   const [sortierung, setSortierung] = useState<EinheitenSortierung>("name");
+  // Sprünge innerhalb der Ansicht (R4-K5): zur Einheitenliste und zu Weitergabe/Export.
+  const ausgabeBlock = useRef<HTMLDivElement>(null);
+  const listeKopf = useRef<HTMLHeadingElement>(null);
+  const [zurListe, setZurListe] = useState(0);
+  useEffect(() => {
+    if (zurListe === 0) return;
+    try {
+      listeKopf.current?.scrollIntoView?.({ block: "start", behavior: "smooth" });
+    } catch {
+      /* Testumgebung ohne Layout */
+    }
+  }, [zurListe]);
   // "" = keine Einschränkung. Schlüssel siehe einheiten-liste.ts.
   const [quali, setQuali] = useState("");
   // Nur Einheiten, bei denen jetzt etwas zu entscheiden ist — Kraftstoff
@@ -913,6 +926,14 @@ export function EinsatzDetail(props: {
   const letzte = letzteMeldung(einsatz.eintraege);
   // Laufende Nummer je Meldung — dieselbe wie auf dem Lageblatt (R2-A6).
   const nummern = meldungsNummern(einsatz.eintraege);
+  // Bögen, die für eine andere Lage ausgefüllt scheinen (R4-K6): Ort/Auftrag
+  // teilt kein Wort mit Sammlung und übrigen Meldungen. Nur ein Hinweis.
+  const fremdeOrte = new Map(
+    alleEinheiten.flatMap((e) => {
+      const ort = abweichenderOrt(e, einsatz, einsatz.eintraege);
+      return ort != null ? [[e.einheitSchluessel, ort] as const] : [];
+    }),
+  );
   /** „Nr. 3 " für die Quittungsleiste — kurz und eindeutig, wie auf dem Lageblatt. */
   const nummerText = (schluessel: string) => {
     const nr = nummern.get(schluessel);
@@ -986,7 +1007,7 @@ export function EinsatzDetail(props: {
     if (kenntnis?.einsatzId !== einsatz.id) setKenntnis({ einsatzId: einsatz.id, stand: kenntnisStand });
   }, [einsatz.id, kenntnis?.einsatzId, kenntnisStand]);
   function kenntnisNehmen() {
-    setKenntnis({ einsatzId: einsatz.id, stand: kenntnisVermerken(einsatz, alleEinsatzIds()) });
+    setKenntnis({ einsatzId: einsatz.id, stand: kenntnisVermerken(einsatz, alleEinsatzIds(), Date.now(), true) });
   }
   const ungeseheneIds = new Set(
     neueEintraege(einsatz.eintraege, kenntnisStand)
@@ -1008,9 +1029,16 @@ export function EinsatzDetail(props: {
   // eingelesen" — dieselbe Einheit zweimal untereinander wäre Lärm.
   // Einheiten, deren aktuelle Fassung eine frische oder noch nicht zur
   // Kenntnis genommene Folgemeldung ist — Marke auch in der Tabelle (R3-K1).
+  // Jünger als 30 Minuten und seit dem letzten Tipp auf „Zur Kenntnis genommen"
+  // eingegangen — nach dem Tipp trägt nichts davon mehr eine Marke (R4-K7).
+  const frischUnquittiert = (e: MeldeEintrag) =>
+    (frischGemeldet(e) || istNeu(e)) && !(kenntnisStand.bestaetigt === true && e.empfangenAm <= kenntnisStand.zeitpunkt);
   const neueFassungen = new Set(
     alleEinheiten
-      .filter((e) => (ungeseheneIds.has(e.id) || frischGemeldet(e)) && folgeAenderung(e, einsatz.eintraege) != null)
+      // Gebunden an die Kenntnisnahme, nicht nur an die Uhr: „Zur Kenntnis
+      // genommen" nimmt die Marke weg (R4-K7). Vorher blieb sie noch 30 Minuten
+      // stehen.
+      .filter((e) => (ungeseheneIds.has(e.id) || frischUnquittiert(e)) && folgeAenderung(e, einsatz.eintraege) != null)
       .map((e) => e.einheitSchluessel),
   );
   const sammelquittungZeigen =
@@ -1207,6 +1235,9 @@ export function EinsatzDetail(props: {
                   ) : (
                     " — neu gemeldet"
                   )}
+                  {fremdeOrte.has(e.einheitSchluessel) && (
+                    <span className="warnung-text"> — ⚠ Bogen nennt: „{fremdeOrte.get(e.einheitSchluessel)}“, passt das zu dieser Lage?</span>
+                  )}
                 </li>
               );
             })}
@@ -1215,7 +1246,18 @@ export function EinsatzDetail(props: {
           <p>
             {sortierung !== "zuletzt" && (
               <>
-                <button type="button" className="link" onClick={() => setSortierung("zuletzt")}>Zuletzt gemeldete oben zeigen</button>
+                <button
+                  type="button"
+                  className="link"
+                  onClick={() => {
+                    setSortierung("zuletzt");
+                    // Sortieren allein änderte die Liste, aber nicht das Bild:
+                    // wer tippte, sah nichts passieren (R4-K5).
+                    setZurListe((n) => n + 1);
+                  }}
+                >
+                  Zuletzt gemeldete oben zeigen
+                </button>
                 {" · "}
               </>
             )}
@@ -1341,151 +1383,31 @@ export function EinsatzDetail(props: {
       )}
 
 
-      {/* Zweite Reihe: was aus der Sammlung herausgeht. Die erste nimmt Bögen
-          auf. Der Sprung zwischen den Reihen muss größer sein als der zwischen
-          den Knöpfen, sonst liest sich die Aufteilung als zufälliger Umbruch
-          einer einzigen Reihe aus sieben gleichrangigen Knöpfen. */}
       {(onWeitergeben || onLageblatt) && (
-        <div className="vorlage-aktionen einsatz-weitergabe">
-          {/* Der Weg, der immer geht — auch am Einsatzende, wenn alle abgerückt
-              sind. Er hieß „Sammel-PDF" und versprach ein Druckstück; dass er
-              die ganze Sammlung trägt, stand nur im Tooltip, den ein Telefon nie
-              zeigt (W2). Das Lageblatt daneben ist das Papier für die Wand:
-              eine Seite statt 41 (A3, A4). */}
-          {onWeitergeben && (
-            <button
-              type="button"
-              className="primaer"
-              onClick={onWeitergeben}
-              title="Die ganze Sammlung als Datei — auf dem nächsten Gerät über „Einsatz importieren…“ einlesbar."
-            >
-              Einsatz weitergeben / sichern
-            </button>
-          )}{" "}
-          {onLageblatt && (
-            <button
-              type="button"
-              onClick={onLageblatt}
-              title="Nur die Übersicht: Einheiten mit Zug, Eintreff- und Abrückzeit, Bedarf und Zwischensummen — A4 quer, ohne Bögen; Stärke und Bedarf stehen oben auf Seite 1; bis etwa zehn Einheiten eine Seite."
-            >
-              {/* Ehrlich beschriftet: bei großen Lagen wird es mehr als eine
-                  Seite (Audit Runde 2, R2-K3). */}
-              Lageblatt (A4 quer)
-            </button>
-          )}{" "}
-          {/* Der leere Vordruck dort, wo am Meldekopf gearbeitet wird — vorher
-              nur über die Website „Aufbau des Bogens" (Audit Runde 3, R3-A7). */}
-          {onBlanko && (
-            <button
-              type="button"
-              onClick={onBlanko}
-              title="Leerer Erfassungsbogen (2 Seiten A4) zum Ausfüllen mit der Hand — für Einheiten ohne Gerät oder bei Geräteausfall."
-            >
-              Blanko-Vordruck (Papier-Reserve)
-            </button>
-          )}
-        </div>
-      )}
-      {onLageblatt && (
-        <p className="hinweis lageblatt-stand" role="status">
-          {lageblattStand
-            ? `Lageblatt erstellt ${exportZeitKurz(lageblattStand.zeitpunkt)} · ${seitdemText(neueEintraege(einsatz.eintraege, lageblattStand).length, aenderungenSeit(einsatz.eintraege, lageblattStand))}${lageblattVeraltet ? " — Aushang ist nicht mehr aktuell, neu drucken" : ""}`
-            : "Noch kein Lageblatt aus diesem Einsatz."}
+        <p className="hinweis ausgabe-sprung">
+          <button
+            type="button"
+            className="link"
+            onClick={() => {
+              try {
+                ausgabeBlock.current?.scrollIntoView?.({ block: "start", behavior: "smooth" });
+              } catch {
+                /* Testumgebung ohne Layout */
+              }
+            }}
+          >
+            Weitergeben, Lageblatt, Export ↓
+          </button>{" "}
+          — unter der Liste der Einheiten.
         </p>
       )}
-      {onWeitergeben && (
-        <p className="hinweis einsatz-ausgaben-hinweis">
-          {/* Ein Knopf für die ganze Sammel-PDF: „Sammel-PDF (alle Bögen)"
-              darunter erzeugte dieselbe Datei — zwei gleichwertige Knöpfe, und
-              welcher „für Papier" ist, stand nur hier (Audit Runde 2, R2-A3). */}
-          „Einsatz weitergeben / sichern" erzeugt die Sammel-PDF mit allen Bögen (zum Drucken) und allen Meldungen,
-          Zeiten, Historie und Zügen — auf dem nächsten Gerät über „Einsatz importieren…" einlesbar, auch wenn alle
-          abgerückt sind. Ein Nachtrag für den Stab (PDF, CSV, Excel): weiter unten „Nur neue Bögen seit dem letzten Export“
-          ankreuzen — erst dann erscheinen dort die Nachtrag-Knöpfe, je Format mit eigenem Bezugspunkt.
-        </p>
-      )}
-      {/* Der Meldekopf liefert dem Stab nach: einmal am Abend alles, am Morgen
-          nur, was seitdem dazukam. Das Kästchen schaltet alle vier Ausgabewege
-          um; die Zeile sagt, wann zuletzt exportiert wurde und wie viel
-          seitdem neu ist (Rückmeldung Anwender, September 2026). */}
-      <div className="export-umfang">
-        <label className="inline">
-          <input
-            type="checkbox"
-            checked={nurNeue}
-            onChange={(e) => setExportUmfang(e.target.checked ? "neue" : "alle")}
-          />
-          Nur neue Bögen seit dem letzten Export
-        </label>
-        {/* Je Format ein eigener Bezugspunkt (R4-W2): Excel für die eigene
-            Liste verbraucht den Nachtrag-PDF nicht, die Weitergabe an die
-            Ablösung keines von beiden. Ohne Haken nur, was es gab. */}
-        {EXPORT_ZIELE.every((z) => !exportStaende[z]) ? (
-          <span className="hinweis">Noch kein Export aus diesem Einsatz — alle Bögen sind neu.</span>
-        ) : null}
-        {EXPORT_ZIELE.filter((z) => nurNeue || exportStaende[z]).map((z) => {
-          const stand = exportStaende[z];
-          if (!stand) {
-            return nurNeue && EXPORT_ZIELE.some((x) => exportStaende[x]) ? (
-              <span className="hinweis export-stand-zeile" key={z}>
-                {EXPORT_ZIEL_NAME[z]}: noch nicht in diesem Format exportiert — alle Bögen sind neu.
-              </span>
-            ) : null;
-          }
-          return (
-            <span className="hinweis export-stand-zeile" key={z}>
-              {EXPORT_ZIEL_NAME[z]}: zuletzt {exportZeitKurz(stand.zeitpunkt)} · {seitdemBoegenText(einsatz.eintraege, stand)}
-            </span>
-          );
-        })}
-      </div>
-      <div className="vorlage-aktionen einsatz-ausgaben">
-        {/* Die ganze Sammel-PDF liegt auf „Einsatz weitergeben / sichern";
-            hier nur noch der Nachtrag „nur neue Bögen" (R2-A3). Ohne
-            Weitergabe-Knopf bleibt der Gesamtweg hier. */}
-        {(nurNeue || !onWeitergeben) && (
-          <>
-            <button
-              type="button"
-              onClick={() => onSammelPdf(exportUmfang)}
-              disabled={gesperrt("pdf")}
-              title={nurNeue
-                ? "Nur die seit dem letzten Export neuen Bögen als eine PDF — mit eingebetteten Daten dieser Bögen. Auf dem Zielgerät über „Einsatz importieren…“ einlesbar."
-                : "Alle Bögen als eine PDF — mit eingebetteter kompletter Sammlung (Züge, Status, Historie). Auf dem Zielgerät über „Einsatz importieren…“ einlesbar."}
-            >
-              {nurNeue ? "Sammel-PDF (nur neue Bögen)" : "Sammel-PDF (alle Bögen)"}
-            </button>{" "}
-          </>
-        )}
-        {/* Zwei CSV-Wege, weil zwei verschiedene Fragen dahinterstehen: die
-            Übersicht beantwortet „wie stark ist die Lage?" (eine Zeile je
-            Einheit, mit Summenzeile), der Detail-Export „wer und was genau ist
-            da?" (jede Person, jedes Fahrzeug einzeln). */}
-        <button type="button" onClick={() => onCsvExport(exportUmfang)} disabled={gesperrt("csv")} title="Eine Zeile je anwesender Einheit mit Stärke, Verpflegung, Unterbringung und Kraftstoff — plus Summenzeile. Für die Lagekarte.">
-          Übersicht als CSV
-        </button>{" "}
-        <button type="button" onClick={() => onCsvDetailExport(exportUmfang)} disabled={gesperrt("csv-detail")} title="Alle Daten aller gemeldeten Einheiten: je Einheit eine Zeile, dazu eine Zeile pro Person und pro Fahrzeug. Für Auswertung in Excel.">
-          Alle Daten als CSV
-        </button>{" "}
-        {/* Drittes Format, weil es keinem der beiden CSVs entspricht: eine
-            fremde Excel-Vorlage mit fester Spaltenfolge, in die die
-            Führungsstelle die Zeilen direkt einfügt. */}
-        <button type="button" onClick={() => onOldenburgExport(exportUmfang)} disabled={gesperrt("xlsx")} title="Einheitenliste im Format der Führungsstelle Oldenburg: je gemeldeter Einheit eine Zeile, Spalten und Formatierung wie in deren Excel-Vorlage.">
-          Excel-Liste (Format „Oldenburg“)
-        </button>{" "}
-        {/* Roh-JSON nur im Debug-Modus: fürs Publikum trägt die Sammel-PDF die
-            Bögen als eingebettetes JSON — ein separater Export verwirrt nur. */}
-        {debugAktiv() && (
-          <button type="button" onClick={onExport}>Als Datei exportieren (Debug)</button>
-        )}
-      </div>
 
       <section className="karte">
         <div className="kopfzeile">
           {/* Zwei beschriftete Zahlen statt drei unbeschrifteter: „gemeldet"
               ist die Länge der Liste, „zählend" die Zahl der Stärkeleiste —
               dieselbe Zählweise wie die Summenzeile der Tabelle (K4). */}
-          <h2>
+          <h2 ref={listeKopf} id="einheiten-liste">
             Einheiten ({gefiltert ? `${kopf.length} von ${alleEinheiten.length}` : alleEinheiten.length} gemeldet
             {" · "}{sum.einheiten} zählend)
           </h2>
@@ -1655,11 +1577,159 @@ export function EinsatzDetail(props: {
                 kompakt={kompakt}
                 nummer={nummern.get(e.einheitSchluessel)}
                 ungesehen={ungeseheneIds.has(e.id)}
+                frisch={frischUnquittiert(e)}
+                fremderOrt={fremdeOrte.get(e.einheitSchluessel)}
               />
             ))}
           </ul>
         )}
       </section>
+
+      {/* Weitergeben, Lageblatt und Exporte stehen UNTER der Liste (R4-K5): Auf
+          dem Telefon lag die erste Einheitenkarte rund vier Bildschirme tief,
+          weil Exportknöpfe, Erklärtext und Kästchen davor standen — wer führt,
+          liest die Einheiten, wer übergibt, scrollt einmal. Der Sprungknopf
+          über der Liste nennt den Ort. */}
+      <div className="ausgabe-block" id="ausgabe-block" ref={ausgabeBlock}>
+      {/* Zweite Reihe: was aus der Sammlung herausgeht. Die erste nimmt Bögen
+          auf. Der Sprung zwischen den Reihen muss größer sein als der zwischen
+          den Knöpfen, sonst liest sich die Aufteilung als zufälliger Umbruch
+          einer einzigen Reihe aus sieben gleichrangigen Knöpfen. */}
+      {(onWeitergeben || onLageblatt) && (
+        <div className="vorlage-aktionen einsatz-weitergabe">
+          {/* Der Weg, der immer geht — auch am Einsatzende, wenn alle abgerückt
+              sind. Er hieß „Sammel-PDF" und versprach ein Druckstück; dass er
+              die ganze Sammlung trägt, stand nur im Tooltip, den ein Telefon nie
+              zeigt (W2). Das Lageblatt daneben ist das Papier für die Wand:
+              eine Seite statt 41 (A3, A4). */}
+          {onWeitergeben && (
+            <button
+              type="button"
+              className="primaer"
+              onClick={onWeitergeben}
+              title="Die ganze Sammlung als Datei — auf dem nächsten Gerät über „Einsatz importieren…“ einlesbar."
+            >
+              Einsatz weitergeben / sichern
+            </button>
+          )}{" "}
+          {onLageblatt && (
+            <button
+              type="button"
+              onClick={onLageblatt}
+              title="Nur die Übersicht: Einheiten mit Zug, Eintreff- und Abrückzeit, Bedarf und Zwischensummen — A4 quer, ohne Bögen; Stärke und Bedarf stehen oben auf Seite 1; bis etwa zehn Einheiten eine Seite."
+            >
+              {/* Ehrlich beschriftet: bei großen Lagen wird es mehr als eine
+                  Seite (Audit Runde 2, R2-K3). */}
+              Lageblatt (A4 quer)
+            </button>
+          )}{" "}
+          {/* Der leere Vordruck dort, wo am Meldekopf gearbeitet wird — vorher
+              nur über die Website „Aufbau des Bogens" (Audit Runde 3, R3-A7). */}
+          {onBlanko && (
+            <button
+              type="button"
+              onClick={onBlanko}
+              title="Leerer Erfassungsbogen (2 Seiten A4) zum Ausfüllen mit der Hand — für Einheiten ohne Gerät oder bei Geräteausfall."
+            >
+              Blanko-Vordruck (Papier-Reserve)
+            </button>
+          )}
+        </div>
+      )}
+      {onLageblatt && (
+        <p className="hinweis lageblatt-stand" role="status">
+          {lageblattStand
+            ? `Lageblatt erstellt ${exportZeitKurz(lageblattStand.zeitpunkt)} · ${seitdemText(neueEintraege(einsatz.eintraege, lageblattStand).length, aenderungenSeit(einsatz.eintraege, lageblattStand))}${lageblattVeraltet ? " — Aushang ist nicht mehr aktuell, neu drucken" : ""}`
+            : "Noch kein Lageblatt aus diesem Einsatz."}
+        </p>
+      )}
+      {onWeitergeben && (
+        <p className="hinweis einsatz-ausgaben-hinweis">
+          {/* Ein Knopf für die ganze Sammel-PDF: „Sammel-PDF (alle Bögen)"
+              darunter erzeugte dieselbe Datei — zwei gleichwertige Knöpfe, und
+              welcher „für Papier" ist, stand nur hier (Audit Runde 2, R2-A3). */}
+          „Einsatz weitergeben / sichern" erzeugt die Sammel-PDF mit allen Bögen (zum Drucken) und allen Meldungen,
+          Zeiten, Historie und Zügen — auf dem nächsten Gerät über „Einsatz importieren…" einlesbar, auch wenn alle
+          abgerückt sind. Ein Nachtrag für den Stab (PDF, CSV, Excel): weiter unten „Nur neue Bögen seit dem letzten Export“
+          ankreuzen — erst dann erscheinen dort die Nachtrag-Knöpfe, je Format mit eigenem Bezugspunkt.
+        </p>
+      )}
+      {/* Der Meldekopf liefert dem Stab nach: einmal am Abend alles, am Morgen
+          nur, was seitdem dazukam. Das Kästchen schaltet alle vier Ausgabewege
+          um; die Zeile sagt, wann zuletzt exportiert wurde und wie viel
+          seitdem neu ist (Rückmeldung Anwender, September 2026). */}
+      <div className="export-umfang">
+        <label className="inline">
+          <input
+            type="checkbox"
+            checked={nurNeue}
+            onChange={(e) => setExportUmfang(e.target.checked ? "neue" : "alle")}
+          />
+          Nur neue Bögen seit dem letzten Export
+        </label>
+        {/* Je Format ein eigener Bezugspunkt (R4-W2): Excel für die eigene
+            Liste verbraucht den Nachtrag-PDF nicht, die Weitergabe an die
+            Ablösung keines von beiden. Ohne Haken nur, was es gab. */}
+        {EXPORT_ZIELE.every((z) => !exportStaende[z]) ? (
+          <span className="hinweis">Noch kein Export aus diesem Einsatz — alle Bögen sind neu.</span>
+        ) : null}
+        {EXPORT_ZIELE.filter((z) => nurNeue || exportStaende[z]).map((z) => {
+          const stand = exportStaende[z];
+          if (!stand) {
+            return nurNeue && EXPORT_ZIELE.some((x) => exportStaende[x]) ? (
+              <span className="hinweis export-stand-zeile" key={z}>
+                {EXPORT_ZIEL_NAME[z]}: noch nicht in diesem Format exportiert — alle Bögen sind neu.
+              </span>
+            ) : null;
+          }
+          return (
+            <span className="hinweis export-stand-zeile" key={z}>
+              {EXPORT_ZIEL_NAME[z]}: zuletzt {exportZeitKurz(stand.zeitpunkt)} · {seitdemBoegenText(einsatz.eintraege, stand)}
+            </span>
+          );
+        })}
+      </div>
+      <div className="vorlage-aktionen einsatz-ausgaben">
+        {/* Die ganze Sammel-PDF liegt auf „Einsatz weitergeben / sichern";
+            hier nur noch der Nachtrag „nur neue Bögen" (R2-A3). Ohne
+            Weitergabe-Knopf bleibt der Gesamtweg hier. */}
+        {(nurNeue || !onWeitergeben) && (
+          <>
+            <button
+              type="button"
+              onClick={() => onSammelPdf(exportUmfang)}
+              disabled={gesperrt("pdf")}
+              title={nurNeue
+                ? "Nur die seit dem letzten Export neuen Bögen als eine PDF — mit eingebetteten Daten dieser Bögen. Auf dem Zielgerät über „Einsatz importieren…“ einlesbar."
+                : "Alle Bögen als eine PDF — mit eingebetteter kompletter Sammlung (Züge, Status, Historie). Auf dem Zielgerät über „Einsatz importieren…“ einlesbar."}
+            >
+              {nurNeue ? "Sammel-PDF (nur neue Bögen)" : "Sammel-PDF (alle Bögen)"}
+            </button>{" "}
+          </>
+        )}
+        {/* Zwei CSV-Wege, weil zwei verschiedene Fragen dahinterstehen: die
+            Übersicht beantwortet „wie stark ist die Lage?" (eine Zeile je
+            Einheit, mit Summenzeile), der Detail-Export „wer und was genau ist
+            da?" (jede Person, jedes Fahrzeug einzeln). */}
+        <button type="button" onClick={() => onCsvExport(exportUmfang)} disabled={gesperrt("csv")} title="Eine Zeile je anwesender Einheit mit Stärke, Verpflegung, Unterbringung und Kraftstoff — plus Summenzeile. Für die Lagekarte.">
+          Übersicht als CSV
+        </button>{" "}
+        <button type="button" onClick={() => onCsvDetailExport(exportUmfang)} disabled={gesperrt("csv-detail")} title="Alle Daten aller gemeldeten Einheiten: je Einheit eine Zeile, dazu eine Zeile pro Person und pro Fahrzeug. Für Auswertung in Excel.">
+          Alle Daten als CSV
+        </button>{" "}
+        {/* Drittes Format, weil es keinem der beiden CSVs entspricht: eine
+            fremde Excel-Vorlage mit fester Spaltenfolge, in die die
+            Führungsstelle die Zeilen direkt einfügt. */}
+        <button type="button" onClick={() => onOldenburgExport(exportUmfang)} disabled={gesperrt("xlsx")} title="Einheitenliste im Format der Führungsstelle Oldenburg: je gemeldeter Einheit eine Zeile, Spalten und Formatierung wie in deren Excel-Vorlage.">
+          Excel-Liste (Format „Oldenburg“)
+        </button>{" "}
+        {/* Roh-JSON nur im Debug-Modus: fürs Publikum trägt die Sammel-PDF die
+            Bögen als eingebettetes JSON — ein separater Export verwirrt nur. */}
+        {debugAktiv() && (
+          <button type="button" onClick={onExport}>Als Datei exportieren (Debug)</button>
+        )}
+      </div>
+      </div>
 
       {/* Das Löschen gehört ans Ende des Inhalts, nicht in die feste Leiste am
           Daumen: Es ist die seltenste und folgenschwerste Handlung dieser
@@ -2234,6 +2304,10 @@ function EinheitKarte(props: {
   nummer?: number;
   /** Aktuelle Fassung kam nach der letzten Kenntnisnahme (R3-K1). */
   ungesehen?: boolean;
+  /** Jünger als 30 Minuten und noch nicht zur Kenntnis genommen (R4-K7). */
+  frisch?: boolean;
+  /** Ort/Auftrag des Bogens passt nicht zu dieser Lage: sein Text (R4-K6). */
+  fremderOrt?: string;
 }) {
   const { einsatzId, kopf, alle, onGeaendert, onEntfernt, qualifikation = "", qualifikationKurz = "", eingang, onStatusWechsel, kompakt = false } = props;
   // Auf dem Telefon zugeklappt, bis die Einheit angetippt wird (R2-K7).
@@ -2329,7 +2403,7 @@ function EinheitKarte(props: {
   const bemerkung = kopf.bogen.sonstiges?.trim() ?? "";
   const bemerkungNeu = folge != null && !!vorige && bemerkung !== "" && (vorige.bogen.sonstiges?.trim() ?? "") !== bemerkung;
   const [bemerkungGanz, setBemerkungGanz] = useState(false);
-  const neueFassung = folge != null && (props.ungesehen || frischGemeldet(kopf));
+  const neueFassung = folge != null && (!!props.ungesehen || (!!props.frisch && frischGemeldet(kopf)));
   const abgerueckt = kopf.status === MeldeStatus.ABGERUECKT;
   const zeitHinweis = zeitUnstimmigkeit({ eintreffen: eintreffzeit(kopf), abgerueckt: abgerueckt ? kopf.abgerueckAm : null });
   const aufgegangen = kopf.status === MeldeStatus.AUFGEGANGEN;
@@ -2709,9 +2783,18 @@ function EinheitKarte(props: {
                 dem letzten Export" — nach einem Export trugen alle Karten
                 weiter „neu", während die Exportzeile „keine neuen Bögen"
                 sagte (Audit Runde 2, R2-A6). */}
-            {zaehlt && istNeu(kopf) && !neueFassung ? <span className="neu-badge" title="Vor weniger als 30 Minuten eingetroffen — unabhängig vom Export">kürzlich eingetroffen</span> : null}
+            {/* Auch das gebunden an die Kenntnisnahme (R4-K7). Zugeklappt am Telefon
+                steht nur „neu": das lange Wort kostete eine eigene Zeile je
+                Karte, die Marke war deshalb ganz ausgeblendet — eine eben
+                eingetroffene Einheit fiel weniger auf als eine Folgemeldung. */}
+            {zaehlt && (props.ungesehen || (props.frisch && istNeu(kopf))) && !neueFassung ? (
+              <span className="neu-badge" title="Vor weniger als 30 Minuten eingetroffen oder seit der letzten Kenntnisnahme eingegangen — unabhängig vom Export">
+                <span className="neu-lang">kürzlich eingetroffen</span>
+                <span className="neu-kurz">neu</span>
+              </span>
+            ) : null}
             {neueFassung ? (
-              <span className="fassung-badge" title="Folgemeldung in den letzten 30 Minuten eingegangen oder noch nicht zur Kenntnis genommen">
+              <span className="fassung-badge" title="Folgemeldung in den letzten 30 Minuten oder noch nicht zur Kenntnis genommen">
                 neue Fassung
               </span>
             ) : null}
@@ -2739,6 +2822,11 @@ function EinheitKarte(props: {
               {bedarf.map((m) => (
                 <span className={m.dringend && zaehlt ? "bedarf-marke dringend" : "bedarf-marke routine"} key={m.lang} title={m.lang}>{m.kurz}</span>
               ))}
+              {props.fremderOrt && (
+                <span className="kompakt-merkmal luecken-merkmal" title={`Bogen nennt als Ort/Auftrag: „${props.fremderOrt}“ — passt das zu dieser Lage?`}>
+                  ⚠ Anderer Einsatz?
+                </span>
+              )}
               {nachgereicht && (
                 <span className="kompakt-merkmal luecken-merkmal" title={`Bogen der Einheit (Stand ${standText(nachgereicht.bogen)}) liegt hinter der Schnellerfassung in der Historie`}>
                   ⚠ Bogen nachgereicht
@@ -2806,6 +2894,12 @@ function EinheitKarte(props: {
               „Abrücken", das vor einer falsch nachgetragenen Eintreffzeit
               liegt (R3-E5). */}
           {zeitHinweis && <span className="muster-sub warnung-text zeit-unstimmig" role="note">⚠ {zeitHinweis}</span>}
+          {/* Ort/Auftrag des Bogens passt nicht zur Lage (R4-K6): nicht sperren, nur zeigen. */}
+          {props.fremderOrt && (
+            <span className="muster-sub warnung-text fremder-ort" role="note">
+              ⚠ Bogen nennt: „{props.fremderOrt}“ — passt das zu dieser Lage? Zählt trotzdem mit.
+            </span>
+          )}
           {/* Nachgereichter Bogen hinter der Schnellerfassung (R4-W1). */}
           {nachgereicht && (
             <span className="muster-sub warnung-text bogen-nachgereicht" role="note">

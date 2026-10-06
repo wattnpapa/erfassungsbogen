@@ -64,6 +64,7 @@ import { absenderkarteGefuellt, absenderkarteLaden, type Absenderkarte } from ".
 import { AbsenderkarteFeld } from "./absenderkarte-ui";
 import {
   EinsatzArt,
+  MeldeStatus,
   bogenInhaltsId,
   einheitSchluessel,
   einsatzAnlegen,
@@ -3277,16 +3278,33 @@ function AppInhalt() {
       einsaetzeNeuLaden();
       setFehler("");
       const abgleich = abgleichText(r);
-      setMeldung(
-        (r.neuerEinsatz
-          ? `Einsatz „${s.name}" importiert (${r.hinzugefuegt} Meldung(en)).`
-          : `Einsatz „${s.name}": ${r.hinzugefuegt} neue Meldung(en) ergänzt` +
-            (abgleich ? `. ${abgleich}` : r.hinzugefuegt === 0 ? " — die Datei enthält nichts, was hier fehlte." : ".")) +
+      // Einheiten statt Fassungen zählen, wie die Liste darunter (R4-K2): „18
+      // Meldung(en)" neben „Einheiten (14 gemeldet)" führte zu Rückfragen beim
+      // Übergebenden.
+      const jetzt = einsaetzeLaden().find((x) => x.id === s.id);
+      const koepfe = geltendeJeEinheit(jetzt?.eintraege ?? []);
+      const anwesend = koepfe.filter((e) => e.status === MeldeStatus.ANWESEND).length;
+      const folgen = (jetzt?.eintraege ?? []).filter((e) => e.quelle !== "aufteilung" && e.quelle !== "zusammenfuehrung").length - koepfe.length;
+      const einheitenText = `${koepfe.length === 1 ? "1 Einheit" : `${koepfe.length} Einheiten`}, davon ${anwesend} anwesend${
+        folgen > 0 ? `, ${folgen === 1 ? "1 Folgemeldung" : `${folgen} Folgemeldungen`}` : ""
+      }`;
+      // Die Quittung steht oben in der Einsatzansicht, bei den Aufnahmeknöpfen —
+      // als `meldung` stand sie hinter „Einsatz löschen…", vier Bildschirme
+      // unter dem sichtbaren Bereich (R4-K2).
+      setMeldung("");
+      setEinlese({
+        fehler: "",
+        meldung:
+          (r.neuerEinsatz
+            ? `Einsatz „${s.name}" übernommen: ${einheitenText}.`
+            : `Einsatz „${s.name}": ${r.hinzugefuegt} neue Meldung(en) ergänzt` +
+              (abgleich ? `. ${abgleich}` : r.hinzugefuegt === 0 ? " — die Datei enthält nichts, was hier fehlte." : ".") +
+              ` Jetzt ${einheitenText}.`) +
           // Wie aktuell die übernommene Lage ist: Kam auf dem alten Gerät
           // danach noch etwas, fehlt es hier (Audit Runde 3, R3-K5).
-          (letzteImImport != null ? ` Letzte Meldung darin: ${zeitLang(letzteImImport)}.` : "") +
+          (letzteImImport != null ? ` Stand der Datei: letzte Meldung ${zeitLang(letzteImImport)}.` : "") +
           geklaert.hinweis,
-      );
+      });
       setOffenerEinsatzId(s.id);
     } catch (err) {
       setFehler(await dateiFehlerMeldung(datei, err, "einsatz")); // nie Parser-Text (R2-E5)

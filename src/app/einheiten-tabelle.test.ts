@@ -30,6 +30,7 @@ import {
   hatSofortbedarf,
   passtZuBedarfsfilter,
   istNeu,
+  abweichenderOrt,
   lueckeKurz,
   lueckenAlle,
   lueckenText,
@@ -371,5 +372,40 @@ describe("Lücken mit Inhalt statt Zahl (Audit Runde 3, R3-K7)", () => {
     const k = lueckeKurz("Ein sehr langer Hinweis ohne Doppelpunkt und ohne Gedankenstrich am Anfang");
     expect(k.length).toBeLessThanOrEqual(32);
     expect(k.endsWith("…")).toBe(true);
+  });
+});
+
+describe("abweichenderOrt — Bogen einer anderen Lage (Audit Runde 4, R4-K6)", () => {
+  const mit = (name: string, ort: string, schl: string) => {
+    const b = bogen(name, 3);
+    b.einsatz = { ...b.einsatz, ortAuftrag: ort };
+    return eintrag(`id-${schl}`, b, { einheitSchluessel: schl, empfangenAm: 1 });
+  };
+  const lage = { name: "Hochwasser Jagst", ort: "Möckmühl" };
+
+  it("meldet einen Ort/Auftrag, der kein Wort mit Sammlung und übrigen Meldungen teilt", () => {
+    const fremd = mit("Schwabach", "Waldbrand Gräfenberg – Wasserversorgung", "s");
+    const eigene = mit("Albstadt", "Hochwasser Jagst, Deichverteidigung Möckmühl", "a");
+    expect(abweichenderOrt(fremd, lage, [fremd, eigene])).toBe("Waldbrand Gräfenberg – Wasserversorgung");
+  });
+
+  it("lässt einen passenden Bogen ohne Marke — Ortsname oder Wort der anderen Meldungen genügt", () => {
+    const passend = mit("Schwabach", "Pumpen in Möckmühl", "s");
+    const andere = mit("Albstadt", "Sandsäcke Kochendorf", "a");
+    expect(abweichenderOrt(passend, lage, [passend, andere])).toBeNull();
+    // Teilt nur mit einer anderen Meldung ein Wort: kein Fehlalarm.
+    const mitNachbar = mit("Ulm", "Sandsäcke füllen", "u");
+    expect(abweichenderOrt(mitNachbar, lage, [mitNachbar, andere])).toBeNull();
+  });
+
+  it("zählt allgemeine Lagewörter nicht als Übereinstimmung und lässt leere Texte in Ruhe", () => {
+    const nurAllgemein = mit("Ulm", "Hochwasserlage", "u");
+    expect(abweichenderOrt(nurAllgemein, lage, [nurAllgemein])).toBeNull(); // nichts Verortbares
+    const fremdMitAllgemeinem = mit("Crailsheim", "Hochwasserlage Crailsheim — Bootsbetrieb", "c");
+    expect(abweichenderOrt(fremdMitAllgemeinem, { name: "Hochwasser Eyach 10/2026" }, [fremdMitAllgemeinem])).toBe(
+      "Hochwasserlage Crailsheim — Bootsbetrieb",
+    );
+    const leer = mit("Ulm", "", "u2");
+    expect(abweichenderOrt(leer, lage, [leer])).toBeNull();
   });
 });

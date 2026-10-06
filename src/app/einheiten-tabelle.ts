@@ -155,6 +155,49 @@ export function meldungsNummern(eintraege: MeldeEintrag[]): Map<string, number> 
   return new Map(reihe.map(([schluessel]) => [schluessel, vergeben.get(schluessel)!]));
 }
 
+// ------------------------------------------------------------ Fremder Einsatz
+
+/** Wörter, die eine Lage nur beschreiben, nicht verorten — zwei Lagen „Hochwasser…" sind noch nicht dieselbe. */
+const LAGE_ALLGEMEIN = /^(hochwasser|einsatz|uebung|lage|katastrophe|hilfe|unterstuetzung|bereitstellung|sturm|starkregen|ueberflutung)/;
+
+/** Bedeutungstragende Wörter eines Orts-/Auftragstexts: klein, ohne Umlaute, ab 4 Zeichen, ohne Allgemeines. */
+function ortWoerter(text: string): string[] {
+  return text
+    .toLowerCase()
+    .replace(/ä/g, "ae")
+    .replace(/ö/g, "oe")
+    .replace(/ü/g, "ue")
+    .replace(/ß/g, "ss")
+    .split(/[^a-z0-9]+/)
+    .filter((w) => w.length >= 4 && !/^\d+$/.test(w) && !LAGE_ALLGEMEIN.test(w));
+}
+
+/**
+ * Nennt der Bogen einen Ort/Auftrag, der zu dieser Lage nicht passt? Verglichen
+ * wird mit dem Namen und Ort der Sammlung und mit dem, was die übrigen Einheiten
+ * als Ort/Auftrag melden: Teilt der Text des Bogens kein bedeutungstragendes Wort
+ * damit, ist er vermutlich für eine andere Lage ausgefüllt (Audit Runde 4, R4-K6).
+ * Rückgabe: der Text des Bogens, sonst null. Nur ein Hinweis — nichts wird
+ * gesperrt, nichts anders gezählt.
+ */
+export function abweichenderOrt(
+  e: MeldeEintrag,
+  sammlung: { name: string; ort?: string },
+  alle: readonly MeldeEintrag[],
+): string | null {
+  const text = (e.bogen.einsatz.ortAuftrag ?? "").trim();
+  const eigene = ortWoerter(text);
+  if (eigene.length === 0) return null; // leer oder nur Allgemeines: nichts zu vergleichen
+  const bezug = new Set<string>(ortWoerter(`${sammlung.name} ${sammlung.ort ?? ""}`));
+  for (const x of alle) {
+    if (x.einheitSchluessel === e.einheitSchluessel) continue;
+    for (const w of ortWoerter(x.bogen.einsatz.ortAuftrag ?? "")) bezug.add(w);
+  }
+  if (bezug.size === 0) return null;
+  const passt = eigene.some((w) => [...bezug].some((b) => b === w || (b.length >= 5 && w.length >= 5 && (b.includes(w) || w.includes(b)))));
+  return passt ? null : text;
+}
+
 /** „Neu": vor weniger als 30 Minuten eingetroffen — was seit der Übernahme dazukam. */
 export const NEU_MS = 30 * 60 * 1000;
 

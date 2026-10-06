@@ -89,6 +89,12 @@ export interface ExportStand {
   zustand?: Record<string, Partial<Record<Feld, string>>>;
   /** Nur Weitergabe-Stand: wann zuletzt eine Sammlung von dort übernommen wurde. */
   uebernommenAm?: number;
+  /**
+   * Nur Kenntnis-Stand: durch „Zur Kenntnis genommen" gesetzt (nicht beim ersten
+   * Öffnen). Was bis dahin einging, trägt keine „neu"-Marke mehr, auch wenn es
+   * jünger als 30 Minuten ist (R4-K7).
+   */
+  bestaetigt?: boolean;
 }
 
 type Ablage = Record<string, ExportStand>;
@@ -126,6 +132,7 @@ function standLesen(stand: unknown): ExportStand | null {
     ...(Array.isArray(s.vermerke) ? { vermerke: s.vermerke.filter((v): v is string => typeof v === "string") } : {}),
     ...(zustand ? { zustand } : {}),
     ...(typeof s.uebernommenAm === "number" ? { uebernommenAm: s.uebernommenAm } : {}),
+    ...(s.bestaetigt === true ? { bestaetigt: true } : {}),
   };
 }
 
@@ -479,8 +486,14 @@ export function kenntnisStandLaden(einsatzId: string): ExportStand | null {
  * als neu da) und bei „Zur Kenntnis genommen". `behalten` räumt Stände
  * verschwundener Einsätze weg — wie beim Export-Stand.
  */
-export function kenntnisVermerken(einsatz: Einsatzsammlung, behalten?: Iterable<string>, jetzt = Date.now()): ExportStand {
-  const stand: ExportStand = { zeitpunkt: jetzt, eintragIds: einsatz.eintraege.map((e) => e.id) };
+export function kenntnisVermerken(
+  einsatz: Einsatzsammlung,
+  behalten?: Iterable<string>,
+  jetzt = Date.now(),
+  /** true: jemand hat „Zur Kenntnis genommen" getippt (R4-K7). */
+  bestaetigt = false,
+): ExportStand {
+  const stand: ExportStand = { zeitpunkt: jetzt, eintragIds: einsatz.eintraege.map((e) => e.id), ...(bestaetigt ? { bestaetigt: true } : {}) };
   const alt = ablageLaden(KENNTNIS_SCHLUESSEL);
   const neu: Ablage = {};
   if (behalten) {

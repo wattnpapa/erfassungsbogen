@@ -2323,6 +2323,38 @@ describe("Einsatz importieren: vor Ort entfernte Meldungen", () => {
   });
 });
 
+describe("Einsatz importieren: Quittung oben, nach Einheiten gezählt (R4-K2)", () => {
+  beforeEach(() => {
+    localStorage.clear();
+  });
+
+  it("nennt Einheiten statt Fassungen und steht in der Quittung bei den Aufnahmeknöpfen", async () => {
+    const s = einsatzImSpeicherAnlegen("Hochwasser Jagst", EinsatzArt.EINSATZ);
+    meldungHinzufuegen(s.id, bogenMitName("OV Albstadt"));
+    meldungHinzufuegen(s.id, bogenMitName("OV Crailsheim"));
+    const folge = bogenMitName("OV Albstadt");
+    folge.stand += 30;
+    folge.einsatz = { ...folge.einsatz, ortAuftrag: "Deich Süd" };
+    meldungHinzufuegen(s.id, folge);
+    const datei = new File([einsatzDateiInhalt(einsaetzeLaden().find((x) => x.id === s.id)!)], "jagst.json", { type: "application/json" });
+    localStorage.clear(); // das „zweite Gerät"
+    const nutzer = userEvent.setup();
+    render(<App />);
+    await nutzer.upload(screen.getByLabelText("Einsatz importieren…"), datei);
+    const quittung = await waitFor(() => {
+      const q = document.querySelector(".einlese-quittung");
+      expect(q).not.toBeNull();
+      return q as HTMLElement;
+    });
+    expect(quittung.textContent).toContain('Einsatz „Hochwasser Jagst" übernommen: 2 Einheiten, davon 2 anwesend, 1 Folgemeldung.');
+    expect(quittung.textContent).not.toContain("Meldung(en)");
+    expect(quittung.textContent).toMatch(/Stand der Datei: letzte Meldung /);
+    // Oben in der Ansicht, nicht hinter „Einsatz löschen…“.
+    const loeschen = screen.getByRole("button", { name: /Einsatz löschen/ });
+    expect(quittung.compareDocumentPosition(loeschen) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+});
+
 describe("Einsatz importieren: Nachtrag („nur neue Bögen“) auf einem Gerät ohne die Lage (R4-W4)", () => {
   beforeEach(() => {
     localStorage.clear();
