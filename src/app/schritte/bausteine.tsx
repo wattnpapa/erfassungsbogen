@@ -47,11 +47,19 @@ export function VokabAuswahl(props: {
   /** Lange Listen (Einheitstyp, Fahrzeugtyp) als tippbare Combobox statt als
       Bildlauf-Select — Freitext bleibt möglich, eine Auswahl setzt den Code. */
   suchbar?: boolean;
+  /**
+   * Bleibt der Text nach dem Verlassen des Felds Freitext, sagt das Feld es
+   * (Einheitstyp, Audit Runde 4, R4-H1): „Bergungsgruppe" ausgeschrieben sah
+   * wie eine Wahl aus, hatte aber keinen Typ-Code.
+   */
+  freitextHinweis?: boolean;
 }) {
-  const { wert, aendern, tabelle, platzhalter, suchbar } = props;
+  const { wert, aendern, tabelle, platzhalter, suchbar, freitextHinweis } = props;
   const titel = useContext(FeldTitel);
   if (suchbar && tabelle.length > 0) {
-    return <VokabCombobox wert={wert} aendern={aendern} tabelle={tabelle} platzhalter={platzhalter} />;
+    return (
+      <VokabCombobox wert={wert} aendern={aendern} tabelle={tabelle} platzhalter={platzhalter} freitextHinweis={freitextHinweis} />
+    );
   }
   if (tabelle.length === 0) {
     return (
@@ -110,8 +118,10 @@ function VokabCombobox(props: {
   aendern: (v: VokabularWert) => void;
   tabelle: VokabularEintrag[];
   platzhalter: string;
+  freitextHinweis?: boolean;
 }) {
-  const { wert, aendern, tabelle, platzhalter } = props;
+  const { wert, aendern, tabelle, platzhalter, freitextHinweis } = props;
+  const [imFeld, setImFeld] = useState(false);
   const sortiert = vokabSortiert(tabelle);
   const label = (t: VokabularEintrag) => `${t.kurz} – ${t.name}`;
   const ausCode = wert.code != null ? sortiert.find((t) => t.code === wert.code) : undefined;
@@ -138,7 +148,11 @@ function VokabCombobox(props: {
       )
     : sortiert;
 
+  const freitext = wert.code == null ? (wert.freitext ?? "").trim() : "";
   return (
+    <>
+    {/* Nur zum Beobachten des Fokus; ohne eigene Darstellung. */}
+    <span style={{ display: "contents" }} onFocusCapture={() => setImFeld(true)} onBlurCapture={() => setImFeld(false)}>
     <VorschlagFeld
       wert={eingabe}
       platzhalter={platzhalter}
@@ -164,16 +178,27 @@ function VokabCombobox(props: {
         aendern({ freitext: v });
       }}
       verlassen={(v) => {
-        // Direkt eingetipptes Kürzel/Label beim Verlassen zum Code auflösen.
-        const t = sortiert.find(
-          (x) => label(x) === v || x.kurz.toLowerCase() === v.trim().toLowerCase(),
-        );
+        // Direkt eingetipptes Kürzel, Label oder ausgeschriebener Name beim
+        // Verlassen zum Code auflösen — ohne Groß-/Kleinschreibung und ohne
+        // Leerzeichen am Rand, aber nur bei genau einem Treffer (R4-H1).
+        const klein = v.trim().toLowerCase();
+        const gleich = sortiert.filter((x) => x.name.toLowerCase() === klein || label(x).toLowerCase() === klein);
+        const t =
+          sortiert.find((x) => label(x) === v || x.kurz.toLowerCase() === klein) ?? (gleich.length === 1 ? gleich[0] : undefined);
         if (t) {
           setEingabe(label(t));
           aendern({ code: t.code });
         }
       }}
     />
+    </span>
+    {freitextHinweis && freitext && !imFeld && (
+      <span className="hinweis warnung-text freitext-hinweis" role="status" style={{ display: "block" }}>
+        „{freitext}" ist nicht aus der Liste — Vorschlag antippen oder als eigener Typ behalten. Ohne Typ-Code
+        fehlen das taktische Zeichen und der Soll-Vergleich.
+      </span>
+    )}
+    </>
   );
 }
 

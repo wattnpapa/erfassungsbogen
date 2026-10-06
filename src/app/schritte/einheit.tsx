@@ -174,9 +174,11 @@ function OvVorschlagFeld(props: {
         // konnte — ohne dass jemand gewählt hatte (Audit Runde 3, R3-S4).
         const klein = e.toLowerCase();
         const gleichAnfang = verzeichnis.filter((o) => o.name.toLowerCase().startsWith(klein));
+        // Ohne Groß-/Kleinschreibung: „ulm" gehörte zu „Ulm", blieb aber Freitext
+        // ohne Kürzel und Kontakt (Audit Runde 4, R4-H1).
         const ov =
           verzeichnis.find((o) => o.kurz === e.toUpperCase()) ??
-          (gleichAnfang.length === 1 && gleichAnfang[0]!.name === e ? gleichAnfang[0] : undefined);
+          (gleichAnfang.length === 1 && gleichAnfang[0]!.name.toLowerCase() === klein ? gleichAnfang[0] : undefined);
         if (ov) (aufgeloest ?? uebernehmen)(ov);
       }}
     />
@@ -388,6 +390,8 @@ export function SchrittEinheit({ bogen, aendern: aendernRoh }: SchrittProps) {
       fahrzeuge: bogen.fahrzeuge.filter((f) => !fahrzeugUnbenannt(f)),
     });
   }
+  // Welches Namensfeld der Zugehörigkeit gerade den Fokus hat (Hinweis „nicht im Verzeichnis" erst danach).
+  const [nameImFokus, setNameImFokus] = useState<number | null>(null);
   const ovDaten = useOvDaten(e.organisation === OrganisationsTyp.THW);
   const ovVerzeichnis = ovDaten?.THW_ORTSVERBAENDE ?? [];
 
@@ -507,6 +511,7 @@ export function SchrittEinheit({ bogen, aendern: aendernRoh }: SchrittProps) {
             tabelle={einheitstypen}
             platzhalter={EINHEITSTYP_BEISPIEL[e.organisation] ?? "z. B. Löschzug, SEG Sanität"}
             suchbar
+            freitextHinweis
           />
         </Feld>
       </div>
@@ -591,6 +596,13 @@ export function SchrittEinheit({ bogen, aendern: aendernRoh }: SchrittProps) {
               platzhalter="z. B. Landkreis"
             />
           </Feld>
+          {/* Nur zum Beobachten des Fokus: Der Hinweis „nicht im Verzeichnis" kommt
+              erst, wenn das Namensfeld verlassen ist. */}
+          <span
+            style={{ display: "contents" }}
+            onFocusCapture={() => setNameImFokus(i)}
+            onBlurCapture={() => setNameImFokus((z) => (z === i ? null : z))}
+          >
           <Feld titel={i === 0 ? "Name (Pflicht)" : "Name"}>
             {e.organisation === OrganisationsTyp.THW && h.bezeichnung.code === 1 ? (
               <OvVorschlagFeld
@@ -613,6 +625,7 @@ export function SchrittEinheit({ bogen, aendern: aendernRoh }: SchrittProps) {
               />
             )}
           </Feld>
+          </span>
           {/* Direkt unter dem Namensfeld, das ergänzt hat — dort liegt der Blick. */}
           {ergaenzt && ergaenzt.i === i && e.hierarchie[ergaenzt.i]?.kurz === ergaenzt.ov.kurz && (
             <p className="hinweis ov-ergaenzt" role="status">
@@ -621,6 +634,20 @@ export function SchrittEinheit({ bogen, aendern: aendernRoh }: SchrittProps) {
               <button type="button" className="link" onClick={ergaenzungZuruecknehmen}>Rückgängig</button>
             </p>
           )}
+          {/* Ein OV-Name ohne Kürzel ist Freitext: nicht aus dem Verzeichnis, ohne
+              Telefon und E-Mail (Audit Runde 4, R4-H1). Erst nach dem Verlassen
+              des Namensfelds, nicht schon beim Tippen. */}
+          {e.organisation === OrganisationsTyp.THW &&
+            h.bezeichnung.code === 1 &&
+            ovVerzeichnis.length > 0 &&
+            h.name.trim() &&
+            !h.kurz?.trim() &&
+            nameImFokus !== i && (
+              <p className="hinweis warnung-text ov-frei-hinweis" role="status">
+                „{h.name.trim()}" ist nicht im OV-Verzeichnis — Vorschlag antippen, sonst fehlen Kürzel, Telefon und E-Mail.
+                Ein Ortsverband, den es dort nicht gibt, darf so stehen bleiben.
+              </p>
+            )}
           {/* Das Kürzel (z. B. THW-OV "OODE") ergibt nur beim THW Sinn; andere Organisationen führen keine solchen Kürzel.
               „Dienststellen-Kürzel (optional)": „Kürzel" allein las ein Neuling als
               irgendeine Abkürzung und tippte „OV OL" — das Beispiel sagt, was gemeint ist. */}

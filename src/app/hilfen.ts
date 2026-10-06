@@ -673,6 +673,21 @@ export function pruefpunkte(b: Erfassungsbogen, mitFahrzeugen = true, heute?: Ee
   if (!einheitOrt(b.einheit) && b.einheit.standortRef == null) {
     hinweise.push({ text: "Zugehörigkeit: Der Name der eigenen Einheit (unterste Ebene) fehlt.", schritt: S_EINHEIT });
   }
+  // Ein ausgeschriebener Einheitstyp ohne Typ-Code (Freitext) sieht in Schritt 1
+  // wie eine Wahl aus, hat aber kein taktisches Zeichen und keinen Soll-Vergleich
+  // (Audit Runde 4, R4-H1). Nur, wo es eine Liste gibt; in der Schnellerfassung
+  // reicht der Name.
+  const typFrei = b.einheit.einheitsTyp.code == null ? (b.einheit.einheitsTyp.freitext ?? "").trim() : "";
+  if (
+    typFrei &&
+    b.personalErfassung !== PersonalErfassung.NUR_STAERKE &&
+    vokabularFuer(b.einheit.organisation, "einheitstyp").length > 0
+  ) {
+    hinweise.push({
+      text: `Einheitstyp „${typFrei}" nicht erkannt — nicht aus der Liste gewählt, deshalb fehlen taktisches Zeichen und Soll-Vergleich.`,
+      schritt: S_EINHEIT,
+    });
+  }
   if (s.gesamt === 0) {
     hinweise.push({ text: "Stärke ist 0 — es ist noch kein Personal erfasst.", schritt: S_PERSONAL });
   }

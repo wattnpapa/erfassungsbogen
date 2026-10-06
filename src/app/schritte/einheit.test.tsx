@@ -135,6 +135,56 @@ describe("Schritt Einheit", () => {
     expect(document.querySelector(".ov-ergaenzt")).toBeNull();
   });
 
+  // Audit Runde 4, R4-H1: Wer „Bergungsgruppe" ausschreibt und „ulm" klein tippt,
+  // behielt Freitext ohne Typ-Code und ohne Kürzel — bei grünem Haken.
+  it("löst einen ausgeschriebenen Einheitstyp und einen kleingeschriebenen OV beim Verlassen auf (R4-H1)", async () => {
+    const nutzer = userEvent.setup();
+    const bogenStand: { b: Erfassungsbogen | null } = { b: null };
+    function Ablesen() {
+      const [bogen, setBogen] = useState(neuerBogen());
+      bogenStand.b = bogen;
+      return <SchrittEinheit bogen={bogen} aendern={(patch) => setBogen((b) => ({ ...b, ...patch }))} />;
+    }
+    render(<Ablesen />);
+
+    await nutzer.type(screen.getByRole("combobox", { name: "Einheitstyp" }), "Bergungsgruppe");
+    await nutzer.tab();
+    expect(bogenStand.b!.einheit.einheitsTyp.code).toBeDefined();
+    expect(bogenStand.b!.einheit.einheitsTyp.freitext).toBeUndefined();
+
+    await nutzer.type(screen.getByLabelText("Name (Pflicht)"), "ulm");
+    await screen.findByText((_t, el) => el?.tagName === "LI" && el.textContent?.startsWith("Ulm") === true, undefined, { timeout: 5000 });
+    await nutzer.tab();
+    expect(bogenStand.b!.einheit.hierarchie[0]!.kurz).toBe("OULM");
+  });
+
+  it("sagt nach dem Verlassen, dass ein Freitext-Einheitstyp nicht aus der Liste ist, und schweigt beim Tippen (R4-H1)", async () => {
+    const nutzer = userEvent.setup();
+    buehne();
+    const feld = screen.getByRole("combobox", { name: "Einheitstyp" });
+    await nutzer.type(feld, "Berg");
+    expect(document.querySelector(".freitext-hinweis")).toBeNull();
+
+    await nutzer.tab();
+
+    const hinweis = document.querySelector<HTMLElement>(".freitext-hinweis")!;
+    expect(hinweis.textContent).toMatch(/^„Berg" ist nicht aus der Liste — Vorschlag antippen oder als eigener Typ behalten/);
+    // Ein gewählter Typ trägt keinen Hinweis.
+    await nutzer.clear(feld);
+    await nutzer.type(feld, "Bergungsgruppe");
+    await nutzer.tab();
+    expect(document.querySelector(".freitext-hinweis")).toBeNull();
+  });
+
+  it("sagt für einen OV-Namen ohne Verzeichnis-Treffer, dass Kürzel und Kontakt fehlen (R4-H1)", async () => {
+    const nutzer = userEvent.setup();
+    buehne();
+    await nutzer.type(screen.getByLabelText("Name (Pflicht)"), "Xyzstadt");
+    await nutzer.tab();
+    await screen.findByText(/ist nicht im OV-Verzeichnis/, undefined, { timeout: 5000 });
+    expect(document.querySelector(".ov-frei-hinweis")!.textContent).toContain("„Xyzstadt\"");
+  }, 15000);
+
   it("zeigt beim Antippen des Einheitstyps die ganze Liste, nicht nur die ersten acht", async () => {
     const nutzer = userEvent.setup();
     buehne();

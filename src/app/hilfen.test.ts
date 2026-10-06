@@ -510,6 +510,26 @@ describe("schrittStatus", () => {
     expect(schrittStatus(b)[2]).toBe("begonnen");
   });
 
+  // Audit Runde 4, R4-H1: Ein ausgeschriebener Einheitstyp ohne Code stand als „1 ✓" da.
+  it("zeigt Schritt 1 mit Freitext-Einheitstyp nicht als fertig und führt den Punkt in der Übersicht (R4-H1)", () => {
+    const b = neuerBogen();
+    b.einheit.einheitsTyp = { freitext: "Berg" };
+    b.einheit.hierarchie = [{ bezeichnung: { code: 1 }, name: "Ulm" }];
+    expect(schrittStatus(b)[0]).toBe("begonnen");
+    expect(pruefpunkte(b).map((p) => p.text)).toContain(
+      "Einheitstyp „Berg\" nicht erkannt — nicht aus der Liste gewählt, deshalb fehlen taktisches Zeichen und Soll-Vergleich.",
+    );
+
+    b.einheit.einheitsTyp = { code: 43 };
+    expect(schrittStatus(b)[0]).toBe("ok");
+    expect(pruefpunkte(b).some((p) => p.text.startsWith("Einheitstyp"))).toBe(false);
+
+    // Schnellerfassung (nur Stärke): der Name genügt, ein Freitext-Typ stört nicht.
+    const schnell = { ...b, personalErfassung: PersonalErfassung.NUR_STAERKE, einheit: { ...b.einheit, einheitsTyp: { freitext: "Berg" } } };
+    expect(schrittStatus(schnell)[0]).toBe("ok");
+    expect(pruefpunkte(schnell, false).some((p) => p.text.startsWith("Einheitstyp"))).toBe(false);
+  });
+
   it("meldet für einen leeren Bogen alle Schritte als leer", () => {
     expect(schrittStatus(neuerBogen())).toEqual(["leer", "leer", "leer", "leer", "leer"]);
   });
