@@ -555,17 +555,19 @@ function PersonalSchnellTabelle(props: {
 
   return (
     <TabellenScroll titel="Personal-Schnelleingabe">
-      <table className="uebersicht schnell-tabelle">
-        <thead>
-          <tr><th>Stelle</th><th>Vorname</th><th>Nachname</th><th>Zählt als</th><th>Geschlecht</th><th aria-label="Reihenfolge" /><th aria-label="Entfernen" /></tr>
+      {/* Rollen ausdrücklich: auf dem Telefon legt index.html jede Zeile als
+          Raster aus (R4-H2) — Browser verlieren dann die Tabellen-Semantik. */}
+      <table className="uebersicht schnell-tabelle" role="table">
+        <thead role="rowgroup">
+          <tr role="row"><th role="columnheader">Stelle</th><th role="columnheader">Vorname</th><th role="columnheader">Nachname</th><th role="columnheader">Zählt als</th><th role="columnheader">Geschlecht</th><th role="columnheader" aria-label="Reihenfolge" /><th role="columnheader" aria-label="Entfernen" /></tr>
         </thead>
-        <tbody>
+        <tbody role="rowgroup">
           {personal.map((p, i) => (
-            <tr key={i}>
+            <tr key={i} role="row">
               {/* Die Sollstelle als erste Spalte: In der Tabelle fehlte die
                   Funktion ganz, und Namen gerieten auf die falsche Stelle (R2-N8). */}
-              <td className="stelle">{platzText(p, org)}</td>
-              <td>
+              <td className="stelle" role="cell">{platzText(p, org)}</td>
+              <td role="cell">
                 {/* Name wie bei den Auswahlfeldern der Zeile: ohne ihn sagte
                     der Vorleser nur den Wert an, ein leeres Feld hieß bloß
                     „Bearbeitungsfeld" — Vor- und Nachname gerieten vertauscht
@@ -579,7 +581,7 @@ function PersonalSchnellTabelle(props: {
                   onKeyDown={(e) => enterWeiter(e, i)}
                 />
               </td>
-              <td>
+              <td role="cell">
                 <input
                   aria-label={`Person ${i + 1}: Nachname`}
                   {...FREMDE_DATEN}
@@ -588,7 +590,7 @@ function PersonalSchnellTabelle(props: {
                   onKeyDown={(e) => enterWeiter(e, i)}
                 />
               </td>
-              <td>
+              <td role="cell">
                 {/* In der Tabelle gibt es kein <Feld> — Beschriftung wie beim
                     Entfernen-Knopf mit der Zeilennummer, sonst heißen alle gleich. */}
                 <Auswahl
@@ -601,7 +603,7 @@ function PersonalSchnellTabelle(props: {
                   <option value={StaerkeRolle.MANNSCHAFT}>Mannschaft</option>
                 </Auswahl>
               </td>
-              <td>
+              <td role="cell">
                 <Auswahl
                   beschriftung={`Person ${i + 1}: Geschlecht`}
                   value={p.geschlecht}
@@ -614,13 +616,13 @@ function PersonalSchnellTabelle(props: {
               </td>
               {/* Die Reihenfolge entscheidet, wer als Ansprechpartner/in gilt —
                   in der Tabelle sieht man die Liste ganz, hier wird sie sortiert. */}
-              <td className="sortier-spalte">
+              <td className="sortier-spalte" role="cell">
                 <SortierKnoepfe index={i} anzahl={personal.length} gruppe="zeile" verschieben={verschieben} />
               </td>
               {/* Klasse „entfernen" wie in der Karte: sie rückt den Knopf von
                   den Sortierpfeilen ab (CSS in index.html) — ein Fehlgriff
                   auf „nach unten" darf nicht auf dem Löschen landen. */}
-              <td>
+              <td role="cell">
                 <button
                   type="button"
                   className="entfernen"

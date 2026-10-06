@@ -111,8 +111,8 @@ describe("Daumen-Quittung und Rückfragen bei großer Schrift (R4-M1)", () => {
     expect(bloecke("dialog.abfrage .abfrage-aktionen:not(.abgesetzt)").join("\n")).toMatch(/position:\s*sticky/);
   });
 
-  it("unter 300 px Leistenbreite (Browser-Zoom 200 %) bekommt der Primärknopf eine eigene Zeile", () => {
-    expect(css).toMatch(/@container assistent-nav \(max-width: 300px\)/);
+  it("unter 260 px Leistenbreite (Browser-Zoom 200 %) bekommt der Primärknopf eine eigene Zeile", () => {
+    expect(css).toMatch(/@container assistent-nav \(max-width: 260px\)/);
     expect(bloecke("footer.nav.assistent-nav > .primaer").join("\n")).toMatch(/grid-area:\s*weiter/);
   });
 });
@@ -182,5 +182,65 @@ describe("Bildschirmtastatur (R4-G3)", () => {
   it("der Wächter wird beim Start der App angeschaltet", () => {
     const main = readFileSync(new URL("./main.tsx", import.meta.url), "utf8");
     expect(main).toMatch(/tastaturWaechterStarten\(\);/);
+  });
+});
+
+describe("Kein Doppeltipp-Zoom an Bedienelementen (R4-G6)", () => {
+  it("Knöpfe, Links, Felder und Zähler tragen touch-action: manipulation", () => {
+    const b = bloecke('button, a, summary, select, input, textarea, label, [role="button"], .datei-knopf').join("\n");
+    expect(b).toMatch(/touch-action:\s*manipulation/);
+  });
+
+  it("der Viewport sperrt den Zwei-Finger-Zoom nicht (Barrierefreiheit)", () => {
+    expect(html).toMatch(/<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/);
+    expect(html).not.toMatch(/user-scalable\s*=\s*no|maximum-scale/);
+  });
+});
+
+describe("Kopfbalken: Kontrast auf der Kennfarbe (R4-L1, R4-L2)", () => {
+  it("die Speicherzeile im Kopf trägt im Dunkel-Modus die Zweitschrift der Kennfarbe, nicht das Grün der Seite", () => {
+    expect(bloecke(".dunkel-modus .seiten-kopf .autosave").join("\n")).toMatch(/color:\s*var\(--kopf-auf-2\)/);
+    // Gewinnt gegen die allgemeine Regel: höhere Spezifität UND später im Blatt.
+    expect(css.indexOf(".dunkel-modus .seiten-kopf .autosave")).toBeGreaterThan(css.indexOf(".dunkel-modus .vollstaendig-ok, .dunkel-modus .autosave"));
+  });
+
+  it("„‹ Startseite“ im Kopf läuft nicht mehr über Deckkraft (0,85 ergab 3,75:1 auf DRK-Rot)", () => {
+    const b = bloecke(".seiten-kopf .zur-start").join("\n");
+    expect(b).toMatch(/color:\s*var\(--kopf-auf-2\)/);
+    expect(b).not.toMatch(/opacity:\s*0?\.\d/);
+    expect(bloecke(".seiten-kopf .zur-start:hover").join("\n")).not.toMatch(/opacity/);
+  });
+
+  it("der Kopfbalken im Dunkel-Modus nimmt die abgedunkelte Kennfarbe", () => {
+    expect(css).toMatch(/--kopf-fond:\s*var\(--org-kopf-dunkel, var\(--org-akzent, #12275e\)\);/);
+  });
+});
+
+describe("Kurz-Liste am Telefon (R4-H2, R4-N3)", () => {
+  it("unter 44rem Rahmenbreite wird jede Person ein Raster, nicht eine 700 px breite Tabellenzeile", () => {
+    expect(css).toMatch(/@container \(max-width: 44rem\)\s*\{\s*table\.uebersicht\.schnell-tabelle, table\.uebersicht\.schnell-tabelle tbody\s*\{\s*display:\s*block/);
+    const zeile = bloecke("table.uebersicht.schnell-tabelle tr").join("\n");
+    expect(zeile).toMatch(/display:\s*grid/);
+    expect(zeile).toMatch(/repeat\(6, minmax\(0, 1fr\)\)/);
+  });
+
+  it("Geschlecht steht direkt unter dem Namen, in derselben Karte (kein Schieben nötig)", () => {
+    expect(bloecke("table.uebersicht.schnell-tabelle td:nth-child(5)").join("\n")).toMatch(/grid-row:\s*3/);
+    expect(bloecke("table.uebersicht.schnell-tabelle td:nth-child(2)").join("\n")).toMatch(/grid-row:\s*2/);
+  });
+
+  it("die Tabelle behält ihre Semantik über ausdrückliche Rollen", () => {
+    const quelle = readFileSync(new URL("./schritte/personal.tsx", import.meta.url), "utf8");
+    expect(quelle).toMatch(/<table className="uebersicht schnell-tabelle" role="table">/);
+    expect(quelle).toMatch(/<tr key=\{i\} role="row">/);
+  });
+});
+
+describe("Stärke-Leiste der Musterung (R4-H3)", () => {
+  it("trägt unter 24rem Kürzel (F / UF / M / Ges) statt abgeschnittener Wörter", () => {
+    expect(css).toMatch(/@container \(max-width: 24rem\)\s*\{\s*\.musterung \.staerke-leiste \.etikett-lang\s*\{[^}]*clip-path/);
+    expect(bloecke(".staerke-leiste .etikett-kurz").join("\n")).toMatch(/display:\s*none/);
+    const quelle = readFileSync(new URL("./vorlagen-ui.tsx", import.meta.url), "utf8");
+    for (const k of ["F", "UF", "M", "Ges"]) expect(quelle).toContain(`aria-hidden="true">${k}</span>`);
   });
 });

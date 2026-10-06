@@ -3871,7 +3871,11 @@ function AppInhalt() {
         </p>
       ) : gespeichertUm ? (
         <p className="autosave" role="status">
-          ✓ automatisch gespeichert · {uhrzeitMitTag(gespeichertUm)} Uhr — bleibt auf diesem Gerät
+          {/* R4-M7: „✓ automatisch gespeichert · 22:24 Uhr — bleibt auf die…" wurde auf
+              360 px an genau der Stelle gekürzt, um die es geht („nur auf diesem
+              Gerät"). Kürzer, und das Wichtige steht hinten, wo gekürzt wird,
+              nicht vorn. */}
+          ✓ gespeichert · {uhrzeitMitTag(gespeichertUm)} Uhr · nur auf diesem Gerät
         </p>
       ) : null}
     </SeitenKopf>

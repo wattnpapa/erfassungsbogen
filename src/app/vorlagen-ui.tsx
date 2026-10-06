@@ -402,10 +402,15 @@ export function Musterung(props: {
     </SeitenKopf>
     <main id="inhalt" tabIndex={-1} className="musterung">
       <section className="karte staerke-leiste">
-        <div><strong>{s.fuehrer}</strong><span>Führer</span></div>
-        <div><strong>{s.unterfuehrer}</strong><span>Unterf.</span></div>
-        <div><strong>{s.mannschaft}</strong><span>Mannsch.</span></div>
-        <div className="gesamt"><strong>{s.gesamt}</strong><span>Gesamt</span></div>
+        {/* R4-H3: Auf schmalen Telefonen standen hier „FÜHRER / UNTERF. /
+            MANNSC… / GESAMT", bei 320 px im Feld-Modus „FÜH… / UNT… / MAN… /
+            GES…". Dort tragen die Felder dieselben Kürzel wie der Bogen und
+            der Assistent (F / UF / M / Ges); das ausgeschriebene Wort bleibt
+            für Vorlesesoftware im Baum (index.html, `.etikett-lang`). */}
+        <div><strong>{s.fuehrer}</strong><span><span className="etikett-lang">Führer</span><span className="etikett-kurz" aria-hidden="true">F</span></span></div>
+        <div><strong>{s.unterfuehrer}</strong><span><span className="etikett-lang">Unterf.</span><span className="etikett-kurz" aria-hidden="true">UF</span></span></div>
+        <div><strong>{s.mannschaft}</strong><span><span className="etikett-lang">Mannsch.</span><span className="etikett-kurz" aria-hidden="true">M</span></span></div>
+        <div className="gesamt"><strong>{s.gesamt}</strong><span><span className="etikett-lang">Gesamt</span><span className="etikett-kurz" aria-hidden="true">Ges</span></span></div>
       </section>
 
       <section className="karte">

@@ -539,6 +539,12 @@
     @media (min-width: 30.01rem) {
       .weiche > .weiche-weg > .aktionen > .primaer { flex: 0 0 100%; }
     }
+    /* R4-G6: Bedienelemente zoomen nicht per Doppeltipp. Safari auf dem iPhone
+       deutet einen schnellen zweiten Tipp auf einen Knopf ohne
+       touch-action: manipulation als Doppeltipp-Zoom; wer die Stärke mit
+       „+" hochzählt (neun Tipps im Abstand von 120 ms), fände die Zähler
+       danach woanders. Wischen und Zwei-Finger-Zoom bleiben erlaubt. */
+    button, a, summary, select, input, textarea, label, [role="button"], .datei-knopf { touch-action: manipulation; }
     button, .datei-knopf {
       font: inherit; font-size: var(--t-s); font-weight: 600;
       padding: 0.5rem 0.9rem;
@@ -818,8 +824,13 @@
       max-width: 100%;
     }
     .seiten-kopf .hinweis { color: var(--kopf-auf-2); margin: var(--r-1) 0 0; }
-    .seiten-kopf .zur-start { color: var(--kopf-auf); opacity: 0.85; }
-    @media (hover: hover) { .seiten-kopf .zur-start:hover { opacity: 1; } }
+    /* R4-L2: Ohne Deckkraft. Mit opacity 0,85 sank „‹ Startseite" auf DRK-Rot
+       auf 3,75:1 und auf DLRG-Gelb auf 3,84:1 (Schrift 16 px, kein großer
+       Text). Die Zweitschrift der Kennfarbe ist je Organisation auf 4,5:1
+       gerechnet (org-farben.ts) und lässt den Rücksprung trotzdem hinter dem
+       Titel zurücktreten; der Zeiger hebt ihn auf die volle Kopfschrift. */
+    .seiten-kopf .zur-start { color: var(--kopf-auf-2); opacity: 1; }
+    @media (hover: hover) { .seiten-kopf .zur-start:hover { color: var(--kopf-auf); } }
     .seiten-kopf .autosave { color: var(--kopf-auf-2); margin: 0; padding: 0 0 var(--r-3); animation: einblenden var(--dauer-2) ease-out; }
     /* Platzhaushalt des Assistenten-Kopfes auf dem Telefon.
        Gemessen im Viewport 360x640: Logo, Titel über zwei Zeilen, der
@@ -885,7 +896,16 @@
         line-height: calc(var(--ziel-basis) + var(--ziel) - 0.4rem);
       }
       .seiten-kopf.assistent-kopf .kopf-oberzeile .anzeige-schalter { flex: 0 0 auto; }
+      /* R4-M7: Die Marke „Aufnahme für: <Sammlung>" bricht um (bis zu drei
+         Zeilen) statt auf „Aufnahme fü…" zu enden — gerade die Angabe, FÜR WELCHE
+         Sammlung erfasst wird, war nicht zu lesen. Kurze Marken daneben
+         („Schnellerfassung") bleiben einzeilig. */
       .seiten-kopf.assistent-kopf .titelzeile .modus-marke { flex: 0 1 auto; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+      .seiten-kopf.assistent-kopf .titelzeile .modus-marke:last-child:not(:only-child) {
+        white-space: normal; overflow-wrap: anywhere; display: -webkit-box; -webkit-box-orient: vertical;
+        -webkit-line-clamp: 3; line-clamp: 3;
+      }
+      .seiten-kopf.assistent-kopf .titelzeile .modus-marke:not(:last-child) { flex-shrink: 0; }
       .seiten-kopf.assistent-kopf .autosave { order: 2; flex: 1 1 100%; padding-bottom: var(--r-1); }
       .seiten-kopf.assistent-kopf .autosave:not(.speicher-fehler) { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
       /* position: relative hält die ausgeblendeten Namen (absolut) im Rahmen
@@ -1496,10 +1516,10 @@
     }
     /* Browser-Zoom statt Systemschrift (200 % auf 360 px = 180 px Layoutbreite):
        Die Knöpfe haben px-Maße und passen dann nicht mehr nebeneinander (der
-       Primärknopf lag über „Zurück" und „◐"). Unter 300 px bekommt der
+       Primärknopf lag über „Zurück" und „◐"). Unter 260 px (Inhaltsbreite der Leiste) bekommt der
        Primärknopf eine eigene, volle Zeile am unteren Rand. */
     footer.nav.assistent-nav { row-gap: min(0.9rem, 8px); }
-    @container assistent-nav (max-width: 300px) {
+    @container assistent-nav (max-width: 260px) {
       footer.nav.assistent-nav > .nav-zurueck { grid-area: auto; grid-row: 2; grid-column: 1; }
       footer.nav.assistent-nav > .anzeige-leiste { grid-area: auto; grid-row: 2; grid-column: 2; }
       footer.nav.assistent-nav > .uebernehmen { grid-area: auto; grid-row: 1; grid-column: 1 / -1; justify-self: stretch; }
@@ -1824,6 +1844,37 @@
     .schnell-tabelle td { padding: 0.15rem 0.25rem; }
     .schnell-tabelle td input, .schnell-tabelle td select { width: 100%; min-width: 5.5rem; }
     .schnell-tabelle td:last-child button { border: none; background: none; font-weight: bold; }
+    /* R4-H2: Kurz-Liste am Telefon ohne seitliches Schieben. Die Tabelle war
+       634–723 px breit in einem 326-px-Rahmen: im ersten Bild standen Stelle,
+       Vorname, Nachname, „Zählt als" nur als „Manns"; Geschlecht, Pfeile und ✕
+       lagen außer Sicht, und jede Zeile war 160 px hoch, weil die drei Pfeile
+       untereinander standen. Unter 44rem Rahmenbreite (in der tatsächlichen
+       Schrift) wird jede Person eine Karte aus sechs Spalten:
+         Stelle · ▲ ▼ ⇑ ✕
+         Vorname · Nachname
+         Zählt als · Geschlecht
+       Alles steht im Bild, die Pfeile nebeneinander. Die Spaltenköpfe bleiben
+       für Vorlesesoftware im Baum (die Rollen setzt personal.tsx). */
+    @container (max-width: 44rem) {
+      table.uebersicht.schnell-tabelle, table.uebersicht.schnell-tabelle tbody { display: block; width: 100%; }
+      table.uebersicht.schnell-tabelle thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+      table.uebersicht.schnell-tabelle tr {
+        display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: var(--r-2);
+        align-items: center; padding: var(--r-2) 0 var(--r-3); border-top: 1px solid var(--rand);
+      }
+      table.uebersicht.schnell-tabelle tr:first-child { border-top: none; }
+      table.uebersicht.schnell-tabelle td { padding: 0; min-width: 0; border: none; }
+      table.uebersicht.schnell-tabelle td input, table.uebersicht.schnell-tabelle td select { min-width: 0; display: block; }
+      table.uebersicht.schnell-tabelle td > *, table.uebersicht.schnell-tabelle td label.feld { margin-top: 0; margin-bottom: 0; }
+      table.uebersicht.schnell-tabelle td.stelle { grid-column: 1 / span 2; grid-row: 1; font-size: var(--t-s); color: var(--text-2); overflow-wrap: anywhere; }
+      table.uebersicht.schnell-tabelle td.sortier-spalte { grid-column: 3 / span 3; grid-row: 1; justify-self: end; padding: 0; }
+      table.uebersicht.schnell-tabelle td.sortier-spalte + td { grid-column: 6; grid-row: 1; justify-self: end; padding: 0; }
+      table.uebersicht.schnell-tabelle td:nth-child(2) { grid-column: 1 / span 3; grid-row: 2; }
+      table.uebersicht.schnell-tabelle td:nth-child(3) { grid-column: 4 / span 3; grid-row: 2; }
+      table.uebersicht.schnell-tabelle td:nth-child(4) { grid-column: 1 / span 3; grid-row: 3; }
+      table.uebersicht.schnell-tabelle td:nth-child(5) { grid-column: 4 / span 3; grid-row: 3; }
+      table.uebersicht.schnell-tabelle .sortieren { gap: 4px; flex-wrap: nowrap; }
+    }
     /* Eingebettete PDF-Vorschau (Übersicht, nur Browser/Desktop). */
     .pdf-rahmen { width: 100%; height: 32rem; border: 1px solid var(--rand); border-radius: var(--radius); margin-top: 0.6rem; }
     /* „Bogen übergeben"-Dialog: je Transportweg ein voller Knopf + ein Satz
@@ -2000,6 +2051,18 @@
     .musterung .staerke-leiste > div.gesamt { border-left-color: var(--linie); }
     .musterung .staerke-leiste span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; letter-spacing: 0; }
     .musterung .staerke-leiste strong { font-size: calc(var(--t-zahl) * 0.8); }
+    /* R4-H3: Kürzel statt abgeschnittener Wörter, sobald die Leiste für vier
+       ausgeschriebene Beschriftungen zu schmal ist. Die Schwelle zählt in der
+       tatsächlichen Schrift (Container-Abfrage, rem der Seite): „MANNSCH."
+       braucht rund 5,6rem, vier Felder also gut 22rem. */
+    .staerke-leiste .etikett-kurz { display: none; }
+    .musterung .staerke-leiste span { position: relative; }
+    @container (max-width: 24rem) {
+      .musterung .staerke-leiste .etikett-lang {
+        position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap;
+      }
+      .musterung .staerke-leiste .etikett-kurz { display: inline; }
+    }
     .staerke-leiste strong {
       font-size: var(--t-zahl); line-height: 1.05; font-weight: 700;
       letter-spacing: -0.02em; font-variant-numeric: tabular-nums;
@@ -2085,7 +2148,7 @@
        außerhalb des Rahmens, wurden vom Rollbereich nicht beschnitten und
        machten die ganze Seite seitlich verschiebbar — 1 677 px breit bei
        360 px Fenster (Audit Runde 2, R2-G2 und R2-M1). */
-    .tabellen-scroll { overflow-x: auto; position: relative; }
+    .tabellen-scroll { overflow-x: auto; position: relative; container-type: inline-size; }
     /* Der Rollbereich nimmt den Fokus an, sobald wirklich etwas verdeckt ist
        (tabellen-scroll.tsx) — sonst wäre der abgeschnittene Teil für alle
        unerreichbar, die nicht wischen können. Die Fokusregeln oben greifen nur
@@ -2519,7 +2582,11 @@
       position: sticky; left: 0; z-index: 1;
       background: var(--flaeche);
       box-shadow: inset calc(-1 * var(--strich-stark)) 0 0 var(--linie);
-      min-width: 8rem; max-width: 14rem; overflow-wrap: anywhere;
+      /* R4-M7: Die Breite folgt dem Rahmen, nicht nur der Schrift. Bei 200 %
+         waren es 8rem = 256 von 322 px — für die Zahlen blieb eine Spalte.
+         Höchstens 40 % (mindestens) bzw. 60 % (höchstens) der Rahmenbreite;
+         bei normaler Schrift bleibt die Mindestbreite 8rem. */
+      min-width: min(8rem, 40cqw); max-width: min(14rem, 60cqw); overflow-wrap: anywhere;
     }
     table.einheiten-tabelle > thead > tr > :first-child,
     table.einheiten-tabelle > tfoot > tr > :first-child { background: var(--flaeche-2); z-index: 2; }
@@ -4175,7 +4242,12 @@
       /* Der Kopfbalken behält die Kennfarbe: die Org-Töne sind ohnehin dunkel
          gehalten (weiße Schrift), also blendet er auch hier nicht — und die
          Organisation bleibt auf den ersten Blick erkennbar. */
-      --kopf-fond:   var(--org-akzent, #12275e);
+      /* R4-L2: Auf DRK-Rot (#e30613), Feuerrot, DLRG-Gelb und ASB-Orange war das
+         ein 130 px hoher, gesättigter Balken über die ganze Breite. Jetzt der
+         abgedunkelte Ton (org-farben.ts `kopfDunkel`: höchstens die
+         Leuchtdichte des Malteser-Bordeaux); THW, Malteser und Johanniter
+         bleiben, wie sie sind. */
+      --kopf-fond:   var(--org-kopf-dunkel, var(--org-akzent, #12275e));
       --kopf-auf:    #ffffff;
       --kopf-kante-farbe: rgba(0, 0, 0, 0.5);
     }
@@ -4190,6 +4262,13 @@
       --rolle-m-fond: var(--flaeche-2); --rolle-m-text: var(--text-2);
     }
     .dunkel-modus .vollstaendig-ok, .dunkel-modus .autosave { color: var(--gut); }
+    /* R4-L1: Das Grün gilt auf der Seite, nicht im Kopfbalken. Dort stand die
+       Zeile „✓ gespeichert" grün auf der Kennfarbe: 2,46:1 (DLRG), 2,59:1 (DRK),
+       3,12:1 (Feuerwehr) und weniger als 4,5:1 bei sieben Organisationen — die
+       Regel davor gewann bei gleicher Spezifität gegen die Kopfregel
+       (`.seiten-kopf .autosave`), weil sie später im Blatt steht. Im Kopf trägt
+       die Zeile wie im Standard-Modus die auf 4,5:1 gerechnete Zweitschrift. */
+    .dunkel-modus .seiten-kopf .autosave { color: var(--kopf-auf-2); }
     .dunkel-modus .offline-badge { color: var(--gut); border-color: var(--gut); }
     /* QR-Bilder behalten ihre weiße Ruhezone — sonst sind sie unscannbar. */
     .dunkel-modus .qr-box img { background: #fff; padding: 8px; }

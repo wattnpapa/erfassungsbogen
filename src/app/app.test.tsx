@@ -1847,6 +1847,15 @@ describe("Speicher voll", () => {
     localStorage.clear();
   });
 
+  /** Audit Runde 4, R4-M7: Die Zeile nennt das Wichtige („nur auf diesem Gerät") hinten und kurz. */
+  it("meldet den Speicherstand kurz: gespeichert, Uhrzeit, nur auf diesem Gerät", async () => {
+    const nutzer = userEvent.setup();
+    render(<App />);
+    await neuerBogenBis(nutzer, 0);
+    await nutzer.type(screen.getByLabelText("Name (Pflicht)"), "V");
+    expect(await screen.findByText(/^✓ gespeichert · .* Uhr · nur auf diesem Gerät$/)).toBeDefined();
+  });
+
   it("meldet im Assistenten, dass nicht gespeichert wurde", async () => {
     const nutzer = userEvent.setup();
     render(<App />);
@@ -1859,7 +1868,7 @@ describe("Speicher voll", () => {
     await nutzer.type(screen.getByLabelText("Name (Pflicht)"), "V");
 
     expect(await screen.findByText(/Nicht gespeichert — der Speicher dieses Geräts ist voll/)).toBeDefined();
-    expect(screen.queryByText(/✓ automatisch gespeichert/)).toBeNull();
+    expect(screen.queryByText(/✓ gespeichert/)).toBeNull();
   });
 
   /** Audit Runde 3, R3-O4: gesperrt ist nicht voll; Schließen fragt nach. */

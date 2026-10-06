@@ -93,9 +93,11 @@ export function themeFarbeAbgleichen(): void {
   const meta = document.querySelector<HTMLMetaElement>('meta[name="theme-color"]');
   if (!meta) return;
   const wurzel = document.documentElement;
-  meta.content = wurzel.classList.contains("nacht-modus")
-    ? NACHT_KOPF_FOND
-    : wurzel.style.getPropertyValue("--org-akzent").trim() || STANDARD_THEME_FARBE;
+  const kennfarbe = wurzel.style.getPropertyValue("--org-akzent").trim() || STANDARD_THEME_FARBE;
+  // Im Dunkel-Modus trägt der Kopfbalken die abgedunkelte Kennfarbe (R4-L2);
+  // die Statusleiste folgt ihm.
+  const dunkel = wurzel.classList.contains("dunkel-modus") ? wurzel.style.getPropertyValue("--org-kopf-dunkel").trim() : "";
+  meta.content = wurzel.classList.contains("nacht-modus") ? NACHT_KOPF_FOND : dunkel || kennfarbe;
 }
 
 /** Eigenes Event, damit mehrere Schalter-Instanzen (Kopf + Fußzeile) synchron bleiben. */

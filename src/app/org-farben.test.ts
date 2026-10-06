@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { OrganisationsTyp } from "@bos/eeb-format/model";
-import { kontrast, orgAkzentPalette, orgFarbe } from "./org-farben";
+import { kontrast, kopfDunkel, orgAkzentPalette, orgFarbe } from "./org-farben";
 
 const HEX = /^#[0-9a-f]{6}$/;
 
@@ -91,6 +91,80 @@ describe("orgAkzentPalette", () => {
       const p = orgAkzentPalette(org);
       expect(p.kopfAuf2).toMatch(HEX);
       expect(p.kopfGut).toMatch(HEX);
+    }
+  });
+});
+
+const ALLE_ORGS = Object.values(OrganisationsTyp).filter((v): v is OrganisationsTyp => typeof v === "number");
+
+/** WCAG-Leuchtdichte (mit Gamma) — unabhängig von org-farben.ts nachgerechnet. */
+function leuchtdichte(hex: string): number {
+  const [r, g, b] = [1, 3, 5]
+    .map((i) => parseInt(hex.slice(i, i + 2), 16) / 255)
+    .map((v) => (v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4)));
+  return 0.2126 * r! + 0.7152 * g! + 0.0722 * b!;
+}
+
+/**
+ * Audit Runde 4, R4-L1/R4-L2: Im Dunkel-Modus stand die Kennfarbe als
+ * vollflächiger Kopfbalken über der Seite (DRK #e30613) und trug die Zeile
+ * „✓ gespeichert" in Grün (2,59:1). Der Balken wird abgedunkelt, die Schrift
+ * darauf bleibt gegen BEIDE Töne lesbar.
+ */
+describe("kopfDunkel: Kopfbalken im Dunkel-Modus (R4-L2)", () => {
+  const MALTESER = leuchtdichte(orgAkzentPalette(OrganisationsTyp.MHD).akzent);
+
+  it("dunkle Kennfarben bleiben unverändert (THW, Malteser, Johanniter)", () => {
+    for (const org of [OrganisationsTyp.THW, OrganisationsTyp.MHD, OrganisationsTyp.JUH]) {
+      const p = orgAkzentPalette(org);
+      expect(p.kopfDunkel).toBe(p.akzent);
+    }
+  });
+
+  it("kein Kopfbalken ist heller als der Malteser-Balken", () => {
+    for (const org of ALLE_ORGS) {
+      expect(leuchtdichte(orgAkzentPalette(org).kopfDunkel)).toBeLessThanOrEqual(MALTESER + 1e-3);
+    }
+  });
+
+  it("DRK, Feuerwehr, DLRG und ASB werden merklich dunkler, behalten aber ihren Farbton", () => {
+    for (const org of [OrganisationsTyp.DRK, OrganisationsTyp.FEUERWEHR, OrganisationsTyp.DLRG, OrganisationsTyp.ASB]) {
+      const p = orgAkzentPalette(org);
+      expect(p.kopfDunkel).not.toBe(p.akzent);
+      expect(leuchtdichte(p.kopfDunkel)).toBeLessThan(leuchtdichte(p.akzent) * 0.6);
+    }
+    // Rot bleibt rot: Rotanteil überwiegt, kein Grau.
+    const drk = orgAkzentPalette(OrganisationsTyp.DRK).kopfDunkel;
+    expect(parseInt(drk.slice(1, 3), 16)).toBeGreaterThan(parseInt(drk.slice(3, 5), 16) * 3);
+  });
+
+  it("Weiß, Zweitschrift und Haken tragen auf dem Balken mit mindestens 4,5:1", () => {
+    for (const org of ALLE_ORGS) {
+      const p = orgAkzentPalette(org);
+      expect(kontrast("#ffffff", p.kopfDunkel)).toBeGreaterThanOrEqual(4.5);
+      expect(kontrast(p.kopfAuf2, p.kopfDunkel)).toBeGreaterThanOrEqual(4.5);
+      expect(kontrast(p.kopfGut, p.kopfDunkel)).toBeGreaterThanOrEqual(4.5);
+    }
+  });
+
+  it("ist ein #rrggbb-Wert, auch für unbekannte (Neutral-)Töne", () => {
+    expect(kopfDunkel("#ff0000")).toMatch(HEX);
+    expect(kopfDunkel("#000000")).toBe("#000000");
+  });
+});
+
+/** Die Zeile im Kopf liegt auf der Kennfarbe: Zweitschrift der Kennfarbe, nie das Grün der Seite. */
+describe("Speicherzeile im Kopf (R4-L1)", () => {
+  it("die Zweitschrift der Kennfarbe erreicht auf jeder Kennfarbe 4,5:1 — das Grün der Seite nicht", () => {
+    const GUT_DUNKEL = "#6cd18a"; // --gut im Dunkel-Modus
+    const ALT = [OrganisationsTyp.DLRG, OrganisationsTyp.DRK, OrganisationsTyp.FEUERWEHR, OrganisationsTyp.ASB, OrganisationsTyp.POLIZEI];
+    for (const org of ALLE_ORGS) {
+      const p = orgAkzentPalette(org);
+      expect(kontrast(p.kopfAuf2, p.akzent)).toBeGreaterThanOrEqual(4.5);
+    }
+    for (const org of ALT) {
+      // Das war der Fehler: die Seitenfarbe auf der Kennfarbe.
+      expect(kontrast(GUT_DUNKEL, orgAkzentPalette(org).akzent)).toBeLessThan(4.5);
     }
   });
 });
