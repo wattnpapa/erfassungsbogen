@@ -76,3 +76,22 @@ Nicht erhoben (Prüfung abgebrochen).
 ## Abgleich mit Runde 3
 
 Nicht erhoben (Prüfung abgebrochen).
+
+## Stand der Behebung
+
+**Der Bericht bleibt unvollständig:** Die Prüfung wurde nach den beiden
+Befunden abgebrochen; Urteil, Bestätigtes und der Abgleich mit Runde 3 fehlen
+weiterhin, weitere Befunde sind nicht ausgeschlossen. Die Behebung betrifft
+nur R4-O1 und R4-O2.
+
+Stand 06.10.2026, Paket 4 „Uhr, Speicher, Löschen, Offline, Zeiten".
+Geprüft mit Typprüfung, Unit-Tests (2 614 grün), Verhaltenstests (137 Szenarien, 1 749 Schritte
+grün) und Nachmessung im Browser (360 × 640, `isMobile`/`hasTouch`, de-DE;
+Dev-Server Port 5180, für den Service Worker Produktionsbuild mit
+`vite preview` Port 4174 hinter einem drosselnden Reverse-Proxy). Aufgeführt
+sind nur die Befunde dieses Pakets.
+
+| Befund | Stand | Umsetzung |
+| --- | --- | --- |
+| R4-O1 Erstladen bricht ab, Zeile bleibt bei „wird geladen" | behoben | Verwirft der Browser die Service-Worker-Registrierung, registriert die Seite neu: beim `online`-Ereignis sofort und bei 20 s stehendem Zähler (nur mit Netz und bekanntem Umfang; `installationAnstossen` in `src/app/offline-bereit.ts`). Der Vorrat im Gerät bleibt, es wird nur der Rest geholt. Fehlt die Registrierung, steht „⚠ Laden abgebrochen bei 1,6 von 6,8 MB — mit Netz einmal neu laden, dann geht es weiter. Bis dahin diese Seite ohne Netz nicht neu laden." mit Knopf „Jetzt neu laden". Nachlauf mit dem Reverse-Proxy des Prüfers (1,6 Mbit/s, Verbindung bei 1,6 von 6,8 MB abgewiesen): (a) ohne `setOffline` — Registrierung nach 1 s verworfen, nach rund 25 s „Laden abgebrochen", nach Netzrückkehr (Registrierung neu, Zähler läuft) ohne Neuladen „✓ Jetzt offline bereit" nach 17 s; (b) mit `setOffline` und `online`-Ereignis — nach Netzrückkehr nach 15 s „✓ Jetzt offline bereit". |
+| R4-O2 „PDF erzeugen" ohne geladenen Baustein: Meldung außer Sicht | behoben | Die Meldung steht im selben Block wie der Knopf (nicht mehr am Dialogende hinter „Weitere Formate"), rollt ins Bild und nennt den Ausweg: „PDF nicht möglich: Der PDF-Baustein ist noch nicht geladen. Ohne Netz geht jetzt nur der QR-Code — mit Netz die Seite einmal neu laden." Nachlauf (Baustein im Dev-Server abgewiesen): Meldung bei y 527–623 px, der Dialog endet bei 624 px; sie steht nur einmal im Baum. |

@@ -358,6 +358,10 @@ describe("Lücken mit Inhalt statt Zahl (Audit Runde 3, R3-K7)", () => {
 
   it("gibt den häufigen Prüfpunkten Stichworte statt eines abgeschnittenen Satzanfangs (R4-K3)", () => {
     expect(lueckeKurz("Verpflegung für 12 Personen angefordert, die Gesamtstärke ist aber 8.")).toBe("Verpflegung 12 ≠ Stärke 8");
+    // R4-H1: Freitext-Einheitstyp als Stichwort, nicht mitten im Satz abgeschnitten.
+    expect(
+      lueckeKurz("Einheitstyp „FGr K (A)\" nicht erkannt — nicht aus der Liste gewählt, deshalb fehlen taktisches Zeichen und Soll-Vergleich."),
+    ).toBe("Einheitstyp nicht erkannt");
     expect(lueckeKurz("Alle 4 Personen stehen auf Geschlecht „männlich“ — das ist die Vorbelegung. Bitte prüfen (zählt für Unterbringung und WC/Dusche).")).toBe(
       "alle als „männlich“ (Vorbelegung)",
     );

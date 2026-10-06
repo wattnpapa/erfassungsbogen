@@ -130,7 +130,7 @@ Funktionalität: Darstellung, Datensicherung und Auskunft
     Und ich auf "Verwerfen" klicke
     Dann sehe ich den Dialog "Angefangenen Bogen verwerfen?"
     Wenn ich im Dialog auf "Verwerfen" klicke
-    Dann sehe ich den Hinweis "Angefangener Bogen verworfen — Rückholung unten auf der Startseite."
+    Dann sehe ich den Hinweis "Angefangener Bogen verworfen — Rückholung oben auf der Startseite."
     Und sehe ich die Schaltfläche "Fortsetzen" nicht
 
   Szenario: Das Verwerfen abbrechen lässt den angefangenen Bogen stehen

@@ -524,3 +524,18 @@ Szenarien grün) und Nachmessung im Dev-Server (360 × 640,
 | Befund | Stand | Umsetzung |
 | --- | --- | --- |
 | R4-E6 „Verschieben…“ in eine Sammlung, die die Einheit schon führt | behoben | Der Dialog nennt am Ziel „dort schon gemeldet, wird zusammengeführt“, die Quittung „war sie schon gemeldet; beide Stände sind zusammengeführt“. „Rückgängig“ legt die eigenen Einträge des Ziels zurück und nimmt sie aus der Ausgangssammlung wieder heraus: Beide Sammlungen führen danach je einen Eintrag, die Übung mit ihrem eigenen Auftrag (Test). |
+
+
+Stand 06.10.2026, Paket 4 „Uhr, Speicher, Löschen, Offline, Zeiten".
+Geprüft mit Typprüfung, Unit-Tests (2 614 grün), Verhaltenstests (137 Szenarien, 1 749 Schritte
+grün) und Nachmessung im Browser (360 × 640, `isMobile`/`hasTouch`, de-DE;
+Dev-Server Port 5180, für den Service Worker Produktionsbuild mit
+`vite preview` Port 4174 hinter einem drosselnden Reverse-Proxy). Aufgeführt
+sind nur die Befunde dieses Pakets.
+
+| Befund | Stand | Umsetzung |
+| --- | --- | --- |
+| R4-E3 „Eingetroffen um" legt Zukunft still auf gestern | behoben | Gestern gilt ohne Nachfrage nur, wenn es höchstens sechs Stunden zurückliegt (23:50 um 00:20). Sonst fragt „Stimmt die Zeit?" („Eingetroffen um" 21:12 liegt in der Zukunft — Stunde oder Tag vertauscht?) mit „Heute …" und „Gestern …" zur Wahl; „Zeit korrigieren" lässt das Feld stehen. Test: 20:42 mit 21:12 und 23:41 → Rückfrage, 00:20 mit 23:50 → still gestern. |
+| R4-E4 Stärke-Zahlendreher in „Stärke ändern…" | behoben | „6o", „-3" und leere Felder öffnen den Dialog mit den eingegebenen Werten wieder und nennen das Feld („nicht lesbar: Mannschaft („6o")"). „66" statt „6" fragt wie im Assistenten („Stärke: 66 Mannschaft — stimmt das?") mit „0 / 0 / 3 / 3 → 0 / 0 / 66 / 66"; auch mehr als das Dreifache warnt; „Zahlen korrigieren" geht zurück in den Dialog. Nach der Übernahme Daumenleiste „Stärke geändert: … 3 → 66" mit „Rückgängig"; die Quittung „Zuletzt eingelesen" trägt bei einer Folgemeldung ebenfalls „Rückgängig" (nimmt die Fassung heraus, die davor gilt wieder). |
+| R4-E5 Startkarte zeigt ungespeicherten Stand als „gespeichert" | behoben | Bei Speicherfehler steht auf der Startkarte kein „gespeichert … Uhr" mehr, sondern als Alarm „⚠ Nicht gespeichert — der Speicher dieses Geräts ist voll. Letzter gesicherter Stand: 21:01 Uhr. Beim Schließen gehen die Änderungen verloren — jetzt „Fortsetzen" und „Bogen übergeben" (PDF oder QR-Code)." (gesperrter Speicher: eigener Wortlaut). |
+| R4-E7 Kleinere Stellen beim Wiederanlauf | behoben | Musterung: Die Haken liegen unter `eeb.musterung.v1` (Kennung und Fassung der Vorlage, Wahrheitswerte je Stelle; keine Namen) und kommen nach dem Neuladen mit dem Hinweis „Deine Haken von vorhin sind wieder da" zurück; das Ende der Musterung räumt sie weg, gilt höchstens einen Tag (neuer Speicherort, in ISK 3.3 D2k und DSFA nachgetragen). Gekürzter Link: „… Er ist vermutlich unterwegs abgeschnitten worden — bitte den QR-Code oder die PDF des Absenders verwenden oder den Link neu anfordern." Fremd-Erfassung bei vollem Speicher: „bitte die Stärke jetzt auf dem Meldeblock notieren und Platz schaffen" statt „Bogen übergeben (PDF)". |

@@ -250,6 +250,7 @@ export function lueckeKurz(text: string): string {
   if (/^Einsatzzeitraum: „bis“ liegt vor „von“/.test(text)) return "Zeitraum: bis vor von";
   if (/^Einsatzende .* vor dem Einsatzbeginn/.test(text)) return "Ende vor Beginn";
   if (/^Einsatzbeginn .* außerhalb des Einsatzzeitraums/.test(text)) return "Beginn außerhalb Zeitraum";
+  if (/^Einheitstyp .* nicht erkannt/.test(text)) return "Einheitstyp nicht erkannt";
   if (/^Stärke ist 0/.test(text)) return "Stärke 0";
   const verpflegung = /^Verpflegung für (\d+) Personen angefordert, die Gesamtstärke ist aber (\d+)/.exec(text);
   if (verpflegung) return `Verpflegung ${verpflegung[1]} ≠ Stärke ${verpflegung[2]}`;

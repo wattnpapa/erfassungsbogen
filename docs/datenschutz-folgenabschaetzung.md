@@ -227,6 +227,22 @@ Grundlage: Repository `wattnpapa/erfassungsbogen`, Stand 2026-09-12 — Version 
 > enthalten und trägt `nachtragSeit` im Umschlag (R4-W4, R4-K8). Keine neue
 > Datenkategorie, kein neuer Empfänger, kein neuer Speicherort außer dem
 > getrennten Exportstand. Geändert: 5.5, 5.7.
+>
+> **Nachgezogen 2026-10-06 — Uhr, Speicher, Löschen, Offline, Zeiten (Audit
+> Runde 4, Paket 4):** Aufräum- und Papierkorbfrist rechnen mit der geprüften
+> Geräteuhr; ein Vorsprung von mehr als 60 Tagen gegenüber dem letzten Start
+> hält alle Löschungen und die Anonymisierung an und zeigt „Geräteuhr prüfen"
+> (R4-D1, 5.7, R10). Neu ist ein Speicherort ohne Personendaten: die Haken
+> einer unterbrochenen Musterung (`eeb.musterung.v1`: Kennung der Vorlage,
+> Wahrheitswerte je Stelle, Zeitpunkt; höchstens einen Tag, mit dem Ende der
+> Musterung gelöscht, R4-E7). Der Rückweg einer entfernten Meldung bleibt
+> im Arbeitsspeicher — die Rückfrage sagt es vorher (R4-D3); ein
+> Papierkorb für einzelne Meldungen hätte fremde Personendaten an einen
+> weiteren Speicherort gelegt. Der Papierkorb nennt Datum und Restzeit,
+> endgültige Löschungen nennen fehlende Exporte (R4-D5). Der Rückholplatz
+> trägt die letzte Bearbeitung des Bogens als Stand (R4-S5). Keine neue
+> Datenkategorie, kein neuer Empfänger, keine neuen Netzverbindungen.
+> Geändert: 5.7.
 
 ## Hinweis zu diesem Dokument
 
@@ -508,6 +524,12 @@ Kapitel 6 der [Arc42-Dokumentation](arc42-architektur.md).
     beim Haken und im Übungs-Störer) sowie „Meine Vorlagen" als Stammdaten der
     eigenen Einheit. Beide bleiben unbefristet gespeichert, bis sie manuell
     gelöscht werden.
+  - **Uhr (seit 2026-10-06, R4-D1):** Die Frist rechnet mit einer geprüften
+    Geräteuhr. Liegt die Uhr mehr als 60 Tage vor dem letzten Start (vorher
+    366 Tage), gilt weiter der letzte akzeptierte Zeitpunkt, bis sich der
+    Sprung einen Tag später bestätigt; die App löscht und anonymisiert dann
+    nichts und warnt „Geräteuhr prüfen". Dieselbe Uhr gilt für Aufräum- und
+    Papierkorbfrist (siehe unten). Ein kleinerer Sprung gilt als echte Zeit.
   - **Grenze:** Der QR-Code selbst, das eingebettete JSON im PDF und
     CSV-/Excel-Exporte bleiben unverändert und unverschlüsselt. Ein fremder
     Decoder oder eine ältere App-Version liest sie vollständig. Die Frist ist
@@ -521,7 +543,11 @@ Kapitel 6 der [Arc42-Dokumentation](arc42-architektur.md).
   2026-09-29 nennt die Startseite eine so gelöschte Sammlung danach einmal
   beim Namen (Zeitraum, Zahl der Meldungen), bis „Verstanden" gedrückt wird
   (`eeb.aufgeraeumt.v1`, `src/app/aufraeum-hinweis.ts`; nur Sammlungsname und
-  Zahlen, keine Personendaten; Audit Runde 2, R2-D5).
+  Zahlen, keine Personendaten; Audit Runde 2, R2-D5). Seit 2026-10-06
+  (R4-D1) rechnet auch diese Frist mit der geprüften Geräteuhr: Eine
+  Ablage-Hülle (`src/app/uhr-korrektur.ts`) schiebt dem Kern bei
+  zurückgehaltener Uhr die Zeitstempel zurecht, damit eine falsch
+  vorgestellte Uhr beim Start keine laufende Sammlung endgültig löscht.
 - **Lageblatt-Stand (seit 2026-09-29, R2-A3):** Zeitpunkt des zuletzt
   erzeugten Lageblatts, die Kennungen der Meldungen darauf und seit
   2026-10-06 (R4-K1) der Zustand je Einheit als Prüfsummen
@@ -544,7 +570,11 @@ Kapitel 6 der [Arc42-Dokumentation](arc42-architektur.md).
   löschen" weg.
 - Eine **Papierkorb-Funktion** existiert (`sicherung.ts`, `vorlagen.ts`,
   `@bos/meldekopf/papierkorb`): gelöschte Einträge lassen sich vor endgültiger
-  Löschung wiederherstellen.
+  Löschung wiederherstellen. Seit 2026-10-06 (R4-D5) nennt der Papierkorb das
+  Datum der endgültigen Entfernung und hebt die letzten drei Tage hervor; die
+  30 Tage rechnen mit der geprüften Uhr (R4-D1). „Endgültig löschen…" und
+  „Alle lokalen Daten löschen" nennen Sammlungen, von denen es keinen Export,
+  kein Lageblatt und keine Weitergabe gibt.
 - **Einzelne Meldung entfernen (seit 2026-09-29 vollständig):** „Entfernen" an
   einer Einheit der Einsatz-Sammlung löscht alle ihre Fassungen samt
   Zusatzfeldern (`einheitEntfernen`, `src/app/eintrag-zeiten.ts`). Vorher
@@ -553,7 +583,10 @@ Kapitel 6 der [Arc42-Dokumentation](arc42-architektur.md).
   der offenen Seite, nicht im Gerätespeicher, und endet, sobald die
   Quittung geschlossen, von einer neueren ersetzt oder die Seite neu geladen
   wird (seit 2026-10-05 nicht mehr schon beim Verlassen der Einsatzansicht,
-  R3-D4). Seit 2026-09-29 merkt sich die
+  R3-D4). Seit 2026-10-06 (R4-D3) sagt die Rückfrage das vorher und nennt,
+  ob die Meldung in einem Export, Lageblatt oder einer Weitergabe der
+  Sammlung steht; einen dauerhaften Rückweg gibt es bewusst nicht, weil er
+  fremde Personendaten an einem weiteren Speicherort hielte. Seit 2026-09-29 merkt sich die
   App die Kennungen der entfernten Einträge (`eeb.entfernt.v1`, nur zufällige
   Kennungen, `src/app/entfernte-meldungen.ts`): Bringt ein „Einsatz
   importieren…" eine davon zurück, wird gefragt, und ohne Zustimmung bleibt sie
@@ -743,7 +776,7 @@ Schutzziele in Anlehnung an das Standard-Datenschutzmodell (SDM): Vertraulichkei
 | R7 | Fehlende eigene Zugriffssperre der App (verlässt sich auf Betriebssystem-/Gerätesperre) | V | Mittel | Niedrig-Mittel | Niedrig-Mittel |
 | R8 | Strukturelle Grenze der Betroffenenrechte bei bereits weitergereichten Kopien (6.3) | Iv | Hoch (systembedingt) | Niedrig-Mittel | ~~Mittel~~ → Niedrig-Mittel: digitale Kopien in anderen App-Installationen (ab dem Stand mit Datenschutzfrist) verfallen nach 90 Tagen von selbst; Papier, Exporte und der QR-Inhalt selbst nicht |
 | R9 | GoatCounter/Update-Check als einzige Netzwerkkontaktpunkte — technische Metadaten (IP-Adresse) fallen bei einem Dritten an | T | Hoch (jeder Aufruf) | Sehr niedrig | Niedrig |
-| R10 | **Neu mit der Datenschutzfrist:** unumkehrbarer Verlust der Personaldaten im laufenden Einsatz — durch eine falsch vorgehende Geräteuhr oder eine Lage, die länger als 90 Tage ohne Bearbeitung des Bogens läuft | Vf | Niedrig (Uhrsprünge über 366 Tage werden erst nach Bestätigung einen Tag später übernommen; Ankündigung 14 Tage vor Ablauf; jede Bearbeitung startet die Frist neu) | Niedrig-Mittel (Stärke und Summen bleiben erhalten, Namen fehlen) | Niedrig |
+| R10 | **Neu mit der Datenschutzfrist:** unumkehrbarer Verlust der Personaldaten im laufenden Einsatz — durch eine falsch vorgehende Geräteuhr oder eine Lage, die länger als 90 Tage ohne Bearbeitung des Bogens läuft | Vf | Niedrig (Uhrsprünge über 60 Tage — bis 2026-10-05 über 366 Tage, dabei löschte ein falsches Jahr beim Start die laufende Sammlung — werden erst nach Bestätigung einen Tag später übernommen, ebenso für Aufräum- und Papierkorbfrist (R4-D1); Ankündigung 14 Tage vor Ablauf; jede Bearbeitung startet die Frist neu) | Niedrig-Mittel (Stärke und Summen bleiben erhalten, Namen fehlen) | Niedrig |
 | R11 | **Neu mit der Datenschutzfrist:** Übungsbögen sind von der Frist ausgenommen — enthalten sie echte Personaldaten, liegen diese unbefristet auf den Geräten | V | Mittel (Übungen mit echtem Personal sind üblich) | Niedrig-Mittel | Niedrig-Mittel |
 
 **Höchste Einzelrisiken:** R1 (Geräteverlust), R2 (Papier-/Exportverlust) und R8

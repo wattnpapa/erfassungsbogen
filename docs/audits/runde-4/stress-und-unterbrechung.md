@@ -417,3 +417,15 @@ dieses Pakets.
 | R4-S2 Doppeltipp auf „Weiter →" überspringt einen Schritt | behoben | Jeder Ansichtswechsel sperrt die Fingerstelle 1,5 s. Nachlauf t07: 150/350/700 ms → „2. Einsatz". |
 | R4-S3 Zweiter Tipp nach „Neuen Bogen erstellen" trifft „◐" | behoben | Dieselbe Sperre. Nachlauf t07: 150/350/700 ms → „1. Einheit", kein Darstellungsmenü. |
 | R4-S4 „Meine Fassung behalten" verwirft das andere Fenster | weitgehend | Der Stand des anderen Fensters kommt auf den Rückholplatz; fiele dort ein dritter Bogen, fragt „Meine Fassung behalten?" und nennt ihn. Die Warnung nennt Name und Stand des anderen Fensters, aber nicht das geänderte Feld; „laden" kehrt in den Schritt zurück. Nachlauf zwei Tabs: A-Ort/B-Ort, B behält → Entwurf B-Ort, Rückholplatz A-Ort; Fall R3-S3 → Rückfrage, dann Entwurf TabA2, Rückholplatz TabB, kein Bogen doppelt; „laden" → „2. Einsatz". |
+
+
+Stand 06.10.2026, Paket 4 „Uhr, Speicher, Löschen, Offline, Zeiten".
+Geprüft mit Typprüfung, Unit-Tests (2 614 grün), Verhaltenstests (137 Szenarien, 1 749 Schritte
+grün) und Nachmessung im Browser (360 × 640, `isMobile`/`hasTouch`, de-DE;
+Dev-Server Port 5180, für den Service Worker Produktionsbuild mit
+`vite preview` Port 4174 hinter einem drosselnden Reverse-Proxy). Aufgeführt
+sind nur die Befunde dieses Pakets.
+
+| Befund | Stand | Umsetzung |
+| --- | --- | --- |
+| R4-S5 Kleinere Stellen beim Wiedereinstieg | teilweise | Rückholplatz: „Zuletzt geschlossener Bogen · zuletzt bearbeitet 22:40" — die Stelle nennt die letzte Bearbeitung, nicht den Zeitpunkt des Schließens (`ersetztenEntwurfMerken(…, { geaendertUm })`). Zwei Rückfragen vor „Einsatz starten": Ersetzt der Start einen offenen Bogen, stehen „Alle dabei?" und „Bogen ersetzen?" in einer Rückfrage („Gemeldet werden alle 2 Personen der Vorlage. Fehlt jemand, vorher in der Liste abwählen. Der angefangene Bogen … wird durch den Bogen aus der Vorlage ersetzt."). **Offen:** Eine zweite Fremd-Erfassung lässt sich weiter nicht parallel anfangen — „Verwerfen und neue Einheit erfassen" legt die erste auf den Rückholplatz, wenn dort kein eigener Bogen liegt, sonst geht sie verloren; ein zweiter Parkplatz wäre ein neuer Speicherort mit eigenen Personendaten und braucht eine eigene Entscheidung. |

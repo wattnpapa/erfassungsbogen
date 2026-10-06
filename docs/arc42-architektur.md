@@ -53,6 +53,16 @@
 > (R4-S1); Rückfragen und Ansichtswechsel sperren die Fingerstelle 1,5 s
 > (`tipp-schutz.ts`, R4-G1/S2/S3) — Kapitel 8.2.
 >
+> **Nachgezogen 2026-10-06:** Audit Runde 4, Paket 4 „Uhr, Speicher, Löschen,
+> Offline, Zeiten" — zwischen Kern und `localStorage` sitzt zusätzlich die
+> Uhrkorrektur-Hülle (`src/app/uhr-korrektur.ts`): Sie zeigt dem Kern, der
+> Aufräum- und Papierkorbfrist mit `Date.now()` rechnet (Submodul, ADR-003 bleibt
+> gewahrt), bei unplausibel vorgehender Geräteuhr die geprüfte Zeit
+> (`src/app/datenschutz-uhr.ts`, `UHR_SPRUNG_TAGE = 60`, R4-D1). Neu:
+> `eeb.musterung.v1` (Haken der Musterung, R4-E7, `musterung-stand.ts`),
+> `papierkorb-frist.ts`, `installationAnstossen` in `offline-bereit.ts`
+> (R4-O1) — Kapitel 6.4, 8.2, 8.3.
+>
 > **Nachgezogen 2026-10-06:** Audit Runde 4, Paket 2 „Meldungsfassungen,
 > Exportstand, Führungssicht" — welche Fassung einer Einheit gilt, entscheidet
 > eine App-Schicht über der unveränderten Kern-Regel (`src/app/fassung-vorrang.ts`,
@@ -949,6 +959,18 @@ Themen- und Länderseiten) schreibt der Build nach `offline-zusatz.json`; die
 Startseite lädt sie nach der Aktivierung nach (`src/app/offline-vorrat.ts`),
 der Service Worker legt sie über zwei Laufzeit-Routen in den Cache
 `eeb-zusatz` (Beispielbögen `CacheFirst`, Seiten und Liste `NetworkFirst`).
+*Nachgezogen 2026-10-06 (Audit Runde 4, R4-O1):* Bricht das Erstladen im
+Funkloch ab, scheitert der Service Worker an der Installation, und der Browser
+verwirft die Registrierung; ein späteres `update()` ginge ins Leere und die
+Zeile bliebe bei „wird geladen". `installationAnstossen`
+(`src/app/offline-bereit.ts`) registriert deshalb beim `online`-Ereignis und
+bei stehendem Zähler (20 s, nur mit Netz und bekanntem Umfang) neu; der Vorrat
+im Gerät bleibt, es wird nur der Rest geholt. Fehlt die Registrierung, steht
+„Laden abgebrochen bei x von y MB — mit Netz einmal neu laden" mit Knopf.
+Gemessen mit einem drosselnden Reverse-Proxy (Verbindung abgewiesen, mit und
+ohne `setOffline`): Nach Netzrückkehr erreicht die Zeile „offline bereit"
+ohne Neuladen.
+
 Die Offline-Zeile zeigt beim Laden den Fortschritt des Kerns in MB und danach
 „offline bereit für Bogen, PDF, QR-Code und Empfang … (120 von 474)". Keine
 neuen Hosts, alle Abrufe gehen an die eigene Herkunft. „Funktioniert komplett
@@ -1120,6 +1142,12 @@ flowchart TB
   wie Link und Scan „Wohin damit?" (`empfangsZielWaehlen`, R4-N2). Gleicht
   ein eintreffender Bogen dem offenen (`bogenSchonOffen`), wird nichts
   ersetzt und nichts vom Rückholplatz verdrängt (R4-E2).
+  *Musterung (seit 2026-10-06, R4-E7):* Die Haken von „Einsatz vorbereiten"
+  stehen unter `eeb.musterung.v1` (`musterung-stand.ts`: Vorlagen-Kennung,
+  `geaendert`, Wahrheitswerte je Stelle, Zeitpunkt; keine Namen) und kommen
+  nach einem Neuladen wieder; das Ende der Musterung räumt den Eintrag weg.
+  Der Rückholplatz trägt als Stand die letzte Bearbeitung des Bogens
+  (`ersetztenEntwurfMerken(…, { geaendertUm })`, R4-S5).
   Zwei Fenster: `entwurfAusAnderemFenster` erkennt einen Entwurf, den dieses
   Fenster nicht selbst geschrieben hat; vor dem Anlegen eines neuen Bogens
   fragt die App und legt ihn auf den Rückholplatz (R3-S3). „Meine Fassung
@@ -1208,6 +1236,19 @@ flowchart TB
     `speicher-browser.ts`, Plausibilitätsprüfung in `datenschutz-uhr.ts`,
     gemerkter Stand unter `eeb.uhr.v1`). Ohne hereingereichte Uhr anonymisiert
     die Sammlung nichts — wie bei der Speicherhülle.
+  - **Geprüfte Uhr für Aufräum- und Papierkorbfrist (seit 2026-10-06, R4-D1):**
+    Der Kern rechnet beide mit `Date.now()` in `alleEinsaetzeLaden()` und
+    löschte bei vorgestellter Uhr beim Start endgültig. Da `vendor/` nicht
+    geändert wird, steht die Prüfung in der App: `geraeteuhrPruefen`
+    (`datenschutz-uhr.ts`) hält eine Uhr zurück, die mehr als 60 Tage vor dem
+    letzten Start liegt (das Format-Maß `UHR_SPRUNG_TAGE = 366` ließ ein
+    falsches Jahr durch); `uhrKorrigierteHuelle` (`uhr-korrektur.ts`)
+    verschiebt dann `geaendert`/`geloeschtAm` der Sammlungen beim Lesen um den
+    Vorsprung und beim Schreiben zurück (Versatz je Seitenaufruf fest). Die
+    Reihenfolge der Hüllen: Beobachter (Aufräum-Nachricht, geprüfte Uhr) →
+    Uhrkorrektur → schonende Hülle. Vorlagen (`vorlagen.ts`) und Papierkorb-
+    Anzeige (`papierkorb-frist.ts`) nutzen `geprueftesJetztMs()`. Die
+    Oberfläche warnt „Geräteuhr prüfen" (`uhr-warnung.tsx`).
   - **Kein Schemafeld:** Die Frist leitet sich aus `stand` und `uebung` ab und
     gilt so auch für schon verteilte QR-Codes.
 - **Papierkorb statt endgültigem Löschen** – Prinzip „Nichts geht verloren"
