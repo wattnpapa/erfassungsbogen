@@ -366,6 +366,12 @@ describe("einsatzPdfDokument()", () => {
    * liegen am Morgen mehrere Ausdrucke; wer den jüngsten greift, darf nicht 8
    * Kräfte für 50 halten.
    */
+  it("druckt die laufende Nummer in den Kasten „Stand am Meldekopf“ (R4-A1)", () => {
+    const dd = einsatzPdfDokument("Hochwasser", [{ bogen: basisBogen(), qr: QR, nummer: 3 }]);
+    expect(texte(dd.content).join("\n").replace(/\u200B/g, "")).toContain("Stand am Meldekopf (Hochwasser");
+    expect(texte(dd.content).join("\n").replace(/\u200B/g, "")).toMatch(/erstellt [^)]*\): Nr\. 3 · Eingetroffen/);
+  });
+
   it("kennzeichnet einen Nachtrag in Kopf, Summen und Fußzeile (R4-W4)", () => {
     const seit = new Date("2026-10-05T20:49").getTime();
     const dd = einsatzPdfDokument("Hochwasser", [{ bogen: folgeBogen(), qr: QR, vorher: basisBogen() }], undefined, undefined, seit);

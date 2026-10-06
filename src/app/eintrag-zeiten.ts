@@ -64,6 +64,14 @@ declare module "@bos/meldekopf/einsaetze" {
      * (Date.now()); fehlt = abgeglichen bzw. nicht vom Papier.
      */
     vomPapier?: number;
+    /**
+     * Laufende Nummer, wie sie auf dem gedruckten Lageblatt stand — nur gesetzt,
+     * wenn der Papier-Abgleich sie übernommen hat (Audit Runde 4, R4-A1). Ohne
+     * sie zählt die App nach dem Eingang (`meldungsNummern`); nach einem
+     * Wiederanlauf vom Papier ergäbe das andere Nummern als auf dem Blatt an
+     * der Wand. Eine gesetzte Nummer ist fest, die übrigen rücken um sie herum.
+     */
+    nummer?: number;
   }
 }
 
@@ -565,6 +573,10 @@ export interface PapierAbgleichZeile {
   /** Nur bei ABGERUECKT. */
   abgerueckAm?: number;
   zug: string;
+  /** Auftrag / Notiz vom Blatt; fehlt = unverändert, leer = entfernen (R4-A2). */
+  notiz?: string;
+  /** „Nr." vom Blatt; fehlt = keine feste Nummer (R4-A1). */
+  nummer?: number;
 }
 
 /**
@@ -602,6 +614,18 @@ export function papierAbgleichUebernehmen(einsatzId: string, zeilen: PapierAbgle
       const war = e.zugEtikett;
       for (const x of s.eintraege) if (x.einheitSchluessel === e.einheitSchluessel) x.zugEtikett = zug;
       vermerken(e, zug ? (war ? `Zug: ${zug} (war: ${war})` : `Zug: ${zug}`) : `Zug-Zuordnung entfernt (war: ${war})`);
+    }
+    if (z.notiz !== undefined) {
+      const notiz = z.notiz.trim() || undefined;
+      const war = e.notiz;
+      if (notiz !== war) {
+        if (notiz) e.notiz = notiz;
+        else delete e.notiz;
+        vermerken(e, !notiz ? `Auftrag/Notiz entfernt (war: ${war})` : war ? `Auftrag/Notiz geändert: ${notiz} (war: ${war})` : `Auftrag/Notiz: ${notiz}`);
+      }
+    }
+    if (z.nummer != null) {
+      for (const x of s.eintraege) if (x.einheitSchluessel === e.einheitSchluessel) x.nummer = z.nummer;
     }
     delete e.vomPapier;
   }

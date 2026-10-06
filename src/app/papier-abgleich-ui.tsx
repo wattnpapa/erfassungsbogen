@@ -42,6 +42,10 @@ interface Zeile {
   abgerueckt: boolean;
   abgerueckAm: string;
   zug: string;
+  /** Auftrag / Notiz laut Blatt (R4-A2). */
+  notiz: string;
+  /** „Nr." laut Blatt, als Text für das Eingabefeld (R4-A1). */
+  nummer: string;
 }
 
 export function PapierAbgleich(props: {
@@ -66,6 +70,8 @@ export function PapierAbgleich(props: {
         abgerueckt: e.status === MeldeStatus.ABGERUECKT,
         abgerueckAm: e.abgerueckAm != null ? zuLokal(e.abgerueckAm) : "",
         zug: e.zugEtikett ?? "",
+        notiz: e.notiz ?? "",
+        nummer: "",
       })),
     );
   const aendern = (i: number, teil: Partial<Zeile>) =>
@@ -80,14 +86,27 @@ export function PapierAbgleich(props: {
       if (ein == null) fehler.push(`${z.name}: Eintreffzeit fehlt`);
       if (z.abgerueckt && ab == null) fehler.push(`${z.name}: Abrückzeit fehlt`);
       if (ein != null && ab != null && ab < ein) fehler.push(`${z.name}: Abrücken vor dem Eintreffen`);
+      const nr = z.nummer.trim() === "" ? undefined : Number(z.nummer.trim());
+      if (nr != null && (!Number.isInteger(nr) || nr < 1)) fehler.push(`${z.name}: „Nr.“ muss eine ganze Zahl ab 1 sein`);
       return {
         eintragId: z.eintragId,
         eingetroffenAm: ein ?? 0,
         status: z.abgerueckt ? MeldeStatus.ABGERUECKT : MeldeStatus.ANWESEND,
         abgerueckAm: ab ?? undefined,
         zug: z.zug,
+        notiz: z.notiz,
+        ...(nr != null && Number.isInteger(nr) && nr >= 1 ? { nummer: nr } : {}),
       } as const;
     });
+    // Eine Nummer gilt für eine Einheit: zweimal dieselbe vom Blatt wäre ein Tippfehler.
+    const gesehen = new Map<number, string>();
+    for (const d of daten) {
+      if (!("nummer" in d) || d.nummer == null) continue;
+      const wer = zeilen.find((z) => z.eintragId === d.eintragId)!.name;
+      const schon = gesehen.get(d.nummer);
+      if (schon) fehler.push(`„Nr. ${d.nummer}“ steht bei ${schon} und ${wer}`);
+      else gesehen.set(d.nummer, wer);
+    }
     if (fehler.length > 0) {
       await zeigeHinweis({ titel: "Abgleich unvollständig", text: `${fehler.join("; ")}. Nichts übernommen.` });
       return;
@@ -98,8 +117,22 @@ export function PapierAbgleich(props: {
       await zeigeHinweis({ titel: "Abgleich", text: e instanceof SpeicherVollFehler ? e.message : String(e) });
       return;
     }
+    const ohneNummer = zeilen.filter((z) => z.nummer.trim() === "").length;
     setZeilen(null);
     onGeaendert();
+    // Ohne „Nr. laut Blatt" vergibt die App die Nummern nach dem Eingang — das
+    // sind nach einem Wiederanlauf vom Papier meist andere als auf dem Blatt
+    // an der Wand (R4-A1). Das gehört gesagt, bevor jemand „Nr. 3 rückt ab"
+    // funkt.
+    if (ohneNummer > 0) {
+      await zeigeHinweis({
+        titel: "Nummern neu vergeben",
+        text:
+          `Für ${ohneNummer === 1 ? "1 Einheit" : `${ohneNummer} Einheiten`} stand keine „Nr. laut Blatt“ im Abgleich. ` +
+          "Ihre Nummern vergibt die App neu, sie können von denen auf dem alten Lageblatt abweichen: " +
+          "neues Lageblatt drucken und das alte abnehmen.",
+      });
+    }
   }
 
   if (!zeilen) {
@@ -109,8 +142,8 @@ export function PapierAbgleich(props: {
           <strong>
             Vom Papier eingelesen, Lage noch nicht abgeglichen: {offen.length === 1 ? "1 Einheit" : `${offen.length} Einheiten`}.
           </strong>{" "}
-          Eintreffzeit ist die Zeit des Einlesens, alle stehen als anwesend und ohne Zug. Die Angaben vom Blatt (Seite 1 bzw.
-          Kasten „Stand am Meldekopf“) hier in einem Schritt eintragen.
+          Eintreffzeit ist die Zeit des Einlesens, alle stehen als anwesend, ohne Zug, Auftrag und Nummer. Die Angaben vom
+          Blatt (Seite 1 bzw. Kasten „Stand am Meldekopf“) hier in einem Schritt eintragen.
         </p>
         <button type="button" className="primaer" onClick={oeffnen}>
           Lage vom Papier abgleichen…
@@ -122,7 +155,10 @@ export function PapierAbgleich(props: {
   return (
     <section className="karte papier-abgleich" aria-label="Lage vom Papier abgleichen">
       <h3>Lage vom Papier abgleichen ({zeilen.length})</h3>
-      <p className="hinweis">Je Einheit, was auf dem Blatt steht. „Abgleich übernehmen“ schreibt alles auf einmal.</p>
+      <p className="hinweis">
+        Je Einheit, was auf dem Blatt steht — auch „Nr.“ und „Auftrag / Notiz“ aus dem Kasten „Stand am Meldekopf“.
+        „Abgleich übernehmen“ schreibt alles auf einmal.
+      </p>
       <datalist id={listeId}>
         {zuege.map((z) => (
           <option key={z} value={z} />
@@ -132,6 +168,18 @@ export function PapierAbgleich(props: {
         {zeilen.map((z, i) => (
           <li key={z.eintragId}>
             <strong>{z.name}</strong>
+            {/* Die Nummer vom Blatt hält die Nummern des Lageblatts an der Wand
+                stabil (R4-A1). Leer = die App vergibt eine. */}
+            <label className="feld">
+              Nr. laut Blatt (leer = App vergibt)
+              <input
+                type="text"
+                inputMode="numeric"
+                pattern="[0-9]*"
+                value={z.nummer}
+                onChange={(e) => aendern(i, { nummer: e.target.value })}
+              />
+            </label>
             <label className="feld">
               Eingetroffen am
               <input type="datetime-local" value={z.eingetroffen} onChange={(e) => aendern(i, { eingetroffen: e.target.value })} />
@@ -160,6 +208,12 @@ export function PapierAbgleich(props: {
             <label className="feld">
               Zug (leer = ohne)
               <input type="text" list={listeId} value={z.zug} onChange={(e) => aendern(i, { zug: e.target.value })} />
+            </label>
+            {/* Der Abgleich nimmt alles auf, was im Kasten steht: Pumpe 2 defekt
+                oder „nur für Abschnitt Nord" gingen sonst verloren (R4-A2). */}
+            <label className="feld">
+              Auftrag / Notiz (leer = keiner)
+              <input type="text" value={z.notiz} onChange={(e) => aendern(i, { notiz: e.target.value })} />
             </label>
           </li>
         ))}

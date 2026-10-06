@@ -860,7 +860,13 @@ export function stiftHinweis(stand: string): string {
 }
 
 export function meldekopfVermerk(e: UebersichtEintrag, name: string, erstellt: number): MeldekopfVermerk {
-  const teile = [`Eingetroffen ${e.eingetroffenAm == null ? "(nicht festgehalten)" : zeitLang(e.eingetroffenAm)}`];
+  // Die Nummer steht auch hier: nach einem Wiederanlauf vom Papier fragt der
+  // Abgleich sie ab, damit „Nr. 3 rückt ab" über Funk dieselbe Einheit meint
+  // wie auf dem Blatt an der Wand (R4-A1).
+  const teile = [
+    ...(e.nummer != null ? [`Nr. ${e.nummer}`] : []),
+    `Eingetroffen ${e.eingetroffenAm == null ? "(nicht festgehalten)" : zeitLang(e.eingetroffenAm)}`,
+  ];
   if (e.abgerueckt) {
     teile.push(e.abgerueckAm == null ? "ABGERÜCKT (nicht mehr vor Ort)" : `ABGERÜCKT ${zeitLang(e.abgerueckAm)}`);
   } else {

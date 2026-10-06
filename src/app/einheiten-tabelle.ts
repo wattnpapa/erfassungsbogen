@@ -125,12 +125,34 @@ export function standIstAlt(e: MeldeEintrag): boolean {
  */
 export function meldungsNummern(eintraege: MeldeEintrag[]): Map<string, number> {
   const erste = new Map<string, number>();
+  const fest = new Map<string, number>();
   for (const e of eintraege) {
     const bisher = erste.get(e.einheitSchluessel);
     if (bisher == null || e.empfangenAm < bisher) erste.set(e.einheitSchluessel, e.empfangenAm);
+    if (e.nummer != null && e.nummer >= 1 && !fest.has(e.einheitSchluessel)) fest.set(e.einheitSchluessel, e.nummer);
   }
   const reihe = [...erste].sort((a, b) => a[1] - b[1] || (a[0] < b[0] ? -1 : a[0] > b[0] ? 1 : 0));
-  return new Map(reihe.map(([schluessel], i) => [schluessel, i + 1]));
+  // Vom Papier übernommene Nummern (R4-A1) sind fest — doppelt vergeben gilt sie
+  // nur der ersten Einheit in Eingangsreihenfolge. Alle übrigen Einheiten zählen
+  // in dieser Reihenfolge die kleinsten freien Nummern; ohne feste Nummern ist
+  // das wie bisher 1, 2, 3 …
+  const vergeben = new Map<string, number>();
+  const belegt = new Set<number>();
+  for (const [schluessel] of reihe) {
+    const n = fest.get(schluessel);
+    if (n != null && !belegt.has(n)) {
+      vergeben.set(schluessel, n);
+      belegt.add(n);
+    }
+  }
+  let frei = 1;
+  for (const [schluessel] of reihe) {
+    if (vergeben.has(schluessel)) continue;
+    while (belegt.has(frei)) frei++;
+    vergeben.set(schluessel, frei);
+    belegt.add(frei);
+  }
+  return new Map(reihe.map(([schluessel]) => [schluessel, vergeben.get(schluessel)!]));
 }
 
 /** „Neu": vor weniger als 30 Minuten eingetroffen — was seit der Übernahme dazukam. */
