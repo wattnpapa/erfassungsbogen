@@ -1026,6 +1026,42 @@ describe("Erreichbarkeit entfernen", () => {
  * wieder loswerden lassen, ohne 13-mal „entfernen" — und ohne die Karten zu
  * treffen, die schon jemand ausgefüllt hat.
  */
+/**
+ * Audit Runde 4, R4-H4: Eine neue Person war ungefragt „M“ und „Fleisch“; die
+ * Vorgabe sah wie eine Angabe aus und floss in Unterbringung und Verpflegung.
+ */
+describe("Neue Person: Vorgaben sichtbar als „bitte wählen“ (R4-H4)", () => {
+  it("kennzeichnet Geschlecht und Ernährung, bis die Auswahl berührt wird — auch nach dem Tippen des Namens", async () => {
+    const nutzer = userEvent.setup();
+    buehne();
+    await nutzer.click(screen.getByRole("button", { name: "+ Person hinzufügen" }));
+
+    const geschlecht = screen.getByRole("combobox", { name: "Geschlecht" });
+    const ernaehrung = screen.getByRole("combobox", { name: "Ernährung" });
+    expect(geschlecht.className).toContain("vorgabe-offen");
+    expect(ernaehrung.className).toContain("vorgabe-offen");
+    expect(document.querySelector(".vorgabe-hinweis")!.textContent).toMatch(/^Geschlecht und Ernährung sind nur vorbelegt \(M, Fleisch\) — bitte wählen\./);
+
+    // Namen tippen berührt die Vorgaben nicht.
+    await nutzer.type(screen.getByLabelText("Vorname"), "Anna");
+    expect(screen.getByRole("combobox", { name: "Geschlecht" }).className).toContain("vorgabe-offen");
+
+    await nutzer.selectOptions(screen.getByRole("combobox", { name: "Geschlecht" }), String(Geschlecht.W));
+    expect(screen.getByRole("combobox", { name: "Geschlecht" }).className).not.toContain("vorgabe-offen");
+    expect(screen.getByRole("combobox", { name: "Ernährung" }).className).toContain("vorgabe-offen");
+    expect(document.querySelector(".vorgabe-hinweis")!.textContent).toMatch(/^Ernährung ist nur vorbelegt \(Fleisch\) — bitte wählen\./);
+
+    await nutzer.click(screen.getByRole("combobox", { name: "Ernährung" }));
+    expect(document.querySelector(".vorgabe-hinweis")).toBeNull();
+  });
+
+  it("kennzeichnet bestehende Personen nicht", () => {
+    render(<SchrittBuehne komponente={SchrittPersonal} bogen={{ ...neuerBogen(), personal: [{ ...neuePerson(), vorname: "Jan", nachname: "Meyer" }] }} />);
+    expect(document.querySelector(".vorgabe-offen")).toBeNull();
+    expect(document.querySelector(".vorgabe-hinweis")).toBeNull();
+  });
+});
+
 describe("Vorbelegung entfernen (Schritt 3)", () => {
   it("entfernt nur die Karten ohne Namen und Erreichbarkeit", async () => {
     const nutzer = userEvent.setup();

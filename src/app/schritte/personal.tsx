@@ -328,6 +328,8 @@ function PersonKarte(props: {
   haeufigeFunktionen: readonly VokabularWert[];
   /** Gerade hinzugefügt: die Karte stempelt sich einmal ein. */
   frisch?: boolean;
+  /** Von „+ Person hinzufügen": Geschlecht und Ernährung sind noch Vorgaben (R4-H4). */
+  neueVorgabe?: boolean;
   /** Stelle in der Liste und Listenlänge — für die Umsortier-Knöpfe. */
   index: number;
   anzahl: number;
@@ -340,9 +342,15 @@ function PersonKarte(props: {
   entfernen: (ort?: { x: number; y: number }) => void;
   verschieben: (von: number, nach: number, gruppe: "karte" | "zeile", art: "hoch" | "runter") => void;
 }) {
-  const { person: p, org, vorschlaege, haeufigeFunktionen, frisch, index, anzahl, ansprech, nichtGezaehlt, aendern, entfernen, verschieben } = props;
+  const { person: p, org, vorschlaege, haeufigeFunktionen, frisch, neueVorgabe, index, anzahl, ansprech, nichtGezaehlt, aendern, entfernen, verschieben } = props;
   const karte = useRef<HTMLDivElement>(null);
   useEinzugsstempel(karte, frisch);
+  // Eine neue Person ist ungefragt „M" und „Fleisch": Die Vorgabe sah wie eine
+  // Angabe aus, und beide Werte fließen in Unterbringung und Verpflegung. Bis
+  // jemand die Auswahl berührt, ist sie als „bitte wählen" gekennzeichnet
+  // (Audit Runde 4, R4-H4). Einen Merker im Bogen gibt es nicht (das Format
+  // bleibt), darum gilt das je Karte und Sitzung.
+  const [vorgabe, setVorgabe] = useState({ geschlecht: !!neueVorgabe, ernaehrung: !!neueVorgabe });
   const bezeichnung = personBezeichnung(p, index);
   const set = (patch: Partial<Person>) => aendern({ ...p, ...patch });
   const funktionen = vokabularFuer(org, "funktion");
@@ -441,14 +449,30 @@ function PersonKarte(props: {
         <div className="person-merkmale">
           <div className="zeile">
             <Feld titel="Geschlecht" schmal>
-              <Auswahl value={p.geschlecht} onChange={(e) => set({ geschlecht: Number(e.target.value) })}>
+              <Auswahl
+                value={p.geschlecht}
+                className={vorgabe.geschlecht ? "vorgabe-offen" : undefined}
+                onFocus={() => setVorgabe((v) => ({ ...v, geschlecht: false }))}
+                onChange={(e) => {
+                  setVorgabe((v) => ({ ...v, geschlecht: false }));
+                  set({ geschlecht: Number(e.target.value) });
+                }}
+              >
                 <option value={Geschlecht.M}>M</option>
                 <option value={Geschlecht.W}>W</option>
                 <option value={Geschlecht.D}>D</option>
               </Auswahl>
             </Feld>
             <Feld titel="Ernährung" schmal>
-              <Auswahl value={p.ernaehrung} onChange={(e) => set({ ernaehrung: Number(e.target.value) })}>
+              <Auswahl
+                value={p.ernaehrung}
+                className={vorgabe.ernaehrung ? "vorgabe-offen" : undefined}
+                onFocus={() => setVorgabe((v) => ({ ...v, ernaehrung: false }))}
+                onChange={(e) => {
+                  setVorgabe((v) => ({ ...v, ernaehrung: false }));
+                  set({ ernaehrung: Number(e.target.value) });
+                }}
+              >
                 <option value={Ernaehrung.FLEISCH}>Fleisch</option>
                 <option value={Ernaehrung.VEGETARISCH}>Vegetarisch</option>
                 <option value={Ernaehrung.VEGAN}>Vegan</option>
@@ -456,6 +480,16 @@ function PersonKarte(props: {
             </Feld>
             <FahrerlaubnisFeld person={p} set={set} />
           </div>
+          {(vorgabe.geschlecht || vorgabe.ernaehrung) && (
+            <p className="hinweis warnung-text vorgabe-hinweis" role="status">
+              {vorgabe.geschlecht && vorgabe.ernaehrung
+                ? "Geschlecht und Ernährung sind nur vorbelegt (M, Fleisch) — bitte wählen."
+                : vorgabe.geschlecht
+                  ? "Geschlecht ist nur vorbelegt (M) — bitte wählen."
+                  : "Ernährung ist nur vorbelegt (Fleisch) — bitte wählen."}{" "}
+              Beides zählt in Unterbringung und Verpflegung.
+            </p>
+          )}
         </div>
         <div className="person-faehigkeiten">
           <Feld titel="Funktionen / Zusatzfunktionen">
@@ -758,6 +792,7 @@ export function SchrittPersonal({ bogen, aendern: aendernRoh }: SchrittProps) {
     const neu = neuePerson();
     setFokusNeue(true);
     setFrischeKarte(neu);
+    setVorgabeKarte(neu);
     if (!schnell) setZurNeuen(bogen.personal.length);
     aendern({ personal: [...bogen.personal, neu] });
   }
@@ -794,6 +829,8 @@ export function SchrittPersonal({ bogen, aendern: aendernRoh }: SchrittProps) {
   // Objektidentität statt Index — siehe fahrzeuge.tsx: ein Index rutscht beim
   // Löschen einer anderen Karte auf eine bestehende.
   const [frischeKarte, setFrischeKarte] = useState<Person | null>(null);
+  // Die zuletzt von „+ Person hinzufügen" angelegte Karte: Geschlecht und Ernährung sind dort Vorgaben (R4-H4).
+  const [vorgabeKarte, setVorgabeKarte] = useState<Person | null>(null);
   // „+ Person hinzufügen" oben: nach dem Anlegen zur neuen Karte springen.
   const [zurNeuen, setZurNeuen] = useState<number | null>(null);
   useEffect(() => {
@@ -1131,6 +1168,7 @@ export function SchrittPersonal({ bogen, aendern: aendernRoh }: SchrittProps) {
             vorschlaege={vorschlaege}
             haeufigeFunktionen={funktionsauswahl}
             frisch={p === frischeKarte}
+            neueVorgabe={p === vorgabeKarte}
             index={i}
             anzahl={bogen.personal.length}
             ansprech={!nurStaerke && i === 0}
@@ -1169,6 +1207,7 @@ export function SchrittPersonal({ bogen, aendern: aendernRoh }: SchrittProps) {
           // hat — der Blick liegt unten. Der Stempel sagt, wohin er soll.
           const neu = neuePerson();
           setFrischeKarte(neu);
+          setVorgabeKarte(neu);
           aendern({ personal: [...bogen.personal, neu] });
         }}
       >
