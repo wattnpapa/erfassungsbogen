@@ -660,7 +660,10 @@ export function SchrittEinheit({ bogen, aendern: aendernRoh }: SchrittProps) {
           )}
         </div>
       ))}
-      <p>
+      {/* R4-G4: Zwei Knöpfe, die Verschiedenes tun („+ übergeordnete Ebene" und
+          die OV/RB/LV-Vorlage), standen ohne Lücke übereinander — ein grober
+          Tipp lud die falsche Ebene. Jetzt mit 12 px Abstand. */}
+      <p className="knopfreihe">
         <button
           type="button"
           onClick={() => {
@@ -673,7 +676,7 @@ export function SchrittEinheit({ bogen, aendern: aendernRoh }: SchrittProps) {
           }}
         >
           + übergeordnete Ebene
-        </button>{" "}
+        </button>
         {e.organisation === OrganisationsTyp.THW && e.hierarchie.length === 1 && (
           <button
             type="button"

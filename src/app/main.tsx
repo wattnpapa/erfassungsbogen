@@ -13,6 +13,7 @@ import { createRoot } from "react-dom/client";
 import { App } from "./app";
 import { DebugLeiste, debugAktiv, wendePlattformKlasseAn, wendeRahmenAn } from "./debug-plattform";
 import { wendeAnzeigeModusAn } from "./anzeige-modus";
+import { tastaturWaechterStarten } from "./tastatur";
 import { statistikStarten } from "./statistik";
 import { dauerhaftWennWertvoll, speicherVerdrahten } from "./speicher-browser";
 
@@ -27,6 +28,8 @@ dauerhaftWennWertvoll();
 wendePlattformKlasseAn();
 wendeRahmenAn();
 wendeAnzeigeModusAn();
+// Feste Leiste weicht der Bildschirmtastatur (R4-G3).
+tastaturWaechterStarten();
 
 // Im Debug-Modus eine schwebende Leiste zum Umschalten der Vorschau zeigen.
 function Wurzel() {

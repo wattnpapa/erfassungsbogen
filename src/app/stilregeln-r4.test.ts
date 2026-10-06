@@ -8,6 +8,7 @@
  */
 
 import { readFileSync } from "node:fs";
+import { TASTATUR_KLASSE } from "./tastatur";
 import { describe, expect, it } from "vitest";
 import { ANZEIGE_MODI } from "./anzeige-modus";
 
@@ -133,5 +134,53 @@ describe("Moduswahl (R4-M7, R4-G5)", () => {
   it("jeder Modus nennt seinen Zweck in einer Zeile, „Feld“ die großen Tasten", () => {
     for (const m of ANZEIGE_MODI) expect(m.kurz.length).toBeGreaterThan(0);
     expect(ANZEIGE_MODI.find((m) => m.modus === "feld")!.kurz).toMatch(/Tasten/);
+  });
+});
+
+describe("QR-Vollbild bei großer Schrift: der Code hat Vorrang (R4-M4)", () => {
+  it("Schrift, Knopfmaß, Polster und Ruhezone sind in px gedeckelt", () => {
+    expect(bloecke("dialog.qr-vollbild").join("\n")).toMatch(/font-size:\s*min\(var\(--t-m\), 18px\)/);
+    expect(bloecke("dialog.qr-vollbild p.qr-vollbild-kopf").join("\n")).toMatch(/font-size:\s*min\(var\(--t-xl\), 22px\)/);
+    expect(bloecke("dialog.qr-vollbild button").join("\n")).toMatch(/min-height:\s*min\([^;]*44px/);
+    expect(bloecke("dialog.qr-vollbild .qr-vollbild-code img").join("\n")).toMatch(/padding:\s*min\(1\.5rem, 24px\)/);
+  });
+
+  it("der Code behält höchstens 192 px Mindesthöhe, nicht 12rem (384 px bei 200 %)", () => {
+    expect(bloecke("dialog.qr-vollbild > .qr-vollbild-code").join("\n")).toMatch(/min-height:\s*min\(12rem, 192px\)/);
+  });
+
+  it("die Blätterknöpfe brechen nicht um", () => {
+    expect(bloecke("dialog.qr-vollbild > .qr-vollbild-nav.mit-teilen > button:not(.primaer)").join("\n")).toMatch(/white-space:\s*nowrap/);
+  });
+});
+
+describe("Abstände zwischen gegensätzlichen Knöpfen (R4-G4)", () => {
+  it("Blättern und „Schließen“ im QR-Vollbild: mindestens 12 px", () => {
+    expect(bloecke("dialog.qr-vollbild > .qr-vollbild-nav.mit-teilen").join("\n")).toMatch(
+      /gap:\s*max\(1rem, 14px\) max\(0\.8rem, 12px\)/,
+    );
+  });
+
+  it("Knopfreihen, Entwurfskarte und Quittungspaar tragen 12 px", () => {
+    expect(bloecke(".knopfreihe").join("\n")).toMatch(/gap:\s*12px/);
+    expect(bloecke(".aktionen").join("\n")).toMatch(/gap:\s*12px/);
+    expect(bloecke(".entwurf-karte .entwurf-aktionen").join("\n")).toMatch(/gap:\s*12px/);
+  });
+
+  it("„+ übergeordnete Ebene“ und die OV-Vorlage stehen in einer Knopfreihe, nicht als Fließtext", () => {
+    const quelle = readFileSync(new URL("./schritte/einheit.tsx", import.meta.url), "utf8");
+    expect(quelle).toMatch(/<p className="knopfreihe">\s*<button/);
+  });
+});
+
+describe("Bildschirmtastatur (R4-G3)", () => {
+  it("die feste Leiste ist bei offener Tastatur ausgeblendet", () => {
+    expect(TASTATUR_KLASSE).toBe("tastatur-offen");
+    expect(bloecke("html.tastatur-offen footer.nav").join("\n")).toMatch(/display:\s*none/);
+  });
+
+  it("der Wächter wird beim Start der App angeschaltet", () => {
+    const main = readFileSync(new URL("./main.tsx", import.meta.url), "utf8");
+    expect(main).toMatch(/tastaturWaechterStarten\(\);/);
   });
 });

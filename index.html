@@ -459,7 +459,10 @@
     }
     .start > p.meldung { color: var(--text); }
     .start > p.fehler { color: var(--alarm); }
-    .aktionen { display: flex; gap: var(--r-2); justify-content: flex-start; flex-wrap: wrap; margin-top: var(--r-5); }
+    /* Zwei Knöpfe mit verschiedener Wirkung brauchen eine Lücke, die ein Handschuh
+       sieht (R4-G4): mindestens 12 px, auch wo sie umbrechen und übereinanderstehen. */
+    .knopfreihe { display: flex; flex-wrap: wrap; gap: 12px; }
+    .aktionen { display: flex; gap: 12px; justify-content: flex-start; flex-wrap: wrap; margin-top: var(--r-5); }
     .aktionen > button, .aktionen > .datei-knopf, .aktionen > .einlese > button {
       min-height: calc(2.75rem + var(--ziel)); padding: 0.6rem 1.1rem; font-size: var(--t-m);
     }
@@ -1416,6 +1419,14 @@
       padding-left: max(min(1rem, 18px), env(safe-area-inset-left));
       padding-right: max(min(1rem, 18px), env(safe-area-inset-right));
     }
+    /* R4-G3: Bei offener Bildschirmtastatur (Fokus in einer Texteingabe UND
+       deutlich kleinere sichtbare Höhe, src/app/tastatur.ts) weicht die feste
+       Leiste. Sie lag über der Vorschlagsliste, ein Tipp auf den ersten
+       Vorschlag traf „In Einsatz übernehmen". */
+    html.tastatur-offen footer.nav { display: none !important; }
+    /* Beim Öffnen der Tastatur rückt das Feld nach oben (tastatur.ts); die
+       Beschriftung darüber bleibt im Bild. */
+    input:not([type="checkbox"]):not([type="radio"]), textarea { scroll-margin-top: 4.5rem; }
     footer.nav .platzhalter { flex: 1; }
     /* R3-L6: Moduswechsel aus der festen Leiste. Der Knopf ist schmal (nur
        „◐"), die Wahl klappt über der Leiste auf, damit sie keine Zeile
@@ -1768,7 +1779,8 @@
     .entwurf-karte button { flex: 0 0 auto; }
     /* „Fortsetzen" und „Verwerfen" stehen als Paar enger beieinander als die
        Teile der Karte — sonst wirkt das Verwerfen wie eine eigene Spalte. */
-    .entwurf-karte .entwurf-aktionen { flex: 0 0 auto; display: flex; gap: var(--r-2); }
+    /* R4-G4: „Fortsetzen" und „Verwerfen" standen 8 px auseinander. */
+    .entwurf-karte .entwurf-aktionen { flex: 0 0 auto; display: flex; gap: 12px; }
     /* Auf dem Telefon reicht die Zeile nicht für Zeichen, Name und Knöpfe: der
        Einheitsname würde mitten im Wort umbrechen. Dann rutschen die Knöpfe auf
        eine eigene Zeile und der Name bekommt die volle Breite. */
@@ -3957,7 +3969,7 @@
        ältere Browser nehmen das Maß davor. Erst unter 12rem Restplatz
        (große Schrift) rollt das Overlay. */
     dialog.qr-vollbild > .qr-vollbild-code {
-      flex: 1 1 0; min-height: 12rem; align-self: stretch;
+      flex: 1 1 0; min-height: min(12rem, 192px); align-self: stretch;
       display: flex; align-items: center; justify-content: center;
       container-type: size;
     }
@@ -3968,20 +3980,44 @@
       height: auto; aspect-ratio: 1 / 1;
       flex: none;
     }
-    dialog.qr-vollbild p.qr-vollbild-teil { font-size: var(--t-l); }
+    dialog.qr-vollbild p.qr-vollbild-teil { font-size: min(var(--t-l), 20px); }
+    /* R4-M4: Im Vollbild hat der Code Vorrang vor der Schrift. Bei 200 % war
+       der Kopf 328 px hoch, die klebende Knopfleiste 270 px, der Code begann
+       hinter ihr (509 px, sichtbar erst nach 504 px Rollen); quer öffnete das
+       Overlay bei scrollTop 467 mit leerer linker Spalte. Wie die Fußleiste
+       (R2-M1) sind Schrift, Knopfmaß, Polster und Ruhezone nach oben in px
+       gedeckelt — bei normaler Schrift ändert sich nichts, im Feld-Modus
+       gewinnt der Code 6 px Ruhezone zurück. */
+    dialog.qr-vollbild { font-size: min(var(--t-m), 18px); padding: min(1rem, 16px); gap: min(0.8rem, 13px); }
+    dialog.qr-vollbild p.qr-vollbild-kopf { font-size: min(var(--t-xl), 22px); }
+    dialog.qr-vollbild .hinweis { font-size: min(var(--t-xs), 14px); }
+    dialog.qr-vollbild button {
+      font-size: min(var(--t-m), 18px); min-height: min(calc(var(--ziel-basis) + var(--ziel)), calc(44px + var(--ziel)));
+      padding: min(0.55rem, 10px) min(1.1rem, 18px);
+    }
+    dialog.qr-vollbild .qr-vollbild-code img { padding: min(1.5rem, 24px); }
+    /* R4-G4: Blättern und „Schließen“ mit mindestens 12 px dazwischen — ein
+       grober Tipp unter „Weiter zu Teil 2 →“ traf „Schließen“ (11 px), das
+       Vollbild ging zu. */
+    dialog.qr-vollbild > .qr-vollbild-nav { gap: max(0.8rem, 12px); }
+    /* Die Blätterknöpfe bleiben einzeilig: „← Teil 1“ und „Weiter zu Teil 3 →“
+       brachen bei 320 px und quer um und machten die Leiste 76 statt 49 px hoch. */
+    dialog.qr-vollbild > .qr-vollbild-nav.mit-teilen > button:not(.primaer) {
+      font-size: min(var(--t-m), 16px); padding-inline: min(1.1rem, 12px); white-space: nowrap;
+    }
     /* Blättern und Schließen in zwei Zeilen statt drei: „← Teil 1" und
        „Nächster Teil (2 von 2) →" nebeneinander, „Schließen" darunter über
        die ganze Breite. Drei umbrechende Knöpfe nahmen bei 320 px Breite
        180 px Höhe, die dem Code fehlten (R3-H2). */
     dialog.qr-vollbild > .qr-vollbild-nav.mit-teilen {
-      display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 0.6rem;
+      display: grid; grid-template-columns: auto minmax(0, 1fr); gap: max(1rem, 14px) max(0.8rem, 12px);
     }
     dialog.qr-vollbild > .qr-vollbild-nav.mit-teilen > .primaer { grid-column: 1 / -1; }
     /* Telefonhöhe: Absender eine Stufe kleiner, Helligkeitstipp und der
        Nachsatz zu „Teil x von n" entfallen — Code, Teilnummer und Knöpfe
        gehen vor, auch im Feld-Modus mit größerer Schrift. */
     @media (max-height: 720px) {
-      dialog.qr-vollbild p.qr-vollbild-kopf { font-size: var(--t-l); }
+      dialog.qr-vollbild p.qr-vollbild-kopf { font-size: min(var(--t-l), 20px); }
       dialog.qr-vollbild .qr-vollbild-tipp,
       dialog.qr-vollbild .qr-vollbild-teil-zusatz { display: none; }
     }
