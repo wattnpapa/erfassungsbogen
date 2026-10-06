@@ -318,7 +318,18 @@ export interface DateiAnteil {
   zeilen: string[];
 }
 
-export function stapelBericht(e: StapelErgebnis, neu: number, uebersprungen: number, dateien?: DateiAnteil): string[] {
+export function stapelBericht(
+  e: StapelErgebnis,
+  neu: number,
+  uebersprungen: number,
+  dateien?: DateiAnteil,
+  /**
+   * Direkt unter dem Bericht steht der Abgleich vom Papier („Lage vom Papier
+   * abgleichen…“): Dann genügt ein kurzer Verweis statt des langen Hinweises,
+   * und der Knopf bleibt im Bild (R4-A6).
+   */
+  abgleichFolgt = false,
+): string[] {
   const zeilen: string[] = [];
   const neuGesamt = neu + (dateien?.neu ?? 0);
   const uebersprungenGesamt = uebersprungen + (dateien?.uebersprungen ?? 0);
@@ -341,10 +352,30 @@ export function stapelBericht(e: StapelErgebnis, neu: number, uebersprungen: num
           : ""),
     );
   }
-  for (const f of e.fehler) zeilen.push(`${f.datei}: ${f.text}`);
-  if (neu > 0) zeilen.push(STIFT_HINWEIS, LAGE_NACHTRAGEN_HINWEIS);
+  // Fehlendes zuerst, dann die Seiten ohne Code: Ein Stapel ganzer Bogenseiten
+  // meldete jede Seite ohne Code einzeln („s-01.png: Kein QR-Code im Bild
+  // gefunden“, 10 Zeilen bei 19 Bildern, 31 bei 30 Einheiten) und begrub
+  // darunter die echte Warnung (Audit Runde 4, R4-A6).
+  const ohneCode = e.fehler.filter((f) => f.grund === "kein-code");
+  const zusammenfassen = ohneCode.length >= 3 || (ohneCode.length >= 2 && e.funde.length + neu + uebersprungen > 0);
+  for (const f of e.fehler) if (!(zusammenfassen && f.grund === "kein-code")) zeilen.push(`${f.datei}: ${f.text}`);
+  if (zusammenfassen) zeilen.push(ohneCodeZeile(ohneCode.map((f) => f.datei)));
+  if (neu > 0) zeilen.push(STIFT_HINWEIS, abgleichFolgt ? LAGE_ABGLEICH_KURZ : LAGE_NACHTRAGEN_HINWEIS);
   return zeilen;
 }
+
+/** Bilder ohne QR-Code in einer Zeile, mit den ersten Dateinamen. */
+function ohneCodeZeile(namen: string[]): string {
+  const zeigen = namen.slice(0, 3).join(", ");
+  return (
+    `${namen.length} Bilder ohne QR-Code (${zeigen}${namen.length > 3 ? ", …" : ""}) — Bogen- und Übersichtsseiten tragen keinen. ` +
+    "Fehlt ein Bogen, dessen Codeseite noch einmal fotografieren."
+  );
+}
+
+/** Kurzer Verweis auf den Abgleich, der direkt unter dem Bericht steht (R4-A6). */
+export const LAGE_ABGLEICH_KURZ =
+  "Eintreffzeit, Status, Zug und Nummer stehen nicht im Code: „Lage vom Papier abgleichen…“ trägt sie vom Blatt ein.";
 
 /**
  * Ein Foto zeigt Papier — und auf Papier wird mit dem Stift korrigiert. Der

@@ -11,7 +11,7 @@
  * Bis dahin tragen die Karten „vom Papier, Zeiten prüfen".
  */
 
-import { useId, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { MeldeStatus, type MeldeEintrag } from "@bos/meldekopf/einsaetze";
 import { geltendeJeEinheit } from "./fassung-vorrang";
 import { einheitAnzeigename } from "./hilfen";
@@ -54,11 +54,36 @@ export function PapierAbgleich(props: {
   /** Züge, die in der Sammlung schon vorkommen — Vorschläge fürs Zugfeld. */
   zuege: string[];
   onGeaendert: () => void;
+  /**
+   * Zählt hoch, wenn der Abgleich von außen geöffnet werden soll — der Knopf im
+   * Bericht von „Bögen einlesen…“ (R4-A6). 0 = nie angestoßen.
+   */
+  anstoss?: number;
 }) {
   const { einsatzId, eintraege, zuege, onGeaendert } = props;
   const offen = offenVomPapier(eintraege);
   const [zeilen, setZeilen] = useState<Zeile[] | null>(null);
   const listeId = useId();
+  const karte = useRef<HTMLElement>(null);
+  const letzterAnstoss = useRef(props.anstoss ?? 0);
+  const anstoss = props.anstoss ?? 0;
+  const offenAnzahl = offen.length;
+  const insBild = useRef(false);
+  const oeffnenRef = useRef<(() => void) | null>(null);
+  // Hooks vor dem frühen Ausstieg. Öffnet den Abgleich (wie sein eigener Knopf)
+  // und holt ihn ins Bild, sobald die Liste steht.
+  useEffect(() => {
+    if (anstoss === letzterAnstoss.current) return;
+    letzterAnstoss.current = anstoss;
+    if (offenAnzahl === 0) return;
+    insBild.current = true;
+    oeffnenRef.current?.();
+  }, [anstoss, offenAnzahl]);
+  useEffect(() => {
+    if (!zeilen || !insBild.current) return;
+    insBild.current = false;
+    karte.current?.scrollIntoView?.({ block: "start" });
+  }, [zeilen]);
   if (offen.length === 0) return null;
 
   const oeffnen = () =>
@@ -74,6 +99,7 @@ export function PapierAbgleich(props: {
         nummer: "",
       })),
     );
+  oeffnenRef.current = oeffnen;
   const aendern = (i: number, teil: Partial<Zeile>) =>
     setZeilen((z) => (z ? z.map((x, j) => (j === i ? { ...x, ...teil } : x)) : z));
 
@@ -137,7 +163,7 @@ export function PapierAbgleich(props: {
 
   if (!zeilen) {
     return (
-      <section className="karte papier-abgleich" aria-label="Lage vom Papier abgleichen">
+      <section className="karte papier-abgleich" aria-label="Lage vom Papier abgleichen" ref={karte}>
         <p>
           <strong>
             Vom Papier eingelesen, Lage noch nicht abgeglichen: {offen.length === 1 ? "1 Einheit" : `${offen.length} Einheiten`}.
@@ -153,7 +179,7 @@ export function PapierAbgleich(props: {
   }
 
   return (
-    <section className="karte papier-abgleich" aria-label="Lage vom Papier abgleichen">
+    <section className="karte papier-abgleich" aria-label="Lage vom Papier abgleichen" ref={karte}>
       <h3>Lage vom Papier abgleichen ({zeilen.length})</h3>
       <p className="hinweis">
         Je Einheit, was auf dem Blatt steht — auch „Nr.“ und „Auftrag / Notiz“ aus dem Kasten „Stand am Meldekopf“.

@@ -765,6 +765,8 @@ export function EinsatzDetail(props: {
   onEinlesen?: (daten: File[], bilder: File[]) => void;
   /** Rückmeldung des Einlesens, unter den Aufnahme-Knöpfen gezeigt (R3-L1). */
   einleseQuittung?: ReactNode;
+  /** Zählt hoch, wenn der Abgleich vom Papier geöffnet werden soll — Knopf im Einlese-Bericht (R4-A6). */
+  abgleichAnstoss?: number;
   onExport: () => void;
   /** Die Ausgabewege bekommen den gewählten Umfang mit: alle Bögen oder nur die seit dem letzten Export neuen. */
   onCsvExport: (umfang: ExportUmfang) => void;
@@ -1259,6 +1261,7 @@ export function EinsatzDetail(props: {
         eintraege={einsatz.eintraege}
         zuege={[...new Set(einsatz.eintraege.map((e) => e.zugEtikett).filter((z): z is string => !!z))].sort()}
         onGeaendert={onGeaendert}
+        anstoss={props.abgleichAnstoss}
       />
 
       {/* Was seit der letzten Kenntnisnahme kam: mit Namen, mit der Änderung

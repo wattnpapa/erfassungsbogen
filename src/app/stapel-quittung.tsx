@@ -10,7 +10,7 @@
  */
 
 import { useEffect, useRef } from "react";
-import type { TeileMerker } from "./qr-stapel";
+import { LAGE_ABGLEICH_KURZ, LAGE_NACHTRAGEN_HINWEIS, STIFT_HINWEIS, type TeileMerker } from "./qr-stapel";
 
 export function StapelQuittung(props: {
   /** „3 von 12 Bildern gelesen…" — leer, solange kein Stapel läuft. */
@@ -20,6 +20,8 @@ export function StapelQuittung(props: {
   onSchliessen: () => void;
   /** Teile unvollständiger Bögen, die für den nächsten Durchgang bereitliegen. */
   merker?: TeileMerker;
+  /** Öffnet „Lage vom Papier abgleichen…“ — der Knopf steht im Bericht, im Bild (R4-A6). */
+  onAbgleich?: () => void;
 }) {
   const standRef = useRef<HTMLParagraphElement>(null);
   const berichtRef = useRef<HTMLElement>(null);
@@ -39,6 +41,13 @@ export function StapelQuittung(props: {
   }, [hatBericht, props.bericht]);
 
   const gemerkt = props.merker?.anzahl() ?? 0;
+  // Ergebnis und Fehlendes zuerst, dann der Knopf, dann die langen Hinweise:
+  // Der Abgleich-Knopf lag nach dem Einlesen einen Bildschirm tiefer, hinter
+  // zehn Zeilen „Kein QR-Code im Bild gefunden“ (Audit Runde 4, R4-A6).
+  const hinweisZeilen = new Set([STIFT_HINWEIS, LAGE_ABGLEICH_KURZ, LAGE_NACHTRAGEN_HINWEIS]);
+  const befund = props.bericht.filter((z) => !hinweisZeilen.has(z));
+  const hinweise = props.bericht.filter((z) => hinweisZeilen.has(z));
+  const abgleich = !!props.onAbgleich && props.bericht.includes(LAGE_ABGLEICH_KURZ);
 
   return (
     <>
@@ -59,10 +68,24 @@ export function StapelQuittung(props: {
         <section className="karte" ref={berichtRef} tabIndex={-1} aria-labelledby="stapel-quittung-titel">
           <h2 id="stapel-quittung-titel">Stapel eingelesen</h2>
           <ul>
-            {props.bericht.map((zeile) => (
+            {befund.map((zeile) => (
               <li key={zeile}>{zeile}</li>
             ))}
           </ul>
+          {abgleich && (
+            <p>
+              <button type="button" className="primaer" onClick={props.onAbgleich}>
+                Lage vom Papier abgleichen…
+              </button>
+            </p>
+          )}
+          {hinweise.length > 0 && (
+            <ul>
+              {hinweise.map((zeile) => (
+                <li key={zeile}>{zeile}</li>
+              ))}
+            </ul>
+          )}
           <button type="button" onClick={props.onSchliessen}>Schließen</button>
           {/* Gemerkte Teile verfallen von selbst (qr-stapel.ts); wer weiß,
               dass das fehlende Blatt nicht mehr kommt, wirft sie gleich weg. */}

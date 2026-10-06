@@ -14,6 +14,7 @@ import {
   type Person,
 } from "@bos/eeb-format/model";
 import {
+  LAGE_ABGLEICH_KURZ,
   LAGE_NACHTRAGEN_HINWEIS,
   STIFT_HINWEIS,
   TEILE_ABLAUF_MS,
@@ -274,6 +275,55 @@ describe("qrStapelLesen", () => {
     expect(STIFT_HINWEIS).toContain("Stand");
     // Nichts aufgenommen — nichts zu prüfen.
     expect(stapelBericht(leer, 0, 2)).not.toContain(STIFT_HINWEIS);
+  });
+
+  it("bericht fasst Bilder ohne Code in einer Zeile zusammen und nennt Fehlendes zuerst (R4-A6)", () => {
+    const keinCode = (n: number) => ({ datei: `s-${String(n).padStart(2, "0")}.png`, grund: "kein-code" as const, text: "Kein QR-Code im Bild gefunden." });
+    const erg = {
+      gelesen: 19,
+      funde: [],
+      fehler: Array.from({ length: 10 }, (_, i) => keinCode(i + 1)),
+      luecken: [{ dateien: ["s-03.png"], haben: 1, anzahl: 2, fehlen: [2] }],
+      abgebrochen: false,
+    };
+    const zeilen = stapelBericht(erg, 8, 0);
+    // Keine Zeile je Bogenseite.
+    expect(zeilen.filter((z) => z.includes("Kein QR-Code im Bild gefunden."))).toHaveLength(0);
+    const zusammen = zeilen.filter((z) => z.includes("10 Bilder ohne QR-Code"));
+    expect(zusammen).toHaveLength(1);
+    expect(zusammen[0]).toContain("s-01.png, s-02.png, s-03.png, …");
+    // Das fehlende Teil steht vor der Sammelzeile.
+    const luecke = zeilen.findIndex((z) => z.startsWith("Unvollständiger mehrteiliger Bogen"));
+    expect(luecke).toBeGreaterThan(0);
+    expect(luecke).toBeLessThan(zeilen.indexOf(zusammen[0]!));
+    // Statt 10 Zeilen: Aufnahme, Lücke, Sammelzeile, zwei Hinweise.
+    expect(zeilen).toHaveLength(5);
+  });
+
+  it("bericht: zwei Bilder ohne Code und sonst nichts bleiben einzeln benannt — der Helfer muss wissen, welches Foto fehlte (R4-A6)", () => {
+    const erg = {
+      gelesen: 2,
+      funde: [],
+      fehler: [
+        { datei: "a.jpg", grund: "kein-code" as const, text: "Kein QR-Code im Bild gefunden." },
+        { datei: "b.jpg", grund: "kein-code" as const, text: "Kein QR-Code im Bild gefunden." },
+      ],
+      luecken: [],
+      abgebrochen: false,
+    };
+    const zeilen = stapelBericht(erg, 0, 0);
+    expect(zeilen).toContain("a.jpg: Kein QR-Code im Bild gefunden.");
+    expect(zeilen).toContain("b.jpg: Kein QR-Code im Bild gefunden.");
+  });
+
+  it("bericht verweist kurz auf den Abgleich darunter, statt den langen Hinweis zu wiederholen (R4-A6)", () => {
+    const leer = { gelesen: 2, funde: [], fehler: [], luecken: [], abgebrochen: false };
+    const kurz = stapelBericht(leer, 4, 0, undefined, true);
+    expect(kurz).toContain(LAGE_ABGLEICH_KURZ);
+    expect(kurz).not.toContain(LAGE_NACHTRAGEN_HINWEIS);
+    expect(kurz).toContain(STIFT_HINWEIS);
+    expect(LAGE_ABGLEICH_KURZ.length).toBeLessThan(LAGE_NACHTRAGEN_HINWEIS.length / 2);
+    expect(stapelBericht(leer, 4, 0)).toContain(LAGE_NACHTRAGEN_HINWEIS);
   });
 
   it("bericht nennt Aufnahme und Dubletten", () => {

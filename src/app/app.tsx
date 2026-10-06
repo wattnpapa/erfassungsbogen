@@ -891,6 +891,8 @@ function AppInhalt() {
   // Der Abbruch als Ref, weil die laufende Schleife sonst den alten Stand sieht.
   const [stapelStand, setStapelStand] = useState("");
   const [stapelBericht, setStapelBericht] = useState<string[]>([]);
+  // Der Knopf im Bericht öffnet den Abgleich vom Papier (R4-A6).
+  const [abgleichAnstoss, setAbgleichAnstoss] = useState(0);
   // Rückmeldung von „Bögen einlesen…" (Dateien) unter den Aufnahme-Knöpfen (R3-L1, R3-E4).
   const [einlese, setEinlese] = useState<{ fehler: string; meldung: string } | null>(null);
   const stapelAbbruchRef = useRef(false);
@@ -3259,7 +3261,7 @@ function AppInhalt() {
       }
       einsaetzeNeuLaden();
       const vorrang = await vorrangImStapel(zielId, vorher, neueIds);
-      setStapelBericht([...stapelBerichtZeilen(erg, neu, uebersprungen, daten), ...vorrang]);
+      setStapelBericht([...stapelBerichtZeilen(erg, neu, uebersprungen, daten, neueIds.length > 0), ...vorrang]);
       const voll = speicherVollMeldung(speicherVoll);
       if (voll) setEinlese({ fehler: voll, meldung: "" });
     } catch (e) {
@@ -3405,6 +3407,7 @@ function AppInhalt() {
           onDateiImport={(dateien) => void importiereStapel(offenerEinsatz.id, dateien, [])}
           onBilderImport={(dateien) => void importiereStapel(offenerEinsatz.id, [], dateien)}
           onEinlesen={(daten, bilder) => void importiereStapel(offenerEinsatz.id, daten, bilder)}
+          abgleichAnstoss={abgleichAnstoss}
           einleseQuittung={
             <>
               <EinleseQuittung fehler={einlese?.fehler ?? ""} meldung={einlese?.meldung ?? ""} />
@@ -3425,6 +3428,7 @@ function AppInhalt() {
                 onAbbrechen={() => (stapelAbbruchRef.current = true)}
                 bericht={stapelBericht}
                 onSchliessen={() => setStapelBericht([])}
+                onAbgleich={() => setAbgleichAnstoss((n) => n + 1)}
                 merker={teileMerker(offenerEinsatz.id)}
               />
             </>

@@ -7,7 +7,7 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen } from "@testing-library/react";
 import { StapelQuittung } from "./stapel-quittung";
-import { TeileMerker } from "./qr-stapel";
+import { LAGE_ABGLEICH_KURZ, STIFT_HINWEIS, TeileMerker } from "./qr-stapel";
 
 const proto = HTMLElement.prototype as unknown as { scrollIntoView?: (opt?: unknown) => void };
 const vorher = proto.scrollIntoView;
@@ -52,5 +52,31 @@ describe("StapelQuittung", () => {
   it("ohne gemerkte Teile nur „Schließen“", () => {
     render(<StapelQuittung stand="" onAbbrechen={() => {}} bericht={["x"]} onSchliessen={() => {}} merker={new TeileMerker()} />);
     expect(screen.queryByRole("button", { name: "Gemerkte Teile verwerfen" })).toBeNull();
+  });
+
+  it("Abgleich-Knopf steht im Bericht — vor den langen Hinweisen, damit er im Bild bleibt (R4-A6)", () => {
+    const abgleich = vi.fn();
+    render(
+      <StapelQuittung
+        stand=""
+        onAbbrechen={() => {}}
+        bericht={["19 Bilder gelesen — 8 Bögen aufgenommen.", "10 Bilder ohne QR-Code (s-01.png, …) — Bogen- und Übersichtsseiten tragen keinen.", STIFT_HINWEIS, LAGE_ABGLEICH_KURZ]}
+        onSchliessen={() => {}}
+        onAbgleich={abgleich}
+      />,
+    );
+    const knopf = screen.getByRole("button", { name: "Lage vom Papier abgleichen…" });
+    const befund = screen.getByText("19 Bilder gelesen — 8 Bögen aufgenommen.");
+    const hinweis = screen.getByText(STIFT_HINWEIS);
+    // Reihenfolge im Dokument: Ergebnis, Knopf, Hinweise.
+    expect(befund.compareDocumentPosition(knopf) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(knopf.compareDocumentPosition(hinweis) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    fireEvent.click(knopf);
+    expect(abgleich).toHaveBeenCalledTimes(1);
+  });
+
+  it("ohne Abgleich (nichts aufgenommen oder nichts vom Papier) kein Knopf", () => {
+    render(<StapelQuittung stand="" onAbbrechen={() => {}} bericht={["2 Bilder gelesen — 0 Bögen aufgenommen."]} onSchliessen={() => {}} onAbgleich={() => {}} />);
+    expect(screen.queryByRole("button", { name: "Lage vom Papier abgleichen…" })).toBeNull();
   });
 });
