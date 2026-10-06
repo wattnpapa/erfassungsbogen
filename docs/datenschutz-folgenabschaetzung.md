@@ -213,6 +213,20 @@ Grundlage: Repository `wattnpapa/erfassungsbogen`, Stand 2026-09-12 — Version 
 > Absenderkarte und Geräteschlüssel, bevor sie ersetzt werden, und verlangt
 > dann den Haken (R4-D2). Keine neue Datenkategorie, kein neuer Empfänger.
 > Geändert: 5.7.
+>
+> **Nachgezogen 2026-10-06 — Meldungsfassungen, Exportstand, Führungssicht
+> (Audit Runde 4, Paket 2):** Der Exportstand ist je Format getrennt
+> (`eeb.export-stand.v2`) und alle Stände tragen den Zustand je Einheit als
+> Prüfsummen (kein Auftragstext) — dem Stab gehen weniger Änderungen verloren,
+> aber nicht mehr Personendaten heraus (R4-W2, R4-K1). Neue Zusatzfelder am
+> Eintrag ohne Personenbezug: `ersetztDurch`/`ersetztAm` (welche Fassung gilt,
+> R4-W1) und `nummer` (R4-A1). Die Übersichts-CSV und die Excel-Bemerkung
+> führen die Rückfragen zur Meldung (Texte aus Bogenangaben, etwa „Rufnummer
+> ohne Ziffer"), die Sammel-PDF druckt sie vollständig; die Nachtrag-PDF kann
+> die geänderten Einheiten einer bereits weitergegebenen Lage erneut
+> enthalten und trägt `nachtragSeit` im Umschlag (R4-W4, R4-K8). Keine neue
+> Datenkategorie, kein neuer Empfänger, kein neuer Speicherort außer dem
+> getrennten Exportstand. Geändert: 5.5, 5.7.
 
 ## Hinweis zu diesem Dokument
 
@@ -443,7 +457,10 @@ biometrische Daten, strafrechtliche Daten.
   siehe 5.4) und seit 2026-10-04 auch die Bemerkung der Einheit („Sonstiges",
   Freitext; R3-K3); die Excel-Liste enthält außerdem die Erreichbarkeit der
   Führungskraft (Name und Kontakt). Abgerückte Einheiten bleiben in allen drei
-  Ausgaben sichtbar, zählen aber nicht in die Summen. In der Sammel-PDF trägt jede Bogenseite den Kasten „Stand am Meldekopf"
+  Ausgaben sichtbar, zählen aber nicht in die Summen. Seit 2026-10-06 (R4-W5,
+  R4-K8) trennt die Übersichts-CSV „Unterbringung angefordert" von „WC/Dusche"
+  und führt eine Spalte „Rückfrage" mit den offenen Punkten der Meldung; ein
+  Nachtrag („nur neue Bögen") ist als solcher gekennzeichnet (R4-W4). In der Sammel-PDF trägt jede Bogenseite den Kasten „Stand am Meldekopf"
   (Eintreff-/Abrückzeit, Zug, Auftrag/Notiz — die Notiz ist Freitext und kann
   Personenbezug haben); der QR-Code enthält davon nichts. Wird ein Ausdruck
   über die QR-Codes wieder eingelesen, kommen nur die Bögen zurück; die App
@@ -506,7 +523,8 @@ Kapitel 6 der [Arc42-Dokumentation](arc42-architektur.md).
   (`eeb.aufgeraeumt.v1`, `src/app/aufraeum-hinweis.ts`; nur Sammlungsname und
   Zahlen, keine Personendaten; Audit Runde 2, R2-D5).
 - **Lageblatt-Stand (seit 2026-09-29, R2-A3):** Zeitpunkt des zuletzt
-  erzeugten Lageblatts und die Kennungen der Meldungen darauf
+  erzeugten Lageblatts, die Kennungen der Meldungen darauf und seit
+  2026-10-06 (R4-K1) der Zustand je Einheit als Prüfsummen
   (`eeb.lageblatt-stand.v1`, `src/app/export-stand.ts`) — wie der
   Export-Stand ohne Personendaten, fällt mit „Alle Daten löschen" weg.
 - **Weitergabe-Stand (seit 2026-09-29, R2-W5):** Zeitpunkt der letzten
@@ -514,7 +532,9 @@ Kapitel 6 der [Arc42-Dokumentation](arc42-architektur.md).
   Kennungen der Meldungen darin (`eeb.weitergabe-stand.v1`,
   `src/app/export-stand.ts`) — Grundlage des Übergabevermerks in der
   Einsatzansicht; seit 2026-10-05 (R3-W2) zusätzlich Prüfsummen der Vermerke
-  der Führungsstelle und der Zeitpunkt der letzten Übernahme per Import;
+  der Führungsstelle und der Zeitpunkt der letzten Übernahme per Import, seit
+  2026-10-06 (R4-K1, R4-W7) statt der Vermerke der Zustand je Einheit als
+  Prüfsummen;
   ohne Personendaten, fällt mit „Alle Daten löschen" weg.
 - **Kenntnis-Stand (seit 2026-10-04, R3-K1):** Zeitpunkt der letzten
   Kenntnisnahme in der Einsatzansicht und die Kennungen der Meldungen, die da
@@ -570,10 +590,13 @@ Kapitel 6 der [Arc42-Dokumentation](arc42-architektur.md).
 - **Strukturelle Grenze:** Sobald ein Bogen als QR-Code gescannt, als PDF
   gedruckt oder als Datei exportiert wurde, hat die App auf diese Kopien keinen
   Zugriff mehr (vertiefend 6.3).
-- **Export-Stand (seit 2026-09-27):** Damit der Meldekopf dem Stab nur die seit
-  dem letzten Export neuen Bögen nachliefern kann, merkt sich die App je
-  Einsatz-Sammlung die Kennungen der bereits exportierten Meldungen und den
-  Zeitpunkt (`src/app/export-stand.ts`, `eeb.export-stand.v1`). Das sind keine
+- **Export-Stand (seit 2026-09-27, je Format seit 2026-10-06, R4-W2):** Damit der
+  Meldekopf dem Stab nur die seit dem letzten Export neuen Bögen nachliefern
+  kann, merkt sich die App je Einsatz-Sammlung und Format (Sammel-PDF,
+  Übersichts-CSV, Alle-Daten-CSV, Excel) die Kennungen der bereits exportierten
+  Meldungen, den Zeitpunkt und den Zustand je Einheit als Prüfsummen
+  (`src/app/export-stand.ts`, `eeb.export-stand.v2`; der alte gemeinsame
+  Merker `v1` wird nicht übernommen und gelöscht). Das sind keine
   Personendaten; der Eintrag wird mit „Alle Daten löschen" entfernt und beim
   nächsten Export um Stände endgültig gelöschter Sammlungen bereinigt. Er
   verkleinert die Zahl der weitergegebenen Kopien (Datenminimierung beim

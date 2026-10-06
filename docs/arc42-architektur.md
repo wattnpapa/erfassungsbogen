@@ -53,6 +53,15 @@
 > (R4-S1); Rückfragen und Ansichtswechsel sperren die Fingerstelle 1,5 s
 > (`tipp-schutz.ts`, R4-G1/S2/S3) — Kapitel 8.2.
 >
+> **Nachgezogen 2026-10-06:** Audit Runde 4, Paket 2 „Meldungsfassungen,
+> Exportstand, Führungssicht" — welche Fassung einer Einheit gilt, entscheidet
+> eine App-Schicht über der unveränderten Kern-Regel (`src/app/fassung-vorrang.ts`,
+> ADR-003 bleibt gewahrt, R4-W1); der Exportstand ist je Format getrennt
+> (`eeb.export-stand.v2`) und vergleicht den Zustand je Einheit statt der
+> Vermerke (`export-stand.ts`, R4-W2/K1/W7); ein Nachtrag trägt `nachtragSeit`
+> im Umschlag der Sammel-PDF (R4-W4); der Papier-Abgleich übernimmt `nummer`
+> und `notiz` (R4-A1/A2) — Kapitel 5.2 und 8.2.
+>
 > **Nachgezogen 2026-10-05:** Audit Runde 3, Paket „Einsatz-Import, Abgleich
 > zwischen Geräten, Papier-Rückweg" — „Einsatz importieren…" läuft über
 > `einsatzAbgleichen` (`src/app/einsatz-abgleich.ts`), das um den
@@ -601,7 +610,7 @@ flowchart TB
 | `pdf-dokument.ts` (833 Zeilen, größte Nicht-UI-Datei) | Baut die pdfmake-Dokumentdefinition im Papier-Layout inkl. eingebettetem QR-Code auf der letzten Seite. |
 | `pdf-bilder.ts` / `pdf-qr.ts` / `pdf-stroeme.ts` | Rückfallebene: PDF-Bild-Objekte roh als Pixel lesen und den enthaltenen QR-Code decodieren – bewusst ohne vollständigen PDF-Renderer. |
 | `bogen-csv.ts` / `einsatz-csv.ts` / `oldenburg-xlsx.ts` / `xlsx.ts` / `csv.ts` | Datenexporte: vollständiges CSV je Bogen/Einsatz (Langformat mit Satzart-Spalte), CSV-Übersicht für die Lagekarte, XLSX im „Oldenburg"-Format, gemeinsame CSV-Formatgrundlagen (Semikolon, UTF-8-BOM, Dezimalkomma). |
-| `entwurf.ts` / `speicher-browser.ts` / `speicher-schonend.ts` / `einsaetze-lesen.ts` / `sicherung.ts` / `absenderkarte.ts` / `export-stand.ts` | Lokale Persistenz: Entwurfswiederherstellung, `localStorage`-Anbindung der Einsatz-Sammlung (seit 2026-10-05, R3-O2, mit schonender Hülle: kein Schreiben unveränderten Textes, Lesen scheitert nicht an einem gesperrten Speicher, Lese-Ergebnis gemerkt solange der Speichertext gleich ist), Datensicherung/-Export, freiwillige Absenderkarte, Export-Stand je Einsatz (welche Meldungen der Stab schon bekommen hat — Grundlage des Teilexports „nur neue Bögen"), dazu Lageblatt- und Weitergabe-Stand (wann zuletzt ein Lageblatt bzw. die ganze Sammlung herausging; Übergabevermerk, nachgezogen 2026-09-29, R2-W5) und Kenntnis-Stand (welche Meldungen an diesem Gerät zuletzt „zur Kenntnis genommen" wurden — Grundlage der Sammelquittung und der Marke „neue Fassung", `eeb.kenntnis-stand.v1`, nachgezogen 2026-10-04, R3-K1). |
+| `entwurf.ts` / `speicher-browser.ts` / `speicher-schonend.ts` / `einsaetze-lesen.ts` / `sicherung.ts` / `absenderkarte.ts` / `export-stand.ts` | Lokale Persistenz: Entwurfswiederherstellung, `localStorage`-Anbindung der Einsatz-Sammlung (seit 2026-10-05, R3-O2, mit schonender Hülle: kein Schreiben unveränderten Textes, Lesen scheitert nicht an einem gesperrten Speicher, Lese-Ergebnis gemerkt solange der Speichertext gleich ist), Datensicherung/-Export, freiwillige Absenderkarte, Export-Stand je Einsatz **und Format** (Sammel-PDF, Übersichts-CSV, Alle-Daten-CSV, Excel; welche Meldungen und welchen Zustand je Einheit der Stab in diesem Format schon bekommen hat — Grundlage des Teilexports „nur neue Bögen", `eeb.export-stand.v2`, nachgezogen 2026-10-06, R4-W2/K1), dazu Lageblatt- und Weitergabe-Stand (wann zuletzt ein Lageblatt bzw. die ganze Sammlung herausging; Übergabevermerk, nachgezogen 2026-09-29, R2-W5; beide führen seit 2026-10-06 den Zustand je Einheit, R4-K1) und Kenntnis-Stand (welche Meldungen an diesem Gerät zuletzt „zur Kenntnis genommen" wurden — Grundlage der Sammelquittung und der Marke „neue Fassung", `eeb.kenntnis-stand.v1`, nachgezogen 2026-10-04, R3-K1). |
 | `nativ.ts` / `hilfen.ts` / `geraete-schluessel.ts` | Abstraktion nativer Fähigkeiten über Capacitor; Anzeige-/Migrations-Helfer (`bogenLaden`, `migriereBogen`, `einheitAnzeigename`); Erzeugung/Verwaltung des geräteeigenen Ed25519-Schlüssels. |
 | `anzeige-modus.ts` / `org-farben.ts` | Dunkel-/Feld-/Nacht-Modus als Design-Token-Umschaltung; organisationsspezifische Akzentfarben. |
 | `aktualisierung.tsx` | Update-Hinweise: Service-Worker-Banner im Web, Electron-Auto-Update-Status im Desktop. |
@@ -1149,7 +1158,42 @@ flowchart TB
   anderem Gerät: …"). Ohne Vermerk wird nur ein hier leerer Wert gefüllt.
   Der Weitergabe-Stand (`eeb.weitergabe-stand.v1`) führt dazu Prüfsummen der
   bekannten Vermerke und den Zeitpunkt der letzten Übernahme; was ein Import
-  brachte, zählt nicht als „hier neu" (R3-W2). Eine Sammel-PDF einer
+  brachte, zählt nicht als „hier neu" (R3-W2). Seit 2026-10-06 (R4-K1, R4-W7)
+  tragen alle Stände (Lageblatt, Weitergabe, je Format der Export) den
+  **Zustand je Einheit** (Prüfsummen von Status samt Abrückzeit, Zug, Auftrag,
+  Eintreffzeit der geltenden Fassung): „seitdem 1 Änderung (Abrücken)" steht an
+  Lageblatt, Export, Weitergabe und Startseitenkarte, ein „Rückgängig" nimmt
+  sie zurück, und der Nachtrag enthält die geltende Fassung jeder geänderten
+  Einheit. Der Abgleich meldet die Felder, deren Wert danach dem der Datei
+  entspricht (`AbgleichErgebnis.bekannt`); `weitergabeUmImportErgaenzen` bucht
+  sie als beim anderen Gerät bekannt. Stände ohne Zustand (ältere
+  Weitergaben) zählen weiter Vermerke.
+- **Welche Fassung gilt** (`fassung-vorrang.ts`, R4-W1, 2026-10-06): Der Kern
+  wählt den Kopf einer Einheit nach dem Stand im Bogen, bei gleicher Minute nach
+  der Empfangszeit (`neuesteJeEinheit`, `revisionen`) und bleibt unverändert
+  (ADR-003). Die App legt eine Schicht darüber: Ein App-Zusatzfeld am Eintrag
+  (`ersetztDurch`, `ersetztAm`) verdrängt eine Fassung zugunsten einer anderen;
+  `geltendeJeEinheit` und `fassungenJeEinheit` ersetzen die Kern-Aufrufe in
+  Karten, Summen, Exporten und Abgleich, verdrängte Fassungen fallen aus der
+  Wahl des Kopfs heraus, unter den übrigen gilt die Kern-Regel (eine spätere
+  Folgemeldung löst die bestätigte Fassung also normal ab). Beim Eingang
+  (`fassungPruefen`) fragt die App in zwei Lagen — der Bogen der Einheit nach
+  einer Schnellerfassung (älterer Stand, Vorschlag „Bogen gilt") und zwei
+  Fassungen derselben Minute; ein älterer Bogen nach einem echten jüngeren
+  steht in der Quittung als „nur Historie". Im Kiosk-Stapel keine Frage, aber ein
+  Satz und an der Karte „Bogen übernehmen". Der Vorrang reist über den
+  Abgleich zwischen Geräten. Das Feld ist wie `zugEtikett` ein Zusatz, kein
+  Schemawechsel.
+- **Nachtrag** (R4-W4, 2026-10-06): Die Sammel-PDF eines Teilexports trägt im
+  Umschlag der eingebetteten Sammlung den optionalen Zusatz `nachtragSeit`
+  (nie gespeichert); „Einsatz importieren…" auf einem Gerät ohne diese
+  Sammlung fragt nach. Übersicht, Summen, Fußzeile, Dateinamen (PDF, CSV,
+  Excel) und die CSV-Summenzeile sagen „Nachtrag". Das Transportformat der
+  QR-Codes bleibt unverändert.
+- **Laufende Nummer vom Papier** (R4-A1): `nummer` am Eintrag ist nur gesetzt,
+  wenn der Papier-Abgleich sie vom Blatt übernommen hat; `meldungsNummern`
+  hält sie fest und lässt die übrigen Einheiten um sie herum zählen. Der
+  Kasten „Stand am Meldekopf" druckt die Nummer. Eine Sammel-PDF einer
   anderen Sammlung über „Bögen einlesen…" bietet die Übernahme in die
   offene Sammlung an (`sammlungFuerZiel`, Zug-Vorschlag = Name der
   Quell-Sammlung, R3-W3); sie läuft über denselben Abgleich, mit Siegel,
