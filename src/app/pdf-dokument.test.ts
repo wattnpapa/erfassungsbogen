@@ -663,6 +663,34 @@ describe("einsatzLageblattDokument()", () => {
     expect(voll).toContain("Stärke (F / UF / M / Ges.):");
   });
 
+  it("Blanko-Vordruck trägt den Meldekopf-Kasten mit „ins Gerät übertragen“ und dem Kästchen „Übung“ (R4-A4)", () => {
+    const blanko = texte(pdfDokument(basisBogen(), null, { fahrzeuge: 1, personal: 1, qualifikationen: 1 }).content).join("\n");
+    expect(blanko).toContain("Meldekopf:");
+    expect(blanko).toMatch(/eingegangen am/);
+    expect(blanko).toMatch(/\[ {2}\] ÜBUNG/);
+    expect(blanko).toMatch(/ins Gerät übertragen \[ {2}\]/);
+    expect(blanko).toContain("Zug / Verband:");
+    // Ein ausgefüllter Bogen trägt den Kasten nicht — er hat seinen „Stand am Meldekopf“.
+    expect(texte(pdfDokument(basisBogen(), QR).content).join("\n")).not.toContain("ins Gerät übertragen");
+  });
+
+  it("Personalzeilen brechen nicht über die Seite — auf dem Vordruck keine 3-mm-Zeile (R4-A8)", () => {
+    const dd = pdfDokument(basisBogen(), null, { fahrzeuge: 1, personal: 3, qualifikationen: 1 });
+    const tabellen: { table?: { dontBreakRows?: boolean; headerRows?: number } }[] = [];
+    const sammle = (n: unknown): void => {
+      if (Array.isArray(n)) n.forEach(sammle);
+      else if (n && typeof n === "object") {
+        if ((n as { table?: unknown }).table) tabellen.push(n as never);
+        Object.values(n).forEach(sammle);
+      }
+    };
+    sammle(dd.content);
+    const personal = tabellen.find((t) => JSON.stringify(t.table).includes("D = dienstlich / P = privat"));
+    expect(personal?.table?.dontBreakRows).toBe(true);
+    // Der Vordruck wiederholt den Kopf auf der zweiten Seite.
+    expect(personal?.table?.headerRows).toBe(1);
+  });
+
   it("stellt die laufende Nummer der Meldung vor den Namen, wie an der Karte (R2-A6)", () => {
     const t = texte(
       einsatzLageblattDokument("Lage", [

@@ -1253,6 +1253,31 @@ function qrBlock(qr: QrSatz, akzent: string, stand: string, vermerk?: MeldekopfV
 }
 
 /**
+ * Kasten oben auf dem Vordruck: was der Meldekopf auf das Papier schreibt —
+ * Eingang, Nummer, Zug, Übung, und der Haken „ins Gerät übertragen“. Auf dem
+ * Vordruck fehlte beides: Nach einer Papierphase tippen zwei Helfer denselben
+ * Stapel ab oder ein Blatt bleibt liegen, und ein handschriftlicher
+ * Übungsbogen wird in einer echten Lage mitgezählt (Audit Runde 4, R4-A4).
+ * Die Felder entsprechen dem Kasten „Stand am Meldekopf“ der Sammel-PDF.
+ */
+function blankoMeldekopf(): Content {
+  return {
+    table: {
+      widths: ["*"],
+      body: [[{
+        stack: [
+          { text: "Meldekopf:   Nr. ______   ·   eingegangen am ____________  um ____:____ Uhr   ·   Zug / Verband: ________________" },
+          { text: `${kasten(false)} ÜBUNG — kein echter Einsatz   ·   ins Gerät übertragen ${kasten(false)}  von (Kürzel) ________  um ____:____ Uhr`, margin: [0, 5, 0, 0] },
+        ],
+        bold: true,
+        margin: [0, 3, 0, 3],
+      }]],
+    },
+    margin: [0, 0, 0, 6],
+  };
+}
+
+/**
  * Zeilenzahlen des Blanko-Vordrucks (leerer Bogen zum Ausfüllen mit der Hand).
  * Die Anzahl ist bewusst nicht fest verdrahtet: wie viele Fahrzeug- und
  * Personalzeilen sinnvoll sind, hängt am Papierformat und nicht am Layoutcode.
@@ -1536,6 +1561,8 @@ export function pdfDokument(
       // Störer VOR dem Kopf: das Wasserzeichen allein kann beim Kopieren oder
       // blassen Druck untergehen, die Textzeile nicht.
       ...(b.uebung ? [uebungsStoerer()] : []),
+      // ---- Meldekopf-Kasten (nur Vordruck) ----
+      ...(blanko ? [blankoMeldekopf()] : []),
       // ---- Kopf ----
       {
         table: {
@@ -1574,7 +1601,13 @@ export function pdfDokument(
       // ---- Personal ----
       // Kein fester Seitenumbruch: kleine Einheiten passen so auf eine Seite,
       // größere lässt pdfmake bei Bedarf selbst umbrechen.
-      { table: { widths: [118, 30, "*", 160], body: personalZeilen }, margin: [0, 12, 0, 10] },
+      {
+        // Zeilen bleiben ganz: Auf Seite 1 des Vordrucks stand die letzte
+        // Personalzeile nur als 3-mm-Streifen über der Fußzeile (R4-A8). Der
+        // Vordruck wiederholt den Tabellenkopf auf Seite 2.
+        table: { widths: [118, 30, "*", 160], body: personalZeilen, dontBreakRows: true, ...(blanko ? { headerRows: 1 } : {}) },
+        margin: [0, 12, 0, 10],
+      },
       ...(b.personalErfassung === PersonalErfassung.NUR_STAERKE
         ? [{ text: "Personal am Meldekopf nur in Stärke erfasst.", italics: true, margin: [0, 0, 0, 6] } as Content]
         : []),

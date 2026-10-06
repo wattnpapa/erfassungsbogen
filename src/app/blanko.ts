@@ -25,7 +25,7 @@ export const BLANKO_DATEINAME = "einheiten-erfassungsbogen-blanko.pdf";
  * anfangen — ein Vordruck, den man in zweifacher Ausfertigung kopiert, soll
  * kein Papier verschwenden.
  */
-export const BLANKO_ZEILEN: BlankoZeilen = { fahrzeuge: 4, personal: 36, qualifikationen: 6 };
+export const BLANKO_ZEILEN: BlankoZeilen = { fahrzeuge: 4, personal: 34, qualifikationen: 6 };
 
 /**
  * Bogen ganz ohne Inhalt. `OrganisationsTyp.SONSTIGE` ist hier kein Notbehelf,
