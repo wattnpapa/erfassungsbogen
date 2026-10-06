@@ -19,7 +19,8 @@ import { istNativ, binaerTeilen } from "./nativ";
 import { einsatzLageblattSeiteFuellen, einsatzPdfDokument, einzelPdfDokument, pdfDokument, type SammelBogen, type UebersichtEintrag } from "./pdf-dokument";
 import { einsatzDateiInhalt } from "./einsatz-transport";
 import { BLANKO_DATEINAME, BLANKO_INFO, BLANKO_ZEILEN, leererBogen } from "./blanko";
-import { MeldeStatus, neuesteJeEinheit, revisionen, type Einsatzsammlung, type MeldeEintrag } from "@bos/meldekopf/einsaetze";
+import { MeldeStatus, type Einsatzsammlung, type MeldeEintrag } from "@bos/meldekopf/einsaetze";
+import { geltendeJeEinheit, fassungenJeEinheit } from "./fassung-vorrang";
 import { zaehltInLage } from "./auswertung";
 import { eintreffzeit } from "./eintrag-zeiten";
 import { lageblattVermerken, weitergabeVermerken } from "./export-stand";
@@ -159,7 +160,7 @@ function uebersichtEintrag(
 ): UebersichtEintrag {
   // revisionen() liefert neueste zuerst — die Vorfassung steht direkt hinter
   // dieser Meldung. Fehlt sie, ist es eine Erstmeldung.
-  const revs = revisionen(historie, m.einheitSchluessel);
+  const revs = fassungenJeEinheit(historie, m.einheitSchluessel);
   const idx = revs.findIndex((r) => r.id === m.id);
   const vorher = idx >= 0 ? revs[idx + 1]?.bogen : undefined;
   return {
@@ -185,7 +186,7 @@ function uebersichtEintrag(
  * (Analog-Audit A1), und bei null Anwesenden gab es gar keine Datei (W2).
  */
 export function alleAktuellen(einsatz: Einsatzsammlung): MeldeEintrag[] {
-  return neuesteJeEinheit(einsatz.eintraege).sort((a, b) =>
+  return geltendeJeEinheit(einsatz.eintraege).sort((a, b) =>
     einheitAnzeigename(a.bogen.einheit).localeCompare(einheitAnzeigename(b.bogen.einheit), "de"),
   );
 }

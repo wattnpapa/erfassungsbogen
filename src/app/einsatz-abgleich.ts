@@ -35,10 +35,10 @@ import {
   einsaetzeLaden,
   einsaetzePapierkorb,
   einsatzImportieren,
-  neuesteJeEinheit,
   type Einsatzsammlung,
   type MeldeEintrag,
 } from "@bos/meldekopf/einsaetze";
+import { geltendeJeEinheit } from "./fassung-vorrang";
 import { einheitAnzeigename } from "./hilfen";
 import { sammlungenSchreiben, zeitKurz, type FuehrungsVermerk } from "./eintrag-zeiten";
 
@@ -84,7 +84,7 @@ interface Seite {
 
 function seite(eintraege: MeldeEintrag[], schl: string): Seite | null {
   const eigene = eintraege.filter((e) => e.einheitSchluessel === schl);
-  const kopf = neuesteJeEinheit(eigene)[0];
+  const kopf = geltendeJeEinheit(eigene)[0];
   if (!kopf) return null;
   const vermerke = vereinigeVermerke(eigene.map((e) => e.vermerke ?? []));
   return { kopf, vermerke, kennungen: new Set(vermerke.map((v) => vermerkKennung(schl, v))) };
@@ -281,12 +281,22 @@ export function einsatzAbgleichen(importiert: Einsatzsammlung, jetzt = Date.now(
 
   const einheiten = new Set(importiert.eintraege.map((e) => e.einheitSchluessel));
   let geschrieben = false;
+  // Welche Fassung gilt, hat womöglich das andere Gerät entschieden (R4-W1):
+  // ein dort bestätigter Vorrang kommt mit, solange hier keiner gesetzt ist.
+  for (const e of importiert.eintraege) {
+    if (e.ersetztDurch == null) continue;
+    const lokal = s.eintraege.find((x) => x.id === e.id);
+    if (!lokal || lokal.ersetztDurch != null) continue;
+    lokal.ersetztDurch = e.ersetztDurch;
+    if (e.ersetztAm != null) lokal.ersetztAm = e.ersetztAm;
+    geschrieben = true;
+  }
   for (const schl of einheiten) {
     const hier = seite(vorher.eintraege, schl);
     const datei = seite(importiert.eintraege, schl);
     if (!hier || !datei) continue; // nur hier oder nur in der Datei: nichts abzugleichen
     const fassungen = s.eintraege.filter((e) => e.einheitSchluessel === schl);
-    const ziel = neuesteJeEinheit(fassungen)[0];
+    const ziel = geltendeJeEinheit(fassungen)[0];
     if (!ziel) continue;
     const vorZiel = JSON.stringify(ziel) + fassungen.map((e) => e.zugEtikett ?? "").join("|");
     const was: string[] = [];
@@ -389,7 +399,7 @@ export function sammlungFuerZiel(
       const fassungen = eintraege.filter((e) => e.einheitSchluessel === schl);
       if (fassungen.some((e) => e.zugEtikett)) continue;
       for (const e of fassungen) e.zugEtikett = wert;
-      const kopf = neuesteJeEinheit(fassungen)[0];
+      const kopf = geltendeJeEinheit(fassungen)[0];
       if (kopf) (kopf.vermerke ??= []).push({ zeit: jetzt, text: `Zug: ${wert} (aus Sammlung „${quelle.name}“ übernommen)` });
     }
   }

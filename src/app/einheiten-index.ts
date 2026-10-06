@@ -12,7 +12,8 @@
  * Kern-Funktionen, nur auf der kleinen Gruppe — das Ergebnis ist dasselbe.
  */
 
-import { neuesteJeEinheit, revisionen, type MeldeEintrag } from "@bos/meldekopf/einsaetze";
+import { type MeldeEintrag } from "@bos/meldekopf/einsaetze";
+import { geltendeJeEinheit, fassungenJeEinheit } from "./fassung-vorrang";
 
 interface Index {
   nachEinheit: Map<string, MeldeEintrag[]>;
@@ -36,15 +37,15 @@ function index(alle: readonly MeldeEintrag[]): Index {
   return i;
 }
 
-/** Wie `revisionen(alle, einheitSchl)` aus dem Kern: alle Fassungen, neueste zuerst. */
+/** Wie `fassungenJeEinheit(alle, einheitSchl)` (fassung-vorrang.ts): alle Fassungen, die geltende zuerst. */
 export function revisionenJe(alle: readonly MeldeEintrag[], einheitSchl: string): MeldeEintrag[] {
   const gruppe = index(alle).nachEinheit.get(einheitSchl);
-  return gruppe ? revisionen(gruppe, einheitSchl) : [];
+  return gruppe ? fassungenJeEinheit(gruppe, einheitSchl) : [];
 }
 
-/** Wie `neuesteJeEinheit(alle)` aus dem Kern; das Array ist jedes Mal neu. */
+/** Wie `geltendeJeEinheit(alle)` (fassung-vorrang.ts, R4-W1); das Array ist jedes Mal neu. */
 export function koepfeJe(alle: readonly MeldeEintrag[]): MeldeEintrag[] {
   const i = index(alle);
-  i.koepfe ??= neuesteJeEinheit(alle as MeldeEintrag[]);
+  i.koepfe ??= geltendeJeEinheit(alle as MeldeEintrag[]);
   return [...i.koepfe];
 }

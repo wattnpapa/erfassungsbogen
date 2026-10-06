@@ -2521,3 +2521,45 @@ describe("Bögen aus einer PDF in einen Einsatz übernehmen", () => {
     expect(await screen.findByText(/weder eine Einsatz-Sammlung noch ein einzelner Bogen/)).toBeTruthy();
   });
 });
+
+describe("Welche Fassung gilt (Audit Runde 4, R4-W1)", () => {
+  beforeEach(() => {
+    localStorage.clear();
+  });
+
+  /** Schnellerfassung mit jüngerem Stand im Speicher, dann der Bogen der Einheit als Datei. */
+  async function schnellerfassungUndBogen(nutzer: ReturnType<typeof userEvent.setup>) {
+    const s = einsatzImSpeicherAnlegen("Hochwasser Eyach", EinsatzArt.EINSATZ);
+    const echt = bogenMitName("Bamberg");
+    const schnell: Erfassungsbogen = { ...bogenMitName("Bamberg"), stand: echt.stand + 120 };
+    schnell.einsatz = { ...schnell.einsatz, ortAuftrag: "Schnellerfassung" };
+    meldungHinzufuegen(s.id, schnell, { quelle: "manuell" });
+    render(<App />);
+    await nutzer.click(screen.getByRole("button", { name: "Öffnen" }));
+    await screen.findByRole("heading", { level: 1, name: "Hochwasser Eyach" });
+    const datei = new File([JSON.stringify(echt)], "bamberg.json", { type: "application/json" });
+    await nutzer.upload(screen.getByLabelText("Dateien wählen…"), datei);
+    return { id: s.id, echt };
+  }
+
+  it("fragt beim nachgereichten Bogen und lässt ihn auf „Ja“ gelten", async () => {
+    const nutzer = userEvent.setup();
+    const { id, echt } = await schnellerfassungUndBogen(nutzer);
+    const frage = await screen.findByRole("dialog", { name: "Bogen der Einheit nachgereicht" });
+    await nutzer.click(within(frage).getByRole("button", { name: /Bogen der Einheit gilt/ }));
+    expect(await screen.findByText(/Bogen der Einheit gilt, ersetzt die Schnellerfassung/)).toBeDefined();
+    const { geltendeJeEinheit } = await import("./fassung-vorrang");
+    const kopf = geltendeJeEinheit(einsaetzeLaden().find((x) => x.id === id)!.eintraege)[0]!;
+    expect(kopf.bogen.stand).toBe(echt.stand);
+    expect(kopf.quelle).toBe("pdf-import");
+  });
+
+  it("behält auf „Schnellerfassung behalten“ den bisherigen Stand und bietet den Bogen an der Karte an", async () => {
+    const nutzer = userEvent.setup();
+    await schnellerfassungUndBogen(nutzer);
+    const frage = await screen.findByRole("dialog", { name: "Bogen der Einheit nachgereicht" });
+    await nutzer.click(within(frage).getByRole("button", { name: "Schnellerfassung behalten" }));
+    expect(await screen.findByText(/die Schnellerfassung gilt weiter/)).toBeDefined();
+    expect(document.querySelector(".bogen-nachgereicht, .kompakt-merkmal")?.textContent).toMatch(/Bogen nachgereicht|Bogen der Einheit nachgereicht/);
+  });
+});

@@ -47,8 +47,6 @@ import {
   meldungenZusammenfuehren,
   meldungEntfernen,
   einsatzImportieren,
-  neuesteJeEinheit,
-  revisionen,
   tageBisAufraeumen,
   stammSchluessel,
   type AufteilungOptionen,
@@ -56,6 +54,7 @@ import {
   type MeldeEintrag,
   type ZusammenfuehrungOptionen,
 } from "@bos/meldekopf/einsaetze";
+import { fassungGiltSetzen, fassungenJeEinheit, geltendeJeEinheit, istVerdraengt, nachgereichterBogen } from "./fassung-vorrang";
 import { einsaetzeLaden, einsaetzePapierkorb } from "./einsaetze-lesen";
 import { koepfeJe, revisionenJe } from "./einheiten-index";
 import { RolleMarke } from "./rolle-marke";
@@ -348,7 +347,7 @@ export function EinsatzListe(props: {
    * einem Textlink, den nichts ankündigt. Die Frage nennt ihn deshalb.
    */
   function fragLoeschen(s: Einsatzsammlung) {
-    const einheiten = neuesteJeEinheit(s.eintraege).length;
+    const einheiten = geltendeJeEinheit(s.eintraege).length;
     return frageJaNein({
       titel: "Einsatz löschen?",
       text: `„${s.name}" mit ${einheiten} gemeldeten Einheit${einheiten === 1 ? "" : "en"} wandert in den Papierkorb und lässt sich dort 30 Tage lang zurückholen.`,
@@ -885,7 +884,7 @@ export function EinsatzDetail(props: {
   // Alle gemeldeten Einheiten (neueste Revision je Einheit) — Grundlage für die
   // Gesamtzahl; `kopf` ist davon nur der gerade angezeigte Ausschnitt. Suche,
   // Filter und Sortierung ändern die Summen oben bewusst nicht.
-  const alleEinheiten = neuesteJeEinheit(einsatz.eintraege);
+  const alleEinheiten = geltendeJeEinheit(einsatz.eintraege);
   const letzte = letzteMeldung(einsatz.eintraege);
   // Laufende Nummer je Meldung — dieselbe wie auf dem Lageblatt (R2-A6).
   const nummern = meldungsNummern(einsatz.eintraege);
@@ -1024,7 +1023,7 @@ export function EinsatzDetail(props: {
    * Rückfrage nennt deshalb den Umfang und den Papierkorb beim Namen.
    */
   async function loeschen() {
-    const anzahl = neuesteJeEinheit(einsatz.eintraege).length;
+    const anzahl = geltendeJeEinheit(einsatz.eintraege).length;
     const sicher = await frageJaNein({
       titel: "Einsatz löschen?",
       text: `„${einsatz.name}" mit ${anzahl} gemeldeten Einheit${anzahl === 1 ? "" : "en"} wandert in den Papierkorb und lässt sich dort 30 Tage lang zurückholen.`,
@@ -1157,6 +1156,20 @@ export function EinsatzDetail(props: {
           <ul>
             {aufgenommenListe.slice(0, QUITTUNG_MAX).map((e) => {
               const folge = folgeAenderung(e, einsatz.eintraege);
+              // Die geltende Fassung war schon bekannt, eingegangen ist nur
+              // ein älterer Stand: kein „neu gemeldet" (Audit Runde 4, R4-W1).
+              const nurAelter = !ungeseheneIds.has(e.id)
+                ? einsatz.eintraege.find((x) => x.einheitSchluessel === e.einheitSchluessel && ungeseheneIds.has(x.id))
+                : undefined;
+              if (nurAelter) {
+                return (
+                  <li key={e.einheitSchluessel}>
+                    {einheitAnzeigename(e.bogen.einheit)}
+                    {e.teilEtikett ? ` (${e.teilEtikett})` : ""}
+                    {` — älterer Stand ${standText(nurAelter.bogen)} nachgereicht, gilt nicht (nur Historie)`}
+                  </li>
+                );
+              }
               return (
                 <li key={e.einheitSchluessel}>
                   {einheitAnzeigename(e.bogen.einheit)}
@@ -2102,12 +2115,16 @@ interface Entfernt {
 }
 
 /** Eine Revisionszeile in der Historie, mit Diff zur direkt älteren Fassung. */
-function HistorieZeile({ eintrag, vorheriger, aktuell, onVerwerfen }: {
+function HistorieZeile({ eintrag, vorheriger, aktuell, verdraengt = false, onVerwerfen, onGilt }: {
   eintrag: MeldeEintrag;
   vorheriger?: MeldeEintrag;
   aktuell: boolean;
+  /** Von der Führungsstelle durch eine andere Fassung ersetzt (R4-W1). */
+  verdraengt?: boolean;
   /** Nur diese Fassung verwerfen (R2-D1) — die Historie steht erst ab zwei Fassungen da. */
   onVerwerfen?: () => void;
+  /** Diese Fassung soll gelten (R4-W1). */
+  onGilt?: () => void;
 }) {
   const [offen, setOffen] = useState(false);
   return (
@@ -2116,7 +2133,13 @@ function HistorieZeile({ eintrag, vorheriger, aktuell, onVerwerfen }: {
       {/* Wann die Fassung HIER eingegangen ist — der Stand ist die Uhr des
           Absenders (Audit Runde 2, R2-K6). */}
       {" · eingegangen "}{zeitKurz(eintrag.empfangenAm)}
-      {aktuell ? " (aktuell)" : ""}
+      {aktuell ? " (aktuell)" : verdraengt ? " (ersetzt)" : ""}
+      {onGilt && (
+        <>
+          {" "}
+          <button type="button" className="link" onClick={onGilt}>Diese Fassung gilt…</button>
+        </>
+      )}
       {vorheriger && (
         <>
           {" "}
@@ -2242,6 +2265,9 @@ function EinheitKarte(props: {
   // Folgemeldung: die direkt ältere Fassung derselben Einheit ist der Bezug für
   // „was hat sich seit der letzten Meldung geändert?".
   const vorige = revs[1];
+  // Bogen der Einheit kam nach der Schnellerfassung, trägt aber den älteren
+  // Stand — die Lage rechnet sonst still weiter mit Platzhaltern (R4-W1).
+  const nachgereicht = nachgereichterBogen(kopf, revs);
   const kurz = vorige ? diffKurzfassung(bogenDiff(vorige.bogen, kopf.bogen)) : "";
   // Folgemeldung von außen (nicht die Rest-Fassung eines Aufteilens): wann
   // sie einging und was sie änderte. Frisch oder noch nicht zur Kenntnis
@@ -2512,9 +2538,29 @@ function EinheitKarte(props: {
       // Die Einträge reisen vollständig zurück an die Ansicht: Sie bietet sie
       // zum Zurückholen an, solange niemand weitergeklickt hat. Für Einsätze
       // gibt es einen Papierkorb, für die einzelne Meldung bisher nichts.
-      if (weg.length > 0) onEntfernt?.({ art: "einheit", eintraege: revisionen(weg, kopf.einheitSchluessel) });
+      if (weg.length > 0) onEntfernt?.({ art: "einheit", eintraege: fassungenJeEinheit(weg, kopf.einheitSchluessel) });
       onGeaendert();
     });
+  }
+
+  /**
+   * Diese Fassung gilt (R4-W1) — etwa der nachgereichte Bogen statt der
+   * Schnellerfassung oder die richtige von zwei Fassungen derselben Minute.
+   * Nichts wird gelöscht: die bisher geltende bleibt in der Historie und
+   * lässt sich dort genauso zurückholen.
+   */
+  async function fassungGilt(r: MeldeEintrag) {
+    if (r.id === kopf.id) return;
+    const sicher = await frageJaNein({
+      titel: "Diese Fassung gilt?",
+      text:
+        `Für „${einheitAnzeigename(kopf.bogen.einheit)}" gilt dann Stand ${standText(r.bogen)} mit Stärke ${staerkeText(r.bogen)} ` +
+        `(${QUELLE_LABEL[r.quelle]}) statt Stand ${standText(kopf.bogen)} mit Stärke ${staerkeText(kopf.bogen)}. ` +
+        "Zug, Auftrag und Eintreffzeit bleiben; die bisherige Fassung bleibt in der Historie.",
+      ok: "Diese Fassung gilt",
+    });
+    if (!sicher) return;
+    if (await gesichert("Fassung übernehmen", () => fassungGiltSetzen(einsatzId, r.id))) onGeaendert();
   }
 
   /**
@@ -2620,6 +2666,11 @@ function EinheitKarte(props: {
               {bedarf.map((m) => (
                 <span className={m.dringend && zaehlt ? "bedarf-marke dringend" : "bedarf-marke routine"} key={m.lang} title={m.lang}>{m.kurz}</span>
               ))}
+              {nachgereicht && (
+                <span className="kompakt-merkmal luecken-merkmal" title={`Bogen der Einheit (Stand ${standText(nachgereicht.bogen)}) liegt hinter der Schnellerfassung in der Historie`}>
+                  ⚠ Bogen nachgereicht
+                </span>
+              )}
               {bemerkungNeu && (
                 <span className="kompakt-merkmal bemerkung-merkmal" title={`Bemerkung der Einheit: ${bemerkung}`}>Bemerkung neu</span>
               )}
@@ -2682,6 +2733,16 @@ function EinheitKarte(props: {
               „Abrücken", das vor einer falsch nachgetragenen Eintreffzeit
               liegt (R3-E5). */}
           {zeitHinweis && <span className="muster-sub warnung-text zeit-unstimmig" role="note">⚠ {zeitHinweis}</span>}
+          {/* Nachgereichter Bogen hinter der Schnellerfassung (R4-W1). */}
+          {nachgereicht && (
+            <span className="muster-sub warnung-text bogen-nachgereicht" role="note">
+              ⚠ Bogen der Einheit nachgereicht (Stand {standText(nachgereicht.bogen)}, Stärke {staerkeText(nachgereicht.bogen)}) — es gilt
+              noch die Schnellerfassung.{" "}
+              <button type="button" className="link" aria-describedby={nameId} onClick={() => void fassungGilt(nachgereicht)}>
+                Bogen übernehmen
+              </button>
+            </span>
+          )}
           {/* Sofortbedarf nur, wenn gesetzt — nichts alarmiert, was leer ist (K1). */}
           {bedarf.length > 0 && (
             <span className="muster-sub bedarf-zeile">
@@ -3023,7 +3084,9 @@ function EinheitKarte(props: {
               eintrag={r}
               vorheriger={revs[i + 1]}
               aktuell={i === 0}
+              verdraengt={istVerdraengt(r, revs)}
               onVerwerfen={() => void fassungVerwerfen(r)}
+              onGilt={i === 0 ? undefined : () => void fassungGilt(r)}
             />
           ))}
         </ul>

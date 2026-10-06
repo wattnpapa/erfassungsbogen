@@ -12,14 +12,15 @@
  */
 
 import { useId, useState } from "react";
-import { MeldeStatus, neuesteJeEinheit, type MeldeEintrag } from "@bos/meldekopf/einsaetze";
+import { MeldeStatus, type MeldeEintrag } from "@bos/meldekopf/einsaetze";
+import { geltendeJeEinheit } from "./fassung-vorrang";
 import { einheitAnzeigename } from "./hilfen";
 import { eintreffzeit, papierAbgleichUebernehmen, SpeicherVollFehler, zeitKurz } from "./eintrag-zeiten";
 import { zeigeHinweis } from "./dialoge";
 
 /** Revisionsköpfe, deren Lage vom Papier noch nicht abgeglichen ist. */
 export function offenVomPapier(eintraege: MeldeEintrag[]): MeldeEintrag[] {
-  return neuesteJeEinheit(eintraege).filter((e) => e.vomPapier != null);
+  return geltendeJeEinheit(eintraege).filter((e) => e.vomPapier != null);
 }
 
 function zuLokal(ms: number): string {

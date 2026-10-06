@@ -37,6 +37,7 @@ import {
   einheitOrt,
   neuerBogen,
   schrittStatus,
+  zeitpunktDeutsch,
 } from "./hilfen";
 import { EEB_EPOCHE_MS, PersonalErfassung, jetztZeitpunkt, staerke } from "@bos/eeb-format/model";
 import {
@@ -66,11 +67,11 @@ import {
   einheitSchluessel,
   einsatzAnlegen,
   meldungEntfernen,
-  neuesteJeEinheit,
-  revisionen,
   type EintragSignatur,
   type Einsatzsammlung,
+  type MeldeEintrag,
 } from "@bos/meldekopf/einsaetze";
+import { fassungGiltSetzen, fassungPruefen, fassungenJeEinheit, geltendeJeEinheit, type FassungsPruefung } from "./fassung-vorrang";
 import { einsaetzeLaden, einsaetzePapierkorb } from "./einsaetze-lesen";
 import { bogenDiff, diffKurzfassung } from "@bos/meldekopf/meldung-diff";
 import {
@@ -478,6 +479,18 @@ function letztenEinsatzLaden(): string | null {
 function staerkeKurz(b: Erfassungsbogen): string {
   const s = staerke(b);
   return `${s.fuehrer} / ${s.unterfuehrer} / ${s.mannschaft} / ${s.gesamt}`;
+}
+
+/**
+ * Quittung im Kiosk-Stapel, wenn eine Fassung nicht nach dem Zeitstempel
+ * gelten soll (R4-W1): keine Rückfrage beim Dauerscannen, aber ein Satz,
+ * der sagt, was gilt und wo es sich ändern lässt.
+ */
+function vorrangKioskText(p: FassungsPruefung): string {
+  const bisher = zeitpunktDeutsch(p.bisher.bogen.stand);
+  if (p.lage === "aelter") return `älterer Stand als der vorhandene (${bisher}) — nur in die Historie gelegt`;
+  if (p.lage === "gleiche-minute") return `gleicher Stand wie die bisherige Fassung (${bisher}) — die eben gescannte gilt, an der Karte unter „Historie" änderbar`;
+  return `älterer Stand als die Schnellerfassung (${bisher}) — an der Karte „Bogen übernehmen" tippen`;
 }
 
 /**
@@ -1659,8 +1672,18 @@ function AppInhalt() {
       const weg = wasWegfiele(vorher, b);
       return weg.length > 0 ? ` Fällt dabei weg: ${weg.join(", ")}.` : "";
     };
+    // Wer in einer Rückfrage ausdrücklich „neue Fassung" gewählt hat, hat
+    // entschieden, welche Fassung gilt — auch bei älterem oder gleichem Stand
+    // im Bogen (R4-W1). "neu" = die eingehende gilt, "bisher" = sie liegt nur
+    // in der Historie.
+    let entschieden: "neu" | "bisher" | null = null;
     if (bekannt && !schonDa && !kiosk) {
-      const bisher = einsatz ? revisionen(einsatz.eintraege, schl)[0]?.bogen : undefined;
+      const bisherKopf = einsatz ? fassungenJeEinheit(einsatz.eintraege, schl)[0] : undefined;
+      const bisher = bisherKopf?.bogen;
+      // Älterer oder gleicher Stand im Bogen: nach dem Zeitstempel gälte er
+      // nicht bzw. nur zufällig — darum hier sagen und wählen lassen (R4-W1).
+      const nichtJuenger = bisher != null && b.stand <= bisher.stand;
+      const platzhalterBisher = bisherKopf?.quelle === "manuell" && quelle !== "manuell";
       // Beide Meldungen nebeneinander, bevor jemand „Fassung" oder „eigene
       // Einheit" wählt: Stärke, Ansprechperson, Kennzeichen, Stand. Haben sie
       // keine Person und kein Fahrzeug gemeinsam, ist es eher eine zweite
@@ -1670,9 +1693,14 @@ function AppInhalt() {
         wert: "fassung",
         label: "Als neue Fassung anhängen",
         hinweis:
-          "Der Normalfall bei einer Folgemeldung: die bisherige Meldung wandert in die Historie." +
+          (nichtJuenger && bisher
+            ? `Der Bogen trägt ${b.stand < bisher.stand ? "einen älteren" : "denselben"} Stand (${zeitpunktDeutsch(b.stand)}) wie die bisherige Meldung (${zeitpunktDeutsch(bisher.stand)}${platzhalterBisher ? ", von Hand erfasst" : ""}) — er gilt trotzdem, die bisherige wandert in die Historie.`
+            : "Der Normalfall bei einer Folgemeldung: die bisherige Meldung wandert in die Historie.") +
           (bisher ? wegfallHinweis(bisher) : ""),
       };
+      const historieWeg: Antwortweg[] = nichtJuenger
+        ? [{ wert: "historie", label: "Nur in die Historie legen", hinweis: "Die bisherige Meldung gilt weiter." }]
+        : [];
       const eigeneWeg: Antwortweg = {
         wert: "eigene",
         label: "Als eigene Einheit führen",
@@ -1689,8 +1717,11 @@ function AppInhalt() {
           </>
         ),
         wege: vergleich?.keineUeberschneidung
-          ? [eigeneWeg, ...(bisher ? nurStaerkeWeg(bisher) : []), fassungWeg]
-          : [...(bisher ? nurStaerkeWeg(bisher) : []), fassungWeg, eigeneWeg],
+          ? [eigeneWeg, ...(bisher ? nurStaerkeWeg(bisher) : []), fassungWeg, ...historieWeg]
+          : nichtJuenger && !platzhalterBisher && b.stand < (bisher?.stand ?? 0)
+            ? // Älterer Bogen nach einem echten jüngeren: Historie zuerst.
+              [...historieWeg, ...(bisher ? nurStaerkeWeg(bisher) : []), fassungWeg, eigeneWeg]
+            : [...(bisher ? nurStaerkeWeg(bisher) : []), fassungWeg, ...historieWeg, eigeneWeg],
       });
       if (!wahl) {
         // Abgebrochen: der Bogen bleibt draußen. Im Kiosk-Scan steht die
@@ -1702,6 +1733,8 @@ function AppInhalt() {
       }
       if (wahl === "eigene") override = `${schl}#${Date.now()}`;
       if (wahl === "staerke" && bisher) aufzunehmen = nurStaerkeUebernehmen(bisher, staerke(b), b.stand);
+      if (wahl === "fassung" || wahl === "staerke") entschieden = "neu";
+      if (wahl === "historie") entschieden = "bisher";
     }
     // Ähnliche Einheit schon da (gleiche Organisation und gleicher Ort, aber
     // anderer Schlüssel — etwa nach einer Papierphase ohne Einheitstyp
@@ -1713,7 +1746,7 @@ function AppInhalt() {
       // Ort ohne Vorsätze wie „OV" und auch als Teil des anderen Namens — vorher
       // buchstabengenau, „OV Albstadt" ≠ „Albstadt" zählte doppelt (R2-A5).
       const ort = einheitOrt(b.einheit);
-      const aehnlich = neuesteJeEinheit(einsatz.eintraege).find(
+      const aehnlich = geltendeJeEinheit(einsatz.eintraege).find(
         (e) =>
           e.einheitSchluessel !== schl &&
           e.bogen.einheit.organisation === b.einheit.organisation &&
@@ -1763,12 +1796,17 @@ function AppInhalt() {
           override = aehnlich.einheitSchluessel;
           aufzunehmen = nurStaerkeUebernehmen(aehnlich.bogen, staerke(b), b.stand);
         }
-        if (wahl === "gleich" || wahl === "staerke") zusammengelegtMit = einheitAnzeigename(aehnlich.bogen.einheit);
+        if (wahl === "gleich" || wahl === "staerke") {
+          zusammengelegtMit = einheitAnzeigename(aehnlich.bogen.einheit);
+          entschieden = "neu";
+        }
       }
     }
     // Was sich gegenüber der vorigen Fassung ändert — für die Quittung im
     // Kiosk, bevor der Kern die neue Fassung obenauf legt.
-    const vorige = bekannt && !schonDa && einsatz ? revisionen(einsatz.eintraege, schl)[0] : undefined;
+    const vorige = bekannt && !schonDa && einsatz ? fassungenJeEinheit(einsatz.eintraege, schl)[0] : undefined;
+    // Stand vor der Aufnahme — für die Frage, welche Fassung gilt (R4-W1).
+    const vorherEintraege = einsatz?.eintraege ?? [];
     let r;
     try {
       // meldungAufnehmen: legt ab und lässt die Folgemeldung Zug, Auftrag und
@@ -1794,8 +1832,35 @@ function AppInhalt() {
       setFehler("Einsatz nicht gefunden.");
       return false;
     }
+    // Welche Fassung gilt? Nicht allein der Zeitstempel im Bogen: Ein
+    // nachgereichter Bogen nach der Schnellerfassung oder zwei Fassungen
+    // derselben Minute fragen nach (Audit Runde 4, R4-W1). Im Kiosk-Stapel
+    // keine Frage — die Quittung sagt es, die Karte bietet die Übernahme an.
+    const pruefung = r.neu ? fassungPruefen(vorherEintraege, einsaetzeLaden().find((x) => x.id === zielId)?.eintraege ?? [], r.eintrag.id) : null;
+    let vorrang: { text: string } | null = null;
+    if (pruefung && entschieden) {
+      // Die Rückfrage davor hat entschieden — still umsetzen, in der Quittung nennen.
+      await vorrangSetzen(zielId, entschieden === "neu" ? pruefung.neu.id : pruefung.bisher.id);
+      vorrang = {
+        text:
+          entschieden === "neu"
+            ? `gilt trotz ${pruefung.neu.bogen.stand < pruefung.bisher.bogen.stand ? "älterem" : "gleichem"} Stand (${zeitpunktDeutsch(pruefung.neu.bogen.stand)}); die bisherige Fassung liegt in der Historie`
+            : `nur in die Historie gelegt — die bisherige Fassung (${zeitpunktDeutsch(pruefung.bisher.bogen.stand)}) gilt weiter`,
+      };
+    } else if (pruefung && kiosk) {
+      vorrang = { text: vorrangKioskText(pruefung) };
+    } else if (pruefung) {
+      vorrang = await vorrangKlaeren(zielId, pruefung);
+    }
+    const folgeText = r.neu && vorige ? `Folgemeldung: ${diffKurzfassung(bogenDiff(vorige.bogen, aufzunehmen)) || "inhaltlich unverändert"}` : "";
     const folge =
-      (r.neu && vorige ? ` (Folgemeldung: ${diffKurzfassung(bogenDiff(vorige.bogen, aufzunehmen)) || "inhaltlich unverändert"})` : "") +
+      (vorrang && folgeText && pruefung?.lage === "gleiche-minute"
+        ? ` (${folgeText}; ${vorrang.text})`
+        : vorrang
+          ? ` (${vorrang.text})`
+          : folgeText
+            ? ` (${folgeText})`
+            : "") +
 
       (r.erbeFehlt ? " Zug, Auftrag und Eintreffzeit der vorigen Fassung konnten nicht übernommen werden (Speicher voll) — bitte an der Karte nachtragen." : "");
     if (kiosk) {
@@ -1840,6 +1905,103 @@ function AppInhalt() {
     );
     setOffenerEinsatzId(zielId); // zurück in die Einsatzansicht
     return true;
+  }
+
+  /**
+   * Rückfrage, welche Fassung einer Einheit gilt (Audit Runde 4, R4-W1). Die
+   * Kern-Regel „jüngster Stand im Bogen" bleibt, wo sie passt; hier fragt die
+   * App in den beiden Lagen, in denen sie still das Falsche wählte: der
+   * nachgereichte Bogen nach einer Schnellerfassung (Vorschlag: der Bogen
+   * gilt) und zwei verschiedene Fassungen derselben Minute. Ein älterer
+   * Bogen nach einem jüngeren gilt nicht und wird nur benannt. Rückgabe: Satz
+   * für die Quittung.
+   */
+  async function vorrangKlaeren(zielId: string, p: FassungsPruefung): Promise<{ text: string }> {
+    const name = einheitAnzeigename(p.neu.bogen.einheit);
+    const stand = (e: MeldeEintrag) => `Stand ${zeitpunktDeutsch(e.bogen.stand)}, Stärke ${staerkeKurz(e.bogen)}`;
+    if (p.lage === "aelter") {
+      return { text: `älterer Stand als der vorhandene (${zeitpunktDeutsch(p.bisher.bogen.stand)}) — nur in die Historie gelegt` };
+    }
+    const vergleich = meldungenVergleichen(p.bisher.bogen, p.neu.bogen);
+    if (p.lage === "ersetzt-platzhalter") {
+      const wahl = await frageWahl({
+        titel: "Bogen der Einheit nachgereicht",
+        text: (
+          <>
+            Für „{name}" gilt bisher die von Hand erfasste Meldung ({stand(p.bisher)}). Der eben eingelesene Bogen der Einheit
+            trägt den älteren {stand(p.neu)} — nach dem Zeitstempel bliebe die Schnellerfassung gültig.
+            <MeldungsGegenueberstellung vergleich={vergleich} />
+          </>
+        ),
+        wege: [
+          {
+            wert: "bogen",
+            label: "Bogen der Einheit gilt — ersetzt die Schnellerfassung",
+            hinweis: "Stärke, Namen, Fahrzeuge und Bedarf aus dem Bogen; Zug, Auftrag und Eintreffzeit bleiben.",
+          },
+          {
+            wert: "bisher",
+            label: "Schnellerfassung behalten",
+            hinweis: "Der Bogen liegt in der Historie; an der Karte lässt er sich später übernehmen.",
+          },
+        ],
+        abbruch: "Später entscheiden",
+      });
+      if (wahl === "bogen") {
+        await vorrangSetzen(zielId, p.neu.id);
+        return { text: `Bogen der Einheit gilt, ersetzt die Schnellerfassung (${zeitpunktDeutsch(p.bisher.bogen.stand)})` };
+      }
+      return { text: `älterer Stand als die Schnellerfassung (${zeitpunktDeutsch(p.bisher.bogen.stand)}) — die Schnellerfassung gilt weiter, der Bogen liegt in der Historie` };
+    }
+    // Gleiche Minute: die Empfangszeit entscheidet nicht mehr.
+    const wahl = await frageWahl({
+      titel: "Zwei Fassungen mit demselben Stand",
+      text: (
+        <>
+          „{name}" hat schon eine Fassung mit Stand {zeitpunktDeutsch(p.bisher.bogen.stand)} (Stärke {staerkeKurz(p.bisher.bogen)}). Die eben
+          eingelesene trägt dieselbe Minute (Stärke {staerkeKurz(p.neu.bogen)}). Welche gilt?
+          <MeldungsGegenueberstellung vergleich={vergleich} />
+        </>
+      ),
+      wege: [
+        { wert: "neu", label: `Die eben eingelesene (Stärke ${staerkeKurz(p.neu.bogen)})` },
+        { wert: "bisher", label: `Die bisherige (Stärke ${staerkeKurz(p.bisher.bogen)})` },
+      ],
+      abbruch: "Bisherige behalten",
+    });
+    if (wahl === "neu") {
+      await vorrangSetzen(zielId, p.neu.id);
+      return { text: `gleicher Stand wie die bisherige Fassung — die eben eingelesene gilt` };
+    }
+    await vorrangSetzen(zielId, p.bisher.id);
+    return { text: `gleicher Stand wie die bisherige Fassung — die bisherige gilt weiter, die eben eingelesene liegt in der Historie` };
+  }
+
+  /** Vorrang schreiben; ein voller Speicher wird gemeldet, die Aufnahme bleibt. */
+  async function vorrangSetzen(zielId: string, eintragId: string): Promise<void> {
+    try {
+      fassungGiltSetzen(zielId, eintragId);
+    } catch (e) {
+      setFehler(istSpeicherVoll(e) ? new SpeicherVollFehler(e).message : fehlerText(e));
+    }
+    einsaetzeNeuLaden();
+  }
+
+  /**
+   * Nach einem Stapel (Dateien, Bilder): je betroffener Einheit dieselbe
+   * Rückfrage wie beim Einzeleingang (R4-W1). Selten — nur nachgereichte
+   * Bögen und gleiche Minuten fragen. Rückgabe: Zeilen für die Quittung.
+   */
+  async function vorrangImStapel(zielId: string, vorher: MeldeEintrag[], neueIds: string[]): Promise<string[]> {
+    const zeilen: string[] = [];
+    for (const id of neueIds) {
+      const nachher = einsaetzeLaden().find((x) => x.id === zielId)?.eintraege ?? [];
+      const p = fassungPruefen(vorher, nachher, id);
+      if (!p) continue;
+      const r = await vorrangKlaeren(zielId, p);
+      zeilen.push(`„${einheitAnzeigename(p.neu.bogen.einheit)}": ${r.text}.`);
+    }
+    return zeilen;
   }
 
   /**
@@ -2717,7 +2879,7 @@ function AppInhalt() {
     zielId: string,
     gefunden: QrBogen[],
     vomPapier = false,
-  ): { neu: number; uebersprungen: number; speicherVoll: number } {
+  ): { neu: number; uebersprungen: number; speicherVoll: number; neueIds: string[] } {
     let neu = 0;
     let uebersprungen = 0;
     // Bögen, die am vollen Speicher scheiterten — kein „kaputter Bogen" und
@@ -2753,7 +2915,7 @@ function AppInhalt() {
         /* Markierung ist Komfort */
       }
     }
-    return { neu, uebersprungen, speicherVoll };
+    return { neu, uebersprungen, speicherVoll, neueIds };
   }
 
   /**
@@ -2789,6 +2951,10 @@ function AppInhalt() {
     const kaputt: string[] = [];
     const zusatz = { sammlungInPdf: false, lage: false }; // R2-A1
     const sammlungenUebernommen: string[] = []; // R3-W3
+    // Stand vor dem Stapel und die neu abgelegten Bögen — für die Frage,
+    // welche Fassung gilt (R4-W1).
+    const vorher = einsaetzeLaden().find((x) => x.id === zielId)?.eintraege ?? [];
+    const neueIds: string[] = [];
     for (const datei of dateien) {
       try {
         const bytes = istPdfDatei(datei) ? new Uint8Array(await datei.arrayBuffer()) : null;
@@ -2810,6 +2976,7 @@ function AppInhalt() {
         neu += r.neu;
         uebersprungen += r.uebersprungen;
         speicherVoll += r.speicherVoll;
+        neueIds.push(...r.neueIds);
       } catch (e) {
         // Je Datei ein ganzer Satz mit Ursache und nächstem Schritt statt
         // Parser-Text in Klammern (Audit Runde 2, R2-E5).
@@ -2817,6 +2984,7 @@ function AppInhalt() {
       }
     }
     einsaetzeNeuLaden();
+    const vorrang = await vorrangImStapel(zielId, vorher, neueIds);
     const fehlerZeilen = [speicherVollMeldung(speicherVoll), ...kaputt].filter(Boolean);
     const bogenMeldung =
       neu + uebersprungen === 0
@@ -2827,6 +2995,7 @@ function AppInhalt() {
     // Für den gemeinsamen Bericht mit Bildern: nur, was die Zahl nicht sagt.
     const hinweise = [
       ...sammlungenUebernommen,
+      ...vorrang,
       zusatz.sammlungInPdf ? SAMMLUNG_IN_PDF_HINWEIS : zusatz.lage && neu > 0 ? LAGE_NACHTRAGEN_HINWEIS : "",
     ].filter(Boolean);
     return {
@@ -2835,7 +3004,7 @@ function AppInhalt() {
       uebersprungen,
       zeilen: [...fehlerZeilen, ...hinweise],
       fehler: fehlerZeilen.join(" "),
-      meldung: [...sammlungenUebernommen, bogenMeldung].filter(Boolean).join(" "),
+      meldung: [...sammlungenUebernommen, bogenMeldung, ...vorrang].filter(Boolean).join(" "),
     };
   }
 
@@ -2965,6 +3134,7 @@ function AppInhalt() {
       let uebersprungen = 0;
       let speicherVoll = 0;
       const neueIds: string[] = [];
+      const vorher = einsaetzeLaden().find((x) => x.id === zielId)?.eintraege ?? []; // R4-W1
       for (const fund of erg.funde) {
         if (speicherVoll > 0) {
           speicherVoll++; // jeder weitere scheitert genauso (R3-O1)
@@ -2994,7 +3164,8 @@ function AppInhalt() {
         /* Markierung ist Komfort */
       }
       einsaetzeNeuLaden();
-      setStapelBericht(stapelBerichtZeilen(erg, neu, uebersprungen, daten));
+      const vorrang = await vorrangImStapel(zielId, vorher, neueIds);
+      setStapelBericht([...stapelBerichtZeilen(erg, neu, uebersprungen, daten), ...vorrang]);
       const voll = speicherVollMeldung(speicherVoll);
       if (voll) setEinlese({ fehler: voll, meldung: "" });
     } catch (e) {

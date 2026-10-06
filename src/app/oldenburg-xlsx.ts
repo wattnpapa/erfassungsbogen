@@ -79,10 +79,10 @@ import {
 import {
   MeldeStatus,
   bogenInhaltsId,
-  neuesteJeEinheit,
   type Einsatzsammlung,
   type MeldeEintrag,
 } from "@bos/meldekopf/einsaetze";
+import { geltendeJeEinheit } from "./fassung-vorrang";
 import { zaehltInLage } from "./auswertung";
 import { eintreffzeit } from "./eintrag-zeiten";
 
@@ -510,7 +510,7 @@ export function bogenOldenburgXlsx(b: Erfassungsbogen): Uint8Array<ArrayBuffer> 
  * (in einer echten Lage) die Übungsmeldungen (R2-K2).
  */
 export function einsatzOldenburgXlsx(s: Einsatzsammlung): Uint8Array<ArrayBuffer> {
-  const meldungen = neuesteJeEinheit(s.eintraege).sort(
+  const meldungen = geltendeJeEinheit(s.eintraege).sort(
     (a, b) =>
       einheitAnzeigename(a.bogen.einheit).localeCompare(einheitAnzeigename(b.bogen.einheit), "de") ||
       (a.teilEtikett ?? "").localeCompare(b.teilEtikett ?? "", "de"),

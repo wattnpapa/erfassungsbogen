@@ -17,7 +17,8 @@ import {
   type Staerke,
   type VerpflegungSplit,
 } from "@bos/eeb-format/model";
-import { EinsatzArt, MeldeStatus, neuesteJeEinheit, type MeldeEintrag } from "@bos/meldekopf/einsaetze";
+import { EinsatzArt, MeldeStatus, type MeldeEintrag } from "@bos/meldekopf/einsaetze";
+import { geltendeJeEinheit } from "./fassung-vorrang";
 
 export interface EinsatzSummen {
   /** Anzahl anwesender Einheiten (nicht Personen). */
@@ -66,7 +67,7 @@ export function zaehltInLage(art: EinsatzArt, bogen: Erfassungsbogen): boolean {
  * nicht in diese Lage gehören. Reihenfolge folgt {@link neuesteJeEinheit}.
  */
 export function aktuelleMeldungen(eintraege: MeldeEintrag[], art?: EinsatzArt): MeldeEintrag[] {
-  const anwesend = neuesteJeEinheit(eintraege).filter((e) => e.status === MeldeStatus.ANWESEND);
+  const anwesend = geltendeJeEinheit(eintraege).filter((e) => e.status === MeldeStatus.ANWESEND);
   return art == null ? anwesend : anwesend.filter((e) => zaehltInLage(art, e.bogen));
 }
 
@@ -76,7 +77,7 @@ export function aktuelleMeldungen(eintraege: MeldeEintrag[], art?: EinsatzArt): 
  * eine stillschweigend kleinere Summe wäre so falsch wie die zu große.
  */
 export function uebungenAusserhalbDerLage(eintraege: MeldeEintrag[], art: EinsatzArt): MeldeEintrag[] {
-  return neuesteJeEinheit(eintraege).filter(
+  return geltendeJeEinheit(eintraege).filter(
     (e) => e.status === MeldeStatus.ANWESEND && !zaehltInLage(art, e.bogen),
   );
 }

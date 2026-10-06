@@ -15,12 +15,13 @@
 
 import { staerke, type Erfassungsbogen } from "@bos/eeb-format/model";
 import type { EinsatzArt } from "@bos/meldekopf/einsaetze";
+import { geltendeJeEinheit } from "./fassung-vorrang";
 import { einheitAnzeigename, orgLabel, vokabText, vokabularFuer, zeitpunktDeutsch } from "./hilfen";
 import { meldungsNummern } from "./einheiten-tabelle";
 import { aktuelleMeldungen, unterbringungLage, verpflegungLage, zaehltInLage } from "./auswertung";
 import { csvDatei, csvZeile } from "./csv";
 import { HERKUNFT_TEXT, eintreffzeit, zeitLang } from "./eintrag-zeiten";
-import { MeldeStatus, neuesteJeEinheit, type Einsatzsammlung, type MeldeEintrag, type MeldeQuelle } from "@bos/meldekopf/einsaetze";
+import { MeldeStatus, type Einsatzsammlung, type MeldeEintrag, type MeldeQuelle } from "@bos/meldekopf/einsaetze";
 
 const STATUS_LABEL: Record<MeldeStatus, string> = {
   [MeldeStatus.ANWESEND]: "anwesend",
@@ -222,7 +223,7 @@ export function einsatzCsvInhalt(
   // als Übung geführte Einheit fiel bisher wortlos aus der Datei — die
   // Führungsstelle sah eine Lücke, die sie nicht als Lücke erkennen konnte.
   // Die Spalten „Status" und „Zählt in Lage" sagen, was die Summe enthält.
-  const alle = neuesteJeEinheit(s.eintraege).sort((a, b) =>
+  const alle = geltendeJeEinheit(s.eintraege).sort((a, b) =>
     einheitName(a.bogen).localeCompare(einheitName(b.bogen), "de"),
   );
   const zaehlende = aktuelleMeldungen(s.eintraege, s.art);

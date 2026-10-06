@@ -18,9 +18,9 @@
 import {
   AUFRAEUM_FRIST_MS,
   einsaetzeAusJson,
-  neuesteJeEinheit,
   type Speicherhuelle,
 } from "@bos/meldekopf/einsaetze";
+import { geltendeJeEinheit } from "./fassung-vorrang";
 
 /** Speicherschlüssel der Sammlungen im Kern (einsaetze.ts, nicht exportiert). */
 const SAMMLUNGEN_SCHLUESSEL = "eeb.einsaetze.v1";
@@ -88,7 +88,7 @@ export function ruhendeVormerken(
       name: s.name,
       angelegt: s.angelegt,
       geaendert: s.geaendert,
-      einheiten: neuesteJeEinheit(s.eintraege).length,
+      einheiten: geltendeJeEinheit(s.eintraege).length,
       meldungen: s.eintraege.length,
       entferntAm: jetzt,
     }));

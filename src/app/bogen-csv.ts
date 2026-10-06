@@ -67,7 +67,8 @@ import {
 import { csvDatei, csvZeile, jaNein } from "./csv";
 import { HERKUNFT_TEXT, eintreffzeit, zeitLang } from "./eintrag-zeiten";
 import { meldungsNummern } from "./einheiten-tabelle";
-import { neuesteJeEinheit, MeldeStatus, type Einsatzsammlung, type MeldeEintrag, type MeldeQuelle } from "@bos/meldekopf/einsaetze";
+import { MeldeStatus, type Einsatzsammlung, type MeldeEintrag, type MeldeQuelle } from "@bos/meldekopf/einsaetze";
+import { geltendeJeEinheit } from "./fassung-vorrang";
 
 // ------------------------------------------------------------------ Spalten
 
@@ -384,7 +385,7 @@ export function einsatzDetailCsvInhalt(
   /** Nummern aus der ganzen Sammlung — beim Teilexport „nur neue" sonst verschoben. */
   nummern: Map<string, number> = meldungsNummern(s.eintraege),
 ): string {
-  const meldungen = neuesteJeEinheit(s.eintraege).sort(
+  const meldungen = geltendeJeEinheit(s.eintraege).sort(
     (a, b) =>
       einheitAnzeigename(a.bogen.einheit).localeCompare(einheitAnzeigename(b.bogen.einheit), "de") ||
       (a.teilEtikett ?? "").localeCompare(b.teilEtikett ?? "", "de"),
