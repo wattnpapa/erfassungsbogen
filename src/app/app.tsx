@@ -3526,7 +3526,12 @@ function AppInhalt() {
               </span>
               <span className="entwurf-aktionen">
                 <button type="button" className="primaer" onClick={() => { setMeldung(""); setZeigeStart(false); }}>Fortsetzen</button>
-                <button type="button" className="gefahr" onClick={entwurfWegwerfen}>Verwerfen</button>
+                {/* Bei der Vorlagen-Bearbeitung klang „Verwerfen" schärfer, als es ist,
+                    und glich dem „Verwerfen" eines echten Bogens: Die Vorlage
+                    bleibt, wie sie war (Audit Runde 4, R4-D5). */}
+                <button type="button" className={bearbeiteteVorlage ? "" : "gefahr"} onClick={entwurfWegwerfen}>
+                  {bearbeiteteVorlage ? "Bearbeitung beenden" : "Verwerfen"}
+                </button>
               </span>
             </section>
           );

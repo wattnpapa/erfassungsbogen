@@ -16,6 +16,7 @@
 import { absenderkarteGefuellt, absenderkarteLaden } from "./absenderkarte";
 import { einsaetzeLaden, einsaetzePapierkorb } from "./einsaetze-lesen";
 import { entwurfLaden, ersetztenEntwurfLaden } from "./entwurf";
+import { exportVorhanden } from "./export-stand";
 import { einheitAnzeigename } from "./hilfen";
 import { geraeteSchluesselPrivat } from "./geraete-schluessel";
 import { vorlagenLaden, vorlagenPapierkorb } from "./vorlagen";
@@ -340,6 +341,12 @@ export interface DatenUmfang {
   rueckholplatz: string | null;
   absender: boolean;
   geraeteschluessel: boolean;
+  /**
+   * Namen der Sammlungen mit Meldungen, von denen es keinen Export, kein
+   * Lageblatt und keine Weitergabe gibt: Beim Löschen ist das die einzige
+   * Kopie (Audit Runde 4, R4-D5).
+   */
+  ohneExport: string[];
 }
 
 function rueckholplatzName(): string | null {
@@ -359,6 +366,7 @@ export function datenUmfang(): DatenUmfang {
     rueckholplatz: rueckholplatzName(),
     absender: absenderkarteGefuellt(absenderkarteLaden()),
     geraeteschluessel: geraeteSchluesselPrivat() != null,
+    ohneExport: einsaetze.filter((e) => e.eintraege.length > 0 && !exportVorhanden(e.id)).map((e) => e.name),
   };
 }
 

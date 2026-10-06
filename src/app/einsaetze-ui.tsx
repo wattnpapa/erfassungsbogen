@@ -69,6 +69,7 @@ import {
   type EinheitenSortierung,
 } from "./einheiten-liste";
 import { debugAktiv } from "./debug-plattform";
+import { papierkorbRest } from "./papierkorb-frist";
 import { Auswahl, STAERKE_LEGENDE } from "./schritte/bausteine";
 import { SeitenKopf } from "./seiten-kopf";
 import { AnzeigeLeistenKnopf, AnzeigeSchalter } from "./anzeige-schalter";
@@ -134,6 +135,7 @@ import {
   exportStaendeLaden,
   exportZeitKurz,
   letzterStandMit,
+  exportVorhanden,
   kenntnisStandLaden,
   kenntnisVermerken,
   lageblattStandLaden,
@@ -388,7 +390,12 @@ export function EinsatzListe(props: {
   function fragEndgueltig(s: Einsatzsammlung) {
     return frageJaNein({
       titel: "Einsatz endgültig löschen?",
-      text: `„${s.name}" mit ${s.eintraege.length} Meldung(en) wird aus dem Papierkorb entfernt. Darin stecken fremde Personendaten; rückgängig geht das nicht.`,
+      text:
+        `„${s.name}" mit ${s.eintraege.length} Meldung(en) wird aus dem Papierkorb entfernt. Darin stecken fremde Personendaten; rückgängig geht das nicht.` +
+        // Gibt es keine Kopie, ist das hier die letzte (Audit Runde 4, R4-D5).
+        (s.eintraege.length > 0 && !exportVorhanden(s.id)
+          ? " Von dieser Sammlung gibt es noch keinen Export, kein Lageblatt und keine Weitergabe — es ist die einzige Kopie."
+          : ""),
       ok: "Endgültig löschen",
       gefahr: true,
     });
@@ -502,9 +509,11 @@ export function EinsatzListe(props: {
                 Wiederherstellen
               </AbgangKnopf>
             </div>
-            <p className="hinweis">
-              {s.eintraege.length} Meldung(en) · gelöscht am {new Date(s.geloeschtAm!).toLocaleDateString("de-DE")} —
-              wird nach 30 Tagen automatisch endgültig entfernt.
+            {/* Datum und Restzeit statt „nach 30 Tagen": Ab drei Tagen
+                hervorgehoben (Audit Runde 4, R4-D5). */}
+            <p className={papierkorbRest(s.geloeschtAm!).bald ? "hinweis warnung-text" : "hinweis"}>
+              {s.eintraege.length} Meldung(en) · gelöscht am {new Date(s.geloeschtAm!).toLocaleDateString("de-DE")} —{" "}
+              {papierkorbRest(s.geloeschtAm!).text}
             </p>
             <div className="papierkorb-endgueltig">
               <AbgangKnopf

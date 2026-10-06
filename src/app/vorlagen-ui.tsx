@@ -40,6 +40,7 @@ import { bedarfMarken } from "./einheiten-tabelle";
 import { frageJaNein, frageText, zeigeHinweis } from "./dialoge";
 import { istNativ, linkTeilen, shareSheetVerfuegbar } from "./nativ";
 import { AbgangKnopf, Kartenstapel } from "./kartenstapel";
+import { papierkorbRest } from "./papierkorb-frist";
 
 function personName(vorname: string, nachname: string): string {
   return `${vorname} ${nachname}`.trim() || "(ohne Name)";
@@ -179,9 +180,8 @@ export function VorlagenListe(props: {
                 Wiederherstellen
               </AbgangKnopf>
             </div>
-            <p className="hinweis">
-              Gelöscht am {new Date(v.geloeschtAm!).toLocaleDateString("de-DE")} — wird nach 30 Tagen
-              automatisch endgültig entfernt.
+            <p className={papierkorbRest(v.geloeschtAm!).bald ? "hinweis warnung-text" : "hinweis"}>
+              Gelöscht am {new Date(v.geloeschtAm!).toLocaleDateString("de-DE")} — {papierkorbRest(v.geloeschtAm!).text}
             </p>
             <div className="papierkorb-endgueltig">
               <AbgangKnopf

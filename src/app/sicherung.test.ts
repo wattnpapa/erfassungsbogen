@@ -17,7 +17,8 @@ import {
 } from "./sicherung";
 import { OrganisationsTyp, PersonalErfassung, SCHEMA_VERSION, type Erfassungsbogen } from "@bos/eeb-format/model";
 import { absenderkarteSpeichern } from "./absenderkarte";
-import { EinsatzArt, einsatzAnlegen, meldungHinzufuegen,
+import { exportVermerken } from "./export-stand";
+import { EinsatzArt, einsaetzeLaden, einsatzAnlegen, meldungHinzufuegen,
   speicherhuelleSetzen,
 } from "@bos/meldekopf/einsaetze";
 import { entwurfLaden, entwurfSpeichern, ersetztenEntwurfMerken } from "./entwurf";
@@ -126,7 +127,21 @@ describe("datenUmfang()", () => {
       rueckholplatz: null,
       absender: false,
       geraeteschluessel: false,
+      ohneExport: [],
     });
+  });
+
+  // Audit Runde 4, R4-D5: Wo es keine Kopie gibt, nennt die Rückfrage es.
+  it("nennt Sammlungen mit Meldungen, von denen es keinen Export gibt (R4-D5)", () => {
+    const a = einsatzAnlegen("Übung", EinsatzArt.UEBUNG);
+    meldungHinzufuegen(a.id, bogen(), { quelle: "manuell" });
+    const b = einsatzAnlegen("Hochwasser", EinsatzArt.EINSATZ);
+    meldungHinzufuegen(b.id, bogen(), { quelle: "manuell" });
+    einsatzAnlegen("Leer", EinsatzArt.EINSATZ); // ohne Meldungen: nichts zu verlieren
+    expect(datenUmfang().ohneExport.sort()).toEqual(["Hochwasser", "Übung"]);
+
+    exportVermerken(einsaetzeLaden().find((s) => s.id === b.id)!, "csv");
+    expect(datenUmfang().ohneExport).toEqual(["Übung"]);
   });
 
   it("zählt Vorlagen und Einsätze inklusive Papierkorb", () => {

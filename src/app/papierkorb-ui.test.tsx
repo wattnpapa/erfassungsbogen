@@ -21,6 +21,7 @@ import {
   einsaetzePapierkorb,
   einsatzAnlegen,
   einsatzLoeschen,
+  meldungHinzufuegen,
 } from "@bos/meldekopf/einsaetze";
 import { vorlageAnlegen, vorlageLoeschen, vorlagenLaden, vorlagenPapierkorb } from "./vorlagen";
 import { neuerBogen } from "./hilfen";
@@ -45,6 +46,43 @@ describe("Papierkorb der Einsätze", () => {
     );
     return s;
   }
+
+  // Audit Runde 4, R4-D5: Datum und Restzeit statt „nach 30 Tagen"; die
+  // Rückfrage sagt, wenn es keine Kopie gibt.
+  it("nennt im Papierkorb das Datum des Entfernens und hebt die letzten Tage hervor (R4-D5)", async () => {
+    const nutzer = userEvent.setup();
+    const s = einsatzAnlegen("Hochwasser Wardenburg", EinsatzArt.EINSATZ, "Wardenburg");
+    einsatzLoeschen(s.id);
+    const liste = JSON.parse(localStorage.getItem("eeb.einsaetze.v1")!);
+    liste[0].geloeschtAm = Date.now() - 29.7 * 24 * 60 * 60 * 1000;
+    localStorage.setItem("eeb.einsaetze.v1", JSON.stringify(liste));
+    render(<EinsatzListe einsaetze={einsaetzeLaden()} onOeffnen={() => {}} onGeaendert={() => {}} />);
+
+    await nutzer.click(screen.getByRole("button", { name: /^Papierkorb \(1\)/ }));
+
+    const zeile = document.querySelector<HTMLElement>(".papierkorb .hinweis")!;
+    expect(zeile.textContent).toMatch(/Wird morgen endgültig entfernt/);
+    expect(zeile.className).toContain("warnung-text");
+    expect(zeile.textContent).not.toMatch(/nach 30 Tagen/);
+  });
+
+  it("sagt vor dem endgültigen Löschen, dass es keine andere Kopie gibt (R4-D5)", async () => {
+    const nutzer = userEvent.setup();
+    const s = einsatzAnlegen("Hochwasser Wardenburg", EinsatzArt.EINSATZ, "Wardenburg");
+    meldungHinzufuegen(s.id, neuerBogen());
+    einsatzLoeschen(s.id);
+    render(
+      <>
+        <EinsatzListe einsaetze={einsaetzeLaden()} onOeffnen={() => {}} onGeaendert={() => {}} />
+        <Dialogschicht />
+      </>,
+    );
+
+    await nutzer.click(screen.getByRole("button", { name: /^Papierkorb \(1\)/ }));
+    await nutzer.click(screen.getByRole("button", { name: "Endgültig löschen…" }));
+
+    expect(rueckfrage("Einsatz endgültig löschen?").textContent).toMatch(/noch keinen Export, kein Lageblatt und keine Weitergabe — es ist die einzige Kopie/);
+  });
 
   it("löscht einen Einsatz endgültig, wenn die Rückfrage bejaht wird", async () => {
     const nutzer = userEvent.setup();

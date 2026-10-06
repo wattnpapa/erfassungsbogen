@@ -448,6 +448,19 @@ export function exportSammlung(einsatz: Einsatzsammlung, umfang: ExportUmfang, s
 }
 
 /**
+ * Gibt es von dieser Sammlung irgendeinen Export, ein Lageblatt oder eine
+ * Weitergabe? Für die Rückfragen vor dem endgültigen Löschen: Sie sagen, wenn
+ * es keine Kopie gibt (Audit Runde 4, R4-D5).
+ */
+export function exportVorhanden(einsatzId: string): boolean {
+  return (
+    Object.keys(exportStaendeLaden(einsatzId)).length > 0 ||
+    lageblattStandLaden(einsatzId) != null ||
+    weitergabeStandLaden(einsatzId) != null
+  );
+}
+
+/**
  * Wann zuletzt ein Export, ein Lageblatt oder eine Weitergabe dieser Sammlung
  * eine der Meldungen enthielt — `null`, wenn keine in irgendeinem Stand steht.
  * Für die Rückfrage vor dem Entfernen: Sie sagt, ob es von der Meldung noch

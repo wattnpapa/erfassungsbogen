@@ -2573,7 +2573,7 @@ describe("Vorlage bearbeiten (Karte in „Gespeicherte Vorlagen“)", () => {
    * „Verwerfen" — auf dem Rückholplatz lag danach die unveränderte
    * Vorlagen-Kopie, der echte Einsatzbogen war gelöscht.
    */
-  it("beendet mit „Verwerfen“ nur die Vorlagen-Bearbeitung; der eigene Bogen bleibt zurückholbar (R3-D1)", async () => {
+  it("beendet mit „Bearbeitung beenden“ nur die Vorlagen-Bearbeitung; der eigene Bogen bleibt zurückholbar (R3-D1)", async () => {
     const v = vorlageAnlegen("OV Ulm B", bogenMitName("Ulm"));
     const vorlageVorher = JSON.stringify(vorlagenLaden().find((x) => x.id === v.id)!.bogen);
     const nutzer = userEvent.setup();
@@ -2590,7 +2590,9 @@ describe("Vorlage bearbeiten (Karte in „Gespeicherte Vorlagen“)", () => {
     // Die Karte ist als Vorlagen-Bearbeitung erkennbar.
     expect(screen.getByText(/Bearbeitung der Vorlage „OV Ulm B"/)).toBeDefined();
 
-    await nutzer.click(screen.getByRole("button", { name: "Verwerfen" }));
+    // R4-D5: Der Knopf heißt wie die Handlung, nicht „Verwerfen".
+    expect(screen.queryByRole("button", { name: "Verwerfen" })).toBeNull();
+    await nutzer.click(screen.getByRole("button", { name: "Bearbeitung beenden" }));
     const frage = rueckfrage("Bearbeitung der Vorlage beenden?");
     expect(frage.textContent).toContain("bleibt unverändert gespeichert");
     expect(frage.textContent).toContain("ECHTER EINSATZ Deichsicherung");

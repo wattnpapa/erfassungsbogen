@@ -965,6 +965,13 @@ export function Fusszeile({ onBogenOeffnen, kompakt = false }: {
                 <li>
                   {loeschUmfang.einsaetze} {loeschUmfang.einsaetze === 1 ? "Einsatz-Sammlung" : "Einsatz-Sammlungen"}
                   {" mit "}{loeschUmfang.meldungen} {loeschUmfang.meldungen === 1 ? "gemeldeten Bogen" : "gemeldeten Bögen"}
+                  {/* Wo es keine Kopie gibt, ist das hier die einzige (R4-D5). */}
+                  {loeschUmfang.ohneExport.length > 0 && (
+                    <strong className="warnung-text">
+                      {" "}— noch kein Export, Lageblatt oder keine Weitergabe von:{" "}
+                      {loeschUmfang.ohneExport.map((n) => `„${n}"`).join(", ")}
+                    </strong>
+                  )}
                 </li>
                 <li>{loeschUmfang.entwurf ? "der aktuelle Bogen-Entwurf" : "kein offener Bogen-Entwurf"}</li>
                 {loeschUmfang.rueckholplatz != null && (
