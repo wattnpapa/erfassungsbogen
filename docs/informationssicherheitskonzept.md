@@ -692,11 +692,10 @@ Datenausleitung an eine andere Herkunft ist technisch unterbunden.
   Nachtragszeilen (gemessen in einem Probesatz, `einsatzLageblattSeiteFuellen`)
   und trägt unter „Summe laut Gerät" eine leere Zeile „Summe einschl.
   Nachträge (von Hand)"; ein leeres Lageblatt druckt Ausfülllinien statt
-  Nullen. Das Einzel-PDF führt je Person die Zählrolle (F/UF/M), die Stärke
+  Nullen. Das Einzel-PDF führt die Stärke
   mit Legende und — nur wo es keine Seite kostet (`einzelPdfDokument`) — zwei
   freie Personalzeilen und einen leeren Fahrzeugblock. Kein neuer Inhalt aus
-  der Sammlung, keine neue Datenkategorie: die Zählrolle ist Teil des Bogens
-  und steht schon im QR-Code und in der CSV.
+  der Sammlung, keine neue Datenkategorie.
   *Nachgezogen 2026-10-05 (R3-A7):* Den Blanko-Vordruck erzeugt die App jetzt
   auch selbst (Einsatzansicht, Übergabe-Dialog unter „Weitere Formate",
   Fußzeile; `blankoPdfErzeugen` aus `src/app/blanko.ts`, derselben Quelle wie

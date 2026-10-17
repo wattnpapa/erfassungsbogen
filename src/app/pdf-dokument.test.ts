@@ -735,17 +735,14 @@ describe("einsatzLageblattDokument()", () => {
     expect(u).not.toContain("Nachtrag von Hand");
   });
 
-  it("führt die Zählrolle je Person im Einzel-PDF (R3-A6)", () => {
+  it("führt keine eigene Rollenspalte, lässt aber Platz für Nachträge (R3-A6)", () => {
     const dd = pdfDokument(basisBogen(), QR);
     const t = texte(dd.content).join("\n");
-    expect(t).toContain("Rolle\nF/UF/M");
-    // Johannes Rudolph ist Führer, Anna Weber Mannschaft.
-    expect(t).toMatch(/\nF\ncenter\nRudolph, Johannes\n/);
-    expect(t).toMatch(/\nM\ncenter\nWeber, Anna\n/);
+    expect(t).not.toContain("Rolle\nF/UF/M");
     // Ohne Messung keine freien Zeilen — die gibt es nur über einzelPdfDokument.
     expect(JSON.stringify(dd.content)).not.toContain('"text":" ","margin":[0,5,0,5]');
     const frei = pdfDokument(basisBogen(), QR, undefined, undefined, { freiePersonalZeilen: 2, freiesFahrzeug: true });
-    expect(JSON.stringify(frei.content).match(/"text":" ","margin":\[0,5,0,5\]/g)).toHaveLength(8);
+    expect(JSON.stringify(frei.content).match(/"text":" ","margin":\[0,5,0,5\]/g)).toHaveLength(6);
     expect(texte(frei.content)).toContain("Kennzeichen:");
   });
 

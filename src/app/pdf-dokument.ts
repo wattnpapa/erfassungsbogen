@@ -21,7 +21,6 @@ import {
   ansprechpartner,
   OrganisationsTyp,
   PersonalErfassung,
-  StaerkeRolle,
   datumZuIso,
   mitTransportVersion,
   staerke,
@@ -1726,13 +1725,6 @@ export interface BlankoZeilen {
   qualifikationen: number;
 }
 
-/** Zählrolle als Kürzel, wie in der Stärke „F / UF / M" (R3-A6). */
-const ROLLE_KURZ: Record<number, string> = {
-  [StaerkeRolle.FUEHRER]: "F",
-  [StaerkeRolle.UNTERFUEHRER]: "UF",
-  [StaerkeRolle.MANNSCHAFT]: "M",
-};
-
 /**
  * Platz für Stiftnachträge im Einzel-PDF (R3-A6) — nur, wenn er keine Seite
  * kostet; siehe {@link einzelPdfDokument}.
@@ -1912,18 +1904,15 @@ export function pdfDokument(
         ...(zusatz?.freiesFahrzeug ? [fahrzeugBlock(BLANKO_FAHRZEUG, true)] : []),
       ];
 
-  // Spalte „Rolle" (F / UF / M): Ohne sie ließ sich eine von Hand geänderte
-  // Stärke auf dem Blatt nicht gegen die Namen prüfen (Audit Runde 3, R3-A6).
   const personalZeilen: TableCell[][] = [
     [
       { text: "Funktion /\nZusatzfunktion", bold: true, fillColor: GRAU },
-      { text: "Rolle\nF/UF/M", bold: true, fillColor: GRAU },
       { text: "Name, Vorname", bold: true, fillColor: GRAU },
       { text: "D = dienstlich / P = privat", bold: true, fillColor: GRAU },
     ],
   ];
   for (let i = 0; blanko && i < blanko.personal; i++) {
-    personalZeilen.push([leerZelle(), leerZelle(), leerZelle(), leerZelle()]);
+    personalZeilen.push([leerZelle(), leerZelle(), leerZelle()]);
   }
   for (const p of blanko ? [] : b.personal) {
     const kontakte = p.kontakte
@@ -1936,7 +1925,6 @@ export function pdfDokument(
       .join("\n");
     personalZeilen.push([
       { text: funktionsText(p, org) },
-      { text: ROLLE_KURZ[p.staerkeRolle] ?? "", alignment: "center" },
       { text: `${p.nachname}${p.nachname && p.vorname ? ", " : ""}${p.vorname}` },
       { text: kontakte },
     ]);
@@ -1946,7 +1934,7 @@ export function pdfDokument(
   // vollständig erfasstem Personal — „nur Stärke" hat keine Namensliste.
   // Wie viele, entscheidet einzelPdfDokument nach einer Messung.
   if (!blanko && b.personalErfassung !== PersonalErfassung.NUR_STAERKE) {
-    for (let i = 0; i < (zusatz?.freiePersonalZeilen ?? 0); i++) personalZeilen.push([leerZelle(), leerZelle(), leerZelle(), leerZelle()]);
+    for (let i = 0; i < (zusatz?.freiePersonalZeilen ?? 0); i++) personalZeilen.push([leerZelle(), leerZelle(), leerZelle()]);
   }
 
   const qualiZeilen: TableCell[][] = [
@@ -2076,7 +2064,7 @@ export function pdfDokument(
         // Zeilen bleiben ganz: Auf Seite 1 des Vordrucks stand die letzte
         // Personalzeile nur als 3-mm-Streifen über der Fußzeile (R4-A8). Der
         // Vordruck wiederholt den Tabellenkopf auf Seite 2.
-        table: { widths: [118, 30, "*", 160], body: personalZeilen, dontBreakRows: true, ...(blanko ? { headerRows: 1 } : {}) },
+        table: { widths: [148, "*", 160], body: personalZeilen, dontBreakRows: true, ...(blanko ? { headerRows: 1 } : {}) },
         margin: [0, luecke(12), 0, luecke(10)],
       },
       ...(b.personalErfassung === PersonalErfassung.NUR_STAERKE

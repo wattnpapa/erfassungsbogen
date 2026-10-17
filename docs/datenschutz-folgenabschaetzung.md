@@ -143,10 +143,10 @@ Grundlage: Repository `wattnpapa/erfassungsbogen`, Stand 2026-09-12 — Version 
 > auch an der Wand. Geändert: 5.5.
 >
 > **Nachgezogen 2026-10-05 — Papierfassungen (Audit Runde 3, R3-A3 bis
-> R3-A6):** Das Einzel-PDF druckt je Person zusätzlich die Zählrolle
-> (F/UF/M), die schon Teil des Bogens, des QR-Codes und der CSV ist; Lageblatt
-> und Einzel-PDF tragen mehr leere Zeilen zum Nachtragen von Hand. Keine neue
-> Datenkategorie, kein neuer Empfänger. Geändert: 5.5.
+> R3-A6):** Lageblatt und Einzel-PDF tragen mehr leere Zeilen zum Nachtragen
+> von Hand. Die zunächst je Person gedruckte Zählrolle (F/UF/M) ist wieder
+> entfallen, sie ergibt sich aus der Funktion. Keine neue Datenkategorie,
+> kein neuer Empfänger. Geändert: 5.5.
 >
 > **Nachgezogen 2026-10-05 — Exportspalten (Audit Runde 3, R3-K7):** „Alle
 > Daten als CSV" enthält jetzt auch Eintreff-/Abrückzeit und Auftrag/Notiz
@@ -549,8 +549,8 @@ biometrische Daten, strafrechtliche Daten.
   Angaben stehen bereits auf dem Bogen bzw. im Stand am Meldekopf. Die
   Spalte „Prüfpunkte" heißt „Hinweise". Keine neue Datenkategorie, kein neuer
   Empfänger.
-  Seit 2026-10-05 (R3-A6) steht im Bogen-PDF je Person auch die Zählrolle
-  (F/UF/M); Lageblatt und Bogen-PDF lassen Platz für Nachträge von Hand.
+  Seit 2026-10-05 (R3-A6) lassen Lageblatt und Bogen-PDF Platz für Nachträge
+  von Hand (die kurz gedruckte Zählrolle je Person ist wieder entfallen).
   Seit 2026-10-06 (R4-A3 bis R4-A8) trägt das Lageblatt mindestens fünf
   Nachtragszeilen mit der Spalte „übertragen" (bei vollem Blatt auf einer
   eigenen Seite), der Blanko-Vordruck oben einen Kasten „Meldekopf" (Nr.,
