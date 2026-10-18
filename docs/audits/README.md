@@ -7,6 +7,8 @@
 > Runde 4 (05.10.2026, nach der Behebung von Runde 3): [runde-4/README.md](runde-4/README.md).
 >
 > Runde 5 (06.10.2026, nach der Behebung von Runde 4): [runde-5/README.md](runde-5/README.md).
+>
+> Reviewer-Runde Lagemonitor (18.10.2026, neue Ansicht für den Fernseher im Führungsfahrzeug): [lagemonitor/README.md](lagemonitor/README.md).
 
 ## Verlauf
 
