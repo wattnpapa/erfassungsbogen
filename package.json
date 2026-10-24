@@ -159,7 +159,7 @@
     "bwip-js": "^4.11.4",
     "concurrently": "^10.0.5",
     "cross-env": "^7.0.3",
-    "electron": "^44.4.5",
+    "electron": "^44.9.1",
     "electron-builder": "^26.15.3",
     "esbuild": "^0.28.2",
     "jsdom": "^30.1.1",
