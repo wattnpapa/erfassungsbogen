@@ -14,7 +14,7 @@
 >
 > **Nachgezogen 2026-10-25 (Produktschnitt):** Entscheidung, die
 > Einsatz-Sammlung in ein eigenes Produkt „Meldekopf" (Repository
-> `wattnpapa/meldekopf`, Domain meldekopf.app) auszulagern — ADR-009 in
+> `wattnpapa/meldekopf`, Domain meldekopf.erfassungsbogen.app) auszulagern — ADR-009 in
 > Kapitel 9, dazu ein Risiko in 11.2. Der Code dieses Repositorys ist davon
 > noch nicht berührt: Der Abbau beginnt erst, wenn die Meldekopf-App den
 > vollen Funktionsumfang trägt. Die Zieldoku (Funktionsumfang, Architektur,
@@ -1843,7 +1843,7 @@ Projekt-Dokumenten rekonstruiert — einschließlich der vier Kern-Submodule, de
   „Meldekopf" für Meldeköpfe, Bereitstellungsräume und kleine
   Führungsstellen im ELW, in einem eigenen Repository
   (<https://github.com/wattnpapa/meldekopf>) mit eigener Domain
-  (meldekopf.app), eigenem Release-Kanal und eigenen Begleitdokumenten.
+  (meldekopf.erfassungsbogen.app), eigenem Release-Kanal und eigenen Begleitdokumenten.
   Damit entsteht eine dreistufige Produktfamilie: Erfassungsbogen (eine
   Einheit erzeugt ihren Bogen), Meldekopf (ein Gerät sammelt viele Bögen und
   gibt eine Lage weiter), S1-Control (der Stab führt die Lage über Tage,
@@ -1855,13 +1855,13 @@ Projekt-Dokumenten rekonstruiert — einschließlich der vier Kern-Submodule, de
   bereits getrennt, und der Kern liegt ohnehin in Submodulen. Ein Monorepo
   mit Deploy in ein reines Pages-Repository war die geprüfte Alternative.
 - **Was geteilt wird, und wie:** Zwei neue Submodule neben den vier
-  bestehenden. `@bos/eeb-satz` (Arbeitstitel) nimmt nach den
+  bestehenden. `@bos/eeb-satz` (<https://github.com/wattnpapa/bos-eeb-satz>) nimmt nach den
   ADR-003-Regeln auf, was beide Apps ausgeben und keine Oberfläche ist:
   `pdf-dokument.ts` (pdfmake-Dokumentdefinition, 2.258 Zeilen),
   `bogen-csv.ts`, `einsatz-csv.ts`, `csv.ts`, `oldenburg-xlsx.ts`, `xlsx.ts`,
   `qr-boegen.ts`, `pdf-bilder.ts`/`pdf-stroeme.ts`/`pdf-qr.ts`,
   `taktische-zeichen-bogen.ts`, `blanko.ts`. `@bos/oberflaeche`
-  (Arbeitstitel) nimmt auf, was beide Apps zeigen und deshalb React und DOM
+  (<https://github.com/wattnpapa/bos-oberflaeche>) nimmt auf, was beide Apps zeigen und deshalb React und DOM
   braucht: `dialoge.tsx`, `modal-overlay.ts`, `anzeige-modus.ts`,
   `anzeige-schalter.tsx`, `org-farben.ts`, `kopfnav*`, `tipp-schutz.ts`,
   `schrift-stufe.ts`, `tastatur.ts`, Quittungen, Listenbewegung,
