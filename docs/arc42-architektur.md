@@ -389,6 +389,8 @@ wieder.
 > läuft damit wieder durch. Nur 8.3.0 (Workbox fand die Build-Ausgabe nicht)
 > bleibt in `.github/dependabot.yml` ausgeblendet. Im selben Schritt: vitest
 > und @vitest/coverage-v8 ^4.1.12 (GHSA-qxg6-89mg-rqv8 in @vitest/mocker),
+> kurz darauf mit den Dependabot-PRs 35/34 auf ^5.0.5 (jsdom-Umgebung gibt
+> `localStorage` nur noch per Getter her, Tests stubben über `vi.stubGlobal`),
 > concurrently ^10.0.6 (shell-quote ≥ 1.11, GHSA-pqg4-j6r4-53mv) sowie die
 > transitiven Pakete axios 1.20.0, http-cache-semantics 4.3.0, fast-uri 3.1.9
 > und serialize-javascript 7.1.4 über `package-lock.json`. Alle Treffer lagen

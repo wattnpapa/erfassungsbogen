@@ -3,7 +3,7 @@
  * „Bögen einlesen…“ trägt den Knopf, damit er nach dem Einlesen im Bild steht
  * (Audit Runde 4, R4-A6).
  */
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { OrganisationsTyp, PersonalErfassung, SCHEMA_VERSION, type Erfassungsbogen } from "@bos/eeb-format/model";
@@ -27,10 +27,13 @@ const vorherScroll = proto.scrollIntoView;
 
 beforeEach(() => {
   const mem = new MemStorage();
-  (globalThis as { localStorage?: Storage }).localStorage = mem as unknown as Storage;
+  // jsdom gibt window.localStorage nur mit Getter her; eine direkte Zuweisung
+  // wirft seit Vitest 5. vi.stubGlobal ersetzt die Eigenschaft sauber.
+  vi.stubGlobal("localStorage", mem as unknown as Storage);
   speicherhuelleSetzen(mem as unknown as Storage);
 });
 afterEach(() => {
+  vi.unstubAllGlobals();
   if (vorherScroll === undefined) delete proto.scrollIntoView;
   else proto.scrollIntoView = vorherScroll;
 });
