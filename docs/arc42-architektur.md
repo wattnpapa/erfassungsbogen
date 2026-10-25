@@ -12,6 +12,14 @@
 > umsetzen: SBOM, CSP ohne unsafe-inline, Entpack-Grenze") betrifft die Kapitel
 > 2.1, 8.3, 8.6, 8.7 und 11.2 — dort jeweils vermerkt.
 >
+> **Nachgezogen 2026-10-25 (Produktschnitt):** Entscheidung, die
+> Einsatz-Sammlung in ein eigenes Produkt „Meldekopf" (Repository
+> `wattnpapa/meldekopf`, Domain meldekopf.app) auszulagern — ADR-009 in
+> Kapitel 9, dazu ein Risiko in 11.2. Der Code dieses Repositorys ist davon
+> noch nicht berührt: Der Abbau beginnt erst, wenn die Meldekopf-App den
+> vollen Funktionsumfang trägt. Die Zieldoku (Funktionsumfang, Architektur,
+> Übernahmeplan) liegt im neuen Repository unter `docs/`.
+>
 > **Nachgezogen 2026-10-24 (Runde 8):** Audit Runde 8 (51 Befunde ohne
 > Doppelungen, vier Pakete) — Kap. 5, 8.2, 8.4, 8.5, 8.6, 9: Ablage: Ein
 > Gesamttext von `eeb.einsaetze.v1` oder `eeb.vorlagen.v1`, der sich nicht
@@ -1817,6 +1825,103 @@ Projekt-Dokumenten rekonstruiert — einschließlich der vier Kern-Submodule, de
 - **Konsequenzen:** Realistischere Tests, aber langsamerer Testlauf und eine
   explizite Portprüfung.
 
+### ADR-009: Einsatz-Sammlung wird eigenes Produkt „Meldekopf" (Stand 2026-10-25, Umsetzung offen)
+
+- **Kontext:** Die App bedient zwei Nutzergruppen mit verschiedenen Aufgaben
+  (Kapitel 1.3): die Einheit, die ihren Bogen ausfüllt, und den Meldekopf,
+  der fremde Bögen sammelt. Gemessen am Produktivcode in `src/app/` (rund
+  39.800 Zeilen ohne Tests) sind rund 14.700 Zeilen Führungsstellen-Sicht
+  (`einsaetze-ui.tsx` 3.924, `einheiten-tabelle.ts`, `export-stand.ts`,
+  `eintrag-zeiten.ts`, Lagemonitor, Papier-Abgleich, Stapel-Import,
+  Oldenburg-Export, …); `app.tsx` (4.701 Zeilen) verdrahtet beide Welten in
+  einem Zustand. Startseite („Neuer Einsatz…"), Kopfnavigation
+  („Meldekopf") und jeder Eingang eines Bogens („Wohin damit?") stellen
+  Einheiten Fragen, die nur den Meldekopf betreffen. Nutzer-Feedback nennt
+  die App überladen. Die Logik der Sammlung liegt seit ADR-003 bereits
+  UI-frei in `@bos/meldekopf`; der Schnitt ist also zur Hälfte vollzogen.
+- **Entscheidung:** Die Einsatz-Sammlung wird ein eigenes Produkt
+  „Meldekopf" für Meldeköpfe, Bereitstellungsräume und kleine
+  Führungsstellen im ELW, in einem eigenen Repository
+  (<https://github.com/wattnpapa/meldekopf>) mit eigener Domain
+  (meldekopf.app), eigenem Release-Kanal und eigenen Begleitdokumenten.
+  Damit entsteht eine dreistufige Produktfamilie: Erfassungsbogen (eine
+  Einheit erzeugt ihren Bogen), Meldekopf (ein Gerät sammelt viele Bögen und
+  gibt eine Lage weiter), S1-Control (der Stab führt die Lage über Tage,
+  Geräte und Sachgebiete). Die Grenze zu S1-Control lautet: ein Gerät,
+  offline, ohne Anmeldung, Ergebnis ist eine Weitergabe.
+- **Warum ein eigenes Repository und nicht zwei Einstiege in diesem:**
+  GitHub Pages liefert eine Site mit eigener Domain je Repository, GitHub
+  Releases und `electron-updater` arbeiten je Repository, S1-Control ist
+  bereits getrennt, und der Kern liegt ohnehin in Submodulen. Ein Monorepo
+  mit Deploy in ein reines Pages-Repository war die geprüfte Alternative.
+- **Was geteilt wird, und wie:** Zwei neue Submodule neben den vier
+  bestehenden. `@bos/eeb-satz` (Arbeitstitel) nimmt nach den
+  ADR-003-Regeln auf, was beide Apps ausgeben und keine Oberfläche ist:
+  `pdf-dokument.ts` (pdfmake-Dokumentdefinition, 2.258 Zeilen),
+  `bogen-csv.ts`, `einsatz-csv.ts`, `csv.ts`, `oldenburg-xlsx.ts`, `xlsx.ts`,
+  `qr-boegen.ts`, `pdf-bilder.ts`/`pdf-stroeme.ts`/`pdf-qr.ts`,
+  `taktische-zeichen-bogen.ts`, `blanko.ts`. `@bos/oberflaeche`
+  (Arbeitstitel) nimmt auf, was beide Apps zeigen und deshalb React und DOM
+  braucht: `dialoge.tsx`, `modal-overlay.ts`, `anzeige-modus.ts`,
+  `anzeige-schalter.tsx`, `org-farben.ts`, `kopfnav*`, `tipp-schutz.ts`,
+  `schrift-stufe.ts`, `tastatur.ts`, Quittungen, Listenbewegung,
+  Fehlerfänger, die von der Schnellerfassung benötigten Feld-Bausteine aus
+  `schritte/bausteine.tsx` und die Design-Token. Für dieses Submodul gilt
+  Aufnahmeregel 2 (kein DOM, kein React) ausdrücklich **nicht**; an ihre
+  Stelle treten: nur Darstellung und Bedienmechanik, keine Fachlogik, keine
+  Persistenz außer den eigenen Anzeige-Schlüsseln, keine Rückimporte aus
+  einer App, bewusst klein. Die übrigen fünf Regeln und der Rückweg gelten.
+- **Was dieses Produkt behält:** Assistent, Vorlagen und Musterung,
+  eigener Bogen samt Entwurf, Absenderkarte als Sender, Übergabe-Stand,
+  Beispielbögen und Organisations-Landingpages. Neu hinzu kommt der
+  **Zug aus Teileinheiten**: Ein Zugführer eines zusammengestellten Zuges
+  oder Verbands kennzeichnet seinen Bogen entsprechend, nimmt die
+  Gruppenbögen per Scan oder Datei als Teileinheiten auf, Stärke,
+  Fahrzeuge und Sofortbedarf werden summiert, ein erneuter Scan ersetzt die
+  Fassung der Teileinheit (Fingerabdruck und Zusammenführen aus
+  `@bos/meldekopf`, damit bleibt der Kern eine Abhängigkeit beider
+  Produkte, Aufnahmeregel 1). Das Ergebnis ist ein gewöhnlicher Bogen, der
+  den normalen Weg nimmt. Ausdrücklich **keine** verkleinerte
+  Einsatz-Sammlung in diesem Produkt. Offen: ob die Teileinheiten-Struktur
+  als additives Feld ins Format muss (Schema 10) und ob die Personen der
+  Teileinheiten vollständig in den Zug-QR gehören (ein Zug aus Zugtrupp und
+  drei Fachgruppen liegt bei rund 40 Personen und wird mehrteilig).
+- **Was dieses Produkt abgibt:** Alles aus Kapitel 5.2, was Einsatz-Sammlung
+  ist, inklusive Lagemonitor, Papier-Abgleich, Stapel-Import,
+  Schichtübergabe-Diff, Export-Stand, Sammel-PDF, Einsatz-Datei, Oldenburg-
+  Export, Papierkorb der Sammlungen, Aufräum- und Datenschutzfristen der
+  Sammlungen. „In Einsatz aufnehmen" aus der Übersicht wird zu „An
+  Meldekopf geben": derselbe Link-Transport wie der QR-Link mit der
+  Zieladresse der Meldekopf-App. Umgekehrt öffnet die Meldekopf-App für
+  einen vollständigen Bogen diesen Erfassungsbogen per Link mit Payload und
+  Rücksprung-Kennzeichen; das Gegenstück dazu (Rücksprung annehmen) ist die
+  einzige Änderung, die hier schon vor dem Abbau gebaut werden darf.
+- **Reihenfolge und Übergang:** Erst wird die Meldekopf-App vollständig
+  gebaut (Phasen 0 bis 6 des Übernahmeplans im neuen Repository), dann
+  beginnt hier der Abbau: Hinweis an der Sammlung und „An Meldekopf-App
+  geben" (Datensicherung oder Einsatz-Datei, dieselben Speicherschlüssel
+  `eeb.einsaetze.v1` usw., kein Migrationscode, kein stiller Kanal zwischen
+  den Herkünften), Eingänge in die Sammlung sperren, `public/meldekopf.html`
+  als Weiche, nach einer kurzen Übergangszeit Entfernen der Module und
+  Umstellung auf `@bos/eeb-satz` und `@bos/oberflaeche`, danach der Zug aus
+  Teileinheiten. Bis zum Abbau existieren die betroffenen Module in beiden
+  Repositories; Änderungen hier sind dort nachzuziehen.
+- **Konsequenzen:** Zwei Apps auf einem Meldekopf-Gerät, wenn dort
+  vollständige Bögen entstehen sollen (Gerätetest iOS für den Link-Wechsel
+  zwischen installierten PWAs offline steht aus; Rückfallebene QR).
+  ISK und DSFA gelten je Produkt: Die dieses Produkts schrumpft auf eigene
+  Daten auf dem eigenen Gerät, die des Meldekopfs trägt die fremden
+  Personendaten. Das Bundle dieses Produkts wird kleiner (`startJs` heute
+  1.198.089 Byte; Zielwert nach dem Abbau neu messen und festschreiben).
+  Pin-Updates betreffen künftig bis zu drei Produkte; der Rückweg aus
+  ADR-003 gilt auch für die beiden neuen Submodule. Die Kapitel 1.3, 3.1,
+  5.1, 5.2, 5.7, 6.3, 8.2 und 11 dieses Dokuments beschreiben bis zum Abbau
+  weiter den Ist-Stand und werden mit ihm nachgezogen.
+- **Referenz:** `docs/architektur.md`, `docs/funktionsumfang.md` und
+  `docs/uebernahme-aus-erfassungsbogen.md` im Repository
+  `wattnpapa/meldekopf` (dort ADR-001 bis ADR-008 aus Sicht des neuen
+  Produkts).
+
 ### Verworfene bzw. offen gelassene Alternativen (aus `docs/TODO.md`)
 
 - **macOS-Codesignierung über den GitHub-Runner** – aktuell nicht
@@ -1917,6 +2022,7 @@ Repository-Analyse, keine offiziellen Angaben des Projekts.
 | `@bos/vokabulare/berufe.ts` ohne dokumentierten Aktualisierungsweg | Die 3512 Berufsbezeichnungen liegen als statische, handgepflegte Tabelle vor – anders als die taktischen Zeichen gibt es keinen Update-Workflow. | Die Liste kann veralten, ohne dass ein technischer Mechanismus das bemerkt. |
 | Lizenzhistorie der taktischen Zeichen | Die Zeichen stammen aus einer externen Sammlung (CC BY 4.0, © Jonas Köritz); das Upstream-Projekt merkt an, dass die Lizenz vor Februar 2021 anders war. | Bei Verwendung sehr alter, zwischengespeicherter Zeichenversionen bestünde ein Restrisiko unklarer Lizenzbedingungen. |
 | Sehr große Einzeldateien | `app.tsx` (1788 Zeilen), `einsaetze-ui.tsx` (1352 Zeilen) sowie `einsaetze.ts` (752) und `codec.ts` (1043) in den Submodulen. | Höheres Risiko von Merge-Konflikten und höherer kognitiver Aufwand; kein Hinweis, dass weitere Modularisierung geplant ist. |
+| Doppelte Pflege während des Produktschnitts (ADR-009) | Bis die Meldekopf-App den vollen Funktionsumfang trägt und hier abgebaut wird, liegen die Module der Einsatz-Sammlung in zwei Repositories; Bestandsdaten im `localStorage` von erfassungsbogen.app sieht die neue Herkunft nicht. | Änderungen hier müssen dort nachgezogen werden; Nutzer brauchen eine Übergangszeit mit Hinweis und Datensicherung, sonst bleiben Sammlungen liegen. Mitigiert durch die Reihenfolge „erst fertig bauen, dann abbauen" und gleiche Speicherschlüssel. |
 | Bus-Faktor / Ein-Personen-Projekt | Alle fünf Repositories nennen denselben einzelnen Autor/Maintainer; keine sichtbaren CODEOWNERS oder weiteren Committer-Hinweise. | Wartung, Sicherheitsreaktion und Weiterentwicklung hängen an einer Person – verschärft dadurch, dass auch S1-Control vom selben Kern abhängt. |
 | TOFU-Vertrauensmodell ohne PKI | Bewusster Verzicht auf zentrale Zertifizierung bei den Ed25519-Signaturen. | Ein Schlüssel-Fingerabdruck bestätigt nur „derselbe Absender wie zuvor", nicht die reale Identität; Social-Engineering-Angriffe sind architektonisch nicht ausgeschlossen. |
 | Native Gerätetests fehlen | Kamera-Scanner, Filesystem-Zugriff und Share-Sheet sind laut `docs/tests.md` „Ausbaustufe 3". | Regressionen in den plattformspezifischsten Pfaden werden nicht automatisch erkannt. |
