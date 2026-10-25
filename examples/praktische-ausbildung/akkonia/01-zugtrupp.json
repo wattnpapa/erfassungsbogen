@@ -1,0 +1,108 @@
+{
+  "schemaVersion": 9,
+  "uebung": true,
+  "stand": 2171520,
+  "einheit": {
+    "organisation": 6,
+    "einheitsTyp": {
+      "freitext": "Zugtrupp (Ztr)"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "code": 1
+        },
+        "name": "Akkonia"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 1508,
+    "zeitraumBis": 1508,
+    "ortAuftrag": "Praktische Ausbildung (Übung): Einheitenerfassung der geplanten Einsatzeinheiten"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "nachname": "",
+      "vorname": "",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "ZF"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "nachname": "",
+      "vorname": "",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "stv. ZF Zugtruppführer"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "nachname": "Puchtar",
+      "vorname": "Fabian",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Funker, Melder"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "nachname": "Hagemeyer",
+      "vorname": "Tobias",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kraftfahrer, Melder, Funker"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "ELW 1"
+      },
+      "kennzeichen": "AK-JU 33",
+      "funkrufname": {
+        "kennwort": {
+          "code": 4
+        },
+        "eigenerStandort": false,
+        "ort": "Akkonia",
+        "teile": [
+          56,
+          11,
+          1
+        ]
+      }
+    }
+  ],
+  "sonstiges": "Fachdienst: Zugtrupp. Hauptleistung: Führung. Kommunikation: Rufname 56-11-1."
+}

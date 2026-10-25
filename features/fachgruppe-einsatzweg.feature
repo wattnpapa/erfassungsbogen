@@ -9,7 +9,7 @@ Funktionalität: Einsatzweg einer Fachgruppe — Vorbereitung, Fahrt, Meldekopf
     Angenommen ich öffne die App
     Wenn ich auf "Neuen Bogen erstellen" klicke
     Und ich das Feld "Organisation" auf "THW" stelle
-    Und ich das Feld "Name (Pflicht)" mit "Oldenburg" fülle
+    Und ich das Feld "Ort der Einheit (Pflicht)" mit "Oldenburg" fülle
     Und ich in der Vorschlagsliste "Oldenburg (NI)" wähle
     Und ich das Feld "Einheitstyp" auf "FGr WP (B) – Fachgruppe Wasserschaden/Pumpen (B)" stelle
 
@@ -39,13 +39,18 @@ Funktionalität: Einsatzweg einer Fachgruppe — Vorbereitung, Fahrt, Meldekopf
 
   # Die Vorbelegung ist ein Startpunkt, kein Diktat: Wer nach dem Ausfüllen den
   # Typ korrigiert, darf dabei nicht die schon angepassten Fahrzeuge und das
-  # eingetragene Personal verlieren.
-  Szenario: Ein späterer Typwechsel wirft die vorbelegten Daten nicht weg
-    Wenn ich das Feld "Einheitstyp" auf "FGr WP (C) – Fachgruppe Wasserschaden/Pumpen (C)" stelle
+  # eingetragene Personal verlieren. Unberührte Vorbelegung (Fahrzeug ohne
+  # Kennzeichen, Person ohne Namen) weicht dagegen der des neuen Typs, statt
+  # sich zu stapeln (Audit „Fehler und Wiederanlauf", E1).
+  Szenario: Ein späterer Typwechsel behält Angepasstes und ersetzt nur die unberührte Vorbelegung
+    Wenn ich zum Schritt "4. Fahrzeuge" wechsle
+    Und ich das Feld "Kennzeichen" mit "THW-84711" fülle
+    Und ich zum Schritt "1. Einheit" wechsle
+    Und ich das Feld "Einheitstyp" auf "FGr WP (C) – Fachgruppe Wasserschaden/Pumpen (C)" stelle
     Und ich zum Schritt "6. Übersicht" wechsle
-    Dann sehe ich die Überschrift "Fahrzeuge (4)"
+    Dann sehe ich den Text "THW-84711"
     Und sehe ich den Text "Heros Oldenburg (NI) 48/43"
-    Und sehe ich die Überschrift "Personal (12)"
+    Und sehe ich die Überschrift "Fahrzeuge (5)"
 
   # Die StAN setzt bewusst keine Fahrerlaubnisklassen — vergisst der Bogen
   # sie ganz, findet der Kraftfahrer-Filter am Meldekopf die Einheit nicht.
@@ -55,6 +60,8 @@ Funktionalität: Einsatzweg einer Fachgruppe — Vorbereitung, Fahrt, Meldekopf
     Dann sehe ich den Hinweis "Fahrzeuge erfasst, aber kein Kraftfahrer"
     Wenn ich auf "Fahrzeuge erfasst, aber kein Kraftfahrer: Bei keiner Person ist eine Fahrerlaubnisklasse eingetragen." klicke
     Dann sehe ich den Schritt "3. Personal"
+    # Ab acht Personen beginnt der Schritt als Kurz-Liste (R7-H6); das Feld steht auf der Karte.
+    Und ich "Alle Angaben (Karten)" ankreuze
     Wenn ich das Feld "Fahrerlaubnis" auf "CE" stelle
     Und ich zum Schritt "6. Übersicht" wechsle
     Dann sehe ich den Hinweis "Fahrzeuge erfasst, aber kein Kraftfahrer" nicht
@@ -64,7 +71,7 @@ Funktionalität: Einsatzweg einer Fachgruppe — Vorbereitung, Fahrt, Meldekopf
   Szenario: Auftrag und Sofortbedarf ergänzen die Vorbereitung, ohne sie zu stören
     Wenn ich zum Schritt "2. Einsatz" wechsle
     Und ich das Feld "Einsatzort / Auftrag" mit "Hochwasser Hunte — Pumpeneinsatz Achterdiek" fülle
-    Und ich "Einsatzbeginn" ankreuze
+    Und ich "Einsatzbeginn eintragen" ankreuze
     Und ich zum Schritt "5. Sofortbedarf" wechsle
     Und ich "Sofortbedarf erfassen" ankreuze
     Und ich das Feld "Diesel (l)" mit "400" fülle
@@ -82,16 +89,16 @@ Funktionalität: Einsatzweg einer Fachgruppe — Vorbereitung, Fahrt, Meldekopf
     Und ich das Feld "Diesel (l)" mit "400" fülle
     Und ich zum Schritt "6. Übersicht" wechsle
     Und ich mir den angezeigten QR-Code merke
-    Und ich auf "Neuer Bogen" klicke
-    Und ich im Dialog auf "Verwerfen und neu beginnen" klicke
+    Und ich auf "Bogen schließen" klicke
+    Und ich im Dialog auf "Schließen, zur Startseite" klicke
     Und ich auf "QR-Code scannen…" klicke
     Und ich den gemerkten QR-Code über "QR aus Bild einlesen…" einlese
     Dann sehe ich die Übersicht mit dem Standort "Oldenburg (NI)"
-    Wenn ich auf "In Einsatz aufnehmen…" klicke
-    Und ich auf "Neuen Einsatz anlegen…" klicke
+    Wenn ich auf "In Einsatz-Sammlung ablegen…" klicke
+    Und ich auf "Neue Sammlung anlegen…" klicke
     Und ich im Dialog "Name" mit "Hochwasser Hunte" fülle
     Und ich im Dialog auf "Einsatz anlegen" klicke
-    Dann sehe ich die Überschrift "Einheiten (1)"
+    Dann sehe ich die Überschrift "Einheiten (1 gemeldet"
     Und sehe ich den Hinweis "Stärke 0 / 3 / 9 / 12"
     Und sehe ich zu "Kraftstoff" den Wert "Diesel 400 l"
     Und sehe ich zu "Fahrzeuge" den Wert "4"
@@ -108,10 +115,11 @@ Funktionalität: Einsatzweg einer Fachgruppe — Vorbereitung, Fahrt, Meldekopf
     Wenn ich die App vom Netz trenne
     Und ich die Seite neu lade
     Und ich auf "Fortsetzen" klicke
+    Und ich zum Schritt "6. Übersicht" wechsle
     Dann sehe ich die Überschrift "Gesamtübersicht"
     Und ich mir den angezeigten QR-Code merke
-    Und ich auf "Neuer Bogen" klicke
-    Und ich im Dialog auf "Verwerfen und neu beginnen" klicke
+    Und ich auf "Bogen schließen" klicke
+    Und ich im Dialog auf "Schließen, zur Startseite" klicke
     Und ich auf "QR-Code scannen…" klicke
     Und ich den gemerkten QR-Code über "QR aus Bild einlesen…" einlese
     Dann sehe ich die Übersicht mit dem Standort "Oldenburg (NI)"

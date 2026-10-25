@@ -1,0 +1,53 @@
+{
+  "schemaVersion": 9,
+  "uebung": true,
+  "stand": 2171520,
+  "einheit": {
+    "organisation": 5,
+    "einheitsTyp": {
+      "freitext": "3. Patiententransportstaffel LHH"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Standort"
+        },
+        "name": "Hannover"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 1508,
+    "zeitraumBis": 1508,
+    "ortAuftrag": "Praktische Ausbildung (Übung): Einlagen Kräfte, Landeshauptstadt Hannover"
+  },
+  "personalErfassung": 1,
+  "personal": [],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "KTW"
+      },
+      "kennzeichen": "H-X XXX"
+    },
+    {
+      "typ": {
+        "freitext": "KTW-B"
+      },
+      "kennzeichen": "H-X XXX"
+    },
+    {
+      "typ": {
+        "freitext": "KTW-B"
+      },
+      "kennzeichen": "H-X XXX"
+    }
+  ],
+  "staerkeManuell": {
+    "fuehrer": 0,
+    "unterfuehrer": 1,
+    "mannschaft": 5,
+    "gesamt": 6
+  },
+  "sonstiges": "Fachdienst: Sonst.: Patiententransp.. Kommunikation: Rufname Rotkreuz."
+}

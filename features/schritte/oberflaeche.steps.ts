@@ -101,6 +101,16 @@ Given("die App sich als Android-App zeigt", async function (this: EebWelt) {
   });
 });
 
+/**
+ * Fenstergröße in CSS-Pixeln. Die Vorgabe von Playwright (1280 × 720) liegt
+ * genau auf der Grenze, ab der die App auf Telefonhöhe verdichtet
+ * (`max-height: 720px`, z. B. im QR-Vollbild seit R3-H2). Szenarien, die das
+ * eine oder das andere Bild prüfen, nennen die Größe darum ausdrücklich.
+ */
+Given("das Fenster {int} × {int} Pixel groß ist", async function (this: EebWelt, breite: number, hoehe: number) {
+  await this.page.setViewportSize({ width: breite, height: hoehe });
+});
+
 // ------------------------------------------------------------------ Bedienen
 
 When("ich das Feld {string} mit {string} fülle", async function (this: EebWelt, name: string, wert: string) {
@@ -224,6 +234,33 @@ When("ich die App vom Netz trenne", async function (this: EebWelt) {
   await this.page.evaluate(async () => {
     await navigator.serviceWorker.ready;
   });
+  // Seit R3-O3 ist der Vorrat zweistufig: „ready" heißt nur, dass der Kern
+  // liegt; Beispielbögen und Themenseiten lädt die Seite danach nach. Die
+  // Startseite sagt „Funktioniert komplett offline" erst, wenn beides da ist —
+  // und so lange soll man sie mit Netz offen lassen. Genau das tut der Schritt.
+  //
+  // Nötig ist das Warten, weil `setOffline` in Chromium nur die Seite vom Netz
+  // nimmt, nicht den Service Worker: Ohne Warten lud der Service Worker den
+  // Rest „ohne Netz" weiter, und die Szenarien bestanden nur dank dieses Lecks.
+  // Als Schleife im Test statt `waitForFunction(async …)`: Playwright wertet das
+  // zurückgegebene Versprechen einer async-Funktion selbst als „wahr" und
+  // beendete das Warten nach Millisekunden, auch wenn noch keine der 474
+  // Dateien im Vorrat lag — bestanden hat der Schritt nur dank Zeitzufall.
+  const bis = Date.now() + 25_000;
+  for (;;) {
+    const fertig = await this.page.evaluate(async () => {
+      const r = await fetch(new URL("offline-zusatz.json", document.baseURI), { cache: "no-cache" }).catch(() => null);
+      if (!r?.ok) return true; // Ohne Liste (Dev-Server) gibt es keine zweite Stufe.
+      const umfang = (await r.json()) as { zusatz: { url: string }[] };
+      for (const e of umfang.zusatz) {
+        if (!(await caches.match(new URL(e.url, document.baseURI).href))) return false;
+      }
+      return true;
+    });
+    if (fertig) break;
+    if (Date.now() > bis) throw new Error("Die zweite Stufe des Offline-Vorrats war nach 25 s nicht vollständig im Cache.");
+    await this.page.waitForTimeout(250);
+  }
   await this.page.context().setOffline(true);
 });
 
@@ -232,13 +269,14 @@ When("ich in der Schnelltabelle Zeile {int} auf {string} setze", async function 
   zeile: number,
   wert: string,
 ) {
-  const zellen = this.page.locator("table.schnell-tabelle tbody tr").nth(zeile - 1).locator("td");
-  await zellen.nth(0).locator("input").fill(wert);
+  // Erstes Eingabefeld der Zeile (Vorname); davor steht seit R2-N8 die Sollstelle als Text.
+  const zeileLoc = this.page.locator("table.schnell-tabelle tbody tr").nth(zeile - 1);
+  await zeileLoc.locator("input").first().fill(wert);
 });
 
 When("ich in der Schnelltabelle in Zeile {int} die Eingabetaste drücke", async function (this: EebWelt, zeile: number) {
-  const zelle = this.page.locator("table.schnell-tabelle tbody tr").nth(zeile - 1).locator("td").first();
-  await zelle.locator("input").press("Enter");
+  const zeileLoc = this.page.locator("table.schnell-tabelle tbody tr").nth(zeile - 1);
+  await zeileLoc.locator("input").first().press("Enter");
 });
 
 // ------------------------------------------------------------------- Prüfen

@@ -1,0 +1,64 @@
+{
+  "schemaVersion": 9,
+  "uebung": true,
+  "stand": 2171520,
+  "einheit": {
+    "organisation": 255,
+    "organisationName": "ASB/MHD",
+    "einheitsTyp": {
+      "freitext": "4. Einsatzzug Landeshauptstadt Hannover"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Standort"
+        },
+        "name": "Hannover"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 1508,
+    "zeitraumBis": 1508,
+    "ortAuftrag": "Praktische Ausbildung (Übung): Einlagen Kräfte, Landeshauptstadt Hannover"
+  },
+  "personalErfassung": 1,
+  "personal": [],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "ELW 1"
+      },
+      "kennzeichen": "H-XXXX",
+      "aenderungen": "Ztr., ASB, 1/1/1"
+    },
+    {
+      "typ": {
+        "freitext": "GW-San"
+      },
+      "kennzeichen": "H-XXXX",
+      "aenderungen": "1. SanGr, MHD, -/1/5/6"
+    },
+    {
+      "typ": {
+        "freitext": "GW-San"
+      },
+      "kennzeichen": "H-XXXX",
+      "aenderungen": "2. SanGr, ASB, -/1/5/6"
+    },
+    {
+      "typ": {
+        "freitext": "GW-San"
+      },
+      "kennzeichen": "H-XXXX",
+      "aenderungen": "Betr.Gr, ASB, -/1/5/6"
+    }
+  ],
+  "staerkeManuell": {
+    "fuehrer": 1,
+    "unterfuehrer": 4,
+    "mannschaft": 16,
+    "gesamt": 21
+  },
+  "sonstiges": "Fachdienst: Zugtrupp, Sanitätsdienst, Betreuungsdienst. Hauptleistung: BHP (30), Sonst.: Schwerpunkt BHP!. Kommunikation: Rufname Samma. Taktisches Zeichen mit Ordnungszahl 4."
+}

@@ -8,7 +8,7 @@
 export type { SchrittProps } from "./bausteine";
 export { SchrittEinheit } from "./einheit";
 export { SchrittEinsatz } from "./einsatz";
-export { SchrittPersonal } from "./personal";
+export { SchrittPersonal, personalRueckwegVergessen } from "./personal";
 export { SchrittFahrzeuge } from "./fahrzeuge";
 export { SchrittSofortbedarf } from "./sofortbedarf";
 export { Uebersicht } from "./uebersicht";

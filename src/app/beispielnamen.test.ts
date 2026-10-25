@@ -17,13 +17,19 @@ describe("beispielPersonen", () => {
     }
   });
 
-  it("baut eine plausible Führungsstruktur auf (1 Führer, Unterführer je angefangene 6)", () => {
-    const personen = beispielPersonen(12);
+  it("baut ab Zugstärke eine Führungsstruktur auf (1 Führer, Unterführer je angefangene 6)", () => {
+    const personen = beispielPersonen(14);
     const fuehrer = personen.filter((p) => p.staerkeRolle === StaerkeRolle.FUEHRER);
     const unterfuehrer = personen.filter((p) => p.staerkeRolle === StaerkeRolle.UNTERFUEHRER);
     expect(fuehrer).toHaveLength(1);
     expect(unterfuehrer.length).toBeGreaterThanOrEqual(1);
-    expect(unterfuehrer.length).toBeLessThanOrEqual(2);
+    expect(unterfuehrer.length).toBeLessThanOrEqual(3);
+  });
+
+  it("setzt bei Gruppenstärke keinen Führer: der Gruppenführer ist Unterführer", () => {
+    const personen = beispielPersonen(9);
+    expect(personen.filter((p) => p.staerkeRolle === StaerkeRolle.FUEHRER)).toHaveLength(0);
+    expect(personen.filter((p) => p.staerkeRolle === StaerkeRolle.UNTERFUEHRER)).toHaveLength(2);
   });
 
   it("ergänzt bestehende Führungskräfte, statt sie zu doppeln", () => {

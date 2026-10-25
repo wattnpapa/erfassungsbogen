@@ -1,0 +1,91 @@
+{
+  "schemaVersion": 9,
+  "uebung": true,
+  "stand": 2171520,
+  "einheit": {
+    "organisation": 6,
+    "einheitsTyp": {
+      "freitext": "Zugtrupp (Einsatzzug / San-Zug)"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "code": 1
+        },
+        "name": "Aller-Leine",
+        "telefon": "5557879788",
+        "email": "elw-aller-leine@johanniter.example"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 1508,
+    "zeitraumBis": 1508,
+    "ortAuftrag": "Praktische Ausbildung (Übung): Einlagen Kräfte, Landeshauptstadt Hannover"
+  },
+  "personalErfassung": 1,
+  "personal": [],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "ELW1"
+      },
+      "kennzeichen": "HK-R5011",
+      "funkrufname": {
+        "kennwort": {
+          "code": 4
+        },
+        "eigenerStandort": false,
+        "ort": "HK",
+        "teile": [
+          50,
+          11,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "Krad"
+      },
+      "kennzeichen": "SFA R5164",
+      "funkrufname": {
+        "kennwort": {
+          "code": 4
+        },
+        "eigenerStandort": false,
+        "ort": "Aller-Leine",
+        "teile": [
+          52,
+          79,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "Krad"
+      },
+      "kennzeichen": "HK R5165",
+      "funkrufname": {
+        "kennwort": {
+          "code": 4
+        },
+        "eigenerStandort": false,
+        "ort": "Aller-Leine",
+        "teile": [
+          52,
+          79,
+          1
+        ]
+      }
+    }
+  ],
+  "staerkeManuell": {
+    "fuehrer": 1,
+    "unterfuehrer": 0,
+    "mannschaft": 4,
+    "gesamt": 5
+  },
+  "sonstiges": "Fachdienst: Zugtrupp. Hauptleistung: Führung (GW-SAN + Transportgruppe). Kommunikation: Rufname HK 50-11-1, Kanal/Rufgruppe R_HK_3, Fax 5552886151. Organisationseinheit auf dem Bogen: SEG-Johanniter (JUH OV Aller-Leine)."
+}

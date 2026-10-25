@@ -1,0 +1,65 @@
+{
+  "schemaVersion": 9,
+  "uebung": true,
+  "stand": 2171520,
+  "einheit": {
+    "organisation": 6,
+    "einheitsTyp": {
+      "freitext": "2. Gruppe T+L Landeshauptstadt Hannover"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "code": 1
+        },
+        "name": "Wasserturm"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 1508,
+    "zeitraumBis": 1508,
+    "ortAuftrag": "Praktische Ausbildung (Übung): Einlagen Kräfte, Landeshauptstadt Hannover"
+  },
+  "personalErfassung": 1,
+  "personal": [],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "LKW Lbw Sto"
+      },
+      "kennzeichen": "H-JU XXX"
+    },
+    {
+      "typ": {
+        "freitext": "Anh. Stromerz. + Lima"
+      },
+      "kennzeichen": "H-JU XXX"
+    },
+    {
+      "typ": {
+        "freitext": "WLF/Ab Log"
+      },
+      "kennzeichen": "H-JU XXX"
+    },
+    {
+      "typ": {
+        "freitext": "Radlader"
+      },
+      "kennzeichen": "H-JU XXX"
+    },
+    {
+      "typ": {
+        "freitext": "Tieflader"
+      },
+      "kennzeichen": "H-JU XXX"
+    }
+  ],
+  "staerkeManuell": {
+    "fuehrer": 0,
+    "unterfuehrer": 1,
+    "mannschaft": 5,
+    "gesamt": 6
+  },
+  "sonstiges": "Fachdienst: Technik u. Logistik. Hauptleistung: Sonst.: Materialumschlag: Radlader mit Palettengabel!. Kommunikation: Rufname Akkon."
+}

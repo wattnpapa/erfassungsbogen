@@ -1,0 +1,53 @@
+{
+  "schemaVersion": 9,
+  "uebung": true,
+  "stand": 2171520,
+  "einheit": {
+    "organisation": 8,
+    "einheitsTyp": {
+      "freitext": "2. Patiententransp. Staffel LHH"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Standort"
+        },
+        "name": "Hannover"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 1508,
+    "zeitraumBis": 1508,
+    "ortAuftrag": "Praktische Ausbildung (Übung): Einlagen Kräfte, Landeshauptstadt Hannover"
+  },
+  "personalErfassung": 1,
+  "personal": [],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "KTW"
+      },
+      "kennzeichen": "H-S XXX"
+    },
+    {
+      "typ": {
+        "freitext": "KTW"
+      },
+      "kennzeichen": "H-J XXX"
+    },
+    {
+      "typ": {
+        "freitext": "KTW"
+      },
+      "kennzeichen": "H-J XXX"
+    }
+  ],
+  "staerkeManuell": {
+    "fuehrer": 0,
+    "unterfuehrer": 1,
+    "mannschaft": 5,
+    "gesamt": 6
+  },
+  "sonstiges": "Fachdienst: Sonst.: Patiententransp.. Kommunikation: Rufname Samma."
+}

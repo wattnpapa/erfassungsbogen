@@ -1,0 +1,70 @@
+{
+  "schemaVersion": 9,
+  "uebung": true,
+  "stand": 2171520,
+  "einheit": {
+    "organisation": 5,
+    "einheitsTyp": {
+      "freitext": "1. Einsatzzug Landeshauptstadt Hannover"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Standort"
+        },
+        "name": "Hannover (Mitte)"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 1508,
+    "zeitraumBis": 1508,
+    "ortAuftrag": "Praktische Ausbildung (Übung): Einlagen Kräfte, Landeshauptstadt Hannover"
+  },
+  "personalErfassung": 1,
+  "personal": [],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "ELW 1"
+      },
+      "kennzeichen": "H-X XXX",
+      "aenderungen": "Ztr"
+    },
+    {
+      "typ": {
+        "freitext": "KdoW"
+      },
+      "kennzeichen": "H-X XXX",
+      "aenderungen": "Ztr"
+    },
+    {
+      "typ": {
+        "freitext": "GW San + MTW"
+      },
+      "kennzeichen": "H-X XXX + H-X XXX",
+      "aenderungen": "1. SanGr"
+    },
+    {
+      "typ": {
+        "freitext": "GW San + MTW"
+      },
+      "kennzeichen": "H-X XXX + H-X XXX",
+      "aenderungen": "2. SanGr"
+    },
+    {
+      "typ": {
+        "freitext": "GW-Betr. + MTW"
+      },
+      "kennzeichen": "H-X XXX + H-X XXX",
+      "aenderungen": "BetrGr"
+    }
+  ],
+  "staerkeManuell": {
+    "fuehrer": 3,
+    "unterfuehrer": 4,
+    "mannschaft": 24,
+    "gesamt": 31
+  },
+  "sonstiges": "Fachdienst: Zugtrupp, Sanitätsdienst, Betreuungsdienst (-). Hauptleistung: BHP (25), Sonst.: Schwerpunkt BHP!. Kommunikation: Rufname Rotkreuz. Taktisches Zeichen mit Ordnungszahl 1."
+}

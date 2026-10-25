@@ -67,45 +67,72 @@ function zeilen(csv: string): string[] {
   return csv.slice(1).replace(/\r\n$/, "").split("\r\n");
 }
 
+/** Felder einer Datenzeile nach Spaltenüberschrift — Spalten kommen dazu, die Tests sollen nicht an Zahlen hängen. */
+function spaltenIndex(csv: string): (name: string) => number {
+  const kopf = zeilen(csv)[0]!.split(";");
+  return (name) => {
+    const i = kopf.indexOf(name);
+    expect(i, `Spalte „${name}“`).toBeGreaterThanOrEqual(0);
+    return i;
+  };
+}
+
 describe("einsatzCsvInhalt()", () => {
   it("beginnt mit UTF-8-BOM und semikolon-getrennter Kopfzeile", () => {
     const csv = einsatzCsvInhalt(sammlung([meldung(bogen("A"))]));
     const [kopf] = zeilen(csv);
     expect(kopf!.split(";")).toEqual([
-      "Einheit", "Teil", "Organisation", "Zug",
+      "Nr.", "Einheit", "Teil", "Organisation", "Zug",
       "Stärke F", "Stärke U", "Stärke M", "Stärke gesamt",
       "Verpflegung gesamt", "Verpflegung veg.", "Verpflegung vegan",
-      "Unterbringung M", "Unterbringung W", "Unterbringung D",
+      "Unterbringung angefordert M", "Unterbringung angefordert W", "Unterbringung angefordert D",
+      "WC/Dusche M", "WC/Dusche W", "WC/Dusche D",
       "Diesel (l)", "Benzin (l)", "Gemisch (l)",
-      "Fahrzeuge", "Stand", "Empfangen", "Quelle",
-      "Status", "Zählt in Lage", "Übung", "Sofortbedarf", "Signatur", "Absender",
+      "Fahrzeuge (Anzahl)", "Fahrzeuge (Liste)", "Stand", "Eingetroffen", "Abgerückt", "Empfangen", "Quelle",
+      "Status", "Zählt in Lage", "Übung", "Sofortbedarf", "Hinweise", "Signatur", "Absender", "Auftrag/Notiz",
+      "Bemerkung (Einheit)",
     ]);
+  });
+
+  it("führt die Bemerkung der Einheit in einer eigenen Spalte (R3-K3)", () => {
+    const b = bogen("OV Alpha");
+    b.sonstiges = "Ölsperre 200 m verbraucht, Nachschub nötig";
+    const [kopf, daten] = zeilen(einsatzCsvInhalt(sammlung([meldung(b)])));
+    const i = kopf!.replace(/^\uFEFF/, "").split(";").indexOf("Bemerkung (Einheit)");
+    expect(daten!.split(";")[i]).toBe("Ölsperre 200 m verbraucht, Nachschub nötig");
   });
 
   it("schreibt je anwesende Einheit eine Datenzeile mit den erwarteten Werten", () => {
     // zugEtikett gehört an die Meldung, nicht an den Bogen.
     const csv = einsatzCsvInhalt(sammlung([meldung(bogen("OV Alpha"), { zugEtikett: "1. Zug" })]));
+    const sp = spaltenIndex(csv);
     const [, daten] = zeilen(csv);
     const f = daten!.split(";");
-    expect(f[0]).toBe("THW OV Alpha Media Team");
-    expect(f[1]).toBe(""); // ungeteilte Einheit: keine Teil-Bezeichnung
-    expect(f[2]).toBe("THW");
-    expect(f[3]).toBe("1. Zug");
-    // Stärke F/U/M/gesamt
-    expect(f.slice(4, 8)).toEqual(["1", "0", "2", "3"]);
-    // Verpflegung gesamt/veg/vegan
-    expect(f.slice(8, 11)).toEqual(["3", "1", "1"]);
-    // Unterbringung M/W/D
-    expect(f.slice(11, 14)).toEqual(["2", "1", "0"]);
-    // Diesel/Benzin/Gemisch
-    expect(f.slice(14, 17)).toEqual(["40", "5", "0"]);
-    expect(f[18]).toMatch(/^\d{6}[a-z]{3}\d{2}$/); // Stand als NATO-Zeitgruppe
-    expect(f[20]).toBe("Scan");
-    expect(f[21]).toBe("anwesend");
-    expect(f[22]).toBe("ja");
-    expect(f[23]).toBe(""); // kein Übungsbogen
-    expect(f[24]).toBe("Unterbringung / Kraftstoff");
-    expect(f[25]).toBe("unsigniert");
+    expect(f[sp("Einheit")]).toBe("THW OV Alpha Media Team");
+    expect(f[sp("Teil")]).toBe(""); // ungeteilte Einheit: keine Teil-Bezeichnung
+    expect(f[sp("Organisation")]).toBe("THW");
+    expect(f[sp("Zug")]).toBe("1. Zug");
+    expect(f.slice(sp("Stärke F"), sp("Stärke gesamt") + 1)).toEqual(["1", "0", "2", "3"]);
+    expect(f.slice(sp("Verpflegung gesamt"), sp("Verpflegung vegan") + 1)).toEqual(["3", "1", "1"]);
+    // Unterbringung angefordert (hier: ja) und WC/Dusche (alle Anwesenden) — beide M/W/D.
+    expect(f.slice(sp("Unterbringung angefordert M"), sp("Unterbringung angefordert D") + 1)).toEqual(["2", "1", "0"]);
+    expect(f.slice(sp("WC/Dusche M"), sp("WC/Dusche D") + 1)).toEqual(["2", "1", "0"]);
+    expect(f.slice(sp("Diesel (l)"), sp("Gemisch (l)") + 1)).toEqual(["40", "5", "0"]);
+    expect(f[sp("Nr.")]).toBe("1"); // laufende Nummer wie auf Karte und Lageblatt (R3-K7)
+    expect(f[sp("Fahrzeuge (Anzahl)")]).toBe("1");
+    expect(f[sp("Fahrzeuge (Liste)")]).not.toBe("");
+    // Eine Zeitform je Datei: Stand, Eingetroffen und Empfangen gleich (R3-K7).
+    expect(f[sp("Stand")]).toMatch(/^\d{2}\.\d{2}\.\d{4}, \d{2}:\d{2}$/);
+    expect(f[sp("Empfangen")]).toMatch(/^\d{2}\.\d{2}\.\d{4}, \d{2}:\d{2}$/);
+    expect(f[sp("Eingetroffen")]).toMatch(/^\d{2}\.\d{2}\.\d{4}, \d{2}:\d{2}$/); // = Empfangszeit, wenn nicht korrigiert
+    expect(f[sp("Abgerückt")]).toBe(""); // nicht abgerückt
+    expect(f[sp("Quelle")]).toBe("Empfangen"); // gleicher Wortlaut wie auf der Karte (R2-K6)
+    expect(f[sp("Status")]).toBe("anwesend");
+    expect(f[sp("Zählt in Lage")]).toBe("ja");
+    expect(f[sp("Übung")]).toBe(""); // kein Übungsbogen
+    expect(f[sp("Sofortbedarf")]).toBe("Unterbringung / Kraftstoff");
+    expect(f[sp("Signatur")]).toBe("unsigniert");
+    expect(f[sp("Auftrag/Notiz")]).toBe(""); // kein Auftrag
   });
 
   it("unterscheidet abgeteilte Truppteile in der Teil-Spalte", () => {
@@ -122,20 +149,53 @@ describe("einsatzCsvInhalt()", () => {
         }),
       ]),
     );
+    const sp = spaltenIndex(csv);
     const felder = zeilen(csv).slice(1, 3).map((z) => z.split(";"));
-    expect(felder.map((f) => f[1])).toEqual(["", "Fachberater"]);
-    expect(felder[1]![20]).toBe("Aufteilung");
+    expect(felder.map((f) => f[sp("Teil")])).toEqual(["", "Fachberater"]);
+    expect(felder[1]![sp("Quelle")]).toBe("Aufteilung");
   });
 
   it("hängt eine Summenzeile über alle anwesenden Einheiten an", () => {
     const csv = einsatzCsvInhalt(sammlung([meldung(bogen("A")), meldung(bogen("B"))]));
+    const sp = spaltenIndex(csv);
     const reihen = zeilen(csv);
     expect(reihen).toHaveLength(4); // Kopf + 2 Einheiten + Summe
     const summe = reihen[3]!.split(";");
-    expect(summe[0]).toBe("Summe (2 Einheiten)");
-    expect(summe.slice(4, 8)).toEqual(["2", "0", "4", "6"]); // Stärke gesamt 6
-    expect(summe.slice(14, 17)).toEqual(["80", "10", "0"]); // Kraftstoff summiert
-    expect(summe[17]).toBe("2"); // Fahrzeuge gesamt
+    expect(summe[1]).toBe("Summe (2 Einheiten)");
+    expect(summe.slice(sp("Stärke F"), sp("Stärke gesamt") + 1)).toEqual(["2", "0", "4", "6"]); // Stärke gesamt 6
+    expect(summe.slice(sp("Diesel (l)"), sp("Gemisch (l)") + 1)).toEqual(["80", "10", "0"]); // Kraftstoff summiert
+    expect(summe[sp("Fahrzeuge (Anzahl)")]).toBe("2"); // Fahrzeuge gesamt als Zahl, die Liste bleibt leer (R4-K8)
+    expect(summe[sp("Fahrzeuge (Liste)")]).toBe("");
+  });
+
+  /**
+   * R4-W5: Die Summe unter „Unterbringung angefordert“ ist die Zahl, mit der
+   * der Stab Schlafplätze plant — dieselbe wie auf Lageblatt und in der
+   * Excel-Liste. „WC/Dusche“ zählt alle Anwesenden.
+   */
+  it("führt Unterbringung angefordert nur für Einheiten mit Anforderung, WC/Dusche für alle (R4-W5)", () => {
+    const ohne = bogen("B", { sofortbedarf: { verpflegungPersonen: 3, dieselLiter: 0, benzinLiter: 0, gemischLiter: 0, unterbringung: false, ruhezeitErforderlich: false } });
+    const csv = einsatzCsvInhalt(sammlung([meldung(bogen("A")), meldung(ohne)]));
+    const sp = spaltenIndex(csv);
+    const reihen = zeilen(csv);
+    const b = reihen[2]!.split(";");
+    expect(b.slice(sp("Unterbringung angefordert M"), sp("Unterbringung angefordert D") + 1)).toEqual(["0", "0", "0"]);
+    expect(b.slice(sp("WC/Dusche M"), sp("WC/Dusche D") + 1)).toEqual(["2", "1", "0"]);
+    const summe = reihen[3]!.split(";");
+    expect(summe.slice(sp("Unterbringung angefordert M"), sp("Unterbringung angefordert D") + 1)).toEqual(["2", "1", "0"]);
+    expect(summe.slice(sp("WC/Dusche M"), sp("WC/Dusche D") + 1)).toEqual(["4", "2", "0"]);
+  });
+
+  it("nennt die Summenzeile eines Nachtrags „Summe Nachtrag“ (R4-W4)", () => {
+    const csv = einsatzCsvInhalt(sammlung([meldung(bogen("A"))]), undefined, true);
+    expect(zeilen(csv)[2]).toContain("Summe Nachtrag (1 Einheiten)");
+    expect(zeilen(einsatzCsvInhalt(sammlung([meldung(bogen("A"))])))[2]).toContain("Summe (1 Einheiten)");
+  });
+
+  it("schreibt die offenen Punkte der Meldung in eine Spalte „Hinweise“ (R4-K8)", () => {
+    const csv = einsatzCsvInhalt(sammlung([meldung(bogen("A", { fahrzeuge: [{ typ: { code: 2 }, kennzeichen: "" }] }))]));
+    const sp = spaltenIndex(csv);
+    expect(zeilen(csv)[1]!.split(";")[sp("Hinweise")]).toContain("hat noch kein Kennzeichen");
   });
 
   it("führt abgerückte Einheiten mit Status auf, zählt sie aber nicht in die Summe", () => {
@@ -144,11 +204,12 @@ describe("einsatzCsvInhalt()", () => {
     const csv = einsatzCsvInhalt(
       sammlung([meldung(bogen("A")), meldung(bogen("B"), { status: MeldeStatus.ABGERUECKT })]),
     );
+    const sp = spaltenIndex(csv);
     const reihen = zeilen(csv);
     expect(reihen).toHaveLength(4); // Kopf + 2 Einheiten + Summe
     const abgerueckt = reihen[2]!.split(";");
-    expect(abgerueckt[21]).toBe("abgerückt");
-    expect(abgerueckt[22]).toBe("nein");
+    expect(abgerueckt[sp("Status")]).toBe("abgerückt");
+    expect(abgerueckt[sp("Zählt in Lage")]).toBe("nein");
     expect(reihen[3]!).toContain("Summe (1 Einheiten)");
   });
 
@@ -156,11 +217,34 @@ describe("einsatzCsvInhalt()", () => {
     const csv = einsatzCsvInhalt(
       sammlung([meldung(bogen("A")), meldung(bogen("B", { uebung: true }))]),
     );
+    const sp = spaltenIndex(csv);
     const reihen = zeilen(csv);
     const uebung = reihen[2]!.split(";");
-    expect(uebung[22]).toBe("nein");
-    expect(uebung[23]).toBe("ÜBUNG");
+    expect(uebung[sp("Zählt in Lage")]).toBe("nein");
+    expect(uebung[sp("Übung")]).toBe("ÜBUNG");
     expect(reihen[3]!).toContain("Summe (1 Einheiten)");
+  });
+
+  it("schreibt korrigierte Eintreffzeit, Abrückzeit und Auftrag der Führungsstelle", () => {
+    // Die Zeiten der Führungsstelle, nicht der Empfangsmoment: fürs
+    // Einsatztagebuch zählt, wann die Einheit da war.
+    const eingetroffen = new Date("2026-09-26T09:40").getTime();
+    const abgerueckt = new Date("2026-09-27T15:10").getTime();
+    const csv = einsatzCsvInhalt(
+      sammlung([
+        meldung(bogen("A"), {
+          status: MeldeStatus.ABGERUECKT,
+          eingetroffenAm: eingetroffen,
+          abgerueckAm: abgerueckt,
+          notiz: "Deichabschnitt Nord",
+        }),
+      ]),
+    );
+    const sp = spaltenIndex(csv);
+    const f = zeilen(csv)[1]!.split(";");
+    expect(f[sp("Eingetroffen")]).toBe("26.09.2026, 09:40");
+    expect(f[sp("Abgerückt")]).toBe("27.09.2026, 15:10");
+    expect(f[sp("Auftrag/Notiz")]).toBe("Deichabschnitt Nord");
   });
 
   it("quotet Felder mit Semikolon und deutschem Dezimalkomma", () => {
@@ -175,5 +259,66 @@ describe("einsatzCsvInhalt()", () => {
     const daten = zeilen(csv)[1]!;
     expect(daten).toContain('"THW Feuerwehr; Ort Media Team"'); // Semikolon-Feld gequotet
     expect(daten.split(";")).toContain("12,5"); // Diesel als deutsche Dezimalzahl
+  });
+});
+
+describe("Nachtrag-CSV (Audit Runde 5, R5-W7, R5-K6)", () => {
+  it("nennt den Grund je Zeile, summiert nur neue Einheiten und kennzeichnet die Teilmenge", async () => {
+    const { einsatzCsvInhalt } = await import("./einsatz-csv");
+    const { neuerBogen } = await import("./hilfen");
+    const { EinsatzArt, MeldeStatus, einheitSchluessel } = await import("@bos/meldekopf/einsaetze");
+    const mk = (id: string, name: string) => {
+      const b = neuerBogen();
+      b.einheit.hierarchie[0]!.name = name;
+      return { id, einheitSchluessel: einheitSchluessel(b.einheit), empfangenAm: 1, quelle: "scan" as const, status: MeldeStatus.ANWESEND, bogen: b };
+    };
+    const alt = mk("a", "Crailsheim");
+    const neu = mk("b", "Bamberg");
+    const s = {
+      id: "e", name: "Lage", art: EinsatzArt.EINSATZ, angelegt: 1, geaendert: 1, eintraege: [alt, neu], nachtragSeit: 5000,
+      nachtragGruende: { [alt.einheitSchluessel]: { neu: false, gruende: ["Zug"] }, [neu.einheitSchluessel]: { neu: true, gruende: ["neu"] } },
+    };
+    const csv = einsatzCsvInhalt(s);
+    expect(csv).toContain("Im Nachtrag wegen");
+    expect(csv).toContain("geändert: Zug");
+    expect(csv).toContain("Summe Nachtrag — nur neue Einheiten (1)");
+    expect(csv).toContain("Geänderte Einheiten (1)");
+    expect(csv).toContain("NACHTRAG seit");
+  });
+});
+
+describe("Anderer Einsatz? in den Exporten (Audit Runde 5, R5-K5)", () => {
+  it("trägt den Hinweis in CSV, Alle-Daten-CSV und Excel-Bemerkung, passende Einheiten nicht", async () => {
+    const { einsatzCsvInhalt } = await import("./einsatz-csv");
+    const { einsatzDetailCsvInhalt } = await import("./bogen-csv");
+    const { neuerBogen } = await import("./hilfen");
+    const { EinsatzArt, MeldeStatus, einheitSchluessel } = await import("@bos/meldekopf/einsaetze");
+    const mk = (id: string, name: string, ort: string) => {
+      const b = neuerBogen();
+      b.einheit.hierarchie[0]!.name = name;
+      b.einsatz = { ...b.einsatz, ortAuftrag: ort };
+      return { id, einheitSchluessel: einheitSchluessel(b.einheit), empfangenAm: 1, quelle: "scan" as const, status: MeldeStatus.ANWESEND, bogen: b };
+    };
+    const s = {
+      id: "e", name: "Hochwasser Jagst", ort: "Möckmühl", art: EinsatzArt.EINSATZ, angelegt: 1, geaendert: 1,
+      eintraege: [mk("a", "Albstadt", "Deichsicherung Möckmühl"), mk("n", "Neu-Ulm", "Brandeinsatz Lagerhalle Ulm")],
+    };
+    for (const csv of [einsatzCsvInhalt(s), einsatzDetailCsvInhalt(s)]) {
+      expect(csv).toContain("Anderer Einsatz? Bogen nennt: „Brandeinsatz Lagerhalle Ulm“");
+      expect(csv.match(/Anderer Einsatz\?/g)).toHaveLength(1);
+    }
+  });
+});
+
+describe("Reihenfolge der Übersicht (R8-A2)", () => {
+  it("ordnet die Zeilen nach Nr., nicht nach Name", () => {
+    const z = bogen("Zeta");
+    const a = bogen("Alpha");
+    const csv = einsatzCsvInhalt(sammlung([meldung(z, { empfangenAm: 1000 }), meldung(a, { empfangenAm: 2000 })]));
+    const zl = zeilen(csv);
+    expect(zl[1]!.split(";")[0]).toBe("1");
+    expect(zl[1]).toContain("Zeta");
+    expect(zl[2]!.split(";")[0]).toBe("2");
+    expect(zl[2]).toContain("Alpha");
   });
 });

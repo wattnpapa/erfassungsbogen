@@ -16,13 +16,14 @@ Funktionalität: Bogen im Assistenten erfassen
     Wenn ich das Feld "Einheitstyp" anklicke
     Dann sehe ich den Text "Bergungsgruppe"
 
-  # Ein Plausibilitätshinweis, der ein anderes Feld betrifft, ist ein Sprung
-  # dorthin — nicht nur in der Übersicht, sondern auch mitten im Schritt.
-  Szenario: Ein Hinweis im Schritt springt zum betroffenen Schritt
+  # Jeder Schritt zeigt nur die Hinweise, die sich auf ihm beheben lassen —
+  # gelbe Kästen zu Schritten, die noch gar nicht dran waren, lehrten nur das
+  # Überlesen. Die Gesamtliste mit Sprung steht in der Übersicht.
+  Szenario: Ein Schritt zeigt nur seine eigenen Hinweise
     Wenn ich zum Schritt "3. Personal" wechsle
+    Dann sehe ich den Hinweis "Ort/Auftrag ist noch leer." nicht
+    Wenn ich zum Schritt "2. Einsatz" wechsle
     Dann sehe ich den Hinweis "Ort/Auftrag ist noch leer."
-    Wenn ich auf "Ort/Auftrag ist noch leer." klicke
-    Dann sehe ich den Schritt "2. Einsatz"
 
   Szenario: Der Assistent führt durch alle sechs Schritte
     Dann ist die Schaltfläche "← Zurück" gesperrt
@@ -55,7 +56,7 @@ Funktionalität: Bogen im Assistenten erfassen
     Und ich das Feld "Organisationsname (optional)" mit "Freiwillige Feuerwehr Wardenburg" fülle
     Und ich das Feld "Einheitstyp" mit "Löschzug" fülle
     Und ich das Feld "Ebene (eigene Einheit)" auf "Gemeinde – Gemeinde/Stadt" stelle
-    Und ich das Feld "Name (Pflicht)" mit "Wardenburg" fülle
+    Und ich das Feld "Ort der Einheit (Pflicht)" mit "Wardenburg" fülle
     Und ich zum Schritt "6. Übersicht" wechsle
     Dann sehe ich den Hinweis "Feuerwehr — Freiwillige Feuerwehr Wardenburg"
     Und sehe ich den Hinweis "Löschzug"
@@ -63,18 +64,18 @@ Funktionalität: Bogen im Assistenten erfassen
 
   Szenario: THW-Ortsverband aus der Vorschlagsliste übernehmen
     Wenn ich das Feld "Organisation" auf "THW" stelle
-    Und ich das Feld "Name (Pflicht)" mit "Oldenburg" fülle
+    Und ich das Feld "Ort der Einheit (Pflicht)" mit "Oldenburg" fülle
     Und ich in der Vorschlagsliste "Oldenburg (NI)" wähle
-    Dann steht im Feld "Kürzel" der Wert "OODE"
+    Dann steht im Feld "Dienststellen-Kürzel (optional)" der Wert "OODE"
     Und steht im Feld "Telefon" der Wert "04413401050"
 
   Szenario: Eine Ebene hinzufügen und wieder entfernen
     Wenn ich das Feld "Organisation" auf "Feuerwehr" stelle
     Und ich auf "+ übergeordnete Ebene" klicke
-    Und ich das Feld "Name (Pflicht)" mit "Wardenburg" fülle
-    Dann sehe ich die Schaltfläche "✕"
-    Wenn ich auf "✕" klicke
-    Dann sehe ich die Schaltfläche "✕" nicht
+    Und ich das Feld "Ort der Einheit (Pflicht)" mit "Wardenburg" fülle
+    Dann sehe ich die Schaltfläche "Ebene LK entfernen"
+    Wenn ich auf "Ebene LK entfernen" klicke
+    Dann sehe ich die Schaltfläche "Ebene LK entfernen" nicht
 
   Szenario: Landesvorlage belegt Einheitstyp, Stärkeplätze und Fahrzeuge vor
     Wenn ich das Feld "Organisation" auf "Feuerwehr" stelle
@@ -98,7 +99,7 @@ Funktionalität: Bogen im Assistenten erfassen
   Szenario: Einsatzdaten landen in der Übersicht
     Wenn ich zum Schritt "2. Einsatz" wechsle
     Und ich das Feld "Einsatzort / Auftrag" mit "Deichverteidigung Elsfleth" fülle
-    Und ich "Einsatzbeginn" ankreuze
+    Und ich "Einsatzbeginn eintragen" ankreuze
     Und ich zum Schritt "6. Übersicht" wechsle
     Dann sehe ich den Text "Deichverteidigung Elsfleth"
     Und sehe ich "Ort/Auftrag ist noch leer." nicht
@@ -108,7 +109,7 @@ Funktionalität: Bogen im Assistenten erfassen
     Und ich auf "+ Person hinzufügen" klicke
     Und ich das Feld "Vorname" mit "Erika" fülle
     Und ich das Feld "Nachname" mit "Musterfrau" fülle
-    Und ich das Feld "Stärkerolle (vor Ort)" auf "Führer/in" stelle
+    Und ich das Feld "Zählt als" auf "Führer/in" stelle
     Und ich zum Schritt "6. Übersicht" wechsle
     Dann sehe ich die Überschrift "Personal (1)"
     Und sehe ich den Text "Musterfrau, Erika"
@@ -163,7 +164,7 @@ Funktionalität: Bogen im Assistenten erfassen
   Szenario: Enter in der Schnelleingabe legt die nächste Zeile an
     Wenn ich zum Schritt "3. Personal" wechsle
     Und ich auf "+ Person hinzufügen" klicke
-    Und ich "Schnelleingabe (Tabelle)" ankreuze
+    Und ich "Kurz-Liste (Tabelle)" ankreuze
     Und ich in der Schnelltabelle Zeile 1 auf "Anke" setze
     Und ich in der Schnelltabelle in Zeile 1 die Eingabetaste drücke
     Und ich in der Schnelltabelle Zeile 2 auf "Bernd" setze
@@ -218,7 +219,7 @@ Funktionalität: Bogen im Assistenten erfassen
   # — ein Funkrufname, den es in Berlin nicht gibt.
   Szenario: In der Großstadt steht der Ortsverband als Kennzahl im Funkrufnamen
     Wenn ich das Feld "Organisation" auf "THW" stelle
-    Und ich das Feld "Name (Pflicht)" mit "Steglitz" fülle
+    Und ich das Feld "Ort der Einheit (Pflicht)" mit "Steglitz" fülle
     Und ich in der Vorschlagsliste "Berlin Steglitz-Zehlendorf" wähle
     Und ich das Feld "Einheitstyp" auf "B – Bergungsgruppe" stelle
     Und ich zum Schritt "6. Übersicht" wechsle
@@ -262,11 +263,11 @@ Funktionalität: Bogen im Assistenten erfassen
 
   Szenario: Der Entwurf übersteht einen Neustart der App
     Wenn ich das Feld "Organisation" auf "Feuerwehr" stelle
-    Und ich das Feld "Name (Pflicht)" mit "Wardenburg" fülle
+    Und ich das Feld "Ort der Einheit (Pflicht)" mit "Wardenburg" fülle
     Und ich die Seite neu lade
     Dann sehe ich den Hinweis "Entwurf vom"
     Und sehe ich die Schaltfläche "Fortsetzen"
     Wenn ich auf "Fortsetzen" klicke
-    Dann sehe ich die Überschrift "Gesamtübersicht"
-    Wenn ich zum Schritt "1. Einheit" wechsle
-    Dann steht im Feld "Name (Pflicht)" der Wert "Wardenburg"
+    # „Fortsetzen" öffnet den Schritt, auf dem gearbeitet wurde (R2-N7).
+    Dann sehe ich die Überschrift "1. Einheit"
+    Und steht im Feld "Ort der Einheit (Pflicht)" der Wert "Wardenburg"

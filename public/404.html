@@ -9,6 +9,21 @@
        Tippfehler-Adressen als scheinbar eigenständige Seiten ein. -->
   <meta name="robots" content="noindex, follow">
   <link rel="icon" href="/icon.svg" type="image/svg+xml">
+  <!-- THEMA:JS:START -->
+  <script>
+    // Anzeigemodus der App (Dunkel/Feld/Nacht) VOR dem ersten Malen übernehmen:
+    // gleiche Herkunft, gleicher Speicher, gleiche Regel wie in der App
+    // (index.html, anzeige-modus.ts). Erzeugt von scripts/content-stil.mts.
+    try {
+      var eebModus = localStorage.getItem("eeb.anzeigemodus.v1")
+        || (localStorage.getItem("eeb.feldmodus.v1") === "1" ? "feld" : "");
+      if (!eebModus && window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches)
+        eebModus = "dunkel";
+      if (eebModus === "feld" || eebModus === "nacht" || eebModus === "dunkel")
+        document.documentElement.classList.add(eebModus + "-modus");
+    } catch (e) { /* Privatmodus/blockierter Speicher: helle Darstellung */ }
+  </script>
+  <!-- THEMA:JS:END -->
   <style>
     @font-face {
       font-family: "Archivo Variable";
@@ -19,7 +34,7 @@
            url("./schrift/archivo-latin-wght-normal.woff2") format("woff2");
       unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
     }
-    :root { --blau: #12275e; --blau-hell: #1d3d8f; --rand: #c9cede; --grau: #f2f3f7; --text: #11141b; }
+    :root { --blau: #12275e; --blau-hell: #1d3d8f; --rand: #c9cede; --grau: #f2f3f7; --text: #11141b; --text-2: #5c6478; --flaeche: #fff; --flaeche-2: #e8ebf2; --auf-blau: #fff; }
     * { box-sizing: border-box; }
     body {
       margin: 0;
@@ -33,10 +48,69 @@
     a { color: var(--blau-hell); }
     .start {
       display: inline-block; margin: 1rem 0;
-      padding: 0.6rem 1.1rem; background: var(--blau); color: #fff;
+      padding: 0.6rem 1.1rem; background: var(--blau); color: var(--auf-blau);
       border-radius: 0; text-decoration: none; font-weight: 600;
     }
-    footer { margin-top: 2.5rem; padding-top: 1rem; border-top: 1px solid var(--rand); font-size: 0.875rem; color: #5c6478; }
+    footer { margin-top: 2.5rem; padding-top: 1rem; border-top: 1px solid var(--rand); font-size: 0.875rem; color: var(--text-2); }
+    /* THEMA:CSS:START */
+    /* Anzeigemodus der App (Modus-Regel, scripts/content-stil.mts): Werte aus
+       index.html. Feld: 112 % Schrift, harte Linien, schwarze Schrift. Dunkel
+       und Nacht: dunkle Flächen, helle Schrift; nachts weicht die Kennfarbe
+       Bernstein, damit kein sattes Blau die Dunkeladaption zerstört. */
+    html.feld-modus { font-size: 112%; --grau: #e8eaef; --text: #000000; --text-2: #262b36; --rand: #111318; --flaeche-2: #dfe3ea; }
+    html.dunkel-modus { color-scheme: dark; --grau: #0f1116; --flaeche: #171a21; --flaeche-2: #21252e; --text: #e7eaf1; --text-2: #aab2c2; --rand: #3a414f; --blau: #a8bdf2; --blau-hell: #c6d4f8; --auf-blau: #101a33; }
+    html.nacht-modus { color-scheme: dark; --grau: #0d0c08; --flaeche: #17150f; --flaeche-2: #221f16; --text: #d9cdb6; --text-2: #a2977e; --rand: #423c2d; --blau: #a8791a; --blau-hell: #c9932c; --auf-blau: #100d07; }
+    /* Sicherheitsnetz gegen die Rohwerte der anderen Generatoren (siehe oben). */
+    html.dunkel-modus :is(.kopfnav, .kopfnav-unter, .hinweis, table, th, .themenliste li, .laenderliste a),
+    html.nacht-modus :is(.kopfnav, .kopfnav-unter, .hinweis, table, th, .themenliste li, .laenderliste a) { background: var(--flaeche); }
+    html.dunkel-modus :is(.kopfnav-links a, footer, figcaption, .fussnav-titel, .marken-hinweis, .sprungmenue-titel, .abschluss .zusicherung, .laenderliste .anzahl, h2#andere-bundeslaender, h2#andere-bundeslaender + p, .frage > summary::before, .aufklapp > summary::before),
+    html.nacht-modus :is(.kopfnav-links a, footer, figcaption, .fussnav-titel, .marken-hinweis, .sprungmenue-titel, .abschluss .zusicherung, .laenderliste .anzahl, h2#andere-bundeslaender, h2#andere-bundeslaender + p, .frage > summary::before, .aufklapp > summary::before) { color: var(--text-2); }
+    /* Der umrandete Knopf .start.papier steht auf der Fläche, nicht auf der
+       Kennfarbe — er behält seine Schrift in var(--blau) (R2-L1). */
+    html.dunkel-modus :is(.start:not(.papier), .sprunglink), html.nacht-modus :is(.start:not(.papier), .sprunglink) { color: var(--auf-blau); }
+    /* Fotos und Bildschirmfotos sind in Dunkel und Nacht helle Flächen —
+       gedimmt, aber erkennbar. Im Dunkel-Modus (auch bei System-dunkel ohne
+       gespeicherte Wahl) waren sie ungedimmt; ein weißer App-Screenshot
+       blendete über eine halbe Bildschirmhöhe (Audit Runde 3, R3-L4). Mit 0,7
+       blieb die Aufnahme „Startseite" nachts bei Luma 137 die hellste Fläche
+       der Seite (Seitengrund 12; Audit Runde 5, R5-L6): 0,4 bringt sie auf
+       Luma 78 (gemessen am Prüfer-Maß; PNG-Mittel 84) — die Schrift in den
+       Aufnahmen ist ohnehin zu klein zum Lesen, sie zeigen, wie die App
+       aussieht. Die Strichcodes (.scancodes) bleiben ungedimmt: sie werden vom
+       Bildschirm abgescannt. */
+    html.dunkel-modus figure:not(.scancodes figure) img,
+    html.nacht-modus figure:not(.scancodes figure) img { filter: brightness(0.4); }
+    /* THEMA:CSS:END */
+    /* UMBRUCH:CSS:START */
+    /* Große Systemschrift (Umbruch-Regel, scripts/content-stil.mts; Audit
+       Runde 2, R2-M1): nichts darf die Seite breiter machen als das Gerät.
+       break-word bricht nur ein Wort, das allein nicht in die Zeile passt;
+       min(…, 100%) lässt ein Raster auf eine Spalte zurückfallen, statt über
+       den Rand zu ragen. Bei normaler Schrift greift keine dieser Regeln. */
+    html { overflow-wrap: break-word; }
+    /* Tabellenzellen ausgenommen: dort ragte schon bei normaler Schrift
+       manches Wort ein Pixel ins Zellpolster („Taschenrechner"), gebrochen
+       stünde es als „Taschenrechne / r" da. Breite Tabellen rollen ohnehin
+       in ihrem .tabellenrahmen. */
+    th, td { overflow-wrap: normal; }
+    .sprungmenue ul { grid-template-columns: repeat(auto-fit, minmax(min(14rem, 100%), 1fr)); }
+    .themenliste { grid-template-columns: repeat(auto-fill, minmax(min(16rem, 100%), 1fr)); }
+    .fussnav { grid-template-columns: repeat(auto-fit, minmax(min(9rem, 100%), 1fr)); }
+    /* Aufklapp-Zeilen sind Flex-Zeilen: Überschrift und bloßer Text darin
+       brauchen eine Mindestbreite unter dem längsten Wort. */
+    summary { overflow-wrap: anywhere; }
+    summary > * { min-width: 0; }
+    .scancodes figure, .scancodes img { max-width: 100%; }
+    /* Der Knopf ist teils inline-flex: seine Beschriftung ist dann ein
+       anonymes Flex-Kind, dessen Mindestbreite das längste Wort ist
+       („Katastrophenschutz-Bogen"). anywhere senkt sie. */
+    .start { max-width: 100%; overflow-wrap: anywhere; }
+    /* UMBRUCH:CSS:END */
+    /* WERKZEUGE:CSS:START */
+    footer .werkzeuge { display: flex; flex-wrap: wrap; align-items: center; gap: 0 0.5rem; margin-top: 1rem; padding-top: 0.5rem; border-top: 1px solid var(--rand); color: var(--text-2); }
+    footer .werkzeuge a { display: inline-flex; align-items: center; min-height: 2.75rem; color: var(--text-2); text-decoration: underline; text-decoration-color: var(--rand); text-underline-offset: 0.2em; }
+    footer .werkzeuge a:hover { color: var(--blau); text-decoration-color: currentColor; }
+    /* WERKZEUGE:CSS:END */
   </style>
 </head>
 <body>
@@ -56,6 +130,17 @@
       <a href="/datenschutz.html">Datenschutz</a> ·
       <a href="/impressum.html">Impressum</a>
       </nav>
+      <!-- WERKZEUGE:START -->
+      <nav class="werkzeuge" aria-label="Weitere Werkzeuge">
+        <a href="https://erfassungsbogen.app/">erfassungsbogen.app</a>
+        <span class="werkzeuge-trenner" aria-hidden="true">·</span>
+        <a href="https://fmbauplaner.app/">fmbauplaner.app</a>
+        <span class="werkzeuge-trenner" aria-hidden="true">·</span>
+        <a href="https://nachrichtenvordruck.app/">nachrichtenvordruck.app</a>
+        <span class="werkzeuge-trenner" aria-hidden="true">·</span>
+        <a href="https://sprechfunk-uebung.de/">sprechfunk-uebung.de</a>
+      </nav>
+      <!-- WERKZEUGE:END -->
     </footer>
   </main>
 </body>

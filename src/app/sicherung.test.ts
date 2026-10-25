@@ -1,7 +1,15 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import {
   alleDatenLoeschen,
+  bestandBetroffen,
+  bestandUmfang,
   datenUmfang,
+  geraetBestand,
+  letzteSicherung,
+  sicherungErstelltAm,
+  sicherungFaellig,
+  wertvolleDaten,
+  ERINNERUNG_TAGE,
   sicherungEinspielen,
   sicherungErstellen,
   sicherungInhalt,
@@ -9,10 +17,11 @@ import {
 } from "./sicherung";
 import { OrganisationsTyp, PersonalErfassung, SCHEMA_VERSION, type Erfassungsbogen } from "@bos/eeb-format/model";
 import { absenderkarteSpeichern } from "./absenderkarte";
-import { EinsatzArt, einsatzAnlegen, meldungHinzufuegen,
+import { exportVermerken } from "./export-stand";
+import { EinsatzArt, einsaetzeLaden, einsatzAnlegen, meldungHinzufuegen,
   speicherhuelleSetzen,
 } from "@bos/meldekopf/einsaetze";
-import { entwurfLaden, entwurfSpeichern } from "./entwurf";
+import { entwurfLaden, entwurfSpeichern, entwurfUeberschreibenErlauben, ersetztenEntwurfMerken } from "./entwurf";
 import { vorlageAnlegen, vorlageLoeschen, vorlagenLaden } from "./vorlagen";
 
 function bogen(): Erfassungsbogen {
@@ -58,6 +67,7 @@ beforeEach(() => {
   (globalThis as { localStorage?: Storage }).localStorage = mem;
   // Die Einsatz-Sammlung bekommt ihre Ablage hineingereicht (ADR-003).
   speicherhuelleSetzen(mem);
+  entwurfUeberschreibenErlauben();
 });
 
 describe("sicherungInhalt() / sicherungParsen()", () => {
@@ -89,7 +99,9 @@ describe("sicherungErstellen() / sicherungEinspielen()", () => {
     (globalThis as { localStorage?: Storage }).localStorage = mem;
     // Die Einsatz-Sammlung bekommt ihre Ablage hineingereicht (ADR-003).
     speicherhuelleSetzen(mem);
-    expect(sicherungEinspielen(datei)).toBe(2);
+    // Zwei Nutzdaten-Einträge plus der Vermerk der Sicherung selbst (R2-O6).
+    expect(sicherungEinspielen(datei)).toBe(3);
+    expect(letzteSicherung()).not.toBeNull();
     expect(localStorage.getItem("eeb.vorlagen.v1")).toBe("[1]");
     expect(localStorage.getItem("eeb.einsaetze.v1")).toBe("[2]");
     expect(localStorage.getItem("fremd")).toBeNull();
@@ -105,6 +117,38 @@ describe("sicherungErstellen() / sicherungEinspielen()", () => {
   });
 });
 
+describe("alte Sicherung (R5-D4)", () => {
+  const TAG = 24 * 60 * 60 * 1000;
+  function sammlungVor(tage: number, extra: Record<string, unknown> = {}) {
+    return { id: "s" + tage, name: "Altlage " + tage, art: 0, angelegt: Date.now() - (tage + 5) * TAG, geaendert: Date.now() - tage * TAG, eintraege: [], ...extra };
+  }
+
+  it("übernimmt den Uhrstand der Datei nicht, das Gerät behält seinen", () => {
+    localStorage.setItem("eeb.uhr.v1", JSON.stringify({ zuletzt: 111 }));
+    const datei = sicherungInhalt({ "eeb.vorlagen.v1": "[]", "eeb.uhr.v1": JSON.stringify({ zuletzt: 5 }) });
+    expect(sicherungEinspielen(datei)).toBe(1);
+    expect(JSON.parse(localStorage.getItem("eeb.uhr.v1")!)).toEqual({ zuletzt: 111 });
+  });
+
+  it("nennt in der Rückfrage, was von einer alten Datei sofort wieder fällt", () => {
+    const b = bestandUmfang({
+      "eeb.einsaetze.v1": JSON.stringify([
+        sammlungVor(100),
+        sammlungVor(10),
+        sammlungVor(5, { geloeschtAm: Date.now() - 40 * TAG }),
+      ]),
+    });
+    expect(b.faellig.sammlungen).toBe(1);
+    expect(b.faellig.namen).toEqual(["Altlage 100"]);
+    expect(b.faellig.papierkorb).toBe(1);
+  });
+
+  it("eine junge Datei hat nichts, was fällt", () => {
+    const b = bestandUmfang({ "eeb.einsaetze.v1": JSON.stringify([sammlungVor(10)]) });
+    expect(b.faellig).toEqual({ sammlungen: 0, namen: [], betroffen: [], papierkorb: 0, meldungen: 0, entwurf: false });
+  });
+});
+
 describe("datenUmfang()", () => {
   it("meldet auf einem frischen Gerät nichts", () => {
     expect(datenUmfang()).toEqual({
@@ -113,9 +157,25 @@ describe("datenUmfang()", () => {
       einsaetze: 0,
       meldungen: 0,
       entwurf: false,
+      rueckholplatz: null,
       absender: false,
+      beiseitegelegt: false,
       geraeteschluessel: false,
+      ohneExport: [],
     });
+  });
+
+  // Audit Runde 4, R4-D5: Wo es keine Kopie gibt, nennt die Rückfrage es.
+  it("nennt Sammlungen mit Meldungen, von denen es keinen Export gibt (R4-D5)", () => {
+    const a = einsatzAnlegen("Übung", EinsatzArt.UEBUNG);
+    meldungHinzufuegen(a.id, bogen(), { quelle: "manuell" });
+    const b = einsatzAnlegen("Hochwasser", EinsatzArt.EINSATZ);
+    meldungHinzufuegen(b.id, bogen(), { quelle: "manuell" });
+    einsatzAnlegen("Leer", EinsatzArt.EINSATZ); // ohne Meldungen: nichts zu verlieren
+    expect(datenUmfang().ohneExport.sort()).toEqual(["Hochwasser", "Übung"]);
+
+    exportVermerken(einsaetzeLaden().find((s) => s.id === b.id)!, "csv");
+    expect(datenUmfang().ohneExport).toEqual(["Übung"]);
   });
 
   it("zählt Vorlagen und Einsätze inklusive Papierkorb", () => {
@@ -139,9 +199,30 @@ describe("datenUmfang()", () => {
     expect(u.entwurf).toBe(true);
     expect(u.absender).toBe(true);
   });
+
+  it("nennt den Bogen auf dem Rückholplatz auch bei leerem Arbeitsplatz (R3-D4)", () => {
+    ersetztenEntwurfMerken(bogen());
+    const u = datenUmfang();
+    expect(u.entwurf).toBe(false);
+    expect(u.rueckholplatz).toMatch(/Oldenburg/);
+  });
 });
 
 describe("alleDatenLoeschen()", () => {
+  it("räumt auch die Merker im Sitzungsspeicher des Tabs ab (R5-S6, R5-D5)", () => {
+    const sitzung = new Map<string, string>([["eeb.wartet.fragment", "abc"], ["eeb.vorbelegung.rueckweg", "{}"], ["fremd", "bleibt"]]);
+    (globalThis as { sessionStorage?: unknown }).sessionStorage = {
+      get length() { return sitzung.size; },
+      key: (i: number) => [...sitzung.keys()][i] ?? null,
+      getItem: (k: string) => sitzung.get(k) ?? null,
+      setItem: (k: string, v: string) => void sitzung.set(k, v),
+      removeItem: (k: string) => void sitzung.delete(k),
+    };
+    localStorage.setItem("eeb.vorlagen.v1", "[]");
+    alleDatenLoeschen();
+    expect([...sitzung.keys()]).toEqual(["fremd"]);
+  });
+
   it("entfernt alle eeb.*-Einträge und lässt fremde Schlüssel stehen", () => {
     vorlageAnlegen("Basis", bogen());
     entwurfSpeichern(bogen());
@@ -158,5 +239,131 @@ describe("alleDatenLoeschen()", () => {
 
   it("ist auf einem leeren Gerät ein Nullvorgang", () => {
     expect(alleDatenLoeschen()).toBe(0);
+  });
+});
+
+describe("bestandUmfang() / geraetBestand() — für die Einspiel-Rückfrage (R2-D3)", () => {
+  it("nennt Sammlungen beim Namen mit Meldungszahl, Papierkorb getrennt", () => {
+    const e = einsatzAnlegen("Heute Nacht Starkregen", EinsatzArt.EINSATZ);
+    meldungHinzufuegen(e.id, bogen(), { quelle: "manuell" });
+    vorlageAnlegen("Basis", bogen());
+
+    const geraet = geraetBestand();
+    expect(geraet.sammlungen).toEqual([{ name: "Heute Nacht Starkregen", meldungen: 1, papierkorb: false }]);
+    expect(geraet.vorlagen).toBe(1);
+    expect(geraet.entwurf).toBe(false);
+  });
+
+  it("misst eine Sicherungsdatei mit derselben Elle wie das Gerät", () => {
+    einsatzAnlegen("Alte Lage", EinsatzArt.EINSATZ);
+    entwurfSpeichern(bogen());
+    const text = sicherungErstellen();
+
+    const datei = bestandUmfang(sicherungParsen(text));
+    expect(datei).toEqual(geraetBestand());
+    expect(sicherungErstelltAm(text)).toMatch(/^\d{4}-\d{2}-\d{2}T/);
+  });
+
+  it("verträgt fremden Müll in den Einträgen", () => {
+    expect(bestandUmfang({ "eeb.einsaetze.v1": "kaputt", "eeb.vorlagen.v1": "{}" })).toEqual({
+      sammlungen: [],
+      vorlagen: 0,
+      vorlagenPapierkorb: 0,
+      entwurf: false,
+      rueckholplatz: null,
+      absender: false,
+      geraeteschluessel: null,
+      faellig: { sammlungen: 0, namen: [], betroffen: [], papierkorb: 0, meldungen: 0, entwurf: false },
+      // Der Müll wird nicht verschwiegen, sondern genannt (R8-E1).
+      beschaedigt: [
+        "Einsatz-Sammlungen: der gespeicherte Text ist beschädigt und nicht lesbar",
+        "Vorlagen: der gespeicherte Text ist beschädigt und nicht lesbar",
+      ],
+    });
+  });
+
+  // Audit Runde 4, R4-D2: Rückholplatz, Absenderkarte und Geräteschlüssel
+  // gingen beim Einspielen verloren, ohne in der Aufzählung zu stehen.
+  it("zählt Rückholplatz, Absenderkarte, Geräteschlüssel und den Vorlagen-Papierkorb mit (R4-D2)", () => {
+    const b = bogen();
+    b.einheit.hierarchie[0]!.name = "Crailsheim";
+    localStorage.setItem("eeb.entwurf.ersetzt.v1", JSON.stringify({ gespeichert: Date.now(), bogen: b }));
+    localStorage.setItem("eeb.absenderkarte.v1", JSON.stringify({ name: "Zugtrupp Albstadt" }));
+    localStorage.setItem("eeb.geraeteschluessel.v1", "ab".repeat(32));
+    localStorage.setItem("eeb.vorlagen.v1", JSON.stringify([{ id: "v1", name: "Alt", geloeschtAm: Date.now(), bogen: b }]));
+    const geraet = geraetBestand();
+    expect(geraet.rueckholplatz).toMatch(/Crailsheim/);
+    expect(geraet.absender).toBe(true);
+    expect(geraet.geraeteschluessel).toBe("ab".repeat(32));
+    expect(geraet.vorlagen).toBe(0);
+    expect(geraet.vorlagenPapierkorb).toBe(1);
+    expect(bestandBetroffen(geraet)).toBe(true);
+    expect(bestandUmfang(sicherungParsen(sicherungErstellen()))).toEqual(geraet);
+  });
+
+  it("ein leeres Gerät ist nicht betroffen", () => {
+    localStorage.clear();
+    expect(bestandBetroffen(geraetBestand())).toBe(false);
+  });
+});
+
+describe("Letzte Sicherung und Erinnerung (Audit Runde 2, R2-O6)", () => {
+  const TAG = 24 * 60 * 60 * 1000;
+
+  it("merkt sich beim Erstellen den Zeitpunkt — die Datei trägt ihn mit", () => {
+    expect(letzteSicherung()).toBeNull();
+    const jetzt = new Date("2026-09-29T10:00:00Z");
+    const text = sicherungErstellen(jetzt);
+    expect(letzteSicherung()).toBe(jetzt.getTime());
+    expect(sicherungParsen(text)["eeb.sicherung.zuletzt.v1"]).toBe(String(jetzt.getTime()));
+  });
+
+  it("erinnert nicht, solange nichts Wertvolles da ist", () => {
+    einsatzAnlegen("Leer", EinsatzArt.EINSATZ); // Sammlung ohne Meldung
+    expect(wertvolleDaten()).toBe(false);
+    expect(sicherungFaellig(Date.now() + 100 * TAG)).toBeNull();
+  });
+
+  it("erinnert, wenn eine Sammlung mit Meldungen seit Tagen ungesichert ist", () => {
+    const e = einsatzAnlegen("Sturmflut", EinsatzArt.EINSATZ);
+    meldungHinzufuegen(e.id, bogen(), { quelle: "manuell" });
+    expect(wertvolleDaten()).toBe(true);
+    expect(sicherungFaellig(Date.now())).toBeNull(); // gerade erst angelegt
+    expect(sicherungFaellig(Date.now() + ERINNERUNG_TAGE * TAG)).toEqual({ seit: null });
+  });
+
+  it("zählt ab der letzten Sicherung", () => {
+    vorlageAnlegen("Basis", bogen());
+    const gesichert = Date.now() + 10 * TAG;
+    sicherungErstellen(new Date(gesichert));
+    expect(sicherungFaellig(gesichert + TAG)).toBeNull();
+    expect(sicherungFaellig(gesichert + ERINNERUNG_TAGE * TAG)).toEqual({ seit: gesichert });
+  });
+});
+
+describe("Beschädigtes in der Sicherungsdatei (R8-E1)", () => {
+  it("nennt einen abgeschnittenen Einsatz-Text und einen abgeschnittenen Entwurf", () => {
+    const heil = '[{"id":"e1","name":"X","eintraege":[]}]';
+    const u = bestandUmfang({
+      "eeb.einsaetze.v1": heil.slice(0, 20),
+      "eeb.vorlagen.v1": "[]",
+      "eeb.entwurf.v1": '{"bogen":{',
+    });
+    expect(u.beschaedigt).toEqual([
+      "Einsatz-Sammlungen: der gespeicherte Text ist beschädigt und nicht lesbar",
+      "Entwurf: der gespeicherte Text ist beschädigt und nicht lesbar",
+    ]);
+  });
+
+  it("zählt nicht lesbare Meldungen und Vorlagen in gültigem JSON", () => {
+    const u = bestandUmfang({
+      "eeb.einsaetze.v1": JSON.stringify([{ id: "e1", name: "X", eintraege: [{ id: "m1", bogen: null }, { id: "m2" }] }]),
+      "eeb.vorlagen.v1": JSON.stringify([{ id: "v1", bogen: 5 }]),
+    });
+    expect(u.beschaedigt).toEqual(["Einsatz-Sammlungen: 2 Meldungen nicht lesbar", "Vorlagen: 1 Vorlage nicht lesbar"]);
+  });
+
+  it("meldet nichts bei einer heilen Datei", () => {
+    expect(bestandUmfang({ "eeb.einsaetze.v1": "[]", "eeb.vorlagen.v1": "[]" }).beschaedigt).toEqual([]);
   });
 });

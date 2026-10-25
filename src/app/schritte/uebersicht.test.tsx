@@ -10,11 +10,18 @@ import userEvent from "@testing-library/user-event";
 import { StaerkeRolle, type Person } from "@bos/eeb-format/model";
 import { neuePerson, neuerBogen, vokabularFuer } from "../hilfen";
 import { Uebersicht } from "./uebersicht";
+import { Dialogschicht } from "../dialoge";
+import { vorlagenLaden } from "../vorlagen";
 
 // pdfmake wird in der Übersicht nur nachgeladen, wenn jemand ein PDF anfordert;
 // im Test ist es teuer und hier ohne Belang.
+const blankoPdfErzeugen = vi.fn(async () => true);
+const pdfFehlt = { an: false };
 vi.mock("../pdf", () => ({
-  pdfErzeugen: async () => {},
+  blankoPdfErzeugen: () => blankoPdfErzeugen(),
+  pdfErzeugen: async () => {
+    if (pdfFehlt.an) throw new TypeError("Failed to fetch dynamically imported module: https://x/assets/pdf-1.js");
+  },
   pdfBlobUrl: async () => "blob:pdf-vorschau",
   einsatzPdfErzeugen: async () => {},
 }));
@@ -77,6 +84,23 @@ describe("Übersicht — Personalliste", () => {
   });
 });
 
+describe("Übersicht — Aufteilung nach Geschlecht (R3-N3)", () => {
+  const kopfzeile = () => document.querySelector<HTMLElement>(".einheit-staerke")!.textContent!;
+
+  it("heißt „Geschlecht“ und ist ausgeschrieben, solange keine Unterbringung angefordert ist", () => {
+    uebersichtMit([person("Anna", "Ahrens", StaerkeRolle.FUEHRER), person("Bernd", "Brandt", StaerkeRolle.MANNSCHAFT)]);
+    expect(kopfzeile()).toContain("Geschlecht: 2 männl. / 0 weibl. / 0 div.");
+    expect(kopfzeile()).not.toMatch(/Unterbringung|M 2/);
+  });
+
+  it("heißt „Unterbringung“, wenn der Bogen Unterbringung anfordert", () => {
+    const bogen = { ...neuerBogen(), personal: [person("Anna", "Ahrens", StaerkeRolle.FUEHRER)] };
+    bogen.sofortbedarf = { verpflegungPersonen: 1, dieselLiter: 0, benzinLiter: 0, gemischLiter: 0, unterbringung: true, ruhezeitErforderlich: false };
+    render(<Uebersicht bogen={bogen} geheZu={() => {}} neu={() => {}} />);
+    expect(kopfzeile()).toContain("Unterbringung: 1 männl. / 0 weibl. / 0 div.");
+  });
+});
+
 /**
  * Der Übergabe-Dialog ist der letzte Moment, in dem eine Lücke im Bogen noch
  * auffallen kann. Vorher zählte nur die Leitzeile der Ansicht die offenen
@@ -90,6 +114,16 @@ describe("Übersicht — Übergabe-Dialog", () => {
   function uebergabeDialog(): HTMLDialogElement {
     return document.querySelector<HTMLDialogElement>("dialog[aria-label='Bogen übergeben']")!;
   }
+
+  it("bietet den Blanko-Vordruck unter „Weitere Formate“ an (R3-A7)", async () => {
+    const nutzer = userEvent.setup();
+    render(<Uebersicht bogen={neuerBogen()} geheZu={() => {}} neu={() => {}} />);
+    await nutzer.click(screen.getByRole("button", { name: "Bogen übergeben…" }));
+    const dialog = uebergabeDialog();
+    await nutzer.click(within(dialog).getByText("Weitere Formate (Link, Tabelle, Excel, Blanko)"));
+    await nutzer.click(within(dialog).getByRole("button", { name: "Blanko-Vordruck (Papier-Reserve)" }));
+    expect(blankoPdfErzeugen).toHaveBeenCalledTimes(1);
+  });
 
   it("zählt die offenen Punkte auch im Übergabe-Dialog auf", async () => {
     const nutzer = userEvent.setup();
@@ -143,5 +177,183 @@ describe("Übersicht — Übergabe-Dialog", () => {
     await nutzer.click(screen.getByRole("button", { name: "Bogen übergeben…" }));
 
     expect(within(uebergabeDialog()).queryByText(/offene[nr]? Punkt/)).toBeNull();
+  });
+});
+
+/**
+ * Gemeldet aus einem THW-OV: In Chrome auf Android zeigte „Vorschau anzeigen"
+ * nur eine graue Seite „Inhalt blockiert". Der Browser hat keinen eingebauten
+ * PDF-Betrachter und sagt das über navigator.pdfViewerEnabled.
+ */
+describe("Übersicht — PDF-Vorschau", () => {
+  function mitPdfBetrachter(wert: boolean | undefined, test: () => Promise<void> | void) {
+    const vorher = Object.getOwnPropertyDescriptor(navigator, "pdfViewerEnabled");
+    Object.defineProperty(navigator, "pdfViewerEnabled", { value: wert, configurable: true });
+    return Promise.resolve(test()).finally(() => {
+      if (vorher) Object.defineProperty(navigator, "pdfViewerEnabled", vorher);
+      else delete (navigator as { pdfViewerEnabled?: boolean }).pdfViewerEnabled;
+    });
+  }
+
+  it("bettet die Vorschau ein, wenn der Browser PDFs anzeigen kann", () =>
+    mitPdfBetrachter(true, async () => {
+      const nutzer = userEvent.setup();
+      const { container } = render(<Uebersicht bogen={neuerBogen()} geheZu={() => {}} neu={() => {}} />);
+
+      await nutzer.click(screen.getByRole("button", { name: "Vorschau anzeigen" }));
+
+      expect(await screen.findByTitle("PDF-Vorschau des Erfassungsbogens")).toBeDefined();
+      expect(container.querySelector("iframe.pdf-rahmen")).not.toBeNull();
+    }));
+
+  it("bietet ohne PDF-Betrachter den Download statt eines leeren Rahmens an", () =>
+    mitPdfBetrachter(false, () => {
+      const { container } = render(<Uebersicht bogen={neuerBogen()} geheZu={() => {}} neu={() => {}} />);
+
+      expect(screen.queryByRole("button", { name: "Vorschau anzeigen" })).toBeNull();
+      expect(screen.getByRole("button", { name: "PDF herunterladen" })).toBeDefined();
+      expect(screen.getByText(/kann PDFs nicht in der Seite anzeigen/)).toBeDefined();
+      expect(container.querySelector("iframe")).toBeNull();
+    }));
+});
+
+/**
+ * Quittung nach „PDF erzeugen" (Audit „Arbeitsablauf", W6): Die Datei entstand,
+ * der Dialog blieb stumm — ob es geklappt hat, zeigte nur der Browser, auf dem
+ * Telefon oft nur kurz. Folge: doppelte Klicks, doppelte Anhänge.
+ */
+describe("Übersicht — PDF-Quittung", () => {
+  it("nennt nach dem Erzeugen den Dateinamen im Dialog", async () => {
+    const nutzer = userEvent.setup();
+    const bogen = neuerBogen();
+    render(
+      <Uebersicht
+        bogen={{ ...bogen, einheit: { ...bogen.einheit, hierarchie: [{ bezeichnung: { code: 1 }, name: "Albstadt", telefon: "" }] } }}
+        geheZu={() => {}}
+        neu={() => {}}
+      />,
+    );
+    await nutzer.click(screen.getByRole("button", { name: "Bogen übergeben…" }));
+    const dialog = document.querySelector<HTMLDialogElement>("dialog[aria-label='Bogen übergeben']")!;
+
+    await nutzer.click(within(dialog).getByRole("button", { name: "PDF erzeugen" }));
+
+    const quittung = await within(dialog).findByText(/PDF gespeichert:/);
+    expect(quittung.getAttribute("role")).toBe("status");
+    expect(quittung.textContent).toMatch(/PDF gespeichert: eeb-\d{6}[a-z]{3}\d{2}_.*Albstadt.*\.pdf/);
+    // Der Knopf steht wieder bereit — ein zweites PDF ist möglich, aber kein Muss.
+    expect(within(dialog).getByRole("button", { name: "PDF erzeugen" })).toHaveProperty("disabled", false);
+  });
+
+  it("vergisst die Quittung beim Schließen des Dialogs", async () => {
+    const nutzer = userEvent.setup();
+    render(<Uebersicht bogen={neuerBogen()} geheZu={() => {}} neu={() => {}} />);
+    await nutzer.click(screen.getByRole("button", { name: "Bogen übergeben…" }));
+    const dialog = document.querySelector<HTMLDialogElement>("dialog[aria-label='Bogen übergeben']")!;
+    await nutzer.click(within(dialog).getByRole("button", { name: "PDF erzeugen" }));
+    await within(dialog).findByText(/PDF gespeichert:/);
+
+    await nutzer.click(within(dialog).getByRole("button", { name: "Schließen" }));
+
+    expect(within(dialog).queryByText(/PDF gespeichert:/)).toBeNull();
+  });
+});
+
+/**
+ * Audit Runde 4, R4-O2: Fehlt der PDF-Baustein (Netz weg vor dem Vorrat),
+ * stand die Meldung unten im Dialog außerhalb des Bildes. Sie gehört direkt
+ * unter den Knopf und nennt den Ausweg.
+ */
+describe("Übersicht — PDF ohne geladenen Baustein (R4-O2)", () => {
+  it("zeigt die Meldung direkt unter „PDF erzeugen“ und nennt den QR-Code", async () => {
+    const nutzer = userEvent.setup();
+    pdfFehlt.an = true;
+    try {
+      render(<Uebersicht bogen={neuerBogen()} geheZu={() => {}} neu={() => {}} />);
+      await nutzer.click(screen.getByRole("button", { name: "Bogen übergeben…" }));
+      const dialog = document.querySelector<HTMLDialogElement>("dialog[aria-label='Bogen übergeben']")!;
+      const knopf = within(dialog).getByRole("button", { name: "PDF erzeugen" });
+      await nutzer.click(knopf);
+
+      const meldung = await within(dialog).findByRole("alert");
+      expect(meldung.textContent).toMatch(/^PDF nicht möglich: Der PDF-Baustein ist noch nicht geladen/);
+      expect(meldung.textContent).toMatch(/Ohne Netz geht jetzt nur der QR-Code/);
+      // Im selben Block wie der Knopf, nicht am Dialogende hinter „Weitere Formate“.
+      expect(meldung.closest(".teilen-weg")).toBe(knopf.closest(".teilen-weg"));
+      expect(within(dialog).getAllByText(/PDF-Baustein ist noch nicht geladen/)).toHaveLength(1);
+
+      await nutzer.click(within(dialog).getByRole("button", { name: "Schließen" }));
+      expect(within(dialog).queryByRole("alert")).toBeNull();
+    } finally {
+      pdfFehlt.an = false;
+    }
+  });
+});
+
+/**
+ * Link-Übergabe (Audit Runde 2, R2-O5): Der Link trägt den Bogen, nicht die
+ * App. Auf einem Gerät, das die App nie mit Netz geöffnet hat, zeigt er
+ * offline nur die Fehlerseite des Browsers — das muss am Link-Knopf stehen.
+ */
+describe("Übersicht — Hinweis zur Link-Übergabe", () => {
+  it("nennt die Voraussetzung der Gegenstelle und den Weg ohne Netz", async () => {
+    const nutzer = userEvent.setup();
+    render(<Uebersicht bogen={neuerBogen()} geheZu={() => {}} neu={() => {}} />);
+
+    await nutzer.click(screen.getByRole("button", { name: "Bogen übergeben…" }));
+
+    const dialog = document.querySelector<HTMLDialogElement>("dialog[aria-label='Bogen übergeben']")!;
+    expect(within(dialog).getByText(/schon einmal mit Netz geöffnet/)).toBeDefined();
+    expect(within(dialog).getByText(/sonst QR-Code oder PDF weitergeben/)).toBeDefined();
+  });
+});
+
+describe("Übersicht — Rückweg und Rückfragen (R7)", () => {
+  it("hat am Seitenende einen Weg zurück zu Schritt 5 (R7-N9)", async () => {
+    const nutzer = userEvent.setup();
+    const geheZu = vi.fn();
+    render(<Uebersicht bogen={neuerBogen()} geheZu={geheZu} neu={() => {}} />);
+    await nutzer.click(screen.getByRole("button", { name: "← Zurück zu Schritt 5 (Sofortbedarf)" }));
+    expect(geheZu).toHaveBeenCalledWith(4);
+  });
+
+  it("legt bei gleichem Namen nicht still eine zweite Vorlage an, sondern fragt (R7-D8)", async () => {
+    localStorage.clear();
+    const nutzer = userEvent.setup();
+    const bogen = neuerBogen();
+    bogen.einheit.organisationName = "OV Test";
+    render(
+      <>
+        <Uebersicht bogen={bogen} geheZu={() => {}} neu={() => {}} />
+        <Dialogschicht />
+      </>,
+    );
+    const speichern = async (name: string) => {
+      await nutzer.click(screen.getByRole("button", { name: "Als Vorlage speichern" }));
+      const frage = await screen.findByRole("dialog", { name: "Als Vorlage speichern" });
+      const feld = within(frage).getByRole("textbox");
+      await nutzer.clear(feld);
+      await nutzer.type(feld, name);
+      await nutzer.click(within(frage).getByRole("button", { name: "Vorlage speichern" }));
+    };
+    await speichern("OV Test");
+    expect(vorlagenLaden()).toHaveLength(1);
+
+    await speichern("ov test");
+    const wahl = await screen.findByRole("dialog", { name: "Vorlage mit diesem Namen vorhanden" });
+    expect(wahl.textContent).toMatch(/Es gibt schon eine Vorlage „OV Test[“"]/);
+    // Abbrechen: Es bleibt bei einer.
+    await nutzer.click(within(wahl).getByRole("button", { name: "Abbrechen" }));
+    expect(vorlagenLaden()).toHaveLength(1);
+
+    await speichern("OV Test");
+    const wahl2 = await screen.findByRole("dialog", { name: "Vorlage mit diesem Namen vorhanden" });
+    await nutzer.click(within(wahl2).getByRole("button", { name: "Vorhandene ersetzen" }));
+    expect(vorlagenLaden()).toHaveLength(1);
+
+    await speichern("OV Test");
+    const wahl3 = await screen.findByRole("dialog", { name: "Vorlage mit diesem Namen vorhanden" });
+    await nutzer.click(within(wahl3).getByRole("button", { name: "Zusätzlich anlegen" }));
+    expect(vorlagenLaden()).toHaveLength(2);
   });
 });

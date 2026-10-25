@@ -1,0 +1,237 @@
+{
+  "schemaVersion": 9,
+  "uebung": true,
+  "stand": 2171520,
+  "einheit": {
+    "organisation": 6,
+    "einheitsTyp": {
+      "freitext": "1. Betreuungsgruppe"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "code": 1
+        },
+        "name": "Akkonia"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 1508,
+    "zeitraumBis": 1508,
+    "ortAuftrag": "Praktische Ausbildung (Übung): Einheitenerfassung der geplanten Einsatzeinheiten"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "nachname": "Schrader",
+      "vorname": "Yvonne",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "GF"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Betr.-H"
+        }
+      ]
+    },
+    {
+      "nachname": "Schmidt",
+      "vorname": "Chayenne",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "TF"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Betr.-H"
+        }
+      ]
+    },
+    {
+      "nachname": "Teichmann",
+      "vorname": "Lothar",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "HE"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Betr.-H"
+        }
+      ]
+    },
+    {
+      "nachname": "Witzig",
+      "vorname": "Sabine",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "TF"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Betr.-H"
+        }
+      ]
+    },
+    {
+      "nachname": "Rüttemann",
+      "vorname": "Sybille",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "HE"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Betr.-H"
+        }
+      ]
+    },
+    {
+      "nachname": "Wolke",
+      "vorname": "Silvia",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "TF"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Betr.-H"
+        }
+      ]
+    },
+    {
+      "nachname": "Mayer",
+      "vorname": "Mia",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "HE"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Betr.-H"
+        }
+      ]
+    },
+    {
+      "nachname": "Sandvoß",
+      "vorname": "Vicky",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Melder"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Betr.-H"
+        }
+      ]
+    },
+    {
+      "nachname": "Schlosser",
+      "vorname": "Tobias",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kraftfahrer"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Betr.-H"
+        }
+      ]
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "GW-Betreuung"
+      },
+      "kennzeichen": "AK-JU 38",
+      "funkrufname": {
+        "kennwort": {
+          "code": 4
+        },
+        "eigenerStandort": false,
+        "ort": "Akkonia",
+        "teile": [
+          56,
+          69,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "MTW"
+      },
+      "kennzeichen": "AK-JU 39",
+      "funkrufname": {
+        "kennwort": {
+          "code": 4
+        },
+        "eigenerStandort": false,
+        "ort": "Akkonia",
+        "teile": [
+          56,
+          17,
+          4
+        ]
+      }
+    }
+  ],
+  "sonstiges": "Fachdienst: Betreuungsdienst. Hauptleistung: BTP. Kommunikation: Rufname 56-17-04."
+}

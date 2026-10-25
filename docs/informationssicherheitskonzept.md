@@ -23,6 +23,377 @@ Grundlage: Repository `wattnpapa/erfassungsbogen`, Stand 2026-09-12 — Version 
 > **Nachgezogen 2026-09-23:** „Vorlage teilen" (Issue #26) — eine einzelne
 > Vorlage lässt sich als signierter QR-Code/Link oder als unsignierte
 > JSON-Datei weitergeben und wieder einlesen (3.3 D5, 5.4).
+>
+> **Nachgezogen 2026-09-27:** Teilexport „Nur neue Bögen seit dem letzten
+> Export" — die App merkt sich je Einsatz-Sammlung, welche Meldungen schon
+> exportiert wurden (3.3 D2b, 5.4).
+>
+> **Nachgezogen 2026-09-28:** Rückholung des Entwurfs (Audit Runde 2, R2-N1,
+> R2-E1, R2-K1) — der Entwurf kennzeichnet die Erfassung einer fremden Einheit
+> am Meldekopf; sie darf den eigenen Bogen nicht mehr vom Rückholplatz
+> verdrängen und wird im Zweifel mit Ansage verworfen. Folgemeldungen erben auf
+> jedem Eingangsweg Zug, Auftrag und Eintreffzeit (3.3 D1, D2c).
+>
+> **Nachgezogen 2026-09-29:** Excel-Liste „Oldenburg" (Audit Runde 2, R2-K2) —
+> trägt jetzt Eintreff-/Abrückzeit und den Auftrag/die Notiz der
+> Führungsstelle; nicht zählende Einheiten stehen in einem Block außerhalb der
+> SUBTOTAL-Summen (5.4).
+>
+> **Nachgezogen 2026-09-29:** „Entfernen" einer Meldung (Audit Runde 2, R2-D1)
+> nimmt die Einheit jetzt mit allen Fassungen aus der Einsatz-Sammlung; bisher
+> blieb die ältere Fassung samt Personendaten stehen und zählte wieder. Eine
+> einzelne Fassung lässt sich getrennt in der Historie verwerfen (5.5).
+>
+> **Nachgezogen 2026-09-29:** Stand am Meldekopf auf den Bogenseiten der
+> Sammel-PDF (Audit Runde 2, R2-A1) — Eintreff-/Abrückzeit, Zug und
+> Auftrag/Notiz stehen zusätzlich über jedem Bogen und neben jedem QR-Code;
+> der QR-Code selbst bleibt unverändert (kein Formatwechsel) (5.4).
+>
+> **Nachgezogen 2026-09-29:** „Sicherung einspielen" (Audit Runde 2, R2-D3)
+> prüft die Datei vor der Rückfrage und nennt dort die laufenden Sammlungen des
+> Geräts mit Namen und Meldungszahl sowie den Inhalt der Datei; es bietet
+> „Vorher Sicherung erstellen…" an und verlangt einen Haken, sobald laufende
+> Sammlungen ersetzt würden (5.5).
+>
+> **Nachgezogen 2026-09-29:** Gedächtnis entfernter Meldungen (Audit Runde 2,
+> R2-D4) — die App merkt sich je Sammlung die Kennungen vor Ort entfernter
+> Einträge (`eeb.entfernt.v1`) und fragt bei „Einsatz importieren…", bevor sie
+> eine davon wieder aufnimmt (3.3 D2e, 5.5).
+>
+> **Nachgezogen 2026-09-29:** Dauerhafter Speicher und Sicherungs-Erinnerung
+> (Audit Runde 2, R2-O6) — die Web-App bittet den Browser um dauerhaften
+> Speicher (`navigator.storage.persist`), sobald Sammlungen mit Meldungen oder
+> Vorlagen vorliegen, zeigt den Status und die letzte Sicherung in der
+> Datensicherung und erinnert in der Fußzeile nach drei Tagen ohne Sicherung
+> (3.3 D2f, 5.5).
+>
+> **Nachgezogen 2026-09-29:** Zwei Fenster, ein Entwurf (Audit Runde 2, R2-O4)
+> — ein Fenster überschreibt den Entwurf nicht mehr still, wenn ein anderes
+> Fenster ihn inzwischen geändert hat, sondern fragt; Einsatz-Sammlungen
+> werden bei Änderungen aus einem anderen Fenster neu eingelesen (3.3 D1).
+>
+> **Nachgezogen 2026-09-29:** Die Quittung mit „Rückgängig" nach Entfernen und
+> Abrücken steht fest im Daumenbereich statt am Seitenanfang (Audit Runde 2,
+> R2-H4); Lebensdauer des Rückwegs präzisiert, keine neue Speicherung (5.5).
+>
+> **Nachgezogen 2026-09-29:** Vermerke der Führungsstelle (Audit Runde 2,
+> R2-K6) — Zug, Auftrag/Notiz, Zeitkorrektur und Abrücken werden mit Uhrzeit
+> als Zusatzfeld `vermerke` am Eintrag festgehalten (Vorwert eines Auftrags
+> steht im Vermerk, also auch dessen Freitext); Herkunft einer Meldung auf
+> Karte und in den CSV-Exporten einheitlich benannt (3.3 D2c).
+>
+> **Nachgezogen 2026-09-29:** Automatische Löschung ruhender Sammlungen (Audit
+> Runde 2, R2-D5) — nach der Löschung nennt die Startseite die entfernte
+> Sammlung einmal beim Namen (neuer Speicherort `eeb.aufgeraeumt.v1`, ohne
+> Personendaten); die Ankündigung ab Tag 60 nennt die tatsächliche Ruhezeit
+> (3.3 D2g).
+>
+> **Nachgezogen 2026-09-29:** Lageblatt/Übergabeblatt (Audit Runde 2, R2-K3) —
+> Zug, Bedarf und Lückenzahl je Einheit, Änderungen als „von … auf …",
+> Bedarf und Zwischensummen nebeneinander (5.4).
+>
+> **Nachgezogen 2026-09-29:** Lageblatt zum Weiterführen (Audit Runde 2,
+> R2-A3) — Funkrufname und Rückrufnummer je Einheit, freie Zeilen; Zeitpunkt
+> des letzten Lageblatts wird gemerkt (3.3 D2h, 5.4).
+>
+> **Nachgezogen 2026-09-29:** Hinweis „von Hand geändert" neben dem QR-Code
+> (Audit Runde 2, R2-A4) — Stiftkorrekturen stecken nicht im Code (5.4).
+>
+> **Nachgezogen 2026-09-29:** Foto-Einlesen (Audit Runde 2, R2-A2) — liest
+> alle QR-Codes eines Bildes und merkt Teile unvollständiger mehrteiliger
+> Bögen bis zu einer Stunde im Arbeitsspeicher (nicht im Gerätespeicher) für
+> den nächsten Durchgang (5.5).
+>
+> **Nachgezogen 2026-09-29:** Rückweg bei Aufteilen und Einsatz löschen (Audit
+> Runde 2, R2-D6) — „Rückgängig" nach dem Aufteilen entfernt die beiden dabei
+> angelegten Einträge und merkt ihre Kennungen in `eeb.entfernt.v1`; „Einsatz
+> löschen" quittiert auf der Startseite mit „Rückgängig" aus dem Papierkorb.
+> Kein neuer Speicherort (5.5).
+>
+> **Nachgezogen 2026-09-29:** Übergabevermerk (Audit Runde 2, R2-W5) — nach
+> „Einsatz weitergeben / sichern" merkt sich die App Zeitpunkt und Kennungen
+> der weitergegebenen Meldungen (neuer Speicherort `eeb.weitergabe-stand.v1`,
+> ohne Personendaten) und zeigt ihn in der Einsatzansicht und auf der
+> Startseitenkarte (3.3 D2i).
+>
+> **Nachgezogen 2026-09-29:** Lageblatt und Sammel-PDF (Audit Runde 2, R2-A6)
+> — laufende Nummer je Meldung („Nr. 3", aus der Eingangsreihenfolge, wie an
+> der Karte), Zeitpunkte einheitlich „TT.MM.JJJJ, hh:mm", Blanko-Vordruck mit
+> Stärke-Legende. Keine neuen Daten (5.4).
+>
+> **Nachgezogen 2026-10-04:** Kenntnisnahme in der Einsatzansicht (Audit
+> Runde 3, R3-K1) — die App merkt sich je Sammlung, welche Meldungen beim
+> letzten „Zur Kenntnis genommen" schon da waren (neuer Speicherort
+> `eeb.kenntnis-stand.v1`, nur Kennungen und Zeitpunkt, keine
+> Personendaten), und nennt bis dahin neue Einheiten und Folgemeldungen auch
+> nach einem Neuladen (3.3 D2j).
+>
+> **Nachgezogen 2026-10-04:** Bemerkung der Einheit (Audit Runde 3, R3-K3) —
+> der Freitext „Sonstiges" des Bogens steht jetzt auch auf der Karte, auf
+> Lageblatt und Übergabeblatt (unter dem Auftrag, auf dem Lageblatt gekürzt)
+> und in der Übersichts-CSV (neue letzte Spalte „Bemerkung (Einheit)"); die
+> Suche der Einsatzansicht findet ihn. In „Alle Daten als CSV", der
+> Excel-Liste und dem Bogen-PDF stand er schon. Kein neuer Speicherort,
+> CSV mit der bestehenden Formel-Abwehr (5.4).
+>
+> **Nachgezogen 2026-10-05:** Exporte der Einsatz-Sammlung (Audit Runde 3,
+> R3-K7) — Übersichts-CSV und „Alle Daten als CSV" führen die laufende
+> Nummer der Meldung („Nr." bzw. „Meldung Nr.") wie Karte und Lageblatt und
+> schreiben alle Zeitpunkte einheitlich „TT.MM.JJJJ, hh:mm". „Alle Daten als
+> CSV" enthält zusätzlich Eingetroffen, Abgerückt und Auftrag/Notiz der
+> Führungsstelle (Freitext, bisher nur in Übersichts-CSV, Excel und PDF); die
+> Spalte „Auftrag" heißt dort „Ort/Auftrag (Bogen)". Die Excel-Liste speichert
+> die Summenwerte der Kopfzeile mit. Kein neuer Speicherort, keine neue
+> Datenkategorie, CSV mit der bestehenden Formel-Abwehr (5.4).
+>
+> **Nachgezogen 2026-10-05:** Rückholplatz des Entwurfs (Audit Runde 3,
+> R3-S1, R3-D2) — ein eingehender Bogen-Link verdrängt den angefangenen Bogen
+> erst nach Rückfrage, auch bei laufender App (Fragmentwechsel, Universal
+> Link) und beim Kaltstart; vorher wanderte der Entwurf beim Kaltstart schon
+> beim Laden auf den Rückholplatz und löschte den dort liegenden Bogen ohne
+> Hinweis. Kein neuer Speicherort (3.3 D1). Ebenso (R3-D1, R3-E2): Die
+> Bearbeitung einer gespeicherten Vorlage kommt unverändert nie auf den
+> Rückholplatz und verdrängt dort verändert keinen eigenen Bogen; „Aus Datei
+> laden…" liest die Datei, bevor gefragt und verdrängt wird — eine
+> unbrauchbare Datei lässt beide Plätze unberührt.
+>
+> **Nachgezogen 2026-10-05:** Beginn der Meldekopf-Erfassung (Audit Runde 3,
+> R3-S6) — die Marke `fremd` am Entwurf trägt zusätzlich den Zeitpunkt, zu dem
+> die Erfassung begann (`beginn`); liegen bis zur Übernahme mehr als fünf
+> Minuten, fragt die App, ob er als Eintreffzeit gilt. Keine Personendaten,
+> kein neuer Speicherort (3.3 D1).
+>
+> **Nachgezogen 2026-10-05:** Zwei Fenster (Audit Runde 3, R3-S3) — ein
+> Fenster ohne eigenen Bogen, das einen neuen anlegt, überschreibt den
+> Entwurf eines anderen Fensters nicht mehr still: Rückfrage mit Namen, dann
+> liegt der fremde Stand auf dem Rückholplatz. Die Konfliktwarnung steht fest
+> am oberen Bildrand (3.3 D1).
+>
+> **Nachgezogen 2026-10-05:** Abgleich beim Einsatz-Import (Audit Runde 3,
+> R3-W1, R3-W2) — „Einsatz importieren…" übernimmt jetzt auch Abrücken, Zug,
+> Auftrag und Eintreffzeit bekannter Einheiten vom anderen Gerät (jüngerer
+> Vermerk gilt, Widersprüche stehen in Quittung und Verlauf), statt sie still
+> zu verwerfen — Integrität der Lage. Der Weitergabe-Stand
+> `eeb.weitergabe-stand.v1` führt zusätzlich Prüfsummen (FNV-1a) der bekannten
+> Vermerke und den Zeitpunkt der letzten Übernahme, keinen Auftragstext
+> (3.3 D2i).
+>
+> **Nachgezogen 2026-10-05:** Rückweg vom Papier (Audit Runde 3, R3-A2) —
+> aus Bildern eingelesene neue Einheiten tragen am Eintrag der Sammlung den
+> Zeitpunkt des Einlesens (`vomPapier`, keine Personendaten) und die Marke
+> „vom Papier, Zeiten prüfen", bis Eintreffzeit, Status und Zug vom Blatt
+> abgeglichen sind. Das Feld reist mit Sammel-PDF und Einsatz-Transport wie
+> die übrigen Zusätze der Führungsstelle (3.3 D2).
+>
+> **Nachgezogen 2026-10-05:** Speicher und Offline (Audit Runde 3, R3-O2) —
+> Lesen der Einsatz-Sammlungen schreibt nicht mehr: Eine Hülle in
+> `src/app/speicher-schonend.ts` überspringt Schreibvorgänge mit
+> unverändertem Text (vorher schrieb jedes Lesen die ganze Liste zurück, bei
+> 5 Mio. Zeichen 64 Mio. Zeichen allein beim Start). Scheitert das
+> Zurückschreiben einer Frist-Bereinigung beim bloßen Lesen (Speicher voll
+> oder gesperrt), erscheint die Liste trotzdem, und Startseite bzw.
+> Einsatzansicht melden den Speicher — vorher blieb der Bildschirm leer
+> (Verfügbarkeit, 5.5). Kein neuer Speicherort; das gemerkte Lese-Ergebnis
+> liegt nur im Arbeitsspeicher der geöffneten Seite.
+>
+> **Nachgezogen 2026-10-05:** Offline-Vorrat in zwei Stufen (Audit Runde 3,
+> R3-O3, `vite.config.ts`, `scripts/precache-aufteilung.ts`,
+> `src/app/offline-vorrat.ts`) — der Service Worker ist nach dem Kern
+> (6,7 MB) aktiv statt nach allen 10,7 MB; Beispielbögen und Themenseiten
+> lädt die Seite danach in den Laufzeit-Cache `eeb-zusatz`. Die Liste dafür
+> (`offline-zusatz.json`) entsteht beim Build. Keine neuen Hosts, CSP
+> unverändert (nur Abrufe an die eigene Herkunft, `connect-src 'self'`), keine
+> personenbezogenen Daten im Cache (3.4 unverändert).
+>
+> **Nachgezogen 2026-10-05:** Speichermeldungen (Audit Runde 3, R3-O4) —
+> „voll" und „gesperrt" werden unterschieden: Scheitert ein Schreibvorgang,
+> prüft die App mit einem Ein-Zeichen-Eintrag `eeb.speicherprobe`, der sofort
+> wieder entfernt wird (keine Daten), ob der Speicher überhaupt etwas annimmt.
+> Ein gesperrter Speicher (Privatmodus, blockierte Website-Daten) wird als
+> solcher benannt statt „Papierkorb leeren" zu empfehlen. Steht „Nicht
+> gespeichert", fragt der Browser vor dem Schließen oder Neuladen nach
+> (`beforeunload`, wo der Browser es zulässt). Anteile einzelner Sammlungen
+> sind auf 100 % gedeckelt.
+>
+> **Nachgezogen 2026-10-05:** Geräteschlüssel bei vollem Speicher (Audit
+> Runde 3, R3-E1) — scheitert das erstmalige Speichern des privaten
+> Schlüssels, signiert die App mit einem Schlüssel nur für diese Sitzung
+> (`src/app/geraete-schluessel.ts`), sagt das in der Übersicht am Siegel und
+> speichert ihn, sobald wieder Platz ist. QR-Code und PDF entstehen damit
+> auch auf einem frischen Gerät mit vollem Speicher; Speicherfehler erscheinen
+> nirgends mehr als englischer Programmtext (`fehlerText`). Signaturformat
+> unverändert (3.3 D4).
+>
+> **Nachgezogen 2026-10-05:** Rückwege (Audit Runde 3, R3-D4, R3-G1, R3-D3)
+> — „Rückgängig" nach dem Entfernen einer Meldung bleibt beim Verlassen und
+> Wiederöffnen der Einsatzansicht erhalten, bis die Seite neu lädt (weiter
+> nur Arbeitsspeicher). „Person entfernen" und neu „Fahrzeug entfernen"
+> halten die entfernte Person bzw. das Fahrzeug im Arbeitsspeicher, bis die
+> Quittung geschlossen, ersetzt oder der Schritt verlassen wird. „Alle Daten
+> löschen" nennt den Bogen auf dem Rückholplatz. Kein neuer Speicherort (5.5).
+>
+> **Nachgezogen 2026-10-05:** Rückfragen, Links, Rückholplatz (Audit Runde 4,
+> Paket 1) — ein Kaltstart-Link auf einem Gerät mit Sammlung, aber ohne
+> eigenen Bogen öffnete den fremden Bogen als eigenen Entwurf; jetzt fragt
+> er „Wohin damit?" (R4-W3). „Aus Datei laden…" fragt bei vorhandener
+> Sammlung ebenso (R4-N2). Derselbe Bogen ein zweites Mal geöffnet ersetzt
+> nichts und löscht den Rückholplatz nicht mehr (R4-E2). „Meine Fassung
+> behalten" legt den Stand des anderen Fensters auf den Rückholplatz statt
+> ihn zu verwerfen (R4-S4). Neu ist ein inhaltsleerer Merker im
+> **`sessionStorage`** (`eeb.abgleich.fortsetzen`, nur der Wert „1", lebt
+> bis zum Schließen des Tabs), damit die Seite nach „Stand aus dem anderen
+> Fenster laden" im Bogen beginnt (3.3 D1). „Sicherung einspielen" nennt
+> jetzt Rückholplatz, Absenderkarte und Geräteschlüssel (mit Kurzform vorher
+> und nachher) und verlangt den Haken, sobald auf dem Gerät überhaupt etwas
+> verloren geht (R4-D2, 5.5). Zurück schließt eine offene Rückfrage als
+> „Abbrechen", statt die Ansicht dahinter zu wechseln (R4-S1).
+>
+> **Nachgezogen 2026-10-06:** Meldungsfassungen, Exportstand, Führungssicht
+> (Audit Runde 4, Paket 2) — „Nur neue Bögen" hat je Format (Sammel-PDF,
+> Übersichts-CSV, Alle-Daten-CSV, Excel) einen eigenen Stand
+> (`eeb.export-stand.v2`, 3.3 D2b); „Einsatz weitergeben / sichern" an die
+> Ablösung und das Lageblatt verbrauchen ihn nicht (R4-W2). Alle Stände
+> führen den Zustand je Einheit als Prüfsummen (Status samt Abrückzeit, Zug,
+> Auftrag, Eintreffzeit), damit ein Abrücken als Änderung zählt und ein
+> „Rückgängig" es zurücknimmt (R4-K1, R4-W7); der Nachtrag enthält die
+> geänderten Einheiten. Neue Zusatzfelder am Eintrag: `ersetztDurch`/`ersetztAm`
+> (welche Fassung gilt, R4-W1) und `nummer` (Nr. vom Papier, R4-A1) — keine
+> Personendaten. Der Umschlag einer Nachtrag-PDF trägt `nachtragSeit`, der
+> Import ohne die Lage fragt nach (R4-W4). Die Übersichts-CSV trennt
+> „Unterbringung angefordert" und „WC/Dusche" und führt die Rückfragen
+> (R4-W5, R4-K8); die Rückfragen prüfen den Einsatzzeitraum (R4-W6).
+> Exportwege 5.4, Speicherorte 3.3.
+>
+> **Nachgezogen 2026-10-06:** Uhr, Speicher, Löschen, Offline, Zeiten (Audit
+> Runde 4, Paket 4) — Aufräum- und Papierkorbfrist rechnen mit der **geprüften
+> Geräteuhr**, nicht mehr mit der ungeprüften `Date.now()` des Kerns: Eine
+> Hülle zwischen Kern und `localStorage` (`src/app/uhr-korrektur.ts`) zeigt
+> dem Kern bei unplausibel vorgehender Uhr das Alter, das die geprüfte Uhr
+> ergibt, und schreibt ehrliche Zeitstempel zurück; die Datenschutzfrist des
+> Entwurfs, die Vorlagen-Papierkorb-Frist und die Aufräum-Nachricht nutzen
+> dieselbe Prüfung (`src/app/datenschutz-uhr.ts`, R4-D1; 3.3 D2a, 5.5).
+> Der Sprung gilt jetzt ab 60 Tagen gegenüber dem letzten Start (vorher 366
+> Tage — ein falsch gestelltes Jahr kam durch und löschte beim Start die
+> laufende Sammlung). Neu ist ein Speicherort ohne Personendaten: die Haken
+> einer unterbrochenen Musterung (`eeb.musterung.v1`, 3.3 D2k, R4-E7). Der
+> Rückweg einer entfernten Meldung bleibt im Arbeitsspeicher; die Rückfrage
+> sagt das vorher und nennt, ob die Meldung in einem Export steht (R4-D3,
+> 5.5). Der Papierkorb nennt Datum und Restzeit der endgültigen Entfernung,
+> „Endgültig löschen…" und „Alle lokalen Daten löschen" nennen Sammlungen
+> ohne jeden Export (R4-D5, 5.5). Der Rückholplatz trägt als Stand die letzte
+> Bearbeitung des Bogens (R4-S5, 3.3 D1). Offline: Bricht das Erstladen ab
+> und verwirft der Browser die Service-Worker-Registrierung, registriert die
+> Seite neu und meldet „Laden abgebrochen" (`src/app/offline-bereit.ts`,
+> R4-O1, 6.1); „PDF erzeugen" ohne geladenen Baustein nennt den QR-Code.
+> Keine neuen Hosts, CSP unverändert.
+>
+> **Nachgezogen 2026-10-06:** Papier, Vordruck, Begriffe (Audit Runde 4,
+> Paket 5) — Das Lageblatt trägt immer mindestens fünf Nachtragszeilen (passen
+> sie nicht mehr auf die letzte Seite, bekommen sie eine eigene Rückseite) mit
+> einer Spalte „übertragen" für den Haken „ins Gerät übertragen"; eine
+> Einheitszeile bricht nicht mehr über den Seitenwechsel (R4-A3, R4-A4,
+> R4-A7). Der Blanko-Vordruck trägt oben den Kasten „Meldekopf" mit Nr.,
+> Eingang, Zug, Übung und „ins Gerät übertragen"; die ausgelieferte Datei
+> unter `public/downloads/` ist neu erzeugt (R4-A4, R4-A8). Jede Codeseite
+> nennt Einheit, Funkrufname und Stand, das Kästchen „von Hand geändert"
+> steht auf dem Bogen neben der Stärke (R4-A5). Die Sammel-PDF setzt Bögen,
+> die mit der letzten Zeile allein auf einer Seite enden würden, per Probesatz
+> enger (R4-A7). Der Bericht von „Bögen einlesen…" fasst Bilder ohne Code
+> zusammen (R4-A6). Keine neuen Daten, keine neuen Speicherorte, keine neuen
+> Hosts, CSP unverändert. Exportwege 5.4.
+>
+> **Nachgezogen 2026-10-14:** Uhr, Löschfristen, Fehlerfänger, Speicher,
+> Offline (Audit Runde 5, Paket 1) — Ein Uhrsprung (60 Tage und mehr, vor
+> oder zurück) wird **nie durch Zeitablauf bestätigt**: Die Runde-4-Fassung
+> übernahm ihn einen Tag später selbst und löschte dann alle Sammlungen und
+> anonymisierte den Entwurf (R5-D1). Jetzt bleibt die Uhr „nicht bestätigt",
+> bis der Helfer „Geräteuhr stimmt" tippt (Rückfrage mit den Folgen in Zahlen)
+> oder die Uhr wieder zum letzten Start passt; ein Sprung nach vorn, der
+> nichts fällig macht (echte Pause), wird ohne Frage übernommen (R5-O5,
+> `src/app/datenschutz-uhr.ts`, `src/app/uhr-folgen.ts`, `uhr-warnung.tsx`;
+> 3.3 D2a, 5.5). „Sicherung einspielen" übernimmt den Uhrstand der Datei
+> nicht und nennt, welche Sammlungen einer alten Datei sofort wieder unter die
+> Fristen fallen (R5-D4, 5.5). „Wiederherstellen" aus dem Papierkorb setzt die
+> Aufräumfrist neu (`src/app/einsatz-wiederherstellen.ts`, R5-D2, 5.5). Ein
+> in einem anderen Fenster gelöschter Entwurf wird nicht zurückgeschrieben
+> (R5-D3, 3.3 D1). Neu sind zwei Speicherorte: ein unlesbarer Entwurf wird
+> beiseitegelegt statt überschrieben (`eeb.entwurf.beschaedigt.v1`, 3.3 D2l,
+> R5-E1) und zwei Merker im `sessionStorage` des Tabs (3.3 D2m, R5-S6,
+> R5-D5). Eine Fehlerseite fängt Abstürze der Ansicht ab und bietet „Daten
+> sichern" (`src/app/fehlerfaenger.tsx`); Einsatz-Dateien, Einzelbögen und
+> Entwürfe werden auf Pflichtfelder geprüft (`src/app/bogen-pruefung.ts`,
+> 6.2). Offline: das Nachladen der zweiten Stufe wiederholt mit Pause (2 bis
+> 60 s) und Zeitgrenze, die Fotos der Themenseiten (nur WebP) liegen in der
+> zweiten Stufe (6.1). Eine feste Warnleiste am Bildrand ersetzt die Zeile
+> „Nicht gespeichert" im Kopf (R5-O1). Keine neuen Hosts, CSP unverändert.
+
+
+> **Nachgezogen 2026-10-17:** Audit Runde 5, Paket 4 „Papier, PDF, Begriffe,
+> Rest" — PDF- und Exportänderungen (5.4): Jede Bogenseite trägt im Seitenrand
+> eine Kopfzeile (Einzel-PDF: Platz „Nr., eingegangen, übertragen", Folgeseiten
+> mit Nr. und Einheit; Sammel-PDF: Nr., Einheit, „Blatt x von y", Haken
+> „übertragen"; Blanko: Einheit und Blattzahl auf Seite 2). Fahrzeugblöcke
+> reißen nicht mehr über die Seitengrenze, das Lageblatt steht nach Nr. und
+> kennzeichnet gekürzte Bemerkungen, der Blanko-Vordruck nennt das Beiblatt und
+> hat mehr Platz für Sofortbedarf und „Sonstiges". Alle PDF-Texte werden auf die
+> PDF-Schrift (WinAnsi) abgebildet. Die Prüfpunkte heißen „Hinweise" (Lageblatt,
+> Karte, Übersichts-CSV-Spalte, Excel-Bemerkung). Neu in der manuellen
+> Erfassung: „Nr. laut Zettel" und Zug (Meldungsdaten, bleiben im Gerät). Kein
+> neuer Speicherort, keine neue Datenkategorie, keine Netzverbindung; Transport
+> und `vendor/` unverändert. Der Entwurf trägt zusätzlich die Marke „über die
+> Startseite verlassen" (`fremd.startseite`, R5-N3, 3.3 D1) — keine Daten.
+
+> **Nachgezogen 2026-10-24 (Runde 8):** Audit Runde 8. Der beiseitegelegte
+> Bestand (3.3 D2o) nimmt auch beschädigte Gesamttexte von Sammlungen und
+> Vorlagen auf, bevor der Kern sie ersetzt; die Hülle um die Ablage prüft vor
+> jedem Lesezugriff (5.5, 6.2). Die Rückfrage von „Sicherung einspielen…"
+> nennt Beschädigtes der Datei. Der Prellschutz der Rückfragen und die
+> Ortssperre haben sich geändert (5.3): Rückfrage 450 ms, mit zerstörender
+> Wahl 800 ms, Quittung 2,5 s, Sperre nur hinter der Rückfrage. Das späte
+> `history.back()` eines geschlossenen Fensters wird erkannt (5.5). Exporte
+> (5.4): CSV nach Nr., Sollstärke-Marke, Umschrift im Feld
+> Ansprechpartner/in. Der Lagemonitor merkt nur die Stufen „dunkel" und
+> „gedimmt" (`eeb.lagestufe.v1`, 3.3). Keine neuen Hosts, CSP und
+> Transportformat unverändert.
+
+> **Nachgezogen 2026-10-24:** Audit Runde 7 (Behebung der 85 Befunde). Neu sind
+> zwei Speicherorte mit möglichen Personendaten und ein Merker ohne (3.3 D2o,
+> D2m (c)): `eeb.unlesbar.v1` hält unlesbare Sammlungen, Meldungen und Vorlagen
+> unverändert für 90 Tage (Sicherung und „Alle Daten löschen" über das Präfix
+> `eeb.`, eigener Weg „Beiseitegelegtes entfernen…"), `eeb.papierabgleich.v1.<ID>`
+> im `sessionStorage` hält die Eingaben des Papier-Abgleichs bis zum Tab-Ende
+> (kein Teil der Sicherung, wird von „Alle Daten löschen" geleert) und
+> `eeb.lagestufe.v1` die Helligkeitsstufe des Lagemonitors. Der Rückweg im
+> Schritt „Personal" wird beim Verwerfen, Schließen und Übergeben des Bogens
+> gelöscht. Der Geräteuhr-Halt (5.5) gilt, bis jemand antwortet; der
+> Service Worker holt HTML-Themenseiten mit `StaleWhileRevalidate` (6.1).
+> Zwei Fenster (5.5): Konflikt nur bei Inhaltsunterschied, ein gelöschter Bogen
+> kommt nicht über den Rückholplatz zurück. Einsatz-Datei und Sammel-PDF
+> tragen im Umschlag `lage` (Einsatzbeginn, Funkrufname; 5.4). Quittungen
+> sagen „erzeugt" statt „übergeben"; der Exportstand zählt „zuletzt erzeugt"
+> (5.4). Keine neuen Hosts, CSP und Transportformat unverändert.
+
+> **Nachgezogen 2026-10-23:** Audit Runde 6 (Behebung der 89 Befunde). Neu sind
+> ein Speicherort ohne Personendaten und die Erweiterung eines Merkers im
+> `sessionStorage` (3.3 D2o, D2m (c)): der letzte bekannte Stand des
+> Offline-Vorrats (`eeb.offline-zusatz.v1`, nur zwei Zähler) und der Rückweg
+> von „Person entfernen" und „Vorbelegung entfernen" über den Schrittwechsel
+> und das Neuladen (`eeb.personal.rueckweg`, enthält die entfernten Personen
+> samt Namen — 15 Minuten, nur für denselben Bogen, weg mit dem Tab). Der
+> beiseitegelegte Entwurf (3.3 D2l) nennt seine Frist von 90 Tagen auf der Karte,
+> erscheint in der Aufzählung von „Alle Daten löschen" und ist als Datei
+> wieder einlesbar; ein Fenster, das „Alle Daten löschen" meldet, baut seine
+> Startseite neu auf, statt mit den alten Vorlagen weiterzuarbeiten (5.5). Was
+> schon im Speicher liegt, wird beim Lesen wie an den Eingängen geprüft
+> (`einsaetze-lesen.ts`, `vorlagen.ts`; 6.2). Die Geräteuhr-Rückfrage nennt die
+> betroffenen Sammlungen mit Alter und fragt auch bei Sprüngen unter 60 Tagen,
+> wenn Unangekündigtes fällig würde (5.5). Der Lagemonitor zeigt Datenstand,
+> Bewegungen und „ÜBUNG" (Einheitsnamen, keine Personen; 5.7). Der Service
+> Worker holt HTML-Themenseiten bei hängendem Netz nach 1 s statt nach 5 s aus
+> dem Gerät (6.1). PDF: Kopfzeile 5,6 mm vom Rand, Vorbelegung nach StAN und
+> Funkrufname einer nur nach Stärke erfassten Einheit stehen nicht als
+> gemeldet auf Papier, nicht darstellbare Namen werden beim Erzeugen genannt
+> (5.4). Keine neuen Hosts, CSP und Transportformat unverändert.
 
 ## Hinweis zu diesem Dokument
 
@@ -129,7 +500,7 @@ Datenbank und keine Benutzerverwaltung.
 
 | # | Zielobjekt | Beschreibung | Plattform(en) |
 | --- | --- | --- | --- |
-| A1 | Web-App / PWA | Hauptauslieferungsform unter erfassungsbogen.app; als Progressive Web App vollständig offlinefähig (Service Worker precacht alle Bausteine). Zusätzlich aus demselben Build als GitLab Pages auf dem Open-CoDE-Spiegel veröffentlicht (`.gitlab-ci.yml`, Job `pages`) — identischer Code, anderer Host; Installer und Auto-Update laufen unverändert über GitHub | Browser (Desktop/Mobil) |
+| A1 | Web-App / PWA | Hauptauslieferungsform unter erfassungsbogen.app; als Progressive Web App vollständig offlinefähig (Service Worker precacht alle Bausteine; Beispielbögen und Themenseiten seit 2026-10-05 als zweite Stufe nach der Aktivierung, R3-O3). Zusätzlich aus demselben Build als GitLab Pages auf dem Open-CoDE-Spiegel veröffentlicht (`.gitlab-ci.yml`, Job `pages`) — identischer Code, anderer Host; Installer und Auto-Update laufen unverändert über GitHub | Browser (Desktop/Mobil) |
 | A2 | Desktop-App | Electron-Wrapper um dieselbe Web-App, für Windows, macOS und Linux; Auslieferung über GitHub Releases mit Auto-Update | Windows, macOS, Linux |
 | A3 | Android-App | Capacitor-Wrapper um dieselbe Web-App | Android |
 | A4 | iOS-App | Capacitor-Wrapper, laut Quellcode/Dokumentation in Vorbereitung, zum Analysezeitpunkt noch nicht produktiv | iOS (geplant) |
@@ -147,11 +518,25 @@ dem Vite-Build); es gibt keine serverseitige Variante.
 
 | # | Zielobjekt | Beschreibung | Speicherort |
 | --- | --- | --- | --- |
-| D1 | Erfassungsbogen-Entwurf | Aktuell bearbeiteter Bogen (Personal, Fahrzeuge, Einsatz, Sofortbedarf); Personaldaten 90 Tage nach der letzten Änderung anonymisiert, außer bei Übungen (5.5) | `localStorage` des Geräts |
+| D1 | Erfassungsbogen-Entwurf | Aktuell bearbeiteter Bogen (Personal, Fahrzeuge, Einsatz, Sofortbedarf); Personaldaten 90 Tage nach der letzten Änderung anonymisiert, außer bei Übungen (5.5). Wird eine Vorlage bearbeitet, trägt der Entwurf zusätzlich deren Kennung (`vorlageId`, keine Personendaten); ist er die Erfassung einer fremden Einheit am Meldekopf, die Marke `fremd` mit der Kennung der Ziel-Sammlung und dem Beginn der Erfassung (`beginn`, Zeitpunkt; Vorschlag für die Eintreffzeit, R3-S6; keine Personendaten). Außerdem der zuletzt offene Schritt (`schritt`) und der Stand der letzten Übergabe (`uebergabe`: Zeitpunkt, Inhaltskennung, Stärke als Zahlen, seit R3-H3 auch der Weg — QR gezeigt, PDF erzeugt, Link, Nahbereich — und ob der Nutzer den Empfang bestätigt hat; keine Personendaten, R2-N7/R2-W2). Ein verdrängter oder verworfener Bogen liegt auf einem einzigen Rückholplatz (`eeb.entwurf.ersetzt.v1`), gleiche Frist; als Stand trägt er seit 2026-10-06 die letzte Bearbeitung des Bogens, nicht den Zeitpunkt des Schließens (R4-S5); eine fremde Erfassung verdrängt dort nie einen eigenen Bogen, sondern wird dann nach Rückfrage verworfen (`src/app/entwurf.ts`). Ein eingehender Bogen (Link, Scan, Datei) verdrängt den angefangenen Bogen erst nach einer Rückfrage, die auch nennt, welcher Bogen dabei vom Rückholplatz fällt — das gilt seit R3-S1/R3-D2 auch für Links bei laufender App und beim Kaltstart. Eine Datei wird vorher gelesen; eine unbrauchbare Datei verdrängt nichts (R3-E2). Die Bearbeitung einer Vorlage kommt unverändert nicht auf den Rückholplatz und verdrängt dort verändert keinen eigenen Bogen (R3-D1). Sind zwei Fenster offen, schreibt ein Fenster nur über den Stand, den es selbst zuletzt geschrieben hat; hat ein anderes Fenster den Entwurf geändert, speichert es nicht und fragt („Stand aus dem anderen Fenster laden" / „Meine Fassung behalten", `src/app/fenster-abgleich.tsx`, `storage`-Ereignis, R2-O4); seit 2026-10-14 gilt das auch, wenn das andere Fenster den Entwurf **entfernt** hat („Alle Daten löschen", Bogen geschlossen): Dieses Fenster schreibt ihn nicht zurück, die Startkarte sagt nicht mehr „gespeichert", und erst „Bogen hier wieder speichern" schreibt ihn bewusst zurück (R5-D3); die Warnung steht fest am oberen Bildrand (seit 2026-10-14 als verdichtete Leiste, `src/app/feste-warnung.tsx`, R5-S4), und ein Fenster ohne eigenen Bogen legt den Entwurf eines anderen Fensters vor dem Anlegen nach Rückfrage auf den Rückholplatz (`entwurfAusAnderemFenster`, R3-S3); „Meine Fassung behalten" legt den Stand des anderen Fensters ebenfalls auf den Rückholplatz und fragt, wenn dabei ein dritter Bogen fiele (R4-S4). Ein eingehender Bogen, der dem offenen gleicht, ersetzt nichts und verdrängt nichts (R4-E2); ein Kaltstart-Link oder „Aus Datei laden…" auf einem Gerät mit Sammlung fragt zuerst „Wohin damit?" und legt eine fremde Meldung nicht als eigenen Entwurf ab (R4-W3, R4-N2) | `localStorage` des Geräts (`eeb.entwurf.v1`, `eeb.entwurf.ersetzt.v1`); nach „Stand aus dem anderen Fenster laden" kurz ein inhaltsleerer Merker im `sessionStorage` des Tabs (`eeb.abgleich.fortsetzen`, wird beim nächsten Start gelesen und gelöscht, R4-S4) |
 | D2 | Gesicherte/archivierte Bögen | Übergebene bzw. empfangene Bögen inkl. Papierkorb (vor endgültiger Löschung); Meldungen der Einsatz-Sammlung unterliegen derselben Datenschutzfrist, Vorlagen nicht (5.5) | `localStorage` des Geräts |
-| D2a | Uhrstand der Datenschutzfrist | Zuletzt akzeptierter Zeitpunkt der Geräteuhr, ggf. unbestätigter Sprung; keine Personendaten | `localStorage` des Geräts (`eeb.uhr.v1`) |
+| D2a | Uhrstand für alle Fristen | Zuletzt akzeptierter Zeitpunkt der Geräteuhr, ggf. unbestätigter Sprung; seit 2026-10-06 (R4-D1) gilt ein Abstand von mehr als 60 Tagen zum letzten Start als Sprung und hält Datenschutzfrist, Aufräumfrist und Papierkorbfrist an (Uhrkorrektur-Hülle, `src/app/uhr-korrektur.ts`). Seit 2026-10-14 (R5-D1, R5-O5) vor **und zurück**, und ein Sprung wird nie durch Zeitablauf bestätigt, sondern nur durch „Geräteuhr stimmt" oder eine Uhr, die wieder zum letzten Start passt; der Uhrstand der Sicherungsdatei wird nicht übernommen (R5-D4); keine Personendaten | `localStorage` des Geräts (`eeb.uhr.v1`), wandert mit der Datensicherung mit (beim Einspielen bleibt der des Geräts) |
+| D2b | Export-Stand je Einsatz-Sammlung **und Format** (seit 2026-10-06, R4-W2) | Je Format (Sammel-PDF, Übersichts-CSV, Alle-Daten-CSV, Excel) Kennungen der Meldungen, die beim letzten Export in diesem Format schon in der Sammlung standen, samt Zeitpunkt und dem Zustand je Einheit (Prüfsummen von Status samt Abrückzeit, Zug, Auftrag, Eintreffzeit; kein Auftragstext) — Grundlage für „Nur neue Bögen seit dem letzten Export" und „seitdem n Änderungen" (5.4); keine Personendaten, nur zufällige Kennungen und Prüfsummen. Der alte gemeinsame Merker (`eeb.export-stand.v1`) wird nicht übernommen und beim ersten Schreiben gelöscht | `localStorage` des Geräts (`eeb.export-stand.v2`), wandert mit der Datensicherung mit, fällt mit „Alle Daten löschen" weg *Nachgezogen 2026-10-14 (R5-W1, R5-W6, R5-W5):* Der Zustand je Einheit führt zusätzlich die Kennung der geltenden Fassung (Prüfsumme; Wechsel durch „Diese Fassung gilt" zählt als Änderung). Der Stand eines Formats **reist jetzt mit der Sammel-PDF und der Einsatz-Datei**: im Umschlag (`staende`, nicht im QR-Transportformat, nicht in der Sammlung) als Kennungen, Prüfsummen und Zeitpunkt, keine Personendaten; „Einsatz importieren…" und „Bögen einlesen…" derselben Sammlung vereinigen ihn mit dem eigenen (`herkunft: geraet`). Auf Wunsch rechnet ein Format ab der Weitergabe (`herkunft: weitergabe`). Damit liegt der Stand auch in jeder weitergegebenen Datei — wie der Rest der Sammlung gehört die Datei zu den Exporten (5.4). |
+| D2c | Zusatzfelder je Meldung der Einsatz-Sammlung | Eintreff- und Abrückzeit (`eingetroffenAm`, `abgerueckAm`, Geräteuhr) sowie eine Notiz/Auftrag der Führungsstelle (`notiz`, Freitext — kann Personenbezug enthalten, z. B. „Rückruf Hr. Meyer 15:00"); seit 2026-09-29 zusätzlich `vermerke` (Zeitstempel + Text je Handlung der Führungsstelle: Zug, Auftrag samt Vorwert, Zeitkorrektur, Abrücken; R2-K6). Seit 2026-10-06 zusätzlich `ersetztDurch`/`ersetztAm` (Kennung der Fassung, die an Stelle einer verdrängten gilt, und Zeitpunkt; R4-W1) und `nummer` (laufende Nummer vom gedruckten Lageblatt, nur nach dem Papier-Abgleich; R4-A1) — keine Personendaten. Eine Folgemeldung derselben Einheit erbt Eintreffzeit, Notiz und Zug der Vorgängerin auf jedem Eingangsweg (`meldungAufnehmen`). Reisen mit der Sammlung in Sammel-PDF und Einsatz-Transport mit; unterliegen mit der Meldung dem Papierkorb und der Löschung (`src/app/eintrag-zeiten.ts`) | `localStorage` des Geräts (`eeb.einsaetze.v1`, am Eintrag) |
+| D2d | Zuletzt offene Sammlung | Kennung und Zeitpunkt der zuletzt geöffneten Einsatz-Sammlung, 12 Stunden gültig; keine Personendaten | `localStorage` des Geräts (`eeb.letzterEinsatz.v1`) |
+| D2e | Entfernte Meldungen je Einsatz-Sammlung | Kennungen der Einträge, die vor Ort über „Entfernen" oder „Fassung verwerfen…" herausgenommen wurden — damit „Einsatz importieren…" sie nicht still zurückholt, sondern nachfragt (`src/app/entfernte-meldungen.ts`, Audit Runde 2, R2-D4); keine Personendaten, nur zufällige Kennungen; „Rückgängig" nimmt sie wieder heraus, Einträge endgültig gelöschter Sammlungen fallen beim nächsten Schreiben weg | `localStorage` des Geräts (`eeb.entfernt.v1`), wandert mit der Datensicherung mit, fällt mit „Alle Daten löschen" weg |
+| D2f | Zeitpunkt der letzten Sicherung | Wann auf diesem Gerät zuletzt „Sicherung erstellen…" ausgelöst wurde — Grundlage für die Anzeige in der Datensicherung und die Erinnerung nach drei Tagen (`src/app/sicherung.ts`, Audit Runde 2, R2-O6); keine Personendaten | `localStorage` des Geräts (`eeb.sicherung.zuletzt.v1`), steht in der Sicherung selbst, fällt mit „Alle Daten löschen" weg |
+| D2g | Nachricht über automatisch gelöschte Sammlungen (seit 2026-09-29, R2-D5) | Name, Zeitraum (angelegt/zuletzt geändert), Zahl der Einheiten und Meldungen sowie Löschzeitpunkt einer Sammlung, die die Aufräumfrist (90 Tage ohne Änderung) überschritten hat; keine Personendaten, Name der Sammlung als Freitext. Vorgemerkt von einer Hülle um die Ablage (`src/app/aufraeum-hinweis.ts`), bevor der Kern die Sammlung verwirft; bleibt bis „Verstanden" auf der Startseite | `localStorage` des Geräts (`eeb.aufgeraeumt.v1`), fällt mit „Alle Daten löschen" weg |
+| D2h | Lageblatt-Stand je Einsatz-Sammlung (seit 2026-09-29, R2-A3) | Zeitpunkt des zuletzt erzeugten Lageblatts, Kennungen der Meldungen darauf und (seit 2026-10-06, R4-K1) der Zustand je Einheit als Prüfsummen — Grundlage für „Lageblatt erstellt … · seitdem n neue Meldungen und m Änderungen"; keine Personendaten | `localStorage` des Geräts (`eeb.lageblatt-stand.v1`), fällt mit „Alle Daten löschen" weg |
+| D2i | Weitergabe-Stand je Einsatz-Sammlung (seit 2026-09-29, R2-W5; erweitert 2026-10-05, R3-W2) | Zeitpunkt der letzten Weitergabe der ganzen Sammlung („Einsatz weitergeben / sichern"), Kennungen der Meldungen darin, der Zustand je Einheit als Prüfsummen (seit 2026-10-06 statt der Vermerke, R4-K1/R4-W7; ältere Stände zählen weiter Vermerk-Prüfsummen) und Zeitpunkt der letzten Übernahme per Import — Grundlage des Übergabevermerks „Weitergegeben … · seitdem n neue Meldungen und m Änderungen"; keine Personendaten, kein Auftragstext | `localStorage` des Geräts (`eeb.weitergabe-stand.v1`), fällt mit „Alle Daten löschen" weg |
+| D2j | Kenntnis-Stand je Einsatz-Sammlung (seit 2026-10-04, R3-K1) | Zeitpunkt der letzten Kenntnisnahme („Zur Kenntnis genommen" in der Einsatzansicht, beim ersten Öffnen einer Sammlung vorbelegt) und Kennungen der Meldungen, die da schon in der Sammlung standen — Grundlage der Sammelquittung „Neu seit der letzten Kenntnisnahme" und der Marken „neu"/„neue Fassung" (seit 2026-10-06 mit dem Vermerk, ob die Kenntnisnahme getippt wurde, R4-K7); je Gerät, reist nicht mit der Sammlung; keine Personendaten | `localStorage` des Geräts (`eeb.kenntnis-stand.v1`), fällt mit „Alle Daten löschen" weg |
+| D2k | Haken einer unterbrochenen Musterung (seit 2026-10-06, R4-E7) | Kennung und Fassung (`geaendert`) der Vorlage, die gemustert wird, die angehakten Plätze als Wahrheitswerte nach Stelle (Personal, Fahrzeuge, Sofortbedarf, Bemerkung) und der Zeitpunkt des letzten Hakens — damit die Auswahl ein Neuladen übersteht; gilt höchstens einen Tag und nur für dieselbe Fassung der Vorlage, wird mit dem Ende der Musterung (Start, Abbrechen, Wechsel der Ansicht) gelöscht (`src/app/musterung-stand.ts`); keine Namen, keine Personendaten | `localStorage` des Geräts (`eeb.musterung.v1`), wandert mit der Datensicherung mit, fällt mit „Alle Daten löschen" weg |
+| D2l | Beiseitegelegter, unlesbarer Entwurf (seit 2026-10-14, R5-E1) | Der unveränderte Text eines gespeicherten Entwurfs, den die App nicht lesen kann (abgeschnitten, Pflichtfeld des Bogens fehlt), mit Ursache und Zeitpunkt — damit der nächste Entwurf ihn nicht überschreibt und die Startseite ihn nennen und als Datei sichern lässt. **Kann Personendaten enthalten**, die die Datenschutzfrist nicht erreicht (die App kann nicht anonymisieren): Er fällt deshalb nach 90 Tagen selbst weg, auf Wunsch früher („Entfernen…" mit Rückfrage), und mit „Alle Daten löschen" (`src/app/entwurf.ts`) | `localStorage` des Geräts (`eeb.entwurf.beschaedigt.v1`), wandert mit der Datensicherung mit |
+| D2m | Merker im Sitzungsspeicher (seit 2026-10-14, R5-S6, R5-D5) | (a) Der Link einer eingegangenen Meldung, auf deren „Wohin damit?" noch gewartet wird (`eeb.wartet.fragment`, `src/app/wartender-link.ts`): enthält den Bogen samt Personendaten wie jeder Link, damit ein Neuladen erneut fragt; gelöscht mit jeder Antwort (aufnehmen, öffnen, abbrechen), mit „Alle Daten löschen" und mit dem Schließen des Tabs. (b) Der Rückweg von „Vorbelegung entfernen" (`eeb.vorbelegung.rueckweg`, `src/app/vorbelegung-rueckweg.ts`): nur unbenannte Sollplätze (kein Name, keine Rufnummer), 15 Minuten, nur solange Personal und Fahrzeuge unverändert sind. (c) Der Rückweg im Schritt „Personal" (`eeb.personal.rueckweg`, `src/app/schritte/personal.tsx`, seit 2026-10-23, R6-S4, R6-D4): die zuletzt entfernte(n) Person(en) **mit Namen, Funktionen und Erreichbarkeiten** bzw. die Liste vor „Vorbelegung entfernen"; 15 Minuten, nur für dieselbe Einheit und solange die Namen der übrigen Personen unverändert sind | `sessionStorage` des Tabs, nicht in der Datensicherung, nicht im `localStorage` |
+| D2n | Einsatzbeginn und Funkrufname für den Lagemonitor (seit 2026-10-17) | Je Einsatz-Kennung der von Hand gesetzte Beginn als Zeitpunkt und der von Hand eingetragene, optionale Funkrufname der eigenen Führungsstelle als Freitext bis 60 Zeichen (`src/app/lagemonitor-beginn.ts`, `lagemonitor-speicher.ts`); beim Schreiben fallen Einträge zu nicht mehr vorhandenen Einsätzen weg; keine Namen von Personen vorgesehen | `localStorage` des Geräts (`eeb.lagebeginn.v1`, `eeb.lagefunkruf.v1`), wandert mit der Datensicherung mit, fällt mit „Alle Daten löschen" weg |
+| D2o | Letzter Stand des Offline-Vorrats (seit 2026-10-23, R6-O7) | Zwei Zähler: wie viele Dateien der zweiten Stufe (Beispielbögen, Themenseiten) im Gerät liegen und wie viele es gibt (`src/app/offline-bereit.ts`) — damit die Zeile nach einem Neuladen ohne Netz weiter sagt, was fehlt; keine Namen, keine Personendaten | `localStorage` des Geräts (`eeb.offline-zusatz.v1`), wandert mit der Datensicherung mit, fällt mit „Alle Daten löschen" weg |
 | D3 | Absenderkarte | Freiwillige Kontaktangabe (Name/E-Mail/Telefon) der meldenden Person | `localStorage` des Geräts |
-| D4 | Privater Geräteschlüssel | Ed25519-Schlüssel zur Signatur weitergereichter Bögen | `localStorage` des Geräts, **unverschlüsselt als Hex** |
+| D4 | Privater Geräteschlüssel | Ed25519-Schlüssel zur Signatur weitergereichter Bögen | `localStorage` des Geräts, **unverschlüsselt als Hex**; lässt er sich beim ersten Erzeugen nicht speichern (Speicher voll/gesperrt), nur im Arbeitsspeicher der offenen Seite, bis Platz ist (seit 2026-10-05, R3-E1) |
 | D5 | QR-Payload / Exportdatei | Binär kodierter, komprimierter Bogen zur Übergabe an ein zweites Gerät; ebenso eine geteilte Vorlage (QR/Link mit Marker `V.`, oder JSON-Datei `eeb-vorlage-*.json`) | Transient (QR-Code-Anzeige) bzw. Datei auf dem Gerät oder in einer vom Nutzer gewählten Ablage (z. B. Cloud-Ordner) |
 | D6 | Ausgedruckte/exportierte Kopien | PDF-Ausdruck im Papier-Layout, CSV-/Excel-Export für Führungsstellen | Außerhalb der App (Papier, Dateisystem des Empfängers) |
 
@@ -235,10 +620,14 @@ Technik gehärtet:
   Berechtigungsanfragen werden pauschal abgelehnt.
 - **Kontrollierte externe Links:** `setWindowOpenHandler` und `will-navigate`
   fangen jede Navigation zu einer fremden URL ab und öffnen sie im
-  System-Standardbrowser statt im App-Fenster.
+  System-Standardbrowser statt im App-Fenster. Einzige Ausnahme ist das zweite
+  App-Fenster des Lagemonitors (Adresse mit `?lagemonitor=`, seit 2026-10-17):
+  `setWindowOpenHandler` erlaubt es mit denselben Einstellungen
+  (`contextIsolation`, `sandbox`, kein Node-Zugriff); jede andere interne
+  Adresse bleibt abgelehnt.
 - `hardenedRuntime: true` für macOS-Builds.
 
-> *Prüfvermerk:* Alle vier Punkte im Code bestätigt (`electron/main.js`,
+> *Prüfvermerk:* Alle vier Punkte im Code bestätigt (`electron/main.js`; Stand 2026-10-17 mit der Ausnahme für den Lagemonitor,
 > `package.json` Feld `build`).
 
 ### 5.2 Kryptografische Herkunfts- und Integritätsprüfung
@@ -252,6 +641,17 @@ bestimmten, lokal erzeugten Schlüssels stammt — nicht die reale Identität ei
 Person. Mehrstufige Weitergaben werden als Signaturkette (`EEB2C`-Container,
 begrenzt auf `MAX_STUFEN = 32`) abgebildet.
 
+*Nachgezogen 2026-09-29 (Audit Runde 2, R2-W6):* Das in eine PDF eingebettete
+Bogen-JSON ist unsigniert. Beim Einlesen einer Einzelbogen-PDF in eine
+Sammlung („Bögen einlesen…", `boegenAusDatei`/`siegelAusPdfQr` in
+`src/app/app.tsx`) wird deshalb zusätzlich der QR-Code der PDF gelesen. Trägt
+er eine Signatur und gehört er zur selben Fassung (Einheitsschlüssel und
+`stand` gleich), wird der Bogen **aus dem QR** übernommen, samt Signaturstatus
+und Original-Payload für das spätere Gegenzeichnen. Der eingebettete Bogen
+bekommt das Siegel nie: nur der Inhalt des QR ist signiert, eine nachträglich
+geänderte Einbettung würde sonst als geprüft erscheinen. Passt der QR nicht
+oder ist er unlesbar, bleibt es beim eingebetteten Bogen ohne Nachweis.
+
 ### 5.3 Content-Security-Policy
 
 Der Produktions-Build setzt eine restriktive CSP als `<meta>`-Header
@@ -259,7 +659,7 @@ Der Produktions-Build setzt eine restriktive CSP als `<meta>`-Header
 
 ```
 default-src 'self' file:; base-uri 'none'; object-src 'none'; form-action 'none';
-script-src 'self' file: 'sha256-…' 'sha256-…' 'sha256-…';
+script-src 'self' file: 'wasm-unsafe-eval' 'sha256-…' 'sha256-…' 'sha256-…';
 style-src 'self' file: 'unsafe-inline';
 img-src 'self' file: data: blob: https://erfassungsbogen.goatcounter.com;
 font-src 'self' file: data:; frame-src 'self' file: blob:;
@@ -278,6 +678,14 @@ Datenausleitung an eine andere Herkunft ist technisch unterbunden.
 > React `style`-Attribute an Elementen setzt. Die ursprüngliche
 > Entwurfsfassung dieses Dokuments beschrieb noch die alte Policy mit
 > `'unsafe-inline'` auch bei `script-src`.
+>
+> *Prüfvermerk (Stand 2026-09-27):* `script-src` trägt zusätzlich
+> `'wasm-unsafe-eval'`. Die Freigabe erlaubt ausschließlich das Kompilieren von
+> WebAssembly-Modulen (kein `eval`, kein Inline-Skript) und ist nötig für den
+> QR-Decoder ZXing (`assets/zxing_reader-*.wasm`, aus dem eigenen Bundle):
+> ohne sie verweigerte der Browser das Modul, und die App fiel still auf den
+> reineren JavaScript-Decoder jsQR zurück. Die Angriffsfläche wächst dadurch
+> nicht — geladen werden kann weiterhin nur, was `'self'` liefert.
 
 ### 5.4 Schutz bei Datenexport
 
@@ -289,6 +697,123 @@ Datenausleitung an eine andere Herkunft ist technisch unterbunden.
 > *Prüfvermerk:* Beides im Code bestätigt (`FORMEL_START = /^[=+\-@\t\r]/`;
 > `&`/`<`-Escaping im XLSX-Writer).
 
+- **Lageblatt und Übergabeblatt der Einsatz-Sammlung** (`src/app/pdf.ts`,
+  `pdf-dokument.ts`, seit 2026-09-27): Das Übergabeblatt (Seite 1 der
+  Sammel-PDF „Einsatz weitergeben / sichern") und das einseitige „Lageblatt"
+  führen je Einheit Eintreff- und Abrückzeit sowie den Auftrag/die Notiz der
+  Führungsstelle (Freitext) — abgerückte Einheiten stehen als eigener Block,
+  damit Papier und eingebettete Sammlung denselben Stand zeigen. Dieselben
+  drei Spalten stehen in der Übersichts-CSV (`einsatz-csv.ts`), dort mit der
+  bestehenden Formel-Abwehr. Die Sammel-PDF entsteht auch ohne anwesende
+  Einheiten (Einsatzende). Wohin Ausdruck und Datei gelangen, entscheidet
+  weiterhin der Nutzer (DSFA 5.8).
+  Seit 2026-09-29 (R2-A1) trägt in der Sammel-PDF zusätzlich jede Bogenseite
+  den Kasten „Stand am Meldekopf" (Eintreff-/Abrückzeit, Zug, Auftrag/Notiz) —
+  über dem Formular und auf jeder QR-Seite, mit dem Hinweis, dass der QR-Code
+  nur den Bogen der Einheit enthält. Die Notiz der Führungsstelle steht damit
+  im Ausdruck nicht mehr nur auf Seite 1, sondern bei der Einheit; in den
+  QR-Code gelangt sie weiterhin nicht. Wer den Ausdruck nur über die QR-Codes
+  wieder einliest, bekommt die Angaben nicht zurück — die App sagt das in der
+  Rückmeldung und verweist bei einer Sammel-PDF-Datei auf „Einsatz
+  importieren…" (`qr-stapel.ts`, `einsatz-transport.ts: pdfInhaltArt`).
+  Seit 2026-09-29 (R2-K3) führen Übergabeblatt und Lageblatt je Einheit
+  zusätzlich Zug, Bedarf (Ruhezeit, Unterbringung, Kraftstoff) und die Zahl
+  der Lücken der Meldung; Änderungen stehen als „von … auf …" (die
+  PDF-Standardschrift kennt den Pfeil nicht). Das Lageblatt heißt jetzt
+  „Lageblatt (A4 quer)" und passt bis etwa zwölf Einheiten auf eine Seite
+  (seit 2026-10-04 mit der Bemerkung der Einheit bis etwa zehn; Stärke und
+  Bedarf stehen dafür als Kopfleiste oben auf Seite 1, R3-K6).
+  Seit 2026-09-29 (R2-A3) trägt das Lageblatt zusätzlich je Einheit
+  Funkrufname und Rückrufnummer der Führungskraft (Personenbezug auf dem
+  Aushang — Aushangort entsprechend wählen) und freie Zeilen für Nachträge.
+  Seit 2026-10-04 (R3-K3) steht in der Spalte „Auftrag / Notiz" darunter
+  kursiv die Bemerkung der Einheit („Sonstiges", Freitext — kann Personenbezug
+  enthalten; auf dem Lageblatt auf 110 Zeichen gekürzt), und die
+  Übersichts-CSV führt sie als letzte Spalte „Bemerkung (Einheit)".
+  Die ganze Sammel-PDF gibt es nur noch über „Einsatz weitergeben / sichern";
+  der Teilexport „nur neue Bögen" heißt `eeb-einsatz-nachtrag-….pdf`.
+  Seit 2026-09-29 (R2-A4) steht neben jedem QR-Code eines Bogen-PDF das
+  Kästchen „[  ] von Hand geändert" mit dem Stand (DTG), den der Code trägt:
+  Eine Stiftkorrektur auf dem Ausdruck steckt nicht im Code, und wer scannt,
+  soll das vorher sehen. Die Rückmeldung von „Bögen einlesen…" wiederholt den
+  Hinweis (`STIFT_HINWEIS`, `qr-stapel.ts`). Integrität: Papier und Gerät
+  können weiterhin auseinanderlaufen; der Hinweis macht es nur sichtbar.
+  *Nachgezogen 2026-10-05 (Audit Runde 3, R3-A3, R3-A5, R3-A6):* Auf den
+  Seiten eines mehrteiligen Codes stehen Anleitung, Stift-Kästchen und Kasten
+  „Stand am Meldekopf" neben den Codes statt darunter (keine fast leeren
+  Folgeseiten mehr). Das Lageblatt füllt die letzte Seite mit
+  Nachtragszeilen (gemessen in einem Probesatz, `einsatzLageblattSeiteFuellen`)
+  und trägt unter „Summe laut Gerät" eine leere Zeile „Summe einschl.
+  Nachträge (von Hand)"; ein leeres Lageblatt druckt Ausfülllinien statt
+  Nullen. Das Einzel-PDF führt je Person die Zählrolle (F/UF/M), die Stärke
+  mit Legende und — nur wo es keine Seite kostet (`einzelPdfDokument`) — zwei
+  freie Personalzeilen und einen leeren Fahrzeugblock. Kein neuer Inhalt aus
+  der Sammlung, keine neue Datenkategorie: die Zählrolle ist Teil des Bogens
+  und steht schon im QR-Code und in der CSV.
+  *Nachgezogen 2026-10-05 (R3-A7):* Den Blanko-Vordruck erzeugt die App jetzt
+  auch selbst (Einsatzansicht, Übergabe-Dialog unter „Weitere Formate",
+  Fußzeile; `blankoPdfErzeugen` aus `src/app/blanko.ts`, derselben Quelle wie
+  die ausgelieferte Datei). Er enthält keine Daten des Geräts.
+  *Nachgezogen 2026-10-06 (Audit Runde 4, R4-A3 bis R4-A8):* Das Lageblatt
+  setzt die Nachtragszeilen in eine eigene Tabelle mit den Spalten der
+  Einheitenzeilen und einer schmalen Spalte „übertragen" (Kästchen und Kürzel
+  zum Ausfüllen mit dem Stift — kein App-Feld, nichts davon wird eingelesen).
+  `einsatzLageblattSeiteFuellen` misst in höchstens zwei Probesätzen ohne Bilder
+  und trägt immer mindestens fünf Zeilen: passen sie auf die letzte Seite,
+  füllen sie diese; sonst stehen sie auf einer eigenen letzten Seite mit
+  Spaltenköpfen („Nachträge von Hand: Seite 2"). Vorher blieben bei sechs bis
+  zehn Einheiten zwei Zeilen, der Bedarf stand bei 30 Einheiten allein auf
+  einer vierten Seite. Zeilen werden nicht mehr über den Seitenrand geteilt.
+  In der Sammel-PDF kostete der Kasten „Stand am Meldekopf" 36 von 443
+  Beispielbögen die letzte Zeile des Sofortbedarfs auf einer eigenen Seite;
+  `einsatzPdfDokumentGesetzt` misst das in einem Probesatz ohne Bilder und ohne
+  eingebettete Dateien und setzt nur diese Bögen enger (kleinerer
+  Innenabstand), der Sofortbedarf-Kasten bleibt ganz. Jede Codeseite trägt eine
+  Kopfzeile mit Einheit, Funkrufname und Stand (Angaben, die schon auf Bogen
+  und Lageblatt stehen); das Kästchen „von Hand geändert" steht nicht mehr auf
+  der Codeseite, sondern auf dem Bogen neben der Stärke. Der Blanko-Vordruck
+  trägt den Kasten „Meldekopf" (Nr., eingegangen am/um, Zug, „Übung",
+  „ins Gerät übertragen von (Kürzel)"), bleibt bei zwei Seiten und enthält
+  weiter keine Daten des Geräts. Der Bericht von „Bögen einlesen…" nennt
+  Bilder ohne Code in einer Zeile mit den ersten drei Dateinamen (Namen der
+  vom Nutzer gewählten Dateien, nur auf dem Bildschirm) und trägt „Lage vom
+  Papier abgleichen…" als Knopf. Das Lageblatt hat damit bei etwa sechs bis
+  zehn Einheiten zwei Seiten (Seite 2 sind die Nachtragszeilen).
+- **Excel-Liste „Oldenburg"** (`src/app/oldenburg-xlsx.ts`, seit 2026-09-29,
+  Audit Runde 2, R2-K2): führt dieselben Führungsstellen-Angaben — Eintreffzeit
+  in „eingetr. / zugew.", Abrückzeit in „Einsatz-ende", Auftrag/Notiz
+  (Freitext) in „Aufträge". Der Freitext steht als `inlineStr` in der Zelle
+  und wird von Excel nie als Formel ausgewertet; `&`/`<` escapt der
+  XLSX-Writer. Die SUBTOTAL-Summen laufen nur über die in die Lage zählenden
+  Einheiten (dieselbe Regel wie App und CSV); abgerückte, aufgegangene und
+  Übungsmeldungen stehen gekennzeichnet in einem Block darunter — eine zu
+  hohe Stärke in der Liste der nächsten Ebene wäre ein Integritätsfehler.
+
+- **Teilexport „Nur neue Bögen seit dem letzten Export"**
+  (`src/app/export-stand.ts`, seit 2026-09-27): Sammel-PDF, beide CSV-Wege und
+  die Excel-Liste lassen sich auf die Meldungen beschränken, die beim letzten
+  Export dieses Einsatzes noch nicht in der Sammlung standen. Die Sammel-PDF
+  bettet dann auch nur diese Meldungen als JSON ein; die Vorfassung einer
+  Folgemeldung dient nur dem Diff auf der Seite. Als „übergeben" gilt der
+  Stand erst nach gelungenem Export — ein abgebrochenes Share-Sheet der App
+  verbucht nichts (`nativ.ts`: `teilen()` meldet den Abbruch). Vorgabe bleibt
+  der Gesamtexport; die Wahl wird nicht gespeichert.
+  *Nachgezogen 2026-10-06 (Audit Runde 4, R4-W2, R4-K1, R4-W4):* Der Bezugspunkt
+  ist je Format getrennt (`eeb.export-stand.v2`): Excel für die eigene Liste
+  verbraucht den Nachtrag-PDF nicht, „Einsatz weitergeben / sichern" an die
+  Ablösung keines von beiden. Der Nachtrag enthält neben den neuen Meldungen die
+  geltende Fassung jeder Einheit mit Änderung seit dem Stand (Abrücken, Zug,
+  Auftrag, Eintreffzeit). Ein Nachtrag steht als solcher im Kopf („NACHTRAG
+  seit …, nicht die ganze Lage"), in Summen, Fußzeile und Dateinamen
+  (`nachtrag-seit-…`); der Umschlag der Nachtrag-PDF trägt den Zusatz
+  `nachtragSeit`, der Import auf einem Gerät ohne die Sammlung fragt nach. Die
+  Übersichts-CSV führt „Unterbringung angefordert M/W/D" nur für Einheiten mit
+  Anforderung, „WC/Dusche M/W/D" für alle Anwesenden, Fahrzeuge als Anzahl und
+  Liste und eine Spalte „Rückfrage" (offene Punkte der Meldung, Freitext aus
+  Bogenangaben — kann Personenbezug enthalten); die Excel-Bemerkung trägt
+  dieselben Rückfragen und lässt ein vor dem Eintreffen abgelaufenes
+  „Verfügbar bis" leer. Lageblatt und Sammel-PDF drucken die Rückfragen ganz
+  (Lageblatt als Stichworte), der Kasten „Stand am Meldekopf" die laufende Nummer.
 - **Vorlage teilen** (`src/app/vorlagen-ui.tsx`, `vorlagen.ts`,
   `vorlageTransportErzeugen` in `hilfen.ts`, seit 2026-09-23): QR-Code und Link
   tragen die Vorlage mit dem Geräteschlüssel signiert, wie beim Bogen. Die
@@ -300,6 +825,39 @@ Datenausleitung an eine andere Herkunft ist technisch unterbunden.
   Vorlage Namen und Erreichbarkeiten enthält. Wohin die Datei gelangt (etwa in
   eine Cloud), entscheidet der Nutzer; die einsetzende Organisation sollte das
   regeln (siehe DSFA 5.8).
+  *Nachgezogen 2026-10-14 (Audit Runde 5, Paket 2, R5-W5 bis R5-W8, R5-K5 bis
+  R5-K7):* Jede Zeile eines Nachtrags nennt ihren Grund („neu", „geändert: Zug,
+  Auftrag, Wieder anwesend, Fassung …", Spalte „Im Nachtrag wegen" bzw. Excel-
+  Bemerkung); die „Summe Nachtrag" zählt nur neue Einheiten, geänderte stehen in
+  eigener Zeile bzw. eigenem Block. CSV, Alle-Daten-CSV und Excel tragen eine
+  Schlusszeile „NACHTRAG seit … — nicht die ganze Lage". Alle Formate benennen
+  Lieferungen gleich (`nachtrag-seit-<Zeitpunkt>-…`, erste Lieferung
+  `erste-lieferung-…`). Die Weitergabe an die Ablösung zählt weiter nicht als
+  Lieferung an den Stab; die Stände der Exporte reisen im Umschlag der
+  Sammel-PDF mit (3.3 D2b). Der Hinweis „Anderer Einsatz?" (Freitext aus dem
+  Bogen, `Ort/Auftrag`) steht jetzt auch in Lageblatt, Sammel-PDF, Übersichts-
+  CSV (Rückfrage), Alle-Daten-CSV („Hinweis zur Meldung") und Excel (Bemerkung);
+  das Lageblatt nennt Bedarfsänderungen (Unterbringung, Kraftstoff) und kennzeichnet
+  vom Papier übernommene, unbestätigte Eintreffzeiten. Die Datenkategorien der
+  Exporte ändern sich dadurch nicht, es kommen nur abgeleitete Hinweise dazu.
+  *Nachgezogen 2026-10-17 (Audit Runde 5, Paket 4, R5-A2 bis R5-A9, R5-K2,
+  R5-L5, R5-N5):* Einzel-PDF, Sammel-PDF und Blanko tragen im oberen Seitenrand
+  eine Kopfzeile (`bogenKopfzeile` in `pdf-dokument.ts`): auf Seite 1 des
+  Einzel-PDF der Platz „Meldekopf: Nr., eingegangen, übertragen [ ] von …", in
+  der Sammel-PDF Nr., Einheit, „Blatt x von y" und der Haken „übertragen", auf
+  jeder Folgeseite Nr. und Einheit. Die Seitenanfänge je Bogen misst ein
+  Probesatz mit Platzhalterbildern. Die Kopfzeilen sind Text aus dem Bogen
+  und dem Meldekopf-Stand, keine neuen Datenkategorien. Fahrzeugblöcke sind
+  unteilbar; Lageblatt und Sammel-PDF stehen nach Nr.; „Bedarf gesamt" steht
+  bei mehr als zwölf Einheiten vor der Tabelle; gekürzte Bemerkungen enden mit
+  „(Rest: Sammel-PDF)". Der Blanko-Vordruck (`public/downloads/…blanko.pdf`,
+  neu erzeugt) hat 29 statt 34 Personalzeilen, einen Beiblatt-Hinweis, Abstand
+  im Sofortbedarf und drei Zeilen „Sonstiges". Alle Texte aller PDFs laufen
+  durch `winAnsiText` (Fremdzeichen wie „≠" oder „→" werden ersetzt, Test
+  `pdf-winansi.test.ts`). In Übersichts-CSV und Excel heißt die Spalte bzw.
+  das Stichwort der Prüfpunkte „Hinweise" statt „Rückfrage". Auf der
+  Einsatzansicht steht der Hinweis, dass die PDFs für Papier gedacht und hell
+  sind. Kein neuer Empfänger, keine neue Netzverbindung.
 
 ### 5.5 Datensparsamkeit und Löschung
 
@@ -309,16 +867,125 @@ Datenausleitung an eine andere Herkunft ist technisch unterbunden.
   für eingelesene Bögen (Scan, Link, Datei, Einsatz-Import), für jede Meldung
   der Einsatz-Sammlung und für den Entwurf. Bei den Meldungen fallen auch der
   Rohpayload und der Signaturnachweis weg. Übungsbögen und Vorlagen sind
-  ausgenommen. Eine Uhr, die mehr als 366 Tage nach vorn springt, wird erst
-  übernommen, wenn sie sich einen Tag später bestätigt (`uhrPruefen`,
-  `src/app/datenschutz-uhr.ts`). Das schützt vor Datenverlust durch eine
-  falsch gehende Uhr. Gegen Absicht schützt die Frist nicht: Der QR-Code bleibt
-  unverschlüsselt, und eine zurückgestellte Uhr wird nicht abgefangen.
+  ausgenommen. Weicht die Uhr um mehr als 60 Tage vom letzten Start ab, wird
+  sie nicht übernommen (`geraeteuhrPruefen`, `src/app/datenschutz-uhr.ts`;
+  bis 2026-10-05 galt das Format-Maß von 366 Tagen, `uhrPruefen`, R4-D1).
+  *Nachgezogen 2026-10-14 (R5-D1):* Bis dahin übernahm die App den Sprung
+  einen Tag später selbst — dann waren alle Sammlungen endgültig gelöscht und
+  der Entwurf anonymisiert, ohne Papierkorb und ohne Frage, mit der Meldung
+  „lagen 90 Tage unverändert". Jetzt bestätigt **nur der Helfer**: „Geräteuhr
+  stimmt" fragt vorher mit den Folgen in Zahlen („3 Sammlungen, 2
+  Papierkorb-Einträge und die Namen im eigenen Bogen endgültig gelöscht",
+  `src/app/uhr-folgen.ts`); „Uhr korrigieren" erklärt den Weg. Ein Sprung nach
+  vorn, der nichts fällig macht (echte Pause, nichts Altes auf dem Gerät),
+  wird ohne Frage übernommen; eine weit zurückgestellte Uhr wird immer
+  festgehalten und dreht den Stand nicht zurück. Neue Stände (Bogen,
+  Vorlage, „Stärke ändern…") werden bei gehaltener Uhr mit der geprüften Zeit
+  gestempelt (`stempelZeitpunkt`, R5-E2). Die Nachricht nach einer
+  Aufräumung sagt „nach dem Datum dieses Geräts". Das schützt vor
+  Datenverlust durch eine falsch gehende Uhr. Dieselbe geprüfte Uhr gilt für Aufräum- und
+  Papierkorbfrist (siehe dort); solange sie zurückgehalten wird, zeigen
+  Startseite und Einsatzansicht „Geräteuhr prüfen" und die App löscht und
+  anonymisiert nichts. Bleibende Grenze: Ein Sprung unter 60 Tagen zählt als
+  echte Zeit und kann Papierkorb-Einträge (30 Tage) und ruhende Sammlungen bis
+  zu 60 Tage früher entfernen. Gegen Absicht schützt die Frist nicht: Der QR-Code bleibt
+  unverschlüsselt, und eine zurückgestellte Uhr verhindert nur, was fällig wäre.
 - **Aufräumfrist ruhender Einsatz-Sammlungen** (`@bos/meldekopf/einsaetze`):
   90 Tage ohne Änderung, dann endgültig gelöscht; Ankündigung ab Tag 60.
+  *Nachgezogen 2026-10-06 (Audit Runde 4, R4-D1):* Der Kern rechnet mit
+  `Date.now()` (Submodul, nicht änderbar) und löschte bei vorgestellter
+  Geräteuhr beim Start die laufende Sammlung endgültig. Eine Hülle um die
+  Ablage (`src/app/uhr-korrektur.ts`, in `speicher-browser.ts` zwischen
+  Beobachter und schonender Hülle eingehängt) verschiebt bei zurückgehaltener
+  Uhr die Zeitstempel `geaendert` und `geloeschtAm` der Sammlungen beim Lesen
+  um den Vorsprung und beim Schreiben zurück; der Kern sieht das Alter der
+  geprüften Uhr, im Speicher stehen ehrliche Zeitstempel. Nachprüfung mit
+  `page.clock`: Sammlung und Papierkorb bleiben bei +365 und +400 Tagen
+  vollständig, nach zurückgestellter Uhr ist alles unverändert da.
+  *Nachgezogen 2026-10-14 (R5-D1, R5-D2):* Die Hülle gilt jetzt auch für eine
+  nachgehende Uhr (negativer Versatz), und der Versatz gilt, bis der Helfer
+  „Geräteuhr stimmt" tippt — nicht nur einen Tag. „Wiederherstellen" im
+  Papierkorb setzt `geaendert` neu (`src/app/einsatz-wiederherstellen.ts`):
+  Der Kern nahm nur `geloeschtAm` weg, und eine vor dem Löschen länger als 90
+  Tage ruhende Sammlung fiel beim nächsten Lesen endgültig, obwohl der
+  Papierkorb 30 Tage Rückholung zusagte.
 - **Papierkorb-Funktion** (`src/app/sicherung.ts`, `src/app/vorlagen.ts`,
   `@bos/meldekopf/papierkorb`): gelöschte Einträge lassen sich vor endgültiger
-  Löschung wiederherstellen.
+  Löschung wiederherstellen. Seit 2026-10-06 (R4-D5) nennt der Papierkorb von
+  Einsätzen und Vorlagen das Datum der endgültigen Entfernung und die
+  Restzeit, ab drei Tagen hervorgehoben (`src/app/papierkorb-frist.ts`);
+  die Frist der Vorlagen rechnet mit der geprüften Uhr (R4-D1).
+  „Endgültig löschen…" im Papierkorb und „Alle lokalen Daten löschen" nennen
+  Sammlungen mit Meldungen, von denen es keinen Export, kein Lageblatt und
+  keine Weitergabe gibt (`exportVorhanden`, `datenUmfang().ohneExport`) — dort
+  ist die Sammlung die einzige Kopie. Seit 2026-10-14 (R5-D5) heißen die beiden
+  Papierkörbe der Startseite „Papierkorb Einsätze" und „Papierkorb Vorlagen".
+- **Meldung aus einer Einsatz-Sammlung entfernen** (`einheitEntfernen`,
+  `src/app/eintrag-zeiten.ts`, seit 2026-09-29): nimmt die Einheit mit
+  **allen** Fassungen (Folgemeldungen) samt Zusatzfeldern aus dem Speicher;
+  abgeteilte Truppteile mit eigenem Fingerabdruck bleiben. „Rückgängig" (in
+  der Quittungsleiste am unteren Bildrand) hält die Einträge nur im
+  Arbeitsspeicher der geöffneten Seite, bis die Quittung geschlossen, von
+  einer neueren ersetzt oder die Seite neu geladen wird; das Verlassen der
+  Einsatzansicht beendet ihn seit 2026-10-05 nicht mehr (R3-D4) — es gibt
+  keinen Papierkorb für einzelne Meldungen. *Nachgezogen 2026-10-06 (R4-D3):*
+  Der Rückweg bleibt bewusst im Arbeitsspeicher — ein dauerhafter Papierkorb
+  hielte fremde Personendaten an einem weiteren Speicherort. Stattdessen sagt
+  die Rückfrage vor dem Entfernen, dass „Rückgängig" nur bis zum Neuladen oder
+  Beenden der App hält (das Betriebssystem beendet die App im Hintergrund),
+  und nennt, ob die Meldung in einem Export, Lageblatt oder einer Weitergabe
+  dieser Sammlung steht (`letzterStandMit`, `src/app/export-stand.ts`).
+  „Stärke ändern…", „Zusammenführen" und eine Folgemeldung haben ein
+  „Rückgängig", das die neue Fassung wieder herausnimmt (R4-E4, R4-D5). „Fassung
+  verwerfen…" in der Historie nimmt gezielt eine einzelne Fassung heraus.
+  Die Kennungen der entfernten Einträge bleiben in `eeb.entfernt.v1` (D2e);
+  „Einsatz importieren…" fragt, bevor es eine davon wieder aufnimmt, und lässt
+  sie ohne Zustimmung draußen (seit 2026-09-29, R2-D4).
+- **Sicherung einspielen** (`src/app/sicherung.ts`, `src/app/fusszeile.tsx`):
+  ersetzt alle `eeb.*`-Einträge des Geräts ohne Papierkorb — dieselbe Folge
+  wie „Alle Daten löschen". Seit 2026-09-29 (R2-D3) wird die Datei vorher
+  geprüft (eine kaputte Datei ändert nichts), die Rückfrage nennt die
+  laufenden Sammlungen des Geräts und den Inhalt der Datei, bietet „Vorher
+  Sicherung erstellen…" an und verlangt einen Haken, sobald laufende
+  Sammlungen mit Meldungen betroffen sind.
+  *Nachgezogen 2026-10-05 (Audit Runde 4, R4-D2):* Die Aufzählung nennt
+  dieselben Posten wie „Alle Daten löschen" — Vorlagen getrennt nach aktiv
+  und Papierkorb, den Bogen auf dem Rückholplatz, die Absenderkarte und den
+  Signatur-Geräteschlüssel mit Kurzform vorher (Gerät) und nachher (Datei).
+  Der Haken ist Pflicht, sobald auf dem Gerät überhaupt etwas verloren geht
+  (Sammlung, Vorlage, Entwurf, Rückholplatz, Absenderkarte oder
+  Geräteschlüssel). Gelöscht wird weiter alles unter `eeb.`.
+  *Nachgezogen 2026-10-14 (R5-D4):* Der Uhrstand der Datei wird nicht
+  übernommen (er löste nach dem Einspielen eine falsche Uhrwarnung aus), der
+  des Geräts bleibt. Die Rückfrage nennt, was von einer alten Datei sofort
+  wieder unter die Fristen fällt (Sammlungen über 90 Tage Ruhe, Papierkorb über
+  30 Tage, Namen in alten Bögen; `bestandUmfang().faellig`), damit niemand
+  Sammlungen für gerettet hält, die beim Neuladen aufgeräumt werden.
+- **Verfügbarkeit des Gerätespeichers** (`src/app/speicher-browser.ts`,
+  `src/app/sicherung.ts`, seit 2026-09-29, R2-O6): Browser dürfen
+  Website-Daten bei Platzmangel oder (Safari) nach längerer Nichtnutzung
+  räumen. Die Web-App bittet deshalb beim Start um dauerhaften Speicher
+  (`navigator.storage.persist`), sobald Sammlungen mit Meldungen oder Vorlagen
+  vorliegen, und zeigt in der Datensicherung, ob der Browser zugestimmt hat
+  (mit Knopf zum erneuten Anfragen und dem Rat, die App auf iOS auf den
+  Home-Bildschirm zu legen). Die native App fragt nicht — dort gehört der
+  Speicher der App. Dazu zeigt die Datensicherung die letzte Sicherung, und
+  die Fußzeile erinnert, wenn wertvolle Daten seit drei Tagen ungesichert sind.
+  Eine Sicherungspflicht erzwingt die App nicht; organisatorisch regeln.
+  Seit 2026-10-05 (R3-O2) hängt das Anzeigen nicht mehr an einem
+  Schreibzugriff: Lesen schreibt nur, wenn eine Frist wirklich etwas
+  bereinigt hat (`src/app/speicher-schonend.ts`); scheitert das, zeigt die App
+  die Daten und meldet den vollen bzw. gesperrten Speicher.
+  *Nachgezogen 2026-10-14 (R5-O1, R5-O7):* „Nicht gespeichert" steht als
+  feste Leiste am oberen Bildrand statt im Kopf, der mit der Seite wegrollt
+  (`src/app/feste-warnung.tsx`); blockiert der Browser den Speicher ganz, warnt
+  schon die Startseite, und die Offline-Zeile verspricht dann nicht mehr „Alle
+  Daten bleiben auf diesem Gerät".
+- **Gemerkte Teile beim Foto-Einlesen** (`TeileMerker`, `src/app/qr-stapel.ts`,
+  seit 2026-09-29, R2-A2): Teile eines unvollständigen mehrteiligen Bogens
+  warten je Einsatz höchstens eine Stunde nach dem letzten neuen Teil im
+  Arbeitsspeicher auf den Rest; Neuladen oder „Gemerkte Teile verwerfen"
+  löscht sie sofort. Kein `localStorage`.
 - **Schema-Migration** (`src/app/hilfen.ts`): verhindert, dass ältere Datensätze
   mit veralteten Feldbedeutungen fehlinterpretiert werden.
 - **Absenderkarte vollständig optional** (Opt-in), ohne Eingabe als „keine
@@ -346,6 +1013,8 @@ ORP.1 Organisation, INF.1 Gebäude) sind nicht Gegenstand dieses Dokuments.
 | Sichere Speicherung sensibler Daten auf dem Endgerät | Teilweise erfüllt | Fachdaten in `localStorage`; privater Signaturschlüssel dort unverschlüsselt (siehe 6.3) |
 | Deaktivierung nicht benötigter Schnittstellen | Erfüllt | CSP unterbindet jede Netzverbindung außer den zwei dokumentierten Zielen |
 | Sichere Update-Mechanismen | Teilweise erfüllt | Vorhanden (`electron-updater`), Signierung/Notarisierung aber bedingt auf CI-Secrets (siehe 6.4) |
+| Zusage „offline bereit" entspricht dem Gerätezustand | Erfüllt (seit 2026-10-06, R4-O1) | Bricht das Erstladen ab und verwirft der Browser die Service-Worker-Registrierung, registriert die Seite beim `online`-Ereignis und bei 20 s stehendem Zähler neu (`installationAnstossen`, `src/app/offline-bereit.ts`); fehlt die Registrierung, steht „Laden abgebrochen … mit Netz einmal neu laden" mit Knopf statt „wird geladen". Geprüft mit einem drosselnden Reverse-Proxy, der die Verbindung abweist |
+| Offline-Vorrat wird vollständig und ehrlich nachgeladen | Erfüllt (seit 2026-10-14, R5-O2, R5-O4) | `zusatzNachladen` (`src/app/offline-vorrat.ts`) wiederholt nach einem Fehlschlag mit Pause (2, 4, 8, 16, 30, dann 60 s), jeder Abruf hat eine Zeitgrenze von 20 s, eine dauerhaft fehlende Datei wird nach acht Versuchen aufgegeben; hakt es, sagt die Zeile es. Die WebP-Fotos der Themenseiten und der Anleitung (`bilder/**`, `screenshots/**`, 3,4 MB) liegen in der zweiten Stufe, der Kern bleibt unverändert; neue Laufzeit-Route `StaleWhileRevalidate` im Cache `eeb-zusatz` |
 
 ### 6.2 SYS.2.1 Allgemeiner Client / CON.10 Entwicklung von Webanwendungen
 
@@ -354,6 +1023,8 @@ ORP.1 Organisation, INF.1 Gebäude) sind nicht Gegenstand dieses Dokuments.
 | Content-Security-Policy zur Reduktion der Angriffsfläche | Erfüllt (Skript) / bewusster Rest (Style) | `script-src` ohne `'unsafe-inline'`, Inline-Blöcke per `sha256`-Hash freigegeben; `style-src` behält `'unsafe-inline'` wegen der `style`-Attribute von React (siehe 5.3) |
 | Eingabevalidierung / Schutz vor Injection | Erfüllt (für die geprüften Exportpfade) | CSV-Formel-Injection-Schutz, korrektes XLSX-Escaping |
 | Robustheit gegenüber fehlerhaften/böswilligen Eingabedaten | Erfüllt | Dekomprimierung importierter QR-/Dateidaten läuft über `inflateRawBegrenzt` (`src/app/hilfen.ts`) mit Obergrenze `MAX_ENTPACKT = 4 MiB`, streamend geprüft — bricht ab, bevor der Speicher volläuft |
+| Pflichtfelder von Bögen aus Dateien und Entwürfen | Erfüllt (seit 2026-10-14, R5-E1) | `src/app/bogen-pruefung.ts`: Harmloses (fehlender Einheitstyp, Listen, Namen) wird ergänzt, Unbrauchbares (Einheit, Stand, Einsatzzeitraum, Personenliste) mit Ursache abgelehnt — Einsatz-Datei, „Bögen einlesen…", „Aus Datei laden…" und Entwurf; ein Bogen ohne Einheitstyp machte vorher die App dauerhaft weiß |
+| Fangnetz bei Abstürzen der Ansicht | Erfüllt (seit 2026-10-14, R5-E1) | `src/app/fehlerfaenger.tsx` um die ganze App: deutsche Meldung, Neu laden, Zur Startseite (vergisst die zuletzt geöffnete Sammlung), „Daten sichern" (Datei mit allen `eeb.`-Einträgen) und, mit Rückfrage, „Alle Daten löschen" |
 | Kontextisolation bei hybriden Apps (Electron/Capacitor) | Erfüllt | `contextIsolation`, `sandbox`, kein Preload |
 
 > *Prüfvermerk (Stand `c7604e9`):* Der `browserKompressor` in

@@ -4,10 +4,11 @@
  * einem einzelnen Schritt — alles hier wird von mehreren Schritten genutzt.
  */
 
-import { createContext, useContext, useEffect, useId, useState, type ComponentProps, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useId, useLayoutEffect, useRef, useState, type ComponentProps, type ReactNode } from "react";
 import { Erfassungsbogen, VokabularWert } from "@bos/eeb-format/model";
 import type { VokabularEintrag } from "@bos/vokabulare/thw";
 import { vokabSortiert, type Pruefpunkt } from "../hilfen";
+import { funktionVergeben } from "../haeufige-funktionen";
 
 export type SchrittProps = {
   bogen: Erfassungsbogen;
@@ -46,11 +47,19 @@ export function VokabAuswahl(props: {
   /** Lange Listen (Einheitstyp, Fahrzeugtyp) als tippbare Combobox statt als
       Bildlauf-Select — Freitext bleibt möglich, eine Auswahl setzt den Code. */
   suchbar?: boolean;
+  /**
+   * Bleibt der Text nach dem Verlassen des Felds Freitext, sagt das Feld es
+   * (Einheitstyp, Audit Runde 4, R4-H1): „Bergungsgruppe" ausgeschrieben sah
+   * wie eine Wahl aus, hatte aber keinen Typ-Code.
+   */
+  freitextHinweis?: boolean;
 }) {
-  const { wert, aendern, tabelle, platzhalter, suchbar } = props;
+  const { wert, aendern, tabelle, platzhalter, suchbar, freitextHinweis } = props;
   const titel = useContext(FeldTitel);
   if (suchbar && tabelle.length > 0) {
-    return <VokabCombobox wert={wert} aendern={aendern} tabelle={tabelle} platzhalter={platzhalter} />;
+    return (
+      <VokabCombobox wert={wert} aendern={aendern} tabelle={tabelle} platzhalter={platzhalter} freitextHinweis={freitextHinweis} />
+    );
   }
   if (tabelle.length === 0) {
     return (
@@ -109,8 +118,10 @@ function VokabCombobox(props: {
   aendern: (v: VokabularWert) => void;
   tabelle: VokabularEintrag[];
   platzhalter: string;
+  freitextHinweis?: boolean;
 }) {
-  const { wert, aendern, tabelle, platzhalter } = props;
+  const { wert, aendern, tabelle, platzhalter, freitextHinweis } = props;
+  const [imFeld, setImFeld] = useState(false);
   const sortiert = vokabSortiert(tabelle);
   const label = (t: VokabularEintrag) => `${t.kurz} – ${t.name}`;
   const ausCode = wert.code != null ? sortiert.find((t) => t.code === wert.code) : undefined;
@@ -123,18 +134,25 @@ function VokabCombobox(props: {
   }, [wert.code, wert.freitext]);
 
   const suche = eingabe.trim().toLowerCase();
-  const treffer = (
-    suche
-      ? sortiert.filter(
-          (t) =>
-            t.kurz.toLowerCase().includes(suche) ||
-            t.name.toLowerCase().includes(suche) ||
-            label(t).toLowerCase().includes(suche),
-        )
-      : sortiert
-  ).slice(0, 8);
+  // Bewusst ohne Obergrenze: die Liste ist ein Ersatz für das Native-Select und
+  // muss ohne Tippen jeden Eintrag zeigen — sie scrollt (max-height in der
+  // CSS). Gekappt auf acht Zeilen las sich „B (ASH) … FGr I" am Handy als
+  // vollständige Auswahl, und wer seine Einheit nicht sah, hielt sie für
+  // nicht vorgesehen, statt zu tippen.
+  const treffer = suche
+    ? sortiert.filter(
+        (t) =>
+          t.kurz.toLowerCase().includes(suche) ||
+          t.name.toLowerCase().includes(suche) ||
+          label(t).toLowerCase().includes(suche),
+      )
+    : sortiert;
 
+  const freitext = wert.code == null ? (wert.freitext ?? "").trim() : "";
   return (
+    <>
+    {/* Nur zum Beobachten des Fokus; ohne eigene Darstellung. */}
+    <span style={{ display: "contents" }} onFocusCapture={() => setImFeld(true)} onBlurCapture={() => setImFeld(false)}>
     <VorschlagFeld
       wert={eingabe}
       platzhalter={platzhalter}
@@ -160,16 +178,27 @@ function VokabCombobox(props: {
         aendern({ freitext: v });
       }}
       verlassen={(v) => {
-        // Direkt eingetipptes Kürzel/Label beim Verlassen zum Code auflösen.
-        const t = sortiert.find(
-          (x) => label(x) === v || x.kurz.toLowerCase() === v.trim().toLowerCase(),
-        );
+        // Direkt eingetipptes Kürzel, Label oder ausgeschriebener Name beim
+        // Verlassen zum Code auflösen — ohne Groß-/Kleinschreibung und ohne
+        // Leerzeichen am Rand, aber nur bei genau einem Treffer (R4-H1).
+        const klein = v.trim().toLowerCase();
+        const gleich = sortiert.filter((x) => x.name.toLowerCase() === klein || label(x).toLowerCase() === klein);
+        const t =
+          sortiert.find((x) => label(x) === v || x.kurz.toLowerCase() === klein) ?? (gleich.length === 1 ? gleich[0] : undefined);
         if (t) {
           setEingabe(label(t));
           aendern({ code: t.code });
         }
       }}
     />
+    </span>
+    {freitextHinweis && freitext && !imFeld && (
+      <span className="hinweis warnung-text freitext-hinweis" role="status" style={{ display: "block" }}>
+        „{freitext}" ist nicht aus der Liste — Vorschlag antippen oder als eigener Typ behalten. Ohne Typ-Code
+        fehlen das taktische Zeichen und der Soll-Vergleich.
+      </span>
+    )}
+    </>
   );
 }
 
@@ -195,7 +224,69 @@ function VokabCombobox(props: {
  *  - Die Trefferzahl kommt zusätzlich über eine Statuszeile: dass sich die
  *    Anzahl beim Tippen ändert, verrät sonst nichts.
  */
+/**
+ * Eingabeattribute für Kennungen — Kennzeichen, Funkruf-Kennzahlen,
+ * Dienststellen-Kürzel. Das sind Buchstaben-Ziffern-Folgen, keine Wörter: die
+ * Autokorrektur „verbesserte" sie, die Großschreibung am Satzanfang machte
+ * aus „THW" ein „Thw", und die Rechtschreibprüfung unterstrich jedes
+ * Kennzeichen rot (Audit Runde 2, R2-M6). `autoComplete="off"` dazu, weil
+ * das Telefon für ein unbeschriftetes Textfeld sonst Einträge aus ganz
+ * anderen Formularen anbietet.
+ */
+export const KENNUNG_EINGABE = {
+  autoCapitalize: "characters",
+  autoCorrect: "off",
+  spellCheck: false,
+  autoComplete: "off",
+} as const;
+
+/**
+ * Für Felder, die NICHT die eigenen Daten des Gerätebesitzers meinen
+ * (Personen des Bogens, Dienststellenkontakte): kein Autofill aus der
+ * eigenen Kontaktkarte. `autocomplete="tel"`/`"email"` am OV-Telefon bot die
+ * private Handynummer an, und ein Tipp darauf setzte sie als
+ * Dienststellenkontakt auf den Bogen (R2-M6). Nur „Name/Kontakt hinterlegen"
+ * (Absenderkarte) meint wirklich den Gerätebesitzer und behält name/email/tel.
+ */
+export const FREMDE_DATEN = { autoComplete: "off" } as const;
+
+/**
+ * Die offene Vorschlagsliste soll über den festen Leisten am unteren Rand (Fußleiste des
+ * Assistenten, Ansicht-Balken, Bildschirmtastatur) im Bild stehen: In der Schnellerfassung lag
+ * „FGr W (B)" ganz unter der zweizeiligen Fußleiste (R7-E8). Erst rollt die Seite so weit, wie
+ * es das Feld oben im Bild lässt, dann wird die Liste auf den Rest begrenzt (sie rollt in sich).
+ */
+function listeInsBildHalten(liste: HTMLElement, eingabe: HTMLElement | null) {
+  liste.style.maxHeight = "";
+  if (typeof window === "undefined") return;
+  const vv = window.visualViewport;
+  let grenze = vv ? vv.offsetTop + vv.height : window.innerHeight;
+  for (const fest of document.querySelectorAll<HTMLElement>("footer.nav, .anzeige-balken")) {
+    const r = fest.getBoundingClientRect();
+    if (r.height > 0 && r.top > 0 && r.top < grenze) grenze = r.top;
+  }
+  const rand = 8;
+  const unten = liste.getBoundingClientRect().bottom;
+  if (unten <= grenze - rand) return;
+  const feldOben = eingabe?.getBoundingClientRect().top ?? 0;
+  // Das Feld bleibt im Bild: höchstens so weit rollen, dass seine Oberkante bei 8 px steht.
+  const rollen = Math.max(0, Math.min(unten - (grenze - rand), feldOben - rand));
+  if (rollen > 0) {
+    try {
+      window.scrollBy(0, rollen);
+    } catch {
+      /* Testumgebung ohne Layout */
+    }
+  }
+  const oben = liste.getBoundingClientRect().top;
+  const platz = grenze - rand - oben;
+  // Mindestens eine Zeile (Grundmaß) bleibt, auch wenn der Platz knapp ist.
+  if (platz > 0 && platz < liste.getBoundingClientRect().height) liste.style.maxHeight = `${Math.max(platz, 48)}px`;
+}
+
 export function VorschlagFeld<T>(props: {
+  /** id des Eingabefelds (Sprungziel); die Listen-IDs bleiben eigene. */
+  id?: string;
   wert: string;
   platzhalter?: string;
   beschriftung?: string;
@@ -220,8 +311,10 @@ export function VorschlagFeld<T>(props: {
    * Suchfeldern wie dem OV-Namen), dass hier eine Liste wartet.
    */
   picker?: boolean;
+  /** true: Kennung (Kürzel) — Großbuchstaben, ohne Autokorrektur ({@link KENNUNG_EINGABE}). */
+  kennung?: boolean;
 }) {
-  const { wert, platzhalter, beschriftung, treffer, schluessel, zeile, tippen, waehlen, bestaetigen, verlassen, imFluss, picker } = props;
+  const { id: feldId, wert, platzhalter, beschriftung, treffer, schluessel, zeile, tippen, waehlen, bestaetigen, verlassen, imFluss, picker, kennung } = props;
   const ausFeld = useContext(FeldTitel);
   const [offen, setOffen] = useState(false);
   const [aktiv, setAktiv] = useState(0);
@@ -233,6 +326,19 @@ export function VorschlagFeld<T>(props: {
 
   const sichtbar = offen ? treffer : [];
   const aufgeklappt = sichtbar.length > 0;
+  const listeRef = useRef<HTMLUListElement>(null);
+  const eingabeRef = useRef<HTMLInputElement>(null);
+  useLayoutEffect(() => {
+    const liste = listeRef.current;
+    if (!aufgeklappt || !liste) return;
+    listeInsBildHalten(liste, eingabeRef.current);
+    // Die Bildschirmtastatur fährt erst nach dem Öffnen auf und verkleinert das Bild.
+    const vv = typeof window === "undefined" ? null : window.visualViewport;
+    if (!vv) return;
+    const neu = () => listeInsBildHalten(liste, eingabeRef.current);
+    vv.addEventListener("resize", neu);
+    return () => vv.removeEventListener("resize", neu);
+  }, [aufgeklappt, sichtbar.length]);
   const nehmen = (v: T) => {
     waehlen(v);
     setOffen(false);
@@ -242,6 +348,8 @@ export function VorschlagFeld<T>(props: {
   return (
     <span className={["autocomplete", imFluss ? "im-fluss" : "", picker ? "picker" : ""].filter(Boolean).join(" ")}>
       <input
+        id={feldId}
+        ref={eingabeRef}
         // Wie bei <Auswahl>: im umschließenden <label> zählt sonst der ganze
         // Textinhalt (hier die schon gesetzten Chips) als Feldname.
         aria-label={beschriftung ?? ausFeld}
@@ -254,6 +362,7 @@ export function VorschlagFeld<T>(props: {
         aria-autocomplete="list"
         // Sonst legt sich die Autovervollständigung des Browsers über unsere.
         autoComplete="off"
+        {...(kennung ? KENNUNG_EINGABE : {})}
         value={wert}
         placeholder={platzhalter}
         onChange={(ev) => {
@@ -303,7 +412,7 @@ export function VorschlagFeld<T>(props: {
         }}
       />
       {aufgeklappt && (
-        <ul className="vorschlaege" id={listeId} role="listbox" aria-label={`Vorschläge zu ${beschriftung ?? ausFeld ?? "der Eingabe"}`}>
+        <ul className="vorschlaege" ref={listeRef} id={listeId} role="listbox" aria-label={`Vorschläge zu ${beschriftung ?? ausFeld ?? "der Eingabe"}`}>
           {sichtbar.map((v, k) => (
             // onMouseDown statt onClick, damit die Auswahl vor dem blur greift
             <li
@@ -359,13 +468,27 @@ export function VokabListe(props: {
    * anderen Feld liegt. Liefert nichts, bleibt die Liste allein.
    */
   suchhinweis?: (suche: string) => ReactNode | undefined;
+  /**
+   * Was das LEERE Feld beim Antippen anbietet (häufigste Funktionen der
+   * Einheit, haeufige-funktionen.ts) — damit sich eine Funktion ohne
+   * Tastatur zuweisen lässt (Audit Runde 2, R2-G5). Schon gesetzte Werte
+   * fallen heraus.
+   */
+  haeufige?: readonly VokabularWert[];
 }) {
-  const { werte, aendern, tabelle, hinzufuegenText, freitextVorschlaege, suchhinweis } = props;
+  const { werte, aendern, tabelle, hinzufuegenText, freitextVorschlaege, suchhinweis, haeufige } = props;
   const [eingabe, setEingabe] = useState("");
 
   const suche = eingabe.trim().toLowerCase();
   const treffer: Kandidat[] = [];
-  if (suche) {
+  if (!suche) {
+    for (const w of haeufige ?? []) {
+      if (funktionVergeben(werte, w)) continue;
+      const t = w.code != null ? tabelle.find((x) => x.code === w.code) : undefined;
+      if (w.code != null && !t) continue; // Code aus fremder Tabelle: lieber nicht als „#12" anbieten
+      treffer.push(t ? { text: t.kurz, zusatz: t.name, wert: w } : { text: w.freitext ?? "", wert: w });
+    }
+  } else {
     // vokabSortiert: gleiche Reihenfolge wie in den Auswahllisten der App,
     // damit Gleichartiges beieinander steht („GrFü B", „GrFü BrB", „GrFü E").
     for (const t of vokabSortiert(tabelle)) {
@@ -457,10 +580,59 @@ export const zahl = (s: string): number => {
   return Number.isFinite(n) && n >= 0 ? n : 0;
 };
 
+/**
+ * Zahlenfeld, das sich leeren lässt. Ein `type="number"`-Feld, dessen Wert beim
+ * Löschen sofort auf „0" zurückspringt, lässt sich nicht neu tippen: aus „5"
+ * löschen und „7" tippen wurde „07". Der Bogen bekommt weiter 0, das Feld zeigt
+ * solange leer, bis jemand tippt, den Wert anderweitig ändert (Stepper) oder
+ * das Feld verlässt.
+ */
+export function ZahlEingabe(props: Omit<ComponentProps<"input">, "value" | "onChange" | "type"> & {
+  wert: number;
+  setzen: (n: number, text: string) => void;
+}) {
+  const { wert, setzen, onBlur, ...rest } = props;
+  const [leerBei, setLeerBei] = useState<number | null>(null);
+  return (
+    <input
+      {...rest}
+      type="number"
+      value={leerBei === wert ? "" : wert}
+      onChange={(e) => {
+        const n = zahl(e.target.value);
+        setLeerBei(e.target.value.trim() === "" ? n : null);
+        setzen(n, e.target.value);
+      }}
+      onBlur={(e) => {
+        setLeerBei(null);
+        onBlur?.(e);
+      }}
+    />
+  );
+}
+
+/**
+ * Satz für ein Zahlenfeld, dessen Eingabe begrenzt wurde — leer, wenn der Wert
+ * unverändert übernommen wird (Audit Runde 7, R7-E6: 999 wurde still zu 99,
+ * −5 zu 0, 1,5 zu 1).
+ */
+export function zahlBegrenzung(eingabe: string, opt: { min?: number; max?: number } = {}): string {
+  const t = eingabe.trim().replace(",", ".");
+  if (t === "") return "";
+  const n = Number(t);
+  if (!Number.isFinite(n)) return "";
+  const min = opt.min ?? 0;
+  if (n < min) return `Mindestens ${min} — dein Wert ${eingabe.trim()} wurde auf ${min} gesetzt.`;
+  if (opt.max != null && n > opt.max) return `Höchstens ${opt.max} — dein Wert ${eingabe.trim()} wurde auf ${opt.max} gesetzt.`;
+  if (!Number.isInteger(n)) return `Nur ganze Zahlen — ${eingabe.trim()} wurde auf ${Math.trunc(n)} gesetzt.`;
+  return "";
+}
+
 // Die Stärke-Notation „x / x / x / x" ist BOS-Konvention, aber nicht jedem
 // geläufig — Tooltip/aria erklären sie, ohne die Anzeige aufzublähen.
 export const STAERKE_LEGENDE = "Führer / Unterführer / Mannschaft / Gesamt";
-export const MWD_LEGENDE = "Unterbringungsplätze: männlich / weiblich / divers";
+/** Wofür die Aufteilung nach Geschlecht gebraucht wird (Unterbringung, WC/Dusche). */
+export const MWD_LEGENDE = "Aufteilung nach Geschlecht — für Unterbringung und WC/Dusche";
 
 export function staerkeVorlesen(s: { fuehrer: number; unterfuehrer: number; mannschaft: number; gesamt: number }): string {
   return `${s.fuehrer} Führer, ${s.unterfuehrer} Unterführer, ${s.mannschaft} Mannschaft, ${s.gesamt} gesamt`;
@@ -485,13 +657,12 @@ export function Stepper(props: { titel: string; wert: number; setzen: (n: number
         >
           −
         </button>
-        <input
-          type="number"
+        <ZahlEingabe
           inputMode="numeric"
           min={min}
-          value={props.wert}
+          wert={props.wert}
           aria-label={props.titel}
-          onChange={(e) => setze(zahl(e.target.value))}
+          setzen={(n) => setze(n)}
         />
         <button type="button" aria-label={`${props.titel}: erhöhen`} onClick={() => setze(props.wert + 1)}>
           +
@@ -502,36 +673,39 @@ export function Stepper(props: { titel: string; wert: number; setzen: (n: number
 }
 
 /**
- * Plausibilitätshinweise (nicht blockierend). Ein Warnmuster wie in der
- * Übersicht: Punkte, die auf einen ANDEREN Schritt zeigen, sind antippbar und
- * springen dorthin — vorher waren sie hier Sackgassen, und man lernte erst in
- * der Übersicht, dass Warnungen klickbar sein können. `role="status"`, damit
- * Vorlesesoftware neu auftauchende Hinweise aktiv mitbekommt.
+ * Plausibilitätshinweise (nicht blockierend) zum AKTUELLEN Schritt.
+ *
+ * Von den Prüfpunkten (pruefpunkte()) erscheinen nur die, die sich auf diesem
+ * Schritt beheben lassen. Vorher standen auf Schritt 1 schon drei gelbe
+ * Kästen, bevor irgendetwas eingegeben war — zwei davon zu Schritt 2 und 3,
+ * antippbar, und wer ihnen folgte, sprang auf Schritt 3, bevor Schritt 1
+ * fertig war. Wer auf dem ersten Bildschirm lernt, dass gelbe Kästen ohnehin
+ * immer da sind, überliest später auch die, die zählen (kein Name, keine
+ * Rufnummer). Die Gesamtliste über alle Schritte gehört in die Übersicht und
+ * den Übergabe-Dialog, wo sie als Checkliste mit Sprung steht.
+ *
+ * `role="status"`, damit Vorlesesoftware neu auftauchende Hinweise aktiv
+ * mitbekommt.
  */
 export function Hinweise(props: {
   /** Nur-Text-Hinweise, die den aktuellen Schritt selbst betreffen. */
   hinweise?: string[];
-  /** Hinweise mit Schrittbezug (pruefpunkte()). */
+  /** Hinweise mit Schrittbezug (pruefpunkte()); gezeigt werden die zu `aktuellerSchritt`. */
   punkte?: Pruefpunkt[];
+  /** Schritt-Index (0-basiert, siehe SCHRITTE in app.tsx) — ohne Angabe erscheinen alle Punkte. */
   aktuellerSchritt?: number;
-  geheZu?: (schritt: number) => void;
 }) {
-  const { hinweise = [], punkte = [], aktuellerSchritt, geheZu } = props;
-  if (hinweise.length === 0 && punkte.length === 0) return null;
+  const { hinweise = [], punkte = [], aktuellerSchritt } = props;
+  const hier = aktuellerSchritt == null ? punkte : punkte.filter((p) => p.schritt === aktuellerSchritt);
+  if (hinweise.length === 0 && hier.length === 0) return null;
   return (
     <div role="status">
       {hinweise.map((h) => (
         <p key={h} className="warnung">⚠ {h}</p>
       ))}
-      {punkte.map((p) =>
-        geheZu && p.schritt !== aktuellerSchritt ? (
-          <p key={p.text} className="warnung">
-            ⚠ <button type="button" className="link" onClick={() => geheZu(p.schritt)}>{p.text}</button>
-          </p>
-        ) : (
-          <p key={p.text} className="warnung">⚠ {p.text}</p>
-        ),
-      )}
+      {hier.map((p) => (
+        <p key={p.text} className="warnung">⚠ {p.text}</p>
+      ))}
     </div>
   );
 }
@@ -543,7 +717,7 @@ export function Hinweise(props: {
  */
 export function Vollstaendigkeit(props: {
   punkte: Pruefpunkt[];
-  geheZu: (schritt: number) => void;
+  geheZu: (schritt: number, feld?: string) => void;
   /** Satz unter der Liste — im Übergabe-Dialog sagt er, dass nichts gesperrt ist. */
   nachsatz?: string;
 }) {
@@ -561,7 +735,7 @@ export function Vollstaendigkeit(props: {
       <ul>
         {punkte.map((p) => (
           <li key={p.text}>
-            <button type="button" className="link" onClick={() => geheZu(p.schritt)}>
+            <button type="button" className="link" onClick={() => geheZu(p.schritt, p.feld)}>
               {p.text}
             </button>
           </li>
@@ -581,6 +755,7 @@ export function KennzahlenFeld(props: { teile: number[]; aendern: (t: number[]) 
   const [text, setText] = useState(props.teile.join("/"));
   return (
     <input
+      {...KENNUNG_EINGABE}
       value={text}
       placeholder="18/13"
       onChange={(e) => {

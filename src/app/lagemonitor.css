@@ -1,0 +1,157 @@
+/*
+ * Lagemonitor: Fernsehanzeige in übereinanderliegenden, mittig gesetzten Zeilen.
+ * Eigene Farbwelt (dunkel mit roter Zeit); „Hell" schaltet in den Optionen um.
+ * Schrift skaliert mit Höhe und Breite des Fensters.
+ */
+/* „main.lm" schlägt die allgemeine main-Regel der App (60rem breit, mittig). */
+main.lm {
+  --lm-grund: #000;
+  --lm-text: #fff;
+  /* Linien heller als das reine Blau (2,4:1 auf Schwarz, R6-L4): 6:1. */
+  --lm-rahmen: #5b8cff;
+  --lm-zeit: #ff0000;
+  /* Kleinste Schrift: am Fernseher 14 px, am Telefon folgt sie der Systemschrift (R8-L5, unten). */
+  --lm-min: 14px;
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  /* Das Großbild füllt genau das Bild: die Einheitentabelle bekommt den Rest, nichts rollt (R7-K1). */
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+  box-sizing: border-box;
+  padding: 0.6vh 2.5vw;
+  display: flex;
+  flex-direction: column;
+  background: var(--lm-grund);
+  color: var(--lm-text);
+}
+/* Gedimmt: für abgedunkelte Fahrzeuge — gedämpftes Weiß und Rot statt Vollblendung (R6-L4). */
+main.lm.lm-gedimmt {
+  --lm-text: #c9c2b8;
+  --lm-rahmen: #4a64b0;
+  --lm-zeit: #d85a5a; /* 5,5:1 auf Schwarz auch für Kleinschrift (R8-L3) */
+}
+main.lm.lm-hell {
+  --lm-grund: #fff;
+  --lm-text: #000;
+  --lm-rahmen: #0000cc;
+  --lm-zeit: #cc0000;
+}
+.lm-zeile {
+  margin: 0;
+  color: inherit;
+  border: 3px solid var(--lm-rahmen);
+  text-align: center;
+  line-height: 1.15;
+  overflow-wrap: anywhere;
+}
+.lm-r1 { font-size: min(5.6vh, 5vw); font-weight: 400; padding: 0.02em 0.2em; flex: none; }
+.lm-r2 { font-size: min(3.8vh, 4.4vw); padding: 0.05em 0.2em; flex: none; }
+.lm-r3 { font-size: min(4.6vh, 4.6vw); padding: 0.04em 0.2em; font-variant-numeric: tabular-nums; flex: none; }
+.lm-ort { font-size: 0.6em; opacity: 0.85; }
+.lm-dtg {
+  position: relative;
+  flex: 0 1 auto;
+  min-height: 14vh;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--lm-zeit);
+  font-size: min(7vh, 8vw);
+  line-height: 1.3;
+  font-variant-numeric: tabular-nums;
+}
+.lm-dtg-text { display: flex; align-items: baseline; gap: 0.25em; }
+/* Beschriftung der Zeitgruppe, damit „1807" als Uhrzeit erkennbar ist (R7-N5). */
+.lm-dtg-label { position: absolute; top: 0.15em; left: 0.5em; font-size: max(var(--lm-min), 0.2em); color: var(--lm-text); }
+.lm-dtg strong { font-size: 1.5em; line-height: 1; }
+.lm-klapp { text-align: left; font-size: max(var(--lm-min), min(2.9vh, 2.2vw)); flex: none; }
+.lm-fuss { display: flex; gap: 8px; align-items: flex-start; flex: none; }
+.lm-fuss > .lm-klapp { flex: 1 1 0; min-width: 0; }
+.lm-klapp > summary { cursor: pointer; padding: 0.15em 0.3em; min-height: 44px; box-sizing: border-box; display: flex; align-items: center; }
+.lm-klapp[open] > summary { border-bottom: 1px solid var(--lm-rahmen); }
+.lm-klapp h2 { margin: 0 0 0.3em; font-size: 1.1em; }
+/* Einheitentabelle: nimmt den Rest des Bildes; Zellen brechen nur an Leerstellen, nie im Wort (R7-K7, R7-N5). */
+.lm-einheiten-block { text-align: left; flex: 1 1 0; min-height: 14vh; display: flex; flex-direction: column; font-size: max(var(--lm-min), min(2.7vh, 2.2vw)); }
+.lm-titel { margin: 0; padding: 0.1em 0.3em; font-size: 1em; font-weight: 400; border-bottom: 1px solid var(--lm-rahmen); flex: none; }
+.lm-tabelle { flex: 1 1 0; min-height: 0; overflow: hidden; }
+.lm-einheiten { width: 100%; border-collapse: collapse; font-size: 1.1em; font-variant-numeric: tabular-nums; }
+.lm-einheiten th, .lm-einheiten td { text-align: left; padding: 0.08em 0.5em; border: 1px solid var(--lm-rahmen); overflow-wrap: normal; word-break: normal; hyphens: none; }
+.lm-einheiten .lm-kurz { display: none; }
+/* Breite nach Inhalt statt zu gleichen Teilen: der lange Einheitentyp bricht sonst um und kostet eine halbe Zeile (R8-L1). */
+.lm-einheiten th:nth-child(2) { width: 16%; }
+.lm-einheiten th:nth-child(3) { width: 26%; }
+.lm-einheiten th.lm-typ { width: 40%; }
+.lm-einheiten .lm-orga { white-space: nowrap; width: 1%; }
+.lm-weitere { padding: 0.15em 0.5em; opacity: 0.9; font-size: 1.1em; }
+.lm-leer-hinweis { margin: 0; padding: 0.3em 0.5em; }
+.lm-einheiten th { opacity: 0.75; font-weight: 400; }
+.lm-einheiten .lm-zahl { text-align: right; width: 3.5em; }
+.lm-daten { display: grid; grid-template-columns: max-content 1fr; gap: 0.2em 1em; margin: 0; padding: 0.5em; }
+.lm-daten dt { opacity: 0.75; }
+.lm-daten dd { margin: 0; }
+.lm-optionen { display: flex; flex-wrap: wrap; gap: max(8px, 0.6em); padding: 0.5em; }
+.lm-optionen button { font-size: inherit; }
+.lm-leer .lm-r1 { margin-bottom: 1em; }
+.lm-block { margin-top: 1.5rem; }
+/* Ränder um die Zeilen bekommen den Grund des Monitors, nicht den der App. */
+body:has(main.lm) { background: #000; }
+body:has(main.lm.lm-hell) { background: #fff; }
+
+/* Beschriftungen und Überschriften nehmen die Farbe des Monitors, nicht die des App-Modus (R6-L1). */
+main.lm h1, main.lm h2, main.lm th, main.lm summary, main.lm dt { color: var(--lm-text); }
+.lm-label { display: block; font-size: max(var(--lm-min), 0.45em); opacity: 0.85; line-height: 1.2; }
+.lm-label.lm-inline { display: inline; font-size: max(var(--lm-min), 0.7em); }
+/* Alter Datenstand (ab einer Stunde) oder unplausible Zeiten: abgesetzt in der Warnfarbe (R7-K8). */
+.lm-label.lm-veraltet { opacity: 1; color: var(--lm-zeit); font-weight: 700; font-size: max(var(--lm-min), 0.6em); }
+.lm-label.lm-veraltet::before { content: "\26A0\FE0E  "; }
+.lm-uebung { color: var(--lm-zeit); font-weight: 700; letter-spacing: 0.05em; }
+.lm-bewegungen { flex: none; padding: 0.05em 0.2em; font-size: min(2.9vh, 3.6vw); }
+.lm-bewegung { text-align: center; }
+.lm-weitere-bewegungen { opacity: 0.9; }
+/* Liste bleibt im Bild: ab dieser Höhe rollt sie in sich (kein Überlauf der Seite, R6-L2). */
+
+/* Knöpfe in der Schrift des Monitors, nicht als weiße App-Knöpfe (R6-L6). */
+.lm-knopf {
+  font-size: max(var(--lm-min), min(3.2vh, 2.2vw));
+  min-height: max(44px, 2.4em);
+  padding: 0.2em 0.9em;
+  background: transparent;
+  color: var(--lm-text);
+  border: 2px solid var(--lm-rahmen);
+  border-radius: 0.3em;
+}
+.lm-leer .lm-knopf { align-self: center; margin-top: 1em; }
+/* Block in der Einsatzansicht: das Datumsfeld bleibt im Bild (R6-G3, R6-M3). */
+.lm-block label { display: block; max-width: 100%; }
+.lm-block input { width: 100%; max-width: 100%; box-sizing: border-box; }
+.lm-block .vorlage-aktionen { flex-wrap: wrap; }
+
+/* Telefon und flaches Querformat: nichts ist für den Fernseher gedacht, also Mindestgrößen und Rollen statt Abschneiden (R7-L2, R7-G3, R7-M6). */
+@media (max-width: 640px), (max-height: 480px) {
+  main.lm { --lm-min: 0.875rem; height: auto; min-height: 100vh; min-height: 100dvh; overflow: visible; }
+  .lm-dtg { flex: none; min-height: 0; padding-top: 1em; }
+  .lm-einheiten-block { flex: none; min-height: 0; }
+  .lm-tabelle { flex: none; overflow-x: auto; }
+  .lm-einheiten { font-size: 1em; }
+  .lm-fuss { flex-direction: column; gap: 8px; }
+  .lm-fuss > .lm-klapp { width: 100%; }
+  .lm-knopf { padding: 0.2em 1em; }
+}
+/* Schmales Fenster (Telefon hochkant): die Zahlen je Einheit gehören ins Bild, der Einheitentyp entfällt;
+   Ort und Funkrufname dürfen umbrechen, F/U/M werden schmal (R8-K1, R8-N1, R8-H3, R8-M4). */
+@media (max-width: 640px) {
+  .lm-einheiten { table-layout: auto; }
+  .lm-einheiten th:nth-child(2), .lm-einheiten th:nth-child(3) { width: auto; }
+  .lm-einheiten .lm-typ { display: none; }
+  .lm-einheiten .lm-lang { display: none; }
+  .lm-einheiten .lm-kurz { display: inline; }
+  .lm-einheiten th, .lm-einheiten td { padding: 0.08em 0.2em; }
+  .lm-einheiten th { font-size: 0.75em; }
+  .lm-einheiten td { overflow-wrap: anywhere; }
+  .lm-einheiten .lm-orga { overflow-wrap: normal; }
+  .lm-einheiten .lm-zahl { width: 1%; white-space: nowrap; }
+  .lm-weitere { padding: 0.15em 0.3em; }
+}

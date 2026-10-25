@@ -1,0 +1,86 @@
+{
+  "schemaVersion": 9,
+  "uebung": true,
+  "stand": 2171520,
+  "einheit": {
+    "organisation": 6,
+    "einheitsTyp": {
+      "freitext": "1. Betreuungstrupp"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "code": 2
+        },
+        "name": "Malter"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 1508,
+    "zeitraumBis": 1508,
+    "ortAuftrag": "Praktische Ausbildung (Übung): Einheitenerfassung der geplanten Einsatzeinheiten"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "nachname": "Weber",
+      "vorname": "Markus",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "GF"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Betreuungshelfer"
+        }
+      ]
+    },
+    {
+      "nachname": "Tone",
+      "vorname": "Tina",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "TF"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Betreuungshelfer"
+        }
+      ]
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "GW-Betreuung"
+      },
+      "kennzeichen": "MA-JU 15",
+      "funkrufname": {
+        "kennwort": {
+          "code": 4
+        },
+        "eigenerStandort": false,
+        "ort": "Malter",
+        "teile": [
+          54,
+          75,
+          2
+        ]
+      }
+    }
+  ],
+  "sonstiges": "Fachdienst: Betreuungsdienst. Hauptleistung: BTP. Kommunikation: Rufname 54-75-02."
+}

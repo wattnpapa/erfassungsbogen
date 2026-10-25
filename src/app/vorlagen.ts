@@ -13,9 +13,12 @@
  */
 
 import type { Erfassungsbogen } from "@bos/eeb-format/model";
-import { datumAusIso, jetztZeitpunkt, mitTransportVersion } from "@bos/eeb-format/model";
+import { datumAusIso, mitTransportVersion, staerke } from "@bos/eeb-format/model";
 import { bogenPruefen, dateinameTeil, einheitAnzeigename, migriereBogen } from "./hilfen";
+import { bogenBefund } from "./bogen-pruefung";
 import { aktive, imPapierkorb, papierkorbBereinigt } from "@bos/meldekopf/papierkorb";
+import { geprueftesJetztMs, stempelZeitpunkt } from "./datenschutz-uhr";
+import { unlesbarerGesamttext, unlesbareVorlagenteile, unlesbaresBeiseitelegen } from "./unlesbar";
 
 /** Versionierter Schlüssel — erlaubt spätere Formatwechsel der Sammlung selbst. */
 const SPEICHER_SCHLUESSEL = "eeb.vorlagen.v1";
@@ -47,7 +50,7 @@ function heute(): number {
 export function bogenAlsVorlage(b: Erfassungsbogen): Erfassungsbogen {
   const kopie = structuredClone(b);
   const t = heute();
-  kopie.stand = jetztZeitpunkt();
+  kopie.stand = stempelZeitpunkt();
   kopie.einsatz = { zeitraumVon: t, zeitraumBis: t, ortAuftrag: "" };
   return kopie;
 }
@@ -56,6 +59,20 @@ export function bogenAlsVorlage(b: Erfassungsbogen): Erfassungsbogen {
 export interface MusterungAuswahl {
   personal: boolean[];
   fahrzeuge: boolean[];
+  /**
+   * Den Standard-Sofortbedarf der Vorlage übernehmen? Fehlt/false = nein.
+   * Er gehört zum letzten Einsatz, nicht zur Einheit: still übernommen, stand
+   * „120 l Diesel" im nächsten Alarm und am Meldekopf in der Bedarfssumme
+   * (Audit Runde 2, R2-W1). Wer ihn will, hakt ihn in der Musterung bewusst an.
+   */
+  sofortbedarf?: boolean;
+  /**
+   * Die Bemerkung („Sonstiges") der Vorlage übernehmen? Fehlt/false = nein.
+   * Sie beschreibt oft den Stand beim Speichern („2 Sollplätze unbesetzt, Anh
+   * in Instandsetzung") und stimmte nach der Musterung nicht mehr — still
+   * übernommen stand sie falsch im übergebenen Bogen (Audit Runde 3, R3-H7).
+   */
+  sonstiges?: boolean;
 }
 
 /**
@@ -69,6 +86,13 @@ export function vorlageInstanziieren(
   const b = bogenAlsVorlage(vorlageBogen); // gleiche Reset-Logik (Einsatz leer, stand heute)
   b.personal = b.personal.filter((_, i) => auswahl.personal[i] ?? true);
   b.fahrzeuge = b.fahrzeuge.filter((_, i) => auswahl.fahrzeuge[i] ?? true);
+  if (!auswahl.sonstiges) delete b.sonstiges;
+  if (!auswahl.sofortbedarf) delete b.sofortbedarf;
+  // Übernommen: die Verpflegung folgt der gemusterten Stärke, nicht der
+  // Stärke, mit der die Vorlage gespeichert wurde.
+  else if (b.sofortbedarf && b.sofortbedarf.verpflegungPersonen > 0) {
+    b.sofortbedarf = { ...b.sofortbedarf, verpflegungPersonen: staerke(b).gesamt };
+  }
   return b;
 }
 
@@ -96,6 +120,9 @@ export function vorlagenAusJson(text: string | null): Vorlage[] {
     } catch {
       continue;
     }
+    // Wie an den Eingängen: ergänzen, was sich leer lassen lässt; sonst weglassen
+    // (Audit Runde 6, R6-E1: eine Vorlage ohne Fahrzeuge legte die Startseite lahm).
+    if (!bogenBefund(e.bogen).ok) continue;
     liste.push(e);
   }
   return liste;
@@ -168,6 +195,8 @@ function speicher(): Storage | null {
   }
 }
 
+let zuletztGeprueft: string | null | undefined;
+
 /**
  * Komplette Liste inkl. Papierkorb — Basis aller Mutationen, damit beim
  * Zurückschreiben keine Papierkorb-Einträge verloren gehen. Abgelaufene
@@ -176,7 +205,17 @@ function speicher(): Storage | null {
 function alleVorlagenLaden(): Vorlage[] {
   const s = speicher();
   if (!s) return [];
-  const r = papierkorbBereinigt(vorlagenAusJson(s.getItem(SPEICHER_SCHLUESSEL)));
+  // Was `vorlagenAusJson` überspringt, ginge beim nächsten Schreiben verloren:
+  // erst beiseitelegen, damit es sich sichern lässt (R7-E2).
+  const roh = s.getItem(SPEICHER_SCHLUESSEL);
+  if (roh !== zuletztGeprueft) {
+    zuletztGeprueft = roh;
+    const unlesbar = unlesbareVorlagenteile(roh);
+    const text = unlesbarerGesamttext(roh, "vorlagen");
+    if (unlesbar.length > 0 || text) unlesbaresBeiseitelegen({ vorlagen: unlesbar, texte: text ? [text] : [] });
+  }
+  // Die geprüfte Uhr, nicht die Geräteuhr (R4-D1).
+  const r = papierkorbBereinigt(vorlagenAusJson(s.getItem(SPEICHER_SCHLUESSEL)), geprueftesJetztMs());
   if (r.entfernt > 0) vorlagenSpeichern(r.liste);
   return r.liste;
 }
@@ -237,6 +276,32 @@ export function vorlageAnlegen(name: string, bogen: Erfassungsbogen): Vorlage {
   return v;
 }
 
+/**
+ * Bogen einer bestehenden Vorlage ersetzen („Bearbeiten" auf der Vorlagenkarte:
+ * Vorlage → Assistent → „Vorlage aktualisieren"). Der Bogen wird wie beim
+ * Anlegen einsatzfrei normalisiert. Liegt die Vorlage inzwischen im Papierkorb,
+ * holt die Aktualisierung sie zurück — wer sie gerade ändert, will sie
+ * behalten. Liefert die aktualisierte Vorlage, oder null, wenn es sie nicht
+ * mehr gibt (endgültig gelöscht).
+ */
+export function vorlageAktualisieren(id: string, bogen: Erfassungsbogen): Vorlage | null {
+  const liste = alleVorlagenLaden();
+  const alt = liste.find((v) => v.id === id);
+  if (!alt) return null;
+  const { geloeschtAm: _, ...rest } = alt;
+  const neu: Vorlage = { ...rest, bogen: bogenAlsVorlage(bogen), geaendert: Date.now() };
+  vorlagenSpeichern(liste.map((v) => (v.id === id ? neu : v)));
+  return neu;
+}
+
+/**
+ * Eine Vorlage wieder auf eine frühere Fassung setzen — das „Rückgängig" nach
+ * „Vorlage aktualisieren" (Audit Runde 2, R2-D2).
+ */
+export function vorlageZuruecksetzen(fassung: Vorlage): void {
+  vorlagenSpeichern(alleVorlagenLaden().map((v) => (v.id === fassung.id ? fassung : v)));
+}
+
 export function vorlageUmbenennen(id: string, name: string): void {
   vorlagenSpeichern(
     alleVorlagenLaden().map((v) =>
@@ -248,7 +313,7 @@ export function vorlageUmbenennen(id: string, name: string): void {
 /** In den Papierkorb verschieben (30 Tage wiederherstellbar). */
 export function vorlageLoeschen(id: string): void {
   vorlagenSpeichern(
-    alleVorlagenLaden().map((v) => (v.id === id ? { ...v, geloeschtAm: Date.now() } : v)),
+    alleVorlagenLaden().map((v) => (v.id === id ? { ...v, geloeschtAm: geprueftesJetztMs() } : v)),
   );
 }
 

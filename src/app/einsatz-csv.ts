@@ -13,12 +13,16 @@
  * wie alle Exporte rein lokal.
  */
 
-import { staerke, unterbringungMWD, verpflegung, type Erfassungsbogen } from "@bos/eeb-format/model";
+import { staerke, type Erfassungsbogen } from "@bos/eeb-format/model";
 import type { EinsatzArt } from "@bos/meldekopf/einsaetze";
-import { einheitAnzeigename, orgLabel, vokabText, vokabularFuer, zeitgruppe } from "./hilfen";
-import { aktuelleMeldungen, zaehltInLage } from "./auswertung";
+import { geltendeJeEinheit } from "./fassung-vorrang";
+import { einheitAnzeigename, orgLabel, vokabText, vokabularFuer, zeitpunktDeutsch } from "./hilfen";
+import { meldungsNummern, pruefpunkteEintrag } from "./einheiten-tabelle";
+import { aktuelleMeldungen, unterbringungLage, verpflegungLage, zaehltInLage } from "./auswertung";
 import { csvDatei, csvZeile } from "./csv";
-import { MeldeStatus, neuesteJeEinheit, type Einsatzsammlung, type MeldeEintrag, type MeldeQuelle } from "@bos/meldekopf/einsaetze";
+import { nachtragGrundText, ortHinweisText, ortHinweise } from "./export-stand";
+import { HERKUNFT_TEXT, eintreffzeit, zeitLang } from "./eintrag-zeiten";
+import { MeldeStatus, type Einsatzsammlung, type MeldeEintrag, type MeldeQuelle } from "@bos/meldekopf/einsaetze";
 
 const STATUS_LABEL: Record<MeldeStatus, string> = {
   [MeldeStatus.ANWESEND]: "anwesend",
@@ -26,15 +30,13 @@ const STATUS_LABEL: Record<MeldeStatus, string> = {
   [MeldeStatus.AUFGEGANGEN]: "aufgegangen",
 };
 
-const QUELLE_LABEL: Record<MeldeQuelle, string> = {
-  scan: "Scan",
-  manuell: "Manuell",
-  "pdf-import": "PDF-Import",
-  aufteilung: "Aufteilung",
-  zusammenfuehrung: "Zusammenführung",
-};
+// Derselbe Wortlaut wie auf der Karte (Audit Runde 2, R2-K6).
+const QUELLE_LABEL: Record<MeldeQuelle, string> = HERKUNFT_TEXT;
 
 const SPALTEN = [
+  // Laufende Nummer wie an der Karte und auf dem Lageblatt — Abgleich
+  // zwischen Papier und Datei über „Nr. 7" (Audit Runde 3, R3-K7).
+  "Nr.",
   "Einheit",
   "Teil",
   "Organisation",
@@ -46,22 +48,43 @@ const SPALTEN = [
   "Verpflegung gesamt",
   "Verpflegung veg.",
   "Verpflegung vegan",
-  "Unterbringung M",
-  "Unterbringung W",
-  "Unterbringung D",
+  // Zwei Zahlen, zwei Fragen — wie auf Lageblatt und in der Excel-Liste (R4-W5):
+  // Schlafplätze brauchen nur die Einheiten mit angeforderter Unterbringung,
+  // WC und Duschen alle Anwesenden. Beide unter derselben Überschrift zu führen
+  // ließ den Stab 50 statt 35 Plätze planen.
+  "Unterbringung angefordert M",
+  "Unterbringung angefordert W",
+  "Unterbringung angefordert D",
+  "WC/Dusche M",
+  "WC/Dusche W",
+  "WC/Dusche D",
   "Diesel (l)",
   "Benzin (l)",
   "Gemisch (l)",
-  "Fahrzeuge",
+  // Anzahl und Liste getrennt: in der Summenzeile stand eine Zahl unter einer
+  // Liste (R4-K8).
+  "Fahrzeuge (Anzahl)",
+  "Fahrzeuge (Liste)",
   "Stand",
+  // Eintreff- und Abrückzeit der Führungsstelle — für Einsatztagebuch und
+  // Abrechnung (Führungssicht-Audit K2). „Empfangen" bleibt daneben der
+  // Moment, in dem das Gerät die Meldung angenommen hat.
+  "Eingetroffen",
+  "Abgerückt",
   "Empfangen",
   "Quelle",
   "Status",
   "Zählt in Lage",
   "Übung",
   "Sofortbedarf",
+  // Offene Punkte der Meldung — gingen in jede Tabelle verloren (R4-K8).
+  "Hinweise",
   "Signatur",
   "Absender",
+  "Auftrag/Notiz",
+  // Was die Einheit selbst dazuschreibt („Nachschub nötig") — stand nur in
+  // „Alle Daten" und in der Excel-Liste (Audit Runde 3, R3-K3).
+  "Bemerkung (Einheit)",
 ] as const;
 
 /** Anzeigename wie in der Meldekopf-Oberfläche: Organisation + Standort + Einheitstyp. */
@@ -100,13 +123,15 @@ function absenderText(e: MeldeEintrag): string {
   return [a.name, a.telefon, a.email].map((x) => x?.trim()).filter(Boolean).join(" · ");
 }
 
-function datenZeile(art: EinsatzArt, e: MeldeEintrag): string {
+function datenZeile(art: EinsatzArt, e: MeldeEintrag, nr: number | undefined, grund?: string, fremderOrt?: string): string {
   const b = e.bogen;
   const st = staerke(b);
-  const vp = verpflegung(b);
-  const u = unterbringungMWD(b);
+  // Wie Tabelle und Summen: Schnellerfassung zählt die Stärke (R2-N5).
+  const vp = verpflegungLage(b);
+  const u = unterbringungLage(b);
   const sb = b.sofortbedarf;
   return csvZeile([
+    nr ?? "",
     einheitName(b),
     // Eigene Spalte statt Anhängsel am Namen: nach einer Aufteilung stehen
     // sonst zwei gleichnamige Zeilen da, und filtern lässt sich das auch nicht.
@@ -120,22 +145,35 @@ function datenZeile(art: EinsatzArt, e: MeldeEintrag): string {
     vp.gesamt,
     vp.vegetarisch,
     vp.vegan,
+    ...(sb?.unterbringung ? [u.m, u.w, u.d] : [0, 0, 0]),
     u.m,
     u.w,
     u.d,
     sb?.dieselLiter ?? 0,
     sb?.benzinLiter ?? 0,
     sb?.gemischLiter ?? 0,
+    b.fahrzeuge.length,
     fahrzeugListe(b),
-    zeitgruppe(b.stand),
-    new Date(e.empfangenAm).toLocaleString("de-DE", { dateStyle: "short", timeStyle: "short" }),
+    // Eine Zeitform je Datei: „04.10.2026, 14:36" für Stand, Eingetroffen,
+    // Abgerückt und Empfangen. Vorher standen „041436okt26",
+    // „04.10.2026, 14:41" und „04.10.26, 14:41" in derselben Zeile (R3-K7).
+    zeitpunktDeutsch(b.stand),
+    zeitLang(eintreffzeit(e)),
+    e.abgerueckAm != null ? zeitLang(e.abgerueckAm) : "",
+    zeitLang(e.empfangenAm),
     QUELLE_LABEL[e.quelle],
     STATUS_LABEL[e.status],
     zaehlt(art, e) ? "ja" : "nein",
     b.uebung ? "ÜBUNG" : "",
     sofortbedarfText(b),
+    // Auch „Anderer Einsatz?": die Warnung der Karte gehört zu den offenen Punkten (R5-K5).
+    [...pruefpunkteEintrag(e).map((p) => p.text), ...(fremderOrt != null ? [ortHinweisText(fremderOrt)] : [])].join(" | "),
     signaturText(e),
     absenderText(e),
+    e.notiz ?? "",
+    b.sonstiges ?? "",
+    // Nur im Nachtrag: warum die Zeile dabei ist (R5-W7).
+    ...(grund != null ? [grund] : []),
   ]);
 }
 
@@ -145,10 +183,11 @@ function zaehlt(art: EinsatzArt, e: MeldeEintrag): boolean {
 }
 
 /** Summenzeile über alle anwesenden Einheiten — spaltenweise passend zu den Datenzeilen. */
-function summenZeile(meldungen: MeldeEintrag[]): string {
+function summenZeile(meldungen: MeldeEintrag[], titel: string, mitGrund = false): string {
   const acc = {
     f: 0, u: 0, m: 0, gesamt: 0,
     vGesamt: 0, veg: 0, vegan: 0,
+    anM: 0, anW: 0, anD: 0,
     uM: 0, uW: 0, uD: 0,
     diesel: 0, benzin: 0, gemisch: 0,
     fahrzeuge: 0,
@@ -156,8 +195,8 @@ function summenZeile(meldungen: MeldeEintrag[]): string {
   for (const e of meldungen) {
     const b = e.bogen;
     const st = staerke(b);
-    const vp = verpflegung(b);
-    const un = unterbringungMWD(b);
+    const vp = verpflegungLage(b);
+    const un = unterbringungLage(b);
     acc.f += st.fuehrer;
     acc.u += st.unterfuehrer;
     acc.m += st.mannschaft;
@@ -165,6 +204,11 @@ function summenZeile(meldungen: MeldeEintrag[]): string {
     acc.vGesamt += vp.gesamt;
     acc.veg += vp.vegetarisch;
     acc.vegan += vp.vegan;
+    if (b.sofortbedarf?.unterbringung) {
+      acc.anM += un.m;
+      acc.anW += un.w;
+      acc.anD += un.d;
+    }
     acc.uM += un.m;
     acc.uW += un.w;
     acc.uD += un.d;
@@ -174,36 +218,73 @@ function summenZeile(meldungen: MeldeEintrag[]): string {
     acc.fahrzeuge += b.fahrzeuge.length;
   }
   return csvZeile([
-    `Summe (${meldungen.length} Einheiten)`,
+    "",
+    titel,
     "",
     "",
     "",
     acc.f, acc.u, acc.m, acc.gesamt,
     acc.vGesamt, acc.veg, acc.vegan,
+    acc.anM, acc.anW, acc.anD,
     acc.uM, acc.uW, acc.uD,
     acc.diesel, acc.benzin, acc.gemisch,
     acc.fahrzeuge,
     "",
     "",
+    "",
+    "",
+    "",
+    ...(mitGrund ? [""] : []),
   ]);
 }
 
 /**
  * Einsatz-Sammlung → CSV-Text (mit BOM). Zeilen: Kopf, je anwesende Einheit
- * eine Zeile (nach Anzeigename sortiert), zuletzt die Summenzeile.
+ * eine Zeile (nach Nr. sortiert), zuletzt die Summenzeile.
+ *
+ * Als Nachtrag („nur neue Bögen", `s.nachtragGruende`) nennt eine letzte Spalte
+ * den Grund jeder Zeile („neu", „geändert: Zug"). Die „Summe Nachtrag" zählt nur
+ * die neuen Einheiten; die geänderten stehen in einer eigenen Zeile und ersetzen
+ * ihre Zeile der letzten Lieferung — wer beide addierte, zählte Kräfte doppelt
+ * (R5-W7). Eine Schlusszeile sagt, dass die Datei nur ein Teil der Lage ist
+ * (R5-K6).
  */
-export function einsatzCsvInhalt(s: Einsatzsammlung): string {
+export function einsatzCsvInhalt(
+  s: Einsatzsammlung,
+  /** Nummern aus der ganzen Sammlung — beim Teilexport „nur neue" sonst verschoben. */
+  nummern: Map<string, number> = meldungsNummern(s.eintraege),
+  /** Nachtrag auch ohne Gründe (ältere Aufrufer): die Summe heißt „Summe Nachtrag" (R4-W4). */
+  nachtrag = s.nachtragGruende != null,
+): string {
   // Alle gemeldeten Einheiten, nicht nur die zählenden: Eine abgerückte oder
   // als Übung geführte Einheit fiel bisher wortlos aus der Datei — die
   // Führungsstelle sah eine Lücke, die sie nicht als Lücke erkennen konnte.
   // Die Spalten „Status" und „Zählt in Lage" sagen, was die Summe enthält.
-  const alle = neuesteJeEinheit(s.eintraege).sort((a, b) =>
-    einheitName(a.bogen).localeCompare(einheitName(b.bogen), "de"),
+  // Nach Nr. wie Lageblatt, Sammel-PDF und Liste am Gerät (R8-A2): Wer Blatt und Tabelle nebeneinanderlegt,
+  // vergleicht Zeile für Zeile. Ohne Nummer (kommt nicht vor) nach Name.
+  const alle = geltendeJeEinheit(s.eintraege).sort(
+    (a, b) =>
+      (nummern.get(a.einheitSchluessel) ?? Infinity) - (nummern.get(b.einheitSchluessel) ?? Infinity) ||
+      einheitName(a.bogen).localeCompare(einheitName(b.bogen), "de"),
   );
+  const gruende = s.nachtragGruende;
   const zaehlende = aktuelleMeldungen(s.eintraege, s.art);
+  const kopf = csvZeile([...SPALTEN, ...(gruende ? ["Im Nachtrag wegen"] : [])]);
+  const orte = ortHinweise(s);
+  const zeilen = alle.map((e) => datenZeile(s.art, e, nummern.get(e.einheitSchluessel), gruende ? nachtragGrundText(gruende[e.einheitSchluessel]) : undefined, orte[e.einheitSchluessel]));
+  if (!gruende) {
+    return csvDatei([kopf, ...zeilen, summenZeile(zaehlende, `${nachtrag ? "Summe Nachtrag" : "Summe"} (${zaehlende.length} Einheiten)`)]);
+  }
+  const neu = zaehlende.filter((e) => gruende[e.einheitSchluessel]?.neu);
+  const geaendert = zaehlende.filter((e) => gruende[e.einheitSchluessel] && !gruende[e.einheitSchluessel]!.neu);
+  const seit = s.nachtragSeit != null ? ` seit ${zeitLang(s.nachtragSeit)}` : "";
   return csvDatei([
-    csvZeile([...SPALTEN]),
-    ...alle.map((e) => datenZeile(s.art, e)),
-    summenZeile(zaehlende),
+    kopf,
+    ...zeilen,
+    summenZeile(neu, `Summe Nachtrag — nur neue Einheiten (${neu.length})`, true),
+    ...(geaendert.length > 0
+      ? [summenZeile(geaendert, `Geänderte Einheiten (${geaendert.length}) — ersetzen ihre Zeile der letzten Lieferung, NICHT zur Summe addieren`, true)]
+      : []),
+    csvZeile([`NACHTRAG${seit} — nicht die ganze Lage (${alle.length} ${alle.length === 1 ? "Einheit" : "Einheiten"} in dieser Datei)`]),
   ]);
 }

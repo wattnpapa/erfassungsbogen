@@ -1,0 +1,254 @@
+{
+  "schemaVersion": 9,
+  "uebung": true,
+  "stand": 2171520,
+  "einheit": {
+    "organisation": 6,
+    "einheitsTyp": {
+      "freitext": "Transportgruppe"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "code": 1
+        },
+        "name": "Johannesburg"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 1508,
+    "zeitraumBis": 1508,
+    "ortAuftrag": "Praktische Ausbildung (Übung): Einheitenerfassung der geplanten Einsatzeinheiten"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "nachname": "Schütte",
+      "vorname": "Ingo",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "NEF 1"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Arzt"
+        }
+      ]
+    },
+    {
+      "nachname": "Poul",
+      "vorname": "Simone",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "NEF 1"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "NFS"
+        }
+      ]
+    },
+    {
+      "nachname": "Fehren",
+      "vorname": "Uschi",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "NEF 2"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Arzt"
+        }
+      ]
+    },
+    {
+      "nachname": "Taucher",
+      "vorname": "Karo",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "NEF 2"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "NFS"
+        }
+      ]
+    },
+    {
+      "nachname": "Willer",
+      "vorname": "Nils",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "RTW 1"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "NFS"
+        }
+      ]
+    },
+    {
+      "nachname": "Knoller",
+      "vorname": "Mario",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "RTW 1"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "RS"
+        }
+      ]
+    },
+    {
+      "nachname": "Sommer",
+      "vorname": "Matthias",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "RTW 2"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "NFS"
+        }
+      ]
+    },
+    {
+      "nachname": "Eckert",
+      "vorname": "Susanne",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "RTW 2"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "RS"
+        }
+      ]
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "NEF"
+      },
+      "kennzeichen": "JO-JU 24",
+      "funkrufname": {
+        "kennwort": {
+          "code": 4
+        },
+        "eigenerStandort": false,
+        "ort": "Johannesburg",
+        "teile": [
+          55,
+          82,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "NEF"
+      },
+      "kennzeichen": "JO-JU 25",
+      "funkrufname": {
+        "kennwort": {
+          "code": 4
+        },
+        "eigenerStandort": false,
+        "ort": "Johannesburg",
+        "teile": [
+          55,
+          82,
+          2
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "RTW"
+      },
+      "kennzeichen": "JO-JU 26",
+      "funkrufname": {
+        "kennwort": {
+          "code": 4
+        },
+        "eigenerStandort": false,
+        "ort": "Johannesburg",
+        "teile": [
+          55,
+          83,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "RTW"
+      },
+      "kennzeichen": "JO-JU 27",
+      "funkrufname": {
+        "kennwort": {
+          "code": 4
+        },
+        "eigenerStandort": false,
+        "ort": "Johannesburg",
+        "teile": [
+          55,
+          83,
+          2
+        ]
+      }
+    }
+  ],
+  "sonstiges": "Fachdienst: Sonst.: Transport. Hauptleistung: Sonst.: Transport. Kommunikation: Rufname 55-82-01."
+}

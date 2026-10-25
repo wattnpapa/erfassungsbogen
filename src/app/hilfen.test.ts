@@ -21,6 +21,7 @@ import {
   PersonalErfassung,
   StaerkeRolle,
   SCHEMA_VERSION,
+  MINUTEN_JE_TAG,
   datumAusIso,
   zeitpunktAusIso,
   type Erfassungsbogen,
@@ -29,9 +30,12 @@ import {
   type Person,
 } from "@bos/eeb-format/model";
 import {
+  betriebsstoffPlausibilitaet,
+  einheitAnzeigename,
   bogenLaden,
   browserKompressor,
   fahrzeugHinweise,
+  fahrzeugUnbenannt,
   inflateRawBegrenzt,
   MAX_ENTPACKT,
   migriereBogen,
@@ -39,11 +43,17 @@ import {
   neuerBogen,
   natoZeitstempel,
   neuesFahrzeug,
+  nurSollstaerke,
+  personUnbenannt,
   plausibilitaet,
+  pruefpunkte,
   qrErzeugen,
   schrittStatus,
+  staerkePlausibilitaet,
   transportBilanz,
+  verpflegungMitziehen,
   verschoben,
+  zeitpunktDeutsch,
 } from "./hilfen";
 import { deflateRaw } from "pako";
 import QRCode from "qrcode";
@@ -258,6 +268,17 @@ describe("plausibilitaet()", () => {
     expect(plausibilitaet(b).some((h) => /„bis“ liegt vor „von“/.test(h))).toBe(true);
   });
 
+  it("macht aus einem Jahresdreher im Zeitraum genau einen Hinweis, der das Jahr nennt (R3-E7)", () => {
+    const b = bogen({
+      personal: [person()],
+      einsatz: { zeitraumVon: datumAusIso("2062-07-16"), zeitraumBis: datumAusIso("2026-07-10"), ortAuftrag: "X" },
+    });
+    const zeitraum = pruefpunkte(b, true, datumAusIso("2026-10-04")).filter((p) => /Einsatzzeitraum/.test(p.text));
+    expect(zeitraum.map((p) => p.text)).toEqual([
+      "Einsatzzeitraum: „bis“ liegt vor „von“ — 16.07.2062 liegt mehr als ein Jahr entfernt, Tippfehler im Jahr 2062?",
+    ]);
+  });
+
   it("prüft die Unterbringungssumme nur bei belastbarer Grundlage (Meldekopf ohne manuelle Angabe: kein Hinweis)", () => {
     const b = bogen({
       personalErfassung: PersonalErfassung.NUR_STAERKE,
@@ -354,6 +375,21 @@ describe("bogenLaden() (JSON-Datei)", () => {
     expect(b.verpflegungManuell).toEqual({ vegetarisch: 2, vegan: 0 });
   });
 
+  // Audit Runde 6, R6-E3: Die gesicherte Hülle des beiseitegelegten Entwurfs.
+  it("liest einen Bogen aus der gesicherten Entwurfs-Hülle", async () => {
+    const huelle = { gespeichert: 1, bogen: neuerBogen() };
+    const b = await bogenLaden(jsonDatei(JSON.stringify(huelle)));
+    expect(b.schemaVersion).toBe(SCHEMA_VERSION);
+  });
+
+  it("nennt bei unvollständigem Bogen in der Hülle, was fehlt, und dass die Datei nur dem dient, der die App betreut", async () => {
+    const bogen = JSON.parse(JSON.stringify(neuerBogen()));
+    delete bogen.einheit.organisation;
+    await expect(bogenLaden(jsonDatei(JSON.stringify({ gespeichert: 1, bogen })))).rejects.toThrow(
+      /gesicherte Entwurf.*Organisation der Einheit fehlt.*betreut/s,
+    );
+  });
+
   it("lehnt kaputtes JSON ab", async () => {
     await expect(bogenLaden(jsonDatei("{ kein json"))).rejects.toThrow(/kein gültiges JSON/i);
   });
@@ -369,9 +405,9 @@ describe("bogenLaden() (JSON-Datei)", () => {
   });
 
   it("lehnt eine Datei ohne Pflichtstruktur ab", async () => {
-    await expect(bogenLaden(jsonDatei(JSON.stringify({ schemaVersion: SCHEMA_VERSION })))).rejects.toThrow(
-      /gültige Erfassungsbogen-Datei/i,
-    );
+    // Gültige Version, aber kein Pflichtfeld: Die Meldung nennt das Feld statt der Version (R8-E3).
+    await expect(bogenLaden(jsonDatei(JSON.stringify({ schemaVersion: SCHEMA_VERSION })))).rejects.toThrow(/unvollständig: der Stand/i);
+    await expect(bogenLaden(jsonDatei(JSON.stringify({ stand: 1 })))).rejects.toThrow(/gültige Erfassungsbogen-Datei/i);
   });
 });
 
@@ -389,7 +425,7 @@ describe("plausibilitaet() — Stärke ohne Substanz", () => {
         { ...neuePerson(), nachname: "Eva", geschlecht: Geschlecht.M },
       ],
     };
-    expect(plausibilitaet(b).some((t) => /Vorbelegung „M"/.test(t))).toBe(true);
+    expect(plausibilitaet(b).some((t) => /Geschlecht „männlich" — das ist die Vorbelegung/.test(t))).toBe(true);
   });
 
   it("schweigt, sobald das Geschlecht irgendwo abweicht", () => {
@@ -491,6 +527,26 @@ describe("schrittStatus", () => {
     expect(schrittStatus(b)[2]).toBe("begonnen");
   });
 
+  // Audit Runde 4, R4-H1: Ein ausgeschriebener Einheitstyp ohne Code stand als „1 ✓" da.
+  it("zeigt Schritt 1 mit Freitext-Einheitstyp nicht als fertig und führt den Punkt in der Übersicht (R4-H1)", () => {
+    const b = neuerBogen();
+    b.einheit.einheitsTyp = { freitext: "Berg" };
+    b.einheit.hierarchie = [{ bezeichnung: { code: 1 }, name: "Ulm" }];
+    expect(schrittStatus(b)[0]).toBe("begonnen");
+    expect(pruefpunkte(b).map((p) => p.text)).toContain(
+      "Einheitstyp „Berg\" nicht erkannt — nicht aus der Liste gewählt, deshalb fehlen taktisches Zeichen und Soll-Vergleich.",
+    );
+
+    b.einheit.einheitsTyp = { code: 43 };
+    expect(schrittStatus(b)[0]).toBe("ok");
+    expect(pruefpunkte(b).some((p) => p.text.startsWith("Einheitstyp"))).toBe(false);
+
+    // Schnellerfassung (nur Stärke): der Name genügt, ein Freitext-Typ stört nicht.
+    const schnell = { ...b, personalErfassung: PersonalErfassung.NUR_STAERKE, einheit: { ...b.einheit, einheitsTyp: { freitext: "Berg" } } };
+    expect(schrittStatus(schnell)[0]).toBe("ok");
+    expect(pruefpunkte(schnell, false).some((p) => p.text.startsWith("Einheitstyp"))).toBe(false);
+  });
+
   it("meldet für einen leeren Bogen alle Schritte als leer", () => {
     expect(schrittStatus(neuerBogen())).toEqual(["leer", "leer", "leer", "leer", "leer"]);
   });
@@ -502,21 +558,57 @@ describe("schrittStatus", () => {
     b.einsatz.ortAuftrag = "Übung Kabelblitz";
     // Mit Namen: eine leere Personenkarte zählt zwar in die Stärke, macht den
     // Schritt aber nicht fertig (sie ist meist ein Fehlgriff).
-    b.personal = [{ ...neuePerson(), nachname: "Muster", vorname: "Max" }];
-    b.fahrzeuge = [neuesFahrzeug()];
+    b.personal = [{
+      ...neuePerson(),
+      nachname: "Muster",
+      vorname: "Max",
+      fahrerlaubnis: Fahrerlaubnis.B,
+      kontakte: [{ art: KontaktArt.MOBIL, dienstlich: true, wert: "0170 1234567" }],
+    }];
+    b.fahrzeuge = [{ ...neuesFahrzeug(), kennzeichen: "THW-84397" }];
     b.sofortbedarf = { verpflegungPersonen: 1, dieselLiter: 0, benzinLiter: 0, gemischLiter: 0, unterbringung: false, ruhezeitErforderlich: false };
     expect(schrittStatus(b)).toEqual(["ok", "ok", "ok", "ok", "ok"]);
+    // Ohne Rufnummer hat Schritt 3 einen Prüfpunkt — dann kein Haken (R3-N4).
+    b.personal = [{ ...b.personal[0]!, kontakte: [] }];
+    expect(schrittStatus(b)[2]).toBe("begonnen");
+  });
+
+  it("gibt 3 von 9 Namen keinen Haken (R3-N4)", () => {
+    const b = neuerBogen();
+    b.personal = [
+      ...["Huber", "Schmid", "Meier"].map((nachname) => ({ ...neuePerson(), nachname, vorname: "X" })),
+      ...Array.from({ length: 6 }, () => ({ ...neuePerson(), funktionen: [{ code: 1 }] })),
+    ];
+    expect(schrittStatus(b)[2]).toBe("begonnen");
+  });
+
+  it("wertet in der Schnellerfassung Schritt 1 schon mit dem Namen als fertig (R3-N4)", () => {
+    const b = neuerBogen();
+    b.personalErfassung = PersonalErfassung.NUR_STAERKE;
+    b.einheit.hierarchie = [{ bezeichnung: { code: 1 }, name: "Biberach" }];
+    expect(schrittStatus(b)[0]).toBe("ok");
+    b.personalErfassung = PersonalErfassung.VOLLSTAENDIG;
+    expect(schrittStatus(b)[0]).toBe("begonnen");
+  });
+
+  it("gibt reinen Sollplätzen keinen Haken (R2-N3)", () => {
+    const b = neuerBogen();
+    b.personal = [{ ...neuePerson(), funktionen: [{ code: 1 }] }, { ...neuePerson(), funktionen: [{ code: 2 }] }];
+    b.fahrzeuge = [neuesFahrzeug(), neuesFahrzeug()];
+    const s = schrittStatus(b);
+    expect(s[2]).toBe("begonnen");
+    expect(s[3]).toBe("begonnen");
   });
 
   it("erkennt Zwischenzustände als begonnen", () => {
     const b = neuerBogen();
     b.einheit.hierarchie = [{ bezeichnung: { code: 1 }, name: "OV X" }]; // Typ fehlt noch → begonnen
     b.einsatz.einsatzbeginn = 1000; // Ort fehlt noch → begonnen
+    expect(schrittStatus(b)[0]).toBe("begonnen");
     b.personalErfassung = PersonalErfassung.NUR_STAERKE;
     b.staerkeManuell = { fuehrer: 0, unterfuehrer: 0, mannschaft: 0, gesamt: 0 };
     b.personal = [neuePerson()]; // Ansprechpartner erfasst, Stärke aber 0 → begonnen
     const s = schrittStatus(b);
-    expect(s[0]).toBe("begonnen");
     expect(s[1]).toBe("begonnen");
     expect(s[2]).toBe("begonnen");
   });
@@ -703,5 +795,258 @@ describe("verschoben", () => {
     expect(verschoben(["a", "b"], 0, -1)).toEqual(["a", "b"]);
     expect(verschoben(["a", "b"], 1, 2)).toEqual(["a", "b"]);
     expect(verschoben([], 0, 0)).toEqual([]);
+  });
+});
+
+describe("zeitpunktDeutsch()", () => {
+  it("schreibt Datum und Uhrzeit wie der Papierbogen: „27.09.2026, 18:00“", () => {
+    expect(zeitpunktDeutsch(zeitpunktAusIso("2026-09-27T18:00"))).toBe("27.09.2026, 18:00");
+    expect(zeitpunktDeutsch(zeitpunktAusIso("2026-01-05T06:05"))).toBe("05.01.2026, 06:05");
+  });
+});
+
+/**
+ * Der Bedarf in Schritt 5 folgt der Stärke, solange er ihr entsprach — wer
+ * bewusst mehr bestellt hat, behält seine Zahl (Audit Arbeitsablauf W4).
+ */
+describe("verpflegungMitziehen()", () => {
+  const sb = (verpflegungPersonen: number) => ({
+    verpflegungPersonen,
+    dieselLiter: 0,
+    benzinLiter: 0,
+    gemischLiter: 0,
+    unterbringung: false,
+    ruhezeitErforderlich: false,
+  });
+
+  it("zieht den Bedarf nach, wenn er der alten Stärke entsprach", () => {
+    const vorher = { ...neuerBogen(), personal: [person(), person()], sofortbedarf: sb(2) };
+    const patch = verpflegungMitziehen(vorher, { personal: [person()] });
+    expect(patch.sofortbedarf?.verpflegungPersonen).toBe(1);
+  });
+
+  it("zieht auch einen noch nicht gesetzten Bedarf (0) nach", () => {
+    const vorher = { ...neuerBogen(), personal: [], sofortbedarf: sb(0) };
+    const patch = verpflegungMitziehen(vorher, { personal: [person(), person(), person()] });
+    expect(patch.sofortbedarf?.verpflegungPersonen).toBe(3);
+  });
+
+  it("lässt einen abweichenden Bedarf stehen", () => {
+    const vorher = { ...neuerBogen(), personal: [person(), person()], sofortbedarf: sb(5) };
+    const patch = verpflegungMitziehen(vorher, { personal: [person()] });
+    expect(patch.sofortbedarf).toBeUndefined(); // Patch unverändert
+  });
+
+  it("rührt nichts an, wenn kein Sofortbedarf erfasst ist oder die Stärke gleich bleibt", () => {
+    const ohne = { ...neuerBogen(), personal: [person()] };
+    expect(verpflegungMitziehen(ohne, { personal: [] })).toEqual({ personal: [] });
+    const gleich = { ...neuerBogen(), personal: [person()], sofortbedarf: sb(1) };
+    const patch = verpflegungMitziehen(gleich, { personal: [person({ vorname: "Neu" })] });
+    expect(patch.sofortbedarf).toBeUndefined();
+  });
+
+  it("rechnet mit der manuellen Stärke, wenn auf „Nur Stärke“ umgeschaltet wird", () => {
+    const vorher = { ...neuerBogen(), personal: [person(), person()], sofortbedarf: sb(2) };
+    const patch = verpflegungMitziehen(vorher, {
+      personalErfassung: PersonalErfassung.NUR_STAERKE,
+      staerkeManuell: { fuehrer: 1, unterfuehrer: 0, mannschaft: 9, gesamt: 10 },
+    });
+    expect(patch.sofortbedarf?.verpflegungPersonen).toBe(10);
+  });
+});
+
+/** Zahlendreher und Zeitfehler, die vorher ungeprüft in die Übergabe gingen (Audit E4). */
+describe("plausibilitaet() — Zahlendreher und Zeitfehler", () => {
+  it("meldet ein Einsatzende vor dem Einsatzbeginn mit lesbaren Zeitpunkten", () => {
+    const b = neuerBogen();
+    b.einsatz.einsatzbeginn = zeitpunktAusIso("2026-09-27T18:00");
+    b.einsatz.einsatzende = zeitpunktAusIso("2026-09-27T06:00");
+    const punkt = pruefpunkte(b).find((p) => /Einsatzende/.test(p.text))!;
+    expect(punkt.text).toBe("Einsatzende 27.09.2026, 06:00 liegt vor dem Einsatzbeginn 27.09.2026, 18:00.");
+    expect(punkt.schritt).toBe(1);
+  });
+
+  it("schweigt bei Einsatzende nach dem Beginn oder ohne einen der Zeitpunkte", () => {
+    const b = neuerBogen();
+    b.einsatz.einsatzbeginn = zeitpunktAusIso("2026-09-27T18:00");
+    expect(plausibilitaet(b).some((h) => /Einsatzende/.test(h))).toBe(false);
+    b.einsatz.einsatzende = zeitpunktAusIso("2026-09-28T06:00");
+    expect(plausibilitaet(b).some((h) => /Einsatzende/.test(h))).toBe(false);
+  });
+
+  it("stutzt bei 99 Führern und bei mehr Führern als Mannschaft", () => {
+    const b = { ...neuerBogen(), personalErfassung: PersonalErfassung.NUR_STAERKE, staerkeManuell: { fuehrer: 99, unterfuehrer: 0, mannschaft: 1, gesamt: 100 } };
+    const h = plausibilitaet(b);
+    expect(h).toContain("Stärke: 99 Führer — stimmt das?");
+    expect(h).toContain("Stärke 99 / 0 / 1 / 100: mehr Führer als Mannschaft — stimmt das?");
+  });
+
+  it("lässt kleine Trupps und normale Gruppen in Ruhe", () => {
+    // Trupp: Führer + Unterführer, keine Mannschaft — normal, kein Hinweis.
+    expect(staerkePlausibilitaet({ fuehrer: 1, unterfuehrer: 1, mannschaft: 0, gesamt: 2 })).toEqual([]);
+    expect(staerkePlausibilitaet({ fuehrer: 0, unterfuehrer: 2, mannschaft: 7, gesamt: 9 })).toEqual([]);
+    expect(staerkePlausibilitaet({ fuehrer: 3, unterfuehrer: 0, mannschaft: 1, gesamt: 4 })).toHaveLength(1);
+  });
+
+  it("meldet 0 Sitzplätze an einem Fahrzeug, das laut Typ Leute befördert — nicht am Anhänger", () => {
+    const b = neuerBogen();
+    b.fahrzeuge = [
+      { typ: { code: 4 }, kennzeichen: "THW-1", sitzplaetze: 0 }, // GKW, Richtwert 9
+      { typ: { code: 43 }, kennzeichen: "THW-2", sitzplaetze: 0 }, // Anhänger, Richtwert 0
+    ];
+    const h = fahrzeugHinweise(b);
+    expect(h).toContain("GKW THW-1: 0 Sitzplätze eingetragen (Richtwert 9) — stimmt das?");
+    expect(h.some((t) => /Anh/.test(t))).toBe(false);
+  });
+
+  it("meldet Betriebsstoff über 1000 l je Fahrzeug, mit Tausenderpunkt", () => {
+    const b = neuerBogen();
+    b.fahrzeuge = [{ typ: { code: 4 }, kennzeichen: "THW-1" }];
+    b.sofortbedarf = { verpflegungPersonen: 0, dieselLiter: 99999, benzinLiter: 800, gemischLiter: 0, unterbringung: false, ruhezeitErforderlich: false };
+    const h = betriebsstoffPlausibilitaet(b);
+    expect(h).toEqual(["Sofortbedarf: 99.999 l Diesel für 1 Fahrzeug — mehr als 1.000 l je Fahrzeug. Stimmt das?"]);
+    // Ohne Fahrzeuge gilt die Grenze einmal.
+    expect(betriebsstoffPlausibilitaet({ ...b, fahrzeuge: [] })).toHaveLength(1);
+    expect(pruefpunkte(b).some((p) => /99\.999 l Diesel/.test(p.text) && p.schritt === 4)).toBe(true);
+  });
+});
+
+/** Was die Vorbelegung offen lässt — und was schon Inhalt ist. */
+describe("personUnbenannt() / fahrzeugUnbenannt()", () => {
+  it("zählt Sollplätze ohne Namen und Erreichbarkeit als unbenannt", () => {
+    const sollplatz = { ...neuePerson(), staerkeRolle: StaerkeRolle.UNTERFUEHRER, funktionen: [{ code: 3 }] };
+    expect(personUnbenannt(sollplatz)).toBe(true);
+    expect(personUnbenannt({ ...sollplatz, nachname: "Meyer" })).toBe(false);
+    // Eine Rufnummer ohne Namen ist Inhalt — sie geht beim Typwechsel nicht verloren.
+    expect(personUnbenannt({ ...sollplatz, kontakte: [{ art: KontaktArt.MOBIL, dienstlich: true, wert: "0170" }] })).toBe(false);
+  });
+
+  it("kennt ein Fahrzeug am Kennzeichen", () => {
+    expect(fahrzeugUnbenannt({ typ: { code: 4 }, funkrufname: { kennwort: { code: 1 }, eigenerStandort: true, teile: [18, 13] } })).toBe(true);
+    expect(fahrzeugUnbenannt({ typ: { code: 4 }, kennzeichen: "THW-84397" })).toBe(false);
+    expect(fahrzeugUnbenannt({ typ: {}, kennzeichen: "  " })).toBe(true);
+  });
+
+  it("zählt Sondergerät und Sitzplätze ohne Kennzeichen als Inhalt (R3-N2)", () => {
+    const vorbelegt = { typ: { code: 4 }, stanKonform: true, funkrufname: { kennwort: { code: 1 }, eigenerStandort: true, teile: [22, 51] } };
+    expect(fahrzeugUnbenannt({ ...vorbelegt, aenderungen: "Lichtmast 2 kW" })).toBe(false);
+    expect(fahrzeugUnbenannt({ ...vorbelegt, sitzplaetze: 6 })).toBe(false);
+    expect(fahrzeugUnbenannt({ ...vorbelegt, aenderungen: "  " })).toBe(true);
+  });
+});
+
+describe("pruefpunkte: weitere Tippfehler (R2-E4)", () => {
+  it("fragt bei Rufnummer ohne Ziffer, E-Mail ohne @, Namen aus Ziffern, Sitzplätzen, doppeltem Kennzeichen und Datum", () => {
+    const b = neuerBogen();
+    b.einheit.hierarchie = [{ bezeichnung: { code: 1 }, name: "12345", telefon: "abc-xyz", email: "keinemail" }];
+    b.personal = [{ ...neuePerson(), vorname: "Max", nachname: "Muster", kontakte: [{ art: KontaktArt.MOBIL, dienstlich: true, wert: "abc" }] }];
+    b.fahrzeuge = [
+      { ...neuesFahrzeug(), kennzeichen: "THW-84397", sitzplaetze: 90 },
+      { ...neuesFahrzeug(), kennzeichen: "THW 84397" },
+    ];
+    const heute = b.einsatz.zeitraumVon;
+    b.einsatz.zeitraumBis = heute + 13000; // Jahr vertippt
+    b.einsatz.einsatzbeginn = (heute - 5) * MINUTEN_JE_TAG;
+    const texte = pruefpunkte(b, true, heute).map((p) => p.text).join("\n");
+    expect(texte).toMatch(/Rufnummer „abc-xyz" enthält keine Ziffer/);
+    expect(texte).toMatch(/E-Mail „keinemail" ohne „@"/);
+    expect(texte).toMatch(/„12345" besteht nur aus Ziffern/);
+    expect(texte).toMatch(/Muster, Max: Rufnummer „abc" ohne Ziffer/);
+    expect(texte).toMatch(/90 Sitzplätze/);
+    expect(texte).toMatch(/Kennzeichen THW-84397 steht mehrfach/);
+    expect(texte).toMatch(/mehr als ein Jahr entfernt/);
+    expect(texte).toMatch(/außerhalb des Einsatzzeitraums/);
+  });
+});
+
+describe("pruefpunkte: Schnellerfassung (R2-H9)", () => {
+  it("zählt ein leeres Ort/Auftrag bei der Schnellerfassung nicht als offenen Punkt, beim vollen Bogen schon", () => {
+    const voll = neuerBogen();
+    expect(pruefpunkte(voll).some((p) => p.text === "Ort/Auftrag ist noch leer.")).toBe(true);
+    const schnell = neuerBogen();
+    schnell.personalErfassung = PersonalErfassung.NUR_STAERKE;
+    schnell.staerkeManuell = { fuehrer: 1, unterfuehrer: 1, mannschaft: 7, gesamt: 9 };
+    expect(pruefpunkte(schnell).some((p) => p.text === "Ort/Auftrag ist noch leer.")).toBe(false);
+  });
+});
+
+describe("bogenPruefen() — Pflichtfelder (R5-E1)", () => {
+  it("ergänzt einen fehlenden Einheitstyp und nennt bei Unbrauchbarem die Ursache", async () => {
+    const { bogenPruefen, neuerBogen } = await import("./hilfen");
+    const b = JSON.parse(JSON.stringify(neuerBogen())) as Record<string, Record<string, unknown>>;
+    delete b.einheit!.einheitsTyp;
+    expect(bogenPruefen(b).einheit.einheitsTyp).toEqual({});
+    const c = JSON.parse(JSON.stringify(neuerBogen())) as Record<string, unknown>;
+    delete c.stand;
+    expect(() => bogenPruefen(c)).toThrow(/Der Bogen ist unvollständig: der Stand/);
+  });
+});
+
+describe("einheitAnzeigename() — jeder Teil einmal (R5-N6)", () => {
+  const einheit = (organisation: OrganisationsTyp, organisationName: string | undefined, ort: string, typ: string) => ({
+    organisation,
+    ...(organisationName ? { organisationName } : {}),
+    einheitsTyp: { freitext: typ },
+    hierarchie: [{ bezeichnung: { freitext: "Ort" }, name: ort }],
+  });
+
+  it("lässt den Ort weg, der schon im Organisationsnamen steht", () => {
+    expect(einheitAnzeigename(einheit(OrganisationsTyp.SONSTIGE, "DRK-Kreisverband Buchenrode e. V.", "Buchenrode", "Behandlung Kat. GELB (BHP 25)"))).toBe(
+      "DRK-Kreisverband Buchenrode e. V. Behandlung Kat. GELB (BHP 25)",
+    );
+    expect(einheitAnzeigename(einheit(OrganisationsTyp.SONSTIGE, "Berufsfeuerwehr Nordwede — MTF-Standort (Bundesausstattung)", "Nordwede", "Führungsgruppe (MTF)"))).toBe(
+      "Berufsfeuerwehr Nordwede — MTF-Standort (Bundesausstattung) Führungsgruppe (MTF)",
+    );
+  });
+
+  it("lässt den Typ weg, der dem Ort gleicht", () => {
+    expect(einheitAnzeigename(einheit(OrganisationsTyp.SONSTIGE, "Bundeswehr", "Panzerpionierzug", "Panzerpionierzug"))).toBe("Bundeswehr Panzerpionierzug");
+  });
+
+  it("lässt THW-Namen und verschiedene Teile unberührt, auch bei Teilwörtern", () => {
+    expect(einheitAnzeigename(einheit(OrganisationsTyp.THW, undefined, "Ulm", "Bergungsgruppe"))).toBe("THW Ulm Bergungsgruppe");
+    // „Ulm“ steckt in „Neu-Ulm“ nur als Wortteil mit Bindestrich — dort ist es ein eigenes Wort und entfällt zu Recht;
+    // „Ulmen“ aber ist ein anderes Wort.
+    expect(einheitAnzeigename(einheit(OrganisationsTyp.SONSTIGE, "FF Ulmen", "Ulm", "Gruppe"))).toBe("FF Ulmen Ulm Gruppe");
+  });
+});
+
+// Audit Runde 7, R7-A1: „Nur Stärke" mit den unveränderten Zahlen der Vorbelegung ist keine Zählung.
+describe("nurSollstaerke() bei der Schnellerfassung (R7-A1)", () => {
+  const vorbelegt = (): Erfassungsbogen => {
+    const b = neuerBogen();
+    b.einheit.einheitsTyp = { code: 4 };
+    b.personal = [
+      { ...neuePerson(), staerkeRolle: StaerkeRolle.UNTERFUEHRER },
+      { ...neuePerson(), staerkeRolle: StaerkeRolle.MANNSCHAFT },
+      { ...neuePerson(), staerkeRolle: StaerkeRolle.MANNSCHAFT },
+    ];
+    b.personalErfassung = PersonalErfassung.NUR_STAERKE;
+    return b;
+  };
+
+  it("gilt als Sollstärke, solange die Zahlen noch der Vorbelegung gleichen", () => {
+    const b = vorbelegt();
+    b.staerkeManuell = { fuehrer: 0, unterfuehrer: 1, mannschaft: 2, gesamt: 3 };
+    expect(nurSollstaerke(b)).toBe(true);
+    delete b.staerkeManuell;
+    expect(nurSollstaerke(b)).toBe(true);
+  });
+
+  it("gilt nicht mehr, sobald eine Zahl angefasst wurde oder eine Karte einen Namen trägt", () => {
+    const b = vorbelegt();
+    b.staerkeManuell = { fuehrer: 0, unterfuehrer: 1, mannschaft: 3, gesamt: 4 };
+    expect(nurSollstaerke(b)).toBe(false);
+    const c = vorbelegt();
+    c.staerkeManuell = { fuehrer: 0, unterfuehrer: 1, mannschaft: 2, gesamt: 3 };
+    c.personal[0] = { ...c.personal[0]!, nachname: "Meyer" };
+    expect(nurSollstaerke(c)).toBe(false);
+  });
+
+  it("gilt ohne Vorbelegungskarten nie (die Zahl ist dann die Angabe)", () => {
+    const b = vorbelegt();
+    b.personal = [];
+    b.staerkeManuell = { fuehrer: 0, unterfuehrer: 1, mannschaft: 2, gesamt: 3 };
+    expect(nurSollstaerke(b)).toBe(false);
   });
 });

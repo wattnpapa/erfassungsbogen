@@ -1,0 +1,256 @@
+{
+  "schemaVersion": 9,
+  "uebung": true,
+  "stand": 2171520,
+  "einheit": {
+    "organisation": 6,
+    "einheitsTyp": {
+      "freitext": "1. Sanitätsgruppe"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "code": 1
+        },
+        "name": "Johannesburg"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 1508,
+    "zeitraumBis": 1508,
+    "ortAuftrag": "Praktische Ausbildung (Übung): Einheitenerfassung der geplanten Einsatzeinheiten"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "nachname": "Symietz",
+      "vorname": "Sabine",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "GF"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "RS"
+        }
+      ]
+    },
+    {
+      "nachname": "Garbosch",
+      "vorname": "Kurt",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "Arzt"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Arzt"
+        }
+      ]
+    },
+    {
+      "nachname": "Pietsch",
+      "vorname": "Jürgen",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "TF"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "NFS"
+        }
+      ]
+    },
+    {
+      "nachname": "Garten",
+      "vorname": "Anabel",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "HE"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "SAN-H"
+        }
+      ]
+    },
+    {
+      "nachname": "Wiese",
+      "vorname": "Lisa",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "TF"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "RS"
+        }
+      ]
+    },
+    {
+      "nachname": "Meyer",
+      "vorname": "Ute",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "HE"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "SAN-H"
+        }
+      ]
+    },
+    {
+      "nachname": "Schridde",
+      "vorname": "Benjamin",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "TF"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "SAN-H"
+        }
+      ]
+    },
+    {
+      "nachname": "Wittenberg",
+      "vorname": "Roland",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "HE"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "SAN-H"
+        }
+      ]
+    },
+    {
+      "nachname": "Rodern",
+      "vorname": "Philipp",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kraftfahrer/Melder"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "SAN-H"
+        }
+      ]
+    },
+    {
+      "nachname": "Schütter",
+      "vorname": "Ramona",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kraftfahrer/Melder"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "SAN-H"
+        }
+      ]
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "GW-SAN"
+      },
+      "kennzeichen": "JO-JU 21",
+      "funkrufname": {
+        "kennwort": {
+          "code": 4
+        },
+        "eigenerStandort": false,
+        "ort": "Johannesburg",
+        "teile": [
+          55,
+          96,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "MTW"
+      },
+      "kennzeichen": "JO-JU 22",
+      "funkrufname": {
+        "kennwort": {
+          "code": 4
+        },
+        "eigenerStandort": false,
+        "ort": "Johannesburg",
+        "teile": [
+          55,
+          17,
+          2
+        ]
+      }
+    }
+  ],
+  "sonstiges": "Fachdienst: Sanitätsdienst. Hauptleistung: BHP. Kommunikation: Rufname 55-96-1."
+}

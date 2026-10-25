@@ -1,0 +1,249 @@
+{
+  "schemaVersion": 9,
+  "uebung": true,
+  "stand": 2171520,
+  "einheit": {
+    "organisation": 6,
+    "einheitsTyp": {
+      "freitext": "Verpflegungsgruppe"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "code": 2
+        },
+        "name": "Malter"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 1508,
+    "zeitraumBis": 1508,
+    "ortAuftrag": "Praktische Ausbildung (Übung): Einheitenerfassung der geplanten Einsatzeinheiten"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "nachname": "Maus",
+      "vorname": "Stefan",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "GF"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Verpflegungshelfer"
+        }
+      ]
+    },
+    {
+      "nachname": "Niele",
+      "vorname": "Silvia",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kraftfahrer/Melder"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Verpflegungshelfer"
+        }
+      ]
+    },
+    {
+      "nachname": "Brome",
+      "vorname": "Cornelius",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kraftfahrer/Melder"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Verpflegungshelfer"
+        }
+      ]
+    },
+    {
+      "nachname": "Pieperton",
+      "vorname": "Michelle",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Feldkoch"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Feldkoch"
+        }
+      ]
+    },
+    {
+      "nachname": "Müller",
+      "vorname": "Jordan",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Helfer"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Verpflegungshelfer"
+        }
+      ]
+    },
+    {
+      "nachname": "Bergmann",
+      "vorname": "Markus",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Feldkoch"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Feldkoch"
+        }
+      ]
+    },
+    {
+      "nachname": "Stein",
+      "vorname": "Michalea",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Helfer"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Verpflegungshelfer"
+        }
+      ]
+    },
+    {
+      "nachname": "Grober",
+      "vorname": "Niklas",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Feldkoch"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Feldkoch"
+        }
+      ]
+    },
+    {
+      "nachname": "Hoppe",
+      "vorname": "Samir",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Helfer"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Verpflegungshelfer"
+        }
+      ]
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "MTW"
+      },
+      "kennzeichen": "MA-JU 16",
+      "funkrufname": {
+        "kennwort": {
+          "code": 4
+        },
+        "eigenerStandort": false,
+        "ort": "Malter",
+        "teile": [
+          54,
+          17,
+          4
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "Feldküche"
+      },
+      "kennzeichen": "MA-JU 17"
+    },
+    {
+      "typ": {
+        "freitext": "GW-Logistik"
+      },
+      "kennzeichen": "MA-JU 18",
+      "funkrufname": {
+        "kennwort": {
+          "code": 4
+        },
+        "eigenerStandort": false,
+        "ort": "Malter",
+        "teile": [
+          54,
+          66,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "Kühlanhänger"
+      },
+      "kennzeichen": "MA-JU 19"
+    }
+  ],
+  "sonstiges": "Fachdienst: Verpflegung. Hauptleistung: Verpflegung. Kommunikation: Rufname 54-17-04. Begründung meiner Planung: Da wir als OV den Einsatz nicht allein bewältigen können, habe ich den Einsatz als einen RB - Einsatz geplant. Folgende Teileinheiten habe ich eingeplant: 1. Zugtrupp, 2. 3 Sanitätsgruppen, 3. Transportstaffel mit Erweiterung der Allradstaffel, 4. Sicherheit und Technik, 5. Verpflegung, 6. Motorradstaffel. Zugtrupp: Der Zugtrupp übernimmt die Führung von allen Einheiten, ich habe die 2-5 Regel bei diesem Einsatz auf 7 Einheiten erweitert (ist laut Konzept möglich). Je nach Lage muss die Überlegung die Führung auf eine Führungsgruppe zu erweitern immer im Hinterkopf vorhanden sein, damit im Fall der Fälle die Führung erweitert werden kann. Führung läuft aus dem ELW. Sollte das Feuerwehrhaus einen Lagebesprechungsraum haben, wird die Führungsstelle vom ELW in diesen Raum verlegt. Bessere Voraussetzungen im Lagebesprechungsrum als im ELW. Muss vor Ort entschieden werden. Zu Beginn sind alle Einheiten auf den Marschkanal. Ein Funkplan wird vor Ort nach vorheriger Absprache mit der örtlichen Gesamteinsatzleitung erstellt. San-Gruppen: Es sind drei San Gruppen vor die eigenständig je nach Lage eine UHS unabhängig voneinander betreiben können. Die UHS 1 ist die einzige UHS, die dauerhaft mit Arzt besetzt ist. Bei Bedarf ist der Arzt für die andren UHSen anforderbar. Auf Grund des Auftrages, das bis zu drei Ortschaften eine Basisversorgung gewährt werden soll, führe ich drei Gruppen inkl. Material mit. Alle drei Gruppen können eigenständig eine UHS betreiben, eine feste Unterkunft wird hierfür nicht benötigt. Transporteinheit: Da der Regelrettungsdienst bei Bedarf unterstützt werden soll, führen wir auch einen RTW mit, der bei Bedarf auch als NAW (Arzt von der UHS 1 steigt zu) eingesetzt werden kann. Der RTW wird bei der UHS 1 stationiert. Zusätzlich wird jeweils ein KTW bei der UHS 2 und der UHS 3 stationiert. Der Gruppenführer von der Transporteinheit verbleibt in der Führung und übernimmt die Funktion des Transportorganisator für unsere Fahrzeuge. Da das Schadensgebiet schwer zugänglich ist, führen wir einen geländefähigen KTW vom Typ B mit, der ins unwegsame Gelände fahren kann. Da das Schadensgebiet schwer zu erreichen ist, sind zusätzlich 2 UTVs in der Transporteinheit mit eingebunden. Mit diesen Fahrzeugen ist es möglich Material ins Schadensgebiet zu bringen und bei Bedarf verletzte Personen aus dem Schadensgebiet in die UHS zu bringen. Diese Fahrzeuge sind für das Gelände gebaut und die Fahrer auf schwieriges Gelände geschult. Technik und Sicherheit: Die Gruppe stellt die beiden Container auf die 2 Parkplätze, die zur Verfügung stehen, WLF mit Anhänger wird auf einen geeigneten Platz abgestellt. Die Gruppe baut die Unterkunft auf (Organisation Gruppenführer Tesi) und ist für alle weiteren logistischen Aufgaben und den ggf. anfallenden Personaltransport während des Einsatzes zuständig. Bei Bedarf unterstützt die Gruppe die Verpflegungsgruppe. Die Lima dient zur Ausleuchtung vom Feuerwehrgelände, sollte die Stromversorgung zusammenbrechen oder nicht ausreichen, so ist der autarke Betrieb der Unterkunft gewährleistet. Sollte der Platz beim Feuerwehrhaus knapp werden, kann der Container mit dem Unterkunftsmaterial nach dem Aufbau wieder aufgesattelt werden. Dadurch wird ein weiterer Platz vor der Feuerwehr wieder freigegeben. Verpflegung: Die Gruppe kümmert sich um die Verpflegung der Einsatzkräfte. Der GW Logistik steht für Einkäufe und sonstige Besorgungen zur Verfügung und steht auf dem Parkplatz vor dem Feuerwehrhaus. Organisation und Aufbau übernimmt der Gruppenführer der Verpflegungsgruppe. Motorradstaffel: Während der Anfahrt und Abfahrt übernimmt die Staffel Erkundungs- und Sicherheitsaufgaben (Sicherungsposten, Absperrungen, Erkunden für Pausen und Co). Im Einsatzgebiet stehen die Kräder als Melder, Bote oder als Erkunder zur Verfügung (1 Krad ist geländetauglich). Sollten Kräfte nachrücken, werden Lotsendienste übernommen. Personaltausch nach spätestens 72 Stunden Einsatz wird von der RB - Führung in der Dienststelle organisiert und mit dem Zugführer abgesprochen. Auf eine PSNV - Staffel habe ich verzichtet, da wir geschulte PSNV - Helfer in den San Gruppen mitführen. Sollte es sich herausstellen, dass wir Betroffene betreuen sollen, muss eine Betreuungsgruppe nachgefordert werden. Sollte es dazukommen, ist dann der Punkt erreicht, die Führung auf eine Führungsgruppe aufzustocken."
+}

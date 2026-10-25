@@ -1,0 +1,254 @@
+{
+  "schemaVersion": 9,
+  "uebung": true,
+  "stand": 2171520,
+  "einheit": {
+    "organisation": 6,
+    "einheitsTyp": {
+      "freitext": "Transportgruppe"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "code": 1
+        },
+        "name": "Akkonia"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 1508,
+    "zeitraumBis": 1508,
+    "ortAuftrag": "Praktische Ausbildung (Übung): Einheitenerfassung der geplanten Einsatzeinheiten"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "nachname": "Gärner",
+      "vorname": "Steffen",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "GF"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "SAN-H"
+        }
+      ]
+    },
+    {
+      "nachname": "Power",
+      "vorname": "Harry",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "(RTW)"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "NFS"
+        }
+      ]
+    },
+    {
+      "nachname": "Symiens",
+      "vorname": "Ute",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "(RTW)"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "RS"
+        }
+      ]
+    },
+    {
+      "nachname": "Bender",
+      "vorname": "Anton",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "(KTW 1)"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "RS"
+        }
+      ]
+    },
+    {
+      "nachname": "Fischer",
+      "vorname": "Ulrich",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "(KTW 1)"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "SAN-H"
+        }
+      ]
+    },
+    {
+      "nachname": "Knaller",
+      "vorname": "Tina",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "(KTW2)"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "RS"
+        }
+      ]
+    },
+    {
+      "nachname": "Schimmer",
+      "vorname": "Elli",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "(KTW 2)"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "SAN-H"
+        }
+      ]
+    },
+    {
+      "nachname": "Marten",
+      "vorname": "Stefanie",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kraftfahrer Melder"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "SAN-H"
+        }
+      ]
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "MTW"
+      },
+      "kennzeichen": "AK-JU 39",
+      "funkrufname": {
+        "kennwort": {
+          "code": 4
+        },
+        "eigenerStandort": false,
+        "ort": "Akkonia",
+        "teile": [
+          56,
+          17,
+          5
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "RTW"
+      },
+      "kennzeichen": "AK-JU 40",
+      "funkrufname": {
+        "kennwort": {
+          "code": 4
+        },
+        "eigenerStandort": false,
+        "ort": "Akkonia",
+        "teile": [
+          56,
+          85,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "KTW"
+      },
+      "kennzeichen": "AK-JU 41",
+      "funkrufname": {
+        "kennwort": {
+          "code": 4
+        },
+        "eigenerStandort": false,
+        "ort": "Akkonia",
+        "teile": [
+          56,
+          92,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "KTW Bund"
+      },
+      "kennzeichen": "AK-JU 42",
+      "funkrufname": {
+        "kennwort": {
+          "code": 4
+        },
+        "eigenerStandort": false,
+        "ort": "Akkonia",
+        "teile": [
+          56,
+          92,
+          2
+        ]
+      }
+    }
+  ],
+  "sonstiges": "Fachdienst: Sonst.: Transport. Hauptleistung: Sonst.: Transport. Kommunikation: Rufname 56-17-05."
+}

@@ -47,7 +47,20 @@ function fensterErstellen() {
   sitzung.setPermissionCheckHandler((_inhalt, recht) => ERLAUBTE_RECHTE.has(recht));
 
   fenster.webContents.setWindowOpenHandler(({ url }) => {
-    if (istExtern(url)) shell.openExternal(url);
+    if (istExtern(url)) {
+      shell.openExternal(url);
+      return { action: "deny" };
+    }
+    // Lagemonitor: zweites App-Fenster für den Fernseher, mit denselben Härtungen.
+    if (url.includes("?lagemonitor=")) {
+      return {
+        action: "allow",
+        overrideBrowserWindowOptions: {
+          autoHideMenuBar: true,
+          webPreferences: { contextIsolation: true, nodeIntegration: false, sandbox: true },
+        },
+      };
+    }
     return { action: "deny" };
   });
   fenster.webContents.on("will-navigate", (ereignis, url) => {

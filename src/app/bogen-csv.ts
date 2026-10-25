@@ -45,7 +45,6 @@ import {
   unterbringungMWD,
   verpflegung,
   datumZuIso,
-  zeitpunktZuIso,
   type EebDatum,
   type EebZeitpunkt,
   type Erfassungsbogen,
@@ -63,10 +62,14 @@ import {
   orgLabel,
   vokabText,
   vokabularFuer,
-  zeitgruppe,
+  zeitpunktDeutsch,
 } from "./hilfen";
 import { csvDatei, csvZeile, jaNein } from "./csv";
-import { neuesteJeEinheit, MeldeStatus, type Einsatzsammlung, type MeldeEintrag, type MeldeQuelle } from "@bos/meldekopf/einsaetze";
+import { HERKUNFT_TEXT, eintreffzeit, zeitLang } from "./eintrag-zeiten";
+import { meldungsNummern } from "./einheiten-tabelle";
+import { MeldeStatus, type Einsatzsammlung, type MeldeEintrag, type MeldeQuelle } from "@bos/meldekopf/einsaetze";
+import { geltendeJeEinheit } from "./fassung-vorrang";
+import { nachtragGrundText, ortHinweisText, ortHinweise } from "./export-stand";
 
 // ------------------------------------------------------------------ Spalten
 
@@ -78,6 +81,9 @@ import { neuesteJeEinheit, MeldeStatus, type Einsatzsammlung, type MeldeEintrag,
 const SPALTEN = [
   // Kontext — auf jeder Zeile
   "Einsatz",
+  // Laufende Nummer der Meldung wie an der Karte und auf dem Lageblatt
+  // (Audit Runde 3, R3-K7); beim Einzelbogen leer.
+  "Meldung Nr.",
   "Einheit",
   "Teil",
   "Zug",
@@ -93,7 +99,10 @@ const SPALTEN = [
   "Zugehörigkeit",
   "Telefon Einheit",
   "E-Mail Einheit",
-  "Auftrag",
+  // Ort/Auftrag aus dem Bogen der Einheit — nicht der Auftrag der
+  // Führungsstelle (der steht in „Auftrag/Notiz (Führungsstelle)"). Hieß
+  // „Auftrag" und wurde dafür gehalten (R3-K7).
+  "Ort/Auftrag (Bogen)",
   "Zeitraum von",
   "Zeitraum bis",
   "Einsatzbeginn",
@@ -119,7 +128,14 @@ const SPALTEN = [
   "Sonstiges",
   "Quelle",
   "Status",
+  // Zusätze der Führungsstelle (MeldeEintrag), wie in der Übersicht-CSV —
+  // fehlten hier ganz (R3-K7).
+  "Eingetroffen",
+  "Abgerückt",
+  "Auftrag/Notiz (Führungsstelle)",
   "Signatur",
+  // „Anderer Einsatz?" wie an der Karte (R5-K5).
+  "Hinweis zur Meldung",
   // Satzart „Person"
   "Nachname",
   "Vorname",
@@ -177,23 +193,19 @@ const STATUS_TEXT: Record<MeldeStatus, string> = {
   [MeldeStatus.AUFGEGANGEN]: "Aufgegangen",
 };
 
-const QUELLE_TEXT: Record<MeldeQuelle, string> = {
-  scan: "Scan",
-  manuell: "Manuell",
-  "pdf-import": "PDF-Import",
-  aufteilung: "Aufteilung",
-  zusammenfuehrung: "Zusammenführung",
-};
+// Derselbe Wortlaut wie auf der Karte (Audit Runde 2, R2-K6).
+const QUELLE_TEXT: Record<MeldeQuelle, string> = HERKUNFT_TEXT;
 
 function datumText(d: EebDatum | undefined): string {
   return d != null ? datumDeutsch(datumZuIso(d)) : "";
 }
 
-/** „14.05.2025 08:30" — Datum wie im Bogen, Uhrzeit als lokale Wandzeit. */
+/**
+ * „14.05.2025, 08:30" — Datum wie im Bogen, Uhrzeit als lokale Wandzeit; dieselbe
+ * Form wie Stand, Eingetroffen und Abgerückt (Audit Runde 3, R3-K7).
+ */
 function zeitpunktText(z: EebZeitpunkt | undefined): string {
-  if (z == null) return "";
-  const [datum = "", zeit = ""] = zeitpunktZuIso(z).split("T");
-  return `${datumDeutsch(datum)} ${zeit}`.trim();
+  return z == null ? "" : zeitpunktDeutsch(z);
 }
 
 /** Ganze Zugehörigkeitskette: „OV Oldenburg (OODE) › RB Bremen". */
@@ -214,20 +226,29 @@ function zugehoerigkeitText(b: Erfassungsbogen): string {
 interface Kontext {
   /** Name der Einsatz-Sammlung; beim Einzelbogen leer. */
   einsatz?: string;
+  /** Laufende Nummer der Meldung (R3-K7). */
+  meldungNr?: number;
+  eingetroffen?: string;
+  abgerueckt?: string;
+  notiz?: string;
   teil?: string;
   zug?: string;
   quelle?: string;
   status?: string;
   signatur?: string;
+  /** Ort, den der Bogen nennt, wenn er nicht zur Lage passt (R5-K5). */
+  fremderOrt?: string;
 }
 
 function kontextFelder(b: Erfassungsbogen, k: Kontext, satzart: string, nr?: number): Satz {
   return {
     Einsatz: k.einsatz ?? "",
+    "Meldung Nr.": k.meldungNr ?? "",
     Einheit: einheitAnzeigename(b.einheit),
     Teil: k.teil ?? "",
     Zug: k.zug ?? "",
-    Stand: zeitgruppe(b.stand),
+    // Eine Zeitform in der ganzen Datei: „04.10.2026, 14:36" (R3-K7).
+    Stand: zeitpunktDeutsch(b.stand),
     "Übung": jaNein(b.uebung === true),
     Satzart: satzart,
     Nr: nr ?? "",
@@ -249,7 +270,7 @@ function einheitSatz(b: Erfassungsbogen, k: Kontext): Satz {
     "Zugehörigkeit": zugehoerigkeitText(b),
     "Telefon Einheit": ebene0?.telefon ?? "",
     "E-Mail Einheit": ebene0?.email ?? "",
-    Auftrag: b.einsatz.ortAuftrag,
+    "Ort/Auftrag (Bogen)": b.einsatz.ortAuftrag,
     "Zeitraum von": datumText(b.einsatz.zeitraumVon),
     "Zeitraum bis": datumText(b.einsatz.zeitraumBis),
     Einsatzbeginn: zeitpunktText(b.einsatz.einsatzbeginn),
@@ -277,7 +298,11 @@ function einheitSatz(b: Erfassungsbogen, k: Kontext): Satz {
     Sonstiges: b.sonstiges ?? "",
     Quelle: k.quelle ?? "",
     Status: k.status ?? "",
+    Eingetroffen: k.eingetroffen ?? "",
+    "Abgerückt": k.abgerueckt ?? "",
+    "Auftrag/Notiz (Führungsstelle)": k.notiz ?? "",
     Signatur: k.signatur ?? "",
+    "Hinweis zur Meldung": k.fremderOrt != null ? ortHinweisText(k.fremderOrt) : "",
   };
 }
 
@@ -325,9 +350,12 @@ function bogenSaetze(b: Erfassungsbogen, k: Kontext): Satz[] {
   ];
 }
 
-function zuDatei(saetze: Satz[]): string {
-  const kopf = csvZeile([...SPALTEN]);
-  return csvDatei([kopf, ...saetze.map((s) => csvZeile(SPALTEN.map((sp) => s[sp] ?? "")))]);
+function zuDatei(saetze: Satz[], zusatzSpalte?: { name: string; werte: (satz: Satz, index: number) => string; schluss?: string }): string {
+  const kopf = csvZeile([...SPALTEN, ...(zusatzSpalte ? [zusatzSpalte.name] : [])]);
+  const zeilen = saetze.map((s, i) => csvZeile([...SPALTEN.map((sp) => s[sp] ?? ""), ...(zusatzSpalte ? [zusatzSpalte.werte(s, i)] : [])]));
+  // Schlusszeile (Nachtrag, R5-K6): ein Satz „Hinweis" mit dem Text im ersten Feld.
+  const schluss = zusatzSpalte?.schluss ? [csvZeile([zusatzSpalte.schluss, ...SPALTEN.slice(1).map((sp) => (sp === "Satzart" ? "Hinweis" : "")), ""])] : [];
+  return csvDatei([kopf, ...zeilen, ...schluss]);
 }
 
 // --------------------------------------------------------------- Öffentlich
@@ -337,9 +365,14 @@ export function bogenCsvInhalt(b: Erfassungsbogen): string {
   return zuDatei(bogenSaetze(b, {}));
 }
 
-function kontextAusMeldung(e: MeldeEintrag, einsatz: string): Kontext {
+function kontextAusMeldung(e: MeldeEintrag, einsatz: string, meldungNr?: number, fremderOrt?: string): Kontext {
   return {
+    fremderOrt,
     einsatz,
+    meldungNr,
+    eingetroffen: zeitLang(eintreffzeit(e)),
+    abgerueckt: e.abgerueckAm != null ? zeitLang(e.abgerueckAm) : "",
+    notiz: e.notiz ?? "",
     teil: e.teilEtikett,
     zug: e.zugEtikett,
     quelle: QUELLE_TEXT[e.quelle],
@@ -357,11 +390,34 @@ function kontextAusMeldung(e: MeldeEintrag, einsatz: string): Kontext {
  * neuesten Revision, nach Anzeigename sortiert, je Einheit die Einheits-,
  * Personal- und Fahrzeugzeilen.
  */
-export function einsatzDetailCsvInhalt(s: Einsatzsammlung): string {
-  const meldungen = neuesteJeEinheit(s.eintraege).sort(
+export function einsatzDetailCsvInhalt(
+  s: Einsatzsammlung,
+  /** Nummern aus der ganzen Sammlung — beim Teilexport „nur neue" sonst verschoben. */
+  nummern: Map<string, number> = meldungsNummern(s.eintraege),
+): string {
+  const meldungen = geltendeJeEinheit(s.eintraege).sort(
     (a, b) =>
+      (nummern.get(a.einheitSchluessel) ?? Infinity) - (nummern.get(b.einheitSchluessel) ?? Infinity) ||
       einheitAnzeigename(a.bogen.einheit).localeCompare(einheitAnzeigename(b.bogen.einheit), "de") ||
       (a.teilEtikett ?? "").localeCompare(b.teilEtikett ?? "", "de"),
   );
-  return zuDatei(meldungen.flatMap((e) => bogenSaetze(e.bogen, kontextAusMeldung(e, s.name))));
+  const gruende = s.nachtragGruende;
+  const orte = ortHinweise(s);
+  // Je Satz die Einheit, zu der er gehört — für die Spalte „Im Nachtrag wegen" (R5-W7).
+  const einheitJeSatz: string[] = [];
+  const saetze = meldungen.flatMap((e) => {
+    const teil = bogenSaetze(e.bogen, kontextAusMeldung(e, s.name, nummern.get(e.einheitSchluessel), orte[e.einheitSchluessel]));
+    for (const _ of teil) einheitJeSatz.push(e.einheitSchluessel);
+    return teil;
+  });
+  if (!gruende) return zuDatei(saetze);
+  // Als Nachtrag: Grund auf jeder Zeile (wie der Kontext, damit eine gefilterte
+  // Ansicht lesbar bleibt) und eine Schlusszeile, die die Datei als Teilmenge
+  // kennzeichnet (R5-K6).
+  const seit = s.nachtragSeit != null ? ` seit ${zeitLang(s.nachtragSeit)}` : "";
+  return zuDatei(saetze, {
+    name: "Im Nachtrag wegen",
+    werte: (_satz, i) => nachtragGrundText(gruende[einheitJeSatz[i]!]),
+    schluss: `NACHTRAG${seit} — nicht die ganze Lage (${meldungen.length} ${meldungen.length === 1 ? "Einheit" : "Einheiten"} in dieser Datei)`,
+  });
 }

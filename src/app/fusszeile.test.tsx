@@ -8,7 +8,7 @@
  * passiert.
  */
 
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { Dialogschicht } from "./dialoge";
@@ -18,6 +18,7 @@ import { vorlageAnlegen, vorlagenLaden } from "./vorlagen";
 import { sicherungErstellen } from "./sicherung";
 import { geraeteSchluesselSicherstellen } from "./geraete-schluessel";
 import { zuHex } from "@bos/eeb-format/signatur";
+import { EinsatzArt, einsatzAnlegen, einsaetzeLaden, meldungHinzufuegen } from "@bos/meldekopf/einsaetze";
 
 /**
  * Alle Wege starten am Ende die App neu. Das ist hier bewusst nicht geprüft:
@@ -75,6 +76,62 @@ describe("Alle Daten löschen", () => {
   });
 });
 
+/**
+ * Wie sicher liegt es hier, und wann gab es zuletzt eine Kopie? (Audit Runde 2,
+ * R2-O6) — dauerhafter Speicher, letzte Sicherung, dezente Erinnerung.
+ */
+describe("Datensicherung: Speicherstatus und Erinnerung", () => {
+  beforeEach(() => {
+    localStorage.clear();
+  });
+  afterEach(() => {
+    Reflect.deleteProperty(navigator, "storage");
+  });
+
+  function speicherVorspielen(dauerhaft: boolean) {
+    const zustand = { dauerhaft };
+    const persist = vi.fn(async () => {
+      zustand.dauerhaft = true;
+      return true;
+    });
+    Object.defineProperty(navigator, "storage", {
+      configurable: true,
+      value: { persisted: async () => zustand.dauerhaft, persist },
+    });
+    return persist;
+  }
+
+  it("zeigt nicht dauerhaften Speicher an und bittet auf Knopfdruck darum", async () => {
+    const persist = speicherVorspielen(false);
+    const nutzer = userEvent.setup();
+    buehne();
+
+    await nutzer.click(screen.getByRole("button", { name: "Datensicherung" }));
+    const dialog = document.querySelector<HTMLDialogElement>("dialog[aria-label='Datensicherung']")!;
+    expect(await within(dialog).findByText(/Speicher ist nicht dauerhaft/)).toBeDefined();
+    expect(within(dialog).getByText("Auf diesem Gerät wurde noch keine Sicherung erstellt.")).toBeDefined();
+
+    await nutzer.click(within(dialog).getByRole("button", { name: "Dauerhaften Speicher anfragen" }));
+    expect(persist).toHaveBeenCalled();
+    expect(await within(dialog).findByText(/hält den Speicher dieser App dauerhaft vor/)).toBeDefined();
+  });
+
+  it("erinnert in der Fußzeile, wenn eine Sammlung mit Meldungen seit Tagen ungesichert ist", async () => {
+    const s = einsatzAnlegen("Sturmflut", EinsatzArt.EINSATZ);
+    meldungHinzufuegen(s.id, neuerBogen(), { quelle: "manuell" });
+    localStorage.setItem("eeb.sicherung.zuletzt.v1", String(Date.now() - 5 * 86_400_000));
+    buehne();
+
+    expect(screen.getByText(/Letzte Sicherung vor 5 Tagen/)).toBeDefined();
+    expect(screen.getByRole("button", { name: "Jetzt sichern…" })).toBeDefined();
+  });
+
+  it("schweigt ohne wertvolle Daten", () => {
+    buehne();
+    expect(screen.queryByRole("button", { name: "Jetzt sichern…" })).toBeNull();
+  });
+});
+
 describe("Sicherung einspielen", () => {
   beforeEach(() => {
     localStorage.clear();
@@ -98,6 +155,9 @@ describe("Sicherung einspielen", () => {
 
     await nutzer.upload(dateiFeld(), datei);
     const dialog = await screen.findByRole("dialog", { name: "Sicherung einspielen?" });
+    // Auf dem Gerät liegt eine Vorlage: ohne Haken kein Ersetzen (R4-D2).
+    expect(within(dialog).getByRole("button", { name: "Einspielen und ersetzen" })).toHaveProperty("disabled", true);
+    await nutzer.click(within(dialog).getByLabelText(/Ja, die Daten dieses Geräts/));
     await nutzer.click(within(dialog).getByRole("button", { name: "Einspielen und ersetzen" }));
 
     // Der eigene Stand ist weg, der Stand aus der Datei steht da.
@@ -115,6 +175,70 @@ describe("Sicherung einspielen", () => {
     const dialog = await screen.findByRole("dialog", { name: "Sicherung einspielen?" });
     await nutzer.click(within(dialog).getByRole("button", { name: "Abbrechen" }));
 
+    expect(vorlagenLaden().map((v) => v.name)).toEqual(["Vorher auf dem Gerät"]);
+  });
+
+  it("nennt laufende Sammlungen und den Datei-Inhalt, bietet die Sicherung vorher an und verlangt den Haken (R2-D3)", async () => {
+    const nutzer = userEvent.setup();
+    const datei = sicherungsdatei();
+    const s = einsatzAnlegen("Heute Nacht Starkregen", EinsatzArt.EINSATZ);
+    meldungHinzufuegen(s.id, neuerBogen(), { quelle: "manuell" });
+    buehne();
+
+    await nutzer.upload(dateiFeld(), datei);
+    const dialog = await screen.findByRole("dialog", { name: "Sicherung einspielen?" });
+
+    expect(within(dialog).getByText(/Sammlung „Heute Nacht Starkregen“ mit 1 Meldung/)).toBeDefined();
+    expect(within(dialog).getByText(/In der Datei „eeb-sicherung.json“/)).toBeDefined();
+    expect(within(dialog).getByText("1 Vorlage")).toBeDefined(); // aus der Datei
+    expect(within(dialog).getByText(/Anders als „Einsatz importieren…“ wird nichts ergänzt/)).toBeDefined();
+    expect(within(dialog).getByRole("button", { name: "Vorher Sicherung erstellen…" })).toBeDefined();
+
+    const ersetzen = within(dialog).getByRole("button", { name: "Einspielen und ersetzen" });
+    expect(ersetzen).toHaveProperty("disabled", true);
+    await nutzer.click(within(dialog).getByLabelText(/Ja, die Daten dieses Geräts/));
+    await nutzer.click(ersetzen);
+
+    expect(await screen.findByRole("dialog", { name: "Sicherung eingespielt" })).toBeDefined();
+    expect(einsaetzeLaden()).toHaveLength(0);
+  });
+
+  /**
+   * Audit Runde 4, R4-D2: Leerer Arbeitsplatz, belegter Rückholplatz und
+   * Absenderkarte — die Liste sagte „kein angefangener Bogen", verlangte
+   * keinen Haken und löschte beides.
+   */
+  it("nennt Rückholplatz, Absenderkarte und Geräteschlüssel mit Kurzform und verlangt dann den Haken (R4-D2)", async () => {
+    const nutzer = userEvent.setup();
+    const datei = sicherungsdatei();
+    const b = neuerBogen();
+    b.einheit.hierarchie[0]!.name = "Crailsheim";
+    localStorage.setItem("eeb.entwurf.ersetzt.v1", JSON.stringify({ gespeichert: Date.now(), bogen: b }));
+    localStorage.setItem("eeb.absenderkarte.v1", JSON.stringify({ name: "Zugtrupp Albstadt" }));
+    await geraeteSchluesselSicherstellen();
+    buehne();
+
+    await nutzer.upload(dateiFeld(), datei);
+    const dialog = await screen.findByRole("dialog", { name: "Sicherung einspielen?" });
+    expect(within(dialog).getByText(/der zuletzt geschlossene Bogen „THW Crailsheim“/)).toBeDefined();
+    expect(within(dialog).getByText("die hinterlegte Absenderkarte")).toBeDefined();
+    expect(within(dialog).getByText(/der Signatur-Geräteschlüssel \(Kurzform [0-9a-f]{4} [0-9a-f]{4} [0-9a-f]{4} [0-9a-f]{4}\)/)).toBeDefined();
+    expect(within(dialog).getByRole("button", { name: "Einspielen und ersetzen" })).toHaveProperty("disabled", true);
+  });
+
+  it("erklärt eine abgeschnittene Sicherung ohne Programmtext und fragt gar nicht erst (R2-E5)", async () => {
+    const nutzer = userEvent.setup();
+    const inhalt = await sicherungsdatei().text();
+    vorlageAnlegen("Vorher auf dem Gerät", neuerBogen());
+    buehne();
+
+    await nutzer.upload(dateiFeld(), new File([inhalt.slice(0, 40)], "eeb-sicherung.json", { type: "application/json" }));
+
+    const meldung = await screen.findByText(/beschädigt oder unvollständig/);
+    expect(meldung.getAttribute("role")).toBe("alert");
+    expect(meldung.textContent).toMatch(/Daten auf diesem Gerät sind unverändert/);
+    expect(meldung.textContent).not.toMatch(/JSON|Unexpected/);
+    expect(screen.queryByRole("dialog", { name: "Sicherung einspielen?" })).toBeNull();
     expect(vorlagenLaden().map((v) => v.name)).toEqual(["Vorher auf dem Gerät"]);
   });
 });
@@ -146,6 +270,50 @@ describe("Geräteschlüssel neu erzeugen", () => {
     expect(await screen.findByRole("dialog", { name: "Geräteschlüssel neu erzeugt" })).toBeDefined();
     expect(schluessel()).not.toBeNull();
     expect(schluessel()).not.toBe(alt);
+  });
+
+  // Audit Runde 7, R7-D6: wie bei „Alle Daten löschen" ein Weg zur Sicherung, und der Text passt zum Bestand.
+  it("bietet bei vorhandenem Schlüssel „Vorher Sicherung erstellen…“ an und fragt danach erneut (R7-D6)", async () => {
+    const nutzer = userEvent.setup();
+    // jsdom kennt keine Blob-Adressen: der Download der Sicherungsdatei wird nachgebildet.
+    const urlAlt = { c: URL.createObjectURL, r: URL.revokeObjectURL };
+    const erzeugt: Blob[] = [];
+    URL.createObjectURL = ((b: Blob) => (erzeugt.push(b), "blob:test")) as typeof URL.createObjectURL;
+    URL.revokeObjectURL = (() => {}) as typeof URL.revokeObjectURL;
+    const klick = vi.spyOn(HTMLAnchorElement.prototype, "click").mockImplementation(() => {});
+    try {
+    const alt = zuHex(await geraeteSchluesselSicherstellen());
+    buehne();
+
+    await nutzer.click(screen.getByRole("button", { name: "Geräteschlüssel neu erzeugen" }));
+    const dialog = await screen.findByRole("dialog", { name: "Geräteschlüssel neu erzeugen?" });
+    expect(dialog.textContent).toContain("wird gelöscht und durch ein neues Schlüsselpaar ersetzt");
+    await nutzer.click(within(dialog).getByRole("button", { name: "Vorher Sicherung erstellen…" }));
+
+    // Die Sicherung ist erzeugt; der Schlüssel steht noch, die Rückfrage kommt wieder.
+    const wieder = await screen.findByRole("dialog", { name: "Geräteschlüssel neu erzeugen?" });
+    expect(schluessel()).toBe(alt);
+    expect(erzeugt).toHaveLength(1); // eine Sicherungsdatei, die den Schlüssel enthält
+    expect(await erzeugt[0]!.text()).toContain(alt);
+    await nutzer.click(within(wieder).getByRole("button", { name: "Abbrechen" }));
+    expect(schluessel()).toBe(alt);
+    } finally {
+      URL.createObjectURL = urlAlt.c;
+      URL.revokeObjectURL = urlAlt.r;
+      klick.mockRestore();
+    }
+  });
+
+  it("sagt ohne vorhandenen Schlüssel, dass nichts gelöscht wird, und bietet keine Sicherung an (R7-D6)", async () => {
+    const nutzer = userEvent.setup();
+    buehne();
+
+    await nutzer.click(screen.getByRole("button", { name: "Geräteschlüssel neu erzeugen" }));
+    const dialog = await screen.findByRole("dialog", { name: "Geräteschlüssel neu erzeugen?" });
+    expect(dialog.textContent).toContain("noch kein Signaturschlüssel");
+    expect(dialog.textContent).not.toContain("wird gelöscht");
+    expect(within(dialog).queryByRole("button", { name: "Vorher Sicherung erstellen…" })).toBeNull();
+    await nutzer.click(within(dialog).getByRole("button", { name: "Abbrechen" }));
   });
 
   it("lässt bei „Abbrechen“ den bisherigen Schlüssel stehen", async () => {
@@ -190,4 +358,24 @@ describe("Beispielbogen-Link kopieren", () => {
       globalThis.fetch = echtesFetch;
     }
   }, 20000);
+});
+
+/** Audit Runde 5, R5-D5: keine doppelte Verneinung in der Löschrückfrage. */
+describe("Alle Daten löschen — Wortlaut (R5-D5)", () => {
+  beforeEach(() => {
+    localStorage.clear();
+  });
+
+  it("sagt „kein Export, kein Lageblatt und keine Weitergabe“, nicht „… oder keine“", async () => {
+    const { EinsatzArt, einsatzAnlegen, meldungHinzufuegen, speicherhuelleSetzen } = await import("@bos/meldekopf/einsaetze");
+    speicherhuelleSetzen(localStorage);
+    const s = einsatzAnlegen("Hochwasser Donau", EinsatzArt.EINSATZ);
+    meldungHinzufuegen(s.id, neuerBogen());
+    const nutzer = userEvent.setup();
+    buehne();
+    await nutzer.click(screen.getByRole("button", { name: "Alle Daten löschen" }));
+    const text = document.querySelector<HTMLDialogElement>("dialog[aria-label='Alle lokalen Daten löschen']")!.textContent!;
+    expect(text).toContain("noch kein Export, kein Lageblatt und keine Weitergabe von:");
+    expect(text).not.toMatch(/Lageblatt oder keine/);
+  });
 });

@@ -12,8 +12,38 @@
 
 import { SCHEMA_VERSION, mitTransportVersion, type Erfassungsbogen } from "@bos/eeb-format/model";
 import { migriereBogen } from "./hilfen";
+import { bogenBefund } from "./bogen-pruefung";
 import type { Einsatzsammlung } from "@bos/meldekopf/einsaetze";
 import { entpackt, pdfStroeme } from "./pdf-stroeme";
+import type { ExportStand, ExportZiel } from "./export-stand";
+import { lageAngabenPruefen, type LageAngaben } from "./lage-angaben";
+
+declare module "@bos/meldekopf/einsaetze" {
+  interface Einsatzsammlung {
+    /**
+     * Nur im Umschlag eines Nachtrags („nur neue Bögen", Audit Runde 4, R4-W4):
+     * ab wann (Date.now()). Die Datei enthält dann nur einen Teil der Lage; das
+     * Einlesen auf einem Gerät ohne diese Sammlung fragt nach. Wird nie in den
+     * Speicher übernommen.
+     */
+    nachtragSeit?: number;
+    /**
+     * Nur im Umschlag der Datei (nie im Speicher): die Stände der Exporte je
+     * Format — Kennungen, Prüfsummen und Zeitpunkt, keine Personendaten. Die
+     * Ablösung weiß damit, was der Stab schon hat (Audit Runde 5, R5-W6). Das
+     * Einlesen übernimmt sie in den Gerätespeicher (`exportStaendeUebernehmen`)
+     * und entfernt das Feld.
+     */
+    exportStaende?: Partial<Record<ExportZiel, ExportStand>>;
+    /**
+     * Nur im Umschlag der Datei (nie im Speicher): Einsatzbeginn und
+     * Funkrufname des Lagemonitors des abgebenden Geräts (R7-K5). Das Einlesen
+     * setzt sie, wenn hier noch nichts gesetzt ist (`lageAngabenUebernehmen`),
+     * und entfernt das Feld.
+     */
+    lageAngaben?: LageAngaben;
+  }
+}
 
 // -------------------------------------------------------- JSON-Datei (Einsatz)
 
@@ -21,31 +51,69 @@ interface EinsatzDatei {
   typ: "eeb-einsatz";
   version: 1;
   einsatz: Einsatzsammlung;
+  /** Stände der Exporte je Format (R5-W6); fehlt in Dateien älterer Versionen. */
+  staende?: Partial<Record<ExportZiel, ExportStand>>;
+  /** Einsatzbeginn und Funkrufname des Lagemonitors (R7-K5); fehlt in Dateien älterer Versionen. */
+  lage?: LageAngaben;
 }
 
-/** Ganze Einsatz-Sammlung als Datei-Inhalt (menschenlesbar eingerückt). */
-export function einsatzDateiInhalt(s: Einsatzsammlung): string {
+/**
+ * Ganze Einsatz-Sammlung als Datei-Inhalt (menschenlesbar eingerückt). `staende`
+ * (R5-W6) sind die Stände der Exporte dieses Geräts; sie reisen im Umschlag mit,
+ * nicht in der Sammlung. Ein zugeschnittener Nachtrag (`nachtragGruende`) trägt
+ * seine Gründe nicht in die Datei.
+ */
+export function einsatzDateiInhalt(s: Einsatzsammlung, staende?: Partial<Record<ExportZiel, ExportStand>>, lage?: LageAngaben): string {
   // Jeder enthaltene Bogen mit seiner Transport-Version: nur Übungsbögen
   // fordern das neue Schema, alles andere bleibt für alte Stände lesbar.
+  const { nachtragGruende: _gruende, exportStaende: _staende, lageAngaben: _lage, fremdeOrte: _orte, ...rest } = s;
   const einsatz: Einsatzsammlung = {
-    ...s,
+    ...rest,
     eintraege: s.eintraege.map((e) => ({ ...e, bogen: mitTransportVersion(e.bogen) })),
   };
-  const datei: EinsatzDatei = { typ: "eeb-einsatz", version: 1, einsatz };
+  const datei: EinsatzDatei = {
+    typ: "eeb-einsatz",
+    version: 1,
+    einsatz,
+    ...(staende && Object.keys(staende).length > 0 ? { staende } : {}),
+    ...(lage && (lage.beginn != null || lage.funkruf != null) ? { lage } : {}),
+  };
   return JSON.stringify(datei, null, 2);
 }
 
-function istBogen(x: unknown): x is Erfassungsbogen {
-  const b = x as Erfassungsbogen;
-  return (
-    !!b &&
-    typeof b.schemaVersion === "number" &&
-    b.schemaVersion >= 2 &&
-    b.schemaVersion <= SCHEMA_VERSION &&
-    !!b.einheit &&
-    !!b.einsatz &&
-    Array.isArray(b.personal)
-  );
+/**
+ * Ist `x` ein Bogen, den die App lesen kann? Prüft Schema-Version und
+ * Pflichtfelder (bogen-pruefung.ts, R5-E1), ergänzt Harmloses und nennt sonst
+ * die Ursache in Alltagssprache.
+ */
+function bogenAufnehmbar(x: unknown): { bogen: Erfassungsbogen | null; ursache?: string; ergaenzt?: string[] } {
+  const v = (x as { schemaVersion?: unknown } | null)?.schemaVersion;
+  if (typeof v === "number" && v > SCHEMA_VERSION) return { bogen: null, ursache: "stammt aus einer neueren Version der App" };
+  if (typeof v !== "number" || v < 2) return { bogen: null, ursache: "ist kein Bogen dieser App" };
+  const r = bogenBefund(x);
+  return r.ok ? { bogen: r.bogen, ergaenzt: r.ergaenzt } : { bogen: null, ursache: r.ursache };
+}
+
+/**
+ * Ursachen der Bögen, die beim Einlesen einer Datei nicht übernommen wurden —
+ * neben der Sammlung gemerkt, nicht an ihr: Sie gehört nie in den Speicher
+ * (Audit Runde 5, R5-E1).
+ */
+const ablehnungen = new WeakMap<object, string[]>();
+
+/** Ursachen der beim Einlesen von `s` abgelehnten Bögen („der Einheitstyp fehlt" …); leer, wenn alle lesbar waren. */
+export function abgelehnteBoegen(s: Einsatzsammlung): string[] {
+  return ablehnungen.get(s) ?? [];
+}
+
+/** Satz für abgelehnte Bögen: „1 von 3 Bögen ist unvollständig (der Einheitstyp fehlt) und wurde nicht übernommen." */
+export function ablehnungsSatz(abgelehnt: readonly string[], gesamt: number): string {
+  if (abgelehnt.length === 0) return "";
+  const ursachen = [...new Set(abgelehnt)];
+  const nenner = `${abgelehnt.length} von ${gesamt} ${gesamt === 1 ? "Bogen" : "Bögen"}`;
+  const ist = abgelehnt.length === 1 ? "ist" : "sind";
+  const grund = ursachen.length <= 2 ? ursachen.join(" bzw. ") : `${ursachen.slice(0, 2).join(" bzw. ")} u. a.`;
+  return `${nenner} ${ist} unvollständig (${grund}) und wurde${abgelehnt.length === 1 ? "" : "n"} nicht übernommen.`;
 }
 
 /** Geparster JSON-Wert → Einsatz-Sammlung (Umschlag oder bloße Sammlung); wirft bei Ungültigem. */
@@ -55,7 +123,30 @@ function einsatzAusRoh(roh: unknown): Einsatzsammlung {
   if (!s || typeof s.id !== "string" || !Array.isArray(s.eintraege)) {
     throw new Error("Keine gültige Einsatz-Datei.");
   }
-  s.eintraege = s.eintraege.filter((e) => e && istBogen(e.bogen)).map((e) => ({ ...e, bogen: migriereBogen(e.bogen) }));
+  // Die Stände der Exporte aus dem Umschlag gehören nicht in die Sammlung: Sie
+  // hängen bis zum Import an ihr und werden dort übernommen und entfernt (R5-W6).
+  delete (s as { nachtragGruende?: unknown }).nachtragGruende;
+  delete (s as { fremdeOrte?: unknown }).fremdeOrte;
+  if (alsDatei?.typ === "eeb-einsatz" && alsDatei.staende && typeof alsDatei.staende === "object") s.exportStaende = alsDatei.staende;
+  else delete s.exportStaende;
+  const lage = alsDatei?.typ === "eeb-einsatz" ? lageAngabenPruefen(alsDatei.lage) : undefined;
+  if (lage) s.lageAngaben = lage;
+  else delete s.lageAngaben;
+  const gesamt = s.eintraege.length;
+  const abgelehnt: string[] = [];
+  const angenommen: typeof s.eintraege = [];
+  for (const e of s.eintraege) {
+    const r = e ? bogenAufnehmbar(e.bogen) : { bogen: null, ursache: "ist kein Bogen dieser App" };
+    if (r.bogen) angenommen.push({ ...e, bogen: migriereBogen(r.bogen) });
+    else abgelehnt.push(r.ursache ?? "unlesbar");
+  }
+  // Nichts Lesbares in einer Datei, die Bögen enthielt: ablehnen, statt eine
+  // leere Sammlung anzulegen (R5-E1).
+  if (gesamt > 0 && angenommen.length === 0) {
+    throw new Error(`Kein Bogen in der Datei ist lesbar — ${ablehnungsSatz(abgelehnt, gesamt)}`);
+  }
+  s.eintraege = angenommen;
+  if (abgelehnt.length > 0) ablehnungen.set(s, abgelehnt);
   return s;
 }
 
@@ -81,16 +172,45 @@ export function istPdfDatei(datei: File): boolean {
   return datei.name.toLowerCase().endsWith(".pdf") || datei.type === "application/pdf";
 }
 
-/** Bogen oder Bogen-Array aus einem JSON-Text ziehen (gültige Bögen migriert). */
-function boegenAusText(text: string): Erfassungsbogen[] {
+/**
+ * Bogen oder Bogen-Array aus einem JSON-Text ziehen (gültige Bögen migriert).
+ * Kaputtes JSON oder etwas anderes als Bögen ergibt eine leere Liste — auch
+ * für die JSON-Datei bei „Bögen einlesen…" (Audit Runde 2, R2-E5).
+ */
+export function boegenAusJsonText(text: string): Erfassungsbogen[] {
+  return boegenAusText(text);
+}
+
+/** Wie {@link boegenAusJsonText}, dazu die Ursachen der abgelehnten Bögen (R5-E1). */
+export function boegenAusJsonTextMitUrsachen(text: string): { boegen: Erfassungsbogen[]; abgelehnt: string[]; gesamt: number } {
+  const alle = rohBoegen(text);
+  const boegen: Erfassungsbogen[] = [];
+  const abgelehnt: string[] = [];
+  for (const k of alle) {
+    // Was gar keinen Bogen andeutet (Sicherung, Vorlage …), zählt nicht als abgelehnter Bogen.
+    if (!(k && typeof k === "object" && "schemaVersion" in k && "einheit" in k)) continue;
+    const r = bogenAufnehmbar(k);
+    if (r.bogen) boegen.push(migriereBogen(r.bogen));
+    else abgelehnt.push(r.ursache ?? "unlesbar");
+  }
+  return { boegen, abgelehnt, gesamt: boegen.length + abgelehnt.length };
+}
+
+function rohBoegen(text: string): unknown[] {
   let daten: unknown;
   try {
     daten = JSON.parse(text);
   } catch {
     return [];
   }
-  const kandidaten = Array.isArray(daten) ? daten : [daten];
-  return kandidaten.filter(istBogen).map((b) => migriereBogen(b as Erfassungsbogen));
+  return Array.isArray(daten) ? daten : [daten];
+}
+
+function boegenAusText(text: string): Erfassungsbogen[] {
+  return rohBoegen(text)
+    .map((k) => bogenAufnehmbar(k).bogen)
+    .filter((b): b is Erfassungsbogen => b != null)
+    .map((b) => migriereBogen(b));
 }
 
 /**
@@ -162,4 +282,17 @@ export function einsatzAusPdfBytes(bytes: Uint8Array): Einsatzsammlung | null {
     }
   }
   return null;
+}
+
+/**
+ * Was trägt diese PDF? „sammlung" = die ganze Einsatz-Sammlung eingebettet
+ * (Sammel-PDF: verlustfrei über „Einsatz importieren…"), „boegen" = nur
+ * eingebettete Bögen, „nur-qr" = keine Daten, allenfalls QR-Codes — ein
+ * eingescannter Ausdruck. Für die Rückmeldung von „Bögen einlesen…": bei
+ * „sammlung" auf den verlustfreien Weg verweisen, bei „nur-qr" sagen, dass
+ * Zeiten und Abrückvermerke vom Papier nachzutragen sind (Audit Runde 2, R2-A1).
+ */
+export function pdfInhaltArt(bytes: Uint8Array): "sammlung" | "boegen" | "nur-qr" {
+  if (einsatzAusPdfBytes(bytes)) return "sammlung";
+  return boegenAusPdfBytes(bytes).length > 0 ? "boegen" : "nur-qr";
 }

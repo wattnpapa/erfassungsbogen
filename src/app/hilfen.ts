@@ -22,13 +22,18 @@ import {
   Sofortbedarf,
   StaerkeRolle,
   datumAusIso,
+  datumZuIso,
   jetztZeitpunkt,
+  zeitpunktZuIso,
+  type EebDatum,
+  type EebZeitpunkt,
   MINUTEN_JE_TAG,
   mitTransportVersion,
   staerke,
   unterbringungMWD,
   verpflegung,
 } from "@bos/eeb-format/model";
+import { bogenBefund } from "./bogen-pruefung";
 import {
   EEB_URL_PREFIX,
   EEB_VORLAGE_MARKER,
@@ -45,12 +50,13 @@ import { gegengezeichnetePayloadBytes, signiertePayloadBytes } from "@bos/eeb-fo
 import { absenderkarteLaden } from "./absenderkarte";
 import { geraeteSchluesselSicherstellen } from "./geraete-schluessel";
 import { binaerTeilen, istNativ, textTeilen } from "./nativ";
-import { sitzplaetzeFuer, sitzplatzBilanz, type SitzplatzBilanz } from "@bos/vokabulare/sitzplaetze";
+import { sitzplaetzeFuer, sitzplaetzeRichtwert, sitzplatzBilanz, type SitzplatzBilanz } from "@bos/vokabulare/sitzplaetze";
 import {
-  einheitAnzeigename,
+  datumDeutsch,
   einheitOrt,
   funkrufText as funkrufTextEinfach,
   kennzeichenText,
+  orgLabel,
   vokabText,
   vokabularFuer,
 } from "@bos/meldekopf/darstellung";
@@ -72,10 +78,42 @@ export {
   kennzeichenText,
   kontaktText,
   einheitOrt,
-  einheitAnzeigename,
   datumDeutsch,
   zeitgruppe,
 } from "@bos/meldekopf/darstellung";
+
+// Stempelzeit neuer Stände: die geprüfte Uhr (datenschutz-uhr.ts, R5-E2). Sie
+// wird beim Start hier angemeldet, statt dass dieses Modul sie importiert: Mit
+// dem Import zog hilfen.ts über datenschutz-uhr und den Meldekopf-Kern die
+// Vokabulare (Berufe, Ortsverbände, ~330 KB) aus den nachgeladenen Brocken in
+// das Startbündel (Startbündel 1,04 → 1,58 MB, ADR-003 Aufnahmeregel 5).
+let stempelQuelle: () => EebZeitpunkt = () => jetztZeitpunkt();
+
+/** Meldet die Quelle für Stempelzeiten an (main.tsx: die geprüfte Uhr). */
+export function stempelQuelleSetzen(quelle: () => EebZeitpunkt): void {
+  stempelQuelle = quelle;
+}
+
+/**
+ * Anzeigename der Einheit: Organisation, Standort, Einheitstyp — jeder Teil einmal
+ * (Audit Runde 5, R5-N6). Der Baustein (vendor, ADR-003) setzt die drei Teile ohne Prüfung
+ * zusammen; bei Bögen anderer Organisationen stand dann „Bundeswehr Panzerpionierzug
+ * Panzerpionierzug“ oder „DRK-Kreisverband Buchenrode e. V. Buchenrode Behandlung“. Ein Teil,
+ * der als ganze Wörter schon in einem davor steht, entfällt. Der Fingerabdruck der Einheit
+ * (einheitSchluessel) hängt nicht daran.
+ */
+export function einheitAnzeigename(e: Einheit): string {
+  const org = e.organisationName?.trim() || orgLabel(e.organisation);
+  const typ = vokabText(e.einheitsTyp, vokabularFuer(e.organisation, "einheitstyp"), "name");
+  const teile: string[] = [];
+  for (const teil of [org, einheitOrt(e), typ]) {
+    if (!teil) continue;
+    const muster = new RegExp(`(?<![\\p{L}\\p{N}])${teil.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}(?![\\p{L}\\p{N}])`, "iu");
+    if (teile.some((davor) => muster.test(davor))) continue;
+    teile.push(teil);
+  }
+  return teile.join(" ");
+}
 
 /**
  * Funkrufname eines Fahrzeugs, wie er gesprochen wird. Im Regelfall die
@@ -393,12 +431,10 @@ function base64Aus(bytes: Uint8Array): string {
 }
 
 /** Binärdatei anbieten — in der App übers Share-Sheet, im Browser als Download. */
-export async function bytesAlsDatei(dateiname: string, bytes: Uint8Array<ArrayBuffer>, mime: string): Promise<void> {
-  if (istNativ()) {
-    await binaerTeilen(dateiname, base64Aus(bytes));
-    return;
-  }
+export async function bytesAlsDatei(dateiname: string, bytes: Uint8Array<ArrayBuffer>, mime: string): Promise<boolean> {
+  if (istNativ()) return binaerTeilen(dateiname, base64Aus(bytes));
   blobAlsDownload(dateiname, new Blob([bytes], { type: mime }));
+  return true;
 }
 
 /**
@@ -519,6 +555,17 @@ export async function bogenLaden(datei: File): Promise<Erfassungsbogen> {
   } catch {
     throw new Error("Datei ist kein gültiges JSON.");
   }
+  // „Als Datei sichern" am beiseitegelegten Entwurf schreibt die Hülle des
+  // Entwurfs; der Bogen steckt darin (Audit Runde 6, R6-E3).
+  const huelle = daten as { schemaVersion?: unknown; bogen?: unknown } | null;
+  if (huelle && typeof huelle === "object" && huelle.schemaVersion === undefined && huelle.bogen && typeof huelle.bogen === "object") {
+    try {
+      return bogenPruefen(huelle.bogen);
+    } catch (e) {
+      const grund = e instanceof Error ? e.message.replace(/ Beim Absender neu anfordern.*$/, "") : "";
+      throw new Error(`Der gesicherte Entwurf lässt sich nicht öffnen. ${grund} In der App lässt sich das Fehlende nicht nachtragen; die Datei braucht dann, wer die App betreut.`);
+    }
+  }
   return bogenPruefen(daten);
 }
 
@@ -529,10 +576,16 @@ export async function bogenLaden(datei: File): Promise<Erfassungsbogen> {
  */
 export function bogenPruefen(daten: unknown): Erfassungsbogen {
   const b = daten as Erfassungsbogen;
-  if (typeof b?.schemaVersion !== "number" || b.schemaVersion < 2 || b.schemaVersion > SCHEMA_VERSION || !b.einheit || !b.einsatz || !Array.isArray(b.personal)) {
+  // Nur eine fehlende oder fremde Schema-Version heißt „keine Bogen-Datei"; ein defektes Feld bei gültiger
+  // Version nennt `bogenBefund` mit dem Feld (R8-E3) — vorher hieß es „Schema-Version 2–9 erwartet" bei Version 8.
+  if (typeof b?.schemaVersion !== "number" || b.schemaVersion < 2 || b.schemaVersion > SCHEMA_VERSION) {
     throw new Error(`Keine gültige Erfassungsbogen-Datei (Schema-Version 2–${SCHEMA_VERSION} erwartet).`);
   }
-  return migriereBogen(b);
+  // Pflichtfelder: Ein Bogen ohne Einheitstyp ließ die Ansicht weiß werden
+  // (Audit Runde 5, R5-E1). Harmloses wird ergänzt, sonst nennt die Meldung die Ursache.
+  const befund = bogenBefund(b);
+  if (!befund.ok) throw new Error(`Der Bogen ist unvollständig: ${befund.ursache}. Beim Absender neu anfordern oder den QR-Code des Bogens scannen.`);
+  return migriereBogen(befund.bogen);
 }
 
 // ------------------------------------------------------ Plausibilitätsprüfung
@@ -563,11 +616,43 @@ export function transportBilanz(b: Erfassungsbogen): SitzplatzBilanz {
  */
 export function fahrzeugHinweise(b: Erfassungsbogen): string[] {
   const hinweise: string[] = [];
+  const org = b.einheit.organisation;
   b.fahrzeuge.forEach((f, i) => {
     if (!kennzeichenText(f).trim()) {
       hinweise.push(`Fahrzeug ${i + 1} hat noch kein Kennzeichen.`);
     }
+    // 0 Sitzplätze an einem Fahrzeug, das laut Typ Leute befördert (MzKW: 7),
+    // ist fast immer ein Tippfehler — ein Anhänger hat den Richtwert 0 und
+    // löst deshalb nichts aus. Negative Werte kommen nur per Datei herein,
+    // die Eingabe hält sie auf 0; gemeldet werden sie trotzdem.
+    if (f.sitzplaetze != null && f.sitzplaetze <= 0) {
+      const richtwert = sitzplaetzeRichtwert(f, vokabularFuer(org, "fahrzeug"));
+      if (f.sitzplaetze < 0 || (richtwert != null && richtwert > 0)) {
+        hinweise.push(
+          `${fahrzeugBezeichnung(f, i, org)}: ${f.sitzplaetze} Sitzplätze eingetragen` +
+            `${richtwert != null ? ` (Richtwert ${richtwert})` : ""} — stimmt das?`,
+        );
+      }
+    }
   });
+  // Sitzplätze weit über dem Richtwert (90 statt 9) und dasselbe Kennzeichen
+  // zweimal gingen still durch (R2-E4).
+  b.fahrzeuge.forEach((f, i) => {
+    const richtwert = sitzplaetzeRichtwert(f, vokabularFuer(org, "fahrzeug"));
+    if (f.sitzplaetze != null && f.sitzplaetze > 9 && f.sitzplaetze > 2 * Math.max(richtwert ?? 0, 1)) {
+      hinweise.push(`${fahrzeugBezeichnung(f, i, org)}: ${f.sitzplaetze} Sitzplätze${richtwert != null ? ` (Richtwert ${richtwert})` : ""} — stimmt das?`);
+    }
+  });
+  const kennzeichenNorm = (f: Fahrzeug) => kennzeichenText(f).toUpperCase().replace(/[\s-]/g, "");
+  const doppelt = new Set(
+    b.fahrzeuge
+      .map(kennzeichenNorm)
+      .filter((k, i, alle) => k && alle.indexOf(k) !== i),
+  );
+  for (const k of doppelt) {
+    const f = b.fahrzeuge.find((x) => kennzeichenNorm(x) === k)!;
+    hinweise.push(`Kennzeichen ${kennzeichenText(f)} steht mehrfach in der Fahrzeugliste — stimmt das?`);
+  }
   // Ohne Fahrzeuge reist die Einheit erklärtermaßen anders an — das ist kein
   // offener Punkt, sondern eine Aussage. Erst wenn Fahrzeuge dastehen, muss
   // die Rechnung aufgehen.
@@ -578,7 +663,7 @@ export function fahrzeugHinweise(b: Erfassungsbogen): string[] {
     // das gehört dann in „Sonstiges" — der Meldekopf muss es wissen.
     hinweise.push(
       `Sitzplätze: ${bilanz.plaetze} in den erfassten Fahrzeugen für ${bilanz.benoetigt} Personen — ` +
-        `${bilanz.fehlend} brauchen eine andere Mitfahrgelegenheit (Richtwerte je Fahrzeugtyp, ` +
+        `${bilanz.fehlend} ${bilanz.fehlend === 1 ? "braucht" : "brauchen"} eine andere Mitfahrgelegenheit (Richtwerte je Fahrzeugtyp, ` +
         `soweit am Fahrzeug nichts anderes eingetragen ist).`,
     );
   }
@@ -593,6 +678,12 @@ export function fahrzeugHinweise(b: Erfassungsbogen): string[] {
 export interface Pruefpunkt {
   text: string;
   schritt: number;
+  /**
+   * Kennung (id) des Eingabefelds, das den Punkt behebt. Antippen springt
+   * dorthin und setzt den Cursor — vorher endete der Sprung beim Schritt, und
+   * sofort eingetippter Text ging ins Leere (Audit Runde 2, R2-H2).
+   */
+  feld?: string;
 }
 
 // Schritt-Indizes des Assistenten (siehe SCHRITTE in main.tsx).
@@ -609,8 +700,21 @@ const S_SOFORTBEDARF = 4;
  * standardmäßig mit an (für die Gesamtübersicht); auf der Personalseite
  * werden sie über `mitFahrzeugen = false` weggelassen.
  */
-export function pruefpunkte(b: Erfassungsbogen, mitFahrzeugen = true): Pruefpunkt[] {
+export function pruefpunkte(b: Erfassungsbogen, mitFahrzeugen = true, heute?: EebDatum): Pruefpunkt[] {
   const hinweise: Pruefpunkt[] = [];
+  // Nur wo `heute` hereinkommt (eigener Bogen vor der Übergabe): ein alter
+  // Entwurf ging sonst mit „✓ vollständig und plausibel" in den QR-Code —
+  // Zeitraum und Auftrag vom Juli als aktuelle Meldung (Audit Runde 2, R2-S1).
+  // Ein Tippfehler, ein Hinweis (Audit Runde 3, R3-E7): Liegt „bis" vor
+  // „von", sagt der eine Hinweis dazu unten auch, welches Datum verdächtig ist
+  // — „ist vorbei" für ein Datum im Jahr 2062 lenkte auf die falsche Fährte.
+  const bisVorVon = b.einsatz.zeitraumBis < b.einsatz.zeitraumVon;
+  if (heute != null && !bisVorVon && b.einsatz.zeitraumBis < heute) {
+    hinweise.push({
+      text: `Einsatzzeitraum ${zeitraumDeutsch(b)} ist vorbei — gilt dieser Bogen noch für den aktuellen Einsatz? Sonst Zeitraum und Ort/Auftrag neu eintragen.`,
+      schritt: S_EINSATZ,
+    });
+  }
   const s = staerke(b);
   const mwd = unterbringungMWD(b);
 
@@ -618,6 +722,21 @@ export function pruefpunkte(b: Erfassungsbogen, mitFahrzeugen = true): Pruefpunk
   // namenlos (nur Organisation + Einheitstyp) und der Funkrufname ortlos.
   if (!einheitOrt(b.einheit) && b.einheit.standortRef == null) {
     hinweise.push({ text: "Zugehörigkeit: Der Name der eigenen Einheit (unterste Ebene) fehlt.", schritt: S_EINHEIT });
+  }
+  // Ein ausgeschriebener Einheitstyp ohne Typ-Code (Freitext) sieht in Schritt 1
+  // wie eine Wahl aus, hat aber kein taktisches Zeichen und keinen Soll-Vergleich
+  // (Audit Runde 4, R4-H1). Nur, wo es eine Liste gibt; in der Schnellerfassung
+  // reicht der Name.
+  const typFrei = b.einheit.einheitsTyp.code == null ? (b.einheit.einheitsTyp.freitext ?? "").trim() : "";
+  if (
+    typFrei &&
+    b.personalErfassung !== PersonalErfassung.NUR_STAERKE &&
+    vokabularFuer(b.einheit.organisation, "einheitstyp").length > 0
+  ) {
+    hinweise.push({
+      text: `Einheitstyp „${typFrei}" nicht erkannt — nicht aus der Liste gewählt, deshalb fehlen taktisches Zeichen und Soll-Vergleich.`,
+      schritt: S_EINHEIT,
+    });
   }
   if (s.gesamt === 0) {
     hinweise.push({ text: "Stärke ist 0 — es ist noch kein Personal erfasst.", schritt: S_PERSONAL });
@@ -635,7 +754,7 @@ export function pruefpunkte(b: Erfassungsbogen, mitFahrzeugen = true): Pruefpunk
   const mwdSumme = mwd.m + mwd.w + mwd.d;
   if (mwdBelastbar && s.gesamt > 0 && mwdSumme !== s.gesamt) {
     hinweise.push({
-      text: `Unterbringung: M ${mwd.m} + W ${mwd.w} + D ${mwd.d} = ${mwdSumme} weicht von der Gesamtstärke ${s.gesamt} ab.`,
+      text: `Aufteilung nach Geschlecht: ${mwd.m} männl. + ${mwd.w} weibl. + ${mwd.d} div. = ${mwdSumme} weicht von der Gesamtstärke ${s.gesamt} ab.`,
       schritt: S_PERSONAL,
     });
   }
@@ -672,13 +791,77 @@ export function pruefpunkte(b: Erfassungsbogen, mitFahrzeugen = true): Pruefpunk
     b.personal.every((p) => p.geschlecht === Geschlecht.M)
   ) {
     hinweise.push({
-      text: `Unterbringung M ${b.personal.length} / W 0 / D 0 — bei allen Personen steht die Vorbelegung „M". Bitte prüfen.`,
+      text: `Alle ${b.personal.length} Personen stehen auf Geschlecht „männlich" — das ist die Vorbelegung. Bitte prüfen (zählt für Unterbringung und WC/Dusche).`,
       schritt: S_PERSONAL,
+      feld: "feld-geschlecht-0",
     });
   }
-  if (b.einsatz.zeitraumBis < b.einsatz.zeitraumVon) {
-    hinweise.push({ text: "Einsatzzeitraum: „bis“ liegt vor „von“.", schritt: S_EINSATZ });
+  if (bisVorVon) {
+    const fern = heute == null ? [] : [b.einsatz.zeitraumVon, b.einsatz.zeitraumBis].filter((d) => Math.abs(d - heute) > 365);
+    const verdaechtig = fern.length === 1 ? datumZuIso(fern[0]!) : null;
+    hinweise.push({
+      text: verdaechtig
+        ? `Einsatzzeitraum: „bis“ liegt vor „von“ — ${datumDeutsch(verdaechtig)} liegt mehr als ein Jahr entfernt, Tippfehler im Jahr ${verdaechtig.slice(0, 4)}?`
+        : "Einsatzzeitraum: „bis“ liegt vor „von“.",
+      schritt: S_EINSATZ,
+    });
   }
+  // Einsatzende 06:00 vor Einsatzbeginn 18:00 am selben Tag ging unbemerkt in
+  // die Übergabe — im Sammel-PDF steht die Einheit dann mit einem Ende vor dem
+  // Anfang, und am Meldekopf ist das nicht mehr als Tippfehler erkennbar.
+  if (
+    b.einsatz.einsatzbeginn != null &&
+    b.einsatz.einsatzende != null &&
+    b.einsatz.einsatzende < b.einsatz.einsatzbeginn
+  ) {
+    hinweise.push({
+      text: `Einsatzende ${zeitpunktDeutsch(b.einsatz.einsatzende)} liegt vor dem Einsatzbeginn ${zeitpunktDeutsch(b.einsatz.einsatzbeginn)}.`,
+      schritt: S_EINSATZ,
+    });
+  }
+  // Weitere Tippfehler, die bisher ohne Hinweis durchgingen (Audit Runde 2,
+  // R2-E4). Alle als Frage, nichts sperrt.
+  const ohneZiffer = (t?: string) => !!t?.trim() && !/\d/.test(t);
+  const ohneAt = (t?: string) => !!t?.trim() && !t.includes("@");
+  const nurZiffern = (t?: string) => !!t?.trim() && /^[\d\s./-]+$/.test(t.trim());
+  b.einheit.hierarchie.forEach((h) => {
+    const wo = h.name.trim() || "Zugehörigkeit";
+    if (ohneZiffer(h.telefon)) hinweise.push({ text: `${wo}: Rufnummer „${h.telefon}" enthält keine Ziffer — stimmt das?`, schritt: S_EINHEIT });
+    if (ohneAt(h.email)) hinweise.push({ text: `${wo}: E-Mail „${h.email}" ohne „@" — stimmt das?`, schritt: S_EINHEIT });
+    if (nurZiffern(h.name)) hinweise.push({ text: `Zugehörigkeit „${h.name}" besteht nur aus Ziffern — stimmt der Name?`, schritt: S_EINHEIT });
+  });
+  b.personal.forEach((p, i) => {
+    const wer = personBezeichnung(p, i);
+    if (nurZiffern(p.vorname) || nurZiffern(p.nachname)) {
+      hinweise.push({ text: `${wer}: Der Name besteht nur aus Ziffern — stimmt das?`, schritt: S_PERSONAL });
+    }
+    for (const k of p.kontakte) {
+      if (k.art === KontaktArt.EMAIL ? ohneAt(k.wert) : ohneZiffer(k.wert)) {
+        hinweise.push({
+          text: `${wer}: ${k.art === KontaktArt.EMAIL ? `E-Mail „${k.wert}" ohne „@"` : `Rufnummer „${k.wert}" ohne Ziffer`} — stimmt das?`,
+          schritt: S_PERSONAL,
+        });
+      }
+    }
+  });
+  if (b.einsatz.einsatzbeginn != null) {
+    const tag = Math.floor(b.einsatz.einsatzbeginn / MINUTEN_JE_TAG);
+    if (tag < b.einsatz.zeitraumVon || tag > b.einsatz.zeitraumBis) {
+      hinweise.push({
+        text: `Einsatzbeginn ${zeitpunktDeutsch(b.einsatz.einsatzbeginn)} liegt außerhalb des Einsatzzeitraums ${zeitraumDeutsch(b)}.`,
+        schritt: S_EINSATZ,
+      });
+    }
+  }
+  if (heute != null && !bisVorVon && (Math.abs(b.einsatz.zeitraumVon - heute) > 365 || b.einsatz.zeitraumBis - heute > 365)) {
+    hinweise.push({ text: `Einsatzzeitraum ${zeitraumDeutsch(b)} liegt mehr als ein Jahr entfernt — Tippfehler im Jahr?`, schritt: S_EINSATZ });
+  }
+  // Zahlendreher in der Stärke: 99 statt 9 fällt beim Tippen nicht auf, am
+  // Meldekopf zählt die Einheit dann mit 100 in die Lage. Zwei Muster, die
+  // fast nie stimmen: ein Einzelwert über 50 und mehr Führer als Mannschaft
+  // (ab vier Personen — ein Trupp aus Führer und Unterführer ist normal).
+  // Bewusst als Frage formuliert: ein Führungsstab kann so aussehen.
+  hinweise.push(...staerkePlausibilitaet(s).map((text) => ({ text, schritt: S_PERSONAL })));
   if (b.sofortbedarf && s.gesamt > 0 && b.sofortbedarf.verpflegungPersonen > s.gesamt) {
     hinweise.push({
       text: `Verpflegung für ${b.sofortbedarf.verpflegungPersonen} Personen angefordert, die Gesamtstärke ist aber ${s.gesamt}.`,
@@ -693,6 +876,7 @@ export function pruefpunkte(b: Erfassungsbogen, mitFahrzeugen = true): Pruefpunk
         schritt: S_SOFORTBEDARF,
       });
     }
+    hinweise.push(...betriebsstoffPlausibilitaet(b).map((text) => ({ text, schritt: S_SOFORTBEDARF })));
   }
   // Manuell erfasste Verpflegungs-Aufteilung (Meldekopf): veg + vegan dürfen die
   // Gesamtstärke nicht übersteigen — Hinweis schon bei der Stärkeerfassung.
@@ -708,8 +892,11 @@ export function pruefpunkte(b: Erfassungsbogen, mitFahrzeugen = true): Pruefpunk
   // Vollständigkeit für die Weitergabe: genau die Angaben, wegen derer der
   // Meldekopf sonst zurückfragen muss (Auftrag, Erreichbarkeit). Die fehlenden
   // Kennzeichen prüft fahrzeugHinweise() auf dem Fahrzeug-Schritt.
-  if (!b.einsatz.ortAuftrag.trim()) {
-    hinweise.push({ text: "Ort/Auftrag ist noch leer.", schritt: S_EINSATZ });
+  // Nicht bei der Schnellerfassung: deren Schritt 1 sagt ausdrücklich
+  // „Einsatzdaten … können offen bleiben", die Übersicht zählte das leere
+  // Feld trotzdem als offenen Punkt für die Weitergabe (Audit Runde 2, R2-H9).
+  if (!b.einsatz.ortAuftrag.trim() && b.personalErfassung !== PersonalErfassung.NUR_STAERKE) {
+    hinweise.push({ text: "Ort/Auftrag ist noch leer.", schritt: S_EINSATZ, feld: "feld-ort-auftrag" });
   }
   const telefonErfasst = b.personal.some((p) =>
     p.kontakte.some((k) => k.art !== KontaktArt.EMAIL && (k.wert ?? "").trim() !== ""),
@@ -721,7 +908,14 @@ export function pruefpunkte(b: Erfassungsbogen, mitFahrzeugen = true): Pruefpunk
     });
   }
   if (mitFahrzeugen) {
-    hinweise.push(...fahrzeugHinweise(b).map((text) => ({ text, schritt: S_FAHRZEUGE })));
+    hinweise.push(
+      ...fahrzeugHinweise(b).map((text) => {
+        const kz = /^Fahrzeug (\d+) hat noch kein Kennzeichen/.exec(text);
+        // Die Sitzplatz-Bilanz springt zum Sitzplatz-Feld des ersten Fahrzeugs (R6-N7).
+        const feld = kz ? `feld-kennzeichen-${Number(kz[1]) - 1}` : /^Sitzplätze: /.test(text) ? "feld-sitzplaetze-0" : null;
+        return { text, schritt: S_FAHRZEUGE, ...(feld ? { feld } : {}) };
+      }),
+    );
     // Fahrzeuge ohne Fahrer kommen nicht in den Einsatz: die StAN-Vorbelegung
     // setzt bewusst keine Fahrerlaubnisklassen — vergisst der Bogen sie ganz,
     // findet der Kraftfahrer-Filter am Meldekopf die Einheit nicht. Nur bei
@@ -748,6 +942,117 @@ export function plausibilitaet(b: Erfassungsbogen, mitFahrzeugen = true): string
   return pruefpunkte(b, mitFahrzeugen).map((p) => p.text);
 }
 
+/** Ab diesem Einzelwert (Führer, Unterführer oder Mannschaft) fragt die Stärkeprüfung nach. */
+const STAERKE_EINZELWERT_GRENZE = 50;
+
+/**
+ * Zahlendreher-Prüfung der Stärke, siehe {@link pruefpunkte}. Eigene Funktion,
+ * damit der Personal-Schritt sie direkt an der Stärke-Zeile zeigen kann.
+ */
+export function staerkePlausibilitaet(s: {
+  fuehrer: number;
+  unterfuehrer: number;
+  mannschaft: number;
+  gesamt: number;
+}): string[] {
+  const hinweise: string[] = [];
+  const einzel: [number, string][] = [
+    [s.fuehrer, "Führer"],
+    [s.unterfuehrer, "Unterführer"],
+    [s.mannschaft, "Mannschaft"],
+  ];
+  for (const [wert, name] of einzel) {
+    if (wert > STAERKE_EINZELWERT_GRENZE) hinweise.push(`Stärke: ${wert} ${name} — stimmt das?`);
+  }
+  if (s.gesamt >= 4 && s.fuehrer > s.mannschaft) {
+    hinweise.push(
+      `Stärke ${s.fuehrer} / ${s.unterfuehrer} / ${s.mannschaft} / ${s.gesamt}: mehr Führer als Mannschaft — stimmt das?`,
+    );
+  }
+  return hinweise;
+}
+
+/** Liter je Fahrzeug, ab denen der Betriebsstoff-Bedarf hinterfragt wird (Tank eines Lkw: 200–400 l). */
+const BETRIEBSSTOFF_JE_FAHRZEUG_GRENZE = 1000;
+
+/**
+ * Betriebsstoff-Plausibilität: „Diesel 99 999 l" tippt man mit einer Ziffer zu
+ * viel. Grenze ist 1000 l je erfasstem Fahrzeug (ohne Fahrzeuge: 1000 l) —
+ * großzügig genug für Aggregate und Reservekanister, aber nicht für einen
+ * Zahlendreher. Nicht sperrend: wer wirklich einen Tankwagen füllt, lässt es stehen.
+ */
+export function betriebsstoffPlausibilitaet(b: Pick<Erfassungsbogen, "sofortbedarf" | "fahrzeuge">): string[] {
+  const s = b.sofortbedarf;
+  if (!s) return [];
+  const fahrzeuge = Math.max(1, b.fahrzeuge.length);
+  const grenze = BETRIEBSSTOFF_JE_FAHRZEUG_GRENZE * fahrzeuge;
+  const sorten: [number, string][] = [
+    [s.dieselLiter, "Diesel"],
+    [s.benzinLiter, "Benzin"],
+    [s.gemischLiter, "Gemisch"],
+  ];
+  return sorten
+    .filter(([liter]) => liter > grenze)
+    .map(
+      ([liter, name]) =>
+        `Sofortbedarf: ${literText(liter)} ${name}` +
+        (b.fahrzeuge.length > 0 ? ` für ${b.fahrzeuge.length} ${b.fahrzeuge.length === 1 ? "Fahrzeug" : "Fahrzeuge"}` : "") +
+        ` — mehr als ${literText(BETRIEBSSTOFF_JE_FAHRZEUG_GRENZE)} je Fahrzeug. Stimmt das?`,
+    );
+}
+
+/** „5.000 l" — Tausenderpunkt wie auf dem Papierbogen, damit die Größenordnung ins Auge fällt. */
+function literText(liter: number): string {
+  return `${liter.toLocaleString("de-DE")} l`;
+}
+
+/**
+ * Zeitpunkt lesbar: „27.09.2026, 18:00" — dieselbe Schreibweise wie das
+ * Datum des Zeitraums (datumDeutsch), nur mit Uhrzeit. Vorher standen
+ * Einsatzbeginn und -ende als „2026-09-27T18:00" neben „27.09.2026" — zwei
+ * Schreibweisen für dieselbe Auskunft auf einer Seite.
+ */
+/** Heutiger Kalendertag in lokaler Wandzeit (EebDatum). */
+export function heuteDatum(): EebDatum {
+  return Math.floor(jetztZeitpunkt() / MINUTEN_JE_TAG);
+}
+
+/** Einsatzzeitraum lesbar: „18.07.2026 – 22.07.2026" bzw. ein Tag. */
+export function zeitraumDeutsch(b: Erfassungsbogen): string {
+  const von = datumDeutsch(datumZuIso(b.einsatz.zeitraumVon));
+  const bis = datumDeutsch(datumZuIso(b.einsatz.zeitraumBis));
+  return von === bis ? von : `${von} – ${bis}`;
+}
+
+export function zeitpunktDeutsch(z: EebZeitpunkt): string {
+  const [datum = "", zeit = ""] = zeitpunktZuIso(z).split("T");
+  return `${datumDeutsch(datum)}, ${zeit}`;
+}
+
+/**
+ * Verpflegungs-Bedarf mit der Stärke mitziehen.
+ *
+ * Der Bedarf in Schritt 5 ist mit der Gesamtstärke vorbelegt. Wer danach in
+ * Schritt 3 eine Person entfernt, bekam nur einen Hinweis („Verpflegung für
+ * 4 angefordert, Stärke ist 3") und musste die Zahl selbst nachziehen — eine
+ * Angabe, zwei Orte. Deshalb folgt der Bedarf der Stärke, solange er ihr
+ * entspricht (oder noch 0 ist): Wer bewusst mehr bestellt hat, weil ein
+ * Nachzügler kommt, behält seine Zahl.
+ *
+ * Nimmt den Bogen vor der Änderung und den Patch, gibt den Patch zurück —
+ * ergänzt um den nachgezogenen Sofortbedarf, wenn nötig.
+ */
+export function verpflegungMitziehen(vorher: Erfassungsbogen, patch: Partial<Erfassungsbogen>): Partial<Erfassungsbogen> {
+  const nachher = { ...vorher, ...patch };
+  const sb = nachher.sofortbedarf;
+  if (!sb) return patch;
+  const alt = staerke(vorher).gesamt;
+  const neu = staerke(nachher).gesamt;
+  if (alt === neu) return patch;
+  if (sb.verpflegungPersonen !== alt && sb.verpflegungPersonen !== 0) return patch;
+  return { ...patch, sofortbedarf: { ...sb, verpflegungPersonen: neu } };
+}
+
 // ------------------------------------------------- Fortschritt je Schritt
 
 /** Heuristischer Füllstand eines Assistenten-Schritts (reiner Orientierungshelfer). */
@@ -755,7 +1060,7 @@ export type SchrittStatus = "leer" | "begonnen" | "ok";
 
 export const SCHRITT_STATUS_TITEL: Record<SchrittStatus, string> = {
   leer: "noch leer",
-  begonnen: "begonnen",
+  begonnen: "offen, hier fehlt noch etwas",
   ok: "ausgefüllt",
 };
 
@@ -763,14 +1068,22 @@ export const SCHRITT_STATUS_TITEL: Record<SchrittStatus, string> = {
  * Leichter Status je Schritt (Einheit, Einsatz, Personal, Fahrzeuge,
  * Sofortbedarf) aus dem Bogen abgeleitet — nur Orientierung, nichts wird
  * erzwungen. Die Übersicht (letzter Schritt) hat bewusst keinen Status.
+ *
+ * „✓" heißt fertig: Ein Schritt mit eigenen Prüfpunkten bleibt „offen", auch
+ * wenn er sonst als ausgefüllt gälte. Vorher stand „3 ✓" bei 3 von 9 Namen,
+ * während die Übersicht „6 Personenkarten ohne Angaben" meldete (Audit
+ * Runde 3, R3-N4). In der Schnellerfassung („Nur Stärke") reicht für
+ * Schritt 1 der Name, wie der Hinweis dort sagt — vorher stand „1 offen" bis
+ * zum Schluss, weil der Einheitstyp fehlte.
  */
 export function schrittStatus(b: Erfassungsbogen): SchrittStatus[] {
   const e = b.einheit;
+  const schnell = b.personalErfassung === PersonalErfassung.NUR_STAERKE;
   const typGesetzt = e.einheitsTyp.code != null || !!e.einheitsTyp.freitext?.trim();
   // Die erste Zugehörigkeits-Ebene ist die eigene Einheit und damit Pflicht.
   const nameGesetzt = !!einheitOrt(e) || e.standortRef != null;
   const einheitBegonnen = typGesetzt || nameGesetzt || e.hierarchie.length > 1 || !!e.organisationName;
-  const einheit: SchrittStatus = typGesetzt && nameGesetzt ? "ok" : einheitBegonnen ? "begonnen" : "leer";
+  const einheit: SchrittStatus = (typGesetzt || schnell) && nameGesetzt ? "ok" : einheitBegonnen ? "begonnen" : "leer";
 
   const ez = b.einsatz;
   const einsatz: SchrittStatus = ez.ortAuftrag.trim()
@@ -783,19 +1096,27 @@ export function schrittStatus(b: Erfassungsbogen): SchrittStatus[] {
   // schon in die Stärke zählt — das grüne Häkchen hätte die Meldung sonst als
   // fertig ausgewiesen, obwohl eine namenlose Person darin steckt.
   const staerkeGemeldet = staerke(b).gesamt > 0;
+  // Ebenso reine Sollplätze aus der StAN-Vorbelegung: Sie tragen Funktionen,
+  // aber keinen Namen — der Haken „ausgefüllt" stand schon, bevor Schritt 3
+  // je offen war (Audit Runde 2, R2-N3).
   const nurLeereKarten =
     b.personalErfassung === PersonalErfassung.VOLLSTAENDIG &&
     b.personal.length > 0 &&
-    b.personal.every(personLeer);
+    b.personal.every((p) => personLeer(p) || personUnbenannt(p));
   const personal: SchrittStatus =
     staerkeGemeldet && !nurLeereKarten ? "ok" : b.personal.length > 0 || staerkeGemeldet ? "begonnen" : "leer";
 
-  const fahrzeuge: SchrittStatus = b.fahrzeuge.length > 0 ? "ok" : "leer";
+  // Vorbelegte Fahrzeuge ohne ein einziges Kennzeichen sind begonnen, nicht fertig (R2-N3).
+  const fahrzeuge: SchrittStatus =
+    b.fahrzeuge.length === 0 ? "leer" : b.fahrzeuge.every(fahrzeugUnbenannt) ? "begonnen" : "ok";
 
   // Sofortbedarf/Sonstiges ist durchweg optional: „ok", sobald etwas erfasst ist, sonst neutral „leer".
   const sofortbedarf: SchrittStatus = b.sofortbedarf != null || !!b.sonstiges?.trim() ? "ok" : "leer";
 
-  return [einheit, einsatz, personal, fahrzeuge, sofortbedarf];
+  // Eigene Prüfpunkte eines Schritts nehmen ihm den Haken (R3-N4). Die
+  // Fahrzeugpunkte nur, wo die App sie auch zeigt (nicht in der Schnellerfassung).
+  const mitPunkten = new Set(pruefpunkte(b, !schnell).map((p) => p.schritt));
+  return [einheit, einsatz, personal, fahrzeuge, sofortbedarf].map((st, i) => (st === "ok" && mitPunkten.has(i) ? "begonnen" : st));
 }
 
 /**
@@ -808,6 +1129,25 @@ export function schrittStatus(b: Erfassungsbogen): SchrittStatus[] {
  */
 export function bogenHatInhalt(b: Erfassungsbogen): boolean {
   return schrittStatus(b).some((s) => s !== "leer");
+}
+
+/**
+ * Steht die Stärke nur aus unbenannten Sollplätzen? Dann hat niemand die
+ * Einheit gezählt — die Zahl ist die Soll-, nicht die gemeldete Stärke. Am
+ * Meldekopf wirkte so eine Erfassung in der Summe wie eine Meldung von neun
+ * Helfern (Audit Runde 2, R2-E2). Die Schnellerfassung (nur Stärke) zählt
+ * nur dann, wenn die Zahlen noch genau der Vorbelegung gleichen (R7-A1) —
+ * sonst ist die Zahl die Angabe.
+ */
+export function nurSollstaerke(b: Erfassungsbogen): boolean {
+  if (b.personal.length === 0 || !b.personal.every(personUnbenannt)) return false;
+  if (b.personalErfassung !== PersonalErfassung.NUR_STAERKE) return true;
+  // Schnellerfassung: Die Zahl ist die Angabe — aber nur, wenn sie angefasst wurde.
+  // Gleicht sie noch der Vorbelegung nach Einheitstyp, hat niemand gezählt (R7-A1).
+  const m = b.staerkeManuell;
+  if (!m) return true;
+  const soll = staerke({ personal: b.personal });
+  return soll.fuehrer === m.fuehrer && soll.unterfuehrer === m.unterfuehrer && soll.mannschaft === m.mannschaft;
 }
 
 // ------------------------------------------------------------- Neuer Bogen
@@ -825,7 +1165,7 @@ export function neuerBogen(): Erfassungsbogen {
   const heute = datumAusIso(new Date().toISOString().slice(0, 10));
   return {
     schemaVersion: SCHEMA_VERSION,
-    stand: jetztZeitpunkt(),
+    stand: stempelQuelle(),
     einheit: {
       organisation: OrganisationsTyp.THW,
       einheitsTyp: {},
@@ -892,6 +1232,39 @@ export function personLeer(p: Person): boolean {
     p.fahrerlaubnis === Fahrerlaubnis.NONE &&
     p.staerkeRolle === StaerkeRolle.MANNSCHAFT
   );
+}
+
+/**
+ * Eine Vorbelegungs-Karte, die noch niemand ausgefüllt hat: kein Name, keine
+ * Erreichbarkeit. Die StAN-Sollplätze und die Landesvorlagen legen genau
+ * solche Karten an (Rolle und Funktion gesetzt, Namen offen). Beim Wechsel
+ * des Einheitstyps und über „Vorbelegung entfernen" werden nur sie
+ * weggeräumt — eine Karte, in der schon eine Rufnummer steht, ist Inhalt,
+ * auch wenn der Name noch fehlt. Dasselbe gilt für eine Fahrerlaubnis oder
+ * Zusatzqualifikation: Wer einem Sollplatz schon „CE" gegeben hat, weil der
+ * Helfer erst später feststeht, verlor die Angabe vorher ohne Rückfrage
+ * (Audit Runde 2, R2-E6). Die Vorbelegung setzt beides nie.
+ */
+export function personUnbenannt(p: Person): boolean {
+  return (
+    !p.vorname.trim() &&
+    !p.nachname.trim() &&
+    p.kontakte.length === 0 &&
+    p.fahrerlaubnis === Fahrerlaubnis.NONE &&
+    p.zusatzqualifikationen.length === 0
+  );
+}
+
+/**
+ * Wie `personUnbenannt`, für ein Fahrzeug: Die Vorbelegung setzt Typ,
+ * „Ausstattung nach StAN" und den Funkrufnamen, lässt aber Kennzeichen,
+ * Sondergerät und Sitzplätze offen. Steht in einem davon etwas, ist das
+ * Fahrzeug Inhalt. Vorher zählte nur das Kennzeichen: „Vorbelegung entfernen"
+ * nahm einen GKW samt eingetragenem Sondergerät ohne Rückfrage mit (Audit
+ * Runde 3, R3-N2), ebenso der Wechsel des Einheitstyps.
+ */
+export function fahrzeugUnbenannt(f: Fahrzeug): boolean {
+  return !f.kennzeichen?.trim() && !f.aenderungen?.trim() && f.sitzplaetze == null;
 }
 
 /** Wie `personLeer`, für ein Fahrzeug. */

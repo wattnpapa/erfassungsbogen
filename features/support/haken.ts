@@ -139,10 +139,25 @@ ${meckern.trim()}` : ""),
  */
 const PRUEFSTAND_ZEIT = new Date("2025-05-20T09:00:00Z");
 
-Before(async function (this: EebWelt) {
+Before(async function (this: EebWelt, { pickle }) {
   const kontext = await browser.newContext();
   await kontext.clock.install({ time: PRUEFSTAND_ZEIT });
   await kontext.clock.resume();
+  // Die Headless-Shell von Playwright meldet keinen PDF-Betrachter
+  // (navigator.pdfViewerEnabled === false), anders als Chrome, Edge, Firefox
+  // und Safari auf dem Desktop. Ohne diese Zeile sähe die Suite überall die
+  // Android-Fassung der PDF-Karte. Szenarien mit @ohne-pdf-betrachter prüfen
+  // genau diese Fassung (Chrome auf Android).
+  const pdfBetrachter = !pickle.tags.some((t) => t.name === "@ohne-pdf-betrachter");
+  // Als Text, nicht als Funktion: tsx hängt übergebenen Funktionen einen
+  // __name-Helfer an, den es im Browser nicht gibt — das Skript bräche still ab.
+  await kontext.addInitScript(
+    `Object.defineProperty(Navigator.prototype, "pdfViewerEnabled", { get: () => ${pdfBetrachter}, configurable: true });`,
+  );
+  // Der Prellschutz der Rückfragen (src/app/dialoge.tsx, R2-G1) verschluckt
+  // Zeiger-Klicks in den ersten 450 ms — Playwright bestätigt schneller als
+  // jeder Finger. Sein Verhalten prüft ein eigener Oberflächentest.
+  await kontext.addInitScript(`globalThis.__EEB_PRELLSCHUTZ_MS = 0;`);
   // „Link teilen" schreibt ohne Web-Share-API in die Zwischenablage; ohne
   // Erlaubnis scheitert das still. WebKit kennt diese Berechtigungsnamen nicht.
   await kontext.grantPermissions(["clipboard-read", "clipboard-write"]).catch(() => {});

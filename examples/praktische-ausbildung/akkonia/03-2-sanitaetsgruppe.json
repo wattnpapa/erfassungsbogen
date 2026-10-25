@@ -1,0 +1,168 @@
+{
+  "schemaVersion": 9,
+  "uebung": true,
+  "stand": 2171520,
+  "einheit": {
+    "organisation": 6,
+    "einheitsTyp": {
+      "freitext": "2. Sanitätsgruppe"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "code": 1
+        },
+        "name": "Akkonia"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 1508,
+    "zeitraumBis": 1508,
+    "ortAuftrag": "Praktische Ausbildung (Übung): Einheitenerfassung der geplanten Einsatzeinheiten"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "nachname": "Gruber",
+      "vorname": "Hannes",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "GF"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "RS"
+        }
+      ]
+    },
+    {
+      "nachname": "Fiedler",
+      "vorname": "Nicole",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "TF"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "RS"
+        }
+      ]
+    },
+    {
+      "nachname": "Estorff",
+      "vorname": "Pascal",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "HE"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "SAN-H"
+        }
+      ]
+    },
+    {
+      "nachname": "Kunst",
+      "vorname": "Michael",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "TF"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "RS"
+        }
+      ]
+    },
+    {
+      "nachname": "Hoffmann",
+      "vorname": "Mirko",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "HE"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "SAN-H"
+        }
+      ]
+    },
+    {
+      "nachname": "Dommeyer",
+      "vorname": "Stefan",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kraftfahrer/Melder"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "SAN-H"
+        }
+      ]
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "MTW"
+      },
+      "kennzeichen": "AK-JU 36",
+      "funkrufname": {
+        "kennwort": {
+          "code": 4
+        },
+        "eigenerStandort": false,
+        "ort": "Akkonia",
+        "teile": [
+          56,
+          17,
+          3
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "Geräteanhänger-SAN"
+      },
+      "kennzeichen": "AK-JU-37"
+    }
+  ],
+  "sonstiges": "Fachdienst: Sanitätsdienst. Hauptleistung: BHP (UHS 2). Kommunikation: Rufname 56-17-3."
+}

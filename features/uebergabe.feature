@@ -31,16 +31,41 @@ Funktionalität: Bogen übergeben — QR, PDF, Link, CSV
     Dann ist kein Dialog offen
 
   Szenario: QR-Code im Vollbild zeigen und wieder schließen
+    Angenommen das Fenster 1280 × 900 Pixel groß ist
     Wenn ich auf "Bogen übergeben…" klicke
     Und ich im Dialog auf "QR-Code im Vollbild zeigen" klicke
     Dann sehe ich den Dialog "QR-Code im Vollbild"
     Und sehe ich den Hinweis "Der Bildschirm bleibt an"
     Wenn ich auf "Schließen" klicke
-    Dann sehe ich "Der Bildschirm bleibt an" nicht
+    Dann sehe ich den Hinweis "Der Bildschirm bleibt an" nicht
+    # Die App weiß nicht, ob gescannt wurde — sie fragt (Audit Runde 3, R3-H3).
+    Und sehe ich den Text "Hat die Gegenstelle den Code gescannt?"
+    Wenn ich auf "Nicht sicher" klicke
+    Dann sehe ich den Hinweis "QR-Code gezeigt"
+    Und sehe ich den Hinweis "Empfang nicht bestätigt"
+
+  # Auf Telefonhöhe gehen Code, Teilnummer und Knöpfe vor; der
+  # Helligkeitstipp entfällt (Audit Runde 3, R3-H2).
+  Szenario: Auf Telefonhöhe hat der Code im Vollbild Vorrang vor dem Helligkeitstipp
+    Angenommen das Fenster 360 × 640 Pixel groß ist
+    Wenn ich auf "Bogen übergeben…" klicke
+    Und ich im Dialog auf "QR-Code im Vollbild zeigen" klicke
+    Dann sehe ich den Dialog "QR-Code im Vollbild"
+    Und sehe ich das Bild "EEB2-QR-Code"
+    Und sehe ich den Hinweis "Der Bildschirm bleibt an" nicht
+    Und sehe ich die Schaltfläche "Schließen"
 
   Szenario: PDF-Vorschau zeigt den fertigen Bogen im Papier-Layout
     Wenn ich auf "Vorschau anzeigen" klicke und die PDF-Vorschau erscheint
     Dann sehe ich die Schaltfläche "Vorschau aktualisieren"
+
+  # Aus einem THW-OV gemeldet: Chrome auf Android zeigte statt der Vorschau
+  # die graue Seite „Inhalt blockiert" — dort gibt es keinen PDF-Betrachter.
+  @ohne-pdf-betrachter
+  Szenario: Ohne PDF-Betrachter im Browser gibt es die Datei statt der Vorschau
+    Dann sehe ich die Schaltfläche "Vorschau anzeigen" nicht
+    Wenn ich auf "PDF herunterladen" klicke und eine Datei erhalte
+    Dann heißt die heruntergeladene Datei wie "eeb-*.pdf"
 
   Szenario: PDF erzeugen liefert eine Datei im Papier-Layout
     Wenn ich auf "Bogen übergeben…" klicke
@@ -91,6 +116,8 @@ Funktionalität: Bogen übergeben — QR, PDF, Link, CSV
     Und ich "Weitere Formate" aufklappe
     Und ich im Dialog auf "Link teilen" klicke
     Und ich den Link aus der Zwischenablage öffne
+    Dann sehe ich den Dialog "Empfangenen Bogen öffnen?"
+    Wenn ich im Dialog auf "Meldung öffnen" klicke
     Dann sehe ich die Übersicht mit dem Standort "Oldenburg - Ni"
     Und sehe ich den Text "eigener Stand"
     Und sehe ich den Hinweis "Empfangen als:"
@@ -106,6 +133,8 @@ Funktionalität: Bogen übergeben — QR, PDF, Link, CSV
     Und ich "Weitere Formate" aufklappe
     Und ich im Dialog auf "Link teilen" klicke
     Und ich den Link aus der Zwischenablage öffne
+    Dann sehe ich den Dialog "Empfangenen Bogen öffnen?"
+    Wenn ich im Dialog auf "Meldung öffnen" klicke
     Dann sehe ich den Hinweis "Unveränderter Bogen von fremder Stelle:"
     Wenn ich zum Schritt "5. Sofortbedarf" wechsle
     Und ich das Feld "Sonstiges (Freitext)" mit "nachträglich ergänzt" fülle
@@ -124,6 +153,8 @@ Funktionalität: Bogen übergeben — QR, PDF, Link, CSV
     Und ich "Weitere Formate" aufklappe
     Und ich im Dialog auf "Link teilen" klicke
     Und ich den Link aus der Zwischenablage öffne
+    Dann sehe ich den Dialog "Empfangenen Bogen öffnen?"
+    Wenn ich im Dialog auf "Meldung öffnen" klicke
     Dann sehe ich den Hinweis "Empfangen als:"
     Und sehe ich den Hinweis "Eigene Angabe des Absenders:"
     Und sehe ich den Hinweis "Max Mustermann"

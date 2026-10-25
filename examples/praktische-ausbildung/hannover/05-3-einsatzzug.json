@@ -1,0 +1,84 @@
+{
+  "schemaVersion": 9,
+  "uebung": true,
+  "stand": 2171520,
+  "einheit": {
+    "organisation": 6,
+    "einheitsTyp": {
+      "freitext": "3. Einsatzzug Landeshauptstadt Hannover"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "code": 1
+        },
+        "name": "Hannover-Wasserturm"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 1508,
+    "zeitraumBis": 1508,
+    "ortAuftrag": "Praktische Ausbildung (Übung): Einlagen Kräfte, Landeshauptstadt Hannover"
+  },
+  "personalErfassung": 1,
+  "personal": [],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "ELW 1"
+      },
+      "kennzeichen": "H-JU XXX",
+      "aenderungen": "ZTr"
+    },
+    {
+      "typ": {
+        "freitext": "PKW gl."
+      },
+      "kennzeichen": "H-JU XXX",
+      "aenderungen": "ZTr"
+    },
+    {
+      "typ": {
+        "freitext": "WLF/Ab BHP 50"
+      },
+      "kennzeichen": "H-JU XXX",
+      "aenderungen": "1. SanGr"
+    },
+    {
+      "typ": {
+        "freitext": "MTW"
+      },
+      "kennzeichen": "H-JU XXX",
+      "aenderungen": "1. SanGr"
+    },
+    {
+      "typ": {
+        "freitext": "MTW"
+      },
+      "kennzeichen": "H-JU XXX",
+      "aenderungen": "2. SanGr"
+    },
+    {
+      "typ": {
+        "freitext": "GW-Betr."
+      },
+      "kennzeichen": "H-JU XXX",
+      "aenderungen": "BetrGr"
+    },
+    {
+      "typ": {
+        "freitext": "MTW"
+      },
+      "kennzeichen": "H-JU XXX",
+      "aenderungen": "BetrGr"
+    }
+  ],
+  "staerkeManuell": {
+    "fuehrer": 1,
+    "unterfuehrer": 4,
+    "mannschaft": 23,
+    "gesamt": 28
+  },
+  "sonstiges": "Fachdienst: Zugtrupp, Sanitätsdienst, Betreuungsdienst. Hauptleistung: Führung (Zug), BHP (50) oder BTP (200). Kommunikation: Rufname Akkon. 3x NFS!"
+}

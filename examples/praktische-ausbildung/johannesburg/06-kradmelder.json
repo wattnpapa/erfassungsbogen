@@ -1,0 +1,104 @@
+{
+  "schemaVersion": 9,
+  "uebung": true,
+  "stand": 2171520,
+  "einheit": {
+    "organisation": 6,
+    "einheitsTyp": {
+      "freitext": "Kradmelder"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "code": 1
+        },
+        "name": "Johannesburg"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 1508,
+    "zeitraumBis": 1508,
+    "ortAuftrag": "Praktische Ausbildung (Übung): Einheitenerfassung der geplanten Einsatzeinheiten"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "nachname": "Knoken",
+      "vorname": "Willi",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kradmelder"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "SAN-H"
+        }
+      ]
+    },
+    {
+      "nachname": "Rowald",
+      "vorname": "Silke",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kradmelder"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "SAN-H"
+        }
+      ]
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "Krad"
+      },
+      "kennzeichen": "JO-JU 32",
+      "funkrufname": {
+        "kennwort": {
+          "code": 4
+        },
+        "eigenerStandort": false,
+        "ort": "Johannesburg",
+        "teile": [
+          55,
+          79,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "Krad"
+      },
+      "kennzeichen": "JO-JU 33",
+      "funkrufname": {
+        "kennwort": {
+          "code": 4
+        },
+        "eigenerStandort": false,
+        "ort": "Johannesburg",
+        "teile": [
+          55,
+          79,
+          2
+        ]
+      }
+    }
+  ],
+  "sonstiges": "Fachdienst: Sonst.: Kradmelder. Hauptleistung: Sonst.: Sicherungsposten, Melde- und Lotsendienst. Kommunikation: Rufname 55-79-1."
+}

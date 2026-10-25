@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 9,
+  "uebung": true,
+  "stand": 2171520,
+  "einheit": {
+    "organisation": 6,
+    "einheitsTyp": {
+      "freitext": "2. Einsatzzug Landeshauptstadt Hannover"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "code": 1
+        },
+        "name": "Hannover-Wasserturm"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 1508,
+    "zeitraumBis": 1508,
+    "ortAuftrag": "Praktische Ausbildung (Übung): Einlagen Kräfte, Landeshauptstadt Hannover"
+  },
+  "personalErfassung": 1,
+  "personal": [],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "GW-San"
+      },
+      "kennzeichen": "H-JU XXX"
+    },
+    {
+      "typ": {
+        "freitext": "MTW"
+      },
+      "kennzeichen": "H-JU XXX"
+    }
+  ],
+  "staerkeManuell": {
+    "fuehrer": 0,
+    "unterfuehrer": 1,
+    "mannschaft": 8,
+    "gesamt": 9
+  },
+  "sonstiges": "Fachdienst: Sanitätsdienst. Hauptleistung: BHP (15). Kommunikation: Rufname Akkon. 2x NFS! Taktisches Zeichen mit Ordnungszahl 2."
+}

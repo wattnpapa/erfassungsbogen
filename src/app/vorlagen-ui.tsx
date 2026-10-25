@@ -1,8 +1,10 @@
 /**
  * Oberfläche für „Meine Vorlagen":
  *  - VorlagenListe: einbettbare Kartenliste der gespeicherten Vorlagen mit
- *    Verwalten (umbenennen, teilen, löschen) und Einstieg in die Musterung.
- *    Wird direkt unter den Start-Buttons angezeigt.
+ *    Verwalten (bearbeiten, umbenennen, teilen, löschen) und Einstieg in die
+ *    Musterung. Wird direkt unter den Start-Buttons angezeigt. „Bearbeiten"
+ *    ändert die Vorlage dauerhaft (über den Assistenten, app.tsx) — die
+ *    Musterung dagegen nie.
  *  - VorlageTeilen: die Vorlage selbst weitergeben (QR, Link, Datei) — für ein
  *    zweites Gerät oder die Ablage in einer Cloud. Der Empfänger legt daraus
  *    wieder eine Vorlage an, keinen Arbeitsbogen.
@@ -10,8 +12,9 @@
  *    zusammenstellen (Variante A) → frischer Arbeitsbogen.
  */
 
+import { ortSperren } from "./tipp-schutz";
 import { useEffect, useRef, useState } from "react";
-import { StaerkeRolle, staerke, type Erfassungsbogen } from "@bos/eeb-format/model";
+import { StaerkeRolle, staerke, type Erfassungsbogen, type Person } from "@bos/eeb-format/model";
 import {
   funktionsText,
   kennzeichenText,
@@ -34,9 +37,12 @@ import {
   type Vorlage,
 } from "./vorlagen";
 import { SeitenKopf } from "./seiten-kopf";
+import { bedarfMarken } from "./einheiten-tabelle";
 import { frageJaNein, frageText, zeigeHinweis } from "./dialoge";
 import { istNativ, linkTeilen, shareSheetVerfuegbar } from "./nativ";
 import { AbgangKnopf, Kartenstapel } from "./kartenstapel";
+import { datumZweistellig, papierkorbRest } from "./papierkorb-frist";
+import { musterungStandLaden, musterungStandLoeschen, musterungStandSpeichern, standPasst } from "./musterung-stand";
 
 function personName(vorname: string, nachname: string): string {
   return `${vorname} ${nachname}`.trim() || "(ohne Name)";
@@ -56,6 +62,8 @@ function staerkeText(b: Erfassungsbogen): string {
 export function VorlagenListe(props: {
   vorlagen: Vorlage[];
   onMustern: (v: Vorlage) => void;
+  /** Die Vorlage selbst ändern: öffnet ihren Bogen im Assistenten (dauerhaft, nicht nur für den nächsten Einsatz). */
+  onBearbeiten: (v: Vorlage) => void;
   onGeaendert: () => void;
   /**
    * Die gerade eingegangene Vorlage (Scan). Sie wird in der Liste
@@ -65,7 +73,7 @@ export function VorlagenListe(props: {
    */
   frischeId?: string | null;
 }) {
-  const { vorlagen, onMustern, onGeaendert, frischeId } = props;
+  const { vorlagen, onMustern, onBearbeiten, onGeaendert, frischeId } = props;
   const [zeigePapierkorb, setZeigePapierkorb] = useState(false);
   const papierkorb = vorlagenPapierkorb();
   /** Die gerade aus dem Papierkorb zurückgeholte Vorlage — siehe EinsatzListe. */
@@ -82,9 +90,22 @@ export function VorlagenListe(props: {
   }
 
   // Kein confirm: Löschen ist nur der Weg in den Papierkorb (30 Tage
-  // wiederherstellbar) — ein Fehltipp lässt sich rückgängig machen.
+  // wiederherstellbar) — ein Fehltipp lässt sich rückgängig machen. Dass es
+  // diesen Rückweg gibt, sagt danach die Statuszeile mit „Rückgängig"
+  // (Audit „Zerstörende Handlungen", D6): vorher verschwand die Karte stumm.
   function loeschen(v: Vorlage) {
     vorlageLoeschen(v.id);
+    setZuletztGeloescht(v);
+    onGeaendert();
+  }
+
+  /** Die eben gelöschte Vorlage — solange sie hier steht, gibt es den Rückweg in einem Tipp. */
+  const [zuletztGeloescht, setZuletztGeloescht] = useState<Vorlage | null>(null);
+  function loeschenRueckgaengig() {
+    if (!zuletztGeloescht) return;
+    vorlageWiederherstellen(zuletztGeloescht.id);
+    setZurueckgeholt(zuletztGeloescht.id);
+    setZuletztGeloescht(null);
     onGeaendert();
   }
 
@@ -106,6 +127,14 @@ export function VorlagenListe(props: {
 
   return (
     <>
+      {zuletztGeloescht && (
+        <p className="meldung" role="status">
+          Vorlage „{zuletztGeloescht.name}" in den Papierkorb gelegt (30 Tage rückholbar).{" "}
+          {/* Voller Knopf wie in der Daumenleiste, kein 74 × 30 px großer
+              Textlink (Audit Runde 3, R3-D4). */}
+          <button type="button" onClick={loeschenRueckgaengig}>Rückgängig</button>
+        </p>
+      )}
       {vorlagen.map((v) => (
         <Kartenstapel className="karte" key={v.id} frisch={v.id === frischeId || v.id === zurueckgeholt}>
           <div className="kopfzeile">
@@ -124,6 +153,7 @@ export function VorlagenListe(props: {
             Stärke {staerkeText(v.bogen)} · {v.bogen.personal.length} Personen · {v.bogen.fahrzeuge.length} Fahrzeuge
           </p>
           <div className="vorlage-aktionen">
+            <button type="button" onClick={() => onBearbeiten(v)}>Bearbeiten</button>{" "}
             <button type="button" onClick={() => umbenennen(v)}>Umbenennen</button>{" "}
             <button type="button" onClick={() => setTeilen(v)}>Teilen…</button>{" "}
             {/* Der Abgang zeigt, welche Vorlage geht — erst danach rückt die
@@ -135,7 +165,7 @@ export function VorlagenListe(props: {
       {papierkorb.length > 0 && (
         <p>
           <button type="button" className="link" onClick={() => setZeigePapierkorb(!zeigePapierkorb)}>
-            {zeigePapierkorb ? "Papierkorb ausblenden" : `Papierkorb (${papierkorb.length})`}
+            {zeigePapierkorb ? "Papierkorb Vorlagen ausblenden" : `Papierkorb Vorlagen (${papierkorb.length})`}
           </button>
         </p>
       )}
@@ -152,9 +182,8 @@ export function VorlagenListe(props: {
                 Wiederherstellen
               </AbgangKnopf>
             </div>
-            <p className="hinweis">
-              Gelöscht am {new Date(v.geloeschtAm!).toLocaleDateString("de-DE")} — wird nach 30 Tagen
-              automatisch endgültig entfernt.
+            <p className={papierkorbRest(v.geloeschtAm!).bald ? "hinweis warnung-text" : "hinweis"}>
+              Gelöscht am {datumZweistellig(v.geloeschtAm!)} — {papierkorbRest(v.geloeschtAm!).text}
             </p>
             <div className="papierkorb-endgueltig">
               <AbgangKnopf
@@ -281,49 +310,199 @@ export function VorlageTeilen(props: { vorlage: Vorlage; onSchliessen: () => voi
 
 // --------------------------------------------------------------- Musterung
 
+/** Ab dieser Zeilenzahl bleibt die Kopfzeile einer Gruppe beim Rollen stehen (R5-H1). */
+const VIELE_ZEILEN = 10;
+
 export function Musterung(props: {
   vorlage: Vorlage;
-  onStart: (bogen: Erfassungsbogen) => void;
+  /** `abgewaehlt`: die Personen, die nicht mitgehen — als Nachzügler später ergänzbar (R4-W8). */
+  onStart: (bogen: Erfassungsbogen, abgewaehlt: Person[], alleDa?: string) => void;
   onAbbrechen: () => void;
+  /**
+   * Der Start ersetzt einen offenen Bogen, und die App fragt deshalb selbst.
+   * Dann steht „Alle dabei?" in DERSELBEN Rückfrage (`alleDa`, Satz zum
+   * Mitgeben), statt als zweite dahinter: Unter Zeitdruck waren zwei Fragen
+   * hintereinander eine zu viel (Audit Runde 4, R4-S5).
+   */
+  ersetztBogen?: boolean;
 }) {
-  const { vorlage, onStart, onAbbrechen } = props;
+  const { vorlage, onStart, onAbbrechen, ersetztBogen = false } = props;
   const b = vorlage.bogen;
   const org = b.einheit.organisation;
-  const [pAn, setPAn] = useState<boolean[]>(() => b.personal.map(() => true));
-  const [vAn, setVAn] = useState<boolean[]>(() => b.fahrzeuge.map(() => true));
+  // Die Haken einer vor dem Neuladen offenen Musterung (R4-E7, musterung-stand.ts).
+  const [gemerkt] = useState(() => {
+    const st = musterungStandLaden();
+    return standPasst(st, vorlage) ? st : null;
+  });
+  const [pAn, setPAn] = useState<boolean[]>(() => gemerkt?.personal ?? b.personal.map(() => true));
+  const [vAn, setVAn] = useState<boolean[]>(() => gemerkt?.fahrzeuge ?? b.fahrzeuge.map(() => true));
+  // Standard-Sofortbedarf der Vorlage: sichtbar, aber nicht vorausgewählt (R2-W1).
+  const bedarf = bedarfMarken({ ...b, sofortbedarf: b.sofortbedarf && { ...b.sofortbedarf, verpflegungPersonen: 0 } });
+  const [bedarfAn, setBedarfAn] = useState(gemerkt?.bedarf ?? false);
+  // Bemerkung der Vorlage wie der Sofortbedarf: sichtbar, nicht vorausgewählt (R3-H7).
+  const bemerkung = b.sonstiges?.trim() ?? "";
+  const [bemerkungAn, setBemerkungAn] = useState(gemerkt?.bemerkung ?? false);
+  // Jeder Haken wird gemerkt, das Ende der Musterung (Start, Abbrechen, andere
+  // Ansicht) räumt ihn weg; ein Neuladen räumt nichts.
+  useEffect(() => {
+    musterungStandSpeichern({
+      vorlageId: vorlage.id,
+      vorlageGeaendert: vorlage.geaendert,
+      personal: pAn,
+      fahrzeuge: vAn,
+      bedarf: bedarfAn,
+      bemerkung: bemerkungAn,
+      zeit: Date.now(),
+    });
+  }, [vorlage.id, vorlage.geaendert, pAn, vAn, bedarfAn, bemerkungAn]);
+  useEffect(() => () => musterungStandLoeschen(), []);
 
   const anwesendePersonen = b.personal.filter((_, i) => pAn[i]);
   const s = staerke({ personal: anwesendePersonen, staerkeManuell: b.staerkeManuell });
   const anzahlFz = vAn.filter(Boolean).length;
 
+  // Nach dem Umschalten rückt die Zeile darunter an die Stelle des Knopfs: Die Stelle nimmt
+  // kurz nichts an, ein Nachtipp hakte sonst die erste Person an (R6-G4).
+  const umschalten = (setzen: () => void) => {
+    ortSperren();
+    setzen();
+  };
   const toggleP = (i: number) => setPAn(pAn.map((x, j) => (j === i ? !x : x)));
   const toggleV = (i: number) => setVAn(vAn.map((x, j) => (j === i ? !x : x)));
 
-  function starten() {
-    onStart(vorlageInstanziieren(b, { personal: pAn, fahrzeuge: vAn }));
+  /**
+   * Vorab ist jede Person und jedes Fahrzeug angehakt. Wer nichts anfasst,
+   * meldet die ganze Vorlage — die Musterung wurde leicht übersprungen, weil
+   * die Liste schon „abgehakt" aussah (Audit Runde 3, R3-H4). Bleibt alles
+   * angehakt, fragt der Start einmal nach; wer abgewählt hat, hat gemustert.
+   */
+  async function starten() {
+    // Beide Gruppen abgewählt: ein Bogen „0 Pers · 0 Fz" nach einem Fehltipp (Audit Runde 6, R6-H5).
+    if (b.personal.length > 0 && s.gesamt === 0) {
+      const weiter = await frageJaNein({
+        titel: "Keine Person aus der Vorlage?",
+        text: `Es ist niemand angehakt: Der Bogen entsteht mit Stärke 0${anzahlFz === 0 ? " und ohne Fahrzeuge" : ""}. Wer da ist, steht in der Liste und lässt sich anhaken.`,
+        ok: "Ja, ohne Personal anlegen",
+        abbruch: "Zurück zur Liste",
+      });
+      if (!weiter) return;
+    }
+    const allesDa = pAn.every(Boolean) && vAn.every(Boolean);
+    if (allesDa && b.personal.length + b.fahrzeuge.length > 1) {
+      const teile = [
+        b.personal.length > 0 ? `alle ${b.personal.length} ${b.personal.length === 1 ? "Person" : "Personen"}` : "",
+        b.fahrzeuge.length > 0 ? `alle ${b.fahrzeuge.length} ${b.fahrzeuge.length === 1 ? "Fahrzeug" : "Fahrzeuge"}` : "",
+      ].filter(Boolean);
+      const satz = `Gemeldet werden ${teile.join(" und ")} der Vorlage. Fehlt jemand, vorher in der Liste abwählen.`;
+      if (ersetztBogen) {
+        // Die Rückfrage der App nimmt den Satz mit (R4-S5).
+        onStart(
+          vorlageInstanziieren(b, { personal: pAn, fahrzeuge: vAn, sofortbedarf: bedarfAn, sonstiges: bemerkungAn }),
+          b.personal.filter((_, i) => !pAn[i]),
+          satz,
+        );
+        return;
+      }
+      const sicher = await frageJaNein({
+        titel: "Alle aus der Vorlage dabei?",
+        text: satz,
+        ok: "Ja, alle sind da",
+        abbruch: "Zurück zur Liste",
+      });
+      if (!sicher) return;
+    }
+    onStart(vorlageInstanziieren(b, { personal: pAn, fahrzeuge: vAn, sofortbedarf: bedarfAn, sonstiges: bemerkungAn }), b.personal.filter((_, i) => !pAn[i]));
   }
+
+  /**
+   * „‹ Abbrechen" nach geänderten Haken: fünf abgewählte Personen waren ohne
+   * Rückfrage verworfen, beim erneuten Öffnen standen wieder alle angehakt
+   * (Audit Runde 2, R2-D6). Ohne Änderung geht es ohne Frage zurück.
+   */
+  async function abbrechen() {
+    const personenAb = pAn.filter((x) => !x).length;
+    const fahrzeugeAb = vAn.filter((x) => !x).length;
+    const geaendert = personenAb > 0 || fahrzeugeAb > 0 || bedarfAn || bemerkungAn;
+    if (geaendert) {
+      const was = [
+        personenAb > 0 ? `${personenAb} ${personenAb === 1 ? "Person" : "Personen"} abgewählt` : "",
+        fahrzeugeAb > 0 ? `${fahrzeugeAb} ${fahrzeugeAb === 1 ? "Fahrzeug" : "Fahrzeuge"} abgewählt` : "",
+        bedarfAn ? "Sofortbedarf angehakt" : "",
+        bemerkungAn ? "Bemerkung angehakt" : "",
+      ].filter(Boolean);
+      const sicher = await frageJaNein({
+        titel: "Musterung verwerfen?",
+        text: `Die Haken dieser Musterung (${was.join(", ")}) gehen verloren; beim nächsten Öffnen sind wieder alle angehakt. Die Vorlage selbst bleibt unverändert.`,
+        ok: "Verwerfen",
+        abbruch: "Weiter mustern",
+        gefahr: true,
+      });
+      if (!sicher) return;
+    }
+    onAbbrechen();
+  }
+
+  // Die klebende Kopfzeile einer Gruppe hängt unter der Stärke-Leiste, nicht auf ihr: Beide
+  // klebten bei 0, die Kopfzeile deckte die Zahlen halb ab (R7-H7). Die Höhe der Leiste
+  // gibt dieser Effekt als Variable an die Seite weiter (index.html, `.klebend`).
+  const leisteRef = useRef<HTMLElement>(null);
+  useEffect(() => {
+    const leiste = leisteRef.current;
+    const wurzel = leiste?.parentElement;
+    if (!leiste || !wurzel) return;
+    const messen = () => wurzel.style.setProperty("--muster-leiste-hoehe", `${Math.ceil(leiste.getBoundingClientRect().height)}px`);
+    messen();
+    if (typeof ResizeObserver === "undefined") return;
+    const beobachter = new ResizeObserver(messen);
+    beobachter.observe(leiste);
+    return () => beobachter.disconnect();
+  }, []);
 
   return (
     <>
     <SeitenKopf>
-      <button type="button" className="zur-start" onClick={onAbbrechen}>‹ Abbrechen</button>
+      <button type="button" className="zur-start" onClick={() => void abbrechen()}>‹ Abbrechen</button>
       <div className="titelzeile">
         <h1>{vorlage.name}</h1>
       </div>
-      <p className="hinweis">Anwesende abhaken lassen — die Vorlage bleibt unverändert.</p>
+      {/* Der Text folgt der Vorgabe: Alle sind vorab angehakt, gemustert wird
+          durch Abwählen. „Anwesende abhaken" las sich wie „hier ist schon
+          abgehakt" (R3-H4). */}
+      {gemerkt && (
+        <p className="meldung" role="status">
+          Deine Haken von vorhin sind wieder da — die Musterung wurde unterbrochen.
+        </p>
+      )}
+      <p className="hinweis">
+        <strong>Alle sind vorab angehakt — wer oder was fehlt, antippen und abwählen.</strong> Die Vorlage bleibt
+        unverändert; dauerhaft ändern lässt sie sich über „Bearbeiten" auf der Startseite.
+      </p>
     </SeitenKopf>
     <main id="inhalt" tabIndex={-1} className="musterung">
-      <section className="karte staerke-leiste">
-        <div><strong>{s.fuehrer}</strong><span>Führer</span></div>
-        <div><strong>{s.unterfuehrer}</strong><span>Unterf.</span></div>
-        <div><strong>{s.mannschaft}</strong><span>Mannsch.</span></div>
-        <div className="gesamt"><strong>{s.gesamt}</strong><span>Gesamt</span></div>
+      <section className="karte staerke-leiste" ref={leisteRef}>
+        {/* R4-H3: Auf schmalen Telefonen standen hier „FÜHRER / UNTERF. /
+            MANNSC… / GESAMT", bei 320 px im Feld-Modus „FÜH… / UNT… / MAN… /
+            GES…". Dort tragen die Felder dieselben Kürzel wie der Bogen und
+            der Assistent (F / UF / M / Ges); das ausgeschriebene Wort bleibt
+            für Vorlesesoftware im Baum (index.html, `.etikett-lang`). */}
+        <div><strong>{s.fuehrer}</strong><span><span className="etikett-lang">Führer</span><span className="etikett-kurz" aria-hidden="true">F</span></span></div>
+        <div><strong>{s.unterfuehrer}</strong><span><span className="etikett-lang">Unterf.</span><span className="etikett-kurz" aria-hidden="true">UF</span></span></div>
+        <div><strong>{s.mannschaft}</strong><span><span className="etikett-lang">Mannsch.</span><span className="etikett-kurz" aria-hidden="true">M</span></span></div>
+        <div className="gesamt"><strong>{s.gesamt}</strong><span><span className="etikett-lang">Gesamt</span><span className="etikett-kurz" aria-hidden="true">Ges</span></span></div>
       </section>
 
       <section className="karte">
-        <div className="kopfzeile">
-          <h2>Personal ({anwesendePersonen.length}/{b.personal.length})</h2>
-          <button type="button" onClick={() => setPAn(b.personal.map(() => true))}>Alle</button>
+        {/* Bei vielen Personen bleibt die Zeile mit Zähler und „Alle abwählen"
+            beim Rollen stehen: Wer aus 43 Personen acht anhakt, sieht, wie viele
+            noch gelten (R5-H1). */}
+        <div className={`kopfzeile${b.personal.length > VIELE_ZEILEN ? " klebend" : ""}`}>
+          <h2>Personal <span className="zaehler">({anwesendePersonen.length}/{b.personal.length})</span></h2>
+          {/* Umschalter statt „Alle anhaken" allein: Nach dem Öffnen sind alle
+              angehakt, der Knopf tat sichtbar nichts, und wer nur eine Gruppe
+              mitnimmt, wählte 35 Zeilen einzeln ab (R5-H1). */}
+          <button type="button" className="muster-umschalter" onClick={() => umschalten(() => setPAn(b.personal.map(() => !pAn.every(Boolean))))}>
+            {pAn.every(Boolean) && b.personal.length > 0 ? "Alle abwählen" : "Alle anhaken"}
+          </button>
         </div>
         {b.personal.length === 0 && <p className="hinweis">Kein Personal in der Vorlage.</p>}
         {b.personal.map((p, i) => (
@@ -341,9 +520,11 @@ export function Musterung(props: {
       </section>
 
       <section className="karte">
-        <div className="kopfzeile">
-          <h2>Fahrzeuge ({anzahlFz}/{b.fahrzeuge.length})</h2>
-          <button type="button" onClick={() => setVAn(b.fahrzeuge.map(() => true))}>Alle</button>
+        <div className={`kopfzeile${b.fahrzeuge.length > VIELE_ZEILEN ? " klebend" : ""}`}>
+          <h2>Fahrzeuge <span className="zaehler">({anzahlFz}/{b.fahrzeuge.length})</span></h2>
+          <button type="button" className="muster-umschalter" onClick={() => umschalten(() => setVAn(b.fahrzeuge.map(() => !vAn.every(Boolean))))}>
+            {vAn.every(Boolean) && b.fahrzeuge.length > 0 ? "Alle abwählen" : "Alle anhaken"}
+          </button>
         </div>
         {b.fahrzeuge.length === 0 && <p className="hinweis">Keine Fahrzeuge in der Vorlage.</p>}
         {b.fahrzeuge.map((f, i) => (
@@ -359,9 +540,35 @@ export function Musterung(props: {
         ))}
       </section>
 
+      {bedarf.length > 0 && (
+        <section className="karte">
+          <h2>Sofortbedarf aus der Vorlage</h2>
+          <label className={`muster-zeile${bedarfAn ? "" : " gestrichen"}`}>
+            <input type="checkbox" checked={bedarfAn} onChange={() => setBedarfAn(!bedarfAn)} />
+            <span className="muster-text">
+              <span className="muster-name">{bedarf.map((m) => m.lang).join(" · ")}</span>
+              <span className="muster-sub">Stammt aus einem früheren Einsatz — nur anhaken, wenn er auch jetzt gilt.</span>
+            </span>
+          </label>
+        </section>
+      )}
+
+      {bemerkung && (
+        <section className="karte">
+          <h2>Bemerkung aus der Vorlage</h2>
+          <label className={`muster-zeile${bemerkungAn ? "" : " gestrichen"}`}>
+            <input type="checkbox" checked={bemerkungAn} onChange={() => setBemerkungAn(!bemerkungAn)} />
+            <span className="muster-text">
+              <span className="muster-name bemerkung-text">{bemerkung}</span>
+              <span className="muster-sub">Stand beim Speichern der Vorlage — nur anhaken, wenn sie auch jetzt stimmt.</span>
+            </span>
+          </label>
+        </section>
+      )}
+
       <footer className="nav">
-        <button type="button" className="primaer muster-start" onClick={starten}>
-          Einsatz starten · {s.gesamt} Pers · {anzahlFz} Fz
+        <button type="button" className="primaer muster-start" onClick={() => void starten()}>
+          Bogen anlegen · {s.gesamt} Pers · {anzahlFz} Fz
         </button>
       </footer>
     </main>

@@ -12,6 +12,91 @@
 > umsetzen: SBOM, CSP ohne unsafe-inline, Entpack-Grenze") betrifft die Kapitel
 > 2.1, 8.3, 8.6, 8.7 und 11.2 — dort jeweils vermerkt.
 >
+> **Nachgezogen 2026-10-24 (Runde 8):** Audit Runde 8 (51 Befunde ohne
+> Doppelungen, vier Pakete) — Kap. 5, 8.2, 8.4, 8.5, 8.6, 9: Ablage: Ein
+> Gesamttext von `eeb.einsaetze.v1` oder `eeb.vorlagen.v1`, der sich nicht
+> als Liste lesen lässt (abgebrochenes JSON, fremder Wert), wird in der Hülle
+> um die Ablage vor jedem Lesezugriff unverändert unter `eeb.unlesbar.v1`
+> (`texte`) beiseitegelegt (`sammlungenRetten`, `uhr-korrektur.ts`,
+> `unlesbar.ts`); der Kern in `vendor/` ersetzt ihn sonst beim ersten
+> Schreiben durch `[]` (R8-D1). Unlesbares ist Teil der Datensicherung, die
+> Rückfrage von „Sicherung einspielen…" nennt Beschädigtes der Datei
+> (`BestandUmfang.beschaedigt`). Nummern: „Entfernen" nennt die
+> Nummernverschiebung, der Papier-Abgleich auch die der unbeteiligten
+> Einheiten. Historie: „Nur in die Historie legen" setzt `ersetztDurch`
+> (vorhandenes Feld, kein Schema). Zug-Namen werden zu „n. Zug"
+> normalisiert (`zug-name.ts`). Exporte: CSV nach Nr., Sollstärke-Marke in
+> Lageblatt und Sammel-PDF, Umschrift kyrillischer und griechischer Namen im
+> Feld Ansprechpartner/in. Verlauf: Das späte `history.back()` eines
+> geschlossenen Fensters wird erkannt (`eigenesZurueckVerbrauchen`,
+> `modal-overlay.ts`) und zieht die gezeigte Ansicht nicht mehr ab. Tipp-
+> Schutz: Die Ortssperre beim Öffnen einer Rückfrage gilt nur hinter ihr;
+> Prellschutz der Rückfrage 450 ms, mit zerstörender Wahl 800 ms, Quittung
+> 2,5 s. Lagemonitor: Messung der Zeilenzahl neu, Tabelle am Telefon ohne
+> Einheitentyp, Stufenleiter Gedimmt < Dunkel < Hell (`eeb.lagestufe.v1`,
+> nur „dunkel"/„gedimmt" gemerkt). Neue Stilregeln (`stilregeln-r8-*.test.ts`).
+> Bundle-Budget erneut angehoben. Kein neuer Host, Transportformat und Schema
+> unverändert.
+>
+> **Nachgezogen 2026-10-24:** Audit Runde 7 (85 Befunde, vier Pakete) — Kap.
+> 5, 8.2, 8.4, 8.5, 8.6, 9: Geräteuhr: Der Halt bei Sprüngen unter 60 Tagen
+> gilt, bis jemand antwortet, nicht nur beim ersten Lesen
+> (`geraeteuhrPruefen`, `datenschutz-uhr.ts`, R7-D2). Unlesbarer Bestand wird
+> nicht mehr still verworfen: `eeb.unlesbar.v1` hält unlesbare Sammlungen,
+> Meldungen und Vorlagen unverändert 90 Tage (`unlesbar.ts`,
+> `einsaetze-lesen.ts`, `vorlagen.ts`); Zähler und „Daten sichern…" an
+> Startseite und Sammlung. Zwei Fenster: Ein Konflikt entsteht nur bei
+> Inhaltsunterschied (`fenster-unterschied.ts`), die Leiste nennt Felder und
+> Zeit; ein im anderen Fenster gelöschter Bogen wird nicht auf den
+> Rückholplatz zurückgeschrieben (`entwurfFremdEntfernt`); der Rückholplatz
+> fasst weiter einen Bogen, die Rückfrage nennt den Verlust vorher. Der Bogen
+> auf dem Rückholplatz trägt optional `ersetztGrund` (Schema und QR-Format
+> unverändert). Umschlag der Einsatz-Datei und der Sammel-PDF: `lage`
+> (Einsatzbeginn, Funkrufname; `lage-angaben.ts`), beim Einlesen nur
+> ergänzend. Papier-Abgleich: Eingaben im Sitzungsspeicher
+> (`eeb.papierabgleich.v1.<Einsatz-ID>`, `papier-abgleich-entwurf.ts`).
+> Lagemonitor: Tabelle im Bild mit Rest als „+ n weitere", Stufe gemerkt
+> (`eeb.lagestufe.v1`), Folgemeldungen mit Betrag. Service Worker: HTML-
+> Themenseiten `StaleWhileRevalidate` (vorher `NetworkFirst`, 1 s;
+> `vite.config.ts`). Musterung als eigene Verlaufsansicht. Stilregeln
+> geschützt durch `stilregeln-r7-layout.test.ts`. Bundle-Budget erneut
+> angehoben (Startbündel +30 KB). Offen: R6-O9 (Uhrstand in der Zukunft,
+> frische Sammlung) als Grenze der Hülle. Kein neuer Host.
+>
+> **Nachgezogen 2026-10-23:** Audit Runde 6 (89 Befunde, sechs Pakete) — Kap.
+> 5, 8.2, 8.5, 8.6, 9: Gelesener Bestand wird wie an den Eingängen geprüft
+> (`einsaetze-lesen.ts`, `vorlagen.ts` über `bogen-pruefung.ts`); die Hülle um
+> die Ablage bleibt unverändert, der Kern in `vendor/` auch. Zurück-Geste: Ein
+> Beobachter legt für jedes offene `<dialog>` den Verlaufseintrag an
+> (`dialogVerlaufVerdrahten`, `modal-overlay.ts`), eine Folgerückfrage
+> übernimmt den Eintrag der vorigen, ein Ansichtswechsel ersetzt den Eintrag
+> einer beantworteten Rückfrage. Zwei Fenster: „Stand laden" fragt und legt die
+> eigene Fassung auf den Rückholplatz; ein Fenster ohne offenen Bogen baut
+> sich nach „Alle Daten löschen" im anderen neu auf. Exportstand: Nur die
+> geltende Fassung zählt als neuer Bogen (`export-stand.ts`). Geräteuhr: Sprung
+> unter 60 Tagen fragt, wenn Unangekündigtes fällig würde
+> (`datenschutz-uhr.ts`, `uhr-folgen.ts`); R6-O9 (Uhrstand in der Zukunft,
+> frische Sammlung) bleibt als Grenze der Hülle offen. Offline: HTML-Themenseiten
+> `NetworkFirst` mit 1 s Zeitgrenze (`vite.config.ts`), Nachladepause höchstens
+> 20 s, Hinweis „Netz hakt" beim Kern, Lücke bleibt nach Neuladen sichtbar
+> (`eeb.offline-zusatz.v1`). Lagemonitor: Bewegungen, Datenstand, Übung,
+> Start schwarz über das Boot-Skript in `index.html`. Neue
+> Stilregeln in `index.html` (Fußleiste, Schrittleiste, Deckel bei großer
+> Schrift), geschützt durch `stilregeln-r6.test.ts`. Bundle-Budget angehoben
+> (Startbündel +14 KB durch Texte und Rückfragen, `scripts/bundle-budget.json`).
+> Kein neuer Host, Transportformat und Schema unverändert.
+
+> **Nachgezogen 2026-10-17:** Lagemonitor — reine Anzeigeseite für einen am
+> Meldekopf-Gerät angeschlossenen Fernseher (`lagemonitor.ts`,
+> `lagemonitor-ui.tsx`, `lagemonitor-beginn.ts`; Aufruf über
+> `main.tsx` mit `?lagemonitor=<Einsatz>`). Zweites Fenster, gleicher
+> `localStorage`, Abgleich über das `storage`-Ereignis und einen Takt von
+> 5 s; kein Netz. Neue Speicherschlüssel `eeb.lagebeginn.v1` (Einsatzbeginn
+> von Hand) und `eeb.lagefunkruf.v1` (optionaler Funkrufname, erste Zeile des
+> Monitors; beide über `lagemonitor-speicher.ts`), bewusst außerhalb des
+> Schemas und der Submodule. Electron lässt
+> dieses eine Fenster zu (`electron/main.js`) — Kapitel 5, 6, 8.2, 8.3.
+>
 > **Nachgezogen 2026-09-13:** Datenschutzfrist (neues Kern-Modul
 > `datenschutzfrist.ts`, Frist je Meldung in `einsaetze.ts`, Uhr in
 > `datenschutz-uhr.ts`) — Kapitel 5.3, 5.4 und 8.2.
@@ -23,6 +108,132 @@
 > **Nachgezogen 2026-09-23:** „Vorlage teilen" (Issue #26) — QR/Link mit dem
 > schon vorhandenen Vorlagen-Marker `V.` und eine Vorlagen-Datei
 > (`eeb-vorlage`, JSON), eingelesen über „Aus Datei laden…" — Kapitel 5 und 8.2.
+>
+> **Nachgezogen 2026-09-27:** „Vorlage bearbeiten" — der Bogen einer
+> gespeicherten Vorlage läuft durch den Assistenten und wird mit „Vorlage
+> aktualisieren" in dieselbe Vorlage zurückgeschrieben (`vorlageAktualisieren`
+> in `vorlagen.ts`); der Entwurf trägt dafür die Vorlagen-Kennung
+> (`Entwurf.vorlageId`, `entwurf.ts`). Bis dahin ließ sich eine Vorlage nur
+> durch „Als Vorlage speichern" plus Löschen der alten ersetzen — Kapitel 5.
+>
+> **Nachgezogen 2026-09-28:** Audit Runde 2, P0-Befunde — der Entwurf trägt die
+> Marke `fremd` (Erfassung einer fremden Einheit samt Ziel-Sammlung), und
+> `rueckholungNimmt` in `entwurf.ts` hält den eigenen Bogen auf dem
+> Rückholplatz; alle Eingänge in eine Sammlung laufen über `meldungAufnehmen`
+> (`eintrag-zeiten.ts`), das Zug, Auftrag und Eintreffzeit an die Folgemeldung
+> vererbt — Kapitel 8.2.
+>
+> **Nachgezogen 2026-10-05:** Audit Runde 3, Paket „Eigener Bogen,
+> Rückholplatz, Übernahme" — eingehende Bogen-Links (laufende App und
+> Kaltstart) fragen vor dem Verdrängen gegen den aktuellen Arbeitsstand —
+> Kapitel 8.2.
+>
+> **Nachgezogen 2026-10-05:** Audit Runde 4, Paket „Rückfragen, Links,
+> Rückholplatz, Zurück-Geste" — die Startentscheidung für einen Bogen-Link
+> (`startLage()` in `app.tsx`) fällt erst beim ersten Aufbau, nach
+> `speicherVerdrahten()` (R4-W3); „Aus Datei laden…" fragt wie Link und Scan
+> „Wohin damit?" (R4-N2); ein Bogen, der dem offenen gleicht, ersetzt nichts
+> (R4-E2); „Meine Fassung behalten" legt den Stand des anderen Fensters auf
+> den Rückholplatz (R4-S4); Zurück schließt bei offener Rückfrage nur sie
+> (R4-S1); Rückfragen und Ansichtswechsel sperren die Fingerstelle 1,5 s
+> (`tipp-schutz.ts`, R4-G1/S2/S3) — Kapitel 8.2.
+>
+> **Nachgezogen 2026-10-06:** Audit Runde 4, Paket 4 „Uhr, Speicher, Löschen,
+> Offline, Zeiten" — zwischen Kern und `localStorage` sitzt zusätzlich die
+> Uhrkorrektur-Hülle (`src/app/uhr-korrektur.ts`): Sie zeigt dem Kern, der
+> Aufräum- und Papierkorbfrist mit `Date.now()` rechnet (Submodul, ADR-003 bleibt
+> gewahrt), bei unplausibel vorgehender Geräteuhr die geprüfte Zeit
+> (`src/app/datenschutz-uhr.ts`, `UHR_SPRUNG_TAGE = 60`, R4-D1). Neu:
+> `eeb.musterung.v1` (Haken der Musterung, R4-E7, `musterung-stand.ts`),
+> `papierkorb-frist.ts`, `installationAnstossen` in `offline-bereit.ts`
+> (R4-O1) — Kapitel 6.4, 8.2, 8.3.
+>
+> **Nachgezogen 2026-10-06:** Audit Runde 4, Paket 2 „Meldungsfassungen,
+> Exportstand, Führungssicht" — welche Fassung einer Einheit gilt, entscheidet
+> eine App-Schicht über der unveränderten Kern-Regel (`src/app/fassung-vorrang.ts`,
+> ADR-003 bleibt gewahrt, R4-W1); der Exportstand ist je Format getrennt
+> (`eeb.export-stand.v2`) und vergleicht den Zustand je Einheit statt der
+> Vermerke (`export-stand.ts`, R4-W2/K1/W7); ein Nachtrag trägt `nachtragSeit`
+> im Umschlag der Sammel-PDF (R4-W4); der Papier-Abgleich übernimmt `nummer`
+> und `notiz` (R4-A1/A2) — Kapitel 5.2 und 8.2.
+>
+> **Nachgezogen 2026-10-05:** Audit Runde 3, Paket „Einsatz-Import, Abgleich
+> zwischen Geräten, Papier-Rückweg" — „Einsatz importieren…" läuft über
+> `einsatzAbgleichen` (`src/app/einsatz-abgleich.ts`), das um den
+> unveränderten Kern-Import herum Status, Zug, Auftrag und Eintreffzeit
+> bekannter Einheiten abgleicht (R3-W1); der Weitergabe-Stand zählt
+> Importiertes nicht mehr als „hier neu" (R3-W2); eine Sammel-PDF des
+> Zugführers lässt sich in die laufende Sammlung übernehmen (R3-W3); eine
+> Stärkeänderung vom Papier ändert nur die Stärke (R3-A1); vom Papier
+> eingelesene Einheiten werden in einem Schritt abgeglichen (R3-A2, Feld
+> `vomPapier`) — Kapitel 8.2, 11.3.
+>
+> **Nachgezogen 2026-10-05:** Audit Runde 3, Paket „Speicher und Offline" —
+> zwischen Kern und `localStorage` sitzt außen eine schonende Hülle
+> (`src/app/speicher-schonend.ts`): Sie überspringt Schreibvorgänge mit
+> unverändertem Text (der Kern schrieb bei jedem Lesen die ganze Liste
+> zurück, weil `fristBereinigt()` immer ein neues Array liefert) und
+> verschluckt ein scheiterndes Zurückschreiben bei reinen Lesezugriffen. Die
+> Oberfläche liest über `src/app/einsaetze-lesen.ts` (gemerktes Ergebnis bei
+> gleichem Speichertext innerhalb einer Minute), Revisionen je Karte über
+> `src/app/einheiten-index.ts`. Der Kern bleibt unverändert (R3-O2) —
+> Kapitel 5, 8.2, 11.
+>
+> **Nachgezogen 2026-10-14:** Audit Runde 5, Paket 2 „Fassungen, Exportstand,
+> Abgleich, Führungssicht" — Die Stände des Exports führen die Kennung der
+> geltenden Fassung (Feld `fassung`, `export-stand.ts`/`einsatz-abgleich.ts`,
+> R5-W1/W4) und reisen im Umschlag der Sammel-PDF und Einsatz-Datei mit
+> (`staende`, nicht im QR-Transportformat, `vendor/` unverändert, R5-W6; Kapitel
+> 5.2, 8.4, ADR-004 bleibt unberührt). Ein Nachtrag trägt je Einheit den Grund
+> (`nachtragGruende`, nie gespeichert, R5-W7). Eine Folgemeldung holt eine
+> abgerückte Einheit gekennzeichnet zurück (`rueckkehr`, `eintrag-zeiten.ts`,
+> R5-K1); „Anderer Einsatz?" steht in allen Exporten (R5-K5).
+>
+> **Nachgezogen 2026-10-14:** Audit Runde 5, Paket 1 „Uhr, Löschfristen,
+> Fehlerfänger, Speicher, Offline" — Die geprüfte Geräteuhr bestätigt einen
+> Sprung nie durch Zeitablauf (`geraeteuhrPruefen` mit „was würde fällig",
+> `src/app/uhr-folgen.ts`; „Geräteuhr stimmt" über `uhrBestaetigen`, R5-D1,
+> R5-O5); die Uhrkorrektur-Hülle kennt einen negativen Versatz, neue Stände
+> tragen die geprüfte Zeit (`stempelZeitpunkt`, R5-E2). Über dem Kern liegen
+> zwei weitere App-Schichten: `einsatz-wiederherstellen.ts` (setzt die
+> Aufräumfrist beim Wiederherstellen neu, R5-D2) und `fassungObenauf` in
+> `fassung-vorrang.ts` (eine Handänderung gilt vor der geltenden Fassung,
+> R5-E2); `vendor/` bleibt unverändert (ADR-003). Neu: `bogen-pruefung.ts`
+> (Pflichtfelder), `fehlerfaenger.tsx` (Fangnetz um die ganze App),
+> `feste-warnung.tsx`, `arbeitet.ts` (eine Sperre für alle PDF-Wege),
+> `wartender-link.ts` und `vorbelegung-rueckweg.ts` (Merker im
+> `sessionStorage`), Speicherort `eeb.entwurf.beschaedigt.v1` — Kapitel 6.4,
+> 8.2, 8.3, 8.8.
+>
+> **Nachgezogen 2026-10-15:** Audit Runde 5, Paket 3 „Touch, Tipp-Sperre,
+> QR-Vollbild, Layout, Sicht" — reine Oberfläche, kein neuer Speicherort, kein
+> neuer Export, `vendor/` und Transportformat unverändert. `tipp-schutz.ts`
+> kennt mehrere gleichzeitig gesperrte Stellen (Auslöser und Bestätigung einer
+> Rückfrage, verlängernd bis 4 s) und zeigt einen verworfenen Tipp („Einen
+> Moment …", R5-S2/S3); das QR-Vollbild sperrt jeden Teilwechsel und zählt einen
+> Teil erst nach 1,5 s Anzeige als gezeigt (R5-S1). Neu: `schrift-stufe.ts`
+> (Klasse `schrift-gross` auf `<html>`, wenn die tatsächliche Grundschrift ab 22 px
+> misst; das Stylesheet verdichtet damit bei niedrigem Fenster, R5-M3). Rückfragen
+> auf dem ersten Verlaufseintrag legen einen eigenen Eintrag an
+> (`ersteEbeneBetreten` in `modal-overlay.ts`, R5-S5). Der Moduswechsel der
+> Einsatzansicht steht in einer festen Leiste statt schwebend (R5-L1). Der
+> Kopfbalken im Feld-Modus ist die auf 7:1 abgedunkelte Kennfarbe (`kopfFeld()`
+> in `org-farben.ts`, R5-L3) — Kapitel 5.2.
+>
+> **Nachgezogen 2026-10-17:** Audit Runde 5, Paket 4 „Papier, PDF, Begriffe,
+> Rest" — `pdf-dokument.ts` setzt im Seitenrand eine Kopfzeile je Bogenseite
+> (`bogenKopfzeile`; Einzel-PDF und Blanko als `header` der Dokumentdefinition,
+> Sammel-PDF über `bogenStart`: Ein Probesatz mit Platzhalterbildern gleicher
+> Größe misst die Startseite je Bogen, `einsatzPdfDokumentGesetzt`). Alle
+> gedruckten Texte laufen durch `winAnsiText` (Helvetica/WinAnsi, R5-K2).
+> `nachNummer` ordnet Lageblatt und Sammel-PDF nach Nr. Der Blanko-Vordruck
+> wurde neu erzeugt (29 Personalzeilen). `hilfen.ts` überschreibt
+> `einheitAnzeigename` des Bausteins (jeder Namensteil einmal, R5-N6; der
+> Fingerabdruck der Einheit bleibt). `eintrag-zeiten.ts` kennt
+> `nummerUndZugSetzen` („Nr. laut Zettel", R5-A4); der Entwurf trägt
+> `fremd.startseite` (R5-N3). Das Stylesheet verdichtet Startseite und
+> Schritt 3 bei niedrigem Fenster (R5-M2, R5-G6). Kapitel 5.2, 8.4. Kein neuer
+> Speicherort außer dieser Marke, `vendor/` und Transportformat unverändert.
 
 ---
 
@@ -164,17 +375,26 @@ wieder.
 | XLSX-Export | Eigener minimaler XLSX-Writer (`src/app/xlsx.ts`, ZIP + zwei XML-Teile über `pako`) statt SheetJS/exceljs – bewusste Entscheidung, keine neue Abhängigkeit | `docs/tests.md` |
 | Node-Version (CI) | Node 24 | `.github/workflows/ci.yml`, `release.yml` |
 | Testwerkzeuge | Vitest (Unit, zwei Projekte `logik`/`oberflaeche`), Cucumber.js + Playwright (E2E/Gherkin auf Deutsch) | `package.json`, `docs/tests.md` |
-| Browser-Sicherheit | Content-Security-Policy wird im Build injiziert (`default-src 'self'`, `object-src 'none'`, `base-uri 'none'`, `script-src` ohne `'unsafe-inline'` über `sha256`-Hashes, eng begrenztes `connect-src`/`img-src` nur für GoatCounter) | `vite.config.ts` (`contentSecurityPolicy()`) |
+| Browser-Sicherheit | Content-Security-Policy wird im Build injiziert (`default-src 'self'`, `object-src 'none'`, `base-uri 'none'`, `script-src` ohne `'unsafe-inline'` über `sha256`-Hashes plus `'wasm-unsafe-eval'` für den ZXing-Decoder, eng begrenztes `connect-src`/`img-src` nur für GoatCounter) | `vite.config.ts` (`contentSecurityPolicy()`) |
 | Software-Lieferkette | SBOM (CycloneDX 1.6) aus den fünf `package-lock.json`, `npm audit` als CI-Gate, Dependabot wöchentlich für npm und GitHub-Actions | `scripts/sbom.ts`, `.github/workflows/ci.yml`, `.github/dependabot.yml` |
 | Kamera-Zugriff | Erfordert Secure Context (HTTPS/localhost) für `getUserMedia`; in Electron zusätzliche macOS-Entitlements nötig (`NSCameraUsageDescription`, Hardened-Runtime-Camera-Entitlement) | `docs/TODO.md` |
 | Sprache der Oberfläche und des Codes | Durchgängig Deutsch – Bezeichner, Kommentare, Fachbegriffe, Gherkin-Szenarien | `PRODUCT.md`, gesamter Quellcode |
 
-> *Prüfvermerk:* Versionen in `package.json` bestätigt (react ^19.2.7,
-> vite ^8.2.2, electron ^44.4.5, typescript ^7.0.2, pako ^3.0.2,
-> pdfmake ^0.3.11, @noble/ed25519 ^2.3.0, jsqr ^1.4.0, zxing-wasm ^3.1.4,
-> qrcode ^1.5.4); CI-Jobs laufen auf `node-version: 24`. Vite bleibt
-> vorerst bei 8.2.2: mit 8.3.0 bricht der Build in vite-plugin-pwa 1.3.0
-> ab, `.github/dependabot.yml` blendet genau diese Version aus.
+> *Prüfvermerk (Stand 2026-10-25):* Versionen in `package.json` bestätigt
+> (react ^19.2.7, vite ^8.3.5, electron ^44.9.1, typescript ^7.0.2,
+> pako ^3.0.2, pdfmake ^0.3.11, @noble/ed25519 ^3.2.0, jsqr ^1.4.0,
+> zxing-wasm ^3.1.4, qrcode ^1.5.4); CI-Jobs laufen auf `node-version: 24`.
+> Vite wurde wegen der Dependabot-Meldungen zu 8.2.x (u. a. GHSA-587h-7wmj-h5pm,
+> GHSA-rq7h-c2jc-7f22) auf 8.3.5 gehoben; der Build mit vite-plugin-pwa 1.3.0
+> läuft damit wieder durch. Nur 8.3.0 (Workbox fand die Build-Ausgabe nicht)
+> bleibt in `.github/dependabot.yml` ausgeblendet. Im selben Schritt: vitest
+> und @vitest/coverage-v8 ^4.1.12 (GHSA-qxg6-89mg-rqv8 in @vitest/mocker),
+> kurz darauf mit den Dependabot-PRs 35/34 auf ^5.0.5 (jsdom-Umgebung gibt
+> `localStorage` nur noch per Getter her, Tests stubben über `vi.stubGlobal`),
+> concurrently ^10.0.6 (shell-quote ≥ 1.11, GHSA-pqg4-j6r4-53mv) sowie die
+> transitiven Pakete axios 1.20.0, http-cache-semantics 4.3.0, fast-uri 3.1.9
+> und serialize-javascript 7.1.4 über `package-lock.json`. Alle Treffer lagen
+> im Bau-/Testwerkzeug; `npm audit --omit=dev` war durchgehend leer.
 
 ### 2.2 Organisatorische Randbedingungen
 
@@ -333,7 +553,7 @@ flowchart LR
 | Partner / Nachbarsystem | Art der Schnittstelle | Beschreibung |
 | --- | --- | --- |
 | Einheit (Erfasser) | Bedienoberfläche (Web/App) | Füllt den Assistenten aus (Einheit, Einsatz, Personal, Fahrzeuge, Sofortbedarf), druckt PDF, gibt Bogen per QR/Datei/AirDrop weiter. |
-| Meldekopf/Führungsstelle (Sammler) | Bedienoberfläche + Scan-Eingang | Erfasst fremde Einheiten neu (Schnellerfassung) oder importiert deren Bögen (Kamera-Scan, USB-Handscanner, Foto-Stapel, Datei/PDF); sammelt sie unter einem Einsatz, sieht laufende Summen, gibt Sammel-PDF/CSV weiter. |
+| Meldekopf/Führungsstelle (Sammler) | Bedienoberfläche + Scan-Eingang | Erfasst fremde Einheiten neu (Schnellerfassung) oder importiert deren Bögen (Kamera-Scan, USB-Handscanner, Foto-Stapel, Datei/PDF); sammelt sie unter einem Einsatz, sieht laufende Summen, gibt Sammel-PDF/CSV weiter. Der Lagemonitor zeigt dieselben Summen in einem zweiten Fenster für einen Fernseher am Gerät (DTG, Einsatzdauer ab handgesetztem Beginn, Stärke, Einheitentabelle mit Organisation, Ort, Funkrufname, Einheitentyp und Führer/Unterführer/Mannschaft, Fahrzeuge; ohne Personennamen). |
 | Papier-Erfassungsbogen der Organisation | Referenzformat (kein Datenfluss) | Das PDF-Layout muss dem gewohnten amtlichen Papierbogen entsprechen, damit Ausdrucke in bestehende (nicht-digitale) Meldewege passen. |
 | USB-Handscanner | Tastatur-Emulation | Der Scanner „tippt" den dekodierten QR-Inhalt wie eine Tastatur ein; die App entwirrt scancode-bedingte Tastaturbelegungsfehler (`src/app/tastaturbelegung.ts`). |
 | AirDrop (Apple) / Quick Share (Android) | Betriebssystem-Nahfeldfreigabe | Reiner Transportkanal für den geteilten Link/die Datei; die App implementiert dafür nichts außer einem teilbaren Link. |
@@ -494,7 +714,7 @@ flowchart LR
 | Baustein | Verantwortung |
 | --- | --- |
 | Web-App (`src/app/`) | React-Oberfläche, Assistent, Meldekopf-UI, PDF-/CSV-/XLSX-Export-Aufrufe, Plattform-Anpassung, lokale Persistenz. |
-| Statische Seiten (`public/*.html`) | ~35 SEO-/Informationsseiten je Organisation (THW, Feuerwehr, DRK, …), Anleitung, Datenschutz, Impressum – teilen sich Kopfnavigation und Design-Token mit der App, laufen aber außerhalb des React-Bundles. |
+| Statische Seiten (`public/*.html`) | ~35 SEO-/Informationsseiten je Organisation (THW, Feuerwehr, DRK, …), Anleitung, Datenschutz, Impressum – teilen sich Kopfnavigation und Design-Token mit der App, laufen aber außerhalb des React-Bundles. Seit 2026-09-27 übernehmen sie den Anzeigemodus der App (Dunkel/Feld/Nacht, ohne gespeicherte Wahl die Systemeinstellung) über einen kleinen Inline-Block, den `scripts/content-stil.mts` schreibt; er liest nur `eeb.anzeigemodus.v1` und setzt eine Klasse auf `<html>`. |
 | Electron-Hülle (`electron/main.js`) | Desktop-Fenster, Auto-Update (`electron-updater`), eingeschränkte Berechtigungsvergabe, externe Links im Systembrowser öffnen. |
 | Capacitor-Hüllen (`android/`, `ios/`) | Native Projekte (Gradle/Xcode), binden Capacitor-Plugins (Kamera-Barcode-Scanner, Filesystem, Share, App) ein. |
 | Build-/Content-Skripte (`scripts/`) | Vite-Plugin-Hilfsfunktionen, Beispielbogen-Generatoren je Bundesland/Organisation, Icon-/Screenshot-Rendering, Sitemap, Kopfnavigation, Bundle-Budget-Prüfung, Kern-Kopien-Prüfung. |
@@ -545,14 +765,17 @@ flowchart TB
 | --- | --- |
 | `schritte/` | Ein Schritt des Erfassungs-Assistenten je Datei (`einheit.tsx`, `einsatz.tsx`, `personal.tsx`, `fahrzeuge.tsx`, `sofortbedarf.tsx`, `uebersicht.tsx`); gemeinsame UI-Bausteine in `bausteine.tsx`. |
 | `dialoge.tsx` | Ersatz für Systemdialoge: `frageText`/`frageFelder` (statt `prompt`), `frageJaNein` (statt `confirm`), `frageWahl`, `zeigeHinweis` (statt `alert`); gezeichnet von einer einmal eingehängten `<Dialogschicht />`. |
-| `einsaetze-ui.tsx` (56 KB, größte UI-Datei) | Einsatz-Sammlung: Liste, Detailsicht mit Summen, Abrücken, Zug-Etikett, Aufteilen/Zusammenführen, Folgemeldung/Historie/Diff, Sammel-PDF, CSV-Export, Papierkorb. |
+| `einsaetze-ui.tsx` (56 KB, größte UI-Datei) | Einsatz-Sammlung: Liste, Detailsicht mit Summen, Abrücken, Zug-Etikett, Aufteilen/Zusammenführen, Folgemeldung/Historie/Diff, Sammel-PDF, CSV-Export (wahlweise nur die seit dem letzten Export neuen Bögen), Papierkorb. |
 | `qr-scanner-web.tsx` + `qr-bild.ts`/`qr-stapel.ts`/`qr-boegen.ts` | Web-QR-Scan per `getUserMedia`/jsQR, Einzelbild-Decodierung, Stapel-Import (mehrere Fotos/Screenshots, Mehrteil-Erkennung), Gruppierung von QR-Texten zu vollständigen Bögen. |
-| `pdf-dokument.ts` (833 Zeilen, größte Nicht-UI-Datei) | Baut die pdfmake-Dokumentdefinition im Papier-Layout inkl. eingebettetem QR-Code auf der letzten Seite. |
+| `pdf-dokument.ts` (rund 1 850 Zeilen, größte Nicht-UI-Datei) | Baut die pdfmake-Dokumentdefinition im Papier-Layout inkl. eingebettetem QR-Code auf der letzten Seite. Seit 2026-10-06 (R4-A3, R4-A7) mit Probesätzen ohne Bilder (pdfmake `pageBreakBefore` misst Messpunkte): Lageblatt mit mindestens fünf Nachtragszeilen (zu voll: eigene Rückseite, `einsatzLageblattSeiteFuellen`), Sammel-PDF mit enger gesetzten Bögen, wo sonst eine Restseite entstünde (`einsatzPdfDokumentGesetzt`), Einzel-PDF mit freien Zeilen, wo sie keine Seite kosten (`einzelPdfDokument`). Die Seitenzahlen prüft `pdf-seiten.test.ts` mit echtem Satz. Seit 2026-10-17 (R5-A2, R5-A3, R5-A8, R5-A9, R5-K2): Kopfzeile je Bogenseite im Seitenrand (`bogenKopfzeile`, Sammel-PDF mit `bogenStart` aus einem Probesatz mit Platzhalterbildern), unteilbare Fahrzeugblöcke, Sortierung nach Nr. (`nachNummer`), WinAnsi-Abbildung aller Texte (`winAnsiText`, Test `pdf-winansi.test.ts`). |
 | `pdf-bilder.ts` / `pdf-qr.ts` / `pdf-stroeme.ts` | Rückfallebene: PDF-Bild-Objekte roh als Pixel lesen und den enthaltenen QR-Code decodieren – bewusst ohne vollständigen PDF-Renderer. |
 | `bogen-csv.ts` / `einsatz-csv.ts` / `oldenburg-xlsx.ts` / `xlsx.ts` / `csv.ts` | Datenexporte: vollständiges CSV je Bogen/Einsatz (Langformat mit Satzart-Spalte), CSV-Übersicht für die Lagekarte, XLSX im „Oldenburg"-Format, gemeinsame CSV-Formatgrundlagen (Semikolon, UTF-8-BOM, Dezimalkomma). |
-| `entwurf.ts` / `speicher-browser.ts` / `sicherung.ts` / `absenderkarte.ts` | Lokale Persistenz: Entwurfswiederherstellung, `localStorage`-Anbindung der Einsatz-Sammlung, Datensicherung/-Export, freiwillige Absenderkarte. |
+| `entwurf.ts` / `speicher-browser.ts` / `speicher-schonend.ts` / `einsaetze-lesen.ts` / `sicherung.ts` / `absenderkarte.ts` / `export-stand.ts` | Lokale Persistenz: Entwurfswiederherstellung, `localStorage`-Anbindung der Einsatz-Sammlung (seit 2026-10-05, R3-O2, mit schonender Hülle: kein Schreiben unveränderten Textes, Lesen scheitert nicht an einem gesperrten Speicher, Lese-Ergebnis gemerkt solange der Speichertext gleich ist), Datensicherung/-Export, freiwillige Absenderkarte, Export-Stand je Einsatz **und Format** (Sammel-PDF, Übersichts-CSV, Alle-Daten-CSV, Excel; welche Meldungen und welchen Zustand je Einheit der Stab in diesem Format schon bekommen hat — Grundlage des Teilexports „nur neue Bögen", `eeb.export-stand.v2`, nachgezogen 2026-10-06, R4-W2/K1), dazu Lageblatt- und Weitergabe-Stand (wann zuletzt ein Lageblatt bzw. die ganze Sammlung herausging; Übergabevermerk, nachgezogen 2026-09-29, R2-W5; beide führen seit 2026-10-06 den Zustand je Einheit, R4-K1) und Kenntnis-Stand (welche Meldungen an diesem Gerät zuletzt „zur Kenntnis genommen" wurden — Grundlage der Sammelquittung und der Marke „neue Fassung", `eeb.kenntnis-stand.v1`, nachgezogen 2026-10-04, R3-K1). |
 | `nativ.ts` / `hilfen.ts` / `geraete-schluessel.ts` | Abstraktion nativer Fähigkeiten über Capacitor; Anzeige-/Migrations-Helfer (`bogenLaden`, `migriereBogen`, `einheitAnzeigename`); Erzeugung/Verwaltung des geräteeigenen Ed25519-Schlüssels. |
-| `anzeige-modus.ts` / `org-farben.ts` | Dunkel-/Feld-/Nacht-Modus als Design-Token-Umschaltung; organisationsspezifische Akzentfarben. |
+| `anzeige-modus.ts` / `org-farben.ts` | Dunkel-/Feld-/Nacht-Modus als Design-Token-Umschaltung; organisationsspezifische Akzentfarben, dazu je Kennfarbe die auf 4,5:1 gerechneten Kopf-Töne und im Dunkel-Modus der abgedunkelte Kopfbalken (`kopfDunkel()`, seit 2026-10-06, R4-L2). Im Feld-Modus trägt der Kopfbalken die auf 7:1 abgedunkelte Kennfarbe (`kopfFeld()`, Statusleiste folgt, seit 2026-10-15, R5-L3). |
+| `tipp-schutz.ts` | Fingerstellen-Sperre nach Handlungen, die unter dem Finger etwas austauschen (1,5 s, mehrere Stellen, nach bestätigter zerstörender Rückfrage verlängernd bis 4 s); ein verworfener Tipp zeigt „Einen Moment …" und einen Rahmen am Knopf (R5-S2); Mindestanzeigedauer der QR-Teile (R5-S1). |
+| `schrift-stufe.ts` | Setzt die Klasse `schrift-gross` auf `<html>`, solange die tatsächliche Grundschrift mindestens 22 px misst (Systemschrift ab etwa 137 %); das Stylesheet verdichtet Kopf und Formular bei niedrigem Fenster (seit 2026-10-15, R5-M3). |
+| `tastatur.ts` | Setzt die Klasse `tastatur-offen` auf `<html>`, solange ein Texteingabefeld den Fokus hat und die sichtbare Höhe deutlich unter der gewohnten liegt (Bildschirmtastatur); das Stylesheet blendet dann die feste Fußleiste aus, damit sie nicht über der Vorschlagsliste liegt (seit 2026-10-06, R4-G3). Reine Darstellung: liest nur Fenstergröße und Fokus, speichert nichts, spricht kein Netz an. |
 | `aktualisierung.tsx` | Update-Hinweise: Service-Worker-Banner im Web, Electron-Auto-Update-Status im Desktop. |
 
 ### 5.3 Whitebox „@bos/eeb-format" (Level 2)
@@ -604,6 +827,18 @@ speicherunabhängige Logik:
 | `meldung-diff.ts` (346 Zeilen) | Was sich zwischen zwei Fassungen einer Meldung geändert hat (Grundlage der Schichtübergabe-Anzeige). |
 | `papierkorb.ts` | Wiederherstellbarkeit für 30 Tage, danach endgültiges Löschen. |
 | `darstellung.ts` | Bogeninhalte als Text, wie sie auf dem Papierbogen stehen — plattformneutrale Vorstufe für PDF/CSV-Ausgabe. |
+
+Der Erfassungsbogen erweitert den Eintrag app-seitig um optionale
+Felder (`src/app/eintrag-zeiten.ts`, seit 2026-09-27): `eingetroffenAm`,
+`abgerueckAm` (Geräteuhr), `notiz` (Auftrag/Notiz der Führungsstelle) und
+seit 2026-09-29 `vermerke` (Verlauf der Führungsstelle mit Uhrzeit: Zug,
+Auftrag, Zeitkorrektur, Abrücken; Audit Runde 2, R2-K6). Sie
+werden per TypeScript-Modul-Augmentation an `MeldeEintrag` gehängt, reisen als
+gewöhnliche JSON-Felder mit der Sammlung (der Kern kopiert unbekannte Felder
+in `einsaetzeAusJson` unverändert) und bleiben damit ohne Schemawechsel im
+Submodul lesbar; ältere Sammlungen ohne die Felder fallen auf `empfangenAm`
+zurück. Bewusst nicht im Kern: Die Felder sind Führungsstellen-Sicht dieses
+Produkts, nicht Bestandteil des Meldeformats.
 
 Die Ablage wird **hineingereicht, nicht selbst geholt** (Aufnahmeregel 2 aus
 ADR-003):
@@ -692,7 +927,7 @@ war und ältere Angaben (z. B. „CC0") geprüft werden sollten.
 | QR/Foto/USB-Scanner einlesen | `qr-scanner-web.tsx`, `qr-stapel.ts`, `qr-boegen.ts`, `tastaturbelegung.ts` |
 | Einsatz-Sammlung/Meldekopf | `einsaetze-ui.tsx`, `@bos/meldekopf/*`, `auswertung.ts` |
 | CSV-/Excel-Export | `bogen-csv.ts`, `einsatz-csv.ts`, `oldenburg-xlsx.ts` |
-| Vorlagen & Musterung, Vorlage teilen | `vorlagen.ts`, `vorlagen-ui.tsx`, `vorlageTransportErzeugen` in `hilfen.ts` |
+| Vorlagen & Musterung, Vorlage bearbeiten/teilen | `vorlagen.ts` (`vorlageAktualisieren`), `vorlagen-ui.tsx`, `vorlageBearbeiten` in `app.tsx`, `vorlageTransportErzeugen` in `hilfen.ts` |
 | Signatur/Herkunft | `@bos/eeb-format/signatur`, `absenderkarte.ts`, `geraete-schluessel.ts` |
 | Offline-Betrieb (PWA) | `vite.config.ts` (VitePWA), `aktualisierung.tsx` |
 | Desktop-Auto-Update | `electron/main.js`, `electron-updater` |
@@ -807,6 +1042,14 @@ gleicher Inhalt wird übersprungen, neuer Inhalt derselben Einheit landet als
 neue Fassung in der Historie; am Ende steht ein Bericht (Funde, Dateien ohne
 Bogen, unvollständige Mehrteil-Sätze).
 
+*Nachgezogen 2026-09-29 (Audit Runde 2, R2-A2):* Je Bild werden alle QR-Codes
+gelesen (`qrAlleAusBild`, ZXing mit bis zu acht Symbolen; die jsQR-Rückfallebene
+liest weiter nur einen) — das Foto einer Bogenseite mit zwei Teilen ergibt so
+einen Bogen. Unvollständige Mehrteil-Sätze bleiben je Einsatz im
+`TeileMerker` (nur Arbeitsspeicher, Ablauf eine Stunde nach dem letzten neuen
+Teil) und werden im nächsten Durchgang vervollständigt. Der Bericht holt sich
+beim Erscheinen selbst ins Bild (`stapel-quittung.tsx`).
+
 ### 6.4 Offline-Start der Web-App (Service Worker)
 
 ```mermaid
@@ -819,8 +1062,11 @@ sequenceDiagram
   Nutzer->>Browser: erster Aufruf von erfassungsbogen.app
   Browser->>Netz: App-Shell laden (HTML/JS/CSS, Icons, manifest, woff2, wasm)
   Browser->>SW: Service Worker installieren
-  SW->>SW: precache App-Shell (globPatterns inkl. wasm/woff2)
+  SW->>SW: precache Kern (App-Shell, alle JS-Bausteine, wasm/woff2, Bilder, Blanko-Vordruck, Anleitung/Vorlage/Datenschutz/Impressum)
+  Browser->>SW: Fortschritt aus der Cache API („2,1 von 6,7 MB")
   SW-->>Browser: clientsClaim() – übernimmt sofort die laufende Seite
+  Browser->>SW: zweite Stufe nachladen (Beispielbögen, Themenseiten laut offline-zusatz.json)
+  SW->>SW: Laufzeit-Cache eeb-zusatz
   Note over Nutzer,Netz: Gerät verliert Netzverbindung
   Nutzer->>Browser: erneuter Aufruf / weiter benutzen
   Browser->>SW: Anfragen aus Precache bedienen
@@ -835,6 +1081,75 @@ Klick aus dem Netz, und ein Funkloch direkt nach dem ersten Aufruf hätte „err
 loading dynamically imported module" zur Folge (`docs/entwicklung.md`,
 abgesichert durch das Szenario „Die PDF entsteht auch ohne Netz und ohne
 Neuladen" in `features/uebergabe.feature`).
+
+*Nachgezogen 2026-09-29 (Audit Runde 2, R2-O7):* Der Blanko-Vordruck
+`downloads/einheiten-erfassungsbogen-blanko.pdf` (rund 11 KB) liegt jetzt im
+Precache. Er ist die Papier-Rückfallebene und wird gerade dann gebraucht, wenn
+kein Netz da ist; vorher lieferte der direkte Aufruf offline
+`ERR_INTERNET_DISCONNECTED`.
+
+*Nachgezogen 2026-10-05 (Audit Runde 3, R3-A4):* Die Datei liegt fertig im
+Repo und entsteht nicht im Build; `npm run blanko-pdf` schreibt sie aus
+derselben DocDefinition wie jede Bogen-PDF (`scripts/blanko-vordruck.ts`). Der
+Test `scripts/blanko-vordruck.test.ts` erzeugt sie mit dem Erstelldatum der
+ausgelieferten Datei neu und vergleicht byte-genau — eine Layoutänderung ohne
+neu erzeugten Vordruck fällt damit im Testlauf auf.
+Bogen, Zeilenzahl und Metadaten stehen in `src/app/blanko.ts`; aus derselben
+Quelle erzeugt die App den Vordruck auch selbst (Knopf „Blanko-Vordruck" in
+Einsatzansicht, Übergabe-Dialog und Fußzeile, R3-A7) — ohne Laden der Datei,
+also auch in der Desktop-App (file:) und offline vor dem Precache.
+
+*Nachgezogen 2026-10-05 (Audit Runde 3, R3-O3):* Der Vorrat ist zweistufig.
+Bisher war der Service Worker erst nach allen 552 Dateien (10,7 MB) aktiv, bei
+schwachem Mobilfunk über eine Minute ohne Fortschritt. Jetzt teilt
+`manifestTransforms` (`scripts/precache-aufteilung.ts`) das Manifest: Der
+**Kern** (78 Dateien, 6,7 MB: App-Shell, alle JS-Bausteine einschließlich PDF,
+QR-Decoder und Landesvorlagen, Schrift, Bilder, Blanko-Vordruck und die von der
+App verlinkten Seiten) bleibt im Workbox-Precache und ist Bedingung für
+„offline bereit". Die **Zusatzstufe** (474 Dateien, 4,0 MB: Beispielbögen,
+Themen- und Länderseiten) schreibt der Build nach `offline-zusatz.json`; die
+Startseite lädt sie nach der Aktivierung nach (`src/app/offline-vorrat.ts`),
+der Service Worker legt sie über zwei Laufzeit-Routen in den Cache
+`eeb-zusatz` (Beispielbögen `CacheFirst`, Seiten `StaleWhileRevalidate` seit Runde 7, Liste `NetworkFirst`).
+*Hinweis 2026-10-24:* Mit `examples/praktische-ausbildung/` (41 Bögen, JSON) sind die Zusatzstufe um 41 Dateien und die Zahlen oben (474 Dateien, 4,0 MB) sowie die Bogenzählungen weiter unten (227/239/443 Beispielbögen) nicht mehr aktuell; beim nächsten Build neu messen.
+*Nachgezogen 2026-10-06 (Audit Runde 4, R4-O1):* Bricht das Erstladen im
+Funkloch ab, scheitert der Service Worker an der Installation, und der Browser
+verwirft die Registrierung; ein späteres `update()` ginge ins Leere und die
+Zeile bliebe bei „wird geladen". `installationAnstossen`
+(`src/app/offline-bereit.ts`) registriert deshalb beim `online`-Ereignis und
+bei stehendem Zähler (20 s, nur mit Netz und bekanntem Umfang) neu; der Vorrat
+im Gerät bleibt, es wird nur der Rest geholt. Fehlt die Registrierung, steht
+„Laden abgebrochen bei x von y MB — mit Netz einmal neu laden" mit Knopf.
+Gemessen mit einem drosselnden Reverse-Proxy (Verbindung abgewiesen, mit und
+ohne `setOffline`): Nach Netzrückkehr erreicht die Zeile „offline bereit"
+ohne Neuladen.
+*Nachgezogen 2026-10-14 (Audit Runde 5, R5-O2, R5-O4, R5-O7):* Das Nachladen
+der zweiten Stufe (`zusatzNachladen`, `src/app/offline-vorrat.ts`) gab beim
+ersten Fehlschlag auf, und der Zähler stand minutenlang. Jetzt geht jede Runde
+über alle offenen Dateien (ein Fehlschlag hält die übrigen nicht auf), danach
+folgt die Pause 2, 4, 8, 16, 30, dann 60 s, solange die Seite offen ist; jeder
+Abruf hat eine Zeitgrenze von 20 s (`AbortController`), eine Datei, die achtmal
+scheitert (dauerhaftes 404), wird aufgegeben. Hakt es, sagt die Zeile es („das
+Netz hakt — der nächste Versuch läuft von selbst"). Gemessen im
+Produktionsbuild mit eingeschleusten Fehlschlägen (60 abgewiesene und zwei
+hängende Abrufe): Der Zähler steht bis zur Zeitgrenze bei 446 von 508, dann
+folgen Hinweis, Pause und Abschluss ohne Neuladen. Die Fotos und
+Bildschirmfotos der Themenseiten (nur die WebP-Fassung, `bilder/**`,
+`screenshots/**`) gehören jetzt zur zweiten Stufe (`istZusatz`,
+`scripts/precache-aufteilung.ts`): Sie standen vorher als leere Flächen da
+(gemessen: 34 Dateien, 3,4 MB). Die Zusatzstufe umfasst damit 508
+Dateien und 7,5 MB (vorher 4,2 MB), der Kern (69 Dateien, 6,8 MiB) wird nicht
+größer; eine weitere Laufzeit-Route `StaleWhileRevalidate` im Cache
+`eeb-zusatz` hält die Fotos frisch. Blockiert der Browser den Speicher ganz,
+sagt die Offline-Zeile „dieser Browser speichert nichts" statt „Alle Daten
+bleiben auf diesem Gerät", und die Startseite warnt (`speicherGesperrt`).
+
+Die Offline-Zeile zeigt beim Laden den Fortschritt des Kerns in MB und danach
+„offline bereit für Bogen, PDF, QR-Code und Empfang … (120 von 474)". Keine
+neuen Hosts, alle Abrufe gehen an die eigene Herkunft. „Funktioniert komplett
+offline" steht erst, wenn die Zusatzstufe gezählt und vollständig ist; bis zur
+ersten Zählung nennt die Zeile nur den Kern (`zweiStufen` in
+`src/app/offline-bereit.ts`, nachgezogen 2026-10-05).
 
 ### 6.5 Desktop-Auto-Update (Electron)
 
@@ -978,7 +1293,113 @@ flowchart TB
   `localStorage` des Geräts (`speicher-browser.ts` als einzige Anbindungsstelle
   zwischen Browser-Speicher und der `@bos/meldekopf`-Kernlogik).
 - **Entwurfswiederherstellung** (`entwurf.ts`): ein gerade ausgefüllter, noch
-  nicht übergebener Bogen geht bei Neuladen/Absturz nicht verloren.
+  nicht übergebener Bogen geht bei Neuladen/Absturz nicht verloren. Ein
+  verdrängter Bogen wartet auf genau einem Rückholplatz
+  (`eeb.entwurf.ersetzt.v1`). Die Erfassung einer fremden Einheit am
+  Meldekopf ist am Entwurf markiert (`Entwurf.fremd` mit Ziel-Sammlung und
+  Beginn der Erfassung als Vorschlag für die Eintreffzeit (R3-S6), nach
+  einem Neustart geht es in derselben Erfassung weiter) und verdrängt dort nie
+  einen eigenen Bogen (`rueckholungNimmt`).
+  Eingehende Bogen-Links laufen bei laufender App (`hashchange`, Universal
+  Link) über eine Ref auf den Handler des aktuellen Renders und beim
+  Kaltstart nach dem Mounten über denselben Weg (`uebernimmBogen`): erst
+  Rückfrage, dann verdrängen. Sofort geöffnet wird ein Start-Link nur ohne
+  angefangenen Bogen und ohne Sammlung (R3-S1/R3-D2). Entschieden wird das
+  in `startLage()` beim ersten Aufbau der App, nicht beim Laden des Moduls:
+  `main.tsx` importiert `app.tsx`, bevor `speicherVerdrahten()` der
+  Sammlung ihren Speicher reicht, und die alte Modulkonstante `START_SOFORT`
+  sah nie eine Sammlung (R4-W3, nachgezogen 2026-10-05). `merkeVerdraengt`
+  legt die Bearbeitung einer gespeicherten Vorlage unverändert gar nicht und
+  verändert nur ohne eigenen Bogen auf den Rückholplatz (R3-D1); „Aus Datei
+  laden…" fragt erst nach dem Lesen (R3-E2) und bei vorhandener Sammlung
+  wie Link und Scan „Wohin damit?" (`empfangsZielWaehlen`, R4-N2). Gleicht
+  ein eintreffender Bogen dem offenen (`bogenSchonOffen`), wird nichts
+  ersetzt und nichts vom Rückholplatz verdrängt (R4-E2).
+  *Musterung (seit 2026-10-06, R4-E7):* Die Haken von „Einsatz vorbereiten"
+  stehen unter `eeb.musterung.v1` (`musterung-stand.ts`: Vorlagen-Kennung,
+  `geaendert`, Wahrheitswerte je Stelle, Zeitpunkt; keine Namen) und kommen
+  nach einem Neuladen wieder; das Ende der Musterung räumt den Eintrag weg.
+  Der Rückholplatz trägt als Stand die letzte Bearbeitung des Bogens
+  (`ersetztenEntwurfMerken(…, { geaendertUm })`, R4-S5).
+  Zwei Fenster: `entwurfAusAnderemFenster` erkennt einen Entwurf, den dieses
+  Fenster nicht selbst geschrieben hat; vor dem Anlegen eines neuen Bogens
+  fragt die App und legt ihn auf den Rückholplatz (R3-S3). „Meine Fassung
+  behalten" legt den Stand des anderen Fensters ebenso dort ab und fragt,
+  wenn dabei ein dritter Bogen fiele; „Stand aus dem anderen Fenster laden"
+  setzt einen inhaltsleeren Merker in `sessionStorage`
+  (`eeb.abgleich.fortsetzen`), damit die neu geladene Seite im Bogen statt
+  auf der Startseite beginnt (R4-S4).
+  Zurück-Geste: Der Verlaufs-Lauscher schließt zuerst das oberste offene
+  Fenster wie Escape und legt den verbrauchten Eintrag neu an; QR-Vollbild
+  und Scanner führen ihren Rücksprung selbst (`data-zurueck="eigen"`,
+  R4-S1, R4-M5).
+- **Folgemeldungen** (`eintrag-zeiten.ts`): Jeder Eingang in eine Sammlung —
+  Scan, Link, Datei, Bilderstapel, „In Einsatz aufnehmen" — läuft über
+  `meldungAufnehmen`. Eine neue Fassung derselben Einheit erbt dort
+  Eintreffzeit, Auftrag/Notiz, Zug- und Teil-Etikett der Vorgängerin; der
+  Kern (`@bos/meldekopf`) bleibt unverändert. Trägt ein Nachtrag nur eine
+  Stärke (Schnellerfassung vom Papier), bietet die Rückfrage „Nur die Stärke
+  ändern" an: `nurStaerkeUebernehmen` (`nur-staerke.ts`) baut die neue Fassung
+  aus der bisherigen und schreibt Verpflegungs- und M/W/D-Aufteilung fest;
+  dasselbe an der Karte über „Mehr…" › „Stärke ändern…" (R3-A1, 2026-10-05).
+- **Rückweg vom Papier** (R3-A2, 2026-10-05): Aus Bildern oder einer
+  PDF ohne eingebettete Daten eingelesene neue Einheiten tragen das
+  App-Zusatzfeld `vomPapier` (Zeitpunkt des Einlesens) am Eintrag. Die
+  Einsatzansicht bietet „Lage vom Papier abgleichen…" (`papier-abgleich-ui.tsx`):
+  Eintreffzeit, Status samt Abrückzeit und Zug je Einheit in einer Liste,
+  geschrieben in einem Vorgang (`papierAbgleichUebernehmen`), danach fällt
+  die Marke weg. Kein Schemawechsel: die Lage steckt weiter nicht im QR-Code.
+- **Abgleich beim Einsatz-Import** (`einsatz-abgleich.ts`, R3-W1,
+  nachgezogen 2026-10-05): Der Kern-Import `einsatzImportieren` hängt nur
+  Meldungen mit unbekannter Eintrags-ID an. `einsatzAbgleichen` merkt sich den
+  Stand vor dem Import und gleicht danach je Einheit Status samt Abrückzeit,
+  Zug, Auftrag/Notiz und Eintreffzeit ab. Maßgeblich ist der Verlauf der
+  Führungsstelle (`vermerke` mit Uhrzeit): Es gilt die Seite, die das Feld
+  seit dem gemeinsamen Stand geändert hat; haben beide geändert, der jüngere
+  Vermerk, und der Widerspruch steht in Quittung und Verlauf („Abgleich mit
+  anderem Gerät: …"). Ohne Vermerk wird nur ein hier leerer Wert gefüllt.
+  Der Weitergabe-Stand (`eeb.weitergabe-stand.v1`) führt dazu Prüfsummen der
+  bekannten Vermerke und den Zeitpunkt der letzten Übernahme; was ein Import
+  brachte, zählt nicht als „hier neu" (R3-W2). Seit 2026-10-06 (R4-K1, R4-W7)
+  tragen alle Stände (Lageblatt, Weitergabe, je Format der Export) den
+  **Zustand je Einheit** (Prüfsummen von Status samt Abrückzeit, Zug, Auftrag,
+  Eintreffzeit der geltenden Fassung): „seitdem 1 Änderung (Abrücken)" steht an
+  Lageblatt, Export, Weitergabe und Startseitenkarte, ein „Rückgängig" nimmt
+  sie zurück, und der Nachtrag enthält die geltende Fassung jeder geänderten
+  Einheit. Der Abgleich meldet die Felder, deren Wert danach dem der Datei
+  entspricht (`AbgleichErgebnis.bekannt`); `weitergabeUmImportErgaenzen` bucht
+  sie als beim anderen Gerät bekannt. Stände ohne Zustand (ältere
+  Weitergaben) zählen weiter Vermerke.
+- **Welche Fassung gilt** (`fassung-vorrang.ts`, R4-W1, 2026-10-06): Der Kern
+  wählt den Kopf einer Einheit nach dem Stand im Bogen, bei gleicher Minute nach
+  der Empfangszeit (`neuesteJeEinheit`, `revisionen`) und bleibt unverändert
+  (ADR-003). Die App legt eine Schicht darüber: Ein App-Zusatzfeld am Eintrag
+  (`ersetztDurch`, `ersetztAm`) verdrängt eine Fassung zugunsten einer anderen;
+  `geltendeJeEinheit` und `fassungenJeEinheit` ersetzen die Kern-Aufrufe in
+  Karten, Summen, Exporten und Abgleich, verdrängte Fassungen fallen aus der
+  Wahl des Kopfs heraus, unter den übrigen gilt die Kern-Regel (eine spätere
+  Folgemeldung löst die bestätigte Fassung also normal ab). Beim Eingang
+  (`fassungPruefen`) fragt die App in zwei Lagen — der Bogen der Einheit nach
+  einer Schnellerfassung (älterer Stand, Vorschlag „Bogen gilt") und zwei
+  Fassungen derselben Minute; ein älterer Bogen nach einem echten jüngeren
+  steht in der Quittung als „nur Historie". Im Kiosk-Stapel keine Frage, aber ein
+  Satz und an der Karte „Bogen übernehmen". Der Vorrang reist über den
+  Abgleich zwischen Geräten. Das Feld ist wie `zugEtikett` ein Zusatz, kein
+  Schemawechsel.
+- **Nachtrag** (R4-W4, 2026-10-06): Die Sammel-PDF eines Teilexports trägt im
+  Umschlag der eingebetteten Sammlung den optionalen Zusatz `nachtragSeit`
+  (nie gespeichert); „Einsatz importieren…" auf einem Gerät ohne diese
+  Sammlung fragt nach. Übersicht, Summen, Fußzeile, Dateinamen (PDF, CSV,
+  Excel) und die CSV-Summenzeile sagen „Nachtrag". Das Transportformat der
+  QR-Codes bleibt unverändert.
+- **Laufende Nummer vom Papier** (R4-A1): `nummer` am Eintrag ist nur gesetzt,
+  wenn der Papier-Abgleich sie vom Blatt übernommen hat; `meldungsNummern`
+  hält sie fest und lässt die übrigen Einheiten um sie herum zählen. Der
+  Kasten „Stand am Meldekopf" druckt die Nummer. Eine Sammel-PDF einer
+  anderen Sammlung über „Bögen einlesen…" bietet die Übernahme in die
+  offene Sammlung an (`sammlungFuerZiel`, Zug-Vorschlag = Name der
+  Quell-Sammlung, R3-W3); sie läuft über denselben Abgleich, mit Siegel,
+  Zeiten und Status, ohne zweite Sammlung.
 - **Datenschutzfrist:** 90 Tage nach dem Stand eines Bogens werden seine
   Personaldaten dauerhaft anonymisiert. Das gilt für die Meldungen der
   Einsatz-Sammlung, den Entwurf und jeden eingelesenen Bogen; Übungsbögen und
@@ -988,6 +1409,37 @@ flowchart TB
     `speicher-browser.ts`, Plausibilitätsprüfung in `datenschutz-uhr.ts`,
     gemerkter Stand unter `eeb.uhr.v1`). Ohne hereingereichte Uhr anonymisiert
     die Sammlung nichts — wie bei der Speicherhülle.
+  - **Geprüfte Uhr für Aufräum- und Papierkorbfrist (seit 2026-10-06, R4-D1):**
+    Der Kern rechnet beide mit `Date.now()` in `alleEinsaetzeLaden()` und
+    löschte bei vorgestellter Uhr beim Start endgültig. Da `vendor/` nicht
+    geändert wird, steht die Prüfung in der App: `geraeteuhrPruefen`
+    (`datenschutz-uhr.ts`) hält eine Uhr zurück, die mehr als 60 Tage vor dem
+    letzten Start liegt (das Format-Maß `UHR_SPRUNG_TAGE = 366` ließ ein
+    falsches Jahr durch); `uhrKorrigierteHuelle` (`uhr-korrektur.ts`)
+    verschiebt dann `geaendert`/`geloeschtAm` der Sammlungen beim Lesen um den
+    Vorsprung und beim Schreiben zurück (Versatz je Seitenaufruf fest). Die
+    Reihenfolge der Hüllen: Beobachter (Aufräum-Nachricht, geprüfte Uhr) →
+    Uhrkorrektur → schonende Hülle. Vorlagen (`vorlagen.ts`) und Papierkorb-
+    Anzeige (`papierkorb-frist.ts`) nutzen `geprueftesJetztMs()`. Die
+    Oberfläche warnt „Geräteuhr prüfen" (`uhr-warnung.tsx`).
+    *Nachgezogen 2026-10-14 (Audit Runde 5, R5-D1, R5-O5, R5-E2):* Die
+    Runde-4-Fassung übernahm einen Sprung einen Tag später selbst
+    (`SPRUNG_FENSTER_TAGE`) und löschte dann alle Sammlungen endgültig; sie ist
+    ersetzt. `geraeteuhrPruefen(jetzt, bisher, faelligWuerde)` hält einen
+    Abstand über 60 Tagen fest (`gehalten`, `richtung` vor oder zurück) und
+    bestätigt ihn nie durch Zeitablauf: weiter nur durch `uhrBestaetigen()`
+    („Geräteuhr stimmt" mit Rückfrage, die `uhrFolgen()` in Zahlen nennt) oder
+    wenn die Uhr wieder innerhalb von 60 Tagen zum letzten Start passt. Ein
+    Sprung nach vorn, bei dem `faelligWuerde()` nichts findet (`uhr-folgen.ts`
+    liest die rohen Einträge ohne die Hüllen: ruhende Sammlungen, Papierkorb,
+    abgelaufene Bögen, Entwurf), ist eine echte Pause und wird ohne Frage
+    übernommen. `uhrVersatzMs()` ist bei einer nachgehenden Uhr negativ: Stempel
+    der Sammlungen liegen während der falschen Uhr in der echten Zeitlinie und
+    sehen nach dem Richtigstellen nicht uralt aus. Neue Stände (Bogen, Vorlage,
+    „Stärke ändern…") nehmen `stempelZeitpunkt()`. Dass die neuere Handlung
+    gilt, sichert `fassungObenauf` (`fassung-vorrang.ts`): Die Empfangszeit der
+    neuen Fassung rückt hinter die jüngste der Einheit, denn der Kern wertet bei
+    gleichem Stand die Empfangszeit (`istNeuer`).
   - **Kein Schemafeld:** Die Frist leitet sich aus `stand` und `uebung` ab und
     gilt so auch für schon verteilte QR-Codes.
 - **Papierkorb statt endgültigem Löschen** – Prinzip „Nichts geht verloren"
@@ -1008,6 +1460,31 @@ flowchart TB
   technische Teil von Maßnahme M3 des
   [Informationssicherheitskonzepts](informationssicherheitskonzept.md).
 
+*Nachgezogen 2026-10-14 (Audit Runde 5, Paket 1):* Neue und geänderte
+Speicherorte und Löschwege. (1) Ein Entwurf, den die App nicht lesen kann
+(abgeschnitten, Pflichtfeld des Bogens fehlt, `entwurfPruefen`), wird
+unverändert unter `eeb.entwurf.beschaedigt.v1` beiseitegelegt, statt vom
+nächsten Autosave überschrieben zu werden; die Startseite nennt die Ursache und
+bietet „Als Datei sichern" an, nach 90 Tagen fällt er selbst weg
+(R5-E1). (2) Hat ein anderes Fenster den Entwurf **entfernt** („Alle Daten
+löschen", Bogen geschlossen), schreibt dieses Fenster ihn nicht zurück
+(`entwurfFremdEntfernt`, `KonfliktArt`), sondern zeigt die feste Warnleiste mit
+„Neu laden, hier verwerfen" und „Bogen hier wieder speichern" (R5-D3,
+`fenster-abgleich.tsx`). (3) Der Link einer Meldung, auf deren „Wohin damit?"
+gewartet wird, liegt bis zur Antwort im `sessionStorage` (`eeb.wartet.fragment`,
+`wartender-link.ts`); `startAusUrlFragment` liest ihn nach einem Neuladen
+wie ein Fragment der Adresszeile (R5-S6). (4) Der Rückweg von „Vorbelegung
+entfernen" liegt 15 Minuten im `sessionStorage` (`eeb.vorbelegung.rueckweg`),
+und nur solange Personal und Fahrzeuge noch gleich aussehen (R5-D5);
+„Alle Daten löschen" räumt beide Merker mit ab (`alleDatenLoeschen`).
+(5) „Wiederherstellen" aus dem Papierkorb läuft über
+`einsatz-wiederherstellen.ts` und setzt `geaendert` neu (R5-D2). (6) „Sicherung
+einspielen" lässt den Uhrstand des Geräts stehen und nennt, was einer alten
+Datei sofort wieder unter die Fristen fällt (`bestandUmfang().faellig`,
+R5-D4). (7) Legt ein anderes Fenster die offene Sammlung in den Papierkorb,
+sagt die Startseite es (R5-O6). Die Sammlung ist über „Papierkorb Einsätze"
+erreichbar (zuvor gleichlautend mit dem der Vorlagen, R5-D5).
+
 ### 8.3 Sicherheits- und Datenschutzkonzept
 
 - **Content-Security-Policy** wird ausschließlich im Produktions-Build als
@@ -1018,8 +1495,11 @@ flowchart TB
   (`erfassungsbogen.goatcounter.com`). `script-src` gibt die drei
   Inline-`<script>`-Blöcke der `index.html` einzeln über beim Bauen erzeugte
   `sha256`-Hashes frei und kommt damit **ohne `'unsafe-inline'`** aus;
-  `style-src` behält `'unsafe-inline'`, weil React `style`-Attribute an
-  Elementen setzt. `file:` deckt den Electron-Build ab.
+  `'wasm-unsafe-eval'` erlaubt zusätzlich das Kompilieren des
+  WebAssembly-Decoders ZXing aus dem eigenen Bundle (seit 2026-09-27; vorher
+  fiel der Scanner im Build still auf jsQR zurück). `style-src` behält
+  `'unsafe-inline'`, weil React `style`-Attribute an Elementen setzt. `file:`
+  deckt den Electron-Build ab.
 
   > *Prüfvermerk:* Die Hash-Freigabe kam mit `c7604e9` (2026-09-12); die
   > PDF-Fassung vom 2026-09-11 beschreibt noch `'unsafe-inline'` bei
@@ -1040,7 +1520,9 @@ flowchart TB
 - **Cookielose Reichweitenmessung** über GoatCounter – der einzige erlaubte
   Fremd-Host in der CSP.
 - **Ed25519-Signatur** jedes von der App erzeugten QR-Codes (Container `EEB2C`),
-  Geräteschlüssel wird lokal beim ersten Bedarf erzeugt; Verifikation ist rein
+  Geräteschlüssel wird lokal beim ersten Bedarf erzeugt (lässt er sich nicht
+  speichern, gilt er bis dahin nur für die offene Seite, seit 2026-10-05,
+  R3-E1 — die Übergabe scheitert nie am Schlüssel); Verifikation ist rein
   informativ und blockiert den Import nie. Ein Schlüsselwechsel ist jederzeit
   möglich (Fußzeile), wird aber nicht verkündet: Ohne PKI gibt es keinen
   Widerruf, die Gegenstelle gleicht die neue Kurzform von Hand ab.
@@ -1159,6 +1641,42 @@ flowchart TB
 - Netzwerkfehler werden dort, wo sie nicht sicherheitsrelevant sind
   (Update-Check, Statistik-Zählpixel), bewusst still ignoriert, um den
   Offline-Grundsatz nicht zu verletzen – siehe Kapitel 6.5.
+- **Fehlerfänger** (seit 2026-10-14, Audit Runde 5, R5-E1,
+  `src/app/fehlerfaenger.tsx`): Eine React-Fehlergrenze um die ganze App.
+  Wirft ein Aufbau der Ansicht einen Fehler, erscheint statt eines weißen
+  Bildschirms eine deutsche Meldung („Deine Daten liegen weiter auf diesem
+  Gerät") mit Neu laden, Zur Startseite (beide vergessen die zuletzt geöffnete
+  Sammlung, damit der Absturz sich nicht wiederholt), „Daten sichern"
+  (Sicherungsdatei aus allen `eeb.`-Einträgen) und, mit Haken, „Alle Daten
+  löschen"; die technische Angabe ist eingeklappt. Die Seite hängt nur an
+  `sicherung.ts` und `hilfen.ts`, nicht an den Komponenten, die abgestürzt
+  sein können.
+- **Pflichtfeldprüfung** (`src/app/bogen-pruefung.ts`): `bogenBefund` ergänzt
+  Harmloses (fehlender Einheitstyp → leerer Wert, fehlende Listen, Namen) und
+  lehnt Unbrauchbares mit Ursache ab (Einheit, Organisation, Stand,
+  Einsatzzeitraum, Personenliste, Erfassungsart). Eingänge: Einsatz-Datei
+  (`einsatzAusRoh`: „1 von 3 Bögen ist unvollständig (…) und wurde nicht
+  übernommen", keine leere Sammlung bei lauter unlesbaren Bögen), „Bögen
+  einlesen…" (`boegenAusJsonTextMitUrsachen`), „Aus Datei laden…"
+  (`bogenPruefen`) und der Entwurf (`entwurfPruefen`). Der Kern (`einsaetzeAusJson`,
+  Submodul) prüft nur die Hülle des JSON; die Schicht sitzt vor ihm. Bereits
+  gespeicherte fehlerhafte Sammlungen fängt der Fehlerfänger ab.
+- **Eine Sperre für alle PDF-Wege** (`src/app/arbeitet.ts`, R5-O3, R5-H4,
+  R5-L4): Einsatz weitergeben / sichern, Sammel-PDF, Lageblatt, Blanko-Vordruck
+  (Start, Einsatzansicht, Fußzeile) und Bogen-PDF laufen über `arbeiten(name,
+  aktion)`: höchstens eine zugleich, der zweite Tipp tut nichts (eine Datei statt
+  zwei), die Oberfläche bekommt vor der schweren Arbeit ein Bild
+  (`naechstesBild`), der Knopf zeigt „… wird erzeugt…" (`aria-busy`), und die
+  Bestätigung steht unter den Knöpfen (`ausgabeQuittung`). Gemessen mit 30
+  Bögen: Zustand nach unter 0,4 s sichtbar, zwei weitere Tipps während der
+  Arbeit erzeugten keine zweite Datei.
+- **Feste Warnleiste** (`src/app/feste-warnung.tsx`, R5-O1, R5-S4): „Nicht
+  gespeichert" und die Konfliktwarnung der zwei Fenster sitzen am oberen
+  Bildrand (zwei Zeilen Kurztext, Einzelheiten hinter „Was tun?" bzw.
+  „Entscheiden", bei knapper Bildhöhe eingeklappt); die Seite rückt um die
+  Leistenhöhe nach unten (`--fest-warnung-hoehe`) und hält sie beim Scrollen zu
+  einem Feld frei. Gemessen bei 360 × 640: 130 statt 240 px, bei 360 × 380
+  (Tastatur) 53 px.
 
 ---
 
@@ -1352,7 +1870,7 @@ flowchart LR
 
 | # | Qualitätsziel | Szenario | Bewertungsmaßstab / Nachweis im Repository |
 | --- | --- | --- | --- |
-| 1 | Offlinefähigkeit | Eine Einheit ruft die Web-App einmal online auf, verliert danach die Netzverbindung im Einsatzgebiet und füllt einen Bogen komplett aus, druckt PDF und erzeugt QR-Code. | Service Worker precacht App-Shell inkl. wasm/woff2 (`vite.config.ts`, VitePWA); Szenario „Die PDF entsteht auch ohne Netz und ohne Neuladen" in `features/uebergabe.feature`. |
+| 1 | Offlinefähigkeit | Eine Einheit ruft die Web-App einmal online auf, verliert danach die Netzverbindung im Einsatzgebiet und füllt einen Bogen komplett aus, druckt PDF und erzeugt QR-Code. | Service Worker precacht App-Shell inkl. wasm/woff2 (`vite.config.ts`, VitePWA), Beispielbögen und Themenseiten als zweite Stufe danach (seit 2026-10-05, 6.4); Szenario „Die PDF entsteht auch ohne Netz und ohne Neuladen" in `features/uebergabe.feature`. |
 | 2 | Benutzbarkeit im Feld | Ein Nutzer schaltet bei grellem Sonnenlicht in den Feld-Modus und kann alle Bedienelemente weiterhin klar erkennen. | `anzeige-modus.ts`, `features/daten-und-anzeige.feature` (Anzeigemodus Dunkel/Feld/Nacht, auch bei dunklem Systemdesign). |
 | 3 | Schnellerfassung am Meldekopf | Eine fremde Einheit trifft ohne eigenen Bogen ein; der Meldekopf erfasst sie in wenigen Minuten (nur Stärke, Führungskraft, Fahrzeuge) und druckt einen Bogen. | `personalErfassung = NUR_STAERKE`, Minimalfelder laut `docs/datenmodell.md` („Meldekopf-Workflow"), gemessene Payload-Größe 191 Bytes → QR-Version 10. |
 | 4 | Rückwärtskompatibilität | Ein vor Jahren gedruckter QR-Code (Schema-Version 2) wird mit der aktuellen App-Version gescannt und korrekt angezeigt. | Eingefrorene v2-Fixture in `codec.migration.test.ts` und `features/fixtures.ts`; `migriereBogen` deckt `2..SCHEMA_VERSION` ab. |
@@ -1426,6 +1944,17 @@ Repository-Analyse, keine offiziellen Angaben des Projekts.
   Vollständigkeit je Organisation ist fortlaufender Pflegeaufwand.
 - **Zwei TypeScript-Versionen nebeneinander** in allen vier Kern-Submodulen –
   Übergangslösung mit definiertem Wegfallkriterium.
+- **Abgleich beim Einsatz-Import liegt im Produkt statt im Kern**
+  (`src/app/einsatz-abgleich.ts`, R3-W1, 2026-10-05): `einsatzImportieren` im
+  Submodul gleicht nur über die Eintrags-ID ab; die Feldregeln hängen an den
+  App-Zusatzfeldern (`eintrag-zeiten.ts`) und den Vermerktexten. Wandern diese
+  Felder in den Kern, gehört der Abgleich mit.
+- **Fassungs-Vorrang liegt im Produkt statt im Kern**
+  (`src/app/fassung-vorrang.ts`, R4-W1, 2026-10-06): Der Kern wählt den Kopf
+  einer Einheit allein nach dem Stand im Bogen; die App verdrängt Fassungen
+  über das Zusatzfeld `ersetztDurch`. Alles, was den Kern direkt aufruft oder
+  eine ältere App-Version, ignoriert den Vorrang. Gehört langfristig in
+  `@bos/meldekopf` (`neuesteJeEinheit`, `revisionen`), dann entfällt die Schicht.
 - **`packages/kern-vendor/`-Rückweg ist vorbereitet, aber ungenutzt** – die
   Exit-Strategie ist eine Prozessvereinbarung, kein eingerichteter Mechanismus.
 

@@ -1,0 +1,192 @@
+{
+  "schemaVersion": 9,
+  "uebung": true,
+  "stand": 2171520,
+  "einheit": {
+    "organisation": 6,
+    "einheitsTyp": {
+      "freitext": "Verpflegungsgruppe"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "code": 1
+        },
+        "name": "Akkonia"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 1508,
+    "zeitraumBis": 1508,
+    "ortAuftrag": "Praktische Ausbildung (Übung): Einheitenerfassung der geplanten Einsatzeinheiten"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "nachname": "Kurzer",
+      "vorname": "Michael",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "GF"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Betr.-H"
+        }
+      ]
+    },
+    {
+      "nachname": "Fischer",
+      "vorname": "Fabian",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Feldkoch"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Betr.-H"
+        }
+      ]
+    },
+    {
+      "nachname": "Brome",
+      "vorname": "Franziska",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Verpflegungshelfer"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Betr.-H"
+        }
+      ]
+    },
+    {
+      "nachname": "Pieper",
+      "vorname": "Sarah",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Feldkoch"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Betr.-H"
+        }
+      ]
+    },
+    {
+      "nachname": "Müller",
+      "vorname": "Jens",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Verpflegungshelfer"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Betr.-H"
+        }
+      ]
+    },
+    {
+      "nachname": "Berger",
+      "vorname": "Markus",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kraftfahrer/Melder"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Betr.-H"
+        }
+      ]
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "MTW"
+      },
+      "kennzeichen": "AK-JU 43",
+      "funkrufname": {
+        "kennwort": {
+          "code": 4
+        },
+        "eigenerStandort": false,
+        "ort": "Akkonia",
+        "teile": [
+          56,
+          17,
+          6
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "Feldküche"
+      },
+      "kennzeichen": "AK-JU 44"
+    },
+    {
+      "typ": {
+        "freitext": "GW-Logistik-Küche"
+      },
+      "kennzeichen": "AK-JU 45",
+      "funkrufname": {
+        "kennwort": {
+          "code": 4
+        },
+        "eigenerStandort": false,
+        "ort": "Akkonia",
+        "teile": [
+          56,
+          66,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "Kühlanhänger"
+      },
+      "kennzeichen": "AK-JU 46"
+    }
+  ],
+  "sonstiges": "Fachdienst: Verpflegung. Hauptleistung: Verpflegung. Kommunikation: Rufname 56-17-06, Kanal/Rufgruppe DMO 601."
+}

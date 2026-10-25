@@ -8,6 +8,7 @@
  */
 
 import { OrganisationsTyp } from "@bos/eeb-format/model";
+import { themeFarbeAbgleichen } from "./anzeige-modus";
 
 /**
  * Kennfarbe je Organisation: färbt im PDF Kopfbalken, Organisationsangabe und die
@@ -27,11 +28,11 @@ const ORG_FARBEN: Partial<Record<OrganisationsTyp, string>> = {
   [OrganisationsTyp.FEUERWEHR]: "#c8102e", // Feuerrot (RAL 3000)
   [OrganisationsTyp.POLIZEI]: "#2d6a2e", // Polizeigrün, heller als die Bundespolizei
   [OrganisationsTyp.BUNDESPOLIZEI]: "#00694e", // Grün in der BGS-Tradition
-  [OrganisationsTyp.DRK]: "#e30613", // DRK-Rot
-  [OrganisationsTyp.JUH]: "#1a1a1a", // Johanniter-Schwarz
-  [OrganisationsTyp.MHD]: "#7d1128", // Malteser-Bordeaux
-  [OrganisationsTyp.ASB]: "#a34700", // dunkles ASB-Orange
-  [OrganisationsTyp.DLRG]: "#9c6b00", // dunkles DLRG-Gelb
+  [OrganisationsTyp.DRK]: "#e60005", // DRK-Rot (offiziell; gilt auch für Bereitschaften und Wasserwacht)
+  [OrganisationsTyp.JUH]: "#e30613", // Johanniter-Rot (Näherungswert)
+  [OrganisationsTyp.MHD]: "#dd040c", // Malteser-Rot (Drittquelle)
+  [OrganisationsTyp.ASB]: "#e30613", // ASB-Rot (Näherungswert)
+  [OrganisationsTyp.DLRG]: "#e30613", // DLRG-Rot (offiziell)
   [OrganisationsTyp.BUNDESWEHR]: "#4b5320", // Oliv
   [OrganisationsTyp.RETTUNGSDIENST]: "#ffffff", // Weiß (Rettungsdienst-Fahrzeuglackierung)
   [OrganisationsTyp.SONSTIGE]: "#4d4d4d", // neutrales Grau
@@ -197,6 +198,62 @@ function kopfZweitschrift(akzent: string): string {
 }
 
 /**
+ * Kopfbalken im Dunkel-Modus (Audit Runde 4, R4-L2): Die Kennfarbe stand dort
+ * unverändert als 130 px hohe, vollflächige Farbe über der Seite — beim DRK
+ * #e30613, dazu als Farbe der Statusleiste. Die Begründung im Stylesheet („die
+ * Org-Töne sind ohnehin dunkel gehalten") trifft auf DRK, Feuerwehr, DLRG und
+ * ASB nicht zu. Der Balken wird deshalb auf die Leuchtdichte des
+ * Malteser-Bordeaux (#7d1128) und die Sättigung desselben Tons begrenzt;
+ * dunklere und weniger gesättigte Kennfarben (THW, Malteser, Johanniter)
+ * bleiben, wie sie sind. Ton und Sättigung bleiben erkennbar die der
+ * Organisation, nur nicht mehr die hellste, lauteste Fläche im abgedunkelten
+ * Raum. Weiß trägt auf dem dunkleren Balken mindestens so gut wie auf der
+ * Kennfarbe, die Zweitschriften sind gegen diese gerechnet.
+ */
+const KOPF_DUNKEL_MAX_LEUCHTDICHTE = 0.05;
+const KOPF_DUNKEL_MAX_SAETTIGUNG = 0.84;
+
+export function kopfDunkel(akzent: string): string {
+  if (leuchtdichte(akzent) <= KOPF_DUNKEL_MAX_LEUCHTDICHTE) return akzent;
+  const basis = hexZuHsl(akzent);
+  const s = Math.min(basis.s, KOPF_DUNKEL_MAX_SAETTIGUNG);
+  for (let l = basis.l; l > 0.05; l -= 0.01) {
+    const ton = hslZuHex({ h: basis.h, s, l });
+    if (leuchtdichte(ton) <= KOPF_DUNKEL_MAX_LEUCHTDICHTE) return ton;
+  }
+  return hslZuHex({ h: basis.h, s, l: 0.05 });
+}
+
+/**
+ * Kopfbalken im Feld-Modus (Audit Runde 5, R5-L3): Der Modus steht für „große
+ * Tippziele und maximaler Kontrast" (Schwarz auf Hellgrau, 21:1), der Balken
+ * behielt aber die Kennfarbe — und Weiß darauf hatte bei sieben Organisationen
+ * nur 4,53 bis 4,63:1, der niedrigste Wert der Seite. Jetzt wird die Kennfarbe
+ * (Ton und Sättigung bleiben) so weit abgedunkelt, bis Weiß mindestens 7:1
+ * erreicht (WCAG AAA); dunkle Kennfarben (THW, Polizei) bleiben, wie sie sind.
+ */
+export const KOPF_FELD_KONTRAST = 7;
+
+export function kopfFeld(akzent: string): string {
+  if (kontrast(FLAECHE, akzent) >= KOPF_FELD_KONTRAST) return akzent;
+  const basis = hexZuHsl(akzent);
+  for (let l = basis.l; l > 0.02; l -= 0.01) {
+    const ton = hslZuHex({ ...basis, l });
+    if (kontrast(FLAECHE, ton) >= KOPF_FELD_KONTRAST) return ton;
+  }
+  return "#000000";
+}
+
+/** Zweitschrift im Kopfbalken des Feld-Modus: Weiß, soweit abgesenkt, wie 7:1 es zulässt. */
+export function kopfZweitschriftFeld(fond: string): string {
+  for (let anteil = 0.78; anteil < 1; anteil += 0.02) {
+    const ton = mische(FLAECHE, anteil, fond);
+    if (kontrast(ton, fond) >= KOPF_FELD_KONTRAST) return ton;
+  }
+  return FLAECHE;
+}
+
+/**
  * Der Ton für Links und Hover: so weit aufgehellt wie möglich, ohne unter
  * 4,5:1 auf der weißen Fläche zu fallen.
  *
@@ -228,6 +285,9 @@ function linkTon(basis: Hsl): string {
  * - `tief`       sehr dunkler Ton — Text AUF dem hellen Tint (Material-Dark on-primary)
  * - `kopfAuf2`   Zweitschrift IM Kopfbalken (inaktiver Schritt, Nebenzeilen)
  * - `kopfGut`    der Erledigt-Haken IM Kopfbalken
+ * - `kopfDunkel` Füllung des Kopfbalkens im Dunkel-Modus (abgedunkelte Kennfarbe)
+ * - `kopfFeld`   Füllung des Kopfbalkens im Feld-Modus (Weiß darauf mindestens 7:1),
+ *                dazu `kopfAuf2Feld` (Zweitschrift) und `kopfGutFeld` (Haken), ebenfalls 7:1
  *
  * `hell`, `kopfAuf2` und `kopfGut` sind auf 4,5:1 gerechnet, nicht geschätzt:
  * `hell` gegen die weiße Fläche, die beiden Kopf-Töne gegen die Kennfarbe.
@@ -240,10 +300,15 @@ export function orgAkzentPalette(org: OrganisationsTyp): {
   tief: string;
   kopfAuf2: string;
   kopfGut: string;
+  kopfDunkel: string;
+  kopfFeld: string;
+  kopfAuf2Feld: string;
+  kopfGutFeld: string;
 } {
   const akzent = orgFarbe(org).akzent;
   const basis = hexZuHsl(akzent);
   const hell = linkTon(basis);
+  const feld = kopfFeld(akzent);
   return {
     akzent: hslZuHex(basis),
     hell,
@@ -251,6 +316,10 @@ export function orgAkzentPalette(org: OrganisationsTyp): {
     tief: hslZuHex({ ...basis, l: 0.18 }),
     kopfAuf2: kopfZweitschrift(akzent),
     kopfGut: bisKontrast(hexZuHsl(GUT_AUF_KOPF), akzent, AA_TEXT, 1, { grenze: GUT_GRENZE }),
+    kopfDunkel: kopfDunkel(akzent),
+    kopfFeld: feld,
+    kopfAuf2Feld: kopfZweitschriftFeld(feld),
+    kopfGutFeld: bisKontrast(hexZuHsl(GUT_AUF_KOPF), feld, KOPF_FELD_KONTRAST, 1, { grenze: GUT_GRENZE }),
   };
 }
 
@@ -262,11 +331,12 @@ export function orgAkzentPalette(org: OrganisationsTyp): {
  */
 export function wendeOrgAkzentAn(org: OrganisationsTyp | undefined): void {
   const wurzel = document.documentElement;
-  const themeColor = document.querySelector<HTMLMetaElement>('meta[name="theme-color"]');
   if (org === undefined) {
     for (const suffix of ["", "-hell", "-dunkel", "-tief"]) wurzel.style.removeProperty(`--org-akzent${suffix}`);
-    for (const name of ["--org-kopf-auf-2", "--org-kopf-gut"]) wurzel.style.removeProperty(name);
-    if (themeColor) themeColor.content = "#12275e";
+    for (const name of ["--org-kopf-auf-2", "--org-kopf-gut", "--org-kopf-dunkel", "--org-kopf-feld", "--org-kopf-auf-2-feld", "--org-kopf-gut-feld"]) {
+      wurzel.style.removeProperty(name);
+    }
+    themeFarbeAbgleichen();
     return;
   }
   const p = orgAkzentPalette(org);
@@ -279,5 +349,10 @@ export function wendeOrgAkzentAn(org: OrganisationsTyp | undefined): void {
   // für das THW-Blau. Ohne Bogen greifen die Vorgaben aus index.html.
   wurzel.style.setProperty("--org-kopf-auf-2", p.kopfAuf2);
   wurzel.style.setProperty("--org-kopf-gut", p.kopfGut);
-  if (themeColor) themeColor.content = p.akzent;
+  wurzel.style.setProperty("--org-kopf-dunkel", p.kopfDunkel);
+  wurzel.style.setProperty("--org-kopf-feld", p.kopfFeld);
+  wurzel.style.setProperty("--org-kopf-auf-2-feld", p.kopfAuf2Feld);
+  wurzel.style.setProperty("--org-kopf-gut-feld", p.kopfGutFeld);
+  // Die Browserleiste folgt der Kennfarbe — außer nachts (R2-L6).
+  themeFarbeAbgleichen();
 }

@@ -9,7 +9,10 @@ Funktionalität: Vorlagen anlegen, verwalten und mustern
     Wenn ich auf "Als Vorlage speichern" klicke
     Und ich im Dialog "Name der Vorlage" mit "FGr K Oldenburg" fülle
     Und ich im Dialog auf "Vorlage speichern" klicke
-    Und ich auf "‹ Startseite" klicke
+    # Erst die Rückmeldung abwarten: Das Schließen des Dialogs nimmt seinen Verlaufseintrag
+    # asynchron zurück, ein sofortiger Tipp auf „Startseite" landete sonst wieder im Bogen.
+    Dann sehe ich den Hinweis 'Als Vorlage „FGr K Oldenburg" gespeichert.'
+    Wenn ich auf "‹ Startseite" klicke
     Dann sehe ich die Überschrift "Gespeicherte Vorlagen"
 
   Szenario: Die gespeicherte Vorlage steht auf der Startseite
@@ -25,6 +28,22 @@ Funktionalität: Vorlagen anlegen, verwalten und mustern
     Dann sehe ich die Überschrift "Fachgruppe Kabel"
     Und sehe ich "FGr K Oldenburg" nicht
 
+  Szenario: Bearbeiten ändert die Vorlage dauerhaft — nicht nur für den nächsten Einsatz
+    Wenn ich auf "Bearbeiten" klicke
+    Und ich im Dialog auf "Vorlage bearbeiten" klicke
+    Dann sehe ich den Schritt "1. Einheit"
+    Wenn ich das Feld "Ort der Einheit (Pflicht)" mit "Bearbeitungshausen" fülle
+    Und ich zum Schritt "6. Übersicht" wechsle
+    Dann sehe ich die Schaltfläche "Vorlage aktualisieren"
+    Und sehe ich die Schaltfläche "Als neue Vorlage speichern"
+    Wenn ich auf "Vorlage aktualisieren" klicke
+    Und ich im Dialog auf "Vorlage aktualisieren" klicke
+    Dann sehe ich die Überschrift "Gespeicherte Vorlagen"
+    Und sehe ich den Hinweis "Vorlage „FGr K Oldenburg\" aktualisiert."
+    Und sehe ich die Überschrift "FGr K Oldenburg"
+    Wenn ich auf "Bearbeiten" klicke
+    Dann steht im Feld "Ort der Einheit (Pflicht)" der Wert "Bearbeitungshausen"
+
   Szenario: Vorlage teilen bietet QR-Code, Link und Datei an
     Wenn ich auf "Teilen…" klicke
     Dann sehe ich den Dialog "Vorlage teilen"
@@ -33,26 +52,26 @@ Funktionalität: Vorlagen anlegen, verwalten und mustern
 
   Szenario: Gelöschte Vorlage liegt im Papierkorb und lässt sich zurückholen
     Wenn ich auf "Löschen" klicke
-    Dann sehe ich die Schaltfläche "Papierkorb (1)"
-    Wenn ich auf "Papierkorb (1)" klicke
+    Dann sehe ich die Schaltfläche "Papierkorb Vorlagen (1)"
+    Wenn ich auf "Papierkorb Vorlagen (1)" klicke
     Und ich auf "Wiederherstellen" klicke
     Dann sehe ich die Schaltfläche "Einsatz vorbereiten"
 
   Szenario: Endgültiges Löschen fragt in der App zurück
     Wenn ich auf "Löschen" klicke
-    Und ich auf "Papierkorb (1)" klicke
+    Und ich auf "Papierkorb Vorlagen (1)" klicke
     Und ich auf "Endgültig löschen…" klicke
     Dann sehe ich den Dialog "Vorlage endgültig löschen?"
     Wenn ich im Dialog auf "Endgültig löschen" klicke
-    Dann sehe ich die Schaltfläche "Papierkorb (1)" nicht
+    Dann sehe ich die Schaltfläche "Papierkorb Vorlagen (1)" nicht
 
   Szenario: Musterung streicht Abwesende und startet einen frischen Bogen
     Wenn ich auf "Einsatz vorbereiten" klicke
     Dann sehe ich die Überschrift "Personal (3/3)"
-    Und sehe ich die Schaltfläche "Einsatz starten · 3 Pers · 1 Fz"
+    Und sehe ich die Schaltfläche "Bogen anlegen · 3 Pers · 1 Fz"
     Wenn ich in der Musterung "Weber" abwähle
-    Dann sehe ich die Schaltfläche "Einsatz starten · 2 Pers · 1 Fz"
-    Wenn ich auf "Einsatz starten · 2 Pers · 1 Fz" klicke
+    Dann sehe ich die Schaltfläche "Bogen anlegen · 2 Pers · 1 Fz"
+    Wenn ich auf "Bogen anlegen · 2 Pers · 1 Fz" klicke
     Und ich im Dialog auf "Aus Vorlage anlegen" klicke
     Dann sehe ich den Schritt "2. Einsatz"
     Wenn ich zum Schritt "6. Übersicht" wechsle
@@ -62,7 +81,7 @@ Funktionalität: Vorlagen anlegen, verwalten und mustern
   Szenario: Die Musterung lässt die Vorlage unangetastet
     Wenn ich auf "Einsatz vorbereiten" klicke
     Und ich in der Musterung "Weber" abwähle
-    Und ich auf "Einsatz starten · 2 Pers · 1 Fz" klicke
+    Und ich auf "Bogen anlegen · 2 Pers · 1 Fz" klicke
     Und ich im Dialog auf "Aus Vorlage anlegen" klicke
     Und ich auf "‹ Startseite" klicke
     Dann sehe ich den Hinweis "3 Personen"
@@ -72,3 +91,12 @@ Funktionalität: Vorlagen anlegen, verwalten und mustern
     Und ich auf "‹ Abbrechen" klicke
     Dann sehe ich die Überschrift "Gespeicherte Vorlagen"
     Und sehe ich die Schaltfläche "Einsatz vorbereiten"
+
+  # Audit Runde 2, R2-D6: abgewählte Personen gingen ohne Rückfrage verloren.
+  Szenario: Musterung nach geänderten Haken abbrechen fragt nach
+    Wenn ich auf "Einsatz vorbereiten" klicke
+    Und ich in der Musterung "Weber" abwähle
+    Und ich auf "‹ Abbrechen" klicke
+    Dann sehe ich den Dialog "Musterung verwerfen?"
+    Wenn ich im Dialog auf "Weiter mustern" klicke
+    Dann sehe ich die Schaltfläche "Bogen anlegen · 2 Pers · 1 Fz"

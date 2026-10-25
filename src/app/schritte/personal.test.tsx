@@ -4,11 +4,21 @@
  * geprüft wird, dass jeder davon Personal bzw. Stärke tatsächlich verändert.
  */
 
-import { describe, it, expect } from "vitest";
-import { render, screen, within } from "@testing-library/react";
+import { describe, it, expect, beforeEach } from "vitest";
+import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { useState } from "react";
 import { SchrittBuehne } from "../../test/schritt-buehne";
-import { OrganisationsTyp } from "@bos/eeb-format/model";
+import { Dialogschicht } from "../dialoge";
+import {
+  Ernaehrung,
+  Fahrerlaubnis,
+  Geschlecht,
+  KontaktArt,
+  OrganisationsTyp,
+  StaerkeRolle,
+  type Erfassungsbogen,
+} from "@bos/eeb-format/model";
 import { neuePerson, neuerBogen } from "../hilfen";
 import { SchrittPersonal, kraftfahrerHinweis } from "./personal";
 import { stanPersonalVorbelegung } from "@bos/vokabulare/thw-stan-personal";
@@ -21,7 +31,17 @@ const dlrgBogen = () => {
   return { ...b, einheit: { ...b.einheit, organisation: OrganisationsTyp.DLRG } };
 };
 
+beforeEach(() => {
+  // Der Rückweg liegt im Sitzungsspeicher (R6-S4) und darf nicht in den nächsten Test hineinragen.
+  sessionStorage.clear();
+});
+
 describe("Schritt Personal", () => {
+  it("sagt, dass auf dem Papier die Fahrzeuge vor dem Personal stehen (R4-A8)", () => {
+    buehne();
+    expect(screen.getByText(/Vom Papier abtippen\? Auf dem Blatt stehen die Fahrzeuge oben, das Personal darunter: erst Schritt 4\./)).toBeDefined();
+  });
+
   it("legt über „+ Person hinzufügen“ eine Detail-Karte an und zählt sie zur Stärke", async () => {
     const nutzer = userEvent.setup();
     buehne();
@@ -113,6 +133,16 @@ describe("Schritt Personal", () => {
     expect(screen.getByText("Person 2 von 2")).toBeDefined();
   });
 
+  it("erklärt „Nur Stärke“ für den eigenen Bogen und die Regel zur ersten Person in der Kurz-Liste (R5-N7, R5-N8)", async () => {
+    const nutzer = userEvent.setup();
+    buehne();
+    expect(screen.getByText(/„Nur Stärke“ meldet nur die Zahlen, ohne Namen; die Fahrzeuge folgen in Schritt 4/)).toBeDefined();
+    await nutzer.click(screen.getByRole("button", { name: "+ Person hinzufügen" }));
+    await nutzer.click(screen.getByRole("button", { name: "+ Person hinzufügen" }));
+    await nutzer.click(screen.getByLabelText("Kurz-Liste (Tabelle)"));
+    expect(screen.getByText(/Die erste Person ist die Ansprechperson/)).toBeDefined();
+  });
+
   it("rechnet in der Meldekopf-Schnellerfassung die Gesamtstärke aus", async () => {
     const nutzer = userEvent.setup();
     buehne();
@@ -153,16 +183,16 @@ describe("Schritt Personal", () => {
   });
 
   /** Dieselbe Bedienung für die Unterbringungsplätze im selben Block. */
-  it("lässt auch die Unterbringung M/W/D zählen", async () => {
+  it("lässt auch die Aufteilung nach Geschlecht zählen, ausgeschrieben statt M/W/D (R3-N3)", async () => {
     const nutzer = userEvent.setup();
     buehne();
 
     await nutzer.click(screen.getByLabelText("Nur Stärke (Meldekopf-Schnellerfassung)"));
-    await nutzer.click(screen.getByLabelText("Unterbringung M/W/D angeben"));
+    await nutzer.click(screen.getByLabelText("Aufteilung nach Geschlecht angeben (für Unterbringung, WC/Dusche)"));
 
-    await nutzer.click(screen.getByRole("button", { name: "W: erhöhen" }));
+    await nutzer.click(screen.getByRole("button", { name: "weiblich: erhöhen" }));
 
-    expect((screen.getByLabelText("W") as HTMLInputElement).value).toBe("1");
+    expect((screen.getByLabelText("weiblich") as HTMLInputElement).value).toBe("1");
   });
 
   /**
@@ -189,7 +219,7 @@ describe("Schritt Personal", () => {
     buehne();
 
     await nutzer.click(screen.getByRole("button", { name: "+ Person hinzufügen" }));
-    await nutzer.click(screen.getByLabelText("Schnelleingabe (Tabelle)"));
+    await nutzer.click(screen.getByLabelText("Kurz-Liste (Tabelle)"));
 
     const tabelle = screen.getByRole("table");
     expect(within(tabelle).getAllByRole("row")).toHaveLength(2); // Kopf + 1 Person
@@ -198,6 +228,62 @@ describe("Schritt Personal", () => {
     await nutzer.type(vorname, "Erika{Enter}");
 
     expect(within(screen.getByRole("table")).getAllByRole("row")).toHaveLength(3);
+  });
+
+  it("benennt die Namensfelder der Schnelleingabe je Person (R2-M5)", async () => {
+    const nutzer = userEvent.setup();
+    buehne();
+
+    await nutzer.click(screen.getByRole("button", { name: "+ Person hinzufügen" }));
+    await nutzer.click(screen.getByRole("button", { name: "+ Person hinzufügen" }));
+    await nutzer.click(screen.getByLabelText("Kurz-Liste (Tabelle)"));
+
+    const tabelle = screen.getByRole("table");
+    const namen = within(tabelle).getAllByRole("textbox").map((f) => f.getAttribute("aria-label"));
+    expect(namen).toEqual(["Person 1: Vorname", "Person 1: Nachname", "Person 2: Vorname", "Person 2: Nachname"]);
+    // Der Name hängt nicht am Wert: auch mit Inhalt heißt das Feld so.
+    await nutzer.type(within(tabelle).getByRole("textbox", { name: "Person 2: Nachname" }), "Musterfrau");
+    expect(within(tabelle).getByRole("textbox", { name: "Person 2: Nachname" })).toHaveProperty("value", "Musterfrau");
+  });
+
+  it("schlägt für Personen des Bogens nicht den eigenen Namen vor (R2-M6)", async () => {
+    const nutzer = userEvent.setup();
+    buehne();
+    await nutzer.click(screen.getByRole("button", { name: "+ Person hinzufügen" }));
+
+    expect(screen.getByLabelText("Vorname").getAttribute("autocomplete")).toBe("off");
+    expect(screen.getByLabelText("Nachname").getAttribute("autocomplete")).toBe("off");
+    await nutzer.click(screen.getByLabelText("Kurz-Liste (Tabelle)"));
+    for (const feld of within(screen.getByRole("table")).getAllByRole("textbox")) {
+      expect(feld.getAttribute("autocomplete")).toBe("off");
+    }
+  });
+
+  it("beschriftet das Feld in „Namen einfügen“ sichtbar, nicht nur per Platzhalter (R2-M5)", async () => {
+    const nutzer = userEvent.setup();
+    buehne();
+
+    await nutzer.click(screen.getByRole("button", { name: "Namen einfügen…" }));
+    const dialog = document.querySelector<HTMLDialogElement>("dialog[aria-label='Namen einfügen']")!;
+    const feld = within(dialog).getByLabelText(/^Namensliste/);
+    expect(feld.tagName).toBe("TEXTAREA");
+    await nutzer.type(feld, "Muster, Max");
+    expect(within(dialog).getByRole("textbox", { name: /^Namensliste/ })).toBe(feld);
+  });
+
+  // Audit Runde 8, R8-E2: Escape oder die Zurück-Geste verwarfen die mühsam eingefügte Liste ohne Frage.
+  it("behält die eingefügte Liste, wenn das Fenster ohne Übernehmen schließt (R8-E2)", async () => {
+    const nutzer = userEvent.setup();
+    buehne();
+    await nutzer.click(screen.getByRole("button", { name: "Namen einfügen…" }));
+    const dialog = document.querySelector<HTMLDialogElement>("dialog[aria-label='Namen einfügen']")!;
+    await nutzer.type(within(dialog).getByRole("textbox"), "Muster, Max\nErika Musterfrau");
+    dialog.close(); // Escape, Zurück-Geste und „Schließen“ laufen alle hierüber
+    await nutzer.click(screen.getByRole("button", { name: "Namen einfügen…" }));
+    expect((within(dialog).getByRole("textbox") as HTMLTextAreaElement).value).toBe("Muster, Max\nErika Musterfrau");
+    expect(within(dialog).getByText(/Die Liste bleibt stehen/)).toBeDefined();
+    await nutzer.click(within(dialog).getByRole("button", { name: "Liste leeren" }));
+    expect((within(dialog).getByRole("textbox") as HTMLTextAreaElement).value).toBe("");
   });
 
   it("übernimmt eine eingefügte Namensliste als Personen", async () => {
@@ -217,6 +303,28 @@ describe("Schritt Personal", () => {
     const tabelle = screen.getByRole("table"); // Übernahme schaltet auf die Tabelle
     const werte = (within(tabelle).getAllByRole("textbox") as HTMLInputElement[]).map((f) => f.value);
     expect(werte).toEqual(["Max", "Muster", "Erika", "Musterfrau"]);
+  });
+
+  // Audit Runde 7, R7-E7: Was kein Name ist, trägt eine Marke und wird nicht ungefragt übernommen.
+  it("markiert Zeilen mit Ziffern oder Klammern als „kein Name?“ und übernimmt sie nur angehakt (R7-E7)", async () => {
+    const nutzer = userEvent.setup();
+    buehne();
+    await nutzer.click(screen.getByRole("button", { name: "Namen einfügen…" }));
+    const dialog = document.querySelector<HTMLDialogElement>("dialog[aria-label='Namen einfügen']")!;
+    await nutzer.type(within(dialog).getByRole("textbox"), "Müller, Hans\n12345\nMax Mustermann (Gf)");
+
+    expect(within(dialog).getAllByText("kein Name?")).toHaveLength(2);
+    expect(dialog.textContent).toContain("Zeilen sehen nicht nach einem Namen aus");
+    // Nur die echte Zeile zählt: 1 Person.
+    expect(within(dialog).getByRole("button", { name: "1 Person übernehmen" })).toBeDefined();
+
+    await nutzer.click(within(dialog).getByRole("checkbox", { name: /12345.*trotzdem als Name übernehmen/ }));
+    await nutzer.click(within(dialog).getByRole("button", { name: "2 Personen übernehmen" }));
+    const tabelle = screen.getByRole("table");
+    const werte = (within(tabelle).getAllByRole("textbox") as HTMLInputElement[]).map((f) => f.value);
+    expect(werte).toContain("Müller");
+    expect(werte).toContain("12345");
+    expect(werte.some((w) => w.includes("Gf"))).toBe(false);
   });
 
   it("bietet Beispielnamen nur bei Übungsbögen an", async () => {
@@ -258,7 +366,12 @@ describe("Schritt Personal", () => {
     expect(werte.some((v) => v === "")).toBe(false);
   });
 
-  it("räumt die namenlosen Zeilen auch beim Einfügen einer Namensliste weg", async () => {
+  /**
+   * Audit Runde 2, R2-N2: Eingefügte Namen räumten die Sollplätze weg — mit
+   * ihnen GrFü und TrFü, aus 0/2/7/9 wurde 0/0/2/2. Jetzt füllen sie die
+   * freien Plätze der Reihe nach auf; nichts Leeres verschwindet.
+   */
+  it("setzt eingefügte Namen in die freien Plätze, statt sie wegzuräumen", async () => {
     const nutzer = userEvent.setup();
     render(
       <SchrittBuehne komponente={SchrittPersonal} bogen={{ ...neuerBogen(), personal: [neuePerson(), neuePerson()] }} />,
@@ -267,11 +380,41 @@ describe("Schritt Personal", () => {
     await nutzer.click(screen.getByRole("button", { name: "Namen einfügen…" }));
     const dialog = document.querySelector<HTMLDialogElement>("dialog[aria-label='Namen einfügen']")!;
     await nutzer.type(within(dialog).getByRole("textbox"), "Muster, Max");
+    expect(within(dialog).getByText(/→ Platz 1/)).toBeDefined();
     await nutzer.click(within(dialog).getByRole("button", { name: "1 Person übernehmen" }));
 
     const werte = (within(screen.getByRole("table")).getAllByRole("textbox") as HTMLInputElement[]).map((f) => f.value);
-    expect(werte).toEqual(["Max", "Muster"]);
+    expect(werte).toEqual(["Max", "Muster", "", ""]);
   });
+
+  it("lässt die StAN-Stärke beim Einfügen von Namen stehen und bietet Rückgängig an", async () => {
+    const nutzer = userEvent.setup();
+    const einheitsTyp = { code: 4 }; // B – Bergungsgruppe, -/2/7/9
+    const bogen = neuerBogen();
+    render(
+      <SchrittBuehne
+        komponente={SchrittPersonal}
+        bogen={{
+          ...bogen,
+          einheit: { ...bogen.einheit, einheitsTyp },
+          personal: stanPersonalVorbelegung(bogen.einheit.organisation, einheitsTyp),
+        }}
+      />,
+    );
+
+    await nutzer.click(screen.getByRole("button", { name: "Namen einfügen…" }));
+    const dialog = document.querySelector<HTMLDialogElement>("dialog[aria-label='Namen einfügen']")!;
+    await nutzer.type(within(dialog).getByRole("textbox"), "Maier, Klaus\nAnna Schulz");
+    await nutzer.click(within(dialog).getByRole("button", { name: "2 Personen übernehmen" }));
+
+    expect(screen.getByLabelText("Stärke: 0 Führer, 2 Unterführer, 7 Mannschaft, 9 gesamt")).toBeDefined();
+    const werte = (within(screen.getByRole("table")).getAllByRole("textbox") as HTMLInputElement[]).map((f) => f.value);
+    expect(werte.slice(0, 4)).toEqual(["Klaus", "Maier", "Anna", "Schulz"]);
+
+    await nutzer.click(screen.getByRole("button", { name: "Rückgängig" }));
+    const danach = (within(screen.getByRole("table")).getAllByRole("textbox") as HTMLInputElement[]).map((f) => f.value);
+    expect(danach.every((v) => v === "")).toBe(true);
+   }, 20000);
 
   /**
    * Schritt 1 belegt das Personal beim Wählen des Einheitstyps schon mit der
@@ -318,11 +461,161 @@ describe("Schritt Personal", () => {
 
     await nutzer.click(knopf);
     const dialog = document.querySelector<HTMLDialogElement>("dialog[aria-label='StAN-Sollplätze laden?']")!;
-    await nutzer.click(within(dialog).getByRole("button", { name: "Ersetzen" }));
+    // Die Rückfrage nennt den Namen, der verloren geht (R2-N2).
+    expect(dialog.textContent).toMatch(/1 eingetragener Name verloren: Lange, Thomas/);
+    await nutzer.click(within(dialog).getByRole("button", { name: "Ersetzen, Namen löschen" }));
 
     expect(screen.getByLabelText("Stärke: 0 Führer, 2 Unterführer, 7 Mannschaft, 9 gesamt")).toBeDefined();
     // Und jetzt steht die StAN so da wie sie ist — der Knopf hätte nichts mehr zu tun.
     expect(screen.getByRole("button", { name: /^StAN-Sollplätze laden/ })).toHaveProperty("disabled", true);
+
+    // Rückgängig bringt Thomas zurück.
+    await nutzer.click(screen.getByRole("button", { name: "Rückgängig" }));
+    expect(screen.getByDisplayValue("Thomas")).toBeDefined();
+  });
+
+  it("quittiert „Person entfernen“ in der Daumenleiste, der Rückweg übersteht weitere Eingaben (R2-G1, R3-G1, R3-D3)", async () => {
+    const nutzer = userEvent.setup();
+    render(
+      <SchrittBuehne
+        komponente={SchrittPersonal}
+        bogen={{ ...neuerBogen(), personal: [{ ...neuePerson(), vorname: "Paul", nachname: "Stein" }, { ...neuePerson(), vorname: "Eva", nachname: "Berg" }] }}
+      />,
+    );
+    await nutzer.click(screen.getByRole("button", { name: "Stein, Paul entfernen" }));
+    const frage = document.querySelector<HTMLDialogElement>("dialog[aria-label='Stein, Paul entfernen?']")!;
+    await nutzer.click(within(frage).getByRole("button", { name: "Person entfernen" }));
+    await waitFor(() => expect(screen.queryByDisplayValue("Paul")).toBeNull());
+
+    // Feste Leiste im Daumenbereich statt an der Kartenoberkante (R3-G1).
+    const daumen = () => document.querySelector<HTMLElement>(".quittung-daumen")!;
+    const leiste = daumen();
+    expect(leiste.getAttribute("role")).toBe("status");
+    expect(leiste.textContent).toMatch(/^Entfernt: Stein, Paul/);
+
+    // Eine weitere Eingabe nimmt den Rückweg nicht mehr weg (R3-D3) …
+    await nutzer.type(screen.getByDisplayValue("Eva"), "-Maria");
+    // … und „Rückgängig" lässt sie stehen: Paul kommt an seine alte Stelle.
+    await nutzer.click(within(daumen()).getByRole("button", { name: "Rückgängig" }));
+    const vornamen = screen.getAllByLabelText("Vorname").map((f) => (f as HTMLInputElement).value);
+    expect(vornamen).toEqual(["Paul", "Eva-Maria"]);
+    const zurueck = daumen();
+    expect(zurueck.textContent).toMatch(/^Zurückgeholt: Stein, Paul \(wieder Person 1\)/);
+    expect(within(zurueck).queryByRole("button", { name: "Rückgängig" })).toBeNull();
+  });
+
+  // Audit Runde 6, R6-S4: „Rückgängig" nach „Person entfernen" verschwand beim Schrittwechsel.
+  it("hält „Rückgängig“ über den Schrittwechsel hinweg bereit (R6-S4)", async () => {
+    const nutzer = userEvent.setup();
+    const ausgang = {
+      ...neuerBogen(),
+      personal: [
+        { ...neuePerson(), vorname: "Paul", nachname: "Stein" },
+        { ...neuePerson(), vorname: "Eva", nachname: "Berg" },
+      ],
+    };
+    const erste = render(<SchrittBuehne komponente={SchrittPersonal} bogen={ausgang} />);
+    await nutzer.click(screen.getByRole("button", { name: "Berg, Eva entfernen" }));
+    const frage = document.querySelector<HTMLDialogElement>("dialog[aria-label='Berg, Eva entfernen?']")!;
+    await nutzer.click(within(frage).getByRole("button", { name: "Person entfernen" }));
+    await waitFor(() => expect(screen.queryByDisplayValue("Eva")).toBeNull());
+    erste.unmount(); // Schrittwechsel: Die Komponente verschwindet
+    const ohneEva = { ...ausgang, personal: [ausgang.personal[0]!] };
+    render(<SchrittBuehne komponente={SchrittPersonal} bogen={ohneEva} />);
+    const leiste = document.querySelector<HTMLElement>(".quittung-daumen")!;
+    expect(leiste.textContent).toMatch(/^Entfernt: Berg, Eva/);
+    await nutzer.click(within(leiste).getByRole("button", { name: "Rückgängig" }));
+    expect(screen.getAllByLabelText("Vorname").map((f) => (f as HTMLInputElement).value)).toEqual(["Paul", "Eva"]);
+  });
+
+  // Audit Runde 5, R5-S3: Wer in einer Reihe zwei Personen entfernt, konnte nur
+  // die zweite zurückholen.
+  it("„Rückgängig“ holt alle in einer Reihe entfernten Personen zurück, an ihre Stellen (R5-S3)", async () => {
+    const nutzer = userEvent.setup();
+    render(
+      <SchrittBuehne
+        komponente={SchrittPersonal}
+        bogen={{
+          ...neuerBogen(),
+          personal: [
+            { ...neuePerson(), vorname: "Paul", nachname: "Stein" },
+            { ...neuePerson(), vorname: "Eva", nachname: "Berg" },
+            { ...neuePerson(), vorname: "Sabine", nachname: "Lang" },
+          ],
+        }}
+      />,
+    );
+    for (const name of ["Berg, Eva", "Stein, Paul"]) {
+      await nutzer.click(screen.getByRole("button", { name: `${name} entfernen` }));
+      const frage = document.querySelector<HTMLDialogElement>(`dialog[aria-label='${name} entfernen?']`)!;
+      await nutzer.click(within(frage).getByRole("button", { name: "Person entfernen" }));
+      await waitFor(() => expect(screen.queryByDisplayValue(name.split(", ")[1]!)).toBeNull());
+    }
+    const leiste = () => document.querySelector<HTMLElement>(".quittung-daumen")!;
+    expect(leiste().textContent).toMatch(/^Entfernt: 2 Personen \(Berg, Eva; Stein, Paul\)/);
+    await nutzer.click(within(leiste()).getByRole("button", { name: "Rückgängig" }));
+    const vornamen = screen.getAllByLabelText("Vorname").map((f) => (f as HTMLInputElement).value);
+    expect(vornamen).toEqual(["Paul", "Eva", "Sabine"]);
+    expect(leiste().textContent).toMatch(/^Zurückgeholt: 2 Personen/);
+  });
+
+  it("bietet „+ Person hinzufügen“ auch über der Liste an, die neue Person bekommt den Cursor (R3-H6)", async () => {
+    const nutzer = userEvent.setup();
+    render(
+      <SchrittBuehne
+        komponente={SchrittPersonal}
+        bogen={{ ...neuerBogen(), personal: [{ ...neuePerson(), vorname: "Paul", nachname: "Stein" }, { ...neuePerson(), vorname: "Eva", nachname: "Berg" }] }}
+      />,
+    );
+    const oben = screen.getByRole("button", { name: "+ Person hinzufügen (springt zur neuen Person)" });
+    // Oben, vor der ersten Karte.
+    expect(oben.compareDocumentPosition(document.querySelector('[data-person-index="0"]')!) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    await nutzer.click(oben);
+    const vornamen = screen.getAllByLabelText("Vorname") as HTMLInputElement[];
+    expect(vornamen).toHaveLength(3);
+    await waitFor(() => expect(document.activeElement).toBe(vornamen[2]));
+    await nutzer.keyboard("Jan");
+    expect(vornamen[2]!.value).toBe("Jan");
+  });
+
+  // Audit Runde 5, R5-H3: Der untere Knopf sprang zur neuen Karte, ließ den Fokus aber auf sich.
+  it("der „+ Person hinzufügen“ unter der Liste setzt den Cursor wie der obere in den Vornamen der neuen Karte (R5-H3)", async () => {
+    const nutzer = userEvent.setup();
+    render(
+      <SchrittBuehne
+        komponente={SchrittPersonal}
+        bogen={{ ...neuerBogen(), personal: [{ ...neuePerson(), vorname: "Paul", nachname: "Stein" }, { ...neuePerson(), vorname: "Eva", nachname: "Berg" }] }}
+      />,
+    );
+    const knoepfe = screen.getAllByRole("button", { name: /^\+ Person hinzufügen/ });
+    const unten = knoepfe[knoepfe.length - 1]!;
+    expect(unten.className).toContain("primaer");
+    await nutzer.click(unten);
+    const vornamen = screen.getAllByLabelText("Vorname") as HTMLInputElement[];
+    expect(vornamen).toHaveLength(3);
+    await waitFor(() => expect(document.activeElement).toBe(vornamen[2]));
+  });
+
+  // Audit Runde 5, R5-H2: 38 Personen als Karten waren 88 Bildschirme hoch.
+  // Audit Runde 7, R7-H6: Neun Karten maßen 14 000 px, zwölf 18 700 — die Grenze sank von 13 auf 8 Personen.
+  it("beginnt ab 8 Personen mit der Kurz-Liste, bei weniger mit den Karten samt Hinweis erst ab 8 (R5-H2, R7-H6)", () => {
+    const viele = Array.from({ length: 8 }, (_, i) => ({ ...neuePerson(), vorname: `V${i}`, nachname: "Zug" }));
+    const { unmount } = render(<SchrittBuehne komponente={SchrittPersonal} bogen={{ ...neuerBogen(), personal: viele }} />);
+    expect((screen.getByLabelText("Kurz-Liste (Tabelle)") as HTMLInputElement).checked).toBe(true);
+    expect(screen.getByRole("table")).toBeDefined();
+    unmount();
+    const sieben = viele.slice(0, 7);
+    render(<SchrittBuehne komponente={SchrittPersonal} bogen={{ ...neuerBogen(), personal: sieben }} />);
+    expect((screen.getByLabelText("Alle Angaben (Karten)") as HTMLInputElement).checked).toBe(true);
+    expect(screen.queryByText(/Viele Personen — die Kurz-Liste/)).toBeNull();
+  });
+
+  it("die Karten nennen bei vielen Personen den kürzeren Weg (R5-H2)", async () => {
+    const nutzer = userEvent.setup();
+    const viele = Array.from({ length: 14 }, (_, i) => ({ ...neuePerson(), vorname: `V${i}`, nachname: "Zug" }));
+    render(<SchrittBuehne komponente={SchrittPersonal} bogen={{ ...neuerBogen(), personal: viele }} />);
+    await nutzer.click(screen.getByLabelText("Alle Angaben (Karten)"));
+    expect(screen.getByText(/Viele Personen — die Kurz-Liste \(eine Zeile je Person\) zeigt mehr auf einmal/)).toBeDefined();
   });
 
   it("versteckt den Beispielnamen-Weg bei echten Bögen vollständig", async () => {
@@ -490,13 +783,51 @@ describe("Vorschlagsfelder für Funktion und Qualifikation", () => {
     expect(screen.queryByText(/^411 /)).toBeNull();
   });
 
-  it("zeigt ohne Eingabe keine Vorschläge", async () => {
+  it("zeigt im leeren Qualifikationsfeld keine Vorschläge", async () => {
     const nutzer = userEvent.setup();
     await mitPerson(nutzer);
 
-    await nutzer.click(screen.getByLabelText("Funktion hinzufügen"));
+    await nutzer.click(screen.getByLabelText("Qualifikation hinzufügen"));
 
     expect(document.querySelector("ul.vorschlaege")).toBeNull();
+  });
+
+  /**
+   * Audit Runde 2, R2-G5: Das Funktionsfeld zeigte beim Antippen nichts —
+   * jede Funktion hieß Tastatur auf, Buchstabe tippen, Vorschlag wählen. Jetzt
+   * bietet das leere Feld die häufigsten Funktionen der Einheit an (StAN,
+   * schon Vergebenes, beim THW Sprechfunk & Co.); eine Funktion lässt sich
+   * mit zwei Tipps zuweisen.
+   */
+  it("bietet im leeren Funktionsfeld die häufigsten Funktionen der Einheit zum Antippen an", async () => {
+    const nutzer = userEvent.setup();
+    const einheitsTyp = { code: 4 }; // B – Bergungsgruppe: GrFü, TrFü, 7 Helfer
+    const bogen = neuerBogen();
+    render(
+      <SchrittBuehne
+        komponente={SchrittPersonal}
+        bogen={{ ...bogen, einheit: { ...bogen.einheit, einheitsTyp }, personal: [neuePerson()] }}
+      />,
+    );
+
+    await nutzer.click(screen.getByLabelText("Funktion hinzufügen"));
+    const liste = screen.getByRole("listbox");
+    const zeilen = within(liste).getAllByRole("option").map((z) => z.textContent);
+    expect(zeilen).toEqual([
+      "HeFachhelfer/in",
+      "GrFüGruppenführer/in",
+      "TrFüTruppführer/in",
+      "SprSprechfunker/in",
+      "SanHeSanitätshelfer/in",
+      "AGTAtemschutzgeräteträger/in",
+    ]);
+
+    await nutzer.click(within(liste).getByText("Spr"));
+    expect(screen.getByRole("button", { name: "Spr entfernen" })).toBeDefined();
+
+    // Schon Vergebenes fällt aus dem Angebot.
+    await nutzer.click(screen.getByLabelText("Funktion hinzufügen"));
+    expect(within(screen.getByRole("listbox")).queryByText("Spr")).toBeNull();
   });
 });
 
@@ -636,14 +967,41 @@ describe("Personal umsortieren", () => {
     expect(vornamen()).toEqual(["Carla", "Anna", "Bernd"]);
     // Die Marke sitzt an der Karte, die jetzt oben steht.
     const oberste = screen.getAllByLabelText("Vorname")[0]!.closest(".karte")!;
-    expect(within(oberste as HTMLElement).getByText("Ansprechpartner/in")).toBeDefined();
-    expect(screen.getAllByText("Ansprechpartner/in")).toHaveLength(1);
+    expect(within(oberste as HTMLElement).getByText("Erreichbar für Rückfragen")).toBeDefined();
+    expect(screen.getAllByText("Erreichbar für Rückfragen")).toHaveLength(1);
+  });
+
+  // Audit Runde 5, R5-G4: „⇑“ stand in der ersten Zeile nicht da, und „▼“ lag an seiner Stelle.
+  it("lässt „▲“, „▼“ und „⇑“ in jeder Zeile an derselben Stelle: in der ersten ist „⇑“ gesperrt statt weggelassen (R5-G4)", async () => {
+    const nutzer = userEvent.setup();
+    render(<SchrittBuehne komponente={SchrittPersonal} bogen={drei()} />);
+    await nutzer.click(screen.getByLabelText("Kurz-Liste (Tabelle)"));
+    const reihe = (i: number) => within(screen.getByRole("table")).getAllByRole("row")[i + 1]!;
+    const namen = (i: number) => within(reihe(i)).getAllByRole("button").map((b) => b.getAttribute("aria-label")!.replace(/^Person \d+ /, ""));
+    expect(namen(0).slice(0, 3)).toEqual(["nach oben", "nach unten", "an die erste Stelle"]);
+    expect(namen(1).slice(0, 3)).toEqual(["nach oben", "nach unten", "an die erste Stelle"]);
+    expect(namen(2).slice(0, 3)).toEqual(["nach oben", "nach unten", "an die erste Stelle"]);
+    expect((within(reihe(0)).getByRole("button", { name: "Person 1 an die erste Stelle" }) as HTMLButtonElement).disabled).toBe(true);
+    expect((within(reihe(0)).getByRole("button", { name: "Person 1 nach oben" }) as HTMLButtonElement).disabled).toBe(true);
+    expect((within(reihe(2)).getByRole("button", { name: "Person 3 nach unten" }) as HTMLButtonElement).disabled).toBe(true);
+    // Ein gesperrtes „⇑“ tut nichts.
+    await nutzer.click(within(reihe(0)).getByRole("button", { name: "Person 1 an die erste Stelle" }));
+    expect((within(screen.getByRole("table")).getAllByRole("textbox") as HTMLInputElement[]).map((f) => f.value).slice(0, 2)).toEqual(["Anna", "Albers"]);
+  });
+
+  // Audit Runde 5, R5-M5: Die Felder einer neuen Person zeigten keine Bezeichnung.
+  it("trägt in den Feldern der Kurz-Liste die Bezeichnung als Platzhalter (R5-M5)", async () => {
+    const nutzer = userEvent.setup();
+    render(<SchrittBuehne komponente={SchrittPersonal} bogen={drei()} />);
+    await nutzer.click(screen.getByLabelText("Kurz-Liste (Tabelle)"));
+    expect(screen.getByLabelText("Person 1: Vorname").getAttribute("placeholder")).toBe("Vorname");
+    expect(screen.getByLabelText("Person 1: Nachname").getAttribute("placeholder")).toBe("Nachname");
   });
 
   it("sortiert auch in der Schnelleingabe-Tabelle", async () => {
     const nutzer = userEvent.setup();
     render(<SchrittBuehne komponente={SchrittPersonal} bogen={drei()} />);
-    await nutzer.click(screen.getByLabelText("Schnelleingabe (Tabelle)"));
+    await nutzer.click(screen.getByLabelText("Kurz-Liste (Tabelle)"));
 
     await nutzer.click(screen.getByRole("button", { name: "Person 1 nach unten" }));
 
@@ -679,5 +1037,355 @@ describe("Personal umsortieren", () => {
 
     expect(screen.queryByRole("button", { name: /nach oben$/ })).toBeNull();
     expect(screen.queryByRole("button", { name: /nach unten$/ })).toBeNull();
+  });
+});
+
+/**
+ * Die Schnelleingabe-Tabelle löschte ohne Rückfrage — in der Karte fragte
+ * derselbe Vorgang mit Namen nach. Hier wiegt es mehr: Qualifikationen und
+ * Erreichbarkeiten sieht man in der Tabelle gar nicht, und der Knopf liegt
+ * am rechten Rand neben den Sortierpfeilen.
+ */
+describe("Schnelleingabe-Tabelle — Person entfernen", () => {
+  const mitJan = () => ({ ...neuerBogen(), personal: [{ ...neuePerson(), vorname: "Jan", nachname: "Meyer" }, neuePerson()] });
+
+  it("fragt in der Tabelle vor dem Entfernen einer ausgefüllten Person nach", async () => {
+    const nutzer = userEvent.setup();
+    render(<SchrittBuehne komponente={SchrittPersonal} bogen={mitJan()} />);
+    await nutzer.click(screen.getByLabelText("Kurz-Liste (Tabelle)"));
+
+    await nutzer.click(screen.getByRole("button", { name: "Meyer, Jan entfernen" }));
+
+    const dialog = document.querySelector<HTMLDialogElement>("dialog[aria-label='Meyer, Jan entfernen?']")!;
+    expect(dialog).not.toBeNull();
+    await nutzer.click(within(dialog).getByRole("button", { name: "Abbrechen" }));
+    expect(within(screen.getByRole("table")).getAllByRole("row")).toHaveLength(3);
+
+    await nutzer.click(screen.getByRole("button", { name: "Meyer, Jan entfernen" }));
+    const zweiter = document.querySelector<HTMLDialogElement>("dialog[aria-label='Meyer, Jan entfernen?']")!;
+    await nutzer.click(within(zweiter).getByRole("button", { name: "Person entfernen" }));
+    expect(within(screen.getByRole("table")).getAllByRole("row")).toHaveLength(2);
+  });
+
+  it("entfernt eine leere Zeile ohne Rückfrage", async () => {
+    const nutzer = userEvent.setup();
+    render(<SchrittBuehne komponente={SchrittPersonal} bogen={mitJan()} />);
+    await nutzer.click(screen.getByLabelText("Kurz-Liste (Tabelle)"));
+
+    await nutzer.click(screen.getByRole("button", { name: "Person 2 entfernen" }));
+
+    expect(document.querySelector("dialog.abfrage")).toBeNull();
+    expect(within(screen.getByRole("table")).getAllByRole("row")).toHaveLength(2);
+  });
+});
+
+/**
+ * „Nur Stärke" setzte bei vier erfassten Personen die gemeldete Stärke auf
+ * 0/0/0/0, während die Karten darunter stehen blieben — der Bogen ging so an
+ * den Meldekopf. Jetzt startet die manuelle Stärke mit der abgeleiteten, und
+ * bei vorhandenem Personal wird vorher gefragt.
+ */
+describe("Umschalten auf „Nur Stärke“", () => {
+  const vier = () => ({
+    ...neuerBogen(),
+    personal: [
+      { ...neuePerson(), vorname: "Anna", nachname: "Albers", staerkeRolle: StaerkeRolle.FUEHRER, ernaehrung: Ernaehrung.VEGETARISCH },
+      { ...neuePerson(), vorname: "Bernd", nachname: "Bruns", staerkeRolle: StaerkeRolle.UNTERFUEHRER, geschlecht: Geschlecht.W },
+      { ...neuePerson(), vorname: "Carla", nachname: "Claus" },
+      { ...neuePerson(), vorname: "Dirk", nachname: "Dahl" },
+    ],
+  });
+
+  it("fragt bei erfasstem Personal nach und bleibt bei Abbruch in der Vollerfassung", async () => {
+    const nutzer = userEvent.setup();
+    render(<SchrittBuehne komponente={SchrittPersonal} bogen={vier()} />);
+
+    await nutzer.click(screen.getByLabelText("Nur Stärke (Meldekopf-Schnellerfassung)"));
+
+    const dialog = document.querySelector<HTMLDialogElement>("dialog[aria-label='Nur die Stärke melden?']")!;
+    expect(dialog).not.toBeNull();
+    expect(dialog.textContent).toContain("4 erfasste Personen zählen dann nicht mehr");
+    await nutzer.click(within(dialog).getByRole("button", { name: "Abbrechen" }));
+
+    expect((screen.getByLabelText("Personal vollständig erfassen") as HTMLInputElement).checked).toBe(true);
+    expect(screen.getByLabelText("Stärke: 1 Führer, 1 Unterführer, 2 Mannschaft, 4 gesamt")).toBeDefined();
+  });
+
+  it("legt den Fokus der Rückfrage auf „Abbrechen“ (R8-H2)", async () => {
+    const nutzer = userEvent.setup();
+    render(<SchrittBuehne komponente={SchrittPersonal} bogen={vier()} />);
+    await nutzer.click(screen.getByLabelText("Nur Stärke (Meldekopf-Schnellerfassung)"));
+    const dialog = document.querySelector<HTMLDialogElement>("dialog[aria-label='Nur die Stärke melden?']")!;
+    expect(document.activeElement).toBe(within(dialog).getByRole("button", { name: "Abbrechen" }));
+  });
+
+  it("belegt Stärke, Unterbringung und Verpflegung mit den abgeleiteten Zahlen vor und kennzeichnet die Karten als nicht gezählt", async () => {
+    const nutzer = userEvent.setup();
+    render(<SchrittBuehne komponente={SchrittPersonal} bogen={vier()} />);
+
+    await nutzer.click(screen.getByLabelText("Nur Stärke (Meldekopf-Schnellerfassung)"));
+    const dialog = document.querySelector<HTMLDialogElement>("dialog[aria-label='Nur die Stärke melden?']")!;
+    await nutzer.click(within(dialog).getByRole("button", { name: "Nur Stärke melden" }));
+
+    expect((screen.getByLabelText("Führer") as HTMLInputElement).value).toBe("1");
+    expect((screen.getByLabelText("Unterführer") as HTMLInputElement).value).toBe("1");
+    expect((screen.getByLabelText("Mannschaft") as HTMLInputElement).value).toBe("2");
+    expect((screen.getByLabelText("Gesamt") as HTMLInputElement).value).toBe("4");
+    expect((screen.getByLabelText("weiblich") as HTMLInputElement).value).toBe("1");
+    expect((screen.getByLabelText("vegetarisch") as HTMLInputElement).value).toBe("1");
+    expect(screen.getByText(/1 von 4 vegetarisch\/vegan/)).toBeDefined();
+    // Die Namen bleiben — als nicht gezählte Erreichbarkeiten.
+    expect(screen.getAllByLabelText("Vorname")).toHaveLength(4);
+    expect(screen.getByText("Person 1 von 4 · nicht gezählt")).toBeDefined();
+    expect(screen.getByText(/Diese 4 Personen zählen nicht in die Stärke/)).toBeDefined();
+  });
+
+  it("schaltet ohne Personal ohne Rückfrage um", async () => {
+    const nutzer = userEvent.setup();
+    buehne();
+
+    await nutzer.click(screen.getByLabelText("Nur Stärke (Meldekopf-Schnellerfassung)"));
+
+    expect(document.querySelector("dialog.abfrage")).toBeNull();
+    expect((screen.getByLabelText("Gesamt") as HTMLInputElement).value).toBe("0");
+  });
+
+  /** „1 von 0 vegetarisch" war ein Bruch, keine Auskunft — der Widerspruch wird benannt. */
+  it("nennt einen Widerspruch zwischen Verpflegung und Gesamtstärke statt „1 von 0“", async () => {
+    const nutzer = userEvent.setup();
+    buehne();
+    await nutzer.click(screen.getByLabelText("Nur Stärke (Meldekopf-Schnellerfassung)"));
+
+    await nutzer.click(screen.getByRole("button", { name: "vegetarisch: erhöhen" }));
+
+    expect(screen.queryByText(/1 von 0/)).toBeNull();
+    expect(screen.getByText(/1 vegetarisch\/vegan — mehr als die Gesamtstärke 0/)).toBeDefined();
+  });
+});
+
+/** Rückfrage-Regel an der Erreichbarkeit: die Rufnummer ist, worüber der Meldekopf zurückruft. */
+describe("Erreichbarkeit entfernen", () => {
+  const mitNummer = () => ({
+    ...neuerBogen(),
+    personal: [
+      {
+        ...neuePerson(),
+        vorname: "Sabine",
+        nachname: "Lang",
+        kontakte: [
+          { art: KontaktArt.MOBIL, dienstlich: true, wert: "01701234567" },
+          { art: KontaktArt.MOBIL, dienstlich: false, wert: "" },
+        ],
+      },
+    ],
+  });
+
+  it("fragt vor dem Entfernen einer Nummer nach und nennt sie", async () => {
+    const nutzer = userEvent.setup();
+    render(<SchrittBuehne komponente={SchrittPersonal} bogen={mitNummer()} />);
+
+    await nutzer.click(screen.getByRole("button", { name: "Erreichbarkeit 01701234567 entfernen" }));
+
+    const dialog = document.querySelector<HTMLDialogElement>("dialog[aria-label='Erreichbarkeit 01701234567 entfernen?']")!;
+    expect(dialog).not.toBeNull();
+    await nutzer.click(within(dialog).getByRole("button", { name: "Abbrechen" }));
+    expect(screen.getByRole("button", { name: "Erreichbarkeit 01701234567 entfernen" })).toBeDefined();
+
+    await nutzer.click(screen.getByRole("button", { name: "Erreichbarkeit 01701234567 entfernen" }));
+    const zweiter = document.querySelector<HTMLDialogElement>("dialog[aria-label='Erreichbarkeit 01701234567 entfernen?']")!;
+    await nutzer.click(within(zweiter).getByRole("button", { name: "Erreichbarkeit entfernen" }));
+    expect(screen.queryByRole("button", { name: "Erreichbarkeit 01701234567 entfernen" })).toBeNull();
+  });
+
+  it("entfernt eine leere Erreichbarkeit ohne Rückfrage", async () => {
+    const nutzer = userEvent.setup();
+    render(<SchrittBuehne komponente={SchrittPersonal} bogen={mitNummer()} />);
+
+    await nutzer.click(screen.getByRole("button", { name: "Erreichbarkeit 2 (leer) entfernen" }));
+
+    expect(document.querySelector("dialog.abfrage")).toBeNull();
+    expect(screen.queryByRole("button", { name: "Erreichbarkeit 2 (leer) entfernen" })).toBeNull();
+  });
+});
+
+/**
+ * Die Vorbelegung aus Schritt 1 (StAN-Sollplätze) muss sich auf Schritt 3
+ * wieder loswerden lassen, ohne 13-mal „entfernen" — und ohne die Karten zu
+ * treffen, die schon jemand ausgefüllt hat.
+ */
+/**
+ * Audit Runde 4, R4-H4: Eine neue Person war ungefragt „M“ und „Fleisch“; die
+ * Vorgabe sah wie eine Angabe aus und floss in Unterbringung und Verpflegung.
+ */
+describe("Neue Person: Vorgaben sichtbar als „bitte wählen“ (R4-H4)", () => {
+  it("kennzeichnet Geschlecht und Ernährung, bis die Auswahl berührt wird — auch nach dem Tippen des Namens", async () => {
+    const nutzer = userEvent.setup();
+    buehne();
+    await nutzer.click(screen.getByRole("button", { name: "+ Person hinzufügen" }));
+
+    const geschlecht = screen.getByRole("combobox", { name: "Geschlecht" });
+    const ernaehrung = screen.getByRole("combobox", { name: "Ernährung" });
+    expect(geschlecht.className).toContain("vorgabe-offen");
+    expect(ernaehrung.className).toContain("vorgabe-offen");
+    expect(document.querySelector(".vorgabe-hinweis")!.textContent).toMatch(/^Geschlecht und Ernährung sind nur vorbelegt \(M, Fleisch\) — bitte wählen\./);
+
+    // Namen tippen berührt die Vorgaben nicht.
+    await nutzer.type(screen.getByLabelText("Vorname"), "Anna");
+    expect(screen.getByRole("combobox", { name: "Geschlecht" }).className).toContain("vorgabe-offen");
+
+    await nutzer.selectOptions(screen.getByRole("combobox", { name: "Geschlecht" }), String(Geschlecht.W));
+    expect(screen.getByRole("combobox", { name: "Geschlecht" }).className).not.toContain("vorgabe-offen");
+    expect(screen.getByRole("combobox", { name: "Ernährung" }).className).toContain("vorgabe-offen");
+    expect(document.querySelector(".vorgabe-hinweis")!.textContent).toMatch(/^Ernährung ist nur vorbelegt \(Fleisch\) — bitte wählen\./);
+
+    await nutzer.click(screen.getByRole("combobox", { name: "Ernährung" }));
+    expect(document.querySelector(".vorgabe-hinweis")).toBeNull();
+  });
+
+  it("kennzeichnet bestehende Personen nicht", () => {
+    render(<SchrittBuehne komponente={SchrittPersonal} bogen={{ ...neuerBogen(), personal: [{ ...neuePerson(), vorname: "Jan", nachname: "Meyer" }] }} />);
+    expect(document.querySelector(".vorgabe-offen")).toBeNull();
+    expect(document.querySelector(".vorgabe-hinweis")).toBeNull();
+  });
+});
+
+describe("Vorbelegung entfernen (Schritt 3)", () => {
+  it("entfernt nur die Karten ohne Namen und Erreichbarkeit", async () => {
+    const nutzer = userEvent.setup();
+    const einheitsTyp = { code: 4 };
+    const bogen = neuerBogen();
+    const vorlage = stanPersonalVorbelegung(bogen.einheit.organisation, einheitsTyp);
+    render(
+      <SchrittBuehne
+        komponente={SchrittPersonal}
+        bogen={{
+          ...bogen,
+          einheit: { ...bogen.einheit, einheitsTyp },
+          personal: [
+            { ...vorlage[0]!, vorname: "Jan", nachname: "Meyer" },
+            { ...vorlage[1]!, kontakte: [{ art: KontaktArt.MOBIL, dienstlich: true, wert: "0170" }] },
+            // R2-E6: Fahrerlaubnis vorbereitet, Helfer noch offen — bleibt.
+            { ...vorlage[2]!, fahrerlaubnis: Fahrerlaubnis.CE },
+            ...vorlage.slice(3),
+          ],
+        }}
+      />,
+    );
+
+    // Ab 8 Personen beginnt die Liste als Kurz-Liste (R7-H6); dieser Test prüft die Karten.
+    await nutzer.click(screen.getByLabelText("Alle Angaben (Karten)"));
+    await nutzer.click(screen.getByRole("button", { name: `Vorbelegung entfernen (${vorlage.length - 3} Personen ohne Namen)` }));
+
+    expect(screen.getAllByLabelText("Vorname")).toHaveLength(3);
+    expect(screen.queryByRole("button", { name: /^Vorbelegung entfernen/ })).toBeNull();
+    // R4-D4: Quittung mit Stärke vorher → nachher und Rückweg.
+    const quittung = document.querySelector<HTMLElement>(".rueckweg")!;
+    expect(quittung.textContent).toContain(`Vorbelegung entfernt: ${vorlage.length - 3} Personen — Stärke ${vorlage.length} → 3.`);
+    await nutzer.click(within(quittung).getByRole("button", { name: "Rückgängig" }));
+    expect(screen.getAllByLabelText("Vorname")).toHaveLength(vorlage.length);
+  });
+
+  it("zeigt den Knopf nicht, wenn alle Karten benannt sind", () => {
+    render(
+      <SchrittBuehne
+        komponente={SchrittPersonal}
+        bogen={{ ...neuerBogen(), personal: [{ ...neuePerson(), vorname: "Jan", nachname: "Meyer" }] }}
+      />,
+    );
+
+    expect(screen.queryByRole("button", { name: /^Vorbelegung entfernen/ })).toBeNull();
+  });
+});
+
+/** Auf Schritt 3 stehen nur die Hinweise zu Schritt 3 — Zugehörigkeit und Auftrag gehören woandershin. */
+describe("Schritt Personal — nur eigene Hinweise", () => {
+  it("zeigt weder den fehlenden Einheitsnamen noch den leeren Auftrag", () => {
+    buehne();
+
+    expect(screen.getByText(/Stärke ist 0/)).toBeDefined();
+    expect(screen.queryByText(/Name der eigenen Einheit/)).toBeNull();
+    expect(screen.queryByText(/Ort\/Auftrag/)).toBeNull();
+  });
+
+  it("stutzt bei einem Zahlendreher in der Stärke", async () => {
+    const nutzer = userEvent.setup();
+    buehne();
+    await nutzer.click(screen.getByLabelText("Nur Stärke (Meldekopf-Schnellerfassung)"));
+
+    await nutzer.type(screen.getByLabelText("Führer"), "99");
+    await nutzer.type(screen.getByLabelText("Mannschaft"), "1");
+
+    expect(screen.getByText(/99 Führer — stimmt das\?/)).toBeDefined();
+    expect(screen.getByText(/mehr Führer als Mannschaft — stimmt das\?/)).toBeDefined();
+  });
+});
+
+/**
+ * Verpflegung wurde doppelt geführt: Nach dem Entfernen einer Person blieb der
+ * Bedarf in Schritt 5 bei 4 und musste von Hand nachgezogen werden. Jetzt
+ * folgt er der Stärke, solange er ihr entsprach.
+ */
+describe("Verpflegung zieht mit der Stärke mit", () => {
+  function Ableseleiste({ start }: { start: Erfassungsbogen }) {
+    const [bogen, setBogen] = useState(start);
+    return (
+      <>
+        <SchrittPersonal bogen={bogen} aendern={(patch) => setBogen((b) => ({ ...b, ...patch }))} />
+        <output data-testid="verpflegung">{bogen.sofortbedarf?.verpflegungPersonen}</output>
+        <Dialogschicht />
+      </>
+    );
+  }
+  const sofortbedarf = (verpflegungPersonen: number) => ({
+    verpflegungPersonen,
+    dieselLiter: 0,
+    benzinLiter: 0,
+    gemischLiter: 0,
+    unterbringung: false,
+    ruhezeitErforderlich: false,
+  });
+
+  it("zieht den Bedarf nach, wenn er der Stärke entsprach", async () => {
+    const nutzer = userEvent.setup();
+    render(<Ableseleiste start={{ ...neuerBogen(), personal: [neuePerson(), neuePerson()], sofortbedarf: sofortbedarf(2) }} />);
+
+    await nutzer.click(screen.getByRole("button", { name: "+ Person hinzufügen" }));
+    expect(screen.getByTestId("verpflegung").textContent).toBe("3");
+
+    await nutzer.click(screen.getByRole("button", { name: "Person 3 entfernen" }));
+    expect(screen.getByTestId("verpflegung").textContent).toBe("2");
+  });
+
+  it("lässt einen bewusst abweichenden Bedarf stehen", async () => {
+    const nutzer = userEvent.setup();
+    render(<Ableseleiste start={{ ...neuerBogen(), personal: [neuePerson(), neuePerson()], sofortbedarf: sofortbedarf(5) }} />);
+
+    await nutzer.click(screen.getByRole("button", { name: "+ Person hinzufügen" }));
+
+    expect(screen.getByTestId("verpflegung").textContent).toBe("5");
+  });
+});
+
+// Audit Runde 7, R7-O5: Der gemerkte Rückweg (Name, Funktionen, Rufnummern) bleibt nicht liegen, wenn er abgelaufen
+// ist oder zu einer anderen Einheit gehört, und lässt sich ausdrücklich vergessen.
+describe("Gemerkter Rückweg im Sitzungsspeicher (R7-O5)", () => {
+  const WEG = "eeb.personal.rueckweg";
+  const lesen = () => sessionStorage.getItem(WEG);
+
+  it("ein abgelaufener Rückweg wird beim Öffnen des Schritts entfernt, nicht nur ignoriert", () => {
+    const bogen = neuerBogen();
+    sessionStorage.setItem(
+      WEG,
+      JSON.stringify({ rueckweg: { art: "liste", text: "alt", personal: [] }, einheit: JSON.stringify(bogen.einheit), zeit: Date.now() - 16 * 60 * 1000 }),
+    );
+    render(<SchrittBuehne komponente={SchrittPersonal} bogen={bogen} />);
+    expect(lesen()).toBeNull();
+  });
+
+  it("personalRueckwegVergessen räumt ihn weg", async () => {
+    const { personalRueckwegVergessen } = await import("./personal");
+    sessionStorage.setItem(WEG, "{}");
+    personalRueckwegVergessen();
+    expect(lesen()).toBeNull();
   });
 });

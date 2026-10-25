@@ -86,18 +86,24 @@ function vorname(g: Geschlecht): string {
 /**
  * `anzahl` Beispielpersonen erzeugen. `bestehende` = Personen, die schon im
  * Bogen stehen: Führungsstruktur wird nur ergänzt, nie doppelt aufgebaut —
- * über Bestand und Neuzugang zusammen gilt 1 Führer/in, dann je angefangene
- * 6 Mannschaften ein/e Unterführer/in (an gängige Gruppenstärken angelehnt).
+ * über Bestand und Neuzugang zusammen je angefangene 6 Mannschaften ein/e
+ * Unterführer/in (an gängige Gruppenstärken angelehnt). Ein/e Führer/in
+ * kommt erst ab Zugstärke dazu: Gruppen- und Truppführer zählen als
+ * Unterführer, bei einer Gruppe stünde sonst ein Gruppenführer als Führer
+ * da (Nutzerhinweis).
  */
+const ZUGSTAERKE = 13;
+
 export function beispielPersonen(anzahl: number, bestehende: Person[] = []): Person[] {
   const neue: Person[] = [];
   let fuehrer = bestehende.filter((p) => p.staerkeRolle === StaerkeRolle.FUEHRER).length;
   let unterfuehrer = bestehende.filter((p) => p.staerkeRolle === StaerkeRolle.UNTERFUEHRER).length;
+  const mitFuehrer = bestehende.length + anzahl >= ZUGSTAERKE;
   for (let i = 0; i < anzahl; i++) {
     const g = zufallsGeschlecht();
     const gesamt = bestehende.length + neue.length + 1;
     let rolle = StaerkeRolle.MANNSCHAFT;
-    if (fuehrer === 0) {
+    if (mitFuehrer && fuehrer === 0) {
       rolle = StaerkeRolle.FUEHRER;
       fuehrer++;
     } else if (unterfuehrer < Math.ceil((gesamt - fuehrer) / 6)) {

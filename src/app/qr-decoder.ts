@@ -35,18 +35,43 @@ export interface QrLeseOptionen {
 /** Liest den ersten QR-Code im Bild; null, wenn keiner drin ist. */
 export type QrLeser = (bild: ImageData, optionen?: QrLeseOptionen) => Promise<string | null>;
 
-let leserVersprechen: Promise<QrLeser> | null = null;
+/**
+ * Liest ALLE QR-Codes im Bild (leer, wenn keiner drin ist). Für Fotos ganzer
+ * Seiten: Die Bogenseiten der Sammel-PDF tragen je zwei Teile eines großen
+ * Bogens — mit nur einem gelesenen Code ergab das Foto der Seite keinen Bogen
+ * (Audit Runde 2, R2-A2). Die jsQR-Rückfallebene kennt nur einen Code je Bild.
+ */
+export type QrAlleLeser = (bild: ImageData, optionen?: QrLeseOptionen) => Promise<string[]>;
+
+interface Decoder {
+  eins: QrLeser;
+  alle: QrAlleLeser;
+}
+
+/** Obergrenze je Bild: zwei Teile je Seite, Luft für Collagen/Screenshots. */
+const MAX_CODES_JE_BILD = 8;
+
+let decoderVersprechen: Promise<Decoder> | null = null;
 
 /**
  * Den besten verfügbaren Decoder laden — einmal je Sitzung, beide Wege lazy,
  * damit weder ZXing noch jsQR im Start-Bundle liegen.
  */
-export function qrLeserLaden(): Promise<QrLeser> {
-  leserVersprechen ??= zxingLeser().catch(() => jsQrLeser());
-  return leserVersprechen;
+function decoderLaden(): Promise<Decoder> {
+  decoderVersprechen ??= zxingDecoder().catch(() => jsQrDecoder());
+  return decoderVersprechen;
 }
 
-async function zxingLeser(): Promise<QrLeser> {
+export function qrLeserLaden(): Promise<QrLeser> {
+  return decoderLaden().then((d) => d.eins);
+}
+
+/** Wie {@link qrLeserLaden}, liefert aber alle Codes eines Bildes. */
+export function qrAlleLeserLaden(): Promise<QrAlleLeser> {
+  return decoderLaden().then((d) => d.alle);
+}
+
+async function zxingDecoder(): Promise<Decoder> {
   const { prepareZXingModule, readBarcodes } = await import("zxing-wasm/reader");
   await prepareZXingModule({
     overrides: {
@@ -54,22 +79,35 @@ async function zxingLeser(): Promise<QrLeser> {
     },
     fireImmediately: true,
   });
-  return async (bild, optionen) => {
+  const lesen = async (bild: ImageData, optionen: QrLeseOptionen | undefined, maxNumberOfSymbols: number) => {
     const treffer = await readBarcodes(bild, {
       formats: ["QRCode"],
       tryHarder: true,
       tryRotate: true,
       tryInvert: optionen?.invertiert === true,
-      maxNumberOfSymbols: 1,
+      maxNumberOfSymbols,
     });
-    return treffer.find((t) => t.isValid && t.text)?.text ?? null;
+    const texte: string[] = [];
+    for (const t of treffer) if (t.isValid && t.text && !texte.includes(t.text)) texte.push(t.text);
+    return texte;
+  };
+  return {
+    eins: async (bild, optionen) => (await lesen(bild, optionen, 1))[0] ?? null,
+    alle: (bild, optionen) => lesen(bild, optionen, MAX_CODES_JE_BILD),
   };
 }
 
-async function jsQrLeser(): Promise<QrLeser> {
+async function jsQrDecoder(): Promise<Decoder> {
   const jsQR = (await import("jsqr")).default;
-  return async (bild, optionen) =>
+  const eins: QrLeser = async (bild, optionen) =>
     jsQR(bild.data, bild.width, bild.height, {
       inversionAttempts: optionen?.invertiert ? "attemptBoth" : "dontInvert",
     })?.data ?? null;
+  return {
+    eins,
+    alle: async (bild, optionen) => {
+      const text = await eins(bild, optionen);
+      return text ? [text] : [];
+    },
+  };
 }

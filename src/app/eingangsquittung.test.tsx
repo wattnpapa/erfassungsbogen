@@ -61,3 +61,25 @@ describe("useEingangsquittung", () => {
     expect(gerufen).toEqual([{ block: "nearest", inline: "nearest" }]);
   });
 });
+
+describe("useEingangsquittung ohne Rollen", () => {
+  function StilleZeile({ marke }: { marke: string | null }) {
+    const el = useEingangsquittung<HTMLDivElement>(marke, { rollen: false });
+    return <div ref={el} data-testid="s" />;
+  }
+
+  it("quittiert, holt die Zeile aber nicht ins Bild (Einsatzansicht bleibt oben, R2-S3)", () => {
+    const gerufen: unknown[] = [];
+    const proto = HTMLElement.prototype as unknown as { scrollIntoView?: unknown };
+    const vorher = proto.scrollIntoView;
+    proto.scrollIntoView = function (opt: unknown) { gerufen.push(opt); };
+    try {
+      const { container } = render(<StilleZeile marke="thw-still#1" />);
+      expect(container.querySelector('[data-testid="s"]')!.classList.contains("eingegangen")).toBe(true);
+    } finally {
+      if (vorher === undefined) delete proto.scrollIntoView;
+      else proto.scrollIntoView = vorher;
+    }
+    expect(gerufen).toEqual([]);
+  });
+});

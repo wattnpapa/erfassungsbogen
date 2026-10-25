@@ -9,17 +9,603 @@
  * damit die Oberfläche sie am Gerät zeigen kann.
  *
  * Bewusst dieselben Spalten wie {@link einsatzCsvInhalt}: wer die Tabelle am
- * Gerät gelesen hat, findet im Export exakt dieselben Zahlen wieder.
+ * Gerät gelesen hat, findet im Export exakt dieselben Zahlen wieder — nur in
+ * anderer Folge (siehe {@link TABELLEN_SPALTEN}).
  *
  * Gesucht, gefiltert und vorsortiert wird weiterhin in einheiten-liste.ts —
  * die Tabelle bekommt die fertige Anzeigeliste und ordnet sie höchstens nach
  * einer angeklickten Spalte um.
  */
 
-import { staerke, unterbringungMWD, verpflegung } from "@bos/eeb-format/model";
-import { einheitAnzeigename, orgLabel, vokabText, vokabularFuer, zeitgruppe } from "./hilfen";
+import { EEB_EPOCHE_MS, staerke, type EebDatum, type Erfassungsbogen } from "@bos/eeb-format/model";
+import { einheitAnzeigename, nurSollstaerke, orgLabel, pruefpunkte, vokabText, vokabularFuer, zeitpunktDeutsch, type Pruefpunkt } from "./hilfen";
 import { MeldeStatus, type EinsatzArt, type MeldeEintrag } from "@bos/meldekopf/einsaetze";
-import { summiereBoegen, zaehltInLage, type EinsatzSummen } from "./auswertung";
+import { FELD_GESAMTSTAERKE, bogenDiff, diffKurzfassung } from "@bos/meldekopf/meldung-diff";
+import { aktuelleMeldungen, summiereBoegen, unterbringungLage, verpflegungLage, zaehltInLage, type EinsatzSummen } from "./auswertung";
+import { eintreffzeit, zeitLang, zeitpunktZuMs } from "./eintrag-zeiten";
+import { revisionenJe } from "./einheiten-index";
+import { istVerdraengt } from "./fassung-vorrang";
+
+// ------------------------------------------------------------ Bedarfsmarken
+
+/** Eine Bedarfsmarke: ausgeschrieben für die Karte, kurz für die Tabellenzelle. */
+export interface BedarfMarke {
+  lang: string;
+  kurz: string;
+  /**
+   * Dringend = jetzt ist etwas zu entscheiden (Ruhezeit, Unterbringung,
+   * abweichende Verpflegung). Kraftstoff meldet fast jede Einheit; er ist
+   * Routine für die Logistik-Summe und steht darum abgesetzt (Audit Runde 2,
+   * R2-K4).
+   */
+  dringend: boolean;
+}
+
+/**
+ * Was eine Einheit sofort braucht — nur das, was gesetzt ist. Der Bedarf
+ * stand bisher allein als Summe im Kopf („Ruhezeit: 3×"); WER Ruhezeit
+ * braucht, war nur über die Details jeder einzelnen Karte zu finden
+ * (Führungssicht-Audit K1). Leer = kein Sofortbedarf, und dann steht auch
+ * nichts da: eine Marke „Ruhezeit: nein" alarmierte, wo nichts ist.
+ *
+ * Verpflegung erscheint nur, wenn die gemeldete Zahl von der Stärke abweicht —
+ * „Verpflegung 12" bei Stärke 12 ist der Normalfall und keine Auffälligkeit.
+ * Reihenfolge: erst das Dringende, dann der Kraftstoff (R2-K4).
+ */
+export function bedarfMarken(b: Erfassungsbogen): BedarfMarke[] {
+  const sb = b.sofortbedarf;
+  if (!sb) return [];
+  const marken: BedarfMarke[] = [];
+  if (sb.ruhezeitErforderlich) marken.push({ lang: "Ruhezeit", kurz: "Ruhezeit", dringend: true });
+  if (sb.unterbringung) marken.push({ lang: "Unterbringung angefordert", kurz: "Unterbr.", dringend: true });
+  const gesamt = staerke(b).gesamt;
+  if (sb.verpflegungPersonen > 0 && sb.verpflegungPersonen !== gesamt) {
+    marken.push({
+      lang: `Verpflegung ${sb.verpflegungPersonen} (Stärke ${gesamt})`,
+      kurz: `Verpfl. ${sb.verpflegungPersonen} (St. ${gesamt})`,
+      dringend: true,
+    });
+  }
+  if (sb.dieselLiter > 0) marken.push({ lang: `Diesel ${sb.dieselLiter} l`, kurz: `Diesel ${sb.dieselLiter} l`, dringend: false });
+  if (sb.benzinLiter > 0) marken.push({ lang: `Benzin ${sb.benzinLiter} l`, kurz: `Benzin ${sb.benzinLiter} l`, dringend: false });
+  if (sb.gemischLiter > 0) marken.push({ lang: `Gemisch ${sb.gemischLiter} l`, kurz: `Gemisch ${sb.gemischLiter} l`, dringend: false });
+  return marken;
+}
+
+/** Kurztext für die Tabellenspalte „Bedarf": „Ruhezeit · Unterbr. · Diesel 400 l". */
+export function bedarfKurztext(b: Erfassungsbogen): string {
+  return bedarfMarken(b)
+    .map((m) => m.kurz)
+    .join(" · ");
+}
+
+/** Hat die Meldung irgendeinen Sofortbedarf (auch nur Kraftstoff)? */
+export function hatSofortbedarf(e: MeldeEintrag): boolean {
+  return bedarfMarken(e.bogen).length > 0;
+}
+
+/**
+ * Bedarfsfilter der Einheitenliste. „Nur mit Sofortbedarf" traf fast alle,
+ * weil jede Einheit Kraftstoff meldet (Audit Runde 2, R2-K4). Gefiltert wird
+ * darum auf das, was jetzt zu entscheiden ist — oder gezielt auf Ruhezeit bzw.
+ * Unterbringung (Sprung aus den Kopfzahlen). Abgerückte fallen immer heraus:
+ * für sie ist nichts mehr zu entscheiden.
+ */
+export type BedarfsFilter = "dringend" | "ruhezeit" | "unterbringung";
+
+export function passtZuBedarfsfilter(e: MeldeEintrag, filter: BedarfsFilter): boolean {
+  if (e.status !== MeldeStatus.ANWESEND) return false;
+  const sb = e.bogen.sofortbedarf;
+  if (filter === "ruhezeit") return !!sb?.ruhezeitErforderlich;
+  if (filter === "unterbringung") return !!sb?.unterbringung;
+  return bedarfMarken(e.bogen).some((m) => m.dringend);
+}
+
+/**
+ * Ist der Absender-Stand alt — älter als 24 Stunden vor dem Eintreffen? Ein
+ * Bogen vom Juli in einer September-Lage sah bisher aus wie jeder andere
+ * (K2); die Marke „alt" sagt, dass die Zahlen aus einer anderen Zeit stammen.
+ */
+export const STAND_ALT_MS = 24 * 60 * 60 * 1000;
+
+export function standIstAlt(e: MeldeEintrag): boolean {
+  // bogen.stand ist ein EebZeitpunkt (Minuten), die Eintreffzeit Millisekunden
+  // — erst umrechnen (Audit Runde 2, R2-N4).
+  return eintreffzeit(e) - zeitpunktZuMs(e.bogen.stand) > STAND_ALT_MS;
+}
+
+/**
+ * Laufende Nummer je Meldung: die Einheiten in der Reihenfolge, in der sie in
+ * dieser Sammlung zum ersten Mal eingingen (erste Fassung, Empfangszeit) —
+ * auf Karte, Tabelle und Lageblatt dieselbe. Über Funk hieß eine Zeile des
+ * Lageblatts sonst „THW Biberach/Riß Fachgruppe Ortung (B)" (Audit Runde 2,
+ * R2-A6). Die Empfangszeit ist unveränderlich (anders als die korrigierbare
+ * Eintreffzeit) und reist beim Weitergeben mit; ein anderes Gerät mit
+ * derselben Sammlung vergibt also dieselben Nummern. Wird eine Einheit
+ * entfernt, rücken die späteren nach.
+ */
+export function meldungsNummern(eintraege: MeldeEintrag[]): Map<string, number> {
+  const erste = new Map<string, number>();
+  const fest = new Map<string, number>();
+  for (const e of eintraege) {
+    const bisher = erste.get(e.einheitSchluessel);
+    if (bisher == null || e.empfangenAm < bisher) erste.set(e.einheitSchluessel, e.empfangenAm);
+    if (e.nummer != null && e.nummer >= 1 && !fest.has(e.einheitSchluessel)) fest.set(e.einheitSchluessel, e.nummer);
+  }
+  const reihe = [...erste].sort((a, b) => a[1] - b[1] || (a[0] < b[0] ? -1 : a[0] > b[0] ? 1 : 0));
+  // Vom Papier übernommene Nummern (R4-A1) sind fest — doppelt vergeben gilt sie
+  // nur der ersten Einheit in Eingangsreihenfolge. Alle übrigen Einheiten zählen
+  // in dieser Reihenfolge die kleinsten freien Nummern; ohne feste Nummern ist
+  // das wie bisher 1, 2, 3 …
+  const vergeben = new Map<string, number>();
+  const belegt = new Set<number>();
+  for (const [schluessel] of reihe) {
+    const n = fest.get(schluessel);
+    if (n != null && !belegt.has(n)) {
+      vergeben.set(schluessel, n);
+      belegt.add(n);
+    }
+  }
+  let frei = 1;
+  for (const [schluessel] of reihe) {
+    if (vergeben.has(schluessel)) continue;
+    while (belegt.has(frei)) frei++;
+    vergeben.set(schluessel, frei);
+    belegt.add(frei);
+  }
+  return new Map(reihe.map(([schluessel]) => [schluessel, vergeben.get(schluessel)!]));
+}
+
+/** „1 Einheit" / „4 Einheiten" — Einheiten (nicht Fassungen) einer Sammlung, wie die Liste sie zählt. */
+export function anzahlEinheiten(eintraege: MeldeEintrag[]): string {
+  const n = new Set(eintraege.map((e) => e.einheitSchluessel)).size;
+  return n === 1 ? "1 Einheit" : `${n} Einheiten`;
+}
+
+/** Eine Einheit, deren laufende Nummer sich durch eine Übernahme geändert hat (R5-W3). */
+export interface NummernWechsel {
+  einheitSchluessel: string;
+  einheit: string;
+  von: number;
+  nach: number;
+}
+
+/**
+ * Welche Einheiten nach einer Übernahme (Import, Abgleich) eine andere Nummer
+ * tragen als vorher (Audit Runde 5, R5-W3). Zwei Geräte vergeben ihre Nummern
+ * parallel nach dem Eingang; beim Zusammenführen rücken die Nummern der einen
+ * Seite um die der anderen herum. Eine am Funk genannte oder gedruckte Nummer
+ * meint dann eine andere Einheit — das gehört in die Quittung.
+ */
+export function nummernWechsel(vorher: MeldeEintrag[], nachher: MeldeEintrag[]): NummernWechsel[] {
+  const alt = meldungsNummern(vorher);
+  const neu = meldungsNummern(nachher);
+  const namen = new Map(neueInfo(nachher));
+  const wechsel: NummernWechsel[] = [];
+  for (const [schl, von] of alt) {
+    const nach = neu.get(schl);
+    if (nach != null && nach !== von) wechsel.push({ einheitSchluessel: schl, einheit: namen.get(schl) ?? schl, von, nach });
+  }
+  return wechsel.sort((a, b) => a.von - b.von);
+}
+
+/**
+ * Wie viel von der Summe nur die Sollstärke der Vorbelegung ist (R8-A1): zählende Einheiten,
+ * für die niemand gezählt hat (`nurSollstaerke`), und ihre Personen.
+ */
+export function sollstaerkeAnteil(eintraege: MeldeEintrag[], art?: EinsatzArt): { einheiten: number; personen: number } {
+  let einheiten = 0;
+  let personen = 0;
+  for (const e of aktuelleMeldungen(eintraege, art)) {
+    if (!nurSollstaerke(e.bogen)) continue;
+    einheiten++;
+    personen += staerke(e.bogen).gesamt;
+  }
+  return { einheiten, personen };
+}
+
+/** „3–6" bzw. „3, 5, 8–9": aufeinanderfolgende Nummern zu Bereichen zusammengezogen. */
+function nummernBereiche(nummern: number[]): string {
+  const sortiert = [...new Set(nummern)].sort((a, b) => a - b);
+  const teile: string[] = [];
+  for (let i = 0; i < sortiert.length; ) {
+    let j = i;
+    while (j + 1 < sortiert.length && sortiert[j + 1] === sortiert[j]! + 1) j++;
+    teile.push(j > i ? `${sortiert[i]}–${sortiert[j]}` : `${sortiert[i]}`);
+    i = j + 1;
+  }
+  return teile.join(", ");
+}
+
+/**
+ * Was „Entfernen" an den Nummern der übrigen Einheiten ändert (Audit Runde 8,
+ * R8-D2): „Die Einheiten Nr. 3–6 rücken auf und heißen danach Nr. 2–5". Leer,
+ * wenn keine Nummer wandert (letzte Einheit).
+ */
+export function entfernenNummernText(eintraege: MeldeEintrag[], einheitSchluessel: string): string {
+  const wechsel = nummernWechsel(
+    eintraege,
+    eintraege.filter((e) => e.einheitSchluessel !== einheitSchluessel),
+  );
+  if (wechsel.length === 0) return "";
+  const von = nummernBereiche(wechsel.map((w) => w.von));
+  const nach = nummernBereiche(wechsel.map((w) => w.nach));
+  return wechsel.length === 1
+    ? `Die Einheit Nr. ${von} rückt auf und heißt danach Nr. ${nach}`
+    : `Die Einheiten Nr. ${von} rücken auf und heißen danach Nr. ${nach}`;
+}
+
+/**
+ * Papier-Abgleich (R8-W1): jede Einheit, deren Nummer sich ändert, mit alter und neuer
+ * Nummer — „Bamberg 2 → 3, Ulm 3 → 4".
+ */
+export function nummernWechselListe(wechsel: NummernWechsel[]): string {
+  return wechsel.map((w) => `${w.einheit} ${w.von} → ${w.nach}`).join(", ");
+}
+
+function neueInfo(eintraege: MeldeEintrag[]): [string, string][] {
+  const aus: [string, string][] = [];
+  for (const e of eintraege) aus.push([e.einheitSchluessel, `${einheitAnzeigename(e.bogen.einheit)}${e.teilEtikett ? ` (${e.teilEtikett})` : ""}`]);
+  return aus;
+}
+
+/**
+ * „2 Nummern geändert — … Lageblatt neu drucken. Zum Beispiel: Nr. 5 gehört jetzt THW
+ * Erlangen (vorher THW Kassel), THW Kassel hat Nr. 6." Leer ohne Wechsel (R5-W3).
+ */
+export function nummernWechselText(wechsel: NummernWechsel[], nachher: MeldeEintrag[]): string {
+  if (wechsel.length === 0) return "";
+  const neu = meldungsNummern(nachher);
+  const namen = new Map(neueInfo(nachher));
+  const inhaber = new Map([...neu].map(([schl, nr]) => [nr, schl]));
+  // Die Aufforderung steht vorn, die Beispiele dahinter und knapp: 15 Wechsel füllten vier Fünftel
+  // der Quittung auf dem Telefon (Audit Runde 6, R6-K6).
+  const teile = wechsel.slice(0, 2).map((w) => {
+    const jetzt = inhaber.get(w.von);
+    return jetzt && jetzt !== w.einheitSchluessel
+      ? `Nr. ${w.von} gehört jetzt ${namen.get(jetzt) ?? "einer anderen Einheit"} (vorher ${w.einheit}), ${w.einheit} hat Nr. ${w.nach}`
+      : `${w.einheit}: Nr. ${w.von} → ${w.nach}`;
+  });
+  const rest = wechsel.length - teile.length;
+  const anzahl = wechsel.length === 1 ? "1 Nummer" : `${wechsel.length} Nummern`;
+  return `${anzahl} geändert — am Funk genannte Nummern und das gedruckte Lageblatt gelten nicht mehr, Lageblatt neu drucken. Zum Beispiel: ${teile.join("; ")}${rest > 0 ? ` und ${rest} weitere` : ""}.`;
+}
+
+// ------------------------------------------------------------ Fremder Einsatz
+
+/** Wörter, die eine Lage nur beschreiben, nicht verorten — zwei Lagen „Hochwasser…" sind noch nicht dieselbe. */
+const LAGE_ALLGEMEIN = /^(hochwasser|einsatz|uebung|lage|katastrophe|hilfe|unterstuetzung|bereitstellung|sturm|starkregen|ueberflutung)/;
+
+/** Füllwörter, die bei drei Buchstaben keinen Ort bezeichnen. */
+const ORT_FUELLWOERTER = new Set(["und", "der", "die", "das", "fuer", "mit", "bei", "von", "vom", "zur", "zum", "auf", "aus", "den", "dem", "des", "ein", "bau"]);
+
+/**
+ * Bedeutungstragende Wörter eines Orts-/Auftragstexts: klein, ohne Umlaute, ab
+ * drei Zeichen (Ortsnamen wie „Ulm"), ohne Allgemeines. Bindestrich-Namen
+ * zählen als ihre Teile — „Neu-Ulm" nennt auch „Ulm" (R5-K5, Ortsnamen-
+ * Normalisierung).
+ */
+function ortWoerter(text: string): string[] {
+  return text
+    .toLowerCase()
+    .replace(/ä/g, "ae")
+    .replace(/ö/g, "oe")
+    .replace(/ü/g, "ue")
+    .replace(/ß/g, "ss")
+    .split(/[^a-z0-9]+/)
+    .filter((w) => w.length >= 3 && !/^\d+$/.test(w) && !LAGE_ALLGEMEIN.test(w) && !ORT_FUELLWOERTER.has(w));
+}
+
+/** So viele ANDERE Einheiten mit Ort/Auftrag braucht der Vergleich, wenn die Sammlung selbst keinen Ort hat (R5-N1). */
+const VERGLEICH_MIN_EINHEITEN = 3;
+
+/**
+ * Nennt der Bogen einen Ort/Auftrag, der zu dieser Lage nicht passt? Nur ein
+ * Hinweis — nichts wird gesperrt, nichts anders gezählt (Audit Runde 4, R4-K6).
+ *
+ * Die Vergleichsbasis (R5-N1): Hat die Sammlung einen Ort/Auftrag, gilt er. Sonst
+ * zählt, was mehrere übrige Einheiten gemeinsam nennen — ein Wort in mindestens
+ * zwei Texten, und erst ab {@link VERGLEICH_MIN_EINHEITEN} anderen Einheiten mit
+ * Text. Der Sammlungsname allein ist keine Basis („Hochwasser Weser" gegen
+ * „Gebäudeschaden Ulm" ist kein Widerspruch, die erste Einheit einer Lage kann
+ * nichts anderes tragen als die Lage), er gilt nur zusätzlich als passend.
+ * Rückgabe: der Text des Bogens, sonst null.
+ */
+export function abweichenderOrt(
+  e: MeldeEintrag,
+  sammlung: { name: string; ort?: string },
+  alle: readonly MeldeEintrag[],
+): string | null {
+  const text = (e.bogen.einsatz.ortAuftrag ?? "").trim();
+  const eigene = ortWoerter(text);
+  if (eigene.length === 0) return null; // leer oder nur Allgemeines: nichts zu vergleichen
+  const bezug = new Set<string>(ortWoerter(sammlung.ort ?? ""));
+  const haeufigkeit = new Map<string, number>();
+  let mitText = 0;
+  for (const x of alle) {
+    if (x.einheitSchluessel === e.einheitSchluessel) continue;
+    const woerter = new Set(ortWoerter(x.bogen.einsatz.ortAuftrag ?? ""));
+    if (woerter.size > 0) mitText++;
+    for (const w of woerter) haeufigkeit.set(w, (haeufigkeit.get(w) ?? 0) + 1);
+  }
+  // Ort bekannt: Ein Wort der Nachbarn zählt nur als „passend", wenn mindestens die Hälfte der
+  // übrigen Einheiten mit Text es nennt. Vorher genügte jedes Wort einer einzigen Nachbarin: Der
+  // Hinweis verschwand, sobald eine zweite abweichende Einheit dasselbe Wort nannte („Stromausfall
+  // Cottbus" und „Stromausfall Langenhagen" in einer Lage am Neckar, Audit Runde 6, R6-K7).
+  if (bezug.size > 0) {
+    for (const [w, n] of haeufigkeit) if (n * 2 >= mitText) bezug.add(w);
+  } else if (mitText >= VERGLEICH_MIN_EINHEITEN) for (const [w, n] of haeufigkeit) if (n >= 2) bezug.add(w);
+  if (bezug.size === 0) return null; // keine Basis: lieber keine Marke als eine falsche
+  // Der Name der Sammlung macht einen Bogen zusätzlich „passend", begründet aber keinen Verdacht.
+  for (const w of ortWoerter(sammlung.name)) bezug.add(w);
+  const gleich = (b: string, w: string) => b === w || (b.length >= 5 && w.length >= 5 && (b.includes(w) || w.includes(b)));
+  const passt = eigene.some((w) => [...bezug].some((b) => gleich(b, w)));
+  return passt ? null : text;
+}
+
+/** „Neu": vor weniger als 30 Minuten eingetroffen — was seit der Übernahme dazukam. */
+export const NEU_MS = 30 * 60 * 1000;
+
+export function istNeu(e: MeldeEintrag, jetzt = Date.now()): boolean {
+  return jetzt - eintreffzeit(e) < NEU_MS;
+}
+
+// ------------------------------------------------------------ Lücken
+
+/**
+ * Kalendertag einer Geräteuhr-Zeit als Tageszähler des Bogenformats — der
+ * Bezug für „ist der Einsatzzeitraum vorbei?" am Meldekopf (R4-W6).
+ */
+export function datumVonMs(ms: number): EebDatum {
+  const d = new Date(ms);
+  return Math.round((Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) - EEB_EPOCHE_MS) / 86_400_000);
+}
+
+/**
+ * Offene Punkte einer Meldung, wie sie der Meldekopf sieht (Karte, Lageblatt,
+ * Sammel-PDF, CSV, Excel). Anders als im Assistenten der Einheit gilt hier die
+ * Zeitraum-Prüfung auch: Der Bezug ist der Tag, an dem die Einheit eintraf —
+ * ein Bogen mit Einsatzzeitraum der Julilage in einer Septemberlage fragt nach,
+ * gerade wenn die Einheit die Warnung übergangen hat (Audit Runde 4, R4-W6). Der
+ * Eintreffzeit-Bezug, nicht „heute", damit eine später geöffnete Sammlung nicht
+ * rückwirkend jede Meldung als abgelaufen zeigt.
+ */
+export function pruefpunkteEintrag(e: MeldeEintrag): Pruefpunkt[] {
+  return pruefpunkte(e.bogen, true, datumVonMs(eintreffzeit(e)));
+}
+
+/**
+ * Kurzform eines offenen Punkts der Meldung für Karte und Lageblatt: „1
+ * Lücke" sagte nicht, worum es geht — dahinter stand etwa ein Sitzplatz-
+ * Hinweis „15 in den erfassten Fahrzeugen für 19 Personen" (Audit Runde 3,
+ * R3-K7). Bekannte Punkte bekommen ein Stichwort, alle anderen ihren Anfang;
+ * die häufigen Prüfpunkte haben jetzt alle eines, damit auf dem Papier nichts
+ * mitten im Satz abbricht (R4-K3).
+ */
+export function lueckeKurz(text: string): string {
+  const sitz = /^Sitzplätze: \d+ in den erfassten Fahrzeugen für \d+ Personen — (\d+)/.exec(text);
+  if (sitz) return `Sitzplätze fehlen: ${sitz[1]}`;
+  if (/^Keine telefonische Erreichbarkeit/.test(text)) return "keine Rufnummer";
+  if (/hat noch kein Kennzeichen/.test(text)) return "Kennzeichen fehlt";
+  if (/^Kennzeichen .* steht mehrfach/.test(text)) return "Kennzeichen doppelt";
+  if (/kein Kraftfahrer/.test(text)) return "kein Kraftfahrer";
+  if (/^Ort\/Auftrag ist noch leer/.test(text)) return "Ort/Auftrag leer";
+  if (/^Einsatzzeitraum .* ist vorbei/.test(text)) return "Zeitraum vorbei";
+  if (/^Einsatzzeitraum .* mehr als ein Jahr entfernt/.test(text)) return "Zeitraum: Jahr prüfen";
+  if (/^Einsatzzeitraum: „bis“ liegt vor „von“/.test(text)) return "Zeitraum: bis vor von";
+  if (/^Einsatzende .* vor dem Einsatzbeginn/.test(text)) return "Ende vor Beginn";
+  if (/^Einsatzbeginn .* außerhalb des Einsatzzeitraums/.test(text)) return "Beginn außerhalb Zeitraum";
+  if (/^Einheitstyp .* nicht erkannt/.test(text)) return "Einheitstyp nicht erkannt";
+  if (/^Stärke ist 0/.test(text)) return "Stärke 0";
+  const verpflegung = /^Verpflegung für (\d+) Personen angefordert, die Gesamtstärke ist aber (\d+)/.exec(text);
+  if (verpflegung) return `Verpflegung ${verpflegung[1]} statt Stärke ${verpflegung[2]}`;
+  if (/^Sofortbedarf: mehr Vegetarier\/Veganer/.test(text)) return "mehr Vegetarier als Verpflegte";
+  if (/^Verpflegung: .* übersteigen die Gesamtstärke/.test(text)) return "vegetarisch/vegan > Stärke";
+  if (/^Alle \d+ Personen stehen auf Geschlecht/.test(text)) return "alle als „männlich“ (Vorbelegung)";
+  if (/^Aufteilung nach Geschlecht: .* weicht von der Gesamtstärke ab/.test(text)) return "M/W/D weicht von Stärke ab";
+  if (/^Stärke: \d+ \+ \d+ \+ \d+ ergibt nicht/.test(text)) return "F+U+M weicht von Gesamt ab";
+  if (/^Stärke \d+ \/ \d+ \/ \d+ \/ \d+: mehr Führer als Mannschaft/.test(text)) return "mehr Führer als Mannschaft";
+  if (/^Stärke: \d+ .* — stimmt das\?/.test(text)) return "Stärke auffällig hoch";
+  if (/^Es sind \d+ Ansprechpartner erfasst/.test(text)) return "mehr Personen als Stärke";
+  if (/Personenkarten? ohne Angaben/.test(text)) return "leere Personenkarte";
+  if (/^Zugehörigkeit: Der Name der eigenen Einheit/.test(text)) return "Einheitsname fehlt";
+  if (/Sitzplätze eingetragen|Sitzplätze \(Richtwert/.test(text) || /: \d+ Sitzplätze/.test(text)) return "Sitzplätze prüfen";
+  if (/^Sofortbedarf: .* — mehr als .* je Fahrzeug/.test(text)) return "Kraftstoff auffällig hoch";
+  const kopf = text.split(/[:—]/)[0]!.trim();
+  if (kopf.length > 0 && kopf.length <= 32 && kopf !== text) return `${kopf} prüfen`;
+  return text.length <= 32 ? text.replace(/\.$/, "") : `${anWortgrenze(text, 30)} …`;
+}
+
+/**
+ * Text auf höchstens `max` Zeichen, am letzten ganzen Wort abgeschnitten: Die
+ * Kurzform brach mitten im Wort ab („Alle 12 Personen stehen auf Ge …“,
+ * Audit Runde 4, R4-N4). Ein einziges langes Wort bleibt hart gekürzt.
+ */
+export function anWortgrenze(text: string, max: number): string {
+  if (text.length <= max) return text;
+  const kopf = text.slice(0, max + 1);
+  const leer = kopf.lastIndexOf(" ");
+  const schnitt = leer >= Math.floor(max / 2) ? kopf.slice(0, leer) : text.slice(0, max);
+  return schnitt.replace(/[\s,;:–—-]+$/, "");
+}
+
+/** „Sitzplätze fehlen: 4" bzw. „Sitzplätze fehlen: 4 + 2 weitere" — leer ohne Lücken. */
+export function lueckenText(texte: string[]): string {
+  if (texte.length === 0) return "";
+  const erst = lueckeKurz(texte[0]!);
+  return texte.length === 1 ? erst : `${erst} + ${texte.length - 1} weitere`;
+}
+
+/**
+ * Alle offenen Punkte als Stichworte, durch „;" getrennt — für Lageblatt und
+ * Tabellen, wo kein Platz für die ganzen Sätze ist, aber auch kein Punkt
+ * hinter „+ 2 weitere" verschwinden soll (R4-K3).
+ */
+export function lueckenAlle(texte: string[]): string {
+  return texte.map(lueckeKurz).join("; ");
+}
+
+// ------------------------------------------------------------ Folgemeldungen
+
+/**
+ * Was eine Folgemeldung an der Einheit geändert hat — für Karte, Kompaktzeile
+ * und Sammelquittung. Eine Folgemeldung erbt die Eintreffzeit (R2-K1); an ihr
+ * ist sie deshalb nicht als neu zu erkennen. Maßgeblich ist hier der Eingang
+ * der Fassung (`empfangenAm`), nicht das Eintreffen der Einheit (Audit
+ * Runde 3, R3-K1).
+ */
+export interface FolgeAenderung {
+  /** Eingang der aktuellen Fassung (Geräteuhr, ms). */
+  gemeldetAm: number;
+  /** „Stärke 12 → 9 (−3)", „Diesel … / 2 Änderungen", „inhaltlich unverändert". */
+  kurz: string;
+  /** Gesamtstärke vorher/nachher, nur wenn sie sich geändert hat. */
+  staerkeVorher?: number;
+  staerkeNachher?: number;
+  /** Die Gesamtstärke ist gesunken — das muss auffallen. */
+  verlust: boolean;
+  /**
+   * Die Folgemeldung hat eine abgerückte Einheit wieder in die Lage geholt
+   * (R5-K1); `abgerueckAm` = seit wann sie abgerückt war.
+   */
+  rueckkehr?: { abgerueckAm?: number };
+}
+
+/** „wieder anwesend — war abgerückt seit 12:47" für Quittung, Karte und Blatt (R5-K1). */
+export function rueckkehrText(r: { abgerueckAm?: number }): string {
+  return r.abgerueckAm != null ? `wieder anwesend — war abgerückt seit ${zeitLang(r.abgerueckAm)}` : "wieder anwesend — war abgerückt";
+}
+
+/**
+ * Ist diese Fassung eine Folgemeldung der Einheit? Ja, wenn es eine ältere
+ * Fassung gibt und die aktuelle von außen kam — eine hier entstandene
+ * Rest-Fassung nach Aufteilen oder Zusammenführen ist keine Meldung.
+ */
+export function folgeAenderung(kopf: MeldeEintrag, alle: MeldeEintrag[]): FolgeAenderung | null {
+  if (kopf.quelle === "aufteilung" || kopf.quelle === "zusammenfuehrung") return null;
+  // Nach der Fassungsfolge, nicht nach der Eingangszeit: Bei zurückgestellter Geräteuhr trägt die
+  // neue Fassung eine frühere Eingangszeit als die alte, und die Quittung hieß „neu gemeldet"
+  // (Audit Runde 6, R6-E5). Die Liste führt die geltende Fassung zuerst, die älteren dahinter.
+  const revs = revisionenJe(alle, kopf.einheitSchluessel);
+  const stelle = revs.findIndex((r) => r.id === kopf.id);
+  const vorige =
+    stelle >= 0
+      ? revs[stelle + 1]
+      : revs.find((r) => r.id !== kopf.id && r.empfangenAm <= kopf.empfangenAm);
+  if (!vorige) return null;
+  // Nur in die Historie gelegt (R8-W2): die ältere Fassung ist keine Vorgängerin, die Lage
+  // ändert sich nicht — also auch keine Folgemeldung.
+  if (istVerdraengt(vorige, revs)) return null;
+  const d = bogenDiff(vorige.bogen, kopf.bogen);
+  const vorher = staerke(vorige.bogen).gesamt;
+  const nachher = staerke(kopf.bogen).gesamt;
+  return {
+    gemeldetAm: kopf.empfangenAm,
+    kurz: platzhalterVergleich(vorige, kopf, d) ?? folgeKurztext(d, vorher, nachher),
+    ...(vorher !== nachher ? { staerkeVorher: vorher, staerkeNachher: nachher } : {}),
+    verlust: nachher < vorher,
+    ...(kopf.rueckkehr ? { rueckkehr: kopf.rueckkehr } : {}),
+  };
+}
+
+/**
+ * Vergleich gegen eine Schnellerfassung (R5-W9): Sie erfasst nur die Stärke.
+ * „3 Fahrzeuge abgemeldet" las sich wie ein Ereignis, dabei hat niemand etwas
+ * abgemeldet — die Schnellerfassung hat sie nie erfasst. Null, wenn `kopf` keine
+ * Schnellerfassung ist.
+ */
+function platzhalterVergleich(vorige: MeldeEintrag, kopf: MeldeEintrag, d: ReturnType<typeof bogenDiff>): string | null {
+  if (kopf.quelle !== "manuell") return null;
+  const vorher = staerke(vorige.bogen).gesamt;
+  const nachher = staerke(kopf.bogen).gesamt;
+  const teile: string[] = [];
+  if (vorher !== nachher) {
+    const diff = nachher - vorher;
+    teile.push(`Stärke ${vorher} → ${nachher}${diff !== 0 ? ` (${diff > 0 ? "+" : "−"}${Math.abs(diff)})` : ""}`);
+  }
+  const fehlt = d.fahrzeugeAbgang.length > 0 || d.personalAbgang.length > 0 || d.bedarf.length > 0;
+  if (fehlt) teile.push("Fahrzeuge, Personal und Sofortbedarf nicht erfasst");
+  return teile.length > 0 ? teile.join(" · ") : null;
+}
+
+/** Kurztext des Vergleichs zweier Fassungen für die Karte („Stärke 12 → 10 · …"); leer ohne Unterschied. */
+export function vergleichKurztext(vorige: MeldeEintrag, kopf: MeldeEintrag): string {
+  const d = bogenDiff(vorige.bogen, kopf.bogen);
+  return platzhalterVergleich(vorige, kopf, d) ?? diffKurzfassung(d);
+}
+
+/** „…“ mit höchstens 60 Zeichen; „—" (geleert) bleibt ohne Anführungszeichen. */
+function zitat(text: string): string {
+  const t = text.trim();
+  if (t === "" || t === "—") return "entfernt";
+  return `„${t.length > 60 ? `${t.slice(0, 59).trimEnd()} …` : t}“`;
+}
+
+/**
+ * Kurzfassung einer Folgemeldung: Stärke zuerst (mit Differenz), dann
+ * Fahrzeuge, dann bis zu zwei Bedarfsänderungen mit Wert („Diesel 200 l →
+ * 400 l") und geänderte Freitexte nur mit Namen. `diffKurzfassung` allein
+ * sagte bei Weinsberg „2 Änderungen" — welche, stand erst hinter einem Tipp.
+ */
+function folgeKurztext(d: ReturnType<typeof bogenDiff>, vorher: number, nachher: number): string {
+  if (d.anzahl === 0) return "inhaltlich unverändert";
+  const teile: string[] = [];
+  let erklaert = 0;
+  if (vorher !== nachher || d.staerke.some((a) => a.feld === FELD_GESAMTSTAERKE)) {
+    const diff = nachher - vorher;
+    teile.push(`Stärke ${vorher} → ${nachher}${diff !== 0 ? ` (${diff > 0 ? "+" : "−"}${Math.abs(diff)})` : ""}`);
+    // Ab- und Zugänge im Personal SIND die Stärkeänderung.
+    erklaert += d.staerke.length + d.personalZugang.length + d.personalAbgang.length;
+  }
+  const fz = diffKurzfassung({ ...d, staerke: [] });
+  if (d.fahrzeugeZugang.length > 0 || d.fahrzeugeAbgang.length > 0) {
+    teile.push(fz);
+    erklaert += d.fahrzeugeZugang.length + d.fahrzeugeAbgang.length;
+  }
+  // Die M/W/D-Aufteilung folgt der Stärke — neben ihr nur Lärm.
+  const bedarf = vorher !== nachher ? d.bedarf.filter((a) => a.feld !== "Unterbringung M/W/D") : d.bedarf;
+  erklaert += d.bedarf.length - bedarf.length;
+  for (const a of bedarf.slice(0, Math.max(0, 3 - teile.length))) {
+    teile.push(`${a.feld} ${a.vorher} → ${a.nachher}`);
+    erklaert++;
+  }
+  for (const a of d.sonstiges.slice(0, Math.max(0, 3 - teile.length))) {
+    // Die Bemerkung und der Auftrag der Einheit im Wortlaut (gekürzt): „Sonstiges
+    // geändert" klang nach Routine, dahinter stand „300 m Sperre nachfordern"
+    // (R4-K4).
+    teile.push(a.feld === "Sonstiges" ? `Bemerkung: ${zitat(a.nachher)}` : a.feld === "Ort / Auftrag" ? `Ort/Auftrag: ${zitat(a.nachher)}` : `${a.feld} geändert`);
+    erklaert++;
+  }
+  const rest = d.anzahl - erklaert;
+  if (rest > 0) teile.push(teile.length === 0 ? `${rest} ${rest === 1 ? "Änderung" : "Änderungen"}` : `${rest} weitere ${rest === 1 ? "Änderung" : "Änderungen"}`);
+  return teile.join(" · ");
+}
+
+/** Wann die aktuelle Fassung einging — Sortierschlüssel „zuletzt gemeldet". */
+export function zuletztGemeldet(e: MeldeEintrag): number {
+  return e.empfangenAm;
+}
+
+/**
+ * Eingang der jüngsten Meldung einer Sammlung (Geräteuhr, ms) — neue
+ * Einheiten wie Folgemeldungen; hier entstandene Fassungen (Aufteilen,
+ * Zusammenführen) zählen nicht. Nach „Einsatz importieren…" tragen die
+ * Meldungen die Empfangszeit des alten Geräts, die Zahl sagt also auch dort,
+ * wann zuletzt etwas einging (Audit Runde 3, R3-K5). null ohne Meldung.
+ */
+export function letzteMeldung(eintraege: MeldeEintrag[]): number | null {
+  let max: number | null = null;
+  for (const e of eintraege) {
+    if (e.quelle === "aufteilung" || e.quelle === "zusammenfuehrung") continue;
+    if (max == null || e.empfangenAm > max) max = e.empfangenAm;
+  }
+  return max;
+}
+
+/** Fassung vor weniger als 30 Minuten eingegangen (Marke „neue Fassung", R3-K1). */
+export function frischGemeldet(e: MeldeEintrag, jetzt = Date.now()): boolean {
+  return jetzt - e.empfangenAm < NEU_MS;
+}
 
 /** Eine Tabellenzeile: eine gemeldete Einheit mit allen Zahlen der Übersicht. */
 export interface TabellenZeile {
@@ -43,7 +629,21 @@ export interface TabellenZeile {
   gemisch: number;
   fahrzeuge: number;
   fahrzeugTypen: string;
+  /** Sofortbedarf als Kurztext (siehe {@link bedarfKurztext}); leer = keiner. */
+  bedarf: string;
+  /** Eintreffzeit als Uhrzeit (bei anderem Tag mit Datum). */
+  eingetroffen: string;
+  /** Eintreffzeit in ms — Sortierschlüssel der Spalte „Eingetroffen". */
+  eingetroffenAm: number;
+  /** Abrückzeit als Uhrzeit; leer, solange die Einheit da ist. */
+  abgerueckt: string;
+  /** Abrückzeit in ms, 0 = nicht abgerückt — Sortierschlüssel. */
+  abgerueckAm: number;
   stand: string;
+  /** Absender-Stand älter als 24 h vor dem Eintreffen (Marke „alt"). */
+  standAlt: boolean;
+  /** Auftrag/Notiz der Führungsstelle (MeldeEintrag.notiz). */
+  auftrag: string;
   /** Vor Ort (neueste Revision, nicht abgerückt/aufgegangen). */
   anwesend: boolean;
   /** Zählt in die Summen: anwesend UND gehört in diese Lage (keine fremde Übung). */
@@ -69,30 +669,57 @@ export type TabellenSpalte =
   | "benzin"
   | "gemisch"
   | "fahrzeuge"
-  | "stand";
+  | "bedarf"
+  | "eingetroffen"
+  | "abgerueckt"
+  | "stand"
+  | "auftrag";
 
 export interface SpaltenDefinition {
   schluessel: TabellenSpalte;
-  /** Spaltenkopf; kurz, weil 18 Spalten nebeneinander stehen. */
+  /** Spaltenkopf; kurz, weil über 20 Spalten nebeneinander stehen. */
   kopf: string;
   /** Langfassung als title/aria — „F" allein sagt am Bildschirm nichts. */
   titel: string;
   /** Zahlenspalte: rechtsbündig und absteigend vorsortiert. */
   zahl: boolean;
+  /**
+   * Sortiert nach diesem Feld statt nach dem angezeigten Text — die Uhrzeit
+   * „09:40" steht als Text da, geordnet wird aber nach dem Zeitpunkt (sonst
+   * käme „26.09., 23:00" vor „08:00" von heute).
+   */
+  sortiertNach?: keyof TabellenZeile;
 }
 
 /**
- * Spaltenfolge der Tabelle. Reihenfolge wie im CSV der Übersicht: erst wer
- * (Einheit, Organisation, Zug), dann wie stark, dann was gebraucht wird.
+ * Spaltenfolge der Tabelle. Vorn steht, wonach die Führung entscheidet: wer
+ * (Einheit, Zug), wie stark, was gebraucht wird, seit wann da und mit welchem
+ * Auftrag. Vorher folgte die Tabelle dem CSV der Übersicht (Einheit, Org.,
+ * Zug, F, U, M, Ges., Verpflegung, Unterbringung, Kraftstoff, …) — auf dem
+ * Tablet endete das Bild bei „Unt. M", Bedarf, Eintreffzeit und Auftrag
+ * lagen rechts außerhalb (Audit Runde 2, R2-K5). Die Aufschlüsselung von
+ * Stärke, Verpflegung, Unterbringung und Kraftstoff folgt dahinter; das CSV
+ * behält seine Folge, die Zahlen sind dieselben.
  */
 export const TABELLEN_SPALTEN: SpaltenDefinition[] = [
   { schluessel: "einheit", kopf: "Einheit", titel: "Einheit", zahl: false },
-  { schluessel: "organisation", kopf: "Org.", titel: "Organisation", zahl: false },
   { schluessel: "zugEtikett", kopf: "Zug", titel: "Zug", zahl: false },
+  // F/U/M und Kfz direkt bei der Gesamtstärke: am Laptop lagen sie erst nach
+  // seitlichem Rollen im Bild (Rahmen 894 px, Tabelle 1 826 px; Audit
+  // Runde 3, R3-K7). Vier schmale Zahlenspalten kosten zusammen kaum Breite.
   { schluessel: "fuehrer", kopf: "F", titel: "Führer", zahl: true },
   { schluessel: "unterfuehrer", kopf: "U", titel: "Unterführer", zahl: true },
   { schluessel: "mannschaft", kopf: "M", titel: "Mannschaft", zahl: true },
   { schluessel: "gesamt", kopf: "Ges.", titel: "Stärke gesamt", zahl: true },
+  { schluessel: "fahrzeuge", kopf: "Kfz", titel: "Fahrzeuge", zahl: true },
+  // Auftrag und Eintreffen stehen vor dem Bedarf (R8-K2): „Wer macht was, und seit wann?" ist die erste
+  // Führungsfrage; am Tablet (754 px Rahmen) lagen beide hinter der breiten Bedarfsspalte, erst nach dem
+  // Rollen im Bild. Der Bedarf folgt unmittelbar dahinter, der Stand ist Beiwerk und steht ganz hinten (K1, K2).
+  { schluessel: "auftrag", kopf: "Auftrag", titel: "Auftrag / Notiz der Führungsstelle", zahl: false },
+  { schluessel: "eingetroffen", kopf: "Eingetr.", titel: "Eingetroffen", zahl: false, sortiertNach: "eingetroffenAm" },
+  { schluessel: "bedarf", kopf: "Bedarf", titel: "Sofortbedarf", zahl: false },
+  { schluessel: "abgerueckt", kopf: "Abger.", titel: "Abgerückt", zahl: false, sortiertNach: "abgerueckAm" },
+  { schluessel: "organisation", kopf: "Org.", titel: "Organisation", zahl: false },
   { schluessel: "verpflegung", kopf: "Verpfl.", titel: "Verpflegung gesamt", zahl: true },
   { schluessel: "vegetarisch", kopf: "veg.", titel: "Verpflegung vegetarisch", zahl: true },
   { schluessel: "vegan", kopf: "vegan", titel: "Verpflegung vegan", zahl: true },
@@ -102,8 +729,7 @@ export const TABELLEN_SPALTEN: SpaltenDefinition[] = [
   { schluessel: "diesel", kopf: "Diesel", titel: "Diesel (Liter)", zahl: true },
   { schluessel: "benzin", kopf: "Benzin", titel: "Benzin (Liter)", zahl: true },
   { schluessel: "gemisch", kopf: "Gemisch", titel: "Gemisch (Liter)", zahl: true },
-  { schluessel: "fahrzeuge", kopf: "Kfz", titel: "Fahrzeuge", zahl: true },
-  { schluessel: "stand", kopf: "Stand", titel: "Stand der Meldung", zahl: false },
+  { schluessel: "stand", kopf: "Stand", titel: "Stand der Meldung (Absender)", zahl: false },
 ];
 
 /** Fahrzeug-Kurzbezeichnungen einer Einheit, z. B. „GKW / MzKW" (wie im CSV). */
@@ -120,12 +746,14 @@ function fahrzeugTypen(e: MeldeEintrag): string {
  * fallen Übungsmeldungen aus der Summe (nicht aus der Tabelle — sie bleiben
  * sichtbar, sie zählen nur nicht; siehe zaehltInLage).
  */
-export function tabellenZeilen(eintraege: MeldeEintrag[], art?: EinsatzArt): TabellenZeile[] {
+export function tabellenZeilen(eintraege: MeldeEintrag[], art?: EinsatzArt, jetzt = Date.now()): TabellenZeile[] {
   return eintraege.map((e) => {
     const b = e.bogen;
     const st = staerke(b);
-    const vp = verpflegung(b);
-    const u = unterbringungMWD(b);
+    // Dieselben Regeln wie die Summen: Schnellerfassung ohne Aufteilung zählt
+    // die Stärke, nicht die Ansprechpartner (R2-N5).
+    const vp = verpflegungLage(b);
+    const u = unterbringungLage(b);
     const sb = b.sofortbedarf;
     return {
       eintrag: e,
@@ -148,7 +776,17 @@ export function tabellenZeilen(eintraege: MeldeEintrag[], art?: EinsatzArt): Tab
       gemisch: sb?.gemischLiter ?? 0,
       fahrzeuge: b.fahrzeuge.length,
       fahrzeugTypen: fahrzeugTypen(e),
-      stand: zeitgruppe(b.stand),
+      bedarf: bedarfKurztext(b),
+      // Eine Zeitform für Karte, Tabelle und Lageblatt: „29.09.2026, 14:05".
+      // Vorher stand hier „14:05" neben „170805jul26", auf dem Blatt
+      // „28.09.2026, 14:05" (Audit Runde 2, R2-A6).
+      eingetroffen: zeitLang(eintreffzeit(e)),
+      eingetroffenAm: eintreffzeit(e),
+      abgerueckt: e.abgerueckAm != null ? zeitLang(e.abgerueckAm) : "",
+      abgerueckAm: e.abgerueckAm ?? 0,
+      stand: zeitpunktDeutsch(b.stand),
+      standAlt: standIstAlt(e),
+      auftrag: e.notiz ?? "",
       anwesend: e.status === MeldeStatus.ANWESEND,
       zaehlt: e.status === MeldeStatus.ANWESEND && (art == null || zaehltInLage(art, b)),
     };
@@ -167,6 +805,44 @@ export function tabellenSumme(zeilen: TabellenZeile[]): EinsatzSummen {
   return summiereBoegen(zeilen.filter((z) => z.zaehlt).map((z) => z.eintrag.bogen));
 }
 
+/** Wie sich die Zeilen auf die Zählweisen verteilen (siehe {@link summenBeschriftung}). */
+export interface TabellenZaehlung {
+  /** Anwesend und in dieser Lage zählend — die Zahl der Stärkeleiste. */
+  zaehlend: number;
+  /** Anwesend, aber als Übung nicht in dieser Lage. */
+  uebung: number;
+  abgerueckt: number;
+  zusammengefuehrt: number;
+}
+
+export function tabellenZaehlung(zeilen: TabellenZeile[]): TabellenZaehlung {
+  const z: TabellenZaehlung = { zaehlend: 0, uebung: 0, abgerueckt: 0, zusammengefuehrt: 0 };
+  for (const zeile of zeilen) {
+    if (zeile.zaehlt) z.zaehlend++;
+    else if (zeile.anwesend) z.uebung++;
+    else if (zeile.eintrag.status === MeldeStatus.AUFGEGANGEN) z.zusammengefuehrt++;
+    else z.abgerueckt++;
+  }
+  return z;
+}
+
+/**
+ * Beschriftung der Summenzeile: „Summe (6 zählend · 1 Übung · 1 abgerückt)".
+ *
+ * Vorher hieß es „Summe (7 anwesend)" und die Stärke daneben war die von
+ * sechs — die Übung zählte als anwesend, aber nicht in die Zahl. Kopfzahl,
+ * Listenüberschrift und Summenzeile nannten damit drei verschiedene Zahlen
+ * für „wie viele Einheiten" (K4). Jetzt sagt jede Zahl, was sie zählt; was
+ * null ist, bleibt weg.
+ */
+export function summenBeschriftung(z: TabellenZaehlung): string {
+  const teile = [`${z.zaehlend} zählend`];
+  if (z.uebung > 0) teile.push(`${z.uebung} Übung`);
+  if (z.abgerueckt > 0) teile.push(`${z.abgerueckt} abgerückt`);
+  if (z.zusammengefuehrt > 0) teile.push(`${z.zusammengefuehrt} zusammengeführt`);
+  return `Summe (${teile.join(" · ")})`;
+}
+
 export type Sortierrichtung = "auf" | "ab";
 
 /**
@@ -180,13 +856,15 @@ export function zeilenSortieren(
   richtung: Sortierrichtung,
 ): TabellenZeile[] {
   const vorzeichen = richtung === "auf" ? 1 : -1;
-  const zahl = TABELLEN_SPALTEN.find((s) => s.schluessel === spalte)?.zahl ?? false;
+  const definition = TABELLEN_SPALTEN.find((s) => s.schluessel === spalte);
+  const feld: keyof TabellenZeile = definition?.sortiertNach ?? spalte;
   return [...zeilen].sort((a, b) => {
-    const wa = a[spalte];
-    const wb = b[spalte];
-    const vergleich = zahl
-      ? (wa as number) - (wb as number)
-      : String(wa).localeCompare(String(wb), "de");
+    const wa = a[feld];
+    const wb = b[feld];
+    const vergleich =
+      typeof wa === "number" && typeof wb === "number"
+        ? wa - wb
+        : String(wa).localeCompare(String(wb), "de");
     return vergleich * vorzeichen || a.einheit.localeCompare(b.einheit, "de");
   });
 }

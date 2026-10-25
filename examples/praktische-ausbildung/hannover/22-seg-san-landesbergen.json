@@ -1,0 +1,129 @@
+{
+  "schemaVersion": 9,
+  "uebung": true,
+  "stand": 2171520,
+  "einheit": {
+    "organisation": 6,
+    "einheitsTyp": {
+      "freitext": "SEG-San"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Standort"
+        },
+        "name": "Landesbergen"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 1508,
+    "zeitraumBis": 1508,
+    "ortAuftrag": "Praktische Ausbildung (Übung): Einlagen Kräfte, Landeshauptstadt Hannover"
+  },
+  "personalErfassung": 1,
+  "personal": [],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "KdoW"
+      },
+      "kennzeichen": "NI",
+      "aenderungen": "-/1/1/2",
+      "funkrufname": {
+        "kennwort": {
+          "code": 4
+        },
+        "eigenerStandort": false,
+        "ort": "NI",
+        "teile": [
+          50,
+          10,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "RTW"
+      },
+      "kennzeichen": "NI",
+      "aenderungen": "-/1/1/2",
+      "funkrufname": {
+        "kennwort": {
+          "code": 4
+        },
+        "eigenerStandort": false,
+        "ort": "NI",
+        "teile": [
+          50,
+          85,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "RTW"
+      },
+      "kennzeichen": "NI",
+      "aenderungen": "-/1/1/2",
+      "funkrufname": {
+        "kennwort": {
+          "code": 4
+        },
+        "eigenerStandort": false,
+        "ort": "NI",
+        "teile": [
+          50,
+          85,
+          2
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "MTW"
+      },
+      "kennzeichen": "NI",
+      "aenderungen": "-/1/8/9",
+      "funkrufname": {
+        "kennwort": {
+          "code": 4
+        },
+        "eigenerStandort": false,
+        "ort": "NI",
+        "teile": [
+          50,
+          17,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "Anh. BHP"
+      },
+      "kennzeichen": "NI",
+      "funkrufname": {
+        "kennwort": {
+          "code": 4
+        },
+        "eigenerStandort": false,
+        "ort": "NI",
+        "teile": [
+          50,
+          90,
+          1
+        ]
+      }
+    }
+  ],
+  "staerkeManuell": {
+    "fuehrer": 0,
+    "unterfuehrer": 4,
+    "mannschaft": 11,
+    "gesamt": 15
+  },
+  "sonstiges": "Fachdienst: keine Angabe. Hauptleistung: BHP (20)."
+}

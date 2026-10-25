@@ -63,11 +63,24 @@ Wer noch abwägt: [Papier oder digital?](https://erfassungsbogen.app/papier-oder
   der Übersicht eines gerade geöffneten Bogens („In Einsatz aufnehmen"). Die App
   zählt Stärke und Bedarf über alle anwesenden Einheiten laufend zusammen (mit
   Zwischensummen je Zug), merkt sich tägliche Neumeldungen als Historie und gibt
-  alles als Sammel-PDF oder Datei an die nächste Führungsstelle weiter. Die
+  alles als Sammel-PDF oder Datei an die nächste Führungsstelle weiter. Wer dem
+  Stab laufend nachliefert, kreuzt „Nur neue Bögen seit dem letzten Export" an:
+  Sammel-PDF, CSV und Excel-Liste enthalten dann nur, was seit der letzten
+  Weitergabe dazugekommen ist, und die Zeile darüber sagt, wann das war. Die
   gemeldeten Einheiten lassen sich als Karten oder als Tabelle lesen — die
   Tabelle zeigt je Einheit eine Zeile mit Stärke, Verpflegung, Unterbringung und
   Kraftstoff, sortiert nach jeder angeklickten Spalte, mit Summenzeile darunter;
   Suche und Filter der Liste gelten für beide Sichten.
+- **Lagemonitor für den Fernseher**: ein zweites Fenster mit der Lage in großer
+  Schrift — in der ersten Zeile der optionale Funkrufname der Führungsstelle,
+  darunter der Name des Einsatzes, dann taktische Zeit (DTG), Einsatzdauer ab
+  einem von Hand gesetzten Einsatzbeginn und die Stärke (Führer/Unterführer/
+  Mannschaft). Aufklappbar darunter die Einheitentabelle mit Organisation, Ort,
+  Funkrufname, Einheitentyp und Stärke je Einheit, ohne Personennamen. Es wird auf den
+  per Kabel angeschlossenen Fernseher gezogen (erweiterter Bildschirm), hält den
+  Bildschirm wach und aktualisiert sich selbst, solange es auf dem
+  Meldekopf-Gerät läuft — ohne Netz und ohne Server. Zu finden in der
+  Einsatzansicht unter „Lagemonitor für den Fernseher".
 - **Viele QR-Bilder auf einmal**: kommen die Bögen als Fotos oder Screenshots
   herein (Messenger, Mail, Ordner auf dem Rechner), liest der Meldekopf sie im
   Stapel ein — Mehrfachauswahl auf jedem Gerät, am Rechner auch ein ganzer

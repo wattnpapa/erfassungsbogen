@@ -13,7 +13,19 @@ import {
   type Erfassungsbogen,
   type Person,
 } from "@bos/eeb-format/model";
-import { istBilddatei, qrStapelLesen, stapelBericht, type StapelDatei } from "./qr-stapel";
+import {
+  LAGE_ABGLEICH_KURZ,
+  LAGE_NACHTRAGEN_HINWEIS,
+  STIFT_HINWEIS,
+  TEILE_ABLAUF_MS,
+  TeileMerker,
+  dateiImportMeldung,
+  istBilddatei,
+  qrStapelLesen,
+  stapelBericht,
+  teileMerker,
+  type StapelDatei,
+} from "./qr-stapel";
 
 const zlib: Kompressor = {
   deflateRaw: (d) => new Uint8Array(deflateRawSync(d, { level: 9 })),
@@ -131,6 +143,83 @@ describe("qrStapelLesen", () => {
     expect(erg.funde[0]!.datei).toBe("a.jpg + c.jpg");
   });
 
+  // Audit Runde 2, R2-A2: Foto einer Bogenseite mit zwei Codes, Teile aus
+  // getrennten Durchgängen.
+  describe("Fotos ganzer Seiten und Teile über Durchgänge (R2-A2)", () => {
+    // Ein Bild mit mehreren Codes: die Texte stehen zeilenweise im Blob.
+    const mehrere = {
+      kompressor: zlib,
+      lesen: async (blob: Blob) => (await blob.text()).split("\n").filter(Boolean),
+    };
+
+    it("liest beide Codes eines Seitenfotos und setzt den Bogen zusammen", async () => {
+      const urls = segmentPayloadUrls(encodePayload(bogen("Crailsheim"), zlib), 2);
+      const erg = await qrStapelLesen([datei("foto-s8.png", `${urls[0]}\n${urls[1]}`)], mehrere);
+      expect(erg.funde).toHaveLength(1);
+      expect(einheitName(erg.funde[0]!.bogen)).toBe("Crailsheim");
+      expect(erg.funde[0]!.datei).toBe("foto-s8.png");
+      expect(erg.luecken).toEqual([]);
+    });
+
+    it("merkt ein Teil bis zum nächsten Durchgang und vervollständigt den Bogen dort", async () => {
+      const urls = segmentPayloadUrls(encodePayload(bogen("Biberach"), zlib), 3);
+      let jetzt = 1_000_000;
+      const merker = new TeileMerker(TEILE_ABLAUF_MS, () => jetzt);
+      const erster = await qrStapelLesen([datei("s9.png", `${urls[0]}\n${urls[1]}`)], { ...mehrere, merker });
+      expect(erster.funde).toEqual([]);
+      expect(erster.luecken).toEqual([
+        { dateien: ["s9.png"], haben: 2, anzahl: 3, fehlen: [3], gemerktBis: jetzt + TEILE_ABLAUF_MS },
+      ]);
+      expect(stapelBericht(erster, 0, 0).join(" ")).toContain("bleiben bis");
+      expect(merker.anzahl()).toBe(1);
+      jetzt += 10 * 60_000;
+      const zweiter = await qrStapelLesen([datei("s10.png", urls[2]!)], { ...mehrere, merker });
+      expect(zweiter.funde).toHaveLength(1);
+      expect(einheitName(zweiter.funde[0]!.bogen)).toBe("Biberach");
+      expect(zweiter.funde[0]!.datei).toBe("s9.png + s10.png");
+      expect(zweiter.luecken).toEqual([]);
+      expect(merker.anzahl()).toBe(0);
+    });
+
+    it("lässt gemerkte Teile nach Ablauf verfallen", async () => {
+      const urls = segmentPayloadUrls(encodePayload(bogen("Albstadt"), zlib), 2);
+      let jetzt = 5_000_000;
+      const merker = new TeileMerker(TEILE_ABLAUF_MS, () => jetzt);
+      await qrStapelLesen([datei("t1.png", urls[0]!)], { ...mehrere, merker });
+      jetzt += TEILE_ABLAUF_MS + 1;
+      expect(merker.anzahl()).toBe(0);
+      const erg = await qrStapelLesen([datei("t2.png", urls[1]!)], { ...mehrere, merker });
+      expect(erg.funde).toEqual([]);
+      expect(erg.luecken[0]!.fehlen).toEqual([1]);
+    });
+
+    it("verlängert die Frist nur bei einem neuen Teil", async () => {
+      const urls = segmentPayloadUrls(encodePayload(bogen("Albstadt"), zlib), 3);
+      let jetzt = 9_000_000;
+      const merker = new TeileMerker(TEILE_ABLAUF_MS, () => jetzt);
+      await qrStapelLesen([datei("t1.png", urls[0]!)], { ...mehrere, merker });
+      const anfang = jetzt;
+      jetzt += 30 * 60_000;
+      // Ein Durchgang ohne Fortschritt für diesen Bogen (dasselbe Teil noch einmal).
+      const erg = await qrStapelLesen([datei("t1b.png", urls[0]!)], { ...mehrere, merker });
+      expect(erg.luecken[0]!.gemerktBis).toBe(anfang + TEILE_ABLAUF_MS);
+    });
+
+    it("verwirft gemerkte Teile auf Wunsch", async () => {
+      const urls = segmentPayloadUrls(encodePayload(bogen("Albstadt"), zlib), 2);
+      const merker = new TeileMerker();
+      await qrStapelLesen([datei("t1.png", urls[0]!)], { ...mehrere, merker });
+      merker.verwerfen();
+      const erg = await qrStapelLesen([datei("t2.png", urls[1]!)], { ...mehrere, merker });
+      expect(erg.funde).toEqual([]);
+    });
+
+    it("führt je Einsatz einen eigenen Merker", () => {
+      expect(teileMerker("einsatz-a")).toBe(teileMerker("einsatz-a"));
+      expect(teileMerker("einsatz-a")).not.toBe(teileMerker("einsatz-b"));
+    });
+  });
+
   it("nimmt Vorlagen und fremde Codes nicht als Meldung auf", async () => {
     const erg = await qrStapelLesen(
       [datei("vorlage.png", encodeVorlagePayloadUrl(bogen("Muster"), zlib)), datei("fremd.png", "https://example.org/")],
@@ -159,9 +248,115 @@ describe("qrStapelLesen", () => {
     expect(stapelBericht(erg, 1, 0)).toContain("Abgebrochen — die restlichen Bilder wurden nicht gelesen.");
   });
 
+  it("bericht sagt nach einer Aufnahme, dass Zeiten und Abrückvermerke nachzutragen sind (R2-A1)", () => {
+    const leer = { gelesen: 4, funde: [], fehler: [], luecken: [], abgebrochen: false };
+    const t = stapelBericht(leer, 4, 0).join(" ");
+    expect(t).toContain("Eintreffzeit der neu aufgenommenen Einheiten ist die Zeit des Einlesens");
+    expect(t).toContain("Abrückvermerk, Zug und Auftrag stecken nicht im Bogen");
+    expect(t).toContain("„Lage vom Papier abgleichen…“");
+    // Nichts aufgenommen — nichts nachzutragen.
+    expect(stapelBericht(leer, 0, 4)).not.toContain(LAGE_NACHTRAGEN_HINWEIS);
+  });
+
+  it("dateiImportMeldung verweist bei eingebetteter Sammlung auf „Einsatz importieren…“ (R2-A1)", () => {
+    expect(dateiImportMeldung(2, 1)).toBe("2 Bögen aufgenommen, 1 bereits vorhanden.");
+    // Numerus statt „Bogen/Bögen" (R2-K8).
+    expect(dateiImportMeldung(1, 0)).toBe("1 Bogen aufgenommen.");
+    expect(dateiImportMeldung(4, 0, { sammlungInPdf: true })).toContain("übernommen wurden nur die Bögen");
+    expect(dateiImportMeldung(4, 0, { sammlungInPdf: true })).not.toContain(LAGE_NACHTRAGEN_HINWEIS);
+    expect(dateiImportMeldung(4, 0, { lage: true })).toContain(LAGE_NACHTRAGEN_HINWEIS);
+    expect(dateiImportMeldung(0, 4, { lage: true })).not.toContain(LAGE_NACHTRAGEN_HINWEIS);
+  });
+
+  it("bericht warnt nach einer Aufnahme vor Stiftkorrekturen auf dem Ausdruck (R2-A4)", () => {
+    const leer = { gelesen: 2, funde: [], fehler: [], luecken: [], abgebrochen: false };
+    expect(stapelBericht(leer, 1, 0)).toContain(STIFT_HINWEIS);
+    expect(STIFT_HINWEIS).toContain("von Hand geändert");
+    expect(STIFT_HINWEIS).toContain("Stand");
+    // Nichts aufgenommen — nichts zu prüfen.
+    expect(stapelBericht(leer, 0, 2)).not.toContain(STIFT_HINWEIS);
+  });
+
+  it("bericht fasst Bilder ohne Code in einer Zeile zusammen und nennt Fehlendes zuerst (R4-A6)", () => {
+    const keinCode = (n: number) => ({ datei: `s-${String(n).padStart(2, "0")}.png`, grund: "kein-code" as const, text: "Kein QR-Code im Bild gefunden." });
+    const erg = {
+      gelesen: 19,
+      funde: [],
+      fehler: Array.from({ length: 10 }, (_, i) => keinCode(i + 1)),
+      luecken: [{ dateien: ["s-03.png"], haben: 1, anzahl: 2, fehlen: [2] }],
+      abgebrochen: false,
+    };
+    const zeilen = stapelBericht(erg, 8, 0);
+    // Keine Zeile je Bogenseite.
+    expect(zeilen.filter((z) => z.includes("Kein QR-Code im Bild gefunden."))).toHaveLength(0);
+    const zusammen = zeilen.filter((z) => z.includes("10 Bilder ohne lesbaren QR-Code"));
+    expect(zusammen).toHaveLength(1);
+    // Alle Dateien sind benannt, nicht nur drei (R5-A5) …
+    for (let n = 1; n <= 10; n++) expect(zusammen[0]).toContain(`s-${String(n).padStart(2, "0")}.png`);
+    // … und die Zeile behauptet nicht mehr, Codeseiten trügen keinen Code.
+    expect(zusammen[0]).toContain("zu unscharf");
+    expect(zusammen[0]).toContain("neu fotografieren");
+    // Das fehlende Teil steht vor der Sammelzeile.
+    const luecke = zeilen.findIndex((z) => z.startsWith("Unvollständiger Bogen (mehrere QR-Codes)"));
+    expect(luecke).toBeGreaterThan(0);
+    expect(luecke).toBeLessThan(zeilen.indexOf(zusammen[0]!));
+    // Statt 10 Zeilen: Aufnahme, Lücke, Sammelzeile, zwei Hinweise.
+    expect(zeilen).toHaveLength(5);
+  });
+
+  it("bericht nennt bei mehr als zwölf Bildern ohne Code den Rest als Zahl (R5-A5)", () => {
+    const erg = {
+      gelesen: 20,
+      funde: [],
+      fehler: Array.from({ length: 15 }, (_, i) => ({ datei: `f-${i + 1}.jpg`, grund: "kein-code" as const, text: "Kein QR-Code im Bild gefunden." })),
+      luecken: [],
+      abgebrochen: false,
+    };
+    const zeile = stapelBericht(erg, 5, 0).find((z) => z.includes("15 Bilder ohne lesbaren QR-Code"))!;
+    expect(zeile).toContain("f-12.jpg");
+    expect(zeile).not.toContain("f-13.jpg");
+    expect(zeile).toContain("und 3 weitere");
+  });
+
+  it("bericht: zwei Bilder ohne Code und sonst nichts bleiben einzeln benannt — der Helfer muss wissen, welches Foto fehlte (R4-A6)", () => {
+    const erg = {
+      gelesen: 2,
+      funde: [],
+      fehler: [
+        { datei: "a.jpg", grund: "kein-code" as const, text: "Kein QR-Code im Bild gefunden." },
+        { datei: "b.jpg", grund: "kein-code" as const, text: "Kein QR-Code im Bild gefunden." },
+      ],
+      luecken: [],
+      abgebrochen: false,
+    };
+    const zeilen = stapelBericht(erg, 0, 0);
+    expect(zeilen).toContain("a.jpg: Kein QR-Code im Bild gefunden.");
+    expect(zeilen).toContain("b.jpg: Kein QR-Code im Bild gefunden.");
+  });
+
+  it("bericht verweist kurz auf den Abgleich darunter, statt den langen Hinweis zu wiederholen (R4-A6)", () => {
+    const leer = { gelesen: 2, funde: [], fehler: [], luecken: [], abgebrochen: false };
+    const kurz = stapelBericht(leer, 4, 0, undefined, true);
+    expect(kurz).toContain(LAGE_ABGLEICH_KURZ);
+    expect(kurz).not.toContain(LAGE_NACHTRAGEN_HINWEIS);
+    expect(kurz).toContain(STIFT_HINWEIS);
+    expect(LAGE_ABGLEICH_KURZ.length).toBeLessThan(LAGE_NACHTRAGEN_HINWEIS.length / 2);
+    expect(stapelBericht(leer, 4, 0)).toContain(LAGE_NACHTRAGEN_HINWEIS);
+  });
+
   it("bericht nennt Aufnahme und Dubletten", () => {
     const zeilen = stapelBericht({ gelesen: 5, funde: [], fehler: [], luecken: [], abgebrochen: false }, 3, 2);
     expect(zeilen[0]).toBe("5 Bilder gelesen — 3 Bögen aufgenommen, 2 bereits vorhanden.");
+  });
+
+  it("bericht zählt Dateien desselben Stapels mit und nennt die kaputte Datei (R3-E4)", () => {
+    const bild = { gelesen: 1, funde: [], fehler: [{ datei: "foto.png", grund: "kein-code" as const, text: "Kein QR-Code im Bild gefunden." }], luecken: [], abgebrochen: false };
+    const zeilen = stapelBericht(bild, 0, 0, { anzahl: 2, neu: 1, uebersprungen: 0, zeilen: ["„abgeschnitten.json“ ist beschädigt."] });
+    expect(zeilen[0]).toBe("2 Dateien und 1 Bild gelesen — 1 Bogen aufgenommen.");
+    expect(zeilen).toContain("„abgeschnitten.json“ ist beschädigt.");
+    expect(zeilen).toContain("foto.png: Kein QR-Code im Bild gefunden.");
+    // Keine Zeile sagt „0 Bögen aufgenommen", wenn ein Bogen ankam.
+    expect(zeilen.join(" ")).not.toMatch(/0 Bögen aufgenommen/);
   });
 });
 

@@ -9,7 +9,10 @@
  *  - SUCHE: alle Wörter müssen treffen (UND), Groß/Klein und Akzente egal.
  *    Gesucht wird über das, was auf der Karte bzw. im Funkverkehr steht —
  *    Einheit, Organisation, Ort/Zugehörigkeit, Zug- und Teil-Etikett,
- *    Kennzeichen und Funkrufname. Nicht über Personennamen: die Liste ist eine
+ *    Kennzeichen und Funkrufname, Auftrag/Notiz der Führungsstelle und der
+ *    Ort/Auftrag des Bogens (Audit Runde 2, R2-K8: „Deich" fand 0 Einheiten,
+ *    obwohl „Deichabschnitt Nord" auf einer Karte stand) sowie die Bemerkung
+ *    der Einheit („Sonstiges", Audit Runde 3, R3-K3). Nicht über Personennamen: die Liste ist eine
  *    Einheitenliste, und die Namen stehen ausgeklappt in den Details.
  *  - QUALIFIKATION: „welche Einheit hat mir Atemschutzgeräteträger gemeldet?"
  *    Filtert auf Einheiten mit mindestens einer passenden Person und nennt
@@ -23,14 +26,22 @@
  */
 
 import { OrganisationsTyp, alleFahrerlaubnisse, type Person } from "@bos/eeb-format/model";
-import type { MeldeEintrag } from "@bos/meldekopf/einsaetze";
+import { MeldeStatus, type MeldeEintrag } from "@bos/meldekopf/einsaetze";
 import { FE_EINGESCHLOSSEN, FE_TEXT, einheitAnzeigename, funkrufText, kennzeichenText, orgLabel, vokabularFuer } from "./hilfen";
+import { eintreffzeit } from "./eintrag-zeiten";
 
-export type EinheitenSortierung = "name" | "eintreffzeit" | "zug" | "organisation";
+export type EinheitenSortierung = "nummer" | "name" | "zuletzt" | "eintreffzeit" | "zug" | "organisation";
 
 export const SORTIERUNGEN: { wert: EinheitenSortierung; label: string }[] = [
+  // Die Nummer, die am Funk genannt wird und das Lageblatt ordnet (R7-K9).
+  { wert: "nummer", label: "Nr. (wie auf dem Lageblatt)" },
   { wert: "name", label: "Name (A–Z)" },
-  { wert: "eintreffzeit", label: "Eintreffzeit (neueste zuerst)" },
+  // „Zuletzt gemeldet" ordnet nach dem Eingang der aktuellen Fassung, auch
+  // einer Folgemeldung. Die Eintreffzeit vererbt sich auf die Folgemeldung
+  // (R2-K1); eine frische Fassung mit drei Helfern weniger stand darin auf
+  // dem letzten Platz (Audit Runde 3, R3-K1).
+  { wert: "zuletzt", label: "Zuletzt gemeldet (neueste zuerst)" },
+  { wert: "eintreffzeit", label: "Eintreffzeit vor Ort (neueste zuerst)" },
   { wert: "zug", label: "Zug" },
   { wert: "organisation", label: "Organisation" },
 ];
@@ -56,6 +67,11 @@ function suchtext(e: MeldeEintrag): string {
     e.teilEtikett ?? "",
     ...einheit.hierarchie.flatMap((h) => [h.name, h.kurz ?? ""]),
     ...e.bogen.fahrzeuge.flatMap((f) => [kennzeichenText(f), funkrufText(f, einheit)]),
+    e.notiz ?? "",
+    e.bogen.einsatz.ortAuftrag,
+    // Freitext der Einheit („Ölsperre verbraucht, Nachschub nötig"): die
+    // Suche „Nachschub" fand 0 von 14 (Audit Runde 3, R3-K3).
+    e.bogen.sonstiges ?? "",
   ];
   return normalisiere(teile.filter(Boolean).join(" "));
 }
@@ -193,17 +209,33 @@ function nameVergleich(a: MeldeEintrag, b: MeldeEintrag): number {
 
 /**
  * Sortierte Kopie der Liste. „zug" stellt Einheiten ohne Etikett ans Ende
- * (wie die Zwischensummen in auswertung.ts), „eintreffzeit" zeigt die zuletzt
- * eingetroffene Meldung oben — das ist beim Meldekopf das Neue.
+ * (wie die Zwischensummen in auswertung.ts), „zuletzt" die zuletzt
+ * eingegangene Fassung oben (auch eine Folgemeldung), „eintreffzeit" die
+ * zuletzt vor Ort eingetroffene Einheit.
  */
 export function einheitenSortieren(
   eintraege: MeldeEintrag[],
   sortierung: EinheitenSortierung,
+  /** Laufende Nummern je Einheitsschlüssel (meldungsNummern) — nur für „nummer". */
+  nummern?: ReadonlyMap<string, number>,
 ): MeldeEintrag[] {
   const liste = [...eintraege];
   switch (sortierung) {
-    case "eintreffzeit":
+    case "nummer":
+      // Ohne Nummer ans Ende; sonst aufsteigend wie das Lageblatt.
+      return liste.sort((a, b) => {
+        const na = nummern?.get(a.einheitSchluessel) ?? Number.MAX_SAFE_INTEGER;
+        const nb = nummern?.get(b.einheitSchluessel) ?? Number.MAX_SAFE_INTEGER;
+        return na - nb || nameVergleich(a, b);
+      });
+    case "zuletzt":
+      // Eingang der aktuellen Fassung (Geräteuhr), nicht das Eintreffen.
       return liste.sort((a, b) => b.empfangenAm - a.empfangenAm || nameVergleich(a, b));
+    case "eintreffzeit":
+      // Die korrigierte Eintreffzeit, nicht der Empfangsmoment: wer einen
+      // Papierstapel nachträgt, hat alle Bögen in derselben Minute erfasst —
+      // geordnet werden soll nach dem Eintreffen der Einheit.
+      return liste.sort((a, b) => eintreffzeit(b) - eintreffzeit(a) || nameVergleich(a, b));
     case "zug":
       return liste.sort((a, b) => {
         const za = a.zugEtikett ?? "";
@@ -234,9 +266,20 @@ export function einheitenAnsicht(
   suche: string,
   sortierung: EinheitenSortierung,
   qualifikation = "",
+  nummern?: ReadonlyMap<string, number>,
 ): MeldeEintrag[] {
   return einheitenSortieren(
     nachQualifikationFiltern(einheitenFiltern(eintraege, suche), qualifikation),
     sortierung,
+    nummern,
   );
+}
+
+/** Einschränkung auf Einheiten, denen noch etwas fehlt (R7-K6). */
+export type LueckenFilter = "ohne-auftrag" | "ohne-zug";
+
+/** Ohne Auftrag/Notiz bzw. ohne Zug — nur anwesende Einheiten; abgerückte brauchen keinen Auftrag mehr. */
+export function passtZuLueckenfilter(e: MeldeEintrag, f: LueckenFilter): boolean {
+  if (e.status !== MeldeStatus.ANWESEND) return false;
+  return f === "ohne-auftrag" ? !(e.notiz ?? "").trim() : !(e.zugEtikett ?? "").trim();
 }

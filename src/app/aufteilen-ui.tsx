@@ -13,18 +13,12 @@ import { PersonalErfassung, staerke, type Erfassungsbogen } from "@bos/eeb-forma
 import { aufteilungFehler, teileBogen, type AufteilungsWahl, type TeilStaerke } from "@bos/meldekopf/aufteilen";
 import { MeldeStatus, type AufteilungOptionen, type MeldeEintrag } from "@bos/meldekopf/einsaetze";
 import { funktionsText, kennzeichenText, vokabText, vokabularFuer } from "./hilfen";
-import { Auswahl } from "./schritte/bausteine";
+import { Auswahl, ZahlEingabe } from "./schritte/bausteine";
 
 /** Kurzfassung „0 / 1 / 8 / 9 · 2 Fzg" für die Vorschau beider Hälften. */
 function bilanz(b: Erfassungsbogen): string {
   const s = staerke(b);
   return `${s.fuehrer} / ${s.unterfuehrer} / ${s.mannschaft} / ${s.gesamt} · ${b.fahrzeuge.length} Fzg`;
-}
-
-/** Zahl aus einem Eingabefeld; leer oder Unsinn zählt als 0. */
-function zahl(text: string): number {
-  const n = Number.parseInt(text, 10);
-  return Number.isFinite(n) ? n : 0;
 }
 
 function AnkreuzZeile(props: { an: boolean; umschalten: () => void; name: string; sub?: string }) {
@@ -85,14 +79,7 @@ export function AufteilenPanel(props: {
     return (
       <label className="feld">
         {label} (von {hoechstens})
-        <input
-          type="number"
-          inputMode="numeric"
-          min={0}
-          max={hoechstens}
-          value={String(wert)}
-          onChange={(e) => setzen(zahl(e.target.value))}
-        />
+        <ZahlEingabe inputMode="numeric" min={0} max={hoechstens} wert={wert} setzen={(n) => setzen(n)} />
       </label>
     );
   }
@@ -135,13 +122,13 @@ export function AufteilenPanel(props: {
           </div>
           {zeigeUnterbringung && (
             <div className="zeile">
-              {staerkeFeld("Unterbringung M", unterbringung.m, bogen.unterbringungManuell!.m, (n) =>
+              {staerkeFeld("Unterbringung männlich", unterbringung.m, bogen.unterbringungManuell!.m, (n) =>
                 setUnterbringung({ ...unterbringung, m: n }),
               )}
-              {staerkeFeld("W", unterbringung.w, bogen.unterbringungManuell!.w, (n) =>
+              {staerkeFeld("weiblich", unterbringung.w, bogen.unterbringungManuell!.w, (n) =>
                 setUnterbringung({ ...unterbringung, w: n }),
               )}
-              {staerkeFeld("D", unterbringung.d, bogen.unterbringungManuell!.d, (n) =>
+              {staerkeFeld("divers", unterbringung.d, bogen.unterbringungManuell!.d, (n) =>
                 setUnterbringung({ ...unterbringung, d: n }),
               )}
             </div>

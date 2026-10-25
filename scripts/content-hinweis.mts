@@ -76,6 +76,9 @@ function inject(inhalt: string): string {
   const blockMuster = /<!-- HINWEIS:START -->[\s\S]*?<!-- HINWEIS:END -->/;
   if (blockMuster.test(neu)) {
     neu = neu.replace(blockMuster, HINWEIS_HTML);
+  } else if (neu.includes("<!-- WERKZEUGE:START -->")) {
+    // Die Werkzeugzeile (content-nav.mts) bleibt die letzte Zeile der Fußzeile.
+    neu = neu.replace("<!-- WERKZEUGE:START -->", `${HINWEIS_HTML}\n      <!-- WERKZEUGE:START -->`);
   } else {
     neu = neu.replace("</footer>", `  ${HINWEIS_HTML}\n    </footer>`);
   }

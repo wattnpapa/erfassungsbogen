@@ -18,8 +18,31 @@
  * Eine Spalte der Vorlage fehlt hier ganz: „Status". Die Einsatzkräfte-Übersicht
  * der Führungsstelle führt eigene Statuswerte; das „Anwesend" aus der Sammlung
  * gehört nicht dazu und stand dort als Fremdkörper. Das Blatt endet dadurch auf
- * AJ statt AK. Wer den Meldestatus braucht, liest ihn in der App — im Blatt
- * stehen abgerückte und aufgegangene Einheiten jetzt wie anwesende.
+ * AJ statt AK.
+ *
+ * Was NICHT in die Lage zählt (abgerückt, aufgegangen, Übungsbogen in einer
+ * echten Lage — dieselbe Regel wie App, Lageblatt und CSV, siehe
+ * aktuelleMeldungen), steht in einem eigenen, überschriebenen Block UNTER dem
+ * Summenbereich, mit dem Grund in „Bemerkung" und der Abrückzeit in
+ * „Einsatz-ende". Bis dahin standen diese Einheiten ohne Kennzeichen zwischen
+ * den anwesenden, und die SUBTOTAL-Summen zählten sie mit: 115 statt der 112
+ * aus der App (Audit Runde 2, R2-K2). Warum ein eigener Block statt eines
+ * voreingestellten Filters: ein Autofilter mit ausgeblendeten Zeilen wird beim
+ * Kopieren in die laufende Liste nicht mitgenommen, hängt an der Bedienung des
+ * Empfängers (Filter aufheben = Summe wieder falsch) und versteckt die
+ * Abgerückten erneut — das Gegenteil von „sichtbar". Weglassen hätte die Zahl
+ * gestimmt, aber der Empfänger hätte eine Lücke gesehen, die er nicht als Lücke
+ * erkennt. Der Block liegt außerhalb der Summenformeln, bleibt also bei jedem
+ * Filter draußen, und seine Überschrift sagt, dass er nicht mitgezählt ist.
+ * „Rück-führung" bleibt leer: die ordnet die Führungsstelle an und trägt sie
+ * selbst ein; das Abrücken am Meldekopf ist das Einsatzende der Einheit.
+ *
+ * Zeiten und Auftrag des Meldekopfs (eintrag-zeiten.ts) gehen mit:
+ * Eintreffzeit → „eingetr. / zugew.", Auftrag/Notiz der Führungsstelle →
+ * „Aufträge". Den Ort/Auftrag, den die Einheit selbst in ihren Bogen
+ * geschrieben hat (wofür sie alarmiert wurde), trägt „Vorgesehener Auftrag" —
+ * in „Aufträge" las er sich wie ein Auftrag von hier, auch wenn er aus einem
+ * früheren Einsatz stammte (R2-K2).
  *
  * Enthält keine Personennamen, aber Kontaktdaten der Führungskraft
  * (Erreichbarkeit) — bleibt wie alle Exporte rein lokal.
@@ -30,12 +53,14 @@
 
 import {
   ansprechpartner,
+  datumZuIso,
   staerke,
   unterbringungMWD,
   verpflegung,
   type Erfassungsbogen,
 } from "@bos/eeb-format/model";
 import {
+  datumDeutsch,
   einheitAnzeigename,
   einheitOrt,
   kontaktText,
@@ -45,6 +70,7 @@ import {
 } from "./hilfen";
 import {
   XLSX_MIME,
+  excelAusMs,
   excelDatum,
   excelZeitpunkt,
   mappeBauen,
@@ -52,7 +78,17 @@ import {
   zeileXml,
   type Zelle,
 } from "./xlsx";
-import { bogenInhaltsId, neuesteJeEinheit, type Einsatzsammlung, type MeldeEintrag } from "@bos/meldekopf/einsaetze";
+import {
+  MeldeStatus,
+  bogenInhaltsId,
+  type Einsatzsammlung,
+  type MeldeEintrag,
+} from "@bos/meldekopf/einsaetze";
+import { geltendeJeEinheit } from "./fassung-vorrang";
+import { zaehltInLage } from "./auswertung";
+import { datumVonMs, lueckenAlle, pruefpunkteEintrag } from "./einheiten-tabelle";
+import { eintreffzeit, zeitLang } from "./eintrag-zeiten";
+import { nachtragGrundText, ortHinweisText, ortHinweise, type NachtragGrund } from "./export-stand";
 
 export { XLSX_MIME };
 
@@ -139,6 +175,12 @@ const STILE =
 const STIL_DATUM = 29;
 /** Stilnummer für Zellen mit Zeilenumbruch (Fahrzeugliste). */
 const STIL_UMBRUCH = 30;
+/**
+ * Überschrift des Blocks „nicht in der Lage gezählt" — fett mit der
+ * Pfirsich-Füllung der Vorlage, damit sie sich von den Datenzeilen abhebt, ohne
+ * eine neue Farbe in die Liste der Führungsstelle zu bringen.
+ */
+const STIL_BLOCKKOPF = 7;
 
 /**
  * Breite der Datumsspalten. „14.05.2026 08:30" braucht rund 16 Zeichen; in der
@@ -286,6 +328,22 @@ interface Kontext {
   teil?: string;
   /** Eintrags-ID der Sammlung; ohne Sammlung der Inhalts-Hash des Bogens. */
   id?: string;
+  /** Eintreffzeit laut Meldekopf (Date.now()); ersetzt den Einsatzbeginn des Bogens. */
+  eingetroffenAm?: number;
+  /** Abrückzeit laut Meldekopf (Date.now()); ersetzt das Einsatzende des Bogens. */
+  abgerueckAm?: number;
+  /** Auftrag/Notiz der Führungsstelle. */
+  auftrag?: string;
+  /** Offene Punkte der Meldung (Rückfragen, R4-K8); reisen in die Bemerkung. */
+  rueckfragen?: string[];
+  /** Statusvermerk für „Bemerkung", z. B. „ABGERÜCKT". */
+  status?: string;
+  /** Zählt nicht in die Lage — „Bemerkung" sagt es ausdrücklich. */
+  zaehltNicht?: boolean;
+  /** Nachtrag: warum die Zeile dabei ist, z. B. „geändert: Zug" (R5-W7). */
+  nachtrag?: string;
+  /** Der Ort, den der Bogen nennt, wenn er nicht zur Lage zu passen scheint (R5-K5). */
+  fremderOrt?: string;
 }
 
 function zeileFuer(b: Erfassungsbogen, k: Kontext): Zeile {
@@ -297,6 +355,13 @@ function zeileFuer(b: Erfassungsbogen, k: Kontext): Zeile {
   const u = unterbringungMWD(b);
   const sb = b.sofortbedarf;
   const ebene = ebeneVon(lang, st.gesamt);
+  // Ein Bogen, dessen Einsatzzeitraum vor dem Eintreffen endete, stammt aus einer
+  // früheren Lage: „Verfügbar bis" bleibt leer, die Bemerkung sagt warum — ein
+  // Datum von vor Monaten sah in der Liste wie eine Zusage aus (R4-W6).
+  const zeitraumVorbei =
+    k.eingetroffenAm != null &&
+    b.einsatz.zeitraumBis >= b.einsatz.zeitraumVon &&
+    b.einsatz.zeitraumBis < datumVonMs(k.eingetroffenAm);
   // ÜN nur, wenn Unterbringung überhaupt angefordert ist — sonst stünden dort
   // Betten für Einheiten, die abends nach Hause fahren.
   const uen = sb?.unterbringung ? u : { m: 0, w: 0, d: 0 };
@@ -314,14 +379,41 @@ function zeileFuer(b: Erfassungsbogen, k: Kontext): Zeile {
     gruppe: ebene === "gruppe" ? kurz : "",
     person: ebene === "person" ? kurz : "",
     geraete: geraeteText(b),
-    auftraege: b.einsatz.ortAuftrag,
+    // „Aufträge" gehört dem Auftrag der Führungsstelle; was die Einheit selbst
+    // als Ort/Auftrag gemeldet hat, ist der Auftrag, für den sie vorgesehen
+    // wurde (R2-K2, siehe Dateikopf).
+    auftraege: k.auftrag ?? "",
     erreichbarkeit: erreichbarkeitText(b),
-    verfuegbarBis: excelDatum(b.einsatz.zeitraumBis),
-    eingetroffen: b.einsatz.einsatzbeginn != null ? excelZeitpunkt(b.einsatz.einsatzbeginn) : "",
-    einsatzende: b.einsatz.einsatzende != null ? excelZeitpunkt(b.einsatz.einsatzende) : "",
-    // Übung zuerst: eine Übungsmeldung darf in der Liste der Führungsstelle
-    // nicht wie eine echte aussehen (siehe uebung im Datenmodell).
-    bemerkung: [b.uebung === true ? "ÜBUNG" : "", b.sonstiges ?? ""].filter(Boolean).join(" — "),
+    verfuegbarBis: zeitraumVorbei ? "" : excelDatum(b.einsatz.zeitraumBis),
+    vorgesehenerAuftrag: b.einsatz.ortAuftrag,
+    // Die Zeiten des Meldekopfs sind die gelebten; der Bogen trägt nur, was
+    // die Einheit selbst eingetragen hat (beim Einzelbogen das einzige).
+    eingetroffen:
+      k.eingetroffenAm != null
+        ? excelAusMs(k.eingetroffenAm)
+        : b.einsatz.einsatzbeginn != null
+          ? excelZeitpunkt(b.einsatz.einsatzbeginn)
+          : "",
+    einsatzende:
+      k.abgerueckAm != null
+        ? excelAusMs(k.abgerueckAm)
+        : b.einsatz.einsatzende != null
+          ? excelZeitpunkt(b.einsatz.einsatzende)
+          : "",
+    // Status und Übung zuerst: eine abgerückte oder Übungsmeldung darf in der
+    // Liste der Führungsstelle nicht wie eine zählende aussehen.
+    bemerkung: [
+      k.status ?? "",
+      k.nachtrag ? `Nachtrag: ${k.nachtrag}` : "",
+      k.fremderOrt ? ortHinweisText(k.fremderOrt) : "",
+      b.uebung === true ? "ÜBUNG" : "",
+      k.zaehltNicht ? "zählt nicht in der Lage" : "",
+      zeitraumVorbei ? `Einsatzzeitraum im Bogen endete ${datumDeutsch(datumZuIso(b.einsatz.zeitraumBis))} — Bogen aus früherer Lage?` : "",
+      k.rueckfragen?.length ? `Hinweise: ${lueckenAlle(k.rueckfragen)}` : "",
+      b.sonstiges ?? "",
+    ]
+      .filter(Boolean)
+      .join(" — "),
     bogenId: k.id ?? bogenInhaltsId(b),
     weiblich: u.w,
     divers: u.d,
@@ -344,11 +436,17 @@ function zeileFuer(b: Erfassungsbogen, k: Kontext): Zeile {
  * auslässt — filtert die Führungsstelle auf eine Organisation, stimmt die Summe
  * oben sofort für diese Auswahl.
  */
-function leisteZeile(letzteZeile: number): string {
+function leisteZeile(letzteZeile: number, zeilen: Zeile[], kennzeichen?: string): string {
   const zellen: Zelle[] = SPALTEN.map((sp, i) => ({
     spalte: i,
     stil: sp.leisteStil,
-    wert: sp.leiste,
+    // Summenspalten: das Ergebnis gleich mit (ohne Filter = Summe aller
+    // zählenden Zeilen), damit nicht rechnende Vorschauen es zeigen (R3-K7).
+    wert: sp.summe
+      ? zeilen.reduce((n, z) => n + (typeof z[sp.id] === "number" ? (z[sp.id] as number) : 0), 0)
+      : i === 0 && kennzeichen
+        ? kennzeichen
+        : sp.leiste,
     formel: sp.summe ? `SUBTOTAL(9,${spaltenName(i)}${ERSTE_DATENZEILE}:${spaltenName(i)}${letzteZeile})` : undefined,
   }));
   return zeileXml(1, zellen);
@@ -383,12 +481,48 @@ function spaltenBreitenXml(): string {
   return `<cols>${cols}</cols>`;
 }
 
-function blattBauen(zeilen: Zeile[]): Uint8Array<ArrayBuffer> {
-  const letzteZeile = Math.max(ERSTE_DATENZEILE, ERSTE_DATENZEILE + zeilen.length - 1);
+/** Überschrift über dem Block der nicht zählenden Einheiten. */
+export function blockKopfText(anzahl: number): string {
+  return (
+    `Nicht in der Lage gezählt (abgerückt, aufgegangen oder Übung) — ${anzahl} Einheit(en), ` +
+    "in den Summen oben NICHT enthalten"
+  );
+}
+
+/**
+ * `zeilen` sind die zählenden Einheiten — nur über sie laufen die
+ * SUBTOTAL-Summen. `ausserhalb` folgt nach einer Leerzeile und einer
+ * Überschrift darunter, außerhalb jeder Formel (R2-K2).
+ */
+function blattBauen(
+  zeilen: Zeile[],
+  bloecke: { kopf: string; zeilen: Zeile[] }[] = [],
+  /** Nachtrag: steht in der Hinweisleiste (A1), weil dort die Summen sind (R5-K6). */
+  kennzeichen?: string,
+  /** Nachtrag: ausführlicher Hinweis in einer Schlusszeile — A1 ist nur drei Spalten breit. */
+  fuss?: string,
+): Uint8Array<ArrayBuffer> {
+  const summenEnde = Math.max(ERSTE_DATENZEILE, ERSTE_DATENZEILE + zeilen.length - 1);
+  const xml = [leisteZeile(summenEnde, zeilen, kennzeichen), kopfZeile(), ...zeilen.map((z, i) => datenZeile(z, ERSTE_DATENZEILE + i))];
+  let letzteZeile = summenEnde;
+  // Jeder Block steht nach einer Leerzeile unter dem vorigen, außerhalb jeder Formel.
+  for (const block of bloecke.filter((x) => x.zeilen.length > 0)) {
+    // Eine Leerzeile trennt den Block: Excel beendet dort die „aktuelle
+    // Region", ein Autofilter oder Strg+A über die Liste greift ihn also nicht
+    // versehentlich mit.
+    const kopfNr = letzteZeile + 2;
+    xml.push(zeileXml(kopfNr, [{ spalte: 0, wert: block.kopf, stil: STIL_BLOCKKOPF }]));
+    block.zeilen.forEach((z, i) => xml.push(datenZeile(z, kopfNr + 1 + i)));
+    letzteZeile = kopfNr + block.zeilen.length;
+  }
+  if (fuss) {
+    letzteZeile += 2;
+    xml.push(zeileXml(letzteZeile, [{ spalte: 0, wert: fuss, stil: STIL_BLOCKKOPF }]));
+  }
   return mappeBauen(
     {
       name: "Tabelle1",
-      zeilen: [leisteZeile(letzteZeile), kopfZeile(), ...zeilen.map((z, i) => datenZeile(z, ERSTE_DATENZEILE + i))],
+      zeilen: xml,
       bereich: `A1:${spaltenName(SPALTEN.length - 1)}${letzteZeile}`,
       spalten: spaltenBreitenXml(),
       verbund: ["A1:C1"],
@@ -406,20 +540,76 @@ export function bogenOldenburgXlsx(b: Erfassungsbogen): Uint8Array<ArrayBuffer> 
 
 /**
  * Einsatz-Sammlung → XLSX-Bytes: je gemeldeter Einheit eine Zeile in ihrer
- * neuesten Revision, nach Anzeigename sortiert. Auch abgerückte und aufgegangene
- * Einheiten sind dabei, seit dem Ausbau der Status-Spalte aber ohne Kennzeichen:
- * das Blatt zeigt sie wie anwesende. Die SUBTOTAL-Summen oben folgen dem Filter,
- * den die Führungsstelle setzt.
+ * neuesten Revision, nach Anzeigename sortiert. Oben die Einheiten, die in die
+ * Lage zählen — die SUBTOTAL-Summen ergeben damit dieselben Zahlen wie die App
+ * und folgen trotzdem dem Filter, den die Führungsstelle setzt. Darunter, in
+ * einem eigenen Block außerhalb der Summen, die abgerückten, aufgegangenen und
+ * (in einer echten Lage) die Übungsmeldungen (R2-K2).
  */
 export function einsatzOldenburgXlsx(s: Einsatzsammlung): Uint8Array<ArrayBuffer> {
-  const meldungen = neuesteJeEinheit(s.eintraege).sort(
+  const meldungen = geltendeJeEinheit(s.eintraege).sort(
     (a, b) =>
       einheitAnzeigename(a.bogen.einheit).localeCompare(einheitAnzeigename(b.bogen.einheit), "de") ||
       (a.teilEtikett ?? "").localeCompare(b.teilEtikett ?? "", "de"),
   );
-  return blattBauen(meldungen.map((e) => zeileFuer(e.bogen, kontextAus(e))));
+  // Dieselbe Regel wie aktuelleMeldungen (App-Summen, CSV, Sammel-PDF).
+  const zaehlt = (e: MeldeEintrag) => e.status === MeldeStatus.ANWESEND && zaehltInLage(s.art, e.bogen);
+  const gruende = s.nachtragGruende;
+  const orte = ortHinweise(s);
+  const zeile = (e: MeldeEintrag) => zeileFuer(e.bogen, kontextAus(s, e, zaehlt(e), gruende?.[e.einheitSchluessel], orte[e.einheitSchluessel]));
+  const nichtGezaehlt = meldungen.filter((e) => !zaehlt(e));
+  if (!gruende) return blattBauen(meldungen.filter(zaehlt).map(zeile), [{ kopf: blockKopfText(nichtGezaehlt.length), zeilen: nichtGezaehlt.map(zeile) }]);
+  // Nachtrag (R5-K6, R5-W7): Die Summen in Zeile 1 gelten nur für die NEUEN
+  // Einheiten; die geänderten stehen darunter und ersetzen ihre Zeile der letzten
+  // Lieferung. Die Leiste sagt, dass die Datei nur ein Teil der Lage ist.
+  const neu = meldungen.filter((e) => zaehlt(e) && gruende[e.einheitSchluessel]?.neu);
+  const geaendert = meldungen.filter((e) => zaehlt(e) && !gruende[e.einheitSchluessel]?.neu);
+  const seit = s.nachtragSeit != null ? ` seit ${zeitLang(s.nachtragSeit)}` : "";
+  return blattBauen(
+    neu.map(zeile),
+    [
+      { kopf: nachtragBlockKopfText(geaendert.length), zeilen: geaendert.map(zeile) },
+      { kopf: blockKopfText(nichtGezaehlt.length), zeilen: nichtGezaehlt.map(zeile) },
+    ],
+    "NACHTRAG – Teil der Lage",
+    `NACHTRAG${seit} — nicht die ganze Lage. „Summe Nachtrag“ (Zeile 1) zählt nur die neuen Einheiten; geänderte Einheiten ersetzen ihre Zeile der letzten Lieferung.`,
+  );
 }
 
-function kontextAus(e: MeldeEintrag): Kontext {
-  return { zug: e.zugEtikett, teil: e.teilEtikett, id: e.id };
+/** Überschrift über den geänderten Einheiten eines Nachtrags (R5-W7). */
+export function nachtragBlockKopfText(anzahl: number): string {
+  return `Geänderte Einheiten (${anzahl}) — ersetzen ihre Zeile der letzten Lieferung, in den Summen oben NICHT enthalten`;
+}
+
+/** „ABGERÜCKT" / „AUFGEGANGEN in …" für die Bemerkung; anwesend = nichts. */
+function statusVermerk(s: Einsatzsammlung, e: MeldeEintrag): string | undefined {
+  if (e.status === MeldeStatus.ABGERUECKT) return "ABGERÜCKT";
+  if (e.status === MeldeStatus.AUFGEGANGEN) {
+    const zielSchluessel = e.aufgegangenIn?.einheitSchluessel;
+    const ziel = zielSchluessel ? s.eintraege.find((x) => x.einheitSchluessel === zielSchluessel) : undefined;
+    return ziel ? `AUFGEGANGEN in ${einheitAnzeigename(ziel.bogen.einheit)}` : "AUFGEGANGEN";
+  }
+  return undefined;
+}
+
+function kontextAus(s: Einsatzsammlung, e: MeldeEintrag, zaehlt: boolean, grund?: NachtragGrund, fremderOrt?: string): Kontext {
+  return {
+    fremderOrt,
+    nachtrag: grund ? nachtragGrundText(grund) : undefined,
+    zug: e.zugEtikett,
+    teil: e.teilEtikett,
+    id: e.id,
+    eingetroffenAm: eintreffzeit(e),
+    abgerueckAm: e.status === MeldeStatus.ABGERUECKT ? e.abgerueckAm : undefined,
+    auftrag: e.notiz,
+    // Nur, wo die Meldung zählt — wie an der Karte; für Abgerückte und Übungen wäre die Rückfrage Lärm.
+    rueckfragen: zaehlt
+      ? pruefpunkteEintrag(e)
+          // Die Zeitraum-Rückfrage sagt „Bogen aus früherer Lage?" schon in ihrer eigenen Zeile.
+          .filter((p) => !/^Einsatzzeitraum .* ist vorbei/.test(p.text))
+          .map((p) => p.text)
+      : [],
+    status: statusVermerk(s, e),
+    zaehltNicht: !zaehlt,
+  };
 }

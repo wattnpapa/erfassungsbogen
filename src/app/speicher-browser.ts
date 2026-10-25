@@ -8,8 +8,13 @@
  * die Datenschutzfrist herein (siehe datenschutz-uhr.ts).
  */
 
-import { datenschutzUhrSetzen, speicherhuelleSetzen, type Speicherhuelle } from "@bos/meldekopf/einsaetze";
+import { datenschutzUhrSetzen, einsaetzeZuJson, speicherhuelleSetzen, type Speicherhuelle } from "@bos/meldekopf/einsaetze";
 import { datenschutzZeitpunkt } from "./datenschutz-uhr";
+import { istNativ } from "./nativ";
+import { wertvolleDaten } from "./sicherung";
+import { aufraeumBeobachter } from "./aufraeum-hinweis";
+import { schonendeHuelle } from "./speicher-schonend";
+import { uhrKorrigierteHuelle } from "./uhr-korrektur";
 
 /** `localStorage`, sofern erreichbar — im Privatmodus oder bei blockiertem
  *  Speicher wirft schon der Zugriff auf die Eigenschaft. */
@@ -23,6 +28,69 @@ export function browserSpeicherhuelle(): Speicherhuelle | null {
 
 /** Einmal beim Start aufrufen, bevor die Sammlung gelesen wird. */
 export function speicherVerdrahten(): void {
-  speicherhuelleSetzen(browserSpeicherhuelle());
+  // Beobachter merkt sich ruhende Sammlungen, bevor der Kern sie nach 90
+  // Tagen still löscht — die Startseite nennt sie danach (Audit Runde 2, R2-D5).
+  // Außen die schonende Hülle: Gleiches wird nicht neu geschrieben, und ein
+  // scheiterndes Zurückschreiben beim bloßen Lesen lässt die Anzeige stehen
+  // (Audit Runde 3, R3-O2). Dazwischen die Uhrkorrektur: Geht die Geräteuhr
+  // unplausibel vor, sieht der Kern die geprüfte Uhr und löscht nichts
+  // (Audit Runde 4, R4-D1, uhr-korrektur.ts).
+  const h = browserSpeicherhuelle();
+  speicherhuelleSetzen(h && schonendeHuelle(uhrKorrigierteHuelle(aufraeumBeobachter(h)), einsaetzeZuJson([])));
   datenschutzUhrSetzen(() => datenschutzZeitpunkt());
+}
+
+// ------------------------------------------------- Dauerhafter Speicher
+
+/**
+ * Browser dürfen Website-Daten räumen, wenn der Gerätespeicher knapp wird;
+ * Safari räumt nicht abgelegte Seiten nach längerer Nichtnutzung. Trifft das
+ * Vorlagen oder eine ruhende Sammlung, ist alles weg — es gibt keinen Server,
+ * der es noch hätte. Die App bittet darum um dauerhaften Speicher
+ * (`navigator.storage.persist`) und zeigt das Ergebnis in der Datensicherung
+ * (Audit Runde 2, R2-O6).
+ *
+ * Nur im Web: In der nativen App gehört der Speicher der App selbst, dort
+ * räumt kein Browser. `null` = nicht feststellbar (alter Browser, nativ).
+ */
+function speicherManager(): StorageManager | null {
+  if (istNativ()) return null;
+  try {
+    return globalThis.navigator?.storage ?? null;
+  } catch {
+    return null;
+  }
+}
+
+/** Hält der Browser den Speicher dieser App dauerhaft vor? */
+export async function speicherDauerhaft(): Promise<boolean | null> {
+  const m = speicherManager();
+  if (!m?.persisted) return null;
+  try {
+    return await m.persisted();
+  } catch {
+    return null;
+  }
+}
+
+/** Um dauerhaften Speicher bitten (Firefox fragt dabei nach, Chrome entscheidet selbst). */
+export async function dauerhaftenSpeicherAnfragen(): Promise<boolean | null> {
+  const m = speicherManager();
+  if (!m?.persist) return null;
+  try {
+    if (await m.persisted?.()) return true;
+    return await m.persist();
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Beim Start: nur bitten, wenn hier etwas liegt, dessen Verlust wehtäte
+ * (laufende Sammlungen mit Meldungen, Vorlagen). Wer die Seite nur ansieht,
+ * bekommt in Firefox keine Rückfrage, bevor er etwas erfasst hat.
+ */
+export function dauerhaftWennWertvoll(): void {
+  if (!wertvolleDaten()) return;
+  void dauerhaftenSpeicherAnfragen();
 }

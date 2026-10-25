@@ -139,6 +139,13 @@ auszuliefern.
 `style-src` behält `'unsafe-inline'`: React setzt `style`-Attribute an
 Elementen, und die deckt ein Hash nicht ab.
 
+`script-src` trägt außerdem `'wasm-unsafe-eval'`. Das ist keine Aufweichung
+von `'self'`, sondern die einzige Freigabe, mit der ein Browser ein
+WebAssembly-Modul überhaupt kompiliert — gebraucht vom QR-Decoder ZXing
+(`zxing_reader-*.wasm` aus dem eigenen Bundle). Ohne sie meldete die Konsole
+im Build „Refused to compile … WebAssembly", und der Scanner fiel still auf
+jsQR zurück, mit kleinerer Reichweite bei schlechten Fotos.
+
 ## Web-App
 
 Assistent (Einheit → Einsatz → Personal → Fahrzeuge → Sofortbedarf) mit
@@ -211,6 +218,27 @@ strukturierten Daten.
   hinten in der Liste. Eine eigene Gewichtung oder eine andere Position bekommt
   sie über die Tabelle `SEITEN` im Skript.
 - **Ansehen:** `npm run sitemap -- /tmp/sitemap.xml`.
+
+### Blanko-Vordruck (generiert, liegt im Repo)
+
+`public/downloads/einheiten-erfassungsbogen-blanko.pdf` ist der leere Bogen
+zum Ausdrucken — die Papier-Rückfallebene, direkt verlinkbar und auch ohne
+laufende App abrufbar. Deshalb liegt die Datei fertig im Repo und entsteht
+**nicht** im Build. Erzeugt wird sie aus derselben DocDefinition wie jede
+Bogen-PDF ([src/app/pdf-dokument.ts](../src/app/pdf-dokument.ts)):
+
+```bash
+npm run blanko-pdf   # schreibt public/downloads/einheiten-erfassungsbogen-blanko.pdf
+```
+
+- **Nach jeder Änderung am PDF-Layout** das Skript aufrufen und die neue Datei
+  mit committen. Vergessen fällt auf: [scripts/blanko-vordruck.test.ts](../scripts/blanko-vordruck.test.ts)
+  erzeugt den Vordruck mit dem Erstelldatum der ausgelieferten Datei neu und
+  vergleicht byte-genau. Vorher war die Stärke-Legende aus R2-A6 nur im
+  Generator, nicht in der ausgelieferten Datei (Audit Runde 3, R3-A4).
+- **Die Ausgabe ist deterministisch**, weil das Erstelldatum übergeben wird und
+  pdfkit die Datei-ID aus den Metadaten bildet. Wer Metadaten ergänzt, die bei
+  jedem Lauf anders sind, macht den Wächter wertlos.
 
 ### Kopfnavigation (generiert, drei Fassungen)
 
@@ -323,7 +351,7 @@ Zusammenspiel:
 | [bogen-transport.feature](../features/bogen-transport.feature) | Startseite, Einstieg in den Assistenten, geteilter Link eines alten Bogens (Migration v2→v3) |
 | [assistent.feature](../features/assistent.feature) | Alle sechs Schritte, Schrittleiste, OV-Vorschläge, Landesvorlage, Namensimport, Schnelleingabe, Meldekopf-Stärke, Fahrzeuge, Sofortbedarf, Vollständigkeit, Entwurfswiederherstellung |
 | [uebergabe.feature](../features/uebergabe.feature) | QR-Code und Vollbild, PDF-Vorschau, PDF-Download, Link teilen — samt Runde „Link erzeugen → öffnen → Herkunft belegt → gegengezeichnet" |
-| [vorlagen.feature](../features/vorlagen.feature) | Vorlage speichern, umbenennen, Papierkorb, Musterung (Abwesende streichen) |
+| [vorlagen.feature](../features/vorlagen.feature) | Vorlage speichern, bearbeiten (dauerhaft ändern), umbenennen, Papierkorb, Musterung (Abwesende streichen) |
 | [einsatz-sammlung.feature](../features/einsatz-sammlung.feature) | Einsatz anlegen (Dialog, Pflichtfeld, Enter, Esc, Abbruch), Bogen aufnehmen |
 | [einsatz-detail.feature](../features/einsatz-detail.feature) | Summen, Vollansicht, Abrücken, Zug-Etikett, Aufteilen/Zusammenführen, Folgemeldung/Historie/Diff, Sammel-PDF, CSV (Übersicht und alle Daten), Papierkorb |
 | [einheiten-liste.feature](../features/einheiten-liste.feature) | Einheitenliste einer Großlage: Suche, Sortierung, Qualifikationsfilter, Tabellensicht mit Spaltensortierung und Summenzeile — und dass die Summen des Einsatzes davon unberührt bleiben |
@@ -393,6 +421,16 @@ localStorage-Hülle getrennt und unit-getestet.
   verknüpft. Ist ein Teil nur als Stärke gemeldet, führt das Ergebnis die Summen
   als Zahlen und behält die bekannten Namen als Ansprechpartner. Oberfläche in
   [src/app/zusammenfuehren-ui.tsx](../src/app/zusammenfuehren-ui.tsx).
+- [src/app/eintrag-zeiten.ts](../src/app/eintrag-zeiten.ts) — App-seitige
+  Erweiterung des Eintrags um Eintreffzeit, Abrückzeit und eine Notiz der
+  Führungsstelle (Modul-Augmentation von `MeldeEintrag`, die Felder reisen als
+  JSON mit der Sammlung; der Kern reicht unbekannte Felder durch). Dazu die
+  Statusänderung mit Zeitstempel, das Erben von Eintreffzeit und Notiz durch
+  eine Folgemeldung und die Meldung eines vollen Speichers
+  (`SpeicherVollFehler`) — ein `setItem`, das still scheitert, darf nie als
+  „gespeichert" erscheinen. Bewusst hier und nicht im Submodul: die Felder
+  sind Führungsstellen-Sicht des Erfassungsbogens, kein Bestandteil des
+  Meldeformats.
 - [src/app/auswertung.ts](../src/app/auswertung.ts) — Summen über die aktuell
   anwesenden Einheiten (`aggregiere`) und Zwischensummen je Zug
   (`aggregiereNachZug`), aufgebaut auf denselben abgeleiteten Werten wie die
@@ -404,6 +442,12 @@ localStorage-Hülle getrennt und unit-getestet.
   anwesenden Einheiten.
 - [src/app/einsatz-transport.ts](../src/app/einsatz-transport.ts) — Export/Import
   als JSON-Datei sowie Import aus dem in Sammel-PDFs eingebetteten JSON (pako).
+- [src/app/export-stand.ts](../src/app/export-stand.ts) — merkt je Einsatz,
+  welche Meldungen beim letzten Export schon in der Sammlung standen
+  (Kennungen, nicht Empfangszeiten: importierte Bögen tragen fremde Zeiten).
+  Darauf beruht das Kästchen „Nur neue Bögen seit dem letzten Export", das alle
+  vier Ausgabewege der Einsatzansicht umschaltet. Verbucht wird erst nach
+  gelungenem Export; ein abgebrochenes Share-Sheet zählt nicht.
 - [src/app/qr-stapel.ts](../src/app/qr-stapel.ts) — viele QR-Bilder auf einmal
   (Mehrfachauswahl oder Ordner). Liest die Dateien nacheinander (parallel wären
   n entpackte Bitmaps gleichzeitig im Speicher), sammelt Teile mehrteiliger
@@ -440,10 +484,15 @@ localStorage-Hülle getrennt und unit-getestet.
   `Status`-Spalte hält sie auseinander. Formatgrundlagen (Semikolon, UTF-8-BOM,
   Dezimalkomma für Excel(DE)) stehen in [src/app/csv.ts](../src/app/csv.ts).
 - [src/app/oldenburg-xlsx.ts](../src/app/oldenburg-xlsx.ts) — XLSX im **fremden**
-  Format „Oldenburg": die Einheitenliste der Führungsstelle, 38 Spalten (A–AL) in
+  Format „Oldenburg": die Einheitenliste der Führungsstelle, 36 Spalten (A–AJ) in
   fester Reihenfolge, Zeile 1 farbige Leiste mit `SUBTOTAL`-Summen, Zeile 2
   Kopfzeile, ab Zeile 3 je Einheit eine Zeile. Für den Einzelbogen wie für die
-  ganze Sammlung. Spaltenfolge, Farben, Rahmen und das Datumsformat sind aus der
+  ganze Sammlung. Bei der Sammlung laufen die Summen nur über die Einheiten,
+  die in die Lage zählen (`zaehltInLage`, wie App und CSV); abgerückte,
+  aufgegangene und Übungsmeldungen folgen nach einer Leerzeile in einem
+  überschriebenen Block außerhalb der Formeln. Eintreffzeit, Abrückzeit und
+  Auftrag/Notiz des Meldekopfs landen in „eingetr. / zugew.", „Einsatz-ende"
+  und „Aufträge"; der Ort/Auftrag aus dem Bogen in „Vorgesehener Auftrag". Spaltenfolge, Farben, Rahmen und das Datumsformat sind aus der
   Vorlagendatei übernommen und **nicht verhandelbar** — der Empfänger fügt die
   Zeilen in seine laufende Liste ein. Spalten, die der Führungsstelle gehören
   (Ablösung, Anforderungs-ID, Zusagen, Rückführung, Schicht, FüSt.), bleiben

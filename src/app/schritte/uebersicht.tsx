@@ -3,6 +3,7 @@
  * prüfung und die Übergabewege (QR, PDF, Link, Datei).
  */
 
+import { UhrHinweis } from "../uhr-warnung";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import {
   Erfassungsbogen,
@@ -12,9 +13,8 @@ import {
   staerke,
   unterbringungMWD,
   verpflegung,
-  zeitpunktZuIso,
 } from "@bos/eeb-format/model";
-import { vorlageAnlegen } from "../vorlagen";
+import { vorlageAktualisieren, vorlageAnlegen, vorlagenLaden } from "../vorlagen";
 import { TabellenScroll } from "../tabellen-scroll";
 import { RolleMarke } from "../rolle-marke";
 import {
@@ -31,13 +31,19 @@ import {
   funktionsText,
   kennzeichenText,
   kontaktText,
+  natoZeitstempel,
   orgLabel,
+  heuteDatum,
+  personUnbenannt,
   pruefpunkte,
+  zeitraumDeutsch,
   qrErzeugen,
   vokabText,
   vokabularFuer,
+  zeitpunktDeutsch,
 } from "../hilfen";
 import { debugAktiv } from "../debug-plattform";
+import { mwdText } from "../auswertung";
 import { bogenCsvInhalt } from "../bogen-csv";
 import { einheitSymbolSvg, svgDataUrl } from "../taktische-zeichen-bogen";
 import {
@@ -49,10 +55,15 @@ import {
 } from "@bos/eeb-format/signatur";
 import { absenderkarteLaden, type Absenderkarte } from "../absenderkarte";
 import { AbsenderkarteFeld } from "../absenderkarte-ui";
-import { geraeteKurzform, geraeteOeffentlichHex } from "../geraete-schluessel";
-import { istNativ, linkTeilen, nahbereichDienst, shareSheetVerfuegbar, textTeilen } from "../nativ";
-import { fehlerText } from "../nachladen";
-import { frageJaNein, frageText, zeigeHinweis } from "../dialoge";
+import { geraeteKurzform, geraeteSchluesselNurSitzung, geraeteOeffentlichHex } from "../geraete-schluessel";
+import { istNativ, linkTeilen, nahbereichDienst, pdfEinbettbar, shareSheetVerfuegbar, textTeilen } from "../nativ";
+import { fehlerText, istNachladeFehler } from "../nachladen";
+import { frageJaNein, frageText, frageWahl, zeigeHinweis } from "../dialoge";
+import { mindestzeigeDauer, ortSperren } from "../tipp-schutz";
+import { arbeiten, useArbeitet } from "../arbeitet";
+import { SpeicherVollFehler, istSpeicherVoll } from "../eintrag-zeiten";
+import { uebergabeText, type UebergabeStand, type UebergabeWeg } from "../uebergabe-stand";
+import { ebeneBetreten, ebeneVerlassen, useEbeneZurueck, useModalesOverlay } from "../modal-overlay";
 import {
   MWD_LEGENDE,
   STAERKE_LEGENDE,
@@ -67,9 +78,22 @@ function stufenText(qr: QrSatz): string {
 
 export function Uebersicht(props: {
   bogen: Erfassungsbogen;
-  geheZu: (schritt: number) => void;
+  geheZu: (schritt: number, feld?: string) => void;
   neu: () => void;
+  /**
+   * Was mit dem offenen Bogen beim Schließen geschieht — ein Satz für die
+   * Rückfrage und ob dabei etwas endgültig verloren geht (app.tsx,
+   * folgenFuerOffenenBogen). Ohne ihn fällt die Rückfrage allgemein aus.
+   */
+  schliessenFolgen?: () => { satz: string; verlust: boolean };
   onVorlageGespeichert?: (name: string) => void;
+  /**
+   * Gesetzt, wenn der Bogen die Bearbeitung einer gespeicherten Vorlage ist
+   * („Bearbeiten" auf der Vorlagenkarte). Dann ist „Vorlage aktualisieren" die
+   * Hauptaktion — ein Einsatzbogen soll hier gar nicht erst entstehen — und
+   * „Als Vorlage speichern" wird zu „Als neue Vorlage speichern".
+   */
+  vorlageBearbeitung?: { name: string; onAktualisieren: () => void };
   /** Signaturstatus des importierten Transports (Herkunft), falls der Bogen gescannt wurde. */
   signatur?: SignaturStatus | null;
   /**
@@ -87,48 +111,127 @@ export function Uebersicht(props: {
    * `sammelAktion` bereits in den vorgewählten Einsatz.
    */
   onInEinsatzAufnehmen?: () => void;
+  /**
+   * Einsatzdaten zurücksetzen (Zeitraum heute, Ort/Auftrag und Sofortbedarf
+   * leer) — angeboten, wenn der Einsatzzeitraum vorbei ist (R2-S1).
+   */
+  onNeuerEinsatz?: () => void;
+  /** Letzte Übergabe und der Rückruf, wenn übergeben wurde (R2-W2). */
+  uebergabe?: UebergabeStand | null;
+  /**
+   * Was mit dem Bogen geschah (R3-H3): Weg und ob der Nutzer den Empfang
+   * bestätigt hat. Ohne Bestätigung heißt der Vermerk nicht „Übergeben".
+   */
+  onUebergeben?: (weg: UebergabeWeg, bestaetigt?: boolean) => void;
+  /** „Ist angekommen" zum letzten, unveränderten Vermerk (R3-H3). */
+  onUebergabeBestaetigen?: () => void;
 }) {
   const { bogen, geheZu, neu } = props;
 
   async function alsVorlageSpeichern() {
     const name = await frageText({
-      titel: "Als Vorlage speichern",
+      titel: props.vorlageBearbeitung ? "Als neue Vorlage speichern" : "Als Vorlage speichern",
       label: "Name der Vorlage",
-      vorgabe: einheitAnzeigename(bogen.einheit),
-      hinweis: "Die Vorlage bleibt auf diesem Gerät und lässt sich für den nächsten Einsatz mustern.",
+      vorgabe: props.vorlageBearbeitung ? "" : einheitAnzeigename(bogen.einheit),
+      hinweis: props.vorlageBearbeitung
+        ? `Legt eine zweite Vorlage neben „${props.vorlageBearbeitung.name}" an; die bleibt, wie sie war.`
+        : "Die Vorlage bleibt auf diesem Gerät und lässt sich für den nächsten Einsatz mustern.",
       ok: "Vorlage speichern",
     });
     if (name == null) return;
-    const v = vorlageAnlegen(name, bogen);
+    // Gleicher Name wie eine vorhandene Vorlage: nicht still eine zweite
+    // anlegen, die sich in der Liste nicht unterscheiden lässt (R7-D8).
+    const gleichnamig = vorlagenLaden().find((x) => x.name.trim().toLowerCase() === name.trim().toLowerCase());
+    let ersetzen: string | null = null;
+    if (gleichnamig) {
+      const stand = new Date(gleichnamig.geaendert).toLocaleString("de-DE", { dateStyle: "medium", timeStyle: "short" });
+      const wahl = await frageWahl({
+        titel: "Vorlage mit diesem Namen vorhanden",
+        text: `Es gibt schon eine Vorlage „${gleichnamig.name}" (gespeichert ${stand} Uhr). Zwei gleich benannte Karten sind beim Mustern kaum zu unterscheiden.`,
+        wege: [
+          { wert: "zusaetzlich", label: "Zusätzlich anlegen", hinweis: "Die vorhandene bleibt, wie sie ist." },
+          { wert: "ersetzen", label: "Vorhandene ersetzen", hinweis: "Ihr Inhalt wird durch diesen Bogen überschrieben.", gefahr: true },
+        ],
+      });
+      if (wahl == null) return;
+      if (wahl === "ersetzen") ersetzen = gleichnamig.id;
+    }
+    let v;
+    try {
+      v = (ersetzen ? vorlageAktualisieren(ersetzen, bogen) : null) ?? vorlageAnlegen(name, bogen);
+    } catch (e) {
+      // Voller Speicher: der Dialog schloss ohne jede Meldung, nur die
+      // Konsole wusste Bescheid (Audit Runde 2, R2-O2).
+      await zeigeHinweis({
+        titel: "Vorlage nicht gespeichert",
+        text: istSpeicherVoll(e) ? new SpeicherVollFehler(e).message : String(e instanceof Error ? e.message : e),
+      });
+      return;
+    }
     props.onVorlageGespeichert?.(v.name);
   }
 
-  /** Bogen schließen und mit einem leeren beginnen — der offene wäre danach weg. */
+  /**
+   * Bogen schließen, zurück zur Startseite. Die Rückfrage sagte „… der
+   * gespeicherte Entwurf gelöscht" — tatsächlich lag der Bogen danach unter
+   * „Zuletzt geschlossenen Bogen zurückholen", und statt eines neuen Bogens kam
+   * die Startseite. Jetzt steht da, was wirklich geschieht; „gefahr" nur,
+   * wenn dabei wirklich etwas verloren geht (Audit Runde 2, R2-H9).
+   */
   async function bogenVerwerfen() {
+    const folgen = props.schliessenFolgen?.() ?? {
+      satz: `„${einheitAnzeigename(bogen.einheit)}" bleibt auf der Startseite unter „Zuletzt geschlossenen Bogen zurückholen" erreichbar.`,
+      verlust: false,
+    };
     const sicher = await frageJaNein({
-      titel: "Aktuellen Bogen verwerfen?",
-      text: `„${einheitAnzeigename(bogen.einheit)}" wird geschlossen und der gespeicherte Entwurf gelöscht.`,
-      ok: "Verwerfen und neu beginnen",
-      gefahr: true,
+      titel: "Bogen schließen?",
+      text: `Der Bogen wird geschlossen, nicht gelöscht. ${folgen.satz} Einen neuen Bogen beginnst du auf der Startseite.`,
+      ok: "Schließen, zur Startseite",
+      gefahr: folgen.verlust,
     });
     if (sicher) neu();
   }
 
   const [qr, setQr] = useState<QrSatz | null>(null);
   const [fehler, setFehler] = useState("");
-  const [pdfLaeuft, setPdfLaeuft] = useState(false);
+  // Die PDF-Erzeugung teilt sich die Sperre mit den übrigen PDF-Wegen der App
+  // (arbeitet.ts): zweimal getippt, entsteht eine Datei (Audit Runde 5, R5-H4).
+  const pdfLaeuft = useArbeitet() === "pdf";
+  // Quittung nach „PDF erzeugen": der Browser zeigt den Download oft nur kurz
+  // oder gar nicht (Telefon), die App sagte nichts — also wurde ein zweites
+  // Mal getippt und die Mail an den Meldekopf trug zwei Anhänge. Steht bis
+  // zum nächsten PDF oder bis der Dialog geschlossen wird.
+  const [pdfQuittung, setPdfQuittung] = useState("");
+  // Fehler von „PDF erzeugen": steht direkt unter dem Knopf, nicht unten im
+  // Dialog, wo er hinter „Weitere Formate" außerhalb des Bildes lag (R4-O2).
+  const [pdfFehler, setPdfFehler] = useState("");
+  const pdfFehlerZeile = useRef<HTMLParagraphElement>(null);
+  // Der Dialog scrollt: Die Meldung rollt ins Bild, auch wenn sie unter dem
+  // Rand erscheint (R4-O2).
+  useEffect(() => {
+    if (pdfFehler) pdfFehlerZeile.current?.scrollIntoView?.({ block: "nearest" });
+  }, [pdfFehler]);
   // Vollbild-QR zum Vorzeigen (Handy-zu-Tablet-Scan ohne Papier); bei
   // Segmentierung blättert `vollbildTeil` durch die Teile.
   const [vollbild, setVollbild] = useState(false);
   const [vollbildTeil, setVollbildTeil] = useState(0);
+  // Welche Teile dieses Codes schon im Vollbild standen — über das Schließen
+  // hinaus: Wieder geöffnet, beginnt das Vollbild beim ersten fehlenden Teil
+  // statt bei Teil 1 (Audit Runde 4, R4-M5). Ein neuer Code fängt neu an.
+  const [vollbildGezeigt, setVollbildGezeigt] = useState<ReadonlySet<number>>(() => new Set());
+  useEffect(() => setVollbildGezeigt(new Set()), [qr]);
   // „Bogen übergeben": ein Dialog bündelt alle Transportwege (QR/PDF/Link/Datei).
   const teilenDialog = useRef<HTMLDialogElement>(null);
   /* Einmal geprüft, zweimal gezeigt: in der Leitzeile dieser Ansicht und im
      Übergabe-Dialog. Dort ist es der letzte Moment, in dem die Lücke noch
      auffallen kann — wer bis zum QR-Code durchgetippt hat, hat die Warnung
      oben längst weggescrollt. */
-  const offenePunkte = pruefpunkte(bogen);
+  const offenePunkte = pruefpunkte(bogen, true, heuteDatum());
+  const zeitraumVorbei = bogen.einsatz.zeitraumBis < heuteDatum();
   const [schluesselKurz, setSchluesselKurz] = useState<string | null>(null);
+  // Geräteschlüssel ließ sich nicht speichern: das Siegel gilt nur für diese
+  // Sitzung (R3-E1). Code und PDF entstehen trotzdem.
+  const [nurSitzung, setNurSitzung] = useState(false);
   // Freiwillige Absenderangaben zur Signatur. Als Effekt-Abhängigkeit geführt:
   // eine geänderte Karte ändert den signierten Payload → QR neu erzeugen.
   const [absender, setAbsender] = useState<Absenderkarte>(() => absenderkarteLaden());
@@ -173,7 +276,15 @@ export function Uebersicht(props: {
    */
   const mwdAngegeben = !nurStaerke || bogen.unterbringungManuell != null;
   const vpAufteilungAngegeben = !nurStaerke || bogen.verpflegungManuell != null;
-  const mwdText = mwdAngegeben ? `M ${mwd.m} / W ${mwd.w} / D ${mwd.d}` : "keine Angabe";
+  const mwdAnzeige = mwdAngegeben ? mwdText(mwd) : "keine Angabe";
+  /**
+   * „Unterbringung: M 9 / W 0 / D 0" stand auch ohne angeforderte
+   * Unterbringung da und las sich wie „9 Mann brauchen ein Quartier" — „M"
+   * hieß in derselben Zeile Mannschaft (Audit Runde 3, R3-N3). Die Zahl ist
+   * die Aufteilung nach Geschlecht; „Unterbringung" heißt sie nur, wenn der
+   * Bogen Unterbringung anfordert.
+   */
+  const mwdTitel = bogen.sofortbedarf?.unterbringung ? "Unterbringung" : "Geschlecht";
   /**
    * Spalten, die für diesen Bogen nirgends etwas enthalten, werden nicht
    * gezeigt. Sonst nimmt „Erreichbarkeit" ein Drittel der Personaltabelle für
@@ -194,9 +305,11 @@ export function Uebersicht(props: {
         // Unverändert empfangener Bogen: Original-Payload gegengezeichnet.
         const q = await qrErzeugen(bogen, props.herkunft);
         if (aktiv) setQr(q);
+        if (aktiv) setNurSitzung(geraeteSchluesselNurSitzung());
         geraeteKurzform().then((k) => aktiv && setSchluesselKurz(k));
       } catch (e) {
-        if (aktiv) setFehler(`QR-Code: ${e instanceof Error ? e.message : e}`);
+        // Nie Programmtext (R3-E1): fehlerText übersetzt auch den vollen Speicher.
+        if (aktiv) setFehler(`QR-Code: ${fehlerText(e)}`);
       }
     })();
     return () => {
@@ -287,6 +400,7 @@ export function Uebersicht(props: {
     setFehler("");
     try {
       await linkInsShareSheet(qr.vollUrl);
+      props.onUebergeben?.("nah");
     } catch (e) {
       // Abbruch im Share-Dialog ist kein Fehler
       if (e instanceof Error && e.name === "AbortError") return;
@@ -300,8 +414,10 @@ export function Uebersicht(props: {
     try {
       if (shareSheetVerfuegbar()) {
         await linkInsShareSheet(url);
+        props.onUebergeben?.("link");
       } else if (navigator.clipboard) {
         await navigator.clipboard.writeText(url);
+        props.onUebergeben?.("kopiert");
         setLinkKopiert(true);
         window.setTimeout(() => setLinkKopiert(false), 3000);
       } else {
@@ -339,16 +455,62 @@ export function Uebersicht(props: {
     }
   }
 
-  async function pdf() {
-    setPdfLaeuft(true);
+  async function blanko() {
     setFehler("");
     try {
-      const { pdfErzeugen } = await import("../pdf");
-      await pdfErzeugen(bogen, undefined, props.herkunft);
+      const { blankoPdfErzeugen } = await import("../pdf");
+      await blankoPdfErzeugen();
     } catch (e) {
-      setFehler(`PDF: ${fehlerText(e)}`);
-    } finally {
-      setPdfLaeuft(false);
+      if (e instanceof Error && e.name === "AbortError") return; // Abbruch im Teilen-Fenster
+      setFehler(`Blanko-Vordruck: ${fehlerText(e)}`);
+    }
+  }
+
+  async function pdf() {
+    await arbeiten("pdf", pdfErzeugenUndMelden);
+  }
+
+  async function pdfErzeugenUndMelden() {
+    setFehler("");
+    setPdfQuittung("");
+    setPdfFehler("");
+    // Der Dateiname wird HIER gebildet und an pdfErzeugen übergeben, nicht
+    // dort erraten: so nennt die Quittung genau die Datei, die entstanden ist
+    // — auch wenn der Minutenwechsel des Zeitstempels dazwischenfällt. Die
+    // Bauart (eeb-<NATO-Zeit>_<Einheit>.pdf) ist dieselbe wie in pdf.ts.
+    const dateiname = `eeb-${natoZeitstempel()}_${bogenDateiname(bogen)}.pdf`;
+    try {
+      const { pdfErzeugen } = await import("../pdf");
+      const pdfErgebnis = await pdfErzeugen(bogen, dateiname, props.herkunft);
+      const nichtDarstellbar = pdfErgebnis?.nichtDarstellbar ?? 0;
+      const betroffen = pdfErgebnis?.betroffen ?? [];
+      // „PDF erzeugt", nicht „Übergeben": die Datei liegt erst auf diesem
+      // Gerät (Audit Runde 3, R3-A7).
+      props.onUebergeben?.("pdf");
+      // In der App gibt es keinen Download: die PDF ging ins Teilen-Fenster
+      // des Systems — dort heißt „fertig" etwas anderes als im Browser.
+      setPdfQuittung(
+        istNativ()
+          ? `PDF erstellt und im Teilen-Fenster übergeben: ${dateiname}`
+          : `PDF gespeichert: ${dateiname} — liegt im Download-Ordner des Browsers.`,
+      );
+      // Zeichen, die die PDF-Schrift nicht kennt, stehen als „?" auf dem Papier (R6-A5).
+      if (nichtDarstellbar > 0) {
+        setPdfFehler(
+          `${nichtDarstellbar === 1 ? "1 Name enthält" : `${nichtDarstellbar} Namen enthalten`} Zeichen, die die PDF nicht darstellen kann (z. B. kyrillisch, arabisch, Emoji) – sie stehen dort als „?".${
+            betroffen.length > 0 ? ` Betroffen: ${betroffen.slice(0, 4).join("; ")}${betroffen.length > 4 ? `; und ${betroffen.length - 4} weitere` : ""}.` : ""
+          } Der QR-Code trägt die Namen unverändert.`,
+        );
+      }
+    } catch (e) {
+      if (e instanceof Error && e.name === "AbortError") return; // Abbruch im Teilen-Fenster
+      // Der Ausweg gehört zur Meldung: Fehlt der PDF-Baustein (Netz weg vor dem
+      // Vorrat), geht der QR-Code in derselben Lage (R4-O2).
+      setPdfFehler(
+        istNachladeFehler(e)
+          ? "PDF nicht möglich: Der PDF-Baustein ist noch nicht geladen. Ohne Netz geht jetzt nur der QR-Code — mit Netz die Seite einmal neu laden."
+          : `PDF: ${fehlerText(e)} Der QR-Code geht trotzdem.`,
+      );
     }
   }
 
@@ -371,7 +533,13 @@ export function Uebersicht(props: {
               stehen als Nebenaktionen abgesetzt daneben, statt als vier
               gleichrangige Knöpfe um den Blick zu konkurrieren. */}
           <span className="uebersicht-aktionen">
-            {props.sammelAktion ? (
+            {props.vorlageBearbeitung ? (
+              // Vorlagen-Bearbeitung: das Ziel ist die gespeicherte Vorlage,
+              // nicht ein Empfänger — Übergabe und Sammlung treten zurück.
+              <button type="button" className="primaer" onClick={props.vorlageBearbeitung.onAktualisieren}>
+                Vorlage aktualisieren
+              </button>
+            ) : props.sammelAktion ? (
               <button type="button" className="primaer" onClick={props.sammelAktion.onUebernehmen}>
                 {props.sammelAktion.label}
               </button>
@@ -383,14 +551,18 @@ export function Uebersicht(props: {
               </button>
             )}
             <span className="neben-aktionen">
-              {props.sammelAktion && (
+              {(props.sammelAktion || props.vorlageBearbeitung) && (
                 <button type="button" onClick={() => teilenDialog.current?.showModal()}>Bogen übergeben…</button>
               )}
-              {!props.sammelAktion && props.onInEinsatzAufnehmen && (
-                <button type="button" onClick={props.onInEinsatzAufnehmen}>In Einsatz aufnehmen…</button>
+              {!props.sammelAktion && !props.vorlageBearbeitung && props.onInEinsatzAufnehmen && (
+                <button type="button" onClick={props.onInEinsatzAufnehmen}>In Einsatz-Sammlung ablegen…</button>
               )}
-              <button type="button" onClick={alsVorlageSpeichern}>Als Vorlage speichern</button>
-              <button type="button" onClick={() => void bogenVerwerfen()}>Neuer Bogen</button>
+              <button type="button" onClick={alsVorlageSpeichern}>
+                {props.vorlageBearbeitung ? "Als neue Vorlage speichern" : "Als Vorlage speichern"}
+              </button>
+              {/* „Bogen schließen" statt „Neuer Bogen": Der Knopf schließt nur
+                  und führt zur Startseite (R3-H7, R3-N6). */}
+              <button type="button" onClick={() => void bogenVerwerfen()}>Bogen schließen</button>
             </span>
           </span>
         </div>
@@ -444,12 +616,33 @@ export function Uebersicht(props: {
                 Stärke{" "}
                 <strong title={STAERKE_LEGENDE} aria-label={`Stärke: ${staerkeVorlesen(s)}`}>
                   {s.fuehrer} / {s.unterfuehrer} / {s.mannschaft} / {s.gesamt}
-                </strong>
+                </strong>{" "}
+                {/* Kurzlegende sichtbar statt nur im Tooltip (R2-N9). */}
+                <span className="hinweis" aria-hidden="true">(F / UF / M / Ges)</span>
               </span>
-              <span title={MWD_LEGENDE}>Unterbringung: {mwdText}</span>
+              <span title={MWD_LEGENDE}>{mwdTitel}: {mwdAnzeige}</span>
             </p>
           </div>
         </div>
+        {/* Hat der Meldekopf den aktuellen Stand? (R2-W2) */}
+        {(() => {
+          const u = uebergabeText(bogen, props.uebergabe);
+          if (!u) return null;
+          return (
+            <>
+              <p className={u.geaendert ? "warnung" : "hinweis"} role="status">{u.text}</p>
+              {/* Die App weiß nicht, ob etwas ankam — der Nutzer kann es
+                  ausdrücklich bestätigen (R3-H3, R3-A7). */}
+              {u.offen && props.onUebergabeBestaetigen && (
+                <p>
+                  <button type="button" onClick={props.onUebergabeBestaetigen}>
+                    Gegenstelle hat ihn — als übergeben vermerken
+                  </button>
+                </p>
+              )}
+            </>
+          );
+        })()}
         <Vollstaendigkeit punkte={offenePunkte} geheZu={geheZu} />
       </section>
 
@@ -468,7 +661,15 @@ export function Uebersicht(props: {
               Paare weiterhin im Raster der Liste. */}
           {bogen.einheit.hierarchie.map((h, i) => (
             <div key={i} style={{ display: "contents" }}>
-              <dt>{vokabText(h.bezeichnung, vokabularFuer(org, "ebene")) || "Ebene"}</dt>
+              {/* Heißt die Ebene wie der Einheitstyp (DRK: „Behandlung Kat. ROT"), wiederholte die Zeile ihn als
+                  Beschriftung; sie heißt dann „Standort" (Audit Runde 6, R6-N8). */}
+              <dt>
+                {(() => {
+                  const ebene = vokabText(h.bezeichnung, vokabularFuer(org, "ebene"));
+                  const typ = vokabText(bogen.einheit.einheitsTyp, vokabularFuer(org, "einheitstyp"), "name");
+                  return !ebene ? "Ebene" : typ && ebene.trim().toLocaleLowerCase("de-DE") === typ.trim().toLocaleLowerCase("de-DE") ? "Standort" : ebene;
+                })()}
+              </dt>
               <dd>{h.name}{h.kurz ? ` (${h.kurz})` : ""}{h.telefon ? ` · ${h.telefon}` : ""}{h.email ? ` · ${h.email}` : ""}</dd>
             </div>
           ))}
@@ -481,9 +682,16 @@ export function Uebersicht(props: {
           <dt>Ort / Auftrag</dt><dd>{bogen.einsatz.ortAuftrag || "—"}</dd>
           <dt>Beginn / Ende</dt>
           <dd>
-            {bogen.einsatz.einsatzbeginn != null ? zeitpunktZuIso(bogen.einsatz.einsatzbeginn).replace("T", " ") : "—"}
+            {bogen.einsatz.einsatzbeginn != null ? zeitpunktDeutsch(bogen.einsatz.einsatzbeginn) : "—"}
             {" / "}
-            {bogen.einsatz.einsatzende != null ? zeitpunktZuIso(bogen.einsatz.einsatzende).replace("T", " ") : "—"}
+            {bogen.einsatz.einsatzende != null ? zeitpunktDeutsch(bogen.einsatz.einsatzende) : "—"}
+            {/* Die Zeiten des Meldekopfs kommen nicht in diesen Bogen zurück;
+                ohne eigenen Eintrag trägt das PDF keine Einsatzzeiten (R2-W4). */}
+            {(bogen.einsatz.einsatzbeginn == null || bogen.einsatz.einsatzende == null) && (
+              <span className="hinweis">
+                {" "}— für eigene Nachweise in Schritt 2 eintragen; die Zeiten des Meldekopfs kommen nicht hierher zurück.
+              </span>
+            )}
           </dd>
         </dl>
       ))}
@@ -598,7 +806,24 @@ export function Uebersicht(props: {
       {/* Eingebettete PDF-Vorschau: man sieht, was der Meldekopf bekommt, bevor
           gedruckt wird. Nur im Browser — die native App zeigt PDFs im Share-Sheet,
           und mobile WebViews rendern eingebettete PDFs nicht zuverlässig. */}
-      {!istNativ() && (
+      {!istNativ() && !pdfEinbettbar() && (
+        // Browser ohne PDF-Betrachter (Chrome auf Android): der Rahmen bliebe
+        // eine Fehlerseite. Stattdessen die Datei selbst — die öffnet das
+        // Telefon mit der PDF-App, die es ohnehin hat.
+        <section className="karte">
+          <div className="kopfzeile">
+            <h2>PDF</h2>
+            <button type="button" className={pdfLaeuft ? "arbeitet" : ""} aria-busy={pdfLaeuft || undefined} onClick={pdf} disabled={pdfLaeuft}>
+              {pdfLaeuft ? "PDF wird erstellt…" : "PDF herunterladen"}
+            </button>
+          </div>
+          <p className="hinweis">
+            Dieser Browser kann PDFs nicht in der Seite anzeigen. Die heruntergeladene Datei öffnet
+            sich mit dem PDF-Betrachter des Telefons.
+          </p>
+        </section>
+      )}
+      {pdfEinbettbar() && (
         <section className="karte">
           <div className="kopfzeile">
             <h2>PDF-Vorschau</h2>
@@ -683,12 +908,27 @@ export function Uebersicht(props: {
               hat signiert", nicht Kurvenname und Byte-Zahl. „Echtheits-Siegel"
               bleibt der Leitbegriff (auch auf der Startseite); Ed25519 & Co.
               stehen nur noch unter „Was das Siegel belegt". */}
+          {/* Die Kurzform (Hex-Ziffern) steht im Aufklapper: in der Karte las
+              sie sich wie etwas, das man abschreiben oder vergleichen müsste,
+              an der Stelle, an der nur der QR-Code gezeigt werden soll (Audit
+              „Neuer Nutzer", F7). Gebraucht wird sie beim Abgleich mit der
+              Gegenstelle — dafür ist sie einen Tipp entfernt. */}
           <p className="hinweis">
-            {qr?.weitergeleitet ? "Gegengezeichnet" : "Signiert"} mit dem Echtheits-Siegel dieses
-            Geräts: <strong>{schluesselKurz ?? "Schlüssel wird erzeugt…"}</strong>
+            {qr?.weitergeleitet ? "Gegengezeichnet" : "Signiert"} mit dem Echtheits-Siegel dieses Geräts.
           </p>
+          {nurSitzung && (
+            <p className="hinweis" role="status">
+              Das Siegel gilt nur, solange diese Seite offen ist: Der Speicher nimmt den Geräteschlüssel
+              gerade nicht an. Code und PDF sind vollständig; die Gegenstelle sieht bei einer späteren
+              Übergabe ein anderes Siegel dieses Geräts.
+            </p>
+          )}
           <details className="signatur-detail">
             <summary>Was das Siegel belegt</summary>
+            <p className="hinweis">
+              Kurzform des Siegels: <strong>{schluesselKurz ?? "Schlüssel wird erzeugt…"}</strong> — die
+              Gegenstelle sieht dieselben Zeichen beim Einlesen.
+            </p>
             <p className="hinweis">
               Es belegt Herkunft und Integrität, nicht die Identität — der private Schlüssel bleibt
               auf dem Gerät. Technisch eine Ed25519-Signatur (+97 Byte je Bogen){qr ? ` · Format EEB2C${stufenText(qr)}` : ""}.
@@ -705,27 +945,65 @@ export function Uebersicht(props: {
           <AbsenderkarteFeld karte={absender} onGespeichert={setAbsender} />
         </div>
       </section>
+      {/* Die Übersicht hat keine feste Fußleiste: der Weg zurück steht am Ende
+          der Seite, an der gewohnten Stelle (R7-N9). */}
+      <p className="uebersicht-zurueck">
+        <button type="button" onClick={() => geheZu(4)}>← Zurück zu Schritt 5 (Sofortbedarf)</button>
+      </p>
       </div>
 
-      <dialog ref={teilenDialog} aria-label="Bogen übergeben" className="teilen-dialog">
+      <dialog
+        ref={teilenDialog}
+        aria-label="Bogen übergeben"
+        className="teilen-dialog"
+        // Beim nächsten Öffnen beginnt der Dialog ohne alte Quittung — sonst
+        // stünde „PDF gespeichert" von gestern unter einem frischen Bogen.
+        onClose={() => {
+          setPdfQuittung("");
+          setPdfFehler("");
+        }}
+      >
         <div className="kopfzeile">
           <h2>Bogen übergeben</h2>
           <button type="button" onClick={() => teilenDialog.current?.close()}>Schließen</button>
         </div>
+        {/* Solange die Frage der Geräteuhr offen ist, trägt der Bogen vielleicht ein falsches Datum (R7-W2). */}
+        <UhrHinweis />
         {/* Die Lücken stehen VOR den Wegen, nicht danach: hinter dem QR-Knopf
             gelesen wären sie eine Nachricht an jemanden, der schon zeigt.
             Gesperrt wird nichts — eine Teilmeldung ist manchmal richtig, und
             eine gesperrte Übergabe hilft am Meldekopf niemandem. Antippen
             schließt den Dialog und springt an die Stelle. */}
+        {/* Alter Bogen: zuerst fragen, ob er noch gilt — drei Tipps nach
+            „Fortsetzen" stand sonst der QR-Code eines Einsatzes vom Juli
+            (Audit Runde 2, R2-S1). */}
+        {/* Nur die Zeile steht vor dem QR-Knopf (R5-M1): Davor standen die Zeile,
+            „Für neuen Einsatz vorbereiten" und dessen Erklärung — bei 200 %
+            Schrift lag „QR-Code im Vollbild zeigen" 1 044 bis 1 212 px tief,
+            hinter einer Textwand. Der Vorbereiten-Knopf folgt dem QR-Knopf. */}
+        {zeitraumVorbei && props.onNeuerEinsatz && (
+          <p className="warnung" role="status">
+            Dieser Bogen gehört zum Einsatz {zeitraumDeutsch(bogen)} — gilt er noch?
+          </p>
+        )}
+        {/* Die Lücken stehen eingeklappt über den Wegen: Aufgeklappt schoben
+            sechs Punkte „QR-Code" und „PDF" unter das erste Bild, und wer
+            übergeben wollte, sah keinen Knopf dafür (Audit Runde 2, R2-H6).
+            Die Zahl bleibt sichtbar, die Liste ist ein Tipp entfernt. */}
         {offenePunkte.length > 0 && (
-          <Vollstaendigkeit
-            punkte={offenePunkte}
-            geheZu={(schritt) => {
-              teilenDialog.current?.close();
-              geheZu(schritt);
-            }}
-            nachsatz="Übergeben ist trotzdem möglich — der Bogen geht dann mit diesen Lücken an die Gegenstelle."
-          />
+          <details className="offene-punkte">
+            <summary className="warnung">
+              ⚠ {offenePunkte.length === 1 ? "1 offener Punkt" : `${offenePunkte.length} offene Punkte`} — ansehen · Übergeben ist trotzdem möglich
+            </summary>
+            <Vollstaendigkeit
+              punkte={offenePunkte}
+              geheZu={(schritt, feld) => {
+                teilenDialog.current?.close();
+                geheZu(schritt, feld);
+              }}
+              nachsatz="Der Bogen geht dann mit diesen Lücken an die Gegenstelle."
+            />
+          </details>
         )}
         <div className="teilen-weg">
           <button
@@ -734,15 +1012,22 @@ export function Uebersicht(props: {
             disabled={!qr}
             onClick={() => {
               teilenDialog.current?.close();
-              setVollbildTeil(0);
+              const fehlt = qr ? qr.teile.findIndex((_, i) => !vollbildGezeigt.has(i)) : -1;
+              setVollbildTeil(fehlt > 0 && vollbildGezeigt.size > 0 ? fehlt : 0);
               setVollbild(true);
+              // Vermerkt wird erst beim Schließen — und nur, wenn alle Teile
+              // gezeigt wurden (R3-H3).
+              ebeneBetreten(VOLLBILD_EBENE); // Zurück schließt nur das Vollbild (R2-H5)
             }}
           >
             QR-Code im Vollbild zeigen
           </button>
+          {/* Je Weg genau ein kurzer Satz: unter Stress wird der Text nicht
+              gelesen, aber er schiebt den nächsten Knopf nach unten — „PDF
+              erzeugen" lag nach zwei Erklärabsätzen außerhalb des Bildes. */}
           <p className="hinweis">
-            Vor Ort ohne Netz: Die Gegenstelle scannt den Code direkt vom Display
-            {qr?.segmentiert ? ` (${qr.teile.length} Teile nacheinander)` : ""}.
+            Die Gegenstelle scannt den Code vom Display
+            {qr?.segmentiert ? ` — ${qr.teile.length} Teile nacheinander` : ""}.
           </p>
         </div>
         {/* Handy zu Handy ohne Papier und ohne Kamera. Nur dort anbieten, wo es
@@ -753,9 +1038,7 @@ export function Uebersicht(props: {
               {nahDienst ? `Per ${nahDienst} senden` : "An Gerät in der Nähe senden"}
             </button>
             <p className="hinweis">
-              Handy zu Handy: im Teilen-Fenster {nahDienst ?? "den Nahbereichs-Dienst"} wählen —
-              ohne Netz, ohne Kopplung. Der Link trägt den ganzen Bogen, auch einen für den
-              QR-Code zu großen.
+              Handy zu Handy über {nahDienst ?? "den Nahbereichs-Dienst"} — ohne Netz, ohne Kopplung.
             </p>
           </div>
         )}
@@ -763,20 +1046,30 @@ export function Uebersicht(props: {
           <button type="button" className={pdfLaeuft ? "arbeitet" : ""} aria-busy={pdfLaeuft || undefined} onClick={pdf} disabled={pdfLaeuft}>
             {pdfLaeuft ? "PDF wird erstellt…" : "PDF erzeugen"}
           </button>
-          <p className="hinweis">Zum Drucken oder Versenden — Papier-Layout, QR-Code auf der letzten Seite.</p>
+          <p className="hinweis">Zum Drucken oder Versenden, mit QR-Code auf der letzten Seite. Das PDF ist immer hell, für Papier — auch in der Ansicht „Nacht“.</p>
+          {/* role="status": die Quittung kommt asynchron, nach dem Klick — ohne
+              Ansage erführe ein Screenreader nichts davon. */}
+          {pdfQuittung && <p className="hinweis pdf-quittung" role="status">✓ {pdfQuittung}</p>}
+          {pdfFehler && <p className="fehler pdf-fehler" role="alert" ref={pdfFehlerZeile}>{pdfFehler}</p>}
         </div>
         {/* Zweite Stufe: Vor Ort zählen fast immer QR-Vollbild, Nahbereich
             oder PDF (oben). Link/CSV/Excel sind Chat- bzw. Führungsstellen-
             Aufgaben — eingeklappt bleiben es am Entscheidungspunkt ≤4 sichtbare
             Optionen, und alle Ausgabewege sind trotzdem an EINER Stelle. */}
         <details className="teilen-weitere">
-          <summary>Weitere Formate (Link, Tabelle, Excel)</summary>
+          <summary>Weitere Formate (Link, Tabelle, Excel, Blanko)</summary>
           <div className="teilen-weg">
             <button type="button" onClick={bogenLinkTeilen} disabled={!qr}>
               {linkKopiert ? "Link kopiert ✓" : "Link teilen"}
             </button>
+            {/* Der Link trägt den Bogen, aber nicht die App: Ein Gerät, das die
+                Seite nie mit Netz geöffnet hat, zeigt offline nur eine
+                Fehlerseite. Das muss der Absender vorher wissen, nicht der
+                Empfänger im Funkloch (Audit Runde 2, R2-O5). */}
             <p className="hinweis">
               Für Chat, Mail oder Notiz: derselbe Inhalt wie im QR-Code — öffnet den Bogen beim Antippen.
+              Ohne Netz öffnet er sich nur, wenn die Gegenstelle die App schon einmal mit Netz
+              geöffnet hat — sonst QR-Code oder PDF weitergeben (die PDF trägt den Bogen selbst).
             </p>
           </div>
           {/* Anders als die Wege darüber ist CSV eine Einbahnstraße: es trägt
@@ -796,6 +1089,12 @@ export function Uebersicht(props: {
               deren Vorlage. Zum Einfügen in die laufende Liste am Meldekopf.
             </p>
           </div>
+          {/* Der leere Vordruck für die nächste Einheit ohne Gerät oder den
+              Ausfall dieses Geräts (Audit Runde 3, R3-A7). */}
+          <div className="teilen-weg">
+            <button type="button" onClick={blanko}>Blanko-Vordruck (Papier-Reserve)</button>
+            <p className="hinweis">Leerer Bogen, 2 Seiten A4, zum Ausfüllen mit der Hand.</p>
+          </div>
           {/* Roh-JSON nur im Debug-Modus anbieten: fürs Publikum ist der Bogen
               ohnehin in jeder PDF eingebettet — ein separater JSON-Download
               verwirrt mehr, als er nützt. */}
@@ -806,43 +1105,285 @@ export function Uebersicht(props: {
             </div>
           )}
         </details>
+        {/* R8-D6: Das Zurücksetzende steht am Ende des Dialogs, abgesetzt — nicht zwischen „QR-Code im
+            Vollbild zeigen“ und „PDF erzeugen“, den beiden Wegen zum Weitergeben. */}
+        {zeitraumVorbei && props.onNeuerEinsatz && (
+          <div className="teilen-weg teilen-weg-ende">
+            {/* Kein zweiter Primärknopf: Nachts standen zwei gleich
+                bernsteinfarbene Knöpfe untereinander (Audit Runde 3, R3-L7);
+                die Übergabe bleibt der eine Primärknopf, er steht jetzt vorn. */}
+            <button
+              type="button"
+              onClick={async () => {
+                // Rückfrage mit den Feldern, die verloren gehen (R7-G2): Der Knopf
+                // steht neben QR-Code und PDF, ein Fehltipp setzte sonst Auftrag
+                // und Sofortbedarf ohne Frage zurück.
+                const ort = bogen.einsatz.ortAuftrag.trim();
+                const verloren = [
+                  `Zeitraum ${zeitraumDeutsch(bogen)} (wird auf heute gesetzt)`,
+                  ort ? `Ort/Auftrag „${ort.length > 60 ? `${ort.slice(0, 59)}…` : ort}"` : "",
+                  bogen.sofortbedarf ? "der Sofortbedarf" : "",
+                ].filter(Boolean);
+                const ja = await frageJaNein({
+                  titel: "Für neuen Einsatz vorbereiten?",
+                  text: `Zurückgesetzt werden: ${verloren.join("; ")}. Personal und Fahrzeuge bleiben. Das lässt sich hier nicht zurücknehmen — wer die Angaben noch braucht, gibt den Bogen vorher weiter.`,
+                  ok: "Zurücksetzen",
+                  abbruch: "Abbrechen, Bogen behalten",
+                  gefahr: true,
+                });
+                if (!ja) return;
+                teilenDialog.current?.close();
+                props.onNeuerEinsatz?.();
+              }}
+            >
+              Für neuen Einsatz vorbereiten
+            </button>
+            <p className="hinweis">Zeitraum heute, Ort/Auftrag und Sofortbedarf leer — Personal und Fahrzeuge bleiben.</p>
+          </div>
+        )}
         {fehler && <p className="fehler">{fehler}</p>}
       </dialog>
 
-      {vollbild && qr && (() => {
-        const teil = qr.teile[Math.min(vollbildTeil, qr.teile.length - 1)]!;
-        return (
-          <div className="qr-vollbild" role="dialog" aria-label="QR-Code im Vollbild">
-            <img
-              src={teil.datenUrl}
-              alt={qr.segmentiert ? `EEB2-QR-Code Teil ${teil.teilNr} von ${teil.anzahl}` : "EEB2-QR-Code"}
-            />
-            {qr.segmentiert && (
-              <p>
-                <strong>Teil {teil.teilNr} von {teil.anzahl}</strong> — alle Teile nacheinander scannen lassen.
-              </p>
-            )}
-            <p className="hinweis">Der Bildschirm bleibt an — Display-Helligkeit hoch stellen hilft beim Scannen.</p>
-            <div className="qr-vollbild-nav">
-              {qr.segmentiert && (
-                <button type="button" disabled={vollbildTeil === 0} onClick={() => setVollbildTeil(vollbildTeil - 1)}>
-                  ← Voriger Teil
-                </button>
-              )}
-              {qr.segmentiert && (
-                <button
-                  type="button"
-                  disabled={vollbildTeil >= qr.teile.length - 1}
-                  onClick={() => setVollbildTeil(vollbildTeil + 1)}
-                >
-                  Nächster Teil →
-                </button>
-              )}
-              <button type="button" className="primaer" onClick={() => setVollbild(false)}>Schließen</button>
-            </div>
-          </div>
-        );
-      })()}
+      {vollbild && qr && (
+        <QrVollbild
+          qr={qr}
+          einheit={`${orgLabel(org)} · ${vokabText(bogen.einheit.einheitsTyp, vokabularFuer(org, "einheitstyp"), "name") || "(Einheitstyp offen)"} · ${einheitOrt(bogen.einheit) || "(Standort offen)"}`}
+          staerke={staerkeText}
+          ohneNamen={nurStaerke ? 0 : bogen.personal.filter(personUnbenannt).length}
+          teilIndex={vollbildTeil}
+          onTeil={setVollbildTeil}
+          bereitsGezeigt={vollbildGezeigt}
+          onGezeigt={setVollbildGezeigt}
+          onSchliessen={(ergebnis) =>
+            ebeneVerlassen(VOLLBILD_EBENE, () => {
+              setVollbild(false);
+              if (ergebnis) props.onUebergeben?.("qr", ergebnis === "bestaetigt");
+            })
+          }
+          onZurueck={(ergebnis) => {
+            setVollbild(false);
+            if (ergebnis) props.onUebergeben?.("qr", ergebnis === "bestaetigt");
+          }}
+        />
+      )}
     </>
+  );
+}
+
+/**
+ * QR-Code im Vollbild zum Vorzeigen. Ein modaler `<dialog>` (R2-M3): Fokus
+ * und Vorlesen bleiben im Overlay, die Übersicht dahinter rollt nicht mit,
+ * Escape schließt, und der Fokus kehrt auf „Bogen übergeben…" zurück.
+ */
+const VOLLBILD_EBENE = "qr-vollbild";
+
+/**
+ * Was beim Schließen des Vollbilds vermerkt wird (R3-H3): `undefined` =
+ * nichts (nicht alle Teile gezeigt), „gezeigt" = alle Teile gezeigt, Empfang
+ * offen, „bestaetigt" = der Nutzer hat gesagt, dass gescannt wurde.
+ */
+export type VollbildErgebnis = "gezeigt" | "bestaetigt" | undefined;
+
+export function QrVollbild(props: {
+  qr: QrSatz;
+  /** Wer gezeigt wird — Organisation · Einheitstyp · Standort. */
+  einheit: string;
+  /** Stärke „F / UF / M / Ges" als Zahlen. */
+  staerke: string;
+  /** Personenkarten ohne Namen: Die Stärke zählt dann Sollplätze, keine benannten Personen (R7-N7). */
+  ohneNamen?: number;
+  teilIndex: number;
+  onTeil: (i: number) => void;
+  /** Teile, die bei einem früheren Öffnen schon gezeigt wurden. */
+  bereitsGezeigt?: ReadonlySet<number>;
+  /** Meldet jeden neu gezeigten Teil (für das nächste Öffnen). */
+  onGezeigt?: (gezeigt: ReadonlySet<number>) => void;
+  /** Knopf oder Escape — verbraucht auch den Verlaufseintrag. */
+  onSchliessen: (ergebnis: VollbildErgebnis) => void;
+  /** Geräte-/Browser-Zurück — der Eintrag ist dann schon weg. */
+  onZurueck: (ergebnis: VollbildErgebnis) => void;
+}) {
+  const { qr, teilIndex } = props;
+  const dialog = useRef<HTMLDialogElement>(null);
+  const anzahl = qr.teile.length;
+  const index = Math.min(teilIndex, anzahl - 1);
+  const teil = qr.teile[index]!;
+  // Welche Teile schon auf dem Bildschirm standen: „gezeigt" gilt erst, wenn
+  // es alle waren — vorher hieß schon Teil 1 von 2 „Übergeben" (R3-H3). Ein
+  // Teil von mehreren zählt zudem erst, wenn er die Mindestzeit im Bild stand
+  // (R5-S1): Ein Doppeltipp ließ Teil 2 150 ms aufblitzen, und er galt als
+  // gezeigt, ohne dass die Kamera ihn je hatte. Ein einzelner Code zählt sofort.
+  const sofortGezeigt = !qr.segmentiert || mindestzeigeDauer() <= 0;
+  const [gezeigt, setGezeigt] = useState<ReadonlySet<number>>(
+    () => new Set([...(props.bereitsGezeigt ?? []), ...(sofortGezeigt ? [index] : [])]),
+  );
+  const onGezeigt = useRef(props.onGezeigt);
+  onGezeigt.current = props.onGezeigt;
+  useEffect(() => onGezeigt.current?.(gezeigt), [gezeigt]);
+  const alleGezeigt = gezeigt.size >= anzahl;
+  /** Mehrteilig, und es steht noch ein Teil nach diesem aus: „Weiter zu Teil n" ist der Hauptknopf. */
+  const weiterIstHaupt = qr.segmentiert && !alleGezeigt && index < anzahl - 1;
+  const fehlend = qr.teile.findIndex((_, i) => !gezeigt.has(i));
+  // „zeigen" = Code; „frage" = Wurde gescannt?; „fehlt" = ein Teil fehlt noch.
+  const [phase, setPhase] = useState<"zeigen" | "frage" | "fehlt">("zeigen");
+  const ohneFrage = (): VollbildErgebnis => (alleGezeigt ? "gezeigt" : undefined);
+  useEffect(() => {
+    if (phase !== "zeigen") return;
+    const mark = () => setGezeigt((g) => (g.has(index) ? g : new Set([...g, index])));
+    if (sofortGezeigt) {
+      mark();
+      return;
+    }
+    const uhr = setTimeout(mark, mindestzeigeDauer());
+    return () => clearTimeout(uhr);
+  }, [index, phase, sofortGezeigt]);
+  /** Teilwechsel: Die Fingerstelle bleibt kurz gesperrt, der Nachtipp überspringt keinen Teil (R5-S1, R5-G1). */
+  const wechseln = (i: number) => {
+    ortSperren();
+    props.onTeil(i);
+  };
+  /**
+   * Zurück-Geste und Escape wie „Schließen", solange Teile fehlen: Sie
+   * schlossen das Vollbild sonst mitten in der Übergabe ohne Hinweis, und
+   * „Schließen" fragte im selben Zustand nach (Audit Runde 4, R4-M5). Einmal
+   * abgefangen, steht „Teil n wurde noch nicht gezeigt" da; ein zweites
+   * Zurück schließt dann wirklich (wie „Trotzdem schließen").
+   */
+  const fehlteilAbfangen = (): boolean => {
+    if (phase !== "zeigen" || alleGezeigt) return false;
+    setPhase("fehlt");
+    return true;
+  };
+  useModalesOverlay(dialog, {
+    onSchliessen: () => {
+      if (!fehlteilAbfangen()) props.onSchliessen(ohneFrage());
+    },
+  });
+  useEbeneZurueck(VOLLBILD_EBENE, () => {
+    if (fehlteilAbfangen()) {
+      ebeneBetreten(VOLLBILD_EBENE); // die Geste ist verbraucht — der nächste Rücksprung landet wieder hier
+      return;
+    }
+    props.onZurueck(ohneFrage());
+  });
+  // Stand = Moment des Öffnens; der Code zeigt den Bogen, wie er jetzt ist.
+  const [stand] = useState(() => new Date().toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit" }));
+  const teilText = (i: number) => `Teil ${i + 1} von ${anzahl}`;
+  return (
+    <dialog ref={dialog} className="qr-vollbild" aria-label="QR-Code im Vollbild" tabIndex={-1} data-zurueck="eigen">
+      {/* Wer mehrere Telefone nacheinander scannt, prüft vor dem Scan, welcher
+          Bogen gerade gezeigt wird — vorher stand hier nur der Code
+          (Audit Runde 2, R2-W6, R2-N9, R2-O7). */}
+      <p className="qr-vollbild-kopf">
+        <strong>{props.einheit}</strong>
+        <br />
+        Stärke <strong>{props.staerke}</strong> <span className="hinweis">(F / UF / M / Ges) · Stand {stand} Uhr</span>
+        {props.ohneNamen != null && props.ohneNamen > 0 && (
+          <>
+            <br />
+            <span className="warnung-text">
+              ⚠ {props.ohneNamen} {props.ohneNamen === 1 ? "Platz" : "Plätze"} ohne Namen — Stärke nach Soll
+            </span>
+          </>
+        )}
+      </p>
+      {/* „Teil 1 von 2" ÜBER dem Code: darunter verdeckte ihn die klebende
+          Knopfleiste, und der zweite Teil wurde leicht vergessen (R3-H2). */}
+      {qr.segmentiert && phase === "zeigen" && (
+        <p className="qr-vollbild-teil">
+          <strong>{teilText(index)}</strong>
+          <span className="qr-vollbild-teil-zusatz"> — alle nacheinander scannen lassen.</span>
+        </p>
+      )}
+      {phase === "zeigen" && (
+        <div className="qr-vollbild-code">
+          <img
+            src={teil.datenUrl}
+            alt={qr.segmentiert ? `EEB2-QR-Code Teil ${teil.teilNr} von ${teil.anzahl}` : "EEB2-QR-Code"}
+          />
+        </div>
+      )}
+      {phase === "zeigen" && (
+        <p className="hinweis qr-vollbild-tipp">Der Bildschirm bleibt an — Display-Helligkeit hoch stellen hilft beim Scannen.</p>
+      )}
+      {phase === "frage" && (
+        <div className="qr-vollbild-frage" role="group" aria-label="Wurde gescannt?">
+          <p>
+            <strong>{anzahl > 1 ? `Hat die Gegenstelle alle ${anzahl} Teile gescannt?` : "Hat die Gegenstelle den Code gescannt?"}</strong>
+          </p>
+          <p className="hinweis">Die App kann das nicht selbst sehen.</p>
+          <div className="qr-vollbild-nav">
+            <button type="button" className="primaer" onClick={() => props.onSchliessen("bestaetigt")}>
+              Ja, gescannt — übergeben
+            </button>
+            <button type="button" onClick={() => props.onSchliessen("gezeigt")}>Nicht sicher</button>
+            <button type="button" onClick={() => { ortSperren(); setPhase("zeigen"); }}>← Code wieder zeigen</button>
+          </div>
+        </div>
+      )}
+      {phase === "fehlt" && fehlend >= 0 && (
+        <div className="qr-vollbild-frage" role="group" aria-label="Teil fehlt">
+          <p className="warnung">
+            <strong>{teilText(fehlend)} wurde noch nicht gezeigt.</strong> Ein Teil gilt als gezeigt, wenn er mindestens{" "}
+            {(mindestzeigeDauer() / 1000).toLocaleString("de-DE", { maximumFractionDigits: 1 })} s im Bild stand. Ohne ihn hat die Gegenstelle den Bogen nicht.
+          </p>
+          <div className="qr-vollbild-nav">
+            <button
+              type="button"
+              className="primaer"
+              onClick={() => {
+                ortSperren();
+                props.onTeil(fehlend);
+                setPhase("zeigen");
+              }}
+            >
+              {teilText(fehlend)} zeigen
+            </button>
+            <button type="button" onClick={() => props.onSchliessen(undefined)}>Trotzdem schließen</button>
+          </div>
+        </div>
+      )}
+      {phase === "zeigen" && (
+        <div className={`qr-vollbild-nav${qr.segmentiert ? " mit-teilen" : ""}`}>
+          {qr.segmentiert && (
+            <button
+              type="button"
+              disabled={index === 0}
+              aria-label={index === 0 ? "Voriger Teil" : `Voriger Teil (${index} von ${anzahl})`}
+              onClick={() => wechseln(index - 1)}
+            >
+              {index === 0 ? "←" : `← Teil ${index}`}
+            </button>
+          )}
+          {qr.segmentiert && (
+            <button
+              type="button"
+              // Solange Teile fehlen, ist „Weiter" der Hauptknopf (R4-H5).
+              className={weiterIstHaupt ? "haupt" : undefined}
+              disabled={index >= anzahl - 1}
+              aria-label={index >= anzahl - 1 ? "Nächster Teil" : `Nächster Teil (${index + 2} von ${anzahl})`}
+              onClick={() => wechseln(index + 1)}
+            >
+              {/* Die Teilzahl auch im Knopf — er bleibt im Bild, wenn der Text darüber es nicht ist (R3-H2). */}
+              {index >= anzahl - 1 ? `${teilText(index)} ist der letzte` : `Weiter zu Teil ${index + 2} →`}
+            </button>
+          )}
+          <button
+            type="button"
+            // „Schließen" tritt zurück, solange noch Teile fehlen: Der Daumen griff
+            // zum dunklen Knopf, und die Rückfrage musste den Fehlgriff abfangen
+            // (Audit Runde 4, R4-H5). Platz und Maß bleiben (Klasse „primaer").
+            className={weiterIstHaupt ? "primaer zurueck" : "primaer"}
+            onClick={() => {
+              // Darunter erscheint die Rückfrage: ein Nachtipp bestätigt sie nicht (R5-S1).
+              ortSperren();
+              setPhase(alleGezeigt ? "frage" : "fehlt");
+            }}
+          >
+            Schließen
+          </button>
+        </div>
+      )}
+    </dialog>
   );
 }

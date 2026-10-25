@@ -11,7 +11,7 @@ import { useState } from "react";
 import { staerke, type Erfassungsbogen } from "@bos/eeb-format/model";
 import { zusammenfuehrungFehler, fuegeZusammen } from "@bos/meldekopf/zusammenfuehren";
 import type { MeldeEintrag, ZusammenfuehrungOptionen } from "@bos/meldekopf/einsaetze";
-import { einheitAnzeigename, zeitgruppe } from "./hilfen";
+import { einheitAnzeigename, zeitpunktDeutsch } from "./hilfen";
 
 /** Kurzfassung „0 / 1 / 8 / 9 · 2 Fzg" für die Vorschau. */
 function bilanz(b: Erfassungsbogen): string {
@@ -70,7 +70,7 @@ export function ZusammenfuehrenPanel(props: {
           <span className="muster-text">
             <span className="muster-name">{t.teilEtikett ?? einheitAnzeigename(t.bogen.einheit)}</span>
             <span className="muster-sub">
-              Stärke {bilanz(t.bogen)} · Stand {zeitgruppe(t.bogen.stand)}
+              Stärke {bilanz(t.bogen)} · Stand {zeitpunktDeutsch(t.bogen.stand)}
             </span>
           </span>
         </label>

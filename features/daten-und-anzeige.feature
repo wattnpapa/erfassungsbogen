@@ -15,18 +15,20 @@ Funktionalität: Darstellung, Datensicherung und Auskunft
     Dann ist der Anzeigemodus "Nacht" aktiv
 
   # Rückmeldung aus Cuxhaven (August 2026): auf einem Android-Gerät mit dunklem
-  # Systemdesign war der Hintergrund dunkel, die Schrift aber schwarz. Die App
-  # folgt dem Systemdesign nun nicht mehr — dunkel wird hier gewählt, nicht geerbt.
+  # Systemdesign war der Hintergrund dunkel, die Schrift aber schwarz. Seit dem
+  # Audit „Nacht und Sicht" (docs/audits/nacht-und-sicht.md) startet die App bei dunklem
+  # Systemdesign im eigenen, vollständig abgestimmten Modus „Dunkel" — geerbt
+  # wird die Wahl, nicht einzelne Farben. Eine ausdrückliche Wahl hat Vorrang.
   Szenario: Dunkles Systemdesign lässt die App lesbar
     Angenommen mein Gerät auf dunkles Design eingestellt ist
     Und die App sich als Android-App zeigt
     Und ich öffne die App
-    Dann ist der Anzeigemodus "Standard" aktiv
+    Dann ist der Anzeigemodus "Dunkel" aktiv
     Und hebt sich jeder Text von seiner Fläche ab
-    Wenn ich den Anzeigemodus "Dunkel" wähle
+    Wenn ich den Anzeigemodus "Standard" wähle
     Dann hebt sich jeder Text von seiner Fläche ab
     Wenn ich die Seite neu lade
-    Dann ist der Anzeigemodus "Dunkel" aktiv
+    Dann ist der Anzeigemodus "Standard" aktiv
     Und hebt sich jeder Text von seiner Fläche ab
 
   # Rückmeldung Anwender (August 2026): „Nacht ist aus irgendeinem Grund weiß."
@@ -58,7 +60,10 @@ Funktionalität: Darstellung, Datensicherung und Auskunft
     Wenn ich auf "Als Vorlage speichern" klicke
     Und ich im Dialog "Name der Vorlage" mit "FGr K Oldenburg" fülle
     Und ich im Dialog auf "Vorlage speichern" klicke
-    Und ich auf "‹ Startseite" klicke
+    # Erst die Rückmeldung abwarten: Das Schließen des Dialogs nimmt seinen Verlaufseintrag
+    # asynchron zurück, ein sofortiger Tipp auf „Startseite" landete sonst wieder im Bogen.
+    Dann sehe ich den Hinweis 'Als Vorlage „FGr K Oldenburg" gespeichert.'
+    Wenn ich auf "‹ Startseite" klicke
     Und ich auf "Datensicherung" klicke
     Und ich auf "Sicherung erstellen…" klicke und eine Datei erhalte
     Und ich im Dialog auf "Schließen" klicke
@@ -128,7 +133,7 @@ Funktionalität: Darstellung, Datensicherung und Auskunft
     Und ich auf "Verwerfen" klicke
     Dann sehe ich den Dialog "Angefangenen Bogen verwerfen?"
     Wenn ich im Dialog auf "Verwerfen" klicke
-    Dann sehe ich den Hinweis "Angefangener Bogen verworfen."
+    Dann sehe ich den Hinweis "Angefangener Bogen verworfen — Rückholung oben auf der Startseite."
     Und sehe ich die Schaltfläche "Fortsetzen" nicht
 
   Szenario: Das Verwerfen abbrechen lässt den angefangenen Bogen stehen
@@ -158,7 +163,7 @@ Funktionalität: Darstellung, Datensicherung und Auskunft
     Angenommen ich öffne die App
     Dann sehe ich die Überschrift "So funktioniert’s"
     Und sehe ich den Hinweis "1. Bogen ausfüllen"
-    Und sehe ich den Hinweis "Funktioniert komplett offline"
+    Und sehe ich den Hinweis "Alle Daten bleiben auf diesem Gerät"
 
   Szenario: Ein kaputter Link meldet sich verständlich
     Angenommen ich öffne einen Bogen-Link mit beschädigtem Inhalt

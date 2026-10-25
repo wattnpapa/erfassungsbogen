@@ -48,7 +48,7 @@ Bisher keine formell bindenden Zusagen erklärt (Stand 2026-08-06). Faktisch vor
 
 ## Evidence on Hand
 
-- Beispielbögen als JSON unter `examples/` (KatS Niedersachsen/Sachsen/Brandenburg/Thüringen, Feuerwehr NDS, DRK, DLRG, THW).
+- Beispielbögen als JSON unter `examples/` (KatS Niedersachsen/Sachsen/Brandenburg/Thüringen, Feuerwehr NDS, DRK, DLRG, THW, praktische Ausbildung Johanniter/Hannover).
 - Eigene Landingpages je Organisation (thw/feuerwehr/drk/johanniter/malteser/asb/dlrg/katastrophenschutz/meldekopf) plus Anleitung und „Papier oder digital?".
 - Keine Testimonials, Fallstudien oder Nutzerzahlen vorhanden — nicht erfinden.
 

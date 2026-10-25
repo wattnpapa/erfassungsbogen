@@ -4,10 +4,18 @@
  */
 
 import { PersonalErfassung, staerke, verpflegung } from "@bos/eeb-format/model";
-import { Feld, zahl, type SchrittProps } from "./bausteine";
+import { pruefpunkte } from "../hilfen";
+import { useState } from "react";
+import { Feld, Hinweise, ZahlEingabe, zahlBegrenzung, type SchrittProps } from "./bausteine";
 
 export function SchrittSofortbedarf({ bogen, aendern }: SchrittProps) {
   const s = bogen.sofortbedarf;
+  // Welches Feld zuletzt begrenzt wurde — „−40 l" würde sonst still zu 0 (R7-E6).
+  const [grenze, setGrenze] = useState<{ feld: string; text: string } | null>(null);
+  const merkeGrenze = (feld: string, eingabe: string) => {
+    const text = zahlBegrenzung(eingabe, { min: 0 });
+    setGrenze((alt) => (text ? { feld, text } : alt?.feld === feld ? null : alt));
+  };
   const gesamt = staerke(bogen).gesamt;
   const nurStaerke = bogen.personalErfassung === PersonalErfassung.NUR_STAERKE;
   const vp = verpflegung(bogen);
@@ -30,19 +38,23 @@ export function SchrittSofortbedarf({ bogen, aendern }: SchrittProps) {
         />
         Sofortbedarf erfassen
       </label>
+      {/* Was darunter fällt, vor dem Anhaken: Ein Neuling wusste es erst danach (R4-N6). */}
+      {!s && (
+        <p className="hinweis">Verpflegung, Betriebsstoff (Diesel, Benzin, Gemisch), Unterbringung, Ruhezeit — nur anhaken, wenn die Einheit etwas anfordert.</p>
+      )}
       {s && (
         <>
           <div className="zeile">
             <Feld titel="Verpflegung (Personen)" schmal>
-              <input type="number" min={0} value={s.verpflegungPersonen} onChange={(e) => aendern({ sofortbedarf: { ...s, verpflegungPersonen: zahl(e.target.value) } })} />
+              <ZahlEingabe min={0} wert={s.verpflegungPersonen} setzen={(n, text) => { merkeGrenze("verpflegungPersonen", text); aendern({ sofortbedarf: { ...s, verpflegungPersonen: n } }); }} />
             </Feld>
             {nurStaerke ? (
               <>
                 <Feld titel="davon vegetarisch" schmal>
-                  <input type="number" min={0} value={vp.vegetarisch} onChange={(e) => setVpManuell({ vegetarisch: zahl(e.target.value) })} />
+                  <ZahlEingabe min={0} wert={vp.vegetarisch} setzen={(n) => setVpManuell({ vegetarisch: n })} />
                 </Feld>
                 <Feld titel="davon vegan" schmal>
-                  <input type="number" min={0} value={vp.vegan} onChange={(e) => setVpManuell({ vegan: zahl(e.target.value) })} />
+                  <ZahlEingabe min={0} wert={vp.vegan} setzen={(n) => setVpManuell({ vegan: n })} />
                 </Feld>
               </>
             ) : (
@@ -51,15 +63,28 @@ export function SchrittSofortbedarf({ bogen, aendern }: SchrittProps) {
               </Feld>
             )}
             <Feld titel="Diesel (l)" schmal>
-              <input type="number" min={0} value={s.dieselLiter} onChange={(e) => aendern({ sofortbedarf: { ...s, dieselLiter: zahl(e.target.value) } })} />
+              <ZahlEingabe min={0} wert={s.dieselLiter} setzen={(n, text) => { merkeGrenze("dieselLiter", text); aendern({ sofortbedarf: { ...s, dieselLiter: n } }); }} />
             </Feld>
             <Feld titel="Benzin (l)" schmal>
-              <input type="number" min={0} value={s.benzinLiter} onChange={(e) => aendern({ sofortbedarf: { ...s, benzinLiter: zahl(e.target.value) } })} />
+              <ZahlEingabe min={0} wert={s.benzinLiter} setzen={(n, text) => { merkeGrenze("benzinLiter", text); aendern({ sofortbedarf: { ...s, benzinLiter: n } }); }} />
             </Feld>
             <Feld titel="Gemisch (l)" schmal>
-              <input type="number" min={0} value={s.gemischLiter} onChange={(e) => aendern({ sofortbedarf: { ...s, gemischLiter: zahl(e.target.value) } })} />
+              <ZahlEingabe min={0} wert={s.gemischLiter} setzen={(n, text) => { merkeGrenze("gemischLiter", text); aendern({ sofortbedarf: { ...s, gemischLiter: n } }); }} />
             </Feld>
           </div>
+          {grenze && (
+            <p className="hinweis warnung-text" role="status">
+              {grenze.text}
+            </p>
+          )}
+          {/* Eine Angabe, ein Ort: der Bedarf folgt der Stärke (verpflegungMitziehen
+              in hilfen.ts), solange er ihr entspricht — wer bewusst abweicht,
+              behält seine Zahl. Das muss dranstehen, sonst wundert man sich,
+              warum die Zahl mal mitgeht und mal nicht. */}
+          <p className="hinweis">
+            Verpflegung ist aus der Stärke vorbelegt und zieht mit ihr mit; abweichend eintragen,
+            wenn mehr oder weniger bestellt wird.
+          </p>
           <p>
             <label className="inline">
               <input type="checkbox" checked={s.unterbringung} onChange={(e) => aendern({ sofortbedarf: { ...s, unterbringung: e.target.checked } })} />
@@ -75,6 +100,9 @@ export function SchrittSofortbedarf({ bogen, aendern }: SchrittProps) {
       <Feld titel="Sonstiges (Freitext)">
         <textarea rows={3} value={bogen.sonstiges ?? ""} onChange={(e) => aendern({ sonstiges: e.target.value || undefined })} />
       </Feld>
+      {/* Schritt-Index 4 = Sofortbedarf (siehe SCHRITTE in app.tsx): „Diesel
+          99 999 l" fiel vorher erst in der Übersicht auf — wenn überhaupt. */}
+      <Hinweise punkte={pruefpunkte(bogen, false)} aktuellerSchritt={4} />
     </section>
   );
 }

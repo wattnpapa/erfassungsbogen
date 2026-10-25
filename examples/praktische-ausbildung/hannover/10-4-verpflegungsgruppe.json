@@ -1,0 +1,59 @@
+{
+  "schemaVersion": 9,
+  "uebung": true,
+  "stand": 2171520,
+  "einheit": {
+    "organisation": 7,
+    "einheitsTyp": {
+      "freitext": "4. Verpflegungsgruppe Landeshauptstadt Hannover"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Standort"
+        },
+        "name": "Hannover"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 1508,
+    "zeitraumBis": 1508,
+    "ortAuftrag": "Praktische Ausbildung (Übung): Einlagen Kräfte, Landeshauptstadt Hannover"
+  },
+  "personalErfassung": 1,
+  "personal": [],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "LKW Lbw (1)"
+      },
+      "kennzeichen": "H-X XXX"
+    },
+    {
+      "typ": {
+        "freitext": "LKW Lbw (2)"
+      },
+      "kennzeichen": "H-X XXX"
+    },
+    {
+      "typ": {
+        "freitext": "FKH"
+      },
+      "kennzeichen": "H-X XXX"
+    },
+    {
+      "typ": {
+        "freitext": "MTW"
+      },
+      "kennzeichen": "H-X XXX"
+    }
+  ],
+  "staerkeManuell": {
+    "fuehrer": 0,
+    "unterfuehrer": 1,
+    "mannschaft": 8,
+    "gesamt": 9
+  },
+  "sonstiges": "Fachdienst: Verpflegung. Hauptleistung: Verpflegung (250 Pers.). Kommunikation: Rufname Malta."
+}

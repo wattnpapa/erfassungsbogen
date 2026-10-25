@@ -16,9 +16,17 @@ import type { Erfassungsbogen } from "@bos/eeb-format/model";
 import { base64UrlDekodieren } from "@bos/eeb-format/codec";
 import { einheitAnzeigename, natoZeitstempel, qrErzeugen } from "./hilfen";
 import { istNativ, binaerTeilen } from "./nativ";
-import { einsatzPdfDokument, pdfDokument, type SammelBogen } from "./pdf-dokument";
+import { einsatzLageblattSeiteFuellen, einsatzPdfDokumentGesetzt, einzelPdfDokument, nichtDarstellbareBetroffene, nichtDarstellbareNamen, pdfDokument, type SammelBogen, type UebersichtEintrag } from "./pdf-dokument";
 import { einsatzDateiInhalt } from "./einsatz-transport";
-import { revisionen, type Einsatzsammlung, type MeldeEintrag } from "@bos/meldekopf/einsaetze";
+import { lageAngabenLaden } from "./lage-angaben";
+import { BLANKO_DATEINAME, BLANKO_INFO, BLANKO_ZEILEN, leererBogen } from "./blanko";
+import { MeldeStatus, type Einsatzsammlung, type MeldeEintrag } from "@bos/meldekopf/einsaetze";
+import { geltendeJeEinheit, fassungenJeEinheit } from "./fassung-vorrang";
+import { zaehltInLage } from "./auswertung";
+import { eintreffzeit } from "./eintrag-zeiten";
+import { exportStaendeLaden, lageblattVermerken, weitergabeVermerken } from "./export-stand";
+import { abweichenderOrt } from "./einheiten-tabelle";
+import { meldungsNummern } from "./einheiten-tabelle";
 
 interface FontContainer {
   vfs: Record<string, string | { data: string; encoding?: string }>;
@@ -51,6 +59,14 @@ pdf.addFonts({
 });
 
 /**
+ * Einzel-PDF mit Platz für Stiftnachträge, wo er keine Seite kostet: ein
+ * Probesatz misst den freien Platz (Audit Runde 3, R3-A6).
+ */
+function einzelDokument(b: Erfassungsbogen, qr: Awaited<ReturnType<typeof qrErzeugen>>) {
+  return einzelPdfDokument(b, qr, (probe) => pdfMake.createPdf(probe).getBuffer());
+}
+
+/**
  * Bogen als PDF ausgeben. `name` überschreibt den aus der Einheit abgeleiteten
  * Dateinamen (die Beispielbögen behalten so ihren Dateinamen aus examples/).
  * `herkunft` = empfangener Payload: unverändert weitergereicht behält der
@@ -60,9 +76,11 @@ export async function pdfErzeugen(
   b: Erfassungsbogen,
   name?: string,
   herkunft?: Uint8Array | null,
-): Promise<void> {
+): Promise<{ nichtDarstellbar: number; betroffen: string[] }> {
   const qr = await qrErzeugen(b, herkunft);
-  const dd = pdfDokument(b, qr);
+  const dd = await einzelDokument(b, qr);
+  const nichtDarstellbar = nichtDarstellbareNamen(b);
+  const betroffen = nichtDarstellbareBetroffene(b);
   const rumpf = einheitAnzeigename(b.einheit).replace(/[^\wäöüÄÖÜß-]+/g, "_");
   const dateiname = name ?? `eeb-${natoZeitstempel()}_${rumpf}.pdf`;
   if (istNativ()) {
@@ -72,6 +90,7 @@ export async function pdfErzeugen(
   } else {
     pdfMake.createPdf(dd).download(dateiname);
   }
+  return { nichtDarstellbar, betroffen };
 }
 
 /**
@@ -85,7 +104,7 @@ export async function pdfErzeugen(
  */
 export async function pdfBlobUrl(b: Erfassungsbogen, herkunft?: Uint8Array | null): Promise<string> {
   const qr = await qrErzeugen(b, herkunft);
-  const dd = pdfDokument(b, qr);
+  const dd = await einzelDokument(b, qr);
   return URL.createObjectURL(await pdfMake.createPdf(dd).getBlob());
 }
 
@@ -130,32 +149,158 @@ export async function meldungPdfAnzeigen(m: MeldeEintrag, fenster: Window | null
     return;
   }
   const qr = await qrErzeugen(m.bogen, herkunft);
-  await pdfMake.createPdf(pdfDokument(m.bogen, qr)).open(fenster);
+  await pdfMake.createPdf(await einzelDokument(m.bogen, qr)).open(fenster);
 }
 
-export async function einsatzPdfErzeugen(einsatz: Einsatzsammlung, meldungen: MeldeEintrag[]): Promise<void> {
-  const boegenMitQr: SammelBogen[] = [];
-  for (const m of meldungen) {
-    // revisionen() liefert neueste zuerst — die Vorfassung steht direkt hinter
-    // dieser Meldung. Fehlt sie, ist es eine Erstmeldung.
-    const revs = revisionen(einsatz.eintraege, m.einheitSchluessel);
-    const idx = revs.findIndex((r) => r.id === m.id);
-    const vorher = idx >= 0 ? revs[idx + 1]?.bogen : undefined;
-    boegenMitQr.push({
-      bogen: m.bogen,
-      qr: await qrErzeugen(m.bogen, herkunftBytes(m)),
-      vorher,
-      zugEtikett: m.zugEtikett,
-      teil: m.teilEtikett,
-    });
-  }
-  const dd = einsatzPdfDokument(einsatz.name, boegenMitQr, einsatzDateiInhalt(einsatz));
-  const rumpf = (einsatz.name || "sammlung").replace(/[^\wäöüÄÖÜß-]+/g, "_");
-  const dateiname = `eeb-einsatz-${natoZeitstempel()}_${rumpf}.pdf`;
+/**
+ * Was die Übersichtsseite über eine Meldung wissen muss — Zeiten, Status,
+ * Auftrag, Vorfassung. Gemeinsam für Sammel-PDF und Lageblatt. `historie`
+ * ist die ganze Sammlung: beim Teilexport („nur neue Bögen") steckt die
+ * Vorfassung einer Folgemeldung nur noch dort.
+ */
+function uebersichtEintrag(
+  einsatz: Einsatzsammlung,
+  m: MeldeEintrag,
+  historie: MeldeEintrag[] = einsatz.eintraege,
+): UebersichtEintrag {
+  // revisionen() liefert neueste zuerst — die Vorfassung steht direkt hinter
+  // dieser Meldung. Fehlt sie, ist es eine Erstmeldung.
+  const revs = fassungenJeEinheit(historie, m.einheitSchluessel);
+  const idx = revs.findIndex((r) => r.id === m.id);
+  const vorher = idx >= 0 ? revs[idx + 1]?.bogen : undefined;
+  const fremderOrt = einsatz.fremdeOrte ? einsatz.fremdeOrte[m.einheitSchluessel] : abweichenderOrt(m, einsatz, historie);
+  return {
+    bogen: m.bogen,
+    vorher,
+    zugEtikett: m.zugEtikett,
+    teil: m.teilEtikett,
+    eingetroffenAm: eintreffzeit(m),
+    abgerueckAm: m.abgerueckAm,
+    abgerueckt: m.status !== MeldeStatus.ANWESEND,
+    zaehlt: m.status === MeldeStatus.ANWESEND && zaehltInLage(einsatz.art, m.bogen),
+    notiz: m.notiz,
+    ...(m.rueckkehr ? { rueckkehr: m.rueckkehr } : {}),
+    ...(m.vomPapier != null ? { zeitUnbestaetigt: true } : {}),
+    // Anderer Einsatz? wie an der Karte (R5-K5); beim Nachtrag aus der ganzen Sammlung gerechnet.
+    ...(fremderOrt != null ? { fremderOrt } : {}),
+    // Beim Nachtrag: warum die Einheit dabei ist, und ob ihre Kräfte zur Summe
+    // der letzten Lieferung dazukommen oder die frühere Zeile ersetzen (R5-W7).
+    ...(einsatz.nachtragGruende?.[m.einheitSchluessel]
+      ? { nachtragGrund: einsatz.nachtragGruende[m.einheitSchluessel]!.gruende, nachtragNeu: einsatz.nachtragGruende[m.einheitSchluessel]!.neu }
+      : {}),
+    // Über die ganze Sammlung gezählt — auch im Nachtrag „nur neue Bögen"
+    // dieselbe Nummer wie am Gerät (R2-A6).
+    nummer: meldungsNummern(historie).get(m.einheitSchluessel),
+  };
+}
+
+/**
+ * Alle aktuellen Meldungen des Einsatzes — neueste Fassung je Einheit, auch
+ * abgerückte und Übungen — nach Anzeigename geordnet. Die Auswahl „nur
+ * anwesende" war der Fehler: Papier und eingebettete Datei sagten Verschiedenes
+ * (Analog-Audit A1), und bei null Anwesenden gab es gar keine Datei (W2).
+ */
+export function alleAktuellen(einsatz: Einsatzsammlung): MeldeEintrag[] {
+  return geltendeJeEinheit(einsatz.eintraege).sort((a, b) =>
+    einheitAnzeigename(a.bogen.einheit).localeCompare(einheitAnzeigename(b.bogen.einheit), "de"),
+  );
+}
+
+/** Dateiname-tauglicher Rumpf aus dem Einsatznamen. */
+function dateiRumpf(einsatz: Einsatzsammlung): string {
+  return (einsatz.name || "sammlung").replace(/[^\wäöüÄÖÜß-]+/g, "_");
+}
+
+/**
+ * Fertiges Dokument ausgeben: Download im Browser, Share-Sheet in der App.
+ * false = Share-Sheet abgebrochen; der Export-Stand verbucht dann nichts.
+ */
+async function dokumentAusgeben(dd: Parameters<typeof pdfMake.createPdf>[0], dateiname: string): Promise<boolean> {
   if (istNativ()) {
     const base64 = await pdfMake.createPdf(dd).getBase64();
-    await binaerTeilen(dateiname, base64);
-  } else {
-    pdfMake.createPdf(dd).download(dateiname);
+    return binaerTeilen(dateiname, base64);
   }
+  pdfMake.createPdf(dd).download(dateiname);
+  return true;
+}
+
+/**
+ * Sammel-PDF: Übergabe-Übersicht plus Bögen plus eingebettete Sammlung.
+ * Ohne `meldungen` gehen ALLE aktuellen Meldungen je Einheit hinein (inkl.
+ * abgerückte und Übungen) — auch bei null anwesenden Einheiten entsteht ein
+ * Dokument. Beim Teilexport ist `einsatz` schon auf die neuen Bögen
+ * zugeschnitten (export-stand.ts); `historie` ist dann die ganze Sammlung,
+ * aus der die Vorfassung einer Folgemeldung für den Diff kommt.
+ */
+export async function einsatzPdfErzeugen(
+  einsatz: Einsatzsammlung,
+  meldungen: MeldeEintrag[] = alleAktuellen(einsatz),
+  historie: MeldeEintrag[] = einsatz.eintraege,
+  /** Nachtrag seit dem Stand des letzten Sammel-PDF (Date.now()) — Kopf, Summen und Umschlag sagen es (R4-W4). */
+  nachtragSeit?: number,
+  /**
+   * Namensteil der Lieferung (export-stand.ts `lieferungsMarke`): für alle
+   * Formate gleich, „nachtrag-seit-…-" bzw. „erste-lieferung-" (R5-W8). Ohne
+   * Angabe heißt ein Nachtrag „nachtrag-".
+   */
+  dateiMarke?: string,
+): Promise<boolean> {
+  const boegenMitQr: SammelBogen[] = [];
+  for (const m of meldungen) {
+    boegenMitQr.push({
+      ...uebersichtEintrag(einsatz, m, historie),
+      qr: await qrErzeugen(m.bogen, herkunftBytes(m)),
+    });
+  }
+  const nachtrag = historie !== einsatz.eintraege;
+  // Ein Probesatz ohne Bilder misst, welche Bögen mit ihrer letzten Zeile allein
+  // auf einer Seite stünden, und setzt diese enger (R4-A7).
+  const dd = await einsatzPdfDokumentGesetzt(
+    einsatz.name,
+    boegenMitQr,
+    // Die Stände der Exporte reisen mit (R5-W6): auf der Ablösung weiß der
+    // erste Nachtrag dann, was der Stab schon hat.
+    einsatzDateiInhalt(nachtrag && nachtragSeit != null ? { ...einsatz, nachtragSeit } : einsatz, exportStaendeLaden(einsatz.id), lageAngabenLaden(einsatz.id)),
+    Date.now(),
+    nachtrag ? nachtragSeit : undefined,
+    (probe) => pdfMake.createPdf(probe).getBuffer(),
+  );
+  // Teilexport („nur neue Bögen") mit eigenem Dateinamen — sonst hießen
+  // Nachtrag und ganze Sammlung gleich (Audit Runde 2, R2-A3).
+  const ok = await dokumentAusgeben(dd, `eeb-einsatz-${dateiMarke ?? (nachtrag ? "nachtrag-" : "")}${natoZeitstempel()}_${dateiRumpf(einsatz)}.pdf`);
+  // Die ganze Sammlung ging heraus — womöglich an die nächste Schicht. Die
+  // Einsatzansicht sagt danach, wann, und was seitdem nur hier dazukam
+  // (Audit Runde 2, R2-W5). Der Nachtrag „nur neue Bögen" ist keine Übergabe.
+  if (ok && !nachtrag) weitergabeVermerken(einsatz);
+  return ok;
+}
+
+/**
+ * Lageblatt: nur die Übersichtsseite (Einheiten mit Zeiten, Bedarf, Züge) als
+ * A4 quer — ohne Bögen und ohne QR-Codes, deshalb in Sekundenbruchteilen
+ * fertig. Das Blatt für die Wand (Analog-Audit A3/A4). Immer der ganze
+ * Einsatz: die Wand braucht die Lage, nicht die Lieferung.
+ */
+export async function einsatzLageblattErzeugen(einsatz: Einsatzsammlung): Promise<boolean> {
+  const eintraege = alleAktuellen(einsatz).map((m) => uebersichtEintrag(einsatz, m));
+  // Zwei Sätze: der erste misst, wie viel Platz unter dem Inhalt bleibt, der
+  // zweite füllt ihn mit Nachtragszeilen (Audit Runde 3, R3-A5).
+  const dd = await einsatzLageblattSeiteFuellen(einsatz.name, eintraege, (probe) => pdfMake.createPdf(probe).getBuffer());
+  const ok = await dokumentAusgeben(dd, `eeb-lageblatt-${natoZeitstempel()}_${dateiRumpf(einsatz)}.pdf`);
+  // Merken, wann das Blatt entstand — die Einsatzansicht sagt dann „Lageblatt
+  // 16:30 · seitdem 1 neue Meldung" (Audit Runde 2, R2-A3).
+  if (ok) lageblattVermerken(einsatz);
+  return ok;
+}
+
+/**
+ * Blanko-Vordruck: der leere Bogen zum Ausfüllen mit der Hand, aus derselben
+ * Quelle wie die ausgelieferte Datei (blanko.ts). In der App erzeugt statt
+ * geladen — geht offline, in der Desktop-App und im Teilen-Fenster gleich.
+ * Bisher nur über „Aufbau des Bogens" auf der Website erreichbar (Audit
+ * Runde 3, R3-A7).
+ */
+export async function blankoPdfErzeugen(): Promise<boolean> {
+  const dd = pdfDokument(leererBogen(), null, BLANKO_ZEILEN);
+  return dokumentAusgeben({ ...dd, info: BLANKO_INFO }, BLANKO_DATEINAME);
 }

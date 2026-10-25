@@ -38,6 +38,9 @@ When("ich den Link aus der Zwischenablage öffne", async function (this: EebWelt
   // EEB_URL_PREFIX), geöffnet wird er aber auf dem Prüfstand. Sonst prüfte die
   // Runde den ausgelieferten Stand der echten Seite statt den eigenen Build —
   // und schlüge bei jeder Schemaänderung fehl, bis veröffentlicht ist.
+  // Der eigene Bogen liegt auf diesem Gerät noch als Entwurf: seit R3-S1/R3-D2
+  // fragt die App auch beim Kaltstart, bevor der Link ihn verdrängt. Die
+  // Szenarien bestätigen das ausdrücklich („Empfangenen Bogen öffnen?").
   // Dazwischen leer laden: ein reiner Fragmentwechsel startet die Seite nicht
   // neu — der Übergabe-Dialog stünde noch offen. Der Bogen soll aber ankommen
   // wie auf einem zweiten Gerät.
@@ -241,12 +244,19 @@ When(
     await this.page
       .locator("main")
       .locator("label")
-      .filter({ hasText: /^Name \(Pflicht\)/ })
+      .filter({ hasText: /^Ort der Einheit \(Pflicht\)/ })
       .locator("input")
       .first()
       .fill(name);
     await this.page.getByRole("button", { name: /^6\. Übersicht/ }).click();
     await schaltflaeche(this, "In Einsatz übernehmen").click();
+    // Ohne Personal hat die Einheit Stärke 0 — die App fragt seit R3-N1 nach,
+    // bevor sie so in die Lage geht. Die Aufbau-Einheiten führen bewusst kein
+    // Personal (siehe einheiten-liste.feature): Rückfrage muss kommen und wird
+    // bewusst mit Stärke 0 bestätigt.
+    const rueckfrage = dialog(this, "Stärke fehlt");
+    await rueckfrage.waitFor({ state: "visible" });
+    await rueckfrage.getByRole("button", { name: "Trotzdem mit Stärke 0 übernehmen", exact: true }).click();
     await this.page.getByRole("heading", { name: /^Einheiten \(/ }).waitFor({ state: "visible" });
   },
 );
@@ -358,8 +368,8 @@ When("ich im Dialog {string} auf {string} klicke", async function (this: EebWelt
 });
 
 When("ich im Dialog den Text {string} eingebe", async function (this: EebWelt, text: string) {
-  // Mehrzeilige Eingaben („Namen einfügen") haben keine eigene Beschriftung —
-  // der Dialogtitel benennt sie bereits.
+  // Der Dialog hat genau ein mehrzeiliges Feld („Namen einfügen": beschriftet
+  // mit „Namensliste …", R2-M5) — der Schritt braucht dessen Namen nicht.
   await offenerDialog(this).locator("textarea").fill(text.replaceAll("\\n", "\n"));
 });
 

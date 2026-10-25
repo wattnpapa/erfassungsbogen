@@ -14,15 +14,21 @@
  */
 
 import { absenderkarteGefuellt, absenderkarteLaden } from "./absenderkarte";
-import { einsaetzeLaden, einsaetzePapierkorb } from "@bos/meldekopf/einsaetze";
-import { entwurfLaden } from "./entwurf";
+import { einsaetzeLaden, einsaetzePapierkorb } from "./einsaetze-lesen";
+import { beschaedigterEntwurf, entwurfLaden, ersetztenEntwurfLaden } from "./entwurf";
+import { exportVorhanden } from "./export-stand";
+import { einheitAnzeigename } from "./hilfen";
 import { geraeteSchluesselPrivat } from "./geraete-schluessel";
 import { vorlagenLaden, vorlagenPapierkorb } from "./vorlagen";
+import { unlesbarerGesamttext, unlesbareSammlungsteile, unlesbareVorlagenteile } from "./unlesbar";
+import { folgenVorhanden, uhrFolgen, type UhrFolgen } from "./uhr-folgen";
 
 const FORMAT = "eeb-sicherung";
 const VERSION = 1;
 /** Nur App-eigene Einträge wandern in die Sicherung. */
 const PRAEFIX = "eeb.";
+/** Merkzettel der Geräteuhr (datenschutz-uhr.ts) — bleibt beim Einspielen beim Gerät. */
+const UHR_SCHLUESSEL = "eeb.uhr.v1";
 
 export interface Sicherung {
   format: typeof FORMAT;
@@ -63,6 +69,198 @@ export function sicherungParsen(text: string): Record<string, string> {
   return eintraege;
 }
 
+/** Zeitpunkt, zu dem die Sicherung erstellt wurde (ISO), oder null. */
+export function sicherungErstelltAm(text: string): string | null {
+  try {
+    const s = JSON.parse(text) as Partial<Sicherung>;
+    return typeof s?.erstellt === "string" ? s.erstellt : null;
+  } catch {
+    return null;
+  }
+}
+
+// ------------------------------------------ Was ersetzt wird (für die Rückfrage)
+
+/** Eine Einsatz-Sammlung, wie die Rückfrage vor dem Einspielen sie nennt. */
+export interface SammlungKurz {
+  name: string;
+  meldungen: number;
+  papierkorb: boolean;
+}
+
+/**
+ * Inhalt eines Bestands (Gerät oder Sicherungsdatei) — Sammlungen beim Namen,
+ * dazu Vorlagen und Entwurf. „Sicherung einspielen" ersetzt ALLES; die
+ * Rückfrage nannte bisher weder, was auf dem Gerät verschwindet, noch, was die
+ * Datei bringt (Audit Runde 2, R2-D3). Gelesen wird aus den rohen Einträgen,
+ * damit Gerät und Datei mit derselben Elle gemessen werden.
+ */
+export interface BestandUmfang {
+  sammlungen: SammlungKurz[];
+  /** Aktive Vorlagen. */
+  vorlagen: number;
+  /** Vorlagen im Papierkorb (R4-D2: getrennt genannt). */
+  vorlagenPapierkorb: number;
+  entwurf: boolean;
+  /**
+   * Name der Einheit auf dem Rückholplatz, sonst null. „Sicherung einspielen"
+   * nannte ihn nicht und löschte ihn trotzdem; bei leerem Arbeitsplatz stand
+   * dort „nichts geht verloren" (Audit Runde 4, R4-D2).
+   */
+  rueckholplatz: string | null;
+  /** Eine Absenderkarte mit Inhalt ist hinterlegt. */
+  absender: boolean;
+  /** Privater Geräteschlüssel (Hex) — für die Kurzform vorher/nachher; null = keiner. */
+  geraeteschluessel: string | null;
+  /**
+   * Was beim Einspielen sofort unter die Fristen fiele (R5-D4): Sammlungen
+   * über 90 Tage Ruhe, Papierkorb über 30 Tage, Namen in alten Meldungen und
+   * im Entwurf. Eine alte Datei bringt nicht, was in ihr steht, sondern was
+   * nach den Fristen übrig bleibt.
+   */
+  faellig: UhrFolgen;
+  /**
+   * Beschädigtes im Bestand, in Worten („Einsatz-Sammlungen: Text abgeschnitten …"). Die Rückfrage
+   * nennt es: Wer die Datei einspielt, bringt es mit (R8-E1). Leer oder fehlend = nichts gefunden.
+   */
+  beschaedigt?: string[];
+}
+
+const EINSAETZE_SCHLUESSEL = "eeb.einsaetze.v1";
+const VORLAGEN_SCHLUESSEL = "eeb.vorlagen.v1";
+const ENTWURF_SCHLUESSEL = "eeb.entwurf.v1";
+const ERSETZT_SCHLUESSEL = "eeb.entwurf.ersetzt.v1";
+const ABSENDER_SCHLUESSEL = "eeb.absenderkarte.v1";
+const GERAETESCHLUESSEL_SCHLUESSEL = "eeb.geraeteschluessel.v1";
+/** Alles, was die Rückfrage vor dem Einspielen zählt — Gerät und Datei mit derselben Elle. */
+const BESTAND_SCHLUESSEL = [
+  EINSAETZE_SCHLUESSEL,
+  VORLAGEN_SCHLUESSEL,
+  ENTWURF_SCHLUESSEL,
+  ERSETZT_SCHLUESSEL,
+  ABSENDER_SCHLUESSEL,
+  GERAETESCHLUESSEL_SCHLUESSEL,
+];
+
+function jsonListe(roh: string | undefined): unknown[] {
+  if (!roh) return [];
+  try {
+    const x: unknown = JSON.parse(roh);
+    return Array.isArray(x) ? x : [];
+  } catch {
+    return [];
+  }
+}
+
+/** Was an den Einträgen eines Bestands beschädigt ist — dieselben Prüfungen, mit denen die App Unlesbares beiseitelegt (unlesbar.ts). */
+function beschaedigtes(eintraege: Record<string, string>): string[] {
+  const aus: string[] = [];
+  const n = (zahl: number, eins: string, viele: string) => `${zahl} ${zahl === 1 ? eins : viele}`;
+  const sammlungenText = unlesbarerGesamttext(eintraege[EINSAETZE_SCHLUESSEL], "sammlungen");
+  if (sammlungenText) aus.push("Einsatz-Sammlungen: der gespeicherte Text ist beschädigt und nicht lesbar");
+  else {
+    const teile = unlesbareSammlungsteile(eintraege[EINSAETZE_SCHLUESSEL]);
+    if (teile.meldungen.length > 0) aus.push(`Einsatz-Sammlungen: ${n(teile.meldungen.length, "Meldung", "Meldungen")} nicht lesbar`);
+    if (teile.sammlungen.length > 0) aus.push(`Einsatz-Sammlungen: ${n(teile.sammlungen.length, "Sammlung", "Sammlungen")} nicht lesbar`);
+  }
+  if (unlesbarerGesamttext(eintraege[VORLAGEN_SCHLUESSEL], "vorlagen")) aus.push("Vorlagen: der gespeicherte Text ist beschädigt und nicht lesbar");
+  else {
+    const v = unlesbareVorlagenteile(eintraege[VORLAGEN_SCHLUESSEL]).length;
+    if (v > 0) aus.push(`Vorlagen: ${n(v, "Vorlage", "Vorlagen")} nicht lesbar`);
+  }
+  for (const [schluessel, name] of [[ENTWURF_SCHLUESSEL, "Entwurf"], [ERSETZT_SCHLUESSEL, "zuletzt geschlossener Bogen"]] as const) {
+    const roh = eintraege[schluessel];
+    if (!roh) continue;
+    try {
+      JSON.parse(roh);
+    } catch {
+      aus.push(`${name}: der gespeicherte Text ist beschädigt und nicht lesbar`);
+    }
+  }
+  return aus;
+}
+
+export function bestandUmfang(eintraege: Record<string, string>): BestandUmfang {
+  const sammlungen: SammlungKurz[] = [];
+  for (const e of jsonListe(eintraege[EINSAETZE_SCHLUESSEL])) {
+    const s = e as { name?: unknown; eintraege?: unknown; geloeschtAm?: unknown };
+    if (!s || !Array.isArray(s.eintraege)) continue;
+    sammlungen.push({
+      name: typeof s.name === "string" && s.name ? s.name : "(ohne Namen)",
+      meldungen: s.eintraege.length,
+      papierkorb: typeof s.geloeschtAm === "number",
+    });
+  }
+  const vorlagen = jsonListe(eintraege[VORLAGEN_SCHLUESSEL]);
+  const imPapierkorb = vorlagen.filter((v) => typeof (v as { geloeschtAm?: unknown } | null)?.geloeschtAm === "number").length;
+  return {
+    sammlungen,
+    vorlagen: vorlagen.length - imPapierkorb,
+    vorlagenPapierkorb: imPapierkorb,
+    entwurf: !!eintraege[ENTWURF_SCHLUESSEL],
+    rueckholplatz: rueckholplatzAusRoh(eintraege[ERSETZT_SCHLUESSEL]),
+    absender: absenderAusRoh(eintraege[ABSENDER_SCHLUESSEL]),
+    geraeteschluessel: /^[0-9a-f]{64}$/i.test(eintraege[GERAETESCHLUESSEL_SCHLUESSEL] ?? "")
+      ? eintraege[GERAETESCHLUESSEL_SCHLUESSEL]!
+      : null,
+    faellig: uhrFolgen(Date.now(), (k) => eintraege[k] ?? null),
+    beschaedigt: beschaedigtes(eintraege),
+  };
+}
+
+export { folgenVorhanden };
+
+function rueckholplatzAusRoh(roh: string | undefined): string | null {
+  if (!roh) return null;
+  try {
+    const e = JSON.parse(roh) as { bogen?: { einheit?: unknown } };
+    if (!e?.bogen?.einheit) return "(Bogen ohne Namen)";
+    return einheitAnzeigename(e.bogen.einheit as Parameters<typeof einheitAnzeigename>[0]) || "(Bogen ohne Namen)";
+  } catch {
+    return "(Bogen ohne Namen)";
+  }
+}
+
+function absenderAusRoh(roh: string | undefined): boolean {
+  if (!roh) return false;
+  try {
+    const k = JSON.parse(roh) as unknown;
+    return !!k && typeof k === "object" && absenderkarteGefuellt(k as Parameters<typeof absenderkarteGefuellt>[0]);
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Steht auf dem Gerät überhaupt etwas, das beim Einspielen verloren geht?
+ * Dann verlangt die Rückfrage den Haken — nicht nur bei laufenden Sammlungen
+ * (R4-D2).
+ */
+export function bestandBetroffen(b: BestandUmfang): boolean {
+  return (
+    b.sammlungen.length > 0 ||
+    b.vorlagen > 0 ||
+    b.vorlagenPapierkorb > 0 ||
+    b.entwurf ||
+    b.rueckholplatz != null ||
+    b.absender ||
+    b.geraeteschluessel != null
+  );
+}
+
+/** Bestand dieses Geräts, gemessen wie eine Sicherungsdatei. */
+export function geraetBestand(): BestandUmfang {
+  const s = speicher();
+  const eintraege: Record<string, string> = {};
+  if (s) {
+    for (const k of BESTAND_SCHLUESSEL) {
+      const v = s.getItem(k);
+      if (v != null) eintraege[k] = v;
+    }
+  }
+  return bestandUmfang(eintraege);
+}
+
 // ------------------------------------------------- localStorage-Hülle (I/O)
 
 function speicher(): Storage | null {
@@ -82,17 +280,76 @@ function alleEebSchluessel(s: Storage): string[] {
   return schluessel;
 }
 
+// ------------------------------------------------- Letzte Sicherung, Erinnerung
+
+/**
+ * Wann auf diesem Gerät zuletzt eine Sicherung erstellt wurde. Alles liegt nur
+ * hier, einen Server, der es noch hätte, gibt es nicht — und bisher sagte die
+ * App nirgends, wann zuletzt eine Kopie gezogen wurde, noch erinnerte sie
+ * daran (Audit Runde 2, R2-O6). Der Zeitpunkt steht unter `eeb.`: Er reist mit
+ * der Sicherung (nach dem Einspielen gilt deren Erstellzeit) und fällt mit
+ * „Alle Daten löschen" weg. Gemerkt wird beim Erstellen der Datei — ob sie
+ * danach wirklich abgelegt wurde, sieht die App nicht.
+ */
+const ZULETZT_SCHLUESSEL = "eeb.sicherung.zuletzt.v1";
+
+/** Nach so vielen Tagen ohne Sicherung erinnert die Fußzeile daran. */
+export const ERINNERUNG_TAGE = 3;
+const TAG_MS = 24 * 60 * 60 * 1000;
+
+export function letzteSicherung(): number | null {
+  const roh = speicher()?.getItem(ZULETZT_SCHLUESSEL);
+  const n = roh == null ? NaN : Number(roh);
+  return Number.isFinite(n) && n > 0 ? n : null;
+}
+
+/**
+ * Was eine Sicherung wert macht: laufende Sammlungen mit Meldungen und
+ * Vorlagen. Zeitpunkt, seit dem das so ist (älteste Anlage), oder null.
+ */
+function wertvollSeit(): number | null {
+  const zeiten = [
+    ...einsaetzeLaden().filter((e) => e.eintraege.length > 0).map((e) => e.angelegt),
+    ...vorlagenLaden().map((v) => v.erstellt),
+  ].filter((t) => typeof t === "number" && Number.isFinite(t));
+  return zeiten.length > 0 ? Math.min(...zeiten) : null;
+}
+
+/** Liegt hier etwas, dessen Verlust wehtäte? (Anlass, dauerhaften Speicher zu erbitten.) */
+export function wertvolleDaten(): boolean {
+  return wertvollSeit() != null;
+}
+
+/**
+ * Ist eine Erinnerung fällig? Ja, wenn wertvolle Daten da sind und die letzte
+ * Sicherung — oder, ohne jede Sicherung, das Entstehen dieser Daten — länger
+ * als {@link ERINNERUNG_TAGE} zurückliegt. `seit` = letzte Sicherung oder null.
+ */
+export function sicherungFaellig(jetzt = Date.now()): { seit: number | null } | null {
+  const wertvoll = wertvollSeit();
+  if (wertvoll == null) return null;
+  const seit = letzteSicherung();
+  const bezug = seit ?? wertvoll;
+  return jetzt - bezug >= ERINNERUNG_TAGE * TAG_MS ? { seit } : null;
+}
+
 /** Alle lokalen App-Daten als Sicherungsdatei-Inhalt. */
-export function sicherungErstellen(): string {
+export function sicherungErstellen(jetzt = new Date()): string {
   const s = speicher();
   const eintraege: Record<string, string> = {};
   if (s) {
+    // Vor dem Einsammeln merken, damit die Datei ihren eigenen Zeitpunkt trägt.
+    try {
+      s.setItem(ZULETZT_SCHLUESSEL, String(jetzt.getTime()));
+    } catch {
+      /* Speicher voll — die Sicherung selbst ist wichtiger als der Vermerk */
+    }
     for (const k of alleEebSchluessel(s)) {
       const v = s.getItem(k);
       if (v != null) eintraege[k] = v;
     }
   }
-  return sicherungInhalt(eintraege);
+  return sicherungInhalt(eintraege, jetzt);
 }
 
 /**
@@ -103,9 +360,17 @@ export function sicherungEinspielen(text: string): number {
   const eintraege = sicherungParsen(text);
   const s = speicher();
   if (!s) throw new Error("Lokaler Speicher ist nicht verfügbar (Privatmodus?).");
-  for (const k of alleEebSchluessel(s)) s.removeItem(k);
-  for (const [k, v] of Object.entries(eintraege)) s.setItem(k, v);
-  return Object.keys(eintraege).length;
+  for (const k of alleEebSchluessel(s)) if (k !== UHR_SCHLUESSEL) s.removeItem(k);
+  let anzahl = 0;
+  for (const [k, v] of Object.entries(eintraege)) {
+    // Der Uhrstand gehört zu diesem Gerät, nicht zur Datei: Der Stand aus einer
+    // 100 Tage alten Sicherung löste beim nächsten Start „Geräteuhr prüfen"
+    // aus, obwohl die Uhr stimmte (Audit Runde 5, R5-D4).
+    if (k === UHR_SCHLUESSEL) continue;
+    s.setItem(k, v);
+    anzahl++;
+  }
+  return anzahl;
 }
 
 // ------------------------------------------------- Restlos löschen
@@ -124,8 +389,31 @@ export interface DatenUmfang {
   /** Gemeldete Bögen über alle Einsatz-Sammlungen. */
   meldungen: number;
   entwurf: boolean;
+  /**
+   * Name der Einheit auf dem Rückholplatz (verdrängter eigener Bogen), sonst
+   * null. Die Aufzählung nannte ihn nicht und sagte bei leerem Arbeitsplatz
+   * „kein offener Bogen-Entwurf" (Audit Runde 3, R3-D4).
+   */
+  rueckholplatz: string | null;
+  /**
+   * Ein unlesbarer Entwurf liegt beiseitegelegt auf dem Gerät. Die Karte
+   * verspricht „nicht gelöscht"; die Aufzählung schwieg und löschte ihn mit
+   * (Audit Runde 6, R6-D2).
+   */
+  beiseitegelegt: boolean;
   absender: boolean;
   geraeteschluessel: boolean;
+  /**
+   * Namen der Sammlungen mit Meldungen, von denen es keinen Export, kein
+   * Lageblatt und keine Weitergabe gibt: Beim Löschen ist das die einzige
+   * Kopie (Audit Runde 4, R4-D5).
+   */
+  ohneExport: string[];
+}
+
+function rueckholplatzName(): string | null {
+  const e = ersetztenEntwurfLaden();
+  return e ? einheitAnzeigename(e.bogen.einheit) || "(Bogen ohne Namen)" : null;
 }
 
 export function datenUmfang(): DatenUmfang {
@@ -137,8 +425,11 @@ export function datenUmfang(): DatenUmfang {
     einsaetze: einsaetze.length,
     meldungen: einsaetze.reduce((summe, e) => summe + e.eintraege.length, 0),
     entwurf: entwurfLaden() != null,
+    rueckholplatz: rueckholplatzName(),
+    beiseitegelegt: beschaedigterEntwurf() != null,
     absender: absenderkarteGefuellt(absenderkarteLaden()),
     geraeteschluessel: geraeteSchluesselPrivat() != null,
+    ohneExport: einsaetze.filter((e) => e.eintraege.length > 0 && !exportVorhanden(e.id)).map((e) => e.name),
   };
 }
 
@@ -156,5 +447,20 @@ export function alleDatenLoeschen(): number {
   if (!s) throw new Error("Lokaler Speicher ist nicht verfügbar (Privatmodus?).");
   const schluessel = alleEebSchluessel(s);
   for (const k of schluessel) s.removeItem(k);
+  // Auch die Merker im Sitzungsspeicher dieses Tabs (wartender Link, Rückweg
+  // von „Vorbelegung entfernen"): Sie können Personendaten tragen (R5-S6, R5-D5).
+  try {
+    const sitzung = globalThis.sessionStorage;
+    if (sitzung) {
+      const sitzungsSchluessel: string[] = [];
+      for (let i = 0; i < sitzung.length; i++) {
+        const k = sitzung.key(i);
+        if (k?.startsWith(PRAEFIX)) sitzungsSchluessel.push(k);
+      }
+      for (const k of sitzungsSchluessel) sitzung.removeItem(k);
+    }
+  } catch {
+    /* Sitzungsspeicher gesperrt — dort liegt dann auch nichts */
+  }
   return schluessel.length;
 }

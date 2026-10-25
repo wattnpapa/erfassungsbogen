@@ -9,6 +9,7 @@ import { useEffect, useRef, useState, type ChangeEvent } from "react";
 import { gemerkteKamera, kameraListe, merkeKamera, suchAusschnitt, type Kamera } from "./kamera";
 import { qrLeserLaden, type QrLeser } from "./qr-decoder";
 import { TeilQuittung } from "./teil-quittung";
+import { useModalesOverlay } from "./modal-overlay";
 import type { SegmentTeil } from "@bos/eeb-format/codec";
 
 /** Was schiefging (ein Satz) und was dagegen hilft (kurze Schritte). */
@@ -182,6 +183,12 @@ export function QrScannerWeb(props: {
   onBild?: (e: ChangeEvent<HTMLInputElement>) => void;
 }) {
   const videoRef = useRef<HTMLVideoElement>(null);
+  // Modaler Dialog statt Overlay-<div>: Tab, Enter und Vorlesen erreichen die
+  // verdeckte Seite nicht mehr, sie rollt nicht mit, und der Fokus kehrt auf
+  // „QR-Code scannen…" zurück (Audit Runde 2, R2-M3). Escape fängt weiterhin
+  // der Tastatur-Lauscher unten ab; `cancel` ist der Weg ohne Tastatur.
+  const dialogRef = useRef<HTMLDialogElement>(null);
+  useModalesOverlay(dialogRef, { onSchliessen: props.onAbbruch });
   // Der Suchrahmen bestimmt, welcher Bildausschnitt dekodiert wird.
   const rahmenRef = useRef<HTMLDivElement>(null);
   const rahmenQuittung = useAngenommen(props.teile?.length ?? 0);
@@ -327,6 +334,17 @@ export function QrScannerWeb(props: {
     let zuletzt = 0;
     function beiTaste(e: KeyboardEvent) {
       if (e.ctrlKey || e.metaKey || e.altKey) return; // Kurzbefehle unangetastet lassen
+      // Escape schließt das Overlay — der Ausgang, den jeder Vollbild-Dialog
+      // hat. Ohne ihn saß, wer ohne Kamera scannen wollte, auf einem kleinen
+      // Bildschirm fest (Audit: „Abbrechen" außerhalb, kein Weg zurück).
+      // Vor dem Puffer geprüft und ohne ihn anzufassen: ein Handscanner tippt
+      // kein Escape, und ein angefangener Puffer verfällt ohnehin nach der
+      // Pause.
+      if (e.key === "Escape") {
+        e.preventDefault();
+        propsRef.current.onAbbruch();
+        return;
+      }
       const jetzt = performance.now();
       if (jetzt - zuletzt > HANDSCANNER_PAUSE_MS) puffer = "";
       zuletzt = jetzt;
@@ -359,7 +377,7 @@ export function QrScannerWeb(props: {
     ?? "";
 
   return (
-    <div className="scanner" role="dialog" aria-label="QR-Code scannen">
+    <dialog ref={dialogRef} className="scanner" aria-label="QR-Code scannen" tabIndex={-1} data-zurueck="eigen">
       <video ref={videoRef} playsInline muted />
       {fehler
         ? (
@@ -414,12 +432,19 @@ export function QrScannerWeb(props: {
                 : props.fortschritt || "Bereit — warte auf den Handscanner"}
             </p>
             <TeilQuittung teile={props.teile ?? []} />
-            <p className="handscanner-fussnote">
-              Der Scanner muss den Code mit Enter abschließen (Werkseinstellung der meisten Geräte).
-              {" "}Kommen die Zeichen verdreht an, steht er auf einer anderen Tastaturbelegung — die Anleitung
-              zeigt unter „USB-Handscanner einrichten“ die Codes zum Umstellen.
-              {props.onBild && " Sonst hilft „QR aus Bild einlesen…“ mit einem Foto oder Screenshot."}
-            </p>
+            {/* Eingeklappt: Diese Sätze braucht nur, wessen Scanner verdreht
+                tippt oder gar nicht ankommt. Ausgeklappt standen sie zwischen
+                dem Helfer und „Abbrechen" und schoben den Ausgang bei 640 px
+                Höhe aus dem Bild. */}
+            <details className="handscanner-hinweise">
+              <summary>Hinweise zum Handscanner</summary>
+              <p className="handscanner-fussnote">
+                Der Scanner muss den Code mit Enter abschließen (Werkseinstellung der meisten Geräte).
+                {" "}Kommen die Zeichen verdreht an, steht er auf einer anderen Tastaturbelegung — die Anleitung
+                zeigt unter „USB-Handscanner einrichten“ die Codes zum Umstellen.
+                {props.onBild && " Sonst hilft „QR aus Bild einlesen…“ mit einem Foto oder Screenshot."}
+              </p>
+            </details>
           </div>
         )}
       <div className="scanner-aktionen">
@@ -447,6 +472,6 @@ export function QrScannerWeb(props: {
         )}
         <button type="button" onClick={props.onAbbruch}>{props.abbruchText ?? "Abbrechen"}</button>
       </div>
-    </div>
+    </dialog>
   );
 }

@@ -22,8 +22,8 @@ import {
   zeitpunktAusIso,
   type Erfassungsbogen,
 } from "@bos/eeb-format/model";
-import type { QrSatz } from "./hilfen";
-import { EEB_JSON_DATEINAME, bogenAlsEingebetteteDatei, einsatzPdfDokument, pdfDokument } from "./pdf-dokument";
+import { einheitAnzeigename, neuePerson, neuesFahrzeug, zeitgruppe, type QrSatz } from "./hilfen";
+import { EEB_JSON_DATEINAME, aenderungFuerPapier, bogenAlsEingebetteteDatei, einsatzLageblattDokument, einsatzPdfDokument, pdfDokument, stiftHinweis, STIFT_KAESTCHEN, codeKopfzeile, meldekopfVermerk, ohneVorbelegung, erreichbarkeitZeilen, nichtDarstellbareNamen, nichtDarstellbareBetroffene, ansprechpersonPapier, umschrift } from "./pdf-dokument";
 
 const QR_BILD = "data:image/png;base64,QRTESTBILD";
 const QR_URL = "https://erfassungsbogen.app/#TESTPAYLOAD";
@@ -122,6 +122,45 @@ describe("pdfDokument()", () => {
     );
   });
 
+  it("sagt neben dem Code, dass Stiftkorrekturen nicht im Code stecken — mit Stand (R2-A4); das Kästchen steht beim Bogen (R4-A5)", () => {
+    const b = basisBogen();
+    const t = texte(pdfDokument(b, QR).content).join("\n");
+    expect(t).toContain(stiftHinweis(zeitgruppe(b.stand)));
+    expect(stiftHinweis("170805jul26")).toBe(
+      "Ist oben auf dem Bogen „von Hand geändert“ angekreuzt, gilt dieser Code (Stand 170805jul26) nicht mehr: abtippen oder neu erzeugen, nicht scannen.",
+    );
+    // Das Kästchen steht einmal, und zwar neben der Stärke auf dem Bogen — nicht auf der Codeseite.
+    expect(t.split(STIFT_KAESTCHEN)).toHaveLength(2);
+    const inhalt = pdfDokument(b, QR).content as unknown[];
+    const kopfTabelle = JSON.stringify(inhalt.slice(0, 3));
+    expect(kopfTabelle).toContain(STIFT_KAESTCHEN);
+    // Ohne Code (Vordruck, Bogen ohne QR) gibt es nichts, was durch Handschrift ungültig würde.
+    expect(texte(pdfDokument(b, null).content).join("\n")).not.toContain(STIFT_KAESTCHEN);
+  });
+
+  it("jede Codeseite nennt Einheit, Funkrufname und Stand — Einzelcode und mehrteilig (R4-A5)", () => {
+    const b = basisBogen();
+    const kopf = codeKopfzeile(b, zeitgruppe(b.stand), 7);
+    expect(kopf).toContain("Nr. 7");
+    expect(kopf).toContain(einheitAnzeigename(b.einheit));
+    expect(kopf).toContain(`Stand ${zeitgruppe(b.stand)}`);
+    expect(kopf).toMatch(/FuRn /);
+    const einzel = texte(pdfDokument(b, QR).content);
+    expect(einzel.filter((z) => z.startsWith(einheitAnzeigename(b.einheit)) && z.includes("Stand "))).toHaveLength(1);
+    const seg: QrSatz = {
+      teile: [1, 2, 3].map((n) => ({ datenUrl: QR_BILD, url: `https://erfassungsbogen.app/#EEBS.${n}.3`, teilNr: n, anzahl: 3, version: 20 })),
+      segmentiert: true,
+      zeichen: 2700,
+      version: 20,
+      vollUrl: "https://erfassungsbogen.app/#V",
+      stufen: 1,
+      weitergeleitet: false,
+    };
+    // 3 Teile = 2 Codeseiten, jede mit eigener Kopfzeile.
+    const mehr = texte(pdfDokument(b, seg).content);
+    expect(mehr.filter((z) => z.includes(einheitAnzeigename(b.einheit)) && z.includes("Stand "))).toHaveLength(2);
+  });
+
   it("legt unter dem QR-Code einen anklickbaren App-Link auf QR-Bild und Text", () => {
     const dd = pdfDokument(basisBogen(), QR);
     // Alle pdfmake-Knoten flach durchgehen und die mit `link` einsammeln.
@@ -166,6 +205,39 @@ describe("pdfDokument()", () => {
     // vollständigen Bogen (vollUrl), nicht einen einzelnen Teil.
     expect(t).toContain("Bogen direkt in der App öffnen");
     expect(roh).toContain("https://erfassungsbogen.app/#EEBSVOLL");
+  });
+
+  it("macht bei Segmentierung jedes Teilbild anklickbar — mit dem vollständigen Bogen", () => {
+    const segQr: QrSatz = {
+      teile: [
+        { datenUrl: "data:image/png;base64,TEIL1", url: "https://erfassungsbogen.app/#EEBS.1.3.99.AA", teilNr: 1, anzahl: 3, version: 20 },
+        { datenUrl: "data:image/png;base64,TEIL2", url: "https://erfassungsbogen.app/#EEBS.2.3.99.BB", teilNr: 2, anzahl: 3, version: 20 },
+        { datenUrl: "data:image/png;base64,TEIL3", url: "https://erfassungsbogen.app/#EEBS.3.3.99.CC", teilNr: 3, anzahl: 3, version: 20 },
+      ],
+      segmentiert: true,
+      zeichen: 2700,
+      version: 20,
+      vollUrl: "https://erfassungsbogen.app/#EEBSVOLL",
+      stufen: 1,
+      weitergeleitet: false,
+    };
+    const dd = pdfDokument(basisBogen(), segQr);
+    const bilder: { image: string; link?: unknown }[] = [];
+    const sammle = (node: unknown): void => {
+      if (Array.isArray(node)) node.forEach(sammle);
+      else if (node && typeof node === "object") {
+        if (typeof (node as { image?: unknown }).image === "string") bilder.push(node as { image: string });
+        Object.values(node).forEach(sammle);
+      }
+    };
+    sammle(dd.content);
+    const qrBilder = bilder.filter((b) => b.image.startsWith("data:image/png;base64,TEIL"));
+    expect(qrBilder).toHaveLength(3);
+    // Jedes Teilbild trägt den Link auf den KOMPLETTEN Bogen — nicht die
+    // Teil-URL, die nur einen Abschnitt enthält. Ein Klick aufs Bild in der
+    // digitalen PDF muss dasselbe tun wie der Textlink darunter.
+    for (const b of qrBilder) expect(b.link).toBe("https://erfassungsbogen.app/#EEBSVOLL");
+    expect(qrBilder.some((b) => typeof b.link === "string" && b.link.includes("EEBS."))).toBe(false);
   });
 
   it("druckt Kopf, Einsatz, Zugehörigkeit und Stärke", () => {
@@ -319,6 +391,34 @@ describe("einsatzPdfDokument()", () => {
     return b;
   }
 
+  /**
+   * R4-W4: Seite 1 eines Nachtrags beginnt nicht wie die Gesamtfassung. Im Stab
+   * liegen am Morgen mehrere Ausdrucke; wer den jüngsten greift, darf nicht 8
+   * Kräfte für 50 halten.
+   */
+  it("druckt die laufende Nummer in den Kasten „Stand am Meldekopf“ (R4-A1)", () => {
+    const dd = einsatzPdfDokument("Hochwasser", [{ bogen: basisBogen(), qr: QR, nummer: 3 }]);
+    expect(texte(dd.content).join("\n").replace(/\u200B/g, "")).toContain("Stand am Meldekopf (Hochwasser");
+    expect(texte(dd.content).join("\n").replace(/\u200B/g, "")).toMatch(/erstellt [^)]*\): Nr\. 3 · Eingetroffen/);
+  });
+
+  it("kennzeichnet einen Nachtrag in Kopf, Summen und Fußzeile (R4-W4)", () => {
+    const seit = new Date("2026-10-05T20:49").getTime();
+    const dd = einsatzPdfDokument("Hochwasser", [{ bogen: folgeBogen(), qr: QR, vorher: basisBogen() }], undefined, undefined, seit);
+    const t = texte(dd.content).join("\n");
+    expect(t).toContain("Übergabe-Übersicht NACHTRAG seit 05.10.2026, 20:49: Hochwasser");
+    expect(t).toContain("NACHTRAG seit 05.10.2026, 20:49 — nicht die ganze Lage:");
+    expect(t).not.toMatch(/^Lage: $/m);
+    expect(t).toContain("Bedarf (nur Nachtrag):");
+    expect(t).toContain("Bedarf Nachtrag (1 Einheiten");
+    expect(t).toContain("Summe Nachtrag (");
+    expect(JSON.stringify(typeof dd.footer === "function" ? dd.footer(1, 1, { width: 0, height: 0, orientation: "landscape" }) : dd.footer)).toContain("NACHTRAG seit");
+    // Die Gesamtfassung bleibt, wie sie war.
+    const voll = texte(einsatzPdfDokument("Hochwasser", [{ bogen: folgeBogen(), qr: QR, vorher: basisBogen() }]).content).join("\n");
+    expect(voll).toMatch(/^Lage: $/m);
+    expect(voll).not.toContain("NACHTRAG");
+  });
+
   it("stellt der Sammlung eine Übersicht mit Änderungsspalte voran", () => {
     const dd = einsatzPdfDokument("Hochwasser", [
       { bogen: folgeBogen(), qr: QR, vorher: basisBogen() },
@@ -326,10 +426,13 @@ describe("einsatzPdfDokument()", () => {
     const t = texte(dd.content).join("\n");
     expect(t).toContain("Übergabe-Übersicht: Hochwasser");
     expect(t).toContain("Veränderung seit der letzten Meldung");
-    expect(t).toContain("gegenüber 141039mai26:");
-    expect(t).toContain("Gesamtstärke: 2 → 1");
+    // Lesbare Zeit und „von … auf …" statt Pfeil — Helvetica kennt „→" nicht,
+    // im Ausdruck stand „!" (Audit Runde 2, R2-K3).
+    expect(t).toContain("gegenüber 14.05.2026, 10:39:");
+    expect(t).toContain("Gesamtstärke: von 2 auf 1");
     expect(t).toContain("Fahrzeug abgemeldet: MzKW (THW-84397)");
-    expect(t).toContain("Ruhezeit erforderlich: nein → ja");
+    expect(t).toContain("Ruhezeit erforderlich: von nein auf ja");
+    expect(t).not.toContain("→");
     // Die Übersicht steht vor dem ersten Bogen.
     expect(t.indexOf("Übergabe-Übersicht")).toBeLessThan(t.indexOf("Erfassungsbogen FGr K (A)"));
   });
@@ -342,7 +445,7 @@ describe("einsatzPdfDokument()", () => {
       ]).content,
     ).join("\n");
     expect(t).toContain("Erstmeldung");
-    expect(t).toContain("unverändert gegenüber 141039mai26");
+    expect(t).toContain("unverändert gegenüber 14.05.2026, 10:39");
   });
 
   it("summiert Stärke und Fahrzeuge über alle Bögen", () => {
@@ -352,8 +455,60 @@ describe("einsatzPdfDokument()", () => {
         { bogen: basisBogen(), qr: QR },
       ]).content,
     ).join("\n");
-    expect(t).toContain("Summe (2 Einheiten)");
+    expect(t).toContain("Summe (2 zählend)");
     expect(t).toContain("2 / 0 / 2 / 4");
+  });
+
+  it("führt abgerückte Einheiten in einem eigenen Block mit Zeiten auf und zählt sie nicht", () => {
+    // Papier und eingebettete Datei müssen dasselbe sagen: Crailsheim war da
+    // und ist wieder weg — auf dem Blatt stand davon bisher nichts (A1).
+    const eingetroffen = new Date("2026-09-26T09:40").getTime();
+    const abgerueckt = new Date("2026-09-27T15:10").getTime();
+    const t = texte(
+      einsatzPdfDokument("Lage", [
+        { bogen: basisBogen(), qr: QR, eingetroffenAm: eingetroffen, notiz: "Deichabschnitt Nord" },
+        { bogen: basisBogen(), qr: QR, eingetroffenAm: eingetroffen, abgerueckAm: abgerueckt, abgerueckt: true },
+      ]).content,
+    ).join("\n");
+    expect(t).toContain("Eingetroffen");
+    expect(t).toContain("Abgerückt (1)");
+    expect(t).toContain("26.09.2026, 09:40");
+    expect(t).toContain("27.09.2026, 15:10");
+    expect(t).toContain("Auftrag / Notiz");
+    expect(t).toContain("Deichabschnitt Nord");
+    expect(t).toContain("Summe (1 zählend · 1 abgerückt)");
+    // Stärke und Bedarf nur über die zählende Einheit.
+    expect(t).toContain("1 / 0 / 1 / 2");
+    expect(t).toContain("Bedarf gesamt (1 Einheiten, 2 Personen)");
+    // Beide Bögen hängen trotzdem an — „alle Bögen" heißt alle.
+    const umbrueche = (einsatzPdfDokument("Lage", [
+      { bogen: basisBogen(), qr: QR },
+      { bogen: basisBogen(), qr: QR, abgerueckt: true },
+    ]).content as { pageBreak?: string }[]).filter((c) => c && c.pageBreak === "before");
+    expect(umbrueche).toHaveLength(2);
+  });
+
+  it("kennzeichnet eine nicht zählende Übung und rechnet ohne sie", () => {
+    const u = basisBogen();
+    u.uebung = true;
+    const t = texte(
+      einsatzPdfDokument("Lage", [
+        { bogen: basisBogen(), qr: QR },
+        { bogen: u, qr: QR, zaehlt: false },
+      ]).content,
+    ).join("\n");
+    expect(t).toContain("zählt nicht in diese Lage");
+    expect(t).toContain("Summe (1 zählend · 1 Übung)");
+  });
+
+  it("erzeugt auch ohne eine einzige Meldung ein Dokument", () => {
+    // Am Einsatzende sind alle abgerückt — die Datei ist dann die Übergabe
+    // ans Archiv und darf sich nicht verweigern (W2).
+    const dd = einsatzPdfDokument("Lage", [], "{}");
+    const t = texte(dd.content).join("\n");
+    expect(t).toContain("Übergabe-Übersicht: Lage");
+    expect(t).toContain("Summe (0 zählend)");
+    expect(dd.files).toBeDefined();
   });
 
   it("legt die Übersicht quer und schaltet ab dem ersten Bogen zurück ins Hochformat", () => {
@@ -379,7 +534,9 @@ describe("einsatzPdfDokument()", () => {
     ).join("\n");
     expect(t).toContain("Bedarf gesamt (2 Einheiten, 4 Personen)");
     expect(t).toContain("4 Portionen (2 Fleisch / 0 vegetarisch / 2 vegan)");
-    expect(t).toContain("M 2 / W 2 / D 0 · 2× Unterbringung angefordert");
+    // Quartier und WC/Dusche getrennt beschriftet (R3-K4).
+    expect(t).toContain("Unterbringung angefordert:\n2 Einheiten, 4 Personen (2 männl. / 2 weibl. / 0 div.)");
+    expect(t).toContain("WC/Dusche (alle Anwesenden):\n2 männl. / 2 weibl. / 0 div.");
     expect(t).toContain("Diesel 400 l · Benzin 0 l");
     expect(t).toContain("2 Fahrzeuge · Ruhezeit erforderlich bei 0 Einheit(en)");
   });
@@ -398,7 +555,395 @@ describe("einsatzPdfDokument()", () => {
       ]).content,
     ).join("\n");
     expect(t).toContain("Zwischensummen nach Zug");
-    expect(t.indexOf("1. Zug")).toBeLessThan(t.indexOf("2. Zug"));
-    expect(t.indexOf("2. Zug")).toBeLessThan(t.indexOf("Ohne Zug"));
+    const zs = t.slice(t.indexOf("Zwischensummen nach Zug"));
+    expect(zs.indexOf("1. Zug")).toBeLessThan(zs.indexOf("2. Zug"));
+    expect(zs.indexOf("2. Zug")).toBeLessThan(zs.indexOf("Ohne Zug"));
+  });
+});
+
+describe("einsatzPdfDokument() — Stand am Meldekopf auf den Bogenseiten (R2-A1)", () => {
+  const eingetroffen = new Date("2026-09-28T14:05").getTime();
+  const abgerueckt = new Date("2026-09-28T16:30").getTime();
+  const erstellt = new Date("2026-09-28T17:00").getTime();
+  const QR3: QrSatz = {
+    ...QR,
+    teile: [1, 2, 3].map((n) => ({ datenUrl: `${QR_BILD}${n}`, url: `${QR_URL}${n}`, teilNr: n, anzahl: 3, version: 20 })),
+    segmentiert: true,
+  };
+
+  /** Text ab dem n-ten Bogen (nach dem n-ten Seitenumbruch) bis zum nächsten. */
+  function bogenTexte(dd: ReturnType<typeof einsatzPdfDokument>): string[] {
+    const bloecke: unknown[][] = [];
+    for (const c of dd.content as { pageBreak?: string; pageOrientation?: string }[]) {
+      if (c && c.pageBreak === "before" && c.pageOrientation === "portrait") bloecke.push([]);
+      else if (bloecke.length > 0) bloecke[bloecke.length - 1]!.push(c);
+    }
+    return bloecke.map((b) => texte(b).join("\n"));
+  }
+
+  it("vermerkt Eintreffzeit, Abrückvermerk, Zug und Auftrag über jedem Bogen", () => {
+    const dd = einsatzPdfDokument(
+      "Hochwasser Albtal",
+      [
+        { bogen: basisBogen(), qr: QR, eingetroffenAm: eingetroffen, zugEtikett: "1. Zug", notiz: "Deich Nord" },
+        { bogen: basisBogen(), qr: QR3, eingetroffenAm: eingetroffen, abgerueckAm: abgerueckt, abgerueckt: true },
+      ],
+      undefined,
+      erstellt,
+    );
+    const [albstadt, biberach] = bogenTexte(dd);
+    expect(albstadt).toContain(
+      "Stand am Meldekopf (Hochwasser Albtal, erstellt 28.09.2026, 17:00): Eingetroffen 28.09.2026, 14:05 · anwesend · Zug: 1. Zug · Auftrag / Notiz: Deich Nord",
+    );
+    expect(biberach).toContain("Eingetroffen 28.09.2026, 14:05 · ABGERÜCKT 28.09.2026, 16:30 · Zug: – · Auftrag / Notiz: –");
+    // Der Kasten steht vor dem Formular — also auf der ersten Seite des Bogens.
+    expect(albstadt!.indexOf("Stand am Meldekopf")).toBeLessThan(albstadt!.indexOf("Erfassungsbogen FGr K (A)"));
+  });
+
+  it("sagt neben jedem QR-Code, dass er nur den Bogen enthält — auch auf jeder Seite eines mehrteiligen Codes", () => {
+    const dd = einsatzPdfDokument(
+      "Lage",
+      [
+        { bogen: basisBogen(), qr: QR, eingetroffenAm: eingetroffen },
+        { bogen: basisBogen(), qr: QR3, eingetroffenAm: eingetroffen, abgerueckAm: abgerueckt, abgerueckt: true },
+      ],
+      undefined,
+      erstellt,
+    );
+    const [einteilig, dreiteilig] = bogenTexte(dd);
+    const hinweis = "Der Code enthält nur den Bogen der Einheit.";
+    expect(einteilig!.split(hinweis)).toHaveLength(2);
+    // Drei Teile → zwei QR-Seiten, jede mit Hinweis und Stand (ABGERÜCKT).
+    expect(dreiteilig!.split(hinweis)).toHaveLength(3);
+    expect(dreiteilig!.split("ABGERÜCKT 28.09.2026, 16:30")).toHaveLength(4); // Kasten oben + 2 QR-Seiten
+    expect(dreiteilig).toContain("nach dem Einlesen von Hand nachtragen");
+    expect(dreiteilig).toContain("„Einsatz importieren…“");
+  });
+
+  it("trägt den Stand des Ausdrucks in der Fußzeile jeder Seite", () => {
+    const dd = einsatzPdfDokument("Lage", [{ bogen: basisBogen(), qr: QR }], undefined, erstellt);
+    const fuss = (dd.footer as (s: number, g: number) => unknown)(3, 4);
+    const t = texte(fuss).join(" ");
+    expect(t).toContain("Einsatz-Sammlung: Lage · Stand 28.09.2026, 17:00");
+    expect(t).toContain("Seite 1 und Kasten über jedem Bogen");
+  });
+
+  it("lässt den Einzelbogen außerhalb der Sammlung ohne Meldekopf-Vermerk", () => {
+    const t = texte(pdfDokument(basisBogen(), QR).content).join("\n");
+    expect(t).not.toContain("Stand am Meldekopf");
+    expect(t).not.toContain("Der Code enthält nur den Bogen");
+  });
+});
+
+describe("einsatzLageblattDokument()", () => {
+  it("liefert nur die Übersichtsseite quer — ohne Bögen, QR und Anhang", () => {
+    const dd = einsatzLageblattDokument("Hochwasser", [
+      { bogen: basisBogen(), eingetroffenAm: new Date("2026-09-27T09:40").getTime() },
+      { bogen: basisBogen(), zugEtikett: "1. Zug" },
+    ], new Date("2026-09-27T20:19").getTime());
+    const t = texte(dd.content).join("\n");
+    expect(dd.pageOrientation).toBe("landscape");
+    expect(t).toContain("Lageblatt: Hochwasser");
+    expect(t).toContain("Erstellt 27.09.2026, 20:19");
+    expect(t).toContain("27.09.2026, 09:40");
+    expect(t).toContain("Bedarf gesamt (2 Einheiten, 4 Personen)");
+    expect(t).toContain("Zwischensummen nach Zug");
+    // Kein Bogen, kein QR-Code, keine eingebettete Datei.
+    expect(t).not.toContain("Erfassungsbogen FGr K (A)");
+    expect(t).not.toContain(QR_BILD);
+    expect(dd.files).toBeUndefined();
+    expect((dd.content as { pageBreak?: string }[]).some((c) => c && c.pageBreak === "before")).toBe(false);
+  });
+
+  it("beschriftet die Stärke-Linien des Blanko-Vordrucks (R2-A6)", () => {
+    const blanko = texte(pdfDokument(basisBogen(), null, { fahrzeuge: 1, personal: 1, qualifikationen: 1 }).content).join("\n");
+    expect(blanko).toContain("Stärke (F / UF / M / Ges.):");
+    // Seit R3-A6 auch auf dem ausgefüllten Bogen — gleiche Beschriftung wie der Vordruck.
+    const voll = texte(pdfDokument(basisBogen(), QR).content).join("\n");
+    expect(voll).toContain("Stärke (F / UF / M / Ges.):");
+  });
+
+  it("Blanko-Vordruck trägt den Meldekopf-Kasten mit „ins Gerät übertragen“ und dem Kästchen „Übung“ (R4-A4)", () => {
+    const blanko = texte(pdfDokument(basisBogen(), null, { fahrzeuge: 1, personal: 1, qualifikationen: 1 }).content).join("\n");
+    expect(blanko).toContain("Meldekopf:");
+    expect(blanko).toMatch(/eingegangen am/);
+    expect(blanko).toMatch(/\[ {2}\] ÜBUNG/);
+    expect(blanko).toMatch(/ins Gerät übertragen \[ {2}\]/);
+    expect(blanko).toContain("Zug / Verband:");
+    // Ein ausgefüllter Bogen trägt den Kasten nicht — er hat seinen „Stand am Meldekopf“.
+    expect(texte(pdfDokument(basisBogen(), QR).content).join("\n")).not.toContain("ins Gerät übertragen");
+  });
+
+  it("Personalzeilen brechen nicht über die Seite — auf dem Vordruck keine 3-mm-Zeile (R4-A8)", () => {
+    const dd = pdfDokument(basisBogen(), null, { fahrzeuge: 1, personal: 3, qualifikationen: 1 });
+    const tabellen: { table?: { dontBreakRows?: boolean; headerRows?: number } }[] = [];
+    const sammle = (n: unknown): void => {
+      if (Array.isArray(n)) n.forEach(sammle);
+      else if (n && typeof n === "object") {
+        if ((n as { table?: unknown }).table) tabellen.push(n as never);
+        Object.values(n).forEach(sammle);
+      }
+    };
+    sammle(dd.content);
+    const personal = tabellen.find((t) => JSON.stringify(t.table).includes("D = dienstlich / P = privat"));
+    expect(personal?.table?.dontBreakRows).toBe(true);
+    // Der Vordruck wiederholt den Kopf auf der zweiten Seite.
+    expect(personal?.table?.headerRows).toBe(1);
+  });
+
+  it("stellt die laufende Nummer der Meldung vor den Namen, wie an der Karte (R2-A6)", () => {
+    const t = texte(
+      einsatzLageblattDokument("Lage", [
+        { bogen: basisBogen(), nummer: 3 },
+        { bogen: basisBogen() },
+      ]).content,
+    ).join("\n");
+    expect(t).toContain("Nr. 3  ");
+    expect(t.match(/Nr\. \d/g)).toHaveLength(1);
+  });
+
+  it("zeigt Zug und Bedarf je Einheit und Änderungen ohne Pfeil (R2-K3)", () => {
+    const ruhe = basisBogen();
+    ruhe.sofortbedarf = { ...ruhe.sofortbedarf!, ruhezeitErforderlich: true, dieselLiter: 200 };
+    const vorher = basisBogen();
+    vorher.sofortbedarf = { ...vorher.sofortbedarf!, dieselLiter: 50 };
+    const t = texte(
+      einsatzLageblattDokument("Lage", [{ bogen: ruhe, vorher, zugEtikett: "1. TZ" }]).content,
+    ).join("\n");
+    expect(t).toContain("1. TZ");
+    expect(t).toMatch(/Ruhezeit\n · [\s\S]*Diesel 200 l/);
+    expect(t).toMatch(/von 50 l auf 200 l/);
+    expect(t).not.toContain("→");
+  });
+
+  it("ist ein Blatt zum Weiterführen: Funkrufname, Rückruf und freie Zeilen (R2-A3)", () => {
+    const dd = einsatzLageblattDokument("Lage", [{ bogen: basisBogen(), zugEtikett: "1. TZ" }]);
+    const t = texte(dd.content).join("\n").replace(/\u200B/g, "");
+    expect(t).toContain("Funkrufname /\nRückruf");
+    expect(t).toContain("Oldenburg - Ni 18/13");
+    expect(t).toContain("01701234501 (J. Rudolph)");
+    expect(t).toContain("Nachtrag von Hand");
+    // Mindestens fünf Nachtragszeilen (R3-A5); den Rest der Seite füllt
+    // einsatzLageblattSeiteFuellen (gemessen in pdf-seiten.test.ts).
+    const leer = JSON.stringify(dd.content).match(/\{"text":" ","margin":\[0,5,0,5\]/g) ?? [];
+    expect(leer.length).toBe(5 * 10);
+    // Unter der gedruckten Summe ein Feld für die fortgeschriebene (R3-A5).
+    expect(t).toContain("Summe laut Gerät (1 zählend)");
+    expect(t).toContain("Summe einschl. Nachträge (von Hand)");
+    // Die Übergabe-Übersicht der Sammel-PDF bleibt ohne diese Zusätze.
+    const u = texte((einsatzPdfDokument("Lage", [{ bogen: basisBogen(), qr: QR }]).content as unknown[]).slice(0, 3)).join("\n");
+    expect(u).not.toContain("Nachtrag von Hand");
+  });
+
+  it("führt die Zählrolle je Person im Einzel-PDF (R3-A6)", () => {
+    const dd = pdfDokument(basisBogen(), QR);
+    const t = texte(dd.content).join("\n");
+    expect(t).toContain("Rolle\nF/UF/M");
+    // Johannes Rudolph ist Führer, Anna Weber Mannschaft.
+    expect(t).toMatch(/\nF\ncenter\nRudolph, Johannes\n/);
+    expect(t).toMatch(/\nM\ncenter\nWeber, Anna\n/);
+    // Ohne Messung keine freien Zeilen — die gibt es nur über einzelPdfDokument.
+    expect(JSON.stringify(dd.content)).not.toContain('"text":" ","margin":[0,5,0,5]');
+    const frei = pdfDokument(basisBogen(), QR, undefined, undefined, { freiePersonalZeilen: 2, freiesFahrzeug: true });
+    expect(JSON.stringify(frei.content).match(/"text":" ","margin":\[0,5,0,5\]/g)).toHaveLength(8);
+    expect(texte(frei.content)).toContain("Kennzeichen:");
+  });
+
+  it("schreibt Änderungen fürs Papier als „von … auf …“", () => {
+    expect(aenderungFuerPapier("Diesel: 50 l → 200 l")).toBe("Diesel: von 50 l auf 200 l");
+    expect(aenderungFuerPapier("Unterbringung M/W/D: M 8 / W 3 / D 0 → M 7 / W 2 / D 0")).toBe(
+      "Unterbringung M/W/D: von M 8 / W 3 / D 0 auf M 7 / W 2 / D 0",
+    );
+    expect(aenderungFuerPapier("Personal neu: Anna Weber")).toBe("Personal neu: Anna Weber");
+  });
+
+  it("führt die Bemerkung der Einheit unter dem Auftrag, auf dem Lageblatt gekürzt (R3-K3)", () => {
+    const b = basisBogen();
+    b.sonstiges = "Ölsperre 200 m verbraucht, Nachschub nötig";
+    const lang = basisBogen();
+    lang.sonstiges = "x".repeat(300);
+    const t = texte(
+      einsatzLageblattDokument("Lage", [{ bogen: b, notiz: "Ölsperre Kocher km 12" }, { bogen: lang }]).content,
+    ).join("\n").replace(/\u200B/g, "");
+    expect(t).toContain("Auftrag / Notiz\n(Bemerkung der Einheit)");
+    expect(t).toContain("Ölsperre Kocher km 12");
+    expect(t).toContain("(Ölsperre 200 m verbraucht, Nachschub nötig)");
+    expect(t).toContain(`(${"x".repeat(70)} … (Rest: Sammel-PDF))`);
+  });
+
+  /**
+   * R4-K3: Auf dem Papier darf kein Hinweis mitten im Satz abbrechen und
+   * keine hinter „+ 2 weitere" verschwinden: Das Lageblatt nennt jeden Punkt
+   * als Stichwort, die Sammel-PDF die ganzen Sätze.
+   */
+  it("nennt alle Hinweise: Lageblatt als Stichworte, Sammel-PDF im Wortlaut (R4-K3)", () => {
+    const b = basisBogen();
+    b.sofortbedarf = { ...b.sofortbedarf!, verpflegungPersonen: b.personal.length + 8 };
+    b.fahrzeuge = [{ typ: { freitext: "MTW" }, kennzeichen: "" }, ...b.fahrzeuge];
+    const lage = texte(einsatzLageblattDokument("Lage", [{ bogen: b }]).content).join("\n").replace(/\u200B/g, "");
+    expect(lage).toMatch(/Hinweise: .*Verpflegung \d+ statt Stärke \d+/);
+    expect(lage).not.toContain("weitere");
+    expect(/Hinweise: [^\n]*/.exec(lage)![0]).not.toContain("…");
+    const sammel = texte(einsatzPdfDokument("Lage", [{ bogen: b, qr: QR }]).content)
+      .join("\n")
+      .replace(/\u200B/g, "");
+    expect(sammel).toMatch(/Hinweise \(\d+\)/);
+    expect(sammel).toContain("Verpflegung für");
+    expect(sammel).toContain("hat noch kein Kennzeichen");
+  });
+
+  it("stellt Stärke und Bedarf als Kopfleiste vor die Tabelle, Dringendes fett, Gesamtstärke zuerst (R3-K6)", () => {
+    const ruhe = basisBogen();
+    ruhe.sofortbedarf = { ...ruhe.sofortbedarf!, ruhezeitErforderlich: true, unterbringung: false, dieselLiter: 80 };
+    const vorher = structuredClone(ruhe);
+    vorher.personal = [...vorher.personal, structuredClone(vorher.personal[1]!), structuredClone(vorher.personal[1]!)];
+    vorher.personal[vorher.personal.length - 1]!.nachname = "Zusatz";
+    vorher.personal[vorher.personal.length - 2]!.nachname = "Extra";
+    const dd = einsatzLageblattDokument("Lage", [{ bogen: ruhe, vorher }]);
+    const inhalt = dd.content as unknown[];
+    // Kopfleiste direkt nach dem Titel, vor der Einheitentabelle.
+    const kopf = texte(inhalt[1]).filter((x) => x !== "*").join("");
+    expect(kopf).toMatch(/^Lage: 1 Einheit zählend · Stärke F \/ U \/ M \/ G \d+ \/ \d+ \/ \d+ \/ \d+ · 1 Fahrzeuge/);
+    expect(kopf).toContain("Bedarf: Verpflegung");
+    expect(kopf).toContain("Ruhezeit: 1 Einheit");
+    expect(kopf).toContain("Diesel 80 l");
+    // Bedarf je Einheit: Ruhezeit fett, Diesel nicht.
+    const json = JSON.stringify(inhalt[2]);
+    expect(json).toContain('{"text":"Ruhezeit","bold":true}');
+    expect(json).toContain('{"text":"Diesel 80 l"}');
+    // Änderungen: die Gesamtstärke zuerst.
+    const t = texte(inhalt[2]).join("\n");
+    expect(t).toMatch(/gegenüber .*:\nGesamtstärke: von \d+ auf \d+\nBedarf\/Auftrag: Unterbringung M\/W\/D .*\nweitere: .*Personal \(2\)/);
+  });
+
+  it("sagt auf einem leeren Blatt, dass noch nichts gemeldet ist", () => {
+    const t = texte(einsatzLageblattDokument("Lage", []).content).join("\n");
+    expect(t).toContain("Noch keine Einheit gemeldet.");
+    // Strichliste ohne vorgedruckte Nullen (R3-A5).
+    expect(t).toContain("Summe (von Hand)");
+    expect(t).not.toContain("zählend");
+    expect(t).not.toMatch(/\b0 \/ 0|0 Portionen|Diesel 0 l/);
+    expect(t).toContain("Stärke F / U / M / G ____ / ____ / ____ / ____");
+    expect(t).toContain("Bedarf gesamt (von Hand)");
+  });
+});
+
+describe("lageblattAenderungen (Audit Runde 5, R5-K7)", () => {
+  it("nennt Unterbringung und Kraftstoff, statt sie hinter „weitere Änderungen“ zu verbergen", async () => {
+    const { lageblattAenderungen } = await import("./pdf-dokument");
+    const { bogenDiff } = await import("@bos/meldekopf/meldung-diff");
+    const alt = basisBogen();
+    alt.sofortbedarf = { ...alt.sofortbedarf!, unterbringung: true, dieselLiter: 100 };
+    const neu = structuredClone(alt);
+    neu.sofortbedarf = { ...neu.sofortbedarf!, dieselLiter: 400 };
+    neu.sonstiges = "Nachschub nötig";
+    const z = lageblattAenderungen(bogenDiff(alt, neu));
+    expect(z.join("\n")).toContain("Diesel von 100 l auf 400 l");
+    expect(z.join("\n")).toContain("weitere: Bemerkung/Sonstiges");
+  });
+});
+
+// Audit Runde 6, R6-A1: Der Kasten „Stand am Meldekopf" trägt die Marke der Übersicht.
+describe("meldekopfVermerk(): unbestätigte Eintreffzeit (R6-A1)", () => {
+  it("nennt die vom Papier eingelesene Zeit als nicht bestätigt", () => {
+    const b = basisBogen();
+    const v = meldekopfVermerk({ bogen: b, nummer: 4, eingetroffenAm: Date.UTC(2026, 9, 17, 11, 22), zeitUnbestaetigt: true }, "Hochwasser", Date.now());
+    expect(v.stand).toMatch(/Eingetroffen .*\(nicht bestätigt, vom Papier\)/);
+  });
+
+  it("lässt die Marke weg, wenn die Zeit bestätigt ist", () => {
+    const v = meldekopfVermerk({ bogen: basisBogen(), nummer: 4, eingetroffenAm: Date.UTC(2026, 9, 17, 11, 22) }, "Hochwasser", Date.now());
+    expect(v.stand).not.toMatch(/nicht bestätigt/);
+  });
+});
+
+// Audit Runde 6, R6-A3: Vorbelegung aus dem Einheitstyp steht nicht als gemeldet auf Papier.
+describe("ohneVorbelegung() (R6-A3)", () => {
+  it("nimmt bei nur nach Stärke erfasster Einheit Funkrufname und StAN-Kreuz weg", () => {
+    const b = basisBogen();
+    b.personalErfassung = PersonalErfassung.NUR_STAERKE;
+    b.fahrzeuge = [{ ...neuesFahrzeug(), stanKonform: true, funkrufname: { kennwort: { freitext: "Heros" }, eigenerStandort: true, teile: [22, 51] } }];
+    const c = ohneVorbelegung(b);
+    expect(c.fahrzeuge[0]!.stanKonform).toBeUndefined();
+    expect(c.fahrzeuge[0]!.funkrufname).toBeUndefined();
+    expect(erreichbarkeitZeilen(b).join(" ")).not.toMatch(/Heros/);
+  });
+
+  it("lässt vollständig erfasste Einheiten unverändert", () => {
+    const b = basisBogen();
+    b.fahrzeuge = [{ ...neuesFahrzeug(), stanKonform: true }];
+    expect(ohneVorbelegung(b)).toBe(b);
+  });
+});
+
+// Audit Runde 6, R6-A5: Namen, die auf Papier als „?" stünden, werden gezählt.
+describe("nichtDarstellbareNamen() (R6-A5)", () => {
+  it("zählt kyrillische und Emoji-Namen, nicht lateinische Akzente", () => {
+    const b = basisBogen();
+    b.personal = [
+      { ...b.personal[0]!, vorname: "Дмитрий", nachname: "Иванов" },
+      { ...b.personal[0]!, vorname: "Łukasz", nachname: "Şahin" },
+      { ...b.personal[0]!, vorname: "Max", nachname: "😀" },
+    ];
+    expect(nichtDarstellbareNamen(b)).toBe(3);
+  });
+});
+
+
+// Audit Runde 7, R7-A2: Eine fehlende Abrückzeit steht als solche auf dem Papier.
+describe("Abrückzeit nicht bestätigt (R7-A2)", () => {
+  it("nennt im Kasten „Stand am Meldekopf“ die fehlende Abrückzeit", () => {
+    const vom = meldekopfVermerk({ bogen: basisBogen(), nummer: 2, eingetroffenAm: 1, abgerueckt: true, zeitUnbestaetigt: true }, "Hochwasser", Date.now());
+    expect(vom.stand).toContain("Abrückzeit nicht bestätigt (vom Papier)");
+    const ohne = meldekopfVermerk({ bogen: basisBogen(), nummer: 2, eingetroffenAm: 1, abgerueckt: true }, "Hochwasser", Date.now());
+    expect(ohne.stand).toContain("Abrückzeit nicht festgehalten");
+    const mit = meldekopfVermerk({ bogen: basisBogen(), nummer: 2, eingetroffenAm: 1, abgerueckt: true, abgerueckAm: 2 }, "Hochwasser", Date.now());
+    expect(mit.stand).not.toContain("Abrückzeit nicht");
+  });
+});
+
+// Audit Runde 7, R7-A4: Die Quittung nennt die Person mit nicht darstellbarem Namen.
+describe("nichtDarstellbareBetroffene() (R7-A4)", () => {
+  it("nennt die Person und kennzeichnet die Ansprechperson", () => {
+    const b = basisBogen();
+    b.personal = [
+      { ...neuePerson(), vorname: "Владимир", nachname: "Lehmann" },
+      { ...neuePerson(), vorname: "Anna", nachname: "Beispiel" },
+      { ...neuePerson(), vorname: "Zoë", nachname: "Ärger" },
+    ];
+    expect(nichtDarstellbareBetroffene(b)).toEqual(["Владимир Lehmann (Ansprechperson)"]);
+    expect(nichtDarstellbareNamen(b)).toBe(1);
+    b.personal.push({ ...neuePerson(), vorname: "Анна", nachname: "Meyer" });
+    expect(nichtDarstellbareBetroffene(b)).toEqual(["Владимир Lehmann (Ansprechperson)", "Анна Meyer"]);
+  });
+});
+
+// Audit Runde 8, R8-A3: Das Rückruf-Feld steht lesbar auf Papier, nicht als „????????".
+describe("ansprechpersonPapier() (R8-A3)", () => {
+  it("setzt Kyrillisch und Griechisch in lateinische Umschrift", () => {
+    expect(umschrift("Владимир")).toBe("Vladimir");
+    expect(umschrift("Жуков Щербаков")).toBe("Zhukov Schtscherbakov");
+    expect(umschrift("Γιώργος")).toBe("Giorgos");
+  });
+  it("lässt Darstellbares unverändert und kennzeichnet die Umschrift", () => {
+    expect(ansprechpersonPapier("Zoë Ärger")).toBe("Zoë Ärger");
+    expect(ansprechpersonPapier("Владимир Lehmann")).toBe("Vladimir Lehmann (Umschrift)");
+  });
+  it("vermerkt, wenn auch die Umschrift nichts nützt", () => {
+    const t = ansprechpersonPapier("张伟 Lehmann");
+    expect(t).toContain("Name nicht darstellbar – siehe digitale Meldung");
+    expect(t).toContain("Lehmann");
+  });
+  it("steht im Feld Ansprechpartner/in der Seite", () => {
+    const b = basisBogen();
+    b.personal = [{ ...neuePerson(), vorname: "Владимир", nachname: "Lehmann" }];
+    const dd = pdfDokument(b, null);
+    expect(JSON.stringify(dd.content)).toContain("Vladimir Lehmann (Umschrift)");
+  });
+  it("R8-A1: die Bogenseite sagt, dass die Stärke nur die Sollstärke ist", () => {
+    const b = basisBogen();
+    b.personalErfassung = 1;
+    b.personal = [{ ...neuePerson() }, { ...neuePerson() }];
+    expect(JSON.stringify(pdfDokument(b, null).content)).toContain("Sollstärke der Vorbelegung");
   });
 });

@@ -1,0 +1,126 @@
+{
+  "schemaVersion": 9,
+  "uebung": true,
+  "stand": 2171520,
+  "einheit": {
+    "organisation": 6,
+    "einheitsTyp": {
+      "freitext": "Patiententransportgruppe (Einsatzzug / San-Zug)"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "code": 1
+        },
+        "name": "Aller-Leine",
+        "telefon": "5554777104"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 1508,
+    "zeitraumBis": 1508,
+    "ortAuftrag": "Praktische Ausbildung (Übung): Einlagen Kräfte, Landeshauptstadt Hannover"
+  },
+  "personalErfassung": 1,
+  "personal": [],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "SEG-RTW Schwarmstedt"
+      },
+      "kennzeichen": "HK-R 5051",
+      "funkrufname": {
+        "kennwort": {
+          "code": 4
+        },
+        "eigenerStandort": false,
+        "ort": "Aller-Leine",
+        "teile": [
+          50,
+          85,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "SEG-RTW Hodenhagen"
+      },
+      "kennzeichen": "HK-R 5251",
+      "funkrufname": {
+        "kennwort": {
+          "code": 4
+        },
+        "eigenerStandort": false,
+        "ort": "Aller-Leine",
+        "teile": [
+          52,
+          85,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "SEG-KTW Typ A"
+      },
+      "kennzeichen": "HK R 5091",
+      "funkrufname": {
+        "kennwort": {
+          "code": 4
+        },
+        "eigenerStandort": false,
+        "ort": "Aller-Leine",
+        "teile": [
+          50,
+          92,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "SEG-KTW4"
+      },
+      "kennzeichen": "SFA 8054",
+      "funkrufname": {
+        "kennwort": {
+          "code": 4
+        },
+        "eigenerStandort": false,
+        "ort": "Aller-Leine",
+        "teile": [
+          52,
+          94,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "HA-RTW 5"
+      },
+      "kennzeichen": "HK-R 5035",
+      "funkrufname": {
+        "kennwort": {
+          "code": 4
+        },
+        "eigenerStandort": false,
+        "ort": "Aller-Leine",
+        "teile": [
+          50,
+          83,
+          5
+        ]
+      }
+    }
+  ],
+  "staerkeManuell": {
+    "fuehrer": 0,
+    "unterfuehrer": 1,
+    "mannschaft": 9,
+    "gesamt": 10
+  },
+  "sonstiges": "Fachdienst: Sonst.: Transportgruppe. Hauptleistung: Sonst.: Transport. Kommunikation: Rufname 50-85-1, Kanal/Rufgruppe R_HK_3. Organisationseinheit auf dem Bogen: SEG-Johanniter (JUH OV Aller-Leine)."
+}

@@ -1,0 +1,168 @@
+{
+  "schemaVersion": 9,
+  "uebung": true,
+  "stand": 2171520,
+  "einheit": {
+    "organisation": 6,
+    "einheitsTyp": {
+      "freitext": "PSNV-Staffel"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "code": 1
+        },
+        "name": "Akkonia"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 1508,
+    "zeitraumBis": 1508,
+    "ortAuftrag": "Praktische Ausbildung (Übung): Einheitenerfassung der geplanten Einsatzeinheiten"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "nachname": "Kurzer",
+      "vorname": "Michael",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "GF"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "SAN-H"
+        }
+      ]
+    },
+    {
+      "nachname": "Ascher",
+      "vorname": "Sabrina",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "PSNV-B"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "SAN-H"
+        }
+      ]
+    },
+    {
+      "nachname": "Zeppelin",
+      "vorname": "Selina",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "PSNV-B"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "SAN-H"
+        }
+      ]
+    },
+    {
+      "nachname": "Pape",
+      "vorname": "Julia",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "PSNV-E"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "SAN-H"
+        }
+      ]
+    },
+    {
+      "nachname": "Herzog",
+      "vorname": "Cindy",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "PSNV-E"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "SAN-H"
+        }
+      ]
+    },
+    {
+      "nachname": "Howard",
+      "vorname": "Lars",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kraftfahrer/Melder"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "SAN-H"
+        }
+      ]
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "MTW"
+      },
+      "kennzeichen": "AK-JU 47",
+      "funkrufname": {
+        "kennwort": {
+          "code": 4
+        },
+        "eigenerStandort": false,
+        "ort": "Akkonia",
+        "teile": [
+          56,
+          17,
+          7
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "Kühlanhänger"
+      },
+      "kennzeichen": "CE-JU 5005"
+    }
+  ],
+  "sonstiges": "Fachdienst: PSNV. Hauptleistung: Sonst.. Kommunikation: Rufname 56-17-07."
+}

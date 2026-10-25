@@ -4,7 +4,7 @@
  */
 
 import { describe, it, expect } from "vitest";
-import { render, screen, within } from "@testing-library/react";
+import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { OrganisationsTyp, PersonalErfassung } from "@bos/eeb-format/model";
 import { SchrittBuehne } from "../../test/schritt-buehne";
@@ -26,6 +26,65 @@ function stanTyp() {
 }
 
 describe("Schritt Fahrzeuge", () => {
+  it("bietet nach „Fahrzeug entfernen“ den Rückweg in der Daumenleiste (R3-D4)", async () => {
+    const nutzer = userEvent.setup();
+    const start = neuerBogen();
+    start.fahrzeuge = [
+      { ...neuesFahrzeug(), kennzeichen: "THW-80125" },
+      { ...neuesFahrzeug(), kennzeichen: "THW-80126" },
+    ];
+    render(<SchrittBuehne komponente={SchrittFahrzeuge} bogen={start} />);
+
+    const kennzeichen = () => (screen.getAllByLabelText("Kennzeichen") as HTMLInputElement[]).map((f) => f.value);
+    const knopf = screen.getAllByRole("button", { name: /entfernen$/ }).find((b) => b.className.includes("entfernen"))!;
+    await nutzer.click(knopf);
+    const frage = document.querySelector<HTMLDialogElement>("dialog[open]")!;
+    await nutzer.click(within(frage).getByRole("button", { name: "Fahrzeug entfernen" }));
+    await waitFor(() => expect(kennzeichen()).toEqual(["THW-80126"]));
+
+    const leiste = document.querySelector<HTMLElement>(".quittung-daumen")!;
+    expect(leiste.textContent).toMatch(/^Entfernt: .*THW-80125/);
+    // Eine Eingabe danach bleibt stehen, das Fahrzeug kommt an seine Stelle zurück.
+    await nutzer.type(screen.getByDisplayValue("THW-80126"), "7");
+    await nutzer.click(within(leiste).getByRole("button", { name: "Rückgängig" }));
+    expect(kennzeichen()).toEqual(["THW-80125", "THW-801267"]);
+    expect(document.querySelector(".quittung-daumen")!.textContent).toMatch(/^Zurückgeholt: .*THW-80125/);
+  });
+
+  it("„Vorbelegung entfernen“ lässt Fahrzeuge mit Sondergerät stehen und bietet „Rückgängig“ (R3-N2)", async () => {
+    const nutzer = userEvent.setup();
+    const { typ, vorlage } = stanTyp();
+    const start = neuerBogen();
+    start.einheit.organisation = OrganisationsTyp.THW;
+    start.einheit.einheitsTyp = { code: typ.code };
+    start.fahrzeuge = [
+      { ...vorlage[0]!, aenderungen: "Lichtmast 2 kW, Tauchpumpe TP 4" },
+      { ...neuesFahrzeug(), kennzeichen: "THW-80125" },
+      { ...vorlage[0]! },
+    ];
+    render(<SchrittBuehne komponente={SchrittFahrzeuge} bogen={start} />);
+    const sondergeraet = () => (screen.getAllByLabelText("Änderungen bzw. Sondergerät") as HTMLInputElement[]).map((f) => f.value);
+    const kennzeichen = () => (screen.getAllByLabelText("Kennzeichen") as HTMLInputElement[]).map((f) => f.value);
+
+    // Der Knopf steht unter der Liste, nicht als erster Knopf des Schritts.
+    const knopf = screen.getByRole("button", { name: "Vorbelegung entfernen (1 Fahrzeug ohne eigene Angaben)" });
+    const hinzufuegen = screen.getByRole("button", { name: "+ Fahrzeug hinzufügen" });
+    expect(hinzufuegen.compareDocumentPosition(knopf) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(knopf.parentElement!.textContent).toMatch(/Ein Fahrzeug ohne Kennzeichen bleibt — dort ist schon Sondergerät/);
+
+    await nutzer.click(knopf);
+    expect(document.querySelector("dialog[open]")).toBeNull();
+    expect(sondergeraet()).toEqual(["Lichtmast 2 kW, Tauchpumpe TP 4", ""]);
+    expect(kennzeichen()).toEqual(["", "THW-80125"]);
+
+    const leiste = document.querySelector<HTMLElement>(".quittung-daumen")!;
+    expect(leiste.textContent).toMatch(/^Vorbelegung entfernt:/);
+    await nutzer.click(within(leiste).getByRole("button", { name: "Rückgängig" }));
+    expect(screen.getAllByLabelText("Kennzeichen")).toHaveLength(3);
+    expect(kennzeichen()).toEqual(["", "THW-80125", ""]);
+    expect(document.querySelector(".quittung-daumen")!.textContent).toMatch(/^Zurückgeholt:/);
+  });
+
   it("legt ein Fahrzeug an und mahnt das fehlende Kennzeichen an", async () => {
     const nutzer = userEvent.setup();
     buehne();
@@ -37,6 +96,37 @@ describe("Schritt Fahrzeuge", () => {
     await nutzer.type(screen.getByLabelText("Kennzeichen"), "OL-FW 2041");
 
     expect(screen.queryByText(/hat noch kein Kennzeichen/)).toBeNull();
+  });
+
+  it("behandelt Kennzeichen und Kennzahlen als Kennung: Großbuchstaben, ohne Autokorrektur (R2-M6)", async () => {
+    const nutzer = userEvent.setup();
+    buehne();
+    await nutzer.click(screen.getByRole("button", { name: "+ Fahrzeug hinzufügen" }));
+    await nutzer.click(screen.getByLabelText("Funkrufname"));
+
+    for (const feld of [screen.getByLabelText("Kennzeichen"), screen.getByLabelText("Kennzahlen (z. B. 18/13)")]) {
+      expect(feld.getAttribute("autocapitalize")).toBe("characters");
+      expect(feld.getAttribute("autocorrect")).toBe("off");
+      expect(feld.getAttribute("spellcheck")).toBe("false");
+      expect(feld.getAttribute("autocomplete")).toBe("off");
+    }
+  });
+
+  // Audit Runde 7, R7-E6: Die Begrenzung auf 0 bis 99 wird genannt, nicht still angewendet.
+  it("nennt die Grenze, wenn die Sitzplatzzahl begrenzt wird (R7-E6)", async () => {
+    const nutzer = userEvent.setup();
+    const start = neuerBogen();
+    start.fahrzeuge = [{ typ: { code: 3 } }];
+    render(<SchrittBuehne komponente={SchrittFahrzeuge} bogen={start} />);
+    const feld = screen.getByLabelText("Sitzplätze") as HTMLInputElement;
+
+    await nutzer.type(feld, "999");
+
+    expect(feld.value).toBe("99");
+    expect(screen.getByText(/Höchstens 99 — dein Wert 999 wurde auf 99 gesetzt/)).toBeDefined();
+    await nutzer.clear(feld);
+    await nutzer.type(feld, "12");
+    expect(screen.queryByText(/Höchstens 99/)).toBeNull();
   });
 
   it("übernimmt eine abweichende Sitzplatzzahl und rechnet die Bilanz damit", async () => {
@@ -59,7 +149,7 @@ describe("Schritt Fahrzeuge", () => {
 
     await nutzer.type(feld, "1");
 
-    expect(screen.getByText(/1 brauchen eine andere Mitfahrgelegenheit/)).toBeDefined();
+    expect(screen.getByText(/1 braucht eine andere Mitfahrgelegenheit/)).toBeDefined();
   });
 
   it("behält beim Tippen der Kennzahlen das Trennzeichen", async () => {
@@ -75,6 +165,22 @@ describe("Schritt Fahrzeuge", () => {
     // Der lokale Textzustand ist der Grund für dieses Feld: „18/" darf beim
     // Tippen nicht auf „18" zurückspringen.
     expect(kennzahlen.value).toBe("18/13");
+  });
+
+  /** R2-N9: Platzhalter als Beispiel der eigenen Organisation, „eigener Standort" erklärt. */
+  it("zeigt ein THW-Beispiel im Kennzeichen und erklärt „eigener Standort“", async () => {
+    const nutzer = userEvent.setup();
+    buehne();
+
+    await nutzer.click(screen.getByRole("button", { name: "+ Fahrzeug hinzufügen" }));
+    expect((screen.getByLabelText("Kennzeichen") as HTMLInputElement).placeholder).toBe("z. B. THW-84397");
+    await nutzer.click(screen.getByLabelText("Funkrufname"));
+
+    // Die Erklärung steht unter dem Kästchen, nicht in der Beschriftung — dort
+    // brach „eigener Standort" in einer schmalen Spalte um (R3-N6).
+    const kaestchen = screen.getByLabelText("eigener Standort");
+    expect(kaestchen.closest("label")!.textContent).toBe("eigener Standort");
+    expect(kaestchen.closest("label")!.nextElementSibling!.textContent).toMatch(/Ort im Funkrufnamen = Standort der Einheit/);
   });
 
   it("lädt die StAN-Vorbelegung des Einheitstyps", async () => {

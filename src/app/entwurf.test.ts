@@ -17,7 +17,20 @@ import {
 } from "@bos/eeb-format/model";
 import { ANONYM_BEZEICHNUNG } from "@bos/eeb-format/datenschutzfrist";
 import { neuerBogen } from "./hilfen";
-import { entwurfAusJson, entwurfZuJson, entwurfLaden, entwurfSpeichern, entwurfVerwerfen } from "./entwurf";
+import {
+  beschaedigtenEntwurfVerwerfen,
+  beschaedigterEntwurf,
+  entwurfPruefen,
+  entwurfAusJson,
+  entwurfZuJson,
+  entwurfLaden,
+  entwurfSpeichern,
+  entwurfUeberschreibenErlauben,
+  entwurfVerwerfen,
+  ersetztenEntwurfLaden,
+  ersetztenEntwurfMerken,
+  rueckholungNimmt,
+} from "./entwurf";
 
 class MemStorage {
   private m = new Map<string, string>();
@@ -43,9 +56,18 @@ class MemStorage {
 
 beforeEach(() => {
   (globalThis as { localStorage?: Storage }).localStorage = new MemStorage() as unknown as Storage;
+  // Was ein früherer Test dieses Fensters geschrieben hat, gehört nicht zum nächsten (R5-D3).
+  entwurfUeberschreibenErlauben();
 });
 
 describe("entwurfAusJson()", () => {
+  it("behält die Marke „über die Startseite verlassen“ einer fremden Erfassung (R5-N3)", () => {
+    const b = neuerBogen();
+    const e = entwurfAusJson(entwurfZuJson(b, 1, { fremd: { einsatzId: "e1", beginn: 5, startseite: true } }));
+    expect(e?.fremd).toEqual({ einsatzId: "e1", beginn: 5, startseite: true });
+    expect(entwurfAusJson(entwurfZuJson(b, 1, { fremd: { einsatzId: "e1" } }))?.fremd).toEqual({ einsatzId: "e1" });
+  });
+
   it("überlebt einen Roundtrip", () => {
     const b = neuerBogen();
     b.einheit.hierarchie = [{ bezeichnung: { code: 1 }, name: "OV Test" }];
@@ -79,6 +101,21 @@ describe("Speichern/Laden/Verwerfen über localStorage", () => {
     entwurfVerwerfen();
     expect(entwurfLaden()).toBeNull();
   });
+
+  it("merkt sich die bearbeitete Vorlage — und lässt sie weg, wenn es keine gibt", () => {
+    const b = neuerBogen();
+    entwurfSpeichern(b, { vorlageId: "vorlage-7" });
+    expect(entwurfLaden()?.vorlageId).toBe("vorlage-7");
+    entwurfSpeichern(b);
+    expect(entwurfLaden()?.vorlageId).toBeUndefined();
+    expect(localStorage.getItem("eeb.entwurf.v1")).not.toMatch(/vorlageId/);
+  });
+
+  it("verwirft eine unbrauchbare Vorlagen-Kennung statt des ganzen Entwurfs", () => {
+    const e = entwurfAusJson(JSON.stringify({ gespeichert: 1, bogen: neuerBogen(), vorlageId: 42 }));
+    expect(e).not.toBeNull();
+    expect(e?.vorlageId).toBeUndefined();
+  });
 });
 
 describe("Datenschutzfrist", () => {
@@ -103,10 +140,13 @@ describe("Datenschutzfrist", () => {
   }
 
   it("anonymisiert einen abgelaufenen Entwurf beim Laden und überschreibt ihn im Speicher", () => {
-    entwurfSpeichern(bogenMitPerson());
+    entwurfSpeichern(bogenMitPerson(), { vorlageId: "vorlage-9" });
     const e = entwurfLaden((2000 + 90) * MINUTEN_JE_TAG);
     expect(e?.bogen.personal[0]!.nachname).toBe(`${ANONYM_BEZEICHNUNG} 1`);
     expect(localStorage.getItem("eeb.entwurf.v1")).not.toMatch(/Anna|Berger/);
+    // Die Verbindung zur Vorlage überlebt das Überschreiben im Speicher.
+    expect(e?.vorlageId).toBe("vorlage-9");
+    expect(entwurfLaden((2000 + 90) * MINUTEN_JE_TAG)?.vorlageId).toBe("vorlage-9");
   });
 
   it("lässt einen Entwurf in der Frist und einen Übungsentwurf unangetastet", () => {
@@ -114,5 +154,123 @@ describe("Datenschutzfrist", () => {
     expect(entwurfLaden((2000 + 89) * MINUTEN_JE_TAG)?.bogen.personal[0]!.nachname).toBe("Berger");
     entwurfSpeichern(bogenMitPerson(true));
     expect(entwurfLaden((2000 + 5000) * MINUTEN_JE_TAG)?.bogen.personal[0]!.nachname).toBe("Berger");
+  });
+});
+
+describe("Rückholung und fremde Erfassungen (R2-N1/R2-E1)", () => {
+  function mitName(name: string) {
+    const b = neuerBogen();
+    b.einheit.hierarchie = [{ bezeichnung: { code: 1 }, name }];
+    return b;
+  }
+
+  it("merkt sich die Kennzeichnung einer fremden Erfassung samt Sammlung", () => {
+    entwurfSpeichern(neuerBogen(), { fremd: { einsatzId: "e-1" } });
+    expect(entwurfLaden()?.fremd).toEqual({ einsatzId: "e-1" });
+    entwurfSpeichern(neuerBogen());
+    expect(entwurfLaden()?.fremd).toBeUndefined();
+    // Müll im Feld ergibt „fremd ohne Sammlung", nicht einen kaputten Entwurf.
+    expect(entwurfAusJson(JSON.stringify({ gespeichert: 1, bogen: neuerBogen(), fremd: { einsatzId: 3 } }))?.fremd).toEqual({});
+  });
+
+  it("merkt sich den Beginn einer fremden Erfassung (R3-S6) und verwirft Müll darin", () => {
+    entwurfSpeichern(neuerBogen(), { fremd: { einsatzId: "e-1", beginn: 1_700_000_000_000 } });
+    expect(entwurfLaden()?.fremd).toEqual({ einsatzId: "e-1", beginn: 1_700_000_000_000 });
+    expect(entwurfAusJson(JSON.stringify({ gespeichert: 1, bogen: neuerBogen(), fremd: { beginn: "12:00" } }))?.fremd).toEqual({});
+  });
+
+  it("lässt eine fremde Erfassung einen eigenen Bogen nie verdrängen", () => {
+    expect(rueckholungNimmt(false, null)).toBe(true);
+    expect(rueckholungNimmt(true, null)).toBe(true);
+
+    expect(ersetztenEntwurfMerken(mitName("Eigenhausen"))).toBe(true);
+    expect(ersetztenEntwurfMerken(mitName("Fremdstadt"), {})).toBe(false);
+    expect(ersetztenEntwurfLaden()?.bogen.einheit.hierarchie[0]!.name).toBe("Eigenhausen");
+
+    // Beim Zurückholen wird der Platz frei — dann darf auch die Erfassung hinein.
+    expect(ersetztenEntwurfMerken(mitName("Fremdstadt"), { einsatzId: "e-1" }, { tausch: true })).toBe(true);
+    expect(ersetztenEntwurfLaden()?.fremd).toEqual({ einsatzId: "e-1" });
+    // Eine fremde Erfassung verdrängt eine andere, ein eigener Bogen jede.
+    expect(ersetztenEntwurfMerken(mitName("Zweitstadt"), {})).toBe(true);
+    expect(ersetztenEntwurfMerken(mitName("Eigenhausen"))).toBe(true);
+    expect(ersetztenEntwurfLaden()?.fremd).toBeUndefined();
+  });
+
+  // Audit Runde 4, R4-S5: Der Stand am Rückholplatz ist die letzte Bearbeitung.
+  it("nennt am Rückholplatz die letzte Bearbeitung statt des Zeitpunkts des Verdrängens", () => {
+    const um2240 = new Date(2026, 9, 5, 22, 40).getTime();
+    expect(ersetztenEntwurfMerken(mitName("Eigenhausen"), undefined, { geaendertUm: um2240 })).toBe(true);
+    expect(ersetztenEntwurfLaden()?.gespeichert).toBe(um2240);
+
+    // Ohne Angabe gilt wie früher der Zeitpunkt des Merkens.
+    const vorher = Date.now();
+    expect(ersetztenEntwurfMerken(mitName("Zweitstadt"))).toBe(true);
+    expect(ersetztenEntwurfLaden()!.gespeichert).toBeGreaterThanOrEqual(vorher);
+  });
+});
+
+describe("Wiedereinstieg (R2-N7, R2-O3)", () => {
+  it("merkt sich den zuletzt offenen Schritt und den Zeitpunkt der letzten Änderung", () => {
+    entwurfSpeichern(neuerBogen(), { schritt: 2 }, 1234);
+    const e = entwurfLaden()!;
+    expect(e.schritt).toBe(2);
+    expect(e.gespeichert).toBe(1234);
+    // Unsinniger Schritt fällt weg, statt die App in einen leeren Schritt zu führen.
+    expect(entwurfAusJson(JSON.stringify({ gespeichert: 1, bogen: neuerBogen(), schritt: 17 }))?.schritt).toBeUndefined();
+  });
+});
+
+describe("Entwurf mit fehlenden Pflichtfeldern (R5-E1)", () => {
+  function ohne(feld: string, unter?: "einheit" | "einsatz") {
+    const b = JSON.parse(JSON.stringify(neuerBogen())) as Record<string, Record<string, unknown> & unknown>;
+    if (unter) delete (b[unter] as Record<string, unknown>)[feld];
+    else delete b[feld];
+    return JSON.stringify({ gespeichert: 5, bogen: b });
+  }
+
+  it("ergänzt einen fehlenden Einheitstyp, Fortsetzen öffnet nicht weiß", () => {
+    const e = entwurfAusJson(ohne("einheitsTyp", "einheit"));
+    expect(e).not.toBeNull();
+    expect(e!.bogen.einheit.einheitsTyp).toEqual({});
+  });
+
+  it("nennt die Ursache, wenn ein Bogen nicht zu retten ist", () => {
+    expect(entwurfPruefen(ohne("einsatz"))).toEqual({ ursache: "die Angaben zum Einsatz fehlen" });
+    expect(entwurfPruefen("{kaputt")).toEqual({ ursache: "der gespeicherte Text ist abgebrochen oder beschädigt" });
+    expect(entwurfPruefen('{"x":1}')).toEqual({ ursache: "es ist kein Entwurf dieser App" });
+  });
+
+  it("legt einen unbrauchbaren Entwurf beiseite, statt ihn zu zerstören", () => {
+    const roh = ohne("einsatz");
+    localStorage.setItem("eeb.entwurf.v1", roh);
+    expect(entwurfLaden()).toBeNull();
+    // Hauptplatz frei, der Text liegt unverändert daneben
+    expect(localStorage.getItem("eeb.entwurf.v1")).toBeNull();
+    expect(beschaedigterEntwurf()).toMatchObject({ text: roh, ursache: "die Angaben zum Einsatz fehlen" });
+    // Ein neuer Entwurf überschreibt ihn nicht
+    entwurfSpeichern(neuerBogen());
+    expect(beschaedigterEntwurf()?.text).toBe(roh);
+    beschaedigtenEntwurfVerwerfen();
+    expect(beschaedigterEntwurf()).toBeNull();
+  });
+
+  it("der beiseitegelegte Text fällt nach 90 Tagen selbst weg — die Datenschutzfrist erreicht ihn sonst nicht", () => {
+    const TAG = 24 * 60 * 60 * 1000;
+    localStorage.setItem("eeb.entwurf.beschaedigt.v1", JSON.stringify({ text: "{}", ursache: "x", am: Date.now() - 89 * TAG }));
+    expect(beschaedigterEntwurf()).not.toBeNull();
+    localStorage.setItem("eeb.entwurf.beschaedigt.v1", JSON.stringify({ text: "{}", ursache: "x", am: Date.now() - 91 * TAG }));
+    expect(beschaedigterEntwurf()).toBeNull();
+    expect(localStorage.getItem("eeb.entwurf.beschaedigt.v1")).toBeNull();
+  });
+
+  it("ein zweiter beschädigter Text überschreibt den ersten nicht", () => {
+    const erster = ohne("einsatz");
+    localStorage.setItem("eeb.entwurf.v1", erster);
+    entwurfLaden();
+    const zweiter = ohne("personal");
+    localStorage.setItem("eeb.entwurf.v1", zweiter);
+    entwurfLaden();
+    expect(beschaedigterEntwurf()?.text).toBe(erster);
+    expect(localStorage.getItem("eeb.entwurf.v1")).toBe(zweiter); // bleibt, wo er ist
   });
 });

@@ -18,14 +18,15 @@ import {
   Erfassungsbogen,
   Fahrzeug,
   KontaktArt,
+  ansprechpartner,
   OrganisationsTyp,
   PersonalErfassung,
+  StaerkeRolle,
   datumZuIso,
   mitTransportVersion,
   staerke,
   unterbringungMWD,
   verpflegung,
-  zeitpunktZuIso,
 } from "@bos/eeb-format/model";
 import {
   datumDeutsch,
@@ -33,14 +34,19 @@ import {
   funkrufText,
   funktionsText,
   kennzeichenText,
+  nurSollstaerke,
   orgLabel,
   vokabText,
   vokabularFuer,
   zeitgruppe,
+  pruefpunkte,
   type QrSatz,
+  zeitpunktDeutsch,
 } from "./hilfen";
-import { summiereBoegen, type EinsatzSummen } from "./auswertung";
-import { bogenDiff, diffZeilen } from "@bos/meldekopf/meldung-diff";
+import { mwdText, summiereBoegen, unterbringungAngefordertText, type EinsatzSummen } from "./auswertung";
+import { zeitLang } from "./eintrag-zeiten";
+import { bedarfMarken, datumVonMs, lueckenAlle, rueckkehrText } from "./einheiten-tabelle";
+import { FELD_GESAMTSTAERKE, bogenDiff, diffZeilen, type BogenDiff } from "@bos/meldekopf/meldung-diff";
 import { fahrzeugSymbolSvg } from "./taktische-zeichen-bogen";
 import { orgFarbe } from "./org-farben";
 import { UEBUNG_BREITE, UEBUNG_HOEHE, UEBUNG_PFAD } from "./uebung-wasserzeichen";
@@ -180,6 +186,154 @@ export function weichUmbrechen(text: string): string {
   );
 }
 
+/**
+ * Zeichen, die die PDF-Schrift (Helvetica, WinAnsi = Windows-1252) kennt.
+ * Alles andere druckt pdfkit als Fremdzeichen: „Verpflegung 12 ≠ Stärke 8"
+ * stand auf dem Lageblatt als „12 ″` Stärke 8" (Audit Runde 5, R5-K2).
+ */
+const WINANSI_SONDER = new Set("€‚ƒ„…†‡ˆ‰Š‹ŒŽ‘’“”•–—˜™š›œžŸ");
+const winAnsiKennt = (z: string): boolean => {
+  const c = z.codePointAt(0)!;
+  return (c >= 0x20 && c <= 0x7e) || (c >= 0xa0 && c <= 0xff) || z === "\n" || z === "\u200B" || WINANSI_SONDER.has(z);
+};
+/** Häufige Zeichen aus Freitext mit sinnvoller Schreibweise in WinAnsi. */
+const WINANSI_ERSATZ: Record<string, string> = {
+  "→": "->", "⇒": "=>", "←": "<-", "↔": "<->", "≠": "!=", "≥": ">=", "≤": "<=", "≈": "ca.", "−": "-", "‐": "-", "‑": "-", "‒": "-",
+  "✓": "x", "✔": "x", "✗": "x", "✘": "x", "☎": "Tel.", "⚠": "!", "ł": "l", "Ł": "L", "đ": "d", "Đ": "D", "ı": "i",
+  "\u202F": " ", "\u2009": " ", "\u2002": " ", "\u2003": " ", "\uFEFF": "", "\u00AD": "",
+};
+
+/**
+ * Text für die PDF-Schrift: unbekannte Zeichen durch eine Schreibweise ersetzen,
+ * die sie kennt („≠" → „!=", „ő" → „o"); was sich nicht abbilden lässt, wird „?"
+ * statt eines Fremdzeichens. Gilt für alle Texte der Dokumente, auch für Freitext
+ * der Bögen, den niemand prüft.
+ */
+export function winAnsiText(text: string): string {
+  let aus = "";
+  let geaendert = false;
+  for (const z of text) {
+    if (winAnsiKennt(z)) {
+      aus += z;
+      continue;
+    }
+    geaendert = true;
+    const ersatz = WINANSI_ERSATZ[z];
+    if (ersatz != null) {
+      aus += ersatz;
+      continue;
+    }
+    // Buchstabe mit Akzent, den WinAnsi nicht hat („ő", „ž" ist drin, „ć" nicht): Grundbuchstabe.
+    const grund = z.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    aus += [...grund].every(winAnsiKennt) && grund !== "" ? grund : "?";
+  }
+  return geaendert ? aus : text;
+}
+
+/** Umschrift kyrillischer und griechischer Buchstaben in lateinische (R8-A3) — klein, die Großschreibung setzt {@link umschrift}. */
+const UMSCHRIFT: Record<string, string> = {
+  а: "a", б: "b", в: "v", г: "g", д: "d", е: "e", ё: "jo", ж: "zh", з: "z", и: "i", й: "j", к: "k", л: "l", м: "m", н: "n", о: "o", п: "p",
+  р: "r", с: "s", т: "t", у: "u", ф: "f", х: "ch", ц: "z", ч: "tsch", ш: "sch", щ: "schtsch", ъ: "", ы: "y", ь: "", э: "e", ю: "ju", я: "ja",
+  і: "i", ї: "ji", є: "je", ґ: "g", ў: "u", ј: "j", љ: "lj", њ: "nj", ћ: "c", ђ: "dj", џ: "dz",
+  α: "a", β: "v", γ: "g", δ: "d", ε: "e", ζ: "z", η: "i", θ: "th", ι: "i", κ: "k", λ: "l", μ: "m", ν: "n", ξ: "x", ο: "o", π: "p",
+  ρ: "r", σ: "s", ς: "s", τ: "t", υ: "y", φ: "f", χ: "ch", ψ: "ps", ω: "o", ά: "a", έ: "e", ή: "i", ί: "i", ό: "o", ύ: "y", ώ: "o", ϊ: "i", ϋ: "y",
+};
+
+/**
+ * Kyrillisch/griechisch → lateinisch („Владимир" → „Vladimir"); alles andere bleibt. Nur für das
+ * Rückruf-Feld auf Papier (R8-A3): Der Name steht dort lesbar statt als „????????".
+ */
+export function umschrift(text: string): string {
+  let aus = "";
+  for (const z of text) {
+    const klein = z.toLowerCase();
+    const u = UMSCHRIFT[klein];
+    if (u === undefined) {
+      aus += z;
+    } else if (klein !== z && u) {
+      aus += u[0]!.toUpperCase() + u.slice(1);
+    } else {
+      aus += u;
+    }
+  }
+  return aus;
+}
+
+/**
+ * Der Name im Feld „Ansprechpartner/in": darstellbar unverändert; kyrillisch/griechisch in Umschrift
+ * mit dem Vermerk dazu; was auch so nicht druckbar ist, mit dem Hinweis auf die digitale Meldung —
+ * kein „????????" mehr an der Stelle, wo der Meldekopf zurückruft (R8-A3).
+ */
+export function ansprechpersonPapier(name: string): string {
+  const weg = (t: string) => winAnsiText(t).includes("?") && !t.includes("?");
+  if (!weg(name)) return name;
+  const u = umschrift(name);
+  if (!weg(u)) return `${u} (Umschrift)`;
+  return `${winAnsiText(u)} (Name nicht darstellbar – siehe digitale Meldung)`;
+}
+
+/**
+ * Wie viele Namen im Bogen Zeichen enthalten, die die PDF-Schrift nicht darstellen kann
+ * (kyrillisch, arabisch, Emoji …) und die als „?" gedruckt würden (Audit Runde 6, R6-A5).
+ */
+export function nichtDarstellbareNamen(b: Erfassungsbogen): number {
+  const namen = [
+    ...b.personal.flatMap((p) => [p.vorname, p.nachname]),
+    b.einheit.organisationName ?? "",
+    ...b.einheit.hierarchie.map((h) => h.name),
+  ];
+  return namen.filter((n) => n && !n.includes("?") && winAnsiText(n).includes("?")).length;
+}
+
+/**
+ * Wer betroffen ist: „Владимир Lehmann (Ansprechperson)" — für die Quittung (R7-A4). Die erste
+ * Person steht im Feld „Ansprechpartner/in", also dort, wo der Meldekopf zurückruft.
+ */
+export function nichtDarstellbareBetroffene(b: Erfassungsbogen): string[] {
+  const betrifft = (...teile: string[]) => teile.some((n) => n && !n.includes("?") && winAnsiText(n).includes("?"));
+  const wer: string[] = [];
+  b.personal.forEach((p, i) => {
+    if (betrifft(p.vorname, p.nachname)) {
+      wer.push(`${[p.vorname, p.nachname].filter(Boolean).join(" ")}${i === 0 ? " (Ansprechperson)" : ""}`);
+    }
+  });
+  if (betrifft(b.einheit.organisationName ?? "")) wer.push(`Organisationsname „${b.einheit.organisationName}"`);
+  for (const h of b.einheit.hierarchie) if (betrifft(h.name)) wer.push(`Zugehörigkeit „${h.name}"`);
+  return wer;
+}
+
+/** Läuft durch ein Dokument und wendet {@link winAnsiText} auf alle gedruckten Texte an (Schlüssel „text"). */
+function winAnsiKnoten<T>(k: T): T {
+  if (Array.isArray(k)) {
+    k.forEach((x, i) => {
+      (k as unknown[])[i] = winAnsiKnoten(x);
+    });
+  } else if (k && typeof k === "object") {
+    const o = k as Record<string, unknown>;
+    for (const name of Object.keys(o)) {
+      // Eingebettete Dateien (JSON, Sammlung) sind Daten, kein gedruckter Text.
+      if (name === "files" || name === "image" || name === "svg" || name === "link") continue;
+      const wert = o[name];
+      if (name === "text" && typeof wert === "string") o[name] = winAnsiText(wert);
+      else if (wert && typeof wert === "object") winAnsiKnoten(wert);
+    }
+  }
+  return k;
+}
+
+/** Dokument-Titel, Inhalt, Kopf- und Fußzeile auf WinAnsi bringen (R5-K2). */
+function winAnsiDokument(dd: TDocumentDefinitions): TDocumentDefinitions {
+  winAnsiKnoten(dd.content);
+  if (dd.info?.title) dd.info.title = winAnsiText(dd.info.title);
+  for (const feld of ["header", "footer"] as const) {
+    const f = dd[feld];
+    if (typeof f === "function") {
+      dd[feld] = ((...a: Parameters<typeof f>) => winAnsiKnoten(f(...a))) as typeof f;
+    } else if (f) winAnsiKnoten(f);
+  }
+  return dd;
+}
+
 /** pdfmake-Attachment inkl. der von pdfkit unterstützten AFRelationship (fehlt im Typ). */
 type EingebetteteDatei = Attachment & { relationship?: string };
 
@@ -243,47 +397,290 @@ export function boegenAlsEingebetteteDatei(boegen: Erfassungsbogen[]): Eingebett
   };
 }
 
-/** Ein Bogen der Sammel-PDF samt QR und (für die Änderungsspalte) seiner Vorfassung. */
-export interface SammelBogen {
+/**
+ * Was die Übergabe-Übersicht je Einheit braucht — bewusst ohne QR-Satz, damit
+ * das einseitige Lageblatt keinen Code rechnen muss (auf dem Telefon Sekunden
+ * je Bogen; für ein Blatt an der Wand ist das der Unterschied zwischen
+ * „drucke ich stündlich" und „drucke ich nie", Analog-Audit A3/A4).
+ */
+export interface UebersichtEintrag {
   bogen: Erfassungsbogen;
-  qr: QrSatz;
   /** Vorherige Meldung derselben Einheit; fehlt bei einer Erstmeldung. */
   vorher?: Erfassungsbogen;
   /** Zug-/Verbandsetikett aus der Sammlung — Grundlage der Zwischensummen. */
   zugEtikett?: string;
   /** Bezeichnung eines abgeteilten Truppteils (MeldeEintrag.teilEtikett). */
   teil?: string;
+  /** Eintreffzeit (ms); fehlt bei Aufrufern, die nur Bögen kennen. */
+  eingetroffenAm?: number;
+  /** Abrückzeit (ms), falls festgehalten. */
+  abgerueckAm?: number;
+  /**
+   * Nicht mehr vor Ort (abgerückt oder zusammengeführt): steht im eigenen
+   * Block unter den anwesenden Einheiten. Bisher fehlten diese Einheiten auf
+   * dem Papier vollständig, während die eingebettete Sammlung sie trug — zwei
+   * Wahrheiten für dieselbe Übergabe (Analog-Audit A1).
+   */
+  abgerueckt?: boolean;
+  /** Zählt in Summen und Bedarf (anwesend, keine fremde Übung). Fehlt = ja. */
+  zaehlt?: boolean;
+  /** Auftrag/Notiz der Führungsstelle zu dieser Einheit. */
+  notiz?: string;
+  /** Laufende Nummer der Meldung, wie an der Karte am Gerät (R2-A6). */
+  nummer?: number;
+  /**
+   * Diese Fassung hat die abgerückte Einheit wieder in die Lage geholt (R5-K1);
+   * `abgerueckAm` = seit wann sie abgerückt war. Das Blatt nennt es in der Spalte
+   * „Veränderung" — die Wand und der Stab lesen sonst nur eine normale Zeile.
+   */
+  rueckkehr?: { abgerueckAm?: number };
+  /**
+   * Nur im Nachtrag (R5-W7): warum die Einheit dabei ist („neu", „Zug", „Auftrag" …).
+   * `nachtragNeu === false`: Sie war schon in der letzten Lieferung — ihre Zeile
+   * ersetzt die frühere, ihre Kräfte gehören nicht noch einmal zur Summe.
+   */
+  nachtragGrund?: string[];
+  nachtragNeu?: boolean;
+  /**
+   * Die Eintreffzeit ist die Zeit des Einlesens vom Papier, nicht bestätigt
+   * (R5-A1): Das Blatt kennzeichnet sie, statt eine Uhrzeit wie eine Angabe zu drucken.
+   */
+  zeitUnbestaetigt?: boolean;
+  /** Ort/Auftrag, den der Bogen nennt, obwohl er nicht zur Lage zu passen scheint (R5-K5). */
+  fremderOrt?: string;
 }
+
+/** Ein Bogen der Sammel-PDF samt QR — die Übersichtsangaben plus der Code für die Bogenseiten. */
+export interface SammelBogen extends UebersichtEintrag {
+  qr: QrSatz;
+}
+
+/**
+ * Nach Nr. geordnet, wie am Gerät und im Funk (R5-A9): „Nr. 17“ steht auf dem
+ * Wandblatt zwischen 16 und 18, nicht an der Stelle des Namens im Alphabet.
+ * Stabil; Einträge ohne Nr. folgen in ihrer Reihenfolge.
+ */
+export function nachNummer<T extends { nummer?: number }>(eintraege: readonly T[]): T[] {
+  return eintraege
+    .map((e, i) => ({ e, i }))
+    .sort((a, b) => (a.e.nummer ?? Infinity) - (b.e.nummer ?? Infinity) || a.i - b.i)
+    .map(({ e }) => e);
+}
+
+/** Zählt der Eintrag in die Summen? Abgerückte nie, Übungen nur in Übungssammlungen (zaehlt=false). */
+function zaehlend(e: UebersichtEintrag): boolean {
+  // Eine Einheit des Nachtrags, die schon in der letzten Lieferung stand, ersetzt
+  // ihre frühere Zeile und wird nicht noch einmal summiert (R5-W7).
+  return !e.abgerueckt && e.zaehlt !== false && e.nachtragNeu !== false;
+}
+
+/** Nur die Bögen, die in Summen und Bedarf gehören. */
+function zaehlendeBoegen(eintraege: UebersichtEintrag[]): Erfassungsbogen[] {
+  return eintraege.filter(zaehlend).map((e) => e.bogen);
+}
+
+/** Ab so vielen Einheiten steht der Bedarf der Sammel-PDF vor der Tabelle (R5-A8). */
+const BEDARF_VORN_AB = 12;
 
 /** Mehr Zeilen passen nicht sinnvoll in eine Tabellenzelle — der Rest wird gezählt. */
 const UEBERSICHT_MAX_ZEILEN = 8;
+/**
+ * Auf dem Lageblatt weniger: es muss bei rund zehn Einheiten auf eine Seite
+ * passen, die Einzelheiten stehen in der Sammel-PDF (Audit Runde 2, R2-K3).
+ */
+const LAGEBLATT_MAX_ZEILEN = 2;
 
 /**
- * Übergabe-Übersicht: eine Zeile je Einheit mit Stärke, Fahrzeugen und der
- * Spalte „Veränderung seit der letzten Meldung" — der Teil, den die ablösende
- * Schicht zuerst liest. Die Detailbögen dahinter bleiben unverändert im Layout
- * des Papiervordrucks.
+ * Änderungszeile fürs Papier: „Diesel: von 50 l auf 200 l" statt
+ * „Diesel: 50 l → 200 l". Die PDF-Standardschrift Helvetica (WinAnsi) kennt
+ * den Pfeil nicht; im Ausdruck stand „50 l !200 l" und las sich als Ausruf
+ * (Audit Runde 2, R2-K3).
  */
-function uebersichtsTabelle(boegen: SammelBogen[]): Content {
+export function aenderungFuerPapier(zeile: string): string {
+  const m = /^([^:]+): (.*) → (.*)$/.exec(zeile);
+  if (m) return `${m[1]}: von ${m[2]} auf ${m[3]}`;
+  return zeile.replace(/→/g, "->");
+}
+
+/** Zeitpunkt auf dem Blatt — immer mit Datum: gelesen wird es auch morgen noch. */
+function blattZeit(ms: number | undefined): string {
+  return ms == null ? "" : zeitLang(ms);
+}
+
+/**
+ * Übergabe-Übersicht: eine Zeile je Einheit mit Eintreff-/Abrückzeit, Stärke,
+ * Fahrzeugen, Auftrag der Führungsstelle und der Spalte „Veränderung seit der
+ * letzten Meldung" — der Teil, den die ablösende Schicht zuerst liest.
+ * Abgerückte Einheiten stehen als eigener Block darunter; die Summe zählt
+ * nur die zählenden — genau wie die Stärkeleiste am Gerät.
+ */
+/**
+ * Bei einer Einheit, deren Personal nur als Stärke erfasst ist, stammen Fahrzeug-
+ * Ausstattung („nach StAN: ja") und Funkrufname aus der Vorbelegung des Einheitstyps –
+ * gemeldet hat sie niemand. Auf Papier sähe das wie eine Aussage der Einheit aus
+ * (Audit Runde 6, R6-A3): Die Kästchen bleiben leer, der Funkrufname entfällt.
+ */
+export function ohneVorbelegung(b: Erfassungsbogen): Erfassungsbogen {
+  if (b.personalErfassung !== PersonalErfassung.NUR_STAERKE) return b;
+  return { ...b, fahrzeuge: b.fahrzeuge.map((f) => ({ ...f, stanKonform: undefined, funkrufname: undefined })) };
+}
+
+/**
+ * Wie erreiche ich die Einheit ohne Gerät? Funkrufname des ersten Fahrzeugs
+ * mit Funkrufnamen und die Rückrufnummer der Führungskraft (sonst die des
+ * Ortsverbands) — auf dem Einzelbogen stehen sie, auf dem Lageblatt fehlten
+ * sie (Audit Runde 2, R2-A3).
+ */
+export function erreichbarkeitZeilen(b: Erfassungsbogen): string[] {
+  const zeilen: string[] = [];
+  b = ohneVorbelegung(b);
+  const fzg = b.fahrzeuge.find((f) => f.funkrufname);
+  const furn = fzg ? funkrufText(fzg, b.einheit) : "";
+  if (furn) zeilen.push(furn);
+  // Knapp, damit die Zeile in die Spalte passt: „5556968346 (S. Lang)".
+  const p = ansprechpartner(b.personal);
+  const tel = p?.kontakte.find((k) => k.art !== KontaktArt.EMAIL && k.wert);
+  if (p && tel) {
+    const name = [p.vorname ? `${p.vorname.charAt(0)}.` : "", p.nachname].filter(Boolean).join(" ");
+    zeilen.push(name ? `${tel.wert} (${name})` : `${tel.wert}`);
+  } else if (b.einheit.hierarchie[0]?.telefon) {
+    zeilen.push(`${b.einheit.hierarchie[0].telefon} (OV)`);
+  }
+  return zeilen;
+}
+
+/**
+ * Leere Zeilen unter den Einheiten des Lageblatts — zum Weiterschreiben bei
+ * Geräteausfall (R2-A3). Bei zehn Einheiten waren es zwei, darunter ein
+ * Fünftel der Seite leer, und nach dem zweiten Nachtrag ging es auf einem
+ * Zettel weiter (Audit Runde 3, R3-A5). Ohne Messung fünf; gemessen füllt
+ * {@link einsatzLageblattSeiteFuellen} die letzte Seite bis unten.
+ */
+export const NACHTRAG_ZEILEN_MIN = 5;
+
+/**
+ * Zeilenzahl des Probesatzes. Früher die Untergrenze („mindestens zwei —
+ * ein Lageblatt, das wegen leerer Zeilen eine zweite Seite anfängt, hängt
+ * niemand aus", R2-K3); seit R4-A3 geht es bei zu vollem Blatt auf die
+ * Rückseite, und Seite 1 bleibt das Blatt für die Wand.
+ */
+const NACHTRAG_ZEILEN_PROBE = 3;
+
+/** Kennungen der Messpunkte für {@link einsatzLageblattSeiteFuellen}. */
+const MESS_ENDE = "lageblatt-ende";
+const MESS_NACHTRAG = "lageblatt-nachtrag-";
+
+/** Zelle „übertragen“ einer Nachtragszeile: Kästchen und Platz für das Kürzel. */
+const NACHTRAG_UEBERTRAGEN = "[  ] ______";
+
+/** Ausfülllinie für Zahlen auf dem leeren Lageblatt — statt vorgedruckter Nullen (R3-A5). */
+const LEERFELD = "____";
+
+/**
+ * Gesamtstärke an den Anfang der Änderungen: Auf dem Lageblatt (zwei Zeilen
+ * je Einheit) stand sonst „Mannschaft: von 9 auf 6 … und 5 weitere
+ * Änderungen", die Gesamtstärke 12 → 9 erst in der Sammel-PDF (Audit
+ * Runde 3, R3-K6).
+ */
+function gesamtZuerst(d: BogenDiff): BogenDiff {
+  const gesamt = d.staerke.filter((a) => a.feld === FELD_GESAMTSTAERKE);
+  return gesamt.length === 0 ? d : { ...d, staerke: [...gesamt, ...d.staerke.filter((a) => a.feld !== FELD_GESAMTSTAERKE)] };
+}
+
+/**
+ * Änderungen für die zwei Zeilen des Lageblatts, nach Bedarfsrelevanz geordnet
+ * (R5-K7): Gesamtstärke; dann alles, was den Bedarf bewegt (Unterbringung,
+ * Ruhezeit, Verpflegung, Kraftstoff) und der Auftrag der Einheit; der Rest
+ * (Personal, Fahrzeuge, Bemerkung) nur als Stichwort mit Zahl. Vorher stand
+ * hinter der Stärke „… und 4 weitere Änderungen" — dahinter die Unterbringung.
+ */
+export function lageblattAenderungen(d: BogenDiff): string[] {
+  const wert = (a: { feld: string; vorher: string; nachher: string }) => `${a.feld}: ${a.vorher} → ${a.nachher}`;
+  const zeilen: string[] = [];
+  const gesamt = d.staerke.find((a) => a.feld === FELD_GESAMTSTAERKE);
+  if (gesamt) zeilen.push(wert(gesamt));
+  const papier = (a: { feld: string; vorher: string; nachher: string }) => `${a.feld} von ${a.vorher} auf ${a.nachher}`;
+  const bedarf = [...d.bedarf.map(papier), ...d.sonstiges.filter((a) => a.feld === "Ort / Auftrag").map(papier)];
+  if (bedarf.length > 0) zeilen.push(`Bedarf/Auftrag: ${bedarf.join("; ")}`);
+  const rest: string[] = [];
+  const andereStaerke = d.staerke.filter((a) => a !== gesamt).length;
+  if (andereStaerke > 0) rest.push("Stärke nach Funktion");
+  const personal = d.personalZugang.length + d.personalAbgang.length + d.personalGeaendert.length;
+  if (personal > 0) rest.push(`Personal (${personal})`);
+  const fahrzeuge = d.fahrzeugeZugang.length + d.fahrzeugeAbgang.length + d.fahrzeugeGeaendert.length;
+  if (fahrzeuge > 0) rest.push(`Fahrzeuge (${fahrzeuge})`);
+  if (d.sonstiges.some((a) => a.feld !== "Ort / Auftrag")) rest.push("Bemerkung/Sonstiges");
+  if (rest.length > 0) zeilen.push(`weitere: ${rest.join(", ")}`);
+  return zeilen;
+}
+
+/**
+ * Bedarf je Einheit: Dringendes (Ruhezeit, Unterbringung, abweichende
+ * Verpflegung) fett, Kraftstoff normal — am Gerät gelb gegen grau, auf dem
+ * Papier war alles gleich fett (Audit Runde 3, R3-K6).
+ */
+function bedarfZelle(b: Erfassungsbogen): TableCell {
+  const marken = bedarfMarken(b);
+  if (marken.length === 0) return { text: "" };
+  return {
+    text: marken.flatMap((m, i) => [
+      ...(i > 0 ? [{ text: " · " }] : []),
+      m.dringend ? { text: m.kurz, bold: true } : { text: m.kurz },
+    ]),
+  };
+}
+
+/** So viele Zeichen der Bemerkung stehen auf dem Lageblatt, der Rest in der Sammel-PDF. */
+const BEMERKUNG_LAGEBLATT = 70;
+
+/** Zelle „Auftrag / Notiz (Bemerkung der Einheit)": Auftrag oben, Bemerkung kursiv darunter (R3-K3). */
+function bemerkungZelle(notiz: string | undefined, sonstiges: string | undefined, kuerzen?: number): TableCell {
+  const teile: Content[] = [];
+  if (notiz?.trim()) teile.push({ text: weichUmbrechen(notiz.trim()) });
+  let b = sonstiges?.trim() ?? "";
+  // Gekürzt, und das Blatt sagt, wo der Rest steht (R5-A9) — sonst endete sie bei „… MTW OV zusätzlich über St …“.
+  if (kuerzen != null && b.length > kuerzen) b = `${b.slice(0, kuerzen).trimEnd()} … (Rest: Sammel-PDF)`;
+  if (b) teile.push({ text: weichUmbrechen(`(${b})`), italics: true });
+  if (teile.length === 0) return { text: "" };
+  return teile.length === 1 ? (teile[0] as TableCell) : { stack: teile };
+}
+
+function uebersichtsTabelle(
+  eintraege: UebersichtEintrag[],
+  maxZeilen = UEBERSICHT_MAX_ZEILEN,
+  /** Lageblatt: Erreichbarkeit je Einheit (R2-A3); die Nachtragszeilen stehen in {@link nachtragsTabelle}. */
+  zumWeiterfuehren = false,
+  /** Nachtrag (R4-W4): „seit 05.10.2026, 20:49" — die Summen heißen dann „Summe Nachtrag". */
+  nachtrag?: string,
+): Content {
   const kopf = (text: string): TableCell => ({ text, bold: true, fillColor: GRAU });
+  // Zug und Bedarf je Einheit, wie in der App-Tabelle — „Ruhezeit bei 5
+  // Einheiten" ohne Namen musste die Ablösung per Funk klären (R2-K3).
+  const SPALTEN = zumWeiterfuehren ? 10 : 9;
   const body: TableCell[][] = [
     [
       kopf("Einheit"),
+      kopf("Zug"),
+      ...(zumWeiterfuehren ? [kopf("Funkrufname /\nRückruf")] : []),
+      // Eine Spalte für beide Zeiten: die Abrückzeit gibt es nur im Block
+      // „Abgerückt", die leere Spalte daneben kostete die Änderungsspalte
+      // ihre Breite und das Blatt seine Seite (R2-K3).
+      kopf("Eingetroffen\n(abgerückt)"),
       kopf("Stand"),
       kopf("Stärke\nF / U / M / G"),
       kopf("Fzg"),
+      kopf("Bedarf"),
+      // Die Bemerkung der Einheit („Sonstiges") unter dem Auftrag — eine
+      // Nachschubanforderung im Freitext stand auf dem Blatt nur, solange sie
+      // als Änderung galt (Audit Runde 3, R3-K3). Gleiche Spalte, damit das
+      // Blatt nicht breiter wird.
+      kopf("Auftrag / Notiz\n(Bemerkung der Einheit)"),
       kopf("Veränderung seit der letzten Meldung"),
     ],
   ];
-  const summe = { fuehrer: 0, unterfuehrer: 0, mannschaft: 0, gesamt: 0, fahrzeuge: 0 };
-  for (const { bogen: b, vorher, teil } of boegen) {
+  const zeile = (e: UebersichtEintrag): TableCell[] => {
+    const { bogen: b, vorher, teil } = e;
     const s = staerke(b);
-    summe.fuehrer += s.fuehrer;
-    summe.unterfuehrer += s.unterfuehrer;
-    summe.mannschaft += s.mannschaft;
-    summe.gesamt += s.gesamt;
-    summe.fahrzeuge += b.fahrzeuge.length;
-
     let aenderung: Content;
     if (!vorher) {
       aenderung = { text: "Erstmeldung", italics: true };
@@ -291,38 +688,154 @@ function uebersichtsTabelle(boegen: SammelBogen[]): Content {
       const d = bogenDiff(vorher, b);
       aenderung =
         d.anzahl === 0
-          ? { text: `unverändert gegenüber ${zeitgruppe(vorher.stand)}`, italics: true }
+          ? { text: `unverändert gegenüber ${zeitpunktDeutsch(vorher.stand)}`, italics: true }
           : {
               stack: [
-                { text: `gegenüber ${zeitgruppe(vorher.stand)}:`, bold: true },
-                ...diffZeilen(d, UEBERSICHT_MAX_ZEILEN).map((z) => ({ text: z })),
+                { text: `gegenüber ${zeitpunktDeutsch(vorher.stand)}:`, bold: true },
+                ...(maxZeilen === LAGEBLATT_MAX_ZEILEN ? lageblattAenderungen(d) : diffZeilen(gesamtZuerst(d), maxZeilen)).map((z) => ({ text: aenderungFuerPapier(z) })),
               ],
             };
+    }
+    // Eine durch Folgemeldung zurückgeholte Einheit steht als Erstes in der
+    // Spalte — nicht als gewöhnliche Zeile (R5-K1).
+    if (e.rueckkehr) {
+      aenderung = { stack: [{ text: rueckkehrText(e.rueckkehr).toUpperCase(), bold: true }, aenderung] };
     }
     // Name, darunter bei Bedarf die Kennzeichnung eines abgeteilten Truppteils
     // und der Übungs-Störer — beides muss in der Übersicht stehen, sonst sind
     // zwei Zeilen derselben Einheit nicht auseinanderzuhalten.
-    const namensZeilen: Content[] = [{ text: einheitAnzeigename(b.einheit) }];
+    // Laufende Nummer vorn, wie an der Karte: „Meldung 3" über Funk statt
+    // des vollen Einheitsnamens (Audit Runde 2, R2-A6).
+    const namensZeilen: Content[] = [
+      e.nummer != null
+        ? { text: [{ text: `Nr. ${e.nummer}  `, bold: true }, { text: einheitAnzeigename(b.einheit) }] }
+        : { text: einheitAnzeigename(b.einheit) },
+    ];
     if (teil) namensZeilen.push({ text: teil, italics: true });
     if (b.uebung) namensZeilen.push({ text: "ÜBUNG", bold: true, color: UEBUNG_FARBE });
-    body.push([
+    if (!e.abgerueckt && e.zaehlt === false) namensZeilen.push({ text: "zählt nicht in diese Lage", italics: true });
+    // Niemand hat gezählt: Die Zahl ist die Sollstärke der Vorbelegung, nicht wie eine Meldung zu lesen (R8-A1).
+    if (nurSollstaerke(b)) namensZeilen.push({ text: "Sollstärke, nicht gemeldet", bold: true });
+    // Wie an der Karte: Der Bogen nennt einen anderen Einsatz, gezählt wird er trotzdem (R5-K5).
+    if (e.fremderOrt) namensZeilen.push({ text: `Anderer Einsatz? Bogen nennt: „${e.fremderOrt}“`, bold: true });
+    // Nachtrag: der Grund je Zeile (R5-W7).
+    if (e.nachtragGrund) {
+      namensZeilen.push({
+        text: e.nachtragNeu === false ? `im Nachtrag wegen: ${e.nachtragGrund.join(", ")} — ersetzt die frühere Zeile` : "im Nachtrag: neu",
+        italics: true,
+        bold: true,
+      });
+    }
+    // Lücken der Meldung als Zahl — am Gerät eine Marke an der Karte (R2-K3).
+    // Mit Inhalt statt „1 Lücke" (R3-K7).
+    // Auf dem Papier alle, nicht „… + 2 weitere" (R4-K3): Das Lageblatt nennt
+    // jeden Punkt als Stichwort, die Sammel-PDF die ganzen Sätze. Der Zeitraum
+    // zählt wie am Gerät mit (Bezug: Eintreffen, R4-W6).
+    const luecken = pruefpunkte(b, true, e.eingetroffenAm != null ? datumVonMs(e.eingetroffenAm) : undefined);
+    if (luecken.length > 0) {
+      if (maxZeilen === LAGEBLATT_MAX_ZEILEN) {
+        namensZeilen.push({ text: `Hinweise: ${lueckenAlle(luecken.map((p) => p.text))}`, italics: true });
+      } else {
+        namensZeilen.push({ text: luecken.length === 1 ? "Hinweis:" : `Hinweise (${luecken.length}):`, italics: true });
+        for (const p of luecken) namensZeilen.push({ text: `– ${p.text}`, italics: true, fontSize: 7 });
+      }
+    }
+    return [
       namensZeilen.length === 1 ? namensZeilen[0]! : { stack: namensZeilen },
-      { text: zeitgruppe(b.stand) },
+      { text: weichUmbrechen(e.zugEtikett ?? "") },
+      ...(zumWeiterfuehren ? [{ stack: erreichbarkeitZeilen(b).map((text) => ({ text: weichUmbrechen(text) })) }] : []),
+      {
+        stack: [
+          { text: blattZeit(e.eingetroffenAm) },
+          ...(e.zeitUnbestaetigt ? [{ text: "Zeit nicht bestätigt (vom Papier)", italics: true, fontSize: 7 }] : []),
+          ...(e.abgerueckAm != null ? [{ text: `ab ${blattZeit(e.abgerueckAm)}`, bold: true }] : []),
+          // Ohne Abrückzeit steht auf dem Wandblatt eine leere Stelle: Sie soll nicht wie „nie bekannt" wirken (R7-A2).
+          ...(e.abgerueckt && e.abgerueckAm == null
+            ? [{ text: e.zeitUnbestaetigt ? "Abrückzeit nicht bestätigt (vom Papier)" : "Abrückzeit nicht festgehalten", italics: true, fontSize: 7 }]
+            : []),
+        ],
+      },
+      { text: zeitpunktDeutsch(b.stand) },
       { text: `${s.fuehrer} / ${s.unterfuehrer} / ${s.mannschaft} / ${s.gesamt}` },
       { text: `${b.fahrzeuge.length}` },
+      bedarfZelle(b),
+      bemerkungZelle(e.notiz, b.sonstiges, maxZeilen === LAGEBLATT_MAX_ZEILEN ? BEMERKUNG_LAGEBLATT : undefined),
       aenderung,
-    ]);
+    ];
+  };
+  const anwesend = eintraege.filter((e) => !e.abgerueckt);
+  const abgerueckt = eintraege.filter((e) => e.abgerueckt);
+  for (const e of anwesend) body.push(zeile(e));
+  if (abgerueckt.length > 0) {
+    // Ein Zwischenkopf statt einer Fußnote: „war da und ist wieder weg" muss
+    // auf dem Papier so sichtbar sein wie in der Datei.
+    const trenner: TableCell[] = [{ text: `Abgerückt (${abgerueckt.length})`, bold: true, fillColor: GRAU, colSpan: SPALTEN }];
+    for (let i = 1; i < SPALTEN; i++) trenner.push({});
+    body.push(trenner);
+    for (const e of abgerueckt) body.push(zeile(e));
   }
-  body.push([
-    { text: `Summe (${boegen.length} Einheiten)`, bold: true },
+  const summe = summiereBoegen(zaehlendeBoegen(eintraege));
+  const uebungen = anwesend.filter((e) => e.zaehlt === false).length;
+  const beschriftung = [`${summe.einheiten} zählend`];
+  // Die Sollstärke steht in der Summe — das Blatt sagt, wie viel davon nicht gezählt ist (R8-A1).
+  const sollEinheiten = eintraege.filter((e) => zaehlend(e) && nurSollstaerke(e.bogen));
+  if (sollEinheiten.length > 0) {
+    const personen = sollEinheiten.reduce((n, e) => n + staerke(e.bogen).gesamt, 0);
+    beschriftung.push(`davon ${sollEinheiten.length} Sollstärke, nicht gemeldet (${personen} Pers.)`);
+  }
+  if (uebungen > 0) beschriftung.push(`${uebungen} Übung`);
+  // Im Nachtrag: Einheiten, die schon in der letzten Lieferung standen, ersetzen
+  // ihre Zeile und stehen nicht in dieser Summe (R5-W7).
+  const ersetzend = anwesend.filter((e) => e.zaehlt !== false && e.nachtragNeu === false).length;
+  if (ersetzend > 0) beschriftung.push(`${ersetzend} geändert, nicht mitgezählt`);
+  if (abgerueckt.length > 0) beschriftung.push(`${abgerueckt.length} abgerückt`);
+  /** Summenzeile: Beschriftung, Stärke, Fahrzeuge an ihren Spalten, Rest leer. */
+  const summenZeile = (titel: string, staerkeText: string, fzg: string, margin?: [number, number, number, number]): TableCell[] => [
+    { text: titel, bold: true, ...(margin ? { margin } : {}) },
     { text: "" },
-    { text: `${summe.fuehrer} / ${summe.unterfuehrer} / ${summe.mannschaft} / ${summe.gesamt}`, bold: true },
-    { text: `${summe.fahrzeuge}`, bold: true },
+    ...(zumWeiterfuehren ? [{ text: "" }] : []),
     { text: "" },
-  ]);
-  // Breiten für die quer liegende Übersichtsseite: Einheitsname und Zeitgruppe
-  // bekommen so viel Platz, dass sie einzeilig bleiben.
-  return { table: { headerRows: 1, widths: [170, 56, 60, 22, "*"], body }, margin: [0, 0, 0, 4] };
+    { text: "" },
+    { text: staerkeText, bold: true },
+    { text: fzg, bold: true },
+    { text: "" },
+    { text: "" },
+    { text: "" },
+  ];
+  // Auf dem leeren Lageblatt keine vorgedruckten Nullen — es ist die
+  // Strichliste eines Meldekopfs, der gar nicht erst ins Gerät kommt (R3-A5).
+  const leer = zumWeiterfuehren && eintraege.length === 0;
+  if (!leer) {
+    body.push(
+      summenZeile(
+        `Summe${nachtrag ? " Nachtrag" : ""}${zumWeiterfuehren ? " laut Gerät" : ""} (${beschriftung.join(" · ")})`,
+        `${summe.staerke.fuehrer} / ${summe.staerke.unterfuehrer} / ${summe.staerke.mannschaft} / ${summe.staerke.gesamt}`,
+        `${summe.fahrzeuge}`,
+      ),
+    );
+  }
+  // Breiten für die quer liegende Übersichtsseite (714 pt Satzbreite): Zeiten
+  // brechen nach dem Datum um, damit Zug und Bedarf daneben Platz haben.
+  return {
+    table: {
+      headerRows: 1,
+      // Eine Einheit steht auf einem Blatt: Auf dem Lageblatt brach die Zeile
+      // „Nr. 8 THW Müllheim …" am Seitenende, oben auf der nächsten Seite
+      // standen „Bergung (B)" und der Bedarf ohne Nummer und Namen (R4-A7).
+      // Kopf und erste Zeile bleiben beisammen.
+      dontBreakRows: true,
+      keepWithHeaderRows: 1,
+      widths: zumWeiterfuehren ? LAGEBLATT_SPALTEN : [118, 38, 48, 48, 48, 16, 66, 88, "*"],
+      body,
+    },
+    // Bei 7,5 pt bleibt es (Zeilenbox 6,9 pt): 8 pt schob zehn Einheiten auf
+    // zwei Seiten. Stärke und Bedarf stehen dafür in 9 pt in der Kopfleiste
+    // über der Tabelle (Audit Runde 3, R3-K6).
+    fontSize: 7.5,
+    // Knappe Innenabstände: bei zehn Einheiten entscheidet das über Seite 2.
+    layout: { paddingTop: () => 1, paddingBottom: () => 1, paddingLeft: () => 3, paddingRight: () => 3 },
+    margin: [0, 0, 0, 4],
+  };
 }
 
 /** „Diesel 120 l · Benzin 30 l" — Gemisch nur, wenn gemeldet (wie in der Oberfläche). */
@@ -332,14 +845,41 @@ function kraftstoffText(k: EinsatzSummen["kraftstoff"]): string {
   return teile.join(" · ");
 }
 
+/** „Diesel 320 l · Gemisch 10 l" — nur gemeldete Sorten; „—" ohne Kraftstoff. */
+function kraftstoffKurz(k: EinsatzSummen["kraftstoff"]): string {
+  const teile: string[] = [];
+  if (k.dieselLiter > 0) teile.push(`Diesel ${k.dieselLiter} l`);
+  if (k.benzinLiter > 0) teile.push(`Benzin ${k.benzinLiter} l`);
+  if (k.gemischLiter > 0) teile.push(`Gemisch ${k.gemischLiter} l`);
+  return teile.join(" · ") || "—";
+}
+
 /**
  * Bedarfs-Übersicht des ganzen Einsatzes: Verpflegung, Unterbringung,
- * Kraftstoff und Ruhezeit über alle Bögen der Sammlung — dieselben Zahlen, die
- * der Meldekopf auf dem Bildschirm sieht (gemeinsame Summierung in
+ * Kraftstoff und Ruhezeit über die zählenden Bögen der Sammlung — dieselben
+ * Zahlen, die der Meldekopf auf dem Bildschirm sieht (gemeinsame Summierung in
  * auswertung.ts). Ohne sie zeigte die gedruckte Sammlung nur die Stärke.
  */
-function bedarfsTabelle(boegen: SammelBogen[]): Content {
-  const s = summiereBoegen(boegen.map((x) => x.bogen));
+function bedarfsTabelle(eintraege: UebersichtEintrag[], leer = false, nachtrag?: string): Content {
+  if (leer) {
+    // Leeres Lageblatt: Zeilen zum Ausfüllen statt „0 Portionen" (R3-A5).
+    const zeile = (titel: string): TableCell[] => [{ text: titel, bold: true }, { text: " ", margin: [0, 3, 0, 3] }];
+    return {
+      stack: [
+        { text: "Bedarf gesamt (von Hand)", bold: true, margin: [0, 6, 0, 4] },
+        {
+          table: {
+            headerRows: 0,
+            widths: [104, "*"],
+            body: [zeile("Verpflegung:"), zeile("Unterbringung angefordert:"), zeile("Betriebsstoff:"), zeile("Ruhezeit erforderlich:")],
+          },
+          margin: [0, 0, 0, 4],
+        },
+      ],
+      unbreakable: true,
+    };
+  }
+  const s = summiereBoegen(zaehlendeBoegen(eintraege));
   const body: TableCell[][] = [
     [
       { text: "Verpflegung:", bold: true },
@@ -349,13 +889,15 @@ function bedarfsTabelle(boegen: SammelBogen[]): Content {
           `(${s.verpflegung.fleisch} Fleisch / ${s.verpflegung.vegetarisch} vegetarisch / ${s.verpflegung.vegan} vegan)`,
       },
     ],
+    // Quartier und WC/Dusche getrennt: die M/W/D-Zahl zählt alle Anwesenden,
+    // angefordert haben nur einige Einheiten (Audit Runde 3, R3-K4).
     [
-      { text: "Unterbringung/WC/Dusche:", bold: true },
-      {
-        text:
-          `M ${s.unterbringung.m} / W ${s.unterbringung.w} / D ${s.unterbringung.d}` +
-          (s.unterbringungBenoetigt > 0 ? ` · ${s.unterbringungBenoetigt}× Unterbringung angefordert` : ""),
-      },
+      { text: "Unterbringung angefordert:", bold: true },
+      { text: unterbringungAngefordertText(s) || "keine" },
+    ],
+    [
+      { text: "WC/Dusche (alle Anwesenden):", bold: true },
+      { text: mwdText({ ...s.unterbringung, ohneAngabe: s.unterbringungOhneAngabe }) },
     ],
     [{ text: "Betriebsstoff:", bold: true }, { text: kraftstoffText(s.kraftstoff) }],
     [
@@ -365,8 +907,8 @@ function bedarfsTabelle(boegen: SammelBogen[]): Content {
   ];
   return {
     stack: [
-      { text: `Bedarf gesamt (${s.einheiten} Einheiten, ${s.staerke.gesamt} Personen)`, bold: true, margin: [0, 10, 0, 4] },
-      { table: { headerRows: 0, widths: [130, "*"], body }, margin: [0, 0, 0, 4] },
+      { text: `${nachtrag ? "Bedarf Nachtrag" : "Bedarf gesamt"} (${s.einheiten} Einheiten, ${s.staerke.gesamt} Personen)`, bold: true, margin: [0, 6, 0, 4] },
+      { table: { headerRows: 0, widths: [104, "*"], body }, margin: [0, 0, 0, 4] },
     ],
     unbreakable: true,
   };
@@ -375,17 +917,20 @@ function bedarfsTabelle(boegen: SammelBogen[]): Content {
 /**
  * Zwischensummen je Zug/Verband — nur sinnvoll, wenn die Sammlung überhaupt
  * mehr als eine Gruppe kennt (sonst wiederholt die Tabelle nur den Gesamtwert).
+ * Nur zählende Einheiten, wie am Gerät (aggregiereNachZug).
  */
-function zugSummenTabelle(boegen: SammelBogen[]): Content | undefined {
+function zugSummenTabelle(eintraege: UebersichtEintrag[], nachtrag?: string): Content | undefined {
   const nach = new Map<string, Erfassungsbogen[]>();
-  for (const { bogen, zugEtikett } of boegen) {
-    const k = zugEtikett ?? "";
-    (nach.get(k) ?? nach.set(k, []).get(k)!).push(bogen);
+  for (const e of eintraege.filter(zaehlend)) {
+    const k = e.zugEtikett ?? "";
+    (nach.get(k) ?? nach.set(k, []).get(k)!).push(e.bogen);
   }
   if (nach.size < 2) return undefined;
   const kopf = (text: string): TableCell => ({ text, bold: true, fillColor: GRAU });
   const body: TableCell[][] = [
-    [kopf("Zug / Verband"), kopf("Einh."), kopf("Stärke\nF / U / M / G"), kopf("Verpfl."), kopf("M / W / D"), kopf("Betriebsstoff"), kopf("Fzg")],
+    // „Unterbr. angef." = Personen der Einheiten mit angeforderter
+    // Unterbringung; „M / W / D (alle)" zählt alle Anwesenden (R3-K4).
+    [kopf("Zug / Verband"), kopf("Einh."), kopf("Stärke\nF / U / M / G"), kopf("Verpfl."), kopf("Unterbr.\nangef."), kopf("M / W / D\n(alle)"), kopf("Betriebsstoff"), kopf("Fzg")],
   ];
   const gruppen = [...nach.entries()].sort(([a], [b]) => {
     if (a === "") return 1; // „ohne Etikett" ans Ende — wie in der Oberfläche
@@ -399,51 +944,448 @@ function zugSummenTabelle(boegen: SammelBogen[]): Content | undefined {
       { text: `${s.einheiten}` },
       { text: `${s.staerke.fuehrer} / ${s.staerke.unterfuehrer} / ${s.staerke.mannschaft} / ${s.staerke.gesamt}` },
       { text: `${s.verpflegung.gesamt}` },
+      { text: `${s.unterbringungAngefordert.personen}` },
       { text: `${s.unterbringung.m} / ${s.unterbringung.w} / ${s.unterbringung.d}` },
-      { text: kraftstoffText(s.kraftstoff) },
+      // Nur, was gemeldet ist: „Benzin 0 l" brach die Zeile in der schmalen
+      // Spalte auf drei Zeilen um und schob den Block auf Seite 2 (R3-K6).
+      { text: kraftstoffKurz(s.kraftstoff) },
       { text: `${s.fahrzeuge}` },
     ]);
   }
   return {
     stack: [
-      { text: "Zwischensummen nach Zug", bold: true, margin: [0, 10, 0, 4] },
-      { table: { headerRows: 1, widths: [150, 32, 60, 36, 56, "*", 24], body }, margin: [0, 0, 0, 4] },
+      { text: nachtrag ? "Zwischensummen nach Zug (nur Nachtrag)" : "Zwischensummen nach Zug", bold: true, margin: [0, 6, 0, 4] },
+      { table: { headerRows: 1, widths: [84, 22, 52, 28, 32, 44, "*", 18], body }, margin: [0, 0, 0, 4] },
     ],
+    unbreakable: true,
   };
 }
 
 /**
- * Sammel-PDF eines Einsatzes: vorneweg die Übergabe-Übersicht (Stärke,
- * Fahrzeuge, Änderungen je Einheit), dahinter alle Bögen (je Bogen die
- * vollständigen Seiten inkl. QR-Code), plus ALLE Bögen als eingebettetes
- * JSON-Array — so ist der ganze Einsatz maschinen- und menschenlesbar in einer
- * Datei übergebbar. Baut die Seiten aus {@link pdfDokument} zusammen.
+ * Kopfleiste der Übersichtsseite: Stärke und Bedarf der zählenden Einheiten
+ * in zwei Zeilen, Dringendes fett. Die Einzelheiten (Verpflegung nach
+ * Kostform, WC/Dusche, Zwischensummen) stehen weiter unter der Tabelle.
+ */
+function lageKopfleiste(eintraege: UebersichtEintrag[], leer = false, nachtrag?: string): Content {
+  if (leer) {
+    // Leeres Lageblatt: Ausfülllinien statt „0 / 0 / 0 / 0" (R3-A5).
+    const l = LEERFELD;
+    return {
+      table: {
+        widths: ["*"],
+        body: [[{
+          stack: [
+            { text: [{ text: "Lage: ", bold: true }, { text: `${l} Einheiten · Stärke F / U / M / G ${l} / ${l} / ${l} / ${l} · ${l} Fahrzeuge` }] },
+            { text: [{ text: "Bedarf: ", bold: true }, { text: `Verpflegung ${l} · Unterbringung ${l} · Ruhezeit ${l} · Diesel ${l} l · Benzin ${l} l` }] },
+          ],
+          margin: [0, 2, 0, 2],
+        }]],
+      },
+      fontSize: 9,
+      margin: [0, 0, 0, 5],
+    };
+  }
+  const s = summiereBoegen(zaehlendeBoegen(eintraege));
+  // Ein Nachtrag beginnt nicht wie die Gesamtfassung: im Stab liegen am Morgen
+  // mehrere Ausdrucke mit „Lage: …", und wer den jüngsten greift, las 8 Kräfte
+  // statt 50 (R4-W4).
+  const staerkeZeile = [
+    nachtrag
+      ? { text: `NACHTRAG ${nachtrag} — nicht die ganze Lage: `, bold: true }
+      : { text: "Lage: ", bold: true },
+    { text: `${s.einheiten} ${s.einheiten === 1 ? "Einheit" : "Einheiten"} zählend · Stärke F / U / M / G ` },
+    { text: `${s.staerke.fuehrer} / ${s.staerke.unterfuehrer} / ${s.staerke.mannschaft} / ${s.staerke.gesamt}`, bold: true },
+    { text: ` · ${s.fahrzeuge} Fahrzeuge` },
+  ];
+  const angefordert = unterbringungAngefordertText(s);
+  const bedarfZeile = [
+    { text: nachtrag ? "Bedarf (nur Nachtrag): " : "Bedarf: ", bold: true },
+    { text: `Verpflegung ${s.verpflegung.gesamt} · ` },
+    angefordert ? { text: `Unterbringung angefordert: ${angefordert}`, bold: true } : { text: "keine Unterbringung angefordert" },
+    { text: " · " },
+    s.ruhezeitErforderlich > 0
+      ? { text: `Ruhezeit: ${s.ruhezeitErforderlich} ${s.ruhezeitErforderlich === 1 ? "Einheit" : "Einheiten"}`, bold: true }
+      : { text: "keine Ruhezeit" },
+    { text: ` · ${kraftstoffText(s.kraftstoff)}` },
+  ];
+  return {
+    table: { widths: ["*"], body: [[{ stack: [{ text: staerkeZeile }, { text: bedarfZeile }] }]] },
+    fontSize: 9,
+    margin: [0, 0, 0, 5],
+  };
+}
+
+/** Spaltenbreiten des Lageblatts (714 pt Satzbreite). */
+const LAGEBLATT_SPALTEN: (number | "*")[] = [100, 34, 86, 46, 46, 50, 14, 56, 104, "*"];
+/** Wie das Lageblatt, die letzte Spalte geteilt: hinten schmal „übertragen“ (R4-A4). */
+const NACHTRAG_SPALTEN: (number | "*")[] = [...LAGEBLATT_SPALTEN.slice(0, 9), "*", 64];
+
+/**
+ * Nachtragszeilen des Lageblatts: Fällt das Gerät aus, geht es auf diesem
+ * Blatt weiter statt auf einem neuen Zettel — sonst gibt es später drei
+ * Quellen (R2-A3). Gleiche Spalten wie die Einheitenzeilen darüber, hinten
+ * eine schmale Spalte „übertragen“: Nach der Papierphase hakt ab, wer die
+ * Zeile ins Gerät übernommen hat, statt dass zwei Helfer denselben Stapel
+ * abtippen (R4-A4). Darunter die fortgeschriebene Summe (R3-A5).
+ *
+ * Eigene Tabelle statt Zeilen der Einheitentabelle: Die Beschriftung
+ * „Nachtrag von Hand“ blieb am Seitenende stehen, ihre Zeilen standen auf
+ * der nächsten Seite (R4-A7). Als Kopfzeile bleibt sie bei den Zeilen und
+ * steht auf jeder Folgeseite wieder oben. Mit `rueckseite` wiederholt die
+ * Tabelle zusätzlich die Spaltenköpfe.
+ */
+function nachtragsTabelle(zeilen: number, leer: boolean, rueckseite: boolean): Content {
+  const SP = NACHTRAG_SPALTEN.length;
+  const kopf = (text: string): TableCell => ({ text, bold: true, fillColor: GRAU });
+  const body: TableCell[][] = [];
+  if (rueckseite) {
+    body.push([
+      kopf("Einheit"),
+      kopf("Zug"),
+      kopf("Funkrufname /\nRückruf"),
+      kopf("Eingetroffen\n(abgerückt)"),
+      kopf("Stand"),
+      kopf("Stärke\nF / U / M / G"),
+      kopf("Fzg"),
+      kopf("Bedarf"),
+      kopf("Auftrag / Notiz"),
+      kopf("Veränderung / Bemerkung"),
+      kopf("übertragen"),
+    ]);
+  }
+  const label: TableCell[] = [{ text: "Nachtrag von Hand (Einheit, Zug, Uhrzeit, Stärke …)", italics: true, colSpan: SP - 1 }];
+  for (let i = 1; i < SP - 1; i++) label.push({});
+  // Mit Spaltenköpfen steht „übertragen“ dort schon.
+  label.push({ text: rueckseite ? "" : "übertragen", italics: true });
+  body.push(label);
+  for (let n = 0; n < zeilen; n++) {
+    // Die zweite und dritte Zeile tragen Messpunkte: ihr Abstand ist die Zeilenhöhe
+    // (die erste steht hinter der Kopfzeile und misst anders).
+    body.push(
+      Array.from({ length: SP }, (_, i): TableCell => ({
+        // Hinten das Kästchen mit Platz für das Kürzel dahinter.
+        text: i === SP - 1 ? NACHTRAG_UEBERTRAGEN : " ",
+        margin: [0, 5, 0, 5],
+        ...(i === 0 && (n === 1 || n === 2) ? { id: `${MESS_NACHTRAG}${n}` } : {}),
+      })),
+    );
+  }
+  // Nach dem ersten Nachtrag ist die gedruckte Summe falsch; die
+  // fortgeschriebene gehört darunter aufs Blatt, nicht auf einen Zettel (R3-A5).
+  const summe: TableCell[] = [
+    { text: leer ? "Summe (von Hand)" : "Summe einschl. Nachträge (von Hand)", bold: true, margin: [0, 5, 0, 5] },
+    ...Array.from({ length: SP - 1 }, (): TableCell => ({ text: " " })),
+  ];
+  body.push(summe);
+  return {
+    table: {
+      // Zeilen bleiben ganz; Kopf (und bei der Rückseite die Spaltenköpfe) bleiben bei den Zeilen.
+      headerRows: rueckseite ? 2 : 1,
+      keepWithHeaderRows: 1,
+      dontBreakRows: true,
+      widths: NACHTRAG_SPALTEN,
+      body,
+    },
+    fontSize: 7.5,
+    layout: { paddingTop: () => 1, paddingBottom: () => 1, paddingLeft: () => 3, paddingRight: () => 3 },
+    margin: [0, 0, 0, 4],
+  };
+}
+
+/** Die Übersichtsseite — gemeinsamer Kern von Sammel-PDF und Lageblatt. */
+function uebersichtsSeite(
+  titel: string,
+  eintraege: UebersichtEintrag[],
+  erstellt: number,
+  hinweis?: string,
+  maxZeilen = UEBERSICHT_MAX_ZEILEN,
+  zumWeiterfuehren = false,
+  nachtragZeilen = NACHTRAG_ZEILEN_MIN,
+  nachtrag?: string,
+  /** Nachtragszeilen auf eine eigene Seite hinter dem Blatt (Lageblatt, das auf eine Seite zu voll ist). */
+  rueckseite = false,
+): Content[] {
+  const leer = zumWeiterfuehren && eintraege.length === 0;
+  const nachtragsTab = zumWeiterfuehren && nachtragZeilen > 0 ? nachtragsTabelle(nachtragZeilen, leer, rueckseite) : undefined;
+  const zugSummen = zugSummenTabelle(eintraege, nachtrag);
+  const bedarf = bedarfsTabelle(eintraege, leer, nachtrag);
+  // Sammel-PDF mit vielen Einheiten: Bedarf und Zwischensummen stehen unter der
+  // Kopfleiste. Hinter der Tabelle passte der unteilbare Block oft nicht mehr auf
+  // die Seite und stand allein auf einer eigenen (R5-A8).
+  const bedarfBlock: Content = zugSummen
+    ? { columns: [{ width: 300, stack: [bedarf] }, { width: "*", stack: [zugSummen] }], columnGap: 12, fontSize: 7.5 }
+    : bedarf;
+  const bedarfVorn = !zumWeiterfuehren && eintraege.length > BEDARF_VORN_AB;
+  return [
+    // Titel und Erstellzeit in einer Zeile — jede Zeile zählt, damit das
+    // Lageblatt bei rund zehn Einheiten auf eine Seite passt (R2-K3).
+    {
+      text: [
+        { text: titel, bold: true, fontSize: 12 },
+        // Wann das Blatt gedruckt wurde, gehört aufs Blatt: an der Wand hängen
+        // nachher drei davon, und nur das jüngste gilt.
+        { text: `   Erstellt ${zeitLang(erstellt)}`, italics: true },
+      ],
+      margin: [0, 0, 0, 6],
+    },
+    // Stärke und Bedarf vor der Tabelle: Ab rund 13 Einheiten stand „Bedarf
+    // gesamt" allein auf Seite 2 — wer nur Seite 1 aushängt oder faxt, gab
+    // Stärke ohne Bedarf weiter (Audit Runde 3, R3-K6).
+    lageKopfleiste(eintraege, leer, nachtrag),
+    ...(bedarfVorn ? [bedarfBlock] : []),
+    uebersichtsTabelle(eintraege, maxZeilen, zumWeiterfuehren, nachtrag),
+    ...(nachtragsTab && !rueckseite ? [nachtragsTab] : []),
+    ...(hinweis ? [{ text: hinweis, italics: true, margin: [0, 2, 0, 0] } as Content] : []),
+    // Bedarf und Zwischensummen nebeneinander statt untereinander: vorher
+    // rutschten die Zwischensummen allein auf Seite 2 (R2-K3).
+    ...(bedarfVorn ? [] : [bedarfBlock]),
+    // Zu voll für eine Seite mit fünf Nachtragszeilen: die Zeilen bekommen die
+    // Rückseite, Seite 1 bleibt, wie sie ist (R4-A3).
+    ...(nachtragsTab && rueckseite ? [{ stack: [nachtragsTab], pageBreak: "before" } as Content] : []),
+    // Messpunkt hinter dem letzten Inhalt: wie viel Platz bleibt auf der
+    // letzten Seite (einsatzLageblattSeiteFuellen)?
+    ...(zumWeiterfuehren ? [{ text: " ", fontSize: 1, id: MESS_ENDE } as Content] : []),
+  ];
+}
+
+/**
+ * Stand einer Einheit am Meldekopf als Text für ihre Bogenseiten in der
+ * Sammel-PDF. Der QR-Code trägt nur den Bogen der Einheit — Eintreffzeit,
+ * Abrückvermerk, Zug und Auftrag gehören dem Meldekopf und stehen sonst nur
+ * auf Seite 1. Ein Ausdruck ohne Seite 1 zeigte eine abgerückte Einheit wie
+ * eine anwesende, und wer die Codes einlas, bekam die Scan-Uhrzeit als
+ * Eintreffzeit, ohne dass Blatt oder App sagten, was fehlt (Audit Runde 2,
+ * R2-A1). Kein Schemawechsel: der Vermerk ist reiner Text neben dem Code.
+ */
+export interface MeldekopfVermerk {
+  /** „Eingetroffen … · ABGERÜCKT … · Zug: … · Auftrag / Notiz: …" */
+  stand: string;
+  /** Nicht mehr vor Ort — hebt den Kasten hervor. */
+  abgerueckt: boolean;
+  /** Laufende Nummer am Meldekopf — steht auch in der Kopfzeile der Codeseiten (R4-A5). */
+  nummer?: number;
+}
+
+/** Hinweis neben den QR-Codes der Sammel-PDF: was der Code NICHT enthält (R2-A1). */
+export const QR_NUR_BOGEN_HINWEIS =
+  "Der Code enthält nur den Bogen der Einheit. Eintreffzeit, Abrückvermerk, Zug und Auftrag des Meldekopfs " +
+  "stehen als Text im Kasten „Stand am Meldekopf“ und auf Seite 1 — nach dem Einlesen von Hand nachtragen. " +
+  "Die ganze Lage liest „Einsatz importieren…“ aus der PDF-Datei.";
+
+/**
+ * Satz neben dem Code: Der Code trägt den gedruckten Stand, Handschrift sieht
+ * die App nicht. Ohne diesen Hinweis korrigierte eine Gruppenführerin „1 / 1 /
+ * 2 / 4" mit dem Stift auf „1 / 1 / 1 / 3", der Meldekopf scannte und zählte
+ * weiter 4 — Papier und Gerät widersprachen sich unbemerkt (Audit Runde 2,
+ * R2-A4). Das Kästchen macht die Korrektur für den Scannenden sichtbar.
+ */
+export function stiftHinweis(stand: string): string {
+  return `Ist oben auf dem Bogen „von Hand geändert“ angekreuzt, gilt dieser Code (Stand ${stand}) nicht mehr: abtippen oder neu erzeugen, nicht scannen.`;
+}
+
+/**
+ * Das Kästchen selbst steht auf dem Bogen, neben der Stärke: Mit dem Stift
+ * korrigiert wird dort, nicht auf der Codeseite. Wer auf Seite 1 änderte und
+ * das Kästchen auf der Codeseite vergaß, lieferte einen Code, der als gültig
+ * durchging (Audit Runde 4, R4-A5).
+ */
+export const STIFT_KAESTCHEN = "[  ] von Hand geändert";
+
+/**
+ * Kopfzeile der Codeseiten: Einheit, Funkrufname, Stand. Lose Codeseiten ohne
+ * Heftung ließen sich sonst nur durch Scannen einem Bogen zuordnen (R4-A5).
+ */
+export function codeKopfzeile(b: Erfassungsbogen, stand: string, nummer?: number): string {
+  const funk = erreichbarkeitZeilen(b)[0];
+  const fzg = b.fahrzeuge.find((f) => f.funkrufname);
+  return [
+    ...(nummer != null ? [`Nr. ${nummer}`] : []),
+    einheitAnzeigename(b.einheit),
+    ...(fzg && funk ? [`FuRn ${funk}`] : []),
+    `Stand ${stand}`,
+  ].join(" · ");
+}
+
+export function meldekopfVermerk(e: UebersichtEintrag, name: string, erstellt: number): MeldekopfVermerk {
+  // Die Nummer steht auch hier: nach einem Wiederanlauf vom Papier fragt der
+  // Abgleich sie ab, damit „Nr. 3 rückt ab" über Funk dieselbe Einheit meint
+  // wie auf dem Blatt an der Wand (R4-A1).
+  const teile = [
+    ...(e.nummer != null ? [`Nr. ${e.nummer}`] : []),
+    // Die Marke der Übersicht gehört auch in den Kasten: Sonst gilt die Einlesezeit beim
+    // Wiederanlauf vom Papier als bestätigt (R6-A1).
+    `Eingetroffen ${e.eingetroffenAm == null ? "(nicht festgehalten)" : `${zeitLang(e.eingetroffenAm)}${e.zeitUnbestaetigt ? " (nicht bestätigt, vom Papier)" : ""}`}`,
+  ];
+  if (e.abgerueckt) {
+    teile.push(
+      e.abgerueckAm == null
+        ? `ABGERÜCKT (nicht mehr vor Ort) — Abrückzeit ${e.zeitUnbestaetigt ? "nicht bestätigt (vom Papier)" : "nicht festgehalten"}`
+        : `ABGERÜCKT ${zeitLang(e.abgerueckAm)}`,
+    );
+  } else {
+    teile.push(e.zaehlt === false ? "anwesend, zählt nicht in diese Lage" : "anwesend");
+  }
+  teile.push(`Zug: ${e.zugEtikett || "–"}`);
+  if (e.teil) teile.push(`Teil: ${e.teil}`);
+  teile.push(`Auftrag / Notiz: ${e.notiz || "–"}`);
+  return {
+    stand: `Stand am Meldekopf (${name}, erstellt ${zeitLang(erstellt)}): ${teile.join(" · ")}`,
+    abgerueckt: !!e.abgerueckt,
+    ...(e.nummer != null ? { nummer: e.nummer } : {}),
+  };
+}
+
+/** Kasten „Stand am Meldekopf" — oben auf dem Bogen und auf jeder QR-Seite. */
+function vermerkKasten(v: MeldekopfVermerk, margin: [number, number, number, number], id?: string): Content {
+  return {
+    ...(id ? { id } : {}),
+    table: {
+      widths: ["*"],
+      body: [[{ text: weichUmbrechen(v.stand), bold: true, fontSize: 8, fillColor: v.abgerueckt ? GRAU : undefined }]],
+    },
+    margin,
+  };
+}
+
+/**
+ * Kopfzeile jeder Bogenseite, im oberen Seitenrand (R5-A2, R5-A3). Der Rand
+ * liegt ohnehin leer; die Zeile kostet dem Satz keine Höhe und damit keine
+ * Seite. Auf Seite 1 steht der Platz, auf dem der Meldekopf „angenommen,
+ * Nr., übertragen“ quittiert — bisher nur auf dem Blanko. Auf jeder Folgeseite
+ * stehen Nr. und Einheit: Eine verrutschte Seite 2 war sonst eine Namensliste
+ * ohne Absender.
+ */
+// 16 pt = 5,6 mm vom Papierrand: Viele Drucker lassen oben 3 bis 5 mm unbedruckt (R6-A2; vorher 6 pt = 2 mm).
+const RAND_ZEILE_Y = 16;
+const NAME_IM_KOPF_MAX = 62;
+const UEBERTRAGEN_KURZ = `übertragen ${kasten(false)} von ______ um ____:____ Uhr`;
+
+/** Mit Rahmen und fett (Seite 1: der Platz zum Quittieren), sonst eine schlichte Zeile. */
+function randZeile(text: string, rahmen: boolean): Content {
+  return {
+    margin: [SEITENRAENDER[0], RAND_ZEILE_Y, SEITENRAENDER[2], 0],
+    table: { widths: ["*"], body: [[{ text, fontSize: 7.5, bold: rahmen, noWrap: true }]] },
+    layout: {
+      hLineWidth: () => (rahmen ? 0.5 : 0),
+      vLineWidth: () => (rahmen ? 0.5 : 0),
+      paddingTop: () => 0.5,
+      paddingBottom: () => 0.5,
+      paddingLeft: () => 4,
+      paddingRight: () => 4,
+    },
+  };
+}
+
+/** Einheit für die Kopfzeile: einzeilig, notfalls gekürzt. */
+function kopfName(name: string): string {
+  return name.length > NAME_IM_KOPF_MAX ? `${name.slice(0, NAME_IM_KOPF_MAX - 1).trimEnd()}…` : name;
+}
+
+/**
+ * Kopfzeile einer Bogenseite. `nummer` aus dem Meldekopf (Sammel-PDF) oder
+ * Ausfülllinie (Einzel-PDF, Blanko). `blatt`/`von`: Seite dieses Bogens.
+ */
+function bogenKopfzeile(einheit: string, nummer: number | undefined, blatt: number, von: number): Content {
+  const nr = nummer != null ? `Nr. ${nummer}` : "Nr. ______";
+  if (blatt === 1) {
+    return randZeile(
+      nummer != null
+        ? `${nr}  ·  ${kopfName(einheit)}  ·  Blatt 1 von ${von}  ·  ${UEBERTRAGEN_KURZ}`
+        : `Meldekopf:  ${nr}  ·  eingegangen ____________ um ____:____ Uhr  ·  ${UEBERTRAGEN_KURZ}`,
+      true,
+    );
+  }
+  return randZeile(`${nr}  ·  ${kopfName(einheit)}  ·  Blatt ${blatt} von ${von} dieses Bogens`, false);
+}
+
+/** Fußzeile mit Seitenzahl — für Sammel-PDF und Lageblatt gleich. */
+function seitenFuss(text: string): TDocumentDefinitions["footer"] {
+  return (seite, gesamt) => ({
+    columns: [
+      { text, margin: [40, 0, 0, 0] },
+      // Seitenzahl nur so breit wie nötig — der Text links darf lang sein.
+      { text: `${seite} / ${gesamt}`, width: "auto", noWrap: true, alignment: "right", margin: [8, 0, 40, 0] },
+    ],
+    fontSize: 7.5,
+  });
+}
+
+/** Ein Pixel, quadratisch: Platzhalter für QR-Bilder im Probesatz. */
+const PIXEL_PNG = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==";
+
+/** Kennung des Kastens „Stand am Meldekopf“ im Probesatz (R4-A7). */
+const MESS_KASTEN = "sammel-kasten-";
+
+/** Nur für {@link einsatzPdfDokumentGesetzt} und den Probesatz. */
+export interface SammelOptionen {
+  /** Index der Bögen, die enger gesetzt werden (R4-A7). */
+  verdichtet?: ReadonlySet<number>;
+  /** Probesatz: Messpunkte je Bogen, ohne eingebettete Dateien. */
+  messen?: boolean;
+  /**
+   * Seite (ab 1), auf der der Bogen mit dem Index i beginnt — aus einem Probesatz
+   * mit Platzhalterbildern. Damit trägt jede Bogenseite im Seitenrand Nr. und Einheit
+   * (R5-A3); ohne Angabe bleibt der Rand leer.
+   */
+  bogenStart?: number[];
+  /** Nur die Kasten „Stand am Meldekopf“ tragen eine Kennung — Probesatz für `bogenStart`, ohne Messpunkte, die Höhe kosten. */
+  nurKastenKennung?: boolean;
+}
+
+/**
+ * Sammel-PDF eines Einsatzes: vorneweg die Übergabe-Übersicht (Zeiten,
+ * Stärke, Fahrzeuge, Auftrag, Änderungen je Einheit — abgerückte in einem
+ * eigenen Block), dahinter alle Bögen (je Bogen die vollständigen Seiten inkl.
+ * QR-Code), plus ALLE Bögen als eingebettetes JSON-Array — so ist der ganze
+ * Einsatz maschinen- und menschenlesbar in einer Datei übergebbar. Auch mit
+ * null anwesenden Einheiten: am Einsatzende, wenn alle abgerückt sind, ist die
+ * Datei die Übergabe ans Archiv (Arbeitsablauf-Audit W2). Baut die Seiten aus
+ * {@link pdfDokument} zusammen.
  */
 export function einsatzPdfDokument(
   name: string,
-  boegenMitQr: SammelBogen[],
+  boegenMitQrUngeordnet: SammelBogen[],
   /** Optional: kompletter Einsatz-Umschlag (einsatzDateiInhalt) für die Schichtübergabe. */
   sammlungJson?: string,
+  erstellt = Date.now(),
+  /**
+   * Ein Nachtrag („nur neue Bögen"): ab wann. Kopf, Summen und Fußzeile sagen,
+   * dass es nur ein Teil der Lage ist, und ein Import warnt (R4-W4).
+   */
+  nachtragSeit?: number,
+  optionen: SammelOptionen = {},
 ): TDocumentDefinitions {
-  const zugSummen = zugSummenTabelle(boegenMitQr);
-  const content: Content[] = [
-    { text: `Übergabe-Übersicht: ${name}`, bold: true, fontSize: 12, margin: [0, 0, 0, 8] },
-    uebersichtsTabelle(boegenMitQr),
-    {
-      text: "Die Änderungsspalte vergleicht jede Meldung mit der vorherigen Meldung derselben Einheit. Die vollständigen Bögen folgen.",
-      italics: true,
-      margin: [0, 4, 0, 0],
-    },
-    bedarfsTabelle(boegenMitQr),
-    ...(zugSummen ? [zugSummen] : []),
-  ];
-  boegenMitQr.forEach(({ bogen, qr }) => {
+  const boegenMitQr = nachNummer(boegenMitQrUngeordnet);
+  const nachtrag = nachtragSeit != null ? `seit ${zeitLang(nachtragSeit)}` : undefined;
+  const content: Content[] = uebersichtsSeite(
+    nachtrag ? `Übergabe-Übersicht NACHTRAG ${nachtrag}: ${name}` : `Übergabe-Übersicht: ${name}`,
+    boegenMitQr,
+    erstellt,
+    (nachtrag
+      ? `NACHTRAG ${nachtrag}: nur die neuen oder geänderten Einheiten — nicht die ganze Lage. Die ganze Lage steht in „Einsatz weitergeben / sichern“. `
+      : "") +
+      "Die Änderungsspalte vergleicht jede Meldung mit der vorherigen Meldung derselben Einheit. Die vollständigen Bögen folgen.",
+    undefined,
+    false,
+    undefined,
+    nachtrag,
+  );
+  boegenMitQr.forEach((eintrag, i) => {
     // Zurück ins Hochformat: der Bogen selbst bleibt exakt der Papiervordruck.
     // pdfmake übernimmt die Ausrichtung des Knotens, der den Umbruch auslöst.
     content.push({ text: "", pageBreak: "before", pageOrientation: "portrait" });
-    content.push(...(pdfDokument(bogen, qr).content as Content[]));
+    // Der Stand am Meldekopf steht über dem Bogen und auf jeder QR-Seite —
+    // die Bogenseiten müssen auch ohne Seite 1 stimmen (R2-A1).
+    const vermerk = meldekopfVermerk(eintrag, name, erstellt);
+    content.push(vermerkKasten(vermerk, [0, 0, 0, 4], optionen.messen || optionen.nurKastenKennung ? `${MESS_KASTEN}${i}` : undefined));
+    content.push(
+      ...(pdfDokument(eintrag.bogen, eintrag.qr, undefined, vermerk, {
+        verdichtet: optionen.verdichtet?.has(i) === true,
+        ...(optionen.messen ? { messpunkt: true, messKennung: `-${i}` } : {}),
+      }).content as Content[]),
+    );
   });
-  return {
+  return winAnsiDokument({
     pageSize: "A4",
     // Nur die vorangestellte Übersicht liegt quer — sie trägt breite Tabellen
     // (Änderungsspalte, Zug-Zwischensummen); ab dem ersten Bogen wird oben
@@ -459,32 +1401,263 @@ export function einsatzPdfDokument(
     ...(boegenMitQr.length > 0 && boegenMitQr.every(({ bogen }) => bogen.uebung)
       ? { background: uebungsWasserzeichen() }
       : {}),
-    files: {
-      [EEB_EINSATZ_DATEINAME]: boegenAlsEingebetteteDatei(boegenMitQr.map((x) => x.bogen)),
-      ...(sammlungJson ? { [EEB_EINSATZ_SAMMLUNG_DATEINAME]: sammlungAlsEingebetteteDatei(sammlungJson) } : {}),
-    },
-    footer: (seite, gesamt) => ({
-      columns: [
-        { text: `Einsatz-Sammlung: ${name}`, margin: [40, 0, 0, 0] },
-        { text: `${seite} / ${gesamt}`, alignment: "right", margin: [0, 0, 40, 0] },
-      ],
-      fontSize: 8,
-    }),
+    ...(optionen.messen || optionen.nurKastenKennung
+      ? {}
+      : {
+          files: {
+            [EEB_EINSATZ_DATEINAME]: boegenAlsEingebetteteDatei(boegenMitQr.map((x) => x.bogen)),
+            ...(sammlungJson ? { [EEB_EINSATZ_SAMMLUNG_DATEINAME]: sammlungAlsEingebetteteDatei(sammlungJson) } : {}),
+          },
+        }),
+    // Kopfzeile jeder Bogenseite: Nr., Einheit, Blatt x von y; auf Blatt 1 der Platz
+    // „übertragen“ (R5-A2, R5-A3). Die Übersicht (quer) hat ihren Titel.
+    ...(optionen.bogenStart
+      ? {
+          header: (seite: number, gesamt: number, groesse: { orientation: string }): Content => {
+            const start = optionen.bogenStart!;
+            let i = -1;
+            start.forEach((von, k) => {
+              if (von <= seite) i = k;
+            });
+            if (i < 0 || groesse.orientation === "landscape") return { text: "" };
+            const ende = (start[i + 1] ?? gesamt + 1) - 1;
+            const e = boegenMitQr[i]!;
+            return bogenKopfzeile(einheitAnzeigename(e.bogen.einheit), e.nummer, seite - start[i]! + 1, ende - start[i]! + 1);
+          },
+        }
+      : {}),
+    // Die Fußzeile trägt den Stand des Ausdrucks auf jeder Seite; Zeiten und
+    // Abrückvermerk je Einheit stehen im Kasten über dem Bogen (R2-A1).
+    footer: seitenFuss(
+      `${nachtrag ? `NACHTRAG ${nachtrag} (nicht die ganze Lage) — Einsatz` : "Einsatz-Sammlung"}: ${name} · Stand ${zeitLang(erstellt)} · Eintreff-/Abrückzeiten: Seite 1 und Kasten über jedem Bogen`,
+    ),
     content,
+  });
+}
+
+/**
+ * Bis zu so viel Höhe (pt) belegt die letzte Zeile(n) eines Bogens auf einer
+ * Folgeseite, damit sie als Restseite gilt: gut zwölf Textzeilen (R5-A8, vorher 110 pt = gut acht). Der Kasten
+ * „Stand am Meldekopf“ über dem Bogen kostete in der Sammel-PDF von 30
+ * Einheiten zwei Seiten, die nur noch die letzte Zeile des Sofortbedarfs
+ * trugen („M 11 / W 1 / D 0“), obwohl das Einzel-PDF derselben Einheit ohne
+ * Restseite auskam (Audit Runde 4, R4-A7).
+ */
+const RESTSEITE_MAX_PT = 160;
+
+/**
+ * Sammel-PDF ohne Restseiten. Ein Probesatz ohne Bilder und ohne Anhang misst
+ * je Bogen, wo sein Formular endet; steht der Rest auf einer Folgeseite und
+ * ist kürzer als {@link RESTSEITE_MAX_PT}, wird dieser Bogen enger gesetzt
+ * (`verdichtet`). Hilft das nicht, bleibt er wie er war — ein enger Bogen, der
+ * trotzdem eine Restseite braucht, hätte nichts gewonnen.
+ *
+ * `setzen` führt den Satz aus (Browser: pdfmake-Puffer, Tests: Node).
+ */
+export async function einsatzPdfDokumentGesetzt(
+  name: string,
+  boegenMitQrUngeordnet: SammelBogen[],
+  sammlungJson: string | undefined,
+  erstellt: number,
+  nachtragSeit: number | undefined,
+  setzen: (dd: TDocumentDefinitions) => Promise<unknown>,
+): Promise<TDocumentDefinitions> {
+  // Die Indizes der Probesätze gelten für diese Reihenfolge (nach Nr., R5-A9).
+  const boegenMitQr = nachNummer(boegenMitQrUngeordnet);
+  const ohneBilder = boegenMitQr.map((e) => ({ ...e, qr: null }) as unknown as SammelBogen);
+  /** Welche Bögen enden mit einer Restseite? */
+  const restseiten = async (verdichtet: ReadonlySet<number>): Promise<Set<number>> => {
+    const pos = new Map<string, MessPosition>();
+    const dd = einsatzPdfDokument(name, ohneBilder, undefined, erstellt, nachtragSeit, { verdichtet, messen: true });
+    dd.pageBreakBefore = (knoten) => {
+      const k = knoten as { id?: string; startPosition?: MessPosition };
+      if (k.id && k.startPosition) pos.set(k.id, k.startPosition);
+      return false;
+    };
+    await setzen(dd);
+    const rest = new Set<number>();
+    boegenMitQr.forEach((_, i) => {
+      const anfang = pos.get(`${MESS_KASTEN}${i}`);
+      const ende = pos.get(`${MESS_BOGEN_ENDE}-formular-${i}`);
+      if (!anfang || !ende || ende.pageNumber <= anfang.pageNumber) return;
+      if (ende.verticalRatio * ende.pageInnerHeight <= RESTSEITE_MAX_PT) rest.add(i);
+    });
+    return rest;
   };
+  const betroffen = await restseiten(new Set());
+  let verdichtet: ReadonlySet<number> = new Set();
+  if (betroffen.size > 0) {
+    const nochBetroffen = await restseiten(betroffen);
+    verdichtet = new Set([...betroffen].filter((i) => !nochBetroffen.has(i)));
+  }
+  // Wo jeder Bogen beginnt, weiß erst der Satz MIT Codeseiten: Platzhalterbilder gleicher
+  // Größe (ein Pixel, quadratisch) setzen gleich wie die QR-Codes, kosten aber nichts (R5-A3).
+  const platzhalter = boegenMitQr.map(
+    (e) => ({ ...e, qr: { ...e.qr, teile: e.qr.teile.map((t) => ({ ...t, datenUrl: PIXEL_PNG })) } }) as SammelBogen,
+  );
+  const start = new Map<string, MessPosition>();
+  const probe = einsatzPdfDokument(name, platzhalter, undefined, erstellt, nachtragSeit, { verdichtet, nurKastenKennung: true });
+  probe.pageBreakBefore = (knoten) => {
+    const k = knoten as { id?: string; startPosition?: MessPosition };
+    if (k.id && k.startPosition) start.set(k.id, k.startPosition);
+    return false;
+  };
+  await setzen(probe);
+  const bogenStart = boegenMitQr.map((_, i) => start.get(`${MESS_KASTEN}${i}`)?.pageNumber ?? 0);
+  return einsatzPdfDokument(name, boegenMitQr, sammlungJson, erstellt, nachtragSeit, {
+    verdichtet,
+    ...(bogenStart.every((n) => n > 0) ? { bogenStart } : {}),
+  });
+}
+
+/**
+ * Lageblatt: nur die Übersichtsseite der Sammel-PDF — Einheiten mit Zeiten,
+ * Bedarf, Zwischensummen — quer auf A4, ohne Bögen, ohne QR, ohne Anhang.
+ *
+ * Das Blatt für die Wand und für die Ablösung: „alle 60 Minuten ein Blatt,
+ * das ist der Stand, der bei Geräteausfall gilt" (Analog-Audit A3). Die
+ * Sammel-PDF mit 40 Bögen ist 41 Seiten und wird deshalb nicht gedruckt (A4).
+ * Bewusst kein eingebettetes JSON: das Blatt ist Papier, die Weitergabe der
+ * Sammlung ist die Sammel-PDF.
+ */
+export function einsatzLageblattDokument(
+  name: string,
+  eintraegeUngeordnet: UebersichtEintrag[],
+  erstellt = Date.now(),
+  nachtragZeilen = NACHTRAG_ZEILEN_MIN,
+  /** Die Nachtragszeilen auf eine eigene Seite hinter dem Blatt (R4-A3). */
+  rueckseite = false,
+): TDocumentDefinitions {
+  const eintraege = nachNummer(eintraegeUngeordnet);
+  return winAnsiDokument({
+    pageSize: "A4",
+    pageOrientation: "landscape",
+    pageMargins: SEITENRAENDER,
+    defaultStyle: { fontSize: 8, font: SCHRIFT },
+    info: { title: `Lageblatt ${name}` },
+    ...(eintraege.length > 0 && eintraege.every(({ bogen }) => bogen.uebung)
+      ? { background: uebungsWasserzeichen() }
+      : {}),
+    footer: seitenFuss(`Lageblatt: ${name}`),
+    content: uebersichtsSeite(
+      `Lageblatt: ${name}`,
+      eintraege,
+      erstellt,
+      eintraege.length === 0
+        ? "Noch keine Einheit gemeldet."
+        : "Summen und Bedarf zählen nur die anwesenden Einheiten dieser Lage; abgerückte stehen im eigenen Block. Nach Nr. geordnet. Alle Änderungen im Einzelnen: Sammel-PDF." +
+          (rueckseite ? " Nachträge von Hand: Seite 2." : ""),
+      LAGEBLATT_MAX_ZEILEN,
+      true,
+      nachtragZeilen,
+      undefined,
+      rueckseite,
+    ),
+  });
+}
+
+/** Was ein Messpunkt beim Setzen über seine Lage meldet (pdfmake `pageBreakBefore`). */
+interface MessPosition {
+  pageNumber: number;
+  top: number;
+  verticalRatio: number;
+  pageInnerHeight: number;
+}
+
+/**
+ * Lageblatt, dessen letzte Seite bis unten mit Nachtragszeilen gefüllt ist
+ * (Audit Runde 3, R3-A5) und das immer mindestens fünf davon trägt (R4-A3).
+ * Wie viel Platz bleibt, weiß erst der Setzer: die Höhe einer Einheitenzeile
+ * hängt an Änderungen, Rückfragen und Bemerkung. Deshalb Probesätze: Der erste
+ * setzt das Blatt mit der Mindestzahl und liest über pdfmakes
+ * `pageBreakBefore` die Lage zweier Messpunkte ab (Ende des Inhalts, Abstand
+ * zweier Nachtragszeilen); der letzte trägt so viele Zeilen, wie in den Rest
+ * passen.
+ *
+ * Passen auf die letzte Seite keine fünf Zeilen mehr (bei sechs bis zehn
+ * Einheiten mit Bedarf und Zwischensummen der Normalfall), bekommen die Zeilen
+ * eine eigene letzte Seite, die Rückseite: mit Spaltenköpfen, bis unten
+ * gefüllt. Vorher blieben bei acht Einheiten zwei Zeilen, und ab dem dritten
+ * Nachtrag ging es auf einem Zettel weiter — drei Quellen statt einer. Bei 30
+ * Einheiten schob das Mindestmaß von fünf Zeilen den Bedarf allein auf eine
+ * vierte Seite. Die Rückseite wird immer mitgedruckt; Seite 1 bleibt das
+ * Blatt für die Wand.
+ *
+ * Kostet bis zu zwei zusätzliche Sätze einer Seite ohne Bilder —
+ * Sekundenbruchteile.
+ *
+ * `setzen` führt den Satz aus (Browser: pdfmake-Puffer, Tests: Node).
+ */
+export async function einsatzLageblattSeiteFuellen(
+  name: string,
+  eintraege: UebersichtEintrag[],
+  setzen: (dd: TDocumentDefinitions) => Promise<unknown>,
+  erstellt = Date.now(),
+): Promise<TDocumentDefinitions> {
+  const messen = async (dd: TDocumentDefinitions) => {
+    const pos = new Map<string, MessPosition>();
+    const seiten = new Set<number>();
+    dd.pageBreakBefore = (knoten) => {
+      const k = knoten as { id?: string; startPosition?: MessPosition; pageNumbers?: number[] };
+      k.pageNumbers?.forEach((n) => seiten.add(n));
+      if (k.id && k.startPosition) pos.set(k.id, k.startPosition);
+      return false;
+    };
+    await setzen(dd);
+    const ende = pos.get(MESS_ENDE);
+    const z1 = pos.get(`${MESS_NACHTRAG}1`);
+    const z2 = pos.get(`${MESS_NACHTRAG}2`);
+    return {
+      ende,
+      zeilenHoehe: z1 && z2 && z1.pageNumber === z2.pageNumber && z2.top > z1.top ? z2.top - z1.top : 20,
+      seiten: seiten.size === 0 ? 0 : Math.max(...seiten),
+      /** Platz unter dem letzten Inhalt der letzten Seite. */
+      rest: ende ? ende.pageInnerHeight * (1 - ende.verticalRatio) : 0,
+    };
+  };
+  const m = await messen(einsatzLageblattDokument(name, eintraege, erstellt, NACHTRAG_ZEILEN_PROBE));
+  if (!m.ende) return einsatzLageblattDokument(name, eintraege, erstellt, NACHTRAG_ZEILEN_MIN);
+  // Über mehrere Seiten wiederholt die Tabelle ihre Kopfzeile; verschiebt sich
+  // dabei eine Zeile über den Seitenrand, kostet das eine Zeile mehr.
+  const rest = m.seiten > 1 ? m.rest - 2 * m.zeilenHoehe : m.rest;
+  const passen = NACHTRAG_ZEILEN_PROBE + Math.max(0, Math.floor((rest - 2) / m.zeilenHoehe));
+  if (passen >= NACHTRAG_ZEILEN_MIN) return einsatzLageblattDokument(name, eintraege, erstellt, Math.min(passen, 40));
+  // Zu voll: Die Zeilen bekommen eine eigene Seite hinter dem Blatt, so viele,
+  // wie draufpassen.
+  const r = await messen(einsatzLageblattDokument(name, eintraege, erstellt, NACHTRAG_ZEILEN_PROBE, true));
+  const zeilen = r.ende
+    ? NACHTRAG_ZEILEN_PROBE + Math.max(0, Math.floor((r.rest - 2) / r.zeilenHoehe))
+    : NACHTRAG_ZEILEN_MIN;
+  return einsatzLageblattDokument(name, eintraege, erstellt, Math.max(NACHTRAG_ZEILEN_MIN, Math.min(zeilen, 40)), true);
 }
 
 /**
  * QR-Block der letzten Seite. Ein Teil = wie bisher (Bild + antippbarer Link).
  * Mehrere Teile (Segmentierung) = eigene QR-Seiten mit je zwei diagonal
  * versetzten Codes „Teil x / n" (Kamera sieht immer nur einen Code, siehe
- * QR_SEGMENT_BREITE). Der Öffnen-Link zeigt dort nicht auf einen einzelnen Teil
- * (der trägt nur einen Abschnitt), sondern auf {@link QrSatz.vollUrl} — den
- * kompletten Bogen in einer URL. Segmentierung ist eine Grenze des QR-Bildes,
- * nicht des Links.
+ * QR_SEGMENT_BREITE). Der Öffnen-Link — auf dem Text UND auf jedem Teilbild —
+ * zeigt dort nicht auf einen einzelnen Teil (der trägt nur einen Abschnitt),
+ * sondern auf {@link QrSatz.vollUrl} — den kompletten Bogen in einer URL.
+ * Segmentierung ist eine Grenze des QR-Bildes, nicht des Links.
  */
-function qrBlock(qr: QrSatz, akzent: string): Content {
+function qrBlock(qr: QrSatz, akzent: string, stand: string, vermerk?: MeldekopfVermerk, einheit = ""): Content {
   const kopf = (text: string): Content => ({ text, bold: true, fontSize: 13, color: akzent, alignment: "center" });
+  // Jede Codeseite nennt ihre Einheit (R4-A5). Beim Einzelcode steht die Zeile
+  // in der freien Spalte neben dem Bild — über dem Bild kostete sie 36 von 443
+  // Beispielbögen eine zweite Seite; auf den eigenen Seiten mehrteiliger Codes
+  // steht sie unter der Überschrift.
+  const einheitZeile = (): Content => ({ text: einheit, bold: true, fontSize: 9, alignment: "center", margin: [0, 2, 0, 0] });
+  const einheitSeitlich = (): Content => ({ text: einheit, bold: true, fontSize: 8, margin: [0, 0, 0, 8] });
+  // Fett und direkt am Code: Wer den Ausdruck scannt, soll vorher aufs
+  // Kästchen schauen (R2-A4). Beim Einzelcode steht er in der freien Spalte
+  // links NEBEN dem Bild — unter dem Code kostete die Zeile 6 von 101
+  // THW-Beispielbögen eine zweite Seite (unbreakable-Block).
+  const stift = (): Content => ({ text: stiftHinweis(stand), bold: true, fontSize: 8 });
+  // Nur in der Sammel-PDF: was der Code nicht enthält, direkt beim Code
+  // (R2-A1). Beim Einzelcode steht der Kasten „Stand am Meldekopf“ schon über
+  // dem Formular derselben Seite, der Hinweis rechts neben dem Code. Mehrteilige
+  // Codes stehen auf eigenen Seiten: dort Kasten und Hinweis neben dem unteren Code (R3-A3).
+  const nurBogenHinweis = (): Content => ({ text: QR_NUR_BOGEN_HINWEIS, bold: true, fontSize: 8 });
   if (qr.teile.length === 1) {
     const t = qr.teile[0]!;
     return {
@@ -494,7 +1667,27 @@ function qrBlock(qr: QrSatz, akzent: string): Content {
         kopf("Digitaler Bogen als QR-Code"),
         // QR-Bild UND Textlink tragen dieselbe App-URL: mit der Kamera scannen ODER
         // in der digitalen PDF direkt anklicken, um den Bogen in der App zu öffnen.
-        { image: t.datenUrl, width: QR_BREITE, alignment: "center", margin: [0, 8, 0, 0], link: t.url },
+        vermerk
+          ? // Sammel-PDF: der Hinweis steht NEBEN dem Code — darunter kostete er
+            // Bögen mittlerer Stärke eine zweite Seite (R2-A1).
+            {
+              columns: [
+                { width: "*", stack: [einheitSeitlich(), stift()], alignment: "right", margin: [0, 8, 12, 0] },
+                { image: t.datenUrl, width: QR_BREITE, link: t.url },
+                { width: "*", stack: [nurBogenHinweis()], margin: [12, 40, 0, 0] },
+              ],
+              columnGap: 0,
+              margin: [0, 8, 0, 0],
+            }
+          : {
+              columns: [
+                { width: "*", stack: [einheitSeitlich(), stift()], alignment: "right", margin: [0, 8, 12, 0] },
+                { image: t.datenUrl, width: QR_BREITE, link: t.url },
+                { width: "*", text: "" },
+              ],
+              columnGap: 0,
+              margin: [0, 8, 0, 0],
+            },
         {
           text: "Bogen direkt in der App öffnen",
           link: t.url,
@@ -517,10 +1710,14 @@ function qrBlock(qr: QrSatz, akzent: string): Content {
   // Pro Seite zwei Teile, diagonal versetzt (siehe QR_SEGMENT_BREITE). Jede
   // QR-Seite beginnt auf einer frischen Seite, damit kein Formularrest die
   // Diagonale zusammenstaucht.
+  // Jedes Teilbild ist — wie der Einzelcode — antippbar und öffnet den
+  // vollständigen Bogen (vollUrl), nicht den einzelnen Abschnitt: Nutzer
+  // versuchen sonst, den Link „aus dem QR-Code zu kopieren", und landen beim
+  // Bild statt bei der URL (Rückmeldung aus dem OV Oldenburg, Firefox-Viewer).
   const teilZelle = (t: QrSatz["teile"][number]): Content => ({
     stack: [
       { text: `Teil ${t.teilNr} / ${anzahl}`, bold: true, alignment: "center", color: akzent },
-      { image: t.datenUrl, width: QR_SEGMENT_BREITE, margin: [0, 4, 0, 0] },
+      { image: t.datenUrl, width: QR_SEGMENT_BREITE, margin: [0, 4, 0, 0], link: qr.vollUrl },
     ],
   });
   const oeffnenLink = (): Content => ({
@@ -534,34 +1731,93 @@ function qrBlock(qr: QrSatz, akzent: string): Content {
   });
   const hinweis = (): Content => ({
     text:
-      `Alle ${anzahl} Teile nacheinander mit der Kamera scannen — die App setzt den Bogen zusammen.\n` +
-      `Beim Scannen jeweils nur einen Code ins Kamerabild nehmen. In der digitalen PDF geht es auch\n` +
-      `ohne Scannen: der Link oben öffnet den vollständigen Bogen.`,
-    alignment: "center",
-    fontSize: 8,
-    margin: [0, 6, 0, 0],
+      // Der Satz folgt dem tatsächlichen Verhalten (Audit Runde 2, R2-A2):
+      // Live-Scan sieht einen Code auf einmal, „Bögen einlesen…" liest alle
+      // Codes eines Fotos und merkt sich Teile bis zum nächsten Foto.
+      `Alle ${anzahl} Teile nacheinander mit der Kamera scannen — die App setzt den Bogen zusammen. ` +
+      `Beim Live-Scan jeweils nur einen Code ins Kamerabild nehmen. Fotos ganzer Seiten liest „Bögen einlesen…“ ` +
+      `mit allen Codes; fehlende Teile dürfen auch in einem späteren Foto kommen. ` +
+      `In der digitalen PDF geht es auch ohne Scannen: der Link unten öffnet den vollständigen Bogen.`,
+    fontSize: 7.5,
   });
+  // Der Erklärtext steht NEBEN den Codes, in der Fläche, die die Diagonale
+  // ohnehin frei lässt: rechts neben dem oberen Code Anleitung und Stift-
+  // Kästchen, links neben dem unteren Code Kasten „Stand am Meldekopf" und
+  // was der Code nicht enthält. Untereinander gestapelt sprengten sie in der
+  // Sammel-PDF die Seite; 7 von 38 Seiten trugen dann nur noch die letzte
+  // Zeile des Erklärtexts (Audit Runde 3, R3-A3).
+  const SEITENTEXT_ABSTAND = 12;
+  const anleitung = (): Content[] => [hinweis(), { ...(stift() as object), margin: [0, 8, 0, 0] } as Content];
+  const meldekopf = (): Content[] =>
+    vermerk ? [vermerkKasten(vermerk, [0, 0, 0, 0]), { ...(nurBogenHinweis() as object), margin: [0, 6, 0, 0] } as Content] : [];
   const seiten: Content[] = [];
   for (let i = 0; i < qr.teile.length; i += 2) {
     const links = qr.teile[i]!;
     const rechts = qr.teile[i + 1];
     const stack: Content[] = [
       kopf(`Digitaler Bogen als QR-Code (${anzahl} Teile)`),
-      // Erster Code oben links …
-      { columns: [{ width: "auto", stack: [teilZelle(links)] }], margin: [0, 10, 0, 0] },
+      einheitZeile(),
+      // Erster Code oben links, daneben die Anleitung …
+      {
+        columns: [
+          { width: "auto", stack: [teilZelle(links)] },
+          { width: "*", stack: anleitung(), margin: [SEITENTEXT_ABSTAND, 24, 0, 0] },
+        ],
+        margin: [0, 10, 0, 0],
+      },
     ];
     if (rechts) {
-      // … zweiter Code unten rechts (Leerspalte schiebt ihn an den Rand,
-      // der obere Rand erzeugt den vertikalen Diagonalabstand).
+      // … zweiter Code unten rechts (der obere Rand erzeugt den vertikalen
+      // Diagonalabstand), links daneben der Stand am Meldekopf.
       stack.push({
-        columns: [{ width: "*", text: "" }, { width: "auto", stack: [teilZelle(rechts)] }],
+        columns: [
+          { width: "*", stack: meldekopf(), margin: [0, 24, SEITENTEXT_ABSTAND, 0] },
+          { width: "auto", stack: [teilZelle(rechts)] },
+        ],
         margin: [0, 150, 0, 0],
       });
+    } else if (vermerk) {
+      // Letzte Seite mit nur einem Code: der Platz unten ist frei.
+      stack.push({ stack: meldekopf(), margin: [0, 16, 0, 0] });
     }
-    stack.push(oeffnenLink(), hinweis());
+    stack.push(oeffnenLink());
     seiten.push({ stack, pageBreak: "before" });
   }
   return { stack: seiten };
+}
+
+/**
+ * Kasten oben auf dem Vordruck: was der Meldekopf auf das Papier schreibt —
+ * Eingang, Nummer, Zug, Übung, und der Haken „ins Gerät übertragen“. Auf dem
+ * Vordruck fehlte beides: Nach einer Papierphase tippen zwei Helfer denselben
+ * Stapel ab oder ein Blatt bleibt liegen, und ein handschriftlicher
+ * Übungsbogen wird in einer echten Lage mitgezählt (Audit Runde 4, R4-A4).
+ * Die Felder entsprechen dem Kasten „Stand am Meldekopf“ der Sammel-PDF.
+ */
+function blankoMeldekopf(): Content {
+  return {
+    table: {
+      widths: ["*"],
+      body: [[{
+        stack: [
+          { text: "Meldekopf:   Nr. ______   ·   eingegangen am ____________  um ____:____ Uhr   ·   Zug / Verband: ________________" },
+          { text: `${kasten(false)} ÜBUNG — kein echter Einsatz   ·   ins Gerät übertragen ${kasten(false)}  von (Kürzel) ________  um ____:____ Uhr`, margin: [0, 5, 0, 0] },
+          // Beiblatt (R5-A6): Der Vordruck fasst 4 Fahrzeuge und 6 Qualifikationen. Mehr gehört
+          // auf einen zweiten Vordruck mit gleicher Einheit und Nr., nicht an den Rand.
+          {
+            text: "Blatt ____ von ____   ·   Reicht der Platz nicht (mehr als 29 Personen, 4 Fahrzeuge oder 6 Qualifikationen): weiteren Vordruck als Beiblatt nehmen, dort Einheit und Nr. eintragen und hier die Blattzahl nachtragen.",
+            bold: false,
+            fontSize: 7.5,
+            lineHeight: 1.25,
+            margin: [0, 5, 0, 0],
+          },
+        ],
+        bold: true,
+        margin: [0, 3, 0, 3],
+      }]],
+    },
+    margin: [0, 0, 0, 6],
+  };
 }
 
 /**
@@ -574,6 +1830,42 @@ export interface BlankoZeilen {
   personal: number;
   qualifikationen: number;
 }
+
+/** Zählrolle als Kürzel, wie in der Stärke „F / UF / M" (R3-A6). */
+const ROLLE_KURZ: Record<number, string> = {
+  [StaerkeRolle.FUEHRER]: "F",
+  [StaerkeRolle.UNTERFUEHRER]: "UF",
+  [StaerkeRolle.MANNSCHAFT]: "M",
+};
+
+/**
+ * Platz für Stiftnachträge im Einzel-PDF (R3-A6) — nur, wenn er keine Seite
+ * kostet; siehe {@link einzelPdfDokument}.
+ */
+export interface NachtragsPlatz {
+  /** Freie Zeilen unter dem Personal. */
+  freiePersonalZeilen?: number;
+  /** Ein leerer Fahrzeugblock unter den Fahrzeugen. */
+  freiesFahrzeug?: boolean;
+  /** Messpunkt hinter dem letzten Inhalt (nur für den Probesatz). */
+  messpunkt?: boolean;
+  /** Kennung des Messpunkts — in der Sammel-PDF je Bogen eine eigene (R4-A7). */
+  messKennung?: string;
+  /**
+   * Enger gesetzt: weniger Innenabstand und Zwischenraum, damit der Bogen samt
+   * Kasten „Stand am Meldekopf“ auf seine Seiten passt, statt mit der letzten
+   * Zeile allein auf einer weiteren zu stehen (R4-A7).
+   */
+  verdichtet?: boolean;
+}
+
+/** Freie Personalzeilen, wenn Platz ist (R3-A6). */
+const PERSONAL_NACHTRAG_ZEILEN = 2;
+/** Höhe einer leeren Personalzeile in pt, gemessen 22,4 (8 pt Schrift, 5 pt Rand oben und unten, Innenabstand), aufgerundet. */
+const LEERZEILE_HOEHE = 23;
+/** Höhe eines leeren Fahrzeugblocks samt Abstand in pt, gemessen 74, aufgerundet. */
+const LEERFAHRZEUG_HOEHE = 76;
+const MESS_BOGEN_ENDE = "bogen-ende";
 
 /** Fahrzeug ohne Angaben — Platzhalter für die Fahrzeugblöcke des Blanko-Vordrucks. */
 const BLANKO_FAHRZEUG: Fahrzeug = { typ: { freitext: "" } };
@@ -588,7 +1880,16 @@ const BLANKO_FAHRZEUG: Fahrzeug = { typ: { freitext: "" } };
  * leere Bogen „0 / 0 / 0 / 0" und „01.01.2020" drucken — auf einem Vordruck
  * sind das falsche Angaben, keine Leerstellen.
  */
-export function pdfDokument(b: Erfassungsbogen, qr: QrSatz | null, blanko?: BlankoZeilen): TDocumentDefinitions {
+export function pdfDokument(
+  b: Erfassungsbogen,
+  qr: QrSatz | null,
+  blanko?: BlankoZeilen,
+  /** Nur Sammel-PDF: Stand der Einheit am Meldekopf neben dem QR-Code (R2-A1). */
+  vermerk?: MeldekopfVermerk,
+  /** Nur Einzel-PDF: Platz für Stiftnachträge (R3-A6). */
+  zusatz?: NachtragsPlatz,
+): TDocumentDefinitions {
+  b = ohneVorbelegung(b);
   const org = b.einheit.organisation;
   const farbe = orgFarbe(org);
   const typName = vokabText(b.einheit.einheitsTyp, vokabularFuer(org, "einheitstyp"), "name") || "Einheit";
@@ -597,6 +1898,11 @@ export function pdfDokument(b: Erfassungsbogen, qr: QrSatz | null, blanko?: Blan
   const mwd = unterbringungMWD(b);
   const vp = verpflegung(b);
   const ansprech = b.personal[0];
+  // Verdichteter Satz (Sammel-PDF, R4-A7): knappere Innenabstände und Lücken.
+  const dicht = zusatz?.verdichtet === true;
+  const tabLayout = dicht ? { paddingTop: () => 0.5, paddingBottom: () => 0.5 } : undefined;
+  /** Abstand in pt, verdichtet halb so groß. */
+  const luecke = (pt: number): number => (dicht ? Math.ceil(pt / 2) : pt);
 
   // Ausfülllinie statt eines errechneten Werts (nur Vordruck). Bewusst kurz:
   // vier Stärkezahlen nebeneinander müssen in eine Tabellenzelle passen, ohne
@@ -609,10 +1915,23 @@ export function pdfDokument(b: Erfassungsbogen, qr: QrSatz | null, blanko?: Blan
 
   const infoZeilen: TableCell[][] = [
     [
-      { text: "Stärke:", bold: true },
-      { text: `${zahl(s.fuehrer)} / ${zahl(s.unterfuehrer)} / ${zahl(s.mannschaft)} / ${zahl(s.gesamt)}` },
+      // Mit Legende: „____ / ____ / ____ / ____" allein sagte nicht, welche
+      // Linie welche Zahl ist (Audit Runde 2, R2-A6) — und „1 / 1 / 2 / 4"
+      // ließ sich nach einer Stiftkorrektur nicht gegen die Namen prüfen
+      // (Audit Runde 3, R3-A6). Gleiche Beschriftung auf Vordruck und Bogen.
+      { text: "Stärke (F / UF / M / Ges.):", bold: true },
+      {
+        // Mit Code: das Kästchen „von Hand geändert“ gehört hierher, wo mit
+        // dem Stift korrigiert wird, nicht auf die Codeseite (R4-A5).
+        stack: [
+          { text: `${zahl(s.fuehrer)} / ${zahl(s.unterfuehrer)} / ${zahl(s.mannschaft)} / ${zahl(s.gesamt)}` },
+          // Zweite Zeile der Zelle: „Ansprechpartner/in:" daneben bricht ohnehin
+          // auf zwei Zeilen um, das Kästchen kostet keine Höhe.
+          ...(qr ? [{ text: STIFT_KAESTCHEN, bold: true } as Content] : []),
+        ],
+      },
       { text: "Ansprechpartner/in:", bold: true },
-      { text: ansprech ? `${ansprech.vorname} ${ansprech.nachname}` : "" },
+      { text: ansprech ? ansprechpersonPapier(`${ansprech.vorname} ${ansprech.nachname}`) : "" },
     ],
   ];
   for (const h of b.einheit.hierarchie) {
@@ -642,12 +1961,17 @@ export function pdfDokument(b: Erfassungsbogen, qr: QrSatz | null, blanko?: Blan
   ]);
   infoZeilen.push([
     { text: "Einsatzbeginn:", bold: true },
-    { text: b.einsatz.einsatzbeginn != null ? zeitpunktZuIso(b.einsatz.einsatzbeginn).replace("T", " ") : "" },
+    { text: b.einsatz.einsatzbeginn != null ? zeitpunktDeutsch(b.einsatz.einsatzbeginn) : "" },
     { text: "Einsatzende:", bold: true },
-    { text: b.einsatz.einsatzende != null ? zeitpunktZuIso(b.einsatz.einsatzende).replace("T", " ") : "" },
+    { text: b.einsatz.einsatzende != null ? zeitpunktDeutsch(b.einsatz.einsatzende) : "" },
   ]);
 
-  const fahrzeugBlock = (f: Fahrzeug): Content => ({
+  const fahrzeugBlock = (f: Fahrzeug, leer = !!blanko): Content => ({
+    ...(tabLayout ? { layout: tabLayout } : {}),
+    // Ein Fahrzeug steht ganz auf einer Seite: Das taktische Zeichen läuft über zwei Zeilen,
+    // und der Block riss über die Seitengrenze — „Tiefl 18 t“ nur als Bild, der Text auf
+    // der nächsten Seite (R5-A3).
+    unbreakable: true,
     table: {
       // Erste Spalte: taktisches Zeichen (DV 102), zeilenübergreifend links.
       widths: [56, "*", "*", "*"],
@@ -656,13 +1980,13 @@ export function pdfDokument(b: Erfassungsbogen, qr: QrSatz | null, blanko?: Blan
           { svg: fahrzeugSymbolSvg(f, org), width: 50, rowSpan: 2, alignment: "center", margin: [2, 6, 2, 6] as [number, number, number, number] },
           // Im Vordruck stehen hier die Feldnamen — sonst wäre die Zeile eine
           // beschriftungslose Leerzeile, in der niemand weiß, was hingehört.
-          { text: blanko ? "Fahrzeug:" : vokabText(f.typ, vokabularFuer(org, "fahrzeug")) || "Fahrzeug", bold: true },
-          { text: blanko ? "Kennzeichen:" : kennzeichenText(f), bold: true },
+          { text: leer ? "Fahrzeug:" : vokabText(f.typ, vokabularFuer(org, "fahrzeug")) || "Fahrzeug", bold: true },
+          { text: leer ? "Kennzeichen:" : kennzeichenText(f), bold: true },
           // Sitzplätze nur, wenn sie am Fahrzeug erfasst sind: der Richtwert
           // des Typs steht in keiner Akte und hätte auf dem Papier den Rang
           // einer Zusage, die niemand gegeben hat.
           {
-            text: blanko
+            text: leer
               ? "Funkrufname:"
               : [f.funkrufname ? `FuRn: ${funkrufText(f, b.einheit)}` : "", f.sitzplaetze != null ? `Sitzplätze: ${f.sitzplaetze}` : ""]
                   .filter(Boolean)
@@ -673,7 +1997,7 @@ export function pdfDokument(b: Erfassungsbogen, qr: QrSatz | null, blanko?: Blan
           {}, // von rowSpan des Zeichens belegt
           {
             colSpan: 3,
-            text: blanko
+            text: leer
               ? `Ausstattung nach StAN: ja ${kasten(false)} / nein ${kasten(false)}\nÄnderungen bzw. Sondergerät:`
               : f.stanKonform == null
                 ? `Änderungen bzw. Sondergerät: ${weichUmbrechen(f.aenderungen ?? "")}`
@@ -684,21 +2008,28 @@ export function pdfDokument(b: Erfassungsbogen, qr: QrSatz | null, blanko?: Blan
         ],
       ],
     },
-    margin: [0, 0, 0, 6] as [number, number, number, number],
+    margin: [0, 0, 0, luecke(6)] as [number, number, number, number],
   });
   const fahrzeuge: Content[] = blanko
     ? Array.from({ length: blanko.fahrzeuge }, () => fahrzeugBlock(BLANKO_FAHRZEUG))
-    : b.fahrzeuge.map(fahrzeugBlock);
+    : [
+        ...b.fahrzeuge.map((f) => fahrzeugBlock(f)),
+        // Ein leerer Fahrzeugblock zum Nachtragen, wenn Platz ist (R3-A6).
+        ...(zusatz?.freiesFahrzeug ? [fahrzeugBlock(BLANKO_FAHRZEUG, true)] : []),
+      ];
 
+  // Spalte „Rolle" (F / UF / M): Ohne sie ließ sich eine von Hand geänderte
+  // Stärke auf dem Blatt nicht gegen die Namen prüfen (Audit Runde 3, R3-A6).
   const personalZeilen: TableCell[][] = [
     [
       { text: "Funktion /\nZusatzfunktion", bold: true, fillColor: GRAU },
+      { text: "Rolle\nF/UF/M", bold: true, fillColor: GRAU },
       { text: "Name, Vorname", bold: true, fillColor: GRAU },
       { text: "D = dienstlich / P = privat", bold: true, fillColor: GRAU },
     ],
   ];
   for (let i = 0; blanko && i < blanko.personal; i++) {
-    personalZeilen.push([leerZelle(), leerZelle(), leerZelle()]);
+    personalZeilen.push([leerZelle(), leerZelle(), leerZelle(), leerZelle()]);
   }
   for (const p of blanko ? [] : b.personal) {
     const kontakte = p.kontakte
@@ -711,9 +2042,17 @@ export function pdfDokument(b: Erfassungsbogen, qr: QrSatz | null, blanko?: Blan
       .join("\n");
     personalZeilen.push([
       { text: funktionsText(p, org) },
+      { text: ROLLE_KURZ[p.staerkeRolle] ?? "", alignment: "center" },
       { text: `${p.nachname}${p.nachname && p.vorname ? ", " : ""}${p.vorname}` },
       { text: kontakte },
     ]);
+  }
+  // Freie Zeilen für Nachrückende: Wer auf dem Ausdruck nachträgt und „von
+  // Hand geändert" ankreuzt, schrieb sonst an den Rand (R3-A6). Nur bei
+  // vollständig erfasstem Personal — „nur Stärke" hat keine Namensliste.
+  // Wie viele, entscheidet einzelPdfDokument nach einer Messung.
+  if (!blanko && b.personalErfassung !== PersonalErfassung.NUR_STAERKE) {
+    for (let i = 0; i < (zusatz?.freiePersonalZeilen ?? 0); i++) personalZeilen.push([leerZelle(), leerZelle(), leerZelle(), leerZelle()]);
   }
 
   const qualiZeilen: TableCell[][] = [
@@ -738,33 +2077,40 @@ export function pdfDokument(b: Erfassungsbogen, qr: QrSatz | null, blanko?: Blan
   const sofort: Content[] = [];
   if (b.sofortbedarf) {
     const sb = b.sofortbedarf;
+    // Auf dem Vordruck Luft zwischen den Zeilen: Die Kästchen berührten sich, „[ ] Betriebsstoff“
+    // war angeschnitten und die Ausfülllinie „____ vegan“ lief in die nächste Zeile (R5-A7).
+    const zeile = (text: string): Content => ({ text, ...(blanko ? { margin: [0, 3, 0, 3] as [number, number, number, number] } : {}) });
     sofort.push({
+      ...(tabLayout ? { layout: tabLayout } : {}),
       table: {
         widths: ["*", "*"],
+        // Der Kasten bleibt ganz: In der Sammel-PDF stand die letzte Zeile
+        // („M 11 / W 1 / D 0“) allein auf einer Seite, die Beschriftung davor (R4-A7).
+        dontBreakRows: true,
         body: [
           [
             {
               stack: [
                 { text: "Sofortbedarf:", bold: true, decoration: "underline" },
-                { text: `${kasten(sb.verpflegungPersonen > 0)} Verpflegung für ${zahl(sb.verpflegungPersonen)} Personen, davon ${zahl(vp.vegetarisch)} vegetarisch, ${zahl(vp.vegan)} vegan` },
-                { text: `${kasten(sb.dieselLiter + sb.benzinLiter + sb.gemischLiter > 0)} Betriebsstoff: ${zahl(sb.dieselLiter)} l Diesel / ${zahl(sb.benzinLiter)} l Benzin / ${zahl(sb.gemischLiter)} l Gemisch` },
+                zeile(`${kasten(sb.verpflegungPersonen > 0)} Verpflegung für ${zahl(sb.verpflegungPersonen)} Personen, davon ${zahl(vp.vegetarisch)} vegetarisch, ${zahl(vp.vegan)} vegan`),
+                zeile(`${kasten(sb.dieselLiter + sb.benzinLiter + sb.gemischLiter > 0)} Betriebsstoff: ${zahl(sb.dieselLiter)} l Diesel / ${zahl(sb.benzinLiter)} l Benzin / ${zahl(sb.gemischLiter)} l Gemisch`),
               ],
             },
             {
               stack: [
-                { text: `${kasten(sb.unterbringung)}  Unterbringung` },
-                { text: `${kasten(sb.ruhezeitErforderlich)}  Ruhezeit erforderlich` },
-                { text: `Anzahl Unterbringung/WC/Dusche:\nM ${zahl(mwd.m)} / W ${zahl(mwd.w)} / D ${zahl(mwd.d)}` },
+                zeile(`${kasten(sb.unterbringung)}  Unterbringung`),
+                zeile(`${kasten(sb.ruhezeitErforderlich)}  Ruhezeit erforderlich`),
+                zeile(`Anzahl Unterbringung/WC/Dusche:\nM ${zahl(mwd.m)} / W ${zahl(mwd.w)} / D ${zahl(mwd.d)}`),
               ],
             },
           ],
         ],
       },
-      margin: [0, 8, 0, 0] as [number, number, number, number],
+      margin: [0, luecke(8), 0, 0] as [number, number, number, number],
     });
   }
 
-  return {
+  return winAnsiDokument({
     pageSize: "A4",
     pageMargins: SEITENRAENDER,
     defaultStyle: { fontSize: 8, font: SCHRIFT },
@@ -773,6 +2119,12 @@ export function pdfDokument(b: Erfassungsbogen, qr: QrSatz | null, blanko?: Blan
     // Maschinenlesbares JSON dokumentweit einbetten (ZUGFeRD-artig). Am
     // Vordruck hinge dort ein leerer Bogen — ein Anhang ohne jede Aussage.
     ...(blanko ? {} : { files: { [EEB_JSON_DATEINAME]: bogenAlsEingebetteteDatei(b) } }),
+    // Kopfzeile im Seitenrand: Seite 1 der Platz für „Nr., eingegangen, übertragen“, jede
+    // Folgeseite Nr. und Einheit (R5-A2, R5-A3). Die Sammel-PDF nimmt nur den Inhalt
+    // dieses Dokuments und setzt ihre eigene Kopfzeile mit der Nr. des Meldekopfs.
+    header: blanko
+      ? (seite) => (seite > 1 ? randZeile("Einheit: ______________________________   ·   Nr. ______   ·   Blatt ____ von ____", false) : { text: "" })
+      : (seite, gesamt) => bogenKopfzeile(einheitAnzeigename(b.einheit), undefined, seite, gesamt),
     footer: (seite, gesamt) => ({
       columns: [
         { text: blanko ? "Stand:" : `Stand: ${zeitgruppe(b.stand)}`, margin: [40, 0, 0, 0] },
@@ -784,8 +2136,11 @@ export function pdfDokument(b: Erfassungsbogen, qr: QrSatz | null, blanko?: Blan
       // Störer VOR dem Kopf: das Wasserzeichen allein kann beim Kopieren oder
       // blassen Druck untergehen, die Textzeile nicht.
       ...(b.uebung ? [uebungsStoerer()] : []),
+      // ---- Meldekopf-Kasten (nur Vordruck) ----
+      ...(blanko ? [blankoMeldekopf()] : []),
       // ---- Kopf ----
       {
+        ...(tabLayout ? { layout: tabLayout } : {}),
         table: {
           // Kopf zweispaltig: Titel im Kasten in der Kennfarbe der Organisation,
           // rechts die Einheit von
@@ -814,28 +2169,90 @@ export function pdfDokument(b: Erfassungsbogen, qr: QrSatz | null, blanko?: Blan
             ],
           ],
         },
-        margin: [0, 0, 0, 8],
+        margin: [0, 0, 0, luecke(8)],
       },
-      { table: { widths: [110, "*", 70, "*"], body: infoZeilen }, margin: [0, 0, 0, 10] },
+      { ...(tabLayout ? { layout: tabLayout } : {}), table: { widths: [110, "*", 70, "*"], body: infoZeilen }, margin: [0, 0, 0, luecke(10)] },
       ...fahrzeuge,
 
       // ---- Personal ----
       // Kein fester Seitenumbruch: kleine Einheiten passen so auf eine Seite,
       // größere lässt pdfmake bei Bedarf selbst umbrechen.
-      { table: { widths: [130, "*", 170], body: personalZeilen }, margin: [0, 12, 0, 10] },
+      {
+        ...(tabLayout ? { layout: tabLayout } : {}),
+        // Zeilen bleiben ganz: Auf Seite 1 des Vordrucks stand die letzte
+        // Personalzeile nur als 3-mm-Streifen über der Fußzeile (R4-A8). Der
+        // Vordruck wiederholt den Tabellenkopf auf Seite 2.
+        table: { widths: [118, 30, "*", 160], body: personalZeilen, dontBreakRows: true, ...(blanko ? { headerRows: 1 } : {}) },
+        margin: [0, luecke(12), 0, luecke(10)],
+      },
       ...(b.personalErfassung === PersonalErfassung.NUR_STAERKE
-        ? [{ text: "Personal am Meldekopf nur in Stärke erfasst.", italics: true, margin: [0, 0, 0, 6] } as Content]
+        ? [{ text: nurSollstaerke(b) ? "Personal am Meldekopf nur in Stärke erfasst. Die Zahl ist die Sollstärke der Vorbelegung, nicht gezählt." : "Personal am Meldekopf nur in Stärke erfasst.", italics: true, margin: [0, 0, 0, 6] } as Content]
         : []),
       { text: "weitere interne / externe Qualifikationen obiger Helfer/-innen:", margin: [0, 0, 0, 4] },
-      { table: { widths: [180, "*"], body: qualiZeilen } },
+      { ...(tabLayout ? { layout: tabLayout } : {}), table: { widths: [180, "*"], body: qualiZeilen } },
       ...sofort,
-      ...(b.sonstiges ? [{ text: `Sonstiges: ${weichUmbrechen(b.sonstiges)}`, margin: [0, 8, 0, 0] } as Content] : []),
+      // Vordruck: Platz für drei Zeilen Handschrift statt einer Zeile (R5-A7).
+      ...(blanko
+        ? [
+            {
+              unbreakable: true,
+              stack: [
+                { text: "Sonstiges:", margin: [0, 8, 0, 3] },
+                { table: { widths: ["*"], body: [[leerZelle()], [leerZelle()], [leerZelle()]] } },
+              ],
+            } as Content,
+          ]
+        : b.sonstiges
+          ? [{ text: `Sonstiges: ${weichUmbrechen(b.sonstiges)}`, margin: [0, 8, 0, 0] } as Content]
+          : []),
+      ...(zusatz?.messpunkt ? [{ text: " ", fontSize: 1, id: `${MESS_BOGEN_ENDE}-formular${zusatz.messKennung ?? ""}` } as Content] : []),
 
       // ---- QR-Block ----
       // Kein fester Seitenumbruch mehr; als unbreakable-Gruppe zusammengehalten,
       // damit der QR-Code nicht über eine Seitengrenze zerrissen wird. Passt der
       // Block nicht mehr, rückt er als Ganzes auf die nächste Seite.
-      ...(qr ? [qrBlock(qr, farbe.akzent)] : []),
+      ...(qr ? [qrBlock(qr, farbe.akzent, zeitgruppe(b.stand), vermerk, codeKopfzeile(b, zeitgruppe(b.stand), vermerk?.nummer))] : []),
+      ...(zusatz?.messpunkt ? [{ text: " ", fontSize: 1, id: `${MESS_BOGEN_ENDE}-qr${zusatz.messKennung ?? ""}` } as Content] : []),
     ],
+  });
+}
+
+/**
+ * Einzel-PDF mit Platz für Stiftnachträge — aber nur, wo er keine Seite
+ * kostet (Audit Runde 3, R3-A6). Zwei freie Personalzeilen hätten 15 von 133
+ * Beispielbögen um eine Seite verlängert, darunter den einseitigen Bogen des
+ * Zugtrupps Albstadt. Deshalb ein Probesatz: Er liest über pdfmakes
+ * `pageBreakBefore` ab, wie viel Platz hinter dem Formular (mehrteiliger Code
+ * auf eigenen Seiten) bzw. hinter dem Code auf derselben Seite bleibt. Passen
+ * zwei Zeilen hinein, kommen sie dazu; passt danach noch ein Fahrzeugblock,
+ * auch der.
+ *
+ * `setzen` führt den Satz aus (Browser: pdfmake-Puffer, Tests: Node).
+ */
+export async function einzelPdfDokument(
+  b: Erfassungsbogen,
+  qr: QrSatz | null,
+  setzen: (dd: TDocumentDefinitions) => Promise<unknown>,
+): Promise<TDocumentDefinitions> {
+  if (b.personalErfassung === PersonalErfassung.NUR_STAERKE) return pdfDokument(b, qr);
+  const pos = new Map<string, MessPosition>();
+  const probe = pdfDokument(b, qr, undefined, undefined, { messpunkt: true });
+  probe.pageBreakBefore = (knoten) => {
+    const k = knoten as { id?: string; startPosition?: MessPosition };
+    if (k.id && k.startPosition) pos.set(k.id, k.startPosition);
+    return false;
   };
+  await setzen(probe);
+  const formular = pos.get(`${MESS_BOGEN_ENDE}-formular`);
+  const ende = pos.get(`${MESS_BOGEN_ENDE}-qr`);
+  if (!formular || !ende) return pdfDokument(b, qr);
+  const rest = (p: MessPosition) => p.pageInnerHeight * (1 - p.verticalRatio);
+  // Einzelcode auf derselben Seite wie das Formularende: der Platz unter dem
+  // Code zählt. Sonst (Code auf eigener Seite, mehrteiliger Code) der Platz
+  // unter dem Formular — was dort nicht hineinpasst, schöbe den Code weiter.
+  const einzelcodeDahinter = qr != null && qr.teile.length === 1 && formular.pageNumber === ende.pageNumber;
+  const frei = (einzelcodeDahinter ? rest(ende) : rest(formular)) - 4;
+  const zeilen = frei >= PERSONAL_NACHTRAG_ZEILEN * LEERZEILE_HOEHE ? PERSONAL_NACHTRAG_ZEILEN : 0;
+  const fahrzeug = zeilen > 0 && frei >= zeilen * LEERZEILE_HOEHE + LEERFAHRZEUG_HOEHE;
+  return pdfDokument(b, qr, undefined, undefined, { freiePersonalZeilen: zeilen, freiesFahrzeug: fahrzeug });
 }

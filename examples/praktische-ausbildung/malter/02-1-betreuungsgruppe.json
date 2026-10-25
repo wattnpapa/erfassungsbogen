@@ -1,0 +1,256 @@
+{
+  "schemaVersion": 9,
+  "uebung": true,
+  "stand": 2171520,
+  "einheit": {
+    "organisation": 6,
+    "einheitsTyp": {
+      "freitext": "1. Betreuungsgruppe"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "code": 2
+        },
+        "name": "Malter"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 1508,
+    "zeitraumBis": 1508,
+    "ortAuftrag": "Praktische Ausbildung (Übung): Einheitenerfassung der geplanten Einsatzeinheiten"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "nachname": "Syiemens",
+      "vorname": "Gabi",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "GF"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Betreuungshelfer"
+        }
+      ]
+    },
+    {
+      "nachname": "Pfeiffer",
+      "vorname": "Sarah",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "TF"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Betreuungshelfer"
+        }
+      ]
+    },
+    {
+      "nachname": "Gruber",
+      "vorname": "Jenny",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "HE"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Betreuungshelfer"
+        }
+      ]
+    },
+    {
+      "nachname": "Garper",
+      "vorname": "Emil",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "TF"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Betreuungshelfer"
+        }
+      ]
+    },
+    {
+      "nachname": "Schenker",
+      "vorname": "Willi",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "HE"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Betreuungshelfer"
+        }
+      ]
+    },
+    {
+      "nachname": "Bonse",
+      "vorname": "Michell",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "TF"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Betreuungshelfer"
+        }
+      ]
+    },
+    {
+      "nachname": "Maler",
+      "vorname": "Benjamin",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "HE"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Betreuungshelfer"
+        }
+      ]
+    },
+    {
+      "nachname": "Wieter",
+      "vorname": "Andrew",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kraftfahrer/Melder"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Betreuungshelfer"
+        }
+      ]
+    },
+    {
+      "nachname": "Alter",
+      "vorname": "Josef",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kraftfahrer/Melder"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Betreuungshelfer"
+        }
+      ]
+    },
+    {
+      "nachname": "Schütze",
+      "vorname": "Wilhelm",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "HE"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Betreuungshelfer"
+        }
+      ]
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "GW-Betreuung"
+      },
+      "kennzeichen": "MA-JU 11",
+      "funkrufname": {
+        "kennwort": {
+          "code": 4
+        },
+        "eigenerStandort": false,
+        "ort": "Malter",
+        "teile": [
+          54,
+          75,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "MTW"
+      },
+      "kennzeichen": "MA-JU 12",
+      "funkrufname": {
+        "kennwort": {
+          "code": 4
+        },
+        "eigenerStandort": false,
+        "ort": "Malter",
+        "teile": [
+          54,
+          17,
+          2
+        ]
+      }
+    }
+  ],
+  "sonstiges": "Fachdienst: Betreuungsdienst. Hauptleistung: BTP. Kommunikation: Rufname 54-17-2."
+}

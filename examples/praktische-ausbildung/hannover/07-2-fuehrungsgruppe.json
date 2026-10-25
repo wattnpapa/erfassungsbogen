@@ -1,0 +1,53 @@
+{
+  "schemaVersion": 9,
+  "uebung": true,
+  "stand": 2171520,
+  "einheit": {
+    "organisation": 7,
+    "einheitsTyp": {
+      "freitext": "2. Führungsgruppe Landeshauptstadt Hannover"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Standort"
+        },
+        "name": "Hannover"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 1508,
+    "zeitraumBis": 1508,
+    "ortAuftrag": "Praktische Ausbildung (Übung): Einlagen Kräfte, Landeshauptstadt Hannover"
+  },
+  "personalErfassung": 1,
+  "personal": [],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "FüKW (Ni)"
+      },
+      "kennzeichen": "H-X XXX"
+    },
+    {
+      "typ": {
+        "freitext": "GW-IuK"
+      },
+      "kennzeichen": "H-X XXX"
+    },
+    {
+      "typ": {
+        "freitext": "Anh. Fm"
+      },
+      "kennzeichen": "H-X XXX"
+    }
+  ],
+  "staerkeManuell": {
+    "fuehrer": 4,
+    "unterfuehrer": 3,
+    "mannschaft": 2,
+    "gesamt": 9
+  },
+  "sonstiges": "Fachdienst: Führungsgruppe. Hauptleistung: Führung (BHP/BTP N1). Kommunikation: Rufname Malta."
+}

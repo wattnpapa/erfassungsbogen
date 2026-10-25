@@ -1,11 +1,12 @@
 import { createHash } from "node:crypto";
-import { readFileSync } from "node:fs";
+import { readFileSync, writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { defineConfig, type Plugin } from "vite";
 import react from "@vitejs/plugin-react";
 import { VitePWA } from "vite-plugin-pwa";
 import { transform } from "esbuild";
 import { sitemapErzeugen } from "./scripts/sitemap";
+import { ZUSATZ_DATEI, vorratAufteilen } from "./scripts/precache-aufteilung";
 
 const { version } = JSON.parse(readFileSync(new URL("./package.json", import.meta.url), "utf8"));
 
@@ -96,7 +97,10 @@ function contentSecurityPolicy(): Plugin {
       "base-uri 'none'",
       "object-src 'none'",
       "form-action 'none'",
-      `script-src 'self' file:${hashes.map((h) => ` '${h}'`).join("")}`,
+      // 'wasm-unsafe-eval' erlaubt NUR das Kompilieren von WebAssembly (kein
+      // eval, kein Inline-Skript): der QR-Decoder ZXing liegt als .wasm im
+      // Bundle und fiel ohne diese Freigabe im Build still auf jsQR zurück.
+      `script-src 'self' file: 'wasm-unsafe-eval'${hashes.map((h) => ` '${h}'`).join("")}`,
       "style-src 'self' file: 'unsafe-inline'",
       "img-src 'self' file: data: blob: https://erfassungsbogen.goatcounter.com",
       "font-src 'self' file: data:",
@@ -262,11 +266,72 @@ export default defineConfig({
         // wasm ebenso: der QR-Decoder (ZXing) liegt als WebAssembly-Datei im
         // Bundle — fehlte sie offline, fiele der Scanner auf jsQR mit
         // kleinerer Reichweite zurück.
-        globPatterns: ["**/*.{js,css,html,svg,png,webmanifest,woff2,wasm}"],
-        // Die Manifest-Screenshots braucht nur der Installationsdialog des
+        globPatterns: [
+          "**/*.{js,css,html,svg,png,webmanifest,woff2,wasm,json}",
+          "downloads/*.pdf",
+          // Fotos und Bildschirmfotos der Themenseiten und der Anleitung: nur die
+          // WebP-Fassung (die JPG/PNG-Rückfälle braucht kein heutiger Browser) und
+          // nur in der zweiten Stufe (precache-aufteilung.ts) — der Kern bleibt
+          // so groß wie er war (Audit Runde 5, R5-O4).
+          "bilder/**/*.webp",
+          "screenshots/**/*.webp",
+        ],
+        // downloads/*.pdf: der Blanko-Vordruck ist die Papier-Rückfallebene —
+        // gebraucht genau dann, wenn Gerät oder Netz ausfallen. Offline gab
+        // der direkte Aufruf ERR_INTERNET_DISCONNECTED (Audit Runde 2, R2-O7).
+        // json: die Beispielbögen (examples/**/*.json, ~450 kleine Dateien)
+        // werden erst beim Anklicken geladen — ohne Vorrat reagierte der
+        // Beispiele-Dialog offline gar nicht (Audit „Offline und Speicher", O2).
+        // Sie gehören seit R3-O3 zur zweiten Stufe (manifestTransforms unten).
+        // Die Manifest-Screenshots (PNG) braucht nur der Installationsdialog des
         // Browsers, nicht die laufende App — sie gehören nicht in den
-        // Offline-Vorrat, den jedes Gerät beim ersten Aufruf mitlädt.
-        globIgnores: ["screenshots/**"],
+        // Offline-Vorrat, den jedes Gerät beim ersten Aufruf mitlädt. Ihre
+        // WebP-Fassungen stehen auf den Themenseiten und kommen mit der zweiten
+        // Stufe (R5-O4).
+        globIgnores: ["screenshots/**/*.png"],
+        // Zwei Stufen (Audit Runde 3, R3-O3): Beispielbögen und Themen-/
+        // Länderseiten bleiben aus dem Precache, damit der Service Worker nach
+        // dem Kern (Bogen, PDF, QR, Empfang) aktiv wird. Die Startseite lädt
+        // sie danach nach (src/app/offline-vorrat.ts) — Liste und Umfang des
+        // Kerns stehen in offline-zusatz.json (scripts/precache-aufteilung.ts).
+        manifestTransforms: [
+          async (eintraege) => {
+            const { kern, umfang } = vorratAufteilen(eintraege);
+            writeFileSync(fileURLToPath(new URL(`./dist/${ZUSATZ_DATEI}`, import.meta.url)), JSON.stringify(umfang));
+            return { manifest: kern, warnings: [] };
+          },
+        ],
+        // Die zweite Stufe: Beispielbögen tragen einen Hash im Namen (ändern
+        // sich nie) → aus dem Cache; Seiten und die Liste selbst → erst Netz,
+        // ohne Netz aus dem Cache.
+        runtimeCaching: [
+          {
+            urlPattern: ({ url, sameOrigin }) => sameOrigin && /\/assets\/[^/]+\.json$/.test(url.pathname),
+            handler: "CacheFirst",
+            options: { cacheName: "eeb-zusatz", expiration: { maxEntries: 1500 } },
+          },
+          {
+            // Fotos der Themenseiten: ohne Hash im Namen, darum im Hintergrund
+            // auffrischen statt für immer aus dem Cache (R5-O4).
+            urlPattern: ({ url, sameOrigin }) => sameOrigin && /\/(?:bilder|screenshots)\/[^/]+\.(?:webp|jpg|png)$/.test(url.pathname),
+            handler: "StaleWhileRevalidate",
+            options: { cacheName: "eeb-zusatz", expiration: { maxEntries: 1500 } },
+          },
+          {
+            // R7-O6: Themenseiten im Vorrat kommen sofort aus dem Gerät und werden im Hintergrund
+            // aufgefrischt. Vorher wartete NetworkFirst im Funkloch mit Balken 1,3 s (R6-O3: 5 s)
+            // auf das Netz. Nicht im Vorrat: ohne Cache-Treffer geht die Anfrage wie sonst ins Netz.
+            urlPattern: ({ url, sameOrigin }) => sameOrigin && /\.html$/.test(url.pathname),
+            handler: "StaleWhileRevalidate",
+            options: { cacheName: "eeb-zusatz" },
+          },
+          {
+            // Die Liste des Vorrats selbst bleibt netzzuerst: Sie sagt, was nachzuladen ist.
+            urlPattern: ({ url, sameOrigin }) => sameOrigin && url.pathname.endsWith("/offline-zusatz.json"),
+            handler: "NetworkFirst",
+            options: { cacheName: "eeb-zusatz", networkTimeoutSeconds: 1 }, // R6-O3: im Funkloch nach 1 s aus dem Gerät, nicht nach 5 s
+          },
+        ],
         // Das Haupt-Bundle (React, pdfmake, THW-OV-Verzeichnis …) ist ~3 MB und
         // damit größer als Workbox' 2-MiB-Standard. Es IST die App-Shell und muss
         // für den Offline-Start precacht werden – Limit entsprechend anheben.

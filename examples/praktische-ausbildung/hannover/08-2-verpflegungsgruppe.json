@@ -1,0 +1,59 @@
+{
+  "schemaVersion": 9,
+  "uebung": true,
+  "stand": 2171520,
+  "einheit": {
+    "organisation": 6,
+    "einheitsTyp": {
+      "freitext": "2. Verpflegungsgruppe Landeshauptstadt Hannover"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "code": 1
+        },
+        "name": "Hannover-Wasserturm"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 1508,
+    "zeitraumBis": 1508,
+    "ortAuftrag": "Praktische Ausbildung (Übung): Einlagen Kräfte, Landeshauptstadt Hannover"
+  },
+  "personalErfassung": 1,
+  "personal": [],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "GW-Verpflegung"
+      },
+      "kennzeichen": "H-JU XXX"
+    },
+    {
+      "typ": {
+        "freitext": "FKH"
+      },
+      "kennzeichen": "H-JU XXX"
+    },
+    {
+      "typ": {
+        "freitext": "MTW"
+      },
+      "kennzeichen": "H-JU XXX"
+    },
+    {
+      "typ": {
+        "freitext": "Anh. Kühlung"
+      },
+      "kennzeichen": "H-JU XXX"
+    }
+  ],
+  "staerkeManuell": {
+    "fuehrer": 0,
+    "unterfuehrer": 1,
+    "mannschaft": 8,
+    "gesamt": 9
+  },
+  "sonstiges": "Fachdienst: Verpflegung. Hauptleistung: Verpflegung (250 Pers.). Kommunikation: Rufname Akkon."
+}

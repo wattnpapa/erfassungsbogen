@@ -17,7 +17,9 @@
  * überschreiben.
  */
 
-import { useEffect, useRef, useState, type FormEvent, type ReactNode } from "react";
+import { useEffect, useRef, useState, type FormEvent, type MouseEvent, type ReactNode } from "react";
+import { ortSperren } from "./tipp-schutz";
+import { ersteEbeneBetreten, ersteEbeneVerlassen } from "./modal-overlay";
 
 /** Ein Eingabefeld einer Abfrage. `name` ist der Schlüssel im Ergebnis. */
 export type Eingabefeld = {
@@ -58,6 +60,8 @@ type Wahlabfrage = {
   wege: Antwortweg[];
   /** Beschriftung des Abbruchknopfes. */
   abbruch: string;
+  /** `abbruch`: Der Fokus liegt beim Öffnen auf „Abbrechen", auch ohne zerstörende Wahl (R7-E4). */
+  fokus?: "abbruch";
 };
 
 type Hinweisabfrage = {
@@ -153,8 +157,9 @@ export function frageWahl(a: {
   text: ReactNode;
   wege: Antwortweg[];
   abbruch?: string;
+  fokus?: "abbruch";
 }): Promise<string | null> {
-  return stellen({ art: "wahl", titel: a.titel, text: a.text, wege: a.wege, abbruch: a.abbruch ?? "Abbrechen" });
+  return stellen({ art: "wahl", titel: a.titel, text: a.text, wege: a.wege, abbruch: a.abbruch ?? "Abbrechen", fokus: a.fokus });
 }
 
 /** Ja/Nein-Rückfrage — der Ersatz für `window.confirm`. */
@@ -166,11 +171,14 @@ export async function frageJaNein(a: {
   abbruch?: string;
   /** Zerstörende Aktion: Knopf in der Alarmfarbe. */
   gefahr?: boolean;
+  /** `abbruch`: Der Fokus liegt auf „Abbrechen", der Wahl, die nichts verändert (R7-E4). */
+  fokus?: "abbruch";
 }): Promise<boolean> {
   const wahl = await frageWahl({
     titel: a.titel,
     text: a.text,
     abbruch: a.abbruch,
+    fokus: a.fokus,
     wege: [{ wert: "ja", label: a.ok ?? "Fortfahren", gefahr: a.gefahr }],
   });
   return wahl === "ja";
@@ -199,6 +207,32 @@ export function zeigeHinweis(a: {
 // ------------------------------------------------------------------ Anzeige
 
 /**
+ * Prellschutz: So lange nach dem Öffnen nimmt das Fenster keinen Tipp an.
+ * Die Rückfrage erscheint in Bildmitte, oft genau unter dem Finger, der den
+ * Löschknopf gerade getroffen hat — ein prellender Handschuh oder ein
+ * Doppeltipp bestätigte sie dann gleich mit (Audit Runde 2, R2-G1). Tastatur
+ * (Enter, Esc) ist nicht betroffen: ein Klick aus der Tastatur trägt
+ * `detail === 0`.
+ *
+ * Das allein reichte nicht: Ein zögernder zweiter Tipp kommt mit Handschuh
+ * bis zu einer Sekunde später, und nach 551 ms bestätigte er „Person
+ * entfernen", nach 574 ms „Einsatz löschen" (Audit Runde 4, R4-G1). Darum
+ * sperrt das Fenster beim Öffnen zusätzlich die Stelle des auslösenden Tipps
+ * für `ORTSSPERRE_MS` (1,5 s, tipp-schutz.ts) — derselbe Schutz wie nach
+ * „Abrücken". Ein Tipp daneben, etwa auf „Abbrechen", wirkt nach dem
+ * Prellschutz sofort.
+ */
+// Der Prüfstand (features/support/haken.ts) setzt ihn vor dem Laden auf 0.
+let prellschutzMs: number = (globalThis as { __EEB_PRELLSCHUTZ_MS?: number }).__EEB_PRELLSCHUTZ_MS ?? 450;
+
+/** Für Tests: Prellschutz setzen (0 = aus). Gibt den alten Wert zurück. */
+export function prellschutzSetzen(ms: number): number {
+  const alt = prellschutzMs;
+  prellschutzMs = ms;
+  return alt;
+}
+
+/**
  * Die eine Stelle, an der Abfragen erscheinen. Die App hängt sie einmal ein
  * (siehe `App`); Tests, die eine einzelne Komponente rendern, brauchen sie
  * ebenfalls, sonst wartet ein `await frageJaNein(...)` ewig.
@@ -219,6 +253,21 @@ export function Dialogschicht() {
 function Dialogfenster({ abfrage }: { abfrage: Abfrage }) {
   const dialog = useRef<HTMLDialogElement>(null);
   const erstes = useRef<HTMLInputElement | HTMLTextAreaElement | null>(null);
+  const abbruchKnopf = useRef<HTMLButtonElement>(null);
+  const rumpf = useRef<HTMLDivElement>(null);
+  const geoeffnetUm = useRef(Date.now());
+  const eigeneEbene = useRef(false);
+
+  /** Zeiger-Klicks kurz nach dem Öffnen verschlucken (siehe `prellschutzMs`). */
+  function prellschutz(e: MouseEvent<HTMLFormElement>) {
+    // Mit zerstörender Wahl länger: Ein zögernder Zweittipp kam bis ~0,6 s später (R4-G1); weil die
+    // Ortssperre die Knöpfe der Rückfrage nicht mehr erfasst (R8-H5), trägt der Prellschutz das allein.
+    const dauer = prellschutzMs === 0 ? 0 : abfrage.art === "wahl" && abfrage.wege.some((w) => w.gefahr) ? Math.max(prellschutzMs, 800) : prellschutzMs;
+    if (e.detail > 0 && Date.now() - geoeffnetUm.current < dauer) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+  }
   const [werte, setWerte] = useState<Record<string, string>>(() =>
     abfrage.art === "eingabe"
       ? Object.fromEntries(abfrage.felder.map((f) => [f.name, f.vorgabe ?? f.auswahl?.[0]?.wert ?? ""]))
@@ -232,12 +281,33 @@ function Dialogfenster({ abfrage }: { abfrage: Abfrage }) {
 
   useEffect(() => {
     dialog.current?.showModal();
+    geoeffnetUm.current = Date.now();
+    // Auf dem ersten Verlaufseintrag verließe Zurück sonst die App (R5-S5).
+    eigeneEbene.current = ersteEbeneBetreten() || eigeneEbene.current; // StrictMode ruft den Effekt zweimal auf
+    // Die Fingerstelle des Auslösers: Dort liegt jetzt womöglich der
+    // bestätigende Knopf (R4-G1).
+    // Die Sperre gilt hinter dem Dialog (R8-H5, R8-S4): Tipps auf die Knöpfe der Rückfrage selbst
+    // fängt nur der Prellschutz ab, ein bewusster Tipp nach dem Lesen geht durch.
+    ortSperren(undefined, undefined, { nurAusserhalbRueckfrage: true });
     // Wie beim alten `window.prompt` steht eine Vorgabe markiert da:
     // weitertippen ersetzt sie, ohne sie erst löschen zu müssen. Vor dem
     // `showModal()` geht das nicht — ein geschlossener Dialog ist unsichtbar
     // und nichts darin fokussierbar.
-    erstes.current?.focus();
+    // preventScroll: Der Fokus auf einen Knopf am Ende riss den Dialog bis ganz
+    // unten; die Überschrift und die Frage lagen dann über der Kante (R7-E4).
+    erstes.current?.focus({ preventScroll: true });
     erstes.current?.select();
+    // Steht eine zerstörende Antwort im Dialog, liegt der Fokus auf dem Weg,
+    // der nichts verändert: Vorher hatte der rote Knopf ihn, und ein Enter
+    // oder ein Tipp auf den hervorgehobenen Knopf ersetzte (Audit Runde 4,
+    // R4-E2).
+    if (abfrage.art === "wahl" && (abfrage.fokus === "abbruch" || abfrage.wege.some((w) => w.gefahr))) {
+      abbruchKnopf.current?.focus({ preventScroll: true });
+    }
+    // Die Frage steht beim Öffnen zuerst im Bild, auch bei großer Schrift.
+    rumpf.current?.scrollTo?.(0, 0);
+    if (dialog.current) dialog.current.scrollTop = 0;
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- nur beim Öffnen; jede Abfrage hat ein eigenes Fenster
   }, []);
 
   /** Pflichtfeld noch leer → die bejahende Antwort bleibt gesperrt. */
@@ -263,10 +333,20 @@ function Dialogfenster({ abfrage }: { abfrage: Abfrage }) {
    * `close()` und damit hier vorbei — die Zusage wird genau einmal eingelöst.
    */
   function beiSchluss() {
+    if (eigeneEbene.current) {
+      eigeneEbene.current = false;
+      ersteEbeneVerlassen();
+    }
     const wert = dialog.current?.returnValue ?? "";
     if (abfrage.art === "hinweis") {
       beantworten(undefined);
     } else if (abfrage.art === "wahl") {
+      // Nach einer bestätigten zerstörenden Antwort rückt oft die nächste
+      // Karte unter den Finger (Person entfernen: ihr Knopf liegt dort, wo
+      // eben die Bestätigung lag). Auch die Stelle der Bestätigung bleibt
+      // gesperrt, und jeder dort verworfene Nachtipp verlängert die Sperre
+      // (R5-S3).
+      if (wert && abfrage.wege.some((w) => w.gefahr)) ortSperren(undefined, undefined, { verlaengern: true });
       beantworten(wert || null);
     } else {
       beantworten(
@@ -283,9 +363,25 @@ function Dialogfenster({ abfrage }: { abfrage: Abfrage }) {
     </button>
   );
 
+  // Ein oder zwei Wege ohne Erklärtext stehen mit „Abbrechen" am festen Fuß; Wege mit
+  // Erklärtext rollen im Rumpf, damit die Erklärung beim Knopf bleibt (R7-W1).
+  const wegeImFuss = abfrage.art === "wahl" && abfrage.wege.length <= 2 && abfrage.wege.every((w) => !w.hinweis);
+  const wegKnopf = (w: Antwortweg, i: number) => (
+    <div className="abfrage-weg" key={w.wert}>
+      <button type="submit" value={w.wert} className={w.gefahr ? "gefahr" : i === 0 ? "primaer" : ""}>
+        {w.label}
+      </button>
+      {w.hinweis && <p className="hinweis">{w.hinweis}</p>}
+    </div>
+  );
+
   return (
     <dialog ref={dialog} className="abfrage" aria-label={abfrage.titel} onClose={beiSchluss}>
-      <form onSubmit={absenden}>
+      <form onSubmit={absenden} onClickCapture={prellschutz}>
+        {/* Zwei Bereiche: Frage und Wege rollen im Rumpf, die Antwortzeile am
+            Fuß steht fest. Der Fuß klebte vorher per `sticky` im selben
+            Rollbereich und deckte bei großer Schrift die Wahl darüber (R7-W1). */}
+        <div className="abfrage-rumpf" ref={rumpf}>
         <h2>{abfrage.titel}</h2>
 
         {abfrage.art === "eingabe" && (
@@ -329,38 +425,13 @@ function Dialogfenster({ abfrage }: { abfrage: Abfrage }) {
                 )}
               </label>
             ))}
-            <div className="abfrage-aktionen">
-              <button type="submit" value="ok" className="primaer" disabled={unvollstaendig}>
-                {abfrage.ok}
-              </button>
-              {abbrechen}
-            </div>
           </>
         )}
 
         {abfrage.art === "wahl" && (
           <>
             <p>{abfrage.text}</p>
-            {abfrage.wege.map((w, i) => (
-              <div className="abfrage-weg" key={w.wert}>
-                <button
-                  type="submit"
-                  value={w.wert}
-                  className={w.gefahr ? "gefahr" : i === 0 ? "primaer" : ""}
-                >
-                  {w.label}
-                </button>
-                {w.hinweis && <p className="hinweis">{w.hinweis}</p>}
-              </div>
-            ))}
-            {/* Steht eine zerstörende Antwort im Dialog, rückt „Abbrechen"
-                sichtbar ab: Beide Knöpfe lagen keine zwei Fingerbreit
-                auseinander, und der obere ist der, der nichts zurücknimmt. */}
-            <div className={`abfrage-aktionen${abfrage.wege.some((w) => w.gefahr) ? " abgesetzt" : ""}`}>
-              <button type="button" onClick={() => dialog.current?.close("")}>
-                {abfrage.abbruch}
-              </button>
-            </div>
+            {!wegeImFuss && abfrage.wege.map((w, i) => wegKnopf(w, i))}
           </>
         )}
 
@@ -376,12 +447,39 @@ function Dialogfenster({ abfrage }: { abfrage: Abfrage }) {
                 ref={merkeErstes}
               />
             )}
-            <div className="abfrage-aktionen">
-              <button type="submit" value="ok" className="primaer">
-                {abfrage.ok}
+          </>
+        )}
+        </div>
+
+        {abfrage.art === "eingabe" && (
+          <div className="abfrage-aktionen">
+            <button type="submit" value="ok" className="primaer" disabled={unvollstaendig}>
+              {abfrage.ok}
+            </button>
+            {abbrechen}
+          </div>
+        )}
+
+        {abfrage.art === "wahl" && (
+          <div className="abfrage-fuss">
+            {wegeImFuss && abfrage.wege.map((w, i) => wegKnopf(w, i))}
+            {/* Steht eine zerstörende Antwort im Dialog, rückt „Abbrechen"
+                sichtbar ab: Beide Knöpfe lagen keine zwei Fingerbreit
+                auseinander, und der obere ist der, der nichts zurücknimmt. */}
+            <div className={`abfrage-aktionen${abfrage.wege.some((w) => w.gefahr) ? " abgesetzt" : ""}`}>
+              <button type="button" ref={abbruchKnopf} onClick={() => dialog.current?.close("")}>
+                {abfrage.abbruch}
               </button>
             </div>
-          </>
+          </div>
+        )}
+
+        {abfrage.art === "hinweis" && (
+          <div className="abfrage-aktionen">
+            <button type="submit" value="ok" className="primaer">
+              {abfrage.ok}
+            </button>
+          </div>
         )}
       </form>
     </dialog>

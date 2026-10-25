@@ -11,6 +11,7 @@
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
+import { WERKZEUGE } from "../src/app/werkzeuge";
 
 const WURZEL = join(import.meta.dirname, "..");
 const PUBLIC = join(WURZEL, "public");
@@ -505,4 +506,23 @@ describe("Content-Seiten unter public/", () => {
     expect(regel).toMatch(/border-bottom:\s*0/);
     expect(regel).not.toMatch(/var\(--blau/);
   });
+});
+
+describe("Werkzeugzeile", () => {
+
+  it.each(SEITEN.filter((d) => lies(d).includes("<footer")))(
+    "%s: die Werkzeuge stehen als letzte Zeile der Fußzeile",
+    (datei) => {
+      const fuss = lies(datei).match(/<footer[^>]*>([\s\S]*?)<\/footer>/)![1]!;
+      const zeile = fuss.match(/<nav class="werkzeuge" aria-label="Weitere Werkzeuge">([\s\S]*?)<\/nav>\s*<!-- WERKZEUGE:END -->\s*$/);
+      expect(zeile).not.toBeNull();
+      const ziele = [...zeile![1]!.matchAll(/<a href="([^"]+)">([^<]+)<\/a>/g)].map((m) => [m[1], m[2]]);
+      expect(ziele).toEqual(WERKZEUGE.map((w) => [w.href, w.label]));
+      // Trenner als eigenes, verborgenes Element zwischen den Links.
+      expect(zeile![1]!.match(/<span class="werkzeuge-trenner" aria-hidden="true">·<\/span>/g)).toHaveLength(WERKZEUGE.length - 1);
+      // Keine zweite Erwähnung derselben Werkzeuge an anderer Stelle der Fußzeile.
+      const rest = fuss.replace(zeile![0], "");
+      for (const w of WERKZEUGE) expect(rest).not.toContain(w.href);
+    },
+  );
 });

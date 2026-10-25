@@ -6,12 +6,12 @@ Funktionalität: Einsatz-Sammlung führen (Meldekopf)
 
   Grundlage:
     Angenommen ich öffne einen geteilten Bogen-Link eines alten Bogens
-    Wenn ich auf "In Einsatz aufnehmen…" klicke
-    Und ich auf "Neuen Einsatz anlegen…" klicke
+    Wenn ich auf "In Einsatz-Sammlung ablegen…" klicke
+    Und ich auf "Neue Sammlung anlegen…" klicke
     Und ich im Dialog "Name" mit "Hochwasser Weser" fülle
     Und ich im Dialog auf "Einsatz anlegen" klicke
     Dann sehe ich die Überschrift "Hochwasser Weser"
-    Und sehe ich die Überschrift "Einheiten (1)"
+    Und sehe ich die Überschrift "Einheiten (1 gemeldet"
 
   Szenario: Die Sammlung summiert Stärke und Bedarf über alle Einheiten
     Dann sehe ich die Überschrift "Bedarf (anwesende Einheiten)"
@@ -28,9 +28,9 @@ Funktionalität: Einsatz-Sammlung führen (Meldekopf)
 
   Szenario: Abgerückte Einheit zählt nicht mehr in die Summe
     Wenn ich auf "Abrücken" klicke
-    Dann sehe ich die Schaltfläche "Als anwesend"
+    Dann sehe ich die Schaltfläche "Wieder anwesend"
     Und sehe ich den Hinweis "abgerückt"
-    Wenn ich auf "Als anwesend" klicke
+    Wenn ich auf "Wieder anwesend" klicke
     Dann sehe ich die Schaltfläche "Abrücken"
 
   Szenario: Einheit einem Zug zuordnen
@@ -47,12 +47,13 @@ Funktionalität: Einsatz-Sammlung führen (Meldekopf)
     Dann sehe ich die Schaltfläche "Zug zuordnen"
 
   Szenario: Bogen aufteilen — der Fachberater steht plötzlich einzeln
-    Wenn ich auf "Aufteilen…" klicke
+    Wenn ich auf "Mehr…" klicke
+    Und ich auf "Aufteilen…" klicke
     Dann sehe ich den Hinweis "Der abgeteilte Teil braucht eine Bezeichnung."
     Wenn ich das Feld "Bezeichnung des abgeteilten Teils" mit "Fachberater" fülle
     Und ich "Rudolph, Johannes" ankreuze
     Und ich auf "Aufteilen" klicke
-    Dann sehe ich die Überschrift "Einheiten (2)"
+    Dann sehe ich die Überschrift "Einheiten (2 gemeldet"
     Und sehe ich den Hinweis "Fachberater"
     Und sehe ich den Hinweis "abgeteilt aus"
     # Die Stärke verteilt sich, sie verschwindet nicht: aus 1 / 0 / 2 / 3 werden
@@ -61,14 +62,16 @@ Funktionalität: Einsatz-Sammlung führen (Meldekopf)
     Und sehe ich den Hinweis "Stärke 0 / 0 / 2 / 2"
 
   Szenario: Aufgeteilte Teile wieder zusammenführen — der Zug sammelt sich
-    Wenn ich auf "Aufteilen…" klicke
+    Wenn ich auf "Mehr…" klicke
+    Und ich auf "Aufteilen…" klicke
     Und ich das Feld "Bezeichnung des abgeteilten Teils" mit "Fachberater" fülle
     Und ich "Rudolph, Johannes" ankreuze
     Und ich auf "Aufteilen" klicke
-    Dann sehe ich die Überschrift "Einheiten (2)"
+    Dann sehe ich die Überschrift "Einheiten (2 gemeldet"
     # Zusammenführen wird erst angeboten, wenn es einen zweiten Teil gibt — und
     # nur zeilenweise: nach der Aufteilung trägt jede Zeile den Knopf.
-    Wenn ich bei der Einheit "Fachberater" auf "Zusammenführen…" klicke
+    Wenn ich bei der Einheit "Fachberater" auf "Mehr…" klicke
+    Und ich bei der Einheit "Fachberater" auf "Zusammenführen…" klicke
     Und ich das Feld "Bezeichnung danach" mit "" fülle
     Und ich auf "Zusammenführen" klicke
     # Die Einheit steht wieder mit ihrer vollen Stärke da, nichts doppelt.
@@ -77,33 +80,40 @@ Funktionalität: Einsatz-Sammlung führen (Meldekopf)
     Und sehe ich den Hinweis "aufgegangen in"
 
   Szenario: Ohne zweiten Teil gibt es nichts zusammenzuführen
+    Wenn ich auf "Mehr…" klicke
     Dann sehe ich die Schaltfläche "Zusammenführen…" nicht
 
   Szenario: Aufteilen abbrechen ändert nichts
-    Wenn ich auf "Aufteilen…" klicke
+    Wenn ich auf "Mehr…" klicke
+    Und ich auf "Aufteilen…" klicke
     Und ich das Feld "Bezeichnung des abgeteilten Teils" mit "Fachberater" fülle
     Und ich "Rudolph, Johannes" ankreuze
     Und ich auf "Abbrechen" klicke
-    Dann sehe ich die Überschrift "Einheiten (1)"
+    Dann sehe ich die Überschrift "Einheiten (1 gemeldet"
 
   Szenario: Meldung entfernen fragt in der App zurück
-    Wenn ich auf "Entfernen" klicke
+    Wenn ich auf "Mehr…" klicke
+    Und ich auf "Entfernen" klicke
     Dann sehe ich den Dialog "Meldung entfernen?"
     Wenn ich im Dialog auf "Meldung entfernen" klicke
-    Dann sehe ich die Überschrift "Einheiten (0)"
+    Dann sehe ich die Überschrift "Einheiten (0 gemeldet"
     Und sehe ich den Hinweis "Noch keine Meldung."
 
+  # Seit R3-S1/R3-D2 fragt „Bogen öffnen" nur, wenn wirklich ein angefangener
+  # Bogen ersetzt würde. Nach dem Ablegen liegt keiner vor — früher fragte die
+  # App beim Kaltstart trotzdem, gegen den eben empfangenen Bogen selbst.
   Szenario: Folgemeldung derselben Einheit wandert in die Historie
     Wenn ich denselben Bogen-Link erneut öffne
-    Und ich im Dialog auf "Meldung öffnen" klicke
+    Und ich im Dialog auf "Bogen öffnen (ansehen oder bearbeiten)" klicke
+    Dann ist kein Dialog offen
     Und ich zum Schritt "5. Sofortbedarf" wechsle
     Und ich das Feld "Sonstiges (Freitext)" mit "Ablösung angefordert" fülle
     Und ich zum Schritt "6. Übersicht" wechsle
-    Und ich auf "In Einsatz aufnehmen…" klicke
+    Und ich auf "In Einsatz-Sammlung ablegen…" klicke
     Und ich auf "Hochwasser Weser" klicke
     Dann sehe ich den Dialog "Einheit ist bereits gemeldet"
     Wenn ich im Dialog auf "Als neue Fassung anhängen" klicke
-    Dann sehe ich die Überschrift "Einheiten (1)"
+    Dann sehe ich die Überschrift "Einheiten (1 gemeldet"
     Und sehe ich die Schaltfläche "Historie (2)"
     Wenn ich auf "Änderungen" klicke
     Dann sehe ich den Hinweis "Auftrag / Sonstiges"
@@ -111,28 +121,59 @@ Funktionalität: Einsatz-Sammlung führen (Meldekopf)
 
   Szenario: Dieselbe Einheit lässt sich getrennt weiterführen
     Wenn ich denselben Bogen-Link erneut öffne
-    Und ich im Dialog auf "Meldung öffnen" klicke
+    Und ich im Dialog auf "Bogen öffnen (ansehen oder bearbeiten)" klicke
+    Dann ist kein Dialog offen
     Und ich zum Schritt "5. Sofortbedarf" wechsle
     Und ich das Feld "Sonstiges (Freitext)" mit "zweiter Trupp" fülle
     Und ich zum Schritt "6. Übersicht" wechsle
-    Und ich auf "In Einsatz aufnehmen…" klicke
+    Und ich auf "In Einsatz-Sammlung ablegen…" klicke
     Und ich auf "Hochwasser Weser" klicke
     Und ich im Dialog auf "Als eigene Einheit führen" klicke
-    Dann sehe ich die Überschrift "Einheiten (2)"
+    Dann sehe ich die Überschrift "Einheiten (2 gemeldet"
+
+  # R5-S7: Die Wahl „Wohin damit?" nennt die Folge schon unter „Bogen öffnen"
+  # (der eigene Bogen wird ersetzt, samt Rückholplatz); eine zweite, gleichlautende
+  # Rückfrage „Empfangenen Bogen öffnen?" folgt nicht mehr.
+  Szenario: Ein Bogen-Link nennt vor dem Ersetzen des eigenen angefangenen Bogens die Folge und fragt einmal
+    Wenn ich auf "‹ Startseite" klicke
+    Und ich auf "Neuen Bogen erstellen" klicke
+    Und ich das Feld "Ort der Einheit (Pflicht)" mit "Eigenstadt" fülle
+    Und ich denselben Bogen-Link erneut öffne
+    Dann sehe ich den Hinweis "Ersetzt deinen angefangenen Bogen"
+    Und sehe ich den Hinweis "Eigenstadt"
+    Wenn ich im Dialog auf "Bogen öffnen (ansehen oder bearbeiten)" klicke
+    Dann ist kein Dialog offen
+    Und sehe ich die Übersicht mit dem Standort "Oldenburg - Ni"
 
   Szenario: Einheit manuell in den Einsatz erfassen
     Wenn ich auf "Einheit manuell erfassen…" klicke
     Dann sehe ich den Schritt "1. Einheit"
     Wenn ich das Feld "Organisation" auf "Feuerwehr" stelle
-    Und ich das Feld "Name (Pflicht)" mit "Wardenburg" fülle
+    Und ich das Feld "Ort der Einheit (Pflicht)" mit "Wardenburg" fülle
     Und ich zum Schritt "6. Übersicht" wechsle
     Dann sehe ich die Schaltfläche "In Einsatz übernehmen"
     Wenn ich auf "In Einsatz übernehmen" klicke
+    Dann sehe ich den Dialog "Stärke fehlt"
+    Wenn ich im Dialog auf "Trotzdem mit Stärke 0 übernehmen" klicke
     Dann sehe ich die Überschrift "Hochwasser Weser"
-    Und sehe ich die Überschrift "Einheiten (2)"
+    Und sehe ich die Überschrift "Einheiten (2 gemeldet"
+    Und sehe ich den Text "Stärke fehlt"
+
+  # R3-N1: Eine Einheit ohne Stärke lag früher ohne Rückfrage als „0 / 0 / 0"
+  # in der Lage. „Stärke eintragen" führt zu den Zählern statt abzulegen.
+  Szenario: Ohne Stärke führt die Rückfrage zu den Zählern
+    Wenn ich auf "Einheit manuell erfassen…" klicke
+    Und ich das Feld "Organisation" auf "Feuerwehr" stelle
+    Und ich das Feld "Ort der Einheit (Pflicht)" mit "Wardenburg" fülle
+    Und ich zum Schritt "6. Übersicht" wechsle
+    Und ich auf "In Einsatz übernehmen" klicke
+    Dann sehe ich den Dialog "Stärke fehlt"
+    Wenn ich im Dialog auf "Stärke eintragen" klicke
+    Dann sehe ich den Schritt "3. Personal"
+    Und sehe ich die Schaltfläche "In Einsatz übernehmen"
 
   Szenario: Sammel-PDF bündelt alle Bögen in einer Datei
-    Wenn ich auf "Sammel-PDF (alle Bögen)" klicke und eine Datei erhalte
+    Wenn ich auf "Einsatz weitergeben / sichern" klicke und eine Datei erhalte
     Dann heißt die heruntergeladene Datei wie "eeb-einsatz-*.pdf"
 
   Szenario: CSV-Übersicht für die Lagekarte
@@ -147,24 +188,45 @@ Funktionalität: Einsatz-Sammlung führen (Meldekopf)
     Wenn ich auf "Excel-Liste (Format „Oldenburg“)" klicke und eine Datei erhalte
     Dann heißt die heruntergeladene Datei wie "eeb-einsatz-*-oldenburg.xlsx"
 
+  # Nachlieferung an den Stab: Abends geht alles hinaus, morgens nur, was
+  # seitdem dazukam. Ohne neue Bögen bleibt der Ausgabeweg gesperrt, statt
+  # eine leere Datei zu erzeugen. Jedes Format hat seinen eigenen Bezugspunkt:
+  # die CSV für die eigene Liste verbraucht den Nachtrag-PDF und die
+  # Excel-Liste nicht (Audit Runde 4, R4-W2).
+  Szenario: Nach dem Export lassen sich nur die seitdem neuen Bögen weitergeben
+    Dann sehe ich den Hinweis "Noch kein Export aus diesem Einsatz"
+    Wenn ich auf "Übersicht als CSV" klicke und eine Datei erhalte
+    Dann sehe ich den Hinweis "seitdem keine neuen Bögen"
+    Wenn ich "Nur neue Bögen seit dem letzten Export" ankreuze
+    Dann ist die Schaltfläche "Übersicht als CSV" gesperrt
+    Und ist die Schaltfläche "Sammel-PDF (erste Lieferung: alle Bögen)" bedienbar
+    Und ist die Schaltfläche "Excel-Liste (Format „Oldenburg“)" bedienbar
+    Wenn ich die Einheit "DLRG" "Wardenburg" manuell in den Einsatz aufnehme
+    Dann sehe ich den Hinweis "seitdem 1 neuer Bogen"
+    Und ist die Schaltfläche "Übersicht als CSV" bedienbar
+    Wenn ich auf "Übersicht als CSV" klicke und eine Datei erhalte
+    Dann sehe ich den Hinweis "seitdem keine neuen Bögen"
+    Und ist die Schaltfläche "Übersicht als CSV" gesperrt
+    Und ist die Schaltfläche "Excel-Liste (Format „Oldenburg“)" bedienbar
+
   Szenario: Gelöschter Einsatz liegt im Papierkorb und kommt zurück
     Wenn ich auf "Einsatz löschen…" klicke
     Und ich im Dialog auf "In den Papierkorb" klicke
     Dann sehe ich die Schaltfläche "Neuen Bogen erstellen"
-    Und sehe ich die Schaltfläche "Papierkorb (1)"
-    Wenn ich auf "Papierkorb (1)" klicke
+    Und sehe ich die Schaltfläche "Papierkorb Einsätze (1)"
+    Wenn ich auf "Papierkorb Einsätze (1)" klicke
     Und ich auf "Wiederherstellen" klicke
     Dann sehe ich die Schaltfläche "Öffnen"
 
   Szenario: Einsatz endgültig löschen fragt in der App zurück
     Wenn ich auf "Einsatz löschen…" klicke
     Und ich im Dialog auf "In den Papierkorb" klicke
-    Und ich auf "Papierkorb (1)" klicke
+    Und ich auf "Papierkorb Einsätze (1)" klicke
     Und ich auf "Endgültig löschen…" klicke
     Dann sehe ich den Dialog "Einsatz endgültig löschen?"
     Und sehe ich den Hinweis "Darin stecken fremde Personendaten"
     Wenn ich im Dialog auf "Endgültig löschen" klicke
-    Dann sehe ich die Schaltfläche "Papierkorb (1)" nicht
+    Dann sehe ich die Schaltfläche "Papierkorb Einsätze (1)" nicht
 
   Szenario: Bei einer einzigen Meldung bleibt die Filterleiste weg
     Dann sehe ich "Suche" nicht
@@ -173,12 +235,12 @@ Funktionalität: Einsatz-Sammlung führen (Meldekopf)
   # fehlende Funktion aussah — ab der zweiten Meldung steht sie da.
   Szenario: Mit der zweiten Meldung erscheint die Filterleiste
     Wenn ich die Einheit "DLRG" "Wardenburg" manuell in den Einsatz aufnehme
-    Dann sehe ich die Überschrift "Einheiten (2)"
+    Dann sehe ich die Überschrift "Einheiten (2 gemeldet"
     Und sehe ich den Text "Suche"
 
   Szenario: Die Sammel-PDF bringt die ganze Sammlung auf ein leeres Gerät
-    Wenn ich auf "Sammel-PDF (alle Bögen)" klicke und eine Datei erhalte
-    Und ich auf "‹ Einsätze" klicke
+    Wenn ich auf "Einsatz weitergeben / sichern" klicke und eine Datei erhalte
+    Und ich auf "‹ Startseite" klicke
     Und ich auf "Alle Daten löschen" klicke
     Und ich im Dialog "Ja, alle lokalen Daten dieser App endgültig löschen" ankreuze
     Und ich im Dialog auf "Endgültig löschen" klicke
@@ -186,11 +248,11 @@ Funktionalität: Einsatz-Sammlung führen (Meldekopf)
     Dann sehe ich "Hochwasser Weser" nicht
     Wenn ich die zuletzt erhaltene Datei über "Einsatz importieren…" einlese
     Dann sehe ich die Überschrift "Hochwasser Weser"
-    Und sehe ich die Überschrift "Einheiten (1)"
+    Und sehe ich die Überschrift "Einheiten (1 gemeldet"
     Und führt die Einheitenliste "THW" an Stelle 1
 
   Szenario: Zurück zur Startseite listet den Einsatz mit seinen Summen
-    Wenn ich auf "‹ Einsätze" klicke
+    Wenn ich auf "‹ Startseite" klicke
     Dann sehe ich die Überschrift "Einsatz-Sammlung (Meldekopf)"
     Und sehe ich die Überschrift "Hochwasser Weser"
     Und sehe ich den Hinweis "1 Einheit(en) anwesend"
