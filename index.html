@@ -6199,6 +6199,38 @@
     .scanner-bildweg { display: grid; gap: 0.6rem; justify-items: center; }
     .scanner-bildweg .datei-knopf { min-width: min(100%, 18rem); justify-content: center; }
     /* ===== Ende Runde 17 (Neuer Nutzer) ===== */
+    /* ===== Runde 17 (Rest) ===== */
+    /* R17-S5/D2: Zeilenknöpfe ▲ ▼ ⇑ ✕ der Personenzeile (Kurz-Liste): mindestens 8 px Lücke (Pfeile 12 px, zum ✕ 12 px), Tippfläche 44 px.
+       Bis 24 rem Rahmenbreite (Telefon) stehen die Stelle und darunter die vier Knöpfe in je einer eigenen Reihe. */
+    @container (max-width: 44rem) {
+      table.uebersicht.schnell-tabelle tr { column-gap: 12px; }
+      table.uebersicht.schnell-tabelle td.sortier-spalte + td > button,
+      table.uebersicht.schnell-tabelle .sortieren > button { min-width: 44px; min-height: 44px; }
+      table.uebersicht.schnell-tabelle .sortieren { gap: 12px; }
+      /* R17-S6: Dienststelle je Person in voller Breite mit sichtbarer Beschriftung statt eines 42-px-Kästchens. */
+      table.uebersicht.schnell-tabelle td:nth-child(6) { grid-column: 1 / -1; grid-row: 5; position: relative; min-width: 12rem; }
+      table.uebersicht.schnell-tabelle td:nth-child(6)::before {
+        content: "Dienststelle"; content: "Dienststelle" / "";
+        position: absolute; top: 4px; left: 11px; z-index: 1; display: block; margin: 0; pointer-events: none;
+        max-width: calc(100% - 26px); font-size: min(var(--t-xs), 11px); line-height: 1.1; font-weight: 600; color: var(--text-2);
+        white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      }
+      table.uebersicht.schnell-tabelle td:nth-child(6) input:not([type="checkbox"]):not([type="radio"]) { width: 100%; min-width: 12rem; padding-top: 16px; padding-bottom: 1px; padding-inline: 10px; }
+    }
+    @container (min-width: 17rem) and (max-width: 24rem) {
+      table.uebersicht.schnell-tabelle td.stelle { grid-column: 1 / -1; grid-row: 1; }
+      table.uebersicht.schnell-tabelle td.sortier-spalte { grid-column: 1 / -1; grid-row: 2; justify-self: start; max-width: calc(100% - 56px); }
+      table.uebersicht.schnell-tabelle td.sortier-spalte + td { grid-column: 1 / -1; grid-row: 2; justify-self: end; }
+      table.uebersicht.schnell-tabelle .sortieren { flex-wrap: wrap; gap: 12px; }
+      table.uebersicht.schnell-tabelle td:nth-child(2), table.uebersicht.schnell-tabelle td:nth-child(3) { grid-row: 3; }
+      table.uebersicht.schnell-tabelle td:nth-child(4), table.uebersicht.schnell-tabelle td:nth-child(5) { grid-row: 4; }
+    }
+    @container (min-width: 24.01rem) and (max-width: 44rem) {
+      table.uebersicht.schnell-tabelle .sortieren { flex-wrap: nowrap; gap: 8px; }
+    }
+    /* R17-D7: „Endgültig löschen" und „Abbrechen" im Dialog „Alle Daten löschen" liegen mindestens 16 px auseinander. */
+    dialog .dialog-entscheidung > .aktionen { gap: 16px; row-gap: 16px; }
+    /* ===== Ende Runde 17 (Rest) ===== */
   </style>
 </head>
 <body>

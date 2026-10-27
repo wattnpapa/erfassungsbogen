@@ -38,3 +38,26 @@ R17-S1, R17-D1.
 | [Mobile-UI](mobile-ui.md) | 0 | 0 | 0 | 4 |
 | Summe der Berichte | 0 | 0 | 4 | 88 |
 | Summe ohne Doppelungen (Verlaufstabelle) | 0 | 0 | 4 | 68 |
+
+## Stand der Behebung (27.10.2026)
+
+Alle Befunde sind bearbeitet. Behoben: alle bis auf einen Teilpunkt: R17-H1
+(Sprung der Startseite beim Erstbesuch) ist nur teilweise nachgestellt; die
+Offline-Zeile hat jetzt eine feste Höhe, der Wechsel von der statischen Startseite
+zur React-Ansicht ist lokal nicht reproduzierbar. Im echten Browser
+(Produktionsbuild, Playwright) gemessen sind unter anderem R17-K1, A2, A7/K5/N2,
+E6/K4, K3, K12, E2/D6, E5/O2/S10/W5, D1, S1, S11, A4/O1/D4, G4/M3, G2, H7/K6/G5,
+H8/K7/G7, G12, G14, L1, S5/D2, S6, D7. Bundle-Budget neu gesetzt
+(Startbündel 1 209 290 Byte; Lagemonitor wird nachgeladen). Neue Speicherschlüssel
+`eeb.meldungen-papierkorb.v1` (localStorage, 7 Tage) und `eeb.karte-offen.v1`
+(sessionStorage). Arc42, ISK und DSFA nachgezogen.
+
+| Gruppe | Stand | Umsetzung |
+| --- | --- | --- |
+| P2 A1, K1, S1, D1 | behoben | WC/Dusche statt Unterbringung ohne Anforderung; Alter bleibt bei „Als Einsatzmeldung zählen…" und „Stärke ändern…"; Rückgängig für „so gezählt" erscheint; StAN-Vorbelegung mit Folgen und Rückgängig |
+| Startseite, Sortierung | behoben | Einsatz einmal, Anwesende vor Abgerückten |
+| Exporte | behoben | Nachtrag-Spalte, Typografie, Einzelbogen mit Dateinamen, Fortschritt „n von m" |
+| Neuladen | behoben | aufgeklappte Karte bleibt offen, Zurück-Geste führt zur Startseite, entfernte Meldungen 7 Tage im Papierkorb |
+| „Namen einfügen…" | behoben | eine Rückfrage zur Reihenfolge, Rufnummern am Zeilenende, Funktionswörter |
+| Layout Assistent und Einsatzansicht | behoben | Fußleiste 57 px, Quittung neben Ansichtsleiste, Kernspalten in der Tabelle, Abstände, 44-px-Verweise |
+| Texte | behoben | Zeitraum/Uhrzeit, CSV-Erklärung, Scanner ohne Kamera, Schnellerfassung, Lagemonitor |
