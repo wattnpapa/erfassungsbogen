@@ -137,6 +137,8 @@ main.lm h1, main.lm h2, main.lm th, main.lm summary, main.lm dt { color: var(--l
 .lm-bewegungen { flex: none; padding: 0.05em 0.2em; font-size: min(2.9vh, 3.6vw); }
 .lm-bewegung { text-align: center; }
 .lm-weitere-bewegungen { opacity: 0.9; }
+/* Angaben der Lagezeile bleiben ungeteilt; umbrochen wird nur zwischen ihnen (R17-K11). */
+.lm-nb { white-space: nowrap; }
 /* Liste bleibt im Bild: ab dieser Höhe rollt sie in sich (kein Überlauf der Seite, R6-L2). */
 
 /* Knöpfe in der Schrift des Monitors, nicht als weiße App-Knöpfe (R6-L6). */
@@ -164,11 +166,12 @@ main.lm h1, main.lm h2, main.lm th, main.lm summary, main.lm dt { color: var(--l
   .lm-einheiten-block { flex: none; min-height: 0; }
   .lm-tabelle { flex: none; overflow-x: auto; }
   .lm-einheiten { font-size: 1em; }
-  /* Die Leiste „Stufe / Dunkler / Heller" steht im ersten Bild ganz oben; der Fuß löst sich dafür in die Spalte des Monitors auf. */
+  /* Die Lage steht im ersten Bild (Funkrufname, Stärke, Einheiten); die Leiste „Stufe / Dunkler / Heller" folgt ganz am Ende (R17-K11).
+     Der Fuß löst sich dafür in die Spalte des Monitors auf. */
   .lm-fuss { display: contents; }
   .lm-fuss > .lm-klapp { width: 100%; box-sizing: border-box; margin-top: 8px; }
   .lm-fuss > .lm-klapp:first-child { margin-top: 0; }
-  .lm-stufenleiste { order: -1; margin-bottom: 6px; }
+  .lm-stufenleiste { order: 99; margin-top: 8px; }
   .lm-knopf { padding: 0.2em 1em; }
   .lm-r1 { font-size: calc(var(--lm-b) * 1.3); }
   .lm-r2 { font-size: var(--lm-b); }

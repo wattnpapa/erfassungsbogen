@@ -31,6 +31,7 @@
 import { MeldeStatus, neuesteJeEinheit, revisionen, type MeldeEintrag } from "@bos/meldekopf/einsaetze";
 import { einsaetzeLaden as kernEinsaetzeLaden, einsaetzePapierkorb as kernEinsaetzePapierkorb } from "@bos/meldekopf/einsaetze";
 import { sammlungenSchreiben } from "./eintrag-zeiten";
+import { angabenErben } from "./angaben-alter";
 
 declare module "@bos/meldekopf/einsaetze" {
   interface MeldeEintrag {
@@ -253,6 +254,19 @@ export function fassungObenauf(einsatzId: string, eintragId: string): boolean {
   const hinter = Math.max(...andere.filter((x) => x.bogen.stand === e.bogen.stand).map((x) => x.empfangenAm), -Infinity) + 1;
   if (e.empfangenAm >= hinter) return false;
   e.empfangenAm = hinter;
+  sammlungenSchreiben(liste);
+  return true;
+}
+
+/**
+ * Die Handänderung `eintragId` („Stärke ändern…", Kennzeichnung) übernimmt das Alter der Angaben von `vorgaengerin`
+ * (R17-K1): Karte, Kopf, Monitor und Lageblatt messen weiter ab der Meldung der Einheit, nicht ab dem Tippen am Meldekopf.
+ */
+export function angabenVermerken(einsatzId: string, eintragId: string, vorgaengerin: MeldeEintrag, kennzeichnung = false): boolean {
+  const liste = alleSammlungen();
+  const e = liste.find((x) => x.id === einsatzId)?.eintraege.find((x) => x.id === eintragId);
+  if (!e) return false;
+  e.angaben = angabenErben(vorgaengerin, kennzeichnung);
   sammlungenSchreiben(liste);
   return true;
 }

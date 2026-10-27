@@ -50,6 +50,16 @@ function kameraRat(err: unknown): KameraFehler {
   }
 }
 
+/** „QR aus Bild einlesen…": ein Foto oder Bildschirmfoto des Codes statt der Kamera. */
+function BildKnopf({ onBild, klasse }: { onBild: (e: ChangeEvent<HTMLInputElement>) => void; klasse?: string }) {
+  return (
+    <label className={`datei-knopf${klasse ? ` ${klasse}` : ""}`}>
+      QR aus Bild einlesen…
+      <input type="file" accept="image/*" onChange={onBild} className="nur-sr" />
+    </label>
+  );
+}
+
 /** Verweigert bleibt verweigert — hier lohnt kein zweiter Anlauf. */
 function istVerweigert(err: unknown): boolean {
   return err instanceof Error && (err.name === "NotAllowedError" || err.name === "SecurityError");
@@ -405,7 +415,15 @@ export function QrScannerWeb(props: {
              die Mitte des Bildschirms, dort wo sonst der Suchrahmen steht,
              statt als Nachsatz unter der Fehlermeldung zu stehen. */
           <div className="scanner-handscanner">
-            <p className="handscanner-titel">{fehler ? "Ohne Kamera: mit dem USB-Handscanner scannen" : "Mit dem USB-Handscanner scannen"}</p>
+            {/* Am Telefon ohne Kamera ist das Foto oder der Bildschirmfoto des Codes der naheliegende Weg, der USB-Handscanner die
+                Ausnahme: Der Bildknopf steht deshalb oben im Rahmen, der Handscanner darunter (R17-N8). */}
+            {fehler && props.onBild && (
+              <div className="scanner-bildweg">
+                <p className="handscanner-titel">Am Telefon: Foto oder Bildschirmfoto des Codes einlesen</p>
+                <BildKnopf onBild={props.onBild} klasse="primaer" />
+              </div>
+            )}
+            <p className="handscanner-titel">{fehler ? "Oder mit dem USB-Handscanner scannen" : "Mit dem USB-Handscanner scannen"}</p>
             <ol className="scanner-schritte">
               <li>QR-Code des Erfassungsbogens auf Papier oder Bildschirm anvisieren.</li>
               <li>Am Handscanner auslösen — dieses Fenster nimmt den Code sofort an, ohne Klick in ein Feld.</li>
@@ -461,12 +479,7 @@ export function QrScannerWeb(props: {
             ? <button type="button" onClick={() => wegWaehlen("kamera")}>Kamera verwenden</button>
             : <button type="button" onClick={() => wegWaehlen("handscanner")}>Handscanner statt Kamera</button>
         )}
-        {props.onBild && (
-          <label className="datei-knopf">
-            QR aus Bild einlesen…
-            <input type="file" accept="image/*" onChange={props.onBild} className="nur-sr" />
-          </label>
-        )}
+        {props.onBild && !fehler && <BildKnopf onBild={props.onBild} />}
         <button type="button" onClick={props.onAbbruch}>{props.abbruchText ?? "Abbrechen"}</button>
       </div>
     </dialog>

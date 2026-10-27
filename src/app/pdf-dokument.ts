@@ -41,16 +41,19 @@ import {
   zeitgruppe,
   pruefpunkte,
   bogenAnonymisiert,
+  datumAnzeige,
   type QrSatz,
   zeitpunktDeutsch,
 } from "./hilfen";
 import { bedarfNichtErfasst, mwdText, summiereBoegen, unterbringungAngefordertText, verpflegungText, type EinsatzSummen } from "./auswertung";
 import { EINTREFF_HINWEIS, zeitLang } from "./eintrag-zeiten";
-import { angabenAlterWort, angabenZeit } from "./angaben-alter";
+import { angabenAlterWort, angabenZeit, type AngabenSeit } from "./angaben-alter";
 import { bedarfOhneAngabeText, kraftstoffTeile, lageblattAlterText, lageblattZeilenAlter, staerkeSummenText, zugAlterText } from "./lagemonitor";
 import { ANONYM_BEMERKUNG_VERMERK, ANONYM_PAPIER_VERMERK, ANONYM_PERSONAL_SATZ, codeGueltigBisText } from "./anonym-hinweis";
-import { bedarfMarken, datumVonMs, lueckenAlle, rueckkehrText } from "./einheiten-tabelle";
-import { FELD_GESAMTSTAERKE, bogenDiff, diffZeilen, type BogenDiff } from "@bos/meldekopf/meldung-diff";
+import { anfuehrung } from "./typografie";
+import { bedarfMarken, datumVonMs, einheitenZahl, lueckenAlle, rueckkehrText } from "./einheiten-tabelle";
+import { FELD_GESAMTSTAERKE, diffZeilen } from "@bos/meldekopf/meldung-diff";
+import { bogenDiff, type BogenDiff } from "./diff-lage";
 import { fahrzeugSymbolSvg } from "./taktische-zeichen-bogen";
 import { orgFarbe } from "./org-farben";
 import { BERUF_PRAEFIX, berufText, qualifikationenUndBerufe } from "./beruf";
@@ -217,7 +220,8 @@ const WINANSI_ERSATZ: Record<string, string> = {
  * statt eines Fremdzeichens. Gilt für alle Texte der Dokumente, auch für Freitext
  * der Bögen, den niemand prüft.
  */
-export function winAnsiText(text: string): string {
+export function winAnsiText(eingabe: string): string {
+  const text = anfuehrung(eingabe); // R17-W3: „…“ statt „…"
   let aus = "";
   let geaendert = false;
   for (const z of text) {
@@ -509,6 +513,8 @@ export interface UebersichtEintrag {
   zeitUnbestaetigt?: boolean;
   /** Die Eintreffzeit ist die Zeit des Einlesens am Gerät, nicht vom Meldeblock oder von Hand bestätigt (R14-A1). */
   zeitEingelesen?: boolean;
+  /** Alter der Angaben nach einer Handänderung am Meldekopf: das der Vorgängerin (R17-K1). */
+  angaben?: AngabenSeit;
   /** Der Stand des Bogens liegt nach dem Eingang am Gerät: Geräteuhr oder Absenderuhr falsch (R13-A3, R14-A2). */
   standNachEintreffen?: boolean;
   /** Die Signatur passt nicht zu den Daten: unterwegs verändert oder beschädigt (R15-E1). */
@@ -572,10 +578,11 @@ export function aenderungFuerPapier(zeile: string): string {
 }
 
 /** Zeitpunkt auf dem Blatt — immer mit Datum: gelesen wird es auch morgen noch. */
-function alterMarke(e: { empfangenAm?: number; bogen: Erfassungsbogen }, erstellt: number): Content[] {
+function alterMarke(e: { empfangenAm?: number; bogen: Erfassungsbogen; angaben?: AngabenSeit }, erstellt: number): Content[] {
   if (e.empfangenAm == null) return [];
   // Alter der Angaben (Stand), nicht des Eintreffens; „Stand vor …", wenn der Bogen schon vor dem Eingang alt war (R14-K1).
-  const m = { empfangenAm: e.empfangenAm, bogen: e.bogen };
+  // Nach einer Handänderung am Meldekopf gilt das Alter der Meldung davor (R17-K1).
+  const m = { empfangenAm: e.empfangenAm, bogen: e.bogen, angaben: e.angaben };
   const t = lageblattZeilenAlter(angabenZeit(m), erstellt, angabenAlterWort(m));
   return t ? [{ text: t, bold: true, fontSize: 7 }] : [];
 }
@@ -726,16 +733,32 @@ export const EINGELESEN_FUSSNOTE = `* ${EINTREFF_HINWEIS}`;
 /** So viele Zeichen der Bemerkung stehen auf dem Lageblatt, der Rest in der Sammel-PDF. */
 const BEMERKUNG_LAGEBLATT = 70;
 
+/**
+ * Bemerkung der Einheit für das Blatt, in Klammern (R17-W4): gekürzt an einer Wortgrenze — nie mitten in „StAN“ —, und das
+ * Blatt sagt, wo der Rest steht (R5-A9). Eigene Klammern der Bemerkung werden eckig, damit keine Klammer in der Klammer steht.
+ */
+export function bemerkungKurz(bemerkung: string, kuerzen?: number): string {
+  let b = bemerkung.trim();
+  if (!b) return "";
+  const umschlossen = b.startsWith("(") && b.endsWith(")") && !b.slice(1, -1).includes(")(");
+  if (umschlossen) b = b.slice(1, -1).trim();
+  b = b.replace(/\(/g, "[").replace(/\)/g, "]");
+  if (kuerzen != null && b.length > kuerzen) {
+    let teil = b.slice(0, kuerzen);
+    if (!/\s/.test(b.charAt(kuerzen)) && /\s/.test(teil)) teil = teil.replace(/\s+\S*$/, "");
+    return `(${teil.replace(/[\s,;:.([-]+$/, "")} … Rest: Sammel-PDF)`;
+  }
+  return `(${b})`;
+}
+
 /** Zelle „Auftrag / Notiz (Bemerkung der Einheit)": Auftrag oben, Bemerkung kursiv darunter (R3-K3). */
 function bemerkungZelle(notiz: string | undefined, sonstiges: string | undefined, kuerzen?: number, anonym = false): TableCell {
   const teile: Content[] = [];
   if (notiz?.trim()) teile.push({ text: weichUmbrechen(notiz.trim()) });
   // Anonymisiert: Die Bemerkung der Einheit ist mit der Frist entfallen; das Blatt sagt es (R13-A2).
   if (anonym) teile.push({ text: ANONYM_BEMERKUNG_VERMERK, italics: true, fontSize: 7 });
-  let b = sonstiges?.trim() ?? "";
-  // Gekürzt, und das Blatt sagt, wo der Rest steht (R5-A9) — sonst endete sie bei „… MTW OV zusätzlich über St …“.
-  if (kuerzen != null && b.length > kuerzen) b = `${b.slice(0, kuerzen).trimEnd()} … (Rest: Sammel-PDF)`;
-  if (b) teile.push({ text: weichUmbrechen(`(${b})`), italics: true });
+  const b = bemerkungKurz(sonstiges?.trim() ?? "", kuerzen);
+  if (b) teile.push({ text: weichUmbrechen(b), italics: true });
   if (teile.length === 0) return { text: "" };
   return teile.length === 1 ? (teile[0] as TableCell) : { stack: teile };
 }
@@ -1009,12 +1032,12 @@ function bedarfsTabelle(eintraege: UebersichtEintrag[], leer = false, nachtrag?:
     [{ text: "Betriebsstoff:", bold: true }, { text: kraftstoffText(s.kraftstoff) || "—" }],
     [
       { text: "Fahrzeuge / Ruhezeit:", bold: true },
-      { text: `${s.fahrzeuge} Fahrzeuge · Ruhezeit erforderlich bei ${s.ruhezeitErforderlich} Einheit(en)` },
+      { text: `${s.fahrzeuge} Fahrzeuge · Ruhezeit erforderlich bei ${einheitenZahl(s.ruhezeitErforderlich)}` },
     ],
   ];
   return {
     stack: [
-      { text: `${nachtrag ? "Bedarf Nachtrag" : "Bedarf gesamt"} (${s.einheiten} Einheiten, ${s.staerke.gesamt} Personen)`, bold: true, margin: [0, 6, 0, 4] },
+      { text: `${nachtrag ? "Bedarf Nachtrag" : "Bedarf gesamt"} (${einheitenZahl(s.einheiten)}, ${s.staerke.gesamt} Personen)`, bold: true, margin: [0, 6, 0, 4] },
       { table: { headerRows: 0, widths: [104, "*"], body }, margin: [0, 0, 0, 4] },
     ],
     unbreakable: true,
@@ -1033,7 +1056,7 @@ function zugSummenTabelle(eintraege: UebersichtEintrag[], nachtrag?: string, ers
     const k = e.zugEtikett ?? "";
     (nach.get(k) ?? nach.set(k, []).get(k)!).push(e.bogen);
     if (e.empfangenAm != null) {
-      const z = angabenZeit({ empfangenAm: e.empfangenAm, bogen: e.bogen });
+      const z = angabenZeit({ empfangenAm: e.empfangenAm, bogen: e.bogen, angaben: e.angaben });
       aeltester.set(k, Math.min(aeltester.get(k) ?? z, z));
     }
   }
@@ -1135,7 +1158,7 @@ function lageKopfleiste(eintraege: UebersichtEintrag[], leer = false, nachtrag?:
   const alterZeile =
     erstellt != null && !nachtrag
       ? lageblattAlterText(
-          eintraege.filter(zaehlend).flatMap((e) => (e.empfangenAm != null ? [angabenZeit({ empfangenAm: e.empfangenAm, bogen: e.bogen })] : [])),
+          eintraege.filter(zaehlend).flatMap((e) => (e.empfangenAm != null ? [angabenZeit({ empfangenAm: e.empfangenAm, bogen: e.bogen, angaben: e.angaben })] : [])),
           erstellt,
         )
       : null;
@@ -2116,7 +2139,7 @@ export function pdfDokument(
     {
       text: blanko
         ? `${linie}______  –  ${linie}______`
-        : `${datumDeutsch(datumZuIso(b.einsatz.zeitraumVon))} – ${datumDeutsch(datumZuIso(b.einsatz.zeitraumBis))}`,
+        : `${datumAnzeige(b.einsatz.zeitraumVon)} – ${datumAnzeige(b.einsatz.zeitraumBis)}`,
       colSpan: 2,
     },
     {},

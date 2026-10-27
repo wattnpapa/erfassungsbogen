@@ -38,9 +38,79 @@ function abonnieren(h: () => void): () => void {
  * nach 40 Sekunden noch nichts sah, hielt die App für hängend. Einen Fortschritt „n von m" gibt es nicht: Die Erzeugung
  * läuft in einem Zug im Hauptfaden.
  */
-export function sammelPdfDauerText(boegen: number): string {
-  const s = Math.ceil(boegen * 1.5);
-  return `Die Sammel-PDF wird erzeugt — bei ${boegen} ${boegen === 1 ? "Bogen" : "Bögen"} am Telefon etwa ${s < 60 ? `${s} Sekunden` : `${Math.ceil(s / 60)} Min.`} oder länger. Nicht noch einmal tippen, Bildschirm anlassen.`;
+export function sammelPdfDauerText(boegen: number, gemessenSek?: number): string {
+  // Sobald die ersten Bögen vorbereitet sind, zählt die Messung an diesem Gerät, nicht die Pauschale (R17-A4).
+  if (gemessenSek != null) {
+    return `Die Sammel-PDF wird erzeugt — an diesem Gerät insgesamt etwa ${dauerText(gemessenSek)} (an den ersten Bögen gemessen). Nicht noch einmal tippen, Bildschirm und Seite offen lassen.`;
+  }
+  // 2 s je Bogen: gemessen 66 s für 30 Bögen bei sechsfach gedrosselter CPU (R17-O1).
+  return `Die Sammel-PDF wird erzeugt — bei ${boegen} ${boegen === 1 ? "Bogen" : "Bögen"} am Telefon etwa ${dauerText(Math.ceil(boegen * 2))} oder länger. Nicht noch einmal tippen, Bildschirm und Seite offen lassen.`;
+}
+
+function dauerText(s: number): string {
+  return s < 60 ? `${s} Sekunden` : `${Math.ceil(s / 60)} Min.`;
+}
+
+/**
+ * Wie oft die ganze Erzeugung dauert, gemessen an der Vorbereitung der Bögen (QR-Code, Übersicht): Im Browser gemessen
+ * 3,6- bis 4-mal so lang wie diese Vorbereitung allein (30 Bögen: 9,1 s gegenüber 2,5 s; mit vierfach gedrosselter CPU 43 s
+ * gegenüber 10 s). Das Setzen der Seiten und das Schreiben der Datei laufen danach ohne Zwischenstand im Hauptfaden.
+ */
+export const PDF_GESAMT_FAKTOR = 4.2;
+
+/** Zwischenstand einer laufenden Aktion: Satz, Schritt n von von (von = 0: kein Zähler). */
+export interface ArbeitFortschritt {
+  text: string;
+  n: number;
+  von: number;
+  /** An den ersten Bögen gemessene Gesamtdauer in Sekunden, in Fünferschritten; fehlt, solange zu wenig gemessen ist. */
+  schaetzungSek?: number;
+}
+
+let phaseStart = 0;
+let letzteSchaetzung: number | undefined;
+
+let fortschritt: ArbeitFortschritt | null = null;
+
+/** Zwischenstand der laufenden Aktion, sonst null (R17-O1/D4/A4: „Bogen 12 von 30"). */
+export function arbeitFortschritt(): ArbeitFortschritt | null {
+  return fortschritt;
+}
+
+/** Hook: Zwischenstand der laufenden Aktion; die Oberfläche zeichnet bei jedem Schritt neu. */
+export function useArbeitFortschritt(): ArbeitFortschritt | null {
+  return useSyncExternalStore(abonnieren, arbeitFortschritt, arbeitFortschritt);
+}
+
+/**
+ * Zwischenstand melden und der Oberfläche ein Bild geben, damit er erscheint, bevor der nächste schwere Schritt den
+ * Hauptfaden belegt. Außerhalb einer laufenden Aktion ohne Wirkung.
+ */
+export async function fortschrittMelden(text: string, n = 0, von = 0): Promise<void> {
+  if (aktuell === null) return;
+  const jetzt = zeitJetzt();
+  if (von > 0 && n === 0) {
+    phaseStart = jetzt;
+    letzteSchaetzung = undefined;
+  }
+  // Ab dem vierten vorbereiteten Bogen (und mindestens einer halben Sekunde Messung): Gesamtdauer hochrechnen, auf fünf Sekunden gerundet.
+  if (von > 0 && n >= 4 && jetzt - phaseStart >= 500) {
+    letzteSchaetzung = Math.max(5, Math.ceil(((jetzt - phaseStart) / n) * von * PDF_GESAMT_FAKTOR / 5000) * 5);
+  }
+  fortschritt = { text, n, von, ...(letzteSchaetzung != null ? { schaetzungSek: letzteSchaetzung } : {}) };
+  melden();
+  await naechstesBild();
+}
+
+/** Der Satz zum Zwischenstand, etwa „12 von 30 Bögen vorbereitet (QR-Code, Übersicht)". */
+export function fortschrittSatz(f: ArbeitFortschritt): string {
+  return f.von > 0 ? `${f.n} von ${f.von} ${f.text}` : f.text;
+}
+
+/** Schließt der Nutzer die Seite mitten in der Erzeugung, fragt der Browser nach (R17-O1). */
+function vorSchliessen(e: BeforeUnloadEvent): void {
+  e.preventDefault();
+  e.returnValue = "";
 }
 
 /** Name der gerade laufenden Aktion, sonst null. */
@@ -56,8 +126,16 @@ export function useArbeitet(): string | null {
 /** Der Oberfläche ein Bild geben (Sperre sichtbar machen), bevor schwere Arbeit den Hauptfaden belegt. */
 export function naechstesBild(): Promise<void> {
   return new Promise((fertig) => {
-    if (typeof requestAnimationFrame === "function") requestAnimationFrame(() => setTimeout(fertig, 0));
-    else setTimeout(fertig, 0);
+    let erledigt = false;
+    const los = () => {
+      if (erledigt) return;
+      erledigt = true;
+      fertig();
+    };
+    // Im verdeckten Tab ruft der Browser keinen Bildrückruf auf: Die Rückfallzeit hält die Erzeugung nicht an.
+    setTimeout(los, 250);
+    if (typeof requestAnimationFrame === "function") requestAnimationFrame(() => setTimeout(los, 0));
+    else setTimeout(los, 0);
   });
 }
 
@@ -68,13 +146,17 @@ export function naechstesBild(): Promise<void> {
 export async function arbeiten<T>(was: string, aktion: () => Promise<T>): Promise<{ lief: true; wert: T } | { lief: false }> {
   if (aktuell !== null) return { lief: false };
   aktuell = was;
+  fortschritt = null;
   lauf = { von: zeitJetzt(), bis: Infinity };
+  if (typeof window !== "undefined") window.addEventListener("beforeunload", vorSchliessen);
   melden();
   try {
     await naechstesBild();
     return { lief: true, wert: await aktion() };
   } finally {
     aktuell = null;
+    fortschritt = null;
+    if (typeof window !== "undefined") window.removeEventListener("beforeunload", vorSchliessen);
     if (lauf) lauf.bis = zeitJetzt();
     melden();
   }
@@ -108,6 +190,7 @@ export const NACHLAUF_MS = 1200;
 /** Nur für Tests. */
 export function arbeitetZuruecksetzen(): void {
   aktuell = null;
+  fortschritt = null;
   lauf = null;
   melden();
 }

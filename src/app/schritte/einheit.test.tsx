@@ -407,7 +407,7 @@ describe("Schritt Einheit — Beispiel im Einheitstyp (R3-H7)", () => {
   it("nennt beim THW THW-Einheiten statt „Löschzug, SEG Sanität“", () => {
     buehne();
     const feld = screen.getByRole("combobox", { name: "Einheitstyp" }) as HTMLInputElement;
-    expect(feld.placeholder).toBe("z. B. Bergungsgruppe, FGr Wasserschaden/Pumpen");
+    expect(feld.placeholder).toBe("z. B. Bergungsgruppe, FGr WP");
   });
 
   it("nennt bei der Feuerwehr Feuerwehr-Einheiten", () => {

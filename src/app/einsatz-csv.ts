@@ -19,7 +19,7 @@ import { geltendeJeEinheit } from "./fassung-vorrang";
 import { einheitAnzeigename, nurSollstaerke, orgLabel, vokabText, vokabularFuer, zeitpunktDeutsch } from "./hilfen";
 import { meldungsNummern, pruefpunkteEintrag } from "./einheiten-tabelle";
 import { aktuelleMeldungen, unterbringungLage, verpflegungAngefordertLage, verpflegungLage, zaehltInLage } from "./auswertung";
-import { csvDatei, csvZeile } from "./csv";
+import { csvDatei, csvZeile, mitNachtragSpalte } from "./csv";
 import { exportKennzeile, nachtragGrundText, ortHinweisText, ortHinweise } from "./export-stand";
 import { EINTREFF_HINWEIS, HERKUNFT_TEXT, eintreffzeit, eintreffzeitUnbestaetigt, zeitLang } from "./eintrag-zeiten";
 import { MeldeStatus, type Einsatzsammlung, type MeldeEintrag, type MeldeQuelle } from "@bos/meldekopf/einsaetze";
@@ -301,14 +301,20 @@ export function einsatzCsvInhalt(
   const neu = zaehlende.filter((e) => gruende[e.einheitSchluessel]?.neu);
   const geaendert = zaehlende.filter((e) => gruende[e.einheitSchluessel] && !gruende[e.einheitSchluessel]!.neu);
   const seit = s.nachtragSeit != null ? ` seit ${zeitLang(s.nachtragSeit)}` : "";
-  return csvDatei([
-    kopf,
-    ...zeilen,
-    summenZeile(neu, `Summe Nachtrag — nur neue Einheiten (${neu.length}${sollAnteilText(neu)})`, true),
-    ...(geaendert.length > 0
-      ? [summenZeile(geaendert, `Geänderte Einheiten (${geaendert.length}) — ersetzen ihre Zeile der letzten Lieferung, NICHT zur Summe addieren`, true)]
-      : []),
-    csvZeile([`NACHTRAG${seit} — nicht die ganze Lage (${alle.length} ${alle.length === 1 ? "Einheit" : "Einheiten"} in dieser Datei)`]),
-    ...fuss,
-  ]);
+  return csvDatei(
+    mitNachtragSpalte(
+      [
+        kopf,
+        ...zeilen,
+        summenZeile(neu, `Summe Nachtrag — nur neue Einheiten (${neu.length}${sollAnteilText(neu)}), kein Gesamtstand`, true),
+        ...(geaendert.length > 0
+          ? [summenZeile(geaendert, `Geänderte Einheiten (${geaendert.length}) — ersetzen ihre Zeile der letzten Lieferung, NICHT zur Summe addieren`, true)]
+          : []),
+        csvZeile([`NACHTRAG${seit} — nicht die ganze Lage (${alle.length} ${alle.length === 1 ? "Einheit" : "Einheiten"} in dieser Datei)`]),
+        ...fuss,
+      ],
+      `NACHTRAG${seit} — nicht die ganze Lage`,
+      zeilen.length,
+    ),
+  );
 }

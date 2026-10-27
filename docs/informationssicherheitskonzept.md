@@ -357,6 +357,15 @@ Grundlage: Repository `wattnpapa/erfassungsbogen`, Stand 2026-09-12 — Version 
 > und `vendor/` unverändert. Der Entwurf trägt zusätzlich die Marke „über die
 > Startseite verlassen" (`fremd.startseite`, R5-N3, 3.3 D1) — keine Daten.
 
+> **Nachgezogen 2026-10-27 (Runde 17):** Audit Runde 17. Speicher (3.3, 5.5): neuer
+> Schlüssel `eeb.meldungen-papierkorb.v1` (localStorage, Namen von Personen, 7 Tage,
+> 20 je Sammlung; über die Präfixregel `eeb.` in Sicherung und Löschweg enthalten)
+> und `eeb.karte-offen.v1` (sessionStorage). Wiederherstellbarkeit (5.5):
+> „Meldung entfernen" ist über das Neuladen hinaus rückgängig zu machen. Exporte
+> (5.4): Nachtrag-Kennzeichnung in jeder CSV-Zeile, Einzelbogen-Download mit
+> sprechendem Namen. Lieferkette (6.4): Startbündel 1,21 MB, Lagemonitor nachgeladen.
+> Keine neuen Hosts, CSP und Transportformat unverändert.
+
 > **Nachgezogen 2026-10-26 (Runde 16):** Audit Runde 16. Speicher (3.3, 5.5): neuer
 > Schlüssel `eeb.einsatz.rueckweg` (sessionStorage, 15 Minuten); der Zwischenstand des
 > Papierabgleichs wird bei „Endgültig löschen" und für verschwundene Einsätze

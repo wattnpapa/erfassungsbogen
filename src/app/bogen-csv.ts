@@ -53,7 +53,7 @@ import {
 } from "@bos/eeb-format/model";
 import {
   FE_TEXT,
-  datumDeutsch,
+  datumAnzeige,
   einheitAnzeigename,
   einheitOrt,
   fahrzeugSitzplaetze,
@@ -65,7 +65,7 @@ import {
   vokabularFuer,
   zeitpunktDeutsch,
 } from "./hilfen";
-import { csvDatei, csvZeile, jaNein } from "./csv";
+import { csvDatei, csvZeile, jaNein, mitNachtragSpalte } from "./csv";
 import { berufText, qualifikationenUndBerufe } from "./beruf";
 import { telefonAlsTabellenText } from "./telefon-eingabe";
 import { EINTREFF_HINWEIS, HERKUNFT_TEXT, eintreffzeit, eintreffzeitUnbestaetigt, zeitLang } from "./eintrag-zeiten";
@@ -201,7 +201,7 @@ const STATUS_TEXT: Record<MeldeStatus, string> = {
 const QUELLE_TEXT: Record<MeldeQuelle, string> = HERKUNFT_TEXT;
 
 function datumText(d: EebDatum | undefined): string {
-  return d != null ? datumDeutsch(datumZuIso(d)) : "";
+  return d != null ? datumAnzeige(d) : "";
 }
 
 /**
@@ -361,13 +361,15 @@ function bogenSaetze(b: Erfassungsbogen, k: Kontext): Satz[] {
   ];
 }
 
-function zuDatei(saetze: Satz[], zusatzSpalte?: { name: string; werte: (satz: Satz, index: number) => string; schluss?: string }, fuss: string[] = []): string {
+function zuDatei(saetze: Satz[], zusatzSpalte?: { name: string; werte: (satz: Satz, index: number) => string; schluss?: string; vorspalte?: string }, fuss: string[] = []): string {
   const kopf = csvZeile([...SPALTEN, ...(zusatzSpalte ? [zusatzSpalte.name] : [])]);
   const zeilen = saetze.map((s, i) => csvZeile([...SPALTEN.map((sp) => s[sp] ?? ""), ...(zusatzSpalte ? [zusatzSpalte.werte(s, i)] : [])]));
   // Schlusszeilen (Nachtrag R5-K6, Lage und Erstellzeit R16-A1): ein Satz „Hinweis" mit dem Text im ersten Feld.
   const hinweis = (text: string) => csvZeile([text, ...SPALTEN.slice(1).map((sp) => (sp === "Satzart" ? "Hinweis" : "")), ...(zusatzSpalte ? [""] : [])]);
   const schluss = [...(zusatzSpalte?.schluss ? [hinweis(zusatzSpalte.schluss)] : []), ...fuss.map(hinweis)];
-  return csvDatei([kopf, ...zeilen, ...schluss]);
+  const datei = [kopf, ...zeilen, ...schluss];
+  // Nachtrag: eine erste Spalte trägt den Vermerk schon in Zeile 1 (R17-A3, W2, K9).
+  return csvDatei(zusatzSpalte?.vorspalte ? mitNachtragSpalte(datei, zusatzSpalte.vorspalte, zeilen.length) : datei);
 }
 
 // --------------------------------------------------------------- Öffentlich
@@ -438,5 +440,6 @@ export function einsatzDetailCsvInhalt(
     name: "Im Nachtrag wegen",
     werte: (_satz, i) => nachtragGrundText(gruende[einheitJeSatz[i]!]),
     schluss: `NACHTRAG${seit} — nicht die ganze Lage (${meldungen.length} ${meldungen.length === 1 ? "Einheit" : "Einheiten"} in dieser Datei)`,
+    vorspalte: `NACHTRAG${seit} — nicht die ganze Lage`,
   }, fuss);
 }

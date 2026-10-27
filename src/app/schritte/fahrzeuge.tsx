@@ -265,6 +265,24 @@ function Transportbilanz({ bogen }: Pick<SchrittProps, "bogen">) {
   );
 }
 
+/**
+ * Was die Fahrzeugliste an eigenen Eingaben trägt — das, was „StAN-Vorbelegung laden" überschreibt (R17-D1):
+ * Kennzeichen (mit Wortlaut), Funkrufnamen, Sitzplatzangaben, Sondergerät und Angaben zur StAN-Ausstattung. Leer, wenn nichts da ist.
+ */
+export function eigeneAngaben(liste: readonly Fahrzeug[]): string {
+  const kennzeichen = liste.map((f) => f.kennzeichen?.trim()).filter((k): k is string => !!k);
+  const zaehl = (n: number, einzahl: string, mehrzahl: string) => (n === 0 ? null : n === 1 ? `1 ${einzahl}` : `${n} ${mehrzahl}`);
+  return [
+    kennzeichen.length > 0 ? `Kennzeichen ${kennzeichen.join(", ")}` : null,
+    zaehl(liste.filter((f) => f.funkrufname != null).length, "Funkrufname", "Funkrufnamen"),
+    zaehl(liste.filter((f) => f.sitzplaetze != null).length, "Sitzplatzangabe", "Sitzplatzangaben"),
+    zaehl(liste.filter((f) => !!f.aenderungen?.trim()).length, "Sondergerät/Änderung", "Sondergeräte/Änderungen"),
+    zaehl(liste.filter((f) => f.stanKonform != null).length, "Angabe zur StAN-Ausstattung", "Angaben zur StAN-Ausstattung"),
+  ]
+    .filter((t): t is string => t != null)
+    .join("; ");
+}
+
 export function SchrittFahrzeuge({ bogen, aendern }: SchrittProps) {
   // Als Objektidentität, nicht als Index: ein Index rutscht beim Löschen einer
   // anderen Karte auf eine bestehende und stempelte sie grundlos ein zweites
@@ -282,7 +300,7 @@ export function SchrittFahrzeuge({ bogen, aendern }: SchrittProps) {
   //
   // Der Rückweg liegt zusätzlich im Sitzungsspeicher dieses Tabs und überlebt Schrittwechsel und
   // Neuladen (15 Minuten, solange die Fahrzeugliste so bleibt), wie bei Personen (R9-D3).
-  type Rueckweg = { eintraege: { fahrzeug: Fahrzeug; index: number }[]; text: string; name: string; nonce: number };
+  type Rueckweg = { eintraege: { fahrzeug: Fahrzeug; index: number }[]; text: string; name: string; nonce: number; /** Die ganze bisherige Liste nach „StAN-Vorbelegung laden" (R17-D1). */ ersetzt?: Fahrzeug[] };
   const [rueckweg, setRueckwegRoh] = useState<Rueckweg | null>(() =>
     rueckwegHolen<Rueckweg>(FAHRZEUG_WEG_SCHLUESSEL, JSON.stringify(bogen.fahrzeuge)),
   );
@@ -294,6 +312,14 @@ export function SchrittFahrzeuge({ bogen, aendern }: SchrittProps) {
   const [zurueckgeholt, setZurueckgeholt] = useState<{ text: string; nonce: number } | null>(null);
   const rueckgaengig = () => {
     if (!rueckweg) return;
+    if (rueckweg.ersetzt) {
+      const alt = rueckweg.ersetzt;
+      setRueckweg(null);
+      setFrisch(null);
+      setZurueckgeholt({ text: `Zurückgeholt: ${alt.length === 1 ? "das bisherige Fahrzeug" : `die ${alt.length} bisherigen Fahrzeuge`} samt Kennzeichen`, nonce: Date.now() });
+      aendern({ fahrzeuge: alt });
+      return;
+    }
     const liste = [...bogen.fahrzeuge];
     // Aufsteigend einsetzen: Jede Stelle bezieht sich auf die Liste vor dem
     // Entfernen, in der die früheren Einträge schon wieder stehen.
@@ -395,15 +421,22 @@ export function SchrittFahrzeuge({ bogen, aendern }: SchrittProps) {
                 : undefined
             }
             onClick={async () => {
+              const alt = bogen.fahrzeuge;
+              const eigene = eigeneAngaben(alt);
               if (
-                bogen.fahrzeuge.length === 0 ||
+                alt.length === 0 ||
                 (await frageJaNein({
                   titel: "StAN-Vorbelegung laden?",
-                  text: `Die aktuelle Fahrzeugliste (${bogen.fahrzeuge.length} Fahrzeuge) wird durch die ${vorlage.length} Fahrzeuge der StAN ersetzt.`,
+                  text: `Die aktuelle Fahrzeugliste (${alt.length} Fahrzeuge) wird durch die ${vorlage.length} Fahrzeuge der StAN ersetzt.${eigene ? ` Verloren gehen dabei deine Eingaben: ${eigene}.` : ""} „Rückgängig“ in der Leiste unten stellt die bisherige Liste wieder her.`,
                   ok: "Ersetzen",
                 }))
               ) {
                 aendern({ fahrzeuge: vorlage });
+                // Ersetzen mit Rückweg wie Entfernen (R17-D1): die ganze bisherige Liste, samt Kennzeichen.
+                if (!alt.every(fahrzeugLeer)) {
+                  setZurueckgeholt(null);
+                  setRueckweg({ eintraege: [], ersetzt: alt, text: "StAN-Vorbelegung geladen:", name: `${alt.length === 1 ? "1 bisheriges Fahrzeug" : `${alt.length} bisherige Fahrzeuge`} ersetzt`, nonce: Date.now() }, vorlage);
+                }
               }
             }}
           >

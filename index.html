@@ -6028,6 +6028,177 @@
     }
     .quittung-daumen.quittung-kompakt > .quittung-knoepfe { margin-left: 0; gap: 8px; }
     /* ===== Ende Runde 16 (Zustand) ===== */
+    /* ===== Runde 17 (Inhalte) ===== */
+    /* R17-K4: Abschnitt „Abgerückt" am Ende der Einheitenliste. */
+    ul.einheiten-liste > li.einheiten-trenner { margin: var(--r-4) 0 var(--r-2); padding: var(--r-2) 0 0; border-top: 2px solid var(--linie-stark); font-size: var(--t-s); color: var(--text-2); }
+    /* R17-K12: Am Telefon steht im ersten Bild der Einsatzansicht die Lage (Kennzahlen, Neues, Bedarf, Zwischensummen); die vier
+       Erfassungsknöpfe folgen direkt vor der Einheitenliste. Nur die Reihenfolge der Darstellung ändert sich, die Dokumentreihenfolge
+       (Tab, Vorleseprogramm) bleibt. */
+    @media (max-width: 30rem) {
+      main.einsatz-detail { display: flex; flex-direction: column; }
+      main.einsatz-detail .einsatz-seite > .aktionen { order: 1; margin-top: var(--r-3); }
+      main.einsatz-detail > .einsatz-liste, main.einsatz-detail > .einsatz-liste ~ * { order: 2; }
+    }
+    /* R17-K12: Die Kennzahlen stehen am Telefon in drei Spalten; „Gesamt" schließt als breite Zelle ab. Die Zahlen der zweiten Zeile
+       beginnen dort, wo die der ersten beginnen — vorher saßen sie in 147 px breiten Zellen versetzt unter 98-px-Zellen. */
+    @media (16rem < width <= 30rem) {
+      html:not(.schrift-gross) .staerke-leiste:has(> div:nth-child(5)) { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      html:not(.schrift-gross) .staerke-leiste:has(> div:nth-child(5)) > div,
+      html:not(.schrift-gross) .staerke-leiste:has(> div:nth-child(5)) > div:nth-child(n + 4) { grid-column: span 1; }
+      html:not(.schrift-gross) .staerke-leiste:has(> div:nth-child(5)) > div.gesamt { grid-column: span 2; }
+    }
+    /* R17-K10: „Angaben vom Zettel (optional)" trägt ein Aufklappzeichen wie die übrigen Aufklapper. */
+    details.zettel-angaben > summary { list-style: none; }
+    details.zettel-angaben > summary::-webkit-details-marker { display: none; }
+    details.zettel-angaben > summary::before { content: "▸"; margin-right: var(--r-2); flex: none; }
+    details.zettel-angaben[open] > summary::before { content: "▾"; }
+    /* ===== Ende Runde 17 (Inhalte) ===== */
+    /* ===== Runde 17 (Zustand) ===== */
+    /* R17-S1: Die zerstörende Wahl einer Rückfrage („Zahlen stimmen, so gezählt") liegt nicht 12 px unter der Hauptaktion,
+       sondern mit Abstand: ein Handschuh trifft sonst die falsche Zeile. */
+    @media (min-height: 481px) {
+      dialog.abfrage .abfrage-weg + .abfrage-weg:has(> button.gefahr) { margin-top: 28px; }
+    }
+    /* R17-E1: Wahl der Namensreihenfolge in „Namen einfügen…": zwei große Ziele nebeneinander, bei Platzmangel untereinander. */
+    .reihenfolge-wahl { border: 0; padding: 0; margin: var(--r-3) 0; display: flex; flex-wrap: wrap; gap: var(--r-2) var(--r-4); }
+    .reihenfolge-wahl legend { padding: 0; margin-bottom: var(--r-1); font-weight: 600; }
+    .reihenfolge-wahl label.inline { min-height: 44px; display: inline-flex; align-items: center; gap: var(--r-2); }
+    /* ===== Ende Runde 17 (Zustand) ===== */
+    /* ===== Runde 17 (Layout) ===== */
+    /* R17-G4, M3, G2, G3, N7, H6: Fußleiste des Assistenten am Telefon (17 bis 36 rem Breite) einzeilig, 57 px statt 75 bis 128: „←", Abschluss und
+       „Weiter →" (als Wort, auch bei 320 px). „◐" entfällt dort (die Wahl steht im Kopf, nur einmal); im niedrigen Querformat bleibt sie, weil dort
+       der Kopf sie nicht trägt. „In Einsatz übernehmen" zeigt unter 20,25 rem Leistenbreite nur „Übernehmen" (der Name bleibt als aria-label). */
+    @media (min-width: 17rem) and (max-width: 35.99rem) and (not ((orientation: landscape) and (max-height: 31.25rem))) {
+      :root footer.nav.assistent-nav, :root footer.nav.assistent-nav.mit-uebernehmen {
+        grid-template-areas: "zurueck mitte weiter"; grid-template-columns: auto minmax(0, 1fr) auto;
+        column-gap: 8px; row-gap: 0; padding-top: 6px; padding-bottom: max(6px, env(safe-area-inset-bottom));
+      }
+      :root footer.nav.assistent-nav > .anzeige-leiste { display: none; }
+      :root:root footer.nav.assistent-nav > .nav-zurueck { grid-area: zurueck; padding-inline: 8px; min-width: calc(44px + var(--ziel)); }
+      :root footer.nav.assistent-nav > .uebernehmen { gap: 0; grid-area: mitte; justify-self: stretch; min-width: 0; white-space: nowrap; padding-inline: 6px; font-size: min(var(--t-s), 15px); }
+      :root:root footer.nav.assistent-nav > .nav-weiter { grid-area: weiter; justify-self: end; padding-inline: 12px; }
+      :root footer.nav.assistent-nav.mit-uebernehmen .nav-weiter-wort { display: inline; }
+      :root main.mit-uebernehmen { padding-bottom: calc(min(6rem, 108px) + env(safe-area-inset-bottom)); }
+      html:has(main.mit-uebernehmen) { scroll-padding-bottom: calc(min(6rem, 108px) + env(safe-area-inset-bottom)); }
+    }
+    @container assistent-nav (max-width: 20.25rem) {
+      footer.nav.assistent-nav .nav-einsatz { display: none; }
+      footer.nav.assistent-nav .nav-ue { display: inline-block; }
+      footer.nav.assistent-nav .nav-ue::first-letter { text-transform: uppercase; }
+    }
+    footer.nav.assistent-nav .nav-einsatz { margin-inline-end: 0.28em; }
+    :root footer.nav.assistent-nav > .uebernehmen { min-height: min(calc(var(--ziel-basis) + var(--ziel)), calc(44px + var(--ziel))); }
+    :root footer.nav.assistent-nav .anzeige-leiste-knopf { min-width: calc(44px + var(--ziel)); }
+    /* R17-H6: In der Schnellerfassung ist der Abschluss der Hauptknopf (dunkel), „Weiter →" der Nebenknopf. */
+    :root footer.nav.assistent-nav.uebernehmen-haupt > .uebernehmen { background: var(--akzent); color: var(--auf-akzent); border-color: var(--akzent); }
+    :root footer.nav.assistent-nav.uebernehmen-haupt > .nav-weiter { background: var(--flaeche); color: var(--text); border-color: var(--linie-stark); }
+    /* R17-M1, L2, M2: Kopf des Assistenten am Telefon: Der Rücksprung nennt den Einsatznamen ganz (bricht um statt zu kürzen), die Marke
+       „Aufnahme für: …" entfällt dort (derselbe Name stünde zweimal), und eine Zeile ohne weitere Marke fällt weg. */
+    @media (max-width: 30rem) {
+      :root .seiten-kopf.assistent-kopf .kopf-oberzeile .zur-start { display: flex; white-space: normal; overflow: visible; text-overflow: clip; overflow-wrap: break-word; line-height: 1.2; padding-block: 4px; min-width: 0; flex: 1 1 0; }
+      :root .seiten-kopf.assistent-kopf .titelzeile .modus-marke.marke-einsatz { display: none; }
+      :root .seiten-kopf.assistent-kopf .titelzeile:not(:has(.modus-marke:not(.marke-einsatz))) { display: none; }
+      /* Die Erklärzeile zum „–" im Reiter (R17-N5) steht unter den Reitern und teilt sich keine Zeile mit dem Rücksprung. */
+      :root .seiten-kopf.assistent-kopf .kopf-oberzeile { flex: 1 1 100%; }
+      :root .seiten-kopf.assistent-kopf .schritte-erklaerung { order: 4; flex: 1 1 100%; }
+      /* Die Speicherzeile bleibt auch im Feld-Modus einzeilig: Kopf und Fußleiste belegen dort höchstens die Hälfte des Bildes. */
+      :root .seiten-kopf.assistent-kopf .autosave:not(.speicher-fehler):not(.fest-warnung) { font-size: min(var(--t-xs), 13px); line-height: 1.25; }
+    }
+    /* R17-M4: Ein Platzhalter, der nicht passt, endet mit „…" statt hart am Rand. */
+    input::placeholder, textarea::placeholder { text-overflow: ellipsis; }
+    /* R17-H8, K7, G7: Kernspalten der Tabelle am Telefon (Einheit, Stärke, Zug, Alter, Bedarf) ohne seitliches Wischen; die Köpfe sind dort nur Text.
+       Mit allen Spalten liegen die Sortierköpfe mindestens 8 px auseinander. */
+    p.tabellen-spalten { margin: 8px 0; }
+    table.einheiten-tabelle.tabelle-kern { table-layout: fixed; width: 100%; min-width: 0; font-size: 13px; }
+    table.einheiten-tabelle.tabelle-kern > * > tr > * { padding-inline: 4px; }
+    table.einheiten-tabelle.tabelle-kern > * > tr > :first-child { position: static; width: 34%; min-width: 0; max-width: none; padding-inline: 6px; box-shadow: none; }
+    table.einheiten-tabelle.tabelle-kern > * > tr > :nth-child(2) { padding-left: 4px; }
+    table.einheiten-tabelle.tabelle-kern th[data-spalte="gesamt"] { width: 12%; }
+    table.einheiten-tabelle.tabelle-kern th[data-spalte="zugEtikett"] { width: 15%; }
+    table.einheiten-tabelle.tabelle-kern th[data-spalte="meldung"] { width: 19%; }
+    table.einheiten-tabelle.tabelle-kern thead th { font-size: 11px; letter-spacing: 0; overflow-wrap: normal; hyphens: manual; padding-block: 8px; vertical-align: bottom; }
+    table.einheiten-tabelle.tabelle-kern thead th.zahl { text-align: right; }
+    table.einheiten-tabelle.tabelle-kern td.zug-zelle { white-space: nowrap; }
+    table.einheiten-tabelle.tabelle-kern tbody th { font-size: 12px; line-height: 1.25; }
+    table.einheiten-tabelle.tabelle-kern td { font-size: 13px; line-height: 1.25; }
+    table.einheiten-tabelle.tabelle-kern .bedarf-zelle { min-width: 0; max-width: none; }
+    table.einheiten-tabelle.tabelle-kern tbody th .uebung-badge,
+    table.einheiten-tabelle.tabelle-kern tbody th .teil-badge,
+    table.einheiten-tabelle.tabelle-kern tbody th .fassung-badge { font-size: 10px; padding: 0 4px; }
+    table.einheiten-tabelle:not(.tabelle-kern) thead th:has(> .spalten-sortierung) { padding-inline: 2px; min-width: 52px; }
+    table.einheiten-tabelle:not(.tabelle-kern) thead th > .spalten-sortierung { margin-inline: 2px; width: calc(100% - 4px); }
+    /* R17-N3, H7, G5, K6: Die Ansichtsleiste der Einsatzansicht zieht sich beim Lesen nach unten ein (balken-einziehen.ts) und weicht einer Quittung;
+       die Quittung steht am Telefon nebeneinander (Text, „Rückgängig", „✕") statt gestapelt: 61 bis 70 px statt 91 bis 108 px. */
+    html.balken-weg .anzeige-balken:not(:focus-within) { visibility: hidden; }
+    html:has(.quittung-daumen) .anzeige-balken { display: none; }
+    html:has(.anzeige-balken):has(.quittung-daumen) .quittung-daumen { bottom: max(var(--r-3), env(safe-area-inset-bottom)); }
+    html:has(.anzeige-balken):has(.quittung-daumen) main { padding-bottom: calc(min(6rem, 108px) + var(--quittung-hoehe, 5rem) + env(safe-area-inset-bottom)); }
+    html:has(.anzeige-balken):has(.quittung-daumen) { scroll-padding-bottom: calc(min(6rem, 108px) + var(--quittung-hoehe, 5rem) + env(safe-area-inset-bottom)); }
+    @media (max-width: 30rem) {
+      .quittung-daumen:not(.quittung-kompakt) { flex-wrap: nowrap; padding: 6px 6px 6px 10px; }
+      .quittung-daumen > .quittung-text { flex: 1 1 0; min-width: 0; font-size: min(var(--t-s), 15px); line-height: 1.2; }
+      .quittung-daumen:not(.quittung-kompakt) > .quittung-knoepfe { margin-left: 0; gap: 8px; }
+      .quittung-daumen button { font-size: min(var(--t-s), 16px); padding-inline: 10px; }
+    }
+    /* R17-G1, G10: Verweise halten mindestens 8 px Abstand zu Knöpfen mit Wirkung (die Trefferfläche eines Verweises reicht 11 px über die Zeile). */
+    .einheit-zeile .muster-sub:has(> button.luecken-marke) { margin-bottom: 8px; }
+    p.hinweis.luecken-zaehler { margin: 22px 0 20px; }
+    p.hinweis.ausgabe-sprung { margin-top: 28px; }
+    /* R17-G6: Nachbarn mit verschiedenem Ziel berühren sich nicht (Schrittleiste, Karten | Tabelle, Vorschläge, Fußzeilenlisten). */
+    :root .seiten-kopf .schritte { gap: 4px; }
+    .ansicht-umschalter { gap: 6px !important; }
+    .ansicht-umschalter button, .ansicht-umschalter button:first-child, .ansicht-umschalter button:last-child { border-radius: var(--radius); }
+    ul.vorschlaege li + li { margin-top: 4px; }
+    .fuss-gruppe { gap: 4px; }
+    .fuss-schmal nav { row-gap: 4px; }
+    footer.seite .fuss-werkzeuge { row-gap: 4px; }
+    /* R17-G9: „−" und „+" der Stärkefelder liegen 10 px (vorher 6,4) auseinander. */
+    .stepper { gap: 10px; }
+    /* R17-G12: Scanner ohne Kamera im niedrigen Querformat: Leiste in einer Zeile, Anleitung in zwei Spalten, „Hinweise zum Handscanner" bleibt frei. */
+    @media (orientation: landscape) and (max-height: 30rem) {
+      .scanner { padding-top: 6px; gap: 6px; }
+      .scanner-text { padding: 4px 12px; }
+      .scanner > .scanner-aktionen { flex-wrap: nowrap; }
+      .scanner > .scanner-aktionen > button:first-child:not(:last-child) { flex: 0 1 auto; }
+      .scanner-handscanner {
+        width: min(96vw, 52rem); grid-template-columns: 1fr 1fr; grid-template-areas: "titel titel" "schritte lampe" "schritte hinweise";
+        gap: 4px 16px; padding: 8px 14px; align-items: start;
+      }
+      .scanner-handscanner > .handscanner-titel { grid-area: titel; font-size: var(--t-m); }
+      .scanner-handscanner > .scanner-schritte { grid-area: schritte; font-size: 15px; line-height: 1.3; gap: 4px; }
+      .scanner-handscanner > .handscanner-lampe { grid-area: lampe; }
+      .scanner-handscanner > .handscanner-hinweise { grid-area: hinweise; }
+    }
+    /* R17-H1: Solange die Offline-Zeile wechselt (Laden, bereit, Beispielbögen n von m), hält sie die Höhe der längsten Fassung. */
+    .offline-badge.offline-offen { min-height: 9rem; box-sizing: border-box; }
+    /* R17-G8, H9: Verweise im Fließtext der Startseite sind Tippziele von 44 px mit 8 px Abstand zur Nachbarzeile. */
+    .start-seo a { display: inline-flex; align-items: center; min-height: calc(var(--ziel-basis) + var(--ziel)); margin-block: 4px; }
+    /* R17-L1: Gesperrte Knöpfe bleiben lesbar (Text in der Nebentextfarbe, gestrichelter Rand) statt bei Deckkraft 0,4 zu verschwinden. */
+    button:disabled:not(.arbeitet):not(.wechsel-quittiert) {
+      opacity: 1; color: var(--text-2); background: var(--flaeche-2); border: var(--strich-stark) dashed var(--linie-stark);
+    }
+    dialog .dialog-entscheidung > p.dialog-fehlt { margin: 6px 0 0; }
+    /* R17-N6: Die Aufnahmeknöpfe tragen auch bei 360 px ihre Unterzeile und stehen untereinander (die Lage steht seit R17-K12 davor). */
+    @media (max-width: 30rem) and (max-height: 720px) {
+      main.einsatz-detail .einsatz-seite > .aktionen { display: flex; flex-direction: column; align-items: stretch; gap: 8px; }
+      main.einsatz-detail .einsatz-seite > .aktionen > :not(.primaer) .knopf-zusatz { display: block; }
+      main.einsatz-detail .einsatz-seite > .aktionen > .einlese > button { flex: 1 1 auto; }
+    }
+    /* ===== Ende Runde 17 (Layout) ===== */
+    /* ===== Runde 17 (Neuer Nutzer) ===== */
+    /* R17-N4/H4: „✓ Abgerückt" ist eine Bestätigung, kein Knopf: ohne Rahmen und Grund, in Textfarbe; der Platz bleibt (Knopfreihe steht still). */
+    .einheit-zeile button.wechsel-knopf.wechsel-quittiert:disabled {
+      border-color: transparent; background: transparent; box-shadow: none; color: var(--gut); cursor: default; text-align: left;
+    }
+    /* R17-N5: Erklärzeile zum Strich im Reiter und Modus-Marken ohne Knopfrahmen („Schnellerfassung", „Aufnahme für: …"). */
+    .schritte-erklaerung { margin: var(--r-1) 0 0; font-size: var(--t-xs); color: var(--kopf-auf-2); }
+    .seiten-kopf .modus-marke { border-color: transparent; padding-inline: 0; }
+    /* R17-N10: Überschriften über den Zeitraum- und Uhrzeitfeldern in Schritt 2. */
+    .gruppen-titel { margin: var(--r-3) 0 var(--r-1); font-weight: 600; }
+    /* R17-N8: Bildweg ohne Kamera oben im Rahmen, Knopf in voller Zielgröße. */
+    .scanner-bildweg { display: grid; gap: 0.6rem; justify-items: center; }
+    .scanner-bildweg .datei-knopf { min-width: min(100%, 18rem); justify-content: center; }
+    /* ===== Ende Runde 17 (Neuer Nutzer) ===== */
   </style>
 </head>
 <body>

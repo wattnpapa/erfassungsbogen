@@ -312,6 +312,16 @@ export function useOfflineStand(): OfflineZustand {
   };
 }
 
+/**
+ * Die Zeile ist noch nicht in ihrer Endfassung (R17-H1): Sie wechselt in den ersten Sekunden mehrfach zwischen zwei und sechs
+ * Zeilen (Laden, „bereit", Beispielbögen n von m) und schob Knöpfe darüber oder darunter um 42 bis 58 px. Solange es so ist,
+ * hält das Stylesheet (`.offline-offen`) die Höhe der längsten Fassung frei; nur der Wechsel auf die Endfassung ändert sie noch.
+ */
+export function offlineZeileOffen(s: OfflineZustand): boolean {
+  if (s.stand !== "bereit") return s.stand !== "ohne";
+  return s.zusatz != null ? s.zusatz.fertig < s.zusatz.gesamt : s.zweiStufen === true;
+}
+
 /** Text der Offline-Zeile auf der Startseite. */
 export function offlineText(s: OfflineZustand): string {
   // Sperrt der Browser den Speicher, bleibt nichts auf dem Gerät — die Zeile

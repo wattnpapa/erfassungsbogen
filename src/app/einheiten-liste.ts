@@ -226,6 +226,18 @@ export function einheitenSortieren(
   /** Laufende Nummern je Einheitsschlüssel (meldungsNummern) — nur für „nummer". */
   nummern?: ReadonlyMap<string, number>,
 ): MeldeEintrag[] {
+  // Anwesende zuerst, Abgerückte (und Aufgegangene) am Ende, in jeder Sortierung (R17-E6, K4): Sie standen sonst zwischen den
+  // anwesenden und zerrissen die Zugruppen. Die Reihenfolge innerhalb beider Gruppen bleibt die gewählte.
+  const sortiert = innenSortieren(eintraege, sortierung, nummern);
+  const da = sortiert.filter((e) => e.status === MeldeStatus.ANWESEND);
+  return da.length === sortiert.length ? sortiert : [...da, ...sortiert.filter((e) => e.status !== MeldeStatus.ANWESEND)];
+}
+
+function innenSortieren(
+  eintraege: MeldeEintrag[],
+  sortierung: EinheitenSortierung,
+  nummern?: ReadonlyMap<string, number>,
+): MeldeEintrag[] {
   const liste = [...eintraege];
   switch (sortierung) {
     case "nummer":

@@ -294,7 +294,7 @@ const ORGANISATIONSNAME_BEISPIEL: Partial<Record<OrganisationsTyp, string>> = {
  * (Audit Runde 3, R3-H7, R3-N6).
  */
 const EINHEITSTYP_BEISPIEL: Partial<Record<OrganisationsTyp, string>> = {
-  [OrganisationsTyp.THW]: "z. B. Bergungsgruppe, FGr Wasserschaden/Pumpen",
+  [OrganisationsTyp.THW]: "z. B. Bergungsgruppe, FGr WP",
   [OrganisationsTyp.FEUERWEHR]: "z. B. Löschzug, Löschgruppe",
   [OrganisationsTyp.DRK]: "z. B. SEG Sanität, Betreuungszug",
   [OrganisationsTyp.JUH]: "z. B. SEG Sanität, Betreuungszug",

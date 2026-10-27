@@ -351,10 +351,11 @@ describe("Schritt Personal", () => {
     expect(within(dialog).getAllByText("kein Name?")).toHaveLength(2);
     expect(dialog.textContent).toContain("Zeilen sehen nicht nach einem Namen aus");
     // Nur die echte Zeile zählt: 1 Person.
-    expect(within(dialog).getByRole("button", { name: "1 Person übernehmen" })).toBeDefined();
+    // Der Knopf nennt auch, wie viele Zeilen nicht übernommen werden (R17-H5).
+    expect(within(dialog).getByRole("button", { name: "1 Person übernehmen (2 nicht)" })).toBeDefined();
 
     await nutzer.click(within(dialog).getByRole("checkbox", { name: /12345.*trotzdem als Name übernehmen/ }));
-    await nutzer.click(within(dialog).getByRole("button", { name: "2 Personen übernehmen" }));
+    await nutzer.click(within(dialog).getByRole("button", { name: "2 Personen übernehmen (1 nicht)" }));
     const tabelle = screen.getByRole("table");
     const werte = (within(tabelle).getAllByRole("textbox", { name: /Vorname|Nachname/ }) as HTMLInputElement[]).map((f) => f.value);
     expect(werte).toContain("Müller");

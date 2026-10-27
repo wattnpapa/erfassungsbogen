@@ -34,6 +34,25 @@
 > Rollleiste den Fokus und rollen die Pfeiltasten-Markierung ins Bild. Kein neuer
 > Host, Transportformat und Schema unverändert.
 >
+> **Nachgezogen 2026-10-27 (Runde 17):** Audit Runde 17 (rund 72 Befunde, vier Pakete)
+> — Kap. 5, 8.2, 8.4, 8.5, 8.6: zwei neue Speicherschlüssel.
+> `eeb.meldungen-papierkorb.v1` (localStorage, `meldungs-papierkorb.ts`: ganze
+> entfernte Meldungen samt Namen, 7 Tage, höchstens 20 je Sammlung; „Zuletzt entfernte
+> Meldungen" mit Zurückholen und Endgültig löschen) und `eeb.karte-offen.v1`
+> (sessionStorage: Einsatz-ID und Schlüssel der zuletzt aufgeklappten Karte). Die
+> Einträge einer Sammlung tragen die optionalen Felder `ortGebilligt`,
+> `ortGebilligtAm` und `standAbsender` (kein Schemawechsel am Bogen). Der Stand des
+> Absenders bleibt bei „Als Übung kennzeichnen…", „Als Einsatzmeldung zählen…" und
+> „Stärke ändern…" erhalten (`stand-absender.ts`, `angaben-alter.ts`). Exporte: Nachtrag-CSV mit
+> Spalte „NACHTRAG" in jeder Zeile und Summe „kein Gesamtstand"; Zeile „WC/Dusche M/W/D"
+> statt „Unterbringung", wenn keine angefordert ist (`diff-lage.ts`); Typografie
+> „…" in Oberfläche, PDF, CSV, Excel (`typografie.ts`); Einzelbogen als Download
+> mit Namen aus Stand und Einheit; Sammel-PDF mit Fortschritt „n von m". „Namen
+> einfügen…" fragt einmal nach der Reihenfolge und übernimmt Rufnummern am
+> Zeilenende. Lagemonitor und seine Kennung per `React.lazy` aus dem Startbündel
+> (`lagemonitor-kennung.ts`, ADR-003 Aufnahmeregel 5; Budget neu gesetzt). Kein
+> neuer Host, Transportformat und Schema unverändert.
+>
 > **Nachgezogen 2026-10-26 (Runde 16):** Audit Runde 16 (33 Befunde, drei Pakete)
 > — Kap. 5, 8.2, 8.4, 8.5, 8.6: neuer Schlüssel `eeb.einsatz.rueckweg`
 > (sessionStorage, 15 Minuten: Rückweg für „Für neuen Einsatz vorbereiten",

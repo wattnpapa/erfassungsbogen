@@ -8,7 +8,7 @@
  */
 
 import type { Erfassungsbogen } from "@bos/eeb-format/model";
-import { bogenDiff } from "@bos/meldekopf/meldung-diff";
+import { bogenDiff, istMwdFeld } from "./diff-lage";
 
 /** „17:44:12 Uhr" aus einem Date.now()-Wert, mit Datum nur wenn nicht heute. */
 export function zeitMitSekunden(ms: number): string {
@@ -97,7 +97,7 @@ export function unterschiedText(
     ];
     teile.push(`Fahrzeuge (${mitNamen(fahrzeuge, namen)})`);
   }
-  for (const a of d.bedarf.filter((x) => x.feld !== "Unterbringung M/W/D")) teile.push(feld(a));
+  for (const a of d.bedarf.filter((x) => !istMwdFeld(x.feld))) teile.push(feld(a));
   if (teile.length === 0) teile.push("Sofortbedarf");
   const gezeigt = teile.slice(0, hoechstens);
   const rest = teile.length - gezeigt.length;

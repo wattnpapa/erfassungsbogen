@@ -23,6 +23,15 @@ Grundlage: Repository `wattnpapa/erfassungsbogen`, Stand 2026-09-12 — Version 
 > angenommen; der Bogen nimmt dann denselben Weg wie ein Bogen-Link (Rückfrage vor
 > dem Ablegen, 5.1). Empfänger und Netzverbindungen unverändert (5.8).
 >
+> **Nachgezogen 2026-10-27 — Audit Runde 17:** Speicherort neu, mit Personendaten:
+> `eeb.meldungen-papierkorb.v1` im `localStorage` (entfernte Meldungen einer Sammlung
+> samt Namen der Personen, höchstens 20 je Sammlung, 7 Tage, danach automatisch
+> gelöscht; „Endgültig löschen" und „Alle Daten löschen" leeren ihn; 5.4, 5.7;
+> Speicherbegrenzung, Art. 5 Abs. 1 lit. e DSGVO; Teil der Datensicherung).
+> Dazu `eeb.karte-offen.v1` im `sessionStorage` (nur Kennungen). Die Nachtrag-CSV
+> kennzeichnet jede Zeile als Nachtrag. Der Einzelbogen wird als Datei mit dem Namen der
+> Einheit gespeichert (5.5). Empfänger und Netzverbindungen unverändert (5.8).
+>
 > **Nachgezogen 2026-10-26 — Audit Runde 16:** Speicherort neu: `eeb.einsatz.rueckweg` im
 > `sessionStorage` (Rückweg für das Zurücksetzen der Vorbereitung, 15 Minuten,
 > mit „Alle Daten löschen" geleert; 5.7). Exporte (5.1, 5.5): CSV und Excel tragen eine

@@ -11,7 +11,8 @@
  */
 
 import { staerke, type Erfassungsbogen } from "@bos/eeb-format/model";
-import { bogenDiff, FELD_GESAMTSTAERKE, type BogenDiff } from "@bos/meldekopf/meldung-diff";
+import { FELD_GESAMTSTAERKE } from "@bos/meldekopf/meldung-diff";
+import { bogenDiff, istMwdFeld, type BogenDiff } from "./diff-lage";
 import { zeitpunktDeutsch } from "./hilfen";
 
 export interface MeldungsSteckbrief {
@@ -89,7 +90,7 @@ export function aenderungsText(d: BogenDiff, hoechstens = 4): string {
   if (d.fahrzeugeAbgang.length > 0) fz.push(`${d.fahrzeugeAbgang.length} abgemeldet`);
   if (d.fahrzeugeGeaendert.length > 0) fz.push(`${d.fahrzeugeGeaendert.length} geändert`);
   if (fz.length > 0) teile.push(`Fahrzeuge: ${fz.join(", ")}`);
-  for (const a of d.bedarf) if (a.feld !== "Unterbringung M/W/D" || !gesamt) teile.push(`${a.feld} ${a.vorher} → ${a.nachher}`);
+  for (const a of d.bedarf) if (!istMwdFeld(a.feld) || !gesamt) teile.push(`${a.feld} ${a.vorher} → ${a.nachher}`);
   for (const a of d.sonstiges) {
     // Kurze Werte im Wortlaut (Einheit, Zeitraum), lange Freitexte nur mit Namen.
     const kurz = a.vorher.length <= 40 && a.nachher.length <= 40;

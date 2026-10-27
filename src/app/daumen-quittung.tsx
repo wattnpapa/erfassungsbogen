@@ -20,7 +20,7 @@
  */
 
 import { useEffect, useLayoutEffect, useRef, useState, type MouseEvent, type ReactNode } from "react";
-import { PRELLSCHUTZ_MS, QUITTUNG_SPERRE_MS, letzterTippOrt, ortSperren, tippVerworfenZeigen } from "./tipp-schutz";
+import { PRELLSCHUTZ_MS, QUITTUNG_SPERRE_KURZ_MS, QUITTUNG_SPERRE_MS, letzterTippOrt, ortSperren, tippVerworfenZeigen } from "./tipp-schutz";
 
 /** So lange steht die Leiste in voller Höhe; danach eine Zeile mit „Rückgängig" und „✕" (R16-W1). */
 export const QUITTUNG_KOMPAKT_NACH_MS = 15_000;
@@ -36,8 +36,12 @@ function darunterLiegendeKarte(tipp: { x: number; y: number }, leiste: HTMLEleme
   return null;
 }
 
-export function DaumenQuittung({ children, prellschutz = false, onRueckgaengig, rueckgaengigName, onSchliessen, mehrzeilig = false }: {
+export function DaumenQuittung({ children, kurz, prellschutz = false, sperreKurz = false, onRueckgaengig, rueckgaengigName, onSchliessen, mehrzeilig = false }: {
   children: ReactNode;
+  /** „Rückgängig" nimmt etwas Harmloses zurück: Die Stelle unter der Leiste sperrt nur so lang wie der Prellschutz (R17-D3). */
+  sperreKurz?: boolean;
+  /** Kurzfassung für die einzeilige Leiste nach dem Lesen: Einheit und Handlung zuerst, ohne langen Namen (R17-W1). */
+  kurz?: ReactNode;
   /** Bis zu vier statt zwei Zeilen Text: der Name der Einheit wird nicht abgeschnitten (R11-M3). */
   mehrzeilig?: boolean;
   prellschutz?: boolean;
@@ -75,14 +79,42 @@ export function DaumenQuittung({ children, prellschutz = false, onRueckgaengig, 
     const hoehe = window.innerHeight || wurzel.clientHeight;
     if (navOben != null && navOben > 0 && navOben < hoehe) {
       el.style.bottom = `${Math.round(hoehe - navOben + 8)}px`;
+    } else {
+      el.style.bottom = ""; // eine schwebende Leiste (R17-S11) rastet beim erneuten Messen unten ein
     }
-    const r = el.getBoundingClientRect();
+    let r = el.getBoundingClientRect();
     wurzel.style.setProperty("--quittung-hoehe", `${Math.round(r.height + 16)}px`);
     // Ging die Leiste unter dem Finger auf: diese Stelle sperren, und was
     // eben getippt wurde, samt den Knöpfen derselben Karte über die Leiste
     // rollen — höchstens so weit, dass die getippte Stelle im Bild bleibt.
     const tipp = gerollt.current ? null : letzterTippOrt();
     gerollt.current = true;
+    // R17-S11: Läge die Leiste auf dem Knopf, den der Finger eben getippt hat, schwebt sie stattdessen direkt darüber. Die
+    // Seite springt dann nicht mehr (vorher rollte sie bis zu 144 px unter dem Finger weg), der getippte Knopf und der
+    // Gegenknopf bleiben, wo sie waren, und „Rückgängig" liegt in Daumennähe. Rollt der Nutzer, rastet sie unten ein.
+    let schwebt = false;
+    let schwebAb: (() => void) | undefined;
+    if (tipp && tipp.y >= r.top - 8 && tipp.y <= r.bottom + 8 && typeof document.elementsFromPoint === "function") {
+      const getippt = document
+        .elementsFromPoint(tipp.x, tipp.y)
+        .find((e) => !el.contains(e))
+        ?.closest<HTMLElement>("button, a[href], summary, input, select, textarea");
+      const oben = getippt?.getBoundingClientRect().top;
+      if (oben != null && oben - 8 - r.height >= 8) {
+        const unten = el.style.bottom;
+        el.style.bottom = `${Math.round(hoehe - oben + 8)}px`;
+        r = el.getBoundingClientRect();
+        schwebt = true;
+        const start = window.scrollY;
+        const einrasten = () => {
+          if (Math.abs(window.scrollY - start) < 48) return;
+          el.style.bottom = unten;
+          window.removeEventListener("scroll", einrasten);
+        };
+        window.addEventListener("scroll", einrasten, { passive: true });
+        schwebAb = () => window.removeEventListener("scroll", einrasten);
+      }
+    }
     /**
      * Ein Kartenkopf unterhalb der getippten Stelle, den die Leiste anschneidet
      * (R3-G2, Rest): Nach „Abrücken" weiter unten lag der Kopf der nächsten
@@ -98,7 +130,11 @@ export function DaumenQuittung({ children, prellschutz = false, onRueckgaengig, 
       }
       return noetig;
     };
-    if (tipp && !(tipp.y >= r.top - 8 && tipp.y <= r.bottom + 8)) {
+    // Eine Leiste ohne „Rückgängig" (Auskunft nach einem Zurücknehmen) liegt oft genau dort, wo gleich das nächste
+    // „Rückgängig" erscheint: Sie sperrt die Stelle nur kurz, sonst verwirft sie den bewussten nächsten Tipp (R17-D3).
+    const sperrDauer = sperreKurz || !onRueckgaengig ? QUITTUNG_SPERRE_KURZ_MS : QUITTUNG_SPERRE_MS;
+    if (schwebt && tipp) ortSperren(sperrDauer);
+    if (tipp && !schwebt && !(tipp.y >= r.top - 8 && tipp.y <= r.bottom + 8)) {
       const rollen = Math.min(angeschnittenerKopf(tipp.y), Math.max(0, tipp.y - 64));
       try {
         if (rollen > 0) window.scrollBy(0, Math.round(rollen));
@@ -106,8 +142,9 @@ export function DaumenQuittung({ children, prellschutz = false, onRueckgaengig, 
         /* Testumgebung ohne Layout */
       }
     }
-    if (tipp && tipp.y >= r.top - 8 && tipp.y <= r.bottom + 8) {
-      ortSperren(QUITTUNG_SPERRE_MS); // 2,5 s statt 1,5 s: Zweittipp ab 1,5 s nahm das Abrücken zurück (R8-D5)
+    if (tipp && !schwebt && tipp.y >= r.top - 8 && tipp.y <= r.bottom + 8) {
+      // 2,5 s statt 1,5 s: Zweittipp ab 1,5 s nahm das Abrücken zurück (R8-D5); bei harmlosem Rückgängig nur der Prellschutz (R17-D3).
+      ortSperren(sperrDauer);
       let rollen = tipp.y - r.top + 40;
       const karte = darunterLiegendeKarte(tipp, el);
       if (karte) {
@@ -128,13 +165,14 @@ export function DaumenQuittung({ children, prellschutz = false, onRueckgaengig, 
       }
     }
     return () => {
+      schwebAb?.();
       wurzel.style.removeProperty("--quittung-hoehe");
     };
     // `kompakt`: Die Seite hält nur so viel Platz frei, wie die Leiste jetzt braucht (R16-W1).
   }, [kompakt]);
   return (
     <div className={`quittung-daumen${mehrzeilig ? " quittung-mehrzeilig" : ""}${kompakt ? " quittung-kompakt" : ""}`} role="status" ref={leiste}>
-      <span className="quittung-text">{children}</span>
+      <span className="quittung-text">{kompakt && kurz != null ? kurz : children}</span>
       {/* Die beiden Knöpfe bleiben als Paar zusammen: reicht die Breite nicht
           für Text und Knöpfe, rutscht das Paar unter den Text (R4-M1) — „✕"
           steht nie allein in einer Zeile. */}

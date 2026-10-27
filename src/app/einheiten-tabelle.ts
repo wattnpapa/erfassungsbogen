@@ -20,13 +20,15 @@
 import { EEB_EPOCHE_MS, staerke, type EebDatum, type Erfassungsbogen } from "@bos/eeb-format/model";
 import { einheitAnzeigename, nurSollstaerke, orgLabel, pruefpunkte, vokabText, vokabularFuer, zeitpunktDeutsch, type Pruefpunkt } from "./hilfen";
 import { MeldeStatus, type EinsatzArt, type MeldeEintrag } from "@bos/meldekopf/einsaetze";
-import { FELD_GESAMTSTAERKE, bogenDiff, diffKurzfassung } from "@bos/meldekopf/meldung-diff";
+import { FELD_GESAMTSTAERKE, diffKurzfassung } from "@bos/meldekopf/meldung-diff";
+import { bogenDiff, istMwdFeld } from "./diff-lage";
 import { aenderungsText } from "./meldungs-vergleich";
 import { aktuelleMeldungen, bedarfNichtErfasst, summiereBoegen, unterbringungLage, verpflegungLage, zaehltInLage, type EinsatzSummen } from "./auswertung";
 import { eintreffzeit, zeitLang, zeitpunktZuMs } from "./eintrag-zeiten";
 import { angabenAlterWort, angabenZeit } from "./angaben-alter";
 import { revisionenJe } from "./einheiten-index";
 import { istVerdraengt } from "./fassung-vorrang";
+import { ortIstGebilligt } from "./ort-gebilligt";
 
 // ------------------------------------------------------------ Bedarfsmarken
 
@@ -158,10 +160,14 @@ export function meldungsNummern(eintraege: MeldeEintrag[]): Map<string, number> 
   return new Map(reihe.map(([schluessel]) => [schluessel, vergeben.get(schluessel)!]));
 }
 
+/** „1 Einheit" / „4 Einheiten": eine Zahl, ein Wort, nie „Einheit(en)" (R17-K8, R17-W4). */
+export function einheitenZahl(n: number): string {
+  return n === 1 ? "1 Einheit" : `${n} Einheiten`;
+}
+
 /** „1 Einheit" / „4 Einheiten" — Einheiten (nicht Fassungen) einer Sammlung, wie die Liste sie zählt. */
 export function anzahlEinheiten(eintraege: MeldeEintrag[]): string {
-  const n = new Set(eintraege.map((e) => e.einheitSchluessel)).size;
-  return n === 1 ? "1 Einheit" : `${n} Einheiten`;
+  return einheitenZahl(new Set(eintraege.map((e) => e.einheitSchluessel)).size);
 }
 
 /**
@@ -342,6 +348,7 @@ export function abweichenderOrt(
   const text = (e.bogen.einsatz.ortAuftrag ?? "").trim();
   const eigene = ortWoerter(text);
   if (eigene.length === 0) return null; // leer oder nur Allgemeines: nichts zu vergleichen
+  if (ortIstGebilligt(e, alle)) return null; // der Meldekopf hat „gehört zu dieser Lage" gesagt (R17-E4)
   const bezug = new Set<string>(ortWoerter(sammlung.ort ?? ""));
   const haeufigkeit = new Map<string, number>();
   let mitText = 0;
@@ -520,6 +527,8 @@ export function rueckkehrText(r: { abgerueckAm?: number }): string {
  */
 export function folgeAenderung(kopf: MeldeEintrag, alle: MeldeEintrag[]): FolgeAenderung | null {
   if (kopf.quelle === "aufteilung" || kopf.quelle === "zusammenfuehrung") return null;
+  // Nur die Kennzeichnung (Übung/Einsatz) umgestellt: inhaltlich keine neue Meldung der Einheit (R17-K1).
+  if (kopf.angaben?.kennzeichnung) return null;
   // Nach der Fassungsfolge, nicht nach der Eingangszeit: Bei zurückgestellter Geräteuhr trägt die
   // neue Fassung eine frühere Eingangszeit als die alte, und die Quittung hieß „neu gemeldet"
   // (Audit Runde 6, R6-E5). Die Liste führt die geltende Fassung zuerst, die älteren dahinter.
@@ -569,7 +578,13 @@ function platzhalterVergleich(vorige: MeldeEintrag, kopf: MeldeEintrag, d: Retur
   if (fehlend.length > 0) {
     teile.push(`${fehlend.join(", ").replace(/, ([^,]+)$/, " und $1")} nicht erfasst`);
   } else if (kopf.bogen.staerkeManuell != null && (kopf.bogen.fahrzeuge.length > 0 || kopf.bogen.personal.length > 0)) {
-    teile.push(`Namen, Fahrzeuge, Bedarf übernommen (Meldung vom ${zeitLang(vorige.empfangenAm)})`);
+    // Verpflegung und M/W/D folgen der neuen Stärke: „Bedarf übernommen" widersprach den Summen im Kopf (R17-K2).
+    const folgt = vorher === nachher ? [] : [...new Set(d.bedarf.flatMap((a) => (a.feld === "Verpflegung" ? ["Verpflegung"] : istMwdFeld(a.feld) ? [a.feld === "WC/Dusche M/W/D" ? "WC/Dusche" : "Unterbringung"] : [])))];
+    teile.push(
+      folgt.length > 0
+        ? `Namen, Fahrzeuge übernommen (Meldung vom ${zeitLang(vorige.empfangenAm)}); ${folgt.join(" und ")} ${folgt.length === 1 ? "folgt" : "folgen"} der Stärke`
+        : `Namen, Fahrzeuge, Bedarf übernommen (Meldung vom ${zeitLang(vorige.empfangenAm)})`,
+    );
   }
   return teile.length > 0 ? teile.join(" · ") : null;
 }
@@ -614,7 +629,7 @@ export function ausgeblendetText(neu: number, folgen: number): string {
   return `${teile.join(", ")} — Zeilen je Einheit ausgeblendet, siehe Liste`;
 }
 
-const BEDARF_RANG = ["Ruhezeit erforderlich", "Unterbringung angefordert", "Unterbringung M/W/D", "Diesel", "Benzin", "Gemisch", "Verpflegung"];
+const BEDARF_RANG = ["Ruhezeit erforderlich", "Unterbringung angefordert", "Unterbringung M/W/D", "WC/Dusche M/W/D", "Diesel", "Benzin", "Gemisch", "Verpflegung"];
 /** Kurzform des Feldnamens in der Kurzzeile: „Ruhezeit ja → nein". */
 const BEDARF_KURZ: Record<string, string> = { "Ruhezeit erforderlich": "Ruhezeit", "Unterbringung angefordert": "Unterbringung" };
 
@@ -636,7 +651,7 @@ function folgeKurztext(d: ReturnType<typeof bogenDiff>, vorher: number, nachher:
   // Die M/W/D-Aufteilung folgt der Stärke — neben ihr nur Lärm; ebenso die Verpflegung, wenn sie nur die neue Stärke wiederholt
   // (R16-K2). Der Rest nach Entscheidungsrelevanz: Ruhezeit und Unterbringung vor Betriebsstoff, nicht in der Reihenfolge des Bogens.
   const bedarf = d.bedarf
-    .filter((a) => !(vorher !== nachher && a.feld === "Unterbringung M/W/D") && !(vorher !== nachher && a.feld === "Verpflegung" && a.nachher === `${nachher} Personen`))
+    .filter((a) => !(vorher !== nachher && istMwdFeld(a.feld)) && !(vorher !== nachher && a.feld === "Verpflegung" && a.nachher === `${nachher} Personen`))
     .sort((a, b) => BEDARF_RANG.indexOf(a.feld) - BEDARF_RANG.indexOf(b.feld));
   erklaert += d.bedarf.length - bedarf.length;
   for (const a of bedarf.slice(0, Math.max(0, 3 - teile.length))) {
@@ -670,7 +685,8 @@ export function zuletztGemeldet(e: MeldeEintrag): number {
 export function letzteMeldung(eintraege: MeldeEintrag[]): number | null {
   let max: number | null = null;
   for (const e of eintraege) {
-    if (e.quelle === "aufteilung" || e.quelle === "zusammenfuehrung") continue;
+    // Auch die Handänderung am Meldekopf ist keine Meldung der Einheit (R17-K1).
+    if (e.quelle === "aufteilung" || e.quelle === "zusammenfuehrung" || e.angaben) continue;
     if (max == null || e.empfangenAm > max) max = e.empfangenAm;
   }
   return max;
@@ -1013,6 +1029,29 @@ export function gemerkteAnsicht(): EinheitenAnsicht {
     return localStorage.getItem(SPEICHER_ANSICHT) === "tabelle" ? "tabelle" : "karten";
   } catch {
     return "karten";
+  }
+}
+
+const SPEICHER_ALLE_SPALTEN = "eeb.einheiten-tabelle-alle-spalten";
+
+/**
+ * Am Telefon zeigt die Tabelle nur die Kernspalten (R17-H8): Einheit, Stärke, Zug, Alter der Meldung, Bedarf.
+ * Wer alle Spalten will, schaltet um; die Wahl bleibt am Gerät.
+ */
+export function gemerkteAlleSpalten(): boolean {
+  try {
+    return localStorage.getItem(SPEICHER_ALLE_SPALTEN) === "1";
+  } catch {
+    return false;
+  }
+}
+
+export function merkeAlleSpalten(alle: boolean): void {
+  try {
+    if (alle) localStorage.setItem(SPEICHER_ALLE_SPALTEN, "1");
+    else localStorage.removeItem(SPEICHER_ALLE_SPALTEN);
+  } catch {
+    /* Komfort, kein Muss. */
   }
 }
 

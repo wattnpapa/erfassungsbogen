@@ -278,8 +278,9 @@ describe("Einheit mit Folgemeldung entfernen (R2-D1)", () => {
     await nutzer.click(within(karte).getByRole("button", { name: "Mehr…" }));
     await nutzer.click(within(karte).getByRole("button", { name: "Entfernen" }));
     let dialog = document.querySelector<HTMLDialogElement>("dialog[aria-label='Meldung entfernen?']")!;
-    expect(dialog.textContent).toMatch(/„Rückgängig" gilt bis zum Neuladen oder Schließen der App/);
-    expect(dialog.textContent).toMatch(/danach ist die Meldung endgültig weg/);
+    // Seit R17-E2 liegt die Meldung nach dem Neuladen im Papierkorb der Sammlung statt endgültig weg zu sein.
+    expect(dialog.textContent).toMatch(/„Rückgängig" gilt bis zum Neuladen/);
+    expect(dialog.textContent).toMatch(/danach liegt die Meldung 7 Tage unter „Zuletzt entfernte Meldungen“/);
     // R10-D1: der Name steht im ersten Satz, R10-S3: die Rückfrage ist kurz (höchstens rund 45 Wörter).
     // R14-D1: dazu Nummer und Stärke (bei einem abgeteilten Trupp auch der Teil), damit gleich benannte Karten verschieden lauten.
     expect(dialog.querySelector("p")!.textContent).toMatch(/^(Nr\. \d+ )?„.*Ulm.*" \(\d+ Personen?, Stand .*\) entfernen/);
@@ -423,58 +424,32 @@ describe("Einzelbogen einer Meldung als PDF", () => {
     vi.unstubAllGlobals();
   });
 
-  /** Fenster, wie window.open es im Browser liefert — nur so viel, wie der Weg anfasst. */
-  function tabAttrappe() {
-    return {
-      document: { body: { textContent: "" } },
-      close: vi.fn(),
-    } as unknown as Window & { close: ReturnType<typeof vi.fn> };
-  }
-
-  it("öffnet einen Tab im Klick und gibt ihm die Meldung mit", async () => {
+  it("öffnet keinen Tab (R17-A2), sondern lädt herunter und gibt die Meldung ohne Fenster mit", async () => {
     const nutzer = userEvent.setup();
-    const tab = tabAttrappe();
-    const oeffnen = vi.fn(() => tab);
+    const oeffnen = vi.fn(() => null);
     vi.stubGlobal("open", oeffnen);
     buehne();
 
     await nutzer.click(screen.getByRole("button", { name: "Bogen als PDF" }));
 
-    // Leer aufgemacht und erst danach befüllt: nur so übersteht der Tab das
-    // Nachladen des PDF-Satzes, ohne vom Popup-Blocker kassiert zu werden.
-    expect(oeffnen).toHaveBeenCalledWith("", "_blank");
+    // Ein Tab mit dem PDF trug im Download-Ordner eine Zufalls-ID als Namen; der Download hat den Namen aus Einheit und Stand.
+    expect(oeffnen).not.toHaveBeenCalled();
     expect(meldungPdfAnzeigen).toHaveBeenCalledTimes(1);
     const [meldung, fenster] = meldungPdfAnzeigen.mock.calls[0]!;
     expect(meldung.bogen.einheit.hierarchie[0]!.name).toBe("Wardenburg");
-    expect(fenster).toBe(tab);
+    expect(fenster).toBeNull();
   });
 
-  it("schließt den leeren Tab und meldet den Fehler, wenn die PDF scheitert", async () => {
+  it("meldet den Fehler, wenn die PDF scheitert", async () => {
     const nutzer = userEvent.setup();
-    const tab = tabAttrappe();
-    vi.stubGlobal("open", vi.fn(() => tab));
     meldungPdfAnzeigen.mockRejectedValue(new Error("Schriften fehlen"));
     buehne();
 
     await nutzer.click(screen.getByRole("button", { name: "Bogen als PDF" }));
 
-    expect(tab.close).toHaveBeenCalled();
     const dialog = document.querySelector<HTMLDialogElement>("dialog[aria-label='Bogen als PDF']")!;
     expect(dialog).not.toBeNull();
     expect(dialog.textContent).toContain("Schriften fehlen");
-  });
-
-  it("kommt ohne Tab aus, wenn der Popup-Blocker keinen zulässt", async () => {
-    const nutzer = userEvent.setup();
-    vi.stubGlobal("open", vi.fn(() => null));
-    buehne();
-
-    await nutzer.click(screen.getByRole("button", { name: "Bogen als PDF" }));
-
-    // Ohne Fenster bleibt der gewohnte Weg (Download bzw. Share-Sheet) — das
-    // entscheidet meldungPdfAnzeigen, es muss den Fall aber zu sehen bekommen.
-    expect(meldungPdfAnzeigen).toHaveBeenCalledTimes(1);
-    expect(meldungPdfAnzeigen.mock.calls[0]![1]).toBeNull();
   });
 });
 
@@ -793,9 +768,7 @@ describe("Abrücken mit Zeit, Quittung und Rückweg", () => {
     await nutzer.click(knopfAmPlatz());
     expect(gespeichert(einsatzId, "Crailsheim").status).toBe(MeldeStatus.ABGERUECKT);
     expect(screen.queryByLabelText("Zug")).toBeNull();
-    // Auch ein anderer Knopf der Karte nimmt im Prellfenster nichts an.
-    await nutzer.click(screen.getByRole("button", { name: "Zug zuordnen" }));
-    expect(screen.queryByLabelText("Zug")).toBeNull();
+    // Ein anderer Knopf der Karte nimmt dagegen sofort an (R17-H3): geschützt ist der Wechselknopf selbst, nicht die Karte.
 
     // Nach der Sperre wirkt der Rückweg wie gewohnt.
     const echt = Date.now.bind(Date);

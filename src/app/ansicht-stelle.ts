@@ -51,3 +51,46 @@ export function stelleLaden(ansicht: string, jetzt: number = Date.now()): number
     return null;
   }
 }
+
+/**
+ * Die zuletzt aufgeklappte Karte einer Einsatz-Sammlung über ein Neuladen hinweg (R17-E5, R17-O2, R17-S10, R17-W5).
+ *
+ * Die Bildlaufstelle blieb, die Karte war wieder zu: Wer die Seite nach einer Unterbrechung neu lud, stand vor 30 zugeklappten
+ * Karten und musste die suchen, an der er gearbeitet hatte. Neuer Speicherschlüssel `eeb.karte-offen.v1` im
+ * `sessionStorage` (je Tab; Einsatz-ID und Schlüssel der Einheit, keine Personendaten; „Alle Daten löschen" leert ihn mit).
+ */
+export const KARTE_OFFEN_SCHLUESSEL = "eeb.karte-offen.v1";
+
+interface OffeneKarte {
+  einsatz: string;
+  einheit: string;
+  zeit: number;
+}
+
+/** Diese Karte ist aufgeklappt (`einheit`) bzw. keine mehr (`null`, nur wenn sie noch die gemerkte war). */
+export function karteOffenMerken(einsatz: string, einheit: string, offen: boolean, jetzt: number = Date.now()): void {
+  try {
+    if (offen) {
+      sessionStorage.setItem(KARTE_OFFEN_SCHLUESSEL, JSON.stringify({ einsatz, einheit, zeit: jetzt } satisfies OffeneKarte));
+      return;
+    }
+    const roh = sessionStorage.getItem(KARTE_OFFEN_SCHLUESSEL);
+    const k = roh ? (JSON.parse(roh) as Partial<OffeneKarte> | null) : null;
+    if (k && k.einsatz === einsatz && k.einheit === einheit) sessionStorage.removeItem(KARTE_OFFEN_SCHLUESSEL);
+  } catch {
+    /* gesperrt oder voll: dann beginnt die Liste nach dem Neuladen zugeklappt */
+  }
+}
+
+/** War diese Karte beim letzten Mal aufgeklappt (und das ist nicht länger als {@link STELLE_MAX_ALTER_MS} her)? */
+export function karteWarOffen(einsatz: string, einheit: string, jetzt: number = Date.now()): boolean {
+  try {
+    const roh = sessionStorage.getItem(KARTE_OFFEN_SCHLUESSEL);
+    if (!roh) return false;
+    const k = JSON.parse(roh) as Partial<OffeneKarte> | null;
+    if (!k || k.einsatz !== einsatz || k.einheit !== einheit || typeof k.zeit !== "number") return false;
+    return jetzt >= k.zeit && jetzt - k.zeit <= STELLE_MAX_ALTER_MS;
+  } catch {
+    return false;
+  }
+}

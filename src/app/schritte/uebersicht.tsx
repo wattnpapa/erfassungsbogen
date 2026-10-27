@@ -39,6 +39,7 @@ import {
   personUnbenannt,
   pruefpunkte,
   zeitraumDeutsch,
+  datumAnzeige,
   qrErzeugen,
   vokabText,
   vokabularFuer,
@@ -688,7 +689,7 @@ export function Uebersicht(props: {
             </>
           );
         })()}
-        <Vollstaendigkeit punkte={offenePunkte} geheZu={geheZu} fremd={empfangenFremd && !nurStaerke && schnellAblegen} schnell={nurStaerke && schnellAblegen} />
+        <Vollstaendigkeit punkte={offenePunkte} geheZu={geheZu} fremd={empfangenFremd && !nurStaerke && schnellAblegen} schnell={nurStaerke && schnellAblegen} typGesetzt={!!vokabText(bogen.einheit.einheitsTyp, vokabularFuer(org, "einheitstyp"), "name")} />
       </section>
 
       {/* Einheit und Einsatz beantworten zusammen „wer, wo, wann" und tragen je
@@ -723,9 +724,9 @@ export function Uebersicht(props: {
 
       {abschnitt("Einsatz", 1, (
         <dl className="paare">
-          <dt>Zeitraum</dt><dd>{datumDeutsch(datumZuIso(bogen.einsatz.zeitraumVon))} – {datumDeutsch(datumZuIso(bogen.einsatz.zeitraumBis))}</dd>
+          <dt>Zeitraum (Tage)</dt><dd>{datumAnzeige(bogen.einsatz.zeitraumVon)} – {datumAnzeige(bogen.einsatz.zeitraumBis)}</dd>
           <dt>Ort / Auftrag</dt><dd>{bogen.einsatz.ortAuftrag || "—"}</dd>
-          <dt>Beginn / Ende</dt>
+          <dt>Uhrzeit Beginn / Ende</dt>
           <dd>
             {bogen.einsatz.einsatzbeginn != null ? zeitpunktDeutsch(bogen.einsatz.einsatzbeginn) : "—"}
             {" / "}

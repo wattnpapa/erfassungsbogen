@@ -24,6 +24,7 @@
  */
 
 import { deflateRaw } from "pako";
+import { anfuehrung } from "./typografie";
 
 // ------------------------------------------------------------------ ZIP-Teil
 
@@ -148,7 +149,7 @@ function zipBauen(eintraege: ZipEintrag[]): Uint8Array<ArrayBuffer> {
  * werden zu Leerzeichen.
  */
 export function xmlText(s: string): string {
-  return s
+  return anfuehrung(s)
     .replace(/\t/g, " ")
     // eslint-disable-next-line no-control-regex
     .replace(/[\x00-\x08\x0b\x0c\x0e-\x1f]/g, "")

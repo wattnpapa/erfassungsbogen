@@ -62,12 +62,13 @@ import { Kopfnav } from "./kopfnav-ui";
 import { bogenLinksEmpfangen, imWebBrowser, istNativ, qrScannen, textTeilen } from "./nativ";
 import { fehlerText } from "./nachladen";
 import { dateiFehlerMeldung } from "./datei-fehler";
+import type { DateiFehler } from "./fehler-buendeln";
 import { FehlerImBild } from "./fehler-im-bild";
 import { entfernteImImportKlaeren } from "./entfernte-meldungen";
 import { eigenesZurueckUm, eigenesZurueckVerbrauchen, rueckfrageEintragErsetzbar } from "./modal-overlay";
 import { FensterKonflikt, nachAbgleichFortsetzen, useFensterAbgleich } from "./fenster-abgleich";
 import { entwirreScanText } from "./tastaturbelegung";
-import { ortSperren, SCHRITTWECHSEL_SPERRE_MS, SEITENWECHSEL_SPERRE_MS } from "./tipp-schutz";
+import { ASSISTENT_SCHRITT_SPERRE_MS, ortSperren, SEITENWECHSEL_SPERRE_MS } from "./tipp-schutz";
 import { vorlageAktualisieren, vorlageAnlegen, vorlageAusDatei, vorlageZahlenText, vorlagenLaden, vorlagenPapierkorb, vorlageZuruecksetzen, type Vorlage } from "./vorlagen";
 import { Musterung, VorlagenListe } from "./vorlagen-ui";
 import { musterungVorlageAusStand } from "./musterung-stand";
@@ -90,7 +91,8 @@ import {
 } from "@bos/meldekopf/einsaetze";
 import { fassungGiltSetzen, fassungInHistorieLegen, fassungPruefen, fassungenJeEinheit, geltendeJeEinheit, type FassungsPruefung } from "./fassung-vorrang";
 import { einsaetzeLaden, einsaetzePapierkorb } from "./einsaetze-lesen";
-import { bogenDiff, diffKurzfassung } from "@bos/meldekopf/meldung-diff";
+import { diffKurzfassung } from "@bos/meldekopf/meldung-diff";
+import { bogenDiff } from "./diff-lage";
 import {
   SpeicherVollFehler,
   eintreffzeitSetzen,
@@ -104,11 +106,11 @@ import {
   zeitKurz,
   zeitLang,
 } from "./eintrag-zeiten";
-import { offlineText, useOfflineStand } from "./offline-bereit";
+import { offlineText, offlineZeileOffen, useOfflineStand } from "./offline-bereit";
 import { uebergabeBestaetigen, uebergabeNachWeg, uebergabeText, type UebergabeStand } from "./uebergabe-stand";
-import { ART_LABEL, EinsatzDetail, EinsatzListe, LetzteMeldungZeit, type Eingang } from "./einsaetze-ui";
+import { ART_LABEL, EinsatzDetail, EinsatzListe, type Eingang } from "./einsaetze-ui";
 import { uebersprungenText } from "./uebersprungen-text";
-import { anzahlEinheiten, einheitenAnwesend, letzteMeldung, lueckeKurz, meldungsNummern, nummernWechsel, nummernWechselText, rueckkehrText } from "./einheiten-tabelle";
+import { anzahlEinheiten, einheitenZahl, letzteMeldung, lueckeKurz, meldungsNummern, nummernWechsel, nummernWechselText, rueckkehrText } from "./einheiten-tabelle";
 import { exportSammlung, exportStaendeLaden, exportStaendeUebernehmen, exportStandAusWeitergabe, exportVermerken, lieferungsMarke, weitergabeUmImportErgaenzen, type ExportStand, type ExportUmfang, type ExportZiel } from "./export-stand";
 import { NICHTS_UEBERNOMMEN_SATZ, abgleichGliederung, abgleichText, einsatzAbgleichen, importUebernahm, sammlungFuerZiel, widerspruecheZumMerken, type Einzelheit } from "./einsatz-abgleich";
 import { widerspruchMerken } from "./widerspruch-merker";
@@ -582,6 +584,20 @@ const LAUF_ID = Math.random().toString(36).slice(2, 10);
 /** Gehört der Verlaufseintrag zu einem früheren Seitenaufruf (Rest vor dem Neuladen)? */
 export function verlaufRest(ziel: { lauf?: string } | undefined | null, lauf: string = LAUF_ID): boolean {
   return !!ziel?.lauf && ziel.lauf !== lauf;
+}
+/**
+ * Soll Zurück den Eintrag aus der Zeit vor dem Neuladen überspringen? Nur auf der Startseite (R11-E8): Wer mitten im Einsatz oder
+ * im Assistenten neu lädt und dann zurück will, soll auf dem vorigen Eintrag landen (meist die Startseite) und nicht aus der App
+ * fliegen (R17-S2).
+ */
+export function verlaufRestUeberspringen(
+  ziel: { lauf?: string } | undefined | null,
+  aktuell: Pick<Ansicht, "zeigeStart" | "scanner" | "muster" | "einsatz"> | null | undefined,
+  lauf: string = LAUF_ID,
+): boolean {
+  // Die Einsatzansicht trägt `zeigeStart` ebenfalls (sie liegt auf der Startseite); sie zählt hier nicht als Startseite.
+  const aufStartseite = !aktuell || (aktuell.zeigeStart && !aktuell.einsatz && !aktuell.scanner && !aktuell.muster);
+  return aufStartseite && verlaufRest(ziel, lauf);
 }
 /**
  * Bisherige und neue Meldung in der Rückfrage nebeneinander (R4-N1): Stärke,
@@ -1212,7 +1228,8 @@ function AppInhalt() {
     // Wechselt nur der Schritt, bleibt „Weiter →" an derselben Stelle: 0,9 s (R4-S2; R10-S2: 1,5 s schluckten im Takt von 1 s jeden zweiten Tipp). Öffnet sich dagegen
     // die Sammlung, die Startseite oder ein anderes Fenster, liegen unter dem Finger andere Knöpfe, und
     // wer die Knöpfe liest, tippt nach einer halben Sekunde: dort nur 600 ms (R9-H5).
-    ortSperren(vorher.schritt === jetzt.schritt ? SEITENWECHSEL_SPERRE_MS : SCHRITTWECHSEL_SPERRE_MS);
+    // R17-G11: 0,5 s nach „Weiter →" (vorher 0,9 s: jeder zweite Tipp im Takt von 0,4 bis 0,8 s blieb liegen).
+    ortSperren(vorher.schritt === jetzt.schritt ? SEITENWECHSEL_SPERRE_MS : ASSISTENT_SCHRITT_SPERRE_MS);
     if (verlaufZielRef.current && ansichtGleich(verlaufZielRef.current, jetzt)) {
       verlaufZielRef.current = null; // Rücksprung angekommen — kein neuer Eintrag
       return;
@@ -1302,7 +1319,9 @@ function AppInhalt() {
         return;
       }
       // Rest des Verlaufs vor dem Neuladen (R11-E8): überspringen, damit Zurück die App beim ersten Mal verlässt.
-      if (verlaufRest(ziel)) {
+      // Nur auf der Startseite: Wer mitten im Einsatz oder im Assistenten neu lädt und dann zurück will, soll auf dem
+      // vorigen Eintrag landen (meist die Startseite) und nicht aus der App fliegen (R17-S2).
+      if (verlaufRestUeberspringen(ziel, ansichtRef.current)) {
         try {
           history.back();
         } catch {
@@ -2583,7 +2602,7 @@ function AppInhalt() {
       wert: s.id,
       label: `In „${s.name}" aufnehmen`,
       // R15-W1: Liegt genau dieser Inhalt dort schon, sagt es die Zeile vor dem Tipp.
-      hinweis: `${s.eintraege.some((e) => e.id === bogenInhaltsId(b)) ? "Schon dort, würde übersprungen · " : ""}${ART_LABEL[s.art]}${s.ort ? ` · ${s.ort}` : ""} · ${aktuelleMeldungen(s.eintraege, s.art).length} Einheit(en) anwesend`,
+      hinweis: `${s.eintraege.some((e) => e.id === bogenInhaltsId(b)) ? "Schon dort, würde übersprungen · " : ""}${ART_LABEL[s.art]}${s.ort ? ` · ${s.ort}` : ""} · ${einheitenZahl(aktuelleMeldungen(s.eintraege, s.art).length)} anwesend`,
     }));
     // Steht ein eigener Bogen im Weg, nennt schon diese Zeile die Folge samt
     // Rückholplatz — „Bogen öffnen" gilt dann als Zustimmung, die zweite,
@@ -3463,14 +3482,10 @@ function AppInhalt() {
     setSammelZiel(zielId);
     setOffenerEinsatzId(null); // Assistent übernimmt die Ansicht
     setMeldung("");
-    // Wie die letzte hier von Hand erfasste Einheit: Wer eben nur die Stärke
-    // gezählt hat, will die nächste nicht mit „Personal vollständig erfassen"
-    // beginnen (R2-S2). Abgeleitet aus der Sammlung, kein eigener Speicher.
-    const zuletzt = einsaetzeLaden()
-      .find((x) => x.id === zielId)
-      ?.eintraege.filter((e) => e.quelle === "manuell")
-      .sort((a, b) => b.empfangenAm - a.empfangenAm)[0];
-    setBogen(schnell || zuletzt?.bogen.personalErfassung === PersonalErfassung.NUR_STAERKE ? schnellerfassungsBogen() : neuerBogen());
+    // Jeder der beiden Knöpfe öffnet seinen eigenen Weg: „Einheit manuell erfassen…" immer das volle Formular,
+    // „Einheit schnell erfassen (nur Stärke)…" immer die Schnellerfassung. Früher erbte der erste Knopf den
+    // Modus der zuletzt erfassten Einheit (R2-S2) und öffnete dauerhaft als Schnellerfassung (R17-S3).
+    setBogen(schnell ? schnellerfassungsBogen() : neuerBogen());
     setzeEmpfang(null);
     setSchritt(0);
     setZeigeStart(false);
@@ -3499,7 +3514,7 @@ function AppInhalt() {
       wert: s.id,
       label: `Für „${s.name}" erfassen`,
       // Zwei Sammlungen gleichen Namens sind sonst nur an der Anlagezeit zu unterscheiden (R11-D5).
-      hinweis: `${ART_LABEL[s.art]}${s.ort ? ` · ${s.ort}` : ""} · ${aktuelleMeldungen(s.eintraege, s.art).length} Einheit(en) anwesend${
+      hinweis: `${ART_LABEL[s.art]}${s.ort ? ` · ${s.ort}` : ""} · ${einheitenZahl(aktuelleMeldungen(s.eintraege, s.art).length)} anwesend${
         sammlungen.some((x) => x.id !== s.id && x.name.trim().toLowerCase() === s.name.trim().toLowerCase()) ? ` · angelegt ${zeitLang(s.angelegt)}` : ""
       }`,
     }));
@@ -3640,7 +3655,7 @@ function AppInhalt() {
         setAusgabeQuittung(
           umfang === "neue"
             ? `✓ Neue Bögen aus „${s.name}" als PDF erzeugt — liegt im Download-Ordner bzw. wurde über das Teilen-Menü abgelegt. Übergeben ist sie erst, wenn sie gedruckt oder verschickt ist.`
-            : `✓ Einsatz „${s.name}" als PDF erzeugt (mit allen Meldungen, Zeiten und Historie) — liegt im Download-Ordner bzw. wurde über das Teilen-Menü abgelegt. Weitergegeben ist sie erst, wenn sie bei der Ablösung oder im Archiv angekommen ist.`,
+            : `✓ Einsatz „${s.name}" als PDF erzeugt (mit allen Meldungen, Zeiten und Historie) — liegt im Download-Ordner bzw. wurde über das Teilen-Menü abgelegt. Weitergegeben ist sie erst, wenn sie bei der Ablösung oder im Archiv angekommen ist.${weitergabe ? " Für den Stab zählt sie nicht als Lieferung: Nachträge dorthin laufen über „Nur neue Bögen seit dem letzten Export“." : ""}`,
         );
       } catch (e) {
         setFehler(`Einsatz weitergeben: ${fehlerText(e)}`);
@@ -3859,7 +3874,8 @@ function AppInhalt() {
     let neu = 0;
     let uebersprungen = 0;
     let speicherVoll = 0;
-    const kaputt: string[] = [];
+    // Dateiname und Satz je Fehler: gleiche Sätze erscheinen gebündelt mit Zahl und Namen (R17-G13).
+    const kaputt: DateiFehler[] = [];
     const zusatz = { sammlungInPdf: false, lage: false }; // R2-A1
     const sammlungenUebernommen: string[] = []; // R3-W3
     // Stand vor dem Stapel und die neu abgelegten Bögen — für die Frage,
@@ -3872,7 +3888,7 @@ function AppInhalt() {
         // Lageblatt oder Blanko als PDF: kein Bogen darin, sagt es und nennt den Weg über die Sammel-PDF (R11-A3).
         const nurLesen = bytes ? leseausgabeMeldung(bytes, datei.name) : null;
         if (nurLesen) {
-          kaputt.push(nurLesen);
+          kaputt.push({ datei: datei.name, text: nurLesen });
           continue;
         }
         const art = bytes ? pdfInhaltArt(bytes) : null;
@@ -3891,7 +3907,7 @@ function AppInhalt() {
         if (art === "nur-qr") zusatz.lage = true;
         const abgelehnt: string[] = [];
         const r = boegenAufnehmen(zielId, await boegenAusDatei(datei, abgelehnt), art === "nur-qr");
-        for (const satz of abgelehnt) kaputt.push(`„${datei.name}“: ${satz}`);
+        for (const satz of abgelehnt) kaputt.push({ datei: datei.name, text: satz, nameVorn: true });
         neu += r.neu;
         uebersprungen += r.uebersprungen;
         speicherVoll += r.speicherVoll;
@@ -3899,12 +3915,14 @@ function AppInhalt() {
       } catch (e) {
         // Je Datei ein ganzer Satz mit Ursache und nächstem Schritt statt
         // Parser-Text in Klammern (Audit Runde 2, R2-E5).
-        kaputt.push(await dateiFehlerMeldung(datei, e, "boegen"));
+        kaputt.push({ datei: datei.name, text: await dateiFehlerMeldung(datei, e, "boegen") });
       }
     }
     einsaetzeNeuLaden();
     const vorrang = await vorrangImStapel(zielId, vorher, neueIds);
-    const fehlerZeilen = [speicherVollMeldung(speicherVoll), ...kaputt].filter(Boolean);
+    // Nur im Fehlerfall nachgeladen: Das Bündeln gehört nicht ins Startbündel.
+    const gebuendelt = kaputt.length > 0 ? (await import("./fehler-buendeln")).fehlerZeilenBuendeln(kaputt) : [];
+    const fehlerZeilen = [speicherVollMeldung(speicherVoll), ...gebuendelt].filter(Boolean);
     const bogenMeldung =
       neu + uebersprungen === 0
         ? kaputt.length > 0 || sammlungenUebernommen.length > 0 || speicherVoll > 0
@@ -4425,11 +4443,29 @@ function AppInhalt() {
   if (!bogen || zeigeStart) {
     // Erststart = noch keinerlei Daten: Onboarding prominent statt am Seitenende.
     const erststart = !bogen && vorlagen.length === 0 && einsaetze.length === 0;
+    // Die Liste der Einsätze (R17-A7, K5, N2): ein Einsatz, ein Eintrag. Läuft einer, steht sie über der Weiche — der frühere
+    // Schnelleinstieg in „Bögen sammeln" wiederholte Name, Einheiten und Letzte Meldung der Karte darunter. Ohne Einsatz bleibt
+    // der Abschnitt mit seinem Hinweis an der alten Stelle.
+    const einsatzAbschnitt = (
+      <section className="start-vorlagen">
+        <h2>Einsatz-Sammlung (Meldekopf)</h2>
+        {einsaetze.length === 0 && (
+          <p className="hinweis">
+            Fremde Bögen zu einem Einsatz/einer Übung sammeln (scannen oder manuell) — mit Stärke-Summen über alle anwesenden Einheiten.
+          </p>
+        )}
+        <EinsatzListe
+          einsaetze={einsaetze}
+          onOeffnen={(s) => { setMeldung(""); setOffenerEinsatzId(s.id); }}
+          onGeaendert={einsaetzeNeuLaden}
+        />
+      </section>
+    );
     const schnellVorlagen = [...vorlagen]
       .sort((a, b) => Number(!!b.standard) - Number(!!a.standard) || b.geaendert - a.geaendert)
       .slice(0, 2);
     const offlineHinweis = (
-      <p className={`offline-badge${offline.stand === "bereit" ? "" : " offline-laedt"}`} role="status">
+      <p className={`offline-badge${offline.stand === "bereit" ? "" : " offline-laedt"}${offlineZeileOffen(offline) ? " offline-offen" : ""}`} role="status">
         {offlineText(offline)}
         {/* Abgebrochenes Erstladen: Der Ausweg steht neben der Meldung (R4-O1). */}
         {offline.abgebrochen && offline.online && (
@@ -4699,6 +4735,9 @@ function AppInhalt() {
             Meldekopf rechts. Vorher gab es nur EINEN Primärknopf („Neuen
             Bogen erstellen"), und wer sammeln wollte, wählte am Meldekopf
             regelmäßig den falschen Einstieg. */}
+        {/* Läuft ein Einsatz, steht seine Karte über den beiden Wegen: nach einer Unterbrechung tippte man sonst in den
+            falschen Block („Neuen Bogen erstellen"), der Einsatz lag erst unter dem Bildrand (R17-S9, R17-A7). */}
+        {einsaetze.length > 0 && einsatzAbschnitt}
         <div className="weiche">
           <section className="weiche-weg" aria-labelledby="weg-eigener-bogen">
             <h2 id="weg-eigener-bogen">Meinen Bogen ausfüllen</h2>
@@ -4782,23 +4821,7 @@ function AppInhalt() {
               {/* „Neuer Einsatz…" lasen Helfer als Beginn der eigenen Meldung
                   (Audit „Neuer Nutzer", F3) — der Knopf nennt jetzt, was er
                   anlegt: die Sammelmappe. */}
-              {/* Laufende Sammlungen direkt hier öffnen: auf dem Telefon stand
-                  ihre Karte erst unter Entwurf, Vorlagen und Weiche, bei rund
-                  1 850 px (Audit Runde 3, R3-K5). Die zuletzt geänderten zuerst,
-                  mit dem Zeitpunkt der letzten Meldung. */}
-              {laufende.map((s) => (
-                <button
-                  key={s.id}
-                  type="button"
-                  className="primaer sammlung-oeffnen"
-                  onClick={() => { setMeldung(""); setOffenerEinsatzId(s.id); }}
-                >
-                  „{s.name}" öffnen
-                  {/* Einheitenzahl und Ort: zwei gleichnamige Sammlungen sind sonst nur an der Zeit zu unterscheiden (R11-K3). */}
-                  <span className="knopf-zusatz sammlung-kenndaten">{einheitenAnwesend(s.eintraege, s.art)}{s.ort ? ` · ${s.ort}` : ""}</span>
-                  <span className="knopf-zusatz"><LetzteMeldungZeit s={s} /></span>
-                </button>
-              ))}
+              {/* Laufende Einsätze stehen als Karten über dieser Weiche (R3-K5, R17-A7): ein Einsatz, ein Eintrag. */}
               <button type="button" className={laufende.length > 0 ? "" : "primaer"} onClick={neuerEinsatz}>Neue Einsatz-Sammlung…</button>
               {/* Direkter Einstieg in die Meldekopf-Schnellerfassung: vorher nur
                   als Radio in Schritt 3 erreichbar — unter Zeitdruck fand ihn
@@ -4858,17 +4881,7 @@ function AppInhalt() {
         {/* Anlegen/Import sitzen oben in der Weiche; hier steht die Liste der
             laufenden Sammlungen. Die Überschrift bleibt wörtlich bestehen —
             E2E-Szenarien und Anleitung verweisen auf sie. */}
-        <section className="start-vorlagen">
-          <h2>Einsatz-Sammlung (Meldekopf)</h2>
-          <p className="hinweis">
-            Fremde Bögen zu einem Einsatz/einer Übung sammeln (scannen oder manuell) — mit Stärke-Summen über alle anwesenden Einheiten.
-          </p>
-          <EinsatzListe
-            einsaetze={einsaetze}
-            onOeffnen={(s) => { setMeldung(""); setOffenerEinsatzId(s.id); }}
-            onGeaendert={einsaetzeNeuLaden}
-          />
-        </section>
+        {einsaetze.length === 0 && einsatzAbschnitt}
         {/* Absender einmal einrichten, bevor der erste Bogen entsteht: hier auf
             der Startseite gefunden, gilt die Angabe für jeden späteren Transport.
             Zugeklappt, bis man ihn braucht — der sichtbare „hinterlegen…"-Link
@@ -4918,6 +4931,10 @@ function AppInhalt() {
   // Fußleiste den Abschluss (F2) — nur bei einer als fremd markierten
   // Erfassung, nie beim eigenen Bogen (R3-S2).
   const sammelEinsatz = fremdeErfassung && sammelZielId ? einsaetze.find((s) => s.id === sammelZielId) ?? null : null;
+  // Schnellerfassung: Der Sofortbedarf entfällt (Reiter „–"). „Weiter" von den Fahrzeugen geht darum gleich zur Übersicht,
+  // und „Zurück" dort nennt den Schritt, von dem man kam — der Knopf heißt auch beim ersten Besuch „Zur Übersicht" (R17-S12).
+  const schnellOhneBedarfSchritt = fremdeErfassung && bogen.personalErfassung === PersonalErfassung.NUR_STAERKE;
+  const zurUebersicht = schritt === UEBERSICHT - 1 || ausUebersicht === schritt || (schnellOhneBedarfSchritt && schritt === UEBERSICHT - 2);
 
   return (
     <>
@@ -4964,7 +4981,7 @@ function AppInhalt() {
           </span>
         )}
         {sammelEinsatz && (
-          <span className="modus-marke" title={`Diese Erfassung wird als Meldung in die Sammlung „${sammelEinsatz.name}" gelegt — mit „In Einsatz übernehmen" auf jedem Schritt.`}>
+          <span className="modus-marke marke-einsatz" title={`Diese Erfassung wird als Meldung in die Sammlung „${sammelEinsatz.name}" gelegt — mit „In Einsatz übernehmen" auf jedem Schritt.`}>
             Aufnahme für: {sammelEinsatz.name}
           </span>
         )}
@@ -4995,7 +5012,7 @@ function AppInhalt() {
               className={klassen}
               ref={i === schritt ? reiterZeigen : undefined}
               aria-current={i === schritt ? "step" : undefined}
-              aria-label={st ? `${i + 1}. ${name} — ${SCHRITT_STATUS_TITEL[st]}` : undefined}
+              aria-label={st ? `${i + 1}. ${name} — ${SCHRITT_STATUS_TITEL[st]}` : entfaellt ? `${i + 1}. ${name} — entfällt in der Schnellerfassung` : undefined}
               title={entfaellt ? "Entfällt in der Schnellerfassung" : st ? SCHRITT_STATUS_TITEL[st] : undefined}
               onClick={() => setSchritt(i)}
             >
@@ -5008,6 +5025,10 @@ function AppInhalt() {
           );
         })}
       </nav>
+      {/* Der Strich im Reiter heißt „entfällt": einmal ausgeschrieben, wo die Schnellerfassung beginnt oder wo man auf einem solchen Reiter steht (R17-N5). */}
+      {fremdeErfassung && bogen.personalErfassung === PersonalErfassung.NUR_STAERKE && (schritt === 0 || schritt === 1 || schritt === 4) && (
+        <p className="schritte-erklaerung">„–“ heißt: Schritt 2 und 5 entfallen hier.</p>
+      )}
       {fenster.konflikt ? (
         <FensterKonflikt abgleich={fenster} />
       ) : speicherFehler ? (
@@ -5162,7 +5183,7 @@ function AppInhalt() {
             <div className="teilen-weg" key={s.id}>
               <button type="button" onClick={() => bogenInEinsatzLegen(s.id)}>{s.name}</button>
               <p className="hinweis">
-                {ART_LABEL[s.art]}{s.ort ? ` · ${s.ort}` : ""} · {aktuelleMeldungen(s.eintraege, s.art).length} Einheit(en) anwesend
+                {ART_LABEL[s.art]}{s.ort ? ` · ${s.ort}` : ""} · {einheitenZahl(aktuelleMeldungen(s.eintraege, s.art).length)} anwesend
               </p>
             </div>
           ))}
@@ -5180,7 +5201,7 @@ function AppInhalt() {
       )}
 
       {schritt !== UEBERSICHT && (
-        <footer className={sammelEinsatz ? "nav assistent-nav mit-uebernehmen" : "nav assistent-nav"}>
+        <footer className={sammelEinsatz ? `nav assistent-nav mit-uebernehmen${schnellOhneBedarfSchritt ? " uebernehmen-haupt" : ""}` : "nav assistent-nav"}>
           {/* Unter 360 px steht nur „←" (das Wort fällt per CSS weg), damit der
               Modusknopf daneben Platz hat; der Name bleibt „← Zurück". */}
           <button type="button" className="nav-zurueck" aria-label="← Zurück" disabled={schritt === 0} onClick={() => setSchritt(schritt - 1)}>
@@ -5196,7 +5217,10 @@ function AppInhalt() {
               „Weiter →" traf ein Handschuh, der „Weiter" suchte, das Ablegen
               (Audit Runde 3, R3-G3). */}
           {sammelEinsatz && (
-            <button type="button" className="uebernehmen" onClick={() => void erfassungUebernehmen()}>In Einsatz übernehmen</button>
+            // R17-M3: Auf schmalen Telefonen steht nur „Übernehmen" (CSS blendet „In Einsatz" aus); der Name bleibt voll.
+            <button type="button" className="uebernehmen" aria-label="In Einsatz übernehmen" onClick={() => void erfassungUebernehmen()}>
+              <span className="nav-einsatz">In Einsatz </span><span className="nav-ue">übernehmen</span>
+            </button>
           )}
           {/* Nach der Musterung stehen Personal, Fahrzeuge und Bedarf schon da:
               Von „Bogen anlegen" bis zur Übergabe führte „Weiter →" durch
@@ -5211,17 +5235,17 @@ function AppInhalt() {
               dort nicht gefragt (R2-N6). */}
           <button
             type="button"
-            className="primaer"
-            aria-label={schritt === UEBERSICHT - 1 || ausUebersicht === schritt ? "Zur Übersicht →" : "Weiter →"}
+            className="primaer nav-weiter"
+            aria-label={zurUebersicht ? "Zur Übersicht →" : "Weiter →"}
             onClick={() =>
               setSchritt(
-                ausUebersicht === schritt
+                ausUebersicht === schritt || (schnellOhneBedarfSchritt && schritt === UEBERSICHT - 2)
                   ? UEBERSICHT
                   : schritt === 0 && fremdeErfassung && bogen.personalErfassung === PersonalErfassung.NUR_STAERKE ? 2 : schritt + 1,
               )
             }
           >
-            {schritt === UEBERSICHT - 1 || ausUebersicht === schritt ? (
+            {zurUebersicht ? (
               <>
                 {/* Auf dem kleinsten Bild fällt „Zur" weg, damit „◐" nicht unter den Knopf gerät (R6-G1). */}
                 <span className="nav-zur">Zur </span>

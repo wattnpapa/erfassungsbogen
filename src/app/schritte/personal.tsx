@@ -3,7 +3,7 @@
  * und die Meldekopf-Schnellerfassung (nur Stärke).
  */
 
-import { Fragment, useEffect, useLayoutEffect, useMemo, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from "react";
+import { Fragment, Suspense, lazy, useEffect, useLayoutEffect, useMemo, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from "react";
 import { DaumenQuittung } from "../daumen-quittung";
 import { ortSperren } from "../tipp-schutz";
 import { useZahlQuittung } from "../quittung";
@@ -26,11 +26,8 @@ import {
   unterbringungMWD,
   verpflegung,
 } from "@bos/eeb-format/model";
-import { namenEinsetzen, namenVerdachtGruende, parseNamen } from "../personal-schnell";
 import { berufText, qualifikationenUndBerufe, zusatzqualifikationenAus } from "../beruf";
 import { SOLL_NICHT_GEMELDET } from "../soll-text";
-import { beispielPersonen } from "../beispielnamen";
-import { beispielMerken } from "../beispiel-herkunft";
 import { stanPersonalVorbelegung } from "@bos/vokabulare/thw-stan-personal";
 import { haeufigeFunktionen } from "../haeufige-funktionen";
 import {
@@ -69,8 +66,11 @@ import {
 import { OvVorschlagFeld, useOvDaten } from "./einheit";
 import type { ThwOrtsverband } from "@bos/vokabulare/thw-ov";
 
+// Inhalt des Fensters „Namen einfügen…": Zerleger, Vorschau und Beispielnamen laden nach und bleiben aus dem Startbündel.
+const NamenInhalt = lazy(() => import("./namen-dialog"));
+
 /** Rollen-Beschriftung für die Einfüge-Vorschau — dieselben Wörter wie im Auswahlfeld. */
-const ROLLE_LABEL: Record<StaerkeRolle, string> = {
+export const ROLLE_LABEL: Record<StaerkeRolle, string> = {
   [StaerkeRolle.FUEHRER]: "Führer/in",
   [StaerkeRolle.UNTERFUEHRER]: "Unterführer/in",
   [StaerkeRolle.MANNSCHAFT]: "Mannschaft",
@@ -877,12 +877,12 @@ function PersonalSchnellTabelle(props: {
  * Namen ersetzen die unbenannten Zeilen — etwa die Sollplätze einer
  * Vorlage —, statt sich dahinter zu stellen; Ausgefülltes bleibt unangetastet.
  */
-function benannte(personal: Person[]): Person[] {
+export function benannte(personal: Person[]): Person[] {
   return personal.filter((p) => !personUnbenannt(p));
 }
 
 /** Kurzbeschreibung eines Sollplatzes für die Namensvorschau: Funktion, sonst Rolle. */
-function platzText(p: Person, org: OrganisationsTyp): string {
+export function platzText(p: Person, org: OrganisationsTyp): string {
   const funktion = p.funktionen
     .map((f) => vokabText(f, vokabularFuer(org, "funktion"), "kurz"))
     .filter(Boolean)
@@ -1042,6 +1042,9 @@ export function SchrittPersonal({ bogen, aendern: aendernRoh }: SchrittProps) {
   /** „Entfernt: Name" bzw. „2 Personen (Name, Name)". */
   const entferntText = (entfernte: { name: string }[]) =>
     entfernte.length === 1 ? entfernte[0]!.name : `${entfernte.length} Personen (${entfernte.map((e) => e.name).join("; ")})`;
+  // Wechsel der Ansprechperson (Platz 1) durch ▲/⇑/▼: Quittung mit „Rückgängig", solange die Liste so steht (R17-D2).
+  const [ansprechWechsel, setAnsprechWechsel] = useState<{ vorher: Person[]; danach: string; name: string; nonce: number } | null>(null);
+  const ansprechWeg = ansprechWechsel && JSON.stringify(bogen.personal) === ansprechWechsel.danach ? ansprechWechsel : null;
   const rueckgaengig = () => {
     if (!rueckweg) return;
     if (rueckweg.art === "liste") {
@@ -1184,76 +1187,17 @@ export function SchrittPersonal({ bogen, aendern: aendernRoh }: SchrittProps) {
   /** Höhe des gedrückten Knopfs im Bild – die verschobene Person soll unter dem Finger bleiben (R6-G5). */
   const sortierAnker = useRef<number | null>(null);
   const namenDialog = useRef<HTMLDialogElement>(null);
-  const [namenText, setNamenText] = useState("");
-  const namenAlle = parseNamen(namenText);
-  // Zeilen, die kein Name sein dürften (Ziffern, Klammern, Semikolon), tragen eine
-  // Marke und werden nur übernommen, wenn sie ausdrücklich angehakt sind (R7-E7).
-  const namenVerdaechtig = (n: { vorname: string; nachname: string }) =>
-    /[\d()\[\]{};<>]/.test(`${n.vorname} ${n.nachname}`) || !/\p{L}/u.test(`${n.vorname}${n.nachname}`);
-  const zeilenSchluessel = (n: { vorname: string; nachname: string }, i: number) => `${i}:${n.nachname}|${n.vorname}`;
-  const [verdachtAngehakt, setVerdachtAngehakt] = useState<ReadonlySet<string>>(() => new Set());
-  const namenVorschau = namenAlle.filter((n, i) => !namenVerdaechtig(n) || verdachtAngehakt.has(zeilenSchluessel(n, i)));
-  // Dubletten kennzeichnen — in der Liste selbst und gegenüber schon
-  // erfassten Personen. Übernommen werden sie trotzdem (zwei gleichnamige
-  // Helfer gibt es), aber nicht unbemerkt (Audit „Fehler", E6).
-  const namensSchluessel = (v: string, n: string) => `${n.trim().toLowerCase()}|${v.trim().toLowerCase()}`;
-  const schonErfasst = new Set(bogen.personal.map((p) => namensSchluessel(p.vorname, p.nachname)));
-  const vorschauDoppelt = namenVorschau.map((n, i) => {
-    const k = namensSchluessel(n.vorname, n.nachname);
-    return schonErfasst.has(k) || namenVorschau.findIndex((m) => namensSchluessel(m.vorname, m.nachname) === k) < i;
-  });
-  const anzahlDoppelt = vorschauDoppelt.filter(Boolean).length;
-  // Wohin jeder Name kommt — freie Sollplätze zuerst (R2-N2). Die Vorschau
-  // zeigt es, bevor übernommen wird.
-  const vorschauPlaetze = namenEinsetzen(bogen.personal, namenVorschau.map(personAusZeile), personUnbenannt).plaetze;
-  // Anzahl für den Beispielnamen-Generator (nur Übungsbögen). Vorgabe 9:
-  // Trupp bis Gruppe, die häufigste Größenordnung in Übungslagen.
-  const [beispielAnzahl, setBeispielAnzahl] = useState(9);
-
-  /**
-   * Eingefügte Zeile → Person. Das Funktionsfeld wandert in die Funktionsliste
-   * (als Vokabeleintrag, wenn das Kürzel im Vokabular der Organisation steht,
-   * sonst als Freitext) und bringt die Stärke-Rolle mit — ohne das zählte ein
-   * eingefügter Zugführer als Mannschaft.
-   */
-  function personAusZeile(n: (typeof namenVorschau)[number]) {
-    const person = { ...neuePerson(), vorname: n.vorname, nachname: n.nachname };
-    if (n.rolle != null) person.staerkeRolle = n.rolle;
-    if (n.funktion) {
-      const tabelle = vokabularFuer(bogen.einheit.organisation, "funktion");
-      const gesucht = n.funktion.toLowerCase();
-      const treffer = tabelle.find(
-        (v) => v.kurz?.toLowerCase() === gesucht || v.name.toLowerCase() === gesucht,
-      );
-      person.funktionen = [treffer ? { code: treffer.code } : { freitext: n.funktion }];
-    }
-    return person;
-  }
-
-  function namenUebernehmen() {
-    if (namenVorschau.length === 0) return;
-    const { personal, plaetze } = namenEinsetzen(bogen.personal, namenVorschau.map(personAusZeile), personUnbenannt);
-    const eingesetzt = plaetze.filter((x) => x != null).length;
-    aendernMitRueckweg(
-      personal,
-      `${namenVorschau.length} ${namenVorschau.length === 1 ? "Name" : "Namen"} übernommen` +
-        (eingesetzt > 0 ? ` — ${eingesetzt} davon in freie Sollplätze.` : "."),
-    );
-    // Die gewählte Ansicht bleibt (R12-N6): Wer Karten wählt, bekommt nach „Übernehmen“ keine Tabelle.
-    setNamenText("");
-    setVerdachtAngehakt(new Set());
+  // Der Inhalt des Fensters „Namen einfügen…" (Zerleger, Vorschau, Beispielnamen) lädt nach und bleibt aus dem Startbündel;
+  // sein Zustand (die eingefügte Liste) lebt dort, solange der Schritt offen ist.
+  const namenUebernehmen = (personal: Person[], text: string) => {
+    aendernMitRueckweg(personal, text);
     namenDialog.current?.close();
-  }
-
-  function beispielnamenUebernehmen() {
-    const anzahl = Math.max(1, Math.min(99, beispielAnzahl));
-    const bestand = benannte(bogen.personal);
-    const erzeugt = beispielPersonen(anzahl, bestand);
-    beispielMerken({ personal: erzeugt }); // erfundene Namen: Rückfrage beim Abwählen von „Übung" (R14-E6)
-    aendern({ personal: [...bestand, ...erzeugt] });
+  };
+  const beispielnamenUebernehmen = (personal: Person[]) => {
+    aendern({ personal });
     setSchnell(true);
     namenDialog.current?.close();
-  }
+  };
   useEffect(() => {
     if (fokusSortierung == null) return;
     setFokusSortierung(null);
@@ -1292,7 +1236,13 @@ export function SchrittPersonal({ bogen, aendern: aendernRoh }: SchrittProps) {
     // (R5-G4). Die Stelle nimmt kurz nichts an, der Tipp zeigt „Einen Moment …".
     ortSperren();
     sortierAnker.current = document.querySelector<HTMLElement>(`[data-sortier="${gruppe}-${von}-${art}"]`)?.getBoundingClientRect().top ?? null;
-    aendern({ personal: verschoben(bogen.personal, von, nach) });
+    const danach = verschoben(bogen.personal, von, nach);
+    aendern({ personal: danach });
+    // Wer an Platz 1 steht, ist die Ansprechperson (PDF, Meldekopf): Ein Wechsel dorthin wird gesagt und lässt sich
+    // mit einem Tipp zurücknehmen — „⇑" liegt 4 px neben „▼" und „✕" (R17-D2, R17-S5).
+    if ((von === 0 || nach === 0) && danach[0] && danach[0] !== bogen.personal[0]) {
+      setAnsprechWechsel({ vorher: bogen.personal, danach: JSON.stringify(danach), name: personBezeichnung(danach[0], 0), nonce: Date.now() });
+    }
     setFokusSortierung(`${gruppe}-${nach}-${art}`);
   }
 
@@ -1687,6 +1637,20 @@ export function SchrittPersonal({ bogen, aendern: aendernRoh }: SchrittProps) {
           <strong>Entfernt:</strong> {entferntText(rueckweg.entfernte)}
         </DaumenQuittung>
       )}
+      {ansprechWeg && !rueckweg && !zahlenWeg && (
+        <DaumenQuittung
+          key={`ansprech:${ansprechWeg.nonce}`}
+          prellschutz
+          onRueckgaengig={() => {
+            setAnsprechWechsel(null);
+            aendernRoh(verpflegungMitziehen(bogen, { personal: ansprechWeg.vorher }));
+          }}
+          rueckgaengigName="Wechsel der Ansprechperson rückgängig machen"
+          onSchliessen={() => setAnsprechWechsel(null)}
+        >
+          <strong>Neue Ansprechperson:</strong> {ansprechWeg.name}
+        </DaumenQuittung>
+      )}
       {zahlenWeg && (
         <DaumenQuittung
           key={`zahlen:${zahlenWeg.nonce}`}
@@ -1783,144 +1747,10 @@ export function SchrittPersonal({ bogen, aendern: aendernRoh }: SchrittProps) {
           Praktisch, wenn die Liste schon existiert (Nachricht, Tabelle, Zettel):
           einfach hier hineinkopieren.
         </p>
-        {/* Sichtbare Beschriftung statt nur Platzhalter: der verschwand mit
-            der ersten Eingabe, und mit ihm der Name des Felds (R2-M5). */}
-        <label className="feld">
-          Namensliste (eine Person je Zeile)
-          <textarea
-            rows={8}
-            value={namenText}
-            onChange={(e) => setNamenText(e.target.value)}
-            placeholder={"Muster, Max\nErika Musterfrau\n…"}
-            style={{ width: "100%" }}
-          />
-        </label>
-        {/* R8-E2: Escape, Zurück-Geste und „Schließen“ verwerfen die Liste nicht mehr — sie bleibt im Feld,
-            bis sie übernommen oder von Hand geleert wird. */}
-        {namenText.trim() !== "" && (
-          <p className="hinweis">
-            Die Liste bleibt stehen, auch wenn du das Fenster schließt — bis du sie übernimmst oder leerst.{" "}
-            <button
-              type="button"
-              onClick={async () => {
-                // Ab einer Handvoll Zeilen fragen: eine aus einer Nachricht kopierte Liste ist sonst mit einem Tipp weg (R10-D3).
-                if (namenAlle.length >= 4) {
-                  const ja = await frageJaNein({
-                    titel: `${namenAlle.length} Zeilen verwerfen?`,
-                    text: "Die eingefügte Liste wird geleert. Sie ist danach nicht wiederherzustellen — nur neu einzufügen.",
-                    ok: "Liste leeren",
-                    abbruch: "Liste behalten",
-                    gefahr: true,
-                    fokus: "abbruch",
-                  });
-                  if (!ja) return;
-                }
-                setNamenText("");
-                setVerdachtAngehakt(new Set());
-              }}
-            >
-              Liste leeren
-            </button>
-          </p>
-        )}
-        {/* Vorschau: Wer welche Rolle bekommt, entscheidet über die gemeldete
-            Stärke — das darf nicht erst im fertigen Bogen auffallen. */}
-        {namenAlle.length > 0 && (
-          <ul className="namen-vorschau">
-            {(() => {
-              let wirksam = -1;
-              return namenAlle.map((n, i) => {
-                const verdacht = namenVerdaechtig(n);
-                const schluessel = zeilenSchluessel(n, i);
-                const dabei = !verdacht || verdachtAngehakt.has(schluessel);
-                if (dabei) wirksam++;
-                const w = wirksam;
-                return (
-                  <li key={i}>
-                    {verdacht && (
-                      <label className="inline">
-                        <input
-                          type="checkbox"
-                          aria-label={`„${[n.nachname, n.vorname].filter(Boolean).join(", ")}" trotzdem als Name übernehmen`}
-                          checked={dabei}
-                          onChange={(e) =>
-                            setVerdachtAngehakt((alt) => {
-                              const neu = new Set(alt);
-                              if (e.target.checked) neu.add(schluessel);
-                              else neu.delete(schluessel);
-                              return neu;
-                            })
-                          }
-                        />
-                      </label>
-                    )}
-                    {[n.nachname, n.vorname].filter(Boolean).join(", ")}
-                    {n.funktion ? ` · ${n.funktion}` : ""}
-                    {" · "}
-                    {verdacht && !dabei ? (
-                      <strong>wird nicht übernommen</strong>
-                    ) : (
-                      <strong>
-                        {vorschauPlaetze[w] != null
-                          ? `→ Platz ${vorschauPlaetze[w]! + 1}: ${platzText(bogen.personal[vorschauPlaetze[w]!]!, bogen.einheit.organisation)}`
-                          : ROLLE_LABEL[n.rolle ?? StaerkeRolle.MANNSCHAFT]}
-                      </strong>
-                    )}
-                    {verdacht && <span className="uebung-badge">kein Name?</span>}
-                    {!verdacht && n.unsicher && <span className="uebung-badge">Reihenfolge prüfen</span>}
-                    {dabei && vorschauDoppelt[w] && <span className="uebung-badge">doppelt</span>}
-                  </li>
-                );
-              });
-            })()}
-          </ul>
-        )}
-        {namenAlle.some(namenVerdaechtig) && (
-          <p className="warnung" role="status">
-            {namenAlle.filter(namenVerdaechtig).length === 1 ? "Eine Zeile sieht" : `${namenAlle.filter(namenVerdaechtig).length} Zeilen sehen`} nicht
-            nach einem Namen aus ({namenVerdachtGruende(namenAlle.filter(namenVerdaechtig))}) und {namenAlle.filter(namenVerdaechtig).length === 1 ? "wird" : "werden"} nicht übernommen. Wer sie
-            doch braucht, hakt sie an.
-          </p>
-        )}
-        {namenAlle.some((n) => n.unsicher && !namenVerdaechtig(n)) && (
-          <p className="warnung" role="status">
-            Bei „Reihenfolge prüfen" ist die Reihenfolge geraten (mehrere Wörter vor dem Komma, Funktion ohne Komma) — die
-            Vorschau zeigt „Nachname, Vorname". Stimmt das nicht, die Zeile als „Nachname, Vorname, Funktion" schreiben.
-          </p>
-        )}
-        {anzahlDoppelt > 0 && (
-          <p className="warnung" role="status">
-            {anzahlDoppelt === 1 ? "Ein Name steht" : `${anzahlDoppelt} Namen stehen`} doppelt — in der Liste oder
-            schon im Bogen. Übernommen werden sie trotzdem; wenn es dieselbe Person ist, die Zeile vorher löschen.
-          </p>
-        )}
-        <p>
-          <button type="button" className="primaer" disabled={namenVorschau.length === 0} onClick={namenUebernehmen}>
-            {namenVorschau.length === 0
-              ? "Übernehmen"
-              : `${namenVorschau.length} ${namenVorschau.length === 1 ? "Person" : "Personen"} übernehmen`}
-          </button>
-        </p>
-        {/* Beispielnamen nur bei Übungsbögen (Haken in Schritt 2): im echten
-            Einsatz existiert dieser Weg gar nicht erst — künstliche Daten
-            lassen sich dort auch nicht versehentlich erzeugen. */}
-        {bogen.uebung && (
-          <>
-            <h3>Beispielnamen (Übung)</h3>
-            <p className="hinweis">
-              Erzeugt erkennbar fiktive Personen mit zufälligem Namen, Geschlecht, Ernährung
-              und Fahrerlaubnis; Unterführerplätze (Gruppen-/Truppführer) werden passend zur Stärke verteilt, ein Führerplatz erst ab Zugstärke.
-            </p>
-            <div className="zeile">
-              <Feld titel="Anzahl" schmal>
-                <ZahlFeld wert={beispielAnzahl} setzen={setBeispielAnzahl} min={1} max={99} einheit="Personen" />
-              </Feld>
-              <button type="button" onClick={beispielnamenUebernehmen}>
-                Beispielpersonen einfügen
-              </button>
-            </div>
-          </>
-        )}
+        {/* Liste, Vorschau, Reihenfolge und Beispielnamen laden nach (namen-dialog.tsx). */}
+        <Suspense fallback={<p className="hinweis" role="status">Wird geladen …</p>}>
+          <NamenInhalt bogen={bogen} onUebernehmen={namenUebernehmen} onBeispiele={beispielnamenUebernehmen} />
+        </Suspense>
       </dialog>
     </section>
   );

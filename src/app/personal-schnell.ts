@@ -5,7 +5,16 @@
  * anzulegen. Reine Funktion, damit sie unit-testbar bleibt.
  */
 
-import { StaerkeRolle, type Person } from "@bos/eeb-format/model";
+import { KontaktArt, StaerkeRolle, type Kontakt, type Person } from "@bos/eeb-format/model";
+import { telefonBereinigen } from "./telefon-eingabe";
+
+/** Kontakt zur Rufnummer einer eingefügten Zeile: Mobilnummern (015x, 016x, 017x) als Mobil, sonst Festnetz; dienstlich (R17-H5). */
+export function kontaktAusNummer(roh: string): Kontakt | null {
+  const wert = telefonBereinigen(roh).wert;
+  if (wert.replace(/\D/g, "").length < 6) return null;
+  const mobil = /^(\+49|0049|0)1[567]/.test(wert);
+  return { art: mobil ? KontaktArt.MOBIL : KontaktArt.FESTNETZ, dienstlich: true, wert };
+}
 
 /** Ein erkannter Name; weitere Personendaten werden anschließend erfasst. */
 export interface NamensEintrag {
@@ -21,6 +30,21 @@ export interface NamensEintrag {
    * Die Vorschau zeigt „Reihenfolge prüfen".
    */
   unsicher?: boolean;
+  /** Rufnummer am Zeilenende oder in einer Tabellenspalte, roh wie eingefügt („0171 1234567"); gehört nicht zum Namen (R17-H5). */
+  telefon?: string;
+}
+
+/** Wie Zeilen ohne Komma gelesen werden: „Vorname Nachname" (Vorgabe) oder „Nachname Vorname" (R17-E1, R17-N1). */
+export type NamenReihenfolge = "vorname" | "nachname";
+
+export interface NamenOptionen {
+  /** Lesart der Zeilen ohne Komma; Vorgabe `"vorname"`. */
+  reihenfolge?: NamenReihenfolge;
+  /**
+   * Jede Zeile ohne Komma mit mehreren Wörtern trägt „Reihenfolge prüfen", weil die Lesart noch niemand bestätigt hat.
+   * Die Vorschau nimmt die Marke weg, sobald der Helfer die Lesart gewählt hat (R17-E1).
+   */
+  pruefen?: boolean;
 }
 
 /**
@@ -96,47 +120,96 @@ export function rolleAusFunktion(funktion: string): StaerkeRolle | undefined {
  * und wird nicht mehr in den Vornamen gezogen; ist das Kürzel bekannt, bringt
  * es die Stärke-Rolle mit (siehe {@link rolleAusFunktion}).
  */
-export function parseNamen(text: string): NamensEintrag[] {
+export function parseNamen(text: string, opt: NamenOptionen = {}): NamensEintrag[] {
   return text
     .split(/\r?\n/)
     .map((zeile) => zeile.trim())
     .filter(Boolean)
-    .map((zeile) => {
-      // Aus einer Tabelle kopiert: Spalte 1 ist der Name, die nächste Spalte ohne Ziffern die Funktion, weitere
-      // Spalten bleiben außen vor. Sonst wurde „Hans Müller⇥GrFü" zu Nachname „GrFü" (R11-H4).
-      // Auch Semikolon (deutsches CSV) trennt Spalten (R16-E1). Steht in Spalte 1 nur ein Wort und folgt eine
-      // Spalte, die keine Funktion ist, sind es die Spalten „Nachname, Vorname[, Funktion]" („Meier⇥Klaus⇥Führer").
-      if (/[\t;]/.test(zeile)) {
-        const [name = "", ...spalten] = zeile.split(/[\t;]+/).map((s) => s.trim().replace(/^"(.*)"$/, "$1")).filter(Boolean);
-        const zweite = spalten[0];
-        const alsVorname =
-          zweite != null && !/\s/.test(name) && !name.includes(",") && !/\d/.test(zweite) && !istFunktionswort(zweite);
-        const funktion = (alsVorname ? spalten.slice(1) : spalten).find((s) => !/\d/.test(s));
-        const eintrag: NamensEintrag = alsVorname ? { nachname: name, vorname: zweite } : zeileLesen(name);
-        return funktion ? { ...eintrag, funktion, rolle: eintrag.rolle ?? rolleAusFunktion(funktion) } : eintrag;
-      }
-      // Kürzel VOR dem Namen („GrFü Maier, Klaus", „TrFü Anna Schulz") wurde
-      // bisher Teil des Nachnamens (Audit Runde 2, R2-N2). Nur bekannte
-      // Führungskürzel zählen — ein Doppelname bleibt ein Name.
-      const erstes = zeile.split(/\s+/)[0] ?? "";
-      const rest = zeile.slice(erstes.length).trim();
-      const vorangestellt = rest && !/,$/.test(erstes) ? rolleAusFunktion(erstes) : undefined;
-      if (vorangestellt != null) {
-        const eintrag = zeileLesen(rest);
-        return { ...eintrag, funktion: eintrag.funktion ?? erstes, rolle: eintrag.rolle ?? vorangestellt };
-      }
-      return zeileLesen(zeile);
+    .map((zeile): NamensEintrag => {
+      const mitNummer = telefonAbtrennen(zeile);
+      const eintrag = ohneTelefon(mitNummer.zeile, opt);
+      const telefon = mitNummer.telefon ?? eintrag.telefon;
+      return telefon ? { ...eintrag, telefon } : eintrag;
     });
 }
 
+/** Rufnummer am Zeilenende: Ziffern mit üblichen Trennzeichen, mindestens sechs Ziffern, hinter Leerraum oder Trenner. */
+const TELEFON_ENDE = /(?:^|[\s,;|]+)(\+?\d[\d\s\-/().]{4,}\d)\s*$/;
+
+/** Hinten stehende Rufnummer abtrennen (R17-H5): „Kevin Meier 0171 1234567" ist „Kevin Meier" mit Nummer, nicht ein Name mit Ziffern. */
+export function telefonAbtrennen(zeile: string): { zeile: string; telefon?: string } {
+  const m = TELEFON_ENDE.exec(zeile);
+  if (!m || zeile.includes("\t") || zeile.includes(";")) return { zeile };
+  const nummer = m[1]!;
+  if (nummer.replace(/\D/g, "").length < 6) return { zeile };
+  const rest = zeile.slice(0, m.index).replace(/[\s,;|]+$/, "");
+  return /\p{L}/u.test(rest) ? { zeile: rest, telefon: nummer.trim() } : { zeile };
+}
+
+/** Eine Zeile ohne hinten stehende Rufnummer lesen (Tabellenzeilen tragen ihre Nummer in einer Spalte). */
+function ohneTelefon(zeile: string, opt: NamenOptionen): NamensEintrag {
+  // Aus einer Tabelle kopiert: Spalte 1 ist der Name, die nächste Spalte ohne Ziffern die Funktion, weitere
+  // Spalten bleiben außen vor. Sonst wurde „Hans Müller⇥GrFü" zu Nachname „GrFü" (R11-H4).
+  // Auch Semikolon (deutsches CSV) trennt Spalten (R16-E1). Steht in Spalte 1 nur ein Wort und folgt eine
+  // Spalte, die keine Funktion ist, sind es die Spalten „Nachname, Vorname[, Funktion]" („Meier⇥Klaus⇥Führer").
+  if (/[\t;]/.test(zeile)) {
+    const [name = "", ...spalten] = zeile.split(/[\t;]+/).map((s) => s.trim().replace(/^"(.*)"$/, "$1")).filter(Boolean);
+    const zweite = spalten[0];
+    const alsVorname =
+      zweite != null && !/\s/.test(name) && !name.includes(",") && !/\d/.test(zweite) && !istFunktionswort(zweite);
+    const uebrige = alsVorname ? spalten.slice(1) : spalten;
+    const funktion = uebrige.find((s) => !/\d/.test(s));
+    // Eine Spalte nur aus Ziffern und Trennzeichen mit mindestens sechs Ziffern ist die Rufnummer (R17-H5).
+    const telefon = uebrige.find((s) => /^\+?[\d\s\-/().]+$/.test(s) && s.replace(/\D/g, "").length >= 6);
+    const eintrag: NamensEintrag = alsVorname ? { nachname: name, vorname: zweite } : zeileLesen(name, opt);
+    const mitFunktion = funktion ? { ...eintrag, funktion, rolle: eintrag.rolle ?? rolleAusFunktion(funktion) } : eintrag;
+    return telefon ? { ...mitFunktion, telefon } : mitFunktion;
+  }
+  // Kürzel VOR dem Namen („GrFü Maier, Klaus", „TrFü Anna Schulz") wurde
+  // bisher Teil des Nachnamens (Audit Runde 2, R2-N2). Nur bekannte
+  // Führungskürzel zählen — ein Doppelname bleibt ein Name.
+  const erstes = zeile.split(/\s+/)[0] ?? "";
+  const rest = zeile.slice(erstes.length).trim();
+  const vorangestellt = rest && !/,$/.test(erstes) ? rolleAusFunktion(erstes) : undefined;
+  if (vorangestellt != null) {
+    const eintrag = zeileLesen(rest, opt);
+    return { ...eintrag, funktion: eintrag.funktion ?? erstes, rolle: eintrag.rolle ?? vorangestellt };
+  }
+  return zeileLesen(zeile, opt);
+}
+
+/** Namensteil ohne Komma lesen: „Vorname [weitere Vornamen] Nachname" oder, auf Wunsch, „Nachname Vorname[n]". */
+function nameOhneKomma(teile: string[], opt: NamenOptionen): { vorname: string; nachname: string } {
+  if (teile.length === 1) return { vorname: "", nachname: teile[0]! };
+  if (opt.reihenfolge === "nachname") {
+    // Vorangestellte Präfixe gehören zum Nachnamen: „von der Heide Anna" (R17-E1).
+    let ende = 1;
+    while (ende < teile.length - 1 && NAMENSPRAEFIX.has(teile[ende - 1]!.toLowerCase())) ende++;
+    return { nachname: teile.slice(0, ende).join(" "), vorname: teile.slice(ende).join(" ") };
+  }
+  return mitPraefix(teile.slice(0, -1), teile[teile.length - 1]!);
+}
+
 /** Eine Zeile ohne vorangestelltes Kürzel lesen (siehe {@link parseNamen}). */
-function zeileLesen(zeile: string): NamensEintrag {
+function zeileLesen(zeile: string, opt: NamenOptionen = {}): NamensEintrag {
   const komma = zeile.indexOf(",");
   if (komma >= 0) {
     const rest = zeile.slice(komma + 1);
     const zweites = rest.indexOf(",");
     let vorname = (zweites >= 0 ? rest.slice(0, zweites) : rest).trim();
     let funktion = zweites >= 0 ? rest.slice(zweites + 1).trim() : "";
+    // „Lisa Meier, Fahrer": Hinter dem Komma steht kein Vorname, sondern eine Funktion; vor dem Komma steht der ganze Name
+    // (R17-S7). Die Lesart der Wörter davor folgt der gewählten Reihenfolge und trägt „Reihenfolge prüfen".
+    if (!funktion && vorname !== "" && !/\s/.test(vorname) && istFunktionswort(vorname)) {
+      const namenTeile = zeile.slice(0, komma).trim().split(/\s+/);
+      const gelesen = nameOhneKomma(namenTeile, opt);
+      return {
+        ...gelesen,
+        funktion: vorname,
+        rolle: rolleAusFunktion(vorname),
+        ...(namenTeile.length > 1 ? { unsicher: true } : {}),
+      };
+    }
     // „Meier, Klaus - Gruppenführer": Der Zusatz nach Gedankenstrich oder Schrägstrich ist die Funktion (R16-E1).
     const zusatz = /\s+[-–—/]\s+/.exec(vorname);
     if (zusatz && !funktion) {
@@ -158,12 +231,16 @@ function zeileLesen(zeile: string): NamensEintrag {
   if (teile.length === 1) return { vorname: "", nachname: teile[0]! };
   // „Mustermann Max Truppführer": ein Funktionswort am Ende ist kein Nachname (R16-E1).
   const letztes = teile[teile.length - 1]!;
-  const funktion = teile.length >= 3 && istFunktionswort(letztes) ? letztes : undefined;
+  // Ein bekanntes Kürzel („GrFü") genügt schon hinter einem einzigen Namenswort: „Meier GrFü" ist nicht Nachname „GrFü".
+  const funktion = teile.length >= 3 ? (istFunktionswort(letztes) ? letztes : undefined) : rolleAusFunktion(letztes) != null ? letztes : undefined;
   if (funktion) teile = teile.slice(0, -1);
-  const gelesen = mitPraefix(teile.slice(0, -1), teile[teile.length - 1]!);
+  const gelesen = nameOhneKomma(teile, opt);
+  const mehrere = teile.length > 1;
   // Mit Funktion am Ende bleiben zwei Wörter, deren Reihenfolge geraten ist: Vorschau „prüfen". Ohne Funktion gilt
-  // weiter „Vorname [weitere Vornamen] Nachname" (die Vorschau zeigt „Nachname, Vorname").
-  return funktion ? { ...gelesen, funktion, rolle: rolleAusFunktion(funktion), unsicher: true } : gelesen;
+  // „Vorname [weitere Vornamen] Nachname" bzw. die gewählte Reihenfolge; solange die niemand bestätigt hat (`pruefen`),
+  // trägt jede Zeile mit mehreren Wörtern die Marke (R17-E1, R17-N1).
+  if (funktion) return { ...gelesen, funktion, rolle: rolleAusFunktion(funktion), ...(mehrere ? { unsicher: true } : {}) };
+  return opt.pruefen && mehrere ? { ...gelesen, unsicher: true } : gelesen;
 }
 
 /** Warum eine Zeile nicht nach einem Namen aussieht – der tatsächliche Grund für den Hinweistext (R16-E1). */
@@ -205,22 +282,35 @@ export function namenEinsetzen(
   const liste = [...personal];
   const frei = liste.map((p, i) => (istFrei(p) ? i : -1)).filter((i) => i >= 0);
   const plaetze: (number | null)[] = [];
-  for (const n of neue) {
+  // Wer eine Funktion mitbringt, sucht sich seinen Platz zuerst: den mit derselben Funktion („GrFü" auf den Sollplatz „GrFü"),
+  // sonst den ersten mit derselben Rolle. Sonst nahm eine Zeile ohne Funktion vor ihm den Platz „GrFü", und „Hans Meier GrFü"
+  // landete auf „TrFü" (R17-S7). Die übrigen füllen die verbleibenden Plätze in der Reihenfolge der Zeilen.
+  const gleicheFunktion = (platz: Person, n: Person) =>
+    platz.funktionen.some((f) => n.funktionen.some((g) => (f.code != null && f.code === g.code) || (f.freitext != null && f.freitext.toLowerCase() === g.freitext?.toLowerCase())));
+  const vorgemerkt = new Map<number, number>();
+  const uebrig = [...frei];
+  neue.forEach((n, i) => {
+    if (n.funktionen.length === 0) return;
+    const platz = uebrig.find((j) => gleicheFunktion(liste[j]!, n)) ?? uebrig.find((j) => liste[j]!.staerkeRolle === n.staerkeRolle);
+    if (platz == null) return;
+    vorgemerkt.set(i, platz);
+    uebrig.splice(uebrig.indexOf(platz), 1);
+  });
+  for (const [i, n] of neue.entries()) {
     const eigeneFunktion = n.funktionen.length > 0;
-    let wahl = eigeneFunktion ? frei.find((i) => liste[i]!.staerkeRolle === n.staerkeRolle) : undefined;
-    wahl ??= frei[0];
+    const wahl = vorgemerkt.get(i) ?? uebrig.shift();
     if (wahl == null) {
       liste.push(n);
       plaetze.push(null);
       continue;
     }
-    frei.splice(frei.indexOf(wahl), 1);
     const platz = liste[wahl]!;
     liste[wahl] = {
       ...platz,
       vorname: n.vorname,
       nachname: n.nachname,
       ...(eigeneFunktion ? { funktionen: n.funktionen, staerkeRolle: n.staerkeRolle } : {}),
+      ...(n.kontakte.length > 0 ? { kontakte: n.kontakte } : {}),
     };
     plaetze.push(wahl);
   }

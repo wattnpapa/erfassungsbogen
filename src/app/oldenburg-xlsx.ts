@@ -60,6 +60,7 @@ import {
   type Erfassungsbogen,
 } from "@bos/eeb-format/model";
 import {
+  datumAnzeige,
   datumDeutsch,
   einheitAnzeigename,
   einheitOrt,
@@ -87,7 +88,7 @@ import {
 } from "@bos/meldekopf/einsaetze";
 import { geltendeJeEinheit } from "./fassung-vorrang";
 import { zaehltInLage } from "./auswertung";
-import { datumVonMs, lueckenAlle, meldungsNummern, pruefpunkteEintrag } from "./einheiten-tabelle";
+import { datumVonMs, einheitenZahl, lueckenAlle, meldungsNummern, pruefpunkteEintrag } from "./einheiten-tabelle";
 import { EINTREFF_HINWEIS, eintreffzeit, eintreffzeitUnbestaetigt, zeitLang } from "./eintrag-zeiten";
 import { exportKennzeile, nachtragGrundText, ortHinweisText, ortHinweise, type NachtragGrund } from "./export-stand";
 
@@ -418,7 +419,7 @@ function zeileFuer(b: Erfassungsbogen, k: Kontext): Zeile {
       b.uebung === true ? "ÜBUNG" : "",
       k.zaehltNicht ? "zählt nicht in der Lage" : "",
       k.eintreffUnbestaetigt ? "Eintreffzeit nicht bestätigt (Zeit des Einlesens am Gerät)" : "",
-      zeitraumVorbei ? `Einsatzzeitraum im Bogen endete ${datumDeutsch(datumZuIso(b.einsatz.zeitraumBis))} — Bogen aus früherer Lage?` : "",
+      zeitraumVorbei ? `Einsatzzeitraum im Bogen endete ${datumAnzeige(b.einsatz.zeitraumBis)} — Bogen aus früherer Lage?` : "",
       k.rueckfragen?.length ? `Hinweise: ${lueckenAlle(k.rueckfragen)}` : "",
       b.sonstiges ?? "",
     ]
@@ -494,7 +495,7 @@ function spaltenBreitenXml(): string {
 /** Überschrift über dem Block der nicht zählenden Einheiten. */
 export function blockKopfText(anzahl: number): string {
   return (
-    `Nicht in der Lage gezählt (abgerückt, aufgegangen oder Übung) — ${anzahl} Einheit(en), ` +
+    `Nicht in der Lage gezählt (abgerückt, aufgegangen oder Übung) — ${einheitenZahl(anzahl)}, ` +
     "in den Summen oben NICHT enthalten"
   );
 }

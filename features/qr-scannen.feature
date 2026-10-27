@@ -13,12 +13,12 @@ Funktionalität: Bogen per QR-Code einlesen
     Angenommen ich öffne die App
     Wenn ich auf "QR-Code scannen…" klicke
     Dann sehe ich den Dialog "QR-Code scannen"
-    Und sehe ich den Hinweis "Ohne Kamera: mit dem USB-Handscanner scannen"
+    Und sehe ich den Hinweis "Oder mit dem USB-Handscanner scannen"
     Und sehe ich den Hinweis "Bereit — warte auf den Handscanner"
     Und sehe ich den Datei-Knopf "QR aus Bild einlesen…"
     Und sehe ich die Schaltfläche "Kamera erneut versuchen"
     Wenn ich im Dialog "QR-Code scannen" auf "Abbrechen" klicke
-    Dann sehe ich den Hinweis "Ohne Kamera: mit dem USB-Handscanner scannen" nicht
+    Dann sehe ich den Hinweis "Oder mit dem USB-Handscanner scannen" nicht
     Und sehe ich die Schaltfläche "Neuen Bogen erstellen"
 
   Szenario: Der angezeigte QR-Code wird als Bild wieder eingelesen

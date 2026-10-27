@@ -56,11 +56,27 @@ export const SEITENWECHSEL_SPERRE_MS: number = ORTSSPERRE_MS === 0 ? 0 : Math.mi
 export const SCHRITTWECHSEL_SPERRE_MS: number = ORTSSPERRE_MS === 0 ? 0 : Math.min(ORTSSPERRE_MS, 900);
 
 /**
+ * Sperre der Stelle nach „Weiter →" im Assistenten: 0,5 s (R17-G11). Bei 0,9 s blieb jeder zweite Tipp eines Helfers auf der
+ * Strecke, der durch leere oder bekannte Schritte blättert (Abstand 0,4 bis 0,8 s: Schritt 2, 2, 3, 3, 4); er hielt den
+ * verworfenen Tipp für einen Fehltipp. Der Doppeltipp mit Handschuh liegt bei 0,1 bis 0,3 s (R2-G4) und bleibt gesperrt; ein
+ * Schrittwechsel ist harmlos und mit „← Zurück" umkehrbar. Die Teilwechsel im QR-Vollbild behalten die längere Sperre.
+ */
+export const ASSISTENT_SCHRITT_SPERRE_MS: number = ORTSSPERRE_MS === 0 ? 0 : Math.min(ORTSSPERRE_MS, 500);
+
+/**
  * Sperre der Stelle unter einer aufgegangenen Quittungsleiste mit „Rückgängig". Ein Zweittipp ab 1,5 s
  * nahm „Abrücken" an derselben Stelle zurück, weil dort jetzt „Rückgängig" lag (R8-D5); der
  * bewusste Rückweg kommt erst nach dem Lesen der Quittung und liegt über 2,5 s.
  */
 export const QUITTUNG_SPERRE_MS: number = ORTSSPERRE_MS === 0 ? 0 : Math.max(ORTSSPERRE_MS, 2500);
+
+/**
+ * Kürzere Sperre unter einer Quittung, deren „Rückgängig" etwas Harmloses zurücknimmt (Kenntnisnahme, Zug, Auftrag,
+ * Name/Ort): so lang wie der Prellschutz des Knopfs. Die 2,5 s oben verwarfen in einer Folge „Kenntnisnahme → Rückgängig →
+ * Kenntnisnahme → Rückgängig" im Abstand von 0,6 s den dritten, bewussten Tipp, obwohl nichts zu schützen war (R17-D3).
+ * Bei „Abrücken", „Entfernen" und Stärke bleibt es bei der langen Sperre.
+ */
+export const QUITTUNG_SPERRE_KURZ_MS: number = ORTSSPERRE_MS === 0 ? 0 : PRELLSCHUTZ_MS;
 
 /** Halbmesser der gesperrten Stelle: eine Fingerkuppe mit Handschuh samt Zittern. */
 export const ORTSSPERRE_RADIUS_PX = 40;

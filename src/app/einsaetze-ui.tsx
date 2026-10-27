@@ -14,8 +14,22 @@ import { useJuengsteQuittung } from "./juengste-quittung";
 
 const ImportHinweis = lazy(() => import("./import-hinweis"));
 const AuftragQuittung = lazy(() => import("./auftrag-quittung"));
+// Papierkorb der entfernten Meldungen (R17-E2): erscheint nur, wenn etwas darin liegt, und bleibt aus dem Startbündel.
+const EntfernteMeldungenBlock = lazy(() => import("./entfernte-meldungen-block"));
+/** So viele Tage liegt eine entfernte Meldung im Papierkorb (gleich `MELDUNGEN_PAPIERKORB_TAGE`; ein Test hält beide gleich). */
+export const PAPIERKORB_TAGE = 7;
+/** Liegt in diesem Papierkorb etwas für diese Sammlung? Billige Vorprüfung, ohne den Block zu laden. */
+function papierkorbGefuellt(einsatzId: string): boolean {
+  try {
+    return (localStorage.getItem("eeb.meldungen-papierkorb.v1") ?? "").includes(`"${einsatzId}"`);
+  } catch {
+    return false;
+  }
+}
 const NeuereEingabe = lazy(() => import("./neuere-eingabe"));
-import { ORTSSPERRE_MS, PRELLSCHUTZ_MS, QUITTUNG_SPERRE_MS, ortSperren } from "./tipp-schutz";
+// Der Block „Lagemonitor für den Fernseher" liegt am Ende der Ansicht und gehört nicht ins Startbündel (R17-K3 gab dem Monitor Zeilen).
+const LagemonitorBlock = lazy(() => import("./lagemonitor-ui").then((m) => ({ default: m.LagemonitorBlock })));
+import { ORTSSPERRE_MS, PRELLSCHUTZ_MS, QUITTUNG_SPERRE_KURZ_MS, ortSperren } from "./tipp-schutz";
 import {
   MINUTEN_JE_TAG,
   PersonalErfassung,
@@ -40,8 +54,10 @@ import {
   vokabularFuer,
   zeitpunktDeutsch,
   staerkePlausibilitaet,
+  datumAnzeige,
 } from "./hilfen";
-import { bogenDiff, diffKurzfassung, type WertAenderung } from "@bos/meldekopf/meldung-diff";
+import { diffKurzfassung, type WertAenderung } from "@bos/meldekopf/meldung-diff";
+import { bogenDiff } from "./diff-lage";
 import {
   EinsatzArt,
   MeldeStatus,
@@ -59,7 +75,7 @@ import {
   type ZusammenfuehrungOptionen,
 } from "@bos/meldekopf/einsaetze";
 import { einsatzWiederherstellen, ruhtSchonLange } from "./einsatz-wiederherstellen";
-import { fassungGiltSetzen, fassungObenauf, fassungenJeEinheit, geltendeJeEinheit, istVerdraengt, nachgereichterBogen } from "./fassung-vorrang";
+import { angabenVermerken, fassungGiltSetzen, fassungObenauf, fassungenJeEinheit, geltendeJeEinheit, istVerdraengt, nachgereichterBogen } from "./fassung-vorrang";
 import { ausgelasseneMeldungen, einsaetzeLaden, einsaetzePapierkorb } from "./einsaetze-lesen";
 import { UnlesbarHinweis } from "./unlesbar-hinweis";
 import { unlesbarBestand } from "./unlesbar";
@@ -68,12 +84,11 @@ import { aehnlicherOrt, andererEinheitstyp } from "./nacherfassung";
 import { vorhandeneZuege, zugNormalisiert } from "./zug-name";
 import { einheitOrt } from "@bos/meldekopf/darstellung";
 import { RolleMarke } from "./rolle-marke";
-import { sammelPdfDauerText, tippWaehrendLauf, useArbeitet } from "./arbeitet";
+import { fortschrittSatz, sammelPdfDauerText, tippWaehrendLauf, useArbeitet, useArbeitFortschritt } from "./arbeitet";
 import { useMinutenTakt } from "./minuten-takt";
 import { AUSGABE_SPERRE_MS, ausgabeFreiBeiTipp } from "./ausgabe-sperre";
 import { verloreneEingabeText } from "./eingabe-verloren";
 import { loeschenErfassungSatz } from "./einsatz-geloescht";
-import { LagemonitorBlock } from "./lagemonitor-ui";
 import { angabenAlterWort, angabenZeit } from "./angaben-alter";
 import { alterText, anwesendenAlter, anwesendenAlterText, bedarfOhneAngabeHinweis, bedarfOhneAngabeText, kraftstoffTeile, personenText, zugAlterText } from "./lagemonitor";
 import { AufteilenPanel } from "./aufteilen-ui";
@@ -127,7 +142,11 @@ import { nurStaerkeUebernehmen } from "./nur-staerke";
 import { PapierAbgleich, PapierMarke } from "./papier-abgleich-ui";
 import { abgleichEntwurfAufraeumen, abgleichEntwurfLoeschen } from "./papier-abgleich-entwurf";
 import { SOLL_NICHT_GEMELDET } from "./soll-text";
-import { gezaehltWegFuer, gezaehltWegVergessen, gezaehltZuruecknehmen } from "./gezaehlt-weg";
+import { karteOffenMerken, karteWarOffen } from "./ansicht-stelle";
+import type { PapierkorbMeldung } from "./meldungs-papierkorb";
+import { standAbsenderVermerken, standDesAbsenders } from "./stand-absender";
+import { ortBilligen, ortIstGebilligt } from "./ort-gebilligt";
+import { gezaehltWegBeobachten, gezaehltWegFuer, gezaehltWegVergessen, gezaehltZuruecknehmen } from "./gezaehlt-weg";
 import { TabellenScroll } from "./tabellen-scroll";
 import {
   TABELLEN_SPALTEN,
@@ -135,6 +154,8 @@ import {
   einheitenAnwesend,
   bedarfMarken,
   gemerkteAnsicht,
+  gemerkteAlleSpalten,
+  merkeAlleSpalten,
   ORT_REGEL,
   abweichenderOrt,
   letzteMeldung,
@@ -144,6 +165,7 @@ import {
   pruefpunkteEintrag,
   folgeAenderung,
   vergleichKurztext,
+  einheitenZahl,
   rueckkehrText,
   meldungsNummern,
   entfernenNummernText,
@@ -207,6 +229,12 @@ export const ART_LABEL: Record<EinsatzArt, string> = {
   [EinsatzArt.VERANSTALTUNG]: "Veranstaltung",
 };
 
+/** Überschrift über den nicht anwesenden Karten am Ende der Liste: „Abgerückt (2)" bzw. mit zusammengeführten Einheiten (R17-K4). */
+export function abgerueckteUeberschrift(liste: readonly Pick<MeldeEintrag, "status">[]): string {
+  const rest = liste.filter((e) => e.status !== MeldeStatus.ANWESEND);
+  return `${rest.every((e) => e.status === MeldeStatus.ABGERUECKT) ? "Abgerückt" : "Abgerückt oder zusammengeführt"} (${rest.length})`;
+}
+
 /**
  * Herkunft der Meldung an der Karte, in Worten, die ohne Einweisung tragen:
  * „Empfangen“ allein sagte nicht, von wem und wie (Audit Runde 4, R4-N4). Die
@@ -224,7 +252,8 @@ const QUELLE_LABEL: Record<keyof typeof HERKUNFT_TEXT, string> = {
  * Herkunft der geltenden Fassung. Eine am Meldekopf geänderte Fassung (Stärke ändern, Übung umstellen) einer
  * eingelesenen Einheit bleibt „aus Datei, …": „von Hand erfasst" stimmte nicht, die Einheit wurde gescannt (R15-A1).
  */
-export function quelleText(kopf: Pick<MeldeEintrag, "quelle">, fassungenNeuesteZuerst: Pick<MeldeEintrag, "quelle">[]): string {
+export function quelleText(kopf: Pick<MeldeEintrag, "quelle" | "angaben">, fassungenNeuesteZuerst: Pick<MeldeEintrag, "quelle">[]): string {
+  if (kopf.quelle !== "manuell" && kopf.angaben) return `${QUELLE_LABEL[kopf.quelle]}, am Meldekopf von Hand geändert`;
   const erste = fassungenNeuesteZuerst[fassungenNeuesteZuerst.length - 1];
   if (kopf.quelle !== "manuell" || !erste || erste.quelle === "manuell") return QUELLE_LABEL[kopf.quelle];
   return `${QUELLE_LABEL[erste.quelle]}, am Meldekopf von Hand geändert`;
@@ -659,7 +688,7 @@ export function EinsatzListe(props: {
           <ul>
             {aufgeraeumt.map((a) => (
               <li key={a.id}>
-                „{a.name}" · {tagText(a.angelegt)} bis {tagText(a.geaendert)} · {a.einheiten} Einheit(en),{" "}
+                „{a.name}" · {tagText(a.angelegt)} bis {tagText(a.geaendert)} · {einheitenZahl(a.einheiten)},{" "}
                 {a.meldungen} Meldung(en) · gelöscht am {zeitLang(a.entferntAm)}
               </li>
             ))}
@@ -1007,6 +1036,30 @@ const QUITTUNG_MAX = 10;
 const QUITTUNG_VIELE = 5;
 
 const SCHMAL_ABFRAGE = "(max-width: 600px)";
+/** So lange steht „Zuletzt abgelegt/eingelesen … jetzt n Einheiten" (R17-S8): zehn Minuten, dann ist „jetzt" nicht mehr wahr. */
+export const EINGANG_QUITTUNG_MS = 10 * 60_000;
+
+/** Was am Kopf des Einsatzes geändert wurde, mit Alt und Neu: „Name: „A" → „B"" (R17-S4). */
+export function kopfAenderungText(vorher: { name: string; ort: string }, name: string, ort: string): string {
+  const teile: string[] = [];
+  if (vorher.name !== name) teile.push(`Name „${vorher.name}" → „${name}"`);
+  if (vorher.ort !== ort) teile.push(`Ort ${vorher.ort ? `„${vorher.ort}"` : "(leer)"} → ${ort ? `„${ort}"` : "(leer)"}`);
+  return teile.join(" · ");
+}
+
+/** Zwischenstand der laufenden Sammel-PDF: „12 von 30 Bögen vorbereitet" samt Balken (R17-O1, R17-D4, R17-A4). */
+function ArbeitFortschrittZeile() {
+  const f = useArbeitFortschritt();
+  if (!f) return null;
+  return (
+    <>
+      <br />
+      <strong className="arbeit-fortschritt">{fortschrittSatz(f)}</strong>
+      {f.von > 0 && <progress value={f.n} max={f.von} aria-label="Fortschritt der Sammel-PDF" style={{ display: "block", width: "100%" }} />}
+    </>
+  );
+}
+
 function useSchmal(): boolean {
   const [schmal, setSchmal] = useState(() => typeof matchMedia === "function" && matchMedia(SCHMAL_ABFRAGE).matches);
   useEffect(() => {
@@ -1099,6 +1152,7 @@ export function EinsatzDetail(props: {
   const { einsatz, onZurueck, onGeaendert, onScannen, onManuell, onDateiImport, onBilderImport, onExport, onCsvExport, onCsvDetailExport, onOldenburgExport, onSammelPdf, onWeitergeben, onLageblatt, onBlanko, onGeloescht, eingang, ausgabeQuittung } = props;
   // Läuft eine PDF-Erzeugung (arbeitet.ts), sperrt sie alle PDF-Knöpfe und beschriftet den eigenen (R5-O3).
   const arbeitet = useArbeitet();
+  const arbeitFortschrittJetzt = useArbeitFortschritt();
   // Altersangaben („gerade eben", „älter als 1 Std") rechnen im Minutentakt und bei Rückkehr in die App neu (R14-O1).
   useMinutenTakt();
   // Tipp-Sperre und sofortige Rückmeldung aller Ausgaben (R12-G2): ein Doppeltipp erzeugt keine zweite Datei,
@@ -1209,6 +1263,19 @@ export function EinsatzDetail(props: {
   // Karten oder Tabelle — geräteweit gemerkt (einheiten-tabelle.ts).
   const [ansicht, setAnsicht] = useState<EinheitenAnsicht>(gemerkteAnsicht);
   const kompakt = useSchmal();
+  // Die feste Ansichtsleiste zieht sich beim Lesen nach unten ein (R17-N3, R17-H7).
+  useEffect(() => {
+    let ab: (() => void) | undefined;
+    let weg = false;
+    // Nachgeladen: Die Einziehregel gehört nicht ins Startbündel (ADR-003, Aufnahmeregel 5).
+    void import("./balken-einziehen").then((m) => {
+      if (!weg) ab = m.balkenEinziehen();
+    });
+    return () => {
+      weg = true;
+      ab?.();
+    };
+  }, []);
   const sum = aggregiere(einsatz.eintraege, einsatz.art);
   const sollAnteil = sollstaerkeAnteil(einsatz.eintraege, einsatz.art);
   const zugGruppen = aggregiereNachZug(einsatz.eintraege, einsatz.art);
@@ -1233,7 +1300,18 @@ export function EinsatzDetail(props: {
     setEntferntStapel(neu);
   };
   /** `x`: oben auf den Stapel; `null`: Leiste schließen, der Rückweg ist damit aufgegeben. */
-  const setZuletztEntfernt = (x: Entfernt | null) => stapelSetzen(x ? [...entferntStapel, x].slice(-ENTFERNT_STAPEL_MAX) : []);
+  const setZuletztEntfernt = (x: Entfernt | null) => {
+    // Jede entfernte Meldung liegt zusätzlich im Papierkorb der Sammlung und übersteht das Neuladen (R17-E2, R17-D6).
+    if (x) void papierkorbBewegen((m) => m.meldungInPapierkorb(einsatz.id, x));
+    stapelSetzen(x ? [...entferntStapel, x].slice(-ENTFERNT_STAPEL_MAX) : []);
+  };
+  // Zeichnet neu, wenn sich der Papierkorb bewegt hat (die Vorprüfung `papierkorbGefuellt` liest den Speicher bei jedem Zeichnen).
+  const [, setPapierkorbStand] = useState(0);
+  /** Den Papierkorb ändern (Modul bei Bedarf nachladen) und danach neu zeichnen. */
+  const papierkorbBewegen = async (aktion: (m: typeof import("./meldungs-papierkorb")) => void) => {
+    aktion(await import("./meldungs-papierkorb"));
+    setPapierkorbStand((n) => n + 1);
+  };
   // Zuletzt aufgeteilt — Quittung mit Rückweg (R2-D6).
   const [aufgeteilt, setAufgeteilt] = useState<Aufgeteilt | null>(null);
   // Zuletzt zusammengeführt — Quittung mit Rückweg (R4-D5).
@@ -1319,6 +1397,21 @@ export function EinsatzDetail(props: {
     onGeaendert();
   }
 
+  /** Eine entfernte Meldung aus dem Papierkorb der Sammlung zurücklegen — auch nach dem Neuladen (R17-E2, R17-D6). */
+  async function ausPapierkorbHolen(m: PapierkorbMeldung) {
+    const ids = m.eintraege.map((e) => e.id);
+    const ok = await gesichert("Zurückholen", () => {
+      einsatzImportieren({ ...einsatz, eintraege: m.eintraege });
+      entfernteVergessen(einsatz.id, ids);
+    });
+    if (!ok) return;
+    void papierkorbBewegen((p) => p.meldungAusPapierkorb(einsatz.id, m.id));
+    const idSet = new Set(ids);
+    if (entferntStapel.some((x) => x.eintraege.some((e) => idSet.has(e.id)))) stapelSetzen(entferntStapel.filter((x) => !x.eintraege.some((e) => idSet.has(e.id))));
+    zurueckQuittieren(m.art === "fassung" ? `Fassung von „${m.name}" zurückgeholt.` : `Meldung „${m.name}" zurückgeholt.`);
+    onGeaendert();
+  }
+
   /** Entferntes unverändert zurücklegen (mit Signatur, Herkunft, Zeiten, Notiz, Etiketten). */
   async function entferntesZurueckholen() {
     if (!zuletztEntfernt) return;
@@ -1328,6 +1421,8 @@ export function EinsatzDetail(props: {
       entfernteVergessen(einsatz.id, zuletztEntfernt.eintraege.map((e) => e.id));
     });
     if (!ok) return;
+    const zurueckIds = zuletztEntfernt.eintraege.map((e) => e.id);
+    void papierkorbBewegen((p) => p.meldungAusPapierkorb(einsatz.id, zurueckIds));
     const name = einheitAnzeigename(zuletztEntfernt.eintraege[0]!.bogen.einheit);
     const weitere = entferntStapel.length - 1;
     zurueckQuittieren(
@@ -1405,6 +1500,12 @@ export function EinsatzDetail(props: {
   }, [eingang, eingegangen]);
   // War es eine Folgemeldung, sagt die Quittung, was sich geändert hat (R3-K1).
   const eingangFolge = eingegangen ? folgeAenderung(eingegangen, einsatz.eintraege) : null;
+  const nurSollAnzahl = alleEinheiten.filter((e) => nurSollstaerke(e.bogen)).length;
+  // „…jetzt 1 Einheit, Gesamt 9" stand nach Stunden noch da und las sich wie der aktuelle Stand (R17-S8): Die Quittung
+  // geht nach EINGANG_QUITTUNG_MS. Die Minutenuhr (useMinutenTakt) zeichnet dafür neu.
+  const eingangGesehen = useRef<{ nonce: number | null; seit: number }>({ nonce: null, seit: Date.now() });
+  if (eingangGesehen.current.nonce !== (eingang?.nonce ?? null)) eingangGesehen.current = { nonce: eingang?.nonce ?? null, seit: Date.now() };
+  const eingangVeraltet = Date.now() - eingangGesehen.current.seit > EINGANG_QUITTUNG_MS;
   // „Rückgängig" an der Folgemeldung hat die Quittung verbraucht (R4-E4).
   const [eingangWeg, setEingangWeg] = useState<number | null>(null);
   /**
@@ -1495,7 +1596,8 @@ export function EinsatzDetail(props: {
       ok: "Übernehmen",
       felder: [
         { name: "name", label: "Name", vorgabe: einsatz.name },
-        { name: "ort", label: "Ort / Auftrag (optional)", vorgabe: einsatz.ort ?? "", optional: true, platzhalter: "z. B. Deichabschnitt Nord" },
+        // Der Knopf „Ort eintragen…" setzt den Cursor in das Feld, das er nennt (R17-S4).
+        { name: "ort", label: "Ort / Auftrag (optional)", vorgabe: einsatz.ort ?? "", optional: true, platzhalter: "z. B. Deichabschnitt Nord", fokus: !einsatz.ort },
       ],
     });
     if (!w) return;
@@ -1505,7 +1607,7 @@ export function EinsatzDetail(props: {
     const alt: { werte: { name: string; ort: string } | null } = { werte: null };
     if (!(await gesichert("Nicht geändert", () => (alt.werte = einsatzKopfSetzen(einsatz.id, name, ort))))) return;
     if (!alt.werte) return;
-    setKopfGeaendert({ vorher: alt.werte, nachher: name, nonce: Date.now() });
+    setKopfGeaendert({ vorher: alt.werte, nachher: kopfAenderungText(alt.werte, name, ort), nonce: Date.now() });
     onGeaendert();
   }
 
@@ -1526,6 +1628,11 @@ export function EinsatzDetail(props: {
   // Meldungen bleibt (er hat seinen eigenen Rückweg und kommt wieder, wenn die jüngere Leiste weg ist).
   // „Zahlen stimmen, so gezählt" (R16-S3): Die Rückfrage legte die Sollzahlen als Meldung ab; „Rückgängig" führt sie wieder als Sollstärke.
   const [gezaehltWeg, setGezaehltWeg] = useState(() => gezaehltWegFuer(einsatz.id));
+  useEffect(() => {
+    const abgleichen = () => setGezaehltWeg(gezaehltWegFuer(einsatz.id));
+    abgleichen();
+    return gezaehltWegBeobachten(abgleichen);
+  }, [einsatz.id]);
   const aktiveQuittung = useJuengsteQuittung({
     entfernt: zuletztEntfernt, aufgeteilt, staerke: staerkeGeaendert, zusammen: zusammengefuehrt, status: statusWechsel,
     verschoben: verschobenQuittung, zug: zugGesetzt, auftrag: auftragGesetzt, kenntnis: kenntnisGenommen, zurueck: zurueckQuittung,
@@ -1572,7 +1679,8 @@ export function EinsatzDetail(props: {
     const vorher = kenntnisStand;
     const anzahl = aufgenommenListe.length;
     // R15-G1: Der Block verschwindet, die Liste rückt unter den Finger — der zweite Tipp an dieser Stelle klappte eine Karte auf.
-    ortSperren(QUITTUNG_SPERRE_MS);
+    // Nur so lang wie der Prellschutz: Das „Rückgängig" der Quittung liegt oft genau dort und musste 2,5 s warten (R17-D3).
+    ortSperren(QUITTUNG_SPERRE_KURZ_MS);
     const { stand, gespeichert } = kenntnisVermerkenGeprueft(einsatz, alleEinsatzIds(), Date.now(), true);
     setKenntnis({ einsatzId: einsatz.id, stand });
     setZugGesetzt(null);
@@ -1650,6 +1758,8 @@ export function EinsatzDetail(props: {
   const kopfNachBedarf = bedarfsFilter ? kopfOhneBedarfsfilter.filter((e) => passtZuBedarfsfilter(e, bedarfsFilter)) : kopfOhneBedarfsfilter;
   const kopfNachLuecke = lueckenFilter ? kopfNachBedarf.filter((e) => passtZuLueckenfilter(e, lueckenFilter)) : kopfNachBedarf;
   const kopf = statusFilter ? kopfNachLuecke.filter((e) => passtZuStatusfilter(e, statusFilter)) : kopfNachLuecke;
+  // Erste nicht anwesende Karte, falls vor ihr anwesende stehen: dort beginnt der Abschnitt „Abgerückt" (R17-E6, K4).
+  const abgerueckteStelle = kopf.some((e) => e.status === MeldeStatus.ANWESEND) ? kopf.findIndex((e) => e.status !== MeldeStatus.ANWESEND) : -1;
   const anwesendAnzahl = alleEinheiten.filter((e) => passtZuStatusfilter(e, "anwesend")).length;
   const abgerueckteAnzahl = alleEinheiten.length - anwesendAnzahl;
   const veraltetAnzahl = alleEinheiten.filter((e) => passtZuStatusfilter(e, "veraltet")).length;
@@ -1901,11 +2011,13 @@ export function EinsatzDetail(props: {
           sie den Knopf für die nächste Einheit nicht unter den Bildrand
           schiebt. */}
       {/* Nach dem Abrücken sagt die Abrück-Quittung, was geschah; „jetzt 0 Einheiten" las sich wie ein Verlust (R13-W2). */}
-      {eingegangen && eingegangen.status !== MeldeStatus.ABGERUECKT && eingang?.nonce !== eingangWeg && !eingang?.uebersprungen && (
+      {eingegangen && eingegangen.status !== MeldeStatus.ABGERUECKT && eingang?.nonce !== eingangWeg && !eingang?.uebersprungen && !eingangVeraltet && (
         <p className="meldung eingang-quittung" role="status" ref={eingangQuittung}>
           {/* Von Hand erfasst oder abgelegt ist nicht „eingelesen“ (R9-N3). */}
           {eingegangen.quelle === "manuell" ? "Zuletzt abgelegt" : "Zuletzt eingelesen"}: „{einheitAnzeigename(eingegangen.bogen.einheit)}"
           {eingegangen.teilEtikett ? ` (${eingegangen.teilEtikett})` : ""}
+          {/* „Als Sollstärke ablegen" und „so gezählt" lasen sich gleich (R17-S1): Die Sollstärke nennt sich hier. */}
+          {nurSollstaerke(eingegangen.bogen) ? " als Sollstärke, nicht gemeldet" : ""}
           {eingangFolge ? <> — Folgemeldung: <span className={eingangFolge.verlust ? "staerke-verlust" : undefined}>{eingangFolge.kurz}</span></> : null}
           {/* Eine abgerückte Einheit kommt durch die Folgemeldung zurück in die Lage — nicht still (R5-K1). */}
           {eingangFolge?.rueckkehr && (
@@ -2288,7 +2400,7 @@ export function EinsatzDetail(props: {
             <div className="zug-summe" key={g.zugEtikett ? `zug:${g.zugEtikett}` : "zug:ohne"}>
               <p>
                 <strong>{g.zugEtikett ?? "Ohne Zug"}</strong>
-                {" · "}{g.summen.einheiten} Einheit(en){" · "}Stärke {summenStaerkeText(g.summen)}
+                {" · "}{einheitenZahl(g.summen.einheiten)}{" · "}Stärke {summenStaerkeText(g.summen)}
                 {zugAlterText(g.aeltesteMeldungAm, Date.now()) && (
                   <span className="warnung-text zug-alter"> · {zugAlterText(g.aeltesteMeldungAm, Date.now())}</span>
                 )}
@@ -2370,7 +2482,8 @@ export function EinsatzDetail(props: {
               ist die Länge der Liste, „zählend" die Zahl der Stärkeleiste —
               dieselbe Zählweise wie die Summenzeile der Tabelle (K4). */}
           <h2 ref={listeKopf} id="einheiten-liste">
-            Einheiten ({gefiltert ? `${kopf.length} von ${alleEinheiten.length}` : alleEinheiten.length} gemeldet
+            Einheiten ({gefiltert ? `${kopf.length} von ${alleEinheiten.length}` : alleEinheiten.length - nurSollAnzahl} gemeldet
+            {!gefiltert && nurSollAnzahl > 0 ? ` · ${nurSollAnzahl} nur Sollstärke` : ""}
             {" · "}{sum.einheiten} zählend)
           </h2>
           {/* Zwei Sichten auf dieselbe (gesuchte, gefilterte, sortierte) Liste:
@@ -2509,9 +2622,13 @@ export function EinsatzDetail(props: {
             erlaubt den Sprung von Eintrag zu Eintrag (R2-M4). */}
         {ansicht === "karten" && kopf.length > 0 && (
           <ul className="einheiten-liste">
-            {kopf.map((e) => (
+            {kopf.map((e, i) => (
+              <Fragment key={e.einheitSchluessel}>
+              {/* Abgerückte stehen am Ende unter eigener Überschrift, nicht zwischen den Anwesenden (R17-E6, K4). */}
+              {i === abgerueckteStelle && (
+                <li className="einheiten-trenner"><strong>{abgerueckteUeberschrift(kopf)}</strong></li>
+              )}
               <EinheitKarte
-                key={e.einheitSchluessel}
                 einsatzId={einsatz.id}
                 kopf={e}
                 alle={einsatz.eintraege}
@@ -2534,10 +2651,18 @@ export function EinsatzDetail(props: {
                 onAuftragGesetzt={(a) => { andereHandlung(); setAuftragGesetzt(a); }}
                 onVerschoben={(v) => { andereHandlung(); setVerschobenQuittung(v); }}
               />
+              </Fragment>
             ))}
           </ul>
         )}
       </section>
+
+      {/* Entfernte Meldungen bleiben eine Woche zum Zurückholen liegen — auch nach dem Neuladen (R17-E2, R17-D6). */}
+      {papierkorbGefuellt(einsatz.id) && (
+        <Suspense fallback={null}>
+          <EntfernteMeldungenBlock einsatzId={einsatz.id} geaendert={einsatz.geaendert} onHolen={(m) => void ausPapierkorbHolen(m)} />
+        </Suspense>
+      )}
 
       {/* Weitergeben, Lageblatt und Exporte stehen UNTER der Liste (R4-K5): Auf
           dem Telefon lag die erste Einheitenkarte rund vier Bildschirme tief,
@@ -2611,10 +2736,10 @@ export function EinsatzDetail(props: {
       {/* Rückmeldung dort, wo getippt wurde: während der Arbeit, dass sie läuft
           und nicht noch einmal getippt werden muss; danach die Bestätigung
           (R5-O3, R5-L4). */}
-      {(onWeitergeben || onLageblatt || onBlanko) && (arbeitet === "weitergeben" || arbeitet === "lageblatt" || arbeitet === "blanko" || ausgabeQuittungSichtbar) && (
+      {(onWeitergeben || onLageblatt || onBlanko) && (arbeitet === "weitergeben" || arbeitet === "sammel-pdf" || arbeitet === "lageblatt" || arbeitet === "blanko" || ausgabeQuittungSichtbar) && (
         <p className="hinweis arbeitet-zeile ausgabe-quittung" role="status">
-          {arbeitet === "weitergeben"
-            ? sammelPdfDauerText(geltendeJeEinheit(einsatz.eintraege).length)
+          {arbeitet === "weitergeben" || arbeitet === "sammel-pdf"
+            ? <>{sammelPdfDauerText(geltendeJeEinheit(einsatz.eintraege).length, arbeitFortschrittJetzt?.schaetzungSek)}<ArbeitFortschrittZeile /></>
             : arbeitet === "lageblatt"
               ? "Das Lageblatt wird erzeugt — einen Moment, bitte nicht noch einmal tippen."
               : arbeitet === "blanko"
@@ -2678,10 +2803,10 @@ export function EinsatzDetail(props: {
             const weitergabeZeigen = z === "pdf" && nurNeue && weitergabeStand != null;
             return nurNeue && (EXPORT_ZIELE.some((x) => exportStaende[x]) || weitergabeZeigen) ? (
               <span className="hinweis export-stand-zeile" key={z}>
-                {EXPORT_ZIEL_NAME[z]}: {weitergabeZeigen ? "noch nie als Nachtrag geliefert" : "noch nicht in diesem Format exportiert"} — alle Bögen sind neu.
+                {EXPORT_ZIEL_NAME[z]}: {weitergabeZeigen ? "für den Stab noch keine Lieferung" : "noch nicht in diesem Format exportiert"} — alle Bögen sind neu.
                 {weitergabeZeigen && (
                   <>
-                    {" "}Die Weitergabe vom {exportZeitKurz(weitergabeStand!.zeitpunkt)} zählt hier nicht (sie geht an die Ablösung oder ins Archiv).
+                    {" "}Die Weitergabe-Datei vom {exportZeitKurz(weitergabeStand!.zeitpunkt)} zählt hier nicht (sie geht zum Sichern an die Ablösung oder ins Archiv). Das nächste Sammel-PDF hier ist die erste Lieferung an den Stab.
                     {props.onStandAusWeitergabe && (
                       <>
                         {" "}
@@ -2713,13 +2838,14 @@ export function EinsatzDetail(props: {
             <button
               type="button"
               onClick={(e) => ausgabeTipp("sammel-pdf", null, () => onSammelPdf(exportUmfang), e)}
-              disabled={gesperrt("pdf")}
+              disabled={gesperrt("pdf") || arbeitet !== null}
+              aria-busy={arbeitet === "sammel-pdf" || undefined}
               title={nurNeue
                 ? "Nur die seit dem letzten Export neuen Bögen als eine PDF — mit eingebetteten Daten dieser Bögen. Auf dem Zielgerät über „Einsatz importieren…“ einlesbar."
                 : "Alle Bögen als eine PDF — mit eingebetteter kompletter Sammlung (Züge, Status, Historie). Auf dem Zielgerät über „Einsatz importieren…“ einlesbar."}
             >
               {/* Ohne früheren Stab-Export ist „nur neue Bögen" die ganze Lage; der Knopf sagt es (R6-K9). */}
-              {nurNeue ? (exportStaende.pdf ? "Sammel-PDF (nur neue Bögen)" : "Sammel-PDF (erste Lieferung: alle Bögen)") : "Sammel-PDF (alle Bögen)"}
+              {arbeitet === "sammel-pdf" ? "Sammel-PDF wird erzeugt…" : nurNeue ? (exportStaende.pdf ? "Sammel-PDF (nur neue Bögen)" : "Sammel-PDF (erste Lieferung: alle Bögen)") : "Sammel-PDF (alle Bögen)"}
             </button>{" "}
           </>
         )}
@@ -2745,6 +2871,11 @@ export function EinsatzDetail(props: {
           <button type="button" onClick={onExport}>Als Datei exportieren (Debug)</button>
         )}
       </div>
+      {/* Was die zwei CSV-Dateien unterscheidet, steht unter den Knöpfen und nicht nur im Tooltip (R17-N9). */}
+      <p className="hinweis csv-erklaerung">
+        „Übersicht“: eine Zeile je Einheit mit Stärke und Bedarf, ohne Namen — für die Lage. „Alle Daten“: zusätzlich eine Zeile je Person
+        (mit Namen und Rufnummern) und je Fahrzeug — nur an Stellen weitergeben, die Personendaten sehen dürfen.
+      </p>
       {sofort && arbeitet === null && (
         <p className="hinweis arbeitet-zeile ausgabe-quittung" role="status">
           {sofort}
@@ -2753,7 +2884,9 @@ export function EinsatzDetail(props: {
       </div>
 
       {/* Hinter den Export-Knöpfen, nicht mitten in deren Erklärung (Audit Runde 6, R6-K5). */}
-      <LagemonitorBlock einsatzId={einsatz.id} alleIds={einsaetzeLaden().map((x) => x.id)} />
+      <Suspense fallback={null}>
+        <LagemonitorBlock einsatzId={einsatz.id} alleIds={einsaetzeLaden().map((x) => x.id)} />
+      </Suspense>
 
       {/* Das Löschen gehört ans Ende des Inhalts, nicht in die feste Leiste am
           Daumen: Es ist die seltenste und folgenschwerste Handlung dieser
@@ -2823,6 +2956,7 @@ export function EinsatzDetail(props: {
       {staerkeGeaendert && aktiveQuittung === "staerke" && (
         <DaumenQuittung
           key={`staerke:${staerkeGeaendert.eintragId}`}
+          kurz={staerkeGeaendert.kennzeichnung ? (staerkeGeaendert.kennzeichnung === "einsatz" ? "Zählt jetzt" : "Jetzt Übung") : `Stärke ${staerkeGeaendert.vorher} → ${staerkeGeaendert.nachher}`}
           onRueckgaengig={() => void staerkeZurueckNehmen()}
           onSchliessen={() => setStaerkeGeaendert(null)}
         >
@@ -2857,6 +2991,7 @@ export function EinsatzDetail(props: {
           key={`status:${statusWechsel.vorher.id}:${statusWechsel.zeit}`}
           prellschutz
           mehrzeilig
+          kurz={`${nummerText(statusWechsel.vorher.einheitSchluessel) || "Einheit "}${statusWechsel.status === MeldeStatus.ABGERUECKT ? "abgerückt" : "wieder da"}`}
           onRueckgaengig={() => void statusZurueck()}
           onSchliessen={() => setStatusWechsel(null)}
         >
@@ -2886,6 +3021,8 @@ export function EinsatzDetail(props: {
         <DaumenQuittung
           key={`zug:${zugGesetzt.nonce}`}
           prellschutz
+          sperreKurz
+          kurz={`Zug „${zugGesetzt.zug.length > 11 ? `${zugGesetzt.zug.slice(0, 10)}…` : zugGesetzt.zug}“`}
           onRueckgaengig={() => void zugZurueck()}
           rueckgaengigName="Zug-Zuordnung rückgängig machen"
           onSchliessen={() => setZugGesetzt(null)}
@@ -2915,6 +3052,8 @@ export function EinsatzDetail(props: {
         <DaumenQuittung
           key={`kenntnis:${kenntnisGenommen.nonce}`}
           prellschutz
+          sperreKurz
+          kurz={`Zur Kenntnis: ${kenntnisGenommen.anzahl}`}
           onRueckgaengig={kenntnisZurueck}
           rueckgaengigName="Zur Kenntnis genommen rückgängig machen"
           onSchliessen={() => setKenntnisGenommen(null)}
@@ -2927,11 +3066,12 @@ export function EinsatzDetail(props: {
         <DaumenQuittung
           key={`kopf:${kopfGeaendert.nonce}`}
           prellschutz
+          sperreKurz
           onRueckgaengig={() => void kopfZurueck()}
           rueckgaengigName="Änderung an Name und Ort rückgängig machen"
           onSchliessen={() => setKopfGeaendert(null)}
         >
-          <strong>Einsatz geändert:</strong> „{kopfGeaendert.nachher}"
+          <strong>Einsatz geändert:</strong> {kopfGeaendert.nachher}
         </DaumenQuittung>
       )}
       {uebersprungenQuittung && aktiveQuittung === "uebersprungen" && !zuletztEntfernt && (
@@ -2976,10 +3116,17 @@ export function EinsatzDetail(props: {
  * 45 px leer vor den Zahlen). Am Telefon steht „Ges." gleich hinter dem Namen, F/U/M als Aufteilung dahinter, „Zug" danach:
  * Einheit, Gesamtstärke und Aufteilung liegen so ohne Wischen im Bild (360 und 320 px).
  */
-export function tabellenSpaltenFuer(zugVorhanden: boolean, kompakt: boolean): SpaltenDefinition[] {
+export function tabellenSpaltenFuer(zugVorhanden: boolean, kompakt: boolean, kern = false): SpaltenDefinition[] {
   const spalten = TABELLEN_SPALTEN.filter((s) => zugVorhanden || s.schluessel !== "zugEtikett");
   if (!kompakt) return spalten;
   const nimm = (k: TabellenSpalte) => spalten.find((s) => s.schluessel === k);
+  // R17-H8, R17-K7, R17-G7: Am Telefon vorerst nur das, wonach die Führung fragt: wer, wie stark, welcher Zug, wie alt die
+  // Angaben, was gebraucht wird. Alle Spalten bleiben einen Tipp entfernt; die schmalen Köpfe sind dort kein Tippziel.
+  if (kern) {
+    return (["einheit", "gesamt", "zugEtikett", "meldung", "bedarf"] as const)
+      .map(nimm)
+      .filter((s): s is SpaltenDefinition => s != null);
+  }
   const vorn = ["einheit", "gesamt", "fuehrer", "unterfuehrer", "mannschaft", "zugEtikett"] as const;
   return [
     ...vorn.map(nimm).filter((s): s is SpaltenDefinition => s != null),
@@ -2992,8 +3139,10 @@ function EinheitenTabelle({ meldungen, art, eingang, nummern, neueFassungen, kom
   // übernehmen. Erst ein Klick auf einen Spaltenkopf ordnet hier um.
   const [spalte, setSpalte] = useState<TabellenSpalte | null>(null);
   const [richtung, setRichtung] = useState<Sortierrichtung>("auf");
+  const [alleSpalten, setAlleSpalten] = useState(gemerkteAlleSpalten);
+  const kern = kompakt && !alleSpalten;
   const zeilen = tabellenZeilen(meldungen, art);
-  const spalten = tabellenSpaltenFuer(zeilen.some((z) => z.zugEtikett !== ""), kompakt);
+  const spalten = tabellenSpaltenFuer(zeilen.some((z) => z.zugEtikett !== ""), kompakt, kern);
   const sortiert = spalte ? zeilenSortieren(zeilen, spalte, richtung) : zeilen;
   const summe = tabellenSumme(zeilen);
   const zaehlung = tabellenZaehlung(zeilen);
@@ -3039,8 +3188,22 @@ function EinheitenTabelle({ meldungen, art, eingang, nummern, neueFassungen, kom
 
   return (
     <>
+      {kompakt && (
+        <p className="tabellen-spalten">
+          <button
+            type="button"
+            aria-pressed={alleSpalten}
+            onClick={() => {
+              setAlleSpalten(!alleSpalten);
+              merkeAlleSpalten(!alleSpalten);
+            }}
+          >
+            {alleSpalten ? "Nur Kernspalten" : "Alle Spalten zeigen"}
+          </button>
+        </p>
+      )}
       <TabellenScroll titel="Einheitenübersicht">
-        <table className="uebersicht einheiten-tabelle">
+        <table className={`uebersicht einheiten-tabelle${kern ? " tabelle-kern" : ""}`}>
           <caption className="nur-sr">
             Gemeldete Einheiten mit Stärke, Verpflegung, Unterbringung und Kraftstoff
           </caption>
@@ -3050,29 +3213,41 @@ function EinheitenTabelle({ meldungen, art, eingang, nummern, neueFassungen, kom
                 <th
                   key={s.schluessel}
                   scope="col"
+                  data-spalte={s.schluessel}
                   className={s.zahl ? "zahl" : undefined}
                   aria-sort={
-                    spalte === s.schluessel
-                      ? richtung === "auf"
-                        ? "ascending"
-                        : "descending"
-                      : "none"
+                    kern
+                      ? undefined
+                      : spalte === s.schluessel
+                        ? richtung === "auf"
+                          ? "ascending"
+                          : "descending"
+                        : "none"
                   }
                 >
-                  <button
-                    type="button"
-                    className="spalten-sortierung"
-                    title={`Nach ${s.titel} sortieren`}
-                    onClick={() => sortierenNach(s.schluessel, s.zahl)}
-                  >
-                    <span aria-hidden="true">{s.kopf}</span>
-                    <span className="nur-sr">{s.titel}</span>
-                    {spalte === s.schluessel && (
-                      <span className="sortier-pfeil" aria-hidden="true">
-                        {richtung === "auf" ? "▲" : "▼"}
-                      </span>
-                    )}
-                  </button>
+                  {kern ? (
+                    // Kernspalten am Telefon: Köpfe nur zum Lesen. Fünf Tippziele von 44 px liegen dort ohne Abstand
+                    // nebeneinander; sortiert wird mit „Alle Spalten" oder in der Leiste „Suchen, sortieren, filtern".
+                    <span className="spalten-kopf">
+                      <span aria-hidden="true">{s.kopf}</span>
+                      <span className="nur-sr">{s.titel}</span>
+                    </span>
+                  ) : (
+                    <button
+                      type="button"
+                      className="spalten-sortierung"
+                      title={`Nach ${s.titel} sortieren`}
+                      onClick={() => sortierenNach(s.schluessel, s.zahl)}
+                    >
+                      <span aria-hidden="true">{s.kopf}</span>
+                      <span className="nur-sr">{s.titel}</span>
+                      {spalte === s.schluessel && (
+                        <span className="sortier-pfeil" aria-hidden="true">
+                          {richtung === "auf" ? "▲" : "▼"}
+                        </span>
+                      )}
+                    </button>
+                  )}
                 </th>
               ))}
             </tr>
@@ -3104,8 +3279,10 @@ function EinheitenTabelle({ meldungen, art, eingang, nummern, neueFassungen, kom
         </table>
       </TabellenScroll>
       <p className="hinweis">
-        Spaltenkopf anklicken sortiert die Tabelle. Details, Historie und Aktionen einer Einheit
-        stehen in der Kartenansicht.
+        {kern
+          ? "Kernspalten. Mit „Alle Spalten zeigen“ sind die Spaltenköpfe zum Sortieren antippbar. "
+          : "Spaltenkopf anklicken sortiert die Tabelle. "}
+        Details, Historie und Aktionen einer Einheit stehen in der Kartenansicht.
       </p>
     </>
   );
@@ -3218,9 +3395,11 @@ function TabellenZelle({ spalte, zeile: z }: { spalte: TabellenSpalte; zeile: Ta
           {z.standAlt && <AltBadge />}
         </td>
       );
+    // „1. Zug" bricht nicht in „1." und „Zug" (R17-K7).
+    case "zugEtikett":
+      return <td className="zug-zelle">{z.zugEtikett}</td>;
     case "einheit":
     case "organisation":
-    case "zugEtikett":
     case "eingetroffen":
     case "abgerueckt":
       return <td>{z[spalte]}</td>;
@@ -3299,7 +3478,7 @@ export function BogenDetails({ bogen, absender, absenderKarte }: { bogen: Erfass
       <h4>Einsatz / Auftrag</h4>
       <dl className="paare">
         <dt>Zeitraum</dt>
-        <dd>{datumDeutsch(datumZuIso(bogen.einsatz.zeitraumVon))} – {datumDeutsch(datumZuIso(bogen.einsatz.zeitraumBis))}</dd>
+        <dd>{datumAnzeige(bogen.einsatz.zeitraumVon)} – {datumAnzeige(bogen.einsatz.zeitraumBis)}</dd>
         <dt>Ort / Auftrag</dt><dd>{bogen.einsatz.ortAuftrag || "—"}</dd>
         <dt>Beginn / Ende</dt>
         <dd>
@@ -3561,6 +3740,8 @@ function HistorieZeile({ eintrag, vorheriger, aktuell, verdraengt = false, onVer
       {/* Wann die Fassung HIER eingegangen ist — der Stand ist die Uhr des
           Absenders (Audit Runde 2, R2-K6). */}
       {" · eingegangen "}{zeitKurz(eintrag.empfangenAm)}
+      {/* Am Meldekopf von Hand geändert: die Meldung der Einheit hat ihre eigene Zeit (R17-K1). */}
+      {eintrag.angaben && <> · Meldung der Einheit {zeitLang(eintrag.angaben.seit)}</>}
       {aktuell ? " (aktuell)" : verdraengt ? " (ersetzt)" : ""}
       {onGilt && (
         <>
@@ -3632,7 +3813,12 @@ function EinheitKarte(props: {
 }) {
   const { einsatzId, kopf, alle, onGeaendert, onEntfernt, qualifikation = "", qualifikationKurz = "", eingang, onStatusWechsel, kompakt = false } = props;
   // Auf dem Telefon zugeklappt, bis die Einheit angetippt wird (R2-K7).
-  const [aufgeklappt, setAufgeklappt] = useState(false);
+  // Nach dem Neuladen wieder aufgeklappt, wenn es die Karte war, an der zuletzt gearbeitet wurde (R17-E5, R17-O2, R17-S10, R17-W5).
+  const [aufgeklappt, setAufgeklapptRoh] = useState(() => karteWarOffen(props.einsatzId, props.kopf.einheitSchluessel));
+  const setAufgeklappt = (offen: boolean) => {
+    setAufgeklapptRoh(offen);
+    karteOffenMerken(einsatzId, kopf.einheitSchluessel, offen);
+  };
   const zu = kompakt && !aufgeklappt;
   // Ohne Rollen: Die Ansicht bleibt nach der Aufnahme oben (R2-S3).
   const zeile = useEingangsquittung<HTMLLIElement>(marke(eingang, kopf.einheitSchluessel), { rollen: false });
@@ -3737,7 +3923,9 @@ function EinheitKarte(props: {
   const [bemerkungGanz, setBemerkungGanz] = useState(false);
   const neueFassung = folge != null && (!!props.ungesehen || (!!props.frisch && frischGemeldet(kopf)));
   const abgerueckt = kopf.status === MeldeStatus.ABGERUECKT;
-  const zeitHinweis = zeitUnstimmigkeit({ eintreffen: eintreffzeit(kopf), abgerueckt: abgerueckt ? kopf.abgerueckAm : null });
+  // Eine Einheit, die schon abgerückt war und zurückgeholt wurde, ist dem Helfer bekannt: kein erneutes „neu" (R17-N4).
+  const warAbgerueckt = (kopf.vermerke ?? []).some((v) => v.text === "Abgerückt");
+  const zeitHinweis =zeitUnstimmigkeit({ eintreffen: eintreffzeit(kopf), abgerueckt: abgerueckt ? kopf.abgerueckAm : null });
   const aufgegangen = kopf.status === MeldeStatus.AUFGEGANGEN;
   // Nur anwesende Meldungen zählen — und nur an ihnen sind Aufteilen und
   // Zusammenführen sinnvoll.
@@ -4011,21 +4199,17 @@ function EinheitKarte(props: {
    * zu Share-Sheet bzw. Download.
    */
   async function bogenPdf() {
-    const tab = imWebBrowser() ? window.open("", "_blank") : null;
-    // Bis das PDF steht, vergehen Sekunden: ein weißes Fenster ohne Erklärung
-    // liest sich am Gerät wie ein Fehlklick.
-    if (tab) tab.document.body.textContent = "Bogen wird erzeugt…";
+    // Kein Tab mehr (R17-A2): Ein Tab mit dem PDF trug im Download-Ordner eine Zufalls-ID als Namen. Der Download hat den Namen
+    // aus Einheit und Stand; der Anker mit `download` liegt in pdfmake.
     setPdfLaeuft(true);
     setPdfHinweis(null);
     try {
       // Dynamisch: pdfmake samt Schriften bleibt aus dem Start-Bundle heraus.
       const { meldungPdfAnzeigen } = await import("./pdf");
-      await meldungPdfAnzeigen(kopf, tab);
+      const datei = await meldungPdfAnzeigen(kopf, null);
       // Auch hier eine Bestätigung in der App wie bei Lageblatt und Sammel-PDF (R15-A5).
-      setPdfHinweis("✓ Bogen als PDF erzeugt (neuer Tab oder Download-Ordner).");
+      setPdfHinweis(typeof datei === "string" ? `✓ Bogen als PDF gespeichert: ${datei} (Download-Ordner).` : "✓ Bogen als PDF gespeichert (Download-Ordner).");
     } catch (e) {
-      // Sonst bleibt der leere Tab als stiller Rest stehen.
-      tab?.close();
       await zeigeHinweis({ titel: "Bogen als PDF", text: fehlerText(e) });
     } finally {
       setPdfLaeuft(false);
@@ -4063,7 +4247,7 @@ function EinheitKarte(props: {
             {fehler && <p className="fehler" role="alert">{fehler}</p>}
             <p>
               „{einheitAnzeigename(kopf.bogen.einheit)}", bisher {alt.fuehrer} / {alt.unterfuehrer} / {alt.mannschaft} / {alt.gesamt}.
-              Fahrzeuge, Bedarf, Namen, Zug und Auftrag bleiben; die bisherige Meldung wandert in die Historie.
+              Fahrzeuge, Namen, Zug und Auftrag bleiben; verpflegt und untergebracht wird nach der neuen Stärke; die bisherige Meldung wandert in die Historie.
             </p>
           </>
         ),
@@ -4128,6 +4312,7 @@ function EinheitKarte(props: {
         neueFassung.fassung = r.eintrag;
         // Die eigene Handlung gilt, auch nach einer zurückgestellten Uhr (R5-E2).
         fassungObenauf(einsatzId, r.eintrag.id);
+        angabenVermerken(einsatzId, r.eintrag.id, kopf); // das Alter der Meldung bleibt (R17-K1)
       }
     }, `Gewünscht war für „${einheitAnzeigename(kopf.bogen.einheit)}": Stärke ${f} / ${u} / ${m} / ${f + u + m} (bisher ${alt.fuehrer} / ${alt.unterfuehrer} / ${alt.mannschaft} / ${alt.gesamt}). Bitte auf dem Meldeblock notieren, Platz schaffen und noch einmal eingeben.`);
     if (!ok) return;
@@ -4157,20 +4342,27 @@ function EinheitKarte(props: {
       titel: wirdEinsatz ? "Als Einsatzmeldung zählen?" : "Als Übung kennzeichnen?",
       text:
         `„${name}" zählt danach ${wirdEinsatz ? "in Stärke, Verpflegung und Unterbringung mit" : "dort nicht mehr mit"} (${personenText}). ` +
-        "Neue Fassung in der Historie; „Rückgängig“ nimmt sie zurück.",
+        "Neue Fassung in der Historie; das Alter der Meldung bleibt; „Rückgängig“ nimmt sie zurück.",
       ok: wirdEinsatz ? "Als Einsatzmeldung zählen" : "Als Übung kennzeichnen",
       fokus: "abbruch",
     });
     if (!sicher) return;
     const neu: Erfassungsbogen = JSON.parse(JSON.stringify(kopf.bogen));
     neu.uebung = !wirdEinsatz;
+    // Der Stand im Bogen wird neu gestempelt, damit die Fassung eine eigene Kennung bekommt und gilt (ein Zurückstellen
+    // auf die Kennzeichnung davor wäre sonst dieselbe Fassung wie die erste); angezeigt wird weiter der Stand des
+    // Absenders (`standAbsender`, R17-D5).
     neu.stand = Math.max(stempelZeitpunkt(), kopf.bogen.stand);
     const neueFassung: { fassung: MeldeEintrag | null } = { fassung: null };
     const ok = await gesichert("Kennzeichnung ändern", () => {
-      const r = meldungAufnehmen(einsatzId, neu, { quelle: "manuell", einheitSchluesselOverride: kopf.einheitSchluessel });
+      // Die Quelle bleibt („Aus Datei“ bleibt „Aus Datei“); nur Aufteilung und Zusammenführung sind keine Quellen einer Meldung.
+      const quelle = kopf.quelle === "aufteilung" || kopf.quelle === "zusammenfuehrung" ? "manuell" : kopf.quelle;
+      const r = meldungAufnehmen(einsatzId, neu, { quelle, einheitSchluesselOverride: kopf.einheitSchluessel });
       if (r?.neu) {
         neueFassung.fassung = r.eintrag;
         fassungObenauf(einsatzId, r.eintrag.id);
+        angabenVermerken(einsatzId, r.eintrag.id, kopf, true); // Alter bleibt, keine Folgemeldung (R17-K1)
+        standAbsenderVermerken(einsatzId, r.eintrag.id, kopf); // Anzeige-Stand bleibt der des Absenders (R17-D5)
       }
     });
     if (!ok) return;
@@ -4184,6 +4376,14 @@ function EinheitKarte(props: {
       });
     }
     onGeaendert();
+  }
+
+  /** „Anderer Einsatz?" entscheiden: Der Bogen gehört zur Lage (Marke fällt weg) oder wird wieder geprüft (R17-E4). */
+  async function ortGehoert(gilt: boolean) {
+    const ok = await gesichert(gilt ? "Ort bestätigen" : "Wieder prüfen", () => {
+      ortBilligen(einsatzId, kopf.id, gilt);
+    });
+    if (ok) onGeaendert();
   }
 
   async function verschieben() {
@@ -4291,7 +4491,7 @@ function EinheitKarte(props: {
             </p>
           )}
           <p>
-            „Rückgängig" gilt bis zum Neuladen oder Schließen der App; danach ist die Meldung endgültig weg.{" "}
+            „Rückgängig" gilt bis zum Neuladen; danach liegt die Meldung {PAPIERKORB_TAGE} Tage unter „Zuletzt entfernte Meldungen“.{" "}
             {kopie != null
               ? `Kopie: Export oder Weitergabe vom ${exportZeitKurz(kopie)}.`
               : "Noch kein Export und keine Weitergabe davon."}
@@ -4377,16 +4577,9 @@ function EinheitKarte(props: {
       ref={zeile}
       data-einheit={kopf.einheitSchluessel}
       className={`einheit-zeile${zaehlt ? "" : " gestrichen"}${zu ? " kompakt" : kompakt ? " karte-offen" : ""}`}
-      // Prellschutz: Der zweite Tipp eines Doppeltipps auf „Abrücken" traf
-      // die neu geordnete Karte (R2-G4). Abgefangen wird in der
-      // Einfangphase, also bevor irgendein Knopf der Karte ihn sieht.
-      onClickCapture={(e) => {
-        // Nur Zeiger-Tipps; ein Klick aus der Tastatur trägt `detail === 0`.
-        if (e.detail > 0 && Date.now() < gesperrtBis.current) {
-          e.stopPropagation();
-          e.preventDefault();
-        }
-      }}
+      // Prellschutz (R2-G4): Den zweiten Tipp eines Doppeltipps auf „Abrücken" fängt der gesperrte Wechselknopf selbst
+      // (`disabled={prellt}`) und die Ortssperre an der Stelle des Tipps (tipp-schutz.ts). Die ganze Karte
+      // zu sperren schluckte auch den bewussten Tipp auf „Mehr…" eine halbe Sekunde später (R17-H3).
     >
       <div className="kopfzeile">
         <div className="muster-text">
@@ -4426,7 +4619,7 @@ function EinheitKarte(props: {
                 steht nur „neu": das lange Wort kostete eine eigene Zeile je
                 Karte, die Marke war deshalb ganz ausgeblendet — eine eben
                 eingetroffene Einheit fiel weniger auf als eine Folgemeldung. */}
-            {zaehlt && (props.ungesehen || (props.frisch && istNeu(kopf))) && !neueFassung ? (
+            {zaehlt && !warAbgerueckt && (props.ungesehen || (props.frisch && istNeu(kopf))) && !neueFassung ? (
               <span className="neu-badge" title="Vor weniger als 30 Minuten eingetroffen oder seit der letzten Kenntnisnahme eingegangen — unabhängig vom Export">
                 {/* „neu" bleibt auch aufgeklappt, solange der Kasten oben die Meldung als neu zählt (R14-S3). */}
                 <span className="neu-lang">{props.ungesehen ? "neu · kürzlich eingetroffen" : "kürzlich eingetroffen"}</span>
@@ -4558,7 +4751,7 @@ function EinheitKarte(props: {
                 </button>
               </>
             )}
-            {" · Stand "}{standText(kopf.bogen)}
+            {" · Stand "}{zeitpunktDeutsch(standDesAbsenders(kopf))}
             {standIstAlt(kopf) && <AltBadge />}
             {" · "}{quelleText(kopf, revs)}
           </span>
@@ -4573,7 +4766,19 @@ function EinheitKarte(props: {
           {/* Ort/Auftrag des Bogens passt nicht zur Lage (R4-K6): nicht sperren, nur zeigen. */}
           {props.fremderOrt && (
             <span className="muster-sub warnung-text fremder-ort" role="note">
-              ⚠ Bogen nennt: „{props.fremderOrt}“ — passt das zu dieser Lage? {ORT_REGEL} Zählt trotzdem mit.
+              ⚠ Bogen nennt: „{props.fremderOrt}“ — passt das zu dieser Lage? {ORT_REGEL} Zählt trotzdem mit.{" "}
+              <button type="button" className="link" aria-describedby={nameId} onClick={() => void ortGehoert(true)}>
+                Gehört zu dieser Lage
+              </button>
+            </span>
+          )}
+          {/* Die Entscheidung des Meldekopfs bleibt sichtbar, bis sie zurückgenommen wird (R17-E4). */}
+          {!props.fremderOrt && ortIstGebilligt(kopf, revs) && (
+            <span className="muster-sub hinweis ort-gebilligt" role="note">
+              Ort/Auftrag „{(kopf.bogen.einsatz.ortAuftrag ?? "").trim()}“ vom Meldekopf als zur Lage gehörig bestätigt.{" "}
+              <button type="button" className="link" aria-describedby={nameId} onClick={() => void ortGehoert(false)}>
+                Wieder prüfen
+              </button>
             </span>
           )}
           {/* Nachgereichter Bogen hinter der Schnellerfassung (R4-W1). */}
@@ -4789,7 +4994,7 @@ function EinheitKarte(props: {
         {getauscht != null ? (
           <>
             {/* Ein Knopf, kein Text: So bleibt die Knopfreihe stehen. */}
-            <button type="button" ref={wechselKnopf} aria-describedby={nameId} disabled className="wechsel-knopf wechsel-quittiert">
+            <button type="button" ref={wechselKnopf} aria-describedby={nameId} disabled className="wechsel-knopf wechsel-quittiert" title="Bestätigung, kein Knopf — gleich folgt „Wieder anwesend“, falls es ein Versehen war.">
               {getauscht === MeldeStatus.ABGERUECKT ? "✓ Abgerückt" : "✓ Anwesend"}
             </button>{" "}
           </>
@@ -4939,6 +5144,7 @@ function EinheitKarte(props: {
             value={notizEntwurf}
             placeholder="z. B. Deichabschnitt Nord ab 14:00"
             aria-label="Auftrag/Notiz"
+            {...NAMEN_EINGABE}
             autoFocus
             onChange={(e) => setNotizEntwurf(e.target.value)}
             onKeyDown={(e) => {

@@ -112,9 +112,11 @@ export function handscannerLauscher(ziel: Window, opt: HandscannerOptionen): () 
       puffer = "";
       imTempo = true;
     }
-    // Leertaste ausgenommen: Sie bedient fokussierte Knöpfe, und kein
-    // Payload-Zeichensatz (URL, Base41, Base64url) enthält Leerzeichen.
-    if (e.key.length === 1 && e.key !== " ") {
+    // Leertaste nur MITTEN in einem Scan (R17-E7): Am Anfang bedient sie fokussierte Knöpfe, und kein
+    // Payload-Zeichensatz (URL, Base41, Base64url) enthält Leerzeichen. Ein fremder Code („hallo welt") soll
+    // aber so angezeigt werden, wie er kam — nicht als „hallowelt".
+    const leerzeichenImScan = e.key === " " && puffer.length > 0 && (opt.streng || (imTempo && abstand <= HANDSCANNER_TEMPO_MS));
+    if (e.key.length === 1 && (e.key !== " " || leerzeichenImScan)) {
       clearTimeout(abschlussUhr);
       if (puffer.length > 0 && abstand > HANDSCANNER_TEMPO_MS) imTempo = false;
       puffer += e.key;

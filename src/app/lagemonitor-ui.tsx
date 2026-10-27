@@ -28,11 +28,20 @@ import { ortOhneZusatz } from "./hilfen";
 import { sammlungenBeiseitegelegt } from "./unlesbar";
 import { alterKurz, alterText, anwesendenAlterText, ausEingabeWert, bedarfText, dauerText, lagebild, uhrTeile, zuEingabeWert, type EinheitZeile } from "./lagemonitor";
 
-const URL_PARAMETER = "lagemonitor";
+import { URL_PARAMETER, lagemonitorKennung } from "./lagemonitor-kennung";
 /** Gemerkte Helligkeitsstufe des Monitors („dunkel" oder „gedimmt"; „hell" wird nie gemerkt, R7-L3). */
 export const STUFE_SCHLUESSEL = "eeb.lagestufe.v1";
 /** Mehr Bewegungszeilen als das gibt es nicht im Bild; der Rest steht als „+ n weitere" (R7-K2). */
 const BEWEGUNGEN_MAX = 3;
+/**
+ * Bewegungszeilen je nach Bild (R17-K3, K11): Die Einheitenliste ist der Kern der Lage, Bewegungen sind Beiwerk. Auf einem
+ * 720p-Fernseher füllten drei Zeilen plus „+ n weitere" das Bild, von sechs Einheiten standen zwei in der Tabelle; am Telefon
+ * brach jede Zeile in drei. Dort und bei niedrigem Bild eine Zeile, bis 1000 px Höhe zwei, darüber drei.
+ */
+export function bewegungenMax(breite: number, hoehe: number): number {
+  if (breite <= 640 || hoehe <= 800) return 1;
+  return hoehe <= 1000 ? 2 : BEWEGUNGEN_MAX;
+}
 /** Schriftfaktoren der Einheitentabelle, bevor Zeilen entfallen (R8-L1). */
 const SCHRIFT_STUFEN = [1, 0.95, 0.9, 0.85];
 /** Ab diesem Alter der letzten Meldung wird der Datenstand abgesetzt (R7-K8). */
@@ -67,11 +76,7 @@ function stufeMerken(stufe: Stufe): void {
 /** Takt für Uhr, Dauer und „vor X Min". */
 const TAKT_MS = 5_000;
 
-/** Kennung aus der Adresse, wenn die Seite als Lagemonitor aufgerufen wurde. */
-export function lagemonitorKennung(suche: string = window.location.search): string | null {
-  const id = new URLSearchParams(suche).get(URL_PARAMETER);
-  return id ? id : null;
-}
+export { lagemonitorKennung };
 
 /**
  * Lagemonitor in einem zweiten Fenster öffnen. Lässt die Umgebung das nicht zu
@@ -369,7 +374,20 @@ export function Lagemonitor({ einsatzId }: { einsatzId: string }) {
       ? bild.abgerueckt > 0
         ? `Alle ${bild.abgerueckt} Einheiten abgerückt`
         : "Noch nichts gemeldet"
-      : `${s.einheiten} ${s.einheiten === 1 ? "Einheit" : "Einheiten"} · ${s.fahrzeuge} ${s.fahrzeuge === 1 ? "Fahrzeug" : "Fahrzeuge"}${bild.abgerueckt > 0 ? ` · ${bild.abgerueckt} abgerückt` : ""}`;
+      : // Jede Angabe bleibt ungeteilt („1 abgerückt" brach am Telefon in „… · 1" und „abgerückt", R17-K11); umbrochen wird nur bei „ · ".
+        (
+          <>
+            <span className="lm-nb">{s.einheiten} {s.einheiten === 1 ? "Einheit" : "Einheiten"}</span>
+            {" · "}
+            <span className="lm-nb">{s.fahrzeuge} {s.fahrzeuge === 1 ? "Fahrzeug" : "Fahrzeuge"}</span>
+            {bild.abgerueckt > 0 && (
+              <>
+                {" · "}
+                <span className="lm-nb">{bild.abgerueckt} abgerückt</span>
+              </>
+            )}
+          </>
+        );
   // Das Alter der anwesenden Einheiten, nicht nur der jüngsten Meldung: eine frische abgerückte Einheit
   // verdeckte sonst, dass die Stärke auf Meldungen von vor Stunden beruht (R11-K1).
   const alterAnwesende = bild.zeitenPruefen ? null : anwesendenAlterText(bild.anwesendenAlter, jetzt);
@@ -382,7 +400,7 @@ export function Lagemonitor({ einsatzId }: { einsatzId: string }) {
       : "";
   const veraltet = bild.zeitenPruefen || letzteAlt;
   const ortText = bild.ort?.trim() ? <span className="lm-ort"> · {bild.ort.trim()}</span> : null;
-  const sichtbareBewegungen = bild.bewegungen.slice(0, BEWEGUNGEN_MAX);
+  const sichtbareBewegungen = bild.bewegungen.slice(0, bewegungenMax(window.innerWidth, window.innerHeight));
   const weitereBewegungen = bild.bewegungen.length - sichtbareBewegungen.length;
 
   return (
@@ -405,7 +423,7 @@ export function Lagemonitor({ einsatzId }: { einsatzId: string }) {
         {/* Reine Sollstärke steckt in der Gesamtstärke: der Vorbehalt gehört an die Zahl, die vorgelesen wird (R9-K1);
             er steht in der Beschriftung der Stärkezeile statt in einer eigenen Zeile, die Einheiten kostet (R10-K4). */}
         <span className="lm-label">
-          Stärke F / U / M // gesamt
+          Stärke Führer / Unterführer / Mannschaft = gesamt
           {bild.sollstaerke.einheiten > 0 && (
             <>
               {" · "}
@@ -413,7 +431,7 @@ export function Lagemonitor({ einsatzId }: { einsatzId: string }) {
             </>
           )}
         </span>
-        {s.staerke.fuehrer} / {s.staerke.unterfuehrer} / {s.staerke.mannschaft} // <u>{s.staerke.gesamt}</u>
+        {s.staerke.fuehrer} / {s.staerke.unterfuehrer} / {s.staerke.mannschaft} = <u>{s.staerke.gesamt}</u>
       </div>
       {staleSeit != null && (
         <div className="lm-zeile lm-r3 lm-stand" role="alert">
@@ -441,17 +459,16 @@ export function Lagemonitor({ einsatzId }: { einsatzId: string }) {
       )}
       {sichtbareBewegungen.length > 0 && (
         <div className="lm-zeile lm-bewegungen">
-          {sichtbareBewegungen.map((b) => (
+          {sichtbareBewegungen.map((b, i) => (
             <div key={b.id} className="lm-bewegung">
               {b.art}: {b.name}
               {b.detail ? ` – ${b.detail}` : ""} <span className="lm-label lm-inline">{alterText(b.zeit, jetzt)}</span>
+              {/* Der Rest steht am Ende der letzten Zeile statt in einer eigenen: jede Zeile kostet eine Einheit in der Tabelle. */}
+              {weitereBewegungen > 0 && i === sichtbareBewegungen.length - 1 && (
+                <span className="lm-label lm-inline lm-weitere-bewegungen"> · + {weitereBewegungen} weitere {weitereBewegungen === 1 ? "Bewegung" : "Bewegungen"}</span>
+              )}
             </div>
           ))}
-          {weitereBewegungen > 0 && (
-            <div className="lm-bewegung lm-weitere-bewegungen">
-              + {weitereBewegungen} weitere {weitereBewegungen === 1 ? "Bewegung" : "Bewegungen"}
-            </div>
-          )}
         </div>
       )}
 
@@ -578,6 +595,8 @@ export function LagemonitorBlock({ einsatzId, alleIds }: { einsatzId: string; al
             value={funkruf}
             maxLength={FUNKRUF_MAX}
             placeholder="z. B. Salus Übungsleitung"
+            autoCorrect="off"
+            spellCheck={false}
             onChange={(e) => setzeFunkruf(e.target.value)}
           />
         </label>

@@ -866,10 +866,10 @@ export function pruefpunkte(b: Erfassungsbogen, mitFahrzeugen = true, heute?: Ee
   }
   if (bisVorVon) {
     const fern = heute == null ? [] : [b.einsatz.zeitraumVon, b.einsatz.zeitraumBis].filter((d) => Math.abs(d - heute) > 365);
-    const verdaechtig = fern.length === 1 ? datumZuIso(fern[0]!) : null;
+    const verdaechtig = fern.length === 1 ? datumAnzeige(fern[0]!) : null;
     hinweise.push({
       text: verdaechtig
-        ? `Einsatzzeitraum: „bis“ liegt vor „von“ — ${datumDeutsch(verdaechtig)} liegt mehr als ein Jahr entfernt, Tippfehler im Jahr ${verdaechtig.slice(0, 4)}?`
+        ? `Einsatzzeitraum: „bis“ liegt vor „von“ — ${verdaechtig} liegt mehr als ein Jahr entfernt, Tippfehler im Jahr${/\d{4}$/.test(verdaechtig) ? ` ${verdaechtig.slice(-4)}` : ""}?`
         : "Einsatzzeitraum: „bis“ liegt vor „von“.",
       schritt: S_EINSATZ,
     });
@@ -1092,9 +1092,22 @@ export function heuteDatum(): EebDatum {
 
 /** Einsatzzeitraum lesbar: „18.07.2026 – 22.07.2026" bzw. ein Tag. */
 export function zeitraumDeutsch(b: Erfassungsbogen): string {
-  const von = datumDeutsch(datumZuIso(b.einsatz.zeitraumVon));
-  const bis = datumDeutsch(datumZuIso(b.einsatz.zeitraumBis));
+  const von = datumAnzeige(b.einsatz.zeitraumVon);
+  const bis = datumAnzeige(b.einsatz.zeitraumBis);
   return von === bis ? von : `${von} – ${bis}`;
+}
+
+/**
+ * Tag (Tage seit der Epoche) als „14.05.2026“. Liegt der Wert außerhalb dessen, was ein Datum mit vierstelligem Jahr darstellt
+ * (beschädigte oder von Hand bearbeitete Datei), steht „ungültiges Datum“ — nicht „undefined.07.+011842“ (R17-A6).
+ */
+export function datumAnzeige(tage: number): string {
+  try {
+    const iso = datumZuIso(tage);
+    return /^\d{4}-\d{2}-\d{2}$/.test(iso) ? datumDeutsch(iso) : "ungültiges Datum";
+  } catch {
+    return "ungültiges Datum";
+  }
 }
 
 export function zeitpunktDeutsch(z: EebZeitpunkt): string {

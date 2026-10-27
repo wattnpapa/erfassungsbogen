@@ -19,9 +19,24 @@ export interface GezaehltWeg {
 }
 
 let gemerkt: GezaehltWeg | null = null;
+const hoerer = new Set<() => void>();
+
+/**
+ * Die Einsatzansicht hört mit (R17-S1): Sie öffnet schon, bevor das Ablegen zu Ende ist; ein erst danach gesetzter Merker
+ * erreichte ihren Zustand nie, und die Quittung mit „Rückgängig" erschien nicht, obwohl die Rückfrage sie versprach.
+ */
+export function gezaehltWegBeobachten(f: () => void): () => void {
+  hoerer.add(f);
+  return () => hoerer.delete(f);
+}
+
+function melden(): void {
+  for (const f of hoerer) f();
+}
 
 export function gezaehltWegMerken(w: Omit<GezaehltWeg, "nonce">): void {
   gemerkt = { ...w, nonce: Date.now() };
+  melden();
 }
 
 /** Der Rückweg zu dieser Sammlung, falls einer gemerkt ist. */
@@ -31,6 +46,7 @@ export function gezaehltWegFuer(einsatzId: string): GezaehltWeg | null {
 
 export function gezaehltWegVergessen(): void {
   gemerkt = null;
+  melden();
 }
 
 /**
@@ -44,7 +60,10 @@ export function gezaehltZuruecknehmen(w: GezaehltWeg): boolean {
   eintrag.bogen = w.soll;
   eintragIdAnpassen(liste.find((s) => s.id === w.einsatzId)!.eintraege, eintrag, bogenInhaltsId(w.soll));
   einsaetzeSpeichern(liste);
-  if (gemerkt?.nonce === w.nonce) gemerkt = null;
+  if (gemerkt?.nonce === w.nonce) {
+    gemerkt = null;
+    melden();
+  }
   return true;
 }
 

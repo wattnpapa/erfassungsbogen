@@ -442,7 +442,7 @@ describe("einsatzPdfDokument()", () => {
     expect(t).toContain("NACHTRAG seit 05.10.2026, 20:49 — nicht die ganze Lage:");
     expect(t).not.toMatch(/^Lage: $/m);
     expect(t).toContain("Bedarf (nur Nachtrag):");
-    expect(t).toContain("Bedarf Nachtrag (1 Einheiten");
+    expect(t).toContain("Bedarf Nachtrag (1 Einheit,");
     expect(t).toContain("Summe Nachtrag (");
     expect(JSON.stringify(typeof dd.footer === "function" ? dd.footer(1, 1, { width: 0, height: 0, orientation: "landscape" }) : dd.footer)).toContain("NACHTRAG seit");
     // Die Gesamtfassung bleibt, wie sie war.
@@ -511,7 +511,7 @@ describe("einsatzPdfDokument()", () => {
     expect(t).toContain("Summe (1 zählend · 1 abgerückt)");
     // Stärke und Bedarf nur über die zählende Einheit.
     expect(t).toContain("1 / 0 / 1 / 2");
-    expect(t).toContain("Bedarf gesamt (1 Einheiten, 2 Personen)");
+    expect(t).toContain("Bedarf gesamt (1 Einheit, 2 Personen)");
     // Beide Bögen hängen trotzdem an — „alle Bögen" heißt alle.
     const umbrueche = (einsatzPdfDokument("Lage", [
       { bogen: basisBogen(), qr: QR },
@@ -572,7 +572,7 @@ describe("einsatzPdfDokument()", () => {
     // Nur gemeldete Sorten, wie Einsatzansicht und Monitor (R14-K4).
     expect(t).toContain("Diesel 400 l");
     expect(t).not.toContain("Benzin 0 l");
-    expect(t).toContain("2 Fahrzeuge · Ruhezeit erforderlich bei 0 Einheit(en)");
+    expect(t).toContain("2 Fahrzeuge · Ruhezeit erforderlich bei 0 Einheiten");
   });
 
   it("zeigt Zwischensummen erst ab zwei Zügen — und stellt „ohne Zug“ ans Ende", () => {
@@ -823,7 +823,7 @@ describe("einsatzLageblattDokument()", () => {
     expect(t).toContain("Auftrag / Notiz\n(Bemerkung der Einheit)");
     expect(t).toContain("Ölsperre Kocher km 12");
     expect(t).toContain("(Ölsperre 200 m verbraucht, Nachschub nötig)");
-    expect(t).toContain(`(${"x".repeat(70)} … (Rest: Sammel-PDF))`);
+    expect(t).toContain(`(${"x".repeat(70)} … Rest: Sammel-PDF)`);
   });
 
   /**
@@ -868,7 +868,7 @@ describe("einsatzLageblattDokument()", () => {
     expect(json).toContain('{"text":"Diesel 80 l"}');
     // Änderungen: die Gesamtstärke zuerst.
     const t = texte(inhalt[2]).join("\n");
-    expect(t).toMatch(/gegenüber .*:\nGesamtstärke: von \d+ auf \d+\nBedarf\/Auftrag: Unterbringung M\/W\/D .*\nweitere: .*Personal \(2\)/);
+    expect(t).toMatch(/gegenüber .*:\nGesamtstärke: von \d+ auf \d+\nBedarf\/Auftrag: WC\/Dusche M\/W\/D .*\nweitere: .*Personal \(2\)/);
   });
 
   it("sagt auf einem leeren Blatt, dass noch nichts gemeldet ist", () => {

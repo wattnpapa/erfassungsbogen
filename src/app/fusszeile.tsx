@@ -1120,6 +1120,8 @@ export function Fusszeile({ onBogenOeffnen, kompakt = false }: {
             />
             Ja, alle lokalen Daten dieser App endgültig löschen
           </label>
+          {/* R17-L1: Der gesperrte Knopf sagt, was fehlt. */}
+          {!loeschVerstanden && <p className="hinweis dialog-fehlt" role="status">„Endgültig löschen“ geht erst, wenn der Haken gesetzt ist.</p>}
           <div className="aktionen">
             <button type="button" className="gefahr" disabled={!loeschVerstanden} onClick={alleDatenLoeschenJetzt}>
               Endgültig löschen

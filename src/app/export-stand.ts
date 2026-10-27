@@ -492,7 +492,7 @@ export function neueEintraege(eintraege: MeldeEintrag[], stand: ExportStand | nu
  */
 export function neuZurKenntnis(eintraege: MeldeEintrag[], stand: ExportStand | null): MeldeEintrag[] {
   return neueEintraege(eintraege, stand).filter(
-    (e) => e.quelle !== "aufteilung" && e.quelle !== "zusammenfuehrung" && e.status !== MeldeStatus.ABGERUECKT,
+    (e) => e.quelle !== "aufteilung" && e.quelle !== "zusammenfuehrung" && !e.angaben?.kennzeichnung && e.status !== MeldeStatus.ABGERUECKT,
   );
 }
 
@@ -574,7 +574,7 @@ export function nachtragGruende(eintraege: MeldeEintrag[], stand: ExportStand): 
     if (!bekannteEinheiten.has(schl)) {
       aus[schl] = { neu: true, gruende: ["neu"] };
     } else if (!bekannteIds.has(k.id) || arten.length > 0) {
-      aus[schl] = { neu: false, gruende: [...(bekannteIds.has(k.id) ? [] : ["Folgemeldung"]), ...arten] };
+      aus[schl] = { neu: false, gruende: [...(bekannteIds.has(k.id) ? [] : [k.angaben?.kennzeichnung ? "Kennzeichnung" : "Folgemeldung"]), ...arten] };
     }
   }
   return aus;

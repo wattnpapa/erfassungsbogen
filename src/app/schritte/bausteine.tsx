@@ -897,12 +897,14 @@ export function Vollstaendigkeit(props: {
   fremd?: boolean;
   /** Schnellerfassung (nur Stärke): „vollständig" gilt nur für das, was dort erfragt wird (R14-N3). */
   schnell?: boolean;
+  /** Der Einheitstyp ist gesetzt: Er „fehlt" in der Schnellerfassung dann nicht (R17-S12). */
+  typGesetzt?: boolean;
 }) {
   const { punkte, geheZu, nachsatz } = props;
   if (punkte.length === 0) {
     return (
       <p className="vollstaendig-ok" role="status">
-        {props.schnell ? "✓ Für die Schnellerfassung vollständig (Typ, Fahrzeuge, Bedarf fehlen bewusst)." : "✓ Alle Angaben vollständig und plausibel."}
+        {props.schnell ? `✓ Für die Schnellerfassung vollständig (${props.typGesetzt ? "" : "Typ, "}Fahrzeuge, Bedarf fehlen bewusst).` : "✓ Alle Angaben vollständig und plausibel."}
       </p>
     );
   }

@@ -162,7 +162,7 @@ describe("R15-D2 „Rückgängig“ nach „Meldung entfernen“ hält über das
     await nutzer.click(within(karteVon("Alpha")).getByRole("button", { name: "Entfernen" }));
     const dialog = document.querySelector<HTMLDialogElement>("dialog[aria-label='Meldung entfernen?']")!;
     // Die Rückfrage nennt die tatsächliche Grenze.
-    expect(dialog.textContent).toMatch(/„Rückgängig" gilt bis zum Neuladen oder Schließen der App/);
+    expect(dialog.textContent).toMatch(/„Rückgängig" gilt bis zum Neuladen/);
     await nutzer.click(within(dialog).getByRole("button", { name: "Meldung entfernen" }));
     await waitFor(() => expect(einsaetzeLaden().find((s) => s.id === id)!.eintraege).toHaveLength(1));
 
@@ -344,7 +344,7 @@ describe("R15-A5 „Bogen als PDF“ bestätigt in der App", () => {
       expect(z).toBeTruthy();
       return z!;
     });
-    expect(zeile.textContent).toMatch(/^✓ Bogen als PDF erzeugt \(neuer Tab oder Download-Ordner\)/);
+    expect(zeile.textContent).toMatch(/^✓ Bogen als PDF gespeichert.*\(Download-Ordner\)/);
     expect(zeile.getAttribute("role")).toBe("status");
   });
 });

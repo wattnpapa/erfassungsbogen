@@ -8,11 +8,11 @@
 // statt von einem CDN: die App muss offline vollständig funktionieren.
 import "@fontsource-variable/archivo";
 
-import { StrictMode } from "react";
+import { StrictMode, Suspense, lazy } from "react";
 import { createRoot } from "react-dom/client";
 import { App } from "./app";
 import { Fehlerfaenger } from "./fehlerfaenger";
-import { Lagemonitor, lagemonitorKennung } from "./lagemonitor-ui";
+import { lagemonitorKennung } from "./lagemonitor-kennung";
 import { DebugLeiste, debugAktiv, wendePlattformKlasseAn, wendeRahmenAn } from "./debug-plattform";
 import { wendeAnzeigeModusAn } from "./anzeige-modus";
 import { tastaturWaechterStarten } from "./tastatur";
@@ -22,6 +22,10 @@ import { dauerhaftWennWertvoll, speicherVerdrahten } from "./speicher-browser";
 import { stempelQuelleSetzen } from "./hilfen";
 import { stempelZeitpunkt } from "./datenschutz-uhr";
 import { dialogVerlaufVerdrahten } from "./modal-overlay";
+import { anfuehrungWaechterStarten } from "./typografie";
+
+// Der Lagemonitor wird nur nachgeladen, wenn die Adresse ihn verlangt (Startbündel, ADR-003 Aufnahmeregel 5).
+const Lagemonitor = lazy(() => import("./lagemonitor-ui").then((m) => ({ default: m.Lagemonitor })));
 
 // Die Einsatz-Sammlung bekommt ihre Ablage hineingereicht (ADR-003); ohne
 // diese Zeile bliebe sie speicherlos. Muss vor dem ersten Lesen stehen.
@@ -48,7 +52,7 @@ schriftStufeStarten();
 function Wurzel() {
   // Zweites Fenster mit der Lage für den Fernseher: nur Anzeige, ohne die App.
   const monitorEinsatz = lagemonitorKennung();
-  if (monitorEinsatz) return <Lagemonitor einsatzId={monitorEinsatz} />;
+  if (monitorEinsatz) return <Suspense fallback={null}><Lagemonitor einsatzId={monitorEinsatz} /></Suspense>;
   return (
     <Fehlerfaenger>
       <App />
@@ -59,6 +63,8 @@ function Wurzel() {
 
 // Einen Start zählen (Browser, PWA, App). Schlägt ohne Netz still fehl.
 statistikStarten();
+// Schließende Anführungszeichen einheitlich „…“ (R17-W3).
+anfuehrungWaechterStarten(document.getElementById("app")!);
 
 createRoot(document.getElementById("app")!).render(
   <StrictMode>

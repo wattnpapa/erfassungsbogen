@@ -117,8 +117,8 @@ describe("R13-W3 Startseite: eine Aufteilung der Einheitenzahl", () => {
     const r = meldungHinzufuegen(s.id, bogen("Wardenburg"))!;
     statusMitZeitSetzen(s.id, r.eintrag.id, MeldeStatus.ABGERUECKT);
     render(<App />);
-    const schnell = document.querySelector(".sammlung-kenndaten")!;
-    expect(schnell.textContent).toBe("1 Einheit gemeldet · 0 anwesend");
+    // Seit R17-A7 gibt es keinen zweiten Schnelleinstieg mehr: Die Karte ist der einzige Eintrag.
+    expect(document.querySelector(".sammlung-kenndaten")).toBeNull();
     expect(document.body.textContent).not.toContain("0 Einheit(en) anwesend");
     expect(document.body.textContent).toContain("1 Einheit gemeldet · 0 anwesend · Stärke");
   }, 20000);

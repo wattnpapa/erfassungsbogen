@@ -8,6 +8,8 @@
  * falsch und alle Spalten in einer.
  */
 
+import { anfuehrung } from "./typografie";
+
 export const CSV_TRENNER = ";";
 
 /** Excel(DE) erkennt UTF-8 nur zuverlässig mit BOM; ohne BOM landen Umlaute falsch. */
@@ -33,12 +35,23 @@ const FORMEL_START = /^[=+\-@\t\r]/;
  */
 export function csvFeld(v: string | number): string {
   if (typeof v === "number") return deZahl(v);
-  const s = FORMEL_START.test(v) ? `'${v}` : v;
+  const t = anfuehrung(v);
+  const s = FORMEL_START.test(t) ? `'${t}` : t;
   return /[";\r\n]/.test(s) || s !== s.trim() ? `"${s.replace(/"/g, '""')}"` : s;
 }
 
 export function csvZeile(werte: (string | number)[]): string {
   return werte.map(csvFeld).join(CSV_TRENNER);
+}
+
+/**
+ * Nachtrag-Datei (R17-A3, W2, K9): Die Kopfzeile bleibt Zeile 1 — Tabellenprogramme und Importe erwarten sie dort —, aber eine
+ * zusätzliche ERSTE SPALTE trägt den Vermerk schon in der Überschrift („NACHTRAG seit …, nicht die ganze Lage") und in jeder
+ * Datenzeile („NACHTRAG"). So sieht man beim Öffnen sofort, dass es nur ein Teil der Lage ist; Summen- und Schlusszeilen bekommen
+ * eine leere erste Zelle. `zeilen`: Kopfzeile, `datenZeilen` Datenzeilen, danach Summen und Schlusszeilen (alle schon CSV).
+ */
+export function mitNachtragSpalte(zeilen: string[], kopfText: string, datenZeilen: number): string[] {
+  return zeilen.map((z, i) => `${csvFeld(i === 0 ? kopfText : i <= datenZeilen ? "NACHTRAG" : "")}${CSV_TRENNER}${z}`);
 }
 
 /** Zeilen → fertiger Dateiinhalt (BOM, CRLF, abschließender Umbruch). */

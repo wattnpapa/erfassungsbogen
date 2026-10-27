@@ -8,7 +8,7 @@
  */
 
 import { staerke, type EebZeitpunkt } from "@bos/eeb-format/model";
-import { angabenAlterWort, angabenZeit } from "./angaben-alter";
+import { angabenAlterWort, angabenZeit, type AngabenSeit } from "./angaben-alter";
 import { einheitOrt } from "@bos/meldekopf/darstellung";
 import { EinsatzArt, MeldeStatus, revisionen, type Einsatzsammlung, type MeldeEintrag } from "@bos/meldekopf/einsaetze";
 import { aggregiere, aktuelleMeldungen, type EinsatzSummen } from "./auswertung";
@@ -149,11 +149,12 @@ export interface AnwesendenAlter {
  * eine frische abgerückte Einheit die jüngste war und die anwesenden Stunden alt waren (R11-K1).
  * `null` ohne anwesende Einheit.
  */
-export function anwesendenAlter(anwesende: readonly { empfangenAm: number; bogen?: { stand: EebZeitpunkt } }[], jetzt: number): AnwesendenAlter | null {
+export function anwesendenAlter(anwesende: readonly { empfangenAm: number; bogen?: { stand: EebZeitpunkt }; angaben?: AngabenSeit }[], jetzt: number): AnwesendenAlter | null {
   if (anwesende.length === 0) return null;
   const grenze = VERALTET_ALTER_MIN * 60_000;
   // Alter der Angaben (Stand), nicht des Eintreffens (R14-K1); ohne Bogen gilt der Eingang.
-  const zeit = (e: { empfangenAm: number; bogen?: { stand: EebZeitpunkt } }) => (e.bogen ? angabenZeit({ empfangenAm: e.empfangenAm, bogen: e.bogen }) : e.empfangenAm);
+  const zeit = (e: { empfangenAm: number; bogen?: { stand: EebZeitpunkt }; angaben?: AngabenSeit }) =>
+    e.bogen ? angabenZeit({ empfangenAm: e.empfangenAm, bogen: e.bogen, angaben: e.angaben }) : e.empfangenAm;
   return {
     aeltesteMs: Math.min(...anwesende.map(zeit)),
     anwesend: anwesende.length,
@@ -257,7 +258,7 @@ function bewegungenSeit(einsatz: Einsatzsammlung, jetzt: number): Bewegung[] {
       if (v.text === "Abgerückt") aus.push({ id: `${k.id}-a-${v.zeit}`, name, art: "Abgerückt", zeit: v.zeit });
       else if (/^Wieder als anwesend/.test(v.text)) aus.push({ id: `${k.id}-w-${v.zeit}`, name, art: "Wieder da", zeit: v.zeit });
     }
-    if (jetzt - k.empfangenAm <= BEWEGUNG_FENSTER_MS) {
+    if (jetzt - k.empfangenAm <= BEWEGUNG_FENSTER_MS && !k.angaben?.kennzeichnung) {
       const revs = revisionen(einsatz.eintraege, k.einheitSchluessel);
       if (revs.length > 1) {
         const davor = revs.find((r) => r.id !== k.id);

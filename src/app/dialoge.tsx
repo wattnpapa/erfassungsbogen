@@ -35,7 +35,14 @@ export type Eingabefeld = {
   zahl?: boolean;
   /** Gesetzt = Auswahlliste statt Textfeld (Wert = `wert` des Eintrags). */
   auswahl?: { wert: string; label: string }[];
+  /** Dieses Feld bekommt beim Öffnen den Fokus (sonst das erste) — „Ort eintragen…" landet im Feld „Ort" (R17-S4). */
+  fokus?: boolean;
 };
+
+/** Index des Felds, das beim Öffnen den Fokus bekommt: das mit `fokus`, sonst das erste. */
+export function fokusIndex(felder: Eingabefeld[]): number {
+  return Math.max(0, felder.findIndex((f) => f.fokus));
+}
 
 /** Ein benannter Weg in einer Rückfrage — mehr als OK/Abbrechen. */
 export type Antwortweg = {
@@ -444,8 +451,10 @@ function Dialogfenster({ abfrage }: { abfrage: Abfrage }) {
                   </select>
                 ) : f.mehrzeilig ? (
                   <textarea
-                    ref={i === 0 ? merkeErstes : undefined}
+                    ref={i === fokusIndex(abfrage.felder) ? merkeErstes : undefined}
                     rows={4}
+                    autoCorrect="off"
+                    spellCheck={false}
                     value={werte[f.name] ?? ""}
                     placeholder={f.platzhalter}
                     onChange={(e) => setWerte({ ...werte, [f.name]: e.target.value })}
@@ -453,8 +462,11 @@ function Dialogfenster({ abfrage }: { abfrage: Abfrage }) {
                   />
                 ) : (
                   <input
-                    ref={i === 0 ? merkeErstes : undefined}
+                    ref={i === fokusIndex(abfrage.felder) ? merkeErstes : undefined}
                     type="text"
+                    // Namen, Orte, Rufnamen: keine Autokorrektur, keine Rechtschreibprüfung (R17-H2).
+                    autoCorrect="off"
+                    spellCheck={false}
                     {...(f.zahl ? { inputMode: "numeric" as const } : {})}
                     enterKeyHint={i < abfrage.felder.length - 1 ? "next" : "done"}
                     value={werte[f.name] ?? ""}

@@ -501,7 +501,7 @@ describe("Oldenburg-XLSX: Lage wie in der App (R2-K2)", () => {
   it("stellt Abgerückte und Übungsmeldungen in einen überschriebenen Block unter den Summen", () => {
     const b = lage(0);
     expect(zelle(b, "A5"), "Leerzeile vor dem Block").toBeUndefined();
-    expect(zelle(b, "A6")).toBe("Nicht in der Lage gezählt (abgerückt, aufgegangen oder Übung) — 2 Einheit(en), in den Summen oben NICHT enthalten");
+    expect(zelle(b, "A6")).toBe("Nicht in der Lage gezählt (abgerückt, aufgegangen oder Übung) — 2 Einheiten, in den Summen oben NICHT enthalten");
     const zEss = zeileMitId(b, "ess");
     const zZtr = zeileMitId(b, "ztr");
     expect([zEss, zZtr].sort()).toEqual([7, 8]);
@@ -522,7 +522,7 @@ describe("Oldenburg-XLSX: Lage wie in der App (R2-K2)", () => {
     // FGr E, B und ZTr TZ zählen; nur die abgerückte Einheit steht im Block.
     expect(subtotal(b, "Fü")).toBe(3);
     expect(subtotal(b, "He")).toBe(6);
-    expect(zelle(b, "A7")).toMatch(/— 1 Einheit\(en\)/);
+    expect(zelle(b, "A7")).toMatch(/— 1 Einheit, /);
     expect(zeileMitId(b, "ztr")).toBeLessThanOrEqual(5);
   });
 

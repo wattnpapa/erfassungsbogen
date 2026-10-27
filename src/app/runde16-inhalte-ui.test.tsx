@@ -171,14 +171,9 @@ describe("R16-N2 Startseite: ein Einsatz, eine ausführliche Zeile", () => {
     const s = einsatzAnlegen("Hochwasser Elbe", EinsatzArt.EINSATZ);
     for (const ort of ["Alpha", "Beta", "Gamma"]) meldungHinzufuegen(s.id, bogen(ort, (b) => { b.stand = 100; }));
     render(<App />);
-    const schnell = document.querySelector<HTMLElement>("button.sammlung-oeffnen")!;
-    expect(schnell.textContent).toContain("Hochwasser Elbe");
-    expect(schnell.textContent).toContain("Letzte Meldung");
-    expect(schnell.textContent).not.toContain("älteste Meldung");
-    expect(schnell.textContent).not.toContain("neu seit der letzten Kenntnisnahme");
-    const kenndaten = schnell.querySelector(".sammlung-kenndaten")!.textContent!;
-    expect(kenndaten).toBe("3 Einheiten anwesend");
-    // Die Karte in der Liste sagt dasselbe Zählwort und trägt die ausführliche Zeile.
+    // Seit R17-A7 gibt es den Schnelleinstieg nicht mehr: Der Einsatz steht einmal da, als Karte mit der ausführlichen Zeile.
+    expect(document.querySelector("button.sammlung-oeffnen")).toBeNull();
+    // Die Karte in der Liste nennt das Zählwort und trägt die ausführliche Zeile.
     const karte = [...document.querySelectorAll<HTMLElement>(".karte")].find((k) => k.querySelector("h2")?.textContent === "Hochwasser Elbe")!;
     expect(karte.textContent).toContain("3 Einheiten anwesend · Stärke");
     expect(karte.textContent).not.toContain("Einheit(en)");

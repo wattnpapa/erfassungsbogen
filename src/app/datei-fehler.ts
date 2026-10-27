@@ -161,12 +161,19 @@ export function dateiFehlerText(name: string, art: DateiArt, weg: DateiWeg, ursa
           : NEU_ANFORDERN)
       );
     case "tabelle":
-      return (
+    case "fremd":
+    case "json-fremd":
+      // Die eigene Auswertung dieser App (eeb-einsatz-…csv, …-oldenburg.xlsx): für den Stab, nicht zum Weiterarbeiten (R17-A5).
+      if (/^eeb-(einsatz|lageblatt)[-_].*\.(csv|xlsx?)$/i.test(name)) {
+        return (
+          `${datei} hat diese App selbst als Auswertung für den Stab erzeugt (Tabelle) — zum Weiterarbeiten ist sie nicht gedacht. ` +
+          "Dafür die Sammel-PDF des Einsatzes („Einsatz weitergeben / sichern“) über „Einsatz importieren…“ einlesen oder die Datensicherung einspielen."
+        );
+      }
+      if (art === "tabelle") return (
         `${datei} ist eine Tabelle oder Liste, keine Datei dieser App. Eingelesen werden die PDF eines Bogens ` +
         "und Dateien, die diese App selbst gespeichert hat. Namen aus einer Liste bitte im Schritt „Personal“ eintragen."
       );
-    case "fremd":
-    case "json-fremd":
       return (
         `${datei} stammt nicht aus dieser App. ` +
         (ausSicherung

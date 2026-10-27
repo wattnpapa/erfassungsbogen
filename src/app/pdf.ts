@@ -17,6 +17,7 @@ import { base64UrlDekodieren } from "@bos/eeb-format/codec";
 import { absenderLabel } from "@bos/eeb-format/signatur";
 import { dateinameTeil, einheitAnzeigename, natoZeitstempel, qrErzeugen } from "./hilfen";
 import { istNativ, binaerTeilen } from "./nativ";
+import { fortschrittMelden } from "./arbeitet";
 import { einsatzLageblattSeiteFuellen, einsatzPdfDokumentGesetzt, einzelPdfDokument, nichtDarstellbareBetroffene, nichtDarstellbareNamen, pdfDokument, umschriftBetroffene, vereinfachtBetroffene, type SammelBogen, type UebersichtEintrag } from "./pdf-dokument";
 import { einsatzDateiInhalt } from "./einsatz-transport";
 import { lageAngabenLaden } from "./lage-angaben";
@@ -24,7 +25,7 @@ import { BLANKO_DATEINAME, BLANKO_INFO, BLANKO_ZEILEN, leererBogen } from "./bla
 import { MeldeStatus, type Einsatzsammlung, type MeldeEintrag } from "@bos/meldekopf/einsaetze";
 import { geltendeJeEinheit, fassungenJeEinheit } from "./fassung-vorrang";
 import { zaehltInLage } from "./auswertung";
-import { eintreffzeit, zeitEingelesen } from "./eintrag-zeiten";
+import { eintreffzeit, zeitEingelesen, zeitpunktZuMs } from "./eintrag-zeiten";
 import { standLiegtNachEintreffen } from "./stand-uhr";
 import { exportStaendeLaden, lageblattVermerken, weitergabeVermerken } from "./export-stand";
 import { abweichenderOrt } from "./einheiten-tabelle";
@@ -146,15 +147,24 @@ function herkunftBytes(m: MeldeEintrag): Uint8Array | null {
  * Popup-Blocker für ungefragt. Ohne Fenster (Popup-Blocker, App, Electron)
  * bleibt der gewohnte Weg: Download bzw. Share-Sheet.
  */
-export async function meldungPdfAnzeigen(m: MeldeEintrag, fenster: Window | null): Promise<void> {
+export async function meldungPdfAnzeigen(m: MeldeEintrag, fenster: Window | null = null): Promise<string> {
   const herkunft = herkunftBytes(m);
+  // Der Dateiname nennt Einheit und Stand des Bogens, wie bei Sammel-PDF und Lageblatt (R17-A2): Zwei Einzelbögen derselben
+  // Einheit vor und nach der Stärkekorrektur sind im Ordner so zu unterscheiden. Ein Tab hätte nur eine Zufalls-ID als Namen.
+  const dateiname = einzelDateiname(m.bogen);
   if (!fenster) {
-    await pdfErzeugen(m.bogen, undefined, herkunft);
-    return;
+    await pdfErzeugen(m.bogen, dateiname, herkunft);
+    return dateiname;
   }
   const qr = await qrErzeugen(m.bogen, herkunft);
   await pdfMake.createPdf(await einzelDokument(m.bogen, qr)).open(fenster);
   tabNachErzeugung(fenster);
+  return dateiname;
+}
+
+/** `eeb-<Stand>_<Einheit>.pdf` — Stand des Bogens in der Schreibweise der anderen Dateien (R17-A2). */
+export function einzelDateiname(b: Erfassungsbogen): string {
+  return `eeb-${natoZeitstempel(new Date(zeitpunktZuMs(b.stand)))}_${dateinameTeil(einheitAnzeigename(b.einheit))}.pdf`;
 }
 
 /** Text des Platzhalter-Tabs, solange der Bogen entsteht. */
@@ -209,6 +219,7 @@ function uebersichtEintrag(
     notiz: m.notiz,
     ...(absenderLabel(m.signatur?.absender) ? { absender: absenderLabel(m.signatur?.absender) } : {}),
     ...(m.rueckkehr ? { rueckkehr: m.rueckkehr } : {}),
+    ...(m.angaben ? { angaben: m.angaben } : {}),
     ...(m.vomPapier != null ? { zeitUnbestaetigt: true } : {}),
     // Eintreffzeit = Zeit des Einlesens am Gerät, nie von Hand gesetzt (R14-A1): nicht vom Absender, nicht vom Meldeblock.
     ...(m.vomPapier == null && zeitEingelesen(m, revs) ? { zeitEingelesen: true } : {}),
@@ -254,7 +265,8 @@ async function dokumentAusgeben(dd: Parameters<typeof pdfMake.createPdf>[0], dat
     const base64 = await pdfMake.createPdf(dd).getBase64();
     return binaerTeilen(dateiname, base64);
   }
-  pdfMake.createPdf(dd).download(dateiname);
+  // Bis die Datei wirklich entstanden ist: Ohne `await` meldete die Sperre „fertig", Sekunden bevor der Download kam (R17-D4).
+  await pdfMake.createPdf(dd).download(dateiname);
   return true;
 }
 
@@ -280,12 +292,15 @@ export async function einsatzPdfErzeugen(
   dateiMarke?: string,
 ): Promise<boolean> {
   const boegenMitQr: SammelBogen[] = [];
-  for (const m of meldungen) {
+  // Zwischenstand „Bogen n von m" für die Oberfläche (R17-O1, R17-D4, R17-A4); ohne laufende Aktion ohne Wirkung.
+  for (const [i, m] of meldungen.entries()) {
+    await fortschrittMelden("Bögen vorbereitet (QR-Code, Übersicht)", i, meldungen.length);
     boegenMitQr.push({
       ...uebersichtEintrag(einsatz, m, historie),
       qr: await qrErzeugen(m.bogen, herkunftBytes(m)),
     });
   }
+  await fortschrittMelden("Seiten werden gesetzt — bei vielen Bögen der längste Schritt, Seite offen lassen");
   const nachtrag = historie !== einsatz.eintraege;
   // Ein Probesatz ohne Bilder misst, welche Bögen mit ihrer letzten Zeile allein
   // auf einer Seite stünden, und setzt diese enger (R4-A7).
@@ -299,9 +314,10 @@ export async function einsatzPdfErzeugen(
     nachtrag ? nachtragSeit : undefined,
     (probe) => pdfMake.createPdf(probe).getBuffer(),
   );
+  await fortschrittMelden("Datei wird geschrieben …");
   // Teilexport („nur neue Bögen") mit eigenem Dateinamen — sonst hießen
   // Nachtrag und ganze Sammlung gleich (Audit Runde 2, R2-A3).
-  const ok = await dokumentAusgeben(dd, `eeb-einsatz-${dateiMarke ?? (nachtrag ? "nachtrag-" : "")}${natoZeitstempel()}_${dateiRumpf(einsatz)}.pdf`);
+  const ok =await dokumentAusgeben(dd, `eeb-einsatz-${dateiMarke ?? (nachtrag ? "nachtrag-" : "")}${natoZeitstempel()}_${dateiRumpf(einsatz)}.pdf`);
   // Die ganze Sammlung ging heraus — womöglich an die nächste Schicht. Die
   // Einsatzansicht sagt danach, wann, und was seitdem nur hier dazukam
   // (Audit Runde 2, R2-W5). Der Nachtrag „nur neue Bögen" ist keine Übergabe.

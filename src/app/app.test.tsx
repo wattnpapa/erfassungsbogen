@@ -202,11 +202,12 @@ describe("Assistenten-Durchlauf", () => {
     try {
       tipp(screen.getByRole("button", { name: "Weiter →" })); // bewusst, nach der Sperre
       expect(screen.getByRole("heading", { level: 2, name: "2. Einsatz" })).toBeDefined();
-      vi.setSystemTime(Date.now() + 700);
-      tipp(screen.getByRole("button", { name: "Weiter →" })); // Doppeltipp mit 700 ms
+      vi.setSystemTime(Date.now() + 400);
+      tipp(screen.getByRole("button", { name: "Weiter →" })); // Doppeltipp mit 400 ms
       expect(screen.getByRole("heading", { level: 2, name: "2. Einsatz" })).toBeDefined();
-      // R10-S2: gleichmäßiges Weitertippen im Abstand von 1 s kommt an (die Sperre dauert 0,9 s).
-      vi.setSystemTime(Date.now() + 1000);
+      // R17-G11: Die Sperre nach „Weiter →“ dauert 0,5 s (vorher 0,9 s, R10-S2): Wer im Takt von 0,6 s durch leere Schritte
+      // blättert, kommt mit jedem Tipp weiter; der Doppeltipp mit Handschuh (0,1 bis 0,3 s) bleibt gesperrt.
+      vi.setSystemTime(Date.now() + 600);
       tipp(screen.getByRole("button", { name: "Weiter →" }));
       expect(screen.getByRole("heading", { level: 2, name: "3. Personal" })).toBeDefined();
     } finally {
@@ -749,23 +750,26 @@ describe("Assistenten-Durchlauf", () => {
     expect(localStorage.getItem("eeb.entwurf.v1")).toBeNull();
     expect(screen.getAllByText("Stärke fehlt").length).toBeGreaterThan(0);
 
-    // Die nächste Erfassung in dieser Sammlung beginnt wieder mit „nur Stärke".
+    // „Einheit manuell erfassen…" öffnet immer das volle Formular, auch nach einer Schnellerfassung (R17-S3);
+    // die Schnellerfassung hat ihren eigenen Knopf.
     await nutzer.click(screen.getByRole("button", { name: "Einheit manuell erfassen…" }));
-    expect(within(screen.getByRole("banner")).getByText("Schnellerfassung")).toBeDefined();
+    expect(within(screen.getByRole("banner")).queryByText("Schnellerfassung")).toBeNull();
   }, 30000);
 
   /**
    * Audit Runde 3, R3-K5: Auf dem Telefon lag die Karte der laufenden
    * Sammlung erst bei rund 1 850 px. Die Weiche bietet sie direkt an.
    */
-  it("öffnet eine laufende Sammlung direkt aus der Weiche „Bögen sammeln“", async () => {
+  it("öffnet eine laufende Sammlung über ihre Karte, die über der Weiche „Bögen sammeln“ steht (R17-A7)", async () => {
     einsatzImSpeicherAnlegen("Sammelhausen", EinsatzArt.EINSATZ);
     const nutzer = userEvent.setup();
     render(<App />);
     const weg = screen.getByRole("region", { name: "Bögen sammeln (Meldekopf)" });
-    const knopf = within(weg).getByRole("button", { name: /^„Sammelhausen" öffnen/ });
-    expect(knopf.className).toContain("primaer");
+    // Kein zweiter Eintrag in der Weiche: Der Einsatz steht einmal da, als Karte darüber.
+    expect(within(weg).queryByRole("button", { name: /Sammelhausen/ })).toBeNull();
     expect(within(weg).getByRole("button", { name: "Neue Einsatz-Sammlung…" }).className).not.toContain("primaer");
+    const knopf = screen.getByRole("button", { name: "Öffnen" });
+    expect(weg.compareDocumentPosition(knopf) & Node.DOCUMENT_POSITION_PRECEDING).toBeTruthy();
     await nutzer.click(knopf);
     await screen.findByRole("heading", { level: 1, name: "Sammelhausen" });
   });

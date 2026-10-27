@@ -80,6 +80,7 @@ export function SchrittEinsatz({ bogen, aendern, meldekopf = false }: SchrittPro
           Monat, das Jahr war abgeschnitten — ein Vorjahresbogen fiel nicht auf.
           Auf dem Telefon stehen die Datumsfelder in voller Breite untereinander
           (index.html, Audit Runde 2, R2-H8). */}
+      <p className="gruppen-titel">Zeitraum: die Tage, für die die Einheit gemeldet ist (Datum)</p>
       <div className="zeile">
         <Feld titel="Zeitraum von" klasse="datum">
           <input
@@ -99,6 +100,21 @@ export function SchrittEinsatz({ bogen, aendern, meldekopf = false }: SchrittPro
           Kästchen „Einsatzende" las sich als Frage, ob der Einsatz ein Ende
           hat, und ein versehentlicher Haken schickte mit dem QR-Code einen
           Abmelde-Zeitpunkt mit. */}
+      {/* Zwei getrennte Angaben, zwei Überschriften mit ihrem Erklärsatz direkt darunter: Der Zeitraum (Datum) oben bestimmt
+          „Zeitraum vorbei" beim Meldekopf, Beginn und Ende (Datum und Uhrzeit) sind eigene Nachweise (R17-N10). */}
+      <p className="gruppen-titel">Uhrzeit von Beginn und Ende (optional, für eigene Nachweise)</p>
+      {meldekopf ? (
+        <p className="hinweis">
+          Nur ausfüllen, wenn der Zettel Beginn oder Ende des Einsatzes der Einheit nennt. Das ersetzt nicht
+          „Eingetroffen um“ aus Schritt 1: Die Eintreff- und Abrückzeiten führt die Sammlung getrennt.
+        </p>
+      ) : (
+        <p className="hinweis">
+          Setzt die aktuelle Uhrzeit, danach änderbar. Für den eigenen Bogen (Nachweis, Freistellung,
+          Abrechnung) hier eintragen — der Meldekopf führt seine Eintreff- und Abrückzeiten getrennt,
+          sie kommen nicht in diesen Bogen zurück.
+        </p>
+      )}
       <div className="zeile">
         <label className="inline">
           <input
@@ -127,22 +143,7 @@ export function SchrittEinsatz({ bogen, aendern, meldekopf = false }: SchrittPro
           </Feld>
         )}
       </div>
-      {/* Vorher: „meist trägt das der Meldekopf … ein". Die Zeiten des
-          Meldekopfs bleiben aber in seiner Sammlung und kommen nie in diesen
-          Bogen zurück — wer dem Hinweis folgte, hatte im eigenen PDF keine
-          Einsatzzeiten (Audit Runde 2, R2-W4). */}
-      {meldekopf ? (
-        <p className="hinweis">
-          Nur ausfüllen, wenn der Zettel Beginn oder Ende des Einsatzes der Einheit nennt. Das ersetzt nicht
-          „Eingetroffen um“ aus Schritt 1: Die Eintreff- und Abrückzeiten führt die Sammlung getrennt.
-        </p>
-      ) : (
-        <p className="hinweis">
-          Setzt die aktuelle Uhrzeit, danach änderbar. Für den eigenen Bogen (Nachweis, Freistellung,
-          Abrechnung) hier eintragen — der Meldekopf führt seine Eintreff- und Abrückzeiten getrennt,
-          sie kommen nicht in diesen Bogen zurück.
-        </p>
-      )}
+      {/* Die Zeiten des Meldekopfs bleiben in seiner Sammlung und kommen nie in diesen Bogen zurück (Audit Runde 2, R2-W4). */}
       {/* Schritt-Index 1 = Einsatz (siehe SCHRITTE in app.tsx): „bis vor von"
           und „Ende vor Beginn" erschienen vorher auf Schritt 1, 3 und in der
           Übersicht — überall, nur nicht dort, wo der Fehler gemacht wird. */}

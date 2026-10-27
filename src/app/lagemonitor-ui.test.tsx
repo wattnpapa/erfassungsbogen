@@ -73,7 +73,7 @@ describe("Lagemonitor", () => {
     const stand = document.querySelector(".lm-stand")!.textContent!;
     expect(stand).toMatch(/1 Einheit · \d+ Fahrzeuge?/);
     expect(stand).toMatch(/letzte Meldung gerade eben/);
-    expect(screen.getByText(/Stärke F \/ U \/ M/)).toBeTruthy();
+    expect(screen.getByText(/Stärke Führer \/ Unterführer \/ Mannschaft = gesamt/)).toBeTruthy();
   });
 
   it("kennzeichnet eine Übung im Hauptbild, auch wenn der Name es nicht tut (R6-K3)", () => {
@@ -164,12 +164,27 @@ describe("Lagemonitor, Runde 7", () => {
     return { e, ids };
   }
 
-  it("nennt mehr als drei Bewegungen mit „+ n weitere“ (R7-K2)", () => {
+  it("nennt mehr als drei Bewegungen mit „+ n weitere“ am Ende der letzten Zeile (R7-K2, R17-K3)", () => {
     const { e, ids } = mitEinheiten(5);
     for (const id of ids) statusMitZeitSetzen(e.id, id, MeldeStatus.ABGERUECKT);
+    // Großes Bild (1080p): drei Zeilen; der Rest steht in der dritten, nicht in einer eigenen.
+    vi.stubGlobal("innerHeight", 1080);
+    vi.stubGlobal("innerWidth", 1920);
     render(<Lagemonitor einsatzId={e.id} />);
-    expect(document.querySelectorAll(".lm-bewegung:not(.lm-weitere-bewegungen)")).toHaveLength(3);
-    expect(document.querySelector(".lm-weitere-bewegungen")!.textContent).toBe("+ 2 weitere Bewegungen");
+    expect(document.querySelectorAll(".lm-bewegung")).toHaveLength(3);
+    expect(document.querySelector(".lm-bewegung:last-child .lm-weitere-bewegungen")!.textContent).toBe(" · + 2 weitere Bewegungen");
+    vi.unstubAllGlobals();
+  });
+
+  it("zeigt bei 720p und am Telefon nur eine Bewegungszeile und lässt der Einheitentabelle den Platz (R17-K3)", () => {
+    const { e, ids } = mitEinheiten(5);
+    for (const id of ids) statusMitZeitSetzen(e.id, id, MeldeStatus.ABGERUECKT);
+    vi.stubGlobal("innerHeight", 720);
+    vi.stubGlobal("innerWidth", 1280);
+    render(<Lagemonitor einsatzId={e.id} />);
+    expect(document.querySelectorAll(".lm-bewegung")).toHaveLength(1);
+    expect(document.querySelector(".lm-weitere-bewegungen")!.textContent).toBe(" · + 4 weitere Bewegungen");
+    vi.unstubAllGlobals();
   });
 
   it("führt das Eintreffen einer neuen Einheit als Bewegung (R7-W4) und setzt die Folgemeldung mit Betrag (R7-K2)", () => {
@@ -438,9 +453,9 @@ describe("Lagemonitor, Runde 10", () => {
     const optionen = Array.from(document.querySelectorAll("details.lm-klapp")).find((d) => d.querySelector("summary")!.textContent === "Optionen")!;
     expect(within(optionen as HTMLElement).queryByRole("button", { name: "Dunkler" })).toBeNull();
     expect(document.querySelector(".lm-stufenleiste")!.contains(screen.getByRole("button", { name: "Dunkler" }))).toBe(true);
-    // Telefon: Leiste vor allem anderen (order -1), Fuß löst sich in die Spalte auf.
+    // Telefon: Leiste hinter allem anderen (order 99, R17-K11), Fuß löst sich in die Spalte auf.
     expect(css).toMatch(/\.lm-fuss \{ display: contents; \}/);
-    expect(css).toMatch(/\.lm-stufenleiste \{ order: -1;/);
+    expect(css).toMatch(/\.lm-stufenleiste \{ order: 99;/);
   });
 
   it("markiert Soll-Einheiten in der Tabelle mit „S“, der Vorbehalt steht in der Stärkezeile (R10-K4)", () => {

@@ -220,12 +220,13 @@ describe("R15-E5 THW-Kennzeichen mit falscher Ziffernzahl", () => {
 
 describe("R15-O1 Dauer der Sammel-PDF richtet sich nach der Zahl der Bögen", () => {
   it("nennt Sekunden bei kleinen und Minuten bei großen Einsätzen, nie eine feste Obergrenze, dazu den Bildschirm", () => {
-    expect(sammelPdfDauerText(5)).toMatch(/bei 5 Bögen am Telefon etwa 8 Sekunden oder länger\. Nicht noch einmal tippen/);
+    // Runde 17 (R17-O1): 2 s je Bogen (gemessen: 66 s für 30 Bögen bei sechsfach gedrosselter CPU).
+    expect(sammelPdfDauerText(5)).toMatch(/bei 5 Bögen am Telefon etwa 10 Sekunden oder länger\. Nicht noch einmal tippen/);
     const dreissig = sammelPdfDauerText(30);
     expect(dreissig).not.toContain("halben Minute");
-    expect(dreissig).toMatch(/bei 30 Bögen am Telefon etwa 45 Sekunden oder länger/);
-    expect(dreissig).toMatch(/Bildschirm anlassen/);
-    expect(sammelPdfDauerText(100)).toMatch(/bei 100 Bögen am Telefon etwa 3 Min\. oder länger/);
+    expect(dreissig).toMatch(/bei 30 Bögen am Telefon etwa 1 Min\. oder länger/);
+    expect(dreissig).toMatch(/Bildschirm und Seite offen lassen/);
+    expect(sammelPdfDauerText(100)).toMatch(/bei 100 Bögen am Telefon etwa 4 Min\. oder länger/);
   });
 });
 

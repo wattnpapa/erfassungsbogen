@@ -13,19 +13,54 @@ import { zeitpunktZuMs as standMs } from "./eintrag-zeiten";
 /** Ab diesem Abstand zwischen Stand und Eingang nennt die Altersangabe den Stand statt der Meldung. */
 export const STAND_VOR_EINGANG_MS = 60 * 60_000;
 
+/**
+ * Alter der Angaben bei einer Fassung, die am Meldekopf von Hand entstand („Stärke ändern…", „Als Einsatzmeldung
+ * zählen…", R17-K1): Die Handänderung ändert den Eintrag, nicht den Zeitpunkt, zu dem die Einheit zuletzt gemeldet hat.
+ * Ohne diese Angabe stünde eine hundert Tage alte Meldung danach als „gerade eben" da, und das ⚠ „älter als 1 Std"
+ * entfiele. Wie `ersetztDurch` ein optionales Feld am Eintrag, kein Schemawechsel.
+ */
+export interface AngabenSeit {
+  /** Zeit, ab der die Angaben der Vorgängerin galten (ms). */
+  seit: number;
+  /** „Stand" oder „Meldung" der Vorgängerin. */
+  wort: "Stand" | "Meldung";
+  /** Nur die Kennzeichnung (Übung/Einsatz) wurde umgestellt: keine Folgemeldung mit neuem Inhalt. */
+  kennzeichnung?: boolean;
+  /** Wann am Meldekopf geändert wurde (ms). */
+  geaendertAm: number;
+}
+
+declare module "@bos/meldekopf/einsaetze" {
+  interface MeldeEintrag {
+    angaben?: AngabenSeit;
+  }
+}
+
 interface MitStand {
   empfangenAm: number;
   bogen: { stand: EebZeitpunkt };
+  angaben?: AngabenSeit;
 }
 
-/** Zeit, ab der die Angaben gelten: Stand im Bogen, höchstens aber der Eingang (ms). */
+/** Zeit, ab der die Angaben gelten: Stand im Bogen, höchstens aber der Eingang (ms); nach einer Handänderung die der Vorgängerin. */
 export function angabenZeit(e: MitStand): number {
-  return Math.min(e.empfangenAm, standMs(e.bogen.stand));
+  return e.angaben?.seit ?? Math.min(e.empfangenAm, standMs(e.bogen.stand));
 }
 
 /** Liegt der Stand mindestens eine Stunde vor dem Eingang? Dann sagt die Marke „Stand vor …" statt „Meldung vor …". */
 export function standLiegtWeitVorEingang(e: MitStand): boolean {
+  if (e.angaben) return e.angaben.wort === "Stand";
   return e.empfangenAm - standMs(e.bogen.stand) >= STAND_VOR_EINGANG_MS;
+}
+
+/** Die Angaben einer neuen Handänderung: das Alter der Vorgängerin bleibt (R17-K1). */
+export function angabenErben(vorgaengerin: MitStand, kennzeichnung = false, jetzt = Date.now()): AngabenSeit {
+  return {
+    seit: angabenZeit(vorgaengerin),
+    wort: standLiegtWeitVorEingang(vorgaengerin) ? "Stand" : "Meldung",
+    ...(kennzeichnung ? { kennzeichnung: true } : {}),
+    geaendertAm: jetzt,
+  };
 }
 
 /**

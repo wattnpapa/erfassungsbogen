@@ -79,11 +79,13 @@ describe("Audit Runde 2, R2-N2", () => {
     const vierter = { ...neuePerson(), vorname: "Eva", nachname: "Berg" };
 
     const r = namenEinsetzen(liste, [helfer, fuehrer, extra, vierter], personUnbenannt);
-    expect(r.plaetze).toEqual([0, 1, 2, null]);
+    // Wer eine Funktion mitbringt, sucht sich seinen Platz zuerst (R17-S7): Klaus Maier nimmt den ersten Führungsplatz,
+    // Anna Schulz ohne Funktion den nächsten freien — nicht umgekehrt.
+    expect(r.plaetze).toEqual([1, 0, 2, null]);
     expect(r.personal).toHaveLength(4);
-    // Platz 0 behält seine Funktion, Platz 1 bekommt die mitgebrachte.
-    expect(r.personal[0]).toMatchObject({ nachname: "Schulz", funktionen: [{ code: 1 }], staerkeRolle: StaerkeRolle.UNTERFUEHRER });
-    expect(r.personal[1]).toMatchObject({ nachname: "Maier", funktionen: [{ freitext: "TrFü" }] });
+    // Platz 0 trägt die mitgebrachte Funktion, Platz 1 behält seine.
+    expect(r.personal[0]).toMatchObject({ nachname: "Maier", funktionen: [{ freitext: "TrFü" }], staerkeRolle: StaerkeRolle.UNTERFUEHRER });
+    expect(r.personal[1]).toMatchObject({ nachname: "Schulz", funktionen: [{ code: 2 }] });
     expect(r.personal[3]).toBe(vierter);
   });
 });
