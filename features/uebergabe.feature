@@ -167,6 +167,6 @@ Funktionalität: Bogen übergeben — QR, PDF, Link, CSV
     # Die Rückmeldung steht dort, wo gespeichert wurde — der Weg zur Startseite
     # räumt sie wieder weg. Erst darauf warten, dann weitergehen: sonst hinge das
     # Szenario davon ab, was der Browser zuerst abarbeitet.
-    Dann sehe ich den Hinweis 'Als Vorlage „FGr K Oldenburg" gespeichert.'
+    Dann sehe ich den Hinweis 'Als Vorlage „FGr K Oldenburg“ gespeichert.'
     Wenn ich auf "‹ Startseite" klicke
     Dann sehe ich die Überschrift "FGr K Oldenburg"

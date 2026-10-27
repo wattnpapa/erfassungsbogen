@@ -62,7 +62,7 @@ Funktionalität: Darstellung, Datensicherung und Auskunft
     Und ich im Dialog auf "Vorlage speichern" klicke
     # Erst die Rückmeldung abwarten: Das Schließen des Dialogs nimmt seinen Verlaufseintrag
     # asynchron zurück, ein sofortiger Tipp auf „Startseite" landete sonst wieder im Bogen.
-    Dann sehe ich den Hinweis 'Als Vorlage „FGr K Oldenburg" gespeichert.'
+    Dann sehe ich den Hinweis 'Als Vorlage „FGr K Oldenburg“ gespeichert.'
     Wenn ich auf "‹ Startseite" klicke
     Und ich auf "Datensicherung" klicke
     Und ich auf "Sicherung erstellen…" klicke und eine Datei erhalte

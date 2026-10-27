@@ -11,7 +11,7 @@ Funktionalität: Vorlagen anlegen, verwalten und mustern
     Und ich im Dialog auf "Vorlage speichern" klicke
     # Erst die Rückmeldung abwarten: Das Schließen des Dialogs nimmt seinen Verlaufseintrag
     # asynchron zurück, ein sofortiger Tipp auf „Startseite" landete sonst wieder im Bogen.
-    Dann sehe ich den Hinweis 'Als Vorlage „FGr K Oldenburg" gespeichert.'
+    Dann sehe ich den Hinweis 'Als Vorlage „FGr K Oldenburg“ gespeichert.'
     Wenn ich auf "‹ Startseite" klicke
     Dann sehe ich die Überschrift "Gespeicherte Vorlagen"
 
@@ -39,7 +39,7 @@ Funktionalität: Vorlagen anlegen, verwalten und mustern
     Wenn ich auf "Vorlage aktualisieren" klicke
     Und ich im Dialog auf "Vorlage aktualisieren" klicke
     Dann sehe ich die Überschrift "Gespeicherte Vorlagen"
-    Und sehe ich den Hinweis "Vorlage „FGr K Oldenburg\" aktualisiert."
+    Und sehe ich den Hinweis "Vorlage „FGr K Oldenburg“ aktualisiert."
     Und sehe ich die Überschrift "FGr K Oldenburg"
     Wenn ich auf "Bearbeiten" klicke
     Dann steht im Feld "Ort der Einheit (Pflicht)" der Wert "Bearbeitungshausen"
