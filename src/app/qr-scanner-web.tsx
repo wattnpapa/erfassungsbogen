@@ -50,7 +50,7 @@ function kameraRat(err: unknown): KameraFehler {
   }
 }
 
-/** „QR aus Bild einlesen…": ein Foto oder Bildschirmfoto des Codes statt der Kamera. */
+/** „QR aus Bild einlesen…": ein Foto oder Bildschirmfoto des Codes statt der Kamera. Immer dieselbe Instanz an derselben Stelle: Ein Neuaufbau, wenn die Kamera scheitert, verlöre ein schon gewähltes Bild. */
 function BildKnopf({ onBild, klasse }: { onBild: (e: ChangeEvent<HTMLInputElement>) => void; klasse?: string }) {
   return (
     <label className={`datei-knopf${klasse ? ` ${klasse}` : ""}`}>
@@ -419,8 +419,7 @@ export function QrScannerWeb(props: {
                 Ausnahme: Der Bildknopf steht deshalb oben im Rahmen, der Handscanner darunter (R17-N8). */}
             {fehler && props.onBild && (
               <div className="scanner-bildweg">
-                <p className="handscanner-titel">Am Telefon: Foto oder Bildschirmfoto des Codes einlesen</p>
-                <BildKnopf onBild={props.onBild} klasse="primaer" />
+                <p className="handscanner-titel">Am Telefon: Foto oder Bildschirmfoto des Codes einlesen — Knopf „QR aus Bild einlesen…“ unten</p>
               </div>
             )}
             <p className="handscanner-titel">{fehler ? "Oder mit dem USB-Handscanner scannen" : "Mit dem USB-Handscanner scannen"}</p>
@@ -479,7 +478,7 @@ export function QrScannerWeb(props: {
             ? <button type="button" onClick={() => wegWaehlen("kamera")}>Kamera verwenden</button>
             : <button type="button" onClick={() => wegWaehlen("handscanner")}>Handscanner statt Kamera</button>
         )}
-        {props.onBild && !fehler && <BildKnopf onBild={props.onBild} />}
+        {props.onBild && <BildKnopf onBild={props.onBild} klasse={fehler ? "primaer" : undefined} />}
         <button type="button" onClick={props.onAbbruch}>{props.abbruchText ?? "Abbrechen"}</button>
       </div>
     </dialog>

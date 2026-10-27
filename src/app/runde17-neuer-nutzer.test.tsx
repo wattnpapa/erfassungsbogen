@@ -181,23 +181,23 @@ describe("R17-N8 Scanner ohne Kamera: der Bildweg steht zuerst", () => {
     Object.defineProperty(navigator, "mediaDevices", { value: echt, configurable: true });
   });
 
-  it("zeigt „QR aus Bild einlesen…“ oben im Rahmen, einmal, vor dem Handscanner", async () => {
+  it("nennt den Bildweg zuerst und zeigt „QR aus Bild einlesen…“ einmal als Hauptknopf", async () => {
     const fehler = Object.assign(new Error("x"), { name: "NotFoundError" });
     Object.defineProperty(navigator, "mediaDevices", { value: { getUserMedia: vi.fn(async () => { throw fehler; }) }, configurable: true });
     render(<QrScannerWeb onErgebnis={() => {}} onAbbruch={() => {}} onBild={() => {}} />);
     await screen.findByText("Dieses Gerät meldet keine nutzbare Kamera.");
     const rahmen = document.querySelector(".scanner-handscanner")!;
     expect(screen.getAllByText("QR aus Bild einlesen…")).toHaveLength(1);
-    const bild = rahmen.querySelector(".scanner-bildweg label.datei-knopf")!;
+    // Immer dieselbe Instanz in der Knopfleiste (ein Neuaufbau beim Kamerafehler verlöre ein schon gewähltes Bild), nur als Hauptknopf.
+    const bild = document.querySelector(".scanner-aktionen label.datei-knopf")!;
     expect(bild.textContent).toContain("QR aus Bild einlesen…");
     expect(bild.className).toContain("primaer");
     const titel = [...rahmen.querySelectorAll(".handscanner-titel")].map((t) => t.textContent);
     expect(titel[0]).toMatch(/Foto oder Bildschirmfoto/);
     expect(titel[1]).toBe("Oder mit dem USB-Handscanner scannen");
-    expect(bild.compareDocumentPosition(rahmen.querySelector(".scanner-schritte")!) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   });
 
-  it("bei blockierter Erlaubnis bleibt der Rat zum Freischalten, der Bildweg ebenfalls oben", async () => {
+  it("bei blockierter Erlaubnis bleibt der Rat zum Freischalten, der Bildweg ebenfalls zuerst genannt", async () => {
     const fehler = Object.assign(new Error("x"), { name: "NotAllowedError" });
     Object.defineProperty(navigator, "mediaDevices", { value: { getUserMedia: vi.fn(async () => { throw fehler; }) }, configurable: true });
     render(<QrScannerWeb onErgebnis={() => {}} onAbbruch={() => {}} onBild={() => {}} />);

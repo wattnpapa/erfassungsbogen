@@ -98,7 +98,9 @@ Funktionalität: Einsatzweg einer Fachgruppe — Vorbereitung, Fahrt, Meldekopf
     Und ich auf "Neue Sammlung anlegen…" klicke
     Und ich im Dialog "Name" mit "Hochwasser Hunte" fülle
     Und ich im Dialog auf "Einsatz anlegen" klicke
-    Dann sehe ich die Überschrift "Einheiten (1 gemeldet"
+    # Der Bogen trägt nur die vorbelegten Plätze (Sollstärke, keine Namen): Er zählt in die Lage, gilt aber seit R17-S1
+    # nicht als „gemeldet" — der Listenkopf sagt es.
+    Dann sehe ich die Überschrift "Einheiten (0 gemeldet · 1 nur Sollstärke · 1 zählend)"
     Und sehe ich den Hinweis "Stärke 0 / 3 / 9 / 12"
     Und sehe ich zu "Kraftstoff" den Wert "Diesel 400 l"
     Und sehe ich zu "Fahrzeuge" den Wert "4"
