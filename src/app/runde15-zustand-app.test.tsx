@@ -137,15 +137,15 @@ describe("R15-S3 und S4 Schnellerfassung", () => {
     await bisFahrzeuge(nutzer);
     for (let i = 0; i < 2; i++) await nutzer.click(screen.getByRole("button", { name: "Weiter →" }));
     await nutzer.click(screen.getByRole("button", { name: "In Einsatz übernehmen" }));
-    const frage = await screen.findByRole("dialog", { name: "Erfassung schon abschließen?" });
-    expect(frage.textContent).toMatch(/Fahrzeuge und Sofortbedarf sind noch nicht bearbeitet/);
-    // „Weiter erfassen“: nichts aufgenommen, die Erfassung bleibt offen.
-    await nutzer.click(within(frage).getByRole("button", { name: "Weiter erfassen" }));
+    // R19-A6: In der Schnellerfassung (nur Stärke) fehlen Fahrzeuge und Sofortbedarf gewollt — keine Rückfrage dazu,
+    // gleich die Rückfrage zur fehlenden Stärke.
+    const frage = await screen.findByRole("dialog", { name: "Stärke fehlt" });
+    expect(screen.queryByRole("dialog", { name: "Erfassung schon abschließen?" })).toBeNull();
+    // „Stärke eintragen“: nichts aufgenommen, die Erfassung bleibt offen.
+    await nutzer.click(within(frage).getByRole("button", { name: "Stärke eintragen" }));
     expect(einsaetzeLaden()[0]!.eintraege).toHaveLength(0);
     expect(screen.queryByRole("heading", { level: 1, name: "Sammelhausen" })).toBeNull();
-    // Bewusst übernehmen: danach die übrigen Rückfragen wie bisher (Stärke 0).
     await nutzer.click(screen.getByRole("button", { name: "In Einsatz übernehmen" }));
-    await nutzer.click(within(await screen.findByRole("dialog", { name: "Erfassung schon abschließen?" })).getByRole("button", { name: "Jetzt übernehmen" }));
     await nutzer.click(within(await screen.findByRole("dialog", { name: "Stärke fehlt" })).getByRole("button", { name: "Trotzdem mit Stärke 0 übernehmen" }));
     await screen.findByRole("heading", { level: 1, name: "Sammelhausen" });
     expect(einsaetzeLaden()[0]!.eintraege).toHaveLength(1);

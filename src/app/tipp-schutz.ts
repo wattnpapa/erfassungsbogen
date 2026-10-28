@@ -182,14 +182,18 @@ function sperreAn(x: number, y: number, jetzt: number, imDialog = false): Sperre
 const VERWORFEN_ANZEIGE_MS = 900;
 let verworfenUhr: ReturnType<typeof setTimeout> | undefined;
 let verworfenKnopf: Element | null = null;
-export function tippVerworfenZeigen(e: MouseEvent): void {
-  verworfenZeigen(e);
+export function tippVerworfenZeigen(e: MouseEvent, text = "Einen Moment …"): void {
+  verworfenZeigen(e, text);
 }
-function verworfenZeigen(e: MouseEvent): void {
+function verworfenZeigen(e: MouseEvent, text = "Einen Moment …"): void {
   if (typeof document === "undefined") return;
-  verworfenKnopf?.removeAttribute("data-tipp-gesperrt");
+  knopfZuruecksetzen();
   const ziel = (e.target as Element | null)?.closest?.("button, a[href], summary, label, [role='button']") ?? null;
-  ziel?.setAttribute("data-tipp-gesperrt", "");
+  // R19-S5/W11/L3/E1/N2/K4: Auf einem breiten Knopf steht der Grund auf dem Knopf selbst (index.html, ::after, voller Kontrast,
+  // verdeckt die Beschriftung nur für diese Zehntelsekunden), nicht als Pille über dem Finger. Schmale Ziele behalten die Pille.
+  const aufKnopf = ziel instanceof HTMLButtonElement && ziel.getBoundingClientRect().width >= KNOPF_TEXT_MIN_PX;
+  ziel?.setAttribute("data-tipp-gesperrt", aufKnopf ? "text" : "");
+  if (aufKnopf) ziel.setAttribute("data-tipp-text", text);
   verworfenKnopf = ziel;
   let pille = document.getElementById("tipp-moment");
   if (!pille) {
@@ -197,7 +201,13 @@ function verworfenZeigen(e: MouseEvent): void {
     pille.id = "tipp-moment";
     pille.className = "tipp-moment";
     pille.setAttribute("role", "status");
-    pille.textContent = "Einen Moment …";
+  }
+  pille.textContent = text;
+  if (aufKnopf) {
+    pille.hidden = true;
+    clearTimeout(verworfenUhr);
+    verworfenUhr = setTimeout(knopfZuruecksetzen, VERWORFEN_ANZEIGE_MS);
+    return;
   }
   // Im QR-Vollbild (und jedem anderen modalen Fenster) liegt der Hinweis IM Fenster: Ein
   // Element im Seitenkörper bleibt unter der obersten Ebene verdeckt (Audit Runde 6, R6-H1).
@@ -226,10 +236,16 @@ function verworfenZeigen(e: MouseEvent): void {
   pille.hidden = false;
   clearTimeout(verworfenUhr);
   verworfenUhr = setTimeout(() => {
-    verworfenKnopf?.removeAttribute("data-tipp-gesperrt");
-    verworfenKnopf = null;
+    knopfZuruecksetzen();
     if (pille) pille.hidden = true;
   }, VERWORFEN_ANZEIGE_MS);
+}
+/** Ab dieser Breite trägt der Knopf „Einen Moment …" selbst. */
+const KNOPF_TEXT_MIN_PX = 104;
+function knopfZuruecksetzen(): void {
+  verworfenKnopf?.removeAttribute("data-tipp-gesperrt");
+  verworfenKnopf?.removeAttribute("data-tipp-text");
+  verworfenKnopf = null;
 }
 
 function klickPruefen(e: MouseEvent) {
@@ -237,6 +253,9 @@ function klickPruefen(e: MouseEvent) {
   const jetzt = Date.now();
   if (istSichereGegenhandlung(e.target)) {
     // Nie gesperrt; der Ort zählt trotzdem als „der Tipp eben" (eine Quittung danach weicht dem Finger aus).
+    // R19-E1: „Abbrechen" in einer Rückfrage gibt die Stelle des öffnenden Knopfs frei — wer sich vertippt hat und
+    // gleich neu ansetzt, trifft sonst einen stummen Knopf.
+    if (inRueckfrage(e)) sperren = sperren.filter((s) => !s.nurAusserhalbRueckfrage);
     letzterTipp = { x: e.clientX, y: e.clientY, zeit: jetzt, halb: halbeZielbreite(e) };
     return;
   }
@@ -320,8 +339,7 @@ export function letzterTippOrt(): { x: number; y: number } | null {
 export function tippSchutzZuruecksetzen(): void {
   letzterTipp = null;
   sperren = [];
-  verworfenKnopf?.removeAttribute("data-tipp-gesperrt");
-  verworfenKnopf = null;
+  knopfZuruecksetzen();
   clearTimeout(verworfenUhr);
   if (typeof document !== "undefined") document.getElementById("tipp-moment")?.remove();
 }

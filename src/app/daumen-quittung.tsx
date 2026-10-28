@@ -2,7 +2,10 @@
  * Quittung mit Rückweg, fest am unteren Bildrand (Daumenbereich), mit
  * „Rückgängig" in voller Knopfgröße (Audit Runde 2, R2-H4). Sie bleibt, bis
  * die nächste Quittung sie ersetzt, sie geschlossen wird, die Ansicht
- * wechselt oder `QUITTUNG_ENDE_NACH_MS` (30 s) vergangen sind (R18).
+ * wechselt oder `QUITTUNG_ENDE_NACH_MS` (9 s, mit „Details" 30 s) vergangen sind (R18, R19).
+ *
+ * Runde 19: kompakt (Kurzfassung in einer bis zwei Zeilen, „Rückgängig", „✕"; am Telefon höchstens ca. 12 % der Bildhöhe), der
+ * volle Satz hinter „Details" und für Vorleseprogramme sofort; „Rückgängig" und „✕" liegen 24 px auseinander.
  *
  * Runde 3 (R3-G2, R3-S5, R3-G1, R3-D3):
  * - höchstens zwei Zeilen Text: Die Handlung („Abgerückt 20:39") steht vorn,
@@ -20,15 +23,17 @@
  * neben „Rückgängig" (R18-D6).
  */
 
-import { useEffect, useLayoutEffect, useRef, type ReactNode } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from "react";
 import { QUITTUNG_SPERRE_KURZ_MS, QUITTUNG_SPERRE_MS, letzterTippOrt, ortSperren } from "./tipp-schutz";
 
 /**
- * So lange steht die Leiste mit vollem Text und „Rückgängig"; danach verschwindet sie ganz (R18-S2, H1, W1, A8). Vorher
- * schrumpfte sie nach 15 s auf eine Zeile mit gekürztem Text und blieb so stehen, auch nach Stunden: ein „Rückgängig"
- * ohne lesbaren Gegenstand. Die Handlung bleibt über die Historie der Einheit und die Kopfzeile erreichbar.
+ * So lange steht die kompakte Leiste (kurzer Text, „Rückgängig", „✕", höchstens ca. 12 % der Bildhöhe am Telefon); danach
+ * verschwindet sie ganz (R18-S2, H1, W1, A8; R19: 9 statt 30 s, A3/E5/W12/L6). Die Handlung bleibt über Papierkorb, Historie
+ * der Einheit und die Kopfzeile erreichbar; die Leiste steht nie dauerhaft vor Knöpfen der Liste.
  */
-export const QUITTUNG_ENDE_NACH_MS = 30_000;
+export const QUITTUNG_ENDE_NACH_MS = 9_000;
+/** Wer „Details" aufklappt, will lesen: Die Leiste steht dann länger (R19-A3/N12). */
+export const QUITTUNG_DETAILS_ENDE_NACH_MS = 30_000;
 
 /** Die Karte (Einheit, Person, Fahrzeug) unter der getippten Stelle, durch die Leiste hindurch. */
 function darunterLiegendeKarte(tipp: { x: number; y: number }, leiste: HTMLElement): HTMLElement | null {
@@ -41,11 +46,11 @@ function darunterLiegendeKarte(tipp: { x: number; y: number }, leiste: HTMLEleme
   return null;
 }
 
-export function DaumenQuittung({ children, sperreKurz = false, onRueckgaengig, rueckgaengigName, onSchliessen, mehrzeilig = false }: {
+export function DaumenQuittung({ children, kurz, sperreKurz = false, onRueckgaengig, rueckgaengigName, onSchliessen, mehrzeilig = false }: {
   children: ReactNode;
   /** „Rückgängig" nimmt etwas Harmloses zurück: Die Stelle unter der Leiste sperrt nur so lang wie der Prellschutz (R17-D3). */
   sperreKurz?: boolean;
-  /** Ohne Wirkung seit R18 (der Text steht immer vollständig da); bleibt, damit ältere Aufrufer weiter passen. */
+  /** Kurzfassung für die kompakte Leiste (R19: eine bis zwei Zeilen); den vollen Text zeigt „Details". */
   kurz?: ReactNode;
   /** Nur noch die Klasse `quittung-mehrzeilig` (R11-M3); der Text steht seit R18 in jedem Fall vollständig da. */
   mehrzeilig?: boolean;
@@ -59,13 +64,23 @@ export function DaumenQuittung({ children, sperreKurz = false, onRueckgaengig, r
   const leiste = useRef<HTMLDivElement>(null);
   // Nur einmal je Leiste rollen (StrictMode ruft den Effekt doppelt auf).
   const gerollt = useRef(false);
-  // Nach 30 s verschwindet die Leiste ganz (R18-S2): Sie stand sonst stundenlang mit gekürztem Text da.
+  // Nach QUITTUNG_ENDE_NACH_MS verschwindet die Leiste ganz (R18-S2, R19): Sie stand sonst stundenlang da.
   const schliessen = useRef(onSchliessen);
   schliessen.current = onSchliessen;
+  // R19: kompakt (Kurzfassung, eine bis zwei Zeilen) und „Details" (voller Text). Ohne `kurz` steht der volle Text da.
+  const [offen, setOffen] = useState(false);
+  const hatDetails = kurz != null;
   useEffect(() => {
-    const uhr = setTimeout(() => schliessen.current(), QUITTUNG_ENDE_NACH_MS);
+    const uhr = setTimeout(() => schliessen.current(), offen ? QUITTUNG_DETAILS_ENDE_NACH_MS : QUITTUNG_ENDE_NACH_MS);
     return () => clearTimeout(uhr);
-  }, []);
+  }, [offen]);
+  useLayoutEffect(() => {
+    // Die Seite hält die jeweilige Höhe frei (auch nach dem Auf- und Zuklappen von „Details").
+    const el = leiste.current;
+    if (el && el.getBoundingClientRect().height > 0) {
+      document.documentElement.style.setProperty("--quittung-hoehe", `${Math.round(el.getBoundingClientRect().height + 16)}px`);
+    }
+  }, [offen]);
   useLayoutEffect(() => {
     const el = leiste.current;
     if (!el) return;
@@ -167,8 +182,26 @@ export function DaumenQuittung({ children, sperreKurz = false, onRueckgaengig, r
     };
   }, []);
   return (
-    <div className={`quittung-daumen${mehrzeilig ? " quittung-mehrzeilig" : ""}`} role="status" ref={leiste}>
-      <span className="quittung-text">{children}</span>
+    <div className={`quittung-daumen${mehrzeilig ? " quittung-mehrzeilig" : ""}${offen ? " quittung-offen" : ""}`} role="status" ref={leiste}>
+      <span className="quittung-text">
+        {/* Das Vorleseprogramm bekommt den vollen Satz sofort; sehende Leser die Kurzfassung (R19), den Rest hinter „Details". */}
+        {kurz != null && !offen ? (
+          <>
+            <span className="nur-sr">{children}</span>
+            <span aria-hidden="true">{kurz}</span>
+          </>
+        ) : (
+          children
+        )}
+        {hatDetails && (
+          <>
+            {" "}
+            <button type="button" className="quittung-details" data-sicher="" aria-expanded={offen} onClick={() => setOffen(!offen)}>
+              {offen ? "Weniger" : "Details"}
+            </button>
+          </>
+        )}
+      </span>
       {/* Die beiden Knöpfe bleiben als Paar zusammen: reicht die Breite nicht
           für Text und Knöpfe, rutscht das Paar unter den Text (R4-M1) — „✕"
           steht nie allein in einer Zeile. */}

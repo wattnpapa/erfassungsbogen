@@ -122,7 +122,8 @@ describe("R18-W6/A4 Ausgaben der Einsatzansicht", () => {
     await nutzer.click(await screen.findByRole("button", { name: /^Übersicht als CSV/ }));
     await waitFor(() => expect(geladen).toHaveLength(1));
     expect(geladen[0]!.name).toMatch(/^\d{4}-\d{2}-\d{2}_\d{4}_eeb-einsatz_Hochwasser_Weser\.csv$/);
-    const quittung = await screen.findByText(/^✓ Gespeichert: /);
+    // R19-O10: Die Quittung ist eine Leiste mit Kurzfassung; der volle Satz steht für Vorleser in `.nur-sr`.
+    const quittung = (await screen.findAllByText(/^✓ Gespeichert: /))[0]!;
     expect(quittung.textContent).toContain(geladen[0]!.name);
     expect(quittung.textContent).toContain("Download-Ordner");
   });
@@ -136,7 +137,7 @@ describe("R18-W6/A4 Ausgaben der Einsatzansicht", () => {
     await nutzer.click(await screen.findByRole("button", { name: /^Alle Daten als CSV/ }));
     await waitFor(() => expect(geladen).toHaveLength(1));
     expect(geladen[0]!.name).toMatch(/^\d{4}-\d{2}-\d{2}_\d{4}_eeb-einsatz-alle-daten_Hochwasser_Weser\.csv$/);
-    await waitFor(() => expect(screen.queryByText(/^✓ Gespeichert: /)).not.toBeNull());
-    expect(within(screen.getByText(/^✓ Gespeichert: /).closest("p")!).getByText(/alle-daten/)).toBeDefined();
+    await waitFor(() => expect(screen.queryAllByText(/^✓ Gespeichert: /).length).toBeGreaterThan(0));
+    expect(within(screen.getAllByText(/^✓ Gespeichert: /)[0]!.closest("[role=status]") as HTMLElement).getAllByText(/alle-daten/).length).toBeGreaterThan(0);
   });
 });

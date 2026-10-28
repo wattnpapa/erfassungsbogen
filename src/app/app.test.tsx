@@ -855,6 +855,7 @@ describe("Assistenten-Durchlauf", () => {
     await nutzer.click(within(liste).getAllByText(/Bergungsgruppe/)[0]!);
 
     await nutzer.click(screen.getByRole("button", { name: "In Einsatz übernehmen" }));
+    await waitFor(() => expect(rueckfrage("Nur Sollplätze, keine gemeldete Stärke")).not.toBeNull());
     const frage = rueckfrage("Nur Sollplätze, keine gemeldete Stärke");
     expect(frage.textContent).toMatch(/nur die Sollplätze nach StAN/);
     await nutzer.click(within(frage).getByRole("button", { name: "Als Sollstärke ablegen" }));
@@ -888,6 +889,7 @@ describe("Assistenten-Durchlauf", () => {
     // R16-S2: Die unveränderten Sollzahlen sind noch nichts Gezähltes — Reiter 3 trägt kein Häkchen.
     expect(screen.getByRole("button", { name: /^3\. Personal/ }).textContent).not.toContain("✓");
     await nutzer.click(screen.getByRole("button", { name: "In Einsatz übernehmen" }));
+    await waitFor(() => expect(rueckfrage("Nur Sollplätze, keine gemeldete Stärke")).not.toBeNull());
     const frage = rueckfrage("Nur Sollplätze, keine gemeldete Stärke");
     expect(frage.textContent).toMatch(/Zahlen der Vorbelegung \(Soll:/);
     // R16-S3: die riskantere Antwort steht zuletzt, nicht neben der Hauptaktion.

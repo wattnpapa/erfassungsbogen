@@ -34,6 +34,7 @@ import {
   kennzeichenText,
   kontaktText,
   ausgabeDateiname,
+  nurSollstaerke,
   orgLabel,
   heuteDatum,
   personUnbenannt,
@@ -665,6 +666,8 @@ export function Uebersicht(props: {
                 </strong>{" "}
                 {/* Kurzlegende sichtbar statt nur im Tooltip (R2-N9). */}
                 <span className="hinweis" aria-hidden="true">(F / UF / M / Ges)</span>
+                {/* R19-N14: Die Zahl stammt aus der Vorbelegung nach Einheitstyp, nicht aus einer Zählung. */}
+                {nurSollstaerke(bogen) && <span className="warnung-text"> · Vorschlag aus StAN, nicht erfasst</span>}
               </span>
               <span title={MWD_LEGENDE}>{mwdTitel}: {mwdAnzeige}</span>
             </p>
@@ -799,7 +802,8 @@ export function Uebersicht(props: {
         <p className="hinweis">Keine Fahrzeuge erfasst.</p>
       ) : (
         <TabellenScroll titel="Fahrzeuge">
-        <table className="uebersicht">
+        {/* R19-E14, N14: Am Telefon steht jedes Fahrzeug als Karte (Beschriftung je Zeile aus data-label, index.html), ohne seitliches Wischen. */}
+        <table className="uebersicht fahrzeug-tabelle">
           <thead>
             <tr>
               <th>Typ</th>
@@ -813,12 +817,12 @@ export function Uebersicht(props: {
           <tbody>
             {bogen.fahrzeuge.map((f, i) => (
               <tr key={i}>
-                <td>{vokabText(f.typ, vokabularFuer(org, "fahrzeug")) || "—"}</td>
-                <td>{kennzeichenText(f)}</td>
-                {zeigeFunkruf && <td>{funkrufText(f, bogen.einheit)}</td>}
-                <td>{fahrzeugSitzplaetze(f, org) ?? "—"}</td>
-                <td>{f.stanKonform == null ? "—" : f.stanKonform ? "ja" : "nein"}</td>
-                {zeigeAenderungen && <td>{f.aenderungen ?? ""}</td>}
+                <td data-label="Typ">{vokabText(f.typ, vokabularFuer(org, "fahrzeug")) || "—"}</td>
+                <td data-label="Kennzeichen">{kennzeichenText(f)}</td>
+                {zeigeFunkruf && <td data-label="Funkrufname">{funkrufText(f, bogen.einheit)}</td>}
+                <td data-label="Sitzplätze">{fahrzeugSitzplaetze(f, org) ?? "—"}</td>
+                <td data-label="Ausstattung (StAN)">{f.stanKonform == null ? "—" : f.stanKonform ? "ja" : "nein"}</td>
+                {zeigeAenderungen && <td data-label="Änderungen">{f.aenderungen ?? ""}</td>}
               </tr>
             ))}
           </tbody>

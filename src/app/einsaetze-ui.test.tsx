@@ -771,7 +771,8 @@ describe("Abrücken mit Zeit, Quittung und Rückweg", () => {
 
     // Nach der Sperre wirkt der Rückweg wie gewohnt.
     const echt = Date.now.bind(Date);
-    const uhr = vi.spyOn(Date, "now").mockImplementation(() => echt() + ORTSSPERRE_MS + 50);
+    // (Eine Minute später: kurz nach dem Abrücken fragt „Wieder anwesend“ erst nach, R19-D9.)
+    const uhr = vi.spyOn(Date, "now").mockImplementation(() => echt() + ORTSSPERRE_MS + 61_000);
     try {
       await waitFor(() => expect((knopfAmPlatz() as HTMLButtonElement).disabled).toBe(false), { timeout: ORTSSPERRE_MS + 500 });
       await nutzer.click(knopfAmPlatz());
@@ -1037,9 +1038,11 @@ describe("Ausgabewege der Einsatzansicht", () => {
 
   it("zeigt die Bestätigung der letzten Erzeugung direkt unter den Knöpfen (R5-L4)", () => {
     buehne(["Wardenburg"], { onWeitergeben: vi.fn(), onLageblatt: vi.fn(), ausgabeQuittung: "✓ Lageblatt erzeugt (A4 quer)." });
+    // R19-O10: Eine schon bekannte Bestätigung (nach dem Neuladen der Ansicht) steht als Absatz unter den Knöpfen, ohne Leiste.
     const zeile = document.querySelector(".ausgabe-quittung")!;
     expect(zeile.textContent).toBe("✓ Lageblatt erzeugt (A4 quer).");
     expect(zeile.previousElementSibling?.classList.contains("einsatz-weitergabe")).toBe(true);
+    expect(document.querySelector(".quittung-daumen")).toBeNull();
   });
 
   it("sagt bei den Papier-Knöpfen, dass die PDFs hell bleiben (R5-L5)", () => {

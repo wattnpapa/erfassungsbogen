@@ -11,7 +11,7 @@ import { staerke, type EebZeitpunkt } from "@bos/eeb-format/model";
 import { angabenAlterWort, angabenZeit, type AngabenSeit } from "./angaben-alter";
 import { einheitOrt } from "@bos/meldekopf/darstellung";
 import { EinsatzArt, MeldeStatus, revisionen, type Einsatzsammlung, type MeldeEintrag } from "@bos/meldekopf/einsaetze";
-import { aggregiere, aktuelleMeldungen, type EinsatzSummen } from "./auswertung";
+import { aggregiere, aktuelleMeldungen, uebungenAusserhalbDerLage, type EinsatzSummen } from "./auswertung";
 import { eintreffzeit } from "./eintrag-zeiten";
 import { letzteMeldung, sollstaerkeAnteil } from "./einheiten-tabelle";
 import { geltendeJeEinheit } from "./fassung-vorrang";
@@ -84,9 +84,10 @@ export function dauerText(beginn: number | null, jetzt: number): string | null {
   const stunden = Math.floor((minuten % 1440) / 60);
   const rest = minuten % 60;
   const teil = (n: number, eins: string, viele: string) => `${n} ${n === 1 ? eins : viele}`;
+  // R19-K11: Unter einer Stunde nur die Minuten („9 Minuten" statt „0 Stunden, 9 Minuten").
   return [
     ...(tage > 0 ? [teil(tage, "Tag", "Tage")] : []),
-    teil(stunden, "Stunde", "Stunden"),
+    ...(tage > 0 || stunden > 0 ? [teil(stunden, "Stunde", "Stunden")] : []),
     teil(rest, "Minute", "Minuten"),
   ].join(", ");
 }
@@ -252,6 +253,8 @@ export interface Lagebild {
   sollstaerke: { einheiten: number; personen: number };
   /** Alter der Meldungen der anwesenden Einheiten (R11-K1); `null` ohne Anwesende. */
   anwesendenAlter: AnwesendenAlter | null;
+  /** Anwesende Übungsmeldungen, die in dieser Lage nicht zählen (R19-L1): Der Monitor nennt sie, statt „Noch nichts gemeldet" zu zeigen. */
+  uebungenDaneben: number;
 }
 
 export function lagebildArt(art: EinsatzArt): string {
@@ -332,6 +335,7 @@ export function lagebild(einsatz: Einsatzsammlung, jetzt: number = Date.now()): 
     bewegungen: bewegungenSeit(einsatz, jetzt),
     sollstaerke: sollstaerkeAnteil(einsatz.eintraege, einsatz.art),
     anwesendenAlter: anwesendenAlter(aktuelleMeldungen(einsatz.eintraege, einsatz.art), jetzt),
+    uebungenDaneben: uebungenAusserhalbDerLage(einsatz.eintraege, einsatz.art).length,
     zeitenPruefen: einsatz.eintraege.some((e) => e.empfangenAm - jetzt > ZUKUNFT_TOLERANZ_MS) ||
       geltend.some((e) => eintreffzeit(e) - jetzt > ZUKUNFT_TOLERANZ_MS),
   };

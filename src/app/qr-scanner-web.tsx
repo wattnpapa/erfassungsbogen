@@ -426,13 +426,13 @@ export function QrScannerWeb(props: {
                 Ausnahme: Der Bildknopf steht deshalb oben im Rahmen, der Handscanner darunter (R17-N8). */}
             {fehler && props.onBild && (
               <div className="scanner-bildweg">
-                <p className="handscanner-titel">Am Telefon: Foto oder Bildschirmfoto des Codes einlesen — Knopf „QR aus Bild einlesen…“ unten</p>
+                <p className="handscanner-titel">Am Telefon: Foto oder Bildschirmfoto des Codes — Knopf unten</p>
               </div>
             )}
             <p className="handscanner-titel">{fehler ? "Oder mit dem USB-Handscanner scannen" : "Mit dem USB-Handscanner scannen"}</p>
             <ol className="scanner-schritte">
-              <li>QR-Code des Erfassungsbogens auf Papier oder Bildschirm anvisieren.</li>
-              <li>Am Handscanner auslösen — dieses Fenster nimmt den Code sofort an, ohne Klick in ein Feld.</li>
+              <li>QR-Code auf Papier oder Bildschirm anvisieren.</li>
+              <li>Am Handscanner auslösen — das Fenster nimmt den Code sofort an.</li>
             </ol>
             {/* role="status": Ohne Kamerabild ist diese Zeile die einzige
                 Rückmeldung — erst dass der Scanner ankommt, dann bei einem

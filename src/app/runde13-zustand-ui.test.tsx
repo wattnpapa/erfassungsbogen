@@ -339,7 +339,7 @@ describe("R13-G1 Doppeltipp auf „Einsatz weitergeben / sichern“", () => {
     const zweiterTipp = performance.now(); // 150 ms nach dem ersten, mitten in der Erzeugung
     await waitFor(() => expect(fertig).toBeTypeOf("function")); // die Aktion läuft erst nach dem ersten Bild
     fertig();
-    await waitFor(() => expect(knopf().textContent).toBe("Einsatz weitergeben / sichern"));
+    await waitFor(() => expect(knopf().textContent).toMatch(/^Einsatz weitergeben \/ sichern/));
 
     tipp(knopf(), zweiterTipp); // der verspätet bearbeitete Doppeltipp
     expect(erzeugen).toHaveBeenCalledTimes(1);

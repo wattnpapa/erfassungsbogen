@@ -190,6 +190,20 @@ function ablageSpeichern(ablage: Ablage | ZielAblage, schluessel: string): boole
   }
 }
 
+/** Ob der letzte Export-, Lageblatt- oder Weitergabe-Vermerk geschrieben werden konnte (R19-O4). */
+let vermerkGelungen = true;
+
+/** Zusatz für die Erfolgsquittung eines Exports, wenn der Vermerk am vollen Speicher scheiterte; sonst leer (R19-O4). */
+export function vermerkFehltZusatz(): string {
+  // Wer ohne Vermerk exportiert (Nachtrag, Weitergabe als Teil), hat ihn vorher mit vermerkNeuBeginnen() freigegeben.
+  return vermerkGelungen ? "" : " Vermerk nicht gespeichert (Speicher voll) — die Übergabe-Liste zeigt „noch nicht“.";
+}
+
+/** Vor jedem Export aufrufen: ein früherer Fehlschlag soll nicht an dieser Quittung hängen. */
+export function vermerkNeuBeginnen(): void {
+  vermerkGelungen = true;
+}
+
 function zielAblageLaden(): ZielAblage {
   const ablage: ZielAblage = {};
   for (const [einsatzId, ziele] of Object.entries(rohLesen(SPEICHER_SCHLUESSEL))) {
@@ -252,7 +266,7 @@ export function exportVermerken(
     Object.assign(neu, alt);
   }
   neu[einsatz.id] = { ...neu[einsatz.id], [ziel]: stand };
-  ablageSpeichern(neu, SPEICHER_SCHLUESSEL);
+  vermerkGelungen = ablageSpeichern(neu, SPEICHER_SCHLUESSEL);
   try {
     speicher()?.removeItem(ALTER_SCHLUESSEL); // der gemeinsame Merker der Runden 1–3
   } catch {
@@ -281,7 +295,7 @@ export function lageblattVermerken(einsatz: Einsatzsammlung, behalten?: Iterable
     Object.assign(neu, alt);
   }
   neu[einsatz.id] = stand;
-  ablageSpeichern(neu, LAGEBLATT_SCHLUESSEL);
+  vermerkGelungen = ablageSpeichern(neu, LAGEBLATT_SCHLUESSEL);
   return stand;
 }
 
@@ -311,7 +325,7 @@ export function weitergabeVermerken(einsatz: Einsatzsammlung, behalten?: Iterabl
     Object.assign(neu, alt);
   }
   neu[einsatz.id] = stand;
-  ablageSpeichern(neu, WEITERGABE_SCHLUESSEL);
+  vermerkGelungen = ablageSpeichern(neu, WEITERGABE_SCHLUESSEL);
   return stand;
 }
 
@@ -690,6 +704,14 @@ export function exportVorhanden(einsatzId: string): boolean {
     lageblattStandLaden(einsatzId) != null ||
     weitergabeStandLaden(einsatzId) != null
   );
+}
+
+/** Satz für Rückfragen vor dem Löschen: was von dieser Sammlung schon hinausging (R19-W10). */
+export function exportStandSatz(einsatzId: string): string {
+  const zeiten = [...Object.values(exportStaendeLaden(einsatzId)), lageblattStandLaden(einsatzId), weitergabeStandLaden(einsatzId)]
+    .filter((s): s is ExportStand => s != null)
+    .map((s) => s.zeitpunkt);
+  return zeiten.length === 0 ? "Noch nichts exportiert oder übergeben." : `Zuletzt herausgegangen: ${exportZeitKurz(Math.max(...zeiten))}.`;
 }
 
 /**

@@ -93,6 +93,19 @@ export function meldungenImPapierkorb(einsatzId: string, jetzt = Date.now()): Pa
     .sort((a, b) => b.entferntAm - a.entferntAm);
 }
 
+/**
+ * Die Lücken in den Nummern als Satz für Lageblatt, Sammel-PDF und CSV (R19-A2): „Nr. 2 entfernt 04:21 (Papierkorb) — nicht in
+ * der Summe." Wer auf der Wand „1, 3, 4, 5" liest, sieht so, dass Nr. 2 bewusst fehlt. Leer, wenn nichts entfernt wurde.
+ */
+export function entfernteNummernText(einsatzId: string, jetzt = Date.now()): string {
+  const luecken = meldungenImPapierkorb(einsatzId, jetzt)
+    .filter((m) => m.art === "einheit" && m.nummer != null)
+    .sort((a, b) => a.nummer! - b.nummer!);
+  if (luecken.length === 0) return "";
+  const uhr = (ms: number) => new Date(ms).toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit" });
+  return `${luecken.map((m) => `Nr. ${m.nummer} entfernt ${uhr(m.entferntAm)}`).join(", ")} (Papierkorb) — nicht in der Summe.`;
+}
+
 /** Wann die Meldung endgültig aus dem Papierkorb fällt. */
 export function papierkorbFristEnde(m: PapierkorbMeldung): number {
   return m.entferntAm + MELDUNGEN_PAPIERKORB_TAGE * TAG_MS;

@@ -45,3 +45,15 @@ Zahl der P3 ist eine Schätzung nach Zusammenführung).
 | [Mobile-UI](mobile-ui.md) | 0 | 0 | 1 | 14 |
 | Summe der Berichte | 0 | 1 | 10 | 135 |
 | Summe ohne Doppelungen (Verlaufstabelle, P3 geschätzt) | 0 | 1 | 6 | 70 |
+
+## Stand der Behebung (28.10.2026)
+
+Behoben, auch der P1 (R19-O1) und die P2 (O2 bis O5, W1/D1, K1/M1, L1), jeweils mit
+Test; die Speicherfälle sind im Browser mit einem bis zum Quota-Fehler gefüllten
+`localStorage` nachgestellt. Offen oder nicht vollständig: R19-K10 („7 aufgenommen,
+7 bereits vorhanden": Ursache nicht gefunden), R19-L2/M5/G9/S10 für 568 x 320 in
+„Feld" (Scanner ohne Kamera rollt noch innen), R19-K12 (die Ruhehöhe der „Ansicht"-Leiste
+von 57 px bleibt), R19-N8 (nicht bearbeitet, Tabellenbefund). Neuer Speicherschlüssel:
+keiner. Startbündel 1 229 774 Byte (Budget neu gesetzt); es wächst seit Runde 12 um
+rund 10 KB je Runde und wird in Runde 20 durch Nachladen verkleinert. Arc42, ISK und DSFA
+nachgezogen.

@@ -18,7 +18,8 @@ import { absenderLabel } from "@bos/eeb-format/signatur";
 import { artMitMarke, ausgabeDateiname, dateinameTeil, einheitAnzeigename, qrErzeugen } from "./hilfen";
 import { istNativ, binaerTeilen } from "./nativ";
 import { fortschrittMelden } from "./arbeitet";
-import { einsatzLageblattSeiteFuellen, einsatzPdfDokumentGesetzt, einzelPdfDokument, nichtDarstellbareBetroffene, nichtDarstellbareNamen, pdfDokument, umschriftBetroffene, vereinfachtBetroffene, type SammelBogen, type UebersichtEintrag } from "./pdf-dokument";
+import { entfernteNummernText } from "./meldungs-papierkorb";
+import { einsatzLageblattSeiteFuellen, einsatzPdfDokumentGesetzt, einzelPdfDokument, lueckenZeileSetzen, nichtDarstellbareBetroffene, nichtDarstellbareNamen, pdfDokument, umschriftBetroffene, vereinfachtBetroffene, type SammelBogen, type UebersichtEintrag } from "./pdf-dokument";
 import { einsatzDateiInhalt } from "./einsatz-transport";
 import { lageAngabenLaden } from "./lage-angaben";
 import { BLANKO_DATEINAME, BLANKO_INFO, BLANKO_ZEILEN, leererBogen } from "./blanko";
@@ -306,6 +307,7 @@ export async function einsatzPdfErzeugen(
   const marke = dateiMarke ?? (nachtrag ? "nachtrag" : "");
   // Ein Probesatz ohne Bilder misst, welche Bögen mit ihrer letzten Zeile allein
   // auf einer Seite stünden, und setzt diese enger (R4-A7).
+  lueckenZeileSetzen(entfernteNummernText(einsatz.id)); // R19-A2: entfernte Nummern benennen
   const dd = await einsatzPdfDokumentGesetzt(
     einsatz.name,
     boegenMitQr,
@@ -316,6 +318,7 @@ export async function einsatzPdfErzeugen(
     nachtrag ? nachtragSeit : undefined,
     (probe) => pdfMake.createPdf(probe).getBuffer(),
   );
+  lueckenZeileSetzen("");
   await fortschrittMelden("Datei wird geschrieben …");
   // Teilexport („nur neue Bögen") mit eigenem Dateinamen — sonst hießen
   // Nachtrag und ganze Sammlung gleich (Audit Runde 2, R2-A3).
@@ -337,7 +340,9 @@ export async function einsatzLageblattErzeugen(einsatz: Einsatzsammlung): Promis
   const eintraege = alleAktuellen(einsatz).map((m) => uebersichtEintrag(einsatz, m));
   // Zwei Sätze: der erste misst, wie viel Platz unter dem Inhalt bleibt, der
   // zweite füllt ihn mit Nachtragszeilen (Audit Runde 3, R3-A5).
+  lueckenZeileSetzen(entfernteNummernText(einsatz.id)); // R19-A2
   const dd = await einsatzLageblattSeiteFuellen(einsatz.name, eintraege, (probe) => pdfMake.createPdf(probe).getBuffer());
+  lueckenZeileSetzen("");
   const ok = await dokumentAusgeben(dd, ausgabeDateiname("lageblatt", dateiRumpf(einsatz), "pdf"));
   // Merken, wann das Blatt entstand — die Einsatzansicht sagt dann „Lageblatt
   // 16:30 · seitdem 1 neue Meldung" (Audit Runde 2, R2-A3).

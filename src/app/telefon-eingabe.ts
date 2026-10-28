@@ -13,6 +13,8 @@ export interface TelefonEingabe {
   wert: string;
   /** Satz für den Helfer, wenn etwas entfernt oder abgetrennt wurde; sonst leer. */
   hinweis: string;
+  /** Die entfernten Stücke dieser Eingabe, wie im Hinweis („abc 12x" → „abc", „x"); fehlt, wenn nichts entfernt wurde (R19-E12). */
+  entfernt?: string[];
 }
 
 /** Trenner zwischen zwei Nummern: Komma, Semikolon, senkrechter Strich, Schrägstrich, „oder", „und". */
@@ -73,7 +75,7 @@ export function telefonBereinigen(roh: string): TelefonEingabe {
       `Zweite Nummer „${rest.trim()}" nicht übernommen — eine Nummer je Zeile, weitere über „+ Kontakt“ anlegen.`,
     );
   }
-  return { wert, hinweis: saetze.join(" ") };
+  return { wert, hinweis: saetze.join(" "), ...(fremd && !zusatzMitZiffern ? { entfernt: fremdTeile } : {}) };
 }
 
 /** Zustand des zeichenweisen Tippens: `undefined` = normal, sonst der Text, der hinter einem Trenner getippt wurde. */

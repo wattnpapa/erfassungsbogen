@@ -13,7 +13,7 @@ describe("dauerText", () => {
   const t0 = new Date(2026, 9, 17, 8, 0).getTime();
   it("schreibt Stunden und Minuten aus", () => {
     expect(dauerText(t0, t0 + (3 * 60 + 15) * 60_000)).toBe("3 Stunden, 15 Minuten");
-    expect(dauerText(t0, t0)).toBe("0 Stunden, 0 Minuten");
+    expect(dauerText(t0, t0)).toBe("0 Minuten");
     expect(dauerText(t0, t0 + 61 * 60_000)).toBe("1 Stunde, 1 Minute");
   });
   it("nimmt ab 24 Stunden Tage dazu", () => {

@@ -243,6 +243,8 @@ export default function NamenInhalt({ bogen, onUebernehmen, onBeispiele }: {
           schon im Bogen. Übernommen werden sie trotzdem; wenn es dieselbe Person ist, die Zeile vorher löschen.
         </p>
       )}
+      {/* R19-E10: „Übernehmen" und der Grund der Sperre bleiben am unteren Rand des Fensters stehen (index.html, .namen-fuss). */}
+      <div className="namen-fuss">
       <p>
         <button type="button" className="primaer" disabled={namenVorschau.length === 0 || reihenfolgeOffen} aria-describedby={reihenfolgeOffen && namenVorschau.length > 0 ? "namen-reihenfolge-fehlt" : undefined} onClick={namenUebernehmen}>
           {namenVorschau.length === 0
@@ -258,6 +260,7 @@ export default function NamenInhalt({ bogen, onUebernehmen, onBeispiele }: {
           „Übernehmen“ geht erst, wenn oben gewählt ist, ob die Zeilen ohne Komma „Vorname Nachname“ oder „Nachname Vorname“ lauten.
         </p>
       )}
+      </div>
       {/* Beispielnamen nur bei Übungsbögen (Haken in Schritt 2): im echten
           Einsatz existiert dieser Weg gar nicht erst — künstliche Daten
           lassen sich dort auch nicht versehentlich erzeugen. */}

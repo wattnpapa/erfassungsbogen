@@ -3,7 +3,7 @@
  * Hierarchie der Kontaktstellen (beim THW mit OV-Vorschlagsliste).
  */
 
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState, type ReactNode } from "react";
 import {
   Einheit,
   Ernaehrung,
@@ -20,6 +20,7 @@ import { fahrzeugVorbelegung, fahrzeugeMitFunkrufOv } from "../../vokabulare/thw
 import { stanPersonalVorbelegung } from "@bos/vokabulare/thw-stan-personal";
 import {
   ORG_OPTIONEN,
+  bogenHatInhalt,
   einheitAnzeigename,
   ersteEbene,
   fahrzeugUnbenannt,
@@ -37,6 +38,7 @@ import { vorbelegungWegLesen, vorbelegungWegSichern, zustandsAbdruck, type Vorbe
 import { Auswahl, Feld, FREMDE_DATEN, Hinweise, KENNUNG_EINGABE, NAMEN_EINGABE, VokabAuswahl, VorschlagFeld, type SchrittProps } from "./bausteine";
 import { TelefonFeld } from "./telefon-feld";
 import { ortAnzeige, sucheForm } from "../schreibweise";
+import { emailProblem, emailSatz } from "../email-pruefung";
 
 // Die beiden großen Datenpakete laden erst mit Schritt 1, nicht mit dem
 // Start-Bundle: das THW-OV-Verzeichnis (~190 KB Quelldaten) und die
@@ -303,8 +305,20 @@ const EINHEITSTYP_BEISPIEL: Partial<Record<OrganisationsTyp, string>> = {
   [OrganisationsTyp.DLRG]: "z. B. Wasserrettungszug, Bootstrupp",
 };
 
+/** Schnellerfassung (R19-E3, S2, O7): alles außer Ort und Typ steht hinter einem Aufklapper. */
+function SchnellMehr({ children }: { children?: ReactNode }) {
+  return (
+    <details className="schnell-mehr">
+      <summary>Organisation, Ebene, Kontakt (optional)</summary>
+      {children}
+    </details>
+  );
+}
+
 export function SchrittEinheit({ bogen, aendern: aendernRoh, ortFokus = false }: SchrittProps & { ortFokus?: boolean }) {
   const e = bogen.einheit;
+  const schnell = bogen.personalErfassung === PersonalErfassung.NUR_STAERKE;
+  const Mehr = schnell ? SchnellMehr : Fragment;
   // Schnell- und manuelle Erfassung für eine Sammlung (R11-M1): Das einzige Pflichtfeld liegt sonst zwei Bildschirme
   // unter dem Kopf. Beim Öffnen (nur solange der Ort noch leer ist, nicht beim Zurückblättern) steht der Fokus dort.
   useEffect(() => {
@@ -637,20 +651,120 @@ export function SchrittEinheit({ bogen, aendern: aendernRoh, ortFokus = false }:
     });
   }
 
-  return (
-    <section className="karte">
-      <h2>1. Einheit</h2>
-      {/* Der Schnell-Einstieg von der Startseite landet in genau diesem
-          sechsschrittigen Assistenten — und sah damit aus wie der volle Bogen.
-          Wer eine eintreffende Einheit in zwanzig Sekunden aufnehmen will,
-          soll hier lesen, was ihn erwartet, statt es auf Schritt 3 zu
-          entdecken. Bewusst „können offen bleiben": Fahrzeuge zählt der
-          Meldekopf manchmal doch mit, gesperrt ist nichts. */}
-      {bogen.personalErfassung === PersonalErfassung.NUR_STAERKE && (
-        <p className="hinweis">
-          Schnellerfassung: Ort hier, Stärke in Schritt 3 — der Rest kann offen bleiben.
-        </p>
+  const alleHinweise = pruefpunkte(bogen, false);
+  const mailPunkt = (adresse?: string) => (emailProblem(adresse) ? alleHinweise.find((p) => p.schritt === 0 && p.text.includes(emailSatz(adresse))) : undefined);
+  const imFeld = new Set(e.hierarchie.map((h) => mailPunkt(h.email)?.text));
+  /** „Ort der Einheit" (bzw. „Name" der übergeordneten Ebene) samt den Hinweisen darunter; in der Schnellerfassung steht er ganz oben (R19-E3). */
+  const ortBlock = (h: (typeof e.hierarchie)[number], i: number) => (
+    <>
+      {/* Nur zum Beobachten des Fokus: Der Hinweis „nicht im Verzeichnis" kommt
+          erst, wenn das Namensfeld verlassen ist. */}
+      <span
+        style={{ display: "contents" }}
+        onFocusCapture={() => setNameImFokus(i)}
+        onBlurCapture={() => setNameImFokus((z) => (z === i ? null : z))}
+      >
+      <Feld titel={i === 0 ? "Ort der Einheit (Pflicht)" : "Name"}>
+        {e.organisation === OrganisationsTyp.THW && h.bezeichnung.code === 1 ? (
+          <OvVorschlagFeld
+            id={i === 0 ? "feld-einheit-name" : undefined}
+            wert={h.name}
+            platzhalter="tippen für Vorschläge…"
+            verzeichnis={ovVerzeichnis}
+            tippen={(name) => setE({ hierarchie: e.hierarchie.map((x, j) => (j === i ? { ...x, name } : x)) })}
+            uebernehmen={(ov) => {
+              setErgaenzt(null);
+              ovUebernehmen(i, ov);
+            }}
+            aufgeloest={(ov) => ovAufgeloest(i, ov)}
+          />
+        ) : (
+          <input
+            {...NAMEN_EINGABE}
+            autoComplete="off" // Ortsnamen und Dienststellen: keine Autokorrektur, keine Vorschläge aus anderen Formularen (R16-H2)
+            id={i === 0 ? "feld-einheit-name" : undefined}
+            value={h.name}
+            onChange={(ev) => setE({ hierarchie: e.hierarchie.map((x, j) => (j === i ? { ...x, name: ev.target.value } : x)) })}
+          />
+        )}
+      </Feld>
+      </span>
+      {/* Direkt unter dem Namensfeld, das ergänzt hat — dort liegt der Blick. */}
+      {ergaenzt && ergaenzt.i === i && e.hierarchie[ergaenzt.i]?.kurz === ergaenzt.ov.kurz && (
+        ortGeaendert(h.name, ergaenzt.ov.name) ? (
+          // Der Ort wurde nach der Ergänzung geändert (R11-E1): Kürzel, Telefon, E-Mail, RB und LV
+          // stammen noch vom zuerst gewählten Ortsverband — das sagt die Zeile statt „ergänzt".
+          <p className="hinweis warnung-text ov-ergaenzt ov-ort-geaendert" role="status">
+            Ort geändert — Kürzel, Telefon und E-Mail{e.hierarchie.length > 1 ? " und die übergeordneten Ebenen" : ""} stammen noch
+            von {ergaenzt.ov.name} ({ergaenzt.ov.kurz}).{" "}
+            <button type="button" className="link" onClick={ergaenzungZuruecknehmen}>
+              Angaben von {ergaenzt.ov.name} entfernen
+            </button>
+          </p>
+        ) : (
+          <p className="hinweis ov-ergaenzt" role="status">
+            Aus dem OV-Verzeichnis ergänzt: {ergaenzt.ov.name} ({ergaenzt.ov.kurz}) mit Telefon und E-Mail
+            {e.hierarchie.length > 1 ? ", dazu die übergeordneten Ebenen" : ""}.{" "}
+            <button type="button" className="link" onClick={ergaenzungZuruecknehmen}>Rückgängig</button>
+          </p>
+        )
       )}
+      {/* Ein OV-Name ohne Kürzel ist Freitext: nicht aus dem Verzeichnis, ohne
+          Telefon und E-Mail (Audit Runde 4, R4-H1). Erst nach dem Verlassen
+          des Namensfelds, nicht schon beim Tippen. */}
+      {e.organisation === OrganisationsTyp.THW &&
+        h.bezeichnung.code === 1 &&
+        ovVerzeichnis.length > 0 &&
+        h.name.trim() &&
+        !h.kurz?.trim() &&
+        nameImFokus !== i && (
+          <p className="hinweis warnung-text ov-frei-hinweis" role="status">
+            {ovFreiHinweis(h.name.trim(), ovTreffer(ovVerzeichnis, h.name))}
+          </p>
+        )}
+    </>
+  );
+  const typZeile = (
+    <div className="zeile">
+      <Feld titel="Einheitstyp">
+        <VokabAuswahl
+          wert={e.einheitsTyp}
+          aendern={einheitstypSetzen}
+          tabelle={einheitstypen}
+          platzhalter={EINHEITSTYP_BEISPIEL[e.organisation] ?? "z. B. Löschzug, SEG Sanität"}
+          suchbar
+          freitextHinweis
+        />
+      </Feld>
+    </div>
+  );
+  // Die Vorbelegung wird angesagt, wo sie ausgelöst wird. Vorher stand auf Schritt 1 nichts davon — erst Schritt 3 meldete
+  // „7 Personenkarten ohne Angaben zählen in die Stärke", ohne zu sagen, woher sie kamen.
+  const vorbelegungHinweis =
+    typHatVorlage && (vorbelegtePersonen > 0 || vorbelegteFahrzeuge > 0) ? (
+      <p className="hinweis vorbelegung-hinweis" role="status">
+        Vorbelegt nach StAN:{" "}
+        {[
+          vorbelegtePersonen > 0 ? `${anzahlText(vorbelegtePersonen, "Person", "Personen")} (Namen offen)` : "",
+          vorbelegteFahrzeuge > 0 ? `${anzahlText(vorbelegteFahrzeuge, "Fahrzeug", "Fahrzeuge")} (Kennzeichen offen)` : "",
+        ]
+          .filter(Boolean)
+          .join(", ")}
+        . Sie zählen in die Stärke, bis sie ausgefüllt oder entfernt sind; ein anderer Einheitstyp
+        ersetzt sie durch seine eigenen Sollplätze.{" "}
+        <button type="button" onClick={vorbelegungEntfernen}>Vorbelegung entfernen</button>
+      </p>
+    ) : null;
+
+  return (
+    <section className={`karte${schnell ? " schnell-einheit" : ""}`}>
+      <h2>1. Einheit</h2>
+      {/* Schnellerfassung (R19-E3, S2, O7, G11, M7, N4): Der Ort — das einzige Pflichtfeld — steht als erstes Feld, dann der Typ;
+          der Rest („kann offen bleiben") liegt hinter dem Aufklapper. */}
+      {schnell && e.hierarchie[0] && ortBlock(e.hierarchie[0], 0)}
+      {schnell && typZeile}
+      {schnell && vorbelegungHinweis}
+      <Mehr>
       <div className="zeile">
         <Feld titel="Organisation">
           <Auswahl
@@ -681,35 +795,8 @@ export function SchrittEinheit({ bogen, aendern: aendernRoh, ortFokus = false }:
           </button>
         </p>
       )}
-      <div className="zeile">
-        <Feld titel="Einheitstyp">
-          <VokabAuswahl
-            wert={e.einheitsTyp}
-            aendern={einheitstypSetzen}
-            tabelle={einheitstypen}
-            platzhalter={EINHEITSTYP_BEISPIEL[e.organisation] ?? "z. B. Löschzug, SEG Sanität"}
-            suchbar
-            freitextHinweis
-          />
-        </Feld>
-      </div>
-      {/* Die Vorbelegung wird angesagt, wo sie ausgelöst wird. Vorher stand
-          auf Schritt 1 nichts davon — erst Schritt 3 meldete „7 Personenkarten
-          ohne Angaben zählen in die Stärke", ohne zu sagen, woher sie kamen. */}
-      {typHatVorlage && (vorbelegtePersonen > 0 || vorbelegteFahrzeuge > 0) && (
-        <p className="hinweis vorbelegung-hinweis" role="status">
-          Vorbelegt nach StAN:{" "}
-          {[
-            vorbelegtePersonen > 0 ? `${anzahlText(vorbelegtePersonen, "Person", "Personen")} (Namen offen)` : "",
-            vorbelegteFahrzeuge > 0 ? `${anzahlText(vorbelegteFahrzeuge, "Fahrzeug", "Fahrzeuge")} (Kennzeichen offen)` : "",
-          ]
-            .filter(Boolean)
-            .join(", ")}
-          . Sie zählen in die Stärke, bis sie ausgefüllt oder entfernt sind; ein anderer Einheitstyp
-          ersetzt sie durch seine eigenen Sollplätze.{" "}
-          <button type="button" onClick={vorbelegungEntfernen}>Vorbelegung entfernen</button>
-        </p>
-      )}
+      {!schnell && typZeile}
+      {!schnell && vorbelegungHinweis}
 
       {lvModul && zeigeLandesvorlagen && (
         <>
@@ -774,71 +861,7 @@ export function SchrittEinheit({ bogen, aendern: aendernRoh, ortFokus = false }:
               platzhalter="z. B. Landkreis"
             />
           </Feld>
-          {/* Nur zum Beobachten des Fokus: Der Hinweis „nicht im Verzeichnis" kommt
-              erst, wenn das Namensfeld verlassen ist. */}
-          <span
-            style={{ display: "contents" }}
-            onFocusCapture={() => setNameImFokus(i)}
-            onBlurCapture={() => setNameImFokus((z) => (z === i ? null : z))}
-          >
-          <Feld titel={i === 0 ? "Ort der Einheit (Pflicht)" : "Name"}>
-            {e.organisation === OrganisationsTyp.THW && h.bezeichnung.code === 1 ? (
-              <OvVorschlagFeld
-                id={i === 0 ? "feld-einheit-name" : undefined}
-                wert={h.name}
-                platzhalter="tippen für Vorschläge…"
-                verzeichnis={ovVerzeichnis}
-                tippen={(name) => setE({ hierarchie: e.hierarchie.map((x, j) => (j === i ? { ...x, name } : x)) })}
-                uebernehmen={(ov) => {
-                  setErgaenzt(null);
-                  ovUebernehmen(i, ov);
-                }}
-                aufgeloest={(ov) => ovAufgeloest(i, ov)}
-              />
-            ) : (
-              <input
-                {...NAMEN_EINGABE}
-                autoComplete="off" // Ortsnamen und Dienststellen: keine Autokorrektur, keine Vorschläge aus anderen Formularen (R16-H2)
-                id={i === 0 ? "feld-einheit-name" : undefined}
-                value={h.name}
-                onChange={(ev) => setE({ hierarchie: e.hierarchie.map((x, j) => (j === i ? { ...x, name: ev.target.value } : x)) })}
-              />
-            )}
-          </Feld>
-          </span>
-          {/* Direkt unter dem Namensfeld, das ergänzt hat — dort liegt der Blick. */}
-          {ergaenzt && ergaenzt.i === i && e.hierarchie[ergaenzt.i]?.kurz === ergaenzt.ov.kurz && (
-            ortGeaendert(h.name, ergaenzt.ov.name) ? (
-              // Der Ort wurde nach der Ergänzung geändert (R11-E1): Kürzel, Telefon, E-Mail, RB und LV
-              // stammen noch vom zuerst gewählten Ortsverband — das sagt die Zeile statt „ergänzt".
-              <p className="hinweis warnung-text ov-ergaenzt ov-ort-geaendert" role="status">
-                Ort geändert — Kürzel, Telefon und E-Mail{e.hierarchie.length > 1 ? " und die übergeordneten Ebenen" : ""} stammen noch
-                von {ergaenzt.ov.name} ({ergaenzt.ov.kurz}).{" "}
-                <button type="button" className="link" onClick={ergaenzungZuruecknehmen}>
-                  Angaben von {ergaenzt.ov.name} entfernen
-                </button>
-              </p>
-            ) : (
-              <p className="hinweis ov-ergaenzt" role="status">
-                Aus dem OV-Verzeichnis ergänzt: {ergaenzt.ov.name} ({ergaenzt.ov.kurz}) mit Telefon und E-Mail
-                {e.hierarchie.length > 1 ? ", dazu die übergeordneten Ebenen" : ""}.{" "}
-                <button type="button" className="link" onClick={ergaenzungZuruecknehmen}>Rückgängig</button>
-              </p>
-            )
-          )}
-          {/* Ein OV-Name ohne Kürzel ist Freitext: nicht aus dem Verzeichnis, ohne
-              Telefon und E-Mail (Audit Runde 4, R4-H1). Erst nach dem Verlassen
-              des Namensfelds, nicht schon beim Tippen. */}
-          {e.organisation === OrganisationsTyp.THW &&
-            h.bezeichnung.code === 1 &&
-            ovVerzeichnis.length > 0 &&
-            h.name.trim() &&
-            !h.kurz?.trim() &&
-            nameImFokus !== i && (
-              <p className="hinweis warnung-text ov-frei-hinweis" role="status">
-                {ovFreiHinweis(h.name.trim(), ovTreffer(ovVerzeichnis, h.name))}
-              </p>
-            )}
+          {!(schnell && i === 0) && ortBlock(h, i)}
           {/* Das Kürzel (z. B. THW-OV "OODE") ergibt nur beim THW Sinn; andere Organisationen führen keine solchen Kürzel.
               „Dienststellen-Kürzel (optional)": „Kürzel" allein las ein Neuling als
               irgendeine Abkürzung und tippte „OV OL" — das Beispiel sagt, was gemeint ist. */}
@@ -898,6 +921,8 @@ export function SchrittEinheit({ bogen, aendern: aendernRoh, ortFokus = false }:
               onChange={(ev) => setE({ hierarchie: e.hierarchie.map((x, j) => (j === i ? { ...x, email: ev.target.value || undefined } : x)) })}
             />
           </Feld>
+          {/* R19-E4: Die Rückfrage zur Adresse steht direkt unter dem Feld, nicht erst unter allen Ebenen. */}
+          {mailPunkt(h.email) && <Hinweise punkte={[mailPunkt(h.email)!]} aktuellerSchritt={0} />}
           {/* Die unterste Ebene ist die Einheit selbst und bleibt stehen. Ihr
               Platz bleibt trotzdem reserviert — sonst stünde die E-Mail-Spalte
               der ersten Zeile um eine Knopfbreite weiter als die darunter. */}
@@ -976,6 +1001,7 @@ export function SchrittEinheit({ bogen, aendern: aendernRoh, ortFokus = false }:
           </button>
         )}
       </p>
+      </Mehr>
       {/* Derselbe Hinweisblock wie im Personal-Schritt, und aus demselben
           Grund: „Ort der Einheit (Pflicht)" konnte man kommentarlos leer lassen und
           „Weiter" drücken — der Fehler fiel erst fünf Schritte später in der
@@ -983,7 +1009,8 @@ export function SchrittEinheit({ bogen, aendern: aendernRoh, ortFokus = false }:
           weiterhin nichts: wer den OV-Namen gerade nicht weiß, soll
           weiterkommen und ihn nachtragen. Er steht jetzt nur nicht mehr still
           da. */}
-      <Hinweise punkte={pruefpunkte(bogen, false)} aktuellerSchritt={0} />
+      {/* R19-N14: Warnungen erst nach der ersten Eingabe; der leere Schritt 1 zeigte schon zwei gelbe Kästen. */}
+      <Hinweise punkte={bogenHatInhalt(bogen) ? alleHinweise.filter((p) => !imFeld.has(p.text)) : []} aktuellerSchritt={0} />
       {ebenenWeg && !vorbelegungWeg && (
         <DaumenQuittung key={`ebene:${ebenenWeg.nonce}`} onRueckgaengig={ebeneZurueck} onSchliessen={() => setEbenenWeg(null)}>
           <strong>Entfernt:</strong> {ebenenWeg.name}

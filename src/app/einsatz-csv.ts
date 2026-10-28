@@ -278,6 +278,8 @@ export function einsatzCsvInhalt(
   /** Ganze Sammlung für die Kennzeichnung der Eintreffzeit (beim Teilexport fehlt die erste Fassung sonst). */
   historie: readonly MeldeEintrag[] = s.eintraege,
   erstellt: number = Date.now(),
+  /** Zeile über entfernte Nummern („Nr. 2 entfernt 04:21 (Papierkorb) — nicht in der Summe."), R19-A2; leer ohne Lücke. */
+  luecken = "",
 ): string {
   // Alle gemeldeten Einheiten, nicht nur die zählenden: Eine abgerückte oder
   // als Übung geführte Einheit fiel bisher wortlos aus der Datei — die
@@ -300,7 +302,11 @@ export function einsatzCsvInhalt(
     historie.filter((x) => x.einheitSchluessel === e.einheitSchluessel).sort((a, b) => a.empfangenAm - b.empfangenAm)[0]?.quelle;
   const zeilen = alle.map((e) => datenZeile(s.art, e, nummern.get(e.einheitSchluessel), gruende ? nachtragGrundText(gruende[e.einheitSchluessel]) : undefined, orte[e.einheitSchluessel], unbestaetigt.has(e.id), e.angaben ? ersteQuelleJe(e) : undefined));
   // Schlusszeilen: Lage und Erstellzeit, bei gekennzeichneter Eintreffzeit die Fußnote (R16-A1). Die Kopfzeile bleibt Zeile 1.
-  const fuss = [csvZeile([exportKennzeile(s, erstellt)]), ...(unbestaetigt.size > 0 ? [csvZeile([`* ${EINTREFF_HINWEIS}`])] : [])];
+  const fuss = [
+    csvZeile([exportKennzeile(s, erstellt)]),
+    ...(unbestaetigt.size > 0 ? [csvZeile([`* ${EINTREFF_HINWEIS}`])] : []),
+    ...(luecken ? [csvZeile([luecken])] : []),
+  ];
   if (!gruende) {
     return csvDatei([kopf, ...zeilen, summenZeile(zaehlende, `${nachtrag ? "Summe Nachtrag" : "Summe"} (${zaehlende.length} Einheiten${sollAnteilText(zaehlende)})`), ...fuss]);
   }

@@ -176,7 +176,8 @@ describe("Tabelle am Telefon (R17-H8, K7, G7)", () => {
     expect(koepfe[0]).toMatch(/^Einheit/);
     expect(koepfe[1]).toMatch(/^Ges\./);
     expect(koepfe[2]).toMatch(/^Eingetr\./);
-    expect(koepfe[3]).toMatch(/^Auftrag/);
+    // R19-W9: Ohne Auftrag in irgendeiner Zeile steht an dieser Stelle der Bedarf.
+    expect(koepfe[3]).toMatch(/^Bedarf/);
     // Fünf Tippziele von 44 px stünden ohne Abstand nebeneinander: Die Köpfe sind dort nur Text.
     expect(tabelle.querySelectorAll("thead th button")).toHaveLength(0);
     // Name und Kernzahlen stehen in jeder Zeile.

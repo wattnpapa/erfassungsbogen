@@ -332,7 +332,7 @@ describe("R15-K4/K5 Lagemonitor: Warnung nur am alten Teil, Auftrag am Telefon",
     expect(zeile.classList.contains("lm-veraltet")).toBe(false);
     expect(zeile.firstChild!.textContent).toMatch(/^letzte Meldung (gerade eben|vor \d+ Min)$/);
     const warn = zeile.querySelector(".lm-warnteil")!;
-    expect(warn.textContent).toMatch(/^ · ⚠ älteste Meldung vor 6 Std/);
+    expect(warn.textContent).toMatch(/^⚠ älteste Meldung vor 6 Std/);
   });
 
   it("der Auftrag steht in der Funkruf-Zelle (am Telefon sichtbar), nicht nur in der ausgeblendeten Typ-Spalte", () => {

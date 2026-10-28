@@ -609,7 +609,8 @@ describe("R17-A7 / K5 / N2 ein Einsatz, ein Eintrag auf der Startseite", () => {
   it("ohne Einsatz bleibt der erklärende Abschnitt an seiner Stelle", () => {
     render(<App />);
     expect(screen.getByRole("heading", { name: "Einsatz-Sammlung (Meldekopf)" })).toBeTruthy();
-    expect(document.body.textContent).toContain("Fremde Bögen zu einem Einsatz");
+    // R19-N10: Der lange Erklärsatz ist weg; Überschrift und die Weiche genügen.
+    expect(document.body.textContent).not.toContain("Fremde Bögen zu einem Einsatz");
   });
 
   it("öffnet den Einsatz über „Öffnen“ der Karte", async () => {

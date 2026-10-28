@@ -143,8 +143,9 @@ describe("R18-S2/H1/W1/N2/D5/D6/A8 Quittungsleiste", () => {
         {lang}
       </DaumenQuittung>,
     );
-    expect(QUITTUNG_ENDE_NACH_MS).toBeGreaterThanOrEqual(20_000);
-    expect(QUITTUNG_ENDE_NACH_MS).toBeLessThanOrEqual(60_000);
+    // R19: kompakt und kurz (8 bis 10 s) statt 30 s; „Details“ verlängert (runde19-fuss-quittung.test.tsx).
+    expect(QUITTUNG_ENDE_NACH_MS).toBeGreaterThanOrEqual(8_000);
+    expect(QUITTUNG_ENDE_NACH_MS).toBeLessThanOrEqual(10_000);
     act(() => void vi.advanceTimersByTime(QUITTUNG_ENDE_NACH_MS - 100));
     expect(screen.getByRole("status").textContent).toContain(lang);
     expect(zu).not.toHaveBeenCalled();

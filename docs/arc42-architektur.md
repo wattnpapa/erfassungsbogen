@@ -34,6 +34,24 @@
 > Rollleiste den Fokus und rollen die Pfeiltasten-Markierung ins Bild. Kein neuer
 > Host, Transportformat und Schema unverändert.
 >
+> **Nachgezogen 2026-10-28 (Runde 19):** Audit Runde 19 (rund 90 Befunde, drei Pakete)
+> — Kap. 5, 8.2, 8.4, 8.5, 8.6, 11: kein neuer Speicherschlüssel. Schreibaktionen
+> quittieren Erfolg erst, nachdem das Schreiben gelang: „Meldung entfernen" legt
+> zuerst den Papierkorb-Eintrag (`eeb.meldungen-papierkorb.v1`) an und fragt bei vollem
+> Speicher „Papierkorb voll" (Endgültig entfernen: Quittung „nur bis Neuladen"); „Einsatz
+> löschen", „Einsatz als beendet markieren" (`eeb.abschluss.v1`) und „Übergabe
+> vermerken" melden ein Scheitern; der Vermerk eines Exports meldet „nicht gespeichert
+> (Speicher voll)". „Übergabe vermerkt" und „Einsatz beendet" gelten nur bis zur
+> nächsten neuen Meldung („nicht mehr aktuell, seitdem n neue Meldung(en)").
+> Lageblatt, Sammel-PDF und Übersichts-CSV nennen entfernte Nummern. Fußleiste des
+> Assistenten ohne Textüberlauf (128 Zustände gemessen), Quittungsleiste als
+> Kurzfassung mit „Details", Tipp-Sperre zeigt „Einen Moment …" am Knopf, „Stärke
+> eintragen" ist nie gesperrt. Schnellerfassung: Ortsfeld zuerst, Schrittzählung wie die
+> Überschriften. Startbündel 1,23 MB (Budget neu gesetzt, ADR-003 Aufnahmeregel 5):
+> **das Startbündel wächst seit Runde 12 um etwa 10 KB je Runde und sollte durch
+> Nachladen weiterer Teile verkleinert werden.** Kein neuer Host, Transportformat und
+> Schema unverändert.
+>
 > **Nachgezogen 2026-10-28 (Runde 18):** Audit Runde 18 (rund 66 Befunde, drei Pakete)
 > — Kap. 5, 8.2, 8.4, 8.5, 8.6: neuer localStorage-Schlüssel `eeb.abschluss.v1`
 > (`einsatz-abschluss.ts`, je Einsatz-Kennung „beendet am", „Übergabe am/an"; das

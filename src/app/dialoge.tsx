@@ -17,7 +17,7 @@
  * überschreiben.
  */
 
-import { useEffect, useId, useRef, useState, type FormEvent, type MouseEvent, type ReactNode } from "react";
+import { useEffect, useId, useRef, useState, type CSSProperties, type FormEvent, type MouseEvent, type ReactNode } from "react";
 import { istSichereGegenhandlung, ortSperren, tippVerworfenZeigen } from "./tipp-schutz";
 import { zahlMarkieren } from "./zahl-eingabe";
 import { ersteEbeneBetreten, ersteEbeneVerlassen } from "./modal-overlay";
@@ -55,6 +55,8 @@ export type Antwortweg = {
   kurz?: string;
   /** Zerstörende Wahl: Knopf in der Alarmfarbe. */
   gefahr?: boolean;
+  /** Harmloser Weg zurück zum Eintragen (nimmt nichts weg): nie gesperrt, nie gedämpft (R19-S5). */
+  sicher?: boolean;
 };
 
 type Eingabeabfrage = {
@@ -420,8 +422,10 @@ function Dialogfenster({ abfrage }: { abfrage: Abfrage }) {
       <button
         type="submit"
         value={w.wert}
-        className={`${w.gefahr ? "gefahr" : i === 0 ? "primaer" : ""}${wartet ? " wartet" : ""}`.trim()}
-        aria-disabled={wartet || undefined}
+        className={`${w.gefahr ? "gefahr" : i === 0 ? "primaer" : ""}${wartet && !w.sicher ? " wartet" : ""}`.trim()}
+        aria-disabled={(wartet && !w.sicher) || undefined}
+        data-sicher={w.sicher ? "" : undefined}
+        style={wartet && !w.sicher ? ({ "--wartet-ms": `${sperrDauer}ms` } as CSSProperties) : undefined}
         aria-describedby={wegeImFuss && (w.hinweis || w.kurz) ? `${idBasis}-w${i}` : undefined}
       >
         {w.label}
@@ -546,7 +550,7 @@ function Dialogfenster({ abfrage }: { abfrage: Abfrage }) {
 
         {abfrage.art === "eingabe" && (
           <div className="abfrage-aktionen">
-            <button type="submit" value="ok" className={`primaer${wartet ? " wartet" : ""}`} aria-disabled={wartet || undefined} disabled={unvollstaendig}>
+            <button type="submit" value="ok" className={`primaer${wartet ? " wartet" : ""}`} aria-disabled={wartet || undefined} disabled={unvollstaendig} style={wartet ? ({ "--wartet-ms": `${sperrDauer}ms` } as CSSProperties) : undefined}>
               {abfrage.ok}
             </button>
             {abbrechen}

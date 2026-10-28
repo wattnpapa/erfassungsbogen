@@ -126,7 +126,7 @@ describe("R18-A6/A7 Block „Übergabe und Abschluss“", () => {
     expect(document.querySelector(".einsatz-beendet-kopf")).toBeNull();
     await nutzer.click(await screen.findByRole("button", { name: "Einsatz als beendet markieren" }));
     const hinweis = document.querySelector(".einsatz-beendet")!;
-    expect(hinweis.textContent).toMatch(/^Einsatz beendet .+ — noch offen: Weitergabe-Datei \(Sammel-PDF\), Lageblatt, Übersicht als CSV, Excel-Liste, Datensicherung\./);
+    expect(hinweis.textContent).toMatch(/^Einsatz beendet .+ — noch offen: Weitergabe-Datei \(Sammel-PDF\), Lageblatt, Übersicht als CSV, Alle Daten als CSV, Excel-Liste, Datensicherung\./);
     expect(document.querySelector(".einsatz-beendet-kopf")!.textContent).toMatch(/^Einsatz beendet /);
     expect(abschlussLaden(s.id).beendetAm).toBeTypeOf("number");
     await nutzer.click(screen.getByRole("button", { name: "Wieder öffnen" }));
@@ -163,7 +163,7 @@ describe("R18-A5/N9 Tabelle am Telefon", () => {
     expect(koepfe.some((k) => /^Alter/.test(k))).toBe(false);
     const zeilen = [...tabelle.querySelectorAll("tbody tr")];
     const zelleAlt = zeilen.find((z) => z.textContent!.includes("Alt"))!.querySelector("td.eingetroffen-kern")!;
-    expect(zelleAlt.textContent).toMatch(/^\d{2}:\d{2}⚠ Stand vor 5 Std/);
+    expect(zelleAlt.textContent).toMatch(/^\d{2}:\d{2} \*⚠ Stand vor 5 Std/);
     expect(zelleAlt.querySelector(".alter-marke")).not.toBeNull();
     const zelleFrisch = zeilen.find((z) => z.textContent!.includes("Frisch"))!.querySelector("td.eingetroffen-kern")!;
     expect(zelleFrisch.querySelector(".alter-marke")).toBeNull();

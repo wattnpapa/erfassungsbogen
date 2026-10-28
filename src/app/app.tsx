@@ -42,6 +42,7 @@ import {
   einheitOrt,
   artMitMarke,
   ausgabeDateiname,
+  bogenSpeichern,
   neuerBogen,
   pruefpunkte,
   schrittStatus,
@@ -111,7 +112,7 @@ import { uebergabeBestaetigen, uebergabeNachWeg, uebergabeText, type UebergabeSt
 import { ART_LABEL, EinsatzDetail, EinsatzListe, type Eingang } from "./einsaetze-ui";
 import { uebersprungenText } from "./uebersprungen-text";
 import { anzahlEinheiten, einheitenZahl, letzteMeldung, lueckeKurz, meldungsNummern, nummernWechsel, nummernWechselText, rueckkehrText } from "./einheiten-tabelle";
-import { exportSammlung, exportStaendeLaden, exportStaendeUebernehmen, exportStandAusWeitergabe, exportVermerken, lieferungsMarke, weitergabeUmImportErgaenzen, type ExportStand, type ExportUmfang, type ExportZiel } from "./export-stand";
+import { exportSammlung, exportStaendeLaden, exportStaendeUebernehmen, exportStandAusWeitergabe, exportVermerken, lieferungsMarke, vermerkFehltZusatz, vermerkNeuBeginnen, weitergabeUmImportErgaenzen, type ExportStand, type ExportUmfang, type ExportZiel } from "./export-stand";
 import { NICHTS_UEBERNOMMEN_SATZ, abgleichGliederung, abgleichText, einsatzAbgleichen, importUebernahm, sammlungFuerZiel, widerspruecheZumMerken, type Einzelheit } from "./einsatz-abgleich";
 import { widerspruchMerken } from "./widerspruch-merker";
 import { aktuelleMeldungen } from "./auswertung";
@@ -1037,6 +1038,9 @@ function AppInhalt() {
   // Rückmeldung von „Bögen einlesen…" (Dateien) unter den Aufnahme-Knöpfen (R3-L1, R3-E4).
   const [einlese, setEinlese] = useState<{ fehler: string; meldung: string; einzelheiten?: Einzelheit[] } | null>(null);
   const stapelAbbruchRef = useRef(false);
+  // Der Stapel, der gerade eingelesen wird (Name, Größe, Änderungszeit): derselbe Stapel ein zweites Mal, solange der erste
+  // läuft, ist ein doppeltes Ereignis des Dateifelds und würde seine Bögen als „bereits vorhanden" zählen (R19-K10).
+  const stapelLaeuft = useRef<string | null>(null);
   // Kiosk-Scan (Meldekopf): Zähler der in diesem Durchgang aufgenommenen Bögen.
   const kioskZaehlerRef = useRef(0);
   // Segmentierung: gesammelte Teile eines großen Bogens (Zustand als Ref, damit
@@ -1704,7 +1708,7 @@ function AppInhalt() {
    * alte Rückfrage versprach immer „bleibt erreichbar", auch wenn der Bogen
    * auf dem Rückholplatz dabei überschrieben wurde (R2-N1/R2-E1).
    */
-  function folgenFuerOffenenBogen(opt: { tausch?: boolean } = {}): { satz: string; verlust: boolean } {
+  function folgenFuerOffenenBogen(opt: { tausch?: boolean } = {}): { satz: string; verlust: boolean; verliertAlt?: Erfassungsbogen } {
     if (!bogen) return { satz: "", verlust: false };
     const name = einheitAnzeigename(bogen.einheit);
     const alt = opt.tausch ? null : ersetztenEntwurfLaden();
@@ -1748,8 +1752,10 @@ function AppInhalt() {
     const stand = new Date(alt.gespeichert).toLocaleString("de-DE", { dateStyle: "short", timeStyle: "short" });
     // Es gibt nur einen Rückholplatz (R7-D3): Der Verlust des dort liegenden Bogens steht VOR der Zusage.
     return {
-      satz: `Achtung, „Zuletzt geschlossener Bogen" fasst nur einen Bogen: ${alt.fremd ? "Die" : "Der"} dort bisher liegende ${alt.fremd ? "Erfassung" : "Bogen"} „${altName}" (Stand ${stand} Uhr${altMerkmal ? ` · ${altMerkmal}` : ""}) wird dabei endgültig gelöscht. ${bleibt.replace("Der Stand bleibt", "Nur der jetzt ersetzte Stand bleibt")}`,
+      // Der verlorene Bogen steht im ersten Satz (R19-D8).
+      satz: `${alt.fremd ? "Die Erfassung" : "Der Bogen"} „${altName}" (Stand ${stand} Uhr${altMerkmal ? ` · ${altMerkmal}` : ""}) auf dem Platz „Zuletzt geschlossener Bogen" wird dabei endgültig gelöscht: Er fasst nur einen Bogen. ${bleibt.replace("Der Stand bleibt", "Nur der jetzt ersetzte Stand bleibt")}`,
       verlust: true,
+      verliertAlt: alt.bogen,
     };
   }
 
@@ -1826,20 +1832,37 @@ function AppInhalt() {
     }
     if (!a.ohneFrage) {
       const folgen = folgenFuerOffenenBogen({ tausch: a.tausch });
-      const ja = await frageJaNein({
-        titel: a.titel,
-        text: `${a.vorab ? `${a.vorab} ` : ""}${
-          bearbeiteteVorlage
-            ? `Die Bearbeitung der Vorlage „${bearbeiteteVorlage.name}"`
-            : `${fremdeErfassung ? "Die angefangene Erfassung" : "Der angefangene Bogen"} „${einheitAnzeigename(bogen.einheit)}"`
-        } wird durch ${a.was} ersetzt. ${folgen.satz}`,
-        ok: a.ok,
-        abbruch: a.abbruch,
-        gefahr: folgen.verlust,
-        // Die sichere Wahl hat den Fokus, auch wenn der Bogen zurückholbar bleibt (R7-E4).
-        fokus: "abbruch",
-      });
-      if (!ja) return false;
+      const text = `${a.vorab ? `${a.vorab} ` : ""}${
+        bearbeiteteVorlage
+          ? `Die Bearbeitung der Vorlage „${bearbeiteteVorlage.name}"`
+          : `${fremdeErfassung ? "Die angefangene Erfassung" : "Der angefangene Bogen"} „${einheitAnzeigename(bogen.einheit)}"`
+      } wird durch ${a.was} ersetzt. ${folgen.satz}`;
+      if (folgen.verliertAlt) {
+        // R19-D8: Geht dabei ein Bogen endgültig verloren, kann er vorher als Datei gesichert werden.
+        const wahl = await frageWahl({
+          titel: a.titel,
+          text,
+          abbruch: a.abbruch,
+          fokus: "abbruch",
+          wege: [
+            { wert: "sichern", label: `${a.ok} — den alten Bogen vorher als Datei sichern` },
+            { wert: "ja", label: `${a.ok} — alten Bogen endgültig löschen`, gefahr: true },
+          ],
+        });
+        if (wahl === null) return false;
+        if (wahl === "sichern") await bogenSpeichern(folgen.verliertAlt);
+      } else {
+        const ja = await frageJaNein({
+          titel: a.titel,
+          text,
+          ok: a.ok,
+          abbruch: a.abbruch,
+          gefahr: folgen.verlust,
+          // Die sichere Wahl hat den Fokus, auch wenn der Bogen zurückholbar bleibt (R7-E4).
+          fokus: "abbruch",
+        });
+        if (!ja) return false;
+      }
     }
     merkeVerdraengt(bogen, { tausch: a.tausch });
     setVorlageInBearbeitung(null);
@@ -3058,7 +3081,7 @@ function AppInhalt() {
     const werte = await frageFelder({
       titel: "Neue Einsatz-Sammlung anlegen",
       hinweis:
-        "Die Sammelmappe des Meldekopfs für eintreffende Bögen — mit Stärke-Summen über alle anwesenden Einheiten. Der eigene Bogen entsteht unter „Meinen Bogen ausfüllen“.",
+        "Sammelmappe des Meldekopfs für eintreffende Bögen. Der eigene Bogen: „Meinen Bogen ausfüllen“.",
       ok: "Einsatz anlegen",
       felder: [
         { name: "name", label: "Name", platzhalter: "z. B. Hochwasser Weser" },
@@ -3181,7 +3204,7 @@ function AppInhalt() {
       titel: "Ort der Einheit fehlt",
       text: `Ohne Ort stünde die Einheit namenlos in der Lage. Offene Punkte (${punkte.length}): ${punkte.join(", ")}.`,
       wege: [
-        { wert: "eintragen", label: "Ort eintragen" },
+        { wert: "eintragen", label: "Ort eintragen", sicher: true },
         { wert: "trotzdem", label: "Trotzdem ablegen", gefahr: true },
       ],
     });
@@ -3218,15 +3241,15 @@ function AppInhalt() {
         : `Für „${einheitAnzeigename(b.einheit)}" stehen nur die Sollplätze nach StAN (Stärke ${s.fuehrer} / ${s.unterfuehrer} / ${s.mannschaft} / ${s.gesamt}${b.fahrzeuge.length ? `, ${b.fahrzeuge.length} Fahrzeug${b.fahrzeuge.length === 1 ? "" : "e"}` : ""}) — niemand hat Personen eingetragen.`,
       wege: [
         // Je Antwort ein Satz unter dem Knopf statt einer Liste davor (R18-S4): Wer in Sekunden entscheidet, liest die Knöpfe.
-        { wert: "eintragen", label: "Stärke jetzt eintragen", kurz: "Springt zum Personal." },
-        { wert: "soll", label: "Als Sollstärke ablegen", kurz: "Zählt nur als Sollwert, nicht als gemeldet." },
+        { wert: "eintragen", label: "Stärke jetzt eintragen", kurz: "Springt zum Personal.", sicher: true },
+        { wert: "soll", label: "Als Sollstärke ablegen", kurz: "Nur Sollwert." },
         // Zuletzt und als Wahl mit Gewicht: Sie macht erfundene Zahlen zur Meldung; danach quittiert die Sammlung mit „Rückgängig" (R16-S3).
         ...(nurZahl
           ? [
               {
                 wert: "gezaehlt",
                 label: "Zahlen stimmen, so gezählt",
-                kurz: "Die Einheit hat genau diese Zahlen gemeldet; „Rückgängig“ geht danach.",
+                kurz: "Diese Zahlen wurden gemeldet; „Rückgängig“ möglich.",
                 gefahr: true,
               },
             ]
@@ -3260,8 +3283,9 @@ function AppInhalt() {
       titel: "Stärke fehlt",
       text: `„${einheitAnzeigename(b.einheit)}" hat noch keine Stärke (0 Personen). In der Lage zählte sie als Einheit ohne Leute.`,
       wege: [
-        { wert: "eintragen", label: "Stärke eintragen", hinweis: "Springt zu „3. Personal“ — die Zahl genügt." },
-        { wert: "null", label: "Trotzdem mit Stärke 0 übernehmen", hinweis: "Die Karte trägt die Marke „Stärke fehlt“; nachtragen als Folgemeldung.", gefahr: true },
+        // R19-S15: Die Folge steht als Satz unter dem Knopf („kurz"), nicht als Liste im Text davor.
+        { wert: "eintragen", label: "Stärke eintragen", kurz: "Springt zu „3. Personal“.", sicher: true },
+        { wert: "null", label: "Trotzdem mit Stärke 0 übernehmen", kurz: "Marke „Stärke fehlt“; später nachtragen.", gefahr: true },
       ],
     });
     if (wahl === "eintragen") {
@@ -3303,7 +3327,8 @@ function AppInhalt() {
     }
     // Fahrzeuge und Sofortbedarf noch nicht bearbeitet: einmal je Erfassung nachfragen, nicht den Abschluss unter
     // dem Daumen 16 px über „Weiter →" verstecken (R15-S4).
-    if (folgeFrageFuer.current !== (erfassungBeginn ?? -1)) {
+    // R19-A6: In der Schnellerfassung (nur Stärke) entfällt die Frage: Fahrzeuge und Sofortbedarf fehlen dort gewollt.
+    if (folgeFrageFuer.current !== (erfassungBeginn ?? -1) && b.personalErfassung !== PersonalErfassung.NUR_STAERKE) {
       if (!(await (await import("./folgeschritte")).folgeschrittFrage(b, schritt))) return;
       folgeFrageFuer.current = erfassungBeginn ?? -1;
     }
@@ -3379,7 +3404,7 @@ function AppInhalt() {
         // unmöglich bezeichnet hatte (R5-E5). Bei einem Stundendreher stimmt
         // weder „Heute" noch „Gestern".
         wege: [
-          { wert: "korrigieren", label: "Zeit korrigieren", hinweis: "Das Feld „Eingetroffen um“ bleibt offen, der Wert steht zum Ändern darin." },
+          { wert: "korrigieren", label: "Zeit korrigieren", hinweis: "Springt zum Feld „Eingetroffen um“.", sicher: true },
           { wert: "heute", label: `Trotzdem heute ${zeitLang(gelesen.heute)}` },
           { wert: "gestern", label: `Gestern ${zeitLang(gelesen.gestern)}` },
         ],
@@ -3501,7 +3526,7 @@ function AppInhalt() {
         titel: "Angefangene Erfassung",
         text: `„${einheitAnzeigename(bogen.einheit) || "(noch ohne Namen)"}" ist angefangen, aber noch in keiner Sammlung.`,
         wege: [
-          { wert: "weiter", label: "Diese Erfassung fortsetzen" },
+          { wert: "weiter", label: "Diese Erfassung fortsetzen", sicher: true },
           { wert: "neu", label: "Verwerfen und neue Einheit erfassen", hinweis: folgen.satz, gefahr: folgen.verlust },
         ],
       });
@@ -3621,7 +3646,7 @@ function AppInhalt() {
 
   /** Quittung einer Tabellendatei: Name und Ablageort, damit am Telefon klar ist, welche Datei an den Stab geht (R18-A4). */
   function dateiQuittungText(name: string, s: Einsatzsammlung): string {
-    return `✓ Gespeichert: ${name} — im Download-Ordner bzw. über das Teilen-Menü abgelegt.${einsatzLeer(s) ? ` ${LEERE_DATEI_TEXT}` : ""}`;
+    return `✓ Gespeichert: ${name} — im Download-Ordner bzw. über das Teilen-Menü abgelegt.${einsatzLeer(s) ? ` ${LEERE_DATEI_TEXT}` : ""}${vermerkFehltZusatz()}`;
   }
 
   async function exportiereEinsatzCsv(s: Einsatzsammlung, umfang: ExportUmfang) {
@@ -3631,8 +3656,9 @@ function AppInhalt() {
     const marke = nachtragMarke(umfang, "csv");
     // Erst beim Klick geladen: der CSV-Schreiber gehört nicht ins Startbündel.
     const { einsatzCsvInhalt } = await import("./einsatz-csv");
+    const { entfernteNummernText } = await import("./meldungs-papierkorb"); // R19-A2: Lücke in den Nummern benennen
     const name = ausgabeDateiname(artMitMarke("einsatz", marke), einsatzDateiname(s), "csv");
-    const ok = await dateiAnbieten(name, einsatzCsvInhalt(teil, meldungsNummern(s.eintraege), undefined, s.eintraege), "text/csv;charset=utf-8");
+    const ok = await dateiAnbieten(name, einsatzCsvInhalt(teil, meldungsNummern(s.eintraege), undefined, s.eintraege, undefined, entfernteNummernText(s.id)), "text/csv;charset=utf-8");
     if (ok) {
       exportVerbuchen(s, "csv");
       setAusgabeQuittung(dateiQuittungText(name, s));
@@ -3684,6 +3710,7 @@ function AppInhalt() {
   async function sammelPdf(s: Einsatzsammlung, umfang: ExportUmfang, weitergabe = false) {
     setFehler("");
     setAusgabeQuittung(null);
+    vermerkNeuBeginnen();
     if (leererEinsatz(s, true)) return;
     const teil = exportSammlung(s, umfang, exportStaende.pdf ?? null);
     if (teil.eintraege.length === 0) {
@@ -3705,9 +3732,9 @@ function AppInhalt() {
         if (!weitergabe) exportVerbuchen(s, "pdf");
         // Die Bestätigung steht direkt unter den Knöpfen (R5-L4), nicht am Seitenende.
         setAusgabeQuittung(
-          umfang === "neue"
+          (umfang === "neue"
             ? `✓ Neue Bögen aus „${s.name}" als PDF gespeichert (Download-Ordner bzw. Teilen-Menü). Ob sie angekommen ist, weiß das Gerät nicht.`
-            : `✓ Einsatz „${s.name}" als PDF gespeichert (Download-Ordner bzw. Teilen-Menü). Ob sie angekommen ist, weiß das Gerät nicht.`,
+            : `✓ Einsatz „${s.name}" als PDF gespeichert (Download-Ordner bzw. Teilen-Menü). Ob sie angekommen ist, weiß das Gerät nicht.`) + vermerkFehltZusatz(),
         );
       } catch (e) {
         setFehler(`Einsatz weitergeben: ${fehlerText(e)}`);
@@ -3739,12 +3766,13 @@ function AppInhalt() {
     setFehler("");
     setAusgabeQuittung(null);
     const leer = einsatzLeer(s);
+    vermerkNeuBeginnen();
     await arbeiten("lageblatt", async () => {
       try {
         const { einsatzLageblattErzeugen } = await import("./pdf");
         if (await einsatzLageblattErzeugen(s)) {
           setAusgabeQuittung(
-            `✓ Lageblatt erzeugt (A4 quer) — liegt im Download-Ordner bzw. wurde über das Teilen-Menü abgelegt.${leer ? ` ${LEERE_DATEI_TEXT}` : ""}`,
+            `✓ Lageblatt erzeugt (A4 quer) — liegt im Download-Ordner bzw. wurde über das Teilen-Menü abgelegt.${leer ? ` ${LEERE_DATEI_TEXT}` : ""}${vermerkFehltZusatz()}`,
           );
         }
       } catch (e) {
@@ -3884,6 +3912,17 @@ function AppInhalt() {
    * Fehlerzeile verdrängte die Erfolgsmeldung.
    */
   async function importiereStapel(zielId: string, daten: File[], bilder: File[]) {
+    const kennung = [zielId, ...[...daten, ...bilder].map((f) => `${f.name}:${f.size}:${f.lastModified}`)].join("|");
+    if (stapelLaeuft.current === kennung) return; // R19-K10: derselbe Stapel läuft schon
+    stapelLaeuft.current = kennung;
+    try {
+      await importiereStapelAusfuehren(zielId, daten, bilder);
+    } finally {
+      stapelLaeuft.current = null;
+    }
+  }
+
+  async function importiereStapelAusfuehren(zielId: string, daten: File[], bilder: File[]) {
     setEinlese(null);
     setStapelBericht([]);
     setFehler("");
@@ -4396,6 +4435,11 @@ function AppInhalt() {
           onBilderImport={(dateien) => void importiereStapel(offenerEinsatz.id, [], dateien)}
           onEinlesen={(daten, bilder) => void importiereStapel(offenerEinsatz.id, daten, bilder)}
           abgleichAnstoss={abgleichAnstoss}
+          onKenntnisGenommen={() => {
+            // R19-N6: Die Aufnahme-Meldung ist gelesen; sie bleibt nicht bis zum nächsten Einlesen stehen.
+            setEinlese(null);
+            setStapelBericht([]);
+          }}
           abgleichKnopfImBericht={stapelBericht.includes(LAGE_ABGLEICH_KURZ)}
           einleseQuittung={
             <>
@@ -4500,12 +4544,9 @@ function AppInhalt() {
     // der Abschnitt mit seinem Hinweis an der alten Stelle.
     const einsatzAbschnitt = (
       <section className="start-vorlagen">
+        {/* R19-N10: Ohne Einsatz steht hier nichts mehr (der Satz wiederholte „Bögen sammeln" und „So funktioniert's"); die leere
+            Überschrift blendet index.html aus. */}
         <h2>Einsatz-Sammlung (Meldekopf)</h2>
-        {einsaetze.length === 0 && (
-          <p className="hinweis">
-            Fremde Bögen zu einem Einsatz/einer Übung sammeln (scannen oder manuell) — mit Stärke-Summen über alle anwesenden Einheiten.
-          </p>
-        )}
         <EinsatzListe
           einsaetze={einsaetze}
           onOeffnen={(s) => { setMeldung(""); setOffenerEinsatzId(s.id); }}
@@ -5067,8 +5108,9 @@ function AppInhalt() {
           const entfaellt = fremdeErfassung && bogen.personalErfassung === PersonalErfassung.NUR_STAERKE && (i === 1 || i === 4);
           const st = entfaellt ? undefined : status[i]; // undefined für die Übersicht (letzter Schritt)
           const klassen = [i === schritt ? "aktiv" : "", st ? `status-${st}` : ""].filter(Boolean).join(" ");
-          // „begonnen" als Wort statt „•": das Symbol verstand niemand (R2-N3, F6).
-          const glyph = entfaellt ? "–" : st === "ok" ? "✓" : st === "begonnen" ? "offen" : "";
+          // „begonnen" als Wort statt „•": das Symbol verstand niemand (R2-N3, F6). „fehlt" statt „offen" (R19-E9): „offen" hieß
+          // für manchen „nicht begonnen"; gemeint ist: hier fehlt noch etwas.
+          const glyph = entfaellt ? "–" : st === "ok" ? "✓" : st === "begonnen" ? "fehlt" : "";
           return (
             <button
               key={name}
@@ -5095,11 +5137,12 @@ function AppInhalt() {
       )}
       {/* Schnellerfassung am Telefon (R18-W7): Schrittleiste und Legende sind dort eingeklappt (CSS); eine Zeile nennt den
           Stand — vier Schritte statt sechs, ohne zwei Zeilen Kopf mehr. Am Rechner bleibt die Leiste. */}
-      {schnellOhneBedarfSchritt && (() => {
-        const folge = [0, 2, 3, UEBERSICHT];
-        const nr = folge.indexOf(schritt) + 1;
-        return nr > 0 ? <p className="schritte-schnell-kurz">Schritt {nr} von {folge.length}: {SCHRITTE[schritt]}</p> : null;
-      })()}
+      {/* R19-E2, H2, A5, N3, S3, K9: dieselben Nummern wie die Überschriften („3. Personal"); die entfallenen Schritte stehen dabei. */}
+      {schnellOhneBedarfSchritt && (
+        <p className="schritte-schnell-kurz">
+          Schritt {schritt + 1} von {SCHRITTE.length}: {SCHRITTE[schritt]}{schritt === 1 || schritt === 4 || schritt === UEBERSICHT ? "" : " · 2, 5 entfallen"}
+        </p>
+      )}
       {fenster.konflikt ? (
         <FensterKonflikt abgleich={fenster} />
       ) : speicherFehler ? (
@@ -5111,8 +5154,9 @@ function AppInhalt() {
           kurz={speicherFehlerKurz(speicherArt, fremdeErfassung, !!bogen && nurSollstaerke(bogen))}
           details={speicherFehlerDetails(speicherArt, fremdeErfassung, gespeichertUm ? uhrzeitMitTag(gespeichertUm) : null)}
         />
-      ) : gespeichertUm ? (
-        <p className="autosave" role="status" data-kurz={`✓ ${uhrzeitMitTag(gespeichertUm)}`}>
+      ) : gespeichertUm && bogenHatInhalt(bogen) ? (
+        // R19-N14: Erst nach der ersten Eingabe; ein leerer Bogen meldete schon „gespeichert".
+        <p className="autosave" role="status" data-kurz={`✓ ${uhrzeitMitTag(gespeichertUm)}`} data-zeit={uhrzeitMitTag(gespeichertUm)}>
           {/* R4-M7: „✓ automatisch gespeichert · 22:24 Uhr — bleibt auf die…" wurde auf
               360 px an genau der Stelle gekürzt, um die es geht („nur auf diesem
               Gerät"). Kürzer, und das Wichtige steht hinten, wo gekürzt wird,

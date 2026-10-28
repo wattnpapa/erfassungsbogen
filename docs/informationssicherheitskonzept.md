@@ -357,6 +357,14 @@ Grundlage: Repository `wattnpapa/erfassungsbogen`, Stand 2026-09-12 — Version 
 > und `vendor/` unverändert. Der Entwurf trägt zusätzlich die Marke „über die
 > Startseite verlassen" (`fremd.startseite`, R5-N3, 3.3 D1) — keine Daten.
 
+> **Nachgezogen 2026-10-28 (Runde 19):** Audit Runde 19. Speicher (3.3, 5.5): kein neuer
+> Schlüssel. Verfügbarkeit (5.5): Löschen, Entfernen, Beenden und Übergabe-Vermerk
+> prüfen das Ergebnis des Schreibens; bei vollem Speicher erscheint ein Dialog mit
+> Ausweg statt einer unwahren Quittung (Risiko „Datenverlust durch volle
+> Ablage", zuvor P1). Bedienung (5.3): Quittungsleiste gekürzt, Tipp-Sperre mit
+> Rückmeldung. Lieferkette (6.4): Startbündel 1,23 MB; Verkleinerung durch
+> Nachladen vorgemerkt. Keine neuen Hosts, CSP und Transportformat unverändert.
+
 > **Nachgezogen 2026-10-28 (Runde 18):** Audit Runde 18. Speicher (3.3, 5.5): neuer
 > Schlüssel `eeb.abschluss.v1` (localStorage, Übergabe- und Abschlussvermerk; über die
 > Präfixregel `eeb.` in Sicherung und Löschweg enthalten). Bedienung (5.3): sichere

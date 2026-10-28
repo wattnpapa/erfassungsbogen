@@ -53,6 +53,8 @@ export function SchrittEinsatz({ bogen, aendern, meldekopf = false }: SchrittPro
       setEz({ [feld]: undefined });
     }
   };
+  const hinweisePunkte = pruefpunkte(bogen, false, heuteDatum());
+  const zuFeldern = (p: { text: string }) => /^(Einsatzzeitraum|Ort\/Auftrag)/.test(p.text);
   return (
     <section className="karte">
       <h2>2. Einsatz</h2>
@@ -62,19 +64,25 @@ export function SchrittEinsatz({ bogen, aendern, meldekopf = false }: SchrittPro
           deshalb mit dem Tag des Beginns vorbelegt. Vorher hieß es hier, das
           Feld dürfe offen bleiben — und stand doch mit dem heutigen Datum da. Und der Rat „später
           nachtragen“ stand im Widerspruch zur Marke „Zeitraum vorbei“ am Folgetag (R5-N2). */}
+      {/* R19-M6: Der erste Satz steht da, der Rest hinter „Mehr dazu" — das erste Feld liegt bei 320 × 568 in „Feld" nicht unter dem Falz. */}
       {meldekopf ? (
-        <p className="hinweis">
-          Aufnahme am Meldekopf: Hier steht, wofür die Einheit laut Zettel gemeldet ist — Einsatz oder Übung. Die
-          Eintreffzeit der Einheit gehört in Schritt 1 („Eingetroffen um“) und steht nur dort. „Zeitraum bis“ ist mit
-          dem Tag des Beginns vorbelegt; steht das Ende nicht auf dem Zettel, den Vorschlag stehen lassen.
-        </p>
+        <div className="hinweis">
+          Aufnahme am Meldekopf: Hier steht, wofür die Einheit laut Zettel gemeldet ist — Einsatz oder Übung.
+          <details className="hinweis-mehr">
+            <summary>Mehr dazu</summary>
+            Die Eintreffzeit der Einheit gehört in Schritt 1 („Eingetroffen um“) und steht nur dort. „Zeitraum bis“ ist mit
+            dem Tag des Beginns vorbelegt; steht das Ende nicht auf dem Zettel, den Vorschlag stehen lassen.
+          </details>
+        </div>
       ) : (
-        <p className="hinweis">
-          Wofür deine Einheit gemeldet wird — Einsatz oder Übung. „Zeitraum bis" ist mit dem Tag des
-          Beginns vorbelegt; steht das Ende noch nicht fest, den Vorschlag stehen lassen. Läuft der Einsatz
-          länger, das Ende nachtragen — sonst steht die Einheit am Folgetag beim Meldekopf als „Zeitraum
-          vorbei“.
-        </p>
+        <div className="hinweis">
+          Wofür deine Einheit gemeldet wird — Einsatz oder Übung.
+          <details className="hinweis-mehr">
+            <summary>Mehr dazu</summary>
+            „Zeitraum bis" ist mit dem Tag des Beginns vorbelegt; steht das Ende noch nicht fest, den Vorschlag stehen lassen. Läuft der
+            Einsatz länger, das Ende nachtragen — sonst steht die Einheit am Folgetag beim Meldekopf als „Zeitraum vorbei“.
+          </details>
+        </div>
       )}
       {/* Klasse „datum" statt „schmal": In 112 px stand vom Datum nur Tag und
           Monat, das Jahr war abgeschnitten — ein Vorjahresbogen fiel nicht auf.
@@ -96,6 +104,8 @@ export function SchrittEinsatz({ bogen, aendern, meldekopf = false }: SchrittPro
           <input id="feld-ort-auftrag" value={ez.ortAuftrag} onChange={(e) => setEz({ ortAuftrag: e.target.value })} placeholder="z. B. Fernmeldebauübung Kabelblitz" {...NAMEN_EINGABE} />
         </Feld>
       </div>
+      {/* R19-E4: Rückfragen zu Zeitraum und Ort stehen direkt unter diesen Feldern, die zu Beginn und Ende weiter unten. */}
+      <Hinweise punkte={hinweisePunkte.filter(zuFeldern)} aktuellerSchritt={1} />
       {/* Die Kästchen setzen einen Zeitstempel — das stand nirgends. Ein
           Kästchen „Einsatzende" las sich als Frage, ob der Einsatz ein Ende
           hat, und ein versehentlicher Haken schickte mit dem QR-Code einen
@@ -147,7 +157,7 @@ export function SchrittEinsatz({ bogen, aendern, meldekopf = false }: SchrittPro
       {/* Schritt-Index 1 = Einsatz (siehe SCHRITTE in app.tsx): „bis vor von"
           und „Ende vor Beginn" erschienen vorher auf Schritt 1, 3 und in der
           Übersicht — überall, nur nicht dort, wo der Fehler gemacht wird. */}
-      <Hinweise punkte={pruefpunkte(bogen, false, heuteDatum())} aktuellerSchritt={1} />
+      <Hinweise punkte={hinweisePunkte.filter((p) => !zuFeldern(p))} aktuellerSchritt={1} />
       {/* Übung als Eigenschaft des BOGENS, nicht der App: die Kennzeichnung
           reist im QR mit und erscheint auch auf dem empfangenden Gerät —
           ein Geräte-Modus könnte das nicht leisten. Nicht gesetzt = Feld

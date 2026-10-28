@@ -12,8 +12,10 @@ import { staerke } from "@bos/eeb-format/model";
 import { zeitpunktDeutsch } from "./hilfen";
 import { MELDUNGEN_PAPIERKORB_TAGE, meldungAusPapierkorb, meldungenImPapierkorb, papierkorbFristEnde, type PapierkorbMeldung } from "./meldungs-papierkorb";
 
-export default function EntferntMeldungenBlock({ einsatzId, geaendert, onHolen }: {
+export default function EntferntMeldungenBlock({ einsatzId, geaendert, onHolen, nummerHier }: {
   einsatzId: string;
+  /** Die Nummer, unter der die Einheit inzwischen wieder in der Sammlung steht (neu eingelesen), sonst nichts (R19-D3). */
+  nummerHier?: (einheitSchluessel: string) => number | undefined;
   /** Ändert sich, wenn die Sammlung sich bewegt hat (Zurückholen, Entfernen): Der Block liest den Papierkorb neu. */
   geaendert: number;
   /** Zurücklegen in die Sammlung — die Einsatzansicht hat Speicherschutz, Quittung und Stapel. */
@@ -50,6 +52,12 @@ export default function EntferntMeldungenBlock({ einsatzId, geaendert, onHolen }
               <strong>„{m.name}"</strong>
               {m.bezug ? ` (${m.bezug})` : ""} · entfernt {zeitLang(m.entferntAm)} · liegt bis {zeitLang(papierkorbFristEnde(m))}
             </span>
+            {/* R19-D3: Wurde dieselbe Meldung inzwischen neu eingelesen, steht hier ihre neue Nummer. */}
+            {m.art === "einheit" && nummerHier?.(m.eintraege[0]!.einheitSchluessel) != null && (
+              <span className="papierkorb-schon-da hinweis">
+                Schon wieder eingelesen als Nr. {nummerHier(m.eintraege[0]!.einheitSchluessel)} — „Zurückholen" bringt sie nicht unter Nr. {m.nummer ?? "?"} zurück.
+              </span>
+            )}
             {/* Je Fassung Stand, Stärke, Zug und Auftrag: Bei mehreren Meldungen derselben Einheit sieht man, welche man holt (R18-K11). */}
             <ul className="papierkorb-fassungen">
               {fassungsZeilen(m).map((z) => (

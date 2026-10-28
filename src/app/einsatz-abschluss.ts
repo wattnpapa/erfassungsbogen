@@ -72,3 +72,30 @@ export function abschlussUebergabeText(a: Abschluss, zeit: (ms: number) => strin
 export function abschlussOffen(getan: readonly { name: string; getan: boolean }[]): string[] {
   return getan.filter((x) => !x.getan).map((x) => x.name);
 }
+
+// ---------------------------------------------------------------- R19: Stand der Lage gegen den Vermerk
+
+/** Wie viele Einheiten seit `zeit` (Date.now()) eine neue Meldung brachten (R19-D1, R19-W1). */
+export function meldungenSeit(eintraege: readonly { empfangenAm: number; einheitSchluessel: string }[], zeit: number): number {
+  return new Set(eintraege.filter((e) => e.empfangenAm > zeit).map((e) => e.einheitSchluessel)).size;
+}
+
+/** „1 neue Meldung" / „3 neue Meldungen"; leer bei 0. */
+export function neueMeldungenText(n: number): string {
+  return n <= 0 ? "" : n === 1 ? "1 neue Meldung" : `${n} neue Meldungen`;
+}
+
+/**
+ * Kurzer Stand für die Karte auf der Startseite: „beendet 04:10 · übergeben an Stab Rottenburg" (R19-A11, K7, L5).
+ * Leer, wenn weder beendet noch übergeben. Kamen nach dem Vermerk Meldungen, steht es dabei („nicht mehr aktuell").
+ */
+export function abschlussKarteText(a: Abschluss, zeit: (ms: number) => string, eintraege: readonly { empfangenAm: number; einheitSchluessel: string }[] = []): string {
+  const teile: string[] = [];
+  const alt = (t: number) => {
+    const n = meldungenSeit(eintraege, t);
+    return n > 0 ? ` — nicht mehr aktuell, seitdem ${neueMeldungenText(n)}` : "";
+  };
+  if (a.beendetAm != null) teile.push(`beendet ${zeit(a.beendetAm)}${alt(a.beendetAm)}`);
+  if (a.uebergabeAm != null) teile.push(`übergeben ${zeit(a.uebergabeAm)}${a.uebergabeAn ? ` an ${a.uebergabeAn}` : " (ohne Empfänger)"}${a.beendetAm == null ? alt(a.uebergabeAm) : ""}`);
+  return teile.join(" · ");
+}

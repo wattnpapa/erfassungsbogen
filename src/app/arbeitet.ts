@@ -147,7 +147,7 @@ export async function arbeiten<T>(was: string, aktion: () => Promise<T>): Promis
   if (aktuell !== null) return { lief: false };
   aktuell = was;
   fortschritt = null;
-  lauf = { von: zeitJetzt(), bis: Infinity };
+  lauf = { von: zeitJetzt(), bis: Infinity, was };
   if (typeof window !== "undefined") window.addEventListener("beforeunload", vorSchliessen);
   melden();
   try {
@@ -167,7 +167,7 @@ function zeitJetzt(): number {
   return typeof performance !== "undefined" ? performance.now() : Date.now();
 }
 
-let lauf: { von: number; bis: number } | null = null;
+let lauf: { von: number; bis: number; was: string } | null = null;
 
 /**
  * Wurde der Tipp mit der Ereigniszeit `zeit` (`event.timeStamp`) während des letzten oder des laufenden Laufs
@@ -175,8 +175,10 @@ let lauf: { von: number; bis: number } | null = null;
  * erfolgte, wird erst danach bearbeitet — und fände dann Sperre und Zeitfenster längst abgelaufen. Die Ereigniszeit
  * verrät, dass er zu früh kam (R13-G1).
  */
-export function tippWaehrendLauf(zeit: number): boolean {
+export function tippWaehrendLauf(zeit: number, was?: string): boolean {
   if (!lauf || !Number.isFinite(zeit)) return false;
+  // R19-K4/N2: Ein Tipp auf eine ANDERE Ausgabe (CSV nach Lageblatt) ist kein Doppeltipp und wird nicht verschluckt.
+  if (was !== undefined && lauf.was !== was) return false;
   return zeit >= lauf.von && zeit <= lauf.bis + NACHLAUF_MS;
 }
 

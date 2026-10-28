@@ -743,6 +743,15 @@ function bedarfZelle(b: Erfassungsbogen): TableCell {
 export const EINGELESEN_STERN = " *";
 export const EINGELESEN_FUSSNOTE = `* ${EINTREFF_HINWEIS}`;
 
+/**
+ * Zeile über die Lücke in den Nummern („Nr. 2 entfernt 04:21 — nicht in der Summe", R19-A2). Die Ausgabe setzt sie vor dem
+ * Bauen des Dokuments (pdf.ts) und leert sie danach; ohne Entfernen bleibt sie leer und ändert nichts am Blatt.
+ */
+let lueckenZeile = "";
+export function lueckenZeileSetzen(text: string): void {
+  lueckenZeile = text;
+}
+
 /** So viele Zeichen der Bemerkung stehen auf dem Lageblatt, der Rest in der Sammel-PDF. */
 const BEMERKUNG_LAGEBLATT = 70;
 
@@ -1570,7 +1579,8 @@ export function einsatzPdfDokument(
       ? `NACHTRAG ${nachtrag}: nur die neuen oder geänderten Einheiten — nicht die ganze Lage. Die ganze Lage steht in „Einsatz weitergeben / sichern“. `
       : "") +
       "Die Änderungsspalte vergleicht jede Meldung mit der vorherigen Meldung derselben Einheit. Die vollständigen Bögen folgen." +
-      (boegenMitQr.some((e) => e.zeitEingelesen) ? ` ${EINGELESEN_FUSSNOTE}` : ""),
+      (boegenMitQr.some((e) => e.zeitEingelesen) ? ` ${EINGELESEN_FUSSNOTE}` : "") +
+      (lueckenZeile ? ` ${lueckenZeile}` : ""),
     undefined,
     false,
     undefined,
@@ -1753,6 +1763,7 @@ export function einsatzLageblattDokument(
         ? "Noch keine Einheit gemeldet."
         : "Summen und Bedarf zählen nur die anwesenden Einheiten dieser Lage; abgerückte stehen im eigenen Block. Nach Nr. geordnet. Alle Änderungen im Einzelnen: Sammel-PDF." +
           (eintraege.some((e) => e.zeitEingelesen) ? ` ${EINGELESEN_FUSSNOTE}` : "") +
+          (lueckenZeile ? ` ${lueckenZeile}` : "") +
           " Rückrufnummer: (D) dienstlich, (P) privat." +
           (rueckseite ? " Nachträge von Hand: Seite 2." : ""),
       LAGEBLATT_MAX_ZEILEN,

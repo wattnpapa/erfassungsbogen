@@ -6427,6 +6427,304 @@
       html.feld-modus dialog .dialog-entscheidung { position: static; box-shadow: none; }
     }
     /* ===== Ende Runde 18 (Layout) ===== */
+    /* ===== Runde 19 (Fußleiste und Quittung) ===== */
+    /* R19-K1, M1, O5, G1, H1, A4, W2, S1: „In Einsatz übernehmen" steht am Telefon immer ganz im Knopf. Der Knopf bricht in zwei Zeilen
+       um („In Einsatz" / „übernehmen"), seine Spalte schrumpft nie unter das längste Wort, und „← Zurück" wird auf schmaler Leiste zum
+       Pfeil (Name bleibt aria-label), damit die Leiste einzeilig bleibt und der Abschluss „Zurück" nie überlagert. */
+    @media (min-width: 17rem) and (max-width: 35.99rem) and (not ((orientation: landscape) and (max-height: 31.25rem))) {
+      :root:root:root footer.nav.assistent-nav.mit-uebernehmen { grid-template-columns: auto minmax(min-content, 1fr) auto; }
+      :root:root:root footer.nav.assistent-nav.mit-uebernehmen > .uebernehmen {
+        display: block; white-space: normal; overflow: visible; overflow-wrap: normal; text-align: center; line-height: 1.15; padding-block: 2px; min-width: min-content;
+      }
+      :root:root:root footer.nav.assistent-nav.mit-uebernehmen > .nav-weiter { min-width: calc(44px + var(--ziel)); }
+      :root:root:root footer.nav.assistent-nav.mit-uebernehmen .nav-einsatz { display: inline; }
+      :root:root:root footer.nav.assistent-nav.mit-uebernehmen .nav-ue { display: inline; }
+      :root:root:root footer.nav.assistent-nav.mit-uebernehmen .nav-ue::first-letter { text-transform: none; }
+    }
+    @container assistent-nav (max-width: 22rem) {
+      :root:root footer.nav.assistent-nav.mit-uebernehmen > .nav-zurueck .nav-wort { display: none; }
+    }
+    @container assistent-nav (max-width: 18.5rem) {
+      :root:root footer.nav.assistent-nav.mit-uebernehmen > .nav-weiter[aria-label^="Zur"] .nav-weiter-wort { display: none; }
+    }
+    /* R19-A3, E5, H6, K5, M4, N12, O6, S4, G4, D4, L6, W12, K12: Die Quittungsleiste ist kompakt: Kurztext (eine bis zwei Zeilen) neben
+       „Rückgängig" und „✕", am Telefon bündig am unteren Rand und nie über 12 % der Bildhöhe; „Details" klappt den vollen Text auf. Nach
+       QUITTUNG_ENDE_NACH_MS (9 s) verschwindet sie (daumen-quittung.tsx), dann liegt nichts mehr über den Knöpfen der Liste.
+       R19-D5: Zwischen „Rückgängig" und „✕" liegen 24 px. */
+    :root:root .quittung-daumen > .quittung-knoepfe { gap: 24px; }
+    :root:root .quittung-daumen:not(.quittung-offen) { flex-wrap: nowrap; max-height: none; overflow: visible; padding: 6px 6px 6px 10px; gap: 8px; }
+    :root:root .quittung-daumen:not(.quittung-offen) > .quittung-text { flex: 1 1 0; min-width: 0; font-size: min(var(--t-s), 15px); line-height: 1.2; }
+    :root:root .quittung-daumen:not(.quittung-offen) > .quittung-knoepfe { margin-left: 0; }
+    :root:root .quittung-daumen button.quittung-details {
+      display: inline; min-height: 0; min-width: 0; padding: 14px 10px; margin: -14px -4px; border: 0; background: none; color: inherit;
+      font: inherit; font-weight: 700; text-decoration: underline; text-underline-offset: 3px;
+    }
+    @media (max-width: 35.99rem) {
+      :root:root:root:root .quittung-daumen {
+        left: 0; right: 0; max-width: none; bottom: 0; border-radius: 0; border-inline: 0; border-bottom: 0;
+        padding-bottom: calc(6px + env(safe-area-inset-bottom)); box-shadow: 0 -4px 14px rgba(0, 0, 0, 0.3);
+      }
+    }
+    @media (max-width: 35.99rem) and (max-height: 37.5rem) {
+      :root:root:root:root .quittung-daumen:not(.quittung-offen) { padding-block: 2px calc(2px + env(safe-area-inset-bottom)); border-top-width: 3px; }
+    }
+    /* R19-E1, N2, K4, W11, S5, L3: Ein verworfener Tipp auf einen breiten Knopf zeigt „Einen Moment …" auf dem Knopf selbst
+       (tipp-schutz.ts setzt data-tipp-gesperrt="text"): deckender Grund in Textfarbe/Fläche, also derselbe Kontrast wie der Seitentext
+       (mind. 7 : 1), und keine Pille, die die Beschriftung des Nachbarn überdeckt. Antworten in der Wartezeit einer Rückfrage sind nicht
+       mehr auf 55 % gedämpft (Kontrast ~3 : 1): voller Kontrast, gestrichelter Rand und ein Streifen am Knopfboden, der in der
+       Sperrzeit (--wartet-ms) läuft. Sichere Antworten (data-sicher) bekommen weder Streifen noch Sperre. */
+    :where(button[data-tipp-gesperrt="text"]) { position: relative; }
+    button[data-tipp-gesperrt="text"]::after {
+      content: attr(data-tipp-text); position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+      border-radius: inherit; background: var(--text); color: var(--flaeche); font: inherit; font-weight: 700; white-space: nowrap;
+    }
+    dialog.abfrage button.wartet { opacity: 1; border-style: dashed; position: relative; overflow: hidden; }
+    dialog.abfrage button.wartet::before {
+      content: ""; position: absolute; left: 0; bottom: 0; width: 100%; height: 5px; background: currentColor;
+      transform: scaleX(0); transform-origin: left; animation: wartet-lauf var(--wartet-ms, 650ms) linear forwards;
+    }
+    @keyframes wartet-lauf { to { transform: scaleX(1); } }
+    @media (prefers-reduced-motion: reduce) { dialog.abfrage button.wartet::before { animation: none; transform: scaleX(1); } }
+    /* R19-L2, M5, G9, S10: Scanner ohne Kamera: Kürzere Sätze und engere Abstände, damit die Anleitung samt Rahmen, „Bereit — warte auf den
+       Handscanner" und „Hinweise zum Handscanner" ohne inneres Rollen zwischen Meldung und Knopfleiste stehen (360 × 640 in allen Ansichten,
+       320 × 568 in „Feld"); die Knopfleiste bleibt dort einzeilig. Quer steht der Weg am Telefon über dem Handscanner-Weg, einspaltig. */
+    .scanner-handscanner { padding: 0.6rem 0.9rem; gap: 0.35rem; }
+    .scanner-handscanner .handscanner-titel { font-size: var(--t-m); line-height: 1.25; }
+    .scanner-handscanner .scanner-bildweg { gap: 0; }
+    .scanner-handscanner .scanner-schritte { font-size: var(--t-s); line-height: 1.25; margin: 0; padding-left: 1.4em; text-align: left; }
+    .scanner-handscanner .handscanner-lampe { padding: 0.2rem 0.5rem; }
+    @media (max-width: 22.5rem) {
+      .scanner > .scanner-aktionen > button, .scanner > .scanner-aktionen > .datei-knopf { padding-inline: 6px; }
+    }
+    @media (max-height: 40rem) {
+      .scanner-handscanner .scanner-schritte { list-style: none; padding-left: 0; }
+      .scanner-handscanner .scanner-schritte li:first-child { display: none; }
+    }
+    @media (max-height: 37.5rem) { .scanner-handscanner { padding-block: 0.4rem; } }
+    @media (orientation: landscape) and (max-height: 30rem) {
+      .scanner-handscanner { grid-template-areas: "bild bild" "titel titel" "schritte lampe" "hinweise lampe"; }
+      .scanner-handscanner > .scanner-bildweg { grid-area: bild; }
+      .scanner-text.fehler { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 0 12px; padding: 0 12px; }
+      .scanner-text.fehler > p { margin: 0; }
+      .scanner-text.fehler > button.scanner-erneut { padding-inline: 10px; }
+    }
+    /* R19-L4: Ansicht „Dunkel": Der Rand von „Ort eintragen…" auf dem blauen Kopfband hatte 2,82 : 1; jetzt über 5 : 1 zum Band und
+       über 7 : 1 zur Knopffläche (Nicht-Text-Kontrast mind. 3 : 1). */
+    .dunkel-modus .seiten-kopf .titelzeile .kopf-aendern { border-color: #9aa6c2; }
+    /* R19-E9: Die Statusmarke im Schrittband („fehlt") ist am Telefon mindestens 12 px groß (vorher 0,7 em = 9,8 px). */
+    @media (min-width: 16.01rem) {
+      :root:root .seiten-kopf.assistent-kopf .schritte button.status-begonnen .schritt-status { font-size: max(0.7em, 12px); }
+    }
+    /* ===== Ende Runde 19 (Fußleiste und Quittung) ===== */
+    /* ===== Runde 19 (Speicher) ===== */
+    /* R19-O7: In der Schnellerfassung steht der Kasten „Angaben vom Zettel" hinter dem Schritt, nicht davor: Das erste Feld liegt bei
+       360 × 640 unter y = 250 (vorher 370). Die Felder des Zettels bleiben unverändert und stehen am Ende des Schritts. */
+    .schritt-inhalt:has(> .nacherfassung-zeit) { display: flex; flex-direction: column; }
+    .schritt-inhalt:has(> .nacherfassung-zeit) > .nacherfassung-zeit { order: 2; }
+    /* R19-O8: Zwischen Bedienelementen mit verschiedenem Ziel mindestens 8 px (Karten | Tabelle, Fußzeilenlisten). */
+    .ansicht-umschalter { gap: 8px !important; }
+    .fuss-gruppe { gap: 8px; }
+    .fuss-schmal nav { row-gap: 8px; }
+    footer.seite .fuss-werkzeuge { row-gap: 8px; }
+    /* R19-O9: Die aufgeklappte Karte ist bei 320 × 568 (auch in „Feld") höchstens 1,2 Bildschirmhöhen hoch: kurze Marke „neu", Bedarfsmarken
+       in einer Reihe, der Knopf „ändern" vergrößert die Zeile nicht, die Bemerkung steht gekürzt (bemerkungKurz() in einsaetze-ui.tsx). */
+    @media (max-width: 22.5rem) {
+      .einheit-zeile.karte-offen .neu-badge .neu-lang { display: none; }
+      .einheit-zeile.karte-offen .neu-badge .neu-kurz { display: inline; }
+      .einheit-zeile.karte-offen .muster-sub.zeiten-zeile button.zeit-aendern,
+      .einheit-zeile.karte-offen .muster-sub.bemerkung button.zeit-aendern { margin-block: -10px; }
+      .einheit-zeile.karte-offen .muster-sub.bedarf-zeile { flex-direction: row; flex-wrap: wrap; gap: 4px 6px; }
+      .einheit-zeile.karte-offen .bedarf-marke { font-size: min(var(--t-s), 14px); padding-block: 1px; }
+      .einheit-zeile.karte-offen .muster-sub { line-height: 1.3; }
+      .einheit-zeile.karte-offen .vorlage-aktionen { gap: 8px; margin-top: 4px; }
+      .einheit-zeile.karte-offen .muster-sub:has(> button.luecken-marke) { margin-block: -6px 0; }
+      /* In „Feld" (große Schrift) sind die Nebenzeilen der Karte 15 px: gemessen 673 statt 907 px (1,19 Bildschirmhöhen). */
+      .feld-modus .einheit-zeile.karte-offen .muster-sub { font-size: min(var(--t-s), 15px); line-height: 1.25; }
+    }
+    /* R19-O10: „Stärke ändern…" füllt bei 320 × 568 nicht mehr 94 % des Bildes: Führer, Unterführer und Mannschaft stehen nebeneinander
+       (jedes Zahlenfeld ist mit Handschuh weiter treffbar als die Zeile hoch war), der Erklärtext ist kleiner. */
+    @media (max-width: 22.5rem) {
+      dialog.abfrage .abfrage-rumpf:has(input[inputmode="numeric"]) { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); column-gap: 8px; align-content: start; }
+      dialog.abfrage .abfrage-rumpf:has(input[inputmode="numeric"]) > :not(label.feld) { grid-column: 1 / -1; }
+      dialog.abfrage .abfrage-rumpf:has(input[inputmode="numeric"]) > label.feld { font-size: min(var(--t-s), 14px); hyphens: auto; overflow-wrap: anywhere; min-width: 0; }
+      dialog.abfrage .abfrage-rumpf > p.hinweis, dialog.abfrage .abfrage-rumpf > p.hinweis p { font-size: min(var(--t-s), 15px); line-height: 1.3; }
+      dialog.abfrage .abfrage-rumpf > p.hinweis p { margin: 0; }
+    }
+    /* ===== Ende Runde 19 (Speicher) ===== */
+    /* ===== Runde 19 (Schnellerfassung und Karte) ===== */
+    /* R19-E3, S2, O7, G11, M7, N3, N4, A5, A6, K9, H2, H3, W5: Schnellerfassung am Telefon. Der Kopf steht in drei Zeilen (Rücksprung und
+       Ansicht, Marke mit „✓ 09:27", „Schritt 1 von 6 …"); der Ort der Einheit ist das erste Feld und liegt bei 360 × 640 über y = 200. */
+    details.schnell-mehr > summary {
+      cursor: pointer; display: flex; align-items: center; margin-top: var(--r-2);
+      min-height: calc(var(--ziel-basis) + var(--ziel)); font-size: var(--t-s); font-weight: 600; color: var(--text-2); list-style: none;
+    }
+    details.schnell-mehr > summary::-webkit-details-marker { display: none; }
+    details.schnell-mehr > summary::before { content: "▸"; margin-right: var(--r-2); flex: none; }
+    details.schnell-mehr[open] > summary::before { content: "▾"; }
+    @media (max-width: 30rem) {
+      :root:root .seiten-kopf.assistent-kopf:has(.schritte-schnell-kurz) .titelzeile { order: 1; flex: 0 0 auto; margin: 0; padding: 0 0 4px; }
+      :root:root .seiten-kopf.assistent-kopf:has(.schritte-schnell-kurz) .titelzeile .modus-marke { padding-block: 0; }
+      :root:root .seiten-kopf.assistent-kopf:has(.schritte-schnell-kurz) .autosave[data-kurz]:not(.speicher-fehler):not(.fest-warnung) {
+        order: 2; flex: 1 1 0; min-width: 0; display: block; white-space: nowrap; font-size: 0; line-height: 1.2; padding: 0 0 4px;
+      }
+      :root:root .seiten-kopf.assistent-kopf:has(.schritte-schnell-kurz) .autosave[data-kurz]:not(.speicher-fehler):not(.fest-warnung)::after {
+        content: attr(data-kurz); font-size: min(var(--t-xs), 14px);
+      }
+      :root:root .seiten-kopf.assistent-kopf:has(.schritte-schnell-kurz) .schritte-schnell-kurz { order: 3; padding: 0 0 4px; }
+      main:has(> .schritt-inhalt > .schnell-einheit) { padding-top: 8px; }
+      .karte.schnell-einheit { padding-top: 8px; }
+      .schnell-einheit > h2 { font-size: var(--t-l); margin: 0 0 4px; }
+    }
+    /* R19-W3, E13, H10, S14, A10, N10: Startseite am Telefon. „Meinen Bogen ausfüllen" und „Bögen sammeln" stehen als zwei Spalten
+       nebeneinander (die Erklärsätze entfallen, „So funktioniert's" erklärt es): „Neuen Bogen erstellen" und „Neue Einsatz-Sammlung…"
+       liegen bei 360 × 640 im ersten Bild. Mit Einsatz steht dessen Karte kompakt darüber, die Offline-Zeile unter den beiden Wegen. */
+    @media (max-width: 30rem) {
+      :root:root .weiche { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; align-items: start; }
+      :root:root .weiche > .weiche-weg { padding: 8px 6px; min-width: 0; }
+      :root:root .weiche > .weiche-weg > h2 { font-size: var(--t-m); margin-bottom: 0; }
+      :root:root .weiche > .weiche-weg > .hinweis { display: none; }
+      :root:root .weiche > .weiche-weg > .aktionen { padding-top: 6px; gap: 8px; margin-top: 0; }
+      :root:root .weiche > .weiche-weg > .aktionen > button, :root:root .weiche > .weiche-weg > .aktionen > .datei-knopf { padding-inline: 4px; font-size: 14px; line-height: 1.2; }
+      main.start { display: flex; flex-direction: column; }
+      main.start > .weiche { order: 1; }
+      main.start > .offline-platz { order: 2; }
+      main.start > .weiche ~ * { order: 3; }
+      main.start > section.start-vorlagen { margin-top: 12px; }
+      main.start > section.start-vorlagen > section.karte { padding: 8px 12px; }
+      main.start > section.start-vorlagen > section.karte > p, main.start > section.start-vorlagen > section.karte > .vorlage-aktionen { margin-block: 2px; font-size: var(--t-xs); line-height: 1.25; }
+    }
+    main.start > section.start-vorlagen:has(> h2:only-child) { display: none; }
+    /* R19-W9, G10, H9, M14, N8, S6, D11: Tabelle am Telefon. Der Name bricht um statt mit „…" zu enden (Nummer und Name stehen im Knopf,
+       der immer mindestens 44 px hoch ist); die Spalte „Auftrag" steht nur mit Inhalt (sonst „Bedarf"); die Namensspalte ist breiter. */
+    :root:root table.einheiten-tabelle.tabelle-kern tbody th .tabelle-name { display: inline; overflow: visible; -webkit-line-clamp: unset; line-clamp: unset; }
+    :root:root table.einheiten-tabelle.tabelle-kern > * > tr > :first-child { width: 44%; }
+    :root:root table.einheiten-tabelle.tabelle-kern:has(th[data-spalte="zugEtikett"]) > * > tr > :first-child { width: 38%; }
+    :root:root table.einheiten-tabelle.tabelle-kern th[data-spalte="gesamt"] { width: 11%; }
+    :root:root table.einheiten-tabelle.tabelle-kern th[data-spalte="eingetroffen"] { width: 20%; }
+    :root:root table.einheiten-tabelle.tabelle-kern th[data-spalte="zugEtikett"] { width: 13%; }
+    table.einheiten-tabelle button.tabelle-oeffnen { display: block; width: 100%; min-height: 44px; padding: 0; text-align: left; white-space: normal; }
+    /* R19-A9, W6, E7, H4, M3, O9, G12, S7, G2, M2, W8, D10, N5: Aufgeklappte Karte am Telefon. Die Aktionen stehen in zwei gleich breiten Spalten
+       (vollständige Beschriftung, 10 px Abstand); „Mehr…" öffnet ein Blatt am unteren Bildrand, die Karte selbst wird dadurch nicht länger
+       (in „Feld" bei 320 × 568 höchstens rund 1,2 Bildschirme). „Entfernen" steht allein in der letzten Zeile, mindestens 24 px von den Nachbarn.
+       Läuft Aufteilen oder Zusammenführen, steht die Reihe wieder in der Karte. Ränder von Seite, Liste und Karte sind schmaler. */
+    .mehr-zu { display: none; }
+    .ort-warum { display: inline; }
+    .ort-warum > summary { display: inline; cursor: pointer; text-decoration: underline; font-weight: 600; }
+    .ort-warum[open] { display: block; }
+    @media (max-width: 30rem) {
+      :root:root main.einsatz-detail { padding-inline: 10px; }
+      :root:root main.einsatz-detail section.einsatz-liste { padding-inline: 8px; }
+      :root:root .einheit-zeile { padding-inline: 8px; }
+      :root:root .einheit-zeile .vorlage-aktionen { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+      :root:root .einheit-zeile .vorlage-aktionen > button { padding-inline: 3px; }
+      :root:root .muster-sub button.ort-knopf { margin: 4px 0; }
+      :root:root .einheit-zeile.karte-offen .vorlage-aktionen.karte-mehr {
+        position: fixed; left: 0; right: 0; bottom: 0; z-index: 80; margin: 0; padding: 12px 12px calc(12px + env(safe-area-inset-bottom));
+        background: var(--flaeche); border: 0; border-top: 4px solid var(--text); box-shadow: 0 -6px 18px rgba(0, 0, 0, 0.35);
+        max-height: 75dvh; overflow-y: auto; overscroll-behavior: contain;
+      }
+      :root:root .einheit-zeile.karte-offen.mehr-panel .vorlage-aktionen.karte-mehr { position: static; box-shadow: none; max-height: none; padding: 8px 0 0; border-top: 1px dashed var(--linie); }
+      :root:root .einheit-zeile .karte-mehr > .entfernen { grid-column: 1 / -1; margin-top: 16px; }
+      :root:root .einheit-zeile .karte-mehr > .mehr-zu { display: inline-flex; grid-column: 1 / -1; order: 99; }
+    }
+    @media (max-width: 22.5rem) {
+      :root:root .einheit-zeile.karte-offen .vorlage-aktionen > button { font-size: 16px; min-height: 48px; }
+      :root:root .einheit-zeile.karte-offen .muster-sub { line-height: 1.2; }
+    }
+    html.feld-modus main.einsatz-detail input[type="checkbox"] { width: 44px; height: 44px; }
+    /* R19-W4, K6: Nach dem Einlesen liegt die erste Karte am Telefon innerhalb von zwei Bildschirmen: „Neu seit der letzten Kenntnisnahme" ist ein
+       Aufklapper (Zusammenfassung ab 44 px), Bedarfszeile und Sprungverweise rücken zusammen. */
+    details.stapel-eingang > summary { display: flex; align-items: center; min-height: 44px; cursor: pointer; list-style: none; }
+    details.stapel-eingang > summary::-webkit-details-marker { display: none; }
+    details.stapel-eingang > summary::before { content: "▸"; margin-right: 8px; flex: none; }
+    details.stapel-eingang[open] > summary::before { content: "▾"; }
+    details.stapel-eingang > summary > strong { margin-right: 4px; }
+    @media (max-width: 30rem) {
+      details.stapel-eingang > p + button.link { display: none; }
+      main.einsatz-detail details.bedarf-block > summary { font-size: var(--t-s); line-height: 1.3; }
+      main.einsatz-detail p.hinweis.ausgabe-sprung { margin-top: 16px; margin-bottom: 8px; }
+    }
+    /* R19-N9, S9, M8: Kennzahlen am Telefon: oben „Einheiten" allein, darunter die Rechnung Führer, Unterführer, Mannschaft und „= Gesamt" in vier
+       gleichen Zellen (keine leere Zelle, Gesamt am Zeilenende hervorgehoben). Im niedrigen Querformat brechen die Beschriftungen nicht mitten im Wort. */
+    @media (max-width: 30rem) {
+      :root:root .staerke-leiste:has(> div:nth-child(5)) { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+      :root:root .staerke-leiste:has(> div:nth-child(5)) > div:nth-child(n) { grid-column: span 1; border-top: var(--strich) solid var(--linie); border-left: var(--strich) solid var(--linie-fein); }
+      :root:root .staerke-leiste:has(> div:nth-child(5)) > div:nth-child(1) { grid-column: 1 / -1; display: flex; align-items: baseline; gap: 8px; border: 0; }
+      :root:root .staerke-leiste:has(> div:nth-child(5)) > div:nth-child(2) { border-left: 0; }
+      :root:root .staerke-leiste:has(> div:nth-child(5)) > div.gesamt:nth-child(n) { grid-column: span 1; }
+      :root:root .staerke-leiste:has(> div:nth-child(5)) > div.gesamt > strong::before { content: "= "; font-weight: 400; }
+    }
+    @media (orientation: landscape) and (max-height: 31.25rem) {
+      :root:root .staerke-leiste:has(> div:nth-child(5)) span { overflow-wrap: normal; word-break: keep-all; hyphens: none; letter-spacing: 0; font-size: min(var(--t-xs), 11px); }
+    }
+    /* R19-E14, N14: Die Fahrzeugliste der Übersicht steht am Telefon als Karten (eine je Fahrzeug, Beschriftung links, Wert rechts). */
+    @media (max-width: 30rem) {
+      table.fahrzeug-tabelle, table.fahrzeug-tabelle tbody { display: block; min-width: 0; width: 100%; }
+      table.fahrzeug-tabelle thead { display: none; }
+      table.fahrzeug-tabelle tr { display: block; margin-bottom: 8px; padding: 6px 10px; border: var(--strich) solid var(--linie); border-radius: var(--radius); }
+      table.fahrzeug-tabelle td { display: flex; justify-content: space-between; gap: 12px; padding: 3px 0; border: 0; text-align: right; overflow-wrap: anywhere; }
+      table.fahrzeug-tabelle td::before { content: attr(data-label); flex: none; color: var(--text-2); text-align: left; }
+    }
+    /* R19-M10: Im niedrigen Querformat steht „✓ gespeichert 04:24" mit dem Wort, nicht nur „✓ 04:24". */
+    @media (orientation: landscape) and (max-height: 31.25rem) and (min-width: 30rem) {
+      .seiten-kopf.assistent-kopf .autosave[data-kurz]:not(.speicher-fehler):not(.fest-warnung)::after { content: "✓ gespeichert " attr(data-zeit); }
+    }
+    /* R19-M6: Kopf des Assistenten am kleinen Telefon (320 × 568, „Feld"): „‹ Einsatz „…"" steht in einer Zeile (gekürzt, der volle Name bleibt der
+       Name des Knopfs), die sechs Reiter stehen in einer Zeile (je mindestens 44 px, 8 px Abstand). Die Erklärung in Schritt 2 liegt hinter „Mehr dazu". */
+    @media (max-width: 30rem) {
+      :root:root .seiten-kopf.assistent-kopf .kopf-oberzeile .zur-start { display: block; max-width: 100%; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    }
+    @media (max-width: 22.5rem) {
+      :root:root .seiten-kopf.assistent-kopf .schritte { flex-wrap: nowrap; }
+      :root:root .seiten-kopf.assistent-kopf .schritte button { flex: 1 1 0; min-width: 44px; padding-inline: 0; }
+      :root:root .schritt-inhalt > .karte > .hinweis { font-size: min(var(--t-s), 15px); line-height: 1.3; }
+      :root:root .schritt-inhalt > .karte > p.gruppen-titel { font-size: min(var(--t-m), 16px); line-height: 1.25; margin-block: 8px 4px; }
+    }
+    /* R19-D6: Zwischen der Bestätigung und „Abbrechen" liegen in allen Rückfragen mindestens 24 px („Stärke ändern…", „Übergabe vermerken…",
+       „Sicherung einspielen…", „Aufteilen…"). */
+    :root:root dialog.abfrage .abfrage-aktionen { gap: 24px; }
+    /* R19-H5, S15, O10: Rückfragen am Telefon höchstens rund 60 % des Bildes: Antwort und „Abbrechen" stehen nebeneinander (24 px Abstand, wenn
+       der Dialog genau eine Antwort hat), die Textzeilen sind etwas enger. */
+    @media (max-width: 30rem) {
+      :root:root dialog.abfrage .abfrage-fuss:has(> .abfrage-weg:first-child:nth-last-child(2)) { display: flex; flex-wrap: nowrap; align-items: stretch; gap: 24px; }
+      :root:root dialog.abfrage .abfrage-fuss:has(> .abfrage-weg:first-child:nth-last-child(2)) > .abfrage-weg,
+      :root:root dialog.abfrage .abfrage-fuss:has(> .abfrage-weg:first-child:nth-last-child(2)) > .abfrage-aktionen { flex: 1 1 0; min-width: 0; margin: 0; padding: 0; border: 0; }
+      :root:root dialog.abfrage .abfrage-fuss:has(> .abfrage-weg:first-child:nth-last-child(2)) > .abfrage-aktionen > button { width: 100%; height: 100%; }
+      :root:root dialog.abfrage form > .abfrage-aktionen:has(> button + button) { flex-direction: row; }
+      :root:root dialog.abfrage form > .abfrage-aktionen:has(> button + button) > button { flex: 1 1 0; min-width: 0; }
+      :root:root:not(.schrift-gross) dialog.abfrage p { font-size: min(var(--t-s), 15px); line-height: 1.3; margin-bottom: 6px; }
+      :root:root:not(.schrift-gross) dialog.abfrage h2 { font-size: min(var(--t-l), 20px); line-height: 1.2; margin-bottom: 6px; }
+    }
+    :root:root dialog .aktionen:has(> button + button) { gap: 24px; }
+    :root:root .einheit-zeile .vorlage-aktionen:has(> button.primaer + button) { column-gap: 24px; row-gap: 24px; }
+    /* R19-M15, D7: Lange Dialoge der Fußzeile („Datensicherung", „Alle lokalen Daten löschen") klappen ihre Erklärungen am kleinen Telefon ein. */
+    details.dialog-mehr > summary { cursor: pointer; display: flex; align-items: center; min-height: 44px; font-weight: 600; }
+    details.dialog-mehr > summary::before { content: "▸"; margin-right: 8px; flex: none; }
+    details.dialog-mehr[open] > summary::before { content: "▾"; }
+    details.dialog-mehr > summary::-webkit-details-marker { display: none; }
+    details.hinweis-mehr > summary { cursor: pointer; display: flex; align-items: center; min-height: 44px; font-weight: 600; text-decoration: underline; }
+    /* R19-M13, G8, S11: Der Lagemonitor-Block ist am Telefon ein Aufklapper und hält 16 px Abstand zur nächsten Karte. */
+    details.lm-block { margin-bottom: 16px; }
+    details.lm-block > summary { cursor: pointer; display: flex; align-items: center; min-height: 44px; list-style: none; }
+    details.lm-block > summary::-webkit-details-marker { display: none; }
+    details.lm-block > summary::before { content: "▸"; margin-right: 8px; flex: none; }
+    details.lm-block[open] > summary::before { content: "▾"; }
+    /* R19-G7: Der Hauptknopf der Weitergabe trägt die Unterzeile „erzeugt das Sammel-PDF …"; „Übergabe vermerken…", „Wieder öffnen" und die
+       übrigen Verweise im Abschlussblock sind Knöpfe von mindestens 44 px, nicht Textverweise am Zeilenende. */
+    .einsatz-weitergabe button.mit-zusatz { flex-direction: column; gap: 0; line-height: 1.25; }
+    .einsatz-weitergabe button.mit-zusatz > .knopf-zusatz { display: block; font-size: var(--t-xs); font-weight: 400; }
+    .einsatz-abschluss button.link {
+      display: inline-flex; align-items: center; min-height: 44px; margin-block: 4px; padding: 0 14px; border: var(--strich-stark) solid var(--linie-stark);
+      border-radius: var(--radius); background: var(--flaeche); color: var(--text); font-weight: 600; text-decoration: none;
+    }
+    /* R19-M10: Die Zusammenfassung „Angaben vom Zettel (optional): Eingetroffen um, …" ist ein Textfluss; der Doppelpunkt steht nie am Zeilenanfang. */
+    details.zettel-angaben > summary { display: block; padding-block: 11px; }
+    /* R19-E4: Die Rückfrage zu einer Eingabe steht unter ihrem Feld, auch in einer Zeile aus mehreren Feldern. */
+    .zeile > [role="status"] { flex: 1 1 100%; }
+    /* R19-E10: „Übernehmen" und der Grund der Sperre bleiben im Fenster „Namen einfügen…" am unteren Rand stehen. */
+    .namen-fuss { position: sticky; bottom: 0; z-index: 1; background: var(--flaeche); padding: 8px 0 4px; border-top: var(--strich) solid var(--linie); }
+    .namen-fuss > p { margin: 0 0 4px; }
+    /* ===== Ende Runde 19 (Schnellerfassung und Karte) ===== */
   </style>
 </head>
 <body>

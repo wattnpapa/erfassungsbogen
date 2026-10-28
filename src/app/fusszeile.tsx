@@ -237,6 +237,9 @@ function IconLink() {
   );
 }
 
+/** Schmales Telefon (R19-M15): Lange Dialoge klappen ihre Erklärungen ein. */
+const engeAnzeige = () => typeof window.matchMedia === "function" && window.matchMedia("(max-width: 30rem)").matches;
+
 function Dialog({ titel, dialogRef, klasse, onSchliessen, children }: {
   titel: string;
   dialogRef: RefObject<HTMLDialogElement | null>;
@@ -922,21 +925,7 @@ export function Fusszeile({ onBogenOeffnen, kompakt = false }: {
           </p>
         )}
         {sicherungFehler && <p className="fehler" role="alert">{sicherungFehler}</p>}
-        <p className="hinweis">
-          Einspielen ersetzt die vorhandenen App-Daten auf diesem Gerät vollständig.
-        </p>
-        {/* Wie sicher liegt es hier, und wann gab es zuletzt eine Kopie?
-            (Audit Runde 2, R2-O6) */}
-        <p className="hinweis" role="status">
-          {zuletztGesichert
-            ? `Letzte Sicherung auf diesem Gerät erstellt: ${new Date(zuletztGesichert).toLocaleString("de-DE", { dateStyle: "short", timeStyle: "short" })} Uhr. ${sicherungStandText()}`.trim()
-            : "Auf diesem Gerät wurde noch keine Sicherung erstellt."}
-        </p>
-        {dauerhaft === true && (
-          <p className="hinweis">
-            Der Browser hält den Speicher dieser App dauerhaft vor und räumt ihn nicht von sich aus.
-          </p>
-        )}
+        {/* R19-M15: Am kleinen Telefon steht das Übrige hinter „Mehr dazu": Der Dialog war 1 309 px hoch, „Sicherung erstellen…" lag unter dem Bildrand. */}
         {dauerhaft === false && (
           <p className="warnung">
             Der Speicher ist nicht dauerhaft: Der Browser darf ihn bei Platzmangel oder nach
@@ -953,11 +942,29 @@ export function Fusszeile({ onBogenOeffnen, kompakt = false }: {
             über „Zum Home-Bildschirm“ ablegen.
           </p>
         )}
+        <details className="dialog-mehr" open={!engeAnzeige()}>
+        <summary>Mehr dazu</summary>
+        <p className="hinweis">
+          Einspielen ersetzt die vorhandenen App-Daten auf diesem Gerät vollständig.
+        </p>
+        {/* Wie sicher liegt es hier, und wann gab es zuletzt eine Kopie?
+            (Audit Runde 2, R2-O6) */}
+        <p className="hinweis" role="status">
+          {zuletztGesichert
+            ? `Letzte Sicherung auf diesem Gerät erstellt: ${new Date(zuletztGesichert).toLocaleString("de-DE", { dateStyle: "short", timeStyle: "short" })} Uhr. ${sicherungStandText()}`.trim()
+            : "Auf diesem Gerät wurde noch keine Sicherung erstellt."}
+        </p>
+        {dauerhaft === true && (
+          <p className="hinweis">
+            Der Browser hält den Speicher dieser App dauerhaft vor und räumt ihn nicht von sich aus.
+          </p>
+        )}
         {/* Der Speicherstand gehört dorthin, wo aufgeräumt wird: Ein voller
             Speicher trifft sonst ohne Vorwarnung (Audit „Offline und
             Speicher", O4). Die Grenze ist eine Schätzung — Browser nennen
             ihr Limit nicht, üblich sind rund 5 MB. */}
         <SpeicherStand />
+        </details>
       </Dialog>
 
       {/* Rückfrage vor dem Einspielen: nennt, was auf dem Gerät verschwindet
@@ -1073,6 +1080,9 @@ export function Fusszeile({ onBogenOeffnen, kompakt = false }: {
         <div className="aktionen">
           <button type="button" onClick={() => void sicherungExportieren()}>Vorher Sicherung erstellen…</button>
         </div>
+        {/* R19-M15, D7: Die Aufzählung liegt am kleinen Telefon hinter „Was genau gelöscht wird"; Sicherung, Haken und Knöpfe stehen im Bild. */}
+        <details className="dialog-mehr" open={!engeAnzeige()}>
+        <summary>Was genau gelöscht wird</summary>
         {loeschUmfang && (
           loeschUmfang.eintraege === 0 ? (
             <p>Auf diesem Gerät sind derzeit keine App-Daten gespeichert.</p>
@@ -1119,6 +1129,7 @@ export function Fusszeile({ onBogenOeffnen, kompakt = false }: {
           nur der Speicher dieser App wird geleert. Die Einstellung „Nicht
           mitzählen“ aus dem Datenschutzhinweis bleibt erhalten.
         </p>
+        </details>
         {/* R16-M2: Haken und Entscheidung kleben am Dialogfuß, auch wenn die Aufzählung darüber lang ist. */}
         <div className="dialog-entscheidung">
           <label className="inline">

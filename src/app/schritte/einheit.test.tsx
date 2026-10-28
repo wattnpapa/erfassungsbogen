@@ -422,9 +422,14 @@ describe("Schritt Einheit — Beispiel im Einheitstyp (R3-H7)", () => {
 });
 
 describe("Schritt Einheit — offene Pflichtangaben", () => {
-  it("nennt den fehlenden Namen der eigenen Einheit schon auf Schritt 1", () => {
-    render(<SchrittEinheit bogen={neuerBogen()} aendern={() => {}} />);
-
+  it("nennt den fehlenden Namen der eigenen Einheit schon auf Schritt 1, sobald etwas eingetragen ist (R19-E4)", () => {
+    const bogen = neuerBogen();
+    // Ein frischer Bogen bleibt still (kein Warnton vor der ersten Eingabe) ...
+    const { unmount } = render(<SchrittEinheit bogen={bogen} aendern={() => {}} />);
+    expect(screen.queryByText(/Ort der Einheit .* fehlt/)).toBeNull();
+    unmount();
+    // ... mit einem Typ ohne Ort steht der Hinweis da.
+    render(<SchrittEinheit bogen={{ ...bogen, einheit: { ...bogen.einheit, einheitsTyp: { freitext: "Bergungsgruppe" } } }} aendern={() => {}} />);
     expect(screen.getByText(/Ort der Einheit .* fehlt/)).toBeDefined();
   });
 
@@ -492,7 +497,7 @@ describe("Schritt Einheit — offene Pflichtangaben", () => {
    * sechs Schritte, dieselbe Überschrift. Dass nur Stärke gemeint ist, stand
    * vorher erst auf Schritt 3.
    */
-  it("benennt die Schnellerfassung auf Schritt 1", () => {
+  it("zeigt in der Schnellerfassung den Ort als erstes Feld, den Rest hinter „Mehr zur Einheit“ (R19-E3)", () => {
     const bogen = neuerBogen();
     render(
       <SchrittEinheit
@@ -501,7 +506,11 @@ describe("Schritt Einheit — offene Pflichtangaben", () => {
       />,
     );
 
-    expect(screen.getByText(/^Schnellerfassung:/)).toBeDefined();
+    const karte = document.querySelector("section.schnell-einheit")!;
+    expect(karte).not.toBeNull();
+    const erstes = karte.querySelector("input")!;
+    expect(erstes.id).toBe("feld-einheit-name");
+    expect(karte.querySelector("details.schnell-mehr")).not.toBeNull();
   });
 });
 
@@ -820,8 +829,9 @@ describe("Schritt Einheit — Ebene entfernen", () => {
  * dass gelbe Kästen ohnehin immer da sind, überliest später auch die, die zählen.
  */
 describe("Schritt Einheit — nur eigene Hinweise", () => {
-  it("weist auf einem frischen Bogen höchstens auf den fehlenden Namen hin", () => {
-    render(<SchrittEinheit bogen={neuerBogen()} aendern={() => {}} />);
+  it("weist auf einem frischen Bogen auf nichts hin und danach höchstens auf den fehlenden Namen", () => {
+    const bogen = neuerBogen();
+    render(<SchrittEinheit bogen={{ ...bogen, einheit: { ...bogen.einheit, einheitsTyp: { freitext: "Bergungsgruppe" } } }} aendern={() => {}} />);
 
     expect(screen.getByText(/Ort der Einheit .* fehlt/)).toBeDefined();
     expect(screen.queryByText(/Stärke ist 0/)).toBeNull();

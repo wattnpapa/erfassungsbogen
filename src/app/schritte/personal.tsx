@@ -1361,32 +1361,41 @@ export function SchrittPersonal({ bogen, aendern: aendernRoh }: SchrittProps) {
     if (verloren.length > 0) setZahlenWeg({ vorher, text: verloren.join("; "), nonce: Date.now() });
   }
 
+  // Die Wahl steht in der Schnellerfassung hinter den Zählern, nicht davor (R19-H3: Zähler ohne Vorspann).
+  const modusWahl = (
+    <p>
+      <label className="inline">
+        <input
+          type="radio"
+          name="perfassung"
+          checked={!nurStaerke}
+          onChange={() => void aufVollstaendig()}
+        />
+        Personal vollständig erfassen
+      </label>
+      <label className="inline">
+        <input
+          type="radio"
+          name="perfassung"
+          checked={nurStaerke}
+          onChange={() => void aufNurStaerke()}
+        />
+        Nur Stärke (Meldekopf-Schnellerfassung)
+      </label>
+    </p>
+  );
+
   return (
     <section className="karte">
       <h2>3. Personal</h2>
       {/* Der Assistent fragt Personal vor Fahrzeugen, das Papier hat sie in
           umgekehrter Reihenfolge — wer abtippt, blättert sonst (R4-A8). */}
-      <p className="hinweis">Vom Papier abtippen? Auf dem Blatt stehen die Fahrzeuge oben, das Personal darunter: erst Schritt 4.</p>
-      <p>
-        <label className="inline">
-          <input
-            type="radio"
-            name="perfassung"
-            checked={!nurStaerke}
-            onChange={() => void aufVollstaendig()}
-          />
-          Personal vollständig erfassen
-        </label>
-        <label className="inline">
-          <input
-            type="radio"
-            name="perfassung"
-            checked={nurStaerke}
-            onChange={() => void aufNurStaerke()}
-          />
-          Nur Stärke (Meldekopf-Schnellerfassung)
-        </label>
-      </p>
+      {!nurStaerke && (
+        <>
+          <p className="hinweis">Vom Papier abtippen? Auf dem Blatt stehen die Fahrzeuge oben, das Personal darunter: erst Schritt 4.</p>
+          {modusWahl}
+        </>
+      )}
       {/* „Meldekopf-Schnellerfassung“ nennt eine Funktion des anderen Geräts; wer seinen
           eigenen Bogen ausfüllt, braucht sie nicht (R5-N7). */}
       {!nurStaerke && (
@@ -1428,6 +1437,7 @@ export function SchrittPersonal({ bogen, aendern: aendernRoh }: SchrittProps) {
               <input ref={gesamtQuittung} value={sm.gesamt} readOnly />
             </Feld>
           </div>
+          {modusWahl}
           <div className="zeile">
             <label className="inline">
               <input

@@ -222,7 +222,7 @@ describe("Lagemonitor, Runde 7", () => {
     const e = einsatzAnlegen("Tag", EinsatzArt.UEBUNG);
     einsatzbeginnSetzen(e.id, Date.now() - 5 * 60_000, [e.id]);
     render(<Lagemonitor einsatzId={e.id} />);
-    expect(screen.getByText(/^seit Beginn: 0 Stunden, 5 Minuten/)).toBeTruthy();
+    expect(screen.getByText(/^seit Beginn: 5 Minuten/)).toBeTruthy();
     // R10-H3: Uhrzeit mit Doppelpunkt, Datum getrennt und beschriftet.
     expect(screen.getByText("Uhrzeit · Datum")).toBeTruthy();
     expect(document.querySelector(".lm-dtg-text strong")!.textContent).toMatch(/^\d{2}:\d{2}$/);

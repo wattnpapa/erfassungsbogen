@@ -238,10 +238,11 @@ function EinheitenTabelle({ einheiten }: { einheiten: readonly EinheitZeile[] })
         <tbody>
           {einheiten.map((e) => (
             <tr key={e.id}>
-              <td className="lm-orga">{e.orga}{e.soll && <abbr className="lm-soll" title="Sollstärke, nicht gemeldet"> S</abbr>}{e.alterMin != null && <abbr className="lm-alt" title={e.standAlt ? "Der Stand der Angaben ist älter als eine Stunde" : "Meldung ist älter als eine Stunde"}> ⚠ {e.standAlt ? "Stand " : ""}{alterKurz(e.alterMin)}</abbr>}{e.zug && <span className="lm-zug-tel">{e.zug}</span>}</td>
+              <td className="lm-orga">{e.orga}{e.soll && <abbr className="lm-soll" title="Sollstärke, nicht gemeldet"> S</abbr>}{e.alterMin != null && <abbr className="lm-alt" title={e.standAlt ? "Der Stand der Angaben ist älter als eine Stunde" : "Meldung ist älter als eine Stunde"}> ⚠ {e.standAlt ? "Stand " : ""}{alterKurz(e.alterMin)}</abbr>}</td>
               <td>{e.ort || "–"}</td>
               {/* Am Telefon entfällt die Ort-Spalte: Der Ort steht im Funkrufnamen oder, wenn nicht, als Zusatz darunter (R9-K5). */}
-              <td data-ort={ortImFunkruf(e) ? undefined : e.ort}>{e.funkruf || "–"}{e.auftrag && <span className="lm-auftrag-tel">{e.auftrag}</span>}</td>
+              {/* R19-K11: Der Zug steht am Telefon unter dem Funkrufnamen, nicht in der Spalte „Orga" zwischen Organisation und Alter. */}
+              <td data-ort={ortImFunkruf(e) ? undefined : e.ort}>{e.funkruf || "–"}{e.zug && <span className="lm-zug-tel">{e.zug}</span>}{e.auftrag && <span className="lm-auftrag-tel">{e.auftrag}</span>}</td>
               <td className="lm-typ">
                 {e.typ || (e.zug ? "" : "–")}
                 {e.zug && <span className="lm-zug">{e.typ ? " · " : ""}{e.zug}</span>}
@@ -373,11 +374,14 @@ export function Lagemonitor({ einsatzId }: { einsatzId: string }) {
         : bild.zeitenPruefen
           ? "Dauer unklar – Zeiten prüfen (Geräteuhr?)"
           : null;
+  // R19-L1: Übungsmeldungen, die in dieser Lage nicht zählen, stehen in der Größe der Lagezeile da; „Noch nichts gemeldet" neben
+  // „gerade eben eingetroffen" las sich als Widerspruch.
+  const uebungTeil = bild.uebungenDaneben > 0 ? `${bild.uebungenDaneben} ${bild.uebungenDaneben === 1 ? "Übungsmeldung" : "Übungsmeldungen"} nicht gezählt` : "";
   const lage =
     s.einheiten === 0
       ? bild.abgerueckt > 0
         ? `Alle ${bild.abgerueckt} Einheiten abgerückt`
-        : "Noch nichts gemeldet"
+        : uebungTeil || "Noch nichts gemeldet"
       : // Jede Angabe bleibt ungeteilt („1 abgerückt" brach am Telefon in „… · 1" und „abgerückt", R17-K11); umbrochen wird nur bei „ · ".
         (
           <>
@@ -388,6 +392,12 @@ export function Lagemonitor({ einsatzId }: { einsatzId: string }) {
               <>
                 {" · "}
                 <span className="lm-nb">{bild.abgerueckt} abgerückt</span>
+              </>
+            )}
+            {uebungTeil && (
+              <>
+                {" · "}
+                <span className="lm-nb">{uebungTeil}</span>
               </>
             )}
           </>
@@ -449,7 +459,8 @@ export function Lagemonitor({ einsatzId }: { einsatzId: string }) {
         {datenstand && (
           <span className={`lm-label${veraltet ? " lm-veraltet" : ""}`}>
             {datenstand}
-            {alterAnwesende && <span className="lm-warnteil">{" · "}⚠ {alterAnwesende}</span>}
+            {/* R19-K11: Der Teil steht als eigene Zeile da (index.html); ein Trennpunkt am Zeilenanfang las sich als Rest eines Satzes. */}
+            {alterAnwesende && <span className="lm-warnteil">⚠ {alterAnwesende}</span>}
           </span>
         )}
       </div>
@@ -575,17 +586,36 @@ export function LagemonitorBlock({ einsatzId, alleIds }: { einsatzId: string; al
     setze(null);
   }
 
+  // R19-D2: Wird ein vorhandener Beginn im Feld überschrieben, bleibt der alte Wert mit Rückweg stehen.
+  const [beginnWar, setBeginnWar] = useState<number | null>(null);
+
   function beginnGeaendert(wert: string) {
     const ms = ausEingabeWert(wert);
     if (ms == null && beginn != null) void entferneBeginn();
-    else setze(ms);
+    else {
+      if (ms != null && beginn != null && ms !== beginn) setBeginnWar((war) => war ?? beginn);
+      setze(ms);
+    }
+  }
+
+  function beginnZurueck() {
+    if (beginnWar == null) return;
+    const ok = einsatzbeginnSetzen(einsatzId, beginnWar, alleIds);
+    setFehler(!ok);
+    if (ok) {
+      setBeginn(beginnWar);
+      setBeginnWar(null);
+    }
   }
 
   const hinweis = beginnHinweis(beginn, Date.now());
+  const [offenAnfang] = useState(() => typeof window.matchMedia !== "function" || !window.matchMedia("(max-width: 30rem)").matches);
 
   return (
-    <div className="lm-block">
-      <p className="lm-block-titel"><strong>Lagemonitor für den Fernseher</strong></p>
+    // R19-M13, G8, S11: Am Telefon ein Aufklapper (der Block war 460 bis 650 px lang und stand zwischen Export und Übergabe); unter dem Block
+    // bleibt ein Abstand zur Karte „Übergabe und Abschluss" (index.html).
+    <details className="lm-block" open={offenAnfang}>
+      <summary className="lm-block-titel"><strong>Lagemonitor für den Fernseher</strong></summary>
       <p className="hinweis">
         Zweites Fenster mit der Lage in großer Schrift, ohne Personennamen — auf den Fernseher ziehen (HDMI,
         erweiterter Bildschirm). Es aktualisiert sich von selbst, solange es auf diesem Gerät läuft. In der ersten
@@ -607,7 +637,7 @@ export function LagemonitorBlock({ einsatzId, alleIds }: { einsatzId: string; al
       </div>
       {/* R12-N5: Zweck und Wirkung von Feld und Knöpfen stehen vor ihnen. */}
       <p className="hinweis lm-beginn-erklaerung">
-        Der Fernseher zeigt die Dauer seit dem Einsatzbeginn („seit Beginn: 0 Stunden, 0 Minuten“). „Jetzt“ setzt den
+        Der Fernseher zeigt die Dauer seit dem Einsatzbeginn („seit Beginn: 2 Stunden, 5 Minuten“). „Jetzt“ setzt den
         Beginn auf die aktuelle Uhrzeit, „Beginn entfernen“ nimmt ihn zurück — der Einsatz selbst bleibt unverändert.
       </p>
       <div className="vorlage-aktionen">
@@ -625,11 +655,17 @@ export function LagemonitorBlock({ einsatzId, alleIds }: { einsatzId: string; al
           Lagemonitor öffnen
         </button>
       </div>
+      {beginnWar != null && beginn != null && beginnWar !== beginn && (
+        <p className="hinweis lm-beginn-war" role="status">
+          Beginn war {uhrTeile(new Date(beginnWar)).zeit} Uhr, {uhrTeile(new Date(beginnWar)).datum}.{" "}
+          <button type="button" className="link" onClick={beginnZurueck}>Alten Beginn zurückholen</button>
+        </p>
+      )}
       {hinweis && <p className="hinweis warnung-text lm-beginn-hinweis" role="status">{hinweis}</p>}
       {fehler && <p className="fehler" role="status">Der Beginn konnte nicht gespeichert werden (Speicher voll oder gesperrt).</p>}
       {funkrufFehler && (
         <p className="fehler" role="status">Der Funkrufname konnte nicht gespeichert werden (Speicher voll oder gesperrt) — der Lagemonitor zeigt ihn nicht.</p>
       )}
-    </div>
+    </details>
   );
 }
