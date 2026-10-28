@@ -103,13 +103,17 @@ import {
   statusMitZeitSetzen,
   speicherFehlerArt,
   speicherVollMeldung,
+  sammlungZuruecksetzen,
   vomPapierMarkieren,
   zeitKurz,
   zeitLang,
 } from "./eintrag-zeiten";
+import { nummernHinweisLoeschen, nummernHinweisMerken } from "./nummern-hinweis";
 import { offlineLangText, offlineText, offlineZeileOffen, useOfflineStand } from "./offline-bereit";
 import { uebergabeBestaetigen, uebergabeNachWeg, uebergabeText, type UebergabeStand } from "./uebergabe-stand";
-import { ART_LABEL, EinsatzDetail, EinsatzListe, type Eingang } from "./einsaetze-ui";
+import type { Eingang } from "./einsaetze-ui";
+import { ART_LABEL, PAPIERKORB_OEFFNEN } from "./einsaetze-konstanten";
+import { EinsatzDetail, EinsatzListe } from "./einsaetze-lazy";
 import { uebersprungenText } from "./uebersprungen-text";
 import { anzahlEinheiten, einheitenZahl, letzteMeldung, lueckeKurz, meldungsNummern, nummernWechsel, nummernWechselText, rueckkehrText } from "./einheiten-tabelle";
 import { exportSammlung, exportStaendeLaden, exportStaendeUebernehmen, exportStandAusWeitergabe, exportVermerken, lieferungsMarke, vermerkFehltZusatz, vermerkNeuBeginnen, weitergabeUmImportErgaenzen, type ExportStand, type ExportUmfang, type ExportZiel } from "./export-stand";
@@ -152,11 +156,13 @@ import {
   entwurfSpeichern,
   entwurfVerwerfen,
   ersetztenEntwurfLaden,
-  ersetztenEntwurfMerken,
+  ersetztenEntwurfAblegen,
+  type AblageErgebnis,
   rueckholungNimmt,
   ersetztenEntwurfVerwerfen,
   entwurfUeberschreibenErlauben,
   entwurfFremdEntfernt,
+  entwurfFremdGeaendert,
   type Entwurf,
 } from "./entwurf";
 import { SeitenKopf } from "./seiten-kopf";
@@ -164,13 +170,14 @@ import { datumZweistellig } from "./papierkorb-frist";
 import { UnlesbarHinweis } from "./unlesbar-hinweis";
 import { AnzeigeLeistenKnopf, AnzeigeSchalter } from "./anzeige-schalter";
 import { orgFarbe, wendeOrgAkzentAn } from "./org-farben";
-import { einheitSymbolSvg, svgDataUrl } from "./taktische-zeichen-bogen";
+import { EinheitZeichen } from "./zeichen-bild";
 import { Fusszeile } from "./fusszeile";
 import { Aktualisierungshinweise } from "./aktualisierung";
 import { SpeicherWarnung } from "./speicher-warnung";
 import { arbeiten, useArbeitet } from "./arbeitet";
 import { LEERER_EINSATZ_TEXT, LEERE_DATEI_TEXT, einsatzLeer } from "./ausgabe-sperre";
 import { selbstGeloeschtMeldung } from "./einsatz-geloescht";
+import { abschlussLaden } from "./einsatz-abschluss";
 import { wartendenLinkErledigt, wartendenLinkLesen, wartendenLinkMerken } from "./wartender-link";
 import { FesteWarnung } from "./feste-warnung";
 import { speicherFehlerDetails, speicherFehlerKurz } from "./speicher-fehler-text";
@@ -178,6 +185,7 @@ import { browserSpeicherhuelle } from "./speicher-browser";
 import { UhrHinweis, UhrWarnung } from "./uhr-warnung";
 import { Dialogschicht, frageFelder, frageJaNein, frageWahl, zeigeHinweis, type Antwortweg } from "./dialoge";
 import { istNurStaerke, nurStaerkeUebernehmen, wasWegfiele } from "./nur-staerke";
+import { schnellKopfzeile } from "./schnell-zaehlung";
 import { eintreffzeitStapelHinweis } from "./angaben-alter";
 import {
   SchrittEinheit,
@@ -561,7 +569,7 @@ function staerkeKurz(b: Erfassungsbogen): string {
 const HISTORIE_WEG = ". Ändern: Historie › „Diese Fassung gilt…“";
 function vorrangKioskText(p: FassungsPruefung): string {
   const bisher = zeitpunktDeutsch(p.bisher.bogen.stand);
-  if (p.lage === "aelter") return `älterer Stand als der vorhandene (${bisher}) — nur in die Historie gelegt${HISTORIE_WEG}`;
+  if (p.lage === "aelter") return `älterer Stand (${zeitpunktDeutsch(p.neu.bogen.stand)}) als der vorhandene (${bisher}) — nur in die Historie gelegt${HISTORIE_WEG}`;
   if (p.lage === "gleiche-minute") return `gleicher Stand wie die bisherige Fassung (${bisher}) — die eben gescannte gilt, an der Karte unter „Historie" änderbar`;
   return `älterer Stand als die Schnellerfassung (${bisher}) — an der Karte „Bogen übernehmen" tippen`;
 }
@@ -1036,7 +1044,7 @@ function AppInhalt() {
   // Der Knopf im Bericht öffnet den Abgleich vom Papier (R4-A6).
   const [abgleichAnstoss, setAbgleichAnstoss] = useState(0);
   // Rückmeldung von „Bögen einlesen…" (Dateien) unter den Aufnahme-Knöpfen (R3-L1, R3-E4).
-  const [einlese, setEinlese] = useState<{ fehler: string; meldung: string; einzelheiten?: Einzelheit[] } | null>(null);
+  const [einlese, setEinlese] = useState<{ fehler: string; meldung: string; einzelheiten?: Einzelheit[]; zurueck?: { label: string; aktion: () => void } } | null>(null);
   const stapelAbbruchRef = useRef(false);
   // Der Stapel, der gerade eingelesen wird (Name, Größe, Änderungszeit): derselbe Stapel ein zweites Mal, solange der erste
   // läuft, ist ein doppeltes Ereignis des Dateifelds und würde seine Bögen als „bereits vorhanden" zählen (R19-K10).
@@ -1655,31 +1663,42 @@ function AppInhalt() {
    * weil eine fremde Erfassung den eigenen Bogen aus der Rückholung verdrängt
    * hätte (dann ist die Erfassung verworfen, siehe `folgenFuerOffenenBogen`).
    */
-  function merkeVerdraengt(b: Erfassungsbogen, opt: { tausch?: boolean } = {}): boolean {
+  function merkeVerdraengt(b: Erfassungsbogen, opt: { tausch?: boolean } = {}): AblageErgebnis {
     const alt = opt.tausch ? null : ersetztenEntwurfLaden();
     // Bearbeitung einer gespeicherten Vorlage (R3-D1): Unverändert ist sie
     // nichts wert — die Vorlage liegt ja gespeichert vor. Verändert darf sie
     // wie eine fremde Erfassung keinen eigenen Bogen vom Rückholplatz
     // schieben: Dort lag nach „Vorlage bearbeiten" → „Verwerfen" die
     // unveränderte Vorlagen-Kopie, der echte Einsatzbogen war gelöscht.
-    if (bearbeiteteVorlage && (vorlageUnveraendert(b) || !rueckholungNimmt(true, alt))) return false;
+    if (bearbeiteteVorlage && (vorlageUnveraendert(b) || !rueckholungNimmt(true, alt))) return "uebersprungen";
     // Derselbe Bogen liegt schon dort: keine Kopie über sich selbst (R3-E2).
-    if (alt && JSON.stringify(alt.bogen) === JSON.stringify(b)) return true;
+    if (alt && JSON.stringify(alt.bogen) === JSON.stringify(b)) return "gemerkt";
     // „Alle Daten löschen" (oder Löschen des Bogens) in einem anderen Fenster:
     // Was dort entfernt wurde, schreibt dieses Fenster nicht aus dem
     // Arbeitsspeicher auf den Rückholplatz zurück (Audit Runde 7, R7-D1).
-    if (entwurfFremdEntfernt()) return false;
+    if (entwurfFremdEntfernt()) return "uebersprungen";
     // Die Rückholung nennt die letzte Bearbeitung, nicht den Moment des Schließens (R4-S5).
     const geaendertUm = bogenGespeichert.current.bogen === b ? bogenGespeichert.current.um : undefined;
-    const ok = ersetztenEntwurfMerken(
+    // R20-D1: Ist der Speicher voll, zieht der Bogen vom Entwurfsplatz auf den Rückholplatz um;
+    // gelingt auch das nicht, meldet die Antwort „voll" und der Aufrufer lässt den Bogen offen.
+    const erg = ersetztenEntwurfAblegen(
       b,
       fremdeErfassung
         ? { einsatzId: sammelZielId ?? undefined, beginn: erfassungBeginn ?? undefined, zettel: zettelPruefen({ zeit: nachEintreffzeit, ab: nachAbgerueckt, nr: nachNummer, zug: nachZug }) }
         : undefined,
-      { ...opt, geaendertUm },
+      { ...opt, geaendertUm, ausEntwurf: !entwurfFremdGeaendert() },
     );
-    if (ok) setErsetzterEntwurf(ersetztenEntwurfLaden());
-    return ok;
+    if (erg === "gemerkt") setErsetzterEntwurf(ersetztenEntwurfLaden());
+    return erg;
+  }
+
+  /**
+   * Der Bogen konnte nicht auf der Startseite abgelegt werden (Speicher voll,
+   * R20-D1): Er bleibt offen, nichts hat sich geändert. Der sichere Ausweg ist
+   * die Datei; erst danach lohnt es sich, Platz zu schaffen.
+   */
+  async function ablageVollMelden(b: Erfassungsbogen, was: string): Promise<void> {
+    await (await import("./bogen-ablage-voll")).ablageVollMelden(b, was); // nachgeladen: der Fall ist selten
   }
 
   /** Steht im offenen Bogen noch genau der gespeicherte Stand der bearbeiteten Vorlage? */
@@ -1864,7 +1883,11 @@ function AppInhalt() {
         if (!ja) return false;
       }
     }
-    merkeVerdraengt(bogen, { tausch: a.tausch });
+    // R20-D1: Konnte der Bogen nicht abgelegt werden, bleibt er offen — die Frage versprach „erreichbar".
+    if (merkeVerdraengt(bogen, { tausch: a.tausch }) === "voll") {
+      await ablageVollMelden(bogen, a.tausch ? "zurückgeholt" : "ersetzt");
+      return false;
+    }
     setVorlageInBearbeitung(null);
     setFremdeErfassung(false);
     setSammelZiel(null);
@@ -1901,7 +1924,14 @@ function AppInhalt() {
       });
       if (!ja) return false;
     }
-    if (nimmt && ersetztenEntwurfMerken(anderes.bogen, anderes.fremd)) setErsetzterEntwurf(ersetztenEntwurfLaden());
+    if (nimmt) {
+      const erg = ersetztenEntwurfAblegen(anderes.bogen, anderes.fremd, { ausEntwurf: true });
+      if (erg === "voll") {
+        await ablageVollMelden(anderes.bogen, "ersetzt"); // R20-D1: der Bogen des anderen Fensters bleibt, wo er ist
+        return false;
+      }
+      if (erg === "gemerkt") setErsetzterEntwurf(ersetztenEntwurfLaden());
+    }
     // Der nächste eigene Stand darf den fremden jetzt überschreiben — er liegt gesichert.
     entwurfUeberschreibenErlauben();
     return true;
@@ -2054,7 +2084,12 @@ function AppInhalt() {
       gefahr: vorlage ? folgen.verlust : true,
     });
     if (!sicher) return;
-    const gemerkt = bogenHatInhalt(bogen) && merkeVerdraengt(bogen);
+    const ablage = bogenHatInhalt(bogen) ? merkeVerdraengt(bogen) : "uebersprungen";
+    if (ablage === "voll") {
+      await ablageVollMelden(bogen, vorlage ? "beendet" : "geschlossen"); // R20-D1: Bogen bleibt offen
+      return;
+    }
+    const gemerkt = ablage === "gemerkt";
     if (vorlage) {
       setBogen(null);
       setVorlageInBearbeitung(null);
@@ -2481,7 +2516,8 @@ function AppInhalt() {
     const stand = (e: MeldeEintrag) => `Stand ${zeitpunktDeutsch(e.bogen.stand)}, Stärke ${staerkeKurz(e.bogen)}`;
     if (p.lage === "aelter") {
       await vorrangSetzen(zielId, p.bisher.id, p.neu.id);
-      return { text: `älterer Stand als der vorhandene (${zeitpunktDeutsch(p.bisher.bogen.stand)}) — nur in die Historie gelegt, die Lage bleibt unverändert${HISTORIE_WEG}` };
+      // R20-W4: Beide Stände stehen da; der Satz behauptet nur, was die Zeitstempel hergeben (gleicher Stand fragt eigens).
+      return { text: `älterer Stand (${zeitpunktDeutsch(p.neu.bogen.stand)}) als der vorhandene (${zeitpunktDeutsch(p.bisher.bogen.stand)}) — nur in die Historie gelegt, die Lage bleibt unverändert${HISTORIE_WEG}` };
     }
     const vergleich = meldungenVergleichen(p.bisher.bogen, p.neu.bogen);
     if (p.lage === "ersetzt-platzhalter") {
@@ -2544,6 +2580,20 @@ function AppInhalt() {
     }
     await vorrangSetzen(zielId, p.bisher.id, p.neu.id);
     return { text: `gleicher Stand wie die bisherige Fassung — die bisherige gilt weiter, die eben eingelesene liegt in der Historie` };
+  }
+
+  /**
+   * „Zusammenführen rückgängig" (R20-D3): Die Sammlung steht wieder so da wie vor dem Einlesen der Datei, samt ihren Nummern; der
+   * Hinweis auf geänderte Nummern entfällt. Scheitert das Schreiben (Speicher voll), bleibt der zusammengeführte Stand und die Quittung sagt es.
+   */
+  async function zusammenfuehrenRueckgaengig(vorher: Einsatzsammlung) {
+    const r = (await import("./einsatz-zusammenfuehren")).zusammenfuehrenZurueck(vorher); // nachgeladen: selten
+    if (!r.ok) {
+      setEinlese((alt) => ({ fehler: r.text, meldung: alt?.meldung ?? "", einzelheiten: alt?.einzelheiten, zurueck: alt?.zurueck }));
+      return;
+    }
+    einsaetzeNeuLaden();
+    setEinlese({ fehler: "", meldung: r.text });
   }
 
   /** Vorrang schreiben; ein voller Speicher wird gemeldet, die Aufnahme bleibt. */
@@ -3473,11 +3523,8 @@ function AppInhalt() {
         if (abWahl.art === "zeit") statusMitZeitSetzen(ziel, neu.id, MeldeStatus.ABGERUECKT, abWahl.zeit, abWahl.zeit);
         einsaetzeNeuLaden();
         // Ohne Nr. vom Zettel: sagen, welche die App vergeben hat — sie gehört auf den Zettel,
-        // sonst laufen Papier und Gerät in zwei Nummernreihen (R5-A4).
-        if (zettelNr == null) {
-          const nr = meldungsNummern(einsaetzeLaden().find((s) => s.id === ziel)?.eintraege ?? []).get(neu.einheitSchluessel);
-          if (nr != null) setMeldung(`„${einheitAnzeigename(b.einheit)}“ hat Nr. ${nr} — die Nummer auf dem Zettel eintragen.`);
-        }
+        // sonst laufen Papier und Gerät in zwei Nummernreihen (R5-A4). R20-H2: Der Satz steht jetzt in der Aufnahme-Quittung
+        // der Einsatzansicht („Zuletzt abgelegt: Nr. 1 …"), nicht mehr als loser Satz am Seitenende.
       }
     }
     setNachEintreffzeit("");
@@ -3616,7 +3663,9 @@ function AppInhalt() {
   function exportVerbuchen(s: Einsatzsammlung, ziel: ExportZiel) {
     const vorhanden = [...einsaetzeLaden(), ...einsaetzePapierkorb()].map((x) => x.id);
     const stand = exportVermerken(s, ziel, vorhanden);
-    setExportStaende((alt) => ({ ...alt, [ziel]: stand }));
+    // R20-L3: Konnte der Vermerk nicht geschrieben werden (Speicher voll), zeigt auch die Zeile „zuletzt erzeugt“ ihn nicht;
+    // sie sagte sonst „erzeugt 07:50“, während die Übergabe-Liste „noch nicht“ zeigt. Die Quittung nennt den fehlenden Vermerk.
+    if (vermerkFehltZusatz() === "") setExportStaende((alt) => ({ ...alt, [ziel]: stand }));
   }
 
   async function exportiereEinsatz(s: Einsatzsammlung) {
@@ -3657,7 +3706,7 @@ function AppInhalt() {
     // Erst beim Klick geladen: der CSV-Schreiber gehört nicht ins Startbündel.
     const { einsatzCsvInhalt } = await import("./einsatz-csv");
     const { entfernteNummernText } = await import("./meldungs-papierkorb"); // R19-A2: Lücke in den Nummern benennen
-    const name = ausgabeDateiname(artMitMarke("einsatz", marke), einsatzDateiname(s), "csv");
+    const name = ausgabeDateiname(artMitMarke("einsatz-uebersicht", marke), einsatzDateiname(s), "csv"); // R20-N8
     const ok = await dateiAnbieten(name, einsatzCsvInhalt(teil, meldungsNummern(s.eintraege), undefined, s.eintraege, undefined, entfernteNummernText(s.id)), "text/csv;charset=utf-8");
     if (ok) {
       exportVerbuchen(s, "csv");
@@ -4295,11 +4344,14 @@ function AppInhalt() {
       // keine gemeinsame Kennung): Der Import fragt, ob die Datei zur vorhandenen
       // Sammlung gehört, statt still eine zweite gleichnamige anzulegen (R5-W2).
       const vorhandene = einsaetzeLaden();
+      let zusammenfuehrenVorher: Einsatzsammlung | null = null;
       if (![...vorhandene, ...einsaetzePapierkorb()].some((x) => x.id === s.id)) {
         const gleichnamig = vorhandene
           .filter((x) => x.name.trim().toLowerCase() === s.name.trim().toLowerCase())
           .sort((a, b) => b.geaendert - a.geaendert)[0];
         if (gleichnamig) {
+          // R20-D3: Die Rückfrage nennt vorab, welche vorhandenen Nummern sich ändern würden.
+          const wechselSatz = (await import("./einsatz-zusammenfuehren")).wechselSatz(gleichnamig, s);
           const wahl = await frageWahl({
             titel: `Es gibt schon eine Sammlung „${gleichnamig.name}“`,
             text:
@@ -4310,7 +4362,7 @@ function AppInhalt() {
               {
                 wert: "vorhanden",
                 label: "In die vorhandene Sammlung übernehmen",
-                hinweis: "Alle Einheiten in einer Sammlung, mit Zeiten, Abrückvermerken, Auftrag und Siegel. Laufende Nummern können sich dabei ändern.",
+                hinweis: `Alle Einheiten in einer Sammlung, mit Zeiten, Abrückvermerken, Auftrag und Siegel.${wechselSatz} „Rückgängig“ danach möglich.`,
               },
               {
                 wert: "eigene",
@@ -4320,7 +4372,10 @@ function AppInhalt() {
             ],
           });
           if (!wahl) return;
-          if (wahl === "vorhanden") s = sammlungFuerZiel(s, gleichnamig);
+          if (wahl === "vorhanden") {
+            zusammenfuehrenVorher = structuredClone(gleichnamig); // für „Rückgängig“ (R20-D3)
+            s = sammlungFuerZiel(s, gleichnamig);
+          }
         }
       }
       if (nachtragSeit != null && ![...einsaetzeLaden(), ...einsaetzePapierkorb()].some((x) => x.id === s.id)) {
@@ -4386,7 +4441,12 @@ function AppInhalt() {
           ...(abgelehnt.length > 0 ? [ablehnungsSatz(abgelehnt, abgelehntGesamt)] : []),
         ].join(" "),
         einzelheiten: r.neuerEinsatz ? [] : gliederung.einzelheiten,
+        // R20-D3: Das Zusammenführen lässt sich zurücknehmen; der Hinweis auf geänderte Nummern bleibt in der Einsatzansicht stehen.
+        ...(zusammenfuehrenVorher && !r.neuerEinsatz
+          ? { zurueck: { label: "Zusammenführen rückgängig", aktion: () => zusammenfuehrenRueckgaengig(zusammenfuehrenVorher!) } }
+          : {}),
       });
+      if (nummernHinweis) nummernHinweisMerken(s.id, nummernHinweis);
       setOffenerEinsatzId(s.id);
     } catch (err) {
       setFehler(await dateiFehlerMeldung(datei, err, "einsatz")); // nie Parser-Text (R2-E5)
@@ -4443,7 +4503,7 @@ function AppInhalt() {
           abgleichKnopfImBericht={stapelBericht.includes(LAGE_ABGLEICH_KURZ)}
           einleseQuittung={
             <>
-              <EinleseQuittung fehler={einlese?.fehler ?? ""} meldung={einlese?.meldung ?? ""} einzelheiten={einlese?.einzelheiten} />
+              <EinleseQuittung fehler={einlese?.fehler ?? ""} meldung={einlese?.meldung ?? ""} einzelheiten={einlese?.einzelheiten} zurueck={einlese?.zurueck} />
               {/* Eine angefangene Erfassung für diesen Einsatz liegt im Assistenten:
                   Wer mit „‹ Einsatz" zurückkam, findet sie hier wieder — nicht als
                   fremden „eigenen Bogen" auf der Startseite (Audit „Neuer Nutzer", F2).
@@ -4557,6 +4617,7 @@ function AppInhalt() {
     const schnellVorlagen = [...vorlagen]
       .sort((a, b) => Number(!!b.standard) - Number(!!a.standard) || b.geaendert - a.geaendert)
       .slice(0, 2);
+    const einsaetzeErledigt = einsaetze.length > 0 && einsaetze.every((s) => { const a = abschlussLaden(s.id); return a.beendetAm != null && a.uebergabeAm != null; });
     const offlineZeile = (
       <p className={`offline-badge${offline.stand === "bereit" ? "" : " offline-laedt"}${offlineZeileOffen(offline) ? " offline-offen" : ""}`} role="status">
         {offlineText(offline)}
@@ -4633,12 +4694,7 @@ function AppInhalt() {
               className="entwurf-karte"
               style={{ borderLeftColor: orgFarbe(bogen.einheit.organisation).balken }}
             >
-              <img
-                className="einheit-avatar gross"
-                src={svgDataUrl(einheitSymbolSvg(bogen.einheit))}
-                alt=""
-                aria-hidden="true"
-              />
+              <EinheitZeichen einheit={bogen.einheit} className="einheit-avatar gross" aria-hidden="true" />
               <span className="entwurf-text">
                 <strong>{einheitAnzeigename(bogen.einheit)}</strong>
                 {/* Vorlagen-Bearbeitung: Die Karte trug denselben Titel wie der
@@ -4842,7 +4898,18 @@ function AppInhalt() {
             regelmäßig den falschen Einstieg. */}
         {/* Läuft ein Einsatz, steht seine Karte über den beiden Wegen: nach einer Unterbrechung tippte man sonst in den
             falschen Block („Neuen Bogen erstellen"), der Einsatz lag erst unter dem Bildrand (R17-S9, R17-A7). */}
-        {einsaetze.length > 0 && einsatzAbschnitt}
+        {/* R20-O5: Wer einen Einsatz versehentlich gelöscht hat, findet den Rückweg ohne Suchen: Solange der Papierkorb der Einsätze
+            gefüllt ist, steht ganz oben der Hinweis mit einem 44-px-Knopf, der ihn öffnet und hinführt (vorher ein 33-px-Verweis
+            2,2 Bildschirme tiefer). */}
+        {einsaetzePapierkorb().length > 0 && (
+          <p className="hinweis papierkorb-hinweis">
+            {einsaetzePapierkorb().length === 1 ? "1 Einsatz liegt im Papierkorb" : `${einsaetzePapierkorb().length} Einsätze liegen im Papierkorb`} (30 Tage rückholbar).{" "}
+            <button type="button" className="link papierkorb-umschalter" onClick={() => window.dispatchEvent(new Event(PAPIERKORB_OEFFNEN))}>
+              Zum Papierkorb
+            </button>
+          </p>
+        )}
+        {einsaetze.length > 0 && !einsaetzeErledigt && einsatzAbschnitt}
         <div className="weiche">
           <section className="weiche-weg" aria-labelledby="weg-eigener-bogen">
             <h2 id="weg-eigener-bogen">Meinen Bogen ausfüllen</h2>
@@ -4962,6 +5029,9 @@ function AppInhalt() {
             {erststart && offlineHinweis}
           </section>
         </div>
+        {/* R20-A1: Ist jeder Einsatz beendet und übergeben, steht seine (dann lange) Karte unter den beiden Wegen: „Neuen Bogen erstellen"
+            lag bei 360 × 640 sonst unter dem Bildrand. Ein laufender Einsatz bleibt über ihnen (R17-S9, R17-A7). */}
+        {einsaetze.length > 0 && einsaetzeErledigt && einsatzAbschnitt}
         {scannerOffen && (
           <QrScannerWeb onErgebnis={scanErgebnisWeb} fortschritt={scanFortschritt} onAbbruch={() => scanAbbrechen(false)} onBild={ladeQrBild} teile={segmentStand} />
         )}
@@ -5057,7 +5127,7 @@ function AppInhalt() {
             nicht auf die Startseite: Dorthin gehört die halbe Erfassung nicht,
             und dort sah sie aus wie der eigene Bogen (Audit „Neuer Nutzer", F2). */}
         {sammelEinsatz ? (
-          <button type="button" className="zur-start" onClick={() => { setMeldung(""); setOffenerEinsatzId(sammelEinsatz.id); }}>
+          <button type="button" className="zur-start zur-einsatz" onClick={() => { setMeldung(""); setOffenerEinsatzId(sammelEinsatz.id); }}>
             ‹ Einsatz „{sammelEinsatz.name}"
           </button>
         ) : (
@@ -5069,12 +5139,7 @@ function AppInhalt() {
       </div>
       <div className="titelzeile">
         {/* Taktisches Zeichen der Einheit als „Avatar" — Wiedererkennung auf einen Blick. */}
-        <img
-          className="einheit-avatar"
-          src={svgDataUrl(einheitSymbolSvg(bogen.einheit))}
-          alt=""
-          aria-hidden="true"
-        />
+        <EinheitZeichen einheit={bogen.einheit} className="einheit-avatar" aria-hidden="true" />
         <h1>Einheiten-Erfassungsbogen</h1>
         {/* Modus-Marke: In der Meldekopf-Schnellerfassung sah der Assistent
             genauso aus wie beim vollen Bogen — sechs Schritte, dieselbe
@@ -5133,14 +5198,14 @@ function AppInhalt() {
       </nav>
       {/* Der Strich im Reiter heißt „entfällt": einmal ausgeschrieben, wo die Schnellerfassung beginnt oder wo man auf einem solchen Reiter steht (R17-N5). */}
       {fremdeErfassung && bogen.personalErfassung === PersonalErfassung.NUR_STAERKE && (schritt === 0 || schritt === 1 || schritt === 4) && (
-        <p className="schritte-erklaerung">„–“ heißt: Schritt 2 und 5 entfallen hier.</p>
+        <p className="schritte-erklaerung">„–“ heißt: Einsatz und Sofortbedarf entfallen hier.</p>
       )}
       {/* Schnellerfassung am Telefon (R18-W7): Schrittleiste und Legende sind dort eingeklappt (CSS); eine Zeile nennt den
           Stand — vier Schritte statt sechs, ohne zwei Zeilen Kopf mehr. Am Rechner bleibt die Leiste. */}
       {/* R19-E2, H2, A5, N3, S3, K9: dieselben Nummern wie die Überschriften („3. Personal"); die entfallenen Schritte stehen dabei. */}
       {schnellOhneBedarfSchritt && (
         <p className="schritte-schnell-kurz">
-          Schritt {schritt + 1} von {SCHRITTE.length}: {SCHRITTE[schritt]}{schritt === 1 || schritt === 4 || schritt === UEBERSICHT ? "" : " · 2, 5 entfallen"}
+          {schnellKopfzeile(schritt, SCHRITTE)}
         </p>
       )}
       {fenster.konflikt ? (
@@ -5244,7 +5309,7 @@ function AppInhalt() {
           onUebergeben={(weg, bestaetigt) => setUebergabe((u) => uebergabeNachWeg(bogen, u, weg, bestaetigt))}
           onUebergabeBestaetigen={() => setUebergabe((u) => uebergabeBestaetigen(bogen, u) ?? u)}
           schliessenFolgen={() => (bogenHatInhalt(bogen) ? folgenFuerOffenenBogen() : { satz: "", verlust: false })}
-          neu={() => { if (bogenHatInhalt(bogen)) merkeVerdraengt(bogen); setMeldung(""); setBogen(null); setVorlageInBearbeitung(null); setFremdeErfassung(false); setSammelZiel(null); setzeEmpfang(null); setSchritt(0); }}
+          neu={async () => { if (bogenHatInhalt(bogen) && merkeVerdraengt(bogen) === "voll") { await ablageVollMelden(bogen, "geschlossen"); return; } setMeldung(""); setBogen(null); setVorlageInBearbeitung(null); setFremdeErfassung(false); setSammelZiel(null); setzeEmpfang(null); setSchritt(0); }}
           onVorlageGespeichert={(name, ersetzt) => {
             vorlagenNeuLaden();
             // Ersetzt: die vorige Fassung bleibt für „Rückgängig“ in Reichweite (R12-D1).

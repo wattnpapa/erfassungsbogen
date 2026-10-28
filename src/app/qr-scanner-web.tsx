@@ -5,7 +5,7 @@
  * Capacitor-Scanner (siehe nativ.ts).
  */
 
-import { useEffect, useRef, useState, type ChangeEvent } from "react";
+import { useEffect, useRef, useState, type ChangeEvent, type SyntheticEvent } from "react";
 import { gemerkteKamera, kameraListe, merkeKamera, suchAusschnitt, type Kamera } from "./kamera";
 import { gemerkterScanWeg, handscannerLauscher, merkeScanWeg, type ScanWeg } from "./handscanner";
 import { qrLeserLaden, type QrLeser } from "./qr-decoder";
@@ -127,6 +127,15 @@ async function kameraOeffnen(wunschId: string): Promise<MediaStream> {
 // Nach dieser Zeit ohne Treffer bekommt der Nutzer den Rat, den sonst nur
 // kennt, wer die Naheinstellgrenze von Handykameras kennt.
 const TIPP_NACH_MS = 6000;
+
+/**
+ * R20-L5: „Hinweise zum Handscanner" aufgeklappt: Der Text beginnt oben im rollbaren Fenster (nicht mitten im Satz am unteren Rand);
+ * Rollleiste und Schattenkante (index.html, „Runde 20 (Layout)") zeigen, dass darunter mehr steht.
+ */
+export function hinweiseGeoeffnet(e: SyntheticEvent<HTMLDetailsElement>) {
+  const d = e.currentTarget;
+  if (d.open && typeof d.scrollIntoView === "function") d.scrollIntoView({ block: "start" });
+}
 
 /**
  * Quittung des Suchrahmens: kurz nach jedem angenommenen Teil `true`.
@@ -448,7 +457,7 @@ export function QrScannerWeb(props: {
                 tippt oder gar nicht ankommt. Ausgeklappt standen sie zwischen
                 dem Helfer und „Abbrechen" und schoben den Ausgang bei 640 px
                 Höhe aus dem Bild. */}
-            <details className="handscanner-hinweise">
+            <details className="handscanner-hinweise" onToggle={hinweiseGeoeffnet}>
               <summary>Hinweise zum Handscanner</summary>
               <p className="handscanner-fussnote">
                 Der Scanner muss den Code mit Enter abschließen (Werkseinstellung der meisten Geräte).

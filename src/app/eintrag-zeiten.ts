@@ -222,14 +222,39 @@ export function zeitLang(ms: number): string {
  */
 export class SpeicherVollFehler extends Error {
   constructor(ursache?: unknown) {
-    super(
-      "Speichern fehlgeschlagen — der Speicher dieses Geräts ist voll. " +
-        "Platz schafft nur Löschen: nicht mehr benötigte Einsätze sichern, den Papierkorb leeren oder einen gesicherten Einsatz dort endgültig löschen " +
-        "(die Sicherung selbst schafft keinen Platz; ins Papierkorb-Legen braucht bei vollem Speicher selbst etwas).",
-    );
+    // R20-H13/N9: Zuerst was los ist, dann nur Wege, die in diesem Zustand bestehen (siehe `platzRat`).
+    super(`Speichern fehlgeschlagen — der Speicher dieses Geräts ist voll${belegungKlammer()}. ${platzRat()}`);
     this.name = "SpeicherVollFehler";
     (this as { cause?: unknown }).cause = ursache;
   }
+}
+
+/** „ (zu 100 % belegt)" — die Belegung, soweit der Browser sie lesen lässt; sonst leer (R20-N9). */
+function belegungKlammer(): string {
+  const b = speicherBelegung();
+  return b ? ` (zu ${Math.round(b.anteil * 100)} % belegt)` : "";
+}
+
+/**
+ * Was bei vollem Speicher Platz schafft — nur die Wege, die im jetzigen Zustand bestehen (R20-N9): Einen leeren
+ * Papierkorb gibt es nicht zu leeren, und ein Einsatz, den es nicht gibt, lässt sich nicht löschen. Sichern kommt
+ * zuerst, weil Löschen nicht rückholbar ist; die Sicherung selbst schafft keinen Platz.
+ */
+export function platzRat(): string {
+  let korb = 0;
+  let sammlungen = 0;
+  try {
+    korb = einsaetzePapierkorb().length;
+    sammlungen = einsaetzeLaden().length;
+  } catch {
+    /* nicht lesbar: dann nennt der Rat nur den allgemeinen Weg */
+  }
+  const wege: string[] = [];
+  if (korb > 0) wege.push(`den Papierkorb leeren (${korb} ${korb === 1 ? "Einsatz" : "Einsätze"})`);
+  if (sammlungen > 0) wege.push("einen gesicherten Einsatz endgültig löschen", "unter „Mehr…“ Meldungen endgültig entfernen");
+  if (wege.length === 0) wege.push("„Alle Daten löschen“ (nach der Sicherung)");
+  const liste = wege.length > 1 ? `${wege.slice(0, -1).join(", ")} oder ${wege[wege.length - 1]}` : wege[0]!;
+  return `Erst sichern${sammlungen > 0 ? " (Einsatz weitergeben / sichern)" : ""}, dann Platz schaffen: ${liste}.`;
 }
 
 /**
@@ -241,8 +266,7 @@ export function speicherVollMeldung(anzahl: number): string {
   if (anzahl <= 0) return "";
   return (
     `Nicht aufgenommen: ${anzahl === 1 ? "1 Bogen" : `${anzahl} Bögen`} — der Speicher dieses Geräts ist voll, ` +
-    "die Datei selbst ist in Ordnung. Platz schafft nur Löschen: nicht mehr benötigte Einsätze sichern, " +
-    "den Papierkorb leeren oder einen gesicherten Einsatz dort endgültig löschen; danach dieselbe Datei noch einmal einlesen."
+    `die Datei selbst ist in Ordnung. ${platzRat()} Danach dieselbe Datei noch einmal einlesen.`
   );
 }
 
@@ -276,6 +300,18 @@ export function sammlungenSchreiben(liste: Einsatzsammlung[]): void {
     if (istSpeicherVoll(e)) throw new SpeicherVollFehler(e);
     throw e;
   }
+}
+
+/**
+ * Eine Sammlung auf einen früheren Stand zurücksetzen (Rückgängig nach dem Zusammenführen, R20-D3). Ersetzt die Sammlung gleicher ID
+ * vollständig; gibt es sie nicht mehr, wird sie wieder angelegt. Ein voller Speicher kommt als {@link SpeicherVollFehler}.
+ */
+export function sammlungZuruecksetzen(vorher: Einsatzsammlung): void {
+  const liste = alleSammlungen();
+  const i = liste.findIndex((x) => x.id === vorher.id);
+  if (i < 0) liste.push(vorher);
+  else liste[i] = vorher;
+  sammlungenSchreiben(liste);
 }
 
 /**

@@ -50,7 +50,7 @@ import { debugAktiv } from "../debug-plattform";
 import { mwdText, verpflegungBogenText } from "../auswertung";
 import { bogenCsvInhalt } from "../bogen-csv";
 import { qrGroessePosten, VIELE_TEILE } from "../qr-posten";
-import { einheitSymbolSvg, svgDataUrl } from "../taktische-zeichen-bogen";
+import { EinheitZeichen } from "../zeichen-bild";
 import {
   absenderLabel,
   kettenLabel,
@@ -647,11 +647,7 @@ export function Uebersicht(props: {
             Name und Stärke ist die Auskunft, wegen der die Ansicht geöffnet
             wird — die Vollständigkeitsprüfung ist ihr Befund und steht danach. */}
         <div className="einheit-kopf leitzeile">
-          <img
-            className="einheit-avatar gross"
-            src={svgDataUrl(einheitSymbolSvg(bogen.einheit))}
-            alt="Taktisches Zeichen der Einheit"
-          />
+          <EinheitZeichen einheit={bogen.einheit} className="einheit-avatar gross" alt="Taktisches Zeichen der Einheit" />
           <div>
             <p className="einheit-name">
               {orgLabel(org)}
@@ -769,7 +765,7 @@ export function Uebersicht(props: {
       ) : (
         <>
         <TabellenScroll titel="Personal">
-        <table className="uebersicht">
+        <table className="uebersicht personal-tabelle">
           <thead>
             <tr>
               {/* Die Rolle führt die Zeile an: sie ist die Auskunft, nach der
@@ -778,7 +774,7 @@ export function Uebersicht(props: {
               <th title={STAERKE_LEGENDE}>Rolle</th>
               <th>Funktion / Zusatzfunktion</th>
               <th>Name, Vorname</th>
-              {zeigeErreichbarkeit && <th>Erreichbarkeit</th>}
+              {zeigeErreichbarkeit && <th className="kontakt-spalte">Erreichbarkeit</th>}
             </tr>
           </thead>
           <tbody>
@@ -787,8 +783,15 @@ export function Uebersicht(props: {
                 <td><RolleMarke rolle={p.staerkeRolle} /></td>
                 <td>{funktionsText(p, org) || "—"}</td>
                 {/* Leere Namenszellen sahen nach Darstellungsfehler aus: „(offen)" sagt, dass der Platz noch niemanden trägt (R18-N12). */}
-                <td>{p.nachname || p.vorname ? <>{p.nachname}{p.nachname && p.vorname ? ", " : ""}{p.vorname}</> : <span className="hinweis">(offen)</span>}</td>
-                {zeigeErreichbarkeit && <td>{p.kontakte.map(kontaktText).join(" · ")}</td>}
+                <td>
+                  {p.nachname || p.vorname ? <>{p.nachname}{p.nachname && p.vorname ? ", " : ""}{p.vorname}</> : <span className="hinweis">(offen)</span>}
+                  {/* R20-E2: Am Telefon steht die Erreichbarkeit unter dem Namen (die vierte Spalte lag zum Teil außerhalb des Rahmens);
+                      ab Tabletbreite bleibt sie eine eigene Spalte (index.html, „Runde 20 (Layout)"). */}
+                  {zeigeErreichbarkeit && p.kontakte.some((k) => kontaktText(k) !== "") && (
+                    <span className="kontakt-unter">{p.kontakte.map(kontaktText).filter((t) => t !== "").join(" · ")}</span>
+                  )}
+                </td>
+                {zeigeErreichbarkeit && <td className="kontakt-spalte">{p.kontakte.map(kontaktText).join(" · ")}</td>}
               </tr>
             ))}
           </tbody>

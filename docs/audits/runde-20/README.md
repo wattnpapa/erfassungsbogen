@@ -42,3 +42,18 @@ Speicher (H13, N9, L3, O2). Es bleiben rund 47 verschiedene Befunde (1 P1,
 | [Mobile-UI](mobile-ui.md) | 0 | 0 | 0 | 6 | 4 |
 | Summe der Berichte | 0 | 1 | 2 | 70 | 58 |
 | Summe ohne Doppelungen (Verlaufstabelle, P3 geschätzt) | 0 | 1 | 2 | 44 | – |
+
+## Stand der Behebung (28.10.2026)
+
+Behoben, auch der P1 (R20-D1) und die P2 (R20-W1, R20-H1), jeweils mit Test.
+Im echten Browser (Produktionsbuild, Playwright) bestätigt: D1 mit bis zum
+Quota-Fehler gefülltem `localStorage`, W1, H1, Scanner ohne Kamera quer, Assistent
+quer, Dialoge bei 320 px, Tippziele „Warum?" und „ganz zeigen", Tabelle am Telefon,
+Startseite. Zusätzlich wurde das Startbündel von 1,23 MB auf 0,73 MB verkleinert.
+Nicht ganz erreicht: R20-W6/H5/G6 (die erste Einheitenkarte liegt direkt nach dem
+Einlesen bei etwa 1209 px statt unter 960 px; weiter nur, wenn die vier
+Aufnahmeknöpfe oder die Quittung weichen) und R20-N2 (im Vollassistenten quer in
+„Feld" liegt das Feld „Ort der Einheit" zur Hälfte unter der Fußleiste). R20-W4
+(gleicher Stand als „älter") ließ sich nicht nachstellen, der Text nennt jetzt beide
+Stände. Bundle-Budget neu gesetzt (Startbündel 734 491 Byte, gesamt 5 702 296 Byte).
+Arc42, ISK und DSFA nachgezogen.

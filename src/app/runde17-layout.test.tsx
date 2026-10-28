@@ -172,12 +172,11 @@ describe("Tabelle am Telefon (R17-H8, K7, G7)", () => {
     const tabelle = document.querySelector("table.einheiten-tabelle")!;
     expect(tabelle.classList.contains("tabelle-kern")).toBe(true);
     const koepfe = [...tabelle.querySelectorAll("thead th")].map((th) => th.textContent);
-    expect(koepfe).toHaveLength(4);
+    // R20-N6, H11: Köpfe ausgeschrieben; ohne Auftrag und ohne Bedarf in irgendeiner Zeile entfällt die letzte (leere) Spalte.
+    expect(koepfe).toHaveLength(3);
     expect(koepfe[0]).toMatch(/^Einheit/);
-    expect(koepfe[1]).toMatch(/^Ges\./);
-    expect(koepfe[2]).toMatch(/^Eingetr\./);
-    // R19-W9: Ohne Auftrag in irgendeiner Zeile steht an dieser Stelle der Bedarf.
-    expect(koepfe[3]).toMatch(/^Bedarf/);
+    expect(koepfe[1]).toMatch(/^Stärke/);
+    expect(koepfe[2]).toMatch(/^Eingetroffen/);
     // Fünf Tippziele von 44 px stünden ohne Abstand nebeneinander: Die Köpfe sind dort nur Text.
     expect(tabelle.querySelectorAll("thead th button")).toHaveLength(0);
     // Name und Kernzahlen stehen in jeder Zeile.

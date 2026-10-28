@@ -23,6 +23,13 @@ Grundlage: Repository `wattnpapa/erfassungsbogen`, Stand 2026-09-12 — Version 
 > angenommen; der Bogen nimmt dann denselben Weg wie ein Bogen-Link (Rückfrage vor
 > dem Ablegen, 5.1). Empfänger und Netzverbindungen unverändert (5.8).
 >
+> **Nachgezogen 2026-10-28 — Audit Runde 20:** Keine neuen Speicherorte. Bei vollem
+> Speicher wird ein geschlossener oder ersetzter Bogen nicht mehr verworfen, sondern
+> auf den Rückholplatz umgelegt; die Meldung bietet die Datei an (Verfügbarkeit,
+> Art. 32 Abs. 1 lit. b DSGVO). Die Löschung im Notweg fragt zweimal und nennt die Folge.
+> Die Zeichensammlung wird nachgeladen, sie enthält keine Personendaten. Empfänger und
+> Netzverbindungen unverändert (5.8).
+>
 > **Nachgezogen 2026-10-28 — Audit Runde 19:** Keine neuen Speicherorte. Das Entfernen
 > einer Meldung geschieht erst, wenn der Papierkorb-Eintrag (7 Tage) geschrieben
 > ist; bei vollem Speicher fragt die App und nennt die Folge (Datenverlust nach

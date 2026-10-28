@@ -526,7 +526,8 @@ function Dialogfenster({ abfrage }: { abfrage: Abfrage }) {
 
         {abfrage.art === "hinweis" && (
           <>
-            {abfrage.text && <p>{abfrage.text}</p>}
+            {/* R20-H13: Ein Text mit eigenen Absätzen und Aufklapper steht in einem Block, nicht in einem Absatz (kein <p> im <p>). */}
+            {abfrage.text && (typeof abfrage.text === "string" ? <p>{abfrage.text}</p> : <div>{abfrage.text}</div>)}
             {abfrage.kopiertext && (
               <textarea
                 className="kopiertext"

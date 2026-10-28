@@ -34,6 +34,22 @@
 > Rollleiste den Fokus und rollen die Pfeiltasten-Markierung ins Bild. Kein neuer
 > Host, Transportformat und Schema unverändert.
 >
+> **Nachgezogen 2026-10-28 (Runde 20):** Audit Runde 20 (rund 47 Befunde, vier Pakete)
+> — Kap. 5, 6, 8.2, 8.6, 9, 11: kein neuer Speicherschlüssel. **Startbündel von 1,23 MB auf
+> 0,73 MB verkleinert** (ADR-003 Aufnahmeregel 5): die Zeichensammlung (`symbole.ts`,
+> 343 KB) wird über `zeichen-bild.tsx` nachgeladen (`EinheitZeichen`,
+> `FahrzeugZeichen`), die Einsatzansicht und Einsatzliste über `einsaetze-lazy.tsx`
+> (`einsaetze-ui.tsx` als eigener Chunk, Platzhalterfläche mit `aria-busy`); beide
+> Chunks stehen im Service-Worker-Precache, die „Ohne Netz"-Szenarien laufen
+> weiter. Schließen, Ersetzen und Zurückholen eines Bogens legen ihn bei vollem
+> Speicher vom Entwurfsplatz auf den Rückholplatz um; gelingt auch das nicht, bleibt er
+> offen und die Meldung bietet die Datei an (`bogen-ablage-voll.ts`, vorher ging der Bogen
+> verloren). „Endgültig löschen" im Notweg fragt zweimal (`einsatz-notweg.ts`). Der Anzeigename
+> gibt jeden Teil nur einmal aus (`einheitAnzeigename`, kein „THW THW Oldenburg"); neu ist
+> „Ort der Einheit ändern…" an der Karte (`ort-aendern.ts`, Nummer bleibt). Karten-PDF
+> beginnt mit dem Erzeugungszeitpunkt, Sammel-PDF und Übersicht-CSV haben eigene Namen.
+> Kein neuer Host, Transportformat und Schema unverändert.
+>
 > **Nachgezogen 2026-10-28 (Runde 19):** Audit Runde 19 (rund 90 Befunde, drei Pakete)
 > — Kap. 5, 8.2, 8.4, 8.5, 8.6, 11: kein neuer Speicherschlüssel. Schreibaktionen
 > quittieren Erfolg erst, nachdem das Schreiben gelang: „Meldung entfernen" legt

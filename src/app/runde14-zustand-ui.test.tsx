@@ -280,8 +280,8 @@ describe("R14-S4 Kontaktzeilen in den Details", () => {
     await nutzer.click(within(karte).getByRole("button", { name: "Details" }));
     const zeilen = [...karte.querySelectorAll(".bogen-details .kontakt-zeile")];
     expect(zeilen).toHaveLength(2);
-    expect(zeilen[0]!.textContent).toBe("0761 123456");
-    expect(zeilen[1]!.textContent).toBe("Poststelle.RSt_Freiburg@thw.de");
+    expect(zeilen[0]!.textContent).toBe("Telefon der Dienststelle: 0761 123456"); // R20-K3
+    expect(zeilen[1]!.textContent).toBe("E-Mail der Dienststelle: Poststelle.RSt_Freiburg@thw.de");
     expect(zeilen[1]!.querySelectorAll("wbr").length).toBe(3);
     const dd = zeilen[0]!.parentElement!;
     expect(dd.textContent).not.toContain(" · ");

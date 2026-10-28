@@ -24,6 +24,7 @@ import {
   beginnHinweis,
 } from "./lagemonitor-beginn";
 import { frageJaNein } from "./dialoge";
+import { DaumenQuittung } from "./daumen-quittung";
 import { ortOhneZusatz } from "./hilfen";
 import { sammlungenBeiseitegelegt } from "./unlesbar";
 import { alterKurz, alterText, anwesendenAlterText, ausEingabeWert, bedarfText, dauerText, lagebild, uhrTeile, zuEingabeWert, type EinheitZeile } from "./lagemonitor";
@@ -491,7 +492,11 @@ export function Lagemonitor({ einsatzId }: { einsatzId: string }) {
         <h2 id="lm-einheiten-titel" className="lm-titel">Einheiten</h2>
         {bild.einheiten.length === 0 ? (
           <p className="lm-leer-hinweis">
-            {bild.abgerueckt > 0 ? "Alle Einheiten sind abgerückt." : "Noch keine Einheit gemeldet."}
+            {bild.abgerueckt > 0
+              ? "Alle Einheiten sind abgerückt."
+              : bild.uebungenDaneben > 0
+                ? `Keine Einheit in der Lage (${bild.uebungenDaneben} Übung, nicht gezählt).` /* R20-L4: sagt, was da ist, statt „noch keine“ */
+                : "Noch keine Einheit gemeldet."}
           </p>
         ) : (
           <EinheitenTabelle einheiten={bild.einheiten} />
@@ -588,12 +593,16 @@ export function LagemonitorBlock({ einsatzId, alleIds }: { einsatzId: string; al
 
   // R19-D2: Wird ein vorhandener Beginn im Feld überschrieben, bleibt der alte Wert mit Rückweg stehen.
   const [beginnWar, setBeginnWar] = useState<number | null>(null);
+  const [beginnLeiste, setBeginnLeiste] = useState<number | null>(null);
 
   function beginnGeaendert(wert: string) {
     const ms = ausEingabeWert(wert);
     if (ms == null && beginn != null) void entferneBeginn();
     else {
-      if (ms != null && beginn != null && ms !== beginn) setBeginnWar((war) => war ?? beginn);
+      if (ms != null && beginn != null && ms !== beginn) {
+        setBeginnWar((war) => war ?? beginn);
+        setBeginnLeiste(Date.now()); // R20-D2: auch am Bildrand sagt eine Leiste mit „Rückgängig“, was der Beginn war
+      }
       setze(ms);
     }
   }
@@ -660,6 +669,18 @@ export function LagemonitorBlock({ einsatzId, alleIds }: { einsatzId: string; al
           Beginn war {uhrTeile(new Date(beginnWar)).zeit} Uhr, {uhrTeile(new Date(beginnWar)).datum}.{" "}
           <button type="button" className="link" onClick={beginnZurueck}>Alten Beginn zurückholen</button>
         </p>
+      )}
+      {beginnLeiste != null && beginnWar != null && beginn != null && beginnWar !== beginn && (
+        <DaumenQuittung
+          key={`beginn:${beginnLeiste}`}
+          sperreKurz
+          kurz={`Beginn war ${uhrTeile(new Date(beginnWar)).zeit} Uhr`}
+          onRueckgaengig={() => { beginnZurueck(); setBeginnLeiste(null); }}
+          rueckgaengigName="Alten Einsatzbeginn zurückholen"
+          onSchliessen={() => setBeginnLeiste(null)}
+        >
+          <strong>Einsatzbeginn geändert:</strong> Beginn war {uhrTeile(new Date(beginnWar)).zeit} Uhr, {uhrTeile(new Date(beginnWar)).datum}.
+        </DaumenQuittung>
       )}
       {hinweis && <p className="hinweis warnung-text lm-beginn-hinweis" role="status">{hinweis}</p>}
       {fehler && <p className="fehler" role="status">Der Beginn konnte nicht gespeichert werden (Speicher voll oder gesperrt).</p>}

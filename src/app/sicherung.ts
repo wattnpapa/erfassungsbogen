@@ -422,22 +422,39 @@ export function sicherungStandText(): string {
  * Quittung nach „Sicherung erstellen…" (R12-O4): Dateiname, Ablage und der ehrliche Satz, dass die Kopie erst zählt,
  * wenn sie woanders liegt. Ob der Browser die Datei wirklich ablegt, sieht die App nicht.
  */
-export function sicherungQuittungText(dateiname: string, nativ: boolean): string {
+export function sicherungQuittungText(dateiname: string, nativ: boolean, vermerkFehlt = false): string {
   const ablage = nativ ? "wurde über das Teilen-Menü abgelegt" : "liegt im Download-Ordner";
-  return `Sicherung „${dateiname}" erzeugt — ${ablage}. Gesichert ist sie erst, wenn sie auf einem zweiten Gerät oder Datenträger liegt.`;
+  // R20-O2: Bei vollem Speicher bleibt der Vermerk aus; dieselbe Auskunft wie bei den Exporten, damit die Übergabe-Liste nicht ohne Grund „noch nicht“ zeigt.
+  const vermerk = vermerkFehlt ? " Vermerk nicht gespeichert (Speicher voll) – die Übergabe-Liste zeigt „noch nicht“." : "";
+  return `Sicherung „${dateiname}" erzeugt — ${ablage}.${vermerk} Gesichert ist sie erst, wenn sie auf einem zweiten Gerät oder Datenträger liegt.`;
+}
+
+/** Ereignis, mit dem Ansichten, die den Sicherungsvermerk zeigen (Übergabe-Liste), neu zeichnen (R20-O2). */
+export const SICHERUNG_EREIGNIS = "eeb:sicherung";
+
+let vermerkFehlte = false;
+/** Konnte die letzte Sicherung ihren Vermerk („zuletzt gesichert“) nicht schreiben, weil der Speicher voll war? */
+export function sicherungVermerkFehlte(): boolean {
+  return vermerkFehlte;
 }
 
 /** Alle lokalen App-Daten als Sicherungsdatei-Inhalt. */
 export function sicherungErstellen(jetzt = new Date()): string {
   const s = speicher();
   const eintraege: Record<string, string> = {};
+  vermerkFehlte = false;
   if (s) {
     // Vor dem Einsammeln merken, damit die Datei ihren eigenen Zeitpunkt trägt.
     try {
       s.setItem(ZULETZT_SCHLUESSEL, String(jetzt.getTime()));
       s.setItem(STAND_SCHLUESSEL, JSON.stringify(meldungenGesamt()));
     } catch {
-      /* Speicher voll — die Sicherung selbst ist wichtiger als der Vermerk */
+      vermerkFehlte = true; /* Speicher voll — die Sicherung selbst ist wichtiger als der Vermerk */
+    }
+    try {
+      globalThis.dispatchEvent?.(new Event(SICHERUNG_EREIGNIS));
+    } catch {
+      /* kein Fenster (Test ohne DOM) */
     }
     for (const k of alleEebSchluessel(s)) {
       const v = s.getItem(k);

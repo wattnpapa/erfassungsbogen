@@ -50,7 +50,7 @@ export function fehlerText(fehler: unknown): string {
   if (istSpeicherFehler(fehler)) {
     return (
       "Der Speicher dieses Geräts nimmt nichts mehr an (voll oder vom Browser gesperrt). " +
-      "Platz schafft nur Löschen: nicht mehr benötigte Einsätze sichern, den Papierkorb leeren oder einen gesicherten Einsatz dort endgültig löschen."
+      "Erst sichern, dann Platz schaffen: Papierkorb leeren (falls er Einsätze enthält) oder einen gesicherten Einsatz endgültig löschen."
     );
   }
   return fehler instanceof Error ? fehler.message : String(fehler);

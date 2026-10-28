@@ -158,7 +158,10 @@ export function verpflegungAngefordertLage(b: Erfassungsbogen): number {
  */
 export function verpflegungText(s: Pick<EinsatzSummen, "verpflegung" | "verpflegungAngefordert">): string {
   if (s.verpflegungAngefordert === s.verpflegung.gesamt) return `Verpflegung ${s.verpflegung.gesamt}`;
-  return `Verpflegung angefordert ${s.verpflegungAngefordert} (Stärke ${s.verpflegung.gesamt})`;
+  // R20-N5: ein Satz, kein „angefordert 0 … nicht erfasst": was angefordert ist, gegen die Zahl der Personen vor Ort.
+  return s.verpflegungAngefordert === 0
+    ? `Verpflegung: keine angefordert (${s.verpflegung.gesamt} Personen vor Ort)`
+    : `Verpflegung: ${s.verpflegungAngefordert} angefordert (${s.verpflegung.gesamt} Personen vor Ort)`;
 }
 
 /**

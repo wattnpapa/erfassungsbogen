@@ -73,6 +73,16 @@ export function abschlussOffen(getan: readonly { name: string; getan: boolean }[
   return getan.filter((x) => !x.getan).map((x) => x.name);
 }
 
+/**
+ * Offene Wege für den Kopf (R20-K1, W2): die Punkte beim Namen statt als Zahl – „Weitergabe-Datei, Lageblatt und
+ * 4 weitere". Bis zu zwei Namen stehen ganz da.
+ */
+export function offenKurz(namen: readonly string[], zeigen = 2): string {
+  if (namen.length <= zeigen) return namen.length > 1 ? `${namen.slice(0, -1).join(", ")} und ${namen[namen.length - 1]}` : (namen[0] ?? "");
+  const rest = namen.length - zeigen;
+  return `${namen.slice(0, zeigen).join(", ")} und ${rest} weitere`;
+}
+
 // ---------------------------------------------------------------- R19: Stand der Lage gegen den Vermerk
 
 /** Wie viele Einheiten seit `zeit` (Date.now()) eine neue Meldung brachten (R19-D1, R19-W1). */

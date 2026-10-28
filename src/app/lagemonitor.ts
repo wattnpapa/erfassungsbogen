@@ -11,7 +11,7 @@ import { staerke, type EebZeitpunkt } from "@bos/eeb-format/model";
 import { angabenAlterWort, angabenZeit, type AngabenSeit } from "./angaben-alter";
 import { einheitOrt } from "@bos/meldekopf/darstellung";
 import { EinsatzArt, MeldeStatus, revisionen, type Einsatzsammlung, type MeldeEintrag } from "@bos/meldekopf/einsaetze";
-import { aggregiere, aktuelleMeldungen, uebungenAusserhalbDerLage, type EinsatzSummen } from "./auswertung";
+import { aggregiere, aktuelleMeldungen, uebungenAusserhalbDerLage, zaehltInLage, type EinsatzSummen } from "./auswertung";
 import { eintreffzeit } from "./eintrag-zeiten";
 import { letzteMeldung, sollstaerkeAnteil } from "./einheiten-tabelle";
 import { geltendeJeEinheit } from "./fassung-vorrang";
@@ -186,7 +186,7 @@ export function lageblattAlterText(empfangenAm: readonly number[], jetzt: number
  * Zeile des Lageblatts, deren Meldung zum Druckzeitpunkt eine Stunde alt oder älter ist: „⚠ Meldung vor 6 Std 41 Min".
  * Der Kopf nennt „4 von 7 älter als 1 Std"; die Zeile sagt, welche (R13-K2). `null` darunter oder ohne Eingang.
  */
-export function lageblattZeilenAlter(empfangenAm: number | undefined, jetzt: number, wort: "Meldung" | "Stand" = "Meldung"): string | null {
+export function lageblattZeilenAlter(empfangenAm: number | undefined, jetzt: number, wort: "Meldung" | "Stand" = "Stand"): string | null {
   if (empfangenAm == null || jetzt - empfangenAm < VERALTET_ALTER_MIN * 60_000) return null;
   return `⚠ ${wort} ${alterText(empfangenAm, jetzt)}`;
 }
@@ -264,6 +264,9 @@ export function lagebildArt(art: EinsatzArt): string {
 function bewegungenSeit(einsatz: Einsatzsammlung, jetzt: number): Bewegung[] {
   const aus: Bewegung[] = [];
   for (const k of geltendeJeEinheit(einsatz.eintraege)) {
+    // R20-L4: Eine Übungsmeldung, die in dieser Lage nicht zählt, bewegt die Lage nicht: Sonst steht „Eingetroffen: …" neben
+    // „Noch keine Einheit gemeldet".
+    if (!zaehltInLage(einsatz.art, k.bogen)) continue;
     const name = einheitAnzeigename(k.bogen.einheit);
     for (const v of k.vermerke ?? []) {
       if (jetzt - v.zeit > BEWEGUNG_FENSTER_MS) continue;

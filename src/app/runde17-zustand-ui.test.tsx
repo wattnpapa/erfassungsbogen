@@ -418,7 +418,7 @@ describe("R17-S8 „Zuletzt abgelegt … jetzt n Einheiten“ steht nicht über 
     const id = einsatzMit(["Alpha"]);
     const e = einsaetzeLaden().find((s) => s.id === id)!.eintraege[0]!;
     render(<Wirt id={id} extra={{ eingang: { schluessel: e.einheitSchluessel, nonce: 1 } }} />);
-    expect(document.querySelector(".eingang-quittung")?.textContent).toMatch(/Zuletzt (abgelegt|eingelesen): „.*Alpha".*jetzt 1 Einheit/);
+    expect(document.querySelector(".eingang-quittung")?.textContent).toMatch(/Zuletzt (abgelegt|eingelesen): (Nr\. \d+ )?„.*Alpha".*jetzt 1 Einheit/);
     await act(async () => {
       vi.advanceTimersByTime(EINGANG_QUITTUNG_MS - 60_000);
     });

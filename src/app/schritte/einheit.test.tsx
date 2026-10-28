@@ -262,7 +262,7 @@ describe("Schritt Einheit", () => {
     const ov = (name: string) => ({ name, kurz: "XX", ort: name, plz: "1" }) as never;
     expect(ovFreiHinweis("Xyz", [])).toContain("nicht im OV-Verzeichnis");
     expect(ovFreiHinweis("Ulm", [ov("Ulm"), ov("Neu-Ulm")])).toContain("mehrere Ortsverbände");
-    expect(ovFreiHinweis("Ulm", [ov("Ulm")])).toContain("meint vielleicht Ulm");
+    expect(ovFreiHinweis("Ulm", [ov("Ulm")])).toContain("meint vielleicht OV Ulm (XX)");
   });
 
   it("zeigt beim Antippen des Einheitstyps die ganze Liste, nicht nur die ersten acht", async () => {

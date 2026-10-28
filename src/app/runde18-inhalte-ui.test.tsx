@@ -159,14 +159,17 @@ describe("R18-A5/N9 Tabelle am Telefon", () => {
     render(<Wirt id={s.id} />);
     const tabelle = document.querySelector("table.einheiten-tabelle")!;
     const koepfe = [...tabelle.querySelectorAll("thead th")].map((th) => th.textContent!);
-    expect(koepfe.some((k) => /^Eingetr\./.test(k))).toBe(true);
+    expect(koepfe.some((k) => /^Eingetroffen/.test(k))).toBe(true);
     expect(koepfe.some((k) => /^Alter/.test(k))).toBe(false);
     const zeilen = [...tabelle.querySelectorAll("tbody tr")];
-    const zelleAlt = zeilen.find((z) => z.textContent!.includes("Alt"))!.querySelector("td.eingetroffen-kern")!;
-    expect(zelleAlt.textContent).toMatch(/^\d{2}:\d{2} \*⚠ Stand vor 5 Std/);
-    expect(zelleAlt.querySelector(".alter-marke")).not.toBeNull();
-    const zelleFrisch = zeilen.find((z) => z.textContent!.includes("Frisch"))!.querySelector("td.eingetroffen-kern")!;
-    expect(zelleFrisch.querySelector(".alter-marke")).toBeNull();
+    // R20-H12: Die Spalte „Eingetroffen" nennt nur die Zeit; das Alter der Angaben steht beim Namen.
+    const zeileAlt = zeilen.find((z) => z.textContent!.includes("Alt"))!;
+    const zelleAlt = zeileAlt.querySelector("td.eingetroffen-kern")!;
+    expect(zelleAlt.textContent).toMatch(/^\d{2}:\d{2} \*$/);
+    expect(zelleAlt.querySelector(".alter-marke")).toBeNull();
+    expect(zeileAlt.querySelector("th .alter-marke")!.textContent).toMatch(/^⚠ Stand vor 5 Std/);
+    const zeileFrisch = zeilen.find((z) => z.textContent!.includes("Frisch"))!;
+    expect(zeileFrisch.querySelector(".alter-marke")).toBeNull();
   });
 
   it("alle Spalten: der Kopf heißt „Alter“, die Werte „vor 5 Min“ bzw. „Stand vor …“", () => {

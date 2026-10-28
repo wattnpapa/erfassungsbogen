@@ -142,7 +142,8 @@ describe("Meldung aus dem Einsatz entfernen", () => {
     const dialog = await entfernenDruecken(nutzer);
     await nutzer.click(within(dialog).getByRole("button", { name: "Meldung entfernen" }));
 
-    expect(einsaetzeLaden().find((s) => s.id === einsatzId)!.eintraege).toHaveLength(0);
+    // Das Entfernen legt zuerst den Papierkorb-Eintrag an (R19-O1) und ist deshalb asynchron.
+    await waitFor(() => expect(einsaetzeLaden().find((s) => s.id === einsatzId)!.eintraege).toHaveLength(0));
     expect(geaendert).toHaveBeenCalled();
   });
 
@@ -1223,7 +1224,7 @@ describe("Summe und Aufnahme im ersten Bild", () => {
       ansicht(angelegt.id, { eingang: { schluessel: zeitz.einheitSchluessel, nonce: 1 } });
 
       const quittung = screen.getByRole("status");
-      expect(quittung.textContent).toMatch(/Zuletzt eingelesen: „.*Zeitz.*" · jetzt 2 Einheiten, Gesamt \d+\./);
+      expect(quittung.textContent).toMatch(/Zuletzt eingelesen: (Nr\. \d+ )?„.*Zeitz.*" · jetzt 2 Einheiten, Gesamt \d+\./);
       // Die Karte blitzt, aber die Seite bleibt oben.
       expect(document.querySelectorAll(".einheit-zeile.eingegangen")).toHaveLength(1);
       expect(gerollt).toEqual([]);

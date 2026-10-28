@@ -159,12 +159,14 @@ describe("R15-S3 und S4 Schnellerfassung", () => {
     await nutzer.click(within(await screen.findByRole("dialog", { name: "Stärke fehlt" })).getByRole("button", { name: "Trotzdem mit Stärke 0 übernehmen" }));
     await screen.findByRole("heading", { level: 1, name: "Sammelhausen" });
     // In der Sammlung gehört die Zeile hin ...
-    expect(document.body.textContent).toMatch(/die Nummer auf dem Zettel eintragen/);
+    // (R20-H2: als Teil der Aufnahme-Quittung mit der Nummer, nicht mehr als loser Satz am Seitenende.)
+    expect(document.querySelector(".eingang-quittung")!.textContent).toMatch(/Zuletzt abgelegt: Nr\. 1 .*Nummer auf den Zettel schreiben/);
+    expect(document.body.textContent).not.toMatch(/die Nummer auf dem Zettel eintragen/);
     await new Promise((r) => setTimeout(r, 50));
     act(() => { history.back(); });
     await waitFor(() => expect(screen.queryByRole("heading", { level: 1, name: "Sammelhausen" })).toBeNull());
     // ... auf der Startseite nicht.
     expect(screen.getByRole("button", { name: "Neuen Bogen erstellen" })).toBeDefined();
-    expect(document.body.textContent).not.toMatch(/die Nummer auf dem Zettel eintragen/);
+    expect(document.body.textContent).not.toMatch(/Nummer auf den Zettel schreiben/);
   }, 40000);
 });

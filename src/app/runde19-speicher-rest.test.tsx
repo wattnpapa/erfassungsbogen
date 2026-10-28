@@ -178,7 +178,7 @@ describe("R19-W10/S13/S12 Rückfrage, Export-Satz und Sprung", () => {
     render(<Wirt id={s.id} extra={{ onWeitergeben: () => {}, onLageblatt: () => {} }} />);
     expect(screen.getByRole("button", { name: "Übergabe, Abschluss ↓" })).toBeDefined();
     expect(document.getElementById("abschluss")).not.toBeNull();
-    expect(document.querySelector(".einsatz-beendet-kopf")!.textContent).toMatch(/Einsatz beendet .* — noch offen: 6/);
+    expect(document.querySelector(".einsatz-beendet-kopf")!.textContent).toMatch(/Einsatz beendet .* — noch offen: Weitergabe-Datei \(Sammel-PDF\), Lageblatt und 4 weitere/);
   });
 });
 

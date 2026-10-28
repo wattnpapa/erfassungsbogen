@@ -352,21 +352,23 @@ export function offlineText(s: OfflineZustand): string {
     // Zweite Stufe noch unvollständig: Bogen, PDF, QR und Empfang gehen
     // schon ohne Netz, Beispielbögen und Themenseiten folgen (R3-O3).
     if (s.zusatz && s.zusatz.fertig < s.zusatz.gesamt) {
-      const kopf = s.frischBereit ? "✓ Jetzt offline bereit" : "✓ Offline bereit";
+      // R20-N7: „Jetzt offline bereit" erst, wenn alles geladen ist – hier steht nur, dass der Kern bereit ist,
+      // und der Rest getrennt als „lädt noch".
+      const kopf = "✓ Bogen, PDF, QR-Code und Empfang gehen offline";
       // Hakt das Nachladen, sagt die Zeile es und dass der Versuch weiterläuft
       // (R5-O2) — „werden nachgeladen" bei stehendem Zähler war falsch.
       if (s.online && s.zusatzHakt) {
-        return `${kopf} für Bogen, PDF, QR-Code und Empfang. Beispielbögen und Themenseiten: ${s.zusatz.fertig} von ${s.zusatz.gesamt} da, das Netz hakt — der nächste Versuch läuft von selbst — ${daten}`;
+        return `${kopf}. Rest (Beispielbögen, Themenseiten): ${s.zusatz.fertig} von ${s.zusatz.gesamt} da, das Netz hakt — der nächste Versuch läuft von selbst — ${daten}`;
       }
       return s.online
-        ? `${kopf} für Bogen, PDF, QR-Code und Empfang. Beispielbögen und Themenseiten werden nachgeladen (${s.zusatz.fertig} von ${s.zusatz.gesamt}) — ${daten}`
-        : `${kopf} für Bogen, PDF, QR-Code und Empfang. Beispielbögen und Themenseiten fehlen noch (${s.zusatz.fertig} von ${s.zusatz.gesamt}), sie folgen beim nächsten Netz — ${daten}`;
+        ? `${kopf}. Rest lädt noch (Beispielbögen, Themenseiten): ${s.zusatz.fertig} von ${s.zusatz.gesamt} — ${daten}`
+        : `${kopf}. Rest fehlt noch (Beispielbögen, Themenseiten): ${s.zusatz.fertig} von ${s.zusatz.gesamt}, folgt beim nächsten Netz — ${daten}`;
     }
     // Zweite Stufe noch nicht gezählt (gleich nach dem Aktivieren, oder das
     // Verzeichnis der Stufen fehlt): sicher ist nur der Kern. Vorher stand hier
     // kurz „komplett offline", obwohl noch keine Beispielbögen im Gerät lagen.
     if (s.zweiStufen && !s.zusatz) {
-      return `${s.frischBereit ? "✓ Jetzt offline bereit" : "✓ Offline bereit"} für Bogen, PDF, QR-Code und Empfang — ${daten}`;
+      return `✓ Bogen, PDF, QR-Code und Empfang gehen offline. Der Rest (Beispielbögen, Themenseiten) wird noch gezählt — ${daten}`;
     }
     return s.frischBereit
       ? `✓ Jetzt offline bereit. Funktioniert komplett offline — ${daten}`

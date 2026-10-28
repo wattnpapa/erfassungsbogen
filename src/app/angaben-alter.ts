@@ -26,6 +26,8 @@ export interface AngabenSeit {
   wort: "Stand" | "Meldung";
   /** Nur die Kennzeichnung (Übung/Einsatz) wurde umgestellt: keine Folgemeldung mit neuem Inhalt. */
   kennzeichnung?: boolean;
+  /** Der Ort der Einheit wurde am Meldekopf geändert (R20-H1); `kennzeichnung` ist dann ebenfalls gesetzt. */
+  name?: boolean;
   /** Wann am Meldekopf geändert wurde (ms). */
   geaendertAm: number;
 }
@@ -54,11 +56,13 @@ export function standLiegtWeitVorEingang(e: MitStand): boolean {
 }
 
 /** Die Angaben einer neuen Handänderung: das Alter der Vorgängerin bleibt (R17-K1). */
-export function angabenErben(vorgaengerin: MitStand, kennzeichnung = false, jetzt = Date.now()): AngabenSeit {
+export function angabenErben(vorgaengerin: MitStand, kennzeichnung: boolean | "name" = false, jetzt = Date.now()): AngabenSeit {
   return {
     seit: angabenZeit(vorgaengerin),
     wort: standLiegtWeitVorEingang(vorgaengerin) ? "Stand" : "Meldung",
     ...(kennzeichnung ? { kennzeichnung: true } : {}),
+    // R20-H1: „Ort der Einheit ändern…" – keine Folgemeldung (wie die Kennzeichnung), der Vermerk sagt „Name".
+    ...(kennzeichnung === "name" ? { name: true } : {}),
     geaendertAm: jetzt,
   };
 }
@@ -83,10 +87,14 @@ export function eintreffzeitStapelHinweis(neu: number, jetzt: number = Date.now(
  */
 export function handAenderungText(e: { angaben?: AngabenSeit }): string {
   if (!e.angaben) return "";
-  return `${e.angaben.kennzeichnung ? "Kennzeichnung" : "Stärke"} am Meldekopf geändert ${zeitLang(e.angaben.geaendertAm)}`;
+  return `${e.angaben.name ? "Ort der Einheit" : e.angaben.kennzeichnung ? "Kennzeichnung" : "Stärke"} am Meldekopf geändert ${zeitLang(e.angaben.geaendertAm)}`;
 }
 
-/** „Stand" oder „Meldung": das Wort vor „vor 14 Std 0 Min". */
-export function angabenAlterWort(e: MitStand): "Stand" | "Meldung" {
-  return standLiegtWeitVorEingang(e) ? "Stand" : "Meldung";
+/**
+ * Das Wort vor „vor 14 Std 0 Min": immer „Stand" (R20-A3). Das Alter rechnet ab dem Stand der Angaben (siehe
+ * `angabenZeit`) – gleiche Ursache, gleiche Bezeichnung; „Meldung vor …" wechselte je Karte ohne erkennbaren Grund
+ * und ließ nach einer alten Meldung fragen, obwohl nur die Angaben im Bogen alt waren.
+ */
+export function angabenAlterWort(_e: MitStand): "Stand" | "Meldung" {
+  return "Stand";
 }

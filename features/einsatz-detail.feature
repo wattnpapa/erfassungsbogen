@@ -174,11 +174,11 @@ Funktionalität: Einsatz-Sammlung führen (Meldekopf)
 
   Szenario: Sammel-PDF bündelt alle Bögen in einer Datei
     Wenn ich auf "Einsatz weitergeben / sichern" klicke und eine Datei erhalte
-    Dann heißt die heruntergeladene Datei wie "*_eeb-einsatz_*.pdf"
+    Dann heißt die heruntergeladene Datei wie "*_eeb-einsatz-sammel-pdf_*.pdf"
 
   Szenario: CSV-Übersicht für die Lagekarte
     Wenn ich auf "Übersicht als CSV" klicke und eine Datei erhalte
-    Dann heißt die heruntergeladene Datei wie "*_eeb-einsatz_*.csv"
+    Dann heißt die heruntergeladene Datei wie "*_eeb-einsatz-uebersicht_*.csv"
 
   Szenario: CSV mit allen Daten aller Bögen für die Auswertung
     Wenn ich auf "Alle Daten als CSV" klicke und eine Datei erhalte

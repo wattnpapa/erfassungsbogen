@@ -357,6 +357,13 @@ Grundlage: Repository `wattnpapa/erfassungsbogen`, Stand 2026-09-12 — Version 
 > und `vendor/` unverändert. Der Entwurf trägt zusätzlich die Marke „über die
 > Startseite verlassen" (`fremd.startseite`, R5-N3, 3.3 D1) — keine Daten.
 
+> **Nachgezogen 2026-10-28 (Runde 20):** Audit Runde 20. Speicher (3.3, 5.5): kein neuer
+> Schlüssel; bei vollem Speicher geht ein Bogen nicht mehr verloren (Risiko
+> „Datenverlust durch volle Ablage" erneut geprüft, P1 behoben). Lieferkette (6.4):
+> Startbündel 0,73 MB (Zeichensammlung und Einsatzansicht nachgeladen, beide im
+> Service-Worker-Precache, Gesamtumfang des JavaScripts 5,7 MB). Keine neuen Hosts,
+> CSP und Transportformat unverändert.
+
 > **Nachgezogen 2026-10-28 (Runde 19):** Audit Runde 19. Speicher (3.3, 5.5): kein neuer
 > Schlüssel. Verfügbarkeit (5.5): Löschen, Entfernen, Beenden und Übergabe-Vermerk
 > prüfen das Ergebnis des Schreibens; bei vollem Speicher erscheint ein Dialog mit

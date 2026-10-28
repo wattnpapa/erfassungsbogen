@@ -11,13 +11,14 @@
  * gemeinsamen Bausteine durcheinander (Einheitentabelle, Auswertung, Meldungsvergleich rutschten ins Startbündel: +26 KB gemessen,
  * ADR-003 Aufnahmeregel 5); statisch eingebunden bleibt das Startbündel unter dem Budget (+7 KB).
  */
+import { useEffect, useState } from "react";
 import type { Einsatzsammlung } from "@bos/meldekopf/einsaetze";
 import { frageFelder, zeigeHinweis } from "./dialoge";
 import { einsaetzeLaden, einsaetzePapierkorb } from "./einsaetze-lesen";
 import { abschlussLaden, abschlussOffen, abschlussSetzen, abschlussUebergabeText, meldungenSeit, neueMeldungenText, UEBERGABE_AN_MAX } from "./einsatz-abschluss";
-import { speicherFehlerArt } from "./eintrag-zeiten";
+import { platzRat, speicherFehlerArt } from "./eintrag-zeiten";
 import { exportStaendeLaden, exportZeitKurz, lageblattStandLaden, neueEintraege, weitergabeStandLaden, type ExportStand } from "./export-stand";
-import { letzteSicherung, sicherungStandText } from "./sicherung";
+import { letzteSicherung, SICHERUNG_EREIGNIS, sicherungStandText } from "./sicherung";
 
 /** Ein Weg des Abschlusses: erledigt? wann? und was seitdem an Meldungen dazukam (R19-W1). */
 export interface AbschlussWeg {
@@ -65,11 +66,18 @@ export function nichtGespeichert(titel: string, was: string): void {
   const ursache = speicherFehlerArt() === "gesperrt" ? "dieser Browser lässt die App nichts speichern" : "der Speicher dieses Geräts ist voll";
   void zeigeHinweis({
     titel,
-    text: `${was} ist nicht gespeichert — ${ursache}. Nichts hat sich geändert. Erst sichern (Einsatz weitergeben / sichern), dann Platz schaffen: Papierkorb leeren oder alte Einsätze endgültig löschen.`,
+    text: `${was} ist nicht gespeichert — ${ursache}. Nichts hat sich geändert. ${speicherFehlerArt() === "gesperrt" ? "Speichern für diese Seite erlauben oder ein normales Fenster nutzen." : platzRat()}`,
   });
 }
 
 export default function AbschlussBlock({ einsatz, onGeaendert, onQuittung }: { einsatz: Einsatzsammlung; onGeaendert: () => void; onQuittung?: (q: AbschlussQuittung | null) => void }) {
+  // R20-O2: Entsteht im Fußdialog eine Sicherung, zeichnet die Liste sofort neu („zuletzt gesichert“ statt „noch nicht“).
+  const [, neuZeichnen] = useState(0);
+  useEffect(() => {
+    const hoeren = () => neuZeichnen((n) => n + 1);
+    window.addEventListener(SICHERUNG_EREIGNIS, hoeren);
+    return () => window.removeEventListener(SICHERUNG_EREIGNIS, hoeren);
+  }, []);
   const a = abschlussLaden(einsatz.id);
   const gesichert = letzteSicherung();
   const bekannt = () => [...einsaetzeLaden(), ...einsaetzePapierkorb()].map((x) => x.id);

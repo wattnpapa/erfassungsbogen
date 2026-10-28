@@ -28,6 +28,7 @@ import { zeitLang } from "./eintrag-zeiten";
 import { FELDER, STAND_FELDER, standGleichheit, vermerkFeld, vermerkKennung, type Feld, type StandFeld } from "./einsatz-abgleich";
 import { MeldeStatus } from "@bos/meldekopf/einsaetze";
 import { geltendeJeEinheit } from "./fassung-vorrang";
+import { nummernHinweisLoeschen } from "./nummern-hinweis";
 import { ORT_REGEL, abweichenderOrt } from "./einheiten-tabelle";
 
 /**
@@ -296,6 +297,8 @@ export function lageblattVermerken(einsatz: Einsatzsammlung, behalten?: Iterable
   }
   neu[einsatz.id] = stand;
   vermerkGelungen = ablageSpeichern(neu, LAGEBLATT_SCHLUESSEL);
+  // R20-D3: Das neue Lageblatt trägt die geltenden Nummern; der Hinweis auf geänderte Nummern hat seinen Zweck erfüllt.
+  nummernHinweisLoeschen(einsatz.id);
   return stand;
 }
 

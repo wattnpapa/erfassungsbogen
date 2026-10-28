@@ -15,7 +15,7 @@ import helvetica from "pdfmake/build/standard-fonts/Helvetica";
 import type { Erfassungsbogen } from "@bos/eeb-format/model";
 import { base64UrlDekodieren } from "@bos/eeb-format/codec";
 import { absenderLabel } from "@bos/eeb-format/signatur";
-import { artMitMarke, ausgabeDateiname, dateinameTeil, einheitAnzeigename, qrErzeugen } from "./hilfen";
+import { artMitMarke, ausgabeDateiname, dateiZeitstempel, dateinameTeil, einheitAnzeigename, qrErzeugen } from "./hilfen";
 import { istNativ, binaerTeilen } from "./nativ";
 import { fortschrittMelden } from "./arbeitet";
 import { entfernteNummernText } from "./meldungs-papierkorb";
@@ -163,9 +163,13 @@ export async function meldungPdfAnzeigen(m: MeldeEintrag, fenster: Window | null
   return dateiname;
 }
 
-/** `eeb-<Stand>_<Einheit>.pdf` — Stand des Bogens in der Schreibweise der anderen Dateien (R17-A2). */
-export function einzelDateiname(b: Erfassungsbogen): string {
-  return ausgabeDateiname("", dateinameTeil(einheitAnzeigename(b.einheit)), "pdf", new Date(zeitpunktZuMs(b.stand)));
+/**
+ * `<Erzeugung>_eeb_<Einheit>_Stand_<Stand des Bogens>.pdf` — vorn der Zeitpunkt der Erzeugung wie bei allen anderen
+ * Ausgaben (R20-G8), der Stand des Bogens dahinter, damit zwei Stände derselben Einheit unterscheidbar bleiben (R17-A2).
+ */
+export function einzelDateiname(b: Erfassungsbogen, jetzt: Date = new Date()): string {
+  const stand = dateiZeitstempel(new Date(zeitpunktZuMs(b.stand)));
+  return ausgabeDateiname("", `${dateinameTeil(einheitAnzeigename(b.einheit))}_Stand_${stand}`, "pdf", jetzt);
 }
 
 /** Text des Platzhalter-Tabs, solange der Bogen entsteht. */
@@ -322,7 +326,7 @@ export async function einsatzPdfErzeugen(
   await fortschrittMelden("Datei wird geschrieben …");
   // Teilexport („nur neue Bögen") mit eigenem Dateinamen — sonst hießen
   // Nachtrag und ganze Sammlung gleich (Audit Runde 2, R2-A3).
-  const ok =await dokumentAusgeben(dd, ausgabeDateiname(artMitMarke("einsatz", marke), dateiRumpf(einsatz), "pdf"));
+  const ok =await dokumentAusgeben(dd, ausgabeDateiname(artMitMarke("einsatz-sammel-pdf", marke), dateiRumpf(einsatz), "pdf")); // R20-N8: Sammel-PDF und Übersicht-CSV unterscheiden sich im Namen
   // Die ganze Sammlung ging heraus — womöglich an die nächste Schicht. Die
   // Einsatzansicht sagt danach, wann, und was seitdem nur hier dazukam
   // (Audit Runde 2, R2-W5). Der Nachtrag „nur neue Bögen" ist keine Übergabe.

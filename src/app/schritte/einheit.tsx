@@ -32,6 +32,7 @@ import {
   vokabularFuer,
 } from "../hilfen";
 import { frageJaNein } from "../dialoge";
+import { ortOhneOrganisation } from "../ort-praefix";
 import { DaumenQuittung } from "../daumen-quittung";
 import { EBENE_WEG_SCHLUESSEL, rueckwegHolen, rueckwegMerken } from "../rueckweg-sitzung";
 import { vorbelegungWegLesen, vorbelegungWegSichern, zustandsAbdruck, type VorbelegungWeg } from "../vorbelegung-rueckweg";
@@ -174,10 +175,12 @@ export function ovFreiHinweis(name: string, treffer: readonly ThwOrtsverband[]):
   if (treffer.length === 0) {
     return `„${name}" ist nicht im OV-Verzeichnis — Vorschlag antippen, sonst fehlen Kürzel, Telefon und E-Mail. Ein Ortsverband, den es dort nicht gibt, darf so stehen bleiben.`;
   }
-  const namen = treffer.slice(0, 3).map((o) => o.name).join(", ") + (treffer.length > 3 ? " …" : "");
+  // R20-S4: den vollen Namen des Vorschlags mit Kürzel nennen („OV Flensburg (OFLE)"), damit er sich vom Eingegebenen unterscheidet.
+  const voll = (o: ThwOrtsverband) => `OV ${o.name} (${o.kurz})`;
+  const namen = treffer.slice(0, 3).map(voll).join(", ") + (treffer.length > 3 ? " …" : "");
   return treffer.length === 1
-    ? `„${name}" meint vielleicht ${namen} — Vorschlag antippen, sonst fehlen Kürzel, Telefon und E-Mail.`
-    : `„${name}" kann mehrere Ortsverbände meinen (${namen}) — Vorschlag antippen, sonst fehlen Kürzel, Telefon und E-Mail.`;
+    ? `„${name}" meint vielleicht ${namen} — Vorschlag antippen, dann kommen Kürzel, Telefon und E-Mail dazu.`
+    : `„${name}" kann mehrere Ortsverbände meinen (${namen}) — Vorschlag antippen, dann kommen Kürzel, Telefon und E-Mail dazu.`;
 }
 
 /**
@@ -662,7 +665,14 @@ export function SchrittEinheit({ bogen, aendern: aendernRoh, ortFokus = false }:
       <span
         style={{ display: "contents" }}
         onFocusCapture={() => setNameImFokus(i)}
-        onBlurCapture={() => setNameImFokus((z) => (z === i ? null : z))}
+        onBlurCapture={() => {
+          setNameImFokus((z) => (z === i ? null : z));
+          // R20-H1: „THW Oldenburg" statt „Oldenburg" getippt – die Organisation steht schon davor, nicht doppelt speichern.
+          if (e.organisation === OrganisationsTyp.THW && h.bezeichnung.code === 1) {
+            const sauber = ortOhneOrganisation(h.name, orgLabel(e.organisation));
+            if (sauber !== h.name) setE({ hierarchie: e.hierarchie.map((x, j) => (j === i ? { ...x, name: sauber } : x)) });
+          }
+        }}
       >
       <Feld titel={i === 0 ? "Ort der Einheit (Pflicht)" : "Name"}>
         {e.organisation === OrganisationsTyp.THW && h.bezeichnung.code === 1 ? (
@@ -795,6 +805,9 @@ export function SchrittEinheit({ bogen, aendern: aendernRoh, ortFokus = false }:
           </button>
         </p>
       )}
+      {/* R20-N2: Auch im Vollassistenten steht der Ort — das einzige Pflichtfeld — gleich unter der Organisation, nicht hinter dem
+          Absatz „Zugehörigkeit / Kontaktstellen" unter dem Falz. */}
+      {!schnell && e.hierarchie[0] && ortBlock(e.hierarchie[0], 0)}
       {!schnell && typZeile}
       {!schnell && vorbelegungHinweis}
 
@@ -861,7 +874,7 @@ export function SchrittEinheit({ bogen, aendern: aendernRoh, ortFokus = false }:
               platzhalter="z. B. Landkreis"
             />
           </Feld>
-          {!(schnell && i === 0) && ortBlock(h, i)}
+          {i > 0 && ortBlock(h, i)}
           {/* Das Kürzel (z. B. THW-OV "OODE") ergibt nur beim THW Sinn; andere Organisationen führen keine solchen Kürzel.
               „Dienststellen-Kürzel (optional)": „Kürzel" allein las ein Neuling als
               irgendeine Abkürzung und tippte „OV OL" — das Beispiel sagt, was gemeint ist. */}

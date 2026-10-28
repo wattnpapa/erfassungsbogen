@@ -16,6 +16,11 @@ import { ausgabeSperreSetzen } from "../app/ausgabe-sperre";
 // Der Inhalt des Fensters „Namen einfügen…" lädt im Browser nach (React.lazy). Im Test liegt er schon im Modulspeicher, damit das
 // Fenster nach einem Klick ohne Wartezeit steht — wie im Browser, wo der Schritt das Nachladen beim Öffnen anstößt.
 import "../app/schritte/namen-dialog";
+// Ebenso die Einsatzansicht und die taktischen Zeichen (nachgeladene Brocken, siehe einsaetze-lazy.tsx, zeichen-bild.tsx);
+// ihre eigenen Tests (startbuendel-nachladen.test.tsx) prüfen das Nachladen mit frischem Modulspeicher.
+import { einsatzUiLaden } from "../app/einsaetze-lazy";
+import { zeichenLaden } from "../app/zeichen-bild";
+await Promise.all([einsatzUiLaden(), zeichenLaden()]);
 // Dasselbe für die Tipp-Sperre der Ausgaben der Einsatzansicht (R12-G2); ihr eigener Test schaltet sie ein.
 ausgabeSperreSetzen(0);
 // Testing Library klickt schneller als jeder Finger: der Prellschutz der

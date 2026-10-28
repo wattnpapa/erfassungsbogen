@@ -6725,6 +6725,209 @@
     .namen-fuss { position: sticky; bottom: 0; z-index: 1; background: var(--flaeche); padding: 8px 0 4px; border-top: var(--strich) solid var(--linie); }
     .namen-fuss > p { margin: 0 0 4px; }
     /* ===== Ende Runde 19 (Schnellerfassung und Karte) ===== */
+    /* ===== Runde 20 (Texte und Logik) ===== */
+    /* R20-H10: Der Rücksprung „‹ Einsatz „Name"" bricht den Namen um, statt ihn mit „…" zu kürzen (zwei Bögen mit gleichem Anfang waren
+       nicht zu unterscheiden, das schließende Anführungszeichen fehlte). Mindestens 44 px hoch, so hoch wie nötig. */
+    :root:root .seiten-kopf.assistent-kopf .kopf-oberzeile .zur-start.zur-einsatz {
+      display: block; flex: 1 1 0; min-width: 0; max-width: 100%; height: auto; white-space: normal; overflow: visible;
+      text-overflow: clip; overflow-wrap: anywhere; text-align: left; line-height: 1.25; padding-block: 6px; min-height: 44px;
+    }
+    /* ===== Ende Runde 20 (Texte und Logik) ===== */
+    /* ===== Runde 20 (Speicher) ===== */
+    /* R20-D4, O5: „Papierkorb Einsätze (n)" ist ein Knopf von mindestens 44 px, kein Textverweis, und steht über der Liste der Einsätze. */
+    button.link.papierkorb-umschalter {
+      display: inline-flex; align-items: center; min-height: 44px; margin-block: 4px; padding: 0 14px; border: var(--strich-stark) solid var(--linie-stark);
+      border-radius: var(--radius); background: var(--flaeche); color: var(--text); font-weight: 600; text-decoration: none;
+    }
+    p.papierkorb-hinweis { margin: 12px 0 16px; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
+    /* ===== Ende Runde 20 (Speicher) ===== */
+    /* ===== Runde 20 (Layout) ===== */
+    /* R20-E1, H8, G5, M2, S2, L5: Scanner ohne Kamera im niedrigen Querformat (568 × 320, auch in „Feld"): Meldung und „Kamera erneut versuchen"
+       stehen in einer Zeile, der Rahmen trägt kleinere Überschriften; die Mitte rollt dann gar nicht. Wo sie doch rollen muss (Hinweise zum
+       Handscanner aufgeklappt, 360 × 640 in „Feld"), zeigt eine sichtbare Rollleiste und ein Schatten am Rand, dass es weitergeht. */
+    @media (orientation: landscape) and (max-height: 30rem) {
+      .scanner-mitte.scrollt { gap: 4px; }
+      .scanner-text.fehler { gap: 2px 14px; max-width: 100%; flex-wrap: nowrap; }
+      .scanner-text.fehler > button.scanner-erneut { flex: none; }
+      .scanner-handscanner > .handscanner-hinweise > summary { font-size: min(var(--t-s), 15px); min-height: 44px; }
+      .scanner-text.fehler > p { font-size: min(var(--t-s), 15px); flex: 0 1 auto; }
+      .scanner-text.fehler > button.scanner-erneut { justify-self: auto; margin: 0; }
+      .scanner-handscanner .handscanner-titel { font-size: min(var(--t-m), 15px); line-height: 1.25; }
+      .scanner-handscanner .scanner-schritte { font-size: min(15px, var(--t-s)); }
+      .scanner-handscanner > .handscanner-lampe { font-size: min(var(--t-s), 15px); padding-block: 2px; }
+    }
+    .scanner-mitte.scrollt {
+      scrollbar-width: auto; scrollbar-color: #fff rgba(255, 255, 255, 0.25);
+      background:
+        linear-gradient(#000 30%, rgba(0, 0, 0, 0)) top / 100% 28px no-repeat local,
+        linear-gradient(rgba(0, 0, 0, 0), #000 70%) bottom / 100% 28px no-repeat local,
+        radial-gradient(farthest-side at 50% 0, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0)) top / 100% 12px no-repeat scroll,
+        radial-gradient(farthest-side at 50% 100%, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0)) bottom / 100% 12px no-repeat scroll;
+    }
+    .scanner-mitte.scrollt::-webkit-scrollbar { width: 12px; }
+    .scanner-mitte.scrollt::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.25); border-radius: 6px; }
+    .scanner-mitte.scrollt::-webkit-scrollbar-thumb { background: #fff; border-radius: 6px; border: 2px solid #000; }
+    /* R20-G7, M3, S3, H7, M4: Assistent und Schnellerfassung im niedrigen Querformat: Rücksprung und Schrittleiste teilen sich eine Zeile
+       (Zeichen, Name der App und Legende entfallen, die Überschrift bleibt für Vorlesesoftware), Kopf und Fußleiste lassen so mindestens
+       60 % der Höhe für Formular und Ortsfeld. */
+    @media (orientation: landscape) and (max-height: 30rem) {
+      :root:root .seiten-kopf.assistent-kopf .kopf-inhalt { flex-wrap: nowrap; column-gap: 10px; }
+      :root:root .seiten-kopf.assistent-kopf .titelzeile {
+        position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); padding: 0; margin: 0; white-space: nowrap;
+      }
+      :root:root .seiten-kopf.assistent-kopf .kopf-oberzeile { order: 1; flex: 1 1 0; min-width: 0; max-width: none; }
+      :root:root .seiten-kopf.assistent-kopf .kopf-oberzeile .zur-start { display: block; min-width: 0; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: left; }
+      :root:root .seiten-kopf.assistent-kopf .kopf-oberzeile .zur-start.zur-einsatz { font-size: min(var(--t-s), 15px); line-height: 1.2; padding-block: 4px; }
+      :root:root .seiten-kopf.assistent-kopf .schritte { order: 2; flex: 0 0 auto; width: auto; }
+      :root:root .seiten-kopf.assistent-kopf .schritte-erklaerung, :root:root .seiten-kopf.assistent-kopf .schritte-schnell-kurz { display: none; }
+    }
+    /* R20-H4, G4: Die Einsatzansicht trägt „Ansicht: Standard ▾" im Kopf, neben „‹ Startseite" (wie Startseite und Assistent): Wer bei Dunkelheit
+       auf „Nacht" oder mit Handschuhen auf „Feld" will, findet den Schalter ohne Bildlauf. (R10-M3 hatte ihn unter Tabletbreite ganz
+       dem Balken am unteren Rand überlassen, der erst nach dem Zurückrollen erscheint.) Der Balken bleibt für den Wechsel tief in der Liste. */
+    @media (max-width: 47.999rem) {
+      :root:root .seiten-kopf.einsatz-kopf .anzeige-mit-name { display: inline-flex; }
+      :root:root .seiten-kopf.einsatz-kopf .anzeige-mit-name > .anzeige-name { display: none; }
+      :root:root .seiten-kopf.einsatz-kopf .anzeige-schalter.klappbar .anzeige-klappe {
+        display: inline-flex; flex-direction: row; align-items: center; gap: 0.3em; white-space: nowrap; min-height: 44px;
+      }
+      .seiten-kopf.einsatz-kopf .anzeige-schalter.klappbar:not(.offen) > button:not(.anzeige-klappe) { display: none; }
+      .seiten-kopf.einsatz-kopf .kopf-oberzeile:has(.anzeige-schalter.offen) { flex-wrap: wrap; }
+      .seiten-kopf.einsatz-kopf .kopf-oberzeile:has(.anzeige-schalter.offen) .anzeige-mit-name { flex: 1 1 100%; }
+      .seiten-kopf.einsatz-kopf .anzeige-schalter.klappbar.offen { flex: 1 1 100%; display: flex; flex-wrap: wrap; }
+      .seiten-kopf.einsatz-kopf .anzeige-schalter.klappbar.offen .anzeige-klappe { flex: 1 1 100%; justify-content: center; }
+      .seiten-kopf.einsatz-kopf .anzeige-schalter.klappbar.offen > button:not(.anzeige-klappe) { flex: 1 1 0; }
+    }
+    /* R20-H7, M4: Einsatzansicht im niedrigen Querformat (568 × 320): Rücksprung, Name und Ansicht in einer Zeile, darunter die Angaben zur
+       Lage mit „Name / Ort ändern…"; Kennzahlen niedriger. „Bogen scannen…" beginnt so vor 60 % der Höhe und liegt ganz im Bild. */
+    @media (orientation: landscape) and (max-height: 30rem) and (max-width: 47.999rem) {
+      .seiten-kopf.einsatz-kopf .kopf-inhalt {
+        display: grid; grid-template-columns: auto minmax(0, 1fr) auto; grid-template-areas: "zur titel ansicht" "info info aendern";
+        align-items: center; column-gap: 12px; row-gap: 2px; padding-block: 4px;
+      }
+      .seiten-kopf.einsatz-kopf .kopf-oberzeile, .seiten-kopf.einsatz-kopf .titelzeile { display: contents; }
+      .seiten-kopf.einsatz-kopf .kopf-oberzeile > .zur-start { grid-area: zur; }
+      .seiten-kopf.einsatz-kopf .kopf-oberzeile > .anzeige-mit-name { grid-area: ansicht; justify-self: end; }
+      .seiten-kopf.einsatz-kopf .titelzeile > h1 { grid-area: titel; margin: 0; font-size: min(var(--t-l), 20px); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+      .seiten-kopf.einsatz-kopf .titelzeile > .kopf-aendern { grid-area: aendern; justify-self: end; }
+      .seiten-kopf.einsatz-kopf .kopf-inhalt > p.hinweis { grid-column: 1 / -1; margin: 0; }
+      .seiten-kopf.einsatz-kopf .kopf-inhalt > p.hinweis:not(.einsatz-beendet-kopf):not(.weitergabe-vermerk) {
+        grid-area: info; grid-column: 1 / 3; font-size: min(var(--t-s), 14px); line-height: 1.25;
+        display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; line-clamp: 3; overflow: hidden;
+      }
+      :root:root main.einsatz-detail .staerke-leiste { padding: 0; margin-bottom: 10px; }
+      :root:root main.einsatz-detail .staerke-leiste > div { padding-block: 2px; gap: 0; }
+      :root:root main.einsatz-detail .staerke-leiste strong { font-size: min(var(--t-zahl), 22px); line-height: 1.1; }
+      :root:root main.einsatz-detail .staerke-leiste span { font-size: min(var(--t-xs), 11px); line-height: 1.2; }
+      :root:root main.einsatz-detail { padding-top: 8px; }
+    }
+    /* R20-H9, M5, L2: „Datensicherung" und „Alle Daten löschen" am kleinen Telefon (320 × 568 in „Feld": 1 141 und 922 px Inhalt): Kopf ohne Kleben
+       in einer Zeile, Fließtext höchstens 16 px, Haken und Entscheidung kleben am Fuß (rund ein Drittel des Fensters) — Haken, „Endgültig
+       löschen" und „Abbrechen" stehen im ersten Bild, „Sicherung erstellen…" auch. */
+    @media (max-width: 30rem) and (max-height: 40rem) {
+      :root:root dialog.rollhinweis > .kopfzeile:first-child { position: static; box-shadow: none; flex-wrap: nowrap; align-items: center; gap: 8px; padding-top: 10px; padding-block-end: 4px; }
+      :root:root dialog.rollhinweis > .kopfzeile:first-child h2 { font-size: min(var(--t-l), 19px); line-height: 1.2; flex: 1 1 0; min-width: 0; }
+      :root:root dialog.rollhinweis > .kopfzeile:first-child > button { flex: 0 0 auto; margin-left: 0; font-size: min(var(--t-m), 16px); min-height: 44px; padding-inline: 12px; }
+      :root:root dialog.rollhinweis p, :root:root dialog.rollhinweis label.inline, :root:root dialog.rollhinweis li { font-size: min(var(--t-m), 16px); line-height: 1.35; }
+      :root:root dialog.rollhinweis p { margin-block: 0 8px; }
+      :root:root dialog.rollhinweis button, :root:root dialog.rollhinweis .datei-knopf { font-size: min(var(--t-m), 16px); min-height: 44px; padding-block: 4px; }
+      :root:root dialog.rollhinweis .dialog-entscheidung { position: sticky; bottom: 0; box-shadow: 0 -10px 8px -8px rgba(0, 0, 0, 0.35); }
+      :root:root dialog.rollhinweis .dialog-entscheidung > .aktionen { margin-top: 6px; gap: 24px; row-gap: 24px; }
+      :root:root dialog.rollhinweis .dialog-entscheidung > p.dialog-fehlt { margin: 4px 0 0; font-size: min(var(--t-s), 14px); line-height: 1.3; }
+    }
+    /* R20-G1, M6, L1, O4, A4: In der aufgeklappten Karte sind „ganz zeigen", „Warum?" und „Hinweise: …" Ziele von mindestens 44 px (in „Feld"
+       größer) mit eigener Fläche: kein negativer Außenabstand mehr, der ihre Trefferfläche über den Nachbarn legte (der Tipp auf „ganz zeigen"
+       öffnete „Hinweise: …"). „Warum?" steht 8 px über „Gehört zu dieser Lage". */
+    .einheit-zeile.karte-offen { --ziel-karte: calc(var(--ziel-basis) + var(--ziel)); }
+    /* R20-G2, M1: Der Chip „⚠ Anderer Einsatz? Prüfen ▸" liegt über dem Aufklapp-Knopf der Karte und ist ein eigenes Ziel: Er klappt auf und
+       bringt „Gehört zu dieser Lage" ins Bild. */
+    .einheit-zeile button.kompakt-merkmal.marke-knopf { position: relative; z-index: 2; min-height: calc(var(--ziel-basis) + var(--ziel)); }
+    :root:root .einheit-zeile.karte-offen .muster-sub.bemerkung button.link.zeit-aendern {
+      display: inline-block; vertical-align: middle; margin: 0 0 0 0.25rem; padding: 0 0.5rem; min-height: var(--ziel-karte); line-height: var(--ziel-karte);
+    }
+    :root:root .einheit-zeile.karte-offen .muster-sub > button.link.luecken-marke {
+      display: block; margin: 0; padding-block: calc((var(--ziel-karte) - 1.3em) / 2); min-height: var(--ziel-karte); text-align: left;
+    }
+    :root:root .einheit-zeile.karte-offen .muster-sub:has(> button.luecken-marke) { margin-block: 0 8px; }
+    :root:root .einheit-zeile.karte-offen .muster-sub.bemerkung { margin-bottom: 8px; }
+    :root:root .fremder-ort .ort-warum > summary {
+      display: inline-block; vertical-align: middle; min-height: var(--ziel-karte, 44px); line-height: var(--ziel-karte, 44px); padding-inline: 0.5rem; margin-bottom: 8px;
+    }
+    /* R20-S5, N6, H11, H12: Einheitentabelle am Telefon (Kernspalten): Der Rollbereich endet am Kartenrand (der Außenabstand von −16 px
+       überholte das Seitenpolster von 8 px und ließ die Tabelle 7 px über den Rahmen ragen), Köpfe ausgeschrieben („Stärke",
+       „Eingetroffen") in Fließschrift, Zellen mindestens 14 px, alle Zellen einer Zeile oben ausgerichtet; das Alter der Angaben steht
+       beim Namen. */
+    @media (max-width: 40rem) {
+      .karte > .tabellen-scroll:has(> table.einheiten-tabelle) { margin-inline: -8px; }
+      :root:root table.einheiten-tabelle.tabelle-kern thead th { font-family: inherit; text-transform: none; letter-spacing: 0; font-size: 14px; font-weight: 700; line-height: 1.2; vertical-align: bottom; }
+      :root:root table.einheiten-tabelle.tabelle-kern tbody td, :root:root table.einheiten-tabelle.tabelle-kern tbody th { font-size: 14px; vertical-align: top; }
+      :root:root table.einheiten-tabelle.tabelle-kern tbody th .alter-marke { display: block; font-size: 13px; line-height: 1.25; margin-top: 2px; }
+      :root:root table.einheiten-tabelle.tabelle-kern thead th { white-space: nowrap; padding-inline: 3px; font-size: 14px; }
+      :root:root table.einheiten-tabelle.tabelle-kern > * > tr > :first-child { box-sizing: border-box; width: 36%; min-width: 0; max-width: none; }
+      :root:root table.einheiten-tabelle.tabelle-kern:has(th[data-spalte="zugEtikett"]) > * > tr > :first-child { width: 30%; }
+      :root:root table.einheiten-tabelle.tabelle-kern th[data-spalte="gesamt"] { width: 14%; }
+      :root:root table.einheiten-tabelle.tabelle-kern th[data-spalte="eingetroffen"] { width: 26%; }
+      :root:root table.einheiten-tabelle.tabelle-kern th[data-spalte="zugEtikett"] { width: 13%; }
+    }
+    @media (max-width: 21rem) {
+      :root:root table.einheiten-tabelle.tabelle-kern > * > tr > :first-child { width: 31%; }
+      :root:root table.einheiten-tabelle.tabelle-kern:has(th[data-spalte="zugEtikett"]) > * > tr > :first-child { width: 27%; }
+      :root:root table.einheiten-tabelle.tabelle-kern th[data-spalte="gesamt"] { width: 15%; }
+      :root:root table.einheiten-tabelle.tabelle-kern th[data-spalte="eingetroffen"] { width: 31%; }
+    }
+    /* R20-E2: Personaltabelle der Übersicht am Telefon: Die Erreichbarkeit steht unter dem Namen (drei statt vier Spalten, nichts liegt
+       außerhalb des Rahmens, kein seitliches Wischen). */
+    .kontakt-unter { display: none; }
+    @media (max-width: 40rem) {
+      table.uebersicht .kontakt-spalte { display: none; }
+      table.uebersicht .kontakt-unter { display: block; margin-top: 2px; font-size: min(var(--t-s), 15px); color: var(--text-2); overflow-wrap: anywhere; }
+      table.personal-tabelle { table-layout: fixed; width: 100%; min-width: 0; }
+      table.personal-tabelle th { font-family: inherit; text-transform: none; letter-spacing: 0; font-size: 14px; line-height: 1.2; overflow-wrap: anywhere; hyphens: auto; }
+      table.personal-tabelle td { overflow-wrap: anywhere; }
+      table.personal-tabelle > * > tr > :nth-child(1) { width: 18%; }
+      table.personal-tabelle > * > tr > :nth-child(2) { width: 34%; }
+    }
+    /* R20-H6: Die Sprungverweise unter den Kennzahlen stehen je in einer eigenen Zeile mit 8 px Abstand (im selben Absatz berührten sich die
+       Trefferflächen, „Zur Einheitenliste ↓" lag nur 5 px über dem nächsten); in der Tabelle hat „Alle Spalten zeigen" 8 px Luft zu
+       „Suchen, sortieren, filtern". */
+    :root:root main.einsatz-detail p.hinweis.ausgabe-sprung { margin: 8px 0 0; }
+    :root:root p.hinweis.ausgabe-sprung > button.link { display: inline-block; vertical-align: middle; margin: 0 8px 8px 0; }
+    @media (max-width: 47.999rem) { .sprung-erklaerung { display: none; } }
+    :root:root .einsatz-liste p.tabellen-spalten { margin-top: 10px; }
+    /* R20-D4, O5: „Papierkorb Einsätze" und „Zum Papierkorb" haben in „Feld" dieselbe Zielhöhe wie die übrigen Knöpfe (mindestens 44 px). */
+    :root:root button.link.papierkorb-umschalter { min-height: calc(var(--ziel-basis) + var(--ziel)); }
+    :root:root .einsatz-liste p.hinweis.luecken-zaehler { margin-block: 4px 10px; }
+    @media (max-width: 47.999rem) {
+      :root:root main.einsatz-detail > section.einsatz-liste { padding-top: 10px; }
+      :root:root .einsatz-liste p.hinweis.staerke-legende { margin-block: 8px 10px; font-size: min(var(--t-xs), 13px); line-height: 1.3; }
+    }
+    :root:root .einsatz-liste p.hinweis.luecken-zaehler > button.link { display: inline-block; vertical-align: middle; margin: 0; }
+    /* R20-W6, H5, G6, N4: Nach dem Einlesen liegt die erste Einheitenkarte nicht mehr unter Bedarf, Zwischensummen und Sprungverweisen
+       (1 524 px bei 360 × 640): Am Telefon steht die Liste gleich nach Aufnahme, Quittung und den Kästen „Neu seit …"; Bedarf und
+       Zwischensummen folgen hinter ihr (sie sind einen Tipp entfernt, aufgeklappt), „Zur Einheitenliste ↓" entfällt, weil die Liste
+       darunter beginnt. Nur die Anordnung am Bildschirm ändert sich, nicht der Inhalt. */
+    @media (max-width: 47.999rem) {
+      main.einsatz-detail { display: flex; flex-direction: column; }
+      main.einsatz-detail > .einsatz-liste { order: 2; }
+      main.einsatz-detail .einsatz-seite > details.bedarf-block, main.einsatz-detail .einsatz-seite > details.zug-summen,
+      main.einsatz-detail .einsatz-seite > details.uebung-ausgenommen { order: 3; }
+      main.einsatz-detail > .einsatz-liste ~ * { order: 4; }
+      .seiten-kopf.einsatz-kopf .titelzeile > h1 { flex: 1 1 7rem; }
+      :root:root main.einsatz-detail .einsatz-liste > .kopfzeile h2 { font-size: min(var(--t-l), 19px); line-height: 1.25; }
+      main.einsatz-detail .einsatz-seite > p.ausgabe-sprung:not(.ausgabe-sprung ~ .ausgabe-sprung) { display: none; }
+    }
+    .handscanner-hinweise { scroll-margin-top: 4px; }
+    @media (orientation: landscape) and (max-height: 30rem) {
+      .scanner-handscanner:has(> .handscanner-hinweise[open]) { grid-template-areas: "bild bild" "titel titel" "schritte lampe" "hinweise hinweise"; }
+    }
+    /* ===== Ende Runde 20 (Layout) ===== */
+    /* ===== Runde 20 (Startbündel) ===== */
+    /* Platzhalter, solange die Einsatzansicht nachlädt (einsaetze-lazy.tsx): so hoch wie die Karten, die gleich dort stehen
+       (gemessen im Produktionsbuild: leere Karte 191 px am Telefon, 276 px ab 30 rem Breite) — die Seite springt beim Austausch nicht. */
+    .einsatz-laedt { --einsatz-karte-platz: 191px; min-height: calc(var(--karten, 1) * (var(--einsatz-karte-platz) + 16px) - 16px); }
+    @media (min-width: 30.0625rem) { .einsatz-laedt { --einsatz-karte-platz: 276px; } }
+    @media (max-width: 30rem) { .einsatz-laedt:not(.detail) { margin-bottom: 16px; } } /* am Telefon trägt die letzte Karte 16 px Abstand nach unten */
+    .einsatz-laedt.detail { min-height: 70vh; }
+    /* ===== Ende Runde 20 (Startbündel) ===== */
   </style>
 </head>
 <body>

@@ -113,7 +113,7 @@ describe("R18-K12 Kaltstart in den letzten Einsatz", () => {
 });
 
 describe("R18-W6/A4 Ausgaben der Einsatzansicht", () => {
-  it("die Übersicht als CSV heißt „JJJJ-MM-TT_HHMM_eeb-einsatz_<Einsatz>.csv“, und die Quittung nennt den Namen", async () => {
+  it("die Übersicht als CSV heißt „JJJJ-MM-TT_HHMM_eeb-einsatz-uebersicht_<Einsatz>.csv“, und die Quittung nennt den Namen", async () => {
     const nutzer = userEvent.setup();
     const s = einsatzAnlegen("Hochwasser Weser", EinsatzArt.EINSATZ);
     meldungHinzufuegen(s.id, (() => { const b = neuerBogen(); b.einheit.hierarchie[0]!.name = "Albstadt"; return b; })());
@@ -121,7 +121,7 @@ describe("R18-W6/A4 Ausgaben der Einsatzansicht", () => {
     render(<App />);
     await nutzer.click(await screen.findByRole("button", { name: /^Übersicht als CSV/ }));
     await waitFor(() => expect(geladen).toHaveLength(1));
-    expect(geladen[0]!.name).toMatch(/^\d{4}-\d{2}-\d{2}_\d{4}_eeb-einsatz_Hochwasser_Weser\.csv$/);
+    expect(geladen[0]!.name).toMatch(/^\d{4}-\d{2}-\d{2}_\d{4}_eeb-einsatz-uebersicht_Hochwasser_Weser\.csv$/);
     // R19-O10: Die Quittung ist eine Leiste mit Kurzfassung; der volle Satz steht für Vorleser in `.nur-sr`.
     const quittung = (await screen.findAllByText(/^✓ Gespeichert: /))[0]!;
     expect(quittung.textContent).toContain(geladen[0]!.name);

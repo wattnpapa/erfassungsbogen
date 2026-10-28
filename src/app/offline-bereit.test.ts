@@ -39,10 +39,15 @@ describe("offlineText mit Fortschritt", () => {
 
   it("meldet den Kern bereit, solange die zweite Stufe nachlädt", () => {
     const t = offlineText({ stand: "bereit", frischBereit: true, online: true, zusatz: { fertig: 120, gesamt: 474 } });
-    expect(t).toMatch(/^✓ Jetzt offline bereit für Bogen, PDF, QR-Code und Empfang\. Beispielbögen und Themenseiten werden nachgeladen \(120 von 474\)/);
-    expect(t).not.toMatch(/komplett offline/);
+    // R20-N7: kein „Jetzt offline bereit", solange der Rest lädt – Kern und Rest stehen getrennt.
+    expect(t).toMatch(/^✓ Bogen, PDF, QR-Code und Empfang gehen offline\. Rest lädt noch \(Beispielbögen, Themenseiten\): 120 von 474/);
+    expect(t).not.toMatch(/komplett offline|Jetzt offline bereit/);
     expect(offlineText({ stand: "bereit", frischBereit: false, online: false, zusatz: { fertig: 120, gesamt: 474 } })).toMatch(
-      /folgen beim nächsten Netz/,
+      /folgt beim nächsten Netz/,
+    );
+    // Erst wenn alles da ist, steht „Jetzt offline bereit".
+    expect(offlineText({ stand: "bereit", frischBereit: true, online: true, zusatz: { fertig: 474, gesamt: 474 } })).toMatch(
+      /^✓ Jetzt offline bereit\. Funktioniert komplett offline/,
     );
     expect(offlineText({ stand: "bereit", frischBereit: false, online: true, zusatz: { fertig: 474, gesamt: 474 } })).toMatch(
       /^✓ Funktioniert komplett offline/,
@@ -54,7 +59,8 @@ describe("offlineText mit Fortschritt", () => {
   // Netz auch dann, wenn noch kein einziger Beispielbogen im Gerät lag.
   it("verspricht „komplett offline“ erst, wenn die zweite Stufe gezählt ist", () => {
     const frisch = offlineText({ stand: "bereit", frischBereit: true, online: true, zweiStufen: true });
-    expect(frisch).toMatch(/^✓ Jetzt offline bereit für Bogen, PDF, QR-Code und Empfang — /);
+    expect(frisch).toMatch(/^✓ Bogen, PDF, QR-Code und Empfang gehen offline\. Der Rest \(Beispielbögen, Themenseiten\) wird noch gezählt — /);
+    expect(frisch).not.toMatch(/Jetzt offline bereit/);
     expect(frisch).not.toMatch(/komplett offline/);
     expect(offlineText({ stand: "bereit", frischBereit: false, online: false, zweiStufen: true, zusatz: null })).not.toMatch(
       /komplett offline/,
@@ -129,6 +135,7 @@ describe("offlineText — hakt und gesperrter Speicher (Runde 5)", () => {
   it("sagt, dass das Nachladen hakt, statt weiter „werden nachgeladen“ zu behaupten (R5-O2)", () => {
     const t = offlineText({ stand: "bereit", frischBereit: false, online: true, zusatz: { fertig: 25, gesamt: 474 }, zusatzHakt: true });
     expect(t).toMatch(/25 von 474 da, das Netz hakt — der nächste Versuch läuft von selbst/);
+    expect(t).not.toMatch(/Rest lädt noch/);
     expect(t).not.toMatch(/werden nachgeladen/);
   });
 

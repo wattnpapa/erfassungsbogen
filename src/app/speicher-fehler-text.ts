@@ -45,4 +45,4 @@ export function speicherFehlerDetails(art: SpeicherFehlerArt, fremd: boolean, le
  */
 export const PAPIERKORB_LEER_RAT =
   "Der Speicher ist voll, der Papierkorb leer — der Einsatz ist nicht gelöscht. Erst sichern (Einsatz weitergeben / sichern). " +
-  "Platz schafft nur Verkleinern: unter „Mehr…“ Meldungen oder Einheiten entfernen, zuletzt „Alle Daten löschen“ (nach der Sicherung).";
+  "Platz schafft dann „Entfernen“ bei einer Einheit (mit „Endgültig entfernen“ in der Rückfrage), zuletzt „Alle Daten löschen“ (nach der Sicherung).";

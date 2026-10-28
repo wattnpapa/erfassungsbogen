@@ -122,6 +122,8 @@ interface Sperre {
    * „Einen Moment …“ verdeckte den Dialogtext (R8-H5, R8-S4).
    */
   nurAusserhalbRueckfrage: boolean;
+  /** Name der Handlung, die gesperrt hat; `ortFreigeben(marke)` hebt alle Sperren dieser Handlung auf (R20-G3). */
+  marke?: string;
 }
 
 /** Obergrenze einer verlängerten Sperre, vom Beginn an gerechnet. */
@@ -300,7 +302,7 @@ tippSchutzInstallieren();
 export function ortSperren(
   ms: number = ORTSSPERRE_MS,
   ort?: { x: number; y: number },
-  optionen: { verlaengern?: boolean; nurAusserhalbRueckfrage?: boolean } = {},
+  optionen: { verlaengern?: boolean; nurAusserhalbRueckfrage?: boolean; marke?: string } = {},
 ): void {
   if (ms <= 0) return;
   let stelle = ort;
@@ -320,12 +322,26 @@ export function ortSperren(
     vorhanden.nurAusserhalbRueckfrage &&= optionen.nurAusserhalbRueckfrage === true;
     vorhanden.kappe = Math.max(vorhanden.kappe, jetzt + VERLAENGERN_KAPPE_MS);
     vorhanden.radius = Math.max(vorhanden.radius, radius);
+    if (optionen.marke) vorhanden.marke = optionen.marke;
     return;
   }
   sperren.push({ x: stelle.x, y: stelle.y, radius, bis, kappe: jetzt + VERLAENGERN_KAPPE_MS,
     verlaengern: optionen.verlaengern === true,
     nurAusserhalbRueckfrage: optionen.nurAusserhalbRueckfrage === true,
+    marke: optionen.marke,
   });
+}
+
+/**
+ * R20-G3: Nach „Zur Kenntnis genommen" liegt unter dem Finger „Bögen einlesen…", weil der Kasten weggefallen ist; ein zögernder
+ * zweiter Tipp nach bis zu 2 s öffnete die Dateiauswahl. Die Stelle bleibt so lange gesperrt, „Rückgängig" gibt sie frei (dann liegt
+ * der Kasten samt „Zur Kenntnis genommen" wieder dort, und die Folge Kenntnisnahme → Rückgängig → Kenntnisnahme bleibt flüssig).
+ */
+export const KENNTNIS_SPERRE_MS: number = ORTSSPERRE_MS === 0 ? 0 : 2500;
+
+/** Hebt alle Sperren auf, die eine Handlung mit dieser `marke` gesetzt hat. */
+export function ortFreigeben(marke: string): void {
+  sperren = sperren.filter((s) => s.marke !== marke);
 }
 
 /** Ort des letzten Tipps (Bildschirmkoordinaten), solange er frisch ist. */

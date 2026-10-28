@@ -119,6 +119,12 @@ export function einheitAnzeigename(e: Einheit): string {
     if (!teil) continue;
     const muster = new RegExp(`(?<![\\p{L}\\p{N}])${teil.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}(?![\\p{L}\\p{N}])`, "iu");
     if (teile.some((davor) => muster.test(davor))) continue;
+    // R20-H1: Steht ein früherer Teil als ganze Wörter schon IN diesem („THW" in „THW Oldenburg", der Ort,
+    // wie er auf dem Zettel steht), trägt der längere beide — der frühere entfällt statt doppelt zu stehen.
+    for (let i = teile.length - 1; i >= 0; i--) {
+      const davor = teile[i]!.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      if (new RegExp(`(?<![\\p{L}\\p{N}])${davor}(?![\\p{L}\\p{N}])`, "iu").test(teil)) teile.splice(i, 1);
+    }
     teile.push(teil);
   }
   return teile.join(" ");

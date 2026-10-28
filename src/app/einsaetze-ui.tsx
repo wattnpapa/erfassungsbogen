@@ -14,6 +14,7 @@ import { useJuengsteQuittung } from "./juengste-quittung";
 
 const ImportHinweis = lazy(() => import("./import-hinweis"));
 const AuftragQuittung = lazy(() => import("./auftrag-quittung"));
+const AufnahmeLeiste = lazy(() => import("./aufnahme-leiste")); // R20-S1, N4: Leiste nach der Aufnahme von Hand
 // Papierkorb der entfernten Meldungen (R17-E2): erscheint nur, wenn etwas darin liegt, und bleibt aus dem Startbündel.
 const EntfernteMeldungenBlock = lazy(() => import("./entfernte-meldungen-block"));
 // Statisch, nicht per lazy: siehe Kopf von abschluss-block.tsx (Aufteilung des Startbündels).
@@ -58,7 +59,7 @@ export function zumPapierkorbSpringen(versuche = 3): void {
 const NeuereEingabe = lazy(() => import("./neuere-eingabe"));
 // Der Block „Lagemonitor für den Fernseher" liegt am Ende der Ansicht und gehört nicht ins Startbündel (R17-K3 gab dem Monitor Zeilen).
 const LagemonitorBlock = lazy(() => import("./lagemonitor-ui").then((m) => ({ default: m.LagemonitorBlock })));
-import { ORTSSPERRE_MS, PRELLSCHUTZ_MS, QUITTUNG_SPERRE_KURZ_MS, ortSperren, tippVerworfenZeigen } from "./tipp-schutz";
+import { KENNTNIS_SPERRE_MS, ORTSSPERRE_MS, PRELLSCHUTZ_MS, ortFreigeben, ortSperren, tippVerworfenZeigen } from "./tipp-schutz";
 import {
   MINUTEN_JE_TAG,
   PersonalErfassung,
@@ -119,7 +120,7 @@ import { AUSGABE_SPERRE_MS, ausgabeFreiBeiTipp } from "./ausgabe-sperre";
 import { verloreneEingabeText } from "./eingabe-verloren";
 import { loeschenErfassungSatz } from "./einsatz-geloescht";
 import { angabenAlterWort, angabenZeit, handAenderungText } from "./angaben-alter";
-import { abschlussKarteText, abschlussLaden, abschlussUebergabeText, meldungenSeit, neueMeldungenText } from "./einsatz-abschluss";
+import { abschlussKarteText, abschlussLaden, abschlussUebergabeText, meldungenSeit, neueMeldungenText, offenKurz } from "./einsatz-abschluss";
 import { alterText, anwesendenAlter, anwesendenAlterText, bedarfOhneAngabeHinweis, bedarfOhneAngabeText, kraftstoffTeile, personenText, zugAlterText } from "./lagemonitor";
 import { AufteilenPanel } from "./aufteilen-ui";
 import { ZusammenfuehrenPanel } from "./zusammenfuehren-ui";
@@ -225,6 +226,10 @@ import { AbgangKnopf, Kartenstapel } from "./kartenstapel";
 import { istBilddatei } from "./qr-stapel";
 import { fehlerText } from "./nachladen";
 import { PAPIERKORB_LEER_RAT } from "./speicher-fehler-text";
+import { nummernHinweisLaden, nummernHinweisLoeschen } from "./nummern-hinweis";
+
+export { PAPIERKORB_OEFFNEN, ART_LABEL } from "./einsaetze-konstanten";
+import { PAPIERKORB_OEFFNEN } from "./einsaetze-konstanten";
 import { widerspruchLaden, widerspruchMerken, widerspruchVergessen } from "./widerspruch-merker";
 import { entfernteMerken, entfernteVergessen } from "./entfernte-meldungen";
 import {
@@ -255,11 +260,7 @@ import {
 /** Zeichen des Auftrags auf der zugeklappten Karte (R8-K3): der Auftrag steht bis hierhin ungekürzt da. */
 const AUFTRAG_KARTE_MAX = 80;
 
-export const ART_LABEL: Record<EinsatzArt, string> = {
-  [EinsatzArt.EINSATZ]: "Einsatz",
-  [EinsatzArt.UEBUNG]: "Übung",
-  [EinsatzArt.VERANSTALTUNG]: "Veranstaltung",
-};
+import { ART_LABEL } from "./einsaetze-konstanten";
 
 /** Überschrift über den nicht anwesenden Karten am Ende der Liste: „Abgerückt (2)" bzw. mit zusammengeführten Einheiten (R17-K4). */
 export function abgerueckteUeberschrift(liste: readonly Pick<MeldeEintrag, "status">[]): string {
@@ -298,21 +299,34 @@ export function quelleText(kopf: Pick<MeldeEintrag, "quelle" | "angaben">, fassu
  * Anzeige sagt „abgerückt", der Speicher sagt „anwesend", und beim nächsten
  * Laden stimmt die Lage nicht mehr. Liefert, ob geschrieben wurde.
  */
-async function gesichert(titel: string, aktion: () => void, merke?: string, papierkorbLeer = false): Promise<boolean> {
+async function gesichert(titel: string, aktion: () => void, merke?: string, papierkorbLeer = false, was?: string): Promise<boolean> {
   try {
     aktion();
     return true;
   } catch (e) {
     // R13-O3: Bei vollem Speicher und leerem Papierkorb passt „Papierkorb leeren" nicht.
     const voll = e instanceof SpeicherVollFehler || istSpeicherVoll(e);
-    const grund =
+    const rest =
       papierkorbLeer && voll ? PAPIERKORB_LEER_RAT : e instanceof SpeicherVollFehler ? e.message : fehlerText(e);
+    // R20-H13: Zuerst steht, was nicht geschehen ist (mit Nr. und Namen), dann der Grund und der eine Weg.
+    const grund = was ? `${was} ${rest}` : rest;
     // `merke`: was der Helfer eingegeben hatte und das der Dialog nicht mehr
     // zeigt — so lässt es sich auf den Meldeblock schreiben, bevor Platz
     // geschaffen und neu eingegeben wird (Audit Runde 5, R5-E7).
+    // R20-H13: Bei vollem Speicher stehen nur zwei Sätze da (was nicht geschah, der eine Weg); der lange Rat liegt hinter „Mehr dazu“.
+    const kurzVoll = voll && !papierkorbLeer;
     await zeigeHinweis({
       titel,
-      text: merke ? (
+      text: kurzVoll ? (
+        <>
+          <p>{was ? `${was} ` : ""}Der Speicher ist voll — erst sichern (Einsatz weitergeben / sichern).</p>
+          {merke && <p><strong>{merke}</strong></p>}
+          <details className="hinweis-mehr">
+            <summary>Mehr dazu</summary>
+            <p>{rest}</p>
+          </details>
+        </>
+      ) : merke ? (
         <>
           <p>{grund}</p>
           <p><strong>{merke}</strong></p>
@@ -328,7 +342,7 @@ async function gesichert(titel: string, aktion: () => void, merke?: string, papi
  * scheiterte also gerade dann, wenn man Platz schaffen wollte. Der Hinweis „Nicht gelöscht" bietet deshalb
  * „Endgültig löschen" an (ohne Papierkorb, nicht rückholbar). Liefert, was geschah.
  */
-async function einsatzLoeschenGesichert(s: Einsatzsammlung): Promise<"papierkorb" | "endgueltig" | null> {
+async function einsatzLoeschenGesichert(s: Einsatzsammlung, sichern?: () => unknown): Promise<"papierkorb" | "endgueltig" | null> {
   const papierkorbLeer = einsaetzePapierkorb().length === 0;
   try {
     einsatzLoeschen(s.id);
@@ -338,16 +352,9 @@ async function einsatzLoeschenGesichert(s: Einsatzsammlung): Promise<"papierkorb
       await zeigeHinweis({ titel: "Nicht gelöscht", text: fehlerText(e) });
       return null;
     }
-    const ja = await frageJaNein({
-      titel: "Nicht gelöscht",
-      text:
-        `${papierkorbLeer ? PAPIERKORB_LEER_RAT : `Der Speicher dieses Geräts ist voll, der Papierkorb braucht selbst Platz: „${s.name}" ist nicht gelöscht.`} ` +
-        `Oder „${s.name}" jetzt endgültig löschen? Das schafft Platz, ist aber nicht rückholbar.${exportVorhanden(s.id) ? "" : " Es gibt noch keinen Export — das wäre die einzige Kopie."}`,
-      ok: "Endgültig löschen",
-      gefahr: true,
-    });
-    if (!ja) return null;
-    return (await gesichert("Nicht gelöscht", () => einsatzEndgueltigLoeschen(s.id))) ? "endgueltig" : null;
+    // R20-W1: Der Notweg löscht nicht mit einem Tipp (zwei Rückfragen, Hauptweg „Erst sichern“); nachgeladen, weil selten.
+    const geloescht = await (await import("./einsatz-notweg")).notwegEndgueltig(s, { papierkorbLeer, keinExport: !exportVorhanden(s.id), sichern, gesichert });
+    return geloescht ? "endgueltig" : null;
   }
 }
 
@@ -630,7 +637,7 @@ export function ZugSchnellZuordnen(props: {
       {/* Der gesperrte Knopf sagt, was fehlt (R18-S5); der Platzhalter verschwindet beim Tippen. */}
       {!wert.trim() && (
         <p className="hinweis zug-schnell-fehlt" id={`${listeId}-fehlt`}>
-          „Zuordnen“ geht erst, wenn ein Zugname eingetragen ist{vorschlaege.length > 0 ? " — oder einen der Züge antippen" : ""}.
+          „Zuordnen“ geht erst, wenn ein Zugname eingetragen ist{vorschlaege.length > 0 ? " — oder einen der Züge antippen" : ""}. Ein Zug fasst Einheiten unter einer Führung zusammen.
         </p>
       )}
     </div>
@@ -657,6 +664,15 @@ export function EinsatzListe(props: {
   const { einsaetze, onOeffnen, onGeaendert } = props;
   useMinutenTakt(); // Altersangaben „vor 4 Min" laufen mit (R14-O1)
   const [zeigePapierkorb, setZeigePapierkorb] = useState(false);
+  // R20-O5: Der Hinweis „n Einsätze im Papierkorb“ oben auf der Startseite öffnet den Papierkorb hier und führt hin.
+  useEffect(() => {
+    const oeffnen = () => {
+      setZeigePapierkorb(true);
+      setTimeout(() => document.getElementById("papierkorb-einsaetze")?.scrollIntoView?.({ block: "start" }), 0);
+    };
+    window.addEventListener(PAPIERKORB_OEFFNEN, oeffnen);
+    return () => window.removeEventListener(PAPIERKORB_OEFFNEN, oeffnen);
+  }, []);
   const papierkorb = einsaetzePapierkorb();
   // Nach dem Laden gelesen: einsaetzePapierkorb() hat die Frist gerade geprüft
   // und fällige Löschungen vorgemerkt (aufraeum-hinweis.ts, R2-D5).
@@ -836,8 +852,8 @@ export function EinsatzListe(props: {
         );
       })}
       {papierkorb.length > 0 && (
-        <p>
-          <button type="button" className="link" onClick={() => setZeigePapierkorb(!zeigePapierkorb)}>
+        <p id="papierkorb-einsaetze">
+          <button type="button" className="link papierkorb-umschalter" onClick={() => setZeigePapierkorb(!zeigePapierkorb)}>
             {zeigePapierkorb ? "Papierkorb Einsätze ausblenden" : `Papierkorb Einsätze (${papierkorb.length})`}
           </button>
         </p>
@@ -1073,6 +1089,20 @@ function alleEinsatzIds(): string[] {
 /** Bis zu so vielen Zeichen steht die Bemerkung der Einheit ungekürzt auf der Karte (R3-K3). */
 const BEMERKUNG_KURZ = 120;
 
+/**
+ * Kürzt an der letzten Wortgrenze vor der Grenze (R20-A4): „… (Reserve aktivie …" brach mitten im Wort ab, ausgerechnet bei Angaben wie
+ * „nicht mit ausgerückt". Gibt den Text unverändert zurück, wenn er passt; hat die Grenze kein Leerzeichen davor, wird hart gekürzt.
+ */
+export function kuerzeAnWortgrenze(text: string, grenze: number): string {
+  if (text.length <= grenze) return text;
+  const stueck = text.slice(0, grenze);
+  // Endet das Stück genau vor einem Leerzeichen, ist das letzte Wort ganz; sonst zurück bis zum letzten Leerzeichen.
+  const ganzesWort = /\s/.test(text.charAt(grenze));
+  const schnitt = ganzesWort ? stueck.length : stueck.search(/\s\S*$/);
+  const kurz = (schnitt > grenze / 3 ? stueck.slice(0, schnitt) : stueck).trimEnd();
+  return `${kurz} …`;
+}
+
 /** Auf schmalen Telefonen (bis 360 px) kürzer, damit die aufgeklappte Karte nicht über anderthalb Bildschirme wächst (R19-O9). */
 function bemerkungKurz(): number {
   try {
@@ -1261,7 +1291,7 @@ export function EinsatzDetail(props: {
     // Nur ein Tipp auf DIESELBE Ausgabe ist ein Doppeltipp; die CSV nach dem Lageblatt läuft (R19-K4, N2).
     if (!ausgabeFreiBeiTipp(schluessel, ereignis, (z) => tippWaehrendLauf(z, schluessel))) {
       // Ein verworfener Tipp sagt es, statt wortlos zu verpuffen (R18-N1, W3; R19-K4: Grund am Ziel).
-      if (ereignis?.nativeEvent && ereignis.nativeEvent.detail > 0) tippVerworfenZeigen(ereignis.nativeEvent, "Schon getippt — einen Moment …");
+      if (ereignis?.nativeEvent && ereignis.nativeEvent.detail > 0) tippVerworfenZeigen(ereignis.nativeEvent, "Schon getippt"); // R20-O1: so kurz wie „Einen Moment …“, passt in jeden Knopf, der den Grund trägt
       return;
     }
     if (name && einsatz.eintraege.length > 0) {
@@ -1459,7 +1489,9 @@ export function EinsatzDetail(props: {
     });
     if (!ok) return;
     zurueckQuittieren(
-      staerkeGeaendert.kennzeichnung
+      staerkeGeaendert.kennzeichnung === "name"
+        ? `Zurückgenommen: „${staerkeGeaendert.neuerName}" heißt wieder „${name}".`
+        : staerkeGeaendert.kennzeichnung
         ? `Zurückgenommen: „${name}" ${staerkeGeaendert.kennzeichnung === "einsatz" ? "ist wieder als Übung gekennzeichnet" : "zählt wieder als Einsatzmeldung"}.`
         : `Stärke zurückgenommen: „${name}" gilt wieder mit ${vorher}.`,
     );
@@ -1597,12 +1629,15 @@ export function EinsatzDetail(props: {
     eingangGerollt = eingang.nonce;
     // Von Hand statt scrollIntoView: scroll-padding-bottom hält Platz für die
     // Fußleiste des Assistenten frei, die es hier nicht gibt.
-    requestAnimationFrame(() => {
+    // R20-H2: Nach „In Einsatz übernehmen" setzt app.tsx die Rollposition per setTimeout(0) auf den Anfang zurück; die
+    // Rollung davor (ein Bild später) wurde so wieder aufgehoben, und die Quittung mit der Nummer blieb unter dem Bildrand
+    // (bei 360 × 640 y = 675). Darum erst nach diesem Zurücksetzen rollen.
+    window.setTimeout(() => {
       const r = eingangQuittung.current?.getBoundingClientRect();
       if (!r || r.height === 0) return;
       const ueber = r.bottom - (window.innerHeight - 16);
       if (ueber > 0) window.scrollBy(0, Math.min(ueber, r.top - 8));
-    });
+    }, 120);
   }, [eingang, eingegangen]);
   // War es eine Folgemeldung, sagt die Quittung, was sich geändert hat (R3-K1).
   const eingangFolge = eingegangen ? folgeAenderung(eingegangen, einsatz.eintraege) : null;
@@ -1614,6 +1649,24 @@ export function EinsatzDetail(props: {
   const eingangVeraltet = Date.now() - eingangGesehen.current.seit > EINGANG_QUITTUNG_MS;
   // „Rückgängig" an der Folgemeldung hat die Quittung verbraucht (R4-E4).
   const [eingangWeg, setEingangWeg] = useState<number | null>(null);
+  // R20-S1, N4, H2: Die Aufnahme von Hand (Schnellerfassung, „Einheit manuell erfassen…") quittiert mit Nummer in der Leiste am
+  // Bildrand — dort liegt der Blick, der Absatz „Zuletzt abgelegt" steht am 360-px-Telefon unter dem Falz. Eigener Schließer:
+  // Die Leiste geht nach ihrer Zeit, der Absatz im Seitentext bleibt.
+  const [aufnahmeZu, setAufnahmeZu] = useState<number | null>(null);
+  // R20-D3: gemerkter Hinweis auf geänderte Nummern (nummern-hinweis.ts); neu gelesen, wenn sich die Sammlung ändert.
+  const [nummernHinweisWeg, setNummernHinweisWeg] = useState<number | null>(null);
+  const nummernHinweisText = useMemo(
+    () => (nummernHinweisWeg === einsatz.geaendert ? null : nummernHinweisLaden(einsatz.id)),
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- `geaendert` stößt das erneute Lesen an
+    [einsatz.id, einsatz.geaendert, nummernHinweisWeg],
+  );
+  const aufnahmeNummer = eingegangen ? nummern.get(eingegangen.einheitSchluessel) : undefined;
+  const aufnahmeNonce = eingang && eingegangen && eingegangen.quelle === "manuell" && !eingangFolge && eingegangen.status !== MeldeStatus.ABGERUECKT && !eingang.uebersprungen && !eingangVeraltet && eingang.nonce !== aufnahmeZu && eingang.nonce !== eingangWeg ? eingang.nonce : null;
+  const aufnahmeName = eingegangen ? einheitAnzeigename(eingegangen.bogen.einheit) : "";
+  const aufnahmeQuittung = useMemo(
+    () => (aufnahmeNonce != null ? { nonce: aufnahmeNonce, nummer: aufnahmeNummer, name: aufnahmeName } : null),
+    [aufnahmeNonce, aufnahmeNummer, aufnahmeName],
+  );
   /**
    * Beim Öffnen und nach jeder Aufnahme beginnt die Ansicht oben, bei Summe
    * und Aufnahme-Knopf. Vorher öffnete sie mitten auf der Seite (mit der
@@ -1721,7 +1774,8 @@ export function EinsatzDetail(props: {
     const ort = (w.ort ?? "").trim();
     if (name === einsatz.name && ort === (einsatz.ort ?? "")) return;
     const alt: { werte: { name: string; ort: string } | null } = { werte: null };
-    if (!(await gesichert("Nicht geändert", () => (alt.werte = einsatzKopfSetzen(einsatz.id, name, ort))))) return;
+    // R20-O3: Der Dialog ist zu; was eingegeben war, steht in der Meldung zum Abschreiben.
+    if (!(await gesichert("Nicht geändert", () => (alt.werte = einsatzKopfSetzen(einsatz.id, name, ort)), `Eingegeben war: Name „${name}"${ort ? `, Ort „${ort}"` : ""}. Nach dem Platzschaffen noch einmal unter „Einsatz bearbeiten“ eintragen.`))) return;
     if (!alt.werte) return;
     setKopfGeaendert({ vorher: alt.werte, nachher: kopfAenderungText(alt.werte, name, ort), nonce: Date.now() });
     onGeaendert();
@@ -1753,6 +1807,8 @@ export function EinsatzDetail(props: {
   const [abschlussQuittung, setAbschlussQuittung] = useState<AbschlussQuittung | null>(null);
   useEffect(() => setAbschlussQuittung(null), [einsatz.id]);
   const aktiveQuittung = useJuengsteQuittung({
+    // Die Aufnahme zuerst: Wechseln in einem Zug mehrere Leisten, gewinnt die spätere Handlung (etwa „so gezählt“ nach der Aufnahme).
+    aufnahme: aufnahmeQuittung,
     entfernt: zuletztEntfernt, aufgeteilt, staerke: staerkeGeaendert, zusammen: zusammengefuehrt, status: statusWechsel,
     verschoben: verschobenQuittung, zug: zugGesetzt, auftrag: auftragGesetzt, kenntnis: kenntnisGenommen, zurueck: zurueckQuittung,
     uebersprungen: uebersprungenQuittung, kopf: kopfGeaendert, gezaehlt: gezaehltWeg, abschluss: abschlussQuittung,
@@ -1799,7 +1855,9 @@ export function EinsatzDetail(props: {
     const anzahl = aufgenommenListe.length;
     // R15-G1: Der Block verschwindet, die Liste rückt unter den Finger — der zweite Tipp an dieser Stelle klappte eine Karte auf.
     // Nur so lang wie der Prellschutz: Das „Rückgängig" der Quittung liegt oft genau dort und musste 2,5 s warten (R17-D3).
-    ortSperren(QUITTUNG_SPERRE_KURZ_MS);
+    // R20-G3: Der zögernde zweite Tipp kam in der Messung noch nach 1,0 s und öffnete die Dateiauswahl („Bögen einlesen…" liegt dann
+    // dort): Die Stelle bleibt 2,5 s gesperrt, „Rückgängig" gibt sie frei.
+    ortSperren(KENNTNIS_SPERRE_MS, undefined, { marke: "kenntnis" });
     const kasten = document.querySelector(".stapel-eingang");
     const anker = kasten?.nextElementSibling ?? kasten?.previousElementSibling;
     kenntnisAnker.current = anker ? { el: anker, oben: anker.getBoundingClientRect().top } : null;
@@ -1807,7 +1865,8 @@ export function EinsatzDetail(props: {
     setKenntnis({ einsatzId: einsatz.id, stand });
     setZugGesetzt(null);
     setVerschobenQuittung(null);
-    setKenntnisGenommen({ vorher, anzahl, nonce: Date.now() });
+    // R20-H14: Ohne gespeicherten Vermerk keine Erfolgsquittung mit „Rückgängig“; der Dialog unten sagt, was gilt.
+    setKenntnisGenommen(gespeichert ? { vorher, anzahl, nonce: Date.now() } : null);
     if (gespeichert) props.onKenntnisGenommen?.();
     if (!gespeichert) {
       void zeigeHinweis({
@@ -1819,6 +1878,7 @@ export function EinsatzDetail(props: {
   function kenntnisZurueck() {
     if (!kenntnisGenommen) return;
     const { vorher } = kenntnisGenommen;
+    ortFreigeben("kenntnis");
     const gespeichert = kenntnisWiederherstellen(einsatz.id, vorher, alleEinsatzIds());
     setKenntnis({ einsatzId: einsatz.id, stand: vorher });
     setKenntnisGenommen(null);
@@ -1925,7 +1985,7 @@ export function EinsatzDetail(props: {
       gefahr: true,
     });
     if (!sicher) return;
-    const weg = await einsatzLoeschenGesichert(einsatz);
+    const weg = await einsatzLoeschenGesichert(einsatz, onWeitergeben);
     if (!weg) return;
     // Die Startseite quittiert mit Rückweg (R2-D6); endgültig Gelöschtes hat keinen.
     if (weg === "endgueltig") await zeigeHinweis({ titel: "Endgültig gelöscht", text: `„${einsatz.name}" ist gelöscht — nicht im Papierkorb, nicht rückholbar.` });
@@ -2071,9 +2131,10 @@ export function EinsatzDetail(props: {
           <strong>Einsatz beendet {exportZeitKurz(abschlussStand.beendetAm)}</strong>
           {/* R19-S12, W1: offene Wege und Nachzügler gleich im Kopf, nicht erst am Seitenende. */}
           {(() => {
-            const offen = abschlussWege(einsatz).filter((w) => !w.getan).length;
+            // R20-K1, W2: die Punkte beim Namen („Weitergabe-Datei, Lageblatt und 4 weitere"), nicht nur die Zahl.
+            const offen = abschlussWege(einsatz).filter((w) => !w.getan).map((w) => w.name);
             const neu = meldungenSeit(einsatz.eintraege, abschlussStand.beendetAm);
-            return `${offen > 0 ? ` — noch offen: ${offen}` : ""}${neu > 0 ? ` — nicht mehr aktuell, seitdem ${neueMeldungenText(neu)}` : ""}`;
+            return `${offen.length > 0 ? ` — noch offen: ${offenKurz(offen)}` : ""}${neu > 0 ? ` — nicht mehr aktuell, seitdem ${neueMeldungenText(neu)}` : ""}`;
           })()}
         </p>
       )}
@@ -2155,6 +2216,22 @@ export function EinsatzDetail(props: {
       {/* Was das Einlesen ergab, dort, wo der Finger eben war (R3-L1). */}
       {props.einleseQuittung}
 
+      {/* R20-D3: Nach dem Zusammenführen zweier Sammlungen bleibt der Hinweis auf geänderte Nummern stehen (nicht nur in der Quittung
+          des Einlesens), bis ein neues Lageblatt erzeugt oder er quittiert wird. */}
+      {nummernHinweisText && (
+        <div className="warnung nummern-hinweis" role="status">
+          <p>⚠ {nummernHinweisText}</p>
+          <button
+            type="button"
+            onClick={() => {
+              nummernHinweisLoeschen(einsatz.id);
+              setNummernHinweisWeg(einsatz.geaendert);
+            }}
+          >
+            Verstanden
+          </button>
+        </div>
+      )}
       {/* Quittung der Aufnahme dort, wo nach dem Übernehmen der Blick liegt:
           Name und neue Gesamtzahl bei Summe und Aufnahme-Knopf, statt die
           Seite zur neuen Karte zu rollen (R2-S3). Unter den Knöpfen, damit
@@ -2164,8 +2241,10 @@ export function EinsatzDetail(props: {
       {eingegangen && eingegangen.status !== MeldeStatus.ABGERUECKT && eingang?.nonce !== eingangWeg && !eingang?.uebersprungen && !eingangVeraltet && (
         <p className="meldung eingang-quittung" role="status" ref={eingangQuittung}>
           {/* Von Hand erfasst oder abgelegt ist nicht „eingelesen“ (R9-N3). */}
-          {eingegangen.quelle === "manuell" ? "Zuletzt abgelegt" : "Zuletzt eingelesen"}: „{einheitAnzeigename(eingegangen.bogen.einheit)}"
+          {/* R20-H2: Die Nummer steht in der Quittung, dort wo „In Einsatz übernehmen" war – nicht als loser Satz am Seitenende. */}
+          {eingegangen.quelle === "manuell" ? "Zuletzt abgelegt" : "Zuletzt eingelesen"}: {nummerText(eingegangen.einheitSchluessel)}„{einheitAnzeigename(eingegangen.bogen.einheit)}"
           {eingegangen.teilEtikett ? ` (${eingegangen.teilEtikett})` : ""}
+          {eingegangen.quelle === "manuell" && eingegangen.nummer == null && nummern.has(eingegangen.einheitSchluessel) ? " — Nummer auf den Zettel schreiben" : ""}
           {/* „Als Sollstärke ablegen" und „so gezählt" lasen sich gleich (R17-S1): Die Sollstärke nennt sich hier. */}
           {nurSollstaerke(eingegangen.bogen) ? " als Sollstärke, nicht gemeldet" : ""}
           {eingangFolge ? <> — Folgemeldung: <span className={eingangFolge.verlust ? "staerke-verlust" : undefined}>{eingangFolge.kurz}</span></> : null}
@@ -2618,7 +2697,9 @@ export function EinsatzDetail(props: {
           >
             Weitergeben, Lageblatt, Export ↓
           </button>{" "}
-          — unter der Liste der Einheiten.{" "}
+          {/* R20-H6: Die beiden Verweise sind Blöcke in der Zeile mit 8 px Abstand (im Fließtext berührten sich die Zielflächen: 47 px hohe
+              Ziele auf 29 px Zeilenabstand); der Erklärsatz entfällt am Telefon. */}
+          <span className="sprung-erklaerung">— unter der Liste der Einheiten. </span>
           {/* R19-S12: Der Abschluss steht am Seitenende; der Sprung führt gezielt dorthin. */}
           <button
             type="button"
@@ -3208,11 +3289,15 @@ export function EinsatzDetail(props: {
       {staerkeGeaendert && aktiveQuittung === "staerke" && (
         <DaumenQuittung
           key={`staerke:${staerkeGeaendert.eintragId}`}
-          kurz={staerkeGeaendert.kennzeichnung ? (staerkeGeaendert.kennzeichnung === "einsatz" ? "Zählt jetzt" : "Jetzt Übung") : `Stärke ${staerkeGeaendert.vorher} → ${staerkeGeaendert.nachher}`}
+          kurz={staerkeGeaendert.kennzeichnung === "name" ? "Name geändert" : staerkeGeaendert.kennzeichnung ? (staerkeGeaendert.kennzeichnung === "einsatz" ? "Zählt jetzt" : "Jetzt Übung") : `Stärke ${staerkeGeaendert.vorher} → ${staerkeGeaendert.nachher}`}
           onRueckgaengig={() => void staerkeZurueckNehmen()}
           onSchliessen={() => setStaerkeGeaendert(null)}
         >
-          {staerkeGeaendert.kennzeichnung ? (
+          {staerkeGeaendert.kennzeichnung === "name" ? (
+            <>
+              <strong>Name geändert:</strong> „{staerkeGeaendert.name}" → „{staerkeGeaendert.neuerName}"
+            </>
+          ) : staerkeGeaendert.kennzeichnung ? (
             <>
               <strong>{staerkeGeaendert.kennzeichnung === "einsatz" ? "Zählt jetzt als Einsatzmeldung" : "Jetzt als Übung gekennzeichnet"}:</strong>{" "}
               „{staerkeGeaendert.name}"
@@ -3276,7 +3361,7 @@ export function EinsatzDetail(props: {
           key={`zug:${zugGesetzt.nonce}`}
           prellschutz
           sperreKurz
-          kurz={`Zug „${zugGesetzt.zug.length > 11 ? `${zugGesetzt.zug.slice(0, 10)}…` : zugGesetzt.zug}“`}
+          kurz={`Zug „${zugGesetzt.zug.length > 11 ? `${zugGesetzt.zug.slice(0, 10)}…` : zugGesetzt.zug}“: ${zugGesetzt.ziele.length === 1 ? "1 Einheit" : `${zugGesetzt.ziele.length} Einheiten`}`}
           onRueckgaengig={() => void zugZurueck()}
           rueckgaengigName="Zug-Zuordnung rückgängig machen"
           onSchliessen={() => setZugGesetzt(null)}
@@ -3329,6 +3414,23 @@ export function EinsatzDetail(props: {
           <strong>Einsatz geändert:</strong> {kopfGeaendert.nachher}
         </DaumenQuittung>
       )}
+      {aufnahmeQuittung && eingegangen && aktiveQuittung === "aufnahme" && !zuletztEntfernt && (
+        <Suspense fallback={null}>
+          <AufnahmeLeiste
+            key={`aufnahme:${aufnahmeQuittung.nonce}`}
+            a={aufnahmeQuittung}
+            einsatzId={einsatz.id}
+            eintragId={eingegangen.id}
+            gesichert={gesichert}
+            onZurueck={(satz) => {
+              setAufnahmeZu(aufnahmeQuittung.nonce);
+              zurueckQuittieren(satz);
+              onGeaendert();
+            }}
+            onSchliessen={() => setAufnahmeZu(aufnahmeQuittung.nonce)}
+          />
+        </Suspense>
+      )}
       {uebersprungenQuittung && aktiveQuittung === "uebersprungen" && !zuletztEntfernt && (
         <DaumenQuittung key={`uebersprungen:${uebersprungenQuittung.nonce}`} onSchliessen={() => setEingangWeg(uebersprungenQuittung.nonce)}>
           {uebersprungenQuittung.text}
@@ -3371,7 +3473,13 @@ export function EinsatzDetail(props: {
  * 45 px leer vor den Zahlen). Am Telefon steht „Ges." gleich hinter dem Namen, F/U/M als Aufteilung dahinter, „Zug" danach:
  * Einheit, Gesamtstärke und Aufteilung liegen so ohne Wischen im Bild (360 und 320 px).
  */
-export function tabellenSpaltenFuer(zugVorhanden: boolean, kompakt: boolean, kern = false, auftragVorhanden = true): SpaltenDefinition[] {
+/**
+ * Köpfe der Kernspalten am Telefon, ausgeschrieben (R20-N6, H11): „Ges." und „Eingetr." musste man in der Legende unter der Tabelle
+ * nachlesen. Die Spalten sind breit genug, seit die Warnung zum Alter der Angaben unter dem Namen steht, nicht mehr unter „Eingetroffen".
+ */
+export const KERN_KOPF: Partial<Record<TabellenSpalte, string>> = { gesamt: "Stärke", eingetroffen: "Eingetroffen" };
+
+export function tabellenSpaltenFuer(zugVorhanden: boolean, kompakt: boolean, kern = false, auftragVorhanden = true, bedarfVorhanden = true): SpaltenDefinition[] {
   const spalten = TABELLEN_SPALTEN.filter((s) => zugVorhanden || s.schluessel !== "zugEtikett");
   if (!kompakt) return spalten;
   const nimm = (k: TabellenSpalte) => spalten.find((s) => s.schluessel === k);
@@ -3380,7 +3488,9 @@ export function tabellenSpaltenFuer(zugVorhanden: boolean, kompakt: boolean, ker
   // Übrige bleibt einen Tipp entfernt („Alle Spalten"); die schmalen Köpfe sind dort kein Tippziel.
   if (kern) {
     // R19-W9, G10, H9, M14, N8, S6: Die Spalte „Auftrag" steht nur, wenn ein Auftrag eingetragen ist; sonst steht dort der Bedarf.
-    return (["einheit", "gesamt", "eingetroffen", "zugEtikett", auftragVorhanden ? "auftrag" : "bedarf"] as const)
+    // R20-N6: Auch der Bedarf nur, wenn mindestens eine Einheit einen hat — die leere Spalte nahm ein Viertel der Breite.
+    const letzte: TabellenSpalte[] = auftragVorhanden ? ["auftrag"] : bedarfVorhanden ? ["bedarf"] : [];
+    return (["einheit", "gesamt", "eingetroffen", "zugEtikett", ...letzte] as const)
       .map(nimm)
       .filter((s): s is SpaltenDefinition => s != null);
   }
@@ -3399,7 +3509,7 @@ function EinheitenTabelle({ meldungen, historie = meldungen, art, eingang, numme
   const [alleSpalten, setAlleSpalten] = useState(gemerkteAlleSpalten);
   const kern = kompakt && !alleSpalten;
   const zeilen = tabellenZeilen(meldungen, art);
-  const spalten = tabellenSpaltenFuer(zeilen.some((z) => z.zugEtikett !== ""), kompakt, kern, zeilen.some((z) => z.auftrag !== ""));
+  const spalten = tabellenSpaltenFuer(zeilen.some((z) => z.zugEtikett !== ""), kompakt, kern, zeilen.some((z) => z.auftrag !== ""), zeilen.some((z) => z.bedarf !== ""));
   // R19-A1: „*" hinter der Eintreffzeit, die nur die Zeit des Einlesens ist — wie auf Lageblatt und in der CSV.
   const eingelesen = new Set(meldungen.filter((e) => eintreffzeitUnbestaetigt(e, historie)).map((e) => e.id));
   const sortiert = spalte ? zeilenSortieren(zeilen, spalte, richtung) : zeilen;
@@ -3488,7 +3598,7 @@ function EinheitenTabelle({ meldungen, historie = meldungen, art, eingang, numme
                     // Kernspalten am Telefon: Köpfe nur zum Lesen. Fünf Tippziele von 44 px liegen dort ohne Abstand
                     // nebeneinander; sortiert wird mit „Alle Spalten" oder in der Leiste „Suchen, sortieren, filtern".
                     <span className="spalten-kopf">
-                      <span aria-hidden="true">{s.kopf}</span>
+                      <span aria-hidden="true">{KERN_KOPF[s.schluessel] ?? s.kopf}</span>
                       <span className="nur-sr">{s.titel}</span>
                     </span>
                   ) : (
@@ -3542,9 +3652,11 @@ function EinheitenTabelle({ meldungen, historie = meldungen, art, eingang, numme
       </TabellenScroll>
       <p className="hinweis">
         {kern
-          ? "Ges. = Stärke gesamt, Eingetr. = eingetroffen. Mit „Alle Spalten zeigen“ sortieren die Köpfe. "
+          ? "Mit „Alle Spalten zeigen“ sortieren die Köpfe. "
           : "Spaltenkopf anklicken sortiert die Tabelle. "}
         {eingelesen.size > 0 ? "* = Zeit des Einlesens, nicht bestätigt. " : ""}
+        {/* R20-N5: „zählend" in der Summenzeile erklärt sich hier, in Worten vom Funk. */}
+        Summe „zählend“ = anwesend, ohne Übung und ohne abgerückte.{" "}
         Details, Historie und Aktionen einer Einheit stehen in der Kartenansicht — den Namen antippen öffnet die Karte.
       </p>
     </>
@@ -3612,6 +3724,11 @@ function TabellenZeileZelle({ zeile: z, spalten, eingang, nummer, neueFassung, k
         )}
         {z.eintrag.bogen.uebung ? <span className="uebung-badge">ÜBUNG</span> : null}
         <AnonymBadge bogen={z.eintrag.bogen} kurz />
+        {/* R20-H12: Das Alter der Angaben steht am Telefon unter dem Namen, nicht in der Spalte „Eingetroffen" (dort las es sich wie
+            „eingetroffen vor 102 Tagen"; gemeint ist der Stand der Angaben). */}
+        {kern && z.anwesend && Date.now() - z.angabenAm >= 60 * 60_000 && (
+          <span className="alter-marke warnung-text">⚠ {z.angabenWort === "Stand" ? "Stand " : ""}{alterText(z.angabenAm, Date.now())}</span>
+        )}
         <SignaturWarnung eintrag={z.eintrag} />
         {z.teilEtikett ? <span className="teil-badge">{z.teilEtikett}</span> : null}
         {z.anwesend && nurSollstaerke(z.eintrag.bogen) ? <span className="bedarf-marke" title="Niemand hat gezählt: Die Zahl ist die Sollstärke der Vorbelegung.">Sollstärke, nicht gemeldet</span> : null}
@@ -3637,16 +3754,8 @@ function TabellenZelle({ spalte, zeile: z, kern = false, stern = false }: { spal
     // Kernspalten am Telefon: die Eintreffzeit steht da, das Alter der Angaben bleibt als Marke darunter (R18-A5).
     case "eingetroffen": {
       if (!kern) return <td>{z.eingetroffen}{stern ? " *" : ""}</td>;
-      const jetzt = Date.now();
-      const alt = z.anwesend && jetzt - z.angabenAm >= 60 * 60_000;
-      return (
-        <td className="eingetroffen-kern">
-          {zeitKurz(z.eingetroffenAm)}{stern ? " *" : ""}
-          {alt && (
-            <span className="alter-marke warnung-text">⚠ {z.angabenWort === "Stand" ? "Stand " : ""}{alterText(z.angabenAm, jetzt)}</span>
-          )}
-        </td>
-      );
+      // Die Spalte nennt nur die Eintreffzeit; die Warnung zum Alter der Angaben steht beim Namen (R20-H12).
+      return <td className="eingetroffen-kern">{zeitKurz(z.eingetroffenAm)}{stern ? " *" : ""}</td>;
     }
     // Zahl plus Typen: „3" beantwortet die Summenfrage, „GKW / MzKW" die
     // nach dem, was tatsächlich dasteht.
@@ -3664,7 +3773,9 @@ function TabellenZelle({ spalte, zeile: z, kern = false, stern = false }: { spal
                   <span className="bedarf-teil">{teil}</span>
                 </Fragment>
               ))
-            : null}
+            : bedarfNichtErfasst(z.eintrag.bogen)
+              ? <span className="bedarf-teil">nicht erfasst</span> /* R20-K2: dasselbe Wort wie Karte und Lageblatt statt einer leeren Zelle */
+              : null}
         </td>
       );
     case "auftrag":
@@ -3761,8 +3872,9 @@ export function BogenDetails({ bogen, absender, absenderKarte }: { bogen: Erfass
             <dd>
               {h.name}{h.kurz ? ` (${h.kurz})` : ""}
               {/* Telefon und Adresse je Zeile, Adressen nur an „@" und „." umbrechen — kein „·" am Zeilenrand (R14-S4). */}
-              {h.telefon ? <span className="kontakt-zeile"><KontaktLink art="tel" wert={h.telefon} /></span> : null}
-              {h.email ? <span className="kontakt-zeile"><KontaktLink art="mail" wert={h.email} kinder={adresseUmbrechbar(h.email)} /></span> : null}
+              {/* R20-K3: beschriftet – die Nummer ist die der Dienststelle (Stammdaten), keine Rückrufnummer der Einheit. */}
+              {h.telefon ? <span className="kontakt-zeile">Telefon der Dienststelle: <KontaktLink art="tel" wert={h.telefon} /></span> : null}
+              {h.email ? <span className="kontakt-zeile">E-Mail der Dienststelle: <KontaktLink art="mail" wert={h.email} kinder={adresseUmbrechbar(h.email)} /></span> : null}
             </dd>
           </div>
         ))}
@@ -3851,11 +3963,12 @@ export function BogenDetails({ bogen, absender, absenderKarte }: { bogen: Erfass
       <h4>Sofortbedarf &amp; Sonstiges</h4>
       <dl className="paare">
         <dt>Verpflegung</dt>
-        <dd>{sb ? verpflegungBogenText(sb.verpflegungPersonen, vp) : "—"}</dd>
+        {/* R20-K2: Ohne Sofortbedarf (Schnellerfassung) steht überall dasselbe Wort wie auf der Karte: „nicht erfasst“, nicht „—“. */}
+        <dd>{sb ? verpflegungBogenText(sb.verpflegungPersonen, vp) : "nicht erfasst"}</dd>
         <dt>Betriebsstoff</dt>
-        <dd>{sb ? `${sb.dieselLiter} l Diesel / ${sb.benzinLiter} l Benzin / ${sb.gemischLiter} l Gemisch` : "—"}</dd>
+        <dd>{sb ? `${sb.dieselLiter} l Diesel / ${sb.benzinLiter} l Benzin / ${sb.gemischLiter} l Gemisch` : "nicht erfasst"}</dd>
         <dt>Unterbringung / Ruhezeit</dt>
-        <dd>{sb ? `${sb.unterbringung ? "Unterbringung" : "keine Unterbringung"} · ${sb.ruhezeitErforderlich ? "Ruhezeit erforderlich" : "keine Ruhezeit"}` : "—"}</dd>
+        <dd>{sb ? `${sb.unterbringung ? "Unterbringung" : "keine Unterbringung"} · ${sb.ruhezeitErforderlich ? "Ruhezeit erforderlich" : "keine Ruhezeit"}` : "nicht erfasst"}</dd>
         <dt>Sonstiges</dt><dd>{bogen.sonstiges || "—"}</dd>
       </dl>
     </div>
@@ -3960,7 +4073,9 @@ interface StaerkeGeaendert {
   /** Die neue Fassung — „Rückgängig" nimmt sie wieder heraus. */
   eintragId: string;
   /** Statt der Stärke wurde die Kennzeichnung umgestellt: „Als Einsatzmeldung zählen" / „Als Übung kennzeichnen" (R14-E1). */
-  kennzeichnung?: "einsatz" | "uebung";
+  kennzeichnung?: "einsatz" | "uebung" | "name";
+  /** Bei `kennzeichnung: "name"`: der neue Name (`name` ist der bisherige) – R20-H1 „Ort der Einheit ändern…". */
+  neuerName?: string;
 }
 
 /** Eben zusammengeführt — Quittung mit Rückweg und der Stärke vorher → nachher (R4-D5). */
@@ -4005,7 +4120,8 @@ async function papierkorbZuerst(einsatzId: string, x: Entfernt, modul: Promise<t
   }
   const trotzdem = await frageJaNein({
     titel: "Papierkorb voll",
-    text: "Die Meldung kam nicht in den Papierkorb — der Speicher dieses Geräts ist voll oder gesperrt. Endgültig entfernen? „Rückgängig“ gilt dann nur bis zum Neuladen.",
+    // R20-H13: Die Frage nennt, welche Meldung gemeint ist.
+    text: `Meldung ${x.nummer != null ? `Nr. ${x.nummer} ` : ""}„${einheitAnzeigename(x.eintraege[0]!.bogen.einheit)}" kam nicht in den Papierkorb — der Speicher dieses Geräts ist voll oder gesperrt. Endgültig entfernen? „Rückgängig“ gilt dann nur bis zum Neuladen.`,
     ok: "Endgültig entfernen",
     gefahr: true,
   });
@@ -4141,6 +4257,18 @@ function EinheitKarte(props: {
     karteOffenMerken(einsatzId, kopf.einheitSchluessel, offen);
   };
   const zu = kompakt && !aufgeklappt;
+  // R20-G2, M1: „⚠ Anderer Einsatz? Prüfen ▸" klappt die Karte auf und bringt „Gehört zu dieser Lage" ins Bild (statt die Karte nur zu öffnen
+  // und den Helfer den Warnsatz 400 px tiefer suchen zu lassen).
+  const ortKnopf = useRef<HTMLButtonElement>(null);
+  const [ortPruefen, setOrtPruefen] = useState(0);
+  useEffect(() => {
+    if (ortPruefen === 0 || zu) return;
+    const knopf = ortKnopf.current;
+    if (!knopf) return;
+    knopf.scrollIntoView?.({ block: "center" });
+    knopf.focus({ preventScroll: true });
+    setOrtPruefen(0);
+  }, [ortPruefen, zu]);
   // Ohne Rollen: Die Ansicht bleibt nach der Aufnahme oben (R2-S3).
   const zeile = useEingangsquittung<HTMLLIElement>(marke(eingang, kopf.einheitSchluessel), { rollen: false });
   const nameId = useId();
@@ -4207,6 +4335,10 @@ function EinheitKarte(props: {
   const zugListeId = useId();
   // Entwurf des Auftrags/der Notiz der Führungsstelle (K5), gleiche Regel.
   const [notizEntwurf, setNotizEntwurf] = useState<string | null>(null);
+  // R20-O3: Scheitert das Speichern (Speicher voll), bleibt das Feld mit dem getippten Text offen. Solange die
+  // Meldung steht, löst der Fokuswechsel zum Dialog kein zweites Speichern aus.
+  const speichertGerade = useRef(false);
+  const gescheitert = useRef<{ zug?: string; notiz?: string }>({});
   // Eintreff- oder Abrückzeit in Korrektur (Nachtragen vom Papier).
   const [zeitEntwurf, setZeitEntwurf] = useState<{ feld: "eintreffen" | "abruecken"; wert: string } | null>(null);
   const [lueckenOffen, setLueckenOffen] = useState(false);
@@ -4304,6 +4436,9 @@ function EinheitKarte(props: {
     const ok = await gesichert(
       status === MeldeStatus.ABGERUECKT ? "Abrücken" : "Wieder anwesend",
       () => statusMitZeitSetzen(einsatzId, kopf.id, status, zeit),
+      undefined,
+      false,
+      `${props.nummer != null ? `Nr. ${props.nummer} ` : ""}„${einheitAnzeigename(kopf.bogen.einheit)}" ist nicht ${status === MeldeStatus.ABGERUECKT ? "als abgerückt vermerkt" : "wieder als anwesend vermerkt"}.`,
     );
     if (!ok) {
       ankerOben.current = null;
@@ -4332,10 +4467,21 @@ function EinheitKarte(props: {
   }
 
   async function zugSpeichern(wert?: string, offenLassen = false) {
-    const ok = await gesichert("Zug zuordnen", () =>
-      zugSetzen(einsatzId, kopf.einheitSchluessel, kopf.id, wert ?? zugEntwurf ?? ""),
-    );
-    if (!offenLassen) setZugEntwurf(null);
+    if (speichertGerade.current) return;
+    // Beim Verlassen des Felds nicht noch einmal denselben gescheiterten Text speichern: Der Dialog kam schon (R20-O3).
+    if (offenLassen && gescheitert.current.zug === (wert ?? zugEntwurf ?? "")) return;
+    speichertGerade.current = true;
+    let ok = false;
+    try {
+      ok = await gesichert("Zug zuordnen", () =>
+        zugSetzen(einsatzId, kopf.einheitSchluessel, kopf.id, wert ?? zugEntwurf ?? ""),
+        `Der Text „${wert ?? zugEntwurf ?? ""}" bleibt im Feld stehen — nach dem Platzschaffen nur noch „Speichern“ tippen.`,
+      );
+    } finally {
+      speichertGerade.current = false;
+    }
+    gescheitert.current.zug = ok ? undefined : (wert ?? zugEntwurf ?? "");
+    if (!offenLassen && ok) setZugEntwurf(null);
     if (ok) {
       if (!offenLassen) props.onHandlung?.();
       onGeaendert();
@@ -4362,7 +4508,11 @@ function EinheitKarte(props: {
     const zuKnopf = e.relatedTarget instanceof HTMLButtonElement;
     if (zuKnopf) {
       if (entwurf.trim() !== "") speichern(true);
-      nachKlickSchliessen(schliessen);
+      // R20-O3: Ist das Speichern gerade gescheitert (oder der Dialog dazu offen), bleibt das Feld mit dem Text stehen.
+      nachKlickSchliessen(() => {
+        if (speichertGerade.current || gescheitert.current.zug === entwurf || gescheitert.current.notiz === entwurf) return;
+        schliessen();
+      });
       return;
     }
     if (entwurf.trim() === "") schliessen();
@@ -4372,8 +4522,21 @@ function EinheitKarte(props: {
   async function notizSpeichern(offenLassen = false) {
     const vorher = kopf.notiz ?? "";
     const nachher = (notizEntwurf ?? "").trim();
-    const ok = await gesichert("Auftrag/Notiz", () => notizSetzen(einsatzId, kopf.id, notizEntwurf ?? ""));
-    if (!offenLassen) setNotizEntwurf(null);
+    if (speichertGerade.current) return;
+    if (offenLassen && gescheitert.current.notiz === (notizEntwurf ?? "")) return; // wie beim Zug (R20-O3)
+    speichertGerade.current = true;
+    let ok = false;
+    try {
+      ok = await gesichert(
+        "Auftrag/Notiz",
+        () => notizSetzen(einsatzId, kopf.id, notizEntwurf ?? ""),
+        `Der Text bleibt im Feld stehen — nach dem Platzschaffen nur noch „Speichern“ tippen: „${(notizEntwurf ?? "").trim()}“`,
+      );
+    } finally {
+      speichertGerade.current = false;
+    }
+    gescheitert.current.notiz = ok ? undefined : (notizEntwurf ?? "");
+    if (!offenLassen && ok) setNotizEntwurf(null);
     if (ok) {
       if (!offenLassen) props.onHandlung?.();
       // Quittung mit Rückgängig, wie bei Zug und Stärke — bei aktivem Filter „ohne Auftrag" verschwindet die Karte (R15-W3).
@@ -4474,7 +4637,7 @@ function EinheitKarte(props: {
         ? eintreffzeitSetzen(einsatzId, kopf.id, ms)
         : abrueckzeitSetzen(einsatzId, kopf.id, ms),
     );
-    setZeitEntwurf(null);
+    if (ok) setZeitEntwurf(null); // R20-O3: bei Speicherfehler bleibt die getippte Zeit im Feld
     if (ok) {
       props.onHandlung?.();
       onGeaendert();
@@ -4707,6 +4870,43 @@ function EinheitKarte(props: {
         nachher: personen,
         eintragId: neueFassung.fassung.id,
         kennzeichnung: wirdEinsatz ? "einsatz" : "uebung",
+      });
+    }
+    onGeaendert();
+  }
+
+  /**
+   * R20-H1: Name / Ort der Einheit am Meldekopf ändern. Ein falsch geschriebener Ort („Oldenburgg") war bisher nur über
+   * „Entfernen" und Neuerfassen zu korrigieren – dabei blieb „Nr. 1 frei", und die Nummer auf dem Zettel wich ab. Wie bei
+   * „Stärke ändern…" entsteht eine neue Fassung mit allem Übrigen; Nummer, Zug und Historie bleiben (gleicher Schlüssel),
+   * „Rückgängig" nimmt sie zurück. Steht die Organisation schon im Namen („THW Oldenburg"), wird sie nicht doppelt gesetzt.
+   */
+  async function ortAendern() {
+    // Dialog und neue Fassung in ort-aendern.ts, erst beim Tippen nachgeladen (Startbündel).
+    const { ortErfragen } = await import("./ort-aendern");
+    const geaendert = await ortErfragen(kopf.bogen, stempelZeitpunkt());
+    if (!geaendert) return;
+    const { neu, vorherName, neuerName } = geaendert;
+    const neueFassung: { fassung: MeldeEintrag | null } = { fassung: null };
+    const ok = await gesichert("Name ändern", () => {
+      const quelle = kopf.quelle === "aufteilung" || kopf.quelle === "zusammenfuehrung" ? "manuell" : kopf.quelle;
+      const r = meldungAufnehmen(einsatzId, neu, { quelle, einheitSchluesselOverride: kopf.einheitSchluessel });
+      if (r?.neu) {
+        neueFassung.fassung = r.eintrag;
+        fassungObenauf(einsatzId, r.eintrag.id);
+        angabenVermerken(einsatzId, r.eintrag.id, kopf, "name"); // Alter bleibt, keine Folgemeldung
+        standAbsenderVermerken(einsatzId, r.eintrag.id, kopf);
+      }
+    });
+    if (!ok) return;
+    if (neueFassung.fassung) {
+      props.onStaerkeGeaendert?.({
+        name: vorherName,
+        vorher: staerke(kopf.bogen).gesamt,
+        nachher: staerke(kopf.bogen).gesamt,
+        eintragId: neueFassung.fassung.id,
+        kennzeichnung: "name",
+        neuerName,
       });
     }
     onGeaendert();
@@ -5040,7 +5240,7 @@ function EinheitKarte(props: {
                   className="kompakt-merkmal luecken-merkmal marke-knopf"
                   title={`Bogen nennt als Ort/Auftrag: „${props.fremderOrt}“ — passt das zu dieser Lage? ${ORT_REGEL}`}
                   aria-describedby={nameId}
-                  onClick={() => setAufgeklappt(true)}
+                  onClick={() => { setAufgeklappt(true); setOrtPruefen((n) => n + 1); }}
                 >
                   ⚠ Anderer Einsatz? Prüfen ▸
                 </button>
@@ -5139,7 +5339,7 @@ function EinheitKarte(props: {
               {/* R19-A9, W6, E7, H4, M3, O9, G12, S7: Die Regel hinter der Marke steht hinter „Warum?" — die Karte wird am Telefon nicht um vier Zeilen länger. */}
               ⚠ Bogen nennt: „{props.fremderOrt}“ — passt das zu dieser Lage? Zählt trotzdem mit.{" "}
               <details className="ort-warum"><summary>Warum?</summary>{ORT_REGEL}</details>{" "}
-              <button type="button" className="link ort-knopf" aria-describedby={nameId} onClick={() => void ortGehoert(true)}>
+              <button type="button" className="link ort-knopf" ref={ortKnopf} aria-describedby={nameId} onClick={() => void ortGehoert(true)}>
                 Gehört zu dieser Lage
               </button>
             </span>
@@ -5209,7 +5409,7 @@ function EinheitKarte(props: {
           {bemerkung && (
             <span className={`muster-sub bemerkung${bemerkungNeu ? " bemerkung-neu" : ""}`}>
               {bemerkungNeu ? "Bemerkung der Einheit (neu): " : "Bemerkung der Einheit: "}
-              {bemerkungGanz || bemerkung.length <= bemerkungKurz() ? bemerkung : `${bemerkung.slice(0, bemerkungKurz()).trimEnd()} …`}
+              {bemerkungGanz || bemerkung.length <= bemerkungKurz() ? bemerkung : kuerzeAnWortgrenze(bemerkung, bemerkungKurz())}
               {bemerkung.length > bemerkungKurz() && (
                 <>
                   {" "}
@@ -5444,6 +5644,11 @@ function EinheitKarte(props: {
               <button type="button" aria-describedby={nameId} onClick={() => void uebungUmstellen()}>
                 {kopf.bogen.uebung ? "Als Einsatzmeldung zählen…" : "Als Übung kennzeichnen…"}
               </button>{" "}
+            </>
+          )}
+          {kopf.bogen.einheit.hierarchie[0] && (
+            <>
+              <button type="button" aria-describedby={nameId} onClick={() => void ortAendern()}>Ort der Einheit ändern…</button>{" "}
             </>
           )}
           <button type="button" aria-describedby={nameId} onClick={() => void verschieben()}>Verschieben…</button>{" "}

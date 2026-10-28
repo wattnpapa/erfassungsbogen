@@ -1,0 +1,20 @@
+/**
+ * Zählung der Schnellerfassung (R20-A2, W3, H3, K4, N3): Es kommen vier Bildschirme
+ * (Einheit, Personal, Fahrzeuge, Übersicht); Einsatz (2) und Sofortbedarf (5) entfallen.
+ * Die Kopfzeile zählt nur diese vier und nennt die echten Schrittnamen, statt
+ * „Schritt 3 von 6 · 2, 5 entfallen" zu zeigen.
+ */
+
+/** Indizes der Schritte (0-basiert), die in der Schnellerfassung vorkommen. */
+export const SCHNELL_SCHRITTE: readonly number[] = [0, 2, 3, 5];
+
+/**
+ * Kopfzeile der Schnellerfassung. `namen` sind die sechs Schrittnamen des Assistenten.
+ * Auf einem entfallenden Schritt (nur über die Reiter erreichbar) steht ein Satz
+ * ohne Zahlenliste.
+ */
+export function schnellKopfzeile(schritt: number, namen: readonly string[]): string {
+  const pos = SCHNELL_SCHRITTE.indexOf(schritt);
+  if (pos < 0) return `${namen[schritt]} entfällt in der Schnellerfassung – weiter mit Personal`;
+  return `Schritt ${pos + 1} von ${SCHNELL_SCHRITTE.length}: ${namen[schritt]}`;
+}

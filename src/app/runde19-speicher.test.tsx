@@ -172,7 +172,7 @@ describe("R19-O3 „Einsatz löschen“ bei vollem Speicher", () => {
     await nutzer.click(within(dialogMit("Einsatz löschen?")!).getByRole("button", { name: "In den Papierkorb" }));
     const hinweis = await waitFor(() => dialogMit("Nicht gelöscht")!);
     expect(hinweis.textContent).toMatch(/Speicher/);
-    await nutzer.click(within(hinweis).getByRole("button", { name: "Abbrechen" }));
+    await nutzer.click(within(hinweis).getByRole("button", { name: "Einsatz behalten" })); // R20-W1: „Abbrechen“ heißt jetzt, was es tut
     expect(onGeloescht).not.toHaveBeenCalled();
     expect(einsaetzeLaden()).toHaveLength(1);
   });
@@ -188,7 +188,15 @@ describe("R19-O3 „Einsatz löschen“ bei vollem Speicher", () => {
     await nutzer.click(within(dialogMit("Einsatz löschen?")!).getByRole("button", { name: "In den Papierkorb" }));
     const frage = await waitFor(() => dialogMit("Nicht gelöscht")!);
     expect(frage.textContent).toContain("nicht rückholbar");
-    await nutzer.click(within(frage).getByRole("button", { name: "Endgültig löschen" }));
+    // R20-W1: „Endgültig löschen…“ führt in eine zweite Rückfrage mit der Folge; erst deren Bestätigung löscht.
+    await nutzer.click(within(frage).getByRole("button", { name: "Endgültig löschen…" }));
+    const zweite = await waitFor(() => {
+      const d = [...document.querySelectorAll<HTMLDialogElement>("dialog[open]")].find((x) => /Hochwasser Platz.* endgültig löschen\?/.test(x.getAttribute("aria-label") ?? ""));
+      expect(d).toBeDefined();
+      return d!;
+    });
+    expect(einsaetzeLaden()).toHaveLength(1);
+    await nutzer.click(within(zweite).getByRole("button", { name: "Ja, endgültig löschen" }));
     const quittung = await waitFor(() => dialogMit("Endgültig gelöscht")!);
     expect(quittung.textContent).toContain("nicht im Papierkorb");
     await nutzer.click(within(quittung).getAllByRole("button")[0]!);

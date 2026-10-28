@@ -76,9 +76,9 @@ describe("R14-K1 Alter der Angaben (Stand), nicht des Eintreffens", () => {
     expect(lageblattZeilenAlter(angabenZeit(e), jetzt, angabenAlterWort(e))).toMatch(/^⚠ Stand vor 14 Std [01] Min$/);
   });
 
-  it("ein frischer Bogen bleibt „Meldung“ und ohne Marke; ein Stand nach dem Eingang verlängert nichts", () => {
+  it("ein frischer Bogen heißt ebenfalls „Stand“ (R20-A3: ein Wort) und trägt keine Marke; ein Stand nach dem Eingang verlängert nichts", () => {
     const frisch = eintrag("a", mitStandVor(5), { empfangenAm: jetzt });
-    expect(angabenAlterWort(frisch)).toBe("Meldung");
+    expect(angabenAlterWort(frisch)).toBe("Stand");
     expect(lageblattZeilenAlter(angabenZeit(frisch), jetzt)).toBeNull();
     const zukunft = eintrag("b", mitStandVor(-120), { empfangenAm: jetzt });
     expect(angabenZeit(zukunft)).toBe(jetzt);

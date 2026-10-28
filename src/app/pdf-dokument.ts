@@ -767,8 +767,23 @@ export function bemerkungKurz(bemerkung: string, kuerzen?: number): string {
   b = b.replace(/\(/g, "[").replace(/\)/g, "]");
   if (kuerzen != null && b.length > kuerzen) {
     let teil = b.slice(0, kuerzen);
-    if (!/\s/.test(b.charAt(kuerzen)) && /\s/.test(teil)) teil = teil.replace(/\s+\S*$/, "");
-    return `(${teil.replace(/[\s,;:.([-]+$/, "")} … Rest: Sammel-PDF)`;
+    // R20-A5: An einer Satz- oder Satzteilgrenze kürzen, nicht mitten im Satz: „… in Instandsetzung — nicht …“ las sich auf der Wand
+    // als „ausgerückt“. Ein vollständiger Satz davor geht vor einem Wortschnitt; die Grenze muss mehr als ein Viertel tragen.
+    const grenzen = [/[.!?](?=\s)/g, /\s[—–]\s|;\s/g];
+    let geschnitten = false;
+    for (const muster of grenzen) {
+      let letzte = -1;
+      for (const m of teil.matchAll(muster)) letzte = m.index! + (m[0].length > 1 && /[—–;]/.test(m[0]) ? 0 : m[0].length);
+      if (letzte >= kuerzen / 4) {
+        teil = teil.slice(0, letzte);
+        geschnitten = true;
+        break;
+      }
+    }
+    if (!geschnitten && !/\s/.test(b.charAt(kuerzen)) && /\s/.test(teil)) teil = teil.replace(/\s+\S*$/, "");
+    // Ein Rest „… nicht“, „… ohne“ oder „… und“ ohne sein Ziel sagt das Gegenteil oder nichts: solche Endwörter fallen weg.
+    teil = teil.replace(/(?:\s+(?:nicht|kein|keine|keinen|keiner|ohne|und|oder|mit|über|in|an|zu|von|bei|für|auf|als|dem|der|die|den))+$/i, "");
+    return `(${teil.replace(/[\s,;:([—–-]+$/, "")} … Rest: Sammel-PDF)`;
   }
   return `(${b})`;
 }
@@ -1036,31 +1051,40 @@ function bedarfsTabelle(eintraege: UebersichtEintrag[], leer = false, nachtrag?:
     };
   }
   const s = summiereBoegen(zaehlendeBoegen(eintraege));
+  // R20-K2: Beruhen Summen auf Einheiten ohne Bedarfsangabe (Schnellerfassung), steht der Vorbehalt an jeder dieser Zeilen:
+  // Das gedruckte Blatt geht an Stellen ohne App, und „keine" / „0 Portionen" las sich dort als „nichts nötig".
+  const ohne = s.bedarfOhneAngabe ?? 0;
+  const vorbehalt = ohne > 0 ? `bei ${ohne} von ${s.einheiten} Einheiten nicht erfasst` : "";
+  const mitVorbehalt = (text: string) => (vorbehalt ? `${text} (${vorbehalt})` : text);
   const body: TableCell[][] = [
     [
       { text: "Verpflegung:", bold: true },
       {
-        text:
+        text: mitVorbehalt(
           (s.verpflegungAngefordert === s.verpflegung.gesamt
             ? `${s.verpflegung.gesamt} Portionen `
             : `angefordert ${s.verpflegungAngefordert} Portionen, Stärke ${s.verpflegung.gesamt} `) +
-          `(${s.verpflegung.fleisch} Fleisch / ${s.verpflegung.vegetarisch} vegetarisch / ${s.verpflegung.vegan} vegan)`,
+            // Die Ernährung kennt nur, wer Bedarf angegeben hat: ohne Angabe steht sie nicht als „Fleisch“ da.
+            (ohne >= s.einheiten && s.einheiten > 0
+              ? "(Ernährung nicht erfasst)"
+              : `(${s.verpflegung.fleisch} Fleisch / ${s.verpflegung.vegetarisch} vegetarisch / ${s.verpflegung.vegan} vegan)`),
+        ),
       },
     ],
     // Quartier und WC/Dusche getrennt: die M/W/D-Zahl zählt alle Anwesenden,
     // angefordert haben nur einige Einheiten (Audit Runde 3, R3-K4).
     [
       { text: "Unterbringung angefordert:", bold: true },
-      { text: unterbringungAngefordertText(s) || "keine" },
+      { text: mitVorbehalt(unterbringungAngefordertText(s) || "keine") },
     ],
     [
       { text: "WC/Dusche (alle Anwesenden):", bold: true },
       { text: mwdText({ ...s.unterbringung, ohneAngabe: s.unterbringungOhneAngabe }) },
     ],
-    [{ text: "Betriebsstoff:", bold: true }, { text: kraftstoffText(s.kraftstoff) || "—" }],
+    [{ text: "Betriebsstoff:", bold: true }, { text: mitVorbehalt(kraftstoffText(s.kraftstoff) || "—") }],
     [
       { text: "Fahrzeuge / Ruhezeit:", bold: true },
-      { text: `${s.fahrzeuge} Fahrzeuge · Ruhezeit erforderlich bei ${einheitenZahl(s.ruhezeitErforderlich)}` },
+      { text: mitVorbehalt(`${s.fahrzeuge} Fahrzeuge · Ruhezeit erforderlich bei ${einheitenZahl(s.ruhezeitErforderlich)}`) },
     ],
   ];
   return {
@@ -1764,7 +1788,7 @@ export function einsatzLageblattDokument(
         : "Summen und Bedarf zählen nur die anwesenden Einheiten dieser Lage; abgerückte stehen im eigenen Block. Nach Nr. geordnet. Alle Änderungen im Einzelnen: Sammel-PDF." +
           (eintraege.some((e) => e.zeitEingelesen) ? ` ${EINGELESEN_FUSSNOTE}` : "") +
           (lueckenZeile ? ` ${lueckenZeile}` : "") +
-          " Rückrufnummer: (D) dienstlich, (P) privat." +
+          " Rückrufnummer: (D) dienstlich, (P) privat, (OV) Nummer des Ortsverbands – die Einheit selbst hat keine gemeldet." +
           (rueckseite ? " Nachträge von Hand: Seite 2." : ""),
       LAGEBLATT_MAX_ZEILEN,
       true,

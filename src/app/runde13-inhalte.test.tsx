@@ -78,7 +78,7 @@ describe("R13-K2 Lageblatt kennzeichnet die Zeilen mit alter Meldung", () => {
     const jetzt = Date.now();
     expect(lageblattZeilenAlter(jetzt - 5 * 60_000, jetzt)).toBeNull();
     expect(lageblattZeilenAlter(undefined, jetzt)).toBeNull();
-    expect(lageblattZeilenAlter(jetzt - 401 * 60_000, jetzt)).toBe("⚠ Meldung vor 6 Std 41 Min");
+    expect(lageblattZeilenAlter(jetzt - 401 * 60_000, jetzt)).toBe("⚠ Stand vor 6 Std 41 Min");
   });
   it("im Lageblatt tragen genau die alten Einheiten die Marke", () => {
     const erstellt = Date.now();
@@ -93,9 +93,9 @@ describe("R13-K2 Lageblatt kennzeichnet die Zeilen mit alter Meldung", () => {
     ];
     const t = texte(einsatzLageblattDokument("Lage", zeilen, erstellt).content);
     // Die PDF-Schrift kennt kein ⚠, winAnsiDokument setzt „!“ ein.
-    expect(t.filter((x) => x === "! Meldung vor 5 Std 0 Min")).toHaveLength(1);
+    expect(t.filter((x) => x === "! Stand vor 5 Std 0 Min")).toHaveLength(1);
     // Abgerückte tragen keine Marke: sie tragen die Lage nicht mehr.
-    expect(t.some((x) => x.startsWith("! Meldung vor 9 Std"))).toBe(false);
+    expect(t.some((x) => x.startsWith("! Stand vor 9 Std"))).toBe(false);
     // Sechs Zeilen darüber trägt der Kopf die Zahl, die diese Marke auflöst.
     expect(t.some((x) => /1 von 2 älter als 1 Std/.test(x))).toBe(true);
   });

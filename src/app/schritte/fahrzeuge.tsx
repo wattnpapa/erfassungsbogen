@@ -18,7 +18,7 @@ import {
   vokabularFuer,
   vorbelegungGeladen,
 } from "../hilfen";
-import { fahrzeugSymbolSvg, svgDataUrl } from "../taktische-zeichen-bogen";
+import { FahrzeugZeichen } from "../zeichen-bild";
 import { frageJaNein } from "../dialoge";
 import { kennzeichenHinweis, kennzeichenSchreibweise } from "../schreibweise";
 import { einheitOrt } from "@bos/meldekopf/darstellung";
@@ -80,7 +80,7 @@ function FahrzeugKarte(props: {
           setzte die Kopflinie erst rechts vom Zeichen an. Der Löschknopf steht
           am Ende der Zeile, beim Umbruch hinter dem Kennzeichen statt darüber. */}
       <div className="zeile eintrag-kopf">
-        <img className="fahrzeug-symbol" src={svgDataUrl(fahrzeugSymbolSvg(f, org))} alt="" aria-hidden="true" />
+        <FahrzeugZeichen fahrzeug={f} org={org} className="fahrzeug-symbol" aria-hidden="true" />
         <Feld titel="Fahrzeugtyp">
           <VokabAuswahl wert={f.typ} aendern={(v) => set({ typ: v })} tabelle={vokabularFuer(org, "fahrzeug")} platzhalter="z. B. MzKW, LF 20" suchbar />
           {/* R12-N3: Das Feld kürzt lange Typen am Ende („…Lastkraftwagen I“); die Langform steht darunter ungekürzt. */}

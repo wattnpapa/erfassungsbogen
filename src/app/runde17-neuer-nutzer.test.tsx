@@ -158,7 +158,7 @@ describe("R17-N5 Strich im Reiter und Modus-Marke", () => {
     const nutzer = userEvent.setup();
     render(<App />);
     await nutzer.click(screen.getByRole("button", { name: "Einheit schnell erfassen (nur Stärke)…" }));
-    expect(document.querySelector(".schritte-erklaerung")!.textContent).toMatch(/Schritt 2 und 5 entfallen/);
+    expect(document.querySelector(".schritte-erklaerung")!.textContent).toMatch(/Einsatz und Sofortbedarf entfallen/);
     expect(screen.getByRole("button", { name: /^2\. .* entfällt in der Schnellerfassung$/ })).toBeTruthy();
     expect(screen.getByRole("button", { name: /^5\. .* entfällt in der Schnellerfassung$/ })).toBeTruthy();
     await nutzer.click(screen.getByRole("button", { name: /^3\. Personal/ }));

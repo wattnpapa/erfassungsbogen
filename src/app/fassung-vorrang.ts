@@ -262,7 +262,7 @@ export function fassungObenauf(einsatzId: string, eintragId: string): boolean {
  * Die Handänderung `eintragId` („Stärke ändern…", Kennzeichnung) übernimmt das Alter der Angaben von `vorgaengerin`
  * (R17-K1): Karte, Kopf, Monitor und Lageblatt messen weiter ab der Meldung der Einheit, nicht ab dem Tippen am Meldekopf.
  */
-export function angabenVermerken(einsatzId: string, eintragId: string, vorgaengerin: MeldeEintrag, kennzeichnung = false): boolean {
+export function angabenVermerken(einsatzId: string, eintragId: string, vorgaengerin: MeldeEintrag, kennzeichnung: boolean | "name" = false): boolean {
   const liste = alleSammlungen();
   const e = liste.find((x) => x.id === einsatzId)?.eintraege.find((x) => x.id === eintragId);
   if (!e) return false;

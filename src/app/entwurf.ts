@@ -501,19 +501,75 @@ export const ENTWURF_SCHLUESSEL = SPEICHER_SCHLUESSEL;
 export function ersetztenEntwurfMerken(
   bogen: Erfassungsbogen,
   fremd?: Entwurf["fremd"],
-  opt: { tausch?: boolean; geaendertUm?: number; grund?: Entwurf["ersetztGrund"] } = {},
+  opt: { tausch?: boolean; geaendertUm?: number; grund?: Entwurf["ersetztGrund"]; ausEntwurf?: boolean } = {},
 ): boolean {
-  if (!opt.tausch && !rueckholungNimmt(!!fremd, ersetztenEntwurfLaden())) return false;
+  return ersetztenEntwurfAblegen(bogen, fremd, opt) === "gemerkt";
+}
+
+/**
+ * Ergebnis von {@link ersetztenEntwurfAblegen}: `gemerkt` = liegt auf dem
+ * Rückholplatz; `uebersprungen` = bewusst nicht abgelegt (eine fremde
+ * Erfassung verdrängt keinen eigenen Bogen); `voll` = der Speicher nahm den
+ * Bogen nicht an, es steht nichts Neues dort.
+ */
+export type AblageErgebnis = "gemerkt" | "uebersprungen" | "voll";
+
+/**
+ * Wie {@link ersetztenEntwurfMerken}, aber mit Grund bei Misserfolg (R20-D1):
+ * Wer „bleibt erreichbar" liest, darf bei vollem Speicher nicht ohne Spur
+ * seinen Bogen verlieren. Die Aufrufer brechen bei `voll` ab, statt den Bogen
+ * trotzdem aus dem Entwurf zu nehmen.
+ *
+ * `ausEntwurf`: Der Bogen steht (in gleicher oder älterer Fassung) schon im
+ * Entwurfsplatz und verlässt ihn ohnehin. Ist der Speicher voll, gibt der
+ * Wechsel diesen Platz frei, schreibt den Rückholplatz und stellt den Entwurf
+ * bei Misserfolg unverändert wieder her — nur so gelingt das Verschieben
+ * auch dann, wenn kein Byte frei ist.
+ */
+export function ersetztenEntwurfAblegen(
+  bogen: Erfassungsbogen,
+  fremd?: Entwurf["fremd"],
+  opt: { tausch?: boolean; geaendertUm?: number; grund?: Entwurf["ersetztGrund"]; ausEntwurf?: boolean } = {},
+): AblageErgebnis {
+  if (!opt.tausch && !rueckholungNimmt(!!fremd, ersetztenEntwurfLaden())) return "uebersprungen";
+  const s = speicher();
+  if (!s) return "voll";
+  // Der Stand ist die letzte BEARBEITUNG des Bogens, nicht der Augenblick des
+  // Schließens: Ein Bogen, der um 22:40 zuletzt bearbeitet war, wirkte sonst
+  // um 22:45 so neu wie der Wechsel selbst (Audit Runde 4, R4-S5). Fehlt die
+  // Angabe, gilt wie früher der Zeitpunkt des Merkens.
+  const text = entwurfZuJson(bogen, opt.geaendertUm ?? Date.now(), { fremd, ersetztGrund: opt.grund });
+  const schreiben = (): boolean => {
+    try {
+      s.setItem(ERSETZT_SCHLUESSEL, text);
+      // Manche Browser scheitern still: dem Speicher glauben, nicht dem Aufruf.
+      return s.getItem(ERSETZT_SCHLUESSEL) === text;
+    } catch {
+      return false;
+    }
+  };
+  if (schreiben()) return "gemerkt";
+  if (!opt.ausEntwurf) return "voll";
+  // Voll: den Entwurfsplatz kurz freigeben, denn der Bogen zieht von dort um.
+  let alt: string | null = null;
   try {
-    // Der Stand ist die letzte BEARBEITUNG des Bogens, nicht der Augenblick des
-    // Schließens: Ein Bogen, der um 22:40 zuletzt bearbeitet war, wirkte sonst
-    // um 22:45 so neu wie der Wechsel selbst (Audit Runde 4, R4-S5). Fehlt die
-    // Angabe, gilt wie früher der Zeitpunkt des Merkens.
-    speicher()?.setItem(ERSETZT_SCHLUESSEL, entwurfZuJson(bogen, opt.geaendertUm ?? Date.now(), { fremd, ersetztGrund: opt.grund }));
-    return true;
+    alt = s.getItem(SPEICHER_SCHLUESSEL);
+    if (alt !== null) s.removeItem(SPEICHER_SCHLUESSEL);
   } catch {
-    return false; // Speicher voll o. ä. — der Wechsel selbst darf daran nicht scheitern
+    return "voll";
   }
+  if (schreiben()) {
+    eigenerStand = undefined; // der Entwurfsplatz ist leer, nicht „von einem anderen Fenster entfernt"
+    return "gemerkt";
+  }
+  if (alt !== null) {
+    try {
+      s.setItem(SPEICHER_SCHLUESSEL, alt); // passt: der Platz war eben noch seiner
+    } catch {
+      /* nichts mehr zu tun; der Aufrufer meldet „voll", der Bogen bleibt offen */
+    }
+  }
+  return "voll";
 }
 
 export function ersetztenEntwurfLaden(jetzt: EebZeitpunkt = datenschutzZeitpunkt()): Entwurf | null {

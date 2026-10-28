@@ -8,7 +8,7 @@ import { staerke, type Erfassungsbogen } from "@bos/eeb-format/model";
 import { istNativ, linkTeilen, shareSheetVerfuegbar, textTeilen } from "./nativ";
 import { fehlerText } from "./nachladen";
 import { blobAlsDownload, bogenVollUrl, einheitAnzeigename, einheitOrt, migriereBogen, orgLabel, vokabText, vokabularFuer } from "./hilfen";
-import { einheitSymbolSvg, svgDataUrl } from "./taktische-zeichen-bogen";
+import { EinheitZeichen } from "./zeichen-bild";
 import { nutzungsKanal, statistikAbgewaehlt, statistikAbwaehlen } from "./statistik";
 import { AnzeigeSchalter } from "./anzeige-schalter";
 import { frageWahl, zeigeHinweis } from "./dialoge";
@@ -22,6 +22,7 @@ import {
   letzteSicherung,
   sicherungErstellen,
   sicherungQuittungText,
+  sicherungVermerkFehlte,
   sicherungStandText,
   sicherungFaellig,
   sicherungErstelltAm,
@@ -622,11 +623,11 @@ export function Fusszeile({ onBogenOeffnen, kompakt = false }: {
     const name = `eeb-sicherung-${new Date().toISOString().slice(0, 10)}.json`;
     if (istNativ()) {
       await textTeilen(name, inhalt);
-      setSicherungQuittung(sicherungQuittungText(name, true));
+      setSicherungQuittung(sicherungQuittungText(name, true, sicherungVermerkFehlte()));
       return;
     }
     blobAlsDownload(name, new Blob([inhalt], { type: "application/json" }));
-    setSicherungQuittung(sicherungQuittungText(name, false));
+    setSicherungQuittung(sicherungQuittungText(name, false, sicherungVermerkFehlte()));
   }
 
   async function sicherungImportieren(e: ChangeEvent<HTMLInputElement>) {
@@ -1061,6 +1062,11 @@ export function Fusszeile({ onBogenOeffnen, kompakt = false }: {
           Einträge im Papierkorb. Es gibt keine Kopie in einer Cloud: was hier weg
           ist, ist weg.
         </p>
+        {/* R20-L2: Der sichere Weg steht über der Folge-Zeile und damit am kleinen Telefon über der festen Leiste: Bei 360 × 640 lag
+            „Vorher Sicherung erstellen…" sonst zur Hälfte unter ihr, der Tipp traf die Leiste. */}
+        <div className="aktionen loesch-sicherung">
+          <button type="button" onClick={() => void sicherungExportieren()}>Vorher Sicherung erstellen…</button>
+        </div>
         {/* Die Folge in einer Zeile ganz oben (R18-D4): Die feste Leiste mit Haken und Knöpfen deckt bei 360 × 640 sonst die
             Aufzählung, und „noch kein Export …" blieb ungelesen. Wo es keine Kopie gibt, ist das hier die einzige (R4-D5). */}
         {loeschUmfang && loeschUmfang.eintraege > 0 && loeschUmfang.einsaetze > 0 && (
@@ -1075,11 +1081,7 @@ export function Fusszeile({ onBogenOeffnen, kompakt = false }: {
             .
           </p>
         )}
-        {/* Die Sicherung steht vor der langen Aufzählung: Bei 200 % Schrift lag sie
-            sieben Bildschirme tiefer, am Ende des Dialogs (R7-D7). */}
-        <div className="aktionen">
-          <button type="button" onClick={() => void sicherungExportieren()}>Vorher Sicherung erstellen…</button>
-        </div>
+        {/* Die Sicherung steht vor der langen Aufzählung (R7-D7), seit R20-L2 vor der Folge-Zeile. */}
         {/* R19-M15, D7: Die Aufzählung liegt am kleinen Telefon hinter „Was genau gelöscht wird"; Sicherung, Haken und Knöpfe stehen im Bild. */}
         <details className="dialog-mehr" open={!engeAnzeige()}>
         <summary>Was genau gelöscht wird</summary>
@@ -1225,7 +1227,7 @@ export function Fusszeile({ onBogenOeffnen, kompakt = false }: {
                       <td role="cell">
                         <span className="beispiel-einheit">
                           {b && (
-                            <img src={svgDataUrl(einheitSymbolSvg(b.einheit))} alt="" aria-hidden="true" />
+                            <EinheitZeichen einheit={b.einheit} aria-hidden="true" />
                           )}
                           <span>
                             <strong>{b ? einheitsTypText(b) || datei : datei}</strong>
