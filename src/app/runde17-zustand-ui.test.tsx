@@ -228,7 +228,7 @@ describe("R17-S1 „Zahlen stimmen, so gezählt“ hat die Quittung mit „Rück
     render(<Wirt id={id} />);
     // Beta trägt unbenannte Sollplätze nur, wenn die Vorbelegung welche brachte; sonst zählt sie nicht als Sollstärke.
     const kopf = document.querySelector("#einheiten-liste")!.textContent!;
-    expect(kopf).toMatch(/^Einheiten \(\d+ gemeldet( · \d+ nur Sollstärke)? · \d+ zählend\)$/);
+    expect(kopf).toMatch(/^Einheiten \(\d+ gemeldet( · \d+ nur Sollstärke)? · \d+ anwesend\)$/);
   });
 });
 
@@ -453,7 +453,7 @@ describe("R17-D5 Der Stand des Absenders bleibt sichtbar", () => {
     });
     const vorher = einsaetzeLaden().find((s) => s.id === id)!.eintraege[0]!.bogen.stand;
     render(<Wirt id={id} />);
-    const stand = () => karteVon("Alpha").textContent!.match(/Stand (\d\d\.\d\d\.\d{4}, \d\d:\d\d)/)?.[1];
+    const stand = () => karteVon("Alpha").textContent!.match(/Stand der Angaben (\d\d\.\d\d\.\d{4}, \d\d:\d\d)/)?.[1];
     const davor = stand();
     expect(davor).toBeDefined();
     await nutzer.click(within(karteVon("Alpha")).getByRole("button", { name: "Mehr…" }));
@@ -563,13 +563,18 @@ describe("R17-E1/N1/H5/S7 „Namen einfügen…“ in der Oberfläche", () => {
     await nutzer.type(within(dialog).getByRole("textbox"), "Schmidt Anna Maria\nMeier Karl\nMüller, Hans");
     expect(within(dialog).getAllByText("Reihenfolge prüfen")).toHaveLength(2);
     expect(within(dialog).getByText(/2 Zeilen ohne Komma lese ich als \(bitte bestätigen\)/)).toBeDefined();
-    // Vorgabe: Vorname Nachname → „Maria, Schmidt Anna“
-    expect(dialog.textContent).toContain("Maria, Schmidt Anna");
+    // R18-S7: keine Vorauswahl, „Übernehmen" gesperrt und mit Grund; die Vorschau zeigt „Vorname Nachname" wie eingegeben.
+    expect((within(dialog).getByRole("radio", { name: "Vorname Nachname" }) as HTMLInputElement).checked).toBe(false);
+    expect((within(dialog).getByRole("radio", { name: "Nachname Vorname" }) as HTMLInputElement).checked).toBe(false);
+    expect(within(dialog).getByRole("button", { name: "3 Personen übernehmen" }).hasAttribute("disabled")).toBe(true);
+    expect(dialog.textContent).toContain("„Übernehmen“ geht erst, wenn oben gewählt ist");
+    expect(dialog.textContent).toContain("Schmidt Anna Maria");
     await nutzer.click(within(dialog).getByRole("radio", { name: "Nachname Vorname" }));
     expect(within(dialog).queryAllByText("Reihenfolge prüfen")).toHaveLength(0);
-    expect(dialog.textContent).toContain("Schmidt, Anna Maria");
-    expect(dialog.textContent).toContain("Meier, Karl");
-    expect(dialog.textContent).toContain("Müller, Hans");
+    expect(dialog.textContent).toContain("Anna Maria Schmidt");
+    expect(dialog.textContent).toContain("Karl Meier");
+    expect(dialog.textContent).toContain("Hans Müller");
+    expect(dialog.textContent).not.toContain("„Übernehmen“ geht erst");
     await nutzer.click(within(dialog).getByRole("button", { name: "3 Personen übernehmen" }));
     const nachnamen = (screen.getAllByLabelText("Nachname") as HTMLInputElement[]).map((f) => f.value);
     expect(nachnamen).toEqual(expect.arrayContaining(["Schmidt", "Meier", "Müller"]));
@@ -588,9 +593,10 @@ describe("R17-E1/N1/H5/S7 „Namen einfügen…“ in der Oberfläche", () => {
     const nutzer = userEvent.setup();
     const dialog = await dialogOeffnen(nutzer);
     await nutzer.type(within(dialog).getByRole("textbox"), "Kevin Meier 0171 1234567");
-    expect(dialog.textContent).toContain("Meier, Kevin");
+    expect(dialog.textContent).toContain("Kevin Meier");
     expect(dialog.textContent).toContain("Tel. 0171 1234567");
     expect(within(dialog).queryByText("kein Name?")).toBeNull();
+    await nutzer.click(within(dialog).getByRole("radio", { name: "Vorname Nachname" })); // R18-S7
     await nutzer.click(within(dialog).getByRole("button", { name: "1 Person übernehmen" }));
     expect((screen.getAllByLabelText("Nachname") as HTMLInputElement[]).map((f) => f.value)).toContain("Meier");
   });
@@ -599,7 +605,18 @@ describe("R17-E1/N1/H5/S7 „Namen einfügen…“ in der Oberfläche", () => {
     const nutzer = userEvent.setup();
     const dialog = await dialogOeffnen(nutzer);
     await nutzer.type(within(dialog).getByRole("textbox"), "Lisa Meier, Fahrer");
-    expect(dialog.textContent).toContain("Meier, Lisa · Fahrer");
+    expect(dialog.textContent).toContain("Lisa Meier · Fahrer");
+  });
+
+  it("R18-H6: „Jürgen Weber +49 171 9876543 ZTrFü“ → Name, Funktion und Nummer getrennt, die Funktion nicht als Nachname", async () => {
+    const nutzer = userEvent.setup();
+    const dialog = await dialogOeffnen(nutzer);
+    await nutzer.type(within(dialog).getByRole("textbox"), "Jürgen Weber +49 171 9876543 ZTrFü");
+    expect(dialog.textContent).toContain("Jürgen Weber · ZTrFü · Tel. +49 171 9876543");
+    expect(within(dialog).queryByText("kein Name?")).toBeNull();
+    await nutzer.click(within(dialog).getByRole("radio", { name: "Vorname Nachname" }));
+    await nutzer.click(within(dialog).getByRole("button", { name: "1 Person übernehmen" }));
+    expect((screen.getAllByLabelText("Nachname") as HTMLInputElement[]).map((f) => f.value)).toContain("Weber");
   });
 });
 
@@ -613,8 +630,8 @@ describe("R17-E3 Weitergabe-Datei und Sammel-PDF an den Stab sind unterscheidbar
     render(<Wirt id={id} extra={{ onWeitergeben: () => {}, exportUmfang: "neue", onExportUmfang: () => {}, onStandAusWeitergabe: () => {} }} />);
     const zeile = [...document.querySelectorAll<HTMLElement>(".export-stand-zeile")].find((z) => z.textContent!.startsWith("Sammel-PDF an den Stab"))!;
     expect(zeile.textContent).toMatch(/für den Stab noch keine Lieferung — alle Bögen sind neu/);
-    expect(zeile.textContent).toMatch(/Weitergabe-Datei vom .* zählt hier nicht \(sie geht zum Sichern an die Ablösung oder ins Archiv\)/);
-    expect(zeile.textContent).toMatch(/Das nächste Sammel-PDF hier ist die erste Lieferung an den Stab/);
+    // R18-W8/K10: gekürzt; die Erklärung steht hinter „Was heißt das?“.
+    expect(zeile.textContent).toMatch(/Weitergabe-Datei vom .* geht an die Ablösung und zählt hier nicht/);
     expect(within(zeile).getByRole("button", { name: "Ab dieser Weitergabe rechnen" })).toBeDefined();
   });
 });

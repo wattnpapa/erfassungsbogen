@@ -38,14 +38,14 @@ export const PRELLSCHUTZ_MS: number = (globalThis as { __EEB_PRELLSCHUTZ_MS?: nu
  * Prellschutz (Prüfstand) ebenfalls aus.
  */
 export const ORTSSPERRE_MS: number =
-  (globalThis as { __EEB_ORTSSPERRE_MS?: number }).__EEB_ORTSSPERRE_MS ?? (PRELLSCHUTZ_MS === 0 ? 0 : 1500);
+  (globalThis as { __EEB_ORTSSPERRE_MS?: number }).__EEB_ORTSSPERRE_MS ?? (PRELLSCHUTZ_MS === 0 ? 0 : 1200);
 
 /**
  * Sperre der Stelle nach einem Wechsel der Ansicht (Sammlung öffnen, Startseite, Scanner): 600 ms. Wer die
  * neuen Knöpfe liest, tippt nach einer halben Sekunde; 1,5 s schluckten den nächsten bewussten Tipp
  * (Audit Runde 9, R9-H5). Gilt wie jede Ortssperre nur an der Stelle des ersten Tipps, nicht für den Rest des Bildes.
  */
-export const SEITENWECHSEL_SPERRE_MS: number = ORTSSPERRE_MS === 0 ? 0 : Math.min(ORTSSPERRE_MS, 600);
+export const SEITENWECHSEL_SPERRE_MS: number = ORTSSPERRE_MS === 0 ? 0 : Math.min(ORTSSPERRE_MS, 400); // R18: 0,4 s statt 0,6 s
 
 /**
  * Sperre der Stelle nach einem Schrittwechsel („Weiter →" liegt danach wieder unter dem Finger): 900 ms
@@ -53,7 +53,7 @@ export const SEITENWECHSEL_SPERRE_MS: number = ORTSSPERRE_MS === 0 ? 0 : Math.mi
  * zweiten Tipp; der Doppeltipp (R4-S2, bis rund 700 ms später) bleibt gesperrt, das bewusste Weitertippen
  * ab einer Sekunde geht durch.
  */
-export const SCHRITTWECHSEL_SPERRE_MS: number = ORTSSPERRE_MS === 0 ? 0 : Math.min(ORTSSPERRE_MS, 900);
+export const SCHRITTWECHSEL_SPERRE_MS: number = ORTSSPERRE_MS === 0 ? 0 : Math.min(ORTSSPERRE_MS, 600); // R18: 0,6 s statt 0,9 s
 
 /**
  * Sperre der Stelle nach „Weiter →" im Assistenten: 0,5 s (R17-G11). Bei 0,9 s blieb jeder zweite Tipp eines Helfers auf der
@@ -61,14 +61,14 @@ export const SCHRITTWECHSEL_SPERRE_MS: number = ORTSSPERRE_MS === 0 ? 0 : Math.m
  * verworfenen Tipp für einen Fehltipp. Der Doppeltipp mit Handschuh liegt bei 0,1 bis 0,3 s (R2-G4) und bleibt gesperrt; ein
  * Schrittwechsel ist harmlos und mit „← Zurück" umkehrbar. Die Teilwechsel im QR-Vollbild behalten die längere Sperre.
  */
-export const ASSISTENT_SCHRITT_SPERRE_MS: number = ORTSSPERRE_MS === 0 ? 0 : Math.min(ORTSSPERRE_MS, 500);
+export const ASSISTENT_SCHRITT_SPERRE_MS: number = ORTSSPERRE_MS === 0 ? 0 : Math.min(ORTSSPERRE_MS, 300); // R18-G3: 0,3 s statt 0,5 s
 
 /**
  * Sperre der Stelle unter einer aufgegangenen Quittungsleiste mit „Rückgängig". Ein Zweittipp ab 1,5 s
  * nahm „Abrücken" an derselben Stelle zurück, weil dort jetzt „Rückgängig" lag (R8-D5); der
  * bewusste Rückweg kommt erst nach dem Lesen der Quittung und liegt über 2,5 s.
  */
-export const QUITTUNG_SPERRE_MS: number = ORTSSPERRE_MS === 0 ? 0 : Math.max(ORTSSPERRE_MS, 2500);
+export const QUITTUNG_SPERRE_MS: number = ORTSSPERRE_MS; // R18: „Rückgängig" und „✕" sind nie gesperrt; die Sperre hält nur den Knopf unter einer schwebenden Leiste
 
 /**
  * Kürzere Sperre unter einer Quittung, deren „Rückgängig" etwas Harmloses zurücknimmt (Kenntnisnahme, Zug, Auftrag,
@@ -132,6 +132,22 @@ let sperren: Sperre[] = [];
 
 function mitOrt(e: MouseEvent): boolean {
   return e.detail > 0 && !(e.clientX === 0 && e.clientY === 0);
+}
+
+/**
+ * Sichere Gegenhandlungen (R18-W3, E1, H4, G3, S3, D2, N1): „Abbrechen", „Rückgängig", „Zurück" und Schließen nehmen
+ * nichts weg und stehen nie hinter einer Tipp-Sperre. Die Sperren schützen den Weg nach vorn und die zerstörende
+ * Antwort; wer einen Fehltipp sofort zurücknehmen will, wird nicht gebremst und sieht kein „Einen Moment …".
+ * Erkannt am Merkmal `data-sicher` oder an der Beschriftung des Knopfs.
+ */
+const SICHERE_BESCHRIFTUNG = /^(?:[←‹]\s*)?(?:Abbrechen|Zurück|Rückgängig|Schließen|Verstanden|✕|×)(?![\p{L}\p{N}])/u;
+const KNOPF_ODER_LINK = "button, a[href], summary, [role='button']";
+
+export function istSichereGegenhandlung(ziel: EventTarget | null): boolean {
+  const knopf = (ziel as Element | null)?.closest?.(KNOPF_ODER_LINK) ?? null;
+  if (!knopf) return false;
+  if (knopf.closest("[data-sicher]")) return true;
+  return SICHERE_BESCHRIFTUNG.test((knopf.textContent ?? "").trim());
 }
 
 /** Halbe Breite des Tippziels unter dem Klick; 0, wenn es kein Maß gibt. */
@@ -219,6 +235,11 @@ function verworfenZeigen(e: MouseEvent): void {
 function klickPruefen(e: MouseEvent) {
   if (!mitOrt(e)) return;
   const jetzt = Date.now();
+  if (istSichereGegenhandlung(e.target)) {
+    // Nie gesperrt; der Ort zählt trotzdem als „der Tipp eben" (eine Quittung danach weicht dem Finger aus).
+    letzterTipp = { x: e.clientX, y: e.clientY, zeit: jetzt, halb: halbeZielbreite(e) };
+    return;
+  }
   const s = sperreAn(e.clientX, e.clientY, jetzt, inRueckfrage(e));
   if (s) {
     if (s.verlaengern) s.bis = Math.min(Math.max(s.bis, jetzt + ORTSSPERRE_MS), s.kappe);
@@ -232,7 +253,7 @@ function klickPruefen(e: MouseEvent) {
 
 /** Ein Feld nimmt den Fokus schon beim Drücken — auch das an der gesperrten Stelle abfangen. */
 function druckPruefen(e: MouseEvent) {
-  if (!mitOrt(e) || sperren.length === 0) return;
+  if (!mitOrt(e) || sperren.length === 0 || istSichereGegenhandlung(e.target)) return;
   if (sperreAn(e.clientX, e.clientY, Date.now(), inRueckfrage(e))) {
     e.preventDefault();
     e.stopImmediatePropagation();

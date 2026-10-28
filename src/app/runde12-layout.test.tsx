@@ -152,6 +152,7 @@ describe("Namen einfügen lässt die gewählte Ansicht stehen (R12-N6)", () => {
     await nutzer.click(screen.getByRole("button", { name: "Namen einfügen…" }));
     const dialog = document.querySelector<HTMLDialogElement>("dialog[aria-label='Namen einfügen']")!;
     await nutzer.type(within(dialog).getByRole("textbox"), "Muster, Max\nErika Musterfrau");
+    await nutzer.click(within(dialog).getByRole("radio", { name: "Vorname Nachname" })); // R18-S7: keine Vorauswahl
     await nutzer.click(within(dialog).getByRole("button", { name: "2 Personen übernehmen" }));
     expect((screen.getByLabelText("Alle Angaben (Karten)") as HTMLInputElement).checked).toBe(true);
     expect((screen.getByLabelText("Kurz-Liste (Tabelle)") as HTMLInputElement).checked).toBe(false);

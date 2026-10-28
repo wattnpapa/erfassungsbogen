@@ -225,6 +225,8 @@ function EinheitenTabelle({ einheiten }: { einheiten: readonly EinheitZeile[] })
   return (
     <div className="lm-tabelle" ref={behaelter}>
       <table className="lm-einheiten" ref={tabelleEl}>
+        {/* Die Reihenfolge steht über der Tabelle: Wer „seine" Einheit sucht, sieht, wonach die Zeilen geordnet sind (R18-K5). */}
+        <caption className="lm-reihenfolge">Reihenfolge: ⚠ älteste Angaben zuerst, danach zuletzt gemeldet</caption>
         <thead>
           <tr>
             <th className="lm-orga">Orga</th><th>Ort</th><th><span className="lm-lang">Funkrufname</span><span className="lm-kurz">Funkruf / Ort</span></th><th className="lm-typ">Einheitentyp</th>
@@ -311,6 +313,7 @@ export function Lagemonitor({ einsatzId }: { einsatzId: string }) {
         type="button"
         className="lm-knopf"
         aria-disabled={dunkler == null || undefined}
+        data-anschlag={dunkler == null || undefined}
         onClick={() => dunkler && stufeWechseln(dunkler, false)}
       >
         Dunkler
@@ -319,6 +322,7 @@ export function Lagemonitor({ einsatzId }: { einsatzId: string }) {
         type="button"
         className="lm-knopf"
         aria-disabled={heller == null || hellerGesperrt || undefined}
+        data-anschlag={heller == null || undefined}
         onClick={() => heller && stufeWechseln(heller, true)}
       >
         Heller{stufe === "dunkel" ? " (weiß)" : ""}

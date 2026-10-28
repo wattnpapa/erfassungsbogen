@@ -362,8 +362,9 @@ describe("Nachtrag: Gründe, Namen, Stände vom anderen Gerät (Audit Runde 5, R
 
   it("benennt Lieferungen in allen Formaten gleich", () => {
     expect(lieferungsMarke("alle", null)).toBe("");
-    expect(lieferungsMarke("neue", null)).toBe("erste-lieferung-");
-    expect(lieferungsMarke("neue", { zeitpunkt: new Date(2026, 9, 6, 11, 47).getTime(), eintragIds: [] })).toBe("nachtrag-seit-20261006-1147-");
+    expect(lieferungsMarke("neue", null)).toBe("erste-lieferung");
+    // R18-W6: kein zweiter Zeitstempel im Namen; der Bezugspunkt steht in der Datei.
+    expect(lieferungsMarke("neue", { zeitpunkt: new Date(2026, 9, 6, 11, 47).getTime(), eintragIds: [] })).toBe("nachtrag");
   });
 
   it("übernimmt Stände aus der Datei und vereinigt sie mit den eigenen", () => {

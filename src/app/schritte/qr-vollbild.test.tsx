@@ -190,7 +190,7 @@ describe("QR-Vollbild (R3-H2, R3-H3)", () => {
 // Warnung „alle 7 Teile gescannt?".
 describe("QR-Vollbild: ein Teil zählt erst nach der Mindestzeit (R5-S1)", () => {
   beforeEach(() => {
-    mindestzeigeSetzen(1500);
+    mindestzeigeSetzen(ORTSSPERRE_MS); // R18: 1,2 s statt 1,5 s
     vi.useFakeTimers({ shouldAdvanceTime: false });
   });
   afterEach(() => {
@@ -259,7 +259,7 @@ describe("QR-Vollbild: ein Teil zählt erst nach der Mindestzeit (R5-S1)", () =>
     expect(teilNr()).toBe("2");
   });
 
-  it("ein Nachtipp an derselben Stelle (150 bis 800 ms) überspringt keinen Teil, ab 1,0 s darf er weiter", async () => {
+  it("ein Nachtipp an derselben Stelle (150 bis 550 ms; R18: Sperre 0,6 s) überspringt keinen Teil, ab 1,0 s darf er weiter", async () => {
     const { tippSchutzZuruecksetzen } = await import("../tipp-schutz");
     tippSchutzZuruecksetzen();
     render(<Rahmen n={7} onSchliessen={() => {}} />);
@@ -270,7 +270,7 @@ describe("QR-Vollbild: ein Teil zählt erst nach der Mindestzeit (R5-S1)", () =>
         knopf.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true, clientX: 300, clientY: 500, detail: 1 }));
       });
     };
-    for (const abstand of [150, 600, 800]) {
+    for (const abstand of [150, 400, 550]) {
       tippSchutzZuruecksetzen();
       cleanup();
       render(<Rahmen n={7} onSchliessen={() => {}} />);

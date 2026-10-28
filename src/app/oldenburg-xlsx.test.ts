@@ -584,6 +584,18 @@ describe("Oldenburg-XLSX: Einsatzname, Erstellzeit, Eintreffzeit (R16-A1)", () =
     expect(b).not.toContain("Eintreffzeit = Zeit des Einlesens");
   });
 
+  it("nennt eine am Meldekopf geänderte Stärke in der Bemerkung (R18-A3), eine umgestellte Kennzeichnung als solche", () => {
+    const geaendert = meldung(bogen(), { quelle: "manuell", angaben: { seit: 1000, wort: "Stand", geaendertAm: new Date(2026, 9, 28, 0, 36).getTime() } });
+    const b = blatt(einsatzOldenburgXlsx(sammlung([geaendert]), undefined, erstellt));
+    expect(zelle(b, `${spalteVon(b, "Bemerkung")}3`)).toContain("Stärke am Meldekopf geändert 28.10.2026, 00:36");
+    const kennz = meldung(bogen(), { angaben: { seit: 1000, wort: "Stand", kennzeichnung: true, geaendertAm: new Date(2026, 9, 28, 0, 36).getTime() } });
+    const k = blatt(einsatzOldenburgXlsx(sammlung([kennz]), undefined, erstellt));
+    expect(zelle(k, `${spalteVon(k, "Bemerkung")}3`)).toContain("Kennzeichnung am Meldekopf geändert");
+    // Ohne Handänderung steht nichts davon da.
+    const ohne = blatt(einsatzOldenburgXlsx(sammlung([meldung(bogen())]), undefined, erstellt));
+    expect(zelle(ohne, `${spalteVon(ohne, "Bemerkung")}3`)).not.toContain("am Meldekopf geändert");
+  });
+
   it("rechnet die Kennzeichnung bei einem Teilexport aus der ganzen Sammlung", () => {
     const erste = meldung(bogen(), { id: "alt", empfangenAm: 1000 });
     const folge = meldung(bogen({ stand: 101 * 1440 }), { id: "neu", empfangenAm: 5000, eingetroffenAm: 1000 });

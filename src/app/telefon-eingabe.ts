@@ -17,8 +17,6 @@ export interface TelefonEingabe {
 
 /** Trenner zwischen zwei Nummern: Komma, Semikolon, senkrechter Strich, Schrägstrich, „oder", „und". */
 const TRENNER = /\s*(?:[,;|]|\/|\boder\b|\bund\b)\s*/giu;
-/** Zeichen, die auf dem Zettel zur Nummer gehören dürfen, ohne dass ihr Verschwinden eine Meldung braucht. */
-const SCHREIBWEISE = /[\s\-–/().]/gu;
 /** Unter so vielen Ziffern fragt die App nach („0171 12"). */
 export const TELEFON_MIN_ZIFFERN = 7;
 
@@ -61,16 +59,13 @@ export function telefonBereinigen(roh: string): TelefonEingabe {
   const nullEntfernt = ohneNull !== wert;
   wert = ohneNull;
   // Entfernt wurde, was weder Ziffer noch übliche Schreibweise noch das führende „+" ist („0441 abc").
-  const fremd = erste
-    .trimStart()
-    .replace(/^\+/u, "")
-    .replace(/\d/gu, "")
-    .replace(SCHREIBWEISE, "")
-    .replace(/\+/gu, "")
-    .trim();
+  // Die entfernten Stücke stehen unverändert und in der Reihenfolge der Eingabe da („abc 12x" → „abc", „x"), nicht zu
+  // „abcx" zusammengezogen (R18-E6).
+  const fremdTeile = [...erste.trimStart().replace(/^\+/u, "").matchAll(/[^\d\s\-–/().+]+/gu)].map((m) => m[0]);
+  const fremd = fremdTeile.join("");
   if (zusatzMitZiffern) {
     saetze.push(`Übernommen: ${wert} — „${zusatz[2]!.trim()}" gehört nicht zur Nummer und wurde nicht angehängt. Stimmt die Nummer?`);
-  } else if (fremd) saetze.push(`Nur Ziffern übernommen („${fremd}" entfernt).`);
+  } else if (fremd) saetze.push(`Nur Ziffern übernommen („${fremdTeile.join('", „')}" entfernt).`);
   else if (/\+/u.test(erste.trimStart().slice(1))) saetze.push("Das „+“ gilt nur am Anfang; es wurde entfernt.");
   if (nullEntfernt) saetze.push("Die „0“ nach der Landesvorwahl entfernt (nicht mitwählen).");
   if (z && ziffern(rest)) {

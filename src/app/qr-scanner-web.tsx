@@ -368,6 +368,9 @@ export function QrScannerWeb(props: {
   return (
     <dialog ref={dialogRef} className="scanner" aria-label="QR-Code scannen" tabIndex={-1} data-zurueck="eigen">
       <video ref={videoRef} playsInline muted />
+      {/* Mit Kamera löst sich die Mitte auf (display: contents, Layout wie bisher); ohne Kamera rollt sie zwischen Kopf und Knopfleiste,
+          statt unter der Leiste durchzulaufen (R18-M5, L2, S9, H8). */}
+      <div className={`scanner-mitte${ohneKamera ? " scrollt" : ""}`}>
       {fehler
         ? (
           <div className="scanner-text fehler">
@@ -377,6 +380,10 @@ export function QrScannerWeb(props: {
                 {fehler.schritte.map((schritt) => <li key={schritt}>{schritt}</li>)}
               </ul>
             )}
+            {/* „Kamera erneut versuchen" gehört zur Meldung, nicht in die Knopfleiste (R18-M5, S9, H8). */}
+            <button type="button" className="scanner-erneut" onClick={() => { setFehler(null); setVersuch((n) => n + 1); }}>
+              Kamera erneut versuchen
+            </button>
           </div>
         )
         : ohneKamera ? null : (
@@ -452,6 +459,7 @@ export function QrScannerWeb(props: {
             </details>
           </div>
         )}
+      </div>
       <div className="scanner-aktionen">
         {kameras.length > 1 && !ohneKamera && (
           <label className="scanner-kamera">
@@ -463,11 +471,6 @@ export function QrScannerWeb(props: {
               {kameras.map((k) => <option key={k.id} value={k.id}>{k.name}</option>)}
             </select>
           </label>
-        )}
-        {fehler && (
-          <button type="button" onClick={() => { setFehler(null); setVersuch((n) => n + 1); }}>
-            Kamera erneut versuchen
-          </button>
         )}
         {/* Der Wechsel zwischen den Wegen steht in der Knopfleiste, nicht in
             einer Vorabfrage: Wer die Kamera nutzt, soll keinen Klick mehr

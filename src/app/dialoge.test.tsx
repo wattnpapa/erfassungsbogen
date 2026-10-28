@@ -108,8 +108,8 @@ describe("Ortssperre der Rückfrage", () => {
     const knopf = within(dialog).getByRole("button", { name: "In den Papierkorb" });
     vi.useFakeTimers({ toFake: ["Date"], now: Date.now() });
     const start = Date.now();
-    // Der Prellschutz der Rückfrage fängt den Zweittipp bis 800 ms ab …
-    for (const ms of [520, 640]) {  // knapp unter 800 ms mit Luft für die Laufzeit des Tests
+    // Der Prellschutz der Rückfrage fängt den Zweittipp bis 650 ms ab (R18: vorher 800 ms) …
+    for (const ms of [300, 480]) {  // deutlich unter 650 ms mit Luft für die Laufzeit des Tests
       vi.setSystemTime(start + ms);
       tippAuf(knopf, 182, 404);
       expect(dialog.hasAttribute("open")).toBe(true);

@@ -6231,6 +6231,202 @@
     /* R17-D7: „Endgültig löschen" und „Abbrechen" im Dialog „Alle Daten löschen" liegen mindestens 16 px auseinander. */
     dialog .dialog-entscheidung > .aktionen { gap: 16px; row-gap: 16px; }
     /* ===== Ende Runde 17 (Rest) ===== */
+    /* ===== Runde 18 (Zustand) ===== */
+    /* R18-S2, N2, D5, W1, H2, A8: Die Quittungsleiste zeigt ihren Text vollständig (kein Abschneiden nach zwei bis vier Zeilen) und
+       lässt Text und Knöpfe umbrechen statt zu quetschen; nach 30 s verschwindet sie (daumen-quittung.tsx). R18-D6: Zwischen
+       „Rückgängig" und „✕" liegen 16 px (vorher 8), „✕" nimmt das Rückgängig nicht mit. */
+    .quittung-daumen, .quittung-daumen:not(.quittung-kompakt) { flex-wrap: wrap; max-height: 60vh; overflow-y: auto; }
+    .quittung-daumen > .quittung-text { display: block; overflow: visible; -webkit-line-clamp: unset; line-clamp: unset; flex: 1 1 12em; min-width: 0; }
+    .quittung-daumen > .quittung-knoepfe,
+    .quittung-daumen:not(.quittung-kompakt) > .quittung-knoepfe { gap: 16px; margin-left: auto; }
+    /* R18-W3, D2, E1: Antworten einer Rückfrage in der kurzen Wartezeit nach dem Öffnen sind sichtbar gedämpft (gestrichelt),
+       „Abbrechen" und „Schließen" nie. */
+    dialog.abfrage button.wartet { opacity: 0.55; border-style: dashed; }
+    /* R18-D1, E4, H3, G1, K11: Papierkorb der entfernten Meldungen. Text, Fassungen und eine eigene Knopfzeile untereinander;
+       „Zurückholen" und „Endgültig löschen…" liegen 16 px auseinander, nie auf einer Linie mit dem Fließtext. */
+    ul.papierkorb-liste { list-style: none; padding: 0; margin: var(--r-3) 0 0; display: grid; gap: var(--r-4); }
+    ul.papierkorb-liste > li { display: grid; gap: var(--r-2); padding-bottom: var(--r-3); border-bottom: 1px solid var(--linie); }
+    ul.papierkorb-liste > li:last-child { border-bottom: 0; }
+    ul.papierkorb-fassungen { margin: 0; padding-left: 1.1em; font-size: var(--t-s); color: var(--text-2); }
+    .papierkorb-knoepfe { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 16px; }
+    p.papierkorb-verweis { margin: 0 0 var(--r-3); }
+    /* R18-D3: „Endgültig löschen" und „Abbrechen" im Dialog „Alle Daten löschen" liegen 32 px auseinander (vorher 16). */
+    dialog .dialog-entscheidung > .aktionen { gap: 32px; row-gap: 32px; }
+    p.loesch-kurz { margin: 0 0 var(--r-3); }
+    /* R18-S5: Grund des gesperrten Knopfs „Zuordnen" unter dem Feld. */
+    .zug-schnell > p.zug-schnell-fehlt { flex: 1 1 100%; margin: 0; }
+    /* R18-E5, S10: Der Name in der Tabelle öffnet die Karte (Knopf ohne eigenen Rahmen, Name bleibt gestaltet wie bisher). */
+    table.einheiten-tabelle button.tabelle-oeffnen { display: inline; min-height: 0; padding: 0; border: 0; background: none; font: inherit; color: inherit; text-align: inherit; text-decoration: underline dotted; text-underline-offset: 3px; }
+    table.einheiten-tabelle button.tabelle-oeffnen::after { content: ""; position: absolute; inset: 0; }
+    table.einheiten-tabelle tbody th { position: relative; }
+    /* R18-E2: Die Marke „Anderer Einsatz?" der zugeklappten Karte ist ein Knopf (klappt die Karte auf), sieht aber aus wie die übrigen Marken. */
+    button.kompakt-merkmal.marke-knopf { font: inherit; color: inherit; cursor: pointer; text-decoration: underline dotted; text-underline-offset: 3px; }
+    /* ===== Ende Runde 18 (Zustand) ===== */
+    /* ===== Runde 18 (Inhalte) ===== */
+    /* R18-N8: „← Zurück" trägt sein Wort, solange die Leiste Platz hat (vorher bis 400 px nur „←"); im Schritt 1 ist der gesperrte Knopf
+       unsichtbar statt gestrichelt (er behält seinen Platz, die anderen Knöpfe bleiben an ihrer Stelle). */
+    @container assistent-nav (min-width: 17rem) {
+      footer.nav.assistent-nav > .nav-zurueck .nav-wort { display: inline; }
+    }
+    footer.nav.assistent-nav > .nav-zurueck:disabled { visibility: hidden; }
+    /* R18-W7: Schnellerfassung am Telefon: Schrittleiste und Legende eingeklappt, eine Zeile „Schritt 2 von 4" statt zwei Zeilen Kopf. */
+    .schritte-schnell-kurz { display: none; }
+    @media (max-width: 30rem) {
+      .seiten-kopf.assistent-kopf .schritte.schritte-schnell, .seiten-kopf.assistent-kopf .schritte-erklaerung { display: none; }
+      .seiten-kopf.assistent-kopf .schritte-schnell-kurz { display: block; order: 4; flex: 1 1 100%; margin: 0; padding: 2px 0 0; font-size: var(--t-s); color: var(--kopf-auf); }
+    }
+    /* R18-A5: Kernspalten der Tabelle am Telefon: Eintreffzeit mit der Altersmarke darunter (statt eigener Spalte „Alter"), Auftrag in der letzten Spalte. */
+    table.tabelle-kern td.eingetroffen-kern { white-space: normal; }
+    table.tabelle-kern td.eingetroffen-kern .alter-marke { display: block; font-size: var(--t-xs); line-height: 1.25; }
+    table.tabelle-kern td.auftrag-zelle { min-width: 0; overflow-wrap: anywhere; }
+    /* R18-A6, A7: Block „Übergabe und Abschluss" (abschluss-block.tsx). */
+    div.abschluss-liste { margin: var(--r-3) 0; display: grid; gap: var(--r-2); }
+    div.abschluss-liste > p { margin: 0; }
+    div.abschluss-liste > p.offen { color: var(--text-2); }
+    .einsatz-abschluss p.abschluss-uebergabe { margin: 0 0 var(--r-3); }
+    /* Die Textverweise des Blocks sind Tippziele von mindestens 44 px, auch mit Handschuhen. */
+    .einsatz-abschluss button.link { display: inline-flex; align-items: center; min-height: 44px; padding-inline: 6px; }
+    .einsatz-abschluss .meldung.einsatz-beendet { margin: 0 0 var(--r-3); }
+    p.einsatz-beendet-kopf { margin: 0; }
+    /* R18-W8, K10: Erklärung der Nachtrag-Logik hinter „Was heißt das?". */
+    details.export-erklaerung > summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; }
+    details.export-erklaerung > p { margin: 0 0 var(--r-3); }
+    /* R18-K5: Monitor. Die Warnzeile hat die Größe der Kennzahlenzeile; die Reihenfolge der Tabelle steht als Unterschrift. */
+    main.lm .lm-stand .lm-warnteil { display: block; font-size: min(4.6vh, 4.6vw); font-weight: 700; }
+    @media (max-width: 640px), (max-height: 480px) { main.lm .lm-stand .lm-warnteil { font-size: calc(var(--lm-b) * 1.25); } }
+    main.lm table.lm-einheiten > caption.lm-reihenfolge { caption-side: bottom; text-align: left; padding: 0.1em 0.5em; opacity: 0.85; font-size: 0.8em; }
+    /* R18-N13: Erklärung neben „Zur Kenntnis genommen" in eigener Zeile. */
+    .kenntnis-aktionen > .kenntnis-erklaerung { flex: 1 1 100%; margin: 0; }
+    /* ===== Ende Runde 18 (Inhalte) ===== */
+    /* ===== Runde 18 (Layout) ===== */
+    /* R18-M1: Ein Bedarfsposten bricht innerhalb seiner selbst um, wenn er breiter ist als der Rahmen (320 px, „Feld": „Unterbringung 27
+       Personen ·" machte die Seite 360 px breit). Unteilbar bleibt er, solange er passt (inline-block). */
+    details.bedarf-block > summary > .bedarf-werte .bedarf-posten { display: inline-block; max-width: 100%; white-space: normal; overflow-wrap: anywhere; }
+    /* R18-G2, S1, W4, K3, N5: Am Telefon stehen „Bogen scannen…" und „Einheit erfassen" direkt unter den Kennzahlen; Neues, Bedarf und
+       Zwischensummen folgen darunter (R17-K12 stellte sie davor und schob die Aufnahme ein bis zwei Bildschirme nach unten). */
+    @media (max-width: 30rem) {
+      main.einsatz-detail .einsatz-seite > .aktionen { order: 0; margin-top: var(--r-3); }
+    }
+    /* R18-K9, S8, N4, M8: Die fünf Kennzahlen stehen am Telefon in zwei Reihen auf einem Raster aus drei Doppelspalten: oben Einheiten,
+       Führer, Unterführer; unten Mannschaft unter „Einheiten", „Gesamt" unter „Führer" bis zum Rand. Alle Zellen tragen dasselbe Polster
+       und dieselbe Beschriftung; die Trennlinien sind überall gleich dünn, damit die Zahlen auf einer Linie beginnen. */
+    @media (max-width: 30rem) {
+      :root:root .staerke-leiste:has(> div:nth-child(5)) { grid-template-columns: repeat(6, minmax(0, 1fr)); padding: 2px 4px; margin-bottom: 12px; }
+      :root:root .staerke-leiste:has(> div:nth-child(5)) > div:nth-child(n) {
+        grid-column: span 2; padding: 4px 6px 4px 8px; border: 0; border-top: var(--strich) solid var(--linie-fein); border-left: var(--strich) solid var(--linie-fein);
+      }
+      :root:root .staerke-leiste:has(> div:nth-child(5)) > div:nth-child(-n + 3) { border-top: 0; }
+      :root:root .staerke-leiste:has(> div:nth-child(5)) > div:nth-child(1),
+      :root:root .staerke-leiste:has(> div:nth-child(5)) > div:nth-child(4) { border-left: 0; }
+      :root:root .staerke-leiste:has(> div:nth-child(5)) > div.gesamt:nth-child(n) { grid-column: span 4; border-top-color: var(--linie); }
+      :root:root .staerke-leiste:has(> div:nth-child(5)) span { font-size: min(var(--t-xs), 12.5px); letter-spacing: 0; overflow-wrap: normal; }
+    }
+    /* R18-K6, G4, M4, L4: „Gehört zu dieser Lage" (und „Wieder prüfen", „Bogen übernehmen") sind Knöpfe von 44 px Höhe unter dem Satz,
+       nicht Textverweise am Ende eines Warntextes. */
+    .muster-sub button.ort-knopf {
+      display: flex; align-items: center; margin: 8px 0; min-height: calc(var(--ziel-basis) + var(--ziel)); padding: 0 14px;
+      border: var(--strich-stark) solid var(--linie-stark); border-radius: var(--radius); background: var(--flaeche); color: var(--text);
+      font-weight: 600; text-decoration: none;
+    }
+    /* R18-H7: „In der Liste zeigen" und „Rückgängig" der Eingangsquittung, „DRK" und „ASB" der Startseite sind Tippziele von 44 px. */
+    .eingang-quittung button.link { display: inline-flex; align-items: center; min-height: calc(var(--ziel-basis) + var(--ziel)); padding-inline: 6px; }
+    .start-seo a { min-width: calc(var(--ziel-basis) + var(--ziel)); justify-content: center; }
+    /* R18-K7, M10: Die Offline-Zeile behält beim Erstbesuch die Höhe ihrer längsten Fassung (unsichtbarer Platzhalter im selben Raster),
+       auch nachdem sie auf die kurze Endfassung gewechselt hat; unter ihr springt nichts. */
+    .offline-platz { display: grid; grid-template-columns: minmax(0, 1fr); }
+    .offline-platz > p.offline-badge { grid-area: 1 / 1; align-self: start; max-width: 100%; width: max-content; font-size: var(--t-s); min-height: 0; }
+    .offline-platz > p.offline-badge.offline-laedt { color: var(--warn-text); border-color: currentColor; }
+    .offline-platz > p.offline-geist { visibility: hidden; pointer-events: none; }
+    .offline-platz > p.offline-geist::after { content: attr(data-text); }
+    /* R18-M5, L2, S9, H8: Scanner ohne Kamera: Die Mitte (Meldung, Anleitung) rollt zwischen Kopf und Knopfleiste, die Leiste steht
+       unter ihr und deckt nichts ab; „Kamera erneut versuchen" steht in der Meldung. Die Knöpfe der Leiste liegen 16 px auseinander. */
+    .scanner-mitte { display: contents; }
+    .scanner-mitte.scrollt { display: flex; flex-direction: column; align-items: center; gap: 1rem; flex: 1 1 auto; min-height: 0; width: 100%; overflow-y: auto; overscroll-behavior: contain; }
+    .scanner-mitte.scrollt > * { flex: none; }
+    .scanner-mitte.scrollt > :first-child { margin-top: auto; }
+    .scanner-mitte.scrollt > :last-child { margin-bottom: auto; }
+    .scanner:has(> .scanner-mitte.scrollt) { overflow-y: hidden; }
+    .scanner:has(> .scanner-mitte.scrollt) > .scanner-aktionen { position: static; flex: none; background: #000; gap: 16px; padding-top: 8px; }
+    .scanner-text.fehler > button.scanner-erneut { justify-self: start; }
+    @media (max-height: 44rem) { .scanner-mitte.scrollt { gap: 0.25rem; } .scanner:has(> .scanner-mitte.scrollt) { padding-top: 8px; } }
+    /* R18-S4: Je Antwort ein Satz unter dem Knopf im Fuß der Rückfrage. */
+    dialog.abfrage .abfrage-weg > p.weg-kurz { margin: 4px 0 0; font-size: min(var(--t-xs), 16px); }
+    /* R18-L3: Gesperrte Stufenknöpfe des Lagemonitors bleiben lesbar (volle Deckkraft, gestrichelter Rand); am Anschlag steht es dran. */
+    main.lm .lm-stufenleiste .lm-knopf[aria-disabled="true"] { opacity: 1; border-style: dashed; }
+    main.lm .lm-stufenleiste .lm-knopf[data-anschlag]::after { content: " (am Ende)"; }
+    /* R18-M2, L1: Spaltenköpfe und Marken der Tabelle sind mindestens 12 px groß (vorher 11 und 10), in „Feld" etwas größer. Die Spalte
+       „Ges." trägt dafür weniger Polster. */
+    table.einheiten-tabelle thead th, table.einheiten-tabelle.tabelle-kern thead th { font-size: 12px; }
+    html.schrift-gross table.einheiten-tabelle.tabelle-kern thead th { font-size: 12.5px; }
+    table.einheiten-tabelle.tabelle-kern th[data-spalte="gesamt"] { padding-inline: 1px; }
+    table.einheiten-tabelle tbody th .uebung-badge, table.einheiten-tabelle tbody th .teil-badge, table.einheiten-tabelle tbody th .fassung-badge,
+    table.einheiten-tabelle.tabelle-kern tbody th .uebung-badge, table.einheiten-tabelle.tabelle-kern tbody th .teil-badge,
+    table.einheiten-tabelle.tabelle-kern tbody th .fassung-badge { font-size: 12px; line-height: 1.25; }
+    /* R18-M3: Mit allen Spalten bleibt die Einheitenspalte beim seitlichen Wischen am linken Rand stehen (klebend), auch am Telefon. */
+    table.einheiten-tabelle:not(.tabelle-kern) > * > tr > :first-child { position: sticky; left: 0; }
+    /* R18-K8: Die Tabelle am Telefon braucht weniger Platz je Zeile: Der Name zeigt höchstens drei Zeilen (die Karte hat ihn ganz), das
+       Polster ist kleiner, und der Bedienblock davor rückt enger zusammen. */
+    table.einheiten-tabelle.tabelle-kern tbody th .tabelle-name { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; line-clamp: 3; overflow: hidden; }
+    table.einheiten-tabelle.tabelle-kern > tbody > tr > * { padding-block: 6px; }
+    .einsatz-liste:has(table.tabelle-kern) p.luecken-zaehler { margin-block: 6px; }
+    .einsatz-liste:has(table.tabelle-kern) p.tabellen-spalten { margin-block: 6px; }
+    /* R18-S10, E5: Eine Zeile, die die Karte öffnet, zeigt es (Zeiger, Rückmeldung beim Drücken). */
+    table.einheiten-tabelle tr.zeile-antippbar { cursor: pointer; }
+    /* Die Zeile selbst trägt den Tipp. Die frühere Deckfläche des Namensknopfs (::after, inset 0) lag in der Kernspalte (position: static)
+       über der ganzen Tabelle, und jeder Tipp traf den Knopf der letzten Zeile. */
+    table.einheiten-tabelle button.tabelle-oeffnen::after { content: none; }
+    table.einheiten-tabelle tr.zeile-antippbar:active > * { background: var(--flaeche-2); }
+    /* R18-M7, S11: Die Knöpfe der aufgeklappten Karte stehen am Telefon in einem Raster gleicher Breite (drei Spalten, bei „Feld" zwei):
+       Abrücken, Zug und Auftrag in der ersten Reihe, danach Details, PDF und „Mehr…"; „Zuklappen" zuletzt. */
+    @media (max-width: 30rem) {
+      .einheit-zeile .vorlage-aktionen { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; align-items: stretch; }
+      .einheit-zeile .vorlage-aktionen > button { min-width: 0; width: 100%; padding-inline: 4px; white-space: normal; overflow-wrap: break-word; hyphens: none; line-height: 1.15; align-self: stretch; }
+      html.schrift-gross .einheit-zeile .vorlage-aktionen, html.feld-modus .einheit-zeile .vorlage-aktionen { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media (max-width: 20.5rem) {
+      .einheit-zeile .vorlage-aktionen { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media (max-width: 30rem) {
+      .einheit-zeile .vorlage-aktionen > .wechsel-knopf { order: 1; min-width: 0; }
+      .einheit-zeile .vorlage-aktionen > .aktion-zug { order: 2; }
+      .einheit-zeile .vorlage-aktionen > .aktion-notiz { order: 3; }
+      .einheit-zeile .vorlage-aktionen > .aktion-details { order: 4; }
+      .einheit-zeile .vorlage-aktionen > .aktion-pdf { order: 5; }
+      .einheit-zeile .vorlage-aktionen > .karte-mehr-knopf { order: 6; }
+      .einheit-zeile .vorlage-aktionen > .aktion-aenderungen { order: 7; }
+      .einheit-zeile .vorlage-aktionen > .aktion-historie { order: 8; }
+      .einheit-zeile .vorlage-aktionen > .aktion-zuklappen { order: 9; grid-column: 1 / -1; }
+    }
+    /* R18-M9, G5: Die Reiter des Assistenten sind mindestens 44 px breit und liegen 8 px auseinander; bei 320 px reicht dafür die
+       Leiste um je 8 px über den Textrand hinaus (6 x 44 + 5 x 8 = 304 px). */
+    :root:root .seiten-kopf .schritte { gap: 8px; }
+    :root:root .seiten-kopf.assistent-kopf .schritte button { min-width: 44px; }
+    @media (max-width: 21rem) {
+      :root:root .seiten-kopf.assistent-kopf .schritte { margin-inline: -8px; }
+    }
+    /* R18-M6: Im niedrigen Querformat steht der Kopf des Assistenten in zwei Zeilen (Titel und Rücksprung nebeneinander, darunter die
+       Reiter): mehr als die Hälfte des Bildes bleibt für den Inhalt. */
+    @media (orientation: landscape) and (max-height: 31.25rem) {
+      .seiten-kopf.assistent-kopf .kopf-inhalt { display: flex; flex-wrap: wrap; align-items: center; column-gap: 16px; row-gap: 0; }
+      .seiten-kopf.assistent-kopf .titelzeile { order: 1; flex: 0 0 auto; margin: 0; }
+      .seiten-kopf.assistent-kopf .titelzeile .modus-marke { display: none; }
+      .seiten-kopf.assistent-kopf .kopf-oberzeile { order: 2; flex: 1 1 auto; min-width: 0; }
+      :root .seiten-kopf.assistent-kopf .kopf-oberzeile .zur-start { white-space: nowrap; }
+      .seiten-kopf.assistent-kopf .schritte { order: 3; flex: 1 1 100%; }
+      .seiten-kopf.assistent-kopf .autosave { order: 4; flex: 1 1 100%; margin: 0; }
+    }
+    /* R18-W7: Schnellerfassung am Telefon: Die Zettel-Zeile nennt ihre Felder erst aufgeklappt (eine Zeile statt zwei), das Logo im Kopf
+       entfällt; das erste Eingabefeld rückt über 200 px. */
+    @media (max-width: 30rem) {
+      details.zettel-angaben > summary > .zettel-felder { display: none; }
+      .seiten-kopf.assistent-kopf .titelzeile .einheit-avatar { display: none; }
+    }
+    /* R18-D4: Mit großer Schrift auf einem niedrigen Telefon (Feld, 320 x 568) wäre die feste Leiste von Haken und Knöpfen höher als das
+       halbe Bild und deckte die Folgen der Rückfrage ab: Sie rollt dort mit dem Text. */
+    @media (max-height: 40rem) {
+      html.feld-modus dialog .dialog-entscheidung { position: static; box-shadow: none; }
+    }
+    /* ===== Ende Runde 18 (Layout) ===== */
   </style>
 </head>
 <body>

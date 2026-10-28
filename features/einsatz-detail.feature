@@ -174,19 +174,19 @@ Funktionalität: Einsatz-Sammlung führen (Meldekopf)
 
   Szenario: Sammel-PDF bündelt alle Bögen in einer Datei
     Wenn ich auf "Einsatz weitergeben / sichern" klicke und eine Datei erhalte
-    Dann heißt die heruntergeladene Datei wie "eeb-einsatz-*.pdf"
+    Dann heißt die heruntergeladene Datei wie "*_eeb-einsatz_*.pdf"
 
   Szenario: CSV-Übersicht für die Lagekarte
     Wenn ich auf "Übersicht als CSV" klicke und eine Datei erhalte
-    Dann heißt die heruntergeladene Datei wie "eeb-einsatz-*.csv"
+    Dann heißt die heruntergeladene Datei wie "*_eeb-einsatz_*.csv"
 
   Szenario: CSV mit allen Daten aller Bögen für die Auswertung
     Wenn ich auf "Alle Daten als CSV" klicke und eine Datei erhalte
-    Dann heißt die heruntergeladene Datei wie "eeb-einsatz-*-alle-daten.csv"
+    Dann heißt die heruntergeladene Datei wie "*_eeb-einsatz-alle-daten_*.csv"
 
   Szenario: Excel-Liste der Einheiten im Format „Oldenburg“
     Wenn ich auf "Excel-Liste (Format „Oldenburg“)" klicke und eine Datei erhalte
-    Dann heißt die heruntergeladene Datei wie "eeb-einsatz-*-oldenburg.xlsx"
+    Dann heißt die heruntergeladene Datei wie "*_eeb-einsatz-oldenburg_*.xlsx"
 
   # Nachlieferung an den Stab: Abends geht alles hinaus, morgens nur, was
   # seitdem dazukam. Ohne neue Bögen bleibt der Ausgabeweg gesperrt, statt

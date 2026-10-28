@@ -88,7 +88,7 @@ describe("einsatzCsvInhalt()", () => {
       "Unterbringung angefordert M", "Unterbringung angefordert W", "Unterbringung angefordert D",
       "WC/Dusche M", "WC/Dusche W", "WC/Dusche D",
       "Diesel (l)", "Benzin (l)", "Gemisch (l)",
-      "Fahrzeuge (Anzahl)", "Fahrzeuge (Liste)", "Stand", "Eingetroffen", "Abgerückt", "Empfangen", "Quelle",
+      "Fahrzeuge (Anzahl)", "Fahrzeuge (Liste)", "Stand der Angaben", "Eingetroffen", "Abgerückt", "Aufnahme", "Quelle",
       "Status", "Zählt in Lage", "Übung", "Sofortbedarf", "Hinweise", "Signatur", "Absender", "Auftrag/Notiz",
       "Bemerkung (Einheit)",
     ]);
@@ -122,8 +122,8 @@ describe("einsatzCsvInhalt()", () => {
     expect(f[sp("Fahrzeuge (Anzahl)")]).toBe("1");
     expect(f[sp("Fahrzeuge (Liste)")]).not.toBe("");
     // Eine Zeitform je Datei: Stand, Eingetroffen und Empfangen gleich (R3-K7).
-    expect(f[sp("Stand")]).toMatch(/^\d{2}\.\d{2}\.\d{4}, \d{2}:\d{2}$/);
-    expect(f[sp("Empfangen")]).toMatch(/^\d{2}\.\d{2}\.\d{4}, \d{2}:\d{2}$/);
+    expect(f[sp("Stand der Angaben")]).toMatch(/^\d{2}\.\d{2}\.\d{4}, \d{2}:\d{2}$/);
+    expect(f[sp("Aufnahme")]).toMatch(/^\d{2}\.\d{2}\.\d{4}, \d{2}:\d{2}$/);
     // = Empfangszeit, wenn nicht korrigiert; dann mit Stern wie auf dem Lageblatt (R16-A1)
     expect(f[sp("Eingetroffen")]).toMatch(/^\d{2}\.\d{2}\.\d{4}, \d{2}:\d{2} \*$/);
     expect(f[sp("Abgerückt")]).toBe(""); // nicht abgerückt

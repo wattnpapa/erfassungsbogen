@@ -34,6 +34,23 @@
 > Rollleiste den Fokus und rollen die Pfeiltasten-Markierung ins Bild. Kein neuer
 > Host, Transportformat und Schema unverändert.
 >
+> **Nachgezogen 2026-10-28 (Runde 18):** Audit Runde 18 (rund 66 Befunde, drei Pakete)
+> — Kap. 5, 8.2, 8.4, 8.5, 8.6: neuer localStorage-Schlüssel `eeb.abschluss.v1`
+> (`einsatz-abschluss.ts`, je Einsatz-Kennung „beendet am", „Übergabe am/an"; das
+> Sammlungsmodell in `vendor/` kennt beides nicht; Block „Übergabe und Abschluss"
+> in der Einsatzansicht). „Meldung entfernen" schreibt die Nummern fest: die übrigen
+> Einheiten rücken nicht auf, eine später eingehende Einheit zählt hinter der
+> höchsten Nummer weiter. Tipp-Sperren (`tipp-schutz.ts`): „Abbrechen", „Rückgängig",
+> „Zurück", „Schließen" und „✕" sind nie gesperrt (`istSichereGegenhandlung`),
+> gesperrte Tipps melden „Einen Moment …"; die Sperren sind kürzer. Quittungsleiste mit
+> vollem Text und Fundort im Papierkorb, nach 30 s weg. Begriffe: „Aufnahme" und „Stand der
+> Angaben"; Stand des Absenders bleibt bei Handänderung. Dateinamen der Exporte mit
+> lesbarem Zeitstempel (`2026-10-27_2237_eeb-lageblatt_<Einsatz>.pdf`). Kaltstart
+> legt einen Verlaufseintrag „Startseite" unter den Einsatz. Tabelle am Telefon mit
+> Kernspalten (Eintreffzeit, Zug, Auftrag) und tippbaren Zeilen. Startbündel 1,22 MB
+> (Budget neu gesetzt, Papierkorb-Block per `React.lazy`; ADR-003 Aufnahmeregel 5).
+> Kein neuer Host, Transportformat und Schema unverändert.
+>
 > **Nachgezogen 2026-10-27 (Runde 17):** Audit Runde 17 (rund 72 Befunde, vier Pakete)
 > — Kap. 5, 8.2, 8.4, 8.5, 8.6: zwei neue Speicherschlüssel.
 > `eeb.meldungen-papierkorb.v1` (localStorage, `meldungs-papierkorb.ts`: ganze

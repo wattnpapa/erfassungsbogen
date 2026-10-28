@@ -230,9 +230,9 @@ describe("Alter auf Lageblatt, je Zug und in der Tabelle (R12-K3)", () => {
     expect(text(min(300))).toContain("älteste Meldung vor 5 Std 0 Min, 1 von 1 älter als 1 Std");
     expect(text(min(5))).not.toContain("älteste Meldung");
   });
-  it("Tabelle hat die Spalte „Meldung vor“, sortierbar nach dem Eingang (älteste zuerst)", () => {
+  it("Tabelle hat die Spalte „Alter“ (R18-N9, früher „Meldung vor“), sortierbar nach dem Eingang (älteste zuerst)", () => {
     const sp = TABELLEN_SPALTEN.find((s) => s.schluessel === "meldung")!;
-    expect(sp.kopf).toBe("Meldung vor");
+    expect(sp.kopf).toBe("Alter");
     const zeilen = tabellenZeilen([eintrag("neu", neuerBogen(), { empfangenAm: min(5) }), eintrag("alt", neuerBogen(), { empfangenAm: min(500) })]);
     expect(zeilenSortieren(zeilen, "meldung", "auf").map((z) => z.eintrag.id)).toEqual(["alt", "neu"]);
   });

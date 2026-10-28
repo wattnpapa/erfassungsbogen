@@ -156,10 +156,12 @@ describe("Meldung aus dem Einsatz entfernen", () => {
     await nutzer.click(within(karte as HTMLElement).getByRole("button", { name: "Mehr…" }));
     await nutzer.click(within(karte as HTMLElement).getByRole("button", { name: "Entfernen" }));
     const dialog = document.querySelector<HTMLDialogElement>("dialog[aria-label='Meldung entfernen?']")!;
-    expect(dialog.textContent).toContain("Nummern ändern sich");
-    expect(dialog.textContent).toContain("Nr. 2–3 rücken auf und heißen danach Nr. 1–2");
+    // R18-A1: Die Nummern rücken nicht auf; die Rückfrage nennt die frei bleibende Nummer.
+    expect(dialog.textContent).toContain("Nummern bleiben");
+    expect(dialog.textContent).toContain("Nr. 1 bleibt frei, die übrigen Nummern (2–3) bleiben");
     await nutzer.click(within(dialog).getByRole("button", { name: "Meldung entfernen" }));
-    await waitFor(() => expect(document.body.textContent).toContain("rücken auf und heißen danach Nr. 1–2."));
+    // Die Quittung nennt kurz die frei bleibende Nummer (die Rückfrage hatte den ganzen Satz).
+    await waitFor(() => expect(document.querySelector(".quittung-daumen")!.textContent).toContain("Nr. 1 bleibt frei."));
   });
 
   it("behält die Meldung, wenn die Rückfrage abgebrochen wird", async () => {
@@ -648,12 +650,9 @@ describe("Abrücken mit Zeit, Quittung und Rückweg", () => {
     expect(quittung.textContent).toMatch(/^Abgerückt \d\d:\d\d: Nr\. 1 „.*Crailsheim.*"/);
     expect(quittung.className).toContain("quittung-daumen");
 
-    // Prellschutz: Die Leiste kann unter dem Finger des Doppeltipps liegen —
-    // „Rückgängig" nimmt erst nach einem Augenblick an.
+    // R18-G3: „Rückgängig" ist nie gesperrt und nimmt vom ersten Tipp an.
     const rueckgaengig = within(quittung).getByRole("button", { name: "Rückgängig" }) as HTMLButtonElement;
-    // Seit R16-D1 nicht mehr `disabled`: Ein Tipp im Prellschutz sagt „Einen Moment …", statt still zu verpuffen.
-    expect(rueckgaengig.getAttribute("aria-disabled")).toBe("true");
-    await waitFor(() => expect(rueckgaengig.getAttribute("aria-disabled")).toBeNull(), { timeout: PRELLSCHUTZ_MS + 500 });
+    expect(rueckgaengig.getAttribute("aria-disabled")).toBeNull();
     await nutzer.click(rueckgaengig);
     const zurueck = gespeichert(einsatzId, "Crailsheim");
     expect(zurueck.status).toBe(MeldeStatus.ANWESEND);
@@ -944,7 +943,7 @@ describe("Zeiten, Auftrag und Bedarf auf der Karte", () => {
     const namen = [...document.querySelectorAll(".muster-name")].map((n) => n.textContent ?? "");
     expect(namen).toHaveLength(1);
     expect(namen[0]).toContain("Crailsheim");
-    expect(screen.getByRole("heading", { name: /Einheiten \(1 von 2 gemeldet · 2 zählend\)/ })).not.toBeNull();
+    expect(screen.getByRole("heading", { name: /Einheiten \(1 von 2 gemeldet · 2 anwesend\)/ })).not.toBeNull();
   });
 
   it("filtert nicht auf Kraftstoff allein und springt aus „Ruhezeit: n×“ in den Filter (R2-K4)", async () => {
@@ -1515,7 +1514,7 @@ describe("Kompakte Einheiten auf dem Telefon (R2-K7)", () => {
     const [crailsheim, ulm] = [...document.querySelectorAll<HTMLElement>(".einheit-zeile")];
     expect(crailsheim!.className).toContain("kompakt");
     const zeile = crailsheim!.querySelector(".kompakt-zeile")!;
-    expect(zeile.querySelector(".folge-merkmal")!.textContent).toMatch(/^Folgem\. \d\d:\d\d · 12 → 9$/);
+    expect(zeile.querySelector(".folge-merkmal")!.textContent).toMatch(/^Folgemeldung \d\d:\d\d · 12 → 9$/);
     expect(zeile.querySelector(".folge-merkmal")!.className).toContain("staerke-verlust");
     // R7-K6: der Inhalt statt eines Hakens.
     expect(zeile.querySelector(".auftrag-merkmal")!.textContent).toBe("Auftrag: Pumpenstandort Kocherbrücke");
@@ -1640,9 +1639,9 @@ describe("Quittung nennt die zuletzt aufgenommenen Einheiten (R2-S4)", () => {
     const schwabach = karten.find((k) => k.textContent!.includes("Schwabach"))!;
     expect(schwabach.textContent).toContain("Bogen nennt: „Waldbrand Gräfenberg – Wasserversorgung“");
     expect(karten.find((k) => k.textContent!.includes("Albstadt"))!.textContent).not.toContain("Bogen nennt");
-    expect(document.querySelector(".stapel-eingang")!.textContent).toContain("Bogen nennt: „Waldbrand Gräfenberg");
+    expect(document.querySelector(".stapel-eingang")!.textContent).toContain("Ort im Bogen: „Waldbrand Gräfenberg");
     // Gezählt wird er weiter.
-    expect(screen.getByText("Einheiten (2 gemeldet · 2 zählend)")).toBeTruthy();
+    expect(screen.getByText("Einheiten (2 gemeldet · 2 anwesend)")).toBeTruthy();
   });
 
   it("zählt Aufteilen nicht als Eingang", async () => {
@@ -2078,7 +2077,7 @@ describe("Zusammenführen mit Quittung und Rückweg (R4-D5)", () => {
     const rest = [...document.querySelectorAll<HTMLElement>(".einheit-zeile")].find((k) => !k.textContent!.includes("Fachberater"))!;
     await nutzer.click(within(rest).getByRole("button", { name: "Zusammenführen…" }));
     const sub = [...rest.querySelectorAll(".muster-sub")].map((x) => x.textContent!).find((t) => t.includes("Stand"))!;
-    expect(sub).toMatch(/Stand \d\d\.\d\d\.\d{4}, \d\d:\d\d/);
+    expect(sub).toMatch(/Stand der Angaben \d\d\.\d\d\.\d{4}, \d\d:\d\d/);
     expect(sub).not.toMatch(/Stand \d{6}[a-z]{3}\d\d/);
   });
 });

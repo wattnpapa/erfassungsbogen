@@ -1,9 +1,8 @@
 /**
  * Quittung mit Rückweg, fest am unteren Bildrand (Daumenbereich), mit
  * „Rückgängig" in voller Knopfgröße (Audit Runde 2, R2-H4). Sie bleibt, bis
- * die nächste Quittung sie ersetzt, sie geschlossen wird oder die Ansicht
- * wechselt — ein Zeitablauf nähme den einzigen Rückweg, während der Helfer
- * gerade woanders hinsieht.
+ * die nächste Quittung sie ersetzt, sie geschlossen wird, die Ansicht
+ * wechselt oder `QUITTUNG_ENDE_NACH_MS` (30 s) vergangen sind (R18).
  *
  * Runde 3 (R3-G2, R3-S5, R3-G1, R3-D3):
  * - höchstens zwei Zeilen Text: Die Handlung („Abgerückt 20:39") steht vorn,
@@ -16,14 +15,20 @@
  * - über einer festen Fußleiste (Assistent) steht sie über ihr, nicht darauf;
  * - ohne `onRueckgaengig` quittiert sie nur (etwa ein Zurücknehmen).
  *
- * `prellschutz`: Die Knöpfe nehmen erst nach PRELLSCHUTZ_MS an.
+ * Runde 18: „Rückgängig" und „✕" nehmen sofort an (nie gesperrt, R18-G3); der Text steht immer vollständig da (kein
+ * Abschneiden, R18-S2/N2/D5); nach `QUITTUNG_ENDE_NACH_MS` verschwindet die Leiste ganz; „✕" liegt mindestens 12 px
+ * neben „Rückgängig" (R18-D6).
  */
 
-import { useEffect, useLayoutEffect, useRef, useState, type MouseEvent, type ReactNode } from "react";
-import { PRELLSCHUTZ_MS, QUITTUNG_SPERRE_KURZ_MS, QUITTUNG_SPERRE_MS, letzterTippOrt, ortSperren, tippVerworfenZeigen } from "./tipp-schutz";
+import { useEffect, useLayoutEffect, useRef, type ReactNode } from "react";
+import { QUITTUNG_SPERRE_KURZ_MS, QUITTUNG_SPERRE_MS, letzterTippOrt, ortSperren } from "./tipp-schutz";
 
-/** So lange steht die Leiste in voller Höhe; danach eine Zeile mit „Rückgängig" und „✕" (R16-W1). */
-export const QUITTUNG_KOMPAKT_NACH_MS = 15_000;
+/**
+ * So lange steht die Leiste mit vollem Text und „Rückgängig"; danach verschwindet sie ganz (R18-S2, H1, W1, A8). Vorher
+ * schrumpfte sie nach 15 s auf eine Zeile mit gekürztem Text und blieb so stehen, auch nach Stunden: ein „Rückgängig"
+ * ohne lesbaren Gegenstand. Die Handlung bleibt über die Historie der Einheit und die Kopfzeile erreichbar.
+ */
+export const QUITTUNG_ENDE_NACH_MS = 30_000;
 
 /** Die Karte (Einheit, Person, Fahrzeug) unter der getippten Stelle, durch die Leiste hindurch. */
 function darunterLiegendeKarte(tipp: { x: number; y: number }, leiste: HTMLElement): HTMLElement | null {
@@ -36,39 +41,31 @@ function darunterLiegendeKarte(tipp: { x: number; y: number }, leiste: HTMLEleme
   return null;
 }
 
-export function DaumenQuittung({ children, kurz, prellschutz = false, sperreKurz = false, onRueckgaengig, rueckgaengigName, onSchliessen, mehrzeilig = false }: {
+export function DaumenQuittung({ children, sperreKurz = false, onRueckgaengig, rueckgaengigName, onSchliessen, mehrzeilig = false }: {
   children: ReactNode;
   /** „Rückgängig" nimmt etwas Harmloses zurück: Die Stelle unter der Leiste sperrt nur so lang wie der Prellschutz (R17-D3). */
   sperreKurz?: boolean;
-  /** Kurzfassung für die einzeilige Leiste nach dem Lesen: Einheit und Handlung zuerst, ohne langen Namen (R17-W1). */
+  /** Ohne Wirkung seit R18 (der Text steht immer vollständig da); bleibt, damit ältere Aufrufer weiter passen. */
   kurz?: ReactNode;
-  /** Bis zu vier statt zwei Zeilen Text: der Name der Einheit wird nicht abgeschnitten (R11-M3). */
+  /** Nur noch die Klasse `quittung-mehrzeilig` (R11-M3); der Text steht seit R18 in jedem Fall vollständig da. */
   mehrzeilig?: boolean;
+  /** Ohne Wirkung seit R18: „Rückgängig" und „✕" sind nie gesperrt (R18-G3). */
   prellschutz?: boolean;
   onRueckgaengig?: () => void;
   /** Voller Name des Rückgängig-Knopfs für Vorlesesoftware und Tooltip, wenn „Rückgängig" allein zu wenig sagt (R5-E3). */
   rueckgaengigName?: string;
   onSchliessen: () => void;
 }) {
-  const [bereit, setBereit] = useState(!prellschutz);
   const leiste = useRef<HTMLDivElement>(null);
   // Nur einmal je Leiste rollen (StrictMode ruft den Effekt doppelt auf).
   const gerollt = useRef(false);
-  // Nach dem Lesen schrumpft die Leiste auf eine Zeile (R16-W1): Sie stand sonst minutenlang auf einem Viertel des Bildes.
-  const [kompakt, setKompakt] = useState(false);
+  // Nach 30 s verschwindet die Leiste ganz (R18-S2): Sie stand sonst stundenlang mit gekürztem Text da.
+  const schliessen = useRef(onSchliessen);
+  schliessen.current = onSchliessen;
   useEffect(() => {
-    const uhr = setTimeout(() => setKompakt(true), QUITTUNG_KOMPAKT_NACH_MS);
+    const uhr = setTimeout(() => schliessen.current(), QUITTUNG_ENDE_NACH_MS);
     return () => clearTimeout(uhr);
   }, []);
-  useEffect(() => {
-    if (bereit) return;
-    const uhr = setTimeout(() => setBereit(true), PRELLSCHUTZ_MS);
-    return () => clearTimeout(uhr);
-  }, [bereit]);
-  // Ein Tipp im Prellschutz verpuffte still (R16-D1): Jetzt sagt „Einen Moment …" auf dem Knopf, dass er verworfen wurde.
-  const verworfen = (e: MouseEvent<HTMLButtonElement>) => {
-    if (e.detail > 0) tippVerworfenZeigen(e.nativeEvent);
-  };
   useLayoutEffect(() => {
     const el = leiste.current;
     if (!el) return;
@@ -168,21 +165,20 @@ export function DaumenQuittung({ children, kurz, prellschutz = false, sperreKurz
       schwebAb?.();
       wurzel.style.removeProperty("--quittung-hoehe");
     };
-    // `kompakt`: Die Seite hält nur so viel Platz frei, wie die Leiste jetzt braucht (R16-W1).
-  }, [kompakt]);
+  }, []);
   return (
-    <div className={`quittung-daumen${mehrzeilig ? " quittung-mehrzeilig" : ""}${kompakt ? " quittung-kompakt" : ""}`} role="status" ref={leiste}>
-      <span className="quittung-text">{kompakt && kurz != null ? kurz : children}</span>
+    <div className={`quittung-daumen${mehrzeilig ? " quittung-mehrzeilig" : ""}`} role="status" ref={leiste}>
+      <span className="quittung-text">{children}</span>
       {/* Die beiden Knöpfe bleiben als Paar zusammen: reicht die Breite nicht
           für Text und Knöpfe, rutscht das Paar unter den Text (R4-M1) — „✕"
           steht nie allein in einer Zeile. */}
       <span className="quittung-knoepfe">
         {onRueckgaengig && (
-          <button type="button" className="quittung-rueckgaengig" aria-disabled={!bereit || undefined} onClick={(e) => (bereit ? onRueckgaengig() : verworfen(e))} aria-label={rueckgaengigName} title={rueckgaengigName}>
+          <button type="button" className="quittung-rueckgaengig" data-sicher="" onClick={() => onRueckgaengig()} aria-label={rueckgaengigName} title={rueckgaengigName}>
             Rückgängig
           </button>
         )}
-        <button type="button" className="quittung-schliessen" aria-disabled={!bereit || undefined} aria-label="Quittung schließen" onClick={(e) => (bereit ? onSchliessen() : verworfen(e))}>
+        <button type="button" className="quittung-schliessen" data-sicher="" aria-label="Quittung schließen" onClick={() => onSchliessen()}>
           ✕
         </button>
       </span>

@@ -127,7 +127,16 @@ export function parseNamen(text: string, opt: NamenOptionen = {}): NamensEintrag
     .filter(Boolean)
     .map((zeile): NamensEintrag => {
       const mitNummer = telefonAbtrennen(zeile);
-      const eintrag = ohneTelefon(mitNummer.zeile, opt);
+      let eintrag = ohneTelefon(mitNummer.zeile, opt);
+      // Funktion hinter der Nummer (R18-H6): Sie zählt wie eine Funktion am Zeilenende, die Reihenfolge der Namenswörter ist geraten.
+      if (mitNummer.funktion && !eintrag.funktion) {
+        eintrag = {
+          ...eintrag,
+          funktion: mitNummer.funktion,
+          rolle: eintrag.rolle ?? rolleAusFunktion(mitNummer.funktion),
+          ...(eintrag.vorname ? { unsicher: true } : {}),
+        };
+      }
       const telefon = mitNummer.telefon ?? eintrag.telefon;
       return telefon ? { ...eintrag, telefon } : eintrag;
     });
@@ -137,14 +146,29 @@ export function parseNamen(text: string, opt: NamenOptionen = {}): NamensEintrag
 const TELEFON_ENDE = /(?:^|[\s,;|]+)(\+?\d[\d\s\-/().]{4,}\d)\s*$/;
 
 /** Hinten stehende Rufnummer abtrennen (R17-H5): „Kevin Meier 0171 1234567" ist „Kevin Meier" mit Nummer, nicht ein Name mit Ziffern. */
-export function telefonAbtrennen(zeile: string): { zeile: string; telefon?: string } {
+export function telefonAbtrennen(zeile: string): { zeile: string; telefon?: string; funktion?: string } {
+  if (zeile.includes("\t") || zeile.includes(";")) return { zeile };
   const m = TELEFON_ENDE.exec(zeile);
-  if (!m || zeile.includes("\t") || zeile.includes(";")) return { zeile };
-  const nummer = m[1]!;
+  if (m) {
+    const nummer = m[1]!;
+    if (nummer.replace(/\D/g, "").length < 6) return { zeile };
+    const rest = zeile.slice(0, m.index).replace(/[\s,;|]+$/, "");
+    return /\p{L}/u.test(rest) ? { zeile: rest, telefon: nummer.trim() } : { zeile };
+  }
+  // „Jürgen Weber +49 171 9876543 ZTrFü": Name, Rufnummer, dann die Funktion (R18-H6). Nur ein Wort, das wie ein Kürzel oder eine
+  // Funktion aussieht, zählt als Funktion; „Hans 0171 1234567 Müller" bleibt eine Zeile, die keine Mitte-Nummer kennt.
+  const mitte = TELEFON_MITTE.exec(zeile);
+  if (!mitte) return { zeile };
+  const nummer = mitte[1]!;
+  const wort = mitte[2]!;
   if (nummer.replace(/\D/g, "").length < 6) return { zeile };
-  const rest = zeile.slice(0, m.index).replace(/[\s,;|]+$/, "");
-  return /\p{L}/u.test(rest) ? { zeile: rest, telefon: nummer.trim() } : { zeile };
+  if (!(istFunktionswort(wort) || /^\p{Lu}\p{L}*\p{Lu}\p{L}*$/u.test(wort))) return { zeile };
+  const rest = zeile.slice(0, mitte.index).replace(/[\s,;|]+$/, "");
+  return /\p{L}/u.test(rest) ? { zeile: rest, telefon: nummer.trim(), funktion: wort } : { zeile };
 }
+
+/** Rufnummer in der Mitte: hinter ihr steht nur noch ein Wort (die Funktion). */
+const TELEFON_MITTE = /(?:^|[\s,;|]+)(\+?\d[\d\s\-/().]{4,}\d)\s+(\p{L}[\p{L}\-./]{0,14})\s*$/u;
 
 /** Eine Zeile ohne hinten stehende Rufnummer lesen (Tabellenzeilen tragen ihre Nummer in einer Spalte). */
 function ohneTelefon(zeile: string, opt: NamenOptionen): NamensEintrag {

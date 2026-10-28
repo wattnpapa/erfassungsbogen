@@ -604,16 +604,14 @@ export function exportSammlung(einsatz: Einsatzsammlung, umfang: ExportUmfang, s
 
 /**
  * Der Namensteil einer Lieferung — für alle Formate gleich (R5-W8):
- * `nachtrag-seit-20261006-1147-` für einen Nachtrag, `erste-lieferung-` für
+ * `nachtrag` für einen Nachtrag, `erste-lieferung` für
  * „nur neue Bögen" ohne Bezugspunkt (das ist die ganze Lage und hieß bisher
  * wie die Gesamtdatei), sonst nichts.
  */
 export function lieferungsMarke(umfang: ExportUmfang, stand: ExportStand | null | undefined): string {
   if (umfang !== "neue") return "";
-  if (!stand) return "erste-lieferung-";
-  const d = new Date(stand.zeitpunkt);
-  const z = (n: number) => String(n).padStart(2, "0");
-  return `nachtrag-seit-${d.getFullYear()}${z(d.getMonth() + 1)}${z(d.getDate())}-${z(d.getHours())}${z(d.getMinutes())}-`;
+  // Der Bezugspunkt („seit …") steht in der Datei; im Namen steht nur der Zeitstempel der Erzeugung (R18-W6).
+  return stand ? "nachtrag" : "erste-lieferung";
 }
 
 /**

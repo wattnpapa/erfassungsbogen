@@ -145,6 +145,9 @@ describe("Notiz und Nummer vom Blatt (Audit Runde 4, R4-A1, R4-A2)", () => {
     const e = sammlung(id).eintraege;
     for (const x of e) x.nummer = 2; // alle behaupten Nr. 2
     const nr = [...meldungsNummern(e).values()].sort();
-    expect(nr).toEqual([1, 2, 3]);
+    // Eine Nummer gilt nur einmal: Die erste Einheit behält die 2, die übrigen bekommen andere, verschiedene Nummern
+    // (R18-A1: Wer nach der letzten festen Einheit einging, zählt hinter der höchsten festen Nummer weiter).
+    expect(new Set(nr).size).toBe(3);
+    expect(nr.filter((n) => n === 2)).toHaveLength(1);
   });
 });

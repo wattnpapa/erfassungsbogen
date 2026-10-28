@@ -322,6 +322,24 @@ export function offlineZeileOffen(s: OfflineZustand): boolean {
   return s.zusatz != null ? s.zusatz.fertig < s.zusatz.gesamt : s.zweiStufen === true;
 }
 
+/**
+ * Die längste Fassung der Zeile bei dieser Netzlage und Speicherlage (R18-K7, M10). Die Startseite legt sie unsichtbar unter die
+ * Zeile (`.offline-platz`), solange der Erstbesuch sie wechseln lässt: Die Zeile behält dann auch in ihrer kurzen Endfassung die
+ * Höhe der längsten, und nichts darunter springt (R17-H1 hielt die Höhe nur bis zum Wechsel auf die Endfassung).
+ */
+export function offlineLangText(s: OfflineZustand): string {
+  const grund: OfflineZustand = { ...s, frischBereit: true, abgebrochen: false, kernHakt: false, zusatzHakt: false, online: true };
+  const kern = s.kern && s.kern.gesamt > 0 ? s.kern : { geladen: 99_000_000, gesamt: 99_000_000 };
+  const zusatz = { fertig: 100, gesamt: 999 };
+  const fassungen = [
+    offlineText({ ...grund, stand: "laedt", kern }),
+    offlineText({ ...grund, stand: "laedt", kern, abgebrochen: true }),
+    offlineText({ ...grund, stand: "bereit", zusatz, zweiStufen: true, zusatzHakt: true }),
+    offlineText({ ...grund, stand: "bereit", zusatz, zweiStufen: true, online: false }),
+  ];
+  return fassungen.reduce((a, b) => (b.length > a.length ? b : a));
+}
+
 /** Text der Offline-Zeile auf der Startseite. */
 export function offlineText(s: OfflineZustand): string {
   // Sperrt der Browser den Speicher, bleibt nichts auf dem Gerät — die Zeile

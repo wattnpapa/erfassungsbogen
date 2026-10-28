@@ -202,12 +202,12 @@ describe("Assistenten-Durchlauf", () => {
     try {
       tipp(screen.getByRole("button", { name: "Weiter →" })); // bewusst, nach der Sperre
       expect(screen.getByRole("heading", { level: 2, name: "2. Einsatz" })).toBeDefined();
-      vi.setSystemTime(Date.now() + 400);
-      tipp(screen.getByRole("button", { name: "Weiter →" })); // Doppeltipp mit 400 ms
+      vi.setSystemTime(Date.now() + 200);
+      tipp(screen.getByRole("button", { name: "Weiter →" })); // Doppeltipp mit 200 ms
       expect(screen.getByRole("heading", { level: 2, name: "2. Einsatz" })).toBeDefined();
-      // R17-G11: Die Sperre nach „Weiter →“ dauert 0,5 s (vorher 0,9 s, R10-S2): Wer im Takt von 0,6 s durch leere Schritte
-      // blättert, kommt mit jedem Tipp weiter; der Doppeltipp mit Handschuh (0,1 bis 0,3 s) bleibt gesperrt.
-      vi.setSystemTime(Date.now() + 600);
+      // R17-G11, R18-G3: Die Sperre nach „Weiter →“ dauert 0,3 s (vorher 0,5 s, davor 0,9 s): Wer im Takt von 0,4 s durch leere
+      // Schritte blättert, kommt mit jedem Tipp weiter; der Doppeltipp mit Handschuh (0,1 bis 0,2 s) bleibt gesperrt.
+      vi.setSystemTime(Date.now() + 400);
       tipp(screen.getByRole("button", { name: "Weiter →" }));
       expect(screen.getByRole("heading", { level: 2, name: "3. Personal" })).toBeDefined();
     } finally {
@@ -535,8 +535,8 @@ describe("Assistenten-Durchlauf", () => {
     await neuerBogenBis(nutzer, 0);
     await nutzer.type(screen.getByLabelText("Ort der Einheit (Pflicht)"), "Doppelhausen");
     await nutzer.click(screen.getByRole("button", { name: "‹ Startseite" }));
-    await nutzer.click(screen.getByRole("button", { name: "Verwerfen" }));
-    const text = rueckfrage("Angefangenen Bogen verwerfen?").textContent!;
+    await nutzer.click(screen.getByRole("button", { name: "Bogen schließen" })); // R18-N6: ein Name für „Verwerfen" und „Bogen schließen"
+    const text = rueckfrage("Angefangenen Bogen schließen?").textContent!;
     expect(text.split("Doppelhausen")).toHaveLength(2);
     expect(text).toContain('Der Stand bleibt auf der Startseite unter „Zuletzt geschlossenen Bogen zurückholen" erreichbar');
   });
@@ -584,15 +584,15 @@ describe("Assistenten-Durchlauf", () => {
     // Der Entwurf steht auf der Startseite zum Fortsetzen bereit.
     expect(screen.getByText(/Entwurfshausen/)).toBeDefined();
 
-    await nutzer.click(screen.getByRole("button", { name: "Verwerfen" }));
-    await nutzer.click(within(rueckfrage("Angefangenen Bogen verwerfen?")).getByRole("button", { name: "Abbrechen" }));
+    await nutzer.click(screen.getByRole("button", { name: "Bogen schließen" }));
+    await nutzer.click(within(rueckfrage("Angefangenen Bogen schließen?")).getByRole("button", { name: "Abbrechen" }));
 
     expect(screen.getByText(/Entwurfshausen/)).toBeDefined();
 
-    await nutzer.click(screen.getByRole("button", { name: "Verwerfen" }));
-    await nutzer.click(within(rueckfrage("Angefangenen Bogen verwerfen?")).getByRole("button", { name: "Verwerfen" }));
+    await nutzer.click(screen.getByRole("button", { name: "Bogen schließen" }));
+    await nutzer.click(within(rueckfrage("Angefangenen Bogen schließen?")).getByRole("button", { name: "Bogen schließen" }));
 
-    expect(screen.getByText("Angefangener Bogen verworfen — Rückholung oben auf der Startseite.")).toBeDefined();
+    expect(screen.getByText("Angefangener Bogen geschlossen — Rückholung oben auf der Startseite.")).toBeDefined();
     expect(screen.queryByRole("button", { name: "Fortsetzen" })).toBeNull();
 
     // Die Rückholung bringt ihn zurück (D7).
@@ -889,7 +889,7 @@ describe("Assistenten-Durchlauf", () => {
     expect(screen.getByRole("button", { name: /^3\. Personal/ }).textContent).not.toContain("✓");
     await nutzer.click(screen.getByRole("button", { name: "In Einsatz übernehmen" }));
     const frage = rueckfrage("Nur Sollplätze, keine gemeldete Stärke");
-    expect(frage.textContent).toMatch(/Zahlen der Vorbelegung nach Einheitstyp/);
+    expect(frage.textContent).toMatch(/Zahlen der Vorbelegung \(Soll:/);
     // R16-S3: die riskantere Antwort steht zuletzt, nicht neben der Hauptaktion.
     const wege = within(frage).getAllByRole("button").map((k) => k.textContent);
     expect(wege.indexOf("Stärke jetzt eintragen")).toBe(0);
@@ -1816,7 +1816,7 @@ describe("Neuen Einsatz anlegen", () => {
       await waitFor(() => expect(mitschnitt.dateien).toHaveLength(1));
       const [datei] = mitschnitt.dateien;
       // Mit Datum-Zeit-Gruppe wie die PDFs (R16-A1).
-      expect(datei!.name).toMatch(/^eeb-einsatz-\d{6}[a-z]{3}\d{2}_Hochwasser_Weser-oldenburg\.xlsx$/);
+      expect(datei!.name).toMatch(/^\d{4}-\d{2}-\d{2}_\d{4}_eeb-einsatz-oldenburg_Hochwasser_Weser\.xlsx$/);
       const bytes = new Uint8Array(await datei!.blob.arrayBuffer());
       expect(String.fromCharCode(bytes[0]!, bytes[1]!)).toBe("PK");
     } finally {
@@ -1929,7 +1929,7 @@ describe("Neuen Einsatz anlegen", () => {
 
     // Der Bogen ist als Meldung abgelegt: Einsatzansicht mit einer Einheit.
     expect(await screen.findByRole("heading", { level: 1, name: "Sammelhausen" })).toBeDefined();
-    const liste = screen.getByRole("heading", { name: "Einheiten (1 gemeldet · 1 zählend)" }).closest("section")!;
+    const liste = screen.getByRole("heading", { name: "Einheiten (1 gemeldet · 1 anwesend)" }).closest("section")!;
     expect(within(liste).getByText("THW Scanhausen")).toBeDefined();
   });
 

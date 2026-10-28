@@ -541,8 +541,9 @@ describe("Nummern und Sollstärke (Audit Runde 8)", () => {
 
   it("R8-D2: Entfernen von Nr. 2 von 6 nennt die aufrückenden Nummern 3–6 → 2–5", async () => {
     const { entfernenNummernText } = await import("./einheiten-tabelle");
-    expect(entfernenNummernText(sechs, "b")).toBe("Die Einheiten Nr. 3–6 rücken auf und heißen danach Nr. 2–5");
-    expect(entfernenNummernText(sechs, "e")).toBe("Die Einheit Nr. 6 rückt auf und heißt danach Nr. 5");
+    // R18-A1: Die Nummern rücken nicht mehr auf; die Rückfrage sagt, welche Nummer frei bleibt.
+    expect(entfernenNummernText(sechs, "b")).toBe("Nr. 2 bleibt frei, die übrigen Nummern (3–6) bleiben");
+    expect(entfernenNummernText(sechs, "e")).toBe("Nr. 5 bleibt frei, die übrigen Nummern (6) bleiben");
     expect(entfernenNummernText(sechs, "f")).toBe("");
   });
 

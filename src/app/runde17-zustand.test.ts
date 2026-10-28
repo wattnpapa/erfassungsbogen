@@ -15,7 +15,7 @@ import {
   fortschrittSatz,
   sammelPdfDauerText,
 } from "./arbeitet";
-import { PRELLSCHUTZ_MS, QUITTUNG_SPERRE_KURZ_MS, QUITTUNG_SPERRE_MS } from "./tipp-schutz";
+import { ORTSSPERRE_MS, PRELLSCHUTZ_MS, QUITTUNG_SPERRE_KURZ_MS, QUITTUNG_SPERRE_MS } from "./tipp-schutz";
 
 describe("R17-E1/N1 „Namen einfügen…“: Zeilen ohne Komma", () => {
   it("liest „Meier Karl“ und „Müller-Lüdenscheidt Maria“ auf Wunsch als Nachname Vorname", () => {
@@ -154,6 +154,7 @@ describe("R17-D3 Sperre unter harmlosen Quittungen", () => {
   it("deckt den Prellschutz, aber nicht die lange Sperre des Abrückens", () => {
     expect(QUITTUNG_SPERRE_KURZ_MS).toBe(PRELLSCHUTZ_MS);
     expect(QUITTUNG_SPERRE_KURZ_MS).toBeLessThan(QUITTUNG_SPERRE_MS);
-    expect(QUITTUNG_SPERRE_MS).toBeGreaterThanOrEqual(2500);
+    // R18: „Rückgängig" ist nie gesperrt; die Sperre schützt nur den Knopf unter einer schwebenden Leiste und ist so lang wie die Ortssperre.
+    expect(QUITTUNG_SPERRE_MS).toBe(ORTSSPERRE_MS);
   });
 });

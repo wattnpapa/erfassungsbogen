@@ -743,14 +743,26 @@ export function einheitVerschieben(vonEinsatzId: string, nachEinsatzId: string, 
  * damit kein halb entfernter Zustand im Speicher landen kann.
  *
  * Rückgabe: die entfernten Einträge unverändert (Signatur, Herkunft, Zeiten,
- * Notiz, Zug, Etiketten) — für „Rückgängig".
+ * Notiz, Zug, Etiketten) — für „Rückgängig". `nummern` = die Nummern vor dem Entfernen (`meldungsNummern`): Sie werden an
+ * allen Fassungen festgeschrieben, damit die übrigen Einheiten nicht aufrücken (R18-A1).
  */
-export function einheitEntfernen(einsatzId: string, einheitSchl: string): MeldeEintrag[] {
+export function einheitEntfernen(einsatzId: string, einheitSchl: string, nummern?: ReadonlyMap<string, number>): MeldeEintrag[] {
   const liste = alleSammlungen();
   const s = liste.find((x) => x.id === einsatzId);
   if (!s) return [];
+  if (!s.eintraege.some((e) => e.einheitSchluessel === einheitSchl)) return [];
+  // Die Nummern gehören der Einheit, nicht ihrer Listenstelle (R18-A1/W2): Das Papier (Meldeblock, Lageblatt, Funk)
+  // trägt die vergebenen Nummern. Vor dem Entfernen werden sie festgeschrieben; die übrigen rücken nicht auf,
+  // und die entfernte Einheit bekommt ihre Nummer beim Zurückholen wieder. Die Zählung (`meldungsNummern`) bringt der
+  // Aufrufer mit: Dieses Modul darf `einheiten-tabelle` nicht importieren (Zyklus; er holte das Modul samt Nachbarn
+  // ins Startbündel, ADR-003 Aufnahmeregel 5).
+  if (nummern) {
+    for (const x of s.eintraege) {
+      const n = nummern.get(x.einheitSchluessel);
+      if (x.nummer == null && n != null) x.nummer = n;
+    }
+  }
   const weg = s.eintraege.filter((e) => e.einheitSchluessel === einheitSchl);
-  if (weg.length === 0) return [];
   s.eintraege = s.eintraege.filter((e) => e.einheitSchluessel !== einheitSchl);
   s.geaendert = Date.now();
   sammlungenSchreiben(liste);

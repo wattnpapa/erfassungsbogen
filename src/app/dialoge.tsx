@@ -18,7 +18,7 @@
  */
 
 import { useEffect, useId, useRef, useState, type FormEvent, type MouseEvent, type ReactNode } from "react";
-import { ortSperren, tippVerworfenZeigen } from "./tipp-schutz";
+import { istSichereGegenhandlung, ortSperren, tippVerworfenZeigen } from "./tipp-schutz";
 import { zahlMarkieren } from "./zahl-eingabe";
 import { ersteEbeneBetreten, ersteEbeneVerlassen } from "./modal-overlay";
 
@@ -51,6 +51,8 @@ export type Antwortweg = {
   label: string;
   /** Erklärt, was dieser Weg bedeutet — steht unter dem Knopf. */
   hinweis?: ReactNode;
+  /** Ein Satz unter dem Knopf im festen Fuß statt eines Eintrags in der Liste des Rumpfs (R18-S4); ersetzt `hinweis`. */
+  kurz?: string;
   /** Zerstörende Wahl: Knopf in der Alarmfarbe. */
   gefahr?: boolean;
 };
@@ -253,7 +255,7 @@ const WEGE_IM_FUSS = 3;
  * Prellschutz sofort.
  */
 // Der Prüfstand (features/support/haken.ts) setzt ihn vor dem Laden auf 0.
-let prellschutzMs: number = (globalThis as { __EEB_PRELLSCHUTZ_MS?: number }).__EEB_PRELLSCHUTZ_MS ?? 450;
+let prellschutzMs: number = (globalThis as { __EEB_PRELLSCHUTZ_MS?: number }).__EEB_PRELLSCHUTZ_MS ?? 350;
 
 /** Für Tests: Prellschutz setzen (0 = aus). Gibt den alten Wert zurück. */
 export function prellschutzSetzen(ms: number): number {
@@ -287,13 +289,23 @@ function Dialogfenster({ abfrage }: { abfrage: Abfrage }) {
   const rumpf = useRef<HTMLDivElement>(null);
   const geoeffnetUm = useRef(Date.now());
   const eigeneEbene = useRef(false);
+  // Mit zerstörender Wahl länger: Ein zögernder Zweittipp kam bis ~0,6 s später (R4-G1); weil die
+  // Ortssperre die Knöpfe der Rückfrage nicht mehr erfasst (R8-H5), trägt der Prellschutz das allein.
+  // R18: 0,65 s statt 0,8 s (und 0,35 s statt 0,45 s), dafür sichtbar: Die gesperrten Antworten stehen gedämpft da.
+  const sperrDauer = prellschutzMs === 0 ? 0 : abfrage.art === "wahl" && abfrage.wege.some((w) => w.gefahr) ? Math.max(prellschutzMs, 650) : prellschutzMs;
+  const [wartet, setWartet] = useState(sperrDauer > 0 && abfrage.art !== "hinweis");
+  useEffect(() => {
+    if (!wartet) return;
+    const uhr = setTimeout(() => setWartet(false), sperrDauer);
+    return () => clearTimeout(uhr);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- nur beim Öffnen
+  }, []);
 
   /** Zeiger-Klicks kurz nach dem Öffnen verschlucken (siehe `prellschutzMs`). */
   function prellschutz(e: MouseEvent<HTMLFormElement>) {
-    // Mit zerstörender Wahl länger: Ein zögernder Zweittipp kam bis ~0,6 s später (R4-G1); weil die
-    // Ortssperre die Knöpfe der Rückfrage nicht mehr erfasst (R8-H5), trägt der Prellschutz das allein.
-    const dauer = prellschutzMs === 0 ? 0 : abfrage.art === "wahl" && abfrage.wege.some((w) => w.gefahr) ? Math.max(prellschutzMs, 800) : prellschutzMs;
-    if (e.detail > 0 && Date.now() - geoeffnetUm.current < dauer) {
+    // „Abbrechen", „Schließen" und „Verstanden" nehmen nichts weg: nie gesperrt (R18-S3, D2, H4, E1).
+    if (istSichereGegenhandlung(e.target)) return;
+    if (e.detail > 0 && Date.now() - geoeffnetUm.current < sperrDauer) {
       e.preventDefault();
       e.stopPropagation();
       // Der verworfene Tipp sagt es: „Einen Moment …" auf dem Knopf, nicht im Text (R9-S2).
@@ -392,7 +404,7 @@ function Dialogfenster({ abfrage }: { abfrage: Abfrage }) {
   }
 
   const abbrechen = (
-    <button type="button" onClick={() => dialog.current?.close("")}>
+    <button type="button" data-sicher="" onClick={() => dialog.current?.close("")}>
       Abbrechen
     </button>
   );
@@ -408,12 +420,14 @@ function Dialogfenster({ abfrage }: { abfrage: Abfrage }) {
       <button
         type="submit"
         value={w.wert}
-        className={w.gefahr ? "gefahr" : i === 0 ? "primaer" : ""}
-        aria-describedby={wegeImFuss && w.hinweis ? `${idBasis}-w${i}` : undefined}
+        className={`${w.gefahr ? "gefahr" : i === 0 ? "primaer" : ""}${wartet ? " wartet" : ""}`.trim()}
+        aria-disabled={wartet || undefined}
+        aria-describedby={wegeImFuss && (w.hinweis || w.kurz) ? `${idBasis}-w${i}` : undefined}
       >
         {w.label}
       </button>
       {!wegeImFuss && w.hinweis && <p className="hinweis">{w.hinweis}</p>}
+      {wegeImFuss && w.kurz && <p className="hinweis weg-kurz" id={`${idBasis}-w${i}`}>{w.kurz}</p>}
     </div>
   );
 
@@ -491,10 +505,10 @@ function Dialogfenster({ abfrage }: { abfrage: Abfrage }) {
         {abfrage.art === "wahl" && (
           <>
             <p>{abfrage.text}</p>
-            {wegeImFuss && abfrage.wege.some((w) => w.hinweis) && (
+            {wegeImFuss && abfrage.wege.some((w) => w.hinweis && !w.kurz) && (
               <ul className="abfrage-wegehinweise">
                 {abfrage.wege.map((w, i) =>
-                  w.hinweis ? (
+                  w.hinweis && !w.kurz ? (
                     <li key={w.wert} id={`${idBasis}-w${i}`}>
                       <strong>{w.label}:</strong> {w.hinweis}
                     </li>
@@ -532,7 +546,7 @@ function Dialogfenster({ abfrage }: { abfrage: Abfrage }) {
 
         {abfrage.art === "eingabe" && (
           <div className="abfrage-aktionen">
-            <button type="submit" value="ok" className="primaer" disabled={unvollstaendig}>
+            <button type="submit" value="ok" className={`primaer${wartet ? " wartet" : ""}`} aria-disabled={wartet || undefined} disabled={unvollstaendig}>
               {abfrage.ok}
             </button>
             {abbrechen}
@@ -546,7 +560,7 @@ function Dialogfenster({ abfrage }: { abfrage: Abfrage }) {
                 sichtbar ab: Beide Knöpfe lagen keine zwei Fingerbreit
                 auseinander, und der obere ist der, der nichts zurücknimmt. */}
             <div className={`abfrage-aktionen${abfrage.wege.some((w) => w.gefahr) ? " abgesetzt" : ""}`}>
-              <button type="button" ref={abbruchKnopf} onClick={() => dialog.current?.close("")}>
+              <button type="button" ref={abbruchKnopf} data-sicher="" onClick={() => dialog.current?.close("")}>
                 {abfrage.abbruch}
               </button>
             </div>
@@ -555,7 +569,7 @@ function Dialogfenster({ abfrage }: { abfrage: Abfrage }) {
 
         {abfrage.art === "hinweis" && (
           <div className="abfrage-aktionen">
-            <button type="submit" value="ok" className="primaer">
+            <button type="submit" value="ok" className="primaer" data-sicher="">
               {abfrage.ok}
             </button>
           </div>

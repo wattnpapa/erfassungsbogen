@@ -23,6 +23,15 @@ Grundlage: Repository `wattnpapa/erfassungsbogen`, Stand 2026-09-12 — Version 
 > angenommen; der Bogen nimmt dann denselben Weg wie ein Bogen-Link (Rückfrage vor
 > dem Ablegen, 5.1). Empfänger und Netzverbindungen unverändert (5.8).
 >
+> **Nachgezogen 2026-10-28 — Audit Runde 18:** Speicherort neu: `eeb.abschluss.v1` im
+> `localStorage` (je Einsatz: Zeitpunkt „beendet" und „Übergabe angekommen" samt frei
+> getipptem Empfänger der Übergabe, höchstens 80 Zeichen; Teil der Datensicherung,
+> fällt mit „Alle Daten löschen" weg; 5.4, 5.7). Der Papierkorb für entfernte Meldungen
+> (7 Tage, `eeb.meldungen-papierkorb.v1`) zeigt je Fassung Stand, Stärke, Zug und
+> Auftrag, keine zusätzlichen Personendaten. Nummern entfernter Meldungen bleiben
+> vergeben (Nachvollziehbarkeit, Art. 5 Abs. 1 lit. d DSGVO). Empfänger und
+> Netzverbindungen unverändert (5.8).
+>
 > **Nachgezogen 2026-10-27 — Audit Runde 17:** Speicherort neu, mit Personendaten:
 > `eeb.meldungen-papierkorb.v1` im `localStorage` (entfernte Meldungen einer Sammlung
 > samt Namen der Personen, höchstens 20 je Sammlung, 7 Tage, danach automatisch

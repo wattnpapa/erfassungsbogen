@@ -357,6 +357,14 @@ Grundlage: Repository `wattnpapa/erfassungsbogen`, Stand 2026-09-12 — Version 
 > und `vendor/` unverändert. Der Entwurf trägt zusätzlich die Marke „über die
 > Startseite verlassen" (`fremd.startseite`, R5-N3, 3.3 D1) — keine Daten.
 
+> **Nachgezogen 2026-10-28 (Runde 18):** Audit Runde 18. Speicher (3.3, 5.5): neuer
+> Schlüssel `eeb.abschluss.v1` (localStorage, Übergabe- und Abschlussvermerk; über die
+> Präfixregel `eeb.` in Sicherung und Löschweg enthalten). Bedienung (5.3): sichere
+> Gegenhandlungen („Abbrechen", „Rückgängig", „Zurück") sind nie gesperrt, gesperrte
+> Tipps melden sich; Nummern entfernter Meldungen bleiben vergeben. Exporte (5.4):
+> Dateinamen mit lesbarem Zeitstempel, Ablagebestätigung mit Dateiname. Lieferkette
+> (6.4): Startbündel 1,22 MB. Keine neuen Hosts, CSP und Transportformat unverändert.
+
 > **Nachgezogen 2026-10-27 (Runde 17):** Audit Runde 17. Speicher (3.3, 5.5): neuer
 > Schlüssel `eeb.meldungen-papierkorb.v1` (localStorage, Namen von Personen, 7 Tage,
 > 20 je Sammlung; über die Präfixregel `eeb.` in Sicherung und Löschweg enthalten)

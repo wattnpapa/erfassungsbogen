@@ -13,7 +13,7 @@ import { einheitOrt } from "@bos/meldekopf/darstellung";
 import { EinsatzArt, MeldeStatus, revisionen, type Einsatzsammlung, type MeldeEintrag } from "@bos/meldekopf/einsaetze";
 import { aggregiere, aktuelleMeldungen, type EinsatzSummen } from "./auswertung";
 import { eintreffzeit } from "./eintrag-zeiten";
-import { sollstaerkeAnteil } from "./einheiten-tabelle";
+import { letzteMeldung, sollstaerkeAnteil } from "./einheiten-tabelle";
 import { geltendeJeEinheit } from "./fassung-vorrang";
 import { einheitAnzeigename, funkrufText, nurSollstaerke, natoZeitstempel, orgLabel, vokabText, vokabularFuer } from "./hilfen";
 
@@ -122,7 +122,8 @@ export function bedarfOhneAngabeHinweis(n: number): string {
 
 /** Alter einer Zeile mit Minuten: „6 Std 40 Min", ab einem Tag „2 T" (R14-K3: abgerundete Stunden verwischten 1:30 und 1:59). */
 export function alterKurz(min: number): string {
-  if (min >= 1440) return `${Math.floor(min / 1440)} T`;
+  // Ausgeschrieben: Auf dem Fernseher liest sich „103 T" nicht als „Tage" (R18-K5).
+  if (min >= 1440) return `${Math.floor(min / 1440)} ${Math.floor(min / 1440) === 1 ? "Tag" : "Tage"}`;
   return `${Math.floor(min / 60)} Std ${min % 60} Min`;
 }
 
@@ -193,9 +194,17 @@ export function lageblattZeilenAlter(empfangenAm: number | undefined, jetzt: num
  * Stärke „F / U / M / G" der Summenzeile: Mit dreistelligen Werten bräche die schmale Spalte um, und die
  * Gesamtstärke stünde allein in der zweiten Zeile (R13-A5). Dann ohne Leerzeichen um die Schrägstriche.
  */
-export function staerkeSummenText(f: number, u: number, m: number, g: number): string {
+export function staerkeSummenText(f: number, u: number, m: number, g: number, kompakt?: boolean): string {
   const breit = `${f} / ${u} / ${m} / ${g}`;
-  return breit.length > 14 ? `${f}/${u}/${m}/${g}` : breit;
+  return (kompakt ?? breit.length > 14) ? `${f}/${u}/${m}/${g}` : breit;
+}
+
+/**
+ * Eine Schreibweise für die ganze Spalte „Stärke F / U / M / G" (R18-W5): Sobald eine Zeile oder die Summe zu breit
+ * wird, stehen alle Zeilen kompakt — vorher wechselte die Schreibweise von Zeile zu Zeile.
+ */
+export function staerkeSpalteKompakt(zeilen: readonly [number, number, number, number][]): boolean {
+  return zeilen.some(([f, u, m, g]) => `${f} / ${u} / ${m} / ${g}`.length > 14);
 }
 
 /** Zwischensumme je Zug: „älteste Meldung vor 5 Std 0 Min" — nur ab einer Stunde, sonst `null` (R12-K3). */
@@ -317,7 +326,8 @@ export function lagebild(einsatz: Einsatzsammlung, jetzt: number = Date.now()): 
     summen: aggregiere(einsatz.eintraege, einsatz.art),
     einheiten,
     abgerueckt: geltend.filter((e) => e.status === MeldeStatus.ABGERUECKT).length,
-    letzteMeldung: einsatz.eintraege.length > 0 ? Math.max(...einsatz.eintraege.map((e) => e.empfangenAm)) : null,
+    // Dieselbe Zählweise wie Kopf, Startseite und Import (R18-K2).
+    letzteMeldung: letzteMeldung(einsatz.eintraege),
     ersteMeldung: geltend.length > 0 ? Math.min(...geltend.map(eintreffzeit)) : null,
     bewegungen: bewegungenSeit(einsatz, jetzt),
     sollstaerke: sollstaerkeAnteil(einsatz.eintraege, einsatz.art),

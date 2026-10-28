@@ -164,7 +164,7 @@ export function dateiFehlerText(name: string, art: DateiArt, weg: DateiWeg, ursa
     case "fremd":
     case "json-fremd":
       // Die eigene Auswertung dieser App (eeb-einsatz-…csv, …-oldenburg.xlsx): für den Stab, nicht zum Weiterarbeiten (R17-A5).
-      if (/^eeb-(einsatz|lageblatt)[-_].*\.(csv|xlsx?)$/i.test(name)) {
+      if (/^(\d{4}-\d{2}-\d{2}_\d{4}_)?eeb-(einsatz|lageblatt)[-_].*\.(csv|xlsx?)$/i.test(name)) {
         return (
           `${datei} hat diese App selbst als Auswertung für den Stab erzeugt (Tabelle) — zum Weiterarbeiten ist sie nicht gedacht. ` +
           "Dafür die Sammel-PDF des Einsatzes („Einsatz weitergeben / sichern“) über „Einsatz importieren…“ einlesen oder die Datensicherung einspielen."

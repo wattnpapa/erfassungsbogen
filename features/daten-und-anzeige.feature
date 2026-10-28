@@ -130,16 +130,16 @@ Funktionalität: Darstellung, Datensicherung und Auskunft
   Szenario: Angefangenen Bogen direkt von der Startseite verwerfen
     Angenommen ich öffne einen geteilten Bogen-Link eines alten Bogens
     Wenn ich auf "‹ Startseite" klicke
-    Und ich auf "Verwerfen" klicke
-    Dann sehe ich den Dialog "Angefangenen Bogen verwerfen?"
-    Wenn ich im Dialog auf "Verwerfen" klicke
-    Dann sehe ich den Hinweis "Angefangener Bogen verworfen — Rückholung oben auf der Startseite."
+    Und ich auf "Bogen schließen" klicke
+    Dann sehe ich den Dialog "Angefangenen Bogen schließen?"
+    Wenn ich im Dialog auf "Bogen schließen" klicke
+    Dann sehe ich den Hinweis "Angefangener Bogen geschlossen — Rückholung oben auf der Startseite."
     Und sehe ich die Schaltfläche "Fortsetzen" nicht
 
   Szenario: Das Verwerfen abbrechen lässt den angefangenen Bogen stehen
     Angenommen ich öffne einen geteilten Bogen-Link eines alten Bogens
     Wenn ich auf "‹ Startseite" klicke
-    Und ich auf "Verwerfen" klicke
+    Und ich auf "Bogen schließen" klicke
     Und ich im Dialog auf "Abbrechen" klicke
     Dann ist kein Dialog offen
     Und sehe ich die Schaltfläche "Fortsetzen"

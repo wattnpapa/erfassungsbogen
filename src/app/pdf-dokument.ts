@@ -47,8 +47,8 @@ import {
 } from "./hilfen";
 import { bedarfNichtErfasst, mwdText, summiereBoegen, unterbringungAngefordertText, verpflegungText, type EinsatzSummen } from "./auswertung";
 import { EINTREFF_HINWEIS, zeitLang } from "./eintrag-zeiten";
-import { angabenAlterWort, angabenZeit, type AngabenSeit } from "./angaben-alter";
-import { bedarfOhneAngabeText, kraftstoffTeile, lageblattAlterText, lageblattZeilenAlter, staerkeSummenText, zugAlterText } from "./lagemonitor";
+import { angabenAlterWort, angabenZeit, handAenderungText, type AngabenSeit } from "./angaben-alter";
+import { bedarfOhneAngabeText, kraftstoffTeile, lageblattAlterText, lageblattZeilenAlter, staerkeSpalteKompakt, staerkeSummenText, zugAlterText } from "./lagemonitor";
 import { ANONYM_BEMERKUNG_VERMERK, ANONYM_PAPIER_VERMERK, ANONYM_PERSONAL_SATZ, codeGueltigBisText } from "./anonym-hinweis";
 import { anfuehrung } from "./typografie";
 import { bedarfMarken, datumVonMs, einheitenZahl, lueckenAlle, rueckkehrText } from "./einheiten-tabelle";
@@ -515,6 +515,8 @@ export interface UebersichtEintrag {
   zeitEingelesen?: boolean;
   /** Alter der Angaben nach einer Handänderung am Meldekopf: das der Vorgängerin (R17-K1). */
   angaben?: AngabenSeit;
+  /** Stand der Angaben, den der Absender gemeldet hat, wenn der Bogen am Meldekopf von Hand umgestellt wurde (R18-A2). */
+  standAbsender?: Erfassungsbogen["stand"];
   /** Der Stand des Bogens liegt nach dem Eingang am Gerät: Geräteuhr oder Absenderuhr falsch (R13-A3, R14-A2). */
   standNachEintreffen?: boolean;
   /** Die Signatur passt nicht zu den Daten: unterwegs verändert oder beschädigt (R15-E1). */
@@ -585,6 +587,17 @@ function alterMarke(e: { empfangenAm?: number; bogen: Erfassungsbogen; angaben?:
   const m = { empfangenAm: e.empfangenAm, bogen: e.bogen, angaben: e.angaben };
   const t = lageblattZeilenAlter(angabenZeit(m), erstellt, angabenAlterWort(m));
   return t ? [{ text: t, bold: true, fontSize: 7 }] : [];
+}
+
+/**
+ * Spalte „Stand der Angaben": der Stand, auf den sich die Angaben der Einheit beziehen — beim Absender, nicht die Zeit
+ * der Aufnahme. Eine Handänderung am Meldekopf steht darunter getrennt (R18-A2, R18-K1), damit eine frische Uhrzeit
+ * neben „Stand vor 2 Std" nicht widerspricht.
+ */
+function standZelle(e: Pick<UebersichtEintrag, "bogen" | "standAbsender" | "angaben">): Content {
+  const stand = { text: zeitpunktDeutsch(e.standAbsender ?? e.bogen.stand) };
+  if (!e.angaben) return stand;
+  return { stack: [stand, { text: handAenderungText(e), italics: true, fontSize: 7 }] };
 }
 
 function blattZeit(ms: number | undefined): string {
@@ -786,7 +799,7 @@ function uebersichtsTabelle(
       // „Abgerückt", die leere Spalte daneben kostete die Änderungsspalte
       // ihre Breite und das Blatt seine Seite (R2-K3).
       kopf("Eingetroffen\n(abgerückt)"),
-      kopf("Stand"),
+      kopf("Stand der\nAngaben"),
       kopf("Stärke\nF / U / M / G"),
       kopf("Fzg"),
       kopf("Bedarf"),
@@ -798,6 +811,12 @@ function uebersichtsTabelle(
       kopf("Veränderung seit der letzten Meldung"),
     ],
   ];
+  // Eine Schreibweise der Stärke in allen Zeilen und der Summe (R18-W5).
+  const staerkeKompakt = (() => {
+    const z = (x: ReturnType<typeof staerke>): [number, number, number, number] => [x.fuehrer, x.unterfuehrer, x.mannschaft, x.gesamt];
+    const sm = summiereBoegen(zaehlendeBoegen(eintraege)).staerke;
+    return staerkeSpalteKompakt([...eintraege.map((e) => z(staerke(e.bogen))), z(sm)]);
+  })();
   const zeile = (e: UebersichtEintrag, blockKopf?: string): TableCell[] => {
     const { bogen: b, vorher, teil } = e;
     const s = staerke(b);
@@ -885,8 +904,8 @@ function uebersichtsTabelle(
             : []),
         ],
       },
-      { text: zeitpunktDeutsch(b.stand) },
-      { text: `${s.fuehrer} / ${s.unterfuehrer} / ${s.mannschaft} / ${s.gesamt}` },
+      standZelle(e),
+      { text: staerkeSummenText(s.fuehrer, s.unterfuehrer, s.mannschaft, s.gesamt, staerkeKompakt) },
       { text: `${b.fahrzeuge.length}` },
       bedarfZelle(b),
       bemerkungZelle(e.notiz, b.sonstiges, maxZeilen === LAGEBLATT_MAX_ZEILEN ? BEMERKUNG_LAGEBLATT : undefined, bogenAnonymisiert(b)),
@@ -936,7 +955,7 @@ function uebersichtsTabelle(
     body.push(
       summenZeile(
         `Summe${nachtrag ? " Nachtrag" : ""}${zumWeiterfuehren ? " laut Gerät" : ""} (${beschriftung.join(" · ")})`,
-        staerkeSummenText(summe.staerke.fuehrer, summe.staerke.unterfuehrer, summe.staerke.mannschaft, summe.staerke.gesamt),
+        staerkeSummenText(summe.staerke.fuehrer, summe.staerke.unterfuehrer, summe.staerke.mannschaft, summe.staerke.gesamt, staerkeKompakt),
         `${summe.fahrzeuge}`,
       ),
     );
@@ -1207,7 +1226,7 @@ function nachtragsTabelle(zeilen: number, leer: boolean, rueckseite: boolean): C
       kopf("Zug"),
       kopf("Funkrufname /\nRückruf"),
       kopf("Eingetroffen\n(abgerückt)"),
-      kopf("Stand"),
+      kopf("Stand der\nAngaben"),
       kopf("Stärke\nF / U / M / G"),
       kopf("Fzg"),
       kopf("Bedarf"),
@@ -1306,7 +1325,9 @@ function uebersichtsSeite(
     ...(bedarfVorn ? [] : [bedarfBlock]),
     // Das Raster zum Weiterschreiben füllt den Rest des Blatts NACH Bedarf und Zugsummen (R16-K4): bei zwei Zügen
     // und einer abgerückten Einheit stand es vor ihnen, und sie rutschten hinter zwölf leere Zeilen auf die Rückseite.
-    ...(nachtragsTab && !rueckseite && !leer ? [nachtragsTab] : []),
+    // Tafel und Summenzeile bleiben auf einer Seite (R18-A9): Passt sie nicht mehr unter den Inhalt, steht sie ganz auf der
+    // nächsten; vorher begann sie am Seitenende mit zwei Zeilen, der Rest samt „Summe einschl. Nachträge" folgte auf Seite 2.
+    ...(nachtragsTab && !rueckseite && !leer ? [{ stack: [nachtragsTab], unbreakable: true } as Content] : []),
     // Zu voll für eine Seite mit fünf Nachtragszeilen: die Zeilen bekommen die
     // Rückseite, Seite 1 bleibt, wie sie ist (R4-A3).
     ...(nachtragsTab && rueckseite ? [{ stack: [nachtragsTab], pageBreak: "before" } as Content] : []),

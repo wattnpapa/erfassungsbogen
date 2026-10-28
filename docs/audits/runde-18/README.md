@@ -35,3 +35,16 @@ R18-G2/S1, R18-M1, R18-O1.
 | [Mobile-UI](mobile-ui.md) | 0 | 0 | 1 | 9 |
 | Summe der Berichte | 0 | 0 | 7 | 89 |
 | Summe ohne Doppelungen (Verlaufstabelle) | 0 | 0 | 6 | 60 |
+
+## Stand der Behebung (28.10.2026)
+
+Behoben bis auf folgende Reste: R18-W7 (erstes Eingabefeld der Schnellerfassung
+bei y = 248 statt unter 200), R18-M7 (aufgeklappte Karte bei 320 x 568 in „Feld"
+1139 px hoch), R18-S4 (Höhe der Sollstärke-Rückfrage nicht im Browser gemessen),
+R18-G5 (Fußzeilen-Linklisten und „Karten | Tabelle" mit 4 bis 6 px Abstand),
+R18-A8 (Höhe der Quittung nach „Entfernen" nicht neu gemessen). Im echten Browser
+(Produktionsbuild, Playwright) bestätigt: Tipp-Sperren und Quittungsleiste,
+Papierkorb, Nummern bleiben, Tabelle am Telefon, Scanner ohne Kamera, Kennzahlenraster,
+Erstbesuch-Sprung, Fußleiste im Querformat. Neuer Speicherschlüssel
+`eeb.abschluss.v1`. Bundle-Budget neu gesetzt (Startbündel 1 217 601 Byte).
+Arc42, ISK und DSFA nachgezogen.

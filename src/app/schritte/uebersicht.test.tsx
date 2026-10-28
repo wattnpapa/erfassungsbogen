@@ -240,7 +240,7 @@ describe("Übersicht — PDF-Quittung", () => {
 
     const quittung = await within(dialog).findByText(/PDF gespeichert:/);
     expect(quittung.getAttribute("role")).toBe("status");
-    expect(quittung.textContent).toMatch(/PDF gespeichert: eeb-\d{6}[a-z]{3}\d{2}_.*Albstadt.*\.pdf/);
+    expect(quittung.textContent).toMatch(/PDF gespeichert: \d{4}-\d{2}-\d{2}_\d{4}_eeb_.*Albstadt.*\.pdf/);
     // Der Knopf steht wieder bereit — ein zweites PDF ist möglich, aber kein Muss.
     expect(within(dialog).getByRole("button", { name: "PDF erzeugen" })).toHaveProperty("disabled", false);
   });

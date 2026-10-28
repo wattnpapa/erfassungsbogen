@@ -8,7 +8,7 @@
  * Warnung) verlängert nichts.
  */
 import type { EebZeitpunkt } from "@bos/eeb-format/model";
-import { zeitpunktZuMs as standMs } from "./eintrag-zeiten";
+import { zeitLang, zeitpunktZuMs as standMs } from "./eintrag-zeiten";
 
 /** Ab diesem Abstand zwischen Stand und Eingang nennt die Altersangabe den Stand statt der Meldung. */
 export const STAND_VOR_EINGANG_MS = 60 * 60_000;
@@ -67,8 +67,23 @@ export function angabenErben(vorgaengerin: MitStand, kennzeichnung = false, jetz
  * Quittung nach einem Stapel (R14-A1): Die Eintreffzeit der eingelesenen Bögen ist die Zeit des Einlesens — bei sechs
  * Bögen in einem Zug stünde sonst überall dieselbe Minute wie eine Ankunftszeit auf dem Lageblatt. Leer unter zwei Bögen.
  */
-export function eintreffzeitStapelHinweis(neu: number): string {
-  return neu < 2 ? "" : `Eintreffzeit dieser ${neu} Bögen ist die Zeit des Einlesens (Lageblatt: *); anders gewesen: Karte › „ändern“.`;
+export function eintreffzeitStapelHinweis(neu: number, jetzt: number = Date.now()): string {
+  // Datiert („Aufnahme 22:41"), weil der Hinweis stehen bleibt, während Einheiten abrücken oder entfernt werden (R18-N3);
+  // das „*" steht in Lageblatt, Sammel-PDF, CSV und Excel, die Fußnote dort sagt dasselbe.
+  const uhr = new Date(jetzt).toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit" });
+  return neu < 2
+    ? ""
+    : `Aufnahme ${uhr}: Eintreffzeit dieser ${neu} Bögen ist die Zeit des Einlesens (in Lageblatt und Tabellen mit * markiert); anders gewesen: Karte › „ändern“.`;
+}
+
+/**
+ * Vermerk einer Handänderung am Meldekopf („Stärke am Meldekopf geändert 28.10.2026, 00:36"); leer ohne Änderung.
+ * Gleich in Karte, Lageblatt, Sammel-PDF, CSV und Excel (R18-A2, R18-A3): Die Handänderung steht getrennt vom Stand
+ * der Angaben, den der Absender gemeldet hat.
+ */
+export function handAenderungText(e: { angaben?: AngabenSeit }): string {
+  if (!e.angaben) return "";
+  return `${e.angaben.kennzeichnung ? "Kennzeichnung" : "Stärke"} am Meldekopf geändert ${zeitLang(e.angaben.geaendertAm)}`;
 }
 
 /** „Stand" oder „Meldung": das Wort vor „vor 14 Std 0 Min". */

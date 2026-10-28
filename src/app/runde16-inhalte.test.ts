@@ -74,8 +74,8 @@ describe("R16-A1 Kennzeile und Eintreffzeit in der Übersicht-CSV", () => {
     const kopf = zeilen(csv)[0]!.split(";");
     const daten = zeilen(csv)[1]!.split(";");
     expect(daten[kopf.indexOf("Eingetroffen")]).toMatch(/ \*$/);
-    // „Empfangen" ist das Einlesen selbst und bleibt ohne Stern.
-    expect(daten[kopf.indexOf("Empfangen")]).not.toMatch(/\*/);
+    // „Aufnahme" (früher „Empfangen") ist das Einlesen selbst und bleibt ohne Stern.
+    expect(daten[kopf.indexOf("Aufnahme")]).not.toMatch(/\*/);
     expect(zeilen(csv)).toContain(`* ${EINTREFF_HINWEIS}`);
   });
 

@@ -31,6 +31,7 @@ import {
   Hinweise,
   KennzahlenFeld,
   KENNUNG_EINGABE,
+  NAMEN_EINGABE,
   VokabAuswahl,
   useZahlEingabe,
   type SchrittProps,
@@ -233,7 +234,7 @@ function FahrzeugKarte(props: {
           </>
         )}
         <Feld titel="Änderungen bzw. Sondergerät">
-          <input value={f.aenderungen ?? ""} onChange={(e) => set({ aenderungen: e.target.value || undefined })} />
+          <input value={f.aenderungen ?? ""} onChange={(e) => set({ aenderungen: e.target.value || undefined })} {...NAMEN_EINGABE} />
         </Feld>
       </div>
     </div>

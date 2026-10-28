@@ -26,9 +26,11 @@ Funktionalität: Bogen im Assistenten erfassen
     Dann sehe ich den Hinweis "Ort/Auftrag ist noch leer."
 
   Szenario: Der Assistent führt durch alle sechs Schritte
-    Dann ist die Schaltfläche "← Zurück" gesperrt
+    # R18-N8: Im ersten Schritt gibt es kein Zurück — der gesperrte Knopf ist unsichtbar statt gestrichelt.
+    Dann sehe ich die Schaltfläche "← Zurück" nicht
     Wenn ich auf "Weiter →" klicke
     Dann sehe ich den Schritt "2. Einsatz"
+    Und ist die Schaltfläche "← Zurück" bedienbar
     Wenn ich auf "Weiter →" klicke
     Dann sehe ich den Schritt "3. Personal"
     Wenn ich auf "Weiter →" klicke
@@ -155,6 +157,9 @@ Funktionalität: Bogen im Assistenten erfassen
     Und ich auf "Namen einfügen…" klicke
     Dann sehe ich den Dialog "Namen einfügen"
     Wenn ich im Dialog den Text "Muster, Max\nErika Musterfrau\nJan Jansen" eingebe
+    # Zeilen ohne Komma: Die Lesart wird gewählt, nicht geraten (R18-S7); vorher bleibt „Übernehmen" gesperrt.
+    Dann ist im Dialog "3 Personen übernehmen" gesperrt
+    Wenn ich im Dialog "Vorname Nachname" ankreuze
     Und ich im Dialog auf "3 Personen übernehmen" klicke
     Und ich zum Schritt "6. Übersicht" wechsle
     Dann sehe ich die Überschrift "Personal (3)"

@@ -504,6 +504,25 @@ export function natoZeitstempel(d: Date = new Date()): string {
   );
 }
 
+/** Zeitstempel für Dateinamen, lesbar und nach Namen zeitlich sortierbar: „2026-10-27_2237" (R18-W6/H9/N10). */
+export function dateiZeitstempel(d: Date = new Date()): string {
+  const zwei = (n: number) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${zwei(d.getMonth() + 1)}-${zwei(d.getDate())}_${zwei(d.getHours())}${zwei(d.getMinutes())}`;
+}
+
+/**
+ * Dateiname einer Ausgabe: `<Datum>_<Uhrzeit>_eeb-<Art>_<Rumpf>.<Endung>` — der Zeitpunkt steht einmal und vorn,
+ * die Art (lageblatt, einsatz-nachtrag …) dahinter, der Einheits- oder Einsatzname zuletzt.
+ */
+export function ausgabeDateiname(art: string, rumpf: string, endung: string, d: Date = new Date()): string {
+  return `${dateiZeitstempel(d)}_eeb${art ? `-${art}` : ""}_${rumpf}.${endung}`;
+}
+
+/** Art einer Ausgabe mit dem Namensteil der Lieferung („einsatz" + „nachtrag" → „einsatz-nachtrag"; ohne Marke unverändert). */
+export function artMitMarke(art: string, marke: string): string {
+  return marke ? `${art}-${marke}` : art;
+}
+
 /** Dateinamens-Rumpf aus dem Anzeigenamen der Einheit („THW_Oldenburg_NI_FGr_K_A"). */
 /** Freitext (Einheits-, Vorlagenname) → unbedenklicher Teil eines Dateinamens. */
 export function dateinameTeil(text: string): string {

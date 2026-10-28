@@ -15,7 +15,7 @@ import helvetica from "pdfmake/build/standard-fonts/Helvetica";
 import type { Erfassungsbogen } from "@bos/eeb-format/model";
 import { base64UrlDekodieren } from "@bos/eeb-format/codec";
 import { absenderLabel } from "@bos/eeb-format/signatur";
-import { dateinameTeil, einheitAnzeigename, natoZeitstempel, qrErzeugen } from "./hilfen";
+import { artMitMarke, ausgabeDateiname, dateinameTeil, einheitAnzeigename, qrErzeugen } from "./hilfen";
 import { istNativ, binaerTeilen } from "./nativ";
 import { fortschrittMelden } from "./arbeitet";
 import { einsatzLageblattSeiteFuellen, einsatzPdfDokumentGesetzt, einzelPdfDokument, nichtDarstellbareBetroffene, nichtDarstellbareNamen, pdfDokument, umschriftBetroffene, vereinfachtBetroffene, type SammelBogen, type UebersichtEintrag } from "./pdf-dokument";
@@ -87,7 +87,7 @@ export async function pdfErzeugen(
   const umschrift = umschriftBetroffene(b);
   const vereinfacht = vereinfachtBetroffene(b);
   const rumpf = dateinameTeil(einheitAnzeigename(b.einheit));
-  const dateiname = name ?? `eeb-${natoZeitstempel()}_${rumpf}.pdf`;
+  const dateiname = name ?? ausgabeDateiname("", rumpf, "pdf");
   if (istNativ()) {
     // In der App gibt es keinen Browser-Download: PDF übers Share-Sheet anbieten
     const base64 = await pdfMake.createPdf(dd).getBase64();
@@ -164,7 +164,7 @@ export async function meldungPdfAnzeigen(m: MeldeEintrag, fenster: Window | null
 
 /** `eeb-<Stand>_<Einheit>.pdf` — Stand des Bogens in der Schreibweise der anderen Dateien (R17-A2). */
 export function einzelDateiname(b: Erfassungsbogen): string {
-  return `eeb-${natoZeitstempel(new Date(zeitpunktZuMs(b.stand)))}_${dateinameTeil(einheitAnzeigename(b.einheit))}.pdf`;
+  return ausgabeDateiname("", dateinameTeil(einheitAnzeigename(b.einheit)), "pdf", new Date(zeitpunktZuMs(b.stand)));
 }
 
 /** Text des Platzhalter-Tabs, solange der Bogen entsteht. */
@@ -220,6 +220,7 @@ function uebersichtEintrag(
     ...(absenderLabel(m.signatur?.absender) ? { absender: absenderLabel(m.signatur?.absender) } : {}),
     ...(m.rueckkehr ? { rueckkehr: m.rueckkehr } : {}),
     ...(m.angaben ? { angaben: m.angaben } : {}),
+    ...(m.standAbsender ? { standAbsender: m.standAbsender } : {}),
     ...(m.vomPapier != null ? { zeitUnbestaetigt: true } : {}),
     // Eintreffzeit = Zeit des Einlesens am Gerät, nie von Hand gesetzt (R14-A1): nicht vom Absender, nicht vom Meldeblock.
     ...(m.vomPapier == null && zeitEingelesen(m, revs) ? { zeitEingelesen: true } : {}),
@@ -286,8 +287,8 @@ export async function einsatzPdfErzeugen(
   nachtragSeit?: number,
   /**
    * Namensteil der Lieferung (export-stand.ts `lieferungsMarke`): für alle
-   * Formate gleich, „nachtrag-seit-…-" bzw. „erste-lieferung-" (R5-W8). Ohne
-   * Angabe heißt ein Nachtrag „nachtrag-".
+   * Formate gleich, „nachtrag" bzw. „erste-lieferung" (R5-W8). Ohne
+   * Angabe (oder leer) heißt ein Nachtrag „nachtrag".
    */
   dateiMarke?: string,
 ): Promise<boolean> {
@@ -302,6 +303,7 @@ export async function einsatzPdfErzeugen(
   }
   await fortschrittMelden("Seiten werden gesetzt — bei vielen Bögen der längste Schritt, Seite offen lassen");
   const nachtrag = historie !== einsatz.eintraege;
+  const marke = dateiMarke ?? (nachtrag ? "nachtrag" : "");
   // Ein Probesatz ohne Bilder misst, welche Bögen mit ihrer letzten Zeile allein
   // auf einer Seite stünden, und setzt diese enger (R4-A7).
   const dd = await einsatzPdfDokumentGesetzt(
@@ -317,7 +319,7 @@ export async function einsatzPdfErzeugen(
   await fortschrittMelden("Datei wird geschrieben …");
   // Teilexport („nur neue Bögen") mit eigenem Dateinamen — sonst hießen
   // Nachtrag und ganze Sammlung gleich (Audit Runde 2, R2-A3).
-  const ok =await dokumentAusgeben(dd, `eeb-einsatz-${dateiMarke ?? (nachtrag ? "nachtrag-" : "")}${natoZeitstempel()}_${dateiRumpf(einsatz)}.pdf`);
+  const ok =await dokumentAusgeben(dd, ausgabeDateiname(artMitMarke("einsatz", marke), dateiRumpf(einsatz), "pdf"));
   // Die ganze Sammlung ging heraus — womöglich an die nächste Schicht. Die
   // Einsatzansicht sagt danach, wann, und was seitdem nur hier dazukam
   // (Audit Runde 2, R2-W5). Der Nachtrag „nur neue Bögen" ist keine Übergabe.
@@ -336,7 +338,7 @@ export async function einsatzLageblattErzeugen(einsatz: Einsatzsammlung): Promis
   // Zwei Sätze: der erste misst, wie viel Platz unter dem Inhalt bleibt, der
   // zweite füllt ihn mit Nachtragszeilen (Audit Runde 3, R3-A5).
   const dd = await einsatzLageblattSeiteFuellen(einsatz.name, eintraege, (probe) => pdfMake.createPdf(probe).getBuffer());
-  const ok = await dokumentAusgeben(dd, `eeb-lageblatt-${natoZeitstempel()}_${dateiRumpf(einsatz)}.pdf`);
+  const ok = await dokumentAusgeben(dd, ausgabeDateiname("lageblatt", dateiRumpf(einsatz), "pdf"));
   // Merken, wann das Blatt entstand — die Einsatzansicht sagt dann „Lageblatt
   // 16:30 · seitdem 1 neue Meldung" (Audit Runde 2, R2-A3).
   if (ok) lageblattVermerken(einsatz);

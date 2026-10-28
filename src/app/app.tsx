@@ -40,7 +40,8 @@ import {
   dateinameTeil,
   einheitAnzeigename,
   einheitOrt,
-  natoZeitstempel,
+  artMitMarke,
+  ausgabeDateiname,
   neuerBogen,
   pruefpunkte,
   schrittStatus,
@@ -74,7 +75,6 @@ import { Musterung, VorlagenListe } from "./vorlagen-ui";
 import { musterungVorlageAusStand } from "./musterung-stand";
 import { rueckwegeVergessen } from "./rueckweg-sitzung";
 import { gezaehltWegMerken } from "./gezaehlt-weg";
-import { SOLL_NICHT_GEMELDET } from "./soll-text";
 import { einsatzVorbereiten, einsatzWegGilt, einsatzWegHolen, einsatzWegVergessen, einsatzWiederherstellen, type EinsatzWeg } from "./einsatz-vorbereiten";
 import { absenderkarteGefuellt, absenderkarteLaden, type Absenderkarte } from "./absenderkarte";
 import { AbsenderkarteFeld } from "./absenderkarte-ui";
@@ -106,7 +106,7 @@ import {
   zeitKurz,
   zeitLang,
 } from "./eintrag-zeiten";
-import { offlineText, offlineZeileOffen, useOfflineStand } from "./offline-bereit";
+import { offlineLangText, offlineText, offlineZeileOffen, useOfflineStand } from "./offline-bereit";
 import { uebergabeBestaetigen, uebergabeNachWeg, uebergabeText, type UebergabeStand } from "./uebergabe-stand";
 import { ART_LABEL, EinsatzDetail, EinsatzListe, type Eingang } from "./einsaetze-ui";
 import { uebersprungenText } from "./uebersprungen-text";
@@ -173,6 +173,7 @@ import { selbstGeloeschtMeldung } from "./einsatz-geloescht";
 import { wartendenLinkErledigt, wartendenLinkLesen, wartendenLinkMerken } from "./wartender-link";
 import { FesteWarnung } from "./feste-warnung";
 import { speicherFehlerDetails, speicherFehlerKurz } from "./speicher-fehler-text";
+import { browserSpeicherhuelle } from "./speicher-browser";
 import { UhrHinweis, UhrWarnung } from "./uhr-warnung";
 import { Dialogschicht, frageFelder, frageJaNein, frageWahl, zeigeHinweis, type Antwortweg } from "./dialoge";
 import { istNurStaerke, nurStaerkeUebernehmen, wasWegfiele } from "./nur-staerke";
@@ -204,6 +205,20 @@ function bogenNachFrist(b: Erfassungsbogen): { bogen: Erfassungsbogen; anonymisi
   if (!datenschutzfristAbgelaufen(b, datenschutzZeitpunkt())) return { bogen: b, anonymisiert: false };
   return { bogen: bogenAnonymisiert(b), anonymisiert: true };
 }
+
+/**
+ * Ziel von „← Zurück" im Assistenten. In der Schnellerfassung führt „Weiter" von Schritt 1 gleich auf Schritt 3 (der Reiter 2
+ * zeigt „–", „entfällt"); „←" springt ebenso zurück, statt auf dem entfallenden Schritt 2 zu landen (R18-S6).
+ */
+export function zurueckSchritt(schritt: number, schnellErfassung: boolean): number {
+  if (schnellErfassung && schritt === 2) return 0;
+  return Math.max(0, schritt - 1);
+}
+
+/** „Einsatz anlegen" bei gesperrtem Browser-Speicher: Grund und Ausweg dort, wo getippt wurde (R18-O1). */
+export const SAMMLUNG_GESPERRT_TEXT =
+  "Dieser Browser lässt die App gerade nichts speichern (privates Fenster oder Datenschutz-Einstellung). Eine Sammlung ginge beim Schließen verloren. " +
+  "Ein normales Fenster öffnen oder Speichern für diese Seite erlauben; bis dahin Bögen als PDF übergeben.";
 
 const FRIST_ABGELAUFEN_MELDUNG =
   `Die Datenschutzfrist dieses Bogens ist abgelaufen (${DATENSCHUTZFRIST_TAGE} Tage nach der letzten Änderung) — ` +
@@ -850,6 +865,9 @@ function AppInhalt() {
   const [schritt, setSchritt] = useState(START_SOFORT ? UEBERSICHT : ENTWURF ? (ENTWURF.schritt ?? UEBERSICHT) : 0);
   const richtung = useSchrittRichtung(schritt);
   const offline = useOfflineStand();
+  // Wechselt die Offline-Zeile beim Erstbesuch ihren Text, hält sie bis zum Neuladen die Höhe der längsten Fassung (R18-K7, M10).
+  const [offlinePlatz, setOfflinePlatz] = useState(() => offlineZeileOffen(offline));
+  if (!offlinePlatz && offlineZeileOffen(offline)) setOfflinePlatz(true);
   // Schrittwechsel (Weiter, Zurück, Schrittleiste, Prüfpunkt): der neue
   // Schritt beginnt oben. Vorher blieb die Scrollposition des vorigen stehen,
   // und Schritt 2 bis 4 öffneten mitten im Formular — Ort/Auftrag, die
@@ -911,6 +929,8 @@ function AppInhalt() {
         ? `Entwurf vom ${new Date(ENTWURF.gespeichert).toLocaleString("de-DE", { dateStyle: "short", timeStyle: "short" })} Uhr wiederhergestellt.${ENTWURF.fremd ? " Die Aufnahme läuft dort weiter, wo du warst." : " „Fortsetzen“ öffnet ihn dort, wo du warst."}`
         : "",
   );
+  /** Der Satz „Entwurf … wiederhergestellt" gehört in die Entwurfskarte (R18-N7). */
+  const meldungInKarte = !!bogen && meldung.startsWith("Entwurf vom ");
   const [scannerOffen, setScannerOffen] = useState(false);
   // Zuletzt verdrängter Arbeitsbogen (entwurf.ts): Solange er hier steht,
   // bietet die Startseite ihn zum Zurückholen an.
@@ -1216,6 +1236,17 @@ function AppInhalt() {
       // eigenen Eintrag an, damit Zurück sie schließt statt die App zu verlassen
       // (R5-S5, modal-overlay.ts). Nach dem Neuladen ist `eeb` schon da.
       const roh = (history.state ?? {}) as { eeb?: Ansicht };
+      // Kaltstart direkt in den zuletzt geöffneten Einsatz (R18-K12): Darunter liegt ein Eintrag „Startseite", damit Zurück
+      // zuerst die Startseite zeigt („die anderen Einsätze") und die App nicht verlässt. Nach dem Neuladen ist `eeb` schon da.
+      if (!roh.eeb && jetzt.einsatz && !jetzt.scanner && !jetzt.muster) {
+        try {
+          history.replaceState({ ...roh, eeb: { ...jetzt, einsatz: null }, eebErste: true }, "");
+          history.pushState({ eeb: jetzt }, "");
+        } catch {
+          /* ohne Verlauf */
+        }
+        return;
+      }
       history.replaceState({ ...roh, eeb: jetzt, ...(roh.eeb ? {} : { eebErste: true }) }, "");
       return;
     }
@@ -1991,11 +2022,12 @@ function AppInhalt() {
     const vorlage = bearbeiteteVorlage;
     const unveraendert = vorlageUnveraendert();
     const sicher = await frageJaNein({
-      titel: vorlage ? "Bearbeitung der Vorlage beenden?" : fremdeErfassung ? "Angefangene Erfassung verwerfen?" : "Angefangenen Bogen verwerfen?",
+      // Ein Name für beides (R18-N6): „Bogen schließen" heißt überall „aufbewahren, nicht löschen" — wie in der Übersicht.
+      titel: vorlage ? "Bearbeitung der Vorlage beenden?" : fremdeErfassung ? "Angefangene Erfassung schließen?" : "Angefangenen Bogen schließen?",
       text: vorlage
         ? `Die Bearbeitung der Vorlage „${vorlage.name}" wird beendet. ${folgen.satz}`
         : `„${einheitAnzeigename(bogen.einheit)}" wird geschlossen. ${folgen.satz}`,
-      ok: vorlage ? "Bearbeitung beenden" : "Verwerfen",
+      ok: vorlage ? "Bearbeitung beenden" : "Bogen schließen",
       gefahr: vorlage ? folgen.verlust : true,
     });
     if (!sicher) return;
@@ -2022,7 +2054,7 @@ function AppInhalt() {
     setSammelZiel(null);
     setzeEmpfang(null);
     setSchritt(0);
-    setMeldung(gemerkt ? "Angefangener Bogen verworfen — Rückholung oben auf der Startseite." : "Angefangene Erfassung verworfen.");
+    setMeldung(gemerkt ? "Angefangener Bogen geschlossen — Rückholung oben auf der Startseite." : "Angefangene Erfassung geschlossen.");
   }
 
   /**
@@ -3017,6 +3049,12 @@ function AppInhalt() {
    * offenen Bogen) fragen dasselbe — deshalb eine gemeinsame Stelle.
    */
   async function einsatzErfragen(): Promise<Einsatzsammlung | null> {
+    // Lässt der Browser nichts speichern (privates Fenster), entstünde keine Sammlung: Das sagt schon der Tipp auf
+    // „Neue Einsatz-Sammlung…", bevor ein Name getippt wird (R18-O1).
+    if (browserSpeicherhuelle() === null) {
+      await zeigeHinweis({ titel: "Sammlung nicht angelegt", text: SAMMLUNG_GESPERRT_TEXT });
+      return null;
+    }
     const werte = await frageFelder({
       titel: "Neue Einsatz-Sammlung anlegen",
       hinweis:
@@ -3057,6 +3095,11 @@ function AppInhalt() {
         titel: "Sammlung nicht angelegt",
         text: istSpeicherVoll(e) ? new SpeicherVollFehler(e).message : fehlerText(e),
       });
+      return null;
+    }
+    // Schreiben still gescheitert (Speicher gesperrt, nicht voll)? Dann liegt die Sammlung nicht im Speicher (R18-O1).
+    if (!einsaetzeLaden().some((x) => x.id === s.id)) {
+      await zeigeHinweis({ titel: "Sammlung nicht angelegt", text: SAMMLUNG_GESPERRT_TEXT });
       return null;
     }
     einsaetzeNeuLaden();
@@ -3171,18 +3214,19 @@ function AppInhalt() {
     const wahl = await frageWahl({
       titel: "Nur Sollplätze, keine gemeldete Stärke",
       text: nurZahl
-        ? `Für „${einheitAnzeigename(b.einheit)}" stehen noch die Zahlen der Vorbelegung nach Einheitstyp (Soll: ${s.fuehrer} / ${s.unterfuehrer} / ${s.mannschaft} / ${s.gesamt}${b.fahrzeuge.length ? `, ${b.fahrzeuge.length} Fahrzeug${b.fahrzeuge.length === 1 ? "" : "e"}` : ""}) — niemand hat gezählt. Die Lage zählte sie sonst als gemeldete Stärke.`
+        ? `Für „${einheitAnzeigename(b.einheit)}" stehen noch die Zahlen der Vorbelegung (Soll: ${s.fuehrer} / ${s.unterfuehrer} / ${s.mannschaft} / ${s.gesamt}${b.fahrzeuge.length ? `, ${b.fahrzeuge.length} Fahrzeug${b.fahrzeuge.length === 1 ? "" : "e"}` : ""}) — niemand hat gezählt.`
         : `Für „${einheitAnzeigename(b.einheit)}" stehen nur die Sollplätze nach StAN (Stärke ${s.fuehrer} / ${s.unterfuehrer} / ${s.mannschaft} / ${s.gesamt}${b.fahrzeuge.length ? `, ${b.fahrzeuge.length} Fahrzeug${b.fahrzeuge.length === 1 ? "" : "e"}` : ""}) — niemand hat Personen eingetragen.`,
       wege: [
-        { wert: "eintragen", label: "Stärke jetzt eintragen", hinweis: "Springt zum Personal — Namen oder nur die Zahl (Schnellerfassung)." },
-        { wert: "soll", label: "Als Sollstärke ablegen", hinweis: `${SOLL_NICHT_GEMELDET}, bis eine echte Zahl vorliegt. Karte, Lageblatt und Sammel-PDF tragen die Marke „Sollstärke, nicht gemeldet“; die Summe nennt den Anteil.` },
+        // Je Antwort ein Satz unter dem Knopf statt einer Liste davor (R18-S4): Wer in Sekunden entscheidet, liest die Knöpfe.
+        { wert: "eintragen", label: "Stärke jetzt eintragen", kurz: "Springt zum Personal." },
+        { wert: "soll", label: "Als Sollstärke ablegen", kurz: "Zählt nur als Sollwert, nicht als gemeldet." },
         // Zuletzt und als Wahl mit Gewicht: Sie macht erfundene Zahlen zur Meldung; danach quittiert die Sammlung mit „Rückgängig" (R16-S3).
         ...(nurZahl
           ? [
               {
                 wert: "gezaehlt",
                 label: "Zahlen stimmen, so gezählt",
-                hinweis: "Die Einheit hat genau diese Stärke gemeldet; die leeren Vorbelegungskarten fallen weg. „Rückgängig“ führt sie danach wieder als Sollstärke.",
+                kurz: "Die Einheit hat genau diese Zahlen gemeldet; „Rückgängig“ geht danach.",
                 gefahr: true,
               },
             ]
@@ -3575,29 +3619,36 @@ function AppInhalt() {
     return blockieren;
   }
 
+  /** Quittung einer Tabellendatei: Name und Ablageort, damit am Telefon klar ist, welche Datei an den Stab geht (R18-A4). */
+  function dateiQuittungText(name: string, s: Einsatzsammlung): string {
+    return `✓ Gespeichert: ${name} — im Download-Ordner bzw. über das Teilen-Menü abgelegt.${einsatzLeer(s) ? ` ${LEERE_DATEI_TEXT}` : ""}`;
+  }
+
   async function exportiereEinsatzCsv(s: Einsatzsammlung, umfang: ExportUmfang) {
+    setAusgabeQuittung(null);
     leererEinsatz(s);
     const teil = exportSammlung(s, umfang, exportStaende.csv ?? null);
     const marke = nachtragMarke(umfang, "csv");
     // Erst beim Klick geladen: der CSV-Schreiber gehört nicht ins Startbündel.
     const { einsatzCsvInhalt } = await import("./einsatz-csv");
-    const ok = await dateiAnbieten(
-      `eeb-einsatz-${marke}${natoZeitstempel()}_${einsatzDateiname(s)}.csv`,
-      einsatzCsvInhalt(teil, meldungsNummern(s.eintraege), undefined, s.eintraege),
-      "text/csv;charset=utf-8",
-    );
-    if (ok) exportVerbuchen(s, "csv");
+    const name = ausgabeDateiname(artMitMarke("einsatz", marke), einsatzDateiname(s), "csv");
+    const ok = await dateiAnbieten(name, einsatzCsvInhalt(teil, meldungsNummern(s.eintraege), undefined, s.eintraege), "text/csv;charset=utf-8");
+    if (ok) {
+      exportVerbuchen(s, "csv");
+      setAusgabeQuittung(dateiQuittungText(name, s));
+    }
   }
 
   async function exportiereEinsatzCsvDetail(s: Einsatzsammlung, umfang: ExportUmfang) {
+    setAusgabeQuittung(null);
     leererEinsatz(s);
     const teil = exportSammlung(s, umfang, exportStaende["csv-detail"] ?? null);
-    const ok = await dateiAnbieten(
-      `eeb-einsatz-${nachtragMarke(umfang, "csv-detail")}${natoZeitstempel()}_${einsatzDateiname(s)}-alle-daten.csv`,
-      einsatzDetailCsvInhalt(teil, meldungsNummern(s.eintraege), s.eintraege),
-      "text/csv;charset=utf-8",
-    );
-    if (ok) exportVerbuchen(s, "csv-detail");
+    const name = ausgabeDateiname(artMitMarke("einsatz-alle-daten", nachtragMarke(umfang, "csv-detail")), einsatzDateiname(s), "csv");
+    const ok = await dateiAnbieten(name, einsatzDetailCsvInhalt(teil, meldungsNummern(s.eintraege), s.eintraege), "text/csv;charset=utf-8");
+    if (ok) {
+      exportVerbuchen(s, "csv-detail");
+      setAusgabeQuittung(dateiQuittungText(name, s));
+    }
   }
 
   /**
@@ -3605,16 +3656,17 @@ function AppInhalt() {
    * XLSX-Schreiber samt Stiltabelle wird nur beim Klick gebraucht (wie die PDF).
    */
   async function exportiereEinsatzOldenburg(s: Einsatzsammlung, umfang: ExportUmfang) {
+    setAusgabeQuittung(null);
     leererEinsatz(s);
     const teil = exportSammlung(s, umfang, exportStaende.xlsx ?? null);
     try {
       const { XLSX_MIME, einsatzOldenburgXlsx } = await import("./oldenburg-xlsx");
-      const ok = await bytesAlsDatei(
-        `eeb-einsatz-${nachtragMarke(umfang, "xlsx")}${natoZeitstempel()}_${einsatzDateiname(s)}-oldenburg.xlsx`,
-        einsatzOldenburgXlsx(teil, s.eintraege),
-        XLSX_MIME,
-      );
-      if (ok) exportVerbuchen(s, "xlsx");
+      const name = ausgabeDateiname(artMitMarke("einsatz-oldenburg", nachtragMarke(umfang, "xlsx")), einsatzDateiname(s), "xlsx");
+      const ok = await bytesAlsDatei(name, einsatzOldenburgXlsx(teil, s.eintraege), XLSX_MIME);
+      if (ok) {
+        exportVerbuchen(s, "xlsx");
+        setAusgabeQuittung(dateiQuittungText(name, s));
+      }
     } catch (e) {
       setFehler(`Excel-Liste: ${fehlerText(e)}`);
     }
@@ -3654,8 +3706,8 @@ function AppInhalt() {
         // Die Bestätigung steht direkt unter den Knöpfen (R5-L4), nicht am Seitenende.
         setAusgabeQuittung(
           umfang === "neue"
-            ? `✓ Neue Bögen aus „${s.name}" als PDF erzeugt — liegt im Download-Ordner bzw. wurde über das Teilen-Menü abgelegt. Übergeben ist sie erst, wenn sie gedruckt oder verschickt ist.`
-            : `✓ Einsatz „${s.name}" als PDF erzeugt (mit allen Meldungen, Zeiten und Historie) — liegt im Download-Ordner bzw. wurde über das Teilen-Menü abgelegt. Weitergegeben ist sie erst, wenn sie bei der Ablösung oder im Archiv angekommen ist.${weitergabe ? " Für den Stab zählt sie nicht als Lieferung: Nachträge dorthin laufen über „Nur neue Bögen seit dem letzten Export“." : ""}`,
+            ? `✓ Neue Bögen aus „${s.name}" als PDF gespeichert (Download-Ordner bzw. Teilen-Menü). Ob sie angekommen ist, weiß das Gerät nicht.`
+            : `✓ Einsatz „${s.name}" als PDF gespeichert (Download-Ordner bzw. Teilen-Menü). Ob sie angekommen ist, weiß das Gerät nicht.`,
         );
       } catch (e) {
         setFehler(`Einsatz weitergeben: ${fehlerText(e)}`);
@@ -4464,7 +4516,7 @@ function AppInhalt() {
     const schnellVorlagen = [...vorlagen]
       .sort((a, b) => Number(!!b.standard) - Number(!!a.standard) || b.geaendert - a.geaendert)
       .slice(0, 2);
-    const offlineHinweis = (
+    const offlineZeile = (
       <p className={`offline-badge${offline.stand === "bereit" ? "" : " offline-laedt"}${offlineZeileOffen(offline) ? " offline-offen" : ""}`} role="status">
         {offlineText(offline)}
         {/* Abgebrochenes Erstladen: Der Ausweg steht neben der Meldung (R4-O1). */}
@@ -4476,6 +4528,13 @@ function AppInhalt() {
         )}
       </p>
     );
+    // Unsichtbarer Platzhalter in der Höhe der längsten Fassung; der Text steht im Attribut, damit er weder vorgelesen noch gefunden wird.
+    const offlineHinweis = offlinePlatz ? (
+      <div className="offline-platz">
+        {offlineZeile}
+        <p className="offline-badge offline-geist" aria-hidden="true" data-text={offlineLangText(offline)} />
+      </div>
+    ) : offlineZeile;
     return (
       <>
       <Aktualisierungshinweise />
@@ -4561,13 +4620,18 @@ function AppInhalt() {
                   const u = uebergabeText(bogen, uebergabe);
                   return u && <span className={`hinweis${u.geaendert ? " warnung-text" : ""}`}>{u.text}</span>;
                 })()}
+                {/* „Entwurf … wiederhergestellt" steht in der Karte, zu der der Satz gehört, nicht darunter (R18-N7). */}
+                {meldungInKarte && <span className="hinweis">{meldung}</span>}
                 {/* Alter Bogen: der Zeitraum steht auf der Karte, bevor jemand „Fortsetzen" tippt (R2-S1). */}
                 {bogen.einsatz.zeitraumBis < heuteDatum() && (
                   <span className="hinweis warnung-text">Einsatz {zeitraumDeutsch(bogen)}</span>
                 )}
                 <span className="hinweis">
                   {/* Kurzlegende sichtbar: die Zahlen allein erklärte nur Schritt 3 (R2-N9). */}
-                  Stärke {s.fuehrer} / {s.unterfuehrer} / {s.mannschaft} / {s.gesamt} (F / UF / M / Ges)
+                  {/* Nur Sollplätze aus der Vorbelegung: keine Meldung, die Zahl nennt sich so (R18-N7). */}
+                  {nurSollstaerke(bogen)
+                    ? `${s.gesamt} Sollplätze, noch ohne Namen`
+                    : `Stärke ${s.fuehrer} / ${s.unterfuehrer} / ${s.mannschaft} / ${s.gesamt} (F / UF / M / Ges)`}
                   {/* Mit ausgefallenem Speicher stand hier „gespeichert 21:01 Uhr"
                       für einen Stand, der nicht im Speicher liegt (Audit Runde 4,
                       R4-E5). */}
@@ -4620,7 +4684,7 @@ function AppInhalt() {
                     und glich dem „Verwerfen" eines echten Bogens: Die Vorlage
                     bleibt, wie sie war (Audit Runde 4, R4-D5). */}
                 <button type="button" className={bearbeiteteVorlage ? "" : "gefahr"} onClick={entwurfWegwerfen}>
-                  {bearbeiteteVorlage ? "Bearbeitung beenden" : "Verwerfen"}
+                  {bearbeiteteVorlage ? "Bearbeitung beenden" : "Bogen schließen"}
                 </button>
               </span>
             </section>
@@ -4712,7 +4776,7 @@ function AppInhalt() {
         {/* Rückmeldungen stehen ÜBER den Aktionen: „Entwurf … wiederhergestellt"
             erklärt die Karte darüber, und unter den Knöpfen klebte der Kasten
             optisch an der Knopfreihe, statt ein eigener Block zu sein. */}
-        {meldung && (
+        {meldung && !meldungInKarte && (
           <p className="meldung" role="status" key={meldung}>
             {meldung}
             {vorlageRueckwegKnopf()}
@@ -4997,7 +5061,7 @@ function AppInhalt() {
       {/* Der aktive Schritt steht nicht nur als CSS-Klasse da: ohne
           aria-current="step" liest eine Vorlesesoftware sechs gleichwertige
           Knöpfe vor und sagt nicht, wo man gerade ist. */}
-      <nav className="schritte" aria-label="Schritte">
+      <nav className={`schritte${schnellOhneBedarfSchritt ? " schritte-schnell" : ""}`} aria-label="Schritte">
         {SCHRITTE.map((name, i) => {
           // Schnellerfassung: Einsatz (2) und Sofortbedarf (5) werden übersprungen — kein Haken für Unerledigtes (R14-N3).
           const entfaellt = fremdeErfassung && bogen.personalErfassung === PersonalErfassung.NUR_STAERKE && (i === 1 || i === 4);
@@ -5029,6 +5093,13 @@ function AppInhalt() {
       {fremdeErfassung && bogen.personalErfassung === PersonalErfassung.NUR_STAERKE && (schritt === 0 || schritt === 1 || schritt === 4) && (
         <p className="schritte-erklaerung">„–“ heißt: Schritt 2 und 5 entfallen hier.</p>
       )}
+      {/* Schnellerfassung am Telefon (R18-W7): Schrittleiste und Legende sind dort eingeklappt (CSS); eine Zeile nennt den
+          Stand — vier Schritte statt sechs, ohne zwei Zeilen Kopf mehr. Am Rechner bleibt die Leiste. */}
+      {schnellOhneBedarfSchritt && (() => {
+        const folge = [0, 2, 3, UEBERSICHT];
+        const nr = folge.indexOf(schritt) + 1;
+        return nr > 0 ? <p className="schritte-schnell-kurz">Schritt {nr} von {folge.length}: {SCHRITTE[schritt]}</p> : null;
+      })()}
       {fenster.konflikt ? (
         <FensterKonflikt abgleich={fenster} />
       ) : speicherFehler ? (
@@ -5204,7 +5275,7 @@ function AppInhalt() {
         <footer className={sammelEinsatz ? `nav assistent-nav mit-uebernehmen${schnellOhneBedarfSchritt ? " uebernehmen-haupt" : ""}` : "nav assistent-nav"}>
           {/* Unter 360 px steht nur „←" (das Wort fällt per CSS weg), damit der
               Modusknopf daneben Platz hat; der Name bleibt „← Zurück". */}
-          <button type="button" className="nav-zurueck" aria-label="← Zurück" disabled={schritt === 0} onClick={() => setSchritt(schritt - 1)}>
+          <button type="button" className="nav-zurueck" aria-label="← Zurück" disabled={schritt === 0} onClick={() => setSchritt(zurueckSchritt(schritt, fremdeErfassung && bogen.personalErfassung === PersonalErfassung.NUR_STAERKE))}>
             ←<span className="nav-wort"> Zurück</span>
           </button>
           {/* Moduswechsel aus der festen Leiste, ohne die Stelle im Formular

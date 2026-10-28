@@ -21,6 +21,7 @@ import { meldungsNummern, pruefpunkteEintrag } from "./einheiten-tabelle";
 import { aktuelleMeldungen, unterbringungLage, verpflegungAngefordertLage, verpflegungLage, zaehltInLage } from "./auswertung";
 import { csvDatei, csvZeile, mitNachtragSpalte } from "./csv";
 import { exportKennzeile, nachtragGrundText, ortHinweisText, ortHinweise } from "./export-stand";
+import { handAenderungText } from "./angaben-alter";
 import { EINTREFF_HINWEIS, HERKUNFT_TEXT, eintreffzeit, eintreffzeitUnbestaetigt, zeitLang } from "./eintrag-zeiten";
 import { MeldeStatus, type Einsatzsammlung, type MeldeEintrag, type MeldeQuelle } from "@bos/meldekopf/einsaetze";
 
@@ -67,13 +68,14 @@ const SPALTEN = [
   // Liste (R4-K8).
   "Fahrzeuge (Anzahl)",
   "Fahrzeuge (Liste)",
-  "Stand",
+  // „Stand der Angaben" = Zeitpunkt, auf den sich die Angaben der Einheit beziehen (beim Absender); „Aufnahme" =
+  // Moment, in dem das Gerät die Meldung angenommen hat (R18-K1).
+  "Stand der Angaben",
   // Eintreff- und Abrückzeit der Führungsstelle — für Einsatztagebuch und
-  // Abrechnung (Führungssicht-Audit K2). „Empfangen" bleibt daneben der
-  // Moment, in dem das Gerät die Meldung angenommen hat.
+  // Abrechnung (Führungssicht-Audit K2).
   "Eingetroffen",
   "Abgerückt",
-  "Empfangen",
+  "Aufnahme",
   "Quelle",
   "Status",
   "Zählt in Lage",
@@ -136,7 +138,7 @@ function sollAnteilText(meldungen: MeldeEintrag[]): string {
   return `, davon ${personen} ${personen === 1 ? "Person" : "Personen"} Sollstärke, nicht gemeldet`;
 }
 
-function datenZeile(art: EinsatzArt, e: MeldeEintrag, nr: number | undefined, grund?: string, fremderOrt?: string, eintreffUnbestaetigt = false): string {
+function datenZeile(art: EinsatzArt, e: MeldeEintrag, nr: number | undefined, grund?: string, fremderOrt?: string, eintreffUnbestaetigt = false, ersteQuelle?: MeldeQuelle): string {
   const b = e.bogen;
   const st = staerke(b);
   // Wie Tabelle und Summen: Schnellerfassung zählt die Stärke (R2-N5).
@@ -171,19 +173,20 @@ function datenZeile(art: EinsatzArt, e: MeldeEintrag, nr: number | undefined, gr
     // Eine Zeitform je Datei: „04.10.2026, 14:36" für Stand, Eingetroffen,
     // Abgerückt und Empfangen. Vorher standen „041436okt26",
     // „04.10.2026, 14:41" und „04.10.26, 14:41" in derselben Zeile (R3-K7).
-    zeitpunktDeutsch(b.stand),
+    zeitpunktDeutsch(e.standAbsender ?? b.stand),
     // Stern wie auf Lageblatt und Sammel-PDF: Zeit des Einlesens, nicht bestätigt (R16-A1); Fußnote am Dateiende.
     `${zeitLang(eintreffzeit(e))}${eintreffUnbestaetigt ? " *" : ""}`,
     e.abgerueckAm != null ? zeitLang(e.abgerueckAm) : "",
     zeitLang(e.empfangenAm),
-    QUELLE_LABEL[e.quelle],
+    // Eine am Meldekopf geänderte Fassung bleibt „Aus Datei, am Meldekopf geändert", nicht „Manuell erfasst" (R18-A3).
+    e.angaben ? `${QUELLE_LABEL[e.quelle === "manuell" && ersteQuelle ? ersteQuelle : e.quelle]}, am Meldekopf geändert` : QUELLE_LABEL[e.quelle],
     STATUS_LABEL[e.status],
     zaehlt(art, e) ? "ja" : "nein",
     b.uebung ? "ÜBUNG" : "",
     sofortbedarfText(b),
     // Auch „Anderer Einsatz?": die Warnung der Karte gehört zu den offenen Punkten (R5-K5).
     // Sollstärke zuerst: Die Zahl in „Stärke" hat niemand gezählt (R9-A2).
-    [...(nurSollstaerke(b) ? [SOLL_MARKE] : []), ...pruefpunkteEintrag(e).map((p) => p.text), ...(fremderOrt != null ? [ortHinweisText(fremderOrt)] : [])].join(" | "),
+    [...(handAenderungText(e) ? [handAenderungText(e)] : []), ...(nurSollstaerke(b) ? [SOLL_MARKE] : []), ...pruefpunkteEintrag(e).map((p) => p.text), ...(fremderOrt != null ? [ortHinweisText(fremderOrt)] : [])].join(" | "),
     signaturText(e),
     absenderText(e),
     e.notiz ?? "",
@@ -292,7 +295,10 @@ export function einsatzCsvInhalt(
   const kopf = csvZeile([...SPALTEN, ...(gruende ? ["Im Nachtrag wegen"] : [])]);
   const orte = ortHinweise(s);
   const unbestaetigt = new Set(alle.filter((e) => eintreffzeitUnbestaetigt(e, historie)).map((e) => e.id));
-  const zeilen = alle.map((e) => datenZeile(s.art, e, nummern.get(e.einheitSchluessel), gruende ? nachtragGrundText(gruende[e.einheitSchluessel]) : undefined, orte[e.einheitSchluessel], unbestaetigt.has(e.id)));
+  // Herkunft der ersten Fassung je Einheit: Eine am Meldekopf geänderte Fassung trägt selbst „manuell" (R18-A3).
+  const ersteQuelleJe = (e: MeldeEintrag): MeldeQuelle | undefined =>
+    historie.filter((x) => x.einheitSchluessel === e.einheitSchluessel).sort((a, b) => a.empfangenAm - b.empfangenAm)[0]?.quelle;
+  const zeilen = alle.map((e) => datenZeile(s.art, e, nummern.get(e.einheitSchluessel), gruende ? nachtragGrundText(gruende[e.einheitSchluessel]) : undefined, orte[e.einheitSchluessel], unbestaetigt.has(e.id), e.angaben ? ersteQuelleJe(e) : undefined));
   // Schlusszeilen: Lage und Erstellzeit, bei gekennzeichneter Eintreffzeit die Fußnote (R16-A1). Die Kopfzeile bleibt Zeile 1.
   const fuss = [csvZeile([exportKennzeile(s, erstellt)]), ...(unbestaetigt.size > 0 ? [csvZeile([`* ${EINTREFF_HINWEIS}`])] : [])];
   if (!gruende) {

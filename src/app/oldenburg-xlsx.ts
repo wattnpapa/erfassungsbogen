@@ -89,6 +89,7 @@ import {
 import { geltendeJeEinheit } from "./fassung-vorrang";
 import { zaehltInLage } from "./auswertung";
 import { datumVonMs, einheitenZahl, lueckenAlle, meldungsNummern, pruefpunkteEintrag } from "./einheiten-tabelle";
+import { handAenderungText } from "./angaben-alter";
 import { EINTREFF_HINWEIS, eintreffzeit, eintreffzeitUnbestaetigt, zeitLang } from "./eintrag-zeiten";
 import { exportKennzeile, nachtragGrundText, ortHinweisText, ortHinweise, type NachtragGrund } from "./export-stand";
 
@@ -350,6 +351,8 @@ interface Kontext {
   nr?: number;
   /** Eintreffzeit ist nur der Eingang am Gerät, nicht bestätigt; „Bemerkung" sagt es (R16-A1). */
   eintreffUnbestaetigt?: boolean;
+  /** Vermerk „Stärke am Meldekopf geändert …": Die Zahl stammt nicht (mehr) vom Absender (R18-A3). */
+  handGeaendert?: string;
 }
 
 function zeileFuer(b: Erfassungsbogen, k: Kontext): Zeile {
@@ -412,6 +415,7 @@ function zeileFuer(b: Erfassungsbogen, k: Kontext): Zeile {
       // Die Nr. wie auf dem Lageblatt: Wer Blatt und Tabelle nebeneinanderlegt, findet die Zeile darüber (R9-A2).
       k.nr != null ? `Nr. ${k.nr}` : "",
       k.status ?? "",
+      k.handGeaendert ?? "",
       // Niemand hat gezählt: Die Zahlen sind die Sollstärke der Vorbelegung (R9-A2).
       nurSollstaerke(b) ? "Sollstärke, nicht gemeldet" : "",
       k.nachtrag ? `Nachtrag: ${k.nachtrag}` : "",
@@ -635,5 +639,6 @@ function kontextAus(s: Einsatzsammlung, e: MeldeEintrag, zaehlt: boolean, grund?
       : [],
     status: statusVermerk(s, e),
     zaehltNicht: !zaehlt,
+    ...(e.angaben ? { handGeaendert: handAenderungText(e) } : {}),
   };
 }

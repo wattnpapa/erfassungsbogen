@@ -145,3 +145,34 @@ export function useEingangsquittung<T extends HTMLElement>(
   }, [marke]);
   return element;
 }
+
+/**
+ * Seitenhöhe (Pixel ab Dokumentanfang), an der ein Element oben stand — vor dem Wegnehmen zu messen (R18-A8).
+ */
+export function seitenOben(element: HTMLElement | null): number | null {
+  if (!element || typeof window === "undefined") return null;
+  const oben = element.getBoundingClientRect().top;
+  return Number.isFinite(oben) ? oben + window.scrollY : null;
+}
+
+/**
+ * Nach dem Entfernen einer hohen, aufgeklappten Karte schrumpft die Seite um mehrere Bildschirme, und die Ansicht landete
+ * 600 px unterhalb der Liste im Exportbereich (R18-A8). Liegt die Stelle der entfernten Karte danach nicht mehr im Bild
+ * (oder unter der Quittungsleiste), rollt die Ansicht dorthin zurück: Die nachrückende Karte steht dort, wo die entfernte stand.
+ * Erst nach zwei Bildern, damit die Rollbewegung der Quittungsleiste (daumen-quittung.tsx) schon gelaufen ist.
+ */
+export function stelleHalten(seitenY: number | null): void {
+  if (seitenY == null || typeof window === "undefined" || typeof requestAnimationFrame !== "function") return;
+  requestAnimationFrame(() =>
+    requestAnimationFrame(() => {
+      try {
+        const hoehe = window.innerHeight || 0;
+        const y = window.scrollY;
+        if (hoehe <= 0) return;
+        if (seitenY < y + 48 || seitenY > y + hoehe * 0.6) window.scrollTo({ top: Math.max(0, Math.round(seitenY - 96)), behavior: "auto" });
+      } catch {
+        /* Testumgebung ohne Layout */
+      }
+    }),
+  );
+}

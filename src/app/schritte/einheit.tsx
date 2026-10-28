@@ -648,8 +648,7 @@ export function SchrittEinheit({ bogen, aendern: aendernRoh, ortFokus = false }:
           Meldekopf manchmal doch mit, gesperrt ist nichts. */}
       {bogen.personalErfassung === PersonalErfassung.NUR_STAERKE && (
         <p className="hinweis">
-          Schnellerfassung: Es reichen der Ort der Einheit hier und die Stärke in Schritt 3 —
-          Einsatzdaten, Fahrzeuge und Sofortbedarf können offen bleiben.
+          Schnellerfassung: Ort hier, Stärke in Schritt 3 — der Rest kann offen bleiben.
         </p>
       )}
       <div className="zeile">

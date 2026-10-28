@@ -14,7 +14,7 @@ import { EinsatzArt, MeldeStatus, einsaetzeLaden, einsatzAnlegen, meldungHinzufu
 import { neuerBogen, neuePerson, datumAnzeige, zeitraumDeutsch, pruefpunkte } from "./hilfen";
 import { Dialogschicht } from "./dialoge";
 import { EinsatzDetail } from "./einsaetze-ui";
-import { DaumenQuittung, QUITTUNG_KOMPAKT_NACH_MS } from "./daumen-quittung";
+import { DaumenQuittung, QUITTUNG_ENDE_NACH_MS } from "./daumen-quittung";
 import { anfuehrung, anfuehrungWaechterStarten } from "./typografie";
 import { csvFeld, mitNachtragSpalte } from "./csv";
 import { xmlText } from "./xlsx";
@@ -206,7 +206,7 @@ describe("R17-K1 Handänderung behält das Alter der Meldung", () => {
     expect(karteVon("Albstadt").textContent).toContain("Meldung der Einheit");
   }, 20000);
 
-  it("„Stärke ändern…“ setzt den Stand nicht auf „jetzt“: Alter, Wort und Letzte Meldung bleiben", async () => {
+  it("„Stärke ändern…“ setzt den Stand nicht auf „jetzt“: Alter und Wort bleiben (die letzte Meldung rückt vor, R18-K2)", async () => {
     const s = einsatzAnlegen("Hochwasser Alt", EinsatzArt.EINSATZ);
     const erste = meldungAufnehmen(s.id, bogen("Ulm", (b) => { mitPersonen(b, 6); b.stand = vorStunden(2); }), { quelle: "scan" })!.eintrag;
     const alterVorher = angabenZeit(erste);
@@ -222,7 +222,9 @@ describe("R17-K1 Handänderung behält das Alter der Meldung", () => {
     const { angabenErben } = await import("./angaben-alter");
     expect(angabenErben(gespeichert).seit).toBe(alterVorher);
     const { letzteMeldung } = await import("./einheiten-tabelle");
-    expect(letzteMeldung(einsaetzeLaden().find((x) => x.id === s.id)!.eintraege)).toBe(erste.empfangenAm);
+    // R18-K2: Die Stärkeänderung am Meldekopf ist eine Folgemeldung und zählt für „letzte Meldung" — wie in der Liste.
+    // (Nur das Umstellen der Kennzeichnung zählt nicht.)
+    expect(letzteMeldung(einsaetzeLaden().find((x) => x.id === s.id)!.eintraege)).toBe(r.eintrag.empfangenAm);
   });
 
   it("das Alter übersteht Weitergabe und Import der Sammlung (kein Schemawechsel, optionales Feld am Eintrag)", async () => {
@@ -439,7 +441,7 @@ describe("R17-A2 Einzelbogen mit sprechendem Namen", () => {
     const b2 = { ...b1, stand: 100_000 + 95 };
     const n1 = einzelDateiname(b1);
     const n2 = einzelDateiname(b2);
-    expect(n1).toMatch(/^eeb-\d{6}[a-zA-Z]{3}\d{2}_[\w-]*Wardenburg[\w-]*\.pdf$/);
+    expect(n1).toMatch(/^\d{4}-\d{2}-\d{2}_\d{4}_eeb_[\w-]*Wardenburg[\w-]*\.pdf$/);
     expect(n1).not.toBe(n2);
     expect(n1).not.toMatch(/[0-9a-f]{8}-[0-9a-f]{4}/);
   });
@@ -464,7 +466,14 @@ describe("R17-A2 Einzelbogen mit sprechendem Namen", () => {
 
 describe("R17-A5 eigene Auswertung beim Einlesen", () => {
   it("die CSV des Stabs verweist auf Sammel-PDF und Sicherung, nicht auf „Personal“", () => {
-    for (const name of ["eeb-einsatz-271913okt26_Hochwasser_Test.csv", "eeb-einsatz-271913okt26_Hochwasser_Test-alle-daten.csv", "eeb-einsatz-271913okt26_Test-oldenburg.xlsx"]) {
+    for (const name of [
+      "eeb-einsatz-271913okt26_Hochwasser_Test.csv",
+      "eeb-einsatz-271913okt26_Hochwasser_Test-alle-daten.csv",
+      "eeb-einsatz-271913okt26_Test-oldenburg.xlsx",
+      "2026-10-27_1913_eeb-einsatz_Hochwasser_Test.csv",
+      "2026-10-27_1913_eeb-einsatz-alle-daten-nachtrag_Hochwasser_Test.csv",
+      "2026-10-27_1913_eeb-einsatz-oldenburg_Test.xlsx",
+    ]) {
       const art = name.endsWith("xlsx") ? "fremd" : "tabelle";
       const t = dateiFehlerText(name, art, "einsatz")!;
       expect(t, name).toContain("Sammel-PDF");
@@ -491,8 +500,8 @@ describe("R17-A6 ungültiger Einsatzzeitraum", () => {
   });
 });
 
-describe("R17-W1 einzeilige Quittung nennt die Einheit", () => {
-  it("zeigt nach dem Lesen die Kurzfassung statt des abgeschnittenen Satzes", () => {
+describe("R17-W1 → R18-S2/W1 Die Quittung nennt Einheit und Folge vollständig, bis sie verschwindet", () => {
+  it("zeigt den vollen Satz mit Namen und fällt nicht auf eine Kurzfassung zurück", () => {
     vi.useFakeTimers();
     render(
       <DaumenQuittung kurz="Nr. 2 abgerückt 17:41" onRueckgaengig={() => {}} onSchliessen={() => {}}>
@@ -500,12 +509,12 @@ describe("R17-W1 einzeilige Quittung nennt die Einheit", () => {
       </DaumenQuittung>,
     );
     expect(document.querySelector(".quittung-text")!.textContent).toContain("THW Biberach");
-    act(() => { vi.advanceTimersByTime(QUITTUNG_KOMPAKT_NACH_MS + 10); });
-    expect(document.querySelector(".quittung-daumen")!.className).toContain("quittung-kompakt");
-    expect(document.querySelector(".quittung-text")!.textContent).toBe("Nr. 2 abgerückt 17:41");
+    act(() => { vi.advanceTimersByTime(QUITTUNG_ENDE_NACH_MS - 10); });
+    expect(document.querySelector(".quittung-daumen")!.className).not.toContain("quittung-kompakt");
+    expect(document.querySelector(".quittung-text")!.textContent).toContain("THW Biberach");
   });
 
-  it("die Quittung des Abrückens in der Einsatzansicht trägt die Nummer in der Kurzfassung", async () => {
+  it("die Quittung des Abrückens in der Einsatzansicht trägt Nummer und Namen und ist nach 30 s weg", async () => {
     vi.useFakeTimers({ shouldAdvanceTime: true });
     const nutzer = userEvent.setup({ advanceTimers: (ms) => vi.advanceTimersByTime(ms) });
     const s = einsatzAnlegen("Hochwasser Abrücken", EinsatzArt.EINSATZ);
@@ -514,9 +523,11 @@ describe("R17-W1 einzeilige Quittung nennt die Einheit", () => {
     await nutzer.click(within(karteVon("Crailsheim")).getByRole("button", { name: "Mehr…" }));
     await nutzer.click(within(karteVon("Crailsheim")).getByRole("button", { name: "Abrücken" }));
     await waitFor(() => expect(document.querySelector(".quittung-daumen")).not.toBeNull());
-    expect(document.querySelector(".quittung-text")!.textContent).toContain("Abgerückt");
-    await act(async () => { vi.advanceTimersByTime(QUITTUNG_KOMPAKT_NACH_MS + PRELLSCHUTZ_MS + 10); });
-    expect(document.querySelector(".quittung-kompakt .quittung-text")!.textContent).toMatch(/^Nr\. \d+ abgerückt$/);
+    expect(document.querySelector(".quittung-text")!.textContent).toMatch(/Abgerückt .*Nr\. \d+ „.*Crailsheim/);
+    await act(async () => { vi.advanceTimersByTime(QUITTUNG_ENDE_NACH_MS - 1000); });
+    expect(document.querySelector(".quittung-text")!.textContent).toMatch(/Nr\. \d+ „.*Crailsheim/);
+    await act(async () => { vi.advanceTimersByTime(1500); });
+    expect(document.querySelector(".quittung-daumen")).toBeNull();
   }, 20000);
 });
 

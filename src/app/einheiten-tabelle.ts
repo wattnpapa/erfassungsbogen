@@ -150,9 +150,15 @@ export function meldungsNummern(eintraege: MeldeEintrag[]): Map<string, number> 
       belegt.add(n);
     }
   }
-  let frei = 1;
-  for (const [schluessel] of reihe) {
+  // Wer nach der letzten festen Einheit einging, zählt hinter der höchsten festen Nummer weiter: Eine beim
+  // Entfernen entstandene Lücke (R18-A1) füllt keine spätere Einheit — auf Papier und im Funk bliebe „Nr. 2"
+  // sonst nicht die entfernte Einheit. Früher Eingegangene ohne Nummer füllen weiter die kleinsten freien (R4-A1).
+  const festZeiten = reihe.filter(([schluessel]) => vergeben.has(schluessel)).map(([, t]) => t);
+  const spaetesteFest = festZeiten.length > 0 ? Math.max(...festZeiten) : Infinity;
+  const hoechsteFest = Math.max(0, ...vergeben.values());
+  for (const [schluessel, empfangen] of reihe) {
     if (vergeben.has(schluessel)) continue;
+    let frei = empfangen > spaetesteFest ? hoechsteFest + 1 : 1;
     while (belegt.has(frei)) frei++;
     vergeben.set(schluessel, frei);
     belegt.add(frei);
@@ -249,16 +255,14 @@ function nummernBereiche(nummern: number[]): string {
  * wenn keine Nummer wandert (letzte Einheit).
  */
 export function entfernenNummernText(eintraege: MeldeEintrag[], einheitSchluessel: string): string {
-  const wechsel = nummernWechsel(
-    eintraege,
-    eintraege.filter((e) => e.einheitSchluessel !== einheitSchluessel),
-  );
-  if (wechsel.length === 0) return "";
-  const von = nummernBereiche(wechsel.map((w) => w.von));
-  const nach = nummernBereiche(wechsel.map((w) => w.nach));
-  return wechsel.length === 1
-    ? `Die Einheit Nr. ${von} rückt auf und heißt danach Nr. ${nach}`
-    : `Die Einheiten Nr. ${von} rücken auf und heißen danach Nr. ${nach}`;
+  // Seit R18-A1 rücken die Nummern nicht mehr auf: „Entfernen" schreibt sie fest (eintrag-zeiten.ts
+  // `einheitEntfernen`). Gesagt wird, welche Nummer frei bleibt — gedruckte Lageblätter und Meldeblock stimmen weiter.
+  const nummern = meldungsNummern(eintraege);
+  const n = nummern.get(einheitSchluessel);
+  if (n == null) return "";
+  const spaeter = [...nummern.values()].filter((x) => x > n);
+  if (spaeter.length === 0) return "";
+  return `Nr. ${n} bleibt frei, die übrigen Nummern (${nummernBereiche(spaeter)}) bleiben`;
 }
 
 /**
@@ -685,8 +689,10 @@ export function zuletztGemeldet(e: MeldeEintrag): number {
 export function letzteMeldung(eintraege: MeldeEintrag[]): number | null {
   let max: number | null = null;
   for (const e of eintraege) {
-    // Auch die Handänderung am Meldekopf ist keine Meldung der Einheit (R17-K1).
-    if (e.quelle === "aufteilung" || e.quelle === "zusammenfuehrung" || e.angaben) continue;
+    // Nur das Umstellen der Kennzeichnung (Übung/Einsatz) ist keine Meldung (R17-K1). Eine Stärkeänderung am Meldekopf
+    // (Funkspruch der Einheit) ist eine Folgemeldung — dieselbe, die die Liste so nennt; Kopf, Startseite, Import und
+    // Lagemonitor zählen sie alle gleich (R18-K2).
+    if (e.quelle === "aufteilung" || e.quelle === "zusammenfuehrung" || e.angaben?.kennzeichnung) continue;
     if (max == null || e.empfangenAm > max) max = e.empfangenAm;
   }
   return max;
@@ -849,7 +855,7 @@ export const TABELLEN_SPALTEN: SpaltenDefinition[] = [
   { schluessel: "eingetroffen", kopf: "Eingetr.", titel: "Eingetroffen", zahl: false, sortiertNach: "eingetroffenAm" },
   { schluessel: "bedarf", kopf: "Bedarf", titel: "Sofortbedarf", zahl: false },
   // Alter der geltenden Meldung: Ältestes oben statt „Eingetr." (absolut) und „Stand" (vom Absender gesetzt) (R12-K3).
-  { schluessel: "meldung", kopf: "Meldung vor", titel: "Meldung vor (Alter der Angaben: Stand im Bogen, höchstens der Eingang)", zahl: false, sortiertNach: "angabenAm" },
+  { schluessel: "meldung", kopf: "Alter", titel: "Alter der Angaben (Stand im Bogen, höchstens der Eingang)", zahl: false, sortiertNach: "angabenAm" },
   { schluessel: "abgerueckt", kopf: "Abger.", titel: "Abgerückt", zahl: false, sortiertNach: "abgerueckAm" },
   { schluessel: "organisation", kopf: "Org.", titel: "Organisation", zahl: false },
   { schluessel: "verpflegung", kopf: "Verpfl.", titel: "Verpflegung gesamt", zahl: true },
@@ -865,7 +871,7 @@ export const TABELLEN_SPALTEN: SpaltenDefinition[] = [
   { schluessel: "diesel", kopf: "Diesel", titel: "Diesel (Liter)", zahl: true },
   { schluessel: "benzin", kopf: "Benzin", titel: "Benzin (Liter)", zahl: true },
   { schluessel: "gemisch", kopf: "Gemisch", titel: "Gemisch (Liter)", zahl: true },
-  { schluessel: "stand", kopf: "Stand", titel: "Stand der Meldung (Absender)", zahl: false },
+  { schluessel: "stand", kopf: "Stand der Angaben", titel: "Stand der Angaben (beim Absender)", zahl: false },
 ];
 
 /** Fahrzeug-Kurzbezeichnungen einer Einheit, z. B. „GKW / MzKW" (wie im CSV). */
@@ -926,7 +932,7 @@ export function tabellenZeilen(eintraege: MeldeEintrag[], art?: EinsatzArt, jetz
       angabenWort: angabenAlterWort(e),
       abgerueckt: e.abgerueckAm != null ? zeitLang(e.abgerueckAm) : "",
       abgerueckAm: e.abgerueckAm ?? 0,
-      stand: zeitpunktDeutsch(b.stand),
+      stand: zeitpunktDeutsch(e.standAbsender ?? b.stand),
       standAlt: standIstAlt(e),
       auftrag: e.notiz ?? "",
       anwesend: e.status === MeldeStatus.ANWESEND,

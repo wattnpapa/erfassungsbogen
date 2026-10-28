@@ -27,14 +27,15 @@ export function schluesselFrage(hatSchluessel: boolean): SchluesselFrage {
   }
   return {
     titel: "Geräteschlüssel neu erzeugen?",
+    // R18-D4: Die Folge steht zuerst und kurz; die feste Knopfleiste deckte bei 360 × 640 den zweiten Absatz.
     erster:
-      "Der bisherige Signaturschlüssel dieses Geräts wird gelöscht und durch ein neues Schlüsselpaar ersetzt. " +
-      "Sinnvoll ist das bei Verdacht, dass der private Schlüssel in fremde Hände geraten ist — etwa nach Verlust oder Weitergabe des Geräts.",
+      "Der bisherige Signaturschlüssel dieses Geräts wird gelöscht und durch ein neues Paar ersetzt " +
+      "(sinnvoll bei Verdacht, dass er in fremde Hände geraten ist).",
     folgen: {
       fett: "Empfänger müssen die Kurzform danach neu abgleichen:",
       rest:
-        " Bögen von diesem Gerät tragen ab sofort eine andere Kurzform. Bereits verschickte Bögen bleiben gültig und prüfbar — " +
-        "aber nur gegen den alten öffentlichen Schlüssel, und der lässt sich danach nur aus einer früheren Sicherungsdatei wiederherstellen.",
+        " Neue Bögen tragen eine andere Kurzform. Bereits verschickte bleiben gültig, aber nur gegen den alten öffentlichen Schlüssel — " +
+        "den gibt es danach nur noch in einer früheren Sicherung.",
     },
     neuLabel: "Neu erzeugen",
     gefahr: true,

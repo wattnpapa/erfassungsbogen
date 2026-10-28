@@ -33,7 +33,7 @@ import {
   funktionsText,
   kennzeichenText,
   kontaktText,
-  natoZeitstempel,
+  ausgabeDateiname,
   orgLabel,
   heuteDatum,
   personUnbenannt,
@@ -496,8 +496,8 @@ export function Uebersicht(props: {
     // Der Dateiname wird HIER gebildet und an pdfErzeugen übergeben, nicht
     // dort erraten: so nennt die Quittung genau die Datei, die entstanden ist
     // — auch wenn der Minutenwechsel des Zeitstempels dazwischenfällt. Die
-    // Bauart (eeb-<NATO-Zeit>_<Einheit>.pdf) ist dieselbe wie in pdf.ts.
-    const dateiname = `eeb-${natoZeitstempel()}_${bogenDateiname(bogen)}.pdf`;
+    // Bauart (<Datum>_<Uhrzeit>_eeb_<Einheit>.pdf) ist dieselbe wie in pdf.ts.
+    const dateiname = ausgabeDateiname("", bogenDateiname(bogen), "pdf");
     try {
       const { pdfErzeugen } = await import("../pdf");
       const pdfErgebnis = await pdfErzeugen(bogen, dateiname, props.herkunft);
@@ -725,18 +725,18 @@ export function Uebersicht(props: {
       {abschnitt("Einsatz", 1, (
         <dl className="paare">
           <dt>Zeitraum (Tage)</dt><dd>{datumAnzeige(bogen.einsatz.zeitraumVon)} – {datumAnzeige(bogen.einsatz.zeitraumBis)}</dd>
-          <dt>Ort / Auftrag</dt><dd>{bogen.einsatz.ortAuftrag || "—"}</dd>
+          <dt>Ort / Auftrag</dt><dd>{bogen.einsatz.ortAuftrag || "nicht eingetragen"}</dd>
           <dt>Uhrzeit Beginn / Ende</dt>
           <dd>
-            {bogen.einsatz.einsatzbeginn != null ? zeitpunktDeutsch(bogen.einsatz.einsatzbeginn) : "—"}
+            {bogen.einsatz.einsatzbeginn != null ? zeitpunktDeutsch(bogen.einsatz.einsatzbeginn) : "nicht eingetragen"}
             {" / "}
-            {bogen.einsatz.einsatzende != null ? zeitpunktDeutsch(bogen.einsatz.einsatzende) : "—"}
+            {bogen.einsatz.einsatzende != null ? zeitpunktDeutsch(bogen.einsatz.einsatzende) : "nicht eingetragen"}
             {/* Die Zeiten des Meldekopfs kommen nicht in diesen Bogen zurück;
                 ohne eigenen Eintrag trägt das PDF keine Einsatzzeiten (R2-W4). */}
             {/* Die Schnellerfassung hat keinen Schritt 2 (R14-N3). */}
             {(bogen.einsatz.einsatzbeginn == null || bogen.einsatz.einsatzende == null) && !nurStaerke && (
               <span className="hinweis">
-                {" "}— für eigene Nachweise in Schritt 2 eintragen; die Zeiten des Meldekopfs kommen nicht hierher zurück.
+                {" "}(optional, nur für eigene Nachweise — Schritt 2)
               </span>
             )}
           </dd>
@@ -764,6 +764,7 @@ export function Uebersicht(props: {
             : "Kein Personal erfasst."}
         </p>
       ) : (
+        <>
         <TabellenScroll titel="Personal">
         <table className="uebersicht">
           <thead>
@@ -782,13 +783,16 @@ export function Uebersicht(props: {
               <tr key={i}>
                 <td><RolleMarke rolle={p.staerkeRolle} /></td>
                 <td>{funktionsText(p, org) || "—"}</td>
-                <td>{p.nachname}{p.nachname && p.vorname ? ", " : ""}{p.vorname}</td>
+                {/* Leere Namenszellen sahen nach Darstellungsfehler aus: „(offen)" sagt, dass der Platz noch niemanden trägt (R18-N12). */}
+                <td>{p.nachname || p.vorname ? <>{p.nachname}{p.nachname && p.vorname ? ", " : ""}{p.vorname}</> : <span className="hinweis">(offen)</span>}</td>
                 {zeigeErreichbarkeit && <td>{p.kontakte.map(kontaktText).join(" · ")}</td>}
               </tr>
             ))}
           </tbody>
         </table>
         </TabellenScroll>
+        <p className="hinweis rollen-legende">Fü = Führer/in · UFü = Unterführer/in · Ma = Mannschaft</p>
+        </>
       ))}
 
       {abschnitt(`Fahrzeuge (${bogen.fahrzeuge.length})`, 3, bogen.fahrzeuge.length === 0 ? (

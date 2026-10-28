@@ -739,13 +739,14 @@ export function Fusszeile({ onBogenOeffnen, kompakt = false }: {
         titel: frage.titel,
         text: (
           <>
-            <p>{frage.erster}</p>
+            {/* Die Folge steht vor der Erläuterung: Die feste Knopfleiste deckt bei 360 × 640 den Rest (R18-D4). */}
             {frage.folgen && (
               <p>
                 <strong>{frage.folgen.fett}</strong>
                 {frage.folgen.rest}
               </p>
             )}
+            <p>{frage.erster}</p>
           </>
         ),
         wege: [
@@ -1053,6 +1054,20 @@ export function Fusszeile({ onBogenOeffnen, kompakt = false }: {
           Einträge im Papierkorb. Es gibt keine Kopie in einer Cloud: was hier weg
           ist, ist weg.
         </p>
+        {/* Die Folge in einer Zeile ganz oben (R18-D4): Die feste Leiste mit Haken und Knöpfen deckt bei 360 × 640 sonst die
+            Aufzählung, und „noch kein Export …" blieb ungelesen. Wo es keine Kopie gibt, ist das hier die einzige (R4-D5). */}
+        {loeschUmfang && loeschUmfang.eintraege > 0 && loeschUmfang.einsaetze > 0 && (
+          <p className="loesch-kurz">
+            <strong>
+              {loeschUmfang.einsaetze} {loeschUmfang.einsaetze === 1 ? "Einsatz-Sammlung" : "Einsatz-Sammlungen"} mit {loeschUmfang.meldungen}{" "}
+              {loeschUmfang.meldungen === 1 ? "gemeldeten Bogen" : "gemeldeten Bögen"}
+            </strong>
+            {loeschUmfang.ohneExport.length > 0
+              ? ` — noch kein Export, kein Lageblatt und keine Weitergabe von: ${loeschUmfang.ohneExport.map((n) => `„${n}"`).join(", ")}`
+              : ""}
+            .
+          </p>
+        )}
         {/* Die Sicherung steht vor der langen Aufzählung: Bei 200 % Schrift lag sie
             sieben Bildschirme tiefer, am Ende des Dialogs (R7-D7). */}
         <div className="aktionen">
@@ -1072,13 +1087,7 @@ export function Fusszeile({ onBogenOeffnen, kompakt = false }: {
                 <li>
                   {loeschUmfang.einsaetze} {loeschUmfang.einsaetze === 1 ? "Einsatz-Sammlung" : "Einsatz-Sammlungen"}
                   {" mit "}{loeschUmfang.meldungen} {loeschUmfang.meldungen === 1 ? "gemeldeten Bogen" : "gemeldeten Bögen"}
-                  {/* Wo es keine Kopie gibt, ist das hier die einzige (R4-D5). */}
-                  {loeschUmfang.ohneExport.length > 0 && (
-                    <strong className="warnung-text">
-                      {" "}— noch kein Export, kein Lageblatt und keine Weitergabe von:{" "}
-                      {loeschUmfang.ohneExport.map((n) => `„${n}"`).join(", ")}
-                    </strong>
-                  )}
+                  {/* „Noch kein Export …" steht jetzt oben in der Kurzzeile (R18-D4). */}
                 </li>
                 <li>{loeschUmfang.entwurf ? "der aktuelle Bogen-Entwurf" : "kein offener Bogen-Entwurf"}</li>
                 {loeschUmfang.rueckholplatz != null && (

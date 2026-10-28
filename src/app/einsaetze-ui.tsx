@@ -16,6 +16,8 @@ const ImportHinweis = lazy(() => import("./import-hinweis"));
 const AuftragQuittung = lazy(() => import("./auftrag-quittung"));
 // Papierkorb der entfernten Meldungen (R17-E2): erscheint nur, wenn etwas darin liegt, und bleibt aus dem Startbündel.
 const EntfernteMeldungenBlock = lazy(() => import("./entfernte-meldungen-block"));
+// Statisch, nicht per lazy: siehe Kopf von abschluss-block.tsx (Aufteilung des Startbündels).
+import AbschlussBlock from "./abschluss-block";
 /** So viele Tage liegt eine entfernte Meldung im Papierkorb (gleich `MELDUNGEN_PAPIERKORB_TAGE`; ein Test hält beide gleich). */
 export const PAPIERKORB_TAGE = 7;
 /** Liegt in diesem Papierkorb etwas für diese Sammlung? Billige Vorprüfung, ohne den Block zu laden. */
@@ -26,10 +28,37 @@ function papierkorbGefuellt(einsatzId: string): boolean {
     return false;
   }
 }
+/** Wie viele entfernte Meldungen liegen für diese Sammlung im Papierkorb (ohne Abgelaufenes)? Billig, ohne den Block zu laden (R18-E3). */
+export function papierkorbAnzahl(einsatzId: string, jetzt = Date.now()): number {
+  try {
+    const stand: unknown = JSON.parse(localStorage.getItem("eeb.meldungen-papierkorb.v1") ?? "{}");
+    const liste = (stand as Record<string, unknown>)[einsatzId];
+    if (!Array.isArray(liste)) return 0;
+    return liste.filter((m) => typeof m?.entferntAm === "number" && jetzt - m.entferntAm <= PAPIERKORB_TAGE * 24 * 60 * 60 * 1000).length;
+  } catch {
+    return 0;
+  }
+}
+/** Springt zum Papierkorb der entfernten Meldungen, klappt ihn auf und setzt den Fokus auf seine Überschrift (R18-E3). */
+export function zumPapierkorbSpringen(versuche = 3): void {
+  const el = document.getElementById("meldungen-papierkorb") as HTMLDetailsElement | null;
+  if (!el) {
+    // Der Block lädt nach (React.lazy): kurz warten.
+    if (versuche > 0) setTimeout(() => zumPapierkorbSpringen(versuche - 1), 250);
+    return;
+  }
+  el.open = true;
+  try {
+    el.scrollIntoView?.({ block: "center", behavior: "smooth" });
+  } catch {
+    /* Testumgebung ohne Layout */
+  }
+  el.querySelector<HTMLElement>("summary")?.focus({ preventScroll: true });
+}
 const NeuereEingabe = lazy(() => import("./neuere-eingabe"));
 // Der Block „Lagemonitor für den Fernseher" liegt am Ende der Ansicht und gehört nicht ins Startbündel (R17-K3 gab dem Monitor Zeilen).
 const LagemonitorBlock = lazy(() => import("./lagemonitor-ui").then((m) => ({ default: m.LagemonitorBlock })));
-import { ORTSSPERRE_MS, PRELLSCHUTZ_MS, QUITTUNG_SPERRE_KURZ_MS, ortSperren } from "./tipp-schutz";
+import { ORTSSPERRE_MS, PRELLSCHUTZ_MS, QUITTUNG_SPERRE_KURZ_MS, ortSperren, tippVerworfenZeigen } from "./tipp-schutz";
 import {
   MINUTEN_JE_TAG,
   PersonalErfassung,
@@ -89,7 +118,8 @@ import { useMinutenTakt } from "./minuten-takt";
 import { AUSGABE_SPERRE_MS, ausgabeFreiBeiTipp } from "./ausgabe-sperre";
 import { verloreneEingabeText } from "./eingabe-verloren";
 import { loeschenErfassungSatz } from "./einsatz-geloescht";
-import { angabenAlterWort, angabenZeit } from "./angaben-alter";
+import { angabenAlterWort, angabenZeit, handAenderungText } from "./angaben-alter";
+import { abschlussLaden, abschlussUebergabeText } from "./einsatz-abschluss";
 import { alterText, anwesendenAlter, anwesendenAlterText, bedarfOhneAngabeHinweis, bedarfOhneAngabeText, kraftstoffTeile, personenText, zugAlterText } from "./lagemonitor";
 import { AufteilenPanel } from "./aufteilen-ui";
 import { ZusammenfuehrenPanel } from "./zusammenfuehren-ui";
@@ -189,7 +219,7 @@ import {
 import { imWebBrowser } from "./nativ";
 import { aufgeraeumteLaden, aufgeraeumteQuittieren } from "./aufraeum-hinweis";
 import { useZahlQuittung } from "./quittung";
-import { mitAbgang, useEingangsquittung } from "./eintrag-bewegung";
+import { mitAbgang, seitenOben, stelleHalten, useEingangsquittung } from "./eintrag-bewegung";
 import { AbgangKnopf, Kartenstapel } from "./kartenstapel";
 import { istBilddatei } from "./qr-stapel";
 import { fehlerText } from "./nachladen";
@@ -564,9 +594,15 @@ export function ZugSchnellZuordnen(props: {
           if (e.key === "Enter") void zuordnen(wert);
         }}
       />
-      <button type="button" className="primaer" disabled={!wert.trim()} onClick={() => void zuordnen(wert)}>
+      <button type="button" className="primaer" disabled={!wert.trim()} aria-describedby={wert.trim() ? undefined : `${listeId}-fehlt`} onClick={() => void zuordnen(wert)}>
         Zuordnen
       </button>
+      {/* Der gesperrte Knopf sagt, was fehlt (R18-S5); der Platzhalter verschwindet beim Tippen. */}
+      {!wert.trim() && (
+        <p className="hinweis zug-schnell-fehlt" id={`${listeId}-fehlt`}>
+          „Zuordnen“ geht erst, wenn ein Zugname eingetragen ist{vorschlaege.length > 0 ? " — oder einen der Züge antippen" : ""}.
+        </p>
+      )}
     </div>
   );
 }
@@ -1168,9 +1204,13 @@ export function EinsatzDetail(props: {
     const n = new Set(nachtragEintraege(einsatz.eintraege, stand).map((e) => e.einheitSchluessel)).size;
     return `${basis} — ${n === 0 ? "Nachtrag: nichts Neues" : `Nachtrag (${n === 1 ? "1 Einheit" : `${n} Einheiten`})`}`;
   };
-  const ausgabeTipp = (schluessel: string, name: string | null, los: () => void, ereignis?: { timeStamp: number }) => {
+  const ausgabeTipp = (schluessel: string, name: string | null, los: () => void, ereignis?: { timeStamp: number; nativeEvent?: MouseEvent }) => {
     // Nach der Ereigniszeit, nicht nach der Bearbeitungszeit: Die PDF-Erzeugung blockiert den Hauptfaden (R13-G1).
-    if (!ausgabeFreiBeiTipp(schluessel, ereignis, tippWaehrendLauf)) return;
+    if (!ausgabeFreiBeiTipp(schluessel, ereignis, tippWaehrendLauf)) {
+      // Ein verworfener Tipp sagt es („Einen Moment …"), statt wortlos zu verpuffen (R18-N1, W3).
+      if (ereignis?.nativeEvent && ereignis.nativeEvent.detail > 0) tippVerworfenZeigen(ereignis.nativeEvent);
+      return;
+    }
     if (name && einsatz.eintraege.length > 0) {
       setSofort(`${name} wird erzeugt — bitte nicht noch einmal tippen.`);
       clearTimeout(sofortUhr.current);
@@ -1211,6 +1251,7 @@ export function EinsatzDetail(props: {
   // Letzte Weitergabe der ganzen Sammlung — nach einer Schichtübergabe führt
   // womöglich ein anderes Gerät die Lage (Audit Runde 2, R2-W5).
   const weitergabeStand = weitergabeStandLaden(einsatz.id);
+  const abschlussStand = abschlussLaden(einsatz.id);
   const seitWeitergabe = weitergabeStand ? neueEintraege(einsatz.eintraege, weitergabeStand).length : 0;
   // Auch Abrücken, Zug, Auftrag zählen — was ein Import mitbrachte, nicht (R3-W2).
   const aenderungenSeitWeitergabe = weitergabeStand ? aenderungenSeit(einsatz.eintraege, weitergabeStand) : { anzahl: 0, arten: [] };
@@ -1936,10 +1977,16 @@ export function EinsatzDetail(props: {
       {/* Übergabevermerk im Kopf: Wer das alte Gerät nach der Schichtübergabe
           wieder in die Hand nimmt, sieht zuerst, dass die Lage weitergegeben
           wurde — und ob seitdem etwas nur hier dazukam (R2-W5). */}
+      {abschlussStand.beendetAm != null && (
+        <p className="hinweis einsatz-beendet-kopf" role="status"><strong>Einsatz beendet {exportZeitKurz(abschlussStand.beendetAm)}</strong></p>
+      )}
       {weitergabeStand && (
         <p className={`hinweis weitergabe-vermerk${weitergabeOffen ? " seitdem-neu" : ""}`}>
           <strong>Weitergabe-Datei erzeugt {exportZeitKurz(weitergabeStand.zeitpunkt)}</strong>
-          {" — Empfang nicht bestätigt"}
+          {/* „Übergabe vermerken" im Block „Übergabe und Abschluss" ersetzt „nicht bestätigt" (R18-A7). */}
+          {abschlussStand.uebergabeAm != null && abschlussStand.uebergabeAm >= weitergabeStand.zeitpunkt
+            ? ` — ${abschlussUebergabeText(abschlussStand, exportZeitKurz)}`
+            : " — Empfang nicht bestätigt"}
           {!weitergabeOffen
             ? ", seitdem hier nichts Neues."
             : `, seitdem hier ${[
@@ -2156,8 +2203,10 @@ export function EinsatzDetail(props: {
                   )}
                   {folge?.rueckkehr && <strong className="rueckkehr-hinweis"> — ⚠ {rueckkehrText(folge.rueckkehr)}, zählt wieder mit</strong>}
                   {e.signatur?.zustand === "ungueltig" && <strong className="warnung-text"> — ⚠ Signatur ungültig (Daten verändert?)</strong>}
-                  {fremdeOrte.has(e.einheitSchluessel) && (
-                    <span className="warnung-text"> — ⚠ Bogen nennt: „{fremdeOrte.get(e.einheitSchluessel)}“, passt das zu dieser Lage? {ORT_REGEL}</span>
+                  {/* Die Ortswarnung gehört zur Aufnahme und steht auf der Karte, nicht bei jeder Folgemeldung (R18-K4): Hier
+                      nur bei „neu gemeldet", kurz; die Regel dahinter steht auf der Karte. */}
+                  {!folge && fremdeOrte.has(e.einheitSchluessel) && (
+                    <span className="warnung-text"> — ⚠ Ort im Bogen: „{fremdeOrte.get(e.einheitSchluessel)}“ — passt das zu dieser Lage?</span>
                   )}
                 </li>
               );
@@ -2204,6 +2253,8 @@ export function EinsatzDetail(props: {
               </button>
             )}
             <button type="button" className="link kenntnis-nehmen" onClick={kenntnisNehmen}>Zur Kenntnis genommen</button>
+            {/* Was der Knopf tut, steht daneben: Er merkt nur, was du gesehen hast, und sendet nichts an die Einheiten (R18-N13). */}
+            <span className="hinweis kenntnis-erklaerung">Merkt nur „gesehen“, sendet nichts an die Einheiten.</span>
           </div>
         </div>
       )}
@@ -2232,7 +2283,8 @@ export function EinsatzDetail(props: {
       {/* Am Telefon eingeklappt, mit einer Summenzeile: Der Block war 346 px hoch und
           schob die erste Einheitenkarte auf 2,6 Bildschirme (R5-K4). Am Laptop steht
           er wie bisher offen in der linken Spalte. */}
-      {kompakt ? (
+      {/* Ohne Meldung gibt es keinen Bedarf: „Bedarf: Verpflegung 0" unter fünf Nullen sagt nichts (R18-N4). */}
+      {einsatz.eintraege.length === 0 ? null : kompakt ? (
         <details className="karte bedarf-block">
           <summary>
             <strong>Bedarf:</strong>{" "}
@@ -2468,6 +2520,15 @@ export function EinsatzDetail(props: {
       </div>
 
       <section className="karte einsatz-liste">
+        {/* Entfernte Meldungen stehen erst am Listenende; hier steht, dass welche liegen, und der Weg dorthin (R18-E3, H3). */}
+        {papierkorbAnzahl(einsatz.id) > 0 && (
+          <p className="hinweis papierkorb-verweis">
+            {papierkorbAnzahl(einsatz.id) === 1 ? "1 entfernte Meldung" : `${papierkorbAnzahl(einsatz.id)} entfernte Meldungen`} im Papierkorb —{" "}
+            <button type="button" className="link" onClick={() => zumPapierkorbSpringen()}>
+              ansehen und zurückholen ↓
+            </button>
+          </p>
+        )}
         <UnlesbarHinweis sammlungId={einsatz.id} />
         {verloreneEingaben.map((text, i) => (
           <p className="warnung verlorene-eingabe" role="alert" key={`${i}-${text}`}>
@@ -2484,7 +2545,7 @@ export function EinsatzDetail(props: {
           <h2 ref={listeKopf} id="einheiten-liste">
             Einheiten ({gefiltert ? `${kopf.length} von ${alleEinheiten.length}` : alleEinheiten.length - nurSollAnzahl} gemeldet
             {!gefiltert && nurSollAnzahl > 0 ? ` · ${nurSollAnzahl} nur Sollstärke` : ""}
-            {" · "}{sum.einheiten} zählend)
+            {" · "}{sum.einheiten} anwesend)
           </h2>
           {/* Zwei Sichten auf dieselbe (gesuchte, gefilterte, sortierte) Liste:
               die Karten für die Arbeit an einer Einheit, die Tabelle für den
@@ -2616,7 +2677,28 @@ export function EinsatzDetail(props: {
           <p className="hinweis staerke-legende">Stärke auf den Karten: Führer / Unterführer / Mannschaft / Gesamt.</p>
         )}
         {ansicht === "tabelle" && kopf.length > 0 && (
-          <EinheitenTabelle meldungen={kopf} art={einsatz.art} eingang={eingang} nummern={nummern} neueFassungen={neueFassungen} kompakt={kompakt} />
+          <EinheitenTabelle
+            meldungen={kopf}
+            art={einsatz.art}
+            eingang={eingang}
+            nummern={nummern}
+            neueFassungen={neueFassungen}
+            kompakt={kompakt}
+            onOeffnen={(schluessel) => {
+              // Zur Karte wechseln und sie aufklappen (R18-E5): Die Karte liest beim Einhängen, ob sie die zuletzt offene war.
+              karteOffenMerken(einsatz.id, schluessel, true);
+              setAnsicht("karten");
+              merkeAnsicht("karten");
+              setTimeout(() => {
+                const ziel = [...document.querySelectorAll<HTMLElement>("[data-einheit]")].find((el) => el.dataset.einheit === schluessel);
+                try {
+                  ziel?.scrollIntoView({ block: "center" });
+                } catch {
+                  /* Testumgebung ohne Layout */
+                }
+              }, 50);
+            }}
+          />
         )}
         {/* Eine Liste: das Vorleseprogramm nennt die Zahl der Einheiten und
             erlaubt den Sprung von Eintrag zu Eintrag (R2-M4). */}
@@ -2764,10 +2846,8 @@ export function EinsatzDetail(props: {
           {/* Ein Knopf für die ganze Sammel-PDF: „Sammel-PDF (alle Bögen)"
               darunter erzeugte dieselbe Datei — zwei gleichwertige Knöpfe, und
               welcher „für Papier" ist, stand nur hier (Audit Runde 2, R2-A3). */}
-          „Einsatz weitergeben / sichern" erzeugt die Sammel-PDF mit allen Bögen (zum Drucken) und allen Meldungen,
-          Zeiten, Historie und Zügen — auf dem nächsten Gerät über „Einsatz importieren…" einlesbar, auch wenn alle
-          abgerückt sind. Ein Nachtrag für den Stab (PDF, CSV, Excel): weiter unten „Nur neue Bögen seit dem letzten Export“
-          ankreuzen — erst dann erscheinen dort die Nachtrag-Knöpfe, je Format mit eigenem Bezugspunkt.
+          „Einsatz weitergeben / sichern": Sammel-PDF mit allen Bögen und der ganzen Lage — auf dem nächsten Gerät über
+          „Einsatz importieren…" einlesbar.
         </p>
       )}
       {/* Der Meldekopf liefert dem Stab nach: einmal am Abend alles, am Morgen
@@ -2784,14 +2864,13 @@ export function EinsatzDetail(props: {
           Nur neue Bögen seit dem letzten Export
         </label>
         {/* Bezugspunkt ist das Erzeugen der Datei: Ob sie den Stab erreicht hat, weiß das Gerät nicht (R7-A3). */}
-        <span className="hinweis">Gerechnet ab dem Erzeugen der Datei — ob sie beim Stab angekommen ist, weiß das Gerät nicht.</span>
+        <span className="hinweis">Gerechnet ab dem Erzeugen der Datei, nicht ab der Ankunft beim Stab.</span>
         {/* Je Format ein eigener Bezugspunkt (R4-W2): Excel für die eigene
             Liste verbraucht den Nachtrag-PDF nicht, die Weitergabe an die
             Ablösung keines von beiden. Ohne Haken nur, was es gab. */}
         {EXPORT_ZIELE.every((z) => !exportStaende[z]) ? (
           <span className="hinweis">
             Noch kein Export aus diesem Einsatz — alle Bögen sind neu.
-            {weitergabeStand ? ` Die Weitergabe vom ${exportZeitKurz(weitergabeStand.zeitpunkt)} (an die Ablösung) zählt nicht als Lieferung an den Stab.` : ""}
           </span>
         ) : null}
         {EXPORT_ZIELE.filter((z) => nurNeue || exportStaende[z]).map((z) => {
@@ -2806,7 +2885,7 @@ export function EinsatzDetail(props: {
                 {EXPORT_ZIEL_NAME[z]}: {weitergabeZeigen ? "für den Stab noch keine Lieferung" : "noch nicht in diesem Format exportiert"} — alle Bögen sind neu.
                 {weitergabeZeigen && (
                   <>
-                    {" "}Die Weitergabe-Datei vom {exportZeitKurz(weitergabeStand!.zeitpunkt)} zählt hier nicht (sie geht zum Sichern an die Ablösung oder ins Archiv). Das nächste Sammel-PDF hier ist die erste Lieferung an den Stab.
+                    {" "}Die Weitergabe-Datei vom {exportZeitKurz(weitergabeStand!.zeitpunkt)} geht an die Ablösung und zählt hier nicht.
                     {props.onStandAusWeitergabe && (
                       <>
                         {" "}
@@ -2828,6 +2907,15 @@ export function EinsatzDetail(props: {
             </span>
           );
         })}
+        {/* Die Erklärung der Nachtrag-Logik liegt hinter einem Aufklapper statt vor den Knöpfen (R18-W8/K10). */}
+        <details className="export-erklaerung">
+          <summary>Was heißt das?</summary>
+          <p className="hinweis">
+            Ein Nachtrag enthält die Bögen und Änderungen seit dem letzten Export in diesem Format; der erste Nachtrag ist die ganze Lage.
+            Die Weitergabe-Datei geht an die Ablösung oder ins Archiv und verschiebt den Bezug zum Stab nicht. Ob eine Datei angekommen ist,
+            weiß das Gerät nicht.
+          </p>
+        </details>
       </div>
       <div className="vorlage-aktionen einsatz-ausgaben">
         {/* Die ganze Sammel-PDF liegt auf „Einsatz weitergeben / sichern";
@@ -2876,7 +2964,7 @@ export function EinsatzDetail(props: {
         „Übersicht“: eine Zeile je Einheit mit Stärke und Bedarf, ohne Namen — für die Lage. „Alle Daten“: zusätzlich eine Zeile je Person
         (mit Namen und Rufnummern) und je Fahrzeug — nur an Stellen weitergeben, die Personendaten sehen dürfen.
       </p>
-      {sofort && arbeitet === null && (
+      {sofort && arbeitet === null && !ausgabeQuittungSichtbar && (
         <p className="hinweis arbeitet-zeile ausgabe-quittung" role="status">
           {sofort}
         </p>
@@ -2886,6 +2974,11 @@ export function EinsatzDetail(props: {
       {/* Hinter den Export-Knöpfen, nicht mitten in deren Erklärung (Audit Runde 6, R6-K5). */}
       <Suspense fallback={null}>
         <LagemonitorBlock einsatzId={einsatz.id} alleIds={einsaetzeLaden().map((x) => x.id)} />
+      </Suspense>
+
+      {/* Sicherungsstand, Wege des Abschlusses, Übergabe vermerken, Einsatz beenden (R18-A6, R18-A7). */}
+      <Suspense fallback={null}>
+        <AbschlussBlock einsatz={einsatz} onGeaendert={onGeaendert} />
       </Suspense>
 
       {/* Das Löschen gehört ans Ende des Inhalts, nicht in die feste Leiste am
@@ -2925,8 +3018,11 @@ export function EinsatzDetail(props: {
               </strong>{" "}
               Meldung {zuletztEntfernt.nummer != null ? `Nr. ${zuletztEntfernt.nummer} ` : ""}„{einheitAnzeigename(zuletztEntfernt.eintraege[0]!.bogen.einheit)}"
               {zuletztEntfernt.bezug ? ` (${zuletztEntfernt.bezug})` : ""}
-              {zuletztEntfernt.verschoben ? `. ${zuletztEntfernt.verschoben}.` : ""}
               {entferntStapel.length > 1 ? ` · davor noch ${entferntStapel.length - 1} entfernt` : ""}
+              {". "}
+              {zuletztEntfernt.verschoben ? `${zuletztEntfernt.verschoben}. ` : ""}
+              {/* Fundort der entfernten Meldung (R18-H2, E3): nach dem Neuladen steht sie im Papierkorb unter der Liste. */}
+              {`${PAPIERKORB_TAGE} Tage im Papierkorb unter der Liste.`}
             </>
           )}
         </DaumenQuittung>
@@ -3120,10 +3216,11 @@ export function tabellenSpaltenFuer(zugVorhanden: boolean, kompakt: boolean, ker
   const spalten = TABELLEN_SPALTEN.filter((s) => zugVorhanden || s.schluessel !== "zugEtikett");
   if (!kompakt) return spalten;
   const nimm = (k: TabellenSpalte) => spalten.find((s) => s.schluessel === k);
-  // R17-H8, R17-K7, R17-G7: Am Telefon vorerst nur das, wonach die Führung fragt: wer, wie stark, welcher Zug, wie alt die
-  // Angaben, was gebraucht wird. Alle Spalten bleiben einen Tipp entfernt; die schmalen Köpfe sind dort kein Tippziel.
+  // R17-H8, R17-K7, R17-G7, R18-A5: Am Telefon vorerst nur das, wonach die Führung fragt: wer, wie stark, seit wann da,
+  // welcher Zug, welcher Auftrag. Das Alter der Angaben steht als Marke unter der Eintreffzeit; der Bedarf und alles
+  // Übrige bleibt einen Tipp entfernt („Alle Spalten"); die schmalen Köpfe sind dort kein Tippziel.
   if (kern) {
-    return (["einheit", "gesamt", "zugEtikett", "meldung", "bedarf"] as const)
+    return (["einheit", "gesamt", "eingetroffen", "zugEtikett", "auftrag"] as const)
       .map(nimm)
       .filter((s): s is SpaltenDefinition => s != null);
   }
@@ -3134,7 +3231,7 @@ export function tabellenSpaltenFuer(zugVorhanden: boolean, kompakt: boolean, ker
   ];
 }
 
-function EinheitenTabelle({ meldungen, art, eingang, nummern, neueFassungen, kompakt = false }: { meldungen: MeldeEintrag[]; art: EinsatzArt; eingang?: Eingang | null; nummern?: Map<string, number>; neueFassungen?: Set<string>; kompakt?: boolean }) {
+function EinheitenTabelle({ meldungen, art, eingang, nummern, neueFassungen, kompakt = false, onOeffnen }: { meldungen: MeldeEintrag[]; art: EinsatzArt; eingang?: Eingang | null; nummern?: Map<string, number>; neueFassungen?: Set<string>; kompakt?: boolean; onOeffnen?: (schluessel: string) => void }) {
   // null = Reihenfolge der Liste (Sortierauswahl der Leiste) unverändert
   // übernehmen. Erst ein Klick auf einen Spaltenkopf ordnet hier um.
   const [spalte, setSpalte] = useState<TabellenSpalte | null>(null);
@@ -3261,6 +3358,8 @@ function EinheitenTabelle({ meldungen, art, eingang, nummern, neueFassungen, kom
                 eingang={eingang}
                 nummer={nummern?.get(z.eintrag.einheitSchluessel)}
                 neueFassung={neueFassungen?.has(z.eintrag.einheitSchluessel)}
+                kern={kern}
+                onOeffnen={onOeffnen}
               />
             ))}
           </tbody>
@@ -3282,7 +3381,7 @@ function EinheitenTabelle({ meldungen, art, eingang, nummern, neueFassungen, kom
         {kern
           ? "Kernspalten. Mit „Alle Spalten zeigen“ sind die Spaltenköpfe zum Sortieren antippbar. "
           : "Spaltenkopf anklicken sortiert die Tabelle. "}
-        Details, Historie und Aktionen einer Einheit stehen in der Kartenansicht.
+        Details, Historie und Aktionen einer Einheit stehen in der Kartenansicht — den Namen antippen öffnet die Karte.
       </p>
     </>
   );
@@ -3321,15 +3420,28 @@ function AltBadge() {
 }
 
 /** Eine Datenzeile — abgerückte Meldungen bleiben sichtbar, aber durchgestrichen. */
-function TabellenZeileZelle({ zeile: z, spalten, eingang, nummer, neueFassung }: { zeile: TabellenZeile; spalten: SpaltenDefinition[]; eingang?: Eingang | null; nummer?: number; neueFassung?: boolean }) {
+function TabellenZeileZelle({ zeile: z, spalten, eingang, nummer, neueFassung, kern = false, onOeffnen }: { zeile: TabellenZeile; spalten: SpaltenDefinition[]; eingang?: Eingang | null; nummer?: number; neueFassung?: boolean; kern?: boolean; onOeffnen?: (schluessel: string) => void }) {
   const zeile = useEingangsquittung<HTMLTableRowElement>(marke(eingang, z.eintrag.einheitSchluessel), { rollen: false });
   return (
-    <tr ref={zeile} data-einheit={z.eintrag.einheitSchluessel} className={z.anwesend ? undefined : "gestrichen"}>
+    <tr
+      ref={zeile}
+      data-einheit={z.eintrag.einheitSchluessel}
+      className={`${z.anwesend ? "" : "gestrichen"}${onOeffnen ? " zeile-antippbar" : ""}`.trim() || undefined}
+      // Ein Tipp irgendwo in der Zeile öffnet die Karte, nicht nur auf den Namen (R18-S10, E5); Knöpfe und Verweise in der Zeile behalten ihren Weg.
+      onClick={onOeffnen ? (e) => { if (!(e.target as HTMLElement).closest("button, a, input, select, textarea, summary")) onOeffnen(z.eintrag.einheitSchluessel); } : undefined}
+    >
       <th scope="row">
         {nummer != null ? <><span className="meldung-nr">Nr. {nummer}</span>{" "}</> : null}
         {/* Durchgestrichen wird nur der Name, das Statuswort bleibt lesbar —
             wie in den Karten (Audit Runde 3, R3-L3). */}
-        <span className="tabelle-name">{weicheTrennstellen(z.einheit)}</span>
+        {/* Der Name ist antippbar: Er öffnet die Karte der Einheit mit Abrücken, Zug, Notiz und Entfernen (R18-E5, S10). */}
+        {onOeffnen ? (
+          <button type="button" className="link tabelle-oeffnen" aria-label={`Karte von ${z.einheit} öffnen`} onClick={() => onOeffnen(z.eintrag.einheitSchluessel)}>
+            <span className="tabelle-name">{weicheTrennstellen(z.einheit)}</span>
+          </button>
+        ) : (
+          <span className="tabelle-name">{weicheTrennstellen(z.einheit)}</span>
+        )}
         {z.eintrag.bogen.uebung ? <span className="uebung-badge">ÜBUNG</span> : null}
         <AnonymBadge bogen={z.eintrag.bogen} kurz />
         <SignaturWarnung eintrag={z.eintrag} />
@@ -3345,15 +3457,29 @@ function TabellenZeileZelle({ zeile: z, spalten, eingang, nummer, neueFassung }:
       {/* Die Zellen folgen TABELLEN_SPALTEN, damit Kopf, Zeile und Summe nie
           auseinanderlaufen, wenn die Spaltenfolge sich ändert (R2-K5). */}
       {spalten.filter((s) => s.schluessel !== "einheit").map((s) => (
-        <TabellenZelle key={s.schluessel} spalte={s.schluessel} zeile={z} />
+        <TabellenZelle key={s.schluessel} spalte={s.schluessel} zeile={z} kern={kern} />
       ))}
     </tr>
   );
 }
 
 /** Eine Datenzelle der Einheitentabelle (alles außer dem Zeilenkopf „Einheit"). */
-function TabellenZelle({ spalte, zeile: z }: { spalte: TabellenSpalte; zeile: TabellenZeile }) {
+function TabellenZelle({ spalte, zeile: z, kern = false }: { spalte: TabellenSpalte; zeile: TabellenZeile; kern?: boolean }) {
   switch (spalte) {
+    // Kernspalten am Telefon: die Eintreffzeit steht da, das Alter der Angaben bleibt als Marke darunter (R18-A5).
+    case "eingetroffen": {
+      if (!kern) return <td>{z.eingetroffen}</td>;
+      const jetzt = Date.now();
+      const alt = z.anwesend && jetzt - z.angabenAm >= 60 * 60_000;
+      return (
+        <td className="eingetroffen-kern">
+          {zeitKurz(z.eingetroffenAm)}
+          {alt && (
+            <span className="alter-marke warnung-text">⚠ {z.angabenWort === "Stand" ? "Stand " : ""}{alterText(z.angabenAm, jetzt)}</span>
+          )}
+        </td>
+      );
+    }
     // Zahl plus Typen: „3" beantwortet die Summenfrage, „GKW / MzKW" die
     // nach dem, was tatsächlich dasteht.
     case "fahrzeuge":
@@ -3383,8 +3509,8 @@ function TabellenZelle({ spalte, zeile: z }: { spalte: TabellenSpalte; zeile: Ta
       return (
         <td className={alt ? "warnung-text" : undefined}>
           {alt ? "⚠ " : ""}
-          {/* Unter „Meldung vor" steht nur die Dauer; beim Stand trägt die Zelle ihr „vor" selbst, sonst las es sich „Stand 101 Tagen" (R16-N1). */}
-          {z.angabenWort === "Stand" ? `Stand ${alterText(z.angabenAm, jetzt)}` : alterText(z.angabenAm, jetzt).replace(/^vor /, "")}
+          {/* Unter „Alter" steht „vor 10 Min" bzw. „Stand vor 101 Tagen" (R16-N1, R18-N9). */}
+          {z.angabenWort === "Stand" ? `Stand ${alterText(z.angabenAm, jetzt)}` : alterText(z.angabenAm, jetzt)}
         </td>
       );
     }
@@ -3400,7 +3526,6 @@ function TabellenZelle({ spalte, zeile: z }: { spalte: TabellenSpalte; zeile: Ta
       return <td className="zug-zelle">{z.zugEtikett}</td>;
     case "einheit":
     case "organisation":
-    case "eingetroffen":
     case "abgerueckt":
       return <td>{z[spalte]}</td>;
     default:
@@ -4313,6 +4438,7 @@ function EinheitKarte(props: {
         // Die eigene Handlung gilt, auch nach einer zurückgestellten Uhr (R5-E2).
         fassungObenauf(einsatzId, r.eintrag.id);
         angabenVermerken(einsatzId, r.eintrag.id, kopf); // das Alter der Meldung bleibt (R17-K1)
+        standAbsenderVermerken(einsatzId, r.eintrag.id, kopf); // Stand der Angaben bleibt der des Absenders (R18-A2)
       }
     }, `Gewünscht war für „${einheitAnzeigename(kopf.bogen.einheit)}": Stärke ${f} / ${u} / ${m} / ${f + u + m} (bisher ${alt.fuehrer} / ${alt.unterfuehrer} / ${alt.mannschaft} / ${alt.gesamt}). Bitte auf dem Meldeblock notieren, Platz schaffen und noch einmal eingeben.`);
     if (!ok) return;
@@ -4409,7 +4535,8 @@ function EinheitKarte(props: {
       text: `„${einheitAnzeigename(kopf.bogen.einheit)}" samt Historie, Zeiten und Auftrag aus „${hierName}" verschieben${staerkeText}. Ziel:`,
       wege: andere.map((s) => ({
         wert: s.id,
-        label: s.name,
+        // Der Knopf nennt Verb und Ziel und wirkt nicht wie eine Auswahlzeile (R18-D8).
+        label: `In „${s.name}“ verschieben`,
         hinweis:
           `${ART_LABEL[s.art]}${s.ort ? ` · ${s.ort}` : ""} · angelegt ${datumZweistellig(s.angelegt)}` +
           (zaehltHier && s.art !== EinsatzArt.EINSATZ ? ` — als Übung zählt die Einheit in keiner Lage mehr` : "") +
@@ -4478,7 +4605,7 @@ function EinheitKarte(props: {
               sah man neben dem roten Knopf nur den Anfang (R9-D5, R10-D1). Kurz gehalten, rund 40 Wörter (R10-S3).
               Nummer, Teil und Stärke unterscheiden einen abgeteilten Trupp von seiner Stammeinheit (R14-D1). */}
           <p>
-            <strong>{props.nummer != null ? `Nr. ${props.nummer} ` : ""}„{einheitAnzeigename(kopf.bogen.einheit)}" ({bezug}, Stand {standText(kopf.bogen)}) entfernen</strong> — samt Historie.
+            <strong>{props.nummer != null ? `Nr. ${props.nummer} ` : ""}„{einheitAnzeigename(kopf.bogen.einheit)}" ({bezug}, Stand {zeitpunktDeutsch(standDesAbsenders(kopf))}) entfernen</strong> — samt Historie.
           </p>
           {personenFolge && (
             <p>
@@ -4487,7 +4614,7 @@ function EinheitKarte(props: {
           )}
           {verschoben && (
             <p>
-              <strong>Nummern ändern sich:</strong> {verschoben}.
+              <strong>Nummern bleiben:</strong> {verschoben} — wie auf Lageblatt und Meldeblock.
             </p>
           )}
           <p>
@@ -4507,17 +4634,19 @@ function EinheitKarte(props: {
     // die richtige ging — und anders als eine Karte im Assistenten ist eine
     // entfernte Meldung nicht wiederherstellbar. Läuft keine Animation
     // (reduzierte Bewegung, verdeckter Tab), nimmt mitAbgang den direkten Weg.
+    const stelleVorher = seitenOben(zeile.current); // R18-A8: Die Ansicht bleibt an der Stelle der entfernten Karte
     mitAbgang(zeile.current, () => {
       // ALLE Fassungen der Einheit, nicht nur der Kopf: sonst rückt die ältere
       // Fassung nach, die Einheit bleibt mit veralteter Stärke in der Lage und
       // die Summen steigen sogar (Audit Runde 2, R2-D1). Abgeteilte Teile haben
       // einen eigenen Schlüssel und bleiben.
-      const weg = einheitEntfernen(einsatzId, kopf.einheitSchluessel);
+      const weg = einheitEntfernen(einsatzId, kopf.einheitSchluessel, meldungsNummern(alle));
       // Die Einträge reisen vollständig zurück an die Ansicht: Sie bietet sie
       // zum Zurückholen an, solange niemand weitergeklickt hat. Für Einsätze
       // gibt es einen Papierkorb, für die einzelne Meldung bisher nichts.
-      if (weg.length > 0) onEntfernt?.({ art: "einheit", eintraege: fassungenJeEinheit(weg, kopf.einheitSchluessel), verschoben, bezug });
+      if (weg.length > 0) onEntfernt?.({ art: "einheit", eintraege: fassungenJeEinheit(weg, kopf.einheitSchluessel), verschoben: verschoben.split(", ")[0] ?? "", bezug });
       onGeaendert();
+      stelleHalten(stelleVorher);
     });
   }
 
@@ -4656,7 +4785,7 @@ function EinheitKarte(props: {
               )}
               {folge && (
                 <span className={`kompakt-merkmal folge-merkmal${folge.verlust ? " staerke-verlust" : ""}`} title={`Folgemeldung ${zeitLang(folge.gemeldetAm)}: ${folge.kurz}`}>
-                  Folgem. {zeitKurz(folge.gemeldetAm)}
+                  Folgemeldung {zeitKurz(folge.gemeldetAm)}
                   {folge.staerkeVorher != null ? ` · ${folge.staerkeVorher} → ${folge.staerkeNachher}` : ""}
                 </span>
               )}
@@ -4672,9 +4801,16 @@ function EinheitKarte(props: {
                 <span className="bedarf-marke routine bedarf-nicht-erfasst">Bedarf nicht erfasst</span>
               )}
               {props.fremderOrt && (
-                <span className="kompakt-merkmal luecken-merkmal" title={`Bogen nennt als Ort/Auftrag: „${props.fremderOrt}“ — passt das zu dieser Lage? ${ORT_REGEL}`}>
-                  ⚠ Anderer Einsatz?
-                </span>
+                // Ein Tipp klappt die Karte auf: Dort steht „Gehört zu dieser Lage" — die Marke ist nicht mehr nur eine Warnung ohne Ausweg (R18-E2).
+                <button
+                  type="button"
+                  className="kompakt-merkmal luecken-merkmal marke-knopf"
+                  title={`Bogen nennt als Ort/Auftrag: „${props.fremderOrt}“ — passt das zu dieser Lage? ${ORT_REGEL}`}
+                  aria-describedby={nameId}
+                  onClick={() => setAufgeklappt(true)}
+                >
+                  ⚠ Anderer Einsatz? Prüfen ▸
+                </button>
               )}
               {neuereMarke(true)}
               {nachgereicht && (
@@ -4751,9 +4887,10 @@ function EinheitKarte(props: {
                 </button>
               </>
             )}
-            {" · Stand "}{zeitpunktDeutsch(standDesAbsenders(kopf))}
+            {" · Stand der Angaben "}{zeitpunktDeutsch(standDesAbsenders(kopf))}
             {standIstAlt(kopf) && <AltBadge />}
             {" · "}{quelleText(kopf, revs)}
+            {kopf.angaben && <>{" · "}{handAenderungText(kopf)}</>}
           </span>
           {/* Bleibt stehen, bis die Zeiten zusammenpassen — auch nach einem
               „Abrücken", das vor einer falsch nachgetragenen Eintreffzeit
@@ -4767,7 +4904,7 @@ function EinheitKarte(props: {
           {props.fremderOrt && (
             <span className="muster-sub warnung-text fremder-ort" role="note">
               ⚠ Bogen nennt: „{props.fremderOrt}“ — passt das zu dieser Lage? {ORT_REGEL} Zählt trotzdem mit.{" "}
-              <button type="button" className="link" aria-describedby={nameId} onClick={() => void ortGehoert(true)}>
+              <button type="button" className="link ort-knopf" aria-describedby={nameId} onClick={() => void ortGehoert(true)}>
                 Gehört zu dieser Lage
               </button>
             </span>
@@ -4776,7 +4913,7 @@ function EinheitKarte(props: {
           {!props.fremderOrt && ortIstGebilligt(kopf, revs) && (
             <span className="muster-sub hinweis ort-gebilligt" role="note">
               Ort/Auftrag „{(kopf.bogen.einsatz.ortAuftrag ?? "").trim()}“ vom Meldekopf als zur Lage gehörig bestätigt.{" "}
-              <button type="button" className="link" aria-describedby={nameId} onClick={() => void ortGehoert(false)}>
+              <button type="button" className="link ort-knopf" aria-describedby={nameId} onClick={() => void ortGehoert(false)}>
                 Wieder prüfen
               </button>
             </span>
@@ -4786,7 +4923,7 @@ function EinheitKarte(props: {
             <span className="muster-sub warnung-text bogen-nachgereicht" role="note">
               ⚠ Bogen der Einheit nachgereicht (Stand {standText(nachgereicht.bogen)}, Stärke {staerkeText(nachgereicht.bogen)}) — es gilt
               noch die Schnellerfassung.{" "}
-              <button type="button" className="link" aria-describedby={nameId} onClick={() => void fassungGilt(nachgereicht)}>
+              <button type="button" className="link ort-knopf" aria-describedby={nameId} onClick={() => void fassungGilt(nachgereicht)}>
                 Bogen übernehmen
               </button>
             </span>
@@ -4960,17 +5097,18 @@ function EinheitKarte(props: {
       <div className="vorlage-aktionen">
         {kompakt && (
           <>
-            <button type="button" aria-describedby={nameId} aria-expanded={true} onClick={() => setAufgeklappt(false)}>
+            <button type="button" className="aktion-zuklappen" aria-describedby={nameId} aria-expanded={true} onClick={() => setAufgeklappt(false)}>
               Zuklappen
             </button>{" "}
           </>
         )}
-        <button type="button" aria-describedby={nameId} onClick={() => setDetails(!details)}>
+        <button type="button" className="aktion-details" aria-describedby={nameId} onClick={() => setDetails(!details)}>
           {details ? "Details schließen" : "Details"}
         </button>{" "}
         <button
           aria-describedby={nameId}
           type="button"
+          className="aktion-pdf"
           onClick={bogenPdf}
           disabled={pdfLaeuft}
           title="Bogen dieser Einheit als PDF — im Browser in einem neuen Tab."
@@ -4979,7 +5117,7 @@ function EinheitKarte(props: {
         </button>{" "}
         {vorige && (
           <>
-            <button type="button" aria-describedby={nameId} onClick={() => setAenderungen(!aenderungen)}>
+            <button type="button" className="aktion-aenderungen" aria-describedby={nameId} onClick={() => setAenderungen(!aenderungen)}>
               {aenderungen ? "Änderungen schließen" : "Änderungen"}
             </button>{" "}
           </>
@@ -5011,10 +5149,10 @@ function EinheitKarte(props: {
             </button>{" "}
           </>
         )}
-        <button type="button" aria-describedby={nameId} onClick={() => setZugEntwurf(kopf.zugEtikett ?? "")}>
+        <button type="button" className="aktion-zug" aria-describedby={nameId} onClick={() => setZugEntwurf(kopf.zugEtikett ?? "")}>
           {kopf.zugEtikett ? "Zug ändern" : "Zug zuordnen"}
         </button>{" "}
-        <button type="button" aria-describedby={nameId} onClick={() => setNotizEntwurf(kopf.notiz ?? "")}>
+        <button type="button" className="aktion-notiz" aria-describedby={nameId} onClick={() => setNotizEntwurf(kopf.notiz ?? "")}>
           {kopf.notiz ? "Auftrag ändern" : "Auftrag/Notiz"}
         </button>{" "}
         {/* Die seltenen, folgenschweren Aktionen hinter „Mehr…": neun Knöpfe
@@ -5041,7 +5179,7 @@ function EinheitKarte(props: {
         {(revs.length > 1 || vermerke.length > 0) && (
           <>
             {" "}
-            <button type="button" aria-describedby={nameId} onClick={() => setHistorie(!historie)}>
+            <button type="button" className="aktion-historie" aria-describedby={nameId} onClick={() => setHistorie(!historie)}>
               {historie ? "Historie schließen" : revs.length > 1 ? `Historie (${revs.length})` : "Historie"}
             </button>
           </>

@@ -119,13 +119,15 @@ describe("R14-K1 Alter der Angaben (Stand), nicht des Eintreffens", () => {
   it("alterKurz nennt Minuten (R14-K3); auftragKurz kürzt auf eine Zeile", () => {
     expect(alterKurz(90)).toBe("1 Std 30 Min");
     expect(alterKurz(119)).toBe("1 Std 59 Min");
-    expect(alterKurz(2 * 1440 + 5)).toBe("2 T");
+    expect(alterKurz(2 * 1440 + 5)).toBe("2 Tage");
+    expect(alterKurz(1440)).toBe("1 Tag");
     expect(auftragKurz("a\n b")).toBe("a b");
   });
 
   it("der Hinweis nach einem Stapel nennt die Einlesezeit erst ab zwei Bögen", () => {
     expect(eintreffzeitStapelHinweis(1)).toBe("");
-    expect(eintreffzeitStapelHinweis(6)).toMatch(/Eintreffzeit dieser 6 Bögen ist die Zeit des Einlesens/);
+    // R18-N3: datiert („Aufnahme 22:41") und mit Deutung des „*".
+    expect(eintreffzeitStapelHinweis(6)).toMatch(/^Aufnahme \d{2}:\d{2}: Eintreffzeit dieser 6 Bögen ist die Zeit des Einlesens \(in Lageblatt und Tabellen mit \* markiert\)/);
   });
 });
 

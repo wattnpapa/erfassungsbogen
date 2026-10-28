@@ -8,6 +8,8 @@
 import { useMemo, useState } from "react";
 import { frageJaNein } from "./dialoge";
 import { zeitLang } from "./eintrag-zeiten";
+import { staerke } from "@bos/eeb-format/model";
+import { zeitpunktDeutsch } from "./hilfen";
 import { MELDUNGEN_PAPIERKORB_TAGE, meldungAusPapierkorb, meldungenImPapierkorb, papierkorbFristEnde, type PapierkorbMeldung } from "./meldungs-papierkorb";
 
 export default function EntferntMeldungenBlock({ einsatzId, geaendert, onHolen }: {
@@ -35,24 +37,53 @@ export default function EntferntMeldungenBlock({ einsatzId, geaendert, onHolen }
   }
 
   return (
-    <details className="meldungen-papierkorb">
+    <details className="meldungen-papierkorb" id={PAPIERKORB_ANKER}>
       <summary>
         Zuletzt entfernte Meldungen ({liste.length}) — {MELDUNGEN_PAPIERKORB_TAGE} Tage zurückholbar
       </summary>
       <ul className="papierkorb-liste">
         {liste.map((m) => (
           <li key={m.id}>
-            <span>
+            <span className="papierkorb-text">
               {m.art === "fassung" ? "Fassung von " : "Meldung "}
               {m.nummer != null ? `Nr. ${m.nummer} ` : ""}
               <strong>„{m.name}"</strong>
               {m.bezug ? ` (${m.bezug})` : ""} · entfernt {zeitLang(m.entferntAm)} · liegt bis {zeitLang(papierkorbFristEnde(m))}
-            </span>{" "}
-            <button type="button" onClick={() => onHolen(m)}>Zurückholen</button>{" "}
-            <button type="button" className="gefahr" onClick={() => void loeschen(m)}>Endgültig löschen…</button>
+            </span>
+            {/* Je Fassung Stand, Stärke, Zug und Auftrag: Bei mehreren Meldungen derselben Einheit sieht man, welche man holt (R18-K11). */}
+            <ul className="papierkorb-fassungen">
+              {fassungsZeilen(m).map((z) => (
+                <li key={z.id}>{z.text}</li>
+              ))}
+            </ul>
+            {/* Eigene Knopfzeile unter dem Text, „Endgültig löschen…" rechts abgesetzt (R18-D1, E4, H3, G1). */}
+            <span className="papierkorb-knoepfe">
+              <button type="button" onClick={() => onHolen(m)}>Zurückholen</button>
+              <button type="button" className="gefahr" onClick={() => void loeschen(m)}>Endgültig löschen…</button>
+            </span>
           </li>
         ))}
       </ul>
     </details>
   );
+}
+
+/** Anker des Blocks: Der Verweis über der Liste springt hierher und klappt ihn auf (R18-E3). */
+export const PAPIERKORB_ANKER = "meldungen-papierkorb";
+
+/** Eine Zeile je Fassung der entfernten Meldung, die jüngste zuerst: Stand · Stärke · Zug · Auftrag. */
+export function fassungsZeilen(m: PapierkorbMeldung): { id: string; text: string }[] {
+  return [...m.eintraege]
+    .sort((a, b) => b.bogen.stand - a.bogen.stand)
+    .map((e) => {
+      const s = staerke(e.bogen);
+      const auftrag = (e.bogen.einsatz.ortAuftrag ?? "").trim();
+      const teile = [
+        `Stand ${zeitpunktDeutsch(e.bogen.stand)}`,
+        `Stärke ${s.fuehrer}/${s.unterfuehrer}/${s.mannschaft}/${s.gesamt}`,
+        e.zugEtikett ? `Zug „${e.zugEtikett}"` : "kein Zug",
+        ...(auftrag ? [`Auftrag „${auftrag}"`] : []),
+      ];
+      return { id: e.id, text: teile.join(" · ") };
+    });
 }

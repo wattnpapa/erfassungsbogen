@@ -106,9 +106,9 @@ describe("Gemerkter Rückweg des Personalschritts (R7-O5)", () => {
       JSON.stringify({ rueckweg: { art: "liste", text: "x", personal: [] }, einheit: "{}", zeit: Date.now() }),
     );
     await nutzer.click(screen.getByRole("button", { name: "‹ Startseite" }));
-    await nutzer.click(screen.getByRole("button", { name: "Verwerfen" }));
-    const frage = document.querySelector<HTMLDialogElement>("dialog[aria-label='Angefangenen Bogen verwerfen?']")!;
-    await nutzer.click(within(frage).getByRole("button", { name: "Verwerfen" }));
+    await nutzer.click(screen.getByRole("button", { name: "Bogen schließen" }));
+    const frage = document.querySelector<HTMLDialogElement>("dialog[aria-label='Angefangenen Bogen schließen?']")!;
+    await nutzer.click(within(frage).getByRole("button", { name: "Bogen schließen" }));
     await waitFor(() => expect(sessionStorage.getItem("eeb.personal.rueckweg")).toBeNull());
   });
 });

@@ -13,7 +13,7 @@
  */
 
 import { useState } from "react";
-import { Feld } from "./schritte/bausteine";
+import { Feld, NAMEN_EINGABE } from "./schritte/bausteine";
 
 /**
  * Vorsätze, die auf Papier vor dem Ortsnamen stehen, aber nicht zum Ort
@@ -153,7 +153,7 @@ export function EintreffzeitFeld(props: {
       {/* Die drei Zettelfelder sind optional (R11-M1): Eingeklappt (solange nichts eingetragen ist) liegt „Ort der
           Einheit" nicht zwei Bildschirme tiefer; die Zusammenfassung ist ein voller Knopf. */}
       <details className="zettel-angaben" open={offenAnfang}>
-      <summary>Angaben vom Zettel (optional): Eingetroffen um, Abgerückt um, Nr., Zug</summary>
+      <summary>Angaben vom Zettel (optional)<span className="zettel-felder">: Eingetroffen um, Abgerückt um, Nr., Zug</span></summary>
       <Feld titel="Eingetroffen um (vom Meldeblock)" schmal>
         <input type="time" value={props.wert} onChange={(e) => props.onAendern(e.target.value)} />
       </Feld>
@@ -164,12 +164,12 @@ export function EintreffzeitFeld(props: {
       )}
       {props.onNummer && (
         <Feld titel="Nr. laut Zettel (leer = die App vergibt)" schmal>
-          <input type="text" inputMode="numeric" value={props.nummer ?? ""} onChange={(e) => props.onNummer?.(e.target.value)} />
+          <input type="text" inputMode="numeric" value={props.nummer ?? ""} onChange={(e) => props.onNummer?.(e.target.value)} {...NAMEN_EINGABE} />
         </Feld>
       )}
       {props.onZug && (
         <Feld titel="Zug / Verband (laut Zettel)">
-          <input type="text" list="nacherfassung-zuege" value={props.zug ?? ""} onChange={(e) => props.onZug?.(e.target.value)} />
+          <input type="text" list="nacherfassung-zuege" value={props.zug ?? ""} onChange={(e) => props.onZug?.(e.target.value)} {...NAMEN_EINGABE} />
           <datalist id="nacherfassung-zuege">
             {(props.zuege ?? []).map((z) => (
               <option key={z} value={z} />

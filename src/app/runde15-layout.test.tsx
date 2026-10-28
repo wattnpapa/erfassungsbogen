@@ -166,9 +166,9 @@ describe("R15-G1 Doppeltipp nach „Zur Kenntnis genommen“", () => {
     expect(tabelle.getAttribute("aria-pressed")).toBe("true");
   });
 
-  it("die Sperre hält länger als der 1-Sekunden-Takt eines zögernden Doppeltipps (QUITTUNG_SPERRE_MS)", async () => {
+  it("die Sperre hält länger als der 1-Sekunden-Takt eines zögernden Doppeltipps (QUITTUNG_SPERRE_MS; R18: 1,2 s)", async () => {
     const { QUITTUNG_SPERRE_MS } = await import("./tipp-schutz");
-    expect(QUITTUNG_SPERRE_MS).toBeGreaterThanOrEqual(1500);
+    expect(QUITTUNG_SPERRE_MS).toBeGreaterThanOrEqual(1100);
   });
 });
 

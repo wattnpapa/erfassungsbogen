@@ -15,7 +15,7 @@ import { beispielRestText } from "../beispiel-herkunft";
 import { frageJaNein } from "../dialoge";
 import { heuteDatum, pruefpunkte } from "../hilfen";
 import { zeitraumNachEingabe } from "../zeitraum-eingabe";
-import { Feld, Hinweise, type SchrittProps } from "./bausteine";
+import { Feld, Hinweise, NAMEN_EINGABE, type SchrittProps } from "./bausteine";
 
 /**
  * `meldekopf`: Aufnahme einer fremden Einheit am Meldekopf („Einheit manuell erfassen…"). Dort spricht der
@@ -93,7 +93,7 @@ export function SchrittEinsatz({ bogen, aendern, meldekopf = false }: SchrittPro
           <input type="date" value={datumZuIso(ez.zeitraumBis)} onChange={(e) => setEz(zeitraumNachEingabe(ez, "bis", e.target.value, heuteDatum()))} />
         </Feld>
         <Feld titel="Einsatzort / Auftrag">
-          <input id="feld-ort-auftrag" value={ez.ortAuftrag} onChange={(e) => setEz({ ortAuftrag: e.target.value })} placeholder="z. B. Fernmeldebauübung Kabelblitz" />
+          <input id="feld-ort-auftrag" value={ez.ortAuftrag} onChange={(e) => setEz({ ortAuftrag: e.target.value })} placeholder="z. B. Fernmeldebauübung Kabelblitz" {...NAMEN_EINGABE} />
         </Feld>
       </div>
       {/* Die Kästchen setzen einen Zeitstempel — das stand nirgends. Ein

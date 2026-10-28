@@ -30,6 +30,8 @@ export default function NamenInhalt({ bogen, onUebernehmen, onBeispiele }: {
   const zeilenOhneKomma = namenText
     .split(/\r?\n/)
     .filter((z) => z.trim() !== "" && !/[,;\t]/.test(z) && telefonAbtrennen(z.trim()).zeile.split(/\s+/).length >= 2).length;
+  // Solange die Lesart nicht gewählt ist, bleibt „Übernehmen" gesperrt (R18-S7).
+  const reihenfolgeOffen = zeilenOhneKomma > 0 && reihenfolge == null;
   // Zeilen, die kein Name sein dürften (Ziffern, Klammern, Semikolon), tragen eine
   // Marke und werden nur übernommen, wenn sie ausdrücklich angehakt sind (R7-E7).
   const namenVerdaechtig = (n: { vorname: string; nachname: string }) =>
@@ -159,7 +161,7 @@ export default function NamenInhalt({ bogen, onUebernehmen, onBeispiele }: {
               <input
                 type="radio"
                 name="namen-reihenfolge"
-                checked={(reihenfolge ?? "vorname") === wert}
+                checked={reihenfolge === wert} // keine Vorauswahl: Bei „Meier Hans" wäre jede geratene Lesart eine stille Vertauschung (R18-S7)
                 onChange={() => setReihenfolge(wert)}
                 onClick={() => setReihenfolge(wert)}
               />
@@ -199,7 +201,8 @@ export default function NamenInhalt({ bogen, onUebernehmen, onBeispiele }: {
                       />
                     </label>
                   )}
-                  {[n.nachname, n.vorname].filter(Boolean).join(", ")}
+                  {/* „Vorname Nachname" in der Lesart, die gerade gilt (R18-S7): „Nachname, Vorname" las sich wie eine Vertauschung. */}
+                  {[n.vorname, n.nachname].filter(Boolean).join(" ")}
                   {n.funktion ? ` · ${n.funktion}` : ""}
                   {n.telefon ? ` · Tel. ${n.telefon}` : ""}
                   {" · "}
@@ -231,7 +234,7 @@ export default function NamenInhalt({ bogen, onUebernehmen, onBeispiele }: {
       {namenAlle.some((n) => n.unsicher && !namenVerdaechtig(n)) && (
         <p className="warnung" role="status">
           Bei „Reihenfolge prüfen" ist die Reihenfolge geraten (mehrere Wörter ohne Komma oder vor dem Komma, Funktion ohne Komma) — die
-          Vorschau zeigt „Nachname, Vorname". Stimmt das nicht, oben die Reihenfolge ändern oder die Zeile als „Nachname, Vorname, Funktion" schreiben.
+          Vorschau zeigt „Vorname Nachname" in der gewählten Lesart. Stimmt das nicht, oben die Reihenfolge ändern oder die Zeile als „Nachname, Vorname, Funktion" schreiben.
         </p>
       )}
       {anzahlDoppelt > 0 && (
@@ -241,7 +244,7 @@ export default function NamenInhalt({ bogen, onUebernehmen, onBeispiele }: {
         </p>
       )}
       <p>
-        <button type="button" className="primaer" disabled={namenVorschau.length === 0} onClick={namenUebernehmen}>
+        <button type="button" className="primaer" disabled={namenVorschau.length === 0 || reihenfolgeOffen} aria-describedby={reihenfolgeOffen && namenVorschau.length > 0 ? "namen-reihenfolge-fehlt" : undefined} onClick={namenUebernehmen}>
           {namenVorschau.length === 0
             ? "Übernehmen"
             : `${namenVorschau.length} ${namenVorschau.length === 1 ? "Person" : "Personen"} übernehmen${
@@ -249,6 +252,12 @@ export default function NamenInhalt({ bogen, onUebernehmen, onBeispiele }: {
               }`}
         </button>
       </p>
+      {/* Der gesperrte Knopf sagt, was fehlt (R18-S7). */}
+      {reihenfolgeOffen && namenVorschau.length > 0 && (
+        <p className="hinweis" id="namen-reihenfolge-fehlt">
+          „Übernehmen“ geht erst, wenn oben gewählt ist, ob die Zeilen ohne Komma „Vorname Nachname“ oder „Nachname Vorname“ lauten.
+        </p>
+      )}
       {/* Beispielnamen nur bei Übungsbögen (Haken in Schritt 2): im echten
           Einsatz existiert dieser Weg gar nicht erst — künstliche Daten
           lassen sich dort auch nicht versehentlich erzeugen. */}

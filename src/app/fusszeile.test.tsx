@@ -328,7 +328,9 @@ describe("Geräteschlüssel neu erzeugen", () => {
 
     await nutzer.click(screen.getByRole("button", { name: "Geräteschlüssel neu erzeugen" }));
     const dialog = await screen.findByRole("dialog", { name: "Geräteschlüssel neu erzeugen?" });
-    expect(dialog.textContent).toContain("wird gelöscht und durch ein neues Schlüsselpaar ersetzt");
+    expect(dialog.textContent).toContain("wird gelöscht und durch ein neues Paar ersetzt");
+    // R18-D4: Die Folge steht vor der Erläuterung, damit die feste Knopfleiste sie nicht verdeckt.
+    expect(dialog.textContent!.indexOf("Empfänger müssen die Kurzform danach neu abgleichen")).toBeLessThan(dialog.textContent!.indexOf("wird gelöscht und durch ein neues Paar ersetzt"));
     await nutzer.click(within(dialog).getByRole("button", { name: "Vorher Sicherung erstellen…" }));
 
     // Die Sicherung ist erzeugt; der Schlüssel steht noch, die Rückfrage kommt wieder.

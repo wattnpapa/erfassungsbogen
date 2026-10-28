@@ -330,6 +330,11 @@ describe("Schritt Personal", () => {
 
     await nutzer.type(within(dialog).getByRole("textbox"), "Muster, Max\nErika Musterfrau");
 
+    // R18-S7: Eine Zeile ohne Komma fordert die Lesart; vorher bleibt „Übernehmen" gesperrt, und der Knopf sagt, was fehlt.
+    const uebernehmen = within(dialog).getByRole("button", { name: "2 Personen übernehmen" });
+    expect(uebernehmen.hasAttribute("disabled")).toBe(true);
+    expect(dialog.textContent).toContain("„Übernehmen“ geht erst, wenn oben gewählt ist");
+    await nutzer.click(within(dialog).getByRole("radio", { name: "Vorname Nachname" }));
     // Der Knopf beziffert die erkannten Zeilen — das ist die Vorschau.
     await nutzer.click(within(dialog).getByRole("button", { name: "2 Personen übernehmen" }));
 
@@ -355,6 +360,7 @@ describe("Schritt Personal", () => {
     expect(within(dialog).getByRole("button", { name: "1 Person übernehmen (2 nicht)" })).toBeDefined();
 
     await nutzer.click(within(dialog).getByRole("checkbox", { name: /12345.*trotzdem als Name übernehmen/ }));
+    await nutzer.click(within(dialog).getByRole("radio", { name: "Vorname Nachname" })); // R18-S7: erst die Lesart wählen
     await nutzer.click(within(dialog).getByRole("button", { name: "2 Personen übernehmen (1 nicht)" }));
     const tabelle = screen.getByRole("table");
     const werte = (within(tabelle).getAllByRole("textbox", { name: /Vorname|Nachname/ }) as HTMLInputElement[]).map((f) => f.value);
@@ -442,6 +448,7 @@ describe("Schritt Personal", () => {
     await nutzer.click(screen.getByRole("button", { name: "Namen einfügen…" }));
     const dialog = document.querySelector<HTMLDialogElement>("dialog[aria-label='Namen einfügen']")!;
     await nutzer.type(within(dialog).getByRole("textbox"), "Maier, Klaus\nAnna Schulz");
+    await nutzer.click(within(dialog).getByRole("radio", { name: "Vorname Nachname" })); // R18-S7: erst die Lesart wählen
     await nutzer.click(within(dialog).getByRole("button", { name: "2 Personen übernehmen" }));
 
     expect(screen.getByLabelText("Stärke: 0 Führer, 2 Unterführer, 7 Mannschaft, 9 gesamt")).toBeDefined();

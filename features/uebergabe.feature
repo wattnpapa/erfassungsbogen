@@ -65,12 +65,12 @@ Funktionalität: Bogen übergeben — QR, PDF, Link, CSV
   Szenario: Ohne PDF-Betrachter im Browser gibt es die Datei statt der Vorschau
     Dann sehe ich die Schaltfläche "Vorschau anzeigen" nicht
     Wenn ich auf "PDF herunterladen" klicke und eine Datei erhalte
-    Dann heißt die heruntergeladene Datei wie "eeb-*.pdf"
+    Dann heißt die heruntergeladene Datei wie "*_eeb_*.pdf"
 
   Szenario: PDF erzeugen liefert eine Datei im Papier-Layout
     Wenn ich auf "Bogen übergeben…" klicke
     Und ich auf "PDF erzeugen" klicke und eine Datei erhalte
-    Dann heißt die heruntergeladene Datei wie "eeb-*.pdf"
+    Dann heißt die heruntergeladene Datei wie "*_eeb_*.pdf"
 
   # Aus dem Einsatz gemeldet (Firefox, Übungswochenende): „PDF: error loading
   # dynamically imported module … /assets/pdf-….js". Der PDF-Satz liegt als
@@ -83,7 +83,7 @@ Funktionalität: Bogen übergeben — QR, PDF, Link, CSV
     Wenn ich die App vom Netz trenne
     Und ich auf "Bogen übergeben…" klicke
     Und ich auf "PDF erzeugen" klicke und eine Datei erhalte
-    Dann heißt die heruntergeladene Datei wie "eeb-*.pdf"
+    Dann heißt die heruntergeladene Datei wie "*_eeb_*.pdf"
 
   Szenario: CSV liefert den Bogen als Tabelle für die Auswertung
     Wenn ich auf "Bogen übergeben…" klicke

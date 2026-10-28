@@ -154,10 +154,10 @@ describe("Tabelle am Telefon (R17-H8, K7, G7)", () => {
     localStorage.clear();
   });
 
-  it("Kernspalten: Einheit, Gesamt, Zug (nur wenn vergeben), Meldung vor, Bedarf — mit „Alle Spalten“ wie bisher", () => {
+  it("Kernspalten (R18-A5): Einheit, Gesamt, Eingetroffen, Zug (nur wenn vergeben), Auftrag — mit „Alle Spalten“ wie bisher", () => {
     const kern = (zug: boolean) => tabellenSpaltenFuer(zug, true, true).map((s) => s.schluessel);
-    expect(kern(true)).toEqual(["einheit", "gesamt", "zugEtikett", "meldung", "bedarf"]);
-    expect(kern(false)).toEqual(["einheit", "gesamt", "meldung", "bedarf"]);
+    expect(kern(true)).toEqual(["einheit", "gesamt", "eingetroffen", "zugEtikett", "auftrag"]);
+    expect(kern(false)).toEqual(["einheit", "gesamt", "eingetroffen", "auftrag"]);
     // Ohne Kern-Wunsch und auf großen Bildschirmen ändert sich nichts.
     expect(tabellenSpaltenFuer(true, true).length).toBeGreaterThan(20);
     expect(tabellenSpaltenFuer(true, false, true).length).toBeGreaterThan(20);
@@ -175,8 +175,8 @@ describe("Tabelle am Telefon (R17-H8, K7, G7)", () => {
     expect(koepfe).toHaveLength(4);
     expect(koepfe[0]).toMatch(/^Einheit/);
     expect(koepfe[1]).toMatch(/^Ges\./);
-    expect(koepfe[2]).toMatch(/^Meldung vor/);
-    expect(koepfe[3]).toMatch(/^Bedarf/);
+    expect(koepfe[2]).toMatch(/^Eingetr\./);
+    expect(koepfe[3]).toMatch(/^Auftrag/);
     // Fünf Tippziele von 44 px stünden ohne Abstand nebeneinander: Die Köpfe sind dort nur Text.
     expect(tabelle.querySelectorAll("thead th button")).toHaveLength(0);
     // Name und Kernzahlen stehen in jeder Zeile.
@@ -362,8 +362,8 @@ describe("Doppeltipp (R17-G11, H3, G14)", () => {
     tippSchutzZuruecksetzen();
   });
 
-  it("G11: „Weiter →“ im Assistenten sperrt 0,5 s; ein Tipp nach 0,6 s kommt an, der Doppeltipp (≤ 0,3 s) nicht", () => {
-    expect(ASSISTENT_SCHRITT_SPERRE_MS).toBe(500);
+  it("G11 (R18-G3: 0,3 s): „Weiter →“ im Assistenten sperrt 0,3 s; ein Tipp nach 0,4 s kommt an, der Doppeltipp (≤ 0,2 s) nicht", () => {
+    expect(ASSISTENT_SCHRITT_SPERRE_MS).toBe(300);
     expect(ASSISTENT_SCHRITT_SPERRE_MS).toBeLessThan(ORTSSPERRE_MS);
     const knopf = document.createElement("button");
     const getroffen = vi.fn();
@@ -374,10 +374,10 @@ describe("Doppeltipp (R17-G11, H3, G14)", () => {
     const tipp = () => knopf.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true, clientX: 290, clientY: 606, detail: 1 }));
     tipp();
     ortSperren(ASSISTENT_SCHRITT_SPERRE_MS);
-    uhr.mockReturnValue(t0 + 300);
+    uhr.mockReturnValue(t0 + 200);
     tipp(); // Doppeltipp: gesperrt
     expect(getroffen).toHaveBeenCalledTimes(1);
-    uhr.mockReturnValue(t0 + 600);
+    uhr.mockReturnValue(t0 + 400);
     tipp(); // bewusstes Weitertippen: kommt an
     expect(getroffen).toHaveBeenCalledTimes(2);
     knopf.remove();

@@ -9,7 +9,7 @@ import { frageJaNein } from "../dialoge";
 import { freitextQrHinweis } from "../qr-posten";
 import { HOECHST_LITER, HOECHST_PERSONEN } from "../zahl-eingabe";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Feld, Hinweise, useZahlEingabe, ZahlMeldung, ZahlMeldungsSenke, type SchrittProps } from "./bausteine";
+import { Feld, Hinweise, NAMEN_EINGABE, useZahlEingabe, ZahlMeldung, ZahlMeldungsSenke, type SchrittProps } from "./bausteine";
 
 /** Was beim Ausschalten verloren ginge: leer, wenn nichts Eigenes dahintersteht. */
 export function sofortbedarfAngaben(s: Sofortbedarf, vorbelegung: number): string[] {
@@ -174,7 +174,8 @@ export function SchrittSofortbedarf({ bogen, aendern }: SchrittProps) {
         </>
       )}
       <Feld titel="Sonstiges (Freitext)">
-        <textarea rows={3} value={bogen.sonstiges ?? ""} onChange={(e) => aendern({ sonstiges: e.target.value || undefined })} />
+        {/* Fachwörter und Kürzel („Nachschub MzKW", „FGr"): Autokorrektur und Rechtschreibprüfung aus (R18-H5). */}
+        <textarea rows={3} value={bogen.sonstiges ?? ""} onChange={(e) => aendern({ sonstiges: e.target.value || undefined })} {...NAMEN_EINGABE} />
       </Feld>
       {/* Ab 500 Zeichen: Der Text kostet QR-Teile (R11-E5). */}
       {freitextQrHinweis(bogen.sonstiges) && (
