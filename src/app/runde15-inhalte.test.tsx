@@ -410,10 +410,10 @@ describe("R15-N3 Schnellerfassung: Rückknopf der Übersicht", () => {
     return geheZu;
   }
 
-  it("Schnellerfassung führt zurück zu Schritt 4 (Fahrzeuge), nicht zum übersprungenen Sofortbedarf", () => {
+  it("Schnellerfassung führt zurück zu Schritt 3 (Fahrzeuge) der eigenen Zählung, nicht zum übersprungenen Sofortbedarf", () => {
     const geheZu = uebersicht(true, true);
     expect(screen.queryByRole("button", { name: /Zurück zu Schritt 5/ })).toBeNull();
-    fireEvent.click(screen.getByRole("button", { name: "← Zurück zu Schritt 4 (Fahrzeuge)" }));
+    fireEvent.click(screen.getByRole("button", { name: "← Zurück zu Schritt 3 (Fahrzeuge)" }));
     expect(geheZu).toHaveBeenCalledWith(3);
   });
 

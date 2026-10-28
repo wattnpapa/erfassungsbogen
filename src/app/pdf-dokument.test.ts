@@ -22,7 +22,7 @@ import {
   zeitpunktAusIso,
   type Erfassungsbogen,
 } from "@bos/eeb-format/model";
-import { einheitAnzeigename, neuePerson, neuesFahrzeug, zeitgruppe, type QrSatz } from "./hilfen";
+import { einheitAnzeigename, neuePerson, neuerBogen, neuesFahrzeug, zeitgruppe, type QrSatz } from "./hilfen";
 import { EEB_JSON_DATEINAME, aenderungFuerPapier, bogenAlsEingebetteteDatei, einsatzLageblattDokument, einsatzPdfDokument, pdfDokument, stiftHinweis, STIFT_KAESTCHEN, codeKopfzeile, meldekopfVermerk, ohneVorbelegung, erreichbarkeitZeilen, nichtDarstellbareNamen, nichtDarstellbareBetroffene, ansprechpersonPapier, umschrift, umschriftBetroffene } from "./pdf-dokument";
 
 const QR_BILD = "data:image/png;base64,QRTESTBILD";
@@ -894,7 +894,22 @@ describe("lageblattAenderungen (Audit Runde 5, R5-K7)", () => {
     neu.sonstiges = "Nachschub nötig";
     const z = lageblattAenderungen(bogenDiff(alt, neu));
     expect(z.join("\n")).toContain("Diesel von 100 l auf 400 l");
-    expect(z.join("\n")).toContain("weitere: Bemerkung/Sonstiges");
+    expect(z.join("\n")).toContain("weitere: Bemerkung");
+  });
+
+  it("R21-A10: nennt eine Ortsänderung beim Namen und setzt „weitere:“ nur hinter eine Aufzählung", async () => {
+    const { lageblattAenderungen } = await import("./pdf-dokument");
+    const { bogenDiff } = await import("@bos/meldekopf/meldung-diff");
+    const alt = neuerBogen();
+    alt.einheit.hierarchie[0]!.name = "Oldenburg";
+    const neu = structuredClone(alt);
+    neu.einheit.hierarchie[0]!.name = "Husum";
+    const nurOrt = lageblattAenderungen(bogenDiff(alt, neu));
+    expect(nurOrt).toEqual(["Ort der Einheit geändert: THW Oldenburg → THW Husum"]);
+    // Nur eine Bemerkung: keine Aufzählung davor, also „Geändert:“ statt „weitere:“.
+    const bemerkung = structuredClone(alt);
+    bemerkung.sonstiges = "Nachschub nötig";
+    expect(lageblattAenderungen(bogenDiff(alt, bemerkung))).toEqual(["Geändert: Bemerkung"]);
   });
 });
 

@@ -177,7 +177,8 @@ Funktionalität: Einsatz-Sammlung führen (Meldekopf)
     Und ich auf "In Einsatz übernehmen" klicke
     Dann sehe ich den Dialog "Stärke fehlt"
     Wenn ich im Dialog auf "Stärke eintragen" klicke
-    Dann sehe ich den Schritt "3. Personal"
+    # R21: „Stärke eintragen" schaltet auf „Nur Stärke" um; dort zählt der Assistent seine vier Schritte (Personal ist Schritt 2).
+    Dann sehe ich den Schritt "2. Personal"
     Und sehe ich die Schaltfläche "In Einsatz übernehmen"
 
   Szenario: Sammel-PDF bündelt alle Bögen in einer Datei

@@ -12,6 +12,10 @@
  */
 
 import { useEffect, useState, type ComponentProps, type CSSProperties } from "react";
+import type { EinsatzArt } from "@bos/meldekopf/einsaetze";
+import { AnzeigeSchalter } from "./anzeige-schalter";
+import { ART_LABEL } from "./einsaetze-konstanten";
+import { SeitenKopf } from "./seiten-kopf";
 
 type Ui = typeof import("./einsaetze-ui");
 
@@ -44,7 +48,35 @@ function LadeFlaeche({ karten }: { karten?: number }) {
       aria-busy="true"
       aria-label="Einsatzansicht wird geladen"
       style={karten == null ? undefined : ({ "--karten": karten } as CSSProperties)}
-    />
+    >
+      {/* R21-M2, N5, E2, A2: sichtbarer Ladehinweis statt leerer Fläche (die Liste bleibt eine stille Platzhalterkarte). */}
+      {karten == null && <p className="einsatz-laedt-text" aria-hidden="true">Einsatzansicht wird geladen …</p>}
+    </div>
+  );
+}
+
+/**
+ * R21-M2, N5, E2, A2: Beim Nachladen der Detailansicht steht schon ihr Kopf da — „‹ Startseite", Ansichtswahl, Name und Art des Einsatzes —,
+ * damit der Weg zurück offen ist und nichts leer wirkt. Die Platzhalterfläche (mit dem sichtbaren Ladehinweis) liegt im selben `main`, in dem
+ * gleich die Ansicht steht; der Kopf hat dieselbe Bauart wie der der Ansicht, die Seite springt beim Austausch nicht.
+ */
+function LadeDetail({ einsatz, onZurueck }: { einsatz: { name: string; art: EinsatzArt; ort?: string }; onZurueck: () => void }) {
+  return (
+    <>
+      <SeitenKopf variante="einsatz-kopf einsatz-laedt-kopf">
+        <div className="kopf-oberzeile">
+          <button type="button" className="zur-start" onClick={onZurueck}>‹ Startseite</button>
+          <AnzeigeSchalter klappbar beschriftet />
+        </div>
+        <div className="titelzeile">
+          <h1>{einsatz.name}</h1>
+        </div>
+        <p className="hinweis">{ART_LABEL[einsatz.art]}{einsatz.ort ? ` · ${einsatz.ort}` : ""}</p>
+      </SeitenKopf>
+      <main id="inhalt" tabIndex={-1} className="einsatz-detail">
+        <LadeFlaeche />
+      </main>
+    </>
   );
 }
 
@@ -72,7 +104,7 @@ function useUi(): Ui | null {
 
 export function EinsatzDetail(props: ComponentProps<Ui["EinsatzDetail"]>) {
   const ui = useUi();
-  return ui ? <ui.EinsatzDetail {...props} /> : <LadeFlaeche />;
+  return ui ? <ui.EinsatzDetail {...props} /> : <LadeDetail einsatz={props.einsatz} onZurueck={props.onZurueck} />;
 }
 
 export function EinsatzListe(props: ComponentProps<Ui["EinsatzListe"]>) {

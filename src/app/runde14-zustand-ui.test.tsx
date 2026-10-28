@@ -263,7 +263,7 @@ describe("R14-S3 Marke „neu“ bleibt aufgeklappt, solange der Kasten die Meld
     const marke = karteVon("Alpha").querySelector(".neu-badge")!;
     expect(marke.querySelector(".neu-lang")!.textContent).toBe("neu · kürzlich eingetroffen");
     expect(marke.querySelector(".neu-kurz")!.textContent).toBe("neu");
-    expect(document.body.textContent).toContain("Neu seit der letzten Kenntnisnahme (1)");
+    expect(document.body.textContent).toContain("Neu seit dem letzten Mal (1)");
   });
 });
 

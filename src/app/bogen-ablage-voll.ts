@@ -14,7 +14,7 @@ export async function ablageVollMelden(b: Erfassungsbogen, was: string): Promise
   const name = einheitAnzeigename(b.einheit) || "(noch ohne Namen)";
   const wahl = await frageWahl({
     titel: `Nicht ${was} — Speicher voll`,
-    text: `„${name}" passt nicht mehr auf die Startseite, der Speicher dieses Geräts ist voll. Der Bogen bleibt offen, nichts hat sich geändert. Erst als Datei sichern, dann Platz schaffen.`,
+    text: `„${name}" passt nicht mehr auf die Startseite. Der Bogen bleibt offen, nichts hat sich geändert. Erst als Datei sichern, dann Platz schaffen.`,
     abbruch: "Bogen bleibt offen",
     fokus: "abbruch",
     wege: [{ wert: "sichern", label: "Bogen als Datei sichern", sicher: true }],

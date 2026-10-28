@@ -176,6 +176,15 @@
         document.querySelector('meta[name="theme-color"]').content = "#221f16";
     } catch (e) { /* Privatmodus/blockierter Speicher: Standard-Darstellung */ }
 
+    // Wiedereinstieg in einen Einsatz (R21-A2, E2): Wer zuletzt eine Einsatz-Sammlung offen hatte (app.tsx, LETZTER_EINSATZ_SCHLUESSEL: höchstens
+    // zwölf Stunden her) und ohne Bogen im Link startet, bekommt statt des Start-Gerüsts einen ruhigen Kopf „Einsatz wird geladen …" — die
+    // Startseite blitzte sonst kurz auf, und ein früher Tipp traf ihre Knöpfe. Nur eine Klasse; die App entscheidet danach selbst.
+    try {
+      var eebLetzter = JSON.parse(localStorage.getItem("eeb.letzterEinsatz.v1") || "null");
+      if (eebLetzter && typeof eebLetzter.id === "string" && Date.now() - eebLetzter.um <= 12 * 60 * 60 * 1000 && !location.hash)
+        document.documentElement.classList.add("einsatz-wiedereinstieg");
+    } catch (e) { /* ohne Speicher eben das Start-Gerüst */ }
+
     // Lagemonitor (?lagemonitor=…): schwarz von der ersten Sekunde an. Bis das
     // Bundle da ist, stünde sonst der helle Grund des App-Modus auf dem
     // Fernseher im abgedunkelten Fahrzeug (Audit Runde 6, R6-L3).
@@ -6928,6 +6937,150 @@
     @media (max-width: 30rem) { .einsatz-laedt:not(.detail) { margin-bottom: 16px; } } /* am Telefon trägt die letzte Karte 16 px Abstand nach unten */
     .einsatz-laedt.detail { min-height: 70vh; }
     /* ===== Ende Runde 20 (Startbündel) ===== */
+    /* ===== Runde 21 (Layout) ===== */
+    /* R21-A4, W4, E5, H4, K3, G5, M5, L4, N4, O3, S3, D4: Einsatzansicht am Telefon, erste Einheitenkarte höher (360 × 640, fünf Bögen, nach dem
+       Neuladen: 1 088 px, jetzt rund 800 px). Die Kennzahlen stehen in einer Zeile (in Standard, Dunkel und Nacht; in „Feld" und bei großer Schrift
+       bleiben zwei), die Blöcke haben 10 statt 20 bis 25 px Abstand, und mit Meldungen steht von den Aufnahmewegen nur „Bogen scannen…" offen —
+       „von Hand, schnell, Datei" liegen in einem Aufklapper darunter (die Hauptaktion bleibt oben, R2-S3, R18-G2). Eine leere Sammlung zeigt alle
+       vier Knöpfe im Zweierraster (ohne Meldungen gibt es nichts zu verdrängen). */
+    @media (max-width: 47.999rem) {
+      :root:root main.einsatz-detail .einsatz-seite > * { margin-block: 0 10px; }
+      :root:root main.einsatz-detail .einsatz-seite .aktionen { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-top: 0; }
+      :root:root main.einsatz-detail .einsatz-seite .aktionen > .primaer,
+      :root:root main.einsatz-detail .einsatz-seite .aktionen > details.aufnahme-weitere { grid-column: 1 / -1; }
+      :root:root main.einsatz-detail .einsatz-seite .aktionen > button,
+      :root:root main.einsatz-detail .einsatz-seite .aktionen > .einlese { min-width: 0; width: auto; }
+      :root:root main.einsatz-detail .einsatz-seite .aktionen > .einlese { display: flex; }
+      :root:root main.einsatz-detail .einsatz-seite .aktionen > button,
+      :root:root main.einsatz-detail .einsatz-seite .aktionen > .einlese > button { padding-inline: 6px; font-size: min(var(--t-m), 16px); flex: 1 1 auto; }
+      :root:root main.einsatz-detail .einsatz-seite .aktionen button.mit-zusatz > .knopf-zusatz { font-size: min(var(--t-xs), 12px); line-height: 1.25; }
+      :root:root main.einsatz-detail .einsatz-seite .aktionen:not(.aufnahme-weitere-knoepfe) > .einlese:last-child:nth-child(even),
+      :root:root main.einsatz-detail .einsatz-seite .aufnahme-weitere-knoepfe > .einlese:last-child:nth-child(odd) { grid-column: 1 / -1; }
+      :root:root main.einsatz-detail .einsatz-seite .aktionen .einlese-menue { left: auto; right: 0; }
+      /* Aufklapper „Weitere Wege der Aufnahme" */
+      :root:root main.einsatz-detail details.aufnahme-weitere { border: var(--strich) solid var(--linie-stark); border-radius: var(--radius); background: var(--flaeche); }
+      :root:root main.einsatz-detail details.aufnahme-weitere > summary {
+        display: flex; align-items: center; min-height: calc(var(--ziel-basis) + var(--ziel)); padding: 4px 12px; cursor: pointer; list-style: none;
+        font-size: min(var(--t-s), 15px); font-weight: 600; line-height: 1.25;
+      }
+      :root:root main.einsatz-detail details.aufnahme-weitere > summary::-webkit-details-marker { display: none; }
+      :root:root main.einsatz-detail details.aufnahme-weitere > summary::before { content: "▸"; margin-right: 8px; color: var(--text-2); flex: none; }
+      :root:root main.einsatz-detail details.aufnahme-weitere[open] > summary::before { content: "▾"; }
+      :root:root main.einsatz-detail details.aufnahme-weitere > .aktionen { padding: 0 8px 8px; }
+    }
+    /* Kennzahlen in einer Zeile ab 360 px (bei 320 px passt „MANNSCH." nicht in eine Fünftelzelle: dort bleibt es bei zwei Reihen) */
+    @media (min-width: 22.5rem) and (max-width: 30rem) {
+      :root:root:root:not(.schrift-gross):not(.feld-modus) main.einsatz-detail .staerke-leiste:has(> div:nth-child(5)) { grid-template-columns: 1.3fr repeat(4, minmax(0, 1fr)); }
+      :root:root:root:not(.schrift-gross):not(.feld-modus) main.einsatz-detail .staerke-leiste:has(> div:nth-child(5)) > div {
+        grid-column: auto; border-top: none; border-left: var(--strich) solid var(--linie-fein); padding: 5px 4px;
+      }
+      :root:root:root:not(.schrift-gross):not(.feld-modus) main.einsatz-detail .staerke-leiste:has(> div:nth-child(5)) > div:first-child { border-left: none; }
+      :root:root:root:not(.schrift-gross):not(.feld-modus) main.einsatz-detail .staerke-leiste:has(> div:nth-child(5)) > div.anzahl + div { border-left: 3px solid var(--linie-stark); }
+      :root:root:root:not(.schrift-gross):not(.feld-modus) main.einsatz-detail .staerke-leiste:has(> div:nth-child(5)) span { letter-spacing: 0; font-size: min(var(--t-xs), 10.5px); }
+    }
+    @media (max-width: 47.999rem) {
+      /* Quittung des Einlesens kleiner gesetzt (fünf Zeilen, 105 px; der Satz bleibt ganz) */
+      :root:root main.einsatz-detail .einlese-quittung > p.meldung { font-size: min(var(--t-s), 14px); line-height: 1.3; padding-block: 6px; }
+      /* Kopf der Liste enger */
+      :root:root main.einsatz-detail > section.einsatz-liste > .kopfzeile { display: flex; flex-wrap: wrap; align-items: flex-start; column-gap: 8px; row-gap: 6px; margin-bottom: 6px; }
+      :root:root main.einsatz-detail > section.einsatz-liste > .kopfzeile > h2 { flex: 1 1 9rem; min-width: 0; margin: 0; }
+      :root:root main.einsatz-detail > section.einsatz-liste > .kopfzeile > .ansicht-umschalter { flex: none; margin-left: auto; }
+      :root:root main.einsatz-detail > section.einsatz-liste > .kopfzeile .einheiten-zahlen { display: block; margin-top: 2px; font-size: min(var(--t-s), 14px); font-weight: 600; line-height: 1.3; color: var(--text-2); }
+      :root:root .einsatz-liste p.hinweis.luecken-zaehler { margin-block: 0 6px; }
+      :root:root .einsatz-liste p.hinweis.staerke-legende { margin-block: 6px 8px; font-size: min(var(--t-xs), 13px); }
+    }
+    @media (max-width: 47.999rem) and (orientation: portrait) {
+      :root:root .seiten-kopf.einsatz-kopf .kopf-inhalt { padding-block: 8px; }
+      :root:root .seiten-kopf.einsatz-kopf .titelzeile { padding-block: 4px 6px; }
+    }
+    /* R21-G4: Die Zeile, die den Kasten „Neu seit der letzten Kenntnisnahme" ersetzt, trägt keinen Knopf. */
+    p.kenntnis-spur { margin: 0 0 10px; padding: 12px 14px; min-height: 104px; box-sizing: border-box; display: flex; align-items: center; font-size: var(--t-s); color: var(--text-2); }
+    /* R21-G6: Die Ansicht steht am Telefon im Kopf der Einsatzansicht; die feste Leiste unten entfällt dort (sie lag auf den untersten 57 px der Karten). */
+    @media (max-width: 47.999rem) {
+      :root:root .anzeige-balken { display: none; }
+      :root:root:has(.anzeige-balken) { --balken-hoehe: 0px; }
+    }
+    /* R21-G7, M6, L6, D3, S4: Tabelle bei 320 und 360 px: Bedarfsposten dürfen vor der Zahl umbrechen (die Leerstelle zwischen Zahl und Einheit ist
+       geschützt: „Diesel | 80 l"), der Kopf „Eingetroffen" darf nach „Einge-" umbrechen; die Spalten sind so verteilt, dass nichts über den
+       Rahmen ragt (kein seitliches Wischen, die Einheit „l" bleibt sichtbar) und der Name ganze Wörter behält. */
+    table.einheiten-tabelle .spalten-kopf > .kopf-weich { display: none; }
+    @media (max-width: 30rem) {
+      :root:root table.einheiten-tabelle .spalten-kopf > .kopf-weich { display: inline; }
+      :root:root table.einheiten-tabelle .spalten-kopf > .kopf-glatt:has(+ .kopf-weich) { display: none; }
+      :root:root table.einheiten-tabelle.tabelle-kern .bedarf-teil { white-space: normal; }
+      :root:root table.einheiten-tabelle.tabelle-kern td.zug-zelle { white-space: normal; }
+      :root:root table.einheiten-tabelle.tabelle-kern thead th[data-spalte="eingetroffen"] { white-space: normal; overflow-wrap: normal; hyphens: manual; }
+      :root:root table.einheiten-tabelle.tabelle-kern th[data-spalte="eingetroffen"] { width: 21%; }
+      :root:root table.einheiten-tabelle.tabelle-kern tbody > tr > * { vertical-align: top; }
+    }
+    @media (max-width: 22.5rem) {
+      :root:root table.einheiten-tabelle.tabelle-kern > * > tr > :first-child { width: 35%; }
+      :root:root table.einheiten-tabelle.tabelle-kern:has(th[data-spalte="zugEtikett"]) > * > tr > :first-child { width: 31%; }
+      :root:root table.einheiten-tabelle.tabelle-kern th[data-spalte="gesamt"] { width: 16%; }
+      :root:root table.einheiten-tabelle.tabelle-kern th[data-spalte="eingetroffen"] { width: 21%; }
+      :root:root table.einheiten-tabelle.tabelle-kern:has(th[data-spalte="zugEtikett"]) th[data-spalte="eingetroffen"] { width: 20%; }
+      :root:root table.einheiten-tabelle.tabelle-kern th[data-spalte="zugEtikett"] { width: 13%; }
+    }
+    /* R21-E7, L5: Rückfragen am schmalen Telefon (320 px): Antwort und „Abbrechen" stehen untereinander (je volle Breite, mindestens 24 px Abstand),
+       statt zwei 119-px-Knöpfe zu bilden, in denen „kennzeichnen" und „übernehmen" mitten im Wort brachen. */
+    @media (max-width: 22.5rem) {
+      :root:root dialog.abfrage .abfrage-fuss:has(> .abfrage-weg:first-child:nth-last-child(2)) { flex-direction: column; gap: 24px; }
+      :root:root dialog.abfrage .abfrage-fuss:has(> .abfrage-weg:first-child:nth-last-child(2)) > * { flex: 0 0 auto; width: 100%; }
+      :root:root dialog.abfrage form > .abfrage-aktionen:has(> button + button) { flex-direction: column; }
+    }
+    /* R21-H8: „Datensicherung" und die anderen Fußzeilen-Fenster am Telefon: Der Titel bricht nie im Wort; reicht die Breite neben „Schließen"
+       nicht, steht „Schließen" in der Zeile darunter. */
+    @media (max-width: 22.5rem) {
+      :root:root dialog.rollhinweis > .kopfzeile:first-child { flex-wrap: wrap; }
+      :root:root dialog.rollhinweis > .kopfzeile:first-child h2 { flex: 1 1 0; min-width: min-content; overflow-wrap: normal; word-break: normal; hyphens: manual; }
+      :root:root dialog.rollhinweis > .kopfzeile:first-child > button { margin-left: auto; }
+    }
+    /* R21-A6, G2: Fußleiste mit „In Einsatz übernehmen" in niedrigen Fenstern (quer am Telefon, auch die Tastaturhöhe 360 × 340): Der Knopf bricht nicht
+       mitten im Wort; unter 45 rem fällt das Wort „Ansicht" weg, unter 26 rem steht nur „Übernehmen" (der Name bleibt aria-label). */
+    @media (orientation: landscape) and (max-height: 31.25rem) {
+      :root:root footer.nav.assistent-nav.mit-uebernehmen { grid-template-columns: auto auto minmax(max-content, 1fr) auto; }
+      :root:root footer.nav.assistent-nav.mit-uebernehmen > .uebernehmen { white-space: nowrap; min-width: max-content; overflow-wrap: normal; }
+    }
+    @media (orientation: landscape) and (max-height: 31.25rem) and (max-width: 45rem) {
+      :root:root footer.nav.assistent-nav.mit-uebernehmen .anzeige-leiste-text { display: none; }
+    }
+    @media (orientation: landscape) and (max-height: 31.25rem) and (max-width: 26rem) {
+      :root:root footer.nav.assistent-nav.mit-uebernehmen .nav-einsatz { display: none; }
+      :root:root footer.nav.assistent-nav.mit-uebernehmen .nav-ue::first-letter { text-transform: uppercase; }
+    }
+    /* R21-W5, E6, H5, G3, M4, L7: Assistent im niedrigen Querformat in „Feld" (568 × 320: Kopf 57 + Fußleiste 65 = 38 %): Die Überschrift des Schritts
+       steht schon im Reiter oben und bleibt nur für Vorlesesoftware; „Ort der Einheit" liegt so ganz über der Fußleiste (206 bis 259 px bei
+       Leiste ab 255 px vorher, jetzt 180 bis 233 px). */
+    @media (orientation: landscape) and (max-height: 30rem) {
+      :root:root.feld-modus main { padding-top: 4px; }
+      :root:root.feld-modus .schritt-inhalt > .karte { padding-block: 8px 12px; }
+      :root:root.feld-modus .schritt-inhalt > .karte > h2:first-child {
+        position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); margin: 0; padding: 0; white-space: nowrap;
+      }
+      :root:root.feld-modus .schritt-inhalt > .karte .feld { margin-top: 3px; }
+    }
+    /* R21-M2, N5, E2, A2: Platzhalter der Einsatzansicht mit sichtbarem Ladehinweis; Kopf und Rückweg stehen schon darüber (einsaetze-lazy.tsx).
+       Er hält eine ganze Bildschirmhöhe: Die Fußzeile steht beim Austausch unter dem Bild und springt nicht. */
+    .einsatz-laedt.detail { min-height: 100vh; }
+    .einsatz-laedt-text { margin: 0; padding: 16px 4px; font-size: var(--t-m); color: var(--text-2); }
+    /* Wiedereinstieg: Hat das Gerät zuletzt einen Einsatz offen gehabt, zeigt das statische Gerüst nicht die Startseite, sondern nur einen Kopf
+       „Einsatz wird geladen …" (das Skript im Kopf der Seite setzt die Klasse; die App zeigt gleich danach den Einsatz). */
+    html.einsatz-wiedereinstieg #app > .kopfnav,
+    html.einsatz-wiedereinstieg #app > main.start > p,
+    html.einsatz-wiedereinstieg #app > main.start > .start-seo { display: none; }
+    html.einsatz-wiedereinstieg #app > header.start-kopf { min-height: 8.75rem; }
+    html.einsatz-wiedereinstieg #app > header.start-kopf h1 { font-size: 0; line-height: 0; }
+    html.einsatz-wiedereinstieg #app > header.start-kopf h1::after { content: "Einsatz wird geladen …"; font-size: var(--t-l); line-height: 1.3; }
+    /* ===== Ende Runde 21 (Layout) ===== */
+    /* ===== Runde 21 (Daten und Texte) ===== */
+    /* R21-A9: Die Speicherzeile im Kopf des Assistenten hat ihren Platz von Anfang an (leer und unsichtbar), damit sie nach der ersten
+       Eingabe nichts um eine Zeile nach unten schiebt. */
+    .seiten-kopf .autosave.autosave-leer { visibility: hidden; animation: none; }
+    /* R21-H7, S5: Warnung bei (fast) vollem Speicher: zwei kurze Sätze, der Rest hinter „Mehr dazu". */
+    .speicher-warnung > p { margin: 0; }
+    .speicher-warnung > details.hinweis-mehr > summary { min-height: 44px; }
+    .speicher-warnung > details.hinweis-mehr > p { margin: 0 0 var(--r-2, 0.5rem); }
+    /* ===== Ende Runde 21 (Daten und Texte) ===== */
   </style>
 </head>
 <body>

@@ -142,7 +142,11 @@ describe("R19-O1 „Meldung entfernen“ bei vollem Speicher", () => {
       return voll.call(this, k, v);
     });
     await nutzer.click(bestaetigen);
-    const frage = await waitFor(() => dialogMit("Papierkorb voll")!);
+    const frage = await waitFor(() => {
+      const d = dialogMit("Papierkorb voll");
+      expect(d).toBeTruthy();
+      return d!;
+    });
     await nutzer.click(within(frage).getByRole("button", { name: "Endgültig entfernen" }));
     const leiste = await waitFor(() => {
       const l = document.querySelector<HTMLElement>(".quittung-daumen");
@@ -169,8 +173,17 @@ describe("R19-O3 „Einsatz löschen“ bei vollem Speicher", () => {
     render(<Wirt id={s.id} extra={{ onGeloescht }} />);
     speicherVoll(0);
     await nutzer.click(screen.getByRole("button", { name: "Einsatz löschen…" }));
-    await nutzer.click(within(dialogMit("Einsatz löschen?")!).getByRole("button", { name: "In den Papierkorb" }));
-    const hinweis = await waitFor(() => dialogMit("Nicht gelöscht")!);
+    const loeschFrage = await waitFor(() => {
+      const d = dialogMit("Einsatz löschen?");
+      expect(d).toBeTruthy();
+      return d!;
+    });
+    await nutzer.click(within(loeschFrage).getByRole("button", { name: "In den Papierkorb" }));
+    const hinweis = await waitFor(() => {
+      const d = dialogMit("Nicht gelöscht");
+      expect(d).toBeTruthy();
+      return d!;
+    });
     expect(hinweis.textContent).toMatch(/Speicher/);
     await nutzer.click(within(hinweis).getByRole("button", { name: "Einsatz behalten" })); // R20-W1: „Abbrechen“ heißt jetzt, was es tut
     expect(onGeloescht).not.toHaveBeenCalled();
@@ -185,8 +198,17 @@ describe("R19-O3 „Einsatz löschen“ bei vollem Speicher", () => {
     render(<Wirt id={s.id} extra={{ onGeloescht }} />);
     speicherVoll(0);
     await nutzer.click(screen.getByRole("button", { name: "Einsatz löschen…" }));
-    await nutzer.click(within(dialogMit("Einsatz löschen?")!).getByRole("button", { name: "In den Papierkorb" }));
-    const frage = await waitFor(() => dialogMit("Nicht gelöscht")!);
+    const loeschFrage = await waitFor(() => {
+      const d = dialogMit("Einsatz löschen?");
+      expect(d).toBeTruthy();
+      return d!;
+    });
+    await nutzer.click(within(loeschFrage).getByRole("button", { name: "In den Papierkorb" }));
+    const frage = await waitFor(() => {
+      const d = dialogMit("Nicht gelöscht");
+      expect(d).toBeTruthy();
+      return d!;
+    });
     expect(frage.textContent).toContain("nicht rückholbar");
     // R20-W1: „Endgültig löschen…“ führt in eine zweite Rückfrage mit der Folge; erst deren Bestätigung löscht.
     await nutzer.click(within(frage).getByRole("button", { name: "Endgültig löschen…" }));
@@ -197,7 +219,11 @@ describe("R19-O3 „Einsatz löschen“ bei vollem Speicher", () => {
     });
     expect(einsaetzeLaden()).toHaveLength(1);
     await nutzer.click(within(zweite).getByRole("button", { name: "Ja, endgültig löschen" }));
-    const quittung = await waitFor(() => dialogMit("Endgültig gelöscht")!);
+    const quittung = await waitFor(() => {
+      const d = dialogMit("Endgültig gelöscht");
+      expect(d).toBeTruthy();
+      return d!;
+    });
     expect(quittung.textContent).toContain("nicht im Papierkorb");
     await nutzer.click(within(quittung).getAllByRole("button")[0]!);
     await waitFor(() => expect(onGeloescht).toHaveBeenCalledTimes(1));
@@ -217,7 +243,11 @@ describe("R19-O2 Übergabe und Abschluss bei vollem Speicher", () => {
     render(<Wirt id={s.id} />);
     speicherVoll(0);
     await nutzer.click(screen.getByRole("button", { name: "Einsatz als beendet markieren" }));
-    const hinweis = await waitFor(() => dialogMit("Einsatz nicht beendet")!);
+    const hinweis = await waitFor(() => {
+      const d = dialogMit("Einsatz nicht beendet");
+      expect(d).toBeTruthy();
+      return d!;
+    });
     expect(hinweis.textContent).toContain("nicht gespeichert");
     expect(abschlussLaden(s.id).beendetAm).toBeUndefined();
     expect(screen.getByRole("button", { name: "Einsatz als beendet markieren" })).toBeDefined();
@@ -233,7 +263,11 @@ describe("R19-O2 Übergabe und Abschluss bei vollem Speicher", () => {
     await nutzer.type(within(eingabe).getByRole("textbox"), "Stab Süd");
     speicherVoll(0);
     await nutzer.click(within(eingabe).getByRole("button", { name: "Vermerken" }));
-    const hinweis = await waitFor(() => dialogMit("Übergabe nicht vermerkt")!);
+    const hinweis = await waitFor(() => {
+      const d = dialogMit("Übergabe nicht vermerkt");
+      expect(d).toBeTruthy();
+      return d!;
+    });
     expect(hinweis.textContent).toContain("nicht gespeichert");
     expect(abschlussLaden(s.id).uebergabeAm).toBeUndefined();
     expect(screen.getByText(/Übergabe noch nicht vermerkt/)).toBeDefined();

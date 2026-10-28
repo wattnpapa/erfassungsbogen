@@ -87,9 +87,10 @@ describe("R13-O3 Rat bei vollem Speicher und leerem Papierkorb", () => {
     await nutzer.click(within(frage).getByRole("button", { name: "In den Papierkorb" }));
 
     const hinweis = await screen.findByRole("dialog", { name: "Nicht gelöscht" });
-    expect(hinweis.textContent).toContain("Papierkorb leer");
-    expect(hinweis.textContent).toContain("entfernen");
-    expect(hinweis.textContent).not.toMatch(/Papierkorb leeren|dort endgültig löschen/);
+    // R21-H7, N7: kurz, und nur die Wege, die darunter als Knöpfe stehen; einen leeren Papierkorb gibt es nicht zu leeren.
+    expect(hinweis.textContent).toContain("ist nicht gelöscht");
+    expect(hinweis.textContent).toContain("Endgültig löschen…");
+    expect(hinweis.textContent).not.toMatch(/Papierkorb leeren|dort endgültig löschen|Entfernen/);
   }, 30000);
 });
 

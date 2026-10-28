@@ -58,8 +58,10 @@ describe("Einsatzliste und Einsatzansicht laden nach", () => {
     );
     const flaeche = screen.getByRole("status", { name: "Einsatzansicht wird geladen" });
     expect(flaeche.className).toBe("einsatz-laedt detail");
-    expect(await screen.findByText(/Sturmschäden/, {}, { timeout: 20000 })).toBeTruthy();
-    expect(screen.queryByRole("status", { name: "Einsatzansicht wird geladen" })).toBeNull();
+    // R21-M2: Der Name steht schon im Kopf des Platzhalters; fertig ist die Ansicht, wenn die Platzhalterfläche weicht.
+    await waitFor(() => expect(screen.queryByRole("status", { name: "Einsatzansicht wird geladen" })).toBeNull(), { timeout: 20000 });
+    expect(screen.getAllByText(/Sturmschäden/).length).toBeGreaterThan(0);
+    expect(screen.getByRole("button", { name: /Bogen scannen/ })).toBeTruthy();
   });
 
   it("nach dem ersten Laden erscheint die Liste ohne erneutes Warten", async () => {

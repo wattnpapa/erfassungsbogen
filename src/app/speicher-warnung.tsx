@@ -44,15 +44,23 @@ export function SpeicherWarnung({ stand }: { stand: unknown }) {
   // und nicht erst im Bogen (Audit Runde 5, R5-O7).
   if (gesperrt) return <SpeicherNimmtNichtsAn />;
   if (!b || b.anteil < SPEICHER_WARNSCHWELLE) return null;
+  // R21-H7, S5: Zwei kurze Sätze (was ist, was jetzt zählt); die Belegung in Zeichen und die Wege stehen hinter „Mehr dazu".
   return (
-    <p className="warnung" role="status">
+    <div className="warnung speicher-warnung" role="status">
       {/* Bei 100 % ist „wird er voll" vorbei (R3-O4). */}
-      {istVoll(b)
-        ? `⚠ Gerätespeicher ist voll: ${speicherText(b)} — die App kann nichts mehr speichern.`
-        : `⚠ Gerätespeicher zu ${speicherText(b)} belegt. Wird er voll, kann die App nichts mehr speichern.`}
-      {groesste ? ` Am meisten belegen: ${groesste}.` : ""} Platz schafft nur Löschen: nicht mehr
-      benötigte Einsätze sichern, den Papierkorb leeren oder einen gesicherten Einsatz dort „Endgültig löschen…“ (bei vollem Speicher kostet schon das Ablegen in den Papierkorb Platz).
-    </p>
+      <p>
+        {istVoll(b)
+          ? `⚠ Gerätespeicher ist voll: ${Math.round(b.anteil * 100)} % — nichts wird mehr gespeichert. Erst sichern.`
+          : `⚠ Gerätespeicher zu ${Math.round(b.anteil * 100)} % belegt — wird er voll, speichert die App nichts mehr.`}
+      </p>
+      <details className="hinweis-mehr">
+        <summary>Mehr dazu</summary>
+        <p>
+          Belegt: {speicherText(b)}.{groesste ? ` Am meisten belegen: ${groesste}.` : ""} Platz schafft nur Löschen: nicht mehr
+          benötigte Einsätze sichern, den Papierkorb leeren oder einen gesicherten Einsatz dort „Endgültig löschen…“ (bei vollem Speicher kostet schon das Ablegen in den Papierkorb Platz).
+        </p>
+      </details>
+    </div>
   );
 }
 
@@ -71,11 +79,16 @@ export function SpeicherNimmtNichtsAn() {
       übergeben.
     </p>
   ) : (
-    <p className="warnung" role="alert">
-      ⚠ Der Speicher dieses Geräts ist voll — angezeigt wird der gespeicherte Stand, Änderungen lassen sich
-      nicht speichern. Platz schafft nur Löschen: nicht mehr benötigte Einsätze sichern, den Papierkorb leeren
-      oder einen gesicherten Einsatz dort „Endgültig löschen…“ (bei vollem Speicher kostet schon das Ablegen
-      in den Papierkorb Platz).
-    </p>
+    <div className="warnung speicher-warnung" role="alert">
+      <p>⚠ Der Speicher dieses Geräts ist voll — Änderungen lassen sich nicht speichern, angezeigt wird der gespeicherte Stand. Erst sichern.</p>
+      <details className="hinweis-mehr">
+        <summary>Mehr dazu</summary>
+        <p>
+          Platz schafft nur Löschen: nicht mehr benötigte Einsätze sichern, den Papierkorb leeren
+          oder einen gesicherten Einsatz dort „Endgültig löschen…“ (bei vollem Speicher kostet schon das Ablegen
+          in den Papierkorb Platz).
+        </p>
+      </details>
+    </div>
   );
 }

@@ -8,7 +8,7 @@
 // statt von einem CDN: die App muss offline vollständig funktionieren.
 import "@fontsource-variable/archivo";
 
-import { StrictMode, Suspense, lazy } from "react";
+import { StrictMode, Suspense, lazy, useEffect } from "react";
 import { createRoot } from "react-dom/client";
 import { App } from "./app";
 import { Fehlerfaenger } from "./fehlerfaenger";
@@ -50,6 +50,10 @@ schriftStufeStarten();
 
 // Im Debug-Modus eine schwebende Leiste zum Umschalten der Vorschau zeigen.
 function Wurzel() {
+  // R21-A2, E2: Die Klasse „einsatz-wiedereinstieg" (Skript in index.html) verdeckt nur das statische Start-Gerüst bis zum ersten Bild der App.
+  useEffect(() => {
+    document.documentElement.classList.remove("einsatz-wiedereinstieg");
+  }, []);
   // Zweites Fenster mit der Lage für den Fernseher: nur Anzeige, ohne die App.
   const monitorEinsatz = lagemonitorKennung();
   if (monitorEinsatz) return <Suspense fallback={null}><Lagemonitor einsatzId={monitorEinsatz} /></Suspense>;

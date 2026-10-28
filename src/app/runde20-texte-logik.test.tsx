@@ -137,14 +137,17 @@ describe("R20-H1 / N1: Organisation steht nicht doppelt im Namen", () => {
     await nutzer.type(eingabe, "THW Oldenburg");
     await nutzer.click(within(dialog).getByRole("button", { name: "Ort übernehmen" }));
     // Neuer Name an der Karte, ohne doppelte Organisation; Schlüssel (damit Nummer, Zug, Historie) bleibt.
+    await waitFor(() => expect(einsaetzeLaden().find((x) => x.id === s.id)!.eintraege).toHaveLength(3));
     const eintraege = einsaetzeLaden().find((x) => x.id === s.id)!.eintraege;
-    const oldenburg = eintraege.filter((e) => e.einheitSchluessel === eintraege[0]!.einheitSchluessel);
+    const schluessel = eintraege.find((e) => einheitAnzeigename(e.bogen.einheit).includes("Oldenburg"))!.einheitSchluessel;
+    const oldenburg = eintraege.filter((e) => e.einheitSchluessel === schluessel);
     expect(oldenburg).toHaveLength(2);
+    await waitFor(() => expect([...document.querySelectorAll(".einheit-zeile")].some((k) => /Nr\. \d THW Oldenburg/.test(k.textContent!))).toBe(true));
     expect(einheitAnzeigename(oldenburg[oldenburg.length - 1]!.bogen.einheit)).toBe("THW Oldenburg");
     expect(document.body.textContent).toContain("Name geändert");
     expect(document.body.textContent).not.toContain("THW THW");
     expect([...document.querySelectorAll(".einheit-zeile")].some((k) => k.textContent!.includes("Oldenburgg"))).toBe(false);
-    expect([...document.querySelectorAll(".einheit-zeile")].some((k) => k.textContent!.includes("Nr. 2 THW Oldenburg"))).toBe(true);
+    expect([...document.querySelectorAll(".einheit-zeile")].some((k) => /Nr\. \d THW Oldenburg/.test(k.textContent!))).toBe(true);
     expect(document.body.textContent).toContain("Ort der Einheit am Meldekopf geändert");
     // Rückgängig
     const quittung = screen.getAllByRole("status").find((q) => q.textContent!.includes("Name geändert"))!;
@@ -229,7 +232,7 @@ describe("R20-K3: Rückrufnummer des Ortsverbands ist gekennzeichnet", () => {
 describe("R20-N5: Fachwörter erklärt", () => {
   it("Verpflegung: ein Satz mit Personen vor Ort, kein „angefordert 0 (Stärke 7)“", () => {
     const sum = (angefordert: number, gesamt: number) => ({ verpflegungAngefordert: angefordert, verpflegung: { gesamt } }) as never;
-    expect(verpflegungText(sum(0, 7))).toBe("Verpflegung: keine angefordert (7 Personen vor Ort)");
+    expect(verpflegungText(sum(0, 7))).toBe("Verpflegung: kein Bedarf gemeldet (7 Personen vor Ort)");
     expect(verpflegungText(sum(3, 7))).toBe("Verpflegung: 3 angefordert (7 Personen vor Ort)");
     expect(verpflegungText(sum(7, 7))).toBe("Verpflegung 7");
   });

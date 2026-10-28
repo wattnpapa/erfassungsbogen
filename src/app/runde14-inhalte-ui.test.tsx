@@ -137,16 +137,16 @@ describe("R14-H1 Empfangene Meldung ohne Sammlung auf dem Gerät", () => {
 });
 
 describe("R14-N3 Schnellerfassung: kein Haken für Schritte, die es nicht gibt", () => {
-  it("Schritt 2 und 5 tragen „–“ statt „✓“", async () => {
+  it("zeigt nur die vier Schritte der Schnellerfassung, ohne Strich und ohne Haken für Entfallenes (R21-E4)", async () => {
     const nutzer = userEvent.setup();
     render(<App />);
     await nutzer.click(screen.getByRole("button", { name: /Einheit schnell erfassen/ }));
     const leiste = await screen.findByRole("navigation", { name: "Schritte" });
     const knoepfe = within(leiste).getAllByRole("button");
-    for (const i of [1, 4]) {
-      expect(knoepfe[i]!.getAttribute("title")).toBe("Entfällt in der Schnellerfassung");
-      expect(knoepfe[i]!.textContent).not.toContain("✓");
+    expect(knoepfe.map((k) => k.textContent!.replace(/\s+/g, " ").trim().slice(0, 2))).toEqual(["1.", "2.", "3.", "4."]);
+    for (const k of knoepfe) {
+      expect(k.getAttribute("title")).not.toBe("Entfällt in der Schnellerfassung");
+      expect(k.textContent).not.toContain("✓");
     }
-    expect(knoepfe[2]!.getAttribute("title")).not.toBe("Entfällt in der Schnellerfassung");
   }, 30000);
 });

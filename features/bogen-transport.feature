@@ -21,7 +21,8 @@ Funktionalität: Erfassungsbogen erstellen und offline transportieren
     Angenommen ich öffne die App
     Wenn ich auf "Einheit schnell erfassen (nur Stärke)…" klicke
     Dann sehe ich den Schritt "1. Einheit"
-    Wenn ich zum Schritt "3. Personal" wechsle
+    # R21: Die Schnellerfassung zählt ihre vier Schritte durch (1 Einheit, 2 Personal, 3 Fahrzeuge, 4 Übersicht).
+    Wenn ich zum Schritt "2. Personal" wechsle
     Dann ist "Nur Stärke (Meldekopf-Schnellerfassung)" ausgewählt
 
   Szenario: Geteilter Link eines alten Bogens wird geladen und migriert

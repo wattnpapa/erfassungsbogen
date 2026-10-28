@@ -23,6 +23,11 @@ Grundlage: Repository `wattnpapa/erfassungsbogen`, Stand 2026-09-12 — Version 
 > angenommen; der Bogen nimmt dann denselben Weg wie ein Bogen-Link (Rückfrage vor
 > dem Ablegen, 5.1). Empfänger und Netzverbindungen unverändert (5.8).
 >
+> **Nachgezogen 2026-10-29 — Audit Runde 21:** Keine neuen Speicherorte und keine geänderten
+> Empfänger. Die Schnellerfassung legt eine Einheit nie mehr still mit der falschen
+> Organisation ab (Richtigkeit, Art. 5 Abs. 1 lit. d DSGVO). Netzverbindungen
+> unverändert (5.8).
+>
 > **Nachgezogen 2026-10-28 — Audit Runde 20:** Keine neuen Speicherorte. Bei vollem
 > Speicher wird ein geschlossener oder ersetzter Bogen nicht mehr verworfen, sondern
 > auf den Rückholplatz umgelegt; die Meldung bietet die Datei an (Verfügbarkeit,

@@ -8,7 +8,24 @@
  */
 import { einsatzEndgueltigLoeschen, type Einsatzsammlung } from "@bos/meldekopf/einsaetze";
 import { frageJaNein, frageWahl } from "./dialoge";
-import { PAPIERKORB_LEER_RAT } from "./speicher-fehler-text";
+import { speicherBelegung } from "./eintrag-zeiten";
+import { loeschenUmfangText } from "./einsatz-geloescht";
+import { geltendeJeEinheit } from "./fassung-vorrang";
+
+/**
+ * Text von „Nicht gelöscht" (R21-H7, N7): ein Satz, was nicht geschah und warum (mit der Belegung), ein Satz, was jetzt zu tun ist.
+ * Er nennt nur die Knöpfe, die darunter stehen: „Erst sichern" (oder auf der Startseite „Einsatz öffnen und sichern"), „Endgültig
+ * löschen…" und „Einsatz behalten".
+ */
+export function notwegText(name: string, belegung: number | null, sichern: boolean, startseite: boolean): string {
+  const prozent = belegung == null ? "" : ` (zu ${Math.round(belegung * 100)} % belegt)`;
+  const weg = sichern
+    ? startseite
+      ? "Erst den Einsatz öffnen und sichern, dann „Endgültig löschen…“ (nicht rückholbar)."
+      : "Erst sichern, dann „Endgültig löschen…“ (nicht rückholbar)."
+    : "„Endgültig löschen…“ schafft Platz (nicht rückholbar).";
+  return `„${name}" ist nicht gelöscht: Der Speicher dieses Geräts ist voll${prozent}, der Papierkorb braucht selbst Platz. ${weg}`;
+}
 
 /** Liefert, ob der Einsatz endgültig gelöscht wurde (`gesichert` meldet einen Fehler beim Schreiben selbst). */
 export async function notwegEndgueltig(
@@ -17,19 +34,24 @@ export async function notwegEndgueltig(
     papierkorbLeer: boolean;
     keinExport: boolean;
     sichern?: () => unknown;
+    /** Auf der Startseite gibt es das Sammel-PDF nicht: Der Weg heißt dort „Einsatz öffnen und sichern" (R21-W6). */
+    startseite?: boolean;
     gesichert: (titel: string, aktion: () => void) => Promise<boolean>;
   },
 ): Promise<boolean> {
+  const sichernAngeboten = o.keinExport && !!o.sichern;
   const wahl = await frageWahl({
     titel: "Nicht gelöscht",
-    text: o.papierkorbLeer
-      ? PAPIERKORB_LEER_RAT
-      : `Der Speicher dieses Geräts ist voll, der Papierkorb braucht selbst Platz: „${s.name}" ist nicht gelöscht.`,
+    text: notwegText(s.name, speicherBelegung()?.anteil ?? null, sichernAngeboten, !!o.startseite),
     abbruch: "Einsatz behalten",
     fokus: "abbruch",
     wege: [
-      ...(o.keinExport && o.sichern
-        ? [{ wert: "sichern", label: "Erst sichern (Sammel-PDF erzeugen)", sicher: true, kurz: "Es gibt noch keinen Export." }]
+      ...(sichernAngeboten
+        ? [
+            o.startseite
+              ? { wert: "sichern", label: "Einsatz öffnen und sichern", sicher: true, kurz: "Dort „Einsatz weitergeben / sichern“." }
+              : { wert: "sichern", label: "Erst sichern (Sammel-PDF erzeugen)", sicher: true, kurz: "Es gibt noch keinen Export." },
+          ]
         : []),
       { wert: "endgueltig", label: "Endgültig löschen…", gefahr: true, kurz: "Schafft Platz, nicht rückholbar." },
     ],
@@ -39,11 +61,10 @@ export async function notwegEndgueltig(
     return false;
   }
   if (wahl !== "endgueltig") return false;
-  const meldungen = s.eintraege.length;
   const sicher = await frageJaNein({
     titel: `„${s.name}" endgültig löschen?`,
     text:
-      `${meldungen} Meldung${meldungen === 1 ? "" : "en"} sind danach weg — nicht im Papierkorb, nicht rückholbar.` +
+      `${loeschenUmfangText(geltendeJeEinheit(s.eintraege).length, s.eintraege.length)} sind danach weg — nicht im Papierkorb, nicht rückholbar.` +
       (o.keinExport ? " Es gibt noch keinen Export: das wäre die einzige Kopie." : ""),
     ok: "Ja, endgültig löschen",
     abbruch: "Einsatz behalten",

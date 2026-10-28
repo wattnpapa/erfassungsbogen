@@ -118,7 +118,7 @@ import { fortschrittSatz, sammelPdfDauerText, tippWaehrendLauf, useArbeitet, use
 import { useMinutenTakt } from "./minuten-takt";
 import { AUSGABE_SPERRE_MS, ausgabeFreiBeiTipp } from "./ausgabe-sperre";
 import { verloreneEingabeText } from "./eingabe-verloren";
-import { loeschenErfassungSatz } from "./einsatz-geloescht";
+import { loeschenErfassungSatz, loeschenUmfangText } from "./einsatz-geloescht";
 import { angabenAlterWort, angabenZeit, handAenderungText } from "./angaben-alter";
 import { abschlussKarteText, abschlussLaden, abschlussUebergabeText, meldungenSeit, neueMeldungenText, offenKurz } from "./einsatz-abschluss";
 import { alterText, anwesendenAlter, anwesendenAlterText, bedarfOhneAngabeHinweis, bedarfOhneAngabeText, kraftstoffTeile, personenText, zugAlterText } from "./lagemonitor";
@@ -150,6 +150,7 @@ import { AnzeigeLeistenKnopf, AnzeigeSchalter } from "./anzeige-schalter";
 import {
   SpeicherVollFehler,
   istSpeicherVoll,
+  speicherBelegung,
   abrueckzeitSetzen,
   eintreffzeit,
   eintreffzeitSetzen,
@@ -342,8 +343,19 @@ async function gesichert(titel: string, aktion: () => void, merke?: string, papi
  * scheiterte also gerade dann, wenn man Platz schaffen wollte. Der Hinweis „Nicht gelöscht" bietet deshalb
  * „Endgültig löschen" an (ohne Papierkorb, nicht rückholbar). Liefert, was geschah.
  */
-async function einsatzLoeschenGesichert(s: Einsatzsammlung, sichern?: () => unknown): Promise<"papierkorb" | "endgueltig" | null> {
+async function einsatzLoeschenGesichert(
+  s: Einsatzsammlung,
+  sichern?: () => unknown,
+  opt: { startseite?: boolean; vorab?: boolean } = {},
+): Promise<"papierkorb" | "endgueltig" | null> {
   const papierkorbLeer = einsaetzePapierkorb().length === 0;
+  // R20-W1: Der Notweg löscht nicht mit einem Tipp (zwei Rückfragen, Hauptweg „Erst sichern“); nachgeladen, weil selten.
+  const notweg = async () => {
+    const geloescht = await (await import("./einsatz-notweg")).notwegEndgueltig(s, { papierkorbLeer, keinExport: !exportVorhanden(s.id), sichern, startseite: opt.startseite, gesichert });
+    return geloescht ? ("endgueltig" as const) : null;
+  };
+  // R21-H6: Ist der Speicher schon als voll bekannt, kommt gleich die Notweg-Rückfrage (die erste hätte den Papierkorb zugesagt).
+  if (opt.vorab) return notweg();
   try {
     einsatzLoeschen(s.id);
     return "papierkorb";
@@ -352,10 +364,14 @@ async function einsatzLoeschenGesichert(s: Einsatzsammlung, sichern?: () => unkn
       await zeigeHinweis({ titel: "Nicht gelöscht", text: fehlerText(e) });
       return null;
     }
-    // R20-W1: Der Notweg löscht nicht mit einem Tipp (zwei Rückfragen, Hauptweg „Erst sichern“); nachgeladen, weil selten.
-    const geloescht = await (await import("./einsatz-notweg")).notwegEndgueltig(s, { papierkorbLeer, keinExport: !exportVorhanden(s.id), sichern, gesichert });
-    return geloescht ? "endgueltig" : null;
+    return notweg();
   }
+}
+
+/** R21-H6: Der Speicher steht schon bei 100 %: Das Ablegen im Papierkorb braucht Platz und kann nicht gelingen. */
+function speicherSchonVoll(): boolean {
+  const b = speicherBelegung();
+  return !!b && b.anteil >= 0.995;
 }
 
 /**
@@ -504,7 +520,7 @@ export function letzteMeldungText(s: Einsatzsammlung): string {
   const stand = kenntnisStandLaden(s.id);
   const neu = stand ? neuZurKenntnis(s.eintraege, stand).length : 0;
   const aelteste = aeltesteAnwesendeText(s);
-  return `Letzte Meldung ${meldeZeitMitAlter(letzte).text}${aelteste ? ` · ${aelteste}` : ""}${neu > 0 ? ` · ${neu} neu seit der letzten Kenntnisnahme` : ""}${unlesbarZusatz ? ` · ${unlesbarZusatz}` : ""}`;
+  return `Letzte Meldung ${meldeZeitMitAlter(letzte).text}${aelteste ? ` · ${aelteste}` : ""}${neu > 0 ? ` · ${neu} neu seit dem letzten Mal` : ""}${unlesbarZusatz ? ` · ${unlesbarZusatz}` : ""}`;
 }
 
 /**
@@ -724,10 +740,10 @@ export function EinsatzListe(props: {
     });
   }
 
-  async function loeschen(s: Einsatzsammlung) {
+  async function loeschen(s: Einsatzsammlung, vorab = false) {
     // Bei vollem Speicher scheiterte das Ablegen im Papierkorb ohne Meldung
-    // (Audit Runde 6, R6-O1).
-    const weg = await einsatzLoeschenGesichert(s);
+    // (Audit Runde 6, R6-O1). R21-W6: Das Sammel-PDF gibt es nur in der Einsatzansicht; „Erst sichern" öffnet sie.
+    const weg = await einsatzLoeschenGesichert(s, () => onOeffnen(s), { startseite: true, vorab });
     if (!weg) return;
     if (weg === "endgueltig") await zeigeHinweis({ titel: "Endgültig gelöscht", text: `„${s.name}" ist gelöscht — nicht im Papierkorb, nicht rückholbar.` });
     else setGeloescht({ id: s.id, name: s.name });
@@ -740,7 +756,7 @@ export function EinsatzListe(props: {
     return frageJaNein({
       titel: "Einsatz endgültig löschen?",
       text:
-        `„${s.name}" mit ${s.eintraege.length} Meldung(en) wird aus dem Papierkorb entfernt. Darin stecken fremde Personendaten; rückgängig geht das nicht.` +
+        `„${s.name}" mit ${loeschenUmfangText(geltendeJeEinheit(s.eintraege).length, s.eintraege.length)} wird aus dem Papierkorb entfernt. Darin stecken fremde Personendaten; rückgängig geht das nicht.` +
         // Gibt es keine Kopie, ist das hier die letzte (Audit Runde 4, R4-D5).
         (s.eintraege.length > 0 && !exportVorhanden(s.id)
           ? " Von dieser Sammlung gibt es noch keinen Export, kein Lageblatt und keine Weitergabe — es ist die einzige Kopie."
@@ -844,7 +860,18 @@ export function EinsatzListe(props: {
                   danach nach. Ohne ihn verschwindet aus einem Stapel gleich
                   aussehender Karten schlagartig eine, und welche es war, steht
                   nur noch im Papierkorb. */}
-              <AbgangKnopf className="entfernen" bestaetigen={() => fragLoeschen(s)} onAusfuehren={() => loeschen(s)}>
+              <AbgangKnopf
+                className="entfernen"
+                bestaetigen={async () => {
+                  // R21-H6: Bei vollem Speicher gleich die Notweg-Rückfrage statt einer Zusage, die die nächste widerruft.
+                  if (speicherSchonVoll()) {
+                    await loeschen(s, true);
+                    return false;
+                  }
+                  return fragLoeschen(s);
+                }}
+                onAusfuehren={() => loeschen(s)}
+              >
                 Löschen…
               </AbgangKnopf>
             </div>
@@ -1978,14 +2005,18 @@ export function EinsatzDetail(props: {
    */
   async function loeschen() {
     const anzahl = geltendeJeEinheit(einsatz.eintraege).length;
-    const sicher = await frageJaNein({
-      titel: "Einsatz löschen?",
-      text: `„${einsatz.name}" mit ${anzahl} gemeldeten Einheit${anzahl === 1 ? "" : "en"} wandert in den Papierkorb und lässt sich dort 30 Tage lang zurückholen. ${exportStandSatz(einsatz.id)}${loeschenErfassungSatz(props.angefangeneErfassung)}`,
-      ok: "In den Papierkorb",
-      gefahr: true,
-    });
+    // R21-H6: Ist der Speicher schon voll, entfällt die Zusage „wandert in den Papierkorb": gleich die Notweg-Rückfrage.
+    const vorab = speicherSchonVoll();
+    const sicher =
+      vorab ||
+      (await frageJaNein({
+        titel: "Einsatz löschen?",
+        text: `„${einsatz.name}" mit ${anzahl} gemeldeten Einheit${anzahl === 1 ? "" : "en"} wandert in den Papierkorb und lässt sich dort 30 Tage lang zurückholen. ${exportStandSatz(einsatz.id)}${loeschenErfassungSatz(props.angefangeneErfassung)}`,
+        ok: "In den Papierkorb",
+        gefahr: true,
+      }));
     if (!sicher) return;
-    const weg = await einsatzLoeschenGesichert(einsatz, onWeitergeben);
+    const weg = await einsatzLoeschenGesichert(einsatz, onWeitergeben, { vorab });
     if (!weg) return;
     // Die Startseite quittiert mit Rückweg (R2-D6); endgültig Gelöschtes hat keinen.
     if (weg === "endgueltig") await zeigeHinweis({ titel: "Endgültig gelöscht", text: `„${einsatz.name}" ist gelöscht — nicht im Papierkorb, nicht rückholbar.` });
@@ -2087,6 +2118,27 @@ export function EinsatzDetail(props: {
         </Auswahl>
       </label>
     </div>
+  );
+
+  // R21-A4 u. a.: Die drei Wege neben „Bogen scannen…" (am Telefon mit Meldungen eingeklappt, siehe unten).
+  const aufnahmeWegeEingeklappt = kompakt && einsatz.eintraege.length > 0;
+  const aufnahmeWege = (
+    <>
+      <button type="button" className="mit-zusatz" onClick={onManuell} aria-describedby="aufnahme-zusatz-manuell">
+        Einheit manuell erfassen…
+        <span className="knopf-zusatz" id="aufnahme-zusatz-manuell" aria-hidden="true">von Hand, ohne Bogen</span>
+      </button>
+      {/* Der kurze Weg der Startseite auch hier, mit dieser Sammlung vorbelegt: Ort, Stärke, übernehmen (R16-W3). */}
+      {props.onSchnell && (
+        <button type="button" className="mit-zusatz" onClick={props.onSchnell} aria-describedby="aufnahme-zusatz-schnell">
+          Einheit schnell erfassen (nur Stärke)…
+          <span className="knopf-zusatz" id="aufnahme-zusatz-schnell" aria-hidden="true">Ort und Stärke vom Zettel</span>
+        </button>
+      )}
+      {/* Datei, PDF, einzelne Bilder, viele Bilder, ganzer Ordner: ein Knopf,
+          der die Sorte am Dateityp erkennt (siehe BoegenEinlesenKnopf). */}
+      <BoegenEinlesenKnopf onDaten={onDateiImport} onBilder={onBilderImport} onEinlesen={props.onEinlesen} />
+    </>
   );
 
   return (
@@ -2197,20 +2249,18 @@ export function EinsatzDetail(props: {
           Bogen scannen…
           <span className="knopf-zusatz" id="aufnahme-zusatz-scan" aria-hidden="true">mit Kamera oder Handscanner</span>
         </button>
-        <button type="button" className="mit-zusatz" onClick={onManuell} aria-describedby="aufnahme-zusatz-manuell">
-          Einheit manuell erfassen…
-          <span className="knopf-zusatz" id="aufnahme-zusatz-manuell" aria-hidden="true">von Hand, ohne Bogen</span>
-        </button>
-        {/* Der kurze Weg der Startseite auch hier, mit dieser Sammlung vorbelegt: Ort, Stärke, übernehmen (R16-W3). */}
-        {props.onSchnell && (
-          <button type="button" className="mit-zusatz" onClick={props.onSchnell} aria-describedby="aufnahme-zusatz-schnell">
-            Einheit schnell erfassen (nur Stärke)…
-            <span className="knopf-zusatz" id="aufnahme-zusatz-schnell" aria-hidden="true">Ort und Stärke vom Zettel</span>
-          </button>
+        {/* R21-A4, W4, E5, H4, K3, G5, M5, L4, N4, O3, S3, D4: Am Telefon steht, sobald die Sammlung Meldungen hat, nur „Bogen scannen…"
+            offen da (die Hauptaktion bleibt oben, R2-S3, R18-G2); die anderen drei Wege liegen eine Zeile darunter („Weitere Wege der
+            Aufnahme"), eingeklappt: Die erste Einheitenkarte rückt so um rund 120 px nach oben. Eine leere Sammlung und alle größeren
+            Fenster zeigen alle vier Knöpfe wie bisher. */}
+        {aufnahmeWegeEingeklappt ? (
+          <details className="aufnahme-weitere">
+            <summary>Weitere Wege: von Hand, schnell, Datei</summary>
+            <div className="aktionen aufnahme-weitere-knoepfe">{aufnahmeWege}</div>
+          </details>
+        ) : (
+          aufnahmeWege
         )}
-        {/* Datei, PDF, einzelne Bilder, viele Bilder, ganzer Ordner: ein Knopf,
-            der die Sorte am Dateityp erkennt (siehe BoegenEinlesenKnopf). */}
-        <BoegenEinlesenKnopf onDaten={onDateiImport} onBilder={onBilderImport} onEinlesen={props.onEinlesen} />
       </div>
 
       {/* Was das Einlesen ergab, dort, wo der Finger eben war (R3-L1). */}
@@ -2343,7 +2393,7 @@ export function EinsatzDetail(props: {
         // R19-W4, K6: Am Telefon ist der Kasten zugeklappt (eine Zeile statt bis zu 700 px); die Einheitenliste rückt nach oben.
         <Kasten className="meldung stapel-eingang" role="status">
           <KastenTitel>
-            <strong>Neu seit der letzten Kenntnisnahme ({aufgenommenListe.length}):</strong>
+            <strong>Neu seit dem letzten Mal ({aufgenommenListe.length}):</strong>
             {aufgenommenUebung > 0
               ? aufgenommenUebung === aufgenommenListe.length
                 ? ` ${aufgenommenUebung === 1 ? "Übung" : aufgenommenUebung === 2 ? "beide Übung" : `alle ${aufgenommenUebung} Übung`}, nicht gezählt.`
@@ -2440,6 +2490,14 @@ export function EinsatzDetail(props: {
             <span className="hinweis kenntnis-erklaerung">Merkt nur „gesehen“, sendet nichts an die Einheiten.</span>
           </div>
         </Kasten>
+      )}
+      {/* R21-G4: Fällt der Kasten weg, bleibt an seiner Stelle (am unteren Rand, wo der Finger eben war) eine Zeile ohne Knopf stehen, solange die
+          Quittung unten steht: Die Liste bleibt, wo sie war (kenntnisAnker), und unter dem Finger liegt kein Knopf mehr („Einheit schnell
+          erfassen…" rutschte dort hin). Nur zum Sehen; die Quittung mit „Rückgängig" steht unten in der Leiste. */}
+      {!sammelquittungZeigen && kenntnisGenommen && aktiveQuittung === "kenntnis" && (
+        <p className="meldung kenntnis-spur" aria-hidden="true">
+          ✓ {kenntnisGenommen.anzahl === 1 ? "1 Einheit" : `${kenntnisGenommen.anzahl} Einheiten`} als gesehen vermerkt.
+        </p>
       )}
 
       {/* Ausgenommene Übungsmeldungen: Die Zahlen darüber sind ohne sie
@@ -2742,9 +2800,13 @@ export function EinsatzDetail(props: {
               ist die Länge der Liste, „zählend" die Zahl der Stärkeleiste —
               dieselbe Zählweise wie die Summenzeile der Tabelle (K4). */}
           <h2 ref={listeKopf} id="einheiten-liste">
-            Einheiten ({gefiltert ? `${kopf.length} von ${alleEinheiten.length}` : alleEinheiten.length - nurSollAnzahl} gemeldet
-            {!gefiltert && nurSollAnzahl > 0 ? ` · ${nurSollAnzahl} nur Sollstärke` : ""}
-            {" · "}{sum.einheiten} anwesend{uebungenDaneben.length > 0 ? ` · ${uebungenDaneben.length} Übung` : ""})
+            Einheiten{" "}
+            {/* R21-A4 u. a.: Die Zahlen in eigenem Span: Am Telefon stehen sie klein unter dem Wort „Einheiten", der Umschalter Karten/Tabelle daneben. */}
+            <span className="einheiten-zahlen">
+              ({gefiltert ? `${kopf.length} von ${alleEinheiten.length}` : alleEinheiten.length - nurSollAnzahl} gemeldet
+              {!gefiltert && nurSollAnzahl > 0 ? ` · ${nurSollAnzahl} nur Sollstärke` : ""}
+              {" · "}{sum.einheiten} anwesend{uebungenDaneben.length > 0 ? ` · ${uebungenDaneben.length} Übung` : ""})
+            </span>
           </h2>
           {/* Zwei Sichten auf dieselbe (gesuchte, gefilterte, sortierte) Liste:
               die Karten für die Arbeit an einer Einheit, die Tabelle für den
@@ -3479,6 +3541,22 @@ export function EinsatzDetail(props: {
  */
 export const KERN_KOPF: Partial<Record<TabellenSpalte, string>> = { gesamt: "Stärke", eingetroffen: "Eingetroffen" };
 
+/**
+ * R21-G7, M6, L6, D3: Bei 320 und 360 px bricht die Tabelle zwischen Zahl und Einheit nicht mehr („Diesel 80 | l" stand mit abgeschnittenem
+ * „l"): Die Leerstelle zwischen Zahl und Einheit ist geschützt, umbrochen wird davor („Diesel | 80 l"). Der Text bleibt für Suche und
+ * Vorlesesoftware derselbe (die geschützte Leerstelle zählt als Leerstelle).
+ */
+export function bedarfTeilFest(teil: string): string {
+  return teil.replace(/(\d) (?=\p{L})/gu, "$1 ");
+}
+
+/**
+ * R21-G7, M6: Der sichtbare Kopf „Eingetroffen" darf am Telefon (bis 30 rem) nach „Einge-" umbrechen, statt der Spalte 92 px zu nehmen, die der
+ * Bedarf braucht. Dafür steht neben dem glatten Kopf (`kopf-glatt`, bleibt für Breiteres) eine Fassung mit weicher Trennstelle (`kopf-weich`);
+ * das Stylesheet zeigt je nach Breite eine von beiden. Beide sind `aria-hidden`; die Vorlesesoftware liest den ausgeschriebenen Titel.
+ */
+export const KERN_KOPF_TRENNUNG: Partial<Record<TabellenSpalte, string>> = { eingetroffen: "Einge­troffen" };
+
 export function tabellenSpaltenFuer(zugVorhanden: boolean, kompakt: boolean, kern = false, auftragVorhanden = true, bedarfVorhanden = true): SpaltenDefinition[] {
   const spalten = TABELLEN_SPALTEN.filter((s) => zugVorhanden || s.schluessel !== "zugEtikett");
   if (!kompakt) return spalten;
@@ -3598,7 +3676,8 @@ function EinheitenTabelle({ meldungen, historie = meldungen, art, eingang, numme
                     // Kernspalten am Telefon: Köpfe nur zum Lesen. Fünf Tippziele von 44 px liegen dort ohne Abstand
                     // nebeneinander; sortiert wird mit „Alle Spalten" oder in der Leiste „Suchen, sortieren, filtern".
                     <span className="spalten-kopf">
-                      <span aria-hidden="true">{KERN_KOPF[s.schluessel] ?? s.kopf}</span>
+                      <span aria-hidden="true" className="kopf-glatt">{KERN_KOPF[s.schluessel] ?? s.kopf}</span>
+                      {KERN_KOPF_TRENNUNG[s.schluessel] && <span aria-hidden="true" className="kopf-weich">{KERN_KOPF_TRENNUNG[s.schluessel]}</span>}
                       <span className="nur-sr">{s.titel}</span>
                     </span>
                   ) : (
@@ -3657,6 +3736,8 @@ function EinheitenTabelle({ meldungen, historie = meldungen, art, eingang, numme
         {eingelesen.size > 0 ? "* = Zeit des Einlesens, nicht bestätigt. " : ""}
         {/* R20-N5: „zählend" in der Summenzeile erklärt sich hier, in Worten vom Funk. */}
         Summe „zählend“ = anwesend, ohne Übung und ohne abgerückte.{" "}
+        {/* R21-N6: „nicht erfasst" und „kein Bedarf gemeldet" sind zwei Aussagen; die Zeile Bedarf nennt beide. */}
+        „Bedarf nicht erfasst“ = bei der Schnellerfassung nicht abgefragt, nicht „kein Bedarf“.{" "}
         Details, Historie und Aktionen einer Einheit stehen in der Kartenansicht — den Namen antippen öffnet die Karte.
       </p>
     </>
@@ -3767,10 +3848,11 @@ function TabellenZelle({ spalte, zeile: z, kern = false, stern = false }: { spal
       return (
         <td className="bedarf-zelle">
           {z.bedarf
-            ? z.bedarf.split(" · ").map((teil, i) => (
+            ? z.bedarf.split(" · ").map((teil, i, alle) => (
                 <Fragment key={i}>
-                  {i > 0 ? " · " : null}
-                  <span className="bedarf-teil">{teil}</span>
+                  {/* R21-G7: Der Punkt gehört zum vorigen Posten (geschützte Leerstelle davor): Eine Zeile beginnt nie mit „·". */}
+                  <span className="bedarf-teil">{bedarfTeilFest(i < alle.length - 1 ? `${teil} ·` : teil)}</span>
+                  {i < alle.length - 1 ? " " : null}
                 </Fragment>
               ))
             : bedarfNichtErfasst(z.eintrag.bogen)
@@ -4327,6 +4409,12 @@ function EinheitKarte(props: {
   // Zweite Knopfreihe mit den seltenen Aktionen (R2-H9).
   const [mehr, setMehr] = useState(false);
   const mehrOffen = mehr || aufteilen || zusammenfuehren;
+  /** R21-K2: Nach „Stärke ändern…", „Als Übung kennzeichnen…" und „Ort der Einheit ändern…" schließt das „Mehr"-Blatt, damit die „Rückgängig"-Leiste frei liegt (wie bei „Entfernen"). */
+  const mehrSchliessen = () => {
+    setMehr(false);
+    setAufteilen(false);
+    setZusammenfuehren(false);
+  };
   const [pdfLaeuft, setPdfLaeuft] = useState(false);
   // Bestätigung nach „Bogen als PDF" (R15-A5); der nächste Tipp auf den Knopf räumt sie weg.
   const [pdfHinweis, setPdfHinweis] = useState<string | null>(null);
@@ -4813,6 +4901,7 @@ function EinheitKarte(props: {
       }
     }, `Gewünscht war für „${einheitAnzeigename(kopf.bogen.einheit)}": Stärke ${f} / ${u} / ${m} / ${f + u + m} (bisher ${alt.fuehrer} / ${alt.unterfuehrer} / ${alt.mannschaft} / ${alt.gesamt}). Bitte auf dem Meldeblock notieren, Platz schaffen und noch einmal eingeben.`);
     if (!ok) return;
+    mehrSchliessen();
     if (neueFassung.fassung) {
       props.onStaerkeGeaendert?.({
         name: einheitAnzeigename(kopf.bogen.einheit),
@@ -4863,6 +4952,7 @@ function EinheitKarte(props: {
       }
     });
     if (!ok) return;
+    mehrSchliessen();
     if (neueFassung.fassung) {
       props.onStaerkeGeaendert?.({
         name,
@@ -4899,6 +4989,7 @@ function EinheitKarte(props: {
       }
     });
     if (!ok) return;
+    mehrSchliessen();
     if (neueFassung.fassung) {
       props.onStaerkeGeaendert?.({
         name: vorherName,

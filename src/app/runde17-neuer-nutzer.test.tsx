@@ -158,10 +158,12 @@ describe("R17-N5 Strich im Reiter und Modus-Marke", () => {
     const nutzer = userEvent.setup();
     render(<App />);
     await nutzer.click(screen.getByRole("button", { name: "Einheit schnell erfassen (nur Stärke)…" }));
-    expect(document.querySelector(".schritte-erklaerung")!.textContent).toMatch(/Einsatz und Sofortbedarf entfallen/);
-    expect(screen.getByRole("button", { name: /^2\. .* entfällt in der Schnellerfassung$/ })).toBeTruthy();
-    expect(screen.getByRole("button", { name: /^5\. .* entfällt in der Schnellerfassung$/ })).toBeTruthy();
-    await nutzer.click(screen.getByRole("button", { name: /^3\. Personal/ }));
+    // R21-E4: Die Leiste zeigt nur die vier Schritte der Schnellerfassung, durchgezählt; Striche gibt es nicht mehr.
+    expect(document.querySelector(".schritte-erklaerung")).toBeNull();
+    expect(screen.queryByRole("button", { name: /entfällt in der Schnellerfassung$/ })).toBeNull();
+    const reiter = [...document.querySelectorAll(".schritte button")].map((b) => b.textContent);
+    expect(reiter).toHaveLength(4);
+    await nutzer.click(screen.getByRole("button", { name: /^2\. Personal/ }));
     expect(document.querySelector(".schritte-erklaerung")).toBeNull();
   });
 

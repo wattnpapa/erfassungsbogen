@@ -284,7 +284,7 @@ export function eigeneAngaben(liste: readonly Fahrzeug[]): string {
     .join("; ");
 }
 
-export function SchrittFahrzeuge({ bogen, aendern }: SchrittProps) {
+export function SchrittFahrzeuge({ bogen, aendern, nummer = 4 }: SchrittProps) {
   // Als Objektidentität, nicht als Index: ein Index rutscht beim Löschen einer
   // anderen Karte auf eine bestehende und stempelte sie grundlos ein zweites
   // Mal. Das Bearbeiten der neuen Karte ersetzt das Objekt ohnehin — dann ist
@@ -355,7 +355,7 @@ export function SchrittFahrzeuge({ bogen, aendern }: SchrittProps) {
   const mitInhaltOhneKennzeichen = bogen.fahrzeuge.filter((f) => !f.kennzeichen?.trim() && !fahrzeugUnbenannt(f)).length;
   return (
     <section className="karte">
-      <h2>4. Fahrzeuge</h2>
+      <h2>{nummer}. Fahrzeuge</h2>
       <Transportbilanz bogen={bogen} />
       {bogen.fahrzeuge.map((f, i) => (
         <FahrzeugKarte

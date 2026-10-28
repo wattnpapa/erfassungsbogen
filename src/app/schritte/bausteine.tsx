@@ -18,6 +18,8 @@ export type SchrittProps = {
   aendern: (patch: Partial<Erfassungsbogen>) => void;
   /** Sprung zu einem anderen Assistenten-Schritt — Hinweise, die dorthin zeigen, werden damit antippbar. */
   geheZu?: (schritt: number) => void;
+  /** Nummer der Überschrift, wenn sie von der des Vollassistenten abweicht (Schnellerfassung zählt 1 bis 4, R21-A3). */
+  nummer?: number;
 };
 
 /** Feldname des umschließenden <Feld> — Auswahllisten beschriften sich daraus. */

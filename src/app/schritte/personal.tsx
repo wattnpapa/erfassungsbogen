@@ -980,7 +980,7 @@ function wegLesen(einheit: Einheit, personal: readonly Person[], jetzt = Date.no
   }
 }
 
-export function SchrittPersonal({ bogen, aendern: aendernRoh }: SchrittProps) {
+export function SchrittPersonal({ bogen, aendern: aendernRoh, nummer = 3 }: SchrittProps) {
   /**
    * Rückweg nach einer Handlung, die Erfasstes wegnimmt: Person entfernen,
    * Namen einfügen, Sollplätze laden. Eine gelöschte Person nahm Name,
@@ -1387,7 +1387,7 @@ export function SchrittPersonal({ bogen, aendern: aendernRoh }: SchrittProps) {
 
   return (
     <section className="karte">
-      <h2>3. Personal</h2>
+      <h2>{nummer}. Personal</h2>
       {/* Der Assistent fragt Personal vor Fahrzeugen, das Papier hat sie in
           umgekehrter Reihenfolge — wer abtippt, blättert sonst (R4-A8). */}
       {!nurStaerke && (

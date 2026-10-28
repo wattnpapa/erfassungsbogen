@@ -34,6 +34,20 @@
 > Rollleiste den Fokus und rollen die Pfeiltasten-Markierung ins Bild. Kein neuer
 > Host, Transportformat und Schema unverändert.
 >
+> **Nachgezogen 2026-10-29 (Runde 21):** Audit Runde 21 — Kap. 5, 6, 8.2, 8.6, 9, 11:
+> kein neuer Speicherschlüssel. **Offline-Fehler der Einsatzansicht behoben (P0):** Die
+> nachgeladene Einsatzansicht führte die Stilvorlage des Einstiegs in ihrer
+> Vorladeliste, die der Bau beim Einbetten der Schrift-CSS (`fontCssInline` in
+> `vite.config.ts`) löscht; ohne Netz scheiterte die Vorladung mit „Unable to preload
+> CSS“. Die Einbettung wählt jetzt die `index-*.css`, `writeBundle` ersetzt die
+> Einträge in den Vorladelisten, und `npm run bundle-budget` bricht ab, wenn ein Chunk
+> auf eine fehlende Stilvorlage verweist (`fehlendeStilvorlagen`). Schnellerfassung
+> zählt 1 bis 4 einheitlich und zeigt die Organisation sichtbar (nie still THW). Der
+> Fehlerschirm bei nicht ladbarem Teil nennt die Ursache und rät nicht zum Löschen.
+> Die Einsatzansicht zeigt beim Nachladen einen Kopf mit Rückweg; die feste
+> Ansichtsleiste entfällt unter 48 rem (der Schalter bleibt im Kopf). Startbündel 0,74 MB.
+> Kein neuer Host, Transportformat und Schema unverändert.
+>
 > **Nachgezogen 2026-10-28 (Runde 20):** Audit Runde 20 (rund 47 Befunde, vier Pakete)
 > — Kap. 5, 6, 8.2, 8.6, 9, 11: kein neuer Speicherschlüssel. **Startbündel von 1,23 MB auf
 > 0,73 MB verkleinert** (ADR-003 Aufnahmeregel 5): die Zeichensammlung (`symbole.ts`,

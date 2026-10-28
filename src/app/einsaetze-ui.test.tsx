@@ -1553,7 +1553,7 @@ describe("Quittung nennt die zuletzt aufgenommenen Einheiten (R2-S4)", () => {
     neuLaden();
     const quittung = document.querySelector<HTMLElement>(".stapel-eingang")!;
     expect(quittung.getAttribute("role")).toBe("status");
-    expect(quittung.textContent).toMatch(/Neu seit der letzten Kenntnisnahme \(3\): davon 2 Übung, nicht gezählt\./);
+    expect(quittung.textContent).toMatch(/Neu seit dem letzten Mal \(3\): davon 2 Übung, nicht gezählt\./);
     expect([...quittung.querySelectorAll("li")].map((li) => li.textContent)).toEqual([
       "THW Weinsberg — neu gemeldet",
       "THW Albstadt — neu gemeldet",
@@ -1645,7 +1645,8 @@ describe("Quittung nennt die zuletzt aufgenommenen Einheiten (R2-S4)", () => {
     expect(karten.find((k) => k.textContent!.includes("Albstadt"))!.textContent).not.toContain("Bogen nennt");
     expect(document.querySelector(".stapel-eingang")!.textContent).toContain("Ort im Bogen: „Waldbrand Gräfenberg");
     // Gezählt wird er weiter.
-    expect(screen.getByText("Einheiten (2 gemeldet · 2 anwesend)")).toBeTruthy();
+    // R21: Die Zahlen stehen in eigenem Span (am Telefon klein unter dem Wort „Einheiten"); der Name der Überschrift bleibt derselbe.
+    expect(screen.getByRole("heading", { name: "Einheiten (2 gemeldet · 2 anwesend)" })).toBeTruthy();
   });
 
   it("zählt Aufteilen nicht als Eingang", async () => {
@@ -1702,7 +1703,7 @@ describe("Folgemeldungen als neue Fassung erkennbar (R3-K1)", () => {
     // Neu aufgebaut wie nach einem Neuladen: die Quittung steht.
     ansicht(angelegt.id);
     const quittung = document.querySelector<HTMLElement>(".stapel-eingang")!;
-    expect(quittung.textContent).toMatch(/Neu seit der letzten Kenntnisnahme \(1\)/);
+    expect(quittung.textContent).toMatch(/Neu seit dem letzten Mal \(1\)/);
     expect(quittung.textContent).toMatch(/THW Crailsheim — Folgemeldung \d\d:\d\d: Stärke 12 → 9 \(−3\)/);
     expect(quittung.querySelector(".staerke-verlust")!.textContent).toBe("Stärke 12 → 9 (−3)");
 
@@ -1778,7 +1779,7 @@ describe("Zeitbezug der letzten Meldung (R3-K5)", () => {
     const s = () => einsaetzeLaden().find((x) => x.id === angelegt.id)!;
     expect(letzteMeldungText(s())).toBe(`Letzte Meldung ${zeit} (gerade eben)`);
     meldungHinzufuegen(angelegt.id, bogenMitName("Ulm"));
-    expect(letzteMeldungText(s())).toMatch(/^Letzte Meldung .* · 1 neu seit der letzten Kenntnisnahme$/);
+    expect(letzteMeldungText(s())).toMatch(/^Letzte Meldung .* · 1 neu seit dem letzten Mal$/);
   });
 });
 

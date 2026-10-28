@@ -160,7 +160,7 @@ export function verpflegungText(s: Pick<EinsatzSummen, "verpflegung" | "verpfleg
   if (s.verpflegungAngefordert === s.verpflegung.gesamt) return `Verpflegung ${s.verpflegung.gesamt}`;
   // R20-N5: ein Satz, kein „angefordert 0 … nicht erfasst": was angefordert ist, gegen die Zahl der Personen vor Ort.
   return s.verpflegungAngefordert === 0
-    ? `Verpflegung: keine angefordert (${s.verpflegung.gesamt} Personen vor Ort)`
+    ? `Verpflegung: kein Bedarf gemeldet (${s.verpflegung.gesamt} Personen vor Ort)` // R21-N6: „keine angefordert" klang nach „nichts nötig"
     : `Verpflegung: ${s.verpflegungAngefordert} angefordert (${s.verpflegung.gesamt} Personen vor Ort)`;
 }
 

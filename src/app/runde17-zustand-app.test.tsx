@@ -49,15 +49,15 @@ describe("R17-S12 Schnellerfassung: Weiter und Zurück führen über denselben S
     await nutzer.click(screen.getByRole("button", { name: "Einheit schnell erfassen (nur Stärke)…" }));
     await nutzer.type(screen.getByLabelText("Ort der Einheit (Pflicht)"), "Schnellhausen");
     await nutzer.click(screen.getByRole("button", { name: "Weiter →" }));
-    expect(screen.getByRole("heading", { level: 2, name: "3. Personal" })).toBeDefined();
+    expect(screen.getByRole("heading", { level: 2, name: "2. Personal" })).toBeDefined();
     await nutzer.click(await screen.findByRole("button", { name: "Weiter →" }));
-    expect(screen.getByRole("heading", { level: 2, name: "4. Fahrzeuge" })).toBeDefined();
+    expect(screen.getByRole("heading", { level: 2, name: "3. Fahrzeuge" })).toBeDefined();
     // Der Sofortbedarf entfällt in der Schnellerfassung (Reiter „–"): schon beim ersten Besuch heißt der Knopf „Zur Übersicht →“.
     await nutzer.click(screen.getByRole("button", { name: "Zur Übersicht →" }));
     expect(screen.getByRole("heading", { name: "Gesamtübersicht" })).toBeDefined();
-    const zurueck = screen.getByRole("button", { name: "← Zurück zu Schritt 4 (Fahrzeuge)" });
+    const zurueck = screen.getByRole("button", { name: "← Zurück zu Schritt 3 (Fahrzeuge)" });
     await nutzer.click(zurueck);
-    expect(screen.getByRole("heading", { level: 2, name: "4. Fahrzeuge" })).toBeDefined();
+    expect(screen.getByRole("heading", { level: 2, name: "3. Fahrzeuge" })).toBeDefined();
     expect(screen.getByRole("button", { name: "Zur Übersicht →" })).toBeDefined();
     expect(screen.queryByRole("button", { name: "Weiter →" })).toBeNull();
   });

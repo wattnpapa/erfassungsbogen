@@ -357,6 +357,12 @@ Grundlage: Repository `wattnpapa/erfassungsbogen`, Stand 2026-09-12 — Version 
 > und `vendor/` unverändert. Der Entwurf trägt zusätzlich die Marke „über die
 > Startseite verlassen" (`fremd.startseite`, R5-N3, 3.3 D1) — keine Daten.
 
+> **Nachgezogen 2026-10-29 (Runde 21):** Audit Runde 21. Verfügbarkeit (5.5): Die Einsatzansicht
+> ließ sich ohne Netz nicht öffnen (P0, Ursache: Vorladeliste verwies auf eine beim
+> Einbetten gelöschte Stilvorlage); behoben, der Bau prüft das jetzt
+> (`npm run bundle-budget`, Lieferkette 6.4). Keine neuen Speicherschlüssel, Hosts,
+> CSP-Änderungen oder Transportformat-Änderungen.
+
 > **Nachgezogen 2026-10-28 (Runde 20):** Audit Runde 20. Speicher (3.3, 5.5): kein neuer
 > Schlüssel; bei vollem Speicher geht ein Bogen nicht mehr verloren (Risiko
 > „Datenverlust durch volle Ablage" erneut geprüft, P1 behoben). Lieferkette (6.4):

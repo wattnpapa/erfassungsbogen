@@ -43,3 +43,17 @@ beim Nachladen der Einsatzansicht (vier), Tabelle bei 320 px: Bedarf abgeschnitt
 | [Analog-first](analog-first.md) | 1 | 0 | 0 | 9 | 5 |
 | [Mobile-UI](mobile-ui.md) | 0 | 1 | 0 | 5 | 5 |
 | Verlaufstabelle (ohne Doppelungen, P3 geschätzt) | 1 | 0 | 3 | 30 | – |
+
+## Stand der Behebung (29.10.2026)
+
+Der P0 ist behoben (Commit 4c56f9e). Behoben mit Test, im Browser (Produktionsbuild)
+gemessen: die Organisation in der Schnellerfassung (R21-W2/H2), der Fehlerschirm
+(R21-L2/D2), das „Mehr"-Blatt (R21-K2), die einheitliche Schrittzählung, die Texte bei
+vollem Speicher, „Ort der Einheit ändern…" mit Prüfung, die Tabelle bei 320 px, der
+Assistent quer in „Feld", der Platzhalter beim Nachladen. Nur teilweise: die erste
+Einheitenkarte liegt bei 360 x 640 bei 762 bis 787 px statt unter 700 px (bei 390 x 844
+bei 725 px), die drei Wege „von Hand", „schnell" und „Datei" stehen nach der ersten
+Meldung im Aufklapper „Weitere Wege" (ein Tipp mehr); „zählend" in der Legende der
+Einheitenliste bleibt (R21-N6). Die feste Ansichtsleiste unter 48 rem entfällt
+(R21-G6). Bundle-Budget neu gesetzt (Startbündel 740 159 Byte). Arc42, ISK und DSFA
+nachgezogen.

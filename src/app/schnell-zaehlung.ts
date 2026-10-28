@@ -18,3 +18,13 @@ export function schnellKopfzeile(schritt: number, namen: readonly string[]): str
   if (pos < 0) return `${namen[schritt]} entfällt in der Schnellerfassung – weiter mit Personal`;
   return `Schritt ${pos + 1} von ${SCHNELL_SCHRITTE.length}: ${namen[schritt]}`;
 }
+
+/**
+ * Nummer, die ein Schritt in der Schnellerfassung trägt (R21-A3, W3, E4, H3, G8, M3, L3, N2, O2, S2):
+ * Überschrift, Reiter, Rücklink und Rückfrage zählen wie die Kopfzeile (1 Einheit, 2 Personal,
+ * 3 Fahrzeuge, 4 Übersicht). Für einen entfallenden Schritt gibt es keine Nummer.
+ */
+export function schnellNummer(schritt: number): number | undefined {
+  const pos = SCHNELL_SCHRITTE.indexOf(schritt);
+  return pos < 0 ? undefined : pos + 1;
+}

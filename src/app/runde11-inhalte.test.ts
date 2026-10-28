@@ -49,7 +49,7 @@ describe("Verpflegung angefordert (R11-W1)", () => {
     b.sofortbedarf = undefined;
     b.staerkeManuell = { fuehrer: 0, unterfuehrer: 0, mannschaft: 9, gesamt: 9 };
     expect(verpflegungAngefordertLage(b)).toBe(0);
-    expect(verpflegungText(summiereBoegen([b]))).toBe("Verpflegung: keine angefordert (9 Personen vor Ort)");
+    expect(verpflegungText(summiereBoegen([b]))).toBe("Verpflegung: kein Bedarf gemeldet (9 Personen vor Ort)");
   });
   it("angefordert = Stärke: eine Zahl", () => {
     const b = neuerBogen();

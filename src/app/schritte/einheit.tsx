@@ -33,6 +33,7 @@ import {
 } from "../hilfen";
 import { frageJaNein } from "../dialoge";
 import { ortOhneOrganisation } from "../ort-praefix";
+import { andereOrganisationImOrt, schnellOrganisationMerken } from "../schnell-organisation";
 import { DaumenQuittung } from "../daumen-quittung";
 import { EBENE_WEG_SCHLUESSEL, rueckwegHolen, rueckwegMerken } from "../rueckweg-sitzung";
 import { vorbelegungWegLesen, vorbelegungWegSichern, zustandsAbdruck, type VorbelegungWeg } from "../vorbelegung-rueckweg";
@@ -46,7 +47,7 @@ import { emailProblem, emailSatz } from "../email-pruefung";
 // Landesvorlagen, die über ihren eager-Glob sämtliche landesrechtlichen
 // Beispielbögen als Daten enthalten (~300 KB). Einmal geladen, bleiben die Module im Cache —
 // der useState-Startwert greift dann sofort, ohne Nachlade-Flackern.
-type OvDaten = typeof import("@bos/vokabulare/thw-ov") &
+export type OvDaten = typeof import("@bos/vokabulare/thw-ov") &
   typeof import("@bos/vokabulare/thw-ov-regionalstruktur");
 type LandesvorlagenModul = typeof import("../../vokabulare/landesvorlagen");
 
@@ -112,7 +113,7 @@ export function ortGeaendert(aktuell: string, ergaenzt: string): boolean {
  * Übernimmt einen OV in die OV-Zeile `i` (Name + Kontaktdaten) und füllt,
  * soweit bekannt, Regionalstelle (Ebene 2) und Landesverband (Ebene 3) mit.
  */
-function ovInHierarchieUebernehmen(daten: OvDaten, hierarchie: HierarchieEbene[], i: number, ov: ThwOrtsverband): HierarchieEbene[] {
+export function ovInHierarchieUebernehmen(daten: OvDaten, hierarchie: HierarchieEbene[], i: number, ov: ThwOrtsverband): HierarchieEbene[] {
   let neu = hierarchie.map((h, j) =>
     j === i
       ? { ...h, name: ov.name, kurz: ov.kurz || undefined, telefon: ov.telefon.replace(/\D/g, "") || undefined, email: ov.email || undefined }
@@ -496,10 +497,14 @@ export function SchrittEinheit({ bogen, aendern: aendernRoh, ortFokus = false }:
    * dreier Ebenen. Steht davon etwas im Bogen, wird gefragt und benannt, was
    * verloren geht; bei Abbruch bleibt die Auswahl, wie sie war.
    */
-  async function organisationWechseln(organisation: OrganisationsTyp) {
+  /**
+   * `ortBehalten` (R21-W2): der Ort, der beim Wechsel stehen bleibt (die Zeile „klingt nach DRK" stellt um, ohne den eingetippten Ort
+   * zu verlieren; Organisation und Ort stehen ohnehin im Namen, `einheitAnzeigename` führt jeden Teil nur einmal).
+   */
+  async function organisationWechseln(organisation: OrganisationsTyp, ortBehalten?: string) {
     if (organisation === e.organisation) return;
     const typText = vokabText(e.einheitsTyp, einheitstypen, "kurz").trim();
-    const ebenenMitInhalt = e.hierarchie.filter(ebeneHatInhalt);
+    const ebenenMitInhalt = e.hierarchie.filter((h, i) => ebeneHatInhalt(h) && !(ortBehalten !== undefined && i === 0 && !h.kurz?.trim() && !h.telefon?.trim() && !h.email?.trim()));
     const verluste: string[] = [];
     if (typText) verluste.push(`Einheitstyp „${typText}"`);
     if (ebenenMitInhalt.length > 0) {
@@ -536,11 +541,18 @@ export function SchrittEinheit({ bogen, aendern: aendernRoh, ortFokus = false }:
     ) {
       return;
     }
+    // R21-W2: Die Schnellerfassung beginnt beim nächsten Mal mit dieser Organisation.
+    if (schnell) schnellOrganisationMerken(organisation);
     // Mit Rückweg (R7-E5): die Leiste im Daumenbereich stellt Organisation, Typ
     // und Zugehörigkeit samt Vorbelegung wieder her.
     aendernMitVorbelegungWeg(
       {
-        einheit: { ...e, organisation, einheitsTyp: {}, hierarchie: [ersteEbene(organisation)] },
+        einheit: {
+          ...e,
+          organisation,
+          einheitsTyp: {},
+          hierarchie: [ortBehalten !== undefined ? { ...ersteEbene(organisation), name: ortBehalten } : ersteEbene(organisation)],
+        },
         // Wie beim Leeren des Typs: die Vorbelegung gehört zum alten Typ.
         personal: bogen.personal.filter((p) => !personUnbenannt(p)),
         fahrzeuge: bogen.fahrzeuge.filter((f) => !fahrzeugUnbenannt(f)),
@@ -655,6 +667,7 @@ export function SchrittEinheit({ bogen, aendern: aendernRoh, ortFokus = false }:
   }
 
   const alleHinweise = pruefpunkte(bogen, false);
+  const andereOrg = andereOrganisationImOrt(e.hierarchie[0]?.name ?? "", e.organisation);
   const mailPunkt = (adresse?: string) => (emailProblem(adresse) ? alleHinweise.find((p) => p.schritt === 0 && p.text.includes(emailSatz(adresse))) : undefined);
   const imFeld = new Set(e.hierarchie.map((h) => mailPunkt(h.email)?.text));
   /** „Ort der Einheit" (bzw. „Name" der übergeordneten Ebene) samt den Hinweisen darunter; in der Schnellerfassung steht er ganz oben (R19-E3). */
@@ -699,6 +712,13 @@ export function SchrittEinheit({ bogen, aendern: aendernRoh, ortFokus = false }:
         )}
       </Feld>
       </span>
+      {/* R21-W2, H2: Der Ort nennt eine andere Organisation als die gewählte („DRK Bremen" bei „THW"): die App fragt, statt still „THW DRK Bremen" abzulegen. */}
+      {i === 0 && andereOrg !== undefined && nameImFokus !== 0 && (
+        <p className="hinweis warnung-text organisation-im-ort" role="status">
+          „{h.name.trim()}“ klingt nach {orgLabel(andereOrg)}, die Organisation steht auf {orgLabel(e.organisation)}.{" "}
+          <button type="button" onClick={() => void organisationWechseln(andereOrg, ortOhneOrganisation(h.name, orgLabel(andereOrg)))}>Auf {orgLabel(andereOrg)} stellen</button>
+        </p>
+      )}
       {/* Direkt unter dem Namensfeld, das ergänzt hat — dort liegt der Blick. */}
       {ergaenzt && ergaenzt.i === i && e.hierarchie[ergaenzt.i]?.kurz === ergaenzt.ov.kurz && (
         ortGeaendert(h.name, ergaenzt.ov.name) ? (
@@ -733,6 +753,18 @@ export function SchrittEinheit({ bogen, aendern: aendernRoh, ortFokus = false }:
           </p>
         )}
     </>
+  );
+  const organisationFeld = (
+    <Feld titel="Organisation">
+      <Auswahl
+        value={e.organisation}
+        onChange={(ev) => void organisationWechseln(Number(ev.target.value))}
+      >
+        {ORG_OPTIONEN.map((o) => (
+          <option key={o.wert} value={o.wert}>{o.label}</option>
+        ))}
+      </Auswahl>
+    </Feld>
   );
   const typZeile = (
     <div className="zeile">
@@ -771,21 +803,16 @@ export function SchrittEinheit({ bogen, aendern: aendernRoh, ortFokus = false }:
       <h2>1. Einheit</h2>
       {/* Schnellerfassung (R19-E3, S2, O7, G11, M7, N4): Der Ort — das einzige Pflichtfeld — steht als erstes Feld, dann der Typ;
           der Rest („kann offen bleiben") liegt hinter dem Aufklapper. */}
+      {/* R21-W2, H2: In der Schnellerfassung steht die Organisation sichtbar über dem Ort (Standard: die letzte Wahl), nicht
+          eingeklappt auf „THW"; im Aufklapper bleibt nur der Organisationsname. Sie steht vor dem Ort, weil ein Wechsel Ort, Typ und
+          Zugehörigkeit zurücksetzt. */}
+      {schnell && <div className="zeile schnell-organisation">{organisationFeld}</div>}
       {schnell && e.hierarchie[0] && ortBlock(e.hierarchie[0], 0)}
       {schnell && typZeile}
       {schnell && vorbelegungHinweis}
       <Mehr>
       <div className="zeile">
-        <Feld titel="Organisation">
-          <Auswahl
-            value={e.organisation}
-            onChange={(ev) => void organisationWechseln(Number(ev.target.value))}
-          >
-            {ORG_OPTIONEN.map((o) => (
-              <option key={o.wert} value={o.wert}>{o.label}</option>
-            ))}
-          </Auswahl>
-        </Feld>
+        {!schnell && organisationFeld}
         <Feld titel={`Organisationsname${e.organisation === OrganisationsTyp.SONSTIGE ? " (Pflicht)" : " (optional)"}`}>
           <input
             {...NAMEN_EINGABE}

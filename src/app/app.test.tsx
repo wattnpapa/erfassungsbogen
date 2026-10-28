@@ -176,8 +176,8 @@ describe("Assistenten-Durchlauf", () => {
     const kopf = screen.getByRole("banner");
     expect(within(kopf).getByText("Schnellerfassung")).toBeDefined();
 
-    // Auch zwei Schritte weiter, nicht nur auf Schritt 1.
-    await nutzer.click(screen.getByRole("button", { name: /^3\. Personal/ }));
+    // Auch zwei Schritte weiter, nicht nur auf Schritt 1 (R21: die Schnellerfassung zählt 1 bis 4, Personal ist Schritt 2).
+    await nutzer.click(screen.getByRole("button", { name: /^2\. Personal/ }));
     expect(within(screen.getByRole("banner")).getByText("Schnellerfassung")).toBeDefined();
   });
 
@@ -689,7 +689,7 @@ describe("Assistenten-Durchlauf", () => {
       const frage = document.querySelector<HTMLDialogElement>("dialog[aria-label='Einheit schnell erfassen?']");
       if (frage) await nutzer.click(within(frage).getByRole("button", { name: "Schnell erfassen" }));
       await nutzer.type(screen.getByLabelText("Ort der Einheit (Pflicht)"), name);
-      await nutzer.click(screen.getByRole("button", { name: /^6\. Übersicht/ }));
+      await nutzer.click(screen.getByRole("button", { name: /^4\. Übersicht/ }));
       await nutzer.click(screen.getByRole("button", { name: "In Einsatz-Sammlung ablegen…" }));
       expect(screen.getByText(/Die Erfassung wird in der Sammlung abgelegt und hier geschlossen/)).toBeDefined();
       await nutzer.click(screen.getByRole("button", { name: "Sammelhausen" }));
@@ -727,7 +727,7 @@ describe("Assistenten-Durchlauf", () => {
     await nutzer.type(screen.getByLabelText("Ort der Einheit (Pflicht)"), "Schnellhausen");
     await nutzer.click(screen.getByRole("button", { name: "Weiter →" }));
     // Direkt zur Stärke, ohne Umweg über „2. Einsatz", und ohne von Hand auf „Nur Stärke" umzustellen.
-    expect(screen.getByRole("heading", { level: 2, name: "3. Personal" })).toBeDefined();
+    expect(screen.getByRole("heading", { level: 2, name: "2. Personal" })).toBeDefined();
     expect((screen.getByLabelText(/Nur Stärke/) as HTMLInputElement).checked).toBe(true);
   }, 30000);
 
@@ -741,7 +741,7 @@ describe("Assistenten-Durchlauf", () => {
     await nutzer.type(screen.getByLabelText("Ort der Einheit (Pflicht)"), "Schnellhausen");
     await nutzer.click(screen.getByRole("button", { name: "Weiter →" }));
     // Direkt zur Stärke, ohne Umweg über „2. Einsatz".
-    expect(screen.getByRole("heading", { level: 2, name: "3. Personal" })).toBeDefined();
+    expect(screen.getByRole("heading", { level: 2, name: "2. Personal" })).toBeDefined();
     await nutzer.click(screen.getByRole("button", { name: "In Einsatz übernehmen" }));
     // Stärke 0: die App fragt nach (R3-N1).
     await nutzer.click(within(await screen.findByRole("dialog", { name: "Stärke fehlt" })).getByRole("button", { name: "Trotzdem mit Stärke 0 übernehmen" }));
@@ -887,7 +887,7 @@ describe("Assistenten-Durchlauf", () => {
     // R16-S2: derselbe Wortlaut wie in der Rückfrage und in der Summe der Lage.
     expect(screen.getByText(/Vorgabe nach Einheitstyp \(Sollstärke\): Sollwert, nicht gemeldet — erscheint in der Summe/)).toBeDefined();
     // R16-S2: Die unveränderten Sollzahlen sind noch nichts Gezähltes — Reiter 3 trägt kein Häkchen.
-    expect(screen.getByRole("button", { name: /^3\. Personal/ }).textContent).not.toContain("✓");
+    expect(screen.getByRole("button", { name: /^2\. Personal/ }).textContent).not.toContain("✓");
     await nutzer.click(screen.getByRole("button", { name: "In Einsatz übernehmen" }));
     await waitFor(() => expect(rueckfrage("Nur Sollplätze, keine gemeldete Stärke")).not.toBeNull());
     const frage = rueckfrage("Nur Sollplätze, keine gemeldete Stärke");
@@ -946,7 +946,7 @@ describe("Assistenten-Durchlauf", () => {
     const frage = await screen.findByRole("dialog", { name: "Stärke fehlt" });
     expect(frage.textContent).toContain("THW Rottweil");
     await nutzer.click(within(frage).getByRole("button", { name: "Stärke eintragen" }));
-    expect(await screen.findByRole("heading", { level: 2, name: "3. Personal" })).toBeDefined();
+    expect(await screen.findByRole("heading", { level: 2, name: "2. Personal" })).toBeDefined();
     expect(within(screen.getByRole("banner")).getByText("Schnellerfassung")).toBeDefined();
     expect(einsaetzeLaden().find((x) => x.id === einsatz.id)!.eintraege).toHaveLength(0);
   }, 20000);

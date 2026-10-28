@@ -137,7 +137,7 @@ describe("R20-W1 „Endgültig löschen“ im Notweg bei vollem Speicher", () =>
     // „Endgültig löschen…“ nennt in einer zweiten Rückfrage die Folge; noch ist nichts gelöscht.
     await nutzer.click(within(notweg).getByRole("button", { name: "Endgültig löschen…" }));
     const zweite = await screen.findByRole("dialog", { name: /endgültig löschen\?/ });
-    expect(zweite.textContent).toContain("2 Meldungen sind danach weg — nicht im Papierkorb, nicht rückholbar");
+    expect(zweite.textContent).toContain("2 Einheiten sind danach weg — nicht im Papierkorb, nicht rückholbar");
     expect(zweite.textContent).toContain("Es gibt noch keinen Export: das wäre die einzige Kopie");
     expect(einsaetzeLaden()).toHaveLength(1);
     await nutzer.click(within(zweite).getByRole("button", { name: "Einsatz behalten" }));
@@ -360,9 +360,14 @@ describe("R20-A5 Lageblatt kürzt die Bemerkung nicht mitten im Satz", () => {
   it("schneidet an der Satzgrenze, ohne „… nicht …“ stehen zu lassen", () => {
     const frei = "2 Sollplätze unbesetzt. Anh Plane/Spriegel in Instandsetzung — nicht mit ausgerückt.";
     const kurz = bemerkungKurz(frei, 70);
-    expect(kurz).toBe("(2 Sollplätze unbesetzt. … Rest: Sammel-PDF)");
+    // R21-A8: Steht im abgeschnittenen Rest ein Fahrzeug („Anh …", „PKW …"), steht die Bemerkung ganz da.
+    expect(kurz).toBe("(2 Sollplätze unbesetzt. Anh Plane/Spriegel in Instandsetzung — nicht mit ausgerückt.)");
     expect(bemerkungKurz("2 Helfer über StAN-Soll (Reserve aktiviert). PKW OV zusätzlich über Staffelkommandant angefordert", 70)).toBe(
-      "(2 Helfer über StAN-Soll [Reserve aktiviert]. … Rest: Sammel-PDF)",
+      "(2 Helfer über StAN-Soll [Reserve aktiviert]. PKW OV zusätzlich über Staffelkommandant angefordert)",
+    );
+    // Ohne Fahrzeug im Rest bleibt es beim Kürzen an der Satzgrenze (R20-A5).
+    expect(bemerkungKurz("2 Sollplätze unbesetzt. Die Verpflegung wird durch den Ortsverband selbst sichergestellt und abgerechnet", 70)).toBe(
+      "(2 Sollplätze unbesetzt. … Rest: Sammel-PDF)",
     );
     // Ohne Satzgrenze: an der Wortgrenze, und ein Endwort wie „nicht“ bleibt nicht allein zurück.
     const ohne = bemerkungKurz("Anhänger Plane und Spriegel in der Instandsetzung bei der Werkstatt, weil er nicht mit ausgerückt ist", 70);

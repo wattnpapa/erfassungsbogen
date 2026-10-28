@@ -270,7 +270,7 @@ describe("R17-K8 / R17-W4 eine Zahl, ein Wort", () => {
   });
 
   it("kürzt die Bemerkung an der Wortgrenze und setzt keine Klammer in die Klammer", () => {
-    const lang = "(2 Helfer über StAN-Soll (Reserve aktiviert). PKW OV zusätzlich über Staffelkommandant angefordert, Rest folgt später)";
+    const lang = "(2 Helfer über StAN-Soll (Reserve aktiviert). Verpflegung zusätzlich über Staffelkommandant angefordert, Rest folgt später)";
     const kurz = bemerkungKurz(lang, 70);
     expect(kurz.endsWith("… Rest: Sammel-PDF)")).toBe(true);
     const vorRest = kurz.slice(1, kurz.indexOf(" …"));

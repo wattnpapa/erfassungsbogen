@@ -805,6 +805,8 @@ const TRENN_BAUSTEINE = [
   "gefahren", "schaden", "abwehr", "versorgung", "instandsetzung", "beleuchtung", "bergung",
   "ortung", "unterstützung", "führung", "kommunikation", "verpflegung", "logistik", "pumpen",
   "räumen", "brückenbau", "infrastruktur", "sprengen",
+  // R21-D3, M6: „Material-wirtschaft" brach in der 121-px-Spalte als „Materialwirtsch / aft".
+  "wirtschaft", "instandhaltung", "transport", "betreuung", "sicherung", "erkundung", "ausstattung",
 ];
 
 /**

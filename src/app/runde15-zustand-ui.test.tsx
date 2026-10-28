@@ -110,7 +110,7 @@ describe("R15-D1 Nur eine Quittungsleiste gleichzeitig: die zuletzt ausgelöste"
     await bereit(rueckKenntnis);
     await nutzer.click(rueckKenntnis);
     // Die Liste „Neu seit der letzten Kenntnisnahme“ ist wieder da, die ältere Info-Leiste kommt nicht zurück.
-    expect(document.body.textContent).toMatch(/Neu seit der letzten Kenntnisnahme \(2\)/);
+    expect(document.body.textContent).toMatch(/Neu seit dem letzten Mal \(2\)/);
     expect(leisten().some((l) => l.textContent!.startsWith("Wieder anwesend"))).toBe(false);
   });
 

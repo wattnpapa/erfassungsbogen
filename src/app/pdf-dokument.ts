@@ -717,8 +717,23 @@ export function lageblattAenderungen(d: BogenDiff): string[] {
   if (personal > 0) rest.push(`Personal (${personal})`);
   const fahrzeuge = d.fahrzeugeZugang.length + d.fahrzeugeAbgang.length + d.fahrzeugeGeaendert.length;
   if (fahrzeuge > 0) rest.push(`Fahrzeuge (${fahrzeuge})`);
-  if (d.sonstiges.some((a) => a.feld !== "Ort / Auftrag")) rest.push("Bemerkung/Sonstiges");
-  if (rest.length > 0) zeilen.push(`weitere: ${rest.join(", ")}`);
+  // R21-A10: Die Ortsänderung steht mit Namen da (statt „weitere: Bemerkung/Sonstiges"); die übrigen Felder tragen ihren Namen.
+  const ort = d.sonstiges.find((a) => a.feld === "Einheit");
+  if (ort) zeilen.push(`Ort der Einheit geändert: ${ort.vorher} → ${ort.nachher}`);
+  const SONSTIGES_NAME: Record<string, string> = {
+    Zeitraum: "Zeitraum",
+    Einsatzbeginn: "Zeitraum",
+    Einsatzende: "Zeitraum",
+    Erfassung: "Erfassungsart",
+    Sonstiges: "Bemerkung",
+  };
+  for (const a of d.sonstiges) {
+    if (a.feld === "Ort / Auftrag" || a.feld === "Einheit") continue;
+    const name = SONSTIGES_NAME[a.feld] ?? a.feld;
+    if (!rest.includes(name)) rest.push(name);
+  }
+  // „weitere:" steht nur hinter einer Aufzählung; allein heißt die Zeile „Geändert:".
+  if (rest.length > 0) zeilen.push(`${zeilen.length > 0 ? "weitere" : "Geändert"}: ${rest.join(", ")}`);
   return zeilen;
 }
 
@@ -783,10 +798,19 @@ export function bemerkungKurz(bemerkung: string, kuerzen?: number): string {
     if (!geschnitten && !/\s/.test(b.charAt(kuerzen)) && /\s/.test(teil)) teil = teil.replace(/\s+\S*$/, "");
     // Ein Rest „… nicht“, „… ohne“ oder „… und“ ohne sein Ziel sagt das Gegenteil oder nichts: solche Endwörter fallen weg.
     teil = teil.replace(/(?:\s+(?:nicht|kein|keine|keinen|keiner|ohne|und|oder|mit|über|in|an|zu|von|bei|für|auf|als|dem|der|die|den))+$/i, "");
+    // R21-A8: Fahrzeugangaben fallen nie weg („Anh … nicht mit ausgerückt" fehlte an der Wand): Steht im abgeschnittenen Rest ein
+    // Fahrzeug, steht die Bemerkung bis zur größeren Grenze ganz da.
+    if (kuerzen < BEMERKUNG_LAGEBLATT_FAHRZEUG && FAHRZEUG_IN_BEMERKUNG.test(b.slice(teil.length))) {
+      return bemerkungKurz(bemerkung, BEMERKUNG_LAGEBLATT_FAHRZEUG);
+    }
     return `(${teil.replace(/[\s,;:([—–-]+$/, "")} … Rest: Sammel-PDF)`;
   }
   return `(${b})`;
 }
+
+/** R21-A8: Grenze für Bemerkungen, die ein Fahrzeug nennen; Wörter, die auf eines hinweisen. */
+const BEMERKUNG_LAGEBLATT_FAHRZEUG = 200;
+const FAHRZEUG_IN_BEMERKUNG = /\b(PKW|LKW|Anh|Anhänger|Fahrzeug|Fahrzeuge|Fzg|GKW|MTW|MLW|MzKW|Kipper|Radlader|Bagger|Boot|Kennzeichen)(?![\p{L}])/iu;
 
 /** Zelle „Auftrag / Notiz (Bemerkung der Einheit)": Auftrag oben, Bemerkung kursiv darunter (R3-K3). */
 function bemerkungZelle(notiz: string | undefined, sonstiges: string | undefined, kuerzen?: number, anonym = false): TableCell {

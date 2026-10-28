@@ -33,6 +33,18 @@ export function fehlerSatz(fehler: Error): string {
 }
 
 /**
+ * R21-L2, D2: Ist der Fehler ein nachgeladener Teil der App, der ohne Netz nicht kam („Unable to preload CSS", „Failed to
+ * fetch dynamically imported module", Safari: „Importing a module script failed")? Dann liegt es nicht an den Daten, und der
+ * Schirm rät weder zum Löschen noch klingt der Einsatz beschädigt.
+ */
+export function istLadeFehler(fehler: Error): boolean {
+  const text = `${fehler.name} ${fehler.message}`;
+  return /preload css|dynamically imported module|importing a module script failed|chunkloaderror|loading (css )?chunk|load failed|failed to fetch|networkerror/i.test(
+    text,
+  );
+}
+
+/**
  * Merker, die die App beim Start wieder in dieselbe Ansicht führen — bei einem
  * Absturz der Ansicht würden sie ihn wiederholen. Die App startet nach „Neu
  * laden" und „Zur Startseite" deshalb auf der Startseite; Daten bleiben.
@@ -87,6 +99,35 @@ export class Fehlerfaenger extends Component<{ children: ReactNode }, Zustand> {
   render(): ReactNode {
     const { fehler, gesichert, loeschenOffen, loeschenVerstanden, meldung } = this.state;
     if (!fehler) return this.props.children;
+    if (istLadeFehler(fehler)) {
+      const keinNetz = typeof navigator !== "undefined" && navigator.onLine === false;
+      return (
+        <main className="fehlerseite fehlerseite-netz" role="alert">
+          <h1>Hier ist etwas schiefgelaufen</h1>
+          <p>
+            <strong>Ein Teil der App konnte ohne Netz nicht geladen werden.</strong>
+            {keinNetz ? " Das Gerät meldet gerade keine Verbindung." : ""}{" "}
+            Deine Daten und dein Einsatz sind unversehrt und liegen weiter auf diesem Gerät.
+          </p>
+          <p>Seite neu laden oder online verbinden, dann noch einmal öffnen. Wer vorher sichern will, nimmt „Daten sichern“.</p>
+          <div className="aktionen">
+            {/* Ohne ansichtVergessen(): Die Ansicht ist nicht schuld, nach dem Neuladen soll der Einsatz wieder aufgehen. */}
+            <button type="button" className="primaer" onClick={() => window.location.reload()}>Seite neu laden</button>
+            <button type="button" onClick={() => { ansichtVergessen(); window.location.assign(window.location.pathname); }}>Zur Startseite</button>
+            <button type="button" onClick={this.sichern}>Daten sichern</button>
+          </div>
+          {meldung && (
+            <p className={gesichert === false ? "fehler" : "meldung"} role="status">
+              {meldung}
+            </p>
+          )}
+          <details className="fehler-aufklapper">
+            <summary>▸ Technische Angabe (für die Fehlersuche)</summary>
+            <p className="hinweis">{fehlerSatz(fehler)}</p>
+          </details>
+        </main>
+      );
+    }
     return (
       <main className="fehlerseite" role="alert">
         <h1>Hier ist etwas schiefgelaufen</h1>

@@ -7,6 +7,17 @@
  * „Erfassung einer fremden Einheit" (so auch der Kasten der Startseite).
  */
 
+/**
+ * R21-A7: Die Zahlen in „Einsatz löschen?" (Einheiten) und „endgültig löschen" (Meldungen) wichen ohne Erklärung ab (7 und 8):
+ * Jede geänderte Einheit trägt in der Historie ihre früheren Fassungen. Der Satz nennt beide Zahlen, wo sie sich unterscheiden.
+ * `einheiten`: geltende Fassungen (die Karten der Liste), `meldungen`: alle Einträge samt Historie.
+ */
+export function loeschenUmfangText(einheiten: number, meldungen: number): string {
+  const e = `${einheiten} Einheit${einheiten === 1 ? "" : "en"}`;
+  if (meldungen === einheiten) return e;
+  return `${e} (mit allen früheren Fassungen ${meldungen} Meldung${meldungen === 1 ? "" : "en"})`;
+}
+
 /** Zusatz der Rückfrage „Einsatz löschen?"; leer, wenn keine Erfassung für diesen Einsatz offen ist. */
 export function loeschenErfassungSatz(erfassungName: string | undefined): string {
   if (!erfassungName) return "";

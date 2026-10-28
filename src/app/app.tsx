@@ -43,6 +43,7 @@ import {
   artMitMarke,
   ausgabeDateiname,
   bogenSpeichern,
+  ersteEbene,
   neuerBogen,
   pruefpunkte,
   schrittStatus,
@@ -101,6 +102,7 @@ import {
   meldungAufnehmen,
   nummerUndZugSetzen,
   statusMitZeitSetzen,
+  speicherBelegung,
   speicherFehlerArt,
   speicherVollMeldung,
   sammlungZuruecksetzen,
@@ -173,7 +175,7 @@ import { orgFarbe, wendeOrgAkzentAn } from "./org-farben";
 import { EinheitZeichen } from "./zeichen-bild";
 import { Fusszeile } from "./fusszeile";
 import { Aktualisierungshinweise } from "./aktualisierung";
-import { SpeicherWarnung } from "./speicher-warnung";
+import { SpeicherWarnung, istVoll } from "./speicher-warnung";
 import { arbeiten, useArbeitet } from "./arbeitet";
 import { LEERER_EINSATZ_TEXT, LEERE_DATEI_TEXT, einsatzLeer } from "./ausgabe-sperre";
 import { selbstGeloeschtMeldung } from "./einsatz-geloescht";
@@ -185,7 +187,8 @@ import { browserSpeicherhuelle } from "./speicher-browser";
 import { UhrHinweis, UhrWarnung } from "./uhr-warnung";
 import { Dialogschicht, frageFelder, frageJaNein, frageWahl, zeigeHinweis, type Antwortweg } from "./dialoge";
 import { istNurStaerke, nurStaerkeUebernehmen, wasWegfiele } from "./nur-staerke";
-import { schnellKopfzeile } from "./schnell-zaehlung";
+import { schnellKopfzeile, schnellNummer } from "./schnell-zaehlung";
+import { schnellOrganisationLaden } from "./schnell-organisation";
 import { eintreffzeitStapelHinweis } from "./angaben-alter";
 import {
   SchrittEinheit,
@@ -1424,6 +1427,22 @@ function AppInhalt() {
     eigenerBogen: () => bogen,
     onRueckholung: () => setErsetzterEntwurf(ersetztenEntwurfLaden()),
   });
+  // R21-A5: „Entwurf vom … wiederhergestellt" steht im Assistenten nur bis zum ersten Schritt oder zur ersten Eingabe
+  // (vorher auf jedem Schritt, 75 px hoch, nicht schließbar); ein leerer Entwurf zeigt ihn gar nicht (siehe Darstellung).
+  const entwurfHinweisBei = useRef<{ bogen: Erfassungsbogen; schritt: number } | null>(null);
+  useEffect(() => {
+    if (!bogen || zeigeStart || !meldung.startsWith("Entwurf vom ")) {
+      entwurfHinweisBei.current = null;
+      return;
+    }
+    const vorher = entwurfHinweisBei.current;
+    if (!vorher) {
+      entwurfHinweisBei.current = { bogen, schritt };
+    } else if (vorher.bogen !== bogen || vorher.schritt !== schritt) {
+      entwurfHinweisBei.current = null;
+      setMeldung("");
+    }
+  }, [bogen, schritt, zeigeStart, meldung]);
   useEffect(() => {
     if (bogen) {
       const merk = bogenGespeichert.current;
@@ -2074,12 +2093,19 @@ function AppInhalt() {
     // ebenso (R3-D1).
     const vorlage = bearbeiteteVorlage;
     const unveraendert = vorlageUnveraendert();
+    // R21-H6: Bei vollem Speicher sagt schon die erste Frage, dass das Ablegen scheitern kann; sie verspricht den Platz auf der
+    // Startseite nicht, den die zweite Meldung („Nicht geschlossen — Speicher voll") danach widerriefe.
+    const belegung = speicherBelegung();
+    const vollSatz =
+      belegung && istVoll(belegung) && bogenHatInhalt(bogen)
+        ? "Der Speicher dieses Geräts ist voll: Passt der Bogen nicht mehr auf die Startseite, bleibt er offen und nichts ändert sich. Besser vorher sichern. "
+        : "";
     const sicher = await frageJaNein({
       // Ein Name für beides (R18-N6): „Bogen schließen" heißt überall „aufbewahren, nicht löschen" — wie in der Übersicht.
       titel: vorlage ? "Bearbeitung der Vorlage beenden?" : fremdeErfassung ? "Angefangene Erfassung schließen?" : "Angefangenen Bogen schließen?",
       text: vorlage
         ? `Die Bearbeitung der Vorlage „${vorlage.name}" wird beendet. ${folgen.satz}`
-        : `„${einheitAnzeigename(bogen.einheit)}" wird geschlossen. ${folgen.satz}`,
+        : `„${einheitAnzeigename(bogen.einheit)}" wird geschlossen. ${vollSatz ? `${vollSatz}${folgen.verlust ? folgen.satz : ""}` : folgen.satz}`,
       ok: vorlage ? "Bearbeitung beenden" : "Bogen schließen",
       gefahr: vorlage ? folgen.verlust : true,
     });
@@ -3334,7 +3360,7 @@ function AppInhalt() {
       text: `„${einheitAnzeigename(b.einheit)}" hat noch keine Stärke (0 Personen). In der Lage zählte sie als Einheit ohne Leute.`,
       wege: [
         // R19-S15: Die Folge steht als Satz unter dem Knopf („kurz"), nicht als Liste im Text davor.
-        { wert: "eintragen", label: "Stärke eintragen", kurz: "Springt zu „3. Personal“.", sicher: true },
+        { wert: "eintragen", label: "Stärke eintragen", kurz: "Springt zum Personal.", sicher: true },
         { wert: "null", label: "Trotzdem mit Stärke 0 übernehmen", kurz: "Marke „Stärke fehlt“; später nachtragen.", gefahr: true },
       ],
     });
@@ -3609,8 +3635,12 @@ function AppInhalt() {
 
   /** Leerer Bogen für die Meldekopf-Schnellerfassung (nur Stärke). */
   function schnellerfassungsBogen(): Erfassungsbogen {
+    // R21-W2, H2: Die Organisation beginnt mit der letzten Wahl dieses Geräts und steht im ersten Bild sichtbar zur Wahl.
+    const organisation = schnellOrganisationLaden();
+    const grund = neuerBogen();
     return {
-      ...neuerBogen(),
+      ...grund,
+      einheit: { ...grund.einheit, organisation, hierarchie: [ersteEbene(organisation)] },
       personalErfassung: PersonalErfassung.NUR_STAERKE,
       staerkeManuell: { fuehrer: 0, unterfuehrer: 0, mannschaft: 0, gesamt: 0 },
     };
@@ -5171,7 +5201,14 @@ function AppInhalt() {
         {SCHRITTE.map((name, i) => {
           // Schnellerfassung: Einsatz (2) und Sofortbedarf (5) werden übersprungen — kein Haken für Unerledigtes (R14-N3).
           const entfaellt = fremdeErfassung && bogen.personalErfassung === PersonalErfassung.NUR_STAERKE && (i === 1 || i === 4);
-          const st = entfaellt ? undefined : status[i]; // undefined für die Übersicht (letzter Schritt)
+          // R21-E4, G8, S2: Die Leiste zählt wie Kopf und Überschrift vier Schritte; entfallende Reiter stehen nicht mehr da
+          // (nur wenn man doch auf einem steht, bleibt er als „–" sichtbar).
+          if (entfaellt && i !== schritt) return null;
+          const nr = (schnellOhneBedarfSchritt ? schnellNummer(i) : undefined) ?? i + 1;
+          // R21-N3: Der Ort der Einheit ist Pflicht. Wer Schritt 1 verlassen hat, ohne ihn einzutragen, sieht am Reiter „fehlt"
+          // (der Schrittstatus bleibt „leer": ein leerer Bogen gilt nicht als begonnen).
+          const ortFehlt = i === 0 && schritt !== 0 && status[0] === "leer" && !einheitOrt(bogen.einheit) && bogen.einheit.standortRef == null;
+          const st = entfaellt ? undefined : ortFehlt ? "begonnen" : status[i]; // undefined für die Übersicht (letzter Schritt)
           const klassen = [i === schritt ? "aktiv" : "", st ? `status-${st}` : ""].filter(Boolean).join(" ");
           // „begonnen" als Wort statt „•": das Symbol verstand niemand (R2-N3, F6). „fehlt" statt „offen" (R19-E9): „offen" hieß
           // für manchen „nicht begonnen"; gemeint ist: hier fehlt noch etwas.
@@ -5183,21 +5220,21 @@ function AppInhalt() {
               className={klassen}
               ref={i === schritt ? reiterZeigen : undefined}
               aria-current={i === schritt ? "step" : undefined}
-              aria-label={st ? `${i + 1}. ${name} — ${SCHRITT_STATUS_TITEL[st]}` : entfaellt ? `${i + 1}. ${name} — entfällt in der Schnellerfassung` : undefined}
+              aria-label={st ? `${nr}. ${name} — ${SCHRITT_STATUS_TITEL[st]}` : entfaellt ? `${name} — entfällt in der Schnellerfassung` : undefined}
               title={entfaellt ? "Entfällt in der Schnellerfassung" : st ? SCHRITT_STATUS_TITEL[st] : undefined}
               onClick={() => setSchritt(i)}
             >
               {/* Name in eigenem Span: auf dem Telefon steht nur die Nummer im
                   Bild, der Name bleibt für Vorlesesoftware im Knopf (R2-H7).
                   Der äußere Span hält Nummer und Name als EIN Flex-Kind. */}
-              <span>{i + 1}<span className="schritt-name">. {name}</span></span>
+              <span>{entfaellt ? "" : nr}<span className="schritt-name">{entfaellt ? name : `. ${name}`}</span></span>
               {glyph && <span className="schritt-status" aria-hidden="true">{glyph}</span>}
             </button>
           );
         })}
       </nav>
       {/* Der Strich im Reiter heißt „entfällt": einmal ausgeschrieben, wo die Schnellerfassung beginnt oder wo man auf einem solchen Reiter steht (R17-N5). */}
-      {fremdeErfassung && bogen.personalErfassung === PersonalErfassung.NUR_STAERKE && (schritt === 0 || schritt === 1 || schritt === 4) && (
+      {fremdeErfassung && bogen.personalErfassung === PersonalErfassung.NUR_STAERKE && (schritt === 1 || schritt === 4) && (
         <p className="schritte-erklaerung">„–“ heißt: Einsatz und Sofortbedarf entfallen hier.</p>
       )}
       {/* Schnellerfassung am Telefon (R18-W7): Schrittleiste und Legende sind dort eingeklappt (CSS); eine Zeile nennt den
@@ -5228,7 +5265,11 @@ function AppInhalt() {
               nicht vorn. */}
           ✓ gespeichert · {uhrzeitMitTag(gespeichertUm)} Uhr · nur auf diesem Gerät
         </p>
-      ) : null}
+      ) : (
+        // R21-A9: Der Platz der Zeile ist von Anfang an da (leer, unsichtbar, für Vorlesesoftware nicht vorhanden): Sie erschien
+        // sonst nach der ersten Eingabe und schob den Inhalt um eine Zeile nach unten.
+        <p className="autosave autosave-leer" aria-hidden="true" data-kurz={" "} data-zeit={" "}>{" "}</p>
+      )}
     </SeitenKopf>
     {/* Übungs-Störer: volle Breite direkt unter dem Kopf, auf jedem Schritt.
         Er hängt am Bogen (nicht an einem Geräte-Modus) und erscheint darum
@@ -5253,7 +5294,7 @@ function AppInhalt() {
           dorthin, wo die Aktion ausgelöst wurde. Ohne diese Zeile blieben sie
           im Assistenten unsichtbar und tauchten später unvermittelt auf der
           Startseite auf. */}
-      {meldung && <p className="meldung" role="status" key={meldung}>{meldung}{vorlageRueckwegKnopf()}</p>}
+      {meldung && !(meldung.startsWith("Entwurf vom ") && !bogenHatInhalt(bogen)) && <p className="meldung" role="status" key={meldung}>{meldung}{vorlageRueckwegKnopf()}</p>}
       {fehler && <p className="fehler" role="alert">{fehler}</p>}
       {/* R16-E2: „Für neuen Einsatz vorbereiten“ ist wie die Nachbarn zurückholbar, solange nichts Neues eingetragen ist. */}
       {bogen && einsatzWegGilt(einsatzWeg, bogen) && (
@@ -5296,8 +5337,8 @@ function AppInhalt() {
       )}
       {schritt === 0 && <SchrittEinheit bogen={bogen} aendern={aendern} geheZu={setSchritt} ortFokus={!!sammelEinsatz && fremdeErfassung} />}
       {schritt === 1 && <SchrittEinsatz bogen={bogen} aendern={aendern} meldekopf={fremdeErfassung} />}
-      {schritt === 2 && <SchrittPersonal bogen={bogen} aendern={aendern} geheZu={setSchritt} />}
-      {schritt === 3 && <SchrittFahrzeuge bogen={bogen} aendern={aendern} />}
+      {schritt === 2 && <SchrittPersonal bogen={bogen} aendern={aendern} geheZu={setSchritt} nummer={schnellOhneBedarfSchritt ? schnellNummer(2) : undefined} />}
+      {schritt === 3 && <SchrittFahrzeuge bogen={bogen} aendern={aendern} nummer={schnellOhneBedarfSchritt ? schnellNummer(3) : undefined} />}
       {schritt === 4 && <SchrittSofortbedarf bogen={bogen} aendern={aendern} />}
       {schritt === UEBERSICHT && (
         <Uebersicht

@@ -1005,7 +1005,7 @@ export function Uebersicht(props: {
           der Seite, an der gewohnten Stelle (R7-N9). */}
       <p className="uebersicht-zurueck">
         <button type="button" onClick={() => geheZu(schnellOhneBedarf ? 3 : 4)}>
-          {schnellOhneBedarf ? "← Zurück zu Schritt 4 (Fahrzeuge)" : "← Zurück zu Schritt 5 (Sofortbedarf)"}
+          {schnellOhneBedarf ? "← Zurück zu Schritt 3 (Fahrzeuge)" : "← Zurück zu Schritt 5 (Sofortbedarf)"}
         </button>
       </p>
       </div>
