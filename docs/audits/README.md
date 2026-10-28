@@ -16,7 +16,7 @@ Befunde je Runde und Priorität, wie in den Übersichten der Runden gezählt
 (Verweise auf Befunde anderer Berichte nicht doppelt). Runde 1: zehn Rollen
 ohne das ältere Feldtauglichkeits-Audit; Runde 2: zwölf Rollen mit
 Mobile-UI; Runde 3: elf THW-Rollen; Runde 4: zwölf Rollen, „Offline und
-Speicher" abgebrochen; Runde 5 bis 20: zwölf Rollen, vollständig.
+Speicher" abgebrochen; Runde 5 bis 21: zwölf Rollen, vollständig.
 
 | Runde | P0 | P1 | P2 | P3 |
 | --- | --- | --- | --- | --- |
@@ -40,6 +40,7 @@ Speicher" abgebrochen; Runde 5 bis 20: zwölf Rollen, vollständig.
 | R18 | 0 | 0 | 6 | 60 |
 | R19 | 0 | 1 | 6 | 70 |
 | R20 | 0 | 1 | 2 | 44 |
+| R21 | 1 (behoben) | 0 | 3 | 30 |
 
 Zehn Prüfberichte aus je einer Nutzerrolle, alle gegen den Produktionsbuild
 (`vite build` + `vite preview`) im Telefon-Viewport 360 × 640 (Führungssicht
