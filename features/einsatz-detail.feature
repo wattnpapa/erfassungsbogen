@@ -13,6 +13,14 @@ Funktionalität: Einsatz-Sammlung führen (Meldekopf)
     Dann sehe ich die Überschrift "Hochwasser Weser"
     Und sehe ich die Überschrift "Einheiten (1 gemeldet"
 
+  # R21-O1: Die Einsatzansicht wird nachgeladen. Ihre Vorladeliste verwies auf eine Stilvorlage, die es nach dem
+  # Einbetten nicht mehr gab: ohne Netz kam nach dem Neuladen „Hier ist etwas schiefgelaufen".
+  Szenario: Die Einsatzansicht öffnet auch ohne Netz nach dem Neuladen
+    Wenn ich die App vom Netz trenne
+    Und ich die Seite neu lade
+    Dann sehe ich die Überschrift "Hochwasser Weser"
+    Und sehe ich die Überschrift "Einheiten (1 gemeldet"
+
   Szenario: Die Sammlung summiert Stärke und Bedarf über alle Einheiten
     Dann sehe ich die Überschrift "Bedarf (anwesende Einheiten)"
     Und sehe ich zu "Verpflegung" den Wert "vegetarisch"

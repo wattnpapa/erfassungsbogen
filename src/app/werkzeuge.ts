@@ -7,8 +7,8 @@
  *   - der statische Block `<!-- WERKZEUGE:START -->` … `<!-- WERKZEUGE:END -->`
  *     in jeder Fußzeile unter `public/` (scripts/content-nav.mts).
  *
- * Alle vier stehen in fester Reihenfolge, das eigene Projekt eingeschlossen:
- * Die Zeile ist auf allen vier Seiten dieselbe. Linktext ist die Domain in
+ * Alle fünf stehen in fester, alphabetischer Reihenfolge, das eigene Projekt
+ * eingeschlossen: Die Zeile ist auf allen fünf Seiten dieselbe. Linktext ist die Domain in
  * Kleinbuchstaben — sie sagt, wohin der Link führt, und ist zugleich der Name.
  *
  * Der Mittelpunkt ist ein eigenes Element mit `aria-hidden`, nicht Teil des
@@ -22,6 +22,7 @@ export interface Werkzeug {
 }
 
 export const WERKZEUGE: readonly Werkzeug[] = [
+  { href: "https://einsatzauftrag.app/", label: "einsatzauftrag.app" },
   { href: "https://erfassungsbogen.app/", label: "erfassungsbogen.app" },
   { href: "https://fmbauplaner.app/", label: "fmbauplaner.app" },
   { href: "https://nachrichtenvordruck.app/", label: "nachrichtenvordruck.app" },
