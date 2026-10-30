@@ -1,0 +1,60 @@
+/*
+ * Lagemonitor V2: Kopfleiste, Stärkeband und Kachelraster ohne doppelte Rahmen.
+ * Farben und Stufen (Hell/Dunkler/Heller) kommen unverändert aus lagemonitor.css.
+ */
+main.lm.lm2 { padding: 1.2vh 1.5vw; gap: 1.2vh; text-align: left; }
+.lm2-kopf { display: flex; align-items: center; gap: 2vw; flex: none; }
+.lm2-titel { flex: 1 1 auto; min-width: 0; }
+.lm2-titel h1 { margin: 0; font-size: min(4vh, 3vw); font-weight: 600; line-height: 1.15; overflow-wrap: anywhere; }
+.lm2-ort { font-weight: 400; opacity: 0.85; }
+.lm2-uebung { margin: 0.2em 0 0; display: inline-block; padding: 0.1em 0.6em; border: 2px solid var(--lm-zeit); border-radius: 0.3em; color: var(--lm-zeit); font-weight: 700; letter-spacing: 0.05em; font-size: min(3vh, 2.4vw); }
+.lm2-uhr { display: flex; align-items: baseline; gap: 0.5em; flex: none; font-variant-numeric: tabular-nums; font-size: min(9vh, 6vw); line-height: 1; }
+.lm2-uhr strong { font-size: 1em; font-weight: 700; }
+.lm2-uhr span { font-size: 0.35em; opacity: 0.85; }
+.lm2-menuknopf { flex: none; min-height: 44px; font-size: max(var(--lm-min), min(2.6vh, 2vw)); }
+.lm2-lage { flex: none; display: flex; flex-wrap: wrap; align-items: center; gap: 0.6em 3vw; padding: 0.6vh 1vw; border-top: 2px solid var(--lm-rahmen); border-bottom: 2px solid var(--lm-rahmen); }
+.lm2-staerke { display: flex; flex-direction: column; font-variant-numeric: tabular-nums; }
+.lm2-zahlen { font-size: min(7vh, 5.5vw); font-weight: 700; line-height: 1.1; }
+.lm2-zaehler { font-size: min(4vh, 3.2vw); display: flex; flex-direction: column; }
+.lm2-bedarf { font-size: 0.7em; font-weight: 700; }
+.lm2-stand { margin-left: auto; text-align: right; display: flex; flex-direction: column; gap: 0.1em; font-size: min(2.6vh, 1.8vw); line-height: 1.2; }
+.lm2-stand-zeile { display: block; }
+.lm2-warnung { color: var(--lm-warn); font-weight: 700; }
+.lm2-einheiten { flex: 1 1 0; min-height: 0; display: flex; }
+.lm2-raster { list-style: none; margin: 0; padding: 0; flex: 1; display: grid; gap: 1vh 0.8vw; min-height: 0; }
+.lm2-kachel {
+  container-type: size;
+  min-width: 0; min-height: 0; overflow: hidden;
+  border: 2px solid var(--lm-rahmen); border-radius: 0.5vh;
+  padding: 0.5em 0.7em;
+  display: flex; flex-direction: column; gap: 0.3em;
+  line-height: 1.15; font-size: var(--lm2-px, 16px);
+}
+.lm2-alt { border-color: var(--lm-warn); }
+.lm2-kopfzeile { display: flex; justify-content: space-between; align-items: baseline; gap: 0.5em; }
+.lm2-funkruf { font-weight: 700; font-size: 1.15em; line-height: 1.1; overflow-wrap: normal; hyphens: none; }
+.lm2-staerke-klein { font-variant-numeric: tabular-nums; white-space: nowrap; font-size: 1em; }
+.lm2-meta { font-size: 0.8em; opacity: 0.9; overflow-wrap: normal; hyphens: none; }
+/* Der Auftrag ist kritisch: er bricht um und wird nie gekürzt; stattdessen schrumpft die Kachelschrift (lagemonitor-v2-ui.tsx). */
+.lm2-auftrag { font-size: 1em; font-weight: 600; line-height: 1.15; overflow-wrap: normal; hyphens: manual; }
+.lm2-trennen .lm2-auftrag { hyphens: auto; }
+.lm2-leiter { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0 0.8em; font-size: 0.85em; opacity: 0.95; }
+.lm2-telefon { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.lm2-warn { margin-top: auto; color: var(--lm-warn); font-weight: 700; font-size: 0.8em; }
+.lm2-menu {
+  position: fixed; top: 0; right: 0; bottom: 0; width: min(32rem, 100vw); z-index: 10; overflow-y: auto;
+  box-sizing: border-box; padding: 1rem 1.2rem; background: var(--lm-grund); color: var(--lm-text);
+  border-left: 3px solid var(--lm-rahmen); font-size: max(16px, min(2.6vh, 2vw));
+}
+.lm2-menu-kopf { display: flex; justify-content: space-between; align-items: center; }
+.lm2-menu h2, .lm2-menu h3 { margin: 0.6em 0 0.3em; font-size: 1.1em; }
+.lm2-menu h3 { font-size: 0.95em; opacity: 0.85; font-weight: 600; }
+.lm2-menu .lm-knopf { min-height: 44px; font-size: inherit; }
+.lm2-menu .lm-knopf[aria-pressed="true"] { font-weight: 700; border-width: 3px; }
+@media (max-width: 640px) {
+  .lm2-kopf { flex-wrap: wrap; }
+  .lm2-raster { grid-template-columns: 1fr !important; grid-template-rows: none !important; overflow-y: auto; }
+  .lm2-kachel { min-height: 9rem; }
+}
+
+.lm2-menu h2, .lm2-menu h3 { color: var(--lm-text); }

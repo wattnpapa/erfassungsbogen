@@ -7,7 +7,7 @@
  * Bildschirm im Fahrzeug sieht jeder, der vorbeikommt.
  */
 
-import { staerke, type EebZeitpunkt } from "@bos/eeb-format/model";
+import { KontaktArt, StaerkeRolle, staerke, type EebZeitpunkt, type Person } from "@bos/eeb-format/model";
 import { angabenAlterWort, angabenZeit, type AngabenSeit } from "./angaben-alter";
 import { einheitOrt } from "@bos/meldekopf/darstellung";
 import { EinsatzArt, MeldeStatus, revisionen, type Einsatzsammlung, type MeldeEintrag } from "@bos/meldekopf/einsaetze";
@@ -114,6 +114,31 @@ export interface EinheitZeile {
   zug?: string;
   /** Auftrag/Notiz des Meldekopfs, auf eine Zeile gekürzt (R14-K3). */
   auftrag?: string;
+  /** Auftrag ungekürzt (nur einzeilig gemacht); V2 zeigt ihn vollständig (V1 nutzt `auftrag`). */
+  auftragVoll?: string;
+  /** Einheitsführer (Vor- und Nachname), wenn der Bogen einen führt; V2 formatiert ihn nach der Menüwahl. */
+  leiter?: { vorname: string; nachname: string };
+  /** Dienstliche Erreichbarkeit des Einheitsführers (nur Ziffern). */
+  telefon?: string;
+}
+
+/** Einheitsführer: erste Person in Rolle Führer, sonst Unterführer; ohne Namen keine Anzeige. */
+export function einheitsfuehrer(personal: readonly Person[]): Person | undefined {
+  const hat = (p: Person) => `${p.vorname}${p.nachname}`.trim() !== "";
+  return personal.find((p) => p.staerkeRolle === StaerkeRolle.FUEHRER && hat(p)) ?? personal.find((p) => p.staerkeRolle === StaerkeRolle.UNTERFUEHRER && hat(p));
+}
+
+/** Telefonnummer der Person: dienstlich vor privat, Mobil vor Festnetz; nur Ziffern. */
+export function telefonVon(p: Person): string | undefined {
+  const nummern = p.kontakte.filter((k) => (k.art === KontaktArt.MOBIL || k.art === KontaktArt.FESTNETZ) && k.wert?.trim());
+  const rang = (k: (typeof nummern)[number]) => (k.dienstlich ? 0 : 2) + (k.art === KontaktArt.MOBIL ? 0 : 1);
+  const beste = [...nummern].sort((a, b) => rang(a) - rang(b))[0];
+  return beste?.wert?.replace(/\D/g, "") || undefined;
+}
+
+/** „01712345678" → „0171 2345678" (Vorwahl abgesetzt, damit die Nummer am Fernseher lesbar bleibt). */
+export function telefonAnzeige(ziffern: string): string {
+  return /^0\d{10,}$/.test(ziffern) ? `${ziffern.slice(0, 4)} ${ziffern.slice(4)}` : ziffern;
 }
 
 /** Satz unter dem Bedarf der Einsatzansicht (R14-W1). */
@@ -296,6 +321,13 @@ function bewegungenSeit(einsatz: Einsatzsammlung, jetzt: number): Bewegung[] {
   return aus.sort((a, b) => b.zeit - a.zeit);
 }
 
+function leiterTeil(personal: readonly Person[]): Pick<EinheitZeile, "leiter" | "telefon"> {
+  const p = einheitsfuehrer(personal);
+  if (!p) return {};
+  const telefon = telefonVon(p);
+  return { leiter: { vorname: p.vorname.trim(), nachname: p.nachname.trim() }, ...(telefon ? { telefon } : {}) };
+}
+
 export function lagebild(einsatz: Einsatzsammlung, jetzt: number = Date.now()): Lagebild {
   const geltend = geltendeJeEinheit(einsatz.eintraege);
   const einheiten = [...aktuelleMeldungen(einsatz.eintraege, einsatz.art)]
@@ -320,7 +352,8 @@ export function lagebild(einsatz: Einsatzsammlung, jetzt: number = Date.now()): 
         soll: nurSollstaerke(m.bogen),
         ...(jetzt - angabenZeit(m) >= VERALTET_ALTER_MIN * 60_000 ? { alterMin: Math.floor((jetzt - angabenZeit(m)) / 60_000) } : {}),
         ...(m.zugEtikett ? { zug: m.zugEtikett } : {}),
-        ...(m.notiz?.trim() ? { auftrag: auftragKurz(m.notiz) } : {}),
+        ...(m.notiz?.trim() ? { auftrag: auftragKurz(m.notiz), auftragVoll: m.notiz.replace(/\s+/g, " ").trim() } : {}),
+        ...leiterTeil(m.bogen.personal),
         ...(angabenAlterWort(m) === "Stand" ? { standAlt: true } : {}),
       };
     });

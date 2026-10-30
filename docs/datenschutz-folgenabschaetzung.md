@@ -197,6 +197,16 @@ Grundlage: Repository `wattnpapa/erfassungsbogen`, Stand 2026-09-12 — Version 
 > gedruckt (Richtigkeit, Art. 5 Abs. 1 lit. d DSGVO). Keine neuen Empfänger,
 > keine Netzverbindung (5.8 unverändert).
 >
+> **Nachgezogen 2026-10-30 — Lagemonitor V2:** Die neue Ansicht V2 zeigt je Einheit
+> den Einheitsführer (Rolle Führer, sonst Unterführer) und dessen dienstliche
+> Telefonnummer auf dem Fernseher — erstmals Personendaten im Lagemonitor. Sie
+> werden nur aus den vorhandenen Bögen gelesen, nicht zusätzlich gespeichert. Im
+> Menü wählbar: Namensdarstellung (voll, „P. Muster", „Patrick M.", „Muster",
+> ausgeblendet) und Erreichbarkeit (Telefonnummer, ausgeblendet); Vorgabe „P.
+> Muster" mit Telefonnummer. Wo der Bildschirm für Unbeteiligte einsehbar ist,
+> ausblenden (Datenminimierung). Neue Speicherschlüssel `eeb.lageansicht.v1` und
+> `eeb.lageanzeige.v1` (nur die Wahl). Geändert: 5.4, 5.7.
+>
 > **Nachgezogen 2026-10-17 — Lagemonitor:** Die Einsatzansicht öffnet auf
 > Wunsch ein zweites Fenster mit der Lage für einen am Gerät angeschlossenen
 > Fernseher (`?lagemonitor=`). Es liest denselben lokalen Speicher, hat kein
