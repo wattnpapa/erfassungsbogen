@@ -1654,6 +1654,32 @@ describe("Erreichbarkeit: Art und Nummer (R11)", () => {
     expect((screen.getByLabelText("Adresse") as HTMLInputElement).value).toBe("");
   });
 
+  it("bietet „Funk“ an: Feld „Funkrufname“ als Freitext, ohne Privat-Schalter, dienstlich gesetzt (Schema 12)", async () => {
+    const nutzer = userEvent.setup();
+    let zuletzt: Erfassungsbogen | undefined;
+    render(<SchrittBuehne komponente={SchrittPersonal} bogen={bogenMit(KontaktArt.MOBIL, "")} beobachten={(b) => (zuletzt = b)} />);
+    await nutzer.selectOptions(screen.getByLabelText("Art"), "Funk");
+    const feld = screen.getByLabelText("Funkrufname") as HTMLInputElement;
+    expect(feld.type).toBe("text");
+    expect(screen.queryByLabelText("dienstlich")).toBeNull();
+    await nutzer.type(feld, "Heros Oldenburg 18/13-1");
+    expect(feld.value).toBe("Heros Oldenburg 18/13-1");
+    expect(zuletzt!.personal[0]!.kontakte[0]).toEqual({ art: KontaktArt.FUNK, dienstlich: true, wert: "Heros Oldenburg 18/13-1" });
+  });
+
+  it("fragt bei Wechsel von Mobil nach Funk nach, weil die Nummer nicht zum Funkrufnamen passt (R11-E2)", async () => {
+    const nutzer = userEvent.setup();
+    render(<SchrittBuehne komponente={SchrittPersonal} bogen={bogenMit(KontaktArt.MOBIL, "01711234567")} />);
+    await nutzer.selectOptions(screen.getByLabelText("Art"), "Funk");
+    const dialog = document.querySelector<HTMLDialogElement>("dialog.abfrage")!;
+    expect(dialog.textContent).toContain("Die Nummer 01711234567 passt nicht zur Art „Funk“");
+    await nutzer.click(within(dialog).getByRole("button", { name: "Art behalten" }));
+    expect((screen.getByLabelText("Nummer") as HTMLInputElement).value).toBe("01711234567");
+    await nutzer.selectOptions(screen.getByLabelText("Art"), "Funk");
+    await nutzer.click(within(document.querySelector<HTMLDialogElement>("dialog.abfrage")!).getByRole("button", { name: "Art ändern, Wert entfernen" }));
+    expect((screen.getByLabelText("Funkrufname") as HTMLInputElement).value).toBe("");
+  });
+
   it("behält das Plus und nennt eine abgetrennte zweite Nummer (R11-E3)", async () => {
     const nutzer = userEvent.setup();
     render(<SchrittBuehne komponente={SchrittPersonal} bogen={bogenMit(KontaktArt.MOBIL, "")} />);

@@ -23,12 +23,21 @@ export function telefonHref(text: string | undefined | null): string | null {
 /** `mailto:`-Ziel aus einer Adresse; `null`, wenn sie nicht wie eine Adresse aussieht. */
 export function mailHref(text: string | undefined | null): string | null {
   const t = (text ?? "").trim();
-  if (!/^[^\s@<>"'?&=,;:]+@[^\s@<>"'?&=,;:]+\.[^\s@<>"'?&=,;:]+$/.test(t)) return null;
+  if (!/^[^\s@<>"'?&=,;:]+@[^\s@<>"'?&=,;:]+\.[^\s@<>"'?&=,;:]+$/.test(t))
+    return null;
   return `mailto:${encodeURIComponent(t).replace(/%40/g, "@")}`;
 }
 
 /** Eine Nummer oder Adresse: als Verweis (44 px Zielhöhe), wenn erkennbar, sonst als Text. */
-export function KontaktLink({ art, wert, kinder }: { art: "tel" | "mail"; wert: string; kinder?: ReactNode }) {
+export function KontaktLink({
+  art,
+  wert,
+  kinder,
+}: {
+  art: "tel" | "mail";
+  wert: string;
+  kinder?: ReactNode;
+}) {
   const href = art === "tel" ? telefonHref(wert) : mailHref(wert);
   if (!href) return <>{kinder ?? wert}</>;
   return (
@@ -39,12 +48,18 @@ export function KontaktLink({ art, wert, kinder }: { art: "tel" | "mail"; wert: 
 }
 
 /** „Hans Beispiel · hans@example.org · 0170 5551234" mit antippbarer Adresse und Nummer. */
-export function AbsenderKontakt({ karte }: { karte: Absenderkarte | undefined }) {
+export function AbsenderKontakt({
+  karte,
+}: {
+  karte: Absenderkarte | undefined;
+}) {
   if (!karte) return null;
   const teile: ReactNode[] = [];
   if (karte.name) teile.push(<span key="n">{karte.name}</span>);
-  if (karte.email) teile.push(<KontaktLink key="e" art="mail" wert={karte.email} />);
-  if (karte.telefon) teile.push(<KontaktLink key="t" art="tel" wert={karte.telefon} />);
+  if (karte.email)
+    teile.push(<KontaktLink key="e" art="mail" wert={karte.email} />);
+  if (karte.telefon)
+    teile.push(<KontaktLink key="t" art="tel" wert={karte.telefon} />);
   return (
     <>
       {teile.map((t, i) => (
@@ -61,11 +76,24 @@ export function AbsenderKontakt({ karte }: { karte: Absenderkarte | undefined })
 export function PersonKontakt({ kontakt }: { kontakt: Kontakt }) {
   const kz = kontakt.dienstlich ? "D" : "P";
   if (kontakt.emailTemplate != null) return <>{`eMail: — (${kz})`}</>;
-  const bez = kontakt.art === KontaktArt.EMAIL ? "eMail" : kontakt.art === KontaktArt.MOBIL ? "Mobil" : "Tel";
+  // Ein Funkrufname ist weder wählbar noch privat: nur Text, ohne (D)/(P).
+  if (kontakt.art === KontaktArt.FUNK)
+    return <>{`Funk: ${kontakt.wert ?? ""}`}</>;
+  const bez =
+    kontakt.art === KontaktArt.EMAIL
+      ? "eMail"
+      : kontakt.art === KontaktArt.MOBIL
+        ? "Mobil"
+        : "Tel";
   const wert = kontakt.wert ?? "";
   return (
     <>
-      {bez}: <KontaktLink art={kontakt.art === KontaktArt.EMAIL ? "mail" : "tel"} wert={wert} /> ({kz})
+      {bez}:{" "}
+      <KontaktLink
+        art={kontakt.art === KontaktArt.EMAIL ? "mail" : "tel"}
+        wert={wert}
+      />{" "}
+      ({kz})
     </>
   );
 }

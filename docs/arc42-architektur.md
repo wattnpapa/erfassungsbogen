@@ -12,6 +12,17 @@
 > umsetzen: SBOM, CSP ohne unsafe-inline, Entpack-Grenze") betrifft die Kapitel
 > 2.1, 8.3, 8.6, 8.7 und 11.2 — dort jeweils vermerkt.
 >
+> **Nachgezogen 2026-11-02 (Schema 12):** Kap. 4.5, 8.4, 12: `KontaktArt.FUNK` — der
+> Funkrufname einer Person als vierte Kontaktart neben Mobil, Festnetz und E-Mail
+> (Freitext, im QR als String wie eine Adresse, keine neuen Bits; Submodul `eeb-format`,
+> `SCHEMA_VERSION` 12, `transportSchemaVersion` fordert 12 nur für Bögen mit dieser
+> Kontaktart, eingefrorene v11-Fixture, VBA-Port auf Schema 12). Schritt 3 bietet
+> in der Erreichbarkeit die Art „Funk" mit dem Feld „Funkrufname" ohne
+> dienstlich/privat-Schalter an; Übersicht, PDF (Personaltabelle und Lageblatt-
+> Erreichbarkeit), CSV, Oldenburg-Tabelle und Meldekopf-Abgleich schreiben
+> `Funk: …` ohne (D)/(P). Der Hinweis „keine telefonische Erreichbarkeit" zählt
+> Funk weiterhin nicht als Rufnummer. Submodul `bos-meldekopf` (`kontaktText`) nachgezogen.
+>
 > **Nachgezogen 2026-10-29 (Schema 11):** Kap. 4.5, 8.4, 12: `Einsatz.zeitraumVonIso`/
 > `zeitraumBisIso` (Zeitraum von/bis mit Uhrzeit als ISO 8601 mit Zeitzonen-Offset; im
 > QR je 3 Byte, Einsatz-Flags 4/8; Submodul `eeb-format`, `SCHEMA_VERSION` 11, eingefrorene v10-Fixture, VBA-Port
@@ -834,7 +845,7 @@ flowchart LR
 | USB-Handscanner | Tastatur-Emulation | Der Scanner „tippt" den dekodierten QR-Inhalt wie eine Tastatur ein; die App erkennt die Folge am Tempo (`src/app/handscanner.ts`, im Scanner-Fenster und auf der ganzen Seite außerhalb von Textfeldern, Abschluss mit Enter/Tab oder nach kurzer Stille) und entwirrt scancode-bedingte Tastaturbelegungsfehler (`src/app/tastaturbelegung.ts`). |
 | AirDrop (Apple) / Quick Share (Android) | Betriebssystem-Nahfeldfreigabe | Reiner Transportkanal für den geteilten Link/die Datei; die App implementiert dafür nichts außer einem teilbaren Link. |
 | Excel-Vorlage „Oldenburg" | Exportformat | Fest vorgegebenes, nicht verhandelbares Spaltenformat (38 Spalten, Farben, Datumsformat) einer externen Führungsstelle; die App liefert nur ihre Spalten, der Rest (Ablösung, Zusagen, Schicht) bleibt leer. |
-| Excel-Arbeitsmappe mit VBA-Dekoder (`vendor/eeb-format/ports/vba/`) | Fremdleser des QR-Formats (Handscanner/Link → Tabellenzeile) | Handgepflegte Portierung des Lesewegs in VBA (Base41/Base64url, Deflate, Binärstrom, `EEBS.`-Serien), Schema 2 bis 11, Signaturen werden übersprungen und nicht geprüft. Lebt im Format-Repo unter `ports/`; dessen CI hält sie gegen `SCHEMA_VERSION`, und das Vokabular-Modul wird hier per `npm run vokabular:excel-vba` aus `bos-vokabulare` erzeugt (CI prüft den Stand). |
+| Excel-Arbeitsmappe mit VBA-Dekoder (`vendor/eeb-format/ports/vba/`) | Fremdleser des QR-Formats (Handscanner/Link → Tabellenzeile) | Handgepflegte Portierung des Lesewegs in VBA (Base41/Base64url, Deflate, Binärstrom, `EEBS.`-Serien), Schema 2 bis 12, Signaturen werden übersprungen und nicht geprüft. Lebt im Format-Repo unter `ports/`; dessen CI hält sie gegen `SCHEMA_VERSION`, und das Vokabular-Modul wird hier per `npm run vokabular:excel-vba` aus `bos-vokabulare` erzeugt (CI prüft den Stand). |
 | THW-Ortsverbandsverzeichnis | Eingebettete Referenzdaten (kein Live-Zugriff) | ~700 THW-Ortsverbände mit Nummer/Name/Kontakten sind im Bundle enthalten; ein QR kann statt der ausgeschriebenen Hierarchie nur die Ortsverbandsnummer tragen (`standortRef`). |
 
 ### 3.2 Technischer Kontext
@@ -922,8 +933,8 @@ Deflate-Kompression und eine alphanumerisch-optimierte Base41-Transportkodierung
 
 ### 4.5 Schema-Evolution statt Breaking Changes
 
-Das Datenformat hat Schema-Version 11 erreicht (v1 THW-spezifisch bis v11
-Einsatzzeitraum mit Uhrzeit als ISO 8601). Jede App-Version kann Schema `2..SCHEMA_VERSION`
+Das Datenformat hat Schema-Version 12 erreicht (v1 THW-spezifisch bis v12
+Funkrufname als Erreichbarkeit einer Person). Jede App-Version kann Schema `2..SCHEMA_VERSION`
 lesen und migriert beim Laden automatisch; beim Schreiben wird stets die
 kleinste tragende Version gewählt (`transportSchemaVersion`).
 
@@ -1067,7 +1078,7 @@ import { bogenZuQrSvg, nodeKompressor } from "@bos/eeb-format/node";     // nur 
 
 | Modul | Verantwortung |
 | --- | --- |
-| `model.ts` (456 Zeilen) | Typdefinitionen (`Erfassungsbogen`, `Einheit`, `Person`, `Fahrzeug`, `Sofortbedarf`, `HierarchieEbene`, …), Enums (`OrganisationsTyp`, `StaerkeRolle`, `Fahrerlaubnis`, `Geschlecht`, `Ernaehrung`, `PersonalErfassung`), abgeleitete Werte (`staerke()`, `unterbringungMWD()`, `verpflegung()`, `ansprechpartner()`), Datums-/Zeitkonvertierung (`EebDatum`, `EebZeitpunkt`, Referenzepoche 2020-01-01), `SCHEMA_VERSION = 11`, `transportSchemaVersion()`, `migriereBogen()`. Importiert laut Kopfkommentar bewusst nichts. |
+| `model.ts` (456 Zeilen) | Typdefinitionen (`Erfassungsbogen`, `Einheit`, `Person`, `Fahrzeug`, `Sofortbedarf`, `HierarchieEbene`, …), Enums (`OrganisationsTyp`, `StaerkeRolle`, `Fahrerlaubnis`, `Geschlecht`, `Ernaehrung`, `PersonalErfassung`), abgeleitete Werte (`staerke()`, `unterbringungMWD()`, `verpflegung()`, `ansprechpartner()`), Datums-/Zeitkonvertierung (`EebDatum`, `EebZeitpunkt`, Referenzepoche 2020-01-01), `SCHEMA_VERSION = 12`, `transportSchemaVersion()`, `migriereBogen()`. Importiert laut Kopfkommentar bewusst nichts. |
 | `codec.ts` (1053 Zeilen) | Binärkodierung/-dekodierung, Base41-Transportkodierung, QR-Payload-Aufbau (`EEB2`/`EEB2C`), Segmentierung großer Bögen. Die Kompression wird als `Kompressor`-Funktion hineingereicht (Browser: pako, Node: `node:zlib`). |
 | `signatur.ts` (340 Zeilen) | Ed25519-Signatur/-Verifikation, Signaturkette („Gegenzeichnen", `gegengezeichnetePayloadBytes`), Container-Format `EEB2C`, Absenderkarten-Kodierung. |
 | `datenschutzfrist.ts` | Datenschutzfrist: Ende 90 Tage nach `stand`, Übungen ausgenommen (`datenschutzfristEnde`, `datenschutzfristAbgelaufen`, `tageBisAnonymisierung`), Anonymisierung eines Bogens (`bogenAnonymisiert`) und Plausibilitätsprüfung der Geräteuhr gegen Sprünge nach vorn (`uhrPruefen`). Baut nur auf `model` auf; kein Schemafeld. |
@@ -1828,12 +1839,13 @@ erreichbar (zuvor gleichlautend mit dem der Vorlagen, R5-D5).
 
 ### 8.4 Kompatibilitätskonzept (Schema-Evolution)
 
-- **Schema-Version aktuell 10** (`vendor/eeb-format/src/model.ts`); Historie: v1
+- **Schema-Version aktuell 12** (`vendor/eeb-format/src/model.ts`); Historie: v1
   (THW-spezifisch) → v2 (organisationsübergreifend) → v3 (Ernährungsform je
   Person) → v4 (ein Kennzeichen-Feld) → v5 (Einheitsname in der Hierarchie) → v6
   (Übungs-Kennzeichnung) → v7 (stand minutengenau) → v8 (mehrere
   Fahrerlaubnisklassen je Person) → v9 (abweichende Sitzplatzzahl je Fahrzeug)
-  → v10 (abweichende Dienststelle je Person).
+  → v10 (abweichende Dienststelle je Person) → v11 (Einsatzzeitraum mit Uhrzeit
+  als ISO 8601) → v12 (Funkrufname als Erreichbarkeit einer Person, `KontaktArt.FUNK`).
 - **Freitext-Konventionen statt Schema-Sprung:** Wo eine Angabe nur Text ist und
   jeder Leser sie auch ohne Vokabular verstehen soll, bleibt das Format
   unberührt — die DLRG-Ausbildungskennzahl steht als Freitext
@@ -2282,7 +2294,7 @@ Repository-Analyse, keine offiziellen Angaben des Projekts.
 | --- | --- |
 | `EEB2` / `EEB2C` | Magic-Bytes/Format-Kennung des QR-Payloads: `EEB2` = unsignierter Bogen, `EEB2C` = signierter Container mit einer oder mehreren Signaturstufen. |
 | Base41 | Eigenes, an Base45/RFC 9285 angelehntes, aber URL-sicheres 41-Zeichen-Alphabet zur Transportkodierung des QR-Dateninhalts (alphanumerischer QR-Modus). |
-| Schema-Version | Versionsnummer des Datenmodells (aktuell 8); steuert, welche Felder ein Bogen enthalten kann und wie er migriert wird. |
+| Schema-Version | Versionsnummer des Datenmodells (aktuell 12); steuert, welche Felder ein Bogen enthalten kann und wie er migriert wird. |
 | `transportSchemaVersion` | Funktion, die beim Kodieren die kleinste Schema-Version wählt, die den tatsächlichen Bogeninhalt noch verlustfrei trägt. |
 | Segmentierung (`EEBS.`) | Aufteilung eines zu großen Bogens auf mehrere QR-Codes; jeder Teil trägt Teilnummer, Gesamtzahl und eine Prüfsumme. |
 | Absenderkarte | Freiwillig hinterlegte Kontaktangabe (Name/E-Mail/Telefon) eines Geräts, die signiert mit jedem übergebenen Bogen mitreist. |

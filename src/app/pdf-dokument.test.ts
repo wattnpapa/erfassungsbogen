@@ -259,6 +259,23 @@ describe("pdfDokument()", () => {
     expect(t).toContain("Bootsführer");
   });
 
+  it("nennt den Funkrufname einer Person ohne (D)/(P) — in der Personaltabelle und auf dem Lageblatt (Schema 12)", () => {
+    const b = basisBogen();
+    b.personal[0]!.kontakte = [
+      { art: KontaktArt.MOBIL, dienstlich: true, wert: "01701234501" },
+      { art: KontaktArt.FUNK, dienstlich: true, wert: "Heros Oldenburg 18/13-1" },
+    ];
+    const t = texte(pdfDokument(b, QR).content).join("\n");
+    expect(t).toContain("Funk: Heros Oldenburg 18/13-1");
+    expect(t).not.toContain("Funk: Heros Oldenburg 18/13-1 (");
+    const zeilen = erreichbarkeitZeilen(b);
+    expect(zeilen).toContain("01701234501 (D) J. Rudolph");
+    expect(zeilen).toContain("Heros Oldenburg 18/13-1 (Funk) J. Rudolph");
+    // Nur Funk, keine Rufnummer: der OV-Rückruf bleibt die Telefonzeile, der Funkrufname kommt dazu.
+    b.personal[0]!.kontakte = [{ art: KontaktArt.FUNK, dienstlich: true, wert: "Heros Oldenburg 18/13-1" }];
+    expect(erreichbarkeitZeilen(b)).toEqual(expect.arrayContaining(["04413401050 (OV)", "Heros Oldenburg 18/13-1 (Funk) J. Rudolph"]));
+  });
+
   /**
    * Rückmeldung aus einem THW-Ortsverband: Beruf UND Qualifikation gehören in
    * die Tabelle „weitere interne / externe Qualifikationen". Die Berufe stehen

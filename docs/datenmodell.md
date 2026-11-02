@@ -65,6 +65,18 @@ sie sind damit Schema 11 und für App-Stände vor Schema 11 nicht mehr lesbar;
 wer beide Uhrzeitfelder leert, schreibt wieder die kleinere Version. Eine
 eingefrorene v10-Fixture belegt, dass v10-Bögen unverschoben gelesen werden.
 
+Ein Funkrufname als Erreichbarkeit einer Person fordert Schema 12. Die
+Kontaktart `FUNK = 3` belegt den bisher freien vierten Wert der zwei Art-Bits
+im Kontakt-Byte; der Wert ist Freitext, wie der Funkrufname gesprochen wird
+(„Heros Oldenburg 18/13-1"), und reist wie eine E-Mail-Adresse als String —
+kein neues Flag, kein neues Byte. Weil ein älterer Leser die Art 3 als Rufnummer
+(BCD) läse und damit den Strom verschöbe, hebt `transportSchemaVersion` jeden
+Bogen mit dieser Kontaktart auf 12; Bögen mit nur Rufnummern und E-Mail bleiben
+bei der kleineren Version. Ein Funkrufname ist nie privat: die App setzt das
+D/P-Flag auf dienstlich und zeigt den Schalter nicht, Anzeige, PDF, CSV und
+die VBA-Portierung schreiben `Funk: …` ohne (D)/(P). Eine eingefrorene
+v11-Fixture belegt, dass v11-Bögen unverschoben gelesen werden.
+
 **Bewusste Ausnahme (v4):** Bis v3 stand das THW-Kennzeichen als Zahl im QR-Code
 (Flag 16 im Fahrzeug-Byte). Dieses Sonderformat ist entfallen; es gibt nur noch ein
 Kennzeichen als String. Beim Decodieren alter QR-Codes wird die Zahl nur noch
@@ -230,7 +242,7 @@ ausgeschriebene Hierarchie der Normalfall.
 | dienststelle | string? | ab Schema 10: Dienststelle (THW: Ortsverband) der Person, wenn sie nicht die der Einheit ist; fehlt = `einheit.hierarchie[0]`. Die App belegt das Feld mit der Dienststelle der Einheit vor und speichert nur die Abweichung |
 | geschlecht | Enum | M/W/D (2 Bit) |
 | ernaehrung | Enum | Fleisch/Vegetarisch/Vegan (2 Bit) — Verpflegung wird **abgeleitet** |
-| kontakte | `Kontakt[]` | Art (Mobil/Festnetz/eMail), D/P-Flag, BCD bzw. Template |
+| kontakte | `Kontakt[]` | Art (Mobil/Festnetz/eMail/Funk — Funk ab Schema 12), D/P-Flag (bei Funk stets D), BCD, String bzw. Template |
 | zusatzqualifikationen | `VokabularWert[]` | „weitere interne/externe Qualifikationen". Berufe stehen im selben Feld als Freitext mit dem Präfix `Beruf: ` (App-Konvention, `src/app/beruf.ts`): die App zeigt sie in einem eigenen Eingabefeld, das Format kennt sie nicht gesondert — so bleibt der Bogen für ältere Stände lesbar |
 
 ### Fahrzeug

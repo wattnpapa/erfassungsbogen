@@ -16,6 +16,15 @@ Grundlage: Repository `wattnpapa/erfassungsbogen`, Stand 2026-09-12 — Version 
 > Abhängigkeiten (6.4/R8/M8). Die betroffenen Abschnitte sind entsprechend
 > gekennzeichnet.
 >
+> **Nachgezogen 2026-11-02 — Schema 12:** Transportformat (5.2): Funkrufname als
+> Erreichbarkeit einer Person (`KontaktArt.FUNK`, Art-Wert 3 im Kontakt-Byte, Wert als
+> String wie eine E-Mail-Adresse). Nur Bögen mit dieser Kontaktart sind Schema 12;
+> ältere App-Stände lehnen sie als „nicht unterstützte Schema-Version" ab, statt den
+> String als Rufnummer zu lesen (gewollt). Bögen ohne Funkrufname bleiben bei der
+> bisherigen Version. Exporte (5.4): PDF, CSV und Oldenburg-Tabelle führen den
+> Funkrufname als `Funk: …` in der Erreichbarkeit; keine neuen Speicherorte, keine
+> neuen Netzverbindungen. VBA-Portierung auf Schema 12.
+>
 > **Nachgezogen 2026-10-29 — Schema 11:** Transportformat (5.2): Einsatzzeitraum
 > mit Uhrzeit, im Modell ISO 8601 mit Offset, im QR je Ende 3 Byte (Einsatz-Flags 4/8). Da die App neue Bögen
 > mit 08:00–18:00 vorbelegt, sind sie Schema 11; ältere App-Stände lehnen sie als

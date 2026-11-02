@@ -256,6 +256,17 @@ describe("plausibilitaet()", () => {
     expect(hinweise.some((h) => /Kennzeichen/.test(h) && /Fahrzeug/.test(h))).toBe(false);
   });
 
+  it("zählt einen Funkrufname nicht als telefonische Erreichbarkeit und fragt nicht nach Ziffern darin (Schema 12)", () => {
+    const basis = neuerBogen();
+    const b = bogen({
+      einsatz: { ...basis.einsatz, ortAuftrag: "X" },
+      personal: [person({ kontakte: [{ art: KontaktArt.FUNK, dienstlich: true, wert: "Heros Oldenburg" }] })],
+    });
+    const hinweise = plausibilitaet(b);
+    expect(hinweise.some((h) => /telefonische Erreichbarkeit/.test(h))).toBe(true);
+    expect(hinweise.some((h) => /ohne Ziffer|ohne „@"/.test(h))).toBe(false);
+  });
+
   it("weist auf eine Stärke von 0 hin", () => {
     expect(plausibilitaet(bogen()).some((h) => /Stärke ist 0/.test(h))).toBe(true);
   });

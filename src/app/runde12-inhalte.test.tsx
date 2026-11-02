@@ -80,6 +80,11 @@ describe("Rückruf antippbar (R12-W1)", () => {
     const { container } = render(<span><PersonKontakt kontakt={{ art: KontaktArt.MOBIL, dienstlich: false, wert: "01715551234" }} /></span>);
     expect(container.textContent).toBe("Mobil: 01715551234 (P)");
   });
+  it("Funkrufname einer Person: nur Text, kein Link, kein (D)/(P)", () => {
+    const { container } = render(<span><PersonKontakt kontakt={{ art: KontaktArt.FUNK, dienstlich: true, wert: "Heros Oldenburg 18/13-1" }} /></span>);
+    expect(container.textContent).toBe("Funk: Heros Oldenburg 18/13-1");
+    expect(container.querySelector("a")).toBeNull();
+  });
   it("Zielgröße 44 px steht im Stylesheet", () => {
     const html = readFileSync("index.html", "utf8");
     const von = html.indexOf("/* ===== Runde 12 (Inhalte) ===== */");

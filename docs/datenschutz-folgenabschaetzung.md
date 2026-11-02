@@ -11,6 +11,15 @@ Grundlage: Repository `wattnpapa/erfassungsbogen`, Stand 2026-09-12 — Version 
 > **Wichtig:** Der Commit „Sicherheitsbericht umsetzen" (`c7604e9`, 2026-09-12)
 > hat das in R5/M6 genannte Dekomprimierungs-Risiko bereits behoben.
 >
+> **Nachgezogen 2026-11-02 — Schema 12:** Datenkategorie Kontaktdaten erweitert (5.4):
+> der Funkrufname einer Person (`KontaktArt.FUNK`, z. B. „Heros Oldenburg 18/13-1")
+> als vierte Kontaktart neben Telefon und E-Mail. Dienstliche Kennung des
+> Handfunkgeräts, kein privates Datum (die App setzt das D/P-Flag fest auf
+> dienstlich) und kein besonderes Datum nach Art. 9; reist mit dem Bogen durch
+> QR, Datei, PDF (Personaltabelle und Lageblatt-Erreichbarkeit), CSV und
+> Oldenburg-Tabelle, unterliegt wie alle Kontakte der Anonymisierung nach der
+> Datenschutzfrist. Speicherorte, Empfänger und Netzverbindungen unverändert.
+>
 > **Nachgezogen 2026-10-29 — Schema 11:** Der Einsatzzeitraum (5.4, Einsatzdaten) trägt
 > optional eine Uhrzeit zu „von" und „bis" (vorbelegt 08:00 und 18:00), gespeichert als
 > ISO 8601 mit dem Zeitzonen-Offset des erfassenden Geräts. Angabe zum Einsatz der
@@ -679,7 +688,7 @@ definieren.
 | Identität | Vorname, Nachname | Pflicht je Personaleintrag | `Person` (`model.ts`) |
 | Funktion/Qualifikation | Funktionen, Zusatzqualifikationen (inkl. Beruf — als Freitext mit Präfix „Beruf: " im selben Feld, eigenes Eingabefeld in der App), Fahrerlaubnis(se), Stärke-Rolle | Teils Pflicht, teils optional | `Person`, `src/app/beruf.ts` |
 | Unterbringungs-/verpflegungsrelevante Angaben | Geschlecht (M/W/D), Ernährungsform (inkl. vegetarisch/vegan) | Pflicht je Personaleintrag | `Person` — kein Gesundheitsdatum im Sinne Art. 9 DSGVO, dient der Logistikplanung |
-| Kontaktdaten | Telefon, E-Mail | Optional, laut Code-Kommentar „i. d. R. nur Führungskräfte" | `Kontakt` |
+| Kontaktdaten | Telefon, E-Mail, Funkrufname der Person (ab Schema 12, stets dienstlich) | Optional, laut Code-Kommentar „i. d. R. nur Führungskräfte" | `Kontakt` |
 | Fahrzeugbezogen (potenziell personenbeziehbar) | Kennzeichen, Funkrufname | Optional | `Fahrzeug` |
 | Freiwillige Absenderangabe | Name, E-Mail, Telefon | Vollständig freiwillig (Opt-in) | Absenderkarte, `docs/datenmodell.md` |
 | Geräteschlüssel | Öffentlicher Ed25519-Schlüssel (kein Personenbezug für sich allein) | Automatisch, lokal erzeugt | `signatur.ts` |
@@ -1000,7 +1009,7 @@ Die Software zeigt an mehreren Stellen erkennbare Datensparsamkeit „by Design"
 
 - Die Absenderkarte ist vollständig optional (Opt-in) und wird ohne Eingabe als
   „keine Karte" kodiert.
-- Kontaktdaten (Telefon/E-Mail) sind laut Code-Kommentar „i. d. R. nur
+- Kontaktdaten (Telefon/E-Mail/Funkrufname) sind laut Code-Kommentar „i. d. R. nur
   Führungskräfte" vorgesehen.
 - Es gibt kein Freitext-Feld für beliebige Zusatzangaben zu Personen außerhalb
   der definierten, zweckgebundenen Felder.
