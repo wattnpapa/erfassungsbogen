@@ -171,8 +171,8 @@ describe("einsatzCsvInhalt()", () => {
 
   /**
    * R4-W5: Die Summe unter „Unterbringung angefordert“ ist die Zahl, mit der
-   * der Stab Schlafplätze plant — dieselbe wie auf Lageblatt und in der
-   * Excel-Liste. „WC/Dusche“ zählt alle Anwesenden.
+   * der Stab Schlafplätze plant — dieselbe wie auf dem Lageblatt.
+   * „WC/Dusche“ zählt alle Anwesenden.
    */
   it("führt Unterbringung angefordert nur für Einheiten mit Anforderung, WC/Dusche für alle (R4-W5)", () => {
     const ohne = bogen("B", { sofortbedarf: { verpflegungPersonen: 3, dieselLiter: 0, benzinLiter: 0, gemischLiter: 0, unterbringung: false, ruhezeitErforderlich: false } });

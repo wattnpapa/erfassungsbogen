@@ -36,7 +36,6 @@ import {
   zeitraumDeutsch,
   bogenLaden,
   browserKompressor,
-  bytesAlsDatei,
   dateinameTeil,
   einheitAnzeigename,
   einheitOrt,
@@ -3757,27 +3756,6 @@ function AppInhalt() {
   }
 
   /**
-   * Einheitenliste im Fremdformat der Führungsstelle. Dynamisch geladen: der
-   * XLSX-Schreiber samt Stiltabelle wird nur beim Klick gebraucht (wie die PDF).
-   */
-  async function exportiereEinsatzOldenburg(s: Einsatzsammlung, umfang: ExportUmfang) {
-    setAusgabeQuittung(null);
-    leererEinsatz(s);
-    const teil = exportSammlung(s, umfang, exportStaende.xlsx ?? null);
-    try {
-      const { XLSX_MIME, einsatzOldenburgXlsx } = await import("./oldenburg-xlsx");
-      const name = ausgabeDateiname(artMitMarke("einsatz-oldenburg", nachtragMarke(umfang, "xlsx")), einsatzDateiname(s), "xlsx");
-      const ok = await bytesAlsDatei(name, einsatzOldenburgXlsx(teil, s.eintraege), XLSX_MIME);
-      if (ok) {
-        exportVerbuchen(s, "xlsx");
-        setAusgabeQuittung(dateiQuittungText(name, s));
-      }
-    } catch (e) {
-      setFehler(`Excel-Liste: ${fehlerText(e)}`);
-    }
-  }
-
-  /**
    * Sammel-PDF. Im Gesamtumfang ALLE aktuellen Meldungen — auch abgerückte und
    * Übungen: Die Datei ist die Übergabe der ganzen Sammlung und muss auch am
    * Einsatzende funktionieren, wenn niemand mehr anwesend ist (Audit
@@ -4567,7 +4545,6 @@ function AppInhalt() {
           onExport={() => exportiereEinsatz(offenerEinsatz)}
           onCsvExport={(umfang) => exportiereEinsatzCsv(offenerEinsatz, umfang)}
           onCsvDetailExport={(umfang) => exportiereEinsatzCsvDetail(offenerEinsatz, umfang)}
-          onOldenburgExport={(umfang) => exportiereEinsatzOldenburg(offenerEinsatz, umfang)}
           onSammelPdf={(umfang) => sammelPdf(offenerEinsatz, umfang)}
           exportStaende={exportStaende}
           onStandAusWeitergabe={(ziel) => {

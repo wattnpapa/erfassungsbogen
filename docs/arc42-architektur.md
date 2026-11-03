@@ -12,6 +12,18 @@
 > umsetzen: SBOM, CSP ohne unsafe-inline, Entpack-Grenze") betrifft die Kapitel
 > 2.1, 8.3, 8.6, 8.7 und 11.2 — dort jeweils vermerkt.
 >
+> **Nachgezogen 2026-11-03 — Excel-Liste „Oldenburg" entfernt:** Kap. 1.2, 1.3, 2.1,
+> 3.1, 5, 10, 12 und ADR-001. Der XLSX-Export der Einheitenliste im festen Spaltenformat
+> einer Führungsstelle (`src/app/oldenburg-xlsx.ts`, `src/app/xlsx.ts`, Knöpfe „Als Excel
+> (Format „Oldenburg")" im Übergabe-Dialog und „Excel-Liste (Format „Oldenburg")" in der
+> Einsatzansicht) ist ausgebaut. Anlass: die Gegenstelle übernimmt Bögen inzwischen über
+> den Link (später ggf. über die PDF-Datei) direkt in ihre Tabelle (VBA-Portierung,
+> Kap. 3.1), der Umweg über eine fertige Excel-Zeile entfällt. Export-Stand-Ziele
+> (`ExportZiel`) sind nur noch `pdf`, `csv`, `csv-detail`; ein alter `xlsx`-Stand im
+> `localStorage` oder in einer Weitergabe-Datei wird beim Lesen übergangen. `pako`
+> bleibt (Codec, PDF-Ströme). Ältere Erwähnungen der „Oldenburg-Tabelle" in den
+> Nachträgen darunter sind Geschichte.
+>
 > **Nachgezogen 2026-11-02 (Schema 12):** Kap. 4.5, 8.4, 12: `KontaktArt.FUNK` — der
 > Funkrufname einer Person als vierte Kontaktart neben Mobil, Festnetz und E-Mail
 > (Freitext, im QR als String wie eine Adresse, keine neuen Bits; Submodul `eeb-format`,
@@ -586,8 +598,8 @@ Kernfunktionalität (siehe `README.md`):
   und zusammengeführt. BOS-Nutzer sind Ehrenamtliche und Einsatzkräfte, keine
   IT-Fachleute – die App muss ohne Schulung und ohne Anmeldung funktionieren
   (`PRODUCT.md`).
-- **Datenexport** als CSV (Langformat mit allen Feldern) und als Excel-Liste im
-  organisationsspezifischen Format „Oldenburg" für Führungsstellen.
+- **Datenexport** als CSV (Übersicht je Einheit und Langformat mit allen Feldern)
+  für Führungsstellen. Die Excel-Liste im Format „Oldenburg" gab es bis 2026-11-03.
 
 Die Anwendung läuft browserbasiert als Progressive Web App
 (erfassungsbogen.app), als Desktop-App (Electron: Windows, macOS, Linux) und als
@@ -618,7 +630,6 @@ Festlegungen im Code (CSP, Bundle-Budget, Schema-Migrationen):
 | Autor/Maintainer – Johannes Rudolph (`package.json`) | Pflegt Code, Vokabulare, Vorlagen und die vier ausgelagerten Kern-Repositories; trifft Architekturentscheidungen (ADRs im Schwesterprojekt). |
 | Schwesterprodukt „S1-Control" | Konsumiert denselben geteilten Kern über dessen gebautes `dist/`; Änderungsanforderungen an den Kern betreffen beide Produkte. |
 | Betreiber der Zielplattformen (GitHub Pages, GitHub Releases, Google Play/App Store – zukünftig) | Hosting- bzw. Vertriebsinfrastruktur, ohne eigenes Backend des Projekts. |
-| THW-Ortsverbände / Führungsstellen mit Excel-Format „Oldenburg" | Definieren ein festes, nicht verhandelbares Spaltenformat für den Excel-Export der Einheitenliste. |
 
 ### 1.4 Hinweis zu dieser Dokumentation
 
@@ -659,7 +670,6 @@ wieder.
 | Datenkompression | `pako` (Deflate) für QR-Payload und Datei-/Sammel-Transport | `package.json` |
 | PDF-Erzeugung | `pdfmake`, rein clientseitig, kein Server-Rendering | `package.json`, `src/app/pdf-dokument.ts` |
 | QR-Erzeugung/-Decodierung | `qrcode` (Erzeugung), `jsqr` und `zxing-wasm` (Decodierung/Scan, inkl. WebAssembly) | `package.json` |
-| XLSX-Export | Eigener minimaler XLSX-Writer (`src/app/xlsx.ts`, ZIP + zwei XML-Teile über `pako`) statt SheetJS/exceljs – bewusste Entscheidung, keine neue Abhängigkeit | `docs/tests.md` |
 | Node-Version (CI) | Node 24 | `.github/workflows/ci.yml`, `release.yml` |
 | Testwerkzeuge | Vitest (Unit, zwei Projekte `logik`/`oberflaeche`), Cucumber.js + Playwright (E2E/Gherkin auf Deutsch) | `package.json`, `docs/tests.md` |
 | Browser-Sicherheit | Content-Security-Policy wird im Build injiziert (`default-src 'self'`, `object-src 'none'`, `base-uri 'none'`, `script-src` ohne `'unsafe-inline'` über `sha256`-Hashes plus `'wasm-unsafe-eval'` für den ZXing-Decoder, eng begrenztes `connect-src`/`img-src` nur für GoatCounter) | `vite.config.ts` (`contentSecurityPolicy()`) |
@@ -823,7 +833,6 @@ flowchart LR
   Scanner["USB-Handscanner<br/>(am PC)"]
   AirDrop["AirDrop / Quick Share<br/>(Gerät zu Gerät, ohne Netz)"]
   Papier["Papier-Erfassungsbogen<br/>(Referenzformat je Organisation)"]
-  Oldenburg["Einheitenliste Format Oldenburg<br/>(Excel, Führungsstelle)"]
 
   Einheit -->|"füllt aus, druckt, gibt weiter"| App
   Einheit -->|"QR-Code / Datei / AirDrop"| Meldekopf
@@ -832,7 +841,6 @@ flowchart LR
   Scanner -.->|"tastaturemulierter Scan"| App
   AirDrop -.->|"Link/Datei"| App
   App -->|"PDF mit QR-Code"| Papier
-  App -->|"Excel-Export je Einheit"| Oldenburg
 ```
 
 **Kommunikationspartner und Schnittstellen**
@@ -844,7 +852,6 @@ flowchart LR
 | Papier-Erfassungsbogen der Organisation | Referenzformat (kein Datenfluss) | Das PDF-Layout muss dem gewohnten amtlichen Papierbogen entsprechen, damit Ausdrucke in bestehende (nicht-digitale) Meldewege passen. |
 | USB-Handscanner | Tastatur-Emulation | Der Scanner „tippt" den dekodierten QR-Inhalt wie eine Tastatur ein; die App erkennt die Folge am Tempo (`src/app/handscanner.ts`, im Scanner-Fenster und auf der ganzen Seite außerhalb von Textfeldern, Abschluss mit Enter/Tab oder nach kurzer Stille) und entwirrt scancode-bedingte Tastaturbelegungsfehler (`src/app/tastaturbelegung.ts`). |
 | AirDrop (Apple) / Quick Share (Android) | Betriebssystem-Nahfeldfreigabe | Reiner Transportkanal für den geteilten Link/die Datei; die App implementiert dafür nichts außer einem teilbaren Link. |
-| Excel-Vorlage „Oldenburg" | Exportformat | Fest vorgegebenes, nicht verhandelbares Spaltenformat (38 Spalten, Farben, Datumsformat) einer externen Führungsstelle; die App liefert nur ihre Spalten, der Rest (Ablösung, Zusagen, Schicht) bleibt leer. |
 | Excel-Arbeitsmappe mit VBA-Dekoder (`vendor/eeb-format/ports/vba/`) | Fremdleser des QR-Formats (Handscanner/Link → Tabellenzeile) | Handgepflegte Portierung des Lesewegs in VBA (Base41/Base64url, Deflate, Binärstrom, `EEBS.`-Serien), Schema 2 bis 12, Signaturen werden übersprungen und nicht geprüft. Lebt im Format-Repo unter `ports/`; dessen CI hält sie gegen `SCHEMA_VERSION`, und das Vokabular-Modul wird hier per `npm run vokabular:excel-vba` aus `bos-vokabulare` erzeugt (CI prüft den Stand). |
 | THW-Ortsverbandsverzeichnis | Eingebettete Referenzdaten (kein Live-Zugriff) | ~700 THW-Ortsverbände mit Nummer/Name/Kontakten sind im Bundle enthalten; ein QR kann statt der ausgeschriebenen Hierarchie nur die Ortsverbandsnummer tragen (`standortRef`). |
 
@@ -1039,7 +1046,7 @@ flowchart TB
   app --> vorlagen["vorlagen.ts, vorlagen-ui.tsx<br/>Eigene Vorlagen, Musterung"]
   app --> qr["qr-scanner-web.tsx, qr-bild.ts,<br/>qr-stapel.ts, qr-boegen.ts"]
   app --> pdf["pdf.ts, pdf-dokument.ts,<br/>pdf-bilder.ts, pdf-qr.ts, pdf-stroeme.ts"]
-  app --> export["bogen-csv.ts, einsatz-csv.ts,<br/>oldenburg-xlsx.ts, xlsx.ts, csv.ts"]
+  app --> export["bogen-csv.ts, einsatz-csv.ts,<br/>csv.ts"]
   app --> persist["entwurf.ts, speicher-browser.ts,<br/>sicherung.ts, absenderkarte.ts"]
   app --> nativ["nativ.ts, hilfen.ts, geraete-schluessel.ts"]
   app --> anzeige["anzeige-modus.ts, org-farben.ts,<br/>fusszeile.tsx, kopfnav-ui.tsx"]
@@ -1057,8 +1064,8 @@ flowchart TB
 | `qr-scanner-web.tsx` + `qr-bild.ts`/`qr-stapel.ts`/`qr-boegen.ts` | Web-QR-Scan per `getUserMedia`/jsQR, Einzelbild-Decodierung, Stapel-Import (mehrere Fotos/Screenshots, Mehrteil-Erkennung), Gruppierung von QR-Texten zu vollständigen Bögen. |
 | `pdf-dokument.ts` (rund 1 850 Zeilen, größte Nicht-UI-Datei) | Baut die pdfmake-Dokumentdefinition im Papier-Layout inkl. eingebettetem QR-Code auf der letzten Seite. Seit 2026-10-06 (R4-A3, R4-A7) mit Probesätzen ohne Bilder (pdfmake `pageBreakBefore` misst Messpunkte): Lageblatt mit mindestens fünf Nachtragszeilen (zu voll: eigene Rückseite, `einsatzLageblattSeiteFuellen`), Sammel-PDF mit enger gesetzten Bögen, wo sonst eine Restseite entstünde (`einsatzPdfDokumentGesetzt`), Einzel-PDF mit freien Zeilen, wo sie keine Seite kosten (`einzelPdfDokument`). Die Seitenzahlen prüft `pdf-seiten.test.ts` mit echtem Satz. Seit 2026-10-17 (R5-A2, R5-A3, R5-A8, R5-A9, R5-K2): Kopfzeile je Bogenseite im Seitenrand (`bogenKopfzeile`, Sammel-PDF mit `bogenStart` aus einem Probesatz mit Platzhalterbildern), unteilbare Fahrzeugblöcke, Sortierung nach Nr. (`nachNummer`), WinAnsi-Abbildung aller Texte (`winAnsiText`, Test `pdf-winansi.test.ts`). |
 | `pdf-bilder.ts` / `pdf-qr.ts` / `pdf-stroeme.ts` | Rückfallebene: PDF-Bild-Objekte roh als Pixel lesen und den enthaltenen QR-Code decodieren – bewusst ohne vollständigen PDF-Renderer. |
-| `bogen-csv.ts` / `einsatz-csv.ts` / `oldenburg-xlsx.ts` / `xlsx.ts` / `csv.ts` | Datenexporte: vollständiges CSV je Bogen/Einsatz (Langformat mit Satzart-Spalte), CSV-Übersicht für die Lagekarte, XLSX im „Oldenburg"-Format, gemeinsame CSV-Formatgrundlagen (Semikolon, UTF-8-BOM, Dezimalkomma). |
-| `entwurf.ts` / `speicher-browser.ts` / `speicher-schonend.ts` / `einsaetze-lesen.ts` / `sicherung.ts` / `absenderkarte.ts` / `export-stand.ts` | Lokale Persistenz: Entwurfswiederherstellung, `localStorage`-Anbindung der Einsatz-Sammlung (seit 2026-10-05, R3-O2, mit schonender Hülle: kein Schreiben unveränderten Textes, Lesen scheitert nicht an einem gesperrten Speicher, Lese-Ergebnis gemerkt solange der Speichertext gleich ist), Datensicherung/-Export, freiwillige Absenderkarte, Export-Stand je Einsatz **und Format** (Sammel-PDF, Übersichts-CSV, Alle-Daten-CSV, Excel; welche Meldungen und welchen Zustand je Einheit der Stab in diesem Format schon bekommen hat — Grundlage des Teilexports „nur neue Bögen", `eeb.export-stand.v2`, nachgezogen 2026-10-06, R4-W2/K1), dazu Lageblatt- und Weitergabe-Stand (wann zuletzt ein Lageblatt bzw. die ganze Sammlung herausging; Übergabevermerk, nachgezogen 2026-09-29, R2-W5; beide führen seit 2026-10-06 den Zustand je Einheit, R4-K1) und Kenntnis-Stand (welche Meldungen an diesem Gerät zuletzt „zur Kenntnis genommen" wurden — Grundlage der Sammelquittung und der Marke „neue Fassung", `eeb.kenntnis-stand.v1`, nachgezogen 2026-10-04, R3-K1). |
+| `bogen-csv.ts` / `einsatz-csv.ts` / `csv.ts` | Datenexporte: vollständiges CSV je Bogen/Einsatz (Langformat mit Satzart-Spalte), CSV-Übersicht für die Lagekarte, gemeinsame CSV-Formatgrundlagen (Semikolon, UTF-8-BOM, Dezimalkomma). Der XLSX-Export im „Oldenburg"-Format (`oldenburg-xlsx.ts`, `xlsx.ts`) ist seit 2026-11-03 ausgebaut. |
+| `entwurf.ts` / `speicher-browser.ts` / `speicher-schonend.ts` / `einsaetze-lesen.ts` / `sicherung.ts` / `absenderkarte.ts` / `export-stand.ts` | Lokale Persistenz: Entwurfswiederherstellung, `localStorage`-Anbindung der Einsatz-Sammlung (seit 2026-10-05, R3-O2, mit schonender Hülle: kein Schreiben unveränderten Textes, Lesen scheitert nicht an einem gesperrten Speicher, Lese-Ergebnis gemerkt solange der Speichertext gleich ist), Datensicherung/-Export, freiwillige Absenderkarte, Export-Stand je Einsatz **und Format** (Sammel-PDF, Übersichts-CSV, Alle-Daten-CSV; bis 2026-11-03 auch Excel; welche Meldungen und welchen Zustand je Einheit der Stab in diesem Format schon bekommen hat — Grundlage des Teilexports „nur neue Bögen", `eeb.export-stand.v2`, nachgezogen 2026-10-06, R4-W2/K1), dazu Lageblatt- und Weitergabe-Stand (wann zuletzt ein Lageblatt bzw. die ganze Sammlung herausging; Übergabevermerk, nachgezogen 2026-09-29, R2-W5; beide führen seit 2026-10-06 den Zustand je Einheit, R4-K1) und Kenntnis-Stand (welche Meldungen an diesem Gerät zuletzt „zur Kenntnis genommen" wurden — Grundlage der Sammelquittung und der Marke „neue Fassung", `eeb.kenntnis-stand.v1`, nachgezogen 2026-10-04, R3-K1). |
 | `nativ.ts` / `hilfen.ts` / `geraete-schluessel.ts` | Abstraktion nativer Fähigkeiten über Capacitor; Anzeige-/Migrations-Helfer (`bogenLaden`, `migriereBogen`, `einheitAnzeigename`); Erzeugung/Verwaltung des geräteeigenen Ed25519-Schlüssels. |
 | `anzeige-modus.ts` / `org-farben.ts` | Dunkel-/Feld-/Nacht-Modus als Design-Token-Umschaltung; organisationsspezifische Akzentfarben, dazu je Kennfarbe die auf 4,5:1 gerechneten Kopf-Töne und im Dunkel-Modus der abgedunkelte Kopfbalken (`kopfDunkel()`, seit 2026-10-06, R4-L2). Im Feld-Modus trägt der Kopfbalken die auf 7:1 abgedunkelte Kennfarbe (`kopfFeld()`, Statusleiste folgt, seit 2026-10-15, R5-L3). |
 | `tipp-schutz.ts` | Fingerstellen-Sperre nach Handlungen, die unter dem Finger etwas austauschen (1,5 s, mehrere Stellen, nach bestätigter zerstörender Rückfrage verlängernd bis 4 s); ein verworfener Tipp zeigt „Einen Moment …" und einen Rahmen am Knopf (R5-S2); Mindestanzeigedauer der QR-Teile (R5-S1). |
@@ -1214,7 +1221,7 @@ war und ältere Angaben (z. B. „CC0") geprüft werden sollten.
 | PDF drucken mit QR | `pdf-dokument.ts`, `@bos/eeb-format/codec` |
 | QR/Foto/USB-Scanner einlesen | `qr-scanner-web.tsx`, `qr-stapel.ts`, `qr-boegen.ts`, `tastaturbelegung.ts` |
 | Einsatz-Sammlung/Meldekopf | `einsaetze-ui.tsx`, `@bos/meldekopf/*`, `auswertung.ts` |
-| CSV-/Excel-Export | `bogen-csv.ts`, `einsatz-csv.ts`, `oldenburg-xlsx.ts` |
+| CSV-Export | `bogen-csv.ts`, `einsatz-csv.ts` |
 | Vorlagen & Musterung, Vorlage bearbeiten/teilen | `vorlagen.ts` (`vorlageAktualisieren`), `vorlagen-ui.tsx`, `vorlageBearbeiten` in `app.tsx`, `vorlageTransportErzeugen` in `hilfen.ts` |
 | Signatur/Herkunft | `@bos/eeb-format/signatur`, `absenderkarte.ts`, `geraete-schluessel.ts` |
 | Offline-Betrieb (PWA) | `vite.config.ts` (VitePWA), `aktualisierung.tsx` |
@@ -2049,7 +2056,11 @@ Projekt-Dokumenten rekonstruiert — einschließlich der vier Kern-Submodule, de
 
 ### ADR-001: Eigener minimaler XLSX-Writer statt SheetJS/exceljs
 
-- **Kontext:** Der Excel-Export im Format „Oldenburg" benötigt nur ein einzelnes
+- **Status:** Zurückgezogen am 2026-11-03 — der Excel-Export im Format „Oldenburg"
+  ist ausgebaut, mit ihm der XLSX-Writer (`src/app/xlsx.ts`). Die Gegenstelle liest
+  Bögen über den Link (VBA-Portierung, Kap. 3.1) selbst in ihre Tabelle ein. Die
+  Entscheidung bleibt als Vorlage stehen, falls wieder ein XLSX-Weg gebraucht wird.
+- **Kontext:** Der Excel-Export im Format „Oldenburg" benötigte nur ein einzelnes
   Arbeitsblatt mit festen Spalten, Farben und Formaten.
 - **Entscheidung:** Ein selbst geschriebener, minimaler XLSX-Writer
   (`src/app/xlsx.ts`, ZIP-Container + zwei XML-Teile), der die bereits im Bundle
@@ -2154,7 +2165,6 @@ flowchart LR
   Q --> K["Kompatibilität /<br/>Interoperabilität"]
   K --> K1["Alte QR-Codes/Dateien bleiben lesbar"]
   K --> K2["Neue Bögen bleiben für alte App-Stände lesbar,<br/>solange keine neuen Merkmale genutzt werden"]
-  K --> K3["Oldenburg-Excel-Format exakt eingehalten"]
   Q --> S["Sicherheit /<br/>Datenschutz"]
   S --> S1["Keine Daten verlassen das Gerät ungefragt"]
   S --> S2["Herkunft nachweisbar (Signatur), keine Identität erzwungen"]
@@ -2312,4 +2322,4 @@ Repository-Analyse, keine offiziellen Angaben des Projekts.
 | Electron | Framework, das eine Web-App als Desktop-Anwendung ausliefert. |
 | Workbox / vite-plugin-pwa | Bibliothek bzw. Vite-Plugin zur Erzeugung des Service Workers samt Precache-Konfiguration. |
 | GoatCounter | Cookielose, datensparsame Web-Analytics-Lösung, der einzige in der CSP erlaubte externe Host. |
-| Oldenburg-Format | Nicht verhandelbares, festes Excel-Spaltenformat einer Führungsstelle (38 Spalten, feste Farben/Datumsformate). |
+| Oldenburg-Format | Festes Excel-Spaltenformat einer Führungsstelle (38 Spalten, feste Farben/Datumsformate), das die App bis 2026-11-03 als XLSX-Export bediente; seitdem entfallen. |

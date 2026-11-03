@@ -17,7 +17,6 @@ import { EinsatzDetail } from "./einsaetze-ui";
 import { DaumenQuittung, QUITTUNG_ENDE_NACH_MS } from "./daumen-quittung";
 import { anfuehrung, anfuehrungWaechterStarten } from "./typografie";
 import { csvFeld, mitNachtragSpalte } from "./csv";
-import { xmlText } from "./xlsx";
 import { winAnsiText, bemerkungKurz, einsatzPdfDokument, lageblattAenderungen } from "./pdf-dokument";
 import { bogenDiff, istMwdFeld } from "./diff-lage";
 import { nurStaerkeUebernehmen } from "./nur-staerke";
@@ -109,7 +108,6 @@ function Wirt({ id, extra }: { id: string; extra?: Partial<Props> }) {
         onExport={() => {}}
         onCsvExport={() => {}}
         onCsvDetailExport={() => {}}
-        onOldenburgExport={() => {}}
         onSammelPdf={() => {}}
         onGeloescht={() => {}}
         {...extra}
@@ -292,10 +290,9 @@ describe("R17-W3 Anführungszeichen", () => {
     expect(anfuehrung("ohne Anführung")).toBe("ohne Anführung");
   });
 
-  it("gilt in den Dateien: CSV, PDF, Excel", () => {
+  it("gilt in den Dateien: CSV, PDF", () => {
     expect(csvFeld('Hinweis „Nr. 2"')).toBe("Hinweis „Nr. 2“");
     expect(winAnsiText('Zug „1. Zug"')).toBe("Zug „1. Zug“");
-    expect(xmlText('Spalte „Hinweis"')).toBe("Spalte „Hinweis“");
   });
 
   it("der Wächter richtet Text und Beschriftungen in der Oberfläche aus, auch später eingefügte", async () => {
@@ -469,7 +466,7 @@ describe("R17-A5 eigene Auswertung beim Einlesen", () => {
     for (const name of [
       "eeb-einsatz-271913okt26_Hochwasser_Test.csv",
       "eeb-einsatz-271913okt26_Hochwasser_Test-alle-daten.csv",
-      "eeb-einsatz-271913okt26_Test-oldenburg.xlsx",
+      "eeb-einsatz-271913okt26_Test-oldenburg.xlsx", // Excel-Liste bis 2026-11; alte Dateien bleiben erkannt
       "2026-10-27_1913_eeb-einsatz_Hochwasser_Test.csv",
       "2026-10-27_1913_eeb-einsatz-alle-daten-nachtrag_Hochwasser_Test.csv",
       "2026-10-27_1913_eeb-einsatz-oldenburg_Test.xlsx",

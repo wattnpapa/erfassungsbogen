@@ -71,7 +71,6 @@ function Wirt({ id, manuell = () => {}, schnell }: { id: string; manuell?: () =>
         onExport={() => {}}
         onCsvExport={() => {}}
         onCsvDetailExport={() => {}}
-        onOldenburgExport={() => {}}
         onSammelPdf={() => {}}
         onWeitergeben={() => {}}
         onGeloescht={() => {}}
@@ -319,7 +318,6 @@ describe("R21-M2, N5, E2, A2: Platzhalter der Einsatzansicht", () => {
         onExport={() => {}}
         onCsvExport={() => {}}
         onCsvDetailExport={() => {}}
-        onOldenburgExport={() => {}}
         onSammelPdf={() => {}}
         onGeloescht={() => {}}
       />,

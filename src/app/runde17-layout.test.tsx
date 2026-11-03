@@ -66,7 +66,6 @@ function ansicht(namen: string[], extra: Partial<Props> = {}) {
         onExport={() => {}}
         onCsvExport={() => {}}
         onCsvDetailExport={() => {}}
-        onOldenburgExport={() => {}}
         onSammelPdf={() => {}}
         onGeloescht={() => {}}
         {...extra}

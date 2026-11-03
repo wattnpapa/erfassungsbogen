@@ -59,7 +59,6 @@ function ansicht(namen: string[]) {
         onExport={() => {}}
         onCsvExport={() => {}}
         onCsvDetailExport={() => {}}
-        onOldenburgExport={() => {}}
         onSammelPdf={() => {}}
         onGeloescht={() => {}}
       />

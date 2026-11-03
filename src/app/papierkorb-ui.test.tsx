@@ -202,7 +202,6 @@ describe("Einsatz löschen quittiert mit Rückgängig (R2-D6)", () => {
           onExport={() => {}}
           onCsvExport={() => {}}
           onCsvDetailExport={() => {}}
-          onOldenburgExport={() => {}}
           onSammelPdf={() => {}}
           onGeloescht={() => {}}
         />

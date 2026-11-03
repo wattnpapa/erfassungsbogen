@@ -75,7 +75,6 @@ function Wirt({ id }: { id: string }) {
         onExport={() => {}}
         onCsvExport={() => {}}
         onCsvDetailExport={() => {}}
-        onOldenburgExport={() => {}}
         onSammelPdf={() => {}}
         onWeitergeben={() => {}}
         onGeloescht={() => {}}

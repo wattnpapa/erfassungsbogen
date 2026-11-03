@@ -29,7 +29,7 @@ Der komplette Bogeninhalt steckt in einem einzigen QR-Code auf der letzten PDF-S
 - Läuft im Browser (PWA, erfassungsbogen.app), als Desktop-App (Electron: Windows x64/arm64, macOS, Linux) und als Android-App (Capacitor); iOS in Vorbereitung. Einheitliche Web-Designsprache auf allen Plattformen.
 - Transportwege ohne Netz: QR-Code (Kamera, USB-Handscanner am PC), AirDrop/Quick Share, Datei; PDF trägt den Bogen als QR mit sich.
 - Papier-Erfassungsbogen der Organisationen ist die Referenz: das PDF muss dem gewohnten Papier-Layout entsprechen, damit es in bestehende Meldewege passt.
-- Anschlussformate der Führungsstellen: CSV je Einsatz, Excel-Liste im Format „Oldenburg".
+- Anschlussformate der Führungsstellen: CSV je Einsatz (Übersicht und alle Daten); Bögen gelangen über den geteilten Link direkt in deren Tabellen (Excel-Leser im Format-Repo). Die Excel-Liste im Format „Oldenburg" gab es bis 2026-11-03.
 
 ## Capabilities and Constraints
 

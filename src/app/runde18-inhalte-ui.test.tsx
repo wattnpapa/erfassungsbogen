@@ -64,7 +64,6 @@ function Wirt({ id, extra = {} }: { id: string; extra?: Partial<Props> }) {
         onExport={() => {}}
         onCsvExport={() => {}}
         onCsvDetailExport={() => {}}
-        onOldenburgExport={() => {}}
         onSammelPdf={() => {}}
         onWeitergeben={() => {}}
         onGeloescht={() => {}}
@@ -126,7 +125,7 @@ describe("R18-A6/A7 Block „Übergabe und Abschluss“", () => {
     expect(document.querySelector(".einsatz-beendet-kopf")).toBeNull();
     await nutzer.click(await screen.findByRole("button", { name: "Einsatz als beendet markieren" }));
     const hinweis = document.querySelector(".einsatz-beendet")!;
-    expect(hinweis.textContent).toMatch(/^Einsatz beendet .+ — noch offen: Weitergabe-Datei \(Sammel-PDF\), Lageblatt, Übersicht als CSV, Alle Daten als CSV, Excel-Liste, Datensicherung\./);
+    expect(hinweis.textContent).toMatch(/^Einsatz beendet .+ — noch offen: Weitergabe-Datei \(Sammel-PDF\), Lageblatt, Übersicht als CSV, Alle Daten als CSV, Datensicherung\./);
     expect(document.querySelector(".einsatz-beendet-kopf")!.textContent).toMatch(/^Einsatz beendet /);
     expect(abschlussLaden(s.id).beendetAm).toBeTypeOf("number");
     await nutzer.click(screen.getByRole("button", { name: "Wieder öffnen" }));

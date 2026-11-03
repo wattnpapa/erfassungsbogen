@@ -45,7 +45,6 @@ function ansicht(einsatzId: string, extra: Partial<Props> = {}) {
         onExport={() => {}}
         onCsvExport={() => {}}
         onCsvDetailExport={() => {}}
-        onOldenburgExport={() => {}}
         onSammelPdf={() => {}}
         onGeloescht={() => {}}
         {...extra}
@@ -236,16 +235,15 @@ describe("R12-G2 Doppeltipp auf die Ausgaben der Einsatzansicht", () => {
     expect(csv).toHaveBeenCalledTimes(1);
   });
 
-  it("gilt für Lageblatt, Weitergabe, Alle Daten als CSV und Excel-Liste", async () => {
+  it("gilt für Lageblatt, Weitergabe und Alle Daten als CSV", async () => {
     const nutzer = userEvent.setup();
-    const f = { lageblatt: vi.fn(), weitergeben: vi.fn(), detail: vi.fn(), xlsx: vi.fn() };
+    const f = { lageblatt: vi.fn(), weitergeben: vi.fn(), detail: vi.fn() };
     ansicht(einsatzMit(["Wardenburg"]), {
       onLageblatt: f.lageblatt,
       onWeitergeben: f.weitergeben,
       onCsvDetailExport: f.detail,
-      onOldenburgExport: f.xlsx,
     });
-    for (const name of [/^Lageblatt/, /^Einsatz weitergeben/, "Alle Daten als CSV", /^Excel-Liste/]) {
+    for (const name of [/^Lageblatt/, /^Einsatz weitergeben/, "Alle Daten als CSV"]) {
       const knopf = screen.getByRole("button", { name });
       await nutzer.click(knopf);
       await nutzer.click(knopf);
@@ -253,7 +251,6 @@ describe("R12-G2 Doppeltipp auf die Ausgaben der Einsatzansicht", () => {
     expect(f.lageblatt).toHaveBeenCalledTimes(1);
     expect(f.weitergeben).toHaveBeenCalledTimes(1);
     expect(f.detail).toHaveBeenCalledTimes(1);
-    expect(f.xlsx).toHaveBeenCalledTimes(1);
   });
 
   it("nach Ablauf der Sperre geht der nächste bewusste Tipp wieder durch", async () => {

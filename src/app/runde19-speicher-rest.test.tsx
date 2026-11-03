@@ -55,7 +55,6 @@ function Wirt({ id, extra }: { id: string; extra?: Partial<Props> }) {
         onExport={() => {}}
         onCsvExport={() => {}}
         onCsvDetailExport={() => {}}
-        onOldenburgExport={() => {}}
         onSammelPdf={() => {}}
         onGeloescht={() => {}}
         {...extra}
@@ -168,7 +167,7 @@ describe("R19-W10/S13/S12 Rückfrage, Export-Satz und Sprung", () => {
     weitergabeVermerken(einsaetzeLaden()[0]!);
     render(<Wirt id={s.id} />);
     expect(document.body.textContent).not.toContain("Noch kein Export aus diesem Einsatz");
-    expect(document.body.textContent).toMatch(/Kein Export an den Stab \(CSV, Excel, Teil-PDF\) — die Weitergabe-Datei vom .* zählt hier nicht/);
+    expect(document.body.textContent).toMatch(/Kein Export an den Stab \(CSV, Teil-PDF\) — die Weitergabe-Datei vom .* zählt hier nicht/);
   });
 
   it("S12: ein Sprungverweis führt zum Abschluss, der Kopf nennt nach dem Beenden die offenen Wege", () => {
@@ -178,7 +177,7 @@ describe("R19-W10/S13/S12 Rückfrage, Export-Satz und Sprung", () => {
     render(<Wirt id={s.id} extra={{ onWeitergeben: () => {}, onLageblatt: () => {} }} />);
     expect(screen.getByRole("button", { name: "Übergabe, Abschluss ↓" })).toBeDefined();
     expect(document.getElementById("abschluss")).not.toBeNull();
-    expect(document.querySelector(".einsatz-beendet-kopf")!.textContent).toMatch(/Einsatz beendet .* — noch offen: Weitergabe-Datei \(Sammel-PDF\), Lageblatt und 4 weitere/);
+    expect(document.querySelector(".einsatz-beendet-kopf")!.textContent).toMatch(/Einsatz beendet .* — noch offen: Weitergabe-Datei \(Sammel-PDF\), Lageblatt und 3 weitere/);
   });
 });
 
@@ -256,17 +255,17 @@ describe("R19-A2 Lücke in den Nummern in Lageblatt, Sammel-PDF und CSV", () => 
 describe("R19-K8 Übernommene Stempel gelten nicht als „erzeugt“", () => {
   beforeEach(() => localStorage.clear());
 
-  it("ein Excel-Stempel vom anderen Gerät steht als „vom anderen Gerät übernommen, hier nicht erzeugt“", () => {
+  it("ein CSV-Stempel vom anderen Gerät steht als „vom anderen Gerät übernommen, hier nicht erzeugt“", () => {
     const s = einsatzAnlegen("Hochwasser Import", EinsatzArt.EINSATZ);
     meldungHinzufuegen(s.id, bogenMitName("Alpha"));
     const einsatz = einsaetzeLaden().find((x) => x.id === s.id)!;
-    exportStaendeUebernehmen(s.id, { xlsx: { zeitpunkt: Date.now() + 1000, eintragIds: einsatz.eintraege.map((e) => e.id) } }, [s.id]);
+    exportStaendeUebernehmen(s.id, { "csv-detail": { zeitpunkt: Date.now() + 1000, eintragIds: einsatz.eintraege.map((e) => e.id) } }, [s.id]);
     const wege = abschlussWege(einsatz);
-    const excel = wege.find((w) => w.name === "Excel-Liste")!;
-    expect(excel.getan).toBe(false);
-    expect(excel.fremd).toBe("geraet");
+    const csv = wege.find((w) => w.name === "Alle Daten als CSV")!;
+    expect(csv.getan).toBe(false);
+    expect(csv.fremd).toBe("geraet");
     render(<Wirt id={s.id} />);
-    const zeile = [...document.querySelectorAll(".abschluss-liste p")].find((p) => p.textContent!.includes("Excel-Liste:"))!;
+    const zeile = [...document.querySelectorAll(".abschluss-liste p")].find((p) => p.textContent!.includes("Alle Daten als CSV:"))!;
     expect(zeile.textContent).toContain("vom anderen Gerät übernommen, hier nicht erzeugt");
     expect(zeile.textContent).not.toMatch(/: erzeugt/);
   });

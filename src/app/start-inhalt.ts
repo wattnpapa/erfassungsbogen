@@ -153,7 +153,7 @@ export const START_ABSCHNITTE: Abschnitt[] = [
       {
         art: "absatz",
         teile: [
-          "Jede Meldung landet in einer Historie; ein Vergleich zeigt zur Schichtübergabe, was sich seit der letzten Meldung geändert hat. Für die Weitermeldung erzeugt die Sammlung ein Sammel-PDF, eine CSV-Liste je Einsatz und eine Excel-Liste im Format „Oldenburg“.",
+          "Jede Meldung landet in einer Historie; ein Vergleich zeigt zur Schichtübergabe, was sich seit der letzten Meldung geändert hat. Für die Weitermeldung erzeugt die Sammlung ein Sammel-PDF und CSV-Listen je Einsatz.",
         ],
       },
     ],

@@ -53,9 +53,13 @@ export function exportKennzeile(s: Pick<Einsatzsammlung, "name">, erstellt: numb
 }
 
 /** Ausgabewege mit eigenem Bezugspunkt für „nur neue Bögen". */
-export type ExportZiel = "pdf" | "csv" | "csv-detail" | "xlsx";
+export type ExportZiel = "pdf" | "csv" | "csv-detail";
 
-export const EXPORT_ZIELE: readonly ExportZiel[] = ["pdf", "csv", "csv-detail", "xlsx"];
+/**
+ * Bis 2026-11 gab es ein viertes Ziel `xlsx` (Excel-Liste im Format „Oldenburg"). Ein alter Stand
+ * dazu wird beim Lesen schlicht übergangen und beim nächsten Schreiben nicht mehr mitgenommen.
+ */
+export const EXPORT_ZIELE: readonly ExportZiel[] = ["pdf", "csv", "csv-detail"];
 
 /** Wie das Format in der Zeile unter dem Kästchen heißt. */
 export const EXPORT_ZIEL_NAME: Record<ExportZiel, string> = {
@@ -64,7 +68,6 @@ export const EXPORT_ZIEL_NAME: Record<ExportZiel, string> = {
   pdf: "Sammel-PDF an den Stab",
   csv: "Übersicht als CSV",
   "csv-detail": "Alle Daten als CSV",
-  xlsx: "Excel-Liste",
 };
 /**
  * Wann zuletzt ein Lageblatt erzeugt wurde, und was da in der Sammlung stand.

@@ -16,6 +16,16 @@ Grundlage: Repository `wattnpapa/erfassungsbogen`, Stand 2026-09-12 — Version 
 > Abhängigkeiten (6.4/R8/M8). Die betroffenen Abschnitte sind entsprechend
 > gekennzeichnet.
 >
+> **Nachgezogen 2026-11-03 — Excel-Liste „Oldenburg" entfernt:** Exportwege (5.4):
+> Der XLSX-Export der Einheitenliste (`src/app/oldenburg-xlsx.ts`, `src/app/xlsx.ts`)
+> ist ausgebaut; die Gegenstelle übernimmt Bögen über den Link (VBA-Leser, Anhang)
+> selbst. Es bleiben PDF und CSV. Damit entfällt ein Weg, über den Notiz-Freitext und
+> Erreichbarkeit der Führungskraft das Gerät verließen; neue Speicherorte oder
+> Netzverbindungen entstehen nicht. Der Export-Stand (5.5, `eeb.export-stand.v2`)
+> kennt die Ziele `pdf`, `csv`, `csv-detail`; ein alter `xlsx`-Eintrag wird beim Lesen
+> übergangen und beim nächsten Schreiben nicht mehr mitgeführt. Die Anforderung
+> „korrektes XLSX-Escaping" in der Tabelle unter 6 ist gegenstandslos.
+>
 > **Nachgezogen 2026-11-02 — Schema 12:** Transportformat (5.2): Funkrufname als
 > Erreichbarkeit einer Person (`KontaktArt.FUNK`, Art-Wert 3 im Kontakt-Byte, Wert als
 > String wie eine E-Mail-Adresse). Nur Bögen mit dieser Kontaktart sind Schema 12;
@@ -840,10 +850,10 @@ Datenausleitung an eine andere Herkunft ist technisch unterbunden.
 - **CSV-Export** (`src/app/csv.ts`): Werte, die mit `=` `+` `-` `@` oder
   Tab/CR beginnen, werden mit einem führenden `'` versehen — eine dokumentierte,
   korrekt umgesetzte Abwehr gegen CSV-Formel-Injection.
-- **XLSX-Export** (`src/app/xlsx.ts`): korrektes XML-Escaping der Zellinhalte.
+- **XLSX-Export** (`src/app/xlsx.ts`): gab es bis 2026-11-03 (korrektes
+  XML-Escaping der Zellinhalte); ausgebaut, siehe Nachtrag oben.
 
-> *Prüfvermerk:* Beides im Code bestätigt (`FORMEL_START = /^[=+\-@\t\r]/`;
-> `&`/`<`-Escaping im XLSX-Writer).
+> *Prüfvermerk:* Formel-Schutz im Code bestätigt (`FORMEL_START = /^[=+\-@\t\r]/`).
 
 - **Lageblatt und Übergabeblatt der Einsatz-Sammlung** (`src/app/pdf.ts`,
   `pdf-dokument.ts`, seit 2026-09-27): Das Übergabeblatt (Seite 1 der
@@ -927,15 +937,11 @@ Datenausleitung an eine andere Herkunft ist technisch unterbunden.
   vom Nutzer gewählten Dateien, nur auf dem Bildschirm) und trägt „Lage vom
   Papier abgleichen…" als Knopf. Das Lageblatt hat damit bei etwa sechs bis
   zehn Einheiten zwei Seiten (Seite 2 sind die Nachtragszeilen).
-- **Excel-Liste „Oldenburg"** (`src/app/oldenburg-xlsx.ts`, seit 2026-09-29,
-  Audit Runde 2, R2-K2): führt dieselben Führungsstellen-Angaben — Eintreffzeit
-  in „eingetr. / zugew.", Abrückzeit in „Einsatz-ende", Auftrag/Notiz
-  (Freitext) in „Aufträge". Der Freitext steht als `inlineStr` in der Zelle
-  und wird von Excel nie als Formel ausgewertet; `&`/`<` escapt der
-  XLSX-Writer. Die SUBTOTAL-Summen laufen nur über die in die Lage zählenden
-  Einheiten (dieselbe Regel wie App und CSV); abgerückte, aufgegangene und
-  Übungsmeldungen stehen gekennzeichnet in einem Block darunter — eine zu
-  hohe Stärke in der Liste der nächsten Ebene wäre ein Integritätsfehler.
+- **Excel-Liste „Oldenburg"** (`src/app/oldenburg-xlsx.ts`, 2026-09-29 bis
+  2026-11-03, Audit Runde 2, R2-K2): führte dieselben Führungsstellen-Angaben in
+  den Spalten der fremden Vorlage; Freitext als `inlineStr`, Summen nur über die
+  in die Lage zählenden Einheiten. Ausgebaut; die Gegenstelle liest den Bogen
+  über den Link selbst ein.
 
 - **Teilexport „Nur neue Bögen seit dem letzten Export"**
   (`src/app/export-stand.ts`, seit 2026-09-27): Sammel-PDF, beide CSV-Wege und
@@ -1169,7 +1175,7 @@ ORP.1 Organisation, INF.1 Gebäude) sind nicht Gegenstand dieses Dokuments.
 | Anforderung (sinngemäß) | Status | Fundstelle/Anmerkung |
 | --- | --- | --- |
 | Content-Security-Policy zur Reduktion der Angriffsfläche | Erfüllt (Skript) / bewusster Rest (Style) | `script-src` ohne `'unsafe-inline'`, Inline-Blöcke per `sha256`-Hash freigegeben; `style-src` behält `'unsafe-inline'` wegen der `style`-Attribute von React (siehe 5.3) |
-| Eingabevalidierung / Schutz vor Injection | Erfüllt (für die geprüften Exportpfade) | CSV-Formel-Injection-Schutz, korrektes XLSX-Escaping |
+| Eingabevalidierung / Schutz vor Injection | Erfüllt (für die geprüften Exportpfade) | CSV-Formel-Injection-Schutz (der XLSX-Export ist seit 2026-11-03 ausgebaut) |
 | Robustheit gegenüber fehlerhaften/böswilligen Eingabedaten | Erfüllt | Dekomprimierung importierter QR-/Dateidaten läuft über `inflateRawBegrenzt` (`src/app/hilfen.ts`) mit Obergrenze `MAX_ENTPACKT = 4 MiB`, streamend geprüft — bricht ab, bevor der Speicher volläuft |
 | Pflichtfelder von Bögen aus Dateien und Entwürfen | Erfüllt (seit 2026-10-14, R5-E1) | `src/app/bogen-pruefung.ts`: Harmloses (fehlender Einheitstyp, Listen, Namen) wird ergänzt, Unbrauchbares (Einheit, Stand, Einsatzzeitraum, Personenliste) mit Ursache abgelehnt — Einsatz-Datei, „Bögen einlesen…", „Aus Datei laden…" und Entwurf; ein Bogen ohne Einheitstyp machte vorher die App dauerhaft weiß |
 | Fangnetz bei Abstürzen der Ansicht | Erfüllt (seit 2026-10-14, R5-E1) | `src/app/fehlerfaenger.tsx` um die ganze App: deutsche Meldung, Neu laden, Zur Startseite (vergisst die zuletzt geöffnete Sammlung), „Daten sichern" (Datei mit allen `eeb.`-Einträgen) und, mit Rückfrage, „Alle Daten löschen" |
@@ -1280,7 +1286,7 @@ Quellcode und dessen Code-Kommentare/Dokumentation:
 - `vite.config.ts` — Content-Security-Policy des Produktions-Builds
 - `vendor/eeb-format/src/signatur.ts`, `src/app/geraete-schluessel.ts` — Schlüsselerzeugung, Signatur, Speicherung
 - `vendor/eeb-format/src/codec.ts` — QR-/Datei-Payload-Format, Kompression/Dekompression
-- `src/app/csv.ts`, `src/app/xlsx.ts` — Exportformate und deren Absicherung
+- `src/app/csv.ts` — Exportformat CSV und dessen Absicherung
 - `src/app/sicherung.ts`, `src/app/vorlagen.ts`, `src/app/hilfen.ts` — Papierkorb-/Löschfunktion, Schema-Migration
 - `docs/datenmodell.md` — Datenmodell, Trust-Modell, QR-Payload-Format
 - `package.json` (Feld `build`), `.github/workflows/release.yml`, `.github/workflows/ci.yml` — Build-, Signier- und CI/CD-Konfiguration

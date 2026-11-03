@@ -71,7 +71,6 @@ function ansicht(einsatzId: string, extra: Partial<Props> = {}) {
         onExport={() => {}}
         onCsvExport={csvExport}
         onCsvDetailExport={() => {}}
-        onOldenburgExport={() => {}}
         onSammelPdf={sammelPdf}
         onGeloescht={() => {}}
         {...extra}
@@ -1093,8 +1092,8 @@ describe("Nur neue Bögen seit dem letzten Export", () => {
     const nutzer = userEvent.setup();
     const { sammelPdf, csvExport } = buehne(["Wardenburg", "Hatten", "Ganderkesee"], { standAus: ["Wardenburg"] });
 
-    // Je Format ein eigener Bezugspunkt (R4-W2): hier haben alle vier denselben.
-    expect(screen.getAllByText(/seitdem 2 neue Bögen/)).toHaveLength(4);
+    // Je Format ein eigener Bezugspunkt (R4-W2): hier haben alle drei denselben.
+    expect(screen.getAllByText(/seitdem 2 neue Bögen/)).toHaveLength(3);
     await nutzer.click(screen.getByRole("checkbox", { name: /Nur neue Bögen seit dem letzten Export/ }));
 
     await nutzer.click(screen.getByRole("button", { name: /^Sammel-PDF \((nur neue Bögen|erste Lieferung: alle Bögen)\)$/ }));
@@ -1119,7 +1118,7 @@ describe("Nur neue Bögen seit dem letzten Export", () => {
 
     await nutzer.click(screen.getByRole("checkbox", { name: /Nur neue Bögen seit dem letzten Export/ }));
 
-    for (const name of [/^Sammel-PDF \(nur neue Bögen\)$/, "Übersicht als CSV — Nachtrag: nichts Neues", "Alle Daten als CSV — Nachtrag: nichts Neues", /^Excel-Liste .* — Nachtrag: nichts Neues$/]) {
+    for (const name of [/^Sammel-PDF \(nur neue Bögen\)$/, "Übersicht als CSV — Nachtrag: nichts Neues", "Alle Daten als CSV — Nachtrag: nichts Neues"]) {
       expect((screen.getByRole("button", { name }) as HTMLButtonElement).disabled).toBe(true);
     }
     await nutzer.click(screen.getByRole("button", { name: /^Sammel-PDF \((nur neue Bögen|erste Lieferung: alle Bögen)\)$/ }));

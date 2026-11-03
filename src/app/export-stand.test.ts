@@ -15,6 +15,7 @@ import {
   type ExportStand,
   exportSammlung,
   exportStandLaden,
+  exportStaendeLaden,
   exportVermerken,
   exportStaendeUebernehmen,
   exportStandAusWeitergabe,
@@ -198,15 +199,15 @@ describe("Stände je Format (Audit Runde 4, R4-W2)", () => {
     const b = eintrag("m2", "Hatten", 2000);
     exportVermerken(sammlung("e1", [a]), "csv", undefined, 5000);
     expect(exportStandLaden("e1", "csv")).not.toBeNull();
-    expect(exportStandLaden("e1", "xlsx")).toBeNull();
+    expect(exportStandLaden("e1", "csv-detail")).toBeNull();
     expect(exportStandLaden("e1", "pdf")).toBeNull();
-    // Excel hat noch keinen Stand: für das Format ist alles neu.
-    expect(exportSammlung(sammlung("e1", [a, b]), "neue", exportStandLaden("e1", "xlsx")).eintraege.map((e) => e.id)).toEqual(["m1", "m2"]);
+    // Die Alle-Daten-CSV hat noch keinen Stand: für das Format ist alles neu.
+    expect(exportSammlung(sammlung("e1", [a, b]), "neue", exportStandLaden("e1", "csv-detail")).eintraege.map((e) => e.id)).toEqual(["m1", "m2"]);
     expect(exportSammlung(sammlung("e1", [a, b]), "neue", exportStandLaden("e1", "csv")).eintraege.map((e) => e.id)).toEqual(["m2"]);
-    // Danach Excel: die anderen Stände bleiben.
-    exportVermerken(sammlung("e1", [a, b]), "xlsx", undefined, 6000);
+    // Danach die Alle-Daten-CSV: die anderen Stände bleiben.
+    exportVermerken(sammlung("e1", [a, b]), "csv-detail", undefined, 6000);
     expect(exportStandLaden("e1", "csv")!.eintragIds).toEqual(["m1"]);
-    expect(exportStandLaden("e1", "xlsx")!.eintragIds).toEqual(["m1", "m2"]);
+    expect(exportStandLaden("e1", "csv-detail")!.eintragIds).toEqual(["m1", "m2"]);
   });
 
   it("lässt den Stand der Weitergabe und des Lageblatts unberührt (und umgekehrt)", () => {
@@ -376,9 +377,12 @@ describe("Nachtrag: Gründe, Namen, Stände vom anderen Gerät (Audit Runde 5, R
     exportStaendeUebernehmen("e1", { csv: dort });
     expect(exportStandLaden("e1", "csv")).toMatchObject({ zeitpunkt: 5000, eintragIds: ["m1"], herkunft: "geraet" });
     // Ein eigener, älterer Stand wird ergänzt, nicht verdrängt.
-    exportVermerken(sammlung("e1", [b]), "xlsx", undefined, 100);
-    exportStaendeUebernehmen("e1", { xlsx: { zeitpunkt: 200, eintragIds: ["m1"] } });
-    expect(exportStandLaden("e1", "xlsx")).toMatchObject({ zeitpunkt: 200, eintragIds: ["m2", "m1"] });
+    exportVermerken(sammlung("e1", [b]), "csv-detail", undefined, 100);
+    exportStaendeUebernehmen("e1", { "csv-detail": { zeitpunkt: 200, eintragIds: ["m1"] } });
+    expect(exportStandLaden("e1", "csv-detail")).toMatchObject({ zeitpunkt: 200, eintragIds: ["m2", "m1"] });
+    // Ein Stand aus einem Format, das es nicht mehr gibt (Excel-Liste bis 2026-11), wird übergangen.
+    exportStaendeUebernehmen("e1", { xlsx: { zeitpunkt: 300, eintragIds: ["m1"] } });
+    expect(exportStaendeLaden("e1")).not.toHaveProperty("xlsx");
     exportStaendeUebernehmen("e1", "kaputt");
   });
 

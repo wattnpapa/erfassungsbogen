@@ -51,7 +51,6 @@ describe("Einsatzliste und Einsatzansicht laden nach", () => {
         onExport={() => {}}
         onCsvExport={() => {}}
         onCsvDetailExport={() => {}}
-        onOldenburgExport={() => {}}
         onSammelPdf={() => {}}
         onGeloescht={() => {}}
       />,

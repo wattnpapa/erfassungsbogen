@@ -85,8 +85,8 @@ so von 843 kB auf 1.258 kB; mit modulgenauen Importen sind es 839 kB.
   aber ohne Kennzahl — dort unterscheidet der OV-Name selbst, also bleibt es
   beim Regelfall. Die Tabelle wandert in `@bos/vokabulare`, sobald der
   Meldekopf sie eigenständig braucht.
-- `pdf-dokument.ts`, `geraete-schluessel.ts` sowie Auswertung, Einheitenliste,
-  XLSX und CSV. Letztere sind Stufe 2 in ADR-003 und wandern erst bei Bedarf.
+- `pdf-dokument.ts`, `geraete-schluessel.ts` sowie Auswertung, Einheitenliste
+  und CSV. Letztere sind Stufe 2 in ADR-003 und wandern erst bei Bedarf.
 
 ## Stückliste (SBOM) und Schwachstellen
 
@@ -483,30 +483,11 @@ localStorage-Hülle getrennt und unit-getestet.
   Übersicht enthält er auch abgerückte/aufgegangene Einheiten — die
   `Status`-Spalte hält sie auseinander. Formatgrundlagen (Semikolon, UTF-8-BOM,
   Dezimalkomma für Excel(DE)) stehen in [src/app/csv.ts](../src/app/csv.ts).
-- [src/app/oldenburg-xlsx.ts](../src/app/oldenburg-xlsx.ts) — XLSX im **fremden**
-  Format „Oldenburg": die Einheitenliste der Führungsstelle, 36 Spalten (A–AJ) in
-  fester Reihenfolge, Zeile 1 farbige Leiste mit `SUBTOTAL`-Summen, Zeile 2
-  Kopfzeile, ab Zeile 3 je Einheit eine Zeile. Für den Einzelbogen wie für die
-  ganze Sammlung. Bei der Sammlung laufen die Summen nur über die Einheiten,
-  die in die Lage zählen (`zaehltInLage`, wie App und CSV); abgerückte,
-  aufgegangene und Übungsmeldungen folgen nach einer Leerzeile in einem
-  überschriebenen Block außerhalb der Formeln. Eintreffzeit, Abrückzeit und
-  Auftrag/Notiz des Meldekopfs landen in „eingetr. / zugew.", „Einsatz-ende"
-  und „Aufträge"; der Ort/Auftrag aus dem Bogen in „Vorgesehener Auftrag". Spaltenfolge, Farben, Rahmen und das Datumsformat sind aus der
-  Vorlagendatei übernommen und **nicht verhandelbar** — der Empfänger fügt die
-  Zeilen in seine laufende Liste ein. Spalten, die der Führungsstelle gehören
-  (Ablösung, Anforderungs-ID, Zusagen, Rückführung, Schicht, FüSt.), bleiben
-  bewusst leer; die Datumsspalten darunter werden trotzdem vorformatiert
-  geschrieben, damit die Handeingabe dort richtig aussieht. Die Einheit wird über
-  ihren ausgeschriebenen Einheitstyp in Zug/Trupp/Gruppe/Person einsortiert
-  (Trupp vor Zug geprüft: „Zugtrupp Technischer Zug" ist ein Trupp).
-- [src/app/xlsx.ts](../src/app/xlsx.ts) — minimaler XLSX-Schreiber (ZIP + zwei
-  XML-Teile) für genau ein Blatt. Kein SheetJS/exceljs: die Kompression kommt aus
-  dem bereits vorhandenen `pako`, es entsteht keine neue Abhängigkeit. Texte
-  stehen als `inlineStr` direkt in der Zelle (keine `sharedStrings`), die
-  ZIP-Zeitstempel sind fest — gleicher Inhalt ergibt byteweise dieselbe Datei.
-  Beide Module werden per `import()` erst beim Klick geladen (eigener Chunk, wie
-  die PDF).
+- Die Excel-Liste im Format „Oldenburg" (`oldenburg-xlsx.ts` samt eigenem
+  XLSX-Schreiber `xlsx.ts`) gab es von 2026-09-29 bis 2026-11-03. Sie ist
+  ausgebaut: die Gegenstelle liest Bögen über den Link (VBA-Portierung in
+  `vendor/eeb-format/ports/`) selbst in ihre Tabelle ein. Arc42 ADR-001 hält die
+  Entscheidung für den Schreiber als zurückgezogen fest.
 - [src/app/einsaetze-ui.tsx](../src/app/einsaetze-ui.tsx) — Liste, Detailansicht
   (Summen, Zwischensummen, Einheitenliste mit Suche/Sortierung und
   Status/Historie), Sammeln per Scan/Datei/manuell.

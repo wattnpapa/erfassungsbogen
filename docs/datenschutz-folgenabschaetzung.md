@@ -11,6 +11,15 @@ Grundlage: Repository `wattnpapa/erfassungsbogen`, Stand 2026-09-12 — Version 
 > **Wichtig:** Der Commit „Sicherheitsbericht umsetzen" (`c7604e9`, 2026-09-12)
 > hat das in R5/M6 genannte Dekomprimierungs-Risiko bereits behoben.
 >
+> **Nachgezogen 2026-11-03 — Excel-Liste „Oldenburg" entfernt:** Der Exportweg
+> „Excel-Liste im Format „Oldenburg"" (Einzelbogen und Einsatz-Sammlung) ist ausgebaut;
+> die übergeordnete Führungsstelle übernimmt Bögen über den geteilten Link selbst in
+> ihre Tabelle. Es bleiben PDF, Übersichts-CSV und Alle-Daten-CSV. Keine neue
+> Datenkategorie, kein neuer Empfänger, keine neue Netzverbindung; ein Weg weniger,
+> über den Notiz-Freitext und Erreichbarkeit der Führungskraft das Gerät verließen.
+> Geändert: 5.1, 5.5, 5.7 (Export-Stand ohne `xlsx`), Risiko R2 (nur noch PDF/CSV).
+> Ältere Nachträge darunter, die die Excel-Liste nennen, sind Geschichte.
+>
 > **Nachgezogen 2026-11-02 — Schema 12:** Datenkategorie Kontaktdaten erweitert (5.4):
 > der Funkrufname einer Person (`KontaktArt.FUNK`, z. B. „Heros Oldenburg 18/13-1")
 > als vierte Kontaktart neben Telefon und E-Mail. Dienstliche Kennung des
@@ -642,12 +651,12 @@ definieren.
 - Zusammenführung mehrerer eingegangener Meldungen zu einer Sammelübersicht
   (Stärke- und Bedarfssummen) beim Meldekopf.
 - Ausdruck als PDF im Layout des gewohnten Papierformulars, inklusive QR-Code.
-- Export als CSV bzw. organisationsspezifisches Excel-Format.
+- Export als CSV (bis 2026-11-03 auch als organisationsspezifisches Excel-Format).
 - Führung der Kräfteübersicht am Meldekopf mit Eintreff- und Abrückzeit je
   Einheit und einer Notiz/einem Auftrag der Führungsstelle; Ausgabe als
   Übergabeblatt (Sammel-PDF mit eingebetteter Sammlung) und einseitiges
   Lageblatt für Wand, Ablösung und Einsatztagebuch (seit 2026-09-27); dieselben
-  Angaben gehen seit 2026-09-29 auch in die Excel-Liste „Oldenburg" für die
+  Angaben gingen von 2026-09-29 bis 2026-11-03 auch in die Excel-Liste „Oldenburg" für die
   übergeordnete Führungsstelle. Seit 2026-09-29 steht dieser Stand in der Sammel-PDF zusätzlich über jedem Bogen
   und neben seinem QR-Code, damit ein Ausdruck ohne Seite 1 nicht eine
   abgerückte Einheit als anwesend zeigt (R2-A1). Seit 2026-09-29 (R2-A3) trägt
@@ -716,13 +725,13 @@ biometrische Daten, strafrechtliche Daten.
 - Beim Empfänger: Dekodierung, optionale Signaturprüfung (reiner Anzeigestatus,
   blockiert den Import nie), Aufnahme in die lokale Einsatz-Sammlung.
 - Aggregation mehrerer Meldungen zu Summen beim Meldekopf.
-- Optionaler Ausdruck (PDF) oder Tabellenexport (CSV/Excel). Übersichts-CSV,
-  Lageblatt und Excel-Liste „Oldenburg" führen je Einheit auch die
+- Optionaler Ausdruck (PDF) oder Tabellenexport (CSV; bis 2026-11-03 auch
+  Excel). Übersichts-CSV und Lageblatt führen je Einheit auch die
   Führungsstellen-Zusätze (Eintreff-/Abrückzeit, Auftrag/Notiz als Freitext,
   siehe 5.4) und seit 2026-10-04 auch die Bemerkung der Einheit („Sonstiges",
-  Freitext; R3-K3); die Excel-Liste enthält außerdem die Erreichbarkeit der
-  Führungskraft (Name und Kontakt). Abgerückte Einheiten bleiben in allen drei
-  Ausgaben sichtbar, zählen aber nicht in die Summen. Seit 2026-10-06 (R4-W5,
+  Freitext; R3-K3); die bis 2026-11-03 angebotene Excel-Liste enthielt außerdem
+  die Erreichbarkeit der Führungskraft (Name und Kontakt). Abgerückte Einheiten
+  bleiben in beiden Ausgaben sichtbar, zählen aber nicht in die Summen. Seit 2026-10-06 (R4-W5,
   R4-K8) trennt die Übersichts-CSV „Unterbringung angefordert" von „WC/Dusche"
   und führt eine Spalte „Rückfrage" mit den offenen Punkten der Meldung; ein
   Nachtrag („nur neue Bögen") ist als solcher gekennzeichnet (R4-W4). In der Sammel-PDF trägt jede Bogenseite den Kasten „Stand am Meldekopf"
@@ -812,7 +821,7 @@ Kapitel 6 der [Arc42-Dokumentation](arc42-architektur.md).
     Die Warnung nennt beide Möglichkeiten („stimmt das heutige Datum?"), nicht
     nur „Datum falsch".
   - **Grenze:** Der QR-Code selbst, das eingebettete JSON im PDF und
-    CSV-/Excel-Exporte bleiben unverändert und unverschlüsselt. Ein fremder
+    CSV-Exporte bleiben unverändert und unverschlüsselt. Ein fremder
     Decoder oder eine ältere App-Version liest sie vollständig. Die Frist ist
     eine Speicherbegrenzung in der App, kein Schutz des Transportwegs und keine
     Anonymisierung im Rechtssinn für bereits weitergegebene Kopien.
@@ -934,7 +943,7 @@ Kapitel 6 der [Arc42-Dokumentation](arc42-architektur.md).
 - **Export-Stand (seit 2026-09-27, je Format seit 2026-10-06, R4-W2):** Damit der
   Meldekopf dem Stab nur die seit dem letzten Export neuen Bögen nachliefern
   kann, merkt sich die App je Einsatz-Sammlung und Format (Sammel-PDF,
-  Übersichts-CSV, Alle-Daten-CSV, Excel) die Kennungen der bereits exportierten
+  Übersichts-CSV, Alle-Daten-CSV; bis 2026-11-03 auch Excel) die Kennungen der bereits exportierten
   Meldungen, den Zeitpunkt und den Zustand je Einheit als Prüfsummen
   (`src/app/export-stand.ts`, `eeb.export-stand.v2`; der alte gemeinsame
   Merker `v1` wird nicht übernommen und gelöscht). Das sind keine
@@ -1015,7 +1024,7 @@ Die Software zeigt an mehreren Stellen erkennbare Datensparsamkeit „by Design"
   der definierten, zweckgebundenen Felder.
 - Die QR-Kapazitätsgrenze (Zielgröße ≤ Version 18) wirkt als technischer Druck
   gegen das Anhäufen unnötiger Felder.
-- Excel-/CSV-Export ist bewusst gegen Formel-Injection abgesichert — ein Zeichen
+- Der CSV-Export ist bewusst gegen Formel-Injection abgesichert — ein Zeichen
   dafür, dass beim Datenexport auch die Integrität der Empfängerseite
   mitgedacht wurde.
 
@@ -1084,7 +1093,7 @@ Schutzziele in Anlehnung an das Standard-Datenschutzmodell (SDM): Vertraulichkei
 | # | Risiko | Schutzziel | Eintrittswahrscheinlichkeit | Schwere für Betroffene | Gesamt |
 | --- | --- | --- | --- | --- | --- |
 | R1 | Verlust/Diebstahl eines Geräts mit unverschlüsseltem `localStorage` → Zugriff auf die lokal gespeicherten Bögen und die Absenderkarte | V | Mittel | ~~Mittel~~ → Niedrig-Mittel: seit der Datenschutzfrist (5.7) nur noch Personaldaten der letzten 90 Tage, dazu Übungsbögen und Vorlagen | ~~Mittel~~ → Niedrig-Mittel |
-| R2 | Verlust/Fehlleitung eines gedruckten PDF- oder exportierten CSV/Excel-Dokuments | V | Mittel | Mittel | Mittel (von der Datenschutzfrist nicht erfasst) |
+| R2 | Verlust/Fehlleitung eines gedruckten PDF- oder exportierten CSV-Dokuments | V | Mittel | Mittel | Mittel (von der Datenschutzfrist nicht erfasst) |
 | R3 | ~~Kein technisch erzwungener Löschzeitpunkt~~ → **Datenschutzfrist umgesetzt** (5.7): nach 90 Tagen anonymisiert. Offen bleiben Übungsbögen und Vorlagen ohne Frist | Vf/T | ~~Hoch~~ → Niedrig (nur noch fristfreie Übungsbögen/Vorlagen) | Niedrig-Mittel | ~~Mittel~~ → Niedrig |
 | R4 | Diebstahl/Auslesen des privaten Signaturschlüssels vom Gerät (unverschlüsselt im `localStorage`) → Signieren im Namen des Geräts | I | Niedrig | Niedrig (Trust-Modell ist ohnehin nur TOFU; der Schlüssel ist über die Fußzeile austauschbar, siehe 5.7) | Niedrig |
 | R5 | ~~Speicher-Überlastung durch präparierte Import-Datei (fehlende Obergrenze bei der Dekomprimierung)~~ **behoben mit `c7604e9`** (`inflateRawBegrenzt`, Deckel 4 MiB) | Vf | Niedrig | Niedrig (Verfügbarkeits-, kein Vertraulichkeitsrisiko) | ~~Niedrig~~ → Sehr niedrig |
@@ -1161,7 +1170,7 @@ Diese Einschätzung ersetzt keine rechtliche Prüfung.
 - `vendor/eeb-format/src/signatur.ts` — Schlüsselerzeugung, Signatur, Verifikation
 - `src/app/geraete-schluessel.ts`, `src/app/speicher-browser.ts` — lokale Speicherung, Schlüsselablage
 - `src/app/statistik.ts` — Reichweitenmessung (GoatCounter), dokumentierte Rechtsgrundlage im Code-Kommentar
-- `src/app/csv.ts`, `src/app/xlsx.ts` — Export-Formate und deren Absicherung
+- `src/app/csv.ts` — Export-Format CSV und dessen Absicherung
 - `src/app/sicherung.ts`, `src/app/vorlagen.ts` — Papierkorb-/Löschfunktion
 - `PRODUCT.md`, `docs/entwicklung.md` — Produktkontext und technische Gesamtübersicht
 - [Arc42-Architekturdokumentation](arc42-architektur.md) und

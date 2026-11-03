@@ -33,7 +33,7 @@ export interface AbschlussWeg {
   fremd?: "geraet" | "weitergabe";
 }
 
-/** Die Wege Sammel-PDF, Lageblatt, beide CSV, Excel, Datensicherung — mit Stand gegen die Meldungen des Einsatzes. */
+/** Die Wege Sammel-PDF, Lageblatt, beide CSV, Datensicherung — mit Stand gegen die Meldungen des Einsatzes. */
 export function abschlussWege(einsatz: Einsatzsammlung): AbschlussWeg[] {
   const staende = exportStaendeLaden(einsatz.id);
   const seitStand = (s: ExportStand | null | undefined) => (s ? new Set(neueEintraege(einsatz.eintraege, s).map((e) => e.einheitSchluessel)).size : 0);
@@ -49,7 +49,6 @@ export function abschlussWege(einsatz: Einsatzsammlung): AbschlussWeg[] {
     weg("Lageblatt", lageblattStandLaden(einsatz.id)),
     weg("Übersicht als CSV", staende.csv),
     weg("Alle Daten als CSV", staende["csv-detail"]),
-    weg("Excel-Liste", staende.xlsx),
     { name: "Datensicherung", getan: gesichert != null && neuSicherung === 0, veraltet: gesichert != null && neuSicherung > 0, ...(gesichert != null ? { zeit: gesichert } : {}), neu: neuSicherung },
   ];
 }

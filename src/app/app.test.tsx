@@ -467,34 +467,6 @@ describe("Assistenten-Durchlauf", () => {
     }
   });
 
-  /**
-   * Der Weg, der zweimal als „Knopf geht nicht" gemeldet wurde: Der Schreiber
-   * wird erst beim Klick nachgeladen, danach muss trotzdem eine gültige Mappe
-   * herauskommen. „PK" ist die Signatur jedes ZIP — und ein XLSX ist eins.
-   */
-  it("gibt den Bogen als Excel-Mappe heraus (Format „Oldenburg“)", async () => {
-    const nutzer = userEvent.setup();
-    const mitschnitt = downloadsMitschneiden();
-    try {
-      const dialog = await uebergabeDialog(nutzer);
-
-      await nutzer.click(within(dialog).getByRole("button", { name: /^Als Excel/ }));
-
-      // Der XLSX-Schreiber wird erst beim Klick nachgeladen — die Datei kommt
-      // also einen Tick später als bei CSV.
-      await waitFor(() => expect(mitschnitt.dateien).toHaveLength(1));
-      expect(within(dialog).queryByText(/^Excel:/)).toBeNull(); // keine Fehlerzeile
-      const [datei] = mitschnitt.dateien;
-      expect(datei!.name).toMatch(/^eeb-.*-oldenburg\.xlsx$/);
-      expect(datei!.blob.type).toBe("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-      const bytes = new Uint8Array(await datei!.blob.arrayBuffer());
-      expect(String.fromCharCode(bytes[0]!, bytes[1]!)).toBe("PK");
-      expect(bytes.length).toBeGreaterThan(1000);
-    } finally {
-      mitschnitt.aufraeumen();
-    }
-  });
-
   it("legt den Bogen-Link in die Zwischenablage und sagt es", async () => {
     // Reihenfolge zählt: `userEvent.setup()` hängt selbst eine Zwischenablage
     // ein und würde einen vorher gesetzten Spion überschreiben.
@@ -1800,33 +1772,6 @@ describe("Neuen Einsatz anlegen", () => {
   });
 
   /**
-   * Der Meldekopf gibt seine Einheitenliste im Fremdformat der Führungsstelle
-   * heraus. Derselbe Weg wie beim einzelnen Bogen: Schreiber wird beim Klick
-   * nachgeladen, danach muss eine gültige Mappe herauskommen.
-   */
-  it("gibt die Einheitenliste des Einsatzes als Excel-Mappe heraus", async () => {
-    const nutzer = userEvent.setup();
-    const mitschnitt = downloadsMitschneiden();
-    try {
-      render(<App />);
-      await nutzer.click(screen.getByRole("button", { name: "Neue Einsatz-Sammlung…" }));
-      await einsatzAnlegen(nutzer, "Hochwasser Weser", "Einsatz");
-      await screen.findByRole("heading", { level: 1, name: "Hochwasser Weser" });
-
-      await nutzer.click(screen.getByRole("button", { name: /^Excel-Liste/ }));
-
-      await waitFor(() => expect(mitschnitt.dateien).toHaveLength(1));
-      const [datei] = mitschnitt.dateien;
-      // Mit Datum-Zeit-Gruppe wie die PDFs (R16-A1).
-      expect(datei!.name).toMatch(/^\d{4}-\d{2}-\d{2}_\d{4}_eeb-einsatz-oldenburg_Hochwasser_Weser\.xlsx$/);
-      const bytes = new Uint8Array(await datei!.blob.arrayBuffer());
-      expect(String.fromCharCode(bytes[0]!, bytes[1]!)).toBe("PK");
-    } finally {
-      mitschnitt.aufraeumen();
-    }
-  });
-
-  /**
    * Nachlieferung an den Stab: Nach dem ersten Export merkt sich die App den
    * Stand; ein danach eingelesener Bogen zählt als neu, und der Teilexport
    * enthält nur ihn. Der ganze Weg über die Oberfläche, weil der Stand in
@@ -1867,8 +1812,8 @@ describe("Neuen Einsatz anlegen", () => {
   });
 
   /**
-   * R4-W2/R4-K1: CSV für die eigene Liste verbraucht den Nachtrag für Excel
-   * nicht, und ein Abrücken seit dem Export gehört in den Nachtrag.
+   * R4-W2/R4-K1: CSV für die eigene Liste verbraucht den Nachtrag der anderen
+   * Formate nicht, und ein Abrücken seit dem Export gehört in den Nachtrag.
    */
   it("hält den Bezugspunkt je Format und nimmt ein Abrücken in den Nachtrag mit", async () => {
     const angelegt = einsatzImSpeicherAnlegen("Hochwasser Weser", EinsatzArt.EINSATZ);
@@ -1884,11 +1829,11 @@ describe("Neuen Einsatz anlegen", () => {
       await nutzer.click(screen.getByRole("button", { name: "Übersicht als CSV" }));
       await waitFor(() => expect(mitschnitt.dateien).toHaveLength(1));
       await nutzer.click(screen.getByRole("checkbox", { name: /Nur neue Bögen seit dem letzten Export/ }));
-      // Die CSV hat nichts mehr zu liefern, Excel und PDF noch alles.
+      // Die CSV hat nichts mehr zu liefern, die Alle-Daten-CSV und PDF noch alles.
       expect((screen.getByRole("button", { name: "Übersicht als CSV — Nachtrag: nichts Neues" }) as HTMLButtonElement).disabled).toBe(true);
-      expect((screen.getByRole("button", { name: /^Excel-Liste/ }) as HTMLButtonElement).disabled).toBe(false);
+      expect((screen.getByRole("button", { name: /^Alle Daten als CSV/ }) as HTMLButtonElement).disabled).toBe(false);
       expect((screen.getByRole("button", { name: /^Sammel-PDF \((nur neue Bögen|erste Lieferung: alle Bögen)\)$/ }) as HTMLButtonElement).disabled).toBe(false);
-      expect(screen.getByText(/Excel-Liste: noch nicht in diesem Format exportiert/)).toBeDefined();
+      expect(screen.getByText(/Alle Daten als CSV: noch nicht in diesem Format exportiert/)).toBeDefined();
 
       // Abrücken nach dem CSV-Export: Änderung, und die CSV lässt sich wieder laden.
       await nutzer.click(screen.getAllByRole("button", { name: "Abrücken" })[0]!);

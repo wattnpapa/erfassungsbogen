@@ -81,7 +81,6 @@ describe("Nachricht nach automatischer Löschung (R2-D5)", () => {
         onExport={nichts}
         onCsvExport={nichts}
         onCsvDetailExport={nichts}
-        onOldenburgExport={nichts}
         onSammelPdf={nichts}
         onGeloescht={nichts}
       />,

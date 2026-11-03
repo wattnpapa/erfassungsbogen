@@ -163,7 +163,7 @@ export function dateiFehlerText(name: string, art: DateiArt, weg: DateiWeg, ursa
     case "tabelle":
     case "fremd":
     case "json-fremd":
-      // Die eigene Auswertung dieser App (eeb-einsatz-…csv, …-oldenburg.xlsx): für den Stab, nicht zum Weiterarbeiten (R17-A5).
+      // Die eigene Auswertung dieser App (eeb-einsatz-…csv; bis 2026-11 auch …-oldenburg.xlsx): für den Stab, nicht zum Weiterarbeiten (R17-A5).
       if (/^(\d{4}-\d{2}-\d{2}_\d{4}_)?eeb-(einsatz|lageblatt)[-_].*\.(csv|xlsx?)$/i.test(name)) {
         return (
           `${datei} hat diese App selbst als Auswertung für den Stab erzeugt (Tabelle) — zum Weiterarbeiten ist sie nicht gedacht. ` +

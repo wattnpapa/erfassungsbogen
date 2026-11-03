@@ -1,5 +1,5 @@
 /**
- * Runde 9, Block Exporte: Sollstärke im Wort (R9-A2), Excel nach Nr. (R9-A2), Rückruf einer
+ * Runde 9, Block Exporte: Sollstärke im Wort (R9-A2), Rückruf einer
  * Soll-Einheit gekennzeichnet (R9-A3), Umschrift in der Personenliste (R9-W3), Zug-Titel (R9-K4).
  */
 import { describe, expect, it } from "vitest";
@@ -18,8 +18,6 @@ import { einsatzCsvInhalt } from "./einsatz-csv";
 import { einsatzDetailCsvInhalt } from "./bogen-csv";
 import { erreichbarkeitZeilen, namePapier, nichtDarstellbareBetroffene, nichtDarstellbareNamen, umschriftBetroffene } from "./pdf-dokument";
 import { neuePerson } from "./hilfen";
-import { einsatzOldenburgXlsx } from "./oldenburg-xlsx";
-import { inflateRaw } from "pako";
 
 function person(over: Partial<Person> = {}): Person {
   return {
@@ -69,38 +67,6 @@ describe("Sollstärke im Wort (R9-A2)", () => {
   it("„Alle Daten“-CSV trägt es in der Spalte Personalerfassung", () => {
     const csv = einsatzDetailCsvInhalt(sammlung([meldung(soll(), 2000)]));
     expect(csv).toContain("Sollstärke, nicht gemeldet");
-  });
-});
-
-/** Zellen der Excel-Datei grob: alle Texte der sharedStrings/inline-Strings. */
-function xlsxText(bytes: Uint8Array): string {
-  // ZIP lokale Header durchlaufen und jede deflate-Datei auspacken.
-  const dv = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
-  let out = "";
-  let i = 0;
-  while (i + 30 < bytes.length && dv.getUint32(i, true) === 0x04034b50) {
-    const methode = dv.getUint16(i + 8, true);
-    const csize = dv.getUint32(i + 18, true);
-    const nl = dv.getUint16(i + 26, true);
-    const el = dv.getUint16(i + 28, true);
-    const start = i + 30 + nl + el;
-    const daten = bytes.subarray(start, start + csize);
-    out += methode === 8 ? new TextDecoder().decode(inflateRaw(daten)) : new TextDecoder().decode(daten);
-    i = start + csize;
-  }
-  return out;
-}
-
-describe("Excel-Liste nach Nr. (R9-A2)", () => {
-  it("führt die Nr. und die Sollstärke in der Bemerkung und sortiert nach Nr. statt nach Name", () => {
-    // Nr. 1 = früher eingegangen, aber nach dem Namen käme „Zulauf“ zuletzt: „Ahlen“ ist Nr. 2.
-    const spaeter = meldung(gemeldet(), 5000);
-    const frueher = meldung(soll(), 1000);
-    const text = xlsxText(einsatzOldenburgXlsx(sammlung([spaeter, frueher])));
-    expect(text).toContain("Nr. 1");
-    expect(text).toContain("Nr. 2");
-    expect(text).toContain("Sollstärke, nicht gemeldet");
-    expect(text.indexOf("Nr. 1")).toBeLessThan(text.indexOf("Nr. 2"));
   });
 });
 

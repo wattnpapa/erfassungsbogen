@@ -51,7 +51,7 @@ const SPALTEN = [
   "Verpflegung angefordert",
   "Verpflegung veg.",
   "Verpflegung vegan",
-  // Zwei Zahlen, zwei Fragen — wie auf Lageblatt und in der Excel-Liste (R4-W5):
+  // Zwei Zahlen, zwei Fragen — wie auf dem Lageblatt (R4-W5):
   // Schlafplätze brauchen nur die Einheiten mit angeforderter Unterbringung,
   // WC und Duschen alle Anwesenden. Beide unter derselben Überschrift zu führen
   // ließ den Stab 50 statt 35 Plätze planen.
@@ -87,7 +87,7 @@ const SPALTEN = [
   "Absender",
   "Auftrag/Notiz",
   // Was die Einheit selbst dazuschreibt („Nachschub nötig") — stand nur in
-  // „Alle Daten" und in der Excel-Liste (Audit Runde 3, R3-K3).
+  // „Alle Daten" (Audit Runde 3, R3-K3).
   "Bemerkung (Einheit)",
 ] as const;
 

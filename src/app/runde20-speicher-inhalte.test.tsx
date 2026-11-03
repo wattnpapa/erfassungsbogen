@@ -85,7 +85,6 @@ describe("R20-K2 Details und Tabelle sagen dasselbe Wort", () => {
           onExport={() => {}}
           onCsvExport={() => {}}
           onCsvDetailExport={() => {}}
-          onOldenburgExport={() => {}}
           onSammelPdf={() => {}}
           onGeloescht={() => {}}
         />

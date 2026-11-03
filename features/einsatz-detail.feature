@@ -193,15 +193,11 @@ Funktionalität: Einsatz-Sammlung führen (Meldekopf)
     Wenn ich auf "Alle Daten als CSV" klicke und eine Datei erhalte
     Dann heißt die heruntergeladene Datei wie "*_eeb-einsatz-alle-daten_*.csv"
 
-  Szenario: Excel-Liste der Einheiten im Format „Oldenburg“
-    Wenn ich auf "Excel-Liste (Format „Oldenburg“)" klicke und eine Datei erhalte
-    Dann heißt die heruntergeladene Datei wie "*_eeb-einsatz-oldenburg_*.xlsx"
-
   # Nachlieferung an den Stab: Abends geht alles hinaus, morgens nur, was
   # seitdem dazukam. Ohne neue Bögen bleibt der Ausgabeweg gesperrt, statt
   # eine leere Datei zu erzeugen. Jedes Format hat seinen eigenen Bezugspunkt:
   # die CSV für die eigene Liste verbraucht den Nachtrag-PDF und die
-  # Excel-Liste nicht (Audit Runde 4, R4-W2).
+  # Alle-Daten-CSV nicht (Audit Runde 4, R4-W2).
   Szenario: Nach dem Export lassen sich nur die seitdem neuen Bögen weitergeben
     Dann sehe ich den Hinweis "Noch kein Export aus diesem Einsatz"
     Wenn ich auf "Übersicht als CSV" klicke und eine Datei erhalte
@@ -210,14 +206,14 @@ Funktionalität: Einsatz-Sammlung führen (Meldekopf)
     # Im Nachtrag-Modus nennen die Knöpfe Nachtrag und Zahl, damit eine Teildatei nicht wie der Vollexport aussieht (R16-W2).
     Dann ist die Schaltfläche "Übersicht als CSV — Nachtrag: nichts Neues" gesperrt
     Und ist die Schaltfläche "Sammel-PDF (erste Lieferung: alle Bögen)" bedienbar
-    Und ist die Schaltfläche "Excel-Liste (Format „Oldenburg“) — erste Lieferung: alle Bögen" bedienbar
+    Und ist die Schaltfläche "Alle Daten als CSV — erste Lieferung: alle Bögen" bedienbar
     Wenn ich die Einheit "DLRG" "Wardenburg" manuell in den Einsatz aufnehme
     Dann sehe ich den Hinweis "seitdem 1 neuer Bogen"
     Und ist die Schaltfläche "Übersicht als CSV — Nachtrag (1 Einheit)" bedienbar
     Wenn ich auf "Übersicht als CSV — Nachtrag (1 Einheit)" klicke und eine Datei erhalte
     Dann sehe ich den Hinweis "seitdem keine neuen Bögen"
     Und ist die Schaltfläche "Übersicht als CSV — Nachtrag: nichts Neues" gesperrt
-    Und ist die Schaltfläche "Excel-Liste (Format „Oldenburg“) — erste Lieferung: alle Bögen" bedienbar
+    Und ist die Schaltfläche "Alle Daten als CSV — erste Lieferung: alle Bögen" bedienbar
 
   Szenario: Gelöschter Einsatz liegt im Papierkorb und kommt zurück
     Wenn ich auf "Einsatz löschen…" klicke

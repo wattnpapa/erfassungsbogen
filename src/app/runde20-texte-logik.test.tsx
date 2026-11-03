@@ -60,7 +60,6 @@ function Wirt({ id, extra }: { id: string; extra?: Partial<Props> }) {
         onExport={() => {}}
         onCsvExport={() => {}}
         onCsvDetailExport={() => {}}
-        onOldenburgExport={() => {}}
         onSammelPdf={() => {}}
         onGeloescht={() => {}}
         {...extra}
@@ -200,13 +199,13 @@ describe("R20-K1 / W2: der Kopf nach „Einsatz beendet“ nennt, was offen ist"
     expect(offenKurz(["A", "B", "C", "D", "E", "F"])).toBe("A, B und 4 weitere");
   });
 
-  it("Kopf: „noch offen: Weitergabe-Datei (Sammel-PDF), Lageblatt und 4 weitere“ statt „noch offen: 6“", () => {
+  it("Kopf: „noch offen: Weitergabe-Datei (Sammel-PDF), Lageblatt und 3 weitere“ statt „noch offen: 5“", () => {
     const s = einsatzAnlegen("Hochwasser Kopf", EinsatzArt.EINSATZ);
     meldungHinzufuegen(s.id, bogenMitOrt("Alpha"));
     abschlussSetzen(s.id, { beendetAm: Date.now() }, [s.id]);
     render(<Wirt id={s.id} />);
     const kopf = document.querySelector(".einsatz-beendet-kopf")!.textContent!;
-    expect(kopf).toMatch(/noch offen: Weitergabe-Datei \(Sammel-PDF\), Lageblatt und 4 weitere/);
+    expect(kopf).toMatch(/noch offen: Weitergabe-Datei \(Sammel-PDF\), Lageblatt und 3 weitere/);
     expect(kopf).not.toMatch(/noch offen: \d/);
   });
 });

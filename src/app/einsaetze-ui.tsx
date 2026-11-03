@@ -1245,7 +1245,6 @@ export function EinsatzDetail(props: {
   /** Die Ausgabewege bekommen den gewählten Umfang mit: alle Bögen oder nur die seit dem letzten Export neuen. */
   onCsvExport: (umfang: ExportUmfang) => void;
   onCsvDetailExport: (umfang: ExportUmfang) => void;
-  onOldenburgExport: (umfang: ExportUmfang) => void;
   /** Sammel-PDF (Übersicht, Bögen, eingebettete Sammlung) im gewählten Umfang. */
   onSammelPdf: (umfang: ExportUmfang) => void;
   /**
@@ -1295,7 +1294,7 @@ export function EinsatzDetail(props: {
    */
   onStandAusWeitergabe?: (ziel: ExportZiel) => void;
 }) {
-  const { einsatz, onZurueck, onGeaendert, onScannen, onManuell, onDateiImport, onBilderImport, onExport, onCsvExport, onCsvDetailExport, onOldenburgExport, onSammelPdf, onWeitergeben, onLageblatt, onBlanko, onGeloescht, eingang, ausgabeQuittung } = props;
+  const { einsatz, onZurueck, onGeaendert, onScannen, onManuell, onDateiImport, onBilderImport, onExport, onCsvExport, onCsvDetailExport, onSammelPdf, onWeitergeben, onLageblatt, onBlanko, onGeloescht, eingang, ausgabeQuittung } = props;
   // Läuft eine PDF-Erzeugung (arbeitet.ts), sperrt sie alle PDF-Knöpfe und beschriftet den eigenen (R5-O3).
   const arbeitet = useArbeitet();
   const arbeitFortschrittJetzt = useArbeitFortschritt();
@@ -2184,7 +2183,7 @@ export function EinsatzDetail(props: {
           <strong>Einsatz beendet {exportZeitKurz(abschlussStand.beendetAm)}</strong>
           {/* R19-S12, W1: offene Wege und Nachzügler gleich im Kopf, nicht erst am Seitenende. */}
           {(() => {
-            // R20-K1, W2: die Punkte beim Namen („Weitergabe-Datei, Lageblatt und 4 weitere"), nicht nur die Zahl.
+            // R20-K1, W2: die Punkte beim Namen („Weitergabe-Datei, Lageblatt und 3 weitere"), nicht nur die Zahl.
             const offen = abschlussWege(einsatz).filter((w) => !w.getan).map((w) => w.name);
             const neu = meldungenSeit(einsatz.eintraege, abschlussStand.beendetAm);
             return `${offen.length > 0 ? ` — noch offen: ${offenKurz(offen)}` : ""}${neu > 0 ? ` — nicht mehr aktuell, seitdem ${neueMeldungenText(neu)}` : ""}`;
@@ -3148,7 +3147,7 @@ export function EinsatzDetail(props: {
           <span className="hinweis">
             {/* R19-S13: Nach der Weitergabe-Datei nicht „noch kein Export" (die Übergabe-Liste nennt sie als erzeugt). */}
             {weitergabeStand
-              ? `Kein Export an den Stab (CSV, Excel, Teil-PDF) — die Weitergabe-Datei vom ${exportZeitKurz(weitergabeStand.zeitpunkt)} zählt hier nicht; alle Bögen sind neu.`
+              ? `Kein Export an den Stab (CSV, Teil-PDF) — die Weitergabe-Datei vom ${exportZeitKurz(weitergabeStand.zeitpunkt)} zählt hier nicht; alle Bögen sind neu.`
               : "Noch kein Export aus diesem Einsatz — alle Bögen sind neu."}
           </span>
         ) : null}
@@ -3225,12 +3224,6 @@ export function EinsatzDetail(props: {
         </button>{" "}
         <button type="button" onClick={(e) => ausgabeTipp("csv-detail", "Die CSV mit allen Daten", () => onCsvDetailExport(exportUmfang), e)} disabled={gesperrt("csv-detail")} title="Alle Daten aller gemeldeten Einheiten: je Einheit eine Zeile, dazu eine Zeile pro Person und pro Fahrzeug. Für Auswertung in Excel.">
           {nachtragKnopf("Alle Daten als CSV", "csv-detail")}
-        </button>{" "}
-        {/* Drittes Format, weil es keinem der beiden CSVs entspricht: eine
-            fremde Excel-Vorlage mit fester Spaltenfolge, in die die
-            Führungsstelle die Zeilen direkt einfügt. */}
-        <button type="button" onClick={(e) => ausgabeTipp("xlsx", "Die Excel-Liste", () => onOldenburgExport(exportUmfang), e)} disabled={gesperrt("xlsx")} title="Einheitenliste im Format der Führungsstelle Oldenburg: je gemeldeter Einheit eine Zeile, Spalten und Formatierung wie in deren Excel-Vorlage.">
-          {nachtragKnopf("Excel-Liste (Format „Oldenburg“)", "xlsx")}
         </button>{" "}
         {/* Roh-JSON nur im Debug-Modus: fürs Publikum trägt die Sammel-PDF die
             Bögen als eingebettetes JSON — ein separater Export verwirrt nur. */}

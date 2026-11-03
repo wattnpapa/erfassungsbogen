@@ -54,11 +54,6 @@ Wer noch abwägt: [Papier oder digital?](https://erfassungsbogen.app/papier-oder
   geht als CSV heraus, mit allem, was drinsteht: je eine Zeile für die Einheit,
   für jede Person und für jedes Fahrzeug. Für Verpflegungsabrechnung,
   Personalnachweis oder eigene Auswertungen.
-- **Excel-Liste im Format „Oldenburg"**: führt die Führungsstelle ihre
-  Einheitenliste in der Oldenburger Excel-Vorlage, kommt der Export gleich in
-  deren Spalten, Farben und Datumsformaten heraus — je Einheit eine Zeile, zum
-  Einfügen in die laufende Liste. Die Spalten, die die Führungsstelle selbst
-  führt (Ablösung, Zusagen, Schicht), bleiben leer.
 - **Einsätze sammeln (Meldekopf)**: mehrere fremde Bögen unter einem Einsatz
   bündeln — per Scan, aus Datei/PDF, am Tablet manuell erfasst oder direkt aus
   der Übersicht eines gerade geöffneten Bogens („In Einsatz aufnehmen"). Die App
@@ -66,7 +61,7 @@ Wer noch abwägt: [Papier oder digital?](https://erfassungsbogen.app/papier-oder
   Zwischensummen je Zug), merkt sich tägliche Neumeldungen als Historie und gibt
   alles als Sammel-PDF oder Datei an die nächste Führungsstelle weiter. Wer dem
   Stab laufend nachliefert, kreuzt „Nur neue Bögen seit dem letzten Export" an:
-  Sammel-PDF, CSV und Excel-Liste enthalten dann nur, was seit der letzten
+  Sammel-PDF und CSV enthalten dann nur, was seit der letzten
   Weitergabe dazugekommen ist, und die Zeile darüber sagt, wann das war. Die
   gemeldeten Einheiten lassen sich als Karten oder als Tabelle lesen — die
   Tabelle zeigt je Einheit eine Zeile mit Stärke, Verpflegung, Unterbringung und

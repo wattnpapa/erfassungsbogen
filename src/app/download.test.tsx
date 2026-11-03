@@ -1,5 +1,5 @@
 /**
- * Der Download-Weg aller Browser-Exporte (CSV, Excel, JSON-Sicherung).
+ * Der Download-Weg aller Browser-Exporte (CSV, JSON-Sicherung).
  *
  * Liegt als `.test.tsx` in der Suite „oberflaeche", weil `blobAlsDownload` ein
  * echtes DOM braucht — geprüft wird gerade das, was in Node nicht existiert:
@@ -55,9 +55,9 @@ afterEach(() => {
 
 describe("blobAlsDownload", () => {
   it("klickt einen Anker, der im Dokument hängt und eine gültige Blob-URL trägt", () => {
-    blobAlsDownload("eeb-THW-oldenburg.xlsx", new Blob(["x"]));
+    blobAlsDownload("eeb-THW.csv", new Blob(["x"]));
 
-    expect(klicks).toEqual([{ imDokument: true, urlGueltig: true, name: "eeb-THW-oldenburg.xlsx" }]);
+    expect(klicks).toEqual([{ imDokument: true, urlGueltig: true, name: "eeb-THW.csv" }]);
   });
 
   it("gibt die Blob-URL nicht im selben Takt frei — der Download hätte sonst ins Leere gegriffen", () => {

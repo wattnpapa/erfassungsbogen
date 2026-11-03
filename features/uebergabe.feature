@@ -26,7 +26,6 @@ Funktionalität: Bogen übergeben — QR, PDF, Link, CSV
     Wenn ich "Weitere Formate" aufklappe
     Dann sehe ich die Schaltfläche "Link teilen"
     Und sehe ich die Schaltfläche "Als CSV (Tabelle)"
-    Und sehe ich die Schaltfläche "Als Excel (Format „Oldenburg“)"
     Wenn ich im Dialog auf "Schließen" klicke
     Dann ist kein Dialog offen
 
@@ -90,14 +89,6 @@ Funktionalität: Bogen übergeben — QR, PDF, Link, CSV
     Und ich "Weitere Formate" aufklappe
     Und ich auf "Als CSV (Tabelle)" klicke und eine Datei erhalte
     Dann heißt die heruntergeladene Datei wie "eeb-*.csv"
-
-  # Manche Führungsstellen arbeiten mit einer eigenen Excel-Vorlage — der
-  # Bogen muss dort als Zeile ankommen, nicht als weiteres PDF.
-  Szenario: Excel liefert den Bogen im Format „Oldenburg“
-    Wenn ich auf "Bogen übergeben…" klicke
-    Und ich "Weitere Formate" aufklappe
-    Und ich auf "Als Excel (Format „Oldenburg“)" klicke und eine Datei erhalte
-    Dann heißt die heruntergeladene Datei wie "eeb-*-oldenburg.xlsx"
 
   Szenario: Link teilen legt den Bogen-Link in die Zwischenablage
     Wenn ich auf "Bogen übergeben…" klicke

@@ -76,7 +76,6 @@ function Wirt({ id, extra }: { id: string; extra?: Partial<Props> }) {
         onExport={() => {}}
         onCsvExport={() => {}}
         onCsvDetailExport={() => {}}
-        onOldenburgExport={() => {}}
         onSammelPdf={() => {}}
         onGeloescht={() => {}}
         {...extra}
