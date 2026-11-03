@@ -30,6 +30,8 @@ import { sammlungenBeiseitegelegt } from "./unlesbar";
 import { alterKurz, alterText, anwesendenAlterText, ausEingabeWert, bedarfText, dauerText, lagebild, uhrTeile, zuEingabeWert, type EinheitZeile } from "./lagemonitor";
 
 import { URL_PARAMETER, lagemonitorKennung } from "./lagemonitor-kennung";
+import { LageV2 } from "./lagemonitor-v2-ui";
+import { ansichtLesen, ansichtMerken, anzeigeLesen, anzeigeMerken, type Ansicht, type AnzeigeWahl } from "./lagemonitor-v2";
 /** Gemerkte Helligkeitsstufe des Monitors („dunkel" oder „gedimmt"; „hell" wird nie gemerkt, R7-L3). */
 export const STUFE_SCHLUESSEL = "eeb.lagestufe.v1";
 /** Mehr Bewegungszeilen als das gibt es nicht im Bild; der Rest steht als „+ n weitere" (R7-K2). */
@@ -287,6 +289,16 @@ export function Lagemonitor({ einsatzId }: { einsatzId: string }) {
   // Leiter Gedimmt < Dunkel < Hell: „heller" und „dunkler" gehen je eine Sprosse. Aus Gedimmt führt ein Tipp nie auf Hell,
   // aus Hell führt ein Tipp zurück auf Dunkel statt über ein zweites helles Bild (R8-L4).
   const [stufe, setStufe] = useState<Stufe>(stufeLesen);
+  const [ansicht, setAnsicht] = useState<Ansicht>(ansichtLesen);
+  const [anzeige, setAnzeige] = useState<AnzeigeWahl>(anzeigeLesen);
+  function anzeigeWechseln(neu: AnzeigeWahl) {
+    setAnzeige(neu);
+    anzeigeMerken(neu);
+  }
+  function ansichtWechseln(neu: Ansicht) {
+    setAnsicht(neu);
+    ansichtMerken(neu);
+  }
   const klasse = `lm${stufe === "hell" ? " lm-hell" : stufe === "gedimmt" ? " lm-gedimmt" : ""}`;
   const heller: Stufe | null = stufe === "gedimmt" ? "dunkel" : stufe === "dunkel" ? "hell" : null;
   const dunkler: Stufe | null = stufe === "hell" ? "dunkel" : stufe === "dunkel" ? "gedimmt" : null;
@@ -418,6 +430,54 @@ export function Lagemonitor({ einsatzId }: { einsatzId: string }) {
   const sichtbareBewegungen = bild.bewegungen.slice(0, bewegungenMax(window.innerWidth, window.innerHeight));
   const weitereBewegungen = bild.bewegungen.length - sichtbareBewegungen.length;
 
+  if (ansicht === "v2") {
+    const b = beginn != null ? uhrTeile(new Date(beginn)) : null;
+    return (
+      <LageV2
+        klasse={klasse}
+        uebung={bild.uebung}
+        name={einsatz.name}
+        ort={bild.ort ?? null}
+        zeit={dtg.zeit}
+        datum={dtg.datum}
+        staerke={s.staerke}
+        sollPersonen={bild.sollstaerke.einheiten > 0 ? bild.sollstaerke.personen : 0}
+        lage={lage}
+        datenstand={datenstand}
+        veraltet={veraltet}
+        alterAnwesende={alterAnwesende}
+        bedarf={bedarf}
+        staleHinweis={staleSeit != null ? `Sammlung nicht lesbar – letzter Stand von ${new Date(staleSeit).toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit" })} Uhr; Hauptfenster: „Daten sichern…“` : null}
+        einheiten={bild.einheiten}
+        leerText={
+          bild.abgerueckt > 0
+            ? "Alle Einheiten sind abgerückt."
+            : bild.uebungenDaneben > 0
+              ? `Keine Einheit in der Lage (${bild.uebungenDaneben} Übung, nicht gezählt).`
+              : "Noch keine Einheit gemeldet."
+        }
+        anzeige={anzeige}
+        onAnzeige={anzeigeWechseln}
+        ansicht={ansicht}
+        onAnsicht={ansichtWechseln}
+        stufenleiste={stufenleiste}
+        onVollbild={vollbild}
+        onSchliessen={schliessen}
+        daten={
+          <dl className="lm-daten">
+            <dt>Art</dt><dd>{bild.art}{bild.ort ? ` · ${bild.ort}` : ""}</dd>
+            <dt>Funkrufname</dt><dd>{funkruf ?? "nicht gesetzt (in der Einsatzansicht einstellen)"}</dd>
+            <dt>Einsatzbeginn</dt>
+            <dd>{b ? `${b.zeit} Uhr, ${b.datum}` : "nicht gesetzt (in der Einsatzansicht einstellen)"}</dd>
+            {dauerZeile && (<><dt>Dauer</dt><dd>{dauerZeile}</dd></>)}
+            <dt>Einheiten</dt><dd>{s.einheiten}</dd>
+            <dt>Fahrzeuge</dt><dd>{s.fahrzeuge}</dd>
+          </dl>
+        }
+      />
+    );
+  }
+
   return (
     <main className={klasse}>
       {/* Erste Zeile: eigener Funkrufname, optional — ohne ihn rückt der Einsatzname nach oben. */}
@@ -524,6 +584,7 @@ export function Lagemonitor({ einsatzId }: { einsatzId: string }) {
       <details className="lm-zeile lm-klapp">
         <summary>Optionen</summary>
         <div className="lm-optionen">
+          <button type="button" className="lm-knopf" onClick={() => ansichtWechseln("v2")}>Lagemonitor V2</button>
           <button type="button" className="lm-knopf" onClick={vollbild}>Vollbild</button>
           <button type="button" className="lm-knopf" onClick={schliessen}>Schließen</button>
         </div>
