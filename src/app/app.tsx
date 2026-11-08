@@ -543,7 +543,7 @@ function BeispielboegenStart() {
         Ausgefüllte Bögen fiktiver Einheiten zum Ansehen und Ausprobieren, sortiert nach Organisation und
         Thema. Jeder lässt sich in der App öffnen, als PDF erzeugen oder als Link weitergeben.
       </p>
-      <button type="button" onClick={beispielboegenOeffnen}>Beispielbögen ansehen</button>
+      <button type="button" className="primaer" onClick={beispielboegenOeffnen}>Beispielbögen ansehen</button>
     </section>
   );
 }
