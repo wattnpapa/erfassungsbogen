@@ -155,9 +155,11 @@ Funktionalität: Darstellung, Datensicherung und Auskunft
 
   Szenario: Beispielbögen lassen sich durchblättern und öffnen
     Angenommen ich öffne die App
-    Wenn ich auf "Beispielbögen" klicke
+    # Einstieg ist der Abschnitt unter „So funktioniert’s“ — die Fußzeile hat keinen Link mehr.
+    Wenn ich auf "Beispielbögen ansehen" klicke
     Dann sehe ich den Dialog "Beispielbögen"
-    Und sehe ich den Hinweis "Organisation oder Thema wählen:"
+    Und sehe ich den Hinweis "Was sind Beispielbögen?"
+    Und sehe ich den Hinweis "Praktische Ausbildung"
 
   Szenario: Der Erststart erklärt das Grundprinzip
     Angenommen ich öffne die App
