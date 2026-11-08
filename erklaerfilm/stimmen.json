@@ -1,28 +1,44 @@
 {
   "modell": "eleven_multilingual_v2",
-  "einstellungen": { "stability": 0.45, "similarity_boost": 0.8, "style": 0.15, "use_speaker_boost": true },
+  "einstellungen": {
+    "stability": 0.45,
+    "similarity_boost": 0.8,
+    "style": 0.15,
+    "use_speaker_boost": true
+  },
   "sprecher": {
     "erzaehler": {
-      "voice_id": "HIER_VOICE_ID_ERZAEHLER",
+      "voice_id": "r8MyP4qUsq5WFFSkPdfV",
       "hinweis": "Ruhige, warme deutsche Off-Stimme. Etwas mehr Stabilität für gleichmäßigen Vortrag.",
-      "einstellungen": { "stability": 0.6, "style": 0.05 }
+      "einstellungen": {
+        "stability": 0.6,
+        "style": 0.05
+      },
+      "stimme": "Johannes – Clear and Neutral (Stimmbibliothek, deutsch)"
     },
     "karsten": {
-      "voice_id": "HIER_VOICE_ID_KARSTEN",
-      "hinweis": "Männlich, Mitte 40, bodenständig, leicht süddeutsch gefärbt passt."
+      "voice_id": "FTNCalFNG5bRnkkaP5Ug",
+      "hinweis": "Männlich, Mitte 40, bodenständig, leicht süddeutsch gefärbt passt.",
+      "stimme": "Otto – Casual and Normal (Stimmbibliothek, deutsch)"
     },
     "jana": {
-      "voice_id": "HIER_VOICE_ID_JANA",
-      "hinweis": "Weiblich, Ende 20, klar, zügig, pragmatisch."
+      "voice_id": "AnvlJBAqSLDzEevYr9Ap",
+      "hinweis": "Weiblich, Ende 20, klar, zügig, pragmatisch.",
+      "stimme": "Ava – Youthful, Authentic and Friendly (Stimmbibliothek, deutsch)"
     },
     "steffi": {
-      "voice_id": "HIER_VOICE_ID_STEFFI",
+      "voice_id": "nF7t9cuYo0u3kuVI9q4B",
       "hinweis": "Weiblich, 30–40, ungeduldig, ruft aus dem Fahrerhaus.",
-      "einstellungen": { "stability": 0.3, "style": 0.4 }
+      "einstellungen": {
+        "stability": 0.3,
+        "style": 0.4
+      },
+      "stimme": "Dana – Friendly and Fun (Stimmbibliothek, deutsch)"
     },
     "einsatzleitung": {
-      "voice_id": "HIER_VOICE_ID_EINSATZLEITUNG",
-      "hinweis": "Männlich oder weiblich, sachlich, knapp. Der Funkklang (Bandpass) kommt beim Rendern dazu."
+      "voice_id": "wGD81UtSGECIRSWQjH8X",
+      "hinweis": "Männlich oder weiblich, sachlich, knapp. Der Funkklang (Bandpass) kommt beim Rendern dazu.",
+      "stimme": "Stefan Rank – Informative and Credible (Stimmbibliothek, deutsch)"
     }
   }
 }

@@ -851,5 +851,31 @@
       "dauer": 0.6,
       "lautstaerke": 0.5
     }
+  },
+  "musik": {
+    "nacht": {
+      "von": "a1",
+      "bis": "a8",
+      "lautstaerke": 0.5,
+      "beschreibung": "Dezente, leicht angespannte Hintergrundmusik für einen Erklärfilm: nächtlicher Sturm, tiefe gedämpfte Streicher, leises tickendes Pizzicato und ruhige Percussion, wachsende Hektik ohne Drama, instrumental, keine Stimmen, gleichmäßige Lautstärke, 90 BPM"
+    },
+    "digital": {
+      "von": "b1",
+      "bis": "b3",
+      "lautstaerke": 0.5,
+      "beschreibung": "Leichte, gelöste und freundliche Hintergrundmusik: gezupfte Akustikgitarre, warmes Klavier, sanfter Shaker, entspannt und zuversichtlich, instrumental, keine Stimmen, 100 BPM"
+    },
+    "app": {
+      "von": "c0",
+      "bis": "c9",
+      "lautstaerke": 0.4,
+      "beschreibung": "Ruhige, unaufdringliche Erklärvideo-Hintergrundmusik: weiche Synth-Pads, leichtes Klavier-Motiv, dezenter Beat, modern und klar, gleichbleibende Energie ohne Höhepunkte, instrumental, keine Stimmen, 95 BPM"
+    },
+    "schluss": {
+      "von": "d1",
+      "bis": "d2",
+      "lautstaerke": 0.6,
+      "beschreibung": "Warmer, hoffnungsvoller Abschluss: Klavier und leise Streicher, Morgendämmerung nach dem Sturm, ruhig ausklingend, instrumental, keine Stimmen, 80 BPM"
+    }
   }
 }

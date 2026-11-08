@@ -59,9 +59,20 @@ Bildes (`"bilder": [...]` in `drehbuch.json`).
    `audio/stimmen-stand.json`). Einzelne Zeilen gezielt neu:
    `npm run erklaerfilm:stimmen -- --nur a5-1 b2-3`.
 3. Geräusche (Regen, Motoren, Funkrauschen …) über die Sound-Effects-API:
-   `npm run erklaerfilm:stimmen -- --geraeusche`. Optional.
-4. Musik: eine eigene, lizenzfreie Datei als `audio/musik.mp3` ablegen; sie
-   läuft leise unter dem ganzen Film.
+   `npm run erklaerfilm:stimmen -- --geraeusche`.
+4. Musik je Abschnitt (angespannt im Papier-Teil, gelöst im digitalen Teil,
+   ruhig im App-Rundgang, warm zum Schluss) über die Music-API:
+   `npm run erklaerfilm:stimmen -- --musik` — erst nach den Stimmen, weil sich
+   die Länge der Stücke aus den Sprachaufnahmen ergibt. Die Beschreibungen
+   stehen unter `musik` in `drehbuch.json`. Wer eigene Musik nimmt, legt sie
+   als `audio/musik.mp3` ab.
+
+Die Rohaufnahmen landen in `audio/roh/`. Daraus entsteht `audio/<id>.mp3`
+ohne lange Pausen (höchstens 0,35 s) und auf −18 LUFS angeglichen.
+
+In einer Claude-Code-Cloud-Sitzung setzt der Proxy den Schlüssel ein; Node
+muss dafür über den Proxy gehen:
+`NODE_USE_ENV_PROXY=1 NODE_EXTRA_CA_CERTS=/root/.ccr/ca-bundle.crt ELEVENLABS_API_KEY=proxy-injected npm run erklaerfilm:stimmen`.
 
 Aussprache: ElevenLabs bekommt `sprechtext`, der Untertitel zeigt `text`. So
 spricht der Erzähler „T-H-W“, „Stan“, „G-K-W“ und Funkrufnamen als
@@ -83,6 +94,7 @@ Zeilen für Plattformen mit Untertitel-Upload.
 npm run erklaerfilm:rendern -- --standbilder         # ein Bild je Zeile zum Durchsehen
 npm run erklaerfilm:rendern -- --von 140 --bis 170   # nur ein Ausschnitt
 npm run erklaerfilm:rendern -- --ohne-untertitel     # App-Teil ohne eingeblendete Untertitel
+npm run erklaerfilm:rendern -- --nur-ton             # Bild behalten, nur Ton neu mischen
 ```
 
 Braucht `ffmpeg`/`ffprobe` im PATH und `pdftoppm` (poppler) für die

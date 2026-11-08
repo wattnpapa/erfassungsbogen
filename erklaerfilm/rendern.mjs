@@ -5,12 +5,14 @@
  *   node erklaerfilm/rendern.mjs --standbilder    ein Bild je Szene → ausgabe/standbilder/
  *   node erklaerfilm/rendern.mjs --von 60 --bis 90   nur ein Ausschnitt
  *   node erklaerfilm/rendern.mjs --ohne-untertitel
+ *   node erklaerfilm/rendern.mjs --nur-ton         Bild von zuvor behalten, nur Ton neu mischen
  *
  * Bild: film.html wird im Browser Bild für Bild auf die Zeit gesetzt
  * (window.film.zeige) und abfotografiert, die Bilder gehen per Pipe an ffmpeg.
  * Ton: alle Sprachzeilen aus audio/ an ihre Startzeit gelegt; Funkzeilen
- * bekommen einen Bandpass. Geräusche (audio/geraeusch-*.mp3) und eine
- * optionale Musik (audio/musik.mp3) liegen leise darunter.
+ * bekommen einen Bandpass. Geräusche (audio/geraeusch-*.mp3) und Musik je
+ * Abschnitt (audio/musik-*.mp3, ersatzweise eine eigene audio/musik.mp3)
+ * liegen leise darunter; die Musik weicht der Sprache aus.
  *
  * Braucht ffmpeg im PATH. CHROMIUM_PFAD setzt einen anderen Browser.
  */
@@ -106,27 +108,38 @@ try {
     const bilder = Math.round((bis - von) * fps);
     const stumm = join(AUSGABE, "bild.mp4");
     const start = Date.now();
-    await ausfuehren(
-      "ffmpeg",
-      ["-y", "-f", "image2pipe", "-framerate", String(fps), "-i", "-", "-c:v", "libx264", "-preset", "medium", "-crf", "18", "-pix_fmt", "yuv420p", stumm],
-      async (stdin) => {
-        for (let n = 0; n < bilder; n++) {
-          await seite.evaluate((t) => window.film.zeige(t), von + n / fps);
-          const jpg = await seite.screenshot({ type: "jpeg", quality: 92 });
-          if (!stdin.write(jpg)) await new Promise((r) => stdin.once("drain", r));
-          if (n % (fps * 5) === 0) process.stdout.write(`\r${(n / fps).toFixed(0)} / ${(bis - von).toFixed(0)} s`);
-        }
-        stdin.end();
-      },
-    );
-    console.log(`\rBild fertig in ${((Date.now() - start) / 1000).toFixed(0)} s`);
+    if (flag("--nur-ton") && existsSync(stumm)) {
+      console.log("Bild aus ausgabe/bild.mp4 übernommen (--nur-ton)");
+    } else {
+      await ausfuehren(
+        "ffmpeg",
+        ["-y", "-f", "image2pipe", "-framerate", String(fps), "-i", "-", "-c:v", "libx264", "-preset", "medium", "-crf", "18", "-pix_fmt", "yuv420p", stumm],
+        async (stdin) => {
+          for (let n = 0; n < bilder; n++) {
+            await seite.evaluate((t) => window.film.zeige(t), von + n / fps);
+            const jpg = await seite.screenshot({ type: "jpeg", quality: 92 });
+            if (!stdin.write(jpg)) await new Promise((r) => stdin.once("drain", r));
+            if (n % (fps * 5) === 0) process.stdout.write(`\r${(n / fps).toFixed(0)} / ${(bis - von).toFixed(0)} s`);
+          }
+          stdin.end();
+        },
+      );
+      console.log(`\rBild fertig in ${((Date.now() - start) / 1000).toFixed(0)} s`);
+    }
 
     // ── Ton mischen ─────────────────────────────────────────────────────
+    // Drei Spuren: Sprache, Geräusche, Musik. Sprache kommt mit −18 LUFS aus
+    // stimmen.mjs; Geräusche und Musik werden hier auf −23 LUFS gebracht und
+    // dann mit ihrer `lautstaerke` aus dem Drehbuch abgesenkt. Die Musik wird
+    // unter der Sprache zusätzlich leiser (Sidechain-Kompressor).
     const eingaben = [];
     const filter = [];
-    const spuren = [];
+    const sprache = [];
+    const geraeusche = [];
+    const musikSpuren = [];
     const audio = (n) => join(ORDNER, "audio", n);
     const drehbuch = JSON.parse(await readFile(join(ORDNER, "drehbuch.json"), "utf8"));
+    const lang = (bis - von).toFixed(2);
     for (const sz of plan) {
       for (const z of sz.zeilen) {
         if (!z.echt || z.ende < von || z.start > bis) continue;
@@ -134,33 +147,68 @@ try {
         const ms = Math.max(0, Math.round((z.start - von) * 1000));
         const funk = z.funk ? ",highpass=f=350,lowpass=f=3200,acompressor=threshold=-18dB:ratio=6,volume=1.4" : "";
         filter.push(`[${i}:a]aresample=44100,aformat=channel_layouts=stereo${funk},adelay=${ms}|${ms}[s${i}]`);
-        spuren.push(`[s${i}]`);
+        sprache.push(`[s${i}]`);
       }
       // Geräusche: Schleifen über die ganze Szene, Einzelgeräusche kurz nach Szenenbeginn.
       for (const name of sz.geraeusche) {
         const datei = audio(`geraeusch-${name}.mp3`);
         const def = drehbuch.geraeusche?.[name];
         if (!existsSync(datei) || !def || sz.ende < von || sz.start > bis) continue;
-        const i = eingaben.push(def.schleife ? ["-stream_loop", "-1", "-i", datei] : ["-i", datei]); // Eingang 0 ist das Bild
+        const i = eingaben.push(def.schleife ? ["-stream_loop", "-1", "-i", datei] : ["-i", datei]);
         const beginn = Math.max(sz.start, von);
         const laenge = sz.ende - beginn;
         const ms = Math.round((beginn - von + (def.schleife ? 0 : 0.4)) * 1000);
         const blende = Math.min(0.6, laenge / 3).toFixed(2);
         filter.push(
-          `[${i}:a]aresample=44100,aformat=channel_layouts=stereo,atrim=0:${laenge.toFixed(2)},afade=t=in:d=${blende},afade=t=out:st=${(laenge - Number(blende)).toFixed(2)}:d=${blende},volume=${def.lautstaerke ?? 0.3},adelay=${ms}|${ms}[g${i}]`,
+          `[${i}:a]aresample=44100,aformat=channel_layouts=stereo,loudnorm=I=-23:TP=-2,aresample=44100,atrim=0:${laenge.toFixed(2)},afade=t=in:d=${blende},afade=t=out:st=${(laenge - Number(blende)).toFixed(2)}:d=${blende},volume=${def.lautstaerke ?? 0.3},adelay=${ms}|${ms}[g${i}]`,
         );
-        spuren.push(`[g${i}]`);
+        geraeusche.push(`[g${i}]`);
       }
     }
-    const musik = audio("musik.mp3");
-    if (existsSync(musik)) {
-      const i = eingaben.push(["-stream_loop", "-1", "-i", musik]); // Eingang 0 ist das Bild
-      filter.push(`[${i}:a]aresample=44100,aformat=channel_layouts=stereo,atrim=0:${(bis - von).toFixed(2)},volume=0.12,afade=t=out:st=${(bis - von - 3).toFixed(2)}:d=3[m${i}]`);
-      spuren.push(`[m${i}]`);
+    // Musik je Abschnitt (drehbuch.musik → audio/musik-<name>.mp3).
+    for (const [name, m] of Object.entries(drehbuch.musik ?? {})) {
+      const datei = audio(`musik-${name}.mp3`);
+      const erste = plan.find((p) => p.id === m.von);
+      const letzte = plan.find((p) => p.id === m.bis);
+      if (!existsSync(datei) || !erste || !letzte || letzte.ende < von || erste.start > bis) continue;
+      const beginn = Math.max(erste.start, von);
+      const ende = Math.min(letzte.ende, bis);
+      const laenge = ende - beginn;
+      const versatz = beginn - erste.start; // bei Ausschnitten mitten im Stück einsteigen
+      const i = eingaben.push(["-i", datei]);
+      const ms = Math.round((beginn - von) * 1000);
+      filter.push(
+        `[${i}:a]aresample=44100,aformat=channel_layouts=stereo,loudnorm=I=-23:TP=-2,aresample=44100,atrim=${versatz.toFixed(2)}:${(versatz + laenge).toFixed(2)},asetpts=PTS-STARTPTS,afade=t=in:d=1.5,afade=t=out:st=${Math.max(0, laenge - 2).toFixed(2)}:d=2,volume=${m.lautstaerke ?? 0.14},adelay=${ms}|${ms}[m${i}]`,
+      );
+      musikSpuren.push(`[m${i}]`);
     }
+    const eigene = audio("musik.mp3");
+    if (existsSync(eigene) && !musikSpuren.length) {
+      const i = eingaben.push(["-stream_loop", "-1", "-i", eigene]);
+      filter.push(`[${i}:a]aresample=44100,aformat=channel_layouts=stereo,atrim=0:${lang},volume=0.12,afade=t=out:st=${(bis - von - 3).toFixed(2)}:d=3[m${i}]`);
+      musikSpuren.push(`[m${i}]`);
+    }
+    const bus = (spuren, name) => {
+      if (!spuren.length) return false;
+      filter.push(`${spuren.join("")}amix=inputs=${spuren.length}:normalize=0:duration=longest,apad=whole_dur=${lang}[${name}]`);
+      return true;
+    };
+    const mitSprache = bus(sprache, "sprache");
+    const mitGeraeusch = bus(geraeusche, "geraeusch");
+    const mitMusik = bus(musikSpuren, "musik");
+    const ausgang = [];
+    if (mitSprache && mitMusik) {
+      filter.push(`[sprache]asplit=2[sprache1][steuer]`);
+      filter.push(`[musik][steuer]sidechaincompress=threshold=0.02:ratio=5:attack=80:release=700[musik1]`);
+      ausgang.push("[sprache1]", "[musik1]");
+    } else {
+      if (mitSprache) ausgang.push("[sprache]");
+      if (mitMusik) ausgang.push("[musik]");
+    }
+    if (mitGeraeusch) ausgang.push("[geraeusch]");
     const ziel = join(AUSGABE, flag("--von") || flag("--bis") ? `erklaerfilm-${von}-${bis}.mp4` : "erklaerfilm.mp4");
-    if (spuren.length) {
-      filter.push(`${spuren.join("")}amix=inputs=${spuren.length}:normalize=0:duration=longest,alimiter=limit=0.95,apad[ton]`);
+    if (ausgang.length) {
+      filter.push(`${ausgang.join("")}amix=inputs=${ausgang.length}:normalize=0:duration=longest,alimiter=limit=0.95[ton]`);
       await ausfuehren("ffmpeg", [
         "-y", "-i", stumm, ...eingaben.flat(), "-filter_complex", filter.join(";"),
         "-map", "0:v", "-map", "[ton]", "-c:v", "copy", "-c:a", "aac", "-b:a", "192k", "-shortest", ziel,
