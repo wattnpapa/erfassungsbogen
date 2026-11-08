@@ -716,6 +716,18 @@ wieder.
 > transitiven Pakete axios 1.20.0, http-cache-semantics 4.3.0, fast-uri 3.1.9
 > und serialize-javascript 7.1.4 über `package-lock.json`. Alle Treffer lagen
 > im Bau-/Testwerkzeug; `npm audit --omit=dev` war durchgehend leer.
+>
+> *Prüfvermerk (Stand 2026-11-08):* Dependabot-PRs 56–59 und 61 übernommen
+> (@capacitor/core ^8.5.3, @capacitor/filesystem ^8.1.5, @capacitor/share
+> ^8.0.3, react-dom ^19.3.1, follow-redirects 1.16.3), dazu joi 18.3.2 über
+> `npm audit fix`. Für glob 9–14.0.1 (AbortSignal-Umgehung) und minimatch
+> 7–11.0.0 (GHSA-g3hv-75wg-m249, über eslint 10 und typescript-eslint) setzt
+> `package.json` gezielte `overrides` auf glob ^14.0.4 und minimatch ^11.0.5;
+> ein Downgrade von eslint, wie `npm audit fix --force` ihn vorschlägt, entfällt
+> damit. Offen bleibt nur deepmerge ≤ 4.3.1 (GHSA-gcqx-w48m-w2h4, niedrig) über
+> workbox-build in vite-plugin-pwa: Eine korrigierte Version gibt es nicht, und
+> das Paket läuft ausschließlich beim Bauen, nicht auf Einsatzgeräten.
+> `softprops/action-gh-release` ist in `release.yml` auf einen Commit-Hash gepinnt.
 
 ### 2.2 Organisatorische Randbedingungen
 

@@ -126,10 +126,10 @@
     "@capacitor/android": "^8.5.1",
     "@capacitor/app": "^8.1.1",
     "@capacitor/barcode-scanner": "^3.1.2",
-    "@capacitor/core": "^8.5.2",
-    "@capacitor/filesystem": "^8.1.2",
+    "@capacitor/core": "^8.6.0",
+    "@capacitor/filesystem": "^8.1.5",
     "@capacitor/ios": "^8.5.1",
-    "@capacitor/share": "^8.0.2",
+    "@capacitor/share": "^8.0.3",
     "@fontsource-variable/archivo": "^5.3.0",
     "@noble/ed25519": "^3.2.0",
     "electron-updater": "^6.8.3",
@@ -138,7 +138,7 @@
     "pdfmake": "^0.3.11",
     "qrcode": "^1.5.4",
     "react": "^19.2.7",
-    "react-dom": "^19.3.0",
+    "react-dom": "^19.3.1",
     "zxing-wasm": "^3.1.4"
   },
   "devDependencies": {
@@ -177,7 +177,9 @@
   "overrides": {
     "xcode": {
       "uuid": "^11.1.1"
-    }
+    },
+    "glob@>=9.0.0 <14.0.2": "^14.0.4",
+    "minimatch@>=7.0.0 <11.0.1": "^11.0.5"
   },
   "type": "module",
   "private": true

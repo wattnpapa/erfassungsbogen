@@ -1214,6 +1214,14 @@ ORP.1 Organisation, INF.1 Gebäude) sind nicht Gegenstand dieses Dokuments.
 > GitHub-Actions, `@bos/*` ist ausgenommen (Submodule über `file:`); `npm audit`
 > blockiert ab „hoch" über die Laufzeit-Abhängigkeiten und protokolliert das
 > Bau-/Testwerkzeug ohne Blockade.
+>
+> *Prüfvermerk (Stand 2026-11-08):* Transitive Schwachstellen ohne direkten
+> Fix werden über gezielte `overrides` in `package.json` geschlossen (derzeit
+> glob ^14.0.4 und minimatch ^11.0.5, beide Bau-/Testwerkzeug). Einziger offener
+> Befund ist deepmerge ≤ 4.3.1 (niedrig, nur im PWA-Build). Die einzige
+> Fremd-Action außerhalb von `actions/*` mit Schreibrecht
+> (`softprops/action-gh-release`) ist auf einen Commit-Hash gepinnt; Dependabot
+> hebt Hash und Versionskommentar gemeinsam.
 
 ## 7. Ergänzende Risikoanalyse (BSI-Standard 200-3, Auswahl)
 
