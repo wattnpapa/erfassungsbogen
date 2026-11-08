@@ -15,6 +15,8 @@
  *   (nur WebP, R5-O4). Die Liste
  *   schreibt der Build nach `offline-zusatz.json`; dort steht auch der Umfang
  *   des Kerns, damit die Startseite beim Laden einen Fortschritt zeigen kann.
+ * - **Nur auf Abruf** (seit 2026-11-08): die Bögen aller THW-Ortsverbände
+ *   (istNurAufAbruf) — weder Kern noch Zusatz.
  */
 
 export interface VorratEintrag {
@@ -35,6 +37,17 @@ export const ZUSATZ_CACHE = "eeb-zusatz";
 /** Seiten, die die App selbst verlinkt oder die offline zur Hand sein müssen. */
 const KERN_SEITEN = new Set(["index.html", "anleitung.html", "vorlage.html", "datenschutz.html", "impressum.html", "404.html"]);
 
+/**
+ * Gar nicht vorab laden: die rund 3.500 Bögen „alle Einheiten aller
+ * Ortsverbände" (examples/thw/ortsverbaende/, Dateinamen „ov-…"). Zusammen gut
+ * 9 MB — das lädt kein Gerät für eine Liste, aus der es ein paar Bögen braucht.
+ * Ein Bogen kommt beim ersten Öffnen aus dem Netz und bleibt danach im
+ * Laufzeit-Cache (`eeb-zusatz`, CacheFirst, vite.config.ts).
+ */
+export function istNurAufAbruf(url: string): boolean {
+  return /^assets\/ov-[^/]+\.json$/.test(url);
+}
+
 /** Gehört die Datei (Pfad wie im Precache-Manifest) in die zweite Stufe? */
 export function istZusatz(url: string): boolean {
   // Beispielbögen: per Glob als URL eingebunden (examples/**/*.json).
@@ -50,7 +63,10 @@ export function istZusatz(url: string): boolean {
 export function vorratAufteilen(eintraege: VorratEintrag[]): { kern: VorratEintrag[]; umfang: OfflineUmfang } {
   const kern: VorratEintrag[] = [];
   const zusatz: VorratEintrag[] = [];
-  for (const e of eintraege) (istZusatz(e.url) ? zusatz : kern).push(e);
+  for (const e of eintraege) {
+    if (istNurAufAbruf(e.url)) continue;
+    (istZusatz(e.url) ? zusatz : kern).push(e);
+  }
   return {
     kern,
     umfang: {

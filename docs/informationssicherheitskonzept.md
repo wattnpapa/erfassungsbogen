@@ -237,6 +237,18 @@ Grundlage: Repository `wattnpapa/erfassungsbogen`, Stand 2026-09-12 — Version 
 > (Verfügbarkeit, 5.5). Kein neuer Speicherort; das gemerkte Lese-Ergebnis
 > liegt nur im Arbeitsspeicher der geöffneten Seite.
 >
+> **Nachgezogen 2026-11-08:** Beispielbögen aller THW-Ortsverbände
+> (`examples/thw/ortsverbaende/`, 3.533 Übungsbögen, erfundene Namen, Rufnummern
+> 555…). Sie gehören weder zum Kern noch zur Zusatzstufe des Offline-Vorrats
+> (`istNurAufAbruf` in `scripts/precache-aufteilung.ts`): Ein Bogen wird beim
+> ersten Öffnen von der eigenen Herkunft geladen und liegt danach im
+> Laufzeit-Cache `eeb-zusatz`; ohne Netz fehlen nur noch nicht geöffnete Bögen
+> dieses Ordners (Verfügbarkeit 5.5, für den Einsatz unkritisch). Keine neuen
+> Hosts zur Laufzeit, CSP unverändert, kein neuer Speicherschlüssel. Lieferkette
+> (6.4): keine neue Abhängigkeit; die Einheitenliste je OV stammt von der
+> inoffiziellen OV-Karte thw.blafusel.de und wird nur beim Erzeugen abgerufen
+> (`npm run beispiele:thw-ov -- --abrufen`), JS-Gesamtumfang 6,45 MB.
+>
 > **Nachgezogen 2026-10-05:** Offline-Vorrat in zwei Stufen (Audit Runde 3,
 > R3-O3, `vite.config.ts`, `scripts/precache-aufteilung.ts`,
 > `src/app/offline-vorrat.ts`) — der Service Worker ist nach dem Kern

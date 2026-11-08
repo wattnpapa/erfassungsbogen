@@ -1448,6 +1448,16 @@ Startseite lädt sie nach der Aktivierung nach (`src/app/offline-vorrat.ts`),
 der Service Worker legt sie über zwei Laufzeit-Routen in den Cache
 `eeb-zusatz` (Beispielbögen `CacheFirst`, Seiten `StaleWhileRevalidate` seit Runde 7, Liste `NetworkFirst`).
 *Hinweis 2026-10-24:* Mit `examples/praktische-ausbildung/` (41 Bögen, JSON) sind die Zusatzstufe um 41 Dateien und die Zahlen oben (474 Dateien, 4,0 MB) sowie die Bogenzählungen weiter unten (227/239/443 Beispielbögen) nicht mehr aktuell; beim nächsten Build neu messen.
+*Nachgezogen 2026-11-08 (alle THW-Ortsverbände):* `examples/thw/ortsverbaende/` trägt 3.533 Übungsbögen
+(jede Einheit von 667 OVs, Landesverband › Regionalstelle › Ortsverband, immer StAN-Stärke, erzeugt von
+`scripts/thw-ov-beispielboegen.mts` aus der Momentaufnahme `scripts/quellen/thw-ov-einheiten.json` der OV-Karte
+thw.blafusel.de). Diese Bögen sind eine dritte Klasse **nur auf Abruf**: `istNurAufAbruf` in
+`scripts/precache-aufteilung.ts` nimmt die Dateien `assets/ov-*.json` (zusammen gut 9 MB) aus Kern und
+Zusatzstufe heraus; ein Bogen kommt beim ersten Öffnen aus dem Netz und bleibt dann über die
+`CacheFirst`-Route in `eeb-zusatz`. Ihre Adressliste steht nicht im Glob der Fußzeile, sondern im eigenen
+Baustein `src/app/beispiele-thw-ov.ts` (rund 0,74 MB, gezippt 84 KB), den der Beispielbögen-Dialog beim
+Öffnen nachlädt; Startbündel unverändert, JS-Gesamtumfang 6,45 MB (`scripts/bundle-budget.json` angehoben).
+Kein neuer Host zur Laufzeit; thw.blafusel.de ruft nur das Generatorskript mit `--abrufen` auf.
 *Nachgezogen 2026-10-06 (Audit Runde 4, R4-O1):* Bricht das Erstladen im
 Funkloch ab, scheitert der Service Worker an der Installation, und der Browser
 verwirft die Registrierung; ein späteres `update()` ginge ins Leere und die

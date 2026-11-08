@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { istZusatz, vorratAufteilen } from "./precache-aufteilung";
+import { istNurAufAbruf, istZusatz, vorratAufteilen } from "./precache-aufteilung";
 import { relativerPfad } from "../src/app/offline-vorrat";
 
 describe("Offline-Vorrat in zwei Stufen (R3-O3)", () => {
@@ -46,6 +46,18 @@ describe("Offline-Vorrat in zwei Stufen (R3-O3)", () => {
     expect(kern.map((e) => e.url)).toEqual(["index.html"]);
     expect(umfang.kern).toEqual([{ url: "index.html", size: 10 }]);
     expect(umfang.zusatz.map((e) => e.url)).toEqual(["assets/x-1.json", "thw.html"]);
+  });
+
+  it("lädt die Bögen aller Ortsverbände nur auf Abruf, nicht vorab", () => {
+    expect(istNurAufAbruf("assets/ov-stralsund-12-2-tz-b-abc123.json")).toBe(true);
+    expect(istNurAufAbruf("assets/001-albstadt-ztr-tz-abc.json")).toBe(false);
+    const { kern, umfang } = vorratAufteilen([
+      { url: "index.html", revision: "1", size: 10 },
+      { url: "assets/ov-aachen-01-1-tz-ztr-tz-1.json", revision: null, size: 3 },
+      { url: "assets/x-1.json", revision: null, size: 5 },
+    ]);
+    expect(kern.map((e) => e.url)).toEqual(["index.html"]);
+    expect(umfang.zusatz.map((e) => e.url)).toEqual(["assets/x-1.json"]);
   });
 
   it("liest Cache-Adressen als Manifest-Pfade", () => {

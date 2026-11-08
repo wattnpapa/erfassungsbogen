@@ -57,6 +57,7 @@ const VORLAGE = "https://erfassungsbogen.app/vorlage.html";
 // sichtbar bleiben.
 const ORDNER_LABEL: Record<string, string> = {
   thw: "THW",
+  ortsverbaende: "Alle Einheiten aller Ortsverbände (LV › RSt › OV)",
   bbk: "BBK (Bundeseinheiten)",
   feuerwehr: "Feuerwehr",
   polizei: "Polizei",
@@ -81,7 +82,7 @@ const ORDNER_LABEL: Record<string, string> = {
 };
 
 function ordnerLabel(ordner: string): string {
-  return ORDNER_LABEL[ordner] ?? ordner.replace(/-/g, " ").toUpperCase();
+  return ORDNER_LABEL[ordner] ?? ORDNER_LABEL_NACHGELADEN.get(ordner) ?? ordner.replace(/-/g, " ").toUpperCase();
 }
 
 // Beispielbögen aus examples/ — beliebig tief verschachtelt (z. B.
@@ -92,10 +93,14 @@ function ordnerLabel(ordner: string): string {
 // aufgelöst, neue Dateien und Ordner erscheinen also automatisch ohne
 // Codeänderung (erzeugt von scripts/*-beispielboegen*.mts). `ordner` sind die
 // Verzeichnissegmente zwischen examples/ und der Datei.
-const BEISPIELE = Object.entries(
-  import.meta.glob("../../examples/**/*.json", { eager: true, query: "?url", import: "default" }),
-)
-  .map(([pfad, url]) => {
+interface BeispielEintrag {
+  ordner: string[];
+  datei: string;
+  url: string;
+}
+
+function beispielEintraege(glob: Record<string, unknown>): BeispielEintrag[] {
+  return Object.entries(glob).map(([pfad, url]) => {
     const teile = pfad.split("/");
     const iExamples = teile.lastIndexOf("examples");
     return {
@@ -103,11 +108,58 @@ const BEISPIELE = Object.entries(
       datei: teile[teile.length - 1]!.replace(/\.json$/, ""),
       url: url as string,
     };
-  })
-  .sort((a, b) => a.datei.localeCompare(b.datei, "de"));
+  });
+}
+
+const nachDatei = (a: BeispielEintrag, b: BeispielEintrag) => a.datei.localeCompare(b.datei, "de");
+
+// Die rund 3.500 Bögen „alle Einheiten aller Ortsverbände" (examples/thw/
+// ortsverbaende/, scripts/thw-ov-beispielboegen.mts) stehen nicht in diesem
+// Glob: Ihre Adressliste allein wäre mehrere hundert KB groß und läge sonst
+// in jedem App-Start. Sie kommt beim Öffnen des Dialogs aus einem eigenen
+// Baustein (beispiele-thw-ov.ts) dazu.
+const BEISPIELE: BeispielEintrag[] = beispielEintraege(
+  import.meta.glob(["../../examples/**/*.json", "!../../examples/thw/ortsverbaende/**"], {
+    eager: true,
+    query: "?url",
+    import: "default",
+  }),
+).sort(nachDatei);
+
+/** Anzeigenamen der nachgeladenen Ordner (Landesverband, Regionalstelle, Ortsverband). */
+const ORDNER_LABEL_NACHGELADEN = new Map<string, string>();
+let ovBeispieleVersprechen: Promise<void> | null = null;
+
+/** Bögen aller Ortsverbände einmalig dazuholen; ein Fehlschlag (offline, alter Stand) darf später erneut versucht werden. */
+function ovBeispieleLaden(): Promise<void> {
+  ovBeispieleVersprechen ??= import("./beispiele-thw-ov")
+    .then(({ THW_OV_BEISPIELE, THW_OV_ORDNER_LABEL }) => {
+      BEISPIELE.push(...beispielEintraege(THW_OV_BEISPIELE));
+      BEISPIELE.sort(nachDatei);
+      for (const [ordner, label] of Object.entries(THW_OV_ORDNER_LABEL)) ORDNER_LABEL_NACHGELADEN.set(ordner, label);
+    })
+    .catch((err: unknown) => {
+      ovBeispieleVersprechen = null;
+      throw err;
+    });
+  return ovBeispieleVersprechen;
+}
+
+/**
+ * Zug einer Einheit aus „alle Ortsverbände" — steht im Dateinamen
+ * („ov-stralsund-12-2-tz-b"), damit „B" im 1. und im 2. TZ in der Liste
+ * unterscheidbar sind, ohne erst den Bogen zu lesen.
+ */
+function zugHinweis(datei: string): string {
+  const m = /^ov-.+-\d{2}-(\d-tz|fz-fk|fz-log)-/.exec(datei);
+  if (!m) return "";
+  if (m[1] === "fz-fk") return "Fachzug Führung/Kommunikation";
+  if (m[1] === "fz-log") return "Fachzug Logistik";
+  return `${m[1]![0]}. Technischer Zug`;
+}
 
 /** Trefferliste unter einem Ordner-Pfad (Prefix-Abgleich). */
-function unterPfad(pfad: string[]): typeof BEISPIELE {
+function unterPfad(pfad: string[]): BeispielEintrag[] {
   return BEISPIELE.filter((b) => pfad.every((seg, i) => b.ordner[i] === seg));
 }
 
@@ -126,7 +178,7 @@ function unterordner(pfad: string[]): { ordner: string; anzahl: number }[] {
 }
 
 /** Bögen, die direkt in diesem Ordner liegen (keine tiefere Ebene mehr). */
-function boegenHier(pfad: string[]): typeof BEISPIELE {
+function boegenHier(pfad: string[]): BeispielEintrag[] {
   return unterPfad(pfad).filter((b) => b.ordner.length === pfad.length);
 }
 
@@ -510,6 +562,22 @@ export function Fusszeile({ onBogenOeffnen, kompakt = false }: {
   // wechselt. Fehlschläge (z. B. offline) sind kein Beinbruch: die Tabelle
   // zeigt dann den Dateinamen und meldet es unter der Liste.
   const beispielPfadSchluessel = beispielPfad.join("/");
+  // Bögen aller Ortsverbände beim ersten Öffnen dazuholen (eigener Baustein,
+  // siehe ovBeispieleLaden); der Zähler lässt Ordnerliste und Tabelle neu rechnen.
+  const [ovBeispieleStand, setOvBeispieleStand] = useState(0);
+  useEffect(() => {
+    if (!beispieleOffen) return;
+    let aktiv = true;
+    ovBeispieleLaden().then(
+      () => aktiv && setOvBeispieleStand((n) => n + 1),
+      () => {
+        /* ohne Netz und ohne Vorrat fehlt nur dieser Ordner */
+      },
+    );
+    return () => {
+      aktiv = false;
+    };
+  }, [beispieleOffen]);
   useEffect(() => {
     if (!beispieleOffen) return;
     const pfad = beispielPfadSchluessel ? beispielPfadSchluessel.split("/") : [];
@@ -552,7 +620,7 @@ export function Fusszeile({ onBogenOeffnen, kompakt = false }: {
     return () => {
       aktiv = false;
     };
-  }, [beispieleOffen, beispielPfadSchluessel]);
+  }, [beispieleOffen, beispielPfadSchluessel, ovBeispieleStand]);
 
   // Anzeigestand der offenen Ebene.
   const beispielOrdner = unterordner(beispielPfad);
@@ -1239,6 +1307,7 @@ export function Fusszeile({ onBogenOeffnen, kompakt = false }: {
                           )}
                           <span>
                             <strong>{b ? einheitsTypText(b) || datei : datei}</strong>
+                            {zugHinweis(datei) && <span className="hinweis">{zugHinweis(datei)}</span>}
                             {beispielLaeuft === datei && <span className="hinweis">wird vorbereitet …</span>}
                           </span>
                         </span>
