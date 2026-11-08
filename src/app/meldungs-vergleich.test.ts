@@ -15,7 +15,7 @@ describe("meldungenVergleichen", () => {
     const v = meldungenVergleichen(bogen([["Lehmann", "Karsten"]], ["THW-84397"]), bogen([["Müller", "Max"], ["Lehmann", "Karsten"]]));
     expect(v.bisher.ansprechperson).toBe("Lehmann, Karsten");
     expect(v.neu.ansprechperson).toBe("Müller, Max");
-    expect(steckbriefZeile(v.bisher)).toMatch(/^Stärke \d+ \/ \d+ \/ \d+ \/ \d+ · Lehmann, Karsten · THW-84397 · Stand /);
+    expect(steckbriefZeile(v.bisher)).toMatch(/^Stärke \d+ \/ \d+ \/ \d+ \/\/ \d+ · Lehmann, Karsten · THW-84397 · Stand /);
   });
 
   // Audit Runde 6, R6-W2: Die Rückfrage nennt, was sich geändert hat.

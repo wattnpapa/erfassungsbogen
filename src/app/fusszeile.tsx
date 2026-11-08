@@ -41,6 +41,7 @@ import { WERKZEUGE, WERKZEUGE_TITEL } from "./werkzeuge";
 import { folgenText } from "./uhr-folgen";
 import { arbeiten, useArbeitet } from "./arbeitet";
 import { FehlerImBild } from "./fehler-im-bild";
+import type { Aenderung } from "./aenderungen";
 
 const KONTAKT = "johannes.rudolph@thw-oldenburg.de";
 const REPO = "https://github.com/wattnpapa/erfassungsbogen";
@@ -56,6 +57,7 @@ const VORLAGE = "https://erfassungsbogen.app/vorlage.html";
 // sichtbar bleiben.
 const ORDNER_LABEL: Record<string, string> = {
   thw: "THW",
+  ortsverbaende: "Alle Einheiten aller Ortsverbände (LV › RSt › OV)",
   bbk: "BBK (Bundeseinheiten)",
   feuerwehr: "Feuerwehr",
   polizei: "Polizei",
@@ -80,7 +82,7 @@ const ORDNER_LABEL: Record<string, string> = {
 };
 
 function ordnerLabel(ordner: string): string {
-  return ORDNER_LABEL[ordner] ?? ordner.replace(/-/g, " ").toUpperCase();
+  return ORDNER_LABEL[ordner] ?? ORDNER_LABEL_NACHGELADEN.get(ordner) ?? ordner.replace(/-/g, " ").toUpperCase();
 }
 
 // Beispielbögen aus examples/ — beliebig tief verschachtelt (z. B.
@@ -91,10 +93,14 @@ function ordnerLabel(ordner: string): string {
 // aufgelöst, neue Dateien und Ordner erscheinen also automatisch ohne
 // Codeänderung (erzeugt von scripts/*-beispielboegen*.mts). `ordner` sind die
 // Verzeichnissegmente zwischen examples/ und der Datei.
-const BEISPIELE = Object.entries(
-  import.meta.glob("../../examples/**/*.json", { eager: true, query: "?url", import: "default" }),
-)
-  .map(([pfad, url]) => {
+interface BeispielEintrag {
+  ordner: string[];
+  datei: string;
+  url: string;
+}
+
+function beispielEintraege(glob: Record<string, unknown>): BeispielEintrag[] {
+  return Object.entries(glob).map(([pfad, url]) => {
     const teile = pfad.split("/");
     const iExamples = teile.lastIndexOf("examples");
     return {
@@ -102,11 +108,58 @@ const BEISPIELE = Object.entries(
       datei: teile[teile.length - 1]!.replace(/\.json$/, ""),
       url: url as string,
     };
-  })
-  .sort((a, b) => a.datei.localeCompare(b.datei, "de"));
+  });
+}
+
+const nachDatei = (a: BeispielEintrag, b: BeispielEintrag) => a.datei.localeCompare(b.datei, "de");
+
+// Die rund 3.500 Bögen „alle Einheiten aller Ortsverbände" (examples/thw/
+// ortsverbaende/, scripts/thw-ov-beispielboegen.mts) stehen nicht in diesem
+// Glob: Ihre Adressliste allein wäre mehrere hundert KB groß und läge sonst
+// in jedem App-Start. Sie kommt beim Öffnen des Dialogs aus einem eigenen
+// Baustein (beispiele-thw-ov.ts) dazu.
+const BEISPIELE: BeispielEintrag[] = beispielEintraege(
+  import.meta.glob(["../../examples/**/*.json", "!../../examples/thw/ortsverbaende/**"], {
+    eager: true,
+    query: "?url",
+    import: "default",
+  }),
+).sort(nachDatei);
+
+/** Anzeigenamen der nachgeladenen Ordner (Landesverband, Regionalstelle, Ortsverband). */
+const ORDNER_LABEL_NACHGELADEN = new Map<string, string>();
+let ovBeispieleVersprechen: Promise<void> | null = null;
+
+/** Bögen aller Ortsverbände einmalig dazuholen; ein Fehlschlag (offline, alter Stand) darf später erneut versucht werden. */
+function ovBeispieleLaden(): Promise<void> {
+  ovBeispieleVersprechen ??= import("./beispiele-thw-ov")
+    .then(({ THW_OV_BEISPIELE, THW_OV_ORDNER_LABEL }) => {
+      BEISPIELE.push(...beispielEintraege(THW_OV_BEISPIELE));
+      BEISPIELE.sort(nachDatei);
+      for (const [ordner, label] of Object.entries(THW_OV_ORDNER_LABEL)) ORDNER_LABEL_NACHGELADEN.set(ordner, label);
+    })
+    .catch((err: unknown) => {
+      ovBeispieleVersprechen = null;
+      throw err;
+    });
+  return ovBeispieleVersprechen;
+}
+
+/**
+ * Zug einer Einheit aus „alle Ortsverbände" — steht im Dateinamen
+ * („ov-stralsund-12-2-tz-b"), damit „B" im 1. und im 2. TZ in der Liste
+ * unterscheidbar sind, ohne erst den Bogen zu lesen.
+ */
+function zugHinweis(datei: string): string {
+  const m = /^ov-.+-\d{2}-(\d-tz|fz-fk|fz-log)-/.exec(datei);
+  if (!m) return "";
+  if (m[1] === "fz-fk") return "Fachzug Führung/Kommunikation";
+  if (m[1] === "fz-log") return "Fachzug Logistik";
+  return `${m[1]![0]}. Technischer Zug`;
+}
 
 /** Trefferliste unter einem Ordner-Pfad (Prefix-Abgleich). */
-function unterPfad(pfad: string[]): typeof BEISPIELE {
+function unterPfad(pfad: string[]): BeispielEintrag[] {
   return BEISPIELE.filter((b) => pfad.every((seg, i) => b.ordner[i] === seg));
 }
 
@@ -125,7 +178,7 @@ function unterordner(pfad: string[]): { ordner: string; anzahl: number }[] {
 }
 
 /** Bögen, die direkt in diesem Ordner liegen (keine tiefere Ebene mehr). */
-function boegenHier(pfad: string[]): typeof BEISPIELE {
+function boegenHier(pfad: string[]): BeispielEintrag[] {
   return unterPfad(pfad).filter((b) => b.ordner.length === pfad.length);
 }
 
@@ -433,6 +486,7 @@ export function Fusszeile({ onBogenOeffnen, kompakt = false }: {
   // Eine PDF-Erzeugung läuft höchstens einmal, gleich von welcher Stelle (arbeitet.ts).
   const arbeitet = useArbeitet();
   const ueber = useRef<HTMLDialogElement>(null);
+  const aenderungen = useAenderungen();
   const impressum = useRef<HTMLDialogElement>(null);
   const datenschutz = useRef<HTMLDialogElement>(null);
   const beispiele = useRef<HTMLDialogElement>(null);
@@ -508,6 +562,22 @@ export function Fusszeile({ onBogenOeffnen, kompakt = false }: {
   // wechselt. Fehlschläge (z. B. offline) sind kein Beinbruch: die Tabelle
   // zeigt dann den Dateinamen und meldet es unter der Liste.
   const beispielPfadSchluessel = beispielPfad.join("/");
+  // Bögen aller Ortsverbände beim ersten Öffnen dazuholen (eigener Baustein,
+  // siehe ovBeispieleLaden); der Zähler lässt Ordnerliste und Tabelle neu rechnen.
+  const [ovBeispieleStand, setOvBeispieleStand] = useState(0);
+  useEffect(() => {
+    if (!beispieleOffen) return;
+    let aktiv = true;
+    ovBeispieleLaden().then(
+      () => aktiv && setOvBeispieleStand((n) => n + 1),
+      () => {
+        /* ohne Netz und ohne Vorrat fehlt nur dieser Ordner */
+      },
+    );
+    return () => {
+      aktiv = false;
+    };
+  }, [beispieleOffen]);
   useEffect(() => {
     if (!beispieleOffen) return;
     const pfad = beispielPfadSchluessel ? beispielPfadSchluessel.split("/") : [];
@@ -550,7 +620,7 @@ export function Fusszeile({ onBogenOeffnen, kompakt = false }: {
     return () => {
       aktiv = false;
     };
-  }, [beispieleOffen, beispielPfadSchluessel]);
+  }, [beispieleOffen, beispielPfadSchluessel, ovBeispieleStand]);
 
   // Anzeigestand der offenen Ebene.
   const beispielOrdner = unterordner(beispielPfad);
@@ -804,8 +874,11 @@ export function Fusszeile({ onBogenOeffnen, kompakt = false }: {
           <a href={ANLEITUNG} target="_blank" rel="noopener noreferrer">Anleitung</a>
           {/* Auch beim Ausfüllen eines Bogens erreichbar (R3-A7). */}
           <button type="button" className="link" onClick={() => void blankoHerunterladen()}>Blanko-Vordruck</button>
-          <span className="fuss-version">v{__APP_VERSION__}</span>
+          <button type="button" className="link fuss-version" title="Was ist neu" onClick={() => void aenderungen.oeffnen()}>
+            v{__APP_VERSION__} · Was ist neu
+          </button>
         </nav>
+        {aenderungen.dialog}
         <Impressumsdialog dialogRef={impressum} />
         <Datenschutzdialog dialogRef={datenschutz} />
         <Werkzeugzeile />
@@ -870,6 +943,7 @@ export function Fusszeile({ onBogenOeffnen, kompakt = false }: {
           </button>
           {/* Das PDF bleibt hell, auch nachts (R5-L5). */}
           <span className="hinweis papier-hinweis">Das PDF ist für Papier gedacht, hell.</span>
+          <button type="button" className="link" onClick={() => void aenderungen.oeffnen()}>Was ist neu</button>
           <a href={`mailto:${KONTAKT}`}>Kontakt</a>
           <a href={REPO} target="_blank" rel="noopener noreferrer">Open Source auf GitHub</a>
         </nav>
@@ -896,7 +970,9 @@ export function Fusszeile({ onBogenOeffnen, kompakt = false }: {
         </div>
       </div>
       <p className="fuss-marke">
-        Einheiten-Erfassungsbogen v{__APP_VERSION__} · von{" "}
+        Einheiten-Erfassungsbogen{" "}
+        <button type="button" className="link" title="Was ist neu" onClick={() => void aenderungen.oeffnen()}>v{__APP_VERSION__}</button>
+        {" "}· von{" "}
         <button type="button" className="link" onClick={() => ueber.current?.showModal()}>Johannes Rudolph</button>
       </p>
 
@@ -1231,6 +1307,7 @@ export function Fusszeile({ onBogenOeffnen, kompakt = false }: {
                           )}
                           <span>
                             <strong>{b ? einheitsTypText(b) || datei : datei}</strong>
+                            {zugHinweis(datei) && <span className="hinweis">{zugHinweis(datei)}</span>}
                             {beispielLaeuft === datei && <span className="hinweis">wird vorbereitet …</span>}
                           </span>
                         </span>
@@ -1249,7 +1326,7 @@ export function Fusszeile({ onBogenOeffnen, kompakt = false }: {
                       <td className="zahl" role="cell">
                         {b && s ? (
                           <>
-                            <strong>{s.fuehrer}/{s.unterfuehrer}/{s.mannschaft}/{s.gesamt}</strong>
+                            <strong>{s.fuehrer}/{s.unterfuehrer}/{s.mannschaft}//{s.gesamt}</strong>
                             <span className="hinweis">
                               {b.fahrzeuge.length} {b.fahrzeuge.length === 1 ? "Fahrzeug" : "Fahrzeuge"}
                             </span>
@@ -1314,6 +1391,8 @@ export function Fusszeile({ onBogenOeffnen, kompakt = false }: {
         </p>
       </Dialog>
 
+      {aenderungen.dialog}
+
       <Impressumsdialog dialogRef={impressum} />
 
       <Datenschutzdialog dialogRef={datenschutz} />
@@ -1321,6 +1400,88 @@ export function Fusszeile({ onBogenOeffnen, kompakt = false }: {
       <Werkzeugzeile />
     </footer>
   );
+}
+
+/**
+ * „Was ist neu" — der Änderungsverlauf (aenderungen.ts). Die Liste kommt erst
+ * beim Öffnen nach (eigener Baustein im Offline-Vorrat), das Startpaket trägt
+ * nur den Knopf. Erreichbar über die Versionsnummer, in der schmalen Zeile des
+ * Assistenten wie in der vollen Fußzeile.
+ */
+function useAenderungen() {
+  const ref = useRef<HTMLDialogElement>(null);
+  const [daten, setDaten] = useState<{ liste: readonly Aenderung[]; monate: Readonly<Record<string, string>> } | null>(null);
+  // Blättern je Monat, 0 = neuester. Ein Verlauf seit Juli war als eine Liste über 20 Bildschirme lang.
+  const [seite, setSeite] = useState(0);
+  const [fehler, setFehler] = useState("");
+  const kopf = useRef<HTMLHeadingElement>(null);
+  const oeffnen = async () => {
+    setFehler("");
+    setSeite(0);
+    try {
+      const m = await import("./aenderungen");
+      setDaten({ liste: m.AENDERUNGEN, monate: m.MONATE });
+    } catch (err) {
+      setFehler(`Der Änderungsverlauf ließ sich nicht laden: ${fehlerText(err)}`);
+    }
+    ref.current?.showModal();
+  };
+  const monate = daten ? [...new Set(daten.liste.map((a) => a.datum.slice(0, 7)))] : [];
+  const monat = monate[seite];
+  const blaettern = (neu: number) => {
+    setSeite(neu);
+    // Nach dem Blättern beginnt der neue Monat oben, nicht dort, wo man im alten gerollt hatte.
+    requestAnimationFrame(() => kopf.current?.scrollIntoView?.({ block: "start" }));
+  };
+  const leiste = monate.length > 1 && (
+    <nav className="aenderungen-blaettern" aria-label="Monate blättern">
+      <button type="button" disabled={seite === 0} onClick={() => blaettern(seite - 1)}>← Neuer</button>
+      <span>
+        {seite + 1} von {monate.length}
+      </span>
+      <button type="button" disabled={seite >= monate.length - 1} onClick={() => blaettern(seite + 1)}>Älter →</button>
+    </nav>
+  );
+  const dialog = (
+    <Dialog titel="Was ist neu" dialogRef={ref} klasse="rollhinweis aenderungen">
+      <p className="hinweis">Installierte Fassung: v{__APP_VERSION__}.</p>
+      {fehler && <p className="fehler" role="alert">{fehler}</p>}
+      {daten && monat && (
+        <>
+          <h3 className="aenderungen-monat" ref={kopf}>{monatsName(monat)}</h3>
+          {daten.monate[monat] && <p className="aenderungen-kurz">{daten.monate[monat]}</p>}
+          {daten.liste
+            .filter((a) => a.datum.startsWith(monat))
+            .map((a) => (
+              <section key={a.datum} className="aenderung">
+                <h4>{aenderungsDatumText(a.datum)}</h4>
+                <ul>
+                  {a.punkte.map((p) => (
+                    <li key={p}>{p}</li>
+                  ))}
+                </ul>
+              </section>
+            ))}
+          {leiste}
+        </>
+      )}
+    </Dialog>
+  );
+  return { oeffnen, dialog };
+}
+
+const MONATSNAMEN = ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"];
+
+/** „November 2026" aus „2026-11". */
+function monatsName(jjjjmm: string): string {
+  const [j, m] = jjjjmm.split("-");
+  return `${MONATSNAMEN[Number(m) - 1] ?? m} ${j}`;
+}
+
+/** „08.11.2026" aus „2026-11-08" — hier statt aus aenderungen.ts, damit das Startpaket die Liste nicht mitlädt. */
+function aenderungsDatumText(iso: string): string {
+  const [j, m, t] = iso.split("-");
+  return `${t}.${m}.${j}`;
 }
 
 /**

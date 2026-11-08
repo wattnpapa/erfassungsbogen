@@ -1251,7 +1251,7 @@ describe("Assistenten-Durchlauf", () => {
     const bild = within(vollbild).getByRole("img") as HTMLImageElement;
     expect(bild.src.startsWith("data:image/")).toBe(true);
     // R2-W6/N9/O7: vor dem Scan sichtbar, wer gezeigt wird.
-    expect(within(vollbild).getByText(/\(F \/ UF \/ M \/ Ges\) · Stand \d\d:\d\d Uhr/)).toBeDefined();
+    expect(within(vollbild).getByText(/\(F \/ UF \/ M \/\/ Ges\) · Stand \d\d:\d\d Uhr/)).toBeDefined();
     expect(vollbild.querySelector(".qr-vollbild-kopf strong")?.textContent).toMatch(/ · /);
   });
 

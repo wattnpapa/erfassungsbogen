@@ -184,7 +184,7 @@ Funktionalität: Bogen im Assistenten erfassen
     Und ich das Feld "Mannschaft" mit "9" fülle
     Dann steht im Feld "Gesamt" der Wert "12"
     Wenn ich zum Schritt "6. Übersicht" wechsle
-    Dann sehe ich den Text "1 / 2 / 9 / 12"
+    Dann sehe ich den Text "1 / 2 / 9 // 12"
 
   # Dieselbe Erfassung ohne Tastatur: Der Meldekopf nimmt eine eintreffende
   # Einheit im Stehen auf, oft mit Handschuh.
@@ -256,7 +256,7 @@ Funktionalität: Bogen im Assistenten erfassen
     Und ich "Unterbringung" ankreuze
     Und ich das Feld "Sonstiges (Freitext)" mit "Kettensäge defekt" fülle
     Und ich zum Schritt "6. Übersicht" wechsle
-    Dann sehe ich den Text "120 l Diesel / 0 l Benzin / 0 l Gemisch"
+    Dann sehe ich den Text "120 l Diesel"
     Und sehe ich den Text "Kettensäge defekt"
 
   Szenario: Die Vollständigkeitsprüfung führt zum offenen Punkt

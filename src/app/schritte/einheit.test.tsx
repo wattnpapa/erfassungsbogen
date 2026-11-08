@@ -5,12 +5,12 @@
  */
 
 import { describe, it, expect, beforeAll } from "vitest";
-import { render, screen, within } from "@testing-library/react";
+import { cleanup, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { useState } from "react";
 import { Dialogschicht } from "../dialoge";
 import { neuePerson, neuerBogen, vokabularFuer } from "../hilfen";
-import { Ernaehrung, Geschlecht, OrganisationsTyp, PersonalErfassung, type Erfassungsbogen } from "@bos/eeb-format/model";
+import { Ernaehrung, Geschlecht, OrganisationsTyp, PersonalErfassung, staerke, type Erfassungsbogen } from "@bos/eeb-format/model";
 import { stanPersonalVorbelegung } from "@bos/vokabulare/thw-stan-personal";
 import { stanFahrzeugVorbelegung } from "@bos/vokabulare/thw-stan-fahrzeuge";
 import { SchrittBuehne } from "../../test/schritt-buehne";
@@ -532,6 +532,7 @@ describe("Schritt Einheit — Vorbelegung nach Einheitstyp", () => {
           Personal: <output data-testid="personal">{bogen.personal.length}</output>
           {" · "}Namen: <output data-testid="namen">{bogen.personal.map((p) => p.nachname).filter(Boolean).join(", ") || "keine"}</output>
           {" · "}Fahrzeuge: <output data-testid="fahrzeuge">{bogen.fahrzeuge.length}</output>
+          {" · "}Stärke: <output data-testid="staerke">{bogen.staerkeManuell ? `${bogen.staerkeManuell.fuehrer}/${bogen.staerkeManuell.unterfuehrer}/${bogen.staerkeManuell.mannschaft}` : "-"}</output>
           {" · "}Kennzeichen: <output data-testid="kennzeichen">{bogen.fahrzeuge.map((f) => f.kennzeichen).filter(Boolean).join(", ") || "keine"}</output>
         </p>
         <Dialogschicht />
@@ -568,6 +569,30 @@ describe("Schritt Einheit — Vorbelegung nach Einheitstyp", () => {
     // Nur die Sollplätze des neuen Typs — nicht die Summe beider.
     expect(zahl("personal")).toBe(personen(klein.code));
     expect(zahl("fahrzeuge")).toBe(fahrzeuge(klein.code));
+  });
+
+  it("„Nur Stärke“: die ungezählten Sollzahlen folgen dem neuen Typ, gezählte bleiben (OV Chemnitz, 11/2026)", async () => {
+    const nutzer = userEvent.setup();
+    const soll = (code: number) => {
+      const s = staerke({ personal: stanPersonalVorbelegung(org, { code }) });
+      return `${s.fuehrer}/${s.unterfuehrer}/${s.mannschaft}`;
+    };
+    const start = neuerBogen();
+    start.einheit.einheitsTyp = { code: gross.code };
+    start.personalErfassung = PersonalErfassung.NUR_STAERKE;
+    start.personal = [];
+    start.staerkeManuell = staerke({ personal: stanPersonalVorbelegung(org, { code: gross.code }) });
+    render(<VorbelegungBuehne start={start} />);
+
+    await typWaehlen(nutzer, klein.name);
+    expect(screen.getByTestId("staerke").textContent).toBe(soll(klein.code));
+
+    // Gezählt (abweichend vom Soll): bleibt beim nächsten Wechsel stehen.
+    cleanup();
+    const gezaehlt = { ...start, staerkeManuell: { fuehrer: 1, unterfuehrer: 1, mannschaft: 5, gesamt: 7 } };
+    render(<VorbelegungBuehne start={gezaehlt} />);
+    await typWaehlen(nutzer, klein.name);
+    expect(screen.getByTestId("staerke").textContent).toBe("1/1/5");
   });
 
   it("nimmt beim Leeren des Typs die unbenannten Karten mit, benannte bleiben", async () => {

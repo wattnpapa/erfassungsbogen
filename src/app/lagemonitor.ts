@@ -192,20 +192,20 @@ export function lageblattZeilenAlter(empfangenAm: number | undefined, jetzt: num
 }
 
 /**
- * Stärke „F / U / M / G" der Summenzeile: Mit dreistelligen Werten bräche die schmale Spalte um, und die
+ * Stärke „F / U / M // G" der Summenzeile: Mit dreistelligen Werten bräche die schmale Spalte um, und die
  * Gesamtstärke stünde allein in der zweiten Zeile (R13-A5). Dann ohne Leerzeichen um die Schrägstriche.
  */
 export function staerkeSummenText(f: number, u: number, m: number, g: number, kompakt?: boolean): string {
-  const breit = `${f} / ${u} / ${m} / ${g}`;
-  return (kompakt ?? breit.length > 14) ? `${f}/${u}/${m}/${g}` : breit;
+  const breit = `${f} / ${u} / ${m} // ${g}`;
+  return (kompakt ?? breit.length > 15) ? `${f}/${u}/${m}//${g}` : breit;
 }
 
 /**
- * Eine Schreibweise für die ganze Spalte „Stärke F / U / M / G" (R18-W5): Sobald eine Zeile oder die Summe zu breit
+ * Eine Schreibweise für die ganze Spalte „Stärke F / U / M // G" (R18-W5): Sobald eine Zeile oder die Summe zu breit
  * wird, stehen alle Zeilen kompakt — vorher wechselte die Schreibweise von Zeile zu Zeile.
  */
 export function staerkeSpalteKompakt(zeilen: readonly [number, number, number, number][]): boolean {
-  return zeilen.some(([f, u, m, g]) => `${f} / ${u} / ${m} / ${g}`.length > 14);
+  return zeilen.some(([f, u, m, g]) => `${f} / ${u} / ${m} // ${g}`.length > 15);
 }
 
 /** Zwischensumme je Zug: „älteste Meldung vor 5 Std 0 Min" — nur ab einer Stunde, sonst `null` (R12-K3). */

@@ -47,7 +47,7 @@ import {
   zeitraumVonBis,
 } from "../hilfen";
 import { debugAktiv } from "../debug-plattform";
-import { mwdText, verpflegungBogenText } from "../auswertung";
+import { betriebsstoffText, mwdText, verpflegungBogenText } from "../auswertung";
 import { bogenCsvInhalt } from "../bogen-csv";
 import { qrGroessePosten, VIELE_TEILE } from "../qr-posten";
 import { EinheitZeichen } from "../zeichen-bild";
@@ -277,7 +277,7 @@ export function Uebersicht(props: {
   const s = staerke(bogen);
   // Schnellerfassung des Meldekopfs: Stärke als Summe, absichtlich ohne Namen.
   const nurStaerke = bogen.personalErfassung === PersonalErfassung.NUR_STAERKE;
-  const staerkeText = `${s.fuehrer} / ${s.unterfuehrer} / ${s.mannschaft} / ${s.gesamt}`;
+  const staerkeText = `${s.fuehrer} / ${s.unterfuehrer} / ${s.mannschaft} // ${s.gesamt}`;
   // R13-S2: Schnellerfassung (nur Stärke) von der Startseite: Ablegen in die Sammlung ist der erste Weg.
   // R14-H1: Auch ein empfangener, unveränderter Bogen einer fremden Einheit (Link ohne Sammlung auf diesem Gerät) gehört
   // in eine Sammlung — nicht in „Mängel beheben und weitergeben".
@@ -643,10 +643,10 @@ export function Uebersicht(props: {
               <span>
                 Stärke{" "}
                 <strong title={STAERKE_LEGENDE} aria-label={`Stärke: ${staerkeVorlesen(s)}`}>
-                  {s.fuehrer} / {s.unterfuehrer} / {s.mannschaft} / {s.gesamt}
+                  {s.fuehrer} / {s.unterfuehrer} / {s.mannschaft} // {s.gesamt}
                 </strong>{" "}
                 {/* Kurzlegende sichtbar statt nur im Tooltip (R2-N9). */}
-                <span className="hinweis" aria-hidden="true">(F / UF / M / Ges)</span>
+                <span className="hinweis" aria-hidden="true">(F / UF / M // Ges)</span>
                 {/* R19-N14: Die Zahl stammt aus der Vorbelegung nach Einheitstyp, nicht aus einer Zählung. */}
                 {nurSollstaerke(bogen) && <span className="warnung-text"> · Vorschlag aus StAN, nicht erfasst</span>}
               </span>
@@ -758,8 +758,7 @@ export function Uebersicht(props: {
                   die Funktion daneben sagt dann, welcher — GrFü, TrFü, … */}
               <th title={STAERKE_LEGENDE}>Rolle</th>
               <th>Funktion / Zusatzfunktion</th>
-              <th>Name, Vorname</th>
-              {zeigeErreichbarkeit && <th className="kontakt-spalte">Erreichbarkeit</th>}
+              <th>{zeigeErreichbarkeit ? "Name, Vorname / Erreichbarkeit" : "Name, Vorname"}</th>
             </tr>
           </thead>
           <tbody>
@@ -770,13 +769,12 @@ export function Uebersicht(props: {
                 {/* Leere Namenszellen sahen nach Darstellungsfehler aus: „(offen)" sagt, dass der Platz noch niemanden trägt (R18-N12). */}
                 <td>
                   {p.nachname || p.vorname ? <>{p.nachname}{p.nachname && p.vorname ? ", " : ""}{p.vorname}</> : <span className="hinweis">(offen)</span>}
-                  {/* R20-E2: Am Telefon steht die Erreichbarkeit unter dem Namen (die vierte Spalte lag zum Teil außerhalb des Rahmens);
-                      ab Tabletbreite bleibt sie eine eigene Spalte (index.html, „Runde 20 (Layout)"). */}
+                  {/* Die Erreichbarkeit steht unter dem Namen, auf jeder Breite: am Telefon lag eine vierte Spalte außerhalb des
+                      Rahmens (R20-E2), am Rechner nahm sie der Funktion den Platz (Rückmeldung OV Chemnitz, 11/2026). */}
                   {zeigeErreichbarkeit && p.kontakte.some((k) => kontaktText(k) !== "") && (
                     <span className="kontakt-unter">{p.kontakte.map(kontaktText).filter((t) => t !== "").join(" · ")}</span>
                   )}
                 </td>
-                {zeigeErreichbarkeit && <td className="kontakt-spalte">{p.kontakte.map(kontaktText).join(" · ")}</td>}
               </tr>
             ))}
           </tbody>
@@ -829,7 +827,7 @@ export function Uebersicht(props: {
           <dt>Betriebsstoff</dt>
           <dd>
             {bogen.sofortbedarf
-              ? `${bogen.sofortbedarf.dieselLiter} l Diesel / ${bogen.sofortbedarf.benzinLiter} l Benzin / ${bogen.sofortbedarf.gemischLiter} l Gemisch`
+              ? betriebsstoffText(bogen.sofortbedarf) || "nicht angefordert"
               : "—"}
           </dd>
           <dt>Unterbringung / Ruhezeit</dt>
@@ -909,6 +907,9 @@ export function Uebersicht(props: {
                 Bogen zu groß für einen Code — in {qr.teile.length} Teile aufgeteilt. Alle Teile
                 nacheinander scannen; die App setzt sie zusammen. Auch auf den letzten PDF-Seiten, je Teil eine Seite.
                 {qr.teile.length > VIELE_TEILE && qrGroessePosten(bogen) ? ` Den größten Anteil haben: ${qrGroessePosten(bogen)}.` : ""}
+                {qr.teileOhneGegenzeichnung !== undefined && qr.teileOhneGegenzeichnung < qr.teile.length
+                  ? ` Beim Absender waren es ${qr.teileOhneGegenzeichnung} ${qr.teileOhneGegenzeichnung === 1 ? "Code" : "Codes"}: Die Gegenzeichnung dieses Geräts (Weitergabe bezeugt, mit Absenderangaben) reist zusätzlich mit — der Inhalt ist derselbe.`
+                  : ""}
               </p>
               <div className="qr-teile">
                 {qr.teile.map((t) => (
@@ -1315,7 +1316,7 @@ export function QrVollbild(props: {
       <p className="qr-vollbild-kopf">
         <strong>{props.einheit}</strong>
         <br />
-        Stärke <strong>{props.staerke}</strong> <span className="hinweis">(F / UF / M / Ges) · Stand&nbsp;{stand}&nbsp;Uhr</span>
+        Stärke <strong>{props.staerke}</strong> <span className="hinweis">(F / UF / M // Ges) · Stand&nbsp;{stand}&nbsp;Uhr</span>
         {props.ohneNamen != null && props.ohneNamen > 0 && (
           <>
             <br />

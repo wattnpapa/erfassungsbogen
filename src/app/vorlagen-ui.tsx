@@ -54,7 +54,7 @@ function rolleKuerzel(r: StaerkeRolle): string {
 
 function staerkeText(b: Erfassungsbogen): string {
   const s = staerke(b);
-  return `${s.fuehrer} / ${s.unterfuehrer} / ${s.mannschaft} / ${s.gesamt}`;
+  return `${s.fuehrer} / ${s.unterfuehrer} / ${s.mannschaft} // ${s.gesamt}`;
 }
 
 // ------------------------------------------------------------ Vorlagenliste

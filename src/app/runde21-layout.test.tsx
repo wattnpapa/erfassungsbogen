@@ -163,7 +163,7 @@ describe("R21-A4, W4, E5, H4, K3, G5, M5, L4, N4, O3, S3, D4: Aufnahmewege am Te
     expect(weitere).not.toBeNull();
     expect(weitere.open).toBe(false);
     expect(weitere.querySelector("summary")!.textContent).toBe("Weitere Wege: von Hand, schnell, Datei");
-    for (const name of WEGE) expect(within(weitere).getByRole("button", { name: new RegExp(name.replace(/[()]/g, "\\$&")) })).toBeTruthy();
+    for (const name of WEGE) expect(within(weitere).getByRole("button", { name: new RegExp(name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")) })).toBeTruthy();
     // Das Gerüst für das Zweierraster der aufgeklappten Wege trägt dieselbe Klasse wie der äußere Block.
     expect(weitere.querySelector(":scope > .aktionen.aufnahme-weitere-knoepfe")).not.toBeNull();
   });
@@ -188,7 +188,7 @@ describe("R21-A4, W4, E5, H4, K3, G5, M5, L4, N4, O3, S3, D4: Aufnahmewege am Te
     const block = document.querySelector<HTMLElement>(".einsatz-seite > .aktionen")!;
     expect(block.querySelector("details")).toBeNull();
     expect(within(block).getByRole("button", { name: /Bogen scannen…/ })).toBeTruthy();
-    for (const name of WEGE) expect(within(block).getByRole("button", { name: new RegExp(name.replace(/[()]/g, "\\$&")) }).parentElement).not.toBeNull();
+    for (const name of WEGE) expect(within(block).getByRole("button", { name: new RegExp(name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")) }).parentElement).not.toBeNull();
     // Direkte Kinder des Blocks (das Raster der Stilregeln greift auf `> button` und `> .einlese`).
     expect([...block.children].filter((k) => k.tagName === "BUTTON")).toHaveLength(3);
   });

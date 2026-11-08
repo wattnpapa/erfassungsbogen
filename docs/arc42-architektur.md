@@ -12,6 +12,30 @@
 > umsetzen: SBOM, CSP ohne unsafe-inline, Entpack-Grenze") betrifft die Kapitel
 > 2.1, 8.3, 8.6, 8.7 und 11.2 — dort jeweils vermerkt.
 >
+> **Nachgezogen 2026-11-08 (Rückmeldungen FAG THW und OV Chemnitz):** Kap. 5, 8.2, 12;
+> Transportformat und Schema unverändert, kein neuer Host, kein neuer Speicherschlüssel.
+> Stärke überall als `F / U / M // G` (wie PRODUCT.md es vorgibt; `staerkeSummenText`,
+> PDF, Dialoge, Submodul `bos-meldekopf`/`aufteilen.ts`). PDF: Sitzplätze ohne eigene
+> Angabe stehen als Richtwert des Typs mit „(Richtwert)" (`sitzplatzZeile` in
+> `pdf-dokument.ts`); der Sofortbedarf eines ausgefüllten Bogens nennt nur angeforderte
+> Posten (`sofortbedarfZellen`, `betriebsstoffText` in `auswertung.ts`), der Vordruck
+> bleibt vollständig. Personaltabelle des ausgefüllten Bogens dreispaltig, die
+> Erreichbarkeit (samt „OV: …") steht klein hinter dem Namen; Übersicht ebenso auf
+> jeder Breite. `QrSatz.teileOhneGegenzeichnung` (`hilfen.ts`) nennt beim
+> Weiterreichen die Teilzahl des Absenders, wenn die Gegenzeichnung einen Code mehr
+> kostet. Schritt 1: Bei „Nur Stärke" folgen ungezählte Sollzahlen dem neuen
+> Einheitstyp. Vokabular (`bos-vokabulare`), Fachzug Logistik von Hand gegen die StAN
+> 09-04 bis 09-07 (Stand 01.07.2026) geprüft: neue Einheitstypen 47–49 (Tr Log-M, Tr Log-VG,
+> Tr Log-TL, Trupps der FGr Log-MW, Funkruf-Teileinheit 63), die Fachgruppe belegt die
+> Fahrzeuge aller drei Trupps vor; THW-Fahrzeugtypen 28 LKW K Lkr (Kennzahl 63 statt LKW
+> Lkr/44), 29/30 Auflieger Plane/Spriegel bzw. Container (Tr Log-TS führt beide), 56–59
+> Anh Kühl, Anh 12t Koffer, Anh 5t Tandem, Anh FGr Log-MW, 60–65 Ladungsträger
+> Abrollbehälter, Wechselbrücke, Container 10/20 ft, Abrollbehälter Kraftstoff,
+> Werkstattcontainer; Zeichen in `bos-taktische-zeichen` (neues Grundzeichen
+> `ladungstraeger`, Aufschrift „Log-TL"), VBA-Vokabular in `eeb-format/ports/vba` neu erzeugt. Neuer Baustein `src/app/aenderungen.ts`
+> (Änderungsverlauf „Was ist neu" seit 2026-07-11, je Monat mit Zusammenfassung `MONATE`, monatsweise blätterbar; per `import()` erst beim Öffnen geladen, eigener
+> Chunk im Precache) mit Dialog in der Fußzeile. Startbündel 0,74 MB (Budget neu gesetzt).
+>
 > **Nachgezogen 2026-11-03 — Excel-Liste „Oldenburg" entfernt:** Kap. 1.2, 1.3, 2.1,
 > 3.1, 5, 10, 12 und ADR-001. Der XLSX-Export der Einheitenliste im festen Spaltenformat
 > einer Führungsstelle (`src/app/oldenburg-xlsx.ts`, `src/app/xlsx.ts`, Knöpfe „Als Excel
@@ -52,7 +76,7 @@
 > je Person mit der Dienststelle aus Schritt 1 vor und schlägt beim THW die
 > Ortsverbände des Verzeichnisses vor (`OvVorschlagFeld`/`useOvDaten` aus Schritt 1,
 > in Karte und Kurz-Liste); das PDF nennt eine Abweichung als erste Zeile der
-> Kontaktspalte („OV: Bremen - Nord"). Die THW-Beispielbögen (`npm run beispiele`)
+> Kontaktspalte („OV: Bremen - Nord"; seit 2026-11-08 klein hinter dem Namen). Die THW-Beispielbögen (`npm run beispiele`)
 > tragen seit 2026-10-27 in rund jeder dritten Einheit ein bis drei Helfer aus
 > Nachbar-Ortsverbänden (eigener Zufallsstrom, übrige Bögen unverändert). Kein
 > neuer Host, kein neuer Speicherort.
@@ -692,6 +716,25 @@ wieder.
 > transitiven Pakete axios 1.20.0, http-cache-semantics 4.3.0, fast-uri 3.1.9
 > und serialize-javascript 7.1.4 über `package-lock.json`. Alle Treffer lagen
 > im Bau-/Testwerkzeug; `npm audit --omit=dev` war durchgehend leer.
+>
+> *Prüfvermerk (Stand 2026-11-08):* Dependabot-PRs 56–59 und 61 übernommen
+> (@capacitor/core ^8.5.3, @capacitor/filesystem ^8.1.5, @capacitor/share
+> ^8.0.3, react-dom ^19.3.1, follow-redirects 1.16.3), dazu joi 18.3.2 über
+> `npm audit fix`. Für glob 9–14.0.1 (AbortSignal-Umgehung) und minimatch
+> 7–11.0.0 (GHSA-g3hv-75wg-m249, über eslint 10 und typescript-eslint) setzt
+> `package.json` gezielte `overrides` auf glob ^14.0.4 und minimatch ^11.0.5;
+> ein Downgrade von eslint, wie `npm audit fix --force` ihn vorschlägt, entfällt
+> damit. Offen bleibt nur deepmerge ≤ 4.3.1 (GHSA-gcqx-w48m-w2h4, niedrig) über
+> workbox-build in vite-plugin-pwa: Eine korrigierte Version gibt es nicht, und
+> das Paket läuft ausschließlich beim Bauen, nicht auf Einsatzgeräten.
+> `softprops/action-gh-release` ist in `release.yml` auf einen Commit-Hash gepinnt.
+>
+> Nachtrag (Stand 2026-11-08): Capacitor (core, ios, android, cli) auf ^8.6.0
+> gehoben, die iOS-Paketauflösung (`ios/App/CapApp-SPM/Package.swift`,
+> `Package.resolved`) entsprechend auf capacitor-swift-pm 8.6.0. Behoben ist
+> damit die Lücke in Capacitor Android und iOS, über die fremder Inhalt mit dem
+> Ursprung der App geladen werden konnte (internes HTTP-Proxy-Präfix
+> `/_capacitor_http_interceptor_`, betroffen 8.3.5 bis vor 8.4.3, kritisch).
 
 ### 2.2 Organisatorische Randbedingungen
 
@@ -1412,6 +1455,16 @@ Startseite lädt sie nach der Aktivierung nach (`src/app/offline-vorrat.ts`),
 der Service Worker legt sie über zwei Laufzeit-Routen in den Cache
 `eeb-zusatz` (Beispielbögen `CacheFirst`, Seiten `StaleWhileRevalidate` seit Runde 7, Liste `NetworkFirst`).
 *Hinweis 2026-10-24:* Mit `examples/praktische-ausbildung/` (41 Bögen, JSON) sind die Zusatzstufe um 41 Dateien und die Zahlen oben (474 Dateien, 4,0 MB) sowie die Bogenzählungen weiter unten (227/239/443 Beispielbögen) nicht mehr aktuell; beim nächsten Build neu messen.
+*Nachgezogen 2026-11-08 (alle THW-Ortsverbände):* `examples/thw/ortsverbaende/` trägt 3.533 Übungsbögen
+(jede Einheit von 667 OVs, Landesverband › Regionalstelle › Ortsverband, immer StAN-Stärke, erzeugt von
+`scripts/thw-ov-beispielboegen.mts` aus der Momentaufnahme `scripts/quellen/thw-ov-einheiten.json` der OV-Karte
+thw.blafusel.de). Diese Bögen sind eine dritte Klasse **nur auf Abruf**: `istNurAufAbruf` in
+`scripts/precache-aufteilung.ts` nimmt die Dateien `assets/ov-*.json` (zusammen gut 9 MB) aus Kern und
+Zusatzstufe heraus; ein Bogen kommt beim ersten Öffnen aus dem Netz und bleibt dann über die
+`CacheFirst`-Route in `eeb-zusatz`. Ihre Adressliste steht nicht im Glob der Fußzeile, sondern im eigenen
+Baustein `src/app/beispiele-thw-ov.ts` (rund 0,74 MB, gezippt 84 KB), den der Beispielbögen-Dialog beim
+Öffnen nachlädt; Startbündel unverändert, JS-Gesamtumfang 6,45 MB (`scripts/bundle-budget.json` angehoben).
+Kein neuer Host zur Laufzeit; thw.blafusel.de ruft nur das Generatorskript mit `--abrufen` auf.
 *Nachgezogen 2026-10-06 (Audit Runde 4, R4-O1):* Bricht das Erstladen im
 Funkloch ab, scheitert der Service Worker an der Installation, und der Browser
 verwirft die Registrierung; ein späteres `update()` ginge ins Leere und die

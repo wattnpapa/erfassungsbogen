@@ -247,7 +247,7 @@ describe("pdfDokument()", () => {
     expect(t).toContain("THW");
     expect(t).toContain("Fernmeldebauübung Kabelblitz");
     expect(t).toContain("Oldenburg - Ni (OODE)");
-    expect(t).toContain("1 / 0 / 1 / 2"); // Stärke: 1 Führer, 0 Unterführer, 1 Mannschaft, 2 gesamt
+    expect(t).toContain("1 / 0 / 1 // 2"); // Stärke: 1 Führer, 0 Unterführer, 1 Mannschaft, 2 gesamt
     expect(t).toContain("Johannes Rudolph"); // Ansprechpartner/in = erste Person
   });
 
@@ -320,8 +320,29 @@ describe("pdfDokument()", () => {
   it("zeigt Sofortbedarf und Sonstiges, wenn vorhanden", () => {
     const t = texte(pdfDokument(basisBogen(), QR).content).join("\n");
     expect(t).toContain("Sofortbedarf:");
-    expect(t).toContain("Verpflegung für 2 Personen, davon 0 vegetarisch, 1 vegan");
+    expect(t).toContain("Verpflegung für 2 Personen, davon 1 vegan");
     expect(t).toContain("Sonstiges: Bitte Verpflegung ab 12 Uhr.");
+  });
+
+  it("druckt beim Sofortbedarf nur, was angefordert ist — keine Nullzeilen (OV Chemnitz, 11/2026)", () => {
+    const b = basisBogen();
+    b.sofortbedarf = { verpflegungPersonen: 0, dieselLiter: 0, benzinLiter: 0, gemischLiter: 0, unterbringung: true, ruhezeitErforderlich: true };
+    const t = texte(pdfDokument(b, QR).content).join("\n");
+    expect(t).toContain("Sofortbedarf:");
+    expect(t).not.toContain("Verpflegung für");
+    expect(t).not.toContain("Betriebsstoff");
+    expect(t).toContain("[X]  Unterbringung");
+    expect(t).toContain("[X]  Ruhezeit erforderlich");
+    expect(t).not.toMatch(/\[ {2}\] {1,2}(Unterbringung|Ruhezeit)/);
+  });
+
+  it("druckt den Sitzplatz-Richtwert gekennzeichnet, eine erfasste Zahl ohne Zusatz (OV Chemnitz, 11/2026)", () => {
+    const b = basisBogen();
+    expect(texte(pdfDokument(b, QR).content).join("\n")).toMatch(/Sitzplätze: \d+ \(Richtwert\)/);
+    b.fahrzeuge[0]!.sitzplaetze = 4;
+    const t = texte(pdfDokument(b, QR).content).join("\n");
+    expect(t).toContain("Sitzplätze: 4");
+    expect(t).not.toContain("(Richtwert)");
   });
 
   it("lässt Sofortbedarf und Sonstiges weg, wenn nicht gesetzt", () => {
@@ -370,7 +391,7 @@ describe("pdfDokument()", () => {
     b.staerkeManuell = { fuehrer: 1, unterfuehrer: 3, mannschaft: 17, gesamt: 21 };
     const t = texte(pdfDokument(b, QR).content).join("\n");
     expect(t).toContain("Personal am Meldekopf nur in Stärke erfasst.");
-    expect(t).toContain("1 / 3 / 17 / 21");
+    expect(t).toContain("1 / 3 / 17 // 21");
   });
 
   it("bettet den Bogen als maschinenlesbares JSON ein (ZUGFeRD-artig)", () => {
@@ -505,7 +526,7 @@ describe("einsatzPdfDokument()", () => {
       ]).content,
     ).join("\n");
     expect(t).toContain("Summe (2 zählend)");
-    expect(t).toContain("2 / 0 / 2 / 4");
+    expect(t).toContain("2 / 0 / 2 // 4");
   });
 
   it("führt abgerückte Einheiten in einem eigenen Block mit Zeiten auf und zählt sie nicht", () => {
@@ -527,7 +548,7 @@ describe("einsatzPdfDokument()", () => {
     expect(t).toContain("Deichabschnitt Nord");
     expect(t).toContain("Summe (1 zählend · 1 abgerückt)");
     // Stärke und Bedarf nur über die zählende Einheit.
-    expect(t).toContain("1 / 0 / 1 / 2");
+    expect(t).toContain("1 / 0 / 1 // 2");
     expect(t).toContain("Bedarf gesamt (1 Einheit, 2 Personen)");
     // Beide Bögen hängen trotzdem an — „alle Bögen" heißt alle.
     const umbrueche = (einsatzPdfDokument("Lage", [
@@ -728,10 +749,10 @@ describe("einsatzLageblattDokument()", () => {
 
   it("beschriftet die Stärke-Linien des Blanko-Vordrucks (R2-A6)", () => {
     const blanko = texte(pdfDokument(basisBogen(), null, { fahrzeuge: 1, personal: 1, qualifikationen: 1 }).content).join("\n");
-    expect(blanko).toContain("Stärke (F / UF / M / Ges.):");
+    expect(blanko).toContain("Stärke (F / UF / M // Ges.):");
     // Seit R3-A6 auch auf dem ausgefüllten Bogen — gleiche Beschriftung wie der Vordruck.
     const voll = texte(pdfDokument(basisBogen(), QR).content).join("\n");
-    expect(voll).toContain("Stärke (F / UF / M / Ges.):");
+    expect(voll).toContain("Stärke (F / UF / M // Ges.):");
   });
 
   it("Blanko-Vordruck trägt den Meldekopf-Kasten mit „ins Gerät übertragen“ und dem Kästchen „Übung“ (R4-A4)", () => {
@@ -817,7 +838,7 @@ describe("einsatzLageblattDokument()", () => {
     // Ohne Messung keine freien Zeilen — die gibt es nur über einzelPdfDokument.
     expect(JSON.stringify(dd.content)).not.toContain('"text":" ","margin":[0,5,0,5]');
     const frei = pdfDokument(basisBogen(), QR, undefined, undefined, { freiePersonalZeilen: 2, freiesFahrzeug: true });
-    expect(JSON.stringify(frei.content).match(/"text":" ","margin":\[0,5,0,5\]/g)).toHaveLength(8);
+    expect(JSON.stringify(frei.content).match(/"text":" ","margin":\[0,5,0,5\]/g)).toHaveLength(6);
     expect(texte(frei.content)).toContain("Kennzeichen:");
   });
 
@@ -875,7 +896,7 @@ describe("einsatzLageblattDokument()", () => {
     const inhalt = dd.content as unknown[];
     // Kopfleiste direkt nach dem Titel, vor der Einheitentabelle.
     const kopf = texte(inhalt[1]).filter((x) => x !== "*").join("");
-    expect(kopf).toMatch(/^Lage: 1 Einheit zählend · Stärke F \/ U \/ M \/ G \d+ \/ \d+ \/ \d+ \/ \d+ · 1 Fahrzeuge/);
+    expect(kopf).toMatch(/^Lage: 1 Einheit zählend · Stärke F \/ U \/ M \/\/ G \d+ \/ \d+ \/ \d+ \/\/ \d+ · 1 Fahrzeuge/);
     expect(kopf).toContain("Bedarf: Verpflegung");
     expect(kopf).toContain("Ruhezeit: 1 Einheit");
     expect(kopf).toContain("Diesel 80 l");
@@ -895,7 +916,7 @@ describe("einsatzLageblattDokument()", () => {
     expect(t).toContain("Summe (von Hand)");
     expect(t).not.toContain("zählend");
     expect(t).not.toMatch(/\b0 \/ 0|0 Portionen|Diesel 0 l/);
-    expect(t).toContain("Stärke F / U / M / G ____ / ____ / ____ / ____");
+    expect(t).toContain("Stärke F / U / M // G ____ / ____ / ____ // ____");
     expect(t).toContain("Bedarf gesamt (von Hand)");
   });
 });

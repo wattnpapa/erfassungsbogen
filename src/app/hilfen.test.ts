@@ -48,6 +48,7 @@ import {
   plausibilitaet,
   pruefpunkte,
   qrErzeugen,
+  qrTeilzahl,
   schrittStatus,
   staerkePlausibilitaet,
   transportBilanz,
@@ -658,6 +659,19 @@ describe("qrErzeugen(): Herkunft eines fremden Bogens", () => {
     ]);
   });
 
+  it("nennt die Teilzahl beim Absender — die Gegenzeichnung kann einen Code mehr kosten (OV Chemnitz, 11/2026)", async () => {
+    const b = neuerBogen();
+    // Zufallsnaher Text, damit Deflate ihn nicht wegschrumpft und der Bogen in mehrere Codes geht.
+    b.einsatz.ortAuftrag = Array.from({ length: 120 }, (_, i) => `Abschnitt${(i * 7919) % 1009}`).join(" ");
+    const { payload } = await fremderPayload(b);
+    const qr = await qrErzeugen(decodePayload(payload, browserKompressor), payload);
+    expect(qr.weitergeleitet).toBe(true);
+    expect(qr.teileOhneGegenzeichnung).toBe(qrTeilzahl(payload));
+    expect(qrTeilzahl(ausQr(qr))).toBe(qr.teile.length);
+    expect(qr.segmentiert).toBe(true);
+    expect(qr.teile.length).toBeGreaterThanOrEqual(qr.teileOhneGegenzeichnung!);
+  });
+
   it("signiert nach einer Bearbeitung allein selbst (fremde Signatur deckt die Änderung nicht)", async () => {
     const b = neuerBogen();
     b.einsatz.ortAuftrag = "Übung Kabelblitz";
@@ -889,7 +903,7 @@ describe("plausibilitaet() — Zahlendreher und Zeitfehler", () => {
     const b = { ...neuerBogen(), personalErfassung: PersonalErfassung.NUR_STAERKE, staerkeManuell: { fuehrer: 99, unterfuehrer: 0, mannschaft: 1, gesamt: 100 } };
     const h = plausibilitaet(b);
     expect(h).toContain("Stärke: 99 Führer — stimmt das?");
-    expect(h).toContain("Stärke 99 / 0 / 1 / 100: mehr Führer als Mannschaft — stimmt das?");
+    expect(h).toContain("Stärke 99 / 0 / 1 // 100: mehr Führer als Mannschaft — stimmt das?");
   });
 
   it("lässt kleine Trupps und normale Gruppen in Ruhe", () => {

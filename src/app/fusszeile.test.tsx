@@ -426,3 +426,50 @@ describe("Alle Daten löschen — Wortlaut (R5-D5)", () => {
     expect(text).not.toMatch(/Lageblatt oder keine/);
   });
 });
+
+/** Wunsch aus der Erprobung (OV Chemnitz, 11/2026): ein aufrufbarer Änderungsverlauf. */
+describe("Was ist neu", () => {
+  it("zeigt zuerst den neuesten Monat mit Zusammenfassung und blättert monatsweise zurück", async () => {
+    const nutzer = userEvent.setup();
+    const { AENDERUNGEN } = await import("./aenderungen");
+    render(<Fusszeile onBogenOeffnen={async () => true} />);
+    await nutzer.click(screen.getByRole("button", { name: "Was ist neu" }));
+    const dialog = await screen.findByRole("dialog", { name: "Was ist neu" });
+    const monat = () => dialog.querySelector(".aenderungen-monat")!.textContent;
+    const tage = () => [...dialog.querySelectorAll(".aenderung h4")].map((h) => h.textContent);
+    expect(monat()).toBe("November 2026");
+    expect(dialog.querySelector(".aenderungen-kurz")!.textContent).toContain("0 / 2 / 9 // 11");
+    expect(tage()[0]).toBe("08.11.2026");
+    expect(tage().every((t) => t!.endsWith(".11.2026"))).toBe(true);
+    const neuer = within(dialog).getByRole("button", { name: "← Neuer" }) as HTMLButtonElement;
+    expect(neuer.disabled).toBe(true);
+    await nutzer.click(within(dialog).getByRole("button", { name: "Älter →" }));
+    expect(monat()).toBe("Oktober 2026");
+    // Bis zum ersten Monat blättern: dort ist „Älter“ gesperrt und der erste Tag steht da.
+    const aelter = within(dialog).getByRole("button", { name: "Älter →" }) as HTMLButtonElement;
+    while (!aelter.disabled) await nutzer.click(aelter);
+    expect(monat()).toBe("Juli 2026");
+    expect(tage()[tage().length - 1]).toBe("11.07.2026");
+    expect(new Set(AENDERUNGEN.map((a) => a.datum.slice(0, 7))).size).toBe(Number(within(dialog).getByText(/^\d+ von \d+$/).textContent!.split(" von ")[1]));
+  });
+
+  it("ist auch in der schmalen Zeile des Assistenten über die Versionsnummer erreichbar", async () => {
+    const nutzer = userEvent.setup();
+    render(<Fusszeile kompakt onBogenOeffnen={async () => true} />);
+    await nutzer.click(screen.getByRole("button", { name: /Was ist neu/ }));
+    expect((await screen.findByRole("dialog", { name: "Was ist neu" })).querySelectorAll("li").length).toBeGreaterThan(5);
+  });
+});
+
+describe("AENDERUNGEN", () => {
+  it("steht nach Datum absteigend, ohne doppelte Tage, und jeder Monat hat seine Zusammenfassung", async () => {
+    const { AENDERUNGEN, MONATE } = await import("./aenderungen");
+    const tage = AENDERUNGEN.map((a) => a.datum);
+    expect(tage).toEqual([...tage].sort().reverse());
+    expect(new Set(tage).size).toBe(tage.length);
+    for (const t of tage) expect(t).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+    const monate = [...new Set(tage.map((t) => t.slice(0, 7)))];
+    expect(Object.keys(MONATE).sort()).toEqual([...monate].sort());
+    expect(tage[tage.length - 1]).toBe("2026-07-11"); // Verlauf seit der ersten Fassung
+  });
+});

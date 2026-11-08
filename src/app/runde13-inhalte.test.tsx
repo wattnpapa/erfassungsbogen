@@ -103,15 +103,15 @@ describe("R13-K2 Lageblatt kennzeichnet die Zeilen mit alter Meldung", () => {
 
 describe("R13-A5 Summenzeile des Lageblatts bricht nicht um", () => {
   it("dreistellige Werte stehen ohne Leerzeichen um die Schrägstriche, kleine wie bisher", () => {
-    expect(staerkeSummenText(5, 69, 195, 269)).toBe("5/69/195/269");
-    expect(staerkeSummenText(1, 1, 2, 4)).toBe("1 / 1 / 2 / 4");
-    expect(staerkeSummenText(0, 3, 9, 12)).toBe("0 / 3 / 9 / 12");
+    expect(staerkeSummenText(5, 69, 195, 269)).toBe("5/69/195//269");
+    expect(staerkeSummenText(1, 1, 2, 4)).toBe("1 / 1 / 2 // 4");
+    expect(staerkeSummenText(0, 3, 9, 12)).toBe("0 / 3 / 9 // 12");
   });
   it("das Lageblatt druckt die große Summe in einem Stück", () => {
     const b = bogenMitPersonen([]);
     b.staerkeManuell = { fuehrer: 5, unterfuehrer: 69, mannschaft: 195, gesamt: 269 };
     const t = texte(einsatzLageblattDokument("Lage", [{ bogen: b, nummer: 1 }]).content);
-    expect(t).toContain("5/69/195/269");
+    expect(t).toContain("5/69/195//269");
   });
 });
 

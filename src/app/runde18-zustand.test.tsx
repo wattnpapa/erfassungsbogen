@@ -223,7 +223,7 @@ describe("R18-E3/E4/H3/G1/D1/K11 Papierkorb der entfernten Meldungen", () => {
     const e = { ...einsaetzeLaden().find((x) => x.id === s.id)!.eintraege[0]!, zugEtikett: "1. Zug" };
     const zeilen = fassungsZeilen({ id: "x", art: "einheit", eintraege: [e], name: "THW Alpha", entferntAm: Date.now() });
     expect(zeilen).toHaveLength(1);
-    expect(zeilen[0]!.text).toMatch(/^Stand \d\d\.\d\d\.\d{4}, \d\d:\d\d · Stärke \d+\/\d+\/\d+\/\d+ · Zug „1\. Zug"/);
+    expect(zeilen[0]!.text).toMatch(/^Stand \d\d\.\d\d\.\d{4}, \d\d:\d\d · Stärke \d+\/\d+\/\d+\/\/\d+ · Zug „1\. Zug"/);
     const ohneZug = fassungsZeilen({ id: "y", art: "einheit", eintraege: [{ ...e, zugEtikett: undefined }], name: "THW Alpha", entferntAm: Date.now() });
     expect(ohneZug[0]!.text).toContain("kein Zug");
 

@@ -64,10 +64,10 @@ Funktionalität: Einsatz-Sammlung führen (Meldekopf)
     Dann sehe ich die Überschrift "Einheiten (2 gemeldet"
     Und sehe ich den Hinweis "Fachberater"
     Und sehe ich den Hinweis "abgeteilt aus"
-    # Die Stärke verteilt sich, sie verschwindet nicht: aus 1 / 0 / 2 / 3 werden
+    # Die Stärke verteilt sich, sie verschwindet nicht: aus 1 / 0 / 2 // 3 werden
     # zwei Meldungen, die zusammen wieder 3 ergeben.
-    Und sehe ich den Hinweis "Stärke 1 / 0 / 0 / 1"
-    Und sehe ich den Hinweis "Stärke 0 / 0 / 2 / 2"
+    Und sehe ich den Hinweis "Stärke 1 / 0 / 0 // 1"
+    Und sehe ich den Hinweis "Stärke 0 / 0 / 2 // 2"
 
   Szenario: Aufgeteilte Teile wieder zusammenführen — der Zug sammelt sich
     Wenn ich auf "Mehr…" klicke
@@ -83,7 +83,7 @@ Funktionalität: Einsatz-Sammlung führen (Meldekopf)
     Und ich das Feld "Bezeichnung danach" mit "" fülle
     Und ich auf "Zusammenführen" klicke
     # Die Einheit steht wieder mit ihrer vollen Stärke da, nichts doppelt.
-    Dann sehe ich den Hinweis "Stärke 1 / 0 / 2 / 3"
+    Dann sehe ich den Hinweis "Stärke 1 / 0 / 2 // 3"
     Und sehe ich den Hinweis "zusammengeführt"
     Und sehe ich den Hinweis "aufgegangen in"
 

@@ -83,6 +83,9 @@ function beispiele(): Erfassungsbogen[] {
   const dateien = (d: string): string[] =>
     readdirSync(d).flatMap((f) => {
       const p = join(d, f);
+      // examples/thw/ortsverbaende/ (rund 3.500 Bögen) sprengte die Sammel-PDF; deren
+      // Texte prüft scripts/thw-ov-beispielboegen.mts beim Erzeugen auf WinAnsi.
+      if (f === "ortsverbaende") return [];
       return statSync(p).isDirectory() ? dateien(p) : p.endsWith(".json") ? [p] : [];
     });
   return dateien(wurzel)

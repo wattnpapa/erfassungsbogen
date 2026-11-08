@@ -16,7 +16,7 @@ import { einheitAnzeigename, zeitpunktDeutsch } from "./hilfen";
 /** Kurzfassung „0 / 1 / 8 / 9 · 2 Fzg" für die Vorschau. */
 function bilanz(b: Erfassungsbogen): string {
   const s = staerke(b);
-  return `${s.fuehrer} / ${s.unterfuehrer} / ${s.mannschaft} / ${s.gesamt} · ${b.fahrzeuge.length} Fzg`;
+  return `${s.fuehrer} / ${s.unterfuehrer} / ${s.mannschaft} // ${s.gesamt} · ${b.fahrzeuge.length} Fzg`;
 }
 
 export function ZusammenfuehrenPanel(props: {

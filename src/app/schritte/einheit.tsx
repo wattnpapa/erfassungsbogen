@@ -3,7 +3,7 @@
  * Hierarchie der Kontaktstellen (beim THW mit OV-Vorschlagsliste).
  */
 
-import { Fragment, useEffect, useState, type ReactNode } from "react";
+import { Fragment, useEffect, useRef, useState, type ReactNode } from "react";
 import {
   Einheit,
   Ernaehrung,
@@ -448,6 +448,9 @@ export function SchrittEinheit({ bogen, aendern: aendernRoh, ortFokus = false }:
    * geleerter oder frei getippter Typ hat keine Vorbelegung — dann gehen die
    * unbenannten Karten nur weg.
    */
+  // Letzter Typ mit Sollstärke: Beim Umtippen im Feld liegt zwischendurch ein leerer oder halber Typ an — der Vergleich
+  // „stehen noch die Sollzahlen?" braucht den Typ davor.
+  const letzterSollTyp = useRef(e.einheitsTyp);
   function einheitstypSetzen(v: Einheit["einheitsTyp"]) {
     const einheit = { ...e, einheitsTyp: v };
     // Derselbe Code noch einmal (Combobox-Auflösung beim Verlassen): nichts anfassen.
@@ -469,11 +472,27 @@ export function SchrittEinheit({ bogen, aendern: aendernRoh, ortFokus = false }:
       ...bogen.fahrzeuge.filter((f) => !fahrzeugUnbenannt(f)),
       ...(bogen.personalErfassung === PersonalErfassung.NUR_STAERKE ? [] : fahrzeugVorbelegung(einheit)),
     ];
+    // Nur Stärke: Stehen noch genau die Sollzahlen des bisherigen Typs da (niemand hat gezählt), folgen sie dem
+    // neuen Typ — sonst meldete der Bogen die Stärke der zuerst gewählten Fachgruppe (Rückmeldung OV Chemnitz,
+    // 11/2026). Gezählte Zahlen bleiben.
+    const sollAlt = staerke({ personal: stanPersonalVorbelegung(e.organisation, letzterSollTyp.current) });
+    const sollNeu = staerke({ personal: stanPersonalVorbelegung(e.organisation, v) });
+    if (sollNeu.gesamt > 0) letzterSollTyp.current = v;
+    const manuell = bogen.staerkeManuell;
+    const staerkeFolgt =
+      bogen.personalErfassung === PersonalErfassung.NUR_STAERKE &&
+      manuell != null &&
+      sollAlt.gesamt > 0 &&
+      sollNeu.gesamt > 0 &&
+      manuell.fuehrer === sollAlt.fuehrer &&
+      manuell.unterfuehrer === sollAlt.unterfuehrer &&
+      manuell.mannschaft === sollAlt.mannschaft;
     aendernMitVorbelegungWeg(
       {
         einheit,
         ...(personal.length !== bogen.personal.length || personal.some((p, i) => p !== bogen.personal[i]) ? { personal } : {}),
         ...(fahrzeuge.length !== bogen.fahrzeuge.length || fahrzeuge.some((f, i) => f !== bogen.fahrzeuge[i]) ? { fahrzeuge } : {}),
+        ...(staerkeFolgt ? { staerkeManuell: sollNeu } : {}),
       },
       "Vorbelegung des bisherigen Typs ersetzt",
     );

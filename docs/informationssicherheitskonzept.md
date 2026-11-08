@@ -237,6 +237,18 @@ Grundlage: Repository `wattnpapa/erfassungsbogen`, Stand 2026-09-12 — Version 
 > (Verfügbarkeit, 5.5). Kein neuer Speicherort; das gemerkte Lese-Ergebnis
 > liegt nur im Arbeitsspeicher der geöffneten Seite.
 >
+> **Nachgezogen 2026-11-08:** Beispielbögen aller THW-Ortsverbände
+> (`examples/thw/ortsverbaende/`, 3.533 Übungsbögen, erfundene Namen, Rufnummern
+> 555…). Sie gehören weder zum Kern noch zur Zusatzstufe des Offline-Vorrats
+> (`istNurAufAbruf` in `scripts/precache-aufteilung.ts`): Ein Bogen wird beim
+> ersten Öffnen von der eigenen Herkunft geladen und liegt danach im
+> Laufzeit-Cache `eeb-zusatz`; ohne Netz fehlen nur noch nicht geöffnete Bögen
+> dieses Ordners (Verfügbarkeit 5.5, für den Einsatz unkritisch). Keine neuen
+> Hosts zur Laufzeit, CSP unverändert, kein neuer Speicherschlüssel. Lieferkette
+> (6.4): keine neue Abhängigkeit; die Einheitenliste je OV stammt von der
+> inoffiziellen OV-Karte thw.blafusel.de und wird nur beim Erzeugen abgerufen
+> (`npm run beispiele:thw-ov -- --abrufen`), JS-Gesamtumfang 6,45 MB.
+>
 > **Nachgezogen 2026-10-05:** Offline-Vorrat in zwei Stufen (Audit Runde 3,
 > R3-O3, `vite.config.ts`, `scripts/precache-aufteilung.ts`,
 > `src/app/offline-vorrat.ts`) — der Service Worker ist nach dem Kern
@@ -1223,6 +1235,22 @@ ORP.1 Organisation, INF.1 Gebäude) sind nicht Gegenstand dieses Dokuments.
 > GitHub-Actions, `@bos/*` ist ausgenommen (Submodule über `file:`); `npm audit`
 > blockiert ab „hoch" über die Laufzeit-Abhängigkeiten und protokolliert das
 > Bau-/Testwerkzeug ohne Blockade.
+>
+> *Prüfvermerk (Stand 2026-11-08):* Transitive Schwachstellen ohne direkten
+> Fix werden über gezielte `overrides` in `package.json` geschlossen (derzeit
+> glob ^14.0.4 und minimatch ^11.0.5, beide Bau-/Testwerkzeug). Einziger offener
+> Befund ist deepmerge ≤ 4.3.1 (niedrig, nur im PWA-Build). Die einzige
+> Fremd-Action außerhalb von `actions/*` mit Schreibrecht
+> (`softprops/action-gh-release`) ist auf einen Commit-Hash gepinnt; Dependabot
+> hebt Hash und Versionskommentar gemeinsam.
+>
+> Nachtrag: Capacitor auf 8.6.0, iOS-Paketauflösung auf capacitor-swift-pm
+> 8.6.0 (Dependabot-Alert für die Swift-Pakete, kritisch: über das interne
+> HTTP-Proxy-Präfix ließ sich fremder Inhalt mit dem Ursprung der App laden und
+> hätte dann Zugriff auf `localStorage` und die Plugins gehabt). Die
+> Swift-Paketauflösung wird von Dependabot mitgeprüft, ist aber nicht im
+> npm-Lockfile enthalten und muss beim Heben von `@capacitor/ios` mit
+> `npx cap update ios` nachgezogen werden.
 
 ## 7. Ergänzende Risikoanalyse (BSI-Standard 200-3, Auswahl)
 

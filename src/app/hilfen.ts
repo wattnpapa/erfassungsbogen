@@ -280,6 +280,14 @@ export interface QrSatz {
    * Geräteschlüssel allein signiert (eigener oder bearbeiteter Bogen).
    */
   weitergeleitet: boolean;
+  /**
+   * Nur bei `weitergeleitet`: wie viele Codes der empfangene Payload ohne die
+   * Gegenzeichnung dieses Geräts gebraucht hätte. Die zusätzliche Stufe
+   * (Schlüssel, Signatur, Absenderkarte) kostet rund 100–150 Byte und kann den
+   * Bogen über die Grenze eines Teils schieben — beim OV Chemnitz wurden aus
+   * drei Codes nach dem Öffnen des Links vier (Rückmeldung 11/2026).
+   */
+  teileOhneGegenzeichnung?: number;
 }
 
 const QR_OPTIONEN = { errorCorrectionLevel: "M" as const };
@@ -350,6 +358,7 @@ export async function qrErzeugen(
   const url = EEB_URL_PREFIX + datenKodieren(payload);
   // Textlink zum Teilen: Base64url statt Base41 (siehe QrSatz.vollUrl).
   const vollUrl = EEB_URL_PREFIX + base64UrlKodieren(payload);
+  const teileOhneGegenzeichnung = weitergeleitet && herkunft ? qrTeilzahl(herkunft) : undefined;
   const einzelVersion = qrVersion(url);
   if (einzelVersion <= QR_EINZEL_MAX_VERSION) {
     const teil = await teilBild(url, 1, 1);
@@ -361,17 +370,11 @@ export async function qrErzeugen(
       vollUrl,
       stufen,
       weitergeleitet,
+      ...(teileOhneGegenzeichnung !== undefined ? { teileOhneGegenzeichnung } : {}),
     };
   }
 
-  // Zu groß: kleinste Teilzahl suchen, bei der jeder Teil auf die gröbere
-  // Segment-Zielversion kommt (grobe Codes = zuverlässig scannbar).
-  const maxTeile = Math.min(20, payload.length);
-  let urls = segmentPayloadUrls(payload, Math.min(2, maxTeile));
-  for (let anzahl = 2; anzahl <= maxTeile; anzahl++) {
-    urls = segmentPayloadUrls(payload, anzahl);
-    if (urls.every((u) => qrVersion(u) <= QR_SEGMENT_ZIEL_VERSION)) break;
-  }
+  const urls = segmentUrls(payload);
   const teile = await Promise.all(
     urls.map((u, i) => teilBild(u, i + 1, urls.length)),
   );
@@ -383,7 +386,28 @@ export async function qrErzeugen(
     vollUrl,
     stufen,
     weitergeleitet,
+    ...(teileOhneGegenzeichnung !== undefined ? { teileOhneGegenzeichnung } : {}),
   };
+}
+
+/**
+ * Zu groß für einen Code: kleinste Teilzahl suchen, bei der jeder Teil auf die
+ * gröbere Segment-Zielversion kommt (grobe Codes = zuverlässig scannbar).
+ */
+function segmentUrls(payload: Uint8Array): string[] {
+  const maxTeile = Math.min(20, payload.length);
+  let urls = segmentPayloadUrls(payload, Math.min(2, maxTeile));
+  for (let anzahl = 2; anzahl <= maxTeile; anzahl++) {
+    urls = segmentPayloadUrls(payload, anzahl);
+    if (urls.every((u) => qrVersion(u) <= QR_SEGMENT_ZIEL_VERSION)) break;
+  }
+  return urls;
+}
+
+/** Wie viele QR-Codes ein Payload braucht — dieselbe Regel wie {@link qrErzeugen}. */
+export function qrTeilzahl(payload: Uint8Array): number {
+  if (qrVersion(EEB_URL_PREFIX + datenKodieren(payload)) <= QR_EINZEL_MAX_VERSION) return 1;
+  return segmentUrls(payload).length;
 }
 
 /**
@@ -1302,7 +1326,7 @@ export function staerkePlausibilitaet(s: {
   }
   if (s.gesamt >= 4 && s.fuehrer > s.mannschaft) {
     hinweise.push(
-      `Stärke ${s.fuehrer} / ${s.unterfuehrer} / ${s.mannschaft} / ${s.gesamt}: mehr Führer als Mannschaft — stimmt das?`,
+      `Stärke ${s.fuehrer} / ${s.unterfuehrer} / ${s.mannschaft} // ${s.gesamt}: mehr Führer als Mannschaft — stimmt das?`,
     );
   }
   return hinweise;

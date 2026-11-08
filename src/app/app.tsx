@@ -614,7 +614,7 @@ function letztenEinsatzLaden(): string | null {
 /** „1 / 1 / 2 / 4" — die Stärke in der Kurzform des Bogens. */
 function staerkeKurz(b: Erfassungsbogen): string {
   const s = staerke(b);
-  return `${s.fuehrer} / ${s.unterfuehrer} / ${s.mannschaft} / ${s.gesamt}`;
+  return `${s.fuehrer} / ${s.unterfuehrer} / ${s.mannschaft} // ${s.gesamt}`;
 }
 
 /**
@@ -3367,8 +3367,8 @@ function AppInhalt() {
     const wahl = await frageWahl({
       titel: "Nur Sollplätze, keine gemeldete Stärke",
       text: nurZahl
-        ? `Für „${einheitAnzeigename(b.einheit)}" stehen noch die Zahlen der Vorbelegung (Soll: ${s.fuehrer} / ${s.unterfuehrer} / ${s.mannschaft} / ${s.gesamt}${b.fahrzeuge.length ? `, ${b.fahrzeuge.length} Fahrzeug${b.fahrzeuge.length === 1 ? "" : "e"}` : ""}) — niemand hat gezählt.`
-        : `Für „${einheitAnzeigename(b.einheit)}" stehen nur die Sollplätze nach StAN (Stärke ${s.fuehrer} / ${s.unterfuehrer} / ${s.mannschaft} / ${s.gesamt}${b.fahrzeuge.length ? `, ${b.fahrzeuge.length} Fahrzeug${b.fahrzeuge.length === 1 ? "" : "e"}` : ""}) — niemand hat Personen eingetragen.`,
+        ? `Für „${einheitAnzeigename(b.einheit)}" stehen noch die Zahlen der Vorbelegung (Soll: ${s.fuehrer} / ${s.unterfuehrer} / ${s.mannschaft} // ${s.gesamt}${b.fahrzeuge.length ? `, ${b.fahrzeuge.length} Fahrzeug${b.fahrzeuge.length === 1 ? "" : "e"}` : ""}) — niemand hat gezählt.`
+        : `Für „${einheitAnzeigename(b.einheit)}" stehen nur die Sollplätze nach StAN (Stärke ${s.fuehrer} / ${s.unterfuehrer} / ${s.mannschaft} // ${s.gesamt}${b.fahrzeuge.length ? `, ${b.fahrzeuge.length} Fahrzeug${b.fahrzeuge.length === 1 ? "" : "e"}` : ""}) — niemand hat Personen eingetragen.`,
       wege: [
         // Je Antwort ein Satz unter dem Knopf statt einer Liste davor (R18-S4): Wer in Sekunden entscheidet, liest die Knöpfe.
         { wert: "eintragen", label: "Stärke jetzt eintragen", kurz: "Springt zum Personal.", sicher: true },
@@ -4790,7 +4790,7 @@ function AppInhalt() {
                   {/* Nur Sollplätze aus der Vorbelegung: keine Meldung, die Zahl nennt sich so (R18-N7). */}
                   {nurSollstaerke(bogen)
                     ? `${s.gesamt} Sollplätze, noch ohne Namen`
-                    : `Stärke ${s.fuehrer} / ${s.unterfuehrer} / ${s.mannschaft} / ${s.gesamt} (F / UF / M / Ges)`}
+                    : `Stärke ${s.fuehrer} / ${s.unterfuehrer} / ${s.mannschaft} // ${s.gesamt} (F / UF / M // Ges)`}
                   {/* Mit ausgefallenem Speicher stand hier „gespeichert 21:01 Uhr"
                       für einen Stand, der nicht im Speicher liegt (Audit Runde 4,
                       R4-E5). */}

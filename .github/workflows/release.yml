@@ -336,7 +336,10 @@ jobs:
           path: artifacts
 
       - name: GitHub Release erstellen
-        uses: softprops/action-gh-release@v3
+        # Fremd-Action mit Schreibrecht auf die Releases: auf den Commit
+        # gepinnt statt auf das verschiebbare Tag (CodeQL actions/unpinned-tag).
+        # Dependabot hebt Hash und Kommentar gemeinsam.
+        uses: softprops/action-gh-release@8a0cd651e5b2365bd640854a3fa5dfc70e4875f3 # v3.0.4
         with:
           tag_name: ${{ needs.prepare.outputs.build_version }}
           name: ${{ needs.prepare.outputs.build_version }}

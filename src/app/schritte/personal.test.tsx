@@ -1268,7 +1268,7 @@ describe("Umschalten auf „Nur Stärke“", () => {
     // Abbrechen: alles bleibt.
     await nutzer.click(screen.getByLabelText("Personal vollständig erfassen"));
     let dialog = document.querySelector<HTMLDialogElement>("dialog[aria-label='Eingetragene Zahlen verwerfen?']")!;
-    expect(dialog.textContent).toContain("Stärke 0 / 0 / 13 / 13");
+    expect(dialog.textContent).toContain("Stärke 0 / 0 / 13 // 13");
     expect(document.activeElement).toBe(within(dialog).getByRole("button", { name: "Zahlen behalten" }));
     await nutzer.click(within(dialog).getByRole("button", { name: "Zahlen behalten" }));
     expect((screen.getByLabelText("Nur Stärke (Meldekopf-Schnellerfassung)") as HTMLInputElement).checked).toBe(true);
@@ -1696,4 +1696,39 @@ describe("Erreichbarkeit: Art und Nummer (R11)", () => {
     await nutzer.tab();
     expect(document.querySelector(".zahl-meldung")?.textContent).toContain("stimmt die Nummer");
   });
+});
+
+/**
+ * Rückmeldung OV Chemnitz (Test vom September 2026): „Wenn man in der
+ * Personenkarte ein wenig herumklickt, verschwindet die voreingestellte
+ * Funktion (z. B. GrFü)." Ursache war der Tipp auf die Beschriftung, der an
+ * den ersten Knopf im Feld ging — „GrFü entfernen" (R12-G1). Hier wird jede
+ * Stelle der Karte außer den Knöpfen einmal angetippt.
+ */
+describe("Vorbelegte Funktion überlebt Herumklicken (OV Chemnitz)", () => {
+  it("lässt die StAN-Funktionen stehen, egal wohin in der Karte getippt wird", async () => {
+    const nutzer = userEvent.setup();
+    const bogen = neuerBogen();
+    const einheitsTyp = { code: 4 }; // B – Bergungsgruppe, GrFü und TrFü vorbelegt
+    let letzt: Erfassungsbogen | null = null;
+    render(
+      <SchrittBuehne
+        komponente={SchrittPersonal}
+        beobachten={(b) => (letzt = b)}
+        bogen={{ ...bogen, einheit: { ...bogen.einheit, einheitsTyp }, personal: stanPersonalVorbelegung(bogen.einheit.organisation, einheitsTyp) }}
+      />,
+    );
+    const karten = screen.queryByRole("radio", { name: "Alle Angaben (Karten)" });
+    if (karten) await nutzer.click(karten);
+    const funktionen = () => JSON.stringify(letzt!.personal.map((p) => p.funktionen));
+    const vorher = funktionen();
+    expect(vorher).toContain('"code"');
+    const karte = document.querySelector("[data-person-index='0']")!;
+    const ziele = [...karte.querySelectorAll("*")].filter((e) => !e.closest("button") && !(e instanceof HTMLOptionElement));
+    expect(ziele.length).toBeGreaterThan(20);
+    for (const ziel of ziele) {
+      await nutzer.click(ziel);
+      expect(funktionen(), `nach Tipp auf ${ziel.tagName}.${ziel.className}`).toBe(vorher);
+    }
+  }, 60_000);
 });

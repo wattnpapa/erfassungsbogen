@@ -123,7 +123,7 @@ describe("Knöpfe statt Textverweise (R18-K6, G4, M4, L4, H7)", () => {
   it("die drei Entscheidungsknöpfe der Karte tragen die Klasse ort-knopf (Quelltext der Karte)", () => {
     const quelle = readFileSync(`${process.cwd()}/src/app/einsaetze-ui.tsx`, "utf8");
     for (const aufruf of ["ortGehoert(true)", "ortGehoert(false)", "fassungGilt(nachgereicht)"]) {
-      expect(quelle).toMatch(new RegExp(`className="link ort-knopf"[^>]*onClick=\\{\\(\\) => void ${aufruf.replace(/[()]/g, "\\$&")}\\}`));
+      expect(quelle).toMatch(new RegExp(`className="link ort-knopf"[^>]*onClick=\\{\\(\\) => void ${aufruf.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\}`));
     }
   });
 });

@@ -140,9 +140,9 @@ describe("Runde 20 (Layout): die Stilregeln sind da", () => {
     expect(abschnitt).toMatch(/tabelle-kern tbody td, :root:root table\.einheiten-tabelle\.tabelle-kern tbody th \{ font-size: 14px; vertical-align: top;/);
   });
 
-  it("R20-E2: Erreichbarkeit unter dem Namen am Telefon, eigene Spalte darüber", () => {
-    expect(abschnitt).toContain(".kontakt-unter { display: none; }");
-    expect(abschnitt).toMatch(/table\.uebersicht \.kontakt-spalte \{ display: none; \}/);
+  it("R20-E2 / OV Chemnitz: Erreichbarkeit auf jeder Breite unter dem Namen, keine eigene Spalte", () => {
+    expect(abschnitt).toMatch(/table\.uebersicht \.kontakt-unter \{ display: block;/);
+    expect(abschnitt).not.toContain(".kontakt-unter { display: none; }");
   });
 
   it("R20-H4, G4: „Ansicht“ steht im Kopf der Einsatzansicht", () => {
@@ -310,7 +310,7 @@ describe("R20-H6: Sprungverweise unter den Kennzahlen", () => {
 });
 
 describe("R20-E2: Personaltabelle der Übersicht", () => {
-  it("die Erreichbarkeit steht zusätzlich unter dem Namen (am Telefon), die Spalte gehört zum Tablet", () => {
+  it("die Erreichbarkeit steht unter dem Namen, eine eigene Spalte gibt es nicht mehr (OV Chemnitz, 11/2026)", () => {
     const bogen = neuerBogen();
     const person: Person = {
       ...neuePerson(),
@@ -323,8 +323,8 @@ describe("R20-E2: Personaltabelle der Übersicht", () => {
     const tabelle = document.querySelector("table.personal-tabelle")!;
     const zeile = tabelle.querySelector("tbody tr")!;
     expect(zeile.querySelector("td .kontakt-unter")!.textContent).toContain("441987654");
-    expect(zeile.querySelector("td.kontakt-spalte")!.textContent).toContain("441987654");
-    expect(tabelle.querySelector("th.kontakt-spalte")!.textContent).toBe("Erreichbarkeit");
+    expect(zeile.querySelectorAll("td")).toHaveLength(3);
+    expect(tabelle.querySelectorAll("th")[2]!.textContent).toBe("Name, Vorname / Erreichbarkeit");
   });
 
   it("ohne Kontakte gibt es weder Spalte noch Zeile unter dem Namen", () => {

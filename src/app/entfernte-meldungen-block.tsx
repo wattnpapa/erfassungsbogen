@@ -88,7 +88,7 @@ export function fassungsZeilen(m: PapierkorbMeldung): { id: string; text: string
       const auftrag = (e.bogen.einsatz.ortAuftrag ?? "").trim();
       const teile = [
         `Stand ${zeitpunktDeutsch(e.bogen.stand)}`,
-        `Stärke ${s.fuehrer}/${s.unterfuehrer}/${s.mannschaft}/${s.gesamt}`,
+        `Stärke ${s.fuehrer}/${s.unterfuehrer}/${s.mannschaft}//${s.gesamt}`,
         e.zugEtikett ? `Zug „${e.zugEtikett}"` : "kein Zug",
         ...(auftrag ? [`Auftrag „${auftrag}"`] : []),
       ];

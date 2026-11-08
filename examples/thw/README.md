@@ -10,6 +10,10 @@ unter „Sonstiges" und im PDF als „OV: …" am Helfer.
 
 Neu erzeugen mit: `npm run beispiele` (deterministisch, fester Zufalls-Seed).
 
+Zusätzlich liegen in [`ortsverbaende/`](ortsverbaende/README.md) alle Einheiten
+aller Ortsverbände als Übungsbögen, gegliedert nach Landesverband › Regionalstelle ›
+Ortsverband (`npm run beispiele:thw-ov`).
+
 | Datei | Einheit | OV | Landesverband | Stärke | Fz | Abweichung |
 |---|---|---|---|---|---|---|
 | 001-albstadt-ztr-tz | ZTr TZ | Albstadt | Baden-Württemberg | 1/1/2/4 | 2 | Fahrzeug zusätzlich |
