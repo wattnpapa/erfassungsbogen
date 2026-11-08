@@ -321,7 +321,7 @@ describe("Umbrüche zerreißen keine Angaben (R4-A7)", () => {
 
 describe("Einzel-PDF: Platz für Stiftnachträge, wo er keine Seite kostet (R3-A6)", () => {
   const freieZeilen = (dd: { content: unknown }) =>
-    (JSON.stringify(dd.content).match(/"text":" ","margin":\[0,5,0,5\]/g) ?? []).length / 4;
+    (JSON.stringify(dd.content).match(/"text":" ","margin":\[0,5,0,5\]/g) ?? []).length / 3;
   const beispiel = (datei: string): Erfassungsbogen =>
     JSON.parse(readFileSync(new URL(`../../examples/thw/${datei}`, import.meta.url), "utf8")) as Erfassungsbogen;
 

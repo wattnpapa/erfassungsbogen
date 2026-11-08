@@ -838,7 +838,7 @@ describe("einsatzLageblattDokument()", () => {
     // Ohne Messung keine freien Zeilen — die gibt es nur über einzelPdfDokument.
     expect(JSON.stringify(dd.content)).not.toContain('"text":" ","margin":[0,5,0,5]');
     const frei = pdfDokument(basisBogen(), QR, undefined, undefined, { freiePersonalZeilen: 2, freiesFahrzeug: true });
-    expect(JSON.stringify(frei.content).match(/"text":" ","margin":\[0,5,0,5\]/g)).toHaveLength(8);
+    expect(JSON.stringify(frei.content).match(/"text":" ","margin":\[0,5,0,5\]/g)).toHaveLength(6);
     expect(texte(frei.content)).toContain("Kennzeichen:");
   });
 

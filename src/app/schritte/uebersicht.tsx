@@ -758,8 +758,7 @@ export function Uebersicht(props: {
                   die Funktion daneben sagt dann, welcher — GrFü, TrFü, … */}
               <th title={STAERKE_LEGENDE}>Rolle</th>
               <th>Funktion / Zusatzfunktion</th>
-              <th>Name, Vorname</th>
-              {zeigeErreichbarkeit && <th className="kontakt-spalte">Erreichbarkeit</th>}
+              <th>{zeigeErreichbarkeit ? "Name, Vorname / Erreichbarkeit" : "Name, Vorname"}</th>
             </tr>
           </thead>
           <tbody>
@@ -770,13 +769,12 @@ export function Uebersicht(props: {
                 {/* Leere Namenszellen sahen nach Darstellungsfehler aus: „(offen)" sagt, dass der Platz noch niemanden trägt (R18-N12). */}
                 <td>
                   {p.nachname || p.vorname ? <>{p.nachname}{p.nachname && p.vorname ? ", " : ""}{p.vorname}</> : <span className="hinweis">(offen)</span>}
-                  {/* R20-E2: Am Telefon steht die Erreichbarkeit unter dem Namen (die vierte Spalte lag zum Teil außerhalb des Rahmens);
-                      ab Tabletbreite bleibt sie eine eigene Spalte (index.html, „Runde 20 (Layout)"). */}
+                  {/* Die Erreichbarkeit steht unter dem Namen, auf jeder Breite: am Telefon lag eine vierte Spalte außerhalb des
+                      Rahmens (R20-E2), am Rechner nahm sie der Funktion den Platz (Rückmeldung OV Chemnitz, 11/2026). */}
                   {zeigeErreichbarkeit && p.kontakte.some((k) => kontaktText(k) !== "") && (
                     <span className="kontakt-unter">{p.kontakte.map(kontaktText).filter((t) => t !== "").join(" · ")}</span>
                   )}
                 </td>
-                {zeigeErreichbarkeit && <td className="kontakt-spalte">{p.kontakte.map(kontaktText).join(" · ")}</td>}
               </tr>
             ))}
           </tbody>

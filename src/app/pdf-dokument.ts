@@ -3266,13 +3266,24 @@ export function pdfDokument(
 
   // Spalte „Rolle" (F / UF / M): Ohne sie ließ sich eine von Hand geänderte
   // Stärke auf dem Blatt nicht gegen die Namen prüfen (Audit Runde 3, R3-A6).
+  // Ausgefüllter Bogen: drei Spalten, die Erreichbarkeit steht klein unter dem
+  // Namen. Als eigene Spalte (160 pt) blieb sie meist leer — es trägt ja oft nur
+  // eine Person eine Nummer — und drückte die Funktionen in 118 pt zusammen
+  // (Rückmeldung OV Chemnitz, 11/2026). Der Vordruck behält die Spalte: dort
+  // wird von Hand geschrieben und gebraucht wird der Platz.
   const personalZeilen: TableCell[][] = [
-    [
-      { text: "Funktion /\nZusatzfunktion", bold: true, fillColor: GRAU },
-      { text: "Rolle\nF/UF/M", bold: true, fillColor: GRAU },
-      { text: "Name, Vorname", bold: true, fillColor: GRAU },
-      { text: "D = dienstlich / P = privat", bold: true, fillColor: GRAU },
-    ],
+    blanko
+      ? [
+          { text: "Funktion /\nZusatzfunktion", bold: true, fillColor: GRAU },
+          { text: "Rolle\nF/UF/M", bold: true, fillColor: GRAU },
+          { text: "Name, Vorname", bold: true, fillColor: GRAU },
+          { text: "D = dienstlich / P = privat", bold: true, fillColor: GRAU },
+        ]
+      : [
+          { text: "Funktion / Zusatzfunktion", bold: true, fillColor: GRAU },
+          { text: "Rolle\nF/UF/M", bold: true, fillColor: GRAU },
+          { text: "Name, Vorname\nErreichbarkeit (D = dienstlich / P = privat)", bold: true, fillColor: GRAU },
+        ],
   ];
   for (let i = 0; blanko && i < blanko.personal; i++) {
     personalZeilen.push([leerZelle(), leerZelle(), leerZelle(), leerZelle()]);
@@ -3308,8 +3319,9 @@ export function pdfDokument(
     personalZeilen.push([
       { text: funktionsText(p, org) },
       { text: ROLLE_KURZ[p.staerkeRolle] ?? "", alignment: "center" },
-      { text: namePapier(p.nachname, p.vorname) },
-      { text: kontakte },
+      kontakte
+        ? { text: [namePapier(p.nachname, p.vorname), { text: `  ${kontakte.replace(/\n/g, " · ")}`, fontSize: 7 }] }
+        : { text: namePapier(p.nachname, p.vorname) },
     ]);
   }
   // Freie Zeilen für Nachrückende: Wer auf dem Ausdruck nachträgt und „von
@@ -3318,7 +3330,7 @@ export function pdfDokument(
   // Wie viele, entscheidet einzelPdfDokument nach einer Messung.
   if (!blanko && b.personalErfassung !== PersonalErfassung.NUR_STAERKE) {
     for (let i = 0; i < (zusatz?.freiePersonalZeilen ?? 0); i++)
-      personalZeilen.push([leerZelle(), leerZelle(), leerZelle(), leerZelle()]);
+      personalZeilen.push([leerZelle(), leerZelle(), leerZelle()]);
   }
 
   const qualiZeilen: TableCell[][] = [
@@ -3504,7 +3516,7 @@ export function pdfDokument(
         // Personalzeile nur als 3-mm-Streifen über der Fußzeile (R4-A8). Der
         // Vordruck wiederholt den Tabellenkopf auf Seite 2.
         table: {
-          widths: [118, 30, "*", 160],
+          widths: blanko ? [118, 30, "*", 160] : ["*", 30, 190],
           body: personalZeilen,
           dontBreakRows: true,
           ...(blanko ? { headerRows: 1 } : {}),

@@ -6889,10 +6889,10 @@
     }
     /* R20-E2: Personaltabelle der Übersicht am Telefon: Die Erreichbarkeit steht unter dem Namen (drei statt vier Spalten, nichts liegt
        außerhalb des Rahmens, kein seitliches Wischen). */
-    .kontakt-unter { display: none; }
+    /* Rückmeldung OV Chemnitz (11/2026): Auch am Tablet und Rechner kostete die eigene Spalte „Erreichbarkeit" Platz, obwohl meist nur
+       eine Person eine Nummer trägt — die Angabe steht deshalb überall unter dem Namen, die Funktion bekommt die Breite. */
+    table.uebersicht .kontakt-unter { display: block; margin-top: 2px; font-size: min(var(--t-s), 15px); color: var(--text-2); overflow-wrap: anywhere; }
     @media (max-width: 40rem) {
-      table.uebersicht .kontakt-spalte { display: none; }
-      table.uebersicht .kontakt-unter { display: block; margin-top: 2px; font-size: min(var(--t-s), 15px); color: var(--text-2); overflow-wrap: anywhere; }
       table.personal-tabelle { table-layout: fixed; width: 100%; min-width: 0; }
       table.personal-tabelle th { font-family: inherit; text-transform: none; letter-spacing: 0; font-size: 14px; line-height: 1.2; overflow-wrap: anywhere; hyphens: auto; }
       table.personal-tabelle td { overflow-wrap: anywhere; }
