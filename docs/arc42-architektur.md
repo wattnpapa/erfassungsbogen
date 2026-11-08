@@ -33,7 +33,7 @@
 > Abrollbehälter, Wechselbrücke, Container 10/20 ft, Abrollbehälter Kraftstoff,
 > Werkstattcontainer; Zeichen in `bos-taktische-zeichen` (neues Grundzeichen
 > `ladungstraeger`, Aufschrift „Log-TL"), VBA-Vokabular in `eeb-format/ports/vba` neu erzeugt. Neuer Baustein `src/app/aenderungen.ts`
-> (Änderungsverlauf „Was ist neu", per `import()` erst beim Öffnen geladen, eigener
+> (Änderungsverlauf „Was ist neu" seit 2026-07-11, je Monat mit Zusammenfassung `MONATE`, monatsweise blätterbar; per `import()` erst beim Öffnen geladen, eigener
 > Chunk im Precache) mit Dialog in der Fußzeile. Startbündel 0,74 MB (Budget neu gesetzt).
 >
 > **Nachgezogen 2026-11-03 — Excel-Liste „Oldenburg" entfernt:** Kap. 1.2, 1.3, 2.1,

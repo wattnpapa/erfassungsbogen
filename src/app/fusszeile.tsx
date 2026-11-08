@@ -1341,38 +1341,72 @@ export function Fusszeile({ onBogenOeffnen, kompakt = false }: {
  */
 function useAenderungen() {
   const ref = useRef<HTMLDialogElement>(null);
-  const [liste, setListe] = useState<readonly Aenderung[] | null>(null);
+  const [daten, setDaten] = useState<{ liste: readonly Aenderung[]; monate: Readonly<Record<string, string>> } | null>(null);
+  // Blättern je Monat, 0 = neuester. Ein Verlauf seit Juli war als eine Liste über 20 Bildschirme lang.
+  const [seite, setSeite] = useState(0);
   const [fehler, setFehler] = useState("");
+  const kopf = useRef<HTMLHeadingElement>(null);
   const oeffnen = async () => {
     setFehler("");
+    setSeite(0);
     try {
       const m = await import("./aenderungen");
-      setListe(m.AENDERUNGEN);
+      setDaten({ liste: m.AENDERUNGEN, monate: m.MONATE });
     } catch (err) {
       setFehler(`Der Änderungsverlauf ließ sich nicht laden: ${fehlerText(err)}`);
     }
     ref.current?.showModal();
   };
+  const monate = daten ? [...new Set(daten.liste.map((a) => a.datum.slice(0, 7)))] : [];
+  const monat = monate[seite];
+  const blaettern = (neu: number) => {
+    setSeite(neu);
+    // Nach dem Blättern beginnt der neue Monat oben, nicht dort, wo man im alten gerollt hatte.
+    requestAnimationFrame(() => kopf.current?.scrollIntoView?.({ block: "start" }));
+  };
+  const leiste = monate.length > 1 && (
+    <nav className="aenderungen-blaettern" aria-label="Monate blättern">
+      <button type="button" disabled={seite === 0} onClick={() => blaettern(seite - 1)}>← Neuer</button>
+      <span>
+        {seite + 1} von {monate.length}
+      </span>
+      <button type="button" disabled={seite >= monate.length - 1} onClick={() => blaettern(seite + 1)}>Älter →</button>
+    </nav>
+  );
   const dialog = (
     <Dialog titel="Was ist neu" dialogRef={ref} klasse="rollhinweis aenderungen">
-      <p className="hinweis">Installierte Fassung: v{__APP_VERSION__}. Neueste Änderungen oben.</p>
+      <p className="hinweis">Installierte Fassung: v{__APP_VERSION__}.</p>
       {fehler && <p className="fehler" role="alert">{fehler}</p>}
-      {liste?.map((a) => (
-        <section key={a.datum} className="aenderung">
-          <h3>{aenderungsDatumText(a.datum)}</h3>
-          <ul>
-            {a.punkte.map((p) => (
-              <li key={p}>{p}</li>
+      {daten && monat && (
+        <>
+          <h3 className="aenderungen-monat" ref={kopf}>{monatsName(monat)}</h3>
+          {daten.monate[monat] && <p className="aenderungen-kurz">{daten.monate[monat]}</p>}
+          {daten.liste
+            .filter((a) => a.datum.startsWith(monat))
+            .map((a) => (
+              <section key={a.datum} className="aenderung">
+                <h4>{aenderungsDatumText(a.datum)}</h4>
+                <ul>
+                  {a.punkte.map((p) => (
+                    <li key={p}>{p}</li>
+                  ))}
+                </ul>
+              </section>
             ))}
-          </ul>
-        </section>
-      ))}
-      <p className="hinweis">
-        Alle Änderungen im Einzelnen: <a href={`${REPO}/commits/main`} target="_blank" rel="noopener noreferrer">Verlauf auf GitHub</a>.
-      </p>
+          {leiste}
+        </>
+      )}
     </Dialog>
   );
   return { oeffnen, dialog };
+}
+
+const MONATSNAMEN = ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"];
+
+/** „November 2026" aus „2026-11". */
+function monatsName(jjjjmm: string): string {
+  const [j, m] = jjjjmm.split("-");
+  return `${MONATSNAMEN[Number(m) - 1] ?? m} ${j}`;
 }
 
 /** „08.11.2026" aus „2026-11-08" — hier statt aus aenderungen.ts, damit das Startpaket die Liste nicht mitlädt. */
