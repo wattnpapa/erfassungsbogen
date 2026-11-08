@@ -64,7 +64,7 @@ describe("Zeichensammlung", () => {
     // Zuordnung bleiben. Die vier Fahrzeugtypen ohne eigenes Zeichen
     // (Auflieger, Anh Plane/Spriegel, Anh BDF, Anh ASH) sind gewollt.
     const ohneZeichen = THW_FAHRZEUGTYPEN.filter((t) => !THW_FAHRZEUG_ZEICHEN[t.code!]).map((t) => t.kurz);
-    expect(ohneZeichen).toEqual(["Auflieger", "Auflieger Plane/Spriegel", "Auflieger Plattform", "Anh Plane/Spriegel", "Anh BDF", "Anh ASH", "WB"]);
+    expect(ohneZeichen).toEqual(["Auflieger", "Auflieger Plane/Spriegel", "Auflieger Container", "Anh Plane/Spriegel", "Anh BDF", "Anh ASH", "Anh 12t Koffer", "Anh 5t Tandem", "WB", "ABK"]);
     expect(THW_EINHEITSTYPEN.filter((t) => !THW_EINHEIT_ZEICHEN[t.code!])).toEqual([]);
   });
 
@@ -213,6 +213,21 @@ describe("Ladungsträger und Auflieger-Bauformen (Rückmeldung OV Chemnitz, 11/2
     };
     expect(zeichen("WB")).toContain(">WB<");
     expect(zeichen("Auflieger Plane/Spriegel")).toContain(">P/S<");
-    expect(zeichen("Auflieger Plattform")).toContain(">PF<");
+    expect(zeichen("Auflieger Container")).toContain(">Cont<");
+    expect(zeichen("ABK")).toContain(">ABK<");
+    expect(zeichen("Anh 12t Koffer")).toContain(">12t K<");
   });
 });
+
+describe("Trupps der FGr Log-MW (StAN 09-05)", () => {
+  it("haben eigene Einheitszeichen, der Tr Log-TL mit Aufschrift", () => {
+    const zeichen = (kurz: string) => {
+      const t = THW_EINHEITSTYPEN.find((x) => x.kurz === kurz)!;
+      return einheitSymbolSvg({ organisation: OrganisationsTyp.THW, einheitsTyp: { code: t.code }, hierarchie: [] });
+    };
+    expect(zeichen("Tr Log-M")).toContain(">Log-M<");
+    expect(zeichen("Tr Log-VG")).toContain(">Log-VG<");
+    expect(zeichen("Tr Log-TL")).toContain(">Log-TL<");
+  });
+});
+

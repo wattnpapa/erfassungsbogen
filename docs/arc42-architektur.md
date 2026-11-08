@@ -24,11 +24,15 @@
 > jeder Breite. `QrSatz.teileOhneGegenzeichnung` (`hilfen.ts`) nennt beim
 > Weiterreichen die Teilzahl des Absenders, wenn die Gegenzeichnung einen Code mehr
 > kostet. Schritt 1: Bei „Nur Stärke" folgen ungezählte Sollzahlen dem neuen
-> Einheitstyp. Vokabular (`bos-vokabulare`): THW-Fahrzeugtypen 28 LKW K Lkr (FGr Log-MW,
-> Kennzahl 63 statt LKW Lkr/44), 29/30 Auflieger Plane/Spriegel bzw. Plattform, 56 Anh
-> Kühl (FGr Log-V), 60–63 Ladungsträger Abrollbehälter, Wechselbrücke, Container 10/20 ft;
-> Zeichen in `bos-taktische-zeichen` (neues Grundzeichen `ladungstraeger`), VBA-Vokabular
-> in `eeb-format/ports/vba` neu erzeugt. Neuer Baustein `src/app/aenderungen.ts`
+> Einheitstyp. Vokabular (`bos-vokabulare`), Fachzug Logistik von Hand gegen die StAN
+> 09-04 bis 09-07 (Stand 01.07.2026) geprüft: neue Einheitstypen 47–49 (Tr Log-M, Tr Log-VG,
+> Tr Log-TL, Trupps der FGr Log-MW, Funkruf-Teileinheit 63), die Fachgruppe belegt die
+> Fahrzeuge aller drei Trupps vor; THW-Fahrzeugtypen 28 LKW K Lkr (Kennzahl 63 statt LKW
+> Lkr/44), 29/30 Auflieger Plane/Spriegel bzw. Container (Tr Log-TS führt beide), 56–59
+> Anh Kühl, Anh 12t Koffer, Anh 5t Tandem, Anh FGr Log-MW, 60–65 Ladungsträger
+> Abrollbehälter, Wechselbrücke, Container 10/20 ft, Abrollbehälter Kraftstoff,
+> Werkstattcontainer; Zeichen in `bos-taktische-zeichen` (neues Grundzeichen
+> `ladungstraeger`, Aufschrift „Log-TL"), VBA-Vokabular in `eeb-format/ports/vba` neu erzeugt. Neuer Baustein `src/app/aenderungen.ts`
 > (Änderungsverlauf „Was ist neu", per `import()` erst beim Öffnen geladen, eigener
 > Chunk im Precache) mit Dialog in der Fußzeile. Startbündel 0,74 MB (Budget neu gesetzt).
 >

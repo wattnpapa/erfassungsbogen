@@ -18,7 +18,7 @@ describe("Zuordnung Vokabular → Zeichen", () => {
     // Neue Vokabular-Codes sollen nicht unbemerkt ohne Zuordnung bleiben. Die
     // Auflieger, nackte Anhänger und die Wechselbrücke ohne eigenes Zeichen sind gewollt.
     const ohneZeichen = THW_FAHRZEUGTYPEN.filter((t) => !THW_FAHRZEUG_ZEICHEN[t.code!]).map((t) => t.kurz);
-    expect(ohneZeichen).toEqual(["Auflieger", "Auflieger Plane/Spriegel", "Auflieger Plattform", "Anh Plane/Spriegel", "Anh BDF", "Anh ASH", "WB"]);
+    expect(ohneZeichen).toEqual(["Auflieger", "Auflieger Plane/Spriegel", "Auflieger Container", "Anh Plane/Spriegel", "Anh BDF", "Anh ASH", "Anh 12t Koffer", "Anh 5t Tandem", "WB", "ABK"]);
     expect(THW_EINHEITSTYPEN.filter((t) => !THW_EINHEIT_ZEICHEN[t.code!])).toEqual([]);
   });
 });
