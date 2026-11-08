@@ -909,6 +909,9 @@ export function Uebersicht(props: {
                 Bogen zu groß für einen Code — in {qr.teile.length} Teile aufgeteilt. Alle Teile
                 nacheinander scannen; die App setzt sie zusammen. Auch auf den letzten PDF-Seiten, je Teil eine Seite.
                 {qr.teile.length > VIELE_TEILE && qrGroessePosten(bogen) ? ` Den größten Anteil haben: ${qrGroessePosten(bogen)}.` : ""}
+                {qr.teileOhneGegenzeichnung !== undefined && qr.teileOhneGegenzeichnung < qr.teile.length
+                  ? ` Beim Absender waren es ${qr.teileOhneGegenzeichnung} ${qr.teileOhneGegenzeichnung === 1 ? "Code" : "Codes"}: Die Gegenzeichnung dieses Geräts (Weitergabe bezeugt, mit Absenderangaben) reist zusätzlich mit — der Inhalt ist derselbe.`
+                  : ""}
               </p>
               <div className="qr-teile">
                 {qr.teile.map((t) => (

@@ -48,6 +48,7 @@ import {
   plausibilitaet,
   pruefpunkte,
   qrErzeugen,
+  qrTeilzahl,
   schrittStatus,
   staerkePlausibilitaet,
   transportBilanz,
@@ -656,6 +657,19 @@ describe("qrErzeugen(): Herkunft eines fremden Bogens", () => {
       schluesselKurzform(pubkey),
       schluesselKurzform(await oeffentlicherSchluessel(GERAET)),
     ]);
+  });
+
+  it("nennt die Teilzahl beim Absender — die Gegenzeichnung kann einen Code mehr kosten (OV Chemnitz, 11/2026)", async () => {
+    const b = neuerBogen();
+    // Zufallsnaher Text, damit Deflate ihn nicht wegschrumpft und der Bogen in mehrere Codes geht.
+    b.einsatz.ortAuftrag = Array.from({ length: 120 }, (_, i) => `Abschnitt${(i * 7919) % 1009}`).join(" ");
+    const { payload } = await fremderPayload(b);
+    const qr = await qrErzeugen(decodePayload(payload, browserKompressor), payload);
+    expect(qr.weitergeleitet).toBe(true);
+    expect(qr.teileOhneGegenzeichnung).toBe(qrTeilzahl(payload));
+    expect(qrTeilzahl(ausQr(qr))).toBe(qr.teile.length);
+    expect(qr.segmentiert).toBe(true);
+    expect(qr.teile.length).toBeGreaterThanOrEqual(qr.teileOhneGegenzeichnung!);
   });
 
   it("signiert nach einer Bearbeitung allein selbst (fremde Signatur deckt die Änderung nicht)", async () => {
