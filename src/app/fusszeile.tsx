@@ -467,10 +467,10 @@ async function blankoHerunterladen(): Promise<void> {
 }
 
 /**
- * Den Beispielbögen-Dialog von außerhalb der Fußzeile öffnen — für den
- * Einstieg auf der Startseite unter „So funktioniert's". Der Dialog selbst
- * bleibt in der Fußzeile (Zustand, Nachladen, Ordner-Navigation); die
- * Startseite schickt nur dieses Ereignis.
+ * Den Beispielbögen-Dialog öffnen. Der einzige Einstieg ist der Abschnitt
+ * „Beispielbögen“ auf der Startseite unter „So funktioniert's"; einen Link in
+ * der Fußzeile gibt es nicht mehr. Der Dialog selbst bleibt hier (Zustand,
+ * Nachladen, Ordner-Navigation); die Startseite schickt nur dieses Ereignis.
  */
 const BEISPIELE_OEFFNEN = "eeb:beispielboegen-oeffnen";
 export function beispielboegenOeffnen(): void {
@@ -937,9 +937,6 @@ export function Fusszeile({ onBogenOeffnen, kompakt = false }: {
               <button type="button" className="link" onClick={sicherungOeffnen}>Jetzt sichern…</button>
             </p>
           )}
-          <button type="button" className="link" onClick={beispieleOeffnen}>
-            Beispielbögen
-          </button>
           <button type="button" className="link" onClick={() => void geraeteSchluesselNeuErzeugen()}>Geräteschlüssel neu erzeugen</button>
           <button type="button" className="link gefahr" onClick={loeschenOeffnen}>Alle Daten löschen</button>
           {schluesselFehler && <p className="fehler">{schluesselFehler}</p>}

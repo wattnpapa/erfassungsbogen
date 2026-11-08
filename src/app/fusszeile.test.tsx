@@ -9,10 +9,10 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
-import { render, screen, within } from "@testing-library/react";
+import { act, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { Dialogschicht } from "./dialoge";
-import { Fusszeile } from "./fusszeile";
+import { Fusszeile, beispielboegenOeffnen } from "./fusszeile";
 import { neuerBogen } from "./hilfen";
 import { vorlageAnlegen, vorlagenLaden } from "./vorlagen";
 import { sicherungErstellen } from "./sicherung";
@@ -391,7 +391,10 @@ describe("Beispielbogen-Link kopieren", () => {
     const nutzer = userEvent.setup();
     try {
       buehne();
-      await nutzer.click(screen.getByRole("button", { name: "Beispielbögen" }));
+      // Geöffnet wird der Dialog von der Startseite aus (app.tsx); die
+      // Fußzeile hat dafür keinen Link mehr.
+      expect(screen.queryByRole("button", { name: "Beispielbögen" })).toBeNull();
+      await act(async () => beispielboegenOeffnen());
       const dialog = await screen.findByRole("dialog", { name: "Beispielbögen" });
       await nutzer.click(within(dialog).getByRole("button", { name: /^THW/ }));
       const knoepfe = await within(dialog).findAllByRole("button", { name: "Link" }, { timeout: 15000 });
