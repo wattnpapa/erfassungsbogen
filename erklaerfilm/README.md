@@ -75,8 +75,8 @@ muss dafür über den Proxy gehen:
 `NODE_USE_ENV_PROXY=1 NODE_EXTRA_CA_CERTS=/root/.ccr/ca-bundle.crt ELEVENLABS_API_KEY=proxy-injected npm run erklaerfilm:stimmen`.
 
 Aussprache: ElevenLabs bekommt `sprechtext`, der Untertitel zeigt `text`. So
-spricht der Erzähler „T-H-W“, „Stan“, „G-K-W“ und Funkrufnamen als
-„zwo-zwo, fünf-eins“, während im Bild „THW“, „StAN“, „GKW“ und „22/51“ steht.
+spricht der Erzähler „T-H-W“, „Schtahn“, „G-K-W“ und Funkrufnamen als
+„zweiundzwanzig einundfünfzig“, während im Bild „THW“, „StAN“, „GKW“ und „22/51“ steht.
 Klingt eine Zeile falsch, dort nachbessern und mit `--nur` neu erzeugen.
 
 Ohne Netz zu ElevenLabs lassen sich die MP3s auch im Browser-Studio von

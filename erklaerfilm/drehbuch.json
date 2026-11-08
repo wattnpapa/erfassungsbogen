@@ -66,7 +66,7 @@
           "sprecher": "karsten",
           "funk": true,
           "text": "Meldekopf von Heros Ulm 22/51, wir sind in zwei Minuten bei euch, kommen.",
-          "sprechtext": "Meldekopf von Heros Ulm zwo-zwo, fünf-eins, wir sind in zwei Minuten bei euch, kommen.",
+          "sprechtext": "Meldekopf von Heros Ulm zweiundzwanzig einundfünfzig, wir sind in zwei Minuten bei euch, kommen.",
           "blase": {
             "x": 1120,
             "y": 110,
@@ -81,7 +81,7 @@
           "id": "a2-3",
           "sprecher": "jana",
           "text": "Heros Ulm 22/51 von Meldekopf, verstanden. Erfassungsbogen bereithalten, Ende.",
-          "sprechtext": "Heros Ulm zwo-zwo, fünf-eins von Meldekopf, verstanden. Erfassungsbogen bereithalten, Ende.",
+          "sprechtext": "Heros Ulm zweiundzwanzig einundfünfzig von Meldekopf, verstanden. Erfassungsbogen bereithalten, Ende.",
           "blase": {
             "x": 560,
             "y": 250,
@@ -515,7 +515,7 @@
           "id": "c1-3",
           "sprecher": "erzaehler",
           "text": "Dann der Einheitstyp: Bergungsgruppe. Die App legt die Sollplätze nach StAN an, hier neun Personen und zwei Fahrzeuge.",
-          "sprechtext": "Dann der Einheitstyp: Bergungsgruppe. Die App legt die Sollplätze nach Stan an, hier neun Personen und zwei Fahrzeuge.",
+          "sprechtext": "Dann der Einheitstyp: Bergungsgruppe. Die App legt die Sollplätze nach Schtahn an, hier neun Personen und zwei Fahrzeuge.",
           "bilder": [
             "Einheitstyp: Bergungsgruppe",
             "Bergungsgruppe wählen"
@@ -554,7 +554,7 @@
           "id": "c3-1",
           "sprecher": "erzaehler",
           "text": "Seite drei: das Personal. Die neun Plätze aus der StAN stehen schon da.",
-          "sprechtext": "Seite drei: das Personal. Die neun Plätze aus der Stan stehen schon da.",
+          "sprechtext": "Seite drei: das Personal. Die neun Plätze aus der Schtahn stehen schon da.",
           "bilder": [
             "StAN-Sollplätze stehen schon da"
           ]
@@ -602,7 +602,7 @@
           "id": "c4-2",
           "sprecher": "erzaehler",
           "text": "Kennzeichen eintragen, beim Funkrufnamen „Heros“ wählen. Den Ort Ulm übernimmt die App aus Seite eins, dazu kommen die Kennzahlen 22/51.",
-          "sprechtext": "Kennzeichen eintragen, beim Funkrufnamen Heros wählen. Den Ort Ulm übernimmt die App aus Seite eins, dazu kommen die Kennzahlen zwo-zwo, fünf-eins.",
+          "sprechtext": "Kennzeichen eintragen, beim Funkrufnamen Heros wählen. Den Ort Ulm übernimmt die App aus Seite eins, dazu kommen die Kennzahlen zweiundzwanzig einundfünfzig.",
           "bilder": [
             "Kennzeichen GKW",
             "Kennwort Heros",

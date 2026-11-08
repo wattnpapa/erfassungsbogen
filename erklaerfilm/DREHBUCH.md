@@ -28,10 +28,10 @@ Erzeugt aus `drehbuch.json` mit `node erklaerfilm/drehbuch-md.mjs` — Änderung
 **Erzähler:** Bevor sie in den Einsatz gehen, müssen alle durch dieselbe Engstelle: den Meldekopf.
 
 **Karsten (über Funk):** Meldekopf von Heros Ulm 22/51, wir sind in zwei Minuten bei euch, kommen.
-<br>*Aussprache:* Meldekopf von Heros Ulm zwo-zwo, fünf-eins, wir sind in zwei Minuten bei euch, kommen.
+<br>*Aussprache:* Meldekopf von Heros Ulm zweiundzwanzig einundfünfzig, wir sind in zwei Minuten bei euch, kommen.
 
 **Jana:** Heros Ulm 22/51 von Meldekopf, verstanden. Erfassungsbogen bereithalten, Ende.
-<br>*Aussprache:* Heros Ulm zwo-zwo, fünf-eins von Meldekopf, verstanden. Erfassungsbogen bereithalten, Ende.
+<br>*Aussprache:* Heros Ulm zweiundzwanzig einundfünfzig von Meldekopf, verstanden. Erfassungsbogen bereithalten, Ende.
 
 *Geräusche:* Starker Regen auf Asphalt bei Nacht, gleichmäßig, Wind; Mehrere Lkw-Dieselmotoren im Leerlauf, aus etwas Entfernung
 
@@ -152,7 +152,7 @@ Erzeugt aus `drehbuch.json` mit `node erklaerfilm/drehbuch-md.mjs` — Änderung
 <br>*Bild:* OV Ulm aus dem Verzeichnis
 
 **Erzähler:** Dann der Einheitstyp: Bergungsgruppe. Die App legt die Sollplätze nach StAN an, hier neun Personen und zwei Fahrzeuge.
-<br>*Aussprache:* Dann der Einheitstyp: Bergungsgruppe. Die App legt die Sollplätze nach Stan an, hier neun Personen und zwei Fahrzeuge.
+<br>*Aussprache:* Dann der Einheitstyp: Bergungsgruppe. Die App legt die Sollplätze nach Schtahn an, hier neun Personen und zwei Fahrzeuge.
 <br>*Bild:* Einheitstyp: Bergungsgruppe → Bergungsgruppe wählen
 
 
@@ -169,7 +169,7 @@ Erzeugt aus `drehbuch.json` mit `node erklaerfilm/drehbuch-md.mjs` — Änderung
 ### Szene c3 · App-Aufnahme · Seite 3 von 6 · Personal
 
 **Erzähler:** Seite drei: das Personal. Die neun Plätze aus der StAN stehen schon da.
-<br>*Aussprache:* Seite drei: das Personal. Die neun Plätze aus der Stan stehen schon da.
+<br>*Aussprache:* Seite drei: das Personal. Die neun Plätze aus der Schtahn stehen schon da.
 <br>*Bild:* StAN-Sollplätze stehen schon da
 
 **Erzähler:** Liegt die Namensliste schon im Messenger, fügst du sie mit „Namen einfügen“ in einem Rutsch ein. Vorher siehst du, wer auf welchen Platz kommt.
@@ -189,7 +189,7 @@ Erzeugt aus `drehbuch.json` mit `node erklaerfilm/drehbuch-md.mjs` — Änderung
 <br>*Bild:* StAN-Fahrzeuge stehen schon da
 
 **Erzähler:** Kennzeichen eintragen, beim Funkrufnamen „Heros“ wählen. Den Ort Ulm übernimmt die App aus Seite eins, dazu kommen die Kennzahlen 22/51.
-<br>*Aussprache:* Kennzeichen eintragen, beim Funkrufnamen Heros wählen. Den Ort Ulm übernimmt die App aus Seite eins, dazu kommen die Kennzahlen zwo-zwo, fünf-eins.
+<br>*Aussprache:* Kennzeichen eintragen, beim Funkrufnamen Heros wählen. Den Ort Ulm übernimmt die App aus Seite eins, dazu kommen die Kennzahlen zweiundzwanzig einundfünfzig.
 <br>*Bild:* Kennzeichen GKW → Kennwort Heros → Kennzahlen 22/51 → Kennzeichen Anhänger
 
 

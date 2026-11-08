@@ -756,9 +756,9 @@
         <rect x="1360" y="110" width="400" height="330" fill="#9cc8ff" stroke="${LINIE}" stroke-width="8"/>
         <path d="M1560 110 v330 M1360 275 h400" stroke="${LINIE}" stroke-width="7"/>
         ${gkw(1330, 420, 0.22, t, { blaulicht: false, licht: false })}
-        ${person({ x: 860, y: 1240, s: 1.0, haar: "#5a3a22", bart: true, kappe: true, blick: 1, gesicht: "froh", ohneBeine: true, arme: { l: "vorne", r: "tippen" }, t })}
+        ${person({ x: 980, y: 1240, s: 1.0, haar: "#5a3a22", bart: true, kappe: true, blick: 1, gesicht: "froh", ohneBeine: true, arme: { l: "vorne", r: "vorne" }, t })}
         ${tisch(960, 900, 1500, { tuch: "#b88a55" })}
-        <g transform="translate(1340 900)">${laptop(500, 320, bogenMini(-220, -245, 440, Math.min(6, 1 + Math.floor(t * 1.2))))}</g>
+        <g transform="translate(980 900)">${laptop(440, 250, bogenMini(-190, -180, 380, Math.min(6, 1 + Math.floor(t * 1.2))))}</g>
         <g transform="translate(480 860)"><path d="M-40 -60 h80 v70 q0 30 -40 30 q-40 0 -40 -30z" fill="#fff" stroke="${LINIE}" stroke-width="7"/><path d="M40 -40 q40 0 30 30 q-6 16 -30 16" fill="none" stroke="${LINIE}" stroke-width="7"/>
           ${[0, 1, 2].map((i) => `<path d="M${-14 + i * 14} ${-80 - ((t * 30 + i * 20) % 50)} q10 -14 0 -28" fill="none" stroke="#999" stroke-width="5" opacity=".7"/>`).join("")}</g>`;
     },
