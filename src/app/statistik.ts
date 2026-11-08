@@ -1,6 +1,7 @@
 /**
  * Anonyme Nutzungsmessung (GoatCounter) — ein Treffer pro Kaltstart, auf allen
- * Plattformen: Browser, installierte PWA, iOS-/Android-App und Desktop.
+ * Plattformen: Browser, installierte PWA, iOS-/Android-App und Desktop. Dazu
+ * wenige feste Ereignisse (Erklärfilm gestartet/halb/zu Ende gesehen).
  *
  * GoatCounter setzt keine Cookies, schreibt nichts in den Storage und bildet
  * keine geräteübergreifende ID. Damit greift § 25 TDDDG nicht und es braucht
@@ -80,27 +81,62 @@ function senden(url: string): void {
 }
 
 /**
- * Einen Start zählen. No-op bei Widerspruch, in der lokalen Entwicklung und
- * überall dort, wo kein Browser-Umfeld existiert.
+ * Darf gezählt werden? Nein bei Widerspruch, in der lokalen Entwicklung und
+ * überall dort, wo kein Browser-Umfeld existiert. Liefert sonst, ob die
+ * Oberfläche in einem Browser-Tab läuft (nur dort gibt es einen Referrer).
  */
-export function statistikStarten(): void {
-  if (typeof window === "undefined" || typeof navigator === "undefined") return;
-  if (statistikAbgewaehlt()) return;
-
-  const { pfad, titel } = nutzungsKanal();
+function zaehlUmfeld(): { imBrowser: boolean } | null {
+  if (typeof window === "undefined" || typeof navigator === "undefined") return null;
+  if (statistikAbgewaehlt()) return null;
   // Lokale Entwicklung nicht mitzählen (Vite-Dev, Electron-Dev gegen localhost).
   // Der Guard gilt NUR für den Browser: Capacitor serviert die installierte App
   // ebenfalls unter "localhost" — die soll und muss gezählt werden.
   const imBrowser = !istNativ() && window.location.protocol !== "file:";
-  if (imBrowser && /^(localhost|127\.0\.0\.1|\[::1\])$/.test(window.location.hostname)) return;
+  if (imBrowser && /^(localhost|127\.0\.0\.1|\[::1\])$/.test(window.location.hostname)) return null;
+  return { imBrowser };
+}
+
+/**
+ * Einen Start zählen. No-op bei Widerspruch, in der lokalen Entwicklung und
+ * überall dort, wo kein Browser-Umfeld existiert.
+ */
+export function statistikStarten(): void {
+  const umfeld = zaehlUmfeld();
+  if (!umfeld) return;
+  const { pfad, titel } = nutzungsKanal();
   // Bewusst NUR Pfad, Titel und (im Web) Referrer. Kein location.search und
   // kein Fragment: die App transportiert Bogendaten in der URL (#<Payload>),
   // und davon darf nie etwas in der Statistik landen.
-  const referrer = imBrowser ? document.referrer : "";
+  const referrer = umfeld.imBrowser ? document.referrer : "";
   const url =
     `${ENDPUNKT}?p=${encodeURIComponent(pfad)}` +
     `&t=${encodeURIComponent(titel)}` +
     `&r=${encodeURIComponent(referrer)}`;
+  senden(url);
+}
+
+/** Gezählte Ereignisse — feste Namen, nie Inhalte aus der App. */
+export const EREIGNISSE = {
+  "erklaerfilm-start": "Erklärfilm gestartet",
+  "erklaerfilm-haelfte": "Erklärfilm zur Hälfte gesehen",
+  "erklaerfilm-ende": "Erklärfilm bis zum Ende gesehen",
+  "erklaerfilm-link-app": "Erklärfilm aus der App geöffnet",
+} as const;
+export type Ereignis = keyof typeof EREIGNISSE;
+
+/**
+ * Ein Ereignis zählen (GoatCounter-Parameter e=true: erscheint im Dashboard
+ * unter „Events“, getrennt von den Seitenpfaden). Übertragen werden nur der
+ * feste Ereignisname und sein Titel — kein Referrer, keine URL-Teile. Dieselben
+ * Regeln wie beim Start: kein Zählen nach Widerspruch und nicht in der
+ * lokalen Entwicklung.
+ */
+export function ereignisZaehlen(name: Ereignis): void {
+  if (!zaehlUmfeld()) return;
+  const url =
+    `${ENDPUNKT}?p=${encodeURIComponent(name)}` +
+    `&t=${encodeURIComponent(EREIGNISSE[name])}` +
+    `&e=true`;
   senden(url);
 }
 

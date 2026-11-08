@@ -466,6 +466,16 @@
       er still fehl.
     </p>
     <p>
+      Dazu kommen wenige Ereignisse mit festem Namen (GoatCounter-Parameter
+      <code>e=true</code>): <code>erklaerfilm-start</code>,
+      <code>erklaerfilm-haelfte</code> und <code>erklaerfilm-ende</code> beim
+      Abspielen des Erklärfilms auf der Startseite, in den installierten Fassungen
+      <code>erklaerfilm-link-app</code> beim Öffnen des Film-Links. Jedes Ereignis
+      zählt je Seitenaufruf höchstens einmal und trägt keinen Referrer
+      (<code>ereignisZaehlen</code> in <code>src/app/statistik.ts</code>). Der
+      Film kommt von derselben Adresse wie die Anwendung.
+    </p>
+    <p>
       Widerspruch: in der App unter „Datenschutz“ die Option <em>Nicht mitzählen</em>
       aktivieren; sie setzt den Eintrag <code>skipgc</code> im lokalen Speicher, und
       der Zählimpuls unterbleibt ab dem nächsten Start. Welche Angaben GoatCounter
