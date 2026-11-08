@@ -48,7 +48,7 @@ export const AENDERUNGEN: readonly Aenderung[] = [
   {
     datum: "2026-10-28",
     punkte: [
-      "Die App startet schneller: Das Startpaket ist etwa halb so groß, Zeichen und Einsatzansicht werden nachgeladen und liegen trotzdem offline vor.",
+      "Die App startet schneller, besonders bei schwachem Netz; offline funktioniert weiterhin alles.",
       "Die Einsatzansicht öffnet auch ohne Netz nach dem Neuladen.",
       "Bei vollem Speicher geht ein geschlossener oder ersetzter Bogen nicht mehr verloren.",
     ],
@@ -127,15 +127,15 @@ export const AENDERUNGEN: readonly Aenderung[] = [
   {
     datum: "2026-09-06",
     punkte: [
-      "PDF-Vorschau: Der Rahmen blieb in einigen Browsern leer (Sicherheitsregel blockte ihn); behoben.",
+      "Die PDF-Vorschau blieb in einigen Browsern leer; behoben.",
       "Bogen aus einer PDF laden, notfalls über den QR-Code auf der PDF; ganze Ordner mit QR-Bildern auf einmal einlesen.",
-      "Ein Knopf für alles, was fertig hereinkommt (Datei, PDF, Bild, Link).",
+      "Ein gemeinsamer Knopf zum Einlesen von Datei, PDF, Bild oder Link.",
     ],
   },
   {
     datum: "2026-09-05",
     punkte: [
-      "Gröbere QR-Codes: weniger Daten je Code, dafür bei großen Bögen mehr Teile; sie lassen sich zuverlässiger scannen, auch vom Handydisplay.",
+      "QR-Codes sind gröber und lassen sich zuverlässiger scannen, auch vom Handydisplay; große Bögen verteilen sich dafür auf mehr Codes.",
       "Die PDF lässt sich auch offline erzeugen.",
     ],
   },
