@@ -719,7 +719,7 @@ dem Vite-Build); es gibt keine serverseitige Variante.
 | # | Zielobjekt | Ziel | Zweck | Absicherung |
 | --- | --- | --- | --- | --- |
 | K1 | Geräte-zu-Geräte-Übergabe | Kein Netzwerk — QR-Kamera-Scan, USB-Handscanner, Datei-Export/-Import, Nahfeld-Freigabe (AirDrop/Quick Share) | Übergabe eines Bogens zwischen zwei Geräten | Physisch/lokal begrenzter Kanal; optionale Ed25519-Signatur zur Herkunftsprüfung |
-| K2 | GoatCounter-Reichweitenmessung | `https://erfassungsbogen.goatcounter.com` | Anonyme Nutzungsstatistik beim App-Start | Cookielos, keine Cross-Device-ID, laut Code-Dokumentation keine Bogen-Inhalte übertragen |
+| K2 | GoatCounter-Reichweitenmessung | `https://erfassungsbogen.goatcounter.com` | Anonyme Nutzungsstatistik beim App-Start; seit 2026-11-08 zusätzlich feste Filmereignisse (Erklärfilm gestartet/halb/zu Ende, in den Apps Link geöffnet), je Seitenaufruf höchstens einmal, ohne Referrer | Cookielos, keine Cross-Device-ID, laut Code-Dokumentation keine Bogen-Inhalte übertragen |
 | K3 | GitHub-Releases-Abfrage | github.com bzw. GitHub-Release-Assets | Prüfung auf neue App-Version (nur Desktop-Variante, `electron-updater`) | HTTPS; Signatur-/Zertifikatsprüfung abhängig vom CI-Build (siehe 6.4) |
 
 Es existieren keine weiteren Netzwerkverbindungen der eigentlichen

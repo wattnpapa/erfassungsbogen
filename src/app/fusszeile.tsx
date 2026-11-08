@@ -422,6 +422,9 @@ function Datenschutzdialog({ dialogRef }: { dialogRef: RefObject<HTMLDialogEleme
         Browser – die verweisende Seite. Die IP-Adresse wird nicht gespeichert, es
         entsteht keine geräteübergreifende Kennung. Inhalte des Erfassungsbogens
         werden nicht übertragen. Ohne Internetverbindung unterbleibt der Impuls.
+        Spielt jemand den Erklärfilm auf der Startseite ab, zählt GoatCounter
+        außerdem, ob er gestartet, zur Hälfte und bis zum Ende gesehen wurde —
+        nur diese festen Ereignisnamen, ohne verweisende Seite.
         Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO.
       </p>
       <label className="inline">

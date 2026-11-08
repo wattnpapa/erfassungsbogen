@@ -63,6 +63,7 @@ import { leseausgabeMeldung } from "./pdf-titel";
 import { Kopfnav } from "./kopfnav-ui";
 import { bogenLinksEmpfangen, imWebBrowser, istNativ, qrScannen, textTeilen } from "./nativ";
 import { useOnline } from "./online";
+import { ereignisZaehlen, type Ereignis } from "./statistik";
 import { fehlerText } from "./nachladen";
 import { dateiFehlerMeldung } from "./datei-fehler";
 import type { DateiFehler } from "./fehler-buendeln";
@@ -434,15 +435,23 @@ const FILM_WEB = "https://erfassungsbogen.app/video/erklaerfilm.mp4";
  * scheitert, obwohl der Browser „online" meldet (WLAN ohne Internet). Läuft
  * der Film schon, bleibt er stehen — was gepuffert ist, spielt weiter.
  */
-function Erklaerfilm() {
+export function Erklaerfilm() {
   const online = useOnline();
   const [ladefehler, setLadefehler] = useState(false);
   const [gestartet, setGestartet] = useState(false);
+  // Je Seitenaufruf jedes Ereignis höchstens einmal zählen — Pause und
+  // Weiterspielen oder Zurückspulen über die Hälfte zählen nicht doppelt.
+  const gezaehlt = useRef(new Set<Ereignis>());
+  const zaehlen = (e: Ereignis) => {
+    if (gezaehlt.current.has(e)) return;
+    gezaehlt.current.add(e);
+    ereignisZaehlen(e);
+  };
   if ((!online && !gestartet) || ladefehler) return null;
   if (!imWebBrowser()) {
     return (
       <p className="erklaerfilm">
-        <a href={FILM_WEB} target="_blank" rel="noopener noreferrer">
+        <a href={FILM_WEB} target="_blank" rel="noopener noreferrer" onClick={() => zaehlen("erklaerfilm-link-app")}>
           Erklärfilm ansehen
         </a>{" "}
         (5 Minuten, öffnet im Browser, rund {FILM_MB} MB)
@@ -458,7 +467,15 @@ function Erklaerfilm() {
         poster="video/erklaerfilm.jpg"
         width={1920}
         height={1080}
-        onPlay={() => setGestartet(true)}
+        onPlay={() => {
+          setGestartet(true);
+          zaehlen("erklaerfilm-start");
+        }}
+        onTimeUpdate={(e) => {
+          const v = e.currentTarget;
+          if (v.duration > 0 && v.currentTime >= v.duration / 2) zaehlen("erklaerfilm-haelfte");
+        }}
+        onEnded={() => zaehlen("erklaerfilm-ende")}
       >
         <source src="video/erklaerfilm.mp4" type="video/mp4" onError={() => setLadefehler(true)} />
         <track kind="subtitles" src="video/erklaerfilm.vtt" srcLang="de" label="Deutsch" />

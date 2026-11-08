@@ -5,7 +5,7 @@ import { describe, it, expect, beforeEach, vi } from "vitest";
 const nativ = vi.hoisted(() => ({ ist: false, name: "web" }));
 vi.mock("./nativ", () => ({ istNativ: () => nativ.ist, plattform: () => nativ.name }));
 
-import { statistikStarten, statistikAbgewaehlt, statistikAbwaehlen, nutzungsKanal } from "./statistik";
+import { statistikStarten, statistikAbgewaehlt, statistikAbwaehlen, nutzungsKanal, ereignisZaehlen } from "./statistik";
 
 class MemStorage {
   private m = new Map<string, string>();
@@ -122,6 +122,29 @@ describe("statistikStarten()", () => {
     expect(url.origin + url.pathname).toBe("https://erfassungsbogen.goatcounter.com/count");
     expect(url.searchParams.get("p")).toBe("/browser/desktop");
     expect(url.searchParams.get("t")).toBe("Browser (Desktop)");
+  });
+
+  it("zählt ein Ereignis als GoatCounter-Event, ohne Referrer und ohne URL-Teile", () => {
+    fakeUmfeld({ ua: "Mozilla/5.0 (Macintosh)", referrer: "https://suche.example/?q=thw" });
+    ereignisZaehlen("erklaerfilm-start");
+    expect(gesendet).toHaveLength(1);
+    const url = new URL(gesendet[0]!);
+    expect(url.searchParams.get("p")).toBe("erklaerfilm-start");
+    expect(url.searchParams.get("t")).toBe("Erklärfilm gestartet");
+    expect(url.searchParams.get("e")).toBe("true");
+    expect(url.searchParams.has("r")).toBe(false);
+    expect(gesendet[0]).not.toContain("geheim");
+    expect(gesendet[0]).not.toContain("nutzlast");
+  });
+
+  it("zählt keine Ereignisse nach Widerspruch und nicht in der lokalen Entwicklung", () => {
+    fakeUmfeld({ hostname: "localhost" });
+    ereignisZaehlen("erklaerfilm-ende");
+    expect(gesendet).toHaveLength(0);
+    fakeUmfeld({});
+    statistikAbwaehlen(true);
+    ereignisZaehlen("erklaerfilm-ende");
+    expect(gesendet).toHaveLength(0);
   });
 
   it("überträgt niemals Query oder Fragment der aktuellen URL", () => {
