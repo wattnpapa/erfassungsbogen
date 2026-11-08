@@ -194,12 +194,17 @@ describe("Assistenten-Durchlauf", () => {
       act(() => {
         el.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true, clientX: 300, clientY: 600, detail: 1 }));
       });
-    tipp(screen.getByRole("button", { name: "Neuen Bogen erstellen" }));
-    await screen.findByRole("heading", { level: 2, name: "1. Einheit" });
-    tipp(screen.getByRole("button", { name: "Weiter →" })); // der zweite Tipp des Doppeltipps
-    expect(screen.getByRole("heading", { level: 2, name: "1. Einheit" })).toBeDefined();
-    vi.useFakeTimers({ toFake: ["Date"], now: Date.now() + 1600 });
+    // Uhr ab dem ersten Tipp anhalten: Die Sperre rechnet mit Date.now(), und
+    // das Nachladen von Schritt 1 dauerte auf dem ausgelasteten CI-Rechner
+    // länger als die Sperre selbst — der zweite Tipp kam dann „zu spät" durch.
+    // Nur Date ist gefälscht; findByRole wartet weiter mit echten Timern.
+    vi.useFakeTimers({ toFake: ["Date"], now: Date.now() });
     try {
+      tipp(screen.getByRole("button", { name: "Neuen Bogen erstellen" }));
+      await screen.findByRole("heading", { level: 2, name: "1. Einheit" });
+      tipp(screen.getByRole("button", { name: "Weiter →" })); // der zweite Tipp des Doppeltipps
+      expect(screen.getByRole("heading", { level: 2, name: "1. Einheit" })).toBeDefined();
+      vi.setSystemTime(Date.now() + 1600);
       tipp(screen.getByRole("button", { name: "Weiter →" })); // bewusst, nach der Sperre
       expect(screen.getByRole("heading", { level: 2, name: "2. Einsatz" })).toBeDefined();
       vi.setSystemTime(Date.now() + 200);
