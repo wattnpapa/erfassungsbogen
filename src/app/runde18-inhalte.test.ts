@@ -249,10 +249,10 @@ describe("R18-W5 eine Schreibweise der Stärke", () => {
   it("setzt alle Zeilen und die Summe kompakt, sobald eine zu breit ist", () => {
     expect(staerkeSpalteKompakt([[1, 1, 2, 4], [0, 2, 9, 11]])).toBe(false);
     expect(staerkeSpalteKompakt([[1, 1, 2, 4], [10, 20, 100, 130]])).toBe(true);
-    expect(staerkeSummenText(1, 1, 2, 4, false)).toBe("1 / 1 / 2 / 4");
-    expect(staerkeSummenText(1, 1, 2, 4, true)).toBe("1/1/2/4");
+    expect(staerkeSummenText(1, 1, 2, 4, false)).toBe("1 / 1 / 2 // 4");
+    expect(staerkeSummenText(1, 1, 2, 4, true)).toBe("1/1/2//4");
     // Ohne Vorgabe wie bisher: nach der eigenen Breite.
-    expect(staerkeSummenText(10, 20, 100, 130)).toBe("10/20/100/130");
+    expect(staerkeSummenText(10, 20, 100, 130)).toBe("10/20/100//130");
   });
 });
 

@@ -64,7 +64,7 @@ describe("Zeichensammlung", () => {
     // Zuordnung bleiben. Die vier Fahrzeugtypen ohne eigenes Zeichen
     // (Auflieger, Anh Plane/Spriegel, Anh BDF, Anh ASH) sind gewollt.
     const ohneZeichen = THW_FAHRZEUGTYPEN.filter((t) => !THW_FAHRZEUG_ZEICHEN[t.code!]).map((t) => t.kurz);
-    expect(ohneZeichen).toEqual(["Auflieger", "Anh Plane/Spriegel", "Anh BDF", "Anh ASH"]);
+    expect(ohneZeichen).toEqual(["Auflieger", "Auflieger Plane/Spriegel", "Auflieger Plattform", "Anh Plane/Spriegel", "Anh BDF", "Anh ASH", "WB"]);
     expect(THW_EINHEITSTYPEN.filter((t) => !THW_EINHEIT_ZEICHEN[t.code!])).toEqual([]);
   });
 
@@ -195,5 +195,24 @@ describe("einheitSymbolSvg()", () => {
 describe("svgDataUrl()", () => {
   it("verpackt das SVG als data:-URL", () => {
     expect(svgDataUrl("<svg/>")).toBe("data:image/svg+xml;charset=utf-8,%3Csvg%2F%3E");
+  });
+});
+
+describe("Ladungsträger und Auflieger-Bauformen (Rückmeldung OV Chemnitz, 11/2026)", () => {
+  it("zeichnet Abrollbehälter, Wechselbrücke und Container als Ladungsträger, nicht als Kraftfahrzeug", () => {
+    expect(grundzeichenFuer("AB Mulde")).toBe("ladungstraeger");
+    expect(grundzeichenFuer("Wechselbrücke Plane")).toBe("ladungstraeger");
+    expect(grundzeichenFuer("Container 20ft")).toBe("ladungstraeger");
+    expect(grundzeichenFuer("LKW Lbw")).toBe("kraftfahrzeug");
+  });
+
+  it("beschriftet die Wechselbrücke und unterscheidet die Auflieger-Bauformen", () => {
+    const zeichen = (kurz: string) => {
+      const t = THW_FAHRZEUGTYPEN.find((x) => x.kurz === kurz)!;
+      return fahrzeugSymbolSvg({ typ: { code: t.code } }, OrganisationsTyp.THW);
+    };
+    expect(zeichen("WB")).toContain(">WB<");
+    expect(zeichen("Auflieger Plane/Spriegel")).toContain(">P/S<");
+    expect(zeichen("Auflieger Plattform")).toContain(">PF<");
   });
 });

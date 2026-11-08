@@ -15,7 +15,7 @@ describe("uebergabeText", () => {
     const neu = { ...b, personal: [neuePerson()] };
     const t = uebergabeText(neu, stand)!;
     expect(t.geaendert).toBe(true);
-    expect(t.text).toMatch(/Stärke 0 \/ 0 \/ 2 \/ 2 → 0 \/ 0 \/ 1 \/ 1/);
+    expect(t.text).toMatch(/Stärke 0 \/ 0 \/ 2 \/\/ 2 → 0 \/ 0 \/ 1 \/\/ 1/);
     expect(t.text).toMatch(/neu übergeben/);
   });
 
