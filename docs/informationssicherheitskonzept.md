@@ -1234,6 +1234,14 @@ ORP.1 Organisation, INF.1 Gebäude) sind nicht Gegenstand dieses Dokuments.
 > Fremd-Action außerhalb von `actions/*` mit Schreibrecht
 > (`softprops/action-gh-release`) ist auf einen Commit-Hash gepinnt; Dependabot
 > hebt Hash und Versionskommentar gemeinsam.
+>
+> Nachtrag: Capacitor auf 8.6.0, iOS-Paketauflösung auf capacitor-swift-pm
+> 8.6.0 (Dependabot-Alert für die Swift-Pakete, kritisch: über das interne
+> HTTP-Proxy-Präfix ließ sich fremder Inhalt mit dem Ursprung der App laden und
+> hätte dann Zugriff auf `localStorage` und die Plugins gehabt). Die
+> Swift-Paketauflösung wird von Dependabot mitgeprüft, ist aber nicht im
+> npm-Lockfile enthalten und muss beim Heben von `@capacitor/ios` mit
+> `npx cap update ios` nachgezogen werden.
 
 ## 7. Ergänzende Risikoanalyse (BSI-Standard 200-3, Auswahl)
 

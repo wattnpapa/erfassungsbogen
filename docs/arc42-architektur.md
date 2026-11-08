@@ -728,6 +728,13 @@ wieder.
 > workbox-build in vite-plugin-pwa: Eine korrigierte Version gibt es nicht, und
 > das Paket läuft ausschließlich beim Bauen, nicht auf Einsatzgeräten.
 > `softprops/action-gh-release` ist in `release.yml` auf einen Commit-Hash gepinnt.
+>
+> Nachtrag (Stand 2026-11-08): Capacitor (core, ios, android, cli) auf ^8.6.0
+> gehoben, die iOS-Paketauflösung (`ios/App/CapApp-SPM/Package.swift`,
+> `Package.resolved`) entsprechend auf capacitor-swift-pm 8.6.0. Behoben ist
+> damit die Lücke in Capacitor Android und iOS, über die fremder Inhalt mit dem
+> Ursprung der App geladen werden konnte (internes HTTP-Proxy-Präfix
+> `/_capacitor_http_interceptor_`, betroffen 8.3.5 bis vor 8.4.3, kritisch).
 
 ### 2.2 Organisatorische Randbedingungen
 
