@@ -426,3 +426,34 @@ describe("Alle Daten löschen — Wortlaut (R5-D5)", () => {
     expect(text).not.toMatch(/Lageblatt oder keine/);
   });
 });
+
+/** Wunsch aus der Erprobung (OV Chemnitz, 11/2026): ein aufrufbarer Änderungsverlauf. */
+describe("Was ist neu", () => {
+  it("öffnet den Änderungsverlauf über die Projekt-Gruppe und nennt die neuesten Einträge zuerst", async () => {
+    const nutzer = userEvent.setup();
+    render(<Fusszeile />);
+    await nutzer.click(screen.getByRole("button", { name: "Was ist neu" }));
+    const dialog = await screen.findByRole("dialog", { name: "Was ist neu" });
+    const tage = [...dialog.querySelectorAll("h3")].map((h) => h.textContent);
+    expect(tage.length).toBeGreaterThan(5);
+    expect(tage[0]).toBe("08.11.2026");
+    expect(dialog.textContent).toContain("0 / 2 / 9 // 11");
+  });
+
+  it("ist auch in der schmalen Zeile des Assistenten über die Versionsnummer erreichbar", async () => {
+    const nutzer = userEvent.setup();
+    render(<Fusszeile kompakt />);
+    await nutzer.click(screen.getByRole("button", { name: /Was ist neu/ }));
+    expect((await screen.findByRole("dialog", { name: "Was ist neu" })).querySelectorAll("li").length).toBeGreaterThan(10);
+  });
+});
+
+describe("AENDERUNGEN", () => {
+  it("steht nach Datum absteigend, ohne doppelte Tage", async () => {
+    const { AENDERUNGEN } = await import("./aenderungen");
+    const tage = AENDERUNGEN.map((a) => a.datum);
+    expect(tage).toEqual([...tage].sort().reverse());
+    expect(new Set(tage).size).toBe(tage.length);
+    for (const t of tage) expect(t).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+  });
+});

@@ -41,6 +41,7 @@ import { WERKZEUGE, WERKZEUGE_TITEL } from "./werkzeuge";
 import { folgenText } from "./uhr-folgen";
 import { arbeiten, useArbeitet } from "./arbeitet";
 import { FehlerImBild } from "./fehler-im-bild";
+import type { Aenderung } from "./aenderungen";
 
 const KONTAKT = "johannes.rudolph@thw-oldenburg.de";
 const REPO = "https://github.com/wattnpapa/erfassungsbogen";
@@ -433,6 +434,7 @@ export function Fusszeile({ onBogenOeffnen, kompakt = false }: {
   // Eine PDF-Erzeugung läuft höchstens einmal, gleich von welcher Stelle (arbeitet.ts).
   const arbeitet = useArbeitet();
   const ueber = useRef<HTMLDialogElement>(null);
+  const aenderungen = useAenderungen();
   const impressum = useRef<HTMLDialogElement>(null);
   const datenschutz = useRef<HTMLDialogElement>(null);
   const beispiele = useRef<HTMLDialogElement>(null);
@@ -804,8 +806,11 @@ export function Fusszeile({ onBogenOeffnen, kompakt = false }: {
           <a href={ANLEITUNG} target="_blank" rel="noopener noreferrer">Anleitung</a>
           {/* Auch beim Ausfüllen eines Bogens erreichbar (R3-A7). */}
           <button type="button" className="link" onClick={() => void blankoHerunterladen()}>Blanko-Vordruck</button>
-          <span className="fuss-version">v{__APP_VERSION__}</span>
+          <button type="button" className="link fuss-version" title="Was ist neu" onClick={() => void aenderungen.oeffnen()}>
+            v{__APP_VERSION__} · Was ist neu
+          </button>
         </nav>
+        {aenderungen.dialog}
         <Impressumsdialog dialogRef={impressum} />
         <Datenschutzdialog dialogRef={datenschutz} />
         <Werkzeugzeile />
@@ -870,6 +875,7 @@ export function Fusszeile({ onBogenOeffnen, kompakt = false }: {
           </button>
           {/* Das PDF bleibt hell, auch nachts (R5-L5). */}
           <span className="hinweis papier-hinweis">Das PDF ist für Papier gedacht, hell.</span>
+          <button type="button" className="link" onClick={() => void aenderungen.oeffnen()}>Was ist neu</button>
           <a href={`mailto:${KONTAKT}`}>Kontakt</a>
           <a href={REPO} target="_blank" rel="noopener noreferrer">Open Source auf GitHub</a>
         </nav>
@@ -896,7 +902,9 @@ export function Fusszeile({ onBogenOeffnen, kompakt = false }: {
         </div>
       </div>
       <p className="fuss-marke">
-        Einheiten-Erfassungsbogen v{__APP_VERSION__} · von{" "}
+        Einheiten-Erfassungsbogen{" "}
+        <button type="button" className="link" title="Was ist neu" onClick={() => void aenderungen.oeffnen()}>v{__APP_VERSION__}</button>
+        {" "}· von{" "}
         <button type="button" className="link" onClick={() => ueber.current?.showModal()}>Johannes Rudolph</button>
       </p>
 
@@ -1314,6 +1322,8 @@ export function Fusszeile({ onBogenOeffnen, kompakt = false }: {
         </p>
       </Dialog>
 
+      {aenderungen.dialog}
+
       <Impressumsdialog dialogRef={impressum} />
 
       <Datenschutzdialog dialogRef={datenschutz} />
@@ -1321,6 +1331,54 @@ export function Fusszeile({ onBogenOeffnen, kompakt = false }: {
       <Werkzeugzeile />
     </footer>
   );
+}
+
+/**
+ * „Was ist neu" — der Änderungsverlauf (aenderungen.ts). Die Liste kommt erst
+ * beim Öffnen nach (eigener Baustein im Offline-Vorrat), das Startpaket trägt
+ * nur den Knopf. Erreichbar über die Versionsnummer, in der schmalen Zeile des
+ * Assistenten wie in der vollen Fußzeile.
+ */
+function useAenderungen() {
+  const ref = useRef<HTMLDialogElement>(null);
+  const [liste, setListe] = useState<readonly Aenderung[] | null>(null);
+  const [fehler, setFehler] = useState("");
+  const oeffnen = async () => {
+    setFehler("");
+    try {
+      const m = await import("./aenderungen");
+      setListe(m.AENDERUNGEN);
+    } catch (err) {
+      setFehler(`Der Änderungsverlauf ließ sich nicht laden: ${fehlerText(err)}`);
+    }
+    ref.current?.showModal();
+  };
+  const dialog = (
+    <Dialog titel="Was ist neu" dialogRef={ref} klasse="rollhinweis aenderungen">
+      <p className="hinweis">Installierte Fassung: v{__APP_VERSION__}. Neueste Änderungen oben.</p>
+      {fehler && <p className="fehler" role="alert">{fehler}</p>}
+      {liste?.map((a) => (
+        <section key={a.datum} className="aenderung">
+          <h3>{aenderungsDatumText(a.datum)}</h3>
+          <ul>
+            {a.punkte.map((p) => (
+              <li key={p}>{p}</li>
+            ))}
+          </ul>
+        </section>
+      ))}
+      <p className="hinweis">
+        Alle Änderungen im Einzelnen: <a href={`${REPO}/commits/main`} target="_blank" rel="noopener noreferrer">Verlauf auf GitHub</a>.
+      </p>
+    </Dialog>
+  );
+  return { oeffnen, dialog };
+}
+
+/** „08.11.2026" aus „2026-11-08" — hier statt aus aenderungen.ts, damit das Startpaket die Liste nicht mitlädt. */
+function aenderungsDatumText(iso: string): string {
+  const [j, m, t] = iso.split("-");
+  return `${t}.${m}.${j}`;
 }
 
 /**

@@ -254,7 +254,7 @@ Zwei Nebensätze dazu, weil sie beim Nachbauen fehlen:
 
 **Die Navigationsraum-Regel.** Die 6rem Fußraum unter `main` halten die fixe Schritt-Navigation frei und gelten nur, wo sie erscheint; Startseite und Übersicht ziehen sie auf `--r-6` zurück (`main.start`, `main.ohne-nav`). Bewusst als Abzug statt als Zuschlag: eine vergessene Ansicht behält den großen Wert und verdeckt nichts.
 
-**Die Rollbereich-Regel.** Eine Tabelle, die seitlich rollt, ist ohne Tastaturzugang für alle abgeschnitten, die nicht wischen können — die Spalte „Erreichbarkeit" existiert dann schlicht nicht mehr. Rollbereiche laufen deshalb über `<TabellenScroll>` (`tabellen-scroll.tsx`), das `tabindex`, `role="region"` und eine Beschriftung vergibt — aber nur, solange wirklich etwas verdeckt ist. Fest gesetzt stünde am Breitbild vor jeder Tabelle ein Tabstopp ohne Zweck.
+**Die Rollbereich-Regel.** Eine Tabelle, die seitlich rollt, ist ohne Tastaturzugang für alle abgeschnitten, die nicht wischen können — die rechte Spalte existiert dann schlicht nicht mehr. Rollbereiche laufen deshalb über `<TabellenScroll>` (`tabellen-scroll.tsx`), das `tabindex`, `role="region"` und eine Beschriftung vergibt — aber nur, solange wirklich etwas verdeckt ist. Fest gesetzt stünde am Breitbild vor jeder Tabelle ein Tabstopp ohne Zweck.
 
 **Die Leere-Tabelle-Regel.** Eine Tabelle ohne Zeilen wird nicht als Kopfzeile über nichts gezeigt. Eine leere Versalzeile liest sich wie abgeschnittener Inhalt; stattdessen steht dort ein Satz, der sagt, was fehlt („Kein Personal erfasst.") — derselbe in der Gesamtübersicht wie in der Einsatz-Sammlung.
 
@@ -387,4 +387,4 @@ Auch die entfernte Meldung geht sichtbar ab (`.einheit-zeile.geht`) — dort wie
 - **Don't** dieselbe Zahl in zwei Größen setzen: die Stärke trägt überall die dicktengleiche Zählwert-Figur (Übersicht wie Einsatz-Sammlung).
 - **Don't** einen Schriftgrad direkt in ein Bauteil schreiben (0.9rem, 0.92rem, 0.6rem …) — nur `var(--t-*)`. Zwischenwerte entziehen sich der Feld-Modus-Korrektur und ergeben über eine Ansicht hinweg eine Leiter ohne Stufen (Ein-Leiter-Regel).
 - **Don't** Text über `opacity` zurücknehmen — dafür gibt es `--text-2`. Opacity trifft auch den Feld-Modus, in dem ausdrücklich nichts zurücktritt. (Ausgenommen: deaktivierte Knöpfe und durchgestrichene Einträge, die als Ganzes zurückgestellt sind.)
-- **Don't** eine Stärkeangabe umbrechen lassen — `0 / 2 / 6 / 8` ist eine Angabe, kein Satz. Wird es eng, gibt die Zeile nach oder der Grad rückt eine Stufe zurück, nie die Zahl selbst.
+- **Don't** eine Stärkeangabe umbrechen lassen — `0 / 2 / 6 // 8` ist eine Angabe, kein Satz (Gesamtstärke mit `//` abgesetzt, wie in PRODUCT.md). Wird es eng, gibt die Zeile nach oder der Grad rückt eine Stufe zurück, nie die Zahl selbst.

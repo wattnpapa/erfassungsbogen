@@ -12,6 +12,26 @@
 > umsetzen: SBOM, CSP ohne unsafe-inline, Entpack-Grenze") betrifft die Kapitel
 > 2.1, 8.3, 8.6, 8.7 und 11.2 — dort jeweils vermerkt.
 >
+> **Nachgezogen 2026-11-08 (Rückmeldungen FAG THW und OV Chemnitz):** Kap. 5, 8.2, 12;
+> Transportformat und Schema unverändert, kein neuer Host, kein neuer Speicherschlüssel.
+> Stärke überall als `F / U / M // G` (wie PRODUCT.md es vorgibt; `staerkeSummenText`,
+> PDF, Dialoge, Submodul `bos-meldekopf`/`aufteilen.ts`). PDF: Sitzplätze ohne eigene
+> Angabe stehen als Richtwert des Typs mit „(Richtwert)" (`sitzplatzZeile` in
+> `pdf-dokument.ts`); der Sofortbedarf eines ausgefüllten Bogens nennt nur angeforderte
+> Posten (`sofortbedarfZellen`, `betriebsstoffText` in `auswertung.ts`), der Vordruck
+> bleibt vollständig. Personaltabelle des ausgefüllten Bogens dreispaltig, die
+> Erreichbarkeit (samt „OV: …") steht klein hinter dem Namen; Übersicht ebenso auf
+> jeder Breite. `QrSatz.teileOhneGegenzeichnung` (`hilfen.ts`) nennt beim
+> Weiterreichen die Teilzahl des Absenders, wenn die Gegenzeichnung einen Code mehr
+> kostet. Schritt 1: Bei „Nur Stärke" folgen ungezählte Sollzahlen dem neuen
+> Einheitstyp. Vokabular (`bos-vokabulare`): THW-Fahrzeugtypen 28 LKW K Lkr (FGr Log-MW,
+> Kennzahl 63 statt LKW Lkr/44), 29/30 Auflieger Plane/Spriegel bzw. Plattform, 56 Anh
+> Kühl (FGr Log-V), 60–63 Ladungsträger Abrollbehälter, Wechselbrücke, Container 10/20 ft;
+> Zeichen in `bos-taktische-zeichen` (neues Grundzeichen `ladungstraeger`), VBA-Vokabular
+> in `eeb-format/ports/vba` neu erzeugt. Neuer Baustein `src/app/aenderungen.ts`
+> (Änderungsverlauf „Was ist neu", per `import()` erst beim Öffnen geladen, eigener
+> Chunk im Precache) mit Dialog in der Fußzeile. Startbündel 0,74 MB (Budget neu gesetzt).
+>
 > **Nachgezogen 2026-11-03 — Excel-Liste „Oldenburg" entfernt:** Kap. 1.2, 1.3, 2.1,
 > 3.1, 5, 10, 12 und ADR-001. Der XLSX-Export der Einheitenliste im festen Spaltenformat
 > einer Führungsstelle (`src/app/oldenburg-xlsx.ts`, `src/app/xlsx.ts`, Knöpfe „Als Excel
@@ -52,7 +72,7 @@
 > je Person mit der Dienststelle aus Schritt 1 vor und schlägt beim THW die
 > Ortsverbände des Verzeichnisses vor (`OvVorschlagFeld`/`useOvDaten` aus Schritt 1,
 > in Karte und Kurz-Liste); das PDF nennt eine Abweichung als erste Zeile der
-> Kontaktspalte („OV: Bremen - Nord"). Die THW-Beispielbögen (`npm run beispiele`)
+> Kontaktspalte („OV: Bremen - Nord"; seit 2026-11-08 klein hinter dem Namen). Die THW-Beispielbögen (`npm run beispiele`)
 > tragen seit 2026-10-27 in rund jeder dritten Einheit ein bis drei Helfer aus
 > Nachbar-Ortsverbänden (eigener Zufallsstrom, übrige Bögen unverändert). Kein
 > neuer Host, kein neuer Speicherort.

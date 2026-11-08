@@ -19,7 +19,7 @@ Funktionalität: Einsatzweg einer Fachgruppe — Vorbereitung, Fahrt, Meldekopf
   Szenario: Die StAN-Vorbelegung stellt Sollstärke und Fahrzeuge bereit
     Wenn ich zum Schritt "6. Übersicht" wechsle
     Dann sehe ich die Überschrift "Personal (12)"
-    Und sehe ich den Text "0 / 3 / 9 / 12"
+    Und sehe ich den Text "0 / 3 / 9 // 12"
     Und sehe ich die Überschrift "Fahrzeuge (4)"
 
   # Nur die beiden Funkstellen (LKW Lbw → 43, MLW IV → 34) bekommen einen
@@ -77,7 +77,7 @@ Funktionalität: Einsatzweg einer Fachgruppe — Vorbereitung, Fahrt, Meldekopf
     Und ich das Feld "Diesel (l)" mit "400" fülle
     Und ich zum Schritt "6. Übersicht" wechsle
     Dann sehe ich den Text "Hochwasser Hunte — Pumpeneinsatz Achterdiek"
-    Und sehe ich den Text "400 l Diesel / 0 l Benzin / 0 l Gemisch"
+    Und sehe ich den Text "400 l Diesel"
     Und sehe ich die Überschrift "Personal (12)"
     Und sehe ich die Überschrift "Fahrzeuge (4)"
 
@@ -101,7 +101,7 @@ Funktionalität: Einsatzweg einer Fachgruppe — Vorbereitung, Fahrt, Meldekopf
     # Der Bogen trägt nur die vorbelegten Plätze (Sollstärke, keine Namen): Er zählt in die Lage, gilt aber seit R17-S1
     # nicht als „gemeldet" — der Listenkopf sagt es.
     Dann sehe ich die Überschrift "Einheiten (0 gemeldet · 1 nur Sollstärke · 1 anwesend)"
-    Und sehe ich den Hinweis "Stärke 0 / 3 / 9 / 12"
+    Und sehe ich den Hinweis "Stärke 0 / 3 / 9 // 12"
     Und sehe ich zu "Kraftstoff" den Wert "Diesel 400 l"
     Und sehe ich zu "Fahrzeuge" den Wert "4"
 
