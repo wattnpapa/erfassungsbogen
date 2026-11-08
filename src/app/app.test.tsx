@@ -1388,7 +1388,11 @@ describe("Assistenten-Durchlauf", () => {
       const nutzer = userEvent.setup();
       const dialog = await uebergabeDialog(nutzer);
 
-      await nutzer.click(within(dialog).getByRole("button", { name: NAHBEREICH }));
+      // Der Knopf ist gesperrt, bis der QR-Code (und damit der Link) berechnet
+      // ist. Auf einem langsamen Runner käme der Klick sonst zu früh und verpuffte.
+      const knopf = within(dialog).getByRole<HTMLButtonElement>("button", { name: NAHBEREICH });
+      await waitFor(() => expect(knopf.disabled).toBe(false));
+      await nutzer.click(knopf);
 
       expect(geteilt).toHaveBeenCalledTimes(1);
       // Der Link trägt den kompletten Payload — nicht nur einen QR-Teil.
