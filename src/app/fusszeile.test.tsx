@@ -431,7 +431,7 @@ describe("Alle Daten löschen — Wortlaut (R5-D5)", () => {
 describe("Was ist neu", () => {
   it("öffnet den Änderungsverlauf über die Projekt-Gruppe und nennt die neuesten Einträge zuerst", async () => {
     const nutzer = userEvent.setup();
-    render(<Fusszeile />);
+    render(<Fusszeile onBogenOeffnen={async () => true} />);
     await nutzer.click(screen.getByRole("button", { name: "Was ist neu" }));
     const dialog = await screen.findByRole("dialog", { name: "Was ist neu" });
     const tage = [...dialog.querySelectorAll("h3")].map((h) => h.textContent);
@@ -442,7 +442,7 @@ describe("Was ist neu", () => {
 
   it("ist auch in der schmalen Zeile des Assistenten über die Versionsnummer erreichbar", async () => {
     const nutzer = userEvent.setup();
-    render(<Fusszeile kompakt />);
+    render(<Fusszeile kompakt onBogenOeffnen={async () => true} />);
     await nutzer.click(screen.getByRole("button", { name: /Was ist neu/ }));
     expect((await screen.findByRole("dialog", { name: "Was ist neu" })).querySelectorAll("li").length).toBeGreaterThan(10);
   });
