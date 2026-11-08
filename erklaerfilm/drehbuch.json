@@ -1,0 +1,855 @@
+{
+  "titel": "Ankommen am Meldekopf — Papier oder digital?",
+  "fps": 25,
+  "breite": 1920,
+  "hoehe": 1080,
+  "pause": 0.35,
+  "sprecher": {
+    "erzaehler": {
+      "name": "Erzähler",
+      "rolle": "Off-Stimme, ruhig, trocken, ein Hauch Humor"
+    },
+    "karsten": {
+      "name": "Karsten",
+      "rolle": "Gruppenführer Bergungsgruppe OV Ulm, Mitte 40, gutmütig, gestresst"
+    },
+    "jana": {
+      "name": "Jana",
+      "rolle": "Helferin am Meldekopf, Ende 20, pragmatisch, schnell"
+    },
+    "steffi": {
+      "name": "Steffi",
+      "rolle": "Gruppenführerin Fachgruppe Wasserschaden, wartet in der Schlange, ungeduldig"
+    },
+    "einsatzleitung": {
+      "name": "Einsatzleitung",
+      "rolle": "Stimme über Funk, sachlich, knapp",
+      "funk": true
+    }
+  },
+  "szenen": [
+    {
+      "id": "a1",
+      "teil": "Comic: Meldekopf mit Papier",
+      "bild": {
+        "art": "titel"
+      },
+      "zeilen": [
+        {
+          "id": "a1-1",
+          "sprecher": "erzaehler",
+          "text": "Sturmtief über der Schwäbischen Alb. Seit dem Nachmittag rollen THW-Einheiten aus ganz Baden-Württemberg nach Albstadt.",
+          "sprechtext": "Sturmtief über der Schwäbischen Alb. Seit dem Nachmittag rollen T-H-W-Einheiten aus ganz Baden-Württemberg nach Albstadt."
+        }
+      ],
+      "geraeusche": [
+        "regen",
+        "wind"
+      ]
+    },
+    {
+      "id": "a2",
+      "teil": "Comic: Meldekopf mit Papier",
+      "bild": {
+        "art": "comic",
+        "panel": "kolonne",
+        "ort": "Meldekopf Albstadt · 21:40 Uhr"
+      },
+      "zeilen": [
+        {
+          "id": "a2-1",
+          "sprecher": "erzaehler",
+          "text": "Bevor sie in den Einsatz gehen, müssen alle durch dieselbe Engstelle: den Meldekopf."
+        },
+        {
+          "id": "a2-2",
+          "sprecher": "karsten",
+          "funk": true,
+          "text": "Meldekopf von Heros Ulm 22/51, wir sind in zwei Minuten bei euch, kommen.",
+          "sprechtext": "Meldekopf von Heros Ulm zwo-zwo, fünf-eins, wir sind in zwei Minuten bei euch, kommen.",
+          "blase": {
+            "x": 1120,
+            "y": 110,
+            "b": 640,
+            "spitze": [
+              1420,
+              640
+            ]
+          }
+        },
+        {
+          "id": "a2-3",
+          "sprecher": "jana",
+          "text": "Heros Ulm 22/51 von Meldekopf, verstanden. Erfassungsbogen bereithalten, Ende.",
+          "sprechtext": "Heros Ulm zwo-zwo, fünf-eins von Meldekopf, verstanden. Erfassungsbogen bereithalten, Ende.",
+          "blase": {
+            "x": 560,
+            "y": 250,
+            "b": 600,
+            "spitze": [
+              420,
+              420
+            ]
+          }
+        }
+      ],
+      "geraeusche": [
+        "regen",
+        "motor"
+      ]
+    },
+    {
+      "id": "a3",
+      "teil": "Comic: Meldekopf mit Papier",
+      "bild": {
+        "art": "comic",
+        "panel": "fahrerhaus"
+      },
+      "zeilen": [
+        {
+          "id": "a3-1",
+          "sprecher": "erzaehler",
+          "text": "Einen fertigen Bogen hat Karsten nicht. Also: Klemmbrett, Kuli, Knie."
+        },
+        {
+          "id": "a3-2",
+          "sprecher": "karsten",
+          "text": "Moritz, wer sitzt alles hinten? Und wie schreibt sich Özdemir? Mit Punkten?",
+          "blase": {
+            "x": 980,
+            "y": 110,
+            "b": 760,
+            "spitze": [
+              900,
+              430
+            ]
+          }
+        }
+      ],
+      "geraeusche": [
+        "regen-dach",
+        "kritzeln"
+      ]
+    },
+    {
+      "id": "a4",
+      "teil": "Comic: Meldekopf mit Papier",
+      "bild": {
+        "art": "comic",
+        "panel": "regen"
+      },
+      "zeilen": [
+        {
+          "id": "a4-1",
+          "sprecher": "karsten",
+          "text": "Na super. Jetzt schreibt der Kuli nicht mehr.",
+          "blase": {
+            "x": 1100,
+            "y": 120,
+            "b": 640,
+            "spitze": [
+              1150,
+              470
+            ]
+          }
+        },
+        {
+          "id": "a4-2",
+          "sprecher": "erzaehler",
+          "text": "Nasses Papier und Kugelschreiber: Das Ergebnis kennt jeder, der schon mal einen Bogen im Regen ausgefüllt hat."
+        }
+      ],
+      "geraeusche": [
+        "regen"
+      ]
+    },
+    {
+      "id": "a5",
+      "teil": "Comic: Meldekopf mit Papier",
+      "bild": {
+        "art": "comic",
+        "panel": "tisch"
+      },
+      "zeilen": [
+        {
+          "id": "a5-1",
+          "sprecher": "jana",
+          "text": "Ist das eine Eins oder eine Sieben? Und hier: Hartmann oder Hartmut?",
+          "blase": {
+            "x": 110,
+            "y": 90,
+            "b": 700,
+            "spitze": [
+              520,
+              430
+            ]
+          }
+        },
+        {
+          "id": "a5-2",
+          "sprecher": "karsten",
+          "text": "Hartmann. Kai. Der fährt, Klasse CE.",
+          "sprechtext": "Hartmann. Kai. Der fährt, Klasse C-E.",
+          "blase": {
+            "x": 1180,
+            "y": 110,
+            "b": 600,
+            "spitze": [
+              1420,
+              420
+            ]
+          }
+        }
+      ],
+      "geraeusche": [
+        "regen-zelt"
+      ]
+    },
+    {
+      "id": "a6",
+      "teil": "Comic: Meldekopf mit Papier",
+      "bild": {
+        "art": "comic",
+        "panel": "rechnen"
+      },
+      "zeilen": [
+        {
+          "id": "a6-1",
+          "sprecher": "jana",
+          "text": "Null, zwei, sieben, macht neun. Plus Albstadt, plus Freiburg, plus Sinsheim … Moment, da hab ich mich verrechnet.",
+          "blase": {
+            "x": 60,
+            "y": 60,
+            "b": 860,
+            "spitze": [
+              600,
+              420
+            ]
+          }
+        },
+        {
+          "id": "a6-2",
+          "sprecher": "erzaehler",
+          "text": "Jeder Bogen wird abgetippt, jede Stärke von Hand zusammengezählt. Und bei jeder Änderung fängt das Rechnen von vorne an."
+        }
+      ],
+      "geraeusche": [
+        "taschenrechner"
+      ]
+    },
+    {
+      "id": "a7",
+      "teil": "Comic: Meldekopf mit Papier",
+      "bild": {
+        "art": "comic",
+        "panel": "schlange"
+      },
+      "zeilen": [
+        {
+          "id": "a7-1",
+          "sprecher": "steffi",
+          "text": "Geht's da vorne mal weiter? Wir stehen seit zwanzig Minuten mit laufendem Motor!",
+          "blase": {
+            "x": 1080,
+            "y": 90,
+            "b": 720,
+            "spitze": [
+              1500,
+              400
+            ]
+          }
+        },
+        {
+          "id": "a7-2",
+          "sprecher": "erzaehler",
+          "text": "Hinten wird die Schlange länger."
+        }
+      ],
+      "geraeusche": [
+        "regen",
+        "motor",
+        "hupe"
+      ]
+    },
+    {
+      "id": "a8",
+      "teil": "Comic: Meldekopf mit Papier",
+      "bild": {
+        "art": "comic",
+        "panel": "funk"
+      },
+      "zeilen": [
+        {
+          "id": "a8-1",
+          "sprecher": "einsatzleitung",
+          "funk": true,
+          "text": "Meldekopf von Einsatzleitung: Wie viele Kräfte habt ihr gerade bei euch? Kommen.",
+          "blase": {
+            "x": 1060,
+            "y": 90,
+            "b": 760,
+            "spitze": [
+              1240,
+              380
+            ]
+          }
+        },
+        {
+          "id": "a8-2",
+          "sprecher": "jana",
+          "text": "… Ich melde mich gleich wieder. Ende.",
+          "blase": {
+            "x": 140,
+            "y": 110,
+            "b": 560,
+            "spitze": [
+              560,
+              470
+            ]
+          }
+        }
+      ],
+      "geraeusche": [
+        "funk-rauschen"
+      ]
+    },
+    {
+      "id": "b0",
+      "teil": "Übergang",
+      "bild": {
+        "art": "rueckspulen"
+      },
+      "zeilen": [
+        {
+          "id": "b0-1",
+          "sprecher": "erzaehler",
+          "text": "Halt. Noch mal von vorne. Diesmal mit dem digitalen Erfassungsbogen."
+        }
+      ],
+      "geraeusche": [
+        "rueckspulen"
+      ]
+    },
+    {
+      "id": "b1",
+      "teil": "Comic: Meldekopf digital",
+      "bild": {
+        "art": "comic",
+        "panel": "dienstabend",
+        "ort": "OV Ulm · Dienstabend, zwei Wochen vorher"
+      },
+      "zeilen": [
+        {
+          "id": "b1-1",
+          "sprecher": "erzaehler",
+          "text": "Karsten hat den Bogen beim Dienstabend im Ortsverband ausgefüllt und als Vorlage gespeichert. Im Einsatz passt er nur noch an, wer wirklich mitfährt."
+        }
+      ]
+    },
+    {
+      "id": "b2",
+      "teil": "Comic: Meldekopf digital",
+      "bild": {
+        "art": "comic",
+        "panel": "scan",
+        "ort": "Meldekopf Albstadt · 21:40 Uhr"
+      },
+      "zeilen": [
+        {
+          "id": "b2-1",
+          "sprecher": "jana",
+          "text": "Bergungsgruppe Ulm, Stärke 0/2/7/9. Habt ihr Sofortbedarf?",
+          "sprechtext": "Bergungsgruppe Ulm, Stärke null, zwei, sieben, neun. Habt ihr Sofortbedarf?",
+          "blase": {
+            "x": 110,
+            "y": 90,
+            "b": 640,
+            "spitze": [
+              470,
+              420
+            ]
+          }
+        },
+        {
+          "id": "b2-2",
+          "sprecher": "karsten",
+          "text": "Sechzig Liter Diesel. Steht auch drin.",
+          "blase": {
+            "x": 1200,
+            "y": 110,
+            "b": 580,
+            "spitze": [
+              1420,
+              420
+            ]
+          }
+        },
+        {
+          "id": "b2-3",
+          "sprecher": "jana",
+          "text": "Seh ich. Fahrt weiter in den Bereitstellungsraum.",
+          "blase": {
+            "x": 110,
+            "y": 90,
+            "b": 640,
+            "spitze": [
+              470,
+              420
+            ]
+          }
+        },
+        {
+          "id": "b2-4",
+          "sprecher": "erzaehler",
+          "text": "Nichts wird abgetippt, und Internet braucht es auch nicht: Der ganze Bogen steckt im QR-Code."
+        }
+      ],
+      "geraeusche": [
+        "regen-zelt",
+        "piep"
+      ]
+    },
+    {
+      "id": "b3",
+      "teil": "Comic: Meldekopf digital",
+      "bild": {
+        "art": "comic",
+        "panel": "funk-digital"
+      },
+      "zeilen": [
+        {
+          "id": "b3-1",
+          "sprecher": "einsatzleitung",
+          "funk": true,
+          "text": "Meldekopf von Einsatzleitung: Wie viele Kräfte habt ihr gerade bei euch? Kommen.",
+          "blase": {
+            "x": 1060,
+            "y": 90,
+            "b": 760,
+            "spitze": [
+              1240,
+              380
+            ]
+          }
+        },
+        {
+          "id": "b3-2",
+          "sprecher": "jana",
+          "text": "Fünf Einheiten, Stärke 2/10/26/38. Kommen.",
+          "sprechtext": "Fünf Einheiten, Stärke zwei, zehn, sechsundzwanzig, achtunddreißig. Kommen.",
+          "blase": {
+            "x": 140,
+            "y": 110,
+            "b": 560,
+            "spitze": [
+              560,
+              470
+            ]
+          }
+        },
+        {
+          "id": "b3-3",
+          "sprecher": "erzaehler",
+          "text": "Und wie kommt der Bogen aufs Handy? Das zeigen wir jetzt, Seite für Seite."
+        }
+      ],
+      "geraeusche": [
+        "funk-rauschen"
+      ]
+    },
+    {
+      "id": "c0",
+      "teil": "App: Start",
+      "bild": {
+        "art": "app",
+        "schild": "erfassungsbogen.app"
+      },
+      "zeilen": [
+        {
+          "id": "c0-1",
+          "sprecher": "erzaehler",
+          "text": "Öffne erfassungsbogen.app im Browser. Es gibt keine Anmeldung und nichts zu installieren. Nach dem ersten Aufruf läuft die App auch ohne Netz.",
+          "sprechtext": "Öffne erfassungsbogen punkt app im Browser. Es gibt keine Anmeldung und nichts zu installieren. Nach dem ersten Aufruf läuft die App auch ohne Netz.",
+          "bilder": [
+            "Startseite"
+          ]
+        },
+        {
+          "id": "c0-2",
+          "sprecher": "erzaehler",
+          "text": "Tippe auf „Neuen Bogen erstellen“.",
+          "bilder": [
+            "Neuen Bogen erstellen"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "c1",
+      "teil": "App: Seite 1 · Einheit",
+      "bild": {
+        "art": "app",
+        "schild": "Seite 1 von 6 · Einheit"
+      },
+      "zeilen": [
+        {
+          "id": "c1-1",
+          "sprecher": "erzaehler",
+          "text": "Seite eins: die Einheit. THW ist schon ausgewählt. Beim Ort tippst du „Ulm“ und wählst den Ortsverband aus der Liste.",
+          "sprechtext": "Seite eins: die Einheit. T-H-W ist schon ausgewählt. Beim Ort tippst du Ulm und wählst den Ortsverband aus der Liste.",
+          "bilder": [
+            "Ort tippen: Ulm",
+            "OV Ulm aus dem Verzeichnis"
+          ]
+        },
+        {
+          "id": "c1-2",
+          "sprecher": "erzaehler",
+          "text": "Kürzel, Telefon und E-Mail kommen aus dem OV-Verzeichnis, Regionalbereich und Landesverband gleich mit.",
+          "sprechtext": "Kürzel, Telefon und E-Mail kommen aus dem O-V-Verzeichnis, Regionalbereich und Landesverband gleich mit.",
+          "bilder": [
+            "OV Ulm aus dem Verzeichnis"
+          ]
+        },
+        {
+          "id": "c1-3",
+          "sprecher": "erzaehler",
+          "text": "Dann der Einheitstyp: Bergungsgruppe. Die App legt die Sollplätze nach StAN an, hier neun Personen und zwei Fahrzeuge.",
+          "sprechtext": "Dann der Einheitstyp: Bergungsgruppe. Die App legt die Sollplätze nach Stan an, hier neun Personen und zwei Fahrzeuge.",
+          "bilder": [
+            "Einheitstyp: Bergungsgruppe",
+            "Bergungsgruppe wählen"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "c2",
+      "teil": "App: Seite 2 · Einsatz",
+      "bild": {
+        "art": "app",
+        "schild": "Seite 2 von 6 · Einsatz"
+      },
+      "zeilen": [
+        {
+          "id": "c2-1",
+          "sprecher": "erzaehler",
+          "text": "Seite zwei: der Einsatz. Der Zeitraum ist mit heute, acht bis achtzehn Uhr, vorbelegt. Du trägst nur Einsatzort und Auftrag ein.",
+          "bilder": [
+            "Zeitraum ist vorbelegt",
+            "Ort/Auftrag"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "c3",
+      "teil": "App: Seite 3 · Personal",
+      "bild": {
+        "art": "app",
+        "schild": "Seite 3 von 6 · Personal"
+      },
+      "zeilen": [
+        {
+          "id": "c3-1",
+          "sprecher": "erzaehler",
+          "text": "Seite drei: das Personal. Die neun Plätze aus der StAN stehen schon da.",
+          "sprechtext": "Seite drei: das Personal. Die neun Plätze aus der Stan stehen schon da.",
+          "bilder": [
+            "StAN-Sollplätze stehen schon da"
+          ]
+        },
+        {
+          "id": "c3-2",
+          "sprecher": "erzaehler",
+          "text": "Liegt die Namensliste schon im Messenger, fügst du sie mit „Namen einfügen“ in einem Rutsch ein. Vorher siehst du, wer auf welchen Platz kommt.",
+          "bilder": [
+            "Namen einfügen",
+            "Namensliste einfügen",
+            "Übernehmen"
+          ]
+        },
+        {
+          "id": "c3-3",
+          "sprecher": "erzaehler",
+          "text": "Die Stärke rechnet die App selbst: 0/2/7/9.",
+          "sprechtext": "Die Stärke rechnet die App selbst: null, zwei, sieben, neun.",
+          "bilder": [
+            "Geschlecht W",
+            "Stärke rechnet mit"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "c4",
+      "teil": "App: Seite 4 · Fahrzeuge",
+      "bild": {
+        "art": "app",
+        "schild": "Seite 4 von 6 · Fahrzeuge"
+      },
+      "zeilen": [
+        {
+          "id": "c4-1",
+          "sprecher": "erzaehler",
+          "text": "Seite vier: die Fahrzeuge. GKW und Anhänger sind ebenfalls vorbelegt.",
+          "sprechtext": "Seite vier: die Fahrzeuge. G-K-W und Anhänger sind ebenfalls vorbelegt.",
+          "bilder": [
+            "StAN-Fahrzeuge stehen schon da"
+          ]
+        },
+        {
+          "id": "c4-2",
+          "sprecher": "erzaehler",
+          "text": "Kennzeichen eintragen, beim Funkrufnamen „Heros“ wählen. Den Ort Ulm übernimmt die App aus Seite eins, dazu kommen die Kennzahlen 22/51.",
+          "sprechtext": "Kennzeichen eintragen, beim Funkrufnamen Heros wählen. Den Ort Ulm übernimmt die App aus Seite eins, dazu kommen die Kennzahlen zwo-zwo, fünf-eins.",
+          "bilder": [
+            "Kennzeichen GKW",
+            "Kennwort Heros",
+            "Kennzahlen 22/51",
+            "Kennzeichen Anhänger"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "c5",
+      "teil": "App: Seite 5 · Sofortbedarf",
+      "bild": {
+        "art": "app",
+        "schild": "Seite 5 von 6 · Sofortbedarf"
+      },
+      "zeilen": [
+        {
+          "id": "c5-1",
+          "sprecher": "erzaehler",
+          "text": "Seite fünf: der Sofortbedarf. Anhaken nur, wenn ihr etwas braucht.",
+          "bilder": [
+            "Sofortbedarf anhaken"
+          ]
+        },
+        {
+          "id": "c5-2",
+          "sprecher": "erzaehler",
+          "text": "Die Verpflegung übernimmt die App aus der Stärke. Du ergänzt sechzig Liter Diesel und die Ruhezeit.",
+          "bilder": [
+            "Verpflegung aus der Stärke",
+            "Diesel 60 l",
+            "Ruhezeit"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "c6",
+      "teil": "App: Seite 6 · Übersicht",
+      "bild": {
+        "art": "app",
+        "schild": "Seite 6 von 6 · Übersicht"
+      },
+      "zeilen": [
+        {
+          "id": "c6-1",
+          "sprecher": "erzaehler",
+          "text": "Seite sechs: die Übersicht. Oben steht, was noch fehlt. Hier ist es ein Kraftfahrer.",
+          "bilder": [
+            "Gesamtübersicht"
+          ]
+        },
+        {
+          "id": "c6-2",
+          "sprecher": "erzaehler",
+          "text": "Antippen, bei Kai die Fahrerlaubnis CE eintragen, zurück. Alle Angaben vollständig.",
+          "sprechtext": "Antippen, bei Kai die Fahrerlaubnis C-E eintragen, zurück. Alle Angaben vollständig.",
+          "bilder": [
+            "Offener Punkt antippen",
+            "Karten-Ansicht",
+            "Fahrerlaubnis CE",
+            "Bogen vollständig"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "c7",
+      "teil": "App: PDF",
+      "bild": {
+        "art": "app",
+        "schild": "PDF im Papier-Layout"
+      },
+      "zeilen": [
+        {
+          "id": "c7-1",
+          "sprecher": "erzaehler",
+          "text": "Daraus entsteht der gewohnte Erfassungsbogen als PDF, mit taktischen Zeichen und in Druckschrift.",
+          "bilder": [
+            "PDF im Papier-Layout",
+            "pdf-seite-1"
+          ]
+        },
+        {
+          "id": "c7-2",
+          "sprecher": "erzaehler",
+          "text": "Auf der letzten Seite steht ein QR-Code mit dem kompletten Bogen.",
+          "sprechtext": "Auf der letzten Seite steht ein Q-R-Code mit dem kompletten Bogen.",
+          "bilder": [
+            "pdf-seite-2"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "c8",
+      "teil": "App: Übergabe",
+      "bild": {
+        "art": "app",
+        "schild": "Übergabe am Meldekopf"
+      },
+      "zeilen": [
+        {
+          "id": "c8-1",
+          "sprecher": "erzaehler",
+          "text": "Am Meldekopf zeigst du den QR-Code im Vollbild. Die Daten gehen direkt von Gerät zu Gerät, ohne Server und ohne Konto.",
+          "sprechtext": "Am Meldekopf zeigst du den Q-R-Code im Vollbild. Die Daten gehen direkt von Gerät zu Gerät, ohne Server und ohne Konto.",
+          "bilder": [
+            "Bogen übergeben",
+            "QR-Vollbild"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "c9",
+      "teil": "App: Meldekopf",
+      "bild": {
+        "art": "app",
+        "schild": "Am Meldekopf: Einsatz-Sammlung"
+      },
+      "zeilen": [
+        {
+          "id": "c9-1",
+          "sprecher": "erzaehler",
+          "text": "Der Meldekopf scannt ihn in seine Einsatz-Sammlung. Aus vier Einheiten werden fünf, die Stärke zählt die App laufend zusammen, Verpflegung und Kraftstoff gleich mit.",
+          "bilder": [
+            "Sammlung mit 4 Einheiten",
+            "Sammlung mit 5 Einheiten"
+          ]
+        },
+        {
+          "id": "c9-2",
+          "sprecher": "erzaehler",
+          "text": "Kommt später eine geänderte Meldung derselben Einheit, zeigt die App, was sich gegenüber der letzten geändert hat.",
+          "bilder": [
+            "Sammlung mit 5 Einheiten"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "d1",
+      "teil": "Abschluss",
+      "bild": {
+        "art": "comic",
+        "panel": "schluss"
+      },
+      "zeilen": [
+        {
+          "id": "d1-1",
+          "sprecher": "erzaehler",
+          "text": "Und wenn der Akku leer ist? Dann gilt das ausgedruckte PDF, wie bisher. Papier bleibt die Rückfallebene."
+        },
+        {
+          "id": "d1-2",
+          "sprecher": "karsten",
+          "text": "Ausgedruckt liegt er sowieso im Handschuhfach.",
+          "blase": {
+            "x": 1000,
+            "y": 250,
+            "b": 560,
+            "spitze": [
+              1180,
+              440
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "d2",
+      "teil": "Abschluss",
+      "bild": {
+        "art": "abspann"
+      },
+      "zeilen": [
+        {
+          "id": "d2-1",
+          "sprecher": "erzaehler",
+          "text": "Der digitale Erfassungsbogen ist kostenlos und freie Software. Er braucht keine Anmeldung, und alle Daten bleiben auf deinem Gerät. erfassungsbogen.app.",
+          "sprechtext": "Der digitale Erfassungsbogen ist kostenlos und freie Software. Er braucht keine Anmeldung, und alle Daten bleiben auf deinem Gerät. Erfassungsbogen punkt app."
+        }
+      ]
+    }
+  ],
+  "geraeusche": {
+    "regen": {
+      "beschreibung": "Starker Regen auf Asphalt bei Nacht, gleichmäßig, Wind",
+      "dauer": 22,
+      "lautstaerke": 0.35,
+      "schleife": true
+    },
+    "wind": {
+      "beschreibung": "Sturmböen, Wind pfeift um Gebäude",
+      "dauer": 10,
+      "lautstaerke": 0.25,
+      "schleife": true
+    },
+    "motor": {
+      "beschreibung": "Mehrere Lkw-Dieselmotoren im Leerlauf, aus etwas Entfernung",
+      "dauer": 12,
+      "lautstaerke": 0.25,
+      "schleife": true
+    },
+    "regen-dach": {
+      "beschreibung": "Regen trommelt auf das Dach einer Lkw-Fahrerkabine, innen gehört",
+      "dauer": 10,
+      "lautstaerke": 0.3,
+      "schleife": true
+    },
+    "kritzeln": {
+      "beschreibung": "Kugelschreiber kritzelt hastig auf Papier auf einem Klemmbrett",
+      "dauer": 3,
+      "lautstaerke": 0.6
+    },
+    "regen-zelt": {
+      "beschreibung": "Regen prasselt auf ein Pavillonzelt, innen gehört",
+      "dauer": 12,
+      "lautstaerke": 0.3,
+      "schleife": true
+    },
+    "taschenrechner": {
+      "beschreibung": "Schnelles Tippen auf einem Taschenrechner, Plastiktasten",
+      "dauer": 3,
+      "lautstaerke": 0.6
+    },
+    "hupe": {
+      "beschreibung": "Kurzes ungeduldiges Hupen eines Lkw in der Ferne",
+      "dauer": 1.5,
+      "lautstaerke": 0.4
+    },
+    "funk-rauschen": {
+      "beschreibung": "Funkgerät: kurzes Rauschen und Quittungston beim Loslassen der Sprechtaste",
+      "dauer": 1.5,
+      "lautstaerke": 0.5
+    },
+    "rueckspulen": {
+      "beschreibung": "Videokassette spult schnell zurück, mechanisches Surren mit Tonhöhenabfall",
+      "dauer": 3,
+      "lautstaerke": 0.6
+    },
+    "piep": {
+      "beschreibung": "Kurzer heller Bestätigungston eines Scanners",
+      "dauer": 0.6,
+      "lautstaerke": 0.5
+    }
+  }
+}

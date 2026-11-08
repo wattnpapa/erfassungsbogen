@@ -240,6 +240,24 @@ npm run blanko-pdf   # schreibt public/downloads/einheiten-erfassungsbogen-blank
   pdfkit die Datei-ID aus den Metadaten bildet. Wer Metadaten ergänzt, die bei
   jedem Lauf anders sind, macht den Wächter wertlos.
 
+### Erklärfilm (erklaerfilm/)
+
+Ein Erklärfilm „Ankommen am Meldekopf“: Comic-Teil (Papier gegen digital am
+THW-Meldekopf), dann ein Rundgang durch die sechs Seiten des Assistenten mit
+echten App-Aufnahmen. Sprache kommt von ElevenLabs. Der Ordner gehört nicht
+zur App: Er wird weder gebaut noch ausgeliefert, und die Verbindung zu
+`api.elevenlabs.io` baut nur das Werkzeug `stimmen.mjs` auf dem Rechner des
+Erstellers auf, nie die App.
+
+```bash
+npm run erklaerfilm:aufnahme   # App-Aufnahmen per Playwright
+npm run erklaerfilm:stimmen    # Sprache (ELEVENLABS_API_KEY, Voice-IDs in stimmen.json)
+npm run erklaerfilm:rendern    # MP4 + SRT nach erklaerfilm/ausgabe/
+```
+
+Ändert sich die Oberfläche der Assistenten-Schritte, die Aufnahme neu laufen
+lassen; Details in [erklaerfilm/README.md](../erklaerfilm/README.md).
+
 ### Kopfnavigation (generiert, drei Fassungen)
 
 Die Domain hat zwei Welten: die App unter `/` (index.html plus React-Bundle)

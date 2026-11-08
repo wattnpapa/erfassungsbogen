@@ -1,0 +1,28 @@
+{
+  "modell": "eleven_multilingual_v2",
+  "einstellungen": { "stability": 0.45, "similarity_boost": 0.8, "style": 0.15, "use_speaker_boost": true },
+  "sprecher": {
+    "erzaehler": {
+      "voice_id": "HIER_VOICE_ID_ERZAEHLER",
+      "hinweis": "Ruhige, warme deutsche Off-Stimme. Etwas mehr Stabilität für gleichmäßigen Vortrag.",
+      "einstellungen": { "stability": 0.6, "style": 0.05 }
+    },
+    "karsten": {
+      "voice_id": "HIER_VOICE_ID_KARSTEN",
+      "hinweis": "Männlich, Mitte 40, bodenständig, leicht süddeutsch gefärbt passt."
+    },
+    "jana": {
+      "voice_id": "HIER_VOICE_ID_JANA",
+      "hinweis": "Weiblich, Ende 20, klar, zügig, pragmatisch."
+    },
+    "steffi": {
+      "voice_id": "HIER_VOICE_ID_STEFFI",
+      "hinweis": "Weiblich, 30–40, ungeduldig, ruft aus dem Fahrerhaus.",
+      "einstellungen": { "stability": 0.3, "style": 0.4 }
+    },
+    "einsatzleitung": {
+      "voice_id": "HIER_VOICE_ID_EINSATZLEITUNG",
+      "hinweis": "Männlich oder weiblich, sachlich, knapp. Der Funkklang (Bandpass) kommt beim Rendern dazu."
+    }
+  }
+}

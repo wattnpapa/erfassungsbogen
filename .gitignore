@@ -7,3 +7,7 @@ sbom.cdx.json
 coverage/
 *.log
 .DS_Store
+# Erklärfilm: erzeugte Aufnahmen, Ton und Ausgabe (npm run erklaerfilm:*)
+erklaerfilm/aufnahmen/
+erklaerfilm/audio/
+erklaerfilm/ausgabe/
