@@ -253,7 +253,15 @@ Erstellers auf, nie die App.
 npm run erklaerfilm:aufnahme   # App-Aufnahmen per Playwright
 npm run erklaerfilm:stimmen    # Sprache (ELEVENLABS_API_KEY, Voice-IDs in stimmen.json)
 npm run erklaerfilm:rendern    # MP4 + SRT nach erklaerfilm/ausgabe/
+npm run erklaerfilm:veroeffentlichen   # Web-Fassung nach public/video/ (committen)
 ```
+
+Die Startseite zeigt den Film aus `public/video/` (nur im Browser, erst beim
+Abspielen geladen, ohne Netz ausgeblendet). In die App-Pakete kommt er nicht:
+electron-builder schließt `dist/video/**` aus, vor `cap sync` entfernt
+`scripts/ohne-video.mjs` den Ordner. Nach dem Veröffentlichen die Größe in
+`FILM_MB` (`src/app/app.tsx`) nachtragen. Jede neue Fassung bleibt dauerhaft
+in der Git-Historie — nur bei echten Änderungen neu einchecken.
 
 Ändert sich die Oberfläche der Assistenten-Schritte, die Aufnahme neu laufen
 lassen; Details in [erklaerfilm/README.md](../erklaerfilm/README.md).

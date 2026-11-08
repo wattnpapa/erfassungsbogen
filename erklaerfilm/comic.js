@@ -779,10 +779,10 @@
       const { t, sprecher } = k;
       return `<rect width="${W}" height="${H}" fill="url(#zelt-innen)"/><rect width="${W}" height="${H}" fill="url(#raster)"/>
         <ellipse cx="700" cy="200" rx="700" ry="520" fill="url(#lampe)"/>
-        ${person({ x: 700, y: 1220, s: 1.05, zopf: true, stirnlampe: true, weste: "MELDEKOPF", haar: "#2b1a12", blick: 1, gesicht: sprecher === "jana" ? "neutral" : "froh", ohneBeine: true, arme: { l: "unten", r: "ohr" }, haltR: `<g transform="translate(-10 20)">${funkgeraet()}</g>`, spricht: sprichtGerade(t, sprecher === "jana"), t })}
+        ${person({ x: 700, y: 1220, s: 1.05, zopf: true, stirnlampe: true, weste: "MELDEKOPF", haar: "#2b1a12", blick: 1, gesicht: sprecher === "jana" ? "neutral" : "froh", ohneBeine: true, arme: { l: "vorne", r: "ohr" }, haltR: `<g transform="translate(-10 20)">${funkgeraet()}</g>`, spricht: sprichtGerade(t, sprecher === "jana"), t })}
         ${tisch(960, 900, 1700)}
         <g transform="translate(1280 760) rotate(-4)">${tablet(520, 340, `
-          <text x="-200" y="-90" font-family="Archivo, sans-serif" font-weight="800" font-size="26" fill="#fff">Einsatz Sturmtief</text>
+          <text x="-230" y="-130" font-family="Archivo, sans-serif" font-weight="800" font-size="24" fill="#fff">Einsatz Sturmtief</text>
           ${[["5", "EINHEITEN"], ["2", "FÜHRER"], ["10", "UNTERF."], ["26", "MANNSCH."]].map(([z, l], i) => `<text x="${-200 + i * 112}" y="-10" font-family="Archivo, sans-serif" font-weight="800" font-size="54" fill="#11141b">${z}</text><text x="${-200 + i * 112}" y="18" font-family="monospace" font-size="15" fill="#5c6478">${l}</text>`).join("")}
           <text x="-200" y="96" font-family="Archivo, sans-serif" font-weight="800" font-size="70" fill="#12275e">38</text><text x="-110" y="96" font-family="monospace" font-size="20" fill="#5c6478">GESAMT</text>`)}</g>
         ${laut("KRRZZ", 1170, 380, { groesse: 80, drehung: 10, farbe: "#c8f0c0", auftauchen: klemme(t * 3, 0, 1), wackeln: 3, t })}`;

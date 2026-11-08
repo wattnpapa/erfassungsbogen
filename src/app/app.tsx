@@ -62,6 +62,7 @@ import { standNachEintreffenQuittung } from "./stand-uhr";
 import { leseausgabeMeldung } from "./pdf-titel";
 import { Kopfnav } from "./kopfnav-ui";
 import { bogenLinksEmpfangen, imWebBrowser, istNativ, qrScannen, textTeilen } from "./nativ";
+import { useOnline } from "./online";
 import { fehlerText } from "./nachladen";
 import { dateiFehlerMeldung } from "./datei-fehler";
 import type { DateiFehler } from "./fehler-buendeln";
@@ -417,6 +418,59 @@ function piep(erfolg: boolean): void {
   }
 }
 
+/** Erklärfilm (erklaerfilm/, veröffentlicht unter public/video/). */
+const FILM_MB = 28; // Größe von public/video/erklaerfilm.mp4 (erklaerfilm/veroeffentlichen.mjs)
+const FILM_WEB = "https://erfassungsbogen.app/video/erklaerfilm.mp4";
+
+/**
+ * Der Erklärfilm „Ankommen am Meldekopf" (gut fünf Minuten): Papier gegen
+ * digital am Meldekopf, dann jede Seite des Assistenten. Im Browser direkt
+ * abspielbar; geladen wird erst beim Antippen (preload="none"), damit die
+ * Startseite am Meldekopf mit schlechtem Netz nicht schwerer wird. Die
+ * installierten Apps tragen die Datei nicht mit (scripts/ohne-video.mjs) und
+ * verlinken auf die Website.
+ * Ohne Netz verschwindet der Bereich ganz: Ein Player, der nichts laden kann,
+ * wäre am Meldekopf nur eine schwarze Fläche. Dasselbe, wenn das Laden
+ * scheitert, obwohl der Browser „online" meldet (WLAN ohne Internet). Läuft
+ * der Film schon, bleibt er stehen — was gepuffert ist, spielt weiter.
+ */
+function Erklaerfilm() {
+  const online = useOnline();
+  const [ladefehler, setLadefehler] = useState(false);
+  const [gestartet, setGestartet] = useState(false);
+  if ((!online && !gestartet) || ladefehler) return null;
+  if (!imWebBrowser()) {
+    return (
+      <p className="erklaerfilm">
+        <a href={FILM_WEB} target="_blank" rel="noopener noreferrer">
+          Erklärfilm ansehen
+        </a>{" "}
+        (5 Minuten, öffnet im Browser, rund {FILM_MB} MB)
+      </p>
+    );
+  }
+  return (
+    <figure className="erklaerfilm">
+      <video
+        controls
+        preload="none"
+        playsInline
+        poster="video/erklaerfilm.jpg"
+        width={1920}
+        height={1080}
+        onPlay={() => setGestartet(true)}
+      >
+        <source src="video/erklaerfilm.mp4" type="video/mp4" onError={() => setLadefehler(true)} />
+        <track kind="subtitles" src="video/erklaerfilm.vtt" srcLang="de" label="Deutsch" />
+      </video>
+      <figcaption>
+        Erklärfilm, 5 Minuten: eine THW-Einheit kommt am Meldekopf an, dann jede Seite des Bogens. Lädt erst beim
+        Abspielen (rund {FILM_MB} MB); Untertitel lassen sich im Player einschalten.
+      </figcaption>
+    </figure>
+  );
+}
+
 /**
  * „So funktioniert's": das Grundprinzip (Offline-QR-Transport) in drei
  * Schritten. Beim Erststart steht es prominent unter den Aktionen; sobald
@@ -427,6 +481,7 @@ function SoFunktionierts() {
   return (
     <section className="onboarding" aria-label="So funktioniert es">
       <h2>So funktioniert&rsquo;s</h2>
+      <Erklaerfilm />
       <div className="onboarding-schritte">
         <div className="onboarding-schritt">
           <svg viewBox="0 0 48 48" aria-hidden="true">

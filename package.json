@@ -35,6 +35,7 @@
     "erklaerfilm:aufnahme": "node erklaerfilm/aufnahme.mjs",
     "erklaerfilm:stimmen": "node erklaerfilm/stimmen.mjs",
     "erklaerfilm:rendern": "node erklaerfilm/rendern.mjs",
+    "erklaerfilm:veroeffentlichen": "node erklaerfilm/veroeffentlichen.mjs",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
@@ -43,7 +44,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "ios:sync": "vite build && cap sync ios",
+    "ios:sync": "vite build && node scripts/ohne-video.mjs && cap sync ios",
     "ios:open": "cap open ios",
     "electron:dev": "concurrently -k \"npm:dev\" \"wait-on tcp:5173 && cross-env VITE_DEV_SERVER_URL=http://localhost:5173 electron .\"",
     "electron:build": "vite build && electron-builder",
@@ -80,6 +81,7 @@
     },
     "files": [
       "dist/**/*",
+      "!dist/video/**",
       "electron/**/*",
       "package.json"
     ],

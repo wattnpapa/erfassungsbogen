@@ -2141,6 +2141,11 @@
     }
     .onboarding-schritt svg { width: 2.25rem; height: 2.25rem; color: var(--akzent); }
     .onboarding-schritt span { font-size: var(--t-s); color: var(--text-2); }
+    /* Erklärfilm über den drei Schritten. 16:9 fest reserviert, damit die
+       Seite beim Laden des Vorschaubilds nicht springt. */
+    .erklaerfilm { margin: 0 0 var(--r-6); max-width: 48rem; }
+    .erklaerfilm video { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; background: #000; border: var(--strich) solid var(--linie); }
+    .erklaerfilm figcaption { margin-top: var(--r-2); font-size: var(--t-s); color: var(--text-2); }
     /* Personal-Schnelleingabe: kompakte Tabellenzeilen, Felder füllen die Zelle. */
     .ansicht-wahl { display: flex; align-items: center; gap: 0.2rem 0.8rem; flex-wrap: wrap; }
     .ansicht-wahl button { margin-top: 0.4rem; }

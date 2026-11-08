@@ -1555,6 +1555,15 @@ flowchart TB
   weil beide dieselbe `latest.yml` schreiben und die Metadaten am Ende auf das
   x64-Paket zeigen sollen; ARM64 ist kein Nebenschauplatz, da die emulierte
   x64-App auf Snapdragon-Geräten nicht an die Kamera kommt.
+- **Erklärfilm nur auf der Website** (seit 2026-11-08): `public/video/`
+  (MP4 1080p, rund 25 MB, dazu Vorschaubild und WebVTT-Untertitel) landet im
+  Pages-Build, aber nicht in den App-Paketen: electron-builder schließt
+  `dist/video/**` über `files` aus, der Android-Job ruft vor `cap sync`
+  `scripts/ohne-video.mjs` auf (ebenso `npm run ios:sync`). Der Service Worker
+  lädt den Film nicht vor (mp4/jpg/vtt stehen nicht in den `globPatterns`);
+  die Startseite lädt ihn erst beim Abspielen (`preload="none"`) und blendet
+  den Bereich ohne Netz aus. In den Apps steht stattdessen ein Link auf die
+  Website. Entstehung und Werkzeuge: `erklaerfilm/README.md`.
 - **Release-Aufräumung:** Ein `cleanup`-Job löscht nach jedem erfolgreichen
   Release alte GitHub-Releases/Tags, außer den neuesten 10 (`KEEP: 10`).
 - Alle Submodul-Checkouts erfolgen mit `submodules: recursive`, da bereits die

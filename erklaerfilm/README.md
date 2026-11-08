@@ -21,6 +21,7 @@ npm run erklaerfilm:aufnahme      # 1. App-Aufnahmen (startet selbst einen Vite-
 npm run erklaerfilm:stimmen       # 2. Stimmen per ElevenLabs (siehe unten)
 npm run dev                       # 3. Vorschau: http://localhost:5173/erklaerfilm/film.html
 npm run erklaerfilm:rendern       # 4. MP4 + SRT nach erklaerfilm/ausgabe/
+npm run erklaerfilm:veroeffentlichen  # 5. Web-Fassung nach public/video/ für die Startseite
 ```
 
 Die Vorschau funktioniert schon ohne Stimmen: Dann schätzt der Film die Länge

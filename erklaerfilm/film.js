@@ -252,11 +252,11 @@
         app.style.zIndex = 3;
         app.style.clipPath = wischPfad(wisch);
       } else {
-        unten.style.display = "none";
+        verbergen(unten);
         app.style.clipPath = "none";
       }
       app.style.display = "block";
-      oben.style.display = "none";
+      verbergen(oben);
     } else {
       oben.innerHTML = comicSvg(s, lt);
       oben.style.display = "block";
@@ -267,20 +267,31 @@
           app.style.display = "block";
           app.style.zIndex = 1;
           app.style.clipPath = "none";
-          unten.style.display = "none";
+          verbergen(unten);
         } else {
           unten.innerHTML = comicSvg(vorher, vorher.d - 0.01);
           unten.style.display = "block";
           app.style.display = "none";
         }
       } else {
-        unten.style.display = "none";
+        verbergen(unten);
         app.style.display = "none";
       }
     }
     untertitel(t, s);
     $("#zeit").textContent = `${t.toFixed(1)} / ${D.plan.dauer.toFixed(1)} s · ${s.szene.id}`;
     return { szene: s.szene.id, t };
+  }
+
+  /**
+   * Comic-Ebene ausblenden UND leeren. Beide Ebenen tragen dieselben
+   * SVG-IDs (Verläufe, Raster); bliebe die verborgene stehen, löste der
+   * Browser url(#…) gegen ihre display:none-Kopie auf und zeichnete in der
+   * sichtbaren Ebene weder Himmel noch Zeltinneres.
+   */
+  function verbergen(ebene) {
+    ebene.style.display = "none";
+    if (ebene.firstChild) ebene.textContent = "";
   }
 
   /** Comic-Wischblende: schräge Kante von links nach rechts. */

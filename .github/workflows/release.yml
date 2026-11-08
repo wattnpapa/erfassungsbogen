@@ -299,6 +299,7 @@ jobs:
       - name: Web-App bauen und nach Android syncen
         run: |
           npm run build
+          node scripts/ohne-video.mjs
           npx cap sync android
       - name: Keystore aus Secret entpacken
         env:

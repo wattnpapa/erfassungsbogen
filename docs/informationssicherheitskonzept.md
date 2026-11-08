@@ -714,6 +714,15 @@ Es existieren keine weiteren Netzwerkverbindungen der eigentlichen
 Bogen-Funktion — dies ist durch die Content-Security-Policy des Builds technisch
 erzwungen (siehe 5.3).
 
+> *Prüfvermerk Erklärfilm (2026-11-08):* Die Startseite der Webfassung bettet
+> einen Erklärfilm ein (`public/video/`). Er kommt vom selben Host wie die
+> Anwendung (`default-src 'self'`, keine Änderung der CSP, kein Fremd-Host) und
+> wird erst beim Abspielen geladen; ohne Netz ist der Bereich ausgeblendet. Die
+> installierten Apps tragen die Datei nicht mit und verlinken auf die Website
+> (Abruf im System-Browser). Die Sprachaufnahmen entstehen mit ElevenLabs
+> ausschließlich im Werkzeug `erklaerfilm/stimmen.mjs` auf dem Rechner des
+> Erstellers; die Anwendung baut zu ElevenLabs keine Verbindung auf.
+
 > *Prüfvermerk zum zweiten Web-Host:* Wird die Anwendung über die GitLab-Pages-
 > Fassung auf Open CoDE aufgerufen (siehe 3.2/3.6), gelten K1 bis K3
 > unverändert — es ist derselbe Build. K2 zählt dabei in denselben
