@@ -400,7 +400,7 @@ describe("Einheit mit Folgemeldung entfernen (R2-D1)", () => {
     // Oberste Zeile ist die aktuelle Fassung (die Folgemeldung).
     await nutzer.click(within(karte).getAllByRole("button", { name: "Fassung verwerfen…" })[0]!);
     const dialog = document.querySelector<HTMLDialogElement>("dialog[aria-label='Fassung verwerfen?']")!;
-    expect(dialog.textContent).toMatch(/Gültig ist dann wieder Stand .* mit Stärke 0 \/ 2 \/ 6 \/ 8/);
+    expect(dialog.textContent).toMatch(/Gültig ist dann wieder Stand .* mit Stärke 0 \/ 2 \/ 6 \/\/ 8/);
     await nutzer.click(within(dialog).getByRole("button", { name: "Fassung verwerfen" }));
     neuLaden();
 
@@ -1447,7 +1447,7 @@ describe("Kompakte Einheiten auf dem Telefon (R2-K7)", () => {
     ansicht(angelegt.id);
     const karte = document.querySelector<HTMLElement>(".einheit-zeile")!;
     expect(karte.className).toContain("kompakt");
-    expect(karte.textContent).toMatch(/Stärke \d+ \/ \d+ \/ \d+ \/ \d+/);
+    expect(karte.textContent).toMatch(/Stärke \d+ \/ \d+ \/ \d+ \/\/ \d+/);
     expect(karte.textContent).toContain("Ruhezeit");
     // Keine Knöpfe außer dem Aufklapper, keine Zeitenzeile.
     expect(within(karte).queryByRole("button", { name: "Abrücken" })).toBeNull();
@@ -1893,7 +1893,7 @@ describe("Stärke ändern mit Prüfung und Rückweg (R4-E4)", () => {
     await nutzer.click(within(dialog).getByRole("button", { name: "Stärke übernehmen" }));
 
     const frage = document.querySelector<HTMLDialogElement>("dialog[aria-label='Stimmt die Stärke?']")!;
-    expect(frage.textContent).toContain("0 / 0 / 3 / 3 → 0 / 0 / 66 / 66");
+    expect(frage.textContent).toContain("0 / 0 / 3 // 3 → 0 / 0 / 66 // 66");
     expect(frage.textContent).toMatch(/Stärke: 66 Mannschaft — stimmt das\?/);
     expect(einsaetzeLaden().find((s) => s.id === einsatzId)!.eintraege).toHaveLength(1);
     await nutzer.click(within(frage).getByRole("button", { name: "Ja, so übernehmen" }));
@@ -1917,7 +1917,7 @@ describe("Stärke ändern mit Prüfung und Rückweg (R4-E4)", () => {
     for (const feld of ["Führer", "Unterführer", "Mannschaft"]) await eintragen(nutzer, dialog, feld, "0");
     await nutzer.click(within(dialog).getByRole("button", { name: "Stärke übernehmen" }));
     const frage = document.querySelector<HTMLDialogElement>("dialog[aria-label='Stimmt die Stärke?']")!;
-    expect(frage.textContent).toContain("0 / 0 / 3 / 3 → 0 / 0 / 0 / 0");
+    expect(frage.textContent).toContain("0 / 0 / 3 // 3 → 0 / 0 / 0 // 0");
     expect(frage.textContent).toMatch(/Gesamt 3 → 0: Die Einheit zählt dann weder in der Stärke noch in der Verpflegung — stimmt das\? Ist die Einheit gar nicht mehr da, bleibt „Abrücken"/);
     expect(einsaetzeLaden().find((s) => s.id === einsatzId)!.eintraege).toHaveLength(1);
     await nutzer.click(within(frage).getByRole("button", { name: "Zahlen korrigieren" }));
@@ -1994,7 +1994,7 @@ describe("Stärke ändern mit Prüfung und Rückweg (R4-E4)", () => {
     try {
       await nutzer.click(within(dialog).getByRole("button", { name: "Stärke übernehmen" }));
       const hinweis = await screen.findByRole("dialog", { name: "Stärke ändern" });
-      expect(hinweis.textContent).toMatch(/Gewünscht war für „.*Wardenburg": Stärke 0 \/ 0 \/ 2 \/ 2 \(bisher 0 \/ 0 \/ 3 \/ 3\)/);
+      expect(hinweis.textContent).toMatch(/Gewünscht war für „.*Wardenburg": Stärke 0 \/ 0 \/ 2 \/\/ 2 \(bisher 0 \/ 0 \/ 3 \/\/ 3\)/);
       expect(hinweis.textContent).toMatch(/Meldeblock notieren/);
     } finally {
       vi.restoreAllMocks();

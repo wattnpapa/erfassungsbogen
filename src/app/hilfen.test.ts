@@ -903,7 +903,7 @@ describe("plausibilitaet() — Zahlendreher und Zeitfehler", () => {
     const b = { ...neuerBogen(), personalErfassung: PersonalErfassung.NUR_STAERKE, staerkeManuell: { fuehrer: 99, unterfuehrer: 0, mannschaft: 1, gesamt: 100 } };
     const h = plausibilitaet(b);
     expect(h).toContain("Stärke: 99 Führer — stimmt das?");
-    expect(h).toContain("Stärke 99 / 0 / 1 / 100: mehr Führer als Mannschaft — stimmt das?");
+    expect(h).toContain("Stärke 99 / 0 / 1 // 100: mehr Führer als Mannschaft — stimmt das?");
   });
 
   it("lässt kleine Trupps und normale Gruppen in Ruhe", () => {

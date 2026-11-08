@@ -541,12 +541,12 @@ function tagText(ms: number): string {
 
 function staerkeText(b: Erfassungsbogen): string {
   const s = staerke(b);
-  return `${s.fuehrer} / ${s.unterfuehrer} / ${s.mannschaft} / ${s.gesamt}`;
+  return `${s.fuehrer} / ${s.unterfuehrer} / ${s.mannschaft} // ${s.gesamt}`;
 }
 
 function summenStaerkeText(sum: EinsatzSummen): string {
   const s = sum.staerke;
-  return `${s.fuehrer} / ${s.unterfuehrer} / ${s.mannschaft} / ${s.gesamt}`;
+  return `${s.fuehrer} / ${s.unterfuehrer} / ${s.mannschaft} // ${s.gesamt}`;
 }
 
 /**
@@ -842,7 +842,7 @@ export function EinsatzListe(props: {
             )}
             <p className="hinweis">
               {/* Gemeldet und anwesend auseinander: beide Wörter, wie auf dem Schnellzugriff (R13-W3). */}
-              {einheitenAnwesend(s.eintraege, s.art)} · Stärke {sum.staerke.fuehrer} / {sum.staerke.unterfuehrer} / {sum.staerke.mannschaft} / {sum.staerke.gesamt}
+              {einheitenAnwesend(s.eintraege, s.art)} · Stärke {sum.staerke.fuehrer} / {sum.staerke.unterfuehrer} / {sum.staerke.mannschaft} // {sum.staerke.gesamt}
               {soll.einheiten > 0 && <> · davon {soll.personen} Sollstärke, nicht gemeldet</>}
             </p>
             {/* Zeitbezug der Zahlen und was seit der letzten Kenntnisnahme kam
@@ -3969,7 +3969,7 @@ export function BogenDetails({ bogen, absender, absenderKarte }: { bogen: Erfass
         </dd>
       </dl>
 
-      <h4>Personal ({s.fuehrer} / {s.unterfuehrer} / {s.mannschaft} / {s.gesamt})</h4>
+      <h4>Personal ({s.fuehrer} / {s.unterfuehrer} / {s.mannschaft} // {s.gesamt})</h4>
       {nurStaerke && (
         <p className="hinweis">
           Meldekopf-Modus: nur Stärke gemeldet{bogen.personal.length > 0 ? " — unten die Ansprechpartner:innen" : ""}.
@@ -4824,7 +4824,7 @@ function EinheitKarte(props: {
           <>
             {fehler && <p className="fehler" role="alert">{fehler}</p>}
             <p>
-              „{einheitAnzeigename(kopf.bogen.einheit)}", bisher {alt.fuehrer} / {alt.unterfuehrer} / {alt.mannschaft} / {alt.gesamt}.
+              „{einheitAnzeigename(kopf.bogen.einheit)}", bisher {alt.fuehrer} / {alt.unterfuehrer} / {alt.mannschaft} // {alt.gesamt}.
               Fahrzeuge, Namen, Zug und Auftrag bleiben; die alte Meldung kommt in die Historie.
             </p>
           </>
@@ -4871,7 +4871,7 @@ function EinheitKarte(props: {
         titel: "Stimmt die Stärke?",
         text: (
           <>
-            <p>Stärke {alt.fuehrer} / {alt.unterfuehrer} / {alt.mannschaft} / {alt.gesamt} → {f} / {u} / {m} / {gesamt}</p>
+            <p>Stärke {alt.fuehrer} / {alt.unterfuehrer} / {alt.mannschaft} // {alt.gesamt} → {f} / {u} / {m} // {gesamt}</p>
             <ul>{warnungen.map((x: string) => <li key={x}>{x}</li>)}</ul>
           </>
         ),
@@ -4893,7 +4893,7 @@ function EinheitKarte(props: {
         angabenVermerken(einsatzId, r.eintrag.id, kopf); // das Alter der Meldung bleibt (R17-K1)
         standAbsenderVermerken(einsatzId, r.eintrag.id, kopf); // Stand der Angaben bleibt der des Absenders (R18-A2)
       }
-    }, `Gewünscht war für „${einheitAnzeigename(kopf.bogen.einheit)}": Stärke ${f} / ${u} / ${m} / ${f + u + m} (bisher ${alt.fuehrer} / ${alt.unterfuehrer} / ${alt.mannschaft} / ${alt.gesamt}). Bitte auf dem Meldeblock notieren, Platz schaffen und noch einmal eingeben.`);
+    }, `Gewünscht war für „${einheitAnzeigename(kopf.bogen.einheit)}": Stärke ${f} / ${u} / ${m} // ${f + u + m} (bisher ${alt.fuehrer} / ${alt.unterfuehrer} / ${alt.mannschaft} // ${alt.gesamt}). Bitte auf dem Meldeblock notieren, Platz schaffen und noch einmal eingeben.`);
     if (!ok) return;
     mehrSchliessen();
     if (neueFassung.fassung) {

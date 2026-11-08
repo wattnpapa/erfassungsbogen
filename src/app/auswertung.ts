@@ -256,6 +256,22 @@ export function verpflegungBogenText(personen: number, vp: { vegetarisch: number
 }
 
 /**
+ * Betriebsstoff ohne Nullwerte: „40 l Diesel / 10 l Gemisch", leer ohne Bedarf.
+ * „0 l Diesel / 0 l Benzin / 0 l Gemisch" las sich wie eine Anforderung
+ * (Rückmeldung OV Chemnitz, 11/2026).
+ */
+export function betriebsstoffText(sb: { dieselLiter: number; benzinLiter: number; gemischLiter: number }): string {
+  return [
+    [sb.dieselLiter, "Diesel"],
+    [sb.benzinLiter, "Benzin"],
+    [sb.gemischLiter, "Gemisch"],
+  ]
+    .filter(([l]) => (l as number) > 0)
+    .map(([l, art]) => `${l} l ${art}`)
+    .join(" / ");
+}
+
+/**
  * „6 Einheiten, 66 Personen (M 56 / W 10 / D 0)" — die Zahl fürs Quartier
  * (R3-K4). Leer, wenn niemand Unterbringung angefordert hat.
  */

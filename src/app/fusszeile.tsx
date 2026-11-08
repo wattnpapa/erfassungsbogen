@@ -1249,7 +1249,7 @@ export function Fusszeile({ onBogenOeffnen, kompakt = false }: {
                       <td className="zahl" role="cell">
                         {b && s ? (
                           <>
-                            <strong>{s.fuehrer}/{s.unterfuehrer}/{s.mannschaft}/{s.gesamt}</strong>
+                            <strong>{s.fuehrer}/{s.unterfuehrer}/{s.mannschaft}//{s.gesamt}</strong>
                             <span className="hinweis">
                               {b.fahrzeuge.length} {b.fahrzeuge.length === 1 ? "Fahrzeug" : "Fahrzeuge"}
                             </span>

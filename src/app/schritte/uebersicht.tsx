@@ -47,7 +47,7 @@ import {
   zeitraumVonBis,
 } from "../hilfen";
 import { debugAktiv } from "../debug-plattform";
-import { mwdText, verpflegungBogenText } from "../auswertung";
+import { betriebsstoffText, mwdText, verpflegungBogenText } from "../auswertung";
 import { bogenCsvInhalt } from "../bogen-csv";
 import { qrGroessePosten, VIELE_TEILE } from "../qr-posten";
 import { EinheitZeichen } from "../zeichen-bild";
@@ -277,7 +277,7 @@ export function Uebersicht(props: {
   const s = staerke(bogen);
   // Schnellerfassung des Meldekopfs: Stärke als Summe, absichtlich ohne Namen.
   const nurStaerke = bogen.personalErfassung === PersonalErfassung.NUR_STAERKE;
-  const staerkeText = `${s.fuehrer} / ${s.unterfuehrer} / ${s.mannschaft} / ${s.gesamt}`;
+  const staerkeText = `${s.fuehrer} / ${s.unterfuehrer} / ${s.mannschaft} // ${s.gesamt}`;
   // R13-S2: Schnellerfassung (nur Stärke) von der Startseite: Ablegen in die Sammlung ist der erste Weg.
   // R14-H1: Auch ein empfangener, unveränderter Bogen einer fremden Einheit (Link ohne Sammlung auf diesem Gerät) gehört
   // in eine Sammlung — nicht in „Mängel beheben und weitergeben".
@@ -643,10 +643,10 @@ export function Uebersicht(props: {
               <span>
                 Stärke{" "}
                 <strong title={STAERKE_LEGENDE} aria-label={`Stärke: ${staerkeVorlesen(s)}`}>
-                  {s.fuehrer} / {s.unterfuehrer} / {s.mannschaft} / {s.gesamt}
+                  {s.fuehrer} / {s.unterfuehrer} / {s.mannschaft} // {s.gesamt}
                 </strong>{" "}
                 {/* Kurzlegende sichtbar statt nur im Tooltip (R2-N9). */}
-                <span className="hinweis" aria-hidden="true">(F / UF / M / Ges)</span>
+                <span className="hinweis" aria-hidden="true">(F / UF / M // Ges)</span>
                 {/* R19-N14: Die Zahl stammt aus der Vorbelegung nach Einheitstyp, nicht aus einer Zählung. */}
                 {nurSollstaerke(bogen) && <span className="warnung-text"> · Vorschlag aus StAN, nicht erfasst</span>}
               </span>
@@ -829,7 +829,7 @@ export function Uebersicht(props: {
           <dt>Betriebsstoff</dt>
           <dd>
             {bogen.sofortbedarf
-              ? `${bogen.sofortbedarf.dieselLiter} l Diesel / ${bogen.sofortbedarf.benzinLiter} l Benzin / ${bogen.sofortbedarf.gemischLiter} l Gemisch`
+              ? betriebsstoffText(bogen.sofortbedarf) || "nicht angefordert"
               : "—"}
           </dd>
           <dt>Unterbringung / Ruhezeit</dt>
@@ -1318,7 +1318,7 @@ export function QrVollbild(props: {
       <p className="qr-vollbild-kopf">
         <strong>{props.einheit}</strong>
         <br />
-        Stärke <strong>{props.staerke}</strong> <span className="hinweis">(F / UF / M / Ges) · Stand&nbsp;{stand}&nbsp;Uhr</span>
+        Stärke <strong>{props.staerke}</strong> <span className="hinweis">(F / UF / M // Ges) · Stand&nbsp;{stand}&nbsp;Uhr</span>
         {props.ohneNamen != null && props.ohneNamen > 0 && (
           <>
             <br />

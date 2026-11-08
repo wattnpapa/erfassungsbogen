@@ -38,7 +38,7 @@ export interface UebergabeStand {
 
 function staerkeText(b: Erfassungsbogen): string {
   const s = staerke(b);
-  return `${s.fuehrer} / ${s.unterfuehrer} / ${s.mannschaft} / ${s.gesamt}`;
+  return `${s.fuehrer} / ${s.unterfuehrer} / ${s.mannschaft} // ${s.gesamt}`;
 }
 
 /** Stand im Moment der Übergabe festhalten. */

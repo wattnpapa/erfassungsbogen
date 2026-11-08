@@ -53,6 +53,7 @@ import {
 } from "./hilfen";
 import {
   bedarfNichtErfasst,
+  betriebsstoffText,
   mwdText,
   summiereBoegen,
   unterbringungAngefordertText,
@@ -92,6 +93,7 @@ import {
 import { FELD_GESAMTSTAERKE, diffZeilen } from "@bos/meldekopf/meldung-diff";
 import { bogenDiff, type BogenDiff } from "./diff-lage";
 import { fahrzeugSymbolSvg } from "./taktische-zeichen-bogen";
+import { sitzplaetzeRichtwert } from "@bos/vokabulare/sitzplaetze";
 import { orgFarbe } from "./org-farben";
 import { BERUF_PRAEFIX, berufText, qualifikationenUndBerufe } from "./beruf";
 import {
@@ -1147,7 +1149,7 @@ function uebersichtsTabelle(
       // ihre Breite und das Blatt seine Seite (R2-K3).
       kopf("Eingetroffen\n(abgerückt)"),
       kopf("Stand der\nAngaben"),
-      kopf("Stärke\nF / U / M / G"),
+      kopf("Stärke\nF / U / M // G"),
       kopf("Fzg"),
       kopf("Bedarf"),
       // Die Bemerkung der Einheit („Sonstiges") unter dem Auftrag — eine
@@ -1646,7 +1648,7 @@ function zugSummenTabelle(
     [
       kopf("Zug / Verband"),
       kopf("Einh."),
-      kopf("Stärke\nF / U / M / G"),
+      kopf("Stärke\nF / U / M // G"),
       kopf("Verpfl."),
       kopf("Unterbr.\nangef."),
       kopf("M / W / D\n(alle)"),
@@ -1678,7 +1680,7 @@ function zugSummenTabelle(
         : { text: etikett || "Ohne Zug" },
       { text: `${s.einheiten}` },
       {
-        text: `${s.staerke.fuehrer} / ${s.staerke.unterfuehrer} / ${s.staerke.mannschaft} / ${s.staerke.gesamt}`,
+        text: `${s.staerke.fuehrer} / ${s.staerke.unterfuehrer} / ${s.staerke.mannschaft} // ${s.staerke.gesamt}`,
       },
       { text: `${s.verpflegung.gesamt}` },
       { text: `${s.unterbringungAngefordert.personen}` },
@@ -1740,7 +1742,7 @@ function lageKopfleiste(
                   text: [
                     { text: "Lage: ", bold: true },
                     {
-                      text: `${l} Einheiten · Stärke F / U / M / G ${l} / ${l} / ${l} / ${l} · ${l} Fahrzeuge`,
+                      text: `${l} Einheiten · Stärke F / U / M // G ${l} / ${l} / ${l} // ${l} · ${l} Fahrzeuge`,
                     },
                   ],
                 },
@@ -1771,10 +1773,10 @@ function lageKopfleiste(
       ? { text: `NACHTRAG ${nachtrag} — nicht die ganze Lage: `, bold: true }
       : { text: "Lage: ", bold: true },
     {
-      text: `${s.einheiten} ${s.einheiten === 1 ? "Einheit" : "Einheiten"} zählend · Stärke F / U / M / G `,
+      text: `${s.einheiten} ${s.einheiten === 1 ? "Einheit" : "Einheiten"} zählend · Stärke F / U / M // G `,
     },
     {
-      text: `${s.staerke.fuehrer} / ${s.staerke.unterfuehrer} / ${s.staerke.mannschaft} / ${s.staerke.gesamt}`,
+      text: `${s.staerke.fuehrer} / ${s.staerke.unterfuehrer} / ${s.staerke.mannschaft} // ${s.staerke.gesamt}`,
       bold: true,
     },
     { text: ` · ${s.fahrzeuge} Fahrzeuge` },
@@ -1913,7 +1915,7 @@ function nachtragsTabelle(
       kopf("Funkrufname /\nRückruf"),
       kopf("Eingetroffen\n(abgerückt)"),
       kopf("Stand der\nAngaben"),
-      kopf("Stärke\nF / U / M / G"),
+      kopf("Stärke\nF / U / M // G"),
       kopf("Fzg"),
       kopf("Bedarf"),
       kopf("Auftrag / Notiz"),
@@ -3116,13 +3118,13 @@ export function pdfDokument(
       // Linie welche Zahl ist (Audit Runde 2, R2-A6) — und „1 / 1 / 2 / 4"
       // ließ sich nach einer Stiftkorrektur nicht gegen die Namen prüfen
       // (Audit Runde 3, R3-A6). Gleiche Beschriftung auf Vordruck und Bogen.
-      { text: "Stärke (F / UF / M / Ges.):", bold: true },
+      { text: "Stärke (F / UF / M // Ges.):", bold: true },
       {
         // Mit Code: das Kästchen „von Hand geändert“ gehört hierher, wo mit
         // dem Stift korrigiert wird, nicht auf die Codeseite (R4-A5).
         stack: [
           {
-            text: `${zahl(s.fuehrer)} / ${zahl(s.unterfuehrer)} / ${zahl(s.mannschaft)} / ${zahl(s.gesamt)}`,
+            text: `${zahl(s.fuehrer)} / ${zahl(s.unterfuehrer)} / ${zahl(s.mannschaft)} // ${zahl(s.gesamt)}`,
           },
           // Zweite Zeile der Zelle: „Ansprechpartner/in:" daneben bricht ohnehin
           // auf zwei Zeilen um, das Kästchen kostet keine Höhe.
@@ -3217,15 +3219,17 @@ export function pdfDokument(
             bold: true,
           },
           { text: leer ? "Kennzeichen:" : kennzeichenText(f), bold: true },
-          // Sitzplätze nur, wenn sie am Fahrzeug erfasst sind: der Richtwert
-          // des Typs steht in keiner Akte und hätte auf dem Papier den Rang
-          // einer Zusage, die niemand gegeben hat.
+          // Erfasste Sitzplätze stehen als Zahl. Ohne eigene Angabe steht der
+          // Richtwert des Typs, aber als solcher gekennzeichnet: in der App
+          // zählte er in die Sitzplatzbilanz, auf dem Papier fehlte er ganz
+          // (Rückmeldung OV Chemnitz, 11/2026). „(Richtwert)“ hält ihn von
+          // einer Zusage der Einheit unterscheidbar.
           {
             text: leer
               ? "Funkrufname:"
               : [
                   f.funkrufname ? `FuRn: ${funkrufText(f, b.einheit)}` : "",
-                  f.sitzplaetze != null ? `Sitzplätze: ${f.sitzplaetze}` : "",
+                  sitzplatzZeile(f, org),
                 ]
                   .filter(Boolean)
                   .join("\n"),
@@ -3363,30 +3367,30 @@ export function pdfDokument(
         // („M 11 / W 1 / D 0“) allein auf einer Seite, die Beschriftung davor (R4-A7).
         dontBreakRows: true,
         body: [
-          [
-            {
-              stack: [
-                { text: "Sofortbedarf:", bold: true, decoration: "underline" },
-                zeile(
-                  `${kasten(sb.verpflegungPersonen > 0)} Verpflegung für ${zahl(sb.verpflegungPersonen)} Personen, davon ${zahl(vp.vegetarisch)} vegetarisch, ${zahl(vp.vegan)} vegan`,
-                ),
-                zeile(
-                  `${kasten(sb.dieselLiter + sb.benzinLiter + sb.gemischLiter > 0)} Betriebsstoff: ${zahl(sb.dieselLiter)} l Diesel / ${zahl(sb.benzinLiter)} l Benzin / ${zahl(sb.gemischLiter)} l Gemisch`,
-                ),
-              ],
-            },
-            {
-              stack: [
-                zeile(`${kasten(sb.unterbringung)}  Unterbringung`),
-                zeile(
-                  `${kasten(sb.ruhezeitErforderlich)}  Ruhezeit erforderlich`,
-                ),
-                zeile(
-                  `Anzahl Unterbringung/WC/Dusche:\nM ${zahl(mwd.m)} / W ${zahl(mwd.w)} / D ${zahl(mwd.d)}`,
-                ),
-              ],
-            },
-          ],
+          blanko
+            ? [
+                {
+                  stack: [
+                    { text: "Sofortbedarf:", bold: true, decoration: "underline" },
+                    zeile(
+                      `${kasten(false)} Verpflegung für ${zahl(sb.verpflegungPersonen)} Personen, davon ${zahl(vp.vegetarisch)} vegetarisch, ${zahl(vp.vegan)} vegan`,
+                    ),
+                    zeile(
+                      `${kasten(false)} Betriebsstoff: ${zahl(sb.dieselLiter)} l Diesel / ${zahl(sb.benzinLiter)} l Benzin / ${zahl(sb.gemischLiter)} l Gemisch`,
+                    ),
+                  ],
+                },
+                {
+                  stack: [
+                    zeile(`${kasten(false)}  Unterbringung`),
+                    zeile(`${kasten(false)}  Ruhezeit erforderlich`),
+                    zeile(
+                      `Anzahl Unterbringung/WC/Dusche:\nM ${zahl(mwd.m)} / W ${zahl(mwd.w)} / D ${zahl(mwd.d)}`,
+                    ),
+                  ],
+                },
+              ]
+            : sofortbedarfZellen(sb, vp, mwd),
         ],
       },
       margin: [0, luecke(8), 0, 0] as [number, number, number, number],
@@ -3652,4 +3656,51 @@ export async function einzelPdfDokument(
     freiePersonalZeilen: zeilen,
     freiesFahrzeug: fahrzeug,
   });
+}
+
+
+/**
+ * „Sitzplätze: 3“ (am Fahrzeug erfasst) oder „Sitzplätze: 3 (Richtwert)“ (aus
+ * dem Fahrzeugtyp); leer, wenn beides fehlt. Anhänger mit Richtwert 0 bleiben
+ * leer — „0 Sitzplätze“ an jedem Anhänger wäre nur Rauschen.
+ */
+export function sitzplatzZeile(f: Fahrzeug, org: OrganisationsTyp): string {
+  if (f.sitzplaetze != null) return `Sitzplätze: ${f.sitzplaetze}`;
+  const richtwert = sitzplaetzeRichtwert(f, vokabularFuer(org, "fahrzeug"));
+  return richtwert ? `Sitzplätze: ${richtwert} (Richtwert)` : "";
+}
+
+
+/**
+ * Sofortbedarf eines ausgefüllten Bogens: nur, was angefordert ist. Mit allen
+ * Kästchen und Nullen („Verpflegung für 0 Personen, davon 0 vegetarisch …“)
+ * sah ein Bogen mit Bedarf „Unterbringung“ aus wie eine lange Bestellliste;
+ * ohne Sofortbedarf erscheint der Block gar nicht (Rückmeldung OV Chemnitz,
+ * 11/2026). Der Vordruck behält alle Zeilen zum Ausfüllen.
+ */
+export function sofortbedarfZellen(
+  sb: NonNullable<Erfassungsbogen["sofortbedarf"]>,
+  vp: { vegetarisch: number; vegan: number },
+  mwd: { m: number; w: number; d: number },
+): TableCell[] {
+  const links: Content[] = [{ text: "Sofortbedarf:", bold: true, decoration: "underline" }];
+  if (sb.verpflegungPersonen > 0) {
+    const davon = [
+      vp.vegetarisch > 0 ? `${vp.vegetarisch} vegetarisch` : "",
+      vp.vegan > 0 ? `${vp.vegan} vegan` : "",
+    ].filter(Boolean);
+    links.push({
+      text: `${kasten(true)} Verpflegung für ${sb.verpflegungPersonen} Personen${davon.length ? `, davon ${davon.join(", ")}` : ""}`,
+    });
+  }
+  const stoff = betriebsstoffText(sb);
+  if (stoff) links.push({ text: `${kasten(true)} Betriebsstoff: ${stoff}` });
+  const rechts: Content[] = [];
+  if (sb.unterbringung) {
+    rechts.push({ text: `${kasten(true)}  Unterbringung` });
+    rechts.push({ text: `Anzahl Unterbringung/WC/Dusche:\nM ${mwd.m} / W ${mwd.w} / D ${mwd.d}` });
+  }
+  if (sb.ruhezeitErforderlich) rechts.push({ text: `${kasten(true)}  Ruhezeit erforderlich` });
+  if (links.length === 1 && rechts.length === 0) links.push({ text: "kein Bedarf angegeben", italics: true });
+  return [{ stack: links }, { stack: rechts.length ? rechts : [{ text: " " }] }];
 }

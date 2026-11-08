@@ -1647,7 +1647,7 @@ export function SchrittPersonal({
      ein Rollenwechsel verschiebt Führer und Mannschaft, ohne die Gesamtzahl
      anzurühren. */
   const staerkeQuittung = useZahlQuittung<HTMLElement>(
-    `${s.fuehrer}/${s.unterfuehrer}/${s.mannschaft}/${s.gesamt}`,
+    `${s.fuehrer}/${s.unterfuehrer}/${s.mannschaft}//${s.gesamt}`,
   );
   const mwd = unterbringungMWD(bogen);
   const sm = bogen.staerkeManuell ?? {
@@ -1688,7 +1688,7 @@ export function SchrittPersonal({
     const benannt = bogen.personal.filter((p) => !personUnbenannt(p)).length;
     const plaetze = bogen.personal.length - benannt;
     const abgeleitet = staerke({ personal: bogen.personal });
-    const startet = `${abgeleitet.fuehrer} / ${abgeleitet.unterfuehrer} / ${abgeleitet.mannschaft} / ${abgeleitet.gesamt}`;
+    const startet = `${abgeleitet.fuehrer} / ${abgeleitet.unterfuehrer} / ${abgeleitet.mannschaft} // ${abgeleitet.gesamt}`;
     const frage =
       benannt === 0
         ? `Keine Person mit Namen, nur ${plaetze === 1 ? "1 vorbelegter Platz" : `${plaetze} vorbelegte Plätze`} nach Einheitstyp. Die Stärke wird von Hand geführt und startet mit diesen Sollzahlen ${startet}; die Plätze zählen nicht mehr mit.`
@@ -1756,7 +1756,7 @@ export function SchrittPersonal({
       (v.vegetarisch !== vpKarten.vegetarisch || v.vegan !== vpKarten.vegan);
     const verloren = [
       eigeneStaerke
-        ? `Stärke ${m!.fuehrer} / ${m!.unterfuehrer} / ${m!.mannschaft} / ${m!.gesamt}`
+        ? `Stärke ${m!.fuehrer} / ${m!.unterfuehrer} / ${m!.mannschaft} // ${m!.gesamt}`
         : "",
       eigeneMwd ? `Geschlecht ${u!.m} m / ${u!.w} w / ${u!.d} d` : "",
       eigeneVp
@@ -1766,7 +1766,7 @@ export function SchrittPersonal({
     if (verloren.length > 0) {
       const ja = await frageJaNein({
         titel: "Eingetragene Zahlen verwerfen?",
-        text: `Diese Zahlen gehen verloren: ${verloren.join("; ")}. Es zählen wieder die Personenkarten: ${karten.fuehrer} / ${karten.unterfuehrer} / ${karten.mannschaft} / ${karten.gesamt}. Gleich danach holt „Rückgängig“ die Zahlen zurück.`,
+        text: `Diese Zahlen gehen verloren: ${verloren.join("; ")}. Es zählen wieder die Personenkarten: ${karten.fuehrer} / ${karten.unterfuehrer} / ${karten.mannschaft} // ${karten.gesamt}. Gleich danach holt „Rückgängig“ die Zahlen zurück.`,
         ok: "Zahlen verwerfen",
         abbruch: "Zahlen behalten",
         fokus: "abbruch",
@@ -2012,7 +2012,7 @@ export function SchrittPersonal({
             title={STAERKE_LEGENDE}
             aria-label={`Stärke: ${staerkeVorlesen(s)}`}
           >
-            {s.fuehrer} / {s.unterfuehrer} / {s.mannschaft} / {s.gesamt}
+            {s.fuehrer} / {s.unterfuehrer} / {s.mannschaft} // {s.gesamt}
           </strong>{" "}
           <span className="legende">({STAERKE_LEGENDE})</span>
           {" · "}

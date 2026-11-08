@@ -19,7 +19,7 @@ import { Auswahl, useZahlEingabe, ZahlMeldung } from "./schritte/bausteine";
 /** Kurzfassung „0 / 1 / 8 / 9 · 2 Fzg" für die Vorschau beider Hälften. */
 function bilanz(b: Erfassungsbogen): string {
   const s = staerke(b);
-  return `${s.fuehrer} / ${s.unterfuehrer} / ${s.mannschaft} / ${s.gesamt} · ${b.fahrzeuge.length} Fzg`;
+  return `${s.fuehrer} / ${s.unterfuehrer} / ${s.mannschaft} // ${s.gesamt} · ${b.fahrzeuge.length} Fzg`;
 }
 
 /**

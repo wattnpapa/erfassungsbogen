@@ -1326,7 +1326,7 @@ export function staerkePlausibilitaet(s: {
   }
   if (s.gesamt >= 4 && s.fuehrer > s.mannschaft) {
     hinweise.push(
-      `Stärke ${s.fuehrer} / ${s.unterfuehrer} / ${s.mannschaft} / ${s.gesamt}: mehr Führer als Mannschaft — stimmt das?`,
+      `Stärke ${s.fuehrer} / ${s.unterfuehrer} / ${s.mannschaft} // ${s.gesamt}: mehr Führer als Mannschaft — stimmt das?`,
     );
   }
   return hinweise;

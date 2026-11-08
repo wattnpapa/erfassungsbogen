@@ -54,7 +54,7 @@ export function steckbrief(b: Erfassungsbogen): MeldungsSteckbrief {
   const s = staerke(b);
   const erste = b.personal.find((p) => personName(p));
   return {
-    staerke: `${s.fuehrer} / ${s.unterfuehrer} / ${s.mannschaft} / ${s.gesamt}`,
+    staerke: `${s.fuehrer} / ${s.unterfuehrer} / ${s.mannschaft} // ${s.gesamt}`,
     ansprechperson: erste ? personName(erste) : "",
     kennzeichen: b.fahrzeuge.map((f) => (f.kennzeichen ?? "").trim()).filter(Boolean),
     stand: zeitpunktDeutsch(b.stand),

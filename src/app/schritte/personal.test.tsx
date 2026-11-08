@@ -1268,7 +1268,7 @@ describe("Umschalten auf „Nur Stärke“", () => {
     // Abbrechen: alles bleibt.
     await nutzer.click(screen.getByLabelText("Personal vollständig erfassen"));
     let dialog = document.querySelector<HTMLDialogElement>("dialog[aria-label='Eingetragene Zahlen verwerfen?']")!;
-    expect(dialog.textContent).toContain("Stärke 0 / 0 / 13 / 13");
+    expect(dialog.textContent).toContain("Stärke 0 / 0 / 13 // 13");
     expect(document.activeElement).toBe(within(dialog).getByRole("button", { name: "Zahlen behalten" }));
     await nutzer.click(within(dialog).getByRole("button", { name: "Zahlen behalten" }));
     expect((screen.getByLabelText("Nur Stärke (Meldekopf-Schnellerfassung)") as HTMLInputElement).checked).toBe(true);
