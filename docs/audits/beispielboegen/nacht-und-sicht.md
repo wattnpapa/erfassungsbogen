@@ -81,7 +81,7 @@ dastehen. Dazu kommen Ordnernamen in Versalien ohne Umlaut (BB-L2) und einige kl
 | Hinweiszeilen, „Stärke"-Vorsatz in den Karten | Nacht 6,31 : 1, Dunkel 8,17, Standard 5,92, Feld 14,18 |
 | Zeilenknöpfe mit Icons | Schrift Nacht 11,61 : 1, Rahmen 3,41 : 1, Icon in Schriftfarbe (`currentColor`), 44 px hoch (Feld 53,75 px); beim Vorbereiten gesperrt mit gestricheltem Rahmen statt Ausblenden, „wird vorbereitet …" steht in der Zeile |
 | Rollen, Schriftgröße | in keinem Modus und Viewport waagerechtes Rollen (Dialog 356 bzw. 1022 px, Tabelle 308 bzw. 974 px ohne Überlauf), kein Text unter 12 px |
-| Dialog-Hintergrund in Nacht | Schleier `rgba(0,0,0,0,45)` in allen Modi; Nacht mit Register: Luma-Mittel 23,6 (390 px) bzw. 15,1 (1280 px), höchstens 206; keine helle Fläche hinter dem Dialog |
+| Dialog-Hintergrund in Nacht | Schleier `rgba(0, 0, 0, 0.45)` in allen Modi; Nacht mit Register: Luma-Mittel 23,6 (390 px) bzw. 15,1 (1280 px), höchstens 206; keine helle Fläche hinter dem Dialog |
 | `colorScheme: 'dark'` ohne Wahl | Start in `dunkel-modus`, kein weißer Erstbildschirm |
 
 ## Befunde
