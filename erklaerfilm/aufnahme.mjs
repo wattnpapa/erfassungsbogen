@@ -109,24 +109,53 @@ async function rechteck(locator) {
 }
 
 /**
- * Ein Bild aufnehmen. `ziel` ist das Feld, auf das der Mauszeiger im Film
- * zeigt (vor der Aktion ermittelt, damit es nach dem Scrollen noch stimmt).
+ * Sichtbares Rechteck eines Elements im aktuellen Zustand — oder null, wenn
+ * es fehlt, unsichtbar ist oder von etwas anderem verdeckt wird (Dialog,
+ * Vollbild, neue Seite). Geprüft wird am Mittelpunkt mit elementFromPoint.
+ */
+async function sichtbaresRechteck(locator) {
+  if (!locator || !(await locator.count()) || !(await locator.isVisible().catch(() => false))) return null;
+  const frei = await locator
+    .evaluate((el) => {
+      const r = el.getBoundingClientRect();
+      if (r.width === 0 || r.height === 0 || r.bottom < 0 || r.top > innerHeight) return false;
+      const x = r.left + r.width / 2;
+      const y = Math.min(r.top + r.height / 2, innerHeight - 1);
+      const oben = document.elementFromPoint(x, y);
+      // Ein Label oder Eingabefeld desselben Feldes zählt nicht als Verdeckung.
+      return !!oben && (el === oben || el.contains(oben) || oben.contains(el) || (oben.control && oben.control === el));
+    })
+    .catch(() => false);
+  return frei ? rechteck(locator) : null;
+}
+
+/**
+ * Ein Bild aufnehmen. `ziel` ist das Element, auf das Mauszeiger und gelbe
+ * Markierung im Film zeigen. Es wird im selben Moment gemessen wie das Bild
+ * entsteht — vorher gemessen lag die Markierung daneben, sobald sich die
+ * Seite durch die Eingabe verschob (Vorschlagsliste, Dialog, neue Seite).
  */
 async function aufnehmen(seite, szene, ziel, notiz) {
   await seite.waitForTimeout(450); // Einblendungen (~200 ms) abwarten
+  const r = ziel ? await sichtbaresRechteck(ziel) : null;
   const bild = `${String(++laufnummer).padStart(3, "0")}-${szene}.png`;
   await seite.screenshot({ path: ZIEL + bild });
-  (index[szene] ??= []).push({ bild, ziel, notiz });
-  console.log(`${bild}  ${notiz}`);
+  (index[szene] ??= []).push({ bild, ziel: r, notiz });
+  console.log(`${bild}  ${notiz}${ziel && !r ? "  (Ziel nicht sichtbar, ohne Markierung)" : ""}`);
 }
 
-/** Feld in den sichtbaren Bereich holen, Aktion ausführen, aufnehmen. */
-async function schritt(seite, szene, locator, notiz, aktion) {
+/**
+ * Feld in den sichtbaren Bereich holen, Aktion ausführen, aufnehmen.
+ * `ohneZiel`: bei Klicks, die auf eine andere Seite führen — das Bild zeigt
+ * dann die neue Seite, eine Markierung auf dem alten Knopf wäre irreführend.
+ * `ziel`: anderes Element markieren, etwa das Feld, in das ein angeklickter
+ * Listenvorschlag übernommen wurde (der Vorschlag selbst ist dann weg).
+ */
+async function schritt(seite, szene, locator, notiz, aktion, { ohneZiel = false, ziel = locator } = {}) {
   await locator.evaluate((el) => el.scrollIntoView({ block: "center" }));
   await seite.waitForTimeout(150);
-  const ziel = await rechteck(locator);
   await aktion(locator);
-  await aufnehmen(seite, szene, ziel, notiz);
+  await aufnehmen(seite, szene, ohneZiel ? null : ziel, notiz);
 }
 
 async function tippen(locator, text) {
@@ -162,27 +191,29 @@ try {
 
   // ── Start ─────────────────────────────────────────────────────────────
   await aufnehmen(s, "start", null, "Startseite");
-  await schritt(s, "start", s.getByRole("button", { name: "Neuen Bogen erstellen" }), "Neuen Bogen erstellen", (l) => l.click());
+  const neu = s.getByRole("button", { name: "Neuen Bogen erstellen" });
+  await aufnehmen(s, "start", neu, "Neuen Bogen erstellen");
+  await neu.click();
 
   // ── 1. Einheit ────────────────────────────────────────────────────────
-  const ort = s.getByLabel("Ort der Einheit (Pflicht)");
+  const ort = s.getByLabel("Ort der Einheit (Pflicht)").first(); // .first(): die Vorschlagsliste trägt dasselbe Label
   await schritt(s, "einheit", ort, "Ort tippen: Ulm", (l) => tippen(l, "Ulm"));
-  await schritt(s, "einheit", s.getByRole("option", { name: /^Ulm\s+OULM/ }), "OV Ulm aus dem Verzeichnis", (l) => l.click());
+  await schritt(s, "einheit", s.getByRole("option", { name: /^Ulm\s+OULM/ }), "OV Ulm aus dem Verzeichnis", (l) => l.click(), { ziel: ort });
   const typ = s.getByRole("combobox", { name: "Einheitstyp" });
   await schritt(s, "einheit", typ, "Einheitstyp: Bergungsgruppe", (l) => tippen(l, "Bergung"));
-  await schritt(s, "einheit", s.getByRole("option", { name: /Bergungsgruppe/ }).first(), "Bergungsgruppe wählen", (l) => l.click());
+  await schritt(s, "einheit", s.getByRole("option", { name: /Bergungsgruppe/ }).first(), "Bergungsgruppe wählen", (l) => l.click(), { ziel: typ });
   const rbLv = s.getByRole("button", { name: "Regionalbereich und Landesverband anlegen" });
   if (await rbLv.count()) await schritt(s, "einheit", rbLv, "Regionalbereich und Landesverband", (l) => l.click());
 
   const weiter = () => s.getByRole("button", { name: /^(Weiter|Zur\s+Übersicht)/ });
-  await schritt(s, "einheit", weiter(), "Weiter", (l) => l.click());
+  await schritt(s, "einheit", weiter(), "Weiter", (l) => l.click(), { ohneZiel: true });
 
   // ── 2. Einsatz ────────────────────────────────────────────────────────
   await aufnehmen(s, "einsatz", null, "Zeitraum ist vorbelegt");
   await schritt(s, "einsatz", s.getByLabel("Einsatzort / Auftrag"), "Ort/Auftrag", (l) =>
     tippen(l, "Sturmtief: Gebäudesicherung Albstadt"),
   );
-  await schritt(s, "einsatz", weiter(), "Weiter", (l) => l.click());
+  await schritt(s, "einsatz", weiter(), "Weiter", (l) => l.click(), { ohneZiel: true });
 
   // ── 3. Personal ───────────────────────────────────────────────────────
   await aufnehmen(s, "personal", null, "StAN-Sollplätze stehen schon da");
@@ -193,7 +224,7 @@ try {
   // Person 7 ist Verena Weiß (Reihenfolge der Namensliste).
   await schritt(s, "personal", s.getByLabel("Person 7: Geschlecht"), "Geschlecht W", (l) => l.selectOption({ label: "W" }));
   await schritt(s, "personal", s.getByText(/^Stärke \(abgeleitet\)/), "Stärke rechnet mit", async () => {});
-  await schritt(s, "personal", weiter(), "Weiter", (l) => l.click());
+  await schritt(s, "personal", weiter(), "Weiter", (l) => l.click(), { ohneZiel: true });
 
   // ── 4. Fahrzeuge ──────────────────────────────────────────────────────
   await aufnehmen(s, "fahrzeuge", null, "StAN-Fahrzeuge stehen schon da");
@@ -202,23 +233,23 @@ try {
   await schritt(s, "fahrzeuge", s.getByLabel("Kennwort").first(), "Kennwort Heros", (l) => l.selectOption({ label: "Heros – Heros (THW)" }));
   await schritt(s, "fahrzeuge", s.getByLabel(/^Kennzahlen/).first(), "Kennzahlen 22/51", (l) => l.fill("22/51"));
   await schritt(s, "fahrzeuge", kennzeichen.nth(1), "Kennzeichen Anhänger", (l) => tippen(l, "THW-80126"));
-  await schritt(s, "fahrzeuge", weiter(), "Weiter", (l) => l.click());
+  await schritt(s, "fahrzeuge", weiter(), "Weiter", (l) => l.click(), { ohneZiel: true });
 
   // ── 5. Sofortbedarf ───────────────────────────────────────────────────
   await schritt(s, "sofortbedarf", s.getByLabel("Sofortbedarf erfassen"), "Sofortbedarf anhaken", (l) => l.check());
   await schritt(s, "sofortbedarf", s.getByLabel("Verpflegung (Personen)"), "Verpflegung aus der Stärke", async () => {});
   await schritt(s, "sofortbedarf", s.getByLabel("Diesel (l)"), "Diesel 60 l", (l) => l.fill("60"));
   await schritt(s, "sofortbedarf", s.getByLabel("Ruhezeit erforderlich"), "Ruhezeit", (l) => l.check());
-  await schritt(s, "sofortbedarf", weiter(), "Zur Übersicht", (l) => l.click());
+  await schritt(s, "sofortbedarf", weiter(), "Zur Übersicht", (l) => l.click(), { ohneZiel: true });
 
   // ── 6. Übersicht ──────────────────────────────────────────────────────
   await aufnehmen(s, "uebersicht", null, "Gesamtübersicht");
-  await schritt(s, "uebersicht", s.getByText(/Kraftfahrer/).first(), "Offener Punkt antippen", (l) => l.click());
+  await schritt(s, "uebersicht", s.getByText(/Kraftfahrer/).first(), "Offener Punkt antippen", (l) => l.click(), { ohneZiel: true });
   await schritt(s, "uebersicht", s.getByLabel("Alle Angaben (Karten)"), "Karten-Ansicht", (l) => l.check());
   // Person 3 (Kai Hartmann) fährt den GKW.
   await schritt(s, "uebersicht", s.getByLabel("Fahrerlaubnis").nth(2), "Fahrerlaubnis CE", (l) => l.selectOption({ label: "CE" }));
-  await schritt(s, "uebersicht", s.getByRole("button", { name: /^6\. Übersicht/ }), "Zurück zur Übersicht", (l) => l.click());
-  await aufnehmen(s, "uebersicht", await rechteck(s.getByText(/^Stärke \d/).first()), "Bogen vollständig");
+  await schritt(s, "uebersicht", s.getByRole("button", { name: /^6\. Übersicht/ }), "Zurück zur Übersicht", (l) => l.click(), { ohneZiel: true });
+  await aufnehmen(s, "uebersicht", s.getByText(/^Stärke \d/).first(), "Bogen vollständig");
   await schritt(s, "uebersicht", s.getByRole("button", { name: "Vorschau anzeigen" }), "PDF-Vorschau", (l) => l.click());
   await s.waitForTimeout(2500);
   await s.getByRole("heading", { name: "PDF-Vorschau" }).evaluate((el) => el.scrollIntoView({ block: "start" }));
@@ -277,7 +308,7 @@ try {
     await leiste.waitFor();
     await leiste.evaluate((el) => el.scrollIntoView({ block: "start" }));
     await seite.mouse.wheel(0, -60);
-    await aufnehmen(seite, szene, await rechteck(leiste), `Sammlung mit ${boegen.length} Einheiten`);
+    await aufnehmen(seite, szene, leiste, `Sammlung mit ${boegen.length} Einheiten`);
     await meldekopf.close();
   }
   await browser.close();
