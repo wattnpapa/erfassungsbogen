@@ -9,6 +9,8 @@
 > Runde 5 (06.10.2026, nach der Behebung von Runde 4): [runde-5/README.md](runde-5/README.md).
 >
 > Runde 6 (23.10.2026, nach der Behebung von Runde 5): [runde-6/README.md](runde-6/README.md).
+>
+> Schwerpunkt Beispielbögen (08.11.2026, außerhalb der Rundenzählung, Live-Seite Stand `0dd56d4`): [beispielboegen/README.md](beispielboegen/README.md).
 
 ## Verlauf
 
