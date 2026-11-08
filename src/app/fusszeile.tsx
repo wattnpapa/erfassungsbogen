@@ -1270,32 +1270,60 @@ export function Fusszeile({ onBogenOeffnen, kompakt = false }: {
             den kompletten Bogen und öffnet ihn beim Antippen in der App.
           </p>
         </details>
+        {/* Pfadleiste: ein echter Zurück-Knopf plus der klickbare Pfad. Vorher
+            stand „← Zurück" als Link lose neben dem fetten Ordnernamen, und
+            zwei Ebenen höher kam man nur über zweimal Zurück. */}
         {beispielPfad.length > 0 && (
-          <p>
-            <button type="button" className="link" onClick={() => setBeispielPfad(beispielPfad.slice(0, -1))}>
-              ← Zurück
-            </button>
-            {"  "}
-            <strong>{beispielPfad.map(ordnerLabel).join(" › ")}</strong>
-          </p>
+          <nav className="beispiel-pfad" aria-label="Ordner">
+            <button type="button" onClick={() => setBeispielPfad(beispielPfad.slice(0, -1))}>‹ Zurück</button>
+            <ol>
+              <li>
+                <button type="button" className="link" onClick={() => setBeispielPfad([])}>Alle</button>
+              </li>
+              {beispielPfad.map((seg, i) => (
+                <li key={`${i}/${seg}`}>
+                  {i === beispielPfad.length - 1 ? (
+                    <strong aria-current="location">{ordnerLabel(seg)}</strong>
+                  ) : (
+                    <button type="button" className="link" onClick={() => setBeispielPfad(beispielPfad.slice(0, i + 1))}>
+                      {ordnerLabel(seg)}
+                    </button>
+                  )}
+                </li>
+              ))}
+            </ol>
+          </nav>
         )}
-        {beispielPfad.length === 0 && <p><strong>Organisation oder Thema wählen:</strong></p>}
+        {/* Ordner als Register: jede Zeile ganz antippbar, Name links, Bogenzahl
+            rechts in der Datenschrift. Vorher eine Aufzählung unterstrichener
+            Links mit der Zahl in Klammern. */}
         {beispielOrdner.length > 0 && (
-          <ul className="beispiel-liste">
+          <ul className="beispiel-register" aria-label={beispielPfad.length === 0 ? "Organisation oder Thema" : "Unterordner"}>
             {beispielOrdner.map(({ ordner, anzahl }) => (
               <li key={`d/${ordner}`}>
-                <button type="button" className="link" onClick={() => setBeispielPfad([...beispielPfad, ordner])}>
-                  {ordnerLabel(ordner)} ({anzahl} {anzahl === 1 ? "Bogen" : "Bögen"})
+                <button type="button" onClick={() => setBeispielPfad([...beispielPfad, ordner])}>
+                  <span className="beispiel-register-name">{ordnerLabel(ordner)}</span>
+                  <span className="beispiel-register-zahl">
+                    {anzahl.toLocaleString("de-DE")} {anzahl === 1 ? "Bogen" : "Bögen"}
+                  </span>
                 </button>
               </li>
             ))}
           </ul>
         )}
-        {/* Ladefortschritt sichtbar machen: ein Ordner mit 45 Bögen braucht einen
-            Moment, und eine Tabelle mit „—" sieht sonst aus wie „keine Daten". */}
-        {beispielLaedt && beispielBoegen.length > 0 && (
-          <p className="hinweis" role="status">
-            Angaben werden geladen … ({beispielGeladen} von {beispielBoegen.length} Bögen)
+        {/* Bogenzahl über der Tabelle, der Ladestand gleich dahinter: ein Ordner
+            mit 45 Bögen braucht einen Moment, und eine Tabelle mit „—" sieht
+            sonst aus wie „keine Daten". */}
+        {beispielBoegen.length > 0 && (
+          <p className="beispiel-zaehler">
+            <strong>
+              {beispielBoegen.length.toLocaleString("de-DE")} {beispielBoegen.length === 1 ? "Bogen" : "Bögen"}
+            </strong>
+            {beispielLaedt && (
+              <span className="hinweis" role="status">
+                Angaben werden geladen … {beispielGeladen} von {beispielBoegen.length}
+              </span>
+            )}
           </p>
         )}
         {beispielBoegen.length > 0 && (

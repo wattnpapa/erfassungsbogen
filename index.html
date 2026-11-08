@@ -1935,7 +1935,7 @@
     }
     .vollstaendigkeit-titel { margin: 0 0 0.3rem; font-weight: 600; }
     /* Eigener Marker mit hängendem Einzug: der Standard-Marker sitzt bei
-       umbrechenden Button-Kindern sonst auf der letzten Zeile (wie .beispiel-liste). */
+       umbrechenden Button-Kindern sonst auf der letzten Zeile. */
     .vollstaendigkeit ul { margin: 0; padding-left: 1.2rem; list-style: none; }
     .vollstaendigkeit li { margin: 0.15rem 0; position: relative; }
     .vollstaendigkeit li::before { content: "•"; position: absolute; left: -0.9em; }
@@ -3270,15 +3270,51 @@
       padding-block: calc((var(--ziel-basis) + var(--ziel) - 1.3em) / 2);
       margin-block: calc(0.28rem + 0.5 * var(--ziel) - (var(--ziel-basis) + var(--ziel) - 1.3em) / 2);
     }
-    /* Beispiel-Liste: eigener Aufzählungspunkt mit hängendem Einzug, damit
-       lange Namen (Button-Links) sauber links umbrechen und der Punkt an der
-       ersten Zeile bleibt. Der Standard-Marker sitzt bei umbrechenden
-       Button-Kindern sonst auf der letzten Zeile. */
-    .beispiel-liste { list-style: none; padding-left: 1.4em; }
-    .beispiel-liste li { position: relative; }
-    .beispiel-liste li::before {
-      content: "•"; position: absolute; left: -1.1em; color: currentColor;
+    /* Beispielbögen-Dialog. Die Erklärung steht zugeklappt und leise oben
+       (R8-M5: die Liste kommt zuerst), darunter Pfad, Register und Tabelle. */
+    .beispiele-erklaerung { margin: 0 0 var(--r-4); font-size: var(--t-s); color: var(--text-2); }
+    .beispiele-erklaerung > summary {
+      cursor: pointer; font-weight: 600; color: var(--akzent-hell);
+      min-height: calc(var(--ziel-basis) + var(--ziel)); display: flex; align-items: center;
     }
+    .beispiele-erklaerung > p { margin: var(--r-1) 0 0; max-width: 62ch; }
+    /* Pfadleiste: Zurück-Knopf und der klickbare Pfad in einer Zeile. */
+    .beispiel-pfad { display: flex; align-items: center; flex-wrap: wrap; gap: var(--r-2) var(--r-3); margin: 0 0 var(--r-4); }
+    .beispiel-pfad ol { display: flex; flex-wrap: wrap; align-items: center; margin: 0; padding: 0; list-style: none; font-size: var(--t-s); }
+    .beispiel-pfad li { display: flex; align-items: center; }
+    .beispiel-pfad li + li::before { content: "›"; color: var(--text-3); padding-inline: 0.45em; }
+    .beispiel-pfad li > button.link { min-height: calc(var(--ziel-basis) + var(--ziel)); }
+    /* Register: Ordner wie im Aktenverzeichnis — Zeilen auf einer Linie, die
+       ganze Zeile ist das Tippziel, die Zahl steht dicktengleich rechts. Der
+       Reiter in der Kennfarbe links zeigt nur, wohin der Finger/die Maus
+       gerade zeigt; sonst bleibt das Register schwarz-weiß. Zweispaltig, sobald
+       der Dialog Platz hat (Container-Breite des Dialogs, nicht des Fensters). */
+    .beispiel-register {
+      list-style: none; margin: 0 0 var(--r-5); padding: 0;
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 19rem), 1fr));
+      column-gap: var(--r-5); border-top: var(--strich) solid var(--linie);
+    }
+    .beispiel-register li { border-bottom: var(--strich) solid var(--linie); }
+    .beispiel-register button {
+      display: flex; width: 100%; justify-content: flex-start; align-items: baseline; gap: var(--r-3);
+      min-height: calc(var(--ziel-basis) + var(--ziel) + 0.5rem);
+      padding: var(--r-2) var(--r-2) var(--r-2) var(--r-3);
+      border: none; border-left: 3px solid transparent; background: transparent;
+      font-size: var(--t-m); font-weight: 600; text-align: left; color: var(--text);
+    }
+    .beispiel-register button::after { content: "›"; color: var(--text-3); font-weight: 400; }
+    @media (hover: hover) {
+      .beispiel-register button:hover { background: var(--flaeche-2); border-left-color: var(--akzent); color: var(--text); }
+    }
+    .beispiel-register button:focus-visible { border-left-color: var(--akzent); outline-offset: -2px; }
+    .beispiel-register-name { flex: 1 1 auto; min-width: 0; overflow-wrap: anywhere; }
+    .beispiel-register-zahl {
+      flex: 0 0 auto; font-family: var(--schrift-daten); font-size: var(--t-s); font-weight: 400;
+      color: var(--text-2); font-variant-numeric: tabular-nums;
+    }
+    /* Zahl der Bögen im offenen Ordner, Ladestand dahinter. */
+    .beispiel-zaehler { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--r-1) var(--r-3); margin: 0 0 var(--r-2); }
+    .beispiel-zaehler .hinweis { margin: 0; }
     /* Beispielbögen-Tabelle: taktisches Zeichen + Einheit, darunter jeweils die
        leisen Zusatzzeilen (Träger, Ebene, Fahrzeuge) — eine Zeile je Bogen mit
        den Aktionen rechts. */
@@ -3287,7 +3323,12 @@
     .beispiel-einheit { display: flex; align-items: center; gap: 0.5rem; }
     .beispiel-einheit > img { height: 1.9rem; width: auto; flex: 0 0 auto; }
     .beispiel-einheit > span { min-width: 0; }
-    .beispiel-aktionen { display: flex; flex-wrap: wrap; gap: 0.4rem; white-space: nowrap; }
+    /* Nicht umbrechen: drei Knöpfe auf zwei Zeilen machten jede Zeile doppelt
+       so hoch. Die Spalte nimmt nur, was die Knöpfe brauchen (width: 1 %);
+       den Rest bekommen Einheit und Herkunft. Reicht der Platz nicht, rollt
+       die Tabelle seitlich (.tabellen-scroll) bzw. wird unter 34rem zur Karte. */
+    .beispiel-aktionen { display: flex; flex-wrap: nowrap; gap: 0.4rem; white-space: nowrap; }
+    table.uebersicht.beispiele td:last-child, table.uebersicht.beispiele th:last-child { width: 1%; }
     /* Zeilen-Aktionen: echte Knöpfe, aber schmaler als die Seitenaktionen —
        zwei davon müssen in eine Tabellenzelle passen. Die Höhe bleibt beim
        Touch-Ziel (var(--ziel)), die Breite spart nur das Innenmaß. */
@@ -3311,7 +3352,8 @@
       }
       table.uebersicht.beispiele td { border: none; padding: 0.15rem 0; }
       table.uebersicht.beispiele td.zahl::before { content: "Stärke "; color: var(--text-2); }
-      .beispiel-aktionen { gap: 1.2rem; padding-top: 0.3rem; }
+      .beispiel-aktionen { flex-wrap: wrap; gap: 1.2rem; padding-top: 0.3rem; }
+      table.uebersicht.beispiele td:last-child { width: auto; }
     }
     /* Teil-Quittung: Kästchenzeile des mehrteiligen QR-Transports (siehe
        teil-quittung.tsx). Ein gefülltes Kästchen sagt auf einem amtlichen Bogen
@@ -5343,9 +5385,6 @@
     html.schrift-gross dialog > .kopfzeile:first-child > button { font-size: min(var(--t-m), 18px); padding-inline: min(1.1rem, 16px); }
     dialog > .kopfzeile:first-child > button { flex: 0 0 auto; min-height: calc(44px + var(--ziel)); }
     dialog button.link { min-height: calc(44px + var(--ziel)); }
-    .beispiel-liste li > button.link { display: flex; align-items: center; justify-content: flex-start; width: 100%; text-align: left; }
-    details.beispiele-erklaerung { margin: var(--r-2) 0; }
-    details.beispiele-erklaerung > summary { cursor: pointer; min-height: calc(44px + var(--ziel)); display: flex; align-items: center; color: var(--akzent); font-weight: 600; }
     /* R8-M7: Die Kurz-Liste der Personen am Telefon trug die Feldnamen nur im aria-label; sobald ein Wert drinsteht, erkannte man
        Vorname und Nachname nur an der Reihenfolge. Jetzt steht über jedem Feld seine Beschriftung (nur sichtbar, der Name bleibt im
        aria-label). Das Rollenfeld bekommt vier von sechs Spalten („Führer/in" wurde bei 200 % zu „Führer/ir" abgeschnitten), das
