@@ -85,10 +85,10 @@ Neu erzeugen mit: `npm run beispiele:ausbildung` (deterministisch).
 
 | Datei | Einheit | Organisation | Stärke | Fz | Erfassung |
 |---|---|---|---|---|---|
-| 01-2-einsatzzug-zugtrupp | 2. Einsatzzug Landeshauptstadt Hannover | JUH Hannover-Wasserturm | 1/1/2/4 | 2 | nur Stärke |
-| 02-2-einsatzzug-1-sanitaetsgruppe | 2. Einsatzzug Landeshauptstadt Hannover | JUH Hannover-Wasserturm | 0/1/7/8 | 2 | nur Stärke |
-| 03-2-einsatzzug-2-sanitaetsgruppe | 2. Einsatzzug Landeshauptstadt Hannover | JUH Hannover-Wasserturm | 0/1/8/9 | 2 | nur Stärke |
-| 04-2-einsatzzug-betreuungsgruppe | 2. Einsatzzug Landeshauptstadt Hannover | JUH Hannover-Wasserturm | 0/1/5/6 | 2 | nur Stärke |
+| 01-2-einsatzzug-zugtrupp | 2. Einsatzzug Landeshauptstadt Hannover – Zugtrupp | JUH Hannover-Wasserturm | 1/1/2/4 | 2 | nur Stärke |
+| 02-2-einsatzzug-1-sanitaetsgruppe | 2. Einsatzzug Landeshauptstadt Hannover – 1. Sanitätsgruppe | JUH Hannover-Wasserturm | 0/1/7/8 | 2 | nur Stärke |
+| 03-2-einsatzzug-2-sanitaetsgruppe | 2. Einsatzzug Landeshauptstadt Hannover – 2. Sanitätsgruppe | JUH Hannover-Wasserturm | 0/1/8/9 | 2 | nur Stärke |
+| 04-2-einsatzzug-betreuungsgruppe | 2. Einsatzzug Landeshauptstadt Hannover – Betreuungsgruppe | JUH Hannover-Wasserturm | 0/1/5/6 | 2 | nur Stärke |
 | 05-3-einsatzzug | 3. Einsatzzug Landeshauptstadt Hannover | JUH Hannover-Wasserturm | 1/4/23/28 | 7 | nur Stärke |
 | 06-1-fuehrungsgruppe | 1. Führungsgruppe Landeshauptstadt Hannover | JUH Hannover-Wasserturm | 4/3/2/9 | 4 | nur Stärke |
 | 07-2-fuehrungsgruppe | 2. Führungsgruppe Landeshauptstadt Hannover | MHD Hannover | 4/3/2/9 | 3 | nur Stärke |

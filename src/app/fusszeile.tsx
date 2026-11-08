@@ -187,6 +187,18 @@ function boegenHier(pfad: string[]): BeispielEintrag[] {
 // zwischen den Ordnern (oder für PDF/Ansehen) wird nicht erneut geladen.
 const BOGEN_CACHE = new Map<string, Erfassungsbogen>();
 
+/**
+ * Bögen der THW-Ortsverbände (examples/thw/ortsverbaende/, Dateinamen „ov-…"):
+ * Die App lädt sie nie vorab (scripts/precache-aufteilung.ts, istNurAufAbruf).
+ * Ohne Netz darf die Meldung deshalb kein Nachladen versprechen (Prüfrunde
+ * Beispielbögen, BB-S1, BB-O1, BB-H3).
+ */
+const istOvBogen = (url: string): boolean => /\/ov-[^/]+\.json$/.test(url);
+const OV_OFFLINE_TEXT =
+  "Die Bögen der THW-Ortsverbände lädt die App nicht vorab: Ein Bogen braucht beim ersten Öffnen Netz und bleibt danach auf dem Gerät.";
+const OV_ORDNER = ["thw", "ortsverbaende"];
+const imOvOrdner = (pfad: string[]): boolean => OV_ORDNER.every((seg, i) => pfad[i] === seg);
+
 /** Beispielbogen-JSON laden (gecacht) und auf das aktuelle Schema heben. */
 async function beispielBogen(url: string): Promise<Erfassungsbogen> {
   const bekannt = BOGEN_CACHE.get(url);
@@ -198,7 +210,9 @@ async function beispielBogen(url: string): Promise<Erfassungsbogen> {
     // Beispielbögen sind die zweite Stufe des Offline-Vorrats (R3-O3): ohne
     // Netz fehlen sie, bis die Startseite sie nachgeladen hat.
     throw new Error(
-      "Dieser Beispielbogen liegt noch nicht auf dem Gerät — Beispielbögen werden nach dem ersten Laden mit Netz nachgeladen (siehe Offline-Zeile der Startseite).",
+      istOvBogen(url)
+        ? `Dieser Bogen liegt noch nicht auf dem Gerät. ${OV_OFFLINE_TEXT}`
+        : "Dieser Beispielbogen liegt noch nicht auf dem Gerät — Beispielbögen werden nach dem ersten Laden mit Netz nachgeladen (siehe Offline-Zeile der Startseite).",
     );
   }
   const bogen = migriereBogen((await antwort.json()) as Erfassungsbogen);
@@ -218,11 +232,13 @@ async function beispielKopie(url: string): Promise<Erfassungsbogen> {
  * Beispielbogen laden und daraus die PDF im aktuellen Layout erzeugen —
  * Download (Web) bzw. Share-Sheet (App) übernimmt pdfErzeugen.
  */
-async function beispielPdf(datei: string, url: string): Promise<void> {
+async function beispielPdf(datei: string, url: string, abgebrochen: () => boolean = () => false): Promise<void> {
   // Dynamisch: pdfmake samt eingebetteter Schriften bleibt aus dem
   // Start-Bundle heraus und wird erst beim ersten PDF geladen.
   const { pdfErzeugen } = await import("./pdf");
-  await pdfErzeugen(await beispielKopie(url), `${datei}.pdf`);
+  const bogen = await beispielKopie(url);
+  if (abgebrochen()) return;
+  await pdfErzeugen(bogen, `${datei}.pdf`, null, abgebrochen);
 }
 
 /**
@@ -480,13 +496,18 @@ export function beispielboegenOeffnen(): void {
   window.dispatchEvent(new Event(BEISPIELE_OEFFNEN));
 }
 
-export function Fusszeile({ onBogenOeffnen, kompakt = false }: {
+export function Fusszeile({ onBogenOeffnen, onAlsUebung, kompakt = false }: {
   /**
    * Beispielbogen in der App öffnen — wie ein frisch gescannter Bogen.
    * Rückgabe false = die Übernahme wurde abgelehnt (Rückfrage abgebrochen);
    * dann bleibt der Dialog stehen.
    */
   onBogenOeffnen: (bogen: Erfassungsbogen) => Promise<boolean>;
+  /**
+   * Alle Bögen des offenen Beispiel-Ordners in eine neue Übungs-Sammlung legen
+   * (Prüfrunde Beispielbögen, BB-K1). Ohne Angabe fehlt der Knopf.
+   */
+  onAlsUebung?: (boegen: Erfassungsbogen[], ordnerName: string) => Promise<boolean>;
   /**
    * Schmale Linkzeile statt voller Fußzeile — für den Assistenten. Beim
    * Ausfüllen gehören Datensicherung, „Alle Daten löschen" und 227
@@ -520,6 +541,14 @@ export function Fusszeile({ onBogenOeffnen, kompakt = false }: {
   // geleerten Cache dauerhaft leer stehen bleiben, ohne dass etwas nachlädt.
   const [beispieleOffen, setBeispieleOffen] = useState(false);
   const [beispielDaten, setBeispielDaten] = useState<Record<string, Erfassungsbogen>>({});
+  // Prüfrunde Beispielbögen (BB-E1): Jedes Schließen des Dialogs (Escape,
+  // Zurück-Geste, „Schließen") zählt hoch. Ein „Anzeigen" oder „PDF", das
+  // davor begann, prüft vor dem Öffnen bzw. Herunterladen, ob der Dialog noch
+  // derselbe ist — sonst öffnete der Bogen Sekunden später mitten in der
+  // eigenen Arbeit.
+  const beispielSitzung = useRef(0);
+  // Der Baustein mit den Ordnern der Ortsverbände ließ sich nicht laden (ohne Netz).
+  const [ovFehlt, setOvFehlt] = useState(false);
   const [beispielLaedt, setBeispielLaedt] = useState(false);
   const sicherung = useRef<HTMLDialogElement>(null);
   const [sicherungFehler, setSicherungFehler] = useState("");
@@ -582,14 +611,23 @@ export function Fusszeile({ onBogenOeffnen, kompakt = false }: {
   useEffect(() => {
     if (!beispieleOffen) return;
     let aktiv = true;
-    ovBeispieleLaden().then(
-      () => aktiv && setOvBeispieleStand((n) => n + 1),
-      () => {
-        /* ohne Netz und ohne Vorrat fehlt nur dieser Ordner */
-      },
-    );
+    // Ohne Netz fehlt nur dieser Ordner. Der Dialog sagt es und versucht es
+    // erneut, sobald das Netz zurück ist — vorher erst nach dem Neuladen
+    // (Prüfrunde Beispielbögen, BB-E3).
+    const laden = () =>
+      ovBeispieleLaden().then(
+        () => {
+          if (!aktiv) return;
+          setOvFehlt(false);
+          setOvBeispieleStand((n) => n + 1);
+        },
+        () => aktiv && setOvFehlt(true),
+      );
+    void laden();
+    window.addEventListener("online", laden);
     return () => {
       aktiv = false;
+      window.removeEventListener("online", laden);
     };
   }, [beispieleOffen]);
   useEffect(() => {
@@ -627,7 +665,9 @@ export function Fusszeile({ onBogenOeffnen, kompakt = false }: {
       setBeispielLaedt(false);
       if (geladen.some((ok) => !ok)) {
         setBeispielFehler(
-          "Einige Beispielbögen liegen noch nicht auf dem Gerät — sie werden mit Netz nachgeladen (siehe Offline-Zeile der Startseite).",
+          fehlend.some(istOvBogen)
+            ? `Einige Bögen liegen noch nicht auf dem Gerät. ${OV_OFFLINE_TEXT}`
+            : "Einige Beispielbögen liegen noch nicht auf dem Gerät — sie werden mit Netz nachgeladen (siehe Offline-Zeile der Startseite).",
         );
       }
     });
@@ -645,8 +685,9 @@ export function Fusszeile({ onBogenOeffnen, kompakt = false }: {
   async function beispielHolen(datei: string, url: string) {
     setBeispielFehler("");
     setBeispielLaeuft(datei);
+    const sitzung = beispielSitzung.current;
     try {
-      await beispielPdf(datei, url);
+      await beispielPdf(datei, url, () => beispielSitzung.current !== sitzung);
     } catch (err) {
       setBeispielFehler(`PDF konnte nicht erzeugt werden: ${fehlerText(err)}`);
     } finally {
@@ -688,11 +729,31 @@ export function Fusszeile({ onBogenOeffnen, kompakt = false }: {
   async function beispielAnsehen(datei: string, url: string) {
     setBeispielFehler("");
     setBeispielLaeuft(datei);
+    const sitzung = beispielSitzung.current;
     try {
       const bogen = await beispielKopie(url);
+      // Dialog inzwischen geschlossen: nichts mehr öffnen (BB-E1).
+      if (beispielSitzung.current !== sitzung) return;
       if (await onBogenOeffnen(bogen)) beispiele.current?.close();
     } catch (err) {
       setBeispielFehler(`Bogen konnte nicht geladen werden: ${err instanceof Error ? err.message : String(err)}`);
+    } finally {
+      setBeispielLaeuft("");
+    }
+  }
+
+  /** Alle Bögen des offenen Ordners in eine neue Übungs-Sammlung (BB-K1, BB-W4, BB-A1). */
+  async function alleAlsUebung() {
+    if (!onAlsUebung) return;
+    setBeispielFehler("");
+    setBeispielLaeuft("*alle*");
+    const sitzung = beispielSitzung.current;
+    try {
+      const boegen = await Promise.all(boegenHier(beispielPfad).map(({ url }) => beispielKopie(url)));
+      if (beispielSitzung.current !== sitzung) return;
+      if (await onAlsUebung(boegen, beispielPfad.map(ordnerLabel).join(" › "))) beispiele.current?.close();
+    } catch (err) {
+      setBeispielFehler(`Sammlung konnte nicht angelegt werden: ${fehlerText(err)}`);
     } finally {
       setBeispielLaeuft("");
     }
@@ -1255,7 +1316,10 @@ export function Fusszeile({ onBogenOeffnen, kompakt = false }: {
         titel="Beispielbögen"
         dialogRef={beispiele}
         klasse="breit"
-        onSchliessen={() => setBeispieleOffen(false)}
+        onSchliessen={() => {
+          beispielSitzung.current++; // laufendes „Anzeigen"/„PDF" verfällt (BB-E1)
+          setBeispieleOffen(false);
+        }}
       >
         {/* Die Liste steht vorn, die Erklärung klappt auf (R8-M5): vorher gingen 15 Zeilen Text der Liste voran, die
             erst auf dem zweiten Bild begann. */}
@@ -1314,6 +1378,12 @@ export function Fusszeile({ onBogenOeffnen, kompakt = false }: {
             ))}
           </ul>
         )}
+        {ovFehlt && beispielPfad.length <= 1 && (beispielPfad.length === 0 || beispielPfad[0] === "thw") && (
+          <p className="hinweis" role="status">
+            Ohne Netz fehlt unter „THW“ der Ordner „Alle Einheiten aller Ortsverbände“. Er erscheint, sobald das Netz zurück ist.
+          </p>
+        )}
+        {imOvOrdner(beispielPfad) && <p className="hinweis">{OV_OFFLINE_TEXT}</p>}
         {/* Bogenzahl über der Tabelle, der Ladestand gleich dahinter: ein Ordner
             mit 45 Bögen braucht einen Moment, und eine Tabelle mit „—" sieht
             sonst aus wie „keine Daten". */}
@@ -1328,6 +1398,16 @@ export function Fusszeile({ onBogenOeffnen, kompakt = false }: {
               </span>
             )}
           </p>
+        )}
+        {onAlsUebung && beispielBoegen.length > 1 && (
+          <div className="beispiel-sammelweg">
+            <button type="button" disabled={beispielLaeuft !== ""} onClick={() => void alleAlsUebung()}>
+              Alle {beispielBoegen.length.toLocaleString("de-DE")} in eine Übungs-Sammlung
+            </button>
+            <span className="hinweis">
+              Legt eine neue Sammlung der Art „Übung“ mit diesen Bögen an — mit Sammel-PDF, Lageblatt und Weitergabe. Dein offener Bogen bleibt, wie er ist.
+            </span>
+          </div>
         )}
         {beispielBoegen.length > 0 && (
           <div className="tabellen-scroll">

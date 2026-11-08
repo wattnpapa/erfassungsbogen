@@ -242,9 +242,13 @@ Grundlage: Repository `wattnpapa/erfassungsbogen`, Stand 2026-09-12 — Version 
 > 555…). Sie gehören weder zum Kern noch zur Zusatzstufe des Offline-Vorrats
 > (`istNurAufAbruf` in `scripts/precache-aufteilung.ts`): Ein Bogen wird beim
 > ersten Öffnen von der eigenen Herkunft geladen und liegt danach im
-> Laufzeit-Cache `eeb-zusatz`; ohne Netz fehlen nur noch nicht geöffnete Bögen
-> dieses Ordners (Verfügbarkeit 5.5, für den Einsatz unkritisch). Keine neuen
-> Hosts zur Laufzeit, CSP unverändert, kein neuer Speicherschlüssel. Lieferkette
+> eigenen Laufzeit-Cache `eeb-ov-beispiele` (Cache Storage des Browsers,
+> höchstens 4000 Einträge, nur Übungsbögen mit erfundenen Daten; bis
+> 2026-11-08 im gemeinsamen `eeb-zusatz`, wo viele geöffnete OV-Bögen die
+> übrigen Beispiele verdrängten, Prüfrunde Beispielbögen BB-O2); ohne Netz
+> fehlen nur noch nicht geöffnete Bögen dieses Ordners (Verfügbarkeit 5.5, für
+> den Einsatz unkritisch), Startseite und Dialog sagen das. Keine neuen
+> Hosts zur Laufzeit, CSP unverändert, kein neuer `localStorage`-Schlüssel. Lieferkette
 > (6.4): keine neue Abhängigkeit; die Einheitenliste je OV stammt von der
 > inoffiziellen OV-Karte thw.blafusel.de und wird nur beim Erzeugen abgerufen
 > (`npm run beispiele:thw-ov -- --abrufen`), JS-Gesamtumfang 6,45 MB.

@@ -329,6 +329,16 @@ export default defineConfig({
         // ohne Netz aus dem Cache.
         runtimeCaching: [
           {
+            // Bögen der THW-Ortsverbände (nur auf Abruf, istNurAufAbruf): eigener
+            // Cache mit eigener Grenze. Im gemeinsamen `eeb-zusatz` (1500
+            // Einträge) verdrängten ab rund 950 geöffneten OV-Bögen still alle
+            // übrigen Beispielbögen und Fotos (Prüfrunde Beispielbögen, BB-O2).
+            // Muss vor der allgemeinen JSON-Regel stehen: die erste passende gilt.
+            urlPattern: ({ url, sameOrigin }) => sameOrigin && /\/assets\/ov-[^/]+\.json$/.test(url.pathname),
+            handler: "CacheFirst",
+            options: { cacheName: "eeb-ov-beispiele", expiration: { maxEntries: 4000 } },
+          },
+          {
             urlPattern: ({ url, sameOrigin }) => sameOrigin && /\/assets\/[^/]+\.json$/.test(url.pathname),
             handler: "CacheFirst",
             options: { cacheName: "eeb-zusatz", expiration: { maxEntries: 1500 } },

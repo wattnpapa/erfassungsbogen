@@ -80,6 +80,8 @@ export async function pdfErzeugen(
   b: Erfassungsbogen,
   name?: string,
   herkunft?: Uint8Array | null,
+  /** Vor dem Ausgeben gefragt: true = der Aufrufer will die Datei nicht mehr (Beispielbögen, BB-E1). */
+  abgebrochen?: () => boolean,
 ): Promise<{ nichtDarstellbar: number; betroffen: string[]; umschrift: string[]; vereinfacht: string[] }> {
   const qr = await qrErzeugen(b, herkunft);
   const dd = await einzelDokument(b, qr);
@@ -89,6 +91,7 @@ export async function pdfErzeugen(
   const vereinfacht = vereinfachtBetroffene(b);
   const rumpf = dateinameTeil(einheitAnzeigename(b.einheit));
   const dateiname = name ?? ausgabeDateiname("", rumpf, "pdf");
+  if (abgebrochen?.()) return { nichtDarstellbar, betroffen, umschrift, vereinfacht };
   if (istNativ()) {
     // In der App gibt es keinen Browser-Download: PDF übers Share-Sheet anbieten
     const base64 = await pdfMake.createPdf(dd).getBase64();

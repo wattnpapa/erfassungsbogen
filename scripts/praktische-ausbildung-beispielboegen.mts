@@ -598,17 +598,20 @@ function hannover(
   return { ordner: "hannover", datei, bezeichnung, standort, soll, feld, fahrzeuge, einsatz: EINSATZ_HANNOVER };
 }
 
+// Die vier Teile des 2. Einsatzzugs tragen den Teil im Namen: Mit gleichem
+// Einheitstyp legte die Sammlung sie als Folgemeldungen EINER Einheit
+// zusammen (6 statt 27 Helfer, Prüfrunde Beispielbögen BB-W2).
 baeuplaene.push(
-  hannover("01-2-einsatzzug-zugtrupp", `2. Einsatzzug ${LHH}`, JUH_WASSERTURM, [1, 1, 2, 4],
+  hannover("01-2-einsatzzug-zugtrupp", `2. Einsatzzug ${LHH} – Zugtrupp`, JUH_WASSERTURM, [1, 1, 2, 4],
     { fachdienst: "Zugtrupp", leistung: "Führung (Zugführung)", rufname: "Akkon" },
     [hJu("ELW 1"), hJu("PKW gl.")]),
-  hannover("02-2-einsatzzug-1-sanitaetsgruppe", `2. Einsatzzug ${LHH}`, JUH_WASSERTURM, [0, 1, 7, 8],
+  hannover("02-2-einsatzzug-1-sanitaetsgruppe", `2. Einsatzzug ${LHH} – 1. Sanitätsgruppe`, JUH_WASSERTURM, [0, 1, 7, 8],
     { fachdienst: "Sanitätsdienst", leistung: "BHP (15)", rufname: "Akkon", bemerkung: "2x NFS! Taktisches Zeichen mit Ordnungszahl 1." },
     [hJu("GW-San"), hJu("MTW")]),
-  hannover("03-2-einsatzzug-2-sanitaetsgruppe", `2. Einsatzzug ${LHH}`, JUH_WASSERTURM, [0, 1, 8, 9],
+  hannover("03-2-einsatzzug-2-sanitaetsgruppe", `2. Einsatzzug ${LHH} – 2. Sanitätsgruppe`, JUH_WASSERTURM, [0, 1, 8, 9],
     { fachdienst: "Sanitätsdienst", leistung: "BHP (15)", rufname: "Akkon", bemerkung: "2x NFS! Taktisches Zeichen mit Ordnungszahl 2." },
     [hJu("GW-San"), hJu("MTW")]),
-  hannover("04-2-einsatzzug-betreuungsgruppe", `2. Einsatzzug ${LHH}`, JUH_WASSERTURM, [0, 1, 5, 6],
+  hannover("04-2-einsatzzug-betreuungsgruppe", `2. Einsatzzug ${LHH} – Betreuungsgruppe`, JUH_WASSERTURM, [0, 1, 5, 6],
     { fachdienst: "Betreuungsdienst", leistung: "BTP (20)", rufname: "Akkon" },
     [hJu("GW-Betreuung"), hJu("WLF + Ab Betr.")]),
   hannover("05-3-einsatzzug", `3. Einsatzzug ${LHH}`, JUH_WASSERTURM, [1, 4, 23, 28],

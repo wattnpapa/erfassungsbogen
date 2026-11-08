@@ -3295,23 +3295,30 @@
       column-gap: var(--r-5); border-top: var(--strich) solid var(--linie);
     }
     .beispiel-register li { border-bottom: var(--strich) solid var(--linie); }
+    /* Prüfrunde Beispielbögen (BB-M1): Bei großer Schrift oder 320 px bekam der
+       Name neben Zahl und „›" keinen Platz und brach nach jedem Buchstaben um
+       („AS/B", „THW" 0 px breit). Jetzt hat der Name eine Mindestbreite; reicht
+       die Zeile nicht, rutscht die Bogenzahl in die nächste Zeile. */
     .beispiel-register button {
-      display: flex; width: 100%; justify-content: flex-start; align-items: baseline; gap: var(--r-3);
+      display: flex; flex-wrap: wrap; width: 100%; justify-content: flex-start; align-items: baseline; gap: 0 var(--r-3);
       min-height: calc(var(--ziel-basis) + var(--ziel) + 0.5rem);
       padding: var(--r-2) var(--r-2) var(--r-2) var(--r-3);
       border: none; border-left: 3px solid transparent; background: transparent;
       font-size: var(--t-m); font-weight: 600; text-align: left; color: var(--text);
     }
-    .beispiel-register button::after { content: "›"; color: var(--text-3); font-weight: 400; }
+    .beispiel-register-zahl::after { content: " ›"; color: var(--text-3); }
     @media (hover: hover) {
       .beispiel-register button:hover { background: var(--flaeche-2); border-left-color: var(--akzent); color: var(--text); }
     }
     .beispiel-register button:focus-visible { border-left-color: var(--akzent); outline-offset: -2px; }
-    .beispiel-register-name { flex: 1 1 auto; min-width: 0; overflow-wrap: anywhere; }
+    .beispiel-register-name { flex: 1 1 9em; min-width: min(100%, 9em); overflow-wrap: break-word; hyphens: auto; -webkit-hyphens: auto; }
     .beispiel-register-zahl {
-      flex: 0 0 auto; font-family: var(--schrift-daten); font-size: var(--t-s); font-weight: 400;
+      flex: 0 0 auto; margin-left: auto; white-space: nowrap; font-family: var(--schrift-daten); font-size: var(--t-s); font-weight: 400;
       color: var(--text-2); font-variant-numeric: tabular-nums;
     }
+    /* Sammelweg: alle Bögen des Ordners in eine Übungs-Sammlung (BB-K1). */
+    .beispiel-sammelweg { display: flex; flex-wrap: wrap; align-items: center; gap: var(--r-2) var(--r-3); margin: 0 0 var(--r-3); }
+    .beispiel-sammelweg .hinweis { flex: 1 1 18rem; margin: 0; font-size: var(--t-s); }
     /* Zahl der Bögen im offenen Ordner, Ladestand dahinter. */
     .beispiel-zaehler { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--r-1) var(--r-3); margin: 0 0 var(--r-2); }
     .beispiel-zaehler .hinweis { margin: 0; }

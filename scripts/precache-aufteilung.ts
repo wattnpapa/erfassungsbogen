@@ -42,7 +42,9 @@ const KERN_SEITEN = new Set(["index.html", "anleitung.html", "vorlage.html", "da
  * Ortsverbände" (examples/thw/ortsverbaende/, Dateinamen „ov-…"). Zusammen gut
  * 9 MB — das lädt kein Gerät für eine Liste, aus der es ein paar Bögen braucht.
  * Ein Bogen kommt beim ersten Öffnen aus dem Netz und bleibt danach im
- * Laufzeit-Cache (`eeb-zusatz`, CacheFirst, vite.config.ts).
+ * eigenen Laufzeit-Cache (`eeb-ov-beispiele`, CacheFirst, vite.config.ts) —
+ * getrennt von `eeb-zusatz`, damit viele geöffnete OV-Bögen dort nichts
+ * verdrängen (Prüfrunde Beispielbögen, BB-O2).
  */
 export function istNurAufAbruf(url: string): boolean {
   return /^assets\/ov-[^/]+\.json$/.test(url);

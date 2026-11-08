@@ -1461,7 +1461,10 @@ der Service Worker legt sie über zwei Laufzeit-Routen in den Cache
 thw.blafusel.de). Diese Bögen sind eine dritte Klasse **nur auf Abruf**: `istNurAufAbruf` in
 `scripts/precache-aufteilung.ts` nimmt die Dateien `assets/ov-*.json` (zusammen gut 9 MB) aus Kern und
 Zusatzstufe heraus; ein Bogen kommt beim ersten Öffnen aus dem Netz und bleibt dann über die
-`CacheFirst`-Route in `eeb-zusatz`. Ihre Adressliste steht nicht im Glob der Fußzeile, sondern im eigenen
+`CacheFirst`-Route im eigenen Laufzeit-Cache `eeb-ov-beispiele` (höchstens 4000 Einträge; seit 2026-11-08,
+Prüfrunde Beispielbögen BB-O2: im gemeinsamen `eeb-zusatz` mit 1500 Einträgen verdrängten ab rund 950 geöffneten
+OV-Bögen alle übrigen Beispiele und Fotos). Die Offline-Zeile der Startseite nennt die Ausnahme („außer den
+Beispielbögen der THW-Ortsverbände"). Ihre Adressliste steht nicht im Glob der Fußzeile, sondern im eigenen
 Baustein `src/app/beispiele-thw-ov.ts` (rund 0,74 MB, gezippt 84 KB), den der Beispielbögen-Dialog beim
 Öffnen nachlädt; Startbündel unverändert, JS-Gesamtumfang 6,45 MB (`scripts/bundle-budget.json` angehoben).
 Kein neuer Host zur Laufzeit; thw.blafusel.de ruft nur das Generatorskript mit `--abrufen` auf.

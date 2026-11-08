@@ -1378,6 +1378,84 @@ describe("Assistenten-Durchlauf", () => {
     }
   }, 20000);
 
+  /**
+   * Prüfrunde Beispielbögen (BB-D1, BB-W1, BB-E2, BB-H1, BB-N1): Ein zweites
+   * „Anzeigen" schob das unveränderte erste Beispiel auf den einzigen
+   * Rückholplatz und bot an, den eigenen Bogen „endgültig" zu löschen.
+   */
+  it("ersetzt ein unverändertes Beispiel ohne Rückfrage — der eigene Bogen bleibt zurückholbar", async () => {
+    const nutzer = userEvent.setup();
+    const { frage, fetchZurueck } = await beispielAnzeigen(nutzer);
+    try {
+      await nutzer.click(within(frage).getByRole("button", { name: "Beispielbogen öffnen" }));
+      expect(await screen.findByRole("heading", { name: "Gesamtübersicht" })).toBeDefined();
+
+      await nutzer.click(screen.getByRole("button", { name: "‹ Startseite" }));
+      await nutzer.click(screen.getByRole("button", { name: "Beispielbögen ansehen" }));
+      const dialog = await screen.findByRole("dialog", { name: "Beispielbögen" });
+      await nutzer.click(within(dialog).getByRole("button", { name: /^THW/ }));
+      const anzeigen = await within(dialog).findAllByRole("button", { name: "Anzeigen" }, { timeout: 15000 });
+      await nutzer.click(anzeigen[1]!);
+
+      expect(await screen.findByRole("heading", { name: "Gesamtübersicht" })).toBeDefined();
+      expect(screen.queryByRole("dialog", { name: "Beispielbogen öffnen?" })).toBeNull();
+      // Der eigene Bogen liegt weiter auf dem Rückholplatz.
+      expect(screen.getAllByText(/Dein eigener Bogen .*Eigenhausen.* liegt auf der Startseite/).length).toBeGreaterThan(0);
+    } finally {
+      fetchZurueck();
+    }
+  }, 30000);
+
+  /** Prüfrunde Beispielbögen (BB-K1, BB-W4, BB-A1): alle Bögen eines Ordners in eine Übungs-Sammlung. */
+  it("legt alle Bögen eines Beispiel-Ordners in eine neue Übungs-Sammlung", async () => {
+    const bogenJson = JSON.stringify({ ...bogenMitName("Sammelhausen"), uebung: true });
+    const echtesFetch = globalThis.fetch;
+    globalThis.fetch = async () => new Response(bogenJson, { headers: { "content-type": "application/json" } });
+    try {
+      const nutzer = userEvent.setup();
+      render(<App />);
+      await nutzer.click(screen.getByRole("button", { name: "Beispielbögen ansehen" }));
+      const dialog = await screen.findByRole("dialog", { name: "Beispielbögen" });
+      await nutzer.click(within(dialog).getByRole("button", { name: /^THW/ }));
+      await nutzer.click(await within(dialog).findByRole("button", { name: /^Alle .* in eine Übungs-Sammlung$/ }));
+
+      await waitFor(() => expect(einsaetzeLaden().some((x) => x.name === "Übung: THW")).toBe(true), { timeout: 15000 });
+      const sammlung = einsaetzeLaden().find((x) => x.name === "Übung: THW");
+      expect(sammlung?.art).toBe(EinsatzArt.UEBUNG);
+      expect(sammlung?.eintraege.length).toBeGreaterThan(0);
+    } finally {
+      globalThis.fetch = echtesFetch;
+    }
+  }, 30000);
+
+  /** Prüfrunde Beispielbögen (BB-E1): Schließen während des Ladens bricht „Anzeigen" ab. */
+  it("öffnet keinen Beispielbogen mehr, wenn der Dialog während des Ladens geschlossen wurde", async () => {
+    const bogenJson = JSON.stringify({ ...bogenMitName("Spaethausen"), uebung: true });
+    const echtesFetch = globalThis.fetch;
+    const wartend: (() => void)[] = [];
+    globalThis.fetch = () =>
+      new Promise<Response>((fertig) => wartend.push(() => fertig(new Response(bogenJson, { headers: { "content-type": "application/json" } }))));
+    try {
+      const nutzer = userEvent.setup();
+      render(<App />);
+      await nutzer.click(screen.getByRole("button", { name: "Beispielbögen ansehen" }));
+      const dialog = await screen.findByRole("dialog", { name: "Beispielbögen" });
+      await nutzer.click(within(dialog).getByRole("button", { name: /^ASB/ }));
+      const anzeigen = await within(dialog).findAllByRole("button", { name: "Anzeigen" });
+      await nutzer.click(anzeigen[0]!);
+      await nutzer.click(within(dialog).getByRole("button", { name: "Schließen" }));
+      expect(dialog.hasAttribute("open")).toBe(false);
+
+      for (const f of wartend.splice(0)) f();
+      await new Promise((r) => setTimeout(r, 50));
+
+      expect(screen.queryByRole("heading", { name: "Gesamtübersicht" })).toBeNull();
+      expect(screen.queryByRole("dialog", { name: "Beispielbogen öffnen?" })).toBeNull();
+    } finally {
+      globalThis.fetch = echtesFetch;
+    }
+  }, 20000);
+
   const NAHBEREICH = /Gerät in der Nähe|AirDrop|Quick Share/;
 
   it("bietet die Übergabe ans Nachbargerät nicht an, wo es kein Share-Sheet gibt", async () => {

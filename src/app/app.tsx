@@ -1508,6 +1508,13 @@ function AppInhalt() {
   // „gespeichert" ist der Zeitpunkt der letzten ÄNDERUNG des Bogens: Bloßes
   // Öffnen oder ein Schrittwechsel verschob ihn bisher auf „jetzt", und ein
   // drei Tage alter Entwurf stand als „gespeichert 12:36 Uhr" da (R2-O3).
+  // Prüfrunde Beispielbögen (BB-D1, BB-W1, BB-E2, BB-H1, BB-N1): Stand des zuletzt
+  // über „Anzeigen" geöffneten Beispielbogens. Solange der offene Bogen genau so
+  // aussieht, ist er nichts wert: Er wird ohne Rückfrage ersetzt oder geschlossen
+  // und belegt den Rückholplatz nicht, auf dem sonst der eigene Entwurf läge.
+  // Nur im Arbeitsspeicher: Nach dem Neuladen gilt das Beispiel wieder als
+  // gewöhnlicher Bogen (die alte, vorsichtigere Behandlung).
+  const offenesBeispiel = useRef<string | null>(null);
   const bogenGespeichert = useRef<{ bogen: Erfassungsbogen | null; um: number }>({
     bogen: ENTWURF?.bogen ?? null,
     um: ENTWURF?.gespeichert ?? Date.now(),
@@ -1773,6 +1780,8 @@ function AppInhalt() {
    * hätte (dann ist die Erfassung verworfen, siehe `folgenFuerOffenenBogen`).
    */
   function merkeVerdraengt(b: Erfassungsbogen, opt: { tausch?: boolean } = {}): AblageErgebnis {
+    // Unverändertes Beispiel: liegt jederzeit wieder unter „Beispielbögen" bereit.
+    if (beispielUnveraendert(b)) return "uebersprungen";
     const alt = opt.tausch ? null : ersetztenEntwurfLaden();
     // Bearbeitung einer gespeicherten Vorlage (R3-D1): Unverändert ist sie
     // nichts wert — die Vorlage liegt ja gespeichert vor. Verändert darf sie
@@ -1808,6 +1817,11 @@ function AppInhalt() {
    */
   async function ablageVollMelden(b: Erfassungsbogen, was: string): Promise<void> {
     await (await import("./bogen-ablage-voll")).ablageVollMelden(b, was); // nachgeladen: der Fall ist selten
+  }
+
+  /** Steht im offenen Bogen noch genau das über „Anzeigen" geöffnete Beispiel? */
+  function beispielUnveraendert(b: Erfassungsbogen | null = bogen): boolean {
+    return !!b && offenesBeispiel.current !== null && JSON.stringify(b) === offenesBeispiel.current;
   }
 
   /** Steht im offenen Bogen noch genau der gespeicherte Stand der bearbeiteten Vorlage? */
@@ -1950,8 +1964,9 @@ function AppInhalt() {
     // eben abgebrochenen Erfassung, und der eigene Bogen landete mit einem
     // Tipp in der fremden Sammlung (Audit Runde 3, R3-S2). Wege, die wieder
     // für eine Sammlung erfassen, setzen das Ziel danach neu.
-    if (!bogen || !bogenHatInhalt(bogen)) {
-      if (!a.tausch && !(await anderesFensterFreigeben(a))) return false;
+    if (!bogen || !bogenHatInhalt(bogen) || beispielUnveraendert()) {
+      if (!a.tausch && !beispielUnveraendert() && !(await anderesFensterFreigeben(a))) return false;
+      offenesBeispiel.current = null;
       setVorlageInBearbeitung(null);
       setFremdeErfassung(false);
       setSammelZiel(null);
@@ -1997,6 +2012,7 @@ function AppInhalt() {
       await ablageVollMelden(bogen, a.tausch ? "zurückgeholt" : "ersetzt");
       return false;
     }
+    offenesBeispiel.current = null;
     setVorlageInBearbeitung(null);
     setFremdeErfassung(false);
     setSammelZiel(null);
@@ -2173,6 +2189,16 @@ function AppInhalt() {
 
   async function entwurfWegwerfen() {
     if (!bogen) return;
+    if (beispielUnveraendert()) {
+      offenesBeispiel.current = null;
+      setBogen(null);
+      setFremdeErfassung(false);
+      setSammelZiel(null);
+      setzeEmpfang(null);
+      setSchritt(0);
+      setMeldung(["Beispielbogen geschlossen — er liegt weiter unter „Beispielbögen“ bereit.", eigenerBogenWartetHinweis()].filter(Boolean).join(" "));
+      return;
+    }
     // Verworfen heißt nicht verloren: Der Bogen wandert in dieselbe Rückholung
     // wie ein verdrängter (Audit „Zerstörende Handlungen", D7) — wer nach
     // 14 Stunden „Verwerfen" statt „Fortsetzen" trifft, hat ihn morgen wieder.
@@ -2243,13 +2269,68 @@ function AppInhalt() {
     }
     beispielMerken(b); // erfundene Personen und Nummern (R14-E6)
     setBogen(b);
+    offenesBeispiel.current = JSON.stringify(b);
     setzeEmpfang(null); // Beispiel aus der App, kein signierter Transport
     setSchritt(UEBERSICHT);
     setMusterVorlage(null);
     setOffenerEinsatzId(null);
     setZeigeStart(false);
     setFehler("");
-    setMeldung("Beispielbogen geöffnet — fiktive Daten zum Ansehen und Ausprobieren.");
+    setMeldung(
+      ["Beispielbogen geöffnet — fiktive Daten zum Ansehen und Ausprobieren. Solange du nichts änderst, ersetzt das nächste Beispiel ihn ohne Rückfrage.", eigenerBogenWartetHinweis()]
+        .filter(Boolean)
+        .join(" "),
+    );
+    return true;
+  }
+
+  /**
+   * Alle Bögen eines Beispiel-Ordners in eine neue Sammlung der Art „Übung"
+   * legen (Prüfrunde Beispielbögen, BB-K1, BB-W4, BB-A1): Vorher ging jeder
+   * Bogen einzeln über „Anzeigen" → „In Einsatz-Sammlung ablegen…", rund elf
+   * Tipps je Bogen, und ab dem zweiten verdrängte er den eigenen Entwurf. Die
+   * Sammlung bietet danach Sammel-PDF, Lageblatt und CSV wie jede andere; als
+   * „Übung" zählen die Übungsbögen in ihrer Lage mit. Der offene Bogen bleibt
+   * unberührt.
+   */
+  async function beispieleAlsUebung(boegen: Erfassungsbogen[], ordnerName: string): Promise<boolean> {
+    if (boegen.length === 0) return false;
+    let s: Einsatzsammlung;
+    try {
+      s = einsatzAnlegen(`Übung: ${ordnerName}`, EinsatzArt.UEBUNG);
+    } catch (e) {
+      await zeigeHinweis({
+        titel: "Sammlung nicht angelegt",
+        text: istSpeicherVoll(e) ? new SpeicherVollFehler(e).message : fehlerText(e),
+      });
+      return false;
+    }
+    if (!einsaetzeLaden().some((x) => x.id === s.id)) {
+      await zeigeHinweis({ titel: "Sammlung nicht angelegt", text: SAMMLUNG_GESPERRT_TEXT });
+      return false;
+    }
+    let neu = 0;
+    let voll = false;
+    for (const b of boegen) {
+      try {
+        if (meldungAufnehmen(s.id, b, { quelle: "manuell" })?.neu) neu++;
+      } catch (e) {
+        if (istSpeicherVoll(e)) {
+          voll = true;
+          break;
+        }
+        /* sonst: ungültiger Bogen — überspringen */
+      }
+    }
+    einsaetzeNeuLaden();
+    setFehler("");
+    setZeigeStart(false);
+    setOffenerEinsatzId(s.id);
+    setMeldung(
+      voll
+        ? `Übungs-Sammlung „${s.name}" angelegt, aber der Speicher ist voll: ${neu} von ${boegen.length} Bögen aufgenommen.`
+        : `Übungs-Sammlung „${s.name}" mit ${neu} ${neu === 1 ? "Beispielbogen" : "Beispielbögen"} angelegt. Sammel-PDF, Lageblatt und Weitergabe stehen in der Sammlung bereit.`,
+    );
     return true;
   }
 
@@ -4571,7 +4652,7 @@ function AppInhalt() {
       <>
         <Aktualisierungshinweise />
         <Musterung vorlage={musterVorlage} onStart={musterungFertig} onAbbrechen={() => setMusterVorlage(null)} ersetztBogen={!!bogen && bogenHatInhalt(bogen)} />
-        <Fusszeile onBogenOeffnen={oeffneBeispiel} />
+        <Fusszeile onBogenOeffnen={oeffneBeispiel} onAlsUebung={beispieleAlsUebung} />
       </>
     );
   }
@@ -4689,7 +4770,7 @@ function AppInhalt() {
             abbruchText={segmenteOffen ? "Abbrechen" : "Fertig"}
           />
         )}
-        <Fusszeile onBogenOeffnen={oeffneBeispiel} />
+        <Fusszeile onBogenOeffnen={oeffneBeispiel} onAlsUebung={beispieleAlsUebung} />
       </>
     );
   }
@@ -5186,7 +5267,7 @@ function AppInhalt() {
             dasselbe wie im statischen Gerüst von index.html. */}
         {erststart && imWebBrowser() && <StartInhalt />}
       </main>
-      <Fusszeile onBogenOeffnen={oeffneBeispiel} />
+      <Fusszeile onBogenOeffnen={oeffneBeispiel} onAlsUebung={beispieleAlsUebung} />
       </>
     );
   }

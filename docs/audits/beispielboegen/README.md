@@ -72,6 +72,22 @@ Hinweise mit Datenbezug, die über die Priorität hinaus geprüft werden sollten
 OV-Bögen nennen echte Dienststellen-Mailadressen (Arbeitsablauf H3, z. B. eine Poststelle
 eines Landesverbands), das DLRG-Beispiel eine echt wirkende Adresse (Neuer Nutzer H9).
 
-## Stand der Behebung
+## Stand der Behebung (08.11.2026)
 
-Noch offen (08.11.2026).
+Behoben, Nr. 1 bis 6 der Tabelle:
+
+1. Ein unverändertes Beispiel (`offenesBeispiel` in `src/app/app.tsx`) wird ohne Rückfrage ersetzt oder
+   geschlossen und belegt den Rückholplatz nicht; die Meldung nach „Anzeigen" nennt den wartenden eigenen
+   Bogen. Nur im Arbeitsspeicher: nach dem Neuladen gilt das Beispiel wieder als gewöhnlicher Bogen.
+2. Bögen der Ortsverbände in eigenem Laufzeit-Cache `eeb-ov-beispiele` (4000 Einträge); Startseite
+   („außer den Beispielbögen der THW-Ortsverbände"), Ordner und Fehlermeldung sagen, dass sie nur mit Netz
+   kommen; fehlt der Ordner ohne Netz, sagt der Dialog es und lädt ihn bei Netzrückkehr nach.
+3. „Alle … in eine Übungs-Sammlung" im Ordner: neue Sammlung der Art „Übung", Sammel-PDF und Lageblatt
+   dort wie gewohnt.
+4. Register: Name mit Mindestbreite, die Bogenzahl rutscht in die nächste Zeile (gemessen bei 320 px/100 %,
+   360 px/200 %, 390 px/150 % auf der Live-Seite mit eingespieltem CSS).
+5. Schließen des Dialogs bricht laufendes „Anzeigen", „PDF" und den Sammelweg ab (`beispielSitzung`).
+6. Die vier Teile des 2. Einsatzzugs Hannover tragen den Teil im Namen (Generator
+   `scripts/praktische-ausbildung-beispielboegen.mts`).
+
+Tests in `src/app/app.test.tsx` für 1, 3 und 5. Offen: Nr. 7 bis 21.

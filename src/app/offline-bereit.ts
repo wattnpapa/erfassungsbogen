@@ -370,9 +370,12 @@ export function offlineText(s: OfflineZustand): string {
     if (s.zweiStufen && !s.zusatz) {
       return `✓ Bogen, PDF, QR-Code und Empfang gehen offline. Der Rest (Beispielbögen, Themenseiten) wird noch gezählt — ${daten}`;
     }
+    // Prüfrunde Beispielbögen (BB-S1, BB-O1): Die Bögen der THW-Ortsverbände
+    // lädt die App nie vorab (precache-aufteilung.ts, istNurAufAbruf). Die
+    // Zeile nennt die Ausnahme, statt „komplett" ohne Einschränkung zu sagen.
     return s.frischBereit
-      ? `✓ Jetzt offline bereit. Funktioniert komplett offline — ${daten}`
-      : `✓ Funktioniert komplett offline — ${daten}`;
+      ? `✓ Jetzt offline bereit. Funktioniert komplett offline (außer den Beispielbögen der THW-Ortsverbände) — ${daten}`
+      : `✓ Funktioniert komplett offline (außer den Beispielbögen der THW-Ortsverbände) — ${daten}`;
   }
   if (s.stand === "ohne") {
     return `Offline-Vorrat ist in diesem Browser nicht möglich (etwa im Privatmodus) — ohne Netz lässt sich die Seite nicht neu laden. ${Daten}`;
