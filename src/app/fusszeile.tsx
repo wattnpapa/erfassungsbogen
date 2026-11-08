@@ -466,6 +466,17 @@ async function blankoHerunterladen(): Promise<void> {
   });
 }
 
+/**
+ * Den Beispielbögen-Dialog von außerhalb der Fußzeile öffnen — für den
+ * Einstieg auf der Startseite unter „So funktioniert's". Der Dialog selbst
+ * bleibt in der Fußzeile (Zustand, Nachladen, Ordner-Navigation); die
+ * Startseite schickt nur dieses Ereignis.
+ */
+const BEISPIELE_OEFFNEN = "eeb:beispielboegen-oeffnen";
+export function beispielboegenOeffnen(): void {
+  window.dispatchEvent(new Event(BEISPIELE_OEFFNEN));
+}
+
 export function Fusszeile({ onBogenOeffnen, kompakt = false }: {
   /**
    * Beispielbogen in der App öffnen — wie ein frisch gescannter Bogen.
@@ -862,6 +873,24 @@ export function Fusszeile({ onBogenOeffnen, kompakt = false }: {
     }
   }
 
+  function beispieleOeffnen() {
+    setBeispielPfad([]); // beim Öffnen wieder ganz oben starten
+    setBeispielFehler("");
+    setBeispieleOffen(true);
+    if (!beispiele.current?.open) beispiele.current?.showModal();
+  }
+
+  // Einstieg von der Startseite (beispielboegenOeffnen). Die kompakte
+  // Fußzeile rendert den Dialog nicht und hört deshalb auch nicht zu.
+  const beispieleOeffnenAktuell = useRef(beispieleOeffnen);
+  beispieleOeffnenAktuell.current = beispieleOeffnen;
+  useEffect(() => {
+    if (kompakt) return;
+    const auf = () => beispieleOeffnenAktuell.current();
+    window.addEventListener(BEISPIELE_OEFFNEN, auf);
+    return () => window.removeEventListener(BEISPIELE_OEFFNEN, auf);
+  }, [kompakt]);
+
   // Im Assistenten bleibt von der Fußzeile eine Zeile übrig: Pflichtangaben und
   // die Anleitung. Alles Übrige — samt der schweren Beispielbögen-Liste — wird
   // gar nicht erst gerendert, statt nur ausgeblendet zu werden.
@@ -908,15 +937,7 @@ export function Fusszeile({ onBogenOeffnen, kompakt = false }: {
               <button type="button" className="link" onClick={sicherungOeffnen}>Jetzt sichern…</button>
             </p>
           )}
-          <button type="button"
-            className="link"
-            onClick={() => {
-              setBeispielPfad([]); // beim Öffnen wieder ganz oben starten
-              setBeispielFehler("");
-              setBeispieleOffen(true);
-              beispiele.current?.showModal();
-            }}
-          >
+          <button type="button" className="link" onClick={beispieleOeffnen}>
             Beispielbögen
           </button>
           <button type="button" className="link" onClick={() => void geraeteSchluesselNeuErzeugen()}>Geräteschlüssel neu erzeugen</button>

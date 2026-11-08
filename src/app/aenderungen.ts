@@ -47,6 +47,7 @@ export const AENDERUNGEN: readonly Aenderung[] = [
       "Schnellerfassung „Nur Stärke“: Ein anderer Einheitstyp ersetzt die Sollzahlen, solange niemand gezählt hat.",
       "Weitergabe per Link: Braucht der weitergereichte Bogen einen QR-Code mehr als beim Absender, sagt die Übersicht warum (die Gegenzeichnung dieses Geräts reist mit).",
       "Dieser Änderungsverlauf ist über die Versionsnummer in der Fußzeile erreichbar.",
+      "Die Beispielbögen haben einen eigenen Abschnitt auf der Startseite unter „So funktioniert’s“, statt nur als Link in der Fußzeile zu stehen.",
       "Beispielbögen für Übungen: Unter THW › „Alle Einheiten aller Ortsverbände“ steht jede Einheit jedes Ortsverbands als Übungsbogen in StAN-Stärke, gegliedert nach Landesverband, Regionalstelle und Ortsverband (alle Namen erfunden). Ein Bogen wird beim ersten Öffnen geladen.",
     ],
   },

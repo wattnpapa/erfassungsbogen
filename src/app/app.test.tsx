@@ -1334,7 +1334,9 @@ describe("Assistenten-Durchlauf", () => {
     await nutzer.type(screen.getByLabelText("Ort der Einheit (Pflicht)"), "Eigenhausen");
     await nutzer.click(screen.getByRole("button", { name: "‹ Startseite" }));
 
-    await nutzer.click(screen.getByRole("button", { name: "Beispielbögen" }));
+    // Über den Einstieg auf der Startseite unter „So funktioniert's" — der
+    // Fußzeilen-Link öffnet denselben Dialog (fusszeile.test.tsx).
+    await nutzer.click(screen.getByRole("button", { name: "Beispielbögen ansehen" }));
     const dialog = await screen.findByRole("dialog", { name: "Beispielbögen" });
     // Erst den Ordner der eigenen Organisation, dann stehen die Bögen da. Die
     // Angaben je Bogen laden nach — die Frist deckt das mit ab.

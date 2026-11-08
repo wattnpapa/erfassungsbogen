@@ -173,7 +173,7 @@ import { UnlesbarHinweis } from "./unlesbar-hinweis";
 import { AnzeigeLeistenKnopf, AnzeigeSchalter } from "./anzeige-schalter";
 import { orgFarbe, wendeOrgAkzentAn } from "./org-farben";
 import { EinheitZeichen } from "./zeichen-bild";
-import { Fusszeile } from "./fusszeile";
+import { Fusszeile, beispielboegenOeffnen } from "./fusszeile";
 import { Aktualisierungshinweise } from "./aktualisierung";
 import { SpeicherWarnung, istVoll } from "./speicher-warnung";
 import { arbeiten, useArbeitet } from "./arbeitet";
@@ -525,6 +525,25 @@ function SoFunktionierts() {
           <span>Die Gegenstelle scannt den Code und hat sofort alle Daten — samt Stärke-Summen.</span>
         </div>
       </div>
+    </section>
+  );
+}
+
+/**
+ * Einstieg in die Beispielbögen direkt unter „So funktioniert's". Bisher
+ * standen sie nur als Link in der Fußzeile unter „Daten" — zum Ausprobieren
+ * sind sie aber der schnellste Weg, einen fertigen Bogen samt QR-Code zu
+ * sehen. Der Knopf öffnet denselben Dialog wie der Fußzeilen-Link.
+ */
+function BeispielboegenStart() {
+  return (
+    <section className="start-vorlagen start-beispiele" aria-label="Beispielbögen">
+      <h2>Beispielbögen</h2>
+      <p className="hinweis">
+        Ausgefüllte Bögen fiktiver Einheiten zum Ansehen und Ausprobieren, sortiert nach Organisation und
+        Thema. Jeder lässt sich in der App öffnen, als PDF erzeugen oder als Link weitergeben.
+      </p>
+      <button type="button" onClick={beispielboegenOeffnen}>Beispielbögen ansehen</button>
     </section>
   );
 }
@@ -5101,6 +5120,7 @@ function AppInhalt() {
             Aktionen erklären — der USP steckt sonst nur im Untertitel. Mit
             vorhandenen Daten wandert die Erklärung ans Seitenende (unten). */}
         {erststart && <SoFunktionierts />}
+        {erststart && <BeispielboegenStart />}
         {/* Auch anzeigen, wenn NUR der Papierkorb gefüllt ist — sonst wäre eine
             versehentlich gelöschte letzte Vorlage nicht wiederherstellbar. */}
         {(vorlagen.length > 0 || vorlagenPapierkorb().length > 0) && (
@@ -5136,6 +5156,7 @@ function AppInhalt() {
         {/* Mit vorhandenen Daten bleibt die Erklärung erreichbar — am Ende der
             Startseite, über der Fußzeile, statt den Arbeitsbereich zu verdrängen. */}
         {!erststart && <SoFunktionierts />}
+        {!erststart && <BeispielboegenStart />}
         {/* Der erklärende Text ist Web-Inhalt: Er beantwortet „was ist das
             hier?" für den ersten Besuch und trägt die Startseite in den
             Suchmaschinen. Deshalb zwei Bedingungen:
