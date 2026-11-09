@@ -96,7 +96,7 @@ Ohne fremde Hilfe ist die Aufgabe zu schaffen, aber mit Umwegen.
 - **Offen (gemessen, `pdftotext`, 200-dpi-Ausschnitt):** Die Kopfzeile der Einzel-PDF hat sich auch im neuen
   THWin-Raster nicht geändert: „Meldekopf: Nr. ______ · eingegangen ____________ um ____:____ Uhr · übertragen [ ] von
   ______ um ____:____ Uhr“. Der Blanko-Vordruck hat jetzt einen eigenen Kasten im Seiteninhalt über dem Bogen (Rahmen
-  rund 31 mm hoch). Darin stehen „eingegangen **am**“, „Zug / Verband“, „[ ] ÜBUNG (kein Einsatz)“, „abgerückt am … um“,
+  rund 25 mm hoch). Darin stehen „eingegangen **am**“, „Zug / Verband“, „[ ] ÜBUNG (kein Einsatz)“, „abgerückt am … um“,
   „ins Gerät übertragen [ ] von … um“ und „Blatt ____ von ____“. Das Abgleich-Formular fragt je Einheit „Nr. laut Blatt“,
   „**Eingetroffen** am“, „Status: anwesend / abgerückt“, „Zug“ und „Auftrag / Notiz“. Für Status, Zug und Auftrag gibt es
   auf Seite 1 der Einzel-PDF kein Feld, und das Blatt sagt „eingegangen“, das Formular „Eingetroffen“. Neu gemessen ist
