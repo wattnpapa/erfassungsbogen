@@ -37,6 +37,16 @@ vi.mock("./nativ", async () => {
   };
 });
 vi.mock("./pdf-qr", () => ({ qrTexteAusPdfBytes: async () => [] }));
+// Die Landesvorlagen (rund 300 Beispielbögen per Glob) braucht hier niemand; ihr später Import riss in CI-Lauf 458
+// nach dem Testende ab (EnvironmentTeardownError, wie in runde17-layout-app.test.tsx).
+vi.mock("../vokabulare/landesvorlagen", () => ({
+  bereichLabel: (s: string) => s,
+  bundeslandLabel: (s: string) => s,
+  hatLandesvorlagen: () => false,
+  landesvorlagenBundeslaender: () => [],
+  landesvorlagenGruppen: () => [],
+  landesvorlage: () => undefined,
+}));
 
 afterEach(() => {
   cleanup();
