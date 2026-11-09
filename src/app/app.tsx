@@ -2384,7 +2384,9 @@ function AppInhalt() {
       try {
         // Zwei Züge eines OV führen dieselben Einheitstypen: Der Zug macht sie zu
         // eigenen Einheiten (Runde 2, BB2-K1: OV Landshut 11 Bögen → 9 Einheiten).
-        const r = meldungAufnehmen(s.id, b, { quelle: "manuell", einheitSchluesselOverride: zug ? `${einheitSchluessel(b.einheit)}#${zug}` : undefined });
+        // Herkunft „aus Datei übernommen" statt „am Meldekopf von Hand erfasst" (Runde 2, BB2-W1, BB2-K4):
+        // Die Beispiele stammen aus den Beispiel-Dateien der App, niemand hat sie am Meldekopf getippt.
+        const r = meldungAufnehmen(s.id, b, { quelle: "pdf-import", einheitSchluesselOverride: zug ? `${einheitSchluessel(b.einheit)}#${zug}` : undefined });
         if (r?.neu) {
           neu++;
           if (zug) nummerUndZugSetzen(s.id, r.eintrag.id, { zug });
@@ -2404,7 +2406,7 @@ function AppInhalt() {
     setMeldung(
       voll
         ? `Übungs-Sammlung „${s.name}" angelegt, aber der Speicher ist voll: ${neu} von ${eintraege.length} Bögen aufgenommen.`
-        : `Übungs-Sammlung „${s.name}" mit ${neu} ${neu === 1 ? "Beispielbogen" : "Beispielbögen"} angelegt. Sammel-PDF, Lageblatt und Weitergabe stehen in der Sammlung bereit.`,
+        : `Übungs-Sammlung „${s.name}" mit ${neu} ${neu === 1 ? "Beispielbogen" : "Beispielbögen"} angelegt — alle gelten als eingetroffen. Sammel-PDF, Lageblatt und Weitergabe stehen in der Sammlung bereit. Sollen die Teilnehmer sich selbst am Meldekopf melden, die Bögen stattdessen einzeln als PDF oder Link an sie geben.`,
     );
     return true;
   }
@@ -3088,8 +3090,15 @@ function AppInhalt() {
     const wartet = eigenerBogenWartetHinweis();
     const { bogen: geoeffnet, anonymisiert } = bogenNachFrist(b);
     setBogen(geoeffnet);
-    if (anonymisiert) setzeEmpfang(null);
+    // Ein geöffneter ÜBUNGS-Bogen (etwa ein Beispiel, das der Ausbilder per Link
+    // verteilt) ist beim Teilnehmer der Bogen, den er selbst weitergibt: ohne
+    // Gegenzeichnung, also ein QR-Code statt drei Teilen (Runde 2, BB2-W2), und
+    // mit der Namensprüfung beim Abwählen von „Übung“ (BB2-D3, R14-E6). In eine
+    // Sammlung abgelegt behält er seine Signatur (oben, bogenInSammlung).
+    const uebungsbogen = !anonymisiert && geoeffnet.uebung === true;
+    if (anonymisiert || uebungsbogen) setzeEmpfang(null);
     else setzeEmpfang(signatur, payload ?? null);
+    if (uebungsbogen) beispielMerken(geoeffnet);
     setSchritt(UEBERSICHT);
     setZeigeStart(false);
     // Einsatzansicht hat Vorrang vor der Übersicht (siehe Render weiter unten):
@@ -3100,7 +3109,15 @@ function AppInhalt() {
         ? `Nicht in die Sammlung aufgenommen: ${nichtAbgelegt} Der Bogen bleibt hier geöffnet — danach „In Einsatz-Sammlung ablegen…".`
         : "",
     );
-    setMeldung([anonymisiert ? FRIST_ABGELAUFEN_MELDUNG : "", wartet].filter(Boolean).join(" "));
+    setMeldung(
+      [
+        anonymisiert ? FRIST_ABGELAUFEN_MELDUNG : "",
+        uebungsbogen ? "Übungsbogen empfangen: Zum Melden am Meldekopf „Bogen übergeben…“ (QR-Code, PDF oder Link)." : "",
+        wartet,
+      ]
+        .filter(Boolean)
+        .join(" "),
+    );
     return true;
   }
 
@@ -3253,6 +3270,11 @@ function AppInhalt() {
   useEffect(() => {
     if (!START_SOFORT || !START.text) return;
     let aktiv = true;
+    // Übungsbogen per Kaltstart-Link: wie oben ohne Gegenzeichnung (BB2-W2), mit Namensprüfung (BB2-D3).
+    if (START_SOFORT.uebung === true) {
+      beispielMerken(START_SOFORT);
+      return;
+    }
     signaturVonText(START.text).then((s) => aktiv && setzeEmpfang(s, payloadAusText(START.text)));
     return () => {
       aktiv = false;

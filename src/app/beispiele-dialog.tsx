@@ -6,12 +6,11 @@
  */
 
 import { useEffect, useRef, useState, type ReactNode, type RefObject } from "react";
-import { staerke, type Erfassungsbogen } from "@bos/eeb-format/model";
+import { MINUTEN_JE_TAG, staerke, type Erfassungsbogen } from "@bos/eeb-format/model";
 import { istNativ, linkTeilen, shareSheetVerfuegbar } from "./nativ";
 import { fehlerText } from "./nachladen";
 import { bogenVollUrl, einheitAnzeigename, einheitOrt, heuteDatum, migriereBogen, orgLabel, vokabText, vokabularFuer } from "./hilfen";
 import { beispielAufHeute } from "./beispiel-heute";
-import { stempelZeitpunkt } from "./datenschutz-uhr";
 import { EinheitZeichen } from "./zeichen-bild";
 import { zeigeHinweis } from "./dialoge";
 import { FehlerImBild } from "./fehler-im-bild";
@@ -320,9 +319,31 @@ async function beispielBogen(url: string): Promise<Erfassungsbogen> {
         : "Dieser Beispielbogen liegt noch nicht auf dem Gerät — Beispielbögen werden nach dem ersten Laden mit Netz nachgeladen (siehe Offline-Zeile der Startseite).",
     );
   }
+  if (antwort.ok && istOvBogen(url)) ovBogenAblegen(url, antwort.clone());
   const bogen = migriereBogen((await antwort.json()) as Erfassungsbogen);
   BOGEN_CACHE.set(url, bogen);
   return bogen;
+}
+
+/**
+ * OV-Bögen beim allerersten Besuch selbst in den Offline-Speicher legen
+ * (Runde 2, BB2-S6): Solange der Service Worker die Seite noch nicht steuert,
+ * gingen die Abrufe an ihm vorbei — von 9 geöffneten Bögen lagen danach nur 3
+ * auf dem Gerät. Gleicher Cache wie die Laufzeit-Route (vite.config.ts).
+ */
+const OV_CACHE = "eeb-ov-beispiele";
+function ovBogenAblegen(url: string, antwort: Response): void {
+  try {
+    if (typeof caches === "undefined" || navigator.serviceWorker?.controller) return;
+    void caches
+      .open(OV_CACHE)
+      .then((c) => c.put(url, antwort))
+      .catch(() => {
+        /* Speicher voll oder gesperrt: dann eben nur mit Netz */
+      });
+  } catch {
+    /* ohne Cache Storage */
+  }
 }
 
 /**
@@ -331,7 +352,10 @@ async function beispielBogen(url: string): Promise<Erfassungsbogen> {
  */
 async function beispielKopie(url: string): Promise<Erfassungsbogen> {
   // Zeitraum und Stand auf heute (BB-W5): sonst warnte jeder Beispielbogen vor seinem Alter.
-  return beispielAufHeute(structuredClone(await beispielBogen(url)), heuteDatum(), stempelZeitpunkt());
+  // Stand fest je Tag (Mitternacht), nicht die Uhrzeit des Tipps (Runde 2, BB2-A1): Sonst ergaben
+  // dieselbe PDF und derselbe Sammelweg am selben Tag „älterer Stand" bei gleichem Inhalt.
+  const heute = heuteDatum();
+  return beispielAufHeute(structuredClone(await beispielBogen(url)), heute, heute * MINUTEN_JE_TAG);
 }
 
 /**
@@ -458,6 +482,12 @@ export default function BeispieleDialog({ anfrage, onBogenOeffnen, onAlsUebung }
   // Rollhöhe stehen, und der Fokus fiel auf <body>.
   const fokusNachWechsel = useRef(false);
   function pfadSetzen(p: string[]) {
+    // Ein anderer Ordner bricht ein laufendes „Anzeigen"/„PDF"/Sammeln ab (BB2-E1):
+    // Sonst kam der Bogen oder die Datei Sekunden später, im falschen Ordner.
+    if (laeuftAktuell.current) {
+      beispielSitzung.current++;
+      setBeispielLaeuft("");
+    }
     fokusNachWechsel.current = true;
     letzterWechsel.current = performance.now();
     setLadeFehlt("");
@@ -473,12 +503,14 @@ export default function BeispieleDialog({ anfrage, onBogenOeffnen, onAlsUebung }
   }
   // Suchtext, aus dem ein Ordnertreffer geöffnet wurde — für „‹ Zur Suche" (BB2-S7, BB2-H5).
   const [ausSuche, setAusSuche] = useState("");
+  const laeuftAktuell = useRef("");
   const pfadAktuell = useRef(beispielPfad);
   pfadAktuell.current = beispielPfad;
   const sucheAktuell = useRef(beispielSuche);
   sucheAktuell.current = beispielSuche;
   // Dateiname des Bogens, dessen PDF gerade entsteht (leer = keiner läuft).
   const [beispielLaeuft, setBeispielLaeuft] = useState("");
+  laeuftAktuell.current = beispielLaeuft;
   const [beispielFehler, setBeispielFehler] = useState("");
   // Datei, deren Link gerade in der Zwischenablage liegt — die Zeile quittiert
   // das kurz selbst, statt dafür einen Dialog aufzumachen.
@@ -634,19 +666,40 @@ export default function BeispieleDialog({ anfrage, onBogenOeffnen, onAlsUebung }
   useEffect(() => {
     const d = beispiele.current;
     if (!d) return;
-    const abbrechen = (e: Event) => {
+    // Ein Schritt zurück: erst einen laufenden Vorgang abbrechen (Runde 2, BB2-E1),
+    // dann die Suche leeren, dann eine Ebene hoch. false = nichts mehr zu tun, der Dialog darf zugehen.
+    const zurueckSchritt = (): boolean => {
+      if (laeuftAktuell.current) {
+        beispielSitzung.current++;
+        setBeispielLaeuft("");
+        setBeispielQuittung("Abgebrochen.");
+        return true;
+      }
       if (sucheAktuell.current) {
-        e.preventDefault();
         setBeispielSuche("");
-        return;
+        return true;
       }
       const p = pfadAktuell.current;
-      if (p.length === 0) return;
-      e.preventDefault();
+      if (p.length === 0) return false;
       pfadSetzen(p.slice(0, -1));
+      return true;
+    };
+    const abbrechen = (e: Event) => {
+      if (zurueckSchritt()) e.preventDefault();
+    };
+    // Escape schon beim Tastendruck abfangen: Chromium lässt das Abbrechen von
+    // „cancel" nur einmal je Nutzeraktivierung zu; das zweite Escape schloss
+    // sonst den ganzen Dialog (BB2-E5, BB2-S3, BB2-G6).
+    const taste = (e: KeyboardEvent) => {
+      if (e.key !== "Escape" || e.defaultPrevented) return;
+      if (zurueckSchritt()) e.preventDefault();
     };
     d.addEventListener("cancel", abbrechen);
-    return () => d.removeEventListener("cancel", abbrechen);
+    d.addEventListener("keydown", taste);
+    return () => {
+      d.removeEventListener("cancel", abbrechen);
+      d.removeEventListener("keydown", taste);
+    };
   }, []);
 
   // Die Pfadleiste klebt unter der Kopfzeile des Dialogs (BB-G5, BB-M5, BB-H5):
@@ -946,7 +999,8 @@ export default function BeispieleDialog({ anfrage, onBogenOeffnen, onAlsUebung }
         )}
         {ovFehlt && beispielPfad.length <= 1 && (beispielPfad.length === 0 || beispielPfad[0] === "thw") && (
           <p className="hinweis" role="status">
-            Ohne Netz fehlt unter „THW“ der Ordner „Alle Einheiten aller Ortsverbände“. Er erscheint, sobald das Netz zurück ist.
+            Ohne Netz fehlt unter „THW“ der Ordner „Alle Einheiten aller Ortsverbände“. Er erscheint wieder, sobald das Netz
+            zurück ist — sonst die Seite mit Netz einmal neu laden.
           </p>
         )}
         {!suchErgebnis && imOvOrdner(beispielPfad) && <p className="hinweis">{OV_OFFLINE_TEXT}</p>}

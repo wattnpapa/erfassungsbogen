@@ -260,7 +260,10 @@ Grundlage: Repository `wattnpapa/erfassungsbogen`, Stand 2026-09-12 — Version 
 > kein Bogen offen ist, und mit „Alle Daten löschen" (BB2-D2). Der Suchindex
 > der Beispielbögen (`src/app/beispiele-suchindex.json`, rund 190 KB,
 > Einheitstypen und Orte der fiktiven Beispiele) liegt als Datei in der
-> zweiten Stufe des Offline-Vorrats; keine Personendaten, kein neuer Host. Lieferkette
+> zweiten Stufe des Offline-Vorrats; keine Personendaten, kein neuer Host.
+> Ebenfalls seit 2026-11-09: Steuert der Service Worker die Seite noch nicht
+> (allererster Besuch), legt der Beispielbögen-Dialog geöffnete OV-Bögen selbst
+> in den Cache `eeb-ov-beispiele` (nur fiktive Übungsbögen, gleicher Ursprung). Lieferkette
 > (6.4): keine neue Abhängigkeit; die Einheitenliste je OV stammt von der
 > inoffiziellen OV-Karte thw.blafusel.de und wird nur beim Erzeugen abgerufen
 > (`npm run beispiele:thw-ov -- --abrufen`), JS-Gesamtumfang 6,45 MB.

@@ -98,4 +98,22 @@ Behoben, Nr. 1 bis 6:
 
 Mitbehoben: Nr. 11 (der Platzhalter für den OV-Ordner hing an `beispielOrdner.length > 0` und erschien nie).
 Tests: `beispiele-suche.test.ts` (Wortanfänge, Index vollständig), `app.test.tsx` (Neuladen, Sammelweg mit
-Rückfrage, Suchtreffer). Offen: Nr. 7 bis 10, 12 bis 17.
+Rückfrage, Suchtreffer).
+
+Behoben am 09.11.2026, Nr. 7 bis 12:
+
+7. Stand der Beispiele fest je Tag (Mitternacht) statt der Uhrzeit des Tipps; PDF, Link und Sammelweg desselben
+   Tages sind gleich. Offen: Wer am Montag vorbereitet und am Samstag übt, sieht wieder „Stand vor 5 Tagen".
+8. Escape, Zurück-Geste und Ordnerwechsel brechen ein laufendes „Anzeigen"/„PDF"/Sammeln ab; Escape wird schon
+   beim Tastendruck abgefangen, wiederholtes Escape geht Ebene für Ebene (die echte Android-Zurück-Geste bleibt
+   an Chromiums Regel „einmal je Aktivierung" gebunden).
+9. Sammelweg: Herkunft „aus Datei übernommen" statt „am Meldekopf von Hand erfasst"; die Meldung sagt, dass alle
+   als eingetroffen gelten, und nennt den Weg über PDF/Link für eine Ankunftsübung. Name und Zug schon mit Nr. 2/5.
+10. Per Link geöffneter Übungsbogen ohne Gegenzeichnung (ein QR-Code), mit Namensprüfung und Hinweis zum
+    Weitergeben; in eine Sammlung abgelegt behält er die Signatur. Gilt auch für den Kaltstart-Link.
+11. Schon mit Nr. 1 bis 6 behoben (Platzhalter).
+12. OV-Bögen, die vor der Steuerung durch den Service Worker geöffnet werden, legt die Seite selbst in den Cache
+    `eeb-ov-beispiele`. Der Hinweis zum fehlenden OV-Ordner nennt das Neuladen (der Browser holt einen einmal
+    gescheiterten Baustein erst danach erneut).
+
+Offen: Nr. 13 bis 17.

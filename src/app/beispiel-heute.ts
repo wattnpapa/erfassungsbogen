@@ -7,7 +7,8 @@
  * Übungs-Sammlung meldete die App deshalb „Stand vor 50 Tagen", „Zeitraum
  * vorbei" und „Tippfehler im Jahr?" — eine Übung voller Warnungen, die nichts
  * mit der Übung zu tun haben. Beim Weitergeben aus dem Dialog rückt der
- * Zeitraum deshalb mit gleicher Dauer auf heute, der Stand auf jetzt. Ein
+ * Zeitraum deshalb mit gleicher Dauer auf heute, der Stand auf den Tagesbeginn
+ * (fest je Tag, damit PDF, Link und Sammelweg desselben Tages gleich sind). Ein
  * laufender oder künftiger Zeitraum bleibt, wie er ist.
  *
  * Bewusst ohne Vokabular- oder Kern-Importe außer dem Format (Startbündel).

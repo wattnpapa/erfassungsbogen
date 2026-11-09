@@ -1526,6 +1526,32 @@ describe("Assistenten-Durchlauf", () => {
     expect(within(dialog).queryByRole("navigation", { name: "Ordner" })).toBeNull();
   });
 
+  /** Runde 2 (BB2-E5, BB2-S3): Wiederholtes Escape geht Ebene für Ebene hoch und schließt erst ganz oben. */
+  it("geht mit mehrfachem Escape Ebene für Ebene hoch", async () => {
+    const nutzer = userEvent.setup();
+    render(<App />);
+    await nutzer.click(screen.getByRole("button", { name: "Beispielbögen ansehen" }));
+    const dialog = await screen.findByRole("dialog", { name: "Beispielbögen" }, { timeout: 15000 });
+    await nutzer.click(within(dialog).getByRole("button", { name: /^Katastrophenschutz/ }));
+    await new Promise((r) => setTimeout(r, 450)); // Doppeltipp-Sperre
+    await nutzer.click(within(dialog).getByRole("button", { name: /^Niedersachsen/ }));
+    expect(within(dialog).getByText("Niedersachsen", { selector: "[aria-current]" })).toBeDefined();
+
+    const esc = () => {
+      const e = new KeyboardEvent("keydown", { key: "Escape", bubbles: true, cancelable: true });
+      act(() => {
+        dialog.dispatchEvent(e);
+      });
+      return e.defaultPrevented;
+    };
+    expect(esc()).toBe(true);
+    expect(within(dialog).getByText("Katastrophenschutz", { selector: "[aria-current]" })).toBeDefined();
+    expect(esc()).toBe(true);
+    expect(within(dialog).queryByRole("navigation", { name: "Ordner" })).toBeNull();
+    // Ganz oben bleibt Escape dem Browser: Der Dialog darf zugehen.
+    expect(esc()).toBe(false);
+  });
+
   const NAHBEREICH = /Gerät in der Nähe|AirDrop|Quick Share/;
 
   it("bietet die Übergabe ans Nachbargerät nicht an, wo es kein Share-Sheet gibt", async () => {
