@@ -760,6 +760,14 @@ wieder.
 > das Paket läuft ausschließlich beim Bauen, nicht auf Einsatzgeräten.
 > `softprops/action-gh-release` ist in `release.yml` auf einen Commit-Hash gepinnt.
 >
+> *Prüfvermerk (Stand 2026-11-09):* Dependabot-Alert #106 zu deepmerge erneut
+> geprüft, keine Änderung an Abhängigkeiten. deepmerge 4.3.1 ist weiterhin die
+> neueste Version, workbox-build 7.4.1 und @rollup/plugin-node-resolve 16.0.3
+> ebenfalls, beide verlangen deepmerge ^4.2.2. Der einzige Aufruf verschmilzt
+> die festen Plugin-Voreinstellungen beim Bauen; kein deepmerge im Bundle.
+> Ein Override auf deepmerge < 4.2.0 entfällt, weil erst 4.2.0 den Schutz
+> gegen Prototyp-Schlüssel einführte. Bewertung und Begründung: ISK 6.4.
+>
 > Nachtrag (Stand 2026-11-08): Capacitor (core, ios, android, cli) auf ^8.6.0
 > gehoben, die iOS-Paketauflösung (`ios/App/CapApp-SPM/Package.swift`,
 > `Package.resolved`) entsprechend auf capacitor-swift-pm 8.6.0. Behoben ist
