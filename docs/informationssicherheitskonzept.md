@@ -253,7 +253,14 @@ Grundlage: Repository `wattnpapa/erfassungsbogen`, Stand 2026-09-12 — Version 
 > Ordner im `sessionStorage` des Tabs (`eeb.beispiel-pfad.v1`, nur die
 > Ordnernamen als JSON-Liste, keine Bogen- oder Personendaten; endet mit dem
 > Tab), damit „Anzeigen", Schließen und Neuladen nicht wieder bei „Alle"
-> beginnen (Prüfrunde Beispielbögen, BB-S3). Lieferkette
+> beginnen (Prüfrunde Beispielbögen, BB-S3).
+> Seit 2026-11-09 (Runde 2) zusätzlich `eeb.beispiel-offen.v1` im
+> `localStorage`: nur eine Prüfsumme (Länge und FNV-1a-Wert) des unverändert
+> geöffneten Beispielbogens, keine Bogen- oder Personendaten; entfällt, sobald
+> kein Bogen offen ist, und mit „Alle Daten löschen" (BB2-D2). Der Suchindex
+> der Beispielbögen (`src/app/beispiele-suchindex.json`, rund 190 KB,
+> Einheitstypen und Orte der fiktiven Beispiele) liegt als Datei in der
+> zweiten Stufe des Offline-Vorrats; keine Personendaten, kein neuer Host. Lieferkette
 > (6.4): keine neue Abhängigkeit; die Einheitenliste je OV stammt von der
 > inoffiziellen OV-Karte thw.blafusel.de und wird nur beim Erzeugen abgerufen
 > (`npm run beispiele:thw-ov -- --abrufen`), JS-Gesamtumfang 6,45 MB.

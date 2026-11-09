@@ -3286,23 +3286,26 @@
        --beispiel-kopf), damit Zurück und Pfad beim Rollen durch 100 Bögen
        erreichbar bleiben (BB-G5, BB-M5, BB-H5). */
     .beispiel-pfad {
-      display: flex; align-items: center; flex-wrap: wrap; gap: var(--r-1) var(--r-3); margin: 0 0 var(--r-4);
+      /* Eine Zeile, immer (Runde 2, BB2-M1, BB2-G1, BB2-M2, BB2-H1, BB2-S4): Die
+         klebende Leiste wuchs mit Umbrüchen bei 200 % Schrift auf 97 % des
+         Dialogs. Jetzt kürzen lange Namen mit „…", der Pfad zeigt höchstens
+         „Alle › … › Eltern › Ordner". Sichtbare Unterkante (BB2-L3). */
+      display: flex; align-items: center; flex-wrap: nowrap; gap: var(--r-3); margin: 0 0 var(--r-4);
       position: sticky; top: var(--beispiel-kopf, 0px); z-index: 2; background: var(--flaeche);
-      padding-block: var(--r-1); box-shadow: 0 1px 0 var(--linie-fein);
+      padding-block: var(--r-1); border-bottom: var(--strich) solid var(--linie-stark);
     }
+    .beispiel-pfad > button { flex: 0 0 auto; }
     .beispiel-pfad strong[tabindex]:focus-visible { outline: var(--fokus) solid var(--akzent); outline-offset: 2px; }
-    /* Tippziele im Pfad mindestens 44 px breit (BB-G4, BB-M4: „Alle" hatte 24 px). */
-    .beispiel-pfad li > button.link { min-width: 44px; justify-content: center; padding-inline: 0.35rem; }
-    .beispiel-pfad .pfad-auslassung { display: none; }
-    @media (max-width: 40rem) {
-      /* Tiefe Ordner: nur „Alle", „…" und die letzten zwei Ebenen (BB-S8, BB-M4, BB-H11). */
-      .beispiel-pfad .pfad-mitte { display: none; }
-      .beispiel-pfad .pfad-auslassung { display: flex; }
-    }
-    .beispiel-pfad ol { display: flex; flex-wrap: wrap; align-items: center; margin: 0; padding: 0; list-style: none; font-size: var(--t-s); }
-    .beispiel-pfad li { display: flex; align-items: center; }
-    .beispiel-pfad li + li::before { content: "›"; color: var(--text-3); padding-inline: 0.45em; }
-    .beispiel-pfad li > button.link { min-height: calc(var(--ziel-basis) + var(--ziel)); }
+    .beispiel-pfad ol { display: flex; flex-wrap: nowrap; align-items: center; min-width: 0; flex: 1 1 auto; overflow: hidden; margin: 0; padding: 0; list-style: none; font-size: var(--t-s); }
+    .beispiel-pfad li { display: flex; align-items: center; min-width: 0; flex: 0 1 auto; }
+    .beispiel-pfad li:first-child { flex: 0 0 auto; }
+    .beispiel-pfad li + li::before { content: "›"; color: var(--text-3); padding-inline: 0.45em; flex: 0 0 auto; }
+    /* Tippziele im Pfad mindestens 44 px breit (BB-G4, BB-M4), lange Namen gekürzt. */
+    .beispiel-pfad li > button.link { min-width: 44px; min-height: calc(var(--ziel-basis) + var(--ziel)); justify-content: center; padding-inline: 0.35rem; }
+    .beispiel-pfad li > button.link, .beispiel-pfad li > strong { display: block; min-width: 44px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .beispiel-pfad li > button.link { line-height: calc(var(--ziel-basis) + var(--ziel)); }
+    /* Ordnertreffer der Suche: Name, darunter klein, woher (BB2-M4, BB2-S9). */
+    .beispiel-register-herkunft { display: block; font-weight: 400; font-size: var(--t-s); }
     /* Register: Ordner wie im Aktenverzeichnis — Zeilen auf einer Linie, die
        ganze Zeile ist das Tippziel, die Zahl steht dicktengleich rechts. Der
        Reiter in der Kennfarbe links zeigt nur, wohin der Finger/die Maus

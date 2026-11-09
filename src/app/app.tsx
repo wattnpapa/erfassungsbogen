@@ -147,7 +147,7 @@ import { EinleseQuittung } from "./einlese-quittung";
 import { StapelQuittung } from "./stapel-quittung";
 import { EintreffzeitFeld, abrueckzeitVomZettel, aehnlicherOrt, andererEinheitstyp, eintreffzeitPruefen } from "./nacherfassung";
 import { meldungenVergleichen, steckbriefZeile, type MeldungsVergleich } from "./meldungs-vergleich";
-import { beispielMerken, beispielVergessen } from "./beispiel-herkunft";
+import { beispielMerken, beispielOffenMerken, beispielVergessen, istUnveraendertesBeispiel } from "./beispiel-herkunft";
 import { ansichtSchluessel, stelleLaden, stelleMerken } from "./ansicht-stelle";
 import { abgeteiltDoppelt, abgeteiltDoppeltImStapel, abgeteiltDoppeltText, doppeltHerausnehmbar, ohneAbgeteilte } from "./abgeteilt-doppelt";
 import { DaumenQuittung } from "./daumen-quittung";
@@ -554,6 +554,8 @@ function SoFunktionierts() {
  * sehen. Der Knopf öffnet denselben Dialog wie der Fußzeilen-Link.
  */
 function BeispielboegenStart() {
+  // Der Dialog ist ein nachgeladener Baustein: Bis er offen ist, sagt der Knopf es (BB2-M5, BB2-E4).
+  const [laedt, setLaedt] = useState(false);
   return (
     <section className="start-vorlagen start-beispiele" aria-label="Beispielbögen">
       <h2>Beispielbögen</h2>
@@ -561,7 +563,18 @@ function BeispielboegenStart() {
         Ausgefüllte Bögen fiktiver Einheiten zum Ansehen und Ausprobieren, sortiert nach Organisation und
         Thema. Jeder lässt sich in der App öffnen, als PDF erzeugen oder als Link weitergeben.
       </p>
-      <button type="button" className="primaer" onClick={beispielboegenOeffnen}>Beispielbögen ansehen</button>
+      <button
+        type="button"
+        className="primaer"
+        aria-busy={laedt || undefined}
+        disabled={laedt}
+        onClick={() => {
+          setLaedt(true);
+          void beispielboegenOeffnen().finally(() => setLaedt(false));
+        }}
+      >
+        {laedt ? "Beispielbögen werden geladen …" : "Beispielbögen ansehen"}
+      </button>
     </section>
   );
 }
@@ -934,7 +947,10 @@ function AppInhalt() {
   // Ohne offenen Bogen gibt es keine Beispieldaten mehr, nach denen die Rückfrage beim Abwählen von „Übung" fragt (R14-E6).
   const keinBogen = bogen === null;
   useEffect(() => {
-    if (keinBogen) beispielVergessen();
+    if (keinBogen) {
+      beispielVergessen();
+      beispielOffenMerken(null);
+    }
   }, [keinBogen]);
   /**
    * Kennung der gespeicherten Vorlage, die der offene Bogen gerade bearbeitet
@@ -1509,13 +1525,11 @@ function AppInhalt() {
   // „gespeichert" ist der Zeitpunkt der letzten ÄNDERUNG des Bogens: Bloßes
   // Öffnen oder ein Schrittwechsel verschob ihn bisher auf „jetzt", und ein
   // drei Tage alter Entwurf stand als „gespeichert 12:36 Uhr" da (R2-O3).
-  // Prüfrunde Beispielbögen (BB-D1, BB-W1, BB-E2, BB-H1, BB-N1): Stand des zuletzt
-  // über „Anzeigen" geöffneten Beispielbogens. Solange der offene Bogen genau so
-  // aussieht, ist er nichts wert: Er wird ohne Rückfrage ersetzt oder geschlossen
-  // und belegt den Rückholplatz nicht, auf dem sonst der eigene Entwurf läge.
-  // Nur im Arbeitsspeicher: Nach dem Neuladen gilt das Beispiel wieder als
-  // gewöhnlicher Bogen (die alte, vorsichtigere Behandlung).
-  const offenesBeispiel = useRef<string | null>(null);
+  // Prüfrunde Beispielbögen (BB-D1 u. a., Runde 2 BB2-D2): Ein über „Anzeigen"
+  // geöffnetes, unverändertes Beispiel ist nichts wert — es wird ohne Rückfrage
+  // ersetzt oder geschlossen und belegt den Rückholplatz nicht. Gemerkt als
+  // Prüfsumme im Speicher (beispiel-herkunft.ts), damit das auch nach dem
+  // Neuladen und in einem zweiten Tab gilt.
   const bogenGespeichert = useRef<{ bogen: Erfassungsbogen | null; um: number }>({
     bogen: ENTWURF?.bogen ?? null,
     um: ENTWURF?.gespeichert ?? Date.now(),
@@ -1832,7 +1846,7 @@ function AppInhalt() {
 
   /** Steht im offenen Bogen noch genau das über „Anzeigen" geöffnete Beispiel? */
   function beispielUnveraendert(b: Erfassungsbogen | null = bogen): boolean {
-    return !!b && offenesBeispiel.current !== null && JSON.stringify(b) === offenesBeispiel.current;
+    return istUnveraendertesBeispiel(b);
   }
 
   /** Steht im offenen Bogen noch genau der gespeicherte Stand der bearbeiteten Vorlage? */
@@ -1863,6 +1877,14 @@ function AppInhalt() {
    */
   function folgenFuerOffenenBogen(opt: { tausch?: boolean } = {}): { satz: string; verlust: boolean; verliertAlt?: Erfassungsbogen } {
     if (!bogen) return { satz: "", verlust: false };
+    // Unverändertes Beispiel (BB2-D1): Es wird nicht abgelegt und verdrängt nichts.
+    // Vorher warnte „Bogen schließen" in der Übersicht rot vor dem Verlust des
+    // eigenen Bogens, der in Wahrheit auf dem Rückholplatz liegen blieb.
+    if (beispielUnveraendert()) {
+      const r = opt.tausch ? null : ersetztenEntwurfLaden();
+      const wartet = r && !r.fremd && bogenHatInhalt(r.bogen) ? ` Dein Bogen „${einheitAnzeigename(r.bogen.einheit)}" bleibt auf der Startseite zurückholbar.` : "";
+      return { satz: `Der Beispielbogen liegt weiter unter „Beispielbögen“ bereit.${wartet}`, verlust: false };
+    }
     const name = einheitAnzeigename(bogen.einheit);
     const alt = opt.tausch ? null : ersetztenEntwurfLaden();
     const altName = alt ? einheitAnzeigename(alt.bogen.einheit) : "";
@@ -1977,7 +1999,7 @@ function AppInhalt() {
     // für eine Sammlung erfassen, setzen das Ziel danach neu.
     if (!bogen || !bogenHatInhalt(bogen) || beispielUnveraendert()) {
       if (!a.tausch && !beispielUnveraendert() && !(await anderesFensterFreigeben(a))) return false;
-      offenesBeispiel.current = null;
+      beispielOffenMerken(null);
       setVorlageInBearbeitung(null);
       setFremdeErfassung(false);
       setSammelZiel(null);
@@ -2023,7 +2045,7 @@ function AppInhalt() {
       await ablageVollMelden(bogen, a.tausch ? "zurückgeholt" : "ersetzt");
       return false;
     }
-    offenesBeispiel.current = null;
+    beispielOffenMerken(null);
     setVorlageInBearbeitung(null);
     setFremdeErfassung(false);
     setSammelZiel(null);
@@ -2206,7 +2228,7 @@ function AppInhalt() {
   async function entwurfWegwerfen() {
     if (!bogen) return;
     if (beispielUnveraendert()) {
-      offenesBeispiel.current = null;
+      beispielOffenMerken(null);
       setBogen(null);
       setFremdeErfassung(false);
       setSammelZiel(null);
@@ -2285,7 +2307,7 @@ function AppInhalt() {
     }
     beispielMerken(b); // erfundene Personen und Nummern (R14-E6)
     setBogen(b);
-    offenesBeispiel.current = JSON.stringify(b);
+    beispielOffenMerken(b);
     setzeEmpfang(null); // Beispiel aus der App, kein signierter Transport
     setSchritt(UEBERSICHT);
     setMusterVorlage(null);
@@ -2309,11 +2331,42 @@ function AppInhalt() {
    * „Übung" zählen die Übungsbögen in ihrer Lage mit. Der offene Bogen bleibt
    * unberührt.
    */
-  async function beispieleAlsUebung(boegen: Erfassungsbogen[], ordnerName: string): Promise<boolean> {
-    if (boegen.length === 0) return false;
+  async function beispieleAlsUebung(eintraege: { bogen: Erfassungsbogen; zug?: string }[], ordnerName: string): Promise<boolean> {
+    if (eintraege.length === 0) return false;
+    const name = `Übung: ${ordnerName}`;
+    // Rückfrage statt Sofort-Anlage (Runde 2, BB2-G2, BB2-E2, BB2-H3), und keine
+    // zweite gleichnamige Sammlung ohne Nachfrage (BB2-D4, BB2-W3, BB2-N4).
+    const vorhanden = einsaetzeLaden()
+      .filter((x) => x.name === name)
+      .sort((x, y) => y.geaendert - x.geaendert)[0];
+    if (vorhanden) {
+      const wahl = await frageWahl({
+        titel: "Diese Übungs-Sammlung gibt es schon",
+        text: `„${name}" gibt es schon (${anzahlEinheiten(vorhanden.eintraege)}). Die vorhandene öffnen oder eine zweite mit denselben ${eintraege.length} Bögen anlegen?`,
+        wege: [
+          { wert: "oeffnen", label: "Vorhandene öffnen" },
+          { wert: "neu", label: "Zweite anlegen" },
+        ],
+      });
+      if (wahl === null) return false;
+      if (wahl === "oeffnen") {
+        setFehler("");
+        setMeldung("");
+        setZeigeStart(false);
+        setOffenerEinsatzId(vorhanden.id);
+        return true;
+      }
+    } else {
+      const ja = await frageJaNein({
+        titel: "Übungs-Sammlung anlegen?",
+        text: `Legt die Sammlung „${name}" (Art „Übung") mit ${eintraege.length} Beispielbögen an — mit Sammel-PDF, Lageblatt und Weitergabe. Dein offener Bogen bleibt, wie er ist.`,
+        ok: `Sammlung mit ${eintraege.length} Bögen anlegen`,
+      });
+      if (!ja) return false;
+    }
     let s: Einsatzsammlung;
     try {
-      s = einsatzAnlegen(`Übung: ${ordnerName}`, EinsatzArt.UEBUNG);
+      s = einsatzAnlegen(name, EinsatzArt.UEBUNG);
     } catch (e) {
       await zeigeHinweis({
         titel: "Sammlung nicht angelegt",
@@ -2327,9 +2380,15 @@ function AppInhalt() {
     }
     let neu = 0;
     let voll = false;
-    for (const b of boegen) {
+    for (const { bogen: b, zug } of eintraege) {
       try {
-        if (meldungAufnehmen(s.id, b, { quelle: "manuell" })?.neu) neu++;
+        // Zwei Züge eines OV führen dieselben Einheitstypen: Der Zug macht sie zu
+        // eigenen Einheiten (Runde 2, BB2-K1: OV Landshut 11 Bögen → 9 Einheiten).
+        const r = meldungAufnehmen(s.id, b, { quelle: "manuell", einheitSchluesselOverride: zug ? `${einheitSchluessel(b.einheit)}#${zug}` : undefined });
+        if (r?.neu) {
+          neu++;
+          if (zug) nummerUndZugSetzen(s.id, r.eintrag.id, { zug });
+        }
       } catch (e) {
         if (istSpeicherVoll(e)) {
           voll = true;
@@ -2344,7 +2403,7 @@ function AppInhalt() {
     setOffenerEinsatzId(s.id);
     setMeldung(
       voll
-        ? `Übungs-Sammlung „${s.name}" angelegt, aber der Speicher ist voll: ${neu} von ${boegen.length} Bögen aufgenommen.`
+        ? `Übungs-Sammlung „${s.name}" angelegt, aber der Speicher ist voll: ${neu} von ${eintraege.length} Bögen aufgenommen.`
         : `Übungs-Sammlung „${s.name}" mit ${neu} ${neu === 1 ? "Beispielbogen" : "Beispielbögen"} angelegt. Sammel-PDF, Lageblatt und Weitergabe stehen in der Sammlung bereit.`,
     );
     return true;

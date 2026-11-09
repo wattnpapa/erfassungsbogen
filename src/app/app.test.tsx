@@ -5,7 +5,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { OrganisationsTyp, type Erfassungsbogen } from "@bos/eeb-format/model";
 import { encodePayload, encodePayloadUrl, encodeVorlagePayloadUrl, fragmentInhalt, segmentPayloadUrls } from "@bos/eeb-format/codec";
@@ -13,7 +13,7 @@ import { encodeSigniertPayloadUrl, schluesselpaarErzeugen } from "@bos/eeb-forma
 import { browserKompressor, neuePerson, neuerBogen } from "./hilfen";
 import { geraeteSchluesselLoeschen } from "./geraete-schluessel";
 import { tippSchutzZuruecksetzen } from "./tipp-schutz";
-import { frageJaNein } from "./dialoge";
+import { dialogeZuruecksetzen, frageJaNein } from "./dialoge";
 import { vorlageAnlegen, vorlagenLaden } from "./vorlagen";
 import { einsatzDateiInhalt } from "./einsatz-transport";
 import { einheitEntfernen, eintreffzeitSetzen, zeitLang } from "./eintrag-zeiten";
@@ -1414,6 +1414,31 @@ describe("Assistenten-Durchlauf", () => {
     }
   }, 30000);
 
+  /** Prüfrunde Beispielbögen, Runde 2 (BB2-D2): Auch nach dem Neuladen bleibt ein unverändertes Beispiel „nichts wert“. */
+  it("ersetzt ein unverändertes Beispiel auch nach dem Neuladen ohne Rückfrage", async () => {
+    const nutzer = userEvent.setup();
+    const { frage, fetchZurueck } = await beispielAnzeigen(nutzer);
+    try {
+      await nutzer.click(within(frage).getByRole("button", { name: "Beispielbogen öffnen" }));
+      expect(await screen.findByRole("heading", { name: "Gesamtübersicht" })).toBeDefined();
+
+      // „Neuladen": App neu aufbauen, Speicher bleibt.
+      cleanup();
+      dialogeZuruecksetzen();
+      render(<App />);
+      await nutzer.click(await screen.findByRole("button", { name: "Beispielbögen ansehen" }));
+      const dialog = await screen.findByRole("dialog", { name: "Beispielbögen" }, { timeout: 15000 });
+      const anzeigen = await within(dialog).findAllByRole("button", { name: "Anzeigen" }, { timeout: 15000 });
+      await nutzer.click(anzeigen[1]!);
+
+      expect(await screen.findByRole("heading", { name: "Gesamtübersicht" })).toBeDefined();
+      expect(screen.queryByRole("dialog", { name: "Beispielbogen öffnen?" })).toBeNull();
+      expect(screen.getAllByText(/Dein eigener Bogen .*Eigenhausen.* liegt auf der Startseite/).length).toBeGreaterThan(0);
+    } finally {
+      fetchZurueck();
+    }
+  }, 40000);
+
   /** Prüfrunde Beispielbögen (BB-K1, BB-W4, BB-A1): alle Bögen eines Ordners in eine Übungs-Sammlung. */
   it("legt alle Bögen eines Beispiel-Ordners in eine neue Übungs-Sammlung", async () => {
     const bogenJson = JSON.stringify({ ...bogenMitName("Sammelhausen"), uebung: true });
@@ -1425,7 +1450,13 @@ describe("Assistenten-Durchlauf", () => {
       await nutzer.click(screen.getByRole("button", { name: "Beispielbögen ansehen" }));
       const dialog = await screen.findByRole("dialog", { name: "Beispielbögen" }, { timeout: 15000 });
       await nutzer.click(within(dialog).getByRole("button", { name: /^THW/ }));
-      await nutzer.click(await within(dialog).findByRole("button", { name: /^Alle .* in eine Übungs-Sammlung$/ }));
+      const sammeln = await within(dialog).findByRole("button", { name: /^Alle .* in eine Übungs-Sammlung$/ });
+      // Doppeltipp-Sperre (Runde 2, BB2-G2): erst nach 800 ms nimmt der Knopf an.
+      await new Promise((r) => setTimeout(r, 850));
+      await nutzer.click(sammeln);
+      // Rückfrage vor dem Anlegen (BB2-G2, BB2-D4).
+      const frage = await screen.findByRole("dialog", { name: "Übungs-Sammlung anlegen?" }, { timeout: 15000 });
+      await nutzer.click(within(frage).getByRole("button", { name: /^Sammlung mit \d+ Bögen anlegen$/ }));
 
       await waitFor(() => expect(einsaetzeLaden().some((x) => x.name === "Übung: THW")).toBe(true), { timeout: 15000 });
       const sammlung = einsaetzeLaden().find((x) => x.name === "Übung: THW");
@@ -1472,7 +1503,7 @@ describe("Assistenten-Durchlauf", () => {
     const dialog = await screen.findByRole("dialog", { name: "Beispielbögen" }, { timeout: 15000 });
     await nutzer.type(within(dialog).getByRole("searchbox", { name: "Suchen" }), "hannover");
     const treffer = within(dialog).getByRole("list", { name: "Gefundene Ordner" });
-    await nutzer.click(within(treffer).getAllByRole("button")[0]!);
+    await nutzer.click(within(treffer).getByRole("button", { name: /^Einlagen Kräfte Hannover/ }));
     expect(within(dialog).getByText("Einlagen Kräfte Hannover", { selector: "[aria-current]" })).toBeDefined();
     expect((within(dialog).getByRole("searchbox", { name: "Suchen" }) as HTMLInputElement).value).toBe("");
   });
