@@ -1555,7 +1555,12 @@ Die Offline-Zeile zeigt beim Laden den Fortschritt des Kerns in MB und danach
 neuen Hosts, alle Abrufe gehen an die eigene Herkunft. „Funktioniert komplett
 offline" steht erst, wenn die Zusatzstufe gezählt und vollständig ist; bis zur
 ersten Zählung nennt die Zeile nur den Kern (`zweiStufen` in
-`src/app/offline-bereit.ts`, nachgezogen 2026-10-05).
+`src/app/offline-bereit.ts`, nachgezogen 2026-10-05). Seit 2026-11-09 steht
+die Zeile nur noch als Kasten auf der Startseite, solange der Kern lädt, kein
+Vorrat möglich ist oder der Speicher gesperrt ist. Liegt der Kern im Gerät
+(`offlineRuhig`), steht der Text klein in der Fußzeile, und ein 3 px hoher
+Balken oben auf der Startseite zeigt den Fortschritt (`offlineFortschritt`:
+Kern in Bytes, Zusatzstufe in Dateien).
 
 ### 6.5 Desktop-Auto-Update (Electron)
 
