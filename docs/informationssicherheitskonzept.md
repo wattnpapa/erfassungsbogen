@@ -16,6 +16,29 @@ Grundlage: Repository `wattnpapa/erfassungsbogen`, Stand 2026-09-12 — Version 
 > Abhängigkeiten (6.4/R8/M8). Die betroffenen Abschnitte sind entsprechend
 > gekennzeichnet.
 >
+> **Nachgezogen 2026-11-09 — Einsatz-Sammlung ausgelagert:** Die Einsatz-Sammlung ist in die eigene Meldekopf-App
+> umgezogen (Repository `wattnpapa/meldekopf`, `meldekopf.erfassungsbogen.app`).
+> Entfernt sind hier: Einsatzliste und -ansicht, „Wohin damit?“, Dauerscan in eine
+> Sammlung, Bilderstapel, Einsatz-Import und -Abgleich, Schnellerfassung für den
+> Meldekopf, Lagemonitor (`?lagemonitor=`), Papier-Abgleich, Sammel-PDF, Lageblatt,
+> Einsatz-CSV und Alle-Daten-CSV der Sammlung, Export-Stände, Aufteilen und
+> Zusammenführen, „Alle … in eine Übungs-Sammlung“ der Beispielbögen. Ein
+> empfangener Bogen öffnet sich wieder direkt. Neu: Die Startseite verweist auf die
+> Meldekopf-App (ein Link, keine Netzverbindung der App; `src/app/meldekopf-weg.tsx`,
+> `meldekopf-app.ts`) und nennt Sammlungen, die noch unter `eeb.einsaetze.v1` auf
+> dem Gerät liegen (Altbestand, `meldekopf-altbestand.ts`): Datensicherung erstellen
+> (die Meldekopf-App spielt sie ein) oder mit Rückfrage löschen. Gelesen wird der
+> Altbestand über den Kern (`einsaetze-lesen.ts`), Aufräumfrist ruhender
+> Sammlungen und Datenschutzfrist je Meldung greifen deshalb weiter;
+> Datensicherung und „Alle Daten löschen“ erfassen die Schlüssel wie bisher über
+> das Präfix `eeb.`.
+> Für dieses Dokument: Exportwege (5.4) ohne Sammel-PDF, Lageblatt, Einsatz-Datei
+> und Sammlungs-CSV; Kommunikationsverbindungen (3.4) unverändert, der Verweis ist
+> ein gewöhnlicher Link; Datenobjekte (3.3) Sammlungen nur noch als Altbestand.
+> Die Meldekopf-App führt ein eigenes ISK. **Die Abschnitte zur Sammlung, zum
+> Lagemonitor und zum Einsatz-Import weiter unten beschreiben den Stand vor dem
+> 2026-11-09 und sind für diese App historisch.**
+>
 > **Nachgezogen 2026-11-03 — Excel-Liste „Oldenburg" entfernt:** Exportwege (5.4):
 > Der XLSX-Export der Einheitenliste (`src/app/oldenburg-xlsx.ts`, `src/app/xlsx.ts`)
 > ist ausgebaut; die Gegenstelle übernimmt Bögen über den Link (VBA-Leser, Anhang)

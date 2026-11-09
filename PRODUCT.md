@@ -33,8 +33,8 @@ Der komplette Bogeninhalt steckt in einem einzigen QR-Code auf der letzten PDF-S
 
 ## Capabilities and Constraints
 
-- Assistent (Einheit, Einsatz, Personal, Fahrzeuge, Sofortbedarf) mit nachbearbeitbarer Gesamtübersicht; Schnellerfassung am Meldekopf (nur Stärke, Führungskraft, Fahrzeuge).
-- Einsatz-Sammlung: fremde Bögen bündeln, laufende Summen mit Zwischensummen je Zug, Melde-Historie, Schichtübergabe-Diff (was hat sich gegenüber der letzten Meldung geändert), Sammel-PDF.
+- Assistent (Einheit, Einsatz, Personal, Fahrzeuge, Sofortbedarf) mit nachbearbeitbarer Gesamtübersicht; Personal wahlweise nur als Stärke.
+- Einsatz-Sammlung: seit 2026-11-09 nicht mehr hier, sondern in der eigenen Meldekopf-App (meldekopf.erfassungsbogen.app); die Startseite verweist dorthin.
 - Vorlagen: Landes-/Organisations-Beispielbögen (KatS der Länder, FwVO NDS, DRK, DLRG, THW-StAN) als anwendbare Vorbelegung; eigene Vorlagen mit Musterung.
 - Optionale Ed25519-Signatur im QR-Code.
 - **Schema-Abwärtskompatibilität ist Pflicht:** alte QR-Codes und Dateien müssen per Migration lesbar bleiben.

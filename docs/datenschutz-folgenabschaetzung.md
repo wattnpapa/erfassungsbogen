@@ -11,6 +11,31 @@ Grundlage: Repository `wattnpapa/erfassungsbogen`, Stand 2026-09-12 — Version 
 > **Wichtig:** Der Commit „Sicherheitsbericht umsetzen" (`c7604e9`, 2026-09-12)
 > hat das in R5/M6 genannte Dekomprimierungs-Risiko bereits behoben.
 >
+> **Nachgezogen 2026-11-09 — Einsatz-Sammlung ausgelagert:** Die Einsatz-Sammlung ist in die eigene Meldekopf-App
+> umgezogen (Repository `wattnpapa/meldekopf`, `meldekopf.erfassungsbogen.app`).
+> Entfernt sind hier: Einsatzliste und -ansicht, „Wohin damit?“, Dauerscan in eine
+> Sammlung, Bilderstapel, Einsatz-Import und -Abgleich, Schnellerfassung für den
+> Meldekopf, Lagemonitor (`?lagemonitor=`), Papier-Abgleich, Sammel-PDF, Lageblatt,
+> Einsatz-CSV und Alle-Daten-CSV der Sammlung, Export-Stände, Aufteilen und
+> Zusammenführen, „Alle … in eine Übungs-Sammlung“ der Beispielbögen. Ein
+> empfangener Bogen öffnet sich wieder direkt. Neu: Die Startseite verweist auf die
+> Meldekopf-App (ein Link, keine Netzverbindung der App; `src/app/meldekopf-weg.tsx`,
+> `meldekopf-app.ts`) und nennt Sammlungen, die noch unter `eeb.einsaetze.v1` auf
+> dem Gerät liegen (Altbestand, `meldekopf-altbestand.ts`): Datensicherung erstellen
+> (die Meldekopf-App spielt sie ein) oder mit Rückfrage löschen. Gelesen wird der
+> Altbestand über den Kern (`einsaetze-lesen.ts`), Aufräumfrist ruhender
+> Sammlungen und Datenschutzfrist je Meldung greifen deshalb weiter;
+> Datensicherung und „Alle Daten löschen“ erfassen die Schlüssel wie bisher über
+> das Präfix `eeb.`.
+> Für diese DSFA: Die Bündelung der Personendaten fremder Einheiten (5.1, 5.3,
+> 5.5) und die Exportwege Sammel-PDF, Lageblatt, Einsatz-Datei und Sammlungs-CSV
+> (5.8) entfallen hier; die Folgenabschätzung dafür führt die Meldekopf-App
+> (`docs/datenschutz-folgenabschaetzung.md` dort). Neue Datenkategorie: keine;
+> neuer Empfänger: keiner. Speicherdauer (5.7): Der Altbestand verfällt wie
+> bisher (90 Tage ohne Änderung, Datenschutzfrist je Meldung) oder wird über den
+> neuen Weg vom Gerät gelöscht. **Die Abschnitte zur Sammlung weiter unten
+> beschreiben den Stand vor dem 2026-11-09 und sind für diese App historisch.**
+>
 > **Nachgezogen 2026-11-09 — Import THW-Word-Bogen:** Neuer Eingangsweg (5.1, 5.5):
 > Ein ausgefüllter Word-Bogen aus den THW-Vorlagen `06-*_Erfassungsbogen.dotx`
 > (`.docx`) lässt sich wie eine Bogen-Datei einlesen. Die App liest ihn lokal und

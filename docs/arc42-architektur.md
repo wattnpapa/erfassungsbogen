@@ -12,6 +12,30 @@
 > umsetzen: SBOM, CSP ohne unsafe-inline, Entpack-Grenze") betrifft die Kapitel
 > 2.1, 8.3, 8.6, 8.7 und 11.2 — dort jeweils vermerkt.
 >
+> **Nachgezogen 2026-11-09 (Einsatz-Sammlung ausgelagert):** Kap. 1, 3, 5, 6.3, 8, 12. Die Einsatz-Sammlung ist in die eigene Meldekopf-App
+> umgezogen (Repository `wattnpapa/meldekopf`, `meldekopf.erfassungsbogen.app`).
+> Entfernt sind hier: Einsatzliste und -ansicht, „Wohin damit?“, Dauerscan in eine
+> Sammlung, Bilderstapel, Einsatz-Import und -Abgleich, Schnellerfassung für den
+> Meldekopf, Lagemonitor (`?lagemonitor=`), Papier-Abgleich, Sammel-PDF, Lageblatt,
+> Einsatz-CSV und Alle-Daten-CSV der Sammlung, Export-Stände, Aufteilen und
+> Zusammenführen, „Alle … in eine Übungs-Sammlung“ der Beispielbögen. Ein
+> empfangener Bogen öffnet sich wieder direkt. Neu: Die Startseite verweist auf die
+> Meldekopf-App (ein Link, keine Netzverbindung der App; `src/app/meldekopf-weg.tsx`,
+> `meldekopf-app.ts`) und nennt Sammlungen, die noch unter `eeb.einsaetze.v1` auf
+> dem Gerät liegen (Altbestand, `meldekopf-altbestand.ts`): Datensicherung erstellen
+> (die Meldekopf-App spielt sie ein) oder mit Rückfrage löschen. Gelesen wird der
+> Altbestand über den Kern (`einsaetze-lesen.ts`), Aufräumfrist ruhender
+> Sammlungen und Datenschutzfrist je Meldung greifen deshalb weiter;
+> Datensicherung und „Alle Daten löschen“ erfassen die Schlüssel wie bisher über
+> das Präfix `eeb.`.
+> Rund 40.000 Zeilen Code und Tests sind entfallen; `@bos/meldekopf` bleibt als
+> Submodul, weil der Altbestand über den Kern gelesen wird und `einsatz-transport.ts`
+> den Bogen aus einer Sammel-PDF liest. Bundle-Budget gesenkt (JavaScript gesamt
+> 6.212.815 Byte, Startbündel 599.592 Byte). **Kap. 5.4 (Whitebox „@bos/meldekopf“)
+> und 6.3 (fremden Bogen in die Einsatz-Sammlung aufnehmen) beschreiben den Stand
+> vor dem 2026-11-09; die Sammlung dokumentiert jetzt die Architektur der
+> Meldekopf-App.**
+>
 > **Nachgezogen 2026-11-09 (Import THW-Word-Bogen):** Kap. 5.2, 6.3, 12. Neuer Eingang
 > für ausgefüllte Word-Bögen aus den THW-Vorlagen `06-*_Erfassungsbogen.dotx` (`.docx`)
 > neben JSON und PDF, in „Aus Datei laden…" und „Bögen einlesen…". `word-bogen.ts`
@@ -1193,7 +1217,7 @@ Architektonische Besonderheiten, die die Trennung technisch erzwingen:
   indem Vite `@bos/*` per Alias direkt auf `vendor/*/src/*.ts` abbildet.
 - Es gibt bewusst **kein** `prepare`-Skript (siehe ADR-003a).
 
-### 5.4 Whitebox „@bos/meldekopf" (Level 2)
+### 5.4 Whitebox „@bos/meldekopf" (Level 2; die App nutzt ihn seit 2026-11-09 nur noch für den Altbestand)
 
 `@bos/meldekopf` (3167 Zeilen) implementiert die Einsatz-Sammlung als reine,
 speicherunabhängige Logik:
@@ -1393,7 +1417,7 @@ Wichtige Eigenschaften:
   Scanner-Fenster gewählte Weg (Kamera/Handscanner) liegt als `eeb-scanweg`
   im `localStorage` (wie die Kamerawahl `eeb-kamera`; keine Personendaten).
 
-### 6.3 Meldekopf: fremden Bogen in die Einsatz-Sammlung aufnehmen
+### 6.3 Meldekopf: fremden Bogen in die Einsatz-Sammlung aufnehmen (bis 2026-11-09, seither Meldekopf-App)
 
 ```mermaid
 sequenceDiagram
