@@ -321,11 +321,11 @@ describe("Umbrüche zerreißen keine Angaben (R4-A7)", () => {
 
 describe("Einzel-PDF: Platz für Stiftnachträge, wo er keine Seite kostet (R3-A6)", () => {
   const freieZeilen = (dd: { content: unknown }) =>
-    (JSON.stringify(dd.content).match(/"text":" ","margin":\[0,5,0,5\]/g) ?? []).length / 3;
+    (JSON.stringify(dd.content).match(/"text":" ","margin":\[0,2,0,2\]/g) ?? []).length / 3;
   const beispiel = (datei: string): Erfassungsbogen =>
     JSON.parse(readFileSync(new URL(`../../examples/thw/${datei}`, import.meta.url), "utf8")) as Erfassungsbogen;
 
-  it.each([1, 3])("kleiner Bogen (%i QR-Teile): zwei freie Personalzeilen und ein leerer Fahrzeugblock, Seitenzahl gleich", async (teile) => {
+  it.each([3])("kleiner Bogen (%i QR-Teile): zwei freie Personalzeilen und ein leerer Fahrzeugblock, Seitenzahl gleich", async (teile) => {
     const b = bogen(4);
     const dd = await einzelPdfDokument(b, qrSatz(teile), pdfBytes);
     expect(freieZeilen(dd)).toBe(2);
@@ -333,10 +333,29 @@ describe("Einzel-PDF: Platz für Stiftnachträge, wo er keine Seite kostet (R3-A
     expect(seitenZahl(await pdfBytes(dd))).toBe(seitenZahl(await pdfBytes(pdfDokument(b, qrSatz(teile)))));
   }, 20_000);
 
-  it("voller einseitiger Bogen (Zugtrupp Albstadt): keine freien Zeilen statt einer zweiten Seite", async () => {
-    const b = beispiel("001-albstadt-ztr-tz.json");
+  // Mit Einzelcode auf Seite 1 bleibt beim Raster der THWin-Vorlage unter dem Code
+  // weniger Platz als zwei Zeilen und ein Fahrzeugblock brauchen: dann eben ohne.
+  it("kleiner Bogen mit Einzelcode auf Seite 1: nichts dazu, was eine Seite kostet", async () => {
+    const b = bogen(4);
     const dd = await einzelPdfDokument(b, qrSatz(1), pdfBytes);
     expect(seitenZahl(await pdfBytes(dd))).toBe(1);
-    expect(freieZeilen(dd)).toBe(0);
+    expect(seitenZahl(await pdfBytes(pdfDokument(b, qrSatz(1))))).toBe(1);
   }, 20_000);
+
+  // Seit dem Raster der THWin-Vorlage (10 pt, Zeilenhöhen der Vorlage) steht der Code des
+  // Zugtrupps Albstadt auf Seite 2. Die Regel bleibt: freie Zeilen kosten keine Seite.
+  it("Zugtrupp Albstadt: freie Zeilen kosten keine Seite", async () => {
+    const b = beispiel("001-albstadt-ztr-tz.json");
+    const dd = await einzelPdfDokument(b, qrSatz(1), pdfBytes);
+    expect(seitenZahl(await pdfBytes(dd))).toBe(seitenZahl(await pdfBytes(pdfDokument(b, qrSatz(1)))));
+  }, 20_000);
+
+  it("50 THW-Beispielbögen: freie Zeilen und Fahrzeugblock kosten nie eine Seite", async () => {
+    for (const datei of readdirSync(new URL("../../examples/thw/", import.meta.url)).filter((d) => /^0[0-4]\d-.*\.json$/.test(d))) {
+      const b = beispiel(datei);
+      const ohne = seitenZahl(await pdfBytes(pdfDokument(b, qrSatz(1))));
+      const mit = seitenZahl(await pdfBytes(await einzelPdfDokument(b, qrSatz(1), pdfBytes)));
+      expect(mit, datei).toBe(ohne);
+    }
+  }, 120_000);
 });

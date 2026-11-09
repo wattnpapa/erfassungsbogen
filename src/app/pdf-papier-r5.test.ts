@@ -157,6 +157,6 @@ describe("Blanko: Beiblatt, Luft, Platz für „Sonstiges“ (R5-A6, R5-A7)", ()
     expect(roh).toContain('"margin":[0,3,0,3]');
     const i = roh.indexOf('"Sonstiges:"');
     expect(i).toBeGreaterThan(-1);
-    expect((roh.slice(i).match(/"text":" ","margin":\[0,5,0,5\]/g) ?? []).length).toBe(3);
+    expect((roh.slice(i).match(/"text":" ","margin":\[0,2,0,2\]/g) ?? []).length).toBe(3);
   });
 });

@@ -18,6 +18,7 @@ import type {
   Content,
   TDocumentDefinitions,
   TableCell,
+  CustomTableLayout,
 } from "pdfmake/interfaces";
 import {
   Erfassungsbogen,
@@ -94,7 +95,8 @@ import { FELD_GESAMTSTAERKE, diffZeilen } from "@bos/meldekopf/meldung-diff";
 import { bogenDiff, type BogenDiff } from "./diff-lage";
 import { fahrzeugSymbolSvg } from "./taktische-zeichen-bogen";
 import { sitzplaetzeRichtwert } from "@bos/vokabulare/sitzplaetze";
-import { orgFarbe } from "./org-farben";
+import { orgFarbePapier } from "./org-farben";
+import { THW_LOGO_BREITE, THW_LOGO_HOEHE, THW_LOGO_JPEG } from "./pdf-logo-thw";
 import { BERUF_PRAEFIX, berufText, qualifikationenUndBerufe } from "./beruf";
 import {
   UEBUNG_BREITE,
@@ -184,6 +186,78 @@ const SCHRIFT = "Helvetica";
  * Platz behält.
  */
 const SEITENRAENDER: [number, number, number, number] = [71, 28, 57, 32];
+
+/*
+ * Raster des Bogens, aus der THWin-Vorlage nachgemessen (06-K_A_Erfassungsbogen.dotx,
+ * mit Word ausgefüllt und als PDF gedruckt). Alle Werte in pt; 1 pt = 20 Twips.
+ *
+ * Der Rahmen der Vorlage steht nicht auf dem Satzspiegel, sondern 3,5 pt
+ * (w:tblInd 70 Twips) weiter rechts und ist 474,9 pt breit (Spaltensumme 9498
+ * Twips): außen links bei x = 74,4 pt, rechts bei 549,1 pt. Oben beginnt er bei
+ * 41 pt. Linien sind 0,5 pt stark (w:sz 4), schwarz.
+ */
+/** Linke Außenkante des Rahmens. */
+const RAHMEN_X = 74.4;
+/** Rahmenbreite = Summe von {@link RASTER}. */
+const RAHMEN_BREITE = 474.9;
+/** Oberkante des Titelbalkens auf Seite 1. */
+const RAHMEN_Y = 41;
+/**
+ * Seitenränder des Bogens: links und rechts auf den Rahmen der Vorlage gelegt.
+ * pdfmake zieht die Außenlinie eine halbe Linienstärke innerhalb des Rands,
+ * darum steht der Rand eine halbe Linie weiter außen.
+ */
+const BOGEN_RAENDER: [number, number, number, number] = [
+  RAHMEN_X - 0.25,
+  RAHMEN_Y,
+  595.28 - (RAHMEN_X - 0.25) - RAHMEN_BREITE,
+  32,
+];
+/** Linienstärke aller Rahmen (w:sz 4 = ½ pt). */
+const LINIE = 0.5;
+/** Innenabstand links/rechts je Zelle (w:tblCellMar 70 Twips). */
+const ZELLE_INNEN = 3.5;
+/**
+ * Spaltenraster der Vorlage (w:tblGrid 1276 · 709 · 2126 · 1134 · 917 · 1209 ·
+ * 2127 Twips). Kopf, Fahrzeugblöcke und Sofortbedarf setzen ihre Trennlinien
+ * auf diese Kanten, sodass alle Tabellen untereinander fluchten.
+ */
+const RASTER = [63.8, 35.45, 106.3, 56.7, 45.85, 60.45, 106.35] as const;
+/** Höhe des Titelbalkens, gemessen (41,0 bis 70,8 pt). */
+const ZEILE_TITEL = 29.8;
+/** Zeilenhöhe von Kopf und Fahrzeugkopf (w:trHeight 567 Twips). */
+const ZEILE_HOCH = 28.35;
+/** Zeilenhöhe der Personal- und Qualifikationstabelle (w:trHeight 397 Twips). */
+const ZEILE_PERSONAL = 19.85;
+/** Zweite Zeile eines Fahrzeugblocks: Platz für StAN und Sondergerät (w:trHeight 1134 Twips). */
+const ZEILE_FAHRZEUG_UNTEN = 56.7;
+
+/**
+ * pdfmake-Spaltenbreite für eine Spalte, die auf dem Papier `pt` breit sein
+ * soll: pdfmake zählt Innenabstand und Linie zur Spalte hinzu.
+ */
+const spalte = (pt: number): number => pt - 2 * ZELLE_INNEN - LINIE;
+/** Breite der Rasterspalten `von` bis `bis` (einschließlich, ab 0). */
+const raster = (von: number, bis: number): number =>
+  RASTER.slice(von, bis + 1).reduce((s, w) => s + w, 0);
+
+/** Zeichenzahl des längsten Worts — Maß dafür, ob ein Text in eine schmale Spalte passt. */
+const laengstesWort = (text: string): number =>
+  Math.max(0, ...text.split(/\s+/).map((w) => w.length));
+
+/** Tabellenlinien und Innenabstände der Vorlage. `dicht` = Sammel-PDF, knapp gesetzt. */
+function rahmenLayout(dicht = false): CustomTableLayout {
+  return {
+    hLineWidth: () => LINIE,
+    vLineWidth: () => LINIE,
+    hLineColor: () => "#000000",
+    vLineColor: () => "#000000",
+    paddingLeft: () => ZELLE_INNEN,
+    paddingRight: () => ZELLE_INNEN,
+    paddingTop: () => (dicht ? 0.5 : 2),
+    paddingBottom: () => (dicht ? 0.5 : 2),
+  };
+}
 
 /**
  * Kantenlänge des QR-Bilds in pt (1 pt = 1/72 Zoll). 190 pt ≈ 67 mm.
@@ -2231,7 +2305,7 @@ const UEBERTRAGEN_KURZ = `übertragen ${kasten(false)} von ______ um ____:____ U
 /** Mit Rahmen und fett (Seite 1: der Platz zum Quittieren), sonst eine schlichte Zeile. */
 function randZeile(text: string, rahmen: boolean): Content {
   return {
-    margin: [SEITENRAENDER[0], RAND_ZEILE_Y, SEITENRAENDER[2], 0],
+    margin: [BOGEN_RAENDER[0], RAND_ZEILE_Y, BOGEN_RAENDER[2], 0],
     table: {
       widths: ["*"],
       body: [[{ text, fontSize: 7.5, bold: rahmen, noWrap: true }]],
@@ -2398,7 +2472,10 @@ export function einsatzPdfDokument(
     // (Änderungsspalte, Zug-Zwischensummen); ab dem ersten Bogen wird oben
     // wieder auf Hochformat zurückgeschaltet.
     pageOrientation: "landscape",
-    pageMargins: SEITENRAENDER,
+    // Links und rechts auf dem Rahmen der Bögen (siehe BOGEN_RAENDER), sonst
+    // ragten deren Tabellen über den rechten Rand. Oben der knappere Rand: Die
+    // Sammel-PDF wird dick, jeder Punkt Satzspiegel spart Seiten.
+    pageMargins: [BOGEN_RAENDER[0], SEITENRAENDER[1], BOGEN_RAENDER[2], SEITENRAENDER[3]],
     defaultStyle: { fontSize: 8, font: SCHRIFT },
     info: { title: `Einsatz-Sammlung ${name}` },
     // Das Wasserzeichen liegt dokumentweit hinter allen Seiten — es erscheint
@@ -2461,13 +2538,15 @@ export function einsatzPdfDokument(
 
 /**
  * Bis zu so viel Höhe (pt) belegt die letzte Zeile(n) eines Bogens auf einer
- * Folgeseite, damit sie als Restseite gilt: gut zwölf Textzeilen (R5-A8, vorher 110 pt = gut acht). Der Kasten
+ * Folgeseite, damit sie als Restseite gilt: gut zwölf Textzeilen (R5-A8, vorher 110 pt = gut acht).
+ * Seit dem Raster der THWin-Vorlage (Personalzeilen 19,85 pt, 10 pt Schrift)
+ * sind zwölf Zeilen höher: 210 statt 160 pt. Der Kasten
  * „Stand am Meldekopf“ über dem Bogen kostete in der Sammel-PDF von 30
  * Einheiten zwei Seiten, die nur noch die letzte Zeile des Sofortbedarfs
  * trugen („M 11 / W 1 / D 0“), obwohl das Einzel-PDF derselben Einheit ohne
  * Restseite auskam (Audit Runde 4, R4-A7).
  */
-const RESTSEITE_MAX_PT = 160;
+const RESTSEITE_MAX_PT = 210;
 
 /**
  * Sammel-PDF ohne Restseiten. Ein Probesatz ohne Bilder und ohne Anhang misst
@@ -2969,7 +3048,7 @@ function qrBlock(
  * Übungsbogen wird in einer echten Lage mitgezählt (Audit Runde 4, R4-A4).
  * Die Felder entsprechen dem Kasten „Stand am Meldekopf“ der Sammel-PDF.
  */
-function blankoMeldekopf(): Content {
+function blankoMeldekopf(z: BlankoZeilen): Content {
   return {
     table: {
       widths: ["*"],
@@ -2989,7 +3068,7 @@ function blankoMeldekopf(): Content {
               // Beiblatt (R5-A6): Der Vordruck fasst 4 Fahrzeuge und 6 Qualifikationen. Mehr gehört
               // auf einen zweiten Vordruck mit gleicher Einheit und Nr., nicht an den Rand.
               {
-                text: "Blatt ____ von ____   ·   Reicht der Platz nicht (mehr als 29 Personen, 4 Fahrzeuge oder 6 Qualifikationen): weiteren Vordruck als Beiblatt nehmen, dort Einheit und Nr. eintragen und hier die Blattzahl nachtragen.",
+                text: `Blatt ____ von ____   ·   Reicht der Platz nicht (mehr als ${z.personal} Personen, ${z.fahrzeuge} Fahrzeuge oder ${z.qualifikationen} Qualifikationen): weiteren Vordruck als Beiblatt nehmen, dort Einheit und Nr. eintragen und hier die Blattzahl nachtragen.`,
                 bold: false,
                 fontSize: 7.5,
                 lineHeight: 1.25,
@@ -3047,10 +3126,10 @@ export interface NachtragsPlatz {
 
 /** Freie Personalzeilen, wenn Platz ist (R3-A6). */
 const PERSONAL_NACHTRAG_ZEILEN = 2;
-/** Höhe einer leeren Personalzeile in pt, gemessen 22,4 (8 pt Schrift, 5 pt Rand oben und unten, Innenabstand), aufgerundet. */
-const LEERZEILE_HOEHE = 23;
-/** Höhe eines leeren Fahrzeugblocks samt Abstand in pt, gemessen 74, aufgerundet. */
-const LEERFAHRZEUG_HOEHE = 76;
+/** Höhe einer leeren Personalzeile in pt: Zeilenhöhe der Vorlage (19,85), aufgerundet. */
+const LEERZEILE_HOEHE = 20;
+/** Höhe eines leeren Fahrzeugblocks in pt: 28,35 + 56,7 aus der Vorlage, aufgerundet; Blöcke stoßen ohne Abstand aneinander. */
+const LEERFAHRZEUG_HOEHE = 86;
 const MESS_BOGEN_ENDE = "bogen-ende";
 
 /** Fahrzeug ohne Angaben — Platzhalter für die Fahrzeugblöcke des Blanko-Vordrucks. */
@@ -3077,7 +3156,7 @@ export function pdfDokument(
 ): TDocumentDefinitions {
   b = ohneVorbelegung(b);
   const org = b.einheit.organisation;
-  const farbe = orgFarbe(org);
+  const farbe = orgFarbePapier(org);
   const typName =
     vokabText(
       b.einheit.einheitsTyp,
@@ -3094,9 +3173,13 @@ export function pdfDokument(
   const ansprech = b.personal[0];
   // Verdichteter Satz (Sammel-PDF, R4-A7): knappere Innenabstände und Lücken.
   const dicht = zusatz?.verdichtet === true;
-  const tabLayout = dicht
-    ? { paddingTop: () => 0.5, paddingBottom: () => 0.5 }
-    : undefined;
+  const tabLayout = rahmenLayout(dicht);
+  /** Mindesthöhe einer Zeile wie in der Vorlage; verdichtet ohne. */
+  // pdfmake rechnet die Höhe ohne Innenabstand oben/unten.
+  const hoch = (pt: number): number | "auto" =>
+    dicht ? "auto" : pt - 2 * 2;
+  /** Schriftgröße des Formulars: 10 pt wie die Vorlage, verdichtet 8 pt. */
+  const schrift = dicht ? 8 : 10;
   /** Abstand in pt, verdichtet halb so groß. */
   const luecke = (pt: number): number => (dicht ? Math.ceil(pt / 2) : pt);
 
@@ -3109,25 +3192,46 @@ export function pdfDokument(
   /** Leere Tabellenzeile mit Schreibhöhe — die Ränder bilden die Ausfülllinien. */
   const leerZelle = (): TableCell => ({
     text: " ",
-    margin: [0, 5, 0, 5] as [number, number, number, number],
+    // Verdichtet fehlt die Mindesthöhe der Zeile — dann trägt die Zelle sie
+    // selbst. Sonst gibt die Zeilenhöhe der Vorlage (19,85 pt) die Schreibhöhe.
+    margin: (dicht ? [0, 5, 0, 5] : [0, 2, 0, 2]) as [number, number, number, number],
   });
+  /** Beschriftung im Kopf: fett, senkrecht mittig wie in der Vorlage. */
+  const feld = (text: string, extra: Partial<TableCell> = {}): TableCell =>
+    ({ text, bold: true, verticalAlignment: "middle", ...extra }) as TableCell;
+  /** Wert im Kopf: senkrecht mittig. */
+  const wert = (text: string, extra: Partial<TableCell> = {}): TableCell =>
+    ({ text, verticalAlignment: "middle", ...extra }) as TableCell;
+  /** Von einer colSpan-Zelle belegter Platz. */
+  const belegt = (n: number): TableCell[] => Array.from({ length: n }, () => ({}));
 
+  // Kopf im Spaltenraster der Vorlage (sieben Spalten, siehe RASTER):
+  //   Stärke | Wert (3 Spalten) | Ansprechpartner/in (2) | Name
+  //   OV/RB/LV | Name (3) | Telefon/eMail | Nummern (2)
+  //   Einsatzzeitraum, Einsatzort (3) | Wert (4)
+  //   Einsatzbeginn (2) | Wert | Einsatzende (2) | Wert (2)
   const infoZeilen: TableCell[][] = [
     [
       // Mit Legende: „____ / ____ / ____ / ____" allein sagte nicht, welche
       // Linie welche Zahl ist (Audit Runde 2, R2-A6) — und „1 / 1 / 2 / 4"
       // ließ sich nach einer Stiftkorrektur nicht gegen die Namen prüfen
       // (Audit Runde 3, R3-A6). Gleiche Beschriftung auf Vordruck und Bogen.
-      { text: "Stärke (F / UF / M // Ges.):", bold: true },
       {
+        verticalAlignment: "middle",
+        stack: [
+          { text: "Stärke:", bold: true },
+          { text: "F / UF / M // Ges.", fontSize: 6.5 },
+        ],
+      },
+      {
+        colSpan: 3,
+        verticalAlignment: "middle",
         // Mit Code: das Kästchen „von Hand geändert“ gehört hierher, wo mit
         // dem Stift korrigiert wird, nicht auf die Codeseite (R4-A5).
         stack: [
           {
             text: `${zahl(s.fuehrer)} / ${zahl(s.unterfuehrer)} / ${zahl(s.mannschaft)} // ${zahl(s.gesamt)}`,
           },
-          // Zweite Zeile der Zelle: „Ansprechpartner/in:" daneben bricht ohnehin
-          // auf zwei Zeilen um, das Kästchen kostet keine Höhe.
           ...(qr
             ? [
                 {
@@ -3136,122 +3240,162 @@ export function pdfDokument(
                       ? STIFT_KAESTCHEN_ANGEKREUZT
                       : STIFT_KAESTCHEN,
                   bold: true,
+                  fontSize: schrift - 2,
                 } as Content,
               ]
             : []),
         ],
       },
-      { text: "Ansprechpartner/in:", bold: true },
-      {
-        text: ansprech
+      ...belegt(2),
+      feld("Ansprechpartner/in:", { colSpan: 2 }),
+      ...belegt(1),
+      wert(
+        ansprech
           ? ansprechpersonPapier(`${ansprech.vorname} ${ansprech.nachname}`)
           : "",
-      },
+      ),
     ],
   ];
   for (const h of b.einheit.hierarchie) {
+    const ebene = vokabText(h.bezeichnung, vokabularFuer(org, "ebene")) || "Ebene";
+    // „OV“, „RB“, „LV“ passen in die 63,8-pt-Spalte der Vorlage; „Ortsfeuerwehr“
+    // oder „übergeordnete Ebene“ brächen mitten im Wort um und bekommen die
+    // nächste Rasterkante (173,5 pt) dazu.
+    const breit = laengstesWort(ebene) > 8;
     infoZeilen.push([
-      {
-        text: vokabText(h.bezeichnung, vokabularFuer(org, "ebene")) || "Ebene",
-        bold: true,
-      },
-      { text: weichUmbrechen(h.kurz ? `${h.name} (${h.kurz})` : h.name) },
-      { text: "Telefon:\neMail:", bold: true },
-      { text: weichUmbrechen(`${h.telefon ?? "—"}\n${h.email ?? "—"}`) },
+      feld(ebene, breit ? { colSpan: 2 } : {}),
+      ...belegt(breit ? 1 : 0),
+      wert(weichUmbrechen(h.kurz ? `${h.name} (${h.kurz})` : h.name), {
+        colSpan: breit ? 2 : 3,
+      }),
+      ...belegt(breit ? 1 : 2),
+      feld("Telefon:\neMail:"),
+      wert(weichUmbrechen(`${h.telefon ?? "—"}\n${h.email ?? "—"}`), {
+        colSpan: 2,
+      }),
+      ...belegt(1),
     ]);
   }
   infoZeilen.push([
-    { text: "vorgesehener Einsatzzeitraum:", bold: true, colSpan: 2 },
-    {},
-    {
-      text: blanko ? `${linie}______  –  ${linie}______` : zeitraumVonBis(b),
-      colSpan: 2,
-    },
-    {},
+    feld("vorgesehener Einsatzzeitraum:", { colSpan: 3 }),
+    ...belegt(2),
+    wert(blanko ? `${linie}______  –  ${linie}______` : zeitraumVonBis(b), {
+      colSpan: 4,
+    }),
+    ...belegt(3),
   ]);
   infoZeilen.push([
-    { text: "vorgesehener Einsatzort / Auftrag:", bold: true, colSpan: 2 },
-    {},
-    { text: weichUmbrechen(b.einsatz.ortAuftrag), colSpan: 2 },
-    {},
+    feld("vorgesehener Einsatzort / Auftrag:", { colSpan: 3 }),
+    ...belegt(2),
+    wert(weichUmbrechen(b.einsatz.ortAuftrag), { colSpan: 4 }),
+    ...belegt(3),
   ]);
   infoZeilen.push([
-    { text: "Einsatzbeginn:", bold: true },
-    {
-      text:
-        b.einsatz.einsatzbeginn != null
-          ? zeitpunktDeutsch(b.einsatz.einsatzbeginn)
-          : "",
-    },
-    { text: "Einsatzende:", bold: true },
-    {
-      text:
-        b.einsatz.einsatzende != null
-          ? zeitpunktDeutsch(b.einsatz.einsatzende)
-          : "",
-    },
+    feld("Einsatzbeginn:", { colSpan: 2 }),
+    ...belegt(1),
+    wert(
+      b.einsatz.einsatzbeginn != null
+        ? zeitpunktDeutsch(b.einsatz.einsatzbeginn)
+        : "",
+    ),
+    feld("Einsatzende:", { colSpan: 2 }),
+    ...belegt(1),
+    wert(
+      b.einsatz.einsatzende != null
+        ? zeitpunktDeutsch(b.einsatz.einsatzende)
+        : "",
+      { colSpan: 2 },
+    ),
+    ...belegt(1),
   ]);
 
-  const fahrzeugBlock = (f: Fahrzeug, leer = !!blanko): Content => ({
-    ...(tabLayout ? { layout: tabLayout } : {}),
-    // Ein Fahrzeug steht ganz auf einer Seite: Das taktische Zeichen läuft über zwei Zeilen,
-    // und der Block riss über die Seitengrenze — „Tiefl 18 t“ nur als Bild, der Text auf
-    // der nächsten Seite (R5-A3).
-    unbreakable: true,
-    table: {
-      // Erste Spalte: taktisches Zeichen (DV 102), zeilenübergreifend links.
-      widths: [56, "*", "*", "*"],
-      body: [
-        [
-          {
-            svg: fahrzeugSymbolSvg(f, org),
-            width: 50,
-            rowSpan: 2,
-            alignment: "center",
-            margin: [2, 6, 2, 6] as [number, number, number, number],
-          },
-          // Im Vordruck stehen hier die Feldnamen — sonst wäre die Zeile eine
-          // beschriftungslose Leerzeile, in der niemand weiß, was hingehört.
-          {
-            text: leer
-              ? "Fahrzeug:"
-              : vokabText(f.typ, vokabularFuer(org, "fahrzeug")) || "Fahrzeug",
-            bold: true,
-          },
-          { text: leer ? "Kennzeichen:" : kennzeichenText(f), bold: true },
-          // Erfasste Sitzplätze stehen als Zahl. Ohne eigene Angabe steht der
-          // Richtwert des Typs, aber als solcher gekennzeichnet: in der App
-          // zählte er in die Sitzplatzbilanz, auf dem Papier fehlte er ganz
-          // (Rückmeldung OV Chemnitz, 11/2026). „(Richtwert)“ hält ihn von
-          // einer Zusage der Einheit unterscheidbar.
-          {
-            text: leer
-              ? "Funkrufname:"
-              : [
-                  f.funkrufname ? `FuRn: ${funkrufText(f, b.einheit)}` : "",
-                  sitzplatzZeile(f, org),
-                ]
-                  .filter(Boolean)
-                  .join("\n"),
-          },
+
+  const fahrzeugBlock = (f: Fahrzeug, leer = !!blanko): Content => {
+    const stan =
+      leer || f.stanKonform != null
+        ? `Ausstattung nach StAN: ja ${kasten(!leer && f.stanKonform === true)} / nein ${kasten(!leer && f.stanKonform === false)}\n`
+        : "";
+    return {
+      layout: tabLayout,
+      // Ein Fahrzeug steht ganz auf einer Seite: Das taktische Zeichen läuft über zwei Zeilen,
+      // und der Block riss über die Seitengrenze — „Tiefl 18 t“ nur als Bild, der Text auf
+      // der nächsten Seite (R5-A3).
+      unbreakable: true,
+      table: {
+        // Spalten wie in der Vorlage: Zeichen | Fahrzeug | Kennzeichen | Funkrufname.
+        widths: [
+          spalte(raster(0, 1)),
+          spalte(RASTER[2]),
+          spalte(raster(3, 4)),
+          spalte(raster(5, 6)),
         ],
-        [
-          {}, // von rowSpan des Zeichens belegt
-          {
-            colSpan: 3,
-            text: leer
-              ? `Ausstattung nach StAN: ja ${kasten(false)} / nein ${kasten(false)}\nÄnderungen bzw. Sondergerät:`
-              : f.stanKonform == null
-                ? `Änderungen bzw. Sondergerät: ${weichUmbrechen(f.aenderungen ?? "")}`
-                : `Ausstattung nach StAN: ja ${kasten(f.stanKonform)} / nein ${kasten(!f.stanKonform)}\nÄnderungen bzw. Sondergerät: ${weichUmbrechen(f.aenderungen ?? "")}`,
-          },
-          {},
-          {},
+        heights: [hoch(ZEILE_HOCH), hoch(ZEILE_FAHRZEUG_UNTEN)],
+        body: [
+          [
+            {
+              // Taktisches Zeichen (DV 102), zeilenübergreifend links und wie in
+              // der Vorlage mittig im 85 pt hohen Block.
+              svg: fahrzeugSymbolSvg(f, org),
+              width: 50,
+              rowSpan: 2,
+              alignment: "center",
+              margin: (dicht ? [2, 6, 2, 6] : [2, 20, 2, 6]) as [
+                number,
+                number,
+                number,
+                number,
+              ],
+            },
+            // Im Vordruck stehen hier die Feldnamen — sonst wäre die Zeile eine
+            // beschriftungslose Leerzeile, in der niemand weiß, was hingehört.
+            feld(
+              leer
+                ? "Fahrzeug:"
+                : vokabText(f.typ, vokabularFuer(org, "fahrzeug")) || "Fahrzeug",
+            ),
+            feld(leer ? "Kennzeichen:" : kennzeichenText(f)),
+            // Erfasste Sitzplätze stehen als Zahl. Ohne eigene Angabe steht der
+            // Richtwert des Typs, aber als solcher gekennzeichnet: in der App
+            // zählte er in die Sitzplatzbilanz, auf dem Papier fehlte er ganz
+            // (Rückmeldung OV Chemnitz, 11/2026). „(Richtwert)“ hält ihn von
+            // einer Zusage der Einheit unterscheidbar.
+            leer
+              ? feld("FuRn:")
+              : {
+                  verticalAlignment: "middle",
+                  stack: [
+                    ...(f.funkrufname
+                      ? [{ text: `FuRn: ${funkrufText(f, b.einheit)}`, bold: true }]
+                      : []),
+                    ...(sitzplatzZeile(f, org)
+                      ? [{ text: sitzplatzZeile(f, org), fontSize: schrift - 2 }]
+                      : []),
+                    { text: "" },
+                  ],
+                },
+          ],
+          [
+            {}, // von rowSpan des Zeichens belegt
+            {
+              colSpan: 3,
+              // Zeilenabstand wie Word in der Vorlage; die 56,7 pt der Zeile haben Platz dafür.
+              lineHeight: dicht ? 1 : 1.25,
+              text: [
+                { text: `${stan}Änderungen bzw. Sondergerät:`, bold: true },
+                leer ? "" : ` ${weichUmbrechen(f.aenderungen ?? "")}`,
+              ],
+            },
+            {},
+            {},
+          ],
         ],
-      ],
-    },
-    margin: [0, 0, 0, luecke(6)] as [number, number, number, number],
-  });
+      },
+      fontSize: schrift,
+      // Die Blöcke schließen wie in der Vorlage ohne Lücke aneinander: Die
+      // Unterkante des einen ist die Oberkante des nächsten.
+      margin: [0, 0, 0, -LINIE] as [number, number, number, number],
+    };
+  };
   const fahrzeuge: Content[] = blanko
     ? Array.from({ length: blanko.fahrzeuge }, () =>
         fahrzeugBlock(BLANKO_FAHRZEUG),
@@ -3271,18 +3415,21 @@ export function pdfDokument(
   // eine Person eine Nummer — und drückte die Funktionen in 118 pt zusammen
   // (Rückmeldung OV Chemnitz, 11/2026). Der Vordruck behält die Spalte: dort
   // wird von Hand geschrieben und gebraucht wird der Platz.
+  // Kopfzeile wie in der Vorlage: weiß, fett, 8 pt.
+  const kopf = (text: string, fontSize = 8): TableCell =>
+    ({ text, bold: true, fontSize, verticalAlignment: "middle" }) as TableCell;
   const personalZeilen: TableCell[][] = [
     blanko
       ? [
-          { text: "Funktion /\nZusatzfunktion", bold: true, fillColor: GRAU },
-          { text: "Rolle\nF/UF/M", bold: true, fillColor: GRAU },
-          { text: "Name, Vorname", bold: true, fillColor: GRAU },
-          { text: "D = dienstlich / P = privat", bold: true, fillColor: GRAU },
+          kopf("Funktion/Zusatzfunktionen"),
+          kopf("Rolle\nF/UF/M", 6.5),
+          kopf("Name, Vorname"),
+          kopf("D = dienstlich / P = privat"),
         ]
       : [
-          { text: "Funktion / Zusatzfunktion", bold: true, fillColor: GRAU },
-          { text: "Rolle\nF/UF/M", bold: true, fillColor: GRAU },
-          { text: "Name, Vorname\nErreichbarkeit (D = dienstlich / P = privat)", bold: true, fillColor: GRAU },
+          kopf("Funktion/Zusatzfunktionen"),
+          kopf("Rolle\nF/UF/M", 6.5),
+          kopf("Name, Vorname\nErreichbarkeit (D = dienstlich / P = privat)"),
         ],
   ];
   for (let i = 0; blanko && i < blanko.personal; i++) {
@@ -3317,11 +3464,11 @@ export function pdfDokument(
       }),
     ].join("\n");
     personalZeilen.push([
-      { text: funktionsText(p, org) },
-      { text: ROLLE_KURZ[p.staerkeRolle] ?? "", alignment: "center" },
+      wert(funktionsText(p, org)),
+      wert(ROLLE_KURZ[p.staerkeRolle] ?? "", { alignment: "center" }),
       kontakte
-        ? { text: [namePapier(p.nachname, p.vorname), { text: `  ${kontakte.replace(/\n/g, " · ")}`, fontSize: 7 }] }
-        : { text: namePapier(p.nachname, p.vorname) },
+        ? wert("", { text: [namePapier(p.nachname, p.vorname), { text: `  ${kontakte.replace(/\n/g, " · ")}`, fontSize: schrift - 2 }] })
+        : wert(namePapier(p.nachname, p.vorname)),
     ]);
   }
   // Freie Zeilen für Nachrückende: Wer auf dem Ausdruck nachträgt und „von
@@ -3334,10 +3481,7 @@ export function pdfDokument(
   }
 
   const qualiZeilen: TableCell[][] = [
-    [
-      { text: "Name, Vorname", bold: true, fillColor: GRAU },
-      { text: "Qualifikation", bold: true, fillColor: GRAU },
-    ],
+    [wert("Name, Vorname"), wert("Qualifikation")],
   ];
   for (let i = 0; blanko && i < blanko.qualifikationen; i++) {
     qualiZeilen.push([leerZelle(), leerZelle()]);
@@ -3352,8 +3496,8 @@ export function pdfDokument(
       if (berufe.length > 0)
         teile.push(BERUF_PRAEFIX + berufe.map(berufText).join(", "));
       qualiZeilen.push([
-        { text: namePapier(p.nachname, p.vorname) },
-        { text: weichUmbrechen(teile.join(", ")) },
+        wert(namePapier(p.nachname, p.vorname)),
+        wert(weichUmbrechen(teile.join(", "))),
       ]);
     }
   }
@@ -3372,9 +3516,12 @@ export function pdfDokument(
         : {}),
     });
     sofort.push({
-      ...(tabLayout ? { layout: tabLayout } : {}),
+      layout: tabLayout,
+      fontSize: schrift,
+      lineHeight: dicht ? 1 : 1.2,
       table: {
-        widths: ["*", "*"],
+        // Trennlinie auf der Kante „Einsatzende“/Funkrufname der Vorlage.
+        widths: [spalte(raster(0, 4)), spalte(raster(5, 6))],
         // Der Kasten bleibt ganz: In der Sammel-PDF stand die letzte Zeile
         // („M 11 / W 1 / D 0“) allein auf einer Seite, die Beschriftung davor (R4-A7).
         dontBreakRows: true,
@@ -3405,13 +3552,77 @@ export function pdfDokument(
             : sofortbedarfZellen(sb, vp, mwd),
         ],
       },
-      margin: [0, luecke(8), 0, 0] as [number, number, number, number],
+      // Schließt wie in der Vorlage direkt an den letzten Fahrzeugblock an.
+      margin: [0, 0, 0, 0] as [number, number, number, number],
     });
   }
 
+  /**
+   * Titelbalken wie in der Vorlage: links das Kurzzeichen der Einheit, in der
+   * Mitte der Titel weiß auf der Kennfarbe, rechts beim THW die Wortbildmarke,
+   * bei allen anderen der Name der Organisation.
+   */
+  // Kurzzeichen links im Titelbalken (in der Vorlage „Fb Fü 6 / K (A)“): Die
+  // Spalte ist nur 56 pt breit. Kurze Zeichen wie „FGr K (A)“ stehen in 10 pt,
+  // etwas längere in 7 pt; ein Wort, das auch dann nicht passt
+  // („Schwerpunktfeuerwehr“), bliebe zerhackt und fällt weg — der Titel daneben
+  // nennt die Einheit ohnehin ausgeschrieben.
+  const titelKurz = laengstesWort(typKurz) <= 13 ? typKurz : "";
+  const titelKurzGroesse = laengstesWort(titelKurz) <= 9 ? schrift : 7;
+  const titelZeile = (): Content => {
+    const mitte = (extra: Partial<TableCell>): TableCell =>
+      ({ alignment: "center", verticalAlignment: "middle", ...extra }) as TableCell;
+    const rechts: TableCell = blanko
+      ? mitte({ text: "Organisation:", bold: true, alignment: "left" })
+      : org === OrganisationsTyp.THW
+        ? mitte({
+            stack: [
+              {
+                image: THW_LOGO_JPEG,
+                width: THW_LOGO_BREITE,
+                height: THW_LOGO_HOEHE,
+                alignment: "center",
+              },
+              ...(b.einheit.organisationName
+                ? [{ text: weichUmbrechen(b.einheit.organisationName), fontSize: 7, color: farbe.akzent }]
+                : []),
+            ],
+          })
+        : mitte({
+            stack: [
+              { text: orgLabel(org), bold: true, fontSize: 11, color: farbe.akzent },
+              ...(b.einheit.organisationName
+                ? [{ text: weichUmbrechen(b.einheit.organisationName), fontSize: 7, color: farbe.akzent }]
+                : []),
+            ],
+          });
+    return {
+      layout: { ...tabLayout, paddingLeft: () => 2, paddingRight: () => 2 },
+      fontSize: schrift,
+      table: {
+        widths: [spalte(RASTER[0]) + 3, spalte(raster(1, 5)) + 3, spalte(RASTER[6]) + 3],
+        heights: () => hoch(ZEILE_TITEL),
+        body: [
+          [
+            // Der Vordruck gehört keiner Einheit — sie wird erst beim Ausfüllen bekannt.
+            mitte({ text: blanko ? "Einheit:" : titelKurz, bold: true, fontSize: titelKurzGroesse }),
+            mitte({
+              text: blanko ? "Erfassungsbogen" : `Erfassungsbogen ${typName}`,
+              color: farbe.schrift,
+              fillColor: farbe.balken,
+              bold: true,
+            }),
+            rechts,
+          ],
+        ],
+      },
+      margin: [0, 0, 0, -LINIE],
+    };
+  };
+
   return winAnsiDokument({
     pageSize: "A4",
-    pageMargins: SEITENRAENDER,
+    pageMargins: BOGEN_RAENDER,
     defaultStyle: { fontSize: 8, font: SCHRIFT },
     // Titel mit Einheit und Stand: Ein im Tab angezeigter Bogen hat keinen Dateinamen, der Titel unterscheidet ihn in Tab und Ablage (R16-A3).
     info: {
@@ -3447,12 +3658,13 @@ export function pdfDokument(
       columns: [
         {
           text: blanko ? "Stand:" : `Stand: ${zeitgruppe(b.stand)}`,
-          margin: [40, 0, 0, 0],
+          // Bündig mit dem Rahmen des Bogens.
+          margin: [BOGEN_RAENDER[0], 0, 0, 0],
         },
         {
           text: `${seite} / ${gesamt}`,
           alignment: "right",
-          margin: [0, 0, 40, 0],
+          margin: [0, 0, BOGEN_RAENDER[2], 0],
         },
       ],
       fontSize: 8,
@@ -3462,64 +3674,49 @@ export function pdfDokument(
       // blassen Druck untergehen, die Textzeile nicht.
       ...(b.uebung ? [uebungsStoerer()] : []),
       // ---- Meldekopf-Kasten (nur Vordruck) ----
-      ...(blanko ? [blankoMeldekopf()] : []),
+      ...(blanko ? [blankoMeldekopf(blanko)] : []),
       // ---- Kopf ----
+      titelZeile(),
       {
-        ...(tabLayout ? { layout: tabLayout } : {}),
+        layout: tabLayout,
+        fontSize: schrift,
         table: {
-          // Kopf zweispaltig: Titel im Kasten in der Kennfarbe der Organisation,
-          // rechts die Einheit von
-          // oben nach unten — Organisation, Organisationsname, Einheitstyp.
-          widths: ["*", 150],
-          body: [
-            [
-              {
-                // Der Vordruck gehört keiner Organisation — der Einheitstyp
-                // wird erst beim Ausfüllen bekannt.
-                text: blanko ? "Erfassungsbogen" : `Erfassungsbogen ${typName}`,
-                color: farbe.schrift,
-                fillColor: farbe.balken,
-                bold: true,
-                fontSize: 12,
-                margin: [6, 8, 6, 8],
-              },
-              {
-                text: blanko
-                  ? "Organisation:\nEinheit:"
-                  : weichUmbrechen(
-                      [orgLabel(org), b.einheit.organisationName, typKurz]
-                        .filter(Boolean)
-                        .join("\n"),
-                    ),
-                bold: true,
-                color: farbe.akzent,
-                margin: [2, 8, 2, 8],
-              },
-            ],
-          ],
+          widths: RASTER.map(spalte),
+          heights: () => hoch(ZEILE_HOCH),
+          body: infoZeilen,
         },
-        margin: [0, 0, 0, luecke(8)],
-      },
-      {
-        ...(tabLayout ? { layout: tabLayout } : {}),
-        table: { widths: [110, "*", 70, "*"], body: infoZeilen },
-        margin: [0, 0, 0, luecke(10)],
+        margin: [0, -LINIE, 0, -LINIE],
       },
       ...fahrzeuge,
+      ...sofort,
 
       // ---- Personal ----
       // Kein fester Seitenumbruch: kleine Einheiten passen so auf eine Seite,
       // größere lässt pdfmake bei Bedarf selbst umbrechen.
       {
-        ...(tabLayout ? { layout: tabLayout } : {}),
+        layout: tabLayout,
+        fontSize: schrift,
         // Zeilen bleiben ganz: Auf Seite 1 des Vordrucks stand die letzte
         // Personalzeile nur als 3-mm-Streifen über der Fußzeile (R4-A8). Der
         // Vordruck wiederholt den Tabellenkopf auf Seite 2.
+        // Spalten nach der Vorlage: Funktion 127,4 pt, Name 163 pt, Erreichbarkeit
+        // 184,3 pt; die Rolle bekommt im Vordruck 30 pt aus der Namensspalte.
+        // Ausgefüllt steht die Erreichbarkeit klein hinter dem Namen (Rückmeldung
+        // OV Chemnitz, 11/2026); Funktion und Rolle nehmen dann alles bis zur
+        // Kante Name/Erreichbarkeit der Vorlage (364,8 pt), sonst brächen
+        // Funktionen wie „Führungsassistent/-in (Zugtrupp) — Personalreserve“
+        // auf drei Zeilen um.
         table: {
-          widths: blanko ? [118, 30, "*", 160] : ["*", 30, 190],
+          widths: blanko
+            ? [spalte(127.4), spalte(30), spalte(133), spalte(184.5)]
+            : [spalte(260.4), spalte(30), spalte(184.5)],
+          heights: () => hoch(ZEILE_PERSONAL),
           body: personalZeilen,
           dontBreakRows: true,
-          ...(blanko ? { headerRows: 1 } : {}),
+          // Der Tabellenkopf wiederholt sich auf der Folgeseite und steht nie
+          // allein am Seitenende.
+          headerRows: 1,
+          keepWithHeaderRows: 1,
         },
         margin: [0, luecke(12), 0, luecke(10)],
       },
@@ -3545,22 +3742,30 @@ export function pdfDokument(
         : []),
       {
         text: "weitere interne / externe Qualifikationen obiger Helfer/-innen:",
+        fontSize: schrift,
         margin: [0, 0, 0, 4],
       },
       {
-        ...(tabLayout ? { layout: tabLayout } : {}),
-        table: { widths: [180, "*"], body: qualiZeilen },
+        layout: tabLayout,
+        fontSize: schrift,
+        // Spalten der Vorlage: 171,25 pt Name (w:tblGrid 3425 Twips), Rest Qualifikation.
+        table: {
+          widths: [spalte(171.25), spalte(RAHMEN_BREITE - 171.25)],
+          heights: () => hoch(ZEILE_PERSONAL),
+          body: qualiZeilen,
+        },
       },
-      ...sofort,
       // Vordruck: Platz für drei Zeilen Handschrift statt einer Zeile (R5-A7).
       ...(blanko
         ? [
             {
               unbreakable: true,
               stack: [
-                { text: "Sonstiges:", margin: [0, 8, 0, 3] },
+                { text: "Sonstiges:", fontSize: schrift, margin: [0, 8, 0, 3] },
                 {
+                  layout: tabLayout,
                   table: {
+                    heights: () => hoch(ZEILE_PERSONAL),
                     widths: ["*"],
                     body: [[leerZelle()], [leerZelle()], [leerZelle()]],
                   },
@@ -3572,6 +3777,7 @@ export function pdfDokument(
           ? [
               {
                 text: `Sonstiges: ${[b.sonstiges ? weichUmbrechen(b.sonstiges) : "", staerkeVonHand(b) ? staerkeVonHandSatz(b) : ""].filter(Boolean).join(" ")}`,
+                fontSize: schrift,
                 margin: [0, 8, 0, 0],
               } as Content,
             ]
