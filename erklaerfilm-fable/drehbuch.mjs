@@ -142,7 +142,7 @@ export const COMIC_INTRO = {
     {
       id: "qr",
       bild:
-        "Panel: Merle tritt ans Zelt, Regenjacke, hält ein Handy hoch – auf dem Display ein großer QR-Code. Sina hebt ihr Tablet. Onomatopoesie „PIEP“. Dann Inset: das Tablet zeigt „THW Oldenburg · FGr WP (B) · Stärke 1/2/9//12 · 4 Fahrzeuge · Sofortbedarf: 300 l Diesel“.",
+        "Panel: Merle tritt ans Zelt, Regenjacke, hält ein Handy hoch – auf dem Display ein großer QR-Code. Sina hebt ihr Tablet. Onomatopoesie „PIEP“. Dann Inset: das Tablet zeigt „THW Oldenburg · FGr WP (B) · Stärke 0/3/9//12 · 4 Fahrzeuge · Sofortbedarf: 300 l Diesel“.",
       sfx: [{ key: "regen", at: 0, dauer: "szene" }, { key: "scan-piep", at: "nach:i13" }],
       zeilen: [
         z("i13", "merle", "Heros Oldenburg 48/43, Fachgruppe Wasserschaden Pumpen. Hier ist unser Bogen – einmal scannen, bitte.", {

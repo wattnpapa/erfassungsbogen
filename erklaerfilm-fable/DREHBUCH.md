@@ -92,7 +92,7 @@ Musikbett: „nacht“ – Instrumental, cinematic but understated: slow pulsing
 
 ### Szene „qr“ (01:32–02:00)
 
-**Bild:** Panel: Merle tritt ans Zelt, Regenjacke, hält ein Handy hoch – auf dem Display ein großer QR-Code. Sina hebt ihr Tablet. Onomatopoesie „PIEP“. Dann Inset: das Tablet zeigt „THW Oldenburg · FGr WP (B) · Stärke 1/2/9//12 · 4 Fahrzeuge · Sofortbedarf: 300 l Diesel“.
+**Bild:** Panel: Merle tritt ans Zelt, Regenjacke, hält ein Handy hoch – auf dem Display ein großer QR-Code. Sina hebt ihr Tablet. Onomatopoesie „PIEP“. Dann Inset: das Tablet zeigt „THW Oldenburg · FGr WP (B) · Stärke 0/3/9//12 · 4 Fahrzeuge · Sofortbedarf: 300 l Diesel“.
 
 **Ton:** regen @ 0 (szene), scan-piep @ nach:i13
 

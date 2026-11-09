@@ -98,7 +98,7 @@ await kontext.addInitScript(() => {
     // Der Dev-Server hat keinen Service Worker: die Zeile „Wird für den Offline-Betrieb geladen“
     // stünde sonst dauerhaft im Bild (in der veröffentlichten App verschwindet sie nach Sekunden).
     const stil = document.createElement("style");
-    stil.textContent = ".offline-badge, .offline-platz { display: none !important; }";
+    stil.textContent = ".offline-badge, .offline-platz, .erklaerfilm { display: none !important; }";
     document.head.append(stil);
   };
   if (document.body) einhaengen();

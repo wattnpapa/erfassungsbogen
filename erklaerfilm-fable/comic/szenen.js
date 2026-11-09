@@ -222,7 +222,7 @@ function tabletInhalt(x, y, w, h, u) {
   s += `<text x="${x + 24}" y="${y + h * 0.11}" font-family="Comic Neue" font-weight="700" font-size="${h * 0.075}" fill="#fff">Einsatz-Sammlung · Hochwasser Hunte</text>`;
   const zeilen = [
     ["THW Oldenburg (NI) · FGr WP (B)", "#141414", true],
-    ["Stärke  1 / 2 / 9 // 12", "#12275e", true],
+    ["Stärke  0 / 3 / 9 // 12", "#12275e", true],
     ["4 Fahrzeuge · Heros Oldenburg 48/43", "#2c3a7a", false],
     ["Sofortbedarf: 300 l Diesel", "#2c3a7a", false],
     ["✓ vollständig und plausibel", "#146b3a", true],
