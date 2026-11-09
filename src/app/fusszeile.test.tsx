@@ -442,7 +442,8 @@ describe("Was ist neu", () => {
     const tage = () => [...dialog.querySelectorAll(".aenderung h4")].map((h) => h.textContent);
     expect(monat()).toBe("November 2026");
     expect(dialog.querySelector(".aenderungen-kurz")!.textContent).toContain("0 / 2 / 9 // 11");
-    expect(tage()[0]).toBe("08.11.2026");
+    // Neuester Eintrag aus den Daten, nicht fest: sonst bricht der Test mit jedem neuen Tag im Verlauf.
+    expect(tage()[0]).toBe(AENDERUNGEN[0]!.datum.split("-").reverse().join("."));
     expect(tage().every((t) => t!.endsWith(".11.2026"))).toBe(true);
     const neuer = within(dialog).getByRole("button", { name: "← Neuer" }) as HTMLButtonElement;
     expect(neuer.disabled).toBe(true);

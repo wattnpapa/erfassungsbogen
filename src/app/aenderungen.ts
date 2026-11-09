@@ -22,7 +22,7 @@ export interface Aenderung {
  */
 export const MONATE: Readonly<Record<string, string>> = {
   "2026-11":
-    "Rückmeldungen aus der Erprobung (FAG THW, OV Chemnitz): Stärke als 0 / 2 / 9 // 11, übersichtlichere PDF, Fachzug Logistik nach StAN mit einzeln meldbaren Trupps, Ladungsträger wie Abrollbehälter, Funkrufname als Erreichbarkeit und dieser Änderungsverlauf. Die Excel-Liste „Oldenburg“ entfällt.",
+    "Rückmeldungen aus der Erprobung (FAG THW, OV Chemnitz): Stärke als 0 / 2 / 9 // 11, übersichtlichere PDF, Fachzug Logistik nach StAN mit einzeln meldbaren Trupps, Ladungsträger wie Abrollbehälter, Funkrufname als Erreichbarkeit, Import ausgefüllter THW-Word-Bögen und dieser Änderungsverlauf. Die Excel-Liste „Oldenburg“ entfällt.",
   "2026-10":
     "Viele Prüfrunden aus Sicht von Helfern, Führungskräften und Meldekopf: sicherere Bedienung, Lagemonitor für den Bildschirm im Führungsfahrzeug, Dienststelle und Beruf je Person, USB-Handscanner überall, Einsatzzeitraum mit Uhrzeit und ein schnellerer Start.",
   "2026-09":
@@ -34,6 +34,13 @@ export const MONATE: Readonly<Record<string, string>> = {
 };
 
 export const AENDERUNGEN: readonly Aenderung[] = [
+  {
+    datum: "2026-11-09",
+    punkte: [
+      "Ausgefüllte THW-Word-Erfassungsbögen (.docx aus den Vorlagen 06-…_Erfassungsbogen) lassen sich über „Aus Datei laden…“ und „Bögen einlesen…“ übernehmen. Was keinem Feld zuzuordnen ist (etwa Fax, Zahl der Vegetarier), steht unter „Sonstiges“; eine Quittung nennt, was übernommen und was weggelassen wurde.",
+      "PDF des Bogens im Raster der THW-Papiervorlage: gleiche Rahmen, Zeilenhöhen und Titelbalken, beim THW mit der Wortbildmarke; der Sofortbedarf steht direkt unter den Fahrzeugen.",
+    ],
+  },
   {
     datum: "2026-11-08",
     punkte: [
