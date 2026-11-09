@@ -143,8 +143,8 @@ Musikbett: „werkstatt“ – Instrumental corporate explainer background: ligh
 
 | Nr. | Sprecher | Text | Funk | Dauer |
 | --- | --- | --- | --- | --- |
-| a06 | Erzähler | Seite zwei: der Einsatz. Zeitraum von heute bis morgen; als Ort und Auftrag tragen wir „Hochwasser Hunte, Bereitstellungsraum Weser-Ems-Hallen“ ein. |  | 11.1 s ab 00:53 (App) |
-| a07 | Erzähler | Den Einsatzbeginn setzt ein Klick auf die aktuelle Uhrzeit. Wäre es eine Übung, käme hier der Haken – die Kennzeichnung bleibt bis in PDF und QR-Code erhalten, damit am Meldekopf niemand eine Übung zur Lage zählt.<br><small>gesprochen: Den Einsatzbeginn setzt ein Klick auf die aktuelle Uhrzeit. Wäre es eine Übung, käme hier der Haken – die Kennzeichnung bleibt bis in Pe-De-Eff und QR-Code erhalten, damit am Meldekopf niemand eine Übung zur Lage zählt.</small> |  | 15.0 s ab 01:05 (App) |
+| a06 | Erzähler | Seite zwei: der Einsatz. Zeitraum von heute bis morgen; als Ort und Auftrag tragen wir „Hochwasser Hunte, Bereitstellungsraum Weser-Ems-Hallen“ ein. |  | 11.1 s ab 00:52 (App) |
+| a07 | Erzähler | Den Einsatzbeginn setzt ein Klick auf die aktuelle Uhrzeit. Wäre es eine Übung, käme hier der Haken – die Kennzeichnung bleibt bis in PDF und QR-Code erhalten, damit am Meldekopf niemand eine Übung zur Lage zählt.<br><small>gesprochen: Den Einsatzbeginn setzt ein Klick auf die aktuelle Uhrzeit. Wäre es eine Übung, käme hier der Haken – die Kennzeichnung bleibt bis in Pe-De-Eff und QR-Code erhalten, damit am Meldekopf niemand eine Übung zur Lage zählt.</small> |  | 15.0 s ab 01:04 (App) |
 
 ### Szene „personal“
 
@@ -152,9 +152,9 @@ Musikbett: „werkstatt“ – Instrumental corporate explainer background: ligh
 
 | Nr. | Sprecher | Text | Funk | Dauer |
 | --- | --- | --- | --- | --- |
-| a08 | Erzähler | Seite drei: das Personal. Die zwölf Plätze aus der StAN stehen schon da – Gruppenführerin, zwei Truppführer, neun Helferinnen und Helfer.<br><small>gesprochen: Seite drei: das Personal. Die zwölf Plätze aus der Schtan stehen schon da – Gruppenführerin, zwei Truppführer, neun Helferinnen und Helfer.</small> |  | 10.9 s ab 01:20 (App) |
-| a09 | Erzähler | Statt jeden Namen einzeln zu tippen, fügen wir die Liste aus dem Ortsverband ein. Die App verteilt sie auf die Karten. |  | 7.2 s ab 01:32 (App) |
-| a10 | Erzähler | Die Stärke rechnet sie dabei selbst: null, drei, neun – Gesamt zwölf. Geschlecht und Verpflegung zählen später für Unterbringung und Küche. Und für Rückfragen trägt die Gruppenführerin ihre Handynummer ein. |  | 16.1 s ab 01:45 (App) |
+| a08 | Erzähler | Seite drei: das Personal. Die zwölf Plätze aus der StAN stehen schon da – Gruppenführerin, zwei Truppführer, neun Helferinnen und Helfer.<br><small>gesprochen: Seite drei: das Personal. Die zwölf Plätze aus der Schtan stehen schon da – Gruppenführerin, zwei Truppführer, neun Helferinnen und Helfer.</small> |  | 10.9 s ab 01:19 (App) |
+| a09 | Erzähler | Statt jeden Namen einzeln zu tippen, fügen wir die Liste aus dem Ortsverband ein. Die App verteilt sie auf die Karten. |  | 7.2 s ab 01:31 (App) |
+| a10 | Erzähler | Die Stärke rechnet sie dabei selbst: null, drei, neun – Gesamt zwölf. Geschlecht und Verpflegung zählen später für Unterbringung und Küche. Und für Rückfragen trägt die Gruppenführerin ihre Handynummer ein. |  | 16.1 s ab 01:44 (App) |
 
 ### Szene „fahrzeuge“
 
@@ -162,8 +162,8 @@ Musikbett: „werkstatt“ – Instrumental corporate explainer background: ligh
 
 | Nr. | Sprecher | Text | Funk | Dauer |
 | --- | --- | --- | --- | --- |
-| a11 | Erzähler | Seite vier: die Fahrzeuge. Auch sie kommen aus der StAN – mit taktischem Zeichen und fertigem Funkrufnamen: Heros Oldenburg 48/43 für den LKW, 48/34 für den Mannschaftslastwagen.<br><small>gesprochen: Seite vier: die Fahrzeuge. Auch sie kommen aus der Schtan – mit taktischem Zeichen und fertigem Funkrufnamen: Heros Oldenburg achtundvierzig dreiundvierzig für den LKW, achtundvierzig vierunddreißig für den Mannschaftslastwagen.</small> |  | 16.1 s ab 02:07 (App) |
-| a12 | Erzähler | Wir ergänzen nur die Kennzeichen. Fehlt etwas, sagt es die App sofort – und rechnet nebenbei, ob die Sitzplätze für die Mannschaft reichen. |  | 9.0 s ab 02:24 (App) |
+| a11 | Erzähler | Seite vier: die Fahrzeuge. Auch sie kommen aus der StAN – mit taktischem Zeichen und fertigem Funkrufnamen: Heros Oldenburg 48/43 für den LKW, 48/34 für den Mannschaftslastwagen.<br><small>gesprochen: Seite vier: die Fahrzeuge. Auch sie kommen aus der Schtan – mit taktischem Zeichen und fertigem Funkrufnamen: Heros Oldenburg achtundvierzig dreiundvierzig für den LKW, achtundvierzig vierunddreißig für den Mannschaftslastwagen.</small> |  | 16.1 s ab 02:06 (App) |
+| a12 | Erzähler | Wir ergänzen nur die Kennzeichen. Fehlt etwas, sagt es die App sofort – und rechnet nebenbei, ob die Sitzplätze für die Mannschaft reichen. |  | 9.0 s ab 02:23 (App) |
 
 ### Szene „sofortbedarf“
 
@@ -171,7 +171,7 @@ Musikbett: „werkstatt“ – Instrumental corporate explainer background: ligh
 
 | Nr. | Sprecher | Text | Funk | Dauer |
 | --- | --- | --- | --- | --- |
-| a13 | Erzähler | Seite fünf: der Sofortbedarf. Verpflegung für zwölf Personen, dreihundert Liter Diesel für die Pumpen. Nur anhaken, was die Einheit wirklich braucht – der Meldekopf zählt es über alle Einheiten zusammen. |  | 13.9 s ab 02:38 (App) |
+| a13 | Erzähler | Seite fünf: der Sofortbedarf. Verpflegung für zwölf Personen, dreihundert Liter Diesel für die Pumpen. Nur anhaken, was die Einheit wirklich braucht – der Meldekopf zählt es über alle Einheiten zusammen. |  | 13.9 s ab 02:37 (App) |
 
 ### Szene „uebersicht“
 
@@ -179,8 +179,8 @@ Musikbett: „werkstatt“ – Instrumental corporate explainer background: ligh
 
 | Nr. | Sprecher | Text | Funk | Dauer |
 | --- | --- | --- | --- | --- |
-| a14 | Erzähler | Die Gesamtübersicht zeigt den ganzen Bogen auf einer Seite – und prüft ihn: alle Angaben vollständig und plausibel. Jeder Abschnitt lässt sich hier noch nachbearbeiten. |  | 11.7 s ab 02:53 (App) |
-| a15 | Erzähler | Die PDF-Vorschau zeigt den Bogen im gewohnten Papier-Layout. Wer drucken will, druckt. Am Ende der PDF steht der QR-Code.<br><small>gesprochen: Die Pe-De-Eff-Vorschau zeigt den Bogen im gewohnten Papier-Layout. Wer drucken will, druckt. Am Ende der Pe-De-Eff steht der QR-Code.</small> |  | 9.1 s ab 03:05 (App) |
+| a14 | Erzähler | Die Gesamtübersicht zeigt den ganzen Bogen auf einer Seite – und prüft ihn: alle Angaben vollständig und plausibel. Jeder Abschnitt lässt sich hier noch nachbearbeiten. |  | 11.7 s ab 02:52 (App) |
+| a15 | Erzähler | Die PDF-Vorschau zeigt den Bogen im gewohnten Papier-Layout. Wer drucken will, druckt. Am Ende der PDF steht der QR-Code.<br><small>gesprochen: Die Pe-De-Eff-Vorschau zeigt den Bogen im gewohnten Papier-Layout. Wer drucken will, druckt. Am Ende der Pe-De-Eff steht der QR-Code.</small> |  | 9.1 s ab 03:04 (App) |
 
 ### Szene „uebergabe“
 
@@ -188,7 +188,7 @@ Musikbett: „werkstatt“ – Instrumental corporate explainer background: ligh
 
 | Nr. | Sprecher | Text | Funk | Dauer |
 | --- | --- | --- | --- | --- |
-| a16 | Erzähler | Der komplette Bogen steckt in diesem Code. Kein Server, kein Netz, keine Kopplung – die Gegenstelle scannt ihn vom Display oder vom Papier. |  | 10.3 s ab 03:15 (App) |
+| a16 | Erzähler | Der komplette Bogen steckt in diesem Code. Kein Server, kein Netz, keine Kopplung – die Gegenstelle scannt ihn vom Display oder vom Papier. |  | 10.3 s ab 03:14 (App) |
 
 ### Szene „meldekopf“
 
@@ -196,9 +196,9 @@ Musikbett: „werkstatt“ – Instrumental corporate explainer background: ligh
 
 | Nr. | Sprecher | Text | Funk | Dauer |
 | --- | --- | --- | --- | --- |
-| a17 | Erzähler | Zurück am Meldekopf. Dort läuft dieselbe App – mit einer Einsatz-Sammlung: „Hochwasser Hunte“. |  | 6.4 s ab 03:29 (App) |
-| a18 | Erzähler | Delmenhorst, Cloppenburg und Westerstede sind schon drin. Jetzt kommt der Oldenburger Bogen dazu – und die Stärke aller anwesenden Einheiten wird sofort neu gerechnet, der Sofortbedarf gleich mit. |  | 13.5 s ab 03:37 (App) |
-| a19 | Erzähler | Für die Weitermeldung an die Einsatzleitung gibt es das Sammel-PDF und CSV-Listen. Und wer eine Einheit nur im Stehen aufnimmt, nutzt die Schnellerfassung: nur Stärke, Führungskraft, Fahrzeuge.<br><small>gesprochen: Für die Weitermeldung an die Einsatzleitung gibt es das Sammel-Pe-De-Eff und C-S-V-Listen. Und wer eine Einheit nur im Stehen aufnimmt, nutzt die Schnellerfassung: nur Stärke, Führungskraft, Fahrzeuge.</small> |  | 15.1 s ab 03:51 (App) |
+| a17 | Erzähler | Zurück am Meldekopf. Dort läuft dieselbe App – mit einer Einsatz-Sammlung: „Hochwasser Hunte“. |  | 6.4 s ab 03:28 (App) |
+| a18 | Erzähler | Delmenhorst, Cloppenburg und Westerstede sind schon drin. Jetzt kommt der Oldenburger Bogen dazu – und die Stärke aller anwesenden Einheiten wird sofort neu gerechnet, der Sofortbedarf gleich mit. |  | 13.5 s ab 03:36 (App) |
+| a19 | Erzähler | Für die Weitermeldung an die Einsatzleitung gibt es das Sammel-PDF und CSV-Listen. Und wer eine Einheit nur im Stehen aufnimmt, nutzt die Schnellerfassung: nur Stärke, Führungskraft, Fahrzeuge.<br><small>gesprochen: Für die Weitermeldung an die Einsatzleitung gibt es das Sammel-Pe-De-Eff und C-S-V-Listen. Und wer eine Einheit nur im Stehen aufnimmt, nutzt die Schnellerfassung: nur Stärke, Führungskraft, Fahrzeuge.</small> |  | 15.1 s ab 03:50 (App) |
 
 ## Block 3 · Comic: Abspann
 
