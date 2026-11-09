@@ -22,7 +22,7 @@ export interface Aenderung {
  */
 export const MONATE: Readonly<Record<string, string>> = {
   "2026-11":
-    "Rückmeldungen aus der Erprobung (FAG THW, OV Chemnitz): Stärke als 0 / 2 / 9 // 11, PDF im Raster der THW-Word-Vorlage mit THW-Logo und gezeichneten Kästchen, Fachzug Logistik nach StAN mit einzeln meldbaren Trupps, Ladungsträger wie Abrollbehälter, Funkrufname als Erreichbarkeit, Import ausgefüllter THW-Word-Bögen und dieser Änderungsverlauf. Die Excel-Liste „Oldenburg“ entfällt.",
+    "Rückmeldungen aus der Erprobung (FAG THW, OV Chemnitz): Stärke als 0 / 2 / 9 // 11, PDF im Raster der THW-Word-Vorlage mit Logo der Organisation und gezeichneten Kästchen, Fachzug Logistik nach StAN mit einzeln meldbaren Trupps, Ladungsträger wie Abrollbehälter, Funkrufname als Erreichbarkeit, Import ausgefüllter THW-Word-Bögen und dieser Änderungsverlauf. Die Excel-Liste „Oldenburg“ entfällt.",
   "2026-10":
     "Viele Prüfrunden aus Sicht von Helfern, Führungskräften und Meldekopf: sicherere Bedienung, Lagemonitor für den Bildschirm im Führungsfahrzeug, Dienststelle und Beruf je Person, USB-Handscanner überall, Einsatzzeitraum mit Uhrzeit und ein schnellerer Start.",
   "2026-09":
@@ -40,6 +40,7 @@ export const AENDERUNGEN: readonly Aenderung[] = [
       "Ausgefüllte THW-Word-Erfassungsbögen (.docx aus den Vorlagen 06-…_Erfassungsbogen) lassen sich über „Aus Datei laden…“ und „Bögen einlesen…“ übernehmen. Was keinem Feld zuzuordnen ist (etwa Fax, Zahl der Vegetarier), steht unter „Sonstiges“; eine Quittung nennt, was übernommen und was weggelassen wurde.",
       "PDF im Raster der THW-Word-Vorlage: gleiche Rahmen, Linien, Spaltenkanten, Zeilenhöhen und Seitenränder, Schrift 10 pt. Fahrzeuge und Sofortbedarf schließen wie auf dem Papierbogen direkt aneinander an.",
       "Titelzeile im PDF wie in der Vorlage: links das Kurzzeichen der Einheit, in der Mitte der Titel auf der Kennfarbe, rechts beim THW das THW-Logo, bei allen anderen der Name der Organisation. THW-Bögen tragen das Blau der Vorlage.",
+      "Im PDF steht rechts in der Titelzeile jetzt auch beim ASB, bei der Bundeswehr, der DLRG, den Johannitern und den Maltesern das Logo der Organisation. DRK, Feuerwehr, Polizei und alle übrigen behalten ihren Namen als Text.",
       "Ankreuzkästchen im PDF sind gezeichnete Quadrate wie in Word, angekreuzt mit einem X, statt „[X]“ als Text.",
       "Personen-, Fahrzeug- und Qualifikationstabellen bleiben so lang wie nötig; der Kopf der Personentabelle steht auf jeder Seite.",
       "Blanko-Vordruck: 25 Personalzeilen statt 29, damit er bei den höheren Zeilen der Vorlage auf zwei Seiten bleibt.",

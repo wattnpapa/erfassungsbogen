@@ -22,9 +22,10 @@ import {
   zeitpunktAusIso,
   type Erfassungsbogen,
 } from "@bos/eeb-format/model";
-import { einheitAnzeigename, neuePerson, neuerBogen, neuesFahrzeug, zeitgruppe, type QrSatz } from "./hilfen";
+import { einheitAnzeigename, orgLabel, neuePerson, neuerBogen, neuesFahrzeug, zeitgruppe, type QrSatz } from "./hilfen";
 import { EEB_JSON_DATEINAME, aenderungFuerPapier, bogenAlsEingebetteteDatei, einsatzLageblattDokument, einsatzPdfDokument, pdfDokument, stiftHinweis, STIFT_KAESTCHEN, codeKopfzeile, meldekopfVermerk, ohneVorbelegung, erreichbarkeitZeilen, nichtDarstellbareNamen, nichtDarstellbareBetroffene, ansprechpersonPapier, umschrift, umschriftBetroffene } from "./pdf-dokument";
 import { THW_LOGO_JPEG } from "./pdf-logo-thw";
+import { ORG_LOGOS } from "./pdf-logos";
 
 const QR_BILD = "data:image/png;base64,QRTESTBILD";
 const QR_URL = "https://erfassungsbogen.app/#TESTPAYLOAD";
@@ -1080,6 +1081,33 @@ describe("Titelbalken im Raster der THWin-Vorlage", () => {
     expect(t).not.toContain(THW_LOGO_JPEG);
     expect(t).toContain('"text":"Feuerwehr"');
     expect(t).toContain("Freiwillige Feuerwehr Musterstadt");
+  });
+
+  it.each([
+    OrganisationsTyp.ASB,
+    OrganisationsTyp.BUNDESWEHR,
+    OrganisationsTyp.DLRG,
+    OrganisationsTyp.JUH,
+    OrganisationsTyp.MHD,
+  ])("Organisation %i mit bekanntem Logo: Logo als Vektor statt Name, Gliederung darunter", (org) => {
+    const b = basisBogen();
+    b.einheit.organisation = org;
+    b.einheit.organisationName = "Kreisverband Musterstadt";
+    const logo = ORG_LOGOS[org]!;
+    const t = JSON.stringify(pdfDokument(b, QR).content);
+    expect(t).toContain(JSON.stringify(logo.svg));
+    expect(t).not.toContain(THW_LOGO_JPEG);
+    expect(t).not.toContain(`"text":"${orgLabel(org)}"`);
+    expect(t).toContain("Kreisverband Musterstadt");
+  });
+
+  it("Logos passen in den Platz der THW-Marke und kommen ohne Stylesheet aus", () => {
+    for (const logo of Object.values(ORG_LOGOS)) {
+      expect(logo.breite).toBeLessThanOrEqual(96);
+      expect(logo.hoehe).toBeLessThanOrEqual(19);
+      // pdfmake (svg-to-pdfkit) zeichnet weder <style>/class noch <switch>.
+      expect(logo.svg).not.toMatch(/<style|class=|<switch|<foreignObject/);
+    }
   });
 
   it("Vordruck: weder Logo noch Organisation, nur die Beschriftung zum Ausfüllen", () => {

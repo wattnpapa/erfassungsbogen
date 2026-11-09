@@ -97,6 +97,7 @@ import { fahrzeugSymbolSvg } from "./taktische-zeichen-bogen";
 import { sitzplaetzeRichtwert } from "@bos/vokabulare/sitzplaetze";
 import { orgFarbePapier } from "./org-farben";
 import { THW_LOGO_BREITE, THW_LOGO_HOEHE, THW_LOGO_JPEG } from "./pdf-logo-thw";
+import { ORG_LOGOS } from "./pdf-logos";
 import { BERUF_PRAEFIX, berufText, qualifikationenUndBerufe } from "./beruf";
 import {
   UEBUNG_BREITE,
@@ -3564,8 +3565,9 @@ export function pdfDokument(
 
   /**
    * Titelbalken wie in der Vorlage: links das Kurzzeichen der Einheit, in der
-   * Mitte der Titel weiß auf der Kennfarbe, rechts beim THW die Wortbildmarke,
-   * bei allen anderen der Name der Organisation.
+   * Mitte der Titel weiß auf der Kennfarbe, rechts das Logo der Organisation
+   * (THW: Wortbildmarke aus der Vorlage; ASB, Bundeswehr, DLRG, JUH, MHD:
+   * pdf-logos.ts), bei allen ohne Logo der Name der Organisation als Text.
    */
   // Kurzzeichen links im Titelbalken (in der Vorlage „Fb Fü 6 / K (A)“): Die
   // Spalte ist nur 56 pt breit. Kurze Zeichen wie „FGr K (A)“ stehen in 10 pt,
@@ -3577,6 +3579,10 @@ export function pdfDokument(
   const titelZeile = (): Content => {
     const mitte = (extra: Partial<TableCell>): TableCell =>
       ({ alignment: "center", verticalAlignment: "middle", ...extra }) as TableCell;
+    const orgName: Content[] = b.einheit.organisationName
+      ? [{ text: weichUmbrechen(b.einheit.organisationName), fontSize: 7, color: farbe.akzent }]
+      : [];
+    const logo = ORG_LOGOS[org];
     const rechts: TableCell = blanko
       ? mitte({ text: "Organisation:", bold: true, alignment: "left" })
       : org === OrganisationsTyp.THW
@@ -3588,19 +3594,20 @@ export function pdfDokument(
                 height: THW_LOGO_HOEHE,
                 alignment: "center",
               },
-              ...(b.einheit.organisationName
-                ? [{ text: weichUmbrechen(b.einheit.organisationName), fontSize: 7, color: farbe.akzent }]
-                : []),
+              ...orgName,
             ],
           })
-        : mitte({
-            stack: [
-              { text: orgLabel(org), bold: true, fontSize: 11, color: farbe.akzent },
-              ...(b.einheit.organisationName
-                ? [{ text: weichUmbrechen(b.einheit.organisationName), fontSize: 7, color: farbe.akzent }]
-                : []),
-            ],
-          });
+        : logo
+          ? mitte({
+              stack: [
+                // 1 pt Luft: ASB und Malteser reichen bis an den unteren Rand ihrer Zeichenfläche.
+                { svg: logo.svg, width: logo.breite, height: logo.hoehe, alignment: "center", margin: [0, 0, 0, 1] },
+                ...orgName,
+              ],
+            })
+          : mitte({
+              stack: [{ text: orgLabel(org), bold: true, fontSize: 11, color: farbe.akzent }, ...orgName],
+            });
     return {
       layout: { ...tabLayout, paddingLeft: () => 2, paddingRight: () => 2 },
       fontSize: schrift,
