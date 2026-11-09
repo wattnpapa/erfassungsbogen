@@ -15,6 +15,10 @@ import { stempelZeitpunkt } from "./datenschutz-uhr";
 import { EinheitZeichen } from "./zeichen-bild";
 import { zeigeHinweis } from "./dialoge";
 import { FehlerImBild } from "./fehler-im-bild";
+// Als Datei-URL, nicht als Modul: Der Index (rund 190 KB) lädt erst beim ersten Suchen
+// und zählt weder ins Start- noch ins JS-Bündel (scripts/beispiele-suchindex.mts).
+import SUCHINDEX_URL from "./beispiele-suchindex.json?url";
+import { suchNorm, treffer, woerterVon } from "./beispiele-suche";
 
 // Anzeigenamen für die Ordner in examples/. Erste Ebene ist die Organisation
 // bzw. ein Thema (z. B. „Katastrophenschutz"), darunter können weitere Ebenen
@@ -222,58 +226,82 @@ function pfadMerken(p: string[]): void {
   }
 }
 
-/** Suchtext vereinheitlichen: klein, Umlaute ausgeschrieben, nur Buchstaben und Ziffern. */
-const NORM_CACHE = new Map<string, string>();
-function suchNorm(t: string): string {
-  let n = NORM_CACHE.get(t);
-  if (n === undefined) {
-    n = t
-      .toLocaleLowerCase("de-DE")
-      .replace(/ä/g, "ae")
-      .replace(/ö/g, "oe")
-      .replace(/ü/g, "ue")
-      .replace(/ß/g, "ss")
-      .replace(/[^a-z0-9]+/g, " ")
-      .trim();
-    NORM_CACHE.set(t, n);
-  }
-  return n;
-}
-
 const SUCHE_MAX_ORDNER = 20;
 const SUCHE_MAX_BOEGEN = 60;
 
+/** Inhalt von beispiele-suchindex.json (siehe scripts/beispiele-suchindex.mts). */
+interface Suchindex {
+  typen: Record<string, string>;
+  ov: Record<string, number>;
+  boegen: Record<string, string>;
+}
+let suchindex: Suchindex | null = null;
+let suchindexVersprechen: Promise<Suchindex | null> | null = null;
+/** Index einmal holen; ohne Netz und ohne Vorrat sucht der Dialog nur in Ordner- und Dateinamen. */
+function suchindexLaden(): Promise<Suchindex | null> {
+  suchindexVersprechen ??= fetch(SUCHINDEX_URL)
+    .then((r) => (r.ok ? (r.json() as Promise<Suchindex>) : null))
+    .then((i) => (suchindex = i))
+    .catch(() => {
+      suchindexVersprechen = null;
+      return null;
+    });
+  return suchindexVersprechen;
+}
+
+/** Suchwörter eines Bogens: Ordner, Dateiname, Zug und, wenn geladen, Einheitstyp und Orte aus dem Index. */
+function bogenWoerter(b: BeispielEintrag): string[] {
+  const teile = [...b.ordner.map(ordnerLabel), ...b.ordner, b.datei, zugHinweis(b.datei)];
+  if (suchindex) {
+    const code = suchindex.ov[b.datei];
+    teile.push(code != null ? (suchindex.typen[String(code)] ?? "") : (suchindex.boegen[[...b.ordner, b.datei].join("/")] ?? ""));
+  }
+  return woerterVon(teile.join(" "));
+}
+
 /**
- * Suche über Ordnernamen und Dateinamen aller Beispielbögen (Prüfrunde
- * Beispielbögen, BB-S2, BB-K4, BB-W8): Ein OV war nur über LV › RSt › OV zu
- * finden, also mit Wissen um die Regionalstelle. Jedes Wort muss vorkommen.
- * Ordner: der kürzeste Pfad, dessen Beschriftungen alle Wörter tragen.
+ * Suche über Ordner, Dateinamen und den Suchindex (Einheitstyp, Träger, Orte).
+ * Ordner: jeder, dessen eigener Name ein Suchwort trägt und dessen Pfad alle
+ * trägt — so steht bei „Oldenburg" die RSt UND der OV da (BB2-S1, BB2-N6).
+ * Sortiert nach Güte; Bögen mit ganzem Wort vor Wortanfängen.
  */
 function suchTreffer(q: string): { ordner: string[][]; boegen: BeispielEintrag[]; mehr: boolean } {
-  const woerter = suchNorm(q).split(" ").filter(Boolean);
-  if (woerter.length === 0) return { ordner: [], boegen: [], mehr: false };
-  const passt = (text: string) => woerter.every((w) => text.includes(w));
-  const ordner = new Map<string, string[]>();
-  const boegen: BeispielEintrag[] = [];
-  let mehr = false;
+  const such = woerterVon(q);
+  if (such.length === 0) return { ordner: [], boegen: [], mehr: false };
+  const ordner = new Map<string, { pfad: string[]; punkte: number }>();
+  const boegen: { b: BeispielEintrag; punkte: number }[] = [];
   for (const b of BEISPIELE) {
-    let text = "";
+    const pfadWoerter: string[] = [];
     for (let i = 0; i < b.ordner.length; i++) {
-      text += ` ${suchNorm(ordnerLabel(b.ordner[i]!))} ${suchNorm(b.ordner[i]!)}`;
-      if (passt(text)) {
-        const pfad = b.ordner.slice(0, i + 1);
-        ordner.set(pfad.join("/"), pfad);
-        break;
+      const eigene = woerterVon(`${ordnerLabel(b.ordner[i]!)} ${b.ordner[i]!}`);
+      pfadWoerter.push(...eigene);
+      const schluessel = b.ordner.slice(0, i + 1).join("/");
+      if (ordner.has(schluessel)) continue;
+      const punkte = treffer(such, pfadWoerter);
+      if (punkte >= 0 && such.some((w) => eigene.some((t) => t.startsWith(w)))) {
+        ordner.set(schluessel, { pfad: b.ordner.slice(0, i + 1), punkte });
       }
     }
-    if (passt(`${text} ${suchNorm(b.datei)}`)) {
-      if (boegen.length < SUCHE_MAX_BOEGEN) boegen.push(b);
-      else mehr = true;
-    }
+    const punkte = treffer(such, bogenWoerter(b));
+    if (punkte >= 0) boegen.push({ b, punkte });
   }
-  const liste = [...ordner.values()].sort((a, b) => a.length - b.length || a.map(ordnerLabel).join(" ").localeCompare(b.map(ordnerLabel).join(" "), "de"));
-  if (liste.length > SUCHE_MAX_ORDNER) mehr = true;
-  return { ordner: liste.slice(0, SUCHE_MAX_ORDNER), boegen, mehr };
+  const ordnerListe = [...ordner.values()].sort((x, y) => y.punkte - x.punkte || y.pfad.length - x.pfad.length || x.pfad.map(ordnerLabel).join(" ").localeCompare(y.pfad.map(ordnerLabel).join(" "), "de"));
+  boegen.sort((x, y) => y.punkte - x.punkte || nachDatei(x.b, y.b));
+  return {
+    ordner: ordnerListe.slice(0, SUCHE_MAX_ORDNER).map((o) => o.pfad),
+    boegen: boegen.slice(0, SUCHE_MAX_BOEGEN).map((x) => x.b),
+    mehr: ordnerListe.length > SUCHE_MAX_ORDNER || boegen.length > SUCHE_MAX_BOEGEN,
+  };
+}
+
+/** Kurzer Ort eines Ordnertreffers: die zwei Ebenen darüber, ohne die immer gleichen THW-Sammelordner (BB2-M4). */
+function ordnerHerkunft(pfad: string[]): string {
+  return pfad
+    .slice(0, -1)
+    .filter((seg) => seg !== "ortsverbaende")
+    .slice(-2)
+    .map(ordnerLabel)
+    .join(" › ");
 }
 
 /** Beispielbogen-JSON laden (gecacht) und auf das aktuelle Schema heben. */
@@ -418,7 +446,7 @@ export default function BeispieleDialog({ anfrage, onBogenOeffnen, onAlsUebung }
    */
   onBogenOeffnen: (bogen: Erfassungsbogen) => Promise<boolean>;
   /** Alle Bögen des offenen Ordners in eine neue Übungs-Sammlung legen (BB-K1). Ohne Angabe fehlt der Knopf. */
-  onAlsUebung?: (boegen: Erfassungsbogen[], ordnerName: string) => Promise<boolean>;
+  onAlsUebung?: (boegen: { bogen: Erfassungsbogen; zug?: string }[], ordnerName: string) => Promise<boolean>;
 }) {
   const beispiele = useRef<HTMLDialogElement>(null);
   // Ordner-Navigation im Beispielbögen-Dialog: erst Organisation/Thema, ggf.
@@ -438,6 +466,13 @@ export default function BeispieleDialog({ anfrage, onBogenOeffnen, onAlsUebung }
     setBeispielPfad(p);
     pfadMerken(p);
   }
+  /** Ordnerwechsel per Tipp: ein zweiter Tipp innerhalb von 400 ms ist ein Doppeltipp und zählt nicht (BB-E6, BB2-E2). */
+  function tippWechsel(p: string[]) {
+    if (performance.now() - letzterWechsel.current < 400) return;
+    pfadSetzen(p);
+  }
+  // Suchtext, aus dem ein Ordnertreffer geöffnet wurde — für „‹ Zur Suche" (BB2-S7, BB2-H5).
+  const [ausSuche, setAusSuche] = useState("");
   const pfadAktuell = useRef(beispielPfad);
   pfadAktuell.current = beispielPfad;
   const sucheAktuell = useRef(beispielSuche);
@@ -458,6 +493,8 @@ export default function BeispieleDialog({ anfrage, onBogenOeffnen, onAlsUebung }
   // Zeit des letzten Ordnerwechsels: Ein Doppeltipp auf ein Register öffnete
   // sonst mit dem zweiten Tipp einen Unterordner (BB-E6).
   const letzterWechsel = useRef(0);
+  // Wann der Dialog aufging: Der Sammelknopf nimmt kurz danach keinen Tipp an (Doppeltipp auf „Beispielbögen ansehen").
+  const geoeffnetUm = useRef(0);
   // Der Dialog lädt die Bögen des offenen Ordners nach, um Einheit, Herkunft
   // und Stärke in der Tabelle zu zeigen. Die Tabelle rendert ausschließlich aus
   // `beispielDaten` (URL → Bogen) — der Modul-Cache ist nur die Abkürzung beim
@@ -484,6 +521,15 @@ export default function BeispieleDialog({ anfrage, onBogenOeffnen, onAlsUebung }
   const beispielPfadSchluessel = beispielPfad.join("/");
   // Anzeigestand: Suche oder offener Ordner. Hängt mittelbar auch am
   // nachgeladenen Ordner der Ortsverbände (ovBeispieleStand löst das Neurechnen aus).
+  const [, setSuchindexDa] = useState(suchindex != null);
+  useEffect(() => {
+    if (beispielSuche.trim().length < 2 || suchindex) return;
+    let aktiv = true;
+    void suchindexLaden().then((i) => aktiv && i && setSuchindexDa(true));
+    return () => {
+      aktiv = false;
+    };
+  }, [beispielSuche]);
   const suchErgebnis = beispielSuche.trim().length >= 2 ? suchTreffer(beispielSuche) : null;
   const beispielOrdner = suchErgebnis ? [] : unterordner(beispielPfad);
   const beispielBoegen = suchErgebnis ? suchErgebnis.boegen : boegenHier(beispielPfad);
@@ -690,13 +736,21 @@ export default function BeispieleDialog({ anfrage, onBogenOeffnen, onAlsUebung }
   /** Alle Bögen des offenen Ordners in eine neue Übungs-Sammlung (BB-K1, BB-W4, BB-A1). */
   async function alleAlsUebung() {
     if (!onAlsUebung) return;
+    // Ein Doppeltipp auf ein Register traf mit dem zweiten Tipp diesen Knopf und
+    // legte ohne Rückfrage eine Sammlung an (Runde 2, BB2-G2, BB2-E2).
+    if (performance.now() - Math.max(letzterWechsel.current, geoeffnetUm.current) < 800) return;
     setBeispielFehler("");
     setBeispielLaeuft("*alle*");
     const sitzung = beispielSitzung.current;
     try {
-      const boegen = await Promise.all(beispielBoegen.map(({ url }) => beispielKopie(url)));
+      // Der Zug aus dem Dateinamen (2. TZ, FZ FK, FZ Log) reist mit: Ohne ihn legte die Sammlung
+      // die Einheiten des 2. TZ als Folgemeldung auf die des 1. (BB2-K1) und führte sie „ohne Zug".
+      const boegen = await Promise.all(
+        beispielBoegen.map(async ({ url, datei }) => ({ bogen: await beispielKopie(url), zug: zugHinweis(datei) || undefined })),
+      );
       if (beispielSitzung.current !== sitzung) return;
-      if (await onAlsUebung(boegen, beispielPfad.map(ordnerLabel).join(" › "))) beispiele.current?.close();
+      // Kurzer Name: der offene Ordner, nicht der ganze Pfad (bis 161 Zeichen, BB2-K3, BB2-A4).
+      if (await onAlsUebung(boegen, ordnerLabel(beispielPfad[beispielPfad.length - 1] ?? ""))) beispiele.current?.close();
     } catch (err) {
       setBeispielFehler(`Sammlung konnte nicht angelegt werden: ${fehlerText(err)}`);
     } finally {
@@ -711,7 +765,9 @@ export default function BeispieleDialog({ anfrage, onBogenOeffnen, onAlsUebung }
     const p = pfadLaden();
     setBeispielPfad(p.length === 0 || unterPfad(p).length > 0 || imOvOrdner(p) ? p : []);
     setBeispielSuche("");
+    setAusSuche("");
     setBeispielFehler("");
+    geoeffnetUm.current = performance.now();
     setBeispieleOffen(true);
     if (!beispiele.current?.open) beispiele.current?.showModal();
   }
@@ -764,25 +820,55 @@ export default function BeispieleDialog({ anfrage, onBogenOeffnen, onAlsUebung }
         {/* Pfadleiste: ein echter Zurück-Knopf plus der klickbare Pfad. Klebt
             unter der Kopfzeile; bei tiefen Ordnern stehen auf schmalen Geräten
             nur „Alle", „…" und die letzten zwei Ebenen. */}
+        {/* Pfadleiste: Zurück-Knopf und Pfad in EINER Zeile, auf jeder Breite und
+            Schriftgröße (Runde 2, BB2-M1, BB2-G1, BB2-M2, BB2-H1): tiefe Ordner
+            zeigen „Alle", „…" und die letzten zwei Ebenen, lange Namen enden mit
+            „…". Vorher wuchs die klebende Leiste bei 200 % auf 97 % des Dialogs. */}
         {!suchErgebnis && beispielPfad.length > 0 && (
           <nav className="beispiel-pfad" aria-label="Ordner">
-            <button type="button" onClick={() => pfadSetzen(beispielPfad.slice(0, -1))}>‹ Zurück</button>
+            {ausSuche ? (
+              <button
+                type="button"
+                onClick={() => {
+                  setBeispielSuche(ausSuche);
+                  setAusSuche("");
+                }}
+              >
+                ‹ Zur Suche
+              </button>
+            ) : (
+              <button type="button" onClick={() => tippWechsel(beispielPfad.slice(0, -1))}>‹ Zurück</button>
+            )}
             <ol>
               <li>
-                <button type="button" className="link" onClick={() => pfadSetzen([])}>Alle</button>
+                <button type="button" className="link" onClick={() => tippWechsel([])}>Alle</button>
               </li>
-              {beispielPfad.length > 2 && <li className="pfad-auslassung" aria-hidden="true">…</li>}
-              {beispielPfad.map((seg, i) => (
-                <li key={`${i}/${seg}`} className={beispielPfad.length > 2 && i < beispielPfad.length - 2 ? "pfad-mitte" : undefined}>
-                  {i === beispielPfad.length - 1 ? (
-                    <strong aria-current="location" tabIndex={-1}>{ordnerLabel(seg)}</strong>
-                  ) : (
-                    <button type="button" className="link" onClick={() => pfadSetzen(beispielPfad.slice(0, i + 1))}>
-                      {ordnerLabel(seg)}
-                    </button>
-                  )}
+              {beispielPfad.length > 2 && (
+                <li>
+                  <button
+                    type="button"
+                    className="link"
+                    aria-label={`Eine Ebene über „${ordnerLabel(beispielPfad[beispielPfad.length - 2]!)}“`}
+                    title={beispielPfad.slice(0, -2).map(ordnerLabel).join(" › ")}
+                    onClick={() => tippWechsel(beispielPfad.slice(0, -2))}
+                  >
+                    …
+                  </button>
                 </li>
-              ))}
+              )}
+              {beispielPfad.map((seg, i) =>
+                beispielPfad.length > 2 && i < beispielPfad.length - 2 ? null : (
+                  <li key={`${i}/${seg}`}>
+                    {i === beispielPfad.length - 1 ? (
+                      <strong aria-current="location" tabIndex={-1} title={ordnerLabel(seg)}>{ordnerLabel(seg)}</strong>
+                    ) : (
+                      <button type="button" className="link" title={ordnerLabel(seg)} onClick={() => tippWechsel(beispielPfad.slice(0, i + 1))}>
+                        {ordnerLabel(seg)}
+                      </button>
+                    )}
+                  </li>
+                ),
+              )}
             </ol>
           </nav>
         )}
@@ -801,6 +887,9 @@ export default function BeispieleDialog({ anfrage, onBogenOeffnen, onAlsUebung }
               {suchErgebnis.boegen.length === 1 ? "Bogen" : "Bögen"}
             </strong>
             {suchErgebnis.mehr && <span className="hinweis">Nicht alle Treffer gezeigt — genauer suchen, z. B. mit Einheit.</span>}
+            {suchErgebnis.ordner.length === 0 && suchErgebnis.boegen.length === 0 && (
+              <span className="hinweis">Nichts gefunden. Ort oder Einheit getrennt eingeben, z. B. „Bergungsgruppe Oldenburg“ oder „Zugtrupp Albstadt“.</span>
+            )}
             {ovLaedt && <span className="hinweis">Bögen der Ortsverbände werden noch geladen …</span>}
           </p>
         )}
@@ -808,8 +897,18 @@ export default function BeispieleDialog({ anfrage, onBogenOeffnen, onAlsUebung }
           <ul className="beispiel-register" aria-label="Gefundene Ordner">
             {suchErgebnis.ordner.map((pfad) => (
               <li key={`s/${pfad.join("/")}`}>
-                <button type="button" onClick={() => pfadSetzen(pfad)}>
-                  <span className="beispiel-register-name">{pfad.map(ordnerLabel).join(" › ")}</span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const q = beispielSuche;
+                    tippWechsel(pfad);
+                    setAusSuche(q);
+                  }}
+                >
+                  <span className="beispiel-register-name">
+                    {ordnerLabel(pfad[pfad.length - 1]!)}
+                    {ordnerHerkunft(pfad) && <span className="hinweis beispiel-register-herkunft">{ordnerHerkunft(pfad)}</span>}
+                  </span>
                   <span className="beispiel-register-zahl">
                     {unterPfad(pfad).length.toLocaleString("de-DE")} {unterPfad(pfad).length === 1 ? "Bogen" : "Bögen"}
                   </span>
@@ -821,17 +920,11 @@ export default function BeispieleDialog({ anfrage, onBogenOeffnen, onAlsUebung }
         {/* Ordner als Register: jede Zeile ganz antippbar, Name links, Bogenzahl
             rechts in der Datenschrift. Vorher eine Aufzählung unterstrichener
             Links mit der Zahl in Klammern. */}
-        {beispielOrdner.length > 0 && (
+        {(beispielOrdner.length > 0 || (ovLaedt && beispielPfad.length === 1 && beispielPfad[0] === "thw")) && (
           <ul className="beispiel-register" aria-label={beispielPfad.length === 0 ? "Organisation oder Thema" : "Unterordner"}>
             {beispielOrdner.map(({ ordner, anzahl }) => (
               <li key={`d/${ordner}`}>
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (performance.now() - letzterWechsel.current < 400) return; // Doppeltipp (BB-E6)
-                    pfadSetzen([...beispielPfad, ordner]);
-                  }}
-                >
+                <button type="button" onClick={() => tippWechsel([...beispielPfad, ordner])}>
                   <span className="beispiel-register-name">{ordnerLabel(ordner)}</span>
                   <span className="beispiel-register-zahl">
                     {/* THW zählt erst fertig, wenn die Ortsverbände da sind (BB-L H5, BB-N6). */}

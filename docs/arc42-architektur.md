@@ -1518,6 +1518,10 @@ Kein neuer Host zur Laufzeit; thw.blafusel.de ruft nur das Generatorskript mit `
 Ordnernavigation liegt in eigenem Baustein `src/app/beispiele-dialog.tsx`, den `fusszeile.tsx` beim ersten
 Öffnen per `lazy()` lädt (vorher Teil des Startbündels, das nach den Prüfrunden-Korrekturen über dem Budget lag).
 Beispiele werden beim Weitergeben auf heute gestellt (`src/app/beispiel-heute.ts`).
+*Nachgezogen 2026-11-09 (Runde 2):* `fusszeile.tsx` lädt den Baustein selbst (`import()` mit Fehlerfang statt
+`React.lazy`), damit ein Fehlschlag ohne Netz nicht die ganze App in den Fehlerfänger reißt. Die Suche nutzt einen
+Index `src/app/beispiele-suchindex.json` (Einheitstyp, Träger, Orte; erzeugt mit `npm run beispiele:suchindex`,
+geprüft von `beispiele-suche.test.ts`), der als Datei-URL erst beim ersten Suchen lädt und nicht ins JS-Bündel zählt.
 *Nachgezogen 2026-10-06 (Audit Runde 4, R4-O1):* Bricht das Erstladen im
 Funkloch ab, scheitert der Service Worker an der Installation, und der Browser
 verwirft die Registrierung; ein späteres `update()` ginge ins Leere und die

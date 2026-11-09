@@ -77,6 +77,25 @@ Doppel-Sammlungen), Nr. 3 (Pfadleiste deckeln und an der Dialoghöhe verkürzen)
 Nr. 4 (Suche über Einheitstyp und Ort aus einem kleinen Index), Nr. 5 (Generator der OV-Bögen: TZ im Namen),
 Nr. 6 (Beispiel-Stand mit dem Entwurf speichern), Nr. 7 (Stand je Tag statt je Erzeugung).
 
-## Stand der Behebung
+## Stand der Behebung (09.11.2026)
 
-Noch offen (09.11.2026).
+Behoben, Nr. 1 bis 6:
+
+1. `fusszeile.tsx` lädt den Dialog per `import()` mit Fehlerfang; ohne Netz kommt ein Hinweis, die App bleibt
+   stehen. Der Knopf „Beispielbögen ansehen" zeigt „werden geladen …", bis der Dialog offen ist.
+2. Sammelweg: Sperre 800 ms nach jedem Ordnerwechsel, Rückfrage „Übungs-Sammlung anlegen?", bei gleichem Namen
+   „Vorhandene öffnen" oder „Zweite anlegen"; Name nur noch der offene Ordner. Alle Ordnerwechsel per Tipp
+   (auch „‹ Zurück", „Alle", Pfad, Treffer) haben die 400-ms-Doppeltipp-Sperre.
+3. Pfadleiste immer einzeilig (`flex-wrap: nowrap`, Namen mit Ellipse), ab drei Ebenen „Alle › … › Eltern ›
+   Ordner" auf jeder Breite, „…" als Knopf, sichtbare Unterkante.
+4. Suchindex `src/app/beispiele-suchindex.json` (THW-Einheitstypen, sonst Freitext, Träger, Orte), Treffer nur
+   an Wortanfängen, Rangfolge nach Güte, Ordnertreffer für jede passende Ebene (RSt und OV) mit kurzem Namen
+   und Herkunft, Hinweis bei null Treffern, „‹ Zur Suche" aus einem Ordnertreffer.
+5. Sammelweg übergibt den Zug aus dem Dateinamen; Einheiten mit Zug bekommen einen eigenen Schlüssel und das
+   Zug-Etikett (zwei TZ eines OV bleiben getrennt). Gilt für den Sammelweg, nicht für „Bögen einlesen…".
+6. Unverändertes Beispiel als Prüfsumme in `eeb.beispiel-offen.v1` (localStorage) statt nur im
+   Arbeitsspeicher; „Bogen schließen" in der Übersicht warnt nicht mehr fälschlich.
+
+Mitbehoben: Nr. 11 (der Platzhalter für den OV-Ordner hing an `beispielOrdner.length > 0` und erschien nie).
+Tests: `beispiele-suche.test.ts` (Wortanfänge, Index vollständig), `app.test.tsx` (Neuladen, Sammelweg mit
+Rückfrage, Suchtreffer). Offen: Nr. 7 bis 10, 12 bis 17.

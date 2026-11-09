@@ -3,7 +3,7 @@
  * Aufbau angelehnt an sprechfunk-uebung.de (gleicher Autor).
  */
 
-import { Fragment, lazy, Suspense, useEffect, useRef, useState, type ChangeEvent, type ReactNode, type RefObject } from "react";
+import { Fragment, useEffect, useRef, useState, type ChangeEvent, type ReactNode, type RefObject } from "react";
 import type { Erfassungsbogen } from "@bos/eeb-format/model";
 import { istNativ, textTeilen } from "./nativ";
 import { fehlerText } from "./nachladen";
@@ -233,9 +233,24 @@ async function blankoHerunterladen(): Promise<void> {
  * Nachladen, Ordner-Navigation); die Startseite schickt nur dieses Ereignis.
  */
 const BEISPIELE_OEFFNEN = "eeb:beispielboegen-oeffnen";
-const BeispieleDialog = lazy(() => import("./beispiele-dialog"));
-export function beispielboegenOeffnen(): void {
-  window.dispatchEvent(new Event(BEISPIELE_OEFFNEN));
+type BeispieleKomponente = typeof import("./beispiele-dialog").default;
+/**
+ * Öffnet den Dialog; das Versprechen erfüllt sich, sobald er offen ist (true)
+ * oder sich nicht laden ließ (false). Der Knopf auf der Startseite zeigt so
+ * lange „wird geladen …" (Prüfrunde Beispielbögen, Runde 2, BB2-M5, BB2-E4).
+ */
+export function beispielboegenOeffnen(): Promise<boolean> {
+  return new Promise((fertig) => {
+    const sicherheit = window.setTimeout(() => fertig(false), 30_000); // niemand hört zu
+    window.dispatchEvent(
+      new CustomEvent(BEISPIELE_OEFFNEN, {
+        detail: (ok: boolean) => {
+          window.clearTimeout(sicherheit);
+          fertig(ok);
+        },
+      }),
+    );
+  });
 }
 
 export function Fusszeile({ onBogenOeffnen, onAlsUebung, kompakt = false, offlineHinweis }: {
@@ -249,7 +264,7 @@ export function Fusszeile({ onBogenOeffnen, onAlsUebung, kompakt = false, offlin
    * Alle Bögen des offenen Beispiel-Ordners in eine neue Übungs-Sammlung legen
    * (Prüfrunde Beispielbögen, BB-K1). Ohne Angabe fehlt der Knopf.
    */
-  onAlsUebung?: (boegen: Erfassungsbogen[], ordnerName: string) => Promise<boolean>;
+  onAlsUebung?: (boegen: { bogen: Erfassungsbogen; zug?: string }[], ordnerName: string) => Promise<boolean>;
   /**
    * Schmale Linkzeile statt voller Fußzeile — für den Assistenten. Beim
    * Ausfüllen gehören Datensicherung, „Alle Daten löschen" und 227
@@ -503,9 +518,32 @@ export function Fusszeile({ onBogenOeffnen, onAlsUebung, kompakt = false, offlin
   // beim ersten Öffnen — mit Ordnern, Suche und der Adressliste aller Beispiel-Dateien wäre
   // er sonst Teil jedes App-Starts (ADR-003, Bundle-Budget). Jede Anfrage zählt hoch.
   const [beispielAnfrage, setBeispielAnfrage] = useState(0);
+  // Der Baustein wird hier selbst geladen statt über React.lazy: Scheitert das
+  // Laden (ohne Netz, bevor der Offline-Vorrat fertig ist), warf lazy() den
+  // Fehler in den Fehlerfänger der App, und „Hier ist etwas schiefgelaufen"
+  // ersetzte alles, auch den eigenen Bogen (Prüfrunde Beispielbögen, Runde 2,
+  // BB2-O1, BB2-E3, BB2-N2). Jetzt sagt ein Hinweis, was fehlt.
+  const [BeispieleDialog, setBeispieleDialog] = useState<BeispieleKomponente | null>(null);
   useEffect(() => {
     if (kompakt) return;
-    const auf = () => setBeispielAnfrage((n) => n + 1);
+    const auf = (e: Event) => {
+      const fertig = (e as CustomEvent<((ok: boolean) => void) | undefined>).detail;
+      import("./beispiele-dialog").then(
+        (m) => {
+          setBeispieleDialog(() => m.default);
+          setBeispielAnfrage((n) => n + 1);
+          fertig?.(true);
+        },
+        async () => {
+          fertig?.(false);
+          await zeigeHinweis({
+            titel: "Beispielbögen noch nicht auf dem Gerät",
+            text:
+              "Die Beispielbögen lassen sich ohne Netz gerade nicht öffnen: Dieses Gerät hat den Offline-Vorrat noch nicht ganz geladen (siehe Offline-Zeile der Startseite). Dein Bogen und alle Daten bleiben, wie sie sind. Mit Netz die Seite einmal neu laden, danach gehen die Beispielbögen auch offline.",
+          });
+        },
+      );
+    };
     window.addEventListener(BEISPIELE_OEFFNEN, auf);
     return () => window.removeEventListener(BEISPIELE_OEFFNEN, auf);
   }, [kompakt]);
@@ -868,10 +906,8 @@ export function Fusszeile({ onBogenOeffnen, onAlsUebung, kompakt = false, offlin
         </div>
       </Dialog>
 
-      {beispielAnfrage > 0 && (
-        <Suspense fallback={null}>
-          <BeispieleDialog anfrage={beispielAnfrage} onBogenOeffnen={onBogenOeffnen} onAlsUebung={onAlsUebung} />
-        </Suspense>
+      {BeispieleDialog && beispielAnfrage > 0 && (
+        <BeispieleDialog anfrage={beispielAnfrage} onBogenOeffnen={onBogenOeffnen} onAlsUebung={onAlsUebung} />
       )}
 
       <Dialog titel="Über dieses Projekt" dialogRef={ueber}>

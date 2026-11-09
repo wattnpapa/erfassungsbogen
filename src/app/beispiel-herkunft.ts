@@ -64,3 +64,45 @@ export function beispielRestText(b: B): string {
   ];
   return teile.length ? `${teile.join(" und ")} stammen aus einem Beispiel- oder Übungsbogen und sind vermutlich erfunden.` : "";
 }
+
+/**
+ * Prüfsumme des über „Anzeigen" geöffneten, noch unveränderten Beispielbogens
+ * (Prüfrunde Beispielbögen, Runde 2, BB2-D2): Bisher stand sie nur im
+ * Arbeitsspeicher; nach dem Neuladen galt das Beispiel wieder als eigener
+ * Entwurf, und das nächste Beispiel bot an, den echten Bogen auf dem
+ * Rückholplatz „endgültig zu löschen". Gespeichert wird nur eine Zahl (FNV-1a
+ * über das JSON), keine Bogendaten; der Schlüssel fällt mit „Alle Daten
+ * löschen" (Präfix `eeb.`) und verschwindet, sobald kein Bogen mehr offen ist.
+ */
+export const BEISPIEL_OFFEN_SCHLUESSEL = "eeb.beispiel-offen.v1";
+
+function pruefsumme(b: unknown): string {
+  const s = JSON.stringify(b);
+  let h = 0x811c9dc5;
+  for (let i = 0; i < s.length; i++) {
+    h ^= s.charCodeAt(i);
+    h = Math.imul(h, 0x01000193) >>> 0;
+  }
+  return `${s.length}:${h.toString(16)}`;
+}
+
+/** Dieses Beispiel ist gerade unverändert geöffnet (null: nichts mehr merken). */
+export function beispielOffenMerken(b: unknown | null): void {
+  try {
+    if (b == null) localStorage.removeItem(BEISPIEL_OFFEN_SCHLUESSEL);
+    else localStorage.setItem(BEISPIEL_OFFEN_SCHLUESSEL, pruefsumme(b));
+  } catch {
+    /* gesperrt: dann gilt das Beispiel wie früher als gewöhnlicher Bogen */
+  }
+}
+
+/** Steht im Bogen noch genau das zuletzt über „Anzeigen" geöffnete Beispiel? */
+export function istUnveraendertesBeispiel(b: unknown | null): boolean {
+  if (b == null) return false;
+  try {
+    const gemerkt = localStorage.getItem(BEISPIEL_OFFEN_SCHLUESSEL);
+    return gemerkt != null && gemerkt === pruefsumme(b);
+  } catch {
+    return false;
+  }
+}
